@@ -120,7 +120,8 @@ public: // IHLTVServer interface:
 	IServer	*GetBaseServer( void );
 	IHLTVDirector *GetDirector( void );
 	int		GetHLTVSlot( void ); // return entity index-1 of HLTV in game
-	float	GetOnlineTime( void ); // seconds since broadcast started
+	// dimhotepus: float -> double
+	double	GetOnlineTime( void ); // seconds since broadcast started
 	void	GetLocalStats( int &proxies, int &slots, int &clients ); 
 	void	GetGlobalStats( int &proxies, int &slots, int &clients );
 	void	GetRelayStats( int &proxies, int &slots, int &clients );

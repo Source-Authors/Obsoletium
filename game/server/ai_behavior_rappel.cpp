@@ -353,7 +353,7 @@ void CAI_RappelBehavior::BeginRappel()
 		Vector forward;
 		GetOuter()->GetVectors( &forward, NULL, NULL );
 
-		CSoundEnt::InsertSound( SOUND_DANGER, tr.m_pEnt->EarPosition() - forward * 12.0f, 32.0f, 0.2f, GetOuter() );
+		CSoundEnt::InsertSound( SOUND_DANGER, tr.m_pEnt->EarPosition() - forward * 12.0f, 32, 0.2f, GetOuter() );
 	}
 }
 

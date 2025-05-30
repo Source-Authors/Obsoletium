@@ -151,7 +151,7 @@ void FX_ThumperDust( const CEffectData &data )
 			pParticle->m_uchStartSize	= flScale * 0.25f;
 			pParticle->m_uchEndSize		= flScale * 0.5f;
 
-			pParticle->m_flRoll			= random->RandomInt( 0, 360 );
+			pParticle->m_flRoll			= random->RandomFloat( 0, 360 );
 			pParticle->m_flRollDelta	= random->RandomFloat( -6.0f, 6.0f );
 		}
 	}

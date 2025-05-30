@@ -9,14 +9,8 @@
 
 #include "mathlib.h"
 
-#include <cstring>
-#include <cstdlib>
-#include <cmath>
-
-#include "minmax.h"
-
 static int current_ndims;
-static struct QuantizedValue *current_root;
+static QuantizedValue *current_root;
 static int current_ssize;
 
 static uint8 *current_weights;
@@ -25,13 +19,13 @@ double SquaredError;
 
 #define SPLIT_THEN_SORT 1
 
-static struct QuantizedValue *AllocQValue(void)
+[[nodiscard]] ALLOC_CALL static QuantizedValue *AllocQValue()
 {
-	struct QuantizedValue *ret=new QuantizedValue;
+	QuantizedValue *ret=new QuantizedValue;
 	ret->Samples=0;
 	ret->Children[0]=ret->Children[1]=0;
 	ret->NSamples=0;
-  
+
 	ret->ErrorMeasure=new double[current_ndims];
 	ret->Mean=new uint8[current_ndims];
 	ret->Mins=new uint8[current_ndims];
@@ -43,7 +37,7 @@ static struct QuantizedValue *AllocQValue(void)
 	return ret;
 }
 
-void FreeQuantization(struct QuantizedValue *t)
+void FreeQuantization(QuantizedValue *t)
 {
 	if (t)
 	{
@@ -60,8 +54,8 @@ void FreeQuantization(struct QuantizedValue *t)
 
 static int QNumSort(void const *a, void const *b)
 {
-	int32 as=((struct Sample *) a)->QNum;
-	int32 bs=((struct Sample *) b)->QNum;
+	int32 as=((const Sample *) a)->QNum;
+	int32 bs=((const Sample *) b)->QNum;
 	if (as==bs) return 0;
 	return (as>bs)?1:-1;
 }
@@ -72,8 +66,8 @@ static int current_sort_dim;
 
 static int samplesort(void const *a, void const *b)
 {
-	uint8 as=((struct Sample *) a)->Value[current_sort_dim];
-	uint8 bs=((struct Sample *) b)->Value[current_sort_dim];
+	uint8 as=((Sample *) a)->Value[current_sort_dim];
+	uint8 bs=((Sample *) b)->Value[current_sort_dim];
 	if (as==bs) return 0;
 	return (as>bs)?1:-1;
 }
@@ -82,30 +76,32 @@ static int samplesort(void const *a, void const *b)
 static int sortlong(void const *a, void const *b)
 {
 	// treat the entire vector of values as a long integer for duplicate removal.
-	return memcmp(((struct Sample *) a)->Value,
-				  ((struct Sample *) b)->Value,current_ndims);
+	return memcmp(((const Sample *) a)->Value,
+				  ((const Sample *) b)->Value,current_ndims);
 }
 
 
   
-#define NEXTSAMPLE(s) ( (struct Sample *) (((uint8 *) s)+current_ssize))
+#define NEXTSAMPLE(s) ( (Sample *) (((uint8 *) s)+current_ssize))
+// dimhotepus: Const-correct macro.
+#define NEXTSAMPLE_CONST(s) ( (const Sample *) (((const uint8 *) s)+current_ssize))
 #define SAMPLE(s,i) NthSample(s,i,current_ndims)
 
 static void SetNDims(int n)
 {
-	current_ssize=sizeof(struct Sample)+(n-1);
+	current_ssize=sizeof(Sample)+(n-1);
 	current_ndims=n;
 }
 
-int CompressSamples(struct Sample *s, int nsamples, int ndims)
+int CompressSamples(Sample *s, int nsamples, int ndims)
 {
 	SetNDims(ndims);
 	qsort(s,nsamples,current_ssize,sortlong);
 	// now, they are all sorted by treating all dimensions as a large number.
 	// we may now remove duplicates.
-	struct Sample *src=s;
-	struct Sample *dst=s;
-	struct Sample *lastdst=dst;
+	Sample *src=s;
+	Sample *dst=s;
+	Sample *lastdst=dst;
 	dst=NEXTSAMPLE(dst);		// copy first sample to get the ball rolling
 	src=NEXTSAMPLE(src);
 	int noutput=1;
@@ -126,7 +122,7 @@ int CompressSamples(struct Sample *s, int nsamples, int ndims)
 	return noutput;
 }
 
-void PrintSamples(struct Sample const *s, int nsamples, int ndims)
+void PrintSamples(Sample const *s, int nsamples, int ndims)
 {
 	SetNDims(ndims);
 	int cnt=0;
@@ -136,11 +132,11 @@ void PrintSamples(struct Sample const *s, int nsamples, int ndims)
 		for(int d=0;d<ndims;d++)
 			printf("%02x,",s->Value[d]);
 		printf("}\n");
-		s=NEXTSAMPLE(s);
+		s=NEXTSAMPLE_CONST(s);
 	}
 }
 
-void PrintQTree(struct QuantizedValue const *p,int idlevel)
+void PrintQTree(QuantizedValue const *p,int idlevel)
 {
 	int i;
 
@@ -172,7 +168,7 @@ void PrintQTree(struct QuantizedValue const *p,int idlevel)
 	}
 }
 
-static void UpdateStats(struct QuantizedValue *v)
+static void UpdateStats(QuantizedValue *v)
 {
 	// first, find mean
 	int32 Means[MAXDIMS];
@@ -184,7 +180,7 @@ static void UpdateStats(struct QuantizedValue *v)
 	int N=0;
 	for(i=0;i<v->NSamples;i++)
 	{
-		struct Sample *s=SAMPLE(v->Samples,i);
+		Sample *s=SAMPLE(v->Samples,i);
 		N+=s->Count;
 		for(j=0;j<current_ndims;j++)
 		{
@@ -199,7 +195,7 @@ static void UpdateStats(struct QuantizedValue *v)
 	}
 	for(i=0;i<v->NSamples;i++)
 	{
-		struct Sample *s=SAMPLE(v->Samples,i);
+		Sample *s=SAMPLE(v->Samples,i);
 		double c=s->Count;
 		for(j=0;j<current_ndims;j++)
 		{
@@ -224,9 +220,9 @@ static void UpdateStats(struct QuantizedValue *v)
 
 static int ErrorDim;
 static double ErrorVal;
-static struct QuantizedValue *ErrorNode;
+static QuantizedValue *ErrorNode;
 
-static void UpdateWorst(struct QuantizedValue *q)
+static void UpdateWorst(QuantizedValue *q)
 {
 	if (q->Children[0])
 	{
@@ -257,7 +253,7 @@ static int FindWorst(void)
 
 
 
-static void SubdivideNode(struct QuantizedValue *n, int whichdim)
+static void SubdivideNode(QuantizedValue *n, int whichdim)
 {
 	int NAdded=0;
 	int i;
@@ -274,12 +270,12 @@ static void SubdivideNode(struct QuantizedValue *n, int whichdim)
 	totsamps[0]=totsamps[1]=0;
 	uint8 minv=255;
 	uint8 maxv=0;
-	struct Sample *minS=0,*maxS=0;
+	Sample *minS=0,*maxS=0;
 	for(i=0;i<n->NSamples;i++)
 	{
 		uint8 v;
 		int whichside=1;
-		struct Sample *sl;
+		Sample *sl;
 		sl=SAMPLE(n->Samples,i);
 		v=sl->Value[whichdim];
 		if (v<minv) { minv=v; minS=sl; }
@@ -319,7 +315,7 @@ static void SubdivideNode(struct QuantizedValue *n, int whichdim)
 	{
 		double dist[2];
 		dist[0]=dist[1]=0.;
-		struct Sample *s=SAMPLE(n->Samples,i);
+		Sample *s=SAMPLE(n->Samples,i);
 		for(int d=0;d<current_ndims;d++)
 			for(int w=0;w<2;w++)
 				dist[w]+=current_weights[d]*Square(LocalMean[d][w]-s->Value[d]);
@@ -359,7 +355,7 @@ static void SubdivideNode(struct QuantizedValue *n, int whichdim)
 		NAdded++;
 	}
 #endif
-	struct QuantizedValue *a=AllocQValue();
+	QuantizedValue * RESTRICT a=AllocQValue();
 	a->sortdim=n->sortdim;
 	a->Samples=n->Samples;
 	a->NSamples=NAdded;
@@ -375,7 +371,7 @@ static void SubdivideNode(struct QuantizedValue *n, int whichdim)
 
 static int colorid=0;
 
-static void Label(struct QuantizedValue *q, int updatecolor)
+static void Label(QuantizedValue *q, int updatecolor)
 {
 	// fill in max/min values for tree, etc.
 	if (q)
@@ -408,21 +404,21 @@ static void Label(struct QuantizedValue *q, int updatecolor)
 	}
 }    
 
-struct QuantizedValue *FindQNode(struct QuantizedValue const *q, int32 code)
+const QuantizedValue *FindQNode(QuantizedValue const *q, int32 code)
 {
 	if (! (q->Children[0]))
-		if (code==q->value) return (struct QuantizedValue *) q;
+		if (code==q->value) return q;
 		else return 0;
 	else
 	{
-		struct QuantizedValue *found=FindQNode(q->Children[0],code);
+		const QuantizedValue *found=FindQNode(q->Children[0],code);
 		if (! found) found=FindQNode(q->Children[1],code);
 		return found;
 	}
 }
 
 
-void CheckInRange(struct QuantizedValue *q, uint8 *max, uint8 *min)
+void CheckInRange(QuantizedValue *q, uint8 *max, uint8 *min)
 {
 	if (q)
 	{
@@ -442,7 +438,7 @@ void CheckInRange(struct QuantizedValue *q, uint8 *max, uint8 *min)
 	}
 }
 
-struct QuantizedValue *Quantize(struct Sample *s, int nsamples, int ndims,
+ALLOC_CALL QuantizedValue *Quantize(Sample *s, int nsamples, int ndims,
 								int nvalues, uint8 *weights, int firstvalue)
 {
 	SetNDims(ndims);
@@ -462,7 +458,7 @@ struct QuantizedValue *Quantize(struct Sample *s, int nsamples, int ndims,
 	return current_root;
 }
 
-double MinimumError(struct QuantizedValue const *q, uint8 const *sample,
+double MinimumError(QuantizedValue const *q, uint8 const *sample,
 					int ndims, uint8 const *weights)
 {
 	double err=0;
@@ -480,7 +476,7 @@ double MinimumError(struct QuantizedValue const *q, uint8 const *sample,
 	return err;
 }
 
-double MaximumError(struct QuantizedValue const *q, uint8 const *sample,
+double MaximumError(QuantizedValue const *q, uint8 const *sample,
 					int ndims, uint8 const *weights)
 {
 	double err=0;
@@ -503,13 +499,13 @@ struct FHeap {
 	double *heap[MAXQUANT];
 };
 
-void InitHeap(struct FHeap *h)
+void InitHeap(FHeap *h)
 {
   h->heap_n=0;
 }
 
 
-void UpHeap(int k, struct FHeap *h)
+void UpHeap(int k, FHeap *h)
 {
   double *tmpk=h->heap[k];
   double tmpkn=*tmpk;
@@ -521,14 +517,14 @@ void UpHeap(int k, struct FHeap *h)
   h->heap[k]=tmpk;
 }
 
-void HeapInsert(struct FHeap *h,double *elem)
+void HeapInsert(FHeap *h,double *elem)
 {
   h->heap_n++;
   h->heap[h->heap_n]=elem;
   UpHeap(h->heap_n,h);
 }
 
-void DownHeap(int k, struct FHeap *h)
+void DownHeap(int k, FHeap *h)
 {
   double *v=h->heap[k];
   while(k<=h->heap_n/2)
@@ -547,7 +543,7 @@ void DownHeap(int k, struct FHeap *h)
   h->heap[k]=v;
 }
 
-void *RemoveHeapItem(struct FHeap *h)
+void *RemoveHeapItem(FHeap *h)
 {
   void *ret=0;
   if (h->heap_n!=0)
@@ -563,23 +559,23 @@ void *RemoveHeapItem(struct FHeap *h)
 // now, nearest neighbor finder. Use a heap to traverse the tree, stopping
 // when there are no nodes with a minimum error < the current error.
 
-struct FHeap TheQueue;
+FHeap TheQueue;
 
 #define PUSHNODE(a) do { \
   (a)->MinError=MinimumError(a,sample,ndims,weights); \
   if ((a)->MinError < besterror) HeapInsert(&TheQueue,&(a)->MinError); \
  } while (false)
 
-struct QuantizedValue *FindMatch(uint8 const *sample, int ndims,
-								 uint8 *weights, struct QuantizedValue *q)
+QuantizedValue *FindMatch(uint8 const *sample, int ndims,
+								 const uint8 *weights, QuantizedValue *q)
 {
 	InitHeap(&TheQueue);
-	struct QuantizedValue *bestmatch=0;
+	QuantizedValue *bestmatch=0;
 	double besterror=1.0e63;
 	PUSHNODE(q);
 	for(;;)
 	{
-		struct QuantizedValue *test=(struct QuantizedValue *)
+		QuantizedValue *test=(QuantizedValue *)
 			RemoveHeapItem(&TheQueue);
 		if (! test) break;		// heap empty
 //    printf("got pop node =%p minerror=%f\n",test,test->MinError);
@@ -588,8 +584,8 @@ struct QuantizedValue *FindMatch(uint8 const *sample, int ndims,
 		if (test->Children[0])
 		{
 			// it's a parent node. put the children on the queue
-			struct QuantizedValue *c1=test->Children[0];
-			struct QuantizedValue *c2=test->Children[1];
+			QuantizedValue *c1=test->Children[0];
+			QuantizedValue *c2=test->Children[1];
 			c1->MinError=MinimumError(c1,sample,ndims,weights);
 			if (c1->MinError < besterror)
 				HeapInsert(&TheQueue,&(c1->MinError));
@@ -618,7 +614,7 @@ struct QuantizedValue *FindMatch(uint8 const *sample, int ndims,
 	return bestmatch;
 }
 
-static void RecalcMeans(struct QuantizedValue *q)
+static void RecalcMeans(QuantizedValue *q)
 {
 	if (q)
 	{
@@ -644,7 +640,7 @@ static void RecalcMeans(struct QuantizedValue *q)
 	}
 }
 		      
-void OptimizeQuantizer(struct QuantizedValue *q, int ndims)
+void OptimizeQuantizer(QuantizedValue *q, int ndims)
 {
 	SetNDims(ndims);
 	RecalcMeans(q);		// reset q values
@@ -652,7 +648,7 @@ void OptimizeQuantizer(struct QuantizedValue *q, int ndims)
 }
 
 
-static void RecalcStats(struct QuantizedValue *q)
+static void RecalcStats(QuantizedValue *q)
 {
 	if (q)
 	{
@@ -662,7 +658,7 @@ static void RecalcStats(struct QuantizedValue *q)
 	}
 }
 
-void RecalculateValues(struct QuantizedValue *q, int ndims)
+void RecalculateValues(QuantizedValue *q, int ndims)
 {
 	SetNDims(ndims);
 	RecalcStats(q);

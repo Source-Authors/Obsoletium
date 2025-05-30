@@ -264,20 +264,16 @@ ConCommandBase *ConCommandBase::GetNext( void )
 //-----------------------------------------------------------------------------
 char *ConCommandBase::CopyString( const char *from )
 {
-	ptrdiff_t	len;
-	char	*to;
-
-	len = V_strlen( from );
+	intp len = V_strlen( from );
 	if ( len <= 0 )
 	{
-		to = new char[1];
-		to[0] = 0;
+		char *to = new char[1];
+		to[0] = '\0';
+		return to;
 	}
-	else
-	{
-		to = new char[len+1];
-		Q_strncpy( to, from, len+1 );
-	}
+
+	char *to = new char[len+1];
+	V_strncpy( to, from, len+1 );
 	return to;
 }
 
@@ -1103,7 +1099,7 @@ bool ConVar::GetCompMax( float& maxVal ) const
 // Input  : maxVal - 
 // Output : true if the value was successfully updated, otherwise false.
 //-----------------------------------------------------------------------------
-bool ConVar::SetCompetitiveMode( bool bCompetitive )
+bool ConVar::SetCompetitiveMode( [[maybe_unused]] bool bCompetitive )
 {
 	// Should only do this for competitive restricted things.
 	Assert( IsCompetitiveRestricted() );
@@ -1194,7 +1190,7 @@ void ConVarRef::Init( const char *pName, bool bIgnoreMissing )
 		{
 			if ( !bIgnoreMissing )
 			{
-				Warning( "ConVarRef %s doesn't point to an existing ConVar\n", pName );
+				Warning( "ConVarRef %s doesn't point to an existing ConVar.\n", pName );
 			}
 			bFirst = false;
 		}

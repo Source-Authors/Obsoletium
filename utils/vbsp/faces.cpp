@@ -1300,7 +1300,7 @@ FaceFromPortal
 
 ============
 */
-extern int FindOrCreateTexInfo( const texinfo_t &searchTexInfo );
+extern intp FindOrCreateTexInfo( const texinfo_t &searchTexInfo );
 
 face_t *FaceFromPortal (portal_t *p, int pside)
 {
@@ -1451,6 +1451,7 @@ void MakeFaces_r (node_t *node)
 
 typedef winding_t *pwinding_t;
 
+#if 0
 static void PrintWinding( winding_t *w )
 {
 	int i;
@@ -1460,6 +1461,7 @@ static void PrintWinding( winding_t *w )
 		Msg( "\t%f %f %f\n", w->p[i].x, w->p[i].y, w->p[i].z );
 	}
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Purpose: Adds a winding to the current list of primverts
@@ -1578,10 +1580,7 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 			planeDist = -( float )( x + subdivsize );
 			ClipWindingEpsilon( tempWinding, normal, planeDist, ON_EPSILON, 
 				&frontWinding, &backWinding );
-			if( tempWinding )
-			{
-				FreeWinding( tempWinding );
-			}
+			FreeWinding( tempWinding );
 			if( backWinding )
 			{
 				FreeWinding( backWinding );
@@ -1596,10 +1595,7 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 			planeDist = ( float )y;
 			ClipWindingEpsilon( tempWinding, normal, planeDist, ON_EPSILON, 
 				&frontWinding, &backWinding );
-			if( tempWinding )
-			{
-				FreeWinding( tempWinding );
-			}
+			FreeWinding( tempWinding );
 			if( backWinding )
 			{
 				FreeWinding( backWinding );
@@ -1614,10 +1610,7 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 			planeDist = -( float )( y + subdivsize );
 			ClipWindingEpsilon( tempWinding, normal, planeDist, ON_EPSILON, 
 				&frontWinding, &backWinding );
-			if( tempWinding )
-			{
-				FreeWinding( tempWinding );
-			}
+			FreeWinding( tempWinding );
 			if( backWinding )
 			{
 				FreeWinding( backWinding );
@@ -1632,10 +1625,7 @@ static void SubdivideFaceBySubdivSize( face_t *f, float subdivsize )
 			PrintWinding( frontWinding );
 #endif
 			
-			if( frontWinding )
-			{
-				windings[xi + yi * xSteps] = frontWinding;
-			}
+			windings[xi + yi * xSteps] = frontWinding;
 		}
 	}
 	FreeWinding( w );
@@ -1743,7 +1733,8 @@ void SubdivideFaceBySubdivSize( face_t *f )
 	const char *subdivsizeString = GetMaterialVar( matID, "$subdivsize" );	
 	if( subdivsizeString )
 	{
-		float subdivSize = atof( subdivsizeString );
+		// dimhotepus: atof -> strtof.
+		float subdivSize = strtof( subdivsizeString, nullptr );
 		if( subdivSize > 0.0f )
 		{
 			// NOTE: Subdivision is unsupported and should be phased out

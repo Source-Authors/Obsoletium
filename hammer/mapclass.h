@@ -18,10 +18,8 @@
 
 #include "tier0/basetypes.h"
 
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
+
 #include "BoundBox.h"
 #include "MapPoint.h"
 #include "utlvector.h"
@@ -90,9 +88,16 @@ enum VisGroupSelection
 	for( int iteratorName=0; iteratorName<(listName).Count(); iteratorName++)
 
 
+#if defined(_WIN64)
+typedef unsigned __int64 ULONG_PTR, *PULONG_PTR;
+#else
+typedef _W64 unsigned long ULONG_PTR, *PULONG_PTR;
+#endif
+
+typedef ULONG_PTR DWORD_PTR;
 
 typedef const char * MAPCLASSTYPE;
-typedef BOOL (*ENUMMAPCHILDRENPROC)(CMapClass *, unsigned int dwParam);
+typedef BOOL (*ENUMMAPCHILDRENPROC)(CMapClass *, DWORD_PTR dwParam);
 typedef CUtlVector<CMapClass*> CMapObjectList;
 
 
@@ -285,7 +290,7 @@ public:
 	void PostUpdate(Notify_Dependent_t eNotifyType);
 	static void UpdateAllDependencies(CMapClass *pObject);
 
-	void SetOrigin(Vector& origin);
+ 	void SetOrigin(const Vector& origin) override;
 
 	// hierarchy
 	virtual void UpdateAnimation( float animTime ) {}
@@ -307,8 +312,8 @@ public:
 	//
 	// Can be serialized:
 	//
-	virtual ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
-	virtual ChunkFileResult_t SaveEditorData(CChunkFile *pFile);
+	[[nodiscard]] virtual ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+	[[nodiscard]] virtual ChunkFileResult_t SaveEditorData(CChunkFile *pFile);
 
 	virtual bool ShouldSerialize(void) { return true; }
 	virtual int SerializeRMF(std::fstream &File, BOOL bRMF);
@@ -331,10 +336,10 @@ public:
 	// HACK: get the world that this object is contained within.
 	static CMapWorld *GetWorldObject(CMapAtom *pStart);
     
-	virtual const char* GetDescription() { return ""; }
+	virtual const char* GetDescription() const { return ""; }
 
-	BOOL EnumChildren(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam = 0, MAPCLASSTYPE Type = NULL);
-	BOOL EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, unsigned int dwParam, MAPCLASSTYPE Type = NULL);
+	BOOL EnumChildren(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam = 0, MAPCLASSTYPE Type = NULL);
+	BOOL EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam, MAPCLASSTYPE Type = NULL);
 	BOOL IsChildOf(CMapAtom *pObject);
 
 	virtual bool ShouldAppearInLightingPreview(void)
@@ -413,8 +418,8 @@ protected:
 	//
 	// Serialization callbacks.
 	//
-	static ChunkFileResult_t LoadEditorCallback(CChunkFile *pFile, CMapClass *pObject);
-	static ChunkFileResult_t LoadEditorKeyCallback(const char *szKey, const char *szValue, CMapClass *pObject);
+	[[nodiscard]] static ChunkFileResult_t LoadEditorCallback(CChunkFile *pFile, CMapClass *pObject);
+	[[nodiscard]] static ChunkFileResult_t LoadEditorKeyCallback(const char *szKey, const char *szValue, CMapClass *pObject);
 
 	//
 	// Has a list of objects that must be notified if it changes size or position.
@@ -514,7 +519,7 @@ class CCheckFaceInfo
 {
 public:
 
-	CCheckFaceInfo() { iPoint = -1; }
+	CCheckFaceInfo() { szDescription[0] = '\0'; iPoint = -1; }
 	char szDescription[128];
 	int iPoint;
 };

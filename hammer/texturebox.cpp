@@ -138,7 +138,7 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				dc.TextOut(r2.right + 4, r2.top + 4, szName, iLen);
 				
 				// draw size
-				sprintf(szName, "%dx%d", pTex->GetWidth(), pTex->GetHeight());
+				V_sprintf_safe(szName, "%dx%d", pTex->GetWidth(), pTex->GetHeight());
 				dc.TextOut(r2.right + 4, r2.top + 4 + iFontHeight, szName, V_strlen(szName));
 			}
 			// if it's < 32, we're drawing the item in the "closed"

@@ -627,7 +627,7 @@ private:
 	class CEntityRestoreSet : public CUtlVector<QueuedItem_t>
 	{
 	public:
-		int Add( CBaseEntity *pOwner, typedescription_t *pTypeDesc, void **ppPhysObj, PhysInterfaceId_t type )
+		intp Add( CBaseEntity *pOwner, typedescription_t *pTypeDesc, void **ppPhysObj, PhysInterfaceId_t type )
 		{
 			intp i = AddToTail();
 			
@@ -649,7 +649,7 @@ private:
 		QueuedItem_t *FindItem( string_t itemFieldName )
 		{
 			// generally, the set is very small, usually one, so linear search is not too gruesome;
-			for ( int i = 0; i < Count(); i++ )
+			for ( intp i = 0; i < Count(); i++ )
 			{
 				string_t testName = Element(i).header.fieldName;
 				Assert( ( testName == itemFieldName && strcmp( STRING( testName ), STRING( itemFieldName ) ) == 0 ) ||

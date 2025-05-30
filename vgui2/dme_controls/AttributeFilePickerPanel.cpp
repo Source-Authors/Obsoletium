@@ -61,7 +61,7 @@ void CAttributeFilePickerPanel::OnFileSelected( char const *fullpath )
 		return;
 
 	char relativepath[ 512 ];
-	g_pFullFileSystem->FullPathToRelativePath( fullpath, relativepath, sizeof( relativepath ) );
+	g_pFullFileSystem->FullPathToRelativePath_safe( fullpath, relativepath );
 
 	// Apply to text panel
 	m_pData->SetText( relativepath );

@@ -91,8 +91,8 @@ public:
 
 	void				SetMousePositionForEvent( mxEvent *event );
 
-	int					NumSamples();
-	CExpressionSample	*GetSample( int idx );
+	intp				NumSamples();
+	CExpressionSample	*GetSample( intp idx );
 	void				PreDataChanged( char const *undodescription );
 	void				PostDataChanged( char const *redodescription );
 	CExpressionSample	*GetSampleUnderMouse( int mx, int my, float tolerance = FP_TL_SELECTION_TOLERANCE );

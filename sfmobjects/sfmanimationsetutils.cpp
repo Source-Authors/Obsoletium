@@ -65,7 +65,7 @@ template < class T >
 CDmeChannel *CreateConstantValuedLog( CDmeChannelsClip *channelsClip, const char *basename, const char *pName, CDmElement *pToElement, const char *pToAttr, const T &value )
 {
 	char name[ 256 ];
-	Q_snprintf( name, sizeof( name ), "%s_%s channel", basename, pName );
+	V_sprintf_safe( name, "%s_%s channel", basename, pName );
 
 	CDmeChannel *pChannel = CreateElement< CDmeChannel >( name, channelsClip->GetFileId() );
 	pChannel->SetMode( CM_PLAY );
@@ -89,7 +89,7 @@ static void CreateTransformChannels( CDmeTransform *pTransform, const char *pBas
 	char name[ 256 ];
 
 	// create, connect and cache bonePos channel
-	Q_snprintf( name, sizeof( name ), "%s_bonePos channel %d", pBaseName, bi );
+	V_sprintf_safe( name, "%s_bonePos channel %d", pBaseName, bi );
 	CDmeChannel *pPosChannel = CreateElement< CDmeChannel >( name, pChannelsClip->GetFileId() );
 	pPosChannel->SetMode( CM_PLAY );
 	pPosChannel->CreateLog( AT_VECTOR3 );
@@ -98,7 +98,7 @@ static void CreateTransformChannels( CDmeTransform *pTransform, const char *pBas
 	pChannelsClip->m_Channels.AddToTail( pPosChannel );
 
 	// create, connect and cache boneRot channel
-	Q_snprintf( name, sizeof( name ), "%s_boneRot channel %d", pBaseName, bi );
+	V_sprintf_safe( name, "%s_boneRot channel %d", pBaseName, bi );
 	CDmeChannel *pRotChannel = CreateElement< CDmeChannel >( name, pChannelsClip->GetFileId() );
 	pRotChannel->SetMode( CM_PLAY );
 	pRotChannel->CreateLog( AT_QUATERNION );
@@ -170,7 +170,7 @@ static void CreateAnimationLogs( CDmeChannelsClip *channelsClip, CDmeGameModel *
 			// create, connect and cache each bone's pos and rot channels
 			for ( bi = 0; bi < numbones; ++bi )
 			{
-				int nCount = channelsClip->m_Channels.Count();
+				intp nCount = channelsClip->m_Channels.Count();
 
 				CDmeTransform *pTransform = pModel->GetBone( bi );
 				CreateTransformChannels( pTransform, basename, bi, channelsClip );
@@ -203,8 +203,8 @@ static CDmeChannelsClip *FindChannelsClipTargetingDmeGameModel( CDmeFilmClip *pC
 	uint nBoneCount = pGameModel->NumBones();
 	CDmeTransform *pGameModelTransform = pGameModel->GetTransform();
 
-	int gc = pClip->GetTrackGroupCount();
-	for ( int i = 0; i < gc; ++i )
+	intp gc = pClip->GetTrackGroupCount();
+	for ( intp i = 0; i < gc; ++i )
 	{
 		CDmeTrackGroup *pTrackGroup = pClip->GetTrackGroup( i );
 		DMETRACKGROUP_FOREACH_CLIP_TYPE_START( CDmeChannelsClip, pTrackGroup, pTrack, pChannelsClip )
@@ -245,8 +245,8 @@ static void RetimeLogData( CDmeChannelsClip *pSrcChannelsClip, CDmeChannelsClip 
 		//	 = t * f1/f0 + f1 * (o1-o0-s1+s0)
 		float scale = dstScale / srcScale;
 		DmeTime_t offset = dstScale * ( dstOffset - srcOffset );
-		int nKeys = pLog->GetKeyCount();
-		for ( int i = 0; i < nKeys; ++i )
+		intp nKeys = pLog->GetKeyCount();
+		for ( intp i = 0; i < nKeys; ++i )
 		{
 			DmeTime_t keyTime = pLog->GetKeyTime( i );
 			keyTime = keyTime * scale + offset;
@@ -266,8 +266,8 @@ static void TransferRemainingChannels( CDmeFilmClip *shot, CDmeChannelsClip *des
 	if ( srcClip == destClip )
 		return;
 
-	int channelsCount = srcClip->m_Channels.Count();
-	for ( int i = 0; i < channelsCount; ++i )
+	intp channelsCount = srcClip->m_Channels.Count();
+	for ( intp i = 0; i < channelsCount; ++i )
 	{
 		// Remove channel from channels clip
 		CDmeChannel *channel = srcClip->m_Channels[ i ];
@@ -327,7 +327,7 @@ static void SetupBoneTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 	for ( i = 0; i < 2 ; ++i )
 	{
 		char szName[ 512 ];
-		Q_snprintf( szName, sizeof( szName ), "%s_bone%s %d", basename, suffix[ i ], bonenum );
+		V_sprintf_safe( szName, "%s_bone%s %d", basename, suffix[ i ], bonenum );
 
 		CDmeChannel *pAttachChannel = NULL;
 		if ( srcChannelsClip )
@@ -349,7 +349,7 @@ static void SetupBoneTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 		if ( bAttachToGameRecording && srcChannelsClip )
 		{
 			// Remove channel from channels clip
-			int idx = srcChannelsClip->m_Channels.Find( pAttachChannel->GetHandle() );
+			intp idx = srcChannelsClip->m_Channels.Find( pAttachChannel->GetHandle() );
 			if ( idx != srcChannelsClip->m_Channels.InvalidIndex() )
 			{
 				srcChannelsClip->m_Channels.Remove( idx );
@@ -395,8 +395,8 @@ static void SetupBoneTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 
 			if ( DMETIME_ZERO != offset )
 			{
-				int c = pOriginalLog->GetKeyCount();
-				for ( int iLog = 0; iLog < c; ++iLog )
+				intp c = pOriginalLog->GetKeyCount();
+				for ( intp iLog = 0; iLog < c; ++iLog )
 				{
 					DmeTime_t keyTime = pOriginalLog->GetKeyTime( iLog );
 					keyTime += offset;
@@ -473,8 +473,8 @@ static void SetupBoneTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 static void SetupRootTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannelsClip, 
 	CDmeChannelsClip *channelsClip, CDmElement *control, CDmeGameModel *gameModel, const char *basename, bool bAttachToGameRecording )
 {
-	char *channelNames[] = { "position", "orientation" };
-	char *valueNames[] = { "valuePosition", "valueOrientation" };
+	const char *channelNames[] = { "position", "orientation" };
+	const char *valueNames[] = { "valuePosition", "valueOrientation" };
 	DmAttributeType_t channelTypes[] = { AT_VECTOR3, AT_QUATERNION };
 	const char *suffix[]			= { "Pos", "Rot" };
 	DmAttributeType_t logType[]		= { AT_VECTOR3, AT_QUATERNION };
@@ -483,7 +483,7 @@ static void SetupRootTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 	for ( i = 0; i < 2 ; ++i )
 	{
 		char szName[ 512 ];
-		Q_snprintf( szName, sizeof( szName ), "%s_root%s channel", basename, suffix[ i ] );
+		V_sprintf_safe( szName, "%s_root%s channel", basename, suffix[ i ] );
 
 		CDmeChannel *pAttachChannel = NULL;
 		if ( srcChannelsClip )
@@ -502,7 +502,7 @@ static void SetupRootTransform( CDmeFilmClip *shot, CDmeChannelsClip *srcChannel
 		if ( bAttachToGameRecording && srcChannelsClip )
 		{
 			// Remove channel from channels clip
-			int idx = srcChannelsClip->m_Channels.Find( pAttachChannel->GetHandle() );
+			intp idx = srcChannelsClip->m_Channels.Find( pAttachChannel->GetHandle() );
 			if ( idx != srcChannelsClip->m_Channels.InvalidIndex() )
 			{
 				srcChannelsClip->m_Channels.Remove( idx );
@@ -583,8 +583,8 @@ static void CreateProceduralPreset( CDmePresetGroup *pPresetGroup, const char *p
 {
 	CDmePreset *pPreset = pPresetGroup->FindOrAddPreset( pPresetName );
 
-	int c = controls.Count();
-	for ( int i = 0; i < c ; ++i )
+	intp c = controls.Count();
+	for ( intp i = 0; i < c ; ++i )
 	{
 		CDmElement *pControl = controls[ i ];
 
@@ -660,8 +660,8 @@ static void CreatePresetGroups( CDmeAnimationSet *pAnimationSet, const char *pMo
 static void RemoveExistingGroupMappings( CDmeAnimationSet *pAnimationSet )
 {
 	CDmaElementArray<> &groups = pAnimationSet->GetSelectionGroups();
-	int nCount = groups.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = groups.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pGroup = groups[i];
 		groups.Set( i, NULL );
@@ -676,13 +676,12 @@ void LoadDefaultGroupMappings( CUtlDict< CUtlString, int > &defaultGroupMapping,
 	defaultGroupMapping.RemoveAll();
 	defaultGroupOrdering.RemoveAll();
 
-	KeyValues *pGroupFile = new KeyValues( "groupFile" );
+	KeyValuesAD pGroupFile("groupFile");
 	if ( !pGroupFile )
 		return;
 
 	if ( !pGroupFile->LoadFromFile( g_pFullFileSystem, ANIMATION_SET_DEFAULT_GROUP_MAPPING_FILE, "GAME" ) )
 	{
-		pGroupFile->deleteThis();
 		return;
 	}
 
@@ -696,7 +695,7 @@ void LoadDefaultGroupMappings( CUtlDict< CUtlString, int > &defaultGroupMapping,
 			continue;
 		}
 
-		int i = defaultGroupOrdering.AddToTail();
+		intp i = defaultGroupOrdering.AddToTail();
 		defaultGroupOrdering[i] = pGroupName;
 
 		for ( KeyValues *pControl = sub->GetFirstSubKey(); pControl; pControl = pControl->GetNextKey() )
@@ -706,15 +705,13 @@ void LoadDefaultGroupMappings( CUtlDict< CUtlString, int > &defaultGroupMapping,
 			defaultGroupMapping.Insert( controlName, pGroupName );
 		}
 	}
-
-	pGroupFile->deleteThis();
 }
 
 CDmElement *FindOrAddDefaultGroupForControls( const char *pGroupName, CDmaElementArray< CDmElement > &groups, DmFileId_t fileid )
 {
 	// Now see if this group exists in the array
-	int c = groups.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = groups.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmElement *pGroup = groups[ i ];
 		if ( !Q_stricmp( pGroup->GetName(), pGroupName ) )
@@ -742,8 +739,8 @@ static void BuildGroupMappings( CDmeAnimationSet *pAnimationSet )
 
 	// Create the default groups in order
 	CDmaElementArray<> &groups = pAnimationSet->GetSelectionGroups();
-	int nCount = defaultGroupOrdering.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = defaultGroupOrdering.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const char *pGroupName = (const char *)defaultGroupOrdering[ i ];
 		if ( !Q_stricmp( pGroupName, "IGNORE" ) )
@@ -759,7 +756,7 @@ static void BuildGroupMappings( CDmeAnimationSet *pAnimationSet )
 	// Populate the groups with the controls
 	CDmaElementArray<> &controls = pAnimationSet->GetControls();
 	nCount = controls.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const char *pGroupName = "Unknown";
 		const char *pControlName = controls[ i ]->GetName();

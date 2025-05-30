@@ -348,7 +348,7 @@ int ParseVectorFromKeyValueString( const char *pParamName, const char* pScan, co
 		vecVal[i] = strtof( pScan, &pEnd );
 		if (pScan == pEnd)
 		{
-			Warning( "Error in .VMT file: error parsing vector element \"%s\" in \"%s\"\n", pParamName, pMaterialName );
+			Warning( "Error in .VMT file (%s): error parsing vector element \"%s\".\n",	pMaterialName, pParamName );
 			return 0;
 		}
 
@@ -522,6 +522,8 @@ bool CImportVMT::UnserializeProxies( CDmElement *pElement, KeyValues *pKeyValues
 		return false;
 
 	CDmrElementArray<> array( pProxies );
+	
+	bool ok = true;
 
 	// Proxies are a list of sub-keys, the name is the proxy name, subkeys are values
 	for ( KeyValues *pProxy = pKeyValues->GetFirstTrueSubKey(); pProxy != NULL; pProxy = pProxy->GetNextTrueSubKey() )
@@ -538,24 +540,29 @@ bool CImportVMT::UnserializeProxies( CDmElement *pElement, KeyValues *pKeyValues
 			{
 			case KeyValues::TYPE_INT:
 				pProxyElement->SetValue( pProxyParam->GetName(), pProxyParam->GetInt() );
-				return true;
+				// dimhotepus: return -> break to process all elements.
+				break;
 
 			case KeyValues::TYPE_FLOAT:
 				pProxyElement->SetValue( pProxyParam->GetName(), pProxyParam->GetFloat() );
-				return true;
+				// dimhotepus: return -> break to process all elements.
+				break;
 
 			case KeyValues::TYPE_STRING:
 				pProxyElement->SetValue( pProxyParam->GetName(), pProxyParam->GetString() );
-				return true;
+				// dimhotepus: return -> break to process all elements.
+				break;
 
 			default:
 				Warning( "Unhandled proxy keyvalues type (proxy %s var %s)\n", pProxy->GetName(), pProxyParam->GetName() );
-				return false;
+				// dimhotepus: return -> break to process all elements.
+				ok = false;
+				break;
 			}
 		}
 	}
 
-	return true;
+	return ok;
 }
 
 
@@ -646,8 +653,8 @@ void CImportVMT::ExpandPatchFile( KeyValues *pKeyValues )
 		const char *pIncludeFileName = pKeyValues->GetString( "include" );
 		if( pIncludeFileName )
 		{
-			KeyValues * includeKeyValues = new KeyValues( "vmt" );
-			bool success = includeKeyValues->LoadFromFile( g_pFullFileSystem, pIncludeFileName, IsX360() ? "GAME" : NULL );
+			KeyValuesAD includeKeyValues( "vmt" );
+			bool success = includeKeyValues->LoadFromFile( g_pFullFileSystem, pIncludeFileName, NULL );
 			if( success )
 			{
 				KeyValues *pInsertSection = pKeyValues->FindKey( "insert" );
@@ -663,12 +670,10 @@ void CImportVMT::ExpandPatchFile( KeyValues *pKeyValues )
 				}
 
 				*pKeyValues = *includeKeyValues;
-				includeKeyValues->deleteThis();
 				// Could add other commands here, like "delete", "rename", etc.
 			}
 			else
 			{
-				includeKeyValues->deleteThis();
 				return;
 			}
 		}

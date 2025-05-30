@@ -535,7 +535,7 @@ void CDispPaintDistDlg::FilterComboBoxBrushGeo( unsigned int nEffect, bool bInit
 				APP()->GetDirectory( DIR_PROGRAM, appDir );
 				
 				// append the filters directory name
-				strcat( appDir, "filters\\" );
+				V_strcat_safe( appDir, "filters\\" );
 				
 				// append the directory prefix to the icon name
 				CString iconFilename = appDir + pFilter->m_Name;
@@ -1088,13 +1088,14 @@ END_MESSAGE_MAP()
 // Purpose:  constructor
 //-----------------------------------------------------------------------------
 CPaintSculptDlg::CPaintSculptDlg( CWnd *pParent ) :
-CBaseDlg( CPaintSculptDlg::IDD, pParent )
+	CBaseDlg( CPaintSculptDlg::IDD, pParent )
 {
 	m_bAutoSew = true;
 	m_SculptMode = SCULPT_MODE_PUSH;
 
 	m_PushOptions = new CSculptPushOptions();
 	m_CarveOptions = new CSculptCarveOptions();
+	m_ProjectOptions = nullptr;
 //	m_ProjectOptions = new CSculptProjectOptions();
 }
 
@@ -1626,7 +1627,7 @@ void CDispPaintDataDlg::FilterComboBoxBrushData( unsigned int uiEffect, bool bIn
 				APP()->GetDirectory( DIR_PROGRAM, appDir );
 				
 				// append the filters directory name
-				strcat( appDir, "filters\\" );
+				V_strcat_safe( appDir, "filters\\" );
 				
 				// append the directory prefix to the icon name
 				CString iconFilename = appDir + pFilter->m_Name;

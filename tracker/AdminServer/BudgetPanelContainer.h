@@ -11,13 +11,13 @@
 #endif
 
 
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/PHandle.h>
 #include <vgui_controls/ListPanel.h>
 #include <vgui_controls/PropertyPage.h>
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 #include "RemoteServer.h"
 
 
@@ -32,25 +32,20 @@ class CBudgetPanelContainer : public vgui::PropertyPage, public IServerDataRespo
 	DECLARE_CLASS_SIMPLE( CBudgetPanelContainer, vgui::PropertyPage );
 public:
 	CBudgetPanelContainer(vgui::Panel *parent, const char *name);
-	~CBudgetPanelContainer();
+	virtual ~CBudgetPanelContainer();
 
 
 // Panel overrides.
 public:
-	virtual void Paint();
-	virtual void PerformLayout();
+	void Paint() override;
+	void PerformLayout() override;
 
+	// PropertyPage overrides.
+	void OnPageShow() override;
+	void OnPageHide() override;
 
-// PropertyPage overrides.
-public:
-	void OnPageShow();
-	void OnPageHide();
-
-
-// IServerDataResponse overrides.
-public:
-	virtual void OnServerDataResponse(const char *value, const char *response);
-
+	// IServerDataResponse overrides.
+	void OnServerDataResponse(const char *value, const char *response) override;
 
 private:
 	CBudgetPanelAdmin *m_pBudgetPanelAdmin;

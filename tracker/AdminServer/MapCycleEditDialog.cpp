@@ -8,7 +8,7 @@
 #include "MapCycleEditDialog.h"
 
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ListPanel.h>
@@ -77,12 +77,12 @@ void CMapCycleEditDialog::Activate(vgui::Panel *updateTarget, CUtlVector<CUtlSym
 
 		if (!inMapCycle)
 		{
-			m_pAvailableMapList->AddItem(new KeyValues("MapItem", "Map", availableMaps[i].String()), 0, false, false);
+			m_pAvailableMapList->AddItem(KeyValuesAD( new KeyValues("MapItem", "Map", availableMaps[i].String()) ), 0, false, false);
 		}
 	}
 	for (int i = 0; i < mapCycle.Count(); i++)
 	{
-		m_pMapCycleList->AddItem(new KeyValues("MapItem", "Map", mapCycle[i].String()), 0, false, false);
+		m_pMapCycleList->AddItem(KeyValuesAD( new KeyValues("MapItem", "Map", mapCycle[i].String()) ), 0, false, false);
 	}
 
 	// show window
@@ -160,7 +160,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 				return;
 
 			const char *map = data->GetString("Map");
-			m_pAvailableMapList->AddItem(new KeyValues("MapItem", "Map", map), 0, true, false);
+			m_pAvailableMapList->AddItem(KeyValuesAD( new KeyValues("MapItem", "Map", map)), 0, true, false);
 			m_pMapCycleList->RemoveItem(itemID);
 		}
 	}
@@ -175,7 +175,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 				return;
 
 			const char *map = data->GetString("Map");
-			m_pMapCycleList->AddItem(new KeyValues("MapItem", "Map", map), 0, true, false);
+			m_pMapCycleList->AddItem(KeyValuesAD( new KeyValues("MapItem", "Map", map) ), 0, true, false);
 			m_pAvailableMapList->RemoveItem(itemID);
 		}
 	}
@@ -248,7 +248,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 		}
 
 		msg.PutChar(0);
-		RemoteServer().SetValue("mapcycle", (const char *)msg.Base());
+		RemoteServer().SetValue("mapcycle", msg.Base<const char>());
 
 		// post message to tell varlist update
 		PostActionSignal(new KeyValues("VarChanged", "var", "mapcycle"));

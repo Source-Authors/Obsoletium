@@ -65,8 +65,8 @@ void CDmxSerializationDictionary::BuildElementList_R( CDmxElement *pElement, boo
 	info.m_pElement = pElement;
 	m_Dict.Insert( info );
 
-	int nCount = pElement->AttributeCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pElement->AttributeCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = pElement->GetAttribute(i);
 		switch( pAttribute->GetType() )
@@ -134,9 +134,9 @@ void CDmxSerializationDictionary::Clear()
 //-----------------------------------------------------------------------------
 // How many root elements do we have?
 //-----------------------------------------------------------------------------
-int CDmxSerializationDictionary::RootElementCount() const
+intp CDmxSerializationDictionary::RootElementCount() const
 {
-	int nCount = 0;
+	intp nCount = 0;
 	DmxSerializationHandle_t h = m_Dict.FirstInorder();
 	while( h != m_Dict.InvalidIndex() )
 	{

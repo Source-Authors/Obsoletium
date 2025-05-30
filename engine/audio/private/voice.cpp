@@ -355,7 +355,7 @@ public:
 	CUtlBuffer		m_Buffer;
 
 private:
-	CVoiceWriterData& operator=(const CVoiceWriterData&);
+	CVoiceWriterData& operator=(const CVoiceWriterData&) = delete;
 };
 
 class CVoiceWriter
@@ -374,6 +374,7 @@ public:
 
 			if ( data->m_Buffer.TellPut() <= 0 )
 				continue;
+
 			data->m_Buffer.Purge();
 		}
 	}
@@ -386,26 +387,32 @@ public:
 			return;
 		}
 
-		for ( auto i = m_VoiceWriter.FirstInorder(); i != m_VoiceWriter.InvalidIndex(); i = m_VoiceWriter.NextInorder( i ) )
+		for ( auto i = m_VoiceWriter.FirstInorder();
+			i != m_VoiceWriter.InvalidIndex();
+			i = m_VoiceWriter.NextInorder( i ) )
 		{
 			CVoiceWriterData *data = &m_VoiceWriter[ i ];
-			
 			if ( data->m_Buffer.TellPut() <= 0 )
 				continue;
 
-			int index = data->m_pChannel - g_VoiceChannels;
+			intp index = data->m_pChannel - g_VoiceChannels;
 			Assert( index >= 0 && index < ssize( g_VoiceChannels ) );
 
 			char path[ MAX_PATH ];
-			Q_snprintf( path, sizeof( path ), "%s/voice", g_pSoundServices->GetGameDir() );
+			V_sprintf_safe( path, "%s/voice", g_pSoundServices->GetGameDir() );
 			g_pFileSystem->CreateDirHierarchy( path );
 
 			char fn[ MAX_PATH ];
-			Q_snprintf( fn, sizeof( fn ), "%s/pl%02d_slot%d-time%d.wav", path, index, data->m_nCount, (int)g_pSoundServices->GetClientTime() );
+			V_sprintf_safe( fn, "%s/pl%02zd_slot%d-time%d.wav", path, index, data->m_nCount, (int)g_pSoundServices->GetClientTime() );
 
-			WriteWaveFile( fn, (const char *)data->m_Buffer.Base(), data->m_Buffer.TellPut(), g_VoiceSampleFormat.wBitsPerSample, g_VoiceSampleFormat.nChannels, Voice_SamplesPerSec() );
-
-			Msg( "Writing file %s\n", fn );
+			if (!WriteWaveFile( fn, data->m_Buffer.Base<char>(), data->m_Buffer.TellPut(), g_VoiceSampleFormat.wBitsPerSample, g_VoiceSampleFormat.nChannels, Voice_SamplesPerSec() ))
+			{
+				Warning("Unable to write voice file '%s'.\n", fn);
+			}
+			else
+			{
+				Msg( "Written voice file '%s'.\n", fn );
+			}
 
 			++data->m_nCount;
 			data->m_Buffer.Purge();
@@ -571,13 +578,6 @@ bool Voice_InitWithDefault( const char *pCodecName )
 		return false;
 	}
 
-	int nRate = Voice_GetDefaultSampleRate( pCodecName );
-	if ( nRate < 0 )
-	{
-		Msg( "Voice_InitWithDefault: Unable to determine defaults for codec \"%s\"\n", pCodecName );
-		return false;
-	}
-
 	return Voice_Init( pCodecName, Voice_GetDefaultSampleRate( pCodecName ) );
 }
 
@@ -707,7 +707,8 @@ bool Voice_Init( const char *pCodecName, int nSampleRate )
 		{
 			CVoiceChannel *pChannel = &g_VoiceChannels[i];
 
-			if ((pChannel->m_pVoiceCodec = (IVoiceCodec*)createCodecFn(pCodecName, NULL)) == NULL || !pChannel->m_pVoiceCodec->Init( quality ))
+			if (!(pChannel->m_pVoiceCodec = createCodecFn(pCodecName, NULL)) ||
+				!pChannel->m_pVoiceCodec->Init( quality ))
 			{
 				Voice_Deinit();
 				return false;
@@ -992,7 +993,10 @@ bool Voice_RecordStart(
 	if(pMicInputFile)
 	{
 		int a, b, c;
-		ReadWaveFile(pMicInputFile, g_pMicInputFileData, g_nMicInputFileBytes, a, b, c);
+		if (!ReadWaveFile(pMicInputFile, g_pMicInputFileData, g_nMicInputFileBytes, a, b, c))
+		{
+			Warning("Voice recording unable to read input file '%s'.\n", pMicInputFile);
+		}
 		g_CurMicInputFileByte = 0;
 		g_MicStartTime = Plat_FloatTime();
 	}
@@ -1053,7 +1057,8 @@ void Voice_UserDesiresStop()
 	}
 	else
 	{
-		VoiceRecord_Stop();
+		// dimhotepus: Need to stop recording AND write results, not just stop recording.
+		Voice_RecordStop();
 	}
 }
 
@@ -1069,14 +1074,26 @@ bool Voice_RecordStop()
 
 	if(g_pUncompressedFileData)
 	{
-		WriteWaveFile(g_pUncompressedDataFilename, g_pUncompressedFileData, g_nUncompressedDataBytes, g_VoiceSampleFormat.wBitsPerSample, g_VoiceSampleFormat.nChannels, Voice_SamplesPerSec() );
+		if (!WriteWaveFile(g_pUncompressedDataFilename, g_pUncompressedFileData, g_nUncompressedDataBytes, g_VoiceSampleFormat.wBitsPerSample, g_VoiceSampleFormat.nChannels, Voice_SamplesPerSec() ))
+		{
+			Warning("Unable to write uncompressed voice file '%s'.\n", g_pUncompressedDataFilename);
+		}
+
 		delete [] g_pUncompressedFileData;
 		g_pUncompressedFileData = NULL;
 	}
 
 	if(g_pDecompressedFileData)
 	{
-		WriteWaveFile(g_pDecompressedDataFilename, g_pDecompressedFileData, g_nDecompressedDataBytes, g_VoiceSampleFormat.wBitsPerSample, g_VoiceSampleFormat.nChannels, Voice_SamplesPerSec() );
+		// dimhotepus: Write received voice data only if it is present.
+		if (g_nDecompressedDataBytes)
+		{
+			if (!WriteWaveFile(g_pDecompressedDataFilename, g_pDecompressedFileData, g_nDecompressedDataBytes, g_VoiceSampleFormat.wBitsPerSample, g_VoiceSampleFormat.nChannels, Voice_SamplesPerSec() ))
+			{
+				Warning("Unable to write decompressed voice file '%s'.\n", g_pUncompressedDataFilename);
+			}
+		}
+
 		delete [] g_pDecompressedFileData;
 		g_pDecompressedFileData = NULL;
 	}
@@ -1099,7 +1116,7 @@ bool Voice_RecordStop()
 
 	g_bVoiceRecording = false;
 	g_bVoiceRecordStopping = false;
-	return(true);
+	return true;
 }
 
 
@@ -1164,9 +1181,9 @@ int Voice_GetCompressedData(char *pchDest, int nCount, bool bFinal)
 		if(g_pMicInputFileData)
 		{
 			double curtime = Plat_FloatTime();
-			int nShouldGet = (curtime - g_MicStartTime) * Voice_SamplesPerSec();
-			gotten = min(sizeof(tempData)/BYTES_PER_SAMPLE,
-			             (size_t)min(nShouldGet, (g_nMicInputFileBytes - g_CurMicInputFileByte) / BYTES_PER_SAMPLE));
+			int nShouldGet = static_cast<int>((curtime - g_MicStartTime) * Voice_SamplesPerSec());
+			gotten = min(static_cast<int>(sizeof(tempData))/BYTES_PER_SAMPLE,
+			             min(nShouldGet, (g_nMicInputFileBytes - g_CurMicInputFileByte) / BYTES_PER_SAMPLE));
 			memcpy(tempData, &g_pMicInputFileData[g_CurMicInputFileByte], gotten*BYTES_PER_SAMPLE);
 			g_CurMicInputFileByte += gotten * BYTES_PER_SAMPLE;
 			g_MicStartTime = curtime;
@@ -1433,24 +1450,6 @@ int Voice_AddIncomingData(int nChannel, const char *pchData, int nCount, int iSe
 }
 
 
-#if DEAD
-//------------------ Copyright (c) 1999 Valve, LLC. ----------------------------
-// Purpose: Flushes a given receive channel.
-// Input  : nChannel - index of channel to flush.
-//------------------------------------------------------------------------------
-void Voice_FlushChannel(int nChannel)
-{
-	if ((nChannel < 0) || (nChannel >= VOICE_NUM_CHANNELS))
-	{
-		Assert(false);
-		return;
-	}
-
-	g_VoiceChannels[nChannel].m_Buffer.Flush();
-}
-#endif
-
-
 //------------------------------------------------------------------------------
 // IVoiceTweak implementation.
 //------------------------------------------------------------------------------
@@ -1592,7 +1591,7 @@ void Voice_Spatialize( channel_t *channel )
 	DevMsg( 1, "Voice_Spatialize changing voice tweak entity from %d to %d\n", pVoiceChannel->m_nViewEntityIndex, g_pSoundServices->GetViewEntity() );
 
 	pVoiceChannel->m_nViewEntityIndex = g_pSoundServices->GetViewEntity();
-	channel->soundsource = pVoiceChannel->m_nViewEntityIndex;
+	channel->soundsource = static_cast<SoundSource>(pVoiceChannel->m_nViewEntityIndex);
 }
 
 IVoiceTweak g_VoiceTweakAPI =

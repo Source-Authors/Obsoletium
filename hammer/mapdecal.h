@@ -66,7 +66,7 @@ class CMapDecal : public CMapHelper
 
 		bool IsVisualElement(void) { return(true); }
 		
-		const char* GetDescription() { return("Decal helper"); }
+		const char* GetDescription() const override { return("Decal helper"); }
 
 		virtual void PostloadWorld(CMapWorld *pWorld);
 

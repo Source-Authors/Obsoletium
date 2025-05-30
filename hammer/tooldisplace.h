@@ -154,7 +154,7 @@ private:
 
 	void AddFiltersToManagers( void );
 	bool LoadFilters( const char *filename );
-	static ChunkFileResult_t LoadFiltersCallback( CChunkFile *pFile, CToolDisplace *pDisplaceTool );
+	[[nodiscard]] static ChunkFileResult_t LoadFiltersCallback( CChunkFile *pFile, CToolDisplace *pDisplaceTool );
 
 	int GetSelectedDisps( void );
 	EditDispHandle_t CollideWithSelectedDisps( const Vector &rayStart, const Vector &rayEnd );

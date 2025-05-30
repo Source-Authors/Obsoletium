@@ -37,7 +37,8 @@ public:
 public:
 
 	virtual void SetRefEHandle( const CBaseHandle &handle )	{ Assert( false ); }
-	virtual const CBaseHandle& GetRefEHandle() const		{ DebuggerBreak(); exit(1); }
+	// dimhotepus: 1 -> ENOTSUP
+	virtual const CBaseHandle& GetRefEHandle() const		{ Assert( false ); exit(ENOTSUP); }
 
 	virtual IClientUnknown*		GetIClientUnknown()		{ return this; }
 	virtual ICollideable*		GetCollideable()		{ return 0; }

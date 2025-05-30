@@ -13,7 +13,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern void DataTable_Warning( const char *pInMessage, ... );
+extern void DataTable_Warning( PRINTF_FORMAT_STRING const char *pInMessage, ... );
 extern bool ShouldWatchThisProp( const SendTable *pTable, int objectID, const char *pPropName );
 
 // The engine implements this.
@@ -29,8 +29,8 @@ void EncodeFloat( const SendProp *pProp, float fVal, bf_write *pOut, int objectI
 	}
 	else if ( flags & ( SPROP_COORD_MP | SPROP_COORD_MP_LOWPRECISION | SPROP_COORD_MP_INTEGRAL ) )
 	{
-		static_assert( SPROP_COORD_MP_INTEGRAL == (1<<15) );
-		static_assert( SPROP_COORD_MP_LOWPRECISION == (1<<14) );
+		static_assert( SPROP_COORD_MP_INTEGRAL == (1<<15) ); //-V501
+		static_assert( SPROP_COORD_MP_LOWPRECISION == (1<<14) ); //-V501
 		pOut->WriteBitCoordMP( fVal, ((flags >> 15) & 1), ((flags >> 14) & 1) );
 	}
 	else if ( flags & SPROP_NORMAL )
@@ -369,11 +369,13 @@ void Int_SkipProp( const SendProp *pProp, bf_read *pIn )
 	{
 		if ( pProp->GetFlags() & SPROP_UNSIGNED )
 		{
-			pIn->ReadVarInt32();
+			// dimhotepus: Result is not needed so skip it.
+			(void)pIn->ReadVarInt32();
 		}
 		else
 		{
-			pIn->ReadSignedVarInt32();
+			// dimhotepus: Result is not needed so skip it.
+			(void)pIn->ReadSignedVarInt32();
 		}
 	}
 	else
@@ -478,15 +480,18 @@ void Float_SkipProp( const SendProp *pProp, bf_read *pIn )
 	}
 	else if ( pProp->GetFlags() & SPROP_COORD_MP )
 	{
-		pIn->ReadBitCoordMP( false, false );
+		// dimhotepus: Result is not needed so skip it.
+		(void)pIn->ReadBitCoordMP( false, false );
 	}
 	else if ( pProp->GetFlags() & SPROP_COORD_MP_LOWPRECISION )
 	{
-		pIn->ReadBitCoordMP( false, true );
+		// dimhotepus: Result is not needed so skip it.
+		(void)pIn->ReadBitCoordMP( false, true );
 	}
 	else if ( pProp->GetFlags() & SPROP_COORD_MP_INTEGRAL )
 	{
-		pIn->ReadBitCoordMP( true, false );
+		// dimhotepus: Result is not needed so skip it.
+		(void)pIn->ReadBitCoordMP( true, false );
 	}
 	else if(pProp->GetFlags() & SPROP_NOSCALE)
 	{
@@ -772,7 +777,9 @@ void String_Decode(DecodeInfo *pInfo)
 
 	if ( len >= DT_MAX_STRING_BUFFERSIZE )
 	{
-		Warning( "String_Decode( %s ) invalid length (%d)\n", pInfo->m_pRecvProp->GetName(), len );
+		Warning( "String_Decode( %s ) invalid length (%d)\n",
+			pInfo->m_pRecvProp ? pInfo->m_pRecvProp->GetName() : "N/A",
+			len);
 		len = DT_MAX_STRING_BUFFERSIZE - 1;
 	}
 
@@ -1244,11 +1251,13 @@ void Int64_SkipProp( const SendProp *pProp, bf_read *pIn )
 	{
 		if ( pProp->GetFlags() & SPROP_UNSIGNED )
 		{
-			pIn->ReadVarInt64();
+			// dimhotepus: Result is not needed so skip it.
+			(void)pIn->ReadVarInt64();
 		}
 		else
 		{
-			pIn->ReadSignedVarInt64();
+			// dimhotepus: Result is not needed so skip it.
+			(void)pIn->ReadSignedVarInt64();
 		}
 	}
 	else

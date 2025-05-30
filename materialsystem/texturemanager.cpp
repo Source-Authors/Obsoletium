@@ -12,13 +12,13 @@
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/IColorCorrection.h"
 #include "tier1/strtools.h"
-#include "utlvector.h"
-#include "utldict.h"
+#include "tier1/utlvector.h"
+#include "tier1/utldict.h"
 #include "itextureinternal.h"
 #include "vtf/vtf.h"
 #include "pixelwriter.h"
-#include "basetypes.h"
-#include "utlbuffer.h"
+#include "tier0/basetypes.h"
+#include "tier1/utlbuffer.h"
 #include "filesystem.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/ishaderapi.h"
@@ -26,12 +26,12 @@
 #include "imorphinternal.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/utlpair.h"
-#include "utlqueue.h"
+#include "tier1/utlqueue.h"
 #include "tier0/icommandline.h"
 #include "ctexturecompositor.h"
 #include "Color.h"
 
-#include "vprof_telemetry.h"
+#include "tier0/vprof_telemetry.h"
 
 // Need lightmaps access here
 #define MATSYS_INTERNAL
@@ -748,8 +748,8 @@ protected:
 	friend class AsyncReader;
 	AsyncReader* m_pAsyncReader;
 
-	ThreadId_t m_nAsyncLoadThread;
-	ThreadId_t m_nAsyncReadThread;
+	std::atomic<ThreadId_t> m_nAsyncReadThread;
+	std::atomic<ThreadId_t> m_nAsyncLoadThread;
 
 	int m_iSuspendTextureStreaming;
 };
@@ -1096,9 +1096,9 @@ private:
 		// dimhotepus: Add thread name to aid debugging.
 		ThreadSetDebugName( "TextureLoader" );
 
-		s_TextureManager.m_nAsyncLoadThread = ThreadGetCurrentId();
+		s_TextureManager.m_nAsyncLoadThread.store( ThreadGetCurrentId(), std::memory_order::memory_order_seq_cst );
 		( ( AsyncLoader* )_this )->ThreadLoader_Main();
-		s_TextureManager.m_nAsyncLoadThread = std::numeric_limits<ThreadId_t>::max();
+		s_TextureManager.m_nAsyncLoadThread.store( std::numeric_limits<ThreadId_t>::max(), std::memory_order::memory_order_release );
 		return 0;
 	}
 
@@ -1397,9 +1397,9 @@ private:
 		// dimhotepus: Add thread name to aid debugging.
 		ThreadSetDebugName( "TextureReader" );
 
-		s_TextureManager.m_nAsyncReadThread = ThreadGetCurrentId();
+		s_TextureManager.m_nAsyncReadThread.store( ThreadGetCurrentId(), std::memory_order::memory_order_seq_cst );
 		( ( AsyncReader* ) _this )->ThreadReader_Main();
-		s_TextureManager.m_nAsyncReadThread = std::numeric_limits<ThreadId_t>::max();
+		s_TextureManager.m_nAsyncReadThread.store( std::numeric_limits<ThreadId_t>::max(), std::memory_order::memory_order_release );
 		return 0;
 	}
 
@@ -1424,8 +1424,8 @@ CTextureManager::CTextureManager( void )
 , m_TextureExcludes( true )
 , m_PendingAsyncLoads( true ) 
 , m_textureStreamingRequests( DefLessFunc( ITextureInternal* ) )
-, m_nAsyncLoadThread( -1 )
-, m_nAsyncReadThread( -1 )
+, m_nAsyncLoadThread( std::numeric_limits<ThreadId_t>::max() )
+, m_nAsyncReadThread( std::numeric_limits<ThreadId_t>::max() )
 {
 	m_iNextTexID = 0;
 	m_nFlags = 0;
@@ -2134,7 +2134,7 @@ void CTextureManager::SetExcludedTextures( const char *pScriptName )
 					break;
 				}
 			}
-			excludeBuffer.GetLine( szToken, sizeof( szToken ) );
+			excludeBuffer.GetLine( szToken );
 			intp tokenLength = V_strlen( szToken );
 			if ( !tokenLength )
 			{
@@ -2834,7 +2834,7 @@ void CTextureManager::FindFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 		else
 		{
 			char filenameNoExtension[_MAX_PATH];
-			V_StripExtension( pFilename, filenameNoExtension, _MAX_PATH );
+			V_StripExtension( pFilename, filenameNoExtension );
 			// Add the file to the list, which we will later traverse in order to ensure we're hitting these in the expected order for the VPK. 
 			( *pOutFilesToLoad ).Insert( CUtlString( filenameNoExtension ), 0 );
 		}
@@ -2862,7 +2862,7 @@ void CTextureManager::ReadFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 	char buffer[_MAX_PATH + 1];
 	while ( 1 ) 
 	{
-		fileContents.GetLine( buffer, _MAX_PATH );
+		fileContents.GetLine( buffer );
 		if ( buffer[ 0 ] == 0 )
 			break;
 
@@ -2904,7 +2904,7 @@ void CTextureManager::UpdatePostAsync()
 	}
 
 	// Then update streaming
-	const int cThirtySecondsOrSoInFrames = 2000;
+	constexpr int cThirtySecondsOrSoInFrames = 2000;
 
 	// First, remove old stuff.
 	FOR_EACH_MAP_FAST( m_textureStreamingRequests, i )
@@ -2952,12 +2952,12 @@ void CTextureManager::ReleaseAsyncScratchVTF( IVTFTexture *pScratchVTF )
 
 bool CTextureManager::ThreadInAsyncLoadThread() const
 {
-	return ThreadGetCurrentId() == m_nAsyncLoadThread;
+	return ThreadGetCurrentId() == m_nAsyncLoadThread.load(std::memory_order::memory_order_relaxed);
 }
 
 bool CTextureManager::ThreadInAsyncReadThread() const
 {
-	return ThreadGetCurrentId() == m_nAsyncReadThread;
+	return ThreadGetCurrentId() == m_nAsyncReadThread.load(std::memory_order::memory_order_relaxed);
 }
 
 bool CTextureManager::AddTextureCompositorTemplate( const char* pName, KeyValues* pTmplDesc )

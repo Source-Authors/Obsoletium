@@ -544,7 +544,8 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 
 	// FIXME: this seems like way too much code
 	info->m_bIsGesture = false;
-	KeyValues *seqKeyValues = GetSequenceKeyValues( info->m_nSequence );
+	// dimhotepus: Do not leak KeyValues.
+	KeyValuesAD seqKeyValues(GetSequenceKeyValues( info->m_nSequence ));
 	if (seqKeyValues)
 	{
 		// Do we have a build point section?
@@ -641,8 +642,6 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 				DevWarning("out of order tags : %s : (%s:%s:%s)\n", scene->GetFilename(), actor->GetName(), event->GetName(), event->GetParameters() );
 			}
 		}
-
-		seqKeyValues->deleteThis();
 	}
 
 	// initialize posture suppression
@@ -2123,9 +2122,9 @@ void CBaseFlex::DoBodyLean( void )
 		}
 
 		vecDelta = vecOrigin - m_vecPrevOrigin;
-		vecDelta.x = clamp( vecDelta.x, -50, 50 );
-		vecDelta.y = clamp( vecDelta.y, -50, 50 );
-		vecDelta.z = clamp( vecDelta.z, -50, 50 );
+		vecDelta.x = clamp( vecDelta.x, -50.f, 50.f );
+		vecDelta.y = clamp( vecDelta.y, -50.f, 50.f );
+		vecDelta.z = clamp( vecDelta.z, -50.f, 50.f );
 
 		float dt = gpGlobals->curtime - GetLastThink();
 		bool bSkip = ((GetFlags() & (FL_FLY | FL_SWIM)) != 0) || (GetMoveParent() != NULL) || (GetGroundEntity() == NULL) || (GetGroundEntity()->IsMoving());

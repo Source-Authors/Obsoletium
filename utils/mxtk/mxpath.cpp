@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "tier1/strtools.h"
 
 
 bool
@@ -56,7 +57,7 @@ mx_getpath (const char *filename)
 #ifdef WIN32
 	_splitpath (filename, 0, path, 0, 0);
 #else
-	strcpy (path, filename);
+	V_strcpy_safe (path, filename);
 	char *ptr = strrchr (path, '/');
 	if (ptr)
 		*ptr = '\0';
@@ -75,9 +76,9 @@ mx_getextension (const char *filename)
 #else
 	char *ptr = strrchr (filename, '.');
 	if (ptr)
-		strcpy (ext, ptr);
+		V_strcpy_safe (ext, ptr);
 	else
-		strcpy (ext, "");
+		V_strcpy_safe (ext, "");
 #endif
 	return ext;
 }
@@ -91,7 +92,7 @@ mx_gettemppath ()
 #ifdef WIN32
 	GetTempPath (256, path);
 #else
-	strcpy (path, "/tmp");
+	V_strcpy_safe (path, "/tmp");
 #endif
 
 	return path;

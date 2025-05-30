@@ -4,8 +4,8 @@
 //
 //==================================================================================================
 
-#include "strtools.h"
-#include "utlvector.h"
+#include "tier1/strtools.h"
+#include "tier1/utlvector.h"
 
 CSplitString::CSplitString(const char *pString, const char **pSeparators, intp nSeparators)
 {
@@ -28,9 +28,7 @@ void CSplitString::Construct( const char *pString, const char **pSeparators, int
 	// make a duplicate of the original string. We'll use pieces of this duplicate to tokenize the string
 	// and create NULL-terminated tokens of the original string
 	//
-	intp nOriginalStringLength = V_strlen(pString);
-	m_szBuffer = new char[nOriginalStringLength + 1];
-	memcpy(m_szBuffer, pString, nOriginalStringLength + 1);
+	m_szBuffer = V_strdup(pString);
 
 	this->Purge();
 	const char *pCurPos = pString;

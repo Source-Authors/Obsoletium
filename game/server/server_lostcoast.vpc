@@ -16,6 +16,11 @@ $Configuration
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,.\hl2,.\episodic"
 		$PreprocessorDefinitions		"$BASE;HL2_DLL;HL2_LOSTCOAST"
 	}
+
+	$Resources
+	{
+		$AdditionalIncludeDirectories		"$BASE;.\loastcoast"
+	}
 }
 
 $Project "Server (LostCoast)"

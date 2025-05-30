@@ -43,11 +43,11 @@
 	#define _S_IFDIR S_IFDIR
 #endif
 
-#include <time.h>
-#include "refcount.h"
-#include "filesystem.h"
-#include "tier1/utlvector.h"
+#include <ctime>
 #include <cstdarg>
+#include "filesystem.h"
+#include "tier1/refcount.h"
+#include "tier1/utlvector.h"
 #include "tier1/utlhashtable.h"
 #include "tier1/utlrbtree.h"
 #include "tier1/utlsymbol.h"
@@ -55,7 +55,6 @@
 #include "tier1/utlstring.h"
 #include "tier1/UtlSortVector.h"
 #include "bspfile.h"
-#include "tier1/utldict.h"
 #include "tier1/tier1.h"
 #include "tier1/strtools.h"
 #include "tier1/byteswap.h"
@@ -123,7 +122,7 @@ public:
 	int		Read( void* pBuffer, int nLength );
 	int		Read( void* pBuffer, int nDestSize, int nLength );
 
-	int		Write( const void* pBuffer, int nLength );
+	int		Write( IN_BYTECAP(nLength) const void* pBuffer, int nLength );
 	int		Seek( int64 nOffset, int nWhence );
 	int		Tell();
 	int		Size();
@@ -139,9 +138,8 @@ public:
 	{
 		Assert( pName );
 		Assert( !m_pszTrueFileName );
-		intp len = Q_strlen( pName );
-		m_pszTrueFileName = new char[len + 1];
-		memcpy( m_pszTrueFileName, pName, len + 1 );
+
+		m_pszTrueFileName = V_strdup( pName );
 	}
 #endif
 
@@ -163,7 +161,7 @@ protected:
 	};
 	unsigned int	m_nMagic;
 
-	bool IsValid();
+	bool IsValid() const;
 };
 
 class CMemoryFileHandle : public CFileHandle
@@ -183,8 +181,8 @@ public:
 	int m_nPosition;
 
 private:
-	CMemoryFileHandle( const CMemoryFileHandle& ); // not defined
-	CMemoryFileHandle& operator=( const CMemoryFileHandle& ); // not defined
+	CMemoryFileHandle( const CMemoryFileHandle& ) = delete; // not defined
+	CMemoryFileHandle& operator=( const CMemoryFileHandle& ) = delete; // not defined
 };
 
 
@@ -199,7 +197,7 @@ private:
 class CPackedStoreRefCount : public CPackedStore, public CRefCounted<CRefCountServiceMT>
 {
 public:
-	CPackedStoreRefCount( char const *pFileBasename, char *pszFName, IBaseFileSystem *pFS );
+	CPackedStoreRefCount( char const *pFileBasename, char *pszFName, intp fnameSize, IBaseFileSystem *pFS );
 
 	bool m_bSignatureValid;
 };
@@ -233,10 +231,10 @@ public:
 	InitReturnVal_t		Init() override;
 	void				Shutdown() override;
 
-	void						InitAsync();
-	void						ShutdownAsync();
+	void				InitAsync();
+	void				ShutdownAsync();
 
-	void						ParsePathID( const char* &pFilename, const char* &pPathID, char tempPathID[MAX_PATH] );
+	void				ParsePathID( const char* &pFilename, const char* &pPathID, char tempPathID[MAX_PATH] );
 
 	// file handling
 	FileHandle_t		Open( const char *pFileName, const char *pOptions, const char *pathID ) override;
@@ -253,10 +251,10 @@ public:
 	bool				Precache( const char *pFileName, const char *pPathID ) override;
 	bool				EndOfFile( FileHandle_t file ) override;
  
-	int					Read( void *pOutput, int size, FileHandle_t file ) override;
-	int					ReadEx( void* pOutput, int sizeDest, int size, FileHandle_t file ) override;
-	int					Write( void const* pInput, int size, FileHandle_t file ) override;
-	char				*ReadLine( char *pOutput, int maxChars, FileHandle_t file ) override;
+	int					Read( OUT_BYTECAP(size) void *pOutput, int size, FileHandle_t file ) override;
+	int					ReadEx( OUT_BYTECAP(destSize) void* pOutput, int destSize, int size, FileHandle_t file ) override;
+	int					Write( IN_BYTECAP(size) void const* pInput, int size, FileHandle_t file ) override;
+	char				*ReadLine( OUT_Z_CAP(maxChars) char *pOutput, int maxChars, FileHandle_t file ) override;
 	int					FPrintf( FileHandle_t file, PRINTF_FORMAT_STRING const char *pFormat, ... ) override FMTFUNCTION( 3, 4 );
 
 	// Reads/writes files to utlbuffers
@@ -304,10 +302,10 @@ public:
 	void				MarkPathIDByRequestOnly( const char *pPathID, bool bRequestOnly ) override;
 
 	bool				FileExists( const char *pFileName, const char *pPathID = NULL ) override;
-	long				GetFileTime( const char *pFileName, const char *pPathID = NULL ) override;
+	time_t				GetFileTime( const char *pFileName, const char *pPathID = NULL ) override;
 	bool				IsFileWritable( char const *pFileName, const char *pPathID = NULL ) override;
 	bool				SetFileWritable( char const *pFileName, bool writable, const char *pPathID = 0 ) override;
-	void				FileTimeToString( char *pString, int maxChars, long fileTime ) override;
+	void				FileTimeToString( OUT_Z_CAP(maxChars) char *pString, intp maxChars, time_t fileTime ) override;
 	
 	const char			*FindFirst( const char *pWildCard, FileFindHandle_t *pHandle ) override;
 	const char			*FindFirstEx( const char *pWildCard, const char *pPathID, FileFindHandle_t *pHandle ) override;
@@ -324,13 +322,18 @@ public:
 
 	void				GetLocalCopy( const char *pFileName ) override;
 
-	virtual bool				FixUpPath( const char *pFileName, char *pFixedUpFileName, int sizeFixedUpFileName );
+	virtual bool		FixUpPath( const char *pFileName, char *pFixedUpFileName, int sizeFixedUpFileName );
+	template<int size>
+	bool				FixUpPath( const char *pFileName, char (&pFixedUpFileName)[size] )
+	{
+		return FixUpPath( pFileName, pFixedUpFileName, size );
+	}
 
 	FileNameHandle_t	FindOrAddFileName( char const *pFileName ) override;
 	FileNameHandle_t	FindFileName( char const *pFileName ) override;
-	bool				String( const FileNameHandle_t& handle, char *buf, int buflen ) override;
+	bool				String( const FileNameHandle_t& handle, OUT_Z_CAP(buflen) char *buf, intp buflen ) override;
 	int					GetPathIndex( const FileNameHandle_t &handle ) override;
-	long				GetPathTime( const char *pFileName, const char *pPathID ) override;
+	time_t				GetPathTime( const char *pFileName, const char *pPathID ) override;
 	
 	void				EnableWhitelistFileTracking( bool bEnable, bool bCacheAllVPKHashes, bool bRecalculateAndCheckHashes ) override;
 	void				RegisterFileWhitelist( IPureServerWhitelist *pWhiteList, IFileList **ppFilesToReload ) override;
@@ -399,7 +402,7 @@ public:
 	const char			*RelativePathToFullPath( const char *pFileName, const char *pPathID, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars, PathTypeFilter_t pathFilter = FILTER_NONE, PathTypeQuery_t *pPathType = NULL ) override;
 
 	// Returns the search path, each path is separated by ;s. Returns the length of the string returned
-	int					GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) override;
+	int					GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars ) override;
 
 #if defined( TRACK_BLOCKING_IO )
 	void				EnableBlockingFileAccessTracking( bool state ) override;
@@ -432,7 +435,7 @@ public:
 	// Otherwise, it'll just fall through to the regular KeyValues loading routines
 	KeyValues			*LoadKeyValues( KeyValuesPreloadType_t type, char const *filename, char const *pPathID = 0 ) override;
 	bool				LoadKeyValues( KeyValues& head, KeyValuesPreloadType_t type, char const *filename, char const *pPathID = 0 ) override;
-	bool				ExtractRootKeyName( KeyValuesPreloadType_t type, char *outbuf, size_t bufsize, char const *filename, char const *pPathID = 0 ) override;
+	bool				ExtractRootKeyName( KeyValuesPreloadType_t type, OUT_Z_CAP(bufsize) char *outbuf, size_t bufsize, char const *filename, char const *pPathID = 0 ) override;
 
 	DVDMode_t			GetDVDMode() override { return m_DVDMode; }
 
@@ -578,7 +581,7 @@ public:
 				CopySearchPaths( pFileSystem->m_SearchPaths );
 				pFileSystem->m_SearchPathsMutex.Unlock();
 
-				pFileSystem->FixUpPath ( *ppszFilename, m_Filename, sizeof( m_Filename ) );
+				pFileSystem->FixUpPath ( *ppszFilename, m_Filename );
 			}
 			else
 			{
@@ -698,9 +701,9 @@ protected:
 	virtual void FS_fseek( FILE *fp, int64 pos, int seekType ) = 0;
 	virtual long FS_ftell( FILE *fp ) = 0;
 	virtual int FS_feof( FILE *fp ) = 0;
-	size_t FS_fread( void *dest, size_t size, FILE *fp ) { return FS_fread( dest, (size_t)-1, size, fp ); }
-	virtual size_t FS_fread( void *dest, size_t destSize, size_t size, FILE *fp ) = 0;
-    virtual size_t FS_fwrite( const void *src, size_t size, FILE *fp ) = 0;
+	size_t FS_fread( OUT_BYTECAP(size) void *dest, size_t size, FILE *fp ) { return FS_fread( dest, (size_t)-1, size, fp ); }
+	virtual size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size, FILE *fp ) = 0;
+    virtual size_t FS_fwrite( IN_BYTECAP(size) const void *src, size_t size, FILE *fp ) = 0;
 	virtual bool FS_setmode( FILE *, FileMode_t ) { return false; }
 	virtual size_t FS_vfprintf( FILE *fp, const char *fmt, va_list list ) = 0;
 	virtual int FS_ferror( FILE *fp ) = 0;
@@ -733,10 +736,10 @@ protected:
 	class COpenedFile
 	{
 	public:
-					COpenedFile( void );
-					~COpenedFile( void );
+		COpenedFile() : m_pFile{nullptr}, m_pName{nullptr} {}
+		~COpenedFile();
 
-					COpenedFile( const COpenedFile& src );
+		COpenedFile( const COpenedFile& src );
 
 		bool operator==( const COpenedFile& src ) const;
 
@@ -787,7 +790,7 @@ protected:
 	void						HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAbsolutePath, bool bNative );
 
 	FileHandle_t				FindFileInSearchPath( CFileOpenInfo &openInfo, bool bNative );
-	long						FastFileTime( const CSearchPath *path, const char *pFileName );
+	time_t						FastFileTime( const CSearchPath *path, const char *pFileName );
 
 	const char					*GetWritePath( const char *pFilename, const char *pathID );
 
@@ -803,7 +806,7 @@ protected:
 
 	// Helper function for fs_log file logging
 	void LogFileAccess( const char *pFullFileName );
-	bool LookupKeyValuesRootKeyName( char const *filename, char const *pPathID, char *rootName, size_t bufsize );
+	bool LookupKeyValuesRootKeyName( char const *filename, char const *pPathID, OUT_Z_CAP(bufsize) char *rootName, size_t bufsize );
 	void UnloadCompiledKeyValues();
 
 	// If bByRequestOnly is -1, then it will default to false if it doesn't already exist, and it 

@@ -25,7 +25,7 @@ $Configuration "Debug"
 	{
 		// General
 		$OutputDirectory					"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME"
-		$IntermediateDirectory				"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\\$PROJECTNAME\i"
+		$IntermediateDirectory				"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i"
 		$ExtensionsToDeleteOnClean
 		$BuildLogFile
 		$InheritedProjectPropertySheets
@@ -258,7 +258,7 @@ $Configuration "Debug"
 		$UseFAT32WorkAround
 
 		// Input And Output
-		$AdditionalManifestFiles			"$SRCDIR\build\win\manifests\supported-os.manifest" [!$SOURCESDK]
+		$AdditionalManifestFiles			"$SRCDIR\build\win\manifests\supported-os.manifest;$SRCDIR\build\win\manifests\heap-type.manifest" [!$SOURCESDK]
 		$InputResourceManifests
 		$EmbedManifest
 		$OutputManifestFile
@@ -301,7 +301,7 @@ $Configuration "Debug"
 	$Resources
 	{
 		// General
-		$PreprocessorDefinitions				"_DEBUG;_CRT_SECURE_NO_DEPRECATE;_CRT_NONSTDC_NO_DEPRECATE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTE$(TargetName)\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTE$(TargetFileName)\$QUOTE;%(PreprocessorDefinitions)"
+		$PreprocessorDefinitions				"_DEBUG;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTE$(TargetName)\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTE$(TargetFileName)\$QUOTE;%(PreprocessorDefinitions)"
 		$Culture								"English (United States) (0x409)"
 		$AdditionalIncludeDirectories			"$(SolutionDir)out\build"
 		$IgnoreStandardIncludePath

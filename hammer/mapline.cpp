@@ -116,13 +116,13 @@ CMapLine::CMapLine(const char *pszStartKey, const char *pszStartValueKey, const 
 {	
 	Initialize();
 
-	strcpy(m_szStartKey, pszStartKey);
-	strcpy(m_szStartValueKey, pszStartValueKey);
+	V_strcpy_safe(m_szStartKey, pszStartKey);
+	V_strcpy_safe(m_szStartValueKey, pszStartValueKey);
 
 	if ((pszEndKey != NULL) && (pszEndValueKey != NULL))
 	{
-		strcpy(m_szEndKey, pszEndKey);
-		strcpy(m_szEndValueKey, pszEndValueKey);
+		V_strcpy_safe(m_szEndKey, pszEndKey);
+		V_strcpy_safe(m_szEndValueKey, pszEndValueKey);
 	}
 }
 
@@ -256,11 +256,11 @@ CMapClass *CMapLine::CopyFrom(CMapClass *pObject, bool bUpdateDependencies)
 			m_pEndEntity = pFrom->m_pEndEntity;
 		}
 
-		strcpy(m_szStartValueKey, pFrom->m_szStartValueKey);
-		strcpy(m_szStartKey, pFrom->m_szStartKey);
+		V_strcpy_safe(m_szStartValueKey, pFrom->m_szStartValueKey);
+		V_strcpy_safe(m_szStartKey, pFrom->m_szStartKey);
 
-		strcpy(m_szEndValueKey, pFrom->m_szEndValueKey);
-		strcpy(m_szEndKey, pFrom->m_szEndKey);
+		V_strcpy_safe(m_szEndValueKey, pFrom->m_szEndValueKey);
+		V_strcpy_safe(m_szEndKey, pFrom->m_szEndKey);
 	}
 
 	return(this);

@@ -535,7 +535,7 @@ bool CGameClient::ProcessIncomingLogo( const char *filename )
 {
 	char crcfilename[ 512 ];
 	char logohex[ 16 ];
-	Q_binarytohex( (byte *)&logo, sizeof( logo ), logohex, sizeof( logohex ) );
+	V_binarytohex( logo, logohex );
 
 	Q_snprintf( crcfilename, sizeof( crcfilename ), "materials/decals/downloads/%s.vtf", logohex );
 
@@ -693,7 +693,7 @@ void CGameClient::Disconnect( const char *fmt, ... )
 		return;	// no recursion
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (reason, sizeof( reason ), fmt,argptr);
+	V_vsprintf_safe (reason, fmt,argptr);
 	va_end (argptr);
 
 	// notify other clients of player leaving the game
@@ -1267,7 +1267,7 @@ bool CGameClient::ShouldSendMessages( void )
 #if defined( REPLAY_ENABLED )
 	if ( m_bIsReplay )
 	{
-		const float replay_snapshotrate = 16.0f;
+		constexpr float replay_snapshotrate = 16.0f;
 
 		// calc snapshot interval
 		int nSnapshotInterval = 1.0f / ( m_Server->GetTickInterval() * replay_snapshotrate );

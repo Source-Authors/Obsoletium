@@ -755,9 +755,9 @@ static void SetClearColorToFogColor()
 	{
 		// @MULTICORE (toml 8/16/2006): Find a way to not do this twice in eye above water case
 		float scale = LinearToGammaFullRange( pRenderContext->GetToneMappingScaleLinear().x );
-		ucFogColor[0] *= scale;
-		ucFogColor[1] *= scale;
-		ucFogColor[2] *= scale;
+		ucFogColor[0] = static_cast<byte>(ucFogColor[0] * scale);
+		ucFogColor[1] = static_cast<byte>(ucFogColor[1] * scale);
+		ucFogColor[2] = static_cast<byte>(ucFogColor[2] * scale);
 	}
 	pRenderContext->ClearColor4ub( ucFogColor[0], ucFogColor[1], ucFogColor[2], 255 );
 }
@@ -1297,10 +1297,10 @@ bool CViewRender::UpdateShadowDepthTexture( ITexture *pRenderTarget, ITexture *p
 	CMatRenderContextPtr pRenderContext( materials );
 
 	char szPIXEventName[128];
-	sprintf( szPIXEventName, "UpdateShadowDepthTexture (%s)", pDepthTexture->GetName() );
+	V_sprintf_safe( szPIXEventName, "UpdateShadowDepthTexture (%s)", pDepthTexture->GetName() );
 	PIXEVENT( pRenderContext, szPIXEventName );
 
-	CRefPtr<CShadowDepthView> pShadowDepthView = new CShadowDepthView( this );
+	CRefPtr<CShadowDepthView> pShadowDepthView{new CShadowDepthView(this)};
 	pShadowDepthView->Setup( shadowViewIn, pRenderTarget, pDepthTexture );
 	AddViewToScene( pShadowDepthView );
 
@@ -1941,7 +1941,7 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 
 	if ( !m_rbTakeFreezeFrame[viewRender.m_eStereoEye ] && m_flFreezeFrameUntil > gpGlobals->curtime )
 	{
-		CRefPtr<CFreezeFrameView> pFreezeFrameView = new CFreezeFrameView( this );
+		CRefPtr<CFreezeFrameView> pFreezeFrameView{new CFreezeFrameView( this )};
 		pFreezeFrameView->Setup( viewRender );
 		AddViewToScene( pFreezeFrameView );
 
@@ -2560,16 +2560,16 @@ void CViewRender::DrawWorldAndEntities( bool bDrawSkybox, const CViewSetup &view
 		cplane_t glassReflectionPlane;
 		if ( IsReflectiveGlassInView( viewIn, glassReflectionPlane ) )
 		{								    
-			CRefPtr<CReflectiveGlassView> pGlassReflectionView = new CReflectiveGlassView( this );
+			CRefPtr<CReflectiveGlassView> pGlassReflectionView{new CReflectiveGlassView( this )};
 			pGlassReflectionView->Setup( viewIn, VIEW_CLEAR_DEPTH | VIEW_CLEAR_COLOR, bDrawSkybox, fogVolumeInfo, info, glassReflectionPlane );
 			AddViewToScene( pGlassReflectionView );
 
-			CRefPtr<CRefractiveGlassView> pGlassRefractionView = new CRefractiveGlassView( this );
+			CRefPtr<CRefractiveGlassView> pGlassRefractionView{new CRefractiveGlassView( this )};
 			pGlassRefractionView->Setup( viewIn, VIEW_CLEAR_DEPTH | VIEW_CLEAR_COLOR, bDrawSkybox, fogVolumeInfo, info, glassReflectionPlane );
 			AddViewToScene( pGlassRefractionView );
 		}
 
-		CRefPtr<CSimpleWorldView> pNoWaterView = new CSimpleWorldView( this );
+		CRefPtr<CSimpleWorldView> pNoWaterView{new CSimpleWorldView( this )};
 		pNoWaterView->Setup( viewIn, nClearFlags, bDrawSkybox, fogVolumeInfo, info, pCustomVisibility );
 		AddViewToScene( pNoWaterView );
 		return;
@@ -2587,14 +2587,14 @@ void CViewRender::DrawWorldAndEntities( bool bDrawSkybox, const CViewSetup &view
 	if ( !fogVolumeInfo.m_bEyeInFogVolume )
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CAboveWaterView" );
-		CRefPtr<CAboveWaterView> pAboveWaterView = new CAboveWaterView( this );
+		CRefPtr<CAboveWaterView> pAboveWaterView{new CAboveWaterView( this )};
 		pAboveWaterView->Setup( viewIn, bDrawSkybox, fogVolumeInfo, info );
 		AddViewToScene( pAboveWaterView );
 	}
 	else
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "CUnderWaterView" );
-		CRefPtr<CUnderWaterView> pUnderWaterView = new CUnderWaterView( this );
+		CRefPtr<CUnderWaterView> pUnderWaterView{new CUnderWaterView( this )};
 		pUnderWaterView->Setup( viewIn, bDrawSkybox, fogVolumeInfo, info );
 		AddViewToScene( pUnderWaterView );
 	}
@@ -3877,7 +3877,7 @@ static void DrawOpaqueRenderables_DrawStaticProps( CClientRenderablesList::CEntr
 	render->SetColorModulation(	one );
 	render->SetBlend( 1.0f );
 	
-	const int MAX_STATICS_PER_BATCH = 512;
+	constexpr int MAX_STATICS_PER_BATCH = 512;
 	IClientRenderable *pStatics[ MAX_STATICS_PER_BATCH ];
 	
 	int numScheduled = 0, numAvailable = MAX_STATICS_PER_BATCH;

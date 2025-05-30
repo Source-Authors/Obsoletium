@@ -14,8 +14,10 @@
 #include "vphysics_interface.h"
 class IPhysics;
 class IPhysicsCollision;
+class IPhysicsSurfaceProps;
 
-extern CreateInterfaceFn	GetPhysicsFactory( void );
+extern CreateInterfaceFnT<IPhysicsCollision> GetPhysicsFactory(void);
+extern CreateInterfaceFnT<IPhysicsSurfaceProps> GetPhysicsFactory2(void);
 
 extern "C" {
 #endif

@@ -31,39 +31,35 @@
 #include "filesystem_init.h"
 #include "vphysics_interface.h"
 
+#include "scoped_app_locale.h"
+
 // dimhotepus: Drop Perforce support
 // #include "p4lib/ip4.h"
 
-// Global systems
+#include "tier0/memdbgon.h"
+
+extern "C" {
+
+// Starting with the Release 302 drivers, application developers can direct the
+// Nvidia Optimus driver at runtime to use the High Performance Graphics to
+// render any application - even those applications for which there is no
+// existing application profile.
+//
+// See
+// https://developer.download.nvidia.com/devzone/devcenter/gamegraphics/files/OptimusRenderingPolicies.pdf
+__declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+
+// This will select the high performance AMD GPU as long as no profile exists
+// that assigns the application to another GPU.  Please make sure to use a 13.35
+// or newer driver.  Older drivers do not support this.
+//
+// See
+// https://community.amd.com/t5/firepro-development/can-an-opengl-app-default-to-the-discrete-gpu-on-an-enduro/td-p/279440
+__declspec(dllexport) DWORD AmdPowerXpressRequestHighPerformance = 0x00000001;
+
+}  // extern "C"
 
 namespace {
-
-// The application object
-class HammerAppSystemGroup final : public CAppSystemGroup {
- public:
-  HammerAppSystemGroup()
-      : file_system_{nullptr},
-        data_cache_{nullptr},
-        input_system_{nullptr},
-        material_system_{nullptr},
-        hammer_{nullptr} {}
-
-  // Methods of IApplication
-  bool Create() override;
-  bool PreInit() override;
-  int Main() override;
-  void PostShutdown() override;
-  void Destroy() override;
-
- private:
-  int MainLoop();
-
-  IFileSystem *file_system_;
-  IDataCache *data_cache_;
-  IInputSystem *input_system_;
-  IMaterialSystem *material_system_;
-  IHammer *hammer_;
-};
 
 template <size_t out_size>
 const char *PrefixMessageGroup(
@@ -102,12 +98,56 @@ SpewRetval_t HammerSpewFunc(SpewType_t type, char const *raw) {
   return SPEW_CONTINUE;
 }
 
+// The application object
+class HammerAppSystemGroup final : public CAppSystemGroup {
+ public:
+  HammerAppSystemGroup()
+      : file_system_{nullptr},
+        data_cache_{nullptr},
+        input_system_{nullptr},
+        material_system_{nullptr},
+        hammer_{nullptr},
+        scoped_spew_output_{HammerSpewFunc},
+        scoped_app_locale_{kEnUsUtf8Locale},
+        scoped_com_{static_cast<COINIT>(COINIT_APARTMENTTHREADED |
+                                        COINIT_DISABLE_OLE1DDE |
+                                        COINIT_SPEED_OVER_MEMORY)},
+        scoped_timer_resolution_{kSystemTimerResolution},
+        scoped_winsock_{WINSOCK_VERSION} {}
+
+  // Methods of IApplication
+  bool Create() override;
+  bool PreInit() override;
+  int Main() override;
+  void PostShutdown() override;
+  void Destroy() override;
+
+ private:
+  static constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+  static constexpr auto kSystemTimerResolution{std::chrono::milliseconds{2}};
+
+  IFileSystem *file_system_;
+  IDataCache *data_cache_;
+  IInputSystem *input_system_;
+  IMaterialSystem *material_system_;
+  IHammer *hammer_;
+
+  const ScopedSpewOutputFunc scoped_spew_output_;
+  const se::ScopedAppLocale scoped_app_locale_;
+  const se::common::windows::ScopedCom scoped_com_;
+  const se::common::windows::ScopedTimerResolution scoped_timer_resolution_;
+  const se::common::windows::ScopedWinsock scoped_winsock_;
+};
+
 // Create all singleton systems
 bool HammerAppSystemGroup::Create() {
+  if (Q_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    Warning("setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
+
   // Save some memory so engine/hammer isn't so painful
   CommandLine()->AppendParm("-disallowhwmorph", nullptr);
-
-  SpewOutputFunc(HammerSpewFunc);
 
   // Game and hammer require theses.
   const CPUInformation *cpu_info{GetCPUInformation()};
@@ -120,32 +160,23 @@ bool HammerAppSystemGroup::Create() {
 
 #ifdef WIN32
   // COM is required.
-  const se::common::windows::ScopedCom scoped_com{
-      static_cast<COINIT>(COINIT_APARTMENTTHREADED | COINIT_DISABLE_OLE1DDE |
-                          COINIT_SPEED_OVER_MEMORY)};
-  if (FAILED(scoped_com.errc())) {
-    const _com_error com_error{scoped_com.errc()};
-    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com.errc(),
+  if (FAILED(scoped_com_.errc())) {
+    const _com_error com_error{scoped_com_.errc()};
+    Error("Unable to initialize COM (0x%x): %s.\n\n", scoped_com_.errc(),
           com_error.ErrorMessage());
   }
 
-  using namespace std::chrono_literals;
-  constexpr std::chrono::milliseconds kSystemTimerResolution{2ms};
-
   // System timer precision affects Sleep & friends performance.
-  const se::common::windows::ScopedTimerResolution scoped_timer_resolution{
-      kSystemTimerResolution};
-  if (!scoped_timer_resolution) {
+  if (!scoped_timer_resolution_) {
     Warning(
         "Unable to set Windows timer resolution to %lld ms. Will use default "
         "one.",
         static_cast<long long>(kSystemTimerResolution.count()));
   }
 
-  const se::common::windows::ScopedWinsock scoped_winsock{WINSOCK_VERSION};
-  if (scoped_winsock.errc()) {
+  if (scoped_winsock_.errc()) {
     Warning("Windows sockets 2.2 unavailable (%d): %s.\n",
-            scoped_winsock.errc(), scoped_winsock.errc().message().c_str());
+            scoped_winsock_.errc(), scoped_winsock_.errc().message().c_str());
   }
 #endif
 
@@ -170,7 +201,7 @@ bool HammerAppSystemGroup::Create() {
       AddSystem<IFileSystem>(file_system_module, FILESYSTEM_INTERFACE_VERSION);
   if (!file_system_) return false;
 
-  FileSystem_SetBasePaths(file_system_);
+  if (FileSystem_SetBasePaths(file_system_) != FS_OK) return false;
 
   AppSystemInfo_t app_systems[] = {
       {"materialsystem" DLL_EXT_STRING, MATERIAL_SYSTEM_INTERFACE_VERSION},
@@ -221,9 +252,6 @@ void HammerAppSystemGroup::Destroy() {
   input_system_ = nullptr;
   data_cache_ = nullptr;
   file_system_ = nullptr;
-
-  // dimhotepus: Restore default spew.
-  SpewOutputFunc(DefaultSpewFunc);
 }
 
 // Init, shutdown

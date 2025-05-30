@@ -58,7 +58,7 @@ DEFINE_SOURCE_NOTIFY_SCOPE_GUARD( PresetGroup, NOTIFY_SOURCE_PRESET_GROUP_EDITOR
 //-----------------------------------------------------------------------------
 class CDmePresetRemapPanel : public vgui::Frame
 {
-	DECLARE_CLASS_SIMPLE( CDmePresetRemapPanel, vgui::Frame );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePresetRemapPanel, vgui::Frame );
 
 public:
 	CDmePresetRemapPanel( vgui::Panel *pParent, const char *pTitle );
@@ -68,9 +68,9 @@ public:
 	void DoModal( CDmeAnimationSet *pAnimationSet, CDmePresetGroup *pDestGroup );
 
 	// Inherited from Frame
-	virtual void OnCommand( const char *pCommand );
+	void OnCommand( const char *pCommand ) override;
 
-	virtual void OnKeyCodeTyped( KeyCode code );
+	void OnKeyCodeTyped( KeyCode code ) override;
 
 private:
 	MESSAGE_FUNC( OnTextChanged, "TextChanged" );
@@ -167,14 +167,14 @@ void CDmePresetRemapPanel::RefreshPresetList( )
 	if ( !pPresetList )
 		return;
 
-	int nCount = pPresetList->Count();
+	intp nCount = pPresetList->Count();
 	if ( nCount == 0 )
 		return;
 
 	CDmePresetRemap *pRemap = m_hDestGroup->GetPresetRemap();
 	bool bUseRemap = ( pRemap && m_hSourceGroup.Get() && !Q_stricmp( pRemap->m_SourcePresetGroup, m_hSourceGroup->GetName() ) );
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePreset *pPreset = pPresetList->Get(i);
 
@@ -315,8 +315,8 @@ void CDmePresetRemapPanel::DoModal( CDmeAnimationSet *pAnimationSet, CDmePresetG
 
 	// Populate the combo box with preset group names
 	const CDmaElementArray< CDmePresetGroup > &presetGroupList = pAnimationSet->GetPresetGroups();
-	int nCount = presetGroupList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = presetGroupList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePresetGroup *pPresetGroup = presetGroupList[i];
 		if ( pPresetGroup == m_hDestGroup.Get() )
@@ -397,18 +397,18 @@ void CDmePresetRemapPanel::OnCommand( const char *command )
 //-----------------------------------------------------------------------------
 class CDmePresetGroupListPanel : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmePresetGroupListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePresetGroupListPanel, vgui::ListPanel );
 
 public:
 	// constructor, destructor
 	CDmePresetGroupListPanel( vgui::Panel *pParent, const char *pName, CDmePresetGroupEditorPanel *pComboPanel );
 
-	virtual void OnCreateDragData( KeyValues *msg );
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& msgList );
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& msgList );
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-	virtual void OnMouseDoublePressed( vgui::MouseCode code );
-	virtual void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels );
+	void OnCreateDragData( KeyValues *msg ) override;
+	bool IsDroppable( CUtlVector< KeyValues * >& msgList ) override;
+	void OnPanelDropped( CUtlVector< KeyValues * >& msgList ) override;
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnMouseDoublePressed( vgui::MouseCode code ) override;
+	void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels ) override;
 
 private:
 	CDmePresetGroupEditorPanel *m_pPresetGroupPanel;
@@ -424,17 +424,17 @@ private:
 //-----------------------------------------------------------------------------
 class CDmePresetListPanel : public vgui::ListPanel
 {
-	DECLARE_CLASS_SIMPLE( CDmePresetListPanel, vgui::ListPanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CDmePresetListPanel, vgui::ListPanel );
 
 public:
 	// constructor, destructor
 	CDmePresetListPanel( vgui::Panel *pParent, const char *pName, CDmePresetGroupEditorPanel *pComboPanel );
 
-	virtual void OnKeyCodeTyped( vgui::KeyCode code );
-	virtual void OnCreateDragData( KeyValues *msg );
-	virtual bool IsDroppable( CUtlVector< KeyValues * >& msgList );
-	virtual void OnPanelDropped( CUtlVector< KeyValues * >& msgList );
-	virtual void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels );
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
+	void OnCreateDragData( KeyValues *msg ) override;
+	bool IsDroppable( CUtlVector< KeyValues * >& msgList ) override;
+	void OnPanelDropped( CUtlVector< KeyValues * >& msgList ) override;
+	void OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, CUtlVector< Panel * >& dragPanels ) override;
 
 private:
 
@@ -550,7 +550,7 @@ void CDmePresetGroupEditorPanel::RefreshAnimationSet()
 		return;
 	
 	const CDmaElementArray< CDmePresetGroup > &presetGroupList = m_hAnimationSet->GetPresetGroups();
-	int nCount = presetGroupList.Count();
+	intp nCount = presetGroupList.Count();
 	for ( int i = 0; i < nCount; ++i )
 	{ 
 		CDmePresetGroup *pPresetGroup = presetGroupList[i];
@@ -605,8 +605,8 @@ void CDmePresetGroupEditorPanel::RefreshPresetNames()
 		return;
 
 	const CDmaElementArray< CDmePreset > &presetList = pPresetGroup->GetPresets();
-	int nCount = presetList.Count( );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = presetList.Count( );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmePreset *pPreset = presetList[i];
 		KeyValues *kv = new KeyValues( "node", "name", pPreset->GetName() );
@@ -931,58 +931,6 @@ struct ExportedControl_t
 	int m_nFirstIndex;
 };
 
-static int FindExportedControlIndex( const char *pControlName, CUtlVector< ExportedControl_t > &uniqueControls )
-{
-	int nCount = uniqueControls.Count();
-	for ( int i = 0; i < nCount; ++i )
-	{
-		if ( !Q_stricmp( pControlName, uniqueControls[i].m_Name ) )
-			return i;
-	}
-	return -1;
-}
-
-
-//-----------------------------------------------------------------------------
-// Builds a unique list of controls found in the presets
-//-----------------------------------------------------------------------------
-static int BuildExportedControlList( CDmeAnimationSet *pAnimationSet, CDmePresetGroup *pPresetGroup, CUtlVector< ExportedControl_t > &uniqueControls )
-{
-	int nGlobalIndex = 0;
-	const CDmrElementArray< CDmePreset > &presets = pPresetGroup->GetPresets();
-	int nPresetCount = presets.Count();
-	for ( int iPreset = 0; iPreset < nPresetCount; ++iPreset )
-	{
-		CDmePreset *pPreset = presets[iPreset];
-		const CDmrElementArray< CDmElement > &controls = pPreset->GetControlValues();
-
-		int nControlCount = controls.Count();
-		for ( int i = 0; i < nControlCount; ++i )
-		{
-			const char *pControlName = controls[i]->GetName();
-			int nIndex = FindExportedControlIndex( pControlName, uniqueControls );
-			if ( nIndex >= 0 )
-				continue;
-			CDmAttribute *pValueAttribute = controls[i]->GetAttribute( "value" );
-			if ( !pValueAttribute || pValueAttribute->GetType() != AT_FLOAT )
-				continue;
-
-			CDmElement *pControl = pAnimationSet->FindControl( pControlName );
-			if ( !pControl )
-				continue;
-
-			int j = uniqueControls.AddToTail();
-			ExportedControl_t &control = uniqueControls[j];
-			control.m_Name = pControlName;
-			control.m_bIsStereo = pControl->GetValue<bool>( "combo" );
-			control.m_bIsMulti = pControl->GetValue<bool>( "multi" );
-			control.m_nFirstIndex = nGlobalIndex;
-			nGlobalIndex += 1 + control.m_bIsStereo + control.m_bIsMulti;
-		}
-	}
-	return nGlobalIndex;
-}
-
 
 //-----------------------------------------------------------------------------
 // Fileopen state machine
@@ -1001,21 +949,21 @@ void CDmePresetGroupEditorPanel::SetupFileOpenDialog( vgui::FileOpenDialog *pDia
 	char pPresetPath[MAX_PATH];
 	if ( !Q_stricmp( pFileFormat, PRESET_FILE_FORMAT ) )
 	{
-		GetModSubdirectory( "models", pPresetPath, sizeof(pPresetPath) );
+		GetModSubdirectory( "models", pPresetPath );
 		pDialog->SetStartDirectoryContext( "preset_importexport", pPresetPath );
 		pDialog->AddFilter( "*.*", "All Files (*.*)", false );
 		pDialog->AddFilter( "*.pre", "Preset File (*.pre)", true, PRESET_FILE_FORMAT );
 	}
 	else if ( !Q_stricmp( pFileFormat, "vfe" ) )
 	{
-		GetModSubdirectory( "expressions", pPresetPath, sizeof(pPresetPath) );
+		GetModSubdirectory( "expressions", pPresetPath );
 		pDialog->SetStartDirectoryContext( "preset_exportvfe", pPresetPath );
 		pDialog->AddFilter( "*.*", "All Files (*.*)", false );
 		pDialog->AddFilter( "*.vfe", "Expression File (*.vfe)", true, "vfe" );
 	}
 	else if ( !Q_stricmp( pFileFormat, "txt" ) )
 	{
-		GetModSubdirectory( "expressions", pPresetPath, sizeof(pPresetPath) );
+		GetModSubdirectory( "expressions", pPresetPath );
 		pDialog->SetStartDirectoryContext( "preset_exportvfe", pPresetPath );
 		pDialog->AddFilter( "*.*", "All Files (*.*)", false );
 		pDialog->AddFilter( "*.txt", "Faceposer Expression File (*.txt)", true, "txt" );
@@ -1162,16 +1110,16 @@ void CDmePresetGroupEditorPanel::ImportPresets( const CUtlVector< CDmePreset * >
 
 	CPresetGroupUndoScopeGuard sg( NOTIFY_SETDIRTYFLAG, "Import Presets" );
 
-	int nPresetCount = presets.Count();
-	for ( int i = 0; i < nPresetCount; ++i )
+	intp nPresetCount = presets.Count();
+	for ( intp i = 0; i < nPresetCount; ++i )
 	{
 		CDmePreset *pPreset = pPresetGroup->FindOrAddPreset( presets[i]->GetName() );
 		const CDmaElementArray< CDmElement > &srcValues = presets[i]->GetControlValues( );
 		CDmaElementArray< CDmElement > &values = pPreset->GetControlValues( );
 		values.RemoveAll();
 
-		int nValueCount = srcValues.Count();
-		for ( int j = 0; j < nValueCount; ++j )
+		intp nValueCount = srcValues.Count();
+		for ( intp j = 0; j < nValueCount; ++j )
 		{
 			CDmElement *pSrcControlValue = srcValues[j];
 			CDmElement *pControlValue = pSrcControlValue->Copy( );
@@ -1326,13 +1274,13 @@ void CDmePresetGroupEditorPanel::OnRemoveDefaultControls()
 
 	CPresetGroupUndoScopeGuard sg( NOTIFY_SETDIRTYFLAG, "Remove Default Controls" );
 	CDmrElementArray< CDmePreset > presets = pPresetGroup->GetPresets();
-	int nPresetCount = presets.Count();
-	for ( int i = 0; i < nPresetCount; ++i )
+	intp nPresetCount = presets.Count();
+	for ( intp i = 0; i < nPresetCount; ++i )
 	{
 		CDmePreset *pPreset = presets[i];
 		CDmrElementArray< CDmElement > controls = pPreset->GetControlValues();	
-		int nControlCount = controls.Count();
-		for ( int j = nControlCount; --j >= 0; )
+		intp nControlCount = controls.Count();
+		for ( intp j = nControlCount; --j >= 0; )
 		{
 			CDmElement *pControlValue = controls[j];
 			CDmElement *pControl = m_hAnimationSet->FindControl( pControlValue->GetName() );
@@ -2284,7 +2232,7 @@ void CDmePresetGroupEditorFrame::OnCommand( const char *pCommand )
 //-----------------------------------------------------------------------------
 // Inherited from IDmNotify
 //-----------------------------------------------------------------------------
-void CDmePresetGroupEditorFrame::NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags )
+void CDmePresetGroupEditorFrame::NotifyDataChanged( [[maybe_unused]] const char *pReason, int nNotifySource, int nNotifyFlags )
 {
 	if ( !IsVisible() )
 		return;

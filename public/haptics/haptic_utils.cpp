@@ -430,7 +430,8 @@ void HapticsEnteredVehicle(C_BaseEntity* vehicle, C_BaseCombatCharacter *pPassen
 		haptics->SetNavigationClass("vehicle_nogun");
 	}
 
-	Msg("VehicleType:%s:\n",vehicle->GetClassname());
+	// dimhotepus: Msg -> DevMsg.
+	DevMsg("Entered vehicle: %s.\n",vehicle->GetClassname());
 }
 
 void HapticsExitedVehicle(C_BaseEntity* vehicle, C_BaseCombatCharacter *pPassenger )

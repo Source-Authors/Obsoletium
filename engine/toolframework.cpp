@@ -577,7 +577,7 @@ void CToolFrameworkInternal::LoadTools()
 	m_bInToolMode = true;
 
 	// Load rootdir/bin/enginetools.txt
-	KeyValues::AutoDelete kv = KeyValues::AutoDelete( "enginetools" );
+	KeyValuesAD kv( "enginetools" );
 	Assert( kv );
 
 	// We don't ship enginetools.txt to Steam public, so we'll need to load sdkenginetools.txt if enginetools.txt isn't present

@@ -22,11 +22,6 @@ ICvar *g_pCVar = 0;
 IProcessUtils *g_pProcessUtils = 0;
 static bool s_bConnected = false;
 
-// for utlsortvector.h
-#ifndef _WIN32
-	void *g_pUtlSortVectorQSortContext = NULL;
-#endif
-
 
 //-----------------------------------------------------------------------------
 // Call this to connect to all tier 1 libraries.

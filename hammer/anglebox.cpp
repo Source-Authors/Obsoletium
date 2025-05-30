@@ -180,11 +180,11 @@ bool CAngleBox::GetAngles(QAngle &vecAngles)
 // Input  : szAngles - Buffer to receive angles string.
 // Output : Returns 'szAngles'.
 //-----------------------------------------------------------------------------
-char *CAngleBox::GetAngles(char *szAngles)
+char *CAngleBox::GetAngles(char *szAngles, intp size)
 {
 	QAngle vecAngles;
 	GetAngles(vecAngles);
-	sprintf(szAngles, "%g %g %g", (double)vecAngles[0], (double)vecAngles[1], (double)vecAngles[2]);
+	V_snprintf(szAngles, size, "%g %g %g", (double)vecAngles[0], (double)vecAngles[1], (double)vecAngles[2]);
 	return(szAngles);
 }
 
@@ -194,21 +194,22 @@ char *CAngleBox::GetAngles(char *szAngles)
 //			This is used for setting the text in the companion edit control.
 // Input  : szBuf - Buffer to receive string.
 //-----------------------------------------------------------------------------
-char *CAngleBox::GetAngleEditText(char *szBuf)
+char *CAngleBox::GetAngleEditText(char *szBuf, ptrdiff_t len)
 {
-	szBuf[0] = '\0';
+	if (len > 0)
+		szBuf[0] = '\0';
 
 	if (m_bDifferent)
 	{
-		strcpy(szBuf, "(diff)");
+		V_strncpy(szBuf, "(diff)", len);
 	}
 	else if ((m_vecAngles[PITCH] == 90) && (m_vecAngles[YAW] == 0) && (m_vecAngles[ROLL] == 0))
 	{
-		strcpy(szBuf, "Down");
+		V_strncpy(szBuf, "Down", len);
 	}
 	else if ((m_vecAngles[PITCH] == -90) && (m_vecAngles[YAW] == 0) && (m_vecAngles[ROLL] == 0))
 	{
-		strcpy(szBuf, "Up");
+		V_strncpy(szBuf, "Up", len);
 	}
 	else if (m_vecAngles[YAW] >= 0)
 	{
@@ -471,7 +472,7 @@ void CAngleBox::UpdateAngleEditText(void)
 	if (m_pEdit)
 	{
 		char szBuf[20];
-		GetAngleEditText(szBuf);
+		GetAngleEditText(szBuf, ssize(szBuf));
 		m_pEdit->SetAnglesInternal(szBuf);
 	}
 }

@@ -1,37 +1,29 @@
-//=============================================================================
-//
-//========= Copyright Valve Corporation, All rights reserved. ============//
-// The contents may be used and/or copied only with the written permission of
-// Valve, L.L.C., or in accordance with the terms and conditions stipulated in
-// the agreement/contract under which the contents have been supplied.
-//
-// $Header: $
-// $NoKeywords: $
+// Copyright Valve Corporation, All rights reserved.
 //
 // Converts from any one DMX file format to another
 // Can also output SMD or a QCI header from DMX input
 //
-//=============================================================================
-
-
+// See https://developer.valvesoftware.com/wiki/Dmxedit
 
 // Standard includes
-
 #include <conio.h>
-#include <stdarg.h>
-#include <math.h>
-#include <time.h>
 
+#include <cstdarg>
+#include <cmath>
+#include <ctime>
 
 // Valve includes
 #include "vstdlib/cvar.h"
+#include "vstdlib/iprocessutils.h"
+#include "tier0/icommandline.h"
+#include "tier1/utlstring.h"
+#include "tier1/utlbuffer.h"
+#include "tier2/p4helpers.h"
 #include "tier1/tier1.h"
 #include "tier2/tier2.h"
 #include "tier2/tier2dm.h"
 #include "tier3/tier3.h"
 #include "filesystem.h"
-#include "vstdlib/iprocessutils.h"
-#include "tier0/icommandline.h"
 #include "istudiorender.h"
 #include "vphysics_interface.h"
 #include "datacache/idatacache.h"
@@ -52,20 +44,16 @@
 #include "movieobjects/dmemodel.h"
 #include "movieobjects/dmedccmakefile.h"
 #include "movieobjects/dmmeshutils.h"
-#include "tier1/utlstring.h"
-#include "tier1/utlbuffer.h"
-#include "tier2/p4helpers.h"
-
 
 // Lua includes
 #include <lua.h>
 #include <lauxlib.h>
 #include <lualib.h>
 
-
 // Local includes
 #include "dmxedit.h"
 
+#include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------
 // Statics
@@ -139,7 +127,7 @@ bool CDmxEdit::Load( const char *pFilename, const CObjType &loadType /* = DIST_A
 {
 	Unload();
 
-	const int sLen = Q_strlen( pFilename );
+	const intp sLen = Q_strlen( pFilename );
 	if ( sLen > 4 && !Q_stricmp( pFilename + sLen - 4, ".dmx" ) )
 	{
 		g_pDataModel->RestoreFromFile( pFilename, NULL, NULL, &m_pRoot );
@@ -1250,7 +1238,7 @@ LUA_COMMAND(
 
 	if ( lua_isnumber( pLuaState, 1 ) )
 	{
-		const int nSize = lua_tointeger( pLuaState, 1 );
+		const intp nSize = lua_tointeger( pLuaState, 1 );
 		if ( LuaFunc_s::m_dmxEdit.GrowSelection( nSize ) )
 			return LuaFunc_s::m_dmxEdit.LuaOk( pLuaState );
 	}
@@ -1290,7 +1278,7 @@ LUA_COMMAND(
 
 	if ( lua_isnumber( pLuaState, 1 ) )
 	{
-		const int nSize = lua_tointeger( pLuaState, 1 );
+		const intp nSize = lua_tointeger( pLuaState, 1 );
 		if ( LuaFunc_s::m_dmxEdit.ShrinkSelection( nSize ) )
 			return LuaFunc_s::m_dmxEdit.LuaOk( pLuaState );
 	}
@@ -1541,7 +1529,7 @@ bool CDmxEdit::Save( const char *pFilename, const CObjType &saveType /* = ABSOLU
 
 	bool retVal = false;
 
-	const int sLen = Q_strlen( pFilename );
+	const intp sLen = Q_strlen( pFilename );
 	if ( sLen > 4 && !Q_stricmp( pFilename + sLen - 4, ".dmx" ) )
 	{
 		retVal = g_p4factory->AccessFile( pFilename )->Edit();
@@ -1605,13 +1593,15 @@ void CDmxEdit::UpdateMakefile( CDmElement *pRoot )
 	sources.AddToTail( CreateElement< CDmeSourceDCCFile >( m_filename, pRoot->GetFileId() ) );
 }
 
+namespace se::dmxedit {
 
 //-----------------------------------------------------------------------------
 // In winstuff.cpp
 //-----------------------------------------------------------------------------
-void MyGetUserName( char *pszBuf, unsigned long *pBufSiz );
-void MyGetComputerName( char *pszBuf, unsigned long *pBufSiz );
+bool MyGetUserName( char *pszBuf, unsigned long *pBufSiz );
+bool MyGetComputerName( char *pszBuf, unsigned long *pBufSiz );
 
+}  // se::dmxedit
 
 //-----------------------------------------------------------------------------
 //
@@ -1634,12 +1624,12 @@ void CDmxEdit::AddExportTags( CDmElement *pRoot, const char *pFilename )
 	unsigned long dwSize( sizeof( szTmpBuf ) );
 
 	*szTmpBuf ='\0';
-	MyGetUserName( szTmpBuf, &dwSize);
+	se::dmxedit::MyGetUserName( szTmpBuf, &dwSize);
 	pExportTags->SetValue( "user", szTmpBuf );
 
 	*szTmpBuf ='\0';
 	dwSize = sizeof( szTmpBuf );
-	MyGetComputerName( szTmpBuf, &dwSize);
+	se::dmxedit::MyGetComputerName( szTmpBuf, &dwSize);
 	pExportTags->SetValue( "machine", szTmpBuf );
 
 	pExportTags->SetValue( "app", "dmxedit" );
@@ -1647,7 +1637,7 @@ void CDmxEdit::AddExportTags( CDmElement *pRoot, const char *pFilename )
 	static const char *pChangeList = "$Change: 633871 $";
 	pExportTags->SetValue( "appVersion", pChangeList );
 
-CUtlString cmdLine( "dmxedit " );
+	CUtlString cmdLine( "dmxedit " );
 	cmdLine += m_scriptFilename;
 	cmdLine += "";
 	pExportTags->SetValue( "cmdLine", cmdLine );
@@ -1912,10 +1902,10 @@ LUA_COMMAND(
 	// TODO: Bad error checking... but failure to remap isn't really an error
 	if ( lua_isnumber( pLuaState, 1 ) )
 	{
-		const int nMaterialIndex = luaL_checkinteger( pLuaState, 1 );
+		const intp nMaterialIndex = luaL_checkinteger( pLuaState, 1 );
 		if ( !LuaFunc_s::m_dmxEdit.RemapMaterial( nMaterialIndex, pString2 ) )
 		{
-			LuaFunc_s::m_dmxEdit.LuaWarning( "Invalid Material Index To Remap, Couldn't Find Material %d\n", nMaterialIndex );
+			LuaFunc_s::m_dmxEdit.LuaWarning( "Invalid Material Index To Remap, Couldn't Find Material %zd\n", nMaterialIndex );
 		}
 	}
 	else
@@ -1979,7 +1969,7 @@ LUA_COMMAND(
 {
 	LuaFunc_s::m_dmxEdit.SetFuncString( pLuaState );
 
-	const int nVertsCount = luaL_checkinteger( pLuaState, 1 );
+	const intp nVertsCount = luaL_checkinteger( pLuaState, 1 );
 	if ( LuaFunc_s::m_dmxEdit.RemoveFacesWithMoreThanNVerts( nVertsCount ) )
 		return LuaFunc_s::m_dmxEdit.LuaOk( pLuaState );
 
@@ -2373,7 +2363,7 @@ bool CDmxEdit::CreateExpressionFilesFromCachedPresets() const
 	if ( !pComboOp )
 		return false;
 
-	for ( int i = 0; i < m_presetCache.GetNumStrings(); ++i )
+	for ( unsigned short i = 0; i < m_presetCache.GetNumStrings(); ++i )
 	{
 		const char *pPresetFilename = m_presetCache.String( i );
 
@@ -2399,9 +2389,9 @@ bool CDmxEdit::CreateExpressionFilesFromCachedPresets() const
 
 			const char *pExpressionFilename = expressionFilename.Get();
 
-			Q_strncpy( buf, pExpressionFilename, sizeof( buf ) );
-			Q_SetExtension( buf, ".txt", sizeof( buf ) );
-			Q_ExtractFilePath( buf, buf1, sizeof( buf1 ) );
+			V_strcpy_safe( buf, pExpressionFilename );
+			Q_SetExtension( buf, ".txt" );
+			V_ExtractFilePath( buf, buf1 );
 			Q_FixSlashes( buf1 );
 			g_pFullFileSystem->CreateDirHierarchy( buf1 );
 
@@ -2412,8 +2402,8 @@ bool CDmxEdit::CreateExpressionFilesFromCachedPresets() const
 
 			pPresetGroup->ExportToTXT( buf, NULL, pComboOp );
 
-			Q_SetExtension( buf, ".vfe", sizeof( buf ) );
-			Q_ExtractFilePath( buf, buf1, sizeof( buf1 ) );
+			Q_SetExtension( buf, ".vfe" );
+			V_ExtractFilePath( buf, buf1 );
 			Q_FixSlashes( buf1 );
 			g_pFullFileSystem->CreateDirHierarchy( buf1 );
 
@@ -2454,18 +2444,18 @@ LUA_COMMAND(
 //-----------------------------------------------------------------------------
 void ScaleDeltaPositions( const CDmrArrayConst< Vector > &bindPosData, CDmeVertexDeltaData *pDelta, float sx, float sy, float sz )
 {
-	const int nPosIndex = pDelta->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
+	const FieldIndex_t nPosIndex = pDelta->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
 	if ( nPosIndex < 0 )
 		return;
 
 	CDmrArray< Vector > posData = pDelta->GetVertexData( nPosIndex );
-	const int nPosDataCount = posData.Count();
+	const intp nPosDataCount = posData.Count();
 	if ( nPosDataCount <= 0 )
 		return;
 
 	Vector *pPosArray = reinterpret_cast< Vector * >( alloca( nPosDataCount * sizeof( Vector ) ) );
 
-	for ( int j = 0; j < nPosDataCount; ++j )
+	for ( intp j = 0; j < nPosDataCount; ++j )
 	{
 		const Vector &s = posData.Get( j );
 		Vector &d = pPosArray[ j ];
@@ -2486,16 +2476,16 @@ bool CDmxEdit::Scale( float sx, float sy, float sz )
 	int nArraySize = 0;
 	Vector *pPosArray = NULL;
 
-	const int nBaseStateCount = m_pMesh->BaseStateCount();
-	for ( int i = 0; i < nBaseStateCount; ++i )
+	const intp nBaseStateCount = m_pMesh->BaseStateCount();
+	for ( intp i = 0; i < nBaseStateCount; ++i )
 	{
 		CDmeVertexData *pBase = m_pMesh->GetBaseState( i );
-		const int nPosIndex = pBase->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
+		const FieldIndex_t nPosIndex = pBase->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
 		if ( nPosIndex < 0 )
 			continue;
 
 		CDmrArray< Vector > posData = pBase->GetVertexData( nPosIndex );
-		const int nPosDataCount = posData.Count();
+		const intp nPosDataCount = posData.Count();
 		if ( nPosDataCount <= 0 )
 			continue;
 
@@ -2511,7 +2501,7 @@ bool CDmxEdit::Scale( float sx, float sy, float sz )
 		if ( nArraySize < nPosDataCount )
 			continue;
 
-		for ( int j = 0; j < nPosDataCount; ++j )
+		for ( intp j = 0; j < nPosDataCount; ++j )
 		{
 			const Vector &s = posData.Get( j );
 			Vector &d = pPosArray[ j ];
@@ -2525,7 +2515,7 @@ bool CDmxEdit::Scale( float sx, float sy, float sz )
 
 	{
 		CDmeVertexData *pBind = m_pMesh->GetBindBaseState();
-		const int nPosIndex = pBind ? pBind->FindFieldIndex( CDmeVertexData::FIELD_POSITION ) : -1;
+		const FieldIndex_t nPosIndex = pBind ? pBind->FindFieldIndex( CDmeVertexData::FIELD_POSITION ) : -1;
 
 		if ( !pBind || nPosIndex < 0 )
 		{
@@ -2637,12 +2627,12 @@ bool CDmxEdit::Translate(
 	int nArraySize = 0;
 	Vector *pPosArray = NULL;
 
-	const int nPosIndex = pBase->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
+	const FieldIndex_t nPosIndex = pBase->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
 	if ( nPosIndex < 0 )
 		return false;
 
 	CDmrArray< Vector > posData = pBase->GetVertexData( nPosIndex );
-	const int nPosDataCount = posData.Count();
+	const intp nPosDataCount = posData.Count();
 	if ( nPosDataCount <= 0 )
 		return false;
 
@@ -2780,12 +2770,12 @@ bool CDmxEdit::Rotate(
 	int nArraySize = 0;
 	Vector *pPosArray = NULL;
 
-	const int nPosIndex = pBase->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
+	const FieldIndex_t nPosIndex = pBase->FindFieldIndex( CDmeVertexData::FIELD_POSITION );
 	if ( nPosIndex < 0 )
 		return false;
 
 	CDmrArray< Vector > posData = pBase->GetVertexData( nPosIndex );
-	const int nPosDataCount = posData.Count();
+	const intp nPosDataCount = posData.Count();
 	if ( nPosDataCount <= 0 )
 		return false;
 
@@ -2941,8 +2931,8 @@ bool HasDuplicateControlName(
 	const char *pControlName,
 	CUtlVector< const char * > &retiredControlNames )
 {
-	int i;
-	int nRetiredControlNameCount = retiredControlNames.Count();
+	intp i;
+	intp nRetiredControlNameCount = retiredControlNames.Count();
 	for ( i = 0; i < nRetiredControlNameCount; ++i )
 	{
 		if ( !Q_stricmp( retiredControlNames[i], pControlName ) )
@@ -3120,8 +3110,8 @@ LUA_COMMAND(
 	{
 		if ( lua_istable( pLuaState, i ) )
 		{
-			const int nCount = luaL_getn( pLuaState, i );
-			for ( int j = 1; j <= nCount; ++j )
+			const uintp nCount = lua_rawlen( pLuaState, i );
+			for ( uintp j = 1; j <= nCount; ++j )
 			{
 				lua_rawgeti( pLuaState, i, j );
 				if ( lua_isstring( pLuaState, -1 ) )
@@ -3163,20 +3153,20 @@ bool CDmxEdit::AddDominationRule( CUtlVector< CUtlString > &dominators, CUtlVect
 		return SetErrorString( "No DmeCombinationOperator On Mesh \"%s\"", m_pMesh->GetName() );
 
 	CUtlVector< const char * > tmpDominators;
-	for ( int i = 0; i < dominators.Count(); ++i )
+	for ( intp i = 0; i < dominators.Count(); ++i )
 	{
 		tmpDominators.AddToTail( dominators[ i ].Get() );
 	}
 
 	CUtlVector< const char * > tmpSupressed;
-	for ( int i = 0; i < supressed.Count(); ++i )
+	for ( intp i = 0; i < supressed.Count(); ++i )
 	{
 		tmpSupressed.AddToTail( supressed[ i ].Get() );
 	}
 
 	pDmeCombo->AddDominationRule(
-		tmpDominators.Count(), ( const char ** )tmpDominators.Base(),
-		tmpSupressed.Count(), ( const char ** )tmpSupressed.Base() );
+		tmpDominators.Count(), tmpDominators.Base(),
+		tmpSupressed.Count(), tmpSupressed.Base() );
 
 	return true;
 }
@@ -3199,8 +3189,8 @@ LUA_COMMAND(
 
 	if ( lua_istable( pLuaState, 1 ) )
 	{
-		const int nCount = luaL_getn( pLuaState, 1 );
-		for ( int i = 1; i <= nCount; ++i )
+		const uintp nCount = lua_rawlen( pLuaState, 1 );
+		for ( uintp i = 1; i <= nCount; ++i )
 		{
 			lua_rawgeti( pLuaState, 1, i );
 			if ( lua_isstring( pLuaState, -1 ) )
@@ -3218,8 +3208,8 @@ LUA_COMMAND(
 
 	if ( lua_istable( pLuaState, 2 ) )
 	{
-		const int nCount = luaL_getn( pLuaState, 2 );
-		for ( int i = 1; i <= nCount; ++i )
+		const uintp nCount = lua_rawlen( pLuaState, 2 );
+		for ( uintp i = 1; i <= nCount; ++i )
 		{
 			lua_rawgeti( pLuaState, 2, i );
 			if ( lua_isstring( pLuaState, -1 ) )
@@ -3418,13 +3408,13 @@ void FindBoundingSphere( CUtlVector< Vector > &points, Vector &cen, float &fRad 
 		return;
 	}
 
-	double dx,dy,dz;
-	double rad_sq,xspan,yspan,zspan,maxspan;
-	double old_to_p,old_to_p_sq,old_to_new;
-	Vector xmin,xmax,ymin,ymax,zmin,zmax,dia1,dia2;
+	float dx,dy,dz;
+	float rad_sq,xspan,yspan,zspan,maxspan;
+	float old_to_p,old_to_p_sq,old_to_new;
+	Vector xmin = {},xmax = {},ymin = {},ymax = {},zmin = {},zmax = {},dia1 = {},dia2 = {};
 
 //	DVec cen;
-	double rad;
+	float rad;
 
 	cen = points[ 0 ];
 	fRad = 0.0f;
@@ -3482,9 +3472,9 @@ void FindBoundingSphere( CUtlVector< Vector > &points, Vector &cen, float &fRad 
 
 	/* dia1,dia2 is a diameter of initial sphere */
 	/* calc initial center */
-	cen.x = (dia1.x+dia2.x)/2.0;
-	cen.y = (dia1.y+dia2.y)/2.0;
-	cen.z = (dia1.z+dia2.z)/2.0;
+	cen.x = (dia1.x+dia2.x)/2.0f;
+	cen.y = (dia1.y+dia2.y)/2.0f;
+	cen.z = (dia1.z+dia2.z)/2.0f;
 	/* calculate initial radius**2 and radius */
 	dx = dia2.x-cen.x; /* x component of radius vector */
 	dy = dia2.y-cen.y; /* y component of radius vector */
@@ -3506,7 +3496,7 @@ void FindBoundingSphere( CUtlVector< Vector > &points, Vector &cen, float &fRad 
 		{ 	/* this point is outside of current sphere */
 			old_to_p = sqrt(old_to_p_sq);
 			/* calc radius of new sphere */
-			rad = (rad + old_to_p) / 2.0;
+			rad = (rad + old_to_p) / 2.0f;
 			rad_sq = rad*rad; 	/* for next r**2 compare */
 			old_to_new = old_to_p - rad;
 			/* calc center of new sphere */
@@ -3724,9 +3714,10 @@ void CDmxEdit::Error( const tchar *pMsgFormat, ... )
 	tchar pTempBuffer[5020];
 	assert( _tcslen( pMsgFormat ) < sizeof( pTempBuffer) ); // check that we won't artificially truncate the string
 	_vsntprintf( pTempBuffer, sizeof( pTempBuffer ) - 1, pMsgFormat, args );
-	pTempBuffer[ ARRAYSIZE(pTempBuffer) - 1 ] = 0;
-	printf( "%s", pTempBuffer );
-	fflush( stdout );
+	pTempBuffer[ std::size(pTempBuffer) - 1 ] = 0;
+	// dimhotepus: Error to stderr.
+	fprintf( stderr, "%s", pTempBuffer );
+	fflush( stderr );
 	va_end(args);
 
 	if ( CommandLine()->FindParm( "-coe" ) || CommandLine()->FindParm( "-continueOnError" ) )
@@ -3745,7 +3736,7 @@ void CDmxEdit::Error( const tchar *pMsgFormat, ... )
 	if ( ch == 'q' || ch == 'Q' )
 	{
 		Unload();
-		exit( 1 );
+		exit(1);
 	}
 	else if ( Plat_IsInDebugSession() && ch == 'd' || ch == 'D' )
 	{
@@ -3882,8 +3873,8 @@ void CDmxEdit::GetFuncArg( lua_State *pLuaState, int nIndex, CUtlString &funcStr
 		case LUA_TTABLE:
 			{
 				funcString += "{ ";
-				const int nCount = luaL_getn( pLuaState, nIndex );
-				for ( int i = 1; i <= nCount; ++i )
+				const uintp nCount = lua_rawlen( pLuaState, nIndex );
+				for ( uintp i = 1; i <= nCount; ++i )
 				{
 					lua_rawgeti( pLuaState, nIndex, i );
 					if ( i > 1 )
@@ -3985,7 +3976,7 @@ const CUtlString &CDmxEdit::SetFuncString( lua_State *pLuaState )
 //
 //-----------------------------------------------------------------------------
 CDmxEditLua::CDmxEditLua()
-: m_pLuaState( lua_open() )
+: m_pLuaState( luaL_newstate() )
 {
 	luaL_openlibs( m_pLuaState );
 

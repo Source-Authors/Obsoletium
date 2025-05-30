@@ -318,7 +318,7 @@ bool UTIL_GetModDir( char *lpszTextOut, unsigned int nSize )
 	if ( Q_strnchr( lpszTextOut, '/', nSize ) || Q_strnchr( lpszTextOut, '\\', nSize ) )
 	{
 		// Strip the last directory off (which will be our game dir)
-		Q_StripLastDir( lpszTextOut, nSize );
+		V_StripLastDir( lpszTextOut, nSize );
 		
 		// Find the difference in string lengths and take that difference from the original string as the mod dir
 		intp dirlen = Q_strlen( lpszTextOut );
@@ -2087,7 +2087,7 @@ void CServerGameDLL::LoadSpecificMOTDMsg( const ConVar &convar, const char *pszS
 }
 
 // keeps track of which chapters the user has unlocked
-ConVar sv_unlockedchapters( "sv_unlockedchapters", "1", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX );
+ConVar sv_unlockedchapters( "sv_unlockedchapters", "1", FCVAR_ARCHIVE );
 
 //-----------------------------------------------------------------------------
 // Purpose: Updates which chapters are unlocked

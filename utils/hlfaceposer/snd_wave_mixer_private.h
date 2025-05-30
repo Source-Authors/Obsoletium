@@ -18,6 +18,7 @@
 #include "snd_audio_source.h"
 #include "snd_wave_mixer.h"
 
+class CAudioSourceWave;
 
 //-----------------------------------------------------------------------------
 // Purpose: Linear iterator over source data.
@@ -64,8 +65,8 @@ public:
 	virtual bool	GetActive( void );
 	virtual void	SetActive( bool active );
 
-	virtual void	SetModelIndex( int index );
-	virtual int		GetModelIndex( void ) const;
+	virtual void	SetModelIndex( intp index );
+	virtual intp	GetModelIndex( void ) const;
 
 	virtual void	SetDirection( bool forward );
 	virtual bool	GetDirection( void ) const;
@@ -89,7 +90,7 @@ protected:
 
 	bool				m_bActive;
 	// Associated playback model in faceposer
-	int					m_nModelIndex;
+	intp				m_nModelIndex;
 
 	bool				m_bForward;
 

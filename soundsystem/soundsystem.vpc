@@ -7,6 +7,14 @@
 $Macro SRCDIR		".."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
 
+$Macro MSSSRCDIR $SRCDIR\thirdparty\mss
+$Macro MSSLIBDIR win32   [$WIN32]
+$Macro MSSLIBDIR win64   [$WIN64]
+$Macro MSSLIBDIR linux32 [$LINUX32]
+$Macro MSSLIBDIR linux64 [$LINUX64]
+$Macro MSSLIBDIR osx32   [$OSX32]
+$Macro MSSLIBDIR osx64   [$OSX64]
+
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
 $Configuration
@@ -18,18 +26,36 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE winmm.lib dsound.lib dxguid.lib"
+		$AdditionalDependencies				"$BASE winmm.lib User32.lib"
+	}
+
+	$PostBuildEvent [!$ANALYZE && $WIN32]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n"		\
+									"COPY $MSSSRCDIR\bin\$MSSLIBDIR\mss32.dll $OUTBINDIR\mss32.dll" "\n"				\
+									"REM COPY $MSSSRCDIR\bin\$MSSLIBDIR\mssmp3.asi $OUTBINDIR\mssmp3.asi" "\n"			\
+									"REM COPY $MSSSRCDIR\bin\$MSSLIBDIR\mssogg.asi $OUTBINDIR\mssogg.asi" "\n"			\
+									"REM COPY $MSSSRCDIR\bin\$MSSLIBDIR\mssvoice.asi $OUTBINDIR\mssvoice.asi" "\n"	\
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"$BASE"
+	}
+
+	$PostBuildEvent [!$ANALYZE && $WIN64]
+	{
+		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n"		\
+									"COPY $MSSSRCDIR\bin\$MSSLIBDIR\mss64.dll $OUTBINDIR\mss64.dll" "\n"				\ 
+									"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+									"$BASE"
 	}
 }
 
-$Project "Soundsystem"
+$Project "soundsystem"
 {
 	$Folder	"Source Files"
 	{
 		$File	"$SRCDIR\public\sentence.cpp"
 		$File	"snd_audio_source.cpp"
 		$File	"snd_dev_wave.cpp"
-		$File	"snd_io.cpp"
 		$File	"snd_wave_mixer.cpp"
 		$File	"snd_wave_mixer_adpcm.cpp"
 		$File	"snd_wave_source.cpp"
@@ -57,6 +83,11 @@ $Project "Soundsystem"
 	{
 		$Lib mathlib
 		$Lib tier2
-		$File	"$SRCDIR\lib\common\mss32.lib"
+		$File "$SRCDIR\thirdparty\mss\bin\$MSSLIBDIR\mss32.lib" [$WIN32]
+		$File "$SRCDIR\thirdparty\mss\bin\$MSSLIBDIR\mss64.lib" [$WIN64]
+		$File "$SRCDIR\thirdparty\mss\bin\$MSSLIBDIR\libMilesX86.dylib" [$OSX32]
+		$File "$SRCDIR\thirdparty\mss\bin\$MSSLIBDIR\libMilesX64.dylib" [$OSX64]
+		$File "$SRCDIR\thirdparty\mss\bin\$MSSLIBDIR\libMiles.so" [$LINUX32]
+		$File "$SRCDIR\thirdparty\mss\bin\$MSSLIBDIR\libMiles.so" [$LINUX64]
 	}
 }

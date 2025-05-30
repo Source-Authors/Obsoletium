@@ -99,7 +99,6 @@ void CMaterialDict::RemoveMaterialFromMaterialList( IMaterialInternal *pMaterial
 //-----------------------------------------------------------------------------
 IMaterialInternal* CMaterialDict::AddMaterial( char const* pName, const char *pTextureGroupName )
 {
-	Assert( ThreadInMainThread() );
 	IMaterialInternal *pMaterial = IMaterialInternal::CreateMaterial( pName, pTextureGroupName );
 	Assert( pMaterial && pMaterial->IsRealTimeVersion() );
 	AddMaterialToMaterialList( pMaterial );
@@ -108,7 +107,6 @@ IMaterialInternal* CMaterialDict::AddMaterial( char const* pName, const char *pT
 
 void CMaterialDict::RemoveMaterial( IMaterialInternal* pMaterial )
 {
-	Assert( ThreadInMainThread() );
 	Assert( (pMaterial == NULL) || pMaterial->IsRealTimeVersion() );
 	RemoveMaterialFromMaterialList( pMaterial );
 }
@@ -143,7 +141,7 @@ void CMaterialDict::RemoveAllMaterialsFromMaterialList()
 
 void CMaterialDict::RemoveAllMaterials()
 {
-	Assert( ThreadInMainThread() );
+	AUTO_LOCK(m_MaterialDictMutex);
 
 	// First remove all the subrect materials, because they'll point at their material pages.
 	MaterialHandle_t iNext;

@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "tier0/platform.h"
+
 abstract_class ISceneTokenProcessor
 {
 public:

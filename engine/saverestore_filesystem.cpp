@@ -193,7 +193,7 @@ public:
 		{
 			intp index = list.AddToTail();
 			memset( list[index].szFileName, 0, sizeof(list[index].szFileName) );
-			Q_strncpy( list[index].szFileName, findfn, sizeof(list[index].szFileName) );
+			V_strcpy_safe( list[index].szFileName, findfn );
 
 			findfn = Sys_FindNext( basefindfn, sizeof( basefindfn ) );
 		}

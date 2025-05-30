@@ -107,7 +107,7 @@ CPhysicsMotionController::CPhysicsMotionController( IMotionEvent *pHandler, CPhy
 {
 	m_handler = pHandler;
 	m_pVEnv = pVEnv;
-	SetPriority( MEDIUM_PRIORITY );
+	CPhysicsMotionController::SetPriority( MEDIUM_PRIORITY );
 }
 
 CPhysicsMotionController::~CPhysicsMotionController( void )
@@ -234,7 +234,7 @@ void CPhysicsMotionController::AttachObject( IPhysicsObject *pObject, bool check
 	// OPTIMIZE: Linear search here?
 	if ( checkIfAlreadyAttached )
 	{
-		int index = m_coreList.Find(pCore);
+		intp index = m_coreList.Find(pCore);
 		if ( m_coreList.IsValidIndex(index) )
 		{
 			DevMsg(1,"Attached core twice!!!\n");
@@ -251,7 +251,7 @@ void CPhysicsMotionController::AttachObject( IPhysicsObject *pObject, bool check
 
 void CPhysicsMotionController::RemoveCore( IVP_Core *pCore )
 {
-	int index = m_coreList.Find(pCore);
+	intp index = m_coreList.Find(pCore);
 	if ( !m_coreList.IsValidIndex(index) )
 	{
 #if DEBUG
@@ -279,7 +279,7 @@ void CPhysicsMotionController::WriteToTemplate( vphysics_save_motioncontroller_t
 {
 	controllerTemplate.m_nPriority = m_priority;
 
-	int nObjectCount = CountObjects();
+	intp nObjectCount = CountObjects();
 	controllerTemplate.m_objectList.AddMultipleToTail( nObjectCount );
 	GetObjects( controllerTemplate.m_objectList.Base() );
 }

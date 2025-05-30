@@ -55,18 +55,18 @@ public:
 	class Iterator_t
 	{
 	public:
-		Iterator_t( I i ) : index( i ) {}
+		constexpr Iterator_t( I i ) : index( i ) {}
 		I index;
 
-		bool operator==( const Iterator_t it ) const	{ return index == it.index; }
-		bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
+		constexpr bool operator==( const Iterator_t it ) const	{ return index == it.index; }
+		constexpr bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
 	};
 	Iterator_t First() const							{ return Iterator_t( IsIdxValid( 0 ) ? 0 : InvalidIndex() ); }
 	Iterator_t Next( const Iterator_t &it ) const		{ return Iterator_t( IsIdxValid( it.index + 1 ) ? it.index + 1 : InvalidIndex() ); }
 	I GetIndex( const Iterator_t &it ) const			{ return it.index; }
 	bool IsIdxAfter( I i, const Iterator_t &it ) const	{ return i > it.index; }
 	bool IsValidIterator( const Iterator_t &it ) const	{ return IsIdxValid( it.index ); }
-	Iterator_t InvalidIterator() const					{ return Iterator_t( InvalidIndex() ); }
+	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex() ); }
 
 	// element access
 	T& operator[]( I i );
@@ -78,8 +78,8 @@ public:
 	bool IsIdxValid( I i ) const;
 
 	// Specify the invalid ('null') index that we'll only return on failure
-	static const I INVALID_INDEX = ( I )-1; // For use with COMPILE_TIME_ASSERT
-	static I InvalidIndex() { return INVALID_INDEX; }
+	static constexpr I INVALID_INDEX = static_cast<I>(-1); // For use with COMPILE_TIME_ASSERT
+	static constexpr I InvalidIndex() { return INVALID_INDEX; }
 
 	// Gets the base address (can change when adding elements!)
 	T* Base();
@@ -157,7 +157,7 @@ class CUtlMemoryFixedGrowable : public CUtlMemory< T, I >
 	typedef CUtlMemory< T, I > BaseClass;
 
 public:
-	CUtlMemoryFixedGrowable( intp nGrowSize = 0, intp nInitSize = SIZE ) : BaseClass( m_pFixedMemory, SIZE ) 
+	CUtlMemoryFixedGrowable( intp nGrowSize = 0, intp nInitSize = SIZE ) : BaseClass( m_pFixedMemory, SIZE )  //-V730 Buffer passed as pointer and not used in base ctor.
 	{
 		Assert( nInitSize == 0 || nInitSize == SIZE );
 		m_nMallocGrowSize = nGrowSize;
@@ -200,7 +200,7 @@ class CUtlMemoryFixed
 {
 public:
 	// constructor, destructor
-	CUtlMemoryFixed( intp nGrowSize = 0, intp nInitSize = 0 )	{ Assert( nInitSize == 0 || nInitSize == SIZE ); 	}
+	CUtlMemoryFixed( intp nGrowSize = 0, intp nInitSize = 0 )	{ Assert( nInitSize == 0 || nInitSize == SIZE ); 	} //-V730
 	CUtlMemoryFixed( T* pMemory, intp numElements ) = delete;
 
 	// Can we use this index?
@@ -208,12 +208,12 @@ public:
 	bool IsIdxValid( intp i ) const							{ return (size_t)i < SIZE; }
 
 	// Specify the invalid ('null') index that we'll only return on failure
-	static const intp INVALID_INDEX = -1; // For use with COMPILE_TIME_ASSERT
-	static intp InvalidIndex() { return INVALID_INDEX; }
+	static constexpr intp INVALID_INDEX = -1; // For use with COMPILE_TIME_ASSERT
+	static constexpr intp InvalidIndex() { return INVALID_INDEX; }
 
 	// Gets the base address
-	T* Base()												{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); }
-	const T* Base() const									{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); }
+	T* Base()											{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); } //-V106
+	const T* Base() const								{ if constexpr ( nAlignment == 0 ) return (T*)(&m_Memory[0]); else return (T*)AlignValue( &m_Memory[0], nAlignment ); } //-V106
 
 	// element access
 	// Use unsigned math and inlined checks to improve performance.
@@ -250,20 +250,20 @@ public:
 	class Iterator_t
 	{
 	public:
-		Iterator_t( intp i ) : index( i ) {}
+		constexpr Iterator_t( intp i ) : index( i ) {}
 		intp index;
-		bool operator==( const Iterator_t it ) const	{ return index == it.index; }
-		bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
+		constexpr bool operator==( const Iterator_t it ) const	{ return index == it.index; }
+		constexpr bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
 	};
 	Iterator_t First() const							{ return Iterator_t( IsIdxValid( 0 ) ? 0 : InvalidIndex() ); }
 	Iterator_t Next( const Iterator_t &it ) const		{ return Iterator_t( IsIdxValid( it.index + 1 ) ? it.index + 1 : InvalidIndex() ); }
 	intp GetIndex( const Iterator_t &it ) const			{ return it.index; }
 	bool IsIdxAfter( intp i, const Iterator_t &it ) const { return i > it.index; }
 	bool IsValidIterator( const Iterator_t &it ) const	{ return IsIdxValid( it.index ); }
-	Iterator_t InvalidIterator() const					{ return Iterator_t( InvalidIndex() ); }
+	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex() ); }
 
 private:
-	char m_Memory[ SIZE*sizeof(T) + nAlignment ];
+	char m_Memory[ SIZE*sizeof(T) + nAlignment ]; //-V104
 };
 
 #if defined(POSIX)
@@ -287,10 +287,7 @@ public:
 	// constructor, destructor
 	CUtlMemoryConservative( intp nGrowSize = 0, intp nInitSize = 0 ) : m_pMemory( NULL )
 	{
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		m_nCurAllocSize = 0;
-#endif
-
 	}
 	CUtlMemoryConservative( T* pMemory, intp numElements ) = delete;
 	~CUtlMemoryConservative()								{ free( m_pMemory ); }
@@ -315,18 +312,12 @@ public:
 	// Size
 	FORCEINLINE void RememberAllocSize( size_t sz )
 	{
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		m_nCurAllocSize = sz;
-#endif
 	}
 
 	size_t AllocSize( void ) const
 	{
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 		return m_nCurAllocSize;
-#else
-		return ( m_pMemory ) ? g_pMemAlloc->GetSize( m_pMemory ) : 0;
-#endif
 	}
 
 	intp NumAllocated() const
@@ -377,25 +368,22 @@ public:
 	class Iterator_t
 	{
 	public:
-		Iterator_t( intp i, intp _limit ) : index( i ), limit( _limit ) {}
+		constexpr Iterator_t( intp i, intp _limit ) : index( i ), limit( _limit ) {}
 		intp index;
 		intp limit;
-		bool operator==( const Iterator_t it ) const	{ return index == it.index; }
-		bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
+		constexpr bool operator==( const Iterator_t it ) const	{ return index == it.index; }
+		constexpr bool operator!=( const Iterator_t it ) const	{ return index != it.index; }
 	};
 	Iterator_t First() const							{ intp limit = NumAllocated(); return Iterator_t( limit ? 0 : InvalidIndex(), limit ); }
 	Iterator_t Next( const Iterator_t &it ) const		{ return Iterator_t( ( it.index + 1 < it.limit ) ? it.index + 1 : InvalidIndex(), it.limit ); }
 	intp GetIndex( const Iterator_t &it ) const			{ return it.index; }
 	bool IsIdxAfter( intp i, const Iterator_t &it ) const { return i > it.index; }
 	bool IsValidIterator( const Iterator_t &it ) const	{ return IsIdxValid( it.index ) && ( it.index < it.limit ); }
-	Iterator_t InvalidIterator() const					{ return Iterator_t( InvalidIndex(), 0 ); }
+	constexpr Iterator_t InvalidIterator() const		{ return Iterator_t( InvalidIndex(), 0 ); }
 
 private:
 	T *m_pMemory;
-#ifdef REMEMBER_ALLOC_SIZE_FOR_VALGRIND
 	size_t m_nCurAllocSize;
-#endif
-
 };
 
 
@@ -652,7 +640,7 @@ inline bool CUtlMemory<T,I>::IsIdxValid( I i ) const
 //-----------------------------------------------------------------------------
 // Grows the memory
 //-----------------------------------------------------------------------------
-inline intp UtlMemory_CalcNewAllocationCount( intp nAllocationCount, intp nGrowSize, intp nNewSize, intp nBytesItem )
+[[nodiscard]] constexpr inline intp UtlMemory_CalcNewAllocationCount( intp nAllocationCount, intp nGrowSize, intp nNewSize, intp nBytesItem )
 {
 	if ( nGrowSize )
 	{ 
@@ -663,20 +651,13 @@ inline intp UtlMemory_CalcNewAllocationCount( intp nAllocationCount, intp nGrowS
 		if ( !nAllocationCount )
 		{
 			// Compute an allocation which is at least as big as a cache line...
+			// dimhotepus: Actually cache line size on modern CPUs (2010+) is 64 bytes, but it allocates too much.
 			nAllocationCount = (31 + nBytesItem) / nBytesItem;
 		}
 
 		while (nAllocationCount < nNewSize)
 		{
-#ifndef _X360
 			nAllocationCount *= 2;
-#else
-			intp nNewAllocationCount = ( nAllocationCount * 9) / 8; // 12.5 %
-			if ( nNewAllocationCount > nAllocationCount )
-				nAllocationCount = nNewAllocationCount;
-			else
-				nAllocationCount *= 2;
-#endif
 		}
 	}
 
@@ -704,9 +685,9 @@ void CUtlMemory<T,I>::Grow( intp num )
 	intp nNewAllocationCount = UtlMemory_CalcNewAllocationCount( m_nAllocationCount, m_nGrowSize, nAllocationRequested, sizeof(T) );
 
 	// if m_nAllocationRequested wraps index type I, recalculate
-	if ( ( intp )( I )nNewAllocationCount < nAllocationRequested )
+	if ( nNewAllocationCount < nAllocationRequested )
 	{
-		if ( ( intp )( I )nNewAllocationCount == 0 && ( intp )( I )( nNewAllocationCount - 1 ) >= nAllocationRequested )
+		if ( nNewAllocationCount == 0 && ( intp )( I )( nNewAllocationCount - 1 ) >= nAllocationRequested )
 		{
 			--nNewAllocationCount; // deal w/ the common case of m_nAllocationCount == MAX_USHORT + 1
 		}
@@ -888,7 +869,7 @@ private:
 template< class T, unsigned nAlignment >
 void *CUtlMemoryAligned<T, nAlignment>::Align( const void *pAddr )
 {
-	size_t nAlignmentMask = nAlignment - 1;
+	const size_t nAlignmentMask = nAlignment - 1; //-V101
 	return (void*)( ((size_t)pAddr + nAlignmentMask) & (~nAlignmentMask) );
 }
 
@@ -911,7 +892,7 @@ CUtlMemoryAligned<T, nAlignment>::CUtlMemoryAligned( intp nGrowSize, intp nInitA
 	{
 		UTLMEMORY_TRACK_ALLOC();
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)_aligned_malloc( nInitAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)_aligned_malloc( nInitAllocationCount * sizeof(T), nAlignment ); //-V106
 	}
 }
 
@@ -1000,13 +981,13 @@ void CUtlMemoryAligned<T, nAlignment>::Grow( intp num )
 	if ( CUtlMemory<T>::m_pMemory )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 		Assert( CUtlMemory<T>::m_pMemory );
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 		Assert( CUtlMemory<T>::m_pMemory );
 	}
 }
@@ -1037,12 +1018,12 @@ inline void CUtlMemoryAligned<T, nAlignment>::EnsureCapacity( intp num )
 	if ( CUtlMemory<T>::m_pMemory )
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_ReallocAligned( CUtlMemory<T>::m_pMemory, CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 	}
 	else
 	{
 		MEM_ALLOC_CREDIT_CLASS();
-		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment );
+		CUtlMemory<T>::m_pMemory = (T*)MemAlloc_AllocAligned( CUtlMemory<T>::m_nAllocationCount * sizeof(T), nAlignment ); //-V106
 	}
 }
 

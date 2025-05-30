@@ -37,7 +37,12 @@ CDmxElement::CDmxElement( const char *pType )
 	m_nLockCount = 0;
 	m_bResortNeeded = false;
 	m_bIsMarkedForDeletion = false;
-	CreateUniqueId( &m_Id );
+
+	// dimhotepus: m_Id will be zeros when unable to create unique id.
+	if ( !CreateUniqueId( &m_Id ) )
+	{
+		AssertMsg( "Unable to create unique id for DMX Element of type %s.", pType );
+	}
 }
 
 CDmxElement::~CDmxElement()
@@ -131,7 +136,7 @@ void CDmxElement::LockForChanges( bool bLock )
 //-----------------------------------------------------------------------------
 CDmxAttribute *CDmxElement::AddAttribute( const char *pAttributeName )
 {
-	int nIndex = FindAttribute( pAttributeName );
+	intp nIndex = FindAttribute( pAttributeName );
 	if ( nIndex >= 0 )
 		return m_Attributes[nIndex];
 
@@ -145,7 +150,7 @@ CDmxAttribute *CDmxElement::AddAttribute( const char *pAttributeName )
 void CDmxElement::RemoveAttribute( const char *pAttributeName )
 {
 	CDmxElementModifyScope modify( this );
-	int idx = FindAttribute( pAttributeName );
+	intp idx = FindAttribute( pAttributeName );
 	if ( idx >= 0 )
 	{
 		delete m_Attributes[idx];
@@ -191,7 +196,7 @@ void CDmxElement::RenameAttribute( const char *pAttributeName, const char *pNewN
 	if ( !Q_stricmp( pAttributeName, pNewName ) )
 		return;
 
-	int idx = FindAttribute( pAttributeName );
+	intp idx = FindAttribute( pAttributeName );
 	if ( idx < 0 )
 		return;
 
@@ -210,7 +215,7 @@ void CDmxElement::RenameAttribute( const char *pAttributeName, const char *pNewN
 //-----------------------------------------------------------------------------
 // Find an attribute by name-based lookup
 //-----------------------------------------------------------------------------
-int CDmxElement::FindAttribute( const char *pAttributeName ) const
+intp CDmxElement::FindAttribute( const char *pAttributeName ) const
 {
 	// FIXME: The cost here is O(log M) + O(log N)
 	// where log N is the binary search for the symbol match
@@ -225,7 +230,7 @@ int CDmxElement::FindAttribute( const char *pAttributeName ) const
 //-----------------------------------------------------------------------------
 // Find an attribute by name-based lookup
 //-----------------------------------------------------------------------------
-int CDmxElement::FindAttribute( CUtlSymbol attributeName ) const
+intp CDmxElement::FindAttribute( CUtlSymbol attributeName ) const
 {
 	Resort();
 	CDmxAttribute search( attributeName );
@@ -238,13 +243,13 @@ int CDmxElement::FindAttribute( CUtlSymbol attributeName ) const
 //-----------------------------------------------------------------------------
 bool CDmxElement::HasAttribute( const char *pAttributeName ) const
 {
-	int idx = FindAttribute( pAttributeName );
+	intp idx = FindAttribute( pAttributeName );
 	return ( idx >= 0 );
 }
 
 CDmxAttribute *CDmxElement::GetAttribute( const char *pAttributeName )
 {
-	int idx = FindAttribute( pAttributeName );
+	intp idx = FindAttribute( pAttributeName );
 	if ( idx >= 0 )
 		return m_Attributes[ idx ];
 	return NULL;
@@ -252,7 +257,7 @@ CDmxAttribute *CDmxElement::GetAttribute( const char *pAttributeName )
 
 const CDmxAttribute *CDmxElement::GetAttribute( const char *pAttributeName ) const
 {
-	int idx = FindAttribute( pAttributeName );
+	intp idx = FindAttribute( pAttributeName );
 	if ( idx >= 0 )
 		return m_Attributes[ idx ];
 	return NULL;
@@ -267,12 +272,12 @@ intp CDmxElement::AttributeCount() const
 	return m_Attributes.Count();
 }
 
-CDmxAttribute *CDmxElement::GetAttribute( int nIndex )
+CDmxAttribute *CDmxElement::GetAttribute( intp nIndex )
 {
 	return m_Attributes[ nIndex ];
 }
 
-const CDmxAttribute *CDmxElement::GetAttribute( int nIndex ) const
+const CDmxAttribute *CDmxElement::GetAttribute( intp nIndex ) const
 {
 	return m_Attributes[ nIndex ];
 }
@@ -289,8 +294,8 @@ void CDmxElement::AddElementsToDelete( CUtlVector< CDmxElement * >& elementsToDe
 	m_bIsMarkedForDeletion = true;
 	elementsToDelete.AddToTail( this );
 
-	int nCount = AttributeCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = AttributeCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = GetAttribute(i);
 		if ( pAttribute->GetType() == AT_ELEMENT )

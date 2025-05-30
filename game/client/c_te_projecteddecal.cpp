@@ -92,7 +92,7 @@ static inline void RecordProjectDecal( const Vector &pos, const QAngle &angles,
 
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_PROJECT_DECAL );
  		msg->SetString( "name", "TE_ProjectDecal" );
@@ -107,7 +107,6 @@ static inline void RecordProjectDecal( const Vector &pos, const QAngle &angles,
 		msg->SetString( "decalname", effects->Draw_DecalNameFromIndex( index ) );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

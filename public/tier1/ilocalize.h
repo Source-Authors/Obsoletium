@@ -14,7 +14,7 @@
 #endif
 
 #include "appframework/IAppSystem.h"
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 
 // unicode character type
 // for more unicode manipulation functions #include <wchar.h>
@@ -26,7 +26,7 @@ typedef unsigned short wchar_t;
 
 // direct references to localized strings
 typedef unsigned long StringIndex_t;
-const unsigned long INVALID_LOCALIZE_STRING_INDEX = (StringIndex_t) -1;
+constexpr inline unsigned long INVALID_LOCALIZE_STRING_INDEX = (StringIndex_t) -1;
 
 //-----------------------------------------------------------------------------
 // Purpose: Handles localization of text
@@ -42,22 +42,22 @@ public:
 	virtual void RemoveAll() = 0;
 
 	// Finds the localized text for tokenName
-	virtual wchar_t *Find(char const *tokenName) = 0;
+	[[nodiscard]] virtual wchar_t *Find(char const *tokenName) = 0;
 
 	// finds the index of a token by token name, INVALID_STRING_INDEX if not found
-	virtual StringIndex_t FindIndex(const char *tokenName) = 0;
+	[[nodiscard]] virtual StringIndex_t FindIndex(const char *tokenName) = 0;
 
 	// gets the values by the string index
-	virtual const char *GetNameByIndex(StringIndex_t index) = 0;
-	virtual wchar_t *GetValueByIndex(StringIndex_t index) = 0;
+	[[nodiscard]] virtual const char *GetNameByIndex(StringIndex_t index) = 0;
+	[[nodiscard]] virtual wchar_t *GetValueByIndex(StringIndex_t index) = 0;
 
 	///////////////////////////////////////////////////////////////////
 	// the following functions should only be used by localization editors
 
 	// iteration functions
-	virtual StringIndex_t GetFirstStringIndex() = 0;
+	[[nodiscard]] virtual StringIndex_t GetFirstStringIndex() = 0;
 	// returns the next index, or INVALID_STRING_INDEX if no more strings available
-	virtual StringIndex_t GetNextStringIndex(StringIndex_t index) = 0;
+	[[nodiscard]] virtual StringIndex_t GetNextStringIndex(StringIndex_t index) = 0;
 
 	// adds a single name/unicode string pair to the table
 	virtual void AddString( const char *tokenName, wchar_t *unicodeString, const char *fileName ) = 0;
@@ -69,21 +69,32 @@ public:
 	virtual bool SaveToFile( const char *fileName ) = 0;
 
 	// iterates the filenames
-	virtual int GetLocalizationFileCount() = 0;
-	virtual const char *GetLocalizationFileName(int index) = 0;
+	[[nodiscard]] virtual int GetLocalizationFileCount() = 0;
+	[[nodiscard]] virtual const char *GetLocalizationFileName(int index) = 0;
 
 	// returns the name of the file the specified localized string is stored in
-	virtual const char *GetFileNameByIndex(StringIndex_t index) = 0;
+	[[nodiscard]] virtual const char *GetFileNameByIndex(StringIndex_t index) = 0;
 
 	// for development only, reloads localization files
 	virtual void ReloadLocalizationFiles( ) = 0;
 
-	virtual const char *FindAsUTF8( const char *pchTokenName ) = 0;
+	[[nodiscard]] virtual const char *FindAsUTF8( const char *pchTokenName ) = 0;
 
 	// need to replace the existing ConstructString with this
 	virtual void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const char *tokenName, KeyValues *localizationVariables) = 0;
+	// dimhotepus: Add bounds-safe interface
+	template<int outSize>
+	void ConstructString_safe(OUT_Z_ARRAY wchar_t (&unicodeOutput)[outSize], const char *tokenName, KeyValues *localizationVariables)
+	{
+		ConstructString( unicodeOutput, static_cast<int>(sizeof(wchar_t)) * outSize, tokenName, localizationVariables );
+	}
 	virtual void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, StringIndex_t unlocalizedTextSymbol, KeyValues *localizationVariables) = 0;
-
+	// dimhotepus: Add bounds-safe interface
+	template<int outSize>
+	void ConstructString_safe(OUT_Z_ARRAY wchar_t (&unicodeOutput)[outSize], StringIndex_t unlocalizedTextSymbol, KeyValues *localizationVariables)
+	{
+		ConstructString( unicodeOutput, static_cast<int>(sizeof(wchar_t)) * outSize, unlocalizedTextSymbol, localizationVariables );
+	}
 	///////////////////////////////////////////////////////////////////
 	// static interface
 
@@ -91,18 +102,35 @@ public:
 	// returns the number of wchar_t in resulting string, including null terminator
 	static int ConvertANSIToUnicode(const char *ansi, OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicode, int unicodeBufferSizeInBytes);
 
+	// converts an english string to unicode
+	// returns the number of wchar_t in resulting string, including null terminator
+	template<int unicodeSize>
+	static int ConvertANSIToUnicode(const char *ansi, OUT_Z_ARRAY wchar_t (&unicode)[unicodeSize])
+	{
+		return ConvertANSIToUnicode(ansi, unicode, unicodeSize * static_cast<int>(sizeof(wchar_t)));
+	}
+
 	// converts an unicode string to an english string
 	// unrepresentable characters are converted to system default
 	// returns the number of characters in resulting string, including null terminator
 	static int ConvertUnicodeToANSI(const wchar_t *unicode, OUT_Z_BYTECAP(ansiBufferSize) char *ansi, int ansiBufferSize);
-
+	
+	// converts an unicode string to an english string
+	// unrepresentable characters are converted to system default
+	// returns the number of characters in resulting string, including null terminator
+	template<int ansiSize>
+	static int ConvertUnicodeToANSI(const wchar_t *unicode, OUT_Z_ARRAY char (&ansi)[ansiSize])
+	{
+		return ConvertUnicodeToANSI(unicode, ansi, ansiSize * static_cast<int>(sizeof(char)));
+	}
+	
 	// builds a localized formatted string
 	// uses the format strings first: %s1, %s2, ...  unicode strings (wchar_t *)
 	template < typename T >
-	static void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOuput, int unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, ...)
+	static void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOuput, intp unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, ...)
 	{
 		va_list argList;
-		va_start( argList, numFormatParameters );
+		va_start( argList, numFormatParameters ); //-V2018 //-V2019
 
 		ConstructStringVArgsInternal( unicodeOuput, unicodeBufferSizeInBytes, formatString, numFormatParameters, argList );
 
@@ -110,13 +138,13 @@ public:
 	}
 
 	template < typename T >
-	static void ConstructStringVArgs(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOuput, int unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, va_list argList)
+	static void ConstructStringVArgs(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOuput, intp unicodeBufferSizeInBytes, const T *formatString, int numFormatParameters, va_list argList)
 	{
 		ConstructStringVArgsInternal( unicodeOuput, unicodeBufferSizeInBytes, formatString, numFormatParameters, argList );
 	}
 
 	template < typename T >
-	static void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOutput, int unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables)
+	static void ConstructString(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) T *unicodeOutput, intp unicodeBufferSizeInBytes, const T *formatString, KeyValues *localizationVariables)
 	{
 		ConstructStringKeyValuesInternal( unicodeOutput, unicodeBufferSizeInBytes, formatString, localizationVariables );
 	}
@@ -127,7 +155,7 @@ public:
 	static void ConstructString_safe( OUT_Z_ARRAY T (&pDest)[maxLenInChars], const T *formatString, int numFormatParameters, ... )
 	{
 		va_list argList;
-		va_start( argList, numFormatParameters );
+		va_start( argList, numFormatParameters ); //-V2018 //-V2019
 
 		ConstructStringVArgsInternal( pDest, maxLenInChars * sizeof( *pDest ), formatString, numFormatParameters, argList );
 
@@ -149,11 +177,11 @@ public:
 
 private:
 	// internal "interface"
-	static void ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, int unicodeBufferSizeInBytes, const char *formatString, int numFormatParameters, va_list argList);
-	static void ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const wchar_t *formatString, int numFormatParameters, va_list argList);
+	static void ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, intp unicodeBufferSizeInBytes, const char *formatString, int numFormatParameters, va_list argList);
+	static void ConstructStringVArgsInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, intp unicodeBufferSizeInBytes, const wchar_t *formatString, int numFormatParameters, va_list argList);
 
-	static void ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, int unicodeBufferSizeInBytes, const char *formatString, KeyValues *localizationVariables);
-	static void ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, int unicodeBufferSizeInBytes, const wchar_t *formatString, KeyValues *localizationVariables);
+	static void ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) char *unicodeOutput, intp unicodeBufferSizeInBytes, const char *formatString, KeyValues *localizationVariables);
+	static void ConstructStringKeyValuesInternal(OUT_Z_BYTECAP(unicodeBufferSizeInBytes) wchar_t *unicodeOutput, intp unicodeBufferSizeInBytes, const wchar_t *formatString, KeyValues *localizationVariables);
 };
 
 #ifdef GC
@@ -192,7 +220,7 @@ template < typename T >
 class TypedKeyValuesStringHelper
 {
 public:
-	static const T *Read( KeyValues *pKeyValues, const char *pKeyName, const T *pDefaultValue );
+	[[nodiscard]] static const T *Read( KeyValues *pKeyValues, const char *pKeyName, const T *pDefaultValue );
 	static void	Write( KeyValues *pKeyValues, const char *pKeyName, const T *pValue );
 };
 
@@ -202,7 +230,7 @@ template < >
 class TypedKeyValuesStringHelper<char>
 {
 public:
-	static const char *Read( KeyValues *pKeyValues, const char *pKeyName, const char *pDefaultValue ) { return pKeyValues->GetString( pKeyName, pDefaultValue ); }
+	[[nodiscard]] static const char *Read( KeyValues *pKeyValues, const char *pKeyName, const char *pDefaultValue ) { return pKeyValues->GetString( pKeyName, pDefaultValue ); }
 	static void Write( KeyValues *pKeyValues, const char *pKeyName, const char *pValue ) { pKeyValues->SetString( pKeyName, pValue ); }
 };
 
@@ -212,7 +240,7 @@ template < >
 class TypedKeyValuesStringHelper<wchar_t>
 {
 public:
-	static const wchar_t *Read( KeyValues *pKeyValues, const char *pKeyName, const wchar_t *pDefaultValue ) { return pKeyValues->GetWString( pKeyName, pDefaultValue ); }
+	[[nodiscard]] static const wchar_t *Read( KeyValues *pKeyValues, const char *pKeyName, const wchar_t *pDefaultValue ) { return pKeyValues->GetWString( pKeyName, pDefaultValue ); }
 	static void Write( KeyValues *pKeyValues, const char *pKeyName, const wchar_t *pValue ) { pKeyValues->SetWString( pKeyName, pValue ); }
 };
 
@@ -248,7 +276,7 @@ public:
 
 	CLocalizedStringArgStringImpl( const locchar_t *pStr ) : m_pStr( pStr ) { }
 
-	const locchar_t *GetLocArg() const { Assert( m_pStr ); return m_pStr; }
+	[[nodiscard]] const locchar_t *GetLocArg() const { Assert( m_pStr ); return m_pStr; }
 
 private:
 	const locchar_t *m_pStr;
@@ -273,7 +301,7 @@ public:
 
 	CLocalizedStringArgPrintfImpl( T value, const locchar_t *loc_Format ) { loc_snprintf( m_cBuffer, kBufferSize, loc_Format, value ); }
 
-	const locchar_t *GetLocArg() const { return m_cBuffer; }
+	[[nodiscard]] const locchar_t *GetLocArg() const { return m_cBuffer; }
 
 private:
 	enum { kBufferSize = 128, };
@@ -392,7 +420,7 @@ public:
 			::ILocalize::ConstructString( m_loc_Buffer,
 										  sizeof( m_loc_Buffer ),
 										  loc_Format,
-										  4,
+										  4, //-V112
 										  CLocalizedStringArg<T>( arg0 ).GetLocArg(),
 										  CLocalizedStringArg<U>( arg1 ).GetLocArg(),
 										  CLocalizedStringArg<V>( arg2 ).GetLocArg(),
@@ -491,7 +519,7 @@ public:
 		}
 	}
 
-	operator const locchar_t *() const
+	[[nodiscard]] operator const locchar_t *() const
 	{
 		return m_loc_Buffer;
 	}

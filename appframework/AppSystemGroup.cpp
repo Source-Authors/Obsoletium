@@ -9,7 +9,7 @@
 
 #include "appframework/IAppSystemGroup.h"
 #include "appframework/IAppSystem.h"
-#include "interface.h"
+#include "tier1/interface.h"
 #include "filesystem.h"
 #include "filesystem_init.h"
 
@@ -43,8 +43,8 @@ AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 {
 	// Remove the extension when creating the name.
 	size_t nLen = V_strlen( pDLLName ) + 1;
-	char *pModuleName = (char*)stackalloc( nLen );
-	Q_StripExtension( pDLLName, pModuleName, nLen );
+	char *pModuleName = stackallocT( char, nLen );
+	V_StripExtension( pDLLName, pModuleName, nLen );
 
 	// See if we already loaded it...
 	for ( auto i = m_Modules.Count(); --i >= 0; ) 
@@ -61,7 +61,7 @@ AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 	CSysModule *pSysModule = LoadModuleDLL( pDLLName );
 	if (!pSysModule)
 	{
-		Warning("AppFramework : Unable to load module %s!\n", pDLLName );
+		Warning("AppFramework: Unable to load module %s!\n", pDLLName );
 		return APP_MODULE_INVALID;
 	}
 
@@ -78,7 +78,7 @@ AppModule_t CAppSystemGroup::LoadModule( CreateInterfaceFn factory )
 {
 	if (!factory)
 	{
-		Warning("AppFramework : Unable to load module %p!\n", factory );
+		Warning("AppFramework: Unable to load module from factory 0x%p!\n", factory );
 		return APP_MODULE_INVALID;
 	}
 
@@ -139,7 +139,7 @@ IAppSystem *CAppSystemGroup::AddSystem( AppModule_t module, const char *pInterfa
 	void *pSystem = pFactory( pInterfaceName, &retval );
 	if ((retval != IFACE_OK) || (!pSystem))
 	{
-		Warning("AppFramework : Unable to create system %s!\n", pInterfaceName );
+		Warning("AppFramework: Unable to create system %s!\n", pInterfaceName );
 		return NULL;
 	}
 
@@ -182,7 +182,7 @@ void CAppSystemGroup::ReportStartupFailure( int nErrorStage, intp nSysIndex )
 		pszSystemName = m_SystemDict.GetElementName( i );
 		break;
 	}
-		 
+
 	// Walk the dictionary
 	Warning( "System (%s) failed during stage %s\n", pszSystemName, pszStageDesc );
 }
@@ -353,7 +353,7 @@ void *AppSystemCreateInterfaceFn(const char *pName, int *pReturnCode)
 	void *pInterface = s_pCurrentAppSystem->FindSystem( pName );
 	if ( pReturnCode )
 	{
-		*pReturnCode = pInterface ? IFACE_OK : IFACE_FAILED;
+		*pReturnCode = pInterface ? to_underlying(IFACE_OK) : to_underlying(IFACE_FAILED);
 	}
 	return pInterface;
 }
@@ -441,14 +441,14 @@ int CAppSystemGroup::OnStartup()
 	}
 
 	// Call Init on all App Systems
-	int nRetVal = InitSystems();
+	InitReturnVal_t nRetVal = InitSystems();
 	if ( nRetVal != INIT_OK )
 	{
 		m_nErrorStage = INITIALIZATION;
 		return -1;
 	}
 
-	return nRetVal;
+	return to_underlying(nRetVal);
 }
 
 void CAppSystemGroup::OnShutdown()
@@ -573,6 +573,6 @@ bool CSteamAppSystemGroup::SetupSearchPaths( const char *pStartingDir, bool bOnl
 		return false;
 
 	FileSystem_AddSearchPath_Platform( fsInfo.m_pFileSystem, steamInfo.m_GameInfoPath );
-	Q_strncpy( m_pGameInfoPath, steamInfo.m_GameInfoPath, sizeof(m_pGameInfoPath) );
+	V_strcpy_safe( m_pGameInfoPath, steamInfo.m_GameInfoPath );
 	return true;
 }

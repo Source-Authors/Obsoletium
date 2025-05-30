@@ -241,11 +241,11 @@ struct CExprUnary : public IExpression {
   ;
 
 BEGIN_EXPR_UNARY(CExprUnary_Negate)
-EVAL { return !m_x->Evaluate(pCtx); };
-PRNT {
-  OutputF(stdout, "!");
-  m_x->Print(pCtx);
-}
+  EVAL { return !m_x->Evaluate(pCtx); };
+  PRNT {
+    OutputF(stdout, "!");
+    m_x->Print(pCtx);
+  }
 END_EXPR_UNARY()
 
 struct CExprBinary : public IExpression {
@@ -268,99 +268,99 @@ struct CExprBinary : public IExpression {
   ;
 
 BEGIN_EXPR_BINARY(CExprBinary_And)
-EVAL { return m_x->Evaluate(pCtx) && m_y->Evaluate(pCtx); }
-PRNT {
-  OutputF(stdout, "( ");
-  m_x->Print(pCtx);
-  OutputF(stdout, " && ");
-  m_y->Print(pCtx);
-  OutputF(stdout, " )");
-}
-EXPR_BINARY_PRIORITY(1);
+  EVAL { return !!m_x->Evaluate(pCtx) && !!m_y->Evaluate(pCtx); }
+  PRNT {
+    OutputF(stdout, "( ");
+    m_x->Print(pCtx);
+    OutputF(stdout, " && ");
+    m_y->Print(pCtx);
+    OutputF(stdout, " )");
+  }
+  EXPR_BINARY_PRIORITY(1);
 END_EXPR_BINARY()
 
 BEGIN_EXPR_BINARY(CExprBinary_Or)
-EVAL { return m_x->Evaluate(pCtx) || m_y->Evaluate(pCtx); }
-PRNT {
-  OutputF(stdout, "( ");
-  m_x->Print(pCtx);
-  OutputF(stdout, " || ");
-  m_y->Print(pCtx);
-  OutputF(stdout, " )");
-}
-EXPR_BINARY_PRIORITY(2);
+  EVAL { return !!m_x->Evaluate(pCtx) || !!m_y->Evaluate(pCtx); }
+  PRNT {
+    OutputF(stdout, "( ");
+    m_x->Print(pCtx);
+    OutputF(stdout, " || ");
+    m_y->Print(pCtx);
+    OutputF(stdout, " )");
+  }
+  EXPR_BINARY_PRIORITY(2);
 END_EXPR_BINARY()
 
 BEGIN_EXPR_BINARY(CExprBinary_Eq)
-EVAL { return m_x->Evaluate(pCtx) == m_y->Evaluate(pCtx); }
-PRNT {
-  OutputF(stdout, "( ");
-  m_x->Print(pCtx);
-  OutputF(stdout, " == ");
-  m_y->Print(pCtx);
-  OutputF(stdout, " )");
-}
-EXPR_BINARY_PRIORITY(0);
+  EVAL { return m_x->Evaluate(pCtx) == m_y->Evaluate(pCtx); }
+  PRNT {
+    OutputF(stdout, "( ");
+    m_x->Print(pCtx);
+    OutputF(stdout, " == ");
+    m_y->Print(pCtx);
+    OutputF(stdout, " )");
+  }
+  EXPR_BINARY_PRIORITY(0);
 END_EXPR_BINARY()
 
 BEGIN_EXPR_BINARY(CExprBinary_Neq)
-EVAL { return m_x->Evaluate(pCtx) != m_y->Evaluate(pCtx); }
-PRNT {
-  OutputF(stdout, "( ");
-  m_x->Print(pCtx);
-  OutputF(stdout, " != ");
-  m_y->Print(pCtx);
-  OutputF(stdout, " )");
-}
-EXPR_BINARY_PRIORITY(0);
+  EVAL { return m_x->Evaluate(pCtx) != m_y->Evaluate(pCtx); }
+  PRNT {
+    OutputF(stdout, "( ");
+    m_x->Print(pCtx);
+    OutputF(stdout, " != ");
+    m_y->Print(pCtx);
+    OutputF(stdout, " )");
+  }
+  EXPR_BINARY_PRIORITY(0);
 END_EXPR_BINARY()
 
 BEGIN_EXPR_BINARY(CExprBinary_G)
-EVAL { return m_x->Evaluate(pCtx) > m_y->Evaluate(pCtx); }
-PRNT {
-  OutputF(stdout, "( ");
-  m_x->Print(pCtx);
-  OutputF(stdout, " > ");
-  m_y->Print(pCtx);
-  OutputF(stdout, " )");
-}
-EXPR_BINARY_PRIORITY(0);
+  EVAL { return m_x->Evaluate(pCtx) > m_y->Evaluate(pCtx); }
+  PRNT {
+    OutputF(stdout, "( ");
+    m_x->Print(pCtx);
+    OutputF(stdout, " > ");
+    m_y->Print(pCtx);
+    OutputF(stdout, " )");
+  }
+  EXPR_BINARY_PRIORITY(0);
 END_EXPR_BINARY()
 
 BEGIN_EXPR_BINARY(CExprBinary_Ge)
-EVAL { return m_x->Evaluate(pCtx) >= m_y->Evaluate(pCtx); }
-PRNT {
-  OutputF(stdout, "( ");
-  m_x->Print(pCtx);
-  OutputF(stdout, " >= ");
-  m_y->Print(pCtx);
-  OutputF(stdout, " )");
-}
-EXPR_BINARY_PRIORITY(0);
+  EVAL { return m_x->Evaluate(pCtx) >= m_y->Evaluate(pCtx); }
+  PRNT {
+    OutputF(stdout, "( ");
+    m_x->Print(pCtx);
+    OutputF(stdout, " >= ");
+    m_y->Print(pCtx);
+    OutputF(stdout, " )");
+  }
+  EXPR_BINARY_PRIORITY(0);
 END_EXPR_BINARY()
 
 BEGIN_EXPR_BINARY(CExprBinary_L)
-EVAL { return m_x->Evaluate(pCtx) < m_y->Evaluate(pCtx); }
-PRNT {
-  OutputF(stdout, "( ");
-  m_x->Print(pCtx);
-  OutputF(stdout, " < ");
-  m_y->Print(pCtx);
-  OutputF(stdout, " )");
-}
-EXPR_BINARY_PRIORITY(0);
+  EVAL { return m_x->Evaluate(pCtx) < m_y->Evaluate(pCtx); }
+  PRNT {
+    OutputF(stdout, "( ");
+    m_x->Print(pCtx);
+    OutputF(stdout, " < ");
+    m_y->Print(pCtx);
+    OutputF(stdout, " )");
+  }
+  EXPR_BINARY_PRIORITY(0);
 END_EXPR_BINARY()
 
 BEGIN_EXPR_BINARY(CExprBinary_Le)
-EVAL { return m_x->Evaluate(pCtx) <= m_y->Evaluate(pCtx); }
-PRNT {
-  OutputF(stdout, "( ");
-  m_x->Print(pCtx);
-  OutputF(stdout, " <= ");
-  m_y->Print(pCtx);
-  OutputF(stdout, " )");
-}
-EXPR_BINARY_PRIORITY(0);
+  EVAL { return m_x->Evaluate(pCtx) <= m_y->Evaluate(pCtx); }
+  PRNT {
+    OutputF(stdout, "( ");
+    m_x->Print(pCtx);
+    OutputF(stdout, " <= ");
+    m_y->Print(pCtx);
+    OutputF(stdout, " )");
+  }
+  EXPR_BINARY_PRIORITY(0);
 END_EXPR_BINARY()
 
 class CComplexExpression : public IExpression {
@@ -794,7 +794,7 @@ class ComboHandleImpl : public IEvaluationContext {
   bool AdvanceCommands(uint64_t &riAdvanceMore);
   bool NextNotSkipped(uint64_t iTotalCommand);
   bool IsSkipped() { return (m_pEntry->m_pExpr->Evaluate(this) != 0); }
-  void FormatCommand(char *pchBuffer);
+  void FormatCommand(OUT_Z_CAP(bufferSize) char *pchBuffer, intp bufferSize);
 };
 
 QuickMap<uint64_t, ComboHandleImpl> s_mapComboCommands;
@@ -888,7 +888,7 @@ bool ComboHandleImpl::NextNotSkipped(uint64_t iTotalCommand) {
   }
 }
 
-void ComboHandleImpl::FormatCommand(char *pchBuffer) {
+void ComboHandleImpl::FormatCommand(OUT_Z_CAP(buffer_size) char *pchBuffer, intp bufferSize) {
   // Get the pointers
   int *const pnValues = m_arrVarSlots.ArrayBaseForEdit();
   int *const pnValuesEnd = pnValues + m_arrVarSlots.Size();
@@ -900,19 +900,20 @@ void ComboHandleImpl::FormatCommand(char *pchBuffer) {
 
   {
     // ------- OnCombo( nCurrentCombo ); ----------
-    sprintf(pchBuffer, "%s ", m_pEntry->m_sPrefix.data());
+    V_snprintf(pchBuffer, bufferSize, "%s ", m_pEntry->m_sPrefix.data());
     pchBuffer += strlen(pchBuffer);
 
-    sprintf(pchBuffer, "/DSHADERCOMBO=%llu ", m_iComboNumber);
+    V_snprintf(pchBuffer, bufferSize, "/DSHADERCOMBO=%llu ", m_iComboNumber);
     pchBuffer += strlen(pchBuffer);
 
     for (pSetValues = pnValues, pSetDef = pDefVars; pSetValues < pnValuesEnd;
          ++pSetValues, ++pSetDef) {
-      sprintf(pchBuffer, "/D%s=%d ", pSetDef->Name(), *pSetValues);
+      V_snprintf(pchBuffer, bufferSize, "/D%s=%d ", pSetDef->Name(),
+                 *pSetValues);
       pchBuffer += strlen(pchBuffer);
     }
 
-    sprintf(pchBuffer, "%s\n", m_pEntry->m_sSuffix.data());
+    V_snprintf(pchBuffer, bufferSize, "%s\n", m_pEntry->m_sSuffix.data());
     pchBuffer += strlen(pchBuffer);
     // ------- end of OnCombo ---------------------
   }
@@ -1282,10 +1283,11 @@ ComboHandle Combo_GetNext(uint64_t &riCommandNumber, ComboHandle &rhCombo,
   }
 }
 
-void Combo_FormatCommand(ComboHandle hCombo, char *pchBuffer) {
+void Combo_FormatCommand(ComboHandle hCombo, OUT_Z_CAP(buffer_size) char *pchBuffer,
+                         intp buffer_size) {
   CPCHI_t *impl = FromHandle(hCombo);
 
-  impl->FormatCommand(pchBuffer);
+  impl->FormatCommand(pchBuffer, buffer_size);
 }
 
 uint64_t Combo_GetCommandNum(ComboHandle hCombo) {

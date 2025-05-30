@@ -877,7 +877,7 @@ public:
 	bool Init();
 	void Shutdown();
 
-	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen );
+	bool GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, size_t nMaxLen );
 
 	struct staticPropAsyncContext_t
 	{
@@ -1024,8 +1024,8 @@ class CResourcePreloadPropLighting : public CResourcePreload
 
 		char szBasename[MAX_PATH];
 		char szFilename[MAX_PATH];
-		V_FileBase( pName, szBasename, sizeof( szBasename ) );
-		V_snprintf( szFilename, sizeof( szFilename ), "%s%s.vhv", szBasename, GetPlatformExt() );
+		V_FileBase( pName, szBasename );
+		V_sprintf_safe( szFilename, "%s%s.vhv", szBasename, GetPlatformExt() );
 
 		// static props have the same name across maps
 		// can check if loading the same map and early out if data present
@@ -1106,11 +1106,6 @@ bool CModelRender::Init()
 	// start a managed section in the cache
 	CCacheClientBaseClass::Init( g_pDataCache, "ColorMesh" );
 
-	if ( IsX360() )
-	{
-		g_pQueuedLoader->InstallLoader( RESOURCEPRELOAD_STATICPROPLIGHTING, &s_ResourcePreloadPropLighting );
-	}
-
 	return true;
 }
 
@@ -1136,7 +1131,7 @@ void CModelRender::SuppressEngineLighting( bool bSuppress )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen )
+bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, size_t nMaxLen )
 {
 	CColorMeshData *pColorMeshData = (CColorMeshData *)pItem;
 	g_pFileSystem->String( pColorMeshData->m_fnHandle, pDest, nMaxLen );
@@ -1434,10 +1429,7 @@ void CModelRender::StudioSetupLighting( const DrawModelState_t &state, const Vec
 	if ( pInfo.instance != m_ModelInstances.InvalidIndex() )
 	{
 		pModelInst = &m_ModelInstances[pInfo.instance];
-		if ( pModelInst )
-		{
-			bHasDecals = ( pModelInst->m_DecalHandle != STUDIORENDER_DECAL_INVALID );
-		}
+		bHasDecals = ( pModelInst->m_DecalHandle != STUDIORENDER_DECAL_INVALID );
 	}
 
 	if ( pLightcache )
@@ -1869,7 +1861,7 @@ struct ModelDebugOverlayData_t
 	DrawModelResults_t m_ModelResults;
 	Vector m_Origin;
 
-	ModelDebugOverlayData_t() {}
+	ModelDebugOverlayData_t() = default;
 
 private:
 	ModelDebugOverlayData_t( const ModelDebugOverlayData_t &vOther );
@@ -1897,8 +1889,7 @@ void DrawModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_
 			return;
 	}
 
-	Assert( info.m_pStudioHdr );
-	Assert( info.m_pStudioHdr->pszName() );
+	Assert( info.m_pStudioHdr && info.m_pStudioHdr->pszName() );
 	Assert( info.m_pHardwareData );
 	float duration = 0.0f;
 	int lineOffset = 0;
@@ -1912,7 +1903,7 @@ void DrawModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, info.m_pStudioHdr->pszName() );
 	Q_snprintf( buf, sizeof( buf ), "lod: %d/%d\n", results.m_nLODUsed+1, ( int )info.m_pHardwareData->m_NumLODs );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );
-	Q_snprintf( buf, sizeof( buf ), "tris: %d\n",  results.m_ActualTriCount );
+	Q_snprintf( buf, sizeof( buf ), "tris: %zd\n",  results.m_ActualTriCount );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );
 	Q_snprintf( buf, sizeof( buf ), "hardware bones: %d\n",  results.m_NumHardwareBones );
 	CDebugOverlay::AddTextOverlay( origin, lineOffset++, duration, r, g, b, alpha, buf );		
@@ -2806,7 +2797,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 #ifndef SWDS
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 	CMatRenderContextPtr pRenderContext( materials );
-	const int MAX_OBJECTS = 1024;
+	constexpr int MAX_OBJECTS = 1024;
 	CUtlSortVector<robject_t, CRobjectLess> objectList( (intp)0, MAX_OBJECTS);
 	CUtlVectorFixedGrowable<rmodel_t, 256> modelList;
 	CUtlVectorFixedGrowable<short,256> lightObjects;
@@ -3703,28 +3694,6 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 		goto cleanUp;
 	}
 
-	if ( IsX360() )
-	{
-		// only the 360 has compressed VHV data
-		// the compressed data is after the header
-		byte *pCompressedData = (byte *)pData + sizeof( HardwareVerts::FileHeader_t );
-		if ( CLZMA::IsCompressed( pCompressedData ) )
-		{
-			// create a buffer that matches the original
-			int actualSize = CLZMA::GetActualSize( pCompressedData );
-			pOriginalData = (byte *)malloc( sizeof( HardwareVerts::FileHeader_t ) + actualSize );
-
-			// place the header, then uncompress directly after it
-			V_memcpy( pOriginalData, pData, sizeof( HardwareVerts::FileHeader_t ) );
-			int outputLength = CLZMA::Uncompress( pCompressedData, pOriginalData + sizeof( HardwareVerts::FileHeader_t ) );
-			if ( outputLength != actualSize )
-			{
-				goto cleanUp;
-			}
-			pData = pOriginalData;
-		}
-	}
-
 	pVhvHdr = (HardwareVerts::FileHeader_t *)pData;
 
 	int startMesh;
@@ -3782,25 +3751,13 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 		meshBuilder.End();
 	}
 cleanUp:
-	if ( IsX360() )
-	{
-		AUTO_LOCK( m_CachedStaticPropMutex );
-		// track the color mesh's datacache handle so that we can find it long after the model instance's are gone
-		// the static prop filenames are guaranteed uniquely decorated
-		m_CachedStaticPropColorData.Insert( pStaticPropContext->m_szFilenameVertex, pStaticPropContext->m_ColorMeshHandle );
-
-		// No support for lightmap textures on X360. 
-	}
 
 	// mark as completed in single atomic operation
 	pStaticPropContext->m_pColorMeshData->m_bColorMeshValid = true;
 	CacheUnlock( pStaticPropContext->m_ColorMeshHandle );
 	delete pStaticPropContext;
 
-	if ( pOriginalData )
-	{
-		free( pOriginalData );
-	}
+	free( pOriginalData );
 }
 
 //-----------------------------------------------------------------------------
@@ -3889,19 +3846,6 @@ static void StaticPropColorTexelCallback( const FileAsyncRequest_t &request, int
 
 
 //-----------------------------------------------------------------------------
-// Queued loader callback
-// Called from async i/o thread - must spend minimal cycles in this context
-//-----------------------------------------------------------------------------
-static void QueuedLoaderCallback_PropLighting( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError )
-{
-	// translate error
-	FSAsyncStatus_t asyncStatus = ( loaderError == LOADERERROR_NONE ? FSASYNC_OK : FSASYNC_ERR_READING );
-
-	// mimic async i/o completion
-	s_ModelRender.StaticPropColorMeshCallback( pContext, pData, nSize, asyncStatus );
-}
-
-//-----------------------------------------------------------------------------
 // Loads the serialized static prop color data.
 // Returns false if legacy path should be used.
 //-----------------------------------------------------------------------------
@@ -3955,23 +3899,6 @@ bool CModelRender::LoadStaticPropColorData( IHandleEntity *pProp, DataCacheHandl
 	pContextVertex->m_ColorMeshHandle = colorMeshHandle;
 	pContextVertex->m_pColorMeshData = pColorMeshData;
 	V_strncpy( pContextVertex->m_szFilenameVertex, fileName, sizeof( pContextVertex->m_szFilenameVertex ) );
-
-	if ( IsX360() && g_pQueuedLoader->IsMapLoading() )
-	{
-		if ( !g_pQueuedLoader->ClaimAnonymousJob( fileName, QueuedLoaderCallback_PropLighting, (void *)pContextVertex ) )
-		{
-			// not there as expected
-			// as a less optimal fallback during loading, issue as a standard queued loader job
-			LoaderJob_t loaderJob;
-			loaderJob.m_pFilename = fileName;
-			loaderJob.m_pPathID = "GAME";
-			loaderJob.m_pCallback = QueuedLoaderCallback_PropLighting;
-			loaderJob.m_pContext = (void *)pContextVertex;
-			loaderJob.m_Priority = LOADERPRIORITY_BEFOREPLAY;
-			g_pQueuedLoader->AddJob( &loaderJob );
-		}
-		return true;
-	}
 
 	// async load the file
 	FileAsyncRequest_t fileRequest;
@@ -4536,45 +4463,6 @@ DataCacheHandle_t CModelRender::GetCachedStaticPropColorData( const char *pName 
 
 void CModelRender::SetupColorMeshes( int nTotalVerts )
 {
-	Assert( IsX360() );
-	if ( IsPC() )
-	{
-		return;
-	}
-
-	if ( !g_pQueuedLoader->IsMapLoading() )
-	{
-		// oops, the queued loader didn't run which does the pre-purge cleanup
-		// do the cleanup now
-		PurgeCachedStaticPropColorData();
-	}
-
-	// Set up the appropriate default value for color mesh pooling
-	if ( r_proplightingpooling.GetInt() == -1 )
-	{
-		// This is useful on X360 because VBs are 4-KiB aligned, so using a shared VB saves tons of memory
-		r_proplightingpooling.SetValue( true );
-	}
-
-	if ( r_proplightingpooling.GetInt() == 1 )
-	{
-		if ( m_colorMeshVBAllocator.GetNumVertsAllocated() == 0 )
-		{
-			if ( nTotalVerts )
-			{
-				// Allocate a mesh (vertex buffer) big enough to accommodate all static prop color meshes
-				// (which are allocated inside CModelRender::FindOrCreateStaticPropColorData() ):
-				m_colorMeshVBAllocator.Init( VERTEX_SPECULAR, nTotalVerts );
-			}
-		}
-		else
-		{
-			// already allocated
-			// 360 keeps the color meshes during same map loads
-			// vb allocator already allocated, needs to match
-			Assert( m_colorMeshVBAllocator.GetNumVertsAllocated() == nTotalVerts );
-		}
-	}
 }
 
 void CModelRender::DestroyInstance( ModelInstanceHandle_t handle )

@@ -12,9 +12,9 @@
 #endif
 
 #include "vgui_surfacelib/FontManager.h"
-#include "utlrbtree.h"
+#include "tier1/utlrbtree.h"
 #include <vgui/ISurface.h>
-#include "utlmap.h"
+#include "tier1/utlmap.h"
 
 class ITexture;
 

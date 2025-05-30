@@ -339,13 +339,13 @@ void CMapReslistGenerator::BuildEngineLogFromReslist()
 	char szToken[MAX_PATH];
 	for ( ;; )
 	{
-		int nTokenSize = buffer.ParseToken( &breakSet, szToken, sizeof( szToken ) );
+		intp nTokenSize = buffer.ParseToken( &breakSet, szToken );
 		if ( nTokenSize <= 0 )
 		{
 			break;
 		}
 
-		int idx = m_EngineLog.Find( szToken );
+		auto idx = m_EngineLog.Find( szToken );
 		if ( idx == m_EngineLog.InvalidIndex() )
 		{
 			m_EngineLog.Insert( szToken );
@@ -484,12 +484,11 @@ void CMapReslistGenerator::OnLevelLoadStart(const char *levelName)
 	OnResourcePrecached( path );
 
 	bool useNodeGraph = true;
-	KeyValues *modinfo = new KeyValues("ModInfo");
+	KeyValuesAD modinfo("ModInfo");
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 	{
 		useNodeGraph = modinfo->GetInt( "nodegraph", 1 ) != 0;
 	}
-	modinfo->deleteThis();
 
 	if ( useNodeGraph )
 	{
@@ -619,14 +618,14 @@ void CMapReslistGenerator::OnModelPrecached(const char *relativePathFileName)
 		// it's a materials file, make sure that it starts in the materials directory, and we get the .vtf
 		char file[_MAX_PATH];
 
-		if (!Q_strnicmp(relativePathFileName, "materials", strlen("materials")))
+		if (!Q_strnicmp(relativePathFileName, "materials", ssize("materials") - 1))
 		{
-			Q_strncpy(file, relativePathFileName, sizeof(file));
+			V_strcpy_safe(file, relativePathFileName);
 		}
 		else
 		{
 			// prepend the materials directory
-			Q_snprintf(file, sizeof(file), "materials\\%s", relativePathFileName);
+			V_sprintf_safe(file, "materials\\%s", relativePathFileName);
 		}
 		OnResourcePrecached(file);
 
@@ -657,14 +656,14 @@ void CMapReslistGenerator::OnSoundPrecached(const char *relativePathFileName)
 
 	// prepend the sound/ directory if necessary
 	char file[_MAX_PATH];
-	if (!Q_strnicmp(relativePathFileName, "sound", strlen("sound")))
+	if (!Q_strnicmp(relativePathFileName, "sound", ssize("sound") - 1))
 	{
-		Q_strncpy(file, relativePathFileName, sizeof(file));
+		V_strcpy_safe(file, relativePathFileName);
 	}
 	else
 	{
 		// prepend the sound directory
-		Q_snprintf(file, sizeof(file), "sound\\%s", relativePathFileName);
+		V_sprintf_safe(file, "sound\\%s", relativePathFileName);
 	}
 
 	OnResourcePrecached(file);
@@ -687,7 +686,7 @@ void CMapReslistGenerator::OnResourcePrecached(const char *relativePathFileName)
 		return;
 
 	char fullPath[_MAX_PATH];
-	if (g_pFileSystem->GetLocalPath(relativePathFileName, fullPath, sizeof(fullPath)))
+	if (g_pFileSystem->GetLocalPath_safe(relativePathFileName, fullPath))
 	{
 		OnResourcePrecachedFullPath(fullPath);
 	}
@@ -885,7 +884,7 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 					Q_strlower( com_token );
 	
 					CUtlSymbol sym = m_DeletionListWarningsSymbols.AddString( com_token );
-					int idx = m_DeletionListWarnings.Find( sym );
+					auto idx = m_DeletionListWarnings.Find( sym );
 					if ( idx == m_DeletionListWarnings.InvalidIndex() )
 					{
 						m_DeletionListWarnings.Insert( sym );
@@ -924,7 +923,7 @@ void CMapReslistGenerator::TrackDeletions( const char *fullPathFileName )
 	{
 		CUtlSymbol warningSymbol = m_DeletionListWarningsSymbols.AddString( test );
 
-		uint idx = m_DeletionListWarnings.Find( warningSymbol );
+		auto idx = m_DeletionListWarnings.Find( warningSymbol );
 		if ( idx == m_DeletionListWarnings.InvalidIndex() )
 		{
 			Msg( "--> Referenced file marked for deletion \"%s\"\n", test );

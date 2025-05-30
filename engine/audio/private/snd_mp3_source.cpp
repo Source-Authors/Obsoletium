@@ -94,7 +94,8 @@ CAudioSourceMP3::CAudioSourceMP3( CSfxTable *pSfx )
 	m_dataStart = 0;
 
 	intp file = g_pSndIO->open( pSfx->GetFileName() );
-	if ( file != -1 )
+	// dimhotepus: Diffrent imple signal errors in different ways
+	if ( file && file != -1 )
 	{
 		m_dataSize = g_pSndIO->size( file );
 		g_pSndIO->close( file );
@@ -240,7 +241,8 @@ void CAudioSourceMP3::GetCacheData( CAudioSourceCachedInfo *info )
 	info->SetDataStart( 0 );
 
 	intp file = g_pSndIO->open( m_pSfx->GetFileName() );
-	if ( !file )
+	// dimhotepus: Diffrent imple signal errors in different ways
+	if ( !file || file == -1 )
 	{
 		Warning( "Failed to find file for building soundcache [ %s ]\n", m_pSfx->GetFileName() );
 		// Don't re-use old cached value
@@ -311,6 +313,7 @@ CAudioSourceMP3Cache::CAudioSourceMP3Cache( CSfxTable *pSfx ) :
 	CAudioSourceMP3( pSfx )
 {
 	m_hCache = 0;
+	m_bNoSentence = false;
 }
 
 CAudioSourceMP3Cache::CAudioSourceMP3Cache( CSfxTable *pSfx, CAudioSourceCachedInfo *info ) :
@@ -332,10 +335,10 @@ CAudioSourceMP3Cache::~CAudioSourceMP3Cache( void )
 	CacheUnload();
 }
 
-int CAudioSourceMP3Cache::GetCacheStatus( void )
+CAudioSourceMP3Cache::AudioStatus CAudioSourceMP3Cache::GetCacheStatus( void )
 {
 	bool bCacheValid;
-	int loaded = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid ) ? AUDIO_IS_LOADED : AUDIO_NOT_LOADED;
+	AudioStatus loaded = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid ) ? AUDIO_IS_LOADED : AUDIO_NOT_LOADED;
 	if ( !bCacheValid )
 	{
 		wavedatacache->RestartDataLoad( &m_hCache, m_pSfx->GetFileName(), m_dataSize, m_dataStart );

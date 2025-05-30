@@ -101,8 +101,9 @@ CON_COMMAND_EXTERN( Test_LoopForNumSeconds, Test_LoopForNumSeconds, "Test_LoopFo
 		Error( "Test_LoopLoopForNumSeconds: requires a loop name and number of seconds to loop." );
 		return;
 	}
-
-	GetTestScriptMgr()->LoopForNumSeconds( args[ 1 ], atof( args[ 2 ] ) );
+	
+	// dimhotepus: atof -> strtof.
+	GetTestScriptMgr()->LoopForNumSeconds( args[ 1 ], strtof( args[ 2 ], nullptr ) );
 }
 
 CON_COMMAND( Test_RandomChance, "Test_RandomChance <percent chance, 0-100> <token1> <token2...> - Roll the dice and maybe run the command following the percentage chance." )

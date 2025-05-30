@@ -136,7 +136,6 @@ unsigned long	g_CurrentMessageIndex = 0;
 
 
 HANDLE	g_hPerfThread = NULL;
-DWORD	g_PerfThreadID = 0xFEFEFEFE;
 HANDLE	g_hPerfThreadExitEvent = NULL;
 
 // These are set by the app and they go into the database.
@@ -155,7 +154,7 @@ friend class CMySQL;
 
 public:
 	// This is like a sprintf, but it will grow the string as necessary.
-	void Format( const char *pFormat, ... );
+	void Format( PRINTF_FORMAT_STRING const char *pFormat, ... );
 
 	int Execute( IMySQL *pDB );
 
@@ -164,18 +163,18 @@ private:
 };
 
 
-void CMySQLQuery::Format( const char *pFormat, ... )
+void CMySQLQuery::Format( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	#define QUERYTEXT_GROWSIZE	1024
 
-	// This keeps growing the buffer and calling _vsnprintf until the buffer is 
+	// This keeps growing the buffer and calling V_vsnprintf until the buffer is 
 	// large enough to hold all the data.
 	m_QueryText.SetSize( QUERYTEXT_GROWSIZE );
 	while ( 1 )
 	{
 		va_list marker;
 		va_start( marker, pFormat );
-		int ret = _vsnprintf( m_QueryText.Base(), m_QueryText.Count(), pFormat, marker );
+		int ret = V_vsnprintf( m_QueryText.Base(), m_QueryText.Count(), pFormat, marker );
 		va_end( marker );
 
 		if ( ret < 0 )
@@ -464,9 +463,9 @@ void PerfThread_AddGraphEntry( ULONGLONG startTicks, DWORD &lastSent, DWORD &las
 
 
 // This function adds a graph_entry into the database periodically.
-DWORD WINAPI PerfThreadFn( LPVOID pParameter )
+unsigned WINAPI PerfThreadFn( void* pParameter )
 {
-	// dimhotepus: Add thread name to aid debugging.	
+	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("VmpiPerfStats");
 
 	DWORD lastSent = 0;
@@ -533,7 +532,7 @@ bool LoadMySQLWrapper(
 	UnloadMySQLWrapper();
 
 	// Load the DLL and the interface.
-	if ( !Sys_LoadInterface( "mysql_wrapper", MYSQL_WRAPPER_VERSION_NAME, &g_hMySQLDLL, (void**)&g_pSQL ) )
+	if ( !Sys_LoadInterfaceT( "mysql_wrapper", MYSQL_WRAPPER_VERSION_NAME, &g_hMySQLDLL, &g_pSQL ) )
 		return false;
 
 	// Try to init the database.
@@ -560,7 +559,7 @@ bool VMPI_Stats_Init_Master(
 	
 	// Connect the database.
 	g_pDB = new CMySqlDatabase;
-	if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) )
+	if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) ) //-V668
 	{
 		delete g_pDB;
 		g_pDB = NULL;
@@ -571,7 +570,7 @@ bool VMPI_Stats_Init_Master(
 	GetComputerName( g_MachineName, &size );
 
 	// Create the job_master_start row.
-	Q_FileBase( pBSPFilename, g_BSPFilename, sizeof( g_BSPFilename ) );
+	Q_FileBase( pBSPFilename, g_BSPFilename );
 
 	g_JobPrimaryID = 0;
 	CMySQLQuery query;
@@ -605,7 +604,7 @@ bool VMPI_Stats_Init_Worker( const char *pHostName, const char *pDBName, const c
 		
 		// Connect the database.
 		g_pDB = new CMySqlDatabase;
-		if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) )
+		if ( !g_pDB || !g_pDB->Initialize() || !LoadMySQLWrapper( pHostName, pDBName, pUserName ) ) //-V668
 		{
 			delete g_pDB;
 			g_pDB = NULL;
@@ -636,15 +635,15 @@ bool VMPI_Stats_Init_Worker( const char *pHostName, const char *pDBName, const c
 
 	// Now create a thread that samples perf data and stores it in the database.
 	g_hPerfThreadExitEvent = CreateEvent( NULL, FALSE, FALSE, NULL );
-	g_hPerfThread = CreateThread(
-		NULL,
+	g_hPerfThread = reinterpret_cast<HANDLE>(_beginthreadex(
+		nullptr,
 		0,
 		PerfThreadFn,
-		NULL,
+		nullptr,
 		0,
-		&g_PerfThreadID );
+		nullptr ));
 
-	return true;	
+	return true;
 }
 
 
@@ -712,7 +711,7 @@ void GetDBInfo( const char *pDBInfoFilename, CDBInfo *pInfo )
 	// Look for the info file in the same directory as the exe.
 	char dbInfoFilename[512];
 	Q_strncpy( dbInfoFilename, baseExeFilename, sizeof( dbInfoFilename ) );
-	Q_StripFilename( dbInfoFilename );
+	V_StripFilename( dbInfoFilename );
 
 	if ( dbInfoFilename[0] == 0 )
 		Q_strncpy( dbInfoFilename, ".", sizeof( dbInfoFilename ) );

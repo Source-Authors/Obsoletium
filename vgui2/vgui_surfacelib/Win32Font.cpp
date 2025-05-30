@@ -126,7 +126,7 @@ bool CWin32Font::Create(const char *windowsFontName, int tall, int weight, int b
 	LOGFONT logfont;
 	logfont.lfCharSet = DEFAULT_CHARSET;
 	logfont.lfPitchAndFamily = 0;
-	strcpy(logfont.lfFaceName, m_szName.String());
+	V_strcpy_safe(logfont.lfFaceName, m_szName.String());
 	bool bFontFound = false;
 	// dimhotepus: Remove global state when using fonts search.
 	::EnumFontFamiliesEx(m_hDC, &logfont, &FontEnumProc, (LPARAM)&bFontFound, 0);
@@ -431,12 +431,12 @@ void CWin32Font::SetAsActiveFont(HDC hdc)
 //-----------------------------------------------------------------------------
 // Purpose: gets the abc widths for a character
 //-----------------------------------------------------------------------------
-void CWin32Font::GetCharABCWidths(int ch, int &a, int &b, int &c)
+void CWin32Font::GetCharABCWidths(wchar_t ch, int &a, int &b, int &c)
 {
 	Assert( IsValid() );
 	{
 		// look for it in the cache
-		abc_cache_t finder = { (wchar_t)ch, {} };
+		abc_cache_t finder = { ch, {} };
 
 		unsigned short i = m_ExtendedABCWidthsCache.Find(finder);
 		if (m_ExtendedABCWidthsCache.IsValidIndex(i))

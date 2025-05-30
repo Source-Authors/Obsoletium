@@ -668,10 +668,7 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 		g_KernelFunc[type]( kernel, info, wratio, hratio, dratio, gammaToLinear, pAlphaResult );
 	}
 
-	if ( pAlphaResult )
-	{
-		free( pAlphaResult );
-	}
+	free( pAlphaResult );
 
 	return true;
 }
@@ -740,33 +737,41 @@ bool ResampleRGB323232F( const ResampleInfo_t& info )
 	Assert( info.m_nSrcWidth >= info.m_nDestWidth );
 	Assert( info.m_nSrcHeight >= info.m_nDestHeight );
 
-	int nSampleWidth = info.m_nSrcWidth / info.m_nDestWidth;
-	int nSampleHeight = info.m_nSrcHeight / info.m_nDestHeight;
+	const int nSampleWidth = info.m_nSrcWidth / info.m_nDestWidth;
+	const int nSampleHeight = info.m_nSrcHeight / info.m_nDestHeight;
 
-	float *pSrc = ( float * )info.m_pSrc;
+	const float *pSrc = ( float * )info.m_pSrc;
 	float *pDst = ( float * )info.m_pDest;
-	int x, y;
-	for( y = 0; y < info.m_nDestHeight; y++ )
+
+	for( int y = 0; y < info.m_nDestHeight; y++ )
 	{
-		for( x = 0; x < info.m_nDestWidth; x++ )
+		const int yMultiplier = y * nSampleHeight;
+
+		for( int x = 0; x < info.m_nDestWidth; x++ )
 		{
-            float accum[4] = {0};
-			int nSampleY;
-			for( nSampleY = 0; nSampleY < nSampleHeight; nSampleY++ )
+			float accum[4] = {0};
+			const int xMultiplier = x * nSampleWidth;
+
+			for( int nSampleY = 0; nSampleY < nSampleHeight; nSampleY++ )
 			{
-				int nSampleX;
-				for( nSampleX = 0; nSampleX < nSampleWidth; nSampleX++ )
+				const int yIndex = (yMultiplier + nSampleY) * info.m_nSrcWidth;
+
+				for( int nSampleX = 0; nSampleX < nSampleWidth; nSampleX++ )
 				{
-					accum[0] += pSrc[((x*nSampleWidth+nSampleX)+(y*nSampleHeight+nSampleY)*info.m_nSrcWidth)*3+0];
-					accum[1] += pSrc[((x*nSampleWidth+nSampleX)+(y*nSampleHeight+nSampleY)*info.m_nSrcWidth)*3+1];
-					accum[2] += pSrc[((x*nSampleWidth+nSampleX)+(y*nSampleHeight+nSampleY)*info.m_nSrcWidth)*3+2];
+					const int xIndex = xMultiplier + nSampleX;
+					const int baseIndex = (xIndex + yIndex) * 3;
+
+					accum[0] += pSrc[baseIndex + 0];
+					accum[1] += pSrc[baseIndex + 1];
+					accum[2] += pSrc[baseIndex + 2];
 				}
 			}
-			int i;
-			for( i = 0; i < 3; i++ )
+
+			const int baseIndex = (x + y * info.m_nDestWidth) * 3;
+			for( int i = 0; i < 3; i++ )
 			{
 				accum[i] /= ( nSampleWidth * nSampleHeight );
-				pDst[(x+y*info.m_nDestWidth)*3+i] = accum[i];
+				pDst[baseIndex + i] = accum[i];
 			}
 		}
 	}
@@ -803,7 +808,8 @@ void GenerateMipmapLevels( unsigned char* pSrc, unsigned char* pDst, int width,
 		info.m_flSrcGamma = srcGamma;
 		info.m_flDestGamma = dstGamma;
 
-		ResampleRGBA8888( info );
+		[[maybe_unused]] const bool ok = ResampleRGBA8888( info );
+		AssertMsg(ok, "Unable to resample image %dx%d to RGBA8888.", width, height);
 
 		// each mipmap level needs to be color converted separately
 		ConvertImageFormat( tmpImage.Base(), IMAGE_FORMAT_RGBA8888,
@@ -862,7 +868,7 @@ void GenerateMipmapLevelsLQ( unsigned char* pSrc, unsigned char* pDst, int width
 	int srcHeight = height;
 
 	// Distance from one pixel to the next
-	const int cStride = 4;
+	constexpr int cStride = 4;
 	
 	do 
 	{

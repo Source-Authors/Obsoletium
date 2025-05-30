@@ -25,7 +25,7 @@ void MakePrefabLibrary(LPCTSTR pszName)
 	CPrefabLibrary *pLibrary = new CPrefabLibraryRMF;
 	int nPrefabs = 0;
 
-	printf("Making prefab library %s.ol\n", pszName);
+	Msg("Making prefab library %s.ol\n", pszName);
 	
 	pLibrary->SetName(pszName);
 
@@ -84,7 +84,7 @@ Again:
 		if(!pPrefab)
 			continue;
 
-		printf("  including %s\n", fd.cFileName);
+		Msg("  including %s\n", fd.cFileName);
 		++nPrefabs;
 
 		// find text file - set info with it
@@ -135,6 +135,6 @@ Again:
 	// re-enable prefab caching
 	CPrefab::EnableCaching(TRUE);
 
-	printf("%d prefabs in library.\n", nPrefabs);
+	Msg("%d prefabs in library.\n", nPrefabs);
 }
 

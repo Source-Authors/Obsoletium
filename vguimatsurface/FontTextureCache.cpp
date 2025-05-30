@@ -128,7 +128,7 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 
 	if ( FontManager().IsBitmapFont( font ) )
 	{
-		const int MAX_BITMAP_CHARS = 256;
+		constexpr int MAX_BITMAP_CHARS = 256;
 		if ( numChars > MAX_BITMAP_CHARS )
 		{
 			// Increase MAX_BITMAP_CHARS
@@ -141,7 +141,7 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 			static float	sTexCoords[ 4*MAX_BITMAP_CHARS ];
 			CBitmapFont		*pWinFont;
 			float			left, top, right, bottom;
-			int				index;
+			unsigned short	index;
 			Page_t			*pPage;
 			
 			pWinFont = reinterpret_cast< CBitmapFont* >( FontManager().GetFontForChar( font, wch[i] ) );
@@ -166,9 +166,9 @@ bool CFontTextureCache::GetTextureForChars( vgui::HFont font, vgui::FontDrawType
 				index = m_FontPages.Insert( font );
 				pPage = &m_FontPages.Element( index );
 
-				for (int type = 0; type < FONT_DRAW_TYPE_COUNT; ++type )
+				for (auto &tid : pPage->textureID)
 				{
-					pPage->textureID[type] = g_MatSystemSurface.CreateNewTextureID( false );
+					tid = g_MatSystemSurface.CreateNewTextureID( false );
 				}
 				CreateFontMaterials( *pPage, pWinFont->GetTexturePage(), true );
 			}

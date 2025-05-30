@@ -210,7 +210,7 @@ void RayTracingEnvironment::ComputeVirtualLightSources(void)
 			for(int try1=0;try1<n_desired;try1++)
 			{
 				LightDesc_t const &li=LightList[l];
-				FourRays myrays;
+				FourRays myrays = {};
 				myrays.origin.DuplicateVector(li.m_Position);
 				RayTracingResult rslt;
 				Vector trial_dir=sample_generator.NextValue();

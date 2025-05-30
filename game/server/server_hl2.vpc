@@ -17,6 +17,11 @@ $Configuration
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2;.\hl2"
 		$PreprocessorDefinitions		"$BASE;HL2_DLL;USES_SAVERESTORE"
 	}
+
+	$Resources
+	{
+		$AdditionalIncludeDirectories		"$BASE;.\hl2"
+	}
 }
 
 $Project "server (HL2)"

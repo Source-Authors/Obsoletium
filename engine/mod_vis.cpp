@@ -62,7 +62,7 @@ static VISINFO vis;
 // 2) camera/monitor (actually, this is merged with the regular world)
 // 3) 3dskybox
 // 4) regular world
-const int VISCACHE_SIZE = 8;
+constexpr inline int VISCACHE_SIZE = 8;
 
 class VisCacheEntry
 {
@@ -103,23 +103,8 @@ static void VisMark_Cached( const VisCacheEntry &cache, const worldbrushdata_t &
 	count = cache.leaflist.Count();
 	const unsigned short * RESTRICT pSrc = cache.leaflist.Base();
 
-#if _X360
-	const int offsetLeaf = offsetof(mleaf_t, visframe);
-	const int offsetNode = offsetof(mnode_t, visframe);
-#endif
-
 	while ( count >= 8 )
 	{
-#if _X360
-		__dcbt( offsetLeaf, (void *)(worldbrush.leafs + pSrc[0]) );
-		__dcbt( offsetLeaf, (void *)(worldbrush.leafs + pSrc[1]) );
-		__dcbt( offsetLeaf, (void *)(worldbrush.leafs + pSrc[2]) );
-		__dcbt( offsetLeaf, (void *)(worldbrush.leafs + pSrc[3]) );
-		__dcbt( offsetLeaf, (void *)(worldbrush.leafs + pSrc[4]) );
-		__dcbt( offsetLeaf, (void *)(worldbrush.leafs + pSrc[5]) );
-		__dcbt( offsetLeaf, (void *)(worldbrush.leafs + pSrc[6]) );
-		__dcbt( offsetLeaf, (void *)(worldbrush.leafs + pSrc[7]) );
-#endif
 		worldbrush.leafs[pSrc[0]].visframe = visframe;
 		worldbrush.leafs[pSrc[1]].visframe = visframe;
 		worldbrush.leafs[pSrc[2]].visframe = visframe;
@@ -143,16 +128,6 @@ static void VisMark_Cached( const VisCacheEntry &cache, const worldbrushdata_t &
 
 	while ( count >= 8 )
 	{
-#if _X360
-		__dcbt( offsetNode, (void *)(worldbrush.nodes + pSrc[0]) );
-		__dcbt( offsetNode, (void *)(worldbrush.nodes + pSrc[1]) );
-		__dcbt( offsetNode, (void *)(worldbrush.nodes + pSrc[2]) );
-		__dcbt( offsetNode, (void *)(worldbrush.nodes + pSrc[3]) );
-		__dcbt( offsetNode, (void *)(worldbrush.nodes + pSrc[4]) );
-		__dcbt( offsetNode, (void *)(worldbrush.nodes + pSrc[5]) );
-		__dcbt( offsetNode, (void *)(worldbrush.nodes + pSrc[6]) );
-		__dcbt( offsetNode, (void *)(worldbrush.nodes + pSrc[7]) );
-#endif
 		worldbrush.nodes[pSrc[0]].visframe = visframe;
 		worldbrush.nodes[pSrc[1]].visframe = visframe;
 		worldbrush.nodes[pSrc[2]].visframe = visframe;

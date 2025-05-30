@@ -45,17 +45,18 @@ public:
 	void			SetValid( int valid );
 	int				GetValid( void ) const;
 
-	void			SetFileTimestamp( long ts );
-	long			GetFileTimestamp( void ) const;
+	void			SetFileTimestamp( time_t ts );
+	time_t			GetFileTimestamp( void ) const;
 
-	bool			IsSameTime( long ts ) const;
+	bool			IsSameTime( time_t ts ) const;
 
-	static long		GetFSTimeStamp( char const *name );
+	static time_t	GetFSTimeStamp( char const *name );
 	static int		CheckFSHeaderVersion( char const *name );
 
 private:
 	int				m_nValid;
-	long			m_lFileTimestamp;
+	// dimhotepus: long -> time_t.
+	time_t			m_lFileTimestamp;
 };
 
 //-----------------------------------------------------------------------------
@@ -89,7 +90,7 @@ int CMapListItem::GetValid( void ) const
 // Purpose: 
 // Input  : ts - 
 //-----------------------------------------------------------------------------
-void CMapListItem::SetFileTimestamp( long ts )
+void CMapListItem::SetFileTimestamp( time_t ts )
 {
 	m_lFileTimestamp = ts;
 }
@@ -98,7 +99,7 @@ void CMapListItem::SetFileTimestamp( long ts )
 // Purpose: 
 // Output : long
 //-----------------------------------------------------------------------------
-long CMapListItem::GetFileTimestamp( void ) const
+time_t CMapListItem::GetFileTimestamp( void ) const
 {
 	return m_lFileTimestamp;
 }
@@ -108,7 +109,7 @@ long CMapListItem::GetFileTimestamp( void ) const
 // Input  : ts - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CMapListItem::IsSameTime( long ts ) const
+bool CMapListItem::IsSameTime( time_t ts ) const
 {
 	return ( m_lFileTimestamp == ts ) ? true : false;
 }
@@ -118,9 +119,9 @@ bool CMapListItem::IsSameTime( long ts ) const
 // Input  : *name - 
 // Output : long
 //-----------------------------------------------------------------------------
-long CMapListItem::GetFSTimeStamp( char const *name )
+time_t CMapListItem::GetFSTimeStamp( char const *name )
 {
-	long ts = g_pFileSystem->GetFileTime( name );
+	time_t ts = g_pFileSystem->GetFileTime( name );
 	return ts;
 }
 
@@ -173,11 +174,11 @@ private:
 	void			BuildList( void );
 
 private:
-	// Dictionary of items
-	CUtlDict< CMapListItem, int > m_Items;
-
 	// Time of last update
 	double			m_flLastRefreshTime;
+
+	// Dictionary of items
+	CUtlDict< CMapListItem, int > m_Items;
 
 	bool			m_bDirty;
 };
@@ -307,7 +308,7 @@ void CMapListManager::RefreshList( void )
 			Assert( item );
 
 			// Make sure data is up to date
-			long timestamp = g_pFileSystem->GetFileTime( szFileName );
+			time_t timestamp = g_pFileSystem->GetFileTime( szFileName );
 			if ( !item->IsSameTime( timestamp ) )
 			{
 				item->SetFileTimestamp( timestamp );
@@ -472,7 +473,7 @@ static bool MapList_CheckPrintMap( const char *pakorfilesys, const char *mapname
 //			maxitemlength - 
 // Output : static int
 //-----------------------------------------------------------------------------
-static int MapList_CountMaps( const char *pszSubString, bool listobsolete, intp& maxitemlength )
+static intp MapList_CountMaps( const char *pszSubString, bool listobsolete, intp& maxitemlength )
 {
 	g_MapListMgr.RefreshList();
 
@@ -516,7 +517,7 @@ static int MapList_CountMaps( const char *pszSubString, bool listobsolete, intp&
 //  If the substring is empty, or "*", then lists all maps
 // Input  : *pszSubString - 
 //-----------------------------------------------------------------------------
-int MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, int maxcount, int maxitemlength, char maplist[][ 64 ] )
+intp MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, intp maxcount, intp maxitemlength, char maplist[][ 64 ] )
 {
 	g_MapListMgr.RefreshList();
 	intp substringlength = 0;
@@ -534,7 +535,7 @@ int MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose,
 		ConMsg( "-------------\n");
 	}
 
-	int count = 0;
+	intp count = 0;
 	int showOutdated;
 	for( showOutdated = listobsolete ? 1 : 0; showOutdated >= 0; showOutdated-- )
 	{
@@ -585,13 +586,13 @@ int _Host_Map_f_CompletionFunc( char const *cmdname, char const *partial, char c
 	}
 
 	intp longest = 0;
-	int count = min( MapList_CountMaps( substring, false, longest ), COMMAND_COMPLETION_MAXITEMS );
+	intp count = min( MapList_CountMaps( substring, false, longest ), static_cast<intp>(COMMAND_COMPLETION_MAXITEMS) );
 	if ( count > 0 )
 	{
 		MapList_ListMaps( substring, false, false, COMMAND_COMPLETION_MAXITEMS, longest, commands );
 
 		// Now prepend maps * in front of all of the options
-		int i;
+		intp i;
 		for ( i = 0; i < count ; i++ )
 		{
 			char old[ COMMAND_COMPLETION_ITEM_LENGTH ];
@@ -688,7 +689,7 @@ static void Host_Maps_f( const CCommand &args )
 		pszSubString = NULL;
 
 	intp longest = 0;
-	int count = MapList_CountMaps( pszSubString, true, longest );
+	intp count = MapList_CountMaps( pszSubString, true, longest );
 	if ( count > 0 )
 	{
 		MapList_ListMaps( pszSubString, true, true, count, 0, NULL );

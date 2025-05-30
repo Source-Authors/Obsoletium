@@ -21,18 +21,6 @@ $Configuration
 	{
 		$AdditionalDependencies				"$BASE glu32.lib opengl32.lib user32.lib gdi32.lib"
 	}
-
-	$ManifestTool
-	{
-		// Input And Output
-		$AdditionalManifestFiles			"$BASE;$SRCDIR\build\win\manifests\dpi-aware.manifest;$SRCDIR\build\win\manifests\ultra-high-scroll-resolution.manifest;$SRCDIR\build\win\manifests\utf-8-code-page.manifest;$SRCDIR\out\manifests\enable-visual-styles.manifest" [!$SOURCESDK]
-	}
-
-	$Resources
-	{
-		// General
-		$PreprocessorDefinitions			"$BASE;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTEhammer\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTEhammer.exe\$QUOTE"
-	}
 }
 
 $Project "glview"
@@ -41,21 +29,26 @@ $Project "glview"
 	{
 		$File	"glview.cpp"
 
-		$Folder	"common files"
+		$Folder	"Common Files"
 		{
 			$File	"..\common\cmdlib.cpp"
-			$File	"$SRCDIR\public\filesystem_helpers.cpp"
-			$File	"$SRCDIR\public\filesystem_init.cpp"
 			$File	"..\common\filesystem_tools.cpp"
 			$File	"..\common\physdll.cpp"
+			$File	"..\common\tools_minidump.cpp"
+			$File	"$SRCDIR\public\filesystem_helpers.cpp"
+			$File	"$SRCDIR\public\filesystem_init.cpp"
 		}
 	}
 
 	$Folder	"Header Files"
 	{
 		$File	"..\common\cmdlib.h"
-		$File	"glos.h"
+		$File	"..\common\filesystem_tools.h"
+		$File	"..\common\tools_minidump.h"
+		$File	"$SRCDIR\public\filesystem_helpers.h"
+		$File	"$SRCDIR\public\filesystem_init.h"
 		$File	"$SRCDIR\public\mathlib\mathlib.h"
+		$File	"glos.h"
 	}
 
 	$Folder	"Link Libraries"

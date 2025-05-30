@@ -60,7 +60,8 @@ public:
 
 constexpr inline char CREATEINTERFACE_PROCNAME[]{"CreateInterface"};
 
-using CreateInterfaceFn = void* (*)(const char *pName, int *pReturnCode);
+using CreateInterfaceFn = void *(*)(const char *pName, int *pReturnCode);
+// dimhotepus: Strongly-typed version.
 template<typename T>
 using CreateInterfaceFnT = T *(*)(const char *pName, int *pReturnCode);
 
@@ -105,7 +106,10 @@ public:
 
 #if !defined(_STATIC_LINKED) || !defined(_SUBSYSTEM)
 #define EXPOSE_INTERFACE(className, interfaceName, versionName) \
-	static void* __Create##className##_interface() {return static_cast<interfaceName *>( new className );} \
+	static void* __Create##className##_interface() { \
+		interfaceName *name = new className; \
+		return name; \
+	} \
 	static InterfaceReg __g_Create##className##_reg(__Create##className##_interface, versionName );
 #else
 #define EXPOSE_INTERFACE(className, interfaceName, versionName) \
@@ -162,29 +166,29 @@ enum
 // if pReturnCode is set, it will return one of the following values (IFACE_OK, IFACE_FAILED)
 // extend this for other error conditions/code
 //-----------------------------------------------------------------------------
-DLL_EXPORT void* CreateInterface(const char *pName, int *pReturnCode);
+DLL_EXPORT void *CreateInterface(const char *pName, int *pReturnCode);
 
 //-----------------------------------------------------------------------------
 // UNDONE: This is obsolete, use the module load/unload/get instead!!!
 //-----------------------------------------------------------------------------
-extern CreateInterfaceFn	Sys_GetFactory( CSysModule *pModule );
+[[nodiscard]] CreateInterfaceFn	Sys_GetFactory( CSysModule *pModule );
 // dimhotepus: Strongly-typed version.
 template<typename TInterface>
-CreateInterfaceFnT<TInterface> Sys_GetFactory( CSysModule* pModule )
+[[nodiscard]] CreateInterfaceFnT<TInterface> Sys_GetFactory( CSysModule* pModule )
 {
 	return reinterpret_cast<CreateInterfaceFnT<TInterface>>(Sys_GetFactory(pModule));
 }
-extern CreateInterfaceFn	Sys_GetFactory( const char *pModuleName );
+[[nodiscard]] CreateInterfaceFn	Sys_GetFactory( const char *pModuleName );
 // dimhotepus: Strongly-typed version.
 template<typename TInterface>
-CreateInterfaceFnT<TInterface> Sys_GetFactory( const char *pModuleName )
+[[nodiscard]] CreateInterfaceFnT<TInterface> Sys_GetFactory( const char *pModuleName )
 {
 	return reinterpret_cast<CreateInterfaceFnT<TInterface>>(Sys_GetFactory(pModuleName));
 }
-extern CreateInterfaceFn	Sys_GetFactoryThis();
+[[nodiscard]] CreateInterfaceFn Sys_GetFactoryThis();
 // dimhotepus: Strongly-typed version.
 template<typename TInterface>
-CreateInterfaceFnT<TInterface> Sys_GetFactoryThis()
+[[nodiscard]] CreateInterfaceFnT<TInterface> Sys_GetFactoryThis()
 {
 	return reinterpret_cast<CreateInterfaceFnT<TInterface>>(Sys_GetFactoryThis());
 }
@@ -200,19 +204,33 @@ enum Sys_Flags
 // The factory for that module should be passed on to dependent components for
 // proper versioning.
 //-----------------------------------------------------------------------------
-extern CSysModule			*Sys_LoadModule( const char *pModuleName, Sys_Flags flags = SYS_NOFLAGS );
+[[nodiscard]] extern CSysModule			*Sys_LoadModule( const char *pModuleName, Sys_Flags flags = SYS_NOFLAGS );
 extern void					Sys_UnloadModule( CSysModule *pModule );
 
 // This is a helper function to load a module, get its factory, and get a specific interface.
 // You are expected to free all of these things.
 // Returns false and cleans up if any of the steps fail.
-bool Sys_LoadInterface(
+[[nodiscard]] bool Sys_LoadInterface(
 	const char *pModuleName,
 	const char *pInterfaceVersionName,
 	CSysModule **pOutModule,
 	void **pOutInterface );
 
-bool Sys_IsDebuggerPresent();
+// dimhotepus: Strongly-typed version.
+template<typename T>
+[[nodiscard]] inline bool Sys_LoadInterfaceT(
+	const char *pModuleName,
+	const char *pInterfaceVersionName,
+	CSysModule **pOutModule,
+	T **pOutInterface )
+{
+	void *out;
+	const bool ok = Sys_LoadInterface(pModuleName, pInterfaceVersionName, pOutModule, &out);
+	if (ok && pOutInterface) *pOutInterface = static_cast<T*>(out);
+	return ok;
+}
+
+[[nodiscard]] bool Sys_IsDebuggerPresent();
 
 //-----------------------------------------------------------------------------
 // Purpose: Place this as a singleton at module scope (e.g.) and use it to get the factory from the specified module name.  
@@ -226,7 +244,14 @@ class CDllDemandLoader
 public:
 						CDllDemandLoader( char const *pchModuleName );
 	virtual				~CDllDemandLoader();
-	CreateInterfaceFn	GetFactory();
+	[[nodiscard]] CreateInterfaceFn	GetFactory();
+
+	// dimhotepus: Strongly-typed version.
+	template<typename T>
+	[[nodiscard]] CreateInterfaceFnT<T>	GetFactoryT()
+	{
+		return reinterpret_cast<CreateInterfaceFnT<T>>(GetFactory());
+	}
 	void				Unload();
 
 private:

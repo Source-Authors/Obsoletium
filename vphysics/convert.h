@@ -12,8 +12,9 @@
 #include "mathlib/vector.h"
 #include "mathlib/mathlib.h"
 #include "ivp_physics.hxx"
-struct cplane_t;
 #include "vphysics_interface.h"
+
+struct cplane_t;
 
 // UNDONE: Remove all conversion/scaling
 // Convert our units (inches) to IVP units (meters)
@@ -32,23 +33,23 @@ const inline float HL2IVP_FACTOR{g_PhysicsUnits.unitScaleMeters};
 const inline float IVP2HL_fACTOR{g_PhysicsUnits.unitScaleMetersInv};
 
 template<typename T>
-inline float IVP2HL(double x)
+[[nodiscard]] inline float IVP2HL(double x)
 {
 	return (float)(x * IVP2HL_fACTOR);
 }
 
-inline float IVP2HL(float x)
+[[nodiscard]] inline float IVP2HL(float x)
 {
 	return x * IVP2HL_fACTOR;
 }
 
 template<typename T>
-inline double HL2IVP(T x)
+[[nodiscard]] inline double HL2IVP(T x)
 {
 	return (double)(x * HL2IVP_FACTOR);
 }
 
-inline float HL2IVP(float x)
+[[nodiscard]] inline float HL2IVP(float x)
 {
 	return x * HL2IVP_FACTOR;
 }
@@ -84,7 +85,7 @@ inline void ConvertPositionToIVP( const Vector &in, IVP_U_Float_Point3 &out )
 inline void ConvertPositionToIVP( float &x, float &y, float &z )
 {
 	float tmpZ = y;
-	y = -HL2IVP(z);
+	y = -HL2IVP(z); //-V537
 	z = HL2IVP(tmpZ);
 	x = HL2IVP(x);
 }
@@ -113,7 +114,7 @@ inline void ConvertDirectionToIVP( const Vector &in, IVP_U_Point &out )
 #define ConvertForceImpulseToIVP ConvertPositionToIVP
 #define ConvertForceImpulseToHL ConvertPositionToHL
 
-constexpr inline float ConvertAngleToIVP( float angleIn )
+[[nodiscard]] constexpr inline float ConvertAngleToIVP( float angleIn )
 {
 	return DEG2RAD(angleIn);
 }
@@ -128,7 +129,7 @@ inline void ConvertAngularImpulseToIVP( const AngularImpulse &in, IVP_U_Float_Po
 }
 
 
-const inline float ConvertDistanceToIVP( float distance )
+[[nodiscard]] const inline float ConvertDistanceToIVP( float distance )
 {
 	return HL2IVP( distance );
 }
@@ -150,7 +151,7 @@ inline void ConvertPlaneToIVP( const Vector &pNormal, float dist, IVP_U_Float_He
 	plane.hesse_val = -ConvertDistanceToIVP( dist );
 }
 
-constexpr inline float ConvertDensityToIVP( float density )
+[[nodiscard]] constexpr inline float ConvertDensityToIVP( float density )
 {
 	return density;
 }
@@ -160,8 +161,8 @@ extern void ConvertMatrixToIVP( const matrix3x4_t& matrix, IVP_U_Matrix &out );
 extern void ConvertRotationToIVP( const QAngle &angles, IVP_U_Matrix3 &out );
 extern void ConvertRotationToIVP( const QAngle& angles, IVP_U_Quat &out );
 extern void ConvertBoxToIVP( const Vector &mins, const Vector &maxs, Vector &outmins, Vector &outmaxs );
-extern int ConvertCoordinateAxisToIVP( int axisIndex );
-extern int ConvertCoordinateAxisToHL( int axisIndex );
+[[nodiscard]] extern int ConvertCoordinateAxisToIVP( int axisIndex );
+[[nodiscard]] extern int ConvertCoordinateAxisToHL( int axisIndex );
 
 // IVP to HL conversions
 inline void ConvertPositionToHL( const IVP_U_Point &point, Vector& out )
@@ -206,7 +207,7 @@ inline void ConvertDirectionToHL( const IVP_U_Float_Point &point, Vector& out )
 }
 
 
-constexpr inline float ConvertAngleToHL( float angleIn )
+[[nodiscard]] constexpr inline float ConvertAngleToHL( float angleIn )
 {
 	return RAD2DEG(angleIn);
 }
@@ -219,7 +220,7 @@ inline void ConvertAngularImpulseToHL( const IVP_U_Float_Point &point, AngularIm
 	out.z = -RAD2DEG(point.k[1]);
 }
 
-inline float ConvertDistanceToHL( float distance )
+[[nodiscard]] inline float ConvertDistanceToHL( float distance )
 {
 	return IVP2HL( distance );
 }
@@ -249,15 +250,16 @@ inline void ConvertPlaneToHL( const IVP_U_Float_Hesse &plane, Vector *pNormalOut
 	}
 }
 
-inline float ConvertVolumeToHL( float volume )
+[[nodiscard]] inline float ConvertVolumeToHL( float volume )
 {
 	float factor = IVP2HL(1.0);
 	factor = (factor * factor * factor);
 	return factor * volume;
 }
 
-#define INSQR_PER_METERSQR (1.f / (METERS_PER_INCH*METERS_PER_INCH))
-constexpr inline float ConvertEnergyToHL( float energy )
+constexpr inline float INSQR_PER_METERSQR{1.f / (METERS_PER_INCH*METERS_PER_INCH)};
+
+[[nodiscard]] constexpr inline float ConvertEnergyToHL( float energy )
 {
 	return energy * INSQR_PER_METERSQR;
 }

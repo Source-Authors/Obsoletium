@@ -12,23 +12,23 @@ $CustomBuildStep "proto"
 
 	$CommandLine	"if not exist $GENERATED_PROTO_DIR mkdir $GENERATED_PROTO_DIR" "\n" \
 					"$PROTOBUFDIR\vsprojects\Release\protoc.exe --proto_path=$PROTOBUFDIR\src" \
-					" --proto_path=$(InputDir) --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
-					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $(InputPath)" [$WIN32]
+					" --proto_path=$QUOTE$(InputDir).$QUOTE --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
+					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $QUOTE$(InputPath)$QUOTE" [$WIN32]
 
 	$CommandLine	"if not exist $GENERATED_PROTO_DIR mkdir $GENERATED_PROTO_DIR" "\n" \
 					"$PROTOBUFDIR\vsprojects\x64\Release\protoc.exe --proto_path=$PROTOBUFDIR\src" \
-					" --proto_path=$(InputDir) --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
-					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $(InputPath)" [$WIN64]
+					" --proto_path=$QUOTE$(InputDir).$QUOTE --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
+					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $QUOTE$(InputPath)$QUOTE" [$WIN64]
 
 	$CommandLine	"mkdir $GENERATED_PROTO_DIR 2> /dev/null;"  \
 					"$LIBCOMMON/protoc" \
-					" --proto_path=$PROTOBUFDIR/src --proto_path=$(InputDir) --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
-					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $(InputPath)" [$OSXALL]
+					" --proto_path=$PROTOBUFDIR/src --proto_path=$QUOTE$(InputDir).$QUOTE --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
+					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $QUOTE$(InputPath)$QUOTE" [$OSXALL]
 
 	$CommandLine	"mkdir $GENERATED_PROTO_DIR 2> /dev/null;"  \
 					"$LIBCOMMON/protoc --proto_path=$PROTOBUFDIR\src" \
-					" --proto_path=$(InputDir) --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
-					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $(InputPath)" [$LINUXALL]
+					" --proto_path=$QUOTE$(InputDir).$QUOTE --proto_path=$SRCDIR\gcsdk --proto_path=$SRCDIR\game\shared" \
+					" $ADDITIONAL_PROTOC_ARGS --cpp_out=$GENERATED_PROTO_DIR $QUOTE$(InputPath)$QUOTE" [$LINUXALL]
 
 	$Outputs		"$GENERATED_PROTO_DIR\$(InputName).pb.cc;$GENERATED_PROTO_DIR\$(InputName).pb.h"
 }

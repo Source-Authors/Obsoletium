@@ -39,7 +39,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories	"$BASE;fxctmp9;vshtmp9"	[$WINDOWS]
+		$AdditionalIncludeDirectories	"$BASE;include"	[$WINDOWS||$POSIX]
 		$PreprocessorDefinitions		"$BASE;STDSHADER_DBG_DLL_EXPORT;FAST_MATERIALVAR_ACCESS"
 	}
 

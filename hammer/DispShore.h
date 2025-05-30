@@ -64,7 +64,7 @@ public:
 	virtual void		Shutdown( void ) = 0;
 
 	// Shoreline management.
-	virtual int			GetShorelineCount( void ) = 0;
+	virtual intp		GetShorelineCount( void ) = 0;
 	virtual Shoreline_t *GetShoreline( intp nShorelineId ) = 0;
 	virtual void		AddShoreline( intp nShorelineId ) = 0;
 	virtual void		RemoveShoreline( intp nShorelineId ) = 0;

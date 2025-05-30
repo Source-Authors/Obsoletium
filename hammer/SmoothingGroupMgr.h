@@ -36,8 +36,8 @@ public:
 	virtual int						GetFaceCountInGroup( SmoothingGroupHandle_t hGroup ) = 0;
 	virtual CMapFace			   *GetFaceFromGroup( SmoothingGroupHandle_t hGroup, int iFace ) = 0;
 
-	virtual ChunkFileResult_t		SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo ) = 0;
-	virtual ChunkFileResult_t		LoadVMF( CChunkFile *pFile ) = 0;
+	[[nodiscard]] virtual ChunkFileResult_t		SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo ) = 0;
+	[[nodiscard]] virtual ChunkFileResult_t		LoadVMF( CChunkFile *pFile ) = 0;
 };
 
 ISmoothingGroupMgr *SmoothingGroupMgr( void );

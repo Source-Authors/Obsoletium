@@ -26,7 +26,7 @@ class IDataCache;
 //
 //-----------------------------------------------------------------------------
 
-#define DATACACHE_INTERFACE_VERSION		"VDataCache003"
+constexpr inline char DATACACHE_INTERFACE_VERSION[]{"VDataCache003"};
 
 //-----------------------------------------------------------------------------
 // Support types and enums
@@ -35,15 +35,15 @@ class IDataCache;
 //---------------------------------------------------------
 // Unique (per section) identifier for a cache item defined by client
 //---------------------------------------------------------
-typedef uintp DataCacheClientID_t;
+using DataCacheClientID_t = uintp;
 
 
 //---------------------------------------------------------
 // Cache-defined handle for a cache item
 //---------------------------------------------------------
 FORWARD_DECLARE_HANDLE( memhandle_t );
-typedef memhandle_t DataCacheHandle_t;
-#define DC_INVALID_HANDLE ((DataCacheHandle_t)0)
+using DataCacheHandle_t = memhandle_t;
+constexpr inline DataCacheHandle_t DC_INVALID_HANDLE{(DataCacheHandle_t)0};
 
 //---------------------------------------------------------
 // Cache Limits
@@ -144,8 +144,8 @@ struct DataCacheNotification_t
 
 //---------------------------------------------------------
 
-const int DC_MAX_CLIENT_NAME = 15;
-const int DC_MAX_ITEM_NAME = 511;
+constexpr inline int DC_MAX_CLIENT_NAME = 15;
+constexpr inline int DC_MAX_ITEM_NAME = 511;
 
 //---------------------------------------------------------
 // Result codes
@@ -330,7 +330,7 @@ public:
 	//--------------------------------------------------------
 	// 
 	//--------------------------------------------------------
-	virtual bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, unsigned nMaxLen  ) = 0;
+	virtual bool GetItemName( DataCacheClientID_t clientId, const void *pItem, char *pDest, size_t nMaxLen  ) = 0;
 };
 
 //-------------------------------------
@@ -351,7 +351,7 @@ public:
 		}
 	}
 
-	bool GetItemName( DataCacheClientID_t , const void *, char *, unsigned ) override
+	bool GetItemName( DataCacheClientID_t , const void *, char *, size_t ) override
 	{
 		return false;
 	}
@@ -370,7 +370,7 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Controls cache size.
 	//--------------------------------------------------------
-	virtual void SetSize( int nMaxBytes ) = 0;
+	virtual void SetSize( size_t nMaxBytes ) = 0;
 	virtual void SetOptions( unsigned options ) = 0;
 	virtual void SetSectionLimits( const char *pszSectionName, const DataCacheLimits_t &limits ) = 0;
 
@@ -403,13 +403,13 @@ public:
 	//--------------------------------------------------------
 	// Purpose: Dump the oldest items to free the specified amount of memory. Returns amount actually freed
 	//--------------------------------------------------------
-	virtual unsigned Purge( unsigned nBytes ) = 0;
+	virtual size_t Purge( size_t nBytes ) = 0;
 
 
 	//--------------------------------------------------------
 	// Purpose: Empty the cache. Returns bytes released, will remove locked items if force specified
 	//--------------------------------------------------------
-	virtual unsigned Flush( bool bUnlockedOnly = true, bool bNotify = true ) = 0;
+	virtual size_t Flush( bool bUnlockedOnly = true, bool bNotify = true ) = 0;
 
 
 	//--------------------------------------------------------

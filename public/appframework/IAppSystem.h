@@ -75,7 +75,7 @@ template<typename IInterface>
 class CTier0AppSystem : public CBaseAppSystem<IInterface>
 {
 public:
-	CTier0AppSystem( bool bIsPrimaryAppSystem = true ) : m_bIsPrimaryAppSystem{ bIsPrimaryAppSystem }
+	explicit CTier0AppSystem( bool bIsPrimaryAppSystem = true ) : m_bIsPrimaryAppSystem{ bIsPrimaryAppSystem }
 	{
 	}
 
@@ -87,7 +87,7 @@ protected:
 
 	// NOTE: We don't do this as a virtual function to avoid
 	// having to up the version on all interfaces
-	bool IsPrimaryAppSystem() { return m_bIsPrimaryAppSystem; }
+	bool IsPrimaryAppSystem() const { return m_bIsPrimaryAppSystem; }
 
 private:
 	const bool m_bIsPrimaryAppSystem;

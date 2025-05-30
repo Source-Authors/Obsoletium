@@ -190,7 +190,7 @@ void CStudioPhysics::Load( MDLHandle_t mdlHandle )
 	// doesn't have a root bone?  Make it the first bone
 	if ( !m_edit.rootName[0] )
 	{
-		strcpy( m_edit.rootName, m_pList[0].m_boneName );
+		V_strcpy_safe( m_edit.rootName, m_pList[0].m_boneName );
 	}
 }
 
@@ -207,7 +207,8 @@ public:
 		}
 		else if ( !strcmpi( pKey, "totalmass" ) )
 		{
-			pEdit->totalMass = atof( pValue );
+			// dimhotepus: atof -> strtof.
+			pEdit->totalMass = strtof( pValue, nullptr );
 		}
 		else if ( !strcmpi( pKey, "concave" ) )
 		{
@@ -286,7 +287,8 @@ public:
 		hlmvsolid_t *pSolid = (hlmvsolid_t *)pCustom;
 		if ( !strcmpi( pKey, "massbias" ) )
 		{
-			pSolid->massBias = atof( pValue );
+			// dimhotepus: atof -> strtof.
+			pSolid->massBias = strtof( pValue, nullptr );
 		}
 		else
 		{
@@ -317,7 +319,7 @@ void CStudioPhysics::ParseKeydata( void )
 
 			if ( solid.index >= 0 && solid.index < m_listCount )
 			{
-				strcpy( m_pList[solid.index].m_boneName, solid.name );
+				V_strcpy_safe( m_pList[solid.index].m_boneName, solid.name );
 				memcpy( &m_pList[solid.index].m_solid, &solid, sizeof(solid) );
 			}
 		}
@@ -461,13 +463,13 @@ static void CalcDefaultProperties( CPhysmesh *pList, int listCount, physdefaults
 static void DumpModelProperties( CTextBuffer &out, float mass, physdefaults_t &defs )
 {
 	char tmpbuf[1024];
-	sprintf( tmpbuf, "\t$mass %.1f\r\n", mass );
+	V_sprintf_safe( tmpbuf, "\t$mass %.1f\r\n", mass );
 	out.WriteText( tmpbuf );
-	sprintf( tmpbuf, "\t$inertia %.2f\r\n", defs.inertia );
+	V_sprintf_safe( tmpbuf, "\t$inertia %.2f\r\n", defs.inertia );
 	out.WriteText( tmpbuf );
-	sprintf( tmpbuf, "\t$damping %.2f\r\n", defs.damping );
+	V_sprintf_safe( tmpbuf, "\t$damping %.2f\r\n", defs.damping );
 	out.WriteText( tmpbuf );
-	sprintf( tmpbuf, "\t$rotdamping %.2f\r\n", defs.rotdamping );
+	V_sprintf_safe( tmpbuf, "\t$rotdamping %.2f\r\n", defs.rotdamping );
 	out.WriteText( tmpbuf );
 }
 
@@ -501,7 +503,7 @@ char *CStudioPhysics::DumpQC( void )
 		if ( m_edit.rootName[0] )
 		{
 			char tmp[128];
-			sprintf( tmp, "\t$rootbone \"%s\"\r\n", m_edit.rootName );
+			V_sprintf_safe( tmp, "\t$rootbone \"%s\"\r\n", m_edit.rootName );
 			out.WriteText( tmp );
 		}
 
@@ -521,25 +523,25 @@ char *CStudioPhysics::DumpQC( void )
 		{
 			CPhysmesh *pmesh = m_pList + i;
 			char jointname[256];
-			sprintf( jointname, "\"%s\"", pmesh->m_boneName );
+			V_sprintf_safe( jointname, "\"%s\"", pmesh->m_boneName );
 			if ( pmesh->m_solid.massBias != 1.0 )
 			{
-				sprintf( tmpbuf, "\t$jointmassbias %s %.2f\r\n", jointname, pmesh->m_solid.massBias );
+				V_sprintf_safe( tmpbuf, "\t$jointmassbias %s %.2f\r\n", jointname, pmesh->m_solid.massBias );
 				out.WriteText( tmpbuf );
 			}
 			if ( pmesh->m_solid.params.inertia != defs.inertia )
 			{
-				sprintf( tmpbuf, "\t$jointinertia %s %.2f\r\n", jointname, pmesh->m_solid.params.inertia );
+				V_sprintf_safe( tmpbuf, "\t$jointinertia %s %.2f\r\n", jointname, pmesh->m_solid.params.inertia );
 				out.WriteText( tmpbuf );
 			}
 			if ( pmesh->m_solid.params.damping != defs.damping )
 			{
-				sprintf( tmpbuf, "\t$jointdamping %s %.2f\r\n", jointname, pmesh->m_solid.params.damping );
+				V_sprintf_safe( tmpbuf, "\t$jointdamping %s %.2f\r\n", jointname, pmesh->m_solid.params.damping );
 				out.WriteText( tmpbuf );
 			}
 			if ( pmesh->m_solid.params.rotdamping != defs.rotdamping )
 			{
-				sprintf( tmpbuf, "\t$jointrotdamping %s %.2f\r\n", jointname, pmesh->m_solid.params.rotdamping );
+				V_sprintf_safe( tmpbuf, "\t$jointrotdamping %s %.2f\r\n", jointname, pmesh->m_solid.params.rotdamping );
 				out.WriteText( tmpbuf );
 			}
 
@@ -548,7 +550,7 @@ char *CStudioPhysics::DumpQC( void )
 				for ( int j = 0; j < 3; j++ )
 				{
 					char *pAxis[] = { "x", "y", "z" };
-					sprintf( tmpbuf, "\t$jointconstrain %s %s limit %.2f %.2f %.2f\r\n", jointname, pAxis[j], pmesh->m_constraint.axes[j].minRotation, pmesh->m_constraint.axes[j].maxRotation, pmesh->m_constraint.axes[j].torque );
+					V_sprintf_safe( tmpbuf, "\t$jointconstrain %s %s limit %.2f %.2f %.2f\r\n", jointname, pAxis[j], pmesh->m_constraint.axes[j].minRotation, pmesh->m_constraint.axes[j].maxRotation, pmesh->m_constraint.axes[j].torque );
 					out.WriteText( tmpbuf );
 				}
 			}

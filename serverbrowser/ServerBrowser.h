@@ -16,7 +16,7 @@ class CServerBrowserDialog;
 //-----------------------------------------------------------------------------
 // Purpose: Handles the UI and pinging of a half-life game server list
 //-----------------------------------------------------------------------------
-class CServerBrowser : public IServerBrowser, public IVGuiModule
+class CServerBrowser final : public IServerBrowser, public IVGuiModule
 {
 public:
 	CServerBrowser();

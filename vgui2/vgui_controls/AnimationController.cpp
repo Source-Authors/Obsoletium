@@ -4,24 +4,26 @@
 //
 //=============================================================================//
 
-#include <vgui/IScheme.h>
-#include <vgui/ISurface.h>
-#include <vgui/ISystem.h>
-#include <vgui/IVGui.h>
 #include <vgui_controls/AnimationController.h>
+
+#include <memory>
+
 #include "filesystem.h"
 #include "filesystem_helpers.h"
 
+#include "tier0/dbg.h"
 #include "tier1/KeyValues.h"
 #include "tier1/mempool.h"
 #include "tier1/utldict.h"
 #include "tier1/characterset.h"
-#include "tier0/dbg.h"
 
 #include "mathlib/mathlib.h"
 #include "vstdlib/random.h"
 
-#include <memory>
+#include <vgui/IScheme.h>
+#include <vgui/ISurface.h>
+#include <vgui/ISystem.h>
+#include <vgui/IVGui.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -550,7 +552,7 @@ bool AnimationController::ParseScriptFile(char *pMem, int length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.variable = g_ScriptSymbols.AddString(token);
 				pMem = ParseFile(pMem, token, NULL);
-				animCmd.cmdData.runEvent.variable2 = atoi(token);
+				animCmd.cmdData.runEvent.variable2 = strtoul(token, nullptr, 10);
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
@@ -560,7 +562,7 @@ bool AnimationController::ParseScriptFile(char *pMem, int length)
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.variable = g_ScriptSymbols.AddString(token);
 				pMem = ParseFile(pMem, token, NULL);
-				animCmd.cmdData.runEvent.variable2 = atoi(token);
+				animCmd.cmdData.runEvent.variable2 = strtoul(token, nullptr, 10);
 				pMem = ParseFile(pMem, token, NULL);
 				animCmd.cmdData.runEvent.timeDelay = strtof(token, nullptr);
 			}
@@ -982,9 +984,9 @@ AnimationController::Value_t AnimationController::GetInterpolatedValue(int inter
 	case INTERPOLATOR_BOUNCE:
 	{
 		// fall from startValue to endValue, bouncing a few times and settling out at endValue
-		const float hit1 = 0.33f;
-		const float hit2 = 0.67f;
-		const float hit3 = 1.0f;
+		constexpr float hit1 = 0.33f;
+		constexpr float hit2 = 0.67f;
+		constexpr float hit3 = 1.0f;
 
 		if ( pos < hit1 )
 		{
@@ -1409,7 +1411,7 @@ void AnimationController::RunCmd_SetFont( PostedMessage_t &msg )
 		return;
 	
 	const char *varName = g_ScriptSymbols.String(msg.variable);
-	auto inputData = KeyValues::AutoDelete(varName);
+	KeyValuesAD inputData(varName);
 	inputData->SetString(varName, g_ScriptSymbols.String(msg.variable2));
 	if (!panel->SetInfo(inputData))
 	{
@@ -1428,7 +1430,7 @@ void AnimationController::RunCmd_SetTexture( PostedMessage_t &msg )
 		return;
 	
 	const char *varName = g_ScriptSymbols.String(msg.variable);
-	auto inputData = KeyValues::AutoDelete(varName);
+	KeyValuesAD inputData(varName);
 	inputData->SetString(varName, g_ScriptSymbols.String(msg.variable2));
 	if (!panel->SetInfo(inputData))
 	{
@@ -1447,7 +1449,7 @@ void AnimationController::RunCmd_SetString( PostedMessage_t &msg )
 		return;
 
 	const char *varName = g_ScriptSymbols.String(msg.variable);
-	auto inputData = KeyValues::AutoDelete(varName);
+	KeyValuesAD inputData(varName);
 	inputData->SetString(varName, g_ScriptSymbols.String(msg.variable2));
 	if (!panel->SetInfo(inputData))
 	{
@@ -1569,7 +1571,7 @@ AnimationController::Value_t AnimationController::GetValue(ActiveAnimation_t& an
 	else
 	{
 		const char *varName = g_ScriptSymbols.String(var);
-		auto outputData = KeyValues::AutoDelete(varName);
+		KeyValuesAD outputData(varName);
 		if (panel->RequestInfo(outputData))
 		{
 			// find the var and lookup it's type
@@ -1666,7 +1668,7 @@ void AnimationController::SetValue(ActiveAnimation_t& anim, Panel *panel, UtlSym
 	else
 	{
 		const char *varName = g_ScriptSymbols.String(var);
-		auto inputData = KeyValues::AutoDelete(varName);
+		KeyValuesAD inputData(varName);
 		// set the custom value
 		if (value.b == 0.0f && value.c == 0.0f && value.d == 0.0f)
 		{
@@ -1751,7 +1753,7 @@ PanelAnimationMap *CPanelAnimationDictionary::FindOrAddPanelAnimationMap( char c
 	Panel::InitPropertyConverters();
 
 	PanelAnimationMapDictionaryEntry entry;
-	entry.map = (PanelAnimationMap *)m_PanelAnimationMapPool.Alloc();
+	entry.map = m_PanelAnimationMapPool.Alloc();
 	m_AnimationMaps.Insert( StripNamespace( className ), entry );
 	return entry.map;
 }

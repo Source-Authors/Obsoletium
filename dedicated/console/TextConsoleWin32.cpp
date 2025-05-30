@@ -116,7 +116,7 @@ char *CTextConsoleWin32::GetLine(int index, char *buf, size_t buflen) {
           switch (ch) {
             case '\r':  // Enter
             {
-              ptrdiff_t nLen = ReceiveNewline();
+              intp nLen = ReceiveNewline();
               if (nLen) {
                 strncpy(buf, m_szConsoleText, buflen);
                 buf[buflen - 1] = 0;
@@ -150,7 +150,7 @@ char *CTextConsoleWin32::GetLine(int index, char *buf, size_t buflen) {
 
 void CTextConsoleWin32::Print(const char *pszMsg) {
   if (m_nConsoleTextLen) {
-    ptrdiff_t nLen = m_nConsoleTextLen;
+    intp nLen = m_nConsoleTextLen;
 
     while (nLen--) {
       PrintRaw("\b \b");
@@ -166,7 +166,7 @@ void CTextConsoleWin32::Print(const char *pszMsg) {
   UpdateStatus();
 }
 
-void CTextConsoleWin32::PrintRaw(const char *pszMsg, ptrdiff_t nChars) {
+void CTextConsoleWin32::PrintRaw(const char *pszMsg, intp nChars) {
   unsigned long dummy;
 
   if (houtput == nullptr) {
@@ -184,7 +184,7 @@ void CTextConsoleWin32::PrintRaw(const char *pszMsg, ptrdiff_t nChars) {
   // filter out ASCII BEL characters because windows actually plays a
   // bell sound, which can be used to lag the server in a DOS attack.
   char *temp_buffer = nullptr;
-  for (ptrdiff_t i = 0; i < nChars; ++i) {
+  for (intp i = 0; i < nChars; ++i) {
     if (pszMsg[i] == '\a') {
       if (!temp_buffer) {
         temp_buffer = new char[nChars];
@@ -245,8 +245,8 @@ void CTextConsoleWin32::SetTitle(const char *pszTitle) {
 
 void CTextConsoleWin32::SetColor(WORD attrib) { Attrib = attrib; }
 
-ptrdiff_t CTextConsoleWin32::ReceiveNewline(void) {
-  ptrdiff_t nLen = 0;
+intp CTextConsoleWin32::ReceiveNewline(void) {
+  intp nLen = 0;
 
   PrintRaw("\n");
 
@@ -278,7 +278,7 @@ ptrdiff_t CTextConsoleWin32::ReceiveNewline(void) {
 }
 
 void CTextConsoleWin32::ReceiveBackspace() {
-  ptrdiff_t nCount;
+  intp nCount;
 
   if (m_nCursorPosition == 0) {
     return;
@@ -323,15 +323,15 @@ void CTextConsoleWin32::ReceiveTab() {
 
     if (pszRest) {
       PrintRaw(pszRest);
-      strcat(m_szConsoleText, pszRest);
+      V_strcat_safe(m_szConsoleText, pszRest);
       m_nConsoleTextLen += strlen(pszRest);
 
       PrintRaw(" ");
-      strcat(m_szConsoleText, " ");
+      V_strcat_safe(m_szConsoleText, " ");
       m_nConsoleTextLen++;
     }
   } else {
-    ptrdiff_t nLongestCmd;
+    intp nLongestCmd;
     int nTotalColumns;
     int nCurrentColumn;
     char *pszCurrentCmd;
@@ -341,7 +341,7 @@ void CTextConsoleWin32::ReceiveTab() {
 
     pszCurrentCmd = matches[0];
     while (pszCurrentCmd) {
-      ptrdiff_t len = V_strlen(pszCurrentCmd);
+      intp len = V_strlen(pszCurrentCmd);
       if (len > nLongestCmd) {
         nLongestCmd = len;
       }
@@ -389,11 +389,11 @@ void CTextConsoleWin32::ReceiveTab() {
 }
 
 void CTextConsoleWin32::ReceiveStandardChar(const char ch) {
-  ptrdiff_t nCount;
+  intp nCount;
 
   // If the line buffer is maxed out, ignore this char
   if (m_nConsoleTextLen >=
-      (static_cast<ptrdiff_t>(sizeof(m_szConsoleText)) - 2)) {
+      (static_cast<intp>(sizeof(m_szConsoleText)) - 2)) {
     return;
   }
 

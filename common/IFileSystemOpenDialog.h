@@ -5,6 +5,8 @@
 #ifndef IFILESYSTEMOPENDIALOG_H
 #define IFILESYSTEMOPENDIALOG_H
 
+#include "tier0/platform.h"
+
 #define FILESYSTEMOPENDIALOG_VERSION	"FileSystemOpenDlg003"
 
 
@@ -24,7 +26,12 @@ public:
 	virtual void AddFileMask( const char *pMask ) = 0;
 	virtual void SetInitialDir( const char *pDir, const char *pPathID = NULL ) = 0;
 	virtual void SetFilterMdlAndJpgFiles( bool bFilter ) = 0;
-	virtual void GetFilename( INOUT_Z_CAP(outLen) char *pOut, int outLen ) const = 0;	// Get the filename they chose.
+	virtual void GetFilename( OUT_Z_CAP(outLen) char *pOut, intp outLen ) const = 0;	// Get the filename they choose.
+	template<intp outSize>
+	void GetFilename( OUT_Z_ARRAY char (&out)[outSize] )
+	{
+		GetFilename( out, outSize );
+	}
 
 	// Call this to make the dialog itself. Returns true if they clicked OK and false 
 	// if they canceled it.

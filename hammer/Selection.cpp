@@ -520,7 +520,7 @@ bool CSelection::SelectObject(CMapClass *pObj, int cmd)
 	}
 	else // object oriented operation
 	{
-		int iIndex = m_SelectionList.Find(pObj);
+		intp iIndex = m_SelectionList.Find(pObj);
 		bool bAlreadySelected = iIndex != -1;
 	
 		if ( cmd & scToggle )

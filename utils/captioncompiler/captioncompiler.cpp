@@ -1,5 +1,11 @@
 // Copyright Valve Corporation, All rights reserved.
 //
+// Closed captions, or subtitles, are text descriptions that accompany sound and
+// dialogue.  They cue players who can't hear what's going on to what people are
+// saying, and to a certain extent what's happening around them.  It can be also
+// used for translation and/or localization.  With a bit of ingenuity they can
+// also be used to display dialogue that has not been recorded yet.
+//
 // See https://developer.valvesoftware.com/wiki/Closed_Captions
 
 #include "captioncompiler.h"
@@ -25,6 +31,7 @@
 
 #include "filesystem.h"
 #include "cmdlib.h"
+#include "tools_minidump.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -54,13 +61,14 @@ void vprint(bool uselogfile, int depth, const char *fmt, ...) {
   char string[8192];
   va_list va;
   va_start(va, fmt);
-  vsprintf(string, fmt, va);
+  V_vsprintf_safe(string, fmt, va);
   va_end(va);
 
   FILE *fp{nullptr};
 
   if (uselogfile) {
-    fp = fopen("log.txt", "ab");
+    // dimhotepus: Better log name.
+    fp = fopen("caption-compiler-log.txt", "ab");
   }
 
   while (depth-- > 0) {
@@ -93,7 +101,7 @@ void printusage(bool uselogfile) {
   vprint(uselogfile, 0,
          "usage:  captioncompiler closecaptionfile.txt\n \
         \t-v = verbose output\n \
-        \t-l = log to file log.txt\n \
+        \t-l = log to file caption-compiler-log.txt\n \
         \ne.g.:  kvc -l u:/xbox/game/hl2x/resource/closecaption_english.txt");
 
   // Exit app
@@ -102,17 +110,16 @@ void printusage(bool uselogfile) {
 
 void CheckLogFile(bool uselogfile) {
   if (uselogfile) {
-    _unlink("log.txt");
-    vprint(uselogfile, 0, "    Outputting to log.txt\n");
+    _unlink("caption-compiler-log.txt");
+    vprint(uselogfile, 0, "    Outputting to caption-compiler-log.txt\n");
   }
 }
 
 void PrintHeader(bool uselogfile) {
 #ifdef PLATFORM_64BITS
-  vprint(uselogfile, 0, "Valve Software - captioncompiler.exe (%s)\n",
-         __DATE__);
+  vprint(uselogfile, 0, "Valve Software - captioncompiler (%s)\n", __DATE__);
 #else
-  vprint(uselogfile, 0, "Valve Software - captioncompiler.exe [64 bit] (%s)\n",
+  vprint(uselogfile, 0, "Valve Software - captioncompiler [64 bit] (%s)\n",
          __DATE__);
 #endif
   vprint(uselogfile, 0, "--- Close Caption File compiler ---\n");
@@ -123,6 +130,8 @@ class CompileCaptionsApp : public CTier3SteamApp {
   typedef CTier3SteamApp BaseClass;
 
  public:
+  CompileCaptionsApp() : scoped_spew_output_{SpewFunc}, m_UseLogFile{false} {}
+
   // Methods of IApplication
   bool Create() override;
   bool PreInit() override;
@@ -137,16 +146,20 @@ class CompileCaptionsApp : public CTier3SteamApp {
   void CompileCaptionFile(char const *infile, char const *outfile);
   void DescribeCaptions(char const *file) const;
 
+  // Install an exception handler.
+  const se::utils::common::ScopedDefaultMinidumpHandler
+      scoped_default_minidumps_;
+  const ScopedSpewOutputFunc scoped_spew_output_;
+
   bool m_UseLogFile;
 };
 
 bool CompileCaptionsApp::Create() {
-  SpewOutputFunc(SpewFunc);
   SpewActivate("kvc", 2);
 
   AppSystemInfo_t appSystems[] = {
-      {"vgui2.dll", VGUI_IVGUI_INTERFACE_VERSION},
-      {"", ""}  // Required to terminate the list
+      {"vgui2" DLL_EXT_STRING, VGUI_IVGUI_INTERFACE_VERSION}, {"", ""}
+      // Required to terminate the list
   };
 
   return AddSystems(appSystems);
@@ -157,8 +170,8 @@ bool CompileCaptionsApp::SetupSearchPaths() {
   if (!BaseClass::SetupSearchPaths(NULL, false, true)) return false;
 
   // Set gamedir.
-  Q_MakeAbsolutePath(gamedir, sizeof(gamedir), GetGameInfoPath());
-  Q_AppendSlash(gamedir, sizeof(gamedir));
+  V_MakeAbsolutePath(gamedir, GetGameInfoPath());
+  V_AppendSlash(gamedir);
 
   return true;
 }
@@ -316,10 +329,10 @@ void CompileCaptionsApp::CompileCaptionFile(char const *infile,
   CUtlBuffer out;
   out.Put(&header, sizeof(header));
   out.Put(directory.Base(), directory.Count() * sizeof(CaptionLookup_t));
-  int curOffset = out.TellPut();
+  intp curOffset = out.TellPut();
   // Round it up to the next 512 byte boundary
-  int nBytesDestBuffer = AlignValue(curOffset, 512);  // align to HD sector
-  int nPadding = nBytesDestBuffer - curOffset;
+  intp nBytesDestBuffer = AlignValue(curOffset, 512);  // align to HD sector
+  intp nPadding = nBytesDestBuffer - curOffset;
   while (--nPadding >= 0) {
     out.PutChar(0);
   }
@@ -463,7 +476,7 @@ int CompileCaptionsApp::Main() {
   char infile[MAX_PATH];
   V_strcpy_safe(infile, outfile);
 
-  Q_SetExtension(outfile, ".dat", sizeof(outfile));
+  Q_SetExtension(outfile, ".dat");
 
   vprint(m_UseLogFile, 0, "gamedir[ %s ]\n", gamedir);
   vprint(m_UseLogFile, 0, "infile[ %s ]\n", infile);

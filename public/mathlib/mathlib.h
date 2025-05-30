@@ -17,10 +17,9 @@
 
 #include "mathlib/vector.h"
 #include "mathlib/vector2d.h"
+#include "mathlib/vplane.h"
 #include "mathlib/math_pfns.h"
 
-// XXX remove me
-#undef clamp
 
 // Uncomment this to enable FP exceptions in parts of the code.
 // This can help track down FP bugs. However the code is not
@@ -89,25 +88,23 @@ private:
 };
 
 
-
-FORCEINLINE float XM_CALLCONV clamp( float val, float minVal, float maxVal )
-{
-	DirectX::XMVECTOR vres = DirectX::XMVectorClamp
-	(
-		DirectX::XMLoadFloat( &val ),
-		DirectX::XMLoadFloat( &minVal ),
-		DirectX::XMLoadFloat( &maxVal )
-	);
-	return DirectX::XMVectorGetX( vres );
-	//val = fpmax(minVal, val);
-	//val = fpmin(maxVal, val);
-}
+// dimhotepus: Causes implicit float conversion issues. Just use std::clamp
+//[[nodiscard]] FORCEINLINE float XM_CALLCONV clamp( float val, float minVal, float maxVal )
+//{
+//	DirectX::XMVECTOR vres = DirectX::XMVectorClamp
+//	(
+//		DirectX::XMLoadFloat( &val ),
+//		DirectX::XMLoadFloat( &minVal ),
+//		DirectX::XMLoadFloat( &maxVal )
+//	);
+//	return DirectX::XMVectorGetX( vres ); //-V2002
+//}
 
 //
 // Returns a clamped value in the range [min, max].
 //
 template<typename T>
-inline T clamp( T val, T minVal, T maxVal )
+[[nodiscard]] inline T clamp( T val, T minVal, T maxVal )
 {
 	return std::clamp( val, minVal, maxVal );
 }
@@ -126,11 +123,11 @@ struct cplane_t
 	byte	pad[2];
 
 #ifdef VECTOR_NO_SLOW_OPERATIONS
-	cplane_t() {}
+	cplane_t() = default;
 
 private:
 	// No copy constructors allowed if we're in optimal mode
-	cplane_t(const cplane_t& vOther);
+	cplane_t(const cplane_t& vOther) = delete;
 #endif
 };
 
@@ -155,11 +152,8 @@ private:
 #define	PLANE_ANYZ		5
 
 
-//-----------------------------------------------------------------------------
 // Frustum plane indices.
 // WARNING: there is code that depends on these values
-//-----------------------------------------------------------------------------
-
 enum
 {
 	FRUSTUM_RIGHT		= 0,
@@ -171,7 +165,7 @@ enum
 	FRUSTUM_NUMPLANES	= 6
 };
 
-extern byte SignbitsForPlane( cplane_t *out );
+extern byte SignbitsForPlane( const cplane_t *out );
 
 class Frustum_t
 {
@@ -185,8 +179,8 @@ public:
 		m_AbsNormal[i].Init( fabsf(vecNormal.x), fabsf(vecNormal.y), fabsf(vecNormal.z) );
 	}
 
-	inline const cplane_t *GetPlane( int i ) const { return &m_Plane[i]; }
-	inline const Vector &GetAbsNormal( int i ) const { return m_AbsNormal[i]; }
+	[[nodiscard]] inline const cplane_t *GetPlane( int i ) const { return &m_Plane[i]; }
+	[[nodiscard]] inline const Vector &GetAbsNormal( int i ) const { return m_AbsNormal[i]; }
 
 private:
 	cplane_t	m_Plane[FRUSTUM_NUMPLANES];
@@ -194,8 +188,8 @@ private:
 };
 
 // Computes Y fov from an X fov and a screen aspect ratio + X from Y
-float XM_CALLCONV CalcFovY( float flFovX, float flScreenAspect );
-float XM_CALLCONV CalcFovX( float flFovY, float flScreenAspect );
+[[nodiscard]] float XM_CALLCONV CalcFovY( float flFovX, float flScreenAspect );
+[[nodiscard]] float XM_CALLCONV CalcFovX( float flFovY, float flScreenAspect );
 
 // Generate a frustum based on perspective view parameters
 // NOTE: FOV is specified in degrees, as the *full* view angle (not half-angle)
@@ -243,39 +237,39 @@ struct matrix3x4_t
 	{
 		for (int i = 0; i < 3; i++)
 		{
-			for (int j = 0; j < 4; j++)
+			for (int j = 0; j < 4; j++) //-V112
 			{
 				m_flMatVal[i][j] = VEC_T_NAN;
 			}
 		}
 	}
 
-	float * XM_CALLCONV operator[]( int i )				{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; }
-	const float * XM_CALLCONV operator[]( int i ) const	{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; }
-	float * XM_CALLCONV Base()							{ return &m_flMatVal[0][0]; }
-	const float * XM_CALLCONV Base() const				{ return &m_flMatVal[0][0]; }
+	[[nodiscard]] float * XM_CALLCONV operator[]( int i )				{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; } //-V302
+	[[nodiscard]] const float * XM_CALLCONV operator[]( int i ) const	{ Assert(( i >= 0 ) && ( i < 3 )); return m_flMatVal[i]; } //-V302
+	[[nodiscard]] float * XM_CALLCONV Base()							{ return &m_flMatVal[0][0]; }
+	[[nodiscard]] const float * XM_CALLCONV Base() const				{ return &m_flMatVal[0][0]; }
 
 	// dimhotepus: Better DirectX math integration.
-	DirectX::XMFLOAT4* XM_CALLCONV XmBase()
+	[[nodiscard]] DirectX::XMFLOAT4* XM_CALLCONV XmBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(m_flMatVal[0]));
 		static_assert(alignof(DirectX::XMFLOAT4) == alignof(decltype(m_flMatVal[0])));
 		return reinterpret_cast<DirectX::XMFLOAT4*>(&m_flMatVal[0][0]);
 	}
-	DirectX::XMFLOAT4 const* XM_CALLCONV XmBase() const
+	[[nodiscard]] DirectX::XMFLOAT4 const* XM_CALLCONV XmBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT4) == sizeof(m_flMatVal[0]));
 		static_assert(alignof(DirectX::XMFLOAT4) == alignof(decltype(m_flMatVal[0])));
 		return reinterpret_cast<DirectX::XMFLOAT4 const*>(&m_flMatVal[0][0]);
 	}
 
-	DirectX::XMFLOAT3X4* XM_CALLCONV XmMBase()
+	[[nodiscard]] DirectX::XMFLOAT3X4 *XM_CALLCONV XmMBase()
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3X4) == sizeof(m_flMatVal));
 		static_assert(alignof(DirectX::XMFLOAT3X4) == alignof(decltype(m_flMatVal)));
 		return reinterpret_cast<DirectX::XMFLOAT3X4*>(&m_flMatVal[0][0]);
 	}
-	DirectX::XMFLOAT3X4 const* XM_CALLCONV XmMBase() const
+	[[nodiscard]] DirectX::XMFLOAT3X4 const* XM_CALLCONV XmMBase() const
 	{
 		static_assert(sizeof(DirectX::XMFLOAT3X4) == sizeof(m_flMatVal));
 		static_assert(alignof(DirectX::XMFLOAT3X4) == alignof(decltype(m_flMatVal)));
@@ -297,20 +291,14 @@ struct matrix3x4_t
 
 // NJS: Inlined to prevent floats from being autopromoted to doubles, as with the old system.
 #ifndef RAD2DEG
-constexpr inline float XM_CALLCONV RAD2DEG(float x) { return x * (180.f / M_PI_F); }
-constexpr inline double XM_CALLCONV RAD2DEG(double x) { return x * (180.0 / M_PI); }
+[[nodiscard]] constexpr inline float XM_CALLCONV RAD2DEG(float x) { return x * (180.f / M_PI_F); }
+[[nodiscard]] constexpr inline double XM_CALLCONV RAD2DEG(double x) { return x * (180.0 / M_PI); }
 #endif
 
 #ifndef DEG2RAD
-constexpr inline float XM_CALLCONV DEG2RAD(float x) { return x * (M_PI_F / 180.f); }
-constexpr inline double XM_CALLCONV DEG2RAD(double x) { return x * (M_PI / 180.0); }
+[[nodiscard]] constexpr inline float XM_CALLCONV DEG2RAD(float x) { return x * (M_PI_F / 180.f); }
+[[nodiscard]] constexpr inline double XM_CALLCONV DEG2RAD(double x) { return x * (M_PI / 180.0); }
 #endif
-
-// Used to represent sides of things like planes.
-#define	SIDE_FRONT	0
-#define	SIDE_BACK	1
-#define	SIDE_ON		2
-#define SIDE_CROSS  -2      // necessary for polylib.c
 
 #define ON_VIS_EPSILON  0.01    // necessary for vvis (flow.c) -- again look into moving later!
 #define	EQUAL_EPSILON	0.001f   // necessary for vbsp (faces.c) -- should look into moving it there?
@@ -324,12 +312,12 @@ extern const Vector vec3_invalid;
 extern	const int nanmask;
 
 template<typename T>
-inline bool IS_NAN(T x)
+[[nodiscard]] inline bool IS_NAN(T x)
 {
 	return std::isnan(x);
 }
 
-FORCEINLINE vec_t XM_CALLCONV DotProduct(const vec_t *v1, const vec_t *v2)
+[[nodiscard]] FORCEINLINE vec_t XM_CALLCONV DotProduct(const vec_t *v1, const vec_t *v2)
 {
 	return v1[0]*v2[0] + v1[1]*v2[1] + v1[2]*v2[2];
 }
@@ -364,7 +352,7 @@ FORCEINLINE float VectorMaximum(const vec_t *v) = delete;
 //	return max( v[0], max( v[1], v[2] ) );
 //}
 
-FORCEINLINE float XM_CALLCONV VectorMaximum(const Vector& v)
+[[nodiscard]] FORCEINLINE float XM_CALLCONV VectorMaximum(const Vector& v)
 {
 	return max( v.x, max( v.y, v.z ) );
 }
@@ -422,7 +410,7 @@ FORCEINLINE void XM_CALLCONV VectorMAInline( const Vector& start, float scale, c
 		DirectX::XMVectorMultiplyAdd
 		(
 			DirectX::XMLoadFloat3( direction.XmBase() ),
-			DirectX::XMVectorReplicate( scale ),
+			DirectX::XMVectorReplicate( scale ), //-V2002
 			DirectX::XMLoadFloat3( start.XmBase() )
 		)
 	);
@@ -442,7 +430,7 @@ FORCEINLINE void VectorMA( const float * start, float scale, const float *direct
 // dimhotepus: Too unsafe. Use overloads.
 int VectorCompare (const float *v1, const float *v2) = delete;
 
-inline float XM_CALLCONV VectorLength(const float *v)
+[[nodiscard]] inline float XM_CALLCONV VectorLength(const float *v)
 {
 	return FastSqrt( v[0]*v[0] + v[1]*v[1] + v[2]*v[2] + FLT_EPSILON );
 }
@@ -453,12 +441,12 @@ void CrossProduct (const float *v1, const float *v2, float *cross) = delete;
 // dimhotepus: Too unsafe. Use safer alternatives.
 qboolean VectorsEqual( const float *v1, const float *v2 ) = delete;
 
-inline vec_t XM_CALLCONV RoundInt(vec_t in)
+[[nodiscard]] inline vec_t XM_CALLCONV RoundInt(vec_t in)
 {
 	return floorf(in + 0.5f);
 }
 
-constexpr inline int XM_CALLCONV Q_log2(int val)
+[[nodiscard]] constexpr inline int XM_CALLCONV Q_log2(int val)
 {
 	int answer=0;
 	while (val>>=1)
@@ -474,7 +462,7 @@ FORCEINLINE void XM_CALLCONV SinCos( float radians, float *sine, float *cosine )
 
 
 template<class T>
-FORCEINLINE constexpr T Square( T a )
+[[nodiscard]] FORCEINLINE constexpr T Square( T a )
 {
 	return a * a;
 }
@@ -484,7 +472,7 @@ FORCEINLINE constexpr T Square( T a )
 // returns 0 if x == 0 or x > 0x80000000 (ie numbers that would be negative if x was signed)
 // NOTE: the old code took an int, and if you pass in an int of 0x80000000 casted to a uint,
 //       you'll get 0x80000000, which is correct for uints, instead of 0, which was correct for ints
-FORCEINLINE constexpr uint XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint x )
+[[nodiscard]] FORCEINLINE constexpr uint XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint x )
 {
 	x -= 1;
 	x |= x >> 1;
@@ -499,7 +487,7 @@ FORCEINLINE constexpr uint XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint x 
 // returns 0 if x == 0 or x > 0x80000000 (ie numbers that would be negative if x was signed)
 // NOTE: the old code took an int, and if you pass in an int of 0x80000000 casted to a uint,
 //       you'll get 0x80000000, which is correct for uints, instead of 0, which was correct for ints
-FORCEINLINE constexpr uint XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( int x )
+[[nodiscard]] FORCEINLINE constexpr uint XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( int x )
 {
 	x -= 1;
 	x |= x >> 1;
@@ -514,7 +502,7 @@ FORCEINLINE constexpr uint XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( int x )
 // returns 0 if x == 0 or x > 0x8000000000000000 (ie numbers that would be negative if x was signed)
 // NOTE: the old code took an int, and if you pass in an int of 0x8000000000000000 casted to a uint64,
 //       you'll get 0x8000000000000000, which is correct for uints, instead of 0, which was correct for ints
-FORCEINLINE constexpr uint64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint64 x )
+[[nodiscard]] FORCEINLINE constexpr uint64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint64 x )
 {
 	x -= 1;
 	x |= x >> 1;
@@ -522,7 +510,7 @@ FORCEINLINE constexpr uint64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint6
 	x |= x >> 4;
 	x |= x >> 8;
 	x |= x >> 16;
-	x |= x >> 32;
+	x |= x >> 32; //-V112
 	return x + 1;
 }
 
@@ -530,7 +518,7 @@ FORCEINLINE constexpr uint64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( uint6
 // returns 0 if x == 0 or x > 0x8000000000000000 (ie numbers that would be negative if x was signed)
 // NOTE: the old code took an int, and if you pass in an int of 0x8000000000000000 casted to a uint64,
 //       you'll get 0x8000000000000000, which is correct for uints, instead of 0, which was correct for ints
-FORCEINLINE constexpr int64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( int64 x )
+[[nodiscard]] FORCEINLINE constexpr int64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( int64 x )
 {
 	x -= 1;
 	x |= x >> 1;
@@ -538,30 +526,30 @@ FORCEINLINE constexpr int64 XM_CALLCONV SmallestPowerOfTwoGreaterOrEqual( int64 
 	x |= x >> 4;
 	x |= x >> 8;
 	x |= x >> 16;
-	x |= x >> 32;
+	x |= x >> 32; //-V112
 	return x + 1;
 }
 
 // return the largest power of two <= x. Will return 0 if passed 0
-FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint x )
+[[nodiscard]] FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint x )
 {
-	if ( x >= 0x80000000 )
-		return 0x80000000;
+	if ( x >= 0x80000000 ) //-V112
+		return 0x80000000; //-V112
 
 	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;
 }
 
 // return the largest power of two <= x. Will return 0 if passed 0
-FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int x )
+[[nodiscard]] FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int x )
 {
-	if ( (uint)x >= 0x80000000 )
-		return 0x80000000;
+	if ( (uint)x >= 0x80000000 ) //-V112
+		return 0x80000000; //-V112
 
 	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;
 }
 
 // return the largest power of two <= x. Will return 0 if passed 0
-FORCEINLINE constexpr uint64 XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint64 x )
+[[nodiscard]] FORCEINLINE constexpr uint64 XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint64 x )
 {
 	if ( x >= 0x8000000000000000 )
 		return 0x8000000000000000;
@@ -570,7 +558,7 @@ FORCEINLINE constexpr uint64 XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( uint6
 }
 
 // return the largest power of two <= x. Will return 0 if passed 0
-FORCEINLINE constexpr int64 XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int64 x )
+[[nodiscard]] FORCEINLINE constexpr int64 XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int64 x )
 {
 	if ( (uint64)x >= 0x8000000000000000 )
 		return 0x8000000000000000;
@@ -579,11 +567,12 @@ FORCEINLINE constexpr int64 XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int64 
 }
 
 // Math routines for optimizing division
-void XM_CALLCONV FloorDivMod (double numer, double denom, int *quotient, int *rem);
-int XM_CALLCONV GreatestCommonDivisor (int i1, int i2);
+// dimhotepus: double -> float.
+void XM_CALLCONV FloorDivMod (float numer, float denom, int *quotient, int *rem);
+[[nodiscard]] int XM_CALLCONV GreatestCommonDivisor (int i1, int i2);
 
 // Test for FPU denormal mode
-bool XM_CALLCONV IsDenormal( float val );
+[[nodiscard]] bool XM_CALLCONV IsDenormal( float val );
 
 // MOVEMENT INFO
 enum
@@ -604,8 +593,8 @@ void XM_CALLCONV VectorIRotate( const float *in1, const matrix3x4_t & in2, float
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
-QAngle XM_CALLCONV TransformAnglesToLocalSpace( const QAngle &angles, const matrix3x4_t &parentMatrix );
-QAngle XM_CALLCONV TransformAnglesToWorldSpace( const QAngle &angles, const matrix3x4_t &parentMatrix );
+[[nodiscard]] QAngle XM_CALLCONV TransformAnglesToLocalSpace( const QAngle &angles, const matrix3x4_t &parentMatrix );
+[[nodiscard]] QAngle XM_CALLCONV TransformAnglesToWorldSpace( const QAngle &angles, const matrix3x4_t &parentMatrix );
 
 #endif
 
@@ -614,7 +603,7 @@ void XM_CALLCONV MatrixCopy( const matrix3x4_t &in, matrix3x4_t &out );
 void XM_CALLCONV MatrixInvert( const matrix3x4_t &in, matrix3x4_t &out );
 
 // Matrix equality test
-bool XM_CALLCONV MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance = 1e-5f );
+[[nodiscard]] bool XM_CALLCONV MatricesAreEqual( const matrix3x4_t &src1, const matrix3x4_t &src2, float flTolerance = 1e-5f );
 
 void XM_CALLCONV MatrixGetColumn( const matrix3x4_t &in, int column, Vector &out );
 void XM_CALLCONV MatrixSetColumn( const Vector &in, int column, matrix3x4_t &out );
@@ -647,10 +636,10 @@ void XM_CALLCONV QuaternionSlerpNoAlign( const Quaternion &p, const Quaternion &
 void XM_CALLCONV QuaternionBlend( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
 void XM_CALLCONV QuaternionBlendNoAlign( const Quaternion &p, const Quaternion &q, float t, Quaternion &qt );
 void XM_CALLCONV QuaternionIdentityBlend( const Quaternion &p, float t, Quaternion &qt );
-float XM_CALLCONV QuaternionAngleDiff( const Quaternion &p, const Quaternion &q );
+[[nodiscard]] float XM_CALLCONV QuaternionAngleDiff( const Quaternion &p, const Quaternion &q );
 void XM_CALLCONV QuaternionScale( const Quaternion &p, float t, Quaternion &q );
 void XM_CALLCONV QuaternionAlign( const Quaternion &p, const Quaternion &q, Quaternion &qt );
-float XM_CALLCONV QuaternionDotProduct( const Quaternion &p, const Quaternion &q );
+[[nodiscard]] float XM_CALLCONV QuaternionDotProduct( const Quaternion &p, const Quaternion &q );
 void XM_CALLCONV QuaternionConjugate( const Quaternion &p, Quaternion &q );
 void XM_CALLCONV QuaternionInvert( const Quaternion &p, Quaternion &q );
 float XM_CALLCONV QuaternionNormalize(Quaternion &q);
@@ -670,36 +659,36 @@ void XM_CALLCONV BasisToQuaternion( const Vector &vecForward, const Vector &vecR
 void XM_CALLCONV MatrixQuaternion( const matrix3x4_t &mat, Quaternion &q );
 
 // A couple methods to find the dot product of a vector with a matrix row or column...
-inline float XM_CALLCONV MatrixRowDotProduct( const matrix3x4_t &in1, int row, const Vector& in2 )
+[[nodiscard]] inline float XM_CALLCONV MatrixRowDotProduct( const matrix3x4_t &in1, int row, const Vector& in2 )
 {
 	Assert( (row >= 0) && (row < 3) );
 	return DotProduct( in1[row], in2.Base() ); 
 }
 
-inline float XM_CALLCONV MatrixColumnDotProduct( const matrix3x4_t &in1, int col, const Vector& in2 )
+[[nodiscard]] inline float XM_CALLCONV MatrixColumnDotProduct( const matrix3x4_t &in1, int col, const Vector& in2 )
 {
-	Assert( (col >= 0) && (col < 4) );
-	return in1[0][col] * in2[0] + in1[1][col] * in2[1] + in1[2][col] * in2[2]; 
+	Assert( (col >= 0) && (col < 4) ); //-V112
+	return in1[0][col] * in2[0] + in1[1][col] * in2[1] + in1[2][col] * in2[2];  //-V108
 }
 
 // dimhotepus: Too unsafe. Use safer overload.
 int __cdecl BoxOnPlaneSide (const float *emins, const float *emaxs, const cplane_t *plane) = delete;
 
-inline float XM_CALLCONV anglemod(float a)
+[[nodiscard]] inline float XM_CALLCONV anglemod(float a)
 {
 	a = (360.f/65536) * ((int)(a*(65536.f/360.0f)) & 65535);
 	return a;
 }
 
 // Remap a value in the range [A,B] to [C,D].
-inline float XM_CALLCONV RemapVal( float val, float A, float B, float C, float D)
+[[nodiscard]] inline float XM_CALLCONV RemapVal( float val, float A, float B, float C, float D)
 {
 	if ( A == B )
 		return val >= B ? D : C;
 	return C + (D - C) * (val - A) / (B - A);
 }
 
-inline float XM_CALLCONV RemapValClamped( float val, float A, float B, float C, float D)
+[[nodiscard]] inline float XM_CALLCONV RemapValClamped( float val, float A, float B, float C, float D)
 {
 	if ( A == B )
 		return val >= B ? D : C;
@@ -712,12 +701,12 @@ inline float XM_CALLCONV RemapValClamped( float val, float A, float B, float C, 
 // Returns A + (B-A)*flPercent.
 // float Lerp( float flPercent, float A, float B );
 template <class T>
-FORCEINLINE T Lerp( float flPercent, T const &A, T const &B )
+[[nodiscard]] FORCEINLINE T Lerp( float flPercent, T const &A, T const &B )
 {
 	return A + (B - A) * flPercent;
 }
 
-FORCEINLINE float XM_CALLCONV Sqr( float f )
+[[nodiscard]] FORCEINLINE float XM_CALLCONV Sqr( float f )
 {
 	return f*f;
 }
@@ -732,7 +721,7 @@ FORCEINLINE float XM_CALLCONV Sqr( float f )
 //   If you know a function f(x)'s value (f1) at position i1, and its value (f2) at position i2,
 //   the function can be linearly interpolated with FLerp(f1,f2,i1,i2,x)
 //    i2=i1 will cause a divide by zero.
-static inline float XM_CALLCONV FLerp(float f1, float f2, float i1, float i2, float x)
+[[nodiscard]] static inline float XM_CALLCONV FLerp(float f1, float f2, float i1, float i2, float x)
 {
   return f1+(f2-f1)*(x-i1)/(i2-i1);
 }
@@ -741,8 +730,9 @@ static inline float XM_CALLCONV FLerp(float f1, float f2, float i1, float i2, fl
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
 // YWB:  Specialization for interpolating euler angles via quaternions...
-template<> FORCEINLINE QAngle Lerp<QAngle>( float flPercent, const QAngle& q1, const QAngle& q2 )
-{
+template <>
+[[nodiscard]] FORCEINLINE QAngle Lerp<QAngle>(float flPercent, const QAngle &q1,
+                                              const QAngle &q2) {
 	// Avoid precision errors
 	if ( q1 == q2 )
 		return q1;
@@ -769,7 +759,7 @@ template<> FORCEINLINE QAngle Lerp<QAngle>( float flPercent, const QAngle& q1, c
 #pragma error
 
 // NOTE NOTE: I haven't tested this!! It may not work! Check out interpolatedvar.cpp in the client dll to try it
-template<> FORCEINLINE QAngleByValue Lerp<QAngleByValue>( float flPercent, const QAngleByValue& q1, const QAngleByValue& q2 )
+[[nodiscard]] template<> FORCEINLINE QAngleByValue Lerp<QAngleByValue>( float flPercent, const QAngleByValue& q1, const QAngleByValue& q2 )
 {
 	// Avoid precision errors
 	if ( q1 == q2 )
@@ -799,12 +789,12 @@ template<> FORCEINLINE QAngleByValue Lerp<QAngleByValue>( float flPercent, const
 template <class T> 
 FORCEINLINE void V_swap( T& x, T& y )
 {
-	T temp = x;
-	x = y;
-	y = temp;
+	T temp = std::move(x);
+	x = std::move(y);
+	y = std::move(temp);
 }
 
-template <class T> FORCEINLINE T AVG(T a, T b)
+template <class T> [[nodiscard]] FORCEINLINE T AVG(T a, T b)
 {
 	return (a+b)/2;
 }
@@ -817,12 +807,12 @@ template <class T> FORCEINLINE T AVG(T a, T b)
 #define XYZ(v) (v).x,(v).y,(v).z
 
 
-inline float XM_CALLCONV Sign( float x )
+[[nodiscard]] inline float XM_CALLCONV Sign( float x )
 {
 	return (x < 0.0f) ? -1.0f : 1.0f;
 }
 
-inline int XM_CALLCONV Sign( int x )
+[[nodiscard]] inline int XM_CALLCONV Sign( int x )
 {
 	return (x < 0) ? -1 : 1;
 }
@@ -840,14 +830,14 @@ inline int XM_CALLCONV Sign( int x )
 //
 // Note: This code has been run against all possible integers.
 //
-inline int XM_CALLCONV ClampArrayBounds( int n, unsigned maxindex )
+[[nodiscard]] inline intp XM_CALLCONV ClampArrayBounds( intp n, uintp maxindex )
 {
 	// mask is 0 if less than 4096, 0xFFFFFFFF if greater than
-	unsigned int inrangemask = 0xFFFFFFFF + (((unsigned) n) > maxindex );
-	unsigned int lessthan0mask = 0xFFFFFFFF + ( n >= 0 );
+	const uintp inrangemask = std::numeric_limits<uintp>::max() + (static_cast<uintp>(n) > maxindex);
+	const uintp lessthan0mask = std::numeric_limits<uintp>::max() + (n >= 0);
 	
 	// If the result was valid, set the result, (otherwise sets zero)
-	int result = (inrangemask & n);
+	intp result = (inrangemask & n);
 
 	// if the result was out of range or zero.
 	result |= ((~inrangemask) & (~lessthan0mask)) & maxindex;
@@ -923,13 +913,13 @@ void XM_CALLCONV VectorRotate( const Vector& in1, const matrix3x4_t &in2, Vector
 
 void XM_CALLCONV VectorIRotate( Vector in1, const matrix3x4_t &in2, Vector &out );
 
-inline DirectX::XMVECTOR XM_CALLCONV VectorIRotate( DirectX::FXMVECTOR in1, const matrix3x4_t &in2 )
+[[nodiscard]] inline DirectX::XMVECTOR XM_CALLCONV VectorIRotate( DirectX::FXMVECTOR in1, const matrix3x4_t &in2 )
 {
 	return DirectX::XMVectorSet
 	(
-		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][0], in2[1][0], in2[2][0], 0.0F ) ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][1], in2[1][1], in2[2][1], 0.0F ) ) ) ),
-		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][2], in2[1][2], in2[2][2], 0.0F ) ) ) ),
+		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][0], in2[1][0], in2[2][0], 0.0F ) ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][1], in2[1][1], in2[2][1], 0.0F ) ) ) ), //-V2002
+		DirectX::XMVectorGetX( DirectX::XMVectorSum( DirectX::XMVectorMultiply( in1, DirectX::XMVectorSet( in2[0][2], in2[1][2], in2[2][2], 0.0F ) ) ) ), //-V2002
 		0.0F
 	);
 }
@@ -956,7 +946,7 @@ void XM_CALLCONV MatrixAngles( const matrix3x4_t &mat, RadianEuler &angles, Vect
 
 void XM_CALLCONV MatrixAngles( const matrix3x4_t &mat, Quaternion &q, Vector &position );
 
-inline int XM_CALLCONV VectorCompare (const Vector& v1, const Vector& v2)
+[[nodiscard]] inline int XM_CALLCONV VectorCompare (const Vector& v1, const Vector& v2)
 {
 	return v1 == v2;
 }
@@ -972,7 +962,7 @@ inline void DecomposeRotation( const matrix3x4_t &mat, Vector &out )
 }
 */
 
-int XM_CALLCONV BoxOnPlaneSide ( Vector emins, Vector emaxs, const cplane_t *plane );
+[[nodiscard]] int XM_CALLCONV BoxOnPlaneSide ( Vector emins, Vector emaxs, const cplane_t *plane );
 
 inline void XM_CALLCONV VectorFill(Vector& a, float b)
 {
@@ -986,7 +976,7 @@ inline void XM_CALLCONV VectorNegate(Vector& a)
 	a[2] = -a[2];
 }
 
-inline vec_t XM_CALLCONV VectorAvg(Vector& a)
+[[nodiscard]] inline vec_t XM_CALLCONV VectorAvg(const Vector& a)
 {
 	return ( a[0] + a[1] + a[2] ) / 3;
 }
@@ -994,7 +984,7 @@ inline vec_t XM_CALLCONV VectorAvg(Vector& a)
 //-----------------------------------------------------------------------------
 // Box/plane test (slow version)
 //-----------------------------------------------------------------------------
-inline int XM_CALLCONV BoxOnPlaneSide2 (const Vector& emins, const Vector& emaxs, const cplane_t *p, float tolerance = 0.f )
+[[nodiscard]] inline int XM_CALLCONV BoxOnPlaneSide2 (const Vector& emins, const Vector& emaxs, const cplane_t *p, float tolerance = 0.f )
 {
 	Vector	corners[2];
 
@@ -1057,7 +1047,7 @@ void XM_CALLCONV AddPointToBounds (const Vector& v, Vector& mins, Vector& maxs);
 void XM_CALLCONV BuildGammaTable( float gamma, float texGamma, float brightness, int overbright );
 
 // convert texture to linear 0..1 value
-inline float XM_CALLCONV TexLightToLinear( int c, int exponent )
+[[nodiscard]] inline float XM_CALLCONV TexLightToLinear( int c, int exponent )
 {
 	extern ALIGN128 float power2_n[256]; 
 	Assert( exponent >= -128 && exponent <= 127 );
@@ -1066,10 +1056,10 @@ inline float XM_CALLCONV TexLightToLinear( int c, int exponent )
 
 
 // converts linear 0..1 value to texture (0..255)
-byte XM_CALLCONV LinearToTexture( float f );
+[[nodiscard]] byte XM_CALLCONV LinearToTexture( float f );
 // converts 0..1 linear value to screen gamma (0..255)
-byte XM_CALLCONV LinearToScreenGamma( float f );
-float XM_CALLCONV TextureToLinear( int c );
+[[nodiscard]] byte XM_CALLCONV LinearToScreenGamma( float f );
+[[nodiscard]] float XM_CALLCONV TextureToLinear( int c );
 
 // compressed color format 
 struct ColorRGBExp32
@@ -1082,23 +1072,23 @@ void XM_CALLCONV ColorRGBExp32ToVector( const ColorRGBExp32& in, Vector& out );
 void XM_CALLCONV VectorToColorRGBExp32( const Vector& v, ColorRGBExp32 &c );
 
 // solve for "x" where "a x^2 + b x + c = 0", return true if solution exists
-bool XM_CALLCONV SolveQuadratic( float a, float b, float c, float &root1, float &root2 );
+[[nodiscard]] bool XM_CALLCONV SolveQuadratic( float a, float b, float c, float &root1, float &root2 );
 
 // solves for "a, b, c" where "a x^2 + b x + c = y", return true if solution exists
-bool XM_CALLCONV SolveInverseQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c );
+[[nodiscard]] bool XM_CALLCONV SolveInverseQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c );
 
 // solves for a,b,c specified as above, except that it always creates a monotonically increasing or
 // decreasing curve if the data is monotonically increasing or decreasing. In order to enforce the
 // monoticity condition, it is possible that the resulting quadratic will only approximate the data
 // instead of interpolating it. This code is not especially fast.
-bool XM_CALLCONV SolveInverseQuadraticMonotonic( float x1, float y1, float x2, float y2, 
+[[nodiscard]] bool XM_CALLCONV SolveInverseQuadraticMonotonic( float x1, float y1, float x2, float y2, 
 									 float x3, float y3, float &a, float &b, float &c );
 
 
 
 
 // solves for "a, b, c" where "1/(a x^2 + b x + c ) = y", return true if solution exists
-bool XM_CALLCONV SolveInverseReciprocalQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c );
+[[nodiscard]] bool XM_CALLCONV SolveInverseReciprocalQuadratic( float x1, float y1, float x2, float y2, float x3, float y3, float &a, float &b, float &c );
 
 // rotate a vector around the Z axis (YAW)
 void XM_CALLCONV VectorYawRotate( const Vector& in, float flYaw, Vector &out);
@@ -1136,7 +1126,7 @@ void XM_CALLCONV VectorYawRotate( const Vector& in, float flYaw, Vector &out);
 // 0                   1
 //
 // With a biasAmt of 0.5, Bias returns X.
-float XM_CALLCONV Bias( float x, float biasAmt );
+[[nodiscard]] float XM_CALLCONV Bias( float x, float biasAmt );
 
 
 // Gain is similar to Bias, but biasAmt biases towards or away from 0.5.
@@ -1168,7 +1158,7 @@ float XM_CALLCONV Bias( float x, float biasAmt );
 // |*****
 // |___________________
 // 0                   1
-float XM_CALLCONV Gain( float x, float biasAmt );
+[[nodiscard]] float XM_CALLCONV Gain( float x, float biasAmt );
 
 
 // SmoothCurve maps a 0-1 value into another 0-1 value based on a cosine wave
@@ -1188,7 +1178,7 @@ float XM_CALLCONV Gain( float x, float biasAmt );
 // |___________________
 // 0                   1
 //
-float XM_CALLCONV SmoothCurve( float x );
+[[nodiscard]] float XM_CALLCONV SmoothCurve( float x );
 
 
 // This works like SmoothCurve, with two changes:
@@ -1198,21 +1188,21 @@ float XM_CALLCONV SmoothCurve( float x );
 //
 // 2. flPeakSharpness is a 0-1 value controlling the sharpness of the peak.
 //    Low values blunt the peak and high values sharpen the peak.
-float XM_CALLCONV SmoothCurve_Tweak( float x, float flPeakPos=0.5, float flPeakSharpness=0.5 );
+[[nodiscard]] float XM_CALLCONV SmoothCurve_Tweak( float x, float flPeakPos=0.5, float flPeakSharpness=0.5 );
 
 
 //float ExponentialDecay( float halflife, float dt );
 //float ExponentialDecay( float decayTo, float decayTime, float dt );
 
 // halflife is time for value to reach 50%
-inline float XM_CALLCONV ExponentialDecay( float halflife, float dt )
+[[nodiscard]] inline float XM_CALLCONV ExponentialDecay( float halflife, float dt )
 {
 	// log(0.5) == -0.69314718055994530941723212145818
 	return expf( -0.69314718f / halflife * dt);
 }
 
 // decayTo is factor the value should decay to in decayTime
-inline float XM_CALLCONV ExponentialDecay(float decayTo, float decayTime,
+[[nodiscard]] inline float XM_CALLCONV ExponentialDecay(float decayTo, float decayTime,
                                           float dt) {
 	return expf( logf( decayTo ) / decayTime * dt);
 }
@@ -1220,7 +1210,7 @@ inline float XM_CALLCONV ExponentialDecay(float decayTo, float decayTime,
 // Get the integrated distanced traveled
 // decayTo is factor the value should decay to in decayTime
 // dt is the time relative to the last velocity update
-inline float XM_CALLCONV ExponentialDecayIntegral( float decayTo, float decayTime, float dt  )
+[[nodiscard]] inline float XM_CALLCONV ExponentialDecayIntegral( float decayTo, float decayTime, float dt  )
 {
 	return (powf( decayTo, dt / decayTime) * decayTime - decayTime) / logf( decayTo );
 }
@@ -1228,7 +1218,7 @@ inline float XM_CALLCONV ExponentialDecayIntegral( float decayTo, float decayTim
 // hermite basis function for smooth interpolation
 // Similar to Gain() above, but very cheap to call
 // value should be between 0 & 1 inclusive
-inline float XM_CALLCONV SimpleSpline( float value )
+[[nodiscard]] inline float XM_CALLCONV SimpleSpline( float value )
 {
 	float valueSquared = value * value;
 
@@ -1238,7 +1228,7 @@ inline float XM_CALLCONV SimpleSpline( float value )
 
 // remaps a value in [startInterval, startInterval+rangeInterval] from linear to
 // spline using SimpleSpline
-inline float XM_CALLCONV SimpleSplineRemapVal( float val, float A, float B, float C, float D)
+[[nodiscard]] inline float XM_CALLCONV SimpleSplineRemapVal( float val, float A, float B, float C, float D)
 {
 	if ( A == B )
 		return val >= B ? D : C;
@@ -1248,7 +1238,7 @@ inline float XM_CALLCONV SimpleSplineRemapVal( float val, float A, float B, floa
 
 // remaps a value in [startInterval, startInterval+rangeInterval] from linear to
 // spline using SimpleSpline
-inline float XM_CALLCONV SimpleSplineRemapValClamped( float val, float A, float B, float C, float D )
+[[nodiscard]] inline float XM_CALLCONV SimpleSplineRemapValClamped( float val, float A, float B, float C, float D )
 {
 	if ( A == B )
 		return val >= B ? D : C;
@@ -1257,16 +1247,96 @@ inline float XM_CALLCONV SimpleSplineRemapValClamped( float val, float A, float 
 	return C + (D - C) * SimpleSpline( cVal );
 }
 
-FORCEINLINE int XM_CALLCONV RoundFloatToInt(float f)
+[[nodiscard]] FORCEINLINE int XM_CALLCONV RoundFloatToInt(float f)
 {
 #if defined(_XM_SSE_INTRINSICS_)
 	return _mm_cvtss_si32(_mm_load_ss(&f));
+#elif defined(_XM_ARM_NEON_INTRINSICS_)
+// sse2neon is freely redistributable under the MIT License.
+//
+// Copyright (c) 2015-2024 SSE2NEON Contributors.
+#if (defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC)) || \
+    defined(__ARM_FEATURE_DIRECTED_ROUNDING)
+  return vgetq_lane_s32(vcvtnq_s32_f32(vrndiq_f32(vreinterpretq_f32_m128(a))),
+                        0);
 #else
-#error "Please define your platform"
+  float32_t data = vgetq_lane_f32(
+      vreinterpretq_f32_m128(_mm_round_ps(a, _MM_FROUND_CUR_DIRECTION)), 0);
+  return (int32_t)data;
+#endif
+#else
+#error "Please implement RoundFloatToInt in your hardware."
 #endif
 }
 
-FORCEINLINE unsigned char XM_CALLCONV RoundFloatToByte(float f)
+[[nodiscard]] FORCEINLINE
+#if defined(_XM_SSE_INTRINSICS_)
+__m128i
+#elif defined(_XM_ARM_NEON_INTRINSICS_)
+int32x4_t
+#endif
+    XM_CALLCONV RoundFloatToInt(DirectX::XMVECTOR f) {
+#if defined(_XM_SSE_INTRINSICS_)
+  return _mm_cvtps_epi32(f);
+#elif defined(_XM_ARM_NEON_INTRINSICS_)
+// sse2neon is freely redistributable under the MIT License.
+//
+// Copyright (c) 2015-2024 SSE2NEON Contributors.
+//
+// *NOTE*. The default rounding mode on SSE is 'round to even', which ARMv7-A
+// does not support! It is supported on ARMv8-A however.
+#if defined(__ARM_FEATURE_FRINT)
+  return vreinterpretq_m128i_s32(vcvtq_s32_f32(vrnd32xq_f32(a)));
+#elif (defined(__aarch64__) || defined(_M_ARM64) || defined(_M_ARM64EC)) || \
+    defined(__ARM_FEATURE_DIRECTED_ROUNDING)
+  switch (_MM_GET_ROUNDING_MODE()) {
+    case _MM_ROUND_NEAREST:
+      return vreinterpretq_m128i_s32(vcvtnq_s32_f32(a));
+    case _MM_ROUND_DOWN:
+      return vreinterpretq_m128i_s32(vcvtmq_s32_f32(a));
+    case _MM_ROUND_UP:
+      return vreinterpretq_m128i_s32(vcvtpq_s32_f32(a));
+    default:  // _MM_ROUND_TOWARD_ZERO
+      return vreinterpretq_m128i_s32(vcvtq_s32_f32(a));
+  }
+#else
+  float *f = (float *)&a;
+  switch (_MM_GET_ROUNDING_MODE()) {
+    case _MM_ROUND_NEAREST: {
+      uint32x4_t signmask = vdupq_n_u32(0x80000000);
+      float32x4_t half = vbslq_f32(signmask, vreinterpretq_f32_m128(a),
+                                   vdupq_n_f32(0.5f)); /* +/- 0.5 */
+      int32x4_t r_normal = vcvtq_s32_f32(vaddq_f32(
+          vreinterpretq_f32_m128(a), half)); /* round to integer: [a + 0.5]*/
+      int32x4_t r_trunc = vcvtq_s32_f32(
+          vreinterpretq_f32_m128(a)); /* truncate to integer: [a] */
+      int32x4_t plusone = vreinterpretq_s32_u32(vshrq_n_u32(
+          vreinterpretq_u32_s32(vnegq_s32(r_trunc)), 31)); /* 1 or 0 */
+      int32x4_t r_even = vbicq_s32(vaddq_s32(r_trunc, plusone),
+                                   vdupq_n_s32(1)); /* ([a] + {0,1}) & ~1 */
+      float32x4_t delta = vsubq_f32(
+          vreinterpretq_f32_m128(a),
+          vcvtq_f32_s32(r_trunc)); /* compute delta: delta = (a - [a]) */
+      uint32x4_t is_delta_half = vceqq_f32(delta, half); /* delta == +/- 0.5 */
+      return vreinterpretq_m128i_s32(
+          vbslq_s32(is_delta_half, r_even, r_normal));
+    }
+    case _MM_ROUND_DOWN:
+      return _mm_set_epi32(floorf(f[3]), floorf(f[2]), floorf(f[1]),
+                           floorf(f[0]));
+    case _MM_ROUND_UP:
+      return _mm_set_epi32(ceilf(f[3]), ceilf(f[2]), ceilf(f[1]), ceilf(f[0]));
+    default:  // _MM_ROUND_TOWARD_ZERO
+      return _mm_set_epi32((int32_t)f[3], (int32_t)f[2], (int32_t)f[1],
+                           (int32_t)f[0]);
+  }
+#endif
+#else
+#error "Please implement RoundFloatToInt in your hardware."
+#endif
+}
+
+[[nodiscard]] FORCEINLINE unsigned char XM_CALLCONV RoundFloatToByte(float f)
 {
 	int nResult = RoundFloatToInt(f);
 #ifdef Assert
@@ -1275,23 +1345,8 @@ FORCEINLINE unsigned char XM_CALLCONV RoundFloatToByte(float f)
 	return (unsigned char) nResult;
 }
 
-FORCEINLINE unsigned long XM_CALLCONV RoundFloatToUnsignedLong(float f)
+[[nodiscard]] FORCEINLINE unsigned long XM_CALLCONV RoundFloatToUnsignedLong(float f)
 {
-#if defined( _X360 )
-#ifdef Assert
-	Assert( IsFPUControlWordSet() );
-#endif
-	union
-	{
-		double flResult;
-		int pIntResult[2];
-		unsigned long pResult[2];
-	};
-	flResult = __fctiw( f );
-	Assert( pIntResult[1] >= 0 );
-	return pResult[1];
-#else  // !X360
-	
 #if defined( PLATFORM_WINDOWS_PC64 )
 	uint nRet = ( uint ) f;
 	if ( nRet & 1 )
@@ -1326,33 +1381,22 @@ FORCEINLINE unsigned long XM_CALLCONV RoundFloatToUnsignedLong(float f)
 
 	return *((unsigned long*)nResult);
 #endif // PLATFORM_WINDOWS_PC64
-#endif // !X360
 }
 
-FORCEINLINE bool XM_CALLCONV IsIntegralValue( float flValue, float flTolerance = 0.001f )
+[[nodiscard]] FORCEINLINE bool XM_CALLCONV IsIntegralValue( float flValue, float flTolerance = 0.001f )
 {
 	return fabsf( RoundFloatToInt( flValue ) - flValue ) < flTolerance;
 }
 
 // Fast, accurate ftol:
-FORCEINLINE int XM_CALLCONV Float2Int( float a )
+[[nodiscard]] FORCEINLINE int XM_CALLCONV Float2Int( float a )
 {
-#if defined( _X360 )
-	union
-	{
-		double flResult;
-		int pResult[2];
-	};
-	flResult = __fctiwz( a );
-	return pResult[1];
-#else  // !X360
 	// Rely on compiler to generate CVTTSS2SI on x86
 	return (int) a;
-#endif
 }
 
 // Over 15x faster than: (int)floor(value)
-inline int XM_CALLCONV Floor2Int( float a )
+[[nodiscard]] inline int XM_CALLCONV Floor2Int( float a )
 {
 	int RetVal;
 
@@ -1372,7 +1416,7 @@ inline int XM_CALLCONV Floor2Int( float a )
 // Fast color conversion from float to unsigned char
 //-----------------------------------------------------------------------------
 // dimhotepus: Use unsigned char as return type.
-FORCEINLINE unsigned char XM_CALLCONV FastFToC( float c )
+[[nodiscard]] FORCEINLINE unsigned char XM_CALLCONV FastFToC( float c )
 {
 #if defined( __i386__ )
 	// IEEE float bit manipulation works for values between [0, 1<<23)
@@ -1387,7 +1431,7 @@ FORCEINLINE unsigned char XM_CALLCONV FastFToC( float c )
 //-----------------------------------------------------------------------------
 // Fast conversion from float to integer with magnitude less than 2**22
 //-----------------------------------------------------------------------------
-FORCEINLINE int XM_CALLCONV FastFloatToSmallInt( float c )
+[[nodiscard]] FORCEINLINE int XM_CALLCONV FastFloatToSmallInt( float c )
 {
 #if defined( __i386__ )
 	// IEEE float bit manipulation works for values between [-1<<22, 1<<22)
@@ -1404,14 +1448,14 @@ FORCEINLINE int XM_CALLCONV FastFloatToSmallInt( float c )
 // Input  : in - 
 // Output : inline float
 //-----------------------------------------------------------------------------
-inline float XM_CALLCONV ClampToMsec( float in )
+[[nodiscard]] inline float XM_CALLCONV ClampToMsec( float in )
 {
 	int msec = Floor2Int( in * 1000.0f + 0.5f );
 	return 0.001f * msec;
 }
 
 // Over 15x faster than: (int)ceil(value)
-inline int XM_CALLCONV Ceil2Int( float a )
+[[nodiscard]] inline int XM_CALLCONV Ceil2Int( float a )
 {
    int RetVal;
 #if defined(_XM_SSE_INTRINSICS_)
@@ -1458,7 +1502,7 @@ inline void XM_CALLCONV GetBarycentricCoords2D(
 // Return true of the sphere might touch the box (the sphere is actually treated
 // like a box itself, so this may return true if the sphere's bounding box touches
 // a corner of the box but the sphere itself doesn't).
-inline bool XM_CALLCONV QuickBoxSphereTest( 
+[[nodiscard]] inline bool XM_CALLCONV QuickBoxSphereTest( 
 	const Vector& vOrigin,
 	float flRadius,
 	const Vector& bbMin,
@@ -1471,7 +1515,7 @@ inline bool XM_CALLCONV QuickBoxSphereTest(
 
 
 // Return true of the boxes intersect (but not if they just touch).
-inline bool XM_CALLCONV QuickBoxIntersectTest( 
+[[nodiscard]] inline bool XM_CALLCONV QuickBoxIntersectTest( 
 	const Vector& vBox1Min,
 	const Vector& vBox1Max,
 	const Vector& vBox2Min,
@@ -1484,19 +1528,19 @@ inline bool XM_CALLCONV QuickBoxIntersectTest(
 }
 
 
-extern float XM_CALLCONV GammaToLinearFullRange( float gamma );
-extern float XM_CALLCONV LinearToGammaFullRange( float linear );
-extern float XM_CALLCONV GammaToLinear( float gamma );
-extern float XM_CALLCONV LinearToGamma( float linear );
+[[nodiscard]] extern float XM_CALLCONV GammaToLinearFullRange( float gamma );
+[[nodiscard]] extern float XM_CALLCONV LinearToGammaFullRange( float linear );
+[[nodiscard]] extern float XM_CALLCONV GammaToLinear( float gamma );
+[[nodiscard]] extern float XM_CALLCONV LinearToGamma( float linear );
 
-extern float XM_CALLCONV SrgbGammaToLinear( float flSrgbGammaValue );
-extern float XM_CALLCONV SrgbLinearToGamma( float flLinearValue );
-extern float XM_CALLCONV X360GammaToLinear( float fl360GammaValue );
-extern float XM_CALLCONV X360LinearToGamma( float flLinearValue );
-extern float XM_CALLCONV SrgbGammaTo360Gamma( float flSrgbGammaValue );
+[[nodiscard]] extern float XM_CALLCONV SrgbGammaToLinear( float flSrgbGammaValue );
+[[nodiscard]] extern float XM_CALLCONV SrgbLinearToGamma( float flLinearValue );
+[[nodiscard]] extern float XM_CALLCONV X360GammaToLinear( float fl360GammaValue );
+[[nodiscard]] extern float XM_CALLCONV X360LinearToGamma( float flLinearValue );
+[[nodiscard]] extern float XM_CALLCONV SrgbGammaTo360Gamma( float flSrgbGammaValue );
 
 // linear (0..4) to screen corrected vertex space (0..1?)
-FORCEINLINE float XM_CALLCONV LinearToVertexLight( float f )
+[[nodiscard]] FORCEINLINE float XM_CALLCONV LinearToVertexLight( float f )
 {
 	extern float lineartovertex[4096];	
 
@@ -1517,7 +1561,7 @@ FORCEINLINE float XM_CALLCONV LinearToVertexLight( float f )
 }
 
 
-FORCEINLINE unsigned char XM_CALLCONV LinearToLightmap( float f )
+[[nodiscard]] FORCEINLINE unsigned char XM_CALLCONV LinearToLightmap( float f )
 {
 	extern unsigned char lineartolightmap[4096];	
 
@@ -1645,7 +1689,7 @@ void XM_CALLCONV Hermite_Spline(
 	float t, 
 	Vector& output );
 
-float XM_CALLCONV Hermite_Spline(
+[[nodiscard]] float XM_CALLCONV Hermite_Spline(
 	float p1,
 	float p2,
 	float d1,
@@ -1660,7 +1704,7 @@ void XM_CALLCONV Hermite_Spline(
 	float t, 
 	Vector& output );
 
-float XM_CALLCONV Hermite_Spline(
+[[nodiscard]] float XM_CALLCONV Hermite_Spline(
 	float p0,
 	float p1,
 	float p2,
@@ -1765,7 +1809,7 @@ void XM_CALLCONV Parabolic_Spline_NormalizeX(
 
 // quintic interpolating polynomial from Perlin.
 // 0->0, 1->1, smooth-in between with smooth tangents
-FORCEINLINE float QuinticInterpolatingPolynomial(float t)
+[[nodiscard]] FORCEINLINE float QuinticInterpolatingPolynomial(float t)
 {
 	// 6t^5-15t^4+10t^3
 	return t * t * t *( t * ( t* 6.0F - 15.0F ) + 10.0F );
@@ -1784,16 +1828,16 @@ void XM_CALLCONV GetInterpolationData( float const *pKnotPositions,
 						   float *pValueB,
 						   float *pInterpolationValue);
 
-float XM_CALLCONV RangeCompressor( float flValue, float flMin, float flMax, float flBase );
+[[nodiscard]] float XM_CALLCONV RangeCompressor( float flValue, float flMin, float flMax, float flBase );
 
 // Get the minimum distance from vOrigin to the bounding box defined by [mins,maxs]
 // using voronoi regions.
 // 0 is returned if the origin is inside the box.
-float XM_CALLCONV CalcSqrDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point );
+[[nodiscard]] float XM_CALLCONV CalcSqrDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point );
 void XM_CALLCONV CalcClosestPointOnAABB( Vector mins, Vector maxs, Vector point, Vector &closestOut );
 void XM_CALLCONV CalcSqrDistAndClosestPointOnAABB( const Vector &mins, const Vector &maxs, const Vector &point, Vector &closestOut, float &distSqrOut );
 
-inline float XM_CALLCONV CalcDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point )
+[[nodiscard]] inline float XM_CALLCONV CalcDistanceToAABB( const Vector &mins, const Vector &maxs, const Vector &point )
 {
 	float flDistSqr = CalcSqrDistanceToAABB( mins, maxs, point );
 	return sqrtf(flDistSqr);
@@ -1804,53 +1848,53 @@ inline float XM_CALLCONV CalcDistanceToAABB( const Vector &mins, const Vector &m
 // If you pass in a value for t, it will tell you the t for (A + (B-A)t) to get the closest point.
 // If the closest point lies on the segment between A and B, then 0 <= t <= 1.
 void  XM_CALLCONV CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=nullptr );
-float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
-float XM_CALLCONV CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
+[[nodiscard]] float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
+[[nodiscard]] float XM_CALLCONV CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
 
 // The same three functions as above, except now the line is closed between A and B.
 void  XM_CALLCONV CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=nullptr );
-float XM_CALLCONV CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr);
-float XM_CALLCONV CalcDistanceSqrToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
+[[nodiscard]] float XM_CALLCONV CalcDistanceToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr);
+[[nodiscard]] float XM_CALLCONV CalcDistanceSqrToLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
 
 // A function to compute the closes line segment connnection two lines (or false if the lines are parallel, etc.)
-bool XM_CALLCONV CalcLineToLineIntersectionSegment(
+[[nodiscard]] bool XM_CALLCONV CalcLineToLineIntersectionSegment(
    const Vector& p1,const Vector& p2,const Vector& p3,const Vector& p4,Vector *s1,Vector *s2,
    float *t1, float *t2 );
 
 // The above functions in 2D
 void  XM_CALLCONV CalcClosestPointOnLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=nullptr );
-float XM_CALLCONV CalcDistanceToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
-float XM_CALLCONV CalcDistanceSqrToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
+[[nodiscard]] float XM_CALLCONV CalcDistanceToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
+[[nodiscard]] float XM_CALLCONV CalcDistanceSqrToLine2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
 void  XM_CALLCONV CalcClosestPointOnLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, Vector2D &vClosest, float *t=nullptr );
-float XM_CALLCONV CalcDistanceToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
-float XM_CALLCONV CalcDistanceSqrToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
+[[nodiscard]] float XM_CALLCONV CalcDistanceToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
+[[nodiscard]] float XM_CALLCONV CalcDistanceSqrToLineSegment2D( Vector2D const &P, Vector2D const &vLineA, Vector2D const &vLineB, float *t=nullptr );
 
 // Init the mathlib
 void XM_CALLCONV MathLib_Init( float gamma = 2.2f, float texGamma = 2.2f, float brightness = 0.0f, int overbright = 2.0f, bool bAllow3DNow = true, bool bAllowSSE = true, bool bAllowSSE2 = true, bool bAllowMMX = true );
-bool XM_CALLCONV MathLib_3DNowEnabled( void );
-bool XM_CALLCONV MathLib_MMXEnabled( void );
-bool XM_CALLCONV MathLib_SSEEnabled( void );
-bool XM_CALLCONV MathLib_SSE2Enabled( void );
+[[nodiscard]] bool XM_CALLCONV MathLib_3DNowEnabled( void );
+[[nodiscard]] bool XM_CALLCONV MathLib_MMXEnabled( void );
+[[nodiscard]] bool XM_CALLCONV MathLib_SSEEnabled( void );
+[[nodiscard]] bool XM_CALLCONV MathLib_SSE2Enabled( void );
 
-float XM_CALLCONV Approach( float target, float value, float speed );
-float XM_CALLCONV ApproachAngle( float target, float value, float speed );
-float XM_CALLCONV AngleDiff( float destAngle, float srcAngle );
-float XM_CALLCONV AngleDistance( float next, float cur );
-float XM_CALLCONV AngleNormalize( float angle );
+[[nodiscard]] float XM_CALLCONV Approach( float target, float value, float speed );
+[[nodiscard]] float XM_CALLCONV ApproachAngle( float target, float value, float speed );
+[[nodiscard]] float XM_CALLCONV AngleDiff( float destAngle, float srcAngle );
+[[nodiscard]] float XM_CALLCONV AngleDistance( float next, float cur );
+[[nodiscard]] float XM_CALLCONV AngleNormalize( float angle );
 
 // ensure that 0 <= angle <= 360
-float XM_CALLCONV AngleNormalizePositive( float angle );
+[[nodiscard]] float XM_CALLCONV AngleNormalizePositive( float angle );
 
-bool XM_CALLCONV AnglesAreEqual( float a, float b, float tolerance = 0.0f );
+[[nodiscard]] bool XM_CALLCONV AnglesAreEqual( float a, float b, float tolerance = 0.0f );
 
 
 void XM_CALLCONV RotationDeltaAxisAngle( const QAngle &srcAngles, const QAngle &destAngles, Vector &deltaAxis, float &deltaAngle );
 void XM_CALLCONV RotationDelta( const QAngle &srcAngles, const QAngle &destAngles, QAngle *out );
 
 void XM_CALLCONV ComputeTrianglePlane( const Vector& v1, const Vector& v2, const Vector& v3, Vector& normal, float& intercept );
-int XM_CALLCONV PolyFromPlane( Vector *outVerts, const Vector& normal, float dist, float fHalfScale = 9000.0f );
-int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vector& normal, float dist, float fOnPlaneEpsilon = 0.1f );
-int XM_CALLCONV ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, const double *normal, double dist, double fOnPlaneEpsilon = 0.1 );
+[[nodiscard]] int XM_CALLCONV PolyFromPlane( Vector *outVerts, const Vector& normal, float dist, float fHalfScale = 9000.0f );
+[[nodiscard]] int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vector& normal, float dist, float fOnPlaneEpsilon = 0.1f );
+[[nodiscard]] int XM_CALLCONV ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, const double *normal, double dist, double fOnPlaneEpsilon = 0.1 );
 
 //-----------------------------------------------------------------------------
 // Computes a reasonable tangent space for a triangle
@@ -1920,7 +1964,7 @@ inline void XM_CALLCONV MatrixITransformPlane( const matrix3x4_t &src, const cpl
 	outPlane.dist -= outPlane.normal.x * vecInvTranslation[0] + outPlane.normal.y * vecInvTranslation[1] + outPlane.normal.z * vecInvTranslation[2];
 }
 
-constexpr inline int XM_CALLCONV CeilPow2( int in )
+[[nodiscard]] constexpr inline int XM_CALLCONV CeilPow2( int in )
 {
 	int retval = 1;
 	while( retval < in )
@@ -1928,7 +1972,7 @@ constexpr inline int XM_CALLCONV CeilPow2( int in )
 	return retval;
 }
 
-constexpr inline int XM_CALLCONV FloorPow2( int in )
+[[nodiscard]] constexpr inline int XM_CALLCONV FloorPow2( int in )
 {
 	int retval = 1;
 	while( retval < in )
@@ -2204,21 +2248,21 @@ void XM_CALLCONV HSVtoRGB( const Vector &hsv, Vector &rgb );
 // Fast version of pow and log
 //-----------------------------------------------------------------------------
 
-float XM_CALLCONV FastLog2(float i);			// log2( i )
-float XM_CALLCONV FastPow2(float i);			// 2^i
-float XM_CALLCONV FastPow(float a, float b);	// a^b
-float XM_CALLCONV FastPow10( float i );			// 10^i
+[[nodiscard]] float XM_CALLCONV FastLog2(float i);			// log2( i )
+[[nodiscard]] float XM_CALLCONV FastPow2(float i);			// 2^i
+[[nodiscard]] float XM_CALLCONV FastPow(float a, float b);	// a^b
+[[nodiscard]] float XM_CALLCONV FastPow10( float i );			// 10^i
 
 //-----------------------------------------------------------------------------
 // For testing float equality
 //-----------------------------------------------------------------------------
 
-inline bool XM_CALLCONV CloseEnough( float a, float b, float epsilon = EQUAL_EPSILON )
+[[nodiscard]] inline bool XM_CALLCONV CloseEnough( float a, float b, float epsilon = EQUAL_EPSILON )
 {
 	return fabsf( a - b ) <= epsilon;
 }
 
-inline bool XM_CALLCONV CloseEnough( const Vector &a, const Vector &b, float epsilon = EQUAL_EPSILON )
+[[nodiscard]] inline bool XM_CALLCONV CloseEnough( const Vector &a, const Vector &b, float epsilon = EQUAL_EPSILON )
 {
 	return
 		CloseEnough( a.x, b.x, epsilon ) &&
@@ -2234,9 +2278,9 @@ inline bool XM_CALLCONV CloseEnough( const Vector &a, const Vector &b, float eps
 // maxUlps can also be interpreted in terms of how many representable floats we
 // are willing to accept between A and B.  This function will allow maxUlps-1
 // floats between A and B.
-bool XM_CALLCONV AlmostEqual(float a, float b, int maxUlps = 10);
+[[nodiscard]] bool XM_CALLCONV AlmostEqual(float a, float b, int maxUlps = 10);
 
-inline bool XM_CALLCONV AlmostEqual( const Vector &a, const Vector &b, int maxUlps = 10)
+[[nodiscard]] inline bool XM_CALLCONV AlmostEqual( const Vector &a, const Vector &b, int maxUlps = 10)
 {
 	return AlmostEqual( a.x, b.x, maxUlps ) &&
 		AlmostEqual( a.y, b.y, maxUlps ) &&

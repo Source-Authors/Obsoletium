@@ -19,13 +19,12 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE comctl32.lib winmm.lib"
-		$Version							"1.1"
+		$AdditionalDependencies				"$BASE Advapi32.lib Comctl32.lib Comdlg32.lib Gdi32.lib winmm.lib Shell32.lib User32.lib"
 		$EntryPoint							"mainCRTStartup"
 	}
 }
 
-$Project "Hlmv"
+$Project "hlmv"
 {
 	$Folder	"Source Files"
 	{
@@ -47,7 +46,6 @@ $Project "Hlmv"
 
 	$Folder "Header Files"
 	{
-		$File	"anorms.h"
 		$File	"attachments_window.h"
 		$File	"controlpanel.h"
 		$File	"debugdrawmodel.h"
@@ -66,6 +64,7 @@ $Project "Hlmv"
 
 	$Folder "External Source Files"
 	{
+		$File	"..\common\tools_minidump.cpp"
 		$File	"$SRCDIR\public\bone_setup.cpp"
 		$File	"$SRCDIR\public\collisionutils.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
@@ -76,6 +75,10 @@ $Project "Hlmv"
 
 	$Folder	"External Header Files"
 	{
+		$File	"debugdrawmodel.h"
+		$File	"..\common\cmdlib.h"
+		$File	"..\common\physdll.h"
+		$File	"..\common\tools_minidump.h"
 		$File	"$SRCDIR\public\basehandle.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\bitvec.h"
@@ -83,7 +86,6 @@ $Project "Hlmv"
 		$File	"$SRCDIR\public\bone_setup.h"
 		$File	"$SRCDIR\public\bspflags.h"
 		$File	"$SRCDIR\public\tier1\characterset.h"
-		$File	"..\common\cmdlib.h"
 		$File	"$SRCDIR\public\cmodel.h"
 		$File	"$SRCDIR\public\CollisionUtils.h"
 		$File	"$SRCDIR\public\tier0\commonmacros.h"
@@ -91,7 +93,6 @@ $Project "Hlmv"
 		$File	"$SRCDIR\public\const.h"
 		$File	"$SRCDIR\public\vphysics\constraints.h"
 		$File	"$SRCDIR\public\tier0\dbg.h"
-		$File	"debugdrawmodel.h"
 		$File	"$SRCDIR\public\tier0\fasttimer.h"
 		$File	"$SRCDIR\public\filesystem.h"
 		$File	"$SRCDIR\public\filesystem_helpers.h"
@@ -118,7 +119,6 @@ $Project "Hlmv"
 		$File	"$SRCDIR\public\tier1\mempool.h"
 		$File	"$SRCDIR\public\mouthinfo.h"
 		$File	"$SRCDIR\public\phyfile.h"
-		$File	"..\common\physdll.h"
 		$File	"$SRCDIR\public\tier0\platform.h"
 		$File	"$SRCDIR\public\tier0\protected_things.h"
 		$File	"$SRCDIR\public\vstdlib\random.h"
@@ -188,7 +188,7 @@ $Project "Hlmv"
 	$Folder	"Resources"
 	{
 		$File	"hlmv.rc"
-		$File	"icon1.ico"
+		$File	"resources\app.ico"
 		$File	"resource.h"
 	}
 

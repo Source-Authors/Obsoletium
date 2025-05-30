@@ -24,7 +24,7 @@ void CDmeTimeSelection::OnConstruction()
 
 	m_threshold.InitAndSet( this, "threshold", 0.0005f );
 
-	m_nRecordingState.InitAndSet( this, "recordingstate", 3 /*AS_PLAYBACK :  HACK THIS SHOULD MOVE TO A PUBLIC HEADER*/ );
+	m_nRecordingState.InitAndSet( this, "recordingstate", (RecordingState_t)3 /*AS_PLAYBACK :  HACK THIS SHOULD MOVE TO A PUBLIC HEADER*/ );
 }
 
 
@@ -143,14 +143,14 @@ void CDmeTimeSelection::GetAlphaForTime( DmeTime_t t, DmeTime_t curtime, byte& a
 		t >= times[ 0 ] && t < times[ 1 ] )
 	{
 		float frac = GetFractionOfTime( t - times[ 0 ], dt1, false );
-		alpha = clamp( alpha * frac, minAlpha, 255 );
+		alpha = static_cast<byte>(clamp( static_cast<int>(alpha * frac), (int)minAlpha, 255 ));
 		return;
 	}
 	if ( dt2 > DmeTime_t( 0 ) &&
 		t > times[ 2 ] && t <= times[ 3 ] )
 	{
 		float frac = GetFractionOfTime( times[ 3 ] - t, dt2, false );
-		alpha = clamp( alpha * frac, minAlpha, 255 );
+		alpha = static_cast<byte>(clamp( static_cast<int>(alpha * frac), (int)minAlpha, 255 ));
 		return;
 	}
 	if ( t < times[ 0 ] )
@@ -319,10 +319,10 @@ float CDmeTimeSelection::GetThreshold()
 
 void CDmeTimeSelection::SetRecordingState( RecordingState_t state )
 {
-	m_nRecordingState = ( int )state;
+	m_nRecordingState = state;
 }
 
 RecordingState_t CDmeTimeSelection::GetRecordingState() const
 {
-	return ( RecordingState_t )m_nRecordingState.Get();
+	return m_nRecordingState.Get();
 }

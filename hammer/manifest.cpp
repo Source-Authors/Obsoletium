@@ -210,7 +210,7 @@ ChunkFileResult_t CManifest::LoadManifestVMFCallback( CChunkFile *pFile, CManife
 {
 	char FileName[ MAX_PATH ];
 
-	strcpy( FileName, pDoc->m_ManifestDir );
+	V_strcpy_safe( FileName, pDoc->m_ManifestDir );
 
 	CManifestMap	*pManifestMap = pDoc->CreateNewMap( FileName, "", false );
 	SetActiveMapDoc( pManifestMap->m_Map );
@@ -370,8 +370,8 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 		return false;
 	}
 
-	V_StripExtension( pszFileName, m_ManifestDir, sizeof( m_ManifestDir ) );
-	strcat( m_ManifestDir, "\\" );
+	V_StripExtension( pszFileName, m_ManifestDir );
+	V_strcat_safe( m_ManifestDir, "\\" );
 
 	CChunkFile File;
 	ChunkFileResult_t eResult = File.Open( pszFileName, ChunkFile_Read );
@@ -486,12 +486,12 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	UserNameSize = sizeof( UserName );
 	if ( GetUserName( UserName, &UserNameSize ) == 0 )
 	{
-		strcpy( UserPrefsFileName, "default" );
+		V_strcpy_safe( UserPrefsFileName, "default" );
 	}
 
-	strcpy( FileName, m_ManifestDir );
-	sprintf( UserPrefsFileName, "%s.vmm_prefs", UserName );
-	strcat( FileName, UserPrefsFileName );
+	V_strcpy_safe( FileName, m_ManifestDir );
+	V_sprintf_safe( UserPrefsFileName, "%s.vmm_prefs", UserName );
+	V_strcat_safe( FileName, UserPrefsFileName );
 
 	FILE *fp = fopen( FileName, "rb" );
 	if ( !fp )
@@ -610,29 +610,61 @@ bool CManifest::SaveVMFManifest( const char *pszFileName )
 	ChunkFileResult_t eResult = File.Open( pszFileName, ChunkFile_Write );
 	if (eResult != ChunkFile_Ok)
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error saving Manifest!" , MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest", MB_OK | MB_ICONEXCLAMATION );
 		bSaved = false;
 	}
 	else
 	{
 		eResult = File.BeginChunk( "Info" );
-		eResult = File.WriteKeyValueInt( "NextInternalID", m_NextInternalID );
-		eResult = File.EndChunk();
+		
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.WriteKeyValueInt( "NextInternalID", m_NextInternalID );
+		}
 
-		eResult = File.BeginChunk( "Maps" );
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.EndChunk();
+		}
+		
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.BeginChunk( "Maps" );
+		}
+		
+		// dimhotepus: Check result.
 		if (eResult == ChunkFile_Ok)
 		{
 			for( int i = 0; i < GetNumMaps(); i++ )
 			{
-				CManifestMap	*pManifestMap = GetMap( i );
-
-				eResult = File.BeginChunk("VMF");
+				// dimhotepus: Check result.
 				if (eResult == ChunkFile_Ok)
 				{
+					eResult = File.BeginChunk("VMF");
+				}
+
+				if (eResult == ChunkFile_Ok)
+				{
+					CManifestMap	*pManifestMap = GetMap( i );
+
 					eResult = File.WriteKeyValue( "Name", pManifestMap->m_FriendlyName );
-					eResult = File.WriteKeyValue( "File", pManifestMap->m_RelativeMapFileName );
-					eResult = File.WriteKeyValueInt( "InternalID", pManifestMap->m_InternalID );
-					if ( pManifestMap->m_bTopLevelMap == true )
+					
+					// dimhotepus: Check result.
+					if (eResult == ChunkFile_Ok)
+					{
+						eResult = File.WriteKeyValue( "File", pManifestMap->m_RelativeMapFileName );
+					}
+					
+					// dimhotepus: Check result.
+					if (eResult == ChunkFile_Ok)
+					{
+						eResult = File.WriteKeyValueInt( "InternalID", pManifestMap->m_InternalID );
+					}
+
+					if (eResult == ChunkFile_Ok && pManifestMap->m_bTopLevelMap == true )
 					{
 						eResult = File.WriteKeyValue( "TopLevel", "1" );
 					}
@@ -648,16 +680,17 @@ bool CManifest::SaveVMFManifest( const char *pszFileName )
 		}
 		else
 		{
-			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error saving Manifest!", MB_OK | MB_ICONEXCLAMATION );
+			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest", MB_OK | MB_ICONEXCLAMATION );
 			bSaved = false;
 		}
 
-		File.Close();
+		// dimhotepus: Check result.
+		eResult = File.Close();
 	}
 
-	V_StripExtension( pszFileName, m_ManifestDir, sizeof( m_ManifestDir ) );
+	V_StripExtension( pszFileName, m_ManifestDir );
 	CreateDirectory( m_ManifestDir, NULL );
-	strcat( m_ManifestDir, "\\" );
+	V_strcat_safe( m_ManifestDir, "\\" );
 
 	if ( bSaved )
 	{
@@ -686,8 +719,8 @@ bool CManifest::SaveVMFManifestMaps( const char *pszFileName )
 		{
 			char FileName[ MAX_PATH ];
 
-			strcpy( FileName, m_ManifestDir );
-			strcat( FileName, pManifestMap->m_RelativeMapFileName );
+			V_strcpy_safe( FileName, m_ManifestDir );
+			V_strcat_safe( FileName, pManifestMap->m_RelativeMapFileName );
 			pManifestMap->m_AbsoluteMapFileName = FileName;
 		}
 
@@ -724,17 +757,17 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 	UserNameSize = sizeof( UserName );
 	if ( GetUserName( UserName, &UserNameSize ) == 0 )
 	{
-		strcpy( UserPrefsFileName, "default" );
+		V_strcpy_safe( UserPrefsFileName, "default" );
 	}
 
-	strcpy( FileName, m_ManifestDir );
-	sprintf( UserPrefsFileName, "%s.vmm_prefs", UserName );
-	strcat( FileName, UserPrefsFileName );
+	V_strcpy_safe( FileName, m_ManifestDir );
+	V_sprintf_safe( UserPrefsFileName, "%s.vmm_prefs", UserName );
+	V_strcat_safe( FileName, UserPrefsFileName );
 
 	ChunkFileResult_t eResult = File.Open( FileName, ChunkFile_Write );
 	if (eResult != ChunkFile_Ok)
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error saving Manifest User Prefs!" , MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest User Prefs" , MB_OK | MB_ICONEXCLAMATION );
 		bSaved = false;
 	}
 	else
@@ -744,21 +777,29 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 		{
 			for( int i = 0; i < GetNumMaps(); i++ )
 			{
-				CManifestMap	*pManifestMap = GetMap( i );
-
-				eResult = File.BeginChunk("VMF");
+				// dimhotepus: Check result.
 				if (eResult == ChunkFile_Ok)
 				{
+					eResult = File.BeginChunk("VMF");
+				}
+
+				if (eResult == ChunkFile_Ok)
+				{
+					CManifestMap	*pManifestMap = GetMap( i );
+
 					eResult = File.WriteKeyValueInt( "InternalID", pManifestMap->m_InternalID );
-					if ( pManifestMap->m_bPrimaryMap )
+					// dimhotepus: Check result.
+					if ( eResult == ChunkFile_Ok && pManifestMap->m_bPrimaryMap )
 					{
 						eResult = File.WriteKeyValue( "IsPrimary", "1" );
 					}
-					if ( pManifestMap->m_bProtected == true )
+					// dimhotepus: Check result.
+					if ( eResult == ChunkFile_Ok && pManifestMap->m_bProtected == true )
 					{
 						eResult = File.WriteKeyValue( "IsProtected", "1" );
 					}
-					if ( pManifestMap->m_bVisible == false )
+					// dimhotepus: Check result.
+					if ( eResult == ChunkFile_Ok && pManifestMap->m_bVisible == false )
 					{
 						eResult = File.WriteKeyValue( "IsVisible", "0" );
 					}
@@ -774,12 +815,16 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 		}
 		else
 		{
-			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error saving Manifest User Prefs!", MB_OK | MB_ICONEXCLAMATION );
+			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest User Prefs", MB_OK | MB_ICONEXCLAMATION );
 			bSaved = false;
 		}
 
 		eResult = File.BeginChunk( "cordoning" );
-		eResult = CordonSaveVMF( &File, NULL );
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = CordonSaveVMF( &File, NULL );
+		}
 
 		if ( m_bIsCordoning )
 		{
@@ -789,10 +834,25 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 			CMapWorld *pCordonWorld = CordonCreateWorld();
 			eResult = pCordonWorld->SaveSolids( &File, &SaveInfo, 0 );
 		}
-
-		eResult = File.EndChunk();
-
-		File.Close();
+		
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.EndChunk();
+		}
+		
+		// dimhotepus: Check result.
+		if (eResult == ChunkFile_Ok)
+		{
+			eResult = File.Close();
+		}
+		
+		// dimhotepus: Check result.
+		if (eResult != ChunkFile_Ok)
+		{
+			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest User Prefs", MB_OK | MB_ICONEXCLAMATION );
+			bSaved = false;
+		}
 	}
 
 	if ( bSaved )
@@ -881,10 +941,10 @@ void CManifest::SetModifiedFlag( BOOL bModified )
 // Input  : pManifestMapFileName - the relative name of the sub map
 // Output : pOutputPath - the full path to the sub map
 //-----------------------------------------------------------------------------
-void CManifest::GetFullMapPath( const char *pManifestMapFileName, char *pOutputPath )
+void CManifest::GetFullMapPath( const char *pManifestMapFileName, OUT_Z_CAP(outSize) char *pOutputPath, intp outSize )
 {
-	strcpy( pOutputPath, m_ManifestDir );
-	strcat( pOutputPath, pManifestMapFileName );
+	V_strncpy( pOutputPath, m_ManifestDir, outSize );
+	V_strncat( pOutputPath, pManifestMapFileName, outSize );
 }
 
 
@@ -1111,8 +1171,8 @@ CManifestMap *CManifest::MoveSelectionToNewSubmap( CString &FriendlyName, CStrin
 	
 	char AbsoluteFileName[ MAX_PATH ];
 
-	strcpy( AbsoluteFileName, m_ManifestDir );
-	strcat( AbsoluteFileName, FileName );
+	V_strcpy_safe( AbsoluteFileName, m_ManifestDir );
+	V_strcat_safe( AbsoluteFileName, FileName );
 
 	CManifestMap	*pManifestMap = CreateNewMap( AbsoluteFileName, FileName, true );
 	pManifestMap->m_FriendlyName = FriendlyName;
@@ -1152,8 +1212,8 @@ CManifestMap *CManifest::AddNewSubmap( CString &FriendlyName, CString &FileName 
 {
 	char AbsoluteFileName[ MAX_PATH ];
 
-	strcpy( AbsoluteFileName, m_ManifestDir );
-	strcat( AbsoluteFileName, FileName );
+	V_strcpy_safe( AbsoluteFileName, m_ManifestDir );
+	V_strcat_safe( AbsoluteFileName, FileName );
 
 	CManifestMap	*pManifestMap = CreateNewMap( AbsoluteFileName, FileName, true );
 
@@ -1194,10 +1254,10 @@ bool CManifest::AddExistingMap( const char *pszFileName, bool bFromInstance )
 	char FileExt[ MAX_PATH ];
 
 	_splitpath_s( pszFileName, NULL, 0, NULL, 0, RelativeFileName, sizeof( RelativeFileName ), FileExt, sizeof( FileExt ) );
-	strcat( RelativeFileName, FileExt );
+	V_strcat_safe( RelativeFileName, FileExt );
 
-	strcpy( AbsoluteFileName, m_ManifestDir );
-	strcat( AbsoluteFileName, RelativeFileName );
+	V_strcpy_safe( AbsoluteFileName, m_ManifestDir );
+	V_strcat_safe( AbsoluteFileName, RelativeFileName );
 	CManifestMap	*pManifestMap = CreateNewMap( AbsoluteFileName, RelativeFileName, true );
 
 	m_bLoading = true;
@@ -1237,8 +1297,8 @@ bool CManifest::AddExistingMap( const char *pszFileName, bool bFromInstance )
 	{
 		char	ManifestFile[ MAX_PATH ];
 
-		strcpy( ManifestFile, pszFileName );
-		V_SetExtension( ManifestFile, ".vmm", sizeof( ManifestFile ) );
+		V_strcpy_safe( ManifestFile, pszFileName );
+		V_SetExtension( ManifestFile, ".vmm" );
 
 		m_bRelocateSave = true;
 		OnSaveDocument( ManifestFile );
@@ -1261,7 +1321,7 @@ bool CManifest::AddExistingMap( void )
 	V_strcpy_safe( szInitialDir, GetPathName() );
 	if ( szInitialDir[ 0 ] == '\0' )
 	{
-		strcpy( szInitialDir, g_pGameConfig->szMapDir );
+		V_strcpy_safe( szInitialDir, g_pGameConfig->szMapDir );
 	}
 
 	CFileDialog dlg( TRUE, NULL, NULL, OFN_LONGNAMES | OFN_HIDEREADONLY | OFN_NOCHANGEDIR, "Valve Map Files (*.vmf)|*.vmf||" );
@@ -1280,7 +1340,7 @@ bool CManifest::AddExistingMap( void )
 	int nSlash = str.ReverseFind( '\\' );
 	if ( nSlash != -1 )
 	{
-		strcpy( szInitialDir, str.Left( nSlash ) );
+		V_strcpy_safe( szInitialDir, str.Left( nSlash ) );
 	}
 
 	if ( str.Find('.') == -1 )

@@ -195,7 +195,7 @@ CON_COMMAND_F( replay_printclientreplays, "Prints out all client replay info", F
 
 		// TODO: All of this should go into a virtual function in CReplay, rather than some here and some in DumpGameSpecificData()
 		char szTitle[MAX_REPLAY_TITLE_LENGTH];
-		g_pVGuiLocalize->ConvertUnicodeToANSI( pReplay->m_wszTitle, szTitle, sizeof( szTitle ) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( pReplay->m_wszTitle, szTitle );
 		Msg( "replay %i: \"%s\"\n", i, szTitle );
 		Msg( "  handle: %i\n", pReplay->GetHandle() );
 		Msg( "  spawn/death tick: %i / %i\n", nSpawnTick, nDeathTick );
@@ -232,7 +232,7 @@ CON_COMMAND_F( replay_printclientreplays, "Prints out all client replay info", F
 		for ( intp i = 0; i < nPerfCount; ++i )
 		{
 			const CReplayPerformance *pCurPerformance = pReplay->GetPerformance( i );
-			g_pVGuiLocalize->ConvertUnicodeToANSI( pCurPerformance->m_wszTitle, szTitle, sizeof( szTitle ) );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( pCurPerformance->m_wszTitle, szTitle );
 			Msg( "    performance %zd:\n", i );
 			Msg( "      title: %s\n", szTitle );
 			Msg( "      ticks: in=%i  out=%i\n", pCurPerformance->m_nTickIn, pCurPerformance->m_nTickOut );
@@ -318,7 +318,7 @@ CON_COMMAND_F( replay_printqueuedtakes, "Print a list of takes queued for render
 
 		if ( iPerf == -1 )
 		{
-			V_strcpy( szTakeName, "original" );
+			V_strcpy_safe( szTakeName, "original" );
 		}
 		else
 		{

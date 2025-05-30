@@ -977,7 +977,7 @@ void CNPC_Stalker::DoSmokeEffect( const Vector &position )
 	if ( gpGlobals->curtime > m_nextSmokeTime )
 	{
 		m_nextSmokeTime = gpGlobals->curtime + 0.5f;
-		UTIL_Smoke(position, random->RandomInt(5, 10), 10);
+		UTIL_Smoke(position, random->RandomFloat(5, 10), 10);
 	}
 }
 
@@ -1267,7 +1267,7 @@ void CNPC_Stalker::HandleAnimEvent( animevent_t *pEvent )
 			{
 				if ( pHurt->GetFlags() & (FL_NPC|FL_CLIENT) )
 				{
-					pHurt->ViewPunch( QAngle( 5, 0, random->RandomInt(-10,10)) );
+					pHurt->ViewPunch( QAngle( 5, 0, random->RandomFloat(-10,10)) );
 				}
 				
 				// Spawn some extra blood if we hit a BCC

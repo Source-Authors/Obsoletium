@@ -211,10 +211,10 @@ void CMDLSequencePicker::RefreshActivitiesAndSequencesList()
 				// Multiple sequences can have the same activity name; only add unique activity names
 				if ( activityNames.Find( pActivityName ) == activityNames.InvalidIndex() )
 				{
-					KeyValues *pkv = new KeyValues("node", "activity", pActivityName );
+					KeyValuesAD pkv( new KeyValues("node", "activity", pActivityName ) );
 					int nItemID = m_pActivitiesList->AddItem( pkv, 0, false, false );
 
-					KeyValues *pDrag = new KeyValues( "drag", "text", pActivityName );
+					KeyValuesAD pDrag( new KeyValues( "drag", "text", pActivityName ) );
 					pDrag->SetString( "texttype", "activityName" );
 					pDrag->SetString( "mdl", vgui::MDLCache()->GetModelName( m_hSelectedMDL ) );
 					m_pActivitiesList->SetItemDragData( nItemID, pDrag );
@@ -226,12 +226,12 @@ void CMDLSequencePicker::RefreshActivitiesAndSequencesList()
 			const char *pSequenceName = hdr->pSeqdesc(j).pszLabel();
 			if ( pSequenceName && pSequenceName[0] )
 			{
-				KeyValues *pkv = new KeyValues("node", "sequence", pSequenceName);
+				KeyValuesAD pkv( new KeyValues("node", "sequence", pSequenceName) );
 				pkv->SetInt( "seqindex", j );
 
 				int nItemID = m_pSequencesList->AddItem( pkv, 0, false, false );
 
-				KeyValues *pDrag = new KeyValues( "drag", "text", pSequenceName );
+				KeyValuesAD pDrag( new KeyValues( "drag", "text", pSequenceName ) );
 				pDrag->SetString( "texttype", "sequenceName" );
 				pDrag->SetString( "mdl", vgui::MDLCache()->GetModelName( m_hSelectedMDL ) );
 				m_pSequencesList->SetItemDragData( nItemID, pDrag );
@@ -422,7 +422,7 @@ void CMDLSequencePicker::OnFileSelected()
 	const char *pFullPathName = pkv->GetString( "path" );
 
 	char pRelativePathName[MAX_PATH];
-	g_pFullFileSystem->FullPathToRelativePath( pFullPathName, pRelativePathName, sizeof(pRelativePathName) );
+	g_pFullFileSystem->FullPathToRelativePath_safe( pFullPathName, pRelativePathName );
 
 	// FIXME: Check that we're not actually opening the wrong file!!
 	SelectMDL( pRelativePathName );

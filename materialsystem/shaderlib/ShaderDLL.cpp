@@ -30,8 +30,8 @@ public:
 	// methods of IShaderDLL
 	virtual bool Connect( CreateInterfaceFn factory );
 	virtual void Disconnect();
-	int ShaderCount() const override;
-	IShader *GetShader( int nShader ) override;
+	intp ShaderCount() const override;
+	IShader *GetShader( intp nShader ) override;
 
 	// methods of IShaderDLLInternal
 	bool Connect( CreateInterfaceFn factory, bool bIsMaterialSystem ) override;
@@ -144,12 +144,12 @@ void CShaderDLL::Disconnect()
 //-----------------------------------------------------------------------------
 // Iterates over all shaders
 //-----------------------------------------------------------------------------
-int CShaderDLL::ShaderCount() const
+intp CShaderDLL::ShaderCount() const
 {
 	return m_ShaderList.Count();
 }
 
-IShader *CShaderDLL::GetShader( int nShader ) 
+IShader *CShaderDLL::GetShader( intp nShader ) 
 {
 	if ( ( nShader < 0 ) || ( nShader >= m_ShaderList.Count() ) )
 		return NULL;

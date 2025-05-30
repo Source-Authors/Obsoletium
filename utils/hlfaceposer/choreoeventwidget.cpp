@@ -4,9 +4,8 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <stdio.h>
-#include "hlfaceposer.h"
 #include "choreoeventwidget.h"
+#include "hlfaceposer.h"
 #include "choreochannelwidget.h"
 #include "choreowidgetdrawhelper.h"
 #include "choreoview.h"
@@ -60,7 +59,7 @@ const char *CChoreoEventWidget::GetLabelText( void )
 	static char label[ 256 ];
 	if ( GetEvent()->GetType() == CChoreoEvent::EXPRESSION )
 	{
-		sprintf( label, "%s : %s", GetEvent()->GetParameters(), GetEvent()->GetParameters2() );
+		V_sprintf_safe( label, "%s : %s", GetEvent()->GetParameters(), GetEvent()->GetParameters2() );
 	}
 	else
 	{
@@ -273,7 +272,7 @@ COLORREF CChoreoEventWidget::GrayOutColor( COLORREF clr )
 	g = GetGValue( clr );
 	b = GetBValue( clr );
 	int val = ( r + g + b ) / 3;
-	val += ( 255 - val ) * 0.25f;
+	val += ( 255 - val ) / 4;
 
 	clr = RGB( val, val, val );
 	return clr;

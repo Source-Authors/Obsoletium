@@ -7,7 +7,7 @@
 
 // Valve includes
 #include "datamodel/dmelementfactoryhelper.h"
-#include "mdlobjects/dmeBoneFlexDriver.h"
+#include "mdlobjects/dmeboneflexdriver.h"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -88,7 +88,7 @@ CDmeBoneFlexDriverControl *CDmeBoneFlexDriver::FindOrCreateControl( const char *
 {
 	CDmeBoneFlexDriverControl *pDmeBoneFlexDriverControl = NULL;
 
-	for ( int i = 0; i < m_eControlList.Count(); ++i )
+	for ( intp i = 0; i < m_eControlList.Count(); ++i )
 	{
 		pDmeBoneFlexDriverControl = m_eControlList[i];
 		if ( !pDmeBoneFlexDriverControl )
@@ -142,7 +142,7 @@ CDmeBoneFlexDriver *CDmeBoneFlexDriverList::FindOrCreateBoneFlexDriver( const ch
 {
 	CDmeBoneFlexDriver *pDmeBoneFlexDriver = NULL;
 
-	for ( int i = 0; i < m_eBoneFlexDriverList.Count(); ++i )
+	for ( intp i = 0; i < m_eBoneFlexDriverList.Count(); ++i )
 	{
 		pDmeBoneFlexDriver = m_eBoneFlexDriverList[i];
 		if ( !pDmeBoneFlexDriver )

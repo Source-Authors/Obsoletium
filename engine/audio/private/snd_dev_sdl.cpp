@@ -201,15 +201,12 @@ void CAudioDeviceSDLAudio::OpenWaveOut( void )
 
 #ifndef WIN32
 	char appname[ 256 ];
-	KeyValues *modinfo = new KeyValues( "ModInfo" );
+	KeyValuesAD modinfo( "ModInfo" );
 
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 		Q_strncpy( appname, modinfo->GetString( "game" ), sizeof( appname ) );
 	else
 		Q_strncpy( appname, "Source1 Game", sizeof( appname ) );
-
-	modinfo->deleteThis();
-	modinfo = NULL;
 
 	// Set these environment variables, in case we're using PulseAudio.
 	setenv("PULSE_PROP_application.name", appname, 1);
@@ -284,7 +281,7 @@ void CAudioDeviceSDLAudio::CloseWaveOut( void )
 void CAudioDeviceSDLAudio::AllocateOutputBuffers()
 {
 	// Allocate and lock memory for the waveform data.  
-	const int nBufferSize = WAV_BUFFER_SIZE * WAV_BUFFERS;
+	constexpr int nBufferSize = WAV_BUFFER_SIZE * WAV_BUFFERS;
 	m_pBuffer = new uint8_t[nBufferSize];
 	memset(m_pBuffer, '\0', nBufferSize);
 	m_readPos = 0;
@@ -359,12 +356,6 @@ void CAudioDeviceSDLAudio::AudioCallback(Uint8 *stream, int len)
 		{
 			const uint8_t *buf = m_pBuffer + m_readPos;
 			debugsdl("SDLAUDIO: Writing %d bytes...\n", writeLen);
-
-			#if 0
-			static FILE *io = NULL;
-			if (io == NULL) io = fopen("dumpplayback.raw", "wb");
-			if (io != NULL) { fwrite(buf, writeLen, 1, io); fflush(io); }
-			#endif
 
 			memcpy(stream, buf, writeLen);
 			stream += writeLen;

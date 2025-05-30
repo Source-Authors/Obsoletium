@@ -1,3 +1,5 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 
-extern "C" int V_tier0_stricmp(const char *s1, const char *s2 );
+#include "tier0/annotations.h"
+
+extern "C" [[nodiscard]] int V_tier0_stricmp( IN_Z const char *s1, IN_Z const char *s2 );

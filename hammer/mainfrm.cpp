@@ -158,6 +158,7 @@ static UINT indicators[] =
 
 const int NUMSTATUSPANES = 7;
 
+constexpr inline char WINSTATEFILENAME[] = "winstate.wc";
 
 const char * WINSTATETAG = "WCWINSTATE";
 const int	 WINSTATEEND = -1;
@@ -1312,7 +1313,7 @@ void CMainFrame::SaveWindowStates(std::fstream *pFile)
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	Q_MakeAbsolutePath( szFullPath, MAX_PATH, "winstate.wc", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, WINSTATEFILENAME, szRootDir ); 
 
 	std::fstream file(szFullPath, std::ios::out | std::ios::binary);
 
@@ -1400,7 +1401,7 @@ void CMainFrame::LoadWindowStates(std::fstream *pFile)
 	char szRootDir[MAX_PATH];
 	char szFullPath[MAX_PATH];
 	APP()->GetDirectory(DIR_PROGRAM, szRootDir);
-	Q_MakeAbsolutePath( szFullPath, MAX_PATH, "winstate.wc", szRootDir ); 
+	V_MakeAbsolutePath( szFullPath, WINSTATEFILENAME, szRootDir ); 
 
 	std::fstream file( szFullPath, std::ios::in | std::ios::binary );
 

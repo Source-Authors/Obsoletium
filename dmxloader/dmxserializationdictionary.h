@@ -23,7 +23,7 @@ class CDmxElement;
 //-----------------------------------------------------------------------------
 // Element dictionary used in unserialization
 //-----------------------------------------------------------------------------
-typedef int DmxSerializationHandle_t;
+typedef intp DmxSerializationHandle_t;
 enum
 {
 	DMX_SERIALIZATION_HANDLE_INVALID = (DmxSerializationHandle_t)~0
@@ -56,7 +56,7 @@ public:
 	DmxSerializationHandle_t Find( CDmxElement *pElement );
 
 	// How many root elements do we have?
-	int RootElementCount() const;
+	intp RootElementCount() const;
 
 private:
 	struct DmxElementInfo_t

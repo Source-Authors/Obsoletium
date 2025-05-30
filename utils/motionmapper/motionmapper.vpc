@@ -6,6 +6,9 @@
 
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+$Macro NVTRISTRIPSSRCDIR	"$SRCDIR\thirdparty\nvtristrip"
+$Macro NVTRISTRIPOUTDIRDEBUG		"$NVTRISTRIPSSRCDIR\out\Debug"
+$Macro NVTRISTRIPOUTDIRRELEASE		"$NVTRISTRIPSSRCDIR\out\Release"
 
 $Include "$SRCDIR\vpc_scripts\source_exe_con_base.vpc"
 
@@ -13,8 +16,8 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\common,..\nvtristriplib,$SRCDIR\Game_Shared"
-		$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE"
+		$AdditionalIncludeDirectories		"$BASE,..\common;$NVTRISTRIPSSRCDIR"
+		$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE;EXTERN"
 	}
 
 	$Linker
@@ -23,23 +26,48 @@ $Configuration
 	}
 }
 
-$Project "Motionmapper"
+$Configuration	"Debug"
+{
+	$Linker
+	{
+		$AdditionalLibraryDirectories		"$BASE;$NVTRISTRIPOUTDIRDEBUG"
+	
+		$AdditionalDependencies				"$BASE nvTriStrip.lib" [$WINDOWS]
+	}
+}
+
+$Configuration	"Release"
+{
+	$Linker
+	{
+		$AdditionalLibraryDirectories		"$BASE;$NVTRISTRIPOUTDIRRELEASE"
+	
+		$AdditionalDependencies				"$BASE nvTriStrip.lib" [$WINDOWS]
+	}
+}
+
+$Project "motionmapper"
 {
 	$Folder	"Source Files"
 	{
 		$File	"..\common\cmdlib.cpp"
+		$File	"..\common\filesystem_tools.cpp"
+		$File	"..\common\scriplib.cpp"
+		$File	"..\common\tools_minidump.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
 		$File	"$SRCDIR\public\filesystem_init.cpp"
-		$File	"..\common\filesystem_tools.cpp"
 		$File	"motionmapper.cpp"
-		$File	"..\common\scriplib.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
+		$File	"motionmapper.h"
+		$File	"..\common\cmdlib.h"
+		$File	"..\common\filesystem_tools.h"
+		$File	"..\common\scriplib.h"
+		$File	"..\common\tools_minidump.h"
 		$File	"$SRCDIR\public\tier0\basetypes.h"
 		$File	"$SRCDIR\public\tier1\characterset.h"
-		$File	"..\common\cmdlib.h"
 		$File	"$SRCDIR\public\Color.h"
 		$File	"$SRCDIR\public\tier0\commonmacros.h"
 		$File	"$SRCDIR\public\mathlib\compressed_vector.h"
@@ -47,7 +75,6 @@ $Project "Motionmapper"
 		$File	"$SRCDIR\public\tier0\fasttimer.h"
 		$File	"$SRCDIR\public\filesystem.h"
 		$File	"$SRCDIR\public\filesystem_helpers.h"
-		$File	"..\common\filesystem_tools.h"
 		$File	"$SRCDIR\public\appframework\IAppSystem.h"
 		$File	"$SRCDIR\public\tier0\icommandline.h"
 		$File	"$SRCDIR\public\vstdlib\IKeyValuesSystem.h"
@@ -58,10 +85,8 @@ $Project "Motionmapper"
 		$File	"$SRCDIR\public\tier0\memalloc.h"
 		$File	"$SRCDIR\public\tier0\memdbgoff.h"
 		$File	"$SRCDIR\public\tier0\memdbgon.h"
-		$File	"motionmapper.h"
 		$File	"$SRCDIR\public\tier0\platform.h"
 		$File	"$SRCDIR\public\tier0\protected_things.h"
-		$File	"..\common\scriplib.h"
 		$File	"$SRCDIR\public\string_t.h"
 		$File	"$SRCDIR\public\tier1\strtools.h"
 		$File	"$SRCDIR\public\studio.h"
@@ -81,7 +106,6 @@ $Project "Motionmapper"
 	$Folder	"Link Libraries"
 	{
 		$Lib mathlib
-		$Lib nvtristrip
 		$Lib tier2
 	}
 }

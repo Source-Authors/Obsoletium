@@ -82,7 +82,7 @@ void C_SlideshowDisplay::OnDataChanged( DataUpdateType_t updateType )
 	}
 }
 
-int C_SlideshowDisplay::GetMaterialIndex( int iSlideIndex )
+int C_SlideshowDisplay::GetMaterialIndex( intp iSlideIndex )
 {
 	if ( !m_SlideMaterialLists[ 0 ] )
 		return 0;
@@ -90,7 +90,7 @@ int C_SlideshowDisplay::GetMaterialIndex( int iSlideIndex )
 	return m_SlideMaterialLists[ 0 ]->iSlideMaterials[ iSlideIndex ];
 }
 
-int C_SlideshowDisplay::NumMaterials( void )
+intp C_SlideshowDisplay::NumMaterials( void )
 {
 	if ( !m_SlideMaterialLists[ 0 ] )
 		return 0;
@@ -199,75 +199,30 @@ void C_SlideshowDisplay::BuildSlideShowImagesList( void )
 	FileFindHandle_t matHandle;
 	char szDirectory[_MAX_PATH];
 	char szMatFileName[_MAX_PATH] = {'\0'};
-	char szFileBuffer[ SLIDESHOW_LIST_BUFFER_MAX ];
-	char *pchCurrentLine = NULL;
 
-	if ( IsX360() )
+	V_sprintf_safe( szDirectory, "materials/vgui/%s/*.vmt", m_szSlideshowDirectory );
 	{
-		Q_snprintf( szDirectory, sizeof( szDirectory ), "materials/vgui/%s/slides.txt", m_szSlideshowDirectory );
-
-		FileHandle_t fh = g_pFullFileSystem->Open( szDirectory, "rt" );
-		if ( !fh )
-		{
-			DevWarning( "Couldn't read slideshow image file %s!", szDirectory );
-			return;
-		}
-
-		int iFileSize = MIN( g_pFullFileSystem->Size( fh ), SLIDESHOW_LIST_BUFFER_MAX );
-
-		int iBytesRead = g_pFullFileSystem->Read( szFileBuffer, iFileSize, fh );
-		g_pFullFileSystem->Close( fh );
-
-		// Ensure we don't write outside of our buffer
-		if ( iBytesRead > iFileSize )
-			iBytesRead = iFileSize;
-		szFileBuffer[ iBytesRead ] = '\0';
-
-		pchCurrentLine = szFileBuffer;
-
-		// Seek to end of first line
-		char *pchNextLine = pchCurrentLine;
-		while ( *pchNextLine != '\0' && *pchNextLine != '\n' && *pchNextLine != ' ' )
-			++pchNextLine;
-
-		if ( *pchNextLine != '\0' )
-		{
-			// Mark end of string
-			*pchNextLine = '\0';
-
-			// Seek to start of next string
-			++pchNextLine;
-			while ( *pchNextLine != '\0' && ( *pchNextLine == '\n' || *pchNextLine == ' ' ) )
-				++pchNextLine;
-		}
-
-		Q_strncpy( szMatFileName, pchCurrentLine, sizeof(szMatFileName) );
-		pchCurrentLine = pchNextLine;
-	}
-	else
-	{
-		Q_snprintf( szDirectory, sizeof( szDirectory ), "materials/vgui/%s/*.vmt", m_szSlideshowDirectory );
 		const char *pMatFileName = g_pFullFileSystem->FindFirst( szDirectory, &matHandle );
 
 		if ( pMatFileName )
-			Q_strncpy( szMatFileName, pMatFileName, sizeof(szMatFileName) );
+			V_strcpy_safe( szMatFileName, pMatFileName );
 	}
 
 	int iSlideIndex = 0;
 
 	while ( szMatFileName[ 0 ] )
 	{
-		char szFileName[_MAX_PATH];
-		Q_snprintf( szFileName, sizeof( szFileName ), "vgui/%s/%s", m_szSlideshowDirectory, szMatFileName );
-		szFileName[ Q_strlen( szFileName ) - 4 ] = '\0';
+		char szFileName[MAX_PATH];
+		V_sprintf_safe( szFileName, "vgui/%s/%s", m_szSlideshowDirectory, szMatFileName );
+		szFileName[ V_strlen( szFileName ) - 4 ] = '\0';
 
 		int iMatIndex = ::GetMaterialIndex( szFileName );
 
 		// Get material keywords
-		char szFullFileName[_MAX_PATH];
-		Q_snprintf( szFullFileName, sizeof( szFullFileName ), "materials/vgui/%s/%s", m_szSlideshowDirectory, szMatFileName );
+		char szFullFileName[MAX_PATH];
+		V_sprintf_safe( szFullFileName, "materials/vgui/%s/%s", m_szSlideshowDirectory, szMatFileName );
 
-		KeyValues *pMaterialKeys = new KeyValues( "material" );
+		KeyValuesAD pMaterialKeys( "material" );
 		bool bLoaded = pMaterialKeys->LoadFromFile( g_pFullFileSystem, szFullFileName, NULL );
 
 		if ( bLoaded )
@@ -336,42 +291,15 @@ void C_SlideshowDisplay::BuildSlideShowImagesList( void )
 		m_SlideMaterialLists[ iList ]->iSlideMaterials.AddToTail( iMatIndex );
 		m_SlideMaterialLists[ iList ]->iSlideIndex.AddToTail( iSlideIndex );
 		
-		if ( IsX360() )
-		{
-			// Seek to end of first line
-			char *pchNextLine = pchCurrentLine;
-			while ( *pchNextLine != '\0' && *pchNextLine != '\n' && *pchNextLine != ' ' )
-				++pchNextLine;
+		const char *pMatFileName = g_pFullFileSystem->FindNext( matHandle );
 
-			if ( *pchNextLine != '\0' )
-			{
-				// Mark end of string
-				*pchNextLine = '\0';
-
-				// Seek to start of next string
-				++pchNextLine;
-				while ( *pchNextLine != '\0' && ( *pchNextLine == '\n' || *pchNextLine == ' ' ) )
-					++pchNextLine;
-			}
-
-			Q_strncpy( szMatFileName, pchCurrentLine, sizeof(szMatFileName) );
-			pchCurrentLine = pchNextLine;
-		}
+		if ( pMatFileName )
+			V_strcpy_safe( szMatFileName, pMatFileName );
 		else
-		{
-			const char *pMatFileName = g_pFullFileSystem->FindNext( matHandle );
-
-			if ( pMatFileName )
-				Q_strncpy( szMatFileName, pMatFileName, sizeof(szMatFileName) );
-			else
-				szMatFileName[ 0 ] = '\0';
-		}
+			szMatFileName[ 0 ] = '\0';
 
 		++iSlideIndex;
 	}
 
-	if ( !IsX360() )
-	{
-		g_pFullFileSystem->FindClose( matHandle );
-	}
+	g_pFullFileSystem->FindClose( matHandle );
 }

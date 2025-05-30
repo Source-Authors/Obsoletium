@@ -11,8 +11,8 @@
 
 #include "tier0/platform.h"
 
-#define LZSS_ID   uint32( BigLong( ('L'<<24)|('Z'<<16)|('S'<<8)|('S') ) )
-#define SNAPPY_ID uint32( BigLong( ('S'<<24)|('N'<<16)|('A'<<8)|('P') ) )
+constexpr inline uint32 LZSS_ID{MAKEUID('L', 'Z', 'S', 'S')};
+constexpr inline uint32 SNAPPY_ID{MAKEUID('S', 'N', 'A', 'P')};
 
 // bind the buffer for correct identification
 struct lzss_header_t
@@ -28,14 +28,13 @@ class CUtlBuffer;
 class CLZSS
 {
 public:
-	unsigned char*	Compress( const unsigned char *pInput, int inputlen, unsigned int *pOutputSize );
-	unsigned char*	CompressNoAlloc( const unsigned char *pInput, int inputlen, unsigned char *pOutput, unsigned int *pOutputSize );
-	unsigned int	Uncompress( const unsigned char *pInput, unsigned char *pOutput );
-	//unsigned int	Uncompress( unsigned char *pInput, CUtlBuffer &buf );
-	unsigned int	SafeUncompress( const unsigned char *pInput, unsigned char *pOutput, unsigned int unBufSize );
+	unsigned char*	Compress( IN_BYTECAP(inSize) const unsigned char *in, int inSize, unsigned int *outSize );
+	unsigned char*	CompressNoAlloc( IN_BYTECAP(inSize) const unsigned char *in, int inSize, OUT_BYTECAP(*outSize) unsigned char *out, unsigned int *outSize );
+	[[deprecated("Unsafe as no buffer size")]] unsigned int	Uncompress( const unsigned char *in, unsigned char *out );
+	unsigned int	SafeUncompress( const unsigned char *in, OUT_BYTECAP(outSize) unsigned char *out, unsigned int outSize );
 
-	static bool			IsCompressed( const unsigned char *pInput );
-	static unsigned int	GetActualSize( const unsigned char *pInput );
+	[[nodiscard]] static bool			IsCompressed( const void *in );
+	[[nodiscard]] static unsigned int	GetActualSize( const void *in );
 
 	// windowsize must be a power of two.
 	FORCEINLINE CLZSS( int nWindowSize = DEFAULT_LZSS_WINDOW_SIZE );

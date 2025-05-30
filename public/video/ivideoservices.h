@@ -14,11 +14,11 @@
     #pragma once
 #endif
 
-#include <math.h>
+#include <cmath>
 #include "appframework/IAppSystem.h"
 #include "tier0/platform.h"
 
-#include <stdint.h>
+#include <cstdint>
 #ifndef _STDINT_H
 #define _STDINT_H
 #endif
@@ -383,7 +383,7 @@ class VideoFrameRate_t
 // Video Material interface - manages the playing back of a video to a 
 //     a material / texture combo
 //-----------------------------------------------------------------------------
-class IVideoMaterial : public IBaseInterface
+abstract_class IVideoMaterial : public IBaseInterface
 {
 	public:
 		// Video information functions		
@@ -443,7 +443,7 @@ class IVideoMaterial : public IBaseInterface
 //-----------------------------------------------------------------------------
 // Video Recorder interface - manages the creation of a new video file
 //-----------------------------------------------------------------------------
-class IVideoRecorder : public IBaseInterface
+abstract_class IVideoRecorder : public IBaseInterface
 {
 	public:
 		virtual bool				EstimateMovieFileSize( size_t *pEstSize, int movieWidth, int movieHeight, VideoFrameRate_t movieFps, float movieDuration, VideoEncodeCodec_t theCodec, int videoQuality,  AudioEncodeSourceFormat_t srcAudioFormat = AudioEncodeSourceFormat::AUDIO_NONE, int audioSampleRate = 0 ) = 0;
@@ -481,10 +481,10 @@ class IVideoRecorder : public IBaseInterface
 //-----------------------------------------------------------------------------
 // Main VIDEO_SERVICES interface
 //-----------------------------------------------------------------------------
-#define VIDEO_SERVICES_INTERFACE_VERSION	"IVideoServices002"
+constexpr inline char VIDEO_SERVICES_INTERFACE_VERSION[]{"IVideoServices002"};
 
 
-class IVideoServices : public IAppSystem
+abstract_class IVideoServices : public IAppSystem
 {
 	public:
 		// Query the available video systems

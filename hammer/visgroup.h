@@ -51,7 +51,7 @@ class CVisGroup
 		{
 			if (pszName != NULL)
 			{
-				strncpy(m_szName, pszName, sizeof(m_szName));
+				V_strcpy_safe(m_szName, pszName);
 			}
 		}
 
@@ -86,11 +86,11 @@ class CVisGroup
 		//
 		// Serialization.
 		//
-		ChunkFileResult_t LoadVMF(CChunkFile *pFile, CMapDoc *pDoc);
-		ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+		[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 
-		static ChunkFileResult_t LoadVisGroupCallback(CChunkFile *pFile, LoadVisGroupData_t *pLoadData);
-		static ChunkFileResult_t LoadVisGroupsCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		static [[nodiscard]] ChunkFileResult_t LoadVisGroupCallback(CChunkFile *pFile, LoadVisGroupData_t *pLoadData);
+		static [[nodiscard]] ChunkFileResult_t LoadVisGroupsCallback(CChunkFile *pFile, CMapDoc *pDoc);
 
 		static bool IsConvertingOldVisGroups();
 
@@ -104,7 +104,7 @@ class CVisGroup
 
 		bool m_bIsAuto;
 
-		static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CVisGroup *pGroup);
+		static [[nodiscard]] ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, CVisGroup *pGroup);
 
 		static bool s_bShowAll;
 		static bool s_bIsConvertingOldVisGroups;
@@ -196,6 +196,13 @@ public:
 	inline intp Find(CVisGroup *pVisGroup) const;
 	inline void FastRemove(intp nElement);
 	inline void RemoveAll(void);
+
+	// STL compatible member functions. These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	CUtlVector<CVisGroup *>::iterator begin()						{ return m_List.Base(); }
+	CUtlVector<CVisGroup *>::const_iterator begin() const			{ return m_List.Base(); }
+	CUtlVector<CVisGroup *>::iterator end()							{ return m_List.Base() + m_List.Count(); }
+	CUtlVector<CVisGroup *>::const_iterator end() const				{ return m_List.Base() + m_List.Count(); }
 
 private:
 

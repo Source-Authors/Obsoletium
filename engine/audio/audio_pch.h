@@ -9,14 +9,14 @@
 
 #include "platform.h"
 
-#if !defined( _X360 ) && defined( WIN32 )
+#if defined( WIN32 )
 #include "winlite.h"
 #include <mmsystem.h>
 #include <mmreg.h>
 #endif
 
-#include "basetypes.h"
-#include "commonmacros.h"
+#include "tier0/basetypes.h"
+#include "tier0/commonmacros.h"
 #include "mathlib/mathlib.h"
 #include "tier0/dbg.h"
 #include "tier0/vprof.h"
@@ -26,7 +26,7 @@
 #include "tier2/riff.h"
 #include "sound.h"
 #include "Color.h"
-#include "convar.h"
+#include "tier1/convar.h"
 #include "soundservice.h"
 #include "voice_sound_engine_interface.h"
 #include "soundflags.h"
@@ -52,10 +52,6 @@
 #include "snd_wave_mixer_adpcm.h"
 #include "snd_io.h"
 
-#include "snd_wave_mixer_xma.h"
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#include <xhv2.h>
-#elif POSIX
+#if defined( POSIX )
 #include "audio/private/posix_stubs.h"
 #endif

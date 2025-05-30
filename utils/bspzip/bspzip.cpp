@@ -1,4 +1,8 @@
-// Copyright Valve Corporation, All rights reserved.
+﻿// Copyright Valve Corporation, All rights reserved.
+//
+// Command-line tool that allows arbitrary files to be embedded within a BSP.
+// When the map is being loaded the files will be mounted as if they were
+// present in the game's real content folders.
 //
 // See https://developer.valvesoftware.com/wiki/BSPZIP
 
@@ -6,6 +10,7 @@
 #include "cmdlib.h"
 #include "tier0/icommandline.h"
 #include "tier1/utlbuffer.h"
+#include "tools_minidump.h"
 
 namespace {
 
@@ -37,7 +42,6 @@ bool RepackBSP(const char *pszMapFile, bool bCompress) {
   }
 
   CUtlBuffer outputBuffer;
-
   if (!RepackBSP(inputBuffer, outputBuffer,
                  bCompress ? RepackBSPCallback_LZMA : NULL,
                  bCompress ? IZip::eCompressionType_LZMA
@@ -90,12 +94,16 @@ bool RepackBSP(const char *pszMapFile, bool bCompress) {
 }  // namespace
 
 int main(int argc, char **argv) {
+  // Install an exception handler.
+  const se::utils::common::ScopedDefaultMinidumpHandler
+      scoped_default_minidumps;
+
   const ScopedHDRMode scoped_hdr_mode{false};
 
 #ifdef PLATFORM_64BITS
-  Msg("\nValve Software - bspzip.exe [64 bit] (%s)\n", __DATE__);
+  Msg("\nValve Software - bspzip [64 bit] (%s)\n", __DATE__);
 #else
-  Msg("\nValve Software - bspzip.exe (%s)\n", __DATE__);
+  Msg("\nValve Software - bspzip (%s)\n", __DATE__);
 #endif
 
   int curArg = 1;
@@ -110,10 +118,8 @@ int main(int argc, char **argv) {
   }
 
   // Should have at least action
-  if (curArg >= argc) {
-    // End of args
-    return Usage();
-  }
+  // End of args
+  if (curArg >= argc) return Usage();
 
   // Pointers to the action, the file, and any action args so I can remove all
   // the messy argc pointer math this was using.
@@ -123,37 +129,36 @@ int main(int argc, char **argv) {
   int nActionArgs = argc - curArg;
 
   CommandLine()->CreateCmdLine(argc, argv);
-
   MathLib_Init(2.2f, 2.2f, 0.0f, 2);
 
   if ((stricmp(pAction, "-extract") == 0) && nActionArgs == 2) {
     // bspzip -extract <bspfile> <blah.zip>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char zipName[MAX_PATH] = {0};
     V_strcpy_safe(zipName, pActionArgs[1]);
-    Q_DefaultExtension(zipName, ".zip", sizeof(zipName));
+    Q_DefaultExtension(zipName, ".zip");
 
     ExtractZipFileFromBSP(bspName, zipName);
   } else if ((stricmp(pAction, "-extractfiles") == 0) && nActionArgs == 2) {
     // bsipzip -extractfiles <bspfile> <targetpath>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     // necessary for xbox process
     // only the .vtf are extracted as necessary for streaming and not the .vmt
     // the .vmt are non-streamed and therefore remain, referenced normally as
     // part of the bsp search path
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    V_DefaultExtension(bspName, ".bsp");
 
     char targetPathName[MAX_PATH] = {0};
     V_strcpy_safe(targetPathName, pActionArgs[1]);
-    Q_AppendSlash(targetPathName, sizeof(targetPathName));
+    V_AppendSlash(targetPathName);
 
     printf("\nOpening bsp file: %s.\n", bspName);
     LoadBSPFile(bspName);
@@ -181,7 +186,7 @@ int main(int argc, char **argv) {
 
         V_strcpy_safe(targetName, targetPathName);
         V_strcat_safe(targetName, relativeName);
-        Q_FixSlashes(targetName, '\\');
+        V_FixSlashes(targetName, '\\');
 
         SafeCreatePath(targetName);
 
@@ -202,19 +207,19 @@ int main(int argc, char **argv) {
     printf("%zi files extracted.\n", numFilesExtracted);
   } else if ((stricmp(pAction, "-extractcubemaps") == 0) && nActionArgs == 2) {
     // bspzip -extractcubemaps <bspfile> <targetPath>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     // necessary for xbox process
     // only the .vtf are extracted as necessary for streaming and not the .vmt
     // the .vmt are non-streamed and therefore remain, referenced normally as
     // part of the bsp search path
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    V_DefaultExtension(bspName, ".bsp");
 
     char targetPathName[MAX_PATH] = {0};
     V_strcpy_safe(targetPathName, pActionArgs[1]);
-    Q_AppendSlash(targetPathName, sizeof(targetPathName));
+    V_AppendSlash(targetPathName);
 
     printf("\nOpening bsp file: %s.\n", bspName);
     LoadBSPFile(bspName);
@@ -242,7 +247,7 @@ int main(int argc, char **argv) {
 
         V_strcpy_safe(targetName, targetPathName);
         V_strcat_safe(targetName, relativeName);
-        Q_FixSlashes(targetName, '\\');
+        V_FixSlashes(targetName, '\\');
 
         SafeCreatePath(targetName);
 
@@ -263,13 +268,13 @@ int main(int argc, char **argv) {
     printf("%zi cubemaps extracted.\n", numFilesExtracted);
   } else if ((stricmp(pAction, "-deletecubemaps") == 0) && nActionArgs == 1) {
     // bspzip -deletecubemaps <bspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     // necessary for xbox process
     // the cubemaps are deleted as they cannot yet be streamed out of the bsp
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    V_DefaultExtension(bspName, ".bsp");
 
     printf("\nOpening bsp file: %s.\n", bspName);
     LoadBSPFile(bspName);
@@ -302,11 +307,11 @@ int main(int argc, char **argv) {
     }
   } else if ((stricmp(pAction, "-addfiles") == 0) && nActionArgs == 4) {
     // bspzip -addfiles <bspfile> <relativePathPrefix> <listfile> <newbspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char relativePrefixName[MAX_PATH] = {0};
     V_strcpy_safe(relativePrefixName, pActionArgs[1]);
@@ -315,8 +320,8 @@ int main(int argc, char **argv) {
     V_strcpy_safe(filelistName, pActionArgs[2]);
 
     char newbspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(newbspName, sizeof(newbspName), pActionArgs[3]);
-    Q_DefaultExtension(newbspName, ".bsp", sizeof(newbspName));
+    V_MakeAbsolutePath(newbspName, pActionArgs[3]);
+    Q_DefaultExtension(newbspName, ".bsp");
 
     char fullpathName[MAX_PATH] = {0};
     FILE *fp = fopen(filelistName, "r");
@@ -354,21 +359,21 @@ int main(int argc, char **argv) {
     }
   } else if ((stricmp(pAction, "-dir") == 0) && nActionArgs == 1) {
     // bspzip -dir <bspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     LoadBSPFile(bspName);
     PrintBSPPackDirectory();
   } else if ((stricmp(pAction, "-addfile") == 0) && nActionArgs == 4) {
     // bspzip -addfile <bspfile> <relativepathname> <fullpathname> <newbspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char relativeName[MAX_PATH] = {0};
     V_strcpy_safe(relativeName, pActionArgs[1]);
@@ -377,8 +382,8 @@ int main(int argc, char **argv) {
     V_strcpy_safe(fullpathName, pActionArgs[2]);
 
     char newbspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(newbspName, sizeof(newbspName), pActionArgs[3]);
-    Q_DefaultExtension(newbspName, ".bsp", sizeof(newbspName));
+    V_MakeAbsolutePath(newbspName, pActionArgs[3]);
+    Q_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
     LoadBSPFile(bspName);
@@ -386,18 +391,18 @@ int main(int argc, char **argv) {
     WriteBSPFile(newbspName);
   } else if ((stricmp(pAction, "-addlist") == 0) && nActionArgs == 3) {
     // bspzip -addlist <bspfile> <listfile> <newbspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char filelistName[MAX_PATH] = {0};
     V_strcpy_safe(filelistName, pActionArgs[1]);
 
     char newbspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(newbspName, sizeof(newbspName), pActionArgs[2]);
-    Q_DefaultExtension(newbspName, ".bsp", sizeof(newbspName));
+    V_MakeAbsolutePath(newbspName, pActionArgs[2]);
+    Q_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
 
@@ -442,18 +447,18 @@ int main(int argc, char **argv) {
     }
   } else if ((stricmp(pAction, "-addorupdatelist") == 0) && nActionArgs == 3) {
     // bspzip -addorupdatelist <bspfile> <listfile> <newbspfile>
-    CmdLib_InitFileSystem(pActionArgs[0]);
+    const ScopedFileSystem scopedFileSystem(pActionArgs[0]);
 
     char bspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(bspName, sizeof(bspName), pActionArgs[0]);
-    Q_DefaultExtension(bspName, ".bsp", sizeof(bspName));
+    V_MakeAbsolutePath(bspName, pActionArgs[0]);
+    Q_DefaultExtension(bspName, ".bsp");
 
     char filelistName[MAX_PATH] = {0};
     V_strcpy_safe(filelistName, pActionArgs[1]);
 
     char newbspName[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(newbspName, sizeof(newbspName), pActionArgs[2]);
-    Q_DefaultExtension(newbspName, ".bsp", sizeof(newbspName));
+    V_MakeAbsolutePath(newbspName, pActionArgs[2]);
+    Q_DefaultExtension(newbspName, ".bsp");
 
     // read it in, add pack file, write it back out
 
@@ -515,11 +520,11 @@ int main(int argc, char **argv) {
       return Usage();
     }
 
-    CmdLib_InitFileSystem(pFile);
+    const ScopedFileSystem scopedFileSystem(pFile);
 
     char szAbsBSPPath[MAX_PATH] = {0};
-    Q_MakeAbsolutePath(szAbsBSPPath, sizeof(szAbsBSPPath), pFile);
-    Q_DefaultExtension(szAbsBSPPath, ".bsp", sizeof(szAbsBSPPath));
+    V_MakeAbsolutePath(szAbsBSPPath, pFile);
+    Q_DefaultExtension(szAbsBSPPath, ".bsp");
 
     return RepackBSP(szAbsBSPPath, bCompress) ? 0 : -1;
   } else {

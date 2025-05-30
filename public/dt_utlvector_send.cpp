@@ -139,7 +139,7 @@ SendProp SendPropUtlVector(
 	int sizeofVar,		// The size of each element in the utlvector.
 	EnsureCapacityFn ensureFn,	// This is the value returned for elements out of the array's current range.
 	int nMaxElements,			// Max # of elements in the array. Keep this as low as possible.
-	SendProp pArrayProp,		// Describe the data inside of each element in the array.
+	const SendProp& pArrayProp,		// Describe the data inside of each element in the array.
 	SendTableProxyFn varProxy	// This can be overridden to control who the array is sent to.
 	)
 {

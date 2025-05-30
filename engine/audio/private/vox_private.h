@@ -50,7 +50,8 @@ struct sentence_t
 	sentence_t() :
 		pName( 0 ),
 		length( 0.0f ),
-		closecaption( false )
+		closecaption( false ),
+		isPrecached( false )
 	{
 	}
 

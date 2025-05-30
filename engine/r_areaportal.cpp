@@ -124,99 +124,103 @@ static inline bool GetPortalScreenExtents( dareaportal_t *pPortal,
 	portalRect.left = portalRect.bottom = 1e24;
 	portalRect.right = portalRect.top   = -1e24;
 	bool bValidExtents = false;
-	worldbrushdata_t *pBrushData = host_state.worldbrush;
 	
 	int nStartVerts = min( (int)pPortal->m_nClipPortalVerts, MAX_PORTAL_VERTS );
-
-	// NOTE: We need two passes to deal with reflection. We need to compute
-	// the screen extents for both the reflected + non-reflected area portals
-	// and make bounds that surrounds them both.
-	int nPassCount = ( pReflectionWaterHeight != NULL ) ? 2 : 1;
-	for ( int j = 0; j < nPassCount; ++j )
+	// dimhotepus: Some maps (ex. background06) has portals without geometry!
+	// dimhotepus: Do not read out-of-bounds (-1) vertex.
+	if (nStartVerts != 0)
 	{
-		int i;
-		for( i=0; i < nStartVerts; i++ )
+		worldbrushdata_t *pBrushData = host_state.worldbrush;
+		// NOTE: We need two passes to deal with reflection. We need to compute
+		// the screen extents for both the reflected + non-reflected area portals
+		// and make bounds that surrounds them both.
+		int nPassCount = ( pReflectionWaterHeight != NULL ) ? 2 : 1;
+		for ( int j = 0; j < nPassCount; ++j )
 		{
-			clip->v0[i] = pBrushData->m_pClipPortalVerts[pPortal->m_FirstClipPortalVert+i];
-
-			// 2nd pass is to compute the reflected areaportal position
-			if ( j == 1 )
+			int i;
+			for( i=0; i < nStartVerts; i++ )
 			{
-				clip->v0[i].z = 2.0f * ( *pReflectionWaterHeight ) - clip->v0[i].z;
-			}
-		}
+				clip->v0[i] = pBrushData->m_pClipPortalVerts[pPortal->m_FirstClipPortalVert+i];
 
-		int iCurList = 0;
-		bool bAllClipped = false;
-		for( int iPlane=0; iPlane < 4; iPlane++ )
-		{
-			const cplane_t *pPlane = g_Frustum.GetPlane(iPlane);
-
-			Vector *pIn = clip->lists[iCurList];
-			Vector *pOut = clip->lists[!iCurList];
-
-			int nOutVerts = 0;
-			int iPrev = nStartVerts - 1;
-			float flPrevDot = pPlane->normal.Dot( pIn[iPrev] ) - pPlane->dist;
-			for( int iCur=0; iCur < nStartVerts; iCur++ )
-			{
-				float flCurDot = pPlane->normal.Dot( pIn[iCur] ) - pPlane->dist;
-
-				if( (flCurDot > 0) != (flPrevDot > 0) )
+				// 2nd pass is to compute the reflected areaportal position
+				if ( j == 1 )
 				{
-					if( nOutVerts < MAX_PORTAL_VERTS )
-					{
-						// Add the vert at the intersection.
-						float t = flPrevDot / (flPrevDot - flCurDot);
-						VectorLerp( pIn[iPrev], pIn[iCur], t, pOut[nOutVerts] );
+					clip->v0[i].z = 2.0f * ( *pReflectionWaterHeight ) - clip->v0[i].z;
+				}
+			}
 
-						++nOutVerts;
+			int iCurList = 0;
+			bool bAllClipped = false;
+			for( int iPlane=0; iPlane < 4; iPlane++ )
+			{
+				const cplane_t *pPlane = g_Frustum.GetPlane(iPlane);
+
+				Vector *pIn = clip->lists[iCurList];
+				Vector *pOut = clip->lists[!iCurList];
+			
+				int nOutVerts = 0;
+				int iPrev = nStartVerts - 1;
+				float flPrevDot = pPlane->normal.Dot( pIn[iPrev] ) - pPlane->dist;
+				for( int iCur=0; iCur < nStartVerts; iCur++ )
+				{
+					float flCurDot = pPlane->normal.Dot( pIn[iCur] ) - pPlane->dist;
+
+					if( (flCurDot > 0) != (flPrevDot > 0) )
+					{
+						if( nOutVerts < MAX_PORTAL_VERTS )
+						{
+							// Add the vert at the intersection.
+							float t = flPrevDot / (flPrevDot - flCurDot);
+							VectorLerp( pIn[iPrev], pIn[iCur], t, pOut[nOutVerts] );
+
+							++nOutVerts;
+						}
 					}
+
+					// Add this vert?
+					if( flCurDot > 0 )
+					{
+						if( nOutVerts < MAX_PORTAL_VERTS )
+						{
+							pOut[nOutVerts] = pIn[iCur];
+							++nOutVerts;
+						}
+					}
+
+					flPrevDot = flCurDot;
+					iPrev = iCur;
 				}
 
-				// Add this vert?
-				if( flCurDot > 0 )
+				if( nOutVerts == 0 )
 				{
-					if( nOutVerts < MAX_PORTAL_VERTS )
-					{
-						pOut[nOutVerts] = pIn[iCur];
-						++nOutVerts;
-					}
+					// If they're all behind, then this portal is clipped out.
+					bAllClipped = true;
+					break;
 				}
 
-				flPrevDot = flCurDot;
-				iPrev = iCur;
+				nStartVerts = nOutVerts;
+				iCurList = !iCurList;
 			}
 
-			if( nOutVerts == 0 )
+			if ( bAllClipped )
+				continue;
+
+			// Project all the verts and figure out the screen extents.
+			Vector screenPos;
+			Assert( iCurList == 0 );
+			for( i=0; i < nStartVerts; i++ )
 			{
-				// If they're all behind, then this portal is clipped out.
-				bAllClipped = true;
-				break;
+				Vector &point = clip->v0[i];
+
+				g_EngineRenderer->ClipTransformWithProjection ( g_ScreenFromWorldProjection, point, &screenPos );
+
+				portalRect.left   = fpmin( screenPos.x, portalRect.left );
+				portalRect.bottom = fpmin( screenPos.y, portalRect.bottom );
+				portalRect.top    = fpmax( screenPos.y, portalRect.top );
+				portalRect.right  = fpmax( screenPos.x, portalRect.right );
 			}
-
-			nStartVerts = nOutVerts;
-			iCurList = !iCurList;
+			bValidExtents = true;
 		}
-
-		if ( bAllClipped )
-			continue;
-
-		// Project all the verts and figure out the screen extents.
-		Vector screenPos;
-		Assert( iCurList == 0 );
-		for( i=0; i < nStartVerts; i++ )
-		{
-			Vector &point = clip->v0[i];
-
-			g_EngineRenderer->ClipTransformWithProjection ( g_ScreenFromWorldProjection, point, &screenPos );
-
-			portalRect.left   = fpmin( screenPos.x, portalRect.left );
-			portalRect.bottom = fpmin( screenPos.y, portalRect.bottom );
-			portalRect.top    = fpmax( screenPos.y, portalRect.top );
-			portalRect.right  = fpmax( screenPos.x, portalRect.right );
-		}
-		bValidExtents = true;
 	}
 
 	if ( !bValidExtents )

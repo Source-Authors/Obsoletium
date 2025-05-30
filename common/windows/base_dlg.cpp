@@ -15,13 +15,13 @@ BEGIN_MESSAGE_MAP(CBaseDlg, CDialog)
   ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 END_MESSAGE_MAP()
 
-CBaseDlg::CBaseDlg() = default;
+CBaseDlg::CBaseDlg() : m_dpi_behavior{false} {}
 
 CBaseDlg::CBaseDlg(LPCTSTR lpszTemplateName, CWnd* pParentWnd)
-    : CDialog{lpszTemplateName, pParentWnd} {}
+    : CDialog{lpszTemplateName, pParentWnd}, m_dpi_behavior{false} {}
 
 CBaseDlg::CBaseDlg(UINT nIDTemplate, CWnd* pParentWnd)
-    : CDialog{nIDTemplate, pParentWnd} {}
+    : CDialog{nIDTemplate, pParentWnd}, m_dpi_behavior{false} {}
 
 CBaseDlg::~CBaseDlg() = default;
 
@@ -29,7 +29,7 @@ BOOL CBaseDlg::OnInitDialog() {
   const BOOL rc{__super::OnInitDialog()};
   // dimhotepus: Try to add main icon for dialog.
   HANDLE hExeIcon = LoadImageW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(101),
-                               IMAGE_ICON, 0, 0, LR_DEFAULTSIZE);
+                               IMAGE_ICON, 0, 0, LR_SHARED);
   if (hExeIcon) {
     SendMessage(WM_SETICON, ICON_BIG, (LPARAM)hExeIcon);
   }

@@ -53,7 +53,6 @@
 #include <vgui_controls/TextEntry.h>
 #include "enginebugreporter.h"
 #include "vgui_baseui_interface.h"
-#include <vgui_controls/FileOpenDialog.h>
 #include "ivideomode.h"
 #include "cl_main.h"
 #include "gl_model_private.h"
@@ -86,11 +85,7 @@
 #include "cl_steamauth.h"
 #endif
 
-#include "zip/XZip.h"
-
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
+#include "XZip.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -165,9 +160,10 @@ MSVC_DISABLE_WARNING(4996)
 	BOOL bOsVersionInfoEx = GetVersionEx( (OSVERSIONINFO *)&osvi );
 
 MSVC_END_WARNING_OVERRIDE_SCOPE()
-	if( !bOsVersionInfoEx )
+	if ( !bOsVersionInfoEx )
 	{
-		Q_strncpy( osversion, "Unable to get OS Version", maxlen );
+		// dimhotepus: Well, some too old or new OS version.
+		Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows N/A" : "Windows Server N/A", maxlen, COPY_ALL_CHARACTERS );
 		return;
 	}
 	
@@ -211,12 +207,6 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 			bOsVersionInfoEx = TRUE;
 		}
 
-		if ( !bOsVersionInfoEx )
-		{
-			// dimhotepus: Well, some too old or new OS version.
-			Q_strncat( osversion, osvi.wProductType == VER_NT_WORKSTATION ? "Windows N/A" : "Windows Server N/A", maxlen, COPY_ALL_CHARACTERS );
-		}
-		
 		// Display version, service pack (if any), and build number.
 		
 		char build[256];
@@ -1090,7 +1080,7 @@ void CBugUIPanel::OnSaveVMF()
 		return;
 
 	char level[ 256 ];
-	m_pLevelName->GetText( level, sizeof( level ) );
+	m_pLevelName->GetText( level );
 
 	// See if .vmf exists in assumed location
 	char localfile[ 512 ];
@@ -1191,11 +1181,11 @@ void CBugUIPanel::OnFileSelected( char const *fullpath )
 		return;
 
 	char relativepath[ 512 ];
-	if ( !g_pFileSystem->FullPathToRelativePath( fullpath, relativepath, sizeof( relativepath ) ) )
+	if ( !g_pFileSystem->FullPathToRelativePath_safe( fullpath, relativepath ) )
 	{
 		if ( Q_stristr( fullpath, com_basedir ) )
 		{
-			Q_snprintf( relativepath, sizeof( relativepath ), "..%s", fullpath + strlen(com_basedir) );	
+			V_sprintf_safe( relativepath, "..%s", fullpath + strlen(com_basedir) );	
 			baseDirFile = true;
 		}
 		else
@@ -1206,7 +1196,7 @@ void CBugUIPanel::OnFileSelected( char const *fullpath )
 	}
 
 	char ext[ 10 ];
-	Q_ExtractFileExtension( relativepath, ext, sizeof( ext ) );
+	V_ExtractFileExtension( relativepath, ext );
 
 	if ( m_hFileOpenDialog != 0 )
 	{
@@ -1214,17 +1204,17 @@ void CBugUIPanel::OnFileSelected( char const *fullpath )
 	}
 
 	includedfile inc;
-	Q_strncpy( inc.name, relativepath, sizeof( inc.name ) );
+	V_strcpy_safe( inc.name, relativepath );
 	
 	if ( baseDirFile )
 	{
-		Q_snprintf( inc.fixedname, sizeof( inc.fixedname ), "%s", inc.name+3 ); // strip the "..\"
+		V_sprintf_safe( inc.fixedname, "%s", inc.name+3 ); // strip the "..\"
 	}
 	else
 	{
-		Q_snprintf( inc.fixedname, sizeof( inc.fixedname ), "%s", inc.name );
+		V_sprintf_safe( inc.fixedname, "%s", inc.name );
 	}
-	Q_FixSlashes( inc.fixedname );
+	V_FixSlashes( inc.fixedname );
 
 	m_IncludedFiles.AddToTail( inc );
 
@@ -1232,8 +1222,8 @@ void CBugUIPanel::OnFileSelected( char const *fullpath )
 	concat[ 0 ] = 0;
 	for ( int i = 0 ; i < m_IncludedFiles.Count(); ++i )
 	{
-		Q_strncat( concat, m_IncludedFiles[ i ].name, sizeof( concat), COPY_ALL_CHARACTERS );
-		Q_strncat( concat, "\n", sizeof( concat), COPY_ALL_CHARACTERS );
+		V_strcat_safe( concat, m_IncludedFiles[ i ].name );
+		V_strcat_safe( concat, "\n" );
 	}
 	m_pIncludedFiles->SetText( concat );
 }
@@ -1254,8 +1244,8 @@ void CBugUIPanel::OnIncludeFile()
 	if ( m_hFileOpenDialog )
 	{
 		char startPath[ MAX_PATH ];
-		Q_strncpy( startPath, com_gamedir, sizeof( startPath ) );
-		Q_FixSlashes( startPath );
+		V_strcpy_safe( startPath, com_gamedir );
+		V_FixSlashes( startPath );
 		m_hFileOpenDialog->SetStartDirectory( startPath );
 		m_hFileOpenDialog->DoModal( false );
 	}
@@ -1299,7 +1289,7 @@ void CBugUIPanel::Activate()
 		{
 			int id = m_pMapNumber->GetItemIDFromRow(i);
 			char level[256];
-			m_pMapNumber->GetItemText(id, level, sizeof(level));
+			m_pMapNumber->GetItemText(id, level);
 			if (!Q_strcmp(currentLevel, level))
 			{
 				item = id;
@@ -1451,7 +1441,7 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 	title[ 0 ] = 0;
 	desc[ 0 ] = 0;
 
-	m_pTitle->GetText( title, sizeof( title ) );
+	m_pTitle->GetText( title );
 	if ( !title[ 0 ] )
 	{
 		if ( verbose ) 
@@ -1465,7 +1455,7 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 	// Only require description in public UI
 	if ( isPublic )
 	{
-		m_pDescription->GetText( desc, sizeof( desc ) );
+		m_pDescription->GetText( desc );
 		if ( !desc[ 0 ] )
 		{
 			if ( verbose ) 
@@ -1546,7 +1536,7 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 	if ( isPublic )
 	{
 		char email[ 80 ];
-		m_pEmail->GetText( email, sizeof( email ) );
+		m_pEmail->GetText( email );
 		if ( email[ 0 ] != 0 &&
 			!IsValidEmailAddress( email ) )
 		{
@@ -1562,7 +1552,7 @@ bool CBugUIPanel::AddBugTextToZip( char const *textfilename, char const *text, i
 	if ( !m_hZip )
 	{
 		// Create using OS pagefile memory...
-		m_hZip = CreateZipZ( 0, MAX_ZIP_SIZE, ZIP_MEMORY );
+		m_hZip = CreateZip( nullptr, MAX_ZIP_SIZE, nullptr );
 		Assert( m_hZip );
 		if ( !m_hZip )
 		{
@@ -1570,9 +1560,7 @@ bool CBugUIPanel::AddBugTextToZip( char const *textfilename, char const *text, i
 		}
 	}
 
-	ZipAdd( m_hZip, textfilename, (void *)text, textlen, ZIP_MEMORY );
-
-	return true;
+	return ZipAdd( m_hZip, textfilename, (void *)text, textlen ) == ZR_OK;
 }
 
 
@@ -1581,7 +1569,7 @@ bool CBugUIPanel::AddFileToZip( char const *relative )
 	if ( !m_hZip )
 	{
 		// Create using OS pagefile memory...
-		m_hZip = CreateZipZ( 0, MAX_ZIP_SIZE, ZIP_MEMORY );
+		m_hZip = CreateZip( nullptr, MAX_ZIP_SIZE, nullptr );
 		Assert( m_hZip );
 		if ( !m_hZip )
 		{
@@ -1590,18 +1578,16 @@ bool CBugUIPanel::AddFileToZip( char const *relative )
 	}
 
 	char fullpath[ 512 ];
-	if ( g_pFileSystem->RelativePathToFullPath( relative, "GAME", fullpath, sizeof( fullpath ) ) )
+	if ( g_pFileSystem->RelativePathToFullPath_safe( relative, "GAME", fullpath ) )
 	{
 		char extension[ 32 ];
-		Q_ExtractFileExtension( relative, extension, sizeof( extension ) );
+		V_ExtractFileExtension( relative, extension );
 		char basename[ 256 ];
-		Q_FileBase( relative, basename, sizeof( basename ) );
+		V_FileBase( relative, basename );
 		char outname[ 512 ];
-		Q_snprintf( outname, sizeof( outname ), "%s.%s", basename, extension );
+		V_sprintf_safe( outname, "%s.%s", basename, extension );
 
-		ZipAdd( m_hZip, outname, fullpath, 0, ZIP_FILENAME );
-
-		return true;
+		return ZipAdd( m_hZip, outname, fullpath, 0 ) == ZR_OK;
 	}
 
 	return false;
@@ -1658,7 +1644,7 @@ void CBugUIPanel::OnSubmit()
 
 
 	char temp[ 80 ];
-	m_pTitle->GetText( temp, sizeof( temp ) );
+	m_pTitle->GetText( temp );
 
 	if ( host_state.worldmodel )
 	{
@@ -1674,16 +1660,19 @@ void CBugUIPanel::OnSubmit()
 
 	Msg( "title:  %s\n", title );
 
-	m_pDescription->GetText( desc, sizeof( desc ) );
+	m_pDescription->GetText( desc );
 
 	Msg( "description:  %s\n", desc );
 
-	m_pLevelName->GetText( level, sizeof( level ) );
-	m_pPosition->GetText( position, sizeof( position ) );
-	m_pOrientation->GetText( orientation, sizeof( orientation ) );
-	m_pBuildNumber->GetText( build, sizeof( build ) );
+	m_pLevelName->GetText( level );
+	m_pPosition->GetText( position );
+	m_pOrientation->GetText( orientation );
+	m_pBuildNumber->GetText( build );
 
+	// dimhotepus: Append steam in steam mode only
+#ifndef NO_STEAM
 	Q_strncat( build, " (Steam)", sizeof(build), COPY_ALL_CHARACTERS );
+#endif
 
 	MaterialAdapterInfo_t info;
 	materials->GetDisplayAdapterInfo( materials->GetCurrentAdapter(), info );
@@ -1745,19 +1734,20 @@ void CBugUIPanel::OnSubmit()
 		extern CGlobalVars g_ServerGlobalVariables;
 		char misc2[ 256 ];
 
-		long mapfiletime = g_pFileSystem->GetFileTime( modelloader->GetName( host_state.worldmodel ), "GAME" );
+		// dimhotepus: long -> time_t
+		time_t mapfiletime = g_pFileSystem->GetFileTime( modelloader->GetName( host_state.worldmodel ), "GAME" );
 		if ( !isPublic && mapfiletime != 0L )
 		{
 			char filetimebuf[ 64 ];
-			g_pFileSystem->FileTimeToString( filetimebuf, sizeof( filetimebuf ), mapfiletime );
+			g_pFileSystem->FileTimeToString( filetimebuf, mapfiletime );
 
-			Q_snprintf( misc2, sizeof( misc2 ), "Map version:  %i\nFile timestamp:  %s", g_ServerGlobalVariables.mapversion, filetimebuf );
-			Q_strncat( misc, misc2, sizeof( misc ), COPY_ALL_CHARACTERS );
+			V_sprintf_safe( misc2, "Map version:  %i\nFile timestamp:  %s", g_ServerGlobalVariables.mapversion, filetimebuf );
+			V_strcat_safe( misc, misc2 );
 		}
 		else
 		{
-			Q_snprintf( misc2, sizeof( misc2 ), "Map version:  %i\n", g_ServerGlobalVariables.mapversion );
-			Q_strncat( misc, misc2, sizeof( misc ), COPY_ALL_CHARACTERS );
+			V_sprintf_safe( misc2, "Map version:  %i\n", g_ServerGlobalVariables.mapversion );
+			V_strcat_safe( misc, misc2 );
 		}
 	}
 
@@ -1781,25 +1771,25 @@ void CBugUIPanel::OnSubmit()
 
 	if ( !isPublic )
 	{
-		m_pSeverity->GetText( severity, sizeof( severity ) );
+		m_pSeverity->GetText( severity );
 		Msg( "severity %s\n", severity );
 
-		m_pGameArea->GetText( area, sizeof( area ) );
+		m_pGameArea->GetText( area );
 		Msg( "area %s\n", area );
 
-		m_pMapNumber->GetText( mapnumber, sizeof( mapnumber) );
+		m_pMapNumber->GetText( mapnumber );
 		Msg( "map number %s\n", mapnumber);
 
-		m_pPriority->GetText( priority, sizeof( priority ) );
+		m_pPriority->GetText( priority );
 		Msg( "priority %s\n", priority );
 
-		m_pAssignTo->GetText( assignedto, sizeof( assignedto ) );
+		m_pAssignTo->GetText( assignedto );
 		Msg( "owner %s\n", assignedto );
 	}
 
 	if ( isPublic )
 	{
-		m_pEmail->GetText( email, sizeof( email ) );
+		m_pEmail->GetText( email );
 		if ( !Q_isempty( email ) )
 		{
 			Msg( "email %s\n", email );
@@ -1811,7 +1801,7 @@ void CBugUIPanel::OnSubmit()
 
 		m_pBugReporter->SetOwner( email );
 		char submitter[ 80 ];
-		m_pSubmitterLabel->GetText( submitter, sizeof( submitter ) );
+		m_pSubmitterLabel->GetText( submitter );
 		m_pBugReporter->SetSubmitter( submitter );
 	}
 	else
@@ -1821,7 +1811,7 @@ void CBugUIPanel::OnSubmit()
 		if ( m_bUseNameForSubmitter )
 		{
 			char submitter[ 80 ];
-			m_pSubmitter->GetText( submitter, sizeof( submitter ) );
+			m_pSubmitter->GetText( submitter );
 			m_pBugReporter->SetSubmitter( submitter );
 		}
 		else
@@ -1830,7 +1820,7 @@ void CBugUIPanel::OnSubmit()
 		}
 	}
 
-	m_pReportType->GetText( reporttype, sizeof( reporttype ) );
+	m_pReportType->GetText( reporttype );
 	Msg( "report type %s\n", reporttype );
 
 	Msg( "submitter %s\n", m_pBugReporter->GetUserName() );
@@ -1942,7 +1932,7 @@ void CBugUIPanel::OnSubmit()
 		buginfo.Printf( "Misc:  %s\n", misc );
 		buginfo.Printf( "Exe:  %s\n", "hl2.exe" );
 		char gd[ 256 ];
-		Q_FileBase( com_gamedir, gd, sizeof( gd ) );
+		Q_FileBase( com_gamedir, gd );
 		buginfo.Printf( "GameDirectory:  %s\n", gd );
 		buginfo.Printf( "Ram:  %lu\n", GetRam() );
 		buginfo.Printf( "CPU:  %i\n", (int)fFrequency );
@@ -2004,13 +1994,10 @@ void CBugUIPanel::OnSubmit()
 		// Don't bother uploading any attachment if it's just the info.txt file, either...
 		if ( m_hZip && ( attachedSave || attachedScreenshot ) )
 		{
-			Assert( m_hZip );
-			void *mem;
+			void *mem = nullptr;
 			unsigned long len;
 
-			ZipGetMemory( m_hZip, &mem, &len );
-			if ( mem != NULL 
-				 && len > 0 )
+			if ( ZipGetMemory( m_hZip, &mem, &len ) == ZR_OK && mem != NULL && len > 0 )
 			{
 				// Store .zip file
 				FileHandle_t fh = g_pFileSystem->Open( "bug.zip", "wb" );
@@ -2026,7 +2013,8 @@ void CBugUIPanel::OnSubmit()
 
 		if ( m_hZip )
 		{
-			CloseZip( m_hZip );
+			[[maybe_unused]] ZRESULT rc = CloseZip( m_hZip );
+			Assert(rc == ZR_OK);
 			m_hZip = (HZIP)0;
 		}
 
@@ -2138,18 +2126,26 @@ bool CBugUIPanel::OnFinishBugReport()
 	return success;
 }
 
-void NonFileSystem_CreatePath (const char *path)
+static void NonFileSystem_CreatePath (const char *path)
 {
 	char temppath[512];
-	Q_strncpy( temppath, path, sizeof(temppath) );
+	V_strcpy_safe( temppath, path );
 	
 	for (char *ofs = temppath+1 ; *ofs ; ofs++)
 	{
 		if (*ofs == '/' || *ofs == '\\')
-		{       // create the directory
+		{
+			// create the directory
 			char old = *ofs;
 			*ofs = 0;
-			_mkdir (temppath);
+			if ( _mkdir (temppath) && errno != EEXIST )
+			{
+				Warning( "Unable to create directory '%s' in hierarchy '%s': %s.\n",
+					temppath,
+					path,
+					std::generic_category().message(errno).c_str() );
+				return;
+			}
 			*ofs = old;
 		}
 	}
@@ -2256,7 +2252,12 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 	}
 	else if ( bDeleteLocal )
 	{
-		unlink( local );
+		if ( unlink( local ) )
+		{
+			Warning( "Unable to remove bug reporter upload file '%s': %s.\n",
+				local,
+				std::generic_category().message(errno).c_str() );
+		}
 	}
 	return bResult;
 }
@@ -2619,7 +2620,7 @@ void CBugUIPanel::ParseDefaultParams( void )
 	g_pFileSystem->Close( hLocal );	// close file after reading
 
 	char token[64];
-	const char *pfile = COM_ParseFile(buffer, token, sizeof( token ) );
+	const char *pfile = COM_ParseFile(buffer, token);
 
 	while ( pfile )
 	{
@@ -2634,7 +2635,7 @@ void CBugUIPanel::ParseDefaultParams( void )
 			}
 		}
 
-		pfile = COM_ParseFile(pfile, token, sizeof( token ) );
+		pfile = COM_ParseFile(pfile, token);
 	}
 }
 
@@ -2789,7 +2790,7 @@ private:
 static CEngineBugReporter g_BugReporter;
 IEngineBugReporter *bugreporter = &g_BugReporter;
 
-CON_COMMAND( _bugreporter_restart, "Restarts bug reporter .dll" )
+CON_COMMAND( _bugreporter_restart, "Restarts bug reporter " DLL_EXT_STRING )
 {
 	if ( args.ArgC() <= 1 )
 	{
@@ -2847,7 +2848,7 @@ void CEngineBugReporter::InstallBugReportingUI( vgui::Panel *parent, IEngineBugR
 	case IEngineBugReporter::BR_AUTOSELECT:
 		{
 			// check
-			bIsPublic = phonehome->IsExternalBuild() ? true : false;
+			bIsPublic = IsExternalBuild();
 			if ( bCanUseInternal )
 			{
 				// if command line param specifies internal, use that
@@ -2974,7 +2975,7 @@ int CBugUIPanel::GetArea()
 		Q_memmove( szDirectory, pszAreaDir, iDirLength );
 		szDirectory[iDirLength] = 0;
 
-		if ( pszAreaDir && pszAreaPrefix )
+		if ( pszAreaPrefix )
 		{
 			if ( !Q_strcmp( szDirectory, gamedir) 
 				&& Q_strstr( mapname, pszAreaPrefix ) )
@@ -2982,7 +2983,7 @@ int CBugUIPanel::GetArea()
 				return i+1;
 			}
 		}
-		else if ( pszAreaDir && !pszAreaPrefix )
+		else if ( !pszAreaPrefix )
 		{
 			if ( !Q_strcmp( szDirectory, gamedir ) )
 			{

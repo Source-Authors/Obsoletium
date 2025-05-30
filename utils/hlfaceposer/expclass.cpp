@@ -4,32 +4,28 @@
 //
 // $NoKeywords: $
 //=============================================================================//
+#include "expclass.h"
 #include "hlfaceposer.h"
 #include <mxtk/mx.h>
 #include "expressions.h"
-#include "expclass.h"
-#include "hlfaceposer.h"
 #include "StudioModel.h"
 #include "filesystem.h"
 #include "FlexPanel.h"
 #include "ControlPanel.h"
 #include "mxExpressionTray.h"
 #include "UtlBuffer.h"
-#include "filesystem.h"
 #include "ExpressionTool.h"
 #include "faceposer_models.h"
 #include "mdlviewer.h"
 #include "phonemeconverter.h"
 #include "ProgressDialog.h"
+#include "tier0/basetypes.h"
 #include "tier1/fmtstr.h"
 #include "tier1/utlstring.h"
 #include "tier1/utlvector.h"
 
-
 #undef ALIGN4
-#undef ALIGN16
-#define ALIGN4( a ) a = (byte *)((int)((byte *)a + 3) & ~ 3)
-#define ALIGN16( a ) a = (byte *)((int)((byte *)a + 15) & ~ 15)
+#define ALIGN4( a ) a = AlignValue(a, 4)
 
 char const *GetGlobalFlexControllerName( int index );
 int GetGlobalFlexControllerCount( void );
@@ -40,8 +36,8 @@ int GetGlobalFlexControllerCount( void );
 //-----------------------------------------------------------------------------
 CExpClass::CExpClass( const char *classname ) 
 { 
-	Q_strncpy( m_szClassName, classname, sizeof( m_szClassName ) ); 
-	Q_FileBase( m_szClassName, m_szBaseName, sizeof( m_szBaseName ) );
+	V_strcpy_safe( m_szClassName, classname ); 
+	Q_FileBase( m_szClassName, m_szBaseName );
 	m_szFileName[ 0 ] = 0;
 	m_bDirty = false;
 	m_nSelectedExpression = -1;
@@ -89,7 +85,7 @@ void CExpClass::Save( void )
 
 	Con_Printf( "Saving changes to %s to file %s\n", GetName(), GetFileName() );
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	int i, j;
 
@@ -163,7 +159,7 @@ void CExpClass::Save( void )
 	}
 
 	char relative[ 512 ];
-	filesystem->FullPathToRelativePath( filename, relative, sizeof( relative ) );
+	filesystem->FullPathToRelativePath_safe( filename, relative );
 	
 	MakeFileWriteable( relative );
 	FileHandle_t fh = filesystem->Open( relative, "wt" );
@@ -197,8 +193,8 @@ void CExpClass::Save( void )
 void CExpClass::Export( void )
 {
 	char vfefilename[ 512 ];
-	Q_StripExtension( GetFileName(), vfefilename, sizeof( vfefilename ) );
-	Q_DefaultExtension( vfefilename, ".vfe", sizeof( vfefilename ) );
+	Q_StripExtension( GetFileName(), vfefilename );
+	Q_DefaultExtension( vfefilename, ".vfe" );
 
 	Con_Printf( "Exporting %s to %s\n", GetName(), vfefilename );
 
@@ -341,7 +337,7 @@ void CExpClass::Export( void )
 	fhdr->length = pData - pDataStart;
 
 	char relative[ 512 ];
-	filesystem->FullPathToRelativePath( vfefilename, relative, sizeof( relative ) );
+	filesystem->FullPathToRelativePath_safe( vfefilename, relative );
 	
 	MakeFileWriteable( relative );
 	FileHandle_t fh = filesystem->Open( relative, "wb" );
@@ -390,7 +386,7 @@ const char *CExpClass::GetFileName( void ) const
 //-----------------------------------------------------------------------------
 void CExpClass::SetFileName( const char *filename )
 {
-	strcpy( m_szFileName, filename );
+	V_strcpy_safe( m_szFileName, filename );
 }
 
 bool IsUsingPerPlayerExpressions();
@@ -465,8 +461,8 @@ CExpression *CExpClass::AddExpression( const char *name, const char *description
 	Assert( weights );
 
 	exp->SetExpressionClass( GetName() );
-	strcpy( exp->name, name );
-	strcpy( exp->description, description );
+	V_strcpy_safe( exp->name, name );
+	V_strcpy_safe( exp->description, description );
 	memcpy( settings, flexsettings, GLOBAL_STUDIO_FLEX_CONTROL_COUNT * sizeof( float ) );
 	memcpy( weights, flexweights, GLOBAL_STUDIO_FLEX_CONTROL_COUNT * sizeof( float ) );
 	exp->index = '_';

@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxChoice.h"
+#include "mxtk/mxchoice.h"
 #include <windows.h>
 
 
@@ -34,10 +34,10 @@ mxChoice::mxChoice (mxWindow *parent, int x, int y, int w, int h, int id)
 
 	void *handle = (void *) CreateWindowEx (0, "COMBOBOX", "", WS_VISIBLE | WS_CHILD | WS_VSCROLL | CBS_DROPDOWNLIST,
 				x, y, w, h + 500, hwndParent,
-				(HMENU) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
+				(HMENU) (std::ptrdiff_t) id, (HINSTANCE) GetModuleHandle (NULL), NULL);
 	
 	SendMessage ((HWND) handle, WM_SETFONT, (WPARAM) (HFONT) GetStockObject (ANSI_VAR_FONT), MAKELPARAM (TRUE, 0));
-	SetWindowLong ((HWND) handle, GWL_USERDATA, (LONG) this);
+	SetWindowLongPtr ((HWND) handle, GWLP_USERDATA, (LONG_PTR) this);
 
 	setHandle (handle);
 	setType (MX_CHOICE);
@@ -63,7 +63,7 @@ mxChoice::add (const char *item)
 
 
 void
-mxChoice::select (int index)
+mxChoice::select (intp index)
 {
 	SendMessage ((HWND) getHandle (), CB_SETCURSEL, (WPARAM) index, 0L);
 }
@@ -71,7 +71,7 @@ mxChoice::select (int index)
 
 
 void
-mxChoice::remove (int index)
+mxChoice::remove (intp index)
 {
 	SendMessage ((HWND) getHandle (), CB_DELETESTRING, (WPARAM) index, 0L);
 }

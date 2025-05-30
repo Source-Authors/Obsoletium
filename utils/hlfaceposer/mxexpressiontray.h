@@ -56,7 +56,7 @@ public:
 
 	void				AB( void );
 
-	void				Select( int exp, bool deselect = true );
+	void				Select( intp exp, bool deselect = true );
 	void				Deselect( void );
 	int					CountSelected( void );
 
@@ -122,13 +122,13 @@ private: // Data
 
 	int					m_nTopOffset;
 
-	int					m_nLastNumExpressions;
+	intp				m_nLastNumExpressions;
 
 	int					m_nGranularity;
 
 	// For A/B
-	int					m_nPrevCell;
-	int					m_nCurCell;
+	intp				m_nPrevCell;
+	intp				m_nCurCell;
 
 	// For context menu
 	int					m_nClickedCell;
@@ -142,7 +142,7 @@ private: // Data
 	int					m_nSnapshotHeight;
 
 	// For detecting that the slider thumbs need to be recomputed
-	int					m_nPreviousExpressionCount;
+	intp				m_nPreviousExpressionCount;
 
 	bool				m_bDragging;
 	RECT				m_rcFocus;

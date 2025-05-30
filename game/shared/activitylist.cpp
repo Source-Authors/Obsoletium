@@ -2409,7 +2409,7 @@ public:
 			return;
 		}
 		nameLen &= 0xFFFF;
-		pRestore->ReadString( nameBuf, sizeof(nameBuf), nameLen );
+		pRestore->ReadString( nameBuf, nameLen );
 		*pActivityIndex = ActivityList_IndexForName( nameBuf );
 		if ( *pActivityIndex < 0 )
 		{
@@ -2451,8 +2451,7 @@ void UTIL_LoadActivityRemapFile( const char *filename, const char *section, CUtl
 		return;
 	}
 
-	KeyValues *pkvFile = new KeyValues( section );
-
+	KeyValuesAD pkvFile( section );
 	if ( pkvFile->LoadFromFile( filesystem, filename, NULL ) )
 	{
 		KeyValues *pTestKey = pkvFile->GetFirstSubKey();

@@ -418,11 +418,11 @@ void CAttributeTextEntry::OnMouseWheeled( int delta )
 			}
 			else if ( input()->IsKeyDown(KEY_LCONTROL) )
 			{
-				deltaFactor = ((float)delta) / 100.0;
+				deltaFactor = ((float)delta) / 100.0f;
 			}
 			else
 			{
-				deltaFactor = ((float)delta) / 10.0;
+				deltaFactor = ((float)delta) / 10.0f;
 			}
 
 			float val = pPanel->GetAttributeValue<float>() + deltaFactor;

@@ -37,9 +37,9 @@ every surface must be divided into at least two patches each axis
 */
 
 CUtlVector<CPatch>		g_Patches;			
-CUtlVector<int>			g_FacePatches;		// contains all patches, children first
-CUtlVector<int>			faceParents;		// contains only root patches, use next parent to iterate
-CUtlVector<int>			clusterChildren;
+CUtlVector<intp>		g_FacePatches;		// contains all patches, children first
+CUtlVector<intp>		faceParents;		// contains only root patches, use next parent to iterate
+CUtlVector<intp>		clusterChildren;
 CUtlVector<Vector>		emitlight;
 CUtlVector<bumplights_t>	addlight;
 
@@ -239,8 +239,10 @@ void ReadLightFile (char *filename)
 
 			g_NonShadowCastingMaterialStrings.AddToTail( strdup( NoShadName ));
 		}
-		else if ( sscanf( scan, "forcetextureshadow %s", NoShadName ) == 1 )
+		// dimhotepus: Prevent overflow,
+		else if ( sscanf( scan, "forcetextureshadow %1023s", NoShadName ) == 1 )
 		{
+			NoShadName[std::size(NoShadName) - 1] = '\0';
 			// dimhotepus: Add verbose log.
 			qprintf( "Added '%s' as a force texture shadows model.\n",NoShadName);
 
@@ -331,7 +333,7 @@ void LightForTexture( const char *name, Vector& result )
 
 				// now we've gotten rid of the 'maps/level_name/' part, so we're left with
 				// 'originalName_%d_%d_%d'.
-				strcpy( baseFilename, base );
+				V_strcpy_safe( baseFilename, base );
 				bool foundSeparators = true;
 				for ( int i=0; i<3; ++i )
 				{
@@ -377,7 +379,7 @@ MAKE FACES
 WindingFromFace
 =============
 */
-winding_t	*WindingFromFace (dface_t *f, Vector& origin )
+winding_t	*WindingFromFace (dface_t *f, const Vector& origin )
 {
 	int			i;
 	int			se;
@@ -546,7 +548,7 @@ void MakePatchForFace (int fn, winding_t *w)
 	totalarea += area;
 
 	// get a patch
-	int ndxPatch = g_Patches.AddToTail();
+	intp ndxPatch = g_Patches.AddToTail();
 	patch = &g_Patches[ndxPatch];
 	memset( patch, 0, sizeof( CPatch ) );
 	patch->ndxNext = g_Patches.InvalidIndex();
@@ -680,15 +682,13 @@ void MakePatchForFace (int fn, winding_t *w)
 
 entity_t *EntityForModel (int modnum)
 {
-	int		i;
-	const char	*s;
 	char	name[16];
+	V_sprintf_safe (name, "*%i", modnum);
 
-	sprintf (name, "*%i", modnum);
 	// search the entities for one using modnum
-	for (i=0 ; i<num_entities ; i++)
+	for (int i=0 ; i<num_entities ; i++)
 	{
-		s = ValueForKey (&entities[i], "model");
+		const char *s = ValueForKey (&entities[i], "model");
 		if (!strcmp (s, name))
 			return &entities[i];
 	}
@@ -779,9 +779,9 @@ bool PreventSubdivision( CPatch *patch )
 //-----------------------------------------------------------------------------
 // Purpose: subdivide the "parent" patch
 //-----------------------------------------------------------------------------
-int CreateChildPatch( int nParentIndex, winding_t *pWinding, float flArea, const Vector &vecCenter )
+intp CreateChildPatch( int nParentIndex, winding_t *pWinding, float flArea, const Vector &vecCenter )
 {
-	int nChildIndex = g_Patches.AddToTail();
+	intp nChildIndex = g_Patches.AddToTail();
 
 	CPatch *child = &g_Patches[nChildIndex];
 	CPatch *parent = &g_Patches[nParentIndex];
@@ -846,7 +846,7 @@ int CreateChildPatch( int nParentIndex, winding_t *pWinding, float flArea, const
 //-----------------------------------------------------------------------------
 // Purpose: subdivide the "parent" patch
 //-----------------------------------------------------------------------------
-void SubdividePatch( int ndxPatch )
+void SubdividePatch( intp ndxPatch )
 {
 	winding_t *w, *o1, *o2;
 	Vector	total;
@@ -919,8 +919,8 @@ void SubdividePatch( int ndxPatch )
 	}
 
 	// create new child patches
-	int ndxChild1Patch = CreateChildPatch( ndxPatch, o1, area1, center1 );
-	int ndxChild2Patch = CreateChildPatch( ndxPatch, o2, area2, center2 );
+	intp ndxChild1Patch = CreateChildPatch( ndxPatch, o1, area1, center1 );
+	intp ndxChild2Patch = CreateChildPatch( ndxPatch, o2, area2, center2 );
 
 	// FIXME: This could go into CreateChildPatch if child1, child2 were stored in the patch as child[0], child[1]
 	patch = &g_Patches.Element( ndxPatch );
@@ -1126,9 +1126,7 @@ float FormFactorDiffToDiff ( CPatch *pDiff1, CPatch* pDiff2 )
 
 
 void MakeTransfer( int ndxPatch1, int ndxPatch2, transfer_t *all_transfers )
-//void MakeTransfer (CPatch *patch, CPatch *patch2, transfer_t *all_transfers )
 {
-	Vector	delta;
 	vec_t	scale;
 	float	trans;
 	transfer_t *transfer;
@@ -1171,7 +1169,7 @@ void MakeTransfer( int ndxPatch1, int ndxPatch2, transfer_t *all_transfers )
 	// Test 5 times rule
 	Vector vDelta;
 	VectorSubtract( pPatch1->origin, pPatch2->origin, vDelta );
-	float flThreshold = ( M_PI * 0.04 ) * DotProduct( vDelta, vDelta );
+	float flThreshold = ( M_PI_F * 0.04f ) * DotProduct( vDelta, vDelta );
 
 	if (flThreshold < pPatch2->area)
 	{
@@ -1331,14 +1329,18 @@ void WriteRTEnv (char *name)
 
 	for( int i = 0; i < g_RtEnv.OptimizedTriangleList.Count(); i++ )
 	{
-		triw->p[0] = g_RtEnv.OptimizedTriangleList[i].Vertex( 0);
-		triw->p[1] = g_RtEnv.OptimizedTriangleList[i].Vertex( 1);
-		triw->p[2] = g_RtEnv.OptimizedTriangleList[i].Vertex( 2);
-		int id = g_RtEnv.OptimizedTriangleList[i].m_Data.m_GeometryData.m_nTriangleID;
+		const auto &v = g_RtEnv.OptimizedTriangleList[i];
+		triw->p[0] = v.Vertex( 0);
+		triw->p[1] = v.Vertex( 1);
+		triw->p[2] = v.Vertex( 2);
+
+		int id = v.m_Data.m_GeometryData.m_nTriangleID;
+
 		Vector color(0, 0, 0);
 		if (id & TRACE_ID_OPAQUE) color.Init(0, 255, 0);
 		if (id & TRACE_ID_SKY) color.Init(0, 0, 255);
 		if (id & TRACE_ID_STATICPROP) color.Init(255, 0, 0);
+
 		WriteWinding(out, triw, color);
 	}
 	FreeWinding(triw);
@@ -1454,19 +1456,11 @@ void CollectLight( Vector& total )
 		{
 			// This is an interior node.
 			// Pull received light from children.
-			float s1, s2;
-			CPatch *child1;
-			CPatch *child2;
+			CPatch *child1 = &g_Patches[patch->child1];
+			CPatch *child2 = &g_Patches[patch->child2];
 
-			child1 = &g_Patches[patch->child1];
-			child2 = &g_Patches[patch->child2];
-
-			// BUG: This doesn't do anything?
-			if ((int)patch->area != (int)(child1->area + child2->area))
-				s1 = 0;
-
-			s1 = child1->area / (child1->area + child2->area);
-			s2 = child2->area / (child1->area + child2->area);
+			float s1 = child1->area / (child1->area + child2->area);
+			float s2 = child2->area / (child1->area + child2->area);
 
 			// patch->totallight = s1 * child1->totallight + s2 * child2->totallight
 			for ( j = 0; j < normalCount; j++ )
@@ -1692,7 +1686,7 @@ void BounceLight (void)
 		Vector total;
 
 		VectorSubtract (g_Patches[i].maxs, g_Patches[i].mins, total);
-		Msg("%4d %4d %4d %4d (%d) %.0f", i, g_Patches[i].parent, g_Patches[i].child1, g_Patches[i].child2, g_Patches[i].samples, g_Patches[i].area );
+		Msg("%4d %4zd %4zd %4d (%d) %.0f", i, g_Patches[i].parent, g_Patches[i].child1, g_Patches[i].child2, g_Patches[i].samples, g_Patches[i].area );
 		Msg(" [%.0f %.0f %.0f]", total[0], total[1], total[2] );
 		if (g_Patches[i].child1 != g_Patches.InvalidIndex() )
 		{
@@ -1729,7 +1723,8 @@ void BounceLight (void)
 		i++;
 		if ( g_bDumpPatches && !bouncing && i != 1)
 		{
-			sprintf (name, "bounce%i.txt", i);
+			// dimhotepus: %i -> %u
+			V_sprintf_safe (name, "bounce%u.txt", i);
 			WriteWorld (name, 0);
 		}
 	}
@@ -1762,13 +1757,11 @@ RadWorld
 */
 void RadWorld_Start()
 {
-	unsigned	i;
-
-	if (luxeldensity < 1.0)
+	if (luxeldensity < 1.0f)
 	{
 		// Remember the old lightmap vectors.
 		float oldLightmapVecs[MAX_MAP_TEXINFO][2][4];
-		for (i = 0; i < texinfo.Count(); i++)
+		for (intp i = 0; i < texinfo.Count(); i++)
 		{
 			for( int j=0; j < 2; j++ )
 			{
@@ -1780,7 +1773,7 @@ void RadWorld_Start()
 		}
 
 		// rescale luxels to be no denser than "luxeldensity"
-		for (i = 0; i < texinfo.Count(); i++)
+		for (intp i = 0; i < texinfo.Count(); i++)
 		{
 			texinfo_t	*tx = &texinfo[i];
 
@@ -1902,7 +1895,7 @@ void BuildFacesVisibleToLights( bool bAllVisible )
 						int index = dleafs[iLeaf].firstleafface + iFace;
 						index = dleaffaces[index];
 						
-						assert( index < numfaces );
+						Assert( index < numfaces );
 						g_FacesVisibleToLights[index >> 3] |= (1 << (index & 7));
 					}
 
@@ -2060,7 +2053,7 @@ bool RadWorld_Go()
 			for( int iBump = 0; iBump < 4; ++iBump )
 			{
 				char szName[64];
-				sprintf ( szName, "bounce0_%d.txt", iBump );
+				V_sprintf_safe ( szName, "bounce0_%d.txt", iBump );
 				WriteWorld( szName, iBump );
 			}
 		}
@@ -2082,7 +2075,7 @@ bool RadWorld_Go()
 		//
 		// displacement surface luxel accumulation (make threaded!!!)
 		//
-		StaticDispMgr()->StartTimer( "Build Patch/Sample Hash Table(s)....." );
+		StaticDispMgr()->StartTimer( "Build Patch/Sample Hash Table(s)..." );
 		StaticDispMgr()->InsertSamplesDataIntoHashTable();
 		StaticDispMgr()->InsertPatchSampleDataIntoHashTable();
 		StaticDispMgr()->EndTimer();
@@ -2118,7 +2111,7 @@ void InitDumpPatchesFiles()
 		for ( int iBump = 0; iBump < 4; ++iBump )
 		{
 			char szFilename[MAX_PATH];
-			sprintf( szFilename, "samples_style%d_bump%d.txt", iStyle, iBump );
+			V_sprintf_safe( szFilename, "samples_style%d_bump%d.txt", iStyle, iBump );
 			pFileSamples[iStyle][iBump] = g_pFileSystem->Open( szFilename, "w" );
 			if( !pFileSamples[iStyle][iBump] )
 			{
@@ -2169,14 +2162,14 @@ void VRAD_LoadBSP( char const *pFilename )
 		Msg( "Could not find lights.rad in %s.\nTrying VRAD BIN directory instead...\n", 
 			    global_lights );
 		GetModuleFileName( NULL, global_lights, sizeof( global_lights ) );
-		Q_ExtractFilePath( global_lights, global_lights, sizeof( global_lights ) );
-		strcat( global_lights, "lights.rad" );
+		V_ExtractFilePath( global_lights, global_lights );
+		V_strcat_safe( global_lights, "lights.rad" );
 	}
 
 	// Set the optional level specific lights filename
 	V_strcpy_safe( level_lights, source );
 
-	Q_DefaultExtension( level_lights, ".rad", sizeof( level_lights ) );
+	Q_DefaultExtension( level_lights, ".rad");
 	if ( !g_pFileSystem->FileExists( level_lights ) ) 
 		*level_lights = 0;	
 
@@ -2185,8 +2178,8 @@ void VRAD_LoadBSP( char const *pFilename )
 	if ( !Q_isempty(level_lights) )	ReadLightFile(level_lights);	// Optional & implied
 
 	V_strcpy_safe(incrementfile, source);
-	Q_DefaultExtension(incrementfile, ".r0", sizeof(incrementfile));
-	Q_DefaultExtension(source, ".bsp", sizeof( source ));
+	Q_DefaultExtension(incrementfile, ".r0");
+	Q_DefaultExtension(source, ".bsp");
 
 	Msg( "Loading %s.\n", source );
 	VMPI_SetCurrentStage( "LoadBSPFile" );
@@ -2277,10 +2270,11 @@ void VRAD_LoadBSP( char const *pFilename )
 		WriteRTEnv("trace.txt");
 
 	// Build acceleration structure
-	qprintf ( "Setting up ray-trace acceleration structure... ");
+	Msg ( "Setting up ray-trace acceleration structure...");
 	double start = Plat_FloatTime();
 	g_RtEnv.SetupAccelerationStructure();
-	qprintf ( "Done (%.2fs)\n", Plat_FloatTime()-start );
+	Msg ( "Done (%.2fs)", Plat_FloatTime()-start );
+	Msg ( "\n" );
 
 #if 0  // To test only k-d build
 	exit(0);
@@ -2363,13 +2357,12 @@ void VRAD_Finish()
 void VRAD_Init()
 {
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
-	InstallAllocationFunctions();
 	InstallSpewFunction();
 	SpewActivate( "developer", 1 );
 }
 
 
-int ParseCommandLine( int argc, char **argv, bool *onlydetail )
+static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 {
 	*onlydetail = false;
 
@@ -2378,8 +2371,7 @@ int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 	// default to LDR
 	SetHDRMode( false );
 
-	int i;
-	for( i=1 ; i<argc ; i++ )
+	for( int i=1 ; i<argc ; i++ )
 	{
 		if ( !Q_stricmp( argv[i], "-StaticPropLighting" ) )
 		{
@@ -2536,7 +2528,8 @@ int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 		{
 			if ( ++i < argc && *argv[i] )
 			{
-				g_flSkySampleScale = atof( argv[i] );
+				// dimhotepus: atof -> strtof.
+				g_flSkySampleScale = strtof( argv[i], nullptr );
 				Msg( "--extra-sky-scale: %f\n", g_flSkySampleScale );
 			}
 			else
@@ -2954,33 +2947,29 @@ void PrintUsage( int argc, char **argv )
 int RunVRAD( int argc, char **argv )
 {
 #ifdef PLATFORM_64BITS
-	Msg("Valve Software - vrad.exe SSE4.2+ [64 bit] (" __DATE__ ")\n" );
+	Msg("Valve Software - vrad SSE4.2+ [64 bit] (" __DATE__ ")\n" );
 #else
-	Msg("Valve Software - vrad.exe SSE4.2+ (" __DATE__ ")\n");
+	Msg("Valve Software - vrad SSE4.2+ (" __DATE__ ")\n");
 #endif
 
 	verbose = false;  // Originally FALSE
 
 	// dimhotepus: Need file system first.
-	CmdLib_InitFileSystem( argv[ argc - 1 ] );
-	if ( g_bUseMPI && !g_bMPIMaster )
-	{
-		// Don't do this if we're a VMPI worker..
-		LoadCmdLineFromFile( argc, argv, source, "vrad" );
-	}
+	const ScopedFileSystem scopedFileSystem( argv[ argc - 1 ] );
 
 	bool onlydetail;
+
+	const ScopedCmdLine scopedCmdLine( argc, argv, source, "vrad" );
 	int i = ParseCommandLine( argc, argv, &onlydetail );
 	if (i == -1)
 	{
 		PrintUsage( argc, argv );
-		DeleteCmdLine( argc, argv );
 		CmdLib_Exit( 1 );
 	}
 
 	// Initialize the filesystem, so additional commandline options can be loaded
-	Q_StripExtension( argv[ i ], source, sizeof( source ) );
-	Q_FileBase( source, source, sizeof( source ) );
+	Q_StripExtension( argv[ i ], source );
+	Q_FileBase( source, source );
 
 	VRAD_LoadBSP( argv[i] );
 
@@ -2995,7 +2984,6 @@ int RunVRAD( int argc, char **argv )
 
 	VMPI_SetCurrentStage( "master done" );
 
-	DeleteCmdLine( argc, argv );
 	CmdLib_Cleanup();
 	SpewDeactivate();
 	return 0;

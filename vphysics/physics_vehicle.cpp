@@ -364,13 +364,20 @@ CVehicleController::CVehicleController( const vehicleparams_t &params, CPhysicsE
 	m_pEnv = pEnv;
 	m_pGameTrace = pGameTrace;
 	m_nVehicleType = nVehicleType;
-	InitVehicleData( params );
+	CVehicleController::InitVehicleData( params );
 	ResetState();
 }
 
 
 CVehicleController::CVehicleController()
 {
+	// dimhotepus: Use safe defaults.
+	m_pEnv = nullptr;
+	m_pGameTrace = nullptr;
+	memset( &m_vehicleData, 0, sizeof(m_vehicleData) );
+	// dimhotepus: Unknown vehicle type.
+	m_nVehicleType = 0;
+
 	ResetState();
 }
 
@@ -389,6 +396,10 @@ void CVehicleController::ResetState()
 	m_wheelRadius = 0;
 	memset( &m_currentState, 0, sizeof(m_currentState) );
 	m_bodyMass = 0;
+	// dimhotepus: Need to reset total wheel mass, too.
+	m_totalWheelMass = 0;
+	// dimhotepus: Need to reset gravity length, too.
+	m_gravityLength = 0;
 	m_vehicleFlags = 0;
 	memset( m_wheelPosition_Bs, 0, sizeof(m_wheelPosition_Bs) );
 	memset( m_tracePosition_Bs, 0, sizeof(m_tracePosition_Bs) );
@@ -1086,7 +1097,6 @@ void CVehicleController::UpdateSkidding( bool bHandbrake )
 		Vector velocity;
 		int surfaceProps;
 		m_currentState.wheelsInContact = 0;
-		m_currentState.wheelsNotInContact = 0;
 
 		for( int iWheel = 0; iWheel < m_wheelCount; ++iWheel )
 		{
@@ -1178,7 +1188,7 @@ float CVehicleController::CalcSteering( float dt, float speed, float steering, b
 	}
 	if ( m_vehicleData.steering.steeringExponent != 0 )
 	{
-		float sign = steering < 0 ? -1 : 1;
+		float sign = steering < 0 ? -1.f : 1.f;
 		float absSteering = fabs(steering);
 		if ( bAnalog )
 		{
@@ -1276,8 +1286,8 @@ void CVehicleController::CalcEngine( float throttle, float brake_val, bool handb
 	{
 		m_vehicleFlags &= ~FVEHICLE_THROTTLE_STOPPED;
 		// calculate the force that propels the car
-		const float watt_per_hp = 745.0f;
-		const float seconds_per_minute = 60.0f;
+		constexpr float watt_per_hp = 745.0f;
+		constexpr float seconds_per_minute = 60.0f;
 
 		float wheel_force_by_throttle = throttle * 
 			m_vehicleData.engine.horsepower * (watt_per_hp * seconds_per_minute) * 

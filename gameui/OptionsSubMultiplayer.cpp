@@ -170,7 +170,7 @@ void CrosshairImagePanelSimple::InitCrosshairColorEntries()
 {
 	if (m_pCrosshairColorCombo != NULL)
 	{
-		KeyValues *data = new KeyValues("data");
+		KeyValuesAD data("data");
 
 		// add in the "Default" selection
 		data->Clear();
@@ -181,8 +181,6 @@ void CrosshairImagePanelSimple::InitCrosshairColorEntries()
 			data->SetInt("color", i);
 			m_pCrosshairColorCombo->AddItem( s_crosshairColors[ i ].name, data);
 		}
-
-		data->deleteThis();
 	}
 }
 
@@ -486,7 +484,7 @@ void CrosshairImagePanelCS::InitCrosshairColorEntries()
 {
 	if (m_pColorComboBox != NULL)
 	{
-		KeyValues *data = new KeyValues("data");
+		KeyValuesAD data("data");
 
 		// add in the "Default" selection
 		data->Clear();
@@ -500,8 +498,6 @@ void CrosshairImagePanelCS::InitCrosshairColorEntries()
 
 		data->SetInt("color", NumCrosshairColors);
 		m_pColorComboBox->AddItem( "Custom", data);
-
-		data->deleteThis();
 	}
 }
 
@@ -617,9 +613,9 @@ void CrosshairImagePanelCS::UpdateCrosshair()
 	}
 	else
 	{
-		m_R = clamp( m_pColorRSlider->GetSliderValue(), 0, 255 );
-		m_G = clamp( m_pColorGSlider->GetSliderValue(), 0, 255 );
-		m_B = clamp( m_pColorBSlider->GetSliderValue(), 0, 255 );
+		m_R = clamp( m_pColorRSlider->GetSliderValue(), 0.f, 255.f );
+		m_G = clamp( m_pColorGSlider->GetSliderValue(), 0.f, 255.f );
+		m_B = clamp( m_pColorBSlider->GetSliderValue(), 0.f, 255.f );
 	}
 
 	m_barSize = m_pSizeSlider->GetSliderValue();
@@ -892,16 +888,16 @@ void CrosshairImagePanelAdvanced::Paint()
 void CrosshairImagePanelAdvanced::UpdateCrosshair()
 {
 	// get the color selected in the combo box.
-	m_R = clamp( m_pAdvCrosshairRedSlider->GetSliderValue(), 0, 255 );
-	m_G = clamp( m_pAdvCrosshairGreenSlider->GetSliderValue(), 0, 255 );
-	m_B = clamp( m_pAdvCrosshairBlueSlider->GetSliderValue(), 0, 255 );
+	m_R = clamp( m_pAdvCrosshairRedSlider->GetSliderValue(), 0.f, 255.f );
+	m_G = clamp( m_pAdvCrosshairGreenSlider->GetSliderValue(), 0.f, 255.f );
+	m_B = clamp( m_pAdvCrosshairBlueSlider->GetSliderValue(), 0.f, 255.f );
 
 	m_flScale = m_pAdvCrosshairScaleSlider->GetSliderValue();
 
 	if ( m_pAdvCrosshairStyle )
 	{
 		char crosshairname[256];
-		m_pAdvCrosshairStyle->GetText( crosshairname, sizeof(crosshairname)	);
+		m_pAdvCrosshairStyle->GetText( crosshairname );
 
 		if ( ModInfo().AdvCrosshairLevel() == 1 && m_pAdvCrosshairStyle->GetActiveItem() == 0 ) // this is the "none" selection
 		{
@@ -1024,7 +1020,7 @@ void CrosshairImagePanelAdvanced::ApplyChanges()
 	// save the crosshair
 	char cmd[512];
 	char crosshair[256];
-	m_pAdvCrosshairStyle->GetText(crosshair, sizeof(crosshair));
+	m_pAdvCrosshairStyle->GetText(crosshair);
 
 	if ( ModInfo().AdvCrosshairLevel() == 1 && m_pAdvCrosshairStyle->GetActiveItem() == 0 ) // this is the "none" selection
 	{
@@ -1327,7 +1323,7 @@ void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 
 		// Get the filename
 		char szRootFilename[MAX_PATH];
-		V_FileBase( fullpath, szRootFilename, sizeof( szRootFilename ) );
+		V_FileBase( fullpath, szRootFilename );
 
 		// automatically select the logo that was just imported.
 		SelectLogo(szRootFilename);
@@ -1406,12 +1402,12 @@ void COptionsSubMultiplayer::SelectLogo(const char *logoName)
 	wchar_t itemToSelectText[MAX_PATH];
 
 	// convert the logo filename to unicode
-	g_pVGuiLocalize->ConvertANSIToUnicode(logoName, itemToSelectText, sizeof(itemToSelectText));
+	g_pVGuiLocalize->ConvertANSIToUnicode(logoName, itemToSelectText);
 
 	// find the index of the spray we want.
 	for (index = 0; index < numEntries; ++index)
 	{
-		m_pLogoList->GetItemText(index, itemText, sizeof(itemText));
+		m_pLogoList->GetItemText(index, itemText);
 		if (!wcscmp(itemText, itemToSelectText))
 		{
 			break;
@@ -1507,8 +1503,8 @@ void FindVMTFilesInFolder( const char *pFolder, const char *pFolderName, CLabele
 
 
 				char realname[ 512 ];
-				Q_FileBase( modelfile, realname, sizeof( realname ) );
-				Q_FileBase( filename, filename, sizeof( filename ) );
+				V_FileBase( modelfile, realname );
+				V_FileBase( filename, filename );
 				
 				if (!stricmp(filename, realname))
 				{
@@ -1542,16 +1538,16 @@ void COptionsSubMultiplayer::InitModelList( CLabeledCommandComboBox *cb )
 void COptionsSubMultiplayer::RemapLogo()
 {
 	char logoname[256];
+	m_pLogoList->GetText( logoname );
 
-	m_pLogoList->GetText( logoname, sizeof( logoname ) );
 	if( !logoname[ 0 ] )
 		return;
 
-	char fullLogoName[512];
-
 	// make sure there is a version with the proper shader
 	g_pFullFileSystem->CreateDirHierarchy( "materials/VGUI/logos/UI", "GAME" );
-	Q_snprintf( fullLogoName, sizeof( fullLogoName ), "materials/VGUI/logos/UI/%s.vmt", logoname );
+
+	char fullLogoName[512];
+	V_sprintf_safe( fullLogoName, "materials/VGUI/logos/UI/%s.vmt", logoname );
 	if ( !g_pFullFileSystem->FileExists( fullLogoName ) )
 	{
 		FileHandle_t fp = g_pFullFileSystem->Open( fullLogoName, "wb" );
@@ -1559,7 +1555,7 @@ void COptionsSubMultiplayer::RemapLogo()
 			return;
 
 		char data[1024];
-		Q_snprintf( data, sizeof( data ), "\"UnlitGeneric\"\n\
+		V_sprintf_safe( data, "\"UnlitGeneric\"\n\
 {\n\
 	// Original shader: BaseTimesVertexColorAlphaBlendNoOverbright\n\
 	\"$translucent\" 1\n\
@@ -1571,11 +1567,11 @@ void COptionsSubMultiplayer::RemapLogo()
 }\n\
 ", logoname );
 
-		g_pFullFileSystem->Write( data, strlen( data ), fp );
+		g_pFullFileSystem->Write( data, V_strlen( data ), fp );
 		g_pFullFileSystem->Close( fp );
 	}
 
-	Q_snprintf( fullLogoName, sizeof( fullLogoName ), "logos/UI/%s", logoname );
+	V_sprintf_safe( fullLogoName, "logos/UI/%s", logoname );
 	m_pLogoImage->SetImage( fullLogoName );
 }
 
@@ -1684,7 +1680,7 @@ void COptionsSubMultiplayer::OnApplyChanges()
 	m_pSecondaryColorSlider->ApplyChanges();
 //	m_pModelList->ApplyChanges();
 	m_pLogoList->ApplyChanges();
-    m_pLogoList->GetText(m_LogoName, sizeof(m_LogoName));
+    m_pLogoList->GetText(m_LogoName);
 	m_pHighQualityModelCheckBox->ApplyChanges();
 
 	for ( int i=0; i<m_cvarToggleCheckButtons.GetCount(); ++i )

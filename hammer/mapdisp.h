@@ -300,8 +300,8 @@ public:
     //
     // Load/Save Functions
     //
-    ChunkFileResult_t LoadVMF(CChunkFile *pFile);
-    ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+    [[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile);
+    [[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
     bool SerializedLoadMAP( std::fstream &file, CMapFace *pFace, UINT version );
     bool SerializedLoadRMF( std::fstream &file, CMapFace *pFace, float version );
     bool SaveDXF(ExportDXFInfo_s *pInfo);
@@ -438,21 +438,21 @@ private:
     //
     // Load/Save Functions
     //
-    static ChunkFileResult_t LoadDispDistancesCallback(CChunkFile *pFile, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispDistancesKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispOffsetsCallback(CChunkFile *pFile, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispOffsetsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispOffsetNormalsCallback(CChunkFile *pFile, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispOffsetNormalsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispNormalsCallback(CChunkFile *pFile, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispNormalsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispAlphasCallback(CChunkFile *pFile, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispAlphasKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispTriangleTagsCallback(CChunkFile *pFile, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispTriangleTagsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispAllowedVertsCallback(CChunkFile *pFile, CMapDisp *pDisp);
-    static ChunkFileResult_t LoadDispAllowedVertsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispDistancesCallback(CChunkFile *pFile, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispDistancesKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispOffsetsCallback(CChunkFile *pFile, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispOffsetsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispOffsetNormalsCallback(CChunkFile *pFile, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispOffsetNormalsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispNormalsCallback(CChunkFile *pFile, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispNormalsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispAlphasCallback(CChunkFile *pFile, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispAlphasKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispTriangleTagsCallback(CChunkFile *pFile, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispTriangleTagsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispAllowedVertsCallback(CChunkFile *pFile, CMapDisp *pDisp);
+    [[nodiscard]] static ChunkFileResult_t LoadDispAllowedVertsKeyCallback(const char *szKey, const char *szValue, CMapDisp *pDisp);
 
     //=========================================================================
     //

@@ -6,31 +6,19 @@
 #include "stdafx.h"
 
 #if defined(_WIN32)
-#if !defined(_X360)
-#define WIN_32_LEAN_AND_MEAN
-#include <Windows.h>
-#else
-#undef Verify
-#define _XBOX
-#include <xtl.h>
-#undef _XBOX
-#include "xbox/xbox_win32stubs.h"
-#endif
+#include "winlite.h"
 #endif
 
-#include <malloc.h>
 #include <algorithm>
+
 #include "tier0/dbg.h"
 #include "tier0/memalloc.h"
 #include "tier0/threadtools.h"
 #include "tier0/tslist.h"
+
 #include "mem_helpers.h"
 
 #pragma pack(4)
-
-#ifdef _X360
-#define USE_PHYSICAL_SMALL_BLOCK_HEAP 1
-#endif
 
 
 // #define NO_SBH	1
@@ -40,13 +28,9 @@
 #define MIN_SBH_ALIGN	8
 #define MAX_SBH_BLOCK	2048
 #define MAX_POOL_REGION (4*1024*1024)
-#if !defined(_X360)
 #define SBH_PAGE_SIZE		(4*1024)
 #define COMMIT_SIZE		(16*SBH_PAGE_SIZE)
-#else
-#define SBH_PAGE_SIZE		(64*1024)
-#define COMMIT_SIZE		(SBH_PAGE_SIZE)
-#endif
+
 #ifdef _M_X64
 #define NUM_POOLS		34
 #else
@@ -73,15 +57,15 @@ class ALIGN16 CSmallBlockPool
 {
 public:
 	void Init( unsigned nBlockSize, byte *pBase, unsigned initialCommit = 0 );
-	size_t GetBlockSize();
-	bool IsOwner( void *p );
+	uintp GetBlockSize() const;
+	bool IsOwner( void *p ) const;
 	void *Alloc();
 	void Free( void *p );
-	int CountFreeBlocks();
-	intp GetCommittedSize();
-	int CountCommittedBlocks();
-	int CountAllocatedBlocks();
-	int Compact();
+	int CountFreeBlocks() const;
+	uintp GetCommittedSize() const;
+	uintp CountCommittedBlocks() const;
+	uintp CountAllocatedBlocks() const;
+	intp Compact();
 
 private:
 
@@ -109,99 +93,25 @@ class ALIGN16 CSmallBlockHeap
 {
 public:
 	CSmallBlockHeap();
-	bool ShouldUse( size_t nBytes );
-	bool IsOwner( void * p );
+	bool ShouldUse( size_t nBytes ) const;
+	bool IsOwner( void * p ) const;
 	void *Alloc( size_t nBytes );
 	void *Realloc( void *p, size_t nBytes );
 	void Free( void *p );
-	size_t GetSize( void *p );
+	uintp GetSize( void *p ) const;
 	void DumpStats( FILE *pFile = NULL );
-	int Compact();
+	intp Compact();
 
 private:
-	CSmallBlockPool *FindPool( size_t nBytes );
+	CSmallBlockPool *FindPool( size_t nBytes ) const;
 	CSmallBlockPool *FindPool( void *p );
+	const CSmallBlockPool *FindPool( void *p ) const;
 
 	CSmallBlockPool *m_PoolLookup[MAX_SBH_BLOCK >> 2];
 	CSmallBlockPool m_Pools[NUM_POOLS];
 	byte *m_pBase;
 	byte *m_pLimit;
 } ALIGN16_POST;
-
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-#define BYTES_X360_SBH (32*1024*1024)
-#define PAGESIZE_X360_SBH (64*1024)
-class CX360SmallBlockPool
-{
-public:
-	void Init( unsigned nBlockSize );
-	size_t GetBlockSize();
-	bool IsOwner( void *p );
-	void *Alloc();
-	void Free( void *p );
-	int CountFreeBlocks();
-	intp GetCommittedSize();
-	int CountCommittedBlocks();
-	int CountAllocatedBlocks();
-
-	static CX360SmallBlockPool *FindPool( void *p )
-	{
-		int index = (size_t)((byte *)p - gm_pPhysicalBase) / PAGESIZE_X360_SBH;
-		if ( index < 0 || index >= ARRAYSIZE(gm_AddressToPool) )
-			return NULL;
-		return gm_AddressToPool[ index ];
-	}
-
-private:
-	friend class CX360SmallBlockHeap;
-
-	typedef TSLNodeBase_t FreeBlock_t;
-	class CFreeList : public CTSListBase
-	{
-	public:
-		void Push( void *p ) { CTSListBase::Push( (TSLNodeBase_t *)p );	}
-	};
-
-	CFreeList		m_FreeList;
-
-	unsigned		m_nBlockSize;
-	unsigned		m_CommittedSize;
-
-	CInterlockedPtr<byte> m_pNextAlloc;
-	byte *			m_pCurBlockEnd;
-
-	CThreadFastMutex m_CommitMutex;
-
-	static CX360SmallBlockPool *gm_AddressToPool[BYTES_X360_SBH/PAGESIZE_X360_SBH];
-
-	static byte *gm_pPhysicalBlock;
-	static byte *gm_pPhysicalBase;
-	static byte *gm_pPhysicalLimit;
-};
-
-
-class CX360SmallBlockHeap
-{
-public:
-	CX360SmallBlockHeap();
-	bool ShouldUse( size_t nBytes );
-	bool IsOwner( void * p );
-	void *Alloc( size_t nBytes );
-	void *Realloc( void *p, size_t nBytes );
-	void Free( void *p );
-	size_t GetSize( void *p );
-	void DumpStats( FILE *pFile = NULL );
-
-	CSmallBlockHeap *GetStandardSBH();
-
-private:
-	CX360SmallBlockPool *FindPool( size_t nBytes );
-	CX360SmallBlockPool *FindPool( void *p );
-
-	CX360SmallBlockPool *m_PoolLookup[MAX_SBH_BLOCK >> 2];
-	CX360SmallBlockPool m_Pools[NUM_POOLS];
-};
-#endif
 
 
 class ALIGN16 CStdMemAlloc : public IMemAlloc
@@ -274,9 +184,6 @@ public:
 	void DumpBlockStats( void * ) override {}
 #ifdef MEM_SBH_ENABLED
 	CSmallBlockHeap m_SmallBlockHeap;
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-	CX360SmallBlockHeap m_LargePageSmallBlockHeap;
-#endif
 #endif
 
 #if defined( _MEMTEST )

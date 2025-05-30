@@ -263,7 +263,7 @@ class CMapDoc : public CDocument
 		void GetCordon( Vector &mins, Vector &maxs);
 		void SetCordon( const Vector &mins, const Vector &maxs);
 		CMapWorld *CordonCreateWorld();
-		ChunkFileResult_t CordonSaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+		[[nodiscard]] ChunkFileResult_t CordonSaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 		Vector		m_vCordonMins;
 		Vector		m_vCordonMaxs;
 		bool		m_bIsCordoning;
@@ -446,7 +446,7 @@ class CMapDoc : public CDocument
 		void QuickHide_HideUnselectedObjects( void );
 		void QuickHide_Unhide( void );
 		bool QuickHide_IsObjectHidden( CMapClass *pObject );
-		ChunkFileResult_t QuickHide_SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
+		[[nodiscard]] ChunkFileResult_t QuickHide_SaveVMF( CChunkFile *pFile, CSaveInfo *pSaveInfo );
 		CUtlVector< CMapClass* > m_QuickHideGroup;
 		CUtlVector< CMapClass* > m_QuickHideGroupedParents;
 
@@ -555,23 +555,23 @@ class CMapDoc : public CDocument
 		//
 		// Serialization.
 		//
-		ChunkFileResult_t SaveVersionInfoVMF(CChunkFile *pFile, bool bIsAutosave = false);
-		ChunkFileResult_t VisGroups_SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
-		ChunkFileResult_t SaveViewSettingsVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+		[[nodiscard]] ChunkFileResult_t SaveVersionInfoVMF(CChunkFile *pFile, bool bIsAutosave = false);
+		[[nodiscard]] ChunkFileResult_t VisGroups_SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+		[[nodiscard]] ChunkFileResult_t SaveViewSettingsVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 
 		static bool HandleLoadError(CChunkFile *pFile, const char *szChunkName, ChunkFileResult_t eError, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadCordonCallback(CChunkFile *pFile, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadCordonKeyCallback(const char *pszKey, const char *pszValue, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadEntityCallback(CChunkFile *pFile, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadHiddenCallback(CChunkFile *pFile, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadGroupKeyCallback(const char *szKey, const char *szValue, CMapGroup *pGroup);
-		static ChunkFileResult_t LoadVersionInfoCallback(CChunkFile *pFile, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadVersionInfoKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadAutosaveCallback(CChunkFile *pFile, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadAutosaveKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc);		
-		static ChunkFileResult_t LoadWorldCallback(CChunkFile *pFile, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadViewSettingsCallback(CChunkFile *pFile, CMapDoc *pDoc);
-		static ChunkFileResult_t LoadViewSettingsKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadCordonCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadCordonKeyCallback(const char *pszKey, const char *pszValue, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadEntityCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadHiddenCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadGroupKeyCallback(const char *szKey, const char *szValue, CMapGroup *pGroup);
+		[[nodiscard]] static ChunkFileResult_t LoadVersionInfoCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadVersionInfoKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadAutosaveCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadAutosaveKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc);		
+		[[nodiscard]] static ChunkFileResult_t LoadWorldCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadViewSettingsCallback(CChunkFile *pFile, CMapDoc *pDoc);
+		[[nodiscard]] static ChunkFileResult_t LoadViewSettingsKeyCallback(const char *szKey, const char *szValue, CMapDoc *pDoc);
 
 		//
 		// Search functions.
@@ -655,8 +655,43 @@ class CMapDoc : public CDocument
 		//
 		// Expands %i keyword in prefab targetnames to generate unique targetnames for this map.
 		//
-		bool ExpandTargetNameKeywords(char *szNewTargetName, const char *szOldTargetName, CMapWorld *pWorld);
-		bool DoExpandKeywords(CMapClass *pObject, CMapWorld *pWorld, char *szOldKeyword, char *szNewKeyword);
+		bool ExpandTargetNameKeywords
+		(
+			OUT_Z_BYTECAP(newTargetNameSize) char *szNewTargetName,
+			intp newTargetNameSize,
+			const char *szOldTargetName,
+			CMapWorld *pWorld
+		);
+		template<intp newTargetNameSize>
+		bool ExpandTargetNameKeywords
+		(
+			OUT_Z_ARRAY char (&szNewTargetName)[newTargetNameSize],
+			const char *szOldTargetName,
+			CMapWorld *pWorld
+		)
+		{
+			return ExpandTargetNameKeywords(szNewTargetName, newTargetNameSize, szOldTargetName, pWorld);
+		}
+		bool DoExpandKeywords
+		(
+			CMapClass *pObject,
+			CMapWorld *pWorld,
+			OUT_Z_CAP(oldKeywordSize) char *szOldKeyword,
+			intp oldKeywordSize,
+			OUT_Z_CAP(newKeywordSize) char *szNewKeyword,
+			intp newKeywordSize
+		);
+		template<intp oldKeywordSize, intp newKeywordSize>
+		bool DoExpandKeywords
+		(
+			CMapClass* pObject,
+			CMapWorld* pWorld,
+			OUT_Z_ARRAY char (&szOldKeyword)[oldKeywordSize],
+			OUT_Z_ARRAY char (&szNewKeyword)[newKeywordSize]
+		)
+		{
+			return DoExpandKeywords(pObject, pWorld, szOldKeyword, oldKeywordSize, szNewKeyword, newKeywordSize);
+		}
 
 		// Renames all named entities in pRoot
 		void RenameEntities( CMapClass *pRoot, CMapWorld *pWorld, bool bMakeUnique, const char *pszPrefix );

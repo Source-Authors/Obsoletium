@@ -13,29 +13,31 @@
 
 namespace {
 
-std::atomic_bool g_bToolsWriteFullMinidumps = false;
-std::atomic<se::utils::common::ToolsExceptionHandler>
-    g_pCustomExceptionHandler = nullptr;
+std::atomic_bool g_bToolsWriteFullMinidumps{false};
+std::atomic<se::utils::common::ToolsExceptionHandler> g_pCustomExceptionHandler{
+    nullptr};
 
 LONG __stdcall DefaultToolsExceptionFilter(EXCEPTION_POINTERS *ptrs) {
   // Non VMPI workers write a minidump and show a crash dialog like normal.
-  MINIDUMP_TYPE minidump_type = MiniDumpNormal;
+  MINIDUMP_TYPE minidump_type{MiniDumpNormal};
 
-  if (g_bToolsWriteFullMinidumps) {
+  if (g_bToolsWriteFullMinidumps.load(
+          std::memory_order::memory_order_relaxed)) {
     minidump_type = static_cast<MINIDUMP_TYPE>(
         MiniDumpWithDataSegs | MiniDumpWithIndirectlyReferencedMemory);
   }
 
-  WriteMiniDumpUsingExceptionInfo(ptrs->ExceptionRecord->ExceptionCode, ptrs,
-                                  minidump_type);
-
-  return EXCEPTION_CONTINUE_SEARCH;
+  return WriteMiniDumpUsingExceptionInfo(ptrs->ExceptionRecord->ExceptionCode,
+                                         ptrs, to_underlying(minidump_type))
+             ? EXCEPTION_CONTINUE_SEARCH
+             : EXCEPTION_EXECUTE_HANDLER;
 }
 
 LONG __stdcall CallbackToolsExceptionFilter(EXCEPTION_POINTERS *ptrs) {
   // Run their custom handler.
-  g_pCustomExceptionHandler.load(std::memory_order::memory_order_relaxed)(
-      ptrs->ExceptionRecord->ExceptionCode, ptrs);
+  const auto handler =
+      g_pCustomExceptionHandler.load(std::memory_order::memory_order_relaxed);
+  if (handler) handler(ptrs->ExceptionRecord->ExceptionCode, ptrs);
 
   return EXCEPTION_EXECUTE_HANDLER;  // (never gets here anyway)
 }

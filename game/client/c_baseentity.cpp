@@ -6236,15 +6236,13 @@ void C_BaseEntity::RecordToolMessage()
 	if ( HasRecordedThisFrame() )
 		return;
 
-	KeyValues *msg = new KeyValues( "entity_state" );
+	KeyValuesAD msg( "entity_state" );
 
 	// Post a message back to all IToolSystems
 	GetToolRecordingState( msg );
 	Assert( (int)GetToolHandle() != 0 );
 	ToolFramework_PostToolMessage( GetToolHandle(), msg );
 	CleanupToolRecordingState( msg );
-
-	msg->deleteThis();
 
 	m_nLastRecordedFrame = gpGlobals->framecount;
 }

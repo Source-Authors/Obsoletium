@@ -13,16 +13,16 @@
 // Unicode-related #defines (see wchartypes.h)
 //-----------------------------------------------------------------------------
 #ifdef ENFORCE_WCHAR
-#define char DontUseChar_SeeWcharOn.h
+#define char DontUseChar_SeeWcharOn.h //-V1059
 #endif
 
 
 //-----------------------------------------------------------------------------
 // Memory-related #defines
 //-----------------------------------------------------------------------------
-#define malloc( cub ) HEY_DONT_USE_MALLOC_USE_PVALLOC
-#define realloc( pvOld, cub ) HEY_DONT_USE_REALLOC_USE_PVREALLOC
+#define malloc( cub ) HEY_DONT_USE_MALLOC_USE_PVALLOC //-V1059
+#define realloc( pvOld, cub ) HEY_DONT_USE_REALLOC_USE_PVREALLOC //-V1059
 #define _expand( pvOld, cub ) HEY_DONT_USE_EXPAND_USE_PVEXPAND
-#define free( pv ) HEY_DONT_USE_FREE_USE_FREEPV
+#define free( pv ) HEY_DONT_USE_FREE_USE_FREEPV //-V1059
 
 #endif

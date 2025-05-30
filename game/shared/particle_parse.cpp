@@ -58,7 +58,7 @@ int GetAttachTypeFromString( const char *pszString )
 void GetParticleManifest( CUtlVector<CUtlString>& list )
 {
 	// Open the manifest file, and read the particles specified inside it
-	KeyValues *manifest = new KeyValues( PARTICLES_MANIFEST_FILE );
+	KeyValuesAD manifest( PARTICLES_MANIFEST_FILE );
 	if ( manifest->LoadFromFile( filesystem, PARTICLES_MANIFEST_FILE, "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
@@ -76,8 +76,6 @@ void GetParticleManifest( CUtlVector<CUtlString>& list )
 	{
 		Warning( "PARTICLE SYSTEM: Unable to load manifest file '%s'\n", PARTICLES_MANIFEST_FILE );
 	}
-
-	manifest->deleteThis();
 }
 
 
@@ -149,7 +147,7 @@ void ReloadParticleEffectsInList( IFileList *pFilesToReload )
 	if ( pszMapName && pszMapName[0] )
 	{
 		char mapname[MAX_MAP_NAME];
-		Q_FileBase( pszMapName, mapname, sizeof( mapname ) );
+		V_FileBase( pszMapName, mapname );
 		Q_strlower( mapname );
 		ParseParticleEffectsMap( mapname, true, pFilesToReload );
 	}
@@ -180,7 +178,7 @@ void ParseParticleEffectsMap( const char *pMapName, bool bLoadSheets, IFileList 
 	}
 
 	// Open the manifest file, and read the particles specified inside it
-	auto manifest = KeyValues::AutoDelete( szMapManifestFilename );
+	KeyValuesAD manifest( szMapManifestFilename );
 	if ( manifest->LoadFromFile( filesystem, szMapManifestFilename, "GAME" ) )
 	{
 		DevMsg( "Successfully loaded particle effects manifest '%s' for map '%s'\n", szMapManifestFilename, pMapName );
@@ -586,7 +584,8 @@ void StopParticleEffects( CBaseEntity *pEntity )
 		float flSurfaceOffsetDistance = 0.f;
 		if ( args.ArgC() == 3 )
 		{
-			flSurfaceOffsetDistance = atof( args[2] );
+			// dimhotepus: atof -> strtof.
+			flSurfaceOffsetDistance = strtof( args[2], nullptr );
 		}
 
 		Vector vForward;

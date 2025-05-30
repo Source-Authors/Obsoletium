@@ -81,11 +81,12 @@ public:
 	bool Unserialize( DmAttributeType_t type, CUtlBuffer &buf );
 	bool UnserializeElement( DmAttributeType_t type, CUtlBuffer &buf );
 	bool Serialize( CUtlBuffer &buf ) const;
-	bool SerializeElement( int nIndex, CUtlBuffer &buf ) const;
+	bool SerializeElement( intp nIndex, CUtlBuffer &buf ) const;
 	bool SerializesOnMultipleLines() const;
 
 	// Returns the size of the variables storing the various attribute types
-	static int AttributeDataSize( DmAttributeType_t type );
+	// dimhotepus: int -> intp
+	static intp AttributeDataSize( DmAttributeType_t type );
 
 private:
 	CDmxAttribute( const char *pAttributeName );
@@ -97,7 +98,7 @@ private:
 	void FreeDataMemory( );
 
 	// Untyped method for setting used by unpack
-	void SetValue( DmAttributeType_t type, const void *pSrc, int nLen );
+	void SetValue( DmAttributeType_t type, const void *pSrc, intp nLen );
 
 	DmAttributeType_t m_Type;
 	CUtlSymbol m_Name;

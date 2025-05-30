@@ -24,7 +24,7 @@ class CDialogAddServer : public vgui::Frame, public ISteamMatchmakingPingRespons
 
 public:
 	CDialogAddServer(vgui::Panel *parent, IGameList *gameList);
-	~CDialogAddServer();
+	virtual ~CDialogAddServer();
 
 	void ServerResponded( gameserveritem_t &server ) override;
 	void ServerFailedToRespond() override;
@@ -58,7 +58,7 @@ protected:
 	CUtlVector<HServerQuery> m_Queries;
 };
 
-class CDialogAddBlacklistedServer : public CDialogAddServer 
+class CDialogAddBlacklistedServer final : public CDialogAddServer 
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CDialogAddBlacklistedServer, CDialogAddServer );
 public:

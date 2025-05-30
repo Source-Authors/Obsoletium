@@ -11,7 +11,7 @@
 #pragma once
 #endif
 
-#include "UtlLinkedList.h"
+#include "tier1/UtlLinkedList.h"
 #include "igameserverdata.h"
 
 class IServerDataResponse;
@@ -53,7 +53,7 @@ public:
 	void AddServerMessageHandler(IServerDataResponse *handler, const char *watch);
 
 	// removes a requester from the list to guarantee the pointer won't be used
-	void RemoveServerDataResponseTarget(IServerDataResponse *invalidRequester);
+	void RemoveServerDataResponseTarget(const IServerDataResponse *invalidRequester);
 
 private:
 	int m_iCurrentRequestID;
@@ -81,7 +81,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: callback interface
 //-----------------------------------------------------------------------------
-class IServerDataResponse
+abstract_class IServerDataResponse
 {
 public:
 	// called when the server has returned a requested value

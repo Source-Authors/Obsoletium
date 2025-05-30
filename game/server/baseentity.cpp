@@ -2044,7 +2044,7 @@ void CBaseEntity::UpdateOnRemove( void )
 	if ( childrenList.Count() )
 	{
 		DevMsg( 2, "Warning: Deleting orphaned children of %s\n", GetClassname() );
-		for ( int i = childrenList.Count()-1; i >= 0; --i )
+		for ( intp i = childrenList.Count()-1; i >= 0; --i )
 		{
 			UTIL_Remove( childrenList[i] );
 		}
@@ -2592,7 +2592,11 @@ void CBaseEntity::PhysicsRelinkChildren( float dt )
 		{
 			// the only case where this is valid is if this entity is an attached ragdoll.
 			// So assert here to catch the non-ragdoll case.
-			Assert( 0 );
+			AssertMsg( child->GetOwnerEntity() == this,
+				"Our child '%s' has owner '%s' is not us '%s'.",
+				child->GetDebugName(),
+				child->GetOwnerEntity() ? child->GetOwnerEntity()->GetDebugName() : "<null>",
+				GetDebugName() );
 		}
 
 		if ( child->FirstMoveChild() )
@@ -3004,7 +3008,7 @@ static auto goodmatch = []( unsigned char cName, unsigned char cQuery )
 	return false;
 };
 
-FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
+static FORCEINLINE bool NamesMatchGood( const char *pszQuery, string_t nameToMatch )
 {
 	if ( nameToMatch == NULL_STRING )
 		return (!pszQuery || *pszQuery == 0 || *pszQuery == '*');
@@ -3020,12 +3024,7 @@ FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 		unsigned char cName = *pszNameToMatch;
 		unsigned char cQuery = *pszQuery;
 
-		bool good = goodmatch( cName, cQuery );
-
-		// dimhotepus: Detect cases when name matching is different. Inspect them.
-		AssertMsg( !(good ^ badmatch(cName, cQuery)),
-			"Behavior change. %s and %s names matching diffs from original.\n",
-			pszQuery, pszNameToMatch );
+		const bool good = goodmatch( cName, cQuery );
 		if ( !good )
 		{
 			break;
@@ -3043,6 +3042,61 @@ FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 		return true;
 
 	return false;
+}
+
+static bool NamesMatchBad( const char *pszQuery, string_t nameToMatch )
+{
+	if ( nameToMatch == NULL_STRING )
+		return (!pszQuery || *pszQuery == 0 || *pszQuery == '*');
+
+	const char *pszNameToMatch = STRING(nameToMatch);
+
+	// If the pointers are identical, we're identical
+	if ( pszNameToMatch == pszQuery )
+		return true;
+
+	while ( *pszNameToMatch && *pszQuery )
+	{
+		unsigned char cName = *pszNameToMatch;
+		unsigned char cQuery = *pszQuery;
+
+		const bool bad = badmatch( cName, cQuery );
+		if ( !bad )
+		{
+			break;
+		}
+
+		++pszNameToMatch;
+		++pszQuery;
+	}
+
+	if ( *pszQuery == 0 && *pszNameToMatch == 0 )
+		return true;
+
+	// @TODO (toml 03-18-03): Perhaps support real wildcards. Right now, only thing supported is trailing *
+	if ( *pszQuery == '*' )
+		return true;
+
+	return false;
+}
+
+static FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
+{
+	const bool good = NamesMatchGood( pszQuery, nameToMatch );
+
+#ifdef _DEBUG
+	const bool bad = NamesMatchBad( pszQuery, nameToMatch );
+
+	// dimhotepus: Detect cases when name matching is different. Inspect them.
+	AssertMsg( good == bad,
+		"Behavior change! New %s and %s match (%s) diffs from old (%s).",
+		pszQuery,
+		nameToMatch.ToCStr(),
+		good ? "true" : "false",
+		bad ? "true" : "false" );
+#endif
+
+	return good;
 }
 
 bool CBaseEntity::NameMatchesComplex( const char *pszNameOrWildcard )
@@ -4815,8 +4869,7 @@ void CBaseEntity::PrecacheModelComponents( int nModelIndex )
 	// particles
 	{
 		// Check keyvalues for auto-emitting particles
-		KeyValues *pModelKeyValues = new KeyValues("");
-		KeyValues::AutoDelete autodelete_pModelKeyValues( pModelKeyValues );
+		KeyValuesAD pModelKeyValues("");
 		if ( pModelKeyValues->LoadFromBuffer( modelinfo->GetModelName( pModel ), modelinfo->GetModelKeyValueText( pModel ) ) )
 		{
 			KeyValues *pParticleEffects = pModelKeyValues->FindKey("Particles");
@@ -5505,7 +5558,7 @@ private:
 
 		char targetEntity[ 256 ];
 		targetEntity[0] = 0;
-		int nEntityNameLength = (space-substring);
+		intp nEntityNameLength = (space-substring);
 		Q_strncat( targetEntity, substring, sizeof( targetEntity ), nEntityNameLength );
 
 		// Find the target entity by name
@@ -5516,7 +5569,7 @@ private:
 		CUtlRBTree< CUtlString > symbols( 0, 0, UtlStringLessFunc );
 
 		// Find the next portion of the text chain, if any (removing space)
-		int nInputNameLength = (checklen-nEntityNameLength-1);
+		intp nInputNameLength = (checklen-nEntityNameLength-1);
 
 		// Starting past the last space, this is the remainder of the string
 		char *inputPartial = ( checklen > nEntityNameLength ) ? (space+1) : NULL;
@@ -5567,7 +5620,7 @@ private:
 			const char *name = symbols[ i ].String();
 
 			char buf[ 512 ];
-			Q_strncpy( buf, name, sizeof( buf ) );
+			V_strcpy_safe( buf, name );
 			Q_strlower( buf );
 
 			CUtlString command = CFmtStr( "%s %s %s", cmdname, targetEntity, buf );
@@ -6496,8 +6549,8 @@ bool CBaseEntity::ContextExpired( int index ) const
 //-----------------------------------------------------------------------------
 int CBaseEntity::FindContextByName( const char *name ) const
 {
-	int c = m_ResponseContexts.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = m_ResponseContexts.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( FStrEq( name, GetContextName( i ) ) )
 			return i;
@@ -7023,7 +7076,7 @@ void CBaseEntity::RemoveRecipientsIfNotCloseCaptioning( CRecipientFilter& filter
 	intp c = filter.GetRecipientCount();
 	for ( intp i = c - 1; i >= 0; --i )
 	{
-		int playerIndex = filter.GetRecipientIndex( i );
+		intp playerIndex = filter.GetRecipientIndex( i );
 
 		CBasePlayer *player = static_cast< CBasePlayer * >( CBaseEntity::Instance( playerIndex ) );
 		if ( !player )

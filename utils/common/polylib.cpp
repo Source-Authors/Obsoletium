@@ -17,13 +17,6 @@
 // doesn't seem to need to be here? -- in threads.h
 //extern int numthreads;
 
-// counters are only bumped when running single threaded,
-// because they are an awefull coherence problem
-int	c_active_windings;
-int	c_peak_windings;
-int	c_winding_allocs;
-int	c_winding_points;
-
 void pw(winding_t *w)
 {
 	int		i;
@@ -40,15 +33,6 @@ AllocWinding
 */
 winding_t *AllocWinding (int points)
 {
-	if (numthreads == 1)
-	{
-		c_winding_allocs++;
-		c_winding_points += points;
-		c_active_windings++;
-		if (c_active_windings > c_peak_windings)
-			c_peak_windings = c_active_windings;
-	}
-	
 	winding_t	*w;
 	{
 		bool need_new = true;
@@ -94,8 +78,6 @@ void FreeWinding (winding_t *w)
 RemoveColinearPoints
 ============
 */
-int	c_removed;
-
 void RemoveColinearPoints (winding_t *w)
 {
 	int		i, j, k;
@@ -122,8 +104,6 @@ void RemoveColinearPoints (winding_t *w)
 	if (nump == w->numpoints)
 		return;
 
-	if (numthreads == 1)
-		c_removed += w->numpoints - nump;
 	w->numpoints = nump;
 	memcpy (w->p, p, nump*sizeof(p[0]));
 }
@@ -174,7 +154,7 @@ vec_t WindingArea(winding_t *w)
 		CrossProduct (d1, d2, cross);
 		total += VectorLength ( cross );
 	}
-	return total * 0.5;
+	return total * 0.5f;
 }
 
 void WindingBounds (winding_t *w, Vector &mins, Vector &maxs)
@@ -212,7 +192,7 @@ void WindingCenter (winding_t *w, Vector &center)
 	for (i=0 ; i<w->numpoints ; i++)
 		VectorAdd (w->p[i], center, center);
 
-	scale = 1.0/w->numpoints;
+	scale = 1.0f/w->numpoints;
 	VectorScale (center, scale, center);
 }
 
@@ -243,15 +223,15 @@ vec_t WindingAreaAndBalancePoint( winding_t *w, Vector &center )
 		total += area;
 
 		// center of triangle, weighed by area
-		VectorMA( center, area / 3.0, w->p[i-1], center );
-		VectorMA( center, area / 3.0, w->p[i], center );
-		VectorMA( center, area / 3.0, w->p[0], center );
+		VectorMA( center, area / 3.0f, w->p[i-1], center );
+		VectorMA( center, area / 3.0f, w->p[i], center );
+		VectorMA( center, area / 3.0f, w->p[0], center );
 	}
 	if (total)
 	{
-		VectorScale( center, 1.0 / total, center );
+		VectorScale( center, 1.0f / total, center );
 	}
-	return total * 0.5;
+	return total * 0.5f;
 }
 
 /*
@@ -373,7 +353,7 @@ void ClipWindingEpsilon (winding_t *in, const Vector &normal, vec_t dist,
 				vec_t epsilon, winding_t **front, winding_t **back)
 {
 	vec_t	dists[MAX_POINTS_ON_WINDING+4];
-	int		sides[MAX_POINTS_ON_WINDING+4];
+	SideType	sides[MAX_POINTS_ON_WINDING+4];
 	int		counts[3];
 	vec_t	dot;
 	int		i, j;
@@ -831,17 +811,12 @@ void CheckWinding (winding_t *w)
 WindingOnPlaneSide
 ============
 */
-int WindingOnPlaneSide (winding_t *w, const Vector &normal, vec_t dist)
+SideType WindingOnPlaneSide (winding_t *w, const Vector &normal, vec_t dist)
 {
-	qboolean	front, back;
-	int			i;
-	vec_t		d;
-
-	front = false;
-	back = false;
-	for (i=0 ; i<w->numpoints ; i++)
+	bool front = false, back = false;
+	for (int i=0 ; i<w->numpoints ; i++)
 	{
-		d = DotProduct (w->p[i], normal) - dist;
+		vec_t d = DotProduct (w->p[i], normal) - dist;
 		if (d < -ON_EPSILON)
 		{
 			if (front)

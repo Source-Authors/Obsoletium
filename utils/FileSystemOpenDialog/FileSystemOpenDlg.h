@@ -5,12 +5,6 @@
 #if !defined(AFX_FILESYSTEMOPENDLG_H__01CFDE04_321F_4F1E_94ED_933B2B32C193__INCLUDED_)
 #define AFX_FILESYSTEMOPENDLG_H__01CFDE04_321F_4F1E_94ED_933B2B32C193__INCLUDED_
 
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
-// FileSystemOpenDlg.h : header file
-//
-
 #include "windows/base_dlg.h"
 #include "tier1/utlvector.h"
 #include "resource.h"
@@ -32,7 +26,7 @@ class CFileInfo
 {
 public:
 	CFileInfo();
-	~CFileInfo();
+	~CFileInfo() = default;
 
 	bool m_bIsDir;
 	CString m_Name;

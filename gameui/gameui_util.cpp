@@ -19,13 +19,13 @@
 //			... - 
 // Output : char
 //-----------------------------------------------------------------------------
-char *VarArgs( const char *format, ... )
+char *VarArgs( PRINTF_FORMAT_STRING const char *format, ... )
 {
 	va_list		argptr;
 	static char		string[1024];
 	
 	va_start (argptr, format);
-	Q_vsnprintf (string, sizeof( string ), format,argptr);
+	V_vsprintf_safe (string, format, argptr);
 	va_end (argptr);
 
 	return string;	

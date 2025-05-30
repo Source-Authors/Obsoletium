@@ -4,14 +4,12 @@
 //
 //=============================================================================
 
+#include "checkuv.h"
 
 #include "tier1/fmtstr.h"
 #include "tier1/utlmap.h"
 
-
 #include "studiomdl.h"
-#include "checkuv.h"
-
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -35,88 +33,6 @@ void CCheckUVCmd::Clear()
 	m_nOptGutterTexWidth = 512;
 	m_nOptGutterTexHeight = 512;
 	m_nOptGutterMin = 5;
-}
-
-
-//-----------------------------------------------------------------------------
-// Dumps an s_soruce_t as an OBJ file
-//-----------------------------------------------------------------------------
-static void WriteOBJ( const char *pszFilename, const s_source_t *pSource )
-{
-	FILE *pFile = fopen( pszFilename, "w" );
-
-	fprintf( pFile, "#\n" );
-	fprintf( pFile, "# s_source_t: %s\n", pSource->filename );
-	fprintf( pFile, "# Bone Count: %d\n", pSource->numbones );
-	
-	for ( int i = 0; i < pSource->numbones; ++i )
-	{
-		if ( pSource->localBone[i].parent >= 0 )
-		{
-			fprintf( pFile, "# Bone %3d: %s Parent %3d: %s\n", i, pSource->localBone[i].name, pSource->localBone[i].parent, pSource->localBone[pSource->localBone[i].parent].name );
-		}
-		else
-		{
-			fprintf( pFile, "# Bone %3d: %s\n", i, pSource->localBone[i].name );
-		}
-	}
-
-	fprintf( pFile, "# Mesh Count:   %d\n", pSource->nummeshes );
-	fprintf( pFile, "# Vertex Count: %d\n", pSource->numvertices );
-	fprintf( pFile, "# Face Count:   %d\n", pSource->numfaces );
-
-	fprintf( pFile, "#\n" );
-	fprintf( pFile, "# positions\n" );
-	fprintf( pFile, "#\n" );
-
-	for ( int i = 0; i < pSource->numvertices; ++i )
-	{
-		const s_vertexinfo_t &v = pSource->vertex[i];
-		fprintf( pFile, "v %.4f %.4f %.4f\n", v.position.x, v.position.y, v.position.z );
-	}
-
-	fprintf( pFile, "#\n" );
-	fprintf( pFile, "# texture coordinates\n" );
-	fprintf( pFile, "#\n" );
-
-	for ( int i = 0; i < pSource->numvertices; ++i )
-	{
-		const s_vertexinfo_t &v = pSource->vertex[i];
-		fprintf( pFile, "vt %.4f %.4f\n", v.texcoord.x, v.texcoord.y );
-	}
-
-	fprintf( pFile, "#\n" );
-	fprintf( pFile, "# normals\n" );
-	fprintf( pFile, "#\n" );
-
-	for ( int i = 0; i < pSource->numvertices; ++i )
-	{
-		const s_vertexinfo_t &v = pSource->vertex[i];
-		fprintf( pFile, "vn %.4f %.4f %.4f\n", v.normal.x, v.normal.y, v.normal.z );
-	}
-
-	for ( int i = 0; i < pSource->nummeshes; ++i )
-	{
-		const s_mesh_t &m = pSource->mesh[i];
-		const s_texture_t &t = g_texture[pSource->meshindex[i]];
-
-		fprintf( pFile, "#\n" );
-		fprintf( pFile, "# mesh %d - %s\n", i, t.name );
-		fprintf( pFile, "# Face Count:   %d\n", m.numfaces );
-		fprintf( pFile, "#\n" );
-		fprintf( pFile, "usemtl %s\n", t.name );
-
-		for ( int j = 0; j < m.numfaces; ++j )
-		{
-			const s_face_t &f = pSource->face[m.faceoffset + j];
-			fprintf( pFile, "f %d/%d/%d %d/%d/%d %d/%d/%d\n",
-				f.a, f.a, f.a,
-				f.b, f.b, f.b,
-				f.c, f.c, f.c );
-		}
-	}
-
-	fclose( pFile );
 }
 
 
@@ -261,7 +177,7 @@ bool CCheckUVCmd::CheckOverlap( const struct s_source_t *pSource ) const
 		}
 	}
 
-	for ( int i = 0; i < faceOverlapMap.Count(); ++i )
+	for ( intp i = 0; i < faceOverlapMap.Count(); ++i )
 	{
 		const CUtlVector< int > &overlapList = faceOverlapMap[i];
 		
@@ -273,7 +189,7 @@ bool CCheckUVCmd::CheckOverlap( const struct s_source_t *pSource ) const
 		PrintFace( pSource, nMeshA, nFaceA );
 		Msg( "       Overlaps\n" );
 
-		for ( int j = 0; j < overlapList.Count(); ++j )
+		for ( intp j = 0; j < overlapList.Count(); ++j )
 		{
 			const int nFaceB = overlapList[j];
 			const int nMeshB = FindMeshIndex( pSource, nFaceB );

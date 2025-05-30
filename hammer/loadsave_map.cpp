@@ -69,18 +69,15 @@ static void StuffLine(char * buf)
 	bStuffed = TRUE;
 }
 
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : file - 
-//			buf - 
-//-----------------------------------------------------------------------------
-static void GetLine(std::fstream& file, char *buf)
+static void GetLine(std::fstream& file, OUT_Z_CAP_OPT(bufferSize) char *buf, intp bufferSize)
 {
+	if (buf && bufferSize > 0)
+		buf[0] = '\0';
+
 	if(bStuffed)
 	{
 		if(buf)
-			strcpy(buf, szStuffed);
+			V_strncpy(buf, szStuffed, bufferSize);
 		bStuffed = FALSE;
 		return;
 	}
@@ -90,7 +87,7 @@ static void GetLine(std::fstream& file, char *buf)
 	while(1)
 	{
 		file >> std::ws;
-		file.getline(szBuf, 512);
+		file.getline(szBuf, std::size(szBuf));
 		if(file.eof())
 			return;
 		if(!strncmp(szBuf, "//", 2))
@@ -102,10 +99,22 @@ static void GetLine(std::fstream& file, char *buf)
 //			if(p) p[0] = 0;
 //			p = strchr(szBuf, '\r');
 //			if(p) p[0] = 0;
-			strcpy(buf, szBuf);
+			V_strncpy(buf, szBuf, bufferSize);
 		}
 		return;
 	}
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : file - 
+//			buf - 
+//-----------------------------------------------------------------------------
+template<intp bufferSize>
+static void GetLine(std::fstream& file, OUT_Z_ARRAY char (&buf)[bufferSize])
+{
+	GetLine( file, buf, bufferSize );
 }
 
 
@@ -388,7 +397,7 @@ int CMapFace::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 			Fix();
 		}
 
-		sprintf(szBuf,
+		V_sprintf_safe(szBuf,
 			"( %.0f %.0f %.0f ) ( %.0f %.0f %.0f ) ( %.0f %.0f %.0f ) "
 			"%s "
 			"[ %g %g %g %g ] "
@@ -606,7 +615,7 @@ int MDkeyvalue::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 	if(fIsStoring)
 	{
 		// save a keyvalue
-		sprintf( szBuf,
+		V_sprintf_safe( szBuf,
 			"\"%s\" \"%s\"",
 
 			Key(), Value() );
@@ -635,8 +644,8 @@ int MDkeyvalue::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 		p = strchr(p+1, '\"');
 		if(!p)
 			return fileError;
-		// ocpy in value
-		strcpy(szValue, p+1);
+		// copy in value
+		V_strcpy_safe(szValue, p+1);
 		// kill trailing "
 		p = strchr(szValue, '\"');
 		if(!p)
@@ -695,7 +704,7 @@ int CMapSolid::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 			Faces[i].CalcPlane();
 		}
 
-		GetLine(file, NULL);	// ignore line
+		GetLine(file, nullptr, 0);	// ignore line
 
 		if (!file.fail())
 		{
@@ -773,11 +782,11 @@ int CMapEntity::SerializeMAP(std::fstream &file, BOOL fIsStoring)
 		if (IsPlaceholder() && (!IsClass() || !IsSolidClass()))
 		{
 			MDkeyvalue tmpkv;
-			strcpy(tmpkv.szKey, "origin");
+			V_strcpy_safe(tmpkv.szKey, "origin");
 
 			Vector Origin;
 			GetOrigin(Origin);
-			sprintf(tmpkv.szValue, "%.0f %.0f %.0f", Origin[0], Origin[1], Origin[2]);
+			V_sprintf_safe(tmpkv.szValue, "%.0f %.0f %.0f", Origin[0], Origin[1], Origin[2]);
 			tmpkv.SerializeMAP(file, fIsStoring);
 		}
 
@@ -800,7 +809,7 @@ int CMapEntity::SerializeMAP(std::fstream &file, BOOL fIsStoring)
 		}
 
 		// skip delimiter
-		GetLine(file, NULL);
+		GetLine(file, nullptr, 0);
 	}
 
 	return file.fail() ? fileOsError : fileOk;
@@ -963,12 +972,12 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 		{
 			MDkeyvalue tmpkv;
 
-			strcpy(tmpkv.szKey, "mapversion");
-			strcpy(tmpkv.szValue, "360");
+			V_strcpy_safe(tmpkv.szKey, "mapversion");
+			V_strcpy_safe(tmpkv.szValue, "360");
 			tmpkv.SerializeMAP(file, fIsStoring);
 
 			// Save wad file line
-			strcpy(tmpkv.szKey, "wad");
+			V_strcpy_safe(tmpkv.szKey, "wad");
 
 			// copy all texfiles into value
 			tmpkv.szValue[0] = 0;
@@ -995,7 +1004,7 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 						//
 						// Append this WAD file to the WAD list.
 						//
-						strcpy(szFile, gf.filename);
+						V_strcpy_safe(szFile, gf.filename);
 
 						// dvs: Strip off the path. This crashes VIS and QRAD!!
 						/*
@@ -1026,10 +1035,10 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 						// WAD names are semicolon delimited.
 						if (!bFirst)
 						{
-							strcat(tmpkv.szValue, ";");
+							V_strcat_safe(tmpkv.szValue, ";");
 						}
 
-						strcat(tmpkv.szValue, pszSlash);
+						V_strcat_safe(tmpkv.szValue, pszSlash);
 						bFirst = FALSE;
 					}
 				}
@@ -1083,7 +1092,7 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 		m_Render2DBox.ResetBounds();
 
 		// load world
-		GetLine(file, NULL);	// ignore delimiter
+		GetLine(file, nullptr, 0);	// ignore delimiter
 		CEditGameClass::SerializeMAP(file, fIsStoring);
 
 		const char* pszMapVersion;
@@ -1105,7 +1114,7 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 		}
 
 		// skip end-of-entity marker
-		GetLine(file, NULL);
+		GetLine(file, nullptr, 0);
 
 		char szBuf[128];
 

@@ -29,7 +29,7 @@ class CDmeHitbox : public CDmeShape
 	DEFINE_ELEMENT( CDmeHitbox, CDmeShape );
 
 public:
-	virtual void Draw( const matrix3x4_t &shapeToWorld, CDmeDrawSettings *pDrawSettings = NULL );
+	void Draw( const matrix3x4_t &shapeToWorld, CDmeDrawSettings *pDrawSettings = NULL ) override;
 
 	CDmaString m_SurfaceProperty;
 	CDmaString m_Group;

@@ -145,7 +145,11 @@ static OptionsDataContainer s_OptionsDataContainer;
 static CUtlVector<OptionChoiceData_t> s_DisabledOptions;
 
 
-const char *UTIL_Parse( const char *data, char *token, int sizeofToken );
+template<intp size>
+const char *UTIL_Parse( const char *data, OUT_Z_ARRAY char (&token)[size] )
+{
+	return engine->ParseFile( data, token, size );
+}
 
 
 bool ActionsAreTheSame( const char *pchAction1, const char *pchAction2 )
@@ -938,8 +942,10 @@ void COptionsDialogXbox::GetChoiceFromConvar( OptionData_t *pOption )
 				// We need to compare values in case we have "0" & "0.00000". 
 				if ( (pchValue[0] >= '0' && pchValue[0] <= '9') || pchValue[0] == '-' )
 				{
-					float flVal = atof(pchValue);
-					float flChoiceVal = atof(pOption->m_Choices[ iChoice ].szValue);
+					// dimhotepus: aotf -> strtof
+					float flVal = strtof(pchValue, nullptr);
+					// dimhotepus: aotf -> strtof
+					float flChoiceVal = strtof(pOption->m_Choices[ iChoice ].szValue, nullptr);
 					if ( flVal == flChoiceVal )
 					{
 						pOption->iCurrentChoice = iChoice;
@@ -1296,8 +1302,8 @@ void COptionsDialogXbox::UpdateBind( OptionData_t *pOption, int iLabel, ButtonCo
 
 		// Turn localized string into icon character
 		Q_snprintf( szBuff, sizeof( szBuff ), "#GameUI_Icons_%s", g_pInputSystem->ButtonCodeToString( static_cast<ButtonCode_t>( iCode ) ) );
-		g_pVGuiLocalize->ConstructString( szWideBuff, sizeof( szWideBuff ), g_pVGuiLocalize->Find( szBuff ), 0 );
-		g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff, sizeof( szBuff ) );
+		g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( szBuff ), 0 );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
 
 		// Add this icon to our list of keys to display
 		szBinds[ iNumBinds ] = szBuff[ 0 ];
@@ -1373,7 +1379,7 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 	while ( data != NULL )
 	{
 		char cmd[64];
-		data = UTIL_Parse( data, cmd, sizeof(cmd) );
+		data = UTIL_Parse( data, cmd );
 		if ( Q_isempty( cmd ) )
 			break;
 
@@ -1381,12 +1387,12 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 		{
 			// Key name
 			char szKeyName[256];
-			data = UTIL_Parse( data, szKeyName, sizeof(szKeyName) );
+			data = UTIL_Parse( data, szKeyName );
 			if ( Q_isempty( szKeyName ) )
 				break; // Error
 
 			char szBinding[256];
-			data = UTIL_Parse( data, szBinding, sizeof(szBinding) );
+			data = UTIL_Parse( data, szBinding );
 			if ( Q_isempty( szKeyName ) )
 				break; // Error
 
@@ -1412,12 +1418,12 @@ void COptionsDialogXbox::FillInDefaultBindings( void )
 					wchar_t szWideBuff[ 64 ];
 					char szBinds[ OPTION_STRING_LENGTH ];
 					if ( pOption->iNumBinds > 0 )
-						m_pValueLabels[ iLabel ]->GetText( szBinds, sizeof( szBinds ) );
+						m_pValueLabels[ iLabel ]->GetText( szBinds );
 
 					// Turn localized string into icon character
 					Q_snprintf( szBuff, sizeof( szBuff ), "#GameUI_Icons_%s", szKeyName );
-					g_pVGuiLocalize->ConstructString( szWideBuff, sizeof( szWideBuff ), g_pVGuiLocalize->Find( szBuff ), 0 );
-					g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff, sizeof( szBuff ) );
+					g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( szBuff ), 0 );
+					g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
 
 					// Add this icon to our list of keys to display
 					szBinds[ pOption->iNumBinds ] = szBuff[ 0 ];
@@ -1514,8 +1520,9 @@ bool COptionsDialogXbox::ShouldSkipOption( KeyValues *pKey )
 
 void COptionsDialogXbox::ReadOptionsFromFile( const char *pchFileName )
 {
-	KeyValues *pOptionKeys = new KeyValues( "options_x360" );
-	pOptionKeys->LoadFromFile( g_pFullFileSystem, pchFileName, NULL );
+	KeyValuesAD pOptionKeys( "options_x360" );
+	if ( !pOptionKeys->LoadFromFile( g_pFullFileSystem, pchFileName, NULL ) )
+		return;
 
 	KeyValues *pKey = NULL;
 	for ( pKey = pOptionKeys->GetFirstTrueSubKey(); pKey; pKey = pKey->GetNextTrueSubKey() )

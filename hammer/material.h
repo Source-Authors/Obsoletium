@@ -55,13 +55,13 @@ public:
 
 	void FreeData(void);
 
-	inline const char *GetName(void) const
+	inline const char *GetName() const
 	{
-		return(m_szName);
+		return m_szName;
 	}
-	int GetShortName(char *pszName) const;
+	intp GetShortName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) const override;
 
-	int GetKeywords(char *pszKeywords) const;
+	intp GetKeywords(OUT_Z_CAP(keywordsSize) char *pszKeywords, intp keywordsSize) const override;
 
 	void GetSize(SIZE &size) const;
 
@@ -155,11 +155,11 @@ protected:
 
 	// Finds all .VMT files in a particular directory
 	static bool LoadMaterialsInDirectory( char const* pDirectoryName, int nDirectoryNameLen, 
-						IMaterialEnumerator *pEnum, int nContext, int nFlags );
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags );
 
 	// Discovers all .VMT files lying under a particular directory recursively
 	static bool InitDirectoryRecursive( char const* pDirectoryName, 
-						IMaterialEnumerator *pEnum, int nContext, int nFlags );
+						IMaterialEnumerator *pEnum, intp nContext, int nFlags );
 
 	CMaterial(void);
 	bool LoadMaterialHeader(IMaterial *material);

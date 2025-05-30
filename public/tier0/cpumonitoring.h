@@ -3,6 +3,8 @@
 #ifndef TIER0_CPU_MONITORING_H_
 #define TIER0_CPU_MONITORING_H_
 
+#include "tier0/platform.h"
+
 /*
 This header defines functions and structures for controlling the measurement of CPU frequency
 in order to detect thermal throttling. For details see the associated source file.

@@ -51,8 +51,8 @@ public:
 	void SetToolWindowFactory( IToolWindowFactory *factory );
 	IToolWindowFactory *GetToolWindowFactory();
 
-	static int GetToolWindowCount();
-	static ToolWindow *GetToolWindow( int index );
+	static intp GetToolWindowCount();
+	static ToolWindow *GetToolWindow( intp index );
 
 	static CUtlVector< ToolWindow * > s_ToolWindows;
 

@@ -49,7 +49,7 @@ enum HelicopterFlags_t
 #define BASECHOPPER_WASH_RADIUS			256
 #define BASECHOPPER_WASH_PUSH_MIN		30		// Initial force * their mass applied to objects in the wash
 #define BASECHOPPER_WASH_PUSH_MAX		40		// Maximum force * their mass applied to objects in the wash
-#define BASECHOPPER_WASH_RAMP_TIME		1.0		// Time it takes to ramp from the initial to the max force on an object in the wash (at the center of the wash)
+#define BASECHOPPER_WASH_RAMP_TIME		1.0f	// Time it takes to ramp from the initial to the max force on an object in the wash (at the center of the wash)
 #define BASECHOPPER_WASH_MAX_MASS		300		// Don't attempt to push anything over this mass
 #define BASECHOPPER_WASH_MAX_OBJECTS	6		// Maximum number of objects the wash will push at once
 

@@ -93,26 +93,9 @@ winding_t *NewWinding (int points)
 
 void pw(winding_t *w)
 {
-	int		i;
-	for (i=0 ; i<w->numpoints ; i++)
+	for (int i=0 ; i<w->numpoints ; i++)
 		Msg ("(%5.1f, %5.1f, %5.1f)\n",w->points[i][0], w->points[i][1],w->points[i][2]);
 }
-
-void prl(leaf_t *l)
-{
-	int			i;
-	portal_t	*p;
-	plane_t		pl;
-	
-	int count = l->portals.Count();
-	for (i=0 ; i<count ; i++)
-	{
-		p = l->portals[i];
-		pl = p->plane;
-		Msg ("portal %4i to leaf %4i : %7.1f : (%4.1f, %4.1f, %4.1f)\n",(int)(p-portals),p->leaf,pl.dist, pl.normal[0], pl.normal[1], pl.normal[2]);
-	}
-}
-
 
 //=============================================================================
 
@@ -124,14 +107,9 @@ Sorts the portals from the least complex, so the later ones can reuse
 the earlier information.
 =============
 */
-int PComp (const void *a, const void *b)
+static bool PComp (const portal_t *a, const portal_t *b)
 {
-	if ( (*(portal_t **)a)->nummightsee == (*(portal_t **)b)->nummightsee)
-		return 0;
-	if ( (*(portal_t **)a)->nummightsee < (*(portal_t **)b)->nummightsee)
-		return -1;
-
-	return 1;
+	return a->nummightsee < b->nummightsee;
 }
 
 void BuildTracePortals( int clusterStart )
@@ -153,7 +131,7 @@ void SortPortals (void)
 
 	if (nosort)
 		return;
-	qsort (sorted_portals, g_numportals*2, sizeof(sorted_portals[0]), PComp);
+	std::sort (sorted_portals, sorted_portals + g_numportals*2, PComp);
 }
 
 
@@ -195,28 +173,27 @@ Merges the portal visibility for a leaf
 */
 void ClusterMerge (int clusternum)
 {
-	leaf_t		*leaf;
-//	byte		portalvector[MAX_PORTALS/8];
-	byte		portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
+	alignas(long) byte portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
 	byte		uncompressed[MAX_MAP_LEAFS/8];
-	int			i, j;
 	int			numvis;
-	portal_t	*p;
 	int			pnum;
 
 	// OR together all the portalvis bits
 
 	memset (portalvector, 0, portalbytes);
-	leaf = &leafs[clusternum];
-	for (i=0 ; i < leaf->portals.Count(); i++)
+	leaf_t *leaf = &leafs[clusternum];
+
+	intp i = 0;
+	for (auto *p : leaf->portals)
 	{
-		p = leaf->portals[i];
 		if (p->status != stat_done)
-			Error ("portal not done %d %p %p\n", i, p, portals);
-		for (j=0 ; j<portallongs ; j++)
+			Error ("portal not done %zd 0x%p 0x%p\n", i, p, portals);
+		for (int j=0 ; j<portallongs ; j++)
 			((long *)portalvector)[j] |= ((long *)p->portalvis)[j];
 		pnum = p - portals;
 		SetBit( portalvector, pnum );
+
+		++i;
 	}
 
 	// convert portal bits to leaf bits
@@ -228,14 +205,14 @@ void ClusterMerge (int clusternum)
 	if ( CheckBit( uncompressed, clusternum ) )
 		Warning("WARNING: Cluster portals saw into cluster\n");
 #endif
-		
+
 	SetBit( uncompressed, clusternum );
 	numvis++;		// count the leaf itself
 
 	// save uncompressed for PHS calculation
 	memcpy (uncompressedvis + clusternum*leafbytes, uncompressed, leafbytes);
 
-	qprintf ("cluster %4i : %4i visible\n", clusternum, numvis);
+	qprintf ("cluster %4i: %4i visible\n", clusternum, numvis);
 	totalvis += numvis;
 }
 
@@ -395,6 +372,27 @@ void SetPortalSphere (portal_t *p)
 	p->radius = bestr;
 }
 
+// dimhotepus: Dispatch vec_t type.
+using vector_type_t = std::conditional_t<
+	std::is_same_v<float, vec_t>,
+	float,
+	std::conditional_t<
+		std::is_same_v<double, vec_t>,
+		double,
+		void
+	>
+>;
+
+static constexpr const char* GetVector3FormatSpecifier() {
+	if constexpr (std::is_same_v<float, vector_type_t>)
+		return "(%f %f %f ) ";
+
+	if constexpr (std::is_same_v<double, vector_type_t>)
+		return "(%lf %lf %lf ) ";
+
+	return "";
+};
+
 /*
 ============
 LoadPortals
@@ -429,17 +427,20 @@ void LoadPortals (char *name)
 			Error( "LoadPortals( %s ): couldn't get file from master.\n", name );
 
 		CUtlVector<char> data;
-		data.SetSize( g_pFileSystem->Size( hFile ) );
+		data.SetCount( g_pFileSystem->Size( hFile ) );
 		g_pFileSystem->Read( data.Base(), data.Count(), hFile );
 		g_pFileSystem->Close( hFile );
 
 		// Dump it into a temp file.
 		f = fopen( tempFile, "wt" );
+		if (f)
+		{
 		fwrite( data.Base(), 1, data.Count(), f );
 		fclose( f );
 
 		// Open the temp file up.
 		f = fopen( tempFile, "rSTD" ); // read only, sequential, temporary, delete on close
+	}
 	}
 	else
 	{
@@ -455,7 +456,7 @@ void LoadPortals (char *name)
 	// dimhotepus: Ensure zero termination.
 	magic[std::size(magic) - 1] = '\0';
 
-	if (stricmp(magic,PORTALFILE))
+	if (stricmp(magic,PORTALFILE) != 0)
 		Error ("LoadPortals %s: not a portal file", name);
 
 	Msg ("%4i portalclusters\n", portalclusters);
@@ -498,7 +499,7 @@ void LoadPortals (char *name)
 		if (numpoints > MAX_POINTS_ON_WINDING)
 			Error ("LoadPortals: portal %i has too many points", i);
 
-		if ( (unsigned)leafnums[0] > portalclusters || (unsigned)leafnums[1] > portalclusters)
+		if ( leafnums[0] > portalclusters || leafnums[1] > portalclusters )
 			Error ("LoadPortals: reading portal %i", i);
 		
 		winding_t *w = p->winding = NewWinding (numpoints);
@@ -507,14 +508,14 @@ void LoadPortals (char *name)
 		
 		for (int j=0 ; j<numpoints ; j++)
 		{
-			double	v[3];
-			int		k;
+			vector_type_t v[3] = {};
+			constexpr auto format = GetVector3FormatSpecifier();
 
 			// scanf into double, then assign to vec_t
 			// so we don't care what size vec_t is
-			if (fscanf (f, "(%lf %lf %lf ) ", &v[0], &v[1], &v[2]) != 3)
+			if (fscanf (f, format, &v[0], &v[1], &v[2]) != 3)
 				Error ("LoadPortals: reading portal %i", i);
-			for (k=0 ; k<3 ; k++)
+			for (int k=0 ; k<3 ; k++)
 				w->points[j][k] = v[k];
 		}
 		fscanf (f, "\n");
@@ -565,7 +566,7 @@ by ORing together all the PVS visible from a leaf
 */
 void CalcPAS (void)
 {
-	byte	uncompressed[MAX_MAP_LEAFS/8];
+	alignas(long) byte	uncompressed[MAX_MAP_LEAFS/8];
 	byte	compressed[MAX_MAP_LEAFS/8];
 	
 	long *dest, *src;
@@ -582,7 +583,7 @@ void CalcPAS (void)
 		memcpy (uncompressed, scan, leafbytes);
 
 		// dimhotepus: Add size check to catch usage issues.
-		Assert(leaflongs * sizeof(long) <= ssize(uncompressed));
+		Assert(leaflongs * static_cast<intp>(sizeof(long)) <= ssize(uncompressed));
 		for (int j=0 ; j<leafbytes ; j++)
 		{
 			int bitbyte = scan[j];
@@ -969,7 +970,7 @@ int ParseCommandLine( int argc, char **argv )
 		else if (!Q_stricmp (argv[i],"-tmpin"))
 		{
 			Msg ("--tmpin: Read from /tmp\n");
-			strcpy (inbase, "/tmp");
+			V_strcpy_safe (inbase, "/tmp");
 		}
 		else if( !Q_stricmp( argv[i], "-low" ) )
 		{
@@ -1097,9 +1098,9 @@ void PrintUsage( int argc, char **argv )
 int RunVVis( int argc, char **argv )
 {
 #ifdef PLATFORM_64BITS
-	Msg( "Valve Software - vvis.exe [64 bit] (%s)\n", __DATE__ );
+	Msg( "Valve Software - vvis [64 bit] (%s)\n", __DATE__ );
 #else
-	Msg( "Valve Software - vvis.exe (%s)\n", __DATE__ );
+	Msg( "Valve Software - vvis (%s)\n", __DATE__ );
 #endif
 
 	char	portalfile[MAX_FILEPATH];
@@ -1108,7 +1109,7 @@ int RunVVis( int argc, char **argv )
 
 	verbose = false;
 
-	CmdLib_InitFileSystem( argv[ argc - 1 ] );
+	const ScopedFileSystem scopedFileSystem(argv[argc - 1]);
 
 	// The ExpandPath is just for VMPI. VMPI's file system needs the basedir in front of all filenames,
 	// so we prepend qdir here.
@@ -1117,22 +1118,21 @@ int RunVVis( int argc, char **argv )
 	//             or reason to this. We get just the base name we were passed, discarding any directory or extension
 	//             information. We then ExpandPath() it (see VMPI comment above), and tack on .bsp for the file access
 	//             parts.
-	V_FileBase( argv[ argc - 1 ], mapFile, sizeof( mapFile ) );
+	V_FileBase( argv[ argc - 1 ], mapFile );
 	V_strcpy_safe( mapFile, ExpandPath( mapFile ) );
 	V_strcat_safe( mapFile, ".bsp" );
 
 	// Source is just the mapfile without an extension at this point...
 	V_strcpy_safe( source, mapFile );
-	V_StripExtension( source, source, sizeof( source ) );
+	V_StripExtension( source, source );
 
 	// dimhotepus: Reorder to apply command line from file, too.
-	LoadCmdLineFromFile( argc, argv, source, "vvis" );
+	ScopedCmdLine scopedCmdLine( argc, argv, source, "vvis" );
 
 	int i = ParseCommandLine( argc, argv );
 	if (i != argc - 1)
 	{
 		PrintUsage( argc, argv );
-		DeleteCmdLine( argc, argv );
 		CmdLib_Exit( 1 );
 	}
 
@@ -1184,7 +1184,7 @@ int RunVVis( int argc, char **argv )
 	else
 	{
 		V_sprintf_safe ( portalfile, "%s%s", inbase, argv[i] );
-		Q_StripExtension( portalfile, portalfile, sizeof( portalfile ) );
+		Q_StripExtension( portalfile, portalfile );
 	}
 	V_strcat_safe (portalfile, ".prt");
 
@@ -1212,8 +1212,7 @@ int RunVVis( int argc, char **argv )
 	}
 	else
 	{
-		if ( g_TraceClusterStart < 0 ||
-			g_TraceClusterStart >= portalclusters ||
+		if ( g_TraceClusterStart >= portalclusters ||
 			g_TraceClusterStop < 0 ||
 			g_TraceClusterStop >= portalclusters )
 		{
@@ -1236,7 +1235,6 @@ int RunVVis( int argc, char **argv )
 	Msg( "%s elapsed\n", str );
 
 	ReleasePakFileLumps();
-	DeleteCmdLine( argc, argv );
 	CmdLib_Cleanup();
 	// dimhotepus: Explicitly close spew and free memory.
 	SpewDeactivate();
@@ -1250,7 +1248,6 @@ int main (int argc, char **argv)
 
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );
 
-	InstallAllocationFunctions();
 	InstallSpewFunction();
 	SpewActivate( "developer", 1 );
 

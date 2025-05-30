@@ -13,14 +13,14 @@ FORWARD_DECLARE_HANDLE(HWND);
 typedef unsigned __int64 UINT_PTR, *PUINT_PTR;
 typedef __int64 LONG_PTR, *PLONG_PTR;
 #else
-typedef unsigned int UINT_PTR, *PUINT_PTR;
-typedef long LONG_PTR, *PLONG_PTR;
+typedef unsigned int UINT_PTR, *PUINT_PTR; //-V677
+typedef long LONG_PTR, *PLONG_PTR; //-V677
 #endif
 
 /* Types use for passing & returning polymorphic values */
-typedef UINT_PTR WPARAM;
-typedef LONG_PTR LPARAM;
-typedef LONG_PTR LRESULT;
+typedef UINT_PTR WPARAM; //-V677
+typedef LONG_PTR LPARAM; //-V677
+typedef LONG_PTR LRESULT; //-V677
 
 namespace se::windows::ui {
 
@@ -29,7 +29,7 @@ namespace se::windows::ui {
  */
 class CDpiWindowBehavior {
  public:
-  CDpiWindowBehavior();
+  explicit CDpiWindowBehavior(bool applyDpiOnCreate = true);
 
   /**
    * @brief Callback on WM_CREATE.
@@ -50,6 +50,11 @@ class CDpiWindowBehavior {
    * @return 0 on handled, non 0 otherwise.
    */
   LRESULT OnWindowDpiChanged(WPARAM wParam, LPARAM lParam);
+
+  /**
+   * @brief Apply current DPI to window and children.
+   */
+  BOOL ApplyDpiToWindow(bool recompute_window_size);
 
   /**
    * @brief Previous X DPI.
@@ -94,6 +99,8 @@ class CDpiWindowBehavior {
 
   unsigned m_previous_dpi_x, m_previous_dpi_y;
   unsigned m_current_dpi_x, m_current_dpi_y;
+
+  const bool m_apply_dpi_on_create;
 };
 
 }  // namespace se::windows::ui

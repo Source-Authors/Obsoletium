@@ -70,15 +70,15 @@ public:
 	CManifest( void );
 	~CManifest( void );
 
-	static ChunkFileResult_t LoadKeyInfoCallback( const char *szKey, const char *szValue, CManifest *pDoc );
-	static ChunkFileResult_t LoadManifestInfoCallback( CChunkFile *pFile, CManifest *pDoc );
-	static ChunkFileResult_t LoadKeyCallback( const char *szKey, const char *szValue, CManifestMap *pManifestMap );
-	static ChunkFileResult_t LoadManifestVMFCallback( CChunkFile *pFile, CManifest *pDoc );
-	static ChunkFileResult_t LoadManifestMapsCallback( CChunkFile *pFile, CManifest *pDoc );
-	static ChunkFileResult_t LoadKeyPrefsCallback( const char *szKey, const char *szValue, TManifestLoadPrefs *pManifestLoadPrefs );
-	static ChunkFileResult_t LoadManifestVMFPrefsCallback( CChunkFile *pFile, CManifest *pDoc );
-	static ChunkFileResult_t LoadManifestMapsPrefsCallback( CChunkFile *pFile, CManifest *pDoc );
-	static ChunkFileResult_t LoadManifestCordoningPrefsCallback( CChunkFile *pFile, CManifest *pDoc );
+	[[nodiscard]] static ChunkFileResult_t LoadKeyInfoCallback( const char *szKey, const char *szValue, CManifest *pDoc );
+	[[nodiscard]] static ChunkFileResult_t LoadManifestInfoCallback( CChunkFile *pFile, CManifest *pDoc );
+	[[nodiscard]] static ChunkFileResult_t LoadKeyCallback( const char *szKey, const char *szValue, CManifestMap *pManifestMap );
+	[[nodiscard]] static ChunkFileResult_t LoadManifestVMFCallback( CChunkFile *pFile, CManifest *pDoc );
+	[[nodiscard]] static ChunkFileResult_t LoadManifestMapsCallback( CChunkFile *pFile, CManifest *pDoc );
+	[[nodiscard]] static ChunkFileResult_t LoadKeyPrefsCallback( const char *szKey, const char *szValue, TManifestLoadPrefs *pManifestLoadPrefs );
+	[[nodiscard]] static ChunkFileResult_t LoadManifestVMFPrefsCallback( CChunkFile *pFile, CManifest *pDoc );
+	[[nodiscard]] static ChunkFileResult_t LoadManifestMapsPrefsCallback( CChunkFile *pFile, CManifest *pDoc );
+	[[nodiscard]] static ChunkFileResult_t LoadManifestCordoningPrefsCallback( CChunkFile *pFile, CManifest *pDoc );
 
 	bool			Load( const char *pszFileName );
 	bool			Save( const char *pszFileName, bool bForce );
@@ -89,7 +89,13 @@ public:
 	virtual void	SetModifiedFlag( BOOL bModified = TRUE );
 	virtual bool	IsManifest( void ) { return true; }
 
-	void			GetFullMapPath( const char *pManifestMapFileName, char *pOutputPath );
+	void			GetFullMapPath( const char *pManifestMapFileName, OUT_Z_CAP(outSize) char *pOutputPath, intp outSize );
+
+	template<intp outSize>
+	inline void GetFullMapPath( const char *pManifestMapFileName, OUT_Z_ARRAY char (&pOutputPath)[outSize] )
+	{
+		GetFullMapPath( pManifestMapFileName, pOutputPath, outSize );
+	}
 
 	void			SetManifestPrefsModifiedFlag( bool bModified = true );
 	int				GetNumMaps( void ) { return m_Maps.Count(); }

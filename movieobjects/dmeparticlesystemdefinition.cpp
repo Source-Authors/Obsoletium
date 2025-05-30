@@ -405,9 +405,9 @@ void CDmeParticleSystemDefinition::OnElementUnserialized()
 	{
 		ParticleFunctionType_t type = (ParticleFunctionType_t)i;
 		CUtlVector< IParticleOperatorDefinition *> &list = g_pParticleSystemMgr->GetAvailableParticleOperatorList( type );
-		int nAvailType = list.Count();
-		int nCount = GetParticleFunctionCount( type );
-		for ( int j = 0; j < nCount; ++j )
+		intp nAvailType = list.Count();
+		intp nCount = GetParticleFunctionCount( type );
+		for ( intp j = 0; j < nCount; ++j )
 		{
 			CDmeParticleFunction *pFunction = GetParticleFunction( type, j );
 
@@ -418,7 +418,7 @@ void CDmeParticleSystemDefinition::OnElementUnserialized()
 				continue;
 			}
 
-			for ( int k = 0; k < nAvailType; ++k )
+			for ( intp k = 0; k < nAvailType; ++k )
 			{
 				if ( Q_stricmp( pFunction->GetName(), list[k]->GetName() ) ) 
 					continue;
@@ -456,8 +456,8 @@ CDmeParticleFunction* CDmeParticleSystemDefinition::AddOperator( ParticleFunctio
 {
 	CUtlVector< IParticleOperatorDefinition *> &list = g_pParticleSystemMgr->GetAvailableParticleOperatorList( type );
 
-	int nCount = list.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = list.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( Q_stricmp( pFunctionName, list[i]->GetName() ) ) 
 			continue;
@@ -486,11 +486,11 @@ CDmeParticleFunction* CDmeParticleSystemDefinition::AddChild( CDmeParticleSystem
 // Remove
 void CDmeParticleSystemDefinition::RemoveFunction( ParticleFunctionType_t type, CDmeParticleFunction *pFunction )
 {
-	int nIndex = FindFunction( type, pFunction );
+	intp nIndex = FindFunction( type, pFunction );
 	RemoveFunction( type, nIndex );
 }
 
-void CDmeParticleSystemDefinition::RemoveFunction( ParticleFunctionType_t type, int nIndex )
+void CDmeParticleSystemDefinition::RemoveFunction( ParticleFunctionType_t type, intp nIndex )
 {
 	if ( nIndex >= 0 )
 	{
@@ -502,10 +502,10 @@ void CDmeParticleSystemDefinition::RemoveFunction( ParticleFunctionType_t type, 
 //-----------------------------------------------------------------------------
 // Find
 //-----------------------------------------------------------------------------
-int CDmeParticleSystemDefinition::FindFunction( ParticleFunctionType_t type, CDmeParticleFunction *pParticleFunction )
+intp CDmeParticleSystemDefinition::FindFunction( ParticleFunctionType_t type, CDmeParticleFunction *pParticleFunction )
 {
-	int nCount = m_ParticleFunction[type].Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ParticleFunction[type].Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pParticleFunction == m_ParticleFunction[type][i] )
 			return i;
@@ -513,10 +513,10 @@ int CDmeParticleSystemDefinition::FindFunction( ParticleFunctionType_t type, CDm
 	return -1;
 }
 
-int CDmeParticleSystemDefinition::FindFunction( ParticleFunctionType_t type, const char *pFunctionName )
+intp CDmeParticleSystemDefinition::FindFunction( ParticleFunctionType_t type, const char *pFunctionName )
 {
-	int nCount = m_ParticleFunction[type].Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ParticleFunction[type].Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pFunctionName, m_ParticleFunction[type][i]->GetFunctionType() ) )
 			return i;
@@ -528,12 +528,12 @@ int CDmeParticleSystemDefinition::FindFunction( ParticleFunctionType_t type, con
 //-----------------------------------------------------------------------------
 // Iteration
 //-----------------------------------------------------------------------------
-int CDmeParticleSystemDefinition::GetParticleFunctionCount( ParticleFunctionType_t type ) const
+intp CDmeParticleSystemDefinition::GetParticleFunctionCount( ParticleFunctionType_t type ) const
 {
 	return m_ParticleFunction[type].Count();
 }
 
-CDmeParticleFunction *CDmeParticleSystemDefinition::GetParticleFunction( ParticleFunctionType_t type, int nIndex )
+CDmeParticleFunction *CDmeParticleSystemDefinition::GetParticleFunction( ParticleFunctionType_t type, intp nIndex )
 {
 	return m_ParticleFunction[type][nIndex];
 }
@@ -544,7 +544,7 @@ CDmeParticleFunction *CDmeParticleSystemDefinition::GetParticleFunction( Particl
 //-----------------------------------------------------------------------------
 void CDmeParticleSystemDefinition::MoveFunctionUp( ParticleFunctionType_t type, CDmeParticleFunction *pElement )
 {
-	int nIndex = FindFunction( type, pElement );
+	intp nIndex = FindFunction( type, pElement );
 	if ( nIndex > 0 )
 	{
 		m_ParticleFunction[type].Swap( nIndex, nIndex - 1 );
@@ -553,8 +553,8 @@ void CDmeParticleSystemDefinition::MoveFunctionUp( ParticleFunctionType_t type, 
 
 void CDmeParticleSystemDefinition::MoveFunctionDown( ParticleFunctionType_t type, CDmeParticleFunction *pElement )
 {
-	int nIndex = FindFunction( type, pElement );
-	int nLastIndex = m_ParticleFunction[type].Count() - 1;
+	intp nIndex = FindFunction( type, pElement );
+	intp nLastIndex = m_ParticleFunction[type].Count() - 1;
 	if ( nIndex >= 0 && nIndex < nLastIndex )
 	{
 		m_ParticleFunction[type].Swap( nIndex, nIndex + 1 );
@@ -571,8 +571,8 @@ void CDmeParticleSystemDefinition::MarkNewInstance()
 {
 	for ( int i = 0; i < PARTICLE_FUNCTION_COUNT; ++i )
 	{
-		int nCount = m_ParticleFunction[i].Count();
-		for ( int j = 0; j < nCount; ++j )
+		intp nCount = m_ParticleFunction[i].Count();
+		for ( intp j = 0; j < nCount; ++j )
 		{
 			m_ParticleFunction[i][j]->MarkNewInstance();
 		}

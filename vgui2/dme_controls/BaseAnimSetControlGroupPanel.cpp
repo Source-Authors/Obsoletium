@@ -23,14 +23,14 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 class CAnimGroupTree : public TreeView
 {
-	DECLARE_CLASS_SIMPLE( CAnimGroupTree, TreeView );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CAnimGroupTree, TreeView );
 public:
 	CAnimGroupTree( Panel *parent, const char *panelName, CBaseAnimSetControlGroupPanel *groupPanel );
 	virtual ~CAnimGroupTree();
 
-	virtual bool IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual void OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual void GenerateContextMenu( int itemIndex, int x, int y );
+	bool IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	void OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	void GenerateContextMenu( int itemIndex, int x, int y ) override;
 
 private:
 	MESSAGE_FUNC( OnImportAnimation, "ImportAnimation" );
@@ -109,11 +109,11 @@ void CAnimGroupTree::OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& ms
 
 void CAnimGroupTree::OnImportAnimation()
 {
-	PostMessage( m_pGroupPanel->m_hEditor, new KeyValues( "ImportAnimation", "visibleOnly", "1" ), 0.0f );
+	PostMessage( m_pGroupPanel->m_hEditor->GetVPanel(), new KeyValues( "ImportAnimation", "visibleOnly", "1" ), 0.0f );
 }
 
 // override to open a custom context menu on a node being selected and right-clicked
-void CAnimGroupTree::GenerateContextMenu( int itemIndex, int x, int y )
+void CAnimGroupTree::GenerateContextMenu( [[maybe_unused]] int itemIndex, [[maybe_unused]] int x, [[maybe_unused]] int y )
 {
 	CleanupContextMenu();
 	m_hContextMenu = new Menu( this, "ActionMenu" );
@@ -190,13 +190,13 @@ void CBaseAnimSetControlGroupPanel::OnTreeViewItemSelected( int itemIndex )
 		return;
 
 	// Build the list of selected groups, and notify the attribute slider panel
-	CUtlVector< int > selection;
+	CUtlVector< intp > selection;
 	m_hGroups->GetSelectedItems( selection );
 
 	const CDmaElementArray<> &groups = m_AnimSet->GetSelectionGroups();
-	int groupCount = groups.Count();
+	intp groupCount = groups.Count();
 
-	int i;
+	intp i;
 	int rootIndex = m_hGroups->GetRootItemIndex();
 
 	bool selectionHasRoot = false;
@@ -222,7 +222,7 @@ void CBaseAnimSetControlGroupPanel::OnTreeViewItemSelected( int itemIndex )
 			const CDmrStringArray array( element, "selectedControls" );
 			if ( array.IsValid() )
 			{
-				for ( int j = 0 ; j < array.Count(); ++j )
+				for ( intp j = 0 ; j < array.Count(); ++j )
 				{
 					const char *sliderName = array[ j ];
 					if ( sliderName && *sliderName )
@@ -262,7 +262,7 @@ void CBaseAnimSetControlGroupPanel::OnTreeViewItemSelected( int itemIndex )
 			const CDmrStringArray array( element, "selectedControls" );
 			if ( array.IsValid() )
 			{
-				for ( int j = 0 ; j < array.Count(); ++j )
+				for ( intp j = 0 ; j < array.Count(); ++j )
 				{
 					const char *sliderName = array[ j ];
 					if ( sliderName && *sliderName )
@@ -299,14 +299,14 @@ void CBaseAnimSetControlGroupPanel::ChangeAnimationSet( CDmeAnimationSet *newAni
 	// Compare groups 
 	bool bRebuildGroups = false;
 	const CDmaElementArray< CDmElement > &groups = m_AnimSet->GetSelectionGroups();
-	int c = groups.Count();
+	intp c = groups.Count();
 	if ( c != m_GroupList.Count() )
 	{
 		bRebuildGroups = true;
 	}
 	else
 	{
-		for ( int i = 0; i < c; ++i )
+		for ( intp i = 0; i < c; ++i )
 		{
 			CDmElement *group = groups[ i ];
 			if ( group == m_GroupList[ i ].Get() )

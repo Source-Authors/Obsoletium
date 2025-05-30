@@ -20,15 +20,16 @@ class CServerConfigPanel : public CVarListPropertyPage
 {
 public:
 	CServerConfigPanel(vgui::Panel *parent, const char *name, const char *mod);
-	~CServerConfigPanel();
+	virtual ~CServerConfigPanel();
 
 protected:
 	// variable updates
-	virtual void OnResetData();
-	virtual void OnThink();
+	void OnResetData() override;
+	void OnThink() override;
 
 private:
-	float m_flUpdateTime;
+	// dimhotepus: float -> double.
+	double m_flUpdateTime;
 	typedef CVarListPropertyPage BaseClass;
 };
 

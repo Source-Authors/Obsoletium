@@ -376,10 +376,10 @@ bool NET_StringToAdr ( const char *s, netadr_t *a)
 	
 	if ( !NET_StringToSockaddr (address, &saddr) )
 		return false;
-		
-	a->SetFromSockadr( &saddr );
 
-	return true;
+	
+	// dimhotepus: Should check address assigned.
+	return a->SetFromSockadr( &saddr );
 }
 
 CNetChan *NET_FindNetChannel(intp socket, netadr_t &adr)
@@ -1348,12 +1348,16 @@ bool NET_ReceiveDatagram ( const intp sock, netpacket_t * packet )
 	int ret = 0;
 	{
 		VPROF_BUDGET( "recvfrom", VPROF_BUDGETGROUP_OTHER_NETWORKING );
-		ret = VCRHook_recvfrom(net_socket, (char *)packet->data, NET_MAX_MESSAGE, 0, (struct sockaddr *)&from, (int *)&fromlen );
+		ret = VCRHook_recvfrom(net_socket, (char *)packet->data, NET_MAX_MESSAGE, 0, &from, &fromlen );
 	}
 	if ( ret >= NET_MIN_MESSAGE )
 	{
 		packet->wiresize = ret;
-		packet->from.SetFromSockadr( &from );
+		if ( !packet->from.SetFromSockadr( &from ) )
+		{
+			Warning( "Unable to set IPv4 address with family %hu.\n", from.sa_family );
+		}
+
 		packet->size = ret;
 
 		if ( net_showudp_wire.GetBool() )
@@ -1363,8 +1367,6 @@ bool NET_ReceiveDatagram ( const intp sock, netpacket_t * packet )
 
 		MEM_ALLOC_CREDIT();
 		CUtlMemoryFixedGrowable< byte, NET_COMPRESSION_STACKBUF_SIZE > bufVoice( NET_COMPRESSION_STACKBUF_SIZE );
-
-		unsigned int nVoiceBits = 0u;
 
 		if ( ret < NET_MAX_MESSAGE )
 		{
@@ -1406,29 +1408,6 @@ bool NET_ReceiveDatagram ( const intp sock, netpacket_t * packet )
 				Q_memcpy( packet->data, memDecompressed.Base(), uDecompressedSize );
 
 				packet->size = uDecompressedSize;
-			}
-
-			if ( nVoiceBits > 0 )
-			{
-				// 9th byte is flag byte
-				byte flagByte = *( (byte *)packet->data + sizeof( unsigned int ) + sizeof( unsigned int ) );
-				unsigned int unPacketBits = packet->size << 3;
-				int nPadBits = DECODE_PAD_BITS( flagByte );
-				unPacketBits -= nPadBits;
-
-				bf_write fixup;
-				fixup.SetDebugName( "X360 Fixup" );
-				fixup.StartWriting( packet->data, NET_MAX_MESSAGE, unPacketBits );
-				fixup.WriteBits( bufVoice.Base(), nVoiceBits );
-
-				// Make sure we have enough bits to read a final net_NOP opcode before compressing 
-				int nRemainingBits = fixup.GetNumBitsWritten() % 8;
-				if ( nRemainingBits > 0 &&  nRemainingBits <= (8-NETMSG_TYPE_BITS) )
-				{
-					fixup.WriteUBitLong( net_NOP, NETMSG_TYPE_BITS );
-				}
-
-				packet->size = fixup.GetNumBytesWritten();
 			}
 
 			return NET_LagPacket( true, packet );
@@ -1549,7 +1528,8 @@ netpacket_t *NET_GetPacket (intp sock, byte *scratch )
 #ifdef _DEBUG
 	if ( fakenoise.GetInt() > 0 )
 	{
-		COM_AddNoise( inpacket.data, inpacket.size, fakenoise.GetInt() );
+		// dimhotepus: Restrict noise bound to packet size to prevent overflow.
+		COM_AddNoise( inpacket.data, inpacket.size, std::min(inpacket.size, fakenoise.GetInt()) );
 	}
 #endif
 	
@@ -1650,7 +1630,7 @@ void NET_ProcessListen(intp sock)
 		
 	socket_handle newSocket;
 
-	VCR_NONPLAYBACKFN( accept( netsock->hTCP, &sa, (socklen_t*)&nLengthAddr), newSocket, "accept" );
+	VCR_NONPLAYBACKFN( accept( netsock->hTCP, &sa, &nLengthAddr), newSocket, "accept" );
 #if !defined( NO_VCR )
 	VCRGenericValue( "sockaddr", &sa, sizeof( sa ) );
 #endif
@@ -1670,7 +1650,12 @@ void NET_ProcessListen(intp sock)
 
 	psock.newsock = newSocket;
 	psock.netsock = sock;
-	psock.addr.SetFromSockadr( &sa );
+
+	if ( !psock.addr.SetFromSockadr( &sa ) )
+	{
+		Warning( "Unable to set IPv4 address with family %hu.\n", sa.sa_family );
+	}
+
 	psock.time = net_time;
 
 	AUTO_LOCK( s_PendingSockets );
@@ -1741,7 +1726,7 @@ void NET_ProcessSocket( intp sock, IConnectionlessPacketHandler *handler )
 		// check for connectionless packet (0xffffffff) first
 		if ( LittleLong( *(unsigned int *)packet->data ) == CONNECTIONLESS_HEADER )
 		{
-			packet->message.ReadLong();	// read the -1
+			(void)packet->message.ReadLong();	// read the -1
 
 			if ( net_showudp.GetInt() )
 			{
@@ -2062,7 +2047,7 @@ int NET_SendLong( INetChannel *chan, intp sock, socket_handle s, const char FAR 
 	const char *sendbuf = buf;
 	int sendlen = len;
 
-	char			packet[ MAX_ROUTABLE_PAYLOAD ];
+	alignas(SPLITPACKET) char			packet[ MAX_ROUTABLE_PAYLOAD ];
 	SPLITPACKET		*pPacket = (SPLITPACKET *)packet;
 
 	// Make pPacket data network endian correct
@@ -2152,8 +2137,6 @@ int NET_SendLong( INetChannel *chan, intp sock, socket_handle s, const char FAR 
 		if ( net_showsplits.GetInt() && net_showsplits.GetInt() != 2 )
 		{
 			netadr_t adr;
-			
-			adr.SetFromSockadr( (struct sockaddr*)to );
 
 			Msg( "--> [%s] Split packet %4i/%4i seq %5i size %4i mtu %4i to %s [ total %4i ]\n",
 				DescribeSocket( sock ),
@@ -2162,7 +2145,7 @@ int NET_SendLong( INetChannel *chan, intp sock, socket_handle s, const char FAR 
 				nSequenceNumber,
 				size,
 				nMaxRoutableSize,
-				adr.ToString(),
+				adr.SetFromSockadr( to ) ? adr.ToString() : "N/A",
 				sendlen );
 		}
 	}
@@ -2365,7 +2348,7 @@ void NET_OutOfBandPrintf(intp sock, const netadr_t &adr, PRINTF_FORMAT_STRING co
 	*(unsigned int*)string = CONNECTIONLESS_HEADER;
 
 	va_start (argptr, format);
-	Q_vsnprintf (string+4, sizeof( string ) - 4, format,argptr);
+	V_vsnprintf (string+4, sizeof( string ) - 4, format,argptr);
 	va_end (argptr);
 
 	intp length = Q_strlen(string+4) + 5;

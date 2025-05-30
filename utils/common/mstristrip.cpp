@@ -117,8 +117,7 @@ class CVertCache
 public:
     CVertCache()
         { Reset(); }
-    ~CVertCache()
-        {};
+    ~CVertCache() = default;
 
     // reset cache
     void Reset()

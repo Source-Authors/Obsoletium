@@ -11,7 +11,7 @@
 //                 provided without guarantee or warrantee expressed or
 //                 implied.
 //
-#include "mxtk/mxMatSysWindow.h"
+#include "mxtk/mxmatsyswindow.h"
 #include <windows.h>
 
 class mxMatSysWindow_i
@@ -24,7 +24,7 @@ public:
 
 
 mxMatSysWindow::mxMatSysWindow (mxWindow *parent, int x, int y, int w, int h, const char *label, int style)
-: mxWindow (parent, x, y, w, h, label, style)
+: mxWindow (parent, x, y, w, h, label, style), d_drawFunc (NULL)
 {
 	d_this = new mxMatSysWindow_i;
 
@@ -56,7 +56,7 @@ mxMatSysWindow::~mxMatSysWindow ()
 
 
 int
-mxMatSysWindow::handleEvent (mxEvent *event)
+mxMatSysWindow::handleEvent ([[maybe_unused]] mxEvent *event)
 {
 	return 0;
 }

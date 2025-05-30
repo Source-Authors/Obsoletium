@@ -9,7 +9,7 @@
 #define ITEXTURECOMPOSITOR_H
 #pragma once
 
-#include "interface.h"
+#include "tier1/interface.h"
 #include "itexture.h"
 
 #define ITEXTURE_COMPOSITOR_INTERFACE_VERSION "_ITextureCompositor000"

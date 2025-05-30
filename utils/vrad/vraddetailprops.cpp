@@ -818,7 +818,7 @@ static void ComputeLighting( DetailObjectLump_t& prop, int iThread )
 				hasLightstyles = true;
 			}
 
-			int j = s_pDetailPropLightStyleLump->AddToTail();
+			intp j = s_pDetailPropLightStyleLump->AddToTail();
 			VectorToColorRGBExp32( totalColor, (*s_pDetailPropLightStyleLump)[j].m_Lighting );
 			(*s_pDetailPropLightStyleLump)[j].m_Style = i;
 			++prop.m_LightStyleCount;
@@ -839,7 +839,7 @@ static void UnserializeModelDict( CUtlBuffer& buf )
 		DetailObjectDictLump_t lump;
 		buf.Get( &lump, sizeof(DetailObjectDictLump_t) );
 		
-		int i = g_ModelCenterOffset.AddToTail();
+		intp i = g_ModelCenterOffset.AddToTail();
 
 		CUtlBuffer mdlbuf;
 		if (LoadStudioModel( lump.m_Name, mdlbuf ))
@@ -865,7 +865,7 @@ static void UnserializeSpriteDict( CUtlBuffer& buf )
 		buf.Get( &lump, sizeof(DetailSpriteDictLump_t) );
 		
 		// For these sprites, x goes out the front, y right, z up
-		int i = g_SpriteCenterOffset.AddToTail();
+		intp i = g_SpriteCenterOffset.AddToTail();
 		g_SpriteCenterOffset[i].x = 0.0f;
 		g_SpriteCenterOffset[i].y = lump.m_LR.x + lump.m_UL.x;
 		g_SpriteCenterOffset[i].z = lump.m_LR.y + lump.m_UL.y;

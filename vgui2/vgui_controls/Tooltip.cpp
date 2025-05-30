@@ -6,8 +6,7 @@
 // and implement another button here.
 //=============================================================================//
 
-#include <math.h>
-#define PROTECTED_THINGS_DISABLE
+#include <vgui_controls/Tooltip.h>
 
 #include <vgui/IInput.h>
 #include <vgui/ISystem.h>
@@ -16,7 +15,6 @@
 #include <vgui/IVGui.h>
 #include <vgui/IPanel.h>
 
-#include <vgui_controls/Tooltip.h>
 #include <vgui_controls/TextEntry.h>
 #include <vgui_controls/Controls.h>
 
@@ -310,8 +308,7 @@ void TextTooltip::ShowTooltip(Panel *currentPanel)
 {
 	if ( s_TooltipWindow.Get() )
 	{
-		int nLen = s_TooltipWindow->GetTextLength();
-
+		intp nLen = s_TooltipWindow->GetTextLength();
 		if ( nLen <= 0 )
 		{
 			// Empty tool tip, no need to show it
@@ -319,8 +316,9 @@ void TextTooltip::ShowTooltip(Panel *currentPanel)
 			return;
 		}
 
-		char *pBuf = (char*)_alloca( nLen+1 );
-		s_TooltipWindow->GetText( pBuf, nLen+1 );
+		// dimhotepus: Drop no side effects code.
+		//char *pBuf = (char*)_alloca( nLen+1 );
+		//s_TooltipWindow->GetText( pBuf, nLen+1 );
 		Panel *pCurrentParent = s_TooltipWindow->GetParent();
 
 		_isDirty = _isDirty || ( pCurrentParent != currentPanel );

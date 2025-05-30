@@ -40,7 +40,7 @@ public:
 	virtual int Read( void* pBuffer, int nDestSize, int nBytes ) = 0;
 	virtual int Seek( int nOffset, int nWhence )                 = 0;
 	virtual int Tell()                                           = 0;
-	virtual int Size()                                           = 0;
+	virtual int Size()											 = 0;
 
 	virtual void   SetBufferSize( int nBytes ) = 0;
 	virtual int    GetSectorSize()             = 0;
@@ -53,15 +53,15 @@ public:
 	CZipPackFileHandle( CZipPackFile* pOwner, int64 nBase, unsigned int nLength, unsigned int nIndex = -1, unsigned int nFilePointer = 0 );
 	virtual ~CZipPackFileHandle();
 
-	virtual int Read( void* pBuffer, int nDestSize, int nBytes ) override;
-	virtual int Seek( int nOffset, int nWhence )                 override;
+	int Read( void* pBuffer, int nDestSize, int nBytes ) override;
+	int Seek( int nOffset, int nWhence )                 override;
 
-	virtual int Tell() override { return m_nFilePointer; };
-	virtual int Size() override { return m_nLength; };
+	int Tell() override { return m_nFilePointer; };
+	int Size() override { return m_nLength; };
 
-	virtual void   SetBufferSize( int nBytes ) override;
-	virtual int    GetSectorSize()             override;
-	virtual int64  AbsoluteBaseOffset()        override;
+	void   SetBufferSize( int nBytes ) override;
+	int    GetSectorSize()             override;
+	int64  AbsoluteBaseOffset()        override;
 
 protected:
 	int64         m_nBase;        // Base offset of the file inside the pack file.
@@ -78,11 +78,11 @@ public:
 	                        unsigned int nIndex = -1, unsigned int nFilePointer = 0 );
 	~CLZMAZipPackFileHandle();
 
-	virtual int Read( void* pBuffer, int nDestSize, int nBytes ) override;
-	virtual int Seek( int nOffset, int nWhence )                 override;
+	int Read( void* pBuffer, int nDestSize, int nBytes ) override;
+	int Seek( int nOffset, int nWhence )                 override;
 
-	virtual int Tell() override;
-	virtual int Size() override;
+	int Tell() override;
+	int Size() override;
 
 private:
 	// Ensure there are bytes in the read buffer, assuming we're not at the end of the underlying data
@@ -128,7 +128,7 @@ public:
 	virtual bool Prepare( int64 fileLen = -1, int64 nFileOfs = 0 ) = 0;
 
 	// Returns the filename for a given file in the pack. Returns true if a filename is found, otherwise buffer is filled with "unknown"
-	virtual bool IndexToFilename( int nIndex, char* buffer, int nBufferSize ) = 0;
+	virtual bool IndexToFilename( intp nIndex, char* buffer, intp nBufferSize ) = 0;
 
 	inline int GetSectorSize();
 
@@ -160,7 +160,8 @@ public:
 	CUtlString			m_ZipName;
 
 	bool				m_bIsMapPath;
-	long				m_lPackFileTime;
+	// dimhotepus: long -> time_t
+	time_t				m_lPackFileTime;
 
 	int					m_refCount;
 	int					m_nOpenFiles;
@@ -198,7 +199,7 @@ public:
 
 	virtual int64 GetPackFileBaseOffset() override { return m_nBaseOffset; }
 
-	virtual bool IndexToFilename( int nIndex, char *pBuffer, int nBufferSize ) override;
+	virtual bool IndexToFilename( intp nIndex, char *pBuffer, intp nBufferSize ) override;
 
 protected:
 	virtual int  ReadFromPack( int nIndex, void* buffer, int nDestBytes, int nBytes, int64 nOffset  ) override;
@@ -254,7 +255,7 @@ protected:
 	// Entries to the individual files stored inside the pack file.
 	CUtlSortVector< CPackFileEntry, CPackFileLessFunc > m_PackFiles;
 
-	bool						GetFileInfo( const char *pFileName, int &nBaseIndex, int64 &nFileOffset, int &nOriginalSize, int &nCompressedSize, unsigned short &nCompressionMethod );
+	bool						GetFileInfo( const char *pFileName, intp &nBaseIndex, int64 &nFileOffset, int &nOriginalSize, int &nCompressedSize, unsigned short &nCompressionMethod );
 
 	// Preload Support
 	void						SetupPreloadData() override;

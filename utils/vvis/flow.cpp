@@ -31,11 +31,8 @@ int g_TraceClusterStop = -1;
 
 int CountBits (byte *bits, int numbits)
 {
-	int		i;
-	int		c;
-
-	c = 0;
-	for (i=0 ; i<numbits ; i++)
+	int c = 0;
+	for (int i=0 ; i<numbits ; i++)
 		if ( CheckBit( bits, i ) )
 			c++;
 
@@ -55,26 +52,20 @@ extern bool g_bVMPIEarlyExit;
 
 void CheckStack (leaf_t *leaf, threaddata_t *thread)
 {
-	pstack_t	*p, *p2;
-
-	for (p=thread->pstack_head.next ; p ; p=p->next)
+	for (pstack_t *p = thread->pstack_head.next; p; p = p->next)
 	{
-//		Msg ("=");
 		if (p->leaf == leaf)
-			Error ("CheckStack: leaf recursion");
-		for (p2=thread->pstack_head.next ; p2 != p ; p2=p2->next)
+			Error ("CheckStack: leaf 0x%p recursion detected!", leaf);
+		for (pstack_t *p2=thread->pstack_head.next ; p2 != p ; p2=p2->next)
 			if (p2->leaf == p->leaf)
-				Error ("CheckStack: late leaf recursion");
+				Error ("CheckStack: late leaf 0x%p recursion detected!", p->leaf);
 	}
-//	Msg ("\n");
 }
 
 
 winding_t *AllocStackWinding (pstack_t *stack)
 {
-	int		i;
-
-	for (i=0 ; i<3 ; i++)
+	for (int i=0 ; i<3 ; i++)
 	{
 		if (stack->freewindings[i])
 		{
@@ -85,20 +76,19 @@ winding_t *AllocStackWinding (pstack_t *stack)
 
 	Error ("Out of memory. AllocStackWinding: failed");
 
-	return NULL;
+	return nullptr;
 }
 
 void FreeStackWinding (winding_t *w, pstack_t *stack)
 {
-	int		i;
-
-	i = w - stack->windings;
+	int i = w - stack->windings;
 
 	if (i<0 || i>2)
 		return;		// not from local
 
 	if (stack->freewindings[i])
 		Error ("FreeStackWinding: allready free");
+
 	stack->freewindings[i] = 1;
 }
 
@@ -112,7 +102,7 @@ ChopWinding
 winding_t	*ChopWinding (winding_t *in, pstack_t *stack, plane_t *split)
 {
 	vec_t	dists[128];
-	int		sides[128];
+	SideType		sides[128];
 	int		counts[3];
 	vec_t	dot;
 	int		i, j;
@@ -284,7 +274,7 @@ winding_t	*ClipToSeperators (winding_t *source, winding_t *pass, winding_t *targ
 				if (d < -ON_VIS_EPSILON)
 				{	// source is on the negative side, so we want all
 					// pass and target on the positive side
-					fliptest = false;
+					fliptest = false; //-V1048
 					break;
 				}
 				else if (d > ON_VIS_EPSILON)
@@ -374,14 +364,11 @@ public:
 
 void WindingCenter (winding_t *w, Vector &center)
 {
-	int		i;
-	float	scale;
-
 	VectorCopy (vec3_origin, center);
-	for (i=0 ; i<w->numpoints ; i++)
+	for (int i=0 ; i<w->numpoints ; i++)
 		VectorAdd (w->points[i], center, center);
 
-	scale = 1.0/w->numpoints;
+	float scale = 1.0f/w->numpoints;
 	VectorScale (center, scale, center);
 }
 
@@ -389,10 +376,9 @@ Vector ClusterCenter( int cluster )
 {
 	Vector mins, maxs;
 	ClearBounds(mins, maxs);
-	int count = leafs[cluster].portals.Count();
-	for ( int i = 0; i < count; i++ )
+	for ( auto *p : leafs[cluster].portals )
 	{
-		winding_t *w = leafs[cluster].portals[i]->winding;
+		winding_t *w = p->winding;
 		for ( int j = 0; j < w->numpoints; j++ )
 		{
 			AddPointToBounds( w->points[j], mins, maxs );
@@ -435,24 +421,20 @@ void DumpPortalTrace( pstack_t *pStack )
 
 void WritePortalTrace( const char *source )
 {
-	Vector	mid;
-	FILE	*linefile;
-	char	filename[1024];
-
 	if ( !g_PortalTrace.m_list.Count() )
 	{
 		Warning("No trace generated from %d to %d\n", g_TraceClusterStart, g_TraceClusterStop );
 		return;
 	}
-
-	sprintf (filename, "%s.lin", source);
-	linefile = fopen (filename, "w");
+	
+	char filename[1024];
+	V_sprintf_safe (filename, "%s.lin", source);
+	FILE *linefile = fopen (filename, "w");
 	if (!linefile)
 		Error ("Couldn't open %s\n", filename);
 
-	for ( int i = 0; i < g_PortalTrace.m_list.Count(); i++ )
+	for ( auto &p : g_PortalTrace.m_list )
 	{
-		Vector p = g_PortalTrace.m_list[i];
 		fprintf (linefile, "%f %f %f\n", p[0], p[1], p[2]);
 	}
 	fclose (linefile);
@@ -470,13 +452,10 @@ If src_portal is NULL, this is the originating leaf
 void RecursiveLeafFlow (int leafnum, threaddata_t *thread, pstack_t *prevstack)
 {
 	pstack_t	stack;
-	portal_t	*p;
 	plane_t		backplane;
-	leaf_t 		*leaf;
-	int			i, j;
+	int			j;
 	long		*test, *might, *vis, more;
-	int			pnum;
-
+	
 	// Early-out if we're a VMPI worker that's told to exit. If we don't do this here, then the
 	// worker might spin its wheels for a while on an expensive work unit and not be available to the pool.
 	// This is pretty common in vis.
@@ -490,7 +469,7 @@ void RecursiveLeafFlow (int leafnum, threaddata_t *thread, pstack_t *prevstack)
 	}
 	thread->c_chains++;
 
-	leaf = &leafs[leafnum];
+	leaf_t *leaf = &leafs[leafnum];
 
 	prevstack->next = &stack;
 
@@ -502,11 +481,10 @@ void RecursiveLeafFlow (int leafnum, threaddata_t *thread, pstack_t *prevstack)
 	vis = (long *)thread->base->portalvis;
 	
 	// check all portals for flowing into other leafs	
-	for (i=0 ; i<leaf->portals.Count() ; i++)
+	for (intp i=0 ; i<leaf->portals.Count() ; i++)
 	{
-
-		p = leaf->portals[i];
-		pnum = p - portals;
+		portal_t *p = leaf->portals[i];
+		int pnum = p - portals;
 
 		if ( ! (prevstack->mightsee[pnum >> 3] & (1<<(pnum&7)) ) )
 		{
@@ -618,34 +596,29 @@ generates the portalvis bit vector
 */
 void PortalFlow (int iThread, int portalnum)
 {
-	threaddata_t	data;
-	int				i;
-	portal_t		*p;
-	int				c_might, c_can;
-
-	p = sorted_portals[portalnum];
+	portal_t *p = sorted_portals[portalnum];
 	p->status = stat_working;
-				
-	c_might = CountBits (p->portalflood, g_numportals*2);
 
+	const int c_might = CountBits (p->portalflood, g_numportals*2);
+	
+	threaddata_t	data;
 	memset (&data, 0, sizeof(data));
 	data.base = p;
 	
 	data.pstack_head.portal = p;
 	data.pstack_head.source = p->winding;
 	data.pstack_head.portalplane = p->plane;
-	for (i=0 ; i<portallongs ; i++)
+	for (int i=0 ; i<portallongs ; i++)
 		((long *)data.pstack_head.mightsee)[i] = ((long *)p->portalflood)[i];
 
 	RecursiveLeafFlow (p->leaf, &data, &data.pstack_head);
 
-
 	p->status = stat_done;
 
-	c_can = CountBits (p->portalvis, g_numportals*2);
+	const int c_can = CountBits (p->portalvis, g_numportals*2);
 
-	qprintf ("portal:%4i  mightsee:%4i  cansee:%4i (%i chains)\n", 
-		(int)(p - portals),	c_might, c_can, data.c_chains);
+	qprintf ("portal:%4zi  mightsee:%4i  cansee:%4i (%i chains)\n", 
+		p - portals, c_might, c_can, data.c_chains);
 }
 
 
@@ -671,17 +644,12 @@ SimpleFlood
 */
 void SimpleFlood (portal_t *srcportal, int leafnum)
 {
-	int		i;
-	leaf_t	*leaf;
-	portal_t	*p;
-	int		pnum;
-
-	leaf = &leafs[leafnum];
+	leaf_t *leaf = &leafs[leafnum];
 	
-	for (i=0 ; i<leaf->portals.Count(); i++)
+	for (auto *p : leaf->portals)
 	{
-		p = leaf->portals[i];
-		pnum = p - portals;
+		int pnum = p - portals;
+
 		if ( !CheckBit( srcportal->portalfront, pnum ) )
 			continue;
 
@@ -702,14 +670,14 @@ BasePortalVis
 void BasePortalVis (int iThread, int portalnum)
 {
 	int			j, k;
-	portal_t	*tp, *p;
+	portal_t	*tp;
 	float		d;
 	winding_t	*w;
 	Vector		segment;
 	double		dist2, minDist2;
 
 	// get the portal
-	p = portals+portalnum;
+	portal_t *p = portals+portalnum;
 
 	//
 	// allocate memory for bitwise vis solutions for this portal
@@ -810,28 +778,22 @@ RecursiveLeafBitFlow
 */
 void RecursiveLeafBitFlow (int leafnum, byte *mightsee, byte *cansee)
 {
-	portal_t	*p;
-	leaf_t 		*leaf;
-	int			i, j;
-	long		more;
-	int			pnum;
-	byte		newmight[MAX_PORTALS/8];
+	alignas(long) byte		newmight[MAX_PORTALS/8];
 
-	leaf = &leafs[leafnum];
+	leaf_t *leaf = &leafs[leafnum];
 	
-// check all portals for flowing into other leafs	
-	for (i=0 ; i<leaf->portals.Count(); i++)
+	// check all portals for flowing into other leafs
+	for (auto *p : leaf->portals)
 	{
-		p = leaf->portals[i];
-		pnum = p - portals;
+		int pnum = p - portals;
 
 		// if some previous portal can't see it, skip
 		if ( !CheckBit( mightsee, pnum ) )
 			continue;
 
 		// if this portal can see some portals we mightsee, recurse
-		more = 0;
-		for (j=0 ; j<portallongs ; j++)
+		long more = 0;
+		for (int j=0 ; j<portallongs ; j++)
 		{
 			((long *)newmight)[j] = ((long *)mightsee)[j] 
 				& ((long *)p->portalflood)[j];
@@ -844,7 +806,7 @@ void RecursiveLeafBitFlow (int leafnum, byte *mightsee, byte *cansee)
 		SetBit( cansee, pnum );
 
 		RecursiveLeafBitFlow (p->leaf, newmight, cansee);
-	}	
+	}
 }
 
 /*
@@ -854,9 +816,7 @@ BetterPortalVis
 */
 void BetterPortalVis (int portalnum)
 {
-	portal_t	*p;
-
-	p = portals+portalnum;
+	portal_t *p = portals + portalnum;
 
 	RecursiveLeafBitFlow (p->leaf, p->portalflood, p->portalvis);
 

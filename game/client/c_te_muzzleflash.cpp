@@ -65,7 +65,7 @@ static inline void RecordMuzzleFlash( const Vector &start, const QAngle &angles,
 
 	if ( clienttools->IsInRecordingMode() )
 	{
-		KeyValues *msg = new KeyValues( "TempEntity" );
+		KeyValuesAD msg( "TempEntity" );
 
  		msg->SetInt( "te", TE_MUZZLE_FLASH );
  		msg->SetString( "name", "TE_MuzzleFlash" );
@@ -80,7 +80,6 @@ static inline void RecordMuzzleFlash( const Vector &start, const QAngle &angles,
 		msg->SetInt( "type", type );
 
 		ToolFramework_PostToolMessage( HTOOLHANDLE_INVALID, msg );
-		msg->deleteThis();
 	}
 }
 

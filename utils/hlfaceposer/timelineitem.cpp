@@ -4,15 +4,13 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "hlfaceposer.h"
-#include <stdio.h>
 #include "TimelineItem.h"
+#include "hlfaceposer.h"
 #include "choreowidgetdrawhelper.h"
 #include "mathlib/mathlib.h"
 #include "expressions.h"
 #include "StudioModel.h"
 #include "expclass.h"
-#include "mathlib/mathlib.h"
 #include "ExpressionTool.h"
 #include "choreoevent.h"
 #include "choreoscene.h"
@@ -136,7 +134,7 @@ int TimelineItem::GetMouseForTime( float t, bool *clipped /*= NULL*/ )
 	return mx;
 }
 
-int TimelineItem::NumSamples()
+intp TimelineItem::NumSamples()
 {
 	CFlexAnimationTrack *track = GetSafeTrack();
 	if ( !track )
@@ -147,7 +145,7 @@ int TimelineItem::NumSamples()
 	// return track->GetNumSamples( m_nEditType );
 }
 
-CExpressionSample *TimelineItem::GetSample( int idx )
+CExpressionSample *TimelineItem::GetSample( intp idx )
 {
 	CFlexAnimationTrack *track = GetSafeTrack();
 	if ( !track )
@@ -944,7 +942,7 @@ void TimelineItem::Draw( CChoreoWidgetDrawHelper& drawHelper )
 				Q_snprintf( sz, sizeof( sz ), "%s", Interpolator_NameForCurveType( start->GetCurveType(), true ) );
 				RECT rc;
 				int fontSize = 9;
-				rc.top = clamp( y + 5, rcClient.top + 2, rcClient.bottom - 2 - fontSize );
+				rc.top = clamp( static_cast<long>(y) + 5, rcClient.top + 2, rcClient.bottom - 2 - fontSize );
 				rc.bottom = rc.top + fontSize + 1;
 				rc.left = x - 75;
 				rc.right = x + 175;
@@ -964,11 +962,11 @@ void TimelineItem::Draw( CChoreoWidgetDrawHelper& drawHelper )
 
 		if ( m_nEditType == 1 )
 		{
-			sprintf( sz, "left" );
+			V_sprintf_safe( sz, "left" );
 
 			drawHelper.DrawColoredText( "Arial", 9, 500, RGB( 0, 0, 255 ), title, sz );
 
-			sprintf( sz, "right" );
+			V_sprintf_safe( sz, "right" );
 
 			title.top = rcClient.bottom - 22;
 			title.bottom = rcClient.bottom;
@@ -981,7 +979,7 @@ void TimelineItem::Draw( CChoreoWidgetDrawHelper& drawHelper )
 		title.top = mid - 10;
 		title.bottom = mid;
 
-		sprintf( sz, "editmode:  <%s>", m_nEditType == 0 ? "amount" : "left/right" );
+		V_sprintf_safe( sz, "editmode:  <%s>", m_nEditType == 0 ? "amount" : "left/right" );
 
 		drawHelper.DrawColoredText( "Arial", 9, 500, RGB( 0, 0, 255 ), title, sz );
 	}
@@ -998,7 +996,7 @@ void TimelineItem::Draw( CChoreoWidgetDrawHelper& drawHelper )
 
 		if ( scount > 0 )
 		{
-			sprintf( sz, "{%i} - ", scount );
+			V_sprintf_safe( sz, "{%i} - ", scount );
 
 			int len = drawHelper.CalcTextWidth( "Arial", 9, 500, sz );
 			drawHelper.DrawColoredText( "Arial", 9, 500, 
@@ -1007,7 +1005,7 @@ void TimelineItem::Draw( CChoreoWidgetDrawHelper& drawHelper )
 			title.left += len + 2;
 		}
 
-		sprintf( sz, "%s -", name );
+		V_sprintf_safe( sz, "%s -", name );
 
 		int len = drawHelper.CalcTextWidth( "Arial", 9, 500, sz );
 
@@ -1015,7 +1013,7 @@ void TimelineItem::Draw( CChoreoWidgetDrawHelper& drawHelper )
 			active ? RGB( 0, 150, 100 ) : RGB( 100, 100, 100 ), 
 			title, sz );
 
-		sprintf( sz, "%s", IsActive() ? "enabled" : "disabled" );
+		V_sprintf_safe( sz, "%s", IsActive() ? "enabled" : "disabled" );
 
 		title.left += len + 2;
 
@@ -1028,7 +1026,7 @@ void TimelineItem::Draw( CChoreoWidgetDrawHelper& drawHelper )
 		{
 			title.left += len + 2;
 
-			sprintf( sz, " <%i>", track->GetNumSamples( 0 ) );
+			V_sprintf_safe( sz, " <%zd>", track->GetNumSamples( 0 ) );
 
 			len = drawHelper.CalcTextWidth( "Arial", 9, 500, sz );
 			drawHelper.DrawColoredText( "Arial", 9, 500, RGB( 220, 0, 00 ), title, sz );
@@ -1577,8 +1575,8 @@ void TimelineItem::DeletePoints( float start, float end )
 
 	for ( int t = 0; t < 2; t++ )
 	{
-		int num = track->GetNumSamples( t );
-		for ( int i = num - 1; i >= 0 ; i-- )
+		intp num = track->GetNumSamples( t );
+		for ( intp i = num - 1; i >= 0 ; i-- )
 		{
 			CExpressionSample *sample = track->GetSample( i, t );
 			if ( sample->time < start || sample->time > end )
@@ -1674,8 +1672,8 @@ void TimelineItem::DrawGrowHandle( CChoreoWidgetDrawHelper& helper, RECT& handle
 	DeleteObject( brBorder );
 
 	// draw a line in the middle
-	int midy = ( handleRect.bottom + handleRect.top ) * 0.5f;
-	int lineinset = GROW_HANDLE_INSETPIXELS *1.5;
+	int midy = ( handleRect.bottom + handleRect.top ) / 2;
+	int lineinset = GROW_HANDLE_INSETPIXELS * 3 / 2;
 
 	helper.DrawColoredLine( RGB( 63, 63, 63 ), PS_SOLID, 1, 
 		handleRect.left + lineinset, midy,

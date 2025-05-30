@@ -111,8 +111,8 @@ void CMainPanel::StartServer(const char *cvars) {
 
   // make sure we have all the steam content for this mod
   char reslist[_MAX_PATH];
-  _snprintf(reslist, sizeof(reslist), "reslists/%s/preload.lst",
-            m_pConfigPage->GetGameName());
+  V_sprintf_safe(reslist, "reslists/%s/preload.lst",
+                 m_pConfigPage->GetGameName());
   m_hResourceWaitHandle = g_pFullFileSystem->WaitForResources(reslist);
   if (!m_hResourceWaitHandle) {
     Assert(0);

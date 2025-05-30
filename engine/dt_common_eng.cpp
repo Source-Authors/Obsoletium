@@ -125,7 +125,8 @@ bool DataTable_SetupReceiveTableFromSendTable( SendTable *sendTable, bool bNeeds
 
 			Assert( pDTName && !Q_isempty(pDTName) );
 
-			pClientProp->SetTableName( COM_StringCopy( pDTName ) );
+			// dimhotepus: Make client prop responsible for copying name.
+			pClientProp->SetTableName( pDTName );
 			
 			// Normally we wouldn't care about this but we need to compare it against 
 			// proxies in the server DLL in SendTable_BuildHierarchy.

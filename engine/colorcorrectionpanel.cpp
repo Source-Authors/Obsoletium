@@ -42,8 +42,8 @@
 
 using namespace vgui;
 
-const int g_nPreviewImageWidth  = 128;
-const int g_nPreviewImageHeight =  96;
+constexpr inline int g_nPreviewImageWidth  = 128;
+constexpr inline int g_nPreviewImageHeight =  96;
 
 ConVar mat_colorcorrection( "mat_colorcorrection", "0", FCVAR_ARCHIVE );
 ConVar mat_colcorrection_disableentities( "mat_colcorrection_disableentities", "0" );
@@ -166,7 +166,7 @@ void CPrecisionSlider::SetEnabled( bool state )
 void CPrecisionSlider::OnTextNewLine( KeyValues *data )
 {
 	char buf[256];
-	m_pTextEntry->GetText( buf, 256 );
+	m_pTextEntry->GetText( buf );
 
 	int value = 0;
 	sscanf( buf, "%d", &value );
@@ -240,9 +240,9 @@ static void VectorToColor24( const Vector &inVector, color24 &outColor )
 	int r = (int)((inVector.x * 255.0f) + 0.5f);
 	int g = (int)((inVector.y * 255.0f) + 0.5f);
 	int b = (int)((inVector.z * 255.0f) + 0.5f);
-	outColor.r = clamp( r, 0, 255 );
-	outColor.g = clamp( g, 0, 255 );
-	outColor.b = clamp( b, 0, 255 );
+	outColor.r = static_cast<byte>(clamp( r, 0, 255 ));
+	outColor.g = static_cast<byte>(clamp( g, 0, 255 ));
+	outColor.b = static_cast<byte>(clamp( b, 0, 255 ));
 }
 
 
@@ -354,22 +354,22 @@ public:
 	void AddOperation( IColorOperation *pOp );
 
 	// Deletes the operation at the specified index
-	void DeleteOperation( int opIndex );
+	void DeleteOperation( intp opIndex );
 
 	// Applys all operations in the list to the color
 	void Apply( color24 in, color24 &out, IColorOperation *pFinalOp=NULL );
 
 	// Queries for the number of operations in the list
-	int	GetNumOperations( );
+	intp	GetNumOperations( ) const;
 
 	// Returns the operation at the specified index in the list
-	IColorOperation *GetOperation( int opIndex );
+	IColorOperation *GetOperation( intp opIndex );
 
 	// Move the item at the specified index in the list towards the front
-	void BringForward( int opIndex );
+	void BringForward( intp opIndex );
 
 	// Move the item at the specified index in the list towards the back
-	void PushBack( int opIndex );
+	void PushBack( intp opIndex );
 
 private:
 	CUtlVector< IColorOperation* > m_OpList;
@@ -379,9 +379,7 @@ private:
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CColorOperationList::CColorOperationList()
-{
-}
+CColorOperationList::CColorOperationList() = default;
 
 
 //-----------------------------------------------------------------------------
@@ -389,7 +387,7 @@ CColorOperationList::CColorOperationList()
 //-----------------------------------------------------------------------------
 void CColorOperationList::Clear()
 {
-	for ( int i = m_OpList.Count(); --i >= 0; )
+	for ( intp i = m_OpList.Count(); --i >= 0; )
 	{
 		m_OpList[i]->Release();
 	}
@@ -409,7 +407,7 @@ void CColorOperationList::AddOperation( IColorOperation *pOp )
 //-----------------------------------------------------------------------------
 // Deletes an operation
 //-----------------------------------------------------------------------------
-void CColorOperationList::DeleteOperation( int opIndex )
+void CColorOperationList::DeleteOperation( intp opIndex )
 {
 	if( !m_OpList.IsValidIndex( opIndex ) )
 		return;
@@ -422,7 +420,7 @@ void CColorOperationList::DeleteOperation( int opIndex )
 //-----------------------------------------------------------------------------
 void CColorOperationList::Apply( color24 in, color24 &out, IColorOperation *pFinalOp )
 {
-	int nCount = m_OpList.Count();
+	intp nCount = m_OpList.Count();
 	if ( nCount == 0 )
 	{
 		out = in;
@@ -432,7 +430,7 @@ void CColorOperationList::Apply( color24 in, color24 &out, IColorOperation *pFin
 	Vector rgb;
 	Color24ToVector( in, &rgb );
 
-	for ( int i = 0; i < nCount && m_OpList[i] != pFinalOp ; ++i )
+	for ( intp i = 0; i < nCount && m_OpList[i] != pFinalOp ; ++i )
 	{
 		Vector temp;
 		m_OpList[i]->Apply( rgb, temp );
@@ -445,7 +443,7 @@ void CColorOperationList::Apply( color24 in, color24 &out, IColorOperation *pFin
 //-----------------------------------------------------------------------------
 // Queries for the number of operations in the list
 //-----------------------------------------------------------------------------
-int	CColorOperationList::GetNumOperations( )
+intp	CColorOperationList::GetNumOperations( ) const
 {
 	return m_OpList.Count();
 }
@@ -453,7 +451,7 @@ int	CColorOperationList::GetNumOperations( )
 //-----------------------------------------------------------------------------
 // Returns the operation at the specified index in the list
 //-----------------------------------------------------------------------------
-IColorOperation *CColorOperationList::GetOperation( int opIndex )
+IColorOperation *CColorOperationList::GetOperation( intp opIndex )
 {
 	if( !m_OpList.IsValidIndex( opIndex ) )
 		return NULL;
@@ -462,7 +460,7 @@ IColorOperation *CColorOperationList::GetOperation( int opIndex )
 }
 
 
-void CColorOperationList::BringForward( int opIndex )
+void CColorOperationList::BringForward( intp opIndex )
 {
 	if( !m_OpList.IsValidIndex( opIndex ) || opIndex==0 )
 		return;
@@ -473,7 +471,7 @@ void CColorOperationList::BringForward( int opIndex )
 }
 
 
-void CColorOperationList::PushBack( int opIndex )
+void CColorOperationList::PushBack( intp opIndex )
 {
 	if( !m_OpList.IsValidIndex( opIndex ) || opIndex==m_OpList.Count()-1 )
 		return;
@@ -577,20 +575,20 @@ public:
 	float ComputeCorrectedColor( float flInColor );
 
 	// Finds or adds a control point
-	int FindControlPoint( float flInValue, float flTolerance );
+	intp FindControlPoint( float flInValue, float flTolerance );
 
 	// Finds or adds a control point
-	int FindOrAddControlPoint( float flInValue, float flTolerance, float flOutValue );
+	intp FindOrAddControlPoint( float flInValue, float flTolerance, float flOutValue );
 
 	// Modifies a control point
-	int ModifyControlPoint( int nPoint, float flInValue, float flOutValue );
+	intp ModifyControlPoint( intp nPoint, float flInValue, float flOutValue );
 
 	// Removes a control point. Points 0 and Last can't be removed 
-	void RemoveControlPoint( int nPoint );
+	void RemoveControlPoint( intp nPoint );
 
 	// Iterates the control points
-	int ControlPointCount() const;
-	void GetControlPoint( int nPoint, float *pInValue, float *pOutValue );
+	intp ControlPointCount() const;
+	void GetControlPoint( intp nPoint, float *pInValue, float *pOutValue );
 
 private:
 	// Computes actual corrected color (expensive!!)
@@ -672,12 +670,12 @@ void CCurvesColorOperation::SetBlendFactor( float flBlend )
 //-----------------------------------------------------------------------------
 // Iterates the control points
 //-----------------------------------------------------------------------------
-int CCurvesColorOperation::ControlPointCount() const
+intp CCurvesColorOperation::ControlPointCount() const
 {
 	return m_ControlPoints.Count();
 }
 
-void CCurvesColorOperation::GetControlPoint( int nPoint, float *pInValue, float *pOutValue )
+void CCurvesColorOperation::GetControlPoint( intp nPoint, float *pInValue, float *pOutValue )
 {
 	*pInValue = m_ControlPoints[nPoint].x;
 	*pOutValue = m_ControlPoints[nPoint].y;
@@ -687,9 +685,9 @@ void CCurvesColorOperation::GetControlPoint( int nPoint, float *pInValue, float 
 //-----------------------------------------------------------------------------
 // Finds or adds a control point
 //-----------------------------------------------------------------------------
-int CCurvesColorOperation::FindControlPoint( float flInValue, float flTolerance )
+intp CCurvesColorOperation::FindControlPoint( float flInValue, float flTolerance )
 {
-	for ( int i = m_ControlPoints.Count(); --i >= 0; )
+	for ( intp i = m_ControlPoints.Count(); --i >= 0; )
 	{
 		if ( fabs( m_ControlPoints[i].x	- flInValue ) < flTolerance )
 			return i;
@@ -701,15 +699,15 @@ int CCurvesColorOperation::FindControlPoint( float flInValue, float flTolerance 
 //-----------------------------------------------------------------------------
 // Finds or adds a control point
 //-----------------------------------------------------------------------------
-int CCurvesColorOperation::FindOrAddControlPoint( float flInValue, float flTolerance, float flOutValue )
+intp CCurvesColorOperation::FindOrAddControlPoint( float flInValue, float flTolerance, float flOutValue )
 {
-	int nPoint = FindControlPoint( flInValue, flTolerance );
+	intp nPoint = FindControlPoint( flInValue, flTolerance );
 	if ( nPoint != -1 )
 		return nPoint;
 
 	Vector insert( flInValue, flOutValue, 0.0f );
 	m_ControlPoints.Insert( insert );
-	int n = m_ControlPoints.Find( insert );
+	intp n = m_ControlPoints.Find( insert );
 	UpdateOutColorArray();
 	colorcorrectiontools->UpdateColorCorrection();
 	return n;
@@ -719,7 +717,7 @@ int CCurvesColorOperation::FindOrAddControlPoint( float flInValue, float flToler
 //-----------------------------------------------------------------------------
 // Modifies a control point
 //-----------------------------------------------------------------------------
-int CCurvesColorOperation::ModifyControlPoint( int nPoint, float flInValue, float flOutValue )
+intp CCurvesColorOperation::ModifyControlPoint( intp nPoint, float flInValue, float flOutValue )
 {
 	Assert( ( nPoint >= 0 ) && ( nPoint < m_ControlPoints.Count() ) );
 	Vector temp = m_ControlPoints[nPoint];
@@ -727,7 +725,7 @@ int CCurvesColorOperation::ModifyControlPoint( int nPoint, float flInValue, floa
 	temp.x = flInValue;
 	temp.y = flOutValue;
 	m_ControlPoints.Insert( temp );
-	int nIndex = m_ControlPoints.Find( temp );
+	intp nIndex = m_ControlPoints.Find( temp );
 	UpdateOutColorArray();
 	colorcorrectiontools->UpdateColorCorrection();
 	return nIndex;
@@ -737,7 +735,7 @@ int CCurvesColorOperation::ModifyControlPoint( int nPoint, float flInValue, floa
 //-----------------------------------------------------------------------------
 // Removes a control point. Points 0 and Last can't be removed 
 //-----------------------------------------------------------------------------
-void CCurvesColorOperation::RemoveControlPoint( int nPoint )
+void CCurvesColorOperation::RemoveControlPoint( intp nPoint )
 {
 	Assert( ( nPoint >= 0 ) && ( nPoint < m_ControlPoints.Count() ) );
 	if ( ( nPoint == 0 ) || ( nPoint == m_ControlPoints.Count() - 1 ) )
@@ -758,11 +756,11 @@ float CCurvesColorOperation::ComputeActualCorrectedColor( float flInColor )
 
 	// First find the control points we are between
 	Vector find( flInColor, 0, 0 );
-	int i = m_ControlPoints.FindLessOrEqual( find );
+	intp i = m_ControlPoints.FindLessOrEqual( find );
 	if ( i < 0 )
 		return m_ControlPoints[0].y;
 
-	int nCount = m_ControlPoints.Count(); 
+	intp nCount = m_ControlPoints.Count(); 
 	if ( i == (nCount - 1) )
 		return m_ControlPoints[nCount - 1].y;
 
@@ -881,13 +879,13 @@ public:
 
 protected:
 	// Control points + values...
-	int FindOrAddControlPoint( float flIn, float flTolerance, float flOut ) override;
-	int FindControlPoint( float flIn, float flTolerance ) override;
-	int ModifyControlPoint( int nPoint, float flIn, float flOut ) override;
-	void RemoveControlPoint( int nPoint ) override;
+	intp FindOrAddControlPoint( float flIn, float flTolerance, float flOut ) override;
+	intp FindControlPoint( float flIn, float flTolerance ) override;
+	intp ModifyControlPoint( intp nPoint, float flIn, float flOut ) override;
+	void RemoveControlPoint( intp nPoint ) override;
 	float GetValue( float flIn ) override;
-	int ControlPointCount() override;
-	void GetControlPoint( int nPoint, float *pIn, float *pOut ) override;
+	intp ControlPointCount() override;
+	void GetControlPoint( intp nPoint, float *pIn, float *pOut ) override;
 
 private:
 	CCurvesColorOperation *m_pCurvesOp;
@@ -911,26 +909,26 @@ CColorCurvesEditPanel::~CColorCurvesEditPanel()
 //-----------------------------------------------------------------------------
 // Control points + values...
 //-----------------------------------------------------------------------------
-int CColorCurvesEditPanel::FindOrAddControlPoint( float flIn, float flTolerance, float flOut )
+intp CColorCurvesEditPanel::FindOrAddControlPoint( float flIn, float flTolerance, float flOut )
 {
 	Assert( m_pCurvesOp );
 	return m_pCurvesOp->FindOrAddControlPoint( flIn, flTolerance, flOut );
 }
 
-int CColorCurvesEditPanel::FindControlPoint( float flIn, float flTolerance )
+intp CColorCurvesEditPanel::FindControlPoint( float flIn, float flTolerance )
 {
 	Assert( m_pCurvesOp );
 	return m_pCurvesOp->FindControlPoint( flIn, flTolerance );
 }
 
-int CColorCurvesEditPanel::ModifyControlPoint( int nPoint, float flIn, float flOut )
+intp CColorCurvesEditPanel::ModifyControlPoint( intp nPoint, float flIn, float flOut )
 {
 	Assert( m_pCurvesOp );
 	m_pCurvesOp->ModifyControlPoint( nPoint, flIn, flOut );
 	return nPoint;
 }
 
-void CColorCurvesEditPanel::RemoveControlPoint( int nPoint )
+void CColorCurvesEditPanel::RemoveControlPoint( intp nPoint )
 {
 	Assert( m_pCurvesOp );
 	m_pCurvesOp->RemoveControlPoint( nPoint );
@@ -942,13 +940,13 @@ float CColorCurvesEditPanel::GetValue( float flIn )
 	return m_pCurvesOp->ComputeCorrectedColor( flIn );
 }
 
-int CColorCurvesEditPanel::ControlPointCount()
+intp CColorCurvesEditPanel::ControlPointCount()
 {
 	Assert( m_pCurvesOp );
 	return m_pCurvesOp->ControlPointCount( );
 }
 
-void CColorCurvesEditPanel::GetControlPoint( int nPoint, float *pIn, float *pOut )
+void CColorCurvesEditPanel::GetControlPoint( intp nPoint, float *pIn, float *pOut )
 {
 	Assert( m_pCurvesOp );
 	m_pCurvesOp->GetControlPoint( nPoint, pIn, pOut );
@@ -1403,7 +1401,7 @@ IColorOperation *CLevelsColorOperation::Clone( )
 {
 	CLevelsColorOperation *pClone = new CLevelsColorOperation;
 
-	Q_memcpy( pClone->m_pOutValue, m_pOutValue, sizeof(float)*256.0f );
+	Q_memcpy( pClone->m_pOutValue, m_pOutValue, sizeof(float)*std::size(pClone->m_pOutValue) );
 
 	pClone->m_nChannelMask = m_nChannelMask;
 	pClone->m_flBlendFactor = m_flBlendFactor;
@@ -1479,6 +1477,8 @@ CColorHistogramPanel::CColorHistogramPanel( vgui::Panel *pParent, const char *pN
 	m_Type = RGB;
 
 	m_pOp = pOp;
+
+	m_flMax = -1;
 }
 
 CColorHistogramPanel::~CColorHistogramPanel()
@@ -1515,9 +1515,9 @@ void CColorHistogramPanel::ComputeHistogram( Rect_t &srcRect, unsigned char *pBi
 			writer.ReadPixelNoAdvance( r, g, b, a );
 
 			color24 inColor, col;
-			inColor.r = clamp( r, 0, 255 );
-			inColor.g = clamp( g, 0, 255 );
-			inColor.b = clamp( b, 0, 255 );
+			inColor.r = static_cast<byte>(clamp( r, 0, 255 ));
+			inColor.g = static_cast<byte>(clamp( g, 0, 255 ));
+			inColor.b = static_cast<byte>(clamp( b, 0, 255 ));
 
 			m_pOp->GetColorOpList()->Apply( inColor, col, m_pOp );
 
@@ -2251,6 +2251,8 @@ private:
 //-----------------------------------------------------------------------------
 CSelectedHSVOperation::CSelectedHSVOperation()
 {
+	m_pOpList = nullptr;
+
 	m_SelectionMethod = SELECT_NEARBY_RGB;
 	m_DeltaHSV.Init( 0, 0, 0 );
 
@@ -2682,6 +2684,7 @@ protected:
 //-----------------------------------------------------------------------------
 CUncorrectedImagePanel::CUncorrectedImagePanel( vgui::Panel *pParent, const char *pName ) : BaseClass( pParent, pName )
 {
+	m_pHSVOp = nullptr;
 	m_bMouseDown = false;
 	SetMouseInputEnabled( true );
 	MaintainProportions( true );
@@ -3128,6 +3131,7 @@ void CSelectedHSVUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		CPrecisionSlider *pSlider = dynamic_cast<CPrecisionSlider *>( pPanel );
+		Assert( pSlider );
 
 		if ( pSlider != m_pBlendFactorSlider )
 		{
@@ -3144,6 +3148,7 @@ void CSelectedHSVUIPanel::OnMessage(const KeyValues *params, VPANEL fromPanel)
 	{
 		vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(params)->GetPtr("panel") );
 		vgui::CheckButton *pButton = dynamic_cast<vgui::CheckButton *>( pPanel );
+		Assert( pButton );
 
 		if( pButton == m_pColorizeButton )
 		{
@@ -3250,12 +3255,14 @@ private:
 //-----------------------------------------------------------------------------
 CColorLookupOperation::CColorLookupOperation( )
 {
+	m_pFilename[0] = '\0';
+
 	m_Resolution = 0;
 	m_LookupTable = 0;
 	m_flBlendFactor = 1.0f;
+	m_bEnable = false;
 
 	V_strcpy_safe( m_pName, "Lookup" );
-	V_strcpy_safe( m_pFilename, "" );
 }
 
 
@@ -3904,9 +3911,9 @@ void CColorBalanceOperation::CreateLookupTables( )
 			blueOut = clamp( blueOut, 0, 255 );
 		}
 
-		m_pRedLookup[i] = redOut;
-		m_pGreenLookup[i] = greenOut;
-		m_pBlueLookup[i] = blueOut;
+		m_pRedLookup[i] = static_cast<byte>(redOut);
+		m_pGreenLookup[i] = static_cast<byte>(greenOut);
+		m_pBlueLookup[i] = static_cast<byte>(blueOut);
 	}
 }
 
@@ -4316,7 +4323,7 @@ void CNewOperationDialog::OnCommand( const char *command )
 		if( m_pName->GetTextLength()>0 )
 		{
 			char buf[256];
-			m_pName->GetText( buf, 256 );
+			m_pName->GetText( buf );
 			newOp->SetName( buf );
 		}
 
@@ -4513,7 +4520,7 @@ void COperationListPanel::OnMouseDoublePressed( MouseCode code )
 void COperationListPanel::OnTextNewLine( KeyValues *data )
 {
 	char newName[256];
-	m_pNameEditPanel->GetText( newName, 256 );
+	m_pNameEditPanel->GetText( newName );
 
 	if( m_nEditItem!=-1 )
 	{
@@ -4658,8 +4665,8 @@ void CColorOperationListPanel::OnOpPanelClose( KeyValues *data )
 	CColorCorrectionUIChildPanel *pSender = (CColorCorrectionUIChildPanel *)data->GetPtr( "panel", 0 );
 	if( pSender )
 	{
-		int opPanelIndex = m_OpPanelList.Find( pSender );
-        m_OpPanelList.Remove( opPanelIndex );
+		intp opPanelIndex = m_OpPanelList.Find( pSender );
+		m_OpPanelList.Remove( opPanelIndex );
 
 		pSender->Shutdown();
 		delete pSender;
@@ -4877,14 +4884,14 @@ void CColorOperationListPanel::PopulateList( )
 {
 	m_pOperationListPanel->DeleteAllItems( );
 
-	int numItems = m_OperationList.GetNumOperations();
+	intp numItems = m_OperationList.GetNumOperations();
 
-	for( int i=0;i<numItems;i++ )
+	for( intp i=0;i<numItems;i++ )
 	{
 		IColorOperation *op = m_OperationList.GetOperation( i );
 		if( op )
 		{
-			KeyValues *kv = new KeyValues( "operation", "layer", op->GetName() );
+			KeyValuesAD kv(new KeyValues( "operation", "layer", op->GetName() ));
 			kv->SetInt( "image", (op->IsEnabled())?1:0 );
 			
 			m_pOperationListPanel->AddItem( kv, (uintp)op, false, false );
@@ -4997,9 +5004,9 @@ void CColorOperationListPanel::LaunchOperationPanel( IColorOperation *pOp )
 		GetParent()->GetPos( parentX, parentY );
 
 		int maxPanels = parentX / 250;
-		int panelOffset = (m_OpPanelList.Count()+1<maxPanels)?m_OpPanelList.Count()+1:maxPanels;
+		intp panelOffset = (m_OpPanelList.Count()+1<maxPanels)?m_OpPanelList.Count()+1:maxPanels;
 
-		int xPos = parentX - 250*panelOffset;
+		int xPos = parentX - 250*static_cast<int>(panelOffset);
 
 		pOpPanel->SetPos(  xPos, parentY );
 		pOpPanel->SetSize( 250, BASE_HEIGHT );

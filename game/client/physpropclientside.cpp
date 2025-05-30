@@ -210,7 +210,7 @@ void C_PhysPropClientside::SetRespawnZone( C_FuncPhysicsRespawnZone *pZone )
 //-----------------------------------------------------------------------------
 int C_PhysPropClientside::ParsePropData( void )
 {
-	KeyValues::AutoDelete modelKeyValues = KeyValues::AutoDelete("");
+	KeyValuesAD modelKeyValues("");
 	if ( !modelKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), modelinfo->GetModelKeyValueText( GetModel() ) ) )
 	{
 		return PARSE_FAILED_NO_DATA;

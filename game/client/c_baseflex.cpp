@@ -70,10 +70,13 @@ BEGIN_PREDICTION_DATA( C_BaseFlex )
 
 END_PREDICTION_DATA()
 
+// dimhotepus: Needed for TF only.
+#if defined( TF_CLIENT_DLL )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-bool GetHWMExpressionFileName( const char *pFilename, char *pHWMFilename )
+template<intp fileNameSize>
+bool GetHWMExpressionFileName( const char *pFilename, char (&pHWMFilename)[fileNameSize] )
 {
 	// Are we even using hardware morph?
 	if ( !UseHWMorphVCDs() )
@@ -86,7 +89,7 @@ bool GetHWMExpressionFileName( const char *pFilename, char *pHWMFilename )
 	// Check to see if we already have an player/hwm/* filename.
 	if ( ( V_strstr( pFilename, "player/hwm" ) != NULL ) || ( V_strstr( pFilename, "player\\hwm" ) != NULL ) )
 	{
-		V_strcpy( pHWMFilename, pFilename );
+		V_strcpy_safe( pHWMFilename, pFilename );
 		return true;
 	}
 
@@ -100,22 +103,23 @@ bool GetHWMExpressionFileName( const char *pFilename, char *pHWMFilename )
 	char *pszToken = strtok( szExpression, "/\\" );
 	while ( pszToken != NULL )
 	{
-		V_strcat( szExpressionHWM, pszToken, sizeof( szExpressionHWM ) );
+		V_strcat_safe( szExpressionHWM, pszToken );
 		if ( !V_stricmp( pszToken, "player" ) )
 		{
-			V_strcat( szExpressionHWM, "\\hwm", sizeof( szExpressionHWM ) );
+			V_strcat_safe( szExpressionHWM, "\\hwm" );
 		}
 
 		pszToken = strtok( NULL, "/\\" );
 		if ( pszToken != NULL )
 		{
-			V_strcat( szExpressionHWM, "\\", sizeof( szExpressionHWM ) );
+			V_strcat_safe( szExpressionHWM, "\\" );
 		}
 	}
 
-	V_strcpy( pHWMFilename, szExpressionHWM );
+	V_strcpy_safe( pHWMFilename, szExpressionHWM );
 	return true;
 }
+#endif
 
 C_BaseFlex::C_BaseFlex() : 
 	m_iv_viewtarget( "C_BaseFlex::m_iv_viewtarget" ), 
@@ -261,7 +265,7 @@ void C_BaseFlex::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quaternio
 		float cosAngle = DotProduct( p0, leanPos );
 		float angle = atan2f( sinAngle, cosAngle ) * 180 / M_PI_F;
 		Quaternion q1;
-		angle = clamp( angle, -45, 45 );
+		angle = clamp( angle, -45.f, 45.f );
 		AxisAngleQuaternion( p1, angle, q1 );
 		QuaternionMult( q1, q[0], q[0] );
 		QuaternionNormalize2( q[0] );
@@ -1270,8 +1274,8 @@ void C_BaseFlex::RunFlexDelay( int nFlexWeightCount, float *pFlexWeights, float 
 	// process the delayed version of the flexweights
 	if ( flFlexDelayTime > 0.0f && flFlexDelayTime < gpGlobals->curtime )
 	{
-		float d = clamp( gpGlobals->curtime - flFlexDelayTime, 0.0, gpGlobals->frametime );
-		d = ExponentialDecay( 0.8, 0.033, d );
+		float d = clamp( gpGlobals->curtime - flFlexDelayTime, 0.0f, gpGlobals->frametime );
+		d = ExponentialDecay( 0.8f, 0.033f, d );
 
 		for ( int i = 0; i < nFlexWeightCount; i++)
 		{

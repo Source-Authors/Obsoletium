@@ -110,7 +110,7 @@ struct ThreadPoolStartParams_t
 	{
 		bExecOnThreadPoolThreadsOnly = false;
 
-		bUseAffinityTable = ( pAffinities != nullptr ) && ( fDistribute == TRS_TRUE ) && ( nThreads != UINT_MAX );
+		bUseAffinityTable = ( pAffinities != nullptr ) && ( fDistribute == TRS_TRUE ) && ( nThreads != -1 );
 		if ( bUseAffinityTable )
 		{
 			// user supplied an optional 1:1 affinity mapping to override normal distribute behavior
@@ -119,6 +119,11 @@ struct ThreadPoolStartParams_t
 			{
 				iAffinityTable[i] = pAffinities[i];
 			}
+		}
+		else
+		{
+			// dimhotepus: Ensure all affinities are used if smb breaks pool affinities logic.
+			memset(iAffinityTable, 0xFF, sizeof(iAffinityTable));
 		}
 	}
 
@@ -678,7 +683,8 @@ public:
 
 	void WaitForFinish( IThreadPool *pPool, bool bRelease = true )
 	{
-		pPool->YieldWait( m_jobs.Base(), m_jobs.Count() );
+		Assert(m_jobs.Count() <= INT_MAX);
+		pPool->YieldWait( m_jobs.Base(), static_cast<int>(m_jobs.Count()) );
 
 		if ( bRelease )
 		{

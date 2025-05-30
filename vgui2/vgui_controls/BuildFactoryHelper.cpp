@@ -4,8 +4,10 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "vgui/IVGui.h"
+
 #include "vgui_controls/MessageMap.h"
+
+#include "vgui/IVGui.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -13,7 +15,7 @@
 using namespace vgui;
 
 // Start with empty list
-CBuildFactoryHelper *CBuildFactoryHelper::m_sHelpers = NULL;
+CBuildFactoryHelper *CBuildFactoryHelper::m_sHelpers = nullptr;
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructs a panel  factory

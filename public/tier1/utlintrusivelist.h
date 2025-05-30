@@ -842,7 +842,7 @@ public:
 		m_pTailPtr = NULL;
 	}
 
-	void Kill( void )
+	void Kill( void ) //-V524
 	{
 		CUtlIntrusiveList<T>::Purge();
 		m_pTailPtr = NULL;

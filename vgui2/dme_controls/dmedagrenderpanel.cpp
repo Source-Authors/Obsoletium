@@ -231,7 +231,7 @@ CDmeDag *CDmeDagRenderPanel::GetDmeElement()
 void CDmeDagRenderPanel::DrawJointNames( CDmeDag *pRoot, CDmeDag *pDag, const matrix3x4_t& parentToWorld )
 {
 	CDmeTransform *pJointTransform = pDag->GetTransform();
-	int nJointIndex = -1;
+	intp nJointIndex = -1;
 
 	CDmeModel *pRootModel = CastElement<CDmeModel>( pRoot );
 	if ( pRootModel )
@@ -439,8 +439,8 @@ void CDmeDagRenderPanel::Paint()
 		currentTime += m_hCurrentAnimation->GetStartTime();
 		DmeTime_t mediaTime = m_hCurrentAnimation->ToChildMediaTime( currentTime, true );
 
-		int nChannelCount = m_hCurrentAnimation->m_Channels.Count();
-		for ( int i = 0; i < nChannelCount; ++i )
+		intp nChannelCount = m_hCurrentAnimation->m_Channels.Count();
+		for ( intp i = 0; i < nChannelCount; ++i )
 		{
 			m_hCurrentAnimation->m_Channels[i]->SetCurrentTime( mediaTime );
 		}
@@ -453,8 +453,8 @@ void CDmeDagRenderPanel::Paint()
 		currentTime += m_hCurrentVertexAnimation->GetStartTime();
 		DmeTime_t mediaTime = m_hCurrentVertexAnimation->ToChildMediaTime( currentTime, true );
 
-		int nChannelCount = m_hCurrentVertexAnimation->m_Channels.Count();
-		for ( int i = 0; i < nChannelCount; ++i )
+		intp nChannelCount = m_hCurrentVertexAnimation->m_Channels.Count();
+		for ( intp i = 0; i < nChannelCount; ++i )
 		{
 			m_hCurrentVertexAnimation->m_Channels[i]->SetCurrentTime( mediaTime );
 		}
@@ -580,8 +580,8 @@ void CDmeDagRenderPanel::RebuildOperatorList( )
 
 	if ( m_hCurrentAnimation.Get() )
 	{
-		int nChannelCount = m_hCurrentAnimation->m_Channels.Count();
-		for ( int i = 0; i < nChannelCount; ++i )
+		intp nChannelCount = m_hCurrentAnimation->m_Channels.Count();
+		for ( intp i = 0; i < nChannelCount; ++i )
 		{
 			m_hCurrentAnimation->m_Channels[i]->SetMode( CM_PLAY );
 			m_operators.AddToTail( m_hCurrentAnimation->m_Channels[i] );
@@ -590,8 +590,8 @@ void CDmeDagRenderPanel::RebuildOperatorList( )
 
 	if ( m_hCurrentVertexAnimation.Get() )
 	{
-		int nChannelCount = m_hCurrentVertexAnimation->m_Channels.Count();
-		for ( int i = 0; i < nChannelCount; ++i )
+		intp nChannelCount = m_hCurrentVertexAnimation->m_Channels.Count();
+		for ( intp i = 0; i < nChannelCount; ++i )
 		{
 			m_hCurrentVertexAnimation->m_Channels[i]->SetMode( CM_PLAY );
 			m_operators.AddToTail( m_hCurrentVertexAnimation->m_Channels[i] );
@@ -673,7 +673,7 @@ void CDmeDagRenderPanel::SelectVertexAnimation( const char *pAnimName )
 void CDmeDagRenderPanel::SetAnimationList( CDmeAnimationList *pAnimationList )
 {
 	m_hAnimationList = pAnimationList;
-	int nCount = pAnimationList ? pAnimationList->GetAnimationCount() : 0;
+	intp nCount = pAnimationList ? pAnimationList->GetAnimationCount() : 0;
 	if ( nCount == 0 )
 	{
 		m_hCurrentAnimation = NULL;
@@ -687,7 +687,7 @@ void CDmeDagRenderPanel::SetAnimationList( CDmeAnimationList *pAnimationList )
 void CDmeDagRenderPanel::SetVertexAnimationList( CDmeAnimationList *pAnimationList )
 {
 	m_hVertexAnimationList = pAnimationList;
-	int nCount = pAnimationList ? pAnimationList->GetAnimationCount() : 0;
+	intp nCount = pAnimationList ? pAnimationList->GetAnimationCount() : 0;
 	if ( nCount == 0 )
 	{
 		m_hCurrentVertexAnimation = NULL;

@@ -27,7 +27,20 @@ void BeginDMXContext( )
 
 	if ( !s_bAllocatorInitialized )
 	{
-		s_DMXAllocator.Init( 2 * 1024 * 1024, 0, 0, 4 );
+		// dimhotepus: x2 size on x86-64.
+#ifdef PLATFORM_64BITS
+		constexpr unsigned size = 4u * 1024 * 1024;
+		if ( !s_DMXAllocator.Init( size, 0, 0, 8 ) )
+		{
+			Error( "DMX allocator unable to allocate %u virtual bytes.\n", size );
+		}
+#else
+		constexpr unsigned size = 2u * 1024 * 1024;
+		if ( !s_DMXAllocator.Init( size, 0, 0, 4 ) )
+		{
+			Error( "DMX allocator unable to allocate %u virtual bytes.\n", size );
+		}
+#endif
 		s_bAllocatorInitialized = true;
 	}
 
@@ -98,8 +111,8 @@ private:
 	CDmxElement* UnserializeElementIndex( CUtlBuffer &buf, CUtlVector<CDmxElement*> &elementList );
 	void UnserializeElementAttribute( CUtlBuffer &buf, CDmxAttribute *pAttribute, CUtlVector<CDmxElement*> &elementList );
 	void UnserializeElementArrayAttribute( CUtlBuffer &buf, CDmxAttribute *pAttribute, CUtlVector<CDmxElement*> &elementList );
-	bool UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pElement, CUtlVector<CDmxElement*> &elementList, int nStrings, int *offsetTable, char *stringTable );
-	int GetStringOffsetTable( CUtlBuffer &buf, int *offsetTable, int nStrings );
+	bool UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pElement, CUtlVector<CDmxElement*> &elementList, int nStrings, intp *offsetTable, char *stringTable );
+	intp GetStringOffsetTable( CUtlBuffer &buf, intp *offsetTable, int nStrings );
 };
 
 
@@ -165,11 +178,11 @@ void CDmxSerializer::SerializeElementArrayAttribute( CUtlBuffer& buf, CDmxSerial
 //-----------------------------------------------------------------------------
 bool CDmxSerializer::SaveElement( CUtlBuffer& buf, CDmxSerializationDictionary& list, CUtlRBTree< const char* > &stringTable, CDmxElement *pElement )
 {
-	int nAttributesToSave = 0;
+	intp nAttributesToSave = 0;
 
 	// Count the attributes...
-	int nCount = pElement->AttributeCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pElement->AttributeCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = pElement->GetAttribute( i );
 		const char *pName = pAttribute->GetName( );
@@ -181,7 +194,7 @@ bool CDmxSerializer::SaveElement( CUtlBuffer& buf, CDmxSerializationDictionary& 
 
 	// Now write them all out.
 	buf.PutInt( nAttributesToSave );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmxAttribute *pAttribute = pElement->GetAttribute( i );
 		const char *pName = pAttribute->GetName();
@@ -246,8 +259,8 @@ bool CDmxSerializer::Serialize( CUtlBuffer &buf, CDmxElement *pRoot, [[maybe_unu
 		if ( !pElement )
 			return false;
 		stringTable.InsertIfNotFound( pElement->GetTypeString() );
-		int nAttributes = pElement->AttributeCount();
-		for ( int ai = 0; ai < nAttributes; ++ai )
+		intp nAttributes = pElement->AttributeCount();
+		for ( intp ai = 0; ai < nAttributes; ++ai )
 		{
 			CDmxAttribute *pAttr = pElement->GetAttribute( ai );
 			if ( !pAttr )
@@ -336,7 +349,7 @@ void CDmxSerializer::UnserializeElementArrayAttribute( CUtlBuffer &buf, CDmxAttr
 //-----------------------------------------------------------------------------
 // Reads a single element
 //-----------------------------------------------------------------------------
-bool CDmxSerializer::UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pElement, CUtlVector<CDmxElement*> &elementList, int nStrings, int *offsetTable, char *stringTable )
+bool CDmxSerializer::UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pElement, CUtlVector<CDmxElement*> &elementList, int nStrings, intp *offsetTable, char *stringTable )
 {
 	CDmxElementModifyScope modify( pElement );
 
@@ -383,9 +396,9 @@ bool CDmxSerializer::UnserializeAttributes( CUtlBuffer &buf, CDmxElement *pEleme
 }
 
 
-int CDmxSerializer::GetStringOffsetTable( CUtlBuffer &buf, int *offsetTable, int nStrings )
+intp CDmxSerializer::GetStringOffsetTable( CUtlBuffer &buf, intp *offsetTable, int nStrings )
 {
-	int nBytes = buf.GetBytesRemaining();
+	intp nBytes = buf.GetBytesRemaining();
 	char *pBegin = ( char* )buf.PeekGet();
 	char *pBytes = pBegin;
 	for ( int i = 0; i < nStrings; ++i )
@@ -429,17 +442,17 @@ bool CDmxSerializer::Unserialize( CUtlBuffer &buf, int nEncodingVersion, CDmxEle
 
 	// Read string table
 	int nStrings = 0;
-	int *offsetTable = NULL;
+	intp *offsetTable = NULL;
 	char *stringTable = NULL;
 	if ( bReadStringTable )
 	{
 		nStrings = buf.GetShort();
 		if ( nStrings > 0 )
 		{
-			offsetTable = ( int* )stackalloc( nStrings * sizeof( int ) );
+			offsetTable = ( intp* )stackalloc( nStrings * sizeof( intp ) );
 
 			// this causes entire string table to be mapped in memory at once
-			int nStringMemoryUsage = GetStringOffsetTable( buf, offsetTable, nStrings );
+			intp nStringMemoryUsage = GetStringOffsetTable( buf, offsetTable, nStrings );
 			stringTable = ( char* )stackalloc( nStringMemoryUsage * sizeof( char ) );
 			buf.Get( stringTable, nStringMemoryUsage );
 		}
@@ -481,7 +494,7 @@ bool CDmxSerializer::Unserialize( CUtlBuffer &buf, int nEncodingVersion, CDmxEle
 			pType = pTypeBuf;
 		}
 		buf.GetString( pName );
-		buf.Get( &id, sizeof(DmObjectId_t) );
+		buf.Get( id );
 
 		CDmxElement *pElement = new CDmxElement( pType );
 		{
@@ -531,13 +544,13 @@ bool SerializeDMX( const char *pFileName, const char *pPathID, [[maybe_unused]] 
 	// NOTE: This guarantees full path names for pathids
 	char pBuf[MAX_PATH];
 	const char *pFullPath = pFileName;
-	if ( !Q_IsAbsolutePath( pFullPath ) && !pPathID )
+	if ( !V_IsAbsolutePath( pFullPath ) && !pPathID )
 	{
 		char pDir[MAX_PATH];
-		if ( g_pFullFileSystem->GetCurrentDirectory( pDir, sizeof(pDir) ) )
+		if ( g_pFullFileSystem->GetCurrentDirectory( pDir ) )
 		{
-			Q_ComposeFileName( pDir, pFileName, pBuf, sizeof(pBuf) );
-			Q_RemoveDotSlashes( pBuf );
+			V_ComposeFileName( pDir, pFileName, pBuf );
+			V_RemoveDotSlashes( pBuf );
 			pFullPath = pBuf;
 		}
 	}
@@ -566,7 +579,7 @@ bool ReadDMXHeader( CUtlBuffer &buf, char *pEncodingName, int nEncodingNameLen, 
 	buf.SetBufferType( true, !bBufIsText || bBufHasCRLF );
 
 	char header[ DMX_MAX_HEADER_LENGTH ] = { 0 };
-	bool bOk = buf.ParseToken( DMX_VERSION_STARTING_TOKEN, DMX_VERSION_ENDING_TOKEN, header, sizeof( header ) );
+	bool bOk = buf.ParseToken( DMX_VERSION_STARTING_TOKEN, DMX_VERSION_ENDING_TOKEN, header );
 	if ( bOk )
 	{
 #ifdef _WIN32
@@ -575,7 +588,9 @@ bool ReadDMXHeader( CUtlBuffer &buf, char *pEncodingName, int nEncodingNameLen, 
 		// sscanf considered harmful. We don't have POSIX 2008 support on OS X and "C11 Annex K" is optional... (optional specs considered useful)
 		char pTmpEncodingName[ sizeof( header ) ] = { 0 };
 		char pTmpFormatName  [ sizeof( header ) ] = { 0 };
-		int nAssigned = sscanf( header, "encoding %s %d format %s %d\n", pTmpEncodingName, &nEncodingVersion, pTmpFormatName, &nFormatVersion );
+		int nAssigned = sscanf( header, "encoding %167s %d format %167s %d\n", pTmpEncodingName, &nEncodingVersion, pTmpFormatName, &nFormatVersion );
+		pTmpEncodingName[sssize(header) - 1] = '\0';
+		pTmpFormatName[sssize(header) - 1] = '\0';
 		bOk = ( V_strlen( pTmpEncodingName ) < nEncodingNameLen ) && ( V_strlen( pTmpFormatName ) < nFormatNameLen );
 		V_strncpy( pEncodingName, pTmpEncodingName, nEncodingNameLen );
 		V_strncpy( pFormatName, pTmpFormatName, nFormatNameLen );
@@ -658,13 +673,13 @@ bool UnserializeDMX( const char *pFileName, const char *pPathID, bool bTextMode,
 	// NOTE: This guarantees full path names for pathids
 	char pBuf[MAX_PATH];
 	const char *pFullPath = pFileName;
-	if ( !Q_IsAbsolutePath( pFullPath ) && !pPathID )
+	if ( !V_IsAbsolutePath( pFullPath ) && !pPathID )
 	{
 		char pDir[MAX_PATH];
-		if ( g_pFullFileSystem->GetCurrentDirectory( pDir, sizeof(pDir) ) )
+		if ( g_pFullFileSystem->GetCurrentDirectory( pDir ) )
 		{
-			Q_ComposeFileName( pDir, pFileName, pBuf, sizeof(pBuf) );
-			Q_RemoveDotSlashes( pBuf );
+			V_ComposeFileName( pDir, pFileName, pBuf );
+			V_RemoveDotSlashes( pBuf );
 			pFullPath = pBuf;
 		}
 	}

@@ -201,7 +201,8 @@ struct FileElementSet_t
 	UtlSymId_t m_format;
 	CDmeCountedHandle m_hRoot;
 	bool m_bLoaded;
-	int m_nElements;
+	// dimhotepus: int -> intp.
+	intp m_nElements;
 };
 
 
@@ -226,120 +227,120 @@ public:
 
 	// Methods of IDataModel
 	void				AddElementFactory( const char *pClassName, IDmElementFactory *pFactory ) override;
-	virtual bool				HasElementFactory( const char *pElementType ) const;
-	virtual void				SetDefaultElementFactory( IDmElementFactory *pFactory );
-	virtual int					GetFirstFactory() const;
-	virtual int					GetNextFactory( int index ) const;
-	virtual bool				IsValidFactory( int index ) const;
-	virtual char const			*GetFactoryName( int index ) const;
-	virtual DmElementHandle_t	CreateElement( UtlSymId_t typeSymbol, const char *pElementName, DmFileId_t fileid, const DmObjectId_t *pObjectID = NULL );
-	virtual DmElementHandle_t	CreateElement( const char *pTypeName, const char *pElementName, DmFileId_t fileid, const DmObjectId_t *pObjectID = NULL );
-	virtual void				DestroyElement( DmElementHandle_t hElement );
-	virtual	CDmElement*		GetElement( DmElementHandle_t hElement ) const;
-	virtual UtlSymId_t			GetElementType( DmElementHandle_t hElement ) const;
-	virtual const char*			GetElementName( DmElementHandle_t hElement ) const;
-	virtual const DmObjectId_t&	GetElementId( DmElementHandle_t hElement ) const;
-	virtual const char			*GetAttributeNameForType( DmAttributeType_t attType ) const;
-	virtual DmAttributeType_t	GetAttributeTypeForName( const char *name ) const;
+	bool				HasElementFactory( const char *pElementType ) const override;
+	void				SetDefaultElementFactory( IDmElementFactory *pFactory ) override;
+	int					GetFirstFactory() const override;
+	int					GetNextFactory( int index ) const override;
+	bool				IsValidFactory( int index ) const override;
+	char const			*GetFactoryName( int index ) const override;
+	DmElementHandle_t	CreateElement( UtlSymId_t typeSymbol, const char *pElementName, DmFileId_t fileid, const DmObjectId_t *pObjectID = NULL ) override;
+	DmElementHandle_t	CreateElement( const char *pTypeName, const char *pElementName, DmFileId_t fileid, const DmObjectId_t *pObjectID = NULL ) override;
+	void				DestroyElement( DmElementHandle_t hElement ) override;
+	CDmElement*			GetElement( DmElementHandle_t hElement ) const override;
+	UtlSymId_t			GetElementType( DmElementHandle_t hElement ) const override;
+	const char*			GetElementName( DmElementHandle_t hElement ) const override;
+	const DmObjectId_t&	GetElementId( DmElementHandle_t hElement ) const override;
+	const char			*GetAttributeNameForType( DmAttributeType_t attType ) const override;
+	DmAttributeType_t	GetAttributeTypeForName( const char *name ) const override;
 
-	virtual void				AddSerializer( IDmSerializer *pSerializer );
-	virtual void				AddLegacyUpdater( IDmLegacyUpdater *pUpdater );
-	virtual void				AddFormatUpdater( IDmFormatUpdater *pUpdater );
-	virtual const char*			GetFormatExtension( const char *pFormatName );
-	virtual const char*			GetFormatDescription( const char *pFormatName );
-	virtual intp				GetFormatCount() const;
-	virtual const char *		GetFormatName( int i ) const;
-	virtual const char *		GetDefaultEncoding( const char *pFormatName );
-	virtual intp				GetEncodingCount() const;
-	virtual const char *		GetEncodingName( int i ) const;
-	virtual bool				IsEncodingBinary( const char *pEncodingName ) const;
-	virtual bool				DoesEncodingStoreVersionInFile( const char *pEncodingName ) const;
+	void				AddSerializer( IDmSerializer *pSerializer ) override;
+	void				AddLegacyUpdater( IDmLegacyUpdater *pUpdater ) override;
+	void				AddFormatUpdater( IDmFormatUpdater *pUpdater ) override;
+	const char*			GetFormatExtension( const char *pFormatName ) override;
+	const char*			GetFormatDescription( const char *pFormatName ) override;
+	intp				GetFormatCount() const override;
+	const char *		GetFormatName( intp i ) const override;
+	const char *		GetDefaultEncoding( const char *pFormatName ) override;
+	intp				GetEncodingCount() const override;
+	const char *		GetEncodingName( intp i ) const override;
+	bool				IsEncodingBinary( const char *pEncodingName ) const override;
+	bool				DoesEncodingStoreVersionInFile( const char *pEncodingName ) const override;
 
-	virtual void				SetSerializationDelimiter( CUtlCharConversion *pConv );
-	virtual void				SetSerializationArrayDelimiter( const char *pDelimiter );
-	virtual bool				IsUnserializing();
-	virtual bool				Serialize( CUtlBuffer &outBuf, const char *pEncodingName, const char *pFormatName, DmElementHandle_t hRoot );
-	virtual bool				Unserialize( CUtlBuffer &buf, const char *pEncodingName, const char *pSourceFormatName, const char *pFormatHint,
-											 const char *pFileName, DmConflictResolution_t idConflictResolution, DmElementHandle_t &hRoot );
-	virtual bool				UpdateUnserializedElements( const char *pSourceFormatName, int nSourceFormatVersion,
-															DmFileId_t fileid, DmConflictResolution_t idConflictResolution, CDmElement **ppRoot );
-	virtual IDmSerializer*		FindSerializer( const char *pEncodingName ) const;
-	virtual IDmLegacyUpdater*	FindLegacyUpdater( const char *pLegacyFormatName ) const;
-	virtual IDmFormatUpdater*	FindFormatUpdater( const char *pFormatName ) const;
-	virtual bool				SaveToFile( char const *pFileName, char const *pPathID, const char *pEncodingName, const char *pFormatName, CDmElement *pRoot );
-	virtual DmFileId_t			RestoreFromFile( char const *pFileName, char const *pPathID, const char *pFormatHint, CDmElement **ppRoot, DmConflictResolution_t idConflictResolution = CR_DELETE_NEW, DmxHeader_t *pHeaderOut = NULL );
+	void				SetSerializationDelimiter( CUtlCharConversion *pConv ) override;
+	void				SetSerializationArrayDelimiter( const char *pDelimiter ) override;
+	bool				IsUnserializing() override;
+	bool				Serialize( CUtlBuffer &outBuf, const char *pEncodingName, const char *pFormatName, DmElementHandle_t hRoot ) override;
+	bool				Unserialize( CUtlBuffer &buf, const char *pEncodingName, const char *pSourceFormatName, const char *pFormatHint,
+											 const char *pFileName, DmConflictResolution_t idConflictResolution, DmElementHandle_t &hRoot ) override;
+	bool				UpdateUnserializedElements( const char *pSourceFormatName, int nSourceFormatVersion,
+													DmFileId_t fileid, DmConflictResolution_t idConflictResolution, CDmElement **ppRoot ) override;
+	IDmSerializer*		FindSerializer( const char *pEncodingName ) const override;
+	IDmLegacyUpdater*	FindLegacyUpdater( const char *pLegacyFormatName ) const override;
+	IDmFormatUpdater*	FindFormatUpdater( const char *pFormatName ) const override;
+	bool				SaveToFile( char const *pFileName, char const *pPathID, const char *pEncodingName, const char *pFormatName, CDmElement *pRoot ) override;
+	DmFileId_t			RestoreFromFile( char const *pFileName, char const *pPathID, const char *pFormatHint, CDmElement **ppRoot, DmConflictResolution_t idConflictResolution = CR_DELETE_NEW, DmxHeader_t *pHeaderOut = NULL ) override;
 
-	virtual void				SetKeyValuesElementCallback( IElementForKeyValueCallback *pCallbackInterface );
-	virtual const char *		GetKeyValuesElementName( const char *pszKeyName, int iNestingLevel );
-	virtual UtlSymId_t			GetSymbol( const char *pString );
-	virtual const char *		GetString( UtlSymId_t sym ) const;
-	virtual int					GetElementsAllocatedSoFar();
-	virtual int					GetMaxNumberOfElements();
-	virtual int					GetAllocatedAttributeCount();
-	virtual int					GetAllocatedElementCount();
-	virtual DmElementHandle_t	FirstAllocatedElement();
-	virtual DmElementHandle_t	NextAllocatedElement( DmElementHandle_t hElement );
-	virtual int					EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth = TD_DEEP );
-	virtual void				SetUndoEnabled( bool enable );
-	virtual bool				IsUndoEnabled() const;
-	virtual bool				UndoEnabledForElement( const CDmElement *pElement ) const;
-	virtual bool				IsDirty() const;
-	virtual bool				CanUndo() const;
-	virtual bool				CanRedo() const;
-	virtual void				StartUndo( const char *undodesc, const char *redodesc, int nChainingID = 0 );
-	virtual void				FinishUndo();
+	void				SetKeyValuesElementCallback( IElementForKeyValueCallback *pCallbackInterface ) override;
+	const char *		GetKeyValuesElementName( const char *pszKeyName, int iNestingLevel ) override;
+	UtlSymId_t			GetSymbol( const char *pString ) override;
+	const char *		GetString( UtlSymId_t sym ) const override;
+	intp				GetElementsAllocatedSoFar() const override;
+	intp				GetMaxNumberOfElements() const override;
+	intp				GetAllocatedAttributeCount() const override;
+	intp				GetAllocatedElementCount() const override;
+	DmElementHandle_t	FirstAllocatedElement() override;
+	DmElementHandle_t	NextAllocatedElement( DmElementHandle_t hElement ) override;
+	intp				EstimateMemoryUsage( DmElementHandle_t hElement, TraversalDepth_t depth = TD_DEEP ) override;
+	void				SetUndoEnabled( bool enable ) override;
+	bool				IsUndoEnabled() const override;
+	bool				UndoEnabledForElement( const CDmElement *pElement ) const override;
+	bool				IsDirty() const override;
+	bool				CanUndo() const override;
+	bool				CanRedo() const override;
+	void				StartUndo( const char *undodesc, const char *redodesc, int nChainingID = 0 ) override;
+	void				FinishUndo() override;
 	void				AbortUndoableOperation() override;
-	virtual void				ClearRedo();
-	virtual const char			*GetUndoDesc();
-	virtual const char			*GetRedoDesc();
-	virtual void				Undo();
-	virtual void				Redo();
-	virtual void				TraceUndo( bool state ); // if true, undo records spew as they are added
-	virtual void				ClearUndo();
-	virtual void				GetUndoInfo( CUtlVector< UndoInfo_t >& list );
-	virtual const char *		GetUndoString( UtlSymId_t sym );
-	virtual void				AddUndoElement( IUndoElement *pElement );
-	virtual UtlSymId_t			GetUndoDescInternal( const char *context );
-	virtual UtlSymId_t			GetRedoDescInternal( const char *context );
-	virtual void				EmptyClipboard();
-	virtual void				SetClipboardData( CUtlVector< KeyValues * >& data, IClipboardCleanup *pfnOptionalCleanuFunction = 0 );
-	virtual void				AddToClipboardData( KeyValues *add );
-	virtual void				GetClipboardData( CUtlVector< KeyValues * >& data );
-	virtual bool				HasClipboardData() const;
+	void				ClearRedo() override;
+	const char			*GetUndoDesc() override;
+	const char			*GetRedoDesc() override;
+	void				Undo() override;
+	void				Redo() override;
+	void				TraceUndo( bool state ) override; // if true, undo records spew as they are added
+	void				ClearUndo() override;
+	void				GetUndoInfo( CUtlVector< UndoInfo_t >& list ) override;
+	const char *		GetUndoString( UtlSymId_t sym ) override;
+	void				AddUndoElement( IUndoElement *pElement ) override;
+	UtlSymId_t			GetUndoDescInternal( const char *context ) override;
+	UtlSymId_t			GetRedoDescInternal( const char *context ) override;
+	void				EmptyClipboard() override;
+	void				SetClipboardData( CUtlVector< KeyValues * >& data, IClipboardCleanup *pfnOptionalCleanuFunction = 0 ) override;
+	void				AddToClipboardData( KeyValues *add ) override;
+	void				GetClipboardData( CUtlVector< KeyValues * >& data ) override;
+	bool				HasClipboardData() const override;
 
- 	virtual CDmAttribute *		GetAttribute( DmAttributeHandle_t h );
-	virtual bool				IsAttributeHandleValid( DmAttributeHandle_t h ) const;
-	virtual void				OnlyCreateUntypedElements( bool bEnable );
-	virtual int					NumFileIds();
-	virtual DmFileId_t			GetFileId( int i );
-	virtual DmFileId_t			FindOrCreateFileId( const char *pFilename );
-	virtual void				RemoveFileId( DmFileId_t fileid );
-	virtual DmFileId_t			GetFileId( const char *pFilename );
-	virtual const char *		GetFileName( DmFileId_t fileid );
-	virtual void				SetFileName( DmFileId_t fileid, const char *pFileName );
-	virtual const char *		GetFileFormat( DmFileId_t fileid );
-	virtual void				SetFileFormat( DmFileId_t fileid, const char *pFormat );
-	virtual DmElementHandle_t	GetFileRoot( DmFileId_t fileid );
-	virtual void				SetFileRoot( DmFileId_t fileid, DmElementHandle_t hRoot );
-	virtual bool				IsFileLoaded( DmFileId_t fileid );
-	virtual void				MarkFileLoaded( DmFileId_t fileid );
-	virtual void				UnloadFile( DmFileId_t fileid );
-	virtual int					NumElementsInFile( DmFileId_t fileid );
-	virtual void				DontAutoDelete( DmElementHandle_t hElement );
-	virtual void				MarkHandleInvalid( DmElementHandle_t hElement );
-	virtual void				MarkHandleValid( DmElementHandle_t hElement );
-	virtual DmElementHandle_t	FindElement( const DmObjectId_t &id );
-	virtual	DmAttributeReferenceIterator_t	FirstAttributeReferencingElement( DmElementHandle_t hElement );
-	virtual DmAttributeReferenceIterator_t	NextAttributeReferencingElement( DmAttributeReferenceIterator_t hAttrIter );
-	virtual CDmAttribute *					GetAttribute( DmAttributeReferenceIterator_t hAttrIter );
-	virtual bool				InstallNotificationCallback( IDmNotify *pNotify );
-	virtual void				RemoveNotificationCallback( IDmNotify *pNotify );
-	virtual bool				IsSuppressingNotify( ) const;
-	virtual void				SetSuppressingNotify( bool bSuppress );
-	virtual void				PushNotificationScope( const char *pReason, int nNotifySource, int nNotifyFlags );
-	virtual void				PopNotificationScope( bool bAbort );
-	virtual void				SetUndoDepth( int nSize );
-	virtual void				DisplayMemoryStats();
+ 	CDmAttribute *		GetAttribute( DmAttributeHandle_t h ) override;
+	bool				IsAttributeHandleValid( DmAttributeHandle_t h ) const override;
+	void				OnlyCreateUntypedElements( bool bEnable ) override;
+	int					NumFileIds() const override;
+	DmFileId_t			GetFileId( int i ) const override;
+	DmFileId_t			FindOrCreateFileId( const char *pFilename ) override;
+	void				RemoveFileId( DmFileId_t fileid ) override;
+	DmFileId_t			GetFileId( const char *pFilename ) override;
+	const char *		GetFileName( DmFileId_t fileid ) override;
+	void				SetFileName( DmFileId_t fileid, const char *pFileName ) override;
+	const char *		GetFileFormat( DmFileId_t fileid ) override;
+	void				SetFileFormat( DmFileId_t fileid, const char *pFormat ) override;
+	DmElementHandle_t	GetFileRoot( DmFileId_t fileid ) override;
+	void				SetFileRoot( DmFileId_t fileid, DmElementHandle_t hRoot ) override;
+	bool				IsFileLoaded( DmFileId_t fileid ) const override;
+	void				MarkFileLoaded( DmFileId_t fileid ) override;
+	void				UnloadFile( DmFileId_t fileid ) override;
+	intp				NumElementsInFile( DmFileId_t fileid ) const override;
+	void				DontAutoDelete( DmElementHandle_t hElement ) override;
+	void				MarkHandleInvalid( DmElementHandle_t hElement ) override;
+	void				MarkHandleValid( DmElementHandle_t hElement ) override;
+	DmElementHandle_t	FindElement( const DmObjectId_t &id ) override;
+	DmAttributeReferenceIterator_t	FirstAttributeReferencingElement( DmElementHandle_t hElement ) override;
+	DmAttributeReferenceIterator_t	NextAttributeReferencingElement( DmAttributeReferenceIterator_t hAttrIter ) override;
+	CDmAttribute *					GetAttribute( DmAttributeReferenceIterator_t hAttrIter ) override;
+	bool				InstallNotificationCallback( IDmNotify *pNotify ) override;
+	void				RemoveNotificationCallback( IDmNotify *pNotify ) override;
+	bool				IsSuppressingNotify( ) const override;
+	void				SetSuppressingNotify( bool bSuppress ) override;
+	void				PushNotificationScope( const char *pReason, int nNotifySource, int nNotifyFlags ) override;
+	void				PopNotificationScope( bool bAbort ) override;
+	void				SetUndoDepth( intp nSize ) override;
+	void				DisplayMemoryStats() override;
 
 public:
 	// Internal public methods
@@ -391,10 +392,10 @@ public:
 	void NotifyState( int nNotifyFlags );
 
 	// estimate memory overhead
-	constexpr int EstimateMemoryOverhead() const
+	constexpr intp EstimateMemoryOverhead() const
 	{
-		int nHandlesOverhead = sizeof( int ) + sizeof( CDmElement* ); // m_Handles
-		int nElementIdsOverhead = sizeof( DmElementHandle_t ); // this also has a 80k static overhead, since hash tables can't grow
+		intp nHandlesOverhead = sizeof( int ) + sizeof( CDmElement* ); // m_Handles
+		intp nElementIdsOverhead = sizeof( DmElementHandle_t ); // this also has a 80k static overhead, since hash tables can't grow
 		return nHandlesOverhead + nElementIdsOverhead;
 	}
 
@@ -498,8 +499,8 @@ private:
 	CClipboardManager m_ClipboardMgr;
 	IElementForKeyValueCallback *m_pKeyvaluesCallbackInterface;
 
-	int m_nElementsAllocatedSoFar;
-	int m_nMaxNumberOfElements;
+	intp m_nElementsAllocatedSoFar;
+	intp m_nMaxNumberOfElements;
 };
 
 //-----------------------------------------------------------------------------
@@ -547,16 +548,16 @@ public:
 	static void SetId( CDmElement *pElement, const DmObjectId_t &id )							{ pElement->SetId( id ); }
 	static bool IsDirty( const CDmElement *pElement )											{ return pElement->IsDirty(); }
 	static void MarkDirty( CDmElement *pElement, bool dirty = true )							{ pElement->MarkDirty( dirty ); }
-	static void MarkAttributesClean( CDmElement *pElement )									{ pElement->MarkAttributesClean(); }
+	static void MarkAttributesClean( CDmElement *pElement )										{ pElement->MarkAttributesClean(); }
 	static void MarkBeingUnserialized( CDmElement *pElement, bool beingUnserialized = true )	{ pElement->MarkBeingUnserialized( beingUnserialized ); }
 	static bool IsBeingUnserialized( const CDmElement *pElement ) 								{ return pElement->IsBeingUnserialized(); }
 	static void AddAttributeByPtr( CDmElement *pElement, CDmAttribute *ptr )					{ pElement->AddAttributeByPtr( ptr ); }
-	static void RemoveAttributeByPtrNoDelete( CDmElement *pElement, CDmAttribute *ptr )		{ pElement->RemoveAttributeByPtrNoDelete( ptr); }
+	static void RemoveAttributeByPtrNoDelete( CDmElement *pElement, CDmAttribute *ptr )			{ pElement->RemoveAttributeByPtrNoDelete( ptr); }
 	static void ChangeHandle( CDmElement *pElement, DmElementHandle_t handle )					{ pElement->ChangeHandle( handle ); }
 	static DmElementReference_t	*GetReference( CDmElement *pElement )							{ return pElement->GetReference(); }
 	static void SetReference( CDmElement *pElement, const DmElementReference_t &ref )			{ pElement->SetReference( ref ); }
-	static int EstimateMemoryUsage( CDmElement *pElement, CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, int *pCategories ) { return pElement->EstimateMemoryUsage( visited, depth, pCategories ); }
-	static void PerformConstruction( CDmElement *pElement )									{ pElement->PerformConstruction(); }
+	static intp EstimateMemoryUsage( CDmElement *pElement, CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, intp *pCategories ) { return pElement->EstimateMemoryUsage( visited, depth, pCategories ); }
+	static void PerformConstruction( CDmElement *pElement )										{ pElement->PerformConstruction(); }
 	static void PerformDestruction( CDmElement *pElement )										{ pElement->PerformDestruction(); }
 };
 

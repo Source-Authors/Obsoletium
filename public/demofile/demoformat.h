@@ -269,7 +269,7 @@ struct CSmoothingContext
 	bool							active;
 	char							filename[ 512 ];
 	CUtlVector< demosmoothing_t >	smooth;
-	int								m_nFirstSelectableSample;
+	intp							m_nFirstSelectableSample;
 };
 
 #endif // DEMOFORMAT_H

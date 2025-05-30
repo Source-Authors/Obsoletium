@@ -4,17 +4,16 @@
 //
 //===========================================================================//
 
-#include <stdlib.h>
-#include <tier0/dbg.h>
-#include "interface.h"
+#include "perfstats.h"
+
+#include "tier1/interface.h"
 #include "istudiorender.h"
 #include "studio.h"
 #include "optimize.h"
 #include "cmdlib.h"
 #include "studiomdl.h"
-#include "perfstats.h"
 
-extern void MdlError( char const *pMsg, ... );
+extern void MdlError( PRINTF_FORMAT_STRING char const *pMsg, ... );
 
 static StudioRenderConfig_t s_StudioRenderConfig;
 
@@ -53,7 +52,7 @@ Cache model's specified dynamic data
 vertexFileHeader_t *CStudioDataCache::CacheVertexData( studiohdr_t *pStudioHdr )
 {
 	// minimal implementation - return persisted data
-	return (vertexFileHeader_t*)pStudioHdr->pVertexBase;
+	return (vertexFileHeader_t*)pStudioHdr->GetVertexBase();
 }
 
 static void UpdateStudioRenderConfig( void )
@@ -95,10 +94,11 @@ SpewRetval_t NullSpewOutputFunc( SpewType_t spewType, const tchar *pMsg )
 	case SPEW_ASSERT:
 	case SPEW_ERROR:
 	case SPEW_LOG:
-		Assert( s_pSavedSpewFunc );
-		if( s_pSavedSpewFunc )
+		const auto spew = s_pSavedSpewFunc;
+		Assert( spew );
+		if( spew )
 		{
-			return s_pSavedSpewFunc( spewType, pMsg );
+			return spew( spewType, pMsg );
 		}
 		break;
 	}
@@ -118,8 +118,7 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 	s_pSavedSpewFunc				= NULL;
 	if( !( flags & SPEWPERFSTATS_SHOWSTUDIORENDERWARNINGS ) )
 	{
-		s_pSavedSpewFunc = GetSpewOutputFunc();
-		SpewOutputFunc( NullSpewOutputFunc );
+		s_pSavedSpewFunc = SpewOutputFunc2( NullSpewOutputFunc );
 	}
 
 	// no stats on these
@@ -130,8 +129,8 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 	UpdateStudioRenderConfig();
 
 	// persist the vvd data
-	Q_StripExtension( pFilename, fileName, sizeof( fileName ) );
-	strcat( fileName, ".vvd" );
+	Q_StripExtension( pFilename, fileName );
+	V_strcat_safe( fileName, ".vvd" );
 
 	if (FileExists( fileName ))
 	{
@@ -175,11 +174,11 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 	}
 	
 	// iterate all ???.vtx files
-	for (int j=0; j<sizeof(prefix)/sizeof(prefix[0]); j++)
+	for (const char *p : prefix)
 	{
 		// make vtx filename
-		Q_StripExtension( pFilename, fileName, sizeof( fileName ) );
-		strcat( fileName, prefix[j] );
+		Q_StripExtension( pFilename, fileName );
+		V_strcat_safe( fileName, p );
 
 		// persist the vtx data
 		if (FileExists(fileName))
@@ -202,8 +201,8 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 		}
 
 		// studio render will request these through cache interface
-		pStudioHdr->pVertexBase = (void *)pVvdHdr;
-		pStudioHdr->pIndexBase  = (void *)pVtxHdr;
+		pStudioHdr->SetVertexBase(pVvdHdr);
+		pStudioHdr->SetIndexBase(pVtxHdr);
 
 		g_pStudioRender->LoadModel( pStudioHdr, pVtxHdr, &studioHWData );
 
@@ -211,7 +210,7 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 		{
 			if(  flags & SPEWPERFSTATS_SPREADSHEET )
 			{
-				printf( "%s,%s,%d,", fileName, prefix[j], studioHWData.m_NumLODs - studioHWData.m_RootLOD );
+				printf( "%s,%s,%d,", fileName, p, studioHWData.m_NumLODs - studioHWData.m_RootLOD );
 			}
 			else
 			{
@@ -234,7 +233,7 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 				drawModelInfo.m_pColorMeshes = 0;
 				drawModelInfo.m_pStudioHdr = pStudioHdr;
 				drawModelInfo.m_pHardwareData = &studioHWData;	
-				CUtlBuffer statsOutput( 0, 0, CUtlBuffer::TEXT_BUFFER );
+				CUtlBuffer statsOutput( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 				if( !( flags & SPEWPERFSTATS_SPREADSHEET ) )
 				{
 					printf( "LOD:%d\n", i );
@@ -263,7 +262,6 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 		free(pVtxHdr);
 	}
 
-	if (pVvdHdr)
 		free(pVvdHdr);
 
 	if( !( flags & SPEWPERFSTATS_SHOWSTUDIORENDERWARNINGS ) )

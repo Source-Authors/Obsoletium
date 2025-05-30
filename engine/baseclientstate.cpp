@@ -76,8 +76,6 @@ void SetNameToSteamIDName( IConVar *pConVar )
 
 void CL_NameCvarChanged( IConVar *pConVar, const char *pOldString, float flOldValue )
 {
-	ConVarRef var( pConVar );
-
 	static bool bPreventRent = false;
 	if ( !bPreventRent )
 	{
@@ -85,6 +83,8 @@ void CL_NameCvarChanged( IConVar *pConVar, const char *pOldString, float flOldVa
 #if !defined( NO_STEAM )
 		SetNameToSteamIDName( pConVar );
 #endif
+		const ConVarRef var( pConVar );
+
 		// Remove any evil characters (ex: zero width no-break space)
 		char pchName[MAX_PLAYER_NAME_LENGTH];
 		V_strcpy_safe( pchName, var.GetString() );
@@ -184,8 +184,9 @@ ConVar  cl_show_connectionless_packet_warnings( "cl_show_connectionless_packet_w
 
 C_ServerClassInfo::C_ServerClassInfo()
 {
-	m_ClassName = NULL;
-	m_DatatableName = NULL;
+	m_pClientClass = nullptr;
+	m_ClassName = nullptr;
+	m_DatatableName = nullptr;
 	m_InstanceBaselineIndex = INVALID_STRING_INDEX;
 }
 
@@ -288,6 +289,7 @@ CBaseClientState::CBaseClientState()
 	m_Socket = NS_CLIENT;
 	m_pServerClasses = NULL;
 	m_StringTableContainer = NULL;
+	m_iEncryptionKeySize = std::numeric_limits<uint>::max();
 	m_NetChannel = NULL;
 	m_nSignonState = SIGNONSTATE_NONE;
 	m_nChallengeNr = 0;
@@ -299,6 +301,7 @@ CBaseClientState::CBaseClientState()
 	m_bRestrictServerCommands = true;
 	m_bRestrictClientCommands = true;
 	m_nServerCount = 0;
+	m_flNextCmdTime = -1.f;
 	m_nCurrentSequence = 0;
 	m_nDeltaTick = 0;
 	m_bPaused = 0;
@@ -594,8 +597,7 @@ bool CBaseClientState::PrepareSteamConnectResponse( uint64 unGSSteamID, bool bGS
 	}
 
 	msg.WriteShort( steam3CookieLen );
-	if ( steam3CookieLen > 0 )
-		msg.WriteBytes( steam3Cookie, steam3CookieLen );
+	msg.WriteBytes( steam3Cookie, steam3CookieLen );
 #endif
 
 	return true;
@@ -938,9 +940,9 @@ bool CBaseClientState::ProcessConnectionlessPacket( netpacket_t *packet )
 										Disconnect( "Invalid Steam key size", true );
 										return false;
 									}
-									if ( msg.GetNumBytesLeft() > static_cast<int>(sizeof(unGSSteamID)) ) 
+									if ( msg.GetNumBytesLeft() > static_cast<intp>(sizeof(unGSSteamID)) ) 
 									{
-										if ( !msg.ReadBytes( &unGSSteamID, sizeof(unGSSteamID) ) )
+										if ( !msg.ReadBytes( unGSSteamID ) )
 										{
 											Msg( "Invalid GS Steam ID.\n" );
 											Disconnect( "Invalid GS Steam ID", true );
@@ -970,7 +972,7 @@ bool CBaseClientState::ProcessConnectionlessPacket( netpacket_t *packet )
 									return false;
 								}
 
-								msg.ReadString( string, sizeof(string) );
+								msg.ReadString( string );
 								// Force failure dialog to come up now.
 								COM_ExplainDisconnection( true, "%s", string );
 								Disconnect( string, true );
@@ -1535,7 +1537,7 @@ void CBaseClientState::ReadPacketEntities( CEntityReadInfo &u )
 	}
 
 	// Something didn't parse...
-	if ( u.m_pBuf->IsOverflowed() )							
+	if ( u.m_pBuf->IsOverflowed() )
 	{	
 		Host_Error ( "CL_ParsePacketEntities:  buffer read overflow\n" );
 	}

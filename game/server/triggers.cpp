@@ -654,6 +654,9 @@ void CTriggerRemove::Touch( CBaseEntity *pOther )
 	if (!PassesTriggerFilters(pOther))
 		return;
 
+	// dimhotepus: Notify object has been removed.
+	m_OnRemove.FireOutput( pOther, this );
+
 	UTIL_Remove( pOther );
 }
 

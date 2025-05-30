@@ -398,7 +398,8 @@ void CReplayFrame::FreeBuffers( void )
 CReplayServer::CReplayServer()
 :	m_DemoRecorder( this )
 {
-	m_flTickInterval = 0.03;
+	m_nDebugID = 0;
+	m_flTickInterval = 0.03f;
 	m_MasterClient = NULL;
 	m_Server = NULL;
 	m_nFirstTick = -1;
@@ -523,9 +524,9 @@ int	CReplayServer::GetReplaySlot( void )
 	return m_nPlayerSlot;
 }
 
-float CReplayServer::GetOnlineTime( void )
+double CReplayServer::GetOnlineTime( void )
 {
-	return MAX(0.0, net_time - m_flStartTime);
+	return max(0.0, net_time - m_flStartTime);
 }
 
 void CReplayServer::FireGameEvent(IGameEvent *event)
@@ -543,6 +544,9 @@ void CReplayServer::FireGameEvent(IGameEvent *event)
 	if ( g_GameEventManager.SerializeEvent( event, &eventMsg.m_DataOut ) )
 	{
 		SendNetMsg( eventMsg );
+		
+		// dimhotepus: Increment events count.
+		++m_nDebugID;
 	}
 	else
 	{
@@ -906,9 +910,7 @@ CClientFrame *CReplayServer::GetDeltaFrame( int nTick )
 			return m_FrameCache[iFrame].pFrame;
 	}
 
-	intp i = m_FrameCache.AddToTail();
-
-	CReplayFrameCacheEntry_s &entry = m_FrameCache[i];
+	CReplayFrameCacheEntry_s &entry = m_FrameCache[m_FrameCache.AddToTail()];
 
 	entry.nTick = nTick;
 	entry.pFrame = GetClientFrame( nTick ); //expensive

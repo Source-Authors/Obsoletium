@@ -249,48 +249,54 @@ static void ServerNotifyVarChangeCallback( IConVar *pConVar, const char *pOldVal
 
 CBaseServer::CBaseServer() 
 {
-	// Just get a unique ID to talk to the steam master server updater.
-	m_bRestartOnLevelChange = false;
-	
-	m_StringTables = NULL;
-	m_pInstanceBaselineTable = NULL;
-	m_pLightStyleTable = NULL;
-	m_pUserInfoTable = NULL;
-	m_pServerStartupTable = NULL;
-	m_pDownloadableFileTable = NULL;
-
-	m_fLastCPUCheckTime = 0;
-	m_fStartTime = 0;
-	m_fCPUPercent = 0;
+	m_State = ss_dead;
 	m_Socket = NS_SERVER;
 	m_nTickCount = 0;
-	
-	m_szMapname[0] = 0;
-	m_szSkyname[0] = 0;
-	m_Password[0] = 0;
-	V_memset( worldmapMD5.bits, 0, MD5_DIGEST_LENGTH );
+	m_bSimulatingTicks = false;
+	m_szMapname[0] = '\0';
+	m_szMapFilename[0] = '\0';
+	m_szSkyname[0] = '\0';
+	m_Password[0] = '\0';
 
-	serverclasses = serverclassbits = 0;
-	m_nMaxclients = m_nSpawnCount = 0;
-	m_flTickInterval = 0.03;
-	m_nUserid = 0;
-	m_nNumConnections = 0;
-	m_bIsDedicated = false;
+	V_memset( worldmapMD5.bits, 0, sizeof(worldmapMD5.bits) );
 	
-	m_bMasterServerRulesDirty = true;
-	m_flLastMasterServerUpdateTime = 0;
+	m_StringTables = nullptr;
+
+	m_pInstanceBaselineTable = nullptr;
+	m_pLightStyleTable = nullptr;
+	m_pUserInfoTable = nullptr;
+	m_pServerStartupTable = nullptr;
+	m_pDownloadableFileTable = nullptr;
+	
+	serverclasses = serverclassbits = 0;
+	
+	m_nUserid = 0;
+
+	m_nMaxclients = m_nSpawnCount = 0;
+	m_flTickInterval = 0.03f;
+	
+	m_bIsDedicated = false;
+
 	m_CurrentRandomNonce = 0;
 	m_LastRandomNonce = 0;
 	m_flLastRandomNumberGenerationTime = -3.0f; // force it to calc first frame
+	m_fCPUPercent = 0;
+	m_fStartTime = 0;
+	m_fLastCPUCheckTime = 0;
+
+	// Just get a unique ID to talk to the steam master server updater.
+	m_bRestartOnLevelChange = false;
+	
+	m_bMasterServerRulesDirty = true;
+	m_flLastMasterServerUpdateTime = 0;
+
+	m_nNumConnections = 0;
 
 	m_bReportNewFakeClients = true;
 	m_flPausedTimeEnd = -1.f;
 }
 
-CBaseServer::~CBaseServer()
-{
-
-}
+CBaseServer::~CBaseServer() = default;
 
 /*
 ================
@@ -313,7 +319,7 @@ bool CBaseServer::CheckChallengeNr( netadr_t &adr, int nChallengeValue )
 	uint64 challenge = ((uint64)adr.GetIPNetworkByteOrder() << 32) + m_CurrentRandomNonce;
 	CRC32_t hash;
 	CRC32_Init( &hash );
-	CRC32_ProcessBuffer( &hash, &challenge, sizeof(challenge) );
+	CRC32_ProcessBuffer( &hash, challenge );
 	CRC32_Final( &hash );
 	if ( (int)hash == nChallengeValue )
 		return true;
@@ -323,7 +329,7 @@ bool CBaseServer::CheckChallengeNr( netadr_t &adr, int nChallengeValue )
 	challenge += m_LastRandomNonce;
 	hash = 0;
 	CRC32_Init( &hash );
-	CRC32_ProcessBuffer( &hash, &challenge, sizeof(challenge) );
+	CRC32_ProcessBuffer( &hash, challenge );
 	CRC32_Final( &hash );
 	if ( (int)hash == nChallengeValue )
 		return true;
@@ -584,7 +590,7 @@ IClient *CBaseServer::ConnectClient ( netadr_t &adr, int protocol, int challenge
 		// StartSteamValidation() above initialized the clients networkid
 	}
 
-	if ( netchan && !netchan->IsLoopback() )
+	if ( !netchan->IsLoopback() )
 		ConMsg("Client \"%s\" connected (%s).\n", client->GetClientName(), netchan->GetAddress() );
 
 	return client;
@@ -705,9 +711,9 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				if ( !s_connectRateChecker.CheckIP( packet->from ) )
 					return false;
 
-				msg.ReadString( name, sizeof(name) );
-				msg.ReadString( password, sizeof(password) );
-				msg.ReadString( productVersion, sizeof(productVersion) );
+				msg.ReadString( name );
+				msg.ReadString( password );
+				msg.ReadString( productVersion );
 				
 //				bool bClientPlugins = ( msg.ReadByte() > 0 );
 
@@ -740,7 +746,7 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				if ( authProtocol == PROTOCOL_STEAM )
 				{
 					int keyLen = msg.ReadShort();
-					if ( keyLen < 0 || keyLen > static_cast<int>(sizeof(cdkey)) )
+					if ( keyLen < 0 || keyLen > static_cast<intp>(sizeof(cdkey)) )
 					{
 						RejectConnection( packet->from, clientChallenge, "#GameUI_ServerRejectBadSteamKey" );
 						break;
@@ -751,7 +757,7 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				}
 				else
 				{
-					msg.ReadString( cdkey, sizeof(cdkey) );
+					msg.ReadString( cdkey );
 					ConnectClient( packet->from, protocol, challengeNr, clientChallenge, authProtocol, name, password, cdkey, strlen(cdkey) );
 				}
 			}
@@ -930,7 +936,7 @@ void CBaseServer::UserInfoChanged( int nClientIndex )
 void CBaseServer::FillServerInfo(SVC_ServerInfo &serverinfo)
 {
 	static char gamedir[MAX_OSPATH];
-	Q_FileBase( com_gamedir, gamedir, sizeof( gamedir ) );
+	V_FileBase( com_gamedir, gamedir );
 
 	serverinfo.m_nProtocol		= PROTOCOL_VERSION;
 	serverinfo.m_nServerCount	= GetSpawnCount();
@@ -1063,7 +1069,7 @@ int CBaseServer::GetChallengeNr (netadr_t &adr)
 	uint64 challenge = ((uint64)adr.GetIPNetworkByteOrder() << 32) + m_CurrentRandomNonce;
 	CRC32_t hash;
 	CRC32_Init( &hash );
-	CRC32_ProcessBuffer( &hash, &challenge, sizeof(challenge) );
+	CRC32_ProcessBuffer( &hash, challenge );
 	CRC32_Final( &hash );
 	return (int)hash;
 }
@@ -1854,9 +1860,6 @@ void CBaseServer::UpdateMasterServerRules()
 			continue;
 
 		ConVar *pConVar = static_cast< ConVar* >( var );
-		if ( !pConVar )
-			continue;
-
 		SetMasterServerKeyValue( pUpdater, pConVar );
 	}
 
@@ -2134,7 +2137,7 @@ void CBaseServer::BroadcastPrintf (const char *fmt, ...)
 	char		string[1024];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe (string, fmt, argptr);
 	va_end (argptr);
 
 	SVC_Print print( string );
@@ -2395,7 +2398,7 @@ void CBaseServer::RecalculateTags( void )
 	// Games without this interface will have no tagged cvars besides "increased_maxplayers"
 	if ( serverGameTags )
 	{
-		auto pKV = KeyValues::AutoDelete( "GameTags" );
+		KeyValuesAD pKV( "GameTags" );
 
 		serverGameTags->GetTaggedConVarList( pKV );
 

@@ -72,7 +72,7 @@ int CheckOtherInstancesRunningWithSnapShot( const char *thisProcessNameShort )
 		{
 			do
 			{
-				V_FileBase( pe32.szExeFile, otherProcessNameShort, MAX_PATH );
+				V_FileBase( pe32.szExeFile, otherProcessNameShort );
 
 				if ( V_strcmp( thisProcessNameShort, otherProcessNameShort ) == 0 )
 				{
@@ -215,7 +215,7 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 				if ( bStatus )
 				{
 					//  We have the process name.  See if it is the same name as our process.
-					V_FileBase( otherProcessName, otherProcessNameShort, MAX_PATH );
+					V_FileBase( otherProcessName, otherProcessNameShort );
 	
 					if ( V_strcmp( thisProcessNameShort, otherProcessNameShort ) == 0 )
 					{
@@ -279,7 +279,7 @@ int CheckOtherInstancesRunning()
 		return CHECK_PROCESS_UNSUPPORTED;
 	}
 
-	V_FileBase( thisProcessName, thisProcessNameShort, MAX_PATH );
+	V_FileBase( thisProcessName, thisProcessNameShort );
 
 	int iSnapShotCount = CheckOtherInstancesRunningWithSnapShot( thisProcessNameShort );
 	if ( iSnapShotCount > 1 )

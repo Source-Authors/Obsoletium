@@ -16,11 +16,9 @@ $Configuration
 {
 	$Compiler
 	{
-		// Deprecated MBCS MFC libraries for VS 2013 (nafxcw.lib and nafxcwd.lib) can be downloaded from http://go.microsoft.com/?linkid=9832071
-		$PreprocessorDefinitions			"$BASE;NO_WARN_MBCS_MFC_DEPRECATION"
 		$AdditionalIncludeDirectories		"$BASE,..\common;$LIBJPEGSRCDIR;$LIBJPEGSRC2DIR"
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
-		$PrecompiledHeaderFile				"Debug/FileSystemOpenDialog.pch"
+		$PrecompiledHeaderFile				"Debug/filesystemopendialog.pch"
 		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 }
@@ -29,8 +27,6 @@ $Project "filesystemopendialog"
 {
 	$Folder	"Source Files"
 	{
-		$File	"FileDialogApp.cpp"
-		$File	"FileDialogApp.h"
 		$File	"FileSystemOpenDlg.cpp"
 		$File	"FileSystemOpenDlg.h"
 		$File	"$SRCDIR\common\windows\base_dlg.h"

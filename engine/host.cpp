@@ -102,7 +102,6 @@
 #include "replay_internal.h"
 #endif
 #include "sys_mainwind.h"
-#include "host_phonehome.h"
 #ifndef SWDS
 #include "vgui_baseui_interface.h"
 #include "cl_steamauth.h"
@@ -110,7 +109,6 @@
 #include "sv_remoteaccess.h" // NotifyDedicatedServerUI()
 #include "snd_audio_source.h"
 #include "sv_steamauth.h"
-#include "MapReslistGenerator.h"
 #include "DevShotGenerator.h"
 #include "sv_plugin.h"
 #include "toolframework/itoolframework.h"
@@ -123,10 +121,6 @@
 #include "soundservice.h"
 #include "profile.h"
 #include "steam/isteamremotestorage.h"
-#if defined( LINUX )
-#include <locale.h>
-#include "include/SDL3/SDL.h"
-#endif
 // dimhotepus: Fix warnings about unpaired voice controls shutdown.
 #include "audio/private/voice_mixer_controls.h"
 
@@ -264,7 +258,7 @@ static ConVar	violence_ablood( "violence_ablood","1", 0, "Draw alien blood" );
 static ConVar	violence_agibs( "violence_agibs","1", 0, "Show alien gib entities" );
 
 // Marked as FCVAR_USERINFO so that the server can cull CC messages before networking them down to us!!!
-ConVar closecaption( "closecaption", "0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX | FCVAR_USERINFO, "Enable close captioning." );
+ConVar closecaption( "closecaption", "0", FCVAR_ARCHIVE | FCVAR_USERINFO, "Enable close captioning." );
 extern ConVar sv_unlockedchapters;
 
 void Snd_Restart_f()
@@ -494,7 +488,7 @@ double		host_jitterhistory[128] = { 0 };
 unsigned int host_jitterhistorypos = 0;
 
 int			host_framecount;
-static int	host_hunklevel;
+static intp	host_hunklevel;
 
 CGameClient	*host_client;			// current client
 
@@ -546,7 +540,7 @@ ConVar  developer( "developer", "0", FCVAR_CHEAT, "Set developer message level")
 ConVar  developer( "developer", "0", 0, "Set developer message level");
 #endif
 
-ConVar	skill( "skill","1", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX, "Game skill level (1-3).", true, 1, true, 3 );			// 1 - 3
+ConVar	skill( "skill","1", FCVAR_ARCHIVE, "Game skill level (1-3).", true, 1, true, 3 );			// 1 - 3
 ConVar	deathmatch( "deathmatch","0", FCVAR_NOTIFY | FCVAR_INTERNAL_USE, "Running a deathmatch server." );	// 0, 1, or 2
 ConVar	coop( "coop","0", FCVAR_NOTIFY, "Cooperative play." );			// 0 or 1
 
@@ -576,7 +570,7 @@ bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const char *
 
 			char filepath[ 512 ];
 			Q_strncpy( filepath, pszLocalFileName, sizeof( filepath ) );
-			Q_StripFilename( filepath );
+			V_StripFilename( filepath );
 			g_pFullFileSystem->CreateDirHierarchy( filepath, "MOD" );
 
 			FileHandle_t hFile = g_pFileSystem->Open( pszLocalFileName, "wb", "MOD" );
@@ -684,7 +678,7 @@ void CheckForFlushMemory( const char *pCurrentMapName, const char *pDestMapName 
 	char szDestMapName[MAX_PATH];
 	if ( pCurrentMapName )
 	{
-		V_FileBase( pCurrentMapName, szCurrentMapName, sizeof( szCurrentMapName ) );
+		V_FileBase( pCurrentMapName, szCurrentMapName );
 	}
 	else
 	{
@@ -694,7 +688,7 @@ void CheckForFlushMemory( const char *pCurrentMapName, const char *pDestMapName 
 
 	if ( pDestMapName )
 	{
-		V_FileBase( pDestMapName, szDestMapName, sizeof( szDestMapName ) );
+		V_FileBase( pDestMapName, szDestMapName );
 	}
 	else
 	{
@@ -762,7 +756,7 @@ void Host_EndGame (bool bShowMainMenu, PRINTF_FORMAT_STRING const char *message,
 	char		string[1024];
 
 	va_start (argptr,message);
-	Q_vsnprintf (string,sizeof(string),message,argptr);
+	V_vsprintf_safe (string,message,argptr);
 	va_end (argptr);
 	ConMsg ("Host_EndGame: %s\n",string);
 
@@ -832,7 +826,7 @@ void Host_Error ( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2
 #endif
 
 	va_start (argptr,error);
-	Q_vsnprintf(string,sizeof(string),error,argptr);
+	V_vsprintf_safe(string,error,argptr);
 	va_end (argptr);
 
 	if ( sv.IsDedicated() )
@@ -923,10 +917,9 @@ void SetupNewBindings()
 
 	// Load the file
 	const char *pFilename = "scripts\\newbindings.txt";
-	KeyValues *pNewBindingsData = new KeyValues( pFilename );
+	KeyValuesAD pNewBindingsData( pFilename );
 	if ( !pNewBindingsData->LoadFromFile( g_pFileSystem, pFilename ) )
 	{
-		pNewBindingsData->deleteThis();
 		return;
 	}
 
@@ -1042,12 +1035,12 @@ void UseDefaultBindings( void )
 	const char *buf = startbuf;
 	while ( 1 )
 	{
-		buf = COM_ParseFile( buf, token, sizeof( token ) );
+		buf = COM_ParseFile( buf, token );
 		if ( Q_isempty( token ) )
 			break;
 		Q_strncpy ( szKeyName, token, sizeof( szKeyName ) );
 
-		buf = COM_ParseFile( buf, token, sizeof( token ) );
+		buf = COM_ParseFile( buf, token );
 		if ( Q_isempty( token ) )  // Error
 			break;
 
@@ -1177,7 +1170,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 								byte *pBuffer = (byte*) malloc( unSize );
 								if ( g_pFileSystem->Read( pBuffer, unSize, hFile ) == unSize )
 								{
-									Q_SetExtension( g_szDefaultLogoFileName, ".vtf", sizeof(g_szDefaultLogoFileName) );
+									Q_SetExtension( g_szDefaultLogoFileName, ".vtf" );
 									if ( pRemoteStorage->FileWrite( g_szDefaultLogoFileName, pBuffer, unSize ) )
 									{
 										DevMsg( "[Cloud]: SUCCEESS saving %s in remote storage\n", g_szDefaultLogoFileName );
@@ -1192,7 +1185,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 							}
 
 							// store logo .VMT file
-							Q_SetExtension( szLogoFileName, ".vmt", sizeof(szLogoFileName) );
+							Q_SetExtension( szLogoFileName, ".vmt" );
 							hFile = g_pFileSystem->Open( szLogoFileName, "rb", "MOD" );
 							if ( FILESYSTEM_INVALID_HANDLE != hFile )
 							{
@@ -1201,7 +1194,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 								byte *pBuffer = (byte*) malloc( unSize );
 								if ( g_pFileSystem->Read( pBuffer, unSize, hFile ) == unSize )
 								{
-									Q_SetExtension( g_szDefaultLogoFileName, ".vmt", sizeof(g_szDefaultLogoFileName) );
+									Q_SetExtension( g_szDefaultLogoFileName, ".vmt" );
 									if ( pRemoteStorage->FileWrite( g_szDefaultLogoFileName, pBuffer, unSize ) )
 									{
 										DevMsg( "[Cloud]: SUCCEESS saving %s in remote storage\n", g_szDefaultLogoFileName );
@@ -1322,13 +1315,12 @@ bool XBX_SetProfileDefaultSettings( void )
 	}
 
 	// If the mod has no difficulty setting, only easy is allowed
-	KeyValues *modinfo = new KeyValues("ModInfo");
+	KeyValuesAD modinfo("ModInfo");
 	if ( modinfo->LoadFromFile( g_pFileSystem, "gameinfo.txt" ) )
 	{
 		if ( stricmp(modinfo->GetString("nodifficulty", "0"), "1") == 0 )
 			nResultSkill = 1;
 	}
-	modinfo->deleteThis();
 
 	char szScratch[MAX_PATH];
 	Q_snprintf( szScratch, sizeof(szScratch), "skill %d", nResultSkill );
@@ -1433,13 +1425,13 @@ void Host_ReadConfiguration()
 		if ( cl_cloud_settings.GetInt() == STEAMREMOTESTORAGE_CLOUD_ON )
 		{
 			// get logo .VTF file
-			Q_SetExtension( g_szDefaultLogoFileName, ".vtf", sizeof(g_szDefaultLogoFileName) );
+			Q_SetExtension( g_szDefaultLogoFileName, ".vtf" );
 			GetFileFromRemoteStorage( pRemoteStorage, g_szDefaultLogoFileName, g_szDefaultLogoFileName );
 
 			cl_logofile.SetValue( g_szDefaultLogoFileName );
 
 			// get logo .VMT file
-			Q_SetExtension( g_szDefaultLogoFileName, ".vmt", sizeof(g_szDefaultLogoFileName) );
+			Q_SetExtension( g_szDefaultLogoFileName, ".vmt" );
 			GetFileFromRemoteStorage( pRemoteStorage, g_szDefaultLogoFileName, g_szDefaultLogoFileName );
 		}
 	}
@@ -1506,7 +1498,7 @@ CON_COMMAND( host_writeconfig, "Store current settings to config.cfg (or specifi
 
 		char outfile[ MAX_QPATH ];
 		// Strip path and extension from filename
-		Q_FileBase( filename, outfile, sizeof( outfile ) );
+		Q_FileBase( filename, outfile );
 		Host_WriteConfiguration( va( "%s.cfg", outfile ), bWriteAll );
 		if  ( !bWriteAll )
 			ConMsg( "Wrote partial config file \"%s\" out, to write full file use host_writeconfig \"%s\" full\n", outfile, outfile );
@@ -1559,7 +1551,7 @@ void Host_ReadPreStartupConfiguration()
 			COM_Parse(search);
 
 			// apply the value
-			ConVar *var = (ConVar *)g_pCVar->FindVar( configVar );
+			ConVar *var = g_pCVar->FindVar( configVar );
 			if ( var )
 			{
 				var->SetValue( com_token );
@@ -2331,7 +2323,7 @@ void Host_CheckDumpMemoryStats( void )
 			}
 
 			char mapname[ 256 ];
-			Q_FileBase( pTest, mapname, sizeof( mapname ) );
+			Q_FileBase( pTest, mapname );
 #if defined( _MEMTEST )
 			MemAlloc_SetStatsExtraInfo( pTest, "" );
 #endif
@@ -2352,18 +2344,18 @@ void Host_CheckDumpMemoryStats( void )
 	Q_memset( &state, 0, sizeof( state ) );
 	_CrtMemCheckpoint( &state );
 
-	unsigned int size = 0;
-
-	for ( int use = 0; use < _MAX_BLOCKS; use++)
+	size_t size = 0;
+	for ( const auto &sz : state.lSizes )
 	{
-		size += state.lSizes[ use ];
+		size += sz;
 	}
+
 	Msg("MEMORY:  Run-time Heap\n------------------------------------\n");
 
 	Msg( "\tHigh water %s\n", Q_pretifymem( state.lHighWaterCount,4 ) );
 	Msg( "\tCurrent mem %s\n", Q_pretifymem( size,4 ) );
 	Msg("------------------------------------\n");
-	int hunk = Hunk_MallocSize();
+	intp hunk = Hunk_MallocSize();
 	Msg("\tAllocated outside hunk:  %s\n", Q_pretifymem( size - hunk ) );
 #endif
 }
@@ -3469,13 +3461,13 @@ bool IsLowViolence_Registry()
 	}
 
 	char gamedir[MAX_OSPATH];
-	Q_FileBase( com_gamedir, gamedir, sizeof( gamedir ) );
+	Q_FileBase( com_gamedir, gamedir );
 
 	// also check mod specific directories for LV changes
-	Q_snprintf(szSubKey, sizeof( szSubKey ), "Software\\Valve\\%s\\%s\\Settings", appname, gamedir );
+	V_sprintf_safe(szSubKey, "Software\\Valve\\%s\\%s\\Settings", appname, gamedir );
 
 	nBufferLen = 127;
-	Q_strncpy( szBuffer, "", sizeof( szBuffer ) );
+	szBuffer[0] = '\0';
 
 	Sys_GetRegKeyValue( szSubKey, "User Token 2", szBuffer,	nBufferLen, szBuffer );
 	if ( !Q_isempty( szBuffer ) )
@@ -3614,24 +3606,6 @@ void Host_PostInit()
 		// vgui needs other systems to finalize
 		EngineVGui()->PostInit();
 	}
-
-#if defined( LINUX )
-	const char en_US[] = "en_US.UTF-8";
-	const char *CurrentLocale = setlocale( LC_ALL, NULL );
-	if ( !CurrentLocale )
-		CurrentLocale = "c";
-	if ( Q_stricmp( CurrentLocale, en_US ) )
-	{
-		char MessageText[ 512 ];
-
-		V_sprintf_safe( MessageText, "SetLocale('%s') failed. Using '%s'.\n"
-									 "You may have limited glyph support.\n"
-									 "Please install '%s' locale.",
-						en_US, CurrentLocale, en_US );
-		SDL_ShowSimpleMessageBox( 0, "Warning", MessageText, GetAssertDialogParent() );
-	}
-#endif // LINUX
-
 #endif
 }
 
@@ -3660,16 +3634,20 @@ void HLTV_Shutdown()
 // Check with steam to see if the requested file (requires full path) is a valid, signed binary
 bool DLL_LOCAL Host_IsValidSignature( const char *pFilename, bool bAllowUnknown )
 {
-#if defined( SWDS ) || defined(_X360)
+#if defined( SWDS )
 	return true;
 #else
-	if ( sv.IsDedicated() || IsOSX() || IsLinux() )
+	if ( sv.IsDedicated() )
 	{
-		// dedicated servers and Mac and Linux  binaries don't check signatures
+		// dedicated servers don't check signatures
 		return true;
 	}
-	else
-	{
+
+#if defined(POSIX)
+	// Mac and Linux binaries don't check signatures
+	return true;
+#else
+
     // dimhotepus: NO_STEAM
 #ifndef NO_STEAM
 		if ( Steam3Client().SteamUtils() )
@@ -3705,7 +3683,8 @@ bool DLL_LOCAL Host_IsValidSignature( const char *pFilename, bool bAllowUnknown 
 			}
 		}
 #endif
-	}
+
+#endif
 
 	return false;
 #endif // SWDS
@@ -3739,12 +3718,12 @@ bool DLL_LOCAL Host_AllowLoadModule( const char *pFilename, const char *pPathID,
 			{
 				char szDllname[512];
 
-				V_strncpy( szDllname, pFilename, sizeof(szDllname) );
-				V_SetExtension( szDllname, g_pModuleExtension, sizeof(szDllname) );
+				V_strcpy_safe( szDllname, pFilename );
+				V_SetExtension( szDllname, g_pModuleExtension );
 				if ( pPathID )
 				{
 					char szFullPath[ 512 ];
-					const char *pFullPath = g_pFileSystem->RelativePathToFullPath( szDllname, pPathID, szFullPath, sizeof(szFullPath) );
+					const char *pFullPath = g_pFileSystem->RelativePathToFullPath_safe( szDllname, pPathID, szFullPath );
 					if ( !pFullPath )
 					{
 						Warning("Can't find %s on disk\n", szDllname );
@@ -4022,17 +4001,6 @@ void Host_Init( bool bDedicated )
 		DevShotGenerator().StartDevShotGeneration();
 	}
 
-	// if running outside of steam and NOT a dedicated server then phone home (or if "-phonehome" is passed on the command line)
-	if ( !sv.IsDedicated() || CommandLine()->FindParm( "-phonehome" ) )
-	{
-		// In debug, only run this check if -phonehome is on the command line (so a debug build will "just work").
-		if ( IsDebug() && CommandLine()->FindParm( "-phonehome" ) )
-		{
-			phonehome->Init();
-			phonehome->Message( IPhoneHome::PHONE_MSG_ENGINESTART, NULL );
-		}
-	}
-
 #ifndef SWDS
 	// Rebuild audio caches
 	if ( !sv.IsDedicated() && S_IsInitted() )
@@ -4099,10 +4067,13 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	sv.InactivateClients();
 
 	// The qualified name of the map, excluding path/extension
-	char szMapName[MAX_PATH] = { 0 };
+	char szMapName[MAX_PATH];
+	V_strcpy_safe( szMapName, mapname );
+
 	// The file to load the map from.
-	char szMapFile[MAX_PATH] = { 0 };
-	Q_strncpy( szMapName, mapname, sizeof( szMapName ) );
+	char szMapFile[MAX_PATH];
+	szMapFile[0] = '\0';
+	
 	Host_DefaultMapFileName( szMapName, szMapFile, sizeof( szMapFile ) );
 
 	// Ask serverDLL to prepare this load
@@ -4148,7 +4119,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 		startspot = NULL;
 	else
 	{
-		Q_strncpy (_startspot, start, sizeof( _startspot ) );
+		V_strcpy_safe (_startspot, start );
 		startspot = _startspot;
 	}
 
@@ -4187,7 +4158,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	}
 #endif
 
-	Q_strncpy( oldlevel, sv.GetMapName(), sizeof( oldlevel ) );
+	V_strcpy_safe( oldlevel, sv.GetMapName() );
 
 #if !defined(SWDS)
 	if ( loadfromsavedgame )
@@ -4293,18 +4264,20 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	VPROF( "Host_NewGame" );
 	COM_TimestampedLog( "Host_NewGame" );
 
-	char previousMapName[MAX_PATH] = { 0 };
-	Q_strncpy( previousMapName, host_map.GetString(), sizeof( previousMapName ) );
+	char previousMapName[MAX_PATH];
+	V_strcpy_safe( previousMapName, host_map.GetString() );
 
 #ifndef SWDS
 	SCR_BeginLoadingPlaque();
 #endif
 
 	// The qualified name of the map, excluding path/extension
-	char szMapName[MAX_PATH] = { 0 };
+	char szMapName[MAX_PATH];
+	V_strcpy_safe( szMapName, mapName );
+
 	// The file to load the map from.
-	char szMapFile[MAX_PATH] = { 0 };
-	Q_strncpy( szMapName, mapName, sizeof( szMapName ) );
+	char szMapFile[MAX_PATH];
+	szMapFile[0] = '\0';
 	Host_DefaultMapFileName( szMapName, szMapFile, sizeof( szMapFile ) );
 
 	// Steam may not have been started yet, ensure it is available to the game DLL before we ask it to prepare level
@@ -4355,7 +4328,7 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 	NET_ListenSocket( sv.m_Socket, true );	// activated server TCP socket
 
 	// let's not have any servers with no name
-	if ( host_name.GetString()[0] == 0 )
+	if ( Q_isempty( host_name.GetString() ) )
 	{
 		host_name.SetValue( serverGameDLL->GetGameDescription() );
 	}
@@ -4400,7 +4373,7 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 		COM_TimestampedLog( "Stuff 'connect localhost' to console" );
 
 		char str[512];
-		Q_snprintf( str, sizeof( str ), "connect localhost:%d listenserver", sv.GetUDPPort() );
+		V_sprintf_safe( str, "connect localhost:%d listenserver", sv.GetUDPPort() );
 		Cbuf_AddText( str );
 	}
 	else
@@ -4521,9 +4494,6 @@ void Host_Shutdown(void)
 		return;
 	}
 	shutting_down = true;
-
-	phonehome->Message( IPhoneHome::PHONE_MSG_ENGINEEND, NULL );
-	phonehome->Shutdown();
 
 #ifndef SWDS
 	// Store active configuration settings

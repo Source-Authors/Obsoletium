@@ -70,7 +70,7 @@ typedef uint64 VertexFormat_t;
 // V081 - 10/25/2016 - Added new Suspend/Resume texture streaming interfaces. Might also have added more calls here due
 //                     to the streaming work that didn't get bumped, but we're not guarding versions on the TF branch
 //                     very judiciously since we need to audit them when merging to SDK branch either way.
-#define MATERIAL_SYSTEM_INTERFACE_VERSION "VMaterialSystem081"
+constexpr inline char MATERIAL_SYSTEM_INTERFACE_VERSION[]{"VMaterialSystem081"};
 
 #ifdef POSIX
 #define ABSOLUTE_MINIMUM_DXLEVEL 90
@@ -121,8 +121,8 @@ enum MaterialMatrixMode_t
 };
 
 // FIXME: How do I specify the actual number of matrix modes?
-const int NUM_MODEL_TRANSFORMS = 53;
-const int MATERIAL_MODEL_MAX = MATERIAL_MODEL + NUM_MODEL_TRANSFORMS;
+constexpr inline int NUM_MODEL_TRANSFORMS = 53;
+constexpr inline int MATERIAL_MODEL_MAX = MATERIAL_MODEL + NUM_MODEL_TRANSFORMS;
 
 enum MaterialPrimitiveType_t 
 { 
@@ -319,7 +319,7 @@ enum StencilOperation_t
 	STENCILOPERATION_INCR = D3DSTENCILOP_INCR,
 	STENCILOPERATION_DECR = D3DSTENCILOP_DECR,
 #endif
-	STENCILOPERATION_FORCE_DWORD = 0x7fffffff
+	STENCILOPERATION_FORCE_DWORD = 0x7fffffff //-V112
 };
 
 enum StencilComparisonFunction_t 
@@ -344,7 +344,7 @@ enum StencilComparisonFunction_t
 	STENCILCOMPARISONFUNCTION_ALWAYS = D3DCMP_ALWAYS,
 #endif
 
-	STENCILCOMPARISONFUNCTION_FORCE_DWORD = 0x7fffffff
+	STENCILCOMPARISONFUNCTION_FORCE_DWORD = 0x7fffffff //-V112
 };
 
 
@@ -754,8 +754,8 @@ public:
 
 	// Used to iterate over all shaders for editing purposes
 	// GetShaders returns the number of shaders it actually found
-	virtual int					ShaderCount() const = 0;
-	virtual int					GetShaders( int nFirstShader, int nMaxCount, IShader **ppShaderList ) const = 0;
+	virtual intp				ShaderCount() const = 0;
+	virtual int					GetShaders( int nFirstShader, int nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const = 0;
 
 	// FIXME: Is there a better way of doing this?
 	// Returns shader flag names for editors to be able to edit them
@@ -1545,11 +1545,11 @@ public:
 	// Allocates temp render data. Renderdata goes out of scope at frame end in multicore
 	// Renderdata goes out of scope after refcount goes to zero in singlecore.
 	// Locking/unlocking increases + decreases refcount
-	virtual void *			LockRenderData( int nSizeInBytes ) = 0;
+	virtual void *			LockRenderData( intp nSizeInBytes ) = 0;
 	virtual void			UnlockRenderData( void *pData ) = 0;
 
 	// Typed version. If specified, pSrcData is copied into the locked memory.
-	template< class E > E*  LockRenderDataTyped( int nCount, const E* pSrcData = nullptr );
+	template< class E > E*  LockRenderDataTyped( intp nCount, const E* pSrcData = nullptr );
 
 	// Temp render data gets immediately freed after it's all unlocked in single core.
 	// This prevents it from being freed
@@ -1573,10 +1573,10 @@ public:
 	virtual void AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) = 0;
 };
 
-template< class E > inline E* IMatRenderContext::LockRenderDataTyped( int nCount, const E* pSrcData )
+template< class E > inline E* IMatRenderContext::LockRenderDataTyped( intp nCount, const E* pSrcData )
 {
-	int nSizeInBytes = nCount * sizeof(E);
-	E *pDstData = (E*)LockRenderData( nSizeInBytes );
+	intp nSizeInBytes = nCount * sizeof(E);
+	E *pDstData = static_cast<E*>( LockRenderData( nSizeInBytes ) );
 	if ( pSrcData && pDstData )
 	{
 		memcpy( pDstData, pSrcData, nSizeInBytes );
@@ -1645,20 +1645,20 @@ class CMatRenderData
 {
 public:
 	CMatRenderData( IMatRenderContext* pRenderContext );
-	CMatRenderData( IMatRenderContext* pRenderContext, int nCount, const E *pSrcData = nullptr );
+	CMatRenderData( IMatRenderContext* pRenderContext, intp nCount, const E *pSrcData = nullptr );
 	~CMatRenderData();
-	E* Lock( int nCount, const E* pSrcData = nullptr ); 
+	E* Lock( intp nCount, const E* pSrcData = nullptr ); 
 	void Release();
 	bool IsValid() const;
 	const E* Base() const;
 	E* Base();
-	const E& operator[]( int i ) const;
-	E& operator[]( int i );
+	const E& operator[]( intp i ) const; //-V302
+	E& operator[]( intp i ); //-V302
 
 private:
 	IMatRenderContext* m_pRenderContext;
 	E *m_pRenderData;
-	int m_nCount;
+	intp m_nCount;
 	bool m_bNeedsUnlock;
 };
 
@@ -1672,7 +1672,7 @@ inline CMatRenderData<E>::CMatRenderData( IMatRenderContext* pRenderContext )
 }
 
 template< typename E >
-inline CMatRenderData<E>::CMatRenderData( IMatRenderContext* pRenderContext, int nCount, const E* pSrcData )
+inline CMatRenderData<E>::CMatRenderData( IMatRenderContext* pRenderContext, intp nCount, const E* pSrcData )
 {
 	m_pRenderContext = pRenderContext;
 	m_nCount = 0;
@@ -1694,7 +1694,7 @@ inline bool CMatRenderData<E>::IsValid() const
 }
 
 template< typename E >
-inline E* CMatRenderData<E>::Lock( int nCount, const E* pSrcData )
+inline E* CMatRenderData<E>::Lock( intp nCount, const E* pSrcData )
 {
 	m_nCount = nCount;
 	if ( pSrcData && m_pRenderContext->IsRenderData( pSrcData ) )
@@ -1743,14 +1743,14 @@ inline const E* CMatRenderData<E>::Base() const
 }
 
 template< typename E >
-inline E& CMatRenderData<E>::operator[]( int i )
+inline E& CMatRenderData<E>::operator[]( intp i )
 {
 	Assert( ( i >= 0 ) && ( i < m_nCount ) );
 	return m_pRenderData[i];
 }
 
 template< typename E >
-inline const E& CMatRenderData<E>::operator[]( int i ) const
+inline const E& CMatRenderData<E>::operator[]( intp i ) const
 {
 	Assert( ( i >= 0 ) && ( i < m_nCount ) );
 	return m_pRenderData[i];

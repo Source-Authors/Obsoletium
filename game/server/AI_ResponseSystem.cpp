@@ -222,10 +222,9 @@ struct ResponseGroup
 
 	ResponseGroup( const ResponseGroup& src )
 	{
-		int c = src.group.Count();
-		for ( int i = 0; i < c; i++ )
+		for ( auto &r : src.group )
 		{
-			group.AddToTail( src.group[ i ] );
+			group.AddToTail( r );
 		}
 
 		rp = src.rp;
@@ -243,10 +242,10 @@ struct ResponseGroup
 	{
 		if ( this == &src )
 			return *this;
-		int c = src.group.Count();
-		for ( int i = 0; i < c; i++ )
+
+		for ( auto &r : src.group )
 		{
-			group.AddToTail( src.group[ i ] );
+			group.AddToTail( r );
 		}
 
 		rp = src.rp;
@@ -266,17 +265,16 @@ struct ResponseGroup
 		if ( !m_bDepleteBeforeRepeat )
 			return true;
 
-		int c = group.Count();
-		for ( int i = 0; i < c; i++ )
+		for ( const auto &r : group )
 		{
-			if ( group[ i ].depletioncount != m_nDepletionCount )
+			if ( r.depletioncount != m_nDepletionCount )
 				return true;
 		}
 
 		return false;
 	}
 
-	void	MarkResponseUsed( int idx )
+	void	MarkResponseUsed( intp idx )
 	{
 		if ( !m_bDepleteBeforeRepeat )
 			return;
@@ -304,21 +302,21 @@ struct ResponseGroup
 		SetCurrentIndex( 0 );
 		m_nDepletionCount = 1;
 
-		for ( int i = 0; i < group.Count(); ++i )
+		for ( auto &r : group )
 		{
-			group[ i ].depletioncount = 0;
+			r.depletioncount = 0;
 		}
 	}
 
-	bool HasUndepletedFirst( int& index )
+	bool HasUndepletedFirst( intp& index )
 	{
 		index = -1;
 
 		if ( !m_bDepleteBeforeRepeat )
 			return false;
 
-		int c = group.Count();
-		for ( int i = 0; i < c; i++ )
+		intp c = group.Count();
+		for ( intp i = 0; i < c; i++ )
 		{
 			Response *r = &group[ i ];
 
@@ -332,15 +330,15 @@ struct ResponseGroup
 		return false;
 	}
 	
-	bool HasUndepletedLast( int& index )
+	bool HasUndepletedLast( intp& index )
 	{
 		index = -1;
 
 		if ( !m_bDepleteBeforeRepeat )
 			return false;
 
-		int c = group.Count();
-		for ( int i = 0; i < c; i++ )
+		intp c = group.Count();
+		for ( intp i = 0; i < c; i++ )
 		{
 			Response *r = &group[ i ];
 
@@ -366,9 +364,8 @@ struct ResponseGroup
 	bool	IsEnabled() const { return m_bEnabled; }
 	void	SetEnabled( bool enabled ) { m_bEnabled = enabled; }
 
-	// dimhotepus: Changed return type int -> byte.
 	byte	GetCurrentIndex() const { return m_nCurrentIndex; }
-	void	SetCurrentIndex( byte idx ) { m_nCurrentIndex = idx; }
+	void	SetCurrentIndex( intp idx ) { Assert(idx <= std::numeric_limits<byte>::max()); m_nCurrentIndex = static_cast<byte>(idx); }
 
 	CUtlVector< Response >	group;
 
@@ -410,10 +407,9 @@ struct Criteria
 
 		matcher = src.matcher;
 
-		int c = src.subcriteria.Count();
-		for ( int i = 0; i < c; i++ )
+		for ( auto &s : src.subcriteria )
 		{
-			subcriteria.AddToTail( src.subcriteria[ i ] );
+			subcriteria.AddToTail( s );
 		}
 
 		return *this;
@@ -427,10 +423,9 @@ struct Criteria
 
 		matcher = src.matcher;
 
-		int c = src.subcriteria.Count();
-		for ( int i = 0; i < c; i++ )
+		for ( auto &s : src.subcriteria )
 		{
-			subcriteria.AddToTail( src.subcriteria[ i ] );
+			subcriteria.AddToTail( s );
 		}
 	}
 	~Criteria()
@@ -470,19 +465,14 @@ struct Rule
 		if ( this == &src )
 			return *this;
 
-		int i;
-		int c;
-		
-		c = src.m_Criteria.Count(); 
-		for ( i = 0; i < c; i++ )
+		for ( auto &c : src.m_Criteria )
 		{
-			m_Criteria.AddToTail( src.m_Criteria[ i ] );
+			m_Criteria.AddToTail( c );
 		}
 
-		c = src.m_Responses.Count(); 
-		for ( i = 0; i < c; i++ )
+		for ( auto &r : src.m_Responses )
 		{
-			m_Responses.AddToTail( src.m_Responses[ i ] );
+			m_Responses.AddToTail( r );
 		}
 
 		SetContext( src.m_szContext );
@@ -494,19 +484,14 @@ struct Rule
 
 	Rule( const Rule& src )
 	{
-		int i;
-		int c;
-		
-		c = src.m_Criteria.Count(); 
-		for ( i = 0; i < c; i++ )
+		for ( auto &c : src.m_Criteria )
 		{
-			m_Criteria.AddToTail( src.m_Criteria[ i ] );
+			m_Criteria.AddToTail( c );
 		}
 
-		c = src.m_Responses.Count(); 
-		for ( i = 0; i < c; i++ )
+		for ( auto &r : src.m_Responses )
 		{
-			m_Responses.AddToTail( src.m_Responses[ i ] );
+			m_Responses.AddToTail( r );
 		}
 
 		SetContext( src.m_szContext );
@@ -690,8 +675,8 @@ public:
 	float		ScoreCriteriaAgainstRuleCriteria( const AI_CriteriaSet& set, unsigned short icriterion, bool& exclude, bool verbose = false );
 	bool		GetBestResponse( ResponseSearchResult& result, Rule *rule, bool verbose = false, IResponseFilter *pFilter = NULL );
 	bool		ResolveResponse( ResponseSearchResult& result, int depth, const char *name, bool verbose = false, IResponseFilter *pFilter = NULL );
-	int			SelectWeightedResponseFromResponseGroup( ResponseGroup *g, IResponseFilter *pFilter );
-	void		DescribeResponseGroup( ResponseGroup *group, int selected, int depth );
+	intp		SelectWeightedResponseFromResponseGroup( ResponseGroup *g, IResponseFilter *pFilter );
+	void		DescribeResponseGroup( ResponseGroup *group, intp selected, int depth );
 	void		DebugPrint( int depth, const char *fmt, ... );
 
 	void		LoadFromBuffer( const char *scriptfile, const char *buffer, CStringPool &includedFiles );
@@ -704,7 +689,7 @@ public:
 	void		PushScript( const char *scriptfile, unsigned char *buffer );
 	void		PopScript(void);
 
-	void		ResponseWarning( const char *fmt, ... );
+	void		ResponseWarning( PRINTF_FORMAT_STRING const char *fmt, ... );
 
 	CUtlDict< ResponseGroup, short >	m_Responses;
 	CUtlDict< Criteria, short >	m_Criteria;
@@ -844,11 +829,11 @@ float CResponseSystem::LookupEnumeration( const char *name, bool& found )
 // Purpose: 
 // Input  : matcher - 
 //-----------------------------------------------------------------------------
-void CResponseSystem::ResolveToken( Matcher& matcher, char *token, size_t bufsize, char const *rawtoken )
+void CResponseSystem::ResolveToken( Matcher& matcher, char *in_token, size_t bufsize, char const *rawtoken )
 {
 	if ( rawtoken[0] != '[' )
 	{
-		Q_strncpy( token, rawtoken, bufsize );
+		Q_strncpy( in_token, rawtoken, bufsize );
 		return;
 	}
 
@@ -857,12 +842,12 @@ void CResponseSystem::ResolveToken( Matcher& matcher, char *token, size_t bufsiz
 	float f = LookupEnumeration( rawtoken, found );
 	if ( !found )
 	{
-		Q_strncpy( token, rawtoken, bufsize );
-		ResponseWarning( "No such enumeration '%s'\n", token );
+		Q_strncpy( in_token, rawtoken, bufsize );
+		ResponseWarning( "No such enumeration '%s'\n", in_token );
 		return;
 	}
 
-	Q_snprintf( token, bufsize, "%f", f );
+	Q_snprintf( in_token, bufsize, "%f", f );
 }
 
 
@@ -895,13 +880,13 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 
 	const char *in = s;
 
-	char token[ 128 ];
+	char in_token[ 128 ];
 	char rawtoken[ 128 ];
 
-	token[ 0 ] = 0;
+	in_token[ 0 ] = 0;
 	rawtoken[ 0 ] = 0;
 
-	int n = 0;
+	intp n = 0;
 
 	bool gt = false;
 	bool lt = false;
@@ -937,14 +922,15 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 				n = 0;
 
 				// Convert raw token to real token in case token is an enumerated type specifier
-				ResolveToken( matcher, token, sizeof( token ), rawtoken );
+				ResolveToken( matcher, in_token, sizeof( in_token ), rawtoken );
 
 				// Fill in first data set
 				if ( gt )
 				{
 					matcher.usemin = true;
 					matcher.minequals = eq;
-					matcher.minval = (float)atof( token );
+					// dimhotepus: atof -> strtof.
+					matcher.minval = strtof( in_token, nullptr );
 
 					matcher.isnumeric = true;
 				}
@@ -952,7 +938,8 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 				{
 					matcher.usemax = true;
 					matcher.maxequals = eq;
-					matcher.maxval = (float)atof( token );
+					// dimhotepus: atof -> strtof.
+					matcher.maxval = strtof( in_token, nullptr );
 
 					matcher.isnumeric = true;
 				}
@@ -966,7 +953,7 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 
 					matcher.notequal = nt;
 
-					matcher.isnumeric = AppearsToBeANumber( token );
+					matcher.isnumeric = AppearsToBeANumber( in_token );
 				}
 
 				gt = lt = eq = nt = false;
@@ -988,7 +975,7 @@ void CResponseSystem::ComputeMatcher( Criteria *c, Matcher& matcher )
 		in++;
 	}
 
-	matcher.SetToken( token );
+	matcher.SetToken( in_token );
 	matcher.SetRaw( rawtoken );
 	matcher.valid = true;
 }
@@ -1070,7 +1057,8 @@ bool CResponseSystem::CompareUsingMatcher( const char *setValue, Matcher& m, boo
 		if ( !setValue || !setValue[0] )
 			return false;
 
-		return v == (float)atof( m.GetToken() );
+		// dimhotepus: atof -> strtof.
+		return v == strtof( m.GetToken(), nullptr );
 	}
 
 	return !Q_stricmp( setValue, m.GetToken() ) ? true : false;
@@ -1098,17 +1086,14 @@ bool CResponseSystem::Compare( const char *setValue, Criteria *c, bool verbose /
 float CResponseSystem::RecursiveScoreSubcriteriaAgainstRule( const AI_CriteriaSet& set, Criteria *parent, bool& exclude, bool verbose /*=false*/ )
 {
 	float score = 0.0f;
-	int subcount = parent->subcriteria.Count();
-	for ( int i = 0; i < subcount; i++ )
+	for ( auto &s : parent->subcriteria )
 	{
-		auto icriterion = parent->subcriteria[ i ];
-
 		bool excludesubrule = false;
 		if (verbose)
 		{
 			DevMsg( "\n" );
 		}
-		score += ScoreCriteriaAgainstRuleCriteria( set, icriterion, excludesubrule, verbose );
+		score += ScoreCriteriaAgainstRuleCriteria( set, s, excludesubrule, verbose );
 	}
 
 	exclude = ( parent->required && score == 0.0f ) ? true : false;
@@ -1119,11 +1104,9 @@ float CResponseSystem::RecursiveScoreSubcriteriaAgainstRule( const AI_CriteriaSe
 float CResponseSystem::RecursiveLookForCriteria( const AI_CriteriaSet &criteriaSet, Criteria *pParent )
 {
 	float flScore = 0.0f;
-	int nSubCount = pParent->subcriteria.Count();
-	for ( int iSub = 0; iSub < nSubCount; ++iSub )
+	for ( auto &s : pParent->subcriteria )
 	{
-		auto iCriteria = pParent->subcriteria[iSub];
-		flScore += LookForCriteria( criteriaSet, iCriteria );
+		flScore += LookForCriteria( criteriaSet, s );
 	}
 
 	return flScore;
@@ -1276,7 +1259,7 @@ float CResponseSystem::ScoreCriteriaAgainstRule( const AI_CriteriaSet& set, shor
 void CResponseSystem::DebugPrint( int depth, const char *fmt, ... )
 {
 	int indentchars = 3 * depth;
-	char *indent = (char *)_alloca( indentchars + 1);
+	char *indent = stackallocT( char, indentchars + 1);
 	indent[ indentchars ] = 0;
 	while ( --indentchars >= 0 )
 	{
@@ -1288,7 +1271,7 @@ void CResponseSystem::DebugPrint( int depth, const char *fmt, ... )
 	char szText[1024];
 
 	va_start (argptr, fmt);
-	Q_vsnprintf (szText, sizeof( szText ), fmt, argptr);
+	V_vsprintf_safe (szText, fmt, argptr);
 	va_end (argptr);
 
 	DevMsg( "%s%s", indent, szText );
@@ -1309,24 +1292,22 @@ void CResponseSystem::ResetResponseGroups()
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *g - 
-// Output : int
+// Output : intp
 //-----------------------------------------------------------------------------
-int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, IResponseFilter *pFilter )
+intp CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, IResponseFilter *pFilter )
 {
-	int c = g->group.Count();
+	intp c = g->group.Count();
 	if ( !c )
 	{
 		AssertMsg( false, "Expecting response group with >= 1 elements" );
 		return -1;
 	}
 
-	int i;
-
 	// Fake depletion of unavailable choices
-	CUtlVector<int> fakedDepletes;
+	CUtlVector<intp> fakedDepletes;
 	if ( pFilter && g->ShouldCheckRepeats() )
 	{
-		for ( i = 0; i < c; i++ )
+		for ( intp i = 0; i < c; i++ )
 		{
 			Response *r = &g->group[ i ];
 			if ( r->depletioncount != g->GetDepletionCount() && !pFilter->IsValidResponse( r->GetType(), r->value ) )
@@ -1344,7 +1325,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 		if ( pFilter && g->ShouldCheckRepeats() )
 		{
 			fakedDepletes.RemoveAll();
-			for ( i = 0; i < c; i++ )
+			for ( intp i = 0; i < c; i++ )
 			{
 				Response *r = &g->group[ i ];
 				if ( !pFilter->IsValidResponse( r->GetType(), r->value ) )
@@ -1370,11 +1351,11 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 	int	depletioncount = g->GetDepletionCount();
 
 	float totalweight = 0.0f;
-	int slot = -1;
+	intp slot = -1;
 
 	if ( checkrepeats )
 	{
-		int check= -1;
+		intp check= -1;
 		// Snag the first slot right away
 		if ( g->HasUndepletedFirst( check ) && check != -1 )
 		{
@@ -1383,6 +1364,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 
 		if ( slot == -1 && g->HasUndepletedLast( check ) && check != -1 )
 		{
+			intp i;
 			// If this is the only undepleted one, use it now
 			for ( i = 0; i < c; i++ )
 			{
@@ -1413,7 +1395,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 
 	if ( slot == -1 )
 	{
-		for ( i = 0; i < c; i++ )
+		for ( intp i = 0; i < c; i++ )
 		{
 			Response *r = &g->group[ i ];
 			if ( checkrepeats && 
@@ -1426,7 +1408,7 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 			if ( checkrepeats && r->last )
 				continue;
 
-			int prevSlot = slot;
+			intp prevSlot = slot;
 
 			if ( !totalweight )
 			{
@@ -1454,9 +1436,9 @@ int CResponseSystem::SelectWeightedResponseFromResponseGroup( ResponseGroup *g, 
 	// Revert fake depletion of unavailable choices
 	if ( pFilter && g->ShouldCheckRepeats() )
 	{
-		for ( i = 0; i < fakedDepletes.Count(); i++ )
+		for ( auto &f : fakedDepletes )
 		{
-			g->group[ fakedDepletes[ i ] ].depletioncount = 0;;
+			g->group[ f ].depletioncount = 0;;
 		}
 	}
 
@@ -1482,11 +1464,11 @@ bool CResponseSystem::ResolveResponse( ResponseSearchResult& searchResult, int d
 	if ( !g->IsEnabled() )
 		return false;
 
-	int c = g->group.Count();
+	intp c = g->group.Count();
 	if ( !c )
 		return false;
 
-	int idx = 0;
+	intp idx = 0;
 
 	if ( g->IsSequential() )
 	{
@@ -1562,11 +1544,11 @@ bool CResponseSystem::ResolveResponse( ResponseSearchResult& searchResult, int d
 //			selected - 
 //			depth - 
 //-----------------------------------------------------------------------------
-void CResponseSystem::DescribeResponseGroup( ResponseGroup *group, int selected, int depth )
+void CResponseSystem::DescribeResponseGroup( ResponseGroup *group, intp selected, int depth )
 {
-	int c = group->group.Count();
+	intp c = group->group.Count();
 
-	for ( int i = 0; i < c ; i++ )
+	for ( intp i = 0; i < c ; i++ )
 	{
 		Response *r = &group->group[ i ];
 		DebugPrint( depth + 1, "%s%20s : %40s %5.3f\n",
@@ -1584,11 +1566,11 @@ void CResponseSystem::DescribeResponseGroup( ResponseGroup *group, int selected,
 //-----------------------------------------------------------------------------
 bool CResponseSystem::GetBestResponse( ResponseSearchResult& searchResult, Rule *rule, bool verbose /*=false*/, IResponseFilter *pFilter )
 {
-	int c = rule->m_Responses.Count();
+	intp c = rule->m_Responses.Count();
 	if ( !c )
 		return false;
 
-	int index = random->RandomInt( 0, c - 1 );
+	int index = random->RandomInt( 0, static_cast<int>(min(static_cast<intp>(std::numeric_limits<int>::max()), c) - 1) );
 	auto groupIndex = rule->m_Responses[ index ];
 
 	ResponseGroup *g = &m_Responses[ groupIndex ];
@@ -1597,11 +1579,11 @@ bool CResponseSystem::GetBestResponse( ResponseSearchResult& searchResult, Rule 
 	if ( !g->IsEnabled() )
 		return false;
 
-	int count = g->group.Count();
+	intp count = g->group.Count();
 	if ( !count )
 		return false;
 
-	int responseIndex = 0;
+	intp responseIndex = 0;
 
 	if ( g->IsSequential() )
 	{
@@ -1713,10 +1695,10 @@ short CResponseSystem::FindBestMatchingRule( const AI_CriteriaSet& set, bool ver
 		return bestrules[0];
 
 	// Randomly pick one of the tied matching rules
-	int idx = random->RandomInt( 0, bestCount - 1 );
+	int idx = random->RandomInt( 0, static_cast<int>(min(static_cast<intp>(std::numeric_limits<int>::max()), bestCount - 1)) );
 	if ( verbose )
 	{
-		DevMsg( "Found %i matching rules, selecting slot %i\n", bestCount, idx );
+		DevMsg( "Found %zd matching rules, selecting slot %d\n", bestCount, idx );
 	}
 	return bestrules[ idx ];
 }
@@ -1795,9 +1777,8 @@ void CResponseSystem::GetAllResponses( CUtlVector<AI_Response *> *pResponses )
 	{
 		ResponseGroup &group = m_Responses[i];
 
-		for ( int j = 0; j < group.group.Count(); j++)
+		for ( auto &response : group.group )
 		{
-			Response &response = group.group[j];
 			if ( response.type != RESPONSE_RESPONSE )
 			{
 				AI_Response *pResponse = new AI_Response;
@@ -1825,10 +1806,8 @@ void CResponseSystem::Precache()
 	{
 		ResponseGroup &group = m_Responses[i];
 
-		for ( int j = 0; j < group.group.Count(); j++)
+		for ( auto &response : group.group )
 		{
-			Response &response = group.group[j];
-
 			switch ( response.type )
 			{
 			default:
@@ -1837,7 +1816,7 @@ void CResponseSystem::Precache()
 				{
 					// fixup $gender references
 					char file[_MAX_PATH];
-					Q_strncpy( file, response.value, sizeof(file) );
+					V_strcpy_safe( file, response.value );
 					char *gender = strstr( file, "$gender" );
 					if ( gender )
 					{
@@ -1846,7 +1825,7 @@ void CResponseSystem::Precache()
 						*gender = 0;
 						char genderFile[_MAX_PATH];
 						// male
-						Q_snprintf( genderFile, sizeof(genderFile), "%smale%s", file, postGender);
+						V_sprintf_safe( genderFile, "%smale%s", file, postGender);
 
 						PrecacheInstancedScene( genderFile );
 						if ( bTouchFiles )
@@ -1854,7 +1833,7 @@ void CResponseSystem::Precache()
 							TouchFile( genderFile );
 						}
 
-						Q_snprintf( genderFile, sizeof(genderFile), "%sfemale%s", file, postGender);
+						V_sprintf_safe( genderFile, "%sfemale%s", file, postGender);
 
 						PrecacheInstancedScene( genderFile );
 						if ( bTouchFiles )
@@ -1886,7 +1865,7 @@ void CResponseSystem::ParseInclude( CStringPool &includedFiles )
 {
 	char includefile[ 256 ];
 	ParseToken();
-	Q_snprintf( includefile, sizeof( includefile ), "scripts/%s", token );
+	V_sprintf_safe( includefile, "scripts/%s", token );
 
 	// check if the file is already included
 	if ( includedFiles.Find( includefile ) != NULL )
@@ -1909,7 +1888,8 @@ void CResponseSystem::ParseInclude( CStringPool &includedFiles )
 
 void CResponseSystem::LoadFromBuffer( const char *scriptfile, const char *buffer, CStringPool &includedFiles )
 {
-	includedFiles.Allocate( scriptfile );
+	// dimhotepus: Assign allocation result to script file.
+	scriptfile = includedFiles.Allocate( scriptfile );
 	PushScript( scriptfile, (unsigned char * )buffer );
 
 	if( rr_dumpresponses.GetBool() )
@@ -1948,9 +1928,9 @@ void CResponseSystem::LoadFromBuffer( const char *scriptfile, const char *buffer
 		}
 		else
 		{
-			int byteoffset = m_ScriptStack[ 0 ].currenttoken - (const char *)m_ScriptStack[ 0 ].buffer;
+			intp byteoffset = m_ScriptStack[ 0 ].currenttoken - (const char *)m_ScriptStack[ 0 ].buffer;
 
-			Error( "CResponseSystem::LoadFromBuffer:  Unknown entry type '%s', expecting 'response', 'criterion', 'enumeration' or 'rules' in file %s(offset:%i)\n", 
+			Error( "CResponseSystem::LoadFromBuffer:  Unknown entry type '%s', expecting 'response', 'criterion', 'enumeration' or 'rules' in file %s(offset:%zd)\n", 
 				token, scriptfile, byteoffset );
 			break;
 		}
@@ -2042,7 +2022,8 @@ void CResponseSystem::ParseOneResponse( const char *responseGroupName, ResponseG
 		if ( !Q_stricmp( token, "weight" ) )
 		{
 			ParseToken();
-			newResponse.weight.SetFloat( (float)atof( token ) );
+			// dimhotepus: atof -> strtof
+			newResponse.weight.SetFloat( strtof( token, nullptr ) );
 			continue;
 		}
 
@@ -2480,7 +2461,7 @@ void CResponseSystem::ParseEnumeration( void )
 //-----------------------------------------------------------------------------
 void CResponseSystem::ParseRule( void )
 {
-	static int instancedCriteria = 0;
+	static intp instancedCriteria = 0;
 
 	char ruleName[ 128 ];
 	ParseToken();
@@ -2585,7 +2566,7 @@ void CResponseSystem::ParseRule( void )
 		}
 
 		// It's an inline criteria, generate a name and parse it in
-		Q_snprintf( sz, sizeof( sz ), "[%s%03i]", ruleName, ++instancedCriteria );
+		V_sprintf_safe( sz, "[%s%03zi]", ruleName, ++instancedCriteria );
 		Unget();
 		short idx = ParseOneCriterion( sz );
 		if ( idx != m_Criteria.InvalidIndex() )
@@ -2616,7 +2597,7 @@ int	CResponseSystem::GetCurrentToken() const
 }
 
 
-void CResponseSystem::ResponseWarning( const char *fmt, ... )
+void CResponseSystem::ResponseWarning( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	va_list		argptr;
 #ifndef _XBOX
@@ -2626,7 +2607,7 @@ void CResponseSystem::ResponseWarning( const char *fmt, ... )
 #endif	
 
 	va_start (argptr, fmt);
-	Q_vsnprintf(string, sizeof(string), fmt,argptr);
+	V_vsprintf_safe(string, fmt,argptr);
 	va_end (argptr);
 
 	char cur[ 256 ];
@@ -3115,7 +3096,7 @@ public:
 			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
 				char groupname[ 256 ];
-				pRestore->ReadString( groupname, sizeof( groupname ), 0 );
+				pRestore->ReadString( groupname, 0 );
 
 				// Try and find it
 				auto idx = rs.m_Responses.Find( groupname );
@@ -3135,7 +3116,7 @@ public:
 						pRestore->StartBlock( szResponseBlockName );
 						if ( !Q_stricmp( szResponseBlockName, "Response" ) )
 						{
-							pRestore->ReadString( responsename, sizeof( responsename ), 0 );
+							pRestore->ReadString( responsename, 0 );
 
 							// Find it by name
 							intp ri;
@@ -3236,7 +3217,7 @@ public:
 			if ( !Q_stricmp( szResponseGroupBlockName, "ResponseGroup" ) )
 			{
 				char groupname[ 256 ];
-				pRestore->ReadString( groupname, sizeof( groupname ), 0 );
+				pRestore->ReadString( groupname, 0 );
 
 				// Try and find it
 				auto idx = pRS->m_Responses.Find( groupname );
@@ -3256,7 +3237,7 @@ public:
 						pRestore->StartBlock( szResponseBlockName );
 						if ( !Q_stricmp( szResponseBlockName, "Response" ) )
 						{
-							pRestore->ReadString( responsename, sizeof( responsename ), 0 );
+							pRestore->ReadString( responsename, 0 );
 
 							// Find it by name
 							intp ri;

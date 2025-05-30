@@ -998,7 +998,7 @@ void CNPC_BaseZombie::MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize )
 	{
 		// Don't set this up until the code calls for it.
 		const char *pszSound = GetMoanSound( m_iMoanSound );
-		m_flMoanPitch = random->RandomInt( zombie_basemin.GetInt(), zombie_basemax.GetInt() );
+		m_flMoanPitch = random->RandomFloat( zombie_basemin.GetInt(), zombie_basemax.GetInt() );
 
 		//m_pMoanSound = ENVELOPE_CONTROLLER.SoundCreate( entindex(), CHAN_STATIC, pszSound, ATTN_NORM );
 		CPASAttenuationFilter filter( this );
@@ -1467,21 +1467,21 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ZOMBIE_STEP_LEFT )
 	{
-		MakeAIFootstepSound( 180.0f );
+		MakeAIFootstepSound( 180 );
 		FootstepSound( false );
 		return;
 	}
 	
 	if ( pEvent->event == AE_ZOMBIE_STEP_RIGHT )
 	{
-		MakeAIFootstepSound( 180.0f );
+		MakeAIFootstepSound( 180 );
 		FootstepSound( true );
 		return;
 	}
 
 	if ( pEvent->event == AE_ZOMBIE_GET_UP )
 	{
-		MakeAIFootstepSound( 180.0f, 3.0f );
+		MakeAIFootstepSound( 180, 3.0f );
 		if( !IsOnFire() )
 		{
 			// If you let this code run while a zombie is burning, it will stop wailing. 
@@ -1493,14 +1493,14 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 
 	if ( pEvent->event == AE_ZOMBIE_SCUFF_LEFT )
 	{
-		MakeAIFootstepSound( 180.0f );
+		MakeAIFootstepSound( 180 );
 		FootscuffSound( false );
 		return;
 	}
 
 	if ( pEvent->event == AE_ZOMBIE_SCUFF_RIGHT )
 	{
-		MakeAIFootstepSound( 180.0f );
+		MakeAIFootstepSound( 180 );
 		FootscuffSound( true );
 		return;
 	}
@@ -1508,7 +1508,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 	// all swat animations are handled as a single case.
 	if ( pEvent->event == AE_ZOMBIE_STARTSWAT )
 	{
-		MakeAIFootstepSound( 180.0f );
+		MakeAIFootstepSound( 180 );
 		AttackSound();
 		return;
 	}
@@ -1602,7 +1602,7 @@ void CNPC_BaseZombie::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ZOMBIE_ATTACK_BOTH )
 	{
 		Vector forward;
-		QAngle qaPunch( 45, random->RandomInt(-5,5), random->RandomInt(-5,5) );
+		QAngle qaPunch( 45, random->RandomFloat(-5,5), random->RandomFloat(-5,5) );
 		AngleVectors( GetLocalAngles(), &forward );
 		forward = forward * 200;
 		ClawAttack( GetClawAttackRange(), sk_zombie_dmg_one_slash.GetFloat(), qaPunch, forward, ZOMBIE_BLOOD_BOTH_HANDS );

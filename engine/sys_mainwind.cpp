@@ -21,8 +21,10 @@
 #include <imm.h>
 // dimhotepus: Disable accessibility keys (ex. five times Shift).
 #include "accessibility_shortcut_keys_toggler.h"
+#ifndef _DEBUG
 // dimhotepus: Disable Win key.
 #include "windows_shortcut_keys_toggler.h"
+#endif
 // dimhotepus: Notify when system suspend / resume. Save game when suspend.
 #include "scoped_power_suspend_resume_notifications_registrator.h"
 // dimhotepus: Notify when system power settings changed (battery, AC, power plan, etc.).
@@ -171,7 +173,8 @@ public:
 	void	DispatchInputEvent( const InputEvent_t &event );
 
 	// Dispatch all the queued up messages.
-	virtual void	DispatchAllStoredGameMessages();
+	void	DispatchAllStoredGameMessages() override;
+
 private:
 	void			AppActivate( bool fActive );
 	void			PlayVideoAndWait( const char *filename, bool bNeedHealthWarning = false); // plays a video file and waits till it's done to return. Can be interrupted by user.
@@ -209,16 +212,20 @@ private:
 	bool			m_bCanPostActivateEvents;
 	int				m_iDesktopWidth, m_iDesktopHeight, m_iDesktopRefreshRate;
 
-#if defined( IS_WINDOWS_PC )
+#ifdef IS_WINDOWS_PC
+#ifndef _DEBUG
 	// dimhotepus: Disable Win key.
+	// Only in Release builds as it slowdowns IDE typing a lot in debugging sessions.
+	// See https://github.com/Source-Authors/Obsoletium/issues/124
 	source::engine::win::WindowsShortcutKeysToggler m_windowsShortcutKeysToggler;
+#endif
 	// dimhotepus: Disable accessibility keys (ex. five times Shift).
 	source::engine::win::AccessibilityShortcutKeysToggler m_accessibilityShortcutKeysToggler;
 	// dimhotepus: Notify when system suspend / resume.
 	std::unique_ptr<source::engine::win::ScopedPowerSuspendResumeNotificationsRegistrator> m_powerSuspendResumeRegistrator;
 	// dimhotepus: Notify when active session display on / offs changed.
 	std::unique_ptr<source::engine::win::ScopedPowerSettingNotificationsRegistrator> m_sessionDisplayStatusChangedNotificationsRegistrator;
-#endif
+#endif  // IS_WINDOWS_PC
 
 	void			UpdateDesktopInformation();
 #ifdef WIN32
@@ -410,8 +417,9 @@ void VCR_EnterPausedState()
 		if ( GetAsyncKeyState( 'R' ) & 0x8000 )
 			break;
 
+		// dimhotepus: Run destructors, 1 -> 0.
 		if ( GetAsyncKeyState( 'Q' ) & 0x8000 )
-			TerminateProcess( GetCurrentProcess(), 1 );
+			exit( 0 );
 
 		if ( GetAsyncKeyState( 'S' ) & 0x8000 )
 		{
@@ -460,7 +468,8 @@ void VCR_HandlePlaybackMessages(
 
 			if ( upper == 'Q' )
 			{
-				TerminateProcess( GetCurrentProcess(), 1 );
+				// dimhotepus: Run destructors, 1 -> 0
+				exit( 0 );
 			}
 			else if ( upper == 'P' )
 			{
@@ -894,7 +903,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			rcWindow.right = rcWindow.left + m_rcLastRestoredClientRect.right;
 			rcWindow.bottom = rcWindow.top + m_rcLastRestoredClientRect.bottom;
 
-			::AdjustWindowRectEx( &rcWindow, ::GetWindowLong( hWnd, GWL_STYLE ), FALSE, ::GetWindowLong( hWnd, GWL_EXSTYLE ) );
+			::AdjustWindowRectEx( &rcWindow, ::GetWindowLong( hWnd, GWL_STYLE ), FALSE, ::GetWindowLong( hWnd, GWL_EXSTYLE ) ); //-V303 //-V2002
 			::MoveWindow( hWnd, rcWindow.left, rcWindow.top,
 				rcWindow.right - rcWindow.left, rcWindow.bottom - rcWindow.top, FALSE );
 		}
@@ -990,7 +999,7 @@ bool CGame::CreateGameWindow( void )
 	char utf8_window_name[256];
 	utf8_window_name[0] = '\0';
 
-	if ( auto modinfo = KeyValues::AutoDelete("ModInfo");
+	if ( KeyValuesAD modinfo("ModInfo");
 		 modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt") )
 	{
 		V_strncpy( utf8_window_name, modinfo->GetString("game"), sizeof(utf8_window_name) );
@@ -1002,26 +1011,31 @@ bool CGame::CreateGameWindow( void )
 		V_strncpy( utf8_window_name, "N/A", sizeof(utf8_window_name) );
 	}
 
-#ifdef PLATFORM_64BITS
-	V_strcat( utf8_window_name, " - 64 bit", sizeof( utf8_window_name ) );
-#endif
-
 	if ( IsOpenGL() )
 	{
-		V_strcat( utf8_window_name, " - OpenGL", sizeof( utf8_window_name ) );
+		V_strcat_safe( utf8_window_name, " - OpenGL" );
+	}
+	else
+	{
+		// dimhotepus: Match steam_legacy branch behavior.
+		V_strcat_safe( utf8_window_name, " - Direct3D 9" );
 	}
 
 #if PIX_ENABLE || defined( PIX_INSTRUMENTATION )
 	// PIX_ENABLE/PIX_INSTRUMENTATION is a big slowdown (that should never be
 	// checked in, but sometimes is by accident), so add this to the Window title too.
-	V_strcat( windowName, " - PIX_ENABLE", sizeof( windowName ) );
+	V_strcat_safe( windowName, " - PIX_ENABLE" );
+#endif
+
+#ifdef PLATFORM_64BITS
+	V_strcat_safe( utf8_window_name, " - 64 bit" );
 #endif
 
 	if ( const char *p = CommandLine()->ParmValue( "-window_name_suffix", "" );
 		 p && !Q_isempty( p ) )
 	{
-		V_strcat( utf8_window_name, " - ", sizeof( utf8_window_name ) );
-		V_strcat( utf8_window_name, p, sizeof( utf8_window_name ) );
+		V_strcat_safe( utf8_window_name, " - " );
+		V_strcat_safe( utf8_window_name, p );
 	}
 
 #if defined( WIN32 ) && !defined( USE_SDL )
@@ -1034,7 +1048,7 @@ bool CGame::CreateGameWindow( void )
 
 	// find the icon file in the filesystem
 	if ( char localPath[ MAX_PATH ];
-		 g_pFileSystem->GetLocalPath( "resource/game.ico", localPath, sizeof(localPath) ) )
+		 g_pFileSystem->GetLocalPath_safe( "resource/game.ico", localPath ) )
 	{
 		g_pFileSystem->GetLocalCopy( localPath );
 
@@ -1046,8 +1060,7 @@ bool CGame::CreateGameWindow( void )
 	}
 
 	wchar_t utf16_window_name[512];
-	V_strtowcs( utf8_window_name, std::size(utf8_window_name),
-		utf16_window_name, sizeof(utf16_window_name) );
+	V_strtowcs( utf8_window_name, std::size(utf8_window_name), utf16_window_name );
 
 	if ( WNDCLASSW ewc; GetClassInfoW( m_hInstance, CLASSNAME, &ewc ) )
 	{
@@ -1117,9 +1130,6 @@ bool CGame::CreateGameWindow( void )
 #elif defined( USE_SDL )
 	bool windowed = videomode->IsWindowedMode();
 
-	modinfo->deleteThis();
-	modinfo = NULL;
-
 	if ( !g_pLauncherMgr->CreateGameWindow( windowName, windowed, 0, 0 ) )
 	{
 		Error( "Fatal Error:  Unable to create game window!" );
@@ -1127,7 +1137,7 @@ bool CGame::CreateGameWindow( void )
 	}
 	
 	char localPath[ MAX_PATH ];
-	if ( g_pFileSystem->GetLocalPath( "resource/game-icon.bmp", localPath, sizeof(localPath) ) )
+	if ( g_pFileSystem->GetLocalPath_safe( "resource/game-icon.bmp", localPath ) )
 	{
 		g_pFileSystem->GetLocalCopy( localPath );
 		g_pLauncherMgr->SetApplicationIcon( localPath );
@@ -1485,8 +1495,7 @@ void CGame::PlayStartupVideos( void )
 
 		// get the path to the media file and play it.
 		char localPath[MAX_PATH];
-
- 		g_pFileSystem->GetLocalPath( com_token, localPath, sizeof(localPath) );
+ 		g_pFileSystem->GetLocalPath_safe( com_token, localPath );
  		
 		PlayVideoAndWait( localPath, bNeedHealthWarning );
 		localPath[0] = 0; // just to make sure we don't play the same avi file twice in the case that one movie is there but another isn't.
@@ -1579,11 +1588,11 @@ bool ShouldEnableWindowsShortcutKeys() noexcept
 //-----------------------------------------------------------------------------
 CGame::CGame()
 	// dimhotepus: Disable Win key.
-#if defined( IS_WINDOWS_PC )
+#if !defined(_DEBUG) && defined(IS_WINDOWS_PC)
 	: m_windowsShortcutKeysToggler{ ::GetModuleHandleW( L"engine.dll" ), ShouldEnableWindowsShortcutKeys }
 #endif
 {
-#if defined(IS_WINDOWS_PC)
+#if !defined(_DEBUG) && defined(IS_WINDOWS_PC)
 	// dimhotepus: Disable Win key.
 	if ( m_windowsShortcutKeysToggler.errno_code() )
 	{
@@ -1591,6 +1600,8 @@ CGame::CGame()
 		Warning("Can't disable Windows keys for full screen mode: %s\n", lastErrorText.c_str() );
 	}
 #endif
+
+	m_bExternallySuppliedWindow = false;
 
 #if defined( USE_SDL )
 	m_pSDLWindow = 0;
@@ -1612,6 +1623,8 @@ CGame::CGame()
 	m_iDesktopWidth = 0;
 	m_iDesktopHeight = 0;
 	m_iDesktopRefreshRate = 0;
+	m_rcLastRestoredClientRect.left = m_rcLastRestoredClientRect.right =
+	m_rcLastRestoredClientRect.top = m_rcLastRestoredClientRect.bottom = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1666,6 +1679,7 @@ void *CGame::GetMainWindowPlatformSpecificHandle( void )
 #ifdef WIN32
 	return (void*)m_hWindow;
 #else
+#ifdef OSX
 	SDL_SysWMinfo pInfo;
 	SDL_VERSION( &pInfo.version );
 	if ( !SDL_GetWindowWMInfo( (SDL_Window*)m_pSDLWindow, &pInfo ) )
@@ -1674,7 +1688,6 @@ void *CGame::GetMainWindowPlatformSpecificHandle( void )
 		return NULL;
 	}
 
-#ifdef OSX
 	id nsWindow = (id)pInfo.info.cocoa.window;
 	SEL selector = sel_registerName("windowRef");
 	id windowRef = objc_msgSend( nsWindow, selector );

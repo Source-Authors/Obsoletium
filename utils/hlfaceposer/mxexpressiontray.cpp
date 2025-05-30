@@ -4,12 +4,10 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include "hlfaceposer.h"
-#include <windows.h>
-#include <stdio.h>
-#include <mxtk/mxWindow.h>
-#include <mxtk/mxScrollBar.h>
 #include "mxexpressiontray.h"
+#include "hlfaceposer.h"
+#include <mxtk/mxwindow.h>
+#include <mxtk/mxScrollBar.h>
 #include "expressions.h"
 #include "expclass.h"
 #include "ControlPanel.h"
@@ -132,9 +130,9 @@ void mxExpressionTray::Deselect( void )
 // Purpose: 
 // Input  : exp - 
 //-----------------------------------------------------------------------------
-void mxExpressionTray::Select( int exp, bool deselect /*=true*/ )
+void mxExpressionTray::Select( intp exp, bool deselect /*=true*/ )
 {
-	int oldcell = m_nCurCell;
+	intp oldcell = m_nCurCell;
 
 	if ( deselect )
 	{
@@ -149,10 +147,10 @@ void mxExpressionTray::Select( int exp, bool deselect /*=true*/ )
 		CExpClass *active = expressions->GetActiveClass();
 		if ( active )
 		{
-			CExpression *exp = active->GetExpression( m_nCurCell );
-			if ( exp )
+			CExpression *expr = active->GetExpression( m_nCurCell );
+			if ( expr )
 			{
-				exp->SetSelected( true );
+				expr->SetSelected( true );
 			}
 		}
 	}
@@ -168,8 +166,8 @@ void mxExpressionTray::AddButton( const char *name, const char *tooltip, const c
 	bool active, int x, int y, int w, int h )
 {
 	mxETButton *btn = new mxETButton;
-	strcpy( btn->m_szName, name );
-	strcpy( btn->m_szToolTip, tooltip );
+	V_strcpy_safe( btn->m_szName, name );
+	V_strcpy_safe( btn->m_szToolTip, tooltip );
 	btn->m_bActive = active;
 	btn->m_rc.left = x;
 	btn->m_rc.top = y;
@@ -569,7 +567,7 @@ void mxExpressionTray::redraw()
 
 		// Arial 36 normal
 		char sz[ 256 ];
-		sprintf( sz, "No expression file loaded" );
+		V_sprintf_safe( sz, "No expression file loaded" );
 
 		int pointsize = 18;
 
@@ -767,7 +765,7 @@ int mxExpressionTray::handleEvent (mxEvent *event)
 				break;
 			case IDC_EXPRESSIONCLASS:
 				{
-					int index = g_pExpressionClass->getSelectedIndex();
+					intp index = g_pExpressionClass->getSelectedIndex();
 					if ( index >= 0 )
 					{
 						CExpClass *current = expressions->GetClass( index );
@@ -1149,9 +1147,9 @@ void mxExpressionTray::RestoreThumbnailSize( void )
 void mxExpressionTray::ReloadBitmaps( void )
 {
 	CExpClass *cl;
-	int c = expressions->GetNumClasses();
+	intp c = expressions->GetNumClasses();
 	EnableStickySnapshotMode();
-	for ( int i = 0 ; i < c; i++ )
+	for ( intp i = 0 ; i < c; i++ )
 	{
 		cl = expressions->GetClass( i );
 		if ( !cl )
@@ -1174,7 +1172,7 @@ bool IsUsingPerPlayerExpressions()
 	{
 		// Returns the search path, each path is separated by ;s. Returns the length of the string returned
 		char pSearchPath[2048];
-		if ( g_pFullFileSystem->GetSearchPath( "GAME", false, pSearchPath, sizeof(pSearchPath) ) )
+		if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, pSearchPath ) )
 		{
 			Q_FixSlashes( pSearchPath );
 			if ( Q_stristr( pSearchPath, "\\tf" ) )

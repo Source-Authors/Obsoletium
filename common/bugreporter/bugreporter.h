@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include "interface.h"
+#include "tier1/interface.h"
 
 abstract_class IBugReporter : public IBaseInterface
 {
@@ -24,38 +24,38 @@ public:
 	virtual char const	*GetUserName() = 0;
 	virtual char const	*GetUserName_Display() = 0;
 
-	virtual ptrdiff_t			GetNameCount() = 0;
-	virtual char const	*GetName( ptrdiff_t index ) = 0;
+	virtual intp			GetNameCount() = 0;
+	virtual char const	*GetName( intp index ) = 0;
 
-	virtual ptrdiff_t			GetDisplayNameCount() = 0;
-	virtual char const  *GetDisplayName( ptrdiff_t index ) = 0;
+	virtual intp			GetDisplayNameCount() = 0;
+	virtual char const  *GetDisplayName( intp index ) = 0;
 
 	virtual char const	*GetDisplayNameForUserName( char const *username ) = 0;
 	virtual char const  *GetUserNameForDisplayName( char const *display ) = 0;
 
-	virtual ptrdiff_t			GetSeverityCount() = 0;
-	virtual char const	*GetSeverity( ptrdiff_t index ) = 0;
+	virtual intp			GetSeverityCount() = 0;
+	virtual char const	*GetSeverity( intp index ) = 0;
 
-	virtual ptrdiff_t			GetPriorityCount() = 0;
-	virtual char const	*GetPriority( ptrdiff_t index ) = 0;
+	virtual intp			GetPriorityCount() = 0;
+	virtual char const	*GetPriority( intp index ) = 0;
 
-	virtual ptrdiff_t			GetAreaCount() = 0;
-	virtual char const	*GetArea( ptrdiff_t index ) = 0;
+	virtual intp			GetAreaCount() = 0;
+	virtual char const	*GetArea( intp index ) = 0;
 
-	virtual ptrdiff_t			GetAreaMapCount() = 0;
-	virtual char const	*GetAreaMap( ptrdiff_t index ) = 0;
+	virtual intp			GetAreaMapCount() = 0;
+	virtual char const	*GetAreaMap( intp index ) = 0;
 
-	virtual ptrdiff_t			GetMapNumberCount() = 0;
-	virtual char const	*GetMapNumber( ptrdiff_t index ) = 0;
+	virtual intp			GetMapNumberCount() = 0;
+	virtual char const	*GetMapNumber( intp index ) = 0;
 
-	virtual ptrdiff_t			GetReportTypeCount() = 0;
-	virtual char const	*GetReportType( ptrdiff_t index ) = 0;
+	virtual intp			GetReportTypeCount() = 0;
+	virtual char const	*GetReportType( intp index ) = 0;
 
 	virtual char const *GetRepositoryURL( void ) = 0;
 	virtual char const *GetSubmissionURL( void ) = 0;
 
-	virtual ptrdiff_t			GetLevelCount(ptrdiff_t area) = 0;
-	virtual char const	*GetLevel(ptrdiff_t area, ptrdiff_t index ) = 0;
+	virtual intp			GetLevelCount(intp area) = 0;
+	virtual char const	*GetLevel(intp area, intp index ) = 0;
 
 // Submission API
 	virtual void		StartNewBugReport() = 0;

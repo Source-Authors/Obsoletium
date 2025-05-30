@@ -11,8 +11,8 @@
 #endif
 
 
-const float PIXELVIS_DEFAULT_PROXY_SIZE = 2.0f;
-const float PIXELVIS_DEFAULT_FADE_TIME = 0.0625f;
+constexpr inline float PIXELVIS_DEFAULT_PROXY_SIZE = 2.0f;
+constexpr inline float PIXELVIS_DEFAULT_FADE_TIME = 0.0625f;
 
 typedef int pixelvis_handle_t;
 struct pixelvis_queryparams_t

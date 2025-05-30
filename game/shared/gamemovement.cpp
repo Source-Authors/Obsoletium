@@ -429,7 +429,7 @@ void DiffPrint( bool bServer, int nCommandNumber, char const *fmt, ... )
 	va_list		argptr;
 	char		string[1024];
 	va_start (argptr,fmt);
-	int len = Q_vsnprintf(string, sizeof( string ), fmt,argptr);
+	int len = V_vsprintf_safe(string, fmt, argptr);
 	va_end (argptr);
 
 	if ( g_pDiffMgr )
@@ -490,7 +490,7 @@ void CGameMovement::DiffPrint( char const *fmt, ... )
 	va_list		argptr;
 	char		string[1024];
 	va_start (argptr,fmt);
-	Q_vsnprintf(string, sizeof( string ), fmt,argptr);
+	V_vsprintf_safe(string, fmt, argptr);
 	va_end (argptr);
 
 	::DiffPrint( CBaseEntity::IsServer(), player->CurrentCommandNumber(), "%s", string );

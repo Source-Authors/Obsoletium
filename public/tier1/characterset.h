@@ -33,7 +33,7 @@ extern void CharacterSetBuild( characterset_t *pSetBuffer, const char *pSetStrin
 //			character - character to lookup
 // Output : int - 1 if the character was in the set
 //-----------------------------------------------------------------------------
-constexpr inline int IN_CHARACTERSET( const characterset_t& SetBuffer, int character )
+[[nodiscard]] constexpr inline int IN_CHARACTERSET( const characterset_t& SetBuffer, int character )
 {
   return SetBuffer.set[static_cast<unsigned char>(character)];
 }

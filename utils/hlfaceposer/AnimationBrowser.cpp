@@ -4,7 +4,6 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <windows.h>
 #include "AnimationBrowser.h"
 #include "hlfaceposer.h"
 #include "ChoreoView.h"
@@ -14,10 +13,11 @@
 #include "faceposer_models.h"
 #include "tabwindow.h"
 #include "inputproperties.h"
-#include "KeyValues.h"
 #include "filesystem.h"
 #include "tier1/KeyValues.h"
 #include "tier1/UtlBuffer.h"
+
+#include "winlite.h"
 
 #define MAX_THUMBNAILSIZE 256
 #define MIN_THUMBNAILSIZE 64
@@ -56,7 +56,7 @@ void CCustomAnim::SaveToFile()
 	if ( !filesystem->String( m_Handle, fn, sizeof( fn ) ) )
 		return;
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 	buf.Printf( "\"%s\"\n", m_ShortName.String() );
 	buf.Printf( "{\n" );
@@ -357,7 +357,7 @@ void AnimationBrowser::DrawSequenceDescription( CChoreoWidgetDrawHelper& helper,
 	OffsetRect( &textRect, 0, textheight - 4 );
 	
 	helper.DrawColoredText( "Arial", 9, FW_NORMAL, RGB( 50, 200, 255 ), textRect, "fps %.2f", 
-		(float)mdl->GetFPS( sequence ) );
+		mdl->GetFPS( sequence ) );
 
 }
 
@@ -956,7 +956,7 @@ void AnimationBrowser::Think( float dt )
 		float dur = model->GetDuration( iSequence );
 		if ( dur > 0.0f )
 		{
-			float elapsed = (float)realtime - m_flDragTime;
+			float elapsed = realtime - m_flDragTime;
 
 			float flFrameRate = 0.0f;
 			float flGroundSpeed = 0.0f;
@@ -1076,7 +1076,7 @@ bool AnimationBrowser::SequencePassesFilter( StudioModel *model, int sequence, m
 	default:
 		{
 
-			int offset = m_nCurFilter - FILTER_FIRST_CUSTOM;
+			intp offset = m_nCurFilter - FILTER_FIRST_CUSTOM;
 			if ( offset >= 0 && offset < m_CustomAnimationTabs.Count() )
 			{
 				// Find the name
@@ -1231,7 +1231,7 @@ void AnimationBrowser::BuildCustomFromFiles( CUtlVector< FileNameHandle_t >& fil
 		Q_strlower( fn );
 
 		char basename[ 128 ];
-		Q_FileBase( fn, basename, sizeof( basename ) );
+		Q_FileBase( fn, basename );
 
 		CCustomAnim *anim = new CCustomAnim( files[ i ] );
 		anim->m_ShortName = basename;
@@ -1290,7 +1290,7 @@ void AnimationBrowser::RenameCustomFile( int index )
 	anim->m_ShortName = params.m_szInputText;
 	
 	char basename[ 128 ];
-	Q_StripExtension( hdr->pszName(), basename, sizeof( basename ) );
+	Q_StripExtension( hdr->pszName(), basename );
 	Q_snprintf( fn, sizeof( fn ), "expressions/%s/animation/%s.txt", basename, params.m_szInputText );
 	Q_FixSlashes( fn );
 	Q_strlower( fn );
@@ -1311,7 +1311,7 @@ void AnimationBrowser::AddCustomFile( const FileNameHandle_t& handle )
 	Q_FixSlashes( fn );
 	Q_strlower( fn );
 	char basename[ 128 ];
-	Q_FileBase( fn, basename, sizeof( basename ) );
+	Q_FileBase( fn, basename );
 
 	CCustomAnim *anim = new CCustomAnim( handle );
 	anim->m_ShortName = basename;
@@ -1374,8 +1374,8 @@ void AnimationBrowser::OnModelChanged()
 		{
 			char subdir[ 512 ];
 			char basename[ 512 ];
-			Q_StripExtension( hdr->pszName(), basename, sizeof( basename ) );
-			Q_snprintf( subdir, sizeof( subdir ), "expressions/%s/animation", basename );
+			Q_StripExtension( hdr->pszName(), basename );
+			V_sprintf_safe( subdir, "expressions/%s/animation", basename );
 			Q_FixSlashes( subdir );
 			Q_strlower( subdir );
 			FindCustomFiles( subdir, files );
@@ -1425,8 +1425,8 @@ void AnimationBrowser::OnModelChanged()
 	// Create it
 	char fn[ 512 ];
 	char basename[ 512 ];
-	Q_StripExtension( hdr->pszName(), basename, sizeof( basename ) );
-	Q_snprintf( fn, sizeof( fn ), "expressions/%s/animation/%s.txt", basename, params.m_szInputText );
+	Q_StripExtension( hdr->pszName(), basename );
+	V_sprintf_safe( fn, "expressions/%s/animation/%s.txt", basename, params.m_szInputText );
 	Q_FixSlashes( fn );
 	Q_strlower( fn );
 	CreatePath( fn );

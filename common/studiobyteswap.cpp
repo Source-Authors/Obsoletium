@@ -562,7 +562,7 @@ intp ByteswapPHY( void *pDestBase, const void *pSrcBase, intp fileSize )
 	{
 		// skip over the size
 		pDest += sizeof(int);
-		int offset = pCollision->CollideWrite( (char*)pDest, collide.solids[i], g_bNativeSrc );
+		size_t offset = pCollision->CollideWrite( (char*)pDest, collide.solids[i], g_bNativeSrc );
 		int destSize = g_bNativeSrc ? SwapLong( offset ) : offset;
 		Q_memcpy( pDest - sizeof(int), &destSize, sizeof(int) );
 		pDest += offset;
@@ -1418,7 +1418,8 @@ intp ByteswapMDLFile( void *pDestBase, void *pSrcBase, const intp fileSize )
 			if ( pAnimDesc->ikruleindex )
 			{
 				SET_INDEX_POINTERS_FIXUP( pData, pAnimDesc, ikruleindex )
-				DECLARE_OBJECT_POINTERS( pIKRule, pData, mstudioikrule_t )
+				// dimhotepus: Comment unsued varaibles
+				// DECLARE_OBJECT_POINTERS( pIKRule, pData, mstudioikrule_t )
 				
 				int numframes = SrcNative( &pAnimDesc->numframes );
 				ByteswapIKRules( pHdrSrc, pAnimDesc->numikrules, numframes, pDataSrc, pDataDest, fixedFileSize, fileSize );

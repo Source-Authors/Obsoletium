@@ -20,6 +20,9 @@ $Macro SNAPPYOUTDIRRELEASE		"$SNAPPYSRCDIR\out\Release"
 $Macro ZLIBSRCDIR		"$SRCDIR\thirdparty\zlib"
 $Macro ZLIBSRC2DIR		"$ZLIBSRCDIR\out"
 $Macro ZLIBOUTDIR		"$ZLIBSRCDIR\out\Release"
+$Macro ZIPUTILSSRCDIR		"$SRCDIR\thirdparty\zip-utils"
+$Macro ZIPUTILSOUTDIRDEBUG		"$ZIPUTILSSRCDIR\out\Debug"
+$Macro ZIPUTILSOUTDIRRELEASE		"$ZIPUTILSSRCDIR\out\Release"
 
 $Macro MPAHEADERINFOOUTDIRDEBUG	"$SRCDIR\thirdparty\mpaheaderinfo\out\Debug"
 $Macro MPAHEADERINFOOUTDIRRELEASE	"$SRCDIR\thirdparty\mpaheaderinfo\out\Release"
@@ -38,10 +41,11 @@ $Configuration	"Debug"
 		$AdditionalIncludeDirectories	"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
 		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include"	[$SDL]
 		$AdditionalIncludeDirectories	"$BASE;$SNAPPYSRCDIR;$SNAPPYSRC2DIR"
+		$AdditionalIncludeDirectories	"$BASE;$ZIPUTILSSRCDIR"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
 		$PreprocessorDefinitions		"$BASE;SUPPORTS_INT64" [$WIN64]
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
-		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
+		$PreprocessorDefinitions		"$BASE;SA_MPA_BUILD_WITHOUT_ATL"
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
 
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/gperftools-2.0/src/" [$GPROFILER]
@@ -54,9 +58,9 @@ $Configuration	"Debug"
 
 	$Linker
 	{
-		$AdditionalLibraryDirectories		"$BASE;$SNAPPYOUTDIRDEBUG;$MPAHEADERINFOOUTDIRDEBUG;"
+		$AdditionalLibraryDirectories		"$BASE;$SNAPPYOUTDIRDEBUG;$MPAHEADERINFOOUTDIRDEBUG;$ZIPUTILSOUTDIRDEBUG"
 		
-		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib comsuppw.lib snappy.lib" [$WINDOWS]
+		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib comsuppw.lib snappy.lib zip-utils.lib" [$WINDOWS]
 		$AdditionalDependencies			"$BASE mpaheaderinfo.lib" [$WINDOWS&&!$DEDICATED]
 		$SystemFrameworks				"Carbon;AppKit;OpenAL;CoreAudio;AudioToolbox;SystemConfiguration;Quicktime;AudioUnit" [$OSXALL]
 		$SystemLibraries				"iconv" [$OSXALL]
@@ -84,10 +88,11 @@ $Configuration	"Release"
 		$AdditionalIncludeDirectories	"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
 		$AdditionalIncludeDirectories	"$BASE;$SDL3SRCDIR;$SDL3SRCDIR\include"	[$SDL]
 		$AdditionalIncludeDirectories	"$BASE;$SNAPPYSRCDIR;$SNAPPYSRC2DIR"
+		$AdditionalIncludeDirectories	"$BASE;$ZIPUTILSSRCDIR"
 		$PreprocessorDefinitions		"$BASE;USE_CONVARS;VOICE_OVER_IP;BUMPMAP;__USEA3D;_ADD_EAX_;ENGINE_DLL;VERSION_SAFE_STEAM_API_INTERFACES;USE_BREAKPAD_HANDLER"
 		$PreprocessorDefinitions		"$BASE;SUPPORTS_INT64" [$WIN64]
 		$PreprocessorDefinitions		"$BASE;DEDICATED;SWDS" [$DEDICATED]
-		$PreprocessorDefinitions		"$BASE;MPA_BUILD_WITHOUT_ATL"
+		$PreprocessorDefinitions		"$BASE;SA_MPA_BUILD_WITHOUT_ATL"
 		$PreprocessorDefinitions		"$BASE;USE_WEBM_FOR_REPLAY"	[$LINUXALL]
 
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR/thirdparty/gperftools-2.0/src/" [$GPROFILER]
@@ -100,9 +105,9 @@ $Configuration	"Release"
 
 	$Linker
 	{
-		$AdditionalLibraryDirectories		"$BASE;$SNAPPYOUTDIRRELEASE;$MPAHEADERINFOOUTDIRRELEASE;"
+		$AdditionalLibraryDirectories		"$BASE;$SNAPPYOUTDIRRELEASE;$MPAHEADERINFOOUTDIRRELEASE;$ZIPUTILSOUTDIRRELEASE"
 
-		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib comsuppw.lib snappy.lib" [$WINDOWS]
+		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib comsuppw.lib snappy.lib zip-utils.lib" [$WINDOWS]
 		$AdditionalDependencies			"$BASE mpaheaderinfo.lib" [$WINDOWS&&!$DEDICATED]
 		$SystemFrameworks				"Carbon;AppKit;OpenAL;CoreAudio;AudioToolbox;SystemConfiguration;Quicktime;AudioUnit" [$OSXALL]
 		$SystemLibraries				"iconv" [$OSXALL]
@@ -299,7 +304,6 @@ $Project "engine"
 		$File	"$SRCDIR\public\builddisp.cpp"
 		$File	"changeframelist.cpp"
 		$File	"checksum_engine.cpp"
-		$File	"ccs.cpp"
 		$File	"clockdriftmgr.cpp"
 		$File	"cl_bounded_cvars.cpp" [!$DEDICATED]
 		$File	"cl_check_process.cpp"	
@@ -428,8 +432,6 @@ $Project "engine"
 		$File	"world.cpp"
 		// dimhotepus: Disable Win key.
 		$File	"windows_shortcut_keys_toggler.cpp"	[$WINDOWS]
-		$File	"$SRCDIR\public\XZip.cpp"
-		$File	"$SRCDIR\public\XUnzip.cpp"
 		$File	"zone.cpp"
 		$File	"bugreporter.cpp" [!$DEDICATED]
 		$File	"cheatcodes.cpp"
@@ -529,8 +531,7 @@ $Project "engine"
 			}
 		}
 		
-		$File	"audio\private\snd_dev_xaudio.cpp"	 \
-				"audio\private\snd_wave_mixer_xma.cpp"	[$X360]
+		$File	"audio\private\snd_dev_xaudio.cpp"
 		{
 			$Configuration
 			{
@@ -580,7 +581,6 @@ $Project "engine"
 			$File	"audio\private\snd_sfx.h"
 			$File	"audio\private\snd_wave_mixer.h"
 			$File	"audio\private\snd_wave_mixer_adpcm.h"
-			$File	"audio\private\snd_wave_mixer_xma.h"
 			$File	"audio\private\snd_wave_mixer_private.h"
 			$File	"audio\private\snd_wave_source.h"
 			$File	"audio\private\snd_wave_temp.h"
@@ -660,7 +660,6 @@ $Project "engine"
 		$File	"bitbuf_errorhandler.h"
 		$File	"$SRCDIR\public\bsptreedata.h"
 		$File	"cbenchmark.h"
-		$File	"ccs.h"
 		$File	"cdll_engine_int.h"
 		$File	"cl_check_process.h"
 		$File	"$SRCDIR\public\cdll_int.h"
@@ -1155,7 +1154,8 @@ $Project "engine"
 		$File	"$SRCDIR\public\vstdlib\vstdlib.h"
 		$File	"$SRCDIR\public\vtf\vtf.h"
 		$File	"$SRCDIR\public\worldsize.h"
-		$File	"$SRCDIR\public\zip\XZip.h"
+		$File	"$SRCDIR\thirdparty\zip-utils\XZip.h"
+		$File	"$SRCDIR\thirdparty\zip-utils\XUnzip.h"
 		$File	"$SRCDIR\public\zip_uncompressed.h"
 	}
 
@@ -1183,6 +1183,7 @@ $Project "engine"
 		$Libexternal	"$LIBJPEGOUTDIR/jpeg-static" [!$DEDICATED]
 		$Libexternal	"$SDL3OUTDIR/SDL3" [$SDL]
 		$Libexternal	"$SNAPPYOUTDIRRELEASE/snappy" [!$WINDOWS]
+		$Libexternal	"$ZIPUTILSOUTDIRRELEASE/zip-utils" [!$WINDOWS]
 		$Libexternal	"$MPAHEADERINFOOUTDIRRELEASE/mpaheaderinfo" [!$WINDOWS&&!$DEDICATED]
 		$Libexternal	"$ZLIBOUTDIR/zlibstatic"
 		$Libexternal 	"$SRCDIR\lib\common\$(CRYPTOPPDIR)\libcrypto" [$LINUXALL&&!$DEDICATED]

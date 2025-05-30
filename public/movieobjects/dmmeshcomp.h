@@ -109,11 +109,11 @@ public:
 
 	CFace *CreateFace( const CUtlVector< CVert * > &verts, const CUtlVector< CEdge * > &edges, const CUtlVector< bool > &edgeReverseMap );
 
-	int FindFacesWithVert( int vIndex, CUtlVector< CFace * > &faces );
+	intp FindFacesWithVert( int vIndex, CUtlVector< CFace * > &faces );
 
-	int FindNeighbouringVerts( int vIndex, CUtlVector< CVert * > &verts );
+	intp FindNeighbouringVerts( int vIndex, CUtlVector< CVert * > &verts );
 
-	int GetBorderEdges( CUtlVector< CUtlVector< CEdge * > > &borderEdges );
+	intp GetBorderEdges( CUtlVector< CUtlVector< CEdge * > > &borderEdges );
 
 	CDmeMesh *m_pMesh;
 	CDmeVertexData *m_pBase;

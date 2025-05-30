@@ -64,8 +64,8 @@ public:
 
 	void						MoveEventToTail( CChoreoEventWidget *event );
 
-	CChoreoEventWidget			*GetEvent( int num );
-	int							GetNumEvents( void );
+	CChoreoEventWidget			*GetEvent( intp num );
+	intp						GetNumEvents( void );
 
 	// Determine time for click position
 	float						GetTimeForMousePosition( int mx );
@@ -84,15 +84,15 @@ private:
 		bool		isSelector;
 		RECT		rcSelector;
 		RECT		rcCaption;
-		int			eventindex;
+		intp		eventindex;
 	};
 
 	void						GetCloseCaptionExpandCollapseRect( RECT& rc );
 	void						GetCloseCaptionLanguageRect( RECT& rc, bool previous );
 	void						GetCloseCaptions( CUtlVector< CloseCaptionInfo >& selectors );
 
-	int							GetVerticalStackingCount( bool dolayout, RECT* rc );
-	void						LayoutEventInRow( CChoreoEventWidget *event, int row, RECT& rc );
+	intp						GetVerticalStackingCount( bool dolayout, RECT* rc );
+	void						LayoutEventInRow( CChoreoEventWidget *event, intp row, RECT& rc );
 
 	void						RenderCloseCaptionInfo( CChoreoWidgetDrawHelper& drawHelper, RECT& rcEventArea );
 	void						RenderCloseCaptions( CChoreoWidgetDrawHelper& drawHelper, RECT& rcEventArea );
@@ -114,7 +114,7 @@ private:
 	bool						m_bHasAudio;
 	int							m_nBaseHeight;
 
-	int							m_nSelectorEventIndex;
+	intp						m_nSelectorEventIndex;
 };
 
 #endif // CHOREOCHANNELWIDGET_H

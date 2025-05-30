@@ -33,6 +33,6 @@ struct CChannelParams : public CBaseDialogParams
 };
 
 // set/create channel properties
-int ChannelProperties( CChannelParams *params );
+intp ChannelProperties( CChannelParams *params );
 
 #endif // CHANNELPROPERTIES_H

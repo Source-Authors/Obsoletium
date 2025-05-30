@@ -232,8 +232,7 @@ void CPropData::ParsePropDataFile( void )
 		while ( pChunkSection )
 		{
 			// Create a new chunk section and add it to our list
-			intp index = m_BreakableChunks.AddToTail();
-			propdata_breakablechunk_t *pBreakableChunk = &m_BreakableChunks[index];
+			propdata_breakablechunk_t *pBreakableChunk = &m_BreakableChunks[m_BreakableChunks.AddToTail()];
 			pBreakableChunk->iszChunkType = AllocPooledString( pChunkSection->GetName() );
 
 			// Read in all the model names
@@ -647,8 +646,7 @@ void BuildPropList( const char *pszBlockName, CUtlVector<breakmodel_t> &list, in
 		const char *pBlock = pParse->GetCurrentBlockName();
 		if ( !strcmpi( pBlock, pszBlockName ) )
 		{
-			intp index = list.AddToTail();
-			breakmodel_t &breakModel = list[index];
+			breakmodel_t &breakModel = list[list.AddToTail()];
 			pParse->ParseCustom( &breakModel, &breakParser );
 		}
 		else

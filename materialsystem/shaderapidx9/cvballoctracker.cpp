@@ -53,7 +53,7 @@ public:
 		m_AllocatorName[ 0 ] = 0;
 	}
 
-	static const int MAX_NAME_SIZE = 128;
+	static constexpr inline int MAX_NAME_SIZE = 128;
 	int			m_memCount;
 	int			m_vertCount;
 	int			m_paddingCount;
@@ -121,8 +121,8 @@ private:
 	void					SpewDataSometimes( int inc );
 
 
-	static const int SPEW_RATE  = 64;
-	static const int MAX_ALLOCATOR_NAME_SIZE = 128;
+	static constexpr inline int SPEW_RATE  = 64;
+	static constexpr inline int MAX_ALLOCATOR_NAME_SIZE = 128;
 	char m_MeshAllocatorName[ MAX_ALLOCATOR_NAME_SIZE ];
 	bool m_bSuperSpew;
 

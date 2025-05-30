@@ -1,10 +1,11 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-// QC_Eyes.cpp : Defines the class behaviors for the application.
+// Copyright Valve Corporation, All rights reserved.
 //
+// QC_Eyes.cpp : Defines the class behaviors for the application.
 
 #include "stdafx.h"
 #include "QC_Eyes.h"
 #include "QC_EyesDlg.h"
+#include "../common/tools_minidump.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
@@ -12,62 +13,51 @@
 static char THIS_FILE[] = __FILE__;
 #endif
 
-/////////////////////////////////////////////////////////////////////////////
 // CQC_EyesApp
-
 BEGIN_MESSAGE_MAP(CQC_EyesApp, CWinApp)
-	//{{AFX_MSG_MAP(CQC_EyesApp)
-		// NOTE - the ClassWizard will add and remove mapping macros here.
-		//    DO NOT EDIT what you see in these blocks of generated code!
-	//}}AFX_MSG
-	ON_COMMAND(ID_HELP, CWinApp::OnHelp)
+  //{{AFX_MSG_MAP(CQC_EyesApp)
+  // NOTE - the ClassWizard will add and remove mapping macros here.
+  //    DO NOT EDIT what you see in these blocks of generated code!
+  //}}AFX_MSG
+  ON_COMMAND(ID_HELP, CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
-/////////////////////////////////////////////////////////////////////////////
-// CQC_EyesApp construction
+CQC_EyesApp::CQC_EyesApp() : CWinApp{"QC Eyes"} {}
 
-CQC_EyesApp::CQC_EyesApp()
-{
-	// TODO: add construction code here,
-	// Place all significant initialization in InitInstance
-}
-
-/////////////////////////////////////////////////////////////////////////////
 // The one and only CQC_EyesApp object
-
 CQC_EyesApp theApp;
 
-/////////////////////////////////////////////////////////////////////////////
 // CQC_EyesApp initialization
+BOOL CQC_EyesApp::InitInstance() {
+  // Install an exception handler.
+  const se::utils::common::ScopedDefaultMinidumpHandler
+      scoped_default_minidumps;
 
-BOOL CQC_EyesApp::InitInstance()
-{
-	AfxEnableControlContainer();
+  AfxEnableControlContainer();
 
-	// Standard initialization
-	// If you are not using these features and wish to reduce the size
-	//  of your final executable, you should remove from the following
-	//  the specific initialization routines you do not need.
+  // Standard initialization
+  // If you are not using these features and wish to reduce the size
+  //  of your final executable, you should remove from the following
+  //  the specific initialization routines you do not need.
 
 #ifdef _AFXDLL
-	Enable3dControls();			// Call this when using MFC in a shared DLL
+  Enable3dControls();  // Call this when using MFC in a shared DLL
 #endif
 
-	CQC_EyesDlg dlg;
-	m_pMainWnd = &dlg;
-	INT_PTR nResponse = dlg.DoModal();
-	if (nResponse == IDOK)
-	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with OK
-	}
-	else if (nResponse == IDCANCEL)
-	{
-		// TODO: Place code here to handle when the dialog is
-		//  dismissed with Cancel
-	}
+  CQC_EyesDlg dlg;
+  m_pMainWnd = &dlg;
 
-	// Since the dialog has been closed, return FALSE so that we exit the
-	//  application, rather than start the application's message pump.
-	return FALSE;
+  INT_PTR nResponse = dlg.DoModal();
+
+  if (nResponse == IDOK) {
+    // TODO: Place code here to handle when the dialog is
+    //  dismissed with OK
+  } else if (nResponse == IDCANCEL) {
+    // TODO: Place code here to handle when the dialog is
+    //  dismissed with Cancel
+  }
+
+  // Since the dialog has been closed, return FALSE so that we exit the
+  //  application, rather than start the application's message pump.
+  return FALSE;
 }

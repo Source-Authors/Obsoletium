@@ -11,7 +11,7 @@
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Label.h>
 #include <vgui_controls/TextEntry.h>
@@ -25,7 +25,7 @@
 
 using namespace vgui;
 
-static const long RETRY_TIME = 10000;		// refresh server every 10 seconds
+static constexpr inline long RETRY_TIME = 10000;		// refresh server every 10 seconds
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -68,12 +68,11 @@ CConfigPanel::CConfigPanel(vgui::Panel *parent, bool autorefresh,bool savercon,i
 	m_pGraphsRefreshTimeTextEntry->SetEditable(m_pGraphsButton->IsSelected());
 
 	char refreshText[20];
-	_snprintf(refreshText,20,"%i",refreshtime);
 
+	V_sprintf_safe(refreshText,"%i",refreshtime);
 	m_pRefreshTextEntry->SetText(refreshText);
 	
-	_snprintf(refreshText,20,"%i",graphsrefreshtime);
-
+	V_sprintf_safe(refreshText,"%i",graphsrefreshtime);
 	m_pGraphsRefreshTimeTextEntry->SetText(refreshText);
 
 	SetVisible(true);
@@ -154,11 +153,11 @@ void CConfigPanel::OnCommand(const char *command)
 		char timeText[20];
 		int time,timeGraphs;
 
-		m_pRefreshTextEntry->GetText(timeText,20);
+		m_pRefreshTextEntry->GetText(timeText);
 		sscanf(timeText,"%i",&time);
 	
-		memset(timeText, 0x0, sizeof(timeText));
-		m_pGraphsRefreshTimeTextEntry->GetText(timeText, 20);
+		BitwiseClear(timeText);
+		m_pGraphsRefreshTimeTextEntry->GetText(timeText);
 		sscanf(timeText,"%i",&timeGraphs);
 
 

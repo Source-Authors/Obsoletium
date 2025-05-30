@@ -47,7 +47,7 @@ public:
 	int GetNumFrames() override;
 	void SetFrame( int nFrame ) override;
 	HTexture GetID() override;
-	void SetRotation( int ) override { return; };
+	void SetRotation( int ) override {}
 
 protected:
 	void SetSize(int wide, int tall) override;
@@ -56,7 +56,7 @@ protected:
 	virtual void DrawFilledRect(int x0, int y0, int x1, int y1);
 	virtual void DrawOutlinedRect(int x0, int y0, int x1, int y1);
 	virtual void DrawLine(int x0,int y0,int x1,int y1);
-	virtual void DrawPolyLine(int *px, int *py, int numPoints);
+	virtual void DrawPolyLine(int *px, int *py, intp numPoints);
 	virtual void DrawSetTextFont(HFont font);
 	virtual void DrawSetTextColor(Color color);
 	virtual void DrawSetTextColor(int r, int g, int b, int a);

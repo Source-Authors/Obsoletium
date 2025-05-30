@@ -5,15 +5,13 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
+#include <vgui_controls/ScalableImagePanel.h>
+
+#include <tier1/KeyValues.h>
 
 #include <vgui/IBorder.h>
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
-#include <vgui/IBorder.h>
-#include <KeyValues.h>
-
-#include <vgui_controls/ScalableImagePanel.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -261,6 +259,6 @@ void ScalableImagePanel::PerformLayout( void )
 const char *ScalableImagePanel::GetDescription()
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s string image, int src_corner_height, int src_corner_width, int draw_corner_height, int draw_corner_width", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s string image, int src_corner_height, int src_corner_width, int draw_corner_height, int draw_corner_width", BaseClass::GetDescription());
 	return buf;
 }

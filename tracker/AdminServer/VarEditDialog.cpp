@@ -15,7 +15,7 @@
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ComboBox.h>
 #include <vgui_controls/TextEntry.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 using namespace vgui;
 
@@ -48,7 +48,7 @@ CVarEditDialog::~CVarEditDialog()
 //-----------------------------------------------------------------------------
 // Purpose: Configures and shows the var edit dialog
 //-----------------------------------------------------------------------------
-void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
+void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, const KeyValues *rules)
 {
 	// configure
 	AddActionSignalTarget(actionSignalTarget);
@@ -78,7 +78,6 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
 		m_pStringEdit->SetVisible(false);
 
 		// fill in the combo box
-		int index = 0;
 		const char *currentValue = m_pRules->GetString("value");
 		const char *parse = m_pRules->GetString("stringlist");
 		while (*parse)
@@ -91,7 +90,7 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
 			}
 
 			// pull out the map name
-			const char *end = strstr(parse, "\n");
+			const char *end = strchr(parse, '\n');
 			if (!end)
 				break;
 
@@ -109,7 +108,6 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
 
 			// add to dropdown
 			int itemID = m_pComboEdit->AddItem(customString, NULL);
-			index++;
 
 			// activate the current item
 			if (!stricmp(customString, currentValue))
@@ -129,7 +127,7 @@ void CVarEditDialog::Activate(vgui::Panel *actionSignalTarget, KeyValues *rules)
 
 	// set value
 	char title[256];
-	_snprintf(title, sizeof(title) - 1, "Change %s", m_pRules->GetString("name"));
+	V_sprintf_safe(title, "Change %s", m_pRules->GetString("name"));
 	SetTitle(title, false);
 
 	// bring to front	
@@ -177,14 +175,14 @@ void CVarEditDialog::ApplyChanges()
 	else if (!stricmp(type, "customlist"))
 	{
 		char value[512];
-		m_pComboEdit->GetText(value, sizeof(value));
+		m_pComboEdit->GetText(value);
 		RemoteServer().SetValue(m_pRules->GetName(), value);
 	}
 	else
 	{
 		// normal string
 		char value[512];
-		m_pStringEdit->GetText(value, sizeof(value));
+		m_pStringEdit->GetText(value);
 		RemoteServer().SetValue(m_pRules->GetName(), value);
 	}
 

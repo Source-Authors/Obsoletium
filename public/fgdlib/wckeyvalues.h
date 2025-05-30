@@ -9,14 +9,14 @@
 #pragma once
 
 
-#include <tier0/dbg.h>
-#include <utlvector.h>
-#include <utldict.h>
+#include "tier0/dbg.h"
+#include "tier1/utlvector.h"
+#include "tier1/utldict.h"
 #include <fstream>
 
 
-#define KEYVALUE_MAX_KEY_LENGTH			80
-#define KEYVALUE_MAX_VALUE_LENGTH		512
+constexpr inline int KEYVALUE_MAX_KEY_LENGTH{80};
+constexpr inline int KEYVALUE_MAX_VALUE_LENGTH{512};
 
 
 class MDkeyvalue 
@@ -28,7 +28,7 @@ class MDkeyvalue
 		//
 		inline MDkeyvalue(void);
 		inline MDkeyvalue(const char *pszKey, const char *pszValue);
-		~MDkeyvalue(void);
+		inline ~MDkeyvalue();
 
 		MDkeyvalue &operator =(const MDkeyvalue &other);
 		
@@ -70,6 +70,12 @@ MDkeyvalue::MDkeyvalue(const char *pszKey, const char *pszValue)
 
 
 //-----------------------------------------------------------------------------
+// Purpose: Destructor.
+//-----------------------------------------------------------------------------
+MDkeyvalue::~MDkeyvalue() = default;
+
+
+//-----------------------------------------------------------------------------
 // Purpose: Assigns a key and value.
 //-----------------------------------------------------------------------------
 void MDkeyvalue::Set(const char *pszKey, const char *pszValue)
@@ -77,8 +83,8 @@ void MDkeyvalue::Set(const char *pszKey, const char *pszValue)
 	Assert(pszKey);
 	Assert(pszValue);
 
-	strcpy(szKey, pszKey);
-	strcpy(szValue, pszValue);
+	V_strcpy_safe(szKey, pszKey);
+	V_strcpy_safe(szValue, pszValue);
 }
 
 
@@ -109,13 +115,13 @@ class WCKVBase_Vector
 public:
 	
 	// Iteration helpers.
-	inline int GetCount() const			{ return m_KeyValues.Count(); }
-	inline int GetFirst() const			{ return m_KeyValues.Count() - 1; }
-	inline int GetNext( int i ) const	{ return i - 1; }
-	static inline int GetInvalidIndex()	{ return -1; }
+	inline intp GetCount() const			{ return m_KeyValues.Count(); }
+	inline intp GetFirst() const			{ return m_KeyValues.Count() - 1; }
+	inline intp GetNext( intp i ) const		{ return i - 1; }
+	static constexpr inline intp GetInvalidIndex()	{ return -1; }
 
-	void RemoveKeyAt(int nIndex);
-	int FindByKeyName( const char *pKeyName ) const; // Returns the same value as GetInvalidIndex if not found.
+	void RemoveKeyAt(intp nIndex);
+	intp FindByKeyName( const char *pKeyName ) const; // Returns the same value as GetInvalidIndex if not found.
 
 	// Special function used for non-unique keyvalue lists.
 	void AddKeyValue(const char *pszKey, const char *pszValue);
@@ -156,7 +162,7 @@ class WCKeyValuesT : public Base
 {
 public:
 
-	WCKeyValuesT(void);
+	WCKeyValuesT(void) {}
 	~WCKeyValuesT(void);
 
 	void RemoveAll(void);
@@ -169,7 +175,7 @@ public:
 	MDkeyvalue &GetKeyValue(unsigned short nIndex);
 	const MDkeyvalue& GetKeyValue(unsigned short nIndex) const;
 	const char *GetValue(unsigned short nIndex) const;
-	const char *GetValue(const char *pszKey, int *piIndex = NULL) const;
+	const char *GetValue(const char *pszKey, intp *piIndex = NULL) const;
 };
 
 
@@ -185,7 +191,7 @@ typedef WCKeyValuesT<WCKVBase_Vector> WCKeyValuesVector;
 template<class Base>
 inline const char *WCKeyValuesT<Base>::GetKey(unsigned short nIndex) const
 {
-	return(m_KeyValues.Element(nIndex).szKey);
+	return(this->m_KeyValues.Element(nIndex).szKey);
 }
 
 
@@ -197,7 +203,7 @@ inline const char *WCKeyValuesT<Base>::GetKey(unsigned short nIndex) const
 template<class Base>
 inline MDkeyvalue &WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex)
 {
-	return(m_KeyValues.Element(nIndex));
+	return(this->m_KeyValues.Element(nIndex));
 }
 
 
@@ -209,7 +215,7 @@ inline MDkeyvalue &WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex)
 template<class Base>
 inline const MDkeyvalue& WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex) const
 {
-	return(m_KeyValues.Element(nIndex));
+	return(this->m_KeyValues.Element(nIndex));
 }
 
 
@@ -220,7 +226,7 @@ inline const MDkeyvalue& WCKeyValuesT<Base>::GetKeyValue(unsigned short nIndex) 
 template<class Base>
 inline const char *WCKeyValuesT<Base>::GetValue(unsigned short nIndex) const
 {
-	return(m_KeyValues.Element(nIndex).szValue);
+	return(this->m_KeyValues.Element(nIndex).szValue);
 }
 
 

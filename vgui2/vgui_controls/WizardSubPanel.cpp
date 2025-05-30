@@ -5,16 +5,16 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "vgui_controls/WizardPanel.h"
 #include "vgui_controls/WizardSubPanel.h"
-#include "vgui_controls/BuildGroup.h"
 
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
+
+#include "vgui_controls/WizardPanel.h"
+#include "vgui_controls/BuildGroup.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#include <stdio.h>
 using namespace vgui;
 
 //-----------------------------------------------------------------------------
@@ -82,7 +82,7 @@ void WizardSubPanel::ApplySettings(KeyValues *inResourceData)
 const char *WizardSubPanel::GetDescription()
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s, int WizardWide, int WizardTall", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s, int WizardWide, int WizardTall", BaseClass::GetDescription());
 	return buf;
 }
 

@@ -6,7 +6,7 @@
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #define VA_COMMIT_FLAGS MEM_COMMIT
 #define VA_RESERVE_FLAGS MEM_RESERVE
 #endif
@@ -69,18 +69,6 @@ void PrintAllocTimes()
 #define PrintAllocTimes() ((void)0)
 #endif
 
-#if _MSC_VER < 1400 && defined( MSVC ) && !defined(_STATIC_LINKED) && (defined(_DEBUG) || defined(USE_MEM_DEBUG))
-void *operator new( unsigned int nSize, int nBlockUse, const char *pFileName, int nLine )
-{
-	return ::operator new( nSize );
-}
-
-void *operator new[] ( unsigned int nSize, int nBlockUse, const char *pFileName, int nLine )
-{
-	return ::operator new[]( nSize );
-}
-#endif
-
 #if (!defined(_DEBUG) && !defined(USE_MEM_DEBUG))
 
 // Support for CHeapMemAlloc for easy switching to using the process heap.
@@ -88,22 +76,11 @@ void *operator new[] ( unsigned int nSize, int nBlockUse, const char *pFileName,
 
 // Round a size up to a multiple of 4 KiB to aid in calculating how much
 // memory is required if full pageheap is enabled.
-static size_t RoundUpToPage( size_t nSize )
+static constexpr size_t RoundUpToPage( size_t nSize )
 {
 	nSize += 0xFFF;
 	nSize &= ~0xFFF;
 	return nSize;
-}
-
-// Convenience function to deal with the necessary type-casting
-static void InterlockedAddSizeT( size_t volatile *Addend, size_t Value )
-{
-#ifdef PLATFORM_WINDOWS_PC32
-	COMPILE_TIME_ASSERT( sizeof( size_t ) == sizeof( int32 ) );
-	InterlockedExchangeAdd( ( LONG* )Addend, LONG( Value ) );
-#else
-	InterlockedExchangeAdd64( ( LONGLONG* )Addend, LONGLONG( Value ) );
-#endif
 }
 
 class CHeapMemAlloc final : public IMemAlloc
@@ -132,27 +109,29 @@ public:
 		{
 			OutputDebugStringA("PageHeap is off. Memory use will be normal.\n" );
 		}
-		if( bZeroMemory )
+
+		if ( bZeroMemory )
 		{
 			OutputDebugStringA( "  HEAP_ZERO_MEMORY is specified.\n" );
 		}
 	}
 
 	// Release versions
-	virtual void *Alloc( size_t nSize )
+	void *Alloc( size_t nSize ) override
 	{
 		// Ensure that the constructor has run already. Poorly defined
 		// order of construction can result in the allocator being used
 		// before it is constructed. Which could be bad.
 		if ( !m_heap )
 			__debugbreak();
+
 		void* pMem = HeapAlloc( m_heap, m_HeapFlags, nSize );
 		if ( pMem )
 		{
-			InterlockedAddSizeT( &m_nOutstandingBytes, nSize );
-			InterlockedAddSizeT( &m_nOutstandingPageHeapBytes, RoundUpToPage( nSize ) );
-			InterlockedIncrement( &m_nOutstandingAllocations );
-			InterlockedIncrement( &m_nLifetimeAllocations );
+			m_nOutstandingBytes.fetch_add( nSize, std::memory_order::memory_order_relaxed );
+			m_nOutstandingPageHeapBytes.fetch_add( RoundUpToPage( nSize ), std::memory_order::memory_order_relaxed );
+			m_nOutstandingAllocations.fetch_add( 1, std::memory_order::memory_order_relaxed );
+			m_nLifetimeAllocations.fetch_add( 1, std::memory_order::memory_order_relaxed );
 		}
 		else if ( nSize )
 		{
@@ -160,12 +139,13 @@ public:
 			// then lead to crashes. In order to avoid confusion about the cause of
 			// these crashes, halt immediately on allocation failures.
 			__debugbreak();
-			InterlockedIncrement( &m_nAllocFailures );
+			m_nAllocFailures.fetch_add( 1, std::memory_order::memory_order_relaxed );
 		}
 
 		return pMem;
 	}
-	virtual void *Realloc( void *pMem, size_t nSize )
+
+	void *Realloc( void *pMem, size_t nSize ) override
 	{
 		// If you pass zero to HeapReAlloc then it fails (with GetLastError() saying S_OK!)
 		// so only call HeapReAlloc if pMem is non-zero.
@@ -177,6 +157,7 @@ public:
 				Free( pMem );
 				return 0;
 			}
+
 			size_t nOldSize = HeapSize( m_heap, 0, pMem );
 			void* pNewMem = HeapReAlloc( m_heap, m_HeapFlags, pMem, nSize );
 
@@ -185,12 +166,20 @@ public:
 			// change.
 			if ( pNewMem )
 			{
-				InterlockedAddSizeT( &m_nOutstandingBytes, nSize - nOldSize );
-				InterlockedAddSizeT( &m_nOutstandingPageHeapBytes,  RoundUpToPage( nSize ) );
-				InterlockedAddSizeT( &m_nOutstandingPageHeapBytes, 0 - RoundUpToPage( nOldSize ) );
+				if ( nSize >= nOldSize )
+				{
+					m_nOutstandingBytes.fetch_add( nSize - nOldSize, std::memory_order::memory_order_relaxed );
+					m_nOutstandingPageHeapBytes.fetch_add( RoundUpToPage( nSize ) - RoundUpToPage( nOldSize ), std::memory_order::memory_order_relaxed );
+				}
+				else
+				{
+					m_nOutstandingBytes.fetch_sub( nOldSize - nSize, std::memory_order::memory_order_relaxed );
+					m_nOutstandingPageHeapBytes.fetch_sub( RoundUpToPage( nOldSize ) - RoundUpToPage( nSize ), std::memory_order::memory_order_relaxed );
+				}
+
 				// Outstanding allocation count isn't affected by Realloc, but
 				// lifetime allocation count is.
-				InterlockedIncrement( &m_nLifetimeAllocations );
+				m_nLifetimeAllocations.fetch_add( 1, std::memory_order::memory_order_relaxed );
 			}
 			else
 			{
@@ -198,40 +187,42 @@ public:
 				// then lead to crashes. In order to avoid confusion about the cause of
 				// these crashes, halt immediately on allocation failures.
 				__debugbreak();
-				InterlockedIncrement( &m_nAllocFailures );
+				m_nAllocFailures.fetch_add( 1, std::memory_order::memory_order_relaxed );
 			}
+
 			return pNewMem;
 		}
 
 		// Call the regular alloc function.
 		return Alloc( nSize );
 	}
-	virtual void  Free( void *pMem )
+
+	void Free( void *pMem ) override
 	{
 		if ( pMem )
 		{
-			size_t nOldSize = HeapSize( m_heap, 0, pMem );
-			InterlockedAddSizeT( &m_nOutstandingBytes, 0 - nOldSize );
-			InterlockedAddSizeT( &m_nOutstandingPageHeapBytes, 0 - RoundUpToPage( nOldSize ) );
-			InterlockedDecrement( &m_nOutstandingAllocations );
+			const size_t nOldSize = HeapSize( m_heap, 0, pMem );
+			m_nOutstandingBytes.fetch_sub( nOldSize, std::memory_order::memory_order_relaxed );
+			m_nOutstandingPageHeapBytes.fetch_sub( RoundUpToPage( nOldSize ), std::memory_order::memory_order_relaxed );
+			m_nOutstandingAllocations.fetch_sub( 1, std::memory_order::memory_order_relaxed );
 			HeapFree( m_heap, 0, pMem );
 		}
 	}
-	virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize ) { return 0; }
+	void *Expand_NoLongerSupported( void *pMem, size_t nSize ) override { return nullptr; }
 
 	// Debug versions
-	virtual void *Alloc( size_t nSize, const char *pFileName, int nLine ) { return Alloc( nSize ); }
-	virtual void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine ) { return Realloc(pMem, nSize); }
-	virtual void  Free( void *pMem, const char *pFileName, int nLine ) { Free( pMem ); }
-	virtual void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine ) { return 0; }
+	void *Alloc( size_t nSize, const char *pFileName, int nLine ) override { return Alloc( nSize ); }
+	void *Realloc( void *pMem, size_t nSize, const char *pFileName, int nLine ) override { return Realloc(pMem, nSize); }
+	void  Free( void *pMem, const char *pFileName, int nLine ) override { Free( pMem ); }
+	void *Expand_NoLongerSupported( void *pMem, size_t nSize, const char *pFileName, int nLine ) override { return nullptr; }
 
 #ifdef MEMALLOC_SUPPORTS_ALIGNED_ALLOCATIONS
 	// Not currently implemented
 #error "Please define your platform"
 #endif
 
-	virtual void *RegionAlloc( int region, size_t nSize ) { __debugbreak(); return 0; }
-	virtual void *RegionAlloc( int region, size_t nSize, const char *pFileName, int nLine ) { __debugbreak(); return 0; }
+	virtual void *RegionAlloc( int region, size_t nSize ) { __debugbreak(); return nullptr; }
+	virtual void *RegionAlloc( int region, size_t nSize, const char *pFileName, int nLine ) { __debugbreak(); return nullptr; }
 
 	// Returns size of a particular allocation
 	// If zero is returned then return the total size of allocated memory.
@@ -263,24 +254,29 @@ public:
 
 	virtual void DumpStats()
 	{
-		const size_t MiB = 1024 * 1024;
+		constexpr size_t MiB = 1024u * 1024;
+
 		Msg( "Sorry -- no stats saved to file memstats.txt when the heap allocator is enabled.\n" );
 		// Print requested memory.
-		Msg( "%u MiB allocated.\n", ( unsigned )( m_nOutstandingBytes / MiB ) );
+		Msg( "%zu MiB allocated.\n", m_nOutstandingBytes / MiB );
 		// Print memory after rounding up to pages.
-		Msg( "%u MiB assuming maximum PageHeap overhead.\n", ( unsigned )( m_nOutstandingPageHeapBytes / MiB ));
-		// Print memory after adding in reserved page after every allocation. Do 64-bit calculations
+		Msg( "%zu MiB assuming maximum PageHeap overhead.\n", m_nOutstandingPageHeapBytes / MiB );
+		// Print memory after adding in reserved page after every allocation.  Do 64-bit calculations
 		// because the pageHeap required memory can easily go over 4 GiB.
-		__int64 pageHeapBytes = m_nOutstandingPageHeapBytes + m_nOutstandingAllocations * 4096LL;
-		Msg( "%u MiB address space used assuming maximum PageHeap overhead.\n", ( unsigned )( pageHeapBytes / MiB ));
-		Msg( "%u outstanding allocations (%d delta).\n", ( unsigned )m_nOutstandingAllocations, ( int )( m_nOutstandingAllocations - m_nOldOutstandingAllocations ) );
-		Msg( "%u lifetime allocations (%u delta).\n", ( unsigned )m_nLifetimeAllocations, ( unsigned )( m_nLifetimeAllocations - m_nOldLifetimeAllocations ) );
-		Msg( "%u allocation failures.\n", ( unsigned )m_nAllocFailures );
+		const size_t pageHeapBytes = m_nOutstandingPageHeapBytes + m_nOutstandingAllocations * 4096;
+		Msg( "%zu MiB address space used assuming maximum PageHeap overhead.\n", pageHeapBytes / MiB );
+		Msg( "%zu outstanding allocations (%zd delta).\n",
+			m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed),
+			(intp)m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed) - (intp)m_nOldOutstandingAllocations );
+		Msg( "%zu lifetime allocations (%u delta).\n",
+			m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed),
+			(intp)m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed) - (intp)m_nOldLifetimeAllocations );
+		Msg( "%zu allocation failures.\n", m_nAllocFailures.load(std::memory_order::memory_order_relaxed) );
 
 		// Update the numbers on outstanding and lifetime allocation counts so
 		// that we can print out deltas.
-		m_nOldOutstandingAllocations = m_nOutstandingAllocations;
-		m_nOldLifetimeAllocations = m_nLifetimeAllocations;
+		m_nOldOutstandingAllocations = m_nOutstandingAllocations.load(std::memory_order::memory_order_relaxed);
+		m_nOldLifetimeAllocations = m_nLifetimeAllocations.load(std::memory_order::memory_order_relaxed);
 	}
 	virtual void DumpStatsFileBase( char const *pchFileBase ) {}
 	virtual size_t ComputeMemoryUsedBy( char const *pchSubStr ) { return 0; }
@@ -301,7 +297,7 @@ public:
 
 	virtual void OutOfMemory( size_t nBytesAttempted = 0 ) {}
 
-	virtual void CompactHeap() {}
+	void CompactHeap() override {}
 	virtual void CompactIncremental() {}
 
 	virtual MemAllocFailHandler_t SetAllocFailHandler( MemAllocFailHandler_t pfnMemAllocFailHandler ) { return 0; }
@@ -321,24 +317,24 @@ private:
 	uint32 m_HeapFlags;
 
 	// Total outstanding bytes allocated.
-	volatile size_t m_nOutstandingBytes;
+	std::atomic_size_t m_nOutstandingBytes;
 
 	// Total outstanding committed bytes assuming that all allocations are
 	// put on individual 4-KiB pages (true when using full PageHeap from
 	// App Verifier).
-	volatile size_t m_nOutstandingPageHeapBytes;
+	std::atomic_size_t m_nOutstandingPageHeapBytes;
 
 	// Total outstanding allocations. With PageHeap enabled each allocation
 	// requires an extra 4-KiB page of address space.
-	volatile LONG m_nOutstandingAllocations;
-	LONG m_nOldOutstandingAllocations;
+	std::atomic_size_t m_nOutstandingAllocations;
+	std::size_t m_nOldOutstandingAllocations;
 
 	// Total allocations without subtracting freed memory.
-	volatile LONG m_nLifetimeAllocations;
-	LONG m_nOldLifetimeAllocations;
+	std::atomic_size_t m_nLifetimeAllocations;
+	std::size_t m_nOldLifetimeAllocations;
 
 	// Total number of allocation failures.
-	volatile LONG m_nAllocFailures;
+	std::atomic_size_t m_nAllocFailures;
 };
 
 #endif //ALLOW_PROCESS_HEAP
@@ -385,14 +381,14 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 
 	// First we get the application's name so we can look in the registry
 	// for App Verifier settings.
-	HMODULE exeHandle = GetModuleHandle( 0 );
+	HMODULE exeHandle = GetModuleHandle( nullptr );
 	if ( exeHandle )
 	{
 		char appName[ MAX_PATH ];
 		if ( GetModuleFileNameA( exeHandle, appName, std::size( appName ) ) )
 		{
 			// Guarantee null-termination -- not guaranteed on Windows XP!
-			appName[ std::size( appName ) - 1 ] = 0;
+			appName[ std::size( appName ) - 1 ] = '\0';
 			// Find the file part of the name.
 			const char* pFilePart = strrchr( appName, '\\' );
 			if ( pFilePart )
@@ -410,7 +406,7 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 				_snprintf( regPathName, std::size( regPathName ),
 							"Software\\Microsoft\\Windows NT\\CurrentVersion\\Image File Execution Options\\%s",
 							pFilePart );
-				regPathName[ std::size( regPathName ) - 1 ] = 0;
+				regPathName[ std::size( regPathName ) - 1 ] = '\0';
 
 				HKEY key;
 				LONG regResult = RegOpenKeyA( HKEY_LOCAL_MACHINE,
@@ -442,7 +438,7 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 
 // Check for various allocator overrides such as -processheap and -reservelowmem.
 // Returns true if -processheap is enabled, by a command line switch or other method.
-bool CheckWindowsAllocSettings( const char* upperCommandLine )
+static bool CheckWindowsAllocSettings( const char* upperCommandLine )
 {
 	// Are we doing ETW heap profiling?
 	bool bETWHeapEnabled = false;
@@ -463,17 +459,19 @@ bool CheckWindowsAllocSettings( const char* upperCommandLine )
 	// We don't really care whether this allocation succeeds, but it's
 	// worth trying. Note that we do this in all cases -- whether we are using
 	// -processheap or not.
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 0xFFEEFFEE->0xFFEEFFEEFFEEFFEE
+	VirtualAlloc( (void*)0xFFEEFFEEFFEEFFEE, 1, MEM_RESERVE, PAGE_NOACCESS );
+#else
 	VirtualAlloc( (void*)0xFFEEFFEE, 1, MEM_RESERVE, PAGE_NOACCESS );
+#endif
 
 	// Enable application termination (breakpoint) on heap corruption. This is
 	// better than trying to patch it up and continue, both from a security and
 	// a bug-finding point of view. Do this always on Windows since the heap is
 	// used by video drivers and other in-proc components.
-	//HeapSetInformation( NULL, HeapEnableTerminationOnCorruption, NULL, 0 );
-	// The HeapEnableTerminationOnCorruption requires a recent platform SDK,
-	// so fake it up.
 #if defined(PLATFORM_WINDOWS_PC)
-	HeapSetInformation( NULL, (HEAP_INFORMATION_CLASS)1, NULL, 0 );
+	HeapSetInformation( NULL, HeapEnableTerminationOnCorruption, NULL, 0 );
 #endif
 
 	bool bZeroMemory = false;
@@ -506,16 +504,17 @@ class CInitGlobalMemAllocPtr
 public:
 	CInitGlobalMemAllocPtr()
 	{
-		char *pStr = (char*)Plat_GetCommandLineA();
+		const char *pStr = Plat_GetCommandLineA();
 		if ( pStr )
 		{
 			char tempStr[512];
-			strncpy( tempStr, pStr, sizeof( tempStr ) - 1 );
-			tempStr[ sizeof( tempStr ) - 1 ] = 0;
+			strncpy( tempStr, pStr, std::size( tempStr ) );
+			tempStr[ std::size( tempStr ) - 1 ] = '\0';
 			_strupr( tempStr );
 
 			CheckWindowsAllocSettings( tempStr );
 		}
+
 #if defined(FORCE_PROCESS_HEAP)
 		// This may cause EnableHeapMemAlloc to be called twice, but that's okay.
 		EnableHeapMemAlloc( false );
@@ -543,14 +542,6 @@ static bool g_UsingSBH = true;
 
 
 //-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-template <typename T>
-inline T MemAlign( T val, size_t alignment )
-{
-	return (T)( ( (size_t)val + alignment - 1 ) & ~( alignment - 1 ) );
-}
-//-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
 
@@ -565,7 +556,7 @@ void CSmallBlockPool::Init( unsigned nBlockSize, byte *pBase, unsigned initialCo
 
 	if ( initialCommit )
 	{
-		initialCommit = MemAlign( initialCommit, SBH_PAGE_SIZE );
+		initialCommit = AlignValue( initialCommit, SBH_PAGE_SIZE );
 		if ( !VirtualAlloc( m_pCommitLimit, initialCommit, VA_COMMIT_FLAGS, PAGE_READWRITE ) )
 		{
 			Assert( 0 );
@@ -575,77 +566,78 @@ void CSmallBlockPool::Init( unsigned nBlockSize, byte *pBase, unsigned initialCo
 	}
 }
 
-size_t CSmallBlockPool::GetBlockSize()
+uintp CSmallBlockPool::GetBlockSize() const
 {
 	return m_nBlockSize;
 }
 
-bool CSmallBlockPool::IsOwner( void *p )
+bool CSmallBlockPool::IsOwner( void *p ) const
 {
 	return ( p >= m_pBase && p < m_pAllocLimit );
-	}
+}
 
 void *CSmallBlockPool::Alloc()
-	{
+{
 	void *pResult = m_FreeList.Pop();
-		if ( !pResult )
-		{
-			int nBlockSize = m_nBlockSize;
+	if ( !pResult )
+	{
+		int nBlockSize = m_nBlockSize;
 		byte *pCommitLimit;
-			byte *pNextAlloc;
+		byte *pNextAlloc;
+
 		for (;;)
-				{
+		{
 			pCommitLimit = m_pCommitLimit;
 			pNextAlloc = m_pNextAlloc;
 			if ( pNextAlloc + nBlockSize <= pCommitLimit )
-					{
+			{
 				if ( m_pNextAlloc.AssignIf( pNextAlloc, pNextAlloc + m_nBlockSize ) )
-					{
+				{
 					pResult = pNextAlloc;
-						break;
-					}
+					break;
 				}
-						else
-						{
+			}
+			else
+			{
 				AUTO_LOCK( m_CommitMutex );
 				if ( pCommitLimit == m_pCommitLimit )
-							{
+				{
 					if ( pCommitLimit + COMMIT_SIZE <= m_pAllocLimit )
-								{
+					{
 						if ( !VirtualAlloc( pCommitLimit, COMMIT_SIZE, VA_COMMIT_FLAGS, PAGE_READWRITE ) )
-								{
+						{
 							Assert( 0 );
 							return NULL;
-							}
+						}
 
 						m_pCommitLimit = pCommitLimit + COMMIT_SIZE;
-						}
-						else
-						{
-							return NULL;
-						}
 					}
+					else
+					{
+						return NULL;
 					}
 				}
 			}
+		}
+	}
 	return pResult;
 }
 
 void CSmallBlockPool::Free( void *p )
-	{	
+{	
 	Assert( IsOwner( p ) );
 
 	m_FreeList.Push( p );
 }
 
 // Count the free blocks.  
-int CSmallBlockPool::CountFreeBlocks()
+int CSmallBlockPool::CountFreeBlocks() const
 {
 	return m_FreeList.Count();
 }
 
 // Size of committed memory managed by this heap:
-intp CSmallBlockPool::GetCommittedSize()
+uintp CSmallBlockPool::GetCommittedSize() const
 {
 	uintp totalSize = (uintp)m_pCommitLimit - (uintp)m_pBase;
 	Assert( 0 != m_nBlockSize );
@@ -654,79 +646,79 @@ intp CSmallBlockPool::GetCommittedSize()
 }
 
 // Return the total blocks memory is committed for in the heap
-int CSmallBlockPool::CountCommittedBlocks()
+uintp CSmallBlockPool::CountCommittedBlocks() const
 {		 
-	return  GetCommittedSize() / GetBlockSize();
+	return GetCommittedSize() / GetBlockSize();
 }
 
 // Count the number of allocated blocks in the heap:
-int CSmallBlockPool::CountAllocatedBlocks()
+uintp CSmallBlockPool::CountAllocatedBlocks() const
 {
 	return CountCommittedBlocks( ) - ( CountFreeBlocks( ) + ( m_pCommitLimit - (byte *)m_pNextAlloc ) / GetBlockSize() );
 }
 
-int CSmallBlockPool::Compact()
+intp CSmallBlockPool::Compact()
 {
-	int nBytesFreed = 0;
+	intp nBytesFreed = 0;
 	if ( m_FreeList.Count() )
-{
-	int i;
-		int nFree = CountFreeBlocks();
+	{
+		const int nFree = CountFreeBlocks();
 		FreeBlock_t **pSortArray = (FreeBlock_t **)malloc( nFree * sizeof(FreeBlock_t *) ); // can't use new because will reenter
 
 		if ( !pSortArray )
 		{
-		return 0;
+			return 0;
 		}
 
-		i = 0;
+		int i = 0;
 		while ( i < nFree )
 		{
 			pSortArray[i++] = m_FreeList.Pop();
-			}
+		}
 
 		std::sort( pSortArray, pSortArray + nFree );
 
 		byte *pOldNextAlloc = m_pNextAlloc;
 
 		for ( i = nFree - 1; i >= 0; i-- )
-			{
+		{
 			if ( (byte *)pSortArray[i] == static_cast<byte*>( m_pNextAlloc ) - m_nBlockSize )
-				{
+			{
 				pSortArray[i] = NULL;
 				m_pNextAlloc -= m_nBlockSize;
-				}
-				else
-				{
-							break;
-						}
 			}
+			else
+			{
+				break;
+			}
+		}
 
 		if ( pOldNextAlloc != m_pNextAlloc )
 		{
-			byte *pNewCommitLimit = MemAlign( (byte *)m_pNextAlloc, SBH_PAGE_SIZE );
+			byte *pNewCommitLimit = AlignValue( (byte *)m_pNextAlloc, SBH_PAGE_SIZE );
 			if ( pNewCommitLimit < m_pCommitLimit )
-		{
+			{
 				nBytesFreed = m_pCommitLimit - pNewCommitLimit;
 				VirtualFree( pNewCommitLimit, nBytesFreed, MEM_DECOMMIT );
 				m_pCommitLimit = pNewCommitLimit;
+			}
 		}
-	}
 
 		if ( pSortArray[0] )
-	{
-			for ( i = 0; i < nFree ; i++ )
 		{
-				if ( !pSortArray[i] )
+			for ( i = 0; i < nFree ; i++ )
 			{
+				if ( !pSortArray[i] )
+				{
 					break;
 				}
+
 				m_FreeList.Push( pSortArray[i] );
 			}
-			}
+		}
 
 		free( pSortArray );
-		}
+	}
 
 	return nBytesFreed;
 }
@@ -751,7 +743,7 @@ CSmallBlockHeap::CSmallBlockHeap()
 	m_pLimit = m_pBase + NUM_POOLS * MAX_POOL_REGION;
 
 	// Build a lookup table used to find the correct pool based on size
-	const int MAX_TABLE = MAX_SBH_BLOCK >> 2;
+	constexpr int MAX_TABLE = MAX_SBH_BLOCK >> 2;
 	int i = 0;
 	int nBytesElement = 0;
 	byte *pCurBase = m_pBase;
@@ -889,12 +881,12 @@ CSmallBlockHeap::CSmallBlockHeap()
 	Assert( iCurPool == NUM_POOLS );
 }
 
-bool CSmallBlockHeap::ShouldUse( size_t nBytes )
+bool CSmallBlockHeap::ShouldUse( size_t nBytes ) const
 {
 	return ( UsingSBH() && nBytes <= MAX_SBH_BLOCK );
 }
 
-bool CSmallBlockHeap::IsOwner( void * p )
+bool CSmallBlockHeap::IsOwner( void * p ) const
 {
 	return ( UsingSBH() && p >= m_pBase && p < m_pLimit );
 }
@@ -919,8 +911,8 @@ void *CSmallBlockHeap::Alloc( size_t nBytes )
 		p = pPool->Alloc();
 		if ( p )
 		{
-	return p;
-}
+			return p;
+		}
 	}
 
 	void *pRet = malloc( nBytes );
@@ -972,7 +964,7 @@ void *CSmallBlockHeap::Realloc( void *p, size_t nBytes )
 
 	if ( pNewBlock )
 	{
-		int nBytesCopy = min( nBytes, pOldPool->GetBlockSize() );
+		size_t nBytesCopy = min( nBytes, pOldPool->GetBlockSize() );
 		memcpy( pNewBlock, p, nBytesCopy );
 	} 
 
@@ -987,9 +979,9 @@ void CSmallBlockHeap::Free( void *p )
 		pPool->Free( p );
 	}
 
-size_t CSmallBlockHeap::GetSize( void *p )
+uintp CSmallBlockHeap::GetSize( void *p ) const
 {
-	CSmallBlockPool *pPool = FindPool( p );
+	const CSmallBlockPool *pPool = FindPool( p );
 	return pPool->GetBlockSize();
 }
 
@@ -1002,9 +994,9 @@ void CSmallBlockHeap::DumpStats( FILE *pFile )
 		for ( int i = 0; i < NUM_POOLS; i++ )
 		{
 			// output for vxconsole parsing
-			fprintf( pFile, "Pool %i: Size: %llu Allocated: %i Free: %i Committed: %i CommittedSize: %i\n", 
+			fprintf( pFile, "Pool %i: Size: %zu Allocated: %zu Free: %i Committed: %zu CommittedSize: %zu\n", 
 				i, 
-				(uint64)m_Pools[i].GetBlockSize(), 
+				m_Pools[i].GetBlockSize(), 
 				m_Pools[i].CountAllocatedBlocks(), 
 				m_Pools[i].CountFreeBlocks(),
 				m_Pools[i].CountCommittedBlocks(), 
@@ -1015,32 +1007,37 @@ void CSmallBlockHeap::DumpStats( FILE *pFile )
 
 	if ( bSpew )
 	{
-		unsigned bytesCommitted = 0;
-		unsigned bytesAllocated = 0;
+		uintp bytesCommitted = 0, bytesAllocated = 0;
 
 		for ( int i = 0; i < NUM_POOLS; i++ )
 		{
-			Msg( "Pool %i: (size: %llu) blocks: allocated:%i free:%i committed:%i (committed size:%u KiB)\n",i, (uint64)m_Pools[i].GetBlockSize(),m_Pools[i].CountAllocatedBlocks(), m_Pools[i].CountFreeBlocks(),m_Pools[i].CountCommittedBlocks(), m_Pools[i].GetCommittedSize() / 1024);
+			Msg( "Pool %i: (size: %zu) blocks: allocated:%zu free:%i committed:%zu (committed size:%zu KiB)\n",
+				i,
+				m_Pools[i].GetBlockSize(),
+				m_Pools[i].CountAllocatedBlocks(),
+				m_Pools[i].CountFreeBlocks(),
+				m_Pools[i].CountCommittedBlocks(),
+				m_Pools[i].GetCommittedSize() / 1024);
 
 			bytesCommitted += m_Pools[i].GetCommittedSize();
 			bytesAllocated += ( m_Pools[i].CountAllocatedBlocks() * m_Pools[i].GetBlockSize() );
 		}
 
-		Msg( "Totals: Committed:%u KiB Allocated:%u KiB\n", bytesCommitted / 1024, bytesAllocated / 1024 );
+		Msg( "Totals: Committed:%zu KiB Allocated:%zu KiB\n", bytesCommitted / 1024, bytesAllocated / 1024 );
 	}
 }
 
-int CSmallBlockHeap::Compact()
+intp CSmallBlockHeap::Compact()
 {
-	int nBytesFreed = 0;
-	for( int i = 0; i < NUM_POOLS; i++ )
+	intp nBytesFreed = 0;
+	for( intp i = 0; i < NUM_POOLS; i++ )
 	{
 		nBytesFreed += m_Pools[i].Compact();
 	}
 	return nBytesFreed;
 }
 
-CSmallBlockPool *CSmallBlockHeap::FindPool( size_t nBytes )
+CSmallBlockPool *CSmallBlockHeap::FindPool( size_t nBytes ) const
 {
 	return m_PoolLookup[(nBytes - 1) >> 2];
 }
@@ -1051,392 +1048,11 @@ CSmallBlockPool *CSmallBlockHeap::FindPool( void *p )
 	return &m_Pools[i];
 }
 
-
-#endif
-
-#if USE_PHYSICAL_SMALL_BLOCK_HEAP
-
-CX360SmallBlockPool *CX360SmallBlockPool::gm_AddressToPool[BYTES_X360_SBH/PAGESIZE_X360_SBH];
-byte *CX360SmallBlockPool::gm_pPhysicalBlock;
-byte *CX360SmallBlockPool::gm_pPhysicalBase;
-byte *CX360SmallBlockPool::gm_pPhysicalLimit;
-
-void CX360SmallBlockPool::Init( unsigned nBlockSize )
+const CSmallBlockPool *CSmallBlockHeap::FindPool( void *p ) const
 {
-	if ( !gm_pPhysicalBlock )
-	{
-		gm_pPhysicalBase = (byte *)XPhysicalAlloc( BYTES_X360_SBH, MAXULONG_PTR, 4096, PAGE_READWRITE | MEM_16MB_PAGES );
-		gm_pPhysicalLimit = gm_pPhysicalBase + BYTES_X360_SBH;
-		gm_pPhysicalBlock = gm_pPhysicalBase;
-	}
-
-	if ( !( nBlockSize % MIN_SBH_ALIGN == 0 && nBlockSize >= MIN_SBH_BLOCK && nBlockSize >= sizeof(TSLNodeBase_t) ) )
-		DebuggerBreak();
-
-	m_nBlockSize = nBlockSize;
-	m_pCurBlockEnd = m_pNextAlloc = NULL;
-	m_CommittedSize = 0;
+	size_t i = ((byte *)p - m_pBase) / MAX_POOL_REGION;
+	return &m_Pools[i];
 }
-
-size_t CX360SmallBlockPool::GetBlockSize()
-		{
-	return m_nBlockSize;
-}
-
-bool CX360SmallBlockPool::IsOwner( void *p )
-			{
-	return ( FindPool( p ) == this );
-			}
-
-void *CX360SmallBlockPool::Alloc()
-{
-	void *pResult = m_FreeList.Pop();
-	if ( !pResult )
-	{
-		if ( !m_pNextAlloc && gm_pPhysicalBlock >= gm_pPhysicalLimit )
-		{
-			return NULL;
-		}
-
-		int nBlockSize = m_nBlockSize;
-		byte *pCurBlockEnd;
-		byte *pNextAlloc;
-		for (;;)
-		{
-			pCurBlockEnd = m_pCurBlockEnd;
-			pNextAlloc = m_pNextAlloc;
-			if ( pNextAlloc + nBlockSize <= pCurBlockEnd )
-			{
-				if ( m_pNextAlloc.AssignIf( pNextAlloc, pNextAlloc + m_nBlockSize ) )
-				{
-					pResult = pNextAlloc;
-					break;
-		}
-	}
-	else
-	{
-				AUTO_LOCK( m_CommitMutex );
-
-				if ( pCurBlockEnd == m_pCurBlockEnd )
-				{
-					for (;;)
-					{
-						if ( gm_pPhysicalBlock >= gm_pPhysicalLimit )
-						{
-							m_pCurBlockEnd = m_pNextAlloc = NULL;
-							return NULL;
-						}
-						byte *pPhysicalBlock = gm_pPhysicalBlock;
-						if ( ThreadInterlockedAssignPointerIf( (void **)&gm_pPhysicalBlock, (void *)(pPhysicalBlock + PAGESIZE_X360_SBH), (void *)pPhysicalBlock ) )
-		{
-							int index = (size_t)((byte *)pPhysicalBlock - gm_pPhysicalBase) / PAGESIZE_X360_SBH;
-							gm_AddressToPool[index] = this;
-							m_pNextAlloc = pPhysicalBlock;
-							m_CommittedSize += PAGESIZE_X360_SBH;
-							__sync();
-							m_pCurBlockEnd = pPhysicalBlock + PAGESIZE_X360_SBH;
-							break;
-						}
-					}
-		}
-	}
-}
-	}
-	return pResult;
-}
-
-void CX360SmallBlockPool::Free( void *p )
-{
-	Assert( IsOwner( p ) );
-
-	m_FreeList.Push( p );
-}
-
-// Count the free blocks.  
-int CX360SmallBlockPool::CountFreeBlocks()
-{
-	return m_FreeList.Count();
-}
-
-// Size of committed memory managed by this heap:
-int CX360SmallBlockPool::GetCommittedSize()
-{
-	return m_CommittedSize;
-}
-
-// Return the total blocks memory is committed for in the heap
-int CX360SmallBlockPool::CountCommittedBlocks()
-{
-	return  GetCommittedSize() / GetBlockSize();
-}
-
-// Count the number of allocated blocks in the heap:
-int CX360SmallBlockPool::CountAllocatedBlocks()
-{
-	int nBytesPossible = ( m_pNextAlloc ) ? ( m_pCurBlockEnd - (byte *)m_pNextAlloc ) : 0;
-	return CountCommittedBlocks( ) - ( CountFreeBlocks( ) + nBytesPossible / GetBlockSize() );
-}
-
-//-----------------------------------------------------------------------------
-//
-//-----------------------------------------------------------------------------
-#define GetInitialCommitForPool( i ) 0
-
-CX360SmallBlockHeap::CX360SmallBlockHeap()
-{
-	if ( !UsingSBH() )
-{
-		return;
-	}
-
-	// Build a lookup table used to find the correct pool based on size
-	const int MAX_TABLE = MAX_SBH_BLOCK >> 2;
-	int i = 0;
-	int nBytesElement = 0;
-	CX360SmallBlockPool *pCurPool = NULL;
-	int iCurPool = 0;
-
-	// Blocks sized 0 - 128 are in pools in increments of 8
-	for ( ; i < 32; i++ )
-{
-		if ( (i + 1) % 2 == 1)
-	{
-			nBytesElement += 8;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-		}
-		else
-		{
-			m_PoolLookup[i] = pCurPool;
-	}
-}
-
-	// Blocks sized 129 - 256 are in pools in increments of 16
-	for ( ; i < 64; i++ )
-{
-		if ( (i + 1) % 4 == 1)
-	{
-			nBytesElement += 16;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-		}
-		else
-		{
-			m_PoolLookup[i] = pCurPool;
-	}
-}
-
-
-	// Blocks sized 257 - 512 are in pools in increments of 32
-	for ( ; i < 128; i++ )
-{
-		if ( (i + 1) % 8 == 1)
-	{
-			nBytesElement += 32;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-	}
-	else
-	{
-			m_PoolLookup[i] = pCurPool;
-		}
-	}
-
-	// Blocks sized 513 - 768 are in pools in increments of 64
-	for ( ; i < 192; i++ )
-	{
-		if ( (i + 1) % 16 == 1)
-	{
-			nBytesElement += 64;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-	}
-	else
-	{
-			m_PoolLookup[i] = pCurPool;
-	}
-}
-
-	// Blocks sized 769 - 1024 are in pools in increments of 128
-	for ( ; i < 256; i++ )
-{
-		if ( (i + 1) % 32 == 1)
-	{
-			nBytesElement += 128;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-	}
-		else
-	{
-			m_PoolLookup[i] = pCurPool;
-	}
-	}
-
-	// Blocks sized 1025 - 2048 are in pools in increments of 256
-	for ( ; i < MAX_TABLE; i++ )
-	{
-		if ( (i + 1) % 64 == 1)
-		{
-			nBytesElement += 256;
-			pCurPool = &m_Pools[iCurPool];
-			pCurPool->Init( nBytesElement );
-			iCurPool++;
-			m_PoolLookup[i] = pCurPool;
-		}
-		else
-			{
-			m_PoolLookup[i] = pCurPool;
-			}
-		}
-
-	Assert( iCurPool == NUM_POOLS );
-	}
-
-bool CX360SmallBlockHeap::ShouldUse( size_t nBytes )
-{
-	return ( UsingSBH() && nBytes <= MAX_SBH_BLOCK );
-}
-
-bool CX360SmallBlockHeap::IsOwner( void * p )
-{
-	int index = (size_t)((byte *)p - CX360SmallBlockPool::gm_pPhysicalBase) / PAGESIZE_X360_SBH;
-	return ( UsingSBH() && ( index >= 0 && index < ssize(CX360SmallBlockPool::gm_AddressToPool) ) );
-	}
-
-void *CX360SmallBlockHeap::Alloc( size_t nBytes )
-{
-	if ( nBytes == 0)
-	{
-		nBytes = 1;
-	}
-	Assert( ShouldUse( nBytes ) );
-	CX360SmallBlockPool *pPool = FindPool( nBytes );
-
-	void *p = pPool->Alloc();
-	if ( p )
-	{
-		return p;
-	}
-
-	return GetStandardSBH()->Alloc( nBytes );
-}
-
-void *CX360SmallBlockHeap::Realloc( void *p, size_t nBytes )
-{
-	if ( nBytes == 0)
-	{
-		nBytes = 1;
-	}
-
-	CX360SmallBlockPool *pOldPool = FindPool( p );
-	CX360SmallBlockPool *pNewPool = ( ShouldUse( nBytes ) ) ? FindPool( nBytes ) : NULL;
-
-	if ( pOldPool == pNewPool )
-	{
-		return p;
-	}
-
-	void *pNewBlock = NULL;
-
-	if ( pNewPool )
-	{
-		pNewBlock = pNewPool->Alloc();
-
-		if ( !pNewBlock )
-	{
-			pNewBlock = GetStandardSBH()->Alloc( nBytes );
-		}
-	}
-
-	if ( !pNewBlock )
-	{
-		pNewBlock = malloc( nBytes );
-		}
-
-	if ( pNewBlock )
-	{
-		int nBytesCopy = min( nBytes, pOldPool->GetBlockSize() );
-		memcpy( pNewBlock, p, nBytesCopy );
-	}
-
-	pOldPool->Free( p );
-
-	return pNewBlock;
-}
-
-void CX360SmallBlockHeap::Free( void *p )
-{
-	CX360SmallBlockPool *pPool = FindPool( p );
-	pPool->Free( p );
-	}
-
-size_t CX360SmallBlockHeap::GetSize( void *p )
-{
-	CX360SmallBlockPool *pPool = FindPool( p );
-	return pPool->GetBlockSize();
-}
-
-void CX360SmallBlockHeap::DumpStats( FILE *pFile )
-{
-	bool bSpew = true;
-
-	if ( pFile )
-	{
-		for( int i = 0; i < NUM_POOLS; i++ )
-	{
-			// output for vxconsole parsing
-			fprintf( pFile, "Pool %i: Size: %u Allocated: %i Free: %i Committed: %i CommittedSize: %i\n", 
-				i, 
-				m_Pools[i].GetBlockSize(), 
-				m_Pools[i].CountAllocatedBlocks(), 
-				m_Pools[i].CountFreeBlocks(),
-				m_Pools[i].CountCommittedBlocks(), 
-				m_Pools[i].GetCommittedSize() );
-	}
-		bSpew = false;
-}
-
-	if ( bSpew )
-{
-		unsigned bytesCommitted = 0;
-		unsigned bytesAllocated = 0;
-
-		for( int i = 0; i < NUM_POOLS; i++ )
-	{
-		
-			bytesCommitted += m_Pools[i].GetCommittedSize();
-			bytesAllocated += ( m_Pools[i].CountAllocatedBlocks() * m_Pools[i].GetBlockSize() );
-		}
-
-		Msg( "Totals: Committed:%u KiB Allocated:%u KiB\n", bytesCommitted / 1024, bytesAllocated / 1024 );
-	}
-}
-
-CSmallBlockHeap *CX360SmallBlockHeap::GetStandardSBH()
-{
-	return &(GET_OUTER( CStdMemAlloc, m_LargePageSmallBlockHeap )->m_SmallBlockHeap);
-}
-
-CX360SmallBlockPool *CX360SmallBlockHeap::FindPool( size_t nBytes )
-	{
-	return m_PoolLookup[(nBytes - 1) >> 2];
-	}
-
-CX360SmallBlockPool *CX360SmallBlockHeap::FindPool( void *p )
-	{
-	return CX360SmallBlockPool::FindPool( p );
-	}
-
 
 #endif
 
@@ -1451,30 +1067,32 @@ void *CStdMemAlloc::Alloc( size_t nSize )
 	void *pMem;
 
 #ifdef _WIN32
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-	if ( m_LargePageSmallBlockHeap.ShouldUse( nSize ) )
-		{
-		pMem = m_LargePageSmallBlockHeap.Alloc( nSize );
-			ApplyMemoryInitializations( pMem, nSize );
-			return pMem;
-		}
-#endif
-
 	if ( m_SmallBlockHeap.ShouldUse( nSize ) )
 	{
 		pMem = m_SmallBlockHeap.Alloc( nSize );
-	ApplyMemoryInitializations( pMem, nSize );
-	return pMem;
-}
+		ApplyMemoryInitializations( pMem, nSize );
 
+		// dimhotepus: Fallback to common allocator if pool has no empty blocks.
+		if ( pMem )
+			return pMem;
+	}
 #endif
 
 	pMem = malloc( nSize );
 	ApplyMemoryInitializations( pMem, nSize );
+	if ( !pMem )
+	{
+		// dimhotepus: Try to free some space and allocate again.
+		CompactHeap();
+
+		pMem = malloc( nSize );
+		ApplyMemoryInitializations( pMem, nSize );
 		if ( !pMem )
 		{
 			SetCRTAllocFailed( nSize );
 		}
+	}
+
 	return pMem;
 }
 
@@ -1488,13 +1106,6 @@ void *CStdMemAlloc::Realloc( void *pMem, size_t nSize )
 	PROFILE_ALLOC(Realloc);
 
 #ifdef MEM_SBH_ENABLED
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-	if ( m_LargePageSmallBlockHeap.IsOwner( pMem ) )
-	{
-		return m_LargePageSmallBlockHeap.Realloc( pMem, nSize );
-	}
-#endif
-
 	if ( m_SmallBlockHeap.IsOwner( pMem ) )
 	{
 		return m_SmallBlockHeap.Realloc( pMem, nSize );
@@ -1502,10 +1113,17 @@ void *CStdMemAlloc::Realloc( void *pMem, size_t nSize )
 #endif
 
 	void *pRet = realloc( pMem, nSize );
+	if ( !pRet )
+	{
+		// dimhotepus: Try to free some space and allocate again.
+		CompactHeap();
+
+		pRet = realloc( pMem, nSize );
 		if ( !pRet )
 		{
 			SetCRTAllocFailed( nSize );
 		}
+	}
 	return pRet;
 }
 
@@ -1519,14 +1137,6 @@ void CStdMemAlloc::Free( void *pMem )
 	PROFILE_ALLOC(Free);
 
 #ifdef MEM_SBH_ENABLED
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-	if ( m_LargePageSmallBlockHeap.IsOwner( pMem ) )
-	{
-		m_LargePageSmallBlockHeap.Free( pMem );
-		return;
-	}
-#endif
-
 	if ( m_SmallBlockHeap.IsOwner( pMem ) )
 	{
 		m_SmallBlockHeap.Free( pMem );
@@ -1538,9 +1148,9 @@ void CStdMemAlloc::Free( void *pMem )
 }
 
 void *CStdMemAlloc::Expand_NoLongerSupported( void *pMem, size_t nSize )
-		{
-			return NULL;
-		}
+{
+	return NULL;
+}
 
 
 //-----------------------------------------------------------------------------
@@ -1585,12 +1195,6 @@ size_t CStdMemAlloc::GetSize( void *pMem )
 		return CalcHeapUsed();
 	else
 	{
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-		if ( m_LargePageSmallBlockHeap.IsOwner( pMem ) )
-		{
-			return m_LargePageSmallBlockHeap.GetSize( pMem );
-		}
-#endif
 		if ( m_SmallBlockHeap.IsOwner( pMem ) )
 		{
 			return m_SmallBlockHeap.GetSize( pMem );
@@ -1663,7 +1267,7 @@ void* CStdMemAlloc::CrtSetReportHook( void* pfnNewHook )
 }
 
 int CStdMemAlloc::CrtDbgReport( int nRptType, const char * szFile,
-		int nLine, const char * szModule, const char * pMsg )
+	int nLine, const char * szModule, const char * pMsg )
 {
 	return 0;
 }
@@ -1686,21 +1290,19 @@ void CStdMemAlloc::DumpStatsFileBase( char const *pchFileBase )
 {
 #ifdef _WIN32
 	char filename[ 512 ];
-	_snprintf( filename, sizeof( filename ) - 1, ( IsX360() ) ? "D:\\%s.txt" : "%s.txt", pchFileBase );
-	filename[ sizeof( filename ) - 1 ] = 0;
+	_snprintf( filename, std::size( filename ) - 1, "%s.txt", pchFileBase );
+	filename[ std::size( filename ) - 1 ] = '\0';
 	FILE *pFile = fopen( filename, "wt" );
-#ifdef USE_PHYSICAL_SMALL_BLOCK_HEAP
-	fprintf( pFile, "X360 Large Page SBH:\n" );
-	m_LargePageSmallBlockHeap.DumpStats(pFile);
-#endif
-	fprintf( pFile, "\nSBH:\n" );
-	m_SmallBlockHeap.DumpStats(pFile);	// Dump statistics to small block heap
-
-#if defined( _X360 ) && !defined( _RETAIL )
-	XBX_rMemDump( filename );
-#endif
-
+	if (pFile)
+	{
+		fprintf( pFile, "\nSBH:\n" );
+		m_SmallBlockHeap.DumpStats(pFile);	// Dump statistics to small block heap
 		fclose( pFile );
+	}
+	else
+	{
+		Warning( "Unable to open '%s' to dump small block heap stats.", filename );
+	}
 #endif
 }
 
@@ -1709,50 +1311,40 @@ void CStdMemAlloc::GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory 
 	if ( !pUsedMemory || !pFreeMemory )
 		return;
 
-#if defined ( _X360 )
-
-	// GlobalMemoryStatus tells us how much physical memory is free
-	MEMORYSTATUS stat;
-	::GlobalMemoryStatus( &stat );
-	*pFreeMemory = stat.dwAvailPhys;
-
-	// NOTE: we do not count free memory inside our small block heaps, as this could be misleading
-	//       (even with lots of SBH memory free, a single allocation over 2kb can still fail)
-
-#if defined( USE_DLMALLOC )
-	// Account for free memory contained within DLMalloc
-	for ( int i = 0; i < ssize( g_AllocRegions ); i++ )
-	{
-		mallinfo info = mspace_mallinfo( g_AllocRegions[ i ] );
-		*pFreeMemory += info.fordblks;
-	}
-#endif
-
-	// Used is total minus free (discount the 32MB system reservation)
-	*pUsedMemory = ( stat.dwTotalPhys - 32*1024*1024 ) - *pFreeMemory;
-
-#else
-
 	// no data
 	*pFreeMemory = 0;
 	*pUsedMemory = 0;
-
-#endif
 }
 
 void CStdMemAlloc::CompactHeap()
 {
 #if !defined( NO_SBH ) && defined( _WIN32 )
-	int nBytesRecovered = m_SmallBlockHeap.Compact();
-	Msg( "Compact freed %d bytes\n", nBytesRecovered );
+	intp nBytesRecovered = m_SmallBlockHeap.Compact();
+	Msg( "Compact heap freed %zd  bytes from small block heap.\n", nBytesRecovered );
+	
+	// dimhotepus: Cleanup caches and decommit if possible.
+	// If HeapSetInformation is called with HeapHandle set to NULL, then all heaps
+	// in the process with a low-fragmentation heap (LFH) will have their caches
+	// optimized, and the memory will be decommitted if possible.
+	//
+	// See
+	// https://docs.microsoft.com/en-us/windows/win32/api/heapapi/nf-heapapi-heapsetinformation
+	HEAP_OPTIMIZE_RESOURCES_INFORMATION information{
+		HEAP_OPTIMIZE_RESOURCES_CURRENT_VERSION, 0U};
+	const BOOL ok = ::HeapSetInformation(
+		nullptr, HeapOptimizeResources, &information, sizeof(information));
+
+	// dimhotepus: Last attempt to allow app allocate smth later.
+	const size_t largestFreeBytes = HeapCompact( ::GetProcessHeap(), 0 );
+	
+	Msg( "Compacted heap. Largest free block is %zu bytes, optimize heap %s.\n",
+		largestFreeBytes, ok ? "OK" : "FAIL" );
 #endif
 }
 
 MemAllocFailHandler_t CStdMemAlloc::SetAllocFailHandler( MemAllocFailHandler_t pfnMemAllocFailHandler )
 {
-	MemAllocFailHandler_t pfnPrevious = m_pfnFailHandler;
-	m_pfnFailHandler = pfnMemAllocFailHandler;
-	return pfnPrevious;
+	return std::exchange(m_pfnFailHandler, pfnMemAllocFailHandler);
 }
 
 size_t CStdMemAlloc::DefaultFailHandler( size_t nBytes )

@@ -17,26 +17,32 @@ $Configuration
 	}
 }
 
-$Project "Splitskybox"
+$Project "splitskybox"
 {
 	$Folder	"Source Files"
 	{
 		-$File	"$SRCDIR\public\tier0\memoverride.cpp"
 		
+		$File	"..\common\cmdlib.cpp"
+		$File	"..\common\filesystem_tools.cpp"
+		$File	"..\common\tools_minidump.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
 		$File	"$SRCDIR\public\filesystem_init.cpp"
-		$File	"..\common\filesystem_tools.cpp"
-		$File	"..\common\cmdlib.cpp"
 		$File	"splitskybox.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
-		$File	"$SRCDIR\public\tier1\strtools.h"
+		$File	"..\common\cmdlib.h"
+		$File	"..\common\filesystem_tools.h"
+		$File	"..\common\tools_minidump.h"
+		$File	"$SRCDIR\public\filesystem_helpers.h"
+		$File	"$SRCDIR\public\filesystem_init.h"
 	}
 
 	$Folder	"Link Libraries"
 	{
 		$Lib tier2
+		$Lib bitmap
 	}
 }

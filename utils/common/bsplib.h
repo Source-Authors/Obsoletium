@@ -16,10 +16,10 @@
 
 #include "zip_utils.h"
 #include "bspfile.h"
-#include "utlvector.h"
-#include "utlstring.h"
-#include "utllinkedlist.h"
-#include "byteswap.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlstring.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/byteswap.h"
 #ifdef ENGINE_DLL
 #include "zone.h"
 #endif
@@ -194,7 +194,6 @@ extern int			g_PhysDispSize;
 
 // Embedded pack/pak file
 IZip				*GetPakFile( void );
-IZip				*GetSwapPakFile( void );
 void				ClearPakFile( IZip *pak );
 void				AddFileToPak( IZip *pak, const char *pRelativeName, const char *fullpath, IZip::eCompressionType compressionType = IZip::eCompressionType_None );
 void				AddBufferToPak( IZip *pak, const char *pRelativeName, void *data, int length, bool bTextMode, IZip::eCompressionType compressionType = IZip::eCompressionType_None );
@@ -238,7 +237,7 @@ public:
 	GameLumpId_t		GetGameLumpId( GameLumpHandle_t handle );
 	unsigned short		GetGameLumpFlags( GameLumpHandle_t handle );
 	unsigned short		GetGameLumpVersion( GameLumpHandle_t handle );
-	void				ComputeGameLumpSizeAndCount( int& size, int& clumpCount );
+	void				ComputeGameLumpSizeAndCount( intp& size, intp& clumpCount );
 	void				ParseGameLump( dheader_t* pHeader );
 	void				SwapGameLump( GameLumpId_t id, unsigned short version, byte *dest, byte *src, int size );
 
@@ -247,7 +246,7 @@ public:
 	// Game lump accessor methods 
 	//-----------------------------------------------------------------------------
 	void*	GetGameLump( GameLumpHandle_t handle );
-	int		GameLumpSize( GameLumpHandle_t handle );
+	intp	GameLumpSize( GameLumpHandle_t handle );
 
 
 	//-----------------------------------------------------------------------------
@@ -275,7 +274,8 @@ extern CByteswap	g_Swap;
 //-----------------------------------------------------------------------------
 // Helper for the bspzip tool
 //-----------------------------------------------------------------------------
-void ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName );
+// dimhotepus: Signal errors.
+bool ExtractZipFileFromBSP( char *pBSPFileName, char *pZipFileName );
 
 
 //-----------------------------------------------------------------------------
@@ -287,10 +287,14 @@ intp					TexDataStringTable_AddOrFindString( const char *pString );
 void	DecompressVis (byte *in, byte *decompressed);
 int		CompressVis (byte *vis, byte *dest);
 
-void	OpenBSPFile( const char *filename );
-void	CloseBSPFile(void);
-void	LoadBSPFile( const char *filename );
-void	LoadBSPFile_FileSystemOnly( const char *filename );
+// dimhotepus: Make stateless. Return header for open file. Call CloseBSPFile when done.
+[[nodiscard]] dheader_t* OpenBSPFile( const char *filename );
+// dimhotepus: Make stateless. Call when done.
+void CloseBSPFile(dheader_t *header);
+// dimhotepus: Signal errors.
+bool	LoadBSPFile( const char *filename );
+// dimhotepus: Signal errors.
+bool	LoadBSPFile_FileSystemOnly( const char *filename );
 bool	LoadBSPFileTexinfo( const char *filename );
 void	WriteBSPFile( const char *filename, char *pUnused = NULL );
 void	PrintBSPFileSizes(void);
@@ -303,7 +307,7 @@ bool	SwapBSPFile( const char *filename, const char *swapFilename, bool bSwapOnLo
 
 bool	GetPakFileLump( const char *pBSPFilename, void **pPakData, int *pPakSize );
 bool	SetPakFileLump( const char *pBSPFilename, const char *pNewFilename, void *pPakData, int pakSize );
-void	WriteLumpToFile( char *filename, int lump );
+bool	WriteLumpToFile( dheader_t *header, char *filename, int lump );
 void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer, size_t nBufLen );
 bool	GetBSPDependants( const char *pBSPFilename, CUtlVector< CUtlString > *pList );
 void	UnloadBSPFile();
@@ -313,15 +317,15 @@ void	UnparseEntities (void);
 void	PrintEntity (entity_t *ent);
 
 void 	SetKeyValue (entity_t *ent, const char *key, const char *value);
-const char 	*ValueForKey (entity_t *ent, char *key);
+const char 	*ValueForKey (entity_t *ent, const char *key);
 // will return "" if not present
-int		IntForKey (entity_t *ent, char *key);
+int		IntForKey (entity_t *ent, const char *key);
 int		IntForKeyWithDefault(entity_t *ent, char *key, int nDefault );
-vec_t	FloatForKey (entity_t *ent, char *key);
-vec_t	FloatForKeyWithDefault (entity_t *ent, char *key, float default_value);
-void 	GetVectorForKey (entity_t *ent, char *key, Vector& vec);
-void 	GetVector2DForKey (entity_t *ent, char *key, Vector2D& vec);
-void 	GetAnglesForKey (entity_t *ent, char *key, QAngle& vec);
+vec_t	FloatForKey (entity_t *ent, const char *key);
+vec_t	FloatForKeyWithDefault (entity_t *ent, const char *key, float default_value);
+void 	GetVectorForKey (entity_t *ent, const char *key, Vector& vec);
+void 	GetVector2DForKey (entity_t *ent, const char *key, Vector2D& vec);
+void 	GetAnglesForKey (entity_t *ent, const char *key, QAngle& vec);
 epair_t *ParseEpair (void);
 void StripTrailing (char *e);
 

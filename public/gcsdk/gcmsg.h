@@ -209,9 +209,7 @@ public:
 	  {
 	  }
 
-	  ~CGCMsg()
-	  {
-	  }
+	  ~CGCMsg() = default;
 
 	  // Accessors
 	  MSG_BODY_TYPE &Body() { return * ( MSG_BODY_TYPE * ) ( m_pubPkt + m_cubMsgHdr ); }

@@ -11,12 +11,12 @@
 #pragma once
 #endif
 
-#include "datamanager.h"
-#include "utlhash.h"
-#include "mempool.h"
 #include "tier0/tslist.h"
-#include "datacache_common.h"
+#include "tier1/datamanager.h"
+#include "tier1/utlhash.h"
+#include "tier1/mempool.h"
 #include "tier3/tier3.h"
+#include "datacache_common.h"
 
 
 //-----------------------------------------------------------------------------
@@ -39,7 +39,7 @@ struct DataCacheItemData_t
 
 //-------------------------------------
 
-#define DC_NO_NEXT_LOCKED ((DataCacheItem_t *)(ptrdiff_t)-1)
+#define DC_NO_NEXT_LOCKED ((DataCacheItem_t *)(intp)-1)
 #define DC_MAX_THREADS_FRAMELOCKED 4
 
 struct DataCacheItem_t : DataCacheItemData_t
@@ -236,47 +236,47 @@ public:
 	//--------------------------------------------------------
 	// IAppSystem methods
 	//--------------------------------------------------------
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	//--------------------------------------------------------
 	// IDataCache methods
 	//--------------------------------------------------------
 
-	virtual void SetSize( int nMaxBytes );
-	virtual void SetOptions( unsigned options );
-	virtual void SetSectionLimits( const char *pszSectionName, const DataCacheLimits_t &limits );
-	virtual void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = NULL );
+	void SetSize( size_t nMaxBytes ) override;
+	void SetOptions( unsigned options )override;
+	void SetSectionLimits( const char *pszSectionName, const DataCacheLimits_t &limits ) override;
+	void GetStatus( DataCacheStatus_t *pStatus, DataCacheLimits_t *pLimits = NULL ) override;
 
 	//--------------------------------------------------------
 
-	virtual IDataCacheSection *AddSection( IDataCacheClient *pClient, const char *pszSectionName, const DataCacheLimits_t &limits = DataCacheLimits_t(), bool bSupportFastFind = false );
-	virtual void RemoveSection( const char *pszClientName, bool bCallFlush = true );
-	virtual IDataCacheSection *FindSection( const char *pszClientName );
+	IDataCacheSection *AddSection( IDataCacheClient *pClient, const char *pszSectionName, const DataCacheLimits_t &limits = DataCacheLimits_t(), bool bSupportFastFind = false ) override;
+	void RemoveSection( const char *pszClientName, bool bCallFlush = true ) override;
+	IDataCacheSection *FindSection( const char *pszClientName ) override;
 
 	//--------------------------------------------------------
 
-	void EnsureCapacity( unsigned nBytes );
-	virtual unsigned Purge( unsigned nBytes );
-	virtual unsigned Flush( bool bUnlockedOnly = true, bool bNotify = true );
+	void EnsureCapacity( size_t nBytes );
+	size_t Purge( size_t nBytes ) override;
+	size_t Flush( bool bUnlockedOnly = true, bool bNotify = true ) override;
 
 	//--------------------------------------------------------
 
-	virtual void OutputReport( DataCacheReportType_t reportType = DC_SUMMARY_REPORT, const char *pszSection = NULL );
+	void OutputReport( DataCacheReportType_t reportType = DC_SUMMARY_REPORT, const char *pszSection = NULL ) override;
 
 	//--------------------------------------------------------
 
-	inline unsigned GetNumBytes()			{ return m_status.nBytes; }
-	inline unsigned GetNumItems()			{ return m_status.nItems; }
+	inline size_t GetNumBytes() const		{ return m_status.nBytes; }
+	inline size_t GetNumItems() const		{ return m_status.nItems; }
 
-	inline unsigned GetNumBytesLocked()		{ return m_status.nBytesLocked; }
-	inline unsigned GetNumItemsLocked()		{ return m_status.nItemsLocked; }
+	inline size_t GetNumBytesLocked() const		{ return m_status.nBytesLocked; }
+	inline size_t GetNumItemsLocked() const		{ return m_status.nItemsLocked; }
 
-	inline unsigned GetNumBytesUnlocked()	{ return m_status.nBytes - m_status.nBytesLocked; }
-	inline unsigned GetNumItemsUnlocked()	{ return m_status.nItems - m_status.nItemsLocked; }
+	inline size_t GetNumBytesUnlocked() const	{ return m_status.nBytes - m_status.nBytesLocked; }
+	inline size_t GetNumItemsUnlocked() const	{ return m_status.nItems - m_status.nItemsLocked; }
 
 private:
 	//-----------------------------------------------------
@@ -287,8 +287,8 @@ private:
 
 	DataCacheItem_t *AccessItem( memhandle_t hCurrent );
 
-	bool IsInFlush()						{ return m_bInFlush; }
-	int FindSectionIndex( const char *pszSection );
+	bool IsInFlush() const { return m_bInFlush; }
+	intp FindSectionIndex( const char *pszSection );
 
 	// Utilities used by the data cache report
 	void OutputItemReport( memhandle_t hItem );
@@ -330,18 +330,31 @@ inline DataCacheItem_t *CDataCacheSection::AccessItem( memhandle_t hCurrent )
 
 inline void CDataCacheSection::NoteSizeChanged( size_t oldSize, size_t newSize )
 {
-	intp nBytes = ( newSize - oldSize );
+	// dimhotepus: Correctly update status if size decreased.
+	if (newSize >= oldSize)
+	{
+		size_t nBytes = newSize - oldSize;
+		ThreadInterlockedExchangeAdd( &m_status.nBytes, nBytes );
+		ThreadInterlockedExchangeAdd( &m_status.nBytesLocked, nBytes );
 
-	m_status.nBytes += nBytes;
-	m_status.nBytesLocked += nBytes;
-	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytes, nBytes );
-	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytesLocked, nBytes );
+		ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytes, nBytes );
+		ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytesLocked, nBytes );
+	}
+	else
+	{
+		size_t nBytes = oldSize - newSize;
+		ThreadInterlockedExchangeAdd( (intp*)&m_status.nBytes, -static_cast<intp>(nBytes) );
+		ThreadInterlockedExchangeAdd( (intp*)&m_status.nBytesLocked, -static_cast<intp>(nBytes) );
+
+		ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytes, -static_cast<intp>(nBytes) );
+		ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytesLocked, -static_cast<intp>(nBytes) );
+	}
 }
 
 inline void CDataCacheSection::NoteAdd( size_t size )
 {
-	m_status.nBytes += size;
-	m_status.nItems++;
+	ThreadInterlockedExchangeAdd( &m_status.nBytes, size );
+	ThreadInterlockedIncrement( &m_status.nItems );
 
 	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytes, size );
 	ThreadInterlockedIncrement( &m_pSharedCache->m_status.nItems );
@@ -349,8 +362,8 @@ inline void CDataCacheSection::NoteAdd( size_t size )
 
 inline void CDataCacheSection::NoteRemove( size_t size )
 {
-	m_status.nBytes -= size;
-	m_status.nItems--;
+	ThreadInterlockedExchangeAdd( (intp*)&m_status.nBytes, -static_cast<intp>(size) );
+	ThreadInterlockedDecrement( &m_status.nItems );
 
 	ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytes, -static_cast<intp>(size) );
 	ThreadInterlockedDecrement( &m_pSharedCache->m_status.nItems );
@@ -358,8 +371,8 @@ inline void CDataCacheSection::NoteRemove( size_t size )
 
 inline void CDataCacheSection::NoteLock( size_t size )
 {
-	m_status.nBytesLocked += size;
-	m_status.nItemsLocked++;
+	ThreadInterlockedExchangeAdd( &m_status.nBytesLocked, size );
+	ThreadInterlockedIncrement( &m_status.nItemsLocked );
 
 	ThreadInterlockedExchangeAdd( &m_pSharedCache->m_status.nBytesLocked, size );
 	ThreadInterlockedIncrement( &m_pSharedCache->m_status.nItemsLocked );
@@ -367,8 +380,12 @@ inline void CDataCacheSection::NoteLock( size_t size )
 
 inline void CDataCacheSection::NoteUnlock( size_t size )
 {
-	m_status.nBytesLocked -= size;
-	m_status.nItemsLocked--;
+	// dimhotepus: Check sizes are consistent.
+	Assert(m_status.nBytesLocked >= size);
+	Assert(m_status.nItemsLocked > 0);
+
+	ThreadInterlockedExchangeAdd( (intp*)&m_status.nBytesLocked, -static_cast<intp>(size) );
+	ThreadInterlockedDecrement( &m_status.nItemsLocked );
 
 	ThreadInterlockedExchangeAdd( (intp*)&m_pSharedCache->m_status.nBytesLocked, -static_cast<intp>(size) );
 	ThreadInterlockedDecrement( &m_pSharedCache->m_status.nItemsLocked );

@@ -29,23 +29,19 @@
 */
 
 #if !defined(_MINIMUM_BUILD_)
-#include <stdio.h>  // Needed for file access
-#if defined( _PS3 )
-#include <sys/memory.h>
-#else
+#include <cstdio>   // Needed for file access
+#include <cstddef>  // std::ptrdiff_t
 #include <memory.h>
-#endif
-#include <string.h> // Needed for strcat and strcpy
 #endif
 
 // If you're compiling big endian, just comment out the following line
 #define SHA1_LITTLE_ENDIAN
 
-typedef union
+union SHA1_WORKSPACE_BLOCK
 {
 	unsigned char c[64];
 	unsigned long l[16];
-} SHA1_WORKSPACE_BLOCK;
+};
 
 // SHA1 hash
 const unsigned int k_cubHash = 20;
@@ -93,7 +89,7 @@ public:
 	// Finalize hash and report
 	void Final();
 #if !defined(_MINIMUM_BUILD_) 
-	void ReportHash(char *szReport, unsigned char uReportType = REPORT_HEX);
+	void ReportHash(char *szReport, std::ptrdiff_t nReportSize, unsigned char uReportType = REPORT_HEX);
 #endif
 	void GetHash(unsigned char *uDest);
 
@@ -110,7 +106,7 @@ private:
 
 #if !defined(_MINIMUM_BUILD_)
 // hash comparison function, for use with CUtlMap/CUtlRBTree
-bool HashLessFunc( SHADigest_t const &lhs, SHADigest_t const &rhs );
+[[nodiscard]] bool HashLessFunc( SHADigest_t const &lhs, SHADigest_t const &rhs );
 
 // utility class for manipulating SHA1 hashes in their compact form
 struct CSHA
@@ -128,37 +124,37 @@ public:
 		memcpy( m_shaDigest, rhs, k_cubHash );
 	}
 
-	SHADigest_t &SHADigest()
+	[[nodiscard]] SHADigest_t &SHADigest()
 	{
 		return m_shaDigest;
 	}
 
-	bool operator<( const CSHA &rhs ) const
+	[[nodiscard]] bool operator<( const CSHA &rhs ) const
 	{
 		return memcmp( m_shaDigest, rhs.m_shaDigest, k_cubHash ) < 0;
 	}
 
-	bool operator==( const CSHA &rhs ) const
+	[[nodiscard]] bool operator==( const CSHA &rhs ) const
 	{
 		return memcmp( m_shaDigest, rhs.m_shaDigest, k_cubHash ) == 0;
 	}
 
-	bool operator!=( const CSHA &rhs ) const
+	[[nodiscard]] bool operator!=( const CSHA &rhs ) const
 	{
 		return !(*this == rhs);
 	}
 
-	bool operator==( const SHADigest_t &rhs ) const
+	[[nodiscard]] bool operator==( const SHADigest_t &rhs ) const
 	{
 		return memcmp( m_shaDigest, rhs, k_cubHash ) == 0;
 	}
 
-	bool operator!=( const SHADigest_t &rhs ) const
+	[[nodiscard]] bool operator!=( const SHADigest_t &rhs ) const
 	{
 		return !(*this == rhs);
 	}
 
-	CSHA &operator=( const SHADigest_t rhs )
+	CSHA &operator=( const SHADigest_t &rhs )
 	{
 		memcpy( m_shaDigest, rhs, k_cubHash );
 		return *this;

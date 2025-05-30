@@ -6,13 +6,13 @@
 
 #include "bitmap/imageformat.h"
 #include "TextureDictionary.h"
-#include "utllinkedlist.h"
-#include "checksum_crc.h"
+#include "tier1/utllinkedlist.h"
+#include "tier1/checksum_crc.h"
 #include "materialsystem/imaterial.h"
 #include "vguimatsurface.h"
 #include "materialsystem/imaterialsystem.h"
 #include "tier0/dbg.h"
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
 #include "pixelwriter.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/itexture.h"
@@ -29,7 +29,7 @@ static CRC32_t Texture_CRCName( const char *string )
 	CRC32_t crc;
 	
 	CRC32_Init( &crc );
-	CRC32_ProcessBuffer( &crc, (void *)string, Q_strlen( string ) );
+	CRC32_ProcessBuffer( &crc, string, V_strlen( string ) );
 	CRC32_Final( &crc );
 
 	return crc;

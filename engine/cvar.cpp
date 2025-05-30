@@ -188,13 +188,13 @@ public:
 
 		if ( parent->IsFlagSet( FCVAR_CLIENTDLL ) )
 		{
-			ConMsg( "Parent cvar in client.dll not allowed (%s)\n", child->GetName() );
+			ConMsg( "Parent cvar in client" DLL_EXT_STRING " not allowed (%s)\n", child->GetName() );
 			return false;
 		}
 
 		if ( parent->IsFlagSet( FCVAR_GAMEDLL ) )
 		{
-			ConMsg( "Parent cvar in server.dll not allowed (%s)\n", child->GetName() );
+			ConMsg( "Parent cvar in server" DLL_EXT_STRING " not allowed (%s)\n", child->GetName() );
 			return false;
 		}
 
@@ -264,7 +264,7 @@ void CCvarUtilities::SetDirect( ConVar *var, const char *value )
 		}
 		else
 		{
-			g_pVGuiLocalize->ConvertANSIToUnicode( pszValue, unicode, sizeof( unicode ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( pszValue, unicode );
 		}
 #else
 		V_UTF8ToUnicode( pszValue, unicode, sizeof( unicode ) );
@@ -309,7 +309,7 @@ void CCvarUtilities::SetDirect( ConVar *var, const char *value )
 		}
 		else
 		{
-			g_pVGuiLocalize->ConvertUnicodeToANSI( newUnicode, szNew, sizeof( szNew ) );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( newUnicode, szNew );
 		}
 #else
 		V_UnicodeToUTF8( newUnicode, szNew, sizeof( szNew ) );
@@ -574,14 +574,12 @@ bool CCvarUtilities::IsValidToggleCommand( const char *cmd )
 //-----------------------------------------------------------------------------
 void CCvarUtilities::WriteVariables( CUtlBuffer &buff, bool bAllVars )
 {
-	const ConCommandBase	*var;
-
-	for (var = g_pCVar->GetCommands() ; var ; var = var->GetNext())
+	for (auto *var = g_pCVar->GetCommands() ; var ; var = var->GetNext())
 	{
 		if ( var->IsCommand() )
 			continue;
 
-		bool archive = var->IsFlagSet( IsX360() ? FCVAR_ARCHIVE_XBOX : FCVAR_ARCHIVE );
+		bool archive = var->IsFlagSet( FCVAR_ARCHIVE );
 		if ( archive )
 		{
 			const ConVar *pConvar = assert_cast<const ConVar *>( var );

@@ -1255,7 +1255,7 @@ int SENTENCEG_PlayRndI(edict_t *entity, int isentenceg,
 	if ( ( ipick > 0 ) && name[0] )
 	{
 		int sentenceIndex = SENTENCEG_Lookup( name );
-		CPASAttenuationFilter filter( GetContainingEntity( entity ), soundlevel );
+		CPASAttenuationFilter filter( GetContainingEntity( entity ), SNDLVL_TO_ATTN( soundlevel ) );
 		CBaseEntity::EmitSentenceByIndex( filter, ENTINDEX(entity), CHAN_VOICE, sentenceIndex, volume, soundlevel, flags, pitch );
 		return sentenceIndex;
 	}
@@ -1300,7 +1300,7 @@ void SENTENCEG_PlaySentenceIndex( edict_t *entity, int iSentenceIndex, float vol
 {
 	if ( iSentenceIndex >= 0 )
 	{
-		CPASAttenuationFilter filter( GetContainingEntity( entity ), soundlevel );
+		CPASAttenuationFilter filter( GetContainingEntity( entity ), SNDLVL_TO_ATTN( soundlevel ) );
 		CBaseEntity::EmitSentenceByIndex( filter, ENTINDEX(entity), CHAN_VOICE, iSentenceIndex, volume, soundlevel, flags, pitch );
 	}
 }
@@ -1329,7 +1329,7 @@ int SENTENCEG_PlayRndSz(edict_t *entity, const char *szgroupname,
 	if (ipick >= 0 && name[0])
 	{
 		int sentenceIndex = SENTENCEG_Lookup( name );
-		CPASAttenuationFilter filter( GetContainingEntity( entity ), soundlevel );
+		CPASAttenuationFilter filter( GetContainingEntity( entity ), SNDLVL_TO_ATTN( soundlevel ) );
 		CBaseEntity::EmitSentenceByIndex( filter, ENTINDEX(entity), CHAN_VOICE, sentenceIndex, volume, soundlevel, flags, pitch );
 		return sentenceIndex;
 	}
@@ -1359,7 +1359,7 @@ int SENTENCEG_PlaySequentialSz(edict_t *entity, const char *szgroupname,
 	if (ipicknext >= 0 && name[0])
 	{
 		int sentenceIndex = SENTENCEG_Lookup( name );
-		CPASAttenuationFilter filter( GetContainingEntity( entity ), soundlevel );
+		CPASAttenuationFilter filter( GetContainingEntity( entity ), SNDLVL_TO_ATTN( soundlevel ) );
 		CBaseEntity::EmitSentenceByIndex( filter, ENTINDEX(entity), CHAN_VOICE, sentenceIndex, volume, soundlevel, flags, pitch );
 		return sentenceIndex;
 	}

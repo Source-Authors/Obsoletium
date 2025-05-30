@@ -9,8 +9,8 @@
 #ifndef FMTSTR_H
 #define FMTSTR_H
 
-#include <stdarg.h>
-#include <stdio.h>
+#include <cstdarg>
+#include <cstdio>
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
@@ -91,21 +91,21 @@ public:
 	CFmtStrN(PRINTF_FORMAT_STRING const char *pszFormat, ...) FMTFUNCTION( 2, 3 )
 	{
 		InitQuietTruncation();
-		FmtStrVSNPrintf( m_szBuf, SIZE_BUF, m_bQuietTruncation, &pszFormat, 0, pszFormat );
+		FmtStrVSNPrintf( m_szBuf, SIZE_BUF, m_bQuietTruncation, &pszFormat, 0, pszFormat ); //-V2018 //-V2019
 	}
 
 	// Use this for pass-through formatting
 	CFmtStrN(const char ** ppszFormat, ...)
 	{
 		InitQuietTruncation();
-		FmtStrVSNPrintf( m_szBuf, SIZE_BUF, m_bQuietTruncation, ppszFormat, 0, ppszFormat );
+		FmtStrVSNPrintf( m_szBuf, SIZE_BUF, m_bQuietTruncation, ppszFormat, 0, ppszFormat ); //-V2018 //-V2019
 	}
 
 	// Explicit reformat
 	const char *sprintf(PRINTF_FORMAT_STRING const char *pszFormat, ...) FMTFUNCTION( 2, 3 )
 	{
 		InitQuietTruncation();
-		FmtStrVSNPrintf(m_szBuf, SIZE_BUF, m_bQuietTruncation, &pszFormat, 0, pszFormat ); 
+		FmtStrVSNPrintf(m_szBuf, SIZE_BUF, m_bQuietTruncation, &pszFormat, 0, pszFormat );  //-V2018 //-V2019
 		return m_szBuf;
 	}
 
@@ -133,18 +133,18 @@ public:
 	void VSprintf(const char **ppszFormat, ...)
 	{
 		InitQuietTruncation();
-		FmtStrVSNPrintf( m_szBuf, SIZE_BUF, m_bQuietTruncation, ppszFormat, 0, ppszFormat );
+		FmtStrVSNPrintf( m_szBuf, SIZE_BUF, m_bQuietTruncation, ppszFormat, 0, ppszFormat ); //-V2018 //-V2019
 	}
 
 	// Compatible API with CUtlString for converting to const char*
-	const char *Get( ) const					{ return m_szBuf; }
-	const char *String( ) const					{ return m_szBuf; }
+	[[nodiscard]] const char *Get( ) const					{ return m_szBuf; }
+	[[nodiscard]] const char *String( ) const					{ return m_szBuf; }
 	// Use for access
-	operator const char *() const				{ return m_szBuf; }
-	char *Access()								{ return m_szBuf; }
+	[[nodiscard]] operator const char *() const				{ return m_szBuf; }
+	[[nodiscard]] char *Access()								{ return m_szBuf; }
 
 	// Access template argument
-	static inline int GetMaxLength() { return SIZE_BUF-1; }
+	[[nodiscard]] static inline int GetMaxLength() { return SIZE_BUF-1; }
 
 	CFmtStrN<SIZE_BUF,QUIET_TRUNCATION> & operator=( const char *pchValue ) 
 	{ 
@@ -159,7 +159,7 @@ public:
 		return *this; 
 	}
 
-	int Length() const							{ return m_nLength; }
+	[[nodiscard]] int Length() const							{ return m_nLength; }
 
 	void SetLength( int nLength )
 	{
@@ -167,7 +167,7 @@ public:
 		m_szBuf[m_nLength] = '\0';
 	}
 
-	void Clear()								
+	void Clear()
 	{ 
 		m_szBuf[0] = 0; 
 		m_nLength = 0; 
@@ -176,7 +176,7 @@ public:
 	void AppendFormat( PRINTF_FORMAT_STRING const char *pchFormat, ... ) FMTFUNCTION( 2, 3 )
 	{ 
 		char *pchEnd = m_szBuf + m_nLength; 
-		FmtStrVSNPrintf( pchEnd, SIZE_BUF - m_nLength, m_bQuietTruncation, &pchFormat, m_nLength, pchFormat ); 
+		FmtStrVSNPrintf( pchEnd, SIZE_BUF - m_nLength, m_bQuietTruncation, &pchFormat, m_nLength, pchFormat );  //-V2018 //-V2019
 	}
 
 	void AppendFormatV( const char *pchFormat, va_list args );
@@ -322,22 +322,32 @@ public:
 	inline void SetInt64( int64 n64 )		{ V_to_chars( m_szBuf, n64 ); }
 	inline void SetUint64( uint64 un64 )	{ V_to_chars( m_szBuf, un64 ); }
 
-	inline void SetDouble( double f )		{ Q_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); }
-	inline void SetFloat( float f )			{ Q_snprintf( m_szBuf, sizeof(m_szBuf), "%.18g", f ); }
+	inline void SetDouble( double f )		{ V_sprintf_safe( m_szBuf, "%.18g", f ); }
+	inline void SetFloat( float f )			{ V_sprintf_safe( m_szBuf, "%.18g", f ); }
 
-	inline void SetHexUint64( uint64 un64 )	{ Q_binarytohex( (byte *)&un64, sizeof( un64 ), m_szBuf, sizeof( m_szBuf ) ); }
+	inline void SetHexUint64( uint64 un64 )	{ V_binarytohex( un64, m_szBuf ); }
 
-	operator const char *() const { return m_szBuf; }
-	const char* String() const { return m_szBuf; }
+	[[nodiscard]] operator const char *() const { return m_szBuf; }
+	[[nodiscard]] const char* String() const { return m_szBuf; }
 	
 	void AddQuotes()
 	{
 		Assert( m_szBuf[0] != '"' );
-		const ptrdiff_t nLength = Q_strlen( m_szBuf );
-		Q_memmove( m_szBuf + 1, m_szBuf, nLength );
-		m_szBuf[0] = '"';
-		m_szBuf[nLength + 1] = '"';
-		m_szBuf[nLength + 2] = 0;
+		const intp nLength = V_strlen( m_szBuf );
+
+		// dimhotepus: Prevent overflow.
+		if (nLength < ssize(m_szBuf) - 2)
+		{
+			V_memmove( m_szBuf + 1, m_szBuf, nLength );
+			m_szBuf[0] = '"';
+			m_szBuf[nLength + 1] = '"';
+			m_szBuf[nLength + 2] = '\0';
+		}
+		else
+		{
+			AssertMsg( "Unable to add double quotes to '%s' (%zd length). Buffer size is %zd and not enough",
+				m_szBuf, nLength, ssize(m_szBuf) );
+		}
 	}
 
 protected:
@@ -348,8 +358,8 @@ protected:
 
 //=============================================================================
 
-bool BGetLocalFormattedDateAndTime( time_t timeVal, char *pchDate, int cubDate, char *pchTime, int cubTime );
-bool BGetLocalFormattedDate( time_t timeVal, char *pchDate, int cubDate );
-bool BGetLocalFormattedTime( time_t timeVal, char *pchTime, int cubTime );
+[[nodiscard]] bool BGetLocalFormattedDateAndTime( time_t timeVal, char *pchDate, int cubDate, char *pchTime, int cubTime );
+[[nodiscard]] bool BGetLocalFormattedDate( time_t timeVal, char *pchDate, int cubDate );
+[[nodiscard]] bool BGetLocalFormattedTime( time_t timeVal, char *pchTime, int cubTime );
 
 #endif // FMTSTR_H

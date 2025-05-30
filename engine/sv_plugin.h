@@ -29,7 +29,7 @@ public:
 	bool Load( const char *fileName );
 	void Unload();
 	void Disable( bool state );
-	bool IsDisabled() { return m_bDisable; }
+	bool IsDisabled() const { return m_bDisable; }
 	int GetPluginInterfaceVersion() const { return m_iPluginInterfaceVersion; }
 
 	IServerPluginCallbacks *GetCallback();

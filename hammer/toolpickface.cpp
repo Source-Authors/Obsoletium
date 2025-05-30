@@ -434,7 +434,7 @@ void CToolPickFace::DeselectFace(int nIndex)
 //-----------------------------------------------------------------------------
 void CToolPickFace::AddToList(CMapFace *pFace, FaceState_t eState)
 {
-	int nIndex = m_Faces.AddToTail();
+	intp nIndex = m_Faces.AddToTail();
 	m_Faces[nIndex].pFace = pFace;
 	m_Faces[nIndex].eState = eState;
 	m_Faces[nIndex].eOriginalState = eState;
@@ -468,7 +468,7 @@ void CToolPickFace::GetSelectedFaces(CMapFaceList &FaceListFull, CMapFaceList &F
 	FaceListFull.RemoveAll();
 	FaceListPartial.RemoveAll();
 
-	for (int i = 0; i < m_Faces.Count(); i++)
+	for (intp i = 0; i < m_Faces.Count(); i++)
 	{
 		if (m_Faces[i].eState == FaceState_Select)
 		{

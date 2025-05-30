@@ -1,11 +1,8 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+// Copyright Valve Corporation, All rights reserved.
 //
-// Purpose: 
-//
-//=====================================================================================//
+// Console interactions.
 
 #include "client_pch.h"
-#include <time.h>
 #include "console.h"
 #include "ivideomode.h"
 #include "zone.h"
@@ -13,18 +10,15 @@
 #include "server.h"
 #include "MapReslistGenerator.h"
 #include "tier0/vcrmode.h"
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#endif
+
+#include <ctime>
+
+#include "../out/build/app_version_config.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#if !defined( _X360 )
-#define	MAXPRINTMSG	4096
-#else
-#define	MAXPRINTMSG	1024
-#endif
+constexpr inline int MAXPRINTMSG{4096};
 
 bool con_debuglog = false;
 bool con_initialized = false;
@@ -107,11 +101,13 @@ ConVar con_logfile( "con_logfile", "", 0, "Console output gets written to this f
 static const char *GetTimestampString( void )
 {
 	static char string[128];
+
 	tm today;
 	VCRHook_LocalTime( &today );
-	Q_snprintf( string, sizeof( string ), "%02i/%02i/%04i - %02i:%02i:%02i",
+	V_sprintf_safe( string, "%02i/%02i/%04i - %02i:%02i:%02i",
 		today.tm_mon+1, today.tm_mday, 1900 + today.tm_year,
 		today.tm_hour, today.tm_min, today.tm_sec );
+
 	return string;
 }
 
@@ -142,7 +138,7 @@ public:
 	};
 
 					CConPanel( vgui::Panel *parent );
-	virtual			~CConPanel( void );
+	virtual			~CConPanel();
 
 	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme );
 
@@ -191,13 +187,13 @@ private:
 
 	float da_default_color[3];
 
-	typedef struct
+	struct da_notify_t
 	{
 		wchar_t	szNotify[MAX_NOTIFY_TEXT_LINE];
-		float	expire;
+		double	expire;
 		float	color[3];
 		bool	fixed_width_font;
-	} da_notify_t;
+	};
 
 	da_notify_t da_notify[MAX_DBG_NOTIFY];
 	bool m_bDrawDebugAreas;
@@ -211,11 +207,8 @@ Con_HideConsole_f
 
 ================
 */
-void Con_HideConsole_f( void )
+void Con_HideConsole_f()
 {
-	if ( IsX360() )
-		return;
-
 	if ( EngineVGui()->IsConsoleVisible() )
 	{
 		// hide the console
@@ -228,7 +221,7 @@ void Con_HideConsole_f( void )
 Con_ShowConsole_f
 ================
 */
-void Con_ShowConsole_f( void )
+void Con_ShowConsole_f()
 {
 	if ( vgui::input()->GetAppModalSurface() )
 	{
@@ -257,11 +250,8 @@ void Con_ShowConsole_f( void )
 //-----------------------------------------------------------------------------
 // Purpose: toggles the console
 //-----------------------------------------------------------------------------
-void Con_ToggleConsole_f( void )
+void Con_ToggleConsole_f()
 {
-	if ( IsX360() )
-		return;
-
 	if (EngineVGui()->IsConsoleVisible())
 	{
 		Con_HideConsole_f();
@@ -278,21 +268,18 @@ void Con_ToggleConsole_f( void )
 //-----------------------------------------------------------------------------
 // Purpose: Clears the console
 //-----------------------------------------------------------------------------
-void Con_Clear_f( void )
+void Con_Clear_f()
 {	
-	if ( IsX360() )
-		return;
-
 	EngineVGui()->ClearConsole();
 	Con_ClearNotify();
 }
-						
+
 /*
 ================
 Con_ClearNotify
 ================
 */
-void Con_ClearNotify (void)
+void Con_ClearNotify ()
 {
 	if ( g_pConPanel )
 	{
@@ -300,7 +287,7 @@ void Con_ClearNotify (void)
 	}
 }
 
-#endif // SWDS												
+#endif // SWDS
 
 
 ConsoleLogManager::ConsoleLogManager()
@@ -370,7 +357,7 @@ const char *ConsoleLogManager::GetConsoleLogFilename() const
 Con_Init
 ================
 */
-void Con_Init (void)
+void Con_Init()
 {
 #ifdef DEDICATED
 	con_debuglog = false; // the dedicated server's console will handle this
@@ -433,7 +420,7 @@ void Con_DebugLog( const char *fmt, ...)
 	char data[MAXPRINTMSG];
     
     va_start(argptr, fmt);
-    Q_vsnprintf(data, sizeof(data), fmt, argptr);
+    V_vsprintf_safe(data, fmt, argptr);
     va_end(argptr);
 
 	FileHandle_t fh = GetConsoleLogManager().GetConsoleLogFileHandleForAppend();
@@ -444,7 +431,7 @@ void Con_DebugLog( const char *fmt, ...)
 			char const *prefix = MapReslistGenerator().LogPrefix();
 			if ( prefix )
 			{
-				g_pFileSystem->Write( prefix, strlen(prefix), fh );
+				g_pFileSystem->Write( prefix, V_strlen(prefix), fh );
 			}
 		}
 
@@ -454,13 +441,13 @@ void Con_DebugLog( const char *fmt, ...)
 			if ( needTimestamp )
 			{
 				const char *timestamp = GetTimestampString();
-				g_pFileSystem->Write( timestamp, strlen( timestamp ), fh );
+				g_pFileSystem->Write( timestamp, V_strlen( timestamp ), fh );
 				g_pFileSystem->Write( ": ", 2, fh );
 			}
 			needTimestamp = V_stristr( data, "\n" ) != 0;   
 		}
 
-		g_pFileSystem->Write( data, strlen(data), fh );
+		g_pFileSystem->Write( data, V_strlen(data), fh );
 		// Now that we don't close the file we need to flush it in order
 		// to make sure that the data makes it to the file system.
 		g_pFileSystem->Flush( fh );
@@ -487,123 +474,98 @@ extern ConVar spew_consolelog_to_debugstring;
 
 void Con_ColorPrint( const Color& clr, char const *msg )
 {
-	if ( IsPC() )
+	if ( g_bInColorPrint )
+		return;
+
+	int nCon_Filter_Enable = con_filter_enable.GetInt();
+	if ( nCon_Filter_Enable > 0 )
 	{
-		if ( g_bInColorPrint )
-			return;
+		const char *pszText = con_filter_text.GetString();
+		const char *pszIgnoreText = con_filter_text_out.GetString();
 
-		int nCon_Filter_Enable = con_filter_enable.GetInt();
-		if ( nCon_Filter_Enable > 0 )
+		switch( nCon_Filter_Enable )
 		{
-			const char *pszText = con_filter_text.GetString();
-			const char *pszIgnoreText = con_filter_text_out.GetString();
+		case 1:
+			// if line does not contain keyword do not print the line
+			if ( pszText && ( *pszText != '\0' ) && ( Q_stristr( msg, pszText ) == NULL ))
+				return;
+			if ( pszIgnoreText && *pszIgnoreText && ( Q_stristr( msg, pszIgnoreText ) != NULL ) )
+				return;
+			break;
 
-			switch( nCon_Filter_Enable )
+		case 2:
+			if ( pszIgnoreText && *pszIgnoreText && ( Q_stristr( msg, pszIgnoreText ) != NULL ) )
+				return;
+			// if line does not contain keyword print it in a darker color
+			if ( pszText && ( *pszText != '\0' ) && ( Q_stristr( msg, pszText ) == NULL ))
 			{
-			case 1:
-				// if line does not contain keyword do not print the line
-				if ( pszText && ( *pszText != '\0' ) && ( Q_stristr( msg, pszText ) == NULL ))
-					return;
-				if ( pszIgnoreText && *pszIgnoreText && ( Q_stristr( msg, pszIgnoreText ) != NULL ) )
-					return;
-				break;
-
-			case 2:
-				if ( pszIgnoreText && *pszIgnoreText && ( Q_stristr( msg, pszIgnoreText ) != NULL ) )
-					return;
-				// if line does not contain keyword print it in a darker color
-				if ( pszText && ( *pszText != '\0' ) && ( Q_stristr( msg, pszText ) == NULL ))
-				{
-					Color mycolor(200, 200, 200, 150 );
-					g_pCVar->ConsoleColorPrintf( mycolor, "%s", msg );
-					return;
-				}
-				break;
-
-			default:
-				// by default do no filtering
-				break;
+				Color mycolor(200, 200, 200, 150 );
+				g_pCVar->ConsoleColorPrintf( mycolor, "%s", msg );
+				return;
 			}
-		}
+			break;
 
-		g_bInColorPrint = true;
-
-		// also echo to debugging console
-		if ( Plat_IsInDebugSession() && !con_trace.GetInt() && !spew_consolelog_to_debugstring.GetBool() )
-		{
-			Sys_OutputDebugString(msg);
+		default:
+			// by default do no filtering
+			break;
 		}
+	}
+
+	g_bInColorPrint = true;
+
+	// also echo to debugging console
+	if ( Plat_IsInDebugSession() && !con_trace.GetInt() && !spew_consolelog_to_debugstring.GetBool() )
+	{
+		Sys_OutputDebugString(msg);
+	}
 			
-		if ( sv.IsDedicated() )
-		{
-			g_bInColorPrint = false;
-			return;		// no graphics mode
-		}
+	if ( sv.IsDedicated() )
+	{
+		g_bInColorPrint = false;
+		return;		// no graphics mode
+	}
 
-		bool convisible = Con_IsVisible();
-		bool indeveloper = ( developer.GetInt() > 0 );
-		bool debugprint = g_fIsDebugPrint;
+	bool convisible = Con_IsVisible();
+	bool indeveloper = ( developer.GetInt() > 0 );
+	bool debugprint = g_fIsDebugPrint;
 
-		if ( g_fColorPrintf )
+	if ( g_fColorPrintf )
+	{
+		g_pCVar->ConsoleColorPrintf( clr, "%s", msg );
+	}
+	else
+	{
+		// write it out to the vgui console no matter what
+		if ( g_fIsDebugPrint )
 		{
-			g_pCVar->ConsoleColorPrintf( clr, "%s", msg );
+			// Don't spew debug stuff to actual console once in game, unless console isn't up
+			if ( !cl.IsActive() || !convisible )
+			{
+				g_pCVar->ConsoleDPrintf( "%s", msg );
+			}
 		}
 		else
 		{
-			// write it out to the vgui console no matter what
-			if ( g_fIsDebugPrint )
-			{
-				// Don't spew debug stuff to actual console once in game, unless console isn't up
-				if ( !cl.IsActive() || !convisible )
-				{
-					g_pCVar->ConsoleDPrintf( "%s", msg );
-				}
-			}
-			else
-			{
-				g_pCVar->ConsolePrintf( "%s", msg );
-			}
+			g_pCVar->ConsolePrintf( "%s", msg );
 		}
-
-		// Make sure we "spew" if this wan't generated from the spew system
-		if ( !g_bInSpew )
-		{
-			Msg( "%s", msg );
-		}
-
-		// Only write to notify if it's non-debug or we are running with developer set > 0
-		// Buf it it's debug then make sure we don't have the console down
-		if ( ( !debugprint || indeveloper ) && !( debugprint && convisible ) )
-		{
-			if ( g_pConPanel )
-			{
-				g_pConPanel->AddToNotify( clr, msg );
-			}
-		}
-		g_bInColorPrint = false;
 	}
 
-#if defined( _X360 )
-	int			r,g,b,a;
-	char		buffer[MAXPRINTMSG];
-	const char	*pFrom;
-	char		*pTo;
-
-	clr.GetColor(r, g, b, a);
-
-	// fixup percent printers
-	pFrom = msg;
-	pTo   = buffer;
-	while ( *pFrom && pTo < buffer+sizeof(buffer)-1 )
+	// Make sure we "spew" if this wan't generated from the spew system
+	if ( !g_bInSpew )
 	{
-		*pTo = *pFrom++;
-		if ( *pTo++ == '%' )
-			*pTo++ = '%';
+		Msg( "%s", msg );
 	}
-	*pTo = '\0';
 
-	XBX_DebugString( XMAKECOLOR(r,g,b), buffer );
-#endif
+	// Only write to notify if it's non-debug or we are running with developer set > 0
+	// Buf it it's debug then make sure we don't have the console down
+	if ( ( !debugprint || indeveloper ) && !( debugprint && convisible ) )
+	{
+		if ( g_pConPanel )
+		{
+			g_pConPanel->AddToNotify( clr, msg );
+		}
+	}
+	g_bInColorPrint = false;
 }
 #endif
 
@@ -630,7 +592,7 @@ bool HandleRedirectAndDebugLog( const char *msg )
 
 void Con_Print( const char *msg )
 {
-	if ( !msg || !msg[0] )
+	if ( Q_isempty( msg ) )
 		return;
 
 	if ( !HandleRedirectAndDebugLog( msg ) )
@@ -647,11 +609,7 @@ void Con_Print( const char *msg )
 	}
 	else
 	{
-#if !defined( _X360 )
 		Color clr( 255, 255, 255, 255 );
-#else
-		Color clr( 0, 0, 0, 255 );
-#endif
 		Con_ColorPrint( clr, msg );
 	}
 #endif
@@ -664,7 +622,7 @@ void Con_Printf( const char *fmt, ... )
 	static bool	inupdate;
 	
 	va_start( argptr, fmt );
-	Q_vsnprintf( msg, sizeof( msg ), fmt, argptr );
+	V_vsprintf_safe( msg, fmt, argptr );
 	va_end( argptr );
 
 #ifndef NO_VCR
@@ -690,11 +648,7 @@ void Con_Printf( const char *fmt, ... )
 	}
 	else
 	{
-#if !defined( _X360 )
 		Color clr( 255, 255, 255, 255 );
-#else
-		Color clr( 0, 0, 0, 255 );
-#endif
 		Con_ColorPrint( clr, msg );
 	}
 #endif
@@ -713,7 +667,7 @@ void Con_ColorPrintf( const Color& clr, const char *fmt, ... )
 	char		msg[MAXPRINTMSG];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf (msg,sizeof( msg ), fmt,argptr);
+	V_vsprintf_safe (msg, fmt, argptr);
 	va_end (argptr);
 
 	AUTO_LOCK( g_AsyncNotifyTextMutex );
@@ -741,7 +695,7 @@ void Con_DPrintf (const char *fmt, ...)
 	char		msg[MAXPRINTMSG];
 
 	va_start (argptr,fmt);
-	Q_vsnprintf(msg,sizeof( msg ), fmt,argptr);
+	V_vsprintf_safe(msg, fmt,argptr);
 	va_end (argptr);
 	
 	g_fIsDebugPrint = true;
@@ -777,19 +731,19 @@ void Con_SafePrintf (const char *fmt, ...)
 	char		msg[MAXPRINTMSG];
 		
 	va_start (argptr,fmt);
-	Q_vsnprintf(msg,sizeof( msg ), fmt,argptr);
+	V_vsprintf_safe(msg, fmt,argptr);
 	va_end (argptr);
 
 #ifndef SWDS
-	bool		temp;
-	temp = scr_disabled_for_loading;
-	scr_disabled_for_loading = true;
+	const bool old_disabled_for_loading = std::exchange( scr_disabled_for_loading, true );
 #endif
+
 	g_fIsDebugPrint = true;
 	Con_Printf ("%s", msg);
 	g_fIsDebugPrint = false;
+
 #ifndef SWDS
-	scr_disabled_for_loading = temp;
+	scr_disabled_for_loading = old_disabled_for_loading;
 #endif
 }
 
@@ -805,17 +759,10 @@ void Con_NPrintf( int idx, const char *fmt, ... )
 	char outtext[MAXPRINTMSG];
 
 	va_start(argptr, fmt);
-    Q_vsnprintf( outtext, sizeof( outtext ), fmt, argptr);
+    V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 
-	if ( IsPC() )
-	{
-		g_pConPanel->Con_NPrintf( idx, outtext );
-	}
-	else
-	{
-		Con_Printf( outtext );
-	}
+	g_pConPanel->Con_NPrintf( idx, outtext );
 }
 
 void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
@@ -824,17 +771,10 @@ void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
 	char outtext[MAXPRINTMSG];
 
 	va_start(argptr, fmt);
-    Q_vsnprintf( outtext, sizeof( outtext ), fmt, argptr);
+    V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 
-	if ( IsPC() )
-	{
-		g_pConPanel->Con_NXPrintf( info, outtext );
-	}
-	else
-	{
-		Con_Printf( outtext );
-	}
+	g_pConPanel->Con_NXPrintf( info, outtext );
 }
 
 //-----------------------------------------------------------------------------
@@ -843,6 +783,9 @@ void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
 //-----------------------------------------------------------------------------
 CConPanel::CConPanel( vgui::Panel *parent ) : CBasePanel( parent, "CConPanel" )
 {
+	m_hFont = vgui::INVALID_FONT;
+	m_hFontFixed = vgui::INVALID_FONT;
+
 	// Full screen assumed
 	SetSize( videomode->GetModeStereoWidth(), videomode->GetModeStereoHeight() );
 	SetPos( 0, 0 );
@@ -850,20 +793,21 @@ CConPanel::CConPanel( vgui::Panel *parent ) : CBasePanel( parent, "CConPanel" )
 	SetMouseInputEnabled( false );
 	SetKeyBoardInputEnabled( false );
 
-	da_default_color[0] = 1.0;
-	da_default_color[1] = 1.0;
-	da_default_color[2] = 1.0;
+	da_default_color[0] = 1.0f;
+	da_default_color[1] = 1.0f;
+	da_default_color[2] = 1.0f;
 
 	m_bDrawDebugAreas = false;
 
 	g_pConPanel = this;
-	memset( da_notify, 0, sizeof(da_notify) );
+
+	BitwiseClear( da_notify );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CConPanel::~CConPanel( void )
+CConPanel::~CConPanel()
 {
 }
 
@@ -873,11 +817,10 @@ void CConPanel::Con_NPrintf( int idx, const char *msg )
 		return;
 
 #ifdef WIN32
-    _snwprintf( da_notify[idx].szNotify, sizeof( da_notify[idx].szNotify ) / sizeof( wchar_t ) - 1, L"%S", msg );
+    V_swprintf_safe( da_notify[idx].szNotify, L"%S", msg );
 #else
-    _snwprintf( da_notify[idx].szNotify, sizeof( da_notify[idx].szNotify ) / sizeof( wchar_t ) - 1, L"%s", msg );
+    V_swprintf_safe( da_notify[idx].szNotify, L"%s", msg );
 #endif
-	da_notify[idx].szNotify[ sizeof( da_notify[idx].szNotify ) / sizeof( wchar_t ) - 1 ] = L'\0';
 
 	// Reset values
 	da_notify[idx].expire = realtime + DBG_NOTIFY_TIMEOUT;
@@ -895,27 +838,28 @@ void CConPanel::Con_NXPrintf( const struct con_nprint_s *info, const char *msg )
 		return;
 
 #ifdef WIN32
-	_snwprintf( da_notify[info->index].szNotify, sizeof( da_notify[info->index].szNotify ) / sizeof( wchar_t ) - 1, L"%S", msg );
+	V_swprintf_safe( da_notify[info->index].szNotify, L"%S", msg );
 #else
-	_snwprintf( da_notify[info->index].szNotify, sizeof( da_notify[info->index].szNotify ) / sizeof( wchar_t ) - 1, L"%s", msg );
+	V_swprintf_safe( da_notify[info->index].szNotify, L"%s", msg );
 #endif
-	da_notify[info->index].szNotify[ sizeof( da_notify[info->index].szNotify ) / sizeof( wchar_t ) - 1 ] = L'\0';
 
 	// Reset values
 	if ( info->time_to_live == -1 )
 		da_notify[ info->index ].expire = -1; // special marker means to just draw it once
 	else
 		da_notify[ info->index ].expire = realtime + info->time_to_live;
+
 	VectorCopy( info->color, da_notify[ info->index ].color );
 	da_notify[ info->index ].fixed_width_font = info->fixed_width_font;
 	m_bDrawDebugAreas = true;
 }
 
-static void safestrncat( wchar_t *text, int maxCharactersWithNullTerminator, wchar_t const *add, int addchars )
+template<intp size>
+static void safestrncat( OUT_Z_ARRAY wchar_t (&text)[size], wchar_t const *add, intp addchars )
 {
-	int maxCharactersWithoutTerminator = maxCharactersWithNullTerminator - 1;
+	constexpr intp maxCharactersWithoutTerminator = size - 1;
 
-	int curlen = wcslen( text );
+	intp curlen = V_wcslen( text );
 	if ( curlen >= maxCharactersWithoutTerminator )
 		return;
 
@@ -925,7 +869,7 @@ static void safestrncat( wchar_t *text, int maxCharactersWithNullTerminator, wch
 	{
 		*p++ = *add++;
 	}
-	*p = 0;
+	*p = L'\0';
 }
 
 void CConPanel::AddToNotify( const Color& clr, char const *msg )
@@ -945,7 +889,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 	}
 
 	// Nothing left
-	if ( !msg[0] )
+	if ( Q_isempty( msg ) )
 		return;
 
 	// Protect against background modifications to m_NotifyText.
@@ -959,7 +903,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 		slot = m_NotifyText.AddToTail();
 		current = &m_NotifyText[ slot ];
 		current->clr = clr;
-		current->text[ 0 ] = 0;
+		current->text[ 0 ] = L'\0';
 		current->liferemaining = con_notifytime.GetFloat();;
 	}
 	else
@@ -971,7 +915,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 	Assert( current );
 
 	wchar_t unicode[ 1024 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( msg, unicode, sizeof( unicode ) );
+	g_pVGuiLocalize->ConvertANSIToUnicode( msg, unicode );
 
 	wchar_t const *p = unicode;
 	while ( *p )
@@ -979,8 +923,8 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 		const wchar_t *nextreturn = wcschr( p, L'\n' );
 		if ( nextreturn != NULL )
 		{
-			int copysize = nextreturn - p + 1;
-			safestrncat( current->text, MAX_NOTIFY_TEXT_LINE, p, copysize );
+			intp copysize = nextreturn - p + 1;
+			safestrncat( current->text, p, copysize );
 
 			// Add a new notify, but don't add a new one if the previous one was empty...
 			if ( current->text[0] && current->text[0] != L'\n' )
@@ -990,7 +934,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 			}
 			// Clear it
 			current->clr = clr;
-			current->text[ 0 ] = 0;
+			current->text[ 0 ] = L'\0';
 			current->liferemaining = con_notifytime.GetFloat();
 			// Skip return character
 			p += copysize;
@@ -998,7 +942,7 @@ void CConPanel::AddToNotify( const Color& clr, char const *msg )
 		}
 
 		// Append it
-		safestrncat( current->text, MAX_NOTIFY_TEXT_LINE, p, wcslen( p ) );
+		safestrncat( current->text, p, V_wcslen( p ) );
 		current->clr = clr;
 		current->liferemaining = con_notifytime.GetFloat();
 		break;
@@ -1027,8 +971,8 @@ void CConPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 	BaseClass::ApplySchemeSettings( pScheme );
 
 	// Console font
-	m_hFont = pScheme->GetFont( "DefaultSmallDropShadow", false );
-	m_hFontFixed = pScheme->GetFont( "DefaultFixedDropShadow", false );
+	m_hFont = pScheme->GetFont( "DefaultSmallDropShadow", true );
+	m_hFontFixed = pScheme->GetFont( "DefaultFixedDropShadow", true );
 }
 
 int CConPanel::DrawText( vgui::HFont font, int x, int y, wchar_t *data )
@@ -1051,43 +995,37 @@ int CConPanel::DrawText( vgui::HFont font, int x, int y, wchar_t *data )
 //-----------------------------------------------------------------------------
 bool CConPanel::ShouldDraw()
 {
-	bool bVisible = false;
-
-	if ( m_bDrawDebugAreas )
-	{
-		bVisible = true;
-	}
-
 	// Should be invisible if there's no notifys and the console is up.
 	// and if the launcher isn't active
 	if ( !Con_IsVisible() )
 	{
-		// Protect against background modifications to m_NotifyText.
-		AUTO_LOCK( g_AsyncNotifyTextMutex );
+		bool bVisible = m_bDrawDebugAreas;
 
-		int i;
-		int c = m_NotifyText.Count();
-		for ( i = c - 1; i >= 0; i-- )
 		{
-			CNotifyText *notify = &m_NotifyText[ i ];
+			// Protect against background modifications to m_NotifyText.
+			AUTO_LOCK( g_AsyncNotifyTextMutex );
 
-			notify->liferemaining -= host_frametime;
-
-			if ( notify->liferemaining <= 0.0f )
+			intp c = m_NotifyText.Count();
+			for ( intp i = c - 1; i >= 0; i-- )
 			{
-				m_NotifyText.Remove( i );
-				continue;
-			}
+				CNotifyText *notify = &m_NotifyText[ i ];
+
+				notify->liferemaining -= host_frametime;
+
+				if ( notify->liferemaining <= 0.0f )
+				{
+					m_NotifyText.Remove( i );
+					continue;
+				}
 			
-			bVisible = true;
+				bVisible = true;
+			}
 		}
-	}
-	else
-	{
-		bVisible = true;
+
+		return bVisible;
 	}
 
-	return bVisible;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -1125,20 +1063,18 @@ void CConPanel::DrawNotify( void )
 		textToDraw = m_NotifyText;
 	}
 
-	int c = textToDraw.Count();
-	for ( int i = 0; i < c; i++ )
+	intp i{0};
+	for ( auto &notify : textToDraw )
 	{
-		CNotifyText *notify = &textToDraw[ i ];
-
-		float timeleft = notify->liferemaining;
+		float timeleft = notify.liferemaining;
 	
-		Color clr = notify->clr;
+		Color clr = notify.clr;
 
 		if ( timeleft < .5f )
 		{
 			float f = clamp( timeleft, 0.0f, .5f ) / .5f;
 
-			clr[3] = (int)( f * 255.0f );
+			clr[3] = (byte)( f * 255.0f );
 
 			if ( i == 0 && f < 0.2f )
 			{
@@ -1150,9 +1086,11 @@ void CConPanel::DrawNotify( void )
 			clr[3] = 255;
 		}
 
-		DrawColoredText( m_hFontFixed, x, y, clr[0], clr[1], clr[2], clr[3], notify->text );
+		DrawColoredText( m_hFontFixed, x, y, clr[0], clr[1], clr[2], clr[3], notify.text );
 
 		y += fontTall;
+
+		++i;
 	}
 }
 
@@ -1168,7 +1106,10 @@ void CConPanel::DrawDebugAreas( void )
 		return;
 
 	// Find the top and bottom of all the nprint text so we can draw a box behind it.
-	int left=99999, top=99999, right=-99999, bottom=-99999;
+	int left = std::numeric_limits<int>::max(),
+		top = std::numeric_limits<int>::max(),
+		right = std::numeric_limits<int>::min(),
+		bottom = std::numeric_limits<int>::min();
 	if ( con_nprint_bgalpha.GetInt() )
 	{
 		// First, figure out the bounds of all the con_nprint text.
@@ -1192,46 +1133,50 @@ void CConPanel::DrawDebugAreas( void )
 
 int CConPanel::ProcessNotifyLines( int &left, int &top, int &right, int &bottom, bool bDraw )
 {
+	const int oneProportional = vgui::scheme()->GetProportionalScaledValue( 1 );
+	const int tenProportional = 10 * oneProportional;
+	const int twentyProportional = 2 * tenProportional;
+
 	int count = 0;
-	int y = 20;
+	int y = tenProportional * 2;
 
 	for ( int i = 0; i < MAX_DBG_NOTIFY; i++ )
 	{
-		if ( realtime < da_notify[i].expire || da_notify[i].expire == -1 )
+		auto &notify = da_notify[i];
+
+		if ( realtime < notify.expire || notify.expire == -1 )
 		{
 			// If it's marked this way, only draw it once.
-			if ( da_notify[i].expire == -1 && bDraw )
+			if ( notify.expire == -1 && bDraw )
 			{
-				da_notify[i].expire = realtime - 1;
+				notify.expire = realtime - 1;
 			}
 			
-			int len;
-			int x;
+			vgui::HFont font = notify.fixed_width_font ? m_hFontFixed : m_hFont;
 
-			vgui::HFont font = da_notify[i].fixed_width_font ? m_hFontFixed : m_hFont ;
+			int fontTall = vgui::surface()->GetFontTall( m_hFontFixed ) + oneProportional;
 
-			int fontTall = vgui::surface()->GetFontTall( m_hFontFixed ) + 1;
+			int len = DrawTextLen( font, notify.szNotify );
+			int x = videomode->GetModeStereoWidth() - tenProportional - len;
 
-			len = DrawTextLen( font, da_notify[i].szNotify );
-			x = videomode->GetModeStereoWidth() - 10 - len;
-
-			if ( y + fontTall > videomode->GetModeStereoHeight() - 20 )
+			if ( y + fontTall > videomode->GetModeStereoHeight() - twentyProportional )
 				return count;
 
 			count++;
-			y = 20 + 10 * i;
+
+			y = twentyProportional + tenProportional * i;
 
 			if ( bDraw )
 			{
 				DrawColoredText( font, x, y, 
-					da_notify[i].color[0] * 255, 
-					da_notify[i].color[1] * 255, 
-					da_notify[i].color[2] * 255,
+					static_cast<int>(notify.color[0] * 255), 
+					static_cast<int>(notify.color[1] * 255), 
+					static_cast<int>(notify.color[2] * 255),
 					255,
-					da_notify[i].szNotify );
+					notify.szNotify );
 			}
 
-			if ( da_notify[i].szNotify[0] )
+			if ( !Q_isempty( notify.szNotify ) )
 			{
 				// Extend the bounds.
 				left = min( left, x );
@@ -1274,32 +1219,43 @@ void CConPanel::PaintBackground()
 		return;
 
 	int wide = GetWide();
-	char ver[ 100 ];
-	Q_snprintf(ver, sizeof( ver ), "Source Engine %i (build %d)", PROTOCOL_VERSION, build_number() );
-	wchar_t unicode[ 200 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( ver, unicode, sizeof( unicode ) );
+	wchar_t ver[ 256 ];
+	// dimhotepus: Add SemVer version number.
+	V_swprintf_safe(ver, L"Source Engine %i (build %d [v.%S])",
+		PROTOCOL_VERSION, build_number(), SRC_PRODUCT_VERSION_INFO_STRING );
 
 	vgui::surface()->DrawSetTextColor( Color( 255, 255, 255, 255 ) );
-	int x = wide - DrawTextLen( m_hFont, unicode ) - 2;
-	DrawText( m_hFont, x, 0, unicode );
+	int xTwoOffset = vgui::scheme()->GetProportionalScaledValue( 2 );
+	int x = wide - DrawTextLen( m_hFont, ver ) - xTwoOffset;
+	DrawText( m_hFont, x, 0, ver );
 
 	if ( cl.IsActive() )
 	{
 		if ( cl.m_NetChannel->IsLoopback() )
 		{
-			Q_snprintf(ver, sizeof( ver ), "Map '%s'", cl.m_szLevelBaseName );
+			V_swprintf_safe(ver,
+#ifdef _WIN32
+				L"Map '%S'",
+#else
+				L"Map '%ls'",
+#endif
+				cl.m_szLevelBaseName );
 		}
 		else
 		{
-			Q_snprintf(ver, sizeof( ver ), "Server '%s' Map '%s'", cl.m_NetChannel->GetRemoteAddress().ToString(), cl.m_szLevelBaseName );
+			V_swprintf_safe(ver,
+#ifdef _WIN32
+				L"Server '%S' Map '%S'",
+#else
+				L"Server '%ls' Map '%ls'",
+#endif
+				cl.m_NetChannel->GetRemoteAddress().ToString(), cl.m_szLevelBaseName );
 		}
-		wchar_t wUnicode[ 200 ];
-		g_pVGuiLocalize->ConvertANSIToUnicode( ver, wUnicode, sizeof( wUnicode ) );
 
 		int tall = vgui::surface()->GetFontTall( m_hFont );
 
-		x = wide - DrawTextLen( m_hFont, wUnicode ) - 2;
-		DrawText( m_hFont, x, tall + 1, wUnicode );
+		x = wide - DrawTextLen( m_hFont, ver ) - xTwoOffset;
+		DrawText( m_hFont, x, tall + xTwoOffset / 2, ver );
 	}
 }
 

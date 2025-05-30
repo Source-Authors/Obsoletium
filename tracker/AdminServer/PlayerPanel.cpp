@@ -17,7 +17,7 @@
 #include <vgui/ILocalize.h>
 #include <vgui/IVGui.h>
 #include <vgui/KeyCode.h>
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ListPanel.h>
@@ -32,7 +32,7 @@ CPlayerPanel::CPlayerPanel(vgui::Panel *parent, const char *name) : vgui::Proper
 {
 	m_pPlayerListPanel = new vgui::ListPanel(this, "Players list");
 
-	m_pPlayerListPanel->AddColumnHeader(0, "name", "#Player_Panel_Name", 200, ListPanel::COLUMN_RESIZEWITHWINDOW );
+	m_pPlayerListPanel->AddColumnHeader(0, "name", "#Player_Panel_Name", 200, ListPanel::COLUMN_RESIZEWITHWINDOW ); //-V2017
 	m_pPlayerListPanel->AddColumnHeader(1, "authid", "#Player_Panel_ID", 100);
 	m_pPlayerListPanel->AddColumnHeader(2, "ping", "#Player_Panel_Ping", 50);
 	m_pPlayerListPanel->AddColumnHeader(3, "loss", "#Player_Panel_Loss", 50);
@@ -65,7 +65,7 @@ CPlayerPanel::CPlayerPanel(vgui::Panel *parent, const char *name) : vgui::Proper
 
 	OnItemSelected(); // disable the buttons
 
-	m_flUpdateTime = 0.0f;
+	m_flUpdateTime = 0.0;
 	RemoteServer().AddServerMessageHandler(this, "UpdatePlayers");
 }
 
@@ -85,7 +85,7 @@ void CPlayerPanel::OnResetData()
 	RemoteServer().RequestValue(this, "playerlist");
 
 	// update once every minute
-	m_flUpdateTime = (float)system()->GetFrameTime() + (60 * 1.0f);
+	m_flUpdateTime = system()->GetFrameTime() + 60.0;
 }
 
 //-----------------------------------------------------------------------------
@@ -142,11 +142,11 @@ static const char *FormatSeconds( int seconds )
 	
 	if ( hours > 0 )
 	{
-		Q_snprintf( string, sizeof(string), "%2i:%02i:%02i", hours, minutes, seconds );
+		V_sprintf_safe( string, "%2i:%02i:%02i", hours, minutes, seconds );
 	}
 	else
 	{
-		Q_snprintf( string, sizeof(string), "%02i:%02i", minutes, seconds );
+		V_sprintf_safe( string, "%02i:%02i", minutes, seconds );
 	}
 
 	return string;
@@ -160,7 +160,7 @@ void CPlayerPanel::OnServerDataResponse(const char *value, const char *response)
 	if (!stricmp(value, "UpdatePlayers"))
 	{
 		// server has indicated a change, force an update
-		m_flUpdateTime = 0.0f;
+		m_flUpdateTime = 0.0;
 	}
 	else if (!stricmp(value, "playerlist"))
 	{
@@ -196,15 +196,19 @@ void CPlayerPanel::OnServerDataResponse(const char *value, const char *response)
 			name[pos] = 0;
 			parse++;	// move past end quote
 
-			if (6 != sscanf(parse, " %s %s %d %d %d %d\n", authID, netAdr, &ping, &packetLoss, &frags, &connectTime))
+			// dimhotepus: Ensure auth id and net address do not overlfow.
+			if (6 != sscanf(parse, " %63s %31s %d %d %d %d\n", authID, netAdr, &ping, &packetLoss, &frags, &connectTime))
 				break;
+
+			authID[std::size(authID) - 1] = '\0';
+			netAdr[std::size(netAdr) - 1] = '\0';
 
 			const char *timeStr = FormatSeconds(connectTime);
 
 			ivgui()->DPrintf2("pars:  \"%s\" %s %s %d %d %d %s\n", name, authID, netAdr, ping, packetLoss, frags, timeStr);
 
 			// add to list
-			KeyValues *player = new KeyValues("Player");
+			KeyValuesAD player("Player");
 			player->SetString("name", name);
 			player->SetString("authID", authID);
 			player->SetString("netAdr", netAdr);
@@ -255,10 +259,10 @@ void CPlayerPanel::OnKickButtonPressed()
 			return;
 
 		wchar_t playerName[64];
-		g_pVGuiLocalize->ConvertANSIToUnicode( kv->GetString("name"), playerName, sizeof(playerName) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( kv->GetString("name"), playerName );
 
 		wchar_t msg[512];
-		g_pVGuiLocalize->ConstructString( msg, sizeof(msg), g_pVGuiLocalize->Find("Kick_Single_Player_Question"), 1, playerName );
+		g_pVGuiLocalize->ConstructString_safe( msg, g_pVGuiLocalize->Find("Kick_Single_Player_Question"), 1, playerName );
 		box = new QueryBox(g_pVGuiLocalize->Find("#Kick_Single_Player_Title"), msg);
 	}
 	box->AddActionSignalTarget(this);
@@ -290,7 +294,7 @@ void CPlayerPanel::OnBanButtonPressed()
 		int s1, s2, s3, s4;
 		if (4 == sscanf(netAdr, "%d.%d.%d.%d", &s1, &s2, &s3, &s4))
 		{
-			Q_snprintf( buf, sizeof(buf), "%d.%d.%d.%d", s1, s2, s3, s4 );
+			V_sprintf_safe( buf, "%d.%d.%d.%d", s1, s2, s3, s4 );
 			authid = buf;
 		}
 	}
@@ -315,7 +319,7 @@ void CPlayerPanel::KickSelectedPlayers()
 
 		// kick 'em
 		char cmd[512];
-		_snprintf(cmd, sizeof(cmd), "kick \"%s\"", pl->GetString("name"));
+		V_sprintf_safe(cmd, "kick \"%s\"", pl->GetString("name"));
 		RemoteServer().SendCommand(cmd);
 	}
 
@@ -335,7 +339,8 @@ void CPlayerPanel::AddBanByID(const char *id, const char *newtime)
 		return;
 
 	// if the newtime string is not valid, then set it to 0 (permanent ban)
-	if (!newtime || atof(newtime) < 0.001)
+	// dimhotepus: atof -> strtof
+	if (!newtime || strtof(newtime, nullptr) < 0.001)
 	{
 		newtime = "0";
 	}

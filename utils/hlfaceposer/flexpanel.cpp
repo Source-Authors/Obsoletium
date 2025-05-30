@@ -4,9 +4,8 @@
 //
 //===========================================================================//
 
-
-#include "hlfaceposer.h"
 #include "FlexPanel.h"
+#include "hlfaceposer.h"
 #include "ViewerSettings.h"
 #include "StudioModel.h"
 #include "MatSysWin.h"
@@ -966,23 +965,23 @@ void FlexPanel::EditExpression( void )
 	CExpressionParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Edit Expression" );
-	strcpy( params.m_szName, exp->name );
-	strcpy( params.m_szDescription, exp->description );
+	V_strcpy_safe( params.m_szDialogTitle, "Edit Expression" );
+	V_strcpy_safe( params.m_szName, exp->name );
+	V_strcpy_safe( params.m_szDescription, exp->description );
 
 	if ( !ExpressionProperties( &params ) )
 		return;
 
 	namechanged = stricmp( exp->name, params.m_szName ) ? true : false;
 
-	if ( ( strlen( params.m_szName ) <= 0 ) ||
+	if ( ( Q_isempty( params.m_szName ) ) ||
 		!stricmp( params.m_szName, "unnamed" ) )
 	{
 		Con_ErrorPrintf( "You must type in a valid name\n" );
 		return;
 	}
 
-	if ( ( strlen( params.m_szDescription ) <= 0 ) ||
+	if ( ( Q_isempty( params.m_szDescription ) ) ||
    	   !stricmp( params.m_szDescription, "description" ) )
 	{
 		Con_ErrorPrintf( "You must type in a valid description\n" );
@@ -997,8 +996,8 @@ void FlexPanel::EditExpression( void )
 		_unlink( exp->GetBitmapFilename( models->GetActiveModelIndex() ) );
 	}
 
-	strcpy( exp->name, params.m_szName );
-	strcpy( exp->description, params.m_szDescription );
+	V_strcpy_safe( exp->name, params.m_szName );
+	V_strcpy_safe( exp->description, params.m_szDescription );
 
 	if ( namechanged )
 	{
@@ -1028,21 +1027,21 @@ void FlexPanel::NewExpression( void )
 	CExpressionParams params;
 	memset( &params, 0, sizeof( params ) );
 
-	strcpy( params.m_szDialogTitle, "Add Expression" );
-	strcpy( params.m_szName, "" );
-	strcpy( params.m_szDescription, "" );
+	V_strcpy_safe( params.m_szDialogTitle, "Add Expression" );
+	V_strcpy_safe( params.m_szName, "" );
+	V_strcpy_safe( params.m_szDescription, "" );
 
 	if ( !ExpressionProperties( &params ) )
 		return;
 
-	if ( ( strlen( params.m_szName ) <= 0 ) ||
+	if ( ( Q_isempty( params.m_szName ) ) ||
 		!stricmp( params.m_szName, "unnamed" ) )
 	{
 		Con_ErrorPrintf( "You must type in a valid name\n" );
 		return;
 	}
 
-	if ( ( strlen( params.m_szDescription ) <= 0 ) ||
+	if ( ( Q_isempty( params.m_szDescription ) ) ||
    	   !stricmp( params.m_szDescription, "description" ) )
 	{
 		Con_ErrorPrintf( "You must type in a valid description\n" );

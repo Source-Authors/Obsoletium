@@ -369,7 +369,7 @@ void CUtlQueue<T, M>::Purge()
 
 #ifdef TEST_UTLQUEUE
 
-#include <stdlib.h>
+#include <cstdlib>
 
 struct Data_t
 {

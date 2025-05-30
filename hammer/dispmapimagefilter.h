@@ -104,14 +104,14 @@ public:
 	CDispMapImageFilter();
 	~CDispMapImageFilter();
 
-	ChunkFileResult_t LoadFilter( CChunkFile *pFile ); 
+	[[nodiscard]] ChunkFileResult_t LoadFilter( CChunkFile *pFile ); 
 
 private:
 
 	static int GetFilterType( CString type );
-	static ChunkFileResult_t LoadFilterKeyCallback( const char *szKey, const char *szValue, CDispMapImageFilter *pFilter );
-	static ChunkFileResult_t LoadImageCallback( CChunkFile *pFile, CDispMapImageFilter *pFilter );
-	static ChunkFileResult_t LoadImageKeyCallback( const char *szKey, const char *szValue, CDispMapImageFilter *pFilter );
+	[[nodiscard]] static ChunkFileResult_t LoadFilterKeyCallback( const char *szKey, const char *szValue, CDispMapImageFilter *pFilter );
+	[[nodiscard]] static ChunkFileResult_t LoadImageCallback( CChunkFile *pFile, CDispMapImageFilter *pFilter );
+	[[nodiscard]] static ChunkFileResult_t LoadImageKeyCallback( const char *szKey, const char *szValue, CDispMapImageFilter *pFilter );
 	static void ValidHeight( int height );
 	static void ValidWidth( int width );
 };

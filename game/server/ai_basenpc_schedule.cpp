@@ -525,7 +525,7 @@ CAI_Schedule *CAI_BaseNPC::GetFailSchedule( void )
 // schedule!
 //=========================================================
 
-static bool ShouldStopProcessingTasks( CAI_BaseNPC *pNPC, int taskTime, int timeLimit )
+static bool ShouldStopProcessingTasks( CAI_BaseNPC *pNPC, unsigned long long taskTimeMcs, unsigned timeLimitMcs )
 {
 #ifdef DEBUG
 	if( ai_simulate_task_overtime.GetBool() )
@@ -545,7 +545,7 @@ static bool ShouldStopProcessingTasks( CAI_BaseNPC *pNPC, int taskTime, int time
 			return true;
 	}
 
-	if ( taskTime > timeLimit )
+	if ( taskTimeMcs > timeLimitMcs )
 	{
 		if ( ShouldUseEfficiency() || 
 			 pNPC->IsMoving() || 
@@ -585,8 +585,9 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 	
 	g_nAITasksRun = 0;
 	
-	const int timeLimit = ( IsDebug() ) ? 16 : 8;
-	int taskTime = Plat_MSTime();
+	constexpr unsigned timeLimitMcs = ( IsDebug() ) ? 16000u : 8000u;
+	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+	unsigned long long taskTimeMcs = Plat_USTime();
 
 	// Reset this at the beginning of the frame
 	Forget( bits_MEMORY_TASK_EXPENSIVE );
@@ -771,7 +772,7 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 					if ( GetTaskInterrupt() == 0 || TaskIsComplete() || HasCondition(COND_TASK_FAILED) )
 						break;
 
-					if ( ShouldUseEfficiency() && ShouldStopProcessingTasks( this, Plat_MSTime() - taskTime, timeLimit ) )
+					if ( ShouldUseEfficiency() && ShouldStopProcessingTasks( this, Plat_USTime() - taskTimeMcs, timeLimitMcs ) )
 					{
 						bStopProcessing = true;
 						break;
@@ -809,7 +810,7 @@ void CAI_BaseNPC::MaintainSchedule ( void )
 		AI_PROFILE_SCOPE_END();
 
 		// Decide if we should continue on this frame
-		if ( !bStopProcessing && ShouldStopProcessingTasks( this, Plat_MSTime() - taskTime, timeLimit ) )
+		if ( !bStopProcessing && ShouldStopProcessingTasks( this, Plat_USTime() - taskTimeMcs, timeLimitMcs ) )
 			bStopProcessing = true;
 	}
 

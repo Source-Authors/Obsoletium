@@ -199,7 +199,7 @@ void DemoOverlay::DrawOverlay( float fSetting )
 			) : OVR_NONE;
 	}
 
-	int const idx = 1;
+	constexpr int idx = 1;
 
 	if ( OVR_NONE == maskDrawnOverlay &&
 		 OVR_NONE != m_maskDrawnOverlay )
@@ -555,7 +555,7 @@ void CDemoRecorder::StartupDemoFile( void )
 
 	// make sure the .dem extension is still present
 	char ext[10];
-	Q_ExtractFileExtension( demoFileName, ext, sizeof( ext ) );
+	V_ExtractFileExtension( demoFileName, ext );
 	if ( Q_strcasecmp( ext, "dem" ) )
 	{
 		ConMsg( "StartupDemoFile: invalid filename.\n" );
@@ -585,16 +585,16 @@ void CDemoRecorder::StartupDemoFile( void )
 
 	dh->demoprotocol = DEMO_PROTOCOL;
 	dh->networkprotocol = PROTOCOL_VERSION;
-	Q_strncpy(dh->demofilestamp, DEMO_HEADER_ID, sizeof(dh->demofilestamp) );
+	V_strcpy_safe( dh->demofilestamp, DEMO_HEADER_ID );
 
-	Q_FileBase( modelloader->GetName( host_state.worldmodel ), dh->mapname, sizeof( dh->mapname ) );
+	Q_FileBase( modelloader->GetName( host_state.worldmodel ), dh->mapname );
 
 	char szGameDir[MAX_OSPATH];
-	Q_strncpy(szGameDir, com_gamedir, sizeof( szGameDir ) );
-	Q_FileBase ( szGameDir, dh->gamedirectory, sizeof( dh->gamedirectory ) );
+	V_strcpy_safe(szGameDir, com_gamedir );
+	Q_FileBase ( szGameDir, dh->gamedirectory );
 
-	Q_strncpy( dh->servername, cl.m_szRetryAddress, sizeof( dh->servername ) );
-	Q_strncpy( dh->clientname, cl_name.GetString(), sizeof( dh->clientname ) );
+	V_strcpy_safe( dh->servername, cl.m_szRetryAddress );
+	V_strcpy_safe( dh->clientname, cl_name.GetString() );
 
 	
 	// get size	signon data size
@@ -634,9 +634,7 @@ void CDemoRecorder::StartupDemoFile( void )
 	g_ClientDLL->OnDemoRecordStart( m_szDemoBaseName );
 }
 
-CDemoRecorder::CDemoRecorder()
-{
-}
+CDemoRecorder::CDemoRecorder() = default;
 
 CDemoRecorder::~CDemoRecorder()
 {
@@ -1610,23 +1608,29 @@ bool CDemoPlayer::IsPlayingBack( void )
 
 CDemoPlayer::CDemoPlayer()
 {
+	m_nStartTick = -1;
+	m_nPreviousTick = 0;
+	V_memset(&m_DemoPacket, 0x00, sizeof(m_DemoPacket));
+	m_bPlayingBack = false;
+	m_bPlaybackPaused = false;
 	m_flAutoResumeTime = 0.0f;
 	m_flPlaybackRateModifier = 1.0f;
-	m_bTimeDemo = false;	
-	m_nTimeDemoStartFrame = -1;	
-	m_flTimeDemoStartTime = 0.0f;	
-	m_flTotalFPSVariability = 0.0f;
-	m_nTimeDemoCurrentFrame = -1; 
-	m_bPlayingBack = false;
-	m_bLoading = false;
-	m_bPlaybackPaused = false;
 	m_nSkipToTick = -1;
-	m_nSkipPacketsPlayed = 0;
-	m_nSnapshotTick = 0;
-	m_SnapshotFilename[0] = 0;
-	m_bResetInterpolation = false;
-	m_nPreviousTick = 0;
 	m_nEndTick = 0;
+	m_bLoading = false;
+	
+	m_nSkipPacketsPlayed = 0;
+	m_bInterpolateView = false;
+	m_bResetInterpolation = false;
+
+	m_bTimeDemo = false;
+	m_nTimeDemoStartFrame = -1;
+	m_flTimeDemoStartTime = 0.0f;
+	m_flTotalFPSVariability = 0.0f;
+	m_nTimeDemoCurrentFrame = -1;
+
+	m_nSnapshotTick = 0;
+	m_SnapshotFilename[0] = '\0';
 }
 
 CDemoPlayer::~CDemoPlayer()
@@ -1964,7 +1968,7 @@ static bool ComputeNextIncrementalDemoFilename( char *name, int namesize )
 
 	char basename[ MAX_OSPATH ];
 
-	Q_StripExtension( name, basename, sizeof( basename ) );
+	Q_StripExtension( name, basename );
 
 	// Start looking for a valid name
 	int i = 0;
@@ -1997,9 +2001,9 @@ void CL_ListDemo_f( const CCommand &args )
 	// Find the file
 	char name[MAX_OSPATH];
 
-	Q_snprintf (name, sizeof(name), "%s", args[1]);
+	V_strcpy_safe (name, args[1]);
 	
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	Q_DefaultExtension( name, ".dem" );
 
 	ConMsg ("Demo contents for %s:\n", name);
 
@@ -2014,14 +2018,6 @@ void CL_ListDemo_f( const CCommand &args )
 	demofile.ReadDemoHeader();
 
 	demoheader_t *header = &demofile.m_DemoHeader;
-
-	if ( !header )
-	{
-		ConMsg( "Failed reading demo header.\n" );
-		demofile.Close();
-		return;
-	}
-	
 	if ( Q_strcmp ( header->demofilestamp, DEMO_HEADER_ID ) )
 	{
 		ConMsg( "%s is not a valid demo file\n", name);
@@ -2111,7 +2107,7 @@ CON_COMMAND_F( record, "Record a demo.", FCVAR_DONTRECORD )
 	}
 
 	// remove .dem extension if user added it
-	Q_StripExtension( args[1], name, sizeof( name ) );
+	Q_StripExtension( args[1], name );
 	
 	if ( incremental )
 	{
@@ -2141,8 +2137,8 @@ void CL_PlayDemo_f( const CCommand &args )
 
 	// Get the demo filename
 	char name[ MAX_OSPATH ];
-	Q_strncpy( name, args[1], sizeof( name ) );
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	V_strcpy_safe( name, args[1] );
+	Q_DefaultExtension( name, ".dem" );
 
 	// set current demo player to replay demo player?
 	demoplayer = g_pClientDemoPlayer;
@@ -2154,7 +2150,7 @@ void CL_PlayDemo_f( const CCommand &args )
 	{
 		// Remove extension
 		char basename[ MAX_OSPATH ];
-		V_StripExtension( name, basename, sizeof( basename ) );
+		V_StripExtension( name, basename );
 		g_ClientDLL->OnDemoPlaybackStart( basename );
 	}
 	else
@@ -2179,11 +2175,11 @@ void CL_TimeDemo_f( const CCommand &args )
 
 	if( args.ArgC() >= 3 )
 	{
-		Q_strncpy( g_pStatsFile, args[ 2 ], sizeof( g_pStatsFile ) );
+		V_strcpy_safe( g_pStatsFile, args[ 2 ] );
 	}
 	else
 	{
-		Q_strncpy( g_pStatsFile, "UNKNOWN", sizeof( g_pStatsFile ) );
+		V_strcpy_safe( g_pStatsFile, "UNKNOWN" );
 	}
 
 	// set current demo player to client demo player
@@ -2191,8 +2187,8 @@ void CL_TimeDemo_f( const CCommand &args )
 	
 	// open the demo file
 	char name[ MAX_OSPATH ];
-	Q_strncpy (name, args[1], sizeof( name ) );
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	V_strcpy_safe (name, args[1] );
+	Q_DefaultExtension( name, ".dem" );
 
 	if ( !demoplayer->StartPlayback( name, true ) )
 	{
@@ -2228,8 +2224,8 @@ void CL_BenchFrame_f( const CCommand &args )
 	
 	// open the demo file
 	char name[ MAX_OSPATH ];
-	Q_strncpy (name, args[1], sizeof( name ) );
-	Q_DefaultExtension( name, ".dem", sizeof( name ) );
+	V_strcpy_safe (name, args[1] );
+	Q_DefaultExtension( name, ".dem" );
 
 	if ( !demoplayer->StartPlayback( name, true ) )
 	{
@@ -2252,7 +2248,7 @@ CON_COMMAND( vtune, "Controls VTune's sampling." )
 	{
 		if(!vtune(false))
 		{
-			ConMsg("Failed to find \"VTPause()\" in \"vtuneapi.dll\".\n");
+			ConMsg("Failed to find \"VTPause()\" in \"vtuneapi" DLL_EXT_STRING "\".\n");
 			return;
 		}
 
@@ -2263,7 +2259,7 @@ CON_COMMAND( vtune, "Controls VTune's sampling." )
 	{
 		if(!vtune(true))
 		{
-			ConMsg("Failed to find \"VTResume()\" in \"vtuneapi.dll\".\n");
+			ConMsg("Failed to find \"VTResume()\" in \"vtuneapi" DLL_EXT_STRING "\".\n");
 			return;
 		}
 		

@@ -618,10 +618,10 @@ void CMapSolid::DeleteFace(int iIndex)
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-const char* CMapSolid::GetDescription(void)
+const char* CMapSolid::GetDescription(void) const
 {
 	static char szBuf[128];
-	sprintf(szBuf, "solid with %d faces", Faces.GetCount());
+	V_sprintf_safe(szBuf, "solid with %hd faces", Faces.GetCount());
 	return szBuf;
 }
 
@@ -965,7 +965,8 @@ int CMapSolid::CreateFromPlanes( DWORD dwFlags )
 			{
 				DeleteFace(nFace);
 
-				memcpy(useplane + nFace, useplane + nFace + 1, MAPSOLID_MAX_FACES - (nFace + 1));
+				// dimhotepus: memcpy -> memmove as src and dest overlaps! 
+				memmove(useplane + nFace, useplane + nFace + 1, MAPSOLID_MAX_FACES - (nFace + 1));
 			}
 		}
 	}
@@ -1570,23 +1571,24 @@ ChunkFileResult_t CMapSolid::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 		//
 		// Save the solid's ID.
 		//
+		eResult = pFile->WriteKeyValueInt("id", GetID());
+
+		// dimhotepus: Check result.
 		if (eResult == ChunkFile_Ok)
 		{
-			eResult = pFile->WriteKeyValueInt("id", GetID());
-		}
-
-		//
-		// Save all the brush faces.
-		//
-		int nFaceCount = GetFaceCount();
-		for (int nFace = 0; nFace < nFaceCount; nFace++)
-		{
-			CMapFace *pFace = GetFace(nFace);
-			eResult = pFace->SaveVMF(pFile, pSaveInfo);
-
-			if (eResult != ChunkFile_Ok)
+			//
+			// Save all the brush faces.
+			//
+			int nFaceCount = GetFaceCount();
+			for (int nFace = 0; nFace < nFaceCount; nFace++)
 			{
-				break;
+				CMapFace *pFace = GetFace(nFace);
+				eResult = pFace->SaveVMF(pFile, pSaveInfo);
+
+				if (eResult != ChunkFile_Ok)
+				{
+					break;
+				}
 			}
 		}
 

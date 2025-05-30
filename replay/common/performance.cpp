@@ -51,8 +51,8 @@ void CReplayPerformance::Write( KeyValues *pOut )
 
 void CReplayPerformance::Copy( const CReplayPerformance *pSrc )
 {
-	V_wcsncpy( m_wszTitle, pSrc->m_wszTitle, sizeof( m_wszTitle ) );
-	V_strcpy( m_szBaseFilename, pSrc->m_szBaseFilename );
+	V_wcscpy_safe( m_wszTitle, pSrc->m_wszTitle );
+	V_strcpy_safe( m_szBaseFilename, pSrc->m_szBaseFilename );
 
 	m_pReplay = pSrc->m_pReplay;
 
@@ -67,7 +67,7 @@ void CReplayPerformance::CopyTicks( const CReplayPerformance *pSrc )
 
 void CReplayPerformance::SetFilename( const char *pFilename )
 {
-	V_strcpy( m_szBaseFilename, pFilename );
+	V_strcpy_safe( m_szBaseFilename, pFilename );
 }
 
 const char *CReplayPerformance::GetFullPerformanceFilename()

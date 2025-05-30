@@ -26,8 +26,8 @@ ILauncherMgr *g_pLauncherMgr = NULL;
 #include "filesystem.h"
 #include <vgui/VGUI.h>
 #include <Color.h>
-#include "utlbuffer.h"
-#include "utlvector.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utlvector.h"
 #include "Clip2D.h"
 #include <vgui_controls/Panel.h>
 #include <vgui/IInput.h>
@@ -800,8 +800,7 @@ void CMatSystemSurface::PushMakeCurrent(VPANEL pPanel, bool useInSets)
 
 	g_pVGuiPanel->GetClipRect(pPanel, clipRect[0], clipRect[1], clipRect[2], clipRect[3]);
 
-	intp i = m_PaintStateStack.AddToTail();
-	PaintState_t &paintState = m_PaintStateStack[i];
+	PaintState_t &paintState = m_PaintStateStack[m_PaintStateStack.AddToTail()];
 	paintState.m_pPanel = pPanel;
 
 	// Determine corrected top left origin
@@ -960,7 +959,7 @@ void CMatSystemSurface::DrawTexturedLine( const Vertex_t &a, const Vertex_t &b )
 //-----------------------------------------------------------------------------
 // Draws a line!
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::DrawPolyLine( int *px, int *py ,int n )
+void CMatSystemSurface::DrawPolyLine( int *px, int *py ,intp n )
 {
 	MAT_FUNC;
 
@@ -975,9 +974,9 @@ void CMatSystemSurface::DrawPolyLine( int *px, int *py ,int n )
 	InternalSetMaterial( );
 	meshBuilder.Begin( m_pMesh, MATERIAL_LINES, n );
 
-	for ( int i = 0; i < n ; i++ )
+	for ( intp i = 0; i < n ; i++ )
 	{
-		int inext = ( i + 1 ) % n;
+		intp inext = ( i + 1 ) % n;
 
 		vgui::Vertex_t verts[2];
 		vgui::Vertex_t clippedVerts[2];
@@ -1782,7 +1781,7 @@ bool CMatSystemSurface::IsFontAdditive(HFont font)
 //-----------------------------------------------------------------------------
 // Purpose: returns the abc widths of a single character
 //-----------------------------------------------------------------------------
-void CMatSystemSurface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &c)
+void CMatSystemSurface::GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c)
 {
 	FontManager().GetCharABCwide(font, ch, a, b, c);
 }
@@ -1790,7 +1789,7 @@ void CMatSystemSurface::GetCharABCwide(HFont font, int ch, int &a, int &b, int &
 //-----------------------------------------------------------------------------
 // Purpose: returns the pixel width of a single character
 //-----------------------------------------------------------------------------
-int CMatSystemSurface::GetCharacterWidth(HFont font, int ch)
+int CMatSystemSurface::GetCharacterWidth(HFont font, wchar_t ch)
 {
 	return FontManager().GetCharacterWidth(font, ch);
 }
@@ -1822,7 +1821,7 @@ bool CMatSystemSurface::AddCustomFontFile( const char *fontName, const char *fon
 
 	char fullPath[MAX_PATH];
 	// windows needs an absolute path for ttf
-	bool bFound = g_pFullFileSystem->GetLocalPath( fontFileName, fullPath, sizeof( fullPath ) );
+	bool bFound = g_pFullFileSystem->GetLocalPath_safe( fontFileName, fullPath );
 	if ( !bFound )
 	{
 		char output[512];
@@ -2033,13 +2032,12 @@ void CMatSystemSurface::SetBitmapFontName( const char *pName, const char *pFontF
 	Q_strlower( fontPath );
 
 	CUtlSymbol sym( fontPath );
-	intp i;
-	for (i = 0; i < m_BitmapFontFileNames.Count(); i++)
+	for (intp i = 0; i < m_BitmapFontFileNames.Count(); i++)
 	{
 		if ( m_BitmapFontFileNames[i] == sym )
 		{
 			// found it, update the mapping
-			int index = m_BitmapFontFileMapping.Find( pName );
+			auto index = m_BitmapFontFileMapping.Find( pName );
 			if ( !m_BitmapFontFileMapping.IsValidIndex( index ) )
 			{
 				index = m_BitmapFontFileMapping.Insert( pName );	
@@ -2056,7 +2054,7 @@ void CMatSystemSurface::SetBitmapFontName( const char *pName, const char *pFontF
 const char *CMatSystemSurface::GetBitmapFontName( const char *pName )
 {
 	// find it in the mapping symbol table
-	int index = m_BitmapFontFileMapping.Find( pName );
+	auto index = m_BitmapFontFileMapping.Find( pName );
 	if ( index == m_BitmapFontFileMapping.InvalidIndex() )
 	{
 		return "";
@@ -2932,7 +2930,7 @@ intp CMatSystemSurface::GetPopupCount(  )
 	return m_PopupList.Count();
 }
 
-VPANEL CMatSystemSurface::GetPopup(  int index )
+VPANEL CMatSystemSurface::GetPopup(  intp index )
 {
 	HPanel p = m_PopupList[ index ];
 	VPANEL panel = ivgui()->HandleToPanel( p );
@@ -3551,12 +3549,12 @@ int CMatSystemSurface::DrawColoredText( vgui::HFont font, int x, int y, int r, i
 	DrawSetTextPos( x, y );
 	DrawSetTextColor( r, g, b, a );
 
-	Q_vsnprintf(data, sizeof( data ), fmt, argptr);
+	V_vsprintf_safe(data, fmt, argptr);
 
 	DrawSetTextFont( font );
 
 	wchar_t szconverted[ 1024 ];
-	g_pVGuiLocalize->ConvertANSIToUnicode( data, szconverted, 1024 );
+	g_pVGuiLocalize->ConvertANSIToUnicode( data, szconverted );
 	DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 	int totalLength = DrawTextLen( font, data );
@@ -3739,7 +3737,7 @@ void CMatSystemSurface::DrawColoredTextRect( vgui::HFont font, int x, int y, int
 		DrawSetTextPos( x, y );
 
 		wchar_t szconverted[ 1024 ];
-		g_pVGuiLocalize->ConvertANSIToUnicode( word, szconverted, 1024 );
+		g_pVGuiLocalize->ConvertANSIToUnicode( word, szconverted );
 		DrawPrintText( szconverted, Q_wcslen(szconverted ) );
 
 		// Leave room for space, too
@@ -3858,12 +3856,12 @@ void CMatSystemSurface::MovePopupToFront(VPANEL panel)
 	{
 		if ( !g_pVGuiPanel->HasParent(panel, input()->GetAppModalSurface()) )
 		{
-			HPanel p = ivgui()->PanelToHandle( input()->GetAppModalSurface() );
-			index = m_PopupList.Find( p );
+			HPanel pn = ivgui()->PanelToHandle( input()->GetAppModalSurface() );
+			index = m_PopupList.Find( pn );
 			if ( index != m_PopupList.InvalidIndex() )
 			{
 				m_PopupList.Remove( index );
-				m_PopupList.AddToTail( p );
+				m_PopupList.AddToTail( pn );
 			}
 		}
 	}
@@ -4309,10 +4307,10 @@ vgui::IImage *CMatSystemSurface::GetIconImageForFullPath( char const *pFullPath 
 		if ( info.szTypeName[ 0 ] != 0 )
 		{
 			char ext[ 32 ];
-			Q_ExtractFileExtension( pFullPath, ext, sizeof( ext ) );
+			V_ExtractFileExtension( pFullPath, ext );
 
 			char lookup[ 512 ];
-			Q_snprintf( lookup, sizeof( lookup ), "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
+			V_sprintf_safe( lookup, "%s", ShouldMakeUnique( ext ) ? pFullPath : info.szTypeName );
 			
 			// Now check the dictionary
 			unsigned short idx = m_FileTypeImages.Find( lookup );

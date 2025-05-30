@@ -15,19 +15,19 @@
 #endif
 
 // constant that define the bounds of various inputs
-static const int	cMinVideoFrameWidth = 16;
-static const int	cMinVideoFrameHeight = 16;
-static const int	cMaxVideoFrameWidth = 2 * 2048;
-static const int	cMaxVideoFrameHeight = 2 * 2048;
+static constexpr inline int	cMinVideoFrameWidth = 16;
+static constexpr inline int	cMinVideoFrameHeight = 16;
+static constexpr inline int	cMaxVideoFrameWidth = 2 * 2048;
+static constexpr inline int	cMaxVideoFrameHeight = 2 * 2048;
 
-static const int	cMinFPS = 1;
-static const int	cMaxFPS = 600;
+static constexpr inline int	cMinFPS = 1;
+static constexpr inline int	cMaxFPS = 600;
 
-static const float  cMinDuration = 0.016666666f;		// 1/60th second
-static const float  cMaxDuration = 3600.0f;				// 1 Hour
+static constexpr inline float  cMinDuration = 0.016666666f;		// 1/60th second
+static constexpr inline float  cMaxDuration = 3600.0f;				// 1 Hour
 
-static const int	cMinSampleRate = 11025;				// 1/4 CD sample rate
-static const int	cMaxSampleRate = 88200;				// 2x CD rate
+static constexpr inline int	cMinSampleRate = 11025;				// 1/4 CD sample rate
+static constexpr inline int	cMaxSampleRate = 88200;				// 2x CD rate
 
 #define NO_MORE_INTERESTING_TIMES   -2
 

@@ -11,29 +11,30 @@
 
 #include "vrad.h"
 #include "mathlib/vector.h"
-#include "UtlBuffer.h"
-#include "utlvector.h"
-#include "GameBSPFile.h"
-#include "BSPTreeData.h"
-#include "VPhysics_Interface.h"
-#include "Studio.h"
-#include "Optimize.h"
-#include "Bsplib.h"
-#include "CModel.h"
-#include "PhysDll.h"
+#include "gamebspfile.h"
+#include "bsptreedata.h"
+#include "vphysics_interface.h"
+#include "studio.h"
+#include "optimize.h"
+#include "bsplib.h"
+#include "cmodel.h"
+#include "physdll.h"
 #include "phyfile.h"
 #include "collisionutils.h"
+#include "tier1/byteswap.h"
 #include "tier1/KeyValues.h"
+#include "tier1/utldict.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utlvector.h"
 #include "pacifier.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/hardwareverts.h"
 #include "materialsystem/hardwaretexels.h"
-#include "byteswap.h"
 #include "mpivrad.h"
 #include "vtf/vtf.h"
-#include "tier1/utldict.h"
-#include "tier1/utlsymbol.h"
 #include "bitmap/tgawriter.h"
+#include "posix_file_stream.h"
 
 #include "messbuf.h"
 #include "vmpi.h"
@@ -192,7 +193,7 @@ void Rasterizer::Build()
 	mRasterizedLocations.EnsureCount(count);
 	memset( mRasterizedLocations.Base(), 0, mRasterizedLocations.Count() * sizeof( Location ) );
 	
-	// Computing Barycentrics adapted from here http://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
+	// Computing Barycentrics adapted from here https://gamedev.stackexchange.com/questions/23743/whats-the-most-efficient-way-to-find-barycentric-coordinates
 	Vector2D edgeA = mT1 - mT0;
 	Vector2D edgeB = mT2 - mT0;
 
@@ -398,11 +399,11 @@ static bool LoadFile( char const* pFileName, CUtlBuffer& buf )
 //-----------------------------------------------------------------------------
 static CPhysConvex* ComputeConvexHull( mstudiomesh_t* pMesh, studiohdr_t *pStudioHdr  )
 {
-	const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData( (void *)pStudioHdr );
+	const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData( pStudioHdr );
 	Assert( vertData ); // This can only return NULL on X360 for now
 
 	// Generate a list of all verts in the mesh
-	Vector** ppVerts = (Vector**)_alloca(pMesh->numvertices * sizeof(Vector*) );
+	Vector** ppVerts = stackallocT(Vector*, pMesh->numvertices);
 	for (int i = 0; i < pMesh->numvertices; ++i)
 	{
 		ppVerts[i] = vertData->Position(i);
@@ -449,7 +450,7 @@ CPhysCollide* ComputeConvexHull( studiohdr_t* pStudioHdr )
 
 bool LoadStudioModel( char const* pModelName, CUtlBuffer& buf )
 {
-	// No luck, gotta build it	
+	// No luck, gotta build it
 	// Construct the file name...
 	if (!LoadFile( pModelName, buf ))
 	{
@@ -461,7 +462,8 @@ bool LoadStudioModel( char const* pModelName, CUtlBuffer& buf )
 	if (strncmp ((const char *) buf.PeekGet(), "IDST", 4) &&
 		strncmp ((const char *) buf.PeekGet(), "IDAG", 4))
 	{
-		Warning("Error! Invalid model file \"%s\"\n", pModelName );
+		Warning("Error! Invalid model file \"%s\": tag %s is not expected.\n",
+			pModelName, (const char *) buf.PeekGet() );
 		return false;
 	}
 
@@ -492,9 +494,9 @@ bool LoadStudioModel( char const* pModelName, CUtlBuffer& buf )
 bool LoadStudioCollisionModel( char const* pModelName, CUtlBuffer& buf )
 {
 	char tmp[1024];
-	Q_strncpy( tmp, pModelName, sizeof( tmp ) );
-	Q_SetExtension( tmp, ".phy", sizeof( tmp ) );
-	// No luck, gotta build it	
+	V_strcpy_safe( tmp, pModelName );
+	V_SetExtension( tmp, ".phy" );
+	// No luck, gotta build it
 	if (!LoadFile( tmp, buf ))
 	{
 		// this is not an error, the model simply has no PHY file
@@ -512,10 +514,11 @@ bool LoadStudioCollisionModel( char const* pModelName, CUtlBuffer& buf )
 bool LoadVTXFile( char const* pModelName, const studiohdr_t *pStudioHdr, CUtlBuffer& buf )
 {
 	char	filename[MAX_PATH];
+	filename[0] = '\0';
 
 	// construct filename
-	Q_StripExtension( pModelName, filename, sizeof( filename ) );
-	strcat( filename, ".dx80.vtx" );
+	V_StripExtension( pModelName, filename );
+	V_strcat_safe( filename, ".dx80.vtx" );
 
 	if ( !LoadFile( filename, buf ) )
 	{
@@ -523,7 +526,7 @@ bool LoadVTXFile( char const* pModelName, const studiohdr_t *pStudioHdr, CUtlBuf
 		return false;
 	}
 
-	OptimizedModel::FileHeader_t* pVtxHdr = (OptimizedModel::FileHeader_t *)buf.Base();
+	const auto* pVtxHdr = buf.Base<OptimizedModel::FileHeader_t>();
 
 	// Check that it's valid
 	if ( pVtxHdr->version != OPTIMIZED_MODEL_FILE_VERSION )
@@ -562,7 +565,16 @@ void DumpCollideToGlView( vcollide_t *pCollide, const char *pFilename )
 
 	Msg("Writing %s...\n", pFilename );
 
-	FILE *fp = fopen( pFilename, "w" );
+	auto [fp, errc] = se::posix::posix_file_stream_factory::open(pFilename, "w");
+	if (errc)
+	{
+		Warning("Unable to open file to dump collide '%s': %s.\n",
+			pFilename, errc.message().c_str());
+		return;
+	}
+
+	constexpr float kRgbFactor = 1 / 255.0f;
+
 	for (int i = 0; i < pCollide->solidCount; ++i)
 	{
 		Vector *outVerts;
@@ -574,26 +586,49 @@ void DumpCollideToGlView( vcollide_t *pCollide, const char *pFilename )
 		unsigned char g = (i & 2) * 64 + 64;
 		unsigned char b = (i & 4) * 64 + 64;
 
-		float fr = r / 255.0f;
-		float fg = g / 255.0f;
-		float fb = b / 255.0f;
+		float fr = r * kRgbFactor;
+		float fg = g * kRgbFactor;
+		float fb = b * kRgbFactor;
 
 		for ( int i = 0; i < triCount; i++ )
 		{
-			fprintf( fp, "3\n" );
-			fprintf( fp, "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
+			std::tie(std::ignore, errc) = fp.print( "3\n" );
+			if (errc)
+			{
+				Warning("Unable to write to file for dump collide '%s': %s.\n",
+					pFilename, errc.message().c_str());
+				return;
+			}
+			std::tie(std::ignore, errc) = fp.print( "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
 				outVerts[vert].x, outVerts[vert].y, outVerts[vert].z, fr, fg, fb );
+			if (errc)
+			{
+				Warning("Unable to write to file for dump collide '%s': %s.\n",
+					pFilename, errc.message().c_str());
+				return;
+			}
 			vert++;
-			fprintf( fp, "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
+			std::tie(std::ignore, errc) = fp.print( "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
 				outVerts[vert].x, outVerts[vert].y, outVerts[vert].z, fr, fg, fb );
+			if (errc)
+			{
+				Warning("Unable to write to file for dump collide '%s': %s.\n",
+					pFilename, errc.message().c_str());
+				return;
+			}
 			vert++;
-			fprintf( fp, "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
+			std::tie(std::ignore, errc) = fp.print( "%6.3f %6.3f %6.3f %.2f %.3f %.3f\n", 
 				outVerts[vert].x, outVerts[vert].y, outVerts[vert].z, fr, fg, fb );
+			if (errc)
+			{
+				Warning("Unable to write to file for dump collide '%s': %s.\n",
+					pFilename, errc.message().c_str());
+				return;
+			}
 			vert++;
 		}
 		s_pPhysCollision->DestroyDebugMesh( vertCount, outVerts );
 	}
-	fclose( fp );
 }
 
 
@@ -618,20 +653,20 @@ class CShadowTextureList
 {
 public:
 	// This loads a vtf and converts it to RGB8888 format
-	unsigned char *LoadVTFRGB8888( const char *pName, int *pWidth, int *pHeight, bool *pClampU, bool *pClampV )
+	std::unique_ptr<unsigned char[]> LoadVTFRGB8888( const char *pName, int *pWidth, int *pHeight, bool *pClampU, bool *pClampV )
 	{
 		char szPath[MAX_PATH];
-		Q_strncpy( szPath, "materials/", sizeof( szPath ) );
-		Q_strncat( szPath, pName, sizeof( szPath ), COPY_ALL_CHARACTERS );
-		Q_strncat( szPath, ".vtf", sizeof( szPath ), COPY_ALL_CHARACTERS );
-		Q_FixSlashes( szPath, CORRECT_PATH_SEPARATOR );
+		V_strcpy_safe( szPath, "materials/" );
+		V_strcat_safe( szPath, pName );
+		V_strcat_safe( szPath, ".vtf" );
+		V_FixSlashes( szPath, CORRECT_PATH_SEPARATOR );
 
 		CUtlBuffer buf;
 		if ( !LoadFileIntoBuffer( buf, szPath ) )
-			return NULL;
+			return {};
 		IVTFTexture *pTex = CreateVTFTexture();
 		if (!pTex->Unserialize( buf ))
-			return NULL;
+			return {};
 		Msg("Loaded alpha texture %s\n", szPath );
 		unsigned char *pSrcImage = pTex->ImageData( 0, 0, 0, 0, 0, 0 );
 		int iWidth = pTex->Width();
@@ -640,13 +675,13 @@ public:
 		ImageFormat srcFormat = pTex->Format();
 		*pClampU = (pTex->Flags() & TEXTUREFLAGS_CLAMPS) ? true : false;
 		*pClampV = (pTex->Flags() & TEXTUREFLAGS_CLAMPT) ? true : false;
-		unsigned char *pDstImage = new unsigned char[ImageLoader::GetMemRequired( iWidth, iHeight, 1, dstFormat, false )];
+		std::unique_ptr<unsigned char[]> pDstImage =
+			std::make_unique<unsigned char[]>(ImageLoader::GetMemRequired( iWidth, iHeight, 1, dstFormat, false ));
 
 		if( !ImageLoader::ConvertImageFormat( pSrcImage, srcFormat, 
-			pDstImage, dstFormat, iWidth, iHeight, 0, 0 ) )
+			pDstImage.get(), dstFormat, iWidth, iHeight, 0, 0 ) )
 		{
-			delete[] pDstImage;
-			return NULL;
+			return {};
 		}
 
 		*pWidth = iWidth;
@@ -659,7 +694,7 @@ public:
 	bool FindOrLoadIfValid( const char *pMaterialName, int *pIndex )
 	{
 		*pIndex = -1;
-		int index = m_Textures.Find(pMaterialName);
+		const auto index = m_Textures.Find(pMaterialName);
 		bool bFound = false;
 		if ( index != m_Textures.InvalidIndex() )
 		{
@@ -668,7 +703,7 @@ public:
 		}
 		else
 		{
-			KeyValues *pVMT = new KeyValues("vmt");
+			KeyValuesAD pVMT("vmt");
 			CUtlBuffer buf((intp)0,0,CUtlBuffer::TEXT_BUFFER);
 			LoadFileIntoBuffer( buf, pMaterialName );
 			if ( pVMT->LoadFromBuffer( pMaterialName, buf ) )
@@ -685,11 +720,11 @@ public:
 							int w, h;
 							bool bClampU = false;
 							bool bClampV = false;
-							unsigned char *pImageBits = LoadVTFRGB8888( pBaseTextureName, &w, &h, &bClampU, &bClampV );
+							std::unique_ptr<unsigned char[]> pImageBits = LoadVTFRGB8888( pBaseTextureName, &w, &h, &bClampU, &bClampV );
 							if ( pImageBits )
 							{
-								int index = m_Textures.Insert( pMaterialName );
-								m_Textures[index].InitFromRGB8888( w, h, pImageBits );
+								const auto index = m_Textures.Insert( pMaterialName );
+								m_Textures[index].InitFromRGB8888( w, h, pImageBits.get() );
 								*pIndex = index;
 								if ( pVMT->FindKey("$nocull") )
 								{
@@ -698,14 +733,12 @@ public:
 								}
 								m_Textures[index].clampU = bClampU;
 								m_Textures[index].clampV = bClampV;
-								delete[] pImageBits;
 							}
 						}
 					}
 				}
 
 			}
-			pVMT->deleteThis();
 		}
 
 		return bFound;
@@ -739,9 +772,9 @@ public:
 		}
 	}
 	
-	int AddMaterialEntry( int shadowTextureIndex, const Vector2D &t0, const Vector2D &t1, const Vector2D &t2 )
+	intp AddMaterialEntry( int shadowTextureIndex, const Vector2D &t0, const Vector2D &t1, const Vector2D &t2 )
 	{
-		int index = m_MaterialEntries.AddToTail();
+		intp index = m_MaterialEntries.AddToTail();
 		m_MaterialEntries[index].textureIndex = shadowTextureIndex;
 		m_MaterialEntries[index].uv[0] = t0;
 		m_MaterialEntries[index].uv[1] = t1;
@@ -763,10 +796,10 @@ public:
 		vmax = max(vmax, t2.y);
 
 		// UNDONE: Do something about tiling
-		umin = clamp(umin, 0, 1);
-		umax = clamp(umax, 0, 1);
-		vmin = clamp(vmin, 0, 1);
-		vmax = clamp(vmax, 0, 1);
+		umin = clamp(umin, 0.f, 1.f);
+		umax = clamp(umax, 0.f, 1.f);
+		vmin = clamp(vmin, 0.f, 1.f);
+		vmax = clamp(vmax, 0.f, 1.f);
 		Assert(umin>=0.0f && umax <= 1.0f);
 		Assert(vmin>=0.0f && vmax <= 1.0f);
 		const alphatexture_t &tex = m_Textures.Element(shadowTextureIndex);
@@ -858,7 +891,7 @@ CShadowTextureList g_ShadowTextureList;
 
 float ComputeCoverageFromTexture( float b0, float b1, float b2, int32 hitID )
 {
-	const float alphaScale = 1.0f / 255.0f;
+	constexpr float alphaScale = 1.0f / 255.0f;
 	// UNDONE: Pass ray down to determine backfacing?
 	//Vector normal( tri.m_flNx, tri.m_flNy, tri.m_flNz );
 	//bool bBackface = DotProduct(delta, tri.N) > 0 ? true : false;
@@ -867,32 +900,32 @@ float ComputeCoverageFromTexture( float b0, float b1, float b2, int32 hitID )
 }
 
 // this is here to strip models/ or .mdl or whatnot
-void CleanModelName( const char *pModelName, char *pOutput, int outLen )
+template<intp outLen>
+static void CleanModelName( const char *pModelName, char (&pOutput)[outLen] )
 {
 	// strip off leading models/ if it exists
-	const char pModelDir[] = "models/";
+	constexpr char pModelDir[] = "models/";
 	constexpr intp modelLen = ssize(pModelDir) - 1;
 
 	if ( !Q_strnicmp(pModelName, pModelDir, modelLen ) )
 	{
 		pModelName += modelLen;
 	}
-	Q_strncpy( pOutput, pModelName, outLen );
+	V_strcpy_safe( pOutput, pModelName );
 
 	// truncate any .mdl extension
-	char *dot = strchr(pOutput,'.');
+	char *dot = strchr(pOutput, '.');
 	if ( dot )
 	{
 		*dot = '\0';
 	}
-
 }
 
 
 void ForceTextureShadowsOnModel( const char *pModelName )
 {
 	char buf[MAX_FILEPATH];
-	CleanModelName( pModelName, buf, sizeof(buf) );
+	CleanModelName( pModelName, buf );
 	if ( !g_ForcedTextureShadowsModels.Find(buf).IsValid())
 	{
 		g_ForcedTextureShadowsModels.AddString(buf);
@@ -902,7 +935,7 @@ void ForceTextureShadowsOnModel( const char *pModelName )
 bool IsModelTextureShadowsForced( const char *pModelName )
 {
 	char buf[1024];
-	CleanModelName( pModelName, buf, sizeof(buf) );
+	CleanModelName( pModelName, buf );
 	return g_ForcedTextureShadowsModels.Find(buf).IsValid();
 }
 
@@ -916,7 +949,7 @@ void CVradStaticPropMgr::CreateCollisionModel( char const* pModelName )
 	CUtlBuffer bufvtx;
 	CUtlBuffer bufphy;
 
-	int i = m_StaticPropDict.AddToTail();
+	intp i = m_StaticPropDict.AddToTail();
 	m_StaticPropDict[i].m_pModel = NULL;
 	m_StaticPropDict[i].m_pStudioHdr = NULL;
 
@@ -927,7 +960,7 @@ void CVradStaticPropMgr::CreateCollisionModel( char const* pModelName )
 		return;
 	}
 
-	studiohdr_t* pHdr = (studiohdr_t*)buf.Base();
+	studiohdr_t* pHdr = buf.Base<studiohdr_t>();
 
 	VectorCopy( pHdr->hull_min, m_StaticPropDict[i].m_Mins );
 	VectorCopy( pHdr->hull_max, m_StaticPropDict[i].m_Maxs );
@@ -944,7 +977,7 @@ void CVradStaticPropMgr::CreateCollisionModel( char const* pModelName )
 		/*
 		static int propNum = 0;
 		char tmp[128];
-		sprintf( tmp, "staticprop%03d.txt", propNum );
+		V_sprintf_safe( tmp, "staticprop%03d.txt", propNum );
 		DumpCollideToGlView( pCollide, tmp );
 		++propNum;
 		*/
@@ -960,7 +993,7 @@ void CVradStaticPropMgr::CreateCollisionModel( char const* pModelName )
 
 	// clone it
 	m_StaticPropDict[i].m_pStudioHdr = (studiohdr_t *)malloc( buf.Size() );
-	memcpy( m_StaticPropDict[i].m_pStudioHdr, (studiohdr_t*)buf.Base(), buf.Size() );
+	memcpy( m_StaticPropDict[i].m_pStudioHdr, buf.Base<studiohdr_t>(), buf.Size() );
 
 	if ( !LoadVTXFile( pModelName, m_StaticPropDict[i].m_pStudioHdr, m_StaticPropDict[i].m_VtxBuf ) )
 	{
@@ -1000,9 +1033,8 @@ void CVradStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 {
 	int count = buf.GetInt();
 
-
 	m_StaticProps.AddMultipleToTail(count);
-	for ( int i = 0; i < count; ++i )				  
+	for ( int i = 0; i < count; ++i )
 	{
 		StaticPropLump_t lump;
 		buf.Get( &lump, sizeof(StaticPropLump_t) );
@@ -1031,7 +1063,7 @@ void CVradStaticPropMgr::UnserializeStaticProps()
 {
 	// Unserialize static props, insert them into the appropriate leaves
 	GameLumpHandle_t handle = g_GameLumps.GetGameLumpHandle( GAMELUMP_STATIC_PROPS );
-	int size = g_GameLumps.GameLumpSize( handle );
+	intp size = g_GameLumps.GameLumpSize( handle );
 	if (!size)
 		return;
 
@@ -1059,11 +1091,11 @@ void CVradStaticPropMgr::UnserializeStaticProps()
 
 void CVradStaticPropMgr::Init()
 {
-	CreateInterfaceFn physicsFactory = GetPhysicsFactory();
+	CreateInterfaceFnT<IPhysicsCollision> physicsFactory = GetPhysicsFactory();
 	if ( !physicsFactory )
-		Error( "Unable to load vphysics DLL." );
-		
-	s_pPhysCollision = (IPhysicsCollision *)physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
+		Error( "Unable to load vphysics" DLL_EXT_STRING );
+
+	s_pPhysCollision = physicsFactory( VPHYSICS_COLLISION_INTERFACE_VERSION, NULL );
 	if( !s_pPhysCollision )
 	{
 		Error( "Unable to get '%s' for physics interface.", VPHYSICS_COLLISION_INTERFACE_VERSION );
@@ -1076,7 +1108,6 @@ void CVradStaticPropMgr::Init()
 
 void CVradStaticPropMgr::Shutdown()
 {
-
 	// Remove all static prop model data
 	for (int i = m_StaticPropDict.Count(); --i >= 0; )
 	{
@@ -1185,7 +1216,7 @@ void CVradStaticPropMgr::ApplyLightingToStaticProp( int iStaticProp, CStaticProp
 
 	StaticPropDict_t &dict = m_StaticPropDict[prop.m_ModelIdx];
 	studiohdr_t	*pStudioHdr = dict.m_pStudioHdr;
-	OptimizedModel::FileHeader_t *pVtxHdr = (OptimizedModel::FileHeader_t *)dict.m_VtxBuf.Base();
+	auto *pVtxHdr = dict.m_VtxBuf.Base<OptimizedModel::FileHeader_t>();
 	Assert( pStudioHdr && pVtxHdr );
 
 	int iCurColorVertsArray = 0;
@@ -1216,7 +1247,7 @@ void CVradStaticPropMgr::ApplyLightingToStaticProp( int iStaticProp, CStaticProp
 					for ( int nGroup = 0; nGroup < pVtxMesh->numStripGroups; ++nGroup )
 					{
 						OptimizedModel::StripGroupHeader_t* pStripGroup = pVtxMesh->pStripGroup( nGroup );
-						int nMeshIdx = prop.m_MeshData.AddToTail();
+						intp nMeshIdx = prop.m_MeshData.AddToTail();
 
 						if (colorVerts)
 						{
@@ -1240,9 +1271,8 @@ void CVradStaticPropMgr::ApplyLightingToStaticProp( int iStaticProp, CStaticProp
 							if (g_bDumpPropLightmaps)
 							{
 								char buffer[_MAX_PATH];
-								V_snprintf( 
+								V_sprintf_safe( 
 									buffer, 
-									_MAX_PATH - 1, 
 									"staticprop_lightmap_%d_%.0f_%.0f_%.0f_%s_%d_%d_%d_%d_%d.tga", 
 									iStaticProp, 
 									prop.m_Origin.x, 
@@ -1282,7 +1312,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 
 	StaticPropDict_t &dict = m_StaticPropDict[prop.m_ModelIdx];
 	studiohdr_t	*pStudioHdr = dict.m_pStudioHdr;
-	OptimizedModel::FileHeader_t *pVtxHdr = (OptimizedModel::FileHeader_t *)dict.m_VtxBuf.Base();
+	auto *pVtxHdr = dict.m_VtxBuf.Base<OptimizedModel::FileHeader_t>();
 	if ( !pStudioHdr || !pVtxHdr )
 	{
 		// must have model and its verts for lighting computation
@@ -1333,7 +1363,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 			for ( int meshID = 0; meshID < pStudioModel->nummeshes; ++meshID )
 			{
 				mstudiomesh_t *pStudioMesh = pStudioModel->pMesh( meshID );
-				const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData((void *)pStudioHdr);
+				const mstudio_meshvertexdata_t *vertData = pStudioMesh->GetVertexData(pStudioHdr);
 
 				Assert(vertData); // This can only return NULL on X360 for now
 				
@@ -1359,7 +1389,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 						badVertex.m_ColorVertex = numVertexes;
 						badVertex.m_Position = samplePosition;
 						badVertex.m_Normal = sampleNormal;
-						badVerts.AddToTail( badVertex );			
+						badVerts.AddToTail( badVertex );
 					}
 					else
 					{
@@ -1402,7 +1432,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 			// must punt, leave black coloring
 			if ( badVerts.Count() && ( prop.m_bLightingOriginValid || badVerts.Count() != numVertexes ) )
 			{
-				for ( int nBadVertex = 0; nBadVertex < badVerts.Count(); nBadVertex++ )
+				for ( intp nBadVertex = 0; nBadVertex < badVerts.Count(); nBadVertex++ )
 				{		
 					Vector bestPosition;
 					if ( prop.m_bLightingOriginValid )
@@ -1487,7 +1517,7 @@ void CVradStaticPropMgr::SerializeLighting()
 	}
 
 	char mapName[MAX_PATH];
-	Q_FileBase( source, mapName, sizeof( mapName ) );
+	Q_FileBase( source, mapName );
 
 	int size;
 	for (int i = 0; i < count; ++i)
@@ -1499,17 +1529,17 @@ void CVradStaticPropMgr::SerializeLighting()
 
 		if (g_bHDR)
 		{
-			sprintf( filename, "sp_hdr_%d.vhv", i );
+			V_sprintf_safe( filename, "sp_hdr_%d.vhv", i );
 		}
 		else
 		{
-			sprintf( filename, "sp_%d.vhv", i );
+			V_sprintf_safe( filename, "sp_%d.vhv", i );
 		}
 
 		int totalVertexes = 0;
-		for ( int j=0; j<m_StaticProps[i].m_MeshData.Count(); j++ )
+		for ( auto &md : m_StaticProps[i].m_MeshData )
 		{
-			totalVertexes += m_StaticProps[i].m_MeshData[j].m_VertexColors.Count();
+			totalVertexes += md.m_VertexColors.Count();
 		}
 
 		// allocate a buffer with enough padding for alignment
@@ -1542,7 +1572,7 @@ void CVradStaticPropMgr::SerializeLighting()
 			pMesh->m_nOffset   = (unsigned int)pVertexData - (unsigned int)pVhvHdr; 
 
 			// construct vertexes
-			for (int k=0; k<pMesh->m_nVertexes; k++)
+			for (unsigned k=0; k<pMesh->m_nVertexes; k++)
 			{
 				Vector &vertexColor = m_StaticProps[i].m_MeshData[n].m_VertexColors[k];
 
@@ -1569,13 +1599,13 @@ void CVradStaticPropMgr::SerializeLighting()
 
 	for (int i = 0; i < count; ++i)
 	{
-		const int kAlignment = 512;
+		constexpr int kAlignment = 512;
 		// no need to write this file if we didn't compute the data
 		// props marked this way will not load the info anyway 
 		if (m_StaticProps[i].m_Flags & STATIC_PROP_NO_PER_TEXEL_LIGHTING)
 			continue;
 
-		sprintf(filename, "texelslighting_%d.ppl", i);
+		V_sprintf_safe(filename, "texelslighting_%d.ppl", i);
 
 		ImageFormat fmt = m_StaticProps[i].m_LightmapImageFormat;
 
@@ -1610,12 +1640,15 @@ void CVradStaticPropMgr::SerializeLighting()
 			HardwareTexels::MeshHeader_t *pMesh = pVhtHdr->pMesh(n);
 			pMesh->m_nLod = m_StaticProps[i].m_MeshData[n].m_nLod;
 			pMesh->m_nOffset = (unsigned int)pTexelData - (unsigned int)pVhtHdr;
-			pMesh->m_nBytes = m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Count();
+
+			const auto &texels = m_StaticProps[i].m_MeshData[n].m_TexelsEncoded;
+
+			pMesh->m_nBytes = texels.Count();
 			pMesh->m_nWidth = m_StaticProps[i].m_LightmapImageWidth;
 			pMesh->m_nHeight = m_StaticProps[i].m_LightmapImageHeight;
 
-			Q_memcpy(pTexelData, m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Base(), m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Count());
-			pTexelData += m_StaticProps[i].m_MeshData[n].m_TexelsEncoded.Count();
+			V_memcpy(pTexelData, texels.Base(), texels.Count());
+			pTexelData += texels.Count();
 		}
 
 		pTexelData = (unsigned char *)((unsigned int)pTexelData - (unsigned int)pVhtHdr);
@@ -1745,7 +1778,7 @@ void CVradStaticPropMgr::ComputeLighting( int iThread )
 		return;
 	}
 
-	StartPacifier( "Computing static prop lighting : " );
+	StartPacifier( "Computing static prop lighting: " );
 
 	// ensure any traces against us are ignored because we have no inherit lighting contribution
 	m_bIgnoreStaticPropTrace = true;
@@ -2147,10 +2180,10 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void *pModelData )
 	// mandatory callback to make requested data resident
 	// load and persist the vertex file
 	char fileName[MAX_PATH];
-	strcpy( fileName, "models/" );	
-	strcat( fileName, pActiveStudioHdr->pszName() );
-	Q_StripExtension( fileName, fileName, sizeof( fileName ) );
-	strcat( fileName, ".vvd" );
+	V_strcpy_safe( fileName, "models/" );
+	V_strcat_safe( fileName, pActiveStudioHdr->pszName() );
+	Q_StripExtension( fileName, fileName );
+	V_strcat_safe( fileName, ".vvd" );
 
 	// load the model
 	FileHandle_t fileHandle = g_pFileSystem->Open( fileName, "rb" );
@@ -2456,7 +2489,7 @@ static void FilterFineMipmap(unsigned int _resX, unsigned int _resY, const CUtlV
 		ConvertRGBExp32ToLinear( &rgbColor, &(filterSrc[i]) );
 	}
 
-	const int cRadius = 1;
+	constexpr int cRadius = 1;
 	const float cOneOverDiameter = 1.0f / pow(2.0f * cRadius + 1.0f, 2.0f) ;
 	// Filter here.
 	for (int j = 0; j < _resY; ++j) 
@@ -2659,11 +2692,15 @@ static void DumpLightmapLinear( const char* _dstFilename, const CUtlVector<color
 	BuildFineMipmap( _width, _height, true, _srcTexels, NULL, &linearFloats );
 	linearBuffer.SetCount( linearFloats.Count() );
 
-	for ( int i = 0; i < linearFloats.Count(); ++i ) {
+	for ( intp i = 0; i < linearFloats.Count(); ++i ) {
 		linearBuffer[i].b = RoundFloatToByte(linearFloats[i].z * 255.0f);
 		linearBuffer[i].g = RoundFloatToByte(linearFloats[i].y * 255.0f);
 		linearBuffer[i].r = RoundFloatToByte(linearFloats[i].x * 255.0f);
 	}
-	
-	TGAWriter::WriteTGAFile( _dstFilename, _width, _height, IMAGE_FORMAT_BGR888, (uint8*)(linearBuffer.Base()), _width * ImageLoader::SizeInBytes(IMAGE_FORMAT_BGR888) );
+
+	// dimhotepus: Dump warning if TGA write fails.
+	if (!TGAWriter::WriteTGAFile(_dstFilename, _width, _height, IMAGE_FORMAT_BGR888, (uint8*)(linearBuffer.Base()), _width * ImageLoader::SizeInBytes(IMAGE_FORMAT_BGR888)))
+	{
+		Warning( "Unable to write lightmap TGA to '%s'.\n", _dstFilename );
+	}
 }

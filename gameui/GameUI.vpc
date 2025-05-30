@@ -66,7 +66,7 @@ $Project "gameui"
 		$File	"LogoFile.cpp" [!$POSIX]
 		$File	"ModInfo.cpp"
 		$File	"MouseMessageForwardingPanel.cpp"
-		$File	"$SRCDIR\Tracker\common\msgbuffer.cpp" [!$POSIX]
+		$File	"$SRCDIR\tracker\common\msgbuffer.cpp" [!$POSIX]
 		$File	"$SRCDIR\common\netapi.cpp" [!$POSIX]
 		$File	"$SRCDIR\common\GameUI\ObjectList.cpp"
 		$File	"PanelListPanel.cpp"
@@ -126,10 +126,10 @@ $Project "gameui"
 		$File	"$SRCDIR\common\IVGuiModuleLoader.h"
 		$File	"$SRCDIR\common\GameUI\ObjectList.h"
 		$File	"$SRCDIR\public\savegame_version.h"
-		$File	"$SRCDIR\Tracker\common\TrackerMessageFlags.h"
+		$File	"$SRCDIR\tracker\common\TrackerMessageFlags.h"
 		$File	"$SRCDIR\common\ValveCDKeyGameAndTerritoryCodes.h"
-		$File	"$SRCDIR\common\language.h"		
-		$File	"$SRCDIR\common\imageutils.h"		
+		$File	"$SRCDIR\common\language.h"
+		$File	"$SRCDIR\common\imageutils.h"
 	}
 
 	$Folder	"Controls"

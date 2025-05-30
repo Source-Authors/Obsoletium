@@ -60,7 +60,7 @@ CToolDisplace::CToolDisplace()
 	// load filters from file
 	static char szProgramDir[MAX_PATH];
 	APP()->GetDirectory( DIR_PROGRAM, szProgramDir );
-	strcat( szProgramDir, "filters\\dispfilters.txt" );
+	V_strcat_safe( szProgramDir, "filters\\dispfilters.txt" );
 	LoadFilters( szProgramDir );
 	AddFiltersToManagers();
 

@@ -89,12 +89,16 @@ bool g_bDspOff;
 float g_dsp_volume;
 
 // dsp performance timing
-unsigned g_snd_call_time_debug = 0;
-unsigned g_snd_time_debug = 0;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+double g_snd_call_time_debug = 0.0;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+double g_snd_time_debug = 0.0;
 unsigned g_snd_count_debug = 0;
 unsigned g_snd_samplecount = 0;
-unsigned g_snd_frametime = 0;
-unsigned g_snd_frametime_total = 0;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+double g_snd_frametime = 0.0;
+// dimhotepus: unsigned -> double to not overflow in 49.7 days.
+double g_snd_frametime_total = 0.0;
 int	g_snd_profile_type = 0;		// type 1 dsp, type 2 mixer, type 3 load sound, type 4 all sound
 
 #define FILTERTYPE_NONE		0
@@ -265,10 +269,9 @@ double MIX_GetMaxRate( double rate, int sampleCount )
 
 	// make sure sampleCount is never greater than paintbuffer samples
 	// (this should have been set up in MIX_PaintChannels)
-
 	Assert (sampleCount <= PAINTBUFFER_SIZE);
 
-	return fpmin( rate, rate_max );
+	return min( rate, rate_max );
 }
 
 
@@ -278,15 +281,6 @@ double MIX_GetMaxRate( double rate, int sampleCount )
 // endtime - total number of 32 bit stereo samples currently mixed in paintbuffer
 void S_TransferStereo16( void *pOutput, const portable_samplepair_t *pfront, int lpaintedtime, int endtime )
 {
-	int		lpos;
-	
-	if ( IsX360() )
-	{
-		// not the right path for 360
-		Assert( 0 );
-		return;
-	}
-
 	Assert( pOutput );
 
 	snd_vol = S_GetMasterVolume()*256;
@@ -299,13 +293,13 @@ void S_TransferStereo16( void *pOutput, const portable_samplepair_t *pfront, int
 	bool bShouldPlaySound = !cl_movieinfo.IsRecording() && !IsReplayRendering();
 
 	while ( lpaintedtime < endtime )
-	{														
+	{
 		// pbuf can hold 16384, 16 bit L/R samplepairs.
 		// lpaintedtime - where to start painting into dma buffer. 
 		// (modulo size of dma buffer for current position).
 		// handle recirculating buffer issues
-		// lpos - samplepair index into dma buffer. First samplepair from paintbuffer to be xfered here.															
-		lpos = lpaintedtime & sampleMask;
+		// lpos - samplepair index into dma buffer. First samplepair from paintbuffer to be xfered here.	
+		int lpos = lpaintedtime & sampleMask;
 
 		// snd_out is L/R sample index into dma buffer.  First L sample from paintbuffer goes here.
 		snd_out = (short *)pOutput + (lpos<<1);
@@ -339,61 +333,47 @@ void S_TransferStereo16( void *pOutput, const portable_samplepair_t *pfront, int
 	}
 }
 
-// Transfer contents of main paintbuffer pfront out to 
-// device.  Perform volume multiply on each sample.
+// Transfer contents of main paintbuffer pfront out to device.  Perform volume multiply on each sample.
 void S_TransferPaintBuffer(void *pOutput, const portable_samplepair_t *pfront, int lpaintedtime, int endtime)
 {
-	int 		out_idx;		// mono sample index
-	int 		count;			// number of mono samples to output
-	int 		out_mask;
-	int 		step;
-	int			val;
-	int			nSoundVol;
-	const int 	*p;
- 
-	if ( IsX360() )
-	{
-		// not the right path for 360
-		Assert( 0 );
-		return;
-	}
-
 	Assert( pOutput );
 
-	p = (const int *) pfront;
+	const int *p = (const int *)pfront;
+	const int device_channels{g_AudioDevice->DeviceChannels()};
 
-	count = ((endtime - lpaintedtime) * g_AudioDevice->DeviceChannels()); 
+	// number of mono samples to output
+	int count = (endtime - lpaintedtime) * device_channels;
+	const int out_mask = g_AudioDevice->DeviceSampleCount() - 1;
+	int out_idx = (lpaintedtime * device_channels) & out_mask; // mono sample index
 	
-	out_mask = g_AudioDevice->DeviceSampleCount() - 1; 
+	const int step = 3 - device_channels;	// mono output buffer - step 2, stereo - step 1
+	const int nSoundVol = S_GetMasterVolume() * 256;
 
-	// 44k: remove old 22k sound support << HISPEED_DMA
-	// out_idx = ((paintedtime << HISPEED_DMA) * g_AudioDevice->DeviceChannels()) & out_mask;
+	const int device_sample_bits{g_AudioDevice->DeviceSampleBits()};
 
-	out_idx = (lpaintedtime * g_AudioDevice->DeviceChannels()) & out_mask;
-	
-	step = 3 - g_AudioDevice->DeviceChannels();	// mono output buffer - step 2, stereo - step 1
-	nSoundVol = S_GetMasterVolume()*256;
-
-	if (g_AudioDevice->DeviceSampleBits() == 16)
+	if (device_sample_bits == 16)
 	{
 		short *out = (short *) pOutput;
 		while (count--)
 		{
-			val = (*p * nSoundVol) >> 8;
-			p+= step;
+			int val = (*p * nSoundVol) >> 8;
+			p += step;
 			val = CLIP(val);
 			
 			out[out_idx] = val;
 			out_idx = (out_idx + 1) & out_mask;
 		}
+
+		return;
 	}
-	else if (g_AudioDevice->DeviceSampleBits() == 8)
+
+	if (device_sample_bits == 8)
 	{
 		unsigned char *out = (unsigned char *) pOutput;
 		while (count--)
 		{
-			val = (*p * nSoundVol) >> 8;
-			p+= step;
+			int val = (*p * nSoundVol) >> 8;
+			p += step;
 			val = CLIP(val);
 			
 			out[out_idx] = (val>>8) + 128;
@@ -866,7 +846,7 @@ void S_MixBufferUpsample2x( int count, portable_samplepair_t *pbuffer, portable_
 // Also sets the rear paintbuffer if paintbuffer has fsurround true.
 // (otherwise, rearpaintbuffer is NULL)
 
-void MIX_SetCurrentPaintbuffer(int ipaintbuffer)
+void MIX_SetCurrentPaintbuffer(intp ipaintbuffer)
 {
 	// set front and rear paintbuffer
 
@@ -896,9 +876,7 @@ void MIX_SetCurrentPaintbuffer(int ipaintbuffer)
 
 intp MIX_GetCurrentPaintbufferIndex( void )
 {
-	intp i;
-
-	for ( i = 0; i < g_paintBuffers.Count(); i++ )
+	for ( intp i = 0; i < g_paintBuffers.Count(); i++ )
 	{
 		if (g_curpaintbuffer == g_paintBuffers[i].pbuf)
 			return i;
@@ -912,7 +890,7 @@ intp MIX_GetCurrentPaintbufferIndex( void )
 
 paintbuffer_t *MIX_GetCurrentPaintbufferPtr( void )
 {
-	int ipaint = MIX_GetCurrentPaintbufferIndex();
+	intp ipaint = MIX_GetCurrentPaintbufferIndex();
 	
 	Assert( ipaint < g_paintBuffers.Count() );
 
@@ -927,7 +905,7 @@ inline portable_samplepair_t *MIX_GetPFrontFromIPaint(int ipaintbuffer)
 	return g_paintBuffers[ipaintbuffer].pbuf;
 }
 
-paintbuffer_t *MIX_GetPPaintFromIPaint( int ipaintbuffer )
+paintbuffer_t *MIX_GetPPaintFromIPaint( intp ipaintbuffer )
 {	
 	Assert( ipaintbuffer < g_paintBuffers.Count() );
 
@@ -1770,7 +1748,7 @@ void MIX_CompressPaintbuffer(int ipaint, int count)
 void MIX_MixUpsampleBuffer( CChannelList &list, int ipaintbuffer, int end, int count, int flags )
 {
 	VPROF("MixUpsampleBuffer");
-	int ipaintcur = MIX_GetCurrentPaintbufferIndex(); // save current paintbuffer
+	intp ipaintcur = MIX_GetCurrentPaintbufferIndex(); // save current paintbuffer
 
 	// reset paintbuffer upsampling filter index
 	MIX_ResetPaintbufferFilterCounter( ipaintbuffer );
@@ -1967,15 +1945,6 @@ protected:
 	int m_numChans;
 };
 
-// comparator for qsort as used below (eg a lambda)
-// returns < 0 if a should come before b, > 0 if a should come after, 0 otherwise
-static int __cdecl ChannelVolComparator ( const void * a, const void * b ) 
-{
-	// greater numbers come first.
-	return static_cast<const CChannelCullList::sChannelVolData *>(b)->m_vol - static_cast<const CChannelCullList::sChannelVolData *>(a)->m_vol;
-}
-
-
 void CChannelCullList::Initialize( CChannelList &list )
 {
 	VPROF("CChannelCullList::Initialize");
@@ -2007,7 +1976,15 @@ void CChannelCullList::Initialize( CChannelList &list )
 	}
 
 	// Sort the list.
-	qsort( m_channelInfo, MAX_CHANNELS, sizeof(sChannelVolData), ChannelVolComparator );
+	std::sort( std::begin(m_channelInfo), std::end(m_channelInfo), []
+	(
+		const CChannelCullList::sChannelVolData &a,
+		const CChannelCullList::sChannelVolData &b
+	) 
+	{
+		// greater numbers come first.
+		return b.m_vol < a.m_vol;
+	});
 
 	// Then, determine if the given sound is less than the nth loudest of its hash. If so, mark its flag
 	// for removal.
@@ -2015,7 +1992,7 @@ void CChannelCullList::Initialize( CChannelList &list )
 	// (I'm using it for now because we don't have convenient/fast hash table 
 	// classes, which would be the linear-time way to deal with this).
 	const int cutoff = snd_cull_duplicates.GetInt();
-	for ( int i = 0 ; i < m_numChans ; ++i ) // i is index in original channel list
+	for ( int i = 0 ; i < m_numChans; ++i ) // i is index in original channel list
 	{
 		channel_t *ch = list.GetChannel(i);
 		// for each sound, determine where it ranks in loudness
@@ -2362,7 +2339,7 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 		if ( !g_bDspOff )
 		{
 			// apply 1ch filtering to SOUND_BUFFER_SPECIALs
-			for ( int iDSP = 0; iDSP < list.m_nSpecialDSPs.Count(); ++iDSP )
+			for ( intp iDSP = 0; iDSP < list.m_nSpecialDSPs.Count(); ++iDSP )
 			{
 				bool bFoundMixer = false;
 				

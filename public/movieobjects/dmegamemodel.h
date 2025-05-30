@@ -17,11 +17,11 @@
 struct studiohdr_t;
 
 // Fixme, this might not be the best spot for this
-class IGlobalFlexController
+abstract_class IGlobalFlexController
 {
 public:
-	virtual int				FindGlobalFlexController( char const *name ) = 0;
-	virtual char const		*GetGlobalFlexControllerName( int idx ) = 0;
+	virtual UtlSymId_t		FindGlobalFlexController( char const *name ) = 0;
+	virtual char const		*GetGlobalFlexControllerName( UtlSymId_t idx ) = 0;
 };
 
 class CDmeGameModel;
@@ -35,10 +35,10 @@ public:
 
 	void		SetGameModel( CDmeGameModel *gameModel );
 
-	virtual void Resolve();
-	virtual void Operate();
-	virtual void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs );
-	virtual void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs );
+	void Resolve() override;
+	void Operate() override;
+	void GetInputAttributes ( CUtlVector< CDmAttribute * > &attrs ) override;
+	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 	void	SetWeight( float flWeight );
 	void	SetMapping( int globalIndex );
@@ -46,7 +46,7 @@ public:
 
 	int	GetGlobalIndex() const;
 
-	virtual void OnAttributeChanged( CDmAttribute *pAttribute );
+	void OnAttributeChanged( CDmAttribute *pAttribute ) override;
 	CDmaVar< float >	m_flexWeight;
 	CDmaElement< CDmeGameModel >	m_gameModel;
 	
@@ -67,26 +67,26 @@ class CDmeGameModel : public CDmeDag
 
 public:
 	void AddBone( CDmeTransform* pTransform );
-	void AddBones( studiohdr_t *pStudioHdr, const char *pBaseName, int nFirstBone, int nCount );
-	void SetBone( uint index, const Vector& pos, const Quaternion& rot );
-	uint NumBones() const;
-	CDmeTransform *GetBone( uint index ) const;
-	int FindBone( CDmeTransform *pTransform ) const;
+	void AddBones( studiohdr_t *pStudioHdr, const char *pBaseName, intp nFirstBone, intp nCount );
+	void SetBone( intp index, const Vector& pos, const Quaternion& rot );
+	intp NumBones() const;
+	CDmeTransform *GetBone( intp index ) const;
+	intp FindBone( CDmeTransform *pTransform ) const;
 	void RemoveAllBones();
 
 	// A src bone transform transforms pre-compiled data (.dmx or .smd files, for example)
 	// into post-compiled data (.mdl or .ani files)
 	// Returns false if there is no transform (or if the transforms are identity)
-	bool GetSrcBoneTransforms( matrix3x4_t *pPreTransform, matrix3x4_t *pPostTransform, int nBoneIndex ) const;
+	bool GetSrcBoneTransforms( matrix3x4_t *pPreTransform, matrix3x4_t *pPostTransform, intp nBoneIndex ) const;
 
-	bool IsRootTransform( int nBoneIndex ) const;
+	bool IsRootTransform( intp nBoneIndex ) const;
 
-	uint NumFlexWeights() const;
+	intp NumFlexWeights() const;
 	const CUtlVector< float >& GetFlexWeights() const;
 	// We drive these through the operators instead
 	// void SetFlexWeights( uint nFlexWeights, const float* flexWeights );
-	void SetNumFlexWeights( uint nFlexWeights );
-	void SetFlexWeights( uint nFlexWeights, const float* flexWeights );
+	void SetNumFlexWeights( intp nFlexWeights );
+	void SetFlexWeights( intp nFlexWeights, const float* flexWeights );
 
 	const Vector& GetViewTarget() const;
 	void SetViewTarget( const Vector &viewTarget );
@@ -106,8 +106,8 @@ public:
 	CDmeGlobalFlexControllerOperator *FindGlobalFlexController( int nGlobalIndex );
 	void	RemoveGlobalFlexController( CDmeGlobalFlexControllerOperator *controller );
 
-	int NumGlobalFlexControllers() const;
-	CDmeGlobalFlexControllerOperator *GetGlobalFlexController( int localIndex ); // localIndex is in order of calls to AddGlobalFlexController
+	intp NumGlobalFlexControllers() const;
+	CDmeGlobalFlexControllerOperator *GetGlobalFlexController( intp localIndex ); // localIndex is in order of calls to AddGlobalFlexController
 
 	void AppendGlobalFlexControllerOperators( CUtlVector< IDmeOperator * >& list );
 	studiohdr_t* GetStudioHdr() const;
@@ -116,7 +116,7 @@ public:
 	CDmaVar< bool > m_bComputeBounds;
 
 protected:
-	void PopulateExistingDagList( CDmeDag** pDags, int nCount );
+	void PopulateExistingDagList( CDmeDag** pDags, intp nCount );
 
 	// This holds the operators which map to the m_flexWeights below
 	CDmaElementArray< CDmeGlobalFlexControllerOperator > m_globalFlexControllers;

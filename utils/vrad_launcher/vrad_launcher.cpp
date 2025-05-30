@@ -15,14 +15,16 @@
 
 #include "ivraddll.h"
 
+#include "tier0/memdbgon.h"
+
 namespace {
 
-template <int size>
+template <intp size>
 [[nodiscard]] std::error_code MakeFullPath(const char *in, char (&out)[size]) {
   if (in[0] == CORRECT_PATH_SEPARATOR || in[0] == INCORRECT_PATH_SEPARATOR ||
       in[1] == ':') {
     // It's already a full path.
-    V_strncpy(out, in, size);
+    V_strcpy_safe(out, in);
   } else {
     try {
       std::error_code rc;
@@ -30,13 +32,13 @@ template <int size>
 
       if (rc) return rc;
 
-      Q_UTF16ToUTF8(cwd.c_str(), out, size * sizeof(out[0]));
+      Q_WStringToUTF8(cwd.c_str(), out, size * sizeof(out[0]));
     } catch (const std::bad_alloc &) {
       return std::error_code{ENOMEM, std::generic_category()};
     }
 
-    V_strncat(out, CORRECT_PATH_SEPARATOR_S, size, COPY_ALL_CHARACTERS);
-    V_strncat(out, in, size, COPY_ALL_CHARACTERS);
+    V_strcat_safe(out, CORRECT_PATH_SEPARATOR_S);
+    V_strcat_safe(out, in);
   }
 
   return std::error_code{};

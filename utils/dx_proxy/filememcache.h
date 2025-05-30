@@ -5,10 +5,10 @@
 #ifndef SRC_UTILS_DX_PROXY_FILEMEMCACHE_H_
 #define SRC_UTILS_DX_PROXY_FILEMEMCACHE_H_
 
-#include <unordered_map>
+#include <atomic>
 
-#include "tier0/platform.h"
-#include "tier1/generichash.h"
+#include <unordered_map>
+#include <string_view>
 
 namespace se::dx_proxy {
 
@@ -16,32 +16,34 @@ class CachedFileData final {
   friend class FileCache;
 
  public:
-  static CachedFileData *GetByDataPtr(void const *pvDataPtr);
+  [[nodiscard]] static CachedFileData *GetByDataPtr(const void *data_ptr);
 
-  char const *GetFileName() const;
-  void const *GetDataPtr() const;
+  const char *GetFileName() const;
+  const void *GetDataPtr() const;
   unsigned GetDataLen() const;
 
-  unsigned AddRef() { return ++m_numRefs; }
-  unsigned Release() { return --m_numRefs; }
+  unsigned AddRef() {
+    return m_numRefs.fetch_add(1, std::memory_order::memory_order_relaxed) + 1;
+  }
+  unsigned Release() {
+    return m_numRefs.fetch_sub(1, std::memory_order::memory_order_relaxed) - 1;
+  }
 
   bool IsValid() const;
 
  protected:  // Constructed by FileCache
   ~CachedFileData();
 
-  static CachedFileData *Create(char const *szFilename);
+  static CachedFileData *Create(const char *file_name);
 
  private:
-  enum { eHeaderSize = 256 };
-
   char m_chFilename[256 - 8];
-  unsigned m_numRefs;
+  std::atomic_uint m_numRefs;
   unsigned m_numDataBytes;
 
-  unsigned char m_data[0];  // file data spans further
+  unsigned char m_data[1];  // file data spans further
 
-  CachedFileData() = default;
+  CachedFileData() : m_numDataBytes{0} { m_chFilename[0] = '\0'; }
 };
 
 class FileCache final {
@@ -49,24 +51,29 @@ class FileCache final {
   FileCache() = default;
   ~FileCache() { Clear(); }
 
-  CachedFileData *Get(char const *szFilename);
+  CachedFileData *Get(const char *file_name);
   void Clear();
 
  private:
-  struct FileNameEq {
-    inline size_t operator()(const char *s) const noexcept {
+  struct HasherAndComparer {
+    const std::hash<std::string_view> hash = {};
+
+    // Hasher.
+    [[nodiscard]] inline size_t operator()(const char *s) const noexcept {
       if (!s) return 0;
 
-      return HashString(s);
+      return hash(std::string_view{s, strlen(s)});
     }
 
-    inline bool operator()(const char *s1, const char *s2) const noexcept {
+    // Comparer.
+    [[nodiscard]] inline bool operator()(const char *s1,
+                                         const char *s2) const noexcept {
       return _stricmp(s1, s2) < 0;
     }
   };
 
-  using Mapping = std::unordered_map<const char *, CachedFileData *, FileNameEq,
-                                     FileNameEq>;
+  using Mapping = std::unordered_map<const char *, CachedFileData *,
+                                     HasherAndComparer, HasherAndComparer>;
 
   Mapping m_map;
 };

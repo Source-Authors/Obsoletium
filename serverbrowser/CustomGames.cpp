@@ -254,7 +254,7 @@ void CCustomGames::OnSaveFilter(KeyValues *filter)
 	if ( m_pTagFilter )
 	{
 		// tags
-		m_pTagFilter->GetText(m_szTagFilter, sizeof(m_szTagFilter) - 1);
+		m_pTagFilter->GetText(m_szTagFilter);
 	}
 
 	if ( m_szTagFilter[0] )
@@ -361,7 +361,7 @@ void CCustomGames::RecalculateCommonTags( void )
 	for ( int i = 0; i < iTagsToAdd; i++ )
 	{
 		const char *pszTag = aTagsInUse[i].pszTag;
-		m_pTagListMenu->AddMenuItem( pszTag, new KeyValues("AddTag", "tag", pszTag), this, new KeyValues( "data", "tag", pszTag ) );
+		m_pTagListMenu->AddMenuItem( pszTag, new KeyValues("AddTag", "tag", pszTag), this, KeyValuesAD( new KeyValues( "data", "tag", pszTag ) ) );
 	}
 
 	m_pTagListMenu->SetFixedWidth( m_pAddTagList->GetWide() );
@@ -401,7 +401,7 @@ int SortServerTags( char* const *p1, char* const *p2 )
 void CCustomGames::AddTagToFilterList( const char *pszTag )
 {
 	char txt[ 128 ];
-	m_pTagFilter->GetText( txt, sizeof( txt ) );
+	m_pTagFilter->GetText( txt );
 
 	CUtlVector<char*> TagList;
 	V_SplitString( txt, ",", TagList );
@@ -429,14 +429,14 @@ void CCustomGames::AddTagToFilterList( const char *pszTag )
 	char tmptags[MAX_TAG_CHARACTERS];
 	tmptags[0] = '\0';
 
-	for ( int i = 0; i < TagList.Count(); i++ )
+	for ( intp i = 0; i < TagList.Count(); i++ )
 	{
 		if ( i > 0 )
 		{
-			Q_strncat( tmptags, ",", MAX_TAG_CHARACTERS );
+			V_strcat_safe( tmptags, "," );
 		}
 
-		Q_strncat( tmptags, TagList[i], MAX_TAG_CHARACTERS );
+		V_strcat_safe( tmptags, TagList[i] );
 	}
 
 	m_pTagFilter->SetText( tmptags );

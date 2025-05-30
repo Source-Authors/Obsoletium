@@ -10,6 +10,11 @@
 #pragma once
 #endif
 
+#include "istudiorender.h"
+
+struct matrix3x4_t;
+class Vector;
+
 int DebugDrawModel( IStudioRender *pStudioRender, DrawModelInfo_t& info, matrix3x4_t *pBoneToWorld, const Vector &modelOrigin,
 			        int flags = STUDIORENDER_DRAW_ENTIRE_MODEL );
 int DebugDrawModelNormals( IStudioRender *pStudioRender, DrawModelInfo_t& info, matrix3x4_t *pBoneToWorld, const Vector &modelOrigin,

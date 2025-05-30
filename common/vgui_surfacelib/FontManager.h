@@ -51,11 +51,11 @@ public:
 	void SetFontScale(HFont font, float sx, float sy);
 	const char *GetFontName( HFont font );
 	const char *GetFontFamilyName( HFont font );
-	void GetCharABCwide(HFont font, int ch, int &a, int &b, int &c);
+	void GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c);
 	int GetFontTall(HFont font);
 	int GetFontTallRequested(HFont font);
 	int GetFontAscent(HFont font, wchar_t wch);
-	int GetCharacterWidth(HFont font, int ch);
+	int GetCharacterWidth(HFont font, wchar_t ch);
 	bool GetFontUnderlined( HFont font );
 	void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall);
 

@@ -1268,7 +1268,7 @@ void CPropAirboat::UpdateGauge()
 	CFourWheelVehiclePhysics *pPhysics = GetPhysics();
 	int speed = pPhysics->GetSpeed();
 	int maxSpeed = pPhysics->GetMaxSpeed();
-	float speedRatio = clamp( (float)speed / (float)maxSpeed, 0, 1 );
+	float speedRatio = clamp( (float)speed / (float)maxSpeed, 0.f, 1.f );
 
 	SetPoseParameter( "Gauge", speedRatio );
 }
@@ -1504,7 +1504,7 @@ void CPropAirboat::UpdateSound()
 	CFourWheelVehiclePhysics *pPhysics = GetPhysics();
 	int speed = pPhysics->GetSpeed();
 	int maxSpeed = pPhysics->GetMaxSpeed();
-	float speedRatio = clamp((float)speed / (float)maxSpeed, 0, 1);
+	float speedRatio = clamp((float)speed / (float)maxSpeed, 0.f, 1.f);
 
 	//Msg("speedRatio=%f\n", speedRatio);
 

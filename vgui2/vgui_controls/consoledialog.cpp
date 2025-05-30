@@ -7,24 +7,23 @@
 
 #include "vgui_controls/consoledialog.h"
 
+#include "icvar.h"
+#include "filesystem.h"
+#include "tier1/convar.h"
+#include "tier1/convar_serverbounded.h"
+#include "tier1/KeyValues.h"
+
 #include "vgui/IInput.h"
 #include "vgui/IScheme.h"
 #include "vgui/IVGui.h"
 #include "vgui/ISurface.h"
 #include "vgui/ILocalize.h"
-#include "KeyValues.h"
+#include "vgui/KeyCode.h"
 
 #include "vgui_controls/Button.h"
-#include "vgui/KeyCode.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/TextEntry.h"
 #include "vgui_controls/RichText.h"
-#include "tier1/convar.h"
-#include "tier1/convar_serverbounded.h"
-#include "icvar.h"
-#include "filesystem.h"
-
-#include <cstdlib>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -165,20 +164,14 @@ const char *CHistoryItem::GetExtra() const
 void CHistoryItem::SetText( const char *text, const char *extra )
 {
 	delete[] m_text;
-	intp len = strlen( text ) + 1;
-
-	m_text = new char[ len ];
-	Q_memset( m_text, 0x0, len );
-	Q_strncpy( m_text, text, len );
+	m_text = V_strdup( text );
 
 	if ( extra )
 	{
 		m_bHasExtra = true;
+
 		delete[] m_extraText;
-		intp elen = strlen( extra ) + 1;
-		m_extraText = new char[ elen ];
-		Q_memset( m_extraText, 0x0, elen);
-		Q_strncpy( m_extraText, extra, elen );
+		m_extraText = V_strdup( extra );
 	}
 	else
 	{
@@ -256,11 +249,11 @@ const char *CConsolePanel::CompletionItem::GetItemText( void )
 	{
 		if ( m_pText->HasExtra() )
 		{
-			Q_snprintf( text, sizeof( text ), "%s %s", m_pText->GetText(), m_pText->GetExtra() );
+			V_sprintf_safe( text, "%s %s", m_pText->GetText(), m_pText->GetExtra() );
 		}
 		else
 		{
-			Q_strncpy( text, m_pText->GetText(), sizeof( text ) );
+			V_strcpy_safe( text, m_pText->GetText() );
 		}
 	}
 	return text;
@@ -272,7 +265,7 @@ const char *CConsolePanel::CompletionItem::GetCommand( void ) const
 	text[0] = 0;
 	if ( m_pText )
 	{
-		Q_strncpy( text, m_pText->GetText(), sizeof( text ) );
+		V_strcpy_safe( text, m_pText->GetText() );
 	}
 	return text;
 }
@@ -410,8 +403,8 @@ void CConsolePanel::DPrint( const char *msg )
 
 void CConsolePanel::ClearCompletionList()
 {
-	int c = m_CompletionList.Count();
-	int i;
+	intp c = m_CompletionList.Count();
+	intp i;
 	for ( i = c - 1; i >= 0; i-- )
 	{
 		delete m_CompletionList[ i ];
@@ -613,7 +606,7 @@ void CConsolePanel::OnAutoComplete(bool reverse)
 
 	if ( !Q_strstr( completedText, " " ) )
 	{
-		Q_strncat(completedText, " ", sizeof(completedText), COPY_ALL_CHARACTERS );
+		V_strcat_safe(completedText, " " );
 	}
 
 	m_pEntry->SetText(completedText);
@@ -632,13 +625,13 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 	if (panel != m_pEntry)
 		return;
 
-	Q_strncpy( m_szPreviousPartialText, m_szPartialText, sizeof( m_szPreviousPartialText ) );
+	V_strcpy_safe( m_szPreviousPartialText, m_szPartialText );
 
 	// get the partial text the user type
-	m_pEntry->GetText(m_szPartialText, sizeof(m_szPartialText));
+	m_pEntry->GetText(m_szPartialText);
 
 	// see if they've hit the tilde key (which opens & closes the console)
-	intp len = Q_strlen(m_szPartialText);
+	intp len = V_strlen(m_szPartialText);
 
 	bool hitTilde = ( m_szPartialText[len - 1] == '~' || m_szPartialText[len - 1] == '`' ) ? true : false;
 
@@ -680,22 +673,23 @@ void CConsolePanel::OnTextChanged(Panel *panel)
 	{
 		m_pCompletionList->SetVisible(true);
 		m_pCompletionList->DeleteAllItems();
-		const int MAX_MENU_ITEMS = 10;
+		constexpr intp MAX_MENU_ITEMS = 10;
 
 		// add the first ten items to the list
-		for (int i = 0; i < m_CompletionList.Count() && i < MAX_MENU_ITEMS; i++)
+		for (intp i = 0; i < m_CompletionList.Count() && i < MAX_MENU_ITEMS; i++)
 		{
 			char text[256];
-			text[0] = 0;
+
 			if (i == MAX_MENU_ITEMS - 1)
 			{
-				Q_strncpy(text, "...", sizeof( text ) );
+				V_strcpy_safe(text, "..." );
 			}
 			else
 			{
 				Assert( m_CompletionList[i] );
-				Q_strncpy(text, m_CompletionList[i]->GetItemText(), sizeof( text ) );
+				V_strcpy_safe(text, m_CompletionList[i]->GetItemText() );
 			}
+
 			KeyValues *kv = new KeyValues("CompletionCommand");
 			kv->SetString("command",text);
 			m_pCompletionList->AddMenuItem(text, kv, this);
@@ -718,7 +712,7 @@ void CConsolePanel::OnCommand(const char *command)
 	{
 		// submit the entry as a console commmand
 		char szCommand[256];
-		m_pEntry->GetText(szCommand, sizeof(szCommand));
+		m_pEntry->GetText(szCommand);
 		PostActionSignal( new KeyValues( "CommandSubmitted", "command", szCommand ) );
 
 		// add to the history
@@ -829,12 +823,12 @@ void CConsolePanel::PerformLayout()
 
 	if ( !m_bStatusVersion )
 	{
-		const int inset = 8;
-		const int entryHeight = 24;
-		const int topHeight = 4;
-		const int entryInset = 4;
-		const int submitWide = 64;
-		const int submitInset = 7; // x inset to pull the submit button away from the frame grab
+		constexpr int inset = 8;
+		constexpr int entryHeight = 24;
+		constexpr int topHeight = 4;
+		constexpr int entryInset = 4;
+		constexpr int submitWide = 64;
+		constexpr int submitInset = 7; // x inset to pull the submit button away from the frame grab
 
 		m_pHistory->SetPos(inset, inset + topHeight); 
 		m_pHistory->SetSize(wide - (inset * 2), tall - (entryInset * 2 + inset * 2 + topHeight + entryHeight));
@@ -849,7 +843,7 @@ void CConsolePanel::PerformLayout()
 	}
 	else
 	{
-		const int inset = 2;
+		constexpr int inset = 2;
 
 		int entryWidth = wide / 2;
 		if ( wide > 400 )
@@ -953,23 +947,16 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 		m_CommandHistory.Remove( 0 );
 	}
 
-	const size_t commandTextLen = strlen( commandText );
-
 	// strip the space off the end of the command before adding it to the history
 	// If this code gets cleaned up then we should remove the redundant calls to strlen,
 	// the check for whether _alloca succeeded, and should use V_strncpy instead of the
 	// error prone memset/strncpy sequence.
-	char *command = static_cast<char *>( _alloca( (commandTextLen + 1 ) * sizeof( char ) ));
-	if ( command )
-	{
-		memset( command, 0x0, commandTextLen + 1 );
-		strncpy( command, commandText, commandTextLen );
+	V_strdup_stack(commandText, command);
 
-		const size_t len = strlen(command) - 1;
-		if ( command[ len ] == ' ' )
-		{
-			 command[ len ] = '\0';
-		}
+	const size_t len = strlen(command) - 1;
+	if ( command[ len ] == ' ' )
+	{
+		command[ len ] = '\0';
 	}
 
 	// strip the quotes off the extra text
@@ -977,14 +964,11 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 
 	if ( extraText )
 	{
-		extra = static_cast<char *>( malloc( (strlen( extraText ) + 1 ) * sizeof( char ) ));
+		extra = V_strdup( extraText );
 		if ( extra )
 		{
-			memset( extra, 0x0, strlen( extraText ) + 1 );
-			strncpy( extra, extraText, strlen( extraText )); // +1 to dodge the starting quote
-			
 			// Strip trailing spaces
-			intp i = strlen( extra ) - 1; 
+			intp i = V_strlen( extra ) - 1;
 			while ( i >= 0 &&  // Check I before referencing i == -1 into the extra array!
 				extra[ i ] == ' ' )
 			{
@@ -1020,19 +1004,18 @@ void CConsolePanel::AddToHistory( const char *commandText, const char *extraText
 	CHistoryItem *item = &m_CommandHistory[ m_CommandHistory.AddToTail() ];
 	Assert( item );
 	item->SetText( command, extra );
+	delete [] extra;
 
 	m_iNextCompletion = 0;
 	RebuildCompletionList( m_szPartialText );
-
-	free( extra );
 }
 
-void CConsolePanel::GetConsoleText( char *pchText, size_t bufSize ) const
+void CConsolePanel::GetConsoleText( char *pchText, intp bufSize ) const
 {
-	wchar_t *temp = new wchar_t[ bufSize ];
-	m_pHistory->GetText( 0, temp, bufSize * sizeof( wchar_t ) );
-	g_pVGuiLocalize->ConvertUnicodeToANSI( temp, pchText, bufSize );
-	delete[] temp;
+	// dimhotepus: Use unique_ptr<[]>. Can't allocate on stack as text may be long.
+	std::unique_ptr<wchar_t[]> temp = std::make_unique<wchar_t[]>( bufSize );
+	m_pHistory->GetText( 0, temp.get(), bufSize * sizeof( wchar_t ) );
+	g_pVGuiLocalize->ConvertUnicodeToANSI( temp.get(), pchText, bufSize );
 }
 
 //-----------------------------------------------------------------------------
@@ -1048,7 +1031,7 @@ void CConsolePanel::DumpConsoleTextToFile()
 	// we don't want to overwrite other condump.txt files
 	for ( int i = 0 ; i < CONDUMP_FILES_MAX_NUM ; ++i )
 	{
-		_snprintf( szfile, sizeof(szfile), "condump%03d.txt", i );
+		V_sprintf_safe( szfile, "condump%03d.txt", i );
 		if ( !g_pFullFileSystem->FileExists(szfile) )
 		{
 			found = true;
@@ -1065,11 +1048,11 @@ void CConsolePanel::DumpConsoleTextToFile()
 	FileHandle_t handle = g_pFullFileSystem->Open(szfile, "wb");
 	if ( handle != FILESYSTEM_INVALID_HANDLE )
 	{
-		int pos = 0;
+		intp pos = 0;
 		while (1)
 		{
 			wchar_t buf[512];
-			m_pHistory->GetText(pos, buf, sizeof(buf));
+			m_pHistory->GetText(pos, buf);
 			pos += sizeof(buf) / sizeof(wchar_t);
 
 			// don't continue if none left
@@ -1078,10 +1061,10 @@ void CConsolePanel::DumpConsoleTextToFile()
 
 			// convert to ansi
 			char ansi[512];
-			g_pVGuiLocalize->ConvertUnicodeToANSI(buf, ansi, sizeof(ansi));
+			g_pVGuiLocalize->ConvertUnicodeToANSI(buf, ansi);
 
 			// write to disk
-			intp len = strlen(ansi);
+			intp len = V_strlen(ansi);
 			for (intp i = 0; i < len; i++)
 			{
 				// preceed newlines with a return

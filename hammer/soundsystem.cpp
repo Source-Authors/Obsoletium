@@ -227,10 +227,11 @@ bool CSoundSystem::RecurseIntoDirectories( char const* pDirectoryName, pDirCallb
 		return false;
 
 	intp nDirectoryNameLen = V_strlen( pDirectoryName );
+	intp sizeWildCard = nDirectoryNameLen + ssize( "/*.*" );
 
-	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 5 );
-	strcpy(pWildCard, pDirectoryName);
-	strcat(pWildCard, "/*.*");
+	char *pWildCard = stackallocT( char, sizeWildCard );
+	V_strncpy(pWildCard, pDirectoryName, sizeWildCard);
+	V_strncat(pWildCard, "/*.*", sizeWildCard);
 	intp nPathStrLen = nDirectoryNameLen + 1;
 
 	FileFindHandle_t findHandle;
@@ -535,7 +536,7 @@ void CSoundSystem::OpenSource( SoundType_t type, int nIndex )
 		V_sprintf_safe( pRelativePath, "%s", pFileName );
 
 		char pFullPath[MAX_PATH];
-		if ( g_pFullFileSystem->GetLocalPath( pRelativePath, pFullPath, MAX_PATH ) )
+		if ( g_pFullFileSystem->GetLocalPath_safe( pRelativePath, pFullPath ) )
 		{
 			if (HINSTANCE(32) > ShellExecute( NULL, "open", pFullPath, NULL, NULL, SW_SHOWNORMAL ))
 			{

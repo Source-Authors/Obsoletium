@@ -30,7 +30,6 @@
 #endif
 #include "sv_plugin.h"
 #include "cl_main.h"
-#include "sv_steamauth.h"
 #include "datacache/imdlcache.h"
 #include "sys_dll.h"
 #include "testscriptmgr.h"
@@ -40,8 +39,6 @@
 #endif
 #include "GameEventManager.h"
 #include "tier0/etwprof.h"
-
-#include "ccs.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -275,9 +272,7 @@ static void WatchDogHandler()
 // Class implementation
 //-----------------------------------------------------------------------------
 
-CHostState::CHostState()
-{
-}
+CHostState::CHostState() = default;
 
 void CHostState::Init()
 {
@@ -294,8 +289,6 @@ void CHostState::Init()
 	m_angLocation.Init();
 	m_bWaitingForConnection = false;
 	m_flShortFrameTime = 1.0;
-
-	CCS_Init();
 
 	Plat_SetWatchdogHandlerFunction( WatchDogHandler );
 }
@@ -352,7 +345,7 @@ void CHostState::State_NewGame()
 
 		if ( !serverGameClients )
 		{
-			Warning( "Can't start game, no valid server.dll loaded\n" );
+			Warning( "Can't start game, no valid server" DLL_EXT_STRING " loaded\n" );
 		}
 		else
 		{
@@ -573,8 +566,6 @@ void CHostState::State_GameShutdown()
 // Tell the launcher we're done.
 void CHostState::State_Shutdown()
 {
-	CCS_Shutdown();
-
 #if !defined(SWDS)
 	CL_EndMovie();
 #endif
@@ -601,8 +592,6 @@ void CHostState::State_Restart( void )
 //-----------------------------------------------------------------------------
 void CHostState::FrameUpdate( float time )
 {
-	CCS_Tick( time );
-
 #if _DEBUG
 	int loopCount = 0;
 #endif
@@ -724,41 +713,49 @@ void CHostState::OnClientConnected()
 	// Spew global texture memory usage if asked to
 	if( CommandLine()->CheckParm( "-dumpvidmemstats" ) )
 	{
-		FileHandle_t fp;
-		fp = g_pFileSystem->Open( "vidmemstats.txt", "a" );
+		// dimhotepus: vidmemstats.txt -> gpu_memstats.txt.
+		// dimhotepus: Notify user we dump stats.
+		constexpr char kGpuMemStatsName[]{"gpu_memstats.txt"};
+		Msg("Dumping GPU memory stats to '%s' as requested by '%s' switch.",
+			kGpuMemStatsName, "-dumpvidmemstats");
 
+		FileHandle_t fp = g_pFileSystem->Open( kGpuMemStatsName, "a" );
 		g_pFileSystem->FPrintf( fp, "%s:\n", g_HostState.m_levelName );
 	
 #ifdef VPROF_ENABLED
-		CVProfile *pProf = &g_VProfCurrentProfile;
+		constexpr char kGroupNamePrefix[]{"TexGroup_Global_"};
+		constexpr intp kGroupNamePrefixLen{ssize( kGroupNamePrefix ) - 1};
+		constexpr float kMibsMultiplier{1.0f / (1024.0f * 1024.0f)};
 
-		intp prefixLen = ssize( "TexGroup_Global_" ) - 1;
-		float total = 0.0f;
-		for ( int i=0; i < pProf->GetNumCounters(); i++ )
+		const CVProfile &profile{g_VProfCurrentProfile};
+		float totalMibs{0.0f};
+
+		for ( int i = 0; i < profile.GetNumCounters(); i++ )
 		{
-			if ( pProf->GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
+			if ( profile.GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
 			{
-				// The counters are in bytes and the panel is all in kilobytes.
-				float value = pProf->GetCounterValue( i ) * ( 1.0f /  ( 1024.0f * 1024.0f ) );
-				total += value;
-				const char *pName = pProf->GetCounterName( i );
-				if( Q_strnicmp( pName, "TexGroup_Global_", prefixLen ) == 0 )
+				const float valueMibs = profile.GetCounterValue( i ) * kMibsMultiplier;
+
+				totalMibs += valueMibs;
+
+				const char *counterName = profile.GetCounterName( i );
+				if ( Q_strnicmp( counterName, kGroupNamePrefix, kGroupNamePrefixLen ) == 0 )
 				{
-					pName += prefixLen;
+					counterName += kGroupNamePrefixLen;
 				}
-				g_pFileSystem->FPrintf( fp, "%s: %0.3fMB\n", pName, value );
+
+				g_pFileSystem->FPrintf( fp, "%s: %0.3f MiB\n", counterName, valueMibs );
 			}
 		}
-		g_pFileSystem->FPrintf( fp, "vidmem total: %0.3fMB\n", total );
+		g_pFileSystem->FPrintf( fp, "GPU memory total: %0.3f MiB\n", totalMibs );
+#else
+		// dimhotepus: Notify user VProfiler is not supported.
+		g_pFileSystem->FPrintf( fp, "VProfiler is not supported.\n" );
 #endif
 
-#if 0
-		g_pFileSystem->FPrintf( fp, "hunk total: %0.3fMB\n", Cache_TotalUsed() * ( 1.0f / ( 1024.0f * 1024.0f ) ) );
-		g_pFileSystem->FPrintf( fp, "hunk sound: %0.3fMB\n", Cache_TotalUsed_Sound() * ( 1.0f / ( 1024.0f * 1024.0f ) ) );
-		g_pFileSystem->FPrintf( fp, "hunk models: %0.3fMB\n", Cache_TotalUsed_Models() * ( 1.0f / ( 1024.0f * 1024.0f ) ) );
-#endif
 		g_pFileSystem->FPrintf( fp, "---------------------------------\n" );
 		g_pFileSystem->Close( fp );
+
 		Cbuf_AddText( "quit\n" );
 	}
 #endif

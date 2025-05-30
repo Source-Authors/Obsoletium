@@ -8,7 +8,7 @@
 #include "vgui_budgethistorypanel.h"
 #include <vgui/ISurface.h>
 #include "tier0/vprof.h"
-#include "convar.h"
+#include "tier1/convar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -21,7 +21,13 @@ CBudgetHistoryPanel::CBudgetHistoryPanel( CBaseBudgetPanel *pParent, const char 
 {
 	m_pBudgetPanel = pParent;
 
+	m_pData = nullptr;
+	m_nGroups = 0;
 	m_nSamplesPerGroup = 0;
+	m_nSampleOffset = 0;
+	m_fRangeMin = -1;
+	m_fRangeMax = -1;
+
 	SetProportional( false );
 	SetKeyBoardInputEnabled( false );
 	SetMouseInputEnabled( false );

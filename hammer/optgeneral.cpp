@@ -208,7 +208,7 @@ BOOL COPTGeneral::OnApply(void)
 	
 	if ( strcmp( Options.general.szAutosaveDir, str ) )
 	{
-		strcpy( Options.general.szAutosaveDir, str );
+		V_strcpy_safe( Options.general.szAutosaveDir, str );
 		bResetTimer = TRUE;
 	}
 

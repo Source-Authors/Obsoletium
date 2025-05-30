@@ -18,6 +18,11 @@ $Configuration
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\game\shared\hl2,.\hl2,.\hl2mp,$SRCDIR\game\shared\hl2mp"
 		$PreprocessorDefinitions		"$BASE;HL2MP;HL2_DLL"
 	}
+
+	$Resources
+	{
+		$AdditionalIncludeDirectories		"$BASE;.\hl2mp"
+	}
 }
 
 $Project "server (hl2mp)"

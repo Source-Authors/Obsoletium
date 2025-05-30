@@ -15,7 +15,7 @@
 #include "vgui/VGUI.h"
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/PHandle.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 namespace vgui
 {

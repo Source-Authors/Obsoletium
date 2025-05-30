@@ -109,7 +109,7 @@ void StockSolid::AddDataField(STSDF_TYPE type, const char *pszName, int iRangeLo
 
 	field.type = type;
 	field.flags = 0;
-	strcpy(field.szName, pszName);
+	V_strcpy_safe(field.szName, pszName);
 
 	if(iRangeLower != -1)
 	{

@@ -13,7 +13,7 @@
 #include "physics_motioncontroller.h"
 #include "physics_vehicle.h"
 #include "physics_virtualmesh.h"
-#include "utlmultilist.h"
+#include "tier1/utlmultilist.h"
 #include "vphysics/constraints.h"
 #include "vphysics/vehicles.h"
 #include "vphysics/object_hash.h"
@@ -148,7 +148,7 @@ public:
 		else
 		{
 			IVP_U_Float_Point normal;
-			IVP_Contact_Point_API::get_surface_normal_ws(const_cast<IVP_Contact_Point *>(m_pPoint), &normal);
+			IVP_Contact_Point_API::get_surface_normal_ws(m_pPoint, &normal);
 			ConvertDirectionToHL( normal, out );
 			out *= m_sign;
 		}
@@ -213,18 +213,17 @@ public:
 
 	void DeleteObject( CPhysicsObject *pObject )
 	{
-		int index = pObject->GetActiveIndex();
+		intp index = pObject->GetActiveIndex();
 		if ( index < m_activeObjects.Count() )
 		{
 			Assert( m_activeObjects[index] == pObject );
 			Remove( index );
-			pObject->SetActiveIndex( 0xFFFF );
+			pObject->SetActiveIndex( std::numeric_limits<intp>::max() );
 		}
 		else
 		{
-			Assert(index==0xFFFF);
+			Assert(index==std::numeric_limits<intp>::max());
 		}
-				
 	}
 
     void event_object_deleted( IVP_Event_Object *pEvent ) override
@@ -257,8 +256,8 @@ public:
 		// don't track static objects (like the world).  That way we only track objects that will move
 		if ( pObject->GetObject()->get_movement_state() != IVP_MT_STATIC )
 		{
-			Assert(pObject->GetActiveIndex()==0xFFFF);
-			if ( pObject->GetActiveIndex()!=0xFFFF)
+			Assert(pObject->GetActiveIndex()==std::numeric_limits<intp>::max());
+			if ( pObject->GetActiveIndex()!=std::numeric_limits<intp>::max())
 				return;
 
 			auto index = m_activeObjects.AddToTail( pObject );
@@ -490,8 +489,7 @@ public:
 		}
 			
 
-		CPhysicsCollisionData data(contact);
-		m_event.pInternalData = &data;
+		m_event.pInternalData = std::make_shared<CPhysicsCollisionData>(contact);
 
 		// clear out any static object collisions unless flagged to keep them
 		if ( contact->objects[0]->get_movement_state() == IVP_MT_STATIC )
@@ -537,8 +535,7 @@ public:
 
 		float collisionSpeed = contact->speed.dot_product(&contact->surf_normal);
 		m_event.collisionSpeed = ConvertDistanceToHL( fabs(collisionSpeed) );
-		CPhysicsCollisionData data(contact);
-		m_event.pInternalData = &data;
+		m_event.pInternalData = std::make_shared<CPhysicsCollisionData>(contact);
 
 		m_pCallback->PostCollision( &m_event );
 	}
@@ -742,6 +739,7 @@ CPhysicsListenerCollision::CPhysicsListenerCollision()
 	m_pCallback(&g_EmptyCollisionListener) 
 {
 	m_pairList.SetLessFunc( CorePairLessFunc );
+	memset(&m_event, 0, sizeof(m_event));
 }
 
 
@@ -1115,6 +1113,7 @@ static CVPhysicsDebugOverlay s_DefaultDebugOverlay;
 CPhysicsEnvironment::CPhysicsEnvironment( void )
 // assume that these lists will have at least one object
 {
+	m_pDebugOverlay = nullptr;
 	// set this to true to force the 
 	m_deleteQuick = false;
 	m_queueDeleteObject = false;
@@ -1122,24 +1121,21 @@ CPhysicsEnvironment::CPhysicsEnvironment( void )
 	m_fixedTimestep = true;	// try to simulate using fixed timesteps
 	m_enableConstraintNotify = false;
 
-    // build a default environment
-    IVP_Environment_Manager *env_manager;
-    env_manager = IVP_Environment_Manager::get_environment_manager();
-
-    IVP_Application_Environment appl_env;
+	// build a default environment
+	IVP_Environment_Manager *env_manager =
+		IVP_Environment_Manager::get_environment_manager();
+	
+	BEGIN_IVP_ALLOCATION();
 	m_pCollisionSolver = new CCollisionSolver;
-    appl_env.collision_filter = m_pCollisionSolver;
+	END_IVP_ALLOCATION();
+
+	IVP_Application_Environment appl_env;
+	appl_env.collision_filter = m_pCollisionSolver;
 	appl_env.material_manager = physprops->GetIVPManager();
 	appl_env.anomaly_manager = m_pCollisionSolver;
-	// UNDONE: This would save another 45K of RAM on xbox, test perf
-	//	if ( IsXbox() )
-	//	{
-	//		appl_env.n_cache_object = 128;
-	//	}
-	
 
 	BEGIN_IVP_ALLOCATION();
-    m_pPhysEnv = env_manager->create_environment( &appl_env, "JAY", 0xBEEF );
+	m_pPhysEnv = env_manager->create_environment( &appl_env, "JAY", 0xBEEF );
 	END_IVP_ALLOCATION();
 
 	// UNDONE: Revisit brush/terrain/object shrinking and tune this number to something larger
@@ -1169,8 +1165,8 @@ CPhysicsEnvironment::CPhysicsEnvironment( void )
 
 	physics_performanceparams_t perf;
 	perf.Defaults();
-	SetPerformanceSettings( &perf );
-	m_pPhysEnv->client_data = (void *)this;
+	CPhysicsEnvironment::SetPerformanceSettings( &perf );
+	m_pPhysEnv->client_data = this;
 	m_lastObjectThisTick = 0;
 }
 
@@ -1185,9 +1181,7 @@ CPhysicsEnvironment::~CPhysicsEnvironment( void )
 
 	// delete/remove the listeners
 	m_pPhysEnv->remove_listener_collision_global( m_pCollisionListener );
-	delete m_pCollisionListener;
 	m_pPhysEnv->remove_listener_constraint_global( m_pConstraintListener );
-	delete m_pConstraintListener;
 
 	// Clean out the list of physics objects
 	for ( intp i = m_objects.Count()-1; i >= 0; --i )
@@ -1196,17 +1190,19 @@ CPhysicsEnvironment::~CPhysicsEnvironment( void )
 		PhantomRemove( pObject );
 		delete pObject;
 	}
-		
+
 	m_objects.RemoveAll();
 	ClearDeadObjects();
 
 	// Clean out the list of fluids
 	m_fluids.PurgeAndDeleteElements();
-
-	delete m_pSleepEvents;
+	
 	delete m_pDragController;
-	delete m_pPhysEnv;
+	delete m_pConstraintListener;
+	delete m_pCollisionListener;
 	delete m_pDeleteQueue;
+	delete m_pSleepEvents;
+	delete m_pPhysEnv;
 
 	// must be deleted after the environment (calls back in destructor)
 	delete m_pCollisionSolver;
@@ -1250,7 +1246,6 @@ void CPhysicsEnvironment::SetDebugOverlay( CreateInterfaceFn debugOverlayFactory
 	m_pCollisionSolver->pVisualizer = new CCollisionVisualizer( m_pDebugOverlay );
 	INSTALL_SHORTRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
 	INSTALL_LONGRANGE_CALLBACK(m_pCollisionSolver->pVisualizer);
-
 #endif
 }
 
@@ -1281,7 +1276,7 @@ void CPhysicsEnvironment::GetGravity( Vector *pGravityVector ) const
 }
 
 
-IPhysicsObject *CPhysicsEnvironment::CreatePolyObject( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams )
+IPhysicsObject *CPhysicsEnvironment::CreatePolyObject( const CPhysCollide *pCollisionModel, intp materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams )
 {
 	IPhysicsObject *pObject = ::CreatePhysicsObject( this, pCollisionModel, materialIndex, position, angles, pParams, false );
 	if ( pObject )
@@ -1291,7 +1286,7 @@ IPhysicsObject *CPhysicsEnvironment::CreatePolyObject( const CPhysCollide *pColl
 	return pObject;
 }
 
-IPhysicsObject *CPhysicsEnvironment::CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams )
+IPhysicsObject *CPhysicsEnvironment::CreatePolyObjectStatic( const CPhysCollide *pCollisionModel, intp materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams )
 {
 	IPhysicsObject *pObject = ::CreatePhysicsObject( this, pCollisionModel, materialIndex, position, angles, pParams, true );
 	if ( pObject )
@@ -1345,7 +1340,7 @@ extern void ControlPhysicsPlayerControllerAttachment_Silent( IPhysicsPlayerContr
 
 bool CPhysicsEnvironment::TransferObject( IPhysicsObject *pObject, IPhysicsEnvironment *pDestinationEnvironment )
 {
-	int iIndex = m_objects.Find( pObject );
+	intp iIndex = m_objects.Find( pObject );
 	if( iIndex == -1 || (pObject->GetCallbackFlags() & CALLBACK_MARKED_FOR_DELETE ) )
 		return false;
 
@@ -1551,7 +1546,8 @@ void CPhysicsEnvironment::Simulate( float deltaTime )
 	}
 	//visualize_collisions();
 	VirtualMeshPSI();
-	GetNextFrameTime();
+	// dimhotepus: Comment pure API. 
+	// GetNextFrameTime();
 }
 
 void CPhysicsEnvironment::ResetSimulationClock()
@@ -1710,9 +1706,11 @@ void CPhysicsEnvironment::SetCollisionSolver( IPhysicsCollisionSolver *pSolver )
 
 void CPhysicsEnvironment::ClearDeadObjects( void )
 {
+	// dimhotepus: Can't use range-for loop here as DeleteObject may recursively
+	// call ClearDeadObjects and m_deadObjects will be modified when iterating.
 	for ( intp i = 0; i < m_deadObjects.Count(); i++ )
 	{
-		CPhysicsObject *pObject = (CPhysicsObject *)m_deadObjects.Element(i);
+		auto *pObject = (CPhysicsObject *)m_deadObjects.Element(i);
 
 		m_pSleepEvents->DeleteObject( pObject );
 		delete pObject;
@@ -1807,7 +1805,7 @@ void CPhysicsEnvironment::DestroyVehicleController( IPhysicsVehicleController *p
 	delete pController;
 }
 
-int	CPhysicsEnvironment::GetActiveObjectCount( void ) const
+intp	CPhysicsEnvironment::GetActiveObjectCount( void ) const
 {
 	return m_pSleepEvents->GetActiveObjectCount();
 }
@@ -1842,17 +1840,15 @@ void CPhysicsEnvironment::CleanupDeleteList()
 	ClearDeadObjects();
 }
 
-bool CPhysicsEnvironment::IsCollisionModelUsed( CPhysCollide *pCollide ) const
+bool CPhysicsEnvironment::IsCollisionModelUsed( const CPhysCollide *pCollide ) const
 {
-	intp i;
-
-	for ( i = m_deadObjects.Count()-1; i >= 0; --i )
+	for ( intp i = m_deadObjects.Count()-1; i >= 0; --i )
 	{
 		if ( m_deadObjects[i]->GetCollide() == pCollide )
 			return true;
 	}
 	
-	for ( i = m_objects.Count()-1; i >= 0; --i )
+	for ( intp i = m_objects.Count()-1; i >= 0; --i )
 	{
 		if ( m_objects[i]->GetCollide() == pCollide )
 			return true;
@@ -1884,7 +1880,7 @@ void CPhysicsEnvironment::PhantomRemove( CPhysicsObject *pObject )
 
 //-------------------------------------
 
-IPhysicsObject *CPhysicsEnvironment::CreateSphereObject( float radius, int materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams, bool isStatic )
+IPhysicsObject *CPhysicsEnvironment::CreateSphereObject( float radius, intp materialIndex, const Vector& position, const QAngle& angles, objectparams_t *pParams, bool isStatic )
 {
 	IPhysicsObject *pObject = ::CreatePhysicsSphere( this, radius, materialIndex, position, angles, pParams, isStatic );
 	m_objects.AddToTail( pObject );
@@ -1957,40 +1953,35 @@ void CPhysicsEnvironment::ReadStats( physics_stats_t *pOutput )
 {
 	if ( !pOutput )
 		return;
+
 	IVP_Statistic_Manager *stats = m_pPhysEnv->get_statistic_manager();
-	if ( stats )
-	{
-		pOutput->maxRescueSpeed = ConvertDistanceToHL( stats->max_rescue_speed );
-		pOutput->maxSpeedGain = ConvertDistanceToHL( stats->max_speed_gain );
-		pOutput->impactSysNum = stats->impact_sys_num;
-		pOutput->impactCounter = stats->impact_counter;
-		pOutput->impactSumSys = stats->impact_sum_sys;
-		pOutput->impactHardRescueCount = stats->impact_hard_rescue_counter;
-		pOutput->impactRescueAfterCount = stats->impact_rescue_after_counter;
+	pOutput->maxRescueSpeed = ConvertDistanceToHL( stats->max_rescue_speed );
+	pOutput->maxSpeedGain = ConvertDistanceToHL( stats->max_speed_gain );
+	pOutput->impactSysNum = stats->impact_sys_num;
+	pOutput->impactCounter = stats->impact_counter;
+	pOutput->impactSumSys = stats->impact_sum_sys;
+	pOutput->impactHardRescueCount = stats->impact_hard_rescue_counter;
+	pOutput->impactRescueAfterCount = stats->impact_rescue_after_counter;
 	
-		pOutput->impactDelayedCount = stats->impact_delayed_counter;
-		pOutput->impactCollisionChecks = stats->impact_coll_checks;
-		pOutput->impactStaticCount = stats->impact_unmov;
+	pOutput->impactDelayedCount = stats->impact_delayed_counter;
+	pOutput->impactCollisionChecks = stats->impact_coll_checks;
+	pOutput->impactStaticCount = stats->impact_unmov;
 
-		pOutput->totalEnergyDestroyed = stats->sum_energy_destr;
-		pOutput->collisionPairsTotal = stats->sum_of_mindists;
-		pOutput->collisionPairsCreated = stats->mindists_generated;
-		pOutput->collisionPairsDestroyed = stats->mindists_deleted;
+	pOutput->totalEnergyDestroyed = stats->sum_energy_destr;
+	pOutput->collisionPairsTotal = stats->sum_of_mindists;
+	pOutput->collisionPairsCreated = stats->mindists_generated;
+	pOutput->collisionPairsDestroyed = stats->mindists_deleted;
 
-		pOutput->potentialCollisionsObjectVsObject = stats->range_intra_exceeded;
-		pOutput->potentialCollisionsObjectVsWorld = stats->range_world_exceeded;
+	pOutput->potentialCollisionsObjectVsObject = stats->range_intra_exceeded;
+	pOutput->potentialCollisionsObjectVsWorld = stats->range_world_exceeded;
 
-		pOutput->frictionEventsProcessed = stats->processed_fmindists;
-	}
+	pOutput->frictionEventsProcessed = stats->processed_fmindists;
 }
 
 void CPhysicsEnvironment::ClearStats()
 {
 	IVP_Statistic_Manager *stats = m_pPhysEnv->get_statistic_manager();
-	if ( stats )
-	{
-		stats->clear_statistic();
-	}
+	stats->clear_statistic();
 }
 
 void CPhysicsEnvironment::EnableConstraintNotify( bool bEnable )
@@ -2109,7 +2100,9 @@ public:
 		if ( !m_objectList.IsValidList( listIndex ) )
 			return;
 
-		for ( unsigned short item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); item = m_objectList.Next(item) )
+		for ( auto item = m_objectList.Head(listIndex);
+			item != m_objectList.InvalidIndex();
+			item = m_objectList.Next(item) )
 		{
 			if ( m_objectList[item] == pRemove )
 			{
@@ -2182,8 +2175,7 @@ public:
 			return 0;
 
 		int nCount = 0;
-		unsigned short item;
-		for ( item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); 
+		for ( auto item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); 
 				item = m_objectList.Next(item) )
 		{
 			++nCount;
@@ -2199,8 +2191,7 @@ public:
 			return 0;
 
 		int nCount = 0;
-		unsigned short item;
-		for ( item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); 
+		for ( auto item = m_objectList.Head(listIndex); item != m_objectList.InvalidIndex(); 
 				item = m_objectList.Next(item) )
 		{
 			ppObjectList[nCount] = m_objectList[item];
@@ -2212,14 +2203,8 @@ public:
 
 	bool IsObjectInHash( void *pObject0 ) override
 	{
-		return m_pObjectHash->find_elem(pObject0) != NULL ? true : false;
+		return m_pObjectHash->find_elem(pObject0) != nullptr;
 	}
-#if 0
-	virtual int CountObjectsInHash()
-	{
-		return m_pObjectHash->n_elems();
-	}
-#endif
 
 private:
 	// this is a hash of object pairs

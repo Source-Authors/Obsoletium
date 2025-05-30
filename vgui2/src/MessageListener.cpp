@@ -9,7 +9,7 @@
 #include "VPanel.h"
 #include "vgui_internal.h"
 
-#include <KeyValues.h>
+#include <tier1/KeyValues.h>
 #include "vgui/IClientPanel.h"
 #include "vgui/IVGui.h"
 

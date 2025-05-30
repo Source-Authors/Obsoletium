@@ -683,7 +683,7 @@ Color Subtract( const Color& v1, const Color& v2 )
 	Color ret;
 	for ( int i = 0; i < 4; ++i )
 	{
-		ret[ i ] = clamp( v1[ i ] - v2[ i ], 0, 255 );
+		ret[ i ] = static_cast<byte>(clamp( v1[ i ] - v2[ i ], 0, 255 ));
 	}
 	return ret;
 }
@@ -735,7 +735,7 @@ Color Add( const Color& v1, const Color& v2 )
 	Color ret;
 	for ( int i = 0; i < 4; ++i )
 	{
-		ret[ i ] = clamp( v1[ i ] + v2[ i ], 0, 255 );
+		ret[ i ] = static_cast<byte>(clamp( v1[ i ] + v2[ i ], 0, 255 ));
 	}
 	return ret;
 }
@@ -899,7 +899,7 @@ DmeTime_t CDmeLogLayer::GetBeginTime() const
 
 DmeTime_t CDmeLogLayer::GetEndTime() const
 {
-	uint tn = m_times.Count();
+	intp tn = m_times.Count();
 	if ( tn == 0 )
 		return DmeTime_t::MaxTime();
 
@@ -910,12 +910,12 @@ DmeTime_t CDmeLogLayer::GetEndTime() const
 // Validates that all keys are correctly sorted in time
 bool CDmeLogLayer::ValidateKeys() const
 {
-	int nCount = m_times.Count();
-	for ( int i = 1; i < nCount; ++i )
+	intp nCount = m_times.Count();
+	for ( intp i = 1; i < nCount; ++i )
 	{
 		if ( m_times[i] <= m_times[i-1] )
 		{
-			Warning( "Error in log %s! Key times are out of order [keys %d->%d: %d->%d]!\n",
+			Warning( "Error in log %s! Key times are out of order [keys %zd->%zd: %d->%d]!\n",
 				GetName(), i-1, i, m_times[i-1], m_times[i] );
 			return false;
 		}
@@ -923,9 +923,9 @@ bool CDmeLogLayer::ValidateKeys() const
 	return true;
 }
 
-int CDmeLogLayer::FindKey( DmeTime_t time ) const
+intp CDmeLogLayer::FindKey( DmeTime_t time ) const
 {
-	int tn = m_times.Count();
+	intp tn = m_times.Count();
 	if ( m_lastKey >= 0 && m_lastKey < tn )
 	{
 		if ( time >= DmeTime_t( m_times[ m_lastKey ] ) )
@@ -946,7 +946,7 @@ int CDmeLogLayer::FindKey( DmeTime_t time ) const
 		}
 	}
 
-	for ( int ti = tn - 1; ti >= 0; --ti )
+	for ( intp ti = tn - 1; ti >= 0; --ti )
 	{
 		if ( time >= DmeTime_t(  m_times[ ti ] ) )
 		{
@@ -972,7 +972,7 @@ intp CDmeLogLayer::GetKeyCount() const
 // Input  : nKeyIndex - 
 //			keyTime - 
 //-----------------------------------------------------------------------------
-void CDmeLogLayer::SetKeyTime( int nKeyIndex, DmeTime_t keyTime )
+void CDmeLogLayer::SetKeyTime( intp nKeyIndex, DmeTime_t keyTime )
 {
 	m_times.Set( nKeyIndex, keyTime.GetTenthsOfMS() );
 }
@@ -980,7 +980,7 @@ void CDmeLogLayer::SetKeyTime( int nKeyIndex, DmeTime_t keyTime )
 //-----------------------------------------------------------------------------
 // Returns a specific key's value
 //-----------------------------------------------------------------------------
-DmeTime_t CDmeLogLayer::GetKeyTime( int nKeyIndex ) const
+DmeTime_t CDmeLogLayer::GetKeyTime( intp nKeyIndex ) const
 {
 	return DmeTime_t( m_times[ nKeyIndex ] );
 }
@@ -995,8 +995,8 @@ void CDmeLogLayer::ScaleBiasKeyTimes( double flScale, DmeTime_t nBias )
 	if ( ( nBias == DMETIME_ZERO ) && ( fabs( flScale - 1.0 ) < 1e-5 ) )
 		return;
 
-	int nCount = GetKeyCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = GetKeyCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		DmeTime_t t = GetKeyTime( i );
 		t.SetSeconds( t.GetSeconds() * flScale );
@@ -1009,15 +1009,15 @@ void CDmeLogLayer::ScaleBiasKeyTimes( double flScale, DmeTime_t nBias )
 //-----------------------------------------------------------------------------
 // Returns the index of a particular key
 //-----------------------------------------------------------------------------
-int CDmeLogLayer::FindKeyWithinTolerance( DmeTime_t nTime, DmeTime_t nTolerance )
+intp CDmeLogLayer::FindKeyWithinTolerance( DmeTime_t nTime, DmeTime_t nTolerance )
 {
-	int nClosest = -1;
+	intp nClosest = -1;
 	DmeTime_t nClosestTolerance = DmeTime_t::MaxTime();
 	DmeTime_t nCurrTolerance;
-	int start = 0, end = GetKeyCount() - 1;
+	intp start = 0, end = GetKeyCount() - 1;
 	while ( start <= end )
 	{
-		int mid = (start + end) >> 1;
+		intp mid = (start + end) >> 1;
 		DmeTime_t nDelta = nTime - DmeTime_t( m_times[mid] );
 		if ( nDelta > DmeTime_t( 0 ) )
 		{
@@ -1058,8 +1058,8 @@ void CDmeLogLayer::OnUsingCurveTypesChanged()
 	{
 		m_CurveTypes.RemoveAll();
 		// Fill in an array with the default curve type for
-		int c = m_times.Count();
-		for ( int i = 0; i < c; ++i )
+		intp c = m_times.Count();
+		for ( intp i = 0; i < c; ++i )
 		{
 			m_CurveTypes.AddToTail( GetDefaultCurveType() );
 		}
@@ -1076,7 +1076,7 @@ int CDmeLogLayer::GetDefaultCurveType() const
 	return GetOwnerLog()->GetDefaultCurveType();
 }
 
-void CDmeLogLayer::SetKeyCurveType( int nKeyIndex, int curveType )
+void CDmeLogLayer::SetKeyCurveType( intp nKeyIndex, int curveType )
 {
 	Assert( GetOwnerLog() );
 	if ( !GetOwnerLog() )
@@ -1090,7 +1090,7 @@ void CDmeLogLayer::SetKeyCurveType( int nKeyIndex, int curveType )
 	m_CurveTypes.Set( nKeyIndex, curveType );
 }
 
-int CDmeLogLayer::GetKeyCurveType( int nKeyIndex ) const
+int CDmeLogLayer::GetKeyCurveType( intp nKeyIndex ) const
 {
 	Assert( GetOwnerLog() );
 	if ( !GetOwnerLog() )
@@ -1110,9 +1110,9 @@ int CDmeLogLayer::GetKeyCurveType( int nKeyIndex ) const
 //-----------------------------------------------------------------------------
 void CDmeLogLayer::RemoveKeysOutsideRange( DmeTime_t tStart, DmeTime_t tEnd )
 {
-	int i;
-	int nKeysToRemove = 0;
-	int nKeyCount = m_times.Count();
+	intp i;
+	intp nKeysToRemove = 0;
+	intp nKeyCount = m_times.Count();
 	for ( i = 0; i < nKeyCount; ++i, ++nKeysToRemove )
 	{
 		if ( m_times[i] >= tStart.GetTenthsOfMS() )
@@ -1177,7 +1177,7 @@ public:
 	virtual const char	*GetDesc() const
 	{
 		static char sz[ 512 ];
-		int iLayer = m_hLog->GetTopmostLayer();
+		intp iLayer = m_hLog->GetTopmostLayer();
 		if ( iLayer >= 0 )
 		{
 			const CDmeLogLayer *layer = m_hLog->GetLayer( iLayer );
@@ -1337,14 +1337,14 @@ void CDmeTypedLogLayer< T >::OnDestruction()
 template< class T >
 void CDmeTypedLogLayer< T >::RemoveKeys( DmeTime_t starttime )
 {
-	int ti = FindKey( starttime );
+	intp ti = FindKey( starttime );
 	if ( ti < 0 )
 		return;
 
 	if ( starttime > DmeTime_t( m_times[ ti ] ) )
 		++ti;
 
-	int nKeys = m_times.Count() - ti;
+	intp nKeys = m_times.Count() - ti;
 	if ( nKeys == 0 )
 		return;
 
@@ -1371,7 +1371,7 @@ void CDmeTypedLogLayer< T >::ClearKeys()
 }
 
 template< class T >
-void CDmeTypedLogLayer< T >::RemoveKey( int nKeyIndex, int nNumKeysToRemove /*= 1*/ )
+void CDmeTypedLogLayer< T >::RemoveKey( intp nKeyIndex, intp nNumKeysToRemove /*= 1*/ )
 {
 	m_times.RemoveMultiple( nKeyIndex, nNumKeysToRemove );
 	m_values.RemoveMultiple( nKeyIndex, nNumKeysToRemove );
@@ -1402,7 +1402,7 @@ void CDmeTypedLogLayer< T >::SetKey( DmeTime_t time, const T& value, int curveTy
 		m_CurveTypes.AddToTail( curveType );
 	}
 
-	int nKeys = m_values.Count();
+	intp nKeys = m_values.Count();
 	if ( ( nKeys < 3 ) || 
 		 ( IsUsingCurveTypes() && ( curveType != m_CurveTypes[ nKeys -1 ] || ( curveType != m_CurveTypes[ nKeys - 2 ] ) ) ) 
 		 )
@@ -1535,12 +1535,12 @@ const T& CDmeTypedLogLayer< T >::GetValue( DmeTime_t time ) const
 		return out;
 	}
 
-	int tc = m_times.Count();
+	intp tc = m_times.Count();
 
 	Assert( m_values.Count() == tc );
 	Assert( !IsUsingCurveTypes() || ( m_CurveTypes.Count() == tc ) );
 
-	int ti = FindKey( time );
+	intp ti = FindKey( time );
 	if ( ti < 0 )
 	{
 		if ( tc > 0 )
@@ -1593,7 +1593,7 @@ void CDmeTypedLogLayer< T >::SetKey( DmeTime_t time, const CDmAttribute *pAttr, 
 template< class T >
 bool CDmeTypedLogLayer< T >::SetDuplicateKeyAtTime( DmeTime_t time )
 {
-	int nKeys = m_times.Count();
+	intp nKeys = m_times.Count();
 	if ( nKeys == 0 || DmeTime_t( m_times[ nKeys - 1 ] ) == time )
 		return false;
 
@@ -1610,7 +1610,7 @@ bool CDmeTypedLogLayer< T >::SetDuplicateKeyAtTime( DmeTime_t time )
 // Returns a specific key's value
 //-----------------------------------------------------------------------------
 template< class T >
-const T& CDmeTypedLogLayer< T >::GetKeyValue( int nKeyIndex ) const
+const T& CDmeTypedLogLayer< T >::GetKeyValue( intp nKeyIndex ) const
 {
 	Assert( m_values.Count() == m_times.Count() );
 	Assert( !IsUsingCurveTypes() || ( m_CurveTypes.Count() == m_times.Count() ) );
@@ -1647,7 +1647,7 @@ float CDmeTypedLogLayer< T >::GetComponent( DmeTime_t time, int componentIndex )
 }
 
 template< class T >
-void CDmeTypedLogLayer< T >::SetKeyValue( int nKey, const T& value )
+void CDmeTypedLogLayer< T >::SetKeyValue( intp nKey, const T& value )
 {
 	Assert( nKey >= 0 );
 	Assert( nKey < m_values.Count() );
@@ -1699,19 +1699,19 @@ void CDmeTypedLogLayer< T >::Resample( DmeFramerate_t samplerate )
 }
 
 template< class T >
-void CDmeTypedLogLayer< T >::Filter( int nSampleRadius )
+void CDmeTypedLogLayer< T >::Filter( intp nSampleRadius )
 {
 	// Doesn't mess with curvetypes!!!
 
 	const CUtlVector< T > &values = m_values.Get();
 	CUtlVector< T > filteredValues;
 
-	int nValues = values.Count();
+	intp nValues = values.Count();
 	filteredValues.EnsureCapacity( nValues );
 
-	for ( int i = 0; i < nValues; ++i )
+	for ( intp i = 0; i < nValues; ++i )
 	{
-		int nSamples = min( nSampleRadius, min( i, nValues - i - 1 ) );
+		intp nSamples = min( nSampleRadius, min( i, nValues - i - 1 ) );
 		filteredValues.AddToTail( Average( values.Base() + i - nSamples, 2 * nSamples + 1 ) );
 	}
 
@@ -1726,7 +1726,7 @@ void CDmeTypedLogLayer< T >::Filter2( DmeTime_t sampleRadius )
 	const CUtlVector< T > &values = m_values.Get();
 	CUtlVector< T > filteredValues;
 
-	int nValues = values.Count();
+	intp nValues = values.Count();
 	filteredValues.EnsureCapacity( nValues );
 
 	DmeTime_t earliest = DMETIME_ZERO;
@@ -1734,7 +1734,7 @@ void CDmeTypedLogLayer< T >::Filter2( DmeTime_t sampleRadius )
 	{
 		earliest = DmeTime_t( m_times[ 0 ] );
 	}
-	for ( int i = 0; i < nValues; ++i )
+	for ( intp i = 0; i < nValues; ++i )
 	{
 		T vals[ 3 ];
 		DmeTime_t t = GetKeyTime( i );
@@ -1766,7 +1766,7 @@ void CDmeTypedLogLayer< T >::Filter2( DmeTime_t sampleRadius )
 }
 
 template< class T >
-const T& CDmeTypedLogLayer< T >::GetValueSkippingKey( int nKeyToSkip ) const
+const T& CDmeTypedLogLayer< T >::GetValueSkippingKey( intp nKeyToSkip ) const
 {
 	// Curve Interpolation only for 1-D float data right now!!!
 	if ( IsUsingCurveTypes() && CanInterpolateType( GetDataType() ) )
@@ -1781,8 +1781,8 @@ const T& CDmeTypedLogLayer< T >::GetValueSkippingKey( int nKeyToSkip ) const
 
 	DmeTime_t time = GetKeyTime( nKeyToSkip );
 
-	int prevKey = nKeyToSkip - 1;
-	int nextKey = nKeyToSkip  + 1;
+	intp prevKey = nKeyToSkip - 1;
+	intp nextKey = nKeyToSkip  + 1;
 
 	DmeTime_t prevTime;
 	T prevValue;
@@ -1805,7 +1805,7 @@ const T& CDmeTypedLogLayer< T >::GetValueSkippingKey( int nKeyToSkip ) const
 template< class T >
 void CDmeTypedLog<T>::RemoveRedundantKeys( float threshold )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return;
 
@@ -1835,11 +1835,11 @@ void CDmeTypedLogLayer<T>::RemoveRedundantKeys( float threshold )
 	
 }
 
-template<> void CDmeTypedLogLayer< bool >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< bool > *output ) {};
-template<> void CDmeTypedLogLayer< int >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< int > *output ) {};
-template<> void CDmeTypedLogLayer< Color >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< Color > *output ) {};
-template<> void CDmeTypedLogLayer< Quaternion >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< Quaternion > *output ) {};
-template<> void CDmeTypedLogLayer< VMatrix >::CurveSimplify_R( float thresholdSqr, int startPoint, int endPoint, CDmeTypedLogLayer< VMatrix > *output ) {};
+template<> void CDmeTypedLogLayer< bool >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< bool > *output ) {};
+template<> void CDmeTypedLogLayer< int >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< int > *output ) {};
+template<> void CDmeTypedLogLayer< Color >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< Color > *output ) {};
+template<> void CDmeTypedLogLayer< Quaternion >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< Quaternion > *output ) {};
+template<> void CDmeTypedLogLayer< VMatrix >::CurveSimplify_R( float thresholdSqr, intp startPoint, intp endPoint, CDmeTypedLogLayer< VMatrix > *output ) {};
 
 // We can't just walk the keys linearly since it'll accumulate too much error and give us a bad curve after simplification.  We do a recursive subdivide which has a worst case of O(n^2) but
 //  probably is better than that in most cases.
@@ -1850,7 +1850,7 @@ void CDmeTypedLogLayer<T>::RemoveRedundantKeys()
 	if ( !pOwner )
 		return;
 
-	int nKeys = GetKeyCount();
+	intp nKeys = GetKeyCount();
 	if ( nKeys <= 2 )
 		return;
 
@@ -1869,7 +1869,7 @@ void CDmeTypedLogLayer<T>::RemoveRedundantKeys()
 
 		// Insert start and end points as first "guess" at simplified curve
 		// Skip preceeding and ending keys that have the same value
-		int nFirstKey, nLastKey;
+		intp nFirstKey, nLastKey;
 		for ( nFirstKey = 1; nFirstKey < nKeys; ++nFirstKey )
 		{
 			// FIXME: Should we use a tolerance check here?
@@ -1905,7 +1905,7 @@ void CDmeTypedLogLayer<T>::RemoveRedundantKeys()
 				save->InsertKey( GetKeyTime( nFirstKey ), GetKeyValue( nFirstKey ) );
 
 				// copy over keys that differ from their prior or next keys - this keeps the first and last key of a run of same-valued keys
-				for ( int i = nFirstKey + 1; i < nLastKey; ++i )
+				for ( intp i = nFirstKey + 1; i < nLastKey; ++i )
 				{
 					// prev is from the saved log to allow deleting runs of same-valued keys
 					const T &prev = save->GetKeyValue( save->GetKeyCount() - 1 ); 
@@ -1984,7 +1984,7 @@ void CDmeTypedLogLayer< T >::GetZeroValue( int side, T& val ) const
 }
 
 template< class T >
-void CDmeTypedLogLayer< T >::GetBoundedSample( int keyindex, DmeTime_t& time, T& val, int& curveType ) const
+void CDmeTypedLogLayer< T >::GetBoundedSample( intp keyindex, DmeTime_t& time, T& val, int& curveType ) const
 {
 	Assert( GetOwnerLog() );
 	if ( !GetOwnerLog() )
@@ -2028,7 +2028,7 @@ void CDmeTypedLogLayer< T >::GetBoundedSample( int keyindex, DmeTime_t& time, T&
 }
 
 template<>
-void CDmeTypedLogLayer< float >::GetValueUsingCurveInfoSkippingKey( int nKeyToSkip, float& out ) const
+void CDmeTypedLogLayer< float >::GetValueUsingCurveInfoSkippingKey( intp nKeyToSkip, float& out ) const
 {
 	Assert( GetOwnerLog() );
 	if ( !GetOwnerLog() )
@@ -2045,7 +2045,7 @@ void CDmeTypedLogLayer< float >::GetValueUsingCurveInfoSkippingKey( int nKeyToSk
 	float v[ 4 ];
 	DmeTime_t t[ 4 ];
 	int curvetypes[ 4 ];
-	int ti = nKeyToSkip;
+	intp ti = nKeyToSkip;
 	DmeTime_t time = GetKeyTime( nKeyToSkip );
 
 	if ( !IsUsingCurveTypes() )
@@ -2096,7 +2096,7 @@ void CDmeTypedLogLayer< float >::GetValueUsingCurveInfoSkippingKey( int nKeyToSk
 }
 
 template<>
-void CDmeTypedLogLayer< Vector >::GetValueUsingCurveInfoSkippingKey( int nKeyToSkip, Vector& out ) const
+void CDmeTypedLogLayer< Vector >::GetValueUsingCurveInfoSkippingKey( intp nKeyToSkip, Vector& out ) const
 {
 	Assert( GetOwnerLog() );
 	if ( !GetOwnerLog() )
@@ -2113,7 +2113,7 @@ void CDmeTypedLogLayer< Vector >::GetValueUsingCurveInfoSkippingKey( int nKeyToS
 	Vector v[ 4 ];
 	DmeTime_t t[ 4 ];
 	int curvetypes[ 4 ];
-	int ti = nKeyToSkip;
+	intp ti = nKeyToSkip;
 	DmeTime_t time = GetKeyTime( nKeyToSkip );
 
 	if ( !IsUsingCurveTypes() )
@@ -2164,7 +2164,7 @@ void CDmeTypedLogLayer< Vector >::GetValueUsingCurveInfoSkippingKey( int nKeyToS
 }
 
 template<>
-void CDmeTypedLogLayer< Quaternion >::GetValueUsingCurveInfoSkippingKey( int nKeyToSkip, Quaternion& out ) const
+void CDmeTypedLogLayer< Quaternion >::GetValueUsingCurveInfoSkippingKey( intp nKeyToSkip, Quaternion& out ) const
 {
 	Assert( GetOwnerLog() );
 	if ( !GetOwnerLog() )
@@ -2181,7 +2181,7 @@ void CDmeTypedLogLayer< Quaternion >::GetValueUsingCurveInfoSkippingKey( int nKe
 	Quaternion v[ 4 ];
 	DmeTime_t t[ 4 ];
 	int curvetypes[ 4 ];
-	int ti = nKeyToSkip;
+	intp ti = nKeyToSkip;
 	DmeTime_t time = GetKeyTime( nKeyToSkip );
 
 	if ( !IsUsingCurveTypes() )
@@ -2250,7 +2250,7 @@ void CDmeTypedLogLayer< float >::GetValueUsingCurveInfo( DmeTime_t time, float& 
 	float v[ 4 ];
 	DmeTime_t t[ 4 ];
 	int curvetypes[ 4 ];
-	int ti = FindKey( time );
+	intp ti = FindKey( time );
 	if ( !IsUsingCurveTypes() )
 	{
 		if ( ti < 0 )
@@ -2316,7 +2316,7 @@ void CDmeTypedLogLayer< Vector >::GetValueUsingCurveInfo( DmeTime_t time, Vector
 	Vector v[ 4 ];
 	DmeTime_t t[ 4 ];
 	int curvetypes[ 4 ];
-	int ti = FindKey( time );
+	intp ti = FindKey( time );
 	if ( !IsUsingCurveTypes() )
 	{
 		if ( ti < 0 )
@@ -2382,7 +2382,7 @@ void CDmeTypedLogLayer< Quaternion >::GetValueUsingCurveInfo( DmeTime_t time, Qu
 	Quaternion v[ 4 ];
 	DmeTime_t t[ 4 ];
 	int curvetypes[ 4 ];
-	int ti = FindKey( time );
+	intp ti = FindKey( time );
 	if ( !IsUsingCurveTypes() )
 	{
 		if ( ti < 0 )
@@ -2507,8 +2507,8 @@ void CDmeTypedLogLayer< T >::CopyPartialLayer( const CDmeLogLayer *src, DmeTime_
 	bool usecurvetypes = pSrc->IsUsingCurveTypes();
 
 	// Now copy the data for the later
-	int c = pSrc->m_times.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = pSrc->m_times.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		DmeTime_t keyTime = DmeTime_t( pSrc->m_times[ i ] );
 		if ( keyTime < startTime || keyTime > endTime )
@@ -2831,30 +2831,30 @@ void CDmeLog::OnDestruction()
 {
 }
 
-int CDmeLog::GetTopmostLayer() const
+intp CDmeLog::GetTopmostLayer() const
 {
 	return m_Layers.Count() - 1;
 }
 
-int	CDmeLog::GetNumLayers() const
+intp CDmeLog::GetNumLayers() const
 {
 	return m_Layers.Count();
 }
 
-CDmeLogLayer *CDmeLog::GetLayer( int index )
+CDmeLogLayer *CDmeLog::GetLayer( intp index )
 {
 	return m_Layers[ index ];
 }
 
-const CDmeLogLayer *CDmeLog::GetLayer( int index ) const
+const CDmeLogLayer *CDmeLog::GetLayer( intp index ) const
 {
 	return m_Layers[ index ];
 }
 
 bool CDmeLog::IsEmpty() const
 {
-	int c = m_Layers.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Layers.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeLogLayer* layer = m_Layers[ i ];
 		if ( layer->GetKeyCount() > 0 )
@@ -2863,16 +2863,16 @@ bool CDmeLog::IsEmpty() const
 	return true;
 }
 
-void CDmeLog::FindLayersForTime( DmeTime_t time, CUtlVector< int >& list ) const
+void CDmeLog::FindLayersForTime( DmeTime_t time, CUtlVector< intp >& list ) const
 {
 	list.RemoveAll();
-	int c = m_Layers.Count();
+	intp c = m_Layers.Count();
 	// The base layer is always available!!!
 	if ( c > 0 )
 	{
 		list.AddToTail( 0 );
 	}
-	for ( int i = 1; i < c; ++i )
+	for ( intp i = 1; i < c; ++i )
 	{
 		CDmeLogLayer* layer = m_Layers[ i ];
 		DmeTime_t layerStart = layer->GetBeginTime();
@@ -2889,10 +2889,10 @@ void CDmeLog::FindLayersForTime( DmeTime_t time, CUtlVector< int >& list ) const
 	}
 }
 
-int CDmeLog::FindLayerForTimeSkippingTopmost( DmeTime_t time ) const
+intp CDmeLog::FindLayerForTimeSkippingTopmost( DmeTime_t time ) const
 {
-	int c = m_Layers.Count() - 1; // This makes it never consider the topmost layer!!!
-	for ( int i = c - 1; i >= 0; --i )
+	intp c = m_Layers.Count() - 1; // This makes it never consider the topmost layer!!!
+	for ( intp i = c - 1; i >= 0; --i )
 	{
 		CDmeLogLayer* layer = m_Layers[ i ];
 		DmeTime_t layerStart = layer->GetBeginTime();
@@ -2908,10 +2908,10 @@ int CDmeLog::FindLayerForTimeSkippingTopmost( DmeTime_t time ) const
 	return ( c > 0 ) ? 0 : -1;
 }
 
-int CDmeLog::FindLayerForTime( DmeTime_t time ) const
+intp CDmeLog::FindLayerForTime( DmeTime_t time ) const
 {
-	int c = m_Layers.Count();
-	for ( int i = c - 1; i >= 0; --i )
+	intp c = m_Layers.Count();
+	for ( intp i = c - 1; i >= 0; --i )
 	{
 		CDmeLogLayer* layer = m_Layers[ i ];
 		DmeTime_t layerStart = layer->GetBeginTime();
@@ -2929,12 +2929,12 @@ int CDmeLog::FindLayerForTime( DmeTime_t time ) const
 
 DmeTime_t CDmeLog::GetBeginTime() const
 {
-	int c = m_Layers.Count();
+	intp c = m_Layers.Count();
 	if ( c == 0 )
 		return DmeTime_t::MinTime();
 
 	DmeTime_t bestMin = DmeTime_t::MinTime();
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeLogLayer* layer = m_Layers[ i ];
 		DmeTime_t layerStart = layer->GetBeginTime();
@@ -2956,12 +2956,12 @@ DmeTime_t CDmeLog::GetBeginTime() const
 
 DmeTime_t CDmeLog::GetEndTime() const
 {
-	int c = m_Layers.Count();
+	intp c = m_Layers.Count();
 	if ( c == 0 )
 		return DmeTime_t::MaxTime();
 
 	DmeTime_t bestMax = DmeTime_t::MaxTime();
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeLogLayer *layer = m_Layers[ i ];
 		DmeTime_t layerEnd = layer->GetEndTime();
@@ -3006,8 +3006,8 @@ void CDmeLog::ScaleBiasKeyTimes( double flScale, DmeTime_t nBias )
 	if ( ( nBias == DMETIME_ZERO ) && ( fabs( flScale - 1.0 ) < 1e-5 ) )
 		return;
 
-	int nCount = GetNumLayers();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = GetNumLayers();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeLogLayer *pLayer = GetLayer( i );
 		pLayer->ScaleBiasKeyTimes( flScale, nBias );
@@ -3020,8 +3020,8 @@ void CDmeLog::ScaleBiasKeyTimes( double flScale, DmeTime_t nBias )
 //-----------------------------------------------------------------------------
 void CDmeLog::Resolve()
 {
-	int c = m_Layers.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Layers.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		CDmeLogLayer* layer = m_Layers[ i ];
 		layer->SetOwnerLog( this );
@@ -3038,8 +3038,8 @@ void CDmeLog::OnAttributeChanged( CDmAttribute *pAttribute )
 
 void CDmeLog::OnUsingCurveTypesChanged()
 {
-	int c = m_Layers.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Layers.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		GetLayer( i )->OnUsingCurveTypesChanged();
 	}
@@ -3093,18 +3093,18 @@ void CDmeLog::SetMaxValue( float val )
 	m_CurveInfo->SetMaxValue( val );
 }
 
-void CDmeLog::SetKeyCurveType( int nKeyIndex, int curveType )
+void CDmeLog::SetKeyCurveType( intp nKeyIndex, int curveType )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return;
 
 	GetLayer( bestLayer )->SetKeyCurveType( nKeyIndex, curveType );
 }
 
-int CDmeLog::GetKeyCurveType( int nKeyIndex ) const
+int CDmeLog::GetKeyCurveType( intp nKeyIndex ) const
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return CURVE_DEFAULT;
 
@@ -3119,10 +3119,10 @@ bool CDmeLog::RemoveKeys( DmeTime_t tStartTime, DmeTime_t tEndTime )
 {
 	CDmeLogLayer *pLayer = GetLayer( GetTopmostLayer() );
 
-	int nKeyCount = pLayer->GetKeyCount();
-	int nFirstRemove = -1;
-	int nLastRemove = -1;
-	for ( int nKey = 0; nKey < nKeyCount; ++nKey )
+	intp nKeyCount = pLayer->GetKeyCount();
+	intp nFirstRemove = -1;
+	intp nLastRemove = -1;
+	for ( intp nKey = 0; nKey < nKeyCount; ++nKey )
 	{
 		DmeTime_t tKeyTime = pLayer->GetKeyTime( nKey );
 		if ( tKeyTime < tStartTime )
@@ -3138,7 +3138,7 @@ bool CDmeLog::RemoveKeys( DmeTime_t tStartTime, DmeTime_t tEndTime )
 
 	if ( nFirstRemove != -1 )
 	{
-		int nRemoveCount = nLastRemove - nFirstRemove + 1;
+		intp nRemoveCount = nLastRemove - nFirstRemove + 1;
 		pLayer->RemoveKey( nFirstRemove, nRemoveCount );
 		return true;
 	}
@@ -3218,7 +3218,7 @@ CDmeLogLayer *CDmeTypedLog< T >::RemoveLayerFromTail()
 }
 
 template< class T >
-CDmeLogLayer *CDmeTypedLog< T >::RemoveLayer( int iLayer )
+CDmeLogLayer *CDmeTypedLog< T >::RemoveLayer( intp iLayer )
 {
 	Assert( m_Layers.IsValidIndex( iLayer ) );
 	CDmeLogLayer *layer = m_Layers[ iLayer ];
@@ -3331,20 +3331,20 @@ struct LayerEvent_t
 
 	CUtlVector< ActiveLayer_t< T > > *m_pList;
 	EventType_t		m_Type;
-	int				m_nLayer;
+	intp			m_nLayer;
 	DmeTime_t		m_Time;
 	T				m_NeighborValue;
 };
 
 template< class T >
-static const T& GetActiveLayerValue( CUtlVector< ActiveLayer_t< T > > &layerlist, DmeTime_t t, int nTopmostLayer )
+static const T& GetActiveLayerValue( CUtlVector< ActiveLayer_t< T > > &layerlist, DmeTime_t t, intp nTopmostLayer )
 {
-	int nCount = layerlist.Count();
+	intp nCount = layerlist.Count();
 #ifdef _DEBUG
 	Assert( nCount >= nTopmostLayer );
 #endif
 
-	for ( int i = nTopmostLayer; i >= 0; --i )
+	for ( intp i = nTopmostLayer; i >= 0; --i )
 	{
 		ActiveLayer_t< T > &layer = layerlist[i];
 		if ( layer.firstTime > t || layer.lastTime < t )
@@ -3478,7 +3478,7 @@ static void ComputeLayerEvents( CDmeTypedLog< T >* pLog,
 		}
 
 		// Add layer to global list
-		int nIndex = layerlist.AddToTail( layer );
+		intp nIndex = layerlist.AddToTail( layer );
 
 		// Add layer start/end events
 		DmeTime_t tNeighbor = ( layer.firstTime != DMETIME_MINTIME ) ? ( layer.firstTime - DMETIME_MINDELTA ) : DMETIME_MINTIME;
@@ -3690,8 +3690,8 @@ void CDmeTypedLog< T >::FlattenLayers( float threshold, int flags )
 		CDmeTypedLogLayer< T > *loglayer = activeLayer->layer;
 
 		// Splat all keys betweeen the current head position and the next event time (layerFinishTime) into the flattened layer
-		int keyCount = loglayer->GetKeyCount();
-		for ( int j = 0; j < keyCount; ++j )
+		intp keyCount = loglayer->GetKeyCount();
+		for ( intp j = 0; j < keyCount; ++j )
 		{
 			DmeTime_t keyTime = loglayer->GetKeyTime( j );
 			// Key is too early, skip
@@ -3776,7 +3776,7 @@ void CDmeTypedLog< T >::FinishTimeSelection( DmeTime_t tHeadPosition, DmeLog_Tim
 
 	// Should be in "layer recording" mode!!!
 	Assert( GetNumLayers() >= 2 );
-	int nBestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
+	intp nBestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
 	if ( nBestLayer < 1 )
 		return;
 
@@ -3785,7 +3785,7 @@ void CDmeTypedLog< T >::FinishTimeSelection( DmeTime_t tHeadPosition, DmeLog_Tim
 	if ( !pWriteLayer )
 		return;
 
-	int nKeyCount = pWriteLayer->GetKeyCount();
+	intp nKeyCount = pWriteLayer->GetKeyCount();
 	if ( nKeyCount <= 0 )
 		return;
 
@@ -4182,7 +4182,7 @@ void CDmeTypedLog< T >::_StampKeyAtHeadResample( DmeTime_t tHeadPosition, const 
 
 	// Should be in "layer recording" mode!!!
 	Assert( GetNumLayers() >= 2 );
-	int nBestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
+	intp nBestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
 	if ( nBestLayer < 1 )
 		return;
 	CDmeTypedLogLayer< T > *pWriteLayer = GetLayer( nBestLayer );
@@ -4249,9 +4249,9 @@ void CDmeTypedLog< T >::_StampKeyAtHeadResample( DmeTime_t tHeadPosition, const 
 
 	// Finally, figure out which layer we're reading from, 
 	// where the next key is, and when we must stop reading from it
-	int nReadLayer = FindLayerForTimeSkippingTopmost( tStartTime );
+	intp nReadLayer = FindLayerForTimeSkippingTopmost( tStartTime );
 	CDmeTypedLogLayer< T > *pReadLayer = GetLayer( nReadLayer );
-	int nLayerSampleIndex = pReadLayer->FindKey( tStartTime ) + 1;
+	intp nLayerSampleIndex = pReadLayer->FindKey( tStartTime ) + 1;
 	DmeTime_t tLayerEndTime = pReadLayer->GetEndTime();
 	// NOTE: This can happen after reading off the end of layer 0
 	if ( tLayerEndTime <= tStartTime )
@@ -4391,7 +4391,7 @@ void CDmeTypedLog< T >::_StampKeyAtHeadFilteredByTimeSelection( DmeTime_t tHeadP
 {
 	// Should be in "layer recording" mode!!!
 	Assert( GetNumLayers() >= 2 );
-	int nBestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
+	intp nBestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
 	if ( nBestLayer < 1 )
 		return;
 
@@ -4433,7 +4433,7 @@ void CDmeTypedLog< T >::_StampKeyAtHeadFilteredByTimeSelection( DmeTime_t tHeadP
 template< class T >
 void CDmeTypedLog< T >::RemoveKeys( DmeTime_t starttime )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return;
 
@@ -4441,9 +4441,9 @@ void CDmeTypedLog< T >::RemoveKeys( DmeTime_t starttime )
 }
 
 template< class T >
-void CDmeTypedLog< T >::RemoveKey( int nKeyIndex, int nNumKeysToRemove /*= 1*/ )
+void CDmeTypedLog< T >::RemoveKey( intp nKeyIndex, intp nNumKeysToRemove /*= 1*/ )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return;
 
@@ -4453,7 +4453,7 @@ void CDmeTypedLog< T >::RemoveKey( int nKeyIndex, int nNumKeysToRemove /*= 1*/ )
 template< class T >
 void CDmeTypedLog< T >::ClearKeys()
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return;
 
@@ -4464,18 +4464,18 @@ void CDmeTypedLog< T >::ClearKeys()
 // Returns a specific key's value
 //-----------------------------------------------------------------------------
 template< class T >
-DmeTime_t CDmeTypedLog< T >::GetKeyTime( int nKeyIndex ) const
+DmeTime_t CDmeTypedLog< T >::GetKeyTime( intp nKeyIndex ) const
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return DmeTime_t::MinTime();
 	return GetLayer( bestLayer )->GetKeyTime( nKeyIndex );
 }
 
 template< class T >
-void CDmeTypedLog< T >::SetKeyTime( int nKeyIndex, DmeTime_t keyTime )
+void CDmeTypedLog< T >::SetKeyTime( intp nKeyIndex, DmeTime_t keyTime )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return;
 	return GetLayer( bestLayer )->SetKeyTime( nKeyIndex, keyTime );
@@ -4485,9 +4485,9 @@ void CDmeTypedLog< T >::SetKeyTime( int nKeyIndex, DmeTime_t keyTime )
 // Returns the index of a particular key
 //-----------------------------------------------------------------------------
 template< class T >
-int CDmeTypedLog< T >::FindKeyWithinTolerance( DmeTime_t nTime, DmeTime_t nTolerance )
+intp CDmeTypedLog< T >::FindKeyWithinTolerance( DmeTime_t nTime, DmeTime_t nTolerance )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return -1;
 
@@ -4533,7 +4533,7 @@ bool CDmeTypedLog< T >::ValuesDiffer( const T& a, const T& b ) const
 template< class T >
 void CDmeTypedLog< T >::SetKey( DmeTime_t time, const T& value, int curveType /*=CURVE_DEFAULT*/)
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer < 0 )
 		return;
 
@@ -4541,7 +4541,7 @@ void CDmeTypedLog< T >::SetKey( DmeTime_t time, const T& value, int curveType /*
 }
 
 template< class T >
-CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( int index )
+CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( intp index )
 {
 	if ( index < 0 )
 		return NULL;
@@ -4550,7 +4550,7 @@ CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( int index )
 }
 
 template< class T >
-const CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( int index ) const
+const CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( intp index ) const
 {
 	if ( index < 0 )
 		return NULL;
@@ -4563,9 +4563,9 @@ const CDmeTypedLogLayer< T > *CDmeTypedLog< T >::GetLayer( int index ) const
 // Finds a key within tolerance, or adds one
 //-----------------------------------------------------------------------------
 template< class T >
-int CDmeTypedLog< T >::FindOrAddKey( DmeTime_t nTime, DmeTime_t nTolerance, const T& value, int curveType /*=CURVE_DEFAULT*/ )
+intp CDmeTypedLog< T >::FindOrAddKey( DmeTime_t nTime, DmeTime_t nTolerance, const T& value, int curveType /*=CURVE_DEFAULT*/ )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer == -1 )
 		return -1;
 
@@ -4579,7 +4579,7 @@ int CDmeTypedLog< T >::FindOrAddKey( DmeTime_t nTime, DmeTime_t nTolerance, cons
 template < class T >
 int CDmeTypedLog< T >::InsertKey( DmeTime_t nTime, const T& value, int curveType /*=CURVE_DEFAULT*/ )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer == -1 )
 		return -1;
 
@@ -4589,7 +4589,7 @@ int CDmeTypedLog< T >::InsertKey( DmeTime_t nTime, const T& value, int curveType
 template < class T >
 int CDmeTypedLog< T >::InsertKeyAtTime( DmeTime_t nTime, int curveType /*=CURVE_DEFAULT*/ )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer == -1 )
 		return -1;
 
@@ -4599,7 +4599,7 @@ int CDmeTypedLog< T >::InsertKeyAtTime( DmeTime_t nTime, int curveType /*=CURVE_
 template< class T >
 const T& CDmeTypedLog< T >::GetValue( DmeTime_t time ) const
 {
-	int bestLayer = FindLayerForTime( time );
+	intp bestLayer = FindLayerForTime( time );
 	if ( bestLayer < 0 )
 	{
 		static T s_value;
@@ -4613,7 +4613,7 @@ const T& CDmeTypedLog< T >::GetValue( DmeTime_t time ) const
 template< class T >
 const T& CDmeTypedLog< T >::GetValueSkippingTopmostLayer( DmeTime_t time ) const
 {
-	int nLayer = FindLayerForTimeSkippingTopmost( time );
+	intp nLayer = FindLayerForTimeSkippingTopmost( time );
 	if ( nLayer < 0 )
 		return GetValue( time );
 	return GetLayer( nLayer )->GetValue( time );
@@ -4622,7 +4622,7 @@ const T& CDmeTypedLog< T >::GetValueSkippingTopmostLayer( DmeTime_t time ) const
 template< class T >
 void CDmeTypedLog< T >::SetKey( DmeTime_t time, const CDmAttribute *pAttr, uint index, int curveType /*= CURVE_DEFAULT*/ )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer == -1 )
 		return;
 
@@ -4632,7 +4632,7 @@ void CDmeTypedLog< T >::SetKey( DmeTime_t time, const CDmAttribute *pAttr, uint 
 template< class T >
 bool CDmeTypedLog< T >::SetDuplicateKeyAtTime( DmeTime_t time )
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer == -1 )
 		return false;
 
@@ -4644,9 +4644,9 @@ bool CDmeTypedLog< T >::SetDuplicateKeyAtTime( DmeTime_t time )
 // Returns a specific key's value
 //-----------------------------------------------------------------------------
 template< class T >
-const T& CDmeTypedLog< T >::GetKeyValue( int nKeyIndex ) const
+const T& CDmeTypedLog< T >::GetKeyValue( intp nKeyIndex ) const
 {
-	int bestLayer = GetTopmostLayer();
+	intp bestLayer = GetTopmostLayer();
 	if ( bestLayer == -1 )
 	{
 		static T s_value;
@@ -4660,7 +4660,7 @@ const T& CDmeTypedLog< T >::GetKeyValue( int nKeyIndex ) const
 template< class T >
 void CDmeTypedLog< T >::GetValue( DmeTime_t time, CDmAttribute *pAttr, uint index ) const
 {
-	int bestLayer = FindLayerForTime( time );
+	intp bestLayer = FindLayerForTime( time );
 	if ( bestLayer < 0 )
 	{
 		T value;
@@ -4674,16 +4674,16 @@ void CDmeTypedLog< T >::GetValue( DmeTime_t time, CDmAttribute *pAttr, uint inde
 template< class T >
 void CDmeTypedLog< T >::GetValueSkippingTopmostLayer( DmeTime_t time, CDmAttribute *pAttr, uint index ) const 
 {
-	CUtlVector< int > layers;
+	CUtlVector< intp > layers;
 	FindLayersForTime( time, layers );
-	int layerCount = layers.Count();
+	intp layerCount = layers.Count();
 	if ( layerCount <= 1 )
 	{
 		return GetValue( time, pAttr, index );
 	}
 
-	int topMostLayer = GetTopmostLayer();
-	int useLayer =  layers[ layerCount - 1 ];
+	intp topMostLayer = GetTopmostLayer();
+	intp useLayer =  layers[ layerCount - 1 ];
 	if ( topMostLayer == useLayer )
 	{
 		useLayer = layers[ layerCount - 2 ];
@@ -4704,8 +4704,8 @@ float CDmeTypedLog< T >::GetComponent( DmeTime_t time, int componentIndex ) cons
 template< class T >
 void CDmeTypedLog< T >::Resample( DmeFramerate_t samplerate )
 {
-	int c = m_Layers.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Layers.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		GetLayer( i )->Resample( samplerate );
 	}
@@ -4714,8 +4714,8 @@ void CDmeTypedLog< T >::Resample( DmeFramerate_t samplerate )
 template< class T >
 void CDmeTypedLog< T >::Filter( int nSampleRadius )
 {
-	int c = m_Layers.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Layers.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		GetLayer( i )->Filter( nSampleRadius );
 	}
@@ -4724,20 +4724,20 @@ void CDmeTypedLog< T >::Filter( int nSampleRadius )
 template< class T >
 void CDmeTypedLog< T >::Filter2( DmeTime_t sampleRadius )
 {
-	int c = m_Layers.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Layers.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		GetLayer( i )->Filter2( sampleRadius );
 	}
 }
 
 template< class T >
-void CDmeTypedLog< T >::OnAttributeArrayElementAdded( CDmAttribute *pAttribute, int nFirstElem, int nLastElem )
+void CDmeTypedLog< T >::OnAttributeArrayElementAdded( CDmAttribute *pAttribute, intp nFirstElem, intp nLastElem )
 {
 	BaseClass::OnAttributeArrayElementAdded( pAttribute, nFirstElem, nLastElem );
 	if ( pAttribute == m_Layers.GetAttribute() )
 	{
-		for ( int i = nFirstElem; i <= nLastElem; ++i )
+		for ( intp i = nFirstElem; i <= nLastElem; ++i )
 		{
 			m_Layers[i]->SetOwnerLog( this );
 		}
@@ -4846,9 +4846,9 @@ void CDmeTypedLog< T >::BlendTimesUsingTimeSelection( const CDmeLogLayer *firstL
 
 	Assert( topLayer->GetKeyCount() == baseLayer->GetKeyCount() );
 
-	int i;
+	intp i;
 	// Resample everything in the base layer first
-	int kc = baseLayer->GetKeyCount();
+	intp kc = baseLayer->GetKeyCount();
 
 	newLayer->ClearKeys();
 
@@ -4889,9 +4889,9 @@ void CDmeTypedLog< T >::BlendLayersUsingTimeSelection( const CDmeLogLayer *first
 	if ( !newLayer )
 		return;
 
-	int i;
+	intp i;
 	// Resample everything in the base layer first
-	int kc = baseLayer->GetKeyCount();
+	intp kc = baseLayer->GetKeyCount();
 	if ( bUseBaseLayerSamples )
 	{
 		for ( i = 0; i < kc; ++i )
@@ -4942,7 +4942,7 @@ template< class T >
 void CDmeTypedLog< T >::BlendLayersUsingTimeSelection( const DmeLog_TimeSelection_t &params )
 {
 	Assert( GetNumLayers() >= 2 );
-	int bestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
+	intp bestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
 	if ( bestLayer <= 0 )
 		return;
 
@@ -4979,7 +4979,7 @@ void CDmeTypedLog< T >::RevealUsingTimeSelection( const DmeLog_TimeSelection_t &
 		return;
 
 	Assert( GetNumLayers() >= 2 );
-	int bestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
+	intp bestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
 	if ( bestLayer <= 0 )
 		return;
 	
@@ -5100,8 +5100,8 @@ void CDmeTypedLog< T >::BuildCorrespondingLayer( const CDmeLogLayer *pReferenceL
 	bool usecurvetypes = ref->IsUsingCurveTypes();
 
 	out->ClearKeys();
-	int kc = ref->GetKeyCount();
-	for ( int i = 0; i < kc; ++i )
+	intp kc = ref->GetKeyCount();
+	for ( intp i = 0; i < kc; ++i )
 	{
 		DmeTime_t keyTime = ref->GetKeyTime( i );
 		T value = data->GetValue( keyTime );
@@ -5143,8 +5143,8 @@ void CDmeTypedLog< T >::StaggerUsingTimeSelection( const DmeLog_TimeSelection_t&
 		}
 	}
 
-	int kc = baseLayer->GetKeyCount();
-	for ( int i = 0; i < kc; ++i )
+	intp kc = baseLayer->GetKeyCount();
+	for ( intp i = 0; i < kc; ++i )
 	{
 		DmeTime_t curtime = baseLayer->GetKeyTime( i );
 		T oldValue = baseLayer->GetKeyValue( i );
@@ -5171,7 +5171,7 @@ template< class T >
 void CDmeTypedLog< T >::FilterUsingTimeSelection( IUniformRandomStream *random, const DmeLog_TimeSelection_t& params, int filterType, bool bResample, bool bApplyFalloff )
 {
 	Assert( GetNumLayers() >= 2 );
-	int bestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
+	intp bestLayer = GetTopmostLayer(); // Topmost should be at least layer # 1 (0 is the base layer)
 	if ( bestLayer <= 0 )
 		return;
 
@@ -5228,8 +5228,8 @@ void CDmeTypedLog< T >::FilterUsingTimeSelection( IUniformRandomStream *random, 
 			else
 			{
 				// Do a second pass where we bias the keys in the falloff area back toward the original value
-				int kc = baseLayer->GetKeyCount();
-				for ( int i = 0; i < kc; ++i )
+				intp kc = baseLayer->GetKeyCount();
+				for ( intp i = 0; i < kc; ++i )
 				{
 					DmeTime_t curtime = baseLayer->GetKeyTime( i );
 					if ( curtime < params.m_nTimes[ TS_LEFT_FALLOFF ] )
@@ -5275,8 +5275,8 @@ void CDmeTypedLog< T >::FilterUsingTimeSelection( IUniformRandomStream *random, 
 				else
 				{
 					// Do a second pass where we bias the keys in the falloff area back toward the original value
-					int kc = writeLayer->GetKeyCount();
-					for ( int i = 0; i < kc; ++i )
+					intp kc = writeLayer->GetKeyCount();
+					for ( intp i = 0; i < kc; ++i )
 					{
 						DmeTime_t curtime = writeLayer->GetKeyTime( i );
 						if ( curtime < params.m_nTimes[ TS_LEFT_FALLOFF ] )
@@ -5340,8 +5340,8 @@ void CDmeTypedLog< T >::FilterUsingTimeSelection( IUniformRandomStream *random, 
 			}
 			else
 			{
-				int kc = baseLayer->GetKeyCount();
-				for ( int i = 0; i < kc; ++i )
+				intp kc = baseLayer->GetKeyCount();
+				for ( intp i = 0; i < kc; ++i )
 				{
 					DmeTime_t curtime = baseLayer->GetKeyTime( i );
 					if ( curtime < params.m_nTimes[ TS_LEFT_FALLOFF ] )
@@ -5370,8 +5370,8 @@ void CDmeTypedLog< T >::FilterUsingTimeSelection( IUniformRandomStream *random, 
 			writeLayer->ClearKeys();
 
 			bool bSharpen = filterType == FILTER_SHARPEN;
-			int kc = baseLayer->GetKeyCount();
-			for ( int i = 0; i < kc; ++i )
+			intp kc = baseLayer->GetKeyCount();
+			for ( intp i = 0; i < kc; ++i )
 			{
 				DmeTime_t curtime = baseLayer->GetKeyTime( i );
 				if ( curtime < params.m_nTimes[ TS_LEFT_FALLOFF ] )
@@ -5457,8 +5457,8 @@ static void CountClipboardSamples( int *pCount, CDmeTypedLogLayer< T > *pClipboa
 {
 	pCount[0] = pCount[1] = pCount[2] = 0;
 
-	int nKeyCount = pClipboard->GetKeyCount();
-	for ( int i = 0; i < nKeyCount; ++i )
+	intp nKeyCount = pClipboard->GetKeyCount();
+	for ( intp i = 0; i < nKeyCount; ++i )
 	{
 		DmeTime_t tKeyTime = pClipboard->GetKeyTime( i );
 		int nIndex = params.ComputeRegionForTime( tKeyTime ) - 1;
@@ -5599,12 +5599,12 @@ void CDmeTypedLog< T >::PasteAndRescaleSamples(
 	CountClipboardSamples( pKeyCount, pClipboard, srcParams );
 
 	// Walk the samples in the clipboard
-	int nKeyCount = pClipboard->GetKeyCount();
+	intp nKeyCount = pClipboard->GetKeyCount();
 	int nPrevState = PASTE_STATE_BEFORE;
 	DmeTime_t tLastWrittenTime = DMETIME_MINTIME;
 	DmeTime_t tMaxKeyTime = DMETIME_MAXTIME;
 	bool bCollapseSamples = false;
-	for ( int j = 0 ; j < nKeyCount; ++j )
+	for ( intp j = 0 ; j < nKeyCount; ++j )
 	{
 		DmeTime_t tKeyTime = pClipboard->GetKeyTime( j );
 		T val = pClipboard->GetKeyValue( j );
@@ -5756,8 +5756,8 @@ void CDmeTypedLog< Vector >::BuildNormalizedLayer( CDmeTypedLogLayer< float > *t
 	float flMin = FLT_MAX;
 	float flMax = FLT_MIN;
 
-	int kc = baseLayer->GetKeyCount();
-	for ( int i = 0; i < kc; ++i )
+	intp kc = baseLayer->GetKeyCount();
+	for ( intp i = 0; i < kc; ++i )
 	{
 		DmeTime_t keyTime = baseLayer->GetKeyTime( i );
 		Vector keyValue = baseLayer->GetKeyValue( i );
@@ -5775,7 +5775,7 @@ void CDmeTypedLog< Vector >::BuildNormalizedLayer( CDmeTypedLogLayer< float > *t
 		target->InsertKey( keyTime, len );
 	}
 
-	for ( int i = 0; i < kc; ++i )
+	for ( intp i = 0; i < kc; ++i )
 	{
 		float keyValue = target->GetKeyValue( i );
 		float normalized = RemapVal( keyValue, flMin, flMax, 0.0f, 1.0f );
@@ -5801,8 +5801,8 @@ void CDmeTypedLog< Vector2D >::BuildNormalizedLayer( CDmeTypedLogLayer< float > 
 	float flMin = FLT_MAX;
 	float flMax = FLT_MIN;
 
-	int kc = baseLayer->GetKeyCount();
-	for ( int i = 0; i < kc; ++i )
+	intp kc = baseLayer->GetKeyCount();
+	for ( intp i = 0; i < kc; ++i )
 	{
 		DmeTime_t keyTime = baseLayer->GetKeyTime( i );
 		Vector2D keyValue = baseLayer->GetKeyValue( i );
@@ -5821,7 +5821,7 @@ void CDmeTypedLog< Vector2D >::BuildNormalizedLayer( CDmeTypedLogLayer< float > 
 		target->InsertKey( keyTime, len );
 	}
 
-	for ( int i = 0; i < kc; ++i )
+	for ( intp i = 0; i < kc; ++i )
 	{
 		float keyValue = target->GetKeyValue( i );
 		float normalized = RemapVal( keyValue, flMin, flMax, 0.0f, 1.0f );
@@ -5847,8 +5847,8 @@ void CDmeTypedLog< Vector4D >::BuildNormalizedLayer( CDmeTypedLogLayer< float > 
 	float flMin = FLT_MAX;
 	float flMax = FLT_MIN;
 
-	int kc = baseLayer->GetKeyCount();
-	for ( int i = 0; i < kc; ++i )
+	intp kc = baseLayer->GetKeyCount();
+	for ( intp i = 0; i < kc; ++i )
 	{
 		DmeTime_t keyTime = baseLayer->GetKeyTime( i );
 		Vector4D keyValue = baseLayer->GetKeyValue( i );
@@ -5867,7 +5867,7 @@ void CDmeTypedLog< Vector4D >::BuildNormalizedLayer( CDmeTypedLogLayer< float > 
 		target->InsertKey( keyTime, len );
 	}
 
-	for ( int i = 0; i < kc; ++i )
+	for ( intp i = 0; i < kc; ++i )
 	{
 		float keyValue = target->GetKeyValue( i );
 		float normalized = RemapVal( keyValue, flMin, flMax, 0.0f, 1.0f );
@@ -5893,8 +5893,8 @@ void CDmeTypedLog< int >::BuildNormalizedLayer( CDmeTypedLogLayer< float > *targ
 	float flMin = FLT_MAX;
 	float flMax = FLT_MIN;
 
-	int kc = baseLayer->GetKeyCount();
-	for ( int i = 0; i < kc; ++i )
+	intp kc = baseLayer->GetKeyCount();
+	for ( intp i = 0; i < kc; ++i )
 	{
 		DmeTime_t keyTime = baseLayer->GetKeyTime( i );
 		int keyValue = baseLayer->GetKeyValue( i );
@@ -5913,7 +5913,7 @@ void CDmeTypedLog< int >::BuildNormalizedLayer( CDmeTypedLogLayer< float > *targ
 		target->InsertKey( keyTime, len );
 	}
 
-	for ( int i = 0; i < kc; ++i )
+	for ( intp i = 0; i < kc; ++i )
 	{
 		float keyValue = target->GetKeyValue( i );
 		float normalized = RemapVal( keyValue, flMin, flMax, 0.0f, 1.0f );
@@ -5939,8 +5939,8 @@ void CDmeTypedLog< float >::BuildNormalizedLayer( CDmeTypedLogLayer< float > *ta
 	float flMin = FLT_MAX;
 	float flMax = FLT_MIN;
 
-	int kc = baseLayer->GetKeyCount();
-	for ( int i = 0; i < kc; ++i )
+	intp kc = baseLayer->GetKeyCount();
+	for ( intp i = 0; i < kc; ++i )
 	{
 		DmeTime_t keyTime = baseLayer->GetKeyTime( i );
 		int keyValue = baseLayer->GetKeyValue( i );
@@ -5959,7 +5959,7 @@ void CDmeTypedLog< float >::BuildNormalizedLayer( CDmeTypedLogLayer< float > *ta
 		target->InsertKey( keyTime, len );
 	}
 
-	for ( int i = 0; i < kc; ++i )
+	for ( intp i = 0; i < kc; ++i )
 	{
 		float keyValue = target->GetKeyValue( i );
 		float normalized = RemapVal( keyValue, flMin, flMax, 0.0f, 1.0f );
@@ -6136,8 +6136,8 @@ void RotatePositionLog( CDmeVector3LogLayer *pPositionLog, const matrix3x4_t& ma
 {
 	Assert( fabs( matrix[0][3] ) < 1e-3 && fabs( matrix[1][3] ) < 1e-3 && fabs( matrix[2][3] ) < 1e-3 );
 	Vector position;
-	int nCount = pPositionLog->GetKeyCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pPositionLog->GetKeyCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const Vector &srcPosition = pPositionLog->GetKeyValue( i );
 		VectorTransform( srcPosition, matrix, position );
@@ -6154,8 +6154,8 @@ void RotateOrientationLog( CDmeQuaternionLogLayer *pOrientationLog, const matrix
 	Assert( fabs( matrix[0][3] ) < 1e-3 && fabs( matrix[1][3] ) < 1e-3 && fabs( matrix[2][3] ) < 1e-3 );
 	matrix3x4_t orientation, newOrientation;
 	Quaternion q;
-	int nCount = pOrientationLog->GetKeyCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pOrientationLog->GetKeyCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const Quaternion &srcQuat = pOrientationLog->GetKeyValue( i );
 		QuaternionMatrix( srcQuat, orientation );

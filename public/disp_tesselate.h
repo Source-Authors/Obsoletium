@@ -111,7 +111,7 @@ inline void TesselateDisplacement_R(
 	if( iLevel >= pHelper->m_pPowerInfo->m_Power - 1 )
 	{
 		// This node has no children.
-		bActiveChildren[0] = bActiveChildren[1] = bActiveChildren[2] = bActiveChildren[3] = false;
+		bActiveChildren[0] = bActiveChildren[1] = bActiveChildren[2] = bActiveChildren[3] = 0;
 	}
 	else
 	{

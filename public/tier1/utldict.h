@@ -75,7 +75,7 @@ public:
 	bool  IsValidIndex( I i ) const;
 	
 	// Invalid index
-	static I InvalidIndex();
+	static constexpr I InvalidIndex();
 	
 	// Insert method (inserts in order)
 	I  Insert( const char *pName, const T &element );
@@ -225,7 +225,7 @@ inline	bool CUtlDict<T, I>::IsValidIndex( I i ) const
 // Invalid index
 //-----------------------------------------------------------------------------
 template <class T, class I>
-inline I CUtlDict<T, I>::InvalidIndex()         
+inline constexpr I CUtlDict<T, I>::InvalidIndex()         
 { 
 	return DictElementMap_t::InvalidIndex(); 
 }

@@ -13,7 +13,7 @@
 #define _wtoi64(arg) wcstoll(arg, NULL, 10)
 #endif
 
-#include "KeyValues.h"
+#include "tier1/KeyValues.h"
 
 #include <cstdlib>
 
@@ -24,12 +24,12 @@
 #include "Color.h"
 #include "tier0/dbg.h"
 #include "tier0/mem.h"
-#include "utlbuffer.h"
-#include "utlhash.h"
-#include "utlvector.h"
-#include "utlqueue.h"
-#include "UtlSortVector.h"
-#include "convar.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/utlhash.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlqueue.h"
+#include "tier1/UtlSortVector.h"
+#include "tier1/convar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -49,7 +49,7 @@ static char s_pTokenBuf[KEYVALUES_TOKEN_SIZE];
 
 
 // a simple class to keep track of a stack of valid parsed symbols
-const int MAX_ERROR_STACK = 64;
+constexpr inline int MAX_ERROR_STACK = 64;
 class CKeyValuesErrorStack
 {
 public:
@@ -429,6 +429,18 @@ KeyValues::KeyValues( const char *setName, const char *firstKey, unsigned firstV
 	Init();
 	SetName( setName );
 	SetInt( firstKey, firstValue );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Constructor
+//-----------------------------------------------------------------------------
+KeyValues::KeyValues( const char *setName, const char *firstKey, float firstValue )
+{
+	TRACK_KV_ADD( this, setName );
+
+	Init();
+	SetName( setName );
+	SetFloat( firstKey, firstValue );
 }
 
 //-----------------------------------------------------------------------------
@@ -939,7 +951,7 @@ void KeyValues::SaveKeyToFile( KeyValues *dat, IBaseFileSystem *filesystem, File
 				{
 					static char buf[KEYVALUES_TOKEN_SIZE];
 					// make sure we have enough space
-					int result = Q_UnicodeToUTF8( dat->m_wsValue, buf, KEYVALUES_TOKEN_SIZE);
+					intp result = Q_UnicodeToUTF8( dat->m_wsValue, buf, KEYVALUES_TOKEN_SIZE);
 					if (result)
 					{
 						WriteIndents(filesystem, f, pBuf, indentLevel + 1);
@@ -1489,7 +1501,7 @@ const char *KeyValues::GetString( const char *keyName, const char *defaultValue 
 		{
 			// convert the string to char *, set it for future use, and return it
 			char wideBuf[512];
-			int result = Q_UnicodeToUTF8(dat->m_wsValue, wideBuf, 512);
+			intp result = Q_UnicodeToUTF8(dat->m_wsValue, wideBuf, 512);
 			if ( result )
 			{
 				// note: this will copy wideBuf
@@ -1547,7 +1559,7 @@ const wchar_t *KeyValues::GetWString( const char *keyName, const wchar_t *defaul
 			intp bufSize = Q_strlen(dat->m_sValue) + 1;
 			// dimhotepus: Speedup by using stack alloc. String is copied in SetWString.
 			wchar_t *pWBuf = static_cast<wchar_t*>( _alloca( sizeof(wchar_t) * bufSize ));
-			int result = Q_UTF8ToUnicode(dat->m_sValue, pWBuf, bufSize * sizeof( wchar_t ) );
+			intp result = Q_UTF8ToUnicode(dat->m_sValue, pWBuf, bufSize * sizeof( wchar_t ) );
 			if ( result >= 0 ) // may be a zero length string
 			{
 				SetWString( keyName, pWBuf);
@@ -1944,8 +1956,8 @@ void KeyValues::CopySubkeys( KeyValues *pParent ) const
 {
 	// recursively copy subkeys
 	// Also maintain ordering....
-	KeyValues *pPrev = NULL;
-	for ( KeyValues *sub = m_pSub; sub != NULL; sub = sub->m_pPeer )
+	KeyValues *pPrev = nullptr;
+	for ( KeyValues *sub = m_pSub; sub != nullptr; sub = sub->m_pPeer )
 	{
 		// take a copy of the subkey
 		KeyValues *dat = sub->MakeCopy();
@@ -2023,6 +2035,11 @@ KeyValues *KeyValues::MakeCopy( void ) const
 	case TYPE_UINT64:
 		newKeyValue->m_sValue = new char[sizeof(uint64)];
 		Q_memcpy( newKeyValue->m_sValue, m_sValue, sizeof(uint64) );
+		break;
+
+		// dimhotepus: Do nothing.
+	case TYPE_NONE:
+	case TYPE_NUMTYPES:
 		break;
 	}
 
@@ -2682,7 +2699,8 @@ bool KeyValues::WriteAsBinary( CUtlBuffer &buffer )
 		return false;
 
 	// Write subkeys:
-	
+	bool ok = true;
+
 	// loop through all our peers
 	for ( KeyValues *dat = this; dat != NULL; dat = dat->m_pPeer )
 	{
@@ -2697,7 +2715,8 @@ bool KeyValues::WriteAsBinary( CUtlBuffer &buffer )
 		{
 		case TYPE_NONE:
 			{
-				dat->m_pSub->WriteAsBinary( buffer );
+				// dimhotepus: Store write failure.
+				ok = dat->m_pSub->WriteAsBinary( buffer ) && ok;
 				break;
 			}
 		case TYPE_STRING:
@@ -2761,7 +2780,7 @@ bool KeyValues::WriteAsBinary( CUtlBuffer &buffer )
 	// write tail, marks end of peers
 	buffer.PutUnsignedChar( TYPE_NUMTYPES ); 
 
-	return buffer.IsValid();
+	return ok && buffer.IsValid();
 }
 
 // read KeyValues from binary buffer, returns true if parsing was successful
@@ -2785,6 +2804,8 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 	KeyValues	*dat = this;
 	types_t		type = (types_t)buffer.GetUnsignedChar();
 	
+	bool ok = true;
+
 	// loop through all our peers
 	while ( true )
 	{
@@ -2805,7 +2826,8 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 		case TYPE_NONE:
 			{
 				dat->m_pSub = new KeyValues("");
-				dat->m_pSub->ReadAsBinary( buffer, nStackDepth + 1 );
+				// dimhotepus: Store read failure.
+				ok = dat->m_pSub->ReadAsBinary( buffer, nStackDepth + 1 ) && ok;
 				break;
 			}
 		case TYPE_STRING:
@@ -2879,7 +2901,7 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 		dat = dat->m_pPeer;
 	}
 
-	return buffer.IsValid();
+	return ok && buffer.IsValid();
 }
 
 #include "tier0/memdbgoff.h"
@@ -2893,7 +2915,7 @@ void *KeyValues::operator new( size_t iAllocSize )
 	return KeyValuesSystem()->AllocKeyValuesMemory( (int)iAllocSize );
 }
 
-void *KeyValues::operator new( size_t iAllocSize, int, const char *pFileName, int nLine )
+void *KeyValues::operator new( size_t iAllocSize, int, [[maybe_unused]] const char *pFileName, [[maybe_unused]] int nLine )
 {
 	MemAlloc_PushAllocDbgInfo( pFileName, nLine );
 	void *p = KeyValuesSystem()->AllocKeyValuesMemory( (int)iAllocSize );
@@ -2914,7 +2936,7 @@ void KeyValues::operator delete( void *pMem, int, const char *, int )
 	KeyValuesSystem()->FreeKeyValuesMemory(pMem);
 }
 
-void KeyValues::UnpackIntoStructure( KeyValuesUnpackStructure const *pUnpackTable, void *pDest, size_t DestSizeInBytes )
+void KeyValues::UnpackIntoStructure( KeyValuesUnpackStructure const *pUnpackTable, void *pDest, [[maybe_unused]] size_t DestSizeInBytes )
 {
 #ifdef DBGFLAG_ASSERT
 	void *pDestEnd = ( char * )pDest + DestSizeInBytes + 1;

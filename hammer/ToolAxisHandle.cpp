@@ -126,7 +126,7 @@ bool CToolAxisHandle::OnMouseMove2D(CMapView2D *pView, UINT nFlags, const Vector
 	// Update the status bar and the views.
 	//
 	char szBuf[128];
-	sprintf(szBuf, " (%.0f %.0f %0.f) ", vecPos[m_nPointIndex][0], vecPos[m_nPointIndex][1], vecPos[m_nPointIndex][2]);
+	V_sprintf_safe(szBuf, " (%.0f %.0f %0.f) ", vecPos[m_nPointIndex][0], vecPos[m_nPointIndex][1], vecPos[m_nPointIndex][2]);
 	SetStatusText(SBI_COORDS, szBuf);
 
 	pDoc->UpdateAllViews( MAPVIEW_UPDATE_TOOL );

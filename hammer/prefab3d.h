@@ -105,8 +105,8 @@ class CPrefabVMF : public CPrefab3D
 
 	protected:
 
-		static ChunkFileResult_t LoadEntityCallback(CChunkFile *pFile, CPrefabVMF *pPrefab);
-		static ChunkFileResult_t LoadWorldCallback(CChunkFile *pFile, CPrefabVMF *pPrefab);
+		[[nodiscard]] static ChunkFileResult_t LoadEntityCallback(CChunkFile *pFile, CPrefabVMF *pPrefab);
+		[[nodiscard]] static ChunkFileResult_t LoadWorldCallback(CChunkFile *pFile, CPrefabVMF *pPrefab);
 
 		char m_szFilename[MAX_PATH];	// Full path of the prefab VMF.
 		// dimhotepus: int -> time_t

@@ -1198,7 +1198,7 @@ void CBaseShader::FixedFunctionMultiplyByDetailPass( int baseTextureVar, int fra
 		BindTexture( SHADER_SAMPLER1, detailVar, frameVar );
 		SetFixedFunctionTextureScaledTransform( MATERIAL_TEXTURE1, textureTransformVar, detailScaleVar );
 		float alpha = GetAlpha();
-		s_pShaderAPI->Color4ub( 128, 128, 128, 255 * alpha );
+		s_pShaderAPI->Color4ub( 128, 128, 128, static_cast<unsigned char>(255 * alpha) );
 
 		Draw( );
 	}
@@ -1278,7 +1278,7 @@ void CBaseShader::FixedFunctionMultiplyByLightmapPass( int baseTextureVar,
 
 		// NOTE: 128 is a more exact OO_OVERBRIGHT; it prevents some artifacts
 //		s_pShaderAPI->Color4f( OO_OVERBRIGHT, OO_OVERBRIGHT, OO_OVERBRIGHT, alpha );
-		s_pShaderAPI->Color4ub( 128, 128, 128, (int)(alpha * 255));
+		s_pShaderAPI->Color4ub( 128, 128, 128, static_cast<unsigned char>(alpha * 255));
 
 		if (TextureIsTranslucent(baseTextureVar, true))
 		{

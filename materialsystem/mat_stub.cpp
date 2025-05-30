@@ -13,7 +13,7 @@
 #include "materialsystem/imaterialvar.h"
 #include "bitmap/imageformat.h"
 #include "mathlib/vmatrix.h"
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 // GR
 #include "imaterialinternal.h"
 #include "materialsystem/materialsystem_config.h"
@@ -249,7 +249,7 @@ public:
 	//		pnumBytes		on return is the number of bytes available in the read-only data buffer or is undefined
 	// Returns:
 	//		pointer to the resource data, or NULL
-	virtual void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const
+	virtual const void *GetResourceData( uint32 eDataType, size_t *pNumBytes ) const
 	{
 		return NULL;
 	}
@@ -1774,7 +1774,7 @@ public:
 	}
 
 	// Used to iterate over all shaders for editing purposes
-	virtual int	 ShaderCount() const
+	virtual intp ShaderCount() const
 	{
 		return 0;
 	}
@@ -2265,7 +2265,7 @@ public:
 	virtual void EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode ) {}
 	virtual void RefreshFrontBufferNonInteractive() {}
 
-	virtual void *			LockRenderData( int nSizeInBytes ) { return NULL; }
+	virtual void *			LockRenderData( intp nSizeInBytes ) { return NULL; }
 	virtual void			UnlockRenderData( void *pData ) {}
 	virtual bool			IsRenderData( const void *pData ) const { return false; }
 	virtual void			AddRefRenderData() override {}

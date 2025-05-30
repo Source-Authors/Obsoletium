@@ -12,12 +12,12 @@
 #pragma once
 #endif
 
-#include <interface.h>
+#include "tier1/interface.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: basic callback interface for the manage server list, to update status text et al
 //-----------------------------------------------------------------------------
-class IManageServer : public IBaseInterface
+abstract_class IManageServer : public IBaseInterface
 {
 public:
 	// activates the manage page
@@ -30,6 +30,6 @@ public:
 	virtual void AddToConsole(const char *msg) = 0;
 };
 
-#define IMANAGESERVER_INTERFACE_VERSION "IManageServer002"
+constexpr inline char IMANAGESERVER_INTERFACE_VERSION[]{"IManageServer002"};
 
 #endif // IMANAGESERVER_H

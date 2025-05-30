@@ -110,7 +110,7 @@ ChunkFileResult_t CDispMapImageFilter::LoadImageKeyCallback( const char *szKey, 
 	if( !strnicmp( szKey, "row", 3 ) )
 	{
 		char szBuf[MAX_KEYVALUE_LEN];
-		strcpy( szBuf, szValue );
+		V_strcpy_safe( szBuf, szValue );
 
 		int row = atoi( &szKey[3] );
 

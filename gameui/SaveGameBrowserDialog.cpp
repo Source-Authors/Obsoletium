@@ -326,8 +326,8 @@ void CSaveGameBrowserDialog::LayoutPanels( void )
 //-----------------------------------------------------------------------------
 void CSaveGameBrowserDialog::AnimateDialogStart( void )
 {
-	const float flAnimInTime = 0.5f;
-	const float flOffset = 0.1f;
+	constexpr float flAnimInTime = 0.5f;
+	constexpr float flOffset = 0.1f;
 
 	for ( int i = 0; i < NUM_SLOTS; i++ )
 	{
@@ -532,7 +532,7 @@ void CSaveGameBrowserDialog::FinishInsert( void )
 {
 	CGameSavePanel *panel = m_SavePanels[ m_nAddedPanel ];
 
-	const float flScrollSpeed = 0.75f;
+	constexpr float flScrollSpeed = 0.75f;
 
 	// Run the actual movement
 	GetAnimationController()->RunAnimationCommand( panel, "xpos",  m_PanelXPos[SLOT_RIGHT],  0, flScrollSpeed, vgui::AnimationController::INTERPOLATOR_SIMPLESPLINE );
@@ -599,7 +599,7 @@ void CSaveGameBrowserDialog::AnimateInsertNewPanel( const SaveGameDescription_t 
 //-----------------------------------------------------------------------------
 void CSaveGameBrowserDialog::FinishOverwriteFadeDown( void )
 {
-	const float flFadeInTime = 0.25f;
+	constexpr float flFadeInTime = 0.25f;
 
 	// Fade the right panel away
 	CGameSavePanel *pActivePanel = GetActivePanel();
@@ -1178,8 +1178,8 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 	if ( !pszFileName || !pszShortName )
 		return false;
 
-	Q_strncpy( save->szShortName, pszShortName, sizeof(save->szShortName) );
-	Q_strncpy( save->szFileName, pszFileName, sizeof(save->szFileName) );
+	V_strcpy_safe( save->szShortName, pszShortName );
+	V_strcpy_safe( save->szFileName, pszFileName );
 
 	FileHandle_t fh = g_pFullFileSystem->Open( pszFileName, "rb", "MOD" );
 	if (fh == FILESYSTEM_INVALID_HANDLE)
@@ -1195,11 +1195,11 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 		return false;
 	}
 
-	Q_strncpy( save->szMapName, szMapName, sizeof(save->szMapName) );
+	V_strcpy_safe( save->szMapName, szMapName );
 
 	// Elapsed time is the last 6 characters in comment. (mmm:ss)
 	intp i = V_strlen( szComment );
-	Q_strncpy( szElapsedTime, "??", sizeof( szElapsedTime ) );
+	V_strcpy_safe( szElapsedTime, "??" );
 	if (i >= 6)
 	{
 		Q_strncpy( szElapsedTime, (char *)&szComment[i - 6], 7 );
@@ -1212,30 +1212,30 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 		minutes %= 60;
 
 		wchar_t wzHours[6];
-		wchar_t wzMins[4];	
+		wchar_t wzMins[4];
 		wchar_t wzSecs[4];
 
-		_snwprintf( wzHours, std::size(wzHours), L"%d", hours );
-		_snwprintf( wzMins, std::size(wzMins), L"%d", minutes );
-		_snwprintf( wzSecs, std::size(wzSecs), L"%d", seconds );
+		V_swprintf_safe( wzHours, L"%d", hours );
+		V_swprintf_safe( wzMins, L"%d", minutes );
+		V_swprintf_safe( wzSecs, L"%d", seconds );
 
 		wchar_t buf[20];
 
 		// reformat
 		if ( hours )
 		{
-			g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Hr_Min" ), 2, wzHours, wzMins );
+			g_pVGuiLocalize->ConstructString_safe( buf, g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Hr_Min" ), 2, wzHours, wzMins );
 		}
 		else if ( minutes )
 		{
-			g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Min_Sec" ), 2, wzMins, wzSecs );
+			g_pVGuiLocalize->ConstructString_safe( buf, g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Min_Sec" ), 2, wzMins, wzSecs );
 		}
 		else
 		{
-			g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Sec" ), 1, wzSecs );
+			g_pVGuiLocalize->ConstructString_safe( buf, g_pVGuiLocalize->Find( "#GameUI_LoadDialog_Sec" ), 1, wzSecs );
 		}
 
-		g_pVGuiLocalize->ConvertUnicodeToANSI( buf, szElapsedTime, sizeof(szElapsedTime) );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( buf, szElapsedTime );
 
 		// Chop elapsed out of comment.
 		char *pChop = Q_stristr( szComment, " " );
@@ -1256,20 +1256,20 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 		pszType = "#GameUI_AutoSave";
 	}
 
-	Q_strncpy( save->szType, pszType, sizeof(save->szType) );
-	Q_strncpy( save->szComment, szComment, sizeof(save->szComment) );
-	Q_strncpy( save->szElapsedTime, szElapsedTime, sizeof(save->szElapsedTime) );
+	V_strcpy_safe( save->szType, pszType );
+	V_strcpy_safe( save->szComment, szComment );
+	V_strcpy_safe( save->szElapsedTime, szElapsedTime );
 
 	// Now get file time stamp.
-	long fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
+	time_t fileTime = g_pFullFileSystem->GetFileTime(pszFileName);
 	char szFileTime[32];
-	g_pFullFileSystem->FileTimeToString(szFileTime, sizeof(szFileTime), fileTime);
+	g_pFullFileSystem->FileTimeToString(szFileTime, fileTime);
 	char *newline = strchr(szFileTime, '\n');
 	if (newline)
 	{
 		*newline = '\0';
 	}
-	Q_strncpy( save->szFileTime, szFileTime, sizeof(save->szFileTime) );
+	V_strcpy_safe( save->szFileTime, szFileTime );
 	save->iTimestamp = fileTime;
 	return true;
 }

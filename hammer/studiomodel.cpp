@@ -161,23 +161,19 @@ StudioModel *CStudioModelCache::CreateModel(const char *pszModelPath)
 BOOL CStudioModelCache::AddModel(StudioModel *pModel, const char *pszModelPath)
 {
 	//
-	// Copy the model pointer.
-	//
-	m_Cache[m_nItems].pModel = pModel;
-
-	//
 	// Allocate space for and copy the model path.
 	//
-	m_Cache[m_nItems].pszPath = new char [strlen(pszModelPath) + 1];
-	if (m_Cache[m_nItems].pszPath != NULL)
-	{
-		strcpy(m_Cache[m_nItems].pszPath, pszModelPath);
-	}
-	else
+	m_Cache[m_nItems].pszPath = V_strdup( pszModelPath );
+	if (m_Cache[m_nItems].pszPath == NULL)
 	{
 		return(FALSE);
 	}
-
+	
+	//
+	// Copy the model pointer.
+	//
+	// dimhotepus: Do it after path is copied as latter may fail.
+	m_Cache[m_nItems].pModel = pModel;
 	m_Cache[m_nItems].nRefCount = 1;
 
 	m_nItems++;
@@ -270,7 +266,7 @@ void CStudioFileChangeWatcher::Init()
 	m_Watcher.Init( this );
 	
 	char searchPaths[1024 * 16];
-	if ( g_pFullFileSystem->GetSearchPath( "GAME", false, searchPaths, sizeof( searchPaths ) ) > 0 )
+	if ( g_pFullFileSystem->GetSearchPath_safe( "GAME", false, searchPaths ) > 0 )
 	{
 		CUtlVector<char*> searchPathList;
 		V_SplitString( searchPaths, ";", searchPathList );
@@ -295,7 +291,7 @@ void CStudioFileChangeWatcher::Init()
 void CStudioFileChangeWatcher::OnFileChange( const char *pRelativeFilename, const char *pFullFilename )
 {
 	char relativeFilename[MAX_PATH];
-	V_ComposeFileName( "models", pRelativeFilename, relativeFilename, sizeof( relativeFilename ) );
+	V_ComposeFileName( "models", pRelativeFilename, relativeFilename );
 	V_FixSlashes( relativeFilename );
 	
 	// Check the cache.
@@ -322,7 +318,7 @@ void CStudioFileChangeWatcher::OnFileChange( const char *pRelativeFilename, cons
 			V_strncpy( filename, tempFilename, sizeof( filename ) );
 
 		// Now we've got the filename with any extension or "dx80"-type stuff at the end.
-		V_strncat( filename, ".mdl", sizeof( filename ) );
+		V_strcat_safe( filename, ".mdl" );
 		
 		// Queue up the list of changes because if they copied all the files for a model,
 		// we'd like to only reload it once.
@@ -765,9 +761,7 @@ bool StudioModel::LoadModel( const char *modelname )
 	{
 		// Copy over the model name; we'll need it later...
 		delete[] m_pModelName;
-
-		m_pModelName = new char[strlen(modelname) + 1];
-		strcpy( m_pModelName, modelname );
+		m_pModelName = V_strdup( modelname );
 	}
 
 	m_MDLHandle = g_pMDLCache->FindMDL( modelname );
@@ -837,12 +831,15 @@ int StudioModel::GetSequenceCount( void )
 // Input  : nIndex - 
 //			szName - 
 //-----------------------------------------------------------------------------
-void StudioModel::GetSequenceName( int nIndex, char *szName )
+void StudioModel::GetSequenceName( int nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize )
 {
+	if (nameSize > 0)
+		szName[0] = '\0';
+
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if (nIndex < pStudioHdr->GetNumSeq())
 	{
-		strcpy(szName, pStudioHdr->pSeqdesc(nIndex).pszLabel());
+		V_strncpy(szName, pStudioHdr->pSeqdesc(nIndex).pszLabel(), nameSize);
 	}
 }
 

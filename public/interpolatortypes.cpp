@@ -56,7 +56,7 @@ char const *Interpolator_NameForInterpolator( unsigned char type, bool printname
 {
 	size_t i = type;
 	size_t c = std::size( g_InterpolatorNameMap );
-	if ( i < 0 || i >= c )
+	if ( i >= c )
 	{
 		AssertMsg( false, "!Interpolator_NameForInterpolator: bogus type %hhu!", type );
 		return printname ? g_InterpolatorNameMap[ 0 ].printname : g_InterpolatorNameMap[ 0 ].name;

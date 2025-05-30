@@ -65,8 +65,7 @@ bool SharedDispatch(MessageBuffer *pBuf, int iSource, int iPacketID) {
           pInPos += sizeof(iFileSize);
 
           // Temp folder
-          char const *szFolder = NULL;
-          if (!szFolder) szFolder = getenv("TEMP");
+          char const *szFolder = getenv("TEMP");
           if (!szFolder) szFolder = getenv("TMP");
           if (!szFolder) szFolder = "c:";
 
@@ -88,16 +87,16 @@ bool SharedDispatch(MessageBuffer *pBuf, int iSource, int iPacketID) {
 
           // Prepare the filename
           char chSaveFileName[2 * _MAX_PATH] = {0};
-          sprintf(chSaveFileName,
-                  "%s\\vmpi_%s_on_%s_%d%02d%02d_%02d%02d%02d_%u.mdmp",
-                  szFolder, pModuleName, VMPI_GetMachineName(iSource),
-                  pTime->tm_year + 1900, /* Year less 2000 */
-                  pTime->tm_mon + 1,     /* month (0 - 11 : 0 = January) */
-                  pTime->tm_mday,        /* day of month (1 - 31) */
-                  pTime->tm_hour,        /* hour (0 - 23) */
-                  pTime->tm_min,         /* minutes (0 - 59) */
-                  pTime->tm_sec,         /* seconds (0 - 59) */
-                  InterlockedIncrement(&s_numMiniDumps));
+          V_sprintf_safe(chSaveFileName,
+                         "%s\\vmpi_%s_on_%s_%d%02d%02d_%02d%02d%02d_%u.mdmp",
+                         szFolder, pModuleName, VMPI_GetMachineName(iSource),
+                         pTime->tm_year + 1900, /* Year less 2000 */
+                         pTime->tm_mon + 1, /* month (0 - 11 : 0 = January) */
+                         pTime->tm_mday,    /* day of month (1 - 31) */
+                         pTime->tm_hour,    /* hour (0 - 23) */
+                         pTime->tm_min,     /* minutes (0 - 59) */
+                         pTime->tm_sec,     /* seconds (0 - 59) */
+                         InterlockedIncrement(&s_numMiniDumps));
 
           if (FILE *fDump = fopen(chSaveFileName, "wb")) {
             fwrite(pInPos, 1, iFileSize, fDump);
@@ -144,7 +143,7 @@ void RecvQDirInfo() {
 void SendDBInfo(const CDBInfo *pInfo, unsigned long jobPrimaryID) {
   char cPacketInfo[2] = {VMPI_SHARED_PACKET_ID, VMPI_SUBPACKETID_DBINFO};
   const void *pChunks[] = {cPacketInfo, pInfo, &jobPrimaryID};
-  ptrdiff_t chunkLengths[] = {2, sizeof(CDBInfo), sizeof(jobPrimaryID)};
+  intp chunkLengths[] = {2, sizeof(CDBInfo), sizeof(jobPrimaryID)};
 
   VMPI_SendChunks(pChunks, chunkLengths, ARRAYSIZE(pChunks), VMPI_PERSISTENT);
 }
@@ -244,8 +243,7 @@ LONG __stdcall VMPI_SecondExceptionFilter(
   return EXCEPTION_EXECUTE_HANDLER;  // (never gets here anyway)
 }
 
-#define SRC_CODE_2_ERROR_RECORD(name) \
-  { name, #name }
+#define SRC_CODE_2_ERROR_RECORD(name) {name, #name}
 
 struct {
   DWORD code;
@@ -299,8 +297,8 @@ void VMPI_ExceptionFilter(unsigned long code, void *exception_info) {
   // process immediately.
   ::SetUnhandledExceptionFilter(VMPI_SecondExceptionFilter);
 
-  constexpr ptrdiff_t nErrors = ssize(g_errorDescriptions);
-  ptrdiff_t i = 0;
+  constexpr intp nErrors = ssize(g_errorDescriptions);
+  intp i = 0;
 
   const char *pchReason = nullptr;
   char chUnknownBuffer[32];
@@ -323,8 +321,9 @@ void VMPI_ExceptionFilter(unsigned long code, void *exception_info) {
 }
 
 void HandleMPIDisconnect(int procID, const char *pReason) {
-  int nLiveWorkers = VMPI_GetCurrentNumberOfConnections() -
-                     g_nDisconnects.load(std::memory_order::memory_order_relaxed) - 1;
+  int nLiveWorkers =
+      VMPI_GetCurrentNumberOfConnections() -
+      g_nDisconnects.load(std::memory_order::memory_order_relaxed) - 1;
 
   // We ran into the size limit before and it wasn't readily apparent that the
   // size limit had been breached, so make sure to show errors about invalid

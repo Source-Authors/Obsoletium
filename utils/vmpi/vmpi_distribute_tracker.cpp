@@ -113,8 +113,8 @@ static LRESULT CALLBACK TrackerWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, 
 		case WM_PAINT:
 		{
 			// Do one pass for each color..
-			HBRUSH hStateColors[ARRAYSIZE( g_StateColors )];
-			for ( int i=0; i < ARRAYSIZE( hStateColors ); i++ )
+			HBRUSH hStateColors[ssize( g_StateColors )];
+			for ( intp i=0; i < ssize( hStateColors ); i++ )
 				hStateColors[i] = CreateSolidBrush( g_StateColors[i] );
 
 			// Copy the WU statuses.
@@ -129,11 +129,11 @@ static LRESULT CALLBACK TrackerWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, 
 
 			PAINTSTRUCT ps;
 			HDC hDC = BeginPaint( hwnd, &ps );		
-			for ( int iState=0; iState < ARRAYSIZE( hStateColors ); iState++ )
+			for ( intp iState=0; iState < ssize( hStateColors ); iState++ )
 			{
 				HGDIOBJ hOldObj = SelectObject( hDC, hStateColors[iState] );
 
-				for ( int iWU=0; iWU < wuStatus.Count(); iWU++ )
+				for ( intp iWU=0; iWU < wuStatus.Count(); iWU++ )
 				{
 					if ( wuStatus[iWU].m_iState != iState )
 						continue;
@@ -216,7 +216,7 @@ static void CheckFlashTimers()
 	LeaveCriticalSection( &g_CS );
 }
 
-static DWORD WINAPI ThreadProc( LPVOID lpParameter )
+static DWORD WINAPI ThreadProc( void* )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("VmpiDistrTracker");
@@ -438,13 +438,19 @@ bool VMPITracker_WriteDebugFile( const char *pFilename )
 	auto [fp, errc] = se::posix::posix_file_stream_factory::open( pFilename, "wt" );
 	if ( !errc )
 	{
-		fp.print( "# work units: %zd\n", g_WorkUnits.Count() );
-		fp.print( "# active work units: %d\n", CountActiveWorkUnits() );
+		std::tie(std::ignore, errc) = fp.print( "# work units: %zd\n", g_WorkUnits.Count() );
+		if (errc) return false;
+		std::tie(std::ignore, errc) = fp.print( "# active work units: %d\n", CountActiveWorkUnits() );
+		if (errc) return false;
 		
-		fp.print( "\n" );
-		fp.print( "--- Events ---" );
-		fp.print( "\n" );
-		fp.print( "\n" );
+		std::tie(std::ignore, errc) = fp.print( "\n" );
+		if (errc) return false;
+		std::tie(std::ignore, errc) = fp.print( "--- Events ---" );
+		if (errc) return false;
+		std::tie(std::ignore, errc) = fp.print( "\n" );
+		if (errc) return false;
+		std::tie(std::ignore, errc) = fp.print( "\n" );
+		if (errc) return false;
 		
 		ptrdiff_t i{0};
 		for ( auto &wu : g_WorkUnits )
@@ -452,12 +458,15 @@ bool VMPITracker_WriteDebugFile( const char *pFilename )
 			if ( wu.m_iWorkerCompleted != -1 )
 				continue;
 
-			fp.print( "  work unit %d\n", i++ );
-			fp.print( "\n" );
+			std::tie(std::ignore, errc) = fp.print( "  work unit %d\n", i++ );
+			if (errc) return false;
+			std::tie(std::ignore, errc) = fp.print( "\n" );
+			if (errc) return false;
 						
 			if ( wu.m_Events.Count() == 0 )
 			{
-				fp.print( "    *no events*\n" );
+				std::tie(std::ignore, errc) = fp.print( "    *no events*\n" );
+				if (errc) return false;
 			}
 			else
 			{
@@ -465,25 +474,30 @@ bool VMPITracker_WriteDebugFile( const char *pFilename )
 				{
 					if ( event.m_iEventType == EVENT_TYPE_WU_STARTED )
 					{
-						fp.print( "   started (by worker %s) %.1f seconds ago\n", 
+						std::tie(std::ignore, errc) = fp.print( "   started (by worker %s) %.1f seconds ago\n", 
 							VMPI_GetMachineName( event.m_iWorker ),
 							Plat_FloatTime() - event.m_flTime );
+						if (errc) return false;
 					}
 					else if ( event.m_iEventType == EVENT_TYPE_SEND_WORK_UNIT )
 					{
-						fp.print( "      sent (to worker %s) %.1f seconds ago\n", 
+						std::tie(std::ignore, errc) = fp.print( "      sent (to worker %s) %.1f seconds ago\n", 
 							VMPI_GetMachineName( event.m_iWorker ),
 							Plat_FloatTime() - event.m_flTime );
+						if (errc) return false;
 					}
 					else if ( event.m_iEventType == EVENT_TYPE_WU_COMPLETED )
 					{
-						fp.print( " completed (by worker %s) %.1f seconds ago\n", 
+						std::tie(std::ignore, errc) = fp.print( " completed (by worker %s) %.1f seconds ago\n", 
 							VMPI_GetMachineName( event.m_iWorker ),
 							Plat_FloatTime() - event.m_flTime );
+						if (errc) return false;
 					}
 				}
 			}
-			fp.print( "\n" );
+
+			std::tie(std::ignore, errc) = fp.print( "\n" );
+			if (errc) return false;
 		}
 		
 		return true;
@@ -532,15 +546,15 @@ void VMPITracker_HandleDebugKeypresses()
 			int nMaxTries = 128;
 			char filename[512];
 			int iFile = 1;
-			for ( iFile; iFile < nMaxTries; iFile++ )
+			for ( ; iFile < nMaxTries; iFile++ )
 			{
-				Q_snprintf( filename, sizeof( filename ), "c:\\vmpi_tracker_%d.txt", iFile );
+				V_sprintf_safe( filename, "vmpi_tracker_%d.txt", iFile );
 				if ( _access( filename, 0 ) != 0 )
 					break;
 			}
 			if ( iFile == nMaxTries )
 			{
-				Warning( "** Please delete c:\\vmpi_tracker_*.txt and try again.\n" );
+				Warning( "** Please delete vmpi_tracker_*.txt and try again.\n" );
 			}
 			else
 			{

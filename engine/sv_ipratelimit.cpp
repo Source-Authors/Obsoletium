@@ -28,9 +28,7 @@ CIPRateLimit::CIPRateLimit(ConVar *maxSec, ConVar *maxWindow, ConVar *maxSecGlob
 //-----------------------------------------------------------------------------
 // Purpose: Destructor
 //-----------------------------------------------------------------------------
-CIPRateLimit::~CIPRateLimit()
-{
-}
+CIPRateLimit::~CIPRateLimit() = default;
 
 //-----------------------------------------------------------------------------
 // Purpose: sort func for rb tree

@@ -5,15 +5,15 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
+#include "vgui_controls/URLLabel.h"
+
+#include "tier1/KeyValues.h"
 
 #include "vgui/ISurface.h"
 #include "vgui/ISystem.h"
 #include "vgui/MouseCode.h"
 #include "vgui/Cursor.h"
-#include "KeyValues.h"
 
-#include "vgui_controls/URLLabel.h"
 #include "vgui_controls/TextImage.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -72,9 +72,13 @@ void URLLabel::SetURL(const char *pszURL)
 	if (iNewURLSize > m_iURLSize || !m_pszURL)
 	{
 		delete [] m_pszURL;
-		m_pszURL = new char [iNewURLSize + 1];
+		m_pszURL = V_strdup(pszURL);
 	}
-	strcpy(m_pszURL, pszURL);
+	else
+	{
+		V_strncpy(m_pszURL, pszURL, m_iURLSize);
+	}
+
 	m_iURLSize = iNewURLSize;
 }
 
@@ -109,7 +113,7 @@ void URLLabel::ApplySettings(KeyValues *inResourceData)
 			if (ws)
 			{
 				char localizedUrl[512];
-				g_pVGuiLocalize->ConvertUnicodeToANSI(ws, localizedUrl, sizeof(localizedUrl));
+				g_pVGuiLocalize->ConvertUnicodeToANSI(ws, localizedUrl);
 				SetURL(localizedUrl);
 			}
 		}
@@ -139,7 +143,7 @@ void URLLabel::GetSettings( KeyValues *outResourceData )
 const char *URLLabel::GetDescription( void )
 {
 	static char buf[1024];
-	_snprintf(buf, sizeof(buf), "%s, string URLText", BaseClass::GetDescription());
+	V_sprintf_safe(buf, "%s, string URLText", BaseClass::GetDescription());
 	return buf;
 }
 

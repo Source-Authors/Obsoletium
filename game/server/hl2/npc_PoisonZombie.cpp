@@ -719,7 +719,7 @@ void CNPC_PoisonZombie::HandleAnimEvent( animevent_t *pEvent )
 	if ( pEvent->event == AE_ZOMBIE_POISON_SPIT )
 	{
 		Vector forward;
-		QAngle qaPunch( 45, random->RandomInt(-5, 5), random->RandomInt(-5, 5) );
+		QAngle qaPunch( 45, random->RandomFloat(-5, 5), random->RandomFloat(-5, 5) );
 		AngleVectors( GetLocalAngles(), &forward );
 		forward = forward * 200;
 		ClawAttack( GetClawAttackRange(), sk_zombie_poison_dmg_spit.GetInt(), qaPunch, forward, ZOMBIE_BLOOD_BITE );
@@ -776,13 +776,13 @@ void CNPC_PoisonZombie::EvacuateNest( bool bExplosion, float flDamage, CBaseEnti
 			switch( i )
 			{
 			case 0:
-				strcpy( szAttachment, "headcrab2" );
+				V_strcpy_safe( szAttachment, "headcrab2" );
 				break;
 			case 1:
-				strcpy( szAttachment, "headcrab3" );
+				V_strcpy_safe( szAttachment, "headcrab3" );
 				break;
 			case 2:
-				strcpy( szAttachment, "headcrab4" );
+				V_strcpy_safe( szAttachment, "headcrab4" );
 				break;
 			}
 
@@ -845,7 +845,7 @@ void CNPC_PoisonZombie::PrescheduleThink( void )
 			// Our enemy is nearby. Breathe faster.
 			float duration = random->RandomFloat( 1.0f, 2.0f );
 			ENVELOPE_CONTROLLER.SoundChangeVolume( m_pFastBreathSound, BREATH_VOL_MAX, duration );
-			ENVELOPE_CONTROLLER.SoundChangePitch( m_pFastBreathSound, random->RandomInt( 100, 120 ), random->RandomFloat( 1.0f, 2.0f ) );
+			ENVELOPE_CONTROLLER.SoundChangePitch( m_pFastBreathSound, random->RandomFloat( 100, 120 ), random->RandomFloat( 1.0f, 2.0f ) );
 
 			ENVELOPE_CONTROLLER.SoundChangeVolume( m_pSlowBreathSound, 0.0f, duration );
 
@@ -1062,17 +1062,17 @@ void CNPC_PoisonZombie::MoanSound( envelopePoint_t *pEnvelope, int iEnvelopeSize
 	{
 		// Don't set this up until the code calls for it.
 		const char *pszSound = GetMoanSound( m_iMoanSound );
-		m_flMoanPitch = random->RandomInt( 98, 110 );
+		m_flMoanPitch = random->RandomFloat( 98, 110 );
 
-		CPASAttenuationFilter filter( this, 1.5 );
+		CPASAttenuationFilter filter( this, 1.5f );
 		//m_pMoanSound = ENVELOPE_CONTROLLER.SoundCreate( entindex(), CHAN_STATIC, pszSound, ATTN_NORM );
-		m_pMoanSound = ENVELOPE_CONTROLLER.SoundCreate( filter, entindex(), CHAN_STATIC, pszSound, 1.5 );
+		m_pMoanSound = ENVELOPE_CONTROLLER.SoundCreate( filter, entindex(), CHAN_STATIC, pszSound, 1.5f );
 
-		ENVELOPE_CONTROLLER.Play( m_pMoanSound, 0.5, m_flMoanPitch );
+		ENVELOPE_CONTROLLER.Play( m_pMoanSound, 0.5f, m_flMoanPitch );
 	}
 
-	envPoisonZombieMoanVolumeFast[ 1 ].durationMin = 0.1;
-	envPoisonZombieMoanVolumeFast[ 1 ].durationMax = 0.4;
+	envPoisonZombieMoanVolumeFast[ 1 ].durationMin = 0.1f;
+	envPoisonZombieMoanVolumeFast[ 1 ].durationMax = 0.4f;
 
 	if ( random->RandomInt( 1, 2 ) == 1 )
 	{

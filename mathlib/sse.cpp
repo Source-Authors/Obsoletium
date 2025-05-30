@@ -59,8 +59,8 @@ _PS_EXTERN_CONST(am_pi_o_2, M_PI_F / 2.0f);
 _PS_EXTERN_CONST(am_2_o_pi, 2.0f / M_PI_F);
 _PS_EXTERN_CONST(am_pi_o_4, M_PI_F / 4.0f);
 _PS_EXTERN_CONST(am_4_o_pi, 4.0f / M_PI_F);
-_PS_EXTERN_CONST_TYPE(am_sign_mask, uint32, 0x80000000);
-_PS_EXTERN_CONST_TYPE(am_inv_sign_mask, uint32, ~0x80000000);
+_PS_EXTERN_CONST_TYPE(am_sign_mask, uint32, 0x80000000); //-V112
+_PS_EXTERN_CONST_TYPE(am_inv_sign_mask, uint32, ~0x80000000); //-V112
 _PS_EXTERN_CONST_TYPE(am_min_norm_pos,uint32, 0x00800000);
 _PS_EXTERN_CONST_TYPE(am_mant_mask, uint32, 0x7f800000);
 _PS_EXTERN_CONST_TYPE(am_inv_mant_mask, int32, ~0x7f800000);

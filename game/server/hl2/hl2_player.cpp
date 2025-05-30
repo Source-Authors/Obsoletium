@@ -106,7 +106,7 @@ ConVar sv_infinite_aux_power( "sv_infinite_aux_power", "0", FCVAR_CHEAT );
 
 ConVar autoaim_unlock_target( "autoaim_unlock_target", "0.8666" );
 
-ConVar sv_stickysprint("sv_stickysprint", "0", FCVAR_ARCHIVE | FCVAR_ARCHIVE_XBOX);
+ConVar sv_stickysprint("sv_stickysprint", "0", FCVAR_ARCHIVE);
 
 #define	FLASH_DRAIN_TIME	 1.1111	// 100 units / 90 secs
 #define	FLASH_CHARGE_TIME	 50.0f	// 100 units / 2 secs
@@ -1994,7 +1994,7 @@ ConVar	sk_battery( "sk_battery","0" );
 
 bool CHL2_Player::ApplyBattery( float powerMultiplier )
 {
-	const float MAX_NORMAL_BATTERY = 100;
+	constexpr float MAX_NORMAL_BATTERY = 100;
 	if ((ArmorValue() < MAX_NORMAL_BATTERY) && IsSuitEquipped())
 	{
 		int pct;
@@ -3223,8 +3223,8 @@ void CHL2_Player::UpdateClientData( void )
 		int iShowHudDamage = g_pGameRules->Damage_GetShowOnHud();
 		int visibleDamageBits = m_bitsDamageType & iShowHudDamage;
 
-		m_DmgTake = clamp( m_DmgTake, 0, 255 );
-		m_DmgSave = clamp( m_DmgSave, 0, 255 );
+		m_DmgTake = clamp( m_DmgTake, 0.f, 255.f );
+		m_DmgSave = clamp( m_DmgSave, 0.f, 255.f );
 
 		// If we're poisoned, but it wasn't this frame, don't send the indicator
 		// Without this check, any damage that occured to the player while they were

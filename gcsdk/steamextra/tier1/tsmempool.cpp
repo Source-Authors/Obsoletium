@@ -111,7 +111,7 @@ void *CThreadSafeMemoryPool::Alloc( unsigned int amount )
 		if ( pFreeListItem )
 		{
 			m_threadRWLock.UnlockRead();
-			m_cBlocksInUse++;
+			++m_cBlocksInUse;
 			return (void *)pFreeListItem;
 		}
 		m_threadRWLock.UnlockRead();
@@ -174,7 +174,7 @@ void CThreadSafeMemoryPool::Free( void *pMem, int cubAlloc )
 
 	// push the item back onto the free list
 	m_ptslistFreeBlocks->Push( (FreeListItem_t *)pMem );
-	m_cBlocksInUse--;
+	--m_cBlocksInUse;
 
 	m_threadRWLock.UnlockRead();
 

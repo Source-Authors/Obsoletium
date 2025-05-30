@@ -40,7 +40,6 @@ CDmeMakefileUtils::CDmeMakefileUtils() : BaseClass( false )
 
 CDmeMakefileUtils::~CDmeMakefileUtils()
 {
-
 }
 
 
@@ -318,8 +317,8 @@ bool CDmeMakefileUtils::PerformCompilationStep( CompilationStep_t step )
 {
 	// Iterate through all elements and run a compilation step
 	m_CompilationStep = step;
-	int nCount = m_CompileTasks.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_CompileTasks.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CompileInfo_t &info = m_CompileTasks[i];
 		if ( info.m_hElement.Get() )
@@ -423,7 +422,7 @@ intp CDmeMakefileUtils::GetCompileOutputSize()
 	return g_pProcessUtils->GetProcessOutputSize( m_hCompileProcess );
 }
 
-CompilationState_t CDmeMakefileUtils::UpdateCompilation( char *pOutputBuf, int nBufLen )
+CompilationState_t CDmeMakefileUtils::UpdateCompilation( char *pOutputBuf, intp nBufLen )
 {
 	switch( m_CompilationStep )
 	{
@@ -492,14 +491,14 @@ bool CDmeMakefileUtils::PerformCompilationStep( CDmeMDLMakefile *pMakeFile, Comp
 		return PerformCompilationStep( static_cast<CDmeMakefile*>( pMakeFile ), step );
 
 	char pBinDirectory[MAX_PATH];
-	GetModSubdirectory( "..\\bin", pBinDirectory, sizeof(pBinDirectory) );
+	GetModSubdirectory( "..\\bin", pBinDirectory );
 	Q_RemoveDotSlashes( pBinDirectory );
 
 	char pStudioMDLCmd[MAX_PATH];
 #ifdef _DEBUG
-	Q_snprintf( pStudioMDLCmd, sizeof(pStudioMDLCmd), "%s\\studiomdl.exe -allowdebug %s", pBinDirectory, pMakeFile->GetFileName() );
+	V_sprintf_safe( pStudioMDLCmd, "%s\\studiomdl.exe -allowdebug %s", pBinDirectory, pMakeFile->GetFileName() );
 #else
-	Q_snprintf( pStudioMDLCmd, sizeof(pStudioMDLCmd), "%s\\studiomdl.exe %s", pBinDirectory, pMakeFile->GetFileName() );
+	V_sprintf_safe( pStudioMDLCmd, "%s\\studiomdl.exe %s", pBinDirectory, pMakeFile->GetFileName() );
 #endif
 
 	ProcessHandle_t hProcess = g_pProcessUtils->StartProcess( pStudioMDLCmd, true );
@@ -531,7 +530,10 @@ bool CDmeMakefileUtils::PerformCompilationStep( CDmeMayaMakefile *pMakeFile, Com
 	mayaCommand += " -selection";
 
 	char pObjectId[128];
-	UniqueIdToString( pMakeFile->GetId(), pObjectId, sizeof(pObjectId) );
+	// dimhotepus: Exit on uuid convert failure.
+	if ( !UniqueIdToString( pMakeFile->GetId(), pObjectId ) )
+		return false;
+
 	mayaCommand += " -makefileObjectId \\\"";
 	mayaCommand += pObjectId;
 	mayaCommand += "\\\"";
@@ -565,14 +567,14 @@ bool CDmeMakefileUtils::PerformCompilationStep( CDmeMayaMakefile *pMakeFile, Com
 	}
 
 	char pFileName[MAX_PATH];
-	Q_strncpy( pFileName, pMakeFile->GetFileName(), sizeof( pFileName ) );
+	V_strcpy_safe( pFileName, pMakeFile->GetFileName() );
 	Q_FixSlashes( pFileName, '/' );
 	mayaCommand += " -filename \\\"";
 	mayaCommand += pFileName;
 	mayaCommand += "\\\"";
 
-	const int rootObjectCount( pDmeSourceDCCFile->m_RootDCCObjects.Count() );
-	for ( int rootObjectIndex( 0 ); rootObjectIndex < rootObjectCount; ++rootObjectIndex )
+	const intp rootObjectCount( pDmeSourceDCCFile->m_RootDCCObjects.Count() );
+	for ( intp rootObjectIndex( 0 ); rootObjectIndex < rootObjectCount; ++rootObjectIndex )
 	{
 		mayaCommand += " ";
 		mayaCommand += pDmeSourceDCCFile->m_RootDCCObjects[ rootObjectIndex ];
@@ -585,7 +587,7 @@ bool CDmeMakefileUtils::PerformCompilationStep( CDmeMayaMakefile *pMakeFile, Com
 	Q_FixSlashes( pSourcePath, '/' );
     
 	char pMayaCommand[1024];
-	Q_snprintf( pMayaCommand, sizeof(pMayaCommand), "mayabatch.exe -batch -file \"%s\" -command \"%s\"", pSourcePath, mayaCommand.Get() );
+	V_sprintf_safe( pMayaCommand, "mayabatch.exe -batch -file \"%s\" -command \"%s\"", pSourcePath, mayaCommand.Get() );
 	ProcessHandle_t hProcess = g_pProcessUtils->StartProcess( pMayaCommand, true );
 	SetCompileProcess( hProcess );
 	return true;
@@ -608,6 +610,6 @@ void CDmeMakefileUtils::OpenEditor( CDmeSourceMayaFile *pDmeSourceDCCFile )
 	Q_FixSlashes( pSourcePath, '/' );
 
 	char pMayaCommand[1024];
-	Q_snprintf( pMayaCommand, sizeof(pMayaCommand), "maya.exe -file \"%s\"", pSourcePath );
+	V_sprintf_safe( pMayaCommand, "maya.exe -file \"%s\"", pSourcePath );
 	g_pProcessUtils->StartProcess( pMayaCommand, true );
 }

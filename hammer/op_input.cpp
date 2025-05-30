@@ -233,7 +233,7 @@ void COP_Input::AddEntityConnections(const char *pTargetName, CMapEntity *pTestE
 				// Build the string for the delay.
 				float fDelay = pConnection->GetDelay();
 				char szTemp[MAX_PATH];
-				sprintf(szTemp, "%.2f", fDelay);
+				V_sprintf_safe(szTemp, "%.2f", fDelay);
 				m_ListCtrl.SetItemText(nItemCount, DELAY_COLUMN, szTemp);
 				m_ListCtrl.SetItemText(nItemCount, ONLY_ONCE_COLUMN, (pConnection->GetTimesToFire() == EVENT_FIRE_ALWAYS) ? "No" : "Yes");
 				m_ListCtrl.SetItemText(nItemCount, PARAMETER_COLUMN, pConnection->GetParam());
@@ -242,7 +242,7 @@ void COP_Input::AddEntityConnections(const char *pTargetName, CMapEntity *pTestE
 				CInputConnection *pInputConn	= new CInputConnection;
 				pInputConn->m_pConnection		= pConnection;
 				pInputConn->m_pEntity			= pTestEntity;
-				m_ListCtrl.SetItemData(nItemCount, (DWORD)pInputConn);
+				m_ListCtrl.SetItemData(nItemCount, (DWORD_PTR)pInputConn);
 
 				nItemCount++;
 			}
@@ -670,11 +670,11 @@ void COP_Input::UpdateColumnHeaderText(int nColumn, bool bIsSortColumn, SortDire
 	Column.cchTextMax = sizeof(szHeaderText);
 	m_ListCtrl.GetColumn(nColumn, &Column);
 
-	int nMarker = 0;
+	ptrdiff_t nMarker = 0;
 
 	if (szHeaderText[0] != '\0')
 	{
-		nMarker = strlen(szHeaderText) - 1;
+		nMarker = V_strlen(szHeaderText) - 1;
 		char chMarker = szHeaderText[nMarker];
 
 		if ((chMarker == '>') || (chMarker == '<'))

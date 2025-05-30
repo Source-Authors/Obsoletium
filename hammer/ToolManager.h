@@ -53,10 +53,10 @@ public:
 	void RemoveAllTools();
 	void AddTool(CBaseTool *pTool);
 
-	static ChunkFileResult_t LoadCallback(CChunkFile *pFile, CBaseTool *pTool);
+	[[nodiscard]] static ChunkFileResult_t LoadCallback(CChunkFile *pFile, CBaseTool *pTool);
 	void AddToolHandlers( CChunkHandlerMap *pHandlersMap );
-	ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
-	ChunkFileResult_t LoadVMF(CChunkFile *pFile);
+	[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+	[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile);
 
 private:
 

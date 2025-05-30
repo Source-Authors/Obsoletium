@@ -62,11 +62,12 @@ public:
 CSendNode::CSendNode()
 {
 	m_iDatatableProp = -1;
-	m_pTable = NULL;
+	m_pTable = nullptr;
 	
 	m_iFirstRecursiveProp = m_nRecursiveProps = 0;
 
 	m_DataTableProxyIndex = DATATABLE_PROXY_INDEX_INVALID; // set it to a questionable value.
+	m_RecursiveProxyIndex = DATATABLE_PROXY_INDEX_INVALID;
 }
 
 CSendNode::~CSendNode()
@@ -540,20 +541,13 @@ bool Sendprop_UsingDebugWatch()
 
 
 // Prints a datatable warning into the console.
-void DataTable_Warning( const char *pInMessage, ... )
+void DataTable_Warning( PRINTF_FORMAT_STRING const char *pInMessage, ... )
 {
 	char msg[4096];
 	va_list marker;
 	
-#if 0
-	#if !defined(_DEBUG)
-		if(!g_CV_DTWarning.GetInt())
-			return;
-	#endif
-#endif
-
 	va_start(marker, pInMessage);
-	Q_vsnprintf( msg, sizeof( msg ), pInMessage, marker);
+	V_sprintf_safe( msg, pInMessage, marker);
 	va_end(marker);
 
 	Warning( "DataTable warning: %s", msg );

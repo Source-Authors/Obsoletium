@@ -136,8 +136,8 @@ public:
 };
 
 // a power 4 displacement can have 341 nodes, pad out to 344 for 16-byte alignment
-const int MAX_DISP_AABB_NODES = 341;
-const int MAX_AABB_LIST = 344;
+constexpr inline int MAX_DISP_AABB_NODES = 341;
+constexpr inline int MAX_AABB_LIST = 344;
 
 struct rayleaflist_t
 {
@@ -200,8 +200,8 @@ public:
 	inline void SetSurfaceProps( int iProp, short nSurfProp )		{ Assert( ( iProp >= 0 ) && ( iProp < 2 ) ); m_nSurfaceProps[iProp] = nSurfProp; }
 	inline short GetSurfaceProps( int iProp )						{ return m_nSurfaceProps[iProp]; }
 
-	inline unsigned int GetMemorySize( void )						{ return m_nSize; }
-	inline unsigned int GetCacheMemorySize( void )					{ return ( m_aTrisCache.Count() * sizeof(CDispCollTriCache) + m_aEdgePlanes.Count() * sizeof(Vector) ); }
+	inline size_t GetMemorySize( void )								{ return m_nSize; }
+	inline size_t GetCacheMemorySize( void )						{ return ( m_aTrisCache.Count() * sizeof(CDispCollTriCache) + m_aEdgePlanes.Count() * sizeof(Vector) ); }
 
 	inline bool IsCached( void )									{ return m_aTrisCache.Count() == m_aTris.Count(); }
 

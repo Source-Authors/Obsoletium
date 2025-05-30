@@ -20,12 +20,12 @@
 class COM_IOReadBinary : public IFileReadBinary
 {
 public:
-	intp open( const char *pFileName );
-	int read( void *pOutput, int size, intp file );
-	void seek( intp file, int pos );
-	unsigned int tell( intp file );
-	unsigned int size( intp file );
-	void close( intp file );
+	intp open( const char *pFileName ) override;
+	int read( void *pOutput, int size, intp file ) override;
+	void seek( intp file, int pos ) override;
+	unsigned int tell( intp file ) override;
+	unsigned int size( intp file ) override;
+	void close( intp file ) override;
 };
 
 
@@ -33,15 +33,15 @@ public:
 intp COM_IOReadBinary::open( const char *pFileName )
 {
 	char namebuffer[512];
-	Q_strncpy( namebuffer, "sound", sizeof( namebuffer ) );
+	V_strcpy_safe( namebuffer, "sound" );
 
 	// the server is sending back sound names with slashes in front... 
-	if ( pFileName[0] != '/' && pFileName[0] != '\\' )
+	if ( pFileName[0] != CORRECT_PATH_SEPARATOR && pFileName[0] != INCORRECT_PATH_SEPARATOR )
 	{
-		Q_strncat( namebuffer, "/", sizeof( namebuffer ), COPY_ALL_CHARACTERS );
+		V_strcat_safe( namebuffer, "/" );
 	}
 
-	Q_strncat( namebuffer, pFileName, sizeof( namebuffer ), COPY_ALL_CHARACTERS );
+	V_strcat_safe( namebuffer, pFileName );
 
 	FileHandle_t hFile = g_pFileSystem->Open(namebuffer, "rb", "GAME");
 

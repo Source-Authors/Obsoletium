@@ -63,9 +63,10 @@ void CDialogServerPassword::OnCommand(const char *command)
 
 	if (!Q_stricmp(command, "Connect"))
 	{
-		KeyValues *msg = new KeyValues("JoinServerWithPassword");
 		char buf[64];
-		m_pPasswordEntry->GetText(buf, sizeof(buf)-1);
+		m_pPasswordEntry->GetText(buf);
+
+		KeyValues *msg = new KeyValues("JoinServerWithPassword");
 		msg->SetString("password", buf);
 		msg->SetInt("serverID", m_iServerID);
 		PostActionSignal(msg);

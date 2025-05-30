@@ -45,26 +45,26 @@ struct chapter_t
 {
 	char filename[32];
 };
-static int __cdecl ChapterSortFunc(const void *elem1, const void *elem2)
+static bool ChapterSortFunc(const chapter_t &c1, const chapter_t &c2)
 {
-	chapter_t *c1 = (chapter_t *)elem1;
-	chapter_t *c2 = (chapter_t *)elem2;
-
 	// compare chapter number first
-	static intp chapterlen = ssize("chapter") - 1;
-	if (atoi(c1->filename + chapterlen) > atoi(c2->filename + chapterlen))
-		return 1;
-	else if (atoi(c1->filename + chapterlen) < atoi(c2->filename + chapterlen))
-		return -1;
+	constexpr intp chapterlen = ssize("chapter") - 1;
+	if (atoi(c1.filename + chapterlen) > atoi(c2.filename + chapterlen))
+		return false;
+	if (atoi(c1.filename + chapterlen) < atoi(c2.filename + chapterlen))
+		return true;
+
+	const size_t len1 = strlen(c1.filename);
+	const size_t len2 = strlen(c2.filename);
 
 	// compare length second (longer string show up later in the list, eg. chapter9 before chapter9a)
-	if (strlen(c1->filename) > strlen(c2->filename))
-		return 1;
-	else if (strlen(c1->filename) < strlen(c2->filename))
-		return -1;
+	if (len1 > len2)
+		return false;
+	if (len1 < len2)
+		return true;
 
 	// compare strings third
-	return strcmp(c1->filename, c2->filename);
+	return strcmp(c1.filename, c2.filename) < 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -133,8 +133,8 @@ class CGameChapterPanel : public vgui::EditablePanel
 public:
 	CGameChapterPanel( CNewGameDialog *parent, const char *name, const char *chapterName, int chapterIndex, const char *chapterNumber, const char *chapterConfigFile, bool bCommentary ) : BaseClass( parent, name )
 	{
-		Q_strncpy( m_szConfigFile, chapterConfigFile, sizeof(m_szConfigFile) );
-		Q_strncpy( m_szChapter, chapterNumber, sizeof(m_szChapter) );
+		V_strcpy_safe( m_szConfigFile, chapterConfigFile );
+		V_strcpy_safe( m_szChapter, chapterNumber );
 
 		m_pLevelPicBorder = SETUP_PANEL( new ImagePanel( this, "LevelPicBorder" ) );
 		m_pLevelPic = SETUP_PANEL( new ImagePanel( this, "LevelPic" ) );
@@ -145,8 +145,8 @@ public:
 		wchar_t text[32];
 		wchar_t num[32];
 		wchar_t *chapter = g_pVGuiLocalize->Find("#GameUI_Chapter");
-		g_pVGuiLocalize->ConvertANSIToUnicode( chapterNumber, num, sizeof(num) );
-		_snwprintf( text, std::size(text), L"%ls %ls", chapter ? chapter : L"CHAPTER", num );
+		g_pVGuiLocalize->ConvertANSIToUnicode( chapterNumber, num );
+		V_swprintf_safe( text, L"%ls %ls", chapter ? chapter : L"CHAPTER", num );
 
 		if ( ModInfo().IsSinglePlayerOnly() )
 		{
@@ -163,7 +163,7 @@ public:
 
 		// the image has the same name as the config file
 		char szMaterial[ MAX_PATH ];
-		Q_snprintf( szMaterial, sizeof(szMaterial), "chapters/%s", chapterConfigFile );
+		V_sprintf_safe( szMaterial, "chapters/%s", chapterConfigFile );
 		char *ext = strchr( szMaterial, '.' );
 		if ( ext )
 		{
@@ -189,7 +189,7 @@ public:
 
 		// HACK: Detect new episode teasers by the "Coming Soon" text
 		wchar_t w_szStrTemp[256];
-		m_pChapterNameLabel->GetText( w_szStrTemp, sizeof(w_szStrTemp)  );
+		m_pChapterNameLabel->GetText( w_szStrTemp );
 		m_bTeaserChapter = !wcscmp(w_szStrTemp, L"Coming Soon");
 		m_bHasBonus = false;
 	}
@@ -282,16 +282,16 @@ public:
 
 const char *COM_GetModDirectory()
 {
-	static char modDir[MAX_PATH];
+	static char modDir[MAX_PATH] = {};
 	if ( Q_isempty( modDir ) )
 	{
 		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		Q_strncpy( modDir, gamedir, sizeof(modDir) );
+		V_strcpy_safe( modDir, gamedir );
 		if ( strchr( modDir, '/' ) || strchr( modDir, '\\' ) )
 		{
-			Q_StripLastDir( modDir, sizeof(modDir) );
-			intp dirlen = Q_strlen( modDir );
-			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
+			V_StripLastDir( modDir );
+			const intp dirlen = V_strlen( modDir );
+			V_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
 		}
 	}
 
@@ -366,13 +366,12 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	}
 
 	// parse out the chapters off disk
-	static const int MAX_CHAPTERS = 32;
+	constexpr int MAX_CHAPTERS = 32;
 	chapter_t chapters[MAX_CHAPTERS];
 
 	char szFullFileName[MAX_PATH];
 	int chapterIndex = 0;
 
-	if ( IsPC() || !IsX360() )
 	{
 		FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 		const char *fileName = "cfg/chapter*.cfg";
@@ -383,14 +382,14 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 			{
 				// Only load chapter configs from the current mod's cfg dir
 				// or else chapters appear that we don't want!
-				Q_snprintf( szFullFileName, sizeof(szFullFileName), "cfg/%s", fileName );
+				V_sprintf_safe( szFullFileName, "cfg/%s", fileName );
 				FileHandle_t f = g_pFullFileSystem->Open( szFullFileName, "rb", "MOD" );
 				if ( f )
 				{	
 					// don't load chapter files that are empty, used in the demo
 					if ( g_pFullFileSystem->Size(f) > 0	)
 					{
-						Q_strncpy(chapters[chapterIndex].filename, fileName, sizeof(chapters[chapterIndex].filename));
+						V_strcpy_safe(chapters[chapterIndex].filename, fileName);
 						++chapterIndex;
 					}
 					g_pFullFileSystem->Close( f );
@@ -398,42 +397,6 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 			}
 			fileName = g_pFullFileSystem->FindNext(findHandle);
 		}
-	}
-	else if ( IsX360() )
-	{
-		int ChapterStringIndex = 0;
-		bool bExists = true;
-		while ( bExists && chapterIndex < MAX_CHAPTERS )
-		{
-			Q_snprintf( szFullFileName, sizeof( szFullFileName ), "cfg/chapter%d.cfg", ChapterStringIndex+1 );
-
-			FileHandle_t f = g_pFullFileSystem->Open( szFullFileName, "rb", "MOD" );
-			if ( f )
-			{		
-				Q_strncpy(chapters[chapterIndex].filename, szFullFileName + 4, sizeof(chapters[chapterIndex].filename));
-				++chapterIndex;
-				++ChapterStringIndex;
-				g_pFullFileSystem->Close( f );
-			}
-			else
-			{
-				bExists = false;
-			}	
-			//Hack to account for xbox360 missing chapter9a
-			if ( ChapterStringIndex == 10 )
-			{				
-				Q_snprintf( szFullFileName, sizeof( szFullFileName ), "cfg/chapter9a.cfg" );
-				FileHandle_t fChap = g_pFullFileSystem->Open( szFullFileName, "rb", "MOD" );
-				if ( fChap )
-				{		
-					Q_strncpy(chapters[chapterIndex].filename, szFullFileName + 4, sizeof(chapters[chapterIndex].filename));
-					++chapterIndex;
-					g_pFullFileSystem->Close( fChap );
-				}		
-			}
-
-		}
-		
 	}
 
 	bool bBonusesUnlocked = false;
@@ -448,7 +411,7 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	}
 
 	// sort the chapters
-	qsort(chapters, chapterIndex, sizeof(chapter_t), &ChapterSortFunc);
+	std::sort(std::begin(chapters), std::begin(chapters) + chapterIndex, ChapterSortFunc);
 
 	// work out which chapters are unlocked
 	ConVarRef var( "sv_unlockedchapters" );
@@ -466,8 +429,13 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	for (int i = 0; i < chapterIndex; i++)
 	{
 		const char *fileName = chapters[i].filename;
+
 		char chapterID[32] = { 0 };
-		sscanf(fileName, "chapter%s", chapterID);
+		sscanf(fileName, "chapter%31s", chapterID);
+		chapterID[ssize(chapterID) - 1] = '\0';
+
+		V_sprintf_safe( szFullFileName, "%s", fileName );
+
 		// strip the extension
 		char *ext = V_stristr(chapterID, ".cfg");
 		if (ext)
@@ -478,27 +446,23 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 		const char *pGameDir = COM_GetModDirectory();
 
 		char chapterName[64];
-		Q_snprintf(chapterName, sizeof(chapterName), "#%s_Chapter%s_Title", pGameDir, chapterID);
+		V_sprintf_safe(chapterName, "#%s_Chapter%s_Title", pGameDir, chapterID);
 
-		Q_snprintf( szFullFileName, sizeof( szFullFileName ), "%s", fileName );
 		CGameChapterPanel *chapterPanel = SETUP_PANEL( new CGameChapterPanel( this, NULL, chapterName, i, chapterID, szFullFileName, m_bCommentaryMode ) );
 		chapterPanel->SetVisible( false );
 
 		UpdatePanelLockedStatus( iUnlockedChapter, i + 1, chapterPanel );
 
-		if ( GameUI().IsConsoleUI() )
+		if ( GameUI().IsConsoleUI() && bBonusesUnlocked )
 		{
-			if ( bBonusesUnlocked )
+			// check to see if it has associated challenges
+			for ( int iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
 			{
-				// check to see if it has associated challenges
-				for ( int iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
+				BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
+				if ( Q_stricmp( pMap->szChapterName, szFullFileName ) == 0 && !pMap->bLocked )
 				{
-					BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
-					if ( Q_stricmp( pMap->szChapterName, szFullFileName ) == 0 && !pMap->bLocked )
-					{
-						chapterPanel->m_bHasBonus = true;
-						chapterPanel->SetControlVisible( "HasBonusLabel", true );
-					}
+					chapterPanel->m_bHasBonus = true;
+					chapterPanel->SetControlVisible( "HasBonusLabel", true );
 				}
 			}
 		}
@@ -685,7 +649,7 @@ void CNewGameDialog::UpdateMenuComponents( EScrollDirection dir )
 		if ( m_PanelIndex[centerIdx] != INVALID_INDEX )
 		{
 			wchar_t buffer[ MAX_PATH ];
-			m_ChapterPanels[ m_PanelIndex[centerIdx] ]->m_pChapterNameLabel->GetText( buffer, sizeof(buffer) );
+			m_ChapterPanels[ m_PanelIndex[centerIdx] ]->m_pChapterNameLabel->GetText( buffer );
 			m_pChapterTitleLabels[(unsigned)m_ActiveTitleIdx]->SetText( buffer );
 
 			// If it has bonuses show the scroll up and down arrows
@@ -821,7 +785,7 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		char szMapAdvancedName[ 256 ] = "";
 		if ( m_pBonusMapDescription )
 		{
-			Q_snprintf( szMapAdvancedName, sizeof( szMapAdvancedName ), "%s_advanced", m_pBonusMapDescription->szMapFileName );
+			V_sprintf_safe( szMapAdvancedName, "%s_advanced", m_pBonusMapDescription->szMapFileName );
 		}
 
 		BonusMapDescription_t *pAdvancedDescription = NULL;
@@ -858,9 +822,9 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		if ( iEarnedMedal > -1 && iBest != -1 )
 		{
 			if ( iChallenge < 10 )
-				Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
+				V_sprintf_safe( szBuff, "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
 			else
-				Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
+				V_sprintf_safe( szBuff, "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
 
 			CBitmapImagePanel *pBitmap = dynamic_cast<CBitmapImagePanel*>( FindChildByName( "ChallengeEarnedMedal" ) );
 			pBitmap->SetVisible( true );
@@ -876,9 +840,9 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		if ( iNextMedal > 0 )
 		{
 			if ( iChallenge < 10 )
-				Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
+				V_sprintf_safe( szBuff, "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
 			else
-				Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
+				V_sprintf_safe( szBuff, "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
 
 			CBitmapImagePanel *pBitmap = dynamic_cast<CBitmapImagePanel*>( FindChildByName( "ChallengeNextMedal" ) );
 			pBitmap->SetVisible( true );
@@ -895,10 +859,10 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		// Best label
 		if ( iBest != -1 )
 		{
-			Q_snprintf( szBuff, sizeof( szBuff ), "%i", iBest );
-			g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2, sizeof( szWideBuff2 ) );
-			g_pVGuiLocalize->ConstructString( szWideBuff, sizeof( szWideBuff ), g_pVGuiLocalize->Find( "#GameUI_BonusMapsBest" ), 1, szWideBuff2 );
-			g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff, sizeof( szBuff ) );
+			V_sprintf_safe( szBuff, "%i", iBest );
+			g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2 );
+			g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( "#GameUI_BonusMapsBest" ), 1, szWideBuff2 );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
 
 			SetControlString( "ChallengeBestLabel", szBuff );
 			SetControlVisible( "ChallengeBestLabel", true );
@@ -911,10 +875,10 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		// Next label
 		if ( iNext != -1 )
 		{
-			Q_snprintf( szBuff, sizeof( szBuff ), "%i", iNext );
-			g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2, sizeof( szWideBuff2 ) );
-			g_pVGuiLocalize->ConstructString( szWideBuff, sizeof( szWideBuff ), g_pVGuiLocalize->Find( "#GameUI_BonusMapsGoal" ), 1, szWideBuff2 );
-			g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff, sizeof( szBuff ) );
+			V_sprintf_safe( szBuff, "%i", iNext );
+			g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2 );
+			g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( "#GameUI_BonusMapsGoal" ), 1, szWideBuff2 );
+			g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
 
 			SetControlString( "ChallengeNextLabel", szBuff );
 			SetControlVisible( "ChallengeNextLabel", true );
@@ -1360,8 +1324,7 @@ void CNewGameDialog::StartGame( void )
 	if ( m_ChapterPanels.IsValidIndex( m_iSelectedChapter ) )
 	{
 		char mapcommand[512];
-		mapcommand[0] = 0;
-		Q_snprintf( mapcommand, sizeof( mapcommand ), "disconnect\ndeathmatch 0\nprogress_enable\nexec %s\n", m_ChapterPanels[m_iSelectedChapter]->GetConfigFile() );
+		V_sprintf_safe( mapcommand, "disconnect\ndeathmatch 0\nprogress_enable\nexec %s\n", m_ChapterPanels[m_iSelectedChapter]->GetConfigFile() );
 
 		// Set commentary
 		ConVarRef commentary( "commentary" );

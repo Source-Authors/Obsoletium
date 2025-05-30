@@ -276,7 +276,7 @@ void C_ParticleFire::Update(float fTimeDelta)
 			{
 				static float particleSpeed = 15;
 				pParticle->m_StartPos = pEmitter->m_Pos;
-				pParticle->m_Direction = g_FireSpreadDirection * particleSpeed + RandomVector(0, particleSpeed*0.5);
+				pParticle->m_Direction = g_FireSpreadDirection * particleSpeed + RandomVector(0, particleSpeed*0.5f);
 				pParticle->m_iRamp = rand() % NUM_FIRE_RAMPS;
 				pParticle->m_Lifetime = 0;
 			}
@@ -290,8 +290,8 @@ void C_ParticleFire::RenderParticles( CParticleRenderIterator *pIterator )
 	const FireParticle *pParticle = (const FireParticle*)pIterator->GetFirst();
 	while ( pParticle )
 	{
-		float smooth01 = 1 - (cos(pParticle->m_Lifetime * 3.14159 / FIRE_PARTICLE_LIFETIME) * 0.5 + 0.5);
-		float smooth00 = 1 - (cos(pParticle->m_Lifetime * 3.14159 * 2 / FIRE_PARTICLE_LIFETIME) * 0.5 + 0.5);
+		float smooth01 = 1 - (cos(pParticle->m_Lifetime * M_PI_F / FIRE_PARTICLE_LIFETIME) * 0.5f + 0.5f);
+		float smooth00 = 1 - (cos(pParticle->m_Lifetime * M_PI_F * 2 / FIRE_PARTICLE_LIFETIME) * 0.5f + 0.5f);
 		
 		FireRamp *pRamp = &g_FireRamps[pParticle->m_iRamp];
 		Vector curColor = pRamp->m_Start + (pRamp->m_End - pRamp->m_Start) * smooth01;
@@ -326,7 +326,7 @@ void C_ParticleFire::SimulateParticles( CParticleSimulateIterator *pIterator )
 		}
 		else
 		{
-			float smooth01 = 1 - (cos(pParticle->m_Lifetime * 3.14159 / FIRE_PARTICLE_LIFETIME) * 0.5 + 0.5);
+			float smooth01 = 1 - (cos(pParticle->m_Lifetime * M_PI_F / FIRE_PARTICLE_LIFETIME) * 0.5f + 0.5f);
 			pParticle->m_Pos = pParticle->m_StartPos + pParticle->m_Direction * smooth01;
 		}
 

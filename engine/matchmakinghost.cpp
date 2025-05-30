@@ -280,13 +280,13 @@ void CMatchmaking::HandleJoinRequest( netpacket_t *pPacket )
 		pNewClient->m_id		= tempClient.m_id;			// 64 bit
 		pNewClient->m_cPlayers	= tempClient.m_cPlayers;
 		pNewClient->m_bInvited	= tempClient.m_bInvited;
-		pPacket->message.ReadBytes( &pNewClient->m_xnaddr, sizeof( pNewClient->m_xnaddr ) );
+		pPacket->message.ReadBytes( pNewClient->m_xnaddr );
 		for ( int i = 0; i < tempClient.m_cPlayers; ++i )
 		{
 			pNewClient->m_xuids[i] = pPacket->message.ReadLongLong();	// 64 bit
-			pPacket->message.ReadBytes( &pNewClient->m_cVoiceState, sizeof( pNewClient->m_cVoiceState ) );
+			pPacket->message.ReadBytes( pNewClient->m_cVoiceState );
 			pNewClient->m_iTeam[i] = joinResponse.m_iTeam;
-			pPacket->message.ReadString( pNewClient->m_szGamertags[i], sizeof( pNewClient->m_szGamertags[i] ), true );
+			pPacket->message.ReadString( pNewClient->m_szGamertags[i], ssize(pNewClient->m_szGamertags[i]), true );
 		}
 
 		// Tell everyone about the new client, and vice versa

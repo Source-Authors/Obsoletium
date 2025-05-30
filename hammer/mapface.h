@@ -215,7 +215,12 @@ public:
 	// so that the texture is in the same apparent spot as the old texture (if they are different sizes).
 	void SetTexture(const char *pszNewTex, bool bRescaleTextureCoordinates = false);
 	void SetTexture(IEditorTexture *pTexture, bool bRescaleTextureCoordinates = false);
-	void GetTextureName(char *pszName) const;
+	void GetTextureName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize) const;
+	template<intp nameSize>
+	void GetTextureName(OUT_Z_ARRAY char (&pszName)[nameSize]) const
+	{
+		GetTextureName(pszName, nameSize);
+	}
 
 	inline IEditorTexture *GetTexture(void) const;
 		
@@ -228,8 +233,8 @@ public:
 	//
 	// Serialization.
 	//
-	ChunkFileResult_t LoadVMF(CChunkFile *pFile);
-	ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+	[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile);
+	[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 	int SerializeRMF(std::fstream&, BOOL);
 	int SerializeMAP(std::fstream&, BOOL);
 
@@ -377,8 +382,8 @@ protected:
 	//
 	// Serialization (chunk handlers).
 	//
-	static ChunkFileResult_t LoadDispInfoCallback(CChunkFile *pFile, CMapFace *pFace);
-	static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, LoadFace_t *pLoadFace);
+	[[nodiscard]] static ChunkFileResult_t LoadDispInfoCallback(CChunkFile *pFile, CMapFace *pFace);
+	[[nodiscard]] static ChunkFileResult_t LoadKeyCallback(const char *szKey, const char *szValue, LoadFace_t *pLoadFace);
 
 	unsigned char m_uchAlpha;			// HACK: should be in CMapAtom
 

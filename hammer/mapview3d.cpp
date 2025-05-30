@@ -291,16 +291,16 @@ void CMapView3D::SetDrawType(DrawType_t eDrawType)
 		//		if ( pMapDoc )
 		//		{
 		//			const char *pFullPathName = pMapDoc->GetPathName();
-		//			if ( pFullPathName && pFullPathName[0] )
+		//			if ( pFullPathName && !Q_isempty(pFullPathName) )
 		//			{
 		//				char buf[MAX_PATH];
-		//				Q_FileBase( pFullPathName, buf,	MAX_PATH );
+		//				Q_FileBase( pFullPathName, buf );
 		//	
 		//				// Don't do it if we're untitled
 		//				//if ( !Q_stristr( buf, "untitled" ) )
 		//				{
 		//					g_pEngineAPI->SetEngineWindow( m_hWnd );
-		//					//g_pEngineAPI->SetMap( buf );
+		//					g_pEngineAPI->SetMap( buf );
 		//					g_pEngineAPI->ActivateSimulation( true );
 		//				}
 		//			}

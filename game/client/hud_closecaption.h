@@ -122,6 +122,7 @@ public:
 		CCFONT_ITALIC,
 		CCFONT_BOLD,
 		CCFONT_ITALICBOLD,
+		// dimhotepus: Unused on PC.
 		CCFONT_SMALL,
 		CCFONT_MAX
 	};

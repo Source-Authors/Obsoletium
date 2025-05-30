@@ -61,7 +61,7 @@ void CSceneTokenProcessor::Error( const char *fmt, ... )
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	vsprintf( string, fmt, argptr );
+	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
 
 	Warning( "%s", string );
@@ -73,10 +73,11 @@ static CSceneTokenProcessor g_TokenProcessor;
 //-----------------------------------------------------------------------------
 // Purpose: Normally implemented in cmdlib.cpp but we don't want that in Hammer.
 //-----------------------------------------------------------------------------
-char *ExpandPath (char *path)
+// dimhotepus: Make const version.
+const char *ExpandPath (const char *path)
 {
 	static char fullpath[ 512 ];
-	g_pFullFileSystem->RelativePathToFullPath( path, "GAME", fullpath, sizeof( fullpath ) );
+	g_pFullFileSystem->RelativePathToFullPath_safe( path, "GAME", fullpath );
 	return fullpath;
 }
 

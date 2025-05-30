@@ -14,7 +14,6 @@
 #include "hammer.h"
 #include "KeyValues.h"
 #include "MapDoc.h"
-#include "MapDoc.h"
 #include "MapEntity.h"
 #include "MapInstance.h"
 #include "MapWorld.h"
@@ -105,7 +104,7 @@ CGameConfig::CGameConfig(void)
 	memset(m_szGameExeDir, 0, sizeof(m_szGameExeDir));
 	memset(szBSPDir, 0, sizeof(szBSPDir));
 	memset(m_szModDir, 0, sizeof(m_szModDir));
-	strcpy(m_szCordonTexture, "BLACK");
+	V_strcpy_safe(m_szCordonTexture, "BLACK");
 
 	m_szSteamDir[0] = '\0';
 	m_szSteamUserDir[0] = '\0';
@@ -216,7 +215,7 @@ bool CGameConfig::Load(KeyValues *pkv)
 	bool bAdded = true;
 	do
 	{
-		sprintf(szKey, "GameData%d", nGDFiles);
+		V_sprintf_safe(szKey, "GameData%d", nGDFiles);
 		const char *pszGameData = pkvHammer->GetString(szKey);
 		if (pszGameData[0] != '\0')
 		{
@@ -258,8 +257,8 @@ bool CGameConfig::Load(KeyValues *pkv)
 	m_MaterialExcludeCount = pkvHammer->GetInt( "MaterialExcludeCount" );
 	for ( int i = 0; i < m_MaterialExcludeCount; i++ )
 	{
-		sprintf( szExcludeDir, "-MaterialExcludeDir%d", i );
-		int index = m_MaterialExclusions.AddToTail();
+		V_sprintf_safe( szExcludeDir, "-MaterialExcludeDir%d", i );
+		intp index = m_MaterialExclusions.AddToTail();
 		Q_strncpy( m_MaterialExclusions[index].szDirectory, pkvHammer->GetString( szExcludeDir ), sizeof( m_MaterialExclusions[index].szDirectory ) ); 
 		Q_StripTrailingSlash( m_MaterialExclusions[index].szDirectory );
 		m_MaterialExclusions[index].bUserGenerated = true;
@@ -301,7 +300,7 @@ bool CGameConfig::Save(KeyValues *pkv)
 	for (int i = 0; i < nGDFiles; i++)
 	{
 		char szKey[MAX_PATH];
-		sprintf(szKey, "GameData%d", i);
+		V_sprintf_safe(szKey, "GameData%d", i);
 		pkvHammer->SetString(szKey, GDFiles.GetAt(i));
 	}
 
@@ -327,7 +326,7 @@ bool CGameConfig::Save(KeyValues *pkv)
 	pkvHammer->SetInt("MaterialExcludeCount", m_MaterialExcludeCount);
 	for (int i = 0; i < m_MaterialExcludeCount; i++)
 	{
-		sprintf(szExcludeDir, "-MaterialExcludeDir%d", i );
+		V_sprintf_safe(szExcludeDir, "-MaterialExcludeDir%d", i );
 		pkvHammer->SetString(szExcludeDir, m_MaterialExclusions[i].szDirectory);
 	}
 
@@ -372,7 +371,7 @@ void CGameConfig::Save(std::fstream &file)
 	char szBuf[128];
 	for(int i = 0; i < nGDFiles; i++)
 	{
-		strcpy(szBuf, GDFiles[i]);
+		V_strcpy_safe(szBuf, GDFiles[i]);
 		file.write(szBuf, sizeof szBuf);
 	}
 }
@@ -389,22 +388,22 @@ void CGameConfig::CopyFrom(CGameConfig *pConfig)
 	GDFiles.RemoveAll();
 	GDFiles.Append(pConfig->GDFiles);
 
-	strcpy(szName, pConfig->szName);
-	strcpy(szExecutable, pConfig->szExecutable);
-	strcpy(szDefaultPoint, pConfig->szDefaultPoint);
-	strcpy(szDefaultSolid, pConfig->szDefaultSolid);
-	strcpy(szBSP, pConfig->szBSP);
-	strcpy(szLIGHT, pConfig->szLIGHT);
-	strcpy(szVIS, pConfig->szVIS);
-	strcpy(szMapDir, pConfig->szMapDir);
-	strcpy(m_szGameExeDir, pConfig->m_szGameExeDir);
-	strcpy(szBSPDir, pConfig->szBSPDir);
-	strcpy(m_szModDir, pConfig->m_szModDir);
+	V_strcpy_safe(szName, pConfig->szName);
+	V_strcpy_safe(szExecutable, pConfig->szExecutable);
+	V_strcpy_safe(szDefaultPoint, pConfig->szDefaultPoint);
+	V_strcpy_safe(szDefaultSolid, pConfig->szDefaultSolid);
+	V_strcpy_safe(szBSP, pConfig->szBSP);
+	V_strcpy_safe(szLIGHT, pConfig->szLIGHT);
+	V_strcpy_safe(szVIS, pConfig->szVIS);
+	V_strcpy_safe(szMapDir, pConfig->szMapDir);
+	V_strcpy_safe(m_szGameExeDir, pConfig->m_szGameExeDir);
+	V_strcpy_safe(szBSPDir, pConfig->szBSPDir);
+	V_strcpy_safe(m_szModDir, pConfig->m_szModDir);
 
 	pConfig->m_MaterialExcludeCount = m_MaterialExcludeCount;
 	for( int i = 0; i < m_MaterialExcludeCount; i++ )
 	{
-		strcpy( m_MaterialExclusions[i].szDirectory, pConfig->m_MaterialExclusions[i].szDirectory );
+		V_strcpy_safe( m_MaterialExclusions[i].szDirectory, pConfig->m_MaterialExclusions[i].szDirectory );
 	}
 }
 
@@ -488,31 +487,32 @@ void CGameConfig::LoadGDFiles(void)
 // Output : Returns true if the file was found, false if not. If the file was
 //			found the full path (not including the filename) is returned in szFoundPath.
 //-----------------------------------------------------------------------------
-bool FindFileInTree(const char *szFile, const char *szStartDir, char *szFoundPath)
+template<size_t foundPathLen>
+bool FindFileInTree(const char *szFile, const char *szStartDir, char (&szFoundPath)[foundPathLen])
 {
-	if ((szFile == NULL) || (szStartDir == NULL) || (szFoundPath == NULL))
+	if ((szFile == NULL) || (szStartDir == NULL))
 	{
 		return false;
 	}
 
 	char szRoot[MAX_PATH];
-	strcpy(szRoot, szStartDir);
-	Q_AppendSlash(szRoot, sizeof(szRoot));
+	V_strcpy_safe(szRoot, szStartDir);
+	V_AppendSlash(szRoot);
 
 	char szTemp[MAX_PATH];
 	do
 	{
-		strcpy(szTemp, szRoot);
-		strcat(szTemp, szFile);
+		V_strcpy_safe(szTemp, szRoot);
+		V_strcat_safe(szTemp, szFile);
 
 		if (!_access(szTemp, 0))
 		{
-			strcpy(szFoundPath, szRoot);
-			Q_StripTrailingSlash(szFoundPath);
+			V_strcpy_safe(szFoundPath, szRoot);
+			V_StripTrailingSlash(szFoundPath);
 			return true;
 		}
 
-	} while (Q_StripLastDir(szRoot, sizeof(szRoot)));
+	} while (V_StripLastDir(szRoot));
 
 	return false;
 }
@@ -525,18 +525,19 @@ bool FindFileInTree(const char *szFile, const char *szStartDir, char *szFoundPat
 //			*szSteamUserDir - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool FindSteamUserDir(const char *szAppDir, const char *szSteamDir, char *szSteamUserDir)
+template<size_t steamDirSize, size_t steamUserDirSize>
+bool FindSteamUserDir(const char *szAppDir, const char (&szSteamDir)[steamDirSize], char (&szSteamUserDir)[steamUserDirSize])
 {
-	if ((szAppDir == NULL) || (szSteamDir == NULL) || (szSteamUserDir == NULL))
+	if (szAppDir == NULL)
 	{
 		return false;
 	}
 
 	// If the szAppDir was run from within the steam tree, we should be able to find the steam user dir.
-	int nSteamDirLen = strlen(szSteamDir);
+	intp nSteamDirLen = V_strlen(szSteamDir);
 	if (!Q_strnicmp(szAppDir, szSteamDir, nSteamDirLen ) && (szAppDir[nSteamDirLen] == '\\'))
 	{
-		strcpy(szSteamUserDir, szAppDir);
+		V_strcpy_safe(szSteamUserDir, szAppDir);
 
 		char *pszSlash = strchr(&szSteamUserDir[nSteamDirLen + 1], '\\');
 		if (pszSlash)
@@ -606,14 +607,14 @@ const char *CGameConfig::GetMod()
 	// Strip path from modDir
 	char szModPath[MAX_PATH];
 	static char szMod[MAX_PATH];
-	Q_strncpy( szModPath, m_szModDir, MAX_PATH );
+	V_strcpy_safe( szModPath, m_szModDir );
 	Q_StripTrailingSlash( szModPath );
-	if ( !szModPath[0] )
+	if ( Q_isempty(szModPath) )
 	{
-		Q_strcpy( szModPath, "hl2" );
+		V_strcpy_safe( szModPath, "hl2" );
 	}
 
-	Q_FileBase( szModPath, szMod, MAX_PATH );
+	Q_FileBase( szModPath, szMod );
 
 	return szMod;
 }
@@ -627,7 +628,7 @@ const char *CGameConfig::GetGame()
 //	static char szGame[MAX_PATH];
 //	Q_strncpy( szGamePath, m_szGameDir, MAX_PATH );
 //	Q_StripTrailingSlash( szGamePath );
-//	Q_FileBase( szGamePath, szGame, MAX_PATH );
+//	Q_FileBase( szGamePath, szGame );
 
 //	return szGame;
 }

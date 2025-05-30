@@ -77,7 +77,7 @@ bool CCommandBuffer::ParseArgV0( CUtlBuffer &buf, char *pArgV0, intp nMaxLen, co
 	if ( !buf.IsValid() )
 		return false;
 
-	intp	nSize = buf.ParseToken( CCommand::DefaultBreakSet(), pArgV0, nMaxLen );
+	intp nSize = buf.ParseToken( CCommand::DefaultBreakSet(), pArgV0, nMaxLen );
 	if ( ( nSize <= 0 ) || ( nMaxLen == nSize ) )
 		return false;
 

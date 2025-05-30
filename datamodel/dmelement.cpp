@@ -285,17 +285,17 @@ void CDmElement::SetReference( const DmElementReference_t &ref )
 }
 
 
-int CDmElement::EstimateMemoryUsage( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, int *pCategories )
+intp CDmElement::EstimateMemoryUsage( CUtlHash< DmElementHandle_t > &visited, TraversalDepth_t depth, intp *pCategories )
 {
 	if ( visited.Find( m_ref.m_hElement ) != visited.InvalidHandle() )
 		return 0;
 	visited.Insert( m_ref.m_hElement );
 
-	int nDataModelUsage = g_pDataModelImp->EstimateMemoryOverhead( );
-	int nReferenceUsage = m_ref.EstimateMemoryOverhead();
+	intp nDataModelUsage = g_pDataModelImp->EstimateMemoryOverhead( );
+	intp nReferenceUsage = m_ref.EstimateMemoryOverhead();
 	CDmElement *pElement = g_pDataModel->GetElement( m_ref.m_hElement );
-	int nInternalUsage = sizeof( *this ) - sizeof( CUtlString );	// NOTE: The utlstring is the 'name' attribute var
-	int nOuterUsage = pElement->AllocatedSize() - nInternalUsage;
+	intp nInternalUsage = sizeof( *this ) - sizeof( CUtlString );	// NOTE: The utlstring is the 'name' attribute var
+	intp nOuterUsage = pElement->AllocatedSize() - nInternalUsage;
 	Assert( nOuterUsage >= 0 );
 
 	if ( pCategories )
@@ -306,7 +306,7 @@ int CDmElement::EstimateMemoryUsage( CUtlHash< DmElementHandle_t > &visited, Tra
 		pCategories[MEMORY_CATEGORY_ELEMENT_INTERNAL] += nInternalUsage;
 	}
 
-	int nAttributeDataUsage = 0;
+	intp nAttributeDataUsage = 0;
 	for ( CDmAttribute *pAttr = m_pAttributes; pAttr; pAttr = pAttr->NextAttribute() )
 	{
 		nAttributeDataUsage += pAttr->EstimateMemoryUsageInternal( visited, depth, pCategories );
@@ -487,7 +487,7 @@ void CDmElement::RemoveAllReferencesToElement( CDmElement *pElement )
 	}
 }
 
-int CDmElement::EstimateMemoryUsage( TraversalDepth_t depth /* = TD_DEEP */ )
+intp CDmElement::EstimateMemoryUsage( TraversalDepth_t depth /* = TD_DEEP */ )
 {
 	return g_pDataModel->EstimateMemoryUsage( GetHandle(), depth );
 }
@@ -844,9 +844,9 @@ DmElementHandle_t CDmElement::GetHandle() const
 //-----------------------------------------------------------------------------
 // Iteration
 //-----------------------------------------------------------------------------
-int CDmElement::AttributeCount() const
+intp CDmElement::AttributeCount() const
 {
-	int nAttrs = 0;
+	intp nAttrs = 0;
 	for ( CDmAttribute *pAttr = m_pAttributes; pAttr; pAttr = pAttr->NextAttribute() )
 	{
 		++nAttrs;
@@ -1348,7 +1348,7 @@ private:
 };
 
 // returns startindex if none found, 2 if only "prefix" found, and n+1 if "prefixn" found
-int GenerateUniqueNameIndex( const char *prefix, const CUtlVector< DmElementHandle_t > &array, int startindex )
+intp GenerateUniqueNameIndex( const char *prefix, const CUtlVector< DmElementHandle_t > &array, intp startindex )
 {
 	return V_GenerateUniqueNameIndex( prefix, ElementArrayNameAccessor( array ), startindex );
 }
@@ -1363,7 +1363,7 @@ void MakeElementNameUnique( CDmElement *pElement, const char *prefix, const CUtl
 	if ( pElement == NULL || prefix == NULL )
 		return;
 
-	int i = GenerateUniqueNameIndex( prefix, array );
+	intp i = GenerateUniqueNameIndex( prefix, array );
 	if ( i <= 0 )
 	{
 		if ( !forceIndex )
@@ -1379,14 +1379,14 @@ void MakeElementNameUnique( CDmElement *pElement, const char *prefix, const CUtl
 	if ( newlen < 256 )
 	{
 		char name[256];
-		Q_snprintf( name, sizeof( name ), "%s%d", prefix, i );
+		V_sprintf_safe( name, "%s%zd", prefix, i );
 		pElement->SetName( name );
 	}
 	else
 	{
 		char *name = new char[ newlen + 1 ];
 		// dimhotepus: Fix name buffer size.
-		Q_snprintf( name, newlen + 1, "%s%d", prefix, i );
+		Q_snprintf( name, newlen + 1, "%s%zd", prefix, i );
 		pElement->SetName( name );
 		delete[] name;
 	}
@@ -1406,7 +1406,7 @@ void RemoveElementFromRefereringAttributes( CDmElement *pElement, bool bPreserve
 		if ( IsArrayType( pAttribute->GetType() ) )
 		{
 			CDmrElementArray<> array( pAttribute );
-			int iElem = array.Find( pElement );
+			intp iElem = array.Find( pElement );
 			Assert( iElem != array.InvalidIndex() );
 			if ( bPreserveOrder )
 			{

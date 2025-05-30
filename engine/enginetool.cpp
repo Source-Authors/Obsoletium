@@ -549,7 +549,7 @@ void CEngineTool::Con_NPrintf( int pos, const char *fmt, ... )
 	char buf[ 1024 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( buf, sizeof( buf ) - 1, fmt, argptr );
+	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
 	return ::Con_NPrintf( pos, "%s", buf );
@@ -560,7 +560,7 @@ void CEngineTool::Con_NXPrintf( const struct con_nprint_s *info, const char *fmt
 	char buf[ 1024 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( buf, sizeof( buf ) - 1, fmt, argptr );
+	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
 	::Con_NXPrintf( info, "%s", buf );
@@ -641,7 +641,7 @@ int CEngineTool::StartSound(
 	StartSoundParams_t params;
 	params.userdata = iUserData;
 	params.staticsound = staticsound;
-	params.soundsource = iEntIndex;
+	params.soundsource = static_cast<SoundSource>(iEntIndex);
 	params.entchannel = iChannel;
 	params.pSfx = S_PrecacheSound( pSample );
 	params.origin = origin; 
@@ -989,7 +989,7 @@ void CEngineTool::StartRecordingVoiceToFile( const char *filename, const char *p
 		g_pFileSystem->Close( fh );
 	}
 
-	g_pFileSystem->RelativePathToFullPath( filename, pPathID, m_szVoiceoverFile, sizeof( m_szVoiceoverFile ) );
+	g_pFileSystem->RelativePathToFullPath_safe( filename, pPathID, m_szVoiceoverFile );
 
 	g_pFileSystem->RemoveFile( filename, pPathID );
 

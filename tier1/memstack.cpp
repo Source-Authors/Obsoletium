@@ -4,7 +4,7 @@
 //
 //=============================================================================//
 
-#include "memstack.h"
+#include "tier1/memstack.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )
 #include "winlite.h"
@@ -13,7 +13,7 @@
 #endif
 
 #include "tier0/dbg.h"
-#include "utlmap.h"
+#include "tier1/utlmap.h"
 #include "tier0/memdbgon.h"
 
 #ifdef _WIN32

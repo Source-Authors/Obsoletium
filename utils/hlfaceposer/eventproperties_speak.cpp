@@ -5,10 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include <mxtk/mx.h>
-#include <stdio.h>
-#include "resource.h"
+#include "eventproperties_speak.h"
 #include "EventProperties.h"
+#include <mxtk/mx.h>
+#include "resource.h"
 #include "mdlviewer.h"
 #include "choreoevent.h"
 #include "filesystem.h"
@@ -17,6 +17,7 @@
 #include "SoundLookup.h"
 #include "ifaceposersound.h"
 #include "MatSysWin.h"
+#include <shellapi.h>
 
 static CEventParams g_Params;
 
@@ -65,9 +66,10 @@ private:
 		TIMER_ID	= 100,
 	};
 
-	UINT			m_Timer;
+	UINT_PTR		m_Timer;
 	char			m_szLastFilter[ 256 ];
-	float			m_flLastFilterUpdateTime;
+	// dimhotepus: float -> double.
+	double			m_flLastFilterUpdateTime;
 };
 
 void CEventPropertiesSpeakDialog::AddFilterToHistory( char const *filter )
@@ -93,11 +95,11 @@ void CEventPropertiesSpeakDialog::PopulateFilterList(  bool resetCurrent )
 
 	SendMessage( control, CB_RESETCONTENT, 0, 0 );
 
-	int c = m_FilterHistory.Count();
+	intp c = m_FilterHistory.Count();
 	if ( c == 0 )
 		return;
 
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		char const *str = m_Symbols.String( m_FilterHistory[ i ] );
 		SendMessage( control, CB_ADDSTRING, 0, (LPARAM)str );
@@ -139,7 +141,7 @@ void CEventPropertiesSpeakDialog::InitControlData( CEventParams *params )
 {
 	BaseClass::InitControlData( params );
 
-	m_flLastFilterUpdateTime = (float)mx::getTickCount() / 1000.0f;
+	m_flLastFilterUpdateTime = Plat_FloatTime();
 
 	m_Timer = SetTimer( m_hDialog, TIMER_ID, 1, 0 );
 
@@ -275,7 +277,7 @@ void CEventPropertiesSpeakDialog::PopulateSoundList( char const *current, HWND w
 	// Remove all
 	SendMessage( wnd, LB_RESETCONTENT, 0, 0 );
 
-	int selectslot = 0;
+	LRESULT selectslot = 0;
 
 	int j = m_SortedNames.FirstInorder();
 	while ( j != m_SortedNames.InvalidIndex() )
@@ -283,7 +285,7 @@ void CEventPropertiesSpeakDialog::PopulateSoundList( char const *current, HWND w
 		char const *name = m_SortedNames[ j ];
 		if ( name && name[ 0 ] )
 		{
-			int temp = SendMessage( wnd, LB_ADDSTRING, 0, (LPARAM)name ); 
+			LRESULT temp = SendMessage( wnd, LB_ADDSTRING, 0, (LPARAM)name ); 
 
 			if ( !Q_stricmp( name, current ) )
 			{
@@ -477,8 +479,8 @@ BOOL CEventPropertiesSpeakDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARAM
 		{
 			g_pMatSysWindow->Frame();
 
-			float curtime = (float)mx::getTickCount() / 1000.0f;
-			if ( curtime - m_flLastFilterUpdateTime > 0.5f )
+			double curtime = Plat_FloatTime();
+			if ( curtime - m_flLastFilterUpdateTime > 0.5 )
 			{
 				m_flLastFilterUpdateTime = curtime;
 				OnCheckFilterUpdate();
@@ -515,9 +517,11 @@ BOOL CEventPropertiesSpeakDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARAM
 
 				char szTime[ 32 ];
 				GetDlgItemText( m_hDialog, IDC_STARTTIME, szTime, sizeof( szTime ) );
-				g_Params.m_flStartTime = atof( szTime );
+				// dimhotepus: atof -> strtof.
+				g_Params.m_flStartTime = strtof( szTime, nullptr );
 				GetDlgItemText( m_hDialog, IDC_ENDTIME, szTime, sizeof( szTime ) );
-				g_Params.m_flEndTime = atof( szTime );
+				// dimhotepus: atof -> strtof.
+				g_Params.m_flEndTime = strtof( szTime, nullptr );
 
 				// Parse tokens from tags
 				ParseTags( &g_Params );
@@ -567,7 +571,7 @@ BOOL CEventPropertiesSpeakDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARAM
 							Q_snprintf( relative_path, MAX_PATH, "%s", scriptfile );
 
 							char full_path[MAX_PATH];
-							if ( filesystem->GetLocalPath( relative_path, full_path, MAX_PATH ) )
+							if ( filesystem->GetLocalPath_safe( relative_path, full_path ) )
 							{
 								ShellExecute( NULL, "open", full_path, NULL, NULL, SW_SHOWNORMAL );
 							}
@@ -606,7 +610,7 @@ BOOL CEventPropertiesSpeakDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARAM
 				HWND control = (HWND)lParam;
 				if ( control )
 				{
-					int cursel = SendMessage( control, LB_GETCURSEL, 0, 0 );
+					LRESULT cursel = SendMessage( control, LB_GETCURSEL, 0, 0 );
 					if ( cursel != LB_ERR )
 					{
 						SendMessage( control, LB_GETTEXT, cursel, (LPARAM)g_Params.m_szParameters );
@@ -658,11 +662,11 @@ BOOL CEventPropertiesSpeakDialog::HandleMessage( HWND hwndDlg, UINT uMsg, WPARAM
 //			*actor - 
 // Output : int
 //-----------------------------------------------------------------------------
-int EventProperties_Speak( CEventParams *params )
+intp EventProperties_Speak( CEventParams *params )
 {
 	g_Params = *params;
 
-	int retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
+	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_EVENTPROPERTIES_SPEAK ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)EventPropertiesSpeakDialog );

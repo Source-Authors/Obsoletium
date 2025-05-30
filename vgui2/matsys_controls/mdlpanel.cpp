@@ -28,9 +28,9 @@ using namespace vgui;
 
 DECLARE_BUILD_FACTORY( CMDLPanel );
 
-static const int THUMBNAIL_SAFE_ZONE_SIZE = 512;
-static const int THUMBNAIL_SAFE_ZONE_HEIGHT = 92;
-static const float THUMBNAIL_SAFE_ZONE_HEIGHT_SCALE = (float)THUMBNAIL_SAFE_ZONE_HEIGHT / THUMBNAIL_SAFE_ZONE_SIZE;
+static constexpr inline int THUMBNAIL_SAFE_ZONE_SIZE = 512;
+static constexpr inline int THUMBNAIL_SAFE_ZONE_HEIGHT = 92;
+static constexpr inline float THUMBNAIL_SAFE_ZONE_HEIGHT_SCALE = (float)THUMBNAIL_SAFE_ZONE_HEIGHT / THUMBNAIL_SAFE_ZONE_SIZE;
 
 //-----------------------------------------------------------------------------
 // Purpose: Keeps a global clock to autoplay sequences to run from
@@ -38,10 +38,11 @@ static const float THUMBNAIL_SAFE_ZONE_HEIGHT_SCALE = (float)THUMBNAIL_SAFE_ZONE
 //-----------------------------------------------------------------------------
 float GetAutoPlayTime( void )
 {
-	static int g_prevTicks;
+	static unsigned long long g_prevTicks;
 	static float g_time;
 
-	int ticks = Plat_MSTime();
+	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
+	unsigned long long ticks = Plat_USTime();
 
 	// limit delta so that float time doesn't overflow
 	if (g_prevTicks == 0)
@@ -49,7 +50,7 @@ float GetAutoPlayTime( void )
 		g_prevTicks = ticks;
 	}
 
-	g_time += ( ticks - g_prevTicks ) / 1000.0f;
+	g_time += ( ticks - g_prevTicks ) / 1000000.0f;
 	g_prevTicks = ticks;
 
 	return g_time;

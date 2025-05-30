@@ -1113,7 +1113,7 @@ void CObjectProperties::ReloadData()
 		// Set the window title to include the object's description.
 		//
 		char szTitle[MAX_PATH];
-		sprintf(szTitle, "Object Properties: %s", pobj->GetDescription());
+		V_sprintf_safe(szTitle, "Object Properties: %s", pobj->GetDescription());
 		SetWindowText(szTitle);
 
 		CManifestInstance	*pManifestInstance = dynamic_cast< CManifestInstance * >( pobj );

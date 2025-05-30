@@ -55,8 +55,8 @@ public:
 	// Serialization.
 	//
 	const char *GetVMFChunkName() { return "cameras"; }
-	ChunkFileResult_t LoadVMF(CChunkFile *pFile);
-	ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
+	[[nodiscard]] ChunkFileResult_t LoadVMF(CChunkFile *pFile);
+	[[nodiscard]] ChunkFileResult_t SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo);
 	void SerializeRMF(std::fstream &file, BOOL fIsStoring);
 
 	//
@@ -104,9 +104,9 @@ private:
 	void OnEscape(void);
 	void EnsureMaxCameras();
 
-	static ChunkFileResult_t LoadCameraKeyCallback(const char *szKey, const char *szValue, CAMSTRUCT *pCam);
-	static ChunkFileResult_t LoadCamerasKeyCallback(const char *szKey, const char *szValue, Camera3D *pCameras);
-	static ChunkFileResult_t LoadCameraCallback(CChunkFile *pFile, Camera3D *pCameras);
+	[[nodiscard]] static ChunkFileResult_t LoadCameraKeyCallback(const char *szKey, const char *szValue, CAMSTRUCT *pCam);
+	[[nodiscard]] static ChunkFileResult_t LoadCamerasKeyCallback(const char *szKey, const char *szValue, Camera3D *pCameras);
+	[[nodiscard]] static ChunkFileResult_t LoadCameraCallback(CChunkFile *pFile, Camera3D *pCameras);
 
 	
 
@@ -119,7 +119,7 @@ private:
 		MoveLook = 1,
 	};
 
-	int m_iActiveCamera;
+	intp m_iActiveCamera;
 	// dimhotepus: int -> unsigned.
 	unsigned m_nMovePositionIndex;
 	Vector m_vOrgPos;

@@ -44,8 +44,8 @@ void CChannelGraphPanel::SetChannel( CDmeChannel *pChannel )
 	m_graphMaxValue = -FLT_MAX;
 
 	int nComponents = NumComponents( pLog->GetDataType() );
-	int nKeys = pLog->GetKeyCount();
-	for ( int k = 0; k < nKeys; ++k )
+	intp nKeys = pLog->GetKeyCount();
+	for ( intp k = 0; k < nKeys; ++k )
 	{
 		DmeTime_t t = pLog->GetKeyTime( k );
 		for ( int i = 0; i < nComponents; ++i )
@@ -175,7 +175,7 @@ float GetDisplayIncrement( int windowpixels, int fontpixels, float valuerange, i
 	{
 		*pDecimalPlaces = max( 0, -nPower );
 	}
-	return pow( 10.0f, nPower );
+	return powf( 10.0f, nPower );
 }
 
 int CChannelGraphPanel::TimeToPixel( DmeTime_t time )
@@ -238,7 +238,7 @@ void CChannelGraphPanel::Paint()
 
 		int y = GetTall() - ValueToPixel( flValue ) - 1;
 		surface()->DrawSetTextPos( m_nGraphOriginX - m_nTextBorder - tw, y - textheight / 2 );
-		surface()->DrawPrintText( wstring, wcslen( wstring ) );
+		surface()->DrawPrintText( wstring, V_wcslen( wstring ) );
 
 		surface()->DrawLine( m_nGraphOriginX - m_nTextBorder, y, m_nGraphOriginX, y );
 	}
@@ -261,7 +261,7 @@ void CChannelGraphPanel::Paint()
 
 		int x = TimeToPixel( DmeTime_t( flTime ) );
 		surface()->DrawSetTextPos( x - tw / 2, GetTall() - m_nGraphOriginY + m_nTextBorder - 1 );
-		surface()->DrawPrintText( wstring, wcslen( wstring ) );
+		surface()->DrawPrintText( wstring, V_wcslen( wstring ) );
 
 		surface()->DrawLine( x, GetTall() - m_nGraphOriginY + m_nTextBorder - 1, x, GetTall() - m_nGraphOriginY - 1 );
 	}
@@ -276,7 +276,7 @@ void CChannelGraphPanel::Paint()
 
 	CDmeLog *pLog = m_hChannel->GetLog();
 	int nComponents = NumComponents( pLog->GetDataType() );
-	int nKeys = pLog->GetKeyCount();
+	intp nKeys = pLog->GetKeyCount();
 
 	// draw plotted graph
 	for ( int i = 0; i < nComponents; ++i )

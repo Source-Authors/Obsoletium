@@ -71,8 +71,8 @@ static int				g_iLastReplacedDynamic = -1;
 
 CUtlVector<decal_t*>		s_aDecalPool;
 
-const int DECALCACHE_ENTRY_COUNT = 1024;
-const int INVALID_CACHE_ENTRY = 0xFFFF;
+constexpr inline int DECALCACHE_ENTRY_COUNT = 1024;
+constexpr inline int INVALID_CACHE_ENTRY = 0xFFFF;
 
 // dimhotepus: Fix aligned alloc.
 class alignas(16) CDecalVertCache : public CAlignedNewDelete<16>
@@ -178,9 +178,10 @@ static void r_printdecalinfo_f()
 
 	for ( int i=0; i < g_nMaxDecals; i++ )
 	{
-		if ( s_aDecalPool[i] )
+		const auto *decal = s_aDecalPool[i];
+		if ( decal )
 		{
-			if ( s_aDecalPool[i]->flags & FDECAL_PERMANENT )
+			if ( decal->flags & FDECAL_PERMANENT )
 				++nPermanent;
 			else
 				++nDynamic;
@@ -403,7 +404,8 @@ static VertexFormat_t GetUncompressedFormat( const IMaterial * pMaterial )
 void Shader_DecalDrawPoly( CDecalVert *v, IMaterial *pMaterial, SurfaceHandle_t surfID, int vertCount, decal_t *pdecal, float flFade )
 {
 #ifndef SWDS
-	int vertexFormat = 0;
+	// dimhotepus: int -> VertexFormat_t
+	VertexFormat_t vertexFormat = 0;
 	CMatRenderContextPtr pRenderContext( materials );
 
 #ifdef USE_CONVARS
@@ -557,14 +559,12 @@ void R_DecalInit( void )
 	s_aDecalPool.Purge();
 	s_aDecalPool.SetSize( g_nMaxDecals );
 
-	int i;
-
 	// Traverse all surfaces of map and throw away current decals
 	//
 	// sort the surfaces into the sort arrays
 	if ( host_state.worldbrush )
 	{
-		for( i = 0; i < host_state.worldbrush->numsurfaces; i++ )
+		for( int i = 0; i < host_state.worldbrush->numsurfaces; i++ )
 		{
 			SurfaceHandle_t surfID = SurfaceHandleFromIndex(i);
 			MSurf_Decals( surfID ) = WORLD_DECAL_HANDLE_INVALID;
@@ -620,7 +620,7 @@ void R_DecalTerm( worldbrushdata_t *pBrushData, bool term_permanent_decals )
 void R_DecalTermAll()
 {
 	s_pDecalDestroyList = NULL;
-	for ( int i = 0; i<s_aDecalPool.Count(); i++ )
+	for ( intp i = 0; i<s_aDecalPool.Count(); i++ )
 	{
 		R_DecalUnlink( s_aDecalPool[i], host_state.worldbrush );
 	}
@@ -949,7 +949,7 @@ static void R_DecalNodeSurfaces( mnode_t* node, decalinfo_t *decalinfo )
 
 		R_DecalSurface( surfID, decalinfo, false );
 	}
-}						 
+}
 
 
 void R_DecalLeaf( mleaf_t *pLeaf, decalinfo_t *decalinfo )
@@ -1081,16 +1081,9 @@ static int DecalListAdd( decallist_t *pList, int count )
 }
 
 
-typedef int (__cdecl *qsortFunc_t)( const void *, const void * );
-
-static int __cdecl DecalDepthCompare( const decallist_t *elem1, const decallist_t *elem2 )
+static bool __cdecl DecalDepthCompare( const decallist_t &elem1, const decallist_t &elem2 )
 {
-	if ( elem1->depth > elem2->depth )
-		return -1;
-	if ( elem1->depth < elem2->depth )
-		return 1;
-
-	return 0;
+	return elem1.depth > elem2.depth;
 }
 
 //-----------------------------------------------------------------------------
@@ -1138,7 +1131,7 @@ int DecalListCreate( decallist_t *pList )
 	}
 
 	// Sort the decals lowest depth first, so they can be re-applied in order
-	qsort( pList, total, sizeof(decallist_t), ( qsortFunc_t )DecalDepthCompare );
+	std::sort( pList, pList + total, DecalDepthCompare );
 
 	return total;
 }
@@ -1257,10 +1250,9 @@ void R_PlayerDecalShoot( IMaterial *material, void *userdata, int entity, const 
 	// seems like the cleanest way to manage this - especially since
 	// it doesn't happen that often.
 	//
-	int i;
 	CUtlVector<decal_t *> decalVec;
 
-	for ( i = 0; i<s_aDecalPool.Count(); i++ )
+	for ( intp i = 0; i<s_aDecalPool.Count(); i++ )
 	{
 		decal_t * decal = s_aDecalPool[i];
 
@@ -1271,7 +1263,7 @@ void R_PlayerDecalShoot( IMaterial *material, void *userdata, int entity, const 
 	}
 
 	// remove all the sprays we found
-	for ( i = 0; i < decalVec.Count(); i++ )
+	for ( intp i = 0; i < decalVec.Count(); i++ )
 	{
 		R_DecalUnlink( decalVec[i], host_state.worldbrush );
 	}
@@ -1461,8 +1453,8 @@ static decal_t *R_DecalFindOverlappingDecals( decalinfo_t* decalinfo, SurfaceHan
 	}
 	if ( coveredList.Count() > r_decal_cover_count.GetInt() )
 	{
-		int last = coveredList.Count() - r_decal_cover_count.GetInt();
-		for ( int i = 0; i < last; i++ )
+		intp last = coveredList.Count() - r_decal_cover_count.GetInt();
+		for ( intp i = 0; i < last; i++ )
 		{
 			R_DecalUnlink( coveredList[i], host_state.worldbrush );
 		}
@@ -1599,7 +1591,7 @@ static void R_DecalMaterialSort( decal_t *pDecal, SurfaceHandle_t surfID )
 	}
 
 	// Get an index for the current sort tree.
-	int iSortTree = g_aDecalFormats[iFormat].m_iSortTree;
+	const intp iSortTree = g_aDecalFormats[iFormat].m_iSortTree;
 	int iTreeType = -1;
 
 	// Lightmapped.
@@ -1626,19 +1618,25 @@ static void R_DecalMaterialSort( decal_t *pDecal, SurfaceHandle_t surfID )
 	int iSort = g_aDecalSortTrees[iSortTree].m_pTrees[iTreeType]->Find( sort );
 	if ( iSort == -1 )
 	{
-		intp iBucket = g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[0][iTreeType].AddToTail();
-		g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[0][iTreeType].AddToTail();
+		auto &decalSortBucket = g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[0][iTreeType];
 
-		g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[0][iTreeType].Element( iBucket ).m_nCheckCount = -1;
-		g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[0][iTreeType].Element( iBucket ).m_nCheckCount = -1;
+		intp iBucket = decalSortBucket.AddToTail();
+		decalSortBucket.Element(iBucket).m_nCheckCount = -1;
+
+		auto &dispDecalSortBucket = g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[0][iTreeType];
+
+		dispDecalSortBucket.AddToTail();
+		dispDecalSortBucket.Element( iBucket ).m_nCheckCount = -1;
 
 		for ( int iGroup = 1; iGroup < ( MAX_MAT_SORT_GROUPS + 1 ); ++iGroup )
 		{
-			g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].AddToTail();
-			g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].AddToTail();
+			auto &decalSortBucketGroup = g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType];
+			decalSortBucketGroup.AddToTail();
+			decalSortBucketGroup.Element( iBucket ).m_nCheckCount = -1;
 
-			g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Element( iBucket ).m_nCheckCount = -1;
-			g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Element( iBucket ).m_nCheckCount = -1;
+			auto &dispDecalSortBucketGroup = g_aDispDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType];
+			dispDecalSortBucketGroup.AddToTail();
+			dispDecalSortBucketGroup.Element( iBucket ).m_nCheckCount = -1;
 		}
 		
 		sort.m_iBucket = iBucket;
@@ -1987,16 +1985,18 @@ void R_DrawDecalsAllImmediate_GatherDecals( IMatRenderContext *pRenderContext, i
 		nCheckCount = g_nBrushModelDecalSortCheckCount;
 	}
 
-	int nSortTreeCount = g_aDecalSortTrees.Count();
-	for ( int iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
+	const intp nSortTreeCount = g_aDecalSortTrees.Count();
+	for ( intp iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
 	{
-		int nBucketCount = g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Count();
-		for ( int iBucket = 0; iBucket < nBucketCount; ++iBucket )
+		auto &buckets = g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType];
+		const intp nBucketCount = buckets.Count();
+
+		for ( intp iBucket = 0; iBucket < nBucketCount; ++iBucket )
 		{
-			if ( g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Element( iBucket ).m_nCheckCount != nCheckCount )
+			if ( buckets.Element( iBucket ).m_nCheckCount != nCheckCount )
 				continue;
 
-			intp iHead = g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Element( iBucket ).m_iHead;
+			const intp iHead = buckets.Element(iBucket).m_iHead;
 
 			intp iElement = iHead;
 			while ( iElement != g_aDecalSortPool.InvalidIndex() )
@@ -2140,17 +2140,18 @@ void R_DrawDecalsAllImmediate( IMatRenderContext *pRenderContext, int iGroup, in
 {
 	SurfaceHandle_t lastSurf = NULL;
 	decalcontext_t context(pRenderContext, vModelOrg);
-	int nSortTreeCount = g_aDecalSortTrees.Count();
+	intp nSortTreeCount = g_aDecalSortTrees.Count();
 	bool bWireframe = ShouldDrawInWireFrameMode() || (r_drawdecals.GetInt() == 2);
-	for ( int iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
+	for ( intp iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
 	{
-		int nBucketCount = g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Count();
-		for ( int iBucket = 0; iBucket < nBucketCount; ++iBucket )
+		auto &buckets = g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType];
+		intp nBucketCount = buckets.Count();
+		for ( intp iBucket = 0; iBucket < nBucketCount; ++iBucket )
 		{
-			if ( g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Element( iBucket ).m_nCheckCount != nCheckCount )
+			if ( buckets.Element( iBucket ).m_nCheckCount != nCheckCount )
 				continue;
 			
-			intp iHead = g_aDecalSortTrees[iSortTree].m_aDecalSortBuckets[iGroup][iTreeType].Element( iBucket ).m_iHead;
+			intp iHead = buckets.Element( iBucket ).m_iHead;
 			
 			int nCount;
 			intp iElement = iHead;
@@ -2311,16 +2312,18 @@ void R_DrawDecalsAll_GatherDecals( IMatRenderContext *pRenderContext, int iGroup
 		nCheckCount = g_nBrushModelDecalSortCheckCount;
 	}
 
-	int nSortTreeCount = g_aDecalSortTrees.Count();
-	for ( int iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
+	intp nSortTreeCount = g_aDecalSortTrees.Count();
+	for ( intp iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
 	{		
 		DrawDecals.AddToTail( DECALMARKERS_SWITCHSORTTREE );
 
 		DecalSortTrees_t &sortTree = g_aDecalSortTrees[iSortTree];
-		int nBucketCount = sortTree.m_aDecalSortBuckets[iGroup][iTreeType].Count();
-		for ( int iBucket = 0; iBucket < nBucketCount; ++iBucket )
+		auto &buckets = sortTree.m_aDecalSortBuckets[iGroup][iTreeType];
+
+		intp nBucketCount = buckets.Count();
+		for ( intp iBucket = 0; iBucket < nBucketCount; ++iBucket )
 		{
-			DecalMaterialBucket_t &bucket = sortTree.m_aDecalSortBuckets[iGroup][iTreeType].Element( iBucket );
+			DecalMaterialBucket_t &bucket = buckets.Element( iBucket );
 			if ( bucket.m_nCheckCount != nCheckCount )
 				continue;
 
@@ -2350,9 +2353,9 @@ void R_DrawDecalsAll_GatherDecals( IMatRenderContext *pRenderContext, int iGroup
 					continue;
 
 				DrawDecals.AddToTail( pDecal );
-			}			
+			}
 		}
-	}	
+	}
 }
 
 void R_DecalsGetMaxMesh( IMatRenderContext *pRenderContext, int &nDecalSortMaxVerts, int &nDecalSortMaxIndices )
@@ -2497,7 +2500,7 @@ void R_DrawDecalsAll_Gathered( IMatRenderContext *pRenderContext, decal_t **ppDe
 			// Todo: we also could flush it right here and continue.
 			if ( meshList.m_aBatches.Count() + 1 > meshList.m_aBatches.NumAllocated() )
 			{
-				Warning( "R_DrawDecalsAll: overflowing m_aBatches. Reduce %d decals in the scene.\n", nDecalSortMaxVerts * meshList.m_aBatches.NumAllocated() );
+				Warning( "R_DrawDecalsAll: overflowing m_aBatches. Reduce %zd decals in the scene.\n", nDecalSortMaxVerts * meshList.m_aBatches.NumAllocated() );
 				meshBuilder.End();
 				R_DrawDecalMeshList( meshList );
 				return;
@@ -2616,8 +2619,8 @@ void R_DrawDecalsAll( IMatRenderContext *pRenderContext, int iGroup, int iTreeTy
 	decalcontext_t context(pRenderContext, vModelOrg);
 	Vector vecNormal( 0.0f, 0.0f, 1.0f ), vecTangentS( 1.0f, 0.0f, 0.0f ), vecTangentT( 0.0f, 1.0f, 0.0f );
 
-	int nVertCount = 0;
-	int nIndexCount = 0;
+	intp nVertCount = 0;
+	intp nIndexCount = 0;
 
 	int nDecalSortMaxVerts;
 	int nDecalSortMaxIndices;
@@ -2626,18 +2629,20 @@ void R_DrawDecalsAll( IMatRenderContext *pRenderContext, int iGroup, int iTreeTy
 	bool bWireframe = ShouldDrawInWireFrameMode() || (r_drawdecals.GetInt() == 2);
 	float localClientTime = cl.GetTime();
 
-	int nSortTreeCount = g_aDecalSortTrees.Count();
+	intp nSortTreeCount = g_aDecalSortTrees.Count();
 
-	for ( int iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
+	for ( intp iSortTree = 0; iSortTree < nSortTreeCount; ++iSortTree )
 	{		
 		// Reset the mesh list.
 		bool bMeshInit = true;
 
 		DecalSortTrees_t &sortTree = g_aDecalSortTrees[iSortTree];
-		int nBucketCount = sortTree.m_aDecalSortBuckets[iGroup][iTreeType].Count();
-		for ( int iBucket = 0; iBucket < nBucketCount; ++iBucket )
+		auto &buckets = sortTree.m_aDecalSortBuckets[iGroup][iTreeType];
+
+		intp nBucketCount = buckets.Count();
+		for ( intp iBucket = 0; iBucket < nBucketCount; ++iBucket )
 		{
-			DecalMaterialBucket_t &bucket = sortTree.m_aDecalSortBuckets[iGroup][iTreeType].Element( iBucket );
+			DecalMaterialBucket_t &bucket = buckets.Element( iBucket );
 			if ( bucket.m_nCheckCount != nCheckCount )
 				continue;
 			
@@ -2751,7 +2756,7 @@ void R_DrawDecalsAll( IMatRenderContext *pRenderContext, int iGroup, int iTreeTy
 					// Todo: we also could flush it right here and continue.
 					if ( meshList.m_aBatches.Count() + 1 > meshList.m_aBatches.NumAllocated() )
 					{
-						Warning( "R_DrawDecalsAll: overflowing m_aBatches. Reduce %d decals in the scene.\n", nDecalSortMaxVerts * meshList.m_aBatches.NumAllocated() );
+						Warning( "R_DrawDecalsAll: overflowing m_aBatches. Reduce %zd decals in the scene.\n", nDecalSortMaxVerts * meshList.m_aBatches.NumAllocated() );
 						meshBuilder.End();
 						R_DrawDecalMeshList( meshList );
 						return;
@@ -2923,7 +2928,7 @@ void DecalSurfaceDraw( IMatRenderContext *pRenderContext, int renderGroup, float
 		bool bBatched = r_drawbatchdecals.GetBool();
 		static CUtlVector<decal_t *> DrawDecals;
 
-		int iPermanentLightmap, iLightmap, iNonLightmap;
+		intp iPermanentLightmap, iLightmap, iNonLightmap;
 		if( bBatched )
 		{
 			R_DrawDecalsAll_GatherDecals( pRenderContext, renderGroup, PERMANENT_LIGHTMAP, DrawDecals );
@@ -2945,7 +2950,7 @@ void DecalSurfaceDraw( IMatRenderContext *pRenderContext, int renderGroup, float
 
 		if( DrawDecals.Count() )
 		{
-			size_t memSize = DrawDecals.Count() * sizeof( decal_t * );
+			intp memSize = DrawDecals.Count() * static_cast<intp>(sizeof( decal_t * ));
 			CMatRenderData< byte > rd(pRenderContext, memSize);
 			memcpy( rd.Base(), DrawDecals.Base(), DrawDecals.Count() * sizeof( decal_t * ) );
 			pCallQueue->QueueCall( DecalSurfaceDraw_QueueHelper, bBatched, renderGroup, modelorg, nCheckCount, (decal_t **)rd.Base(), iPermanentLightmap, iLightmap, iNonLightmap, flFade  );

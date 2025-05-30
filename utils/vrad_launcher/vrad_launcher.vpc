@@ -16,17 +16,13 @@ $Configuration
 	{
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
 		$PrecompiledHeaderFile				"$(IntDir)/vrad_launcher.pch"
+		// dimhotepus: Enable exceptions as we use them in a single place
+		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 
 	$Linker [$WIN32]
 	{
 		$EnableLargeAddresses				"Support Addresses Larger Than 2 Gigabytes (/LARGEADDRESSAWARE)"
-	}
-
-	$ManifestTool
-	{
-		// Input And Output
-		$AdditionalManifestFiles			"$BASE;$SRCDIR\build\win\manifests\dpi-aware.manifest;$SRCDIR\build\win\manifests\ultra-high-scroll-resolution.manifest;$SRCDIR\build\win\manifests\utf-8-code-page.manifest;$SRCDIR\out\manifests\enable-visual-styles.manifest" [!$SOURCESDK]
 	}
 }
 
