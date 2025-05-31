@@ -79,10 +79,11 @@ CFrameSnapshot*	CFrameSnapshotManager::NextSnapshot( const CFrameSnapshot *pSnap
 	return m_FrameSnapshots[ next ];
 }
 
-CFrameSnapshot*	CFrameSnapshotManager::CreateEmptySnapshot( int tickcount, int maxEntities )
+CFrameSnapshot*	CFrameSnapshotManager::CreateEmptySnapshot( int tickcount, int maxEntities, uint32 nSnapshotSet )
 {
 	CFrameSnapshot *snap = new CFrameSnapshot;
 	snap->AddReference();
+	snap->m_nSnapshotSet = nSnapshotSet;
 	snap->m_nTickCount = tickcount;
 	snap->m_nNumEntities = maxEntities;
 	snap->m_nValidEntities = 0;
@@ -112,11 +113,11 @@ CFrameSnapshot*	CFrameSnapshotManager::CreateEmptySnapshot( int tickcount, int m
 // Purpose: 
 // Input  : framenumber - 
 //-----------------------------------------------------------------------------
-CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount )
+CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount, uint32 nSnapshotSet )
 {
 	unsigned short nValidEntities[MAX_EDICTS];
 
-	CFrameSnapshot *snap = CreateEmptySnapshot( tickcount, sv.num_edicts );
+	CFrameSnapshot *snap = CreateEmptySnapshot( tickcount, sv.num_edicts, nSnapshotSet );
 	
 	int maxclients = sv.GetClientCount();
 
@@ -430,7 +431,47 @@ UnpackedDataCache_t *CFrameSnapshotManager::GetCachedUncompressedEntity( PackedE
 	return pdcOldest;
 }
 
+void CFrameSnapshotManager::BuildSnapshotList( CFrameSnapshot *pCurrentSnapshot, CFrameSnapshot *pLastSnapshot, uint32 nSnapshotSet, CReferencedSnapshotList &list )
+{
+	// Keep list building thread-safe
+	m_FrameSnapshotsWriteMutex.Lock();
 
+	int nInsanity = 0;
+	CFrameSnapshot *pSnapshot;
+	if ( pLastSnapshot )
+	{
+		pSnapshot = NextSnapshot( pLastSnapshot );
+	} 
+	else
+	{
+		pSnapshot = pCurrentSnapshot;
+	}
+
+	while ( pSnapshot )
+	{
+		//only add snapshots that match the desired set to the list
+		if( pSnapshot->m_nSnapshotSet == nSnapshotSet )
+		{
+			pSnapshot->AddReference();
+			list.m_vecSnapshots.AddToTail( pSnapshot );
+		}
+
+		++nInsanity;
+		if ( nInsanity > 100000 )
+		{
+			m_FrameSnapshotsWriteMutex.Unlock();
+			Error( "CFrameSnapshotManager::BuildSnapshotList:  infinite loop building list!!!" );
+		}
+
+		if ( pSnapshot == pCurrentSnapshot )
+			break; 
+
+		// got to next snapshot
+		pSnapshot = NextSnapshot( pSnapshot );
+	}
+
+	m_FrameSnapshotsWriteMutex.Unlock();
+}
 
 
 // ------------------------------------------------------------------------------------------------ //
