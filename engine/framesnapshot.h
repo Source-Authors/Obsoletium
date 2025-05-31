@@ -106,9 +106,28 @@ public:
 	CUtlVector<int>			m_iExplicitDeleteSlots;
 
 private:
+	friend class CFrameSnapshotManager;
+
+	//the set that this snapshot belongs to
+	uint32					m_nSnapshotSet;
 
 	// Snapshots auto-delete themselves when their refcount goes to zero.
 	CInterlockedInt			m_nReferences;
+};
+
+class CReferencedSnapshotList
+{
+public:
+	~CReferencedSnapshotList()
+	{
+		for ( int i = 0; i < m_vecSnapshots.Count(); ++i )
+		{
+			m_vecSnapshots[ i ]->ReleaseReference();
+		}
+		m_vecSnapshots.RemoveAll();
+	}
+
+	CUtlVector< CFrameSnapshot * > m_vecSnapshots;
 };
 
 //-----------------------------------------------------------------------------
@@ -125,14 +144,16 @@ public:
 
 	// IFrameSnapshot implementation.
 public:
+	//the default identifier to use for snapshots that are created
+	static const uint32 knDefaultSnapshotSet = 0;
 
 	// Called when a level change happens
 	virtual void			LevelChanged();
 
 	// Called once per frame after simulation to store off all entities.
 	// Note: the returned snapshot has a recount of 1 so you MUST call ReleaseReference on it.
-	CFrameSnapshot*	CreateEmptySnapshot( int ticknumber, int maxEntities );
-	CFrameSnapshot*	TakeTickSnapshot( int ticknumber );
+	CFrameSnapshot*	CreateEmptySnapshot( int ticknumber, int maxEntities, uint32 nSnapshotSet = knDefaultSnapshotSet );
+	CFrameSnapshot*	TakeTickSnapshot( int ticknumber, uint32 nSnapshotSet = knDefaultSnapshotSet );
 
 	CFrameSnapshot*	NextSnapshot( const CFrameSnapshot *pSnapshot );
 
@@ -163,9 +184,12 @@ public:
 	// List of entities to explicitly delete
 	void			AddExplicitDelete( int iSlot );
 
+	void			BuildSnapshotList( CFrameSnapshot *pCurrentSnapshot, CFrameSnapshot *pLastSnapshot, uint32 nSnapshotSet, CReferencedSnapshotList &list );
+
 private:
 	void	DeleteFrameSnapshot( CFrameSnapshot* pSnapshot );
 
+	CThreadFastMutex									m_FrameSnapshotsWriteMutex;
 	CUtlLinkedList<CFrameSnapshot*, int>		m_FrameSnapshots;
 	CClassMemoryPool< PackedEntity >			m_PackedEntitiesPool;
 

@@ -2231,145 +2231,130 @@ void CBaseServer::BroadcastMessage( INetMessage &msg, IRecipientFilter &filter )
 //-----------------------------------------------------------------------------
 static ConVar sv_debugtempentities( "sv_debugtempentities", "0", 0, "Show temp entity bandwidth usage." );
 
-static bool CEventInfo_LessFunc( CEventInfo * const &lhs, CEventInfo * const &rhs )
-{
-	return lhs->classID < rhs->classID;
-}
+// 8 KB should be far more than is needed -- in fact less than 100 bytes seems to be sufficient
+const int kTempEntityBufferSize = 8192;
 
 void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurrentSnapshot, CFrameSnapshot *pLastSnapshot, bf_write &buf, int ev_max )
 {
 	VPROF_BUDGET( "CBaseServer::WriteTempEntities", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 
-	ALIGN4 char data[NET_MAX_PAYLOAD] ALIGN4_POST;
+	ALIGN4 char data[kTempEntityBufferSize] ALIGN4_POST;
 	SVC_TempEntities msg;
 	msg.m_DataOut.StartWriting( data, sizeof(data) );
 	bf_write &buffer = msg.m_DataOut; // shortcut
-	
-	CFrameSnapshot *pSnapshot;
-	CEventInfo *pLastEvent = NULL;
 
 	bool bDebug = sv_debugtempentities.GetBool();
 
-	// limit max entities to field bit length
-	ev_max = min( ev_max, ((1<<CEventInfo::EVENT_INDEX_BITS)-1) );
+	// Container which calls ReleaseReference on all snapshots in list on exit of function scope
+	CReferencedSnapshotList snapshotlist;
+	// Builds list and calls AddReference on each item in list (uses a mutex to be thread safe)
+	framesnapshotmanager->BuildSnapshotList( pCurrentSnapshot, pLastSnapshot, CFrameSnapshotManager::knDefaultSnapshotSet, snapshotlist );
 
-	if ( pLastSnapshot )
-	{
-		pSnapshot = pLastSnapshot->NextSnapshot();
-	} 
-	else
-	{
-		pSnapshot = pCurrentSnapshot;
-	}
-
-	CUtlRBTree< CEventInfo * >	sorted( 0, ev_max, CEventInfo_LessFunc );
+	//keep count of the number of entities that we write out (since some can be omitted by the client)
+	int32 nNumEntitiesWritten = 0;
+	CEventInfo *pLastEvent = NULL;
 
 	// Build list of events sorted by send table classID (makes the delta work better in cases with a lot of the same message type )
-	while ( pSnapshot && ((int)sorted.Count() < ev_max) )
+	for ( int nSnapShotIndex = 0; 
+		 nSnapShotIndex < snapshotlist.m_vecSnapshots.Count(); 
+		 ++nSnapShotIndex )
 	{
+		CFrameSnapshot *pSnapshot = snapshotlist.m_vecSnapshots[ nSnapShotIndex ];
+
 		for( int i = 0; i < pSnapshot->m_nTempEntities; ++i )
 		{
 			CEventInfo *event = pSnapshot->m_pTempEntities[ i ];
 
 			if ( client->IgnoreTempEntity( event ) )
 				continue; // event is not seen by this player
-			
-			sorted.Insert( event );
-			// More space still
-			if ( (int)sorted.Count() >= ev_max )
-				break;	
-		}
 
-		// stop, we reached our current snapshot
-		if ( pSnapshot == pCurrentSnapshot )
-			break; 
+			//we are writing this entity so update our count so the receiver knows how many to parse
+			nNumEntitiesWritten++;
 
-		// got to next snapshot
-		pSnapshot = framesnapshotmanager->NextSnapshot( pSnapshot );
-	}
-
-	if ( sorted.Count() <= 0 )
-		return;
-
-	for ( auto i = sorted.FirstInorder(); 
-		i != sorted.InvalidIndex(); 
-		i = sorted.NextInorder( i ) )
-	{
-		CEventInfo *event = sorted[ i ];
-
-		if ( event->fire_delay == 0.0f )
-		{
-			buffer.WriteOneBit( 0 );
-		} 
-		else
-		{
-			buffer.WriteOneBit( 1 );
-			buffer.WriteSBitLong( event->fire_delay*100.0f, 8 );
-		}
-
-		if ( pLastEvent && 
-			pLastEvent->classID == event->classID )
-		{
-			buffer.WriteOneBit( 0 ); // delta against last temp entity
-
-			int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
-
-			SendTable_WriteAllDeltaProps( event->pSendTable, 
-				pLastEvent->pData,
-				pLastEvent->bits,
-				event->pData,
-				event->bits,
-				-1,
-				&buffer );
-
-			if ( bDebug )
+			if ( event->fire_delay == 0.0f )
 			{
-				int length = buffer.GetNumBitsWritten() - startBit;
-				DevMsg("TE %s delta bits: %i\n", event->pSendTable->GetName(), length );
+				buffer.WriteOneBit( 0 );
+			} 
+			else
+			{
+				buffer.WriteOneBit( 1 );
+				buffer.WriteSBitLong( event->fire_delay*100.0f, 8 );
 			}
-		}
-		else
-		{
-			 // full update, just compressed against zeros in MP
 
-			buffer.WriteOneBit( 1 );
-
-			int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
-
-			buffer.WriteUBitLong( event->classID, GetClassBits() );
-
-			if ( IsMultiplayer() )
+			if ( pLastEvent && 
+				pLastEvent->classID == event->classID )
 			{
+				buffer.WriteOneBit( 0 ); // delta against last temp entity
+
+				int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
+
 				SendTable_WriteAllDeltaProps( event->pSendTable, 
-					NULL,	// will write only non-zero elements
-					0,
+					pLastEvent->pData,
+					pLastEvent->bits,
 					event->pData,
 					event->bits,
 					-1,
 					&buffer );
+
+				if ( bDebug )
+				{
+					int length = buffer.GetNumBitsWritten() - startBit;
+					DevMsg("TE %s delta bits: %i\n", event->pSendTable->GetName(), length );
+				}
 			}
 			else
 			{
-				// write event with zero properties
-				buffer.WriteBits( event->pData, event->bits );
+				 // full update, just compressed against zeros in MP
+
+				buffer.WriteOneBit( 1 );
+
+				int startBit = bDebug ? buffer.GetNumBitsWritten() : 0;
+
+				buffer.WriteUBitLong( event->classID, GetClassBits() );
+
+				if ( IsMultiplayer() )
+				{
+					SendTable_WriteAllDeltaProps( event->pSendTable, 
+						NULL,	// will write only non-zero elements
+						0,
+						event->pData,
+						event->bits,
+						-1,
+						&buffer );
+				}
+				else
+				{
+					// write event with zero properties
+					buffer.WriteBits( event->pData, event->bits );
+				}
+
+				if ( bDebug )
+				{
+					int length = buffer.GetNumBitsWritten() - startBit;
+					DevMsg("TE %s full bits: %i\n", event->pSendTable->GetName(), length );
+				}
 			}
 
-			if ( bDebug )
+			if ( IsMultiplayer() )
 			{
-				int length = buffer.GetNumBitsWritten() - startBit;
-				DevMsg("TE %s full bits: %i\n", event->pSendTable->GetName(), length );
+				// in single player, don't used delta compression, lastEvent remains NULL
+				pLastEvent = event;
 			}
-		}
-
-		if ( IsMultiplayer() )
-		{
-			// in single player, don't used delta compression, lastEvent remains NULL
-			pLastEvent = event;
 		}
 	}
 
+	//don't do any more work if we didn't write anything out
+	if( nNumEntitiesWritten <= 0 )
+		return;
+
+	if ( buffer.IsOverflowed() )
+	{
+		Warning( "WriteTempOverflow! Discarding all ents!\n" );
+		return;
+	}
+
 	// set num entries
-	msg.m_nNumEntries = sorted.Count();
+	msg.m_nNumEntries = nNumEntitiesWritten;
 	msg.WriteToBuffer( buf );
 }
 
