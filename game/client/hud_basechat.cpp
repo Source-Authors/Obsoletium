@@ -22,7 +22,6 @@
 #include "c_playerresource.h"
 #include "ihudlcd.h"
 #include "vgui/IInput.h"
-#include "vgui/ILocalize.h"
 #include "multiplay_gamerules.h"
 #include "voice_status.h"
 
@@ -783,7 +782,8 @@ void CBaseHudChat::MsgFunc_SayText( bf_read &msg )
 	CLocalPlayerFilter filter;
 	C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
 
-	Msg( "%s", szString );
+	// dimhotepus: Color console echo.
+	// Msg( "%s", szString );
 }
 
 int CBaseHudChat::GetFilterForString( const char *pString )
@@ -836,7 +836,8 @@ void CBaseHudChat::MsgFunc_SayText2( bf_read &msg )
 		// print raw chat text
 		ChatPrintf( client, iFilter, "%s", ansiString );
 
-		Msg( "%s\n", RemoveColorMarkup(ansiString) );
+		// dimhotepus: Color console echo.
+		// Msg( "%s\n", RemoveColorMarkup(ansiString) );
 
 		CLocalPlayerFilter filter;
 		C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
@@ -923,7 +924,8 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 			Q_strncat( szString, "\n", sizeof(szString), 1 );
 		}
 		Printf( CHAT_FILTER_NONE, "%s", ConvertCRtoNL( szString ) );
-		Msg( "%s", ConvertCRtoNL( szString ) );
+		// dimhotepus: Color console echo.
+		// Msg( "%s", ConvertCRtoNL( szString ) );
 		break;
 
 	case HUD_PRINTCONSOLE:
@@ -1523,6 +1525,9 @@ void CBaseHudChatLine::Colorize( int alpha )
 			InsertColorChange( color );
 			InsertString( wText );
 
+			// dimhotepus: Color console echo.
+			ConColorMsg( color, "%ls", wText );
+
 			if ( pChat && pChat->GetChatHistory() )
 			{	
 				pChat->GetChatHistory()->InsertColorChange( color );
@@ -1537,6 +1542,9 @@ void CBaseHudChatLine::Colorize( int alpha )
 
 		}
 	}
+
+	// dimhotepus: Color console echo.
+	Msg( "\n" );
 
 	InvalidateLayout( true );
 }
