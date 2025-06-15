@@ -385,7 +385,8 @@ HScheme  CSchemeManager::LoadSchemeFromFileEx( VPANEL sizingPanel, const char *f
 		return 0;
 	}
 	
-	ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
+	// dimhotepus: Do not do costly O(n) lookup every time.
+	static ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
 	if ( cl_hud_minmode.IsValid() && cl_hud_minmode.GetBool() )
 	{
 		data->ProcessResolutionKeys( "_minmode" );

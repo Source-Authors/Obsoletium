@@ -949,18 +949,12 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 
 		if ( bSuccess )
 		{
-			if ( IsX360() )
-			{
-				rDat->ProcessResolutionKeys( surface()->GetResolutionKey() );
-			}
-			if ( IsPC() )
-			{
-				ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
+			// dimhotepus: Do not do costly O(n) lookup every time.
+			static ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
 				if ( cl_hud_minmode.IsValid() && cl_hud_minmode.GetBool() )
 				{
 					rDat->ProcessResolutionKeys( "_minmode" );
 				}
-			}
 			bDeleteKeys = true;
 			bShouldCacheKeys = true;
 		}
