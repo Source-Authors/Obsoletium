@@ -69,7 +69,7 @@ public:
 	CIVPMaterialManager( void );
 	void Init( CPhysicsSurfaceProps *pProps ) { m_props = pProps; }
 	void SetPropMap( intp *map, int mapSize );
-	int RemapIVPMaterialIndex( int ivpMaterialIndex ) const;
+	intp RemapIVPMaterialIndex( intp ivpMaterialIndex ) const;
 
 	// IVP_Material_Manager
 	virtual IVP_Material *get_material_by_index(IVP_Real_Object *pObject, const IVP_U_Point *world_position, int index);
@@ -129,19 +129,19 @@ public:
 	const char *GetString( unsigned short stringTableIndex ) const override;
 	const char *GetPropName( intp surfaceDataIndex ) const override;
 	void SetWorldMaterialIndexTable( intp *pMapArray, int mapSize ) override;
-	int RemapIVPMaterialIndex( int ivpMaterialIndex ) const override
+	intp RemapIVPMaterialIndex( intp ivpMaterialIndex ) const override
 	{
 		return m_ivpManager.RemapIVPMaterialIndex( ivpMaterialIndex );
 	}
-	bool IsReservedMaterialIndex( int materialIndex ) const;
+	bool IsReservedMaterialIndex( intp materialIndex ) const;
 	virtual const char *GetReservedMaterialName( int materialIndex ) const;
-	intp GetReservedFallBack( int materialIndex ) const;
+	intp GetReservedFallBack( intp materialIndex ) const;
 
 	intp GetReservedSurfaceIndex( const char *pPropertyName ) const;
 
 	// The database is derived from the IVP material class
-	const IVP_Material *GetIVPMaterial( int materialIndex ) const;
-	IVP_Material *GetIVPMaterial( int materialIndex ) override;
+	const IVP_Material *GetIVPMaterial( intp materialIndex ) const;
+	IVP_Material *GetIVPMaterial( intp materialIndex ) override;
 	intp GetIVPMaterialIndex( const IVP_Material *pIVP ) const override;
 	IVP_Material_Manager *GetIVPManager( void ) override { return &m_ivpManager; }
 
@@ -330,7 +330,7 @@ const char *CPhysicsSurfaceProps::GetString( unsigned short stringTableIndex ) c
 }
 
 
-bool CPhysicsSurfaceProps::IsReservedMaterialIndex( int materialIndex ) const
+bool CPhysicsSurfaceProps::IsReservedMaterialIndex( intp materialIndex ) const
 {
 	return (materialIndex > 127) ? true : false;
 }
@@ -356,18 +356,18 @@ intp CPhysicsSurfaceProps::GetReservedSurfaceIndex( const char *pPropertyName ) 
 	return -1;
 }
 
-const IVP_Material *CPhysicsSurfaceProps::GetIVPMaterial( int materialIndex ) const
+const IVP_Material *CPhysicsSurfaceProps::GetIVPMaterial( intp materialIndex ) const
 {
 	return GetInternalSurface(materialIndex);
 }
 
-IVP_Material *CPhysicsSurfaceProps::GetIVPMaterial( int materialIndex )
+IVP_Material *CPhysicsSurfaceProps::GetIVPMaterial( intp materialIndex )
 {
 	return GetInternalSurface(materialIndex);
 }
 
 
-intp CPhysicsSurfaceProps::GetReservedFallBack( int materialIndex ) const
+intp CPhysicsSurfaceProps::GetReservedFallBack( intp materialIndex ) const
 {
 	switch( materialIndex )
 	{
@@ -599,7 +599,7 @@ CIVPMaterialManager::CIVPMaterialManager( void ) : IVP_Material_Manager( IVP_FAL
 	}
 }
 
-int CIVPMaterialManager::RemapIVPMaterialIndex( int ivpMaterialIndex ) const
+intp CIVPMaterialManager::RemapIVPMaterialIndex( intp ivpMaterialIndex ) const
 {
 	if ( ivpMaterialIndex > 127 )
 		return ivpMaterialIndex;

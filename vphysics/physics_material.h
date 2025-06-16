@@ -16,11 +16,11 @@ class IVP_Material_Manager;
 class IPhysicsSurfacePropsInternal : public IPhysicsSurfaceProps
 {
 public:
-	[[nodiscard]] virtual IVP_Material *GetIVPMaterial( int materialIndex ) = 0;
+	[[nodiscard]] virtual IVP_Material *GetIVPMaterial( intp materialIndex ) = 0;
 
 	[[nodiscard]] virtual intp GetIVPMaterialIndex( const IVP_Material *pIVP ) const = 0;
 	[[nodiscard]] virtual IVP_Material_Manager *GetIVPManager( void ) = 0;
-	[[nodiscard]] virtual int RemapIVPMaterialIndex( int ivpMaterialIndex ) const = 0;
+	[[nodiscard]] virtual intp RemapIVPMaterialIndex( intp ivpMaterialIndex ) const = 0;
 };
 
 extern IPhysicsSurfacePropsInternal	*physprops;
