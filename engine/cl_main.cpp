@@ -2196,7 +2196,8 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 
 	// If TF2 and PC we don't want to load the background map.
 	bool bIsTF2 = false;
-	if ( ( Q_stricmp( COM_GetModDirectory(), "tf" ) == 0 ) || ( Q_stricmp( COM_GetModDirectory(), "tf_beta" ) == 0 ) )
+	if ( ( Q_stricmp( COM_GetModDirectory(), "tf" ) == 0 ) ||
+		 ( Q_stricmp( COM_GetModDirectory(), "tf_beta" ) == 0 ) )
 	{
 		bIsTF2 = true;
 	}
@@ -2206,15 +2207,6 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 
 	if ( args.ArgC() == 2 )
 	{
-		// presence of args identifies an end-of-game situation
-		if ( IsX360() )
-		{
-			// 360 needs to get UI in the correct state to transition to the Background level
-			// from the credits.
-			EngineVGui()->OnCreditsFinished();
-			return true;
-		}
-
 		if ( !Q_stricmp( args[1], "force" ) )
 		{
 			// Adrian: Have to do this so the menu shows up if we ever call this while in a level.
@@ -2263,12 +2255,6 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 		CommandLine()->CheckParm("+load") ||
 		CommandLine()->CheckParm("-makereslists"))
 		return false;
-
-#ifdef _X360
-	// check if we are accepting an invite
-	if ( XboxLaunch()->GetLaunchFlags() & LF_INVITERESTART )
-		return false;
-#endif
 
 	// nothing else is going on, so load the startup level
 
