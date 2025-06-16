@@ -211,6 +211,8 @@ private:
 	void					MuzzleFlash_357_Player( ClientEntityHandle_t hEntity, int attachmentIndex );
 
 	// RPG
+	// dimhotepus: Add muzzle flash support for Player RPG.
+	void					MuzzleFlash_RPG_Player( ClientEntityHandle_t hEntity, int attachmentIndex );
 	void					MuzzleFlash_RPG_NPC( ClientEntityHandle_t hEntity, int attachmentIndex );
 };
 

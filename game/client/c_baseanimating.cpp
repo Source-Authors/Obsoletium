@@ -3748,7 +3748,7 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 {
 	const char	*p = options;
 	char		token[128];
-	int			weaponType = 0;
+	int			weaponType = MUZZLEFLASH_AR2;
 
 	// Get the first parameter
 	p = nexttoken( token, p, ' ' );
@@ -4373,9 +4373,10 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 			if ( iAttachment != -1 && m_Attachments.Count() > iAttachment )
 			{
 				GetAttachment( iAttachment+1, attachOrigin, attachAngles );
-				int entId = render->GetViewEntity();
-				ClientEntityHandle_t hEntity = ClientEntityList().EntIndexToHandle( entId );
-				tempents->MuzzleFlash( attachOrigin, attachAngles, atoi( options ), hEntity, bFirstPerson );
+				// int entId = render->GetViewEntity();
+				// ClientEntityHandle_t hEntity = ClientEntityList().EntIndexToHandle( entId );
+				// dimhotepus: Use current entity for muzzle attachment, not view one.
+				tempents->MuzzleFlash( attachOrigin, attachAngles, atoi( options ), GetRefEHandle(), /*hEntity,*/ bFirstPerson );
 			}
 		}
 		break;

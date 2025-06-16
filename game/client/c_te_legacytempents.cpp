@@ -1780,7 +1780,8 @@ void CTempEnts::MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachm
 	case MUZZLEFLASH_RPG:
 		if ( firstPerson )
 		{
-			// MuzzleFlash_RPG_Player( hEntity, attachmentIndex );
+			// dimhotepus: Add muzzle flash for RPG. 
+			MuzzleFlash_RPG_Player( hEntity, attachmentIndex );
 		}
 		else
 		{
@@ -1854,6 +1855,8 @@ void CTempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int type,
 		}
 		break;
 
+	// dimhotepus: AR2 and combine are same weapon.
+    case MUZZLEFLASH_AR2:
 	case MUZZLEFLASH_COMBINE:
 		if ( firstPerson )
 		{
@@ -1864,6 +1867,18 @@ void CTempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int type,
 		{
 			//FIXME: These should go away
 			MuzzleFlash_Combine_NPC( hEntity, 1 );
+		}
+		break;
+	
+	// dimhotepus: Add muzzle flash support for RPG (Player and NPC).
+	case MUZZLEFLASH_RPG:
+		if ( firstPerson )
+		{
+			MuzzleFlash_RPG_Player( hEntity, 1 );
+		}
+		else
+		{
+			MuzzleFlash_RPG_NPC( hEntity, 1 );
 		}
 		break;
 	
@@ -3222,8 +3237,69 @@ void CTempEnts::MuzzleFlash_Pistol_NPC( ClientEntityHandle_t hEntity, int attach
 	FX_MuzzleEffectAttached( 0.5f, hEntity, attachmentIndex, NULL, true );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+// dimhotepus: Derived from MuzzleFlash_RPG_NPC.
+void CTempEnts::MuzzleFlash_RPG_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
+{
+	VPROF_BUDGET( "MuzzleFlash_RPG_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
+	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash_RPG_Player", hEntity, attachmentIndex, FLE_VIEWMODEL );
+	pSimple->SetDrawBeforeViewModel( true );
 
+	CacheMuzzleFlashes();
 
+	constexpr float scale = 1.5f;
+
+	// Lock our bounding box
+	pSimple->GetBinding().SetBBox( -( Vector( 16, 16, 16 ) * scale ), ( Vector( 16, 16, 16 ) * scale ) );
+	
+	SimpleParticle *pParticle;
+	Vector			forward(1,0,0), offset;
+
+	float flScale = random->RandomFloat( scale-0.25f, scale+0.25f );
+
+	if ( flScale < 0.5f )
+	{
+		flScale = 0.5f;
+	}
+	else if ( flScale > 8.0f )
+	{
+		flScale = 8.0f;
+	}
+
+	//
+	// Flash
+	//
+
+	int i;
+	for ( i = 1; i < 9; i++ )
+	{
+		offset = (forward * (i*2.0f*scale));
+
+		pParticle = (SimpleParticle *) pSimple->AddParticle( sizeof( SimpleParticle ), g_Mat_SMG_Muzzleflash[random->RandomInt(0,3)], offset );
+			
+		if ( pParticle == NULL )
+			return;
+
+		pParticle->m_flLifetime		= 0.0f;
+		pParticle->m_flDieTime		= 0.1f;
+
+		pParticle->m_vecVelocity.Init();
+
+		pParticle->m_uchColor[0]	= 255;
+		pParticle->m_uchColor[1]	= 255;
+		pParticle->m_uchColor[2]	= 255;
+
+		pParticle->m_uchStartAlpha	= 255;
+		pParticle->m_uchEndAlpha	= 128;
+
+		pParticle->m_uchStartSize	= (random->RandomFloat( 6.0f, 9.0f ) * (12-(i))/9) * flScale;
+		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
+		pParticle->m_flRollDelta	= 0.0f;
+	}
+}
 
 //==================================================
 // Purpose: 

@@ -141,6 +141,13 @@ void C_BaseViewModel::FireEvent( const Vector& origin, const QAngle& angles, int
 		bool bResult = pWeapon->OnFireEvent( this, origin, angles, event, options );
 		if ( !bResult )
 		{
+			// dimhotepus: Added special method Ex to allow patch options by weapon class. 
+			bResult = pWeapon->OnFireEventEx( this, origin, angles, event, options );
+		}
+
+		// dimhotepus: Call FireEvent only if OnFireEvent & OnFireEventEx allowed to.
+		if (!bResult)
+		{
 			BaseClass::FireEvent( origin, angles, event, options );
 		}
 	}
