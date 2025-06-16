@@ -1840,7 +1840,8 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 	if ( !boneSetup.GetStudioHdr() )
 		return;
 
-	if ( prediction->InPrediction() )
+	// dimhotepus: Allow death pose animations to run when entity is ragdolled.
+	if ( prediction->InPrediction() || IsAboutToRagdoll() )
 	{
 		m_nPrevNewSequenceParity = m_nNewSequenceParity;
 		return;
