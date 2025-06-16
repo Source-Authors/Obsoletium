@@ -21,7 +21,7 @@
 #define FRAG_GRENADE_GRACE_TIME_AFTER_PICKUP 1.5f
 #define FRAG_GRENADE_WARN_TIME 1.5f
 
-const float GRENADE_COEFFICIENT_OF_RESTITUTION = 0.2f;
+constexpr inline float GRENADE_COEFFICIENT_OF_RESTITUTION = 0.2f;
 
 ConVar sk_plr_dmg_fraggrenade	( "sk_plr_dmg_fraggrenade","0");
 ConVar sk_npc_dmg_fraggrenade	( "sk_npc_dmg_fraggrenade","0");

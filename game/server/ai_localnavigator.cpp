@@ -265,7 +265,7 @@ bool CAI_LocalNavigator::MoveCalcSteer( AILocalMoveGoal_t *pMoveGoal, float dist
 		{
 			float dot = moveSolution.AsVector2D().Dot( pMoveGoal->dir.AsVector2D() );
 
-			const float COS_HALF_30 = 0.966;
+			constexpr float COS_HALF_30 = 0.966;
 			if ( dot > COS_HALF_30 )
 			{
 				float probeDist = m_pPlaneSolver->CalcProbeDist( pMoveGoal->speed );

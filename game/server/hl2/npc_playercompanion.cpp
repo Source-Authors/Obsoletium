@@ -1746,8 +1746,8 @@ void CNPC_PlayerCompanion::UpdateReadiness()
 		// Draw the readiness-o-meter
 		Vector vecSpot;
 		Vector vecOffset( 0, 0, 12 );
-		const float BARLENGTH = 12.0f;
-		const float GRADLENGTH	= 4.0f;
+		constexpr float BARLENGTH = 12.0f;
+		constexpr float GRADLENGTH	= 4.0f;
 
 		Vector right;
 		UTIL_PlayerByIndex( 1 )->GetVectors( NULL, &right, NULL );
@@ -2389,7 +2389,7 @@ void CNPC_PlayerCompanion::PickupWeapon( CBaseCombatWeapon *pWeapon )
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 
-const int MAX_NON_SPECIAL_MULTICOVER = 2;
+constexpr inline int MAX_NON_SPECIAL_MULTICOVER = 2;
 
 CUtlVector<AI_EnemyInfo_t *>	g_MultiCoverSearchEnemies;
 CNPC_PlayerCompanion *			g_pMultiCoverSearcher;

@@ -470,7 +470,7 @@ void CBounceBomb::BounceThink()
 	
 	if ( pPhysicsObject != NULL )
 	{
-		const float MINE_MAX_JUMP_HEIGHT = 200;
+		constexpr float MINE_MAX_JUMP_HEIGHT = 200;
 
 		// Figure out how much headroom the mine has, and hop to within a few inches of that.
 		trace_t tr;
@@ -532,7 +532,7 @@ void CBounceBomb::CavernBounceThink()
 
 	if ( pPhysicsObject != NULL )
 	{
-		const float MINE_MAX_JUMP_HEIGHT = 78;
+		constexpr float MINE_MAX_JUMP_HEIGHT = 78;
 
 		// Figure out how much headroom the mine has, and hop to within a few inches of that.
 		trace_t tr;

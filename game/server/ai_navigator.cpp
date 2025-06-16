@@ -1956,8 +1956,8 @@ bool CAI_Navigator::OnFailedSteer( AILocalMoveGoal_t *pMoveGoal, float distClear
 
 	// If fail steer more than once after a second with no measurable progres, fail completely
 	// This usually means a sucessful triangulation was not actually a valid avoidance.
-	const float MOVE_TOLERANCE = 12.0;
-	const float TIME_TOLERANCE = 1.0;
+	constexpr float MOVE_TOLERANCE = 12.0;
+	constexpr float TIME_TOLERANCE = 1.0;
 
 	if ( m_vPosBeginFailedSteer == vec3_invalid || ( m_vPosBeginFailedSteer - GetAbsOrigin() ).LengthSqr() > Square(MOVE_TOLERANCE) )
 	{
@@ -2188,7 +2188,7 @@ bool CAI_Navigator::OnMoveBlocked( AIMoveResult_t *pResult )
 
 	SetActivity( GetOuter()->GetStoppedActivity() );
 
-	const float EPS = 0.1;
+	constexpr float EPS = 0.1;
 	
 	flWaypointDist = ComputePathDistance( GetNavType(), GetLocalOrigin(), GetPath()->ActualGoalPosition() );
 
@@ -2730,7 +2730,7 @@ ConVar ai_disable_path_simplification( "ai_disable_path_simplification","0" );
 #define IsSimplifyPathDisabled() false
 #endif
 
-const float MIN_ANGLE_COS_SIMPLIFY = 0.766; // 40 deg left or right
+constexpr inline float MIN_ANGLE_COS_SIMPLIFY = 0.766; // 40 deg left or right
 
 bool CAI_Navigator::ShouldAttemptSimplifyTo( const Vector &pos )
 {
@@ -3580,7 +3580,7 @@ bool CAI_Navigator::DoFindPathToPos(void)
 		  ShouldOptimizeInitialPathSegment( pFirstWaypoint ) )
 	{
 		// If we're seemingly beyond the waypoint, and our hull is over the line, move on
-		const float EPS = 0.1;
+		constexpr float EPS = 0.1;
 		Vector vClosest;
 		CalcClosestPointOnLineSegment( origin, 
 									   pFirstWaypoint->GetPos(), pFirstWaypoint->GetNext()->GetPos(), 

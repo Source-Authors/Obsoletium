@@ -3546,7 +3546,7 @@ bool CBaseCombatCharacter::HasEverBeenInjured( int team /*= TEAM_ANY */ ) const
 //-----------------------------------------------------------------------------
 float CBaseCombatCharacter::GetTimeSinceLastInjury( int team /*= TEAM_ANY */ ) const
 {
-	const float never = 999999999999.9f;
+	constexpr float never = 999999999999.9f;
 
 	if ( team == TEAM_ANY )
 	{

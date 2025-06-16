@@ -54,7 +54,7 @@ ConVar sv_vote_ui_hide_disabled_issues( "sv_vote_ui_hide_disabled_issues", "1", 
 
 ConVar sv_vote_holder_may_vote_no( "sv_vote_holder_may_vote_no", "0", FCVAR_NONE, "1 = Vote caller is not forced to vote yes on yes/no votes." );
 
-static const int k_nKickWatchListMaxDuration = 300;
+static constexpr inline int k_nKickWatchListMaxDuration = 300;
 
 //-----------------------------------------------------------------------------
 // Purpose: 

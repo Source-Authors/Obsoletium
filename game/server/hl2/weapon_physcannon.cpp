@@ -530,8 +530,8 @@ BEGIN_SIMPLE_DATADESC( CGrabController )
 
 END_DATADESC()
 
-const float DEFAULT_MAX_ANGULAR = 360.0f * 10.0f;
-const float REDUCED_CARRY_MASS = 1.0f;
+constexpr inline float DEFAULT_MAX_ANGULAR = 360.0f * 10.0f;
+constexpr inline float REDUCED_CARRY_MASS = 1.0f;
 
 CGrabController::CGrabController( void )
 {
@@ -1873,8 +1873,8 @@ void CWeaponPhysCannon::PuntVPhysics( CBaseEntity *pEntity, const Vector &vecFor
 			// Put some spin on the object
 			for ( i = 0; i < listCount; i++ )
 			{
-				const float hitObjectFactor = 0.5f;
-				const float otherObjectFactor = 1.0f - hitObjectFactor;
+				constexpr float hitObjectFactor = 0.5f;
+				constexpr float otherObjectFactor = 1.0f - hitObjectFactor;
   				// Must be light enough
 				float ratio = pList[i]->GetMass() / totalMass;
 				if ( pList[i] == pEntity->VPhysicsGetObject() )

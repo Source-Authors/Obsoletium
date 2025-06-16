@@ -69,16 +69,16 @@ int ACT_COMBINE_CAMERA_CLOSED_IDLE;
 int ACT_COMBINE_CAMERA_FIRE;
 
 
-const float CAMERA_CLICK_INTERVAL = 0.5f;
-const float CAMERA_MOVE_INTERVAL = 1.0f;
+constexpr inline float CAMERA_CLICK_INTERVAL = 0.5f;
+constexpr inline float CAMERA_MOVE_INTERVAL = 1.0f;
 
 
 //
 // The camera has two FOVs - a wide one for becoming slightly aware of someone,
 // a narrow one for becoming totally aware of them.
 //
-const float CAMERA_FOV_WIDE = 0.5;
-const float CAMERA_FOV_NARROW = 0.707;
+constexpr inline float CAMERA_FOV_WIDE = 0.5;
+constexpr inline float CAMERA_FOV_NARROW = 0.707;
 
 
 // Camera states

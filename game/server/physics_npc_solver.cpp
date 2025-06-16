@@ -293,7 +293,7 @@ IMotionEvent::simresult_e CPhysicsNPCSolver::Simulate( IPhysicsMotionController 
 {
 	if ( IsIntersecting() )
 	{
-		const float PUSH_SPEED = 150.0f;
+		constexpr float PUSH_SPEED = 150.0f;
 
 		if ( pObject->GetGameFlags() & FVPHYSICS_PLAYER_HELD )
 		{

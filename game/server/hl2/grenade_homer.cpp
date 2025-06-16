@@ -639,7 +639,7 @@ void CGrenadeHomer::AimThink( void )
 	if( gpGlobals->curtime > m_flNextWarnTime )
 	{
 		// Make a bubble of warning sound in front of me.
-		const float WARN_INTERVAL = 0.25f;
+		constexpr float WARN_INTERVAL = 0.25f;
 		float flSpeed = GetAbsVelocity().Length();
 		Vector vecWarnLocation;
 

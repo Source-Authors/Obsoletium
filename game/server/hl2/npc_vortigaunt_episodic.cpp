@@ -575,7 +575,7 @@ bool CNPC_Vortigaunt::InnateWeaponLOSCondition( const Vector &ownerPos, const Ve
 	// deliver his attack and looks very strange if he starts to attack when he'd never be able to hit
 	// due to movement.
 
-	const float flTimeDelta = 0.5f;
+	constexpr float flTimeDelta = 0.5f;
 	Vector vecNewOwnerPos;
 	Vector vecNewTargetPos;
 	UTIL_PredictedPosition( this, flTimeDelta, &vecNewOwnerPos );

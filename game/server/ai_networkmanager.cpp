@@ -2925,7 +2925,7 @@ static bool IsInLineForClimb( const Vector &srcPos, const Vector &srcFacing, con
 
 	float fabsCos = fabs( srcFacing.Dot( vecDelta ) );
 
-	const float CosAngLadderStairs = 0.4472; // rise 2 & run 1
+	constexpr float CosAngLadderStairs = 0.4472; // rise 2 & run 1
 
 	if ( fabsCos > 0.05 && fabs( fabsCos - CosAngLadderStairs ) > 0.05 )
 		return false;

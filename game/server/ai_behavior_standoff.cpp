@@ -64,7 +64,7 @@ static AI_StandoffParams_t AI_DEFAULT_STANDOFF_PARAMS = { AIHCR_MOVE_ON_COVER, t
 //
 //-----------------------------------------------------------------------------
 
-const float AIBL_THINK_INTERVAL = 0.3;
+constexpr inline float AIBL_THINK_INTERVAL = 0.3;
 
 class CAI_BattleLine : public CBaseEntity
 {
@@ -763,7 +763,7 @@ void CAI_StandoffBehavior::UpdateBattleLines()
 		if ( bHaveGoalPosition )
 		{
 			// If we have a valid standoff goal position, it takes precendence.
-			const float DIST_GOAL_PLANE = 180;
+			constexpr float DIST_GOAL_PLANE = 180;
 			
 			BattleLine_t goalLine;
 
@@ -777,7 +777,7 @@ void CAI_StandoffBehavior::UpdateBattleLines()
 		{
 			if ( m_params.fPlayerIsBattleline )
 			{
-				const float DIST_PLAYER_PLANE = 180;
+				constexpr float DIST_PLAYER_PLANE = 180;
 				CBaseEntity *pPlayer = UTIL_GetLocalPlayer();
 				
 				BattleLine_t playerLine;

@@ -1653,7 +1653,7 @@ void CNPC_AntlionGuard::GetPhysicsShoveDir( CBaseEntity *pObject, float flMass, 
 	const Vector vecStart = pObject->WorldSpaceCenter();
 	const Vector vecTarget = GetEnemy()->WorldSpaceCenter();
 	
-	const float flBaseSpeed = 800.0f;
+	constexpr float flBaseSpeed = 800.0f;
 	float flSpeed = RemapValClamped( flMass, 0.0f, 150.0f, flBaseSpeed * 2.0f, flBaseSpeed );
 
 	// Try the most direct route
@@ -2241,7 +2241,7 @@ int CNPC_AntlionGuard::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 		// Otherwise see if we've passed a measured point in our health
 		if ( bTakeHeavyDamage == false )
 		{
-			const float flNumDamagePhases =	5.0f;
+			constexpr float flNumDamagePhases =	5.0f;
 
 			float flDenom = ( (float) GetMaxHealth() / flNumDamagePhases );
 			int nPreDamagePhase = ceil( (float) nPreHealth / flDenom );

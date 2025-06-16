@@ -808,7 +808,7 @@ inline void TransmitShakeEvent( CBasePlayer *pPlayer, float localAmplitude, floa
 //									for all players within the radius
 //			bAirShake - if this is false, then it will only shake players standing on the ground.
 //-----------------------------------------------------------------------------
-const float MAX_SHAKE_AMPLITUDE = 16.0f;
+constexpr inline float MAX_SHAKE_AMPLITUDE = 16.0f;
 void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, float duration, float radius, ShakeCommand_t eCommand, bool bAirShake )
 {
 	int			i;

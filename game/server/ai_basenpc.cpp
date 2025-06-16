@@ -3317,9 +3317,9 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 					AIE_VERY_EFFICIENT,	
 	};
 
-	static const int stateBase[] = { 0, 9, 18 };
-	const int NOT_FACING_OFFSET = 3;
-	const int NO_PVS_OFFSET = 6;
+	static constexpr int stateBase[] = { 0, 9, 18 };
+	constexpr int NOT_FACING_OFFSET = 3;
+	constexpr int NO_PVS_OFFSET = 6;
 
 	int iStateOffset = stateBase[state - NPC_STATE_IDLE] ;
 	int iFacingOffset = (!bInPVS || bPlayerFacing) ? 0 : NOT_FACING_OFFSET;
@@ -5971,7 +5971,7 @@ Activity CAI_BaseNPC::NPC_TranslateActivity( Activity eNewActivity )
 
 Activity CAI_BaseNPC::TranslateActivity( Activity idealActivity, Activity *pIdealWeaponActivity )
 {
-	const int MAX_TRIES = 5;
+	constexpr int MAX_TRIES = 5;
 	int count = 0;
 
 	bool bIdealWeaponRequired = false;
@@ -10910,13 +10910,13 @@ void CAI_BaseNPC::Precache( void )
 
 //-----------------------------------------------------------------------------
 
-const short AI_EXTENDED_SAVE_HEADER_VERSION = 5;
-const short AI_EXTENDED_SAVE_HEADER_RESET_VERSION = 3;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_VERSION = 5;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_RESET_VERSION = 3;
 
-const short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_CONDITIONS = 2;
-const short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SCHEDULE_ID_FIXUP = 3;
-const short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SEQUENCE = 4;
-const short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_NAVIGATOR_SAVE = 5;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_CONDITIONS = 2;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SCHEDULE_ID_FIXUP = 3;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SEQUENCE = 4;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_NAVIGATOR_SAVE = 5;
 
 struct AIExtendedSaveHeader_t
 {

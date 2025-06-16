@@ -372,7 +372,7 @@ bool CAI_ScriptConditions::EvalPlayerBlockingActor( const EvalArgs_t &args )
 #if 0
 	CAI_BaseNPC *pNpc = args.pActor->MyNPCPointer();
 
-	const float testDist = 30.0;
+	constexpr float testDist = 30.0;
 
 	Vector origin = args.pActor->WorldSpaceCenter();
 	Vector delta  = UTIL_YawToVector( args.pActor->GetAngles().y ) * testDist;

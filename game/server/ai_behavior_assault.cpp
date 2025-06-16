@@ -733,7 +733,7 @@ CRallyPoint *CAI_AssaultBehavior::FindBestRallyPointInRadius( const Vector &vecC
 {
 	VPROF_BUDGET( "CAI_AssaultBehavior::FindBestRallyPointInRadius", VPROF_BUDGETGROUP_NPCS );
 
-	const int RALLY_SEARCH_ENTS	= 30;
+	constexpr int RALLY_SEARCH_ENTS	= 30;
 	CBaseEntity *pEntities[RALLY_SEARCH_ENTS];
 	int iNumEntities = UTIL_EntitiesInSphere( pEntities, RALLY_SEARCH_ENTS, vecCenter, flRadius, 0 );
 

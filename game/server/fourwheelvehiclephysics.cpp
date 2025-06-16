@@ -742,8 +742,8 @@ bool CFourWheelVehiclePhysics::Think()
 	// Only check wheels if we're not being carried by a dropship
 	if ( m_pOuter->VPhysicsGetObject() && !m_pOuter->VPhysicsGetObject()->GetShadowController() )
 	{
-		const float skidFactor = 0.15f;
-		const float minSpeed = DEFAULT_SKID_THRESHOLD / skidFactor;
+		constexpr float skidFactor = 0.15f;
+		constexpr float minSpeed = DEFAULT_SKID_THRESHOLD / skidFactor;
 		// we have to slide at least 15% of our speed at higher speeds to make the skid sound (otherwise it can be too frequent)
 		float skidThreshold = m_bLastSkid ? DEFAULT_SKID_THRESHOLD : (carState.speed * 0.15f);
 		if ( skidThreshold < DEFAULT_SKID_THRESHOLD )
@@ -1053,7 +1053,7 @@ void CFourWheelVehiclePhysics::SteeringTurnAnalog( float carSpeed, const vehicle
 //-----------------------------------------------------------------------------
 void CFourWheelVehiclePhysics::UpdateDriverControls( CUserCmd *cmd, float flFrameTime )
 {
-	const float SPEED_THROTTLE_AS_BRAKE = 2.0f;
+	constexpr float SPEED_THROTTLE_AS_BRAKE = 2.0f;
 	int nButtons = cmd->buttons;
 
 	// Get vehicle data.

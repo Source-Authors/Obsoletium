@@ -15,7 +15,7 @@ class CStringRegistry;
 #endif
 
 #define MAX_STRING_INDEX 9999
-const int GLOBAL_IDS_BASE = 1000000000; // decimal for debugging readability
+constexpr inline int GLOBAL_IDS_BASE = 1000000000; // decimal for debugging readability
 
 //-----------------------------------------------------------------------------
 

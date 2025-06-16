@@ -1567,9 +1567,9 @@ void CFastZombie::BecomeTorso( const Vector &vecTorsoForce, const Vector &vecLeg
 //-----------------------------------------------------------------------------
 bool CFastZombie::IsJumpLegal(const Vector &startPos, const Vector &apex, const Vector &endPos) const
 {
-	const float MAX_JUMP_RISE		= 220.0f;
-	const float MAX_JUMP_DISTANCE	= 512.0f;
-	const float MAX_JUMP_DROP		= 384.0f;
+	constexpr float MAX_JUMP_RISE		= 220.0f;
+	constexpr float MAX_JUMP_DISTANCE	= 512.0f;
+	constexpr float MAX_JUMP_DROP		= 384.0f;
 
 	if ( BaseClass::IsJumpLegal( startPos, apex, endPos, MAX_JUMP_RISE, MAX_JUMP_DROP, MAX_JUMP_DISTANCE ) )
 	{

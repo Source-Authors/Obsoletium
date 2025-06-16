@@ -25,7 +25,7 @@
 
 //#define DEBUG_MICROPHONE
 
-const float MICROPHONE_SETTLE_EPSILON = 0.005;
+constexpr inline float MICROPHONE_SETTLE_EPSILON = 0.005;
 
 // List of env_microphones who want to be told whenever a sound is started
 static CUtlVector< CHandle<CEnvMicrophone> > s_Microphones;

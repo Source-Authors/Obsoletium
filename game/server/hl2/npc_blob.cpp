@@ -1174,7 +1174,7 @@ void CNPC_Blob::InputIsolateElement( inputdata_t &inputdata )
 void CNPC_Blob::InputFormHemisphere( inputdata_t &inputdata )
 {
 	Vector center = GetAbsOrigin();
-	const float flRadius = 240.0f;
+	constexpr float flRadius = 240.0f;
 
 	Vector vecDir;
 
@@ -1201,7 +1201,7 @@ void CNPC_Blob::InputFormTwoSpheres( inputdata_t &inputdata )
 	Vector center = GetAbsOrigin();
 	Vector sphere1 = GetAbsOrigin() + Vector( 120.0f, 0, 120.0f );
 	Vector sphere2 = GetAbsOrigin() + Vector( -120.0f, 0, 120.0f );
-	const float flRadius = 100.0f;
+	constexpr float flRadius = 100.0f;
 
 	Vector vecDir;
 

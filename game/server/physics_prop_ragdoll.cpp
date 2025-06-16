@@ -34,10 +34,10 @@ const char *GetMassEquivalent(float flMass);
 //-----------------------------------------------------------------------------
 // ThinkContext
 //-----------------------------------------------------------------------------
-const char *s_pFadeOutContext = "RagdollFadeOutContext";
-const char *s_pDebrisContext = "DebrisContext";
+constexpr inline char s_pFadeOutContext[] = "RagdollFadeOutContext";
+constexpr inline char s_pDebrisContext[] = "DebrisContext";
 
-const float ATTACHED_DAMPING_SCALE = 50.0f;
+constexpr inline float ATTACHED_DAMPING_SCALE = 50.0f;
 
 //-----------------------------------------------------------------------------
 // Spawnflags

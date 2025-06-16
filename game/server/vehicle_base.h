@@ -27,7 +27,7 @@ class CPropVehicleDriveable;
 class CSoundPatch;
 
 // the tires are considered to be skidding if they have sliding velocity of 10 in/s or more
-const float DEFAULT_SKID_THRESHOLD = 10.0f;
+constexpr float DEFAULT_SKID_THRESHOLD = 10.0f;
 
 //-----------------------------------------------------------------------------
 // Purpose: Four wheel physics vehicle server vehicle

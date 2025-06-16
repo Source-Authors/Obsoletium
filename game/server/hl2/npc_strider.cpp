@@ -193,8 +193,8 @@ enum
 	SF_TAKE_MINIMAL_DAMAGE_FROM_NPCS	= 0x20000
 };
 
-const float STRIDER_SPEED = 500;
-const float STRIDER_SPEED_CHANGE = .0067; // per think
+constexpr inline float STRIDER_SPEED = 500;
+constexpr inline float STRIDER_SPEED_CHANGE = .0067; // per think
 
 
 static void MoveToGround( Vector *position, CBaseEntity *ignore, const Vector &mins, const Vector &maxs );
@@ -3545,8 +3545,8 @@ bool CNPC_Strider::OverrideMove( float flInterval )
 	heightMove = fabsf( heightMove );
 	if ( heightMove > 0.01 )
 	{
-		const float maxVelocity = 300;
-		const float minVelocity = 10;
+		constexpr float maxVelocity = 300;
+		constexpr float minVelocity = 10;
 
 		constexpr float HEIGHTINVDECAY = 0.8f;	// maintain X percent of velocity when slowing down
 		constexpr float HEIGHTDECAYTIME	= 0.4161f;	// Sum( 1..cycle, HEIGHTINVDECAY^cycle ) 
@@ -4005,7 +4005,7 @@ bool CNPC_Strider::AimCannonAt( CBaseEntity *pEntity, float flInterval )
 	
 	Vector unitAngles = Vector( localEnemyAngles.x, localEnemyAngles.y, localEnemyAngles.z ); 
 	float angleDiff = VectorNormalize(unitAngles);
-	const float aimSpeed = 16;
+	constexpr float aimSpeed = 16;
 
 	// Exponentially approach the target
 	float yawSpeed = fabsf(aimSpeed*flInterval*localEnemyAngles.y);
@@ -4593,7 +4593,7 @@ bool CNPC_Strider::CNavigator::DoFindPathToPos()
 			TranslateNavGoal( GetPath()->GetTarget(), vOrigin );
 
 			// If we're seemingly beyond the waypoint and our hull is near enough to the path segment, advance to the next node
-			const float EPS = 0.1f;
+			constexpr float EPS = 0.1f;
 			bool bPastStartNode = ( ( pFirstWaypoint->GetPos() - vClosest ).Length() > EPS );
 			bool bNearPathSegment = ( ( vOrigin - vClosest ).Length() < GetHullWidth() * 0.5f );
 			if ( bPastStartNode && bNearPathSegment )

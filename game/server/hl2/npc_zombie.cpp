@@ -570,7 +570,7 @@ void CZombie::GatherConditions( void )
 	{
 		if ( GetNavigator()->IsGoalActive() )
 		{
-			const float CHARGE_RESET_TOLERANCE = 60.0;
+			constexpr float CHARGE_RESET_TOLERANCE = 60.0;
 			if ( !GetEnemy() ||
 				 ( m_vPositionCharged - GetEnemyLKP()  ).Length() > CHARGE_RESET_TOLERANCE )
 			{

@@ -318,9 +318,9 @@ bool CAI_BaseNPC::IsJumpLegal( const Vector &startPos, const Vector &apex, const
 //-----------------------------------------------------------------------------
 bool CAI_BaseNPC::IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos ) const
 {
-	const float MAX_JUMP_RISE		= 80.0f;
-	const float MAX_JUMP_DISTANCE	= 250.0f;
-	const float MAX_JUMP_DROP		= 192.0f;
+	constexpr float MAX_JUMP_RISE		= 80.0f;
+	constexpr float MAX_JUMP_DISTANCE	= 250.0f;
+	constexpr float MAX_JUMP_DROP		= 192.0f;
 
 	return IsJumpLegal( startPos, apex, endPos, MAX_JUMP_RISE, MAX_JUMP_DROP, MAX_JUMP_DISTANCE );
 }

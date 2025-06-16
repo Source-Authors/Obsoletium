@@ -28,10 +28,10 @@ void DoSpark( CBaseEntity *ent, const Vector &location, int nMagnitude, int nTra
 	}
 }
 
-const int SF_SPARK_START_ON			= 64;
-const int SF_SPARK_GLOW				= 128;
-const int SF_SPARK_SILENT			= 256;
-const int SF_SPARK_DIRECTIONAL		= 512;
+constexpr inline int SF_SPARK_START_ON			= 64;
+constexpr inline int SF_SPARK_GLOW				= 128;
+constexpr inline int SF_SPARK_SILENT			= 256;
+constexpr inline int SF_SPARK_DIRECTIONAL		= 512;
 
 BEGIN_DATADESC( CEnvSpark )
 
