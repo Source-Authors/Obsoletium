@@ -347,6 +347,10 @@ void CRagdollProp::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 //-----------------------------------------------------------------------------
 void CRagdollProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason )
 {
+	// dimhotepus: Clear thrown flags as we catched the ragdoll.
+	PhysClearGameFlags( VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
+	m_bFirstCollisionAfterLaunch = false;
+
 	m_hPhysicsAttacker = pPhysGunUser;
 	m_flLastPhysicsInfluenceTime = gpGlobals->curtime;
 

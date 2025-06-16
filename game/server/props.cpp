@@ -2740,6 +2740,13 @@ void CPhysicsProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 		}
 	}
 
+	// dimhotepus: If we catch explosive launched by cannon it should not explode when we stay it on ground.
+	if ( pPhysicsObject && ( pPhysicsObject->GetGameFlags() & FVPHYSICS_WAS_THROWN ) )
+	{
+		PhysClearGameFlags( pPhysicsObject, FVPHYSICS_WAS_THROWN );
+	}
+	m_bFirstCollisionAfterLaunch = false;
+
 	m_OnPhysGunPickup.FireOutput( pPhysGunUser, this );
 
 	if( reason == PICKED_UP_BY_CANNON )
