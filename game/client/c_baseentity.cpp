@@ -577,7 +577,7 @@ END_PREDICTION_DATA()
 void SpewInterpolatedVar( CInterpolatedVar< Vector > *pVar )
 {
 	Msg( "--------------------------------------------------\n" );
-	int i = pVar->GetHead();
+	intp i = pVar->GetHead();
 	Vector v0(0, 0, 0);
 	CApparentVelocity<Vector> apparent(v0);
 	float prevtime = 0.0f;
@@ -601,7 +601,7 @@ void SpewInterpolatedVar( CInterpolatedVar< Vector > *pVar, float flNow, float f
 	float target = flNow - flInterpAmount;
 
 	Msg( "--------------------------------------------------\n" );
-	int i = pVar->GetHead();
+	intp i = pVar->GetHead();
 	Vector v0(0, 0, 0);
 	CApparentVelocity<Vector> apparent(v0);
 	float newtime = 999999.0f;
@@ -631,8 +631,7 @@ void SpewInterpolatedVar( CInterpolatedVar< Vector > *pVar, float flNow, float f
 			else
 			{
 				bSpew = true;
-				int savei = i;
-				i = pVar->GetNext( i );
+				intp savei = std::exchange(i, pVar->GetNext( i ));
 				float oldtertime = 0.0f;
 				pVar->GetHistoryValue( i, oldtertime );
 
@@ -670,7 +669,7 @@ void SpewInterpolatedVar( CInterpolatedVar< Vector > *pVar, float flNow, float f
 void SpewInterpolatedVar( CInterpolatedVar< float > *pVar )
 {
 	Msg( "--------------------------------------------------\n" );
-	int i = pVar->GetHead();
+	intp i = pVar->GetHead();
 	CApparentVelocity<float> apparent(0.0f);
 	while ( 1 )
 	{
@@ -692,7 +691,7 @@ void GetInterpolatedVarTimeRange( CInterpolatedVar<T> *pVar, float &flMin, float
 	flMin = 1e23;
 	flMax = -1e23;
 
-	int i = pVar->GetHead();
+	intp i = pVar->GetHead();
 	Vector v0(0, 0, 0);
 	CApparentVelocity<Vector> apparent(v0);
 	while ( 1 )
@@ -802,13 +801,11 @@ void C_BaseEntity::Interp_SetupMappings( VarMapping_t *map )
 	if( !map )
 		return;
 
-	int c = map->m_Entries.Count();
-	for ( int i = 0; i < c; i++ )
+	for ( auto &e : map->m_Entries )
 	{
-		VarMapEntry_t *e = &map->m_Entries[ i ];
-		IInterpolatedVar *watcher = e->watcher;
-		void *data = e->data;
-		int type = e->type;
+		IInterpolatedVar *watcher = e.watcher;
+		void *data = e.data;
+		int type = e.type;
 
 		watcher->Setup( data, type );
 		watcher->SetInterpolationAmount( GetInterpolationAmount( watcher->GetType() ) ); 
@@ -825,11 +822,9 @@ void C_BaseEntity::Interp_RestoreToLastNetworked( VarMapping_t *map )
 	QAngle oldAngles = GetLocalAngles();
 	Vector oldVel = GetLocalVelocity();
 
-	int c = map->m_Entries.Count();
-	for ( int i = 0; i < c; i++ )
+	for ( auto &e : map->m_Entries )
 	{
-		VarMapEntry_t *e = &map->m_Entries[ i ];
-		IInterpolatedVar *watcher = e->watcher;
+		IInterpolatedVar *watcher = e.watcher;
 		watcher->RestoreToLastNetworked();
 	}
 
@@ -841,11 +836,9 @@ void C_BaseEntity::Interp_UpdateInterpolationAmounts( VarMapping_t *map )
 	if( !map )
 		return;
 
-	int c = map->m_Entries.Count();
-	for ( int i = 0; i < c; i++ )
+	for ( auto &e : map->m_Entries )
 	{
-		VarMapEntry_t *e = &map->m_Entries[ i ];
-		IInterpolatedVar *watcher = e->watcher;
+		IInterpolatedVar *watcher = e.watcher;
 		watcher->SetInterpolationAmount( GetInterpolationAmount( watcher->GetType() ) ); 
 	}
 }
@@ -2272,11 +2265,8 @@ void C_BaseEntity::MarkAimEntsDirty()
 	// will cause the aim-ent's (and all its children's) dirty state to be correctly updated.
 	//
 	// Then we will iterate over the loop a second time and call CalcAbsPosition on them,
-	int i;
-	int c = g_AimEntsList.Count();
-	for ( i = 0; i < c; ++i )
+	for ( auto *pEnt : g_AimEntsList )
 	{
-		C_BaseEntity *pEnt = g_AimEntsList[ i ];
 		Assert( pEnt && pEnt->GetMoveParent() );
 		if ( pEnt->IsEffectActive(EF_BONEMERGE | EF_PARENT_ANIMATES) )
 		{
@@ -2289,11 +2279,8 @@ void C_BaseEntity::MarkAimEntsDirty()
 void C_BaseEntity::CalcAimEntPositions()
 {
 	VPROF("CalcAimEntPositions");
-	int i;
-	int c = g_AimEntsList.Count();
-	for ( i = 0; i < c; ++i )
+	for ( auto *pEnt : g_AimEntsList )
 	{
-		C_BaseEntity *pEnt = g_AimEntsList[ i ];
 		Assert( pEnt );
 		Assert( pEnt->GetMoveParent() );
 		if ( pEnt->IsEffectActive(EF_BONEMERGE) )
@@ -5860,11 +5847,9 @@ void C_BaseEntity::EstimateAbsVelocity( Vector& vel )
 void C_BaseEntity::Interp_Reset( VarMapping_t *map )
 {
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, "reset" );
-	int c = map->m_Entries.Count();
-	for ( int i = 0; i < c; i++ )
+	for ( auto &e : map->m_Entries )
 	{
-		VarMapEntry_t *e = &map->m_Entries[ i ];
-		IInterpolatedVar *watcher = e->watcher;
+		IInterpolatedVar *watcher = e.watcher;
 
 		watcher->Reset();
 	}
