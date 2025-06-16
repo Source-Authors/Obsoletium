@@ -304,12 +304,13 @@ void CBaseButton::InputPressOut( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 int CBaseButton::OnTakeDamage( const CTakeDamageInfo &info )
 {
-	m_OnDamaged.FireOutput(m_hActivator, this);
+	// dimhotepus: Fire damage with real attacker instead of obsolete activator value.
+	m_OnDamaged.FireOutput( info.GetAttacker(), this );
 
-	// dvsents2: remove obselete health keyvalue from func_button
+	// dvsents2: remove obsolete health keyvalue from func_button
 	if (!HasSpawnFlags(SF_BUTTON_DAMAGE_ACTIVATES) && (m_iHealth == 0))
 	{
-		return(0);
+		return 0;
 	}
 
 	BUTTON_CODE code = ButtonResponseToTouch();
@@ -325,7 +326,7 @@ int CBaseButton::OnTakeDamage( const CTakeDamageInfo &info )
 
 	if (m_bLocked)
 	{
-		return(0);
+		return 0;
 	}
 
 	// Temporarily disable the touch function, until movement is finished.
