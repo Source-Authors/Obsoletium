@@ -2429,7 +2429,8 @@ bool V_MakeRelativePath( IN_Z const char *pFullPath, IN_Z const char *pDirectory
 //-----------------------------------------------------------------------------
 bool V_IsAbsolutePath( IN_Z const char *pStr )
 {
-	bool bIsAbsolute = ( pStr[0] && pStr[1] == ':' ) || pStr[0] == '/' || pStr[0] == '\\';
+	char first = pStr[0];
+	bool bIsAbsolute = ( first && pStr[1] == ':' ) || first == '/' || first == '\\';
 	return bIsAbsolute;
 }
 
