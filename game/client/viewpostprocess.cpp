@@ -1094,7 +1094,7 @@ static void SetToneMapScale(IMatRenderContext *pRenderContext, float newvalue, f
 	else
 	{
 		// scroll, losing oldest
-		for( ptrdiff_t i = 0;i < ssize( s_MovingAverageToneMapScale ) - 1;i ++ )
+		for( intp i = 0;i < ssize( s_MovingAverageToneMapScale ) - 1;i ++ )
 			s_MovingAverageToneMapScale[i] = s_MovingAverageToneMapScale[i + 1];
 		s_MovingAverageToneMapScale[std::size( s_MovingAverageToneMapScale ) - 1]= newvalue;
 	}

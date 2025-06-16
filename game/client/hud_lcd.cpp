@@ -616,8 +616,8 @@ void CLCD::ShowItems_R( CLCDPage *page, unsigned int dwCurTime, CUtlVector< CLCD
 
 void CLCD::DisplayCurrentPage( unsigned int dwCurTime )
 {
-	int pageCount = m_Pages.Count();
-	for ( int i = 0; i < pageCount; ++i )
+	intp pageCount = m_Pages.Count();
+	for ( intp i = 0; i < pageCount; ++i )
 	{
 		bool bShowItems = ( i == m_nCurrentPage ) ? true : false;
 

@@ -1822,7 +1822,7 @@ int C_BaseFlex::FlexControllerLocalToGlobal( const flexsettinghdr_t *pSettinghdr
 {
 	FS_LocalToGlobal_t entry( pSettinghdr );
 
-	int idx = m_LocalToGlobal.Find( entry );
+	auto idx = m_LocalToGlobal.Find( entry );
 	if ( idx == m_LocalToGlobal.InvalidIndex() )
 	{
 		// This should never happen!!!

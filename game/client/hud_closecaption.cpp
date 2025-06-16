@@ -2858,7 +2858,7 @@ void CHudCloseCaption::FindSound( char const *pchANSI )
 				Msg( "found '%s' in %s\n", streamANSI, fn );
 
 				// Now find the sounds that will hash to this
-				for ( int k = soundemitterbase->First(); k != soundemitterbase->InvalidIndex(); k = soundemitterbase->Next( k ) )
+				for ( auto k = soundemitterbase->First(); k != soundemitterbase->InvalidIndex(); k = soundemitterbase->Next( k ) )
 				{
 					char const *pchSoundName = soundemitterbase->GetSoundName( k );
 
