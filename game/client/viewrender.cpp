@@ -1920,14 +1920,14 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 
 	if ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 80 )
 	{
-			static bool bFirstTime = true;
-			if ( bFirstTime )
-			{
-				bFirstTime = false;
-				Msg( "This game has a minimum requirement of DirectX 8.0 to run properly.\n" );
-			}
-			return;
+		static bool bFirstTime = true;
+		if ( bFirstTime )
+		{
+			bFirstTime = false;
+			Msg( "This game has a minimum requirement of DirectX 8.0 to run properly.\n" );
 		}
+		return;
+	}
 
 	CMatRenderContextPtr pRenderContext( materials );
 	ITexture *saveRenderTarget = pRenderContext->GetRenderTarget();

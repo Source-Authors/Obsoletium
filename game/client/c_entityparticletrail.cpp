@@ -146,7 +146,7 @@ void C_EntityParticleTrail::AddParticle( float flInitialDeltaTime, const Vector 
 	pParticle->m_uchColor[0]	= 64;
 	pParticle->m_uchColor[1]	= 140;
 	pParticle->m_uchColor[2]	= 225;
-	pParticle->m_uchStartAlpha	= Helper_RandomInt( 64, 64 );
+	pParticle->m_uchStartAlpha	= static_cast<byte>(Helper_RandomInt( 64, 64 ));
 	pParticle->m_uchEndAlpha	= 0;
 
 	pParticle->m_uchStartSize	= m_Info.m_flStartSize;
@@ -219,7 +219,7 @@ inline void C_EntityParticleTrail::RenderParticles( CParticleRenderIterator *pIt
 
 		Vector	color = Vector( pParticle->m_uchColor[0] / 255.0f, pParticle->m_uchColor[1] / 255.0f, pParticle->m_uchColor[2] / 255.0f );
 		float alpha = Lerp( t, pParticle->m_uchStartAlpha / 255.0f, pParticle->m_uchEndAlpha / 255.0f );
-		float flSize = Lerp( t, pParticle->m_uchStartSize, pParticle->m_uchEndSize );
+		float flSize = Lerp( t, pParticle->m_uchStartSize * 1.0f, pParticle->m_uchEndSize * 1.0f );
 
 		// Render it
 		RenderParticle_ColorSize( pIterator->GetParticleDraw(), tPos, color, alpha, flSize );

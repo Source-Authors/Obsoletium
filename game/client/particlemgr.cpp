@@ -1494,7 +1494,7 @@ void EndSimulateParticles( void )
 	double flETime = Plat_FloatTime() - g_flStartSimTime;
 	if ( g_bMeasureParticlePerformance )
 	{
-		g_nNumUSSpentSimulatingParticles += 1.0e6 * flETime;
+		g_nNumUSSpentSimulatingParticles += static_cast<int64_t>(1.0e6 * flETime);
 	}
 	g_pParticleSystemMgr->CommitProfileInformation( flETime > .001 * r_particle_sim_spike_threshold_ms.GetInt() );
 }
