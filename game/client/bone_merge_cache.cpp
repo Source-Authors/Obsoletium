@@ -154,9 +154,9 @@ void CBoneMergeCache::MergeMatchingBones( int boneMask )
 		}
 #endif
 
-		for ( int i=0; i < m_MergedBones.Count(); i++ )
+		for ( const auto &bone : m_MergedBones )
 		{
-			int iOwnerBone = m_MergedBones[i].m_iMyBone;
+			int iOwnerBone = bone.m_iMyBone;
 		
 			// Only update bones reference by the bone mask.
 			if ( !( m_pOwnerHdr->boneFlags( iOwnerBone ) & boneMask ) )
@@ -168,10 +168,10 @@ void CBoneMergeCache::MergeMatchingBones( int boneMask )
 	else
 	{
 		// Now copy the bone matrices.
-		for ( int i=0; i < m_MergedBones.Count(); i++ )
+		for ( const auto &bone : m_MergedBones )
 		{
-			int iOwnerBone = m_MergedBones[i].m_iMyBone;
-			int iParentBone = m_MergedBones[i].m_iParentBone;
+			int iOwnerBone = bone.m_iMyBone;
+			int iParentBone = bone.m_iParentBone;
 		
 			// Only update bones reference by the bone mask.
 			if ( !( m_pOwnerHdr->boneFlags( iOwnerBone ) & boneMask ) )
@@ -193,10 +193,10 @@ void CBoneMergeCache::CopyParentToChild( const Vector parentPos[], const Quatern
 		return;
 
 	// Now copy the bone matrices.
-	for ( int i=0; i < m_MergedBones.Count(); i++ )
+	for ( const auto &bone : m_MergedBones )
 	{
-		int iOwnerBone = m_MergedBones[i].m_iMyBone;
-		int iParentBone = m_MergedBones[i].m_iParentBone;
+		int iOwnerBone = bone.m_iMyBone;
+		int iParentBone = bone.m_iParentBone;
 		
 		if ( m_pOwnerHdr->boneParent( iOwnerBone ) == -1 || m_pFollowHdr->boneParent( iParentBone ) == -1 )
 			continue;
@@ -219,10 +219,10 @@ void CBoneMergeCache::CopyChildToParent( const Vector childPos[], const Quaterni
 		return;
 
 	// Now copy the bone matrices.
-	for ( int i=0; i < m_MergedBones.Count(); i++ )
+	for ( const auto &bone : m_MergedBones )
 	{
-		int iOwnerBone = m_MergedBones[i].m_iMyBone;
-		int iParentBone = m_MergedBones[i].m_iParentBone;
+		int iOwnerBone = bone.m_iMyBone;
+		int iParentBone = bone.m_iParentBone;
 		
 		if ( m_pOwnerHdr->boneParent( iOwnerBone ) == -1 || m_pFollowHdr->boneParent( iParentBone ) == -1 )
 			continue;
