@@ -1459,17 +1459,15 @@ int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_
 {
 	AUTO_LOCK( m_SearchPathsMutex );
 
-	if ( maxLenInChars )
-	{
-		pDest[0] = 0;
-	}
-
 	// Build up result into string object
-	CUtlString sResult;
+	// dimhotepus: Use std::string and reserve capacity. 
+	std::string sResult;
+	sResult.reserve(maxLenInChars);
+
 	CSearchPathsIterator iter( this, pathID, bGetPackFiles ? FILTER_NONE : FILTER_CULLPACK );
 	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != nullptr; pSearchPath = iter.GetNext() )
 	{
-		if ( !sResult.IsEmpty() )
+		if ( !sResult.empty() )
 			sResult += ";";
 		if ( pSearchPath->GetPackFile() )
 		{
@@ -1491,11 +1489,11 @@ int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_
 	// Copy into user's buffer, possibly truncating
 	if ( maxLenInChars )
 	{
-		V_strncpy( pDest, sResult.String(), maxLenInChars );
+		V_strncpy( pDest, sResult.c_str(), maxLenInChars );
 	}
 
 	// Return 1 extra for the nullptr terminator
-	return sResult.Length()+1;
+	return sResult.size()+1;
 }
 
 
