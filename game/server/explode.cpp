@@ -352,7 +352,8 @@ void CEnvExplosion::InputExplode( inputdata_t &inputdata )
 	SetNextThink( gpGlobals->curtime + 0.3f );
 
 	// Only do these effects if we're not submerged
-	if ( UTIL_PointContents( GetAbsOrigin() ) & CONTENTS_WATER )
+	// dimhotepus: Inverse condition so explosion sparks shown out of water.
+	if ( !( UTIL_PointContents( GetAbsOrigin() ) & CONTENTS_WATER ) )
 	{
 		// draw sparks
 		if ( !( m_spawnflags & SF_ENVEXPLOSION_NOSPARKS ) )
