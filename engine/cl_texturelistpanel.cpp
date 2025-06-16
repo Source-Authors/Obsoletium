@@ -2503,7 +2503,7 @@ CTextureListPanel::CTextureListPanel( vgui::Panel *parent ) :
 	SetSize( videomode->GetModeStereoWidth() - 20, videomode->GetModeStereoHeight() - 20 );
 	SetPos( 10, 10 );
 	SetVisible( true );
-	SetCursor( null );
+	SetCursor( 0 );
 
 	SetTitle( "Texture list", false );
 	SetMenuButtonVisible( false );

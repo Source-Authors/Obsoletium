@@ -1722,12 +1722,12 @@ void CWin32Surface::DrawSetTextureFile(int id, const char *filename, int, bool f
 //-----------------------------------------------------------------------------
 void CWin32Surface::DrawTexturedRect(int x0,int y0,int x1,int y1)
 {
-	if (m_pCurrentTexture == null)
+	if (m_pCurrentTexture == nullptr)
 	{
 		return;
 	}
 
-	if (PLAT(_currentContextPanel)->textureDC == null)
+	if (PLAT(_currentContextPanel)->textureDC == nullptr)
 	{
 		return;
 	}
@@ -2461,7 +2461,7 @@ void CWin32Surface::CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIc
 	plat->clipRgn = CreateRectRgn(0,0,64,64);
 	plat->hdc = CreateCompatibleDC(NULL);
 	plat->hwndDC = NULL;
-	plat->bitmap = null;
+	plat->bitmap = nullptr;
 	plat->bitmapSize[0] = 0;
 	plat->bitmapSize[1] = 0;
 	plat->isFullscreen = false;
@@ -2599,7 +2599,7 @@ bool CWin32Surface::RecreateContext(VPANEL panel)
 			|| (wide < (plat->bitmapSize[0] - 200)) 
 			|| (tall < (plat->bitmapSize[1] - 200)))
 		{
-			if (plat->bitmap != null)
+			if (plat->bitmap != nullptr)
 			{
 				::DeleteObject(plat->bitmap);
 			}
@@ -3570,20 +3570,20 @@ void CWin32Surface::initStaticData()
 {
 	//load up all default cursors, this gets called everytime a Surface is created, but
 	//who cares
-	staticDefaultCursor[dc_none]     =null;
-	staticDefaultCursor[dc_arrow]    =(HICON)LoadCursor(null,(LPCTSTR)OCR_NORMAL);
-	staticDefaultCursor[dc_ibeam]    =(HICON)LoadCursor(null,(LPCTSTR)OCR_IBEAM);
-	staticDefaultCursor[dc_hourglass]=(HICON)LoadCursor(null,(LPCTSTR)OCR_WAIT);
-	staticDefaultCursor[dc_waitarrow]=(HICON)LoadCursor(null,(LPCTSTR)OCR_APPSTARTING);
-	staticDefaultCursor[dc_crosshair]=(HICON)LoadCursor(null,(LPCTSTR)OCR_CROSS);
-	staticDefaultCursor[dc_up]       =(HICON)LoadCursor(null,(LPCTSTR)OCR_UP);
-	staticDefaultCursor[dc_sizenwse] =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZENWSE);
-	staticDefaultCursor[dc_sizenesw] =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZENESW);
-	staticDefaultCursor[dc_sizewe]   =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZEWE);
-	staticDefaultCursor[dc_sizens]   =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZENS);
-	staticDefaultCursor[dc_sizeall]  =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZEALL);
-	staticDefaultCursor[dc_no]       =(HICON)LoadCursor(null,(LPCTSTR)OCR_NO);
-	staticDefaultCursor[dc_hand]     =(HICON)LoadCursor(null,(LPCTSTR)32649);
+	staticDefaultCursor[dc_none]     =nullptr;
+	staticDefaultCursor[dc_arrow]    =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_NORMAL);
+	staticDefaultCursor[dc_ibeam]    =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_IBEAM);
+	staticDefaultCursor[dc_hourglass]=(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_WAIT);
+	staticDefaultCursor[dc_waitarrow]=(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_APPSTARTING);
+	staticDefaultCursor[dc_crosshair]=(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_CROSS);
+	staticDefaultCursor[dc_up]       =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_UP);
+	staticDefaultCursor[dc_sizenwse] =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZENWSE);
+	staticDefaultCursor[dc_sizenesw] =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZENESW);
+	staticDefaultCursor[dc_sizewe]   =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZEWE);
+	staticDefaultCursor[dc_sizens]   =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZENS);
+	staticDefaultCursor[dc_sizeall]  =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZEALL);
+	staticDefaultCursor[dc_no]       =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_NO);
+	staticDefaultCursor[dc_hand]     =(HICON)LoadCursor(nullptr,(LPCTSTR)32649);
 
 	// make and register a very simple Window Class
 	memset( &staticWndclass,0,sizeof(staticWndclass) );

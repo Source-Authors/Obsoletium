@@ -375,7 +375,7 @@ void CSystem::SetClipboardText(const char *text, intp textLen)
 	if (hmem)
 	{
 		void *ptr = GlobalLock(hmem);
-		if (ptr != null)
+		if (ptr != nullptr)
 		{
 			memset(ptr, 0, textLen + 1);
 			memcpy(ptr, text, textLen);
@@ -411,7 +411,7 @@ void CSystem::SetClipboardText(const wchar_t *text, intp textLen)
 	if (hmem)
 	{
 		void *ptr = GlobalLock(hmem);
-		if (ptr != null)
+		if (ptr != nullptr)
 		{
 			memset(ptr, 0, (textLen + 1) * sizeof(wchar_t));
 			memcpy(ptr, text, textLen * sizeof(wchar_t));
@@ -542,7 +542,7 @@ intp CSystem::GetClipboardText(int offset, wchar_t *buf, intp bufLen)
 
 static bool staticSplitRegistryKey(const char *key, char *key0, char *key1)
 {
-	if(key==null)
+	if(key==nullptr)
 	{
 		return false;
 	}

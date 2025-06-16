@@ -320,8 +320,8 @@ CInputSystem::CInputSystem()
 {
 	m_nDebugMessages = -1;
 #ifdef DO_IME
-	_imeWnd = null;
-	_imeCandidates = null;
+	_imeWnd = nullptr;
+	_imeCandidates = nullptr;
 #endif
 	InitInputContext( &m_DefaultInputContext );
 	m_hContext = DEFAULT_INPUT_CONTEXT;
@@ -2790,7 +2790,7 @@ void CInputSystem::DestroyCandidateList()
 	if ( _imeCandidates )
 	{
 		delete[] (char *)_imeCandidates;
-		_imeCandidates = null;
+		_imeCandidates = nullptr;
 	}
 #endif
 }

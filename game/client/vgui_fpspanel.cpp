@@ -98,7 +98,7 @@ CFPSPanel::CFPSPanel( vgui::VPANEL parent ) : BaseClass( NULL, "CFPSPanel" )
 {
 	SetParent( parent );
 	SetVisible( false );
-	SetCursor( null );
+	SetCursor( 0 );
 
 	SetFgColor( Color( 0, 0, 0, 255 ) );
 	SetPaintBackgroundEnabled( false );
@@ -559,7 +559,7 @@ CBlockingFileIOPanel::CBlockingFileIOPanel( vgui::VPANEL parent ) : BaseClass( N
 	SetSize( IO_PANEL_WIDTH, 140 );
 
 	SetVisible( false );
-	SetCursor( null );
+	SetCursor( 0 );
 
 	SetFgColor( Color( 0, 0, 0, 255 ) );
 	SetPaintBackgroundEnabled( false );
