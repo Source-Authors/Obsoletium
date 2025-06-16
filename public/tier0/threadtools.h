@@ -1809,7 +1809,7 @@ inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, LockInfo_t 
 
 inline bool CThreadSpinRWLock::TryLockForWrite( const ThreadId_t threadId )
 {
-	auto lockInfo = m_lockInfo.load();
+	const auto lockInfo = m_lockInfo.load();
 
 	// In order to grab a write lock, there can be no readers and no owners of the write lock
 	if ( lockInfo.m_nReaders > 0 || ( lockInfo.m_writerId && lockInfo.m_writerId != threadId ) )

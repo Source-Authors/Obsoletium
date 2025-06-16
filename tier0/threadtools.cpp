@@ -1432,9 +1432,7 @@ void CThreadRWLock::UnlockWrite()
 
 void CThreadSpinRWLock::SpinLockForWrite( const ThreadId_t threadId )
 {
-	int i;
-
-	for ( i = 1000; i != 0; --i )
+	for ( int i = 1000; i != 0; --i )
 	{
 		if ( TryLockForWrite( threadId ) )
 		{
@@ -1443,7 +1441,7 @@ void CThreadSpinRWLock::SpinLockForWrite( const ThreadId_t threadId )
 		ThreadPause();
 	}
 
-	for ( i = 20000; i != 0; --i )
+	for ( int i = 20000; i != 0; --i )
 	{
 		if ( TryLockForWrite( threadId ) )
 		{
@@ -1468,55 +1466,44 @@ void CThreadSpinRWLock::SpinLockForWrite( const ThreadId_t threadId )
 
 void CThreadSpinRWLock::LockForRead()
 {
-	int i;
-
-	// In order to grab a read lock, the number of readers must not change and no thread can own the write lock
-	LockInfo_t oldValue{0, m_lockInfo.load().m_nReaders};
-	LockInfo_t newValue{0, oldValue.m_nReaders + 1};
-
-	if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
-		return;
-
-	ThreadPause();
-	oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
-	newValue.m_nReaders = oldValue.m_nReaders + 1;
-
-	for ( i = 1000; i != 0; --i )
+	for ( int i = 1000; i != 0; --i )
 	{
-		if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
+		if ( TryLockForRead() )
+		{
 			return;
+		}
 		ThreadPause();
-		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
-		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 
-	for ( i = 20000; i != 0; --i )
+	for ( int i = 20000; i != 0; --i )
 	{
-		if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
+		if ( TryLockForRead() )
+		{
 			return;
+		}
+
 		ThreadPause();
 		ThreadSleep( 0 );
-		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
-		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 
 	for ( ;; ) // coded as for instead of while to make easy to breakpoint success
 	{
-		if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
+		if ( TryLockForRead() )
+		{
 			return;
+		}
+
 		ThreadPause();
 		ThreadSleep( 1 );
-		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
-		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 }
 
 void CThreadSpinRWLock::UnlockRead()
 {
-	int i;
+	const auto lockInfo = m_lockInfo.load();
+	Assert( lockInfo.m_nReaders > 0 && lockInfo.m_writerId == 0 );
 
-	Assert( m_lockInfo.load().m_nReaders > 0 && m_lockInfo.load().m_writerId == 0 );
-	LockInfo_t oldValue{0UL, m_lockInfo.load().m_nReaders};
+	LockInfo_t oldValue{0UL, lockInfo.m_nReaders};
 	LockInfo_t newValue{0UL, oldValue.m_nReaders - 1};
 	
 	if( AssignIf( newValue, oldValue ) )
@@ -1525,7 +1512,7 @@ void CThreadSpinRWLock::UnlockRead()
 	oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 	newValue.m_nReaders = oldValue.m_nReaders - 1;
 
-	for ( i = 500; i != 0; --i )
+	for ( int i = 500; i != 0; --i )
 	{
 		if( AssignIf( newValue, oldValue ) )
 			return;
@@ -1534,7 +1521,7 @@ void CThreadSpinRWLock::UnlockRead()
 		newValue.m_nReaders = oldValue.m_nReaders - 1;
 	}
 
-	for ( i = 20000; i != 0; --i )
+	for ( int i = 20000; i != 0; --i )
 	{
 		if( AssignIf( newValue, oldValue ) )
 			return;
@@ -1557,9 +1544,12 @@ void CThreadSpinRWLock::UnlockRead()
 
 void CThreadSpinRWLock::UnlockWrite()
 {
-	Assert( m_lockInfo.load().m_writerId == ThreadGetCurrentId() && m_lockInfo.load().m_nReaders == 0 );
-	alignas(int64) static const LockInfo_t newValue = { 0, 0 };
-	m_lockInfo.exchange(newValue);
+	const auto lockInfo = m_lockInfo.load();
+
+	Assert( lockInfo.m_writerId == ThreadGetCurrentId() );
+	Assert( lockInfo.m_nReaders == 0 );
+
+	m_lockInfo.exchange(LockInfo_t{0, 0});
 	--m_nWriters;
 }
 
