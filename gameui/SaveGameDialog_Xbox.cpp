@@ -275,20 +275,4 @@ void CSaveGameDialogXbox::OnDoneScanningSaveGames( void )
 	ConVarRef save_history_count("save_history_count" );
 
 	m_bNewSaveAvailable = false;
-#ifdef _X360
-	if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED )
-		return;
-
-	// We only allow 10 save games minus the number of autosaves, autosavedangerous, and autosave0?'s at once
-	if ( GetNumPanels() >= 10 - ( 2 + (unsigned)save_history_count.GetInt() ) )
-		return;
-
-	if ( GetStorageSpaceUsed() + XBX_SAVEGAME_BYTES > XBX_PERSISTENT_BYTES_NEEDED )
-		return;
-
-	m_bNewSaveAvailable = true;
-	SaveGameDescription_t bogusDesc = { "#GameUI_SaveGame_NewSavedGame", "#GameUI_SaveGame_NewSave", "#GameUI_SaveGame_NewSave", "#GameUI_SaveGame_NewSave", "#GameUI_SaveGame_NewSave", "#GameUI_SaveGame_NewSave", "#GameUI_SaveGame_NewSave", 0, 0 };
-	CGameSavePanel *newSavePanel = SETUP_PANEL( new CGameSavePanel( this, &bogusDesc, true ) );
-	AddPanel( newSavePanel );
-#endif // _X360
 }

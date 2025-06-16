@@ -1333,8 +1333,6 @@ void CNewGameDialog::StartGame( void )
 		ConVarRef sv_cheats( "sv_cheats" );
 		sv_cheats.SetValue( m_bCommentaryMode );
 
-		if ( IsPC() )
-		{
 			// If commentary is on, we go to the explanation dialog (but not for teaser trailers)
 			if ( m_bCommentaryMode && !m_ChapterPanels[m_iSelectedChapter]->IsTeaserChapter() )
 			{
@@ -1358,41 +1356,6 @@ void CNewGameDialog::StartGame( void )
 				// start map
 				BasePanel()->FadeToBlackAndRunEngineCommand( mapcommand );
 			}
-		}
-		else if ( IsX360() )
-		{
-			if ( m_ChapterPanels[m_iSelectedChapter]->HasBonus() && m_iBonusSelection > 0 )
-			{
-				if ( m_iBonusSelection == 1 )
-				{
-					// Run the advanced chamber instead of the config file
-					char *pLastSpace = Q_strrchr( mapcommand, '\n' );
-					pLastSpace[ 0 ] = '\0';
-					pLastSpace = Q_strrchr( mapcommand, '\n' );
-
-					Q_snprintf( pLastSpace, sizeof( mapcommand ) - Q_strlen( mapcommand ), "\nmap %s_advanced\n", m_pBonusMapDescription->szMapFileName );
-				}
-				else
-				{
-					char sz[ 256 ];
-
-					int iChallenge = m_iBonusSelection - 1;
-
-					// Set up the challenge mode
-					Q_snprintf( sz, sizeof( sz ), "sv_bonus_challenge %i\n", iChallenge );
-					engine->ClientCmd_Unrestricted( sz );
-
-					ChallengeDescription_t *pChallengeDescription = &((*m_pBonusMapDescription->m_pChallenges)[ iChallenge - 1 ]);
-
-					// Set up medal goals
-					BonusMapsDatabase()->SetCurrentChallengeObjectives( pChallengeDescription->iBronze, pChallengeDescription->iSilver, pChallengeDescription->iGold );
-					BonusMapsDatabase()->SetCurrentChallengeNames( m_pBonusMapDescription->szFileName, m_pBonusMapDescription->szMapName, pChallengeDescription->szName );
-				}
-			}
-
-			m_bMapStarting = true;
-			BasePanel()->FadeToBlackAndRunEngineCommand( mapcommand );
-		}
 
 		OnClose();
 	}
@@ -1453,62 +1416,6 @@ void CNewGameDialog::OnCommand( const char *command )
 			StartGame();
 		}
 	}
-
-#ifdef _X360
-	else if ( !stricmp( command, "StartNewGame" ) )
-	{
-		ConVarRef commentary( "commentary" );
-
-		if ( m_bCommentaryMode && !commentary.GetBool() )
-		{
-			// Using the commentary menu, but not already in commentary mode, explain the rules
-			PostMessage( (vgui::Panel*)this, new KeyValues( "command", "command", "StartNewGameWithCommentaryExplanation" ), 0.2f );
-		}
-		else
-		{
-			if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED || 
-				 !ModInfo().IsSinglePlayerOnly() )
-			{
-				// Multiplayer or no storage device so don't bore them with autosave details
-				m_bMapStarting = true;
-				OnCommand( "StartNewGameNoCommentaryExplanation" );
-			}
-			else
-			{
-				// Don't allow other inputs
-				m_bMapStarting = true;
-
-				// Remind them how autosaves work
-				PostMessage( (vgui::Panel*)this, new KeyValues( "command", "command", "StartNewGameWithAutosaveExplanation" ), 0.2f );
-			}
-		}
-	}
-	else if ( !stricmp( command, "StartNewGameWithAutosaveExplanation" ) )
-	{
-		BasePanel()->ShowMessageDialog( MD_AUTOSAVE_EXPLANATION, this );
-	}
-	else if ( !stricmp( command, "StartNewGameWithCommentaryExplanation" ) )
-	{
-		if ( ModInfo().IsSinglePlayerOnly() )
-		{
-			// Don't allow other inputs
-			m_bMapStarting = true;
-			BasePanel()->ShowMessageDialog( MD_COMMENTARY_EXPLANATION, this );
-		}
-		else
-		{
-			// Don't allow other inputs
-			m_bMapStarting = true;
-			BasePanel()->ShowMessageDialog( MD_COMMENTARY_EXPLANATION_MULTI, this );
-		}
-	}
-	else if ( !stricmp( command, "StartNewGameNoCommentaryExplanation" ) )
-	{
-		vgui::surface()->PlaySound( "UI/buttonclickrelease.wav" );
-		BasePanel()->RunAnimationWithCallback( this, "CloseNewGameDialog", new KeyValues( "StartGame" ) );
-	}
-#endif
-
 	else if ( !stricmp( command, "Next" ) )
 	{
 		if ( m_bMapStarting )

@@ -483,20 +483,8 @@ void CLoadingDialog::PerformLayout()
 		int wide,tall;
 		GetSize( wide, tall );
 
-		if ( IsPC() )
-		{
-			x = screenWide - ( wide + 10 );
-			y = screenTall - ( tall + 10 );
-		}
-		else
-		{
-			// Move farther in so we're title safe
-			x = screenWide - wide - (screenWide * 5 / 100);
-			y = screenTall - tall - (screenTall * 5 / 100);
-		}
-
-		x -= m_iAdditionalIndentX;
-		y -= m_iAdditionalIndentY;
+		x = screenWide - ( wide + 10 ) - m_iAdditionalIndentX;
+		y = screenTall - ( tall + 10 ) - m_iAdditionalIndentY;
 
 		SetPos( x, y );
 	}
@@ -524,7 +512,7 @@ bool CLoadingDialog::SetProgressPoint( float fraction )
 			m_flProgressFraction = fraction;
 			return true;
 		}
-		return IsX360();
+		return false;
 	}
 
 	if ( !m_bShowingVACInfo && gameuifuncs->IsConnectedToVACSecureServer() )
