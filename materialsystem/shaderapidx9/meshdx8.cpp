@@ -3352,33 +3352,34 @@ void CMeshDX8::CheckIndices( CPrimList *pPrim, int numPrimitives )
 	{
 		Assert( pPrim->m_FirstIndex >= 0 && pPrim->m_FirstIndex < g_pLastIndex->IndexCount() );
 
-		const int maxVertexIdx = (int)( s_FirstVertex + m_FirstIndex );
+		const unsigned maxVertexIdx = s_FirstVertex + m_FirstIndex;
 
 		{
 			CVertexBuffer* pMesh = g_pLastVertex;
 
-			Assert( pMesh && maxVertexIdx < pMesh->VertexCount() );
+			Assert( pMesh && maxVertexIdx < (unsigned)pMesh->VertexCount() );
 		}
 
+		if ( g_pLastColorMesh )
 		{
-			CVertexBuffer* pMesh = g_pLastColorMesh ? g_pLastColorMesh->m_pVertexBuffer : NULL;
+			CVertexBuffer* pMesh = g_pLastColorMesh->m_pVertexBuffer;
 
-			if ( pMesh )
-			{
-				Assert( maxVertexIdx < pMesh->VertexCount() );
-			}
+			Assert( maxVertexIdx < (unsigned)pMesh->VertexCount() );
 		}
 
-		for (int j = 0; j < nIndexCount; j++)
-		{
-			const unsigned int index = g_pLastIndex->GetShadowIndex( j + pPrim->m_FirstIndex );
+		const int upperPrimIndexBound = nIndexCount + pPrim->m_FirstIndex;
+		const int upperShadowIndexBound = s_FirstVertex + s_NumVertices;
 
-			if (index >= s_FirstVertex && index < s_FirstVertex + s_NumVertices)
+		for (int j = pPrim->m_FirstIndex; j < upperPrimIndexBound; j++)
+		{
+			const unsigned index = g_pLastIndex->GetShadowIndex( j );
+
+			if (index >= s_FirstVertex && index < upperShadowIndexBound)
 			{
 				continue;
 			}
 
-			Warning("%s invalid index: %d [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, s_FirstVertex + s_NumVertices - 1);
+			Warning("%s invalid index: %u [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, upperShadowIndexBound - 1);
 
 			Assert( false );
 		}
@@ -3451,7 +3452,7 @@ void CMeshDX8::RenderPass()
 
 					numPrimitives );// Number of primitives to render. The number of vertices used is a function of the primitive count and the primitive type.
 			}
-	}
+		}
 	}
 }
 
