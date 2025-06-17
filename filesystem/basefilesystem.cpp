@@ -5348,11 +5348,11 @@ int CFileHandle::Tell()
 	return -1;
 }
 
-int CFileHandle::Size()
+unsigned CFileHandle::Size()
 {
 	Assert( IsValid() );
 
-	int nReturnedSize = -1;
+	unsigned nReturnedSize = std::numeric_limits<unsigned>::max();
 
 #if defined( SUPPORT_PACKED_STORE )
 	if ( m_VPKHandle )

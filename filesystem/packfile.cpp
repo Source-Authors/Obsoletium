@@ -847,7 +847,7 @@ CLZMAZipPackFileHandle::~CLZMAZipPackFileHandle()
 
 int CLZMAZipPackFileHandle::Read( void* pBuffer, int nDestSize, int nBytes )
 {
-	int nMaxRead = Min( Min( nDestSize, nBytes ), Size() - Tell() );
+	int nMaxRead = Min( Min( nDestSize, nBytes ), static_cast<int>(Size()) - Tell() );
 	int nBytesRead = 0;
 
 	// If we have seeked backwards into our buffer, read from there first
@@ -952,7 +952,7 @@ int CLZMAZipPackFileHandle::Seek( int nOffset, int nWhence )
 		AssertMsg( false, "Unknown seek type" );
 	}
 
-	nNewPosition = Min( Size(), nNewPosition );
+	nNewPosition = Min( static_cast<int>(Size()), nNewPosition );
 	nNewPosition = Max( 0, nNewPosition );
 
 	if ( nNewPosition == m_nSeekPosition )
@@ -1013,7 +1013,7 @@ int CLZMAZipPackFileHandle::Tell()
 	return m_nSeekPosition;
 }
 
-int CLZMAZipPackFileHandle::Size()
+unsigned CLZMAZipPackFileHandle::Size()
 {
 	return m_nOriginalSize;
 }
