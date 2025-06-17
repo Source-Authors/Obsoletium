@@ -340,22 +340,35 @@ inline bool CUtlMultiList<T,I>::IndexInRange( intp index ) // Static method
 
 template <class T, class I>
 inline bool CUtlMultiList<T,I>::IsValidIndex( I i ) const  
-{ 
-	// GCC warns if I is an unsigned type and we do a ">= 0" against it (since the comparison is always 0).
-	// We get the warning even if we cast inside the expression. It only goes away if we assign to another variable.
-	long x = i;
+{
+	bool res = (i < m_MaxElementIndex);
 
- 	return (i < m_MaxElementIndex) && (x >= 0) &&
-		((m_Memory[i].m_Previous != i) || (m_Memory[i].m_Next == i));
+	if constexpr (std::is_signed<I>())
+	{
+		res = res && (x >= 0);
+	}
+
+	if (res)
+	{
+		const auto &value = m_Memory[i];
+
+		return ((value.m_Previous != i) || (value.m_Next == i));
+	}
+
+	return false;
 }
 
 template <class T, class I>
 inline bool CUtlMultiList<T,I>::IsInList( I i ) const
 {
-	// GCC warns if I is an unsigned type and we do a ">= 0" against it (since the comparison is always 0).
-	// We get the warning even if we cast inside the expression. It only goes away if we assign to another variable.
-	long x = i;
-	return (i < m_MaxElementIndex) && (x >= 0) && (Previous(i) != i);
+	bool res = (i < m_MaxElementIndex);
+
+	if constexpr (std::is_signed<I>())
+	{
+		res = res && (i >= 0);
+	}
+
+	return res && (Previous(i) != i);
 }
 
 
