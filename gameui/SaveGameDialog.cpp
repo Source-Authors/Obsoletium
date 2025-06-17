@@ -160,5 +160,5 @@ void CSaveGameDialog::FindSaveSlot( OUT_Z_CAP(bufsize) char *buffer, intp bufsiz
 		g_pFullFileSystem->Close(fp);
 	}
 
-	Assert(!("Could not generate new save game file"));
+	Warning("Could not generate new save game file. Last checked save file '%s' already exist.\n", szFileName);
 }
