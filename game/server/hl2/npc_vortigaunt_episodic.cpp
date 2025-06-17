@@ -1146,7 +1146,7 @@ void CNPC_Vortigaunt::Precache()
 	if ( hl2_episodic.GetBool() )
 	{
 		char modDir[MAX_PATH];
-		if ( UTIL_GetModDir( modDir, sizeof(modDir) ) )
+		if ( UTIL_GetModDir( modDir ) )
 		{
 			if ( !Q_stricmp( modDir, "ep2" ) )
 			{

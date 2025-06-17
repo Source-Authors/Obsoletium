@@ -165,7 +165,7 @@ bool Flashlight_UseLegacyVersion( void )
 	if ( g_bCacheLegacyFlashlightStatus )
 	{
 		char modDir[MAX_PATH];
-		if ( UTIL_GetModDir( modDir, sizeof(modDir) ) == false )
+		if ( UTIL_GetModDir( modDir ) == false )
 			return false;
 
 		g_bUseLegacyFlashlight = ( !Q_strcmp( modDir, "hl2" ) ||

@@ -608,7 +608,12 @@ extern const char	*UTIL_FunctionToName( datamap_t *pMap, inputfunc_t *function )
 
 int UTIL_GetCommandClientIndex( void );
 CBasePlayer *UTIL_GetCommandClient( void );
-bool UTIL_GetModDir( char *lpszTextOut, unsigned int nSize );
+bool UTIL_GetModDir( OUT_Z_CAP(nSize) char *lpszTextOut, intp nSize );
+template<intp size>
+bool UTIL_GetModDir( OUT_Z_ARRAY char (&lpszTextOut)[size] )
+{
+	return UTIL_GetModDir( lpszTextOut, size );
+}
 
 AngularImpulse WorldToLocalRotation( const VMatrix &localToWorld, const Vector &worldAxis, float rotation );
 void UTIL_WorldToParentSpace( CBaseEntity *pEntity, Vector &vecPosition, QAngle &vecAngles );
