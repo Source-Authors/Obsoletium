@@ -911,7 +911,7 @@ static bool PortalCrossesWater( waterleaf_t &baseleaf, portal_t *portal )
 {
 	if ( baseleaf.hasSurface )
 	{
-		int side = WindingOnPlaneSide( portal->winding, baseleaf.surfaceNormal, baseleaf.surfaceDist );
+		SideType side = WindingOnPlaneSide( portal->winding, baseleaf.surfaceNormal, baseleaf.surfaceDist );
 		if ( side == SIDE_CROSS || side == SIDE_FRONT )
 			return true;
 	}
