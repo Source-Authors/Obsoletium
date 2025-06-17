@@ -3176,7 +3176,7 @@ inline int V_iswspace( int c ) { return ( c <= 0xFFFF ) ? iswspace( (wint_t)c ) 
 //			sep - Character to use as separator. UNDONE: allow multiple separator chars
 // Output : Returns a pointer to the next token to be parsed.
 //-----------------------------------------------------------------------------
-RET_MAY_BE_NULL const char *nexttoken(OUT_Z_CAP(nMaxTokenLen) char *token, size_t nMaxTokenLen, IN_Z const char *str, char sep)
+RET_MAY_BE_NULL const char *nexttoken(OUT_Z_CAP(nMaxTokenLen) char *token, size_t nMaxTokenLen, IN_OPT_Z const char *str, char sep)
 {
 	if (nMaxTokenLen < 1)
 	{

@@ -80,11 +80,11 @@ char *V_strlower( INOUT_Z char *start );
 //-----------------------------------------------------------------------------
 RET_MAY_BE_NULL const char *nexttoken(OUT_Z_CAP(nMaxTokenLen) char *token,
 	size_t nMaxTokenLen,
-	IN_Z const char *str,
+	IN_OPT_Z const char *str,
 	char sep);
 template <size_t maxLenInChars>
 inline RET_MAY_BE_NULL const char *nexttoken( OUT_Z_ARRAY char (&pToken)[maxLenInChars],
-	IN_Z const char *str,
+	IN_OPT_Z const char *str,
 	char sep)
 {
 	return nexttoken( pToken, maxLenInChars, str, sep );
