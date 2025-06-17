@@ -2638,16 +2638,20 @@ inline void _SSE_RSqrtInline( float a, float* out ) = delete;
 //}
 #endif
 
-FORCEINLINE float XM_CALLCONV VectorNormalize( DirectX::XMVECTOR& val )
+FORCEINLINE DirectX::XMVECTOR XM_CALLCONV VectorNormalize( DirectX::XMVECTOR& val )
 {
 	DirectX::XMVECTOR len = DirectX::XMVector3Length( val );
-	float slen = DirectX::XMVectorGetX( len ); //-V2002
+
 	// Prevent division on zero.
-	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( slen + FLT_EPSILON ) ); //-V2002
+	DirectX::XMVECTOR den = DirectX::XMVectorDivide
+	(
+		DirectX::g_XMOne,
+		DirectX::XMVectorAdd( len, DirectX::g_XMEpsilon )
+	);
 
 	val = DirectX::XMVectorMultiply( val, den );
 	
-	return slen;
+	return len;
 }
 
 FORCEINLINE float XM_CALLCONV VectorNormalize( Vector& vec )
@@ -2655,11 +2659,11 @@ FORCEINLINE float XM_CALLCONV VectorNormalize( Vector& vec )
 	CHECK_VALID(vec);
 
 	DirectX::XMVECTOR val = DirectX::XMLoadFloat3( vec.XmBase() );
-	float slen = VectorNormalize( val );
+	DirectX::XMVECTOR len = VectorNormalize( val );
 
 	DirectX::XMStoreFloat3( vec.XmBase(), val );
 
-	return slen;
+	return DirectX::XMVectorGetX( len );
 }
 
 [[nodiscard]] FORCEINLINE float XM_CALLCONV VectorNormalize( DirectX::XMFLOAT4 *v )
@@ -2672,11 +2676,11 @@ FORCEINLINE float XM_CALLCONV VectorNormalize( Vector& vec )
 		DirectX::XMLoadFloat4( v ),
 		0.0f
 	);
-	float slen = VectorNormalize( val );
+	DirectX::XMVECTOR len = VectorNormalize( val );
 
 	DirectX::XMStoreFloat4( v, val );
 	
-	return slen;
+	return DirectX::XMVectorGetX( len );
 }
 
 // FIXME: Obsolete version of VectorNormalize, once we remove all the friggin float*s
