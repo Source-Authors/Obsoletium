@@ -128,6 +128,9 @@ void CGameMenuItem::ApplySchemeSettings(IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
 
+	// dimhotepus: Large screens friendly menu.
+	SetProportional(true);
+
 	// make fully transparent
 	SetFgColor(GetSchemeColor("MainMenu.TextColor", pScheme));
 	SetBgColor(Color(0, 0, 0, 0));
@@ -222,8 +225,18 @@ public:
 	{
 		BaseClass::ApplySchemeSettings(pScheme);
 
+		// dimhotepus: Large screens friendly menu.
+		// SetProportional(true);
+
+		// dimhotepus: Large screens friendly menu.
+		const int menuItemHeight = scheme()->GetProportionalScaledValueEx
+		(
+			GetScheme(),
+			atoi(pScheme->GetResourceString("MainMenu.MenuItemHeight"))
+		);
+
 		// make fully transparent
-		SetMenuItemHeight(atoi(pScheme->GetResourceString("MainMenu.MenuItemHeight")));
+		SetMenuItemHeight(menuItemHeight);
 		SetBgColor(Color(0, 0, 0, 0));
 		SetBorder(NULL);
 	}
