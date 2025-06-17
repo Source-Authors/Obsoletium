@@ -5901,13 +5901,13 @@ void CMeshMgr::RenderPassWithVertexAndIndexBuffers( void )
 				if( m_PrimitiveType == MATERIAL_TRIANGLES || m_PrimitiveType == MATERIAL_TRIANGLE_STRIP )
 				{
 					// FIXME: need to be able to deal with multiple stream here, but don't bother for now.
-					int j;
-					int numVerts = m_pVertexCount[0];
-					for( j = 0; j < m_nNumIndices; j++ )
+					const int numVerts = m_pVertexCount[0], indicesUpperBound = m_nNumIndices + m_nFirstIndex;
+					const int firstVertex = m_pFirstVertex[0];
+					for( int j = m_nFirstIndex; j < indicesUpperBound; j++ )
 					{
-						int index = pIndexBuffer->GetShadowIndex( j + m_nFirstIndex );
-						Assert( index >= m_pFirstVertex[0] );
-						Assert( index < m_pFirstVertex[0] + numVerts );
+						int index = pIndexBuffer->GetShadowIndex( j );
+						Assert( index >= firstVertex );
+						Assert( index < firstVertex + numVerts );
 					}
 				}
 #endif // CHECK_INDICES
