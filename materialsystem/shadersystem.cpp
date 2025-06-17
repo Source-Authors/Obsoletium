@@ -859,45 +859,44 @@ void CShaderSystem::CleanUpDebugMaterials()
 // Deal with buffering of spew while doing shader draw so that we don't get 
 // recursive spew during precache due to fonts not being loaded, etc.
 //-----------------------------------------------------------------------------
-CThreadFastMutex g_StgoredSpewMutex;
+CThreadMutex g_StgoredSpewMutex;
 void CShaderSystem::BufferSpew( SpewType_t spewType, const char *pGroup, const Color &c, const char *pMsg )
 {
 	AUTO_LOCK( g_StgoredSpewMutex );
-	m_StoredSpew.PutInt( spewType );
+
+	static_assert(SpewType_t::SPEW_TYPE_COUNT <= std::numeric_limits<unsigned char>::max());
+	m_StoredSpew.PutUnsignedChar( static_cast<unsigned char>(spewType) );
+
 	m_StoredSpew.PutString( pGroup );
-	m_StoredSpew.PutChar( c.r() );
-	m_StoredSpew.PutChar( c.g() );
-	m_StoredSpew.PutChar( c.b() );
-	m_StoredSpew.PutChar( c.a() );
+	m_StoredSpew.PutInt( c.GetRawColor() );
 	m_StoredSpew.PutString( pMsg );
 }
 
 void CShaderSystem::PrintBufferedSpew( void )
 {
 	AUTO_LOCK( g_StgoredSpewMutex );
+
 	while ( m_StoredSpew.GetBytesRemaining() > 0 )
 	{
-		SpewType_t spewType	= (SpewType_t)m_StoredSpew.GetInt();
+		static_assert(SpewType_t::SPEW_TYPE_COUNT <= std::numeric_limits<unsigned char>::max());
+		SpewType_t spewType	= (SpewType_t)m_StoredSpew.GetUnsignedChar();
 
 		intp nGroupLen = m_StoredSpew.PeekStringLength();
-		char *pGroup = (char*)_alloca( nGroupLen );
+		char *pGroup = stackallocT( char, nGroupLen );
 		if ( nGroupLen )
 		{
 			m_StoredSpew.GetStringManualCharCount( pGroup, nGroupLen );
 		}
 		
-		unsigned char r, g, b, a;
-		r = m_StoredSpew.GetChar();
-		g = m_StoredSpew.GetChar();
-		b = m_StoredSpew.GetChar();
-		a = m_StoredSpew.GetChar();
+		const int rawColor = m_StoredSpew.GetInt();
 
-		Color c( r, g, b, a );
+		Color c;
+		c.SetRawColor( rawColor );
 		
 		intp nMsgLen = m_StoredSpew.PeekStringLength();
 		if ( nMsgLen )
 		{
-			char *pMsg = (char*)_alloca( nMsgLen );
+			char *pMsg = stackallocT( char, nMsgLen );
 			m_StoredSpew.GetStringManualCharCount( pMsg, nMsgLen );
 
 			if ( nGroupLen && !Q_isempty(pGroup) )
@@ -920,7 +919,6 @@ void CShaderSystem::PrintBufferedSpew( void )
 
 static SpewRetval_t MySpewOutputFunc( SpewType_t spewType, char const *pMsg )
 {
-	AUTO_LOCK( g_StgoredSpewMutex );
 	const char *g = GetSpewOutputGroup();
 	Color c = *GetSpewOutputColor();
 	s_ShaderSystem.BufferSpew( spewType, g, c, pMsg );
@@ -958,7 +956,9 @@ void CShaderSystem::PrepForShaderDraw( IShader *pShader,
 
 void CShaderSystem::DoneWithShaderDraw()
 {
-	SpewOutputFunc( m_SaveSpewOutput );
+	[[maybe_unused]] const auto oldSpewOutput = SpewOutputFunc2( m_SaveSpewOutput );
+	Assert( oldSpewOutput == &MySpewOutputFunc );
+
 	PrintBufferedSpew();
 
 	m_SaveSpewOutput = NULL;
