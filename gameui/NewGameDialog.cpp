@@ -478,9 +478,9 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	LoadControlSettings( "Resource/NewGameDialog.res", NULL, pKeys );
 
 	// Reset all properties
-	for ( int i = 0; i < NUM_SLOTS; ++i )
+	for ( auto &idx : m_PanelIndex )
 	{
-		m_PanelIndex[i] = INVALID_INDEX;
+		idx = INVALID_INDEX;
 	}
 
 	if ( !m_ChapterPanels.Count() )
@@ -579,9 +579,9 @@ void CNewGameDialog::ApplySettings( KeyValues *inResourceData )
 	BaseClass::ApplySettings( inResourceData );
 
 	int ypos = inResourceData->GetInt( "chapterypos", 40 );
-	for ( int i = 0; i < NUM_SLOTS; ++i )
+	for ( auto &idx : m_PanelYPos )
 	{
-		m_PanelYPos[i] = ypos;
+		idx = ypos;
 	}
 
 	m_pCenterBg->SetTall( inResourceData->GetInt( "centerbgtall", 0 ) );
