@@ -44,8 +44,6 @@
 #include <gnu/libc-version.h>
 #endif
 
-#include "tier0/tslist.h"
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
