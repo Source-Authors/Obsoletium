@@ -18,14 +18,6 @@
 
 #define null 0L
 
-#ifndef NULL
-#ifdef __cplusplus
-#define NULL    0
-#else
-#define NULL    nullptr
-#endif
-#endif
-
 using uchar = unsigned char;
 using ushort = unsigned short;
 using uint = unsigned int;
