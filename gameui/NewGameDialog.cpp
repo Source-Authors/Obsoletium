@@ -44,6 +44,7 @@ static float	g_ScrollSpeedFast;
 struct chapter_t
 {
 	char filename[32];
+	intp length;
 };
 static bool ChapterSortFunc(const chapter_t &c1, const chapter_t &c2)
 {
@@ -54,8 +55,8 @@ static bool ChapterSortFunc(const chapter_t &c1, const chapter_t &c2)
 	if (atoi(c1.filename + chapterlen) < atoi(c2.filename + chapterlen))
 		return true;
 
-	const size_t len1 = strlen(c1.filename);
-	const size_t len2 = strlen(c2.filename);
+	const size_t len1 = c1.length;
+	const size_t len2 = c2.length;
 
 	// compare length second (longer string show up later in the list, eg. chapter9 before chapter9a)
 	if (len1 > len2)
@@ -390,6 +391,7 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 					if ( g_pFullFileSystem->Size(f) > 0	)
 					{
 						V_strcpy_safe(chapters[chapterIndex].filename, fileName);
+						chapters[chapterIndex].length = V_strlen(chapters[chapterIndex].filename);
 						++chapterIndex;
 					}
 					g_pFullFileSystem->Close( f );
