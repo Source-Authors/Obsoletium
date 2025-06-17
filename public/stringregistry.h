@@ -15,6 +15,8 @@
 #define STRINGREGISTRY_H
 #pragma once
 
+#include "tier0/basetypes.h"
+
 struct StringTable_t;
 
 //-----------------------------------------------------------------------------
@@ -27,20 +29,20 @@ private:
 
 public:
 	// returns a key for a given string
-	unsigned short AddString(const char *stringText, int stringID);
+	unsigned short AddString(const char *stringText, intp stringID);
 
 	// This is optimized.  It will do 2 O(logN) searches
 	// Only one of the searches needs to compare strings, the other compares symbols (ints)
 	// returns -1 if the string is not present in the registry.
-	int		GetStringID(const char *stringText);
+	intp		GetStringID(const char *stringText);
 
 	// This is unoptimized.  It will linearly search (but only compares ints, not strings)
-	const char	*GetStringText(int stringID);
+	const char	*GetStringText(intp stringID);
 
 	// This is O(1).  It will not search.  key MUST be a value that was returned by AddString
 	const char *GetStringForKey(unsigned short key);
 	// This is O(1).  It will not search.  key MUST be a value that was returned by AddString
-	int		GetIDForKey(unsigned short key);
+	intp		GetIDForKey(unsigned short key);
 
 	void	ClearStrings(void);
 

@@ -25,7 +25,7 @@
 //-----------------------------------------------------------------------------
 // Purpose: This class wraps the containers that do the actual work
 //-----------------------------------------------------------------------------
-struct StringTable_t : public CUtlDict<int, unsigned short>
+struct StringTable_t : public CUtlDict<intp, unsigned short>
 {
 };
 
@@ -36,7 +36,7 @@ struct StringTable_t : public CUtlDict<int, unsigned short>
 // Input  :
 // Output :
 //-----------------------------------------------------------------------------
-unsigned short CStringRegistry::AddString(const char *stringText, int stringID)
+unsigned short CStringRegistry::AddString(const char *stringText, intp stringID)
 {
 	return m_pStringList->Insert( stringText, stringID );
 }
@@ -46,9 +46,9 @@ unsigned short CStringRegistry::AddString(const char *stringText, int stringID)
 // Input  :	Text of string to find
 // Output : Return string id or -1 if no such string exists
 //-----------------------------------------------------------------------------
-int	CStringRegistry::GetStringID( const char *stringText )
+intp	CStringRegistry::GetStringID( const char *stringText )
 {
-	unsigned short index = m_pStringList->Find( stringText );
+	auto index = m_pStringList->Find( stringText );
 	if ( m_pStringList->IsValidIndex( index ) )
 	{
 		return (*m_pStringList)[index];
@@ -62,9 +62,9 @@ int	CStringRegistry::GetStringID( const char *stringText )
 // Input  : ID of string to find
 // Output : Return string text of NULL of no such ID exists
 //-----------------------------------------------------------------------------
-char const *CStringRegistry::GetStringText( int stringID )
+char const *CStringRegistry::GetStringText( intp stringID )
 {
-	for( unsigned short index = m_pStringList->First() ; index != m_pStringList->InvalidIndex(); index = m_pStringList->Next( index ) )
+	for( auto index = m_pStringList->First() ; index != m_pStringList->InvalidIndex(); index = m_pStringList->Next( index ) )
 	{
 		if ( (*m_pStringList)[index] == stringID )
 		{
@@ -90,7 +90,7 @@ char const *CStringRegistry::GetStringForKey( unsigned short key )
 //-----------------------------------------------------------------------------
 // Purpose: Given a key return the string text
 //-----------------------------------------------------------------------------
-int CStringRegistry::GetIDForKey( unsigned short key )
+intp CStringRegistry::GetIDForKey( unsigned short key )
 {
 	if ( !m_pStringList->IsValidIndex( key ) )
 		return 0;
