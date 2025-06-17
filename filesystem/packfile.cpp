@@ -459,7 +459,7 @@ void CZipPackFile::GetFileAndDirLists( const char *pRawWildCard, CUtlStringList 
 			if ( pSubDirSlash )
 			{
 				// This is a subdirectory match, drop everything after it and continue with it as the filename
-				nSubDirLen = (size_t)( (ptrdiff_t)pSubDirSlash - (ptrdiff_t)( szCandidateName + nLenWildcardPath ) );
+				nSubDirLen = (size_t)( pSubDirSlash - ( szCandidateName + nLenWildcardPath ) );
 				V_strncpy( szCandidateBaseName, szCandidateName + nLenWildcardPath, nSubDirLen + 1 );
 				bIsDir = true;
 
