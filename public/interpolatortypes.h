@@ -71,7 +71,7 @@ enum
 };
 
 // Turn enum into string and vice versa
-int			Interpolator_CurveTypeForName( const char *name );
+unsigned short	Interpolator_CurveTypeForName( const char *name );
 const char	*Interpolator_NameForCurveType( int type, bool printname );
 void		Interpolator_CurveInterpolatorsForType( int type, int& inbound, int& outbound );
 int			Interpolator_CurveTypeForHotkey( int key );
