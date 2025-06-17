@@ -421,7 +421,8 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	if ( bBonusesUnlocked )
 	{
 		// Bonuses are unlocked so we need to unlock all the chapters too
-		var.SetValue( 15 );
+		// dimhotepus: Set to real chapters count, not 15!
+		var.SetValue( chapterIndex );
 	}
 
 	const char *unlockedChapter = var.IsValid() ? var.GetString() : "1";
