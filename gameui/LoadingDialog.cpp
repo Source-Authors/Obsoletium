@@ -52,8 +52,8 @@ CLoadingDialog::CLoadingDialog( vgui::Panel *parent ) : Frame(parent, "LoadingDi
 
 	m_bShowingSecondaryProgress = false;
 	m_flSecondaryProgress = 0.0f;
-	m_flLastSecondaryProgressUpdateTime = 0.0f;
-	m_flSecondaryProgressStartTime = 0.0f;
+	m_flLastSecondaryProgressUpdateTime = 0.0;
+	m_flSecondaryProgressStartTime = 0.0;
 
 	m_pProgress = new ProgressBar( this, "Progress" );
 	m_pProgress2 = new ProgressBar( this, "Progress2" );
@@ -325,7 +325,7 @@ void CLoadingDialog::DisplayGenericError(const char *failureReason, const char *
 	m_pInfoLabel->GetContentSize( wide, tall );
 	m_pInfoLabel->GetPos( x, y );
 	SetTall( tall + y + 50 );
-
+	 
 	int buttonX, buttonY;
 	m_pCancelButton->GetPos( buttonX, buttonY );
 	m_pCancelButton->SetPos( buttonX, tall + y + 6 );
@@ -523,7 +523,7 @@ bool CLoadingDialog::SetProgressPoint( float fraction )
 	int nOldDrawnSegments = m_pProgress->GetDrawnSegmentCount();
 	m_pProgress->SetProgress( fraction );
 	int nNewDrawSegments = m_pProgress->GetDrawnSegmentCount();
-	return (nOldDrawnSegments != nNewDrawSegments) || IsX360();
+	return nOldDrawnSegments != nNewDrawSegments;
 }
 
 //-----------------------------------------------------------------------------
@@ -544,7 +544,7 @@ void CLoadingDialog::SetSecondaryProgress( float progress )
 		LoadControlSettings("Resource/LoadingDialogDualProgress.res");
 		m_bShowingSecondaryProgress = true;
 		m_pProgress2->SetVisible(true);
-		m_flSecondaryProgressStartTime = (float)system()->GetFrameTime();
+		m_flSecondaryProgressStartTime = system()->GetFrameTime();
 	}
 
 	// if progress has increased then update the progress counters
@@ -552,7 +552,7 @@ void CLoadingDialog::SetSecondaryProgress( float progress )
 	{
 		m_pProgress2->SetProgress(progress);
 		m_flSecondaryProgress = progress;
-		m_flLastSecondaryProgressUpdateTime = (float)system()->GetFrameTime();
+		m_flLastSecondaryProgressUpdateTime = system()->GetFrameTime();
 	}
 
 	// if progress has decreased then reset progress counters
@@ -560,8 +560,8 @@ void CLoadingDialog::SetSecondaryProgress( float progress )
 	{
 		m_pProgress2->SetProgress(progress);
 		m_flSecondaryProgress = progress;
-		m_flLastSecondaryProgressUpdateTime = (float)system()->GetFrameTime();
-		m_flSecondaryProgressStartTime = (float)system()->GetFrameTime();
+		m_flLastSecondaryProgressUpdateTime = system()->GetFrameTime();
+		m_flSecondaryProgressStartTime = system()->GetFrameTime();
 	}
 }
 
