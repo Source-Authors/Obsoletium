@@ -800,26 +800,134 @@ inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == a
 
 #else
 
-// @Note (toml 05-02-02): this technique expects the compiler to
-// optimize the expression and eliminate the other path. On any new
-// platform/compiler this should be tested.
-inline short BigShort( short val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? WordSwap( val )  : val; } //-V206
-inline uint16 BigWord( uint16 val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? WordSwap( val )  : val; } //-V206
-inline long BigLong( long val )			{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? DWordSwap( val ) : val; } //-V206
-inline uint32 BigDWord( uint32 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? DWordSwap( val ) : val; } //-V206
-inline short LittleShort( short val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : WordSwap( val ); } //-V206
-inline uint16 LittleWord( uint16 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : WordSwap( val ); } //-V206
-inline long LittleLong( long val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : DWordSwap( val ); } //-V206
-inline uint32 LittleDWord( uint32 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : DWordSwap( val ); } //-V206
-inline uint64 LittleQWord( uint64 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : QWordSwap( val ); } //-V206
-inline short SwapShort( short val )					{ return WordSwap( val ); }
+template <bool isLittleEndian = endian::native == endian::little>
+inline int16 BigShort( int16 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return WordSwap( val );
+	}
+
+	return val;
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint16 BigWord( uint16 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return WordSwap( val );
+	}
+
+	return val;
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline long BigLong( long val )
+{
+	if constexpr (isLittleEndian)
+	{
+		// dimhotepus: Honor size ex for LP64.
+		if constexpr (sizeof(val) <= 4)
+			return DWordSwap( val );
+		else
+			return QWordSwap( val );
+	}
+
+	return val;
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint32 BigDWord( uint32 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return DWordSwap( val );
+	}
+
+	return val;
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline int16 LittleShort( int16 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	return WordSwap( val );
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint16 LittleWord( uint16 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	return WordSwap( val );
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline long LittleLong( long val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	// dimhotepus: Honor size ex for LP64.
+	if constexpr (sizeof(val) <= 4)
+		return DWordSwap( val );
+	else
+		return QWordSwap( val );
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint32 LittleDWord( uint32 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	return DWordSwap(val);
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint64 LittleQWord( uint64 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	return QWordSwap( val ); 
+}
+inline int16 SwapShort( int16 val )					{ return WordSwap( val ); }
 inline uint16 SwapWord( uint16 val )				{ return WordSwap( val ); }
 inline long SwapLong( long val )					{ return DWordSwap( val ); }
 inline uint32 SwapDWord( uint32 val )				{ return DWordSwap( val ); }
 
 // Pass floats by pointer for swapping to avoid truncation in the fpu
-inline void BigFloat( float *pOut, const float *pIn )		{ int test = 1; ( *reinterpret_cast<char *>(&test) == 1 ) ? SafeSwapFloat( pOut, pIn ) : ( *pOut = *pIn ); } //-V206
-inline void LittleFloat( float *pOut, const float *pIn )	{ int test = 1; ( *reinterpret_cast<char *>(&test) == 1 ) ? ( *pOut = *pIn ) : SafeSwapFloat( pOut, pIn ); } //-V206
+template <bool isLittleEndian = endian::native == endian::little>
+inline void BigFloat( float *pOut, const float *pIn )
+{
+	if constexpr (isLittleEndian)
+	{
+		SafeSwapFloat( pOut, pIn );
+	}
+	else
+	{
+		*pOut = *pIn;
+	}
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline void LittleFloat( float *pOut, const float *pIn )
+{
+	if constexpr (isLittleEndian)
+	{
+		*pOut = *pIn;
+	}
+	else
+	{
+		SafeSwapFloat( pOut, pIn );
+	}
+}
 inline void SwapFloat( float *pOut, const float *pIn )		{ SafeSwapFloat( pOut, pIn ); }
 
 #endif
