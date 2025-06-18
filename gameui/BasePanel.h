@@ -20,10 +20,7 @@
 #include "tier1/CommandBuffer.h"
 
 #include "ixboxsystem.h"
-
-#if !defined( _X360 )
 #include "xbox/xboxstubs.h"
-#endif
 
 enum
 {
@@ -148,7 +145,6 @@ public:
 	CGameMenuItem(vgui::Menu *parent, const char *name);
 
 	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
-	void PaintBackground( void ) override;
 	void SetRightAlignedText( bool state );
 
 private:
@@ -214,9 +210,7 @@ public:
 	void OnOpenNewGameDialog( const char *chapter = NULL );
 	void OnOpenBonusMapsDialog();
 	void OnOpenLoadGameDialog();
-	void OnOpenLoadGameDialog_Xbox();
 	void OnOpenSaveGameDialog();
-	void OnOpenSaveGameDialog_Xbox();
 	void OnOpenServerBrowser();
 	void OnOpenFriendsDialog();
 	void OnOpenDemoDialog();
@@ -227,7 +221,6 @@ public:
 	void OnOpenPlayerListDialog();
 	void OnOpenBenchmarkDialog();
 	void OnOpenOptionsDialog();
-	void OnOpenOptionsDialog_Xbox();
 	void OnOpenLoadCommentaryDialog();
 	void OpenLoadSingleplayerCommentaryDialog();
 	void OnOpenAchievementsDialog();
@@ -243,8 +236,6 @@ public:
     //=============================================================================
     // HPE_END
     //=============================================================================
-
-	void OnOpenControllerDialog();
 
 	// Xbox 360
 	CMatchmakingBasePanel* GetMatchmakingBasePanel();
@@ -271,8 +262,6 @@ public:
 	void PositionDialog( vgui::PHandle dlg );
 
 	void OnSizeChanged( int newWide, int newTall ) override;
-
-	void ArmFirstMenuItem( void );
 
 	void OnGameUIHidden();
 
@@ -326,8 +315,6 @@ private:
 	void UpdateGameMenus();
 	CGameMenu *RecursiveLoadGameMenu(KeyValues *datafile);
 
-	void StartExitingProcess();
-
 	bool IsPromptableCommand( const char *command );
 	bool CommandRequiresSignIn( const char *command );
 	bool CommandRequiresStorageDevice( const char *command );
@@ -365,11 +352,8 @@ private:
 	vgui::DHANDLE<vgui::Frame> m_hNewGameDialog;
 	vgui::DHANDLE<vgui::Frame> m_hBonusMapsDialog;
 	vgui::DHANDLE<vgui::Frame> m_hLoadGameDialog;
-	vgui::DHANDLE<vgui::Frame> m_hLoadGameDialog_Xbox;
 	vgui::DHANDLE<vgui::Frame> m_hSaveGameDialog;
-	vgui::DHANDLE<vgui::Frame> m_hSaveGameDialog_Xbox;
 	vgui::DHANDLE<vgui::PropertyDialog> m_hOptionsDialog;
-	vgui::DHANDLE<vgui::Frame> m_hOptionsDialog_Xbox;
 	vgui::DHANDLE<vgui::Frame> m_hCreateMultiplayerGameDialog;
 	//vgui::DHANDLE<vgui::Frame> m_hDemoPlayerDialog;
 	vgui::DHANDLE<vgui::Frame> m_hChangeGameDialog;
@@ -380,7 +364,6 @@ private:
 
 	// Xbox 360
 	vgui::DHANDLE<vgui::Frame> m_hMatchmakingBasePanel;
-	vgui::DHANDLE<vgui::Frame> m_hControllerDialog;
 
 	EBackgroundState m_eBackgroundState;
 
@@ -403,7 +386,6 @@ private:
 	bool						m_bXUIVisible;
 	bool						m_bUseMatchmaking;
 	bool						m_bRestartFromInvite;
-	bool						m_bRestartSameGame;
 	
 	// Used for internal state dealing with blades
 	bool						m_bUserRefusedSignIn;

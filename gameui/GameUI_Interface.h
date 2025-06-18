@@ -137,7 +137,6 @@ private:
 	bool m_bPlayGameStartupSound : 1;
 	bool m_bTryingToLoadFriends : 1;
 	bool m_bActivatedUI : 1;
-	bool m_bIsConsoleUI : 1;
 	bool m_bHasSavedThisMenuSession : 1;
 	bool m_bOpenProgressOnStart : 1;
 

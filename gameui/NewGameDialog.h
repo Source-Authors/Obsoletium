@@ -16,7 +16,6 @@
 #include "utlvector.h"
 
 class CGameChapterPanel;
-class CSkillSelectionDialog;
 
 // Slot indices in new game menu
 #define INVALID_INDEX	-1
@@ -82,7 +81,6 @@ public:
 	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	void	OnCommand( const char *command ) override;
 	void	OnClose( void ) override;
-	void	PaintBackground() override;
 	void			SetSelectedChapterIndex( int index );
 	void			SetSelectedChapter( const char *chapter );
 	void			UpdatePanelLockedStatus( int iUnlockedChapter, int i, CGameChapterPanel *pChapterPanel );
@@ -107,8 +105,6 @@ private:
 
 	CUtlVector<CGameChapterPanel *> m_ChapterPanels;
 
-	vgui::DHANDLE<CSkillSelectionDialog> m_hSkillSelectionDialog;
-
 	vgui::Button		*m_pPlayButton;
 	vgui::Button		*m_pNextButton;
 	vgui::Button		*m_pPrevButton;
@@ -116,7 +112,6 @@ private:
 	vgui::Label			*m_pChapterTitleLabels[2];
 	vgui::Label			*m_pBonusSelection;
 	vgui::ImagePanel	*m_pBonusSelectionBorder;
-	CFooterPanel		*m_pFooter;
 	bool				m_bCommentaryMode;
 	vgui::Label			*m_pCommentaryLabel;
 

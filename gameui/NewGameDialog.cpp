@@ -172,12 +172,7 @@ public:
 		}
 		m_pLevelPic->SetImage( szMaterial );
 
-		KeyValues *pKeys = NULL;
-		if ( GameUI().IsConsoleUI() )
-		{
-			pKeys = BasePanel()->GetConsoleControlSettings()->FindKey( "NewGameChapterPanel.res" );
-		}
-		LoadControlSettings( "Resource/NewGameChapterPanel.res", NULL, pKeys );
+		LoadControlSettings( "Resource/NewGameChapterPanel.res", NULL, nullptr );
 
 		int px, py;
 		m_pLevelPicBorder->GetPos( px, py );
@@ -209,10 +204,6 @@ public:
 		{
 			m_pChapterLabel->SetVisible( false );
 		}
-		if ( GameUI().IsConsoleUI() )
-		{
-			m_pChapterNameLabel->SetVisible( false );
-		}
 
 		m_pCommentaryIcon = dynamic_cast<ImagePanel*>( FindChildByName( "CommentaryIcon" ) );
 		if ( m_pCommentaryIcon )
@@ -231,17 +222,14 @@ public:
 			m_pChapterLabel->SetFgColor( m_DisabledColor );
 			m_pChapterNameLabel->SetFgColor( Color(0, 0, 0, 0) );
 			m_pLevelPicBorder->SetFillColor( m_DisabledColor );
-			m_pLevelPic->SetAlpha( GameUI().IsConsoleUI() ? 64 : 128 );
+			m_pLevelPic->SetAlpha( 128 );
 			return;
 		}
 
 		if ( state )
 		{
-			if ( !GameUI().IsConsoleUI() )
-			{
-				m_pChapterLabel->SetFgColor( m_SelectedColor );
-				m_pChapterNameLabel->SetFgColor( m_SelectedColor );
-			}
+			m_pChapterLabel->SetFgColor( m_SelectedColor );
+			m_pChapterNameLabel->SetFgColor( m_SelectedColor );
 			m_pLevelPicBorder->SetFillColor( m_SelectedColor );
 		}
 		else
@@ -335,37 +323,6 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	m_pCenterBg = SETUP_PANEL( new Panel( this, "CenterBG" ) );
 	m_pCenterBg->SetVisible( false );
 
-	if ( GameUI().IsConsoleUI() )
-	{
-		m_pNextButton->SetVisible( false );
-		m_pPrevButton->SetVisible( false );
-		m_pPlayButton->SetVisible( false );
-		cancel->SetVisible( false );
-
-		m_pCenterBg->SetPaintBackgroundType( 2 );
-		m_pCenterBg->SetVisible( true );
-
-		m_pChapterTitleLabels[0] = SETUP_PANEL( new Label( this, "ChapterTitleLabel", "" ) );
-		m_pChapterTitleLabels[0]->SetVisible( true );
-		m_pChapterTitleLabels[0]->SetFgColor( Color( 255, 255, 255, 255 ) );
-
-		m_pChapterTitleLabels[1] = SETUP_PANEL( new Label( this, "ChapterTitleLabel2", "" ) );
-		m_pChapterTitleLabels[1]->SetVisible( true );
-		m_pChapterTitleLabels[1]->SetAlpha( 0 );
-		m_pChapterTitleLabels[1]->SetFgColor( Color( 255, 255, 255, 255 ) );
-
-		m_pBonusSelection = SETUP_PANEL( new Label( this, "BonusSelectionLabel", "#GameUI_BonusMapsStandard" ) );
-		m_pBonusSelectionBorder = SETUP_PANEL( new ImagePanel( this, "BonusSelectionBorder" ) );
-
-		m_pFooter = new CFooterPanel( parent, "NewGameFooter" );
-		m_pFooter->AddNewButtonLabel( "#GameUI_Play", "#GameUI_Icons_A_BUTTON" );
-		m_pFooter->AddNewButtonLabel( "#GameUI_Close", "#GameUI_Icons_B_BUTTON" );
-	}
-	else
-	{
-		m_pFooter = NULL;
-	}
-
 	// parse out the chapters off disk
 	constexpr int MAX_CHAPTERS = 32;
 	chapter_t chapters[MAX_CHAPTERS];
@@ -401,29 +358,11 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 		}
 	}
 
-	bool bBonusesUnlocked = false;
-
-	if ( GameUI().IsConsoleUI() )
-	{
-		if ( !m_bCommentaryMode )
-		{
-			// Scan to see if the bonus maps have been unlocked
-			bBonusesUnlocked = BonusMapsDatabase()->BonusesUnlocked();
-		}
-	}
-
 	// sort the chapters
 	std::sort(std::begin(chapters), std::begin(chapters) + chapterIndex, ChapterSortFunc);
 
 	// work out which chapters are unlocked
 	ConVarRef var( "sv_unlockedchapters" );
-
-	if ( bBonusesUnlocked )
-	{
-		// Bonuses are unlocked so we need to unlock all the chapters too
-		// dimhotepus: Set to real chapters count, not 15!
-		var.SetValue( chapterIndex );
-	}
 
 	const char *unlockedChapter = var.IsValid() ? var.GetString() : "1";
 	int iUnlockedChapter = atoi(unlockedChapter);
@@ -456,29 +395,10 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 
 		UpdatePanelLockedStatus( iUnlockedChapter, i + 1, chapterPanel );
 
-		if ( GameUI().IsConsoleUI() && bBonusesUnlocked )
-		{
-			// check to see if it has associated challenges
-			for ( int iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
-			{
-				BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
-				if ( Q_stricmp( pMap->szChapterName, szFullFileName ) == 0 && !pMap->bLocked )
-				{
-					chapterPanel->m_bHasBonus = true;
-					chapterPanel->SetControlVisible( "HasBonusLabel", true );
-				}
-			}
-		}
-
 		m_ChapterPanels.AddToTail( chapterPanel );
 	}
 
-	KeyValues *pKeys = NULL;
-	if ( GameUI().IsConsoleUI() )
-	{
-		 pKeys = BasePanel()->GetConsoleControlSettings()->FindKey( "NewGameDialog.res" );
-	}
-	LoadControlSettings( "Resource/NewGameDialog.res", NULL, pKeys );
+	LoadControlSettings( "Resource/NewGameDialog.res", NULL, nullptr );
 
 	// Reset all properties
 	for ( auto &idx : m_PanelIndex )
@@ -530,23 +450,11 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 
 CNewGameDialog::~CNewGameDialog()
 {
-	delete m_pFooter;
-	m_pFooter = NULL;
 }
 
 void CNewGameDialog::Activate( void )
 {
 	m_bMapStarting = false;
-
-	if ( GameUI().IsConsoleUI() )
-	{
-		// Stop blinking the menu item now that we've seen the unlocked stuff
-		CBasePanel *pBasePanel = BasePanel();
-		if ( pBasePanel )
-			pBasePanel->SetMenuItemBlinkingState( "OpenNewGameDialog", false );
-
-		BonusMapsDatabase()->SetBlink( false );
-	}
 
 	// Commentary stuff is set up on activate because in XBox the new game menu is never deleted
 	SetTitle( ( ( m_bCommentaryMode ) ? ( "#GameUI_LoadCommentary" ) : ( "#GameUI_NewGame") ), true);
@@ -598,27 +506,11 @@ void CNewGameDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	if ( m_pFooter )
-	{
-		KeyValues *pFooterControlSettings = BasePanel()->GetConsoleControlSettings()->FindKey( "NewGameFooter.res" );
-		m_pFooter->LoadControlSettings( "null", NULL, pFooterControlSettings );
-	}
-
 	UpdateMenuComponents( SCROLL_NONE );
 
 	m_pCommentaryLabel = dynamic_cast<vgui::Label*>( FindChildByName( "CommentaryUnlock" ) );
 	if ( m_pCommentaryLabel )
 		m_pCommentaryLabel->SetVisible( m_bCommentaryMode );
-
-	if ( GameUI().IsConsoleUI() )
-	{
-		if ( !m_bCommentaryMode && BonusMapsDatabase()->BonusesUnlocked() && !m_ChapterPanels[ m_PanelIndex[SLOT_CENTER] ]->HasBonus() )
-		{
-			// Find the first bonus
-			ScrollSelectionPanels( SCROLL_LEFT );
-			m_bScrollToFirstBonusMap = true;
-		}
-	}
 }
 
 static float GetArrowAlpha( void )
@@ -646,102 +538,31 @@ void CNewGameDialog::UpdateMenuComponents( EScrollDirection dir )
 	int leftIdx = centerIdx - 1;
 	int rightIdx = centerIdx + 1;
 
-	if ( GameUI().IsConsoleUI() )
+	if ( m_PanelIndex[leftIdx] == INVALID_INDEX || m_PanelIndex[leftIdx] == 0 )
 	{
-		bool bHasBonus = false;
-		if ( m_PanelIndex[centerIdx] != INVALID_INDEX )
-		{
-			wchar_t buffer[ MAX_PATH ];
-			m_ChapterPanels[ m_PanelIndex[centerIdx] ]->m_pChapterNameLabel->GetText( buffer );
-			m_pChapterTitleLabels[(unsigned)m_ActiveTitleIdx]->SetText( buffer );
-
-			// If it has bonuses show the scroll up and down arrows
-			bHasBonus = m_ChapterPanels[ m_PanelIndex[centerIdx] ]->HasBonus();
-		}
-
-		vgui::Panel *leftArrow = this->FindChildByName( "LeftArrow" );
-		vgui::Panel *rightArrow = this->FindChildByName( "RightArrow" );
-		if ( leftArrow )
-		{
-			if ( m_PanelIndex[leftIdx] != INVALID_INDEX )
-			{
-				leftArrow->SetFgColor( Color( 255, 255, 255, GetArrowAlpha() ) );
-			}
-			else
-			{
-				leftArrow->SetFgColor( Color( 128, 128, 128, 64 ) );
-			}
-		}
-		if ( rightArrow )
-		{
-			if ( m_PanelIndex[rightIdx] != INVALID_INDEX )
-			{
-				rightArrow->SetFgColor( Color( 255, 255, 255, GetArrowAlpha() ) );
-			}
-			else
-			{
-				rightArrow->SetFgColor( Color( 128, 128, 128, 64 ) );
-			}
-		}
-
-		if ( bHasBonus )
-		{
-			// Find the bonus description for this panel
-			for ( int iBonus = 0; iBonus < BonusMapsDatabase()->BonusCount(); ++iBonus )
-			{
-				m_pBonusMapDescription = BonusMapsDatabase()->GetBonusData( iBonus );
-				if ( Q_stricmp( m_pBonusMapDescription->szChapterName, m_ChapterPanels[ m_PanelIndex[centerIdx] ]->GetConfigFile() ) == 0 )
-					break;
-			}
-		}
-		else
-		{
-			m_pBonusMapDescription = NULL;
-		}
-
-		vgui::Panel *upArrow = this->FindChildByName( "UpArrow" );
-		vgui::Panel *downArrow = this->FindChildByName( "DownArrow" );
-
-		if ( upArrow )
-			upArrow->SetVisible( bHasBonus );
-		if ( downArrow )
-			downArrow->SetVisible( bHasBonus );
-
-		m_pBonusSelection->SetVisible( bHasBonus );
-		m_pBonusSelectionBorder->SetVisible( bHasBonus );
-
-		UpdateBonusSelection();
+		m_pPrevButton->SetVisible( false );
+		m_pPrevButton->SetEnabled( false );
+	}
+	else
+	{
+		m_pPrevButton->SetVisible( true );
+		m_pPrevButton->SetEnabled( true );
 	}
 
-	// No buttons in the xbox ui
-	if ( !GameUI().IsConsoleUI() )
+	if ( m_ChapterPanels.Count() < 4 ) // if there are less than 4 chapters show the next button but disabled
 	{
-		if ( m_PanelIndex[leftIdx] == INVALID_INDEX || m_PanelIndex[leftIdx] == 0 )
-		{
-			m_pPrevButton->SetVisible( false );
-			m_pPrevButton->SetEnabled( false );
-		}
-		else
-		{
-			m_pPrevButton->SetVisible( true );
-			m_pPrevButton->SetEnabled( true );
-		}
-
-		if ( m_ChapterPanels.Count() < 4 ) // if there are less than 4 chapters show the next button but disabled
-		{
-			m_pNextButton->SetVisible( true );
-			m_pNextButton->SetEnabled( false );
-		}
-		else if ( m_PanelIndex[rightIdx] == INVALID_INDEX || m_PanelIndex[rightIdx] == m_ChapterPanels.Count()-1 )
-		{
-			m_pNextButton->SetVisible( false );
-			m_pNextButton->SetEnabled( false );
-		}
-		else
-		{
-			m_pNextButton->SetVisible( true );
-			m_pNextButton->SetEnabled( true );
-		}
+		m_pNextButton->SetVisible( true );
+		m_pNextButton->SetEnabled( false );
+	}
+	else if ( m_PanelIndex[rightIdx] == INVALID_INDEX || m_PanelIndex[rightIdx] == m_ChapterPanels.Count()-1 )
+	{
+		m_pNextButton->SetVisible( false );
+		m_pNextButton->SetEnabled( false );
+	}
+	else
+	{
+		m_pNextButton->SetVisible( true );
+		m_pNextButton->SetEnabled( true );
 	}
 }
 
@@ -918,9 +739,9 @@ void CNewGameDialog::SetSelectedChapterIndex( int index )
 	}
 
 	// Setup panels to the left of the selected panel
-	int selectedSlot = GameUI().IsConsoleUI() ? SLOT_CENTER : index % 3 + 1;
-	int currIdx = index;
-	for ( int i = selectedSlot; i >= 0 && currIdx >= 0; --i )
+	intp selectedSlot = index % 3 + 1;
+	intp currIdx = index;
+	for ( intp i = selectedSlot; i >= 0 && currIdx >= 0; --i )
 	{
 		m_PanelIndex[i] = currIdx;
 		--currIdx;
@@ -1044,23 +865,6 @@ void CNewGameDialog::PostScroll( EScrollDirection dir )
 		panel->SetZPos( 50 );
 		GetAnimationController()->RunAnimationCommand( panel, "alpha", 255, 0, m_ScrollSpeed, vgui::AnimationController::INTERPOLATOR_LINEAR );
 	}
-
-	if ( GameUI().IsConsoleUI() )
-	{
-		if ( BonusMapsDatabase()->BonusesUnlocked() && m_bScrollToFirstBonusMap )
-		{
-			if ( !m_ChapterPanels[ m_PanelIndex[SLOT_CENTER] ]->HasBonus() )
-			{
-				// Find the first bonus
-				ScrollSelectionPanels( SCROLL_LEFT );
-			}
-			else
-			{
-				// Found a bonus, stop scrolling
-				m_bScrollToFirstBonusMap = false;
-			}
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1115,13 +919,13 @@ void CNewGameDialog::AnimateSelectionPanels( void )
 	int endIdx = SLOT_RIGHT;
 
 	// Don't scroll outside the bounds of the panel list
-	if ( m_ScrollCt >= SCROLL_LEFT && (m_PanelIndex[SLOT_CENTER] < m_ChapterPanels.Count() - 1 || !GameUI().IsConsoleUI()) )
+	if ( m_ScrollCt >= SCROLL_LEFT )
 	{
 		idxOffset = -1;
 		endIdx = SLOT_OFFRIGHT;
 		m_ScrollDirection = SCROLL_LEFT;
 	}
-	else if ( m_ScrollCt <= SCROLL_RIGHT && (m_PanelIndex[SLOT_CENTER] > 0 || !GameUI().IsConsoleUI()) )
+	else if ( m_ScrollCt <= SCROLL_RIGHT )
 	{
 		idxOffset = 1;
 		startIdx = SLOT_OFFLEFT;
@@ -1152,22 +956,6 @@ void CNewGameDialog::AnimateSelectionPanels( void )
 			GetAnimationController()->RunAnimationCommand( panel, "ypos",  m_PanelYPos[nextIdx],  0, m_ScrollSpeed, vgui::AnimationController::INTERPOLATOR_LINEAR );
 			GetAnimationController()->RunAnimationCommand( panel, "alpha", m_PanelAlpha[nextIdx], 0, m_ScrollSpeed, vgui::AnimationController::INTERPOLATOR_LINEAR );
 		}
-	}
-
-	if ( GameUI().IsConsoleUI() )
-	{
-		vgui::surface()->PlaySound( "UI/buttonclick.wav" );
-
-		// Animate the center background panel
-		GetAnimationController()->RunAnimationCommand( m_pCenterBg, "alpha", 0, 0, m_ScrollSpeed * 0.25f, vgui::AnimationController::INTERPOLATOR_LINEAR );
-		
-		// Crossfade the chapter title labels
-		int inactiveTitleIdx = m_ActiveTitleIdx ^ 0x01;
-		GetAnimationController()->RunAnimationCommand( m_pChapterTitleLabels[(unsigned)m_ActiveTitleIdx], "alpha", 255, 0, m_ScrollSpeed, vgui::AnimationController::INTERPOLATOR_LINEAR );
-		GetAnimationController()->RunAnimationCommand( m_pChapterTitleLabels[inactiveTitleIdx], "alpha", 0, 0, m_ScrollSpeed, vgui::AnimationController::INTERPOLATOR_LINEAR );
-		
-		// Scrolling up through chapters, offset is negative
-		m_iSelectedChapter -= idxOffset;
 	}
 
 	PostMessage( this, new KeyValues( "FinishScroll" ), m_ScrollSpeed );
@@ -1273,30 +1061,9 @@ void CNewGameDialog::SetFastScroll( bool fast )
 //-----------------------------------------------------------------------------
 void CNewGameDialog::ContinueScrolling( void )
 {
-	if ( !GameUI().IsConsoleUI() )
+	if ( m_PanelIndex[SLOT_CENTER-1] % 3 )
 	{
-		if ( m_PanelIndex[SLOT_CENTER-1] % 3 )
-		{
-	//		m_ButtonPressed = m_ScrollDirection;
-			ScrollSelectionPanels( m_ScrollDirection );
-		}
-		return;
-	}
-
-	if ( m_ButtonPressed == m_ScrollDirection )
-	{
-		SetFastScroll( true );
 		ScrollSelectionPanels( m_ScrollDirection );
-	}
-	else if ( m_ButtonPressed != SCROLL_NONE )
-	{
-		// The other direction has been pressed - start a slow scroll
-		SetFastScroll( false );
-		ScrollSelectionPanels( (EScrollDirection)m_ButtonPressed );
-	}
-	else
-	{
-		SetFastScroll( false );
 	}
 }
 
@@ -1368,11 +1135,6 @@ void CNewGameDialog::OnClose( void )
 {
 	m_KeyRepeat.Reset();
 
-	if ( GameUI().IsConsoleUI() && !m_bMapStarting )
-	{
-		BasePanel()->RunCloseAnimation( "CloseNewGameDialog_OpenMainMenu" );			
-		BonusMapsDatabase()->WriteSaveData();	// Closing this dialog is a good time to save
-	}
 	BaseClass::OnClose();
 }
 
@@ -1388,36 +1150,7 @@ void CNewGameDialog::OnCommand( const char *command )
 		if ( m_bMapStarting )
 			return;
 
-		if ( GameUI().IsConsoleUI() )
-		{
-			if ( m_ChapterPanels[m_iSelectedChapter]->IsEnabled() )
-			{
-				if ( !GameUI().HasSavedThisMenuSession() && GameUI().IsInLevel() && engine->GetMaxClients() == 1 )
-				{
-					vgui::surface()->PlaySound( "UI/buttonclickrelease.wav" );
-					BasePanel()->ShowMessageDialog( MD_SAVE_BEFORE_NEW_GAME, this );
-				}
-				else
-				{
-					OnCommand( "StartNewGame" );
-				}
-			}
-			else
-			{
-				// This chapter isn't unlocked!
-				m_bMapStarting = false;
-				vgui::surface()->PlaySound( "player/suit_denydevice.wav" );
-
-				if ( m_bCommentaryMode )
-				{
-					BasePanel()->ShowMessageDialog( MD_COMMENTARY_CHAPTER_UNLOCK_EXPLANATION, this );
-				}
-			}
-		}
-		else
-		{
-			StartGame();
-		}
+		StartGame();
 	}
 	else if ( !stricmp( command, "Next" ) )
 	{
@@ -1464,40 +1197,6 @@ void CNewGameDialog::OnCommand( const char *command )
 	{
 		m_KeyRepeat.Reset();
 	}
-}
-
-void CNewGameDialog::PaintBackground()
-{
-	if ( !GameUI().IsConsoleUI() )
-	{
-		BaseClass::PaintBackground();
-		return;
-	}
-
-	int wide, tall;
-	GetSize( wide, tall );
-
-	Color col = GetBgColor();
-	DrawBox( 0, 0, wide, tall, col, 1.0f );
-
-	int y = 0;
-	if ( m_pChapterTitleLabels[0] )
-	{
-		// offset by title
-		int titleX, titleY, titleWide, titleTall;
-		m_pChapterTitleLabels[0]->GetBounds( titleX, titleY, titleWide, titleTall );	
-		y += titleY + titleTall;
-	}
-	else
-	{
-		y = 8;
-	}
-
-	// draw an inset
-	Color darkColor;
-	darkColor.SetColor( 0.70f * (float)col.r(), 0.70f * (float)col.g(), 0.70f * (float)col.b(), col.a() );
-	vgui::surface()->DrawSetColor( darkColor );
-	vgui::surface()->DrawFilledRect( 8, y, wide - 8, tall - 8 );
 }
 
 void CNewGameDialog::OnKeyCodePressed( KeyCode code )

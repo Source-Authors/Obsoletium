@@ -50,7 +50,6 @@
 #include "PlayerListDialog.h"
 #include "BenchmarkDialog.h"
 #include "LoadCommentaryDialog.h"
-#include "ControllerDialog.h"
 #include "BonusMapsDatabase.h"
 #include "engine/IEngineSound.h"
 #include "inputsystem/iinputsystem.h"
@@ -97,7 +96,6 @@ static float		g_flAnimationPadding = 0.01f;
 
 extern const char *COM_GetModDirectory( void );
 
-extern ConVar x360_audio_english;
 extern bool bSteamCommunityFriendsVersion;
 
 static vgui::DHANDLE<vgui::PropertyDialog> g_hOptionsDialog;
@@ -159,34 +157,9 @@ void CGameMenuItem::ApplySchemeSettings(IScheme *pScheme)
 	SetReleasedSound("UI/buttonclickrelease.wav");
 	SetButtonActivationType(Button::ACTIVATE_ONPRESSED);
 
-	if ( GameUI().IsConsoleUI() )
-	{
-		SetArmedColor(GetSchemeColor("MainMenu.ArmedTextColor", pScheme), GetSchemeColor("Button.ArmedBgColor", pScheme));
-		SetTextInset( MAIN_MENU_INDENT_X360, 0 );
-	}
-
 	if (m_bRightAligned)
 	{
 		SetContentAlignment(Label::a_east);
-	}
-}
-
-void CGameMenuItem::PaintBackground()
-{
-	if ( !GameUI().IsConsoleUI() )
-	{
-		BaseClass::PaintBackground();
-	}
-	else
-	{
-		if ( !IsArmed() || !IsVisible() || GetParent()->GetAlpha() < 32 )
-			return;
-
-		int wide, tall;
-		GetSize( wide, tall );
-
-		DrawBoxFade( 0, 0, wide, tall, GetButtonBgColor(), 1.0f, 255, 0, true );
-		DrawBoxFade( 2, 2, wide - 4, tall - 4, Color( 0, 0, 0, 96 ), 1.0f, 255, 0, true );
 	}
 }
 
@@ -205,19 +178,6 @@ public:
 
 	CGameMenu(vgui::Panel *parent, const char *name) : BaseClass(parent, name) 
 	{
-		if ( GameUI().IsConsoleUI() )
-		{
-			// shows graphic button hints
-			m_pConsoleFooter = new CFooterPanel( parent, "MainMenuFooter" );
-
-			int iFixedWidth = 245;
-			SetFixedWidth( iFixedWidth );
-		}
-		else
-		{
-			m_pConsoleFooter = NULL;
-		}
-
 		m_hMainMenuOverridePanel = NULL;
 	}
 
@@ -463,16 +423,11 @@ public:
 
 	void ShowFooter( bool bShow )
 	{
-		if ( m_pConsoleFooter )
-		{
-			m_pConsoleFooter->SetVisible( bShow );
-		}
 	}
 
 	void UpdateMenuItemState( bool isInGame, bool isMultiplayer, bool isInReplay, bool isVREnabled, bool isVRActive )
 	{
 		bool isSteam = IsPC() && ( CommandLine()->FindParm("-steam") != 0 );
-		bool bIsConsoleUI = GameUI().IsConsoleUI();
 
 		// disabled save button if we're not in a game
 		for (int i = 0; i < GetChildCount(); i++)
@@ -519,7 +474,7 @@ public:
 				{
 					shouldBeVisible = false;
 				}
-				else if ( !bIsConsoleUI && kv->GetInt( "ConsoleOnly" ) )
+				else if ( kv->GetInt( "ConsoleOnly" ) )
 				{
 					shouldBeVisible = false;
 				}
@@ -565,33 +520,11 @@ public:
 		}
 
 		InvalidateLayout();
-
-		if ( m_pConsoleFooter )
-		{
-			// update the console footer
-			const char *pHelpName;
-			if ( !isInGame )
-				pHelpName = "MainMenu";
-			else
-				pHelpName = "GameMenu";
-
-			if ( !m_pConsoleFooter->GetHelpName() || V_stricmp( pHelpName, m_pConsoleFooter->GetHelpName() ) )
-			{
-				// game menu must re-establish its own help once it becomes re-active
-				m_pConsoleFooter->SetHelpNameAndReset( pHelpName );
-				m_pConsoleFooter->AddNewButtonLabel( "#GameUI_Action", "#GameUI_Icons_A_BUTTON" );
-				if ( isInGame )
-				{
-					m_pConsoleFooter->AddNewButtonLabel( "#GameUI_Close", "#GameUI_Icons_B_BUTTON" );
-				}
-			}
-		}
 	}
 
 	MESSAGE_FUNC_HANDLE_OVERRIDE( OnCursorEnteredMenuItem, "CursorEnteredMenuItem", VPanel);
 
 private:
-	CFooterPanel *m_pConsoleFooter;
 	vgui::CKeyRepeatHandler	m_KeyRepeat;
 	vgui::VPANEL	m_hMainMenuOverridePanel;
 };
@@ -652,7 +585,6 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 	m_bXUIVisible = false;
 	m_bUseMatchmaking = false;
 	m_bRestartFromInvite = false;
-	m_bRestartSameGame = false;
 	m_bUserRefusedSignIn = false;
 	m_bUserRefusedStorageDevice = false;
 	m_bWaitingForUserSignIn = false;
@@ -667,23 +599,6 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 	m_iBackgroundImageID = -1;
 	m_iProductImageID = -1;
 	m_iLoadingImageID = -1;
-
-	if ( GameUI().IsConsoleUI() )
-	{
-		m_pConsoleAnimationController = new AnimationController( this );
-		m_pConsoleAnimationController->SetScriptFile( GetVPanel(), "scripts/GameUIAnimations.txt" );
-		m_pConsoleAnimationController->SetAutoReloadScript( IsDebug() );
-
-		m_pConsoleControlSettings = new KeyValues( "XboxDialogs.res" );
-		if ( !m_pConsoleControlSettings->LoadFromFile( g_pFullFileSystem, "resource/UI/XboxDialogs.res", "GAME" ) )
-		{
-			Error( "Failed to load UI control settings!\n" );
-		}
-		else
-		{
-			m_pConsoleControlSettings->ProcessResolutionKeys( surface()->GetResolutionKey() );
-		}
-	}
 
 	m_pGameMenuButtons.AddToTail( CreateMenuButton( this, "GameMenuButton", ModInfo().GetGameTitle() ) );
 	m_pGameMenuButtons.AddToTail( CreateMenuButton( this, "GameMenuButton2", ModInfo().GetGameTitle2() ) );
@@ -722,26 +637,7 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 
 	// start the menus fully transparent
 	SetMenuAlpha( 0 );
-
-	if ( GameUI().IsConsoleUI() )
-	{
-		// do any costly resource prefetching now....
-		// force the new dialog to get all of its chapter pics
-		g_bIsCreatingNewGameMenuForPreFetching = true;
-		m_hNewGameDialog = new CNewGameDialog( this, false );
-		m_hNewGameDialog->MarkForDeletion();
-		g_bIsCreatingNewGameMenuForPreFetching = false;
-
-		m_hOptionsDialog_Xbox = new COptionsDialogXbox( this );
-		m_hOptionsDialog_Xbox->MarkForDeletion();
-
-		m_hControllerDialog = new CControllerDialog( this );
-		m_hControllerDialog->MarkForDeletion();
-		
-		ArmFirstMenuItem();
-		m_pConsoleAnimationController->StartAnimationSequence( "InitializeUILayout" );
-	}
-		}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Xbox 360 - Get the console UI keyvalues to pass to LoadControlSettings()
@@ -749,24 +645,6 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 KeyValues *CBasePanel::GetConsoleControlSettings( void )
 {
 	return m_pConsoleControlSettings;
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Causes the first menu item to be armed
-//-----------------------------------------------------------------------------
-void CBasePanel::ArmFirstMenuItem( void )
-{
-	UpdateGameMenus();
-
-	// Arm the first item in the menu
-	for ( int i = 0; i < m_pGameMenu->GetItemCount(); ++i )
-	{
-		if ( m_pGameMenu->GetMenuItem( i )->IsVisible() )
-		{
-			m_pGameMenu->SetCurrentlyHighlightedItem( i );
-			break;
-		}
-	}
 }
 
 CBasePanel::~CBasePanel()
@@ -894,11 +772,6 @@ void CBasePanel::PaintBackground()
 		// not in the game or loading dialog active or exiting, draw the ui background
 		DrawBackgroundImage();
 	}
-	else if ( IsX360() )
-	{
-		// only valid during loading from level to level
-		m_bUseRenderTargetImage = false;
-	}
 
 	if ( m_flBackgroundFillAlpha )
 	{
@@ -938,23 +811,6 @@ void CBasePanel::UpdateBackgroundState()
 	else if ( m_bEverActivated && m_bPlatformMenuInitialized )
 	{
 		SetBackgroundRenderState( BACKGROUND_DISCONNECTED );
-	}
-
-	if ( GameUI().IsConsoleUI() )
-	{
-		if ( !m_ExitingFrameCount && !m_bLevelLoading && !g_hLoadingDialog.Get() && GameUI().IsInLevel() )
-		{
-			// paused
-			if ( m_flBackgroundFillAlpha == 0.0f )
-				m_flBackgroundFillAlpha = 120.0f;
-		}
-		else
-		{
-			m_flBackgroundFillAlpha = 0;
-		}
-
-		// console ui has completely different menu/dialog/fill/fading behavior
-		return;
 	}
 
 	// don't evaluate the rest until we've initialized the menus
@@ -1113,11 +969,6 @@ void CBasePanel::SetBackgroundRenderState(EBackgroundState state)
 	}
 	else if ( state == BACKGROUND_LOADING )
 	{
-		if ( GameUI().IsConsoleUI() )
-		{
-			RunAnimationWithCallback( this, "InstantHideMainMenu", new KeyValues( "LoadMap" ) );
-		}
-
 		// hide the menus
 		SetMenuAlpha( 0 );
 	}
@@ -1128,24 +979,6 @@ void CBasePanel::SetBackgroundRenderState(EBackgroundState state)
 	}
 
 	m_eBackgroundState = state;
-}
-
-void CBasePanel::StartExitingProcess()
-{
-	// must let a non trivial number of screen swaps occur to stabilize image
-	// ui runs in a constrained state, while shutdown is occurring
-	m_flTransitionStartTime = engine->Time();
-	m_flTransitionEndTime = m_flTransitionStartTime + 0.5f;
-	m_ExitingFrameCount = 30;
-	g_pInputSystem->DetachFromWindow();
-
-	CMatchmakingBasePanel *pPanel = GetMatchmakingBasePanel();
-	if ( pPanel )
-	{
-		pPanel->CloseAllDialogs( false );
-	}
-
-	engine->StartXboxExitingProcess();
 }
 
 //-----------------------------------------------------------------------------
@@ -1175,13 +1008,6 @@ void CBasePanel::OnLevelLoadingStarted()
 	{
 		m_hMatchmakingBasePanel->OnCommand( "LevelLoadingStarted" );
 	}
-
-	if ( IsX360() && m_eBackgroundState == BACKGROUND_LEVEL )
-	{
-		// already in a level going to another level
-		// frame buffer is about to be cleared, copy it off for ui backing purposes
-		m_bCopyFrameBuffer = true;
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1202,16 +1028,6 @@ void CBasePanel::OnLevelLoadingFinished()
 //-----------------------------------------------------------------------------
 void CBasePanel::DrawBackgroundImage()
 {
-	if ( IsX360() && m_bCopyFrameBuffer )
-	{
-		// force the engine to do an image capture ONCE into this image's render target
-		char filename[MAX_PATH];
-		surface()->DrawGetTextureFile( m_iRenderTargetImageID, filename, sizeof( filename ) );
-		engine->CopyFrameBufferToMaterial( filename );
-		m_bCopyFrameBuffer = false;
-		m_bUseRenderTargetImage = true;
-	}
-
 	int wide, tall;
 	GetSize( wide, tall );
 
@@ -1236,46 +1052,12 @@ void CBasePanel::DrawBackgroundImage()
 	}
 
 	int iImageID = m_iBackgroundImageID;
-	if ( IsX360() )
-	{
-		if ( m_ExitingFrameCount )
-		{
-			if ( !m_bRestartSameGame )
-			{
-				iImageID = m_iProductImageID;
-			}
-		}
-		else if ( m_bUseRenderTargetImage )
-		{
-			// the render target image must be opaque, the alpha channel contents are unknown
-			// it is strictly an opaque background image and never used as an overlay
-			iImageID = m_iRenderTargetImageID;
-			alpha = 255;
-		}
-	}
 
 	surface()->DrawSetColor( 255, 255, 255, alpha );
 	surface()->DrawSetTexture( iImageID );
 	surface()->DrawTexturedRect( 0, 0, wide, tall );
 
-	if ( IsX360() && m_ExitingFrameCount )
-	{
-		// Make invisible when going back to appchooser
-		m_pGameMenu->CGameMenu::BaseClass::SetVisible( false );
-
-		IScheme *pScheme = vgui::scheme()->GetIScheme( vgui::scheme()->GetScheme( "SourceScheme" ) );
-		HFont hFont = pScheme->GetFont( "ChapterTitle" );
-		wchar_t *pString = g_pVGuiLocalize->Find( "#GameUI_Loading" );
-		int textWide, textTall;
-		surface()->GetTextSize( hFont, pString, textWide, textTall );
-		surface()->DrawSetTextPos( ( wide - textWide )/2, tall * 0.50f );
-		surface()->DrawSetTextFont( hFont );
-		surface()->DrawSetTextColor( 255, 255, 255, alpha );
-		surface()->DrawPrintText( pString, wcslen( pString ) );
-	}
-
-	// 360 always use the progress bar, TCR Requirement, and never this loading plaque
-	if ( IsPC() && ( m_bRenderingBackgroundTransition || m_eBackgroundState == BACKGROUND_LOADING ) )
+	if ( m_bRenderingBackgroundTransition || m_eBackgroundState == BACKGROUND_LOADING )
 	{
 		// draw the loading image over the top
 		surface()->DrawSetColor(255, 255, 255, alpha);
@@ -1288,21 +1070,13 @@ void CBasePanel::DrawBackgroundImage()
 	// update the menu alpha
 	if ( m_bFadingInMenus )
 	{
-		if ( GameUI().IsConsoleUI() )
+		// goes from [0..255]
+		alpha = (frametime - m_flFadeMenuStartTime) / (m_flFadeMenuEndTime - m_flFadeMenuStartTime) * 255;
+		alpha = clamp( alpha, 0, 255 );
+		m_pGameMenu->SetAlpha( alpha );
+		if ( alpha == 255 )
 		{
-			m_pConsoleAnimationController->StartAnimationSequence( "OpenMainMenu" );
 			m_bFadingInMenus = false;
-		}
-		else
-		{
-			// goes from [0..255]
-			alpha = (frametime - m_flFadeMenuStartTime) / (m_flFadeMenuEndTime - m_flFadeMenuStartTime) * 255;
-			alpha = clamp( alpha, 0, 255 );
-			m_pGameMenu->SetAlpha( alpha );
-			if ( alpha == 255 )
-			{
-				m_bFadingInMenus = false;
-			}
 		}
 	}
 }
@@ -1358,17 +1132,9 @@ void CBasePanel::CreateGameLogo()
 
 void CBasePanel::CheckBonusBlinkState()
 {
-#ifdef _X360
-	// On 360 if we have a storage device at this point and try to read the bonus data it can't find the bonus file!
-	return;
-#endif
-
 	if ( BonusMapsDatabase()->GetBlink() )
 	{
-		if ( GameUI().IsConsoleUI() )
-			SetMenuItemBlinkingState( "OpenNewGameDialog", true );	// Consoles integrate bonus maps menu into the new game menu
-		else
-			SetMenuItemBlinkingState( "OpenBonusMapsDialog", true );
+		SetMenuItemBlinkingState( "OpenBonusMapsDialog", true );
 	}
 }
 
@@ -1429,18 +1195,12 @@ void CBasePanel::RunFrame()
 	InvalidateLayout();
 	vgui::GetAnimationController()->UpdateAnimations( engine->Time() );
 
-	if ( GameUI().IsConsoleUI() )
-	{
-		// run the console ui animations
-		m_pConsoleAnimationController->UpdateAnimations( engine->Time() );
-	}
-
 	UpdateBackgroundState();
 
 	if ( !m_bPlatformMenuInitialized )
 	{
 		// check to see if the platform is ready to load yet
-		if ( IsX360() || g_VModuleLoader.IsPlatformReady() )
+		if ( g_VModuleLoader.IsPlatformReady() )
 		{
 			m_bPlatformMenuInitialized = true;
 		}
@@ -1503,13 +1263,6 @@ void CBasePanel::PerformLayout()
 		m_pGameLogo->SetPos( m_iGameMenuPos.x + m_pGameLogo->GetOffsetX(), idealMenuY - m_pGameLogo->GetTall() + m_pGameLogo->GetOffsetY() );
 	}
 
-	// position self along middle of screen
-	if ( GameUI().IsConsoleUI() )
-	{
-		int posx, posy;
-		m_pGameMenu->GetPos( posx, posy );
-		m_iGameMenuPos.x = posx;
-	}
 	m_pGameMenu->SetPos(m_iGameMenuPos.x, idealMenuY);
 
 	UpdateGameMenus();
@@ -1540,10 +1293,7 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 			m_iGameTitlePos[i].y = atoi(pClientScheme->GetResourceString( CFmtStr( "Main.Title%d.Y", i+1 ) ) );
 			m_iGameTitlePos[i].y = scheme()->GetProportionalScaledValue( m_iGameTitlePos[i].y );
 
-			if ( GameUI().IsConsoleUI() )
-				m_iGameTitlePos[i].x += MAIN_MENU_INDENT_X360;
-
-			buttonColor.AddToTail( pClientScheme->GetColor( CFmtStr( "Main.Title%d.Color", i+1 ), Color(255, 255, 255, 255)) );
+			buttonColor.AddToTail( pClientScheme->GetColor( CFmtStr( "Main.Title%zd.Color", i+1 ), Color(255, 255, 255, 255)) );
 		}
 #ifdef CS_BETA
 		if ( !ModInfo().NoCrosshair() ) // hack to not show the BETA for HL2 or HL1Port
@@ -1583,17 +1333,6 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 
 	m_BackdropColor = pScheme->GetColor("mainmenu.backdrop", Color(0, 0, 0, 128));
 
-	char filename[MAX_PATH];
-	if ( IsX360() )
-	{
-		// 360 uses FullFrameFB1 RT for map to map transitioning
-		if ( m_iRenderTargetImageID == -1 )
-		{
-			m_iRenderTargetImageID = surface()->CreateNewTextureID();
-			surface()->DrawSetTextureFile( m_iRenderTargetImageID, "console/rt_background", false, false );
-		}
-	}
-
 	int screenWide, screenTall;
 	surface()->GetScreenSize( screenWide, screenTall );
 	float aspectRatio = (float)screenWide/(float)screenTall;
@@ -1611,26 +1350,11 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 	}
 	surface()->DrawSetTextureFile( m_iBackgroundImageID, filename, false, false );
 
-	if ( IsX360() )
+	// load the loading icon
+	if ( m_iLoadingImageID == -1 )
 	{
-		// 360 uses a product image during application exit
-		V_snprintf( filename, sizeof( filename ), "vgui/appchooser/background_orange%s", ( bIsWidescreen ? "_widescreen" : "" ) );
-
-		if ( m_iProductImageID == -1 )
-		{
-			m_iProductImageID = surface()->CreateNewTextureID();
-		}
-		surface()->DrawSetTextureFile( m_iProductImageID, filename, false, false );
-	}
-
-	if ( IsPC() )
-	{
-		// load the loading icon
-		if ( m_iLoadingImageID == -1 )
-		{
-			m_iLoadingImageID = surface()->CreateNewTextureID();
-			surface()->DrawSetTextureFile( m_iLoadingImageID, "Console/startup_loading", false, false );
-		}
+		m_iLoadingImageID = surface()->CreateNewTextureID();
+		surface()->DrawSetTextureFile( m_iLoadingImageID, "Console/startup_loading", false, false );
 	}
 }
 
@@ -1661,23 +1385,8 @@ void CBasePanel::OnGameUIActivated()
 		// Layout the first time to avoid focus issues (setting menus visible will grab focus)
 		UpdateGameMenus();
 		m_bEverActivated = true;
-
-		// Brute force check to open tf matchmaking ui.
-		if ( GameUI().IsConsoleUI() )
-		{
-			const char *pGame = engine->GetGameDirectory();
-			if ( !Q_stricmp( Q_UnqualifiedFileName( pGame ), "tf" ) )
-			{
-				m_bUseMatchmaking = true;
-				RunMenuCommand( "OpenMatchmakingBasePanel" );
-			}
-		}
 	}
 
-	if ( GameUI().IsConsoleUI() )
-	{
-		ArmFirstMenuItem();
-	}
 	if ( GameUI().IsInLevel() )
 	{
 		if ( !m_bUseMatchmaking )
@@ -1719,25 +1428,11 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "OpenLoadGameDialog" ) )
 	{
-		if ( !GameUI().IsConsoleUI() )
-		{
-			OnOpenLoadGameDialog();
-		}
-		else
-		{
-			OnOpenLoadGameDialog_Xbox();
-		}
+		OnOpenLoadGameDialog();
 	}
 	else if ( !Q_stricmp( command, "OpenSaveGameDialog" ) )
 	{
-		if ( !GameUI().IsConsoleUI() )
-		{
-			OnOpenSaveGameDialog();
-		}
-		else
-		{
-			OnOpenSaveGameDialog_Xbox();
-		}
+		OnOpenSaveGameDialog();
 	}
 	else if ( !Q_stricmp( command, "OpenBonusMapsDialog" ) )
 	{
@@ -1745,21 +1440,11 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "OpenOptionsDialog" ) )
 	{
-		if ( !GameUI().IsConsoleUI() )
-		{
-			OnOpenOptionsDialog();
-		}
-		else
-		{
-			OnOpenOptionsDialog_Xbox();
-		}
+		OnOpenOptionsDialog();
 	}
 	else if ( !Q_stricmp( command, "OpenControllerDialog" ) )
 	{
-		if ( GameUI().IsConsoleUI() )
-		{
-			OnOpenControllerDialog();
-		}
+		// XBOX only.
 	}
 	else if ( !Q_stricmp( command, "OpenBenchmarkDialog" ) )
 	{
@@ -1837,13 +1522,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 
 	else if ( !Q_stricmp( command, "AchievementsDialogClosing" ) )
 	{
-		if ( IsX360() )
-		{
-			if ( m_hAchievementsDialog.Get() )
-			{
-				m_hAchievementsDialog->Close();
-			}
-		}
+		// XBOX-only.
 	}
 	else if ( !Q_stricmp( command, "Quit" ) )
 	{
@@ -1851,41 +1530,28 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "QuitNoConfirm" ) )
 	{
-		if ( IsX360() )
-		{
-			// start the shutdown process
-			StartExitingProcess();
-		}
-		else
-		{
-            //=============================================================================
-            // HPE_BEGIN:
-            // [dwenger] Shut down achievements panel
-            //=============================================================================
+        //=============================================================================
+        // HPE_BEGIN:
+        // [dwenger] Shut down achievements panel
+        //=============================================================================
 
-            if ( GameClientExports() )
-            {
-                GameClientExports()->ShutdownAchievementPanel();
-            }
+        if ( GameClientExports() )
+        {
+            GameClientExports()->ShutdownAchievementPanel();
+        }
 
-            //=============================================================================
-            // HPE_END
-            //=============================================================================
+        //=============================================================================
+        // HPE_END
+        //=============================================================================
 
-            // hide everything while we quit
-			SetVisible( false );
-			vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
-			engine->ClientCmd_Unrestricted( "quit\n" );
-		}
+        // hide everything while we quit
+		SetVisible( false );
+		vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
+		engine->ClientCmd_Unrestricted( "quit\n" );
 	}
 	else if ( !Q_stricmp( command, "QuitRestartNoConfirm" ) )
 	{
-		if ( IsX360() )
-		{
-			// start the shutdown process
-			m_bRestartSameGame = true;
-			StartExitingProcess();
-		}
+		// XBOX only.
 	}
 	else if ( !Q_stricmp( command, "ResumeGame" ) )
 	{
@@ -1893,14 +1559,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "Disconnect" ) )
 	{
-		if ( IsX360() )
-		{
-			OnOpenDisconnectConfirmationDialog();
-		}
-		else
-		{
-			engine->ClientCmd_Unrestricted( "disconnect" );
-		}
+		engine->ClientCmd_Unrestricted( "disconnect" );
 	}
 	else if ( !Q_stricmp( command, "DisconnectNoConfirm" ) )
 	{
@@ -1982,11 +1641,11 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "RestartWithNewLanguage" ) )
 	{
-			// hide everything while we quit
-			SetVisible( false );
-			vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
-			engine->ClientCmd_Unrestricted( "quit\n" );
-
+		// hide everything while we quit
+		SetVisible( false );
+		vgui::surface()->RestrictPaintToSinglePanel( GetVPanel() );
+		engine->ClientCmd_Unrestricted( "quit\n" );
+		
 		char szSteamURL[50];
 		// Construct Steam URL. Pattern is steam://run/<appid>/<language>.
 		// (e.g. Ep1 In French ==> steam://run/380/french)
@@ -2128,11 +1787,6 @@ void CBasePanel::ExecuteAsync( CAsyncJobContext *pAsync )
 #ifdef _WIN32
 	ThreadHandle_t hHandle = CreateSimpleThread( PanelJobWrapperFn, pAsync );
 	pAsync->m_hThreadHandle = hHandle;
-
-#ifdef _X360
-	ThreadSetAffinity( hHandle, XBOX_PROCESSOR_3 );
-#endif
-
 #else
 	pAsync->ExecuteAsync();
 #endif
@@ -2230,14 +1884,6 @@ void CAsyncCtxOnDeviceAttached::ExecuteAsync()
 	m_ContainerOpenResult = engine->OnStorageDeviceAttached();
 	if ( m_ContainerOpenResult != ERROR_SUCCESS )
 		return;
-
-	// Make the QOS system initialized for multiplayer games
-	if ( !ModInfo().IsSinglePlayerOnly() )
-	{
-#if defined( _X360 )
-		( void ) matchmaking->GetQosWithLIVE();
-#endif
-	}
 }
 
 void CAsyncCtxOnDeviceAttached::Completed()
@@ -2271,18 +1917,6 @@ void CBasePanel::OnCompletedAsyncDeviceAttached( CAsyncCtxOnDeviceAttached *job 
 
 	BonusMapsDatabase()->ReadBonusMapSaveData();
 
-	if ( m_hSaveGameDialog_Xbox.Get() )
-	{
-		m_hSaveGameDialog_Xbox->OnCommand( "RefreshSaveGames" );
-	}
-	if ( m_hLoadGameDialog_Xbox.Get() )
-	{
-		m_hLoadGameDialog_Xbox->OnCommand( "RefreshSaveGames" );
-	}
-	if ( m_hOptionsDialog_Xbox.Get() )
-	{
-		m_hOptionsDialog_Xbox->OnCommand( "RefreshOptions" );
-	}
 	if ( m_pStorageDeviceValidatedNotify )
 	{
 		*m_pStorageDeviceValidatedNotify = 1;
@@ -2298,29 +1932,6 @@ void CBasePanel::OnCompletedAsyncDeviceAttached( CAsyncCtxOnDeviceAttached *job 
 //-----------------------------------------------------------------------------
 bool CBasePanel::ValidateStorageDevice( void )
 {
-	if ( m_bUserRefusedStorageDevice == false )
-	{
-#if defined( _X360 )
-		if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID )
-		{
-			// Try to discover content on the user's storage devices
-			DWORD nFoundDevice = xboxsystem->DiscoverUserData( XBX_GetPrimaryUserId(), COM_GetModDirectory() );
-			if ( nFoundDevice == XBX_INVALID_STORAGE_ID )
-			{
-				// They don't have a device, so ask for one
-				ShowMessageDialog( MD_PROMPT_STORAGE_DEVICE );
-				return false;
-			}
-			else
-			{
-				// Take this device
-				XBX_SetStorageDeviceId( nFoundDevice );
-				OnDeviceAttached();
-			}
-			// Fall through
-		}
-#endif
-	}
 	return true;
 }
 
@@ -2357,52 +1968,6 @@ bool CBasePanel::ValidateStorageDevice( int *pStorageDeviceValidated )
 //-----------------------------------------------------------------------------
 bool CBasePanel::HandleSignInRequest( const char *command )
 {
-#ifdef _X360
-	// If we have a post-prompt command, we're coming back into the call from that prompt
-	bool bQueuedCall = ( m_strPostPromptCommand.IsEmpty() == false );
-
-	XUSER_SIGNIN_INFO info;
-	bool bValidUser = ( XUserGetSigninInfo( XBX_GetPrimaryUserId(), 0, &info ) == ERROR_SUCCESS );
-
-	if ( bValidUser )
-		return true;
-
-	// Queued command means we're returning from a prompt or blade
-	if ( bQueuedCall )
-	{
-		// Blade has returned with nothing
-		if ( m_bUserRefusedSignIn )
-			return true;
-		
-		// User has not denied the storage device, so ask
-		ShowMessageDialog( MD_PROMPT_SIGNIN );
-		m_strPostPromptCommand = command;
-		
-		// Do not run command
-		return false;
-	}
-	else
-	{
-		// If the user refused the sign-in and we respect that on this command, we're done
-		if ( m_bUserRefusedSignIn && CommandRespectsSignInDenied( command ) )
-			return true;
-
-		// If the message is required first, then do that instead
-		if ( CommandRequiresSignIn( command ) )
-		{
-			ShowMessageDialog( MD_PROMPT_SIGNIN_REQUIRED );
-			m_strPostPromptCommand = command;
-			return false;
-		}
-
-		// Pop a blade out
-		xboxsystem->ShowSigninUI( 1, 0 );
-		m_strPostPromptCommand = command;
-		m_bWaitingForUserSignIn = true;
-		m_bUserRefusedSignIn = false;
-		return false;	
-	}
-#endif // _X360
 	return true;
 }
 
@@ -2442,18 +2007,6 @@ bool CBasePanel::HandleStorageDeviceRequest( const char *command )
 		// If the user refused the sign-in and we respect that on this command, we're done
 		if ( m_bUserRefusedStorageDevice && CommandRespectsSignInDenied( command ) )
 			return true;
-
-#if 0 // This attempts to find user data, but may not be cert-worthy even though it's a bit nicer for the user
-		// Attempt to automatically find a device
-		DWORD nFoundDevice = xboxsystem->DiscoverUserData( XBX_GetPrimaryUserId(), COM_GetModDirectory() );
-		if ( nFoundDevice != XBX_INVALID_STORAGE_ID )
-		{
-			// Take this device
-			XBX_SetStorageDeviceId( nFoundDevice );
-			OnDeviceAttached();
-			return true;
-		}
-#endif // 
 
 		// If the message is required first, then do that instead
 		if ( CommandRequiresStorageDevice( command ) )
@@ -2512,17 +2065,7 @@ void CBasePanel::IssuePostPromptCommand( void )
 //-----------------------------------------------------------------------------
 void CBasePanel::OnCommand( const char *command )
 {
-	if ( GameUI().IsConsoleUI() )
-	{
-		RunAnimationWithCallback( this, command, new KeyValues( "RunMenuCommand", "command", command ) );
-	
-		// Clear our pending command if we just executed it
-		ClearPostPromptCommand( command );
-	}
-	else
-	{
-		RunMenuCommand( command );
-	}
+	RunMenuCommand( command );
 }
 
 //-----------------------------------------------------------------------------
@@ -2701,28 +2244,6 @@ public:
 //-----------------------------------------------------------------------------
 void CBasePanel::OnOpenQuitConfirmationDialog()
 {
-	if ( GameUI().IsConsoleUI() )
-	{
-		if ( !GameUI().HasSavedThisMenuSession() && GameUI().IsInLevel() && engine->GetMaxClients() == 1 )
-		{
-			// single player, progress will be lost...
-			ShowMessageDialog( MD_SAVE_BEFORE_QUIT ); 
-		}
-		else
-		{
-			if ( m_bUseMatchmaking )
-			{
-				ShowMessageDialog( MD_QUIT_CONFIRMATION_TF );
-			}
-			else
-			{
-				ShowMessageDialog( MD_QUIT_CONFIRMATION );
-			}
-		}
-		return;
-	}
-
-
 	if ( GameUI().IsInLevel() && engine->GetMaxClients() == 1 )
 	{
 		// prompt for saving current game before quiting
@@ -2746,21 +2267,6 @@ void CBasePanel::OnOpenQuitConfirmationDialog()
 //-----------------------------------------------------------------------------
 void CBasePanel::OnOpenDisconnectConfirmationDialog()
 {
-	// THis is for disconnecting from a multiplayer server
-	Assert( m_bUseMatchmaking );
-	Assert( IsX360() );
-
-	if ( GameUI().IsConsoleUI() && GameUI().IsInLevel() )
-	{
-		if ( engine->GetLocalPlayer() == 1 )
-		{
-			ShowMessageDialog( MD_DISCONNECT_CONFIRMATION_HOST );
-		}
-		else
-		{
-			ShowMessageDialog( MD_DISCONNECT_CONFIRMATION );
-		}
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -2813,19 +2319,6 @@ void CBasePanel::OnOpenLoadGameDialog()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CBasePanel::OnOpenLoadGameDialog_Xbox()
-{
-	if ( !m_hLoadGameDialog_Xbox.Get() )
-	{
-		m_hLoadGameDialog_Xbox = new CLoadGameDialogXbox(this);
-		PositionDialog( m_hLoadGameDialog_Xbox );
-	}
-	m_hLoadGameDialog_Xbox->Activate();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
 void CBasePanel::OnOpenSaveGameDialog()
 {
 	if ( !m_hSaveGameDialog.Get() )
@@ -2834,19 +2327,6 @@ void CBasePanel::OnOpenSaveGameDialog()
 		PositionDialog( m_hSaveGameDialog );
 	}
 	m_hSaveGameDialog->Activate();
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBasePanel::OnOpenSaveGameDialog_Xbox()
-{
-	if ( !m_hSaveGameDialog_Xbox.Get() )
-	{
-		m_hSaveGameDialog_Xbox = new CSaveGameDialogXbox(this);
-		PositionDialog( m_hSaveGameDialog_Xbox );
-	}
-	m_hSaveGameDialog_Xbox->Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -2865,20 +2345,6 @@ void CBasePanel::OnOpenOptionsDialog()
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBasePanel::OnOpenOptionsDialog_Xbox()
-{
-	if ( !m_hOptionsDialog_Xbox.Get() )
-	{
-		m_hOptionsDialog_Xbox = new COptionsDialogXbox( this );
-		PositionDialog( m_hOptionsDialog_Xbox );
-	}
-
-	m_hOptionsDialog_Xbox->Activate();
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: forces any changed options dialog settings to be applied immediately, if it's open
 //-----------------------------------------------------------------------------
 void CBasePanel::ApplyOptionsDialogSettings()
@@ -2887,20 +2353,6 @@ void CBasePanel::ApplyOptionsDialogSettings()
 	{
 		m_hOptionsDialog->ApplyChanges();
 	}
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBasePanel::OnOpenControllerDialog()
-{
-	if ( !m_hControllerDialog.Get() )
-	{
-		m_hControllerDialog = new CControllerDialog( this );
-		PositionDialog( m_hControllerDialog );
-	}
-
-	m_hControllerDialog->Activate();
 }
 
 //-----------------------------------------------------------------------------
@@ -3173,40 +2625,9 @@ void CBasePanel::SystemNotification( const int notification )
 
 	if ( notification == SYSTEMNOTIFY_USER_SIGNEDIN )
 	{
-#if defined( _X360 )
-		// See if it was the active user who signed in
-		uint state = XUserGetSigninState( XBX_GetPrimaryUserId() );
-		if ( state != eXUserSigninState_NotSignedIn )
-		{
-			// Reset a bunch of state
-			m_bUserRefusedSignIn = false;
-			m_bUserRefusedStorageDevice = false;
-			m_bStorageBladeShown = false;
-		}	
-		UpdateRichPresenceInfo();
-		engine->GetAchievementMgr()->DownloadUserData();
-		engine->GetAchievementMgr()->EnsureGlobalStateLoaded();
-#endif
 	}
 	else if ( notification == SYSTEMNOTIFY_USER_SIGNEDOUT  )
 	{
-#if defined( _X360 )
-		// See if it was the active user who signed out
-		uint state = XUserGetSigninState( XBX_GetPrimaryUserId() );
-		if ( state != eXUserSigninState_NotSignedIn )
-		{
-			return;
-		}
-
-		// Invalidate their storage ID
-		engine->OnStorageDeviceDetached();
-		m_bUserRefusedStorageDevice = false;
-		m_bUserRefusedSignIn = false;
-		m_iStorageID = XBX_INVALID_STORAGE_ID;
-		engine->GetAchievementMgr()->InitializeAchievements();
-		m_MessageDialogHandler.CloseAllMessageDialogs();
-
-#endif
 		if ( GameUI().IsInLevel() )
 		{
 			if ( m_pGameLogo )
@@ -3234,11 +2655,6 @@ void CBasePanel::SystemNotification( const int notification )
 	}
 	else if ( notification == SYSTEMNOTIFY_STORAGEDEVICES_CHANGED )
 	{
-		if ( m_hSaveGameDialog_Xbox.Get() )
-			m_hSaveGameDialog_Xbox->OnCommand( "RefreshSaveGames" );
-		if ( m_hLoadGameDialog_Xbox.Get() )
-			m_hLoadGameDialog_Xbox->OnCommand( "RefreshSaveGames" );
-
 		// FIXME: This code is incorrect, they do NOT need a storage device, it is only recommended that they do
 		if ( GameUI().IsInLevel() )
 		{
@@ -3377,28 +2793,6 @@ void CBasePanel::OnChangeStorageDevice( void )
 
 void CBasePanel::OnCreditsFinished( void )
 {
-	if ( !IsX360() )
-	{
-		// valid for 360 only
-		Assert( 0 );
-		return;
-	}
-
-	bool bExitToAppChooser = false;
-	if ( bExitToAppChooser )
-	{
-		// unknown state from engine, force to a compliant exiting state
-		// causes an complete exit out of the game back to the app launcher
-		SetVisible( true );
-		m_pGameMenu->SetAlpha( 0 );
-		StartExitingProcess();
-	}
-	else
-	{
-		// expecting to transition from the credits back to the background map
-		// prevent any possibility of using the last transition image
-		m_bUseRenderTargetImage = false;
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -3417,12 +2811,6 @@ void CBasePanel::OnGameUIHidden()
 //-----------------------------------------------------------------------------
 void CBasePanel::SetMenuAlpha(int alpha)
 {
-	if ( GameUI().IsConsoleUI() )
-	{
-		// handled by animation, not code
-		return;
-	}
-
 	m_pGameMenu->SetAlpha(alpha);
 
 	if ( m_pGameLogo )
@@ -3889,21 +3277,6 @@ void CFooterPanel::Paint( void )
 }	
 
 DECLARE_BUILD_FACTORY( CFooterPanel );
-
-#ifdef _X360
-//-----------------------------------------------------------------------------
-// Purpose: Reload the resource files on the Xbox 360
-//-----------------------------------------------------------------------------
-void CBasePanel::Reload_Resources( const CCommand &args )
-{
-	m_pConsoleControlSettings->Clear();
-	if ( m_pConsoleControlSettings->LoadFromFile( g_pFullFileSystem, "resource/UI/XboxDialogs.res" ) )
-	{
-		m_pConsoleControlSettings->ProcessResolutionKeys( surface()->GetResolutionKey() );
-	}
-}
-#endif
-
 
 // X360TBD: Move into a separate module when completed
 CMessageDialogHandler::CMessageDialogHandler()
@@ -4544,18 +3917,6 @@ void CBasePanel::CloseBaseDialogs( void )
 	if ( m_hBonusMapsDialog.Get() )
 		m_hBonusMapsDialog->Close();
 	
-	if ( m_hControllerDialog.Get() )
-		m_hControllerDialog->Close();
-
-	if ( m_hLoadGameDialog_Xbox.Get() )
-		m_hLoadGameDialog_Xbox->Close();
-
-	if ( m_hOptionsDialog_Xbox.Get() )
-		m_hOptionsDialog_Xbox->Close();
-
-	if ( m_hSaveGameDialog_Xbox.Get() )
-		m_hSaveGameDialog_Xbox->Close();
-
 	if ( m_hLoadCommentaryDialog.Get() )
 		m_hLoadCommentaryDialog->Close();
 

@@ -31,24 +31,4 @@ public:
 	void OnCommand( const char *command ) override;
 };
 
-//
-//
-//
-
-class CLoadGameDialogXbox : public CSaveGameBrowserDialog
-{
-	DECLARE_CLASS_SIMPLE_OVERRIDE( CLoadGameDialogXbox, CSaveGameBrowserDialog );
-
-public:
-					CLoadGameDialogXbox( vgui::Panel *parent );
-	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
-	void	OnCommand(const char *command) override;
-	void	PerformSelectedAction( void ) override;
-	void	PerformDeletion( void ) override;
-	void	UpdateFooterOptions( void ) override;
-
-private:
-	void			DeleteSaveGame( const SaveGameDescription_t *pSaveDesc );
-};
-
 #endif // LOADGAMEDIALOG_H

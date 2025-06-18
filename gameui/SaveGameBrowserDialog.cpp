@@ -65,12 +65,7 @@ CGameSavePanel::CGameSavePanel( CSaveGameBrowserDialog *parent, SaveGameDescript
 	}
 
 	// Setup our basic settings
-	KeyValues *pKeys = NULL;
-	if ( GameUI().IsConsoleUI() )
-	{
-		pKeys = BasePanel()->GetConsoleControlSettings()->FindKey( "SaveGamePanel.res" );
-	}
-	LoadControlSettings( "Resource/SaveGamePanel.res", NULL, pKeys );
+	LoadControlSettings( "Resource/SaveGamePanel.res", NULL, nullptr );
 
 	int px, py;
 	m_pLevelPicBorder->GetPos( px, py );
@@ -202,13 +197,7 @@ CSaveGameBrowserDialog::CSaveGameBrowserDialog( vgui::Panel *parent )
 	m_pFooter = new CFooterPanel( parent, "SaveGameFooter" );
 
 	// Load our res files from the keyvalue we're holding
-	KeyValues *pKeys = NULL;
-	if ( GameUI().IsConsoleUI() )
-	{
-		pKeys = BasePanel()->GetConsoleControlSettings()->FindKey( "SaveGameDialog.res" );
-	}
-	
-	LoadControlSettings( "Resource/SaveGameDialog.res", NULL, pKeys );
+	LoadControlSettings( "Resource/SaveGameDialog.res", NULL, nullptr );
 }
 
 //-----------------------------------------------------------------------------
@@ -908,29 +897,9 @@ void CSaveGameBrowserDialog::SetFastScroll( bool fast )
 //-----------------------------------------------------------------------------
 void CSaveGameBrowserDialog::ContinueScrolling( void )
 {
-	if ( !GameUI().IsConsoleUI() )
+	if ( m_PanelIndex[SLOT_CENTER-1] % 3 )
 	{
-		if ( m_PanelIndex[SLOT_CENTER-1] % 3 )
-		{
-			ScrollSelectionPanels( m_ScrollDirection );
-		}
-		return;
-	}
-
-	if ( m_ButtonPressed == m_ScrollDirection )
-	{
-		SetFastScroll( true );
 		ScrollSelectionPanels( m_ScrollDirection );
-	}
-	else if ( m_ButtonPressed != SCROLL_NONE )
-	{
-		// The other direction has been pressed - start a slow scroll
-		SetFastScroll( false );
-		ScrollSelectionPanels( (EScrollDirection)m_ButtonPressed );
-	}
-	else
-	{
-		SetFastScroll( false );
 	}
 }
 

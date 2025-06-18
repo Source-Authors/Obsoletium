@@ -141,7 +141,6 @@ CGameUI::CGameUI()
 	m_iGameQueryPort = 0;
 	m_bActivatedUI = false;
 	m_szPreviousStatusText[0] = 0;
-	m_bIsConsoleUI = false;
 	m_bHasSavedThisMenuSession = false;
 	m_bOpenProgressOnStart = false;
 }
@@ -172,9 +171,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 #ifndef NO_STEAM
 	steamapicontext->Init();
 #endif
-
-	ConVarRef var( "gameui_xbox" );
-	m_bIsConsoleUI = var.IsValid() && var.GetBool();
 
 	vgui::VGui_InitInterfacesList( "gameui", &factory, 1 );
 	vgui::VGui_InitMatSysInterfacesList( "gameui", &factory, 1 );
@@ -263,17 +259,7 @@ void CGameUI::BonusMapUnlock( const char *pchFileName, const char *pchMapName )
 			CBasePanel *pBasePanel = BasePanel();
 			if ( pBasePanel )
 			{
-				if ( GameUI().IsConsoleUI() )
-				{
-					if ( Q_stricmp( pchFileName, "scripts/advanced_chambers" ) == 0 )
-					{
-						pBasePanel->SetMenuItemBlinkingState( "OpenNewGameDialog", true );
-					}
-				}
-				else
-				{
-					pBasePanel->SetMenuItemBlinkingState( "OpenBonusMapsDialog", true );
-				}
+				pBasePanel->SetMenuItemBlinkingState( "OpenBonusMapsDialog", true );
 			}
 
 			BonusMapsDatabase()->SetBlink( true );
@@ -1145,7 +1131,7 @@ bool CGameUI::IsInReplay()
 //-----------------------------------------------------------------------------
 bool CGameUI::IsConsoleUI()
 {
-	return m_bIsConsoleUI;
+	return false;
 }
 
 //-----------------------------------------------------------------------------
