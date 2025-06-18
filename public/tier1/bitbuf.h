@@ -158,7 +158,7 @@ public:
 	void			Reset();
 
 	// Get the base pointer.
-	[[nodiscard]] unsigned char*	GetBasePointer() { return (unsigned char*) m_pData; }
+	[[nodiscard]] RESTRICT_FUNC byte*	GetBasePointer() { return (byte*) m_pData; }
 
 	// Enable or disable assertion on overflow. 99% of the time, it's a bug that we need to catch,
 	// but there may be the occasional buffer that is allowed to overflow gracefully.
