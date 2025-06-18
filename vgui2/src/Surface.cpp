@@ -1067,12 +1067,12 @@ void CWin32Surface::PushMakeCurrent(VPANEL panel, bool useInsets)
 	if ( _currentContextPanel == panel )
 	{
 		// this panel has it's own window, so use screen space
-		::SetViewportOrgEx(PLAT(_currentContextPanel)->hdc,0+inset[0],0+inset[1],null);
+		::SetViewportOrgEx(PLAT(_currentContextPanel)->hdc,0+inset[0],0+inset[1],nullptr);
 	}
 	else
 	{
 		// child window, so set win32 up so all subsequent drawing calls are done in local space
-		::SetViewportOrgEx(PLAT(_currentContextPanel)->hdc,(absPanel[0]+inset[0])-absThis[0],(absPanel[1]+inset[1])-absThis[1],null);
+		::SetViewportOrgEx(PLAT(_currentContextPanel)->hdc,(absPanel[0]+inset[0])-absThis[0],(absPanel[1]+inset[1])-absThis[1],nullptr);
 	}
 
 	// setup clipping
@@ -1296,7 +1296,7 @@ void CWin32Surface::DrawSetColor(Color col)
 
 void CWin32Surface::DrawSetTextPos(int x, int y)
 {
-	MoveToEx(PLAT(_currentContextPanel)->hdc,x,y,null);	
+	MoveToEx(PLAT(_currentContextPanel)->hdc,x,y,nullptr);	
 	m_TextPos[0] = x;
 	m_TextPos[1] = y;
 }
@@ -2725,7 +2725,7 @@ void CWin32Surface::ApplyChanges()
 		// if they are not the same, then adjust the win32 window so it is
 		if ((x != sx) || (y != sy) || (wide != swide) || (tall != stall))
 		{
-			::SetWindowPos(Plat->hwnd, null, x, y, wide, tall, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+			::SetWindowPos(Plat->hwnd, nullptr, x, y, wide, tall, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
 			if ( sx > 0 || sy > 0 ) // only message for moves that are on the screen
 			{
 				g_pIVgui->PostMessage(panel, new KeyValues("Move"), NULL ); 

@@ -599,7 +599,7 @@ bool CSystem::SetRegistryString(const char *key, const char *value)
 		return false;
 	}
 
-	if(VCRHook_RegCreateKeyEx(hSlot,key0,null,null,REG_OPTION_NON_VOLATILE, value ? KEY_WRITE : KEY_ALL_ACCESS,null,&hKey,null)!=ERROR_SUCCESS)
+	if(VCRHook_RegCreateKeyEx(hSlot,key0,0,nullptr,REG_OPTION_NON_VOLATILE, value ? KEY_WRITE : KEY_ALL_ACCESS,0,&hKey,0)!=ERROR_SUCCESS)
 	{
 		return false;
 	}
@@ -641,13 +641,13 @@ bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 		return false;
 	}
 
-	if(VCRHook_RegOpenKeyEx(hSlot,key0,null,KEY_READ,&hKey)!=ERROR_SUCCESS)
+	if(VCRHook_RegOpenKeyEx(hSlot,key0,0,KEY_READ,&hKey)!=ERROR_SUCCESS)
 	{
 		return false;
 	}
 
 	ulong len=valueLen;
-	if(VCRHook_RegQueryValueEx(hKey,key1,null,null,(uchar*)value,&len)==ERROR_SUCCESS)
+	if(VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)value,&len)==ERROR_SUCCESS)
 	{		
 		VCRHook_RegCloseKey(hKey);
 		return true;
@@ -679,12 +679,12 @@ bool CSystem::SetRegistryInteger(const char *key, int value)
 		return false;
 	}
 
-	if(VCRHook_RegCreateKeyEx(hSlot,key0,null,null,REG_OPTION_NON_VOLATILE,KEY_WRITE,null,&hKey,null)!=ERROR_SUCCESS)
+	if(VCRHook_RegCreateKeyEx(hSlot,key0,0,nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE,nullptr,&hKey,0)!=ERROR_SUCCESS)
 	{
 		return false;
 	}
 		
-	if(VCRHook_RegSetValueEx(hKey,key1,null,REG_DWORD,(uchar*)&value,4)==ERROR_SUCCESS)
+	if(VCRHook_RegSetValueEx(hKey,key1,0,REG_DWORD,(uchar*)&value,4)==ERROR_SUCCESS)
 	{
 		VCRHook_RegCloseKey(hKey);
 		return true;
@@ -715,13 +715,13 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 		return false;
 	}
 
-	if(VCRHook_RegOpenKeyEx(hSlot,key0,null,KEY_READ,&hKey)!=ERROR_SUCCESS)
+	if(VCRHook_RegOpenKeyEx(hSlot,key0,0,KEY_READ,&hKey)!=ERROR_SUCCESS)
 	{
 		return false;
 	}
 
 	ulong len=4;
-	if(VCRHook_RegQueryValueEx(hKey,key1,null,null,(uchar*)&value,&len)==ERROR_SUCCESS)
+	if(VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)&value,&len)==ERROR_SUCCESS)
 	{		
 		VCRHook_RegCloseKey(hKey);
 		return true;
