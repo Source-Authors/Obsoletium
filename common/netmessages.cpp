@@ -54,10 +54,6 @@ bool CLC_VoiceData::ReadFromBuffer( bf_read &buffer )
 
 	m_nLength = buffer.ReadWord();	// length in bits
 
-#if defined ( _X360 )
-	m_xuid	= buffer.ReadLongLong();
-#endif
-
 	m_DataIn = buffer;
 
 	return buffer.SeekRelative( m_nLength );
@@ -1015,11 +1011,6 @@ bool SVC_VoiceData::ReadFromBuffer( bf_read &buffer )
 	m_bProximity = !!buffer.ReadByte();
 	m_nLength = buffer.ReadWord();
 
-	if ( IsX360() )
-	{
-		m_xuid =  buffer.ReadLongLong();
-	}
-
 	m_DataIn = buffer;
 	return buffer.SeekRelative( m_nLength );
 }
@@ -1850,7 +1841,7 @@ bool MM_ClientInfo::WriteToBuffer( bf_write &buffer )
 	buffer.WriteLongLong( m_id );			// 64 bit
 	buffer.WriteByte( m_cPlayers );
 	buffer.WriteByte( m_bInvited );
-	for ( int i = 0; i < m_cPlayers; ++i )
+	for ( byte i = 0; i < m_cPlayers; ++i )
 	{
 		buffer.WriteLongLong( m_xuids[i] );	// 64 bit
 		buffer.WriteBytes( &m_cVoiceState, sizeof( m_cVoiceState ) );
@@ -1868,7 +1859,7 @@ bool MM_ClientInfo::ReadFromBuffer( bf_read &buffer )
 	m_id = buffer.ReadLongLong();			// 64 bit
 	m_cPlayers = buffer.ReadByte();
 	m_bInvited = (buffer.ReadByte() != 0);
-	for ( int i = 0; i < m_cPlayers; ++i )
+	for ( byte i = 0; i < m_cPlayers; ++i )
 	{
 		m_xuids[i] = buffer.ReadLongLong();	// 64 bit
 		buffer.ReadBytes( m_cVoiceState );
@@ -1882,7 +1873,7 @@ bool MM_ClientInfo::ReadFromBuffer( bf_read &buffer )
 
 const char *MM_ClientInfo::ToString( void ) const
 {
-	Q_snprintf( s_text, sizeof( s_text ), "Client Info: ID: %llu, Players: %d", m_id, m_cPlayers );
+	Q_snprintf( s_text, sizeof( s_text ), "Client Info: ID: %llu, Players: %hhu", m_id, m_cPlayers );
 	return s_text;
 }
 
@@ -1909,7 +1900,7 @@ bool MM_Mutelist::WriteToBuffer( bf_write &buffer )
 
 	buffer.WriteLongLong( m_id );
 	buffer.WriteByte( m_cPlayers );
-	for ( int i = 0; i < m_cPlayers; ++i )
+	for ( byte i = 0; i < m_cPlayers; ++i )
 	{
 		buffer.WriteByte( m_cRemoteTalkers[i] );
 		buffer.WriteLongLong( m_xuid[i] ); // 64 bit
@@ -1926,12 +1917,12 @@ bool MM_Mutelist::ReadFromBuffer( bf_read &buffer )
 {
 	m_id = buffer.ReadLongLong();
 	m_cPlayers = buffer.ReadByte();
-	for ( int i = 0; i < m_cPlayers; ++i )
+	for ( byte i = 0; i < m_cPlayers; ++i )
 	{
 		m_cRemoteTalkers[i] = buffer.ReadByte();
 		m_xuid[i] = buffer.ReadLongLong();	// 64 bit
 		m_cMuted[i] = buffer.ReadByte();
-		for ( int j = 0; j < m_cMuted[i]; ++j )
+		for ( byte j = 0; j < m_cMuted[i]; ++j )
 		{
 			m_Muted[i].AddToTail( buffer.ReadLongLong() );
 		}

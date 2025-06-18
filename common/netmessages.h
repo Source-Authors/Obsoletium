@@ -885,7 +885,7 @@ public:
 	uint64	m_xuids[MAX_PLAYERS_PER_CLIENT];
 	byte	m_cVoiceState[MAX_PLAYERS_PER_CLIENT];
 	bool	m_bInvited;
-	char	m_cPlayers;
+	byte	m_cPlayers;
 	char	m_iControllers[MAX_PLAYERS_PER_CLIENT];
 	char	m_iTeam[MAX_PLAYERS_PER_CLIENT];
 	char	m_szGamertags[MAX_PLAYERS_PER_CLIENT][MAX_PLAYER_NAME_LENGTH];

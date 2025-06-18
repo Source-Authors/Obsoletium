@@ -193,12 +193,12 @@ void bf_write::SeekToBit( intp bitPos )
 
 
 // Sign bit comes first
-void bf_write::WriteSBitLong( int data, int numbits )
+void bf_write::WriteSBitLong( int32 data, int numbits )
 {
 	// Force the sign-extension bit to be correct even in the case of overflow.
-	int nValue = data;
-	int nPreserveBits = ( 0x7FFFFFFF >> ( static_cast<int>(CHAR_BIT * sizeof(int32)) - numbits ) );
-	int nSignExtension = ( nValue >> 31 ) & ~nPreserveBits;
+	int32 nValue = data;
+	int32 nPreserveBits = ( 0x7FFFFFFF >> ( static_cast<int32>(CHAR_BIT * sizeof(int32)) - numbits ) );
+	int32 nSignExtension = ( nValue >> 31 ) & ~nPreserveBits;
 	nValue &= nPreserveBits;
 	nValue |= nSignExtension;
 	
@@ -423,22 +423,22 @@ int bf_write::ByteSizeSignedVarInt64( int64 data )
 	return ByteSizeVarInt64( bitbuf::ZigZagEncode64( data ) );
 }
 
-void bf_write::WriteBitLong(unsigned int data, int numbits, bool bSigned)
+void bf_write::WriteBitLong(uint32 data, int numbits, bool bSigned)
 {
 	if(bSigned)
-		WriteSBitLong((int)data, numbits);
+		WriteSBitLong((int32)data, numbits);
 	else
 		WriteUBitLong(data, numbits);
 }
 
-bool bf_write::WriteBits(const void *pInData, int nBits)
+bool bf_write::WriteBits(const void *pInData, intp nBits)
 {
 #if defined( BB_PROFILING )
 	VPROF( "bf_write::WriteBits" );
 #endif
 
-	unsigned char *pOut = (unsigned char*)pInData;
-	int nBitsLeft = nBits;
+	const auto *pOut = (const unsigned char*)pInData;
+	intp nBitsLeft = nBits;
 
 	// Bounds checking..
 	if ( (m_iCurBit+nBits) > m_nDataBits )
@@ -459,8 +459,8 @@ bool bf_write::WriteBits(const void *pInData, int nBits)
 	if ( (nBitsLeft >= 32) && (m_iCurBit & 7) == 0 )
 	{
 		// current bit is byte aligned, do block copy
-		int numbytes = nBitsLeft / CHAR_BIT; 
-		int numbits = numbytes * CHAR_BIT;
+		intp numbytes = nBitsLeft / CHAR_BIT; 
+		intp numbits = numbytes * CHAR_BIT;
 		
 		Q_memcpy( (char*)m_pData+(m_iCurBit>>3), pOut, numbytes );
 		pOut += numbytes;
@@ -513,14 +513,14 @@ bool bf_write::WriteBits(const void *pInData, int nBits)
 	// write remaining bits
 	if ( nBitsLeft )
 	{
-		WriteUBitLong( *pOut, nBitsLeft, false );
+		WriteUBitLong( *pOut, static_cast<int>(nBitsLeft), false );
 	}
 
 	return !IsOverflowed();
 }
 
 
-bool bf_write::WriteBitsFromBuffer( bf_read *pIn, int nBits )
+bool bf_write::WriteBitsFromBuffer( bf_read *pIn, intp nBits )
 {
 	constexpr int kUint32Bits = CHAR_BIT * sizeof(uint32);
 
@@ -531,7 +531,7 @@ bool bf_write::WriteBitsFromBuffer( bf_read *pIn, int nBits )
 		nBits -= kUint32Bits;
 	}
 
-	WriteUBitLong( pIn->ReadUBitLong( nBits ), nBits );
+	WriteUBitLong( pIn->ReadUBitLong( static_cast<int>(nBits) ), static_cast<int>(nBits) );
 	return !IsOverflowed() && !pIn->IsOverflowed();
 }
 
@@ -766,7 +766,7 @@ void bf_write::WriteFloat(float val)
 	WriteBits(&val, sizeof(val) * CHAR_BIT);
 }
 
-bool bf_write::WriteBytes( const void *pBuf, int nBytes )
+bool bf_write::WriteBytes( const void *pBuf, intp nBytes )
 {
 	return WriteBits(pBuf, nBytes * CHAR_BIT);
 }
@@ -887,7 +887,7 @@ void bf_read::ReadBits(void *pOutData, intp nBits)
 #endif
 
 	uint8 *pOut = static_cast<uint8 *>(pOutData);
-	int nBitsLeft = nBits;
+	intp nBitsLeft = nBits;
 	
 	// align output to dword boundary
 	while( ((size_t)pOut & 3) != 0 && nBitsLeft >= CHAR_BIT )
@@ -919,23 +919,22 @@ void bf_read::ReadBits(void *pOutData, intp nBits)
 	// read remaining bits
 	if ( nBitsLeft )
 	{
-		*pOut = static_cast<uint8>(ReadUBitLong(nBitsLeft));
+		*pOut = static_cast<uint8>(ReadUBitLong(static_cast<int>(nBitsLeft)));
 	}
-
 }
 
-int bf_read::ReadBitsClamped_ptr(void *pOutData, size_t outSizeBytes, size_t nBits)
+intp bf_read::ReadBitsClamped_ptr(void *pOutData, intp outSizeBytes, intp nBits)
 {
-	size_t outSizeBits = outSizeBytes * CHAR_BIT;
-	size_t readSizeBits = nBits;
-	int skippedBits = 0;
+	intp outSizeBits = outSizeBytes * CHAR_BIT;
+	intp readSizeBits = nBits;
+	intp skippedBits = 0;
 	if ( readSizeBits > outSizeBits )
 	{
 		// Should we print a message when we clamp the data being read? Only
 		// in debug builds I think.
 		AssertMsg( 0, "Oversized network packet received, and clamped." );
 		readSizeBits = outSizeBits;
-		skippedBits = (int)( nBits - outSizeBits );
+		skippedBits = nBits - outSizeBits;
 		// What should we do in this case, which should only happen if nBits
 		// is negative for some reason?
 		//if ( skippedBits < 0 )
@@ -946,7 +945,7 @@ int bf_read::ReadBitsClamped_ptr(void *pOutData, size_t outSizeBytes, size_t nBi
 	SeekRelative( skippedBits );
 
 	// Return the number of bits actually read.
-	return (int)readSizeBits;
+	return readSizeBits;
 }
 
 float bf_read::ReadBitAngle( int numbits )
@@ -959,7 +958,7 @@ float bf_read::ReadBitAngle( int numbits )
 	return fReturn;
 }
 
-unsigned int bf_read::PeekUBitLong( int numbits )
+uint32 bf_read::PeekUBitLong( int numbits )
 {
 #ifdef BIT_VERBOSE
 	int nShifts = numbits;
@@ -967,7 +966,7 @@ unsigned int bf_read::PeekUBitLong( int numbits )
 
 	bf_read savebf = *this;  // Save current state info
 
-	unsigned r = 0;
+	uint32 r = 0;
 	for(int i=0; i < numbits; i++)
 	{
 		int nBitValue = ReadOneBit();
@@ -988,7 +987,7 @@ unsigned int bf_read::PeekUBitLong( int numbits )
 	return r;
 }
 
-unsigned int bf_read::ReadUBitLongNoInline( int numbits )
+uint32 bf_read::ReadUBitLongNoInline( int numbits )
 {
 	return ReadUBitLong( numbits );
 }
@@ -1002,10 +1001,10 @@ unsigned int bf_read::ReadUBitVarInternal( int encodingType )
 }
 
 // Append numbits least significant bits from data to the current bit stream
-int bf_read::ReadSBitLong( int numbits )
+int32 bf_read::ReadSBitLong( int numbits )
 {
-	unsigned int r = ReadUBitLong(numbits);
-	unsigned int s = 1 << (numbits-1);
+	uint32 r = ReadUBitLong(numbits);
+	uint32 s = 1 << (numbits-1);
 	if (r >= s)
 	{
 		// sign-extend by removing sign bit and then subtracting sign bit again
