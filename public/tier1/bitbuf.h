@@ -223,12 +223,14 @@ public:
 // Byte functions.
 public:
 
-	void			WriteChar(int val);
-	void			WriteByte(int val);
-	void			WriteShort(int val);
-	void			WriteWord(int val);
-	void			WriteLong(long val);
+	void			WriteChar(char val);
+	void			WriteByte(uint8 val);
+	void			WriteShort(int16 val);
+	void			WriteWord(uint16 val);
+	void			WriteLong(int32 val);
+	void			WriteULong(uint32 val);
 	void			WriteLongLong(int64 val);
+	void			WriteULongLong(uint64 val);
 	void			WriteFloat(float val);
 	bool			WriteBytes( const void *pBuf, int nBytes );
 
@@ -599,12 +601,14 @@ public:
 // Byte functions (these still read data in bit-by-bit).
 public:
 	
-	[[nodiscard]] BITBUF_INLINE char	ReadChar() { return (char)ReadUBitLong(8); }
-	[[nodiscard]] BITBUF_INLINE int	ReadByte() { return ReadUBitLong(8); }
-	[[nodiscard]] BITBUF_INLINE short	ReadShort() { return (short)ReadUBitLong(16); }
-	[[nodiscard]] BITBUF_INLINE int	ReadWord() { return ReadUBitLong(16); }
-	[[nodiscard]] BITBUF_INLINE long ReadLong() { return ReadUBitLong(32); }
+	[[nodiscard]] BITBUF_INLINE char	ReadChar() { return (char)ReadUBitLong(CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE byte	ReadByte() { return (byte)ReadUBitLong(CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE int16	ReadShort() { return (int16)ReadUBitLong(sizeof(int16) * CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE uint16	ReadWord() { return (uint16)ReadUBitLong(sizeof(uint16) * CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE int32	ReadLong() { return (int32)ReadUBitLong(sizeof(int32) * CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE uint32	ReadULong() { return (uint32)ReadUBitLong(sizeof(uint32) * CHAR_BIT); }
 	[[nodiscard]] int64			ReadLongLong();
+	[[nodiscard]] uint64		ReadULongLong();
 	[[nodiscard]] float			ReadFloat();
 
 	bool			ReadBytes( OUT_CAP(nBytes) void *pOut, intp nBytes);

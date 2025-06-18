@@ -696,32 +696,57 @@ void bf_write::WriteBitAngles( const QAngle& fa )
 	WriteBitVec3Coord( tmp );
 }
 
-void bf_write::WriteChar(int val)
+void bf_write::WriteChar(char val)
 {
-	WriteSBitLong(val, sizeof(char) * CHAR_BIT);
+	// dimhotepus: Correctly write char as it may be signed or unsigned depend on platform.
+	if constexpr (std::is_signed_v<decltype(val)>)
+	{
+		WriteSBitLong(val, sizeof(val) * CHAR_BIT);
+	}
+	else
+	{
+		WriteUBitLong(val, sizeof(val) * CHAR_BIT);
+	}
 }
 
-void bf_write::WriteByte(int val)
+void bf_write::WriteByte(uint8 val)
 {
-	WriteUBitLong(val, sizeof(unsigned char) * CHAR_BIT);
+	WriteUBitLong(val, sizeof(val) * CHAR_BIT);
 }
 
-void bf_write::WriteShort(int val)
+void bf_write::WriteShort(int16 val)
 {
-	WriteSBitLong(val, sizeof(short) * CHAR_BIT);
+	WriteSBitLong(val, sizeof(val) * CHAR_BIT);
 }
 
-void bf_write::WriteWord(int val)
+void bf_write::WriteWord(uint16 val)
 {
-	WriteUBitLong(val, sizeof(unsigned short) * CHAR_BIT);
+	WriteUBitLong(val, sizeof(val) * CHAR_BIT);
 }
 
-void bf_write::WriteLong(long val)
+void bf_write::WriteLong(int32 val)
 {
-	WriteSBitLong(val, sizeof(long) * CHAR_BIT);
+	WriteSBitLong(val, sizeof(int32) * CHAR_BIT);
+}
+
+void bf_write::WriteULong(uint32 val)
+{
+	WriteUBitLong(val, sizeof(uint32) * CHAR_BIT);
 }
 
 void bf_write::WriteLongLong(int64 val)
+{
+	uint32 *pLongs = (uint32*)&val;
+
+	// dimhotepus: Fix writing int64 bits in LP64 model.
+	// Insert the two DWORDS according to network endian
+	constexpr short endianIndex = 0x0100;
+	byte *idx = (byte*)&endianIndex;
+	WriteUBitLong(pLongs[*idx++], sizeof(uint32) * CHAR_BIT);
+	WriteUBitLong(pLongs[*idx], sizeof(uint32) * CHAR_BIT);
+}
+
+void bf_write::WriteULongLong(uint64 val)
 {
 	uint32 *pLongs = (uint32*)&val;
 
@@ -1313,6 +1338,21 @@ void bf_read::ReadBitAngles( QAngle& fa )
 int64 bf_read::ReadLongLong()
 {
 	int64 retval;
+	uint32 *pLongs = (uint32*)&retval;
+	
+	// dimhotepus: Fix reading int64 bits in LP64 model.
+	// Read the two DWORDs according to network endian
+	constexpr short endianIndex = 0x0100;
+	const byte *idx = (const byte*)&endianIndex;
+	pLongs[*idx++] = ReadUBitLong(sizeof(uint32) * CHAR_BIT);
+	pLongs[*idx] = ReadUBitLong(sizeof(uint32) * CHAR_BIT);
+
+	return retval;
+}
+
+uint64 bf_read::ReadULongLong()
+{
+	uint64 retval;
 	uint32 *pLongs = (uint32*)&retval;
 	
 	// dimhotepus: Fix reading int64 bits in LP64 model.
