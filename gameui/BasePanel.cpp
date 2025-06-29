@@ -3730,10 +3730,9 @@ void CMessageDialogHandler::ShowMessageDialog( int nType, vgui::Panel *pOwner )
 
 void CMessageDialogHandler::CloseAllMessageDialogs()
 {
-	for ( int i = 0; i < MAX_MESSAGE_DIALOGS; ++i )
+	for ( auto &dialog : m_hMessageDialogs )
 	{
-		CMessageDialog *pDlg = m_hMessageDialogs[i];
-		if ( pDlg )
+		if ( dialog )
 		{
 			vgui::surface()->RestrictPaintToSinglePanel(NULL);
 			if ( vgui_message_dialog_modal.GetBool() )
@@ -3741,8 +3740,8 @@ void CMessageDialogHandler::CloseAllMessageDialogs()
 				vgui::input()->ReleaseAppModalSurface();
 			}
 
-			pDlg->Close();
-			m_hMessageDialogs[i] = NULL;
+			dialog->Close();
+			dialog = nullptr;
 		}
 	}
 }
@@ -3844,11 +3843,11 @@ void CMessageDialogHandler::ActivateMessageDialog( int nStackIdx )
 
 void CMessageDialogHandler::PositionDialogs( int wide, int tall )
 {
-	for ( int i = 0; i < MAX_MESSAGE_DIALOGS; ++i )
+	for ( auto &dialog : m_hMessageDialogs )
 	{
-		if ( m_hMessageDialogs[i].Get() )
+		if ( dialog.Get() )
 		{
-			PositionDialog( m_hMessageDialogs[i], wide, tall );
+			PositionDialog( dialog, wide, tall );
 		}
 	}
 }
