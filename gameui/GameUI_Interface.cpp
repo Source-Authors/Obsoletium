@@ -5,6 +5,8 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include "GameUI_Interface.h"
+
 #ifdef WIN32
 #if !defined( _X360 )
 #include "winlite.h"
@@ -24,11 +26,13 @@
 #ifdef SendMessage
 #undef SendMessage
 #endif
-																
+
+#ifdef MessageBox
+#undef MessageBox
+#endif
+
 #include "filesystem.h"
-#include "GameUI_Interface.h"
 #include "Sys_Utils.h"
-#include "string.h"
 #include "tier0/icommandline.h"
 
 // interface to engine
