@@ -61,7 +61,7 @@ void CLoadGameDialog::OnCommand( const char *command )
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
 		{
 			const char *shortName = m_SaveGames[saveIndex].szShortName;
-			if ( shortName && shortName[ 0 ] )
+			if ( !Q_isempty( shortName ) )
 			{
 				// Load the game, return to top and switch to engine
 				char sz[ 256 ];
