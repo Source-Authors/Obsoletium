@@ -57,14 +57,15 @@ void CTGAImagePanel::Paint()
 
 		// load the file
 		CUtlMemory<unsigned char> tga;
+		int iImageWidth, iImageHeight;
 #ifndef _XBOX
-		if ( TGALoader::LoadRGBA8888( m_szTGAName, tga, m_iImageWidth, m_iImageHeight ) )
+		if ( TGALoader::LoadRGBA8888( m_szTGAName, tga, iImageWidth, iImageHeight ) )
 		{
 			// set the textureID
-			surface()->DrawSetTextureRGBA( m_iTextureID, tga.Base(), m_iImageWidth, m_iImageHeight, false, true );
+			surface()->DrawSetTextureRGBA( m_iTextureID, tga.Base(), iImageWidth, iImageHeight, false, true );
 			m_bHasValidTexture = true;
 			// set our size to be the size of the tga
-			SetSize( m_iImageWidth, m_iImageHeight );
+			SetSize( iImageWidth, iImageHeight );
 		}
 		else
 #endif
