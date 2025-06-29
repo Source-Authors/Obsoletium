@@ -134,13 +134,9 @@ private:
 	float	m_PanelAlpha[ NUM_SLOTS ];
 	int		m_PanelIndex[ NUM_SLOTS ];
 	float	m_ScrollSpeed;
-	int		m_ButtonPressed;
 	int		m_ScrollCt;
 	bool	m_bScrolling;
-	char	m_ActiveTitleIdx;
-	bool	m_bMapStarting;
 	int		m_iBonusSelection;
-	bool	m_bScrollToFirstBonusMap;
 	
 	struct BonusMapDescription_t	*m_pBonusMapDescription;
 

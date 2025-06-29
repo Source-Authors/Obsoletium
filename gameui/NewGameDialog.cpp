@@ -296,19 +296,15 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	SetBounds(0, 0, 372, 160);
 	SetSizeable( false );
 	m_iSelectedChapter = -1;
-	m_ActiveTitleIdx = 0;
 
 	m_bCommentaryMode = bCommentaryMode;
-	m_bMapStarting = false;
 	m_bScrolling = false;
 	m_ScrollCt = 0;
 	m_ScrollSpeed = 0.f;
-	m_ButtonPressed = SCROLL_NONE;
 	m_ScrollDirection = SCROLL_NONE;
 	m_pCommentaryLabel = NULL;
 
 	m_iBonusSelection = 0;
-	m_bScrollToFirstBonusMap = false;
 
 	SetTitle("#GameUI_NewGame", true);
 
@@ -454,8 +450,6 @@ CNewGameDialog::~CNewGameDialog()
 
 void CNewGameDialog::Activate( void )
 {
-	m_bMapStarting = false;
-
 	// Commentary stuff is set up on activate because in XBox the new game menu is never deleted
 	SetTitle( ( ( m_bCommentaryMode ) ? ( "#GameUI_LoadCommentary" ) : ( "#GameUI_NewGame") ), true);
 
@@ -838,9 +832,6 @@ void CNewGameDialog::PreScroll( EScrollDirection dir )
 		// so the next panel scrolls over the top of it.
 		m_ChapterPanels[hideIdx]->SetZPos( 0 );
 	}
-
-	// Flip the active title label prior to the crossfade
-	m_ActiveTitleIdx ^= 0x01;
 }
 
 //-----------------------------------------------------------------------------
@@ -1147,40 +1138,25 @@ void CNewGameDialog::OnCommand( const char *command )
 
 	if ( !stricmp( command, "Play" ) )
 	{
-		if ( m_bMapStarting )
-			return;
-
 		StartGame();
 	}
 	else if ( !stricmp( command, "Next" ) )
 	{
-		if ( m_bMapStarting )
-			return;
-
 		ScrollSelectionPanels( SCROLL_LEFT );
 		bReset = false;
 	}
 	else if ( !stricmp( command, "Prev" ) )
 	{
-		if ( m_bMapStarting )
-			return;
-
 		ScrollSelectionPanels( SCROLL_RIGHT );
 		bReset = false;
 	}
 	else if ( !stricmp( command, "Mode_Next" ) )
 	{
-		if ( m_bMapStarting )
-			return;
-
 		ScrollBonusSelection( SCROLL_LEFT );
 		bReset = false;
 	}
 	else if ( !stricmp( command, "Mode_Prev" ) )
 	{
-		if ( m_bMapStarting )
-			return;
-
 		ScrollBonusSelection( SCROLL_RIGHT );
 		bReset = false;
 	}
