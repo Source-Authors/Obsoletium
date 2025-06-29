@@ -47,6 +47,12 @@ struct SaveGameDescription_t
 
 int SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) char *name, int nameSize, OUT_Z_CAP(commentSize) char *comment, int commentSize );
 
+template<int nameSize, int commentSize>
+int SaveReadNameAndComment( FileHandle_t f, OUT_Z_ARRAY char (&name)[nameSize], OUT_Z_ARRAY char (&comment)[commentSize] )
+{
+	return SaveReadNameAndComment( f, name, nameSize, comment, commentSize );
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: Base class for save & load game dialogs
