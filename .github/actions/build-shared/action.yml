@@ -15,10 +15,15 @@ inputs:
 runs:
   using: "composite"
   steps:
-  - name: Add MSBuild to PATH
+  - name: Add MSBuild ${{inputs.platform-name}} to PATH
     uses: microsoft/setup-msbuild@v2
     with:
-      msbuild-architecture: ${{matrix.platform-name}}
+      msbuild-architecture: ${{inputs.platform-name}}
+
+  - name: Add MASM ${{inputs.platform-name}} to PATH
+    uses: Source-Authors/setup-masm@v1.1
+    with:
+      vs-architecture: ${{inputs.platform-name}}
 
   - name: Add cmake / nmake to PATH
     uses: ilammy/msvc-dev-cmd@v1
