@@ -266,7 +266,7 @@ void Snd_Restart_f()
 #ifndef SWDS
 	extern bool snd_firsttime;
 
-	char szVoiceCodec[_MAX_PATH] = { 0 };
+	char szVoiceCodec[MAX_PATH] = { 0 };
 	int nVoiceSampleRate = Voice_ConfiguredSampleRate();
 
 	{
@@ -1013,7 +1013,7 @@ void SetupNewBindings()
 void UseDefaultBindings( void )
 {
 	FileHandle_t f;
-	char szFileName[ _MAX_PATH ];
+	char szFileName[ MAX_PATH ];
 	char token[ 1024 ];
 	char szKeyName[ 256 ];
 

@@ -61,7 +61,7 @@ void CDownloadListGenerator::SetStringTable( INetworkStringTable *pStringTable )
 	m_AlreadyWrittenFileNames.RemoveAll();
 
 	// add in the bsp file to the list, and its node graph and nav mesh
-	char path[_MAX_PATH];
+	char path[MAX_PATH];
 	Q_snprintf(path, sizeof(path), "maps\\%s.bsp", m_mapName);
 	OnResourcePrecached(path);
 
@@ -168,7 +168,7 @@ void CDownloadListGenerator::OnModelPrecached(const char *relativePathFileName)
 	if (Q_strstr(relativePathFileName, ".vmt"))
 	{
 		// it's a materials file, make sure that it starts in the materials directory, and we get the .vtf
-		char file[_MAX_PATH];
+		char file[MAX_PATH];
 
 		if (!Q_strnicmp(relativePathFileName, "materials", ssize("materials") - 1))
 		{
@@ -214,7 +214,7 @@ void CDownloadListGenerator::OnSoundPrecached(const char *relativePathFileName)
 	}
 
 	// prepend the sound/ directory if necessary
-	char file[_MAX_PATH];
+	char file[MAX_PATH];
 	if (!Q_strnicmp(relativePathFileName, "sound", ssize("sound") - 1))
 	{
 		Q_strncpy(file, relativePathFileName, sizeof(file));
@@ -251,7 +251,7 @@ void CDownloadListGenerator::OnResourcePrecached(const char *relativePathFileNam
 		return;
 	}
 
-	char fullPath[_MAX_PATH];
+	char fullPath[MAX_PATH];
 	if (g_pFileSystem->GetLocalPath_safe(relativePathFileName, fullPath))
 	{
 		OnResourcePrecachedFullPath( fullPath, relativePathFileName);
@@ -279,7 +279,7 @@ void CDownloadListGenerator::ForceSimpleMaterial( const char *relativePathFileNa
 	}
 
 	// it's a materials file, make sure that it starts in the materials directory, and we get the .vtf
-	char szFixedFilename[_MAX_PATH];
+	char szFixedFilename[MAX_PATH];
 	if (!Q_strnicmp(relativePathFileName, "materials", ssize("materials") - 1))
 	{
 		V_strcpy_safe( szFixedFilename, relativePathFileName );
@@ -343,7 +343,7 @@ void CDownloadListGenerator::ForceModelBounds( const char *relativePathFileName,
 		return;
 	}
 
-	char relativeFileName[_MAX_PATH];
+	char relativeFileName[MAX_PATH];
 	Q_strncpy( relativeFileName, relativePathFileName, sizeof( relativeFileName ) );
 	Q_FixSlashes( relativeFileName );
 
@@ -408,7 +408,7 @@ void CDownloadListGenerator::OnResourcePrecachedFullPath( char *fullPathFileName
 	if (Q_strstr(relativeFileName, ".mdl"))
 	{
 		// it's a model, get it's other files as well
-		char file[_MAX_PATH];
+		char file[MAX_PATH];
 		Q_strncpy(file, relativeFileName, sizeof(file) - 10);
 		char *ext = Q_strstr(file, ".mdl");
 

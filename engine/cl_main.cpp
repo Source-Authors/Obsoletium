@@ -2364,11 +2364,11 @@ void CL_CheckToDisplayStartupMenus( const CCommand &args )
 {
 	if ( CL_ShouldLoadBackgroundLevel( args ) )
 	{
-		char szBackgroundName[_MAX_PATH];
+		char szBackgroundName[MAX_PATH];
 		CL_GetBackgroundLevelName( szBackgroundName, sizeof(szBackgroundName), true );
 
-		char cmd[_MAX_PATH];
-		Q_snprintf( cmd, sizeof(cmd), "map_background %s\n", szBackgroundName );
+		char cmd[MAX_PATH];
+		V_sprintf_safe( cmd, "map_background %s\n", szBackgroundName );
 		Cbuf_AddText( cmd );
 	}
 }

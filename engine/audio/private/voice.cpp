@@ -144,7 +144,7 @@ int g_VoiceTweakSpeakingVolume = 0;
 bool g_bVoiceAtLeastPartiallyInitted = false;
 
 // The codec and sample rate passed to Voice_Init. "" and -1 if voice is not initialized
-char g_szVoiceCodec[_MAX_PATH] = { 0 };
+char g_szVoiceCodec[MAX_PATH] = { 0 };
 int g_nVoiceRequestedSampleRate = -1;
 
 const char *Voice_ConfiguredCodec() { return g_szVoiceCodec; }

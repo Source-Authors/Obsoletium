@@ -652,7 +652,7 @@ IVTFTexture *CVideoMode_Common::LoadVTF( CUtlBuffer &temp, const char *szFileNam
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::ComputeStartupGraphicName( char *pBuf, int nBufLen )
 {
-    char szBackgroundName[_MAX_PATH];
+    char szBackgroundName[MAX_PATH];
     CL_GetBackgroundLevelName( szBackgroundName, sizeof(szBackgroundName), false );
 
     float aspectRatio = (float)GetModeStereoWidth() / GetModeStereoHeight();
@@ -745,11 +745,11 @@ void CVideoMode_Common::SetupStartupGraphic()
 {
     COM_TimestampedLog( "CVideoMode_Common::Init  SetupStartupGraphic" );
 
-    char szBackgroundName[_MAX_PATH];
+    char szBackgroundName[MAX_PATH];
     CL_GetBackgroundLevelName( szBackgroundName, sizeof(szBackgroundName), false );
 
     // get the image to load
-    char material[_MAX_PATH];
+    char material[MAX_PATH];
     CUtlBuffer buf;
 
     float aspectRatio = (float)GetModeWidth() / GetModeHeight();

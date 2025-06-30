@@ -110,7 +110,7 @@ void CMainPanel::StartServer(const char *cvars) {
   m_pProgressBox->ShowWindow();
 
   // make sure we have all the steam content for this mod
-  char reslist[_MAX_PATH];
+  char reslist[MAX_PATH];
   V_sprintf_safe(reslist, "reslists/%s/preload.lst",
                  m_pConfigPage->GetGameName());
   m_hResourceWaitHandle = g_pFullFileSystem->WaitForResources(reslist);
