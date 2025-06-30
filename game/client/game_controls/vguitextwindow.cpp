@@ -241,10 +241,10 @@ void CTextWindow::ShowFile( const char *filename )
 	if  ( Q_stristr( filename, ".htm" ) || Q_stristr( filename, ".html" ) )
 	{
 		// it's a local HTML file
-		char localURL[ _MAX_PATH + 7 ];
+		char localURL[ MAX_PATH + 7 ];
 		V_strcpy_safe( localURL, "file://" );
 		
-		char pPathData[ _MAX_PATH ];
+		char pPathData[ MAX_PATH ];
 		g_pFullFileSystem->GetLocalPath_safe( filename, pPathData );
 		V_strcat_safe( localURL, pPathData );
 

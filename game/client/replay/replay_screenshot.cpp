@@ -215,7 +215,7 @@ void CReplayScreenshotTaker::TakeScreenshot( WriteReplayScreenshotParams_t &para
 	}
 
 	// async write to disk (this will take ownership of the memory)
-	char szPathedFileName[_MAX_PATH];
+	char szPathedFileName[MAX_PATH];
 	Q_snprintf( szPathedFileName, sizeof(szPathedFileName), "//MOD/%s", params.m_pFilename );
 
 	timer.Start();

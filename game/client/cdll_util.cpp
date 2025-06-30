@@ -1198,8 +1198,8 @@ void UTIL_IncrementMapKey( const char *pszCustomKey )
 	if ( !pszCustomKey )
 		return;
 
-	char szFilename[ _MAX_PATH ];
-	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, _MAX_PATH ) )
+	char szFilename[ MAX_PATH ];
+	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, MAX_PATH ) )
 		return;
 
 	int iCount = 1;
@@ -1245,8 +1245,8 @@ int UTIL_GetMapKeyCount( const char *pszCustomKey )
 	if ( !pszCustomKey )
 		return 0;
 
-	char szFilename[ _MAX_PATH ];
-	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, _MAX_PATH ) )
+	char szFilename[ MAX_PATH ];
+	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, MAX_PATH ) )
 		return 0;
 
 	int iCount = 0;
@@ -1283,8 +1283,8 @@ int UTIL_GetMapKeyCount( const char *pszCustomKey )
 
 bool UTIL_HasLoadedAnyMap()
 {
-	char szFilename[ _MAX_PATH ];
-	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, _MAX_PATH ) )
+	char szFilename[ MAX_PATH ];
+	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, MAX_PATH ) )
 		return false;
 
 	return g_pFullFileSystem->FileExists( szFilename, "MOD" );
