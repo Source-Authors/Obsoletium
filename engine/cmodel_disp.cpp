@@ -124,7 +124,7 @@ public:
 			}
 		}
 	}
-	int GetDispListCount() { return m_dispList.Count(); }
+	intp GetDispListCount() const { return m_dispList.Count(); }
 	void WriteLeafList( unsigned short *pLeafList )
 	{
 		// clear current count if any
@@ -134,9 +134,8 @@ public:
 			pLeaf->dispCount = 0;
 		}
 		// compute new count per leaf
-		for ( int i = 0; i < m_dispList.Count(); i++ )
+		for ( auto leafIndex : m_dispList )
 		{
-			int leafIndex = m_dispList[i];
 			cleaf_t *pLeaf = &m_pBSPData->map_leafs[leafIndex];
 			pLeaf->dispCount++;
 		}
@@ -151,14 +150,14 @@ public:
 		}
 		// now iterate the references in disp order adding to each leaf's (now compact) list
 		// for each displacement with leaves
-		for ( int i = 0; i < m_leafCount.Count(); i++ )
+		for ( intp i = 0; i < m_leafCount.Count(); i++ )
 		{
 			// for each leaf in this disp's list
-			int count = m_leafCount[i];
-			for ( int j = 0; j < count; j++ )
+			auto count = m_leafCount[i];
+			for ( decltype(count) j = 0; j < count; j++ )
 			{
-				int listIndex = m_firstIndex[i] + j;					// index to per-disp list
-				int leafIndex = m_dispList[listIndex];					// this reference is for one leaf
+				intp listIndex = m_firstIndex[i] + j;					// index to per-disp list
+				auto leafIndex = m_dispList[listIndex];					// this reference is for one leaf
 				cleaf_t *pLeaf = &m_pBSPData->map_leafs[leafIndex];
 				int outListIndex = pLeaf->dispListStart + pLeaf->dispCount;	// output position for this leaf
 				pLeafList[outListIndex] = i;							// write the reference there
@@ -173,7 +172,7 @@ private:
 	// this is a list of all of the leaf indices for each displacement
 	CUtlVector<unsigned short> m_dispList;
 	// this is the first entry into dispList for each displacement
-	CUtlVector<int> m_firstIndex;
+	CUtlVector<intp> m_firstIndex;
 	// this is the # of leaf entries for each displacement
 	CUtlVector<unsigned short> m_leafCount;
 };
@@ -199,7 +198,7 @@ void CM_DispTreeLeafnum( CCollisionBSPData *pBSPData )
 	{
 		leafBuilder.BuildLeafListForDisplacement( i );
 	}
-	int count = leafBuilder.GetDispListCount();
+	intp count = leafBuilder.GetDispListCount();
 	pBSPData->map_dispList.Attach( count, Hunk_Alloc<unsigned short>( count, false ) );
 	leafBuilder.WriteLeafList( pBSPData->map_dispList.Base() );
 }
@@ -277,7 +276,7 @@ public:
 		byte *pData = (byte *)(pDataSize + pLump->numDisplacements);
 		memcpy( m_pDispHullData, pData, totalHullData );
 #if _DEBUG
-		int offset = pData - ((byte *)pLump);
+		intp offset = pData - ((byte *)pLump);
 		Assert( offset + totalHullData == lumpSize );
 #endif
 	}
@@ -338,7 +337,7 @@ void CM_CreateDispPhysCollide( dphysdisp_t *pDispLump, int dispLumpSize )
 void CM_DestroyDispPhysCollide()
 {
 	g_VirtualTerrain.LevelShutdown();
-	for ( int i = g_TerrainList.Count()-1; i>=0; --i )
+	for ( intp i = g_TerrainList.Count()-1; i>=0; --i )
 	{
 		physcollision->DestroyCollide( g_TerrainList[i] );
 	}
