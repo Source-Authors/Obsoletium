@@ -680,8 +680,8 @@ bool CBaseClient::SendServerInfo( void )
 		char devtext[ 2048 ];
 		int curplayers = m_Server->GetNumClients();
 
-		Q_snprintf( devtext, sizeof( devtext ), 
-			"\n%s\nMap: %s\nPlayers: %i / %i\nBuild: %d\nServer Number: %i\n\n",
+		V_sprintf_safe( devtext, 
+			"\n%s\nMap: %s\nPlayers: %i / %i\nBuild: %d\nServer Number: %i\n",
 			serverGameDLL->GetGameDescription(),
 			m_Server->GetMapName(),
 			curplayers, m_Server->GetMaxClients(),
@@ -700,12 +700,6 @@ bool CBaseClient::SendServerInfo( void )
 	m_Server->FillServerInfo( serverinfo ); // fill rest of info message
 	
 	serverinfo.WriteToBuffer( msg );
-
-	if ( IsX360() && serverinfo.m_nMaxClients > 1 )
-	{
-		Msg( "Telling clients to connect" );
-		g_pMatchmaking->TellClientsToConnect();
-	}
 
 	// send first tick
 	m_nSignonTick = m_Server->m_nTickCount;
