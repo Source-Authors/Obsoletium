@@ -1936,7 +1936,7 @@ void SV_WriteVoiceCodec(bf_write &pBuf)
 // Gets voice data from a client and forwards it to anyone who can hear this client.
 ConVar voice_debugfeedbackfrom( "voice_debugfeedbackfrom", "0" );
 
-void SV_BroadcastVoiceData(IClient * pClient, int nBytes, char * data, int64 xuid )
+void SV_BroadcastVoiceData(IClient * pClient, intp nBytes, char * data, int64 xuid )
 {
 	// Disable voice?
 	if( !sv_voiceenable.GetInt() )
@@ -1945,7 +1945,7 @@ void SV_BroadcastVoiceData(IClient * pClient, int nBytes, char * data, int64 xui
 	// Build voice message once
 	SVC_VoiceData voiceData;
 	voiceData.m_nFromClient = pClient->GetPlayerSlot();
-	voiceData.m_nLength = nBytes * 8;	// length in bits
+	voiceData.m_nLength = nBytes * CHAR_BIT;	// length in bits
 	voiceData.m_DataOut = data;
 	voiceData.m_xuid = xuid;
 
@@ -1954,7 +1954,7 @@ void SV_BroadcastVoiceData(IClient * pClient, int nBytes, char * data, int64 xui
 		Msg( "Sending voice from: %s - playerslot: %d\n", pClient->GetClientName(), pClient->GetPlayerSlot() + 1 );
 	}
 
-	for(int i=0; i < sv.GetClientCount(); i++)
+	for(intp i=0; i < sv.GetClientCount(); i++)
 	{
 		IClient *pDestClient = sv.GetClient(i);
 
@@ -1969,13 +1969,13 @@ void SV_BroadcastVoiceData(IClient * pClient, int nBytes, char * data, int64 xui
 		bool bHearsPlayer = pDestClient->IsHearingClient( voiceData.m_nFromClient );
 		voiceData.m_bProximity = pDestClient->IsProximityHearingClient( voiceData.m_nFromClient );
 
-		if ( IsX360() && bSelf == true )			
+		if ( bSelf == true )			
 			continue;
 			
 		if ( !bHearsPlayer && !bSelf )
 			continue;	
 
-		voiceData.m_nLength = nBytes * 8;
+		voiceData.m_nLength = nBytes * CHAR_BIT;
 
 		// Is loopback enabled?
 		if( !bHearsPlayer )

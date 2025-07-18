@@ -88,11 +88,11 @@ public:
 
 
 	// implement helpers
-	virtual void CreateMessage( edict_t *pEntity, DIALOG_TYPE type, KeyValues *data, IServerPluginCallbacks *plugin );
-	virtual void ClientCommand( edict_t *pEntity, const char *cmd );
-	virtual QueryCvarCookie_t StartQueryCvarValue( edict_t *pEntity, const char *pName );
+	void CreateMessage( edict_t *pEntity, DIALOG_TYPE type, KeyValues *data, IServerPluginCallbacks *plugin ) override;
+	void ClientCommand( edict_t *pEntity, const char *cmd ) override;
+	QueryCvarCookie_t StartQueryCvarValue( edict_t *pEntity, const char *pName ) override;
 
-	int						GetNumLoadedPlugins( void ){ return m_Plugins.Count(); }
+	intp					GetNumLoadedPlugins( void ) const { return m_Plugins.Count(); }
 
 private:
 	CUtlVector<CPlugin *>	m_Plugins;

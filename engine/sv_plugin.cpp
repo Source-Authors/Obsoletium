@@ -258,7 +258,7 @@ void CServerPlugin::LoadPlugins()
 //---------------------------------------------------------------------------------
 void CServerPlugin::UnloadPlugins()
 {
-	for ( int i = m_Plugins.Count() - 1; i >= 0; --i )
+	for ( intp i = m_Plugins.Count() - 1; i >= 0; --i )
 	{
 		m_Plugins[i]->Unload();
 		m_Plugins.Remove(i);

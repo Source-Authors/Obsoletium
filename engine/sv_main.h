@@ -95,7 +95,7 @@ void SV_InitSendTables( ServerClass *pClasses );
 void SV_TermSendTables( ServerClass *pClasses );
 
 // send voice data from cl to other clients
-void SV_BroadcastVoiceData(IClient * cl, int nBytes, char * data, int64 xuid);
+void SV_BroadcastVoiceData(IClient * cl, intp nBytes, char * data, int64 xuid);
 void SV_SendRestoreMsg( bf_write &dest );
 
 // A client has uploaded its logo to us;
