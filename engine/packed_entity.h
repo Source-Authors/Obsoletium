@@ -74,7 +74,7 @@ public:
 
 	// Copy the data into the PackedEntity's data and make sure the # bytes allocated is
 	// an integer multiple of 4.
-	bool		AllocAndCopyPadded( const void *pData, unsigned long size );
+	bool		AllocAndCopyPadded( const void *pData, intp size );
 
 	// These are like Get/Set, except SnagChangeFrameList clears out the
 	// PackedEntity's pointer since the usage model in sv_main is to keep
