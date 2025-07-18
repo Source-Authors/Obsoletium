@@ -162,9 +162,9 @@ static void Filter_Add_f( const CCommand& args )
 		return;
 	}
 
-	// dimhotepus: atof -> strtof
+	// dimhotepus: atof -> strtod
 	char *end = nullptr;
-	float banTime = strtof( args[1], &end );
+	double banTime = strtod( args[1], &end );
 	if ( !Q_isempty(end) )
 	{
 		ConMsg( "Usage: addip <minutes> <ipaddress>\nUse 0 minutes for permanent.\n" );
@@ -199,14 +199,14 @@ static void Filter_Add_f( const CCommand& args )
 		bKick = false;
 	}
 	
-	if (banTime < 0.01f)
+	if (banTime < 0.01)
 	{
-		banTime = 0.0f;
+		banTime = 0.0;
 	}
 
 	g_IPFilters[i].banTime = banTime;
 	// Time to unban.
-	g_IPFilters[i].banEndTime = ( banTime != 0.0F ) ? ( realtime + 60.0F * banTime ) : 0.0F;
+	g_IPFilters[i].banEndTime = ( banTime != 0.0 ) ? ( realtime + 60.0 * banTime ) : 0.0;
 
 	if ( !Filter_ConvertString( args[2], &g_IPFilters[i]) )
 	{
@@ -234,7 +234,7 @@ static void Filter_Add_f( const CCommand& args )
 	}
 
 	// Build a duration string for the ban
-	if ( banTime == 0.0f )
+	if ( banTime == 0.0 )
 	{
 		V_sprintf_safe( szDuration, "permanently" );
 	}
@@ -379,13 +379,13 @@ CON_COMMAND( listip, "List IP addresses on the ban list." )
 	{
 		memcpy( b, &g_IPFilters[i].compare, sizeof(b) );
 
-		if ( g_IPFilters[i].banTime != 0.0f )
+		if ( g_IPFilters[i].banTime != 0.0 )
 		{
-			ConMsg( "%i %i.%i.%i.%i: %.3f min\n", i+1, b[0], b[1], b[2], b[3], g_IPFilters[i].banTime );
+			ConMsg( "%zi %i.%i.%i.%i: %.3f min\n", i+1, b[0], b[1], b[2], b[3], g_IPFilters[i].banTime );
 		}
 		else
 		{
-			ConMsg( "%i %i.%i.%i.%i: permanent\n", i+1, b[0], b[1], b[2], b[3] );
+			ConMsg( "%zi %i.%i.%i.%i: permanent\n", i+1, b[0], b[1], b[2], b[3] );
 		}
 	}
 }
@@ -413,8 +413,8 @@ CON_COMMAND( writeip, "Save the ban list to " BANNED_IP_FILENAME "." )
 		memcpy( b, &ipf.compare, sizeof(b) );
 
 		// Only store out the permanent bad guys from this server.
-		float banTime = ipf.banTime;
-		if ( banTime != 0.0f )
+		double banTime = ipf.banTime;
+		if ( banTime != 0.0 )
 		{
 			continue;
 		}
@@ -527,8 +527,8 @@ CON_COMMAND( writeid, "Writes a list of permanently-banned user IDs to " BANNED_
 	
 	for ( intp i = 0 ; i < g_UserFilters.Count() ; i++ )
 	{
-		float banTime = g_UserFilters[i].banTime;
-		if ( banTime != 0.0f )
+		double banTime = g_UserFilters[i].banTime;
+		if ( banTime != 0.0 )
 		{
 			continue;
 		}
@@ -668,19 +668,19 @@ CON_COMMAND( listid, "Lists banned users." )
 		return;
 	}
 
-	ConMsg( "ID filter list: %i entr%s\n", count, count == 1 ? "y" : "ies" );
+	ConMsg( "ID filter list: %zi entr%s\n", count, count == 1 ? "y" : "ies" );
 
 	for ( intp i = 0 ; i < count ; i++ )
 	{
 		const char *uid = GetUserIDString( g_UserFilters[i].userid );
 
-		if ( g_UserFilters[i].banTime != 0.0f )
+		if ( g_UserFilters[i].banTime != 0.0 )
 		{
-			ConMsg( "%i %s: %.3f min\n", i+1, uid, g_UserFilters[i].banTime );
+			ConMsg( "%zi %s: %.3f min\n", i+1, uid, g_UserFilters[i].banTime );
 		}
 		else
 		{
-			ConMsg( "%i %s: permanent\n", i+1, uid );
+			ConMsg( "%zi %s: permanent\n", i+1, uid );
 		}
 	}
 }
@@ -704,16 +704,17 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 	}
 
 	char *end = nullptr;
-	float banTime = strtof( args[1], &end );
+	// dimhotepus: atof -> strtod
+	double banTime = strtod( args[1], &end );
 	if ( !Q_isempty(end) )
 	{
 		ConMsg( "Usage: banid <minutes> <userid | uniqueid> {kick}\n" );
 		return;
 	}
 
-	if ( banTime < 0.01f )
+	if ( banTime < 0.01 )
 	{
-		banTime = 0.0f;
+		banTime = 0.0;
 	}
 
 	// get the first argument
@@ -862,12 +863,12 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 	}
 
 	g_UserFilters[i].banTime = banTime;
-	g_UserFilters[i].banEndTime = ( banTime != 0.0F ) ? ( realtime + 60.0F * banTime ) : 0.0F;
+	g_UserFilters[i].banEndTime = ( banTime != 0.0 ) ? ( realtime + 60.0 * banTime ) : 0.0;
 	g_UserFilters[i].userid = *id;
 	
 	char szDuration[64];
 	// Build a duration string for the ban
-	if ( banTime == 0.0f )
+	if ( banTime == 0.0 )
 	{
 		V_sprintf_safe( szDuration, "permanently" );
 	}
