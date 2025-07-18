@@ -2830,7 +2830,7 @@ bool WriteLumpToFile( dheader_t *header, char *filename, int lump )
 	return true;
 }
 
-void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer, size_t nBufLen )
+void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer, intp nBufLen )
 {
 	char lumppre[MAX_PATH];	
 	if ( !GenerateNextLumpFileName( filename, lumppre, MAX_PATH ) )

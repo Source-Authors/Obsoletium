@@ -308,7 +308,7 @@ bool	SwapBSPFile( const char *filename, const char *swapFilename, bool bSwapOnLo
 bool	GetPakFileLump( const char *pBSPFilename, void **pPakData, int *pPakSize );
 bool	SetPakFileLump( const char *pBSPFilename, const char *pNewFilename, void *pPakData, int pakSize );
 bool	WriteLumpToFile( dheader_t *header, char *filename, int lump );
-void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer, size_t nBufLen );
+void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer, intp nBufLen );
 bool	GetBSPDependants( const char *pBSPFilename, CUtlVector< CUtlString > *pList );
 void	UnloadBSPFile();
 
