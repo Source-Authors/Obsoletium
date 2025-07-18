@@ -37,7 +37,7 @@ public:
 	void EndEntityStateUpdate();
 
 	void EntityDormant( int iEnt, int iSerialNum );
-	void AddToPendingDormantEntityList( unsigned short iEdict );
+	void AddToPendingDormantEntityList( int iEdict );
 	void ProcessDormantEntities();
 
 	void NotifyEdictFlagsChange( int iEdict )

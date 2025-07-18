@@ -221,7 +221,7 @@ void CLocalNetworkBackdoor::EntityDormant( int iEnt, int iSerialNum )
 }
 
 
-void CLocalNetworkBackdoor::AddToPendingDormantEntityList( unsigned short iEdict )
+void CLocalNetworkBackdoor::AddToPendingDormantEntityList( int iEdict )
 {
 	edict_t *e = &sv.edicts[iEdict];
 	if ( !( e->m_fStateFlags & FL_EDICT_PENDING_DORMANT_CHECK ) )
