@@ -56,7 +56,7 @@ PLATFORM_INTERFACE FnMiniDump SetMiniDumpFunction( FnMiniDump pfn );
 // so they can show their own dialog.
 //
 // ptchMinidumpFileNameBuffer if not-NULL should be a writable tchar buffer of length at
-// least _MAX_PATH and on return will contain the name of the minidump file written.
+// least MAX_PATH and on return will contain the name of the minidump file written.
 // If ptchMinidumpFileNameBuffer is NULL the name of the minidump file written will not
 // be available after the function returns.
 //
