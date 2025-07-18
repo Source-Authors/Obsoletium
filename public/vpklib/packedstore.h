@@ -49,11 +49,7 @@ public:
 		if ( lhs.m_nPackFileNumber > rhs.m_nPackFileNumber )
 			return false;
 
-		if ( lhs.m_nFileFraction < rhs.m_nFileFraction )
-			return true;
-		if ( lhs.m_nFileFraction > rhs.m_nFileFraction )
-			return false;
-		return false;
+		return lhs.m_nFileFraction < rhs.m_nFileFraction;
 	}
 };
 
