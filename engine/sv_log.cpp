@@ -368,9 +368,7 @@ bool CLog::DelLogAddress(netadr_t addr)
 
 void CLog::ListLogAddress( void )
 {
-	netadr_t *pElement;
-	const char *pszAdr;
-	int count = m_LogAddresses.Count();
+	intp count = m_LogAddresses.Count();
 
 	if ( count <= 0 )
 	{
@@ -380,19 +378,16 @@ void CLog::ListLogAddress( void )
 	{
 		if ( count == 1 )
 		{
-			ConMsg( "logaddress_list: %i entry\n", count );
+			ConMsg( "logaddress_list: %zi entry\n", count );
 		}
 		else
 		{
-			ConMsg( "logaddress_list: %i entries\n", count );
+			ConMsg( "logaddress_list: %zi entries\n", count );
 		}
 
-		for ( int i = 0 ; i < count ; ++i )
+		for ( auto &address : m_LogAddresses )
 		{
-			pElement = &m_LogAddresses.Element(i);
-			pszAdr = pElement->ToString();
-			
-			ConMsg( "%s\n", pszAdr );
+			ConMsg( "%s\n", address.ToString() );
 		}
 	}
 }
