@@ -75,9 +75,14 @@ void CChatPanel::OnSendChat()
 {
 	// build a chat command and send it to the server
 	char chat_text[512];
-	V_strcpy_safe(chat_text, "say ");
-	m_pEnterChatPanel->GetText(chat_text + 4, sizeof(chat_text) - 4);
-	if (ssize("say ") - 1 != strlen(chat_text))
+
+	constexpr char kCommand[]{"say "};
+	constexpr intp kCommandLength = ssize(kCommand) - 1;
+
+	V_strcpy_safe(chat_text, kCommand);
+	m_pEnterChatPanel->GetText(chat_text + kCommandLength, ssize(chat_text) - kCommandLength);
+
+	if (kCommandLength != V_strlen(chat_text))
 	{
 		RemoteServer().SendCommand(chat_text);
 
