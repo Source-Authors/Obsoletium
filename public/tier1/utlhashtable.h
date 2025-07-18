@@ -957,15 +957,15 @@ protected:
 		}
 		unsigned int operator()( IndirectIndex lhs, KeyArg_t rhs ) const
 		{
-			const ptrdiff_t tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
-			const ptrdiff_t owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
+			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
+			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_eq( pOwner->m_data[ lhs.m_index ].m_key, rhs );
 		}
 		unsigned int operator()( IndirectIndex lhs, KeyAlt_t rhs ) const
 		{
-			const ptrdiff_t tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
-			const ptrdiff_t owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
+			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
+			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_eq( pOwner->m_data[ lhs.m_index ].m_key, rhs );
 		}
