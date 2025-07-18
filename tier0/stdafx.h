@@ -23,7 +23,6 @@
 #ifdef POSIX
 #include <cctype>
 #include <climits>
-#define _MAX_PATH PATH_MAX
 #endif
 
 #include "tier0/valve_on.h"

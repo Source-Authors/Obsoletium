@@ -9,7 +9,7 @@
 
 #ifdef POSIX
 #include <climits>
-#define _MAX_PATH PATH_MAX
+#define MAX_PATH PATH_MAX
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -112,7 +112,7 @@ CCommandLine::~CCommandLine( void )
 void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, size_t maxDestLen, bool bInQuotes )
 {
 	// Suck out the file name
-	char szFileName[ _MAX_PATH ];
+	char szFileName[ MAX_PATH ];
 	char *pOut;
 	char *pDestStart = pDst;
 
@@ -131,7 +131,7 @@ void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, size_
 	while ( *pSrc && *pSrc != terminatingChar )
 	{
 		*pOut++ = *pSrc++;
-		if ( (pOut - szFileName) >= (_MAX_PATH-1) )
+		if ( (pOut - szFileName) >= (MAX_PATH-1) )
 			break;
 	}
 

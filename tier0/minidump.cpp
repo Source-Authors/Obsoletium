@@ -33,7 +33,7 @@ static char g_rgchMinidumpComment[8192];
 //			pExceptionInfo				- call stack.
 //			minidumpType				- type of minidump to write.
 //			ptchMinidumpFileNameBuffer	- if not-nullptr points to a writable tchar buffer
-//										  of length at least _MAX_PATH to contain the name
+//										  of length at least MAX_PATH to contain the name
 //										  of the written minidump file on return.
 //-----------------------------------------------------------------------------
 bool WriteMiniDumpUsingExceptionInfo( 
@@ -181,7 +181,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 		// mark any failed minidump writes by renaming them
 		if ( !bMinidumpResult )
 		{
-			tchar rgchFailedFileName[_MAX_PATH];
+			tchar rgchFailedFileName[MAX_PATH];
 			_sntprintf( rgchFailedFileName, sizeof(rgchFailedFileName) / sizeof(tchar), "(failed)%s", rgchFileName );
 			// Ensure null-termination.
 			rgchFailedFileName[ std::size(rgchFailedFileName) - 1 ] = '\0';
