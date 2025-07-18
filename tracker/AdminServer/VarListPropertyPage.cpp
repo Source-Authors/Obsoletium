@@ -104,7 +104,7 @@ void CVarListPropertyPage::OnEditVariable(KeyValues *rule)
 void CVarListPropertyPage::RefreshVarList()
 {
 	// iterate the vars
-	for (int i = 0; i < m_pRulesList->GetItemCount(); i++)
+	for (intp i = 0; i < m_pRulesList->GetItemCount(); i++)
 	{
 		KeyValues *row = m_pRulesList->GetItem(i);
 		if (!row)
