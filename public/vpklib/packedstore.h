@@ -66,7 +66,7 @@ public:
 	struct CFileHeaderFixedData *m_pHeaderData;
 	uint8 *m_pDirFileNamePtr;								// pointer to basename in dir block
 
-	FORCEINLINE operator bool( void ) const
+	FORCEINLINE operator bool() const
 	{
 		return ( m_nFileNumber != -1 );
 	}
@@ -102,7 +102,7 @@ public:
 		return m_nCurrentFileOffset;
 	}
 
-	int Tell( void ) const
+	int Tell() const
 	{
 		return m_nCurrentFileOffset;
 	}
@@ -219,13 +219,8 @@ struct CachedVPKRead_t
 			return true;
 		if ( lhs.m_nPackFileNumber > rhs.m_nPackFileNumber )
 			return false;
-		if ( lhs.m_nFileFraction < rhs.m_nFileFraction )
-			return true;
-		if ( lhs.m_nFileFraction > rhs.m_nFileFraction )
-			return false;
-		return false;
+		return lhs.m_nFileFraction < rhs.m_nFileFraction;
 	}
-
 };
 
 
