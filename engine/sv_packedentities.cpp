@@ -45,7 +45,7 @@ ConVar sv_debugmanualmode( "sv_debugmanualmode", "0", 0, "Make sure entities cor
 
 // This function makes sure that this entity class has an instance baseline.
 // If it doesn't have one yet, it makes a new one.
-void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const void *pData, int nBytes )
+void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const void *pData, intp nBytes )
 {
 	edict_t *pEnt = &sv.edicts[iEdict];
 	ErrorIfNot( pEnt->GetNetworkable(),

@@ -113,7 +113,7 @@ public: // IConnectionlessPacketHandler implementation
 	virtual void	FillServerInfo(SVC_ServerInfo &serverinfo);
 	virtual void	UserInfoChanged( int nClientIndex );
 
-	bool	GetClassBaseline( ServerClass *pClass, void const **pData, int *pDatalen );
+	bool	GetClassBaseline( ServerClass *pClass, void const **pData, intp *pDatalen );
 	void	RunFrame( void );
 	void	InactivateClients( void );
 	void	ReconnectClients( void );

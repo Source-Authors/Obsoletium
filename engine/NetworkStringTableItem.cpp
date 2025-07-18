@@ -35,10 +35,8 @@ CNetworkStringTableItem::~CNetworkStringTableItem( void )
 	{
 		// free changelist and elements
 
-		for ( int i=0; i < m_pChangeList->Count(); i++ )
+		for ( auto &item : *m_pChangeList )
 		{
-			itemchange_s item = m_pChangeList->Element( i );
-
 			delete[] item.data;
 		}
 
@@ -62,7 +60,7 @@ void CNetworkStringTableItem::EnableChangeHistory( void )
 	Assert ( m_pChangeList );
 }
 
-void CNetworkStringTableItem::UpdateChangeList( int tick, int length, const void *userData )
+void CNetworkStringTableItem::UpdateChangeList( int tick, intp length, const void *userData )
 {
 	intp count = m_pChangeList->Count();
 	itemchange_s item;
@@ -119,7 +117,7 @@ int CNetworkStringTableItem::RestoreTick( int tick )
 {
 	Assert( m_pChangeList->Count()>0 );
 
-	int index = 1;
+	intp index = 1;
 
 	itemchange_s *item = &m_pChangeList->Element( 0 );
 
@@ -159,7 +157,7 @@ int CNetworkStringTableItem::RestoreTick( int tick )
 // Purpose: 
 // Input  : *string - 
 //-----------------------------------------------------------------------------
-bool CNetworkStringTableItem::SetUserData( int tick, int length, const void *userData )
+bool CNetworkStringTableItem::SetUserData( int tick, intp length, const void *userData )
 {
 
 #ifndef SHARED_NET_STRING_TABLES
@@ -209,12 +207,12 @@ bool CNetworkStringTableItem::SetUserData( int tick, int length, const void *use
 // Input  : stringNumber - 
 // Output : const void
 //-----------------------------------------------------------------------------
-const void *CNetworkStringTableItem::GetUserData( int *length )
+const void *CNetworkStringTableItem::GetUserData( intp *length )
 {
 	if ( length )
 		*length = m_nUserDataLength;
 
-	return ( const void * )m_pUserData;
+	return m_pUserData;
 }
 
 

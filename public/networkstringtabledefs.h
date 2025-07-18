@@ -47,11 +47,11 @@ public:
 	virtual bool			ChangedSinceTick( int tick ) const = 0;
 
 	// Accessors (length -1 means don't change user data if string already exits)
-	virtual int				AddString( bool bIsServer, const char *value, int length = -1, const void *userdata = 0 ) = 0; 
+	virtual int				AddString( bool bIsServer, const char *value, intp length = -1, const void *userdata = 0 ) = 0; 
 
 	virtual const char		*GetString( int stringNumber ) = 0;
-	virtual void			SetStringUserData( int stringNumber, int length, const void *userdata ) = 0;
-	virtual const void		*GetStringUserData( int stringNumber, int *length ) = 0;
+	virtual void			SetStringUserData( int stringNumber, intp length, const void *userdata ) = 0;
+	virtual const void		*GetStringUserData( int stringNumber, intp *length ) = 0;
 	virtual int				FindStringIndex( char const *string ) = 0; // returns INVALID_STRING_INDEX if not found
 
 	// Callbacks

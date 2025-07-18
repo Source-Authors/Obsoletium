@@ -2034,7 +2034,7 @@ void SV_CreateBaseline (void)
 	if ( !g_pLocalNetworkBackdoor )
 	{
 		int		count = 0;
-		int		bytes = 0;
+		intp	bytes = 0;
 		
 		for ( int entnum = 0; entnum < sv.num_edicts ; entnum++)
 		{
@@ -2084,7 +2084,7 @@ void SV_CreateBaseline (void)
 			bytes += writeBuf.GetNumBytesWritten();
 			count ++;
 		}
-		DevMsg("Created class baseline: %i classes, %i bytes.\n", count,bytes); 
+		DevMsg("Created class baseline: %i classes, %zd bytes.\n", count,bytes); 
 	}
 
 	g_GameEventManager.ReloadEventDefinitions();

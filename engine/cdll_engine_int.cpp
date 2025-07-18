@@ -738,10 +738,10 @@ bool CEngineClient::GetPlayerInfo( int ent_num, player_info_t *pinfo )
 		return false;
 	}
 
-	int cubPlayerInfo;
+	intp cubPlayerInfo;
 	player_info_t *pi = (player_info_t*) cl.m_pUserInfoTable->GetStringUserData( ent_num, &cubPlayerInfo );
 
-	if ( !pi || cubPlayerInfo < static_cast<int>(sizeof( player_info_t )) )
+	if ( !pi || cubPlayerInfo < static_cast<intp>(sizeof( player_info_t )) )
 	{
 		Q_memset( pinfo, 0, sizeof( player_info_t ) );
 		return false;

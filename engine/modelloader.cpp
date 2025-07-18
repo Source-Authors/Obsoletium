@@ -339,7 +339,7 @@ private:
 		model_t *modelpointer;
 	};
 
-	CUtlMap< FileNameHandle_t, ModelEntry_t >	m_Models;
+	CUtlMap< FileNameHandle_t, ModelEntry_t, int >	m_Models;
 
 	CUtlMemoryPool			m_ModelPool;
 
@@ -3973,7 +3973,7 @@ int Mod_GetModelMaterials( model_t* pModel, int count, IMaterial** ppMaterials )
 	case mod_studio:
 		if ( pModel->ppMaterials )
 		{
-			int nMaterials = ((intptr_t*)(pModel->ppMaterials))[-1];
+			intp nMaterials = ((intptr_t*)(pModel->ppMaterials))[-1];
 			found = MIN( count, nMaterials );
 			memcpy( ppMaterials, pModel->ppMaterials, found * sizeof( IMaterial* ) );
 		}
@@ -5969,7 +5969,7 @@ void CModelLoader::DebugPrintDynamicModels()
 	{
 		for ( int i = 0; i < sv.GetDynamicModelsTable()->GetNumStrings(); ++i )
 		{
-			int dummy = 0;
+			intp dummy = 0;
 			char* data = (char*) sv.GetDynamicModelsTable()->GetStringUserData( i, &dummy );
 			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
 			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', sv.GetDynamicModelsTable()->GetString(i) );
@@ -5982,7 +5982,7 @@ void CModelLoader::DebugPrintDynamicModels()
 	{
 		for ( int i = 0; i < cl.m_pDynamicModelsTable->GetNumStrings(); ++i )
 		{
-			int dummy = 0;
+			intp dummy = 0;
 			char* data = (char*) cl.m_pDynamicModelsTable->GetStringUserData( i, &dummy );
 			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
 			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', cl.m_pDynamicModelsTable->GetString(i) );

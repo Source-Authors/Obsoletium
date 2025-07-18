@@ -174,7 +174,7 @@ void CTextWindow::ShowURL( const char *URL, bool bAllowUserToDisable )
 			int index = g_pStringTableInfoPanel->FindStringIndex( "motd_text" );
 			if ( index != ::INVALID_STRING_INDEX )
 			{
-				int length = 0;
+				intp length = 0;
 				const char *data = (const char *)g_pStringTableInfoPanel->GetStringUserData( index, &length );
 				if ( data && data[0] )
 				{
@@ -194,7 +194,7 @@ void CTextWindow::ShowURL( const char *URL, bool bAllowUserToDisable )
 void CTextWindow::ShowIndex( const char *entry )
 {
 	const char *data = NULL;
-	int length = 0;
+	intp length = 0;
 
 	if ( NULL == g_pStringTableInfoPanel )
 		return;

@@ -559,7 +559,7 @@ int CNetworkStringTable::WriteUpdate( CBaseClient *client, bf_write &buf, int ti
 		}
 
 		// Write the item's user data.
-		int len;
+		intp len;
 		const void *pUserData = GetStringUserData( i, &len );
 		if ( pUserData && len > 0 )
 		{
@@ -761,7 +761,7 @@ void CNetworkStringTable::TriggerCallbacks( int tick_ack )
 		if ( pItem->GetTickChanged() <= tick_ack )
 			continue;
 
-		int userDataSize;
+		intp userDataSize;
 		const void *pUserData = pItem->GetUserData( &userDataSize );
 
 		// fire the callback function
@@ -796,7 +796,7 @@ bool CNetworkStringTable::ChangedSinceTick( int tick ) const
 // Input  : *value - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CNetworkStringTable::AddString( bool bIsServer, const char *string, int length /*= -1*/, const void *userdata /*= NULL*/ )
+int CNetworkStringTable::AddString( bool bIsServer, const char *string, intp length /*= -1*/, const void *userdata /*= NULL*/ )
 {
 	bool bHasChanged;
 	CNetworkStringTableItem *item;
@@ -974,7 +974,7 @@ const char *CNetworkStringTable::GetString( int stringNumber )
 //			length - 
 //			*userdata - 
 //-----------------------------------------------------------------------------
-void CNetworkStringTable::SetStringUserData( int stringNumber, int length /*=0*/, const void *userdata /*= 0*/ )
+void CNetworkStringTable::SetStringUserData( int stringNumber, intp length /*=0*/, const void *userdata /*= 0*/ )
 {
 #ifdef _DEBUG
 	if ( m_bLocked )
@@ -1023,7 +1023,7 @@ void CNetworkStringTable::DataChanged( int stringNumber, CNetworkStringTableItem
 
 	if ( m_changeFunc != NULL )
 	{
-		int userDataSize;
+		intp userDataSize;
 		const void *pUserData = item->GetUserData( &userDataSize );
 		( *m_changeFunc )( m_pObject, this, stringNumber, GetString( stringNumber ), pUserData );
 	}
@@ -1040,7 +1040,7 @@ void CNetworkStringTable::WriteStringTable( bf_write& buf )
 	for ( int i = 0 ; i < numstrings; i++ )
 	{
 		buf.WriteString( GetString( i ) );
-		int userDataSize;
+		intp userDataSize;
 		const void *pUserData = GetStringUserData( i, &userDataSize );
 		if ( userDataSize > 0 )
 		{
@@ -1063,7 +1063,7 @@ void CNetworkStringTable::WriteStringTable( bf_write& buf )
 		for ( int i = 0 ; i < numstrings; i++ )
 		{
 			buf.WriteString( m_pItemsClientSide->String( i ) );
-			int userDataSize;
+			intp userDataSize;
 			const void *pUserData = m_pItemsClientSide->Element( i ).GetUserData( &userDataSize );
 			if ( userDataSize > 0 )
 			{
@@ -1088,8 +1088,8 @@ bool CNetworkStringTable::ReadStringTable( bf_read& buf )
 {
 	DeleteAllStrings();
 
-	int numstrings = buf.ReadWord();
-	for ( int i = 0 ; i < numstrings; i++ )
+	unsigned short numstrings = buf.ReadWord();
+	for ( unsigned short i = 0 ; i < numstrings; i++ )
 	{
 		char stringname[4096];
 		
@@ -1097,7 +1097,7 @@ bool CNetworkStringTable::ReadStringTable( bf_read& buf )
 
 		if ( buf.ReadOneBit() == 1 )
 		{
-			int userDataSize = (int)buf.ReadWord();
+			unsigned short userDataSize = buf.ReadWord();
 			Assert( userDataSize > 0 );
 			byte *data = new byte[ userDataSize + 4 ];
 			Assert( data );
@@ -1119,7 +1119,7 @@ bool CNetworkStringTable::ReadStringTable( bf_read& buf )
 	if ( buf.ReadOneBit() == 1 )
 	{
 		numstrings = buf.ReadWord();
-		for ( int i = 0 ; i < numstrings; i++ )
+		for ( unsigned short i = 0 ; i < numstrings; i++ )
 		{
 			char stringname[4096];
 
@@ -1127,7 +1127,7 @@ bool CNetworkStringTable::ReadStringTable( bf_read& buf )
 
 			if ( buf.ReadOneBit() == 1 )
 			{
-				int userDataSize = (int)buf.ReadWord();
+				unsigned short userDataSize = buf.ReadWord();
 				Assert( userDataSize > 0 );
 				byte *data = new byte[ userDataSize + 4 ];
 				Assert( data );
@@ -1163,7 +1163,7 @@ bool CNetworkStringTable::ReadStringTable( bf_read& buf )
 //			length - 
 // Output : const void
 //-----------------------------------------------------------------------------
-const void *CNetworkStringTable::GetStringUserData( int stringNumber, int *length )
+const void *CNetworkStringTable::GetStringUserData( int stringNumber, intp *length )
 {
 	INetworkStringDict *dict = m_pItems;
 	if ( m_pItemsClientSide && stringNumber < -1 )

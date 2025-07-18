@@ -349,7 +349,7 @@ void CL_CopyNewEntity(
 
 	// Get either the static or instance baseline.
 	const void *pFromData;
-	int nFromBits;
+	intp nFromBits;
 
 	PackedEntity *baseline = u.m_bAsDelta ? cl.GetEntityBaseline( u.m_nBaseline, u.m_nNewEntity ) : NULL;
 	if ( baseline && baseline->m_pClientClass == pClass )

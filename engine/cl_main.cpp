@@ -275,13 +275,13 @@ ConCommand whitelist( "whitelist", whitelist_f );
 
 const CPrecacheUserData* CL_GetPrecacheUserData( INetworkStringTable *table, int index )
 {
-	int testLength;
+	intp testLength;
 	const CPrecacheUserData *data = ( CPrecacheUserData * )table->GetStringUserData( index, &testLength );
 	if ( data )
 	{
 		ErrorIfNot( 
 			testLength == sizeof( *data ),
-			("CL_GetPrecacheUserData(%d,%d) - length (%d) invalid.", table->GetTableId(), index, testLength)
+			("CL_GetPrecacheUserData(%d,%d) - length (%zd) invalid.", table->GetTableId(), index, testLength)
 		);
 
 	}
@@ -850,7 +850,7 @@ CPureServerWhitelist* CL_LoadWhitelist( INetworkStringTable *pTable, const char 
 	if ( iString == INVALID_STRING_INDEX )
 		return NULL;
 
-	int dataLen; 
+	intp dataLen; 
 	const void *pData = pTable->GetStringUserData( iString, &dataLen );
 	if ( pData )
 	{
@@ -904,7 +904,7 @@ int CL_GetServerQueryPort()
 	if ( iString == INVALID_STRING_INDEX )
 		return 0;
 		
-	int dataLen; 
+	intp dataLen; 
 	const void *pData = cl.m_pServerStartupTable->GetStringUserData( iString, &dataLen );
 	if ( pData && dataLen == sizeof( int ) )
 		return *((const int*)pData);
@@ -2913,7 +2913,7 @@ void CL_InstallAndInvokeClientStringTableCallbacks()
 
 		for ( int j = 0; j < pTable->GetNumStrings(); ++j )
 		{
-			int userDataSize;
+			intp userDataSize;
 			const void *pUserData = pTable->GetStringUserData( j, &userDataSize );
 			(*pNewFunction)( NULL, pTable, j, pTable->GetString( j ), pUserData );
 		}

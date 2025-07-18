@@ -1668,7 +1668,7 @@ ConsistencyType GetFileConsistencyType( INetworkStringTable *table, const char *
 		return CONSISTENCY_NONE;
 	}
 
-	int length = 0;
+	intp length = 0;
 	unsigned char *userData = NULL;
 	userData = (unsigned char *)table->GetStringUserData( index, &length );
 	if ( userData && length == sizeof( ExactFileUserData ) )
@@ -1866,7 +1866,7 @@ void CClientState::ConsistencyCheck(bool bChanged )
 	Color blue( 100, 100, 200, 255 );
 	for ( int i=0; i<m_pDownloadableFileTable->GetNumStrings(); ++i )
 	{
-		int length = 0;
+		intp length = 0;
 		unsigned char *userData = NULL;
 		userData = (unsigned char *)m_pDownloadableFileTable->GetStringUserData( i, &length );
 		const char *filename = m_pDownloadableFileTable->GetString( i );

@@ -48,24 +48,24 @@ public:
 public:
 	// INetworkStringTable interface:
 
-	const char		*GetTableName( void ) const;
-	TABLEID			GetTableId( void ) const;
-	int				GetNumStrings( void ) const;
-	int				GetMaxStrings( void ) const;
-	int				GetEntryBits( void ) const;
+	const char		*GetTableName( void ) const override;
+	TABLEID			GetTableId( void ) const override;
+	int				GetNumStrings( void ) const override;
+	int				GetMaxStrings( void ) const override;
+	int				GetEntryBits( void ) const override;
 
 	// Networking
-	void			SetTick( int tick );
-	bool			ChangedSinceTick( int tick ) const;
+	void			SetTick( int tick ) override;
+	bool			ChangedSinceTick( int tick ) const override;
 
-	int				AddString( bool bIsServer, const char *value, int length = -1, const void *userdata = NULL ); 
-	const char		*GetString( int stringNumber );
+	int				AddString( bool bIsServer, const char *value, intp length = -1, const void *userdata = NULL ) override; 
+	const char		*GetString( int stringNumber ) override;
 
-	void			SetStringUserData( int stringNumber, int length, const void *userdata );
-	const void		*GetStringUserData( int stringNumber, int *length );
-	int				FindStringIndex( char const *string );
+	void			SetStringUserData( int stringNumber, intp length, const void *userdata ) override;
+	const void		*GetStringUserData( int stringNumber, intp *length ) override;
+	int				FindStringIndex( char const *string ) override;
 
-	void			SetStringChangedCallback( void *object, pfnStringChanged changeFunc );
+	void			SetStringChangedCallback( void *object, pfnStringChanged changeFunc ) override;
 
 	bool			HasFileNameStrings() const;
 	bool			IsUserDataFixedSize() const;

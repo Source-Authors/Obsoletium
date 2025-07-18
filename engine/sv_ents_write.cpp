@@ -596,7 +596,7 @@ static inline void SV_WriteEnterPVS( CEntityWriteInfo &u )
 	else
 	{
 		// Since the ent is in the fullpack, then it must have either a static or an instance baseline.
-		int nFromBytes;
+		intp nFromBytes;
 		if ( !u.m_pServer->GetClassBaseline( pClass, &pFromData, &nFromBytes ) )
 		{
 			Error( "SV_WriteEnterPVS: missing instance baseline for '%s'.", pClass->m_pNetworkName );
