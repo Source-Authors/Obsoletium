@@ -45,7 +45,7 @@ class BootAppSystemGroup : public CSteamAppSystemGroup {
   const char *DetermineDefaultMod();
   const char *DetermineDefaultGame();
 
-  char base_dir_[_MAX_PATH];
+  char base_dir_[MAX_PATH];
   ICommandLine *command_line_;
   IEngineAPI *engine_api_;
   IHammer *hammer_;
