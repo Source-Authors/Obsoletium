@@ -79,11 +79,11 @@ public:
 	virtual bool ModInit();
 	virtual void ModShutdown();
 
-	virtual int	GetSoundIndex( const char *pName ) const;
-	virtual bool IsValidIndex( int index );
-	virtual int GetSoundCount( void );
+	virtual UtlHashHandle_t	GetSoundIndex( const char *pName ) const;
+	virtual bool IsValidIndex( UtlHashHandle_t index );
+	virtual intp GetSoundCount( void );
 
-	virtual const char *GetSoundName( intp index );
+	virtual const char *GetSoundName( UtlHashHandle_t index );
 	virtual bool GetParametersForSound( const char *soundname, CSoundParameters& params, gender_t gender, bool isbeingemitted = false );
 	virtual const char *GetWaveName( CUtlSymbol& sym );
 
@@ -94,13 +94,13 @@ public:
 	virtual const char *GetWavFileForSound( const char *soundname, gender_t gender );
 
 	virtual int		CheckForMissingWavFiles( bool verbose );
-	virtual const char *GetSourceFileForSound( int index ) const;
+	virtual const char *GetSourceFileForSound( intp index ) const;
 	// Iteration methods
-	virtual int		First() const;
-	virtual int		Next( int i ) const;
-	virtual int		InvalidIndex() const;
+	virtual UtlHashHandle_t		First() const;
+	virtual UtlHashHandle_t		Next( UtlHashHandle_t i ) const;
+	virtual UtlHashHandle_t		InvalidIndex() const;
 
-	virtual CSoundParametersInternal *InternalGetParametersForSound( int index );
+	virtual CSoundParametersInternal *InternalGetParametersForSound( UtlHashHandle_t index );
 
 
 	// The host application is responsible for dealing with dirty sound scripts, etc.
@@ -113,11 +113,11 @@ public:
 	virtual void		UpdateSoundParameters( const char *soundname, const CSoundParametersInternal& params );
 
 	virtual int			GetNumSoundScripts() const;
-	virtual char const	*GetSoundScriptName( int index ) const;
-	virtual bool		IsSoundScriptDirty( int index ) const;
+	virtual char const	*GetSoundScriptName( intp index ) const;
+	virtual bool		IsSoundScriptDirty( intp index ) const;
 	virtual int			FindSoundScript( const char *name ) const;
 
-	virtual void		SaveChangesToSoundScript( int scriptindex );
+	virtual void		SaveChangesToSoundScript( intp scriptindex );
 
 	virtual void		ExpandSoundNameMacros( CSoundParametersInternal& params, char const *wavename );
 	virtual gender_t	GetActorGender( char const *actormodel );
