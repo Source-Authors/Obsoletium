@@ -146,7 +146,7 @@ public:
 	virtual bool GetTileOrg( int iTile, int &x, int &y );
 
 protected: // Overrides for contents
-	virtual int GetNumTiles() = 0;
+	virtual intp GetNumTiles() = 0;
 	virtual void GetTileSize( int &wide, int &tall ) = 0;
 	virtual void RenderTile( int iTile, int x, int y ) = 0;
 
@@ -161,7 +161,7 @@ protected:
 
 protected:
 	virtual bool ComputeLayoutInfo();
-	int m_li_numTiles;							//!< Total number of tiles
+	intp m_li_numTiles;							//!< Total number of tiles
 	int m_li_numVisibleTiles;					//!< Number of tiles fitting in the client area
 	int m_li_wide, m_li_tall;					//!< Tile area width/height
 	int m_li_wideItem, m_li_tallItem;			//!< Every item width/height
@@ -262,7 +262,7 @@ void TileViewPanelEx::OnSizeChanged( int wide, int tall )
 
 void TileViewPanelEx::PerformLayout()
 {
-	int numTiles = GetNumTiles();
+	intp numTiles = GetNumTiles();
 	m_hbar->SetVisible( false );
 
 	int wide, tall;
@@ -1979,7 +1979,7 @@ public:
 	~CRenderTexturesListViewPanel();
 
 protected:
-	int GetNumTiles() override;
+	intp GetNumTiles() override;
 	void GetTileSize( int &wide, int &tall ) override;
 	void RenderTile( int iTile, int x, int y ) override;
 
@@ -2091,7 +2091,7 @@ void CRenderTexturesListViewPanel::OnMousePressed( vgui::MouseCode code )
 	m_pRenderTxEditor->Activate();
 }
 
-int CRenderTexturesListViewPanel::GetNumTiles()
+intp CRenderTexturesListViewPanel::GetNumTiles()
 {
 	return m_pListPanel ? m_pListPanel->GetItemCount() : 0;
 }
