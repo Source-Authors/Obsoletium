@@ -4420,7 +4420,7 @@ void COperationListPanel::SetSortColumn( int column )
 	if( column==0 )
 	{
 		bool bAllEnabled = true;
-		for( int i=0;i<GetItemCount();i++ )
+		for( intp i=0;i<GetItemCount();i++ )
 		{
 			IColorOperation *pOp = (IColorOperation *)GetItemUserData( i );
 
@@ -4431,7 +4431,7 @@ void COperationListPanel::SetSortColumn( int column )
 			}
 		}
 
-		for( int i=0;i<GetItemCount();i++ )
+		for( intp i=0;i<GetItemCount();i++ )
 		{
 			KeyValues *kv = GetItem( i );
 			kv->SetInt( "image", (!bAllEnabled)?1:0 );

@@ -81,12 +81,12 @@ public:
 	SendTable*		GetSendTable() const;
 	RecvTable*		GetRecvTable() const;
 
-	int				GetNumProps() const;
-	const RecvProp*	GetProp( int i ) const;
-	const SendProp*	GetSendProp( int i ) const;
+	intp			GetNumProps() const;
+	const RecvProp*	GetProp( intp i ) const;
+	const SendProp*	GetSendProp( intp i ) const;
 
-	int				GetNumDatatableProps() const;
-	const RecvProp*	GetDatatableProp( int i ) const;
+	intp			GetNumDatatableProps() const;
+	const RecvProp*	GetDatatableProp( intp i ) const;
 
 
 public:
@@ -124,12 +124,12 @@ inline RecvTable* CRecvDecoder::GetRecvTable() const
 	return m_pTable; 
 }
 
-inline int CRecvDecoder::GetNumProps() const
+inline intp CRecvDecoder::GetNumProps() const
 {
 	return m_Props.Count();
 }
 
-inline const RecvProp* CRecvDecoder::GetProp( int i ) const
+inline const RecvProp* CRecvDecoder::GetProp( intp i ) const
 {
 	// When called from RecvTable_Decode it is expected that this will
 	// return NULL if 'i' is out of range, but for two years there has been
@@ -141,22 +141,22 @@ inline const RecvProp* CRecvDecoder::GetProp( int i ) const
 	// function is called ~1,200 times per second, so the cost of the branch is
 	// not significant.
 	// Do the check using unsigned math to check for < 0 simultaneously.
-	if ( (unsigned)i < (unsigned)GetNumProps() )
+	if ( (uintp)i < (uintp)GetNumProps() )
 		return m_Props[i];
 	return NULL;
 }
 
-inline const SendProp* CRecvDecoder::GetSendProp( int i ) const
+inline const SendProp* CRecvDecoder::GetSendProp( intp i ) const
 {
 	return m_Precalc.GetProp( i );
 }
 
-inline int CRecvDecoder::GetNumDatatableProps() const
+inline intp CRecvDecoder::GetNumDatatableProps() const
 {
 	return m_DatatableProps.Count();
 }
 
-inline const RecvProp* CRecvDecoder::GetDatatableProp( int i ) const
+inline const RecvProp* CRecvDecoder::GetDatatableProp( intp i ) const
 {
 	return m_DatatableProps[i]; 
 }

@@ -142,9 +142,9 @@ FORCEINLINE void CDeltaBitsReader::SkipPropData( const SendProp *pProp )
 
 FORCEINLINE void CDeltaBitsReader::CopyPropData( bf_write* pOut, const SendProp *pProp )
 {
-	int start = m_pBuf->GetNumBitsRead();
+	intp start = m_pBuf->GetNumBitsRead();
 	g_PropTypeFns[ pProp->GetType() ].SkipProp( pProp, m_pBuf );
-	int len = m_pBuf->GetNumBitsRead() - start;
+	intp len = m_pBuf->GetNumBitsRead() - start;
 	m_pBuf->Seek( start );
 	pOut->WriteBitsFromBuffer( m_pBuf, len );
 }
@@ -224,8 +224,8 @@ public:
 					CSendNode();
 					~CSendNode();
 
-	int				GetNumChildren() const;
-	CSendNode*		GetChild( int i ) const;
+	intp			GetNumChildren() const;
+	CSendNode*		GetChild( intp i ) const;
 	
 	
 	// Returns true if the specified prop is in this node or any of its children.
@@ -277,12 +277,12 @@ public:
 };
 
 
-inline int CSendNode::GetNumChildren() const
+inline intp CSendNode::GetNumChildren() const
 {
 	return m_Children.Count(); 
 }
 
-inline CSendNode* CSendNode::GetChild( int i ) const
+inline CSendNode* CSendNode::GetChild( intp i ) const
 {
 	return m_Children[i];
 }
@@ -349,11 +349,11 @@ public:
 	// This function builds the flat property array given a SendTable.
 	bool				SetupFlatPropertyArray();
 
-	int					GetNumProps() const;
-	const SendProp*		GetProp( int i ) const;
+	intp				GetNumProps() const;
+	const SendProp*		GetProp( intp i ) const;
 
-	int					GetNumDatatableProps() const;
-	const SendProp*		GetDatatableProp( int i ) const;
+	intp				GetNumDatatableProps() const;
+	const SendProp*		GetDatatableProp( intp i ) const;
 
 	SendTable*			GetSendTable() const;
 	CSendNode*			GetRootNode();
@@ -413,22 +413,22 @@ public:
 };
 
 
-inline int CSendTablePrecalc::GetNumProps() const
+inline intp CSendTablePrecalc::GetNumProps() const
 {
 	return m_Props.Count(); 
 }
 
-inline const SendProp* CSendTablePrecalc::GetProp( int i ) const
+inline const SendProp* CSendTablePrecalc::GetProp( intp i ) const
 {
 	return m_Props[i]; 
 }
 
-inline int CSendTablePrecalc::GetNumDatatableProps() const
+inline intp CSendTablePrecalc::GetNumDatatableProps() const
 {
 	return m_DatatableProps.Count();
 }
 
-inline const SendProp* CSendTablePrecalc::GetDatatableProp( int i ) const
+inline const SendProp* CSendTablePrecalc::GetDatatableProp( intp i ) const
 {
 	return m_DatatableProps[i];
 }
