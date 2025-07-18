@@ -11,7 +11,7 @@
 #include "sound.h"
 // dimhotepus: For SOUND_DMA_SPEED
 #include "snd_device.h"
-#include <inetchannel.h>
+#include "inetchannel.h"
 #include "checksum_engine.h"
 #include "con_nprint.h"
 #include "r_local.h"
@@ -42,7 +42,6 @@
 #include "decal.h"
 #include "sv_rcon.h"
 #include "cl_rcon.h"
-#include "vgui_baseui_interface.h"
 #include "snd_audio_source.h"
 #include "iregistry.h"
 #include "sys.h"
@@ -66,9 +65,7 @@
 #include "cl_steamauth.h"
 #include "sv_steamauth.h"
 #include "engine/ivmodelinfo.h"
-#ifdef _X360
-#include "xbox/xbox_launch.h"
-#endif
+
 #if defined( REPLAY_ENABLED )
 #include "replay_internal.h"
 #endif
