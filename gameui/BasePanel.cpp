@@ -265,8 +265,7 @@ public:
 	{
 		for (int i = 0; i < GetChildCount(); i++)
 		{
-			Panel *child = GetChild(i);
-			MenuItem *menuItem = dynamic_cast<MenuItem *>(child);
+			MenuItem *menuItem = dynamic_cast<MenuItem *>(GetChild(i));
 			if (menuItem)
 			{
 				if ( Q_strcmp( menuItem->GetCommand()->GetString("command", ""), itemName ) == 0 )
@@ -295,7 +294,6 @@ public:
 	void OnCommand(const char *command) override
 	{
 		m_KeyRepeat.Reset();
-
 
 		if (!stricmp(command, "Open"))
 		{
@@ -358,11 +356,11 @@ public:
 			CUtlSortVector< SortedPanel_t, CSortedPanelYLess > vecSortedButtons;
 			VguiPanelGetSortedChildButtonList( this, (void*)&vecSortedButtons );
 
-			for ( int i = 0; i < vecSortedButtons.Count(); i++ )
+			for ( auto &button : vecSortedButtons )
 			{
-				if ( vecSortedButtons[ i ].pButton->IsArmed() )
+				if ( button.pButton->IsArmed() )
 				{
-					vecSortedButtons[ i ].pButton->DoClick();
+					button.pButton->DoClick();
 					return;
 				}
 			}
@@ -432,8 +430,7 @@ public:
 		// disabled save button if we're not in a game
 		for (int i = 0; i < GetChildCount(); i++)
 		{
-			Panel *child = GetChild(i);
-			MenuItem *menuItem = dynamic_cast<MenuItem *>(child);
+			MenuItem *menuItem = dynamic_cast<MenuItem *>(GetChild(i));
 			if (menuItem)
 			{
 				bool shouldBeVisible = true;
@@ -819,10 +816,9 @@ void CBasePanel::UpdateBackgroundState()
 
 	// check for background fill
 	// fill over the top if we have any dialogs up
-	int i;
 	bool bHaveActiveDialogs = false;
 	bool bIsInLevel = GameUI().IsInLevel();
-	for ( i = 0; i < GetChildCount(); ++i )
+	for ( int i = 0; i < GetChildCount(); ++i )
 	{
 		VPANEL child = ipanel()->GetChild( GetVPanel(), i );
 		if ( child 
@@ -835,7 +831,7 @@ void CBasePanel::UpdateBackgroundState()
 	}
 	// see if the base gameui panel has dialogs hanging off it (engine stuff, console, bug reporter)
 	VPANEL parent = GetVParent();
-	for ( i = 0; i < ipanel()->GetChildCount( parent ); ++i )
+	for ( int i = 0; i < ipanel()->GetChildCount( parent ); ++i )
 	{
 		VPANEL child = ipanel()->GetChild( parent, i );
 		if ( child 
@@ -898,9 +894,9 @@ void CBasePanel::UpdateBackgroundState()
 		}
 
 		// Msg( "animating title (%d => %d at time %.2f)\n", m_pGameMenuButton->GetAlpha(), (int)targetTitleAlpha, engine->Time());
-		for ( i=0; i<m_pGameMenuButtons.Count(); ++i )
+		for ( auto *button : m_pGameMenuButtons )
 		{
-			vgui::GetAnimationController()->RunAnimationCommand( m_pGameMenuButtons[i], "alpha", targetTitleAlpha, 0.0f, duration, AnimationController::INTERPOLATOR_LINEAR );
+			vgui::GetAnimationController()->RunAnimationCommand( button, "alpha", targetTitleAlpha, 0.0f, duration, AnimationController::INTERPOLATOR_LINEAR );
 		}
 		m_bHaveDarkenedTitleText = bNeedDarkenedTitleText;
 		m_bForceTitleTextUpdate = false;
@@ -1245,7 +1241,7 @@ void CBasePanel::PerformLayout()
 
 	int yDiff = idealMenuY - m_iGameMenuPos.y;
 
-	for ( int i=0; i<m_pGameMenuButtons.Count(); ++i )
+	for ( intp i=0; i<m_pGameMenuButtons.Count(); ++i )
 	{
 		// Get the size of the logo text
 		//int textWide, textTall;
@@ -1273,7 +1269,6 @@ void CBasePanel::PerformLayout()
 //-----------------------------------------------------------------------------
 void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 {
-	int i;
 	BaseClass::ApplySchemeSettings(pScheme);
 
 	m_iGameMenuInset = atoi(pScheme->GetResourceString("MainMenu.Inset"));
@@ -1284,13 +1279,13 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 	if ( pClientScheme )
 	{
 		m_iGameTitlePos.RemoveAll();
-		for ( i=0; i<m_pGameMenuButtons.Count(); ++i )
+		for ( intp i=0; i<m_pGameMenuButtons.Count(); ++i )
 		{
 			m_pGameMenuButtons[i]->SetFont(pClientScheme->GetFont("ClientTitleFont", true));
 			m_iGameTitlePos.AddToTail( coord() );
-			m_iGameTitlePos[i].x = atoi(pClientScheme->GetResourceString( CFmtStr( "Main.Title%d.X", i+1 ) ) );
+			m_iGameTitlePos[i].x = atoi(pClientScheme->GetResourceString( CFmtStr( "Main.Title%zd.X", i+1 ) ) );
 			m_iGameTitlePos[i].x = scheme()->GetProportionalScaledValue( m_iGameTitlePos[i].x );
-			m_iGameTitlePos[i].y = atoi(pClientScheme->GetResourceString( CFmtStr( "Main.Title%d.Y", i+1 ) ) );
+			m_iGameTitlePos[i].y = atoi(pClientScheme->GetResourceString( CFmtStr( "Main.Title%zd.Y", i+1 ) ) );
 			m_iGameTitlePos[i].y = scheme()->GetProportionalScaledValue( m_iGameTitlePos[i].y );
 
 			buttonColor.AddToTail( pClientScheme->GetColor( CFmtStr( "Main.Title%zd.Color", i+1 ), Color(255, 255, 255, 255)) );
@@ -1312,14 +1307,14 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 	}
 	else
 	{
-		for ( i=0; i<m_pGameMenuButtons.Count(); ++i )
+		for ( intp i=0; i<m_pGameMenuButtons.Count(); ++i )
 		{
 			m_pGameMenuButtons[i]->SetFont(pScheme->GetFont("TitleFont"));
 			buttonColor.AddToTail( Color( 255, 255, 255, 255 ) );
 		}
 	}
 
-	for ( i=0; i<m_pGameMenuButtons.Count(); ++i )
+	for ( intp i=0; i<m_pGameMenuButtons.Count(); ++i )
 	{
 		m_pGameMenuButtons[i]->SetDefaultColor(buttonColor[i], Color(0, 0, 0, 0));
 		m_pGameMenuButtons[i]->SetArmedColor(buttonColor[i], Color(0, 0, 0, 0));
@@ -1697,7 +1692,7 @@ void CBasePanel::QueueCommand( const char *pCommand )
 //-----------------------------------------------------------------------------
 void CBasePanel::RunQueuedCommands()
 {
-	for ( int i = 0; i < m_CommandQueue.Count(); ++i )
+	for ( intp i = 0; i < m_CommandQueue.Count(); ++i )
 	{
 		OnCommand( m_CommandQueue[i] );
 	}
@@ -2536,7 +2531,7 @@ void CBasePanel::OnOpenMatchmakingBasePanel()
 	}
 
 	// Hide the standard game menu
-	for ( int i = 0; i < m_pGameMenuButtons.Count(); ++i ) 
+	for ( intp i = 0; i < m_pGameMenuButtons.Count(); ++i ) 
 	{
 		m_pGameMenuButtons[i]->SetVisible( false );
 	}
@@ -2636,7 +2631,7 @@ void CBasePanel::SystemNotification( const int notification )
 			}
 
 			// Hide the standard game menu
-			for ( int i = 0; i < m_pGameMenuButtons.Count(); ++i )
+			for ( intp i = 0; i < m_pGameMenuButtons.Count(); ++i )
 			{
 				m_pGameMenuButtons[i]->SetVisible( false );
 			}
@@ -2818,7 +2813,7 @@ void CBasePanel::SetMenuAlpha(int alpha)
 		m_pGameLogo->SetAlpha( alpha );
 	}
 
-	for ( int i=0; i<m_pGameMenuButtons.Count(); ++i )
+	for ( intp i=0; i<m_pGameMenuButtons.Count(); ++i )
 	{
 		m_pGameMenuButtons[i]->SetAlpha(alpha);
 	}
@@ -3109,7 +3104,7 @@ void CFooterPanel::AddNewButtonLabel( const char *text, const char *icon )
 //-----------------------------------------------------------------------------
 void CFooterPanel::ShowButtonLabel( const char *name, bool show )
 {
-	for ( int i = 0; i < m_ButtonLabels.Count(); ++i )
+	for ( intp i = 0; i < m_ButtonLabels.Count(); ++i )
 	{
 		if ( !Q_stricmp( m_ButtonLabels[ i ]->name, name ) )
 		{
@@ -3124,7 +3119,7 @@ void CFooterPanel::ShowButtonLabel( const char *name, bool show )
 //-----------------------------------------------------------------------------
 void CFooterPanel::SetButtonText( const char *buttonName, const char *text )
 {
-	for ( int i = 0; i < m_ButtonLabels.Count(); ++i )
+	for ( intp i = 0; i < m_ButtonLabels.Count(); ++i )
 	{
 		if ( !Q_stricmp( m_ButtonLabels[ i ]->name, buttonName ) )
 		{
@@ -3179,7 +3174,7 @@ void CFooterPanel::Paint( void )
 		// draw the buttons, right to left
 		int x = right;
 
-		for ( int i = 0; i < m_ButtonLabels.Count(); ++i )
+		for ( intp i = 0; i < m_ButtonLabels.Count(); ++i )
 		{
 			ButtonLabel_t *pButton = m_ButtonLabels[i];
 			if ( !pButton->bVisible )
@@ -3220,11 +3215,10 @@ void CFooterPanel::Paint( void )
 		// center the buttons (as a group)
 		int x = wide / 2;
 		int totalWidth = 0;
-		int i = 0;
 		int nButtonCount = 0;
 
 		// need to loop through and figure out how wide our buttons and text are (with gaps between) so we can offset from the center
-		for ( i = 0; i < m_ButtonLabels.Count(); ++i )
+		for ( intp i = 0; i < m_ButtonLabels.Count(); ++i )
 		{
 			ButtonLabel_t *pButton = m_ButtonLabels[i];
 			if ( !pButton->bVisible )
@@ -3245,7 +3239,7 @@ void CFooterPanel::Paint( void )
 		totalWidth += ( nButtonCount - 1 ) * m_nButtonGap; // add in the gaps between the buttons
 		x -= ( totalWidth / 2 );
 
-		for ( i = 0; i < m_ButtonLabels.Count(); ++i )
+		for ( intp i = 0; i < m_ButtonLabels.Count(); ++i )
 		{
 			ButtonLabel_t *pButton = m_ButtonLabels[i];
 			if ( !pButton->bVisible )
