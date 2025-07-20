@@ -104,7 +104,7 @@ public:
 	void ScanBonusMaps( void );
 	void RefreshMapData( void );
 
-	int BonusCount( void );
+	intp BonusCount( void );
 	BonusMapDescription_t * GetBonusData( intp iIndex ) { return &(m_BonusMaps[ iIndex ]); }
 	intp InvalidIndex( void ) { return m_BonusMaps.InvalidIndex(); }
 	bool IsValidIndex( intp iIndex ) { return m_BonusMaps.IsValidIndex( iIndex ); }
@@ -151,7 +151,7 @@ private:
 	bool	m_bHasLoadedSaveData;
 
 	int		m_iDirDepth;
-	char	m_szCurrentPath[_MAX_PATH];
+	char	m_szCurrentPath[MAX_PATH];
 	float	m_fCurrentCompletion;
 	int		m_iCompletableLevels;
 

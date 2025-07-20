@@ -272,7 +272,7 @@ void GetChallengeMedals( ChallengeDescription_t *pChallengeDescription, int &iBe
 
 CBonusMapsDatabase *BonusMapsDatabase( void )
 {
-		static CBonusMapsDatabase StaticBonusMapsDatabase;
+	static CBonusMapsDatabase StaticBonusMapsDatabase;
 	return &StaticBonusMapsDatabase;
 }
 
@@ -454,7 +454,7 @@ void CBonusMapsDatabase::RefreshMapData( void )
 	m_iCompletableLevels = 0;
 	m_fCurrentCompletion = 0.0f;
 
-	for ( int iMap = 0; iMap < m_BonusMaps.Count(); ++iMap )
+	for ( intp iMap = 0; iMap < m_BonusMaps.Count(); ++iMap )
 	{
 		BonusMapDescription_t *pMap = &m_BonusMaps[ iMap ];
 
@@ -477,7 +477,7 @@ void CBonusMapsDatabase::RefreshMapData( void )
 	}
 }
 
-int CBonusMapsDatabase::BonusCount( void )
+intp CBonusMapsDatabase::BonusCount( void )
 {
 	if ( m_BonusMaps.Count() == 0 )
 		ScanBonusMaps();
@@ -529,7 +529,7 @@ bool CBonusMapsDatabase::BonusesUnlocked( void )
 	if ( m_iX360BonusesUnlocked == 0 )
 	{
 		// Hasn't been recorded as unlocked yet
-		for ( int iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
+		for ( intp iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
 		{
 			BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
 			if ( Q_strcmp( pMap->szMapName, "#Bonus_Map_AdvancedChambers" ) == 0 && !pMap->bLocked )
@@ -630,7 +630,7 @@ int CBonusMapsDatabase::NumAdvancedComplete( void )
 	int iNumComplete = 0;
 
 	// Look through all the bonus maps
-	for ( int iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
+	for ( intp iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
 	{
 		BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
 
@@ -663,7 +663,7 @@ void CBonusMapsDatabase::NumMedals( int piNumMedals[ 3 ] )
 		piNumMedals[ i ] = 0;
 
 	// Look through all the bonus maps
-	for ( int iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
+	for ( intp iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
 	{
 		BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
 
