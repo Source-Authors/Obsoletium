@@ -61,7 +61,7 @@ public:
 	void SetSaveGameInfo( SaveGameDescription_t &save )
 	{
 		// set the bitmap to display
-		char tga[_MAX_PATH];
+		char tga[MAX_PATH];
 		V_strcpy_safe( tga, save.szFileName );
 		char *ext = strstr( tga, ".sav" );
 		if ( ext )
@@ -203,7 +203,7 @@ intp CBaseSaveGameDialog::GetSelectedItemSaveIndex()
 void CBaseSaveGameDialog::ScanSavedGames()
 {
 	// populate list box with all saved games on record:
-	char	szDirectory[_MAX_PATH];
+	char	szDirectory[MAX_PATH];
 	V_sprintf_safe( szDirectory, "%s/*.sav", SAVE_DIR );
 
 	// clear the current list
@@ -221,7 +221,7 @@ void CBaseSaveGameDialog::ScanSavedGames()
 			continue;
 		}
 
-		char szFileName[_MAX_PATH];
+		char szFileName[MAX_PATH];
 		V_sprintf_safe(szFileName, "%s/%s", SAVE_DIR, pFileName);
 
 		// Only load save games from the current mod's save dir
@@ -635,7 +635,7 @@ void CBaseSaveGameDialog::DeleteSaveGame( const char *fileName )
 	g_pFullFileSystem->RemoveFile( fileName, "MOD" );
 
 	// delete the associated tga
-	char tga[_MAX_PATH];
+	char tga[MAX_PATH];
 	V_strcpy_safe( tga, fileName );
 	char *ext = strstr( tga, ".sav" );
 	if ( ext )
