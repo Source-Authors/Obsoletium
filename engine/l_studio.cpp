@@ -3104,26 +3104,26 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	drawFlags = STUDIORENDER_DRAW_ENTIRE_MODEL | STUDIORENDER_DRAW_STATIC_LIGHTING;
 	for ( intp i = 0; i < lightObjects.Count(); i++ )
 	{
-			robject_t &obj = objectList[lightObjects[i]];
-			rmodel_t &model = modelList[obj.modelIndex];
+		robject_t &obj = objectList[lightObjects[i]];
+		rmodel_t &model = modelList[obj.modelIndex];
 
-			if ( obj.pEnvCubeMap )
-			{
-				pRenderContext->BindLocalCubemap( obj.pEnvCubeMap );
-			}
-
-			LightingState_t *pState = &lightStates[obj.lightIndex];
-			g_pStudioRender->SetAmbientLightColors( pState->r_boxcolor );
-			pRenderContext->SetLightingOrigin( *obj.pLightingOrigin );
-			R_SetNonAmbientLightingState( pState->numlights, pState->locallight, &nLocalLightCount, localLightDescs, true );
-			info.m_pStudioHdr = model.pStudioHdr;
-			info.m_pHardwareData = model.pStudioHWData;
-			info.m_Skin = obj.skin;
-			info.m_pClientEntity = static_cast<void*>(obj.pRenderable);
-			info.m_Lod = obj.lod;
-			info.m_pColorMeshes = obj.pColorMeshes;
-			g_pStudioRender->DrawModelStaticProp( info, *obj.pMatrix, drawFlags );
+		if ( obj.pEnvCubeMap )
+		{
+			pRenderContext->BindLocalCubemap( obj.pEnvCubeMap );
 		}
+
+		LightingState_t *pState = &lightStates[obj.lightIndex];
+		g_pStudioRender->SetAmbientLightColors( pState->r_boxcolor );
+		pRenderContext->SetLightingOrigin( *obj.pLightingOrigin );
+		R_SetNonAmbientLightingState( pState->numlights, pState->locallight, &nLocalLightCount, localLightDescs, true );
+		info.m_pStudioHdr = model.pStudioHdr;
+		info.m_pHardwareData = model.pStudioHWData;
+		info.m_Skin = obj.skin;
+		info.m_pClientEntity = static_cast<void*>(obj.pRenderable);
+		info.m_Lod = obj.lod;
+		info.m_pColorMeshes = obj.pColorMeshes;
+		g_pStudioRender->DrawModelStaticProp( info, *obj.pMatrix, drawFlags );
+	}
 
 	if ( !IsX360() && ( r_flashlight_version2.GetInt() == 0 ) && shadowObjects.Count() )
 	{
@@ -3981,13 +3981,13 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 		// purposely not deterministic to catch bugs with excessive re-baking (i.e. disco)
 		Vector fRandomColor;
 		int nColor = RandomInt(1,6);
-		fRandomColor.x = (nColor>>2) & 1;
-		fRandomColor.y = (nColor>>1) & 1;
-		fRandomColor.z = nColor & 1;
+		fRandomColor.x = static_cast<vec_t>((nColor>>2) & 1);
+		fRandomColor.y = static_cast<vec_t>((nColor>>1) & 1);
+		fRandomColor.z = static_cast<vec_t>(nColor & 1);
 		VectorNormalize( fRandomColor );
-		debugColor[0] = fRandomColor[0] * 255.0f;
-		debugColor[1] = fRandomColor[1] * 255.0f;
-		debugColor[2] = fRandomColor[2] * 255.0f;
+		debugColor[0] = static_cast<byte>(fRandomColor[0] * 255.0f);
+		debugColor[1] = static_cast<byte>(fRandomColor[1] * 255.0f);
+		debugColor[2] = static_cast<byte>(fRandomColor[2] * 255.0f);
 		bDebugColor = true;
 	}
 
@@ -4005,7 +4005,7 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 		{
 			// prop was compiled for static prop lighting, but out of sync
 			// bad disk data for model, show as red
-			debugColor[0] = 255.0f;
+			debugColor[0] = 255;
 			debugColor[1] = 0;
 			debugColor[2] = 0;
 		}
@@ -4013,15 +4013,15 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 		{
 			// valid disk data, show as green
 			debugColor[0] = 0;
-			debugColor[1] = 255.0f;
+			debugColor[1] = 255;
 			debugColor[2] = 0;
 		}
 		else
 		{
 			// no disk based data, using runtime method, show as yellow
 			// identifies a prop that wasn't compiled for static prop lighting
-			debugColor[0] = 255.0f;
-			debugColor[1] = 255.0f;
+			debugColor[0] = 255;
+			debugColor[1] = 255;
 			debugColor[2] = 0;
 		}
 		bDebugColor = true;
