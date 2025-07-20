@@ -84,6 +84,9 @@ CPredictionCopy::CPredictionCopy( int type, void *dest, bool dest_packed, void c
 	m_nErrorCount		= 0;
 
 	m_FieldCompareFunc	= func;
+
+	m_pWatchField		= nullptr;
+	m_pOperation		= nullptr;
 }
 
 //-----------------------------------------------------------------------------

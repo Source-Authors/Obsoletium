@@ -95,6 +95,7 @@ EmitSound_t::EmitSound_t( const CSoundParameters &src )
 	m_bWarnOnMissingCloseCaption = false;
 	m_bWarnOnDirectWaveReference = false;
 	m_nSpeakerEntity = -1;
+	m_hSoundScriptHandle = -1;
 }
 
 void Hack_FixEscapeChars( char *str )

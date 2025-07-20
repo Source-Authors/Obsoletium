@@ -99,6 +99,8 @@ void __MsgFunc_RequestState(bf_read &msg)
 
 CVoiceStatus::CVoiceStatus()
 {
+	m_pHelper = nullptr;
+
 	m_nControlSize = 0;
 	m_bBanMgrInitialized = false;
 	m_LastUpdateServerState = 0;

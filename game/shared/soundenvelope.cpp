@@ -653,7 +653,7 @@ void CSoundPatch::AddPlayerPost( CBasePlayer *pPlayer )
 struct SoundCommand_t
 {
 	SoundCommand_t( void ) { memset( this, 0, sizeof(*this) ); }
-	SoundCommand_t( CSoundPatch *pSound, float executeTime, soundcommands_t command, float deltaTime, float value ) : m_pPatch(pSound), m_time(executeTime), m_deltaTime(deltaTime), m_command(command), m_value(value) {}
+	SoundCommand_t( CSoundPatch *pSound, float executeTime, soundcommands_t command, float deltaTime, float value ) : m_pPatch(pSound), m_time(executeTime), m_deltaTime(deltaTime), m_command(command), m_value(value), m_pNext(0) {}
 
 	CSoundPatch		*m_pPatch;
 	float			m_time;

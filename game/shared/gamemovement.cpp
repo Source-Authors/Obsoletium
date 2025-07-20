@@ -592,12 +592,17 @@ void DrawDispCollPlane( CBaseTrace *pTrace )
 //-----------------------------------------------------------------------------
 CGameMovement::CGameMovement( void )
 {
+	player				= nullptr;
+	mv					= nullptr;
+
 	m_nOldWaterLevel	= WaterLevel::WL_NotInWater;
 	m_flWaterEntryTime	= 0;
 	m_nOnLadder			= 0;
 
-	mv					= NULL;
+	m_fFrameTime		= 0;
+	m_iSpeedCropped		= 0;
 
+	memset( m_CachedGetPointContents, 0, sizeof(m_CachedGetPointContents) );
 	memset( m_flStuckCheckTime, 0, sizeof(m_flStuckCheckTime) );
 }
 
