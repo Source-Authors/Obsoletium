@@ -2280,7 +2280,8 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	if ( !IsX360() )
 	{
 		if ( bResetAnisotropy || recomputeSnapshots || bRedownloadLightmaps ||
-			bRedownloadTextures || bResetAnisotropy || bVideoModeChange ||
+			// dimhotepus: Ensure single-threaded material system on dx level change.
+			bRedownloadTextures || dxSupportLevelChanged || bVideoModeChange ||
 			bSetStandardVertexShaderConstants || bResetTextureFilter )
 		{
 			Unlock( hLock );
