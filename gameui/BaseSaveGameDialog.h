@@ -53,7 +53,6 @@ int SaveReadNameAndComment( FileHandle_t f, OUT_Z_ARRAY char (&name)[nameSize], 
 	return SaveReadNameAndComment( f, name, nameSize, comment, commentSize );
 }
 
-
 //-----------------------------------------------------------------------------
 // Purpose: Base class for save & load game dialogs
 //-----------------------------------------------------------------------------

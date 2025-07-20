@@ -506,7 +506,7 @@ bool CBaseSaveGameDialog::SaveGameSortFunc( const SaveGameDescription_t &s1, con
 		return true;
 
 	// timestamps are equal, so just sort by filename
-	return strcmp(s1.szFileName, s2.szFileName) == -1;
+	return strcmp(s1.szFileName, s2.szFileName) < 0;
 }
 
 int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int nameSize, OUT_Z_CAP(commentSize) char *comment, int commentSize )
