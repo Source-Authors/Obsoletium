@@ -30,35 +30,35 @@ public:
 	virtual void ListenForEvents() {};
 	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event );
 
-	int GetAchievementID() { return m_iAchievementID; }
+	int GetAchievementID() const override { return m_iAchievementID; }
 	void SetAchievementID( int iAchievementID ) { m_iAchievementID = iAchievementID; }
 	void SetName( const char *pszName ) { m_pszName = pszName; }
 	const char *GetName() { return m_pszName; }
 	const char *GetStat() { return m_pszStat?m_pszStat:GetName(); }
 	void SetFlags( int iFlags );
-	int GetFlags() { return m_iFlags; }
+	int GetFlags() const override { return m_iFlags; }
 	void SetGoal( int iGoal ) { m_iGoal = iGoal; }
-	int GetGoal() { return m_iGoal; }
+	int GetGoal() const override { return m_iGoal; }
 	void SetGameDirFilter( const char *pGameDir );
 	bool HasComponents() { return ( m_iFlags & ACH_HAS_COMPONENTS ) > 0; }	
 	void SetPointValue( int iPointValue ) { m_iPointValue = iPointValue; }
-	int	GetPointValue() { return m_iPointValue; }
-	bool ShouldHideUntilAchieved() { return m_bHideUntilAchieved; }
+	int	GetPointValue() const override { return m_iPointValue; }
+	bool ShouldHideUntilAchieved() const override { return m_bHideUntilAchieved; }
 	void SetHideUntilAchieved( bool bHide ) { m_bHideUntilAchieved = bHide; }
 	void SetStoreProgressInSteam( bool bStoreProgressInSteam ) { m_bStoreProgressInSteam = bStoreProgressInSteam; }
 	bool StoreProgressInSteam() { return m_bStoreProgressInSteam; }
 	virtual bool ShouldShowProgressNotification() { return true; }
 	virtual void OnPlayerStatsUpdate() {}
 
-	virtual bool ShouldSaveWithGame();
+	bool ShouldSaveWithGame() const override;
 	bool ShouldSaveGlobal();
 	virtual void PreRestoreSavedGame();
 	virtual void PostRestoreSavedGame();
 	void SetCount( int iCount ) { m_iCount = iCount; }
-	int GetCount() { return m_iCount; }
+	int GetCount() const override { return m_iCount; }
 	void SetProgressShown( int iProgressShown ) { m_iProgressShown = iProgressShown; }
 	int GetProgressShown() { return m_iProgressShown; }
-	virtual bool IsAchieved() { return m_bAchieved; }
+	bool IsAchieved() const override { return m_bAchieved; }
 	virtual bool IsActive();
 	virtual bool LocalPlayerCanEarn( void ) { return true; }
 	void SetAchieved( bool bAchieved ) { m_bAchieved = bAchieved; }
@@ -88,8 +88,8 @@ public:
 	virtual void PrintAdditionalStatus() {}		// for debugging, achievements may report additional status in achievement_status concmd
 	virtual void OnSteamUserStatsStored() {}
 	virtual void UpdateAchievement( int ) {}
-	virtual bool ShouldShowOnHUD() { return m_bShowOnHUD; }
-	virtual void SetShowOnHUD( bool bShow );
+	bool ShouldShowOnHUD() const override { return m_bShowOnHUD; }
+	void SetShowOnHUD( bool bShow ) override;
 
 	//=============================================================================
 	// HPE_BEGIN:
@@ -168,10 +168,10 @@ public:
 	CFailableAchievement();
 	void SetFailed();	
 
-	virtual bool ShouldSaveWithGame();
+	bool ShouldSaveWithGame() const override;
 	virtual void PreRestoreSavedGame();
 	virtual void PostRestoreSavedGame();
-	virtual bool IsAchieved() { return !m_bFailed && BaseClass::IsAchieved(); }
+	bool IsAchieved() const override { return !m_bFailed && BaseClass::IsAchieved(); }
 	virtual bool IsActive() { return m_bActivated && !m_bFailed && BaseClass::IsActive(); }
 	bool IsFailed() { return m_bFailed; }
 

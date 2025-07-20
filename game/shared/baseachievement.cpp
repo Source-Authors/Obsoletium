@@ -68,6 +68,7 @@ CBaseAchievement::CBaseAchievement()
 	m_uUnlockTime = 0;
 	m_pAchievementMgr = NULL;
 	m_bShowOnHUD = false;
+	m_pszName = NULL;
 	m_pszStat = NULL;
 }
 
@@ -524,7 +525,7 @@ void CBaseAchievement::SetComponentBits( uint64 iComponentBits )
 //-----------------------------------------------------------------------------
 // Purpose: returns whether we should save this achievement with a save game
 //-----------------------------------------------------------------------------
-bool CBaseAchievement::ShouldSaveWithGame() 
+bool CBaseAchievement::ShouldSaveWithGame() const
 { 
 	// save if we should get saved with the game, have a non-zero count, and have not
 	// been achieved (at which point the achievement state gets saved globally)
@@ -626,7 +627,7 @@ CFailableAchievement::CFailableAchievement() : CBaseAchievement()
 //-----------------------------------------------------------------------------
 // Purpose: returns whether we should save this achievement with a save game
 //-----------------------------------------------------------------------------
-bool CFailableAchievement::ShouldSaveWithGame() 
+bool CFailableAchievement::ShouldSaveWithGame() const
 { 
 	// save if we should get saved with the game, and are active or have failed
 	return ( ( ( m_iFlags & ACH_SAVE_WITH_GAME ) > 0 ) && ( m_bActivated || m_bFailed ) );
