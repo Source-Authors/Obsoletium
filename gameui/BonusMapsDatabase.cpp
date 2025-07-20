@@ -42,7 +42,7 @@ bool WriteBonusMapSavedData( KeyValues *data )
 
 	data->RecursiveSaveToFile( buf, 0 );
 
-	char	szFilename[_MAX_PATH];
+	char	szFilename[MAX_PATH];
 	V_sprintf_safe( szFilename, "%s/bonus_maps_data.bmd", SAVE_DIR );
 
 	bool bWriteSuccess = g_pFullFileSystem->WriteFile( szFilename, MOD_DIR, buf );
@@ -323,7 +323,7 @@ bool CBonusMapsDatabase::ReadBonusMapSaveData( void )
 		return false;
 	}
 
-	char	szFilename[_MAX_PATH];
+	char	szFilename[MAX_PATH];
 	V_sprintf_safe( szFilename, "%s/bonus_maps_data.bmd", SAVE_DIR );
 
 	// dimhotepus: Support bonus maps in mods.
@@ -411,7 +411,7 @@ void CBonusMapsDatabase::ScanBonusMaps( void )
 	m_fCurrentCompletion = 0.0f;
 
 	// populate list box with all bonus maps in the current path
-	char szDirectory[_MAX_PATH];
+	char szDirectory[MAX_PATH];
 
 	if ( Q_strcmp( m_szCurrentPath, "." ) == 0 )
 	{
@@ -619,7 +619,7 @@ float CBonusMapsDatabase::GetCompletionPercentage( void )
 
 int CBonusMapsDatabase::NumAdvancedComplete( void )
 {
-	char szCurrentPath[_MAX_PATH];
+	char szCurrentPath[MAX_PATH];
 	V_strcpy_safe( szCurrentPath, m_szCurrentPath );
 	int iDirDepth = m_iDirDepth;
 
@@ -651,7 +651,7 @@ int CBonusMapsDatabase::NumAdvancedComplete( void )
 
 void CBonusMapsDatabase::NumMedals( int piNumMedals[ 3 ] )
 {
-	char szCurrentPath[_MAX_PATH];
+	char szCurrentPath[MAX_PATH];
 	V_strcpy_safe( szCurrentPath, m_szCurrentPath );
 	int iDirDepth = m_iDirDepth;
 
@@ -692,7 +692,7 @@ void CBonusMapsDatabase::NumMedals( int piNumMedals[ 3 ] )
 
 void CBonusMapsDatabase::AddBonus( const char *pCurrentPath, const char *pDirFileName, bool bIsFolder )
 {
-	char szFileName[_MAX_PATH];
+	char szFileName[MAX_PATH];
 	V_sprintf_safe( szFileName, "%s%s", pCurrentPath, pDirFileName );
 
 	// Only load bonus maps from the current mod's maps dir
@@ -704,7 +704,7 @@ void CBonusMapsDatabase::AddBonus( const char *pCurrentPath, const char *pDirFil
 
 void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool bOutOfRoot )
 {
-	char szDirectory[_MAX_PATH];
+	char szDirectory[MAX_PATH];
 	V_sprintf_safe( szDirectory, "%s*", pCurrentPath );
 
 	FileFindHandle_t dirHandle;
@@ -727,7 +727,7 @@ void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool b
 			AddBonus( pCurrentPath, pDirFileName, true );
 		else
 		{
-			char szFileName[_MAX_PATH];
+			char szFileName[MAX_PATH];
 			V_sprintf_safe( szFileName, "%s%s", pCurrentPath, pDirFileName );
 			AddBonus( "", szFileName, true );
 		}
@@ -740,7 +740,7 @@ void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool b
 
 void CBonusMapsDatabase::BuildBonusMapsList( const char *pCurrentPath, bool bOutOfRoot )
 {
-	char szDirectory[_MAX_PATH];
+	char szDirectory[MAX_PATH];
 	V_sprintf_safe( szDirectory, "%s*.bns", pCurrentPath );
 
 	FileFindHandle_t mapHandle;
@@ -759,7 +759,7 @@ void CBonusMapsDatabase::BuildBonusMapsList( const char *pCurrentPath, bool bOut
 			AddBonus( pCurrentPath, pMapFileName, false );
 		else
 		{
-			char szFileName[_MAX_PATH];
+			char szFileName[MAX_PATH];
 			V_sprintf_safe( szFileName, "%s%s", pCurrentPath, pMapFileName );
 			AddBonus( "", szFileName, false );
 		}
@@ -778,7 +778,7 @@ void CBonusMapsDatabase::ParseBonusMapData( char const *pszFileName, char const 
 	if ( !pszFileName || !pszShortName )
 		return;
 
-	char szMapInfo[_MAX_PATH];
+	char szMapInfo[MAX_PATH];
 
 	// if it's a directory, there's no optional info
 	if ( bIsFolder )
