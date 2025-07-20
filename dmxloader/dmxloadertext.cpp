@@ -552,11 +552,8 @@ bool CDmxSerializerKeyValues2::SerializeElementArrayAttribute( CUtlBuffer& buf, 
 		if ( dict.ShouldInlineElement( pElement ) )
 		{
 			buf.Printf( "\"%s\"\n{\n", pElement->GetTypeString() );
-			if ( pElement )
-			{
-				// dimhotepus: Always serialize.
-				ok = SaveElement( buf, dict, pElement, false ) && ok;
-			}
+			// dimhotepus: Always serialize.
+			ok = SaveElement( buf, dict, pElement, false ) && ok;
 			buf.PutChar( '}' );
 		}
 		else
