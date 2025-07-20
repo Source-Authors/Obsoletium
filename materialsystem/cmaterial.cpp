@@ -2840,7 +2840,9 @@ IMaterialVar *CMaterial::FindVarFast( char const *pVarName, unsigned int *pCache
 		{
 			if (m_pShaderParams[i]->GetNameAsSymbol() == pToken->symbol)
 			{
-				pToken->varIndex = i;
+				static_assert(std::is_same_v<decltype(m_VarCount), unsigned char>);
+		
+				pToken->varIndex = static_cast<unsigned char>(i);
 				return m_pShaderParams[i];
 			}
 		}
