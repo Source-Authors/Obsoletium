@@ -2702,12 +2702,13 @@ struct robject_t
 	ColorMeshInfo_t		*pColorMeshes;
 	ITexture			*pEnvCubeMap;
 	Vector				*pLightingOrigin;
-	short				modelIndex;
+	// dimhotepus: short -> intp
+	intp				modelIndex;
 	short				lod;
 	ModelInstanceHandle_t instance;
 	short				skin;
-	short				lightIndex;
-	short				pad0;
+	// dimhotepus: short -> intp
+	intp				lightIndex;
 };
 
 struct rmodel_t
@@ -2735,16 +2736,22 @@ public:
 				return lhs.skin < rhs.skin;
 			return lhs.lod < rhs.lod;
 		}
-		if ( pModels[lhs.modelIndex].maxArea == pModels[rhs.modelIndex].maxArea )
+
+		float lmax = pModels[lhs.modelIndex].maxArea,
+			  rmax = pModels[rhs.modelIndex].maxArea;
+
+		if ( lmax == rmax )
 			return lhs.modelIndex < rhs.modelIndex;
-		return pModels[lhs.modelIndex].maxArea > pModels[rhs.modelIndex].maxArea;
+		return lmax > rmax;
 	}
 };
 
 struct rdecalmodel_t
 {
-	short			objectIndex;
-	short			lightIndex;
+	// dimhotepus: short -> intp
+	intp			objectIndex;
+	// dimhotepus: short -> intp
+	intp			lightIndex;
 };
 /*
 // ----------------------------------------
@@ -2800,8 +2807,8 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	constexpr int MAX_OBJECTS = 1024;
 	CUtlSortVector<robject_t, CRobjectLess> objectList( (intp)0, MAX_OBJECTS);
 	CUtlVectorFixedGrowable<rmodel_t, 256> modelList;
-	CUtlVectorFixedGrowable<short,256> lightObjects;
-	CUtlVectorFixedGrowable<short,64> shadowObjects;
+	CUtlVectorFixedGrowable<intp,256> lightObjects;
+	CUtlVectorFixedGrowable<intp,64> shadowObjects;
 	CUtlVectorFixedGrowable<rdecalmodel_t,64> decalObjects;
 	CUtlVectorFixedGrowable<LightingState_t,256> lightStates;
 	bool bForceCubemap = r_showenvcubemap.GetBool();
@@ -2882,7 +2889,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	else
 	{
 		// force the lod of each object
-		for ( int i = 0; i < objectList.Count(); i++ )
+		for ( intp i = 0; i < objectList.Count(); i++ )
 		{
 			const rmodel_t &model = modelList[objectList[i].modelIndex];
 			objectList[i].lod = clamp(forcedLodSetting, model.pStudioHWData->m_RootLOD, model.lodCount-1);
@@ -2898,7 +2905,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	// now build out the lighting states
 	if ( !bShadowDepth )
 	{
-		for ( int i = 0; i < objectList.Count(); i++ )
+		for ( intp i = 0; i < objectList.Count(); i++ )
 		{
 			robject_t &obj = objectList[i];
 			rmodel_t &model = modelList[obj.modelIndex];
@@ -3071,7 +3078,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	info.m_Decals = STUDIORENDER_DECAL_INVALID;
 	info.m_Body = 0;
 	info.m_HitboxSet = 0;
-	for ( int i = 0; i < objectList.Count(); i++ )
+	for ( intp i = 0; i < objectList.Count(); i++ )
 	{
 		robject_t &obj = objectList[i];
 		if ( obj.lightIndex >= 0 )
@@ -3095,10 +3102,8 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	int				nLocalLightCount = 0;
 	LightDesc_t		localLightDescs[4];
 	drawFlags = STUDIORENDER_DRAW_ENTIRE_MODEL | STUDIORENDER_DRAW_STATIC_LIGHTING;
-	if ( lightObjects.Count() )
+	for ( intp i = 0; i < lightObjects.Count(); i++ )
 	{
-		for ( int i = 0; i < lightObjects.Count(); i++ )
-		{
 			robject_t &obj = objectList[lightObjects[i]];
 			rmodel_t &model = modelList[obj.modelIndex];
 
@@ -3119,12 +3124,11 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 			info.m_pColorMeshes = obj.pColorMeshes;
 			g_pStudioRender->DrawModelStaticProp( info, *obj.pMatrix, drawFlags );
 		}
-	}
 
 	if ( !IsX360() && ( r_flashlight_version2.GetInt() == 0 ) && shadowObjects.Count() )
 	{
 		drawFlags = STUDIORENDER_DRAW_ENTIRE_MODEL;
-		for ( int i = 0; i < shadowObjects.Count(); i++ )
+		for ( intp i = 0; i < shadowObjects.Count(); i++ )
 		{
 			// draw just the shadows!
 			robject_t &obj = objectList[shadowObjects[i]];
@@ -3142,7 +3146,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 		g_pStudioRender->ClearAllShadows();
 	}
 
-	for ( int i = 0; i < decalObjects.Count(); i++ )
+	for ( intp i = 0; i < decalObjects.Count(); i++ )
 	{
 		// draw just the decals!
 		robject_t &obj = objectList[decalObjects[i].objectIndex];
