@@ -36,20 +36,20 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 bool LoadAchievementIcon( vgui::ImagePanel* pIconPanel, IAchievement *pAchievement, const char *pszExt /*= NULL*/ )
 {
-	char imagePath[_MAX_PATH];
-	Q_strncpy( imagePath, "achievements\\", sizeof(imagePath) );
-	Q_strncat( imagePath, pAchievement->GetName(), sizeof(imagePath), COPY_ALL_CHARACTERS );
+	char imagePath[MAX_PATH];
+	V_strcpy_safe( imagePath, "achievements\\" );
+	V_strcat_safe( imagePath, pAchievement->GetName() );
 	if ( pszExt )
 	{
-		Q_strncat( imagePath, pszExt, sizeof(imagePath), COPY_ALL_CHARACTERS );
+		V_strcat_safe( imagePath, pszExt );
 	}
-	Q_strncat( imagePath, ".vtf", sizeof(imagePath), COPY_ALL_CHARACTERS );
+	V_strcat_safe( imagePath, ".vtf" );
 
-	char checkFile[_MAX_PATH];
-	Q_snprintf( checkFile, sizeof(checkFile), "materials\\vgui\\%s", imagePath );
+	char checkFile[MAX_PATH];
+	V_sprintf_safe( checkFile, "materials\\vgui\\%s", imagePath );
 	if ( !g_pFullFileSystem->FileExists( checkFile ) )
 	{
-		Q_snprintf( imagePath, sizeof(imagePath), "hud\\icon_locked.vtf" );
+		V_sprintf_safe( imagePath, "hud\\icon_locked.vtf" );
 	}
 
 	pIconPanel->SetShouldScaleImage( true );
