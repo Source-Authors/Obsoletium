@@ -183,7 +183,7 @@ int CSessionOptionsDialog::GetMaxPlayersRecommendedOption( void )
 		}
 	}
 
-	return ssize( options ) - 1;
+	return static_cast<int>(ssize( options ) - 1);
 }
 
 //---------------------------------------------------------------------
