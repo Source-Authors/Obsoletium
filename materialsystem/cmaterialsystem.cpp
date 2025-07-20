@@ -631,7 +631,7 @@ InitReturnVal_t CMaterialSystem::Init()
 	// version of hammer initializing the material system. We need to know this so that we set
 	// up the editor materials properly. If we don't do this, we never allocate the white lightmap,
 	// for example. We can remove this when we update the SDK!!
-	char szExeName[_MAX_PATH];
+	char szExeName[MAX_PATH];
     if ( ::GetModuleFileName( GetModuleHandle( NULL ), szExeName, sizeof( szExeName ) ) )
     {
 		char szRight[20];

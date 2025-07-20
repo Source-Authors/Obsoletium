@@ -2826,14 +2826,14 @@ void CTextureManager::FindFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 		{
 			if ( pFilename[0] != '.' ) 
 			{
-				char childFilename[_MAX_PATH];
+				char childFilename[MAX_PATH];
 				V_sprintf_safe( childFilename, "%s/*.*", pFilename );
 				FindFilesToLoad( pOutFilesToLoad, childFilename );
 			}
 		}
 		else
 		{
-			char filenameNoExtension[_MAX_PATH];
+			char filenameNoExtension[MAX_PATH];
 			V_StripExtension( pFilename, filenameNoExtension );
 			// Add the file to the list, which we will later traverse in order to ensure we're hitting these in the expected order for the VPK. 
 			( *pOutFilesToLoad ).Insert( CUtlString( filenameNoExtension ), 0 );
@@ -2859,7 +2859,7 @@ void CTextureManager::ReadFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 	if ( !g_pFullFileSystem->ReadToBuffer( fh, fileContents ) )
 		goto cleanup;
 
-	char buffer[_MAX_PATH + 1];
+	char buffer[MAX_PATH + 1];
 	while ( 1 ) 
 	{
 		fileContents.GetLine( buffer );
