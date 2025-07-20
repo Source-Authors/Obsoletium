@@ -47,7 +47,7 @@ public:
 // Return true if the state was changed at all (in any way that would require an InvalidateLayout on the control).
 typedef bool (*UpdateItemStateFn)(
 	vgui::TreeView *pTree, 
-	int iChildItemId, 
+	intp iChildItemId, 
 	KeyValues *pSub );
 
 
@@ -65,7 +65,7 @@ bool IncrementalUpdateTree(
 	vgui::TreeView *pTree, 
 	KeyValues *pValues,
 	UpdateItemStateFn fn,
-	int iRoot = -1
+	intp iRoot = -1
 	);
 
 

@@ -413,7 +413,7 @@ void VGui_RecursivePrintTree(
 
 bool UpdateItemState(
 	vgui::TreeView *pTree, 
-	int iChildItemId, 
+	intp iChildItemId, 
 	KeyValues *pSub )
 {
 	bool bRet = false;
@@ -491,8 +491,8 @@ bool WillPanelBeVisible( vgui::VPANEL hPanel )
 void VGui_AddPopupsToKeyValues( KeyValues *pCurrentParent )
 {
 	// 'twould be nice if we could get the Panel* from the VPANEL, but we can't.
-	int count = vgui::surface()->GetPopupCount();
-	for ( int i=0; i < count; i++ )
+	intp count = vgui::surface()->GetPopupCount();
+	for ( intp i=0; i < count; i++ )
 	{
 		vgui::VPANEL vPopup = vgui::surface()->GetPopup( i );
 		if ( vgui_drawtree_hidden.GetInt() || WillPanelBeVisible( vPopup ) )

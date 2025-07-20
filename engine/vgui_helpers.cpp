@@ -40,14 +40,14 @@ void CConVarCheckButton::SetSelected( bool state )
 
 void IncrementalUpdateTree_R( 
 	vgui::TreeView *pTree, 
-	int iCurTreeNode,
+	intp iCurTreeNode,
 	KeyValues *pValues,
 	bool &bChanges,
 	UpdateItemStateFn fn )
 {
 	// Add new items.
-	int iCurChild = 0;
-	int nChildren = pTree->GetNumChildren( iCurTreeNode );
+	intp iCurChild = 0;
+	intp nChildren = pTree->GetNumChildren( iCurTreeNode );
 	KeyValues *pSub = pValues->GetFirstSubKey();
 
 	while ( iCurChild < nChildren || pSub )
@@ -61,7 +61,7 @@ void IncrementalUpdateTree_R(
 				if ( iCurChild < nChildren )
 				{
 					// Compare the items here.
-					int iChildItemId = pTree->GetChild( iCurTreeNode, iCurChild );
+					intp iChildItemId = pTree->GetChild( iCurTreeNode, iCurChild );
 					
 					if ( fn( pTree, iChildItemId, pSub ) )
 						bChanges = true;
@@ -72,7 +72,7 @@ void IncrementalUpdateTree_R(
 				{
 					// This means that the KeyValues has an extra node..
 					bChanges = true;
-					int iChildItemId = pTree->AddItem( pSub, iCurTreeNode );
+					intp iChildItemId = pTree->AddItem( pSub, iCurTreeNode );
 					
 					if ( fn( pTree, iChildItemId, pSub ) )
 						bChanges = true;
@@ -88,7 +88,7 @@ void IncrementalUpdateTree_R(
 		else
 		{
 			// This means that the tree view has extra ones at the end. Get rid of them.
-			int iChildItemId = pTree->GetChild( iCurTreeNode, iCurChild );
+			intp iChildItemId = pTree->GetChild( iCurTreeNode, iCurChild );
 			--nChildren;
 			bChanges = true;
 
@@ -105,7 +105,7 @@ bool IncrementalUpdateTree(
 	vgui::TreeView *pTree, 
 	KeyValues *pValues,
 	UpdateItemStateFn fn,
-	int iRoot )
+	intp iRoot )
 {
 	if ( iRoot == -1 )
 	{
