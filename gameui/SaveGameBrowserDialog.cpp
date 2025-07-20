@@ -1281,7 +1281,7 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 	CUtlVector<SaveGameDescription_t> saveGames;
 
 	// Get the search path
-	char szDirectory[_MAX_PATH];
+	char szDirectory[MAX_PATH];
 	Q_snprintf( szDirectory, sizeof( szDirectory ), "%s/*", SAVE_DIR );
 
 	Q_DefaultExtension( szDirectory, ".sav", sizeof( szDirectory ) );
@@ -1298,7 +1298,7 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 			continue;
 		}
 
-		char szFileName[_MAX_PATH];
+		char szFileName[MAX_PATH];
 		Q_snprintf(szFileName, sizeof( szFileName ), "%s/%s", SAVE_DIR, pFileName);
 
 		Q_FixSlashes( szFileName );

@@ -91,7 +91,7 @@ public:
 	void SetCommentaryInfo( CommentaryItem_t &item )
 	{
 		// set the bitmap to display
-		char tga[_MAX_PATH];
+		char tga[MAX_PATH];
 		V_strcpy_safe( tga, item.szMapFileName );
 		char *ext = strstr( tga, ".sav" );
 		if ( ext )
@@ -269,7 +269,7 @@ intp CLoadCommentaryDialog::GetSelectedItemIndex()
 void CLoadCommentaryDialog::ScanCommentaryFiles()
 {
 	// populate list box with all saved games on record:
-	char	szDirectory[_MAX_PATH];
+	char	szDirectory[MAX_PATH];
 	Q_snprintf( szDirectory, sizeof( szDirectory ), "maps/*commentary.txt" );
 
 	// clear the current list
@@ -281,7 +281,7 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 	const char *pFileName = g_pFullFileSystem->FindFirst( szDirectory, &handle );
 	while (pFileName)
 	{
-		char szFileName[_MAX_PATH];
+		char szFileName[MAX_PATH];
 		Q_snprintf(szFileName, sizeof( szFileName ), "maps/%s", pFileName);
 
 		// Only load save games from the current mod's save dir
@@ -373,7 +373,7 @@ void CLoadCommentaryDialog::ParseCommentaryFile( char const *pszFileName, char c
 		CommentaryItem_t item;
 		V_strcpy_safe( item.szMapFileName, pszFileName );
 
-		char mapname[_MAX_PATH];
+		char mapname[MAX_PATH];
 		V_strcpy_safe( mapname, pszFileName );
 		char *ext = strstr( mapname, "_commentary" );
 		if ( !ext )

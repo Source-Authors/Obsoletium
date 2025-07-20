@@ -64,7 +64,7 @@ CChangeGameDialog::~CChangeGameDialog()
 void CChangeGameDialog::LoadModList()
 {
 	// look for third party games
-	char szSearchPath[_MAX_PATH + 5];
+	char szSearchPath[MAX_PATH + 5];
 	Q_strncpy(szSearchPath, "*.*", sizeof( szSearchPath ) );
 
 	// use local filesystem since it has to look outside path system, and will never be used under steam

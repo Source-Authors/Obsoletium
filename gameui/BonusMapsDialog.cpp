@@ -94,7 +94,7 @@ public:
 	void SetBonusMapInfo( const char *pCurrentPath, BonusMapDescription_t &map )
 	{
 		// set the image to display
-		char szImageFileName[_MAX_PATH];
+		char szImageFileName[MAX_PATH];
 
 		bool bIsTGA = false;
 
@@ -124,7 +124,7 @@ public:
 			if ( map.szImageName[ 0 ] == '\0' )
 			{
 				// Didn't specify an image name, so pair it with the name of this file
-				char szImpliedTgaName[_MAX_PATH];
+				char szImpliedTgaName[MAX_PATH];
 				V_sprintf_safe( szImpliedTgaName, "%s.tga", map.szMapFileName );
 				bIsTGA = ConstructFullImagePath( pCurrentPath, szImpliedTgaName, szImageFileName );
 
@@ -335,8 +335,8 @@ void CBonusMapsDialog::BuildMapsList( void )
 	SetControlEnabled( "ImportBonusMaps", bIsRoot );
 	SetControlVisible( "ImportBonusMaps", bIsRoot );
 
-	char szDisplayPath[_MAX_PATH];
-	Q_snprintf( szDisplayPath, _MAX_PATH, "%s/", BonusMapsDatabase()->GetPath() );
+	char szDisplayPath[MAX_PATH];
+	Q_snprintf( szDisplayPath, MAX_PATH, "%s/", BonusMapsDatabase()->GetPath() );
 
 	SetControlString( "FileName", szDisplayPath );
 	SetControlString( "CommentLabel", "" );
