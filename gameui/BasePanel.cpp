@@ -91,10 +91,10 @@ using namespace vgui;
 ConVar vgui_message_dialog_modal( "vgui_message_dialog_modal", "1", FCVAR_ARCHIVE );
 
 extern vgui::DHANDLE<CLoadingDialog> g_hLoadingDialog;
-static CBasePanel	*g_pBasePanel = NULL;
+static CBasePanel	*g_pBasePanel = nullptr;
 static float		g_flAnimationPadding = 0.01f;
 
-extern const char *COM_GetModDirectory( void );
+extern const char *COM_GetModDirectory();
 
 extern bool bSteamCommunityFriendsVersion;
 
@@ -184,9 +184,6 @@ public:
 	void ApplySchemeSettings(IScheme *pScheme) override
 	{
 		BaseClass::ApplySchemeSettings(pScheme);
-
-		// dimhotepus: Large screens friendly menu.
-		// SetProportional(true);
 
 		// dimhotepus: Large screens friendly menu.
 		const int menuItemHeight = scheme()->GetProportionalScaledValueEx
@@ -369,7 +366,7 @@ public:
 		BaseClass::OnKeyCodePressed( code );
 
 		// HACK: Allow F key bindings to operate even here
-		if ( IsPC() && code >= KEY_F1 && code <= KEY_F12 )
+		if ( code >= KEY_F1 && code <= KEY_F12 )
 		{
 			// See if there is a binding for the FKey
 			const char *binding = gameuifuncs->GetBindingForButtonCode( code );
@@ -377,7 +374,7 @@ public:
 			{
 				// submit the entry as a console commmand
 				char szCommand[256];
-				Q_strncpy( szCommand, binding, sizeof( szCommand ) );
+				V_strcpy_safe( szCommand, binding );
 				engine->ClientCmd_Unrestricted( szCommand );
 			}
 		}
@@ -425,7 +422,7 @@ public:
 
 	void UpdateMenuItemState( bool isInGame, bool isMultiplayer, bool isInReplay, bool isVREnabled, bool isVRActive )
 	{
-		bool isSteam = IsPC() && ( CommandLine()->FindParm("-steam") != 0 );
+		bool isSteam = CommandLine()->FindParm("-steam") != 0;
 
 		// disabled save button if we're not in a game
 		for (int i = 0; i < GetChildCount(); i++)
@@ -1168,10 +1165,10 @@ CGameMenu *CBasePanel::RecursiveLoadGameMenu(KeyValues *datafile)
 	CGameMenu *menu = new CGameMenu(this, datafile->GetName());
 
 	// loop through all the data adding items to the menu
-	for (KeyValues *dat = datafile->GetFirstSubKey(); dat != NULL; dat = dat->GetNextKey())
+	for (auto *dat = datafile->GetFirstSubKey(); dat != NULL; dat = dat->GetNextKey())
 	{
 		const char *label = dat->GetString("label", "<unknown>");
-		const char *cmd = dat->GetString("command", NULL);
+		const char *cmd = dat->GetString("command", nullptr);
 		const char *name = dat->GetString("name", label);
 
 		if ( cmd && !Q_stricmp( cmd, "OpenFriendsDialog" ) && bSteamCommunityFriendsVersion )
@@ -1479,8 +1476,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "OpenAchievementsDialog" ) )
 	{
-		if ( IsPC() )
-		{
 #ifndef NO_STEAM
 			if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
 			{
@@ -1491,7 +1486,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 #endif
 			OnOpenAchievementsDialog();
 		}
-	}
     //=============================================================================
     // HPE_BEGIN:
     // [dwenger] Use cs-specific achievements dialog
@@ -1499,8 +1493,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 
     else if ( !Q_stricmp( command, "OpenCSAchievementsDialog" ) )
     {
-        if ( IsPC() )
-        {
             if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
             {
                 vgui::MessageBox *pMessageBox = new vgui::MessageBox("#GameUI_Achievements_SteamRequired_Title", "#GameUI_Achievements_SteamRequired_Message", this );
@@ -1510,7 +1502,6 @@ void CBasePanel::RunMenuCommand(const char *command)
 
 			OnOpenCSAchievementsDialog();
         }
-    }
     //=============================================================================
     // HPE_END
     //=============================================================================
