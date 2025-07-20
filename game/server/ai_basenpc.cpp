@@ -12995,14 +12995,14 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 
 				// Origin
 				const char *pszOrigin = pkvNode->GetString( "origin_relative", "0 0 0" );
-				UTIL_StringToVector( sInteraction.vecRelativeOrigin.Base(), pszOrigin );
+				UTIL_StringToVector( sInteraction.vecRelativeOrigin, pszOrigin );
 
 				// Angles
 				const char *pszAngles = pkvNode->GetString( "angles_relative", NULL );
 				if ( pszAngles )
 				{
 					sInteraction.iFlags |= SCNPC_FLAG_TEST_OTHER_ANGLES;
-					UTIL_StringToVector( sInteraction.angRelativeAngles.Base(), pszAngles );
+					UTIL_StringToVector( sInteraction.angRelativeAngles, pszAngles );
 				}
 
 				// Velocity 
@@ -13010,7 +13010,7 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 				if ( pszVelocity )
 				{
 					sInteraction.iFlags |= SCNPC_FLAG_TEST_OTHER_VELOCITY;
-					UTIL_StringToVector( sInteraction.vecRelativeVelocity.Base(), pszVelocity );
+					UTIL_StringToVector( sInteraction.vecRelativeVelocity, pszVelocity );
 				}
 
 				// Entry Sequence

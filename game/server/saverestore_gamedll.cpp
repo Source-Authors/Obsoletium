@@ -77,8 +77,11 @@ bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, c
 
 			case FIELD_POSITION_VECTOR:
 			case FIELD_VECTOR:
-				UTIL_StringToVector( (float *)((char *)pObject + fieldOffset), szValue );
+			{
+				const float *vec = (float *)((char *)pObject + fieldOffset);
+				UTIL_StringToVector( Vector( *vec, *(vec + 1), *(vec + 2) ), szValue );
 				return true;
+			}
 
 			case FIELD_VMATRIX:
 			case FIELD_VMATRIX_WORLDSPACE:

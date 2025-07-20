@@ -725,7 +725,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 			{
 				QAngle angles;
 				Assert( objectIndex >= 0 && objectIndex < RAGDOLL_MAX_ELEMENTS );
-				UTIL_StringToVector( angles.Base(), szToken );
+				UTIL_StringToVector( angles, szToken );
 				int boneIndex = m_ragdoll.boneIndex[objectIndex];
 				AngleMatrix( angles, pBoneToWorld[boneIndex] );
 				const ragdollelement_t &element = m_ragdoll.list[objectIndex];

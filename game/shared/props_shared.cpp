@@ -549,7 +549,7 @@ public:
 		}
 		else if ( !strcmpi( pKey, "offset" ) )
 		{
-			UTIL_StringToVector( pModel->offset.Base(), pValue );
+			UTIL_StringToVector( pModel->offset, pValue );
 		}
 		else if ( !strcmpi( pKey, "health" ) )
 		{
@@ -603,7 +603,7 @@ public:
 		}
 		else if ( !strcmpi( pKey, "velocity" ) )
 		{
-			UTIL_StringToVector( pModel->velocity.Base(), pValue );
+			UTIL_StringToVector( pModel->velocity, pValue );
 		}
 	}
 	virtual void SetDefaults( void *pData ) 

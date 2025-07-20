@@ -1445,12 +1445,12 @@ void UTIL_AxisStringToPointPoint( Vector &start, Vector &end, const char *pStrin
 	{
 		if ( i == 0 )
 		{
-			UTIL_StringToVector( start.Base(), pVec );
+			UTIL_StringToVector( start, pVec );
 			i++;
 		}
 		else
 		{
-			UTIL_StringToVector( end.Base(), pVec );
+			UTIL_StringToVector( end, pVec );
 		}
 		pVec = strtok( NULL, "," );
 	}

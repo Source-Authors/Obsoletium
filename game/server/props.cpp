@@ -2828,7 +2828,7 @@ bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 			char const *pszBase = pkvPropData->GetString( pKeyName );
 			if ( pszBase && pszBase[0] )
 			{
-				UTIL_StringToVector( vecAngles.Base(), pszBase );
+				UTIL_StringToVector( vecAngles, pszBase );
 				return true;
 			}
 		}

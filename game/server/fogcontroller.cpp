@@ -213,7 +213,7 @@ void CFogController::InputSetAngles( inputdata_t &inputdata )
 	const char *pAngles = inputdata.value.String();
 
 	QAngle angles;
-	UTIL_StringToVector( angles.Base(), pAngles );
+	UTIL_StringToVector( angles, pAngles );
 
 	Vector vTemp;
 	AngleVectors( angles, &vTemp );
