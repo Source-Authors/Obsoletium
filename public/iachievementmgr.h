@@ -18,16 +18,16 @@ class CBaseAchievement;
 abstract_class IAchievement
 {
 public:
-	virtual int GetAchievementID() = 0;
+	virtual int GetAchievementID() const = 0;
 	virtual const char *GetName() = 0;
-	virtual int GetFlags() = 0;
-	virtual int GetGoal() = 0;
-	virtual int GetCount() = 0;
-	virtual bool IsAchieved() = 0;
-	virtual int GetPointValue() = 0;
-	virtual bool ShouldSaveWithGame() = 0;
-	virtual bool ShouldHideUntilAchieved() = 0;
-	virtual bool ShouldShowOnHUD() = 0;
+	virtual int GetFlags() const = 0;
+	virtual int GetGoal() const = 0;
+	virtual int GetCount() const = 0;
+	virtual bool IsAchieved() const = 0;
+	virtual int GetPointValue() const = 0;
+	virtual bool ShouldSaveWithGame() const = 0;
+	virtual bool ShouldHideUntilAchieved() const = 0;
+	virtual bool ShouldShowOnHUD() const = 0;
 	virtual void SetShowOnHUD( bool bShow ) = 0;
 };
 
@@ -35,9 +35,9 @@ public:
 abstract_class IAchievementMgr
 {
 public:
-	virtual IAchievement* GetAchievementByIndex( int index ) = 0;
+	virtual IAchievement* GetAchievementByIndex( intp index ) = 0;
 	virtual CBaseAchievement* GetAchievementByID ( int id ) = 0;
-	virtual int GetAchievementCount() = 0;
+	virtual intp GetAchievementCount() const = 0;
 	virtual void InitializeAchievements() = 0;
 	virtual void AwardAchievement( int iAchievementID ) = 0;
 	virtual void OnMapEvent( const char *pchEventName ) = 0;
