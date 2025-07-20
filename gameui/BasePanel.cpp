@@ -1747,14 +1747,14 @@ static unsigned PanelJobWrapperFn( void *pvContext )
 	
 	pAsync->ExecuteAsync();
 
-	float const flElapsedTime = Plat_FloatTime() - flTimeStart;
+	double const flElapsedTime = Plat_FloatTime() - flTimeStart;
 
 	if ( flElapsedTime < pAsync->m_flLeastExecuteTime )
 	{
-		ThreadSleep( ( pAsync->m_flLeastExecuteTime - flElapsedTime ) * 1000 );
+		ThreadSleep( static_cast<unsigned>( ( pAsync->m_flLeastExecuteTime - flElapsedTime ) * 1000 ) );
 	}
 
-	ReleaseThreadHandle( ( ThreadHandle_t ) static_cast<void *>( pAsync->m_hThreadHandle ) );
+	ReleaseThreadHandle( static_cast<ThreadHandle_t>( static_cast<void*>( pAsync->m_hThreadHandle ) ) );
 	pAsync->m_hThreadHandle = NULL;
 
 	return 0;
@@ -1842,16 +1842,18 @@ class CAsyncCtxOnDeviceAttached : public CBasePanel::CAsyncJobContext
 public:
 	CAsyncCtxOnDeviceAttached();
 	~CAsyncCtxOnDeviceAttached();
-	virtual void ExecuteAsync();
-	virtual void Completed();
-	uint GetContainerOpenResult( void ) { return m_ContainerOpenResult; }
+
+	void ExecuteAsync() override;
+	void Completed() override;
+
+	uint GetContainerOpenResult() const { return m_ContainerOpenResult; }
 
 private:
 	uint m_ContainerOpenResult;
 };
 
 CAsyncCtxOnDeviceAttached::CAsyncCtxOnDeviceAttached() :
-	CBasePanel::CAsyncJobContext( 3.0f ),	// Storage device info for at least 3 seconds
+	CBasePanel::CAsyncJobContext( 3.0 ),	// Storage device info for at least 3 seconds
 	m_ContainerOpenResult( ERROR_SUCCESS )
 {
 	BasePanel()->ShowMessageDialog( MD_CHECKING_STORAGE_DEVICE );

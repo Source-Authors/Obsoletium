@@ -174,7 +174,9 @@ public:
 	class CAsyncJobContext
 	{
 	public:
-		CAsyncJobContext( float flLeastExecuteTime = 0.0f ) : m_hThreadHandle( NULL ), m_flLeastExecuteTime( flLeastExecuteTime ) {}
+		// dimhotepus: float -> double.
+		explicit CAsyncJobContext( double flLeastExecuteTime = 0.0 )
+			: m_hThreadHandle( NULL ), m_flLeastExecuteTime( flLeastExecuteTime ) {}
 		virtual ~CAsyncJobContext() {}
 
 		virtual void ExecuteAsync() = 0;		// Executed on the secondary thread
@@ -182,7 +184,8 @@ public:
 
 	public:
 		CInterlockedPtr<void> m_hThreadHandle;		// Handle to an async job thread waiting for
-		float m_flLeastExecuteTime;				// Least amount of time this job should keep executing
+		// dimhotepus: float -> double.
+		double m_flLeastExecuteTime;				// Least amount of time this job should keep executing
 	};
 
 	CAsyncJobContext *m_pAsyncJob;
@@ -375,13 +378,9 @@ private:
 
 	void						DrawBackgroundImage();
 	int							m_iBackgroundImageID;
-	int							m_iRenderTargetImageID;
 	int							m_iLoadingImageID;
-	int							m_iProductImageID;
 	bool						m_bLevelLoading;
 	bool						m_bEverActivated;
-	bool						m_bCopyFrameBuffer;
-	bool						m_bUseRenderTargetImage;
 	int							m_ExitingFrameCount;
 	bool						m_bXUIVisible;
 	bool						m_bUseMatchmaking;
@@ -409,9 +408,6 @@ private:
 	bool m_bRenderingBackgroundTransition;
 	float m_flTransitionStartTime;
 	float m_flTransitionEndTime;
-
-	// Used for rich presence updates on xbox360
-	bool m_bSinglePlayer;
 
 	// background fill transition
 	bool m_bHaveDarkenedBackground;
