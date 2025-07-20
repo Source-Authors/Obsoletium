@@ -275,9 +275,9 @@ void CAchievementsDialog_XBox::ApplySettings( KeyValues *pResourceData )
 
 	achievementmgr->EnsureGlobalStateLoaded();
 
-	int iAllAchievements = achievementmgr->GetAchievementCount();
+	intp iAllAchievements = achievementmgr->GetAchievementCount();
 	
-	for ( int i = 0; i < iAllAchievements; ++i )
+	for ( intp i = 0; i < iAllAchievements; ++i )
 	{		
 		IAchievement* pCurAchievement = (IAchievement*)achievementmgr->GetAchievementByIndex( i );
 		Assert ( pCurAchievement );
@@ -405,8 +405,8 @@ CAchievementsDialog::CAchievementsDialog(vgui::Panel *parent) : BaseClass(parent
 	Assert ( achievementmgr );
 	if ( achievementmgr )
 	{
-		int iCount = achievementmgr->GetAchievementCount();
-		for ( int i = 0; i < iCount; ++i )
+		intp iCount = achievementmgr->GetAchievementCount();
+		for ( intp i = 0; i < iCount; ++i )
 		{		
 			IAchievement* pCur = achievementmgr->GetAchievementByIndex( i );
 
@@ -579,8 +579,8 @@ void CAchievementsDialog::UpdateAchievementList()
 		{
 			CUtlSortVector<IAchievement*, CAchievementsLess> achievements;
 
-			int iCount = achievementmgr->GetAchievementCount();
-			for ( int i = 0; i < iCount; ++i )
+			intp iCount = achievementmgr->GetAchievementCount();
+			for ( intp i = 0; i < iCount; ++i )
 			{		
 				IAchievement* pCur = achievementmgr->GetAchievementByIndex( i );
 
@@ -811,18 +811,16 @@ void CAchievementsDialog::UpdateAchievementDialogInfo( void )
 	// update the groups and overall progress bar
 	if ( achievementmgr )
 	{
-		int i;
-
 		// reset group completed counts
-		for ( i=0;i<m_iNumAchievementGroups;i++ )
+		for ( int i=0;i<m_iNumAchievementGroups;i++ )
 		{
 			m_AchievementGroups[i].m_iNumUnlocked = 0;
 		}
 
-		int iAchievementCount = achievementmgr->GetAchievementCount();
+		intp iAchievementCount = achievementmgr->GetAchievementCount();
 
 		// update counts for each achieved achievement
-		for ( i=0;i<iAchievementCount;i++ )
+		for ( intp i=0;i<iAchievementCount;i++ )
 		{
 			IAchievement* pCurAchievement = achievementmgr->GetAchievementByIndex( i );
 
