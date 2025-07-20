@@ -144,7 +144,7 @@ bool CVGuiSystemModuleLoader::LoadPlatformModules(CreateInterfaceFn *factorylist
 
 		// get copy out of steam cache
 		const char *dllPath = NULL;
-		if ( IsOSX() )
+		if ( IsOSX() ) //-V517
 		{
 			dllPath = it->GetString("dll_osx");
 		}
