@@ -462,7 +462,7 @@ void CSaveGameBrowserDialog::UpdateMenuComponents( EScrollDirection dir )
 //-----------------------------------------------------------------------------
 // Purpose: sets a chapter as selected
 //-----------------------------------------------------------------------------
-void CSaveGameBrowserDialog::SetSelectedSaveIndex( int index )
+void CSaveGameBrowserDialog::SetSelectedSaveIndex( intp index )
 {
 	m_iSelectedSave = index;
 
@@ -471,7 +471,7 @@ void CSaveGameBrowserDialog::SetSelectedSaveIndex( int index )
 		return;
 
 	// Setup panels to the left of the selected panel
-	int currIdx = index;
+	intp currIdx = index;
 	for ( int i = SLOT_CENTER; i >= 0 && currIdx >= 0; --i )
 	{
 		m_PanelIndex[i] = currIdx;
@@ -868,7 +868,7 @@ bool CSaveGameBrowserDialog::IsValidPanel( const intp idx )
 //-----------------------------------------------------------------------------
 // Purpose: Sets up a panel's properties before it is displayed
 //-----------------------------------------------------------------------------
-void CSaveGameBrowserDialog::InitPanelIndexForDisplay( const int idx )
+void CSaveGameBrowserDialog::InitPanelIndexForDisplay( const intp idx )
 {
 	CGameSavePanel *panel = m_SavePanels[ m_PanelIndex[idx] ];
 	if ( panel )
@@ -1156,7 +1156,7 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 
 	save->iSize = g_pFullFileSystem->Size( fh );
 
-	int readok = SaveReadNameAndComment( fh, szMapName, sizeof(szMapName), szComment, sizeof(szComment) );
+	int readok = SaveReadNameAndComment( fh, szMapName, szComment );
 	g_pFullFileSystem->Close(fh);
 
 	if ( !readok )
