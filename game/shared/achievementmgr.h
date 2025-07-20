@@ -54,8 +54,8 @@ public:
 	void OnMapEvent( const char *pchEventName );
 	
 	// Interfaces exported to other dlls for achievement list queries
-	IAchievement* GetAchievementByIndex( int index );
-	int GetAchievementCount();
+	IAchievement* GetAchievementByIndex( intp index ) override;
+	intp GetAchievementCount() const override;
 
 	CBaseAchievement *GetAchievementByID( int iAchievementID );
 	CUtlMap<int, CBaseAchievement *> &GetAchievements() { return m_mapAchievement; }
@@ -136,8 +136,6 @@ private:
 		CBaseAchievement *pAchievement;
 	};
 	CUtlVector<achievementthink_t> m_vecThinkListeners;					// vector of achievements that are actively thinking
-
-	float m_flLevelInitTime;
 
 	float m_flLastClassChangeTime;		// Time when player last changed class
 	float m_flTeamplayStartTime;		// Time when player joined a non-spectating team.  Not updated if she switches game teams; cleared if she joins spectator

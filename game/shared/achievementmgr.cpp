@@ -94,7 +94,7 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
 		return;
 #endif
 
-	char szFilename[_MAX_PATH];
+	char szFilename[MAX_PATH];
 
 	if ( IsX360() )
 	{
@@ -456,8 +456,8 @@ void CAchievementMgr::Update( float frametime )
 #endif
 
 	// Call think functions. Work backwards, because we may remove achievements from the list.
-	int iCount = m_vecThinkListeners.Count();
-	for ( int i = iCount-1; i >= 0; i-- )
+	intp iCount = m_vecThinkListeners.Count();
+	for ( intp i = iCount-1; i >= 0; i-- )
 	{
 		if ( m_vecThinkListeners[i].m_flThinkTime < gpGlobals->curtime )
 		{
@@ -544,8 +544,6 @@ void CAchievementMgr::LevelInitPreEntity()
 			pAchievement->ListenForEvents();
 		}
 	}
-
-	m_flLevelInitTime = gpGlobals->curtime;
 }
 
 
@@ -730,7 +728,7 @@ void CAchievementMgr::LoadGlobalState()
 #endif
 	}
 
-	char	szFilename[_MAX_PATH];
+	char	szFilename[MAX_PATH];
 
 	if ( IsX360() )
 	{
@@ -1610,10 +1608,10 @@ void CAchievementMgr::OnMapEvent( const char *pchEventName )
 // Input  : index - 
 // Output : IBaseAchievement*
 //-----------------------------------------------------------------------------
-IAchievement* CAchievementMgr::GetAchievementByIndex( int index )
+IAchievement* CAchievementMgr::GetAchievementByIndex( intp index )
 {
 	Assert( m_vecAchievement.IsValidIndex(index) );
-	return (IAchievement*)m_vecAchievement[index];
+	return m_vecAchievement[index];
 }
 
 //-----------------------------------------------------------------------------
@@ -1621,7 +1619,7 @@ IAchievement* CAchievementMgr::GetAchievementByIndex( int index )
 // Input  :  - 
 // Output : Count of achievements in manager's vector.
 //-----------------------------------------------------------------------------
-int CAchievementMgr::GetAchievementCount()
+intp CAchievementMgr::GetAchievementCount() const
 {
 	return m_vecAchievement.Count();
 }
@@ -1771,8 +1769,8 @@ void CAchievementMgr::ResetAchievement_Internal( CBaseAchievement *pAchievement 
 void CAchievementMgr::SetAchievementThink( CBaseAchievement *pAchievement, float flThinkTime )
 {
 	// Is the achievement already in the think list?
-	int iCount = m_vecThinkListeners.Count();
-	for ( int i = 0; i < iCount; i++ )
+	intp iCount = m_vecThinkListeners.Count();
+	for ( intp i = 0; i < iCount; i++ )
 	{
 		if ( m_vecThinkListeners[i].pAchievement == pAchievement )
 		{
@@ -1930,8 +1928,8 @@ CON_COMMAND_F( achievement_unlock_all, "Unlocks all achievements", FCVAR_CHEAT )
 	if ( !pAchievementMgr )
 		return;
 
-	int iCount = pAchievementMgr->GetAchievementCount();
-	for ( int i = 0; i < iCount; i++ )
+	intp iCount = pAchievementMgr->GetAchievementCount();
+	for ( intp i = 0; i < iCount; i++ )
 	{
 		IAchievement *pAchievement = pAchievementMgr->GetAchievementByIndex( i );
 		if ( !pAchievement->IsAchieved() )
