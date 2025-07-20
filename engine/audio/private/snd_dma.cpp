@@ -3582,7 +3582,7 @@ bool DAS_UpdateRoomSize( das_room_t *proom )
 			// ignore horizontal sky hits for distance calculations
 			surfdata.dist = 1.0;
 		else
-			surfdata.dist = surfdata.dist; // debug
+			surfdata.dist = surfdata.dist; // debug //-V570
 	}
 
 	// get length of trace if it hit world
