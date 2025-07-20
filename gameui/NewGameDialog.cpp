@@ -30,8 +30,6 @@
 #include "vgui_controls/BitmapImagePanel.h"
 #include "BonusMapsDatabase.h"
 
-#include <stdio.h>
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -122,7 +120,7 @@ class CGameChapterPanel : public vgui::EditablePanel
 	Color m_SelectedColor;
 	Color m_FillColor;
 
-	char m_szConfigFile[_MAX_PATH];
+	char m_szConfigFile[MAX_PATH];
 	char m_szChapter[32];
 
 	bool m_bTeaserChapter;
@@ -328,8 +326,7 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 
 	{
 		FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
-		const char *fileName = "cfg/chapter*.cfg";
-		fileName = g_pFullFileSystem->FindFirst( fileName, &findHandle );
+		const char *fileName = g_pFullFileSystem->FindFirst( "cfg/chapter*.cfg", &findHandle );
 		while ( fileName && chapterIndex < MAX_CHAPTERS )
 		{
 			if ( fileName[0] )
@@ -461,7 +458,7 @@ void CNewGameDialog::Activate( void )
 	const char *unlockedChapter = var.IsValid() ? var.GetString() : "1";
 	int iUnlockedChapter = atoi(unlockedChapter);
 
-	for ( int i = 0; i < m_ChapterPanels.Count(); i++)
+	for ( intp i = 0; i < m_ChapterPanels.Count(); i++)
 	{
 		CGameChapterPanel *pChapterPanel = m_ChapterPanels[ i ];
 
@@ -609,7 +606,7 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		BonusMapDescription_t *pAdvancedDescription = NULL;
 
 		// Find the bonus description for this panel
-		for ( int iBonus = 0; iBonus < BonusMapsDatabase()->BonusCount(); ++iBonus )
+		for ( intp iBonus = 0; iBonus < BonusMapsDatabase()->BonusCount(); ++iBonus )
 		{
 			pAdvancedDescription = BonusMapsDatabase()->GetBonusData( iBonus );
 			if ( Q_stricmp( szMapAdvancedName, pAdvancedDescription->szMapFileName ) == 0 )
@@ -711,20 +708,13 @@ void CNewGameDialog::UpdateBonusSelection( void )
 //-----------------------------------------------------------------------------
 // Purpose: sets a chapter as selected
 //-----------------------------------------------------------------------------
-void CNewGameDialog::SetSelectedChapterIndex( int index )
+void CNewGameDialog::SetSelectedChapterIndex( intp index )
 {
 	m_iSelectedChapter = index;
 
-	for (int i = 0; i < m_ChapterPanels.Count(); i++)
+	for (intp i = 0; i < m_ChapterPanels.Count(); i++)
 	{
-		if ( i == index )
-		{
-			m_ChapterPanels[i]->SetSelected( true );
-		}
-		else
-		{
-			m_ChapterPanels[i]->SetSelected( false );
-		}
+		m_ChapterPanels[i]->SetSelected( i == index );
 	}
 
 	if ( m_pPlayButton )
@@ -744,7 +734,7 @@ void CNewGameDialog::SetSelectedChapterIndex( int index )
 
 	// Setup panels to the right of the selected panel
 	currIdx = index + 1;
-	for ( int i = selectedSlot + 1; i < NUM_SLOTS && currIdx < m_ChapterPanels.Count(); ++i )
+	for ( intp i = selectedSlot + 1; i < NUM_SLOTS && currIdx < m_ChapterPanels.Count(); ++i )
 	{
 		m_PanelIndex[i] = currIdx;
 		++currIdx;
@@ -760,7 +750,7 @@ void CNewGameDialog::SetSelectedChapterIndex( int index )
 void CNewGameDialog::SetSelectedChapter( const char *chapter )
 {
 	Assert( chapter );
-	for (int i = 0; i < m_ChapterPanels.Count(); i++)
+	for (intp i = 0; i < m_ChapterPanels.Count(); i++)
 	{
 		if ( chapter && !Q_stricmp(m_ChapterPanels[i]->GetChapter(), chapter) )
 		{
@@ -817,7 +807,7 @@ void CNewGameDialog::UpdatePanelLockedStatus( int iUnlockedChapter, int i, CGame
 //-----------------------------------------------------------------------------
 void CNewGameDialog::PreScroll( EScrollDirection dir )
 {
-	int hideIdx = INVALID_INDEX;
+	intp hideIdx = INVALID_INDEX;
 	if ( dir == SCROLL_LEFT )
 	{
 		hideIdx = m_PanelIndex[SLOT_LEFT];
@@ -839,7 +829,7 @@ void CNewGameDialog::PreScroll( EScrollDirection dir )
 //-----------------------------------------------------------------------------
 void CNewGameDialog::PostScroll( EScrollDirection dir )
 {
-	int index = INVALID_INDEX;
+	intp index = INVALID_INDEX;
 	if ( dir == SCROLL_LEFT )
 	{
 		index = m_PanelIndex[SLOT_RIGHT];
@@ -1014,7 +1004,7 @@ void CNewGameDialog::ShiftPanelIndices( int offset )
 //-----------------------------------------------------------------------------
 // Purpose: Validates an index into the selection panels vector
 //-----------------------------------------------------------------------------
-bool CNewGameDialog::IsValidPanel( const int idx )
+bool CNewGameDialog::IsValidPanel( const intp idx )
 {
 	if ( idx < 0 || idx >= m_ChapterPanels.Count() )
 		return false;
@@ -1024,7 +1014,7 @@ bool CNewGameDialog::IsValidPanel( const int idx )
 //-----------------------------------------------------------------------------
 // Purpose: Sets up a panel's properties before it is displayed
 //-----------------------------------------------------------------------------
-void CNewGameDialog::InitPanelIndexForDisplay( const int idx )
+void CNewGameDialog::InitPanelIndexForDisplay( const intp idx )
 {
 	CGameChapterPanel *panel = m_ChapterPanels[ m_PanelIndex[idx] ];
 	if ( panel )
@@ -1186,11 +1176,11 @@ void CNewGameDialog::OnKeyCodePressed( KeyCode code )
 	case STEAMCONTROLLER_DPAD_LEFT:
 		if ( !m_bScrolling )
 		{
-			for ( int i = 0; i < m_ChapterPanels.Count(); ++i )
+			for ( intp i = 0; i < m_ChapterPanels.Count(); ++i )
 			{
 				if ( m_ChapterPanels[ i ]->IsSelected() )
 				{
-					int nNewChapter = i - 1;
+					intp nNewChapter = i - 1;
 					if ( nNewChapter >= 0 )
 					{
 						if ( nNewChapter < m_PanelIndex[ SLOT_LEFT ] && m_PanelIndex[ SLOT_LEFT ] != -1 )
@@ -1215,7 +1205,7 @@ void CNewGameDialog::OnKeyCodePressed( KeyCode code )
 	case STEAMCONTROLLER_DPAD_RIGHT:
 		if ( !m_bScrolling )
 		{
-			for ( int i = 0; i < m_ChapterPanels.Count(); ++i )
+			for ( intp i = 0; i < m_ChapterPanels.Count(); ++i )
 			{
 				if ( m_ChapterPanels[ i ]->IsSelected() )
 				{

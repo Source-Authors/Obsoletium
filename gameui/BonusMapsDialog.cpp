@@ -341,10 +341,10 @@ void CBonusMapsDialog::BuildMapsList( void )
 	SetControlString( "FileName", szDisplayPath );
 	SetControlString( "CommentLabel", "" );
 
-	int iMapCount = BonusMapsDatabase()->BonusCount();
+	intp iMapCount = BonusMapsDatabase()->BonusCount();
 
 	// add to the list
-	for ( int iMapIndex = 0; iMapIndex < iMapCount && iMapIndex < MAX_LISTED_BONUS_MAPS; ++iMapIndex )
+	for ( intp iMapIndex = 0; iMapIndex < iMapCount && iMapIndex < MAX_LISTED_BONUS_MAPS; ++iMapIndex )
 	{
 		CBonusMapPanel *bonusMapPanel = new CBonusMapPanel( m_pGameList, "BonusMapPanel", iMapIndex );
 		bonusMapPanel->SetBonusMapInfo( BonusMapsDatabase()->GetPath(), *(BonusMapsDatabase()->GetBonusData( iMapIndex )) );
