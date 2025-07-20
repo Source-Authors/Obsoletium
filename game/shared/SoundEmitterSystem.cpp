@@ -194,7 +194,7 @@ public:
 		filesystem->CreateDirHierarchy("reslists", "DEFAULT_WRITE_PATH");
 
 		// open the new level reslist
-		char path[_MAX_PATH];
+		char path[MAX_PATH];
 		Q_snprintf(path, sizeof(path), "reslists\\%s.snd", gpGlobals->mapname.ToCStr() );
 		m_hPrecacheLogFile = filesystem->Open(path, "wt", "GAME");
 	}
@@ -315,7 +315,7 @@ public:
 #endif
 
 #if !defined( CLIENT_DLL )
-		for ( int i=soundemitterbase->First(); i != soundemitterbase->InvalidIndex(); i=soundemitterbase->Next( i ) )
+		for ( auto i=soundemitterbase->First(); i != soundemitterbase->InvalidIndex(); i=soundemitterbase->Next( i ) )
 		{
 			CSoundParametersInternal *pParams = soundemitterbase->InternalGetParametersForSound( i );
 			if ( pParams->ShouldPreload() )
@@ -373,7 +373,7 @@ public:
 		}
 	}
 
-	void InternalPrefetchWaves( int soundIndex )
+	void InternalPrefetchWaves( UtlHashHandle_t soundIndex )
 	{
 		CSoundParametersInternal *internal = soundemitterbase->InternalGetParametersForSound( soundIndex );
 		if ( !internal )
@@ -396,7 +396,7 @@ public:
 
 	HSOUNDSCRIPTHANDLE PrecacheScriptSound( const char *soundname )
 	{
-		int soundIndex = soundemitterbase->GetSoundIndex( soundname );
+		UtlHashHandle_t soundIndex = soundemitterbase->GetSoundIndex( soundname );
 		if ( !soundemitterbase->IsValidIndex( soundIndex ) )
 		{
 			if ( Q_stristr( soundname, ".wav" ) || Q_strstr( soundname, ".mp3" ) )
@@ -434,7 +434,7 @@ public:
 
 	void PrefetchScriptSound( const char *soundname )
 	{
-		int soundIndex = soundemitterbase->GetSoundIndex( soundname );
+		UtlHashHandle_t soundIndex = soundemitterbase->GetSoundIndex( soundname );
 		if ( !soundemitterbase->IsValidIndex( soundIndex ) )
 		{
 			if ( Q_stristr( soundname, ".wav" ) || Q_strstr( soundname, ".mp3" ) )
@@ -881,9 +881,7 @@ public:
 		if ( handle == SOUNDEMITTER_INVALID_HANDLE )
 			return;
 
-		CSoundParametersInternal *params;
-
-		params = soundemitterbase->InternalGetParametersForSound( (int)handle );
+		CSoundParametersInternal *params = soundemitterbase->InternalGetParametersForSound( handle );
 		if ( !params )
 		{
 			return;
@@ -1053,8 +1051,8 @@ CON_COMMAND_F( sv_findsoundname, "Find sound names which reference the specified
 	if ( args.ArgC() != 2 )
 		return;
 
-	int c = soundemitterbase->GetSoundCount();
-	int i;
+	intp c = soundemitterbase->GetSoundCount();
+	intp i;
 
 	char const *search = args[ 1 ];
 	if ( !search )
@@ -1133,7 +1131,7 @@ static int GamesoundCompletion( const char *partial, char commands[ COMMAND_COMP
 		substringLen = strlen(substring);
 	}
 	
-	for ( int i = soundemitterbase->GetSoundCount()-1; i >= 0 && current < COMMAND_COMPLETION_MAXITEMS; i-- )
+	for ( intp i = soundemitterbase->GetSoundCount()-1; i >= 0 && current < COMMAND_COMPLETION_MAXITEMS; i-- )
 	{
 		const char *pSoundName = soundemitterbase->GetSoundName( i );
 		if ( pSoundName )

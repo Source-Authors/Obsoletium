@@ -111,8 +111,8 @@ void CModelSoundsCache::PrecacheSoundList()
 //-----------------------------------------------------------------------------
 void CModelSoundsCache::FindOrAddScriptSound( CUtlVector< unsigned short >& sounds, char const *soundname )
 {
-	int soundindex = soundemitterbase->GetSoundIndex( soundname );
-	if ( soundindex != -1 )
+	UtlHashHandle_t soundindex = soundemitterbase->GetSoundIndex( soundname );
+	if ( soundindex != std::numeric_limits<UtlHashHandle_t>::max() )
 	{
 		// Only add it once per model...
 		if ( sounds.Find( soundindex ) == sounds.InvalidIndex() )
