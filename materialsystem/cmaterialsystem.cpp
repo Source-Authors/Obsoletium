@@ -4206,7 +4206,7 @@ public:
 		m_ImageData.EnsureCapacity( srcBufferSize );
 		Q_memcpy( m_ImageData.Base(), srcBits, srcBufferSize );
 	}
-	virtual ~CTextureBitsRegenerator() {}
+	~CTextureBitsRegenerator() {}
 
 	void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect ) override
 	{
