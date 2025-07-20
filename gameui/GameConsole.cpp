@@ -38,6 +38,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGameConsole, IGameConsole, GAMECONSOLE_INTERF
 CGameConsole::CGameConsole()
 {
 	m_bInitialized = false;
+	m_pConsole = nullptr;
 }
 
 //-----------------------------------------------------------------------------

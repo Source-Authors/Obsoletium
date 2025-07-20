@@ -138,6 +138,8 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGameUI, IGameUI, GAMEUI_INTERFACE_VERSION, g_
 CGameUI::CGameUI()
 {
 	g_pGameUI = this;
+	m_GameFactory = nullptr;
+	m_bPlayGameStartupSound = false;
 	m_bTryingToLoadFriends = false;
 	m_iFriendsLoadPauseFrames = 0;
 	m_iGameIP = 0;
@@ -145,6 +147,7 @@ CGameUI::CGameUI()
 	m_iGameQueryPort = 0;
 	m_bActivatedUI = false;
 	m_szPreviousStatusText[0] = 0;
+	m_szPlatformDir[0] = 0;
 	m_bHasSavedThisMenuSession = false;
 	m_bOpenProgressOnStart = false;
 }
