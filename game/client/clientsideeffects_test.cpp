@@ -187,6 +187,7 @@ class CBulletWhizTimer : public CAutoGameSystem
 public:
 	CBulletWhizTimer( char const *name ) : CAutoGameSystem( name )
 	{
+		m_nextWhizTime = FLT_MAX;
 	}
 
 	void LevelInitPreEntity()
