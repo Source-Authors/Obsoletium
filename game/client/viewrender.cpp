@@ -603,8 +603,6 @@ public:
 	friend class CReflectionView;
 	friend class CIntersectionView;
 
-	bool m_bViewIntersectsWater;
-
 	CReflectionView m_ReflectionView;
 	CRefractionView m_RefractionView;
 	CIntersectionView m_IntersectionView;
@@ -620,6 +618,7 @@ class CUnderWaterView : public CBaseWaterView
 public:
 	CUnderWaterView(CViewRender *pMainView) : 
 		CBaseWaterView( pMainView ),
+		m_bDrawSkybox( false ),
 		m_RefractionView( pMainView )
 	{}
 
