@@ -16,7 +16,7 @@ class CBloodSprayEmitter : public CSimpleEmitter
 {
 public:
 	
-	CBloodSprayEmitter( const char *pDebugName ) : CSimpleEmitter( pDebugName ) {}
+	CBloodSprayEmitter( const char *pDebugName ) : CSimpleEmitter( pDebugName ), m_flGravity{0} {}
 	
 	static CBloodSprayEmitter *Create( const char *pDebugName )
 	{

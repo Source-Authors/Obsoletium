@@ -57,6 +57,8 @@ CHudGeiger::CHudGeiger( const char *pElementName ) :
 {
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
 	SetParent( pParent );
+
+	m_iGeigerRange = 0;
 	m_flLastSoundTestTime = -9999;
 
 	SetHiddenBits( HIDEHUD_HEALTH );

@@ -115,7 +115,8 @@ CParticleSubTexture::CParticleSubTexture()
 CEffectMaterial::CEffectMaterial()
 {
 	m_Particles.m_pNext = m_Particles.m_pPrev = &m_Particles;
-	m_pGroup = NULL;
+	m_pHashedNext = nullptr;
+	m_pGroup = nullptr;
 }
 
 

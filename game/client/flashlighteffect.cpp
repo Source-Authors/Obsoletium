@@ -73,6 +73,8 @@ CFlashlightEffect::CFlashlightEffect(int nEntIndex)
 
 	m_bIsOn = false;
 	m_pPointLight = NULL;
+	m_flDistMod = 0;
+
 	if( engine->GetDXSupportLevel() < 70 )
 	{
 		r_newflashlight.SetValue( 0 );

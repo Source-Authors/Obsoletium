@@ -19,7 +19,7 @@ class CSplashParticle : public CSimpleEmitter
 {
 public:
 	
-	CSplashParticle( const char *pDebugName ) : CSimpleEmitter( pDebugName ), m_bUseClipHeight( false ) {}
+	CSplashParticle( const char *pDebugName ) : CSimpleEmitter( pDebugName ), m_flClipHeight(FLT_MAX), m_bUseClipHeight( false ) {}
 	
 	// Create
 	static CSplashParticle *Create( const char *pDebugName )

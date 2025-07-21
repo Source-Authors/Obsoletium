@@ -735,8 +735,11 @@ CDetailModel::CDetailModel()
 {
 	m_Color.r = m_Color.g = m_Color.b = 255;
 	m_Color.exponent = 0;
-	m_bFlipped = 0;
+	m_Orientation = 0;
+	m_Type = 0;
 	m_bHasLightStyle = 0;
+	m_bFlipped = 0;
+	m_Alpha = 0;
 
 #ifdef USE_DETAIL_SHAPES
 	m_pAdvInfo = NULL;
