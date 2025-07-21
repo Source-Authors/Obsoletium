@@ -84,10 +84,8 @@ void ImagePanel::SetImage(const char *imageName)
 	if ( imageName && m_pszImageName && V_stricmp( imageName, m_pszImageName ) == 0 )
 		return;
 
-	intp len = Q_strlen(imageName) + 1;
 	delete [] m_pszImageName;
-	m_pszImageName = new char[ len ];
-	Q_strncpy(m_pszImageName, imageName, len );
+	m_pszImageName = V_strdup(imageName);
 	InvalidateLayout(false, true); // force applyschemesettings to run
 }
 
