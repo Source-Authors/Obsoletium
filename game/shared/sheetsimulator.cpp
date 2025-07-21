@@ -609,7 +609,8 @@ CIterativeSheetSimulator::CIterativeSheetSimulator( TraceLineFunc_t traceline, T
 {
 }
 
-void CIterativeSheetSimulator::BeginSimulation( float dt, int steps, int substeps, int collisionCount )
+// dimhotepus: collisionCount (int) -> char.
+void CIterativeSheetSimulator::BeginSimulation( float dt, char steps, int substeps, char collisionCount )
 {
 	m_CurrentCollisionPt = 0;
 	m_TimeStep = dt;
