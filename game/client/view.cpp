@@ -944,7 +944,7 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 	free( pPaddedImage );
 
 	// async write to disk (this will take ownership of the memory)
-	char szPathedFileName[_MAX_PATH];
+	char szPathedFileName[MAX_PATH];
 	Q_snprintf( szPathedFileName, sizeof(szPathedFileName), "//MOD/%s", pFilename );
 
 	filesystem->AsyncWrite( szPathedFileName, buffer.Base(), buffer.TellPut(), true );

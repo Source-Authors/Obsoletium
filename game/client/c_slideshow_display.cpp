@@ -197,8 +197,8 @@ void C_SlideshowDisplay::ClientThink( void )
 void C_SlideshowDisplay::BuildSlideShowImagesList( void )
 {
 	FileFindHandle_t matHandle;
-	char szDirectory[_MAX_PATH];
-	char szMatFileName[_MAX_PATH] = {'\0'};
+	char szDirectory[MAX_PATH];
+	char szMatFileName[MAX_PATH] = {'\0'};
 
 	V_sprintf_safe( szDirectory, "materials/vgui/%s/*.vmt", m_szSlideshowDirectory );
 	{
