@@ -254,7 +254,7 @@ public:
 	handle_t NextHandle( handle_t start ) const;
 
 	// Returns the number of unique keys in the table
-	int Count() const { return m_nUsed; }
+	intp Count() const { return m_nUsed; }
 
 
 	// Key lookup, returns InvalidHandle() if not found
@@ -869,7 +869,7 @@ public:
 
 	void RemoveAll() { m_table.RemoveAll(); m_data.RemoveAll(); }
 	void Purge() { m_table.Purge(); m_data.Purge(); }
-	int Count() const { return m_table.Count(); }
+	intp Count() const { return m_table.Count(); }
 
 	typedef typename KVPair::ValueReturn_t Element_t;
 	KeyT const &Key( UtlHashHandle_t idx ) const { return m_data[idx].m_key; }
@@ -939,8 +939,8 @@ protected:
 		KeyHashT m_hash;
 		unsigned int operator()( IndirectIndex idx ) const
 		{
-			const ptrdiff_t tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetHashRef()) - 1024;
-			const ptrdiff_t owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
+			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetHashRef()) - 1024;
+			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_hash( pOwner->m_data[ idx.m_index ].m_key );
 		}
