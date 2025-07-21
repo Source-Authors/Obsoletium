@@ -245,6 +245,14 @@ void CalcFovFromProjection ( float *pFov, const VMatrix &proj )
 // --------------------------------------------------------------------
 CClientVirtualReality::CClientVirtualReality()
 {
+	m_fHudHorizontalFov = -1;
+	m_fHudHalfWidth = -1;
+	m_fHudHalfHeight = -1;
+
+	m_nNonVRWidth = -1;
+	m_nNonVRHeight = -1;
+	m_bNonVRWindowed = false;
+
 	m_PlayerTorsoOrigin.Init();
 	m_PlayerTorsoAngle.Init();
 	m_WorldFromWeapon.Identity();
