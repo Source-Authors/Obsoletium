@@ -20,6 +20,7 @@
 VideoPanel::VideoPanel( unsigned int nXPos, unsigned int nYPos, unsigned int nHeight, unsigned int nWidth, bool allowAlternateMedia ) : 
 	BaseClass( NULL, "VideoPanel" ),
 	m_VideoMaterial( NULL ),
+	m_pMaterial( NULL ),
 	m_nPlaybackHeight( 0 ),
 	m_nPlaybackWidth( 0 ),
 	m_bAllowAlternateMedia( allowAlternateMedia )
