@@ -41,13 +41,15 @@ struct CExpressionSample
 		selected = 0;
 		m_curvetype = CURVE_DEFAULT;
 	}
-
-	void SetCurveType( int curveType )
+	
+	// dimhotepus: int -> unsigned short.
+	void SetCurveType( unsigned short curveType )
 	{
 		m_curvetype = curveType;
 	}
-
-	int	GetCurveType() const
+	
+	// dimhotepus: int -> unsigned short.
+	unsigned short	GetCurveType() const
 	{
 		return m_curvetype;
 	}
