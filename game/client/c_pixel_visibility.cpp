@@ -175,6 +175,9 @@ public:
 	bool IsActive();
 	CPixelVisSet()
 	{
+		proxySize = 0;
+		proxyAspect = 0;
+		fadeTimeInv = 0;
 		frameIssued = 0;
 		serial = 0;
 		queryList = 0xFFFF;

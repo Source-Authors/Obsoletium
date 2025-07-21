@@ -38,7 +38,7 @@ public:
 class CDustEffect : public CParticleEffect
 {
 public:
-	CDustEffect( const char *pDebugName ) : CParticleEffect( pDebugName ) {}
+	CDustEffect( const char *pDebugName ) : CParticleEffect( pDebugName ), m_pDust{nullptr} {}
 
 	virtual void RenderParticles( CParticleRenderIterator *pIterator );
 	virtual void SimulateParticles( CParticleSimulateIterator *pIterator );

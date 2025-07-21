@@ -26,6 +26,7 @@ END_NETWORK_TABLE()
 
 C_DynamicProp::C_DynamicProp( void )
 {
+	m_bUseHitboxesForRenderBox = false;
 	m_iCachedFrameCount = -1;
 }
 
