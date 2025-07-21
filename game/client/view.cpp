@@ -69,17 +69,10 @@ bool ToolFramework_SetupEngineView( Vector &origin, QAngle &angles, float &fov )
 extern ConVar default_fov;
 extern bool g_bRenderingScreenshot;
 
-#if !defined( _X360 )
 #define SAVEGAME_SCREENSHOT_WIDTH	180
 #define SAVEGAME_SCREENSHOT_HEIGHT	100
-#else
-#define SAVEGAME_SCREENSHOT_WIDTH	128
-#define SAVEGAME_SCREENSHOT_HEIGHT	128
-#endif
 
-#ifndef _XBOX
 extern ConVar sensitivity;
-#endif
 
 ConVar zoom_sensitivity_ratio( "zoom_sensitivity_ratio", "1.0", FCVAR_ARCHIVE, "Additional mouse sensitivity scale factor applied when FOV is zoomed in." );
 
