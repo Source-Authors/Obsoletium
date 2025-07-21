@@ -807,7 +807,7 @@ int CSystem::GetAvailableDrives(char *buf, int bufLen)
 //-----------------------------------------------------------------------------
 double CSystem::GetFreeDiskSpace(const char *path)
 {
-	char buf[_MAX_PATH];
+	char buf[MAX_PATH];
 	V_strcpy_safe(buf, path);
 	// strip of to first slash (to make it look like 'x:\')
 	char *slash = strstr(buf, "\\");

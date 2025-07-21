@@ -68,10 +68,10 @@ void CheckButtonList::RemoveAll()
 //-----------------------------------------------------------------------------
 // Purpose: returns the number of items in list that are checked
 //-----------------------------------------------------------------------------
-int CheckButtonList::GetCheckedItemCount()
+intp CheckButtonList::GetCheckedItemCount() const
 {
-	int count = 0;
-	for (int i = 0; i < m_CheckItems.Count(); i++)
+	intp count = 0;
+	for (intp i = 0; i < m_CheckItems.Count(); i++)
 	{
 		if (m_CheckItems[i].checkButton->IsSelected())
 		{
@@ -93,7 +93,7 @@ void CheckButtonList::PerformLayout()
 	int x = 4, y = 4, wide = GetWide() - ((x * 2) + m_pScrollBar->GetWide()), tall = 22;
 
 	// set scrollbar
-	int totalHeight = y + (m_CheckItems.Count() * tall);
+	intp totalHeight = y + (m_CheckItems.Count() * tall);
 	if (totalHeight > GetTall())
 	{
 		m_pScrollBar->SetRange(0, totalHeight + 1);
@@ -110,7 +110,7 @@ void CheckButtonList::PerformLayout()
 	}
 
 	// position the items
-	for (int i = 0; i < m_CheckItems.Count(); i++)
+	for (intp i = 0; i < m_CheckItems.Count(); i++)
 	{
 		CheckButton *btn = m_CheckItems[i].checkButton;
 		btn->SetBounds(x, y, wide, tall);
@@ -130,7 +130,7 @@ void CheckButtonList::ApplySchemeSettings(IScheme *pScheme)
 //-----------------------------------------------------------------------------
 // Purpose: iteration
 //-----------------------------------------------------------------------------
-bool CheckButtonList::IsItemIDValid(int itemID)
+bool CheckButtonList::IsItemIDValid(intp itemID) const
 {
 	return m_CheckItems.IsValidIndex(itemID);
 }
@@ -138,7 +138,7 @@ bool CheckButtonList::IsItemIDValid(int itemID)
 //-----------------------------------------------------------------------------
 // Purpose: iteration
 //-----------------------------------------------------------------------------
-int CheckButtonList::GetHighestItemID()
+intp CheckButtonList::GetHighestItemID()  const
 {
 	return m_CheckItems.Count() - 1;
 }
@@ -146,7 +146,7 @@ int CheckButtonList::GetHighestItemID()
 //-----------------------------------------------------------------------------
 // Purpose: iteration
 //-----------------------------------------------------------------------------
-KeyValues *CheckButtonList::GetItemData(int itemID)
+KeyValues *CheckButtonList::GetItemData(intp itemID)
 {
 	return m_CheckItems[itemID].userData;
 }
@@ -154,7 +154,7 @@ KeyValues *CheckButtonList::GetItemData(int itemID)
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-int CheckButtonList::GetItemCount()
+intp CheckButtonList::GetItemCount() const
 {
 	return m_CheckItems.Count();
 }
@@ -162,7 +162,7 @@ int CheckButtonList::GetItemCount()
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-bool CheckButtonList::IsItemChecked(int itemID)
+bool CheckButtonList::IsItemChecked(intp itemID)
 {
 	return m_CheckItems[itemID].checkButton->IsSelected();
 }
@@ -170,7 +170,7 @@ bool CheckButtonList::IsItemChecked(int itemID)
 //-----------------------------------------------------------------------------
 // Purpose: Sets the state of the check button
 //-----------------------------------------------------------------------------
-void CheckButtonList::SetItemCheckable(int itemID, bool state)
+void CheckButtonList::SetItemCheckable(intp itemID, bool state)
 {
 	m_CheckItems[itemID].checkButton->SetCheckButtonCheckable(state);
 }
@@ -181,8 +181,8 @@ void CheckButtonList::SetItemCheckable(int itemID, bool state)
 void CheckButtonList::OnCheckButtonChecked( KeyValues *pParams )
 {
 	vgui::Panel *pPanel = (vgui::Panel *)pParams->GetPtr( "panel" );
-	int c = m_CheckItems.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_CheckItems.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		if ( pPanel == m_CheckItems[i].checkButton )
 		{

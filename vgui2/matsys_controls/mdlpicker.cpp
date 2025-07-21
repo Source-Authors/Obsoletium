@@ -59,7 +59,7 @@ static bool SaveTgaAndAddToP4( unsigned char *pImage, ImageFormat imageFormat, i
 	CP4AutoEditAddFile autop4( szDestFilename );
 
 	// async write to disk (this will take ownership of the memory)
-	char szDirName[ _MAX_PATH ];
+	char szDirName[ MAX_PATH ];
 	V_strcpy_safe( szDirName, szDestFilename );
 	V_StripFilename( szDirName );
 	g_pFullFileSystem->CreateDirHierarchy( szDirName, "" );
@@ -443,13 +443,13 @@ void CMDLPicker::OnCommand( const char *pCommand )
 					KeyValues *pItemKeyValues = m_pAssetBrowser->GetItem( m_AssetList[ i ].m_nItemId );
 					const char *pSelectedAsset = pItemKeyValues->GetString( "asset" );
 
-					char		szBathPath[ _MAX_PATH ];
+					char		szBathPath[ MAX_PATH ];
 					Label		*m_pOutputDirectory;
 
 					m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
 					m_pOutputDirectory->GetText( szBathPath );
 
-					char szPathedFileName[ _MAX_PATH ];
+					char szPathedFileName[ MAX_PATH ];
 					V_sprintf_safe( szPathedFileName, "%s%s", szBathPath, pSelectedAsset );
 
 					Label		*m_pResults = ( Label * )m_pScreenCapsPage->FindChildByName( "CaptureResults" );
@@ -588,7 +588,7 @@ const char *CMDLPicker::CaptureModel( int nModIndex, const char *AssetName, cons
 		}
 	}
 
-	static char szPathedFileName[ _MAX_PATH ];
+	static char szPathedFileName[ MAX_PATH ];
 	V_sprintf_safe( szPathedFileName, "%s%s", OutputPath, AssetName );
 	V_SetExtension( szPathedFileName, ".tga" );
 
@@ -617,7 +617,7 @@ void CMDLPicker::CaptureScreenCaps( void )
 	TextEntry	*pTempValue;
 	int			width;
 	int			height;
-	char		szBathPath[ _MAX_PATH ];
+	char		szBathPath[ MAX_PATH ];
 	Label		*m_pOutputDirectory;
 
 	m_pOutputDirectory = ( Label * )m_pScreenCapsPage->FindChildByName( "OutputDirectory" );
@@ -1052,7 +1052,7 @@ CUtlString CMDLPicker::GetOutputFileSuffix()
 //-----------------------------------------------------------------------------
 void CMDLPicker::SaveCaps( const char *szFileName )
 {
-	char	temp[ _MAX_PATH ];
+	char	temp[ MAX_PATH ];
 
 	// dimhotepus: Do RAII.
 	KeyValuesAD CaptureData( "ScreenCaps" );
@@ -1135,7 +1135,7 @@ void CMDLPicker::SaveCaps( const char *szFileName )
 //-----------------------------------------------------------------------------
 bool CMDLPicker::RestoreCaps( const char *szFileName )
 {
-	char	temp[ _MAX_PATH ];
+	char	temp[ MAX_PATH ];
 
 	if ( szFileName != NULL )
 	{
