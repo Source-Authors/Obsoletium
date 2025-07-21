@@ -27,7 +27,7 @@ public:
 	CSceneCache();
 	CSceneCache( const CSceneCache& src );
 
-	int	GetSoundCount() const;
+	intp	GetSoundCount() const;
 	char const *GetSoundName( int index );
 
 	virtual void Save( CUtlBuffer& buf  );

@@ -23,7 +23,7 @@ CSceneCache::CSceneCache( const CSceneCache& src )
 	sounds = src.sounds;
 }
 
-int	CSceneCache::GetSoundCount() const
+intp CSceneCache::GetSoundCount() const
 {
 	return sounds.Count();
 }
@@ -61,8 +61,8 @@ void CSceneCache::Restore( CUtlBuffer& buf  )
 		char soundname[ 512 ];
 		buf.GetString( soundname );
 
-		int idx = soundemitterbase->GetSoundIndex( soundname );
-		if ( idx != -1 )
+		UtlHashHandle_t idx = soundemitterbase->GetSoundIndex( soundname );
+		if ( idx != std::numeric_limits<UtlHashHandle_t>::max() )
 		{
 			Assert( idx <= 65535 );
 			if ( sounds.Find( idx ) == sounds.InvalidIndex() )
@@ -83,8 +83,8 @@ void CSceneCache::PrecacheSceneEvent( CChoreoEvent *event, CUtlVector< unsigned 
 	if ( !event || event->GetType() != CChoreoEvent::SPEAK )
 		return;
 
-	int idx = soundemitterbase->GetSoundIndex( event->GetParameters() );
-	if ( idx != -1 )
+	UtlHashHandle_t idx = soundemitterbase->GetSoundIndex( event->GetParameters() );
+	if ( idx != std::numeric_limits<UtlHashHandle_t>::max() )
 	{
 		MEM_ALLOC_CREDIT();
 		Assert( idx <= 65535 );
@@ -96,8 +96,9 @@ void CSceneCache::PrecacheSceneEvent( CChoreoEvent *event, CUtlVector< unsigned 
 		char tok[ CChoreoEvent::MAX_CCTOKEN_STRING ];
 		if ( event->GetPlaybackCloseCaptionToken( tok, sizeof( tok ) ) )
 		{
-			int idx = soundemitterbase->GetSoundIndex( tok );
-			if ( idx != -1 && soundlist.Find( idx ) == soundlist.InvalidIndex() )
+			UtlHashHandle_t idx = soundemitterbase->GetSoundIndex( tok );
+			if ( idx != std::numeric_limits<UtlHashHandle_t>::max() &&
+				 soundlist.Find( idx ) == soundlist.InvalidIndex() )
 			{
 				MEM_ALLOC_CREDIT();
 				Assert( idx <= 65535 );

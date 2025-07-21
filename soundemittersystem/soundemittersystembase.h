@@ -14,9 +14,10 @@
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "soundflags.h"
 #include "interval.h"
-#include "UtlSortVector.h"
-#include <tier1/utlstring.h>
-#include <tier1/utlhashtable.h>
+#include "tier1/KeyValues.h"
+#include "tier1/UtlSortVector.h"
+#include "tier1/utlstring.h"
+#include "tier1/utlhashtable.h"
 
 soundlevel_t TextToSoundLevel( const char *key );
 
@@ -68,79 +69,79 @@ public:
 	virtual ~CSoundEmitterSystemBase() { }
 
 	// Methods of IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 public:
 
-	virtual bool ModInit();
-	virtual void ModShutdown();
+	bool ModInit() override;
+	void ModShutdown() override;
 
-	virtual UtlHashHandle_t	GetSoundIndex( const char *pName ) const;
-	virtual bool IsValidIndex( UtlHashHandle_t index );
-	virtual intp GetSoundCount( void );
+	UtlHashHandle_t	GetSoundIndex( const char *pName ) const override;
+	bool IsValidIndex( UtlHashHandle_t index ) override;
+	intp GetSoundCount( void ) override;
 
-	virtual const char *GetSoundName( UtlHashHandle_t index );
-	virtual bool GetParametersForSound( const char *soundname, CSoundParameters& params, gender_t gender, bool isbeingemitted = false );
-	virtual const char *GetWaveName( CUtlSymbol& sym );
+	const char *GetSoundName( UtlHashHandle_t index ) override;
+	bool GetParametersForSound( const char *soundname, CSoundParameters& params, gender_t gender, bool isbeingemitted = false ) override;
+	const char *GetWaveName( CUtlSymbol& sym ) override;
 
-	virtual CUtlSymbol AddWaveName( const char *name );
+	CUtlSymbol AddWaveName( const char *name ) override;
 
-	virtual soundlevel_t LookupSoundLevel( const char *soundname );
-	virtual const char *GetWavFileForSound( const char *soundname, char const *actormodel );
-	virtual const char *GetWavFileForSound( const char *soundname, gender_t gender );
+	soundlevel_t LookupSoundLevel( const char *soundname ) override;
+	const char *GetWavFileForSound( const char *soundname, char const *actormodel ) override;
+	const char *GetWavFileForSound( const char *soundname, gender_t gender ) override;
 
-	virtual int		CheckForMissingWavFiles( bool verbose );
-	virtual const char *GetSourceFileForSound( intp index ) const;
+	int		CheckForMissingWavFiles( bool verbose ) override;
+	const char *GetSourceFileForSound( intp index ) const override;
 	// Iteration methods
-	virtual UtlHashHandle_t		First() const;
-	virtual UtlHashHandle_t		Next( UtlHashHandle_t i ) const;
-	virtual UtlHashHandle_t		InvalidIndex() const;
+	UtlHashHandle_t		First() const override;
+	UtlHashHandle_t		Next( UtlHashHandle_t i ) const override;
+	UtlHashHandle_t		InvalidIndex() const override;
 
-	virtual CSoundParametersInternal *InternalGetParametersForSound( UtlHashHandle_t index );
+	CSoundParametersInternal *InternalGetParametersForSound( UtlHashHandle_t index ) override;
 
 
 	// The host application is responsible for dealing with dirty sound scripts, etc.
-	virtual bool		AddSound( const char *soundname, const char *scriptfile, const CSoundParametersInternal& params );
-	virtual void		RemoveSound( const char *soundname );
+	bool		AddSound( const char *soundname, const char *scriptfile, const CSoundParametersInternal& params ) override;
+	void		RemoveSound( const char *soundname ) override;
 
-	virtual void		MoveSound( const char *soundname, const char *newscript );
+	void		MoveSound( const char *soundname, const char *newscript ) override;
 
-	virtual void		RenameSound( const char *soundname, const char *newname );
-	virtual void		UpdateSoundParameters( const char *soundname, const CSoundParametersInternal& params );
+	void		RenameSound( const char *soundname, const char *newname ) override;
+	void		UpdateSoundParameters( const char *soundname, const CSoundParametersInternal& params ) override;
 
-	virtual int			GetNumSoundScripts() const;
-	virtual char const	*GetSoundScriptName( intp index ) const;
-	virtual bool		IsSoundScriptDirty( intp index ) const;
-	virtual int			FindSoundScript( const char *name ) const;
+	int			GetNumSoundScripts() const override;
+	char const	*GetSoundScriptName( intp index ) const override;
+	bool		IsSoundScriptDirty( intp index ) const override;
+	int			FindSoundScript( const char *name ) const override;
 
-	virtual void		SaveChangesToSoundScript( intp scriptindex );
+	void		SaveChangesToSoundScript( intp scriptindex ) override;
 
-	virtual void		ExpandSoundNameMacros( CSoundParametersInternal& params, char const *wavename );
-	virtual gender_t	GetActorGender( char const *actormodel );
-	virtual void		GenderExpandString( char const *actormodel, char const *in, char *out, int maxlen );
-	virtual void		GenderExpandString( gender_t gender, char const *in, char *out, int maxlen );
-	virtual bool		IsUsingGenderToken( char const *soundname );
-	virtual unsigned int GetManifestFileTimeChecksum();
+	void		ExpandSoundNameMacros( CSoundParametersInternal& params, char const *wavename ) override;
+	gender_t	GetActorGender( char const *actormodel ) override;
+	void		GenderExpandString( char const *actormodel, char const *in, char *out, int maxlen ) override;
+	void		GenderExpandString( gender_t gender, char const *in, char *out, int maxlen ) override;
+	bool		IsUsingGenderToken( char const *soundname ) override;
+	unsigned int GetManifestFileTimeChecksum() override;
 
-	virtual bool			GetParametersForSoundEx( const char *soundname, HSOUNDSCRIPTHANDLE& handle, CSoundParameters& params, gender_t gender, bool isbeingemitted = false );
-	virtual soundlevel_t	LookupSoundLevelByHandle( char const *soundname, HSOUNDSCRIPTHANDLE& handle );
+	bool			GetParametersForSoundEx( const char *soundname, HSOUNDSCRIPTHANDLE& handle, CSoundParameters& params, gender_t gender, bool isbeingemitted = false ) override;
+	soundlevel_t	LookupSoundLevelByHandle( char const *soundname, HSOUNDSCRIPTHANDLE& handle ) override;
 
 
 	// Called from both client and server (single player) or just one (server only in dedicated server and client only if connected to a remote server)
 	// Called by LevelInitPreEntity to override sound scripts for the mod with level specific overrides based on custom mapnames, etc.
-	virtual void			AddSoundOverrides( char const *scriptfile, bool bPreload = false );
+	void			AddSoundOverrides( char const *scriptfile, bool bPreload = false ) override;
 
 	// Called by either client or server in LevelShutdown to clear out custom overrides
-	virtual void			ClearSoundOverrides();
+	void			ClearSoundOverrides() override;
 
-	virtual void		ReloadSoundEntriesInList( IFileList *pFilesToReload );
+	void			ReloadSoundEntriesInList( IFileList *pFilesToReload ) override;
 
 	// Called by either client or server to force ModShutdown and ModInit
-	virtual void			Flush();
+	void			Flush() override;
 
 private:
 
