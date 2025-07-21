@@ -1000,11 +1000,11 @@ unsigned	 CMaterialSystem::GetModeCount( unsigned adapter ) const
 //-----------------------------------------------------------------------------
 static void ConvertModeStruct( ShaderDeviceInfo_t *pMode, const MaterialSystem_Config_t &config ) 
 {
-	pMode->m_DisplayMode.m_nWidth = config.m_VideoMode.m_Width;					
+	pMode->m_DisplayMode.m_nWidth = config.m_VideoMode.m_Width;
 	pMode->m_DisplayMode.m_nHeight = config.m_VideoMode.m_Height;
-	pMode->m_DisplayMode.m_Format = config.m_VideoMode.m_Format;			
-	pMode->m_DisplayMode.m_nRefreshRateNumerator = config.m_VideoMode.m_RefreshRate;	
-	pMode->m_DisplayMode.m_nRefreshRateDenominator = config.m_VideoMode.m_RefreshRate ? 1 : 0;	
+	pMode->m_DisplayMode.m_Format = config.m_VideoMode.m_Format;
+	pMode->m_DisplayMode.m_nRefreshRateNumerator = config.m_VideoMode.m_RefreshRate;
+	pMode->m_DisplayMode.m_nRefreshRateDenominator = config.m_VideoMode.m_RefreshRate ? 1 : 0;
 	pMode->m_nBackBufferCount = 1;
 	pMode->m_nAASamples = config.m_nAASamples;
 	pMode->m_nAAQuality = config.m_nAAQuality;
@@ -1023,9 +1023,9 @@ static void ConvertModeStruct( ShaderDeviceInfo_t *pMode, const MaterialSystem_C
 
 static void ConvertModeStruct( MaterialVideoMode_t *pMode, const ShaderDisplayMode_t &info ) 
 {
-	pMode->m_Width = info.m_nWidth;					
+	pMode->m_Width = info.m_nWidth;
 	pMode->m_Height = info.m_nHeight;
-	pMode->m_Format = info.m_Format;			
+	pMode->m_Format = info.m_Format;
 	pMode->m_RefreshRate = info.m_nRefreshRateDenominator ? ( info.m_nRefreshRateNumerator / info.m_nRefreshRateDenominator ) : 0;
 }
 
