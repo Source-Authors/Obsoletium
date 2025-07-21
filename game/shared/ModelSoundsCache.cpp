@@ -51,7 +51,7 @@ void CModelSoundsCache::Save( CUtlBuffer& buf  )
 {
 	buf.PutShort( sounds.Count() );
 	
-	for ( int i = 0; i < sounds.Count(); ++i )
+	for ( intp i = 0; i < sounds.Count(); ++i )
 	{
 		buf.PutString( GetSoundName( i ) );
 	}
@@ -70,8 +70,8 @@ void CModelSoundsCache::Restore( CUtlBuffer& buf  )
 
 		buf.GetString( soundname );
 
-		int idx = soundemitterbase->GetSoundIndex( soundname );
-		if ( idx != -1 )
+		UtlHashHandle_t idx = soundemitterbase->GetSoundIndex( soundname );
+		if ( idx != std::numeric_limits<UtlHashHandle_t>::max() )
 		{
 			Assert( idx <= 65535 );
 			if ( sounds.Find( idx ) == sounds.InvalidIndex() )

@@ -919,10 +919,9 @@ void CBasePlayer::RemoveFromPlayerSimulationList( CBaseEntity *other )
 
 void CBasePlayer::SimulatePlayerSimulatedEntities( void )
 {
-	int c = m_SimulatedByThisPlayer.Count();
-	int i;
+	intp c = m_SimulatedByThisPlayer.Count();
 
-	for ( i = c - 1; i >= 0; i-- )
+	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		CHandle< CBaseEntity > h;
 		
@@ -950,7 +949,7 @@ void CBasePlayer::SimulatePlayerSimulatedEntities( void )
 	// Loop through all entities again, checking their untouch if flagged to do so
 	c = m_SimulatedByThisPlayer.Count();
 
-	for ( i = c - 1; i >= 0; i-- )
+	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		CHandle< CBaseEntity > h;
 		
