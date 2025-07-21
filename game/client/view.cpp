@@ -65,8 +65,6 @@
 		  
 void ToolFramework_AdjustEngineViewport( int& x, int& y, int& width, int& height );
 bool ToolFramework_SetupEngineView( Vector &origin, QAngle &angles, float &fov );
-bool ToolFramework_SetupEngineMicrophone( Vector &origin, QAngle &angles );
-
 
 extern ConVar default_fov;
 extern bool g_bRenderingScreenshot;
