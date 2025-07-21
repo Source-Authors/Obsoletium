@@ -862,7 +862,7 @@ void CSoundControllerImp::CommandAdd( CSoundPatch *pSound, float executeDeltaTim
 // Reset the whole system (level change, etc.)
 void CSoundControllerImp::SystemReset( void )
 {
-	for ( int i = m_soundList.Count()-1; i >=0; i-- )
+	for ( intp i = m_soundList.Count()-1; i >=0; i-- )
 	{
 		CSoundPatch *pNode = m_soundList[i];
 	
@@ -917,7 +917,7 @@ void CSoundControllerImp::SystemUpdate( void )
 	// we can fast remove inside it without breaking the indexing
 	{
 		VPROF( "CSoundControllerImp::SystemUpdate:removesounds" );
-		for ( int i = m_soundList.Count()-1; i >=0; i-- )
+		for ( intp i = m_soundList.Count()-1; i >=0; i-- )
 		{
 			CSoundPatch *pNode = m_soundList[i];
 			if ( !pNode->Update( time, deltaTime ) )
@@ -932,7 +932,7 @@ void CSoundControllerImp::SystemUpdate( void )
 // Remove any envelope commands from the list (dynamically changing envelope)
 void CSoundControllerImp::CommandClear( CSoundPatch *pSound )
 {
-	for ( int i = m_commandList.Count()-1; i >= 0; i-- )
+	for ( intp i = m_commandList.Count()-1; i >= 0; i-- )
 	{
 		SoundCommand_t *pCmd = m_commandList.Element( i );
 		if ( pCmd->m_pPatch == pSound )
@@ -949,8 +949,6 @@ void CSoundControllerImp::CommandClear( CSoundPatch *pSound )
 //-----------------------------------------------------------------------------
 void CSoundControllerImp::SaveSoundPatch( CSoundPatch *pSoundPatch, ISave *pSave )
 {
-	int i;
-
 	// Write out the sound patch
 	pSave->StartBlock();
 	pSave->WriteAll( pSoundPatch );
@@ -958,7 +956,7 @@ void CSoundControllerImp::SaveSoundPatch( CSoundPatch *pSoundPatch, ISave *pSave
 
 	// Count the number of commands that refer to the sound patch
 	int nCount = 0;
-	for ( i = m_commandList.Count()-1; i >= 0; i-- )
+	for ( intp i = m_commandList.Count()-1; i >= 0; i-- )
 	{
 		SoundCommand_t *pCmd = m_commandList.Element( i );
 		if ( pCmd->m_pPatch == pSoundPatch )
@@ -971,7 +969,7 @@ void CSoundControllerImp::SaveSoundPatch( CSoundPatch *pSoundPatch, ISave *pSave
 	pSave->StartBlock();
 	pSave->WriteInt( &nCount );
 
-	for ( i = m_commandList.Count()-1; i >= 0; i-- )
+	for ( intp i = m_commandList.Count()-1; i >= 0; i-- )
 	{
 		SoundCommand_t *pCmd = m_commandList.Element( i );
 		if ( pCmd->m_pPatch == pSoundPatch )
@@ -1233,7 +1231,7 @@ float CSoundControllerImp::SoundPlayEnvelope( CSoundPatch *pSound, soundcommands
 //-----------------------------------------------------------------------------
 void CSoundControllerImp::CheckLoopingSoundsForPlayer( CBasePlayer *pPlayer )
 {
-	for ( int i = m_soundList.Count()-1; i >=0; i-- )
+	for ( intp i = m_soundList.Count()-1; i >=0; i-- )
 	{
 		CSoundPatch *pNode = m_soundList[i];
 		pNode->AddPlayerPost( pPlayer );
@@ -1245,7 +1243,7 @@ void CSoundControllerImp::CheckLoopingSoundsForPlayer( CBasePlayer *pPlayer )
 //-----------------------------------------------------------------------------
 void CSoundControllerImp::OnRestore()
 {
-	for ( int i = m_soundList.Count()-1; i >=0; i-- )
+	for ( intp i = m_soundList.Count()-1; i >=0; i-- )
 	{
 		CSoundPatch *pNode = m_soundList[i];
 		if ( pNode && pNode->IsPlaying() )
