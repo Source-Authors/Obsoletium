@@ -189,7 +189,7 @@ void CBaseGameStats::StatsLog( char const *fmt, ... )
 	struct tm *newtime = localtime( &aclock );
 
 	char timeString[ 128 ];
-	Q_strncpy( timeString, asctime( newtime ), sizeof( timeString ) );
+	V_strcpy_safe( timeString, asctime( newtime ) );
 	// Get rid of the \n.
 	char *pEnd = strchr( timeString, '\n' );
 	if ( pEnd )
