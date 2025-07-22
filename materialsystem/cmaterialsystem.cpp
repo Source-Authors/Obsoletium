@@ -1475,6 +1475,8 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 	// Get the desktop resolution and aspect ratio
 	ShaderDisplayMode_t displayMode;
 	g_pShaderDeviceMgr->GetCurrentModeInfo( &displayMode, 0 );
+	// dimhotepus: Honor image format.
+	ImageFormat imageFormat = displayMode.m_Format;
 	int nCurrentScreenAspect = GetScreenAspectMode( displayMode.m_nWidth, displayMode.m_nHeight );
 
 	// Let's see what the device supports and pick the most appropriate mode
@@ -1510,11 +1512,15 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 	{
 		pConfig->m_VideoMode.m_Width = nBestWidth;
 		pConfig->m_VideoMode.m_Height = nBestHeight;
+		// dimhotepus: Honor mode image format.
+		pConfig->m_VideoMode.m_Format = imageFormat;
 	}
 	else // Fall back to 4:3 mode from the cfg file.  This should never happen
 	{
 		pConfig->m_VideoMode.m_Width = nRecommendedWidth;
 		pConfig->m_VideoMode.m_Height = nRecommendedHeight;
+		// dimhotepus: Honor mode image format.
+		pConfig->m_VideoMode.m_Format = imageFormat;
 	}
 
 #endif // LINUX
