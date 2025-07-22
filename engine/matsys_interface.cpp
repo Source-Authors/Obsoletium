@@ -843,6 +843,7 @@ void GetMaterialSystemConfigForBenchmarkUpload(KeyValues *dataToUpload)
 	dataToUpload->SetInt( "EnableParallaxMapping", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_ENABLE_PARALLAX_MAPPING) ? 1 : 0 );
 	dataToUpload->SetInt( "ZPrefill", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_USE_Z_PREFILL) ? 1 : 0 );
 	dataToUpload->SetInt( "ReduceFillRate", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE) ? 1 : 0 );
+	dataToUpload->SetInt( "UsingPartialPresentation", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION) ? 1 : 0 );
 	dataToUpload->SetInt( "RenderToTextureShadows", r_shadowrendertotexture.GetInt() ? 1 : 0 );
 	dataToUpload->SetInt( "FlashlightDepthTexture", r_flashlightdepthtexture.GetInt() ? 1 : 0 );
 	dataToUpload->SetInt( "RealtimeWaterReflection", r_waterforceexpensive.GetInt() ? 1 : 0 );
@@ -872,6 +873,7 @@ void PrintMaterialSystemConfig( const MaterialSystem_Config_t &config )
 	Warning( "MATSYS_VIDCFG_FLAGS_ENABLE_PARALLAX_MAPPING: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_ENABLE_PARALLAX_MAPPING ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_USE_Z_PREFILL: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_USE_Z_PREFILL ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE ) ? "true" : "false" );
+	Warning( "MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION ) ? "true" : "false" );
 	Warning( "r_shadowrendertotexture: %s\n", r_shadowrendertotexture.GetInt() ? "true" : "false" );
 	Warning( "motionblur: %s\n", config.m_bMotionBlur ? "true" : "false" );
 	Warning( "shadowdepthtexture: %s\n", config.m_bShadowDepthTexture ? "true" : "false" );

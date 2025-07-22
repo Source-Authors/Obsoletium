@@ -32,11 +32,12 @@ enum MaterialSystem_Config_Flags_t
 	MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE				= ( 1 << 11 ),
 	MATSYS_VIDCFG_FLAGS_ENABLE_HDR					= ( 1 << 12 ),
 	MATSYS_VIDCFG_FLAGS_LIMIT_WINDOWED_SIZE			= ( 1 << 13 ),
-	MATSYS_VIDCFG_FLAGS_SCALE_TO_OUTPUT_RESOLUTION  = ( 1 << 14 ),
-	MATSYS_VIDCFG_FLAGS_USING_MULTIPLE_WINDOWS      = ( 1 << 15 ),
-	MATSYS_VIDCFG_FLAGS_DISABLE_PHONG               = ( 1 << 16 ),
+	MATSYS_VIDCFG_FLAGS_SCALE_TO_OUTPUT_RESOLUTION	= ( 1 << 14 ),
+	MATSYS_VIDCFG_FLAGS_USING_MULTIPLE_WINDOWS		= ( 1 << 15 ),
+	MATSYS_VIDCFG_FLAGS_DISABLE_PHONG				= ( 1 << 16 ),
 	MATSYS_VIDCFG_FLAGS_VR_MODE						= ( 1 << 17 ),
 	MATSYS_VIDCFG_FLAGS_BORDERLESS					= ( 1 << 18 ),
+	MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION	= ( 1 << 19 ),
 };
 
 struct MaterialSystemHardwareIdentifier_t
@@ -68,6 +69,7 @@ struct MaterialSystem_Config_t
 	bool LimitWindowedSize() const { return ( m_Flags & MATSYS_VIDCFG_FLAGS_LIMIT_WINDOWED_SIZE ) != 0; }
 	bool ScaleToOutputResolution() const { return ( m_Flags & MATSYS_VIDCFG_FLAGS_SCALE_TO_OUTPUT_RESOLUTION ) != 0; }
 	bool UsingMultipleWindows() const { return ( m_Flags & MATSYS_VIDCFG_FLAGS_USING_MULTIPLE_WINDOWS ) != 0; }
+	bool UsingPartialPresentation() const { return ( m_Flags & MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION ) != 0; }
 	bool UsePhong() const { return ( m_Flags & MATSYS_VIDCFG_FLAGS_DISABLE_PHONG ) == 0; }
 	bool VRMode() const { return ( m_Flags & MATSYS_VIDCFG_FLAGS_VR_MODE) != 0; }
 	bool ShadowDepthTexture() const { return m_bShadowDepthTexture; }
@@ -170,6 +172,7 @@ struct MaterialSystem_Config_t
 		SetFlag( MATSYS_VIDCFG_FLAGS_DISABLE_PHONG, false );
 		SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, false );
 		SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, false );
+		SetFlag( MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION, false );
 
 		m_VideoMode.m_Width = BASE_WIDTH;
 		m_VideoMode.m_Height = BASE_HEIGHT;

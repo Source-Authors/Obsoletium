@@ -1019,6 +1019,7 @@ static void ConvertModeStruct( ShaderDeviceInfo_t *pMode, const MaterialSystem_C
 	pMode->m_bWaitForVSync = config.WaitForVSync();
 	pMode->m_bScaleToOutputResolution = config.ScaleToOutputResolution();
 	pMode->m_bUsingMultipleWindows = config.UsingMultipleWindows();
+	pMode->m_bUsingPartialPresentation = config.UsingPartialPresentation();
 }
 
 static void ConvertModeStruct( MaterialVideoMode_t *pMode, const ShaderDisplayMode_t &info ) 
