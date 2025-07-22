@@ -22,6 +22,7 @@ enum NormalDecodeMode_t
 // Forward declaration
 #ifdef _WIN32
 using D3DFORMAT = enum _D3DFORMAT;
+enum DXGI_FORMAT;
 #endif
 
 //-----------------------------------------------------------------------------
@@ -368,7 +369,9 @@ namespace ImageLoader
 	// whether it's supported or not
 	//-----------------------------------------------------------------------------
 	[[nodiscard]] ImageFormat D3DFormatToImageFormat( D3DFORMAT format );
+	[[nodiscard]] ImageFormat DxgiFormatToImageFormat( DXGI_FORMAT format );
 	[[nodiscard]] D3DFORMAT ImageFormatToD3DFormat( ImageFormat format );
+	[[nodiscard]] DXGI_FORMAT ImageFormatToDxgiFormat( ImageFormat format );
 
 	// Flags for ResampleRGBA8888
 	enum
