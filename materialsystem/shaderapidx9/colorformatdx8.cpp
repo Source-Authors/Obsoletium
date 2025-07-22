@@ -101,24 +101,6 @@ D3DFORMAT GetNearestD3DColorFormat( ImageFormat fmt,
 			return D3DFMT_A4R4G4B4;
 		break;
 
-#if defined( _X360 )
-	case IMAGE_FORMAT_LINEAR_RGBA8888:
-	case IMAGE_FORMAT_LINEAR_ABGR8888:
-	case IMAGE_FORMAT_LINEAR_ARGB8888:
-	case IMAGE_FORMAT_LINEAR_BGRA8888:
-		// same as above - all xxxx8888 RGBA ordering funnels to d3d a8r8g8b8
-		if ( TestTextureFormat( D3DFMT_LIN_A8R8G8B8, isRenderTarget, bIsVertexTexture, bIsFilterableRequired ) )
-			return D3DFMT_LIN_A8R8G8B8;
-		break;
-#endif
-
-#if defined( _X360 )
-	case IMAGE_FORMAT_LINEAR_BGRX8888:
-		if ( TestTextureFormat( D3DFMT_LIN_X8R8G8B8, isRenderTarget, bIsVertexTexture, bIsFilterableRequired ) )
-			return D3DFMT_LIN_X8R8G8B8;
-		break;
-#endif
-
 	case IMAGE_FORMAT_BGRX8888:
 		// We want this format to return exactly it's equivalent so that
 		// when we create render targets to blit to from the framebuffer,
@@ -182,13 +164,6 @@ D3DFORMAT GetNearestD3DColorFormat( ImageFormat fmt,
 			return D3DFMT_A8R8G8B8;
 		break;
 
-#if defined( _X360 )
-	case IMAGE_FORMAT_LINEAR_BGRX5551:
-		if ( TestTextureFormat( D3DFMT_LIN_X1R5G5B5, isRenderTarget, bIsVertexTexture, bIsFilterableRequired ) )
-			return D3DFMT_LIN_X1R5G5B5;
-		break;
-#endif
-
 	case IMAGE_FORMAT_BGRA5551:
 		if (TestTextureFormat(D3DFMT_A1R5G5B5, isRenderTarget, bIsVertexTexture, bIsFilterableRequired))
 			return D3DFMT_A1R5G5B5;
@@ -211,13 +186,6 @@ D3DFORMAT GetNearestD3DColorFormat( ImageFormat fmt,
 		if (TestTextureFormat(D3DFMT_A8R8G8B8, isRenderTarget, bIsVertexTexture, bIsFilterableRequired))
 			return D3DFMT_A8R8G8B8;
 		break;
-
-#if defined( _X360 )
-	case IMAGE_FORMAT_LINEAR_I8:
-		if ( TestTextureFormat( D3DFMT_LIN_L8, isRenderTarget, bIsVertexTexture, bIsFilterableRequired ) )
-			return D3DFMT_LIN_L8;
-		break;
-#endif
 
 	case IMAGE_FORMAT_IA88:
 		if (TestTextureFormat(D3DFMT_A8L8, isRenderTarget, bIsVertexTexture, bIsFilterableRequired))
@@ -280,13 +248,6 @@ D3DFORMAT GetNearestD3DColorFormat( ImageFormat fmt,
 			return D3DFMT_A16B16G16R16F;
 		break;
 
-#if defined( _X360 )
-	case IMAGE_FORMAT_LINEAR_RGBA16161616:
-		if ( TestTextureFormat( D3DFMT_LIN_A16B16G16R16, isRenderTarget, bIsVertexTexture, bIsFilterableRequired ) )
-			return D3DFMT_LIN_A16B16G16R16;
-		break;
-#endif
-
 	case IMAGE_FORMAT_R32F:
 		if ( TestTextureFormat( D3DFMT_R32F, isRenderTarget, bIsVertexTexture, bIsFilterableRequired ) )
 			return D3DFMT_R32F;
@@ -296,23 +257,6 @@ D3DFORMAT GetNearestD3DColorFormat( ImageFormat fmt,
 		if ( TestTextureFormat( D3DFMT_A32B32G32R32F, isRenderTarget, bIsVertexTexture, bIsFilterableRequired ) )
 			return D3DFMT_A32B32G32R32F;
 		break;
-
-#if defined( _X360 )
-	case IMAGE_FORMAT_X360_DST16:
-		return D3DFMT_D16;
-
-	case IMAGE_FORMAT_X360_DST24:
-		return D3DFMT_D24S8;
-
-	case IMAGE_FORMAT_X360_DST24F:
-		return D3DFMT_D24FS8;
-
-	case IMAGE_FORMAT_LE_BGRX8888:
-		return D3DFMT_LE_X8R8G8B8;
-
-	case IMAGE_FORMAT_LE_BGRA8888:
-		return D3DFMT_LE_A8R8G8B8;
-#endif
 
 	// nVidia overloads DST formats as texture formats
 	case IMAGE_FORMAT_NV_DST16:
