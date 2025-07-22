@@ -91,7 +91,7 @@ public:
     void        DrawNullBackground( void *hdc, int w, int h ) override;
     void        InvalidateWindow() override;
     void        DrawStartupGraphic() override;
-    bool        CreateGameWindow( int nWidth, int nHeight, bool bWindowed, bool bBorderless ) override;
+    bool        CreateGameWindow( int nWidth, int nHeight, int refreshRate, bool bWindowed, bool bBorderless ) override;
     int         GetModeWidth( void ) const override;
     int         GetModeHeight( void ) const override;
 	int			GetModeStereoWidth() const override;
@@ -545,7 +545,7 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 //-----------------------------------------------------------------------------
 // Creates the game window, plays the startup movie
 //-----------------------------------------------------------------------------
-bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowed, bool bBorderless )
+bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, int refreshRate, bool bWindowed, bool bBorderless )
 {
     COM_TimestampedLog( "CVideoMode_Common::Init  CreateGameWindow" );
 
@@ -581,6 +581,8 @@ bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowe
         // and reading the command-line. Would be nice for just one place where this is done.
         RequestedWindowVideoMode().width = nWidth;
         RequestedWindowVideoMode().height = nHeight;
+        // dimhotepus: Honor refresh rate for requested mode.
+        RequestedWindowVideoMode().refreshRate = refreshRate;
     }
     
     if ( !InEditMode() )
@@ -2013,15 +2015,15 @@ bool CVideoMode_MaterialSystem::Init( )
         bool bAlreadyInList = false;
         for ( int j = 0; j < m_nNumModes; j++ )
         {
-            if ( info.m_Width == m_rgModeList[ j ].width && info.m_Height == m_rgModeList[ j ].height )
+            auto &mode = m_rgModeList[j];
+            if ( info.m_Width == mode.width && info.m_Height == mode.height )
             {
-
 				// in VR mode we want the highest refresh rate, without regard for the desktop refresh rate
 				if ( UseVR() || ShouldForceVRActive() )
 				{
-					if ( info.m_RefreshRate > m_rgModeList[j].refreshRate )
+					if ( info.m_RefreshRate > mode.refreshRate )
 					{
-						m_rgModeList[j].refreshRate = info.m_RefreshRate;
+						mode.refreshRate = info.m_RefreshRate;
 					}
 				}
 				else
@@ -2029,9 +2031,11 @@ bool CVideoMode_MaterialSystem::Init( )
 					// choose the highest refresh rate available for each mode up to the desktop rate
 
 					// if the new mode is valid and current is invalid or not as high, choose the new one
-					if ( info.m_RefreshRate <= nDesktopRefresh && (m_rgModeList[j].refreshRate > nDesktopRefresh || m_rgModeList[j].refreshRate < info.m_RefreshRate) )
+					if ( info.m_RefreshRate <= nDesktopRefresh &&
+                        (mode.refreshRate > nDesktopRefresh ||
+                         mode.refreshRate < info.m_RefreshRate) )
 					{
-						m_rgModeList[j].refreshRate = info.m_RefreshRate;
+						mode.refreshRate = info.m_RefreshRate;
 					}
 				}
 

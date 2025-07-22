@@ -1694,6 +1694,7 @@ bool CEngineAPI::ModInit( const char *pModName, const char *pGameDir )
 	// FIXME: Deal with initial window width + height better
 	int width = g_pMaterialSystemConfig->m_VideoMode.m_Width;
 	int height = g_pMaterialSystemConfig->m_VideoMode.m_Height;
+	int refreshRate = g_pMaterialSystemConfig->m_VideoMode.m_RefreshRate;
 
 	bool bWindowed = g_pMaterialSystemConfig->Windowed() ||
 		// at init time we never want to start up full screen
@@ -1703,7 +1704,7 @@ bool CEngineAPI::ModInit( const char *pModName, const char *pGameDir )
 		g_pMaterialSystemConfig->m_nVRModeAdapter != UINT_MAX;
 
 	return videomode &&
-		   videomode->CreateGameWindow( width, height, bWindowed, bBorderless );
+		   videomode->CreateGameWindow( width, height, refreshRate, bWindowed, bBorderless );
 }
 
 void CEngineAPI::ModShutdown()

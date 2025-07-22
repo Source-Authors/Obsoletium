@@ -36,7 +36,7 @@ public:
 	virtual void			DrawStartupGraphic() = 0;
 
 	// Creates the game window, plays the startup movie, starts up the material system
-	virtual bool			CreateGameWindow( int nWidth, int nHeight, bool bWindowed, bool bBorderless ) = 0;
+	virtual bool			CreateGameWindow( int nWidth, int nHeight, int refreshRate, bool bWindowed, bool bBorderless ) = 0;
 
 	// Sets the game window in editor mode
 	virtual void			SetGameWindow( void *hWnd ) = 0;
