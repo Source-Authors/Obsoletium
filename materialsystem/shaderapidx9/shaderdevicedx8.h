@@ -47,29 +47,29 @@ typedef void (WINAPI *D3DPERF_SetOptions_FuncPtr)( DWORD dwOptions );
 //-----------------------------------------------------------------------------
 // The Base implementation of the shader device
 //-----------------------------------------------------------------------------
-class CShaderDeviceMgrDx8 : public CShaderDeviceMgrBase
+class CShaderDeviceMgrDx8 final : public CShaderDeviceMgrBase
 {
 	typedef CShaderDeviceMgrBase BaseClass;
 
 public:
 	// constructor, destructor
 	CShaderDeviceMgrDx8();
-	virtual ~CShaderDeviceMgrDx8();
+	~CShaderDeviceMgrDx8();
 
 	// Methods of IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	// Methods of IShaderDevice
-	virtual unsigned	 GetAdapterCount() const;
-	virtual void GetAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const;
-	virtual unsigned	 GetModeCount( unsigned nAdapter ) const;
-	virtual void GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter, unsigned mode ) const;
-	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const;
-	virtual bool SetAdapter( unsigned nAdapter, int nFlags );
-	virtual CreateInterfaceFn SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode );
+	unsigned	 GetAdapterCount() const override;
+	void GetAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const override;
+	unsigned	 GetModeCount( unsigned nAdapter ) const override;
+	void GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter, unsigned mode ) const override;
+	void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const override;
+	bool SetAdapter( unsigned nAdapter, int nFlags ) override;
+	CreateInterfaceFn SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode ) override;
 
 	// Determines hardware caps from D3D
 	bool ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nAdapter );
@@ -81,7 +81,7 @@ public:
 	bool ValidateMode( unsigned nAdapter, const ShaderDeviceInfo_t &info ) const;
 
 	// Returns the amount of video memory in bytes for a particular adapter
-	virtual size_t GetVidMemBytes( unsigned nAdapter ) const;
+	size_t GetVidMemBytes( unsigned nAdapter ) const override;
 
 #if !defined( _X360 )
 	FORCEINLINE IDirect3D9 *D3D() const
