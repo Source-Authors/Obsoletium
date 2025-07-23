@@ -20,13 +20,11 @@
 
 
 
-//-----------------------------------------------------------------------------
 // Describes which D3DDEVTYPE to use
-//-----------------------------------------------------------------------------
 #ifndef USE_REFERENCE_RASTERIZER
-#define DX8_DEVTYPE	D3DDEVTYPE_HAL
+constexpr inline D3DDEVTYPE DX8_DEVTYPE{D3DDEVTYPE_HAL};
 #else
-#define DX8_DEVTYPE	D3DDEVTYPE_REF
+constexpr inline D3DDEVTYPE DX8_DEVTYPE{D3DDEVTYPE_REF};
 #endif
     
 
