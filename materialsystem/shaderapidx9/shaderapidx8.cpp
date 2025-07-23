@@ -12300,15 +12300,10 @@ const FlashlightState_t &CShaderAPIDx8::GetFlashlightStateEx( VMatrix &worldToTe
 
 bool CShaderAPIDx8::SupportsMSAAMode( int nMSAAMode )
 {
-	if ( IsX360() )
-	{
-		return false;
-	}
-
-	return ( D3D_OK == D3D()->CheckDeviceMultiSampleType( m_DisplayAdapter, m_DeviceType, 
+	return D3D_OK == D3D()->CheckDeviceMultiSampleType( m_DisplayAdapter, m_DeviceType, 
 														   m_PresentParameters.BackBufferFormat,
 														   m_PresentParameters.Windowed,
-														   ComputeMultisampleType( nMSAAMode ), NULL ) );
+														   ComputeMultisampleType( nMSAAMode ), NULL );
 }
 
 bool CShaderAPIDx8::SupportsCSAAMode( int nNumSamples, int nQualityLevel )
@@ -12343,7 +12338,7 @@ bool CShaderAPIDx8::SupportsBorderColor( void ) const
 
 bool CShaderAPIDx8::SupportsFetch4( void )
 {
-	return IsPC() && g_pHardwareConfig->Caps().m_bSupportsFetch4;
+	return g_pHardwareConfig->Caps().m_bSupportsFetch4;
 }
 
 ImageFormat CShaderAPIDx8::GetShadowDepthTextureFormat( void )

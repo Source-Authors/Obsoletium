@@ -546,7 +546,6 @@ constexpr inline int DeterminePowerOfTwo( int val )
 //-----------------------------------------------------------------------------
 // NOTE: IF YOU CHANGE THIS, CHANGE THE VERSION IN PLAYBACK.CPP!!!!
 // OPTIMIZE??: could lock the texture directly instead of the surface in dx9.
-#if !defined( _X360 )
 static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, int srcStride )
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
@@ -747,12 +746,10 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - pTextureLevel->Release", __FUNCTION__ );
 	pTextureLevel->Release();
 }
-#endif
 
 //-----------------------------------------------------------------------------
 // Blit in bits
 //-----------------------------------------------------------------------------
-#if !defined( _X360 )
 static void BlitVolumeBits( TextureLoadInfo_t &info, int xOffset, int yOffset, int srcStride )
 {
 	D3DBOX srcBox;
@@ -801,111 +798,6 @@ static void BlitVolumeBits( TextureLoadInfo_t &info, int xOffset, int yOffset, i
 		return;
 	}
 }
-#endif
-
-//-----------------------------------------------------------------------------
-// Puts 3D texture data into 360 gpu memory.
-// Does not support any subvolume or slice blitting.
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-static void BlitVolumeBits( TextureLoadInfo_t &info, int xOffset, int yOffset, int srcStride )
-{
-	if ( xOffset || yOffset || info.m_nZOffset || srcStride )
-	{
-		// not supporting any subvolume blitting
-		// the entire volume per mip must be blitted
-		Assert( 0 );
-		return;
-	}
-
-	ImageFormat	dstFormat = GetImageFormat( info.m_pTexture );
-	if ( dstFormat != info.m_SrcFormat )
-	{
-		// texture is expected to be in target format
-		// not supporting conversion
-		Assert( 0 );
-		return;
-	}
-
-	// get the top mip level info (needed for proper sub mip access)
-	XGTEXTURE_DESC baseDesc;
-	XGGetTextureDesc( info.m_pTexture, 0, &baseDesc );
-	bool bDstIsTiled = XGIsTiledFormat( baseDesc.Format ) == TRUE;
-	if ( info.m_bSrcIsTiled && !bDstIsTiled )
-	{
-		// not supporting a tiled source into an untiled target
-		Assert( 0 );
-		return;
-	}
-
-	// get the mip level info
-	XGTEXTURE_DESC mipDesc;
-	XGGetTextureDesc( info.m_pTexture, info.m_nLevel, &mipDesc );
-	bool bFullSurfBlit = ( mipDesc.Width == (unsigned int)info.m_nWidth && mipDesc.Height == (unsigned int)info.m_nHeight );
-
-	if ( !bFullSurfBlit )
-	{
-		// not supporting subrect blitting
-		Assert( 0 );
-		return;
-	}
-
-	D3DLOCKED_BOX lockedBox;
-
-	// get the mip level of the volume we want to write into
-	IDirect3DVolumeTexture *pVolumeTexture = static_cast<IDirect3DVolumeTexture*>( info.m_pTexture );
-	HRESULT hr = pVolumeTexture->LockBox( info.m_nLevel, &lockedBox, NULL, D3DLOCK_NOSYSLOCK );
-	if ( FAILED( hr ) )
-	{
-		Warning( "CShaderAPIDX8::BlitVolumeBits: Couldn't lock volume box\n" );
-		return;
-	}
-
-	unsigned char *pSrcData = info.m_pSrcData;
-	unsigned char *pTargetImage = (unsigned char *)lockedBox.pBits;
-
-	int tileFlags = 0;
-	if ( !( mipDesc.Flags & XGTDESC_PACKED ) )
-		tileFlags |= XGTILE_NONPACKED;
-	if ( mipDesc.Flags & XGTDESC_BORDERED )
-		tileFlags |= XGTILE_BORDER;
-
-	if ( !info.m_bSrcIsTiled && bDstIsTiled )
-	{
-		// tile the source directly into the target surface
-		XGTileVolumeTextureLevel(
-			baseDesc.Width,
-			baseDesc.Height,
-			baseDesc.Depth,
-			info.m_nLevel,
-			XGGetGpuFormat( baseDesc.Format ),
-			tileFlags,
-			pTargetImage,
-			NULL,
-			pSrcData,
-			mipDesc.RowPitch,
-			mipDesc.SlicePitch,
-			NULL );
-	}
-	else if ( !info.m_bSrcIsTiled && !bDstIsTiled )
-	{
-		// not implemented yet
-		Assert( 0 );
-	}
-	else
-	{
-		// not implemented yet
-		Assert( 0 );
-	}
-
-	hr = pVolumeTexture->UnlockBox( info.m_nLevel );
-	if ( FAILED( hr ) )
-	{
-		Warning( "CShaderAPIDX8::BlitVolumeBits: couldn't unlock volume box\n" );
-		return;
-	}
-}
-#endif
 
 // FIXME: How do I blit from D3DPOOL_SYSTEMMEM to D3DPOOL_MANAGED?  I used to use CopyRects for this.  UpdateSurface doesn't work because it can't blit to anything besides D3DPOOL_DEFAULT.
 // We use this only in the case where we need to create a < 4x4 miplevel for a compressed texture.  We end up creating a 4x4 system memory texture, and blitting it into the proper miplevel.

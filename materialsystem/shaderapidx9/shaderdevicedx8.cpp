@@ -1449,9 +1449,7 @@ bool CShaderDeviceMgrDx8::ValidateMode( unsigned nAdapter, const ShaderDeviceInf
 //-----------------------------------------------------------------------------
 size_t CShaderDeviceMgrDx8::GetVidMemBytes( unsigned nAdapter ) const
 {
-#if defined( _X360 )
-	return 256*1024*1024;
-#elif defined (DX_TO_GL_ABSTRACTION)
+#if defined (DX_TO_GL_ABSTRACTION)
 	D3DADAPTER_IDENTIFIER9 devIndentifier;
 	D3D()->GetAdapterIdentifier( nAdapter, D3DENUM_WHQL_LEVEL, &devIndentifier );
 	return devIndentifier.VideoMemory;

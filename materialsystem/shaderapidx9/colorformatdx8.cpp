@@ -61,7 +61,7 @@ static bool TestTextureFormat( D3DFORMAT format, bool bIsRenderTarget,
 	HRESULT hr;
 
 	// IHV depth texture formats require a slightly different check...
-	if ( !IsX360() && bIsRenderTarget && ( ( format == NVFMT_RAWZ ) || ( format == NVFMT_INTZ   ) ||
+	if ( bIsRenderTarget && ( ( format == NVFMT_RAWZ ) || ( format == NVFMT_INTZ   ) ||
 										   ( format == D3DFMT_D16 ) || ( format == D3DFMT_D24S8 ) ||
 										   ( format == ATIFMT_D16 ) || ( format == ATIFMT_D24S8 ) ) )
 	{
@@ -69,17 +69,12 @@ static bool TestTextureFormat( D3DFORMAT format, bool bIsRenderTarget,
 			g_DisplayAdapter, g_DeviceType, ImageLoader::ImageFormatToD3DFormat( g_DeviceFormat ),
 			D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, format );
 	}
-	else if ( !IsX360() || !bIsRenderTarget )
+	else
 	{
 		// See if we can do it!
 		hr = D3D()->CheckDeviceFormat( 
 			g_DisplayAdapter, g_DeviceType, ImageLoader::ImageFormatToD3DFormat( g_DeviceFormat ),
 			nUsage, D3DRTYPE_TEXTURE, format );
-	}
-	else // 360
-	{
-		// 360 can only validate render targets as surface display format
-		hr = D3D()->CheckDeviceFormat( g_DisplayAdapter, g_DeviceType, format, 0, D3DRTYPE_SURFACE, format );
 	}
 
     return SUCCEEDED( hr );
@@ -425,23 +420,13 @@ D3DFORMAT FindNearestSupportedDepthFormat( unsigned nAdapter, ImageFormat displa
 
 	switch (depthFormat)
 	{
-#if defined( _X360 )
-	case D3DFMT_D24FS8:
-		return D3DFMT_D24FS8;
-
-	case D3DFMT_LIN_D24S8:
-		if ( g_bSupportsD24S8 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_LIN_D24S8 ) )
-			return D3DFMT_LIN_D24S8;
-#endif
 	case D3DFMT_D24S8:
 		if ( g_bSupportsD24S8 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D24S8 ) )
 			return D3DFMT_D24S8;
-#if !defined( _X360 )
 		if ( g_bSupportsD24X4S4 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D24X4S4 ) )
 			return D3DFMT_D24X4S4;
 		if ( g_bSupportsD15S1 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D15S1 ) )
 			return D3DFMT_D15S1;
-#endif
 		if ( g_bSupportsD24X8 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D24X8 ) )
 			return D3DFMT_D24X8;
 		if ( g_bSupportsD16 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D16 ) )
@@ -453,33 +438,25 @@ D3DFORMAT FindNearestSupportedDepthFormat( unsigned nAdapter, ImageFormat displa
 			return D3DFMT_D24X8;
 		if ( g_bSupportsD24S8 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D24S8 ) )
 			return D3DFMT_D24S8;
-#if !defined( _X360 )
 		if ( g_bSupportsD24X4S4 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D24X4S4 ) )
 			return D3DFMT_D24X4S4;
-#endif
         if ( g_bSupportsD16 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D16 ) )
 			return D3DFMT_D16;
-#if !defined( _X360 )
 		if ( g_bSupportsD15S1 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D15S1 ) )
 			return D3DFMT_D15S1;
-#endif
 		break;
 
 	case D3DFMT_D16:
 		if ( g_bSupportsD16 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D16 ) )
 			return D3DFMT_D16;
-#if !defined( _X360 )
 		if ( g_bSupportsD15S1 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D15S1 ) )
 			return D3DFMT_D15S1;
-#endif
 		if ( g_bSupportsD24X8 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D24X8 ) )
 			return D3DFMT_D24X8;
 		if ( g_bSupportsD24S8 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D24S8 ) )
 			return D3DFMT_D24S8;
-#if !defined( _X360 )
 		if ( g_bSupportsD24X4S4 && IsDepthFormatCompatible( nAdapter, displayFormat, renderTargetFormat, D3DFMT_D24X4S4 ) )
 			return D3DFMT_D24X4S4;
-#endif
 		break;
 	}
 
