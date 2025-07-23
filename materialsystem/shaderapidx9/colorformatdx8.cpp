@@ -62,8 +62,8 @@ static bool TestTextureFormat( D3DFORMAT format, bool bIsRenderTarget,
 
 	// IHV depth texture formats require a slightly different check...
 	if ( bIsRenderTarget && ( ( format == NVFMT_RAWZ ) || ( format == NVFMT_INTZ   ) ||
-										   ( format == D3DFMT_D16 ) || ( format == D3DFMT_D24S8 ) ||
-										   ( format == ATIFMT_D16 ) || ( format == ATIFMT_D24S8 ) ) )
+								( format == D3DFMT_D16 ) || ( format == D3DFMT_D24S8 ) ||
+								( format == ATIFMT_D16 ) || ( format == ATIFMT_D24S8 ) ) )
 	{
 		hr = D3D()->CheckDeviceFormat(
 			g_DisplayAdapter, g_DeviceType, ImageLoader::ImageFormatToD3DFormat( g_DeviceFormat ),
@@ -330,35 +330,27 @@ void InitializeColorInformation( UINT displayAdapter, D3DDEVTYPE deviceType,
     HRESULT hr = D3D()->CheckDeviceFormat( 
 		g_DisplayAdapter, g_DeviceType, ImageLoader::ImageFormatToD3DFormat( g_DeviceFormat ),
         D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24S8 );
-	g_bSupportsD24S8 = !FAILED(hr);
+	g_bSupportsD24S8 = SUCCEEDED(hr);
 
     hr = D3D()->CheckDeviceFormat( 
 		g_DisplayAdapter, g_DeviceType, ImageLoader::ImageFormatToD3DFormat( g_DeviceFormat ),
         D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24X8 );
-	g_bSupportsD24X8 = !FAILED(hr);
+	g_bSupportsD24X8 = SUCCEEDED(hr);
 
     hr = D3D()->CheckDeviceFormat( 
 		g_DisplayAdapter, g_DeviceType, ImageLoader::ImageFormatToD3DFormat( g_DeviceFormat ),
         D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D16 );
-	g_bSupportsD16 = !FAILED(hr);
+	g_bSupportsD16 = SUCCEEDED(hr);
 
-#if !defined( _X360 )
 	hr = D3D()->CheckDeviceFormat( 
 		g_DisplayAdapter, g_DeviceType, ImageLoader::ImageFormatToD3DFormat( g_DeviceFormat ),
 		D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D24X4S4 );
-	g_bSupportsD24X4S4 = !FAILED(hr);
-#else
-	g_bSupportsD24X4S4 = false;
-#endif
+	g_bSupportsD24X4S4 = SUCCEEDED(hr);
 
-#if !defined( _X360 )
 	hr = D3D()->CheckDeviceFormat( 
 		g_DisplayAdapter, g_DeviceType, ImageLoader::ImageFormatToD3DFormat( g_DeviceFormat ),
 		D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, D3DFMT_D15S1 );
-	g_bSupportsD15S1 = !FAILED(hr);
-#else
-	g_bSupportsD15S1 = false;
-#endif
+	g_bSupportsD15S1 = SUCCEEDED(hr);
 }
 
 
@@ -392,7 +384,7 @@ bool D3DSupportsDepthTexture(D3DFORMAT format)
 		g_DisplayAdapter, g_DeviceType, ImageLoader::ImageFormatToD3DFormat(g_DeviceFormat),
         D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, format);
 
-	return !FAILED(hr);
+	return SUCCEEDED(hr);
 }
 
 
@@ -407,7 +399,7 @@ static inline bool IsDepthFormatCompatible( unsigned nAdapter, ImageFormat displ
 	// Verify that the depth format is compatible.
 	HRESULT hr = D3D()->CheckDepthStencilMatch(	nAdapter, DX8_DEVTYPE,
 		d3dDisplayFormat, d3dRenderTargetFormat, depthFormat);
-	return !FAILED(hr);
+	return SUCCEEDED(hr);
 }
 
 //-----------------------------------------------------------------------------
@@ -473,7 +465,7 @@ static inline bool IsFrameBufferFormatValid( UINT displayAdapter, D3DDEVTYPE dev
 {
 	HRESULT hr = D3D()->CheckDeviceType( displayAdapter, deviceType, displayFormat, 
                                         backBufferFormat, bIsWindowed );
-	return !FAILED(hr);
+	return SUCCEEDED(hr);
 }
 
 
