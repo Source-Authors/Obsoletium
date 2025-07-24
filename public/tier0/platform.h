@@ -144,16 +144,6 @@ typedef double				float64;
 // for when we don't care about how many bits we use
 typedef unsigned int		uint;
 
-#ifdef _MSC_VER
-// Ensure that everybody has the right compiler version installed. The version
-// number can be obtained by looking at the compiler output when you type 'cl'
-// dimhotepus: Require MSVC 2019 16.10/11 for C++17 support.
-// See https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros
-#if _MSC_VER < 1929
-#error "Please install VS 2019 version 16.10, 16.11+"
-#endif
-#endif
-
 // This can be used to ensure the size of pointers to members when declaring
 // a pointer type for a class that has only been forward declared
 #ifdef _MSC_VER

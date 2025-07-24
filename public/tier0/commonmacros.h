@@ -23,6 +23,13 @@
  * @brief Defined when GCC compiler used.
  */
 #define COMPILER_GCC 1
+
+// dimhotepus: Require GCC 8+ for C++17 support.
+// Only Clang 8 has full C++17 support.
+// See https://gcc.gnu.org/projects/cxx-status.html#cxx17
+#if __GNUC__ < 8
+#error "Please install GCC 8+ to support C++ 17"
+#endif
 #endif
 
 #ifdef __clang__
@@ -30,13 +37,29 @@
  * @brief Defined when clang compiler used.
  */
 #define COMPILER_CLANG 1
+
+// dimhotepus: Require Clang 8+ for C++17 support.
+// Only Clang 8 has full C++17 support.
+// See https://clang.llvm.org/cxx_status.html#cxx17
+#if __clang_major__ < 8
+#error "Please install Clang 8+ to support C++ 17"
+#endif
 #endif
 
-#if defined(_MSC_VER) && !defined(COMPILER_MSVC)
+#if defined(_MSC_VER)
+#if !defined(COMPILER_MSVC)
 /**
  * @brief Defined when MSVC compiler used.
  */
 #define COMPILER_MSVC 1
+#endif
+
+// dimhotepus: Require Visual Studio 2022 version 17.2+ for C++17 support.
+// See https://en.cppreference.com/w/cpp/compiler_support/17.html
+// See https://learn.microsoft.com/en-us/cpp/overview/visual-cpp-language-conformance?view=msvc-170
+#if _MSC_VER < 1932
+#error "Please install Visual Studio 2022 version 17.2+ to support C++ 17"
+#endif
 #endif
 
 /**
