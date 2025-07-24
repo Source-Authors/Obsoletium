@@ -1081,7 +1081,7 @@ inline uint64_t Plat_MeasureRtscpOverhead()
 // Type-safe copying for trivial types.
 template<typename T>
 std::enable_if_t<std::is_trivially_copyable_v<T>>
-BitwiseCopy(const T* src, T* dest, size_t size) noexcept
+BitwiseCopy(const T* src, T* dest, size_t size = 1) noexcept
 {
   std::memcpy(dest, src, sizeof(T) * size);
 }
@@ -1089,7 +1089,7 @@ BitwiseCopy(const T* src, T* dest, size_t size) noexcept
 // Type-safe copying for non-trivial types.
 template<typename T>
 std::enable_if_t<!std::is_trivially_copyable_v<T>>
-constexpr BitwiseCopy(const T* src, T* dest, size_t size) noexcept
+constexpr BitwiseCopy(const T* src, T* dest, size_t size = 1) noexcept
 {
   std::copy_n(src, size, dest);
 }
