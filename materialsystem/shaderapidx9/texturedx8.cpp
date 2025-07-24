@@ -5,36 +5,39 @@
 // $NoKeywords: $
 //
 //===========================================================================//
-
-#define DISABLE_PROTECTED_THINGS
-#include "locald3dtypes.h"
 #include "texturedx8.h"
+
 #include "shaderapidx8_global.h"
 #include "colorformatdx8.h"
+#include "recording.h"
+
+#include "shaderapi/ishaderapi.h"
 #include "shaderapi/ishaderutil.h"
 #include "materialsystem/imaterialsystem.h"
-#include "utlvector.h"
-#include "recording.h"
-#include "shaderapi/ishaderapi.h"
-#include "filesystem.h"
+
+#include "tier0/icommandline.h"
+#include "tier0/vprof.h"
+#include "tier1/utlvector.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/callqueue.h"
-#include "tier0/vprof.h"
+
 #include "vtf/vtf.h"
-#include "tier0/icommandline.h"
+#include "filesystem.h"
+
+#include <atomic>
 
 #include "tier0/memdbgon.h"
 
-static int s_TextureCount = 0;
+static std::atomic_uint s_TextureCount = 0;
 static bool s_bTestingVideoMemorySize = false;
 
 //-----------------------------------------------------------------------------
 // Stats...
 //-----------------------------------------------------------------------------
 
-int TextureCount()
+unsigned TextureCount()
 {
-	return s_TextureCount;
+	return s_TextureCount.load(std::memory_order::memory_order_relaxed);
 }
 
 static bool IsVolumeTexture( IDirect3DBaseTexture* pBaseTexture )
@@ -319,7 +322,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 #endif
 
-	++s_TextureCount;
+	s_TextureCount.fetch_add(1, std::memory_order::memory_order_relaxed);
 
 	return pBaseTexture;
 }
@@ -361,7 +364,7 @@ void DestroyD3DTexture( IDirect3DBaseTexture* pD3DTex )
 			ReleaseD3DTexture( pD3DTex );
 		}
 
-		--s_TextureCount;
+		s_TextureCount.fetch_sub(1, std::memory_order::memory_order_relaxed);
 	}
 }
 
