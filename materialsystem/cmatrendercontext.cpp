@@ -8,14 +8,12 @@
 
 #define MATSYS_INTERNAL
 
-#include <math.h>
 #include "cmatrendercontext.h"
 #include "tier2/renderutils.h"
 #include "cmaterialsystem.h"
 #include "occlusionquerymgr.h"
 #include "texturemanager.h"
 #include "IHardwareConfigInternal.h"
-#include "ctype.h"
 
 #include "tier1/fmtstr.h"
 #include "togl/rendermechanism.h"
@@ -2208,7 +2206,7 @@ void CMatRenderContext::CopyRenderTargetToTextureEx( ITexture *pTexture, int nRe
 	GetMaterialSystem()->Flush( false );
 	ITextureInternal *pTextureInternal = (ITextureInternal *)pTexture;
 
-			pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
+	pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
 }
 
 void CMatRenderContext::CopyRenderTargetToTexture( ITexture *pTexture )
@@ -2228,8 +2226,8 @@ void CMatRenderContext::CopyTextureToRenderTargetEx( int nRenderTargetID, ITextu
 	GetMaterialSystem()->Flush( false );
 	ITextureInternal *pTextureInternal = (ITextureInternal *)pTexture;
 
-		pTextureInternal->CopyMeToFrameBuffer( nRenderTargetID, pSrcRect, pDstRect );
-	}
+	pTextureInternal->CopyMeToFrameBuffer( nRenderTargetID, pSrcRect, pDstRect );
+}
 
 
 void CMatRenderContext::ClearBuffers( bool bClearColor, bool bClearDepth, bool bClearStencil )
