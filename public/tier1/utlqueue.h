@@ -41,6 +41,9 @@ public:
 
 	// Add a new item to the end of the queue
 	void	Insert( T const &element );
+	
+	// Add a new item to the end of the queue
+	void	Insert( T &&element );
 
 	// checks if an element of this value already exists on the stack, returns true if it does
 	bool		Check( T const element ) const;
@@ -232,6 +235,44 @@ void CUtlQueue<T, M>::Insert( T const &element )
 	}
 
 	CopyConstruct( std::addressof( m_memory[ m_tail ] ), element );
+}
+
+template <class T, class M>
+void CUtlQueue<T, M>::Insert( T&& element )
+{
+	if ( m_tail == QUEUE_ITERATOR_INVALID )
+	{
+		// empty
+		m_memory.EnsureCapacity( 1 );
+		m_head = m_tail = QueueIter_t( 0 );
+	}
+	else
+	{
+		// non-empty
+		QueueIter_t nextTail = Next_Unchecked( m_tail );
+		if ( nextTail == m_head ) // if non-empty, and growing by 1 appears to make the queue of length 1, then we were already full before the Insert
+		{
+			intp nOldAllocCount = m_memory.NumAllocated();
+			m_memory.Grow();
+			intp nNewAllocCount = m_memory.NumAllocated();
+			intp nGrowAmount = nNewAllocCount - nOldAllocCount;
+
+			nextTail = Next_Unchecked( m_tail ); // if nextTail was 0, then it now should be nOldAllocCount
+
+			if ( m_head != QueueIter_t( 0 ) )
+			{
+				// if the queue wraps around the end of m_memory, move the part at the end of memory to the new end of memory
+				Q_memmove( &m_memory[ m_head + nGrowAmount ], &m_memory[ m_head ], ( nOldAllocCount - m_head ) * sizeof( T ) );
+#ifdef _DEBUG
+				Q_memset( &m_memory[ m_head ], 0xdd, nGrowAmount * sizeof( T ) );
+#endif
+				m_head = QueueIter_t( m_head + nGrowAmount );
+			}
+		}
+		m_tail = nextTail;
+	}
+
+	MoveConstruct( std::addressof( m_memory[ m_tail ] ), std::move( element ) );
 }
 
 template <class T, class M>

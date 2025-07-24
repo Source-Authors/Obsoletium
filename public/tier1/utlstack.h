@@ -60,6 +60,9 @@ public:
 	// Adds an element, uses copy constructor
 	intp Push( T const& src );
 
+	// Adds an element, uses move constructor
+	intp Push( T&& src );
+
 	// Pops the stack
 	void Pop();
 	void Pop( T& oldTop );
@@ -268,6 +271,18 @@ intp CUtlStack<T,M>::Push( T const& src )
 {
 	GrowStack();
 	CopyConstruct( std::addressof( Element(m_Size-1) ), src );
+	return m_Size - 1;
+}
+
+//-----------------------------------------------------------------------------
+// Adds an element, uses copy constructor
+//-----------------------------------------------------------------------------
+
+template< class T, class M >
+intp CUtlStack<T,M>::Push( T&& src )
+{
+	GrowStack();
+	MoveConstruct( std::addressof( Element(m_Size-1) ), std::move( src ) );
 	return m_Size - 1;
 }
 

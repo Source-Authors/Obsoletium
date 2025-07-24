@@ -155,6 +155,9 @@ public:
 	// Add the specified array to the tail.
 	intp AddVectorToTail( CUtlVector<T, A> const &src );
 
+	// Move the specified array to the tail.
+	intp AddVectorToTail( CUtlVector<T, A>&& src );
+
 	// Finds an element (element needs operator== defined)
 	intp Find( const T& src ) const;
 
@@ -1248,6 +1251,26 @@ intp CUtlVector<T, A>::AddVectorToTail( CUtlVector const &src )
 }
 
 template< typename T, class A >
+intp CUtlVector<T, A>::AddVectorToTail( CUtlVector&& src )
+{
+	Assert( &src != this );
+
+	intp base = Count();
+	
+	// Make space.
+	intp nSrcCount = src.Count();
+	EnsureCapacity( base + nSrcCount );
+
+	// Copy the elements.
+	m_Size += nSrcCount;
+	for ( intp i=0; i < nSrcCount; i++ )
+	{
+		MoveConstruct( std::addressof( Element(base+i) ), std::move( src[i] ) );
+	}
+	return base;
+}
+
+template< typename T, class A >
 inline intp CUtlVector<T, A>::InsertMultipleBefore( intp elem, intp num )
 {
 	if( num == 0 )
@@ -1285,14 +1308,14 @@ inline intp CUtlVector<T, A>::InsertMultipleBefore( intp elem, intp num, const T
 	{
 		for ( intp i = 0; i < num; ++i )
 		{
-			Construct(std::addressof( Element( elem+i ) ));
+			Construct( std::addressof( Element( elem+i ) ) );
 		}
 	}
 	else
 	{
 		for ( intp i=0; i < num; i++ )
 		{
-			CopyConstruct(std::addressof( Element( elem+i )), pToInsert[i] );
+			CopyConstruct( std::addressof( Element( elem+i )), pToInsert[i] );
 		}
 	}
 
