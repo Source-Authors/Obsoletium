@@ -142,20 +142,20 @@ void RecordCommand( RecordingCommands_t cmd, unsigned char numargs );
 void RecordArgument( const void *pMemory, intp size );
 void FinishRecording( void );
 
-template<typename TIntegral, typename = std::enable_if_t<std::is_integral_v<TIntegral>>>
-inline void RecordInt( TIntegral i )
+template<typename TIntegral>
+inline std::enable_if_t<std::is_integral_v<TIntegral>> RecordInt( TIntegral i )
 {
 	RecordArgument( &i, sizeof(i) );
 }
 
-template<typename TPointer, typename = std::enable_if_t<std::is_pointer_v<TPointer>>>
-inline void RecordPtr( TPointer p )
+template<typename TPointer>
+inline std::enable_if_t<std::is_pointer_v<TPointer>> RecordPtr( TPointer p )
 {
 	RecordArgument( p, sizeof(p) );
 }
 
-template<typename TFloat, typename = std::enable_if_t<std::is_floating_point_v<TFloat>>>
-inline void RecordFloat( TFloat f )
+template<typename TFloat>
+inline std::enable_if_t<std::is_floating_point_v<TFloat>> RecordFloat( TFloat f )
 {
 	RecordArgument( &f, sizeof(f) );
 }

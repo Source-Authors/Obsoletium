@@ -167,13 +167,15 @@ class TSLIST_HEAD_ALIGN CTSListBase : public CAlignedNewDelete<TSLIST_HEAD_ALIGN
 };
 
 // Lock free simple stack.
-template <typename T, typename = std::enable_if_t<std::is_base_of_v<TSLNodeBase_t, T>>>
+template <typename T>
 class TSLIST_HEAD_ALIGN CTSSimpleList : public CTSListBase
 {
+	using tls_node_concept = std::enable_if_t<std::is_base_of_v<TSLNodeBase_t, T>>;
+
 public:
 	void Push( T *pNode )
 	{
-		Assert( sizeof(T) >= sizeof(TSLNodeBase_t) );
+		static_assert( sizeof(T) >= sizeof(TSLNodeBase_t) );
 		CTSListBase::Push( pNode );
 	}
 
