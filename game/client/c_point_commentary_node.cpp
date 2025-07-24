@@ -37,6 +37,11 @@ bool IsInCommentaryMode( void )
 
 static bool g_bTracingVsCommentaryNodes = false;
 
+
+int CHud::LookupRenderGroupIndexByName(const char *pszGroupName) {
+  return m_RenderGroupNames.Find(pszGroupName);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------

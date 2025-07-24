@@ -1,9 +1,9 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+﻿//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
 //=============================================================================//
-
+#include <algorithm>
 #include "cbase.h"
 
 #if defined( CLIENT_DLL )
@@ -189,33 +189,25 @@ bool CHL2MPMachineGun::Deploy( void )
 // Purpose: Make enough sound events to fill the estimated think interval
 // returns: number of shots needed
 //-----------------------------------------------------------------------------
-int CHL2MPMachineGun::WeaponSoundRealtime( WeaponSound_t shoot_type )
-{
-	int numBullets = 0;
+int CHL2MPMachineGun::WeaponSoundRealtime(WeaponSound_t shoot_type) {
+  int numBullets = 0;
 
-	// ran out of time, clamp to current
-	if (m_flNextSoundTime < gpGlobals->curtime)
-	{
-		m_flNextSoundTime = gpGlobals->curtime;
-	}
+  if (m_flNextSoundTime < gpGlobals->curtime) {
+    m_flNextSoundTime = gpGlobals->curtime;
+  }
 
-	// make enough sound events to fill up the next estimated think interval
-	float dt = clamp( m_flAnimTime - m_flPrevAnimTime, 0, 0.2 );
-	if (m_flNextSoundTime < gpGlobals->curtime + dt)
-	{
-		WeaponSound( SINGLE_NPC, m_flNextSoundTime );
-		m_flNextSoundTime += GetFireRate();
-		numBullets++;
-	}
-	if (m_flNextSoundTime < gpGlobals->curtime + dt)
-	{
-		WeaponSound( SINGLE_NPC, m_flNextSoundTime );
-		m_flNextSoundTime += GetFireRate();
-		numBullets++;
-	}
+  float rawDelta = m_flAnimTime - m_flPrevAnimTime;
+  float dt = std::clamp(rawDelta, 0.0f, 0.2f);
 
-	return numBullets;
+  while (m_flNextSoundTime < gpGlobals->curtime + dt) {
+    WeaponSound(SINGLE_NPC, m_flNextSoundTime);
+    m_flNextSoundTime += GetFireRate();
+    numBullets++;
+  }
+
+  return numBullets;
 }
+
 
 
 

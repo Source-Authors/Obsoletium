@@ -573,8 +573,8 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 	m_BackdropColor = Color(0, 0, 0, 128);
 	m_pConsoleAnimationController = NULL;
 	m_pConsoleControlSettings = NULL;
-	m_bCopyFrameBuffer = false;
-	m_bUseRenderTargetImage = false;
+	//m_bCopyFrameBuffer = false;
+	//m_bUseRenderTargetImage = false;
 	m_ExitingFrameCount = 0;
 	m_bXUIVisible = false;
 	m_bUseMatchmaking = false;
@@ -589,9 +589,9 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 	m_pAsyncJob = NULL;
 	m_pStorageDeviceValidatedNotify = NULL;
 
-	m_iRenderTargetImageID = -1;
+	//m_iRenderTargetImageID = -1;
 	m_iBackgroundImageID = -1;
-	m_iProductImageID = -1;
+	//m_iProductImageID = -1;
 	m_iLoadingImageID = -1;
 
 	m_pGameMenuButtons.AddToTail( CreateMenuButton( this, "GameMenuButton", ModInfo().GetGameTitle() ) );
@@ -647,6 +647,7 @@ CBasePanel::~CBasePanel()
 
 	if ( vgui::surface() )
 	{
+        /*
 		if ( m_iRenderTargetImageID != -1 )
 		{
 			vgui::surface()->DestroyTextureID( m_iRenderTargetImageID );
@@ -670,6 +671,7 @@ CBasePanel::~CBasePanel()
 			vgui::surface()->DestroyTextureID( m_iLoadingImageID );
 			m_iLoadingImageID = -1;
 		}
+                  */
 	}
 }
 
@@ -942,7 +944,7 @@ void CBasePanel::SetBackgroundRenderState(EBackgroundState state)
 	if ( state == BACKGROUND_EXITING )
 	{
 		// hide the menus
-		m_bCopyFrameBuffer = false;
+		//m_bCopyFrameBuffer = false;
 	}
 	else if ( state == BACKGROUND_DISCONNECTED || state == BACKGROUND_MAINMENU )
 	{
@@ -2033,6 +2035,9 @@ void CBasePanel::IssuePostPromptCommand( void )
 	// The device is valid, so launch any pending commands
 	if ( m_strPostPromptCommand.IsEmpty() == false )
 	{
+		// yungDoom - I really dont know...
+        int m_bSinglePlayer = 0;
+
 		if ( m_bSinglePlayer )
 		{
 			OnCommand( m_strPostPromptCommand );

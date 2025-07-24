@@ -3,7 +3,7 @@
 // Purpose: Physics cannon
 //
 //=============================================================================//
-
+#include <algorithm>
 #include "cbase.h"
 
 #ifdef CLIENT_DLL
@@ -878,7 +878,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 			Vector vecLaunch;
 			m_pPlayer->EyeVectors( &vecLaunch );
 			// JAY: Scale this with mass because some small objects really go flying
-			float massFactor = clamp( pPhys->GetMass(), 0.5, 15 );
+			float massFactor = std::clamp( pPhys->GetMass(), 0.5f, 15.0f );
 			massFactor = RemapVal( massFactor, 0.5, 15, 0.5, 4 );
 			vecLaunch *= player_throwforce.GetFloat() * massFactor;
 
@@ -2255,7 +2255,7 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	QAngle playerAngles = pPlayer->EyeAngles();
 
 	float pitch = AngleDistance(playerAngles.x,0);
-	playerAngles.x = clamp( pitch, -75, 75 );
+    playerAngles.x = std::clamp(pitch, -75.0f, 75.0f);
 	AngleVectors( playerAngles, &forward, &right, &up );
 
 	// Now clamp a sphere of object radius at end to the player's bbox

@@ -5,6 +5,7 @@
 // $NoKeywords: $
 //
 //=============================================================================//
+#include <algorithm>
 #include "cbase.h"
 
 #ifdef CLIENT_DLL
@@ -312,25 +313,24 @@ void CPlayerAnimState::ComputePoseParam_BodyYaw( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CPlayerAnimState::ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr )
-{
-	// Get pitch from v_angle
-	float flPitch = GetOuter()->GetLocalAngles()[ PITCH ];
+void CPlayerAnimState::ComputePoseParam_BodyPitch(CStudioHdr *pStudioHdr) {
 
-	if ( flPitch > 180.0f )
-	{
-		flPitch -= 360.0f;
-	}
-	flPitch = clamp( flPitch, -90, 90 );
+  float flPitch = GetOuter()->GetLocalAngles()[PITCH];
 
-	QAngle absangles = GetOuter()->GetAbsAngles();
-	absangles.x = 0.0f;
-	m_angRender = absangles;
-	m_angRender[ PITCH ] = m_angRender[ ROLL ] = 0.0f;
+  if (flPitch > 180.0f) {
+    flPitch -= 360.0f;
+  }
 
-	// See if we have a blender for pitch
-	GetOuter()->SetPoseParameter( pStudioHdr, "aim_pitch", flPitch );
+  flPitch = std::clamp(flPitch, -90.0f, 90.0f);
+
+  QAngle absangles = GetOuter()->GetAbsAngles();
+  absangles.x = 0.0f;
+  m_angRender = absangles;
+  m_angRender[PITCH] = m_angRender[ROLL] = 0.0f;
+
+  GetOuter()->SetPoseParameter(pStudioHdr, "aim_pitch", flPitch);
 }
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 

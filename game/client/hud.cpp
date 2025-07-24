@@ -992,11 +992,6 @@ void CHud::ProcessInput( bool bActive )
 	}
 }
 
-intp CHud::LookupRenderGroupIndexByName( const char *pszGroupName )
-{
-	return m_RenderGroupNames.Find( pszGroupName );
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: A hud element wants to lock this render group so other panels in the
 // group do not draw

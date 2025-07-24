@@ -3,7 +3,7 @@
 // Purpose: 
 //
 //=============================================================================//
-
+#include <algorithm>
 #include "cbase.h"
 #include "npcevent.h"
 #include "in_buttons.h"
@@ -229,8 +229,7 @@ void CWeaponPistol::UpdatePenaltyTime( void )
 	// Check our penalty time decay
 	if ( ( ( pOwner->m_nButtons & IN_ATTACK ) == false ) && ( m_flSoonestPrimaryAttack < gpGlobals->curtime ) )
 	{
-		m_flAccuracyPenalty -= gpGlobals->frametime;
-		m_flAccuracyPenalty = clamp( m_flAccuracyPenalty, 0.0f, PISTOL_ACCURACY_MAXIMUM_PENALTY_TIME );
+          m_flAccuracyPenalty -= gpGlobals->frametime;
 	}
 }
 
