@@ -58,21 +58,21 @@ struct ShaderDeviceInfo_t
 
 	int m_nVersion;
 	ShaderDisplayMode_t m_DisplayMode;
-	int m_nBackBufferCount;				// valid values are 1 or 2 [2 results in triple buffering]
-	int m_nAASamples;					// Number of AA samples to use
-	int m_nAAQuality;					// AA quality level
-	int m_nDXLevel;						// 0 means use recommended DX level for this adapter
-	int m_nWindowedSizeLimitWidth;		// Used if m_bLimitWindowedSize is set, defines max bounds for the back buffer
+	int m_nBackBufferCount;					// valid value is 2+ [2 results in triple buffering]
+	int m_nAASamples;						// Number of AA samples to use. Ignored for modern FLIP_* modes.
+	int m_nAAQuality;						// AA quality level. Ignored for modern FLIP_* modes.
+	int m_nDXLevel;							// 0 means use recommended DX level for this adapter
+	int m_nWindowedSizeLimitWidth;			// Used if m_bLimitWindowedSize is set, defines max bounds for the back buffer
 	int m_nWindowedSizeLimitHeight;
 
 	bool m_bWindowed : 1;
-	bool m_bResizing : 1;				// Only is meaningful when using windowed mode; means the window can be resized.
+	bool m_bResizing : 1;					// Only is meaningful when using windowed mode; means the window can be resized.
 	bool m_bUseStencil : 1;
-	bool m_bLimitWindowedSize : 1;		// In windowed mode, should we prevent the back buffer from getting too large?
-	bool m_bWaitForVSync : 1;			// Would we not present until vsync?
-	bool m_bScaleToOutputResolution : 1;			// 360 ONLY: sets up hardware scaling
-	bool m_bProgressive : 1;			// 360 ONLY: interlaced or progressive
-	bool m_bUsingMultipleWindows : 1; 	// Forces D3DPresent to use _COPY instead
+	bool m_bLimitWindowedSize : 1;			// In windowed mode, should we prevent the back buffer from getting too large?
+	bool m_bWaitForVSync : 1;				// Would we not present until vsync?
+	bool m_bScaleToOutputResolution : 1;	// 360 ONLY: sets up hardware scaling
+	bool m_bProgressive : 1;				// 360 ONLY: interlaced or progressive
+	bool m_bUsingMultipleWindows : 1; 		// Forces D3DPresent to use _COPY instead
 	bool m_bUsingPartialPresentation : 1;	// Allow to use partial presentation mode aka _SEQUENTIAL
 };
 
