@@ -245,16 +245,6 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 
 	VertexCompressionType_t compressionType = CompressionType( fmt );
 
-	if ( IsX360() )
-	{
-		// On 360, there's a performance penalty for reading more than 2 streams in the vertex shader
-		// (we don't do this yet, but we should be aware if we start doing it)
-#ifdef _DEBUG
-		int numStreams = 1 + ( bStaticLit ? 1 : 0 ) + ( bUsingFlex ? 1 : 0 ) + ( bUsingMorph ? 1 : 0 );
-		Assert( numStreams <= 2 );
-#endif
-	}
-
 	if ( fmt & VERTEX_POSITION )
 	{
 		pDecl[i].Stream = 0;
