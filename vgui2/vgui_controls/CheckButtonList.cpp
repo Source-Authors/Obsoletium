@@ -70,16 +70,16 @@ void CheckButtonList::RemoveAll()
 //-----------------------------------------------------------------------------
 intp CheckButtonList::GetCheckedItemCount() const
 {
-	intp count = 0;
-	for (intp i = 0; i < m_CheckItems.Count(); i++)
-	{
-		if (m_CheckItems[i].checkButton->IsSelected())
-		{
-			count++;
-		}
-	}
+    intp count = 0;
+    for (intp i = 0; i < this->m_CheckItems.Count(); i++)
+    {
+        if (this->m_CheckItems[i].checkButton->IsSelected())
+        {
+            count++;
+        }
+    }
 
-	return count;
+    return count;
 }
 
 //-----------------------------------------------------------------------------

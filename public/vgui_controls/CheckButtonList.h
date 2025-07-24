@@ -1,9 +1,3 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
-//
-// Purpose: 
-//
-//=============================================================================//
-
 #ifndef CHECKBUTTONLIST_H
 #define CHECKBUTTONLIST_H
 #ifdef _WIN32
@@ -12,63 +6,62 @@
 
 #include <vgui_controls/EditablePanel.h>
 #include "tier1/utlvector.h"
+#include "tier1/KeyValues.h"
+#include <vgui_controls/CheckButton.h>
+#include <vgui_controls/ScrollBar.h>
 
-namespace vgui
-{
+namespace vgui {
 
-//-----------------------------------------------------------------------------
-// Purpose: Contains a list of check boxes, displaying scrollbars if necessary
-//-----------------------------------------------------------------------------
-class CheckButtonList : public EditablePanel
-{
-	DECLARE_CLASS_SIMPLE_OVERRIDE( CheckButtonList, EditablePanel );
+typedef intptr_t intp;  // Add this typedef if not already defined globally
 
-public:
-	CheckButtonList(Panel *parent, const char *name);
-	~CheckButtonList();
+class CheckButtonList : public EditablePanel {
+  DECLARE_CLASS_SIMPLE_OVERRIDE(CheckButtonList, EditablePanel);
 
-	// adds a check button to the list
-	intp AddItem(const char *itemText, bool startsSelected, KeyValues *userData);
+ public:
+  CheckButtonList(Panel *parent, const char *name);
+  ~CheckButtonList();
 
-	// clears the list
-	void RemoveAll();
+  // adds a check button to the list
+  intp AddItem(const char *itemText, bool startsSelected, KeyValues *userData);
 
-	// number of items in list that are checked
-	int GetCheckedItemCount();
+  // clears the list
+  void RemoveAll();
 
-	// item iteration
-	bool IsItemIDValid(int itemID);
-	int GetHighestItemID();
-	int GetItemCount();
+  // number of items in list that are checked
+  intp GetCheckedItemCount() const;
 
-	// item info
-	KeyValues *GetItemData(int itemID);
-	bool IsItemChecked(int itemID);
-	void SetItemCheckable(int itemID, bool state);
+  // item iteration
+  bool IsItemIDValid(intp itemID) const;
+  intp GetHighestItemID() const;
+  intp GetItemCount() const;
 
-	/* MESSAGES SENT
-		"CheckButtonChecked" - sent when one of the check buttons state has changed
+  // item info
+  KeyValues *GetItemData(intp itemID);
+  bool IsItemChecked(intp itemID);
+  void SetItemCheckable(intp itemID, bool state);
 
-	*/
+  /* MESSAGES SENT
+          "CheckButtonChecked" - sent when one of the check buttons state has
+     changed
+  */
 
-protected:
-	void PerformLayout() override;
-	void ApplySchemeSettings(IScheme *pScheme) override;
-	void OnMouseWheeled(int delta) override;
+ protected:
+  void PerformLayout() override;
+  void ApplySchemeSettings(IScheme *pScheme) override;
+  void OnMouseWheeled(int delta) override;
 
-private:
-	MESSAGE_FUNC_PARAMS( OnCheckButtonChecked, "CheckButtonChecked", pParams );
-	MESSAGE_FUNC( OnScrollBarSliderMoved, "ScrollBarSliderMoved" );
+ private:
+  MESSAGE_FUNC_PARAMS(OnCheckButtonChecked, "CheckButtonChecked", pParams);
+  MESSAGE_FUNC(OnScrollBarSliderMoved, "ScrollBarSliderMoved");
 
-	struct CheckItem_t
-	{
-		vgui::CheckButton *checkButton;
-		KeyValues *userData;
-	};
-	CUtlVector<CheckItem_t> m_CheckItems;
-	vgui::ScrollBar *m_pScrollBar;
+  struct CheckItem_t {
+    vgui::CheckButton *checkButton;
+    KeyValues *userData;
+  };
+  CUtlVector<CheckItem_t> m_CheckItems;
+  vgui::ScrollBar *m_pScrollBar;
 };
 
-}
+}  // namespace vgui
 
-#endif // CHECKBUTTONLIST_H
+#endif  // CHECKBUTTONLIST_H
