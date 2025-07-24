@@ -43,7 +43,6 @@ IDirect3DBaseTexture *CreateD3DTexture( int width, int height, int depth,
 //-----------------------------------------------------------------------------
 void DestroyD3DTexture( IDirect3DBaseTexture *pTex );
 
-int GetD3DTextureRefCount( IDirect3DBaseTexture *pTex );
 
 
 //-----------------------------------------------------------------------------

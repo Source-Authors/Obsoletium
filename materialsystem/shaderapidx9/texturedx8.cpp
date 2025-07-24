@@ -368,26 +368,6 @@ void DestroyD3DTexture( IDirect3DBaseTexture* pD3DTex )
 	}
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *pTex - 
-// Output : int
-//-----------------------------------------------------------------------------
-int GetD3DTextureRefCount( IDirect3DBaseTexture *pTex )
-{
-	if ( !pTex )
-		return 0;
-
-	pTex->AddRef();
-	int ref = pTex->Release();
-
-	return ref;
-}
-
-//-----------------------------------------------------------------------------
-// See version 13 for a function that converts a texture to a mipmap (ConvertToMipmap)
-//-----------------------------------------------------------------------------
-
 
 //-----------------------------------------------------------------------------
 // Lock, unlock a texture...
