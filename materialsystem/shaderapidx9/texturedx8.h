@@ -47,14 +47,6 @@ int GetD3DTextureRefCount( IDirect3DBaseTexture *pTex );
 
 
 //-----------------------------------------------------------------------------
-// Texture heap methods
-//-----------------------------------------------------------------------------
-#if defined( _X360 )
-void SetD3DTextureImmobile( IDirect3DBaseTexture *pTex, bool bImmobile );
-void CompactTextureHeap();
-#endif
-
-//-----------------------------------------------------------------------------
 // Stats...
 //-----------------------------------------------------------------------------
 int TextureCount();
@@ -73,12 +65,7 @@ struct TextureLoadInfo_t
 	int							m_nWidth;
 	int							m_nHeight;
 	int16						m_nZOffset;				// What z-slice of the volume texture are we loading?
-#if defined( _X360 )
-	bool						m_bSrcIsTiled;			// format may not be, but data could be
-	bool						m_bCanConvertFormat;	// allow format conversion
-#else
 	bool						m_bTextureIsLockable;
-#endif
 	ImageFormat					m_SrcFormat;
 	unsigned char				*m_pSrcData;
 };

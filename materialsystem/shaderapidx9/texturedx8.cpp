@@ -158,28 +158,11 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	// NOTE: This function shouldn't be used for creating depth buffers!
 	Assert( !bIsDepthBuffer );
 
-	D3DFORMAT d3dFormat = D3DFMT_UNKNOWN;
-
 	D3DPOOL pool = bManaged ? D3DPOOL_MANAGED : D3DPOOL_DEFAULT;
 	if ( bSysmem )
 		pool = D3DPOOL_SYSTEMMEM;
 
-	if ( IsX360() )
-	{
-		// 360 does not support vertex textures
-		// 360 render target creation path is for the target as a texture source (NOT the EDRAM version)
-		// use normal texture format rules
-		Assert( !bVertexTexture );
-		if ( !bVertexTexture )
-		{
-			d3dFormat = ImageLoader::ImageFormatToD3DFormat( FindNearestSupportedFormat( dstFormat, false, false, false ) );
-		}
-	}
-	else
-	{
-		d3dFormat = ImageLoader::ImageFormatToD3DFormat( FindNearestSupportedFormat( dstFormat, bVertexTexture, bIsRenderTarget, bAllowNonFilterable ) );
-	}
-
+	const D3DFORMAT d3dFormat = ImageLoader::ImageFormatToD3DFormat( FindNearestSupportedFormat( dstFormat, bVertexTexture, bIsRenderTarget, bAllowNonFilterable ) );
 	if ( d3dFormat == D3DFMT_UNKNOWN )
 	{
 		Warning( "ShaderAPIDX8::CreateD3DTexture: Invalid color format!\n" );
@@ -218,7 +201,6 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 
 	if ( isCubeMap )
 	{
-#if !defined( _X360 )
 		hr = Dx9Device()->CreateCubeTexture( 
 				width,
 				numLevels,
@@ -231,14 +213,10 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 				, debugLabel					// tex create funcs take extra arg for debug name on GL
 	#endif
 				   );
-#else
-		pD3DCubeTexture = g_TextureHeap.AllocCubeTexture( width, numLevels, usage, d3dFormat, bIsFallback, bNoD3DBits );
-#endif
 		pBaseTexture = pD3DCubeTexture;
 	}
 	else if ( bVolumeTexture )
 	{
-#if !defined( _X360 )
 		hr = Dx9Device()->CreateVolumeTexture( 
 				width, 
 				height, 
@@ -253,15 +231,10 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 				, debugLabel					// tex create funcs take extra arg for debug name on GL
 	#endif
 				  );
-#else
-		Assert( !bIsFallback && !bNoD3DBits );
-		pD3DVolumeTexture = g_TextureHeap.AllocVolumeTexture( width, height, nDepth, numLevels, usage, d3dFormat );
-#endif
 		pBaseTexture = pD3DVolumeTexture;
 	}
 	else
 	{
-#if !defined( _X360 )
 		// Override usage and managed params if using special hardware shadow depth map formats...
 		if ( ( d3dFormat == NVFMT_RAWZ ) || ( d3dFormat == NVFMT_INTZ   ) || 
 		     ( d3dFormat == D3DFMT_D16 ) || ( d3dFormat == D3DFMT_D24S8 ) || 
@@ -292,9 +265,6 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	#endif
 				 );
 
-#else
-		pD3DTexture = g_TextureHeap.AllocTexture( width, height, numLevels, usage, d3dFormat, bIsFallback, bNoD3DBits );
-#endif
 		pBaseTexture = pD3DTexture;
 	}
 
@@ -571,7 +541,7 @@ static void BlitSurfaceBits( TextureLoadInfo_t &info, int xOffset, int yOffset, 
 	srcRect.top    = yOffset;
 	srcRect.bottom = yOffset + info.m_nHeight;
 
-#if defined( SHADERAPIDX9 ) && !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
+#if defined( SHADERAPIDX9 ) && !defined( DX_TO_GL_ABSTRACTION )
 	if ( !info.m_bTextureIsLockable )
 	{
 		// Copy from system memory to video memory using D3D9Device->UpdateSurface
@@ -894,7 +864,7 @@ void LoadVolumeTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int i
 
 	TextureLoadInfo_t sliceInfo = info;
 
-#if !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
+#if !defined( DX_TO_GL_ABSTRACTION )
 	IDirect3DVolumeTexture9 *pStagingTexture = NULL;
 	if ( !info.m_bTextureIsLockable )
 	{
@@ -925,7 +895,7 @@ void LoadVolumeTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int i
 		}
 	}
 
-#if !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
+#if !defined( DX_TO_GL_ABSTRACTION )
 	if ( pStagingTexture )
 	{
 		if ( Dx9Device()->UpdateTexture( pStagingTexture, pVolTex ) != S_OK )
@@ -963,7 +933,7 @@ void LoadCubeTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVT
 
 	TextureLoadInfo_t faceInfo = info;
 
-#if !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
+#if !defined( DX_TO_GL_ABSTRACTION )
 	IDirect3DCubeTexture9 *pStagingTexture = NULL;
 	if ( !info.m_bTextureIsLockable )
 	{
@@ -994,7 +964,7 @@ void LoadCubeTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVT
 		}
 	}
 
-#if !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
+#if !defined( DX_TO_GL_ABSTRACTION )
 	if ( pStagingTexture )
 	{
 		if ( Dx9Device()->UpdateTexture( pStagingTexture, pCubeTex ) != S_OK )
@@ -1040,7 +1010,7 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 	int iVTFFaceNum = info.m_CubeFaceID;
 	mipInfo.m_CubeFaceID = (D3DCUBEMAP_FACES)0;
 
-#if !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
+#if !defined( DX_TO_GL_ABSTRACTION )
 	// If blitting more than one mip level of an unlockable texture, create a temporary
 	// texture for all mip levels only call UpdateTexture once. For textures with
 	// only a single mip level, fall back on the support in BlitSurfaceBits. -henryg
@@ -1088,7 +1058,7 @@ void LoadTextureFromVTF( TextureLoadInfo_t &info, IVTFTexture* pVTF, int iVTFFra
 		}
 	}
 
-#if !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION )
+#if !defined( DX_TO_GL_ABSTRACTION )
 	if ( pStagingTexture )
 	{
 		if ( ( coarsest - finest + 1 ) == iMipCount )
@@ -1144,11 +1114,6 @@ void LoadSubTexture( TextureLoadInfo_t &info, int xOffset, int yOffset, int srcS
 {
 	Assert( info.m_pSrcData );
 	Assert( info.m_pTexture );
-
-#if defined( _X360 )
-	// xboxissue - not supporting subrect swizzling
-	Assert( !info.m_bSrcIsTiled );
-#endif
 
 #ifdef _DEBUG
 	ImageFormat format = GetImageFormat( info.m_pTexture );
