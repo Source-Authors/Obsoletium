@@ -39,13 +39,8 @@ int TextureCount()
 
 static bool IsVolumeTexture( IDirect3DBaseTexture* pBaseTexture )
 {
-	if ( !pBaseTexture )
-	{
-		return false;
+	return pBaseTexture && pBaseTexture->GetType() == D3DRTYPE_VOLUMETEXTURE;
 	}
-
-	return ( pBaseTexture->GetType() == D3DRTYPE_VOLUMETEXTURE );
-}
 
 static HRESULT GetLevelDesc( IDirect3DBaseTexture* pBaseTexture, UINT level, D3DSURFACE_DESC* pDesc )
 {
@@ -53,7 +48,7 @@ static HRESULT GetLevelDesc( IDirect3DBaseTexture* pBaseTexture, UINT level, D3D
 
 	if ( !pBaseTexture )
 	{
-		return ( HRESULT )-1;
+		return E_POINTER;
 	}
 
 	HRESULT hr;
@@ -66,7 +61,8 @@ static HRESULT GetLevelDesc( IDirect3DBaseTexture* pBaseTexture, UINT level, D3D
 		hr = ( ( IDirect3DCubeTexture * )pBaseTexture )->GetLevelDesc( level, pDesc );
 		break;
 	default:
-		return ( HRESULT )-1;
+		AssertMsg( false, "Unexpected texture type 0x%x.", pBaseTexture->GetType() );
+		return E_NOTIMPL;
 	}
 	return hr;
 }
@@ -92,7 +88,7 @@ static HRESULT GetSurfaceFromTexture( IDirect3DBaseTexture* pBaseTexture, UINT l
 		hr = ( ( IDirect3DCubeTexture * )pBaseTexture )->GetCubeMapSurface( cubeFaceID, level, ppSurfLevel );
 		break;
 	default:
-		Assert(0);
+		AssertMsg( false, "Unexpected texture type 0x%x.", pBaseTexture->GetType() );
 		return E_NOTIMPL;
 	}
 	return hr;
