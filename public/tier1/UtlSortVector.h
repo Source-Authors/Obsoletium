@@ -83,6 +83,11 @@ public:
 	/// produces a correctly ordered list.
 	intp	InsertAfter( intp nElemIndex, const T &src );
 
+	/// Use this to insert at a specific insertion point; using FindLessOrEqual
+	/// is required for use this this. This will test that what you've inserted
+	/// produces a correctly ordered list.
+	intp	InsertAfter( intp nElemIndex, T&& src );
+
 	/// finds a particular element using a linear search. Useful when used
 	/// in between calls to InsertNoSort and RedoSort
 	template< typename TKey >
@@ -93,18 +98,24 @@ protected:
 	CUtlSortVector( const CUtlSortVector<T, LessFunc> & ) = delete;
 
 	// never call these; illegal for this class
-	intp AddToHead();
-	intp AddToTail();
-	intp InsertBefore( intp elem );
-	intp InsertAfter( intp elem );
-	intp InsertBefore( intp elem, const T& src );
-	intp AddToHead( const T& src );
-	intp AddToTail( const T& src );
-	intp AddMultipleToHead( intp num );
-	intp AddMultipleToTail( intp num, const T *pToCopy=NULL );	   
-	intp InsertMultipleBefore( intp elem, intp num, const T *pToCopy=NULL );
-	intp InsertMultipleAfter( intp elem, intp num );
-	intp AddVectorToTail( CUtlVector<T> const &src );
+	intp AddToHead() = delete;
+	intp AddToTail() = delete;
+	intp InsertBefore( intp elem ) = delete;
+	intp InsertAfter( intp elem ) = delete;
+	
+	intp AddToHead( const T& src ) = delete;
+	intp AddToTail( const T& src ) = delete;
+	intp InsertBefore( intp elem, const T& src ) = delete;
+
+	intp AddToHead( T&& src ) = delete;
+	intp AddToTail( T&& src ) = delete;
+	intp InsertBefore( intp elem, T&& src ) = delete;
+
+	intp AddMultipleToHead( intp num ) = delete;
+	intp AddMultipleToTail( intp num, const T *pToCopy=nullptr ) = delete;
+	intp InsertMultipleBefore( intp elem, intp num, const T *pToCopy=nullptr ) = delete;
+	intp InsertMultipleAfter( intp elem, intp num ) = delete;
+	intp AddVectorToTail( CUtlVector<T> const &src ) = delete;
 
 	struct QSortContext_t
 	{
@@ -217,6 +228,30 @@ intp CUtlSortVector<T, LessFunc, BaseVector>::InsertAfter( intp nIndex, const T 
 		Assert( less.Less( src, this->Element(nInsertedIndex+1), m_pLessContext ) );
 	}
 #endif
+	return nInsertedIndex;
+}
+
+
+template <class T, class LessFunc, class BaseVector> 
+intp CUtlSortVector<T, LessFunc, BaseVector>::InsertAfter( intp nIndex, T &&src )
+{
+#ifdef DEBUG
+	// In DEBUG mode we copy, not move as we check invariant using src later.
+	intp nInsertedIndex = this->BaseClass::InsertAfter( nIndex, src );
+
+	LessFunc less;
+	if ( nInsertedIndex > 0 )
+	{
+		Assert( less.Less( this->Element(nInsertedIndex-1), src, m_pLessContext ) );
+	}
+	if ( nInsertedIndex < BaseClass::Count()-1 )
+	{
+		Assert( less.Less( src, this->Element(nInsertedIndex+1), m_pLessContext ) );
+	}
+#else
+	intp nInsertedIndex = this->BaseClass::InsertAfter( nIndex, std::move( src ) );
+#endif
+
 	return nInsertedIndex;
 }
 

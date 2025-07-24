@@ -99,6 +99,11 @@ public:
 	I	AddToHead( T const& src ); 
 	I	AddToTail( T const& src );
 
+	I	InsertBefore( I before, T&& src );
+	I	InsertAfter( I after, T&& src );
+	I	AddToHead( T&& src ); 
+	I	AddToTail( T&& src );
+
 	// Find an element and return its index or InvalidIndex() if it couldn't be found.
 	I		Find( const T &src ) const;
 	
@@ -830,6 +835,53 @@ template <class T, class S, bool ML, class I, class M>
 inline I CUtlLinkedList<T,S,ML,I,M>::AddToTail( T const& src ) 
 { 
 	return InsertBefore( InvalidIndex(), src ); 
+}
+
+
+template <class T, class S, bool ML, class I, class M>
+I CUtlLinkedList<T,S,ML,I,M>::InsertBefore( I before, T&& src )
+{
+	// Make a new node
+	I   newNode = AllocInternal();
+	if ( newNode == InvalidIndex() )
+		return newNode;
+
+	// Link it in
+	LinkBefore( before, newNode );
+	
+	// Construct the data
+	MoveConstruct( &Element(newNode), std::move( src ) );
+	
+	return newNode;
+}
+
+template <class T, class S, bool ML, class I, class M>
+I CUtlLinkedList<T,S,ML,I,M>::InsertAfter( I after, T&& src )
+{
+	// Make a new node
+	I   newNode = AllocInternal();
+	if ( newNode == InvalidIndex() )
+		return newNode;
+
+	// Link it in
+	LinkAfter( after, newNode );
+	
+	// Construct the data
+	MoveConstruct( &Element(newNode), std::move( src ) );
+	
+	return newNode;
+}
+
+template <class T, class S, bool ML, class I, class M>
+inline I CUtlLinkedList<T,S,ML,I,M>::AddToHead( T&& src ) 
+{ 
+	return InsertAfter( InvalidIndex(), std::move( src ) ); 
+}
+
+template <class T, class S, bool ML, class I, class M>
+inline I CUtlLinkedList<T,S,ML,I,M>::AddToTail( T&& src ) 
+{ 
+	return InsertBefore( InvalidIndex(), std::move( src ) ); 
 }
 
 

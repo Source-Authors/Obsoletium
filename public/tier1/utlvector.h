@@ -123,6 +123,12 @@ public:
 	intp InsertBefore( intp elem, const T& src );
 	intp InsertAfter( intp elem, const T& src );
 
+	// Adds an element, uses move constructor
+	intp AddToHead( T&& src );
+	intp AddToTail( T&& src );
+	intp InsertBefore( intp elem, T&& src );
+	intp InsertAfter( intp elem, T&& src );
+
 	// Adds multiple elements, uses default constructor
 	intp AddMultipleToHead( intp num );
 	intp AddMultipleToTail( intp num );	   
@@ -1100,6 +1106,49 @@ intp CUtlVector<T, A>::InsertBefore( intp elem, const T& src )
 	GrowVector();
 	ShiftElementsRight(elem);
 	CopyConstruct( &Element(elem), src );
+	return elem;
+}
+
+
+//-----------------------------------------------------------------------------
+// Adds an element, uses move constructor
+//-----------------------------------------------------------------------------
+template< typename T, class A >
+inline intp CUtlVector<T, A>::AddToHead( T&& src )
+{
+	// Can't insert something that's in the list... reallocation may hose us
+	Assert( (Base() == NULL) || (&src < Base()) || (&src >= (Base() + Count()) ) ); 
+	return InsertBefore( 0, std::move( src ) );
+}
+
+template< typename T, class A >
+inline intp CUtlVector<T, A>::AddToTail( T&& src )
+{
+	// Can't insert something that's in the list... reallocation may hose us
+	Assert( (Base() == NULL) || (&src < Base()) || (&src >= (Base() + Count()) ) ); 
+	return InsertBefore( m_Size, std::move( src ) );
+}
+
+template< typename T, class A >
+inline intp CUtlVector<T, A>::InsertAfter( intp elem, T&& src )
+{
+	// Can't insert something that's in the list... reallocation may hose us
+	Assert( (Base() == NULL) || (&src < Base()) || (&src >= (Base() + Count()) ) ); 
+	return InsertBefore( elem + 1, std::move( src ) );
+}
+
+template< typename T, class A >
+intp CUtlVector<T, A>::InsertBefore( intp elem, T&& src )
+{
+	// Can't insert something that's in the list... reallocation may hose us
+	Assert( (Base() == NULL) || (&src < Base()) || (&src >= (Base() + Count()) ) ); 
+
+	// Can insert at the end
+	Assert( (elem == Count()) || IsValidIndex(elem) );
+
+	GrowVector();
+	ShiftElementsRight(elem);
+	MoveConstruct( &Element(elem), std::move(src) );
 	return elem;
 }
 

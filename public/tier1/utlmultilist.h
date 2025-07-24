@@ -83,6 +83,12 @@ public:
 	I	AddToHead( ListHandle_t list, T const& src ); 
 	I	AddToTail( ListHandle_t list, T const& src );
 
+	// Insertion methods (call move constructor)....
+	I	InsertBefore( ListHandle_t list, I before, T&& src );
+	I	InsertAfter( ListHandle_t list, I after, T&& src );
+	I	AddToHead( ListHandle_t list, T&& src ); 
+	I	AddToTail( ListHandle_t list, T&& src );
+
 	// Removal methods
 	void	Remove( ListHandle_t list, I elem );
 
@@ -710,6 +716,56 @@ template <class T, class I>
 inline I CUtlMultiList<T,I>::AddToTail( ListHandle_t list, T const& src ) 
 { 
 	return InsertBefore( list, InvalidIndex(), src ); 
+}
+
+
+//-----------------------------------------------------------------------------
+// Insertion methods; allocates and links (uses move constructor)
+//-----------------------------------------------------------------------------
+template <class T, class I>
+I CUtlMultiList<T,I>::InsertBefore( ListHandle_t list, I before, T&& src )
+{
+	// Make a new node
+	I   newNode = Alloc();
+	if ( newNode == InvalidIndex() )
+		return newNode;
+
+	// Link it in
+	LinkBefore( list, before, newNode );
+	
+	// Construct the data
+	MoveConstruct( &Element(newNode), std::move( src ) );
+	
+	return newNode;
+}
+
+template <class T, class I>
+I CUtlMultiList<T,I>::InsertAfter( ListHandle_t list, I after, T&& src )
+{
+	// Make a new node
+	I   newNode = Alloc();
+	if ( newNode == InvalidIndex() )
+		return newNode;
+
+	// Link it in
+	LinkAfter( list, after, newNode );
+	
+	// Construct the data
+	MoveConstruct( &Element(newNode), std::move( src ) );
+	
+	return newNode;
+}
+
+template <class T, class I>
+inline I CUtlMultiList<T,I>::AddToHead( ListHandle_t list, T&& src ) 
+{ 
+	return InsertAfter( list, InvalidIndex(), std::move( src ) ); 
+}
+
+template <class T, class I>
+inline I CUtlMultiList<T,I>::AddToTail( ListHandle_t list, T&& src ) 
+{ 
+	return InsertBefore( list, InvalidIndex(), std::move( src ) ); 
 }
 
 
