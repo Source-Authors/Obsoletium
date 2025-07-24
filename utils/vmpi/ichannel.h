@@ -5,7 +5,7 @@
 #ifndef SRC_UTILS_VMPI_ICHANNEL_H_
 #define SRC_UTILS_VMPI_ICHANNEL_H_
 
-#include "tier1/basetypes.h"
+#include "tier0/basetypes.h"
 #include "tier1/utlvector.h"
 
 struct IChannel {
