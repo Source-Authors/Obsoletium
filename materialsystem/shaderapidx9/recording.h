@@ -12,6 +12,8 @@
 
 #include <type_traits>
 
+#include "tier0/basetypes.h"
+
 //-----------------------------------------------------------------------------
 // Use this to put us into a 'recording' mode
 //-----------------------------------------------------------------------------
@@ -48,7 +50,7 @@
 // Recording state, if you change this, change the table in playback/playback.cpp
 //-----------------------------------------------------------------------------
 
-enum RecordingCommands_t
+enum RecordingCommands_t : unsigned char
 {
 	DX8_CREATE_DEVICE = 0,
 	DX8_DESTROY_DEVICE,
@@ -136,8 +138,8 @@ enum RecordingCommands_t
 
 #ifdef RECORDING
 
-void RecordCommand( RecordingCommands_t cmd, int numargs );
-void RecordArgument( void const* pMemory, int size );
+void RecordCommand( RecordingCommands_t cmd, unsigned char numargs );
+void RecordArgument( const void *pMemory, intp size );
 void FinishRecording( void );
 
 template<typename TIntegral, typename = std::enable_if_t<std::is_integral_v<TIntegral>>>

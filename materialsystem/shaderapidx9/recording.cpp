@@ -5,33 +5,32 @@
 // $NoKeywords: $
 //
 //=============================================================================//
+#include "recording.h"
+
+#include "shaderapi/ishaderutil.h"
+#include "shaderapidx8_global.h"
+
+#include "materialsystem/imaterialsystem.h"
 
 #include "togl/rendermechanism.h"
-#include "recording.h"
-#include "shaderapi/ishaderutil.h"
-#include "materialsystem/imaterialsystem.h"
-#include "shaderapidx8_global.h"
-#include "utlvector.h"
-#include <stdio.h>
+#include "tier1/utlvector.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 #ifdef RECORDING
 
-//-----------------------------------------------------------------------------
-// Globals
-//-----------------------------------------------------------------------------
+namespace {
 
-static CUtlVector<unsigned char> g_pRecordingBuffer;
-static int g_ArgsRemaining = 0;
-static intp g_CommandStartIdx = 0;
+CUtlVector<unsigned char> g_pRecordingBuffer;
+unsigned char g_ArgsRemaining = 0;
+intp g_CommandStartIdx = 0;
 
-//-----------------------------------------------------------------------------
+// set this to true in the debugger to actually record commands.
+bool g_bDoRecord = true;
+
 // Opens the recording file
-//-----------------------------------------------------------------------------
-
-static FILE* OpenRecordingFile()
+FILE* OpenRecordingFile()
 {
 #ifdef CRASH_RECORDING
 	static FILE *fp = 0;
@@ -42,40 +41,43 @@ static FILE* OpenRecordingFile()
 	static bool g_NeverOpened = true;
 	if (!g_CantOpenFile)
 	{
+#ifdef PLATFORM_64BITS
+		constexpr char kRecordingFileName[]{"shaderdx8_x86-64.rec"};
+#else
+		constexpr char kRecordingFileName[]{"shaderdx8_x86.rec"};
+#endif
+
 #ifdef CRASH_RECORDING
 		if( g_NeverOpened )
 		{
-			fp = fopen( "shaderdx8.rec", "wbc" );
+			fp = fopen( kRecordingFileName, "wbc" );
 		}
 #else
-		fp = fopen( "shaderdx8.rec", g_NeverOpened ? "wb" : "ab" );
+		fp = fopen( kRecordingFileName, g_NeverOpened ? "wb" : "ab" );
 #endif
 		if (!fp)
 		{
-			Warning("Unable to open recording file shaderdx8.rec!\n");
-			g_CantOpenFile = true;			
+			Warning( "Unable to open recording file %s!\n", kRecordingFileName );
+			g_CantOpenFile = true;
 		}
 		g_NeverOpened = false;
 	}
 	return fp;
 }
 
-//-----------------------------------------------------------------------------
 // Writes to the recording file
-//-----------------------------------------------------------------------------
-
-#define COMMAND_BUFFER_SIZE 32768
-
-static void WriteRecordingFile()
+void WriteRecordingFile()
 {
+	constexpr intp COMMAND_BUFFER_SIZE = 32768;
+
 	// Store the command size
-	*(int*)&g_pRecordingBuffer[g_CommandStartIdx] = 
-		g_pRecordingBuffer.Size() - g_CommandStartIdx;
+	*(intp*)&g_pRecordingBuffer[g_CommandStartIdx] = 
+		g_pRecordingBuffer.Count() - g_CommandStartIdx;
 
 #ifndef CRASH_RECORDING
 	// When not crash recording, flush when buffer gets too big, 
 	// or when Present() is called
-	if ((g_pRecordingBuffer.Size() < COMMAND_BUFFER_SIZE) &&
+	if ((g_pRecordingBuffer.Count() < COMMAND_BUFFER_SIZE) &&
 		(g_pRecordingBuffer[g_CommandStartIdx+4] != DX8_PRESENT))
 		return;
 #endif
@@ -84,7 +86,7 @@ static void WriteRecordingFile()
 	if (fp)
 	{
 		// store the command size
-		fwrite( g_pRecordingBuffer.Base(), 1, g_pRecordingBuffer.Size(), fp );
+		fwrite( g_pRecordingBuffer.Base(), 1, g_pRecordingBuffer.Count(), fp );
 		fflush( fp );
 #ifndef CRASH_RECORDING
 		fclose( fp );
@@ -92,6 +94,8 @@ static void WriteRecordingFile()
 	}
 
 	g_pRecordingBuffer.RemoveAll();
+}
+
 }
 
 // Write the buffered crap out on shutdown.
@@ -102,7 +106,7 @@ void FinishRecording()
 	if (fp)
 	{
 		// store the command size
-		fwrite( g_pRecordingBuffer.Base(), 1, g_pRecordingBuffer.Size(), fp );
+		fwrite( g_pRecordingBuffer.Base(), 1, g_pRecordingBuffer.Count(), fp );
 		fflush( fp );
 	}
 
@@ -110,14 +114,8 @@ void FinishRecording()
 #endif
 }
 
-// set this to true in the debugger to actually record commands.
-static bool g_bDoRecord = true;
-
-//-----------------------------------------------------------------------------
 // Records a command
-//-----------------------------------------------------------------------------
-
-void RecordCommand( RecordingCommands_t cmd, int numargs )
+void RecordCommand( RecordingCommands_t cmd, unsigned char numargs )
 {
 	if( !g_bDoRecord )
 	{
@@ -135,23 +133,21 @@ void RecordCommand( RecordingCommands_t cmd, int numargs )
 		WriteRecordingFile();
 }
 
-//-----------------------------------------------------------------------------
 // Records an argument for a command, flushes when the command is done
-//-----------------------------------------------------------------------------
-
-void RecordArgument( void const* pMemory, int size )
+void RecordArgument( const void * pMemory, intp size )
 {
 	if( !g_bDoRecord )
 	{
 		return;
 	}
 	Assert( g_ArgsRemaining > 0 );
-	int tail = g_pRecordingBuffer.Size();
+
+	const intp tail = g_pRecordingBuffer.Count();
 	g_pRecordingBuffer.AddMultipleToTail( size );
 	memcpy( &g_pRecordingBuffer[tail], pMemory, size );
+
 	if (--g_ArgsRemaining == 0)
 		WriteRecordingFile();
 }
-
 
 #endif // RECORDING
