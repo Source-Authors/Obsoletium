@@ -45,10 +45,6 @@
 #define ForceSync() ((void)(0))
 #endif
 
-#ifdef _X360
-static bool s_bDirtyDisk = false;
-#endif
-
 
 void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001f )
 {
@@ -60,17 +56,6 @@ void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001f )
 		AssertFloatEquals( m1.Base()[i], m2.Base()[i], eps );
 	}
 }
-
-
-//-----------------------------------------------------------------------------
-// The dirty disk error report function (NOTE: Could be called from any thread!)
-//-----------------------------------------------------------------------------
-#ifdef _X360
-unsigned ThreadedDirtyDiskErrorDisplay( void *pParam )
-{
-	XShowDirtyDiscErrorUI( XBX_GetPrimaryUserId() );
-}
-#endif
 
 
 void SpinPresent()
@@ -804,11 +789,7 @@ void CMatRenderContextBase::PushRenderTargetAndViewport( )
 void CMatRenderContextBase::PushRenderTargetAndViewport( ITexture *pTexture )
 {
 	// Just blindly push the data on the stack with flags indicating full bounds
-#if !defined( _X360 )
 	RenderTargetStackElement_t element = { {pTexture, NULL, NULL, NULL}, 0, 0, -1, -1 };
-#else
-	RenderTargetStackElement_t element = { {pTexture}, 0, 0, -1, -1 };
-#endif
 	m_RenderTargetStack.Push( element );
 	CommitRenderTargetAndViewport();
 }
@@ -834,11 +815,7 @@ void CMatRenderContextBase::PushRenderTargetAndViewport( ITexture *pTexture, int
 void CMatRenderContextBase::PushRenderTargetAndViewport( ITexture *pTexture, ITexture *pDepthTexture, int nViewX, int nViewY, int nViewW, int nViewH )
 {
 	// Just blindly push the data on the stack
-#if !defined( _X360 )
 	RenderTargetStackElement_t element = { {pTexture, NULL, NULL, NULL}, pDepthTexture, nViewX, nViewY, nViewW, nViewH };
-#else
-	RenderTargetStackElement_t element = { {pTexture}, pDepthTexture, nViewX, nViewY, nViewW, nViewH };
-#endif
 	m_RenderTargetStack.Push( element );
 	CommitRenderTargetAndViewport();
 }
@@ -1552,13 +1529,6 @@ void CMatRenderContext::SwapBuffers()
 	g_pMorphMgr->AdvanceFrame();
 	g_pOcclusionQueryMgr->AdvanceFrame();
 	g_pShaderDevice->Present();
-
-#ifdef _X360
-	if ( s_bDirtyDisk )
-	{
-		SpinPresent();
-	}
-#endif
 }
 
 
@@ -1909,22 +1879,6 @@ void CMatRenderContext::SetNonInteractiveTempFullscreenBuffer( ITexture *pTextur
 void CMatRenderContext::RefreshFrontBufferNonInteractive()
 {
 	g_pShaderDevice->RefreshFrontBufferNonInteractive();
-#ifdef _X360
-	if ( s_bDirtyDisk )
-	{
-		if ( m_NonInteractiveMode == MATERIAL_NON_INTERACTIVE_MODE_NONE )
-		{
-			SpinPresent();
-		}
-		else
-		{
-			while ( true )
-			{
-				g_pShaderDevice->RefreshFrontBufferNonInteractive();
-			}
-		}
-	}
-#endif
 }
 
 void CMatRenderContext::EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode )
@@ -2254,84 +2208,7 @@ void CMatRenderContext::CopyRenderTargetToTextureEx( ITexture *pTexture, int nRe
 	GetMaterialSystem()->Flush( false );
 	ITextureInternal *pTextureInternal = (ITextureInternal *)pTexture;
 
-	if ( IsPC() || !IsX360() )
-	{
-		pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
-	}
-	else
-	{
-		// X360 only does 1:1 resolves. So we can do full resolves to textures of size 
-		// equal or greater than the viewport trivially. Downsizing is nasty.
-		Rect_t srcRect;
-		if ( !pSrcRect )
-		{
-			// build out source rect
-			pSrcRect = &srcRect;
-			int x, y, w, h;
-			GetViewport( x, y, w, h );
-
-			pSrcRect->x = 0;
-			pSrcRect->y = 0;
-			pSrcRect->width = w;
-			pSrcRect->height = h;
-		}
-
-		Rect_t dstRect;
-		if ( !pDstRect )
-		{
-			// build out target rect
-			pDstRect = &dstRect;
-
-			pDstRect->x = 0;
-			pDstRect->y = 0;
-			pDstRect->width = pTexture->GetActualWidth();
-			pDstRect->height = pTexture->GetActualHeight();
-		}
-
-		if ( pSrcRect->width == pDstRect->width && pSrcRect->height == pDstRect->height )
-		{
-			// 1:1 mapping, no stretching needed, use direct path
 			pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
-			return;
-		}
-
-		if( (pDstRect->x == 0) && (pDstRect->y == 0) && 
-			(pDstRect->width == pTexture->GetActualWidth()) && (pDstRect->height == pTexture->GetActualHeight()) &&
-			(pDstRect->width >= pSrcRect->width) && (pDstRect->height >= pSrcRect->height) )
-		{
-			// Resolve takes up the whole texture, and the texture is large enough to hold the resolve.
-			// This is turned into a 1:1 resolve within shaderapi by making D3D think the texture is smaller from now on. (Until it resolves from a bigger source)
-			pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
-			return;
-		}
-
-		// currently assuming disparate copies are only for FB blits
-		// ensure active render target is actually the back buffer
-		Assert( m_RenderTargetStack.Top().m_pRenderTargets[0] == NULL );
-
-		// nasty sequence:
-		// resolve FB surface to matching clone DDR texture
-		// gpu draw from clone DDR FB texture to disparate RT target surface
-		// resolve to its matching DDR clone texture
-		ITextureInternal *pFullFrameFB = (ITextureInternal*)GetMaterialSystem()->FindTexture( "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET );
-		pFullFrameFB->CopyFrameBufferToMe( nRenderTargetID, NULL, NULL );
-
-		// target texture must be a render target
-		PushRenderTargetAndViewport( pTexture );
-
-		// blit FB source to render target
-		DrawScreenSpaceRectangle(
-			GetMaterialSystem()->GetRenderTargetBlitMaterial(),
-			pDstRect->x, pDstRect->y, pDstRect->width, pDstRect->height,
-			pSrcRect->x, pSrcRect->y, pSrcRect->x+pSrcRect->width-1, pSrcRect->y+pSrcRect->height-1, 
-			pFullFrameFB->GetActualWidth(), pFullFrameFB->GetActualHeight() );
-
-		// resolve render target to texture
-		((ITextureInternal *)pTexture)->CopyFrameBufferToMe( 0, NULL, NULL );
-
-		// restore render target and viewport
-		PopRenderTargetAndViewport();
-	}
 }
 
 void CMatRenderContext::CopyRenderTargetToTexture( ITexture *pTexture )
@@ -2351,15 +2228,8 @@ void CMatRenderContext::CopyTextureToRenderTargetEx( int nRenderTargetID, ITextu
 	GetMaterialSystem()->Flush( false );
 	ITextureInternal *pTextureInternal = (ITextureInternal *)pTexture;
 
-	if ( IsPC() || !IsX360() )
-	{
 		pTextureInternal->CopyMeToFrameBuffer( nRenderTargetID, pSrcRect, pDstRect );
 	}
-	else
-	{
-		Assert( 0 );
-	}
-}
 
 
 void CMatRenderContext::ClearBuffers( bool bClearColor, bool bClearDepth, bool bClearStencil )
