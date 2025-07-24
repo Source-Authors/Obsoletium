@@ -255,7 +255,7 @@ template< class T, class M >
 intp CUtlStack<T,M>::Push()
 {
 	GrowStack();
-	Construct( &Element(m_Size-1) );
+	Construct( std::addressof( Element(m_Size-1) ) );
 	return m_Size - 1;
 }
 
@@ -267,7 +267,7 @@ template< class T, class M >
 intp CUtlStack<T,M>::Push( T const& src )
 {
 	GrowStack();
-	CopyConstruct( &Element(m_Size-1), src );
+	CopyConstruct( std::addressof( Element(m_Size-1) ), src );
 	return m_Size - 1;
 }
 
@@ -280,7 +280,7 @@ template< class T, class M >
 void CUtlStack<T,M>::Pop()
 {
 	Assert( m_Size > 0 );
-	Destruct( &Element(m_Size-1) );
+	Destruct( std::addressof( Element(m_Size-1) ) );
 	--m_Size;
 }
 
@@ -297,7 +297,7 @@ void CUtlStack<T,M>::PopMultiple( intp num )
 {
 	Assert( m_Size >= num );
 	for ( intp i = 0; i < num; ++i )
-		Destruct( &Element( m_Size - i - 1 ) );
+		Destruct( std::addressof( Element( m_Size - i - 1 ) ) );
 	m_Size -= num;
 }
 
@@ -310,7 +310,7 @@ template< class T, class M >
 void CUtlStack<T,M>::Clear()
 {
 	for (intp i = m_Size; --i >= 0; )
-		Destruct(&Element(i));
+		Destruct( std::addressof( Element(i) ) );
 
 	m_Size = 0;
 }

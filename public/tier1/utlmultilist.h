@@ -451,7 +451,7 @@ I CUtlMultiList<T,I>::Alloc( )
 
 	++m_TotalElements;
 
-	Construct( &Element(elem) );
+	Construct( std::addressof( Element(elem) ) );
 
 	return elem;
 }
@@ -460,7 +460,7 @@ template <class T, class I>
 void  CUtlMultiList<T,I>::Free( I elem )
 {
 	Assert( IsValidIndex(elem) && !IsInList(elem) );
-	Destruct( &Element(elem) );
+	Destruct( std::addressof( Element(elem) ) );
 	InternalElement(elem).m_Next = m_FirstFree;
 	m_FirstFree = elem;
 	--m_TotalElements;
@@ -634,7 +634,7 @@ I CUtlMultiList<T,I>::InsertBefore( ListHandle_t list, I before )
 	LinkBefore( list, before, newNode );
 	
 	// Construct the data
-	Construct( &Element(newNode) );
+	Construct( std::addressof( Element(newNode) ) );
 	
 	return newNode;
 }
@@ -651,7 +651,7 @@ I CUtlMultiList<T,I>::InsertAfter( ListHandle_t list, I after )
 	LinkAfter( list, after, newNode );
 	
 	// Construct the data
-	Construct( &Element(newNode) );
+	Construct( std::addressof( Element(newNode) ) );
 	
 	return newNode;
 }
@@ -684,7 +684,7 @@ I CUtlMultiList<T,I>::InsertBefore( ListHandle_t list, I before, T const& src )
 	LinkBefore( list, before, newNode );
 	
 	// Construct the data
-	CopyConstruct( &Element(newNode), src );
+	CopyConstruct( std::addressof( Element(newNode) ), src );
 	
 	return newNode;
 }
@@ -701,7 +701,7 @@ I CUtlMultiList<T,I>::InsertAfter( ListHandle_t list, I after, T const& src )
 	LinkAfter( list, after, newNode );
 	
 	// Construct the data
-	CopyConstruct( &Element(newNode), src );
+	CopyConstruct( std::addressof( Element(newNode) ), src );
 	
 	return newNode;
 }
@@ -734,7 +734,7 @@ I CUtlMultiList<T,I>::InsertBefore( ListHandle_t list, I before, T&& src )
 	LinkBefore( list, before, newNode );
 	
 	// Construct the data
-	MoveConstruct( &Element(newNode), std::move( src ) );
+	MoveConstruct( std::addressof( Element(newNode) ), std::move( src ) );
 	
 	return newNode;
 }
@@ -751,7 +751,7 @@ I CUtlMultiList<T,I>::InsertAfter( ListHandle_t list, I after, T&& src )
 	LinkAfter( list, after, newNode );
 	
 	// Construct the data
-	MoveConstruct( &Element(newNode), std::move( src ) );
+	MoveConstruct( std::addressof( Element(newNode) ), std::move( src ) );
 	
 	return newNode;
 }
@@ -808,7 +808,7 @@ void  CUtlMultiList<T,I>::RemoveAll()
 	{
 		// Invoke the destructor
 		if (IsValidIndex((I)i))
-			Destruct( &Element((I)i) );
+			Destruct( std::addressof( Element((I)i) ) );
 		
 		// next points to the next free list item
 		InternalElement((I)i).m_Next = prev;

@@ -477,7 +477,7 @@ public:
 			for (intp i = m_pData->m_Size; --i >= 0; )
 			{
 				// Global scope to resolve conflict with Scaleform 4.0
-				::Destruct(&m_pData->m_Elements[i]);
+				::Destruct( std::addressof( m_pData->m_Elements[i] ) );
 			}
 		}
 		if ( m_pData != StaticData() )
@@ -505,7 +505,7 @@ public:
 		Assert( IsValidIndex(elem) );
 
 		// Global scope to resolve conflict with Scaleform 4.0
-		::Destruct( &Element(elem) );
+		::Destruct( std::addressof( Element(elem) ) );
 		if (Count() > 0)
 		{
 			if ( elem != m_pData->m_Size -1 )
@@ -522,7 +522,7 @@ public:
 	void Remove( intp elem )
 	{
 		// Global scope to resolve conflict with Scaleform 4.0
-		::Destruct( &Element(elem) );
+		::Destruct( std::addressof( Element(elem) ) );
 		ShiftElementsLeft(elem);
 		--m_pData->m_Size;
 		if ( !m_pData->m_Size )
@@ -894,7 +894,7 @@ void CUtlVector<T, A>::Sort( int (__cdecl *pfnCompare)(const T *, const T *) )
 		{
 			for ( intp j = 1; j <= i; ++j )
 			{
-				if ( pfnCompare( &Element( j - 1 ), &Element( j ) ) < 0 )
+				if ( pfnCompare( std::addressof( Element( j - 1 ) ), std::addressof( Element( j ) ) ) < 0 )
 				{
 					V_swap( Element( j - 1 ), Element( j ) );
 				}
@@ -920,12 +920,12 @@ void CUtlVector<T, A>::InPlaceQuickSort_r( int (__cdecl *pfnCompare)(const T *, 
 
 		while ( ( nLeftIdx <= nPivot ) && ( nRightIdx >= nPivot ) )
 		{
-			while ( ( pfnCompare( &Element( nLeftIdx ), &Element( nPivot ) ) < 0 ) && ( nLeftIdx <= nPivot ) )
+			while ( ( pfnCompare( std::addressof( Element( nLeftIdx ) ), std::addressof( Element( nPivot ) ) ) < 0 ) && ( nLeftIdx <= nPivot ) )
 			{
 				nLeftIdx++;
 			}
 
-			while ( ( pfnCompare( &Element( nRightIdx ), &Element( nPivot ) ) > 0 ) && ( nRightIdx >= nPivot ) )
+			while ( ( pfnCompare( std::addressof( Element( nRightIdx ) ),  std::addressof( Element( nPivot ) ) ) > 0 ) && ( nRightIdx >= nPivot ) )
 			{
 				nRightIdx--;
 			}
@@ -1045,7 +1045,7 @@ inline intp CUtlVector<T, A>::AddToTail()
 template< typename T, class A >
 inline T *CUtlVector<T, A>::AddToTailGetPtr()
 {
-	return &Element( AddToTail() );
+	return std::addressof( Element( AddToTail() ) );
 }
 
 template< typename T, class A >
@@ -1062,7 +1062,7 @@ intp CUtlVector<T, A>::InsertBefore( intp elem )
 
 	GrowVector();
 	ShiftElementsRight(elem);
-	Construct( &Element(elem) );
+	Construct( std::addressof( Element(elem) ) );
 	return elem;
 }
 
@@ -1105,7 +1105,7 @@ intp CUtlVector<T, A>::InsertBefore( intp elem, const T& src )
 
 	GrowVector();
 	ShiftElementsRight(elem);
-	CopyConstruct( &Element(elem), src );
+	CopyConstruct( std::addressof( Element(elem) ), src );
 	return elem;
 }
 
@@ -1148,7 +1148,7 @@ intp CUtlVector<T, A>::InsertBefore( intp elem, T&& src )
 
 	GrowVector();
 	ShiftElementsRight(elem);
-	MoveConstruct( &Element(elem), std::move(src) );
+	MoveConstruct( std::addressof( Element(elem) ), std::move(src) );
 	return elem;
 }
 
@@ -1242,7 +1242,7 @@ intp CUtlVector<T, A>::AddVectorToTail( CUtlVector const &src )
 	m_Size += nSrcCount;
 	for ( intp i=0; i < nSrcCount; i++ )
 	{
-		CopyConstruct( &Element(base+i), src[i] );
+		CopyConstruct( std::addressof( Element(base+i) ), src[i] );
 	}
 	return base;
 }
@@ -1262,7 +1262,7 @@ inline intp CUtlVector<T, A>::InsertMultipleBefore( intp elem, intp num )
 	// Invoke default constructors
 	for (intp i = 0; i < num; ++i )
 	{
-		Construct( &Element( elem+i ) );
+		Construct(std::addressof( Element(elem + i) ));
 	}
 
 	return elem;
@@ -1285,14 +1285,14 @@ inline intp CUtlVector<T, A>::InsertMultipleBefore( intp elem, intp num, const T
 	{
 		for ( intp i = 0; i < num; ++i )
 		{
-			Construct( &Element( elem+i ) );
+			Construct(std::addressof( Element( elem+i ) ));
 		}
 	}
 	else
 	{
 		for ( intp i=0; i < num; i++ )
 		{
-			CopyConstruct( &Element( elem+i ), pToInsert[i] );
+			CopyConstruct(std::addressof( Element( elem+i )), pToInsert[i] );
 		}
 	}
 
@@ -1363,7 +1363,7 @@ void CUtlVector<T, A>::FastRemove( intp elem )
 	Assert( IsValidIndex(elem) );
 
 	// Global scope to resolve conflict with Scaleform 4.0
-	::Destruct( &Element(elem) );
+	::Destruct( std::addressof( Element(elem) ) );
 	if (m_Size > 0)
 	{
 		if ( elem != m_Size -1 )
@@ -1376,7 +1376,7 @@ template< typename T, class A >
 void CUtlVector<T, A>::Remove( intp elem )
 {
 	// Global scope to resolve conflict with Scaleform 4.0
-	::Destruct( &Element(elem) );
+	::Destruct( std::addressof( Element(elem) ) );
 	ShiftElementsLeft(elem);
 	--m_Size;
 }
@@ -1413,7 +1413,7 @@ void CUtlVector<T, A>::RemoveMultiple( intp elem, intp num )
 
 	// Global scope to resolve conflict with Scaleform 4.0
 	for (intp i = elem + num; --i >= elem; )
-		::Destruct(&Element(i));
+		::Destruct( std::addressof( Element(i) ) );
 
 	ShiftElementsLeft(elem, num);
 	m_Size -= num;
@@ -1426,7 +1426,7 @@ void CUtlVector<T, A>::RemoveMultipleFromHead( intp num )
 
 	// Global scope to resolve conflict with Scaleform 4.0
 	for (intp i = num; --i >= 0; )
-		::Destruct(&Element(i));
+		::Destruct( std::addressof( Element(i) ) );
 
 	ShiftElementsLeft(0, num);
 	m_Size -= num;
@@ -1439,7 +1439,7 @@ void CUtlVector<T, A>::RemoveMultipleFromTail( intp num )
 
 	// Global scope to resolve conflict with Scaleform 4.0
 	for (intp i = m_Size-num; i < m_Size; i++)
-		::Destruct(&Element(i));
+		::Destruct( std::addressof( Element(i) ) );
 
 	m_Size -= num;
 }
@@ -1450,7 +1450,7 @@ void CUtlVector<T, A>::RemoveAll()
 	for (intp i = m_Size; --i >= 0; )
 	{
 		// Global scope to resolve conflict with Scaleform 4.0
-		::Destruct(&Element(i));
+		::Destruct( std::addressof( Element(i) ) );
 	}
 
 	m_Size = 0;

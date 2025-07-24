@@ -317,10 +317,10 @@ public:
 	Element_t const &Get( KeyArg_t k, Element_t const &defaultValue ) const { handle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 	Element_t const &Get( KeyAlt_t k, Element_t const &defaultValue ) const { handle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 
-	Element_t const *GetPtr( KeyArg_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t const *GetPtr( KeyAlt_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t *GetPtr( KeyArg_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t *GetPtr( KeyAlt_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
+	Element_t const *GetPtr( KeyArg_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t const *GetPtr( KeyAlt_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t *GetPtr( KeyArg_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t *GetPtr( KeyAlt_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
 
 	// Swap memory and contents with another identical hashtable
 	// (NOTE: if using function pointers or functors with state,
@@ -884,10 +884,10 @@ public:
 	Element_t const &Get( KeyArg_t k, Element_t const &defaultValue ) const { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 	Element_t const &Get( KeyAlt_t k, Element_t const &defaultValue ) const { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 
-	Element_t const *GetPtr( KeyArg_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t const *GetPtr( KeyAlt_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t *GetPtr( KeyArg_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t *GetPtr( KeyAlt_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
+	Element_t const *GetPtr( KeyArg_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t const *GetPtr( KeyAlt_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t *GetPtr( KeyArg_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t *GetPtr( KeyAlt_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
 
 	UtlHashHandle_t FirstHandle() const { return ExtendInvalidHandle( m_data.Head() ); }
 	UtlHashHandle_t NextHandle( UtlHashHandle_t h ) const { return ExtendInvalidHandle( m_data.Next( h ) ); }

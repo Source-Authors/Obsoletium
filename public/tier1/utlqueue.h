@@ -127,7 +127,7 @@ inline bool CUtlQueue<T, M>::RemoveAtHead( T &removedElement )
 
 	QueueIter_t it = m_head;
 	removedElement = m_memory[ it ];
-	Destruct( &m_memory[ it ] );
+	Destruct( std::addressof( m_memory[ it ] ) );
 	if ( m_head == m_tail )
 	{
 		m_head = m_tail = QUEUE_ITERATOR_INVALID;
@@ -158,7 +158,7 @@ inline bool CUtlQueue<T, M>::RemoveAtTail( T &removedElement )
 	}
 
 	removedElement = m_memory[ m_tail ];
-	Destruct( &m_memory[ m_tail ] );
+	Destruct( std::addressof( m_memory[ m_tail ] ) );
 	if ( m_head == m_tail )
 	{
 		m_head = m_tail = QUEUE_ITERATOR_INVALID;
@@ -231,7 +231,7 @@ void CUtlQueue<T, M>::Insert( T const &element )
 		m_tail = nextTail;
 	}
 
-	CopyConstruct( &m_memory[ m_tail ], element );
+	CopyConstruct( std::addressof( m_memory[ m_tail ] ), element );
 }
 
 template <class T, class M>

@@ -719,7 +719,7 @@ I CUtlLinkedList<T,S,ML,I,M>::Alloc( bool multilist )
 	if ( elem == InvalidIndex() )
 		return elem;
 
-	Construct( &Element(elem) );
+	Construct( std::addressof( Element(elem) ) );
 
 	return elem;
 }
@@ -731,7 +731,7 @@ void  CUtlLinkedList<T,S,ML,I,M>::Free( I elem )
 	Unlink(elem);
 
 	ListElem_t &internalElem = InternalElement(elem);
-	Destruct( &internalElem.m_Element );
+	Destruct( std::addressof( internalElem.m_Element ) );
 	internalElem.m_Next = m_FirstFree;
 	m_FirstFree = elem;
 }
@@ -752,7 +752,7 @@ I CUtlLinkedList<T,S,ML,I,M>::InsertBefore( I before )
 	LinkBefore( before, newNode );
 	
 	// Construct the data
-	Construct( &Element(newNode) );
+	Construct( std::addressof( Element(newNode) ) );
 	
 	return newNode;
 }
@@ -769,7 +769,7 @@ I CUtlLinkedList<T,S,ML,I,M>::InsertAfter( I after )
 	LinkAfter( after, newNode );
 	
 	// Construct the data
-	Construct( &Element(newNode) );
+	Construct( std::addressof( Element(newNode) ) );
 	
 	return newNode;
 }
@@ -803,7 +803,7 @@ I CUtlLinkedList<T,S,ML,I,M>::InsertBefore( I before, T const& src )
 	LinkBefore( before, newNode );
 	
 	// Construct the data
-	CopyConstruct( &Element(newNode), src );
+	CopyConstruct( std::addressof( Element(newNode) ), src );
 	
 	return newNode;
 }
@@ -820,7 +820,7 @@ I CUtlLinkedList<T,S,ML,I,M>::InsertAfter( I after, T const& src )
 	LinkAfter( after, newNode );
 	
 	// Construct the data
-	CopyConstruct( &Element(newNode), src );
+	CopyConstruct( std::addressof( Element(newNode) ), src );
 	
 	return newNode;
 }
@@ -850,7 +850,7 @@ I CUtlLinkedList<T,S,ML,I,M>::InsertBefore( I before, T&& src )
 	LinkBefore( before, newNode );
 	
 	// Construct the data
-	MoveConstruct( &Element(newNode), std::move( src ) );
+	MoveConstruct( std::addressof( Element(newNode) ), std::move( src ) );
 	
 	return newNode;
 }
@@ -867,7 +867,7 @@ I CUtlLinkedList<T,S,ML,I,M>::InsertAfter( I after, T&& src )
 	LinkAfter( after, newNode );
 	
 	// Construct the data
-	MoveConstruct( &Element(newNode), std::move( src ) );
+	MoveConstruct( std::addressof( Element(newNode) ), std::move( src ) );
 	
 	return newNode;
 }
@@ -949,7 +949,7 @@ void  CUtlLinkedList<T,S,ML,I,M>::RemoveAll()
 			if ( IsValidIndex( i ) ) // skip elements already in the free list
 			{
 				ListElem_t &internalElem = InternalElement( i );
-				Destruct( &internalElem.m_Element );
+				Destruct( std::addressof( internalElem.m_Element ) );
 				internalElem.m_Previous = i;
 				internalElem.m_Next = m_FirstFree;
 				m_FirstFree = i;
@@ -967,7 +967,7 @@ void  CUtlLinkedList<T,S,ML,I,M>::RemoveAll()
 		{
 			next = Next( i );
 			ListElem_t &internalElem = InternalElement( i );
-			Destruct( &internalElem.m_Element );
+			Destruct( std::addressof( internalElem.m_Element ) );
 			internalElem.m_Previous = i;
 			internalElem.m_Next = next == InvalidIndex() ? m_FirstFree : next;
 			i = next;

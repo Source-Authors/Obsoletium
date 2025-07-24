@@ -691,7 +691,7 @@ I  CUtlRBTree<T, I, L, M>::NewNode()
 	node.m_Left = node.m_Right = node.m_Parent = InvalidIndex();
 #endif
 
-	Construct( &Element( elem ) );
+	Construct( std::addressof( Element( elem ) ) );
 	ResetDbgInfo();
 
 	return elem;
@@ -701,7 +701,7 @@ template < class T, class I, typename L, class M >
 void  CUtlRBTree<T, I, L, M>::FreeNode( I i )
 {
 	Assert( IsValidIndex(i) && (i != InvalidIndex()) );
-	Destruct( &Element(i) );
+	Destruct( std::addressof( Element(i) ) );
 	SetLeftChild( i, i ); // indicates it's in not in the tree
 	SetRightChild( i, m_FirstFree );
 	m_FirstFree = i;
@@ -1123,7 +1123,7 @@ void CUtlRBTree<T, I, L, M>::RemoveAll()
 		I i = m_Elements.GetIndex( it );
 		if ( IsValidIndex( i ) ) // skip elements in the free list
 		{
-			Destruct( &Element( i ) );
+			Destruct( std::addressof( Element( i ) ) );
 			SetRightChild( i, m_FirstFree );
 			SetLeftChild( i, i );
 			m_FirstFree = i;
@@ -1488,7 +1488,7 @@ I CUtlRBTree<T, I, L, M>::Insert( T const &insert )
 	bool leftchild;
 	FindInsertionPosition( insert, parent, leftchild );
 	I newNode = InsertAt( parent, leftchild );
-	CopyConstruct( &Element( newNode ), insert );
+	CopyConstruct( std::addressof( Element( newNode ) ), insert );
 	return newNode;
 }
 
@@ -1530,7 +1530,7 @@ I CUtlRBTree<T, I, L, M>::InsertIfNotFound( T const &insert )
 	}
 
 	I newNode = InsertAt( parent, leftchild );
-	CopyConstruct( &Element( newNode ), insert );
+	CopyConstruct( std::addressof( Element( newNode ) ), insert );
 	return newNode;
 }
 

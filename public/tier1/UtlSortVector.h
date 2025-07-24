@@ -179,7 +179,7 @@ intp CUtlSortVector<T, LessFunc, BaseVector>::Insert( const T& src )
 	intp pos = FindLessOrEqual( src ) + 1;
 	this->GrowVector();
 	this->ShiftElementsRight(pos);
-	CopyConstruct<T>( &this->Element(pos), src );
+	CopyConstruct<T>( std::addressof( this->Element(pos) ), src );
 	return pos;
 }
 
@@ -191,7 +191,7 @@ intp CUtlSortVector<T, LessFunc, BaseVector>::InsertNoSort( const T& src )
 	// Just stick the new element at the end of the vector, but don't do a sort
 	this->GrowVector();
 	this->ShiftElementsRight(lastElement);
-	CopyConstruct( &this->Element(lastElement), src );
+	CopyConstruct( std::addressof( this->Element(lastElement) ), src );
 	return lastElement;
 }
 
@@ -208,7 +208,7 @@ intp CUtlSortVector<T, LessFunc, BaseVector>::InsertIfNotFound( const T& src )
 	++pos;
 	this->GrowVector();
 	this->ShiftElementsRight(pos);
-	CopyConstruct<T>( &this->Element(pos), src );
+	CopyConstruct<T>( std::addressof( this->Element(pos) ), src );
 	return pos;
 }
 
