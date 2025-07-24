@@ -546,7 +546,7 @@ IDirect3DVertexDeclaration9 *FindOrCreateVertexDecl( VertexFormat_t fmt, bool bS
 
 	// NOTE: can't record until we have m_pDecl!
 	RECORD_COMMAND( DX8_CREATE_VERTEX_DECLARATION, 2 );
-	RECORD_INT( ( int )lookup.m_pDecl );
+	RECORD_PTR( lookup.m_pDecl );
 	RECORD_STRUCT( decl, sizeof( decl ) );
 	COMPILE_TIME_ASSERT( sizeof( decl ) == sizeof( D3DVERTEXELEMENT9 ) * 32 );
 

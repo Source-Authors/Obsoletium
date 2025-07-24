@@ -10,6 +10,8 @@
 #define RECORDING_H
 #pragma once
 
+#include <type_traits>
+
 //-----------------------------------------------------------------------------
 // Use this to put us into a 'recording' mode
 //-----------------------------------------------------------------------------
@@ -138,18 +140,27 @@ void RecordCommand( RecordingCommands_t cmd, int numargs );
 void RecordArgument( void const* pMemory, int size );
 void FinishRecording( void );
 
-inline void RecordInt( int i )
+template<typename TIntegral, typename = std::enable_if_t<std::is_integral_v<TIntegral>>>
+inline void RecordInt( TIntegral i )
 {
-	RecordArgument( &i, sizeof(int) );
+	RecordArgument( &i, sizeof(i) );
 }
 
-inline void RecordFloat( float f )
+template<typename TPointer, typename = std::enable_if_t<std::is_pointer_v<TPointer>>>
+inline void RecordPtr( TPointer p )
 {
-	RecordArgument( &f, sizeof(float) );
+	RecordArgument( p, sizeof(p) );
+}
+
+template<typename TFloat, typename = std::enable_if_t<std::is_floating_point_v<TFloat>>>
+inline void RecordFloat( TFloat f )
+{
+	RecordArgument( &f, sizeof(f) );
 }
 
 #	define RECORD_COMMAND( _cmd, _numargs )		RecordCommand( _cmd, _numargs )
 #	define RECORD_INT( _int )					RecordInt( _int )
+#	define RECORD_PTR( _ptr )					RecordPtr( _int )
 #	define RECORD_FLOAT( _float )				RecordFloat( _float )
 #	define RECORD_STRING( _string )				RecordArgument( _string, strlen(_string) + 1 )
 #	define RECORD_STRUCT( _struct, _size )		RecordArgument( _struct, _size )
@@ -185,6 +196,7 @@ inline void RecordFloat( float f )
 
 #	define RECORD_COMMAND( _cmd, _numargs )		0
 #	define RECORD_INT( _int )					0
+#	define RECORD_PTR( _ptr )					0
 #	define RECORD_FLOAT( _float )				0
 #	define RECORD_STRING( _string )				0
 #	define RECORD_STRUCT( _struct, _size )		0

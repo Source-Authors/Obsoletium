@@ -315,7 +315,7 @@ static HardwareShader_t CreateD3DVertexShader( DWORD *pByteCode, int numBytes, c
 	// NOTE: This isn't recorded before the CreateVertexShader because
 	// we don't know the value of shader until after the CreateVertexShader.
 	RECORD_COMMAND( DX8_CREATE_VERTEX_SHADER, 3 );
-	RECORD_INT( ( int )hShader ); // hack hack hack
+	RECORD_PTR( hShader ); // hack hack hack
 	RECORD_INT( numBytes );
 	RECORD_STRUCT( pByteCode, numBytes );
 
@@ -437,7 +437,7 @@ static HardwareShader_t CreateD3DPixelShader( DWORD *pByteCode, unsigned int nCe
 	// NOTE: We have to do this after creating the pixel shader since we don't know
 	// lookup.m_PixelShader yet!!!!!!!
 	RECORD_COMMAND( DX8_CREATE_PIXEL_SHADER, 3 );
-	RECORD_INT( ( int )shader );  // hack hack hack
+	RECORD_PTR( shader );  // hack hack hack
 	RECORD_INT( numBytes );
 	RECORD_STRUCT( pByteCode, numBytes );
 	
@@ -2924,7 +2924,7 @@ void CShaderManager::SetVertexShaderState( HardwareShader_t shader, DataCacheHan
 	if ( m_HardwareVertexShader != shader )
 	{
 		RECORD_COMMAND( DX8_SET_VERTEX_SHADER, 1 );
-		RECORD_INT( ( int )shader ); // hack hack hack
+		RECORD_PTR( shader ); // hack hack hack
 
 		Dx9Device()->SetVertexShader( (IDirect3DVertexShader9*)shader );
 		m_HardwareVertexShader = shader;
