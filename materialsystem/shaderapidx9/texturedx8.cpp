@@ -188,12 +188,11 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	}
 
 #ifdef DX_TO_GL_ABSTRACTION
+	if ( bSRGB )
 	{
-		if (bSRGB)
-		{
-			usage |= D3DUSAGE_TEXTURE_SRGB;		// does not exist in real DX9... just for GL to know that this is an SRGB tex
+		// does not exist in real DX9... just for GL to know that this is an SRGB tex
+		usage |= D3DUSAGE_TEXTURE_SRGB;
 		}
-	}
 #endif
 
 	if ( isCubeMap )
@@ -206,7 +205,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 				pool, 
 				&pD3DCubeTexture,
 				NULL
-	#if defined( DX_TO_GL_ABSTRACTION )			
+#ifdef DX_TO_GL_ABSTRACTION
 				, debugLabel					// tex create funcs take extra arg for debug name on GL
 	#endif
 				   );
