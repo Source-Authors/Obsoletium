@@ -4,7 +4,7 @@
 //
 //===========================================================================//
 #define DISABLE_PROTECTED_THINGS
-#if ( defined(_WIN32) && !defined( _X360 ) )
+#ifdef _WIN32
 #elif POSIX
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -13,6 +13,7 @@
 #include <netinet/tcp.h>
 #include <errno.h>
 #include <sys/ioctl.h>
+#include <sys/stat.h>
 #define closesocket close
 #define WSAGetLastError() errno
 #undef SOCKET
@@ -23,43 +24,46 @@ typedef int SOCKET;
 #endif
 
 #include "togl/rendermechanism.h"
-#include "vertexshaderdx8.h"
+
 #include "tier1/utlsymbol.h"
 #include "tier1/utlvector.h"
 #include "tier1/utldict.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/UtlStringMap.h"
-#include "locald3dtypes.h"
-#include "shaderapidx8_global.h"
-#include "recording.h"
-#include "tier0/vprof.h"
-#include "materialsystem/imaterialsystem.h"
-#include "materialsystem/imaterialsystemhardwareconfig.h"
-#include "KeyValues.h"
-#include "shaderapidx8.h"
-#include "materialsystem/IShader.h"
-#include "IShaderSystem.h"
-#include "tier0/fasttimer.h"
-#include <sys/stat.h>
-#include <time.h>
-#include <stdlib.h>
-#include "filesystem.h"
-#include "convar.h"
-#include "materialsystem/shader_vcs_version.h"
 #include "tier1/lzmaDecoder.h"
 #include "tier1/utlmap.h"
+#include "tier1/KeyValues.h"
+#include "tier1/convar.h"
+#include "tier1/diff.h"
+#include "tier1/checksum_crc.h"
+
+#include "tier0/fasttimer.h"
+#include "tier0/vprof.h"
+#include "tier0/icommandline.h"
+#include "tier0/dbg.h"
+
+#include "tier2/tier2.h"
+
+#include "materialsystem/imaterialsystem.h"
+#include "materialsystem/imaterialsystemhardwareconfig.h"
+#include "materialsystem/IShader.h"
+#include "materialsystem/shader_vcs_version.h"
+
+#include "vertexshaderdx8.h"
+#include "locald3dtypes.h"
+#include "recording.h"
+#include "IShaderSystem.h"
+#include "shaderdevicedx8.h"
+#include "shaderapidx8.h"
+#include "shaderapidx8_global.h"
+#include "filesystem.h"
 
 #include "datacache/idatacache.h"
-#include "tier1/diff.h"
-#include "shaderdevicedx8.h"
 #include "filesystem/IQueuedLoader.h"
-#include "tier2/tier2.h"
 #include "shaderapi/ishaderutil.h"
-#include "tier0/icommandline.h"
 
 #include "Color.h"
-#include "tier0/dbg.h"
 
 #ifdef REMOTE_DYNAMIC_SHADER_COMPILE
 
