@@ -548,42 +548,43 @@ struct ShaderFileCache_t
 //-----------------------------------------------------------------------------
 // Vertex + pixel shader manager
 //-----------------------------------------------------------------------------
-class CShaderManager : public IShaderManager
+class CShaderManager final : public IShaderManager
 {
 public:
 	CShaderManager();
-	virtual ~CShaderManager();
+	~CShaderManager();
 
 	// Methods of IShaderManager
-	virtual void				Init();
-	virtual void				Shutdown();
-	virtual IShaderBuffer		*CompileShader( const char *pProgram, size_t nBufLen, const char *pShaderVersion );
-	virtual VertexShaderHandle_t CreateVertexShader( IShaderBuffer* pShaderBuffer );
-	virtual void				DestroyVertexShader( VertexShaderHandle_t hShader );
-	virtual PixelShaderHandle_t CreatePixelShader( IShaderBuffer* pShaderBuffer );
-	virtual void				DestroyPixelShader( PixelShaderHandle_t hShader );
-	virtual VertexShader_t		CreateVertexShader( const char *pVertexShaderFile, int nStaticVshIndex = 0, char *debugLabel = NULL );
-	virtual PixelShader_t		CreatePixelShader( const char *pPixelShaderFile, int nStaticPshIndex = 0, char *debugLabel = NULL );
-	virtual void				SetVertexShader( VertexShader_t shader );
-	virtual void				SetPixelShader( PixelShader_t shader );
-	virtual void				BindVertexShader( VertexShaderHandle_t shader );
-	virtual void				BindPixelShader( PixelShaderHandle_t shader );
-	virtual void				*GetCurrentVertexShader();
-	virtual void				*GetCurrentPixelShader();
-	virtual void				ResetShaderState();
-	void						FlushShaders();
-	virtual void				ClearVertexAndPixelShaderRefCounts();
-	virtual void				PurgeUnusedVertexAndPixelShaders();
-	void						SpewVertexAndPixelShaders();
-
-	bool						CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuffer );
-	bool						CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuffer, char *debugLabel = NULL );
+	void				Init() override;
+	void				Shutdown() override;
+	IShaderBuffer		*CompileShader( const char *pProgram, size_t nBufLen, const char *pShaderVersion ) override;
+	VertexShaderHandle_t CreateVertexShader( IShaderBuffer* pShaderBuffer ) override;
+	void				DestroyVertexShader( VertexShaderHandle_t hShader ) override;
+	PixelShaderHandle_t CreatePixelShader( IShaderBuffer* pShaderBuffer ) override;
+	void				DestroyPixelShader( PixelShaderHandle_t hShader ) override;
+	VertexShader_t		CreateVertexShader( const char *pVertexShaderFile, int nStaticVshIndex = 0, char *debugLabel = NULL ) override;
+	PixelShader_t		CreatePixelShader( const char *pPixelShaderFile, int nStaticPshIndex = 0, char *debugLabel = NULL ) override;
+	void				SetVertexShader( VertexShader_t shader ) override;
+	void				SetPixelShader( PixelShader_t shader ) override;
+	void				BindVertexShader( VertexShaderHandle_t shader ) override;
+	void				BindPixelShader( PixelShaderHandle_t shader ) override;
+	void				*GetCurrentVertexShader() override;
+	void				*GetCurrentPixelShader() override;
+	void				ResetShaderState() override;
+	void				ClearVertexAndPixelShaderRefCounts() override;
+	void				PurgeUnusedVertexAndPixelShaders() override;
 
 #if defined( DX_TO_GL_ABSTRACTION )
-	virtual void				DoStartupShaderPreloading();
+	void		DoStartupShaderPreloading() override;
 #endif
 
-	static void					QueuedLoaderCallback( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError );
+	void				SpewVertexAndPixelShaders();
+	void				FlushShaders();
+
+	bool				CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuffer );
+	bool				CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuffer, char *debugLabel = NULL );
+
+	static void			QueuedLoaderCallback( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError );
 
 private:
 	typedef CUtlFixedLinkedList< IDirect3DVertexShader9* >::IndexType_t VertexShaderIndex_t;
