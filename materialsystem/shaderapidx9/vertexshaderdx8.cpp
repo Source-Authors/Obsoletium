@@ -3308,7 +3308,7 @@ void CShaderManager::FlushShaders( void )
 			if( combos.m_pHardwareShaders[i] != INVALID_HARDWARE_SHADER )
 			{
 #ifdef _DEBUG
-				int nRetVal=
+				ULONG nRetVal=
 #endif
 					( ( IDirect3DVertexShader9 * )combos.m_pHardwareShaders[i] )->Release();
 				Assert( nRetVal == 0 );
@@ -3327,7 +3327,7 @@ void CShaderManager::FlushShaders( void )
 			if( combos.m_pHardwareShaders[i] != INVALID_HARDWARE_SHADER )
 			{
 #ifdef _DEBUG
-				int nRetVal =
+				ULONG nRetVal =
 #endif
 					( ( IDirect3DPixelShader * )combos.m_pHardwareShaders[i] )->Release();
 				Assert( nRetVal == 0 );
