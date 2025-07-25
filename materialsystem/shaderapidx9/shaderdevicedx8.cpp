@@ -2760,7 +2760,10 @@ void CShaderDeviceDx8::Present()
 	// If we're not iconified, try to present (without this check, we can flicker when Alt-Tabbed away)
 	if ( IsIconic( (VD3DHWND)m_hWnd ) == FALSE && bValidPresent )
 	{
-		if ( m_IsResizing || ( m_ViewHWnd != (VD3DHWND)m_hWnd ) )
+		// Rects work only for D3DSWAPEFFECT_COPY.
+		// See https://learn.microsoft.com/en-us/windows/win32/api/d3d9/nf-d3d9-idirect3ddevice9ex-presentex
+		if ( ( m_IsResizing || m_ViewHWnd != (VD3DHWND)m_hWnd ) &&
+			 m_PresentParameters.SwapEffect == D3DSWAPEFFECT_COPY )
 		{
 			RECT destRect;
 			#ifndef DX_TO_GL_ABSTRACTION
