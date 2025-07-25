@@ -104,7 +104,7 @@ protected:
 
 private:
 	// Initialize adapter information
-	void InitAdapterInfo();
+	bool InitGpuInfo();
 
 	// Code to detect support for texture border mode (not a simple caps check)
 	void CheckBorderColorSupport( HardwareCaps_t *pCaps, unsigned nAdapter );

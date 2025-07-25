@@ -264,7 +264,12 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 	// FIXME: Want this to be here, but we can't because Steam
 	// hasn't had it's application ID set up yet.
 	// dimhotepus: Init adapters immediately.
-	InitAdapterInfo();
+	if ( !InitGpuInfo() )
+	{
+		Warning("No suitable GPU device. Do you have a GPU?\n");
+		return false;
+	}
+
 	return true;
 }
 
@@ -305,10 +310,10 @@ void CShaderDeviceMgrDx8::Disconnect()
 //-----------------------------------------------------------------------------
 InitReturnVal_t CShaderDeviceMgrDx8::Init( )
 {
-	// FIXME: Remove call to InitAdapterInfo once Steam startup issues are resolved.
+	// FIXME: Remove call to InitGpuInfo once Steam startup issues are resolved.
 	// Do it in Connect instead.
 	// dimhotepus: Init adapters in Connect.
-	// InitAdapterInfo();
+	// InitGpuInfo();
 
 	return INIT_OK;
 }
@@ -351,20 +356,21 @@ void CShaderDeviceMgrDx8::Shutdown( )
 //-----------------------------------------------------------------------------
 // Initialize adapter information
 //-----------------------------------------------------------------------------
-void CShaderDeviceMgrDx8::InitAdapterInfo()
+bool CShaderDeviceMgrDx8::InitGpuInfo()
 {
 	if ( m_bAdapterInfoIntialized )
-		return;
+		return true;
 
 	m_bAdapterInfoIntialized = true;
 	m_Adapters.RemoveAll();
 
+	bool has_any_adapter = false;
 	Assert(m_pD3D);
 	unsigned nCount = m_pD3D->GetAdapterCount( );
+
 	for( unsigned i = 0; i < nCount; ++i )
 	{
 		AdapterInfo_t &info = m_Adapters[m_Adapters.AddToTail()];
-
 #ifdef _DEBUG
 		memset( &info.m_ActualCaps, 0xDD, sizeof(info.m_ActualCaps) );
 #endif
@@ -379,13 +385,14 @@ void CShaderDeviceMgrDx8::InitAdapterInfo()
 		ReadHardwareCaps( info.m_ActualCaps, info.m_ActualCaps.m_nMaxDXSupportLevel );
 
 		// What's in "-shader" overrides dxsupport.cfg
-		const char *pShaderParam = CommandLine()->ParmValue( "-shader" );
-		if ( pShaderParam )
-		{
-			V_strcpy_safe( info.m_ActualCaps.m_pShaderDLL, pShaderParam );
+		const char *override = CommandLine()->ParmValue( "-shader" );
+		if ( override )	V_strcpy_safe( info.m_ActualCaps.m_pShaderDLL, override );
+
+		has_any_adapter = true;
 		}
+
+	return has_any_adapter;
 	}
-}
 
 //--------------------------------------------------------------------------------
 // Code to detect support for texture border color (widely supported but the caps
@@ -1226,11 +1233,11 @@ void CShaderDeviceMgrDx8::ComputeDXSupportLevel( HardwareCaps_t &caps )
 //-----------------------------------------------------------------------------
 unsigned CShaderDeviceMgrDx8::GetAdapterCount() const
 {
-	// FIXME: Remove call to InitAdapterInfo once Steam startup issues are resolved.
+	// FIXME: Remove call to InitGpuInfo once Steam startup issues are resolved.
 	// dimhotepus: Init adapters in Connect.
-	// const_cast<CShaderDeviceMgrDx8*>( this )->InitAdapterInfo();
+	// const_cast<CShaderDeviceMgrDx8*>( this )->InitGpuInfo();
 
-	return m_Adapters.Count();
+	return static_cast<unsigned>(m_Adapters.Count());
 }
 
 
@@ -1239,9 +1246,9 @@ unsigned CShaderDeviceMgrDx8::GetAdapterCount() const
 //-----------------------------------------------------------------------------
 void CShaderDeviceMgrDx8::GetAdapterInfo( unsigned nAdapter, MaterialAdapterInfo_t& info ) const
 {
-	// FIXME: Remove call to InitAdapterInfo once Steam startup issues are resolved.
+	// FIXME: Remove call to InitGpuInfo once Steam startup issues are resolved.
 	// dimhotepus: Init adapters in Connect.
-	// const_cast<CShaderDeviceMgrDx8*>( this )->InitAdapterInfo();
+	// const_cast<CShaderDeviceMgrDx8*>( this )->InitGpuInfo();
 
 	Assert( ( nAdapter >= 0 ) && ( nAdapter < (unsigned)m_Adapters.Count() ) );
 	const HardwareCaps_t &caps = m_Adapters[ nAdapter ].m_ActualCaps;
