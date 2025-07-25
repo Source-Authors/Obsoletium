@@ -21,6 +21,8 @@
 #include "materialsystem/imaterialsystem.h"
 #include "hardwareconfig.h"
 
+#include <com_ptr.h>
+
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -168,7 +170,7 @@ protected:
 	void RemoveWindowHook( void *hWnd );
 	void SetCurrentThreadAsOwner();
 	void RemoveThreadOwner();
-	bool ThreadOwnsDevice();
+	bool ThreadOwnsDevice() const;
 
 	// Finds a child window
 	int  FindView( void* hWnd ) const;
@@ -184,7 +186,10 @@ protected:
 
 	int	m_nWindowWidth;
 	int m_nWindowHeight;
-	ThreadId_t m_dwThreadId;
+	// dimhotepus: Make atomic as mutlithreaded access.
+	std::atomic<ThreadId_t> m_dwThreadId;
+
+	constexpr static inline wchar_t kShaderApiWindowClassName[]{L"shaderdx8"};
 };
 
 
@@ -200,34 +205,27 @@ inline void* CShaderDeviceBase::GetIPCHWnd()
 //-----------------------------------------------------------------------------
 // Helper class to reduce code related to shader buffers
 //-----------------------------------------------------------------------------
-template< class T >
-class CShaderBuffer : public IShaderBuffer
+template<typename TShader>
+class CShaderBuffer final : public IShaderBuffer
 {
 public:
-	CShaderBuffer( T *pBlob ) : m_pBlob( pBlob ) {}
-	virtual ~CShaderBuffer() = default;
+	using interface_concept = se::win::com::com_interface_concept<TShader>;
 
-	virtual size_t GetSize() const
+	CShaderBuffer( se::win::com::com_ptr<TShader> &&pBlob ) : m_pBlob( std::move(pBlob) ) {}
+	~CShaderBuffer() = default;
+
+	size_t GetSize() const override
 	{
 		return m_pBlob ? m_pBlob->GetBufferSize() : 0;
 	}
 
-	virtual const void* GetBits() const
+	const void* GetBits() const override
 	{
-		return m_pBlob ? m_pBlob->GetBufferPointer() : NULL;
-	}
-
-	virtual void Release()
-	{
-		if ( m_pBlob )
-		{
-			m_pBlob->Release();
-		}
-		delete this;
+		return m_pBlob ? m_pBlob->GetBufferPointer() : nullptr;
 	}
 
 private:
-	T *m_pBlob;
+	se::win::com::com_ptr<TShader> m_pBlob;
 };
 
 

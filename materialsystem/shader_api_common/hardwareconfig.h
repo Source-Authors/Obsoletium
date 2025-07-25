@@ -20,18 +20,8 @@
 #include "materialsystem/imaterialsystem.h"
 
 
-//-----------------------------------------------------------------------------
-// Forward declarations
-//-----------------------------------------------------------------------------
 struct ShaderDeviceInfo_t;
 
-
-//-----------------------------------------------------------------------------
-// Vendor IDs sometimes needed for vendor-specific code
-//-----------------------------------------------------------------------------
-#define VENDORID_NVIDIA	0x10DE
-#define VENDORID_ATI	0x1002
-#define VENDORID_INTEL  0x8086
 
 //-----------------------------------------------------------------------------
 // ShaderAPI constants
@@ -113,42 +103,49 @@ struct HardwareCaps_t : public MaterialAdapterInfo_t
 	int m_MaxSimultaneousRenderTargets;
 
 	bool m_bDeviceOk : 1;
-	bool m_HasSetDeviceGammaRamp : 1;
-	bool m_SupportsVertexShaders : 1;
-	bool m_SupportsVertexShaders_2_0 : 1;
-	bool m_SupportsPixelShaders : 1;
-	bool m_SupportsPixelShaders_1_4 : 1;
-	bool m_SupportsPixelShaders_2_0 : 1;
-	bool m_SupportsPixelShaders_2_b : 1;
-	bool m_SupportsShaderModel_3_0 : 1;
-	bool m_bSupportsAnisotropicFiltering : 1;
-	bool m_bSupportsMagAnisotropicFiltering : 1;
-	bool m_bSupportsVertexTextures : 1;
+	bool m_HasSetDeviceGammaRamp : 1;				// Indicates device support gamma ramps in the swap chain's current presentation mode (full-screen or windowed).
+	bool m_SupportsVertexShaders : 1;				// Vertex shaders support.
+	bool m_SupportsVertexShaders_2_0 : 1;			// Vertex shaders 2.0-2.x.
+	bool m_SupportsPixelShaders : 1;				// Pixel shaders support.
+	bool m_SupportsPixelShaders_1_4 : 1;			// Pixel shaders 1.1-1.4.
+	bool m_SupportsPixelShaders_2_0 : 1;			// Pixel shaders 2.0.
+	bool m_SupportsPixelShaders_2_b : 1;			// Pixel shaders 2.b.
+	bool m_SupportsShaderModel_3_0 : 1;				// Shader model 3.0.
+	bool m_SupportsShaderModel_4_0 : 1;				// Shader model 4.0.
+	bool m_SupportsShaderModel_5_0 : 1;				// Shader model 5.0.
+	bool m_SupportsShaderModel_5_1 : 1;				// Shader model 5.1.
+	bool m_SupportsShaderModel_6_0 : 1;				// Shader model 6.0.
+	bool m_SupportsHullShaders : 1;					// Hull shaders support.
+	bool m_SupportsDomainShaders : 1;				// Domain shaders support.
+	bool m_SupportsComputeShaders : 1;				// Compute shaders support.
+	bool m_bSupportsAnisotropicFiltering : 1;		// Indicates device supports per-stage anisotropic filtering for minifying textures.
+	bool m_bSupportsMagAnisotropicFiltering : 1;	// Indicates device supports per-stage anisotropic filtering for magnifying textures.
+	bool m_bSupportsVertexTextures : 1;				// Indicates device supports vertex textures.
 	bool m_ZBiasAndSlopeScaledDepthBiasSupported : 1;
-	bool m_SupportsMipmapping : 1;
+	bool m_SupportsMipmapping : 1;					// Indicates device supports mipmaps.
 	bool m_SupportsOverbright : 1;
-	bool m_SupportsCubeMaps : 1;
-	bool m_SupportsHardwareLighting : 1;
-	bool m_SupportsMipmappedCubemaps : 1;
-	bool m_SupportsNonPow2Textures : 1;
-	bool m_PreferDynamicTextures : 1;
+	bool m_SupportsCubeMaps : 1;					// Indicates device supports cube textures.
+	bool m_SupportsHardwareLighting : 1;			// Indicates device supports transformation and lighting in hardware.
+	bool m_SupportsMipmappedCubemaps : 1;			// Indicates device supports mipmapped cube textures.
+	bool m_SupportsNonPow2Textures : 1;				// Indicates non-power of 2 texture dimensions support.
+	bool m_PreferDynamicTextures : 1;				// Indicates device supports dynamic textures.
 	bool m_HasProjectedBumpEnv : 1;
-	bool m_SupportsSRGB : 1; // Means both read and write
-	bool m_bSupportsSpheremapping : 1;
+	bool m_SupportsSRGB : 1;						// Indicates texture supports gamma correction during a read/write operation.
+	bool m_bSupportsSpheremapping : 1;				// Indicates support of texture coordinates for sphere mapping.
 	bool m_UseFastClipping : 1;
 	bool m_bNeedsATICentroidHack : 1;
 	bool m_bDisableShaderOptimizations : 1;
-	bool m_bColorOnSecondStream : 1;
-	bool m_bSupportsStreamOffset : 1;
+	bool m_bColorOnSecondStream : 1;				// Indicates device supports multiple concurrent data streams.
+	bool m_bSupportsStreamOffset : 1;				// Indicates device supports stream offsets.
 	bool m_bFogColorSpecifiedInLinearSpace : 1;
 	bool m_bFogColorAlwaysLinearSpace : 1;
-	bool m_bSupportsAlphaToCoverage : 1;
-	bool m_bSupportsShadowDepthTextures : 1;
-	bool m_bSupportsFetch4 : 1;
-	bool m_bSoftwareVertexProcessing : 1;
-	bool m_bScissorSupported : 1;
-	bool m_bSupportsFloat32RenderTargets : 1;
-	bool m_bSupportsBorderColor : 1;
+	bool m_bSupportsAlphaToCoverage : 1;			// Indicates alpha to coverage support. Alpha to coverage is a multisampling technique used in graphics rendering that allows for order-independent transparency, particularly useful for rendering complex scenes like foliage in video games.
+	bool m_bSupportsShadowDepthTextures : 1;		// Indicates shadow depth formats support.
+	bool m_bSupportsFetch4 : 1;						// ATI has a feature called Fetch4 that is able to fetch texels in a single call from a 1-component texture. Analog of Gather4 from sm5: https://learn.microsoft.com/en-us/windows/win32/direct3dhlsl/gather4--sm5---asm-
+	bool m_bSoftwareVertexProcessing : 1;			// Vertex processing can be done in software.
+	bool m_bScissorSupported : 1;					// Indicates scissor test support. See https://learn.microsoft.com/en-us/windows/win32/direct3d9/scissor-test
+	bool m_bSupportsFloat32RenderTargets : 1;		// Indicated f32 formats support.
+	bool m_bSupportsBorderColor : 1;				// Indicates texture border color support.
 	bool m_bDX10Card : 1;							// Indicates DX10 part with performant vertex textures running DX9 path
 	bool m_bDX10Blending : 1;						// Indicates DX10 part that does DX10 blending (but may not have performant vertex textures, such as Intel parts)
 	bool m_bSupportsStaticControlFlow : 1;			// Useful on OpenGL, where we have a mix of support...
@@ -156,6 +153,8 @@ struct HardwareCaps_t : public MaterialAdapterInfo_t
 	bool m_CanDoSRGBReadFromRTs : 1;				// Gotta do this on OpenGL.  Mostly hidden, but some high level code needs to know
 	bool m_bSupportsGLMixedSizeTargets : 1;			// on OpenGL, are mixed size depth buffers supported - aka ARB_framebuffer_object
 	bool m_bCanStretchRectFromTextures : 1;			// Does the device expose D3DDEVCAPS2_CAN_STRETCHRECT_FROM_TEXTURES (or is it >DX9?)
+
+	bool m_bPresentAllowTearing : 1;				// The display supports tearing, a requirement of variable refresh rate displays.
 
 	HDRType_t m_MaxHDRType;
 };

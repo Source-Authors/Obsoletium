@@ -931,10 +931,18 @@ const char *COM_DXLevelToString( int dxlevel )
 			return !bHalfPrecision
 				? "10.0 [sm4] (full-precision)"
 				: "10.0 [sm4] (half-precision)";
-		case 114:
+		case 110:
 			return !bHalfPrecision
-				? "11.4 [sm5] (full-precision)"
-				: "11.4 [sm5] (half-precision)";
+				? "11.0 [sm5] (full-precision)"
+				: "11.0 [sm5] (half-precision)";
+		case 111:
+			return !bHalfPrecision
+				? "11.1 [sm5] (full-precision)"
+				: "11.1 [sm5] (half-precision)";
+		case 120:
+			return !bHalfPrecision
+				? "12.0 [sm6] (full-precision)"
+				: "12.0 [sm6] (half-precision)";
 		default:
 			return "UNKNOWN";
 		}
@@ -971,10 +979,18 @@ const char *COM_DXLevelToString( int dxlevel )
 			return !bHalfPrecision
 				? "gamemode - 10.0 [sm4] (full-precision)"
 				: "gamemode - 10.0 [sm4] (half-precision)";
-		case 114:
+		case 110:
 			return !bHalfPrecision
-				? "gamemode - 11.4 [sm5] (full-precision)"
-				: "gamemode - 11.4 [sm5] (half-precision)";
+				? "gamemode - 11.0 [sm5] (full-precision)"
+				: "gamemode - 11.0 [sm5] (half-precision)";
+		case 111:
+			return !bHalfPrecision
+				? "gamemode - 11.1 [sm5] (full-precision)"
+				: "gamemode - 11.1 [sm5] (half-precision)";
+		case 120:
+			return !bHalfPrecision
+				? "gamemode - 12.0 [sm6] (full-precision)"
+				: "gamemode - 12.0 [sm6] (half-precision)";
 		default:
 			return "gamemode";
 		}

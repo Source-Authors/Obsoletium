@@ -19,19 +19,18 @@ $Configuration
 	$Compiler
 	{
 		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty;$SRCDIR\thirdparty\DirectXMath\Inc" [$WINDOWS && !$GL]
-		$AdditionalIncludeDirectories	"$BASE;..\"
+		$AdditionalIncludeDirectories	"$BASE;..\;..\shader_api_common"
 		$PreprocessorDefinitions		"$BASE;SHADERAPIDX9;SHADER_DLL_EXPORT;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead"
 		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WINDOWS && !$GL]
 		$PreprocessorDefinitions		"$BASE;GL_GLEXT_PROTOTYPES;DX_TO_GL_ABSTRACTION" [$GL]
-//		$AdditionalOptions		"/FC"
 	}
     
 	$Linker
 	{
-		$SystemLibraries                    "iconv" [$OSXALL]
-		$GCC_ExtraLinkerFlags                   		"-L/usr/lib32" [$LINUXALL]
-		$SystemFrameworks					"Carbon;OpenGL;Quartz;Cocoa;IOKit" [$OSXALL]
-		$AdditionalDependencies				"$BASE d3d9.lib d3dcompiler.lib wsock32.lib Ws2_32.lib" [$WINDOWS]
+		$SystemLibraries				"iconv" [$OSXALL]
+		$GCC_ExtraLinkerFlags			"-L/usr/lib32" [$LINUXALL]
+		$SystemFrameworks				"Carbon;OpenGL;Quartz;Cocoa;IOKit" [$OSXALL]
+		$AdditionalDependencies			"$BASE d3d9.lib d3dcompiler.lib wsock32.lib Ws2_32.lib" [$WINDOWS]
 	}
 }
 
@@ -39,15 +38,18 @@ $Project "shaderapidx9"
 {
 	$Folder	"Source Files"
 	{
+		$File	"$SRCDIR\materialsystem\shader_api_common\hardwareconfig.cpp"
+		$File	"$SRCDIR\materialsystem\shader_api_common\meshbase.cpp"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderapibase.cpp"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderdevicebase.cpp"
+		$File	"$SRCDIR\materialsystem\shader_api_common\winutils.cpp"		[!$WINDOWS]
+		$File	"$SRCDIR\materialsystem\shader_api_common\wmi.cpp"			[$WINDOWS && !$GL]
+
 		$File	"colorformatdx8.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
-		$File	"hardwareconfig.cpp"
-		$File	"meshbase.cpp"
 		$File	"meshdx8.cpp"
-		$File	"recording.cpp"								[$WINDOWS && !$GL]
+		$File	"recording.cpp"							[$WINDOWS && !$GL]
 		$File	"shaderapidx8.cpp"
-		$File	"shaderdevicebase.cpp"
-		$File	"shaderapibase.cpp"
 		$File	"shaderdevicedx8.cpp"
 		$File	"shadershadowdx8.cpp"
 		$File	"texturedx8.cpp"
@@ -55,8 +57,6 @@ $Project "shaderapidx9"
 		$File	"cvballoctracker.cpp"
 		$File	"vertexdecl.cpp"
 		$File	"vertexshaderdx8.cpp"
-		$File	"wmi.cpp"									[$WINDOWS && !$GL]
-		$File	"winutils.cpp"							[!$WINDOWS]
 	}
 
 	$Folder	"Public Header Files"
@@ -73,27 +73,29 @@ $Project "shaderapidx9"
 
 	$Folder	"Header Files"
 	{
+		$File	"$SRCDIR\materialsystem\shader_api_common\hardwareconfig.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\locald3dtypes.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\meshbase.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderapi_global.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderapibase.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderdevicebase.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\winutils.h"	[!$WINDOWS]
+		$File	"$SRCDIR\materialsystem\shader_api_common\wmi.h"		[$WINDOWS && !$GL]
+
 		$File	"TransitionTable.h"
 		$File	"vertexdecl.h"
 		$File	"colorformatdx8.h"
 		$File	"dynamicib.h"
 		$File	"dynamicvb.h"
-		$File	"hardwareconfig.h"
-		$File	"meshbase.h"
 		$File	"imeshdx8.h"
-		$File	"locald3dtypes.h"
 		$File	"recording.h"
 		$File	"shaderapidx8.h"
-		$File	"shaderdevicebase.h"
-		$File	"shaderapibase.h"
 		$File	"shaderdevicedx8.h"
 		$File	"shaderapidx8_global.h"
 		$File	"shadershadowdx8.h"
 		$File	"stubd3ddevice.h"
 		$File	"texturedx8.h"
 		$File	"vertexshaderdx8.h"
-		$File	"wmi.h"							[$WINDOWS && !$GL]
-		$File	"winutils.h"				[!$WINDOWS]
 	}
 	
 	$Folder "Link Libraries"

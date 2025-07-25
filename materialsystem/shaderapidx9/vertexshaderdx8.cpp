@@ -939,7 +939,7 @@ IShaderBuffer *CShaderManager::CompileShader( const char *pProgram, size_t nBufL
 
 	// NOTE: This uses small block heap allocator; so I'm not going
 	// to bother creating a memory pool.
-	return new CShaderBuffer( pCompiledShader );
+	return new CShaderBuffer( std::move(pCompiledShader) );
 }
 
 
@@ -1181,16 +1181,8 @@ const CShaderManager::ShaderCombos_t *CShaderManager::FindOrCreateShaderCombos( 
 		}
 
 		// Check if line intended for platform lines
-		if( IsX360() )
-		{
-			if ( Q_stristr( line, "[PC]" ) )
+		if ( Q_stristr( line, "[360]" ) || Q_stristr( line, "[XBOX]" ) )
 				continue;
-		}
-		else
-		{
-			if ( Q_stristr( line, "[360]" ) || Q_stristr( line, "[XBOX]" ) )
-				continue;
-		}
 
 		// Skip any lines intended for other shader version
 		if ( Q_stristr( pShaderName, "_ps20" ) && !Q_stristr( pShaderName, "_ps20b" ) &&
@@ -1887,7 +1879,7 @@ retry_compile:
 #elif defined( DYNAMIC_SHADER_COMPILE )
 		hr = D3DDisassemble( pShader->GetBufferPointer(), pShader->GetBufferSize(), 0, NULL, &d3dblob );
 #endif
-		Assert( hr == D3D_OK );
+		Assert( SUCCEEDED( hr ) );
 		CUtlBuffer tempBuffer;
 		tempBuffer.SetBufferType( true, false );
 		intp exampleCommandLineLength = V_strlen( exampleCommandLine );
@@ -2024,7 +2016,7 @@ void CShaderManager::DisassembleShader( ShaderLookup_t *pLookup, int dynamicComb
 
 	se::win::com::com_ptr<ID3DBlob> d3dblob;
 	HRESULT hr = D3DDisassemble( pByteCode, size, 0, NULL, &d3dblob );
-	Assert( hr == D3D_OK );
+	Assert( SUCCEEDED( hr ) );
 
 	CUtlBuffer tempBuffer;
 	tempBuffer.SetBufferType( true, false );
@@ -2929,17 +2921,6 @@ void CShaderManager::SetVertexShader( VertexShader_t shader )
 		// compile it since we haven't already!
 		dxshader = CompileShader( m_ShaderSymbolTable.String( vshLookup.m_Name ), vshLookup.m_nStaticIndex, vshIndex, true );
 		Assert( dxshader != INVALID_HARDWARE_SHADER );
-
-		if( IsX360() )
-		{
-			//360 does not respond well at all to bad shaders or Error() calls. So we're staying here until we get something that compiles
-			while( dxshader == INVALID_HARDWARE_SHADER )
-			{
-				Warning( "A dynamically compiled vertex shader has failed to build. Pausing for 5 seconds and attempting rebuild.\n" );
-				ThreadSleep( 5000 );
-				dxshader = CompileShader( m_ShaderSymbolTable.String( vshLookup.m_Name ), vshLookup.m_nStaticIndex, vshIndex, true );
-			}
-		}
 	}
 #else
 	if ( vshLookup.m_Flags & SHADER_FAILED_LOAD )
@@ -3028,17 +3009,6 @@ void CShaderManager::SetPixelShader( PixelShader_t shader )
 		// compile it since we haven't already!
 		dxshader = CompileShader( m_ShaderSymbolTable.String( pshLookup.m_Name ), pshLookup.m_nStaticIndex, pshIndex, false );
 //		Assert( dxshader != INVALID_HARDWARE_SHADER );
-
-		if( IsX360() )
-		{
-			//360 does not respond well at all to bad shaders or Error() calls. So we're staying here until we get something that compiles
-			while( dxshader == INVALID_HARDWARE_SHADER )
-			{
-				Warning( "A dynamically compiled pixel shader has failed to build. Pausing for 5 seconds and attempting rebuild.\n" );
-				ThreadSleep( 5000 );
-				dxshader = CompileShader( m_ShaderSymbolTable.String( pshLookup.m_Name ), pshLookup.m_nStaticIndex, pshIndex, false );
-			}
-		}
 	}
 #else
 	if ( pshLookup.m_Flags & SHADER_FAILED_LOAD )

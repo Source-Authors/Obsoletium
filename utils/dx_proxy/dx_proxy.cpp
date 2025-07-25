@@ -41,16 +41,16 @@ SRC_DX_PROXY_API const char* WINAPI GetDllVersion();
 
 #endif  // DX9_V30_PC
 
-// DX10_V00_PC
-#ifdef DX10_V00_PC
+// DX11_V00_PC
+#ifdef DX11_V00_PC
 
 #ifdef DX_PROXY_INC_CONFIG
-#error "DX10_V00_PC: Multiple DX_PROXY configurations disallowed!"
+#error "DX11_V00_PC: Multiple DX_PROXY configurations disallowed!"
 #endif
 #define DX_PROXY_INC_CONFIG
-#pragma message("Compiling DX_PROXY for DX10_V00_PC")
+#pragma message("Compiling DX_PROXY for DX11_V00_PC")
 
-#endif  // DX10_V00_PC
+#endif  // DX11_V00_PC
 
 //
 // No DX configuration
@@ -92,12 +92,12 @@ SRC_DX_PROXY_API const char* WINAPI GetDllVersionLong() {
   return "{DX_PROXY for DX9_V30_PC RELEASE}";
 #endif
 
-#if defined(DX10_V00_PC) && defined(_DEBUG)
-  return "{DX_PROXY for DX10_V00_PC DEBUG}";
+#if defined(DX11_V00_PC) && defined(_DEBUG)
+  return "{DX_PROXY for DX11_V00_PC DEBUG}";
 #endif
 
-#if defined(DX10_V00_PC) && defined(NDEBUG)
-  return "{DX_PROXY for DX10_V00_PC RELEASE}";
+#if defined(DX11_V00_PC) && defined(NDEBUG)
+  return "{DX_PROXY for DX11_V00_PC RELEASE}";
 #endif
 }
 
@@ -118,12 +118,12 @@ SRC_DX_PROXY_API const char* WINAPI GetDllVersion() {
   return "DXPRX_DX9_V30_PC_r";
 #endif
 
-#if defined(DX10_V00_PC) && defined(_DEBUG)
-  return "DXPRX_DX10_V00_PC_d";
+#if defined(DX11_V00_PC) && defined(_DEBUG)
+  return "DXPRX_DX11_V00_PC_d";
 #endif
 
-#if defined(DX10_V00_PC) && defined(NDEBUG)
-  return "DXPRX_DX10_V00_PC_r";
+#if defined(DX11_V00_PC) && defined(NDEBUG)
+  return "DXPRX_DX11_V00_PC_r";
 #endif
 }
 

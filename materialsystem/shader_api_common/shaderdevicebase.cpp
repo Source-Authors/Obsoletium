@@ -19,10 +19,8 @@
 #include "shaderapibase.h"
 #include "shaderapi/ishadershadow.h"
 #include "shaderapi_global.h"
+#ifndef _WIN32
 #include "winutils.h"
-
-#ifdef _X360
-#include "xbox/xbox_win32stubs.h"
 #endif
 
 //-----------------------------------------------------------------------------
@@ -129,7 +127,7 @@ bool CShaderDeviceMgrBase::Connect( CreateInterfaceFn factory )
 
 	if ( !g_pShaderUtil || !g_pFullFileSystem )
 	{
-		Warning( "ShaderAPIDx10 was unable to access the required interfaces!\n" );
+		Warning( "ShaderAPI was unable to access the required interfaces!\n" );
 		return false;
 	}
 
@@ -561,7 +559,7 @@ void CShaderDeviceMgrBase::ReadDXSupportLevels( HardwareCaps_t &caps )
 		if ( nDXSupportLevel != 0 )
 		{
 			caps.m_nDXSupportLevel = nDXSupportLevel;
-			// Don't slam up the dxlevel level to 92 on DX10 cards in OpenGL Linux/Win mode (otherwise Intel will get dxlevel 92 when we want 90)
+			// Don't slam up the dxlevel level to 92 on DX10+ cards in OpenGL Linux/Win mode (otherwise Intel will get dxlevel 92 when we want 90)
 			if ( !( IsOpenGL() && ( IsLinux() || IsWindows() ) ) )
 			{
 				if ( caps.m_bDX10Card )
@@ -800,7 +798,7 @@ int CShaderDeviceMgrBase::GetClosestActualDXLevel( int nDxLevel ) const
 
 	if ( IsOpenGL() )
 	{
-		return ( nDxLevel <= 90 ) ? 90 : 92;
+		return nDxLevel <= 90 ? 90 : 92;
 	}
 
 	if ( nDxLevel <= 94 )
@@ -811,8 +809,14 @@ int CShaderDeviceMgrBase::GetClosestActualDXLevel( int nDxLevel ) const
 
 	if ( nDxLevel <= 100)
 		return 100;
+	
+	if ( nDxLevel <= 110)
+		return 110;
+	
+	if ( nDxLevel <= 111)
+		return 111;
 
-	return 110;
+	return 120;
 }
 
 
@@ -834,10 +838,9 @@ void CShaderDeviceMgrBase::RemoveModeChangeCallback( ShaderModeChangeCallbackFun
 
 void CShaderDeviceMgrBase::InvokeModeChangeCallbacks()
 {
-	int nCount = m_ModeChangeCallbacks.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( auto &&cb : m_ModeChangeCallbacks )
 	{
-		m_ModeChangeCallbacks[i]();
+		cb();
 	}
 }
 
@@ -886,7 +889,7 @@ CShaderDeviceBase::CShaderDeviceBase()
 	m_hWndCookie = nullptr;
 	m_nWindowWidth = 0;
 	m_nWindowHeight = 0;
-	m_dwThreadId = ThreadGetCurrentId();
+	m_dwThreadId.store( ThreadGetCurrentId(), std::memory_order::memory_order_relaxed );
 }
 
 CShaderDeviceBase::~CShaderDeviceBase()
@@ -895,19 +898,17 @@ CShaderDeviceBase::~CShaderDeviceBase()
 
 void CShaderDeviceBase::SetCurrentThreadAsOwner()
 {
-	m_dwThreadId = ThreadGetCurrentId();
+	m_dwThreadId.store( ThreadGetCurrentId(), std::memory_order::memory_order_relaxed );
 }
 
 void CShaderDeviceBase::RemoveThreadOwner()
 {
-	m_dwThreadId = std::numeric_limits<ThreadId_t>::max();
+	m_dwThreadId.store( std::numeric_limits<ThreadId_t>::max(), std::memory_order::memory_order_relaxed );
 }
 
-bool CShaderDeviceBase::ThreadOwnsDevice()
+bool CShaderDeviceBase::ThreadOwnsDevice() const
 {
-	if ( ThreadGetCurrentId() == m_dwThreadId )
-		return true;
-	return false;
+	return ThreadGetCurrentId() == m_dwThreadId.load( std::memory_order::memory_order_relaxed );
 }
 
 
@@ -991,7 +992,6 @@ static BOOL CALLBACK EnumWindowsProcNotThis( VD3DHWND hWnd, LPARAM lParam )
 #ifdef USE_ACTUAL_DX
 static LRESULT CALLBACK ShaderDX8WndProc(VD3DHWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-#if !defined( _X360 )
 	// FIXME: Should these IPC messages tell when an app has focus or not?
 	// If so, we'd want to totally disable the shader api layer when an app
 	// doesn't have focus.
@@ -1012,11 +1012,11 @@ static LRESULT CALLBACK ShaderDX8WndProc(VD3DHWND hWnd, UINT msg, WPARAM wParam,
 			{
 				g_pShaderDevice->OtherAppInitializing(true);
 			}
-			else if ( pData->dwData == CShaderDeviceBase::REACQUIRE_MESSAGE )  
+			else if ( pData->dwData == CShaderDeviceBase::REACQUIRE_MESSAGE )
 			{
 				g_pShaderDevice->OtherAppInitializing(false);
 			}
-			else if ( pData->dwData == CShaderDeviceBase::EVICT_MESSAGE )  
+			else if ( pData->dwData == CShaderDeviceBase::EVICT_MESSAGE )
 			{
 				g_pShaderDevice->EvictManagedResourcesInternal( );
 			}
@@ -1025,7 +1025,6 @@ static LRESULT CALLBACK ShaderDX8WndProc(VD3DHWND hWnd, UINT msg, WPARAM wParam,
 	}
 
 	return DefWindowProc( hWnd, msg, wParam, lParam );
-#endif
 }
 #endif
 
@@ -1037,7 +1036,6 @@ void CShaderDeviceBase::InstallWindowHook( void* hWnd )
 {
 	Assert( m_hWndCookie == NULL );
 #ifdef USE_ACTUAL_DX
-#if !defined( _X360 )
 	VD3DHWND hParent = GetTopmostParentWindow( (VD3DHWND)hWnd );
 
 	// Attach a child window to the parent; we're gonna store special info there
@@ -1048,19 +1046,19 @@ void CShaderDeviceBase::InstallWindowHook( void* hWnd )
 	wc.style         = CS_NOCLOSE | CS_PARENTDC;
 	wc.lpfnWndProc   = ShaderDX8WndProc;
 	wc.hInstance     = hInst;
-	wc.lpszClassName = L"shaderdx8";
+	wc.lpszClassName = kShaderApiWindowClassName;
 
-	if ( WNDCLASSW ewc; GetClassInfoW( hInst, wc.lpszClassName, &ewc ) )
+	if ( WNDCLASSW ewc; ::GetClassInfoW( hInst, wc.lpszClassName, &ewc ) )
 	{
 		// In case an old one is sitting around still...
-		UnregisterClassW( wc.lpszClassName, hInst );
+		::UnregisterClassW( wc.lpszClassName, hInst );
 	}
 
 	constexpr wchar_t kWindowName[]{L"shaderdx8"};
 
-	if ( !RegisterClassW( &wc ) )
+	if ( !::RegisterClassW( &wc ) )
 	{
-		auto error = std::system_category().message(::GetLastError());
+		const auto error = std::system_category().message(::GetLastError());
 		Warning("Unable to register window '%S' class: %s.\n",
 			kWindowName, error.c_str());
 		return;
@@ -1071,7 +1069,7 @@ void CShaderDeviceBase::InstallWindowHook( void* hWnd )
 		0, 0, 0, 0, hParent, NULL, hInst, NULL );
 	if ( !m_hWndCookie )
 	{
-		auto error = std::system_category().message(::GetLastError());
+		const auto error = std::system_category().message(::GetLastError());
 		Warning("Unable to create window '%S' class: %s.\n",
 			kWindowName, error.c_str());
 		return;
@@ -1080,13 +1078,11 @@ void CShaderDeviceBase::InstallWindowHook( void* hWnd )
 	// Marks it as a material system window
 	SetWindowLongPtr( (VD3DHWND)m_hWndCookie, GWLP_USERDATA, MATERIAL_SYSTEM_WINDOW_ID );
 #endif
-#endif
 }
 
 void CShaderDeviceBase::RemoveWindowHook( void* hWnd )
 {
 #ifdef USE_ACTUAL_DX
-#if !defined( _X360 )
 	if ( m_hWndCookie )
 	{
 		DestroyWindow( (VD3DHWND)m_hWndCookie );
@@ -1096,11 +1092,10 @@ void CShaderDeviceBase::RemoveWindowHook( void* hWnd )
 	VD3DHWND hParent = GetTopmostParentWindow( (VD3DHWND)hWnd );
 	HINSTANCE hInst = (HINSTANCE)GetWindowLongPtr( hParent, GWLP_HINSTANCE );
 
-	if ( WNDCLASSW ewc; GetClassInfoW( hInst, L"shaderdx8", &ewc ) )
+	if ( WNDCLASSW ewc; ::GetClassInfoW( hInst, kShaderApiWindowClassName, &ewc ) )
 	{
-		UnregisterClassW( L"shaderdx8", hInst );
+		::UnregisterClassW( kShaderApiWindowClassName, hInst );
 	}
-#endif
 #endif
 }
 
@@ -1111,7 +1106,6 @@ void CShaderDeviceBase::RemoveWindowHook( void* hWnd )
 void CShaderDeviceBase::SendIPCMessage( IPCMessage_t msg )
 {
 #ifdef USE_ACTUAL_DX
-#if !defined( _X360 )
 	// Gotta send this to all windows, since we don't know which ones
 	// are material system apps...
 	if ( msg != EVICT_MESSAGE )
@@ -1123,7 +1117,6 @@ void CShaderDeviceBase::SendIPCMessage( IPCMessage_t msg )
 		EnumWindows( EnumWindowsProcNotThis, (DWORD)msg );
 	}
 #endif
-#endif
 }
 
 
@@ -1132,14 +1125,6 @@ void CShaderDeviceBase::SendIPCMessage( IPCMessage_t msg )
 //-----------------------------------------------------------------------------
 int CShaderDeviceBase::FindView( void* hWnd ) const
 {
-	/* FIXME: Is this necessary?
-	// Look for the view in the list of views
-	for (int i = m_Views.Count(); --i >= 0; )
-	{
-	if (m_Views[i].m_HWnd == (VD3DHWND)hwnd)
-	return i;
-	}
-	*/
 	return -1;
 }
 
@@ -1149,27 +1134,6 @@ int CShaderDeviceBase::FindView( void* hWnd ) const
 bool CShaderDeviceBase::AddView( void* hWnd )
 {
 	LOCK_SHADERAPI();
-	/*
-	// If we haven't created a device yet
-	if (!Dx9Device())
-		return false;
-
-	// Make sure no duplicate hwnds...
-	if (FindView(hwnd) >= 0)
-		return false;
-
-	// In this case, we need to create the device; this is our
-	// default swap chain. This here says we're gonna use a part of the
-	// existing buffer and just grab that.
-	intp view = m_Views.AddToTail();
-	m_Views[view].m_HWnd = (VD3DHWND)hwnd;
-	//	memcpy( &m_Views[view].m_PresentParamters, m_PresentParameters, sizeof(m_PresentParamters) );
-
-	HRESULT hr;
-	hr = Dx9Device()->CreateAdditionalSwapChain( &m_PresentParameters,
-	&m_Views[view].m_pSwapChain );
-	return !FAILED(hr);
-	*/
 
 	return true;
 }
@@ -1177,15 +1141,6 @@ bool CShaderDeviceBase::AddView( void* hWnd )
 void CShaderDeviceBase::RemoveView( void* hWnd )
 {
 	LOCK_SHADERAPI();
-	/*
-	// Look for the view in the list of views
-	int i = FindView(hwnd);
-	if (i >= 0)
-	{
-	// FIXME		m_Views[i].m_pSwapChain->Release();
-	m_Views.FastRemove(i);
-	}
-	*/
 }
 
 //-----------------------------------------------------------------------------
@@ -1213,25 +1168,19 @@ void CShaderDeviceBase::SetView( void* hWnd )
 //-----------------------------------------------------------------------------
 void CShaderDeviceBase::GetWindowSize( int& nWidth, int& nHeight ) const
 {
-#if defined( USE_SDL )
-
+#ifdef USE_SDL
 	// this matches up to what the threaded material system does
 	g_pShaderAPI->GetBackBufferDimensions( nWidth, nHeight );
-
 #else
 
 	// If the window was minimized last time swap buffers happened, or if it's iconic now, 
 	// return 0 size
-#ifdef _WIN32
-	if ( !m_bIsMinimized && !IsIconic( ( HWND )m_hWnd ) )
-#else
 	if ( !m_bIsMinimized && !IsIconic( (VD3DHWND)m_hWnd ) )
-#endif
 	{
 		// NOTE: Use the 'current view' (which may be the same as the main window) 
 		RECT rect;
 #ifdef _WIN32
-		GetClientRect( ( HWND )m_ViewHWnd, &rect );
+		::GetClientRect( (VD3DHWND)m_ViewHWnd, &rect );
 #else
 		toglGetClientRect( (VD3DHWND)m_ViewHWnd, &rect );
 #endif
@@ -1242,7 +1191,6 @@ void CShaderDeviceBase::GetWindowSize( int& nWidth, int& nHeight ) const
 	{
 		nWidth = nHeight = 0;
 	}
-
 #endif
 }
 

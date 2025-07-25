@@ -836,9 +836,9 @@ $Project "togl"
 	"togl/togl.vpc" [$GL]
 }
 
-$Project "shaderapidx10"
+$Project "shaderapidx11"
 {
-	"materialsystem\shaderapidx9\shaderapidx10.vpc" [$WINDOWS]
+	"materialsystem\shader_api_dx11\shaderapidx11.vpc" [$WINDOWS]
 }
 
 $Project "shaderapiempty"

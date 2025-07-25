@@ -358,7 +358,7 @@ FORCEINLINE void SetFlashLightColorFromState( FlashlightState_t const &state, IS
 		flFlashlightScale = 2.0f;
 	}
 
-	// DX10 requires some hackery due to sRGB/blend ordering change from DX9
+	// DX10+ requires some hackery due to sRGB/blend ordering change from DX9
 	if ( g_pHardwareConfig->UsesSRGBCorrectBlending() )
 	{
 		flFlashlightScale *= 2.5f; // Magic number that works well on the NVIDIA 8800

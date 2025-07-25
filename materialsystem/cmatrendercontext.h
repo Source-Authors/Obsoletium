@@ -551,7 +551,7 @@ public:
 
 	DELEGATE_TO_OBJECT_1V(                  PushDeformation, const DeformationBase_t *, g_pShaderAPI );
 	DELEGATE_TO_OBJECT_0V(                  PopDeformation, g_pShaderAPI );
-	DELEGATE_TO_OBJECT_0C( int,             GetNumActiveDeformations, g_pShaderAPI );
+	DELEGATE_TO_OBJECT_0C( intp,            GetNumActiveDeformations, g_pShaderAPI );
 
 	// Color correction related methods..
 	DELEGATE_TO_OBJECT_1V(					EnableColorCorrection, bool, g_pColorCorrectionSystem );

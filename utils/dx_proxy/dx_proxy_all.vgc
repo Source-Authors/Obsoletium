@@ -9,15 +9,15 @@ $Project "dx_proxy_dx9_v30_pc"
 	"utils\dx_proxy\dx_proxy_dx9_v30_pc.vpc" [$WINDOWS]
 }
 
-$Project "dx_proxy_dx10_v00_pc"
+$Project "dx_proxy_dx11_v00_pc"
 {
-	"utils\dx_proxy\dx_proxy_dx10_v00_pc.vpc" [$WINDOWS]
+	"utils\dx_proxy\dx_proxy_dx11_v00_pc.vpc" [$WINDOWS]
 }
 
 
 $Group "dx_proxy" "source" "everything"
 {
-	"dx_proxy_dx10_v00_pc"
+	"dx_proxy_dx11_v00_pc"
 	
 	"dx_proxy_dx9_v00_pc"
 	"dx_proxy_dx9_v30_pc"

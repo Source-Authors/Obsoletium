@@ -389,7 +389,7 @@ public:
 		CannotSupport();
 	}
 
-	int GetNumActiveDeformations( ) const
+	intp GetNumActiveDeformations( ) const
 	{
 		return 0;
 	}

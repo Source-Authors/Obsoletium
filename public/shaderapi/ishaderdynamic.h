@@ -309,7 +309,7 @@ public:
 	// deformations
 	virtual void PushDeformation( DeformationBase_t const *Deformation ) = 0;
 	virtual void PopDeformation( ) = 0;
-	virtual int GetNumActiveDeformations() const =0;
+	virtual intp GetNumActiveDeformations() const =0;
 
 
 	// for shaders to set vertex shader constants. returns a packed state which can be used to set

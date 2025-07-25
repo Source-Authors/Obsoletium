@@ -22,17 +22,16 @@
 #include "tier1/utllinkedlist.h"
 #include "tier0/dbg.h"
 
+#include "windows/com_error_category.h"
 
 // Helper function to unbind an vertex buffer
 void Unbind( IDirect3DVertexBuffer9 *pVertexBuffer );
-
-//#define SPEW_VERTEX_BUFFER_STALLS //uncomment to allow buffer stall spewing.
 
 
 class CVertexBuffer
 {
 public:
-	CVertexBuffer( IDirect3DDevice9 * pD3D, VertexFormat_t fmt, DWORD theFVF, int vertexSize,
+	CVertexBuffer( IDirect3DDevice9Ex * pD3D, VertexFormat_t fmt, DWORD theFVF, int vertexSize,
 					int theVertexCount, const char *pTextureBudgetName, bool bSoftwareVertexProcessing, bool dynamic = false );
 	~CVertexBuffer();
 	
@@ -51,7 +50,7 @@ public:
 	unsigned char* Modify( bool bReadOnly, int firstVertex, int numVerts );	
 	void Unlock( int numVerts );
 
-	void HandleLateCreation( );
+	void HandleLateCreation( IDirect3DDevice9Ex *pD3D );
 
 	// Vertex size
 	int VertexSize() const { return m_VertexSize; }
@@ -121,14 +120,19 @@ public:
 	}
 
 private:
-	void Create( IDirect3DDevice9 *pD3D );
+	void Create( IDirect3DDevice9Ex *pD3D );
 	inline void ReallyUnlock( [[maybe_unused]] int unlockBytes )
 	{
 #if DX_TO_GL_ABSTRACTION
 		// Knowing how much data was actually written is critical for performance under OpenGL.
 		m_pVB->UnlockActualSize( unlockBytes );
 #else
-		m_pVB->Unlock();
+		const HRESULT hr = m_pVB->Unlock();
+		if (FAILED(hr))
+		{
+			Warning( __FUNCTION__ ": IDirect3DVertexBuffer9::Unlock() failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 #endif
 	}
 
@@ -138,7 +142,7 @@ private:
 		LOCKFLAGS_APPEND = D3DLOCK_NOSYSLOCK | D3DLOCK_NOOVERWRITE
 	};
 
-	LPDIRECT3DVERTEXBUFFER m_pVB;
+	se::win::com::com_ptr<IDirect3DVertexBuffer9> m_pVB;
 
 	VertexFormat_t	m_VertexBufferFormat;		// yes, Vertex, only used for allocation tracking
 	int				m_nBufferSize;
@@ -174,10 +178,9 @@ private:
 
 // constructor, destructor
 
-inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9 * pD3D, VertexFormat_t fmt, DWORD theFVF, 
+inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9Ex * pD3D, VertexFormat_t fmt, DWORD theFVF, 
 	int vertexSize, int vertexCount, const char *pTextureBudgetName,
 	bool bSoftwareVertexProcessing, bool dynamic ) :
-		m_pVB(0), 
 		m_VertexBufferFormat( fmt ),
 		m_nBufferSize(vertexSize * vertexCount),
 		m_Position(0),
@@ -249,25 +252,15 @@ inline CVertexBuffer::CVertexBuffer(IDirect3DDevice9 * pD3D, VertexFormat_t fmt,
 }
 
 
-void CVertexBuffer::Create( IDirect3DDevice9 *pD3D )
+void CVertexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 {
 	D3DVERTEXBUFFER_DESC desc;
-	memset( &desc, 0x00, sizeof( desc ) );
+	BitwiseClear( desc );
+
 	desc.Format = D3DFMT_VERTEXDATA;
-	desc.Size = m_nBufferSize;
 	desc.Type = D3DRTYPE_VERTEXBUFFER;
-	desc.Pool = m_bDynamic ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
-	desc.FVF = m_TheFVF;
-
-#if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
-	extern bool g_ShaderDeviceUsingD3D9Ex;
-	if ( g_ShaderDeviceUsingD3D9Ex )
-	{
-		desc.Pool = D3DPOOL_DEFAULT;
-	}
-#endif
-
 	desc.Usage = D3DUSAGE_WRITEONLY;
+
 	if ( m_bDynamic )
 	{
 		desc.Usage |= D3DUSAGE_DYNAMIC;
@@ -279,6 +272,15 @@ void CVertexBuffer::Create( IDirect3DDevice9 *pD3D )
 		desc.Usage |= D3DUSAGE_SOFTWAREPROCESSING;
 	}
 
+#if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
+	desc.Pool = D3DPOOL_DEFAULT;
+#else
+	desc.Pool = m_bDynamic ? D3DPOOL_DEFAULT : D3DPOOL_MANAGED;
+#endif
+
+	desc.Size = m_nBufferSize;
+	desc.FVF = m_TheFVF;
+
 	RECORD_COMMAND( DX8_CREATE_VERTEX_BUFFER, 6 );
 	RECORD_INT( m_UID );
 	RECORD_INT( m_nBufferSize );
@@ -287,38 +289,52 @@ void CVertexBuffer::Create( IDirect3DDevice9 *pD3D )
 	RECORD_INT( desc.Pool );
 	RECORD_INT( m_bDynamic );
 
-	HRESULT hr = pD3D->CreateVertexBuffer( m_nBufferSize, desc.Usage, desc.FVF, desc.Pool, &m_pVB, NULL );
-
-	if ( hr == D3DERR_OUTOFVIDEOMEMORY || hr == E_OUTOFMEMORY )
+	HRESULT hr = pD3D->CreateVertexBuffer(
+		m_nBufferSize,
+		desc.Usage,
+		desc.FVF,
+		desc.Pool,
+		&m_pVB,
+		nullptr );
+	if ( FAILED( hr ) )
 	{
-		// Don't have the memory for this.  Try flushing all managed resources
-		// out of vid mem and try again.
-		// FIXME: need to record this
-		pD3D->EvictManagedResources();
-		pD3D->CreateVertexBuffer( m_nBufferSize, desc.Usage, desc.FVF, desc.Pool, &m_pVB, NULL );
-	}
-
-#ifdef _DEBUG
-	if ( hr != D3D_OK )
-	{
-		switch ( hr )
+		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateVertexBuffer(length = %u, usage = 0x%x, format = 0x%x, pool = 0x%x) failed w/e %s. Retrying...\n",
+			m_nBufferSize,
+			desc.Usage,
+			desc.Format,
+			desc.Pool,
+			se::win::com::com_error_category().message(hr).c_str() );
+	
+		if ( hr == D3DERR_OUTOFVIDEOMEMORY || hr == E_OUTOFMEMORY )
 		{
-		case D3DERR_INVALIDCALL:
-			AssertMsg( false, "D3DERR_INVALIDCALL" );
-			break;
-		case D3DERR_OUTOFVIDEOMEMORY:
-			AssertMsg( false, "D3DERR_OUTOFVIDEOMEMORY" );
-			break;
-		case E_OUTOFMEMORY:
-			AssertMsg( false, "E_OUTOFMEMORY" );
-			break;
-		default:
-			Assert( 0 );
-			break;
+			// Don't have the memory for this.  Try flushing all managed resources out of vid mem and try again.
+			// FIXME: need to record this
+			hr = pD3D->EvictManagedResources();
+			if ( FAILED( hr ) )
+			{
+				Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
+					se::win::com::com_error_category().message(hr).c_str() );
+			}
+
+			hr = pD3D->CreateVertexBuffer(
+				m_nBufferSize,
+				desc.Usage,
+				desc.FVF,
+				desc.Pool,
+				&m_pVB,
+				NULL );
+			if ( FAILED( hr ) )
+			{
+				Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateVertexBuffer(length = %u, usage = 0x%x, format = 0x%x, pool = 0x%x) failed w/e %s. Skipping.\n",
+					m_nBufferSize,
+					desc.Usage,
+					desc.Format,
+					desc.Pool,
+					se::win::com::com_error_category().message(hr).c_str() );
+			}
 		}
 	}
-#endif
-
+	
 	Assert( m_pVB );
 
 #ifdef MEASURE_DRIVER_ALLOCATIONS
@@ -326,6 +342,23 @@ void CVertexBuffer::Create( IDirect3DDevice9 *pD3D )
 	VPROF_INCREMENT_GROUP_COUNTER( "vb count", COUNTER_GROUP_NO_RESET, 1 );
 	VPROF_INCREMENT_GROUP_COUNTER( "vb driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
 	VPROF_INCREMENT_GROUP_COUNTER( "total driver mem", COUNTER_GROUP_NO_RESET, nMemUsed );
+#endif
+
+#if defined( _DEBUG )
+	if ( m_pVB && !m_pSysmemBuffer )
+	{
+		D3DVERTEXBUFFER_DESC actual_desc;
+		hr = m_pVB->GetDesc( &actual_desc );
+		if ( SUCCEEDED( hr ) )
+		{
+			Assert( memcmp( &actual_desc, &desc, sizeof( desc ) ) == 0 );
+		}
+		else
+		{
+			Warning( __FUNCTION__ ": IDirect3DVertexBuffer9::GetDesc() failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
+	}
 #endif
 
 	// Track VB allocations
@@ -336,7 +369,7 @@ void CVertexBuffer::Create( IDirect3DDevice9 *pD3D )
 inline CVertexBuffer::~CVertexBuffer()
 {
 	// Track VB allocations (even if pooled)
-	if ( m_pVB != NULL )
+	if ( m_pVB )
 	{
 		g_VBAllocTracker->UnCountVB( m_pVB );
 	}
@@ -376,7 +409,7 @@ inline CVertexBuffer::~CVertexBuffer()
 		RECORD_COMMAND( DX8_DESTROY_VERTEX_BUFFER, 1 );
 		RECORD_INT( m_UID );
 
-		m_pVB->Release();
+		m_pVB.Release();
 	}
 }
 
@@ -478,12 +511,21 @@ inline unsigned char* CVertexBuffer::Lock( int numVerts, int& baseVertexIndex )
 		Assert( nLockOffset >= m_nSysmemBufferStartBytes );
 		pLockedData = m_pSysmemBuffer + nLockOffset;
 	}
-	else 
+	else
 	{
-		m_pVB->Lock( nLockOffset, 
-					nBufferSize, 
-					reinterpret_cast< void** >( &pLockedData ), 
-					dwFlags );
+		const HRESULT hr = m_pVB->Lock(
+			nLockOffset,
+			nBufferSize, 
+			reinterpret_cast< void** >( &pLockedData ),
+			dwFlags );
+		if (FAILED(hr))
+		{
+			Warning( __FUNCTION__ ": IDirect3DVertexBuffer9::Lock(offset = 0x%x, size = 0x%x, flags = 0x%x) failed w/e %s.\n",
+				nLockOffset,
+				nBufferSize,
+				dwFlags,
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 	}
 
 	Assert( pLockedData != 0 );
@@ -529,11 +571,19 @@ inline unsigned char* CVertexBuffer::Modify( bool bReadOnly, int firstVertex, in
 	RECORD_INT( dwFlags );
 
 	// mmw: for forcing all dynamic...        LOCKFLAGS_FLUSH );
-	m_pVB->Lock(
+	const HRESULT hr = m_pVB->Lock(
 		firstVertex * m_VertexSize, 
 		numVerts * m_VertexSize, 
 		reinterpret_cast< void** >( &pLockedData ), 
 		dwFlags );
+	if (FAILED(hr))
+	{
+		Warning( __FUNCTION__ ": IDirect3DVertexBuffer9::Lock(offset = 0x%x, size = 0x%x, flags = 0x%x) failed w/e %s.\n",
+			firstVertex * m_VertexSize,
+			numVerts * m_VertexSize,
+			dwFlags,
+			se::win::com::com_error_category().message(hr).c_str() );
+	}
 	
 	m_Position = firstVertex * m_VertexSize;
 	Assert( pLockedData != 0 );
@@ -576,7 +626,7 @@ inline void CVertexBuffer::Unlock( int numVerts )
 }
 
 
-inline void CVertexBuffer::HandleLateCreation( )
+inline void CVertexBuffer::HandleLateCreation( IDirect3DDevice9Ex *pD3D )
 {
 	if ( !m_pSysmemBuffer )
 	{
@@ -586,7 +636,7 @@ inline void CVertexBuffer::HandleLateCreation( )
 	if( !m_pVB )
 	{
 		bool bPrior = g_VBAllocTracker->TrackMeshAllocations( "HandleLateCreation" );
-		Create( Dx9Device() );
+		Create( pD3D );
 		if ( !bPrior )
 		{
 			g_VBAllocTracker->TrackMeshAllocations( NULL );
@@ -605,10 +655,19 @@ inline void CVertexBuffer::HandleLateCreation( )
 	m_bLateCreateShouldDiscard = false;
 	
 	// Don't use the Lock function, it does a bunch of stuff we don't want.
-	HRESULT hr = m_pVB->Lock( m_nSysmemBufferStartBytes, 
-	                         dataToWriteBytes,
-				             &pWritePtr,
-				             dwFlags);
+	HRESULT hr = m_pVB->Lock(
+		m_nSysmemBufferStartBytes,
+		dataToWriteBytes,
+		&pWritePtr,
+		dwFlags);
+	if (FAILED(hr))
+	{
+		Warning( __FUNCTION__ ": IDirect3DVertexBuffer9::Lock(offset = 0x%x, size = 0x%x, flags = 0x%x) failed w/e %s.\n",
+			m_nSysmemBufferStartBytes,
+			dataToWriteBytes,
+			dwFlags,
+			se::win::com::com_error_category().message(hr).c_str() );
+	}
 
 	// If this fails we're about to crash. Consider skipping the update and leaving 
 	// m_pSysmemBuffer around to try again later. (For example in case of device loss)

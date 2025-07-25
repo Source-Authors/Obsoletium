@@ -134,7 +134,7 @@ enum ShaderAPIOcclusionQueryResult_t
 //-----------------------------------------------------------------------------
 // This is what the material system gets to see.
 //-----------------------------------------------------------------------------
-#define SHADERAPI_INTERFACE_VERSION		"ShaderApi030"
+#define SHADERAPI_INTERFACE_VERSION		"ShaderApi031"
 abstract_class IShaderAPI : public IShaderDynamicAPI
 {
 public:
@@ -608,6 +608,10 @@ public:
 	
 	virtual void CopyTextureToTexture( ShaderAPITextureHandle_t srcTex, ShaderAPITextureHandle_t dstTex ) = 0;
 	
+	// Methods related to binding shaders
+	virtual void BindHullShader(HullShaderHandle_t hPixelShader) = 0;
+	virtual void BindDomainShader(DomainShaderHandle_t hPixelShader) = 0;
+	virtual void BindComputeShader(ComputeShaderHandle_t hPixelShader) = 0;
 };
 
 

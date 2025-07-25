@@ -16,15 +16,17 @@
 #include "locald3dtypes.h"
 #include "materialsystem/imaterial.h"
 
+#include "com_ptr.h"
 
-//-----------------------------------------------------------------------------
 // Gets the declspec associated with a vertex format
-//-----------------------------------------------------------------------------
-IDirect3DVertexDeclaration9 *FindOrCreateVertexDecl( VertexFormat_t fmt, bool bStaticLit, bool bUsingFlex, bool bUsingMorph );
+se::win::com::com_ptr<IDirect3DVertexDeclaration9> FindOrCreateVertexDecl(
+	IDirect3DDevice9Ex *pD3D,
+	VertexFormat_t fmt,
+	bool bStaticLit,
+	bool bUsingFlex,
+	bool bUsingMorph );
 
-//-----------------------------------------------------------------------------
 // Clears out all declspecs
-//-----------------------------------------------------------------------------
 void ReleaseAllVertexDecl( );
 
 

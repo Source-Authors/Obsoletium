@@ -395,17 +395,25 @@ enum
 	MATERIAL_ADAPTER_NAME_LENGTH = 512
 };
 
+// dimhotepus: Make enum and move to imaterialsystem.
+// Vendor IDs sometimes needed for vendor-specific code
+enum VendorId : unsigned {
+	VENDORID_ATI = 0x1002,
+	VENDORID_NVIDIA = 0x10DE,
+	VENDORID_INTEL = 0x8086
+};
+
 struct MaterialAdapterInfo_t
 {
 	char m_pDriverName[MATERIAL_ADAPTER_NAME_LENGTH];
-	unsigned int m_VendorID;
-	unsigned int m_DeviceID;
-	unsigned int m_SubSysID;
-	unsigned int m_Revision;
+	VendorId m_VendorID;
+	unsigned m_DeviceID;
+	unsigned m_SubSysID;
+	unsigned m_Revision;
 	int m_nDXSupportLevel;			// This is the *preferred* dx support level
 	int m_nMaxDXSupportLevel;
-	unsigned int m_nDriverVersionHigh;
-	unsigned int m_nDriverVersionLow;
+	unsigned m_nDriverVersionHigh;
+	unsigned m_nDriverVersionLow;
 };
 
 
@@ -1500,7 +1508,7 @@ public:
 
 	virtual void				PushDeformation( DeformationBase_t const *Deformation ) = 0;
 	virtual void				PopDeformation( ) = 0;
-	virtual int					GetNumActiveDeformations() const = 0;
+	virtual intp				GetNumActiveDeformations() const = 0;
 
 	virtual bool				GetMorphAccumulatorTexCoord( Vector2D *pTexCoord, IMorph *pMorph, int nVertex ) = 0;
 

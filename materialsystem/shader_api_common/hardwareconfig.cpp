@@ -115,6 +115,13 @@ CON_COMMAND_F( ccs_create_convars_from_hwconfig, "Create convars from the curren
 	HWCFG( m_SupportsPixelShaders_2_0 );
 	HWCFG( m_SupportsPixelShaders_2_b );
 	HWCFG( m_SupportsShaderModel_3_0 );
+	HWCFG( m_SupportsShaderModel_4_0 );
+	HWCFG( m_SupportsShaderModel_5_0 );
+	HWCFG( m_SupportsShaderModel_5_1 );
+	HWCFG( m_SupportsShaderModel_6_0 );
+	HWCFG( m_SupportsHullShaders );
+	HWCFG( m_SupportsDomainShaders );
+	HWCFG( m_SupportsComputeShaders );
 	HWCFG( m_bSupportsAnisotropicFiltering );
 	HWCFG( m_bSupportsMagAnisotropicFiltering );
 	HWCFG( m_bSupportsVertexTextures );
@@ -150,6 +157,7 @@ CON_COMMAND_F( ccs_create_convars_from_hwconfig, "Create convars from the curren
 	HWCFG( m_CanDoSRGBReadFromRTs );				
 	HWCFG( m_bSupportsGLMixedSizeTargets );			
 	HWCFG( m_bCanStretchRectFromTextures );
+	HWCFG( m_bPresentAllowTearing );
 
 	HWCFG( m_MaxHDRType );
 #undef HWCFG
@@ -210,6 +218,13 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_SupportsPixelShaders_2_0 = false;
 		pCaps->m_SupportsPixelShaders_2_b = false;
 		pCaps->m_SupportsShaderModel_3_0 = false;
+		pCaps->m_SupportsShaderModel_4_0 = false;
+		pCaps->m_SupportsShaderModel_5_0 = false;
+		pCaps->m_SupportsShaderModel_5_1 = false;
+		pCaps->m_SupportsShaderModel_6_0 = false;
+		pCaps->m_SupportsHullShaders = false;
+		pCaps->m_SupportsDomainShaders = false;
+		pCaps->m_SupportsComputeShaders = false;
 		pCaps->m_bSupportsStaticControlFlow = false;
 		pCaps->m_SupportsCompressedTextures = COMPRESSED_TEXTURES_OFF;
 		pCaps->m_SupportsCompressedVertices = VERTEX_COMPRESSION_NONE;
@@ -279,6 +294,7 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_MaxVertexShader30InstructionSlots = 0;
 		pCaps->m_MaxPixelShader30InstructionSlots = 0;
 		pCaps->m_bCanStretchRectFromTextures = false;
+		pCaps->m_bPresentAllowTearing = false;
 		break;
 
 	case 70:
@@ -292,6 +308,13 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_SupportsPixelShaders_2_0 = false;
 		pCaps->m_SupportsPixelShaders_2_b = false;
 		pCaps->m_SupportsShaderModel_3_0 = false;
+		pCaps->m_SupportsShaderModel_4_0 = false;
+		pCaps->m_SupportsShaderModel_5_0 = false;
+		pCaps->m_SupportsShaderModel_5_1 = false;
+		pCaps->m_SupportsShaderModel_6_0 = false;
+		pCaps->m_SupportsHullShaders = false;
+		pCaps->m_SupportsDomainShaders = false;
+		pCaps->m_SupportsComputeShaders = false;
 		pCaps->m_bSupportsStaticControlFlow = false;
 		//		pCaps->m_SupportsCompressedTextures = true;
 		pCaps->m_SupportsCompressedVertices = VERTEX_COMPRESSION_NONE;
@@ -353,6 +376,7 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_bDX10Card = false;
 		pCaps->m_bDX10Blending = false;
 		pCaps->m_bCanStretchRectFromTextures = false;
+		pCaps->m_bPresentAllowTearing = false;
 		break;
 
 	case 80:
@@ -368,6 +392,13 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_SupportsPixelShaders_2_0 = false;
 		pCaps->m_SupportsPixelShaders_2_b = false;
 		pCaps->m_SupportsShaderModel_3_0 = false;
+		pCaps->m_SupportsShaderModel_4_0 = false;
+		pCaps->m_SupportsShaderModel_5_0 = false;
+		pCaps->m_SupportsShaderModel_5_1 = false;
+		pCaps->m_SupportsShaderModel_6_0 = false;
+		pCaps->m_SupportsHullShaders = false;
+		pCaps->m_SupportsDomainShaders = false;
+		pCaps->m_SupportsComputeShaders = false;
 		pCaps->m_bSupportsStaticControlFlow = false;
 		//		pCaps->m_SupportsCompressedTextures = true;
 		pCaps->m_SupportsCompressedVertices = VERTEX_COMPRESSION_NONE;
@@ -438,6 +469,7 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_bDX10Card = false;
 		pCaps->m_bDX10Blending = false;
 		pCaps->m_bCanStretchRectFromTextures = false;
+		pCaps->m_bPresentAllowTearing = false;
 		break;
 
 	case 81:
@@ -453,6 +485,13 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_SupportsPixelShaders_2_0 = false;
 		pCaps->m_SupportsPixelShaders_2_b = false;
 		pCaps->m_SupportsShaderModel_3_0 = false;
+		pCaps->m_SupportsShaderModel_4_0 = false;
+		pCaps->m_SupportsShaderModel_5_0 = false;
+		pCaps->m_SupportsShaderModel_5_1 = false;
+		pCaps->m_SupportsShaderModel_6_0 = false;
+		pCaps->m_SupportsHullShaders = false;
+		pCaps->m_SupportsDomainShaders = false;
+		pCaps->m_SupportsComputeShaders = false;
 		pCaps->m_bSupportsStaticControlFlow = false;
 		//		pCaps->m_SupportsCompressedTextures = true;
 		pCaps->m_SupportsCompressedVertices = VERTEX_COMPRESSION_NONE;
@@ -522,11 +561,21 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_bDX10Card = false;
 		pCaps->m_bDX10Blending = false;
 		pCaps->m_bCanStretchRectFromTextures = false;
+		pCaps->m_bPresentAllowTearing = false;
 		break;
 
 	case 90:
 		pCaps->m_nVertexTextureCount = 0;
 		pCaps->m_nMaxVertexTextureDimension = 0;
+
+		pCaps->m_SupportsShaderModel_4_0 = false;
+		pCaps->m_SupportsShaderModel_5_0 = false;
+		pCaps->m_SupportsShaderModel_5_1 = false;
+		pCaps->m_SupportsShaderModel_6_0 = false;
+		pCaps->m_SupportsHullShaders = false;
+		pCaps->m_SupportsDomainShaders = false;
+		pCaps->m_SupportsComputeShaders = false;
+
 		pCaps->m_bSupportsVertexTextures = false;
 		pCaps->m_bSupportsStreamOffset = true;
 		pCaps->m_bSupportsGLMixedSizeTargets = true;
@@ -568,6 +617,7 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_MaxVertexShader30InstructionSlots = 0;
 		pCaps->m_MaxPixelShader30InstructionSlots  = 0;
 		pCaps->m_bCanStretchRectFromTextures = false;
+		pCaps->m_bPresentAllowTearing = false;
 		break;
 
 	case 92:
@@ -598,6 +648,14 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 			pCaps->m_MaxNumLights = MAX_NUM_LIGHTS;
 		}
 
+		pCaps->m_SupportsShaderModel_4_0 = false;
+		pCaps->m_SupportsShaderModel_5_0 = false;
+		pCaps->m_SupportsShaderModel_5_1 = false;
+		pCaps->m_SupportsShaderModel_6_0 = false;
+		pCaps->m_SupportsHullShaders = false;
+		pCaps->m_SupportsDomainShaders = false;
+		pCaps->m_SupportsComputeShaders = false;
+
 		pCaps->m_nMaxViewports = 1;
 		pCaps->m_NumPixelShaderConstants = 32;
 		pCaps->m_nMaxVertexTextureDimension = 0;
@@ -606,9 +664,18 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_MaxVertexShader30InstructionSlots = 0;
 		pCaps->m_MaxPixelShader30InstructionSlots  = 0;
 		pCaps->m_bCanStretchRectFromTextures = false;
+		pCaps->m_bPresentAllowTearing = false;
 		break;
 
 	case 95:
+		pCaps->m_SupportsShaderModel_4_0 = false;
+		pCaps->m_SupportsShaderModel_5_0 = false;
+		pCaps->m_SupportsShaderModel_5_1 = false;
+		pCaps->m_SupportsShaderModel_6_0 = false;
+		pCaps->m_SupportsHullShaders = false;
+		pCaps->m_SupportsDomainShaders = false;
+		pCaps->m_SupportsComputeShaders = false;
+
 		pCaps->m_bSupportsStreamOffset = true;
 		pCaps->m_bSupportsStaticControlFlow = true;
 		pCaps->m_bDX10Card = false;
@@ -617,9 +684,7 @@ void CHardwareConfig::ForceCapsToDXLevel( HardwareCaps_t *pCaps, int nDxLevel, c
 		pCaps->m_nMaxViewports = 1;
 		pCaps->m_bSupportsBorderColor = false;
 		pCaps->m_bCanStretchRectFromTextures = false;
-		break;
-
-	case 100:
+		pCaps->m_bPresentAllowTearing = false;
 		break;
 
 	default:

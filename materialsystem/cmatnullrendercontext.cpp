@@ -346,7 +346,7 @@ public:
 	{
 	}
 
-	virtual int GetNumActiveDeformations() const
+	virtual intp GetNumActiveDeformations() const
 	{
 		return 0;
 	}

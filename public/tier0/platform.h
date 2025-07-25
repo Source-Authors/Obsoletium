@@ -210,7 +210,7 @@ typedef unsigned int DWORD;
 #endif
 typedef unsigned short WORD;
 typedef void * HINSTANCE;
-#define _MAX_PATH PATH_MAX
+#define MAX_PATH PATH_MAX
 #define __cdecl
 #define __stdcall
 #define __declspec
@@ -923,14 +923,14 @@ inline void SwapFloat( float *pOut, const float *pIn )		{ SafeSwapFloat( pOut, p
 #endif
 
 FORCEINLINE unsigned int LoadLittleDWord( const unsigned int *base, size_t dwordIndex )
-	{
-		return LittleDWord( base[dwordIndex] );
-	}
+{
+	return LittleDWord( base[dwordIndex] );
+}
 
 FORCEINLINE void StoreLittleDWord( unsigned int *base, size_t dwordIndex, unsigned int dword )
-	{
-		base[dwordIndex] = LittleDWord(dword);
-	}
+{
+	base[dwordIndex] = LittleDWord(dword);
+}
 
 
 //-----------------------------------------------------------------------------
@@ -1418,7 +1418,13 @@ template <class T, class P1, class P2, class P3 >
 template <class T>
 inline T* CopyConstruct( T* pMemory, T const& src )
 {
-	return reinterpret_cast<T*>(::new( pMemory ) T(src)); //-V572
+	return reinterpret_cast<T*>(::new( pMemory ) T{src}); //-V572
+}
+
+template <class T>
+inline T* MoveConstruct( T* pMemory, T&& src )
+{
+	return reinterpret_cast<T*>(::new( pMemory ) T{std::move(src)}); //-V572
 }
 
 template <class T>

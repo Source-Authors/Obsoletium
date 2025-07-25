@@ -318,6 +318,19 @@ public:
 
 	virtual const char *GetDisplayDeviceName() OVERRIDE { return ""; }
 
+	// Shader creation, destruction
+	virtual HullShaderHandle_t CreateHullShader(
+		IShaderBuffer *pShaderBuffer) { return HULL_SHADER_HANDLE_INVALID; }
+	virtual void DestroyHullShader(HullShaderHandle_t hShader) {}
+	virtual DomainShaderHandle_t CreateDomainShader(
+		IShaderBuffer* pShaderBuffer) {
+		return DOMAIN_SHADER_HANDLE_INVALID;
+	}
+	virtual void DestroyDomainShader(DomainShaderHandle_t hShader) {}
+	virtual ComputeShaderHandle_t CreateComputeShader(
+		IShaderBuffer *pShaderBuffer) { return COMPUTE_SHADER_HANDLE_INVALID; }
+	virtual void DestroyComputeShader(ComputeShaderHandle_t hShader) {}
+
 private:
 	CEmptyMesh m_Mesh;
 	CEmptyMesh m_DynamicMesh;
@@ -1178,7 +1191,7 @@ public:
 	{
 	}
 
-	int GetNumActiveDeformations( ) const
+	intp GetNumActiveDeformations( ) const
 	{
 		return 0;
 	}
@@ -1226,6 +1239,10 @@ public:
 	void PrintfVA( char *fmt, va_list vargs ) {}
 	void Printf( const char *fmt, ... ) {}
 	float Knob( char *knobname, float *setvalue = NULL ) { return 0.0f; };
+
+	virtual void BindHullShader(HullShaderHandle_t hPixelShader) {}
+	virtual void BindDomainShader(DomainShaderHandle_t hPixelShader) {}
+	virtual void BindComputeShader(ComputeShaderHandle_t hPixelShader) {}
 
 private:
 	enum

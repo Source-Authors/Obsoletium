@@ -116,7 +116,7 @@ enum RecordingCommands_t : unsigned char
 	DX8_DESTROY_DEPTH_TEXTURE,
 	DX8_SET_RENDER_TARGET,
 
-	DX8_TEST_COOPERATIVE_LEVEL,
+	DX8_CHECK_DEVICE_STATE,
 	
 	DX8_SET_VERTEX_BUFFER_FORMAT, // isn't actually a dx8 command. . let's playback know what format a buffer is for listing info
 	

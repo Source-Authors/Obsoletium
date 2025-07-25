@@ -28,10 +28,8 @@
 #define DEBUG_BOARD_STATE 0
 #endif
 
-#if !defined( _X360 )
-IDirect3DDevice9 *Dx9Device();
-IDirect3D9 *D3D();
-#endif
+IDirect3DDevice9Ex* Dx9Device();
+IDirect3D9Ex *D3D();
 
 
 //-----------------------------------------------------------------------------

@@ -1,0 +1,105 @@
+//-----------------------------------------------------------------------------
+//	SHADERAPIDX11.VPC
+//
+//	Project Script
+//-----------------------------------------------------------------------------
+
+$macro SRCDIR		"..\.."
+$Macro OUTBINDIR	"$SRCDIR\..\game\bin"
+
+$Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
+
+// Common Configuration
+$Configuration
+{
+	$Compiler
+	{
+		$AdditionalIncludeDirectories	"$BASE;$SRCDIR\thirdparty;$SRCDIR\thirdparty\DirectXMath\Inc"
+		$AdditionalIncludeDirectories	"$BASE;..\;..\shader_api_common"
+		$PreprocessorDefinitions		"$BASE;SHADERAPIDX11;SHADER_DLL_EXPORT;PROTECTED_THINGS_ENABLE;strncpy=use_Q_strncpy_instead;_snprintf=use_Q_snprintf_instead"
+		$PreprocessorDefinitions		"$BASE;USE_ACTUAL_DX" [$WINDOWS]
+	}
+
+	$Linker
+	{
+		$AdditionalDependencies			"$BASE d3d11.lib d3dcompiler.lib dxgi.lib Gdi32.lib" [$WINDOWS]
+	}
+}
+
+$Project "shaderapidx11"
+{
+	$Folder	"Source Files"
+	{
+		$File	"$SRCDIR\materialsystem\shader_api_common\hardwareconfig.cpp"
+		$File	"$SRCDIR\materialsystem\shader_api_common\meshbase.cpp"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderapibase.cpp"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderdevicebase.cpp"
+		$File	"$SRCDIR\materialsystem\shader_api_common\wmi.cpp"
+
+		// Shared files
+		//$File	"cvballoctracker.cpp"
+		
+		// DX11 related files
+		$File	"shader_device_dx11.cpp"		\
+				"shader_api_dx11.cpp"			\
+				"mesh_dx11.cpp"					\
+				"input_layout_dx11.cpp"			\
+				"shader_shadow_dx11.cpp"
+  		{
+			$Configuration
+			{
+				$Compiler
+				{
+					$PreprocessorDefinitions	"$BASE;DX11"
+				}
+			}
+		}
+
+		// DX9 related files
+		$File	"$SRCDIR\public\filesystem_helpers.cpp"
+		// $File	"Recording.cpp"
+	}
+
+	$Folder	"Public Header Files"
+	{
+		$File	"$SRCDIR\public\shaderapi\ishaderdevice.h"
+		$File	"$SRCDIR\public\shaderapi\ishaderutil.h"
+		$File	"$SRCDIR\public\shaderapi\ishaderapi.h"
+		$File	"$SRCDIR\public\shaderapi\ishaderdynamic.h"
+		$File	"$SRCDIR\public\shaderapi\ishadershadow.h"
+		$File	"$SRCDIR\public\materialsystem\idebugtextureinfo.h"
+		$File	"$SRCDIR\public\materialsystem\ivballoctracker.h"
+		$File	"$SRCDIR\public\materialsystem\shader_vcs_version.h"
+	}
+
+	$Folder	"Header Files"
+	{
+		$File	"$SRCDIR\materialsystem\shader_api_common\hardwareconfig.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\locald3dtypes.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\meshbase.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderapi_global.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderapibase.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\shaderdevicebase.h"
+		$File	"$SRCDIR\materialsystem\shader_api_common\wmi.h"
+
+		// DX11 related files
+		$File	"input_layout_dx11.h"
+		$File	"mesh_dx11.h"
+		$File	"shader_api_dx11.h"
+		$File	"shader_api_dx11_global.h"
+		$File	"shader_device_dx11.h"
+		$File	"shader_shadow_dx11.h"
+
+		// DX9 related files	
+		//$File	"dynamicib.h"
+		//$File	"dynamicvb.h"
+		// $File	"Recording.h"
+	}
+
+	$Folder	"Link Libraries"
+	{
+		$Lib	bitmap
+		$Lib	mathlib
+		$Lib	tier2
+	}
+}

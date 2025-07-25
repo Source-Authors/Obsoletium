@@ -1005,7 +1005,9 @@ static void ConvertModeStruct( ShaderDeviceInfo_t *pMode, const MaterialSystem_C
 	pMode->m_DisplayMode.m_Format = config.m_VideoMode.m_Format;
 	pMode->m_DisplayMode.m_nRefreshRateNumerator = config.m_VideoMode.m_RefreshRate;
 	pMode->m_DisplayMode.m_nRefreshRateDenominator = config.m_VideoMode.m_RefreshRate ? 1 : 0;
-	pMode->m_nBackBufferCount = 1;
+	// dimhotepus: All modern FLIP* swap modes need 2+ back buffers.
+	pMode->m_nBackBufferCount = 2;
+	// dimhotepus: Note modern FLIP* swap modes do not support MSAA directly.
 	pMode->m_nAASamples = config.m_nAASamples;
 	pMode->m_nAAQuality = config.m_nAAQuality;
 	pMode->m_nDXLevel = MAX( ABSOLUTE_MINIMUM_DXLEVEL, config.dxSupportLevel );
@@ -1757,8 +1759,6 @@ static const char *pConvarsAllowedInDXSupport[]={
 	"mat_depthbias_decal",
 	"mat_depthbias_normal",
 	"mat_disable_ps_patch",
-	// dimhotepus: Added Windows Aero Extensions support.
-	"mat_disable_d3d9ex",
 	"mat_forceaniso",
 	"mat_forcehardwaresync",
 	"mat_forcemanagedtextureintohardware",

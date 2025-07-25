@@ -131,8 +131,8 @@ public:
 
 	// Adds multiple elements, uses default constructor
 	intp AddMultipleToHead( intp num );
-	intp AddMultipleToTail( intp num );	   
-	intp AddMultipleToTail( intp num, const T *pToCopy );	   
+	intp AddMultipleToTail( intp num );
+	intp AddMultipleToTail( intp num, const T *pToCopy );
 	intp InsertMultipleBefore( intp elem, intp num );
 	intp InsertMultipleBefore( intp elem, intp num, const T *pToCopy );
 	intp InsertMultipleAfter( intp elem, intp num );
@@ -154,7 +154,7 @@ public:
 	
 	// Add the specified array to the tail.
 	intp AddVectorToTail( CUtlVector<T, A> const &src );
-
+	
 	// Move the specified array to the tail.
 	intp AddVectorToTail( CUtlVector<T, A>&& src );
 
@@ -512,7 +512,7 @@ public:
 		if (Count() > 0)
 		{
 			if ( elem != m_pData->m_Size -1 )
-				memcpy( &Element(elem), &Element(m_pData->m_Size-1), sizeof(T) );
+				memcpy( std::addressof( Element(elem) ), std::addressof( Element(m_pData->m_Size-1) ), sizeof(T) );
 			--m_pData->m_Size;
 		}
 		if ( !m_pData->m_Size )
@@ -586,10 +586,10 @@ private:
 		intp numToMove = Size - elem - num;
 		if ((numToMove > 0) && (num > 0))
 		{
-			Q_memmove( &Element(elem), &Element(elem+num), numToMove * sizeof(T) );
+			Q_memmove( std::addressof( Element(elem) ), std::addressof( Element(elem+num) ), numToMove * sizeof(T) );
 
 #ifdef _DEBUG
-			Q_memset( &Element(Size-num), 0xDD, num * sizeof(T) );
+			Q_memset( std::addressof( Element(Size-num) ), 0xDD, num * sizeof(T) );
 #endif
 		}
 	}
@@ -1011,7 +1011,7 @@ void CUtlVector<T, A>::ShiftElementsRight( intp elem, intp num )
 	Assert( IsValidIndex(elem) || ( m_Size == 0 ) || ( num == 0 ));
 	intp numToMove = m_Size - elem - num;
 	if ((numToMove > 0) && (num > 0))
-		Q_memmove( &Element(elem+num), &Element(elem), numToMove * sizeof(T) );
+		Q_memmove( std::addressof( Element(elem+num) ), std::addressof( Element(elem) ), numToMove * sizeof(T) );
 }
 
 template< typename T, class A >
@@ -1021,10 +1021,10 @@ void CUtlVector<T, A>::ShiftElementsLeft( intp elem, intp num )
 	intp numToMove = m_Size - elem - num;
 	if ((numToMove > 0) && (num > 0))
 	{
-		Q_memmove( &Element(elem), &Element(elem+num), numToMove * sizeof(T) );
+		Q_memmove( std::addressof( Element(elem) ), std::addressof( Element(elem+num) ), numToMove * sizeof(T) );
 
 #ifdef _DEBUG
-		Q_memset( &Element(m_Size-num), 0xDD, num * sizeof(T) );
+		Q_memset( std::addressof( Element(m_Size-num) ), 0xDD, num * sizeof(T) );
 #endif
 	}
 }
@@ -1241,7 +1241,7 @@ intp CUtlVector<T, A>::AddVectorToTail( CUtlVector const &src )
 	intp nSrcCount = src.Count();
 	EnsureCapacity( base + nSrcCount );
 
-	// Copy the elements.	
+	// Copy the elements.
 	m_Size += nSrcCount;
 	for ( intp i=0; i < nSrcCount; i++ )
 	{
@@ -1390,7 +1390,7 @@ void CUtlVector<T, A>::FastRemove( intp elem )
 	if (m_Size > 0)
 	{
 		if ( elem != m_Size -1 )
-			memcpy( &Element(elem), &Element(m_Size-1), sizeof(T) );
+			memcpy( std::addressof( Element(elem) ), std::addressof( Element(m_Size-1) ), sizeof(T) );
 		--m_Size;
 	}
 }

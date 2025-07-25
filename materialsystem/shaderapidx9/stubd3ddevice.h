@@ -328,7 +328,7 @@ public:
 		FPRINTF( s_FileHandle, "CreateTexture\n" );
 #if 0
 		HRESULT ret = m_pD3DDevice->CreateTexture( Width, Height, Levels, Usage, Format, Pool, ppTexture );
-		if( ret == D3D_OK )
+		if( SUCCEEDED( ret ) )
 		{
 			*ppTexture = new CStubD3DTexture( *ppTexture, this );
 			return ret;

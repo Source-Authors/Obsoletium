@@ -26,6 +26,8 @@
 #include "winutils.h"
 #include "tier0/vprof_telemetry.h"
 
+#include "windows/com_error_category.h"
+
 #if defined ( DX_TO_GL_ABSTRACTION )
 // Placed here so inlines placed in dxabstract.h can access gGL
 COpenGLEntryPoints *gGL = NULL;
@@ -67,72 +69,8 @@ static double s_rdtsc_to_ms;
 static CShaderDeviceMgrDx8 g_ShaderDeviceMgrDx8;
 CShaderDeviceMgrDx8* g_pShaderDeviceMgrDx8 = &g_ShaderDeviceMgrDx8;
 
-#ifndef SHADERAPIDX10
-
-// In the shaderapidx10.dll, we use its version of IShaderDeviceMgr. 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderDeviceMgrDx8, IShaderDeviceMgr, 
 	SHADER_DEVICE_MGR_INTERFACE_VERSION, g_ShaderDeviceMgrDx8 )
-
-#endif
-
-IDirect3DDevice *g_pD3DDevice = NULL;
-
-#if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
-#define NOD3D9EX_CMD_OPTION "-nod3d9ex"
-
-// HACK: need to pass knowledge of D3D9Ex usage into callers of D3D Create* methods
-// so they do not try to specify D3DPOOL_MANAGED, which is unsupported in D3D9Ex
-bool g_ShaderDeviceUsingD3D9Ex = false;
-static ConVar mat_supports_d3d9ex( "mat_supports_d3d9ex", "0", FCVAR_HIDDEN );
-static std::atomic_bool g_allow_set_mat_disable_d3d9ex = false;
-
-class ScopedAllowSetMatDisableD3D9Ex
-{
-public:
-	explicit ScopedAllowSetMatDisableD3D9Ex(bool new_value) noexcept
-		: m_old_value{g_allow_set_mat_disable_d3d9ex.exchange(new_value)}
-	{
-	}
-
-	ScopedAllowSetMatDisableD3D9Ex(ScopedAllowSetMatDisableD3D9Ex&) = delete;
-	ScopedAllowSetMatDisableD3D9Ex(ScopedAllowSetMatDisableD3D9Ex&&) = delete;
-	ScopedAllowSetMatDisableD3D9Ex& operator=(ScopedAllowSetMatDisableD3D9Ex&) = delete;
-	ScopedAllowSetMatDisableD3D9Ex& operator=(ScopedAllowSetMatDisableD3D9Ex&&) = delete;
-
-	~ScopedAllowSetMatDisableD3D9Ex() noexcept
-	{
-		g_allow_set_mat_disable_d3d9ex.exchange(m_old_value);
-	}
-
-private:
-	const bool m_old_value;
-};
-
-// dimhotepus: Remove archive. Problem is convar read later than DirectX device created, so it is meaningless to set.
-static ConVar mat_disable_d3d9ex( "mat_disable_d3d9ex", "0", 0,
-	"Read-only. Use " NOD3D9EX_CMD_OPTION " command line arg.\n"
-	"Disables Windows Aero DirectX extensions (may positively or negatively "
-	"affect performance depending on video drivers)",
-	true, 0, true, 1,
-	[](IConVar *var, const char *, float old_value) {
-	auto *convar = static_cast<ConVar*>(var);
-
-	// dimhotepus: User tries to change mat_disable_d3d9ex.
-	if (!g_allow_set_mat_disable_d3d9ex && convar->GetFloat() != old_value)
-	{
-		Warning("%s is read-only. Use " NOD3D9EX_CMD_OPTION " command line arg to disable Windows Aero DirectX extensions.\n", var->GetName() );
-
-		const ScopedAllowSetMatDisableD3D9Ex scoped_allow_set_mat_disable_d3d9ex{true};
-		convar->SetValue(old_value);
-	}
-});
-static ConVar mat_disable_d3d9ex_hidden("mat_disable_d3d9ex_hidden", "0", FCVAR_HIDDEN, "Hidden mat_disable_d3d9ex", [](IConVar* var, const char*, float old_value) {
-	auto *convar = static_cast<ConVar*>(var);
-	
-	const ScopedAllowSetMatDisableD3D9Ex scoped_allow_set_mat_disable_d3d9ex{true};
-	mat_disable_d3d9ex.SetValue(convar->GetFloat());
-});
-#endif
 
 // hook into mat_forcedynamic from the engine.
 static ConVar mat_forcedynamic( "mat_forcedynamic", "0", FCVAR_CHEAT );
@@ -153,7 +91,6 @@ ConVar mat_debugalttab( "mat_debugalttab", "0", FCVAR_CHEAT );
 //-----------------------------------------------------------------------------
 CShaderDeviceMgrDx8::CShaderDeviceMgrDx8()
 {
-	m_pD3D = NULL;
 	m_bObeyDxCommandlineOverride = true;
 	m_bAdapterInfoIntialized = false;
 
@@ -188,57 +125,26 @@ bool CShaderDeviceMgrDx8::Connect( CreateInterfaceFn factory )
 #endif
 
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9) && !defined(RECORDING) && !defined( DX_TO_GL_ABSTRACTION )
-	m_pD3D = NULL;
-
-	// Attempt to create a D3D9Ex device (Windows Vista and later) if possible
-	bool bD3D9ExForceDisable = mat_disable_d3d9ex.GetInt() == 1 ||
-								( CommandLine()->FindParm( NOD3D9EX_CMD_OPTION ) != 0 ) ||
-								( CommandLine()->ParmValue( "-dxlevel", 95 ) < 90 );
-
-	IDirect3D9Ex *pD3D9Ex = NULL;
-	bool bD3D9ExAvailable = Direct3DCreate9Ex( D3D_SDK_VERSION, &pD3D9Ex ) == S_OK && pD3D9Ex;
-	if ( bD3D9ExAvailable )
+	if (m_pD3D)
 	{
-		if ( bD3D9ExForceDisable )
-		{
-			pD3D9Ex->Release();
-		}
-		else
-		{
-			g_ShaderDeviceUsingD3D9Ex = true;
-
-			// dimhotepus: The following is more "correct" but incompatible with the Steam overlay:
-			//pD3D9Ex->QueryInterface( IID_IDirect3D9, (void**) &m_pD3D );
-			//pD3D9Ex->Release();
-			m_pD3D = static_cast< IDirect3D9* >( pD3D9Ex );
-		}
+		m_pD3D.Release();
 	}
 
-	if ( !m_pD3D )
-	{
-		g_ShaderDeviceUsingD3D9Ex = false;
-		m_pD3D = Direct3DCreate9( D3D_SDK_VERSION );
-	}
-	
-	// dimhotepus: When command line option is passed, it should apply to mat_disable_d3d9ex
-	// as later signals D3D9Ex state to user.  mat_disable_d3d9ex should be readonly for user.
-	if ( CommandLine()->FindParm( NOD3D9EX_CMD_OPTION ) && !mat_disable_d3d9ex.GetInt() )
-	{
-		mat_disable_d3d9ex_hidden.SetValue( g_ShaderDeviceUsingD3D9Ex ? 0 : 1 );
-	}
-	
-	mat_supports_d3d9ex.SetValue( bD3D9ExAvailable ? 1 : 0 );
+	const HRESULT hr{ Direct3DCreate9Ex( D3D_SDK_VERSION, &m_pD3D ) };
 #else
 	#if defined( DO_DX9_HOOK )
 		m_pD3D = Direct3DCreate9Hook(D3D_SDK_VERSION);
 	#else
 		m_pD3D = Direct3DCreate9(D3D_SDK_VERSION);
 	#endif
+	constexpr HRESULT hr = E_FAIL;
 #endif
 
-	if ( !m_pD3D )
+	if ( FAILED( hr ) )
 	{
-		Warning( "Failed to create D3D9!\n" );
+		Warning( "Direct3DCreate9Ex(sdk version = 0x%x) failed w/e %s.\n",
+			D3D_SDK_VERSION, 
+			se::win::com::com_error_category().message(hr).c_str() );
 		return false;
 	}
 
@@ -292,8 +198,7 @@ void CShaderDeviceMgrDx8::Disconnect()
 
 	if ( m_pD3D )
 	{
-		m_pD3D->Release();
-		m_pD3D = 0;
+		m_pD3D.Release();
 	}
 
 #if defined ( DX_TO_GL_ABSTRACTION )
@@ -363,7 +268,7 @@ bool CShaderDeviceMgrDx8::InitGpuInfo()
 
 	m_bAdapterInfoIntialized = true;
 	m_Adapters.RemoveAll();
-
+	
 	bool has_any_adapter = false;
 	Assert(m_pD3D);
 	unsigned nCount = m_pD3D->GetAdapterCount( );
@@ -389,10 +294,10 @@ bool CShaderDeviceMgrDx8::InitGpuInfo()
 		if ( override )	V_strcpy_safe( info.m_ActualCaps.m_pShaderDLL, override );
 
 		has_any_adapter = true;
-		}
+	}
 
 	return has_any_adapter;
-	}
+}
 
 //--------------------------------------------------------------------------------
 // Code to detect support for texture border color (widely supported but the caps
@@ -606,18 +511,29 @@ ConVar mat_fastclip( "mat_fastclip", "0", FCVAR_CHEAT  );
 bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nAdapter )
 {
 	D3DCAPS caps;
-	D3DADAPTER_IDENTIFIER9 ident;
-	HRESULT hr;
-
 	// NOTE: When getting the caps, we want to be limited by the hardware
 	// even if we're running with software T&L...
-	hr = m_pD3D->GetDeviceCaps( nAdapter, DX8_DEVTYPE, &caps );
+	HRESULT hr = m_pD3D->GetDeviceCaps( nAdapter, DX8_DEVTYPE, &caps );
 	if ( FAILED( hr ) )
+	{
+		Assert( false );
+		Warning( "IDirect3D9Ex::GetDeviceCaps(adapter = %u, device type = 0x%x) failed w/e %s.\n",
+			nAdapter,
+			DX8_DEVTYPE,
+			se::win::com::com_error_category().message(hr).c_str() );
 		return false;
-
+	}
+	
+	D3DADAPTER_IDENTIFIER9 ident;
 	hr = m_pD3D->GetAdapterIdentifier( nAdapter, D3DENUM_WHQL_LEVEL, &ident );
 	if ( FAILED( hr ) )
+	{
+		Assert( false );
+		Warning( "IDirect3D9Ex::GetAdapterIdentifier(adapter = %u, flags = D3DENUM_WHQL_LEVEL) failed w/e %s.\n",
+			nAdapter, 
+			se::win::com::com_error_category().message(hr).c_str() );
 		return false;
+	}
 
 	if ( IsOpenGL() )
 	{
@@ -656,8 +572,8 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		}
 	}
 
-	Q_strncpy( pCaps->m_pDriverName, ident.Description, MATERIAL_ADAPTER_NAME_LENGTH );
-	pCaps->m_VendorID = ident.VendorId;
+	V_strcpy_safe( pCaps->m_pDriverName, ident.Description );
+	pCaps->m_VendorID = static_cast<VendorId>(ident.VendorId);
 	pCaps->m_DeviceID = ident.DeviceId;
 	pCaps->m_SubSysID = ident.SubSysId;
 	pCaps->m_Revision = ident.Revision;
@@ -691,6 +607,13 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 	pCaps->m_SupportsPixelShaders_2_b = ( ( caps.PixelShaderVersion & 0xffff ) >= 0x0200) && (caps.PS20Caps.NumInstructionSlots >= 512); // More caps to this, but this will do
 	pCaps->m_SupportsVertexShaders_2_0 = ( caps.VertexShaderVersion & 0xffff ) >= 0x0200;
 	pCaps->m_SupportsShaderModel_3_0 = ( caps.PixelShaderVersion & 0xffff ) >= 0x0300;
+	pCaps->m_SupportsShaderModel_4_0 = false;
+	pCaps->m_SupportsShaderModel_5_0 = false;
+	pCaps->m_SupportsShaderModel_5_1 = false;
+	pCaps->m_SupportsShaderModel_6_0 = false;
+	pCaps->m_SupportsHullShaders = false;
+	pCaps->m_SupportsDomainShaders = false;
+	pCaps->m_SupportsComputeShaders = false;
 	pCaps->m_SupportsMipmappedCubemaps = ( caps.TextureCaps & D3DPTEXTURECAPS_MIPCUBEMAP ) ? true : false;
 #endif
 
@@ -922,13 +845,11 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 #endif
 	
 	// Query for SRGB support as needed for our DX 9 stuff
-	{
-		pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE, D3DFMT_DXT1 ) == S_OK);
+	pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE, D3DFMT_DXT1 ) == S_OK);
 
-		if ( pCaps->m_SupportsSRGB )
-		{
-			pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD | D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8 ) == S_OK);
-		}
+	if ( pCaps->m_SupportsSRGB )
+	{
+		pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD | D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8 ) == S_OK);
 	}
 
 	if ( CommandLine()->CheckParm( "-nosrgb" ) )
@@ -968,7 +889,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING | D3DUSAGE_RENDERTARGET,
 		D3DRTYPE_TEXTURE, D3DFMT_A16B16G16R16F ) == S_OK );
 
-	// Essentially a proxy for a DX10 device running DX9 code path
+	// Essentially a proxy for a DX10+ device running DX9 code path
 	pCaps->m_bSupportsFloat32RenderTargets = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE,
 	D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING | D3DUSAGE_RENDERTARGET,
 		D3DRTYPE_TEXTURE, D3DFMT_A32B32G32R32F ) == S_OK );
@@ -1299,10 +1220,13 @@ bool CShaderDeviceMgrDx8::SetAdapter( unsigned nAdapter, int nAdapterFlags )
 unsigned CShaderDeviceMgrDx8::GetModeCount( unsigned nAdapter ) const
 {
 	LOCK_SHADERAPI();
-	Assert( m_pD3D && (nAdapter < GetAdapterCount() ) );
+	Assert( m_pD3D && nAdapter < GetAdapterCount() );
 
-	// fixme - what format should I use here?
-	return m_pD3D->GetAdapterModeCount( nAdapter, D3DFMT_X8R8G8B8 );
+	D3DDISPLAYMODEFILTER filter = {};
+	filter.Size = sizeof(filter);
+	filter.Format = m_AdapterEnumImageFormat;
+	filter.ScanLineOrdering = m_AdapterEnumScanlineOrdering;
+	return m_pD3D->GetAdapterModeCountEx( nAdapter, &filter );
 }
 
 
@@ -1314,19 +1238,31 @@ void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAda
 	Assert( pInfo->m_nVersion == SHADER_DISPLAY_MODE_VERSION );
 
 	LOCK_SHADERAPI();
-	Assert( m_pD3D && (nAdapter < GetAdapterCount() ) );
+	Assert( m_pD3D && nAdapter < GetAdapterCount() );
 	Assert( nMode < GetModeCount( nAdapter ) );
 
-	D3DDISPLAYMODE d3dInfo;
+	D3DDISPLAYMODEEX mode = {};
+	mode.Size = sizeof(mode);
+	
+	D3DDISPLAYMODEFILTER filter = {};
+	filter.Size = sizeof(filter);
+	filter.Format = m_AdapterEnumImageFormat;
+	filter.ScanLineOrdering = m_AdapterEnumScanlineOrdering;
 
-	// fixme - what format should I use here?
-	HRESULT hr = D3D()->EnumAdapterModes( nAdapter, D3DFMT_X8R8G8B8, nMode, &d3dInfo );
-	Assert( !FAILED(hr) );
+	const HRESULT hr = D3D()->EnumAdapterModesEx( nAdapter, &filter, nMode, &mode );
+	if ( FAILED(hr) )
+	{
+		Error( "IDirect3D9Ex::EnumAdapterModesEx(adapter = %u, format = 0x%x, mode = %u) failed w/e %s.\n",
+			nAdapter,
+			m_AdapterEnumImageFormat,
+			nMode,
+			se::win::com::com_error_category().message(hr).c_str() );
+	}
 
-	pInfo->m_nWidth      = d3dInfo.Width;
-	pInfo->m_nHeight     = d3dInfo.Height;
-	pInfo->m_Format      = ImageLoader::D3DFormatToImageFormat( d3dInfo.Format );
-	pInfo->m_nRefreshRateNumerator = d3dInfo.RefreshRate;
+	pInfo->m_nWidth      = mode.Width;
+	pInfo->m_nHeight     = mode.Height;
+	pInfo->m_Format      = ImageLoader::D3DFormatToImageFormat( mode.Format );
+	pInfo->m_nRefreshRateNumerator = mode.RefreshRate;
 	pInfo->m_nRefreshRateDenominator = 1;
 }
 
@@ -1341,9 +1277,17 @@ void CShaderDeviceMgrDx8::GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsign
 	LOCK_SHADERAPI();
 	Assert( D3D() );
 
-	D3DDISPLAYMODE mode = {};
-	HRESULT hr = D3D()->GetAdapterDisplayMode(nAdapter, &mode);
-	Assert( !FAILED(hr) );
+	D3DDISPLAYMODEEX mode = {};
+	mode.Size = sizeof(mode);
+
+	D3DDISPLAYROTATION rotation;
+	HRESULT hr = D3D()->GetAdapterDisplayModeEx(nAdapter, &mode, &rotation);
+	if ( FAILED(hr) )
+	{
+		Error( "IDirect3D9Ex::GetAdapterDisplayModeEx(adapter = %u) failed w/e %s.\n",
+			nAdapter,
+			se::win::com::com_error_category().message(hr).c_str() );
+	}
 
 	pInfo->m_nWidth = mode.Width;
 	pInfo->m_nHeight = mode.Height;
@@ -1447,7 +1391,7 @@ bool CShaderDeviceMgrDx8::ValidateMode( unsigned nAdapter, const ShaderDeviceInf
 	// Make sure the image format requested is valid
 	ImageFormat backBufferFormat = FindNearestSupportedBackBufferFormat( nAdapter,
 		DX8_DEVTYPE, displayMode.m_Format, info.m_DisplayMode.m_Format, info.m_bWindowed );
-	return ( backBufferFormat != IMAGE_FORMAT_UNKNOWN );
+	return backBufferFormat != IMAGE_FORMAT_UNKNOWN;
 }
 
 
@@ -1461,7 +1405,7 @@ size_t CShaderDeviceMgrDx8::GetVidMemBytes( unsigned nAdapter ) const
 	D3D()->GetAdapterIdentifier( nAdapter, D3DENUM_WHQL_LEVEL, &devIndentifier );
 	return devIndentifier.VideoMemory;
 #else
-  return ::GetVidMemBytes(nAdapter);
+	return ::GetVidMemBytes(nAdapter);
 #endif
 }
 
@@ -1491,15 +1435,12 @@ CShaderDeviceDx8::CShaderDeviceDx8()
 	memset( &m_PresentParameters, 0, sizeof(m_PresentParameters) );
 	m_AdapterFormat = IMAGE_FORMAT_UNKNOWN;
 
-	g_pD3DDevice = NULL;
 	for ( size_t i = 0; i < std::size(m_pFrameSyncQueryObject); i++ )
 	{
-		m_pFrameSyncQueryObject[i] = NULL;
 		m_bQueryIssued[i] = false;
 	}
 	m_currentSyncQuery = 0;
 
-	m_pFrameSyncTexture = NULL;
 	m_bQueuedDeviceLost = false;
 	m_DeviceState = DEVICE_STATE_OK;
 	m_bOtherAppInitializing = false;
@@ -1509,13 +1450,6 @@ CShaderDeviceDx8::CShaderDeviceDx8()
 	m_bUsingStencil = false;
 	m_bResourcesReleased = false;
 	m_iStencilBufferBits = 0;
-	m_NonInteractiveRefresh.m_Mode = MATERIAL_NON_INTERACTIVE_MODE_NONE;
-	m_NonInteractiveRefresh.m_pVertexShader = NULL;
-	m_NonInteractiveRefresh.m_pPixelShader = NULL;
-	m_NonInteractiveRefresh.m_pPixelShaderStartup = NULL;
-	m_NonInteractiveRefresh.m_pPixelShaderStartupPass2 = NULL;
-	m_NonInteractiveRefresh.m_pVertexDecl = NULL;
-	m_NonInteractiveRefresh.m_nPacifierFrame = 0;
 	m_numReleaseResourcesRefCount = 0;
 }
 
@@ -1547,10 +1481,6 @@ static DWORD ComputeDeviceCreationFlags( D3DCAPS& caps, bool bSoftwareVertexProc
 	}
 	nDeviceCreationFlags |= D3DCREATE_FPU_PRESERVE;
 
-#ifdef _X360
-	nDeviceCreationFlags |= D3DCREATE_BUFFER_2_FRAMES;
-#endif
-
 	return nDeviceCreationFlags;
 }
 
@@ -1562,7 +1492,6 @@ D3DMULTISAMPLE_TYPE CShaderDeviceDx8::ComputeMultisampleType( int nSampleCount )
 {
 	switch (nSampleCount)
 	{
-#if !defined( _X360 )
 	case 2: return D3DMULTISAMPLE_2_SAMPLES;
 	case 3: return D3DMULTISAMPLE_3_SAMPLES;
 	case 4: return D3DMULTISAMPLE_4_SAMPLES;
@@ -1578,10 +1507,6 @@ D3DMULTISAMPLE_TYPE CShaderDeviceDx8::ComputeMultisampleType( int nSampleCount )
 	case 14: return D3DMULTISAMPLE_14_SAMPLES;
 	case 15: return D3DMULTISAMPLE_15_SAMPLES;
 	case 16: return D3DMULTISAMPLE_16_SAMPLES;
-#else
-	case 2: return D3DMULTISAMPLE_2_SAMPLES;
-	case 4: return D3DMULTISAMPLE_4_SAMPLES;
-#endif
 	default:
 	case 0:
 	case 1:
@@ -1598,11 +1523,28 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 	ShaderDisplayMode_t mode;
 	g_pShaderDeviceMgr->GetCurrentModeInfo( &mode, nAdapter );
 
-	HRESULT hr;
-	ZeroMemory( &m_PresentParameters, sizeof(m_PresentParameters) );
+	BitwiseClear( m_PresentParameters );
 
+	D3DSWAPEFFECT swap_effect{D3DSWAPEFFECT_FORCE_DWORD};
+	if (info.m_bUsingMultipleWindows)
+	{
+		swap_effect = D3DSWAPEFFECT_COPY;
+	}
+	else if (info.m_bUsingPartialPresentation)
+	{
+		swap_effect = D3DSWAPEFFECT_DISCARD;
+	}
+	else
+	{
+		// dimhotepus: Add modern, fast D3DSWAPEFFECT_FLIPEX. 
+
+		// D3DSWAPEFFECT_FLIPEX requires 2+ back buffers.
+		Assert(info.m_nBackBufferCount >= 2);
+		swap_effect = D3DSWAPEFFECT_FLIPEX;
+	}
+	
 	m_PresentParameters.Windowed = info.m_bWindowed;
-	m_PresentParameters.SwapEffect = info.m_bUsingMultipleWindows ? D3DSWAPEFFECT_COPY : D3DSWAPEFFECT_DISCARD;
+	m_PresentParameters.SwapEffect = swap_effect;
 	m_PresentParameters.EnableAutoDepthStencil = TRUE;
 
 	// What back-buffer format should we use?
@@ -1610,14 +1552,10 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 		DX8_DEVTYPE, m_AdapterFormat, info.m_DisplayMode.m_Format, info.m_bWindowed );
 
 	// What depth format should we use?
-	m_bUsingStencil = info.m_bUseStencil;
-	if ( info.m_nDXLevel >= 80 )
-	{
-		// always stencil for dx9/hdr
-		m_bUsingStencil = true;
-	}
+	// always stencil for dx9/hdr
+	m_bUsingStencil = info.m_bUseStencil || info.m_nDXLevel >= 80;
 	D3DFORMAT nDepthFormat = m_bUsingStencil ? D3DFMT_D24S8 : D3DFMT_D24X8;
-	m_PresentParameters.AutoDepthStencilFormat = FindNearestSupportedDepthFormat( 
+	m_PresentParameters.AutoDepthStencilFormat = FindNearestSupportedDepthFormat(
 		nAdapter, m_AdapterFormat, backBufferFormat, nDepthFormat );
 	m_PresentParameters.hDeviceWindow = (VD3DHWND)hWnd;
 
@@ -1641,7 +1579,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 	if ( !info.m_bWindowed )
 	{
 		bool useDefault = ( info.m_DisplayMode.m_nWidth == 0 ) || ( info.m_DisplayMode.m_nHeight == 0 );
-		m_PresentParameters.BackBufferCount = 1;
+		m_PresentParameters.BackBufferCount = info.m_nBackBufferCount;
 		m_PresentParameters.BackBufferWidth = useDefault ? mode.m_nWidth : info.m_DisplayMode.m_nWidth;
 		m_PresentParameters.BackBufferHeight = useDefault ? mode.m_nHeight : info.m_DisplayMode.m_nHeight;
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
@@ -1687,13 +1625,15 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 			m_PresentParameters.BackBufferHeight = info.m_DisplayMode.m_nHeight;
 		}
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
-		m_PresentParameters.BackBufferCount = 1;
+		m_PresentParameters.BackBufferCount = info.m_nBackBufferCount;
 	}
 
 	if ( info.m_nAASamples > 0 && ( m_PresentParameters.SwapEffect == D3DSWAPEFFECT_DISCARD ) )
 	{
 		D3DMULTISAMPLE_TYPE multiSampleType = ComputeMultisampleType( info.m_nAASamples );
 		DWORD nQualityLevel;
+
+		HRESULT hr;
 
 		// FIXME: Should we add the quality level to the ShaderAdapterMode_t struct?
 		// 16x on nVidia refers to CSAA or "Coverage Sampled Antialiasing"
@@ -1742,16 +1682,6 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 //-----------------------------------------------------------------------------
 bool CShaderDeviceDx8::InitDevice( void* hwnd, unsigned nAdapter, const ShaderDeviceInfo_t &info )
 {
-	//Debugger();
-	
-	// good place to run some self tests.
-	//#if OSX
-	//{
-	//	extern void GLMgrSelfTests( void );
-	//	GLMgrSelfTests();
-	//}
-	//#endif
-	
 	// windowed
 	if ( !CreateD3DDevice( (VD3DHWND)hwnd, nAdapter, info ) )
 		return false;
@@ -1764,15 +1694,13 @@ bool CShaderDeviceDx8::InitDevice( void* hwnd, unsigned nAdapter, const ShaderDe
 
 void CShaderDeviceDx8::ShutdownDevice()
 {
-	if ( IsPC() && IsActive() )
+	if ( IsActive() )
 	{
-		Dx9Device()->Release();
+		m_d3d9_device_ex.Release();
 
 #ifdef STUBD3D
-		delete ( CStubD3DDevice * )Dx9Device();
+		delete ( CStubD3DDevice * )D3D9Device();
 #endif
-
-		g_pD3DDevice = NULL;
 
 		RemoveWindowHook( (VD3DHWND)m_hWnd );
 		m_hWnd = 0;
@@ -1808,14 +1736,19 @@ const char *CShaderDeviceDx8::GetDisplayDeviceName()
 	if( m_sDisplayDeviceName.IsEmpty() )
 	{
 		D3DADAPTER_IDENTIFIER9 ident;
+		const unsigned adapter = m_nAdapter == UINT_MAX ? 0U : m_nAdapter;
+
 		// On Win10, this function is getting called with m_nAdapter still initialized to -1.
 		// It's failing, and m_sDisplayDeviceName has garbage, and tf2 fails to launch.
 		// To repro this, run "hl2.exe -dev -fullscreen -game tf" on Win10.
-		HRESULT hr = D3D()->GetAdapterIdentifier( m_nAdapter == UINT_MAX ? 0U : m_nAdapter, 0, &ident );
+		const HRESULT hr = D3D()->GetAdapterIdentifier( adapter, 0, &ident );
 		if ( FAILED(hr) )
 		{
-			Assert( false );
-			ident.DeviceName[0] = 0;
+			Assert(false);
+			Warning( "IDirect3D9Ex::GetAdapterIdentifier(adapter = %u) failed w/e %s.\n",
+				m_nAdapter,
+				se::win::com::com_error_category().message(hr).c_str() );
+			ident.DeviceName[0] = '\0';
 		}
 		m_sDisplayDeviceName = ident.DeviceName;
 	}
@@ -1838,15 +1771,31 @@ void CShaderDeviceDx8::SpewDriverInfo() const
 	RECORD_INT( m_nAdapter );
 	RECORD_INT( 0 );
 
-	HRESULT hr = Dx9Device()->GetDeviceCaps(&caps);
-	Assert(SUCCEEDED(hr));
-	hr = D3D()->GetAdapterIdentifier( m_nAdapter, D3DENUM_WHQL_LEVEL, &ident );
-	Assert(SUCCEEDED(hr));
+	HRESULT hr = m_d3d9_device_ex->GetDeviceCaps(&caps);
+	if ( FAILED(hr) )
+	{
+		Assert(false);
+		Warning( "IDirect3D9Ex::GetDeviceCaps() failed w/e %s.\n",
+			se::win::com::com_error_category().message(hr).c_str() );
+		return;
+	}
 
-	Warning("Shader API Driver Info:\n\nDriver : %s Version : %lld\n", 
-		ident.Driver, ident.DriverVersion.QuadPart );
+	hr = D3D()->GetAdapterIdentifier( m_nAdapter, D3DENUM_WHQL_LEVEL, &ident );
+	if ( FAILED(hr) )
+	{
+		Assert(false);
+		Warning( "IDirect3D9Ex::GetAdapterIdentifier(adapter = %u, flags = D3DENUM_WHQL_LEVEL) failed w/e %s.\n",
+			m_nAdapter,
+			se::win::com::com_error_category().message(hr).c_str() );
+		return;
+	}
+
+	// dimhotepus: Dump version in high.low format.
+	Warning("Shader API Driver Info:\n\nDriver : %s Version : %lu.%lu\n",
+		ident.Driver, ident.DriverVersion.HighPart, ident.DriverVersion.LowPart );
 	Warning("Driver Description :  %s\n", ident.Description );
-	Warning("Chipset version %d %d %d %d\n\n", 
+	// dimhotepus: Dump version with dots.
+	Warning("GPU version %lu.%lu.%lu.%lu\n\n", 
 		ident.VendorId, ident.DeviceId, ident.SubSysId, ident.Revision );
 
 	ShaderDisplayMode_t mode;
@@ -2019,184 +1968,106 @@ void CShaderDeviceDx8::DetectQuerySupport( IDirect3DDevice9 *pD3DDevice )
 	if ( m_DeviceSupportsCreateQuery != -1 )
 		return;
 
-	IDirect3DQuery9 *pQueryObject = NULL;
-
+	se::win::com::com_ptr<IDirect3DQuery9> pQueryObject;
 	// Detect whether query is supported by creating and releasing:
 	HRESULT hr = pD3DDevice->CreateQuery( D3DQUERYTYPE_EVENT, &pQueryObject );
-	if ( !FAILED(hr) && pQueryObject ) 
-	{
-		pQueryObject->Release();
-		m_DeviceSupportsCreateQuery = 1;
-	} 
-	else
-	{
-		m_DeviceSupportsCreateQuery = 0;
-	}
-}
-
-
-const char *GetD3DErrorText( HRESULT hr )
-{
-	const char *pszMoreInfo = NULL;
-
-#if defined( _WIN32 ) && !defined(DX_TO_GL_ABSTRACTION)
-	switch ( hr )
-	{
-	case D3DERR_WRONGTEXTUREFORMAT:
-		pszMoreInfo = "D3DERR_WRONGTEXTUREFORMAT: The pixel format of the texture surface is not valid.";
-		break;
-	case D3DERR_UNSUPPORTEDCOLOROPERATION:
-		pszMoreInfo = "D3DERR_UNSUPPORTEDCOLOROPERATION: The device does not support a specified texture-blending operation for color values.";
-		break;
-	case D3DERR_UNSUPPORTEDCOLORARG:
-		pszMoreInfo = "D3DERR_UNSUPPORTEDCOLORARG: The device does not support a specified texture-blending argument for color values.";
-		break;
-	case D3DERR_UNSUPPORTEDALPHAOPERATION:
-		pszMoreInfo = "D3DERR_UNSUPPORTEDALPHAOPERATION: The device does not support a specified texture-blending operation for the alpha channel.";
-		break;
-	case D3DERR_UNSUPPORTEDALPHAARG:
-		pszMoreInfo = "D3DERR_UNSUPPORTEDALPHAARG: The device does not support a specified texture-blending argument for the alpha channel.";
-		break;
-	case D3DERR_TOOMANYOPERATIONS:
-		pszMoreInfo = "D3DERR_TOOMANYOPERATIONS: The application is requesting more texture-filtering operations than the device supports.";
-		break;
-	case D3DERR_CONFLICTINGTEXTUREFILTER:
-		pszMoreInfo = "D3DERR_CONFLICTINGTEXTUREFILTER: The current texture filters cannot be used together.";
-		break;
-	case D3DERR_UNSUPPORTEDFACTORVALUE:
-		pszMoreInfo = "D3DERR_UNSUPPORTEDFACTORVALUE: The device does not support the specified texture factor value.";
-		break;
-	case D3DERR_CONFLICTINGRENDERSTATE:
-		pszMoreInfo = "D3DERR_CONFLICTINGRENDERSTATE: The currently set render states cannot be used together.";
-		break;
-	case D3DERR_UNSUPPORTEDTEXTUREFILTER:
-		pszMoreInfo = "D3DERR_UNSUPPORTEDTEXTUREFILTER: The device does not support the specified texture filter.";
-		break;
-	case D3DERR_CONFLICTINGTEXTUREPALETTE:
-		pszMoreInfo = "D3DERR_CONFLICTINGTEXTUREPALETTE: The current textures cannot be used simultaneously.";
-		break;
-	case D3DERR_DRIVERINTERNALERROR:
-		pszMoreInfo = "D3DERR_DRIVERINTERNALERROR: Internal driver error.";
-		break;
-	case D3DERR_NOTFOUND:
-		pszMoreInfo = "D3DERR_NOTFOUND: The requested item was not found.";
-		break;
-	case D3DERR_DEVICELOST:
-		pszMoreInfo = "D3DERR_DEVICELOST: The device has been lost but cannot be reset at this time. Therefore, rendering is not possible.";
-		break;
-	case D3DERR_DEVICENOTRESET:
-		pszMoreInfo = "D3DERR_DEVICENOTRESET: The device has been lost.";
-		break;
-	case D3DERR_NOTAVAILABLE:
-		pszMoreInfo = "D3DERR_NOTAVAILABLE: This device does not support the queried technique.";
-		break;
-	case D3DERR_OUTOFVIDEOMEMORY:
-		pszMoreInfo = "D3DERR_OUTOFVIDEOMEMORY: Direct3D does not have enough display memory to perform the operation. The device is using more resources in a single scene than can fit simultaneously into video memory.";
-		break;
-	case D3DERR_INVALIDDEVICE:
-		pszMoreInfo = "D3DERR_INVALIDDEVICE: The requested device type is not valid.";
-		break;
-	case D3DERR_INVALIDCALL:
-		pszMoreInfo = "D3DERR_INVALIDCALL: The method call is invalid.";
-		break;
-	case D3DERR_DRIVERINVALIDCALL:
-		pszMoreInfo = "D3DERR_DRIVERINVALIDCALL";
-		break;
-	case D3DERR_WASSTILLDRAWING:
-		pszMoreInfo = "D3DERR_WASSTILLDRAWING: The previous blit operation that is transferring information to or from this surface is incomplete.";
-		break;
-	}
-#endif // _WIN32
-
-	return pszMoreInfo;
+	m_DeviceSupportsCreateQuery = SUCCEEDED(hr) ? 1 : 0;
 }
 
 
 //-----------------------------------------------------------------------------
 // Actually creates the D3D Device once the present parameters are set up
 //-----------------------------------------------------------------------------
-IDirect3DDevice9* CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags )
+se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags )
 {
-	IDirect3DDevice9 *pD3DDevice = NULL;
-	D3DDEVTYPE devType = DX8_DEVTYPE;
+#if !defined(NVPERFHUD)
+	D3DDEVTYPE devType{DX8_DEVTYPE};
+#else 
+	D3DDEVTYPE devType{D3DDEVTYPE_REF};
 
-#if NVPERFHUD
 	nAdapter = D3D()->GetAdapterCount()-1;
-	devType = D3DDEVTYPE_REF;
 	deviceCreationFlags = D3DCREATE_FPU_PRESERVE | D3DCREATE_HARDWARE_VERTEXPROCESSING;
 #endif
 
-#if 1	// with the changes for opengl to enable threading, we no longer need the d3d device to have threading guards
-#ifndef _X360
+#if defined(ENABLE_NULLREF_DEVICE_SUPPORT)
+	devType = CommandLine()->FindParm("-nulldevice") ? D3DDEVTYPE_NULLREF : devType;
+#endif
+
 	// Create the device with multi-threaded safeguards if we're using mat_queue_mode 2.
-	// The logic to enable multithreaded rendering happens well after the device has been created, 
+	// The logic to enable multithreaded rendering happens well after the device has been created,
 	// so we replicate some of that logic here.
 	static ConVarRef mat_queue_mode( "mat_queue_mode" );
+	const uint8_t physicalCpuCoresCount = GetCPUInformation()->m_nPhysicalProcessors;
 	if ( mat_queue_mode.GetInt() == 2 ||
-		 ( mat_queue_mode.GetInt() == -2 && GetCPUInformation()->m_nPhysicalProcessors >= 2 ) ||
-	     ( mat_queue_mode.GetInt() == -1 && GetCPUInformation()->m_nPhysicalProcessors >= 2 ) )
+		 ( mat_queue_mode.GetInt() == -2 && physicalCpuCoresCount >= 2 ) ||
+	     ( mat_queue_mode.GetInt() == -1 && physicalCpuCoresCount >= 2 ) )
 	{
 		deviceCreationFlags |= D3DCREATE_MULTITHREADED;
 	}
-#endif
-#endif
+	
+	se::win::com::com_ptr<IDirect3DDevice9Ex> d3d9_ex_device;
+	HRESULT hr = D3D()->CreateDeviceEx( nAdapter, devType,
+		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, nullptr, &d3d9_ex_device );
+	if ( SUCCEEDED( hr ) )
+		return d3d9_ex_device;
 
-#ifdef ENABLE_NULLREF_DEVICE_SUPPORT
-	devType =  CommandLine()->FindParm( "-nulldevice" ) ? D3DDEVTYPE_NULLREF: devType;
-#endif
-
-	HRESULT hr = D3D()->CreateDevice( nAdapter, devType,
-		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, &pD3DDevice );
-
-	if ( !FAILED( hr ) && pD3DDevice )
-		return pD3DDevice;
-
-	// try again, other applications may be taking their time
+	// Try again, other applications may be taking their time.
 	ThreadSleep( 1000 );
-	hr = D3D()->CreateDevice( nAdapter, devType,
-		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, &pD3DDevice );
-	if ( !FAILED( hr ) && pD3DDevice )
-		return pD3DDevice;
 
-	// in this case, we actually are allocating too much memory....
-	// This will cause us to use less buffers...
-	if ( m_PresentParameters.Windowed )
-	{
-		m_PresentParameters.SwapEffect = D3DSWAPEFFECT_COPY; 
-		m_PresentParameters.BackBufferCount = 0;
-		hr = D3D()->CreateDevice( nAdapter, devType,
-			(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, &pD3DDevice );
-	}
-	if ( !FAILED( hr ) && pD3DDevice )
-		return pD3DDevice;
+	hr = D3D()->CreateDeviceEx( nAdapter, devType,
+		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, nullptr, &d3d9_ex_device );
+	if ( SUCCEEDED( hr ) )
+		return d3d9_ex_device;
 
-	const char *pszMoreInfo = NULL;
+	const char *more_info = nullptr;
 	switch ( hr )
 	{
 #ifdef _WIN32
 	case D3DERR_INVALIDCALL:
-		// Override the error text for this error since it has a known meaning for CreateDevice failures.
-		pszMoreInfo = "D3DERR_INVALIDCALL: The device or the device driver may not support Direct3D or may not support the resolution or color depth specified.";
+		more_info = "D3DERR_INVALIDCALL: The device or the device driver may not support Direct3D or may not support the resolution or color depth specified.";
+		break;
+	case D3DERR_NOTAVAILABLE:
+		more_info = "D3DERR_NOTAVAILABLE: Direct3DEx features are not supported (no WDDM driver is installed) or if the SDKVersion does not match the version of the DLL.";
+		break;
+	case E_OUTOFMEMORY:
+		more_info = "E_OUTOFMEMORY: Out of RAM when create device. Close existing RAM consuming apps and retry.";
+		break;
+	case D3DERR_OUTOFVIDEOMEMORY:
+		more_info = "D3DERR_OUTOFVIDEOMEMORY: Out of GPU memory when create device. Close existing GPU consuming apps and retry.";
 		break;
 #endif // _WIN32
-	default:
-		pszMoreInfo = GetD3DErrorText( hr );
-		break;
 	}
 
-	// Otherwise we failed, show a message and shutdown
-	if ( pszMoreInfo )
+	// Otherwise we failed, show a message and shutdown.
+	if ( more_info )
 	{
-		DWarning( "init", 0, "Failed to create %s device!\nError 0x%lX: %s\n\nPlease see the following for more info.\n"
-			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145", IsOpenGL() ? "OpenGL" : "D3D", hr, pszMoreInfo );
+		DWarning( "init",
+			0,
+			"IDirect3d9Ex::CreateDeviceEx(adapter = %u, window = 0x%p, device type = 0x%x, flags = 0x%x) failed to create %s device!\nError %s: %s\n\nPlease see the following for more info.\n"
+			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145",
+			nAdapter,
+			hWnd,
+			devType,
+			deviceCreationFlags,
+			IsOpenGL() ? "OpenGL" : "D3D",
+			se::win::com::com_error_category().message(hr).c_str(),
+			more_info );
 	}
 	else
 	{
-		DWarning( "init", 0, "Failed to create %s device!\nError 0x%lX.\n\nPlease see the following for more info.\n"
-			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145", IsOpenGL() ? "OpenGL" : "D3D", hr );
+		DWarning( "init",
+			0,
+			"IDirect3d9Ex::CreateDeviceEx(adapter = %u, window = 0x%p, device type = 0x%x, flags = 0x%x) failed to create %s device!\nError %s.\n\nPlease see the following for more info.\n"
+			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145",
+			nAdapter,
+			hWnd,
+			devType,
+			deviceCreationFlags,
+			IsOpenGL() ? "OpenGL" : "D3D",
+			se::win::com::com_error_category().message(hr).c_str() );
 	}
 
-	return NULL;
+	return {};
 }
 
 
@@ -2219,7 +2090,14 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 	D3DCAPS caps;
 	HRESULT hr = D3D()->GetDeviceCaps( nAdapter, DX8_DEVTYPE, &caps );
 	if ( FAILED( hr ) )
+	{
+		Assert(false);
+		Warning( "IDirect3D9Ex::GetDeviceCaps(adapter = %u, device type = 0x%x) failed w/e %s.\n",
+			m_nAdapter,
+			DX8_DEVTYPE, 
+			se::win::com::com_error_category().message(hr).c_str() );
 		return false;
+	}
 
 	// Determine the adapter format
 	ShaderDisplayMode_t mode;
@@ -2238,18 +2116,15 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 	SendIPCMessage( RELEASE_MESSAGE );
 
 	// Creates the device
-	IDirect3DDevice9 *pD3DDevice = InvokeCreateDevice( pHWnd, nAdapter, deviceCreationFlags );
-
-	if ( !pD3DDevice )
+	m_d3d9_device_ex = std::move( InvokeCreateDevice( pHWnd, nAdapter, deviceCreationFlags ) );
+	if ( !m_d3d9_device_ex )
 		return false;
 
 	// Check to see if query is supported
-	DetectQuerySupport( pD3DDevice );
+	DetectQuerySupport( m_d3d9_device_ex );
 
 #ifdef STUBD3D
-	Dx9Device() = new CStubD3DDevice( pD3DDevice, g_pFullFileSystem );
-#else
-	g_pD3DDevice = pD3DDevice;
+	m_d3d9_device_ex = new CStubD3DDevice( d3d9ex_device, g_pFullFileSystem );
 #endif
 
 	// CheckDeviceLost();
@@ -2293,13 +2168,10 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 //-----------------------------------------------------------------------------
 void CShaderDeviceDx8::AllocFrameSyncTextureObject()
 {
-	if ( IsX360() )
-		return;
-
 	FreeFrameSyncTextureObject();
 
 	// Create a tiny managed texture.
-	HRESULT hr = Dx9Device()->CreateTexture( 
+	const HRESULT hr = D3D9Device()->CreateTexture( 
 		1, 1,	// width, height
 		0,		// levels
 		D3DUSAGE_DYNAMIC,	// usage
@@ -2309,27 +2181,22 @@ void CShaderDeviceDx8::AllocFrameSyncTextureObject()
 		NULL );
 	if ( FAILED( hr ) )
 	{
-		m_pFrameSyncTexture = NULL;
+		Assert( false );
+		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateTexture(width = 1, height = 1, levels = 0, usage = D3DUSAGE_DYNAMIC, format = D3DFMT_A8R8G8B8, pool = D3DPOOL_DEFAULT) failed w/e %s.\n",
+			 se::win::com::com_error_category().message(hr).c_str() );
 	}
 }
 
 void CShaderDeviceDx8::FreeFrameSyncTextureObject()
 {
-	if ( IsX360() )
-		return;
-
 	if ( m_pFrameSyncTexture )
 	{
-		m_pFrameSyncTexture->Release();
-		m_pFrameSyncTexture = NULL;
+		m_pFrameSyncTexture.Release();
 	}
 }
 
 void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( mat_debugalttab.GetBool() )
 	{
 		Warning( "mat_debugalttab: CShaderAPIDX8::AllocFrameSyncObjects\n" );
@@ -2342,7 +2209,10 @@ void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 	{
 		for ( size_t i = 0; i < std::size(m_pFrameSyncQueryObject); i++ )
 		{
-			m_pFrameSyncQueryObject[i] = NULL;
+			if ( m_pFrameSyncQueryObject[i] )
+			{
+				m_pFrameSyncQueryObject[i].Release();
+			}
 			m_bQueryIssued[i] = false;
 		}
 		return;
@@ -2351,15 +2221,20 @@ void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 	// FIXME FIXME FIXME!!!!!  Need to record this.
 	for ( size_t i = 0; i < std::size(m_pFrameSyncQueryObject); i++ )
 	{
-		HRESULT hr = Dx9Device()->CreateQuery( D3DQUERYTYPE_EVENT, &m_pFrameSyncQueryObject[i] );
-		if( hr == D3DERR_NOTAVAILABLE )
+		const HRESULT hr = D3D9Device()->CreateQuery( D3DQUERYTYPE_EVENT, &m_pFrameSyncQueryObject[i] );
+		if ( hr == D3DERR_NOTAVAILABLE )
 		{
-			Warning( "D3DQUERYTYPE_EVENT not available on this driver\n" );
-			Assert( m_pFrameSyncQueryObject[i] == NULL );
+			Warning( "D3DQUERYTYPE_EVENT not available on GPU driver. It means asynchronous events are not supported.\n" );
+			Assert( !m_pFrameSyncQueryObject[i] );
+		}
+		else if ( hr == E_OUTOFMEMORY )
+		{
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateQuery(type = D3DQUERYTYPE_EVENT) returns E_OUTOFMEMORY. Please stop other apps consuming GPU VRAM.\n" );
+			Assert( !m_pFrameSyncQueryObject[i] );
 		}
 		else
 		{
-			Assert( hr == D3D_OK );
+			Assert( SUCCEEDED( hr ) );
 			Assert( m_pFrameSyncQueryObject[i] );
 			m_pFrameSyncQueryObject[i]->Issue( D3DISSUE_END );
 			m_bQueryIssued[i] = true;
@@ -2369,9 +2244,6 @@ void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 
 void CShaderDeviceDx8::FreeFrameSyncObjects( void )
 {
-	if ( IsX360() )
-		return;
-
 	if ( mat_debugalttab.GetBool() )
 	{
 		Warning( "mat_debugalttab: CShaderAPIDX8::FreeFrameSyncObjects\n" );
@@ -2404,12 +2276,7 @@ void CShaderDeviceDx8::FreeFrameSyncObjects( void )
 						break;
 				} while ( hr == S_FALSE );
 			}
-#ifdef DBGFLAG_ASSERT
-			int nRetVal = 
-#endif
-			m_pFrameSyncQueryObject[i]->Release();
-			Assert( nRetVal == 0 );
-			m_pFrameSyncQueryObject[i] = NULL;
+			m_pFrameSyncQueryObject[i].Release();
 			m_bQueryIssued[i] = false;
 		}
 	}
@@ -2437,7 +2304,13 @@ void CShaderDeviceDx8::OtherAppInitializing( bool initializing )
 
 	if ( !IsDeactivated() )
 	{
-		Dx9Device()->EndScene();
+		const HRESULT hr = D3D9Device()->EndScene();
+		if (FAILED(hr))
+		{
+			Assert(false);
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 	}
 
 	// NOTE: OtherApp is set in this way because we need to know we're
@@ -2446,7 +2319,13 @@ void CShaderDeviceDx8::OtherAppInitializing( bool initializing )
 
 	if ( !IsDeactivated() )
 	{
-		Dx9Device()->BeginScene();
+		const HRESULT hr = D3D9Device()->BeginScene();
+		if (FAILED(hr))
+		{
+			Assert(false);
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 	}
 }
 
@@ -2490,16 +2369,25 @@ bool CShaderDeviceDx8::TryDeviceReset()
 
 	// FIXME: Make this rebuild the Dx9Device from scratch!
 	// Helps with compatibility
-	HRESULT hr = Dx9Device()->Reset( &m_PresentParameters );
-	bool bResetSuccess = !FAILED(hr);
+	const HRESULT hr{ D3D9Device()->Reset( &m_PresentParameters ) };
+	bool bResetSuccess = SUCCEEDED(hr);
+	if ( !bResetSuccess )
+	{
+		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::Reset failed w/e %s.\n",
+			se::win::com::com_error_category().message(hr).c_str() );
+	}
 
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
-	if ( bResetSuccess && g_ShaderDeviceUsingD3D9Ex )
+	if ( bResetSuccess )
 	{
-		bResetSuccess = SUCCEEDED( Dx9Device()->TestCooperativeLevel() );
+		// Possible return values include:
+		// D3D_OK,
+		// D3DERR_DEVICELOST, D3DERR_DEVICEHUNG, D3DERR_DEVICEREMOVED, D3DERR_OUTOFVIDEOMEMORY
+		// S_PRESENT_MODE_CHANGED, or S_PRESENT_OCCLUDED
+		bResetSuccess = SUCCEEDED( D3D9Device()->CheckDeviceState(static_cast<HWND>(m_hWnd)) );
 		if ( bResetSuccess )
 		{
-			Warning("video driver has crashed and been reset, re-uploading resources now");
+			Warning("GPU driver has crashed and been reset, re-uploading resources now.\n");
 		}
 	}
 #endif
@@ -2538,17 +2426,13 @@ void CShaderDeviceDx8::ReleaseResources()
 	CPixEvent( PIX_VALVE_ORANGE, "ReleaseResources" );
 
 	FreeFrameSyncObjects();
-	FreeNonInteractiveRefreshObjects();
 	ShaderUtil()->ReleaseShaderObjects();
 	MeshMgr()->ReleaseBuffers();
 	g_pShaderAPI->ReleaseShaderObjects();
 
 #ifdef _DEBUG
-	if ( MeshMgr()->BufferCount() != 0 )
+	for( int i = 0; i < MeshMgr()->BufferCount(); i++ )
 	{
-		for( int i = 0; i < MeshMgr()->BufferCount(); i++ )
-		{
-		}
 	}
 #endif
 
@@ -2614,7 +2498,6 @@ void CShaderDeviceDx8::ReacquireResourcesInternal( bool bResetState, bool bForce
 
 	g_pShaderAPI->RestoreShaderObjects();
 	AllocFrameSyncObjects();
-	AllocNonInteractiveRefreshObjects();
 	MeshMgr()->RestoreBuffers();
 	ShaderUtil()->RestoreShaderObjects( CShaderDeviceMgrBase::ShaderInterfaceFactory );
 }
@@ -2637,14 +2520,15 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 	ReleaseResources();
 	SetPresentParameters( m_hWnd, m_DisplayAdapter, info );
 
-	const HRESULT hr{ Dx9Device()->Reset( &m_PresentParameters ) };
+	const HRESULT hr{ D3D9Device()->Reset( &m_PresentParameters ) };
 	if ( SUCCEEDED( hr ) )
 	{
 		ReacquireResourcesInternal( true, true, "ResizeWindow" );
 		return true;
 	}
 
-	Warning( "ResizeWindow: GPU reset failed, hr = 0x%08lX.\n", hr );
+	Warning( __FUNCTION__ ": IDirect3DDevice9Ex::Reset failed w/e %s.\n",
+			se::win::com::com_error_category().message(hr).c_str() );
 	return false;
 }
 
@@ -2654,9 +2538,6 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 //-----------------------------------------------------------------------------
 void CShaderDeviceDx8::MarkDeviceLost( )
 {
-	if ( IsX360() )
-		return;
-
 	m_bQueuedDeviceLost = true;
 }
 
@@ -2672,11 +2553,7 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 	// but that seems to only make sense if we have resizable windows where 
 	// we do *not* allocate buffers as large as the entire current video mode
 	// which we're not doing
-#ifdef _WIN32
-	m_bIsMinimized = IsIconic( ( HWND )m_hWnd ) == TRUE;
-#else
-	m_bIsMinimized = ( IsIconic( (VD3DHWND)m_hWnd ) == TRUE );
-#endif
+	m_bIsMinimized = IsIconic( (VD3DHWND)m_hWnd ) == TRUE;
 
 	m_bOtherAppInitializing = bOtherAppInitializing;
 
@@ -2691,7 +2568,7 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 	HRESULT hr = D3D_OK;
 
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
-	if ( g_ShaderDeviceUsingD3D9Ex && m_DeviceState == DEVICE_STATE_OK )
+	if ( m_DeviceState == DEVICE_STATE_OK )
 	{
 		// Steady state - PresentEx return value will mark us lost if necessary.
 		// We do not care if we are minimized in this state.
@@ -2700,22 +2577,26 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 	else
 #endif
 	{
-		RECORD_COMMAND( DX8_TEST_COOPERATIVE_LEVEL, 0 );
-		hr = Dx9Device()->TestCooperativeLevel();
+		RECORD_COMMAND( DX8_CHECK_DEVICE_STATE, 0 );
+		// Possible return values include:
+		// D3D_OK,
+		// D3DERR_DEVICELOST, D3DERR_DEVICEHUNG, D3DERR_DEVICEREMOVED, D3DERR_OUTOFVIDEOMEMORY
+		// S_PRESENT_MODE_CHANGED, or S_PRESENT_OCCLUDED
+		hr = D3D9Device()->CheckDeviceState(static_cast<HWND>(m_hWnd));
 	}
 
-	// If some other call returned device lost previously in the frame, spoof the return value from TCL
+	// If some other call returned device lost previously in the frame, spoof the return value from CDS
 	if ( m_bQueuedDeviceLost )
 	{
-		hr = hr != D3D_OK ? hr : D3DERR_DEVICENOTRESET;
+		hr = FAILED( hr ) ? hr : D3DERR_DEVICENOTRESET;
 		m_bQueuedDeviceLost = false;
 	}
 
 	if ( m_DeviceState == DEVICE_STATE_OK )
 	{
 		// We can transition out of ok if bOtherAppInitializing is set
-		// or if we become minimized, or if TCL returns anything other than D3D_OK.
-		if ( ( hr != D3D_OK ) || m_bIsMinimized )
+		// or if we become minimized, or if CDS returns anything other than D3D_OK.
+		if ( FAILED( hr ) || m_bIsMinimized )
 		{
 			// purge unreferenced materials
 			g_pShaderUtil->UncacheUnusedMaterials( true );
@@ -2740,7 +2621,7 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 	if ( m_DeviceState == DEVICE_STATE_LOST_DEVICE )
 	{
 		// We can only try to reset if we're not minimized and not lost
-		if ( !m_bIsMinimized && (hr != D3DERR_DEVICELOST) )
+		if ( !m_bIsMinimized && hr != D3DERR_DEVICELOST )
 		{
 			m_DeviceState = DEVICE_STATE_NEEDS_RESET; 
 		}
@@ -2775,7 +2656,7 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 
 	if ( m_DeviceState == DEVICE_STATE_OTHER_APP_INIT )
 	{
-		if ( ( hr != D3D_OK ) || m_bIsMinimized )
+		if ( FAILED( hr ) || m_bIsMinimized )
 		{
 			m_DeviceState = DEVICE_STATE_LOST_DEVICE; 
 		}
@@ -2819,103 +2700,14 @@ bool CShaderDeviceDx8::AllocNonInteractiveRefreshObjects()
 
 void CShaderDeviceDx8::FreeNonInteractiveRefreshObjects()
 {
-	if ( m_NonInteractiveRefresh.m_pVertexShader )
-	{
-		m_NonInteractiveRefresh.m_pVertexShader->Release();
-		m_NonInteractiveRefresh.m_pVertexShader = NULL;
-	}
-
-	if ( m_NonInteractiveRefresh.m_pPixelShader )
-	{
-		m_NonInteractiveRefresh.m_pPixelShader->Release();
-		m_NonInteractiveRefresh.m_pPixelShader = NULL;
-	}
-
-	if ( m_NonInteractiveRefresh.m_pPixelShaderStartup )
-	{
-		m_NonInteractiveRefresh.m_pPixelShaderStartup->Release();
-		m_NonInteractiveRefresh.m_pPixelShaderStartup = NULL;
-	}
-
-	if ( m_NonInteractiveRefresh.m_pPixelShaderStartupPass2 )
-	{
-		m_NonInteractiveRefresh.m_pPixelShaderStartupPass2->Release();
-		m_NonInteractiveRefresh.m_pPixelShaderStartupPass2 = NULL;
-	}
-
-	if ( m_NonInteractiveRefresh.m_pVertexDecl )
-	{
-		m_NonInteractiveRefresh.m_pVertexDecl->Release();
-		m_NonInteractiveRefresh.m_pVertexDecl = NULL;
-	}
-}
-
-bool CShaderDeviceDx8::InNonInteractiveMode() const
-{
-	return m_NonInteractiveRefresh.m_Mode != MATERIAL_NON_INTERACTIVE_MODE_NONE;
 }
 
 void CShaderDeviceDx8::EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode, ShaderNonInteractiveInfo_t *pInfo )
 {
-	if ( !IsX360() )
-		return;
-	if ( pInfo && ( pInfo->m_hTempFullscreenTexture == INVALID_SHADERAPI_TEXTURE_HANDLE ) )
-	{
-		mode = MATERIAL_NON_INTERACTIVE_MODE_NONE;
-	}
-	m_NonInteractiveRefresh.m_Mode = mode;
-	if ( pInfo )
-	{
-		m_NonInteractiveRefresh.m_Info = *pInfo;
-	}
-	m_NonInteractiveRefresh.m_nPacifierFrame = 0;
-
-	if ( mode != MATERIAL_NON_INTERACTIVE_MODE_NONE )
-	{
-		ConVarRef mat_monitorgamma( "mat_monitorgamma" );
-		ConVarRef mat_monitorgamma_tv_range_min( "mat_monitorgamma_tv_range_min" );
-		ConVarRef mat_monitorgamma_tv_range_max( "mat_monitorgamma_tv_range_max" );
-		ConVarRef mat_monitorgamma_tv_exp( "mat_monitorgamma_tv_exp" );
-		ConVarRef mat_monitorgamma_tv_enabled( "mat_monitorgamma_tv_enabled" );
-		SetHardwareGammaRamp( mat_monitorgamma.GetFloat(), mat_monitorgamma_tv_range_min.GetFloat(), mat_monitorgamma_tv_range_max.GetFloat(),
-			mat_monitorgamma_tv_exp.GetFloat(), mat_monitorgamma_tv_enabled.GetBool() );
-	}
-
-//	Msg( "Time elapsed: %.3f Peak %.3f Ave %.5f Count %d Count Above %d\n", Plat_FloatTime() - m_NonInteractiveRefresh.m_flStartTime,
-//		m_NonInteractiveRefresh.m_flPeakDt, m_NonInteractiveRefresh.m_flTotalDt / m_NonInteractiveRefresh.m_nSamples, m_NonInteractiveRefresh.m_nSamples, m_NonInteractiveRefresh.m_nCountAbove66 );
-
-	m_NonInteractiveRefresh.m_flStartTime = m_NonInteractiveRefresh.m_flLastPresentTime = 
-		m_NonInteractiveRefresh.m_flLastPacifierTime = Plat_FloatTime();
-	m_NonInteractiveRefresh.m_flPeakDt = 0.0;
-	m_NonInteractiveRefresh.m_flTotalDt = 0.0;
-	m_NonInteractiveRefresh.m_nSamples = 0;
-	m_NonInteractiveRefresh.m_nCountAbove66 = 0;
-}
-
-void CShaderDeviceDx8::UpdatePresentStats()
-{
-	double t = Plat_FloatTime();
-	double flActualDt = t - m_NonInteractiveRefresh.m_flLastPresentTime;
-	if ( flActualDt > m_NonInteractiveRefresh.m_flPeakDt )
-	{
-		m_NonInteractiveRefresh.m_flPeakDt = flActualDt;
-	}
-	if ( flActualDt > 0.066 )
-	{
-		++m_NonInteractiveRefresh.m_nCountAbove66;
-	}
-
-	m_NonInteractiveRefresh.m_flTotalDt += flActualDt;
-	++m_NonInteractiveRefresh.m_nSamples;
-
-	t = Plat_FloatTime();
-	m_NonInteractiveRefresh.m_flLastPresentTime = t;
 }
 
 void CShaderDeviceDx8::RefreshFrontBufferNonInteractive()
 {
-	// Other code should not be talking to D3D at the same time as this
-	AUTO_LOCK( m_nonInteractiveModeMutex );
 }
 
 
@@ -2932,11 +2724,13 @@ void CShaderDeviceDx8::Present()
 	HRESULT hr = S_OK;
 	if ( !IsDeactivated() )
 	{
-		hr = Dx9Device()->EndScene();
-
-		AssertMsg(SUCCEEDED(hr),
-			"Dx9Device()->EndScene() failed w/e '%s'.",
-			_com_error{hr}.ErrorMessage());
+		hr = D3D9Device()->EndScene();
+		if (FAILED(hr))
+		{
+			Assert(false);
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 	}
 
 	// if we're in queued mode, don't present if the device is already lost
@@ -2955,11 +2749,6 @@ void CShaderDeviceDx8::Present()
 		{
 			bValidPresent = false;
 		}
-	}
-	// Copy the back buffer into the non-interactive temp buffer
-	if ( m_NonInteractiveRefresh.m_Mode == MATERIAL_NON_INTERACTIVE_MODE_LEVEL_LOAD )
-	{
-		g_pShaderAPI->CopyRenderTargetToTextureEx( m_NonInteractiveRefresh.m_Info.m_hTempFullscreenTexture, 0, NULL, NULL );
 	}
 
 	// If we're not iconified, try to present (without this check, we can flicker when Alt-Tabbed away)
@@ -2983,37 +2772,40 @@ void CShaderDeviceDx8::Present()
 			srcRect.top = viewport.m_nTopLeftY;
 			srcRect.bottom = viewport.m_nTopLeftY + viewport.m_nHeight;
 
-			hr = Dx9Device()->Present( &srcRect, &destRect, (VD3DHWND)m_ViewHWnd, 0 );
+			hr = D3D9Device()->PresentEx( &srcRect, &destRect, (VD3DHWND)m_ViewHWnd, nullptr, 0 );
 		}
 		else
 		{
 			g_pShaderAPI->OwnGPUResources( false );
-			hr = Dx9Device()->Present( 0, 0, 0, 0 );
+			hr = D3D9Device()->PresentEx( nullptr, nullptr, nullptr, nullptr, 0 );
 		}
 	}
 
-	UpdatePresentStats();
-
-	if ( IsWindows() )
+	if constexpr ( IsWindows() )
 	{
+		// Sometimes the API calls get loaded into a command buffer and are batched up to be sent
+		// to the GPU (see https://learn.microsoft.com/en-us/windows/win32/direct3d9/accurately-profiling-direct3d-api-calls).
+		// In this case, the errors cannot be relayed to the application when action needs to be
+		// taken, so the error code is consumed by the runtime and a note is made on the device
+		// object that this happened.
+		// 
+		// Later when the application invokes IDirect3DDevice9(Ex)::Present(Ex),
+		// IDirect3DDevice9(Ex)::Present(Ex) will return D3DERR_DRIVERINTERNALERROR.  This is why
+		// the best approach for an application to take when receiving a
+		// D3DERR_DRIVERINTERNALERROR from IDirect3DDevice9::Present is to destroy and recreate the
+		// device.
+		// 
+		// See https://learn.microsoft.com/en-us/windows/win32/direct3d9/driver-internal-errors
 		if ( hr == D3DERR_DRIVERINTERNALERROR )
 		{
 			/*	Usually this bug means that the driver has run out of internal video
 				memory, due to leaking it slowly over several application restarts. 
-				As of summer 2007, IE in particular seemed to leak a lot of driver 
-				memory for every image context it created in the browser window. A
-				reboot clears out the leaked memory and will generally allow the game
-				to be run again; occasionally (but not frequently) it's necessary to 
-				reduce video settings in the game as well to run. But, this is too 
-				fine a distinction to explain in a dialog, so place the guilt on the 
-				user and ask them to reduce video settings regardless.
 			*/
-
-			Error( "Internal driver error at Present.\n"
+			Error( "GPU internal driver error at Present.\n"
 				   "You're likely out of OS Paged Pool Memory! For more info, see\n"
 				   "https://help.steampowered.com/\n" );
 		}
-		if ( hr == D3DERR_DEVICELOST )
+		else if ( hr == D3DERR_DEVICELOST )
 		{
 			MarkDeviceLost();
 		}
@@ -3049,11 +2841,13 @@ void CShaderDeviceDx8::Present()
 		}
 #endif
 
-		hr = Dx9Device()->BeginScene();
-		
-		AssertMsg(SUCCEEDED(hr),
-			"Dx9Device()->BeginScene() failed w/e '%s'.",
-			_com_error{hr}.ErrorMessage());
+		hr = D3D9Device()->BeginScene();
+		if (FAILED(hr))
+		{
+			Assert(false);
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 	}
 }
 
@@ -3070,8 +2864,8 @@ void CShaderDeviceDx8::SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMi
 {
 	DevMsg( 2, "SetHardwareGammaRamp( %f )\n", fGamma );
 
-	Assert( Dx9Device() );
-	if( !Dx9Device() )
+	Assert( D3D9Device() );
+	if( !D3D9Device() )
 		return;
 
 	D3DGAMMARAMP gammaRamp;
@@ -3102,7 +2896,7 @@ void CShaderDeviceDx8::SetHardwareGammaRamp( float fGamma, float fGammaTVRangeMi
 		gammaRamp.blue[i] = val;
 	}
 
-	Dx9Device()->SetGammaRamp( 0, D3DSGR_NO_CALIBRATION, &gammaRamp );
+	D3D9Device()->SetGammaRamp(0, D3DSGR_NO_CALIBRATION, &gammaRamp);
 }
 
 
