@@ -85,25 +85,28 @@ enum
 // Code related to vertex buffers start here
 //
 //-----------------------------------------------------------------------------
-class CVertexBufferDx8 : public CVertexBufferBase
+class CVertexBufferDx8 final : public CVertexBufferBase
 {
 	typedef CVertexBufferBase BaseClass;
 
 	// Methods of IVertexBuffer
 public:
-	virtual int VertexCount() const;
-	virtual VertexFormat_t GetVertexFormat() const;
-	virtual bool IsDynamic() const;
-	virtual void BeginCastBuffer( VertexFormat_t format );
-	virtual void EndCastBuffer( );
-	virtual int GetRoomRemaining() const;
-	virtual bool Lock( int nVertexCount, bool bAppend, VertexDesc_t &desc );
-	virtual void Unlock( int nVertexCount, VertexDesc_t &desc );
+	int VertexCount() const override;
+	VertexFormat_t GetVertexFormat() const override;
+	bool IsDynamic() const override;
+	void BeginCastBuffer( VertexFormat_t format ) override;
+	void EndCastBuffer( ) override;
+	int GetRoomRemaining() const override;
+	bool Lock( int nVertexCount, bool bAppend, VertexDesc_t &desc ) override;
+	void Unlock( int nVertexCount, VertexDesc_t &desc ) override;
 
 public:
 	// constructor
-	CVertexBufferDx8( ShaderBufferType_t type, VertexFormat_t fmt, int nVertexCount, const char *pBudgetGroupName );
-	virtual ~CVertexBufferDx8();
+	CVertexBufferDx8( ShaderBufferType_t type,
+		VertexFormat_t fmt,
+		int nVertexCount,
+		const char *pBudgetGroupName );
+	~CVertexBufferDx8();
 
 	// Allocates, deallocates the index buffer
 	bool Allocate( );
@@ -150,27 +153,30 @@ protected:
 // Code related to index buffers start here
 //
 //-----------------------------------------------------------------------------
-class CIndexBufferDx8 : public CIndexBufferBase
+class CIndexBufferDx8 final : public CIndexBufferBase
 {
 	typedef CIndexBufferBase BaseClass;
 
 	// Methods of IIndexBuffer
 public:
-	virtual int IndexCount( ) const;
-	virtual MaterialIndexFormat_t IndexFormat() const;
-	virtual int GetRoomRemaining() const;
-	virtual bool Lock( int nIndexCount, bool bAppend, IndexDesc_t &desc );
-	virtual void Unlock( int nIndexCount, IndexDesc_t &desc );
-	virtual void BeginCastBuffer( MaterialIndexFormat_t format );
-	virtual void EndCastBuffer( );
-	virtual bool IsDynamic() const;
-	virtual void ModifyBegin( bool bReadOnly, int nFirstIndex, int nIndexCount, IndexDesc_t& desc ) { Assert(0); }
-	virtual void ModifyEnd( IndexDesc_t& desc ) { Assert(0); }
+	int IndexCount() const override;
+	MaterialIndexFormat_t IndexFormat() const override;
+	int GetRoomRemaining() const override;
+	bool Lock( int nIndexCount, bool bAppend, IndexDesc_t &desc ) override;
+	void Unlock( int nIndexCount, IndexDesc_t &desc ) override;
+	void BeginCastBuffer( MaterialIndexFormat_t format ) override;
+	void EndCastBuffer( ) override;
+	bool IsDynamic() const override;
+	void ModifyBegin( bool bReadOnly, int nFirstIndex, int nIndexCount, IndexDesc_t& desc ) override { Assert(0); }
+	void ModifyEnd( IndexDesc_t& desc ) override { Assert(0); }
 
 public:
 	// constructor
-	CIndexBufferDx8( ShaderBufferType_t bufferType, MaterialIndexFormat_t fmt, int nIndexCount, const char *pBudgetGroupName );
-	virtual ~CIndexBufferDx8();
+	CIndexBufferDx8( ShaderBufferType_t bufferType,
+		MaterialIndexFormat_t fmt,
+		int nIndexCount,
+		const char *pBudgetGroupName );
+	~CIndexBufferDx8();
 
 	// Allocates, deallocates the index buffer
 	bool Allocate( );
@@ -504,12 +510,12 @@ protected:
 //-----------------------------------------------------------------------------
 // A little extra stuff for the dynamic version
 //-----------------------------------------------------------------------------
-class CDynamicMeshDX8 : public CMeshDX8
+class CDynamicMeshDX8 final : public CMeshDX8
 {
 public:
 	// constructor, destructor
 	CDynamicMeshDX8();
-	virtual ~CDynamicMeshDX8();
+	~CDynamicMeshDX8();
 
 	// Initializes the dynamic mesh
 	void Init( int nBufferId );
@@ -577,12 +583,12 @@ private:
 //-----------------------------------------------------------------------------
 // A mesh that stores temporary vertex data in the correct format (for modification)
 //-----------------------------------------------------------------------------
-class CTempMeshDX8 : public CBaseMeshDX8
+class CTempMeshDX8 final : public CBaseMeshDX8
 {
 public:
 	// constructor, destructor
 	CTempMeshDX8( bool isDynamic );
-	virtual ~CTempMeshDX8();
+	~CTempMeshDX8();
 
 	// Sets the material
 	virtual void SetVertexFormat( VertexFormat_t format );
@@ -652,65 +658,15 @@ private:
 #endif
 };
 
-#if 0
-//-----------------------------------------------------------------------------
-// A mesh that stores temporary vertex data in the correct format (for modification)
-//-----------------------------------------------------------------------------
-class CTempIndexBufferDX8 : public CIndexBufferBase
-{
-public:
-	// constructor, destructor
-	CTempIndexBufferDX8( bool isDynamic );
-	virtual ~CTempIndexBufferDX8();
-
-	// Locks/unlocks the mesh
-	void LockIndexBuffer( int nIndexCount );
-	void UnlockMesh( int nIndexCount );
-
-	// Locks mesh for modifying
-	virtual void ModifyBeginEx( bool bReadOnly, int nFirstIndex, int nIndexCount );
-	virtual void ModifyEnd();
-
-	// Number of indices
-	virtual int IndexCount() const;
-	virtual bool IsDynamic() const;
-
-	virtual void CopyToIndexBuilder( 
-		int iStartIndex,	// Which indices to copy.
-		int nIndices, 
-		int indexOffset,	// This is added to each index.
-		CIndexBuilder &builder );
-private:
-	// Selection mode 
-	void TestSelection( );
-
-	CDynamicMeshDX8 *GetDynamicMesh();
-
-	CUtlVector< unsigned short > m_IndexData;
-
-	MaterialPrimitiveType_t m_Type;
-	int m_LockedIndices;
-	bool m_IsDynamic;
-
-	// Used in rendering sub-parts of the mesh
-	static unsigned int s_NumIndices;
-	static unsigned int s_FirstIndex;
-
-#ifdef DBGFLAG_ASSERT
-	bool m_Locked;
-	bool m_InPass;
-#endif
-};
-#endif
 //-----------------------------------------------------------------------------
 // This is a version that buffers up vertex data so we can blast through it later
 //-----------------------------------------------------------------------------
-class CBufferedMeshDX8 : public CBaseMeshDX8
+class CBufferedMeshDX8 final : public CBaseMeshDX8
 {
 public:
 	// constructor, destructor
 	CBufferedMeshDX8();
-	virtual ~CBufferedMeshDX8();
+	~CBufferedMeshDX8();
 
 	// checks to see if it was rendered..
 	void ResetRendered();
@@ -1091,8 +1047,10 @@ int CIndexBufferDx8::s_nBufferCount = 0;
 //-----------------------------------------------------------------------------
 // Constructor, destructor
 //-----------------------------------------------------------------------------
-CIndexBufferDx8::CIndexBufferDx8( ShaderBufferType_t bufferType, MaterialIndexFormat_t fmt, int nIndexCount, const char *pBudgetGroupName ) :
-	BaseClass( pBudgetGroupName )
+CIndexBufferDx8::CIndexBufferDx8( ShaderBufferType_t bufferType,
+	MaterialIndexFormat_t fmt,
+	int nIndexCount,
+	const char *pBudgetGroupName ) : BaseClass( pBudgetGroupName )
 {
 	Assert( nIndexCount != 0 );
 
@@ -1500,8 +1458,10 @@ int CVertexBufferDx8::s_nBufferCount = 0;
 //-----------------------------------------------------------------------------
 // constructor
 //-----------------------------------------------------------------------------
-CVertexBufferDx8::CVertexBufferDx8( ShaderBufferType_t type, VertexFormat_t fmt, int nVertexCount, const char *pBudgetGroupName ) : 
-	BaseClass( pBudgetGroupName )
+CVertexBufferDx8::CVertexBufferDx8(	ShaderBufferType_t type,
+	VertexFormat_t fmt,
+	int nVertexCount,
+	const char *pBudgetGroupName ) : BaseClass( pBudgetGroupName )
 {
 //	Debugger();
 	Assert( nVertexCount != 0 );
