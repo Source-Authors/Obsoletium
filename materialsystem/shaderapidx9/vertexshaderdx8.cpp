@@ -2101,7 +2101,9 @@ bool CShaderManager::CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuff
 	int nStartingOffset = 0;
 	for ( int i = 0; i < pHeader->m_nDynamicCombos; i++ )
 	{
-		if ( pLookup->m_pComboDictionary[i].m_Offset == -1 )
+		auto &shaderEntry = pLookup->m_pComboDictionary[i];
+
+		if ( shaderEntry.m_Offset == -1 )
 		{
 			// skipped
 			continue;
@@ -2109,21 +2111,21 @@ bool CShaderManager::CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuff
 
 		if ( !nStartingOffset )
 		{
-			nStartingOffset = pLookup->m_pComboDictionary[i].m_Offset;
+			nStartingOffset = shaderEntry.m_Offset;
 		}
 
 		// offsets better be sequentially ascending
-		Assert( nStartingOffset <= pLookup->m_pComboDictionary[i].m_Offset );
+		Assert( nStartingOffset <= shaderEntry.m_Offset );
 
-		if ( pLookup->m_pComboDictionary[i].m_Size <= 0 )
+		if ( shaderEntry.m_Size <= 0 )
 		{
 			// skipped
 			continue;
 		}
 
 		// get the right byte code from the monolithic buffer
-		uint8 *pByteCode = (uint8 *)pComboBuffer + pLookup->m_nDataOffset + pLookup->m_pComboDictionary[i].m_Offset - nStartingOffset;
-		int nByteCodeSize = pLookup->m_pComboDictionary[i].m_Size;
+		uint8 *pByteCode = (uint8 *)pComboBuffer + pLookup->m_nDataOffset + shaderEntry.m_Offset - nStartingOffset;
+		intp nByteCodeSize = shaderEntry.m_Size;
 
 		if ( pReferenceShader )
 		{
