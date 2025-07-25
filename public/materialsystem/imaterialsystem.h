@@ -996,24 +996,6 @@ public:
 	virtual void				ClearBuffers( bool bClearColor, bool bClearDepth, bool bClearStencil = false ) = 0;
 
 	// -----------------------------------------------------------
-	// X360 specifics
-	// -----------------------------------------------------------
-
-#if defined( _X360 )
-	virtual void				ListUsedMaterials( void ) = 0;
-	virtual HXUIFONT			OpenTrueTypeFont( const char *pFontname, int tall, int style ) = 0;
-	virtual void				CloseTrueTypeFont( HXUIFONT hFont ) = 0;
-	virtual bool				GetTrueTypeFontMetrics( HXUIFONT hFont, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] ) = 0;
-	// Render a sequence of characters and extract the data into a buffer
-	// For each character, provide the width+height of the font texture subrect,
-	// an offset to apply when rendering the glyph, and an offset into a buffer to receive the RGBA data
-	virtual bool				GetTrueTypeGlyphs( HXUIFONT hFont, int numChars, wchar_t *pWch, int *pOffsetX, int *pOffsetY, int *pWidth, int *pHeight, unsigned char *pRGBA, int *pRGBAOffset ) = 0;
-	virtual void				PersistDisplay() = 0;
-	virtual void				*GetD3DDevice() = 0;
-	virtual bool				OwnGPUResources( bool bEnable ) = 0;
-#endif
-
-	// -----------------------------------------------------------
 	// Access the render contexts
 	// -----------------------------------------------------------
 	virtual IMatRenderContext *	GetRenderContext() = 0;
