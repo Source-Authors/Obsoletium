@@ -2784,13 +2784,6 @@ VertexShader_t CShaderManager::CreateVertexShader( const char *pFileName, int nS
 	{
 		return INVALID_SHADER;
 	}
-
-	#if 0 //old
-		if ( mat_cacheshaders.GetBool() )
-		{
-			WriteToShaderCache( pFileName, nStaticVshIndex );
-		}
-	#endif
 	
 	ShaderLookup_t lookup;
 	lookup.m_Name = m_ShaderSymbolTable.AddString( pFileName );
@@ -2798,8 +2791,6 @@ VertexShader_t CShaderManager::CreateVertexShader( const char *pFileName, int nS
 	VertexShader_t shader = m_VertexShaderDict.Find( lookup );
 	if ( shader == m_VertexShaderDict.InvalidIndex() )
 	{
-		//printf("\nCShaderManager::CreateVertexShader( filename = %s, staticVshIndex = %d - not in cache", pFileName, nStaticVshIndex );
-	
 		shader = m_VertexShaderDict.AddToTail( lookup );
 		if ( !LoadAndCreateShaders( m_VertexShaderDict[shader], true, debugLabel ) )
 		{
@@ -2821,13 +2812,6 @@ PixelShader_t CShaderManager::CreatePixelShader( const char *pFileName, int nSta
 	{
 		return INVALID_SHADER;
 	}
-
-	#if 0 //old
-		if ( mat_cacheshaders.GetBool() )
-		{
-			WriteToShaderCache( pFileName, nStaticPshIndex );
-		}
-	#endif
 	
 	ShaderLookup_t lookup;
 	lookup.m_Name = m_ShaderSymbolTable.AddString( pFileName );
@@ -3202,12 +3186,6 @@ void CShaderManager::DestroyPixelShader( PixelShader_t pixelShader )
 //-----------------------------------------------------------------------------
 void CShaderManager::DestroyAllShaders( void )
 {
-	// Remarking this out because it's conflicting with dxabstract's shutdown resource leak detection code (we leak thousands of shaders at shutdown with this in place). 
-	// I see no reason why we would want to do this in D3D9 but not GL?
-//#ifdef DX_TO_GL_ABSTRACTION
-//		return;
-//#endif
-	
 	for ( VertexShader_t vshIndex = m_VertexShaderDict.Head(); 
 		 vshIndex != m_VertexShaderDict.InvalidIndex(); )
 	{
