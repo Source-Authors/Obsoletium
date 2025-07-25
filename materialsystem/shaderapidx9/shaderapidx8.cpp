@@ -129,8 +129,6 @@ static ConVar r_pix_start( "r_pix_start", "0" );
 static ConVar r_pix_recordframes( "r_pix_recordframes", "0" );
 
 
-#define D3DDeviceWrapper IDirect3DDevice9
-
 
 //-----------------------------------------------------------------------------
 // These board states change with high frequency; are not shadowed
