@@ -305,6 +305,12 @@ protected:
 	// ReacquireResources, only the last top-level ReacquireResources will
 	// have effect. Nested ReleaseResources calls are bugs.
 	int	m_numReleaseResourcesRefCount;
+
+#ifdef DEBUG
+	// dimhotepus: Some DirectX API calls require to be performed on the same
+	// thread as device created.
+	ThreadId_t m_createDeviceThreadId;
+#endif
 };
 
 

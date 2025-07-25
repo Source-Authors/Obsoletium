@@ -1451,6 +1451,9 @@ CShaderDeviceDx8::CShaderDeviceDx8()
 	m_bResourcesReleased = false;
 	m_iStencilBufferBits = 0;
 	m_numReleaseResourcesRefCount = 0;
+#ifdef DEBUG
+	m_createDeviceThreadId = std::numeric_limits<ThreadId_t>::max();
+#endif
 }
 
 CShaderDeviceDx8::~CShaderDeviceDx8()
@@ -2120,6 +2123,10 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 	if ( !m_d3d9_device_ex )
 		return false;
 
+#ifdef DEBUG
+	m_createDeviceThreadId = ThreadGetCurrentId();
+#endif
+
 	// Check to see if query is supported
 	DetectQuerySupport( m_d3d9_device_ex );
 
@@ -2373,6 +2380,9 @@ bool CShaderDeviceDx8::TryDeviceReset()
 		return false;
 	}
 
+	AssertMsg( m_createDeviceThreadId == ThreadGetCurrentId(),
+		"IDirect3DDevice9Ex::Reset can be perfomed only on same thread which created device." );
+
 	// FIXME: Make this rebuild the Dx9Device from scratch!
 	// Helps with compatibility
 	const HRESULT hr{ D3D9Device()->Reset( &m_PresentParameters ) };
@@ -2525,6 +2535,9 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 
 	ReleaseResources();
 	SetPresentParameters( m_hWnd, m_DisplayAdapter, info );
+
+	AssertMsg( m_createDeviceThreadId == ThreadGetCurrentId(),
+		"IDirect3DDevice9Ex::Reset can be perfomed only on same thread which created device." );
 
 	const HRESULT hr{ D3D9Device()->Reset( &m_PresentParameters ) };
 	if ( SUCCEEDED( hr ) )
