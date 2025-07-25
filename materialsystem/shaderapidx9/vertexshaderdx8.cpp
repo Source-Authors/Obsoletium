@@ -459,17 +459,17 @@ static HardwareShader_t CreateD3DPixelShader( DWORD *pByteCode, unsigned int nCe
 	return shader;
 }
 
-template<class T> int BinarySearchCombos( uint32 nStaticComboID, int nCombos, T const *pRecords )
+template<class T> intp BinarySearchCombos( uint32 nStaticComboID, intp nCombos, T const *pRecords )
 {
 	// Use binary search - data is sorted
-	int nLowerIdx = 1;
-	int nUpperIdx = nCombos;
+	intp nLowerIdx = 1;
+	intp nUpperIdx = nCombos;
 	for (;;)
 	{
 		if ( nUpperIdx < nLowerIdx )
 			return -1;
 
-		int nMiddleIndex = ( nLowerIdx + nUpperIdx ) / 2;
+		intp nMiddleIndex = ( nLowerIdx + nUpperIdx ) / 2;
 		uint32 nProbe = pRecords[nMiddleIndex-1].m_nStaticComboID;
 		if ( nStaticComboID < nProbe )
 		{
@@ -485,7 +485,7 @@ template<class T> int BinarySearchCombos( uint32 nStaticComboID, int nCombos, T 
 	}
 }
 
-inline int FindShaderStaticCombo( uint32 nStaticComboID, const ShaderHeader_t& header, StaticComboRecord_t *pRecords )
+inline intp FindShaderStaticCombo( uint32 nStaticComboID, const ShaderHeader_t& header, StaticComboRecord_t *pRecords )
 {
 	if ( header.m_nVersion < 5 )
 		return -1;
@@ -530,9 +530,9 @@ struct ShaderFileCache_t
 		return ( m_Header.m_nVersion == 6 );
 	}
 
-	int FindCombo( uint32 nStaticComboID )
+	intp FindCombo( uint32 nStaticComboID )
 	{
-		int nSearchAliases = BinarySearchCombos( nStaticComboID, m_StaticComboDupRecords.Count(), m_StaticComboDupRecords.Base() );
+		intp nSearchAliases = BinarySearchCombos( nStaticComboID, m_StaticComboDupRecords.Count(), m_StaticComboDupRecords.Base() );
 		if ( nSearchAliases != -1 )
 			nStaticComboID = m_StaticComboDupRecords[nSearchAliases].m_nSourceStaticCombo;
 		return FindShaderStaticCombo( nStaticComboID, m_Header, m_StaticComboRecords.Base() );
@@ -2520,7 +2520,7 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 	}
 	else
 	{
-		int nStaticComboIdx = pFileCache.FindCombo( lookup.m_nStaticIndex / pFileCache.m_Header.m_nDynamicCombos );
+		intp nStaticComboIdx = pFileCache.FindCombo( lookup.m_nStaticIndex / pFileCache.m_Header.m_nDynamicCombos );
 		if ( nStaticComboIdx == -1 )
 		{
 			g_pFullFileSystem->Close( hFile );
