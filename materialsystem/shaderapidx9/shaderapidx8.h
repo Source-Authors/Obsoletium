@@ -37,7 +37,7 @@ struct BufferedState_t
 {
 	DirectX::XMMATRIX m_Transform[3];
 	D3DVIEWPORT9 m_Viewport;
-	int m_BoundTexture[16];
+	ShaderAPITextureHandle_t m_BoundTexture[16];
 	void *m_VertexShader;
 	void *m_PixelShader;
 };
