@@ -25,20 +25,24 @@
 #define CHECK_INDICES_MAX_NUM_STREAMS 2
 #endif
 
+#include "shaderapidx8.h"
+#include "shaderapi/ishaderapi.h"
+#include "shaderapi/ishaderutil.h"
+#include "shaderdevicedx8.h"
+
 #include "dynamicib.h"
 #include "dynamicvb.h"
-#include "utlvector.h"
-#include "shaderapi/ishaderapi.h"
+
 #include "imaterialinternal.h"
 #include "imaterialsysteminternal.h"
-#include "shaderapidx8.h"
-#include "shaderapi/ishaderutil.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
-#include "materialsystem/materialsystem_config.h"
 #include "materialsystem/ivballoctracker.h"
+#include "materialsystem/materialsystem_config.h"
+
 #include "tier1/strtools.h"
-#include "convar.h"
-#include "shaderdevicedx8.h"
+#include "tier1/utlvector.h"
+#include "tier1/convar.h"
+
 #include <DirectXMath.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
