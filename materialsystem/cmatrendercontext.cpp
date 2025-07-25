@@ -56,16 +56,6 @@ void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001f )
 }
 
 
-void SpinPresent()
-{
-	while ( true )
-	{
-		g_pShaderAPI->ClearColor3ub( 0, 0, 0 );
-		g_pShaderAPI->ClearBuffers( true, true, true, -1, -1 );
-		g_pShaderDevice->Present();
-	}
-}
-
 void ReportDirtyDisk()
 {
 }
