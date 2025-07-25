@@ -890,7 +890,7 @@ MDLHandle_t CMDLCache::FindMDL( const char *pMDLRelativePath )
 	// can't trust provided path
 	// ensure provided path correctly resolves (Dictionary is case-insensitive)
 	char szFixedName[MAX_PATH];
-	V_strncpy( szFixedName, pMDLRelativePath, sizeof( szFixedName ) );
+	V_strcpy_safe( szFixedName, pMDLRelativePath );
 	V_RemoveDotSlashes( szFixedName, '/' );
 
 	// dimhotepus: Oh, some custom packs have model names like models/humans/male_postures.mdl\r\n :(
@@ -1929,10 +1929,10 @@ bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlB
 	VPROF( "CMDLCache::ReadMDLFile" );
 
 	char pFileName[ MAX_PATH ];
-	Q_strncpy( pFileName, pMDLFileName, sizeof( pFileName ) );
-	Q_FixSlashes( pFileName );
+	V_strcpy_safe( pFileName, pMDLFileName );
+	V_FixSlashes( pFileName );
 #ifdef _LINUX
-	Q_strlower( pFileName );
+	V_strlower( pFileName );
 #endif
 
 	MdlCacheMsg( "MDLCache: Load studiohdr '%s'.\n", pFileName );
