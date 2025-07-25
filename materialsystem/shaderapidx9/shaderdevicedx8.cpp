@@ -2782,7 +2782,6 @@ void CShaderDeviceDx8::Present()
 		}
 		else
 		{
-			g_pShaderAPI->OwnGPUResources( false );
 			hr = D3D9Device()->PresentEx( nullptr, nullptr, nullptr, nullptr, 0 );
 		}
 	}

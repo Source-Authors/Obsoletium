@@ -3082,8 +3082,6 @@ void CShaderAPIDx8::ResetRenderState( bool bFullReset )
 
 	m_bResettingRenderState = true;
 
-	OwnGPUResources( true );
-
 	ResetDXRenderState();
 
 	// We're not currently rendering anything
