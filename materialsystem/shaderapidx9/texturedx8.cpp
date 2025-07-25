@@ -111,15 +111,15 @@ static ImageFormat GetImageFormat( IDirect3DBaseTexture* pTexture )
 		{
 			D3DSURFACE_DESC desc;
 			hr = GetLevelDesc( pTexture, 0, &desc );
-			if ( !FAILED( hr ) )
+			if ( SUCCEEDED( hr ) )
 				return ImageLoader::D3DFormatToImageFormat( desc.Format );
 		}
 		else
 		{
 			D3DVOLUME_DESC desc;
-			IDirect3DVolumeTexture *pVolumeTexture = static_cast<IDirect3DVolumeTexture*>( pTexture );
+			auto *pVolumeTexture = static_cast<IDirect3DVolumeTexture*>( pTexture );
 			hr = pVolumeTexture->GetLevelDesc( 0, &desc );
-			if ( !FAILED( hr ) )
+			if ( SUCCEEDED( hr ) )
 				return ImageLoader::D3DFormatToImageFormat( desc.Format );
 		}
 	}
