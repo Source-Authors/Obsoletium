@@ -28,73 +28,66 @@ mat_fullbright 1 doesn't work properly on alpha materials in testroom_standards
 #include "shaderapidx8_global.h"
 #include "shadershadowdx8.h"
 #include "locald3dtypes.h"
-#include "utlvector.h"
 #include "IHardwareConfigInternal.h"
-#include "utlstack.h"
 #include "shaderapi/ishaderutil.h"
 #include "shaderapi/commandbuffer.h"
-#include "shaderapidx8_global.h"
+
+#include "materialsystem/deformations.h"
+#include "materialsystem/idebugtextureinfo.h"
 #include "materialsystem/imaterialsystem.h"
-#include "materialsystem/itexture.h"
-#include "imaterialinternal.h"
-#include "imeshdx8.h"
 #include "materialsystem/imorph.h"
+#include "materialsystem/itexture.h"
+#include "materialsystem/materialsystem_config.h"
+#include "imaterialinternal.h"
+
+#include "imeshdx8.h"
 #include "colorformatdx8.h"
 #include "texturedx8.h"
-#include <malloc.h>
-#include "interface.h"
-#include "utlrbtree.h"
-#include "utlsymbol.h"
-#include "tier1/strtools.h"
-#include "recording.h"
-#ifndef _X360
-#include <crtmemdebug.h>
-#endif
+#include "shaderdevicedx8.h"
 #include "vertexshaderdx8.h"
-#include "filesystem.h"
-#include "mathlib/mathlib.h"
-#include "materialsystem/materialsystem_config.h"
-#include "worldsize.h"
+#include "recording.h"
 #include "TransitionTable.h"
+#include "vertexdecl.h"
+
 #include "tier0/vcrmode.h"
 #include "tier0/vprof.h"
+#include "tier0/tslist.h"
+#include "tier0/icommandline.h"
+
+#include "tier1/interface.h"
+#include "tier1/utlstack.h"
+#include "tier1/utlvector.h"
+#include "tier1/utlrbtree.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/strtools.h"
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
-#include "vertexdecl.h"
-#include "tier0/icommandline.h"
-#include "IShaderSystem.h"
+#include "tier1/utllinkedlist.h"
 #include "tier1/convar.h"
 #include "tier1/KeyValues.h"
+
+#include "tier2/tier2.h"
+
+#include "bitmap/imageformat.h"
+#include "bitmap/tgawriter.h"
+
+#include <crtmemdebug.h>
+
+#include "filesystem.h"
+#include "worldsize.h"
+#include "mathlib/mathlib.h"
+#include "IShaderSystem.h"
 #include "Color.h"
 #ifdef RECORDING
 #include "materialsystem/IShader.h"
 #endif
 #include "../stdshaders/common_hlsl_cpp_consts.h" // hack hack hack!
-#include "KeyValues.h"
-#include "bitmap/imageformat.h"
-#include "materialsystem/idebugtextureinfo.h"
-#include "tier1/utllinkedlist.h"
 #include "vtf/vtf.h"
 #include "datacache/idatacache.h"
 #include "renderparm.h"
-#include "tier2/tier2.h"
-#include "materialsystem/deformations.h"
-#include "bitmap/tgawriter.h"
-#include "tier0/icommandline.h"
 #include "com_ptr.h"
-#include "togl/rendermechanism.h"  // provides GLMPRINTF/GLMPRINTSTR / GLMPRINTEXT macros which only activate if GLMDEBUG is nonzero and POSIX is defined.
-
-#if defined( _X360 )
-#include "xbox/xbox_console.h"
-#include "xbox/xbox_win32stubs.h"
-#include "xbox/xbox_launch.h"
-#endif
-#include "tier0/tslist.h"
-#ifndef _X360
 #include "wmi.h"
-#endif
 #include "filesystem/IQueuedLoader.h"
-#include "shaderdevicedx8.h"
 #include "togl/rendermechanism.h"
 
 // Define this if you want to use a stubbed d3d.
