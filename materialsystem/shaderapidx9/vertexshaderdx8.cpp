@@ -2150,12 +2150,16 @@ bool CShaderManager::CreateDynamicCombos_Ver4( void *pContext, uint8 *pComboBuff
 #endif
 		HardwareShader_t hardwareShader = INVALID_HARDWARE_SHADER;
 
-		if ( IsPC() && m_bCreateShadersOnDemand )
+		if ( m_bCreateShadersOnDemand )
 		{
+			auto &shaderCreationData = pLookup->m_ShaderStaticCombos.m_pCreationData[i];
+
 			// cache the code off for later
-			pLookup->m_ShaderStaticCombos.m_pCreationData[i].ByteCode.SetSize( nByteCodeSize );
-			V_memcpy( pLookup->m_ShaderStaticCombos.m_pCreationData[i].ByteCode.Base(), pByteCode, nByteCodeSize );
-			pLookup->m_ShaderStaticCombos.m_pCreationData[i].iCentroidMask = pFileCache->m_bVertexShader ? 0 : pHeader->m_nCentroidMask;
+			shaderCreationData.ByteCode.SetSize( nByteCodeSize );
+
+			V_memcpy( shaderCreationData.ByteCode.Base(), pByteCode, nByteCodeSize );
+
+			shaderCreationData.iCentroidMask = pFileCache->m_bVertexShader ? 0 : pHeader->m_nCentroidMask;
 		}
 		else
 		{
@@ -2290,10 +2294,14 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 				iIndex -= pLookup->m_nStaticIndex;			// ver5 stores combos as full combo, ver6 as dynamic combo # only
 			if ( m_bCreateShadersOnDemand )
 			{
+				auto &shaderCreationData = pLookup->m_ShaderStaticCombos.m_pCreationData[iIndex];
+
 				// cache the code off for later
-				pLookup->m_ShaderStaticCombos.m_pCreationData[iIndex].ByteCode.SetSize( nShaderSize );
-				V_memcpy( pLookup->m_ShaderStaticCombos.m_pCreationData[iIndex].ByteCode.Base(), pReadPtr, nShaderSize );
-				pLookup->m_ShaderStaticCombos.m_pCreationData[iIndex].iCentroidMask = pFileCache->m_bVertexShader ? 0 : pFileCache->m_Header.m_nCentroidMask;
+				shaderCreationData.ByteCode.SetSize( nShaderSize );
+
+				V_memcpy( shaderCreationData.ByteCode.Base(), pReadPtr, nShaderSize );
+
+				shaderCreationData.iCentroidMask = pFileCache->m_bVertexShader ? 0 : pFileCache->m_Header.m_nCentroidMask;
 			}
 			else
 			{
