@@ -116,11 +116,6 @@ ConVar mat_frame_sync_enable( "mat_frame_sync_enable", "1", FCVAR_CHEAT );
 ConVar mat_frame_sync_force_texture( "mat_frame_sync_force_texture", "0", FCVAR_CHEAT, "Force frame syncing to lock a managed texture." );
 
 
-#if defined( _X360 )
-ConVar mat_texturecachesize( "mat_texturecachesize", "176" );
-ConVar mat_force_flush_texturecache( "mat_force_flush_texturecache", "0" );
-#endif
-
 extern ConVar mat_debugalttab;
 
 #define ALLOW_SMP_ACCESS 0
