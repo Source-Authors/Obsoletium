@@ -2275,6 +2275,12 @@ void CShaderDeviceDx8::FreeFrameSyncObjects( void )
 					if ( flCurrTime - flStartTime > 2.00 )
 						break;
 				} while ( hr == S_FALSE );
+
+				// dimhotepus: Handle lost device case.
+				if ( hr == D3DERR_DEVICELOST )
+				{
+					MarkDeviceLost( );
+				}
 			}
 			m_pFrameSyncQueryObject[i].Release();
 			m_bQueryIssued[i] = false;
