@@ -150,8 +150,6 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	bool bVertexTexture = ( nCreationFlags & TEXTURE_CREATE_VERTEXTEXTURE ) != 0;
 	bool bAllowNonFilterable = ( nCreationFlags & TEXTURE_CREATE_UNFILTERABLE_OK ) != 0;
 	bool bVolumeTexture = ( nDepth > 1 );
-	[[maybe_unused]] bool bIsFallback = ( nCreationFlags & TEXTURE_CREATE_FALLBACK ) != 0;
-	[[maybe_unused]] bool bNoD3DBits = ( nCreationFlags & TEXTURE_CREATE_NOD3DMEMORY ) != 0;
 	[[maybe_unused]] bool bSRGB = (nCreationFlags & TEXTURE_CREATE_SRGB) != 0;			// for Posix/GL only
 
 	// NOTE: This function shouldn't be used for creating depth buffers!
