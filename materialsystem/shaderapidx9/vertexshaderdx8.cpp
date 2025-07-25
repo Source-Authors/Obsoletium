@@ -3240,7 +3240,7 @@ void CShaderManager::SpewVertexAndPixelShaders( void )
 		const ShaderLookup_t &lookup = m_VertexShaderDict[vshIndex];
 		const char *pName = m_ShaderSymbolTable.String( lookup.m_Name );
 		Msg( "vsh 0x%8.8x: static combo:%9d dynamic combos:%6d refcount:%4d \"%s\"\n", vshIndex,
-			( int )lookup.m_nStaticIndex, ( int )lookup.m_ShaderStaticCombos.m_nCount,
+			lookup.m_nStaticIndex, lookup.m_ShaderStaticCombos.m_nCount,
 			lookup.m_nRefCount, pName );
 		totalVertexShaders += lookup.m_ShaderStaticCombos.m_nCount;
 		totalVertexShaderSets++;
@@ -3256,7 +3256,7 @@ void CShaderManager::SpewVertexAndPixelShaders( void )
 		const ShaderLookup_t &lookup = m_PixelShaderDict[pshIndex];
 		const char *pName = m_ShaderSymbolTable.String( lookup.m_Name );
 		Msg( "psh 0x%8.8x: static combo:%9d dynamic combos:%6d refcount:%4d \"%s\"\n", pshIndex,
-			( int )lookup.m_nStaticIndex, ( int )lookup.m_ShaderStaticCombos.m_nCount,
+			lookup.m_nStaticIndex, lookup.m_ShaderStaticCombos.m_nCount,
 			lookup.m_nRefCount, pName );
 		totalPixelShaders += lookup.m_ShaderStaticCombos.m_nCount;
 		totalPixelShaderSets++;
