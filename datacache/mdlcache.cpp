@@ -893,6 +893,13 @@ MDLHandle_t CMDLCache::FindMDL( const char *pMDLRelativePath )
 	V_strncpy( szFixedName, pMDLRelativePath, sizeof( szFixedName ) );
 	V_RemoveDotSlashes( szFixedName, '/' );
 
+	// dimhotepus: Oh, some custom packs have model names like models/humans/male_postures.mdl\r\n :(
+	intp i{V_strlen(szFixedName)};
+	while (--i >= 0 && (szFixedName[i] == '\r' || szFixedName[i] == '\n'))
+	{
+		szFixedName[i] = '\0';
+	}
+
 	MDLHandle_t handle = m_MDLDict.Find( szFixedName );
 	if ( handle == m_MDLDict.InvalidIndex() )
 	{
