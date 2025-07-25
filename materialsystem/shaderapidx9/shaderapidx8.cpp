@@ -189,11 +189,7 @@ enum TransformDirtyBits_t
 
 enum
 {
-#if !defined( _X360 )
 	MAX_NUM_RENDERSTATES = ( D3DRS_BLENDOPALPHA+1 ),
-#else
-	MAX_NUM_RENDERSTATES = D3DRS_MAX,                 
-#endif
 //	MORPH_TARGET_FACTOR_COUNT = VERTEX_SHADER_MORPH_TARGET_FACTOR_COUNT * 4,
 };
 
@@ -316,10 +312,6 @@ enum CommitFunc_t
 	COMMIT_FUNC_CommitFlexWeights,
 	COMMIT_FUNC_CommitSetScissorRect,
 	COMMIT_FUNC_CommitSetViewports,
-
-#if defined( _X360 )
-	COMMIT_FUNC_CommitShaderGPRs,
-#endif
 
 	COMMIT_FUNC_COUNT,
 	COMMIT_FUNC_BYTE_COUNT = ( COMMIT_FUNC_COUNT + 0x7 ) >> 3,
@@ -2368,9 +2360,6 @@ void CShaderAPIDx8::ClearAllCommitFuncs( CommitFuncType_t func, CommitShaderType
 //-----------------------------------------------------------------------------
 void CShaderAPIDx8::CallCommitFuncs( CommitFuncType_t func, CommitShaderType_t shader, bool bForce )
 {
-	// 360 does not have have a FF pipe
-	Assert ( IsPC() || ( IsX360() && shader != COMMIT_FIXED_FUNCTION ) );
-
 	// Don't bother committing anything if we're deactivated
 	if ( IsDeactivated() )
 		return;
@@ -2416,11 +2405,6 @@ static FORCEINLINE void SetSamplerState( IDirect3DDevice9 *pDevice, int stage, D
 {
 	RECORD_SAMPLER_STATE( stage, state, val ); 
 
-#if defined( _X360 )
-	if ( state == D3DSAMP_NOTSUPPORTED )
-		return;
-#endif
-
 	pDevice->SetSamplerState( stage, state, val );
 }
 
@@ -2439,17 +2423,15 @@ inline void CShaderAPIDx8::SetSamplerState( int stage, D3DSAMPLERSTATETYPE state
 //-----------------------------------------------------------------------------
 inline void CShaderAPIDx8::SetTextureStageState( int stage, D3DTEXTURESTAGESTATETYPE state, DWORD val )
 {
-#if !defined( _X360 )
 	if ( IsDeactivated() )
 		return;
 
 	Dx9Device()->SetTextureStageState( stage, state, val );
-#endif
 }
 
 inline void CShaderAPIDx8::SetRenderState( D3DRENDERSTATETYPE state, DWORD val, bool bFlushIfChanged )
 {
-#if ( !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION ) )
+#if !defined( DX_TO_GL_ABSTRACTION )
 	{
 		if ( IsDeactivated() )
 			return;
@@ -2594,7 +2576,7 @@ inline void CShaderAPIDx8::SetScissorRect( const int nLeft, const int nTop, cons
 
 inline void CShaderAPIDx8::SetRenderStateForce( D3DRENDERSTATETYPE state, DWORD val )
 {
-#if ( !defined( _X360 ) && !defined( DX_TO_GL_ABSTRACTION ) )
+#if !defined( DX_TO_GL_ABSTRACTION )
 	{
 		if ( IsDeactivated() )
 			return;
@@ -2656,8 +2638,7 @@ void CShaderAPIDx8::SetStandardVertexShaderConstants( float fOverbright )
 			VERTEX_SHADER_LIGHTS + 5, 
 			// Use COLOR instead of UBYTE4 since Geforce3 does not support it
 			// vConst.w should be 3, but due to about hack, mul by 255 and add epsilon
-			// 360 supports UBYTE4, so no fixup required
-			(IsPC() || !IsX360()) ? 765.01f : 3.0f,
+			765.01f,
 			nModelIndex );	// DX8 has different constant packing
 
 		SetVertexShaderConstant( VERTEX_SHADER_LIGHT_INDEX, standardVertexShaderConstant.Base(), 1 );
@@ -3039,16 +3020,6 @@ void CShaderAPIDx8::ResetDXRenderState( void )
     SetSupportedRenderStateForce( D3DRS_WRAP15, 0 );
     SetSupportedRenderStateForce( D3DRS_BLENDOP, D3DBLENDOP_ADD );
     SetSupportedRenderStateForce( D3DRS_BLENDOPALPHA, D3DBLENDOP_ADD );
-
-#if defined( _X360 )
-	SetSupportedRenderStateForce( D3DRS_HIZENABLE, D3DHIZ_AUTOMATIC );
-	SetSupportedRenderStateForce( D3DRS_HIZWRITEENABLE, D3DHIZ_AUTOMATIC );
-
-	SetSupportedRenderStateForce( D3DRS_HISTENCILENABLE, FALSE );
-	SetSupportedRenderStateForce( D3DRS_HISTENCILWRITEENABLE, FALSE );
-	SetSupportedRenderStateForce( D3DRS_HISTENCILFUNC, D3DHSCMP_EQUAL );
-	SetSupportedRenderStateForce( D3DRS_HISTENCILREF, 0 );
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -3056,33 +3027,7 @@ void CShaderAPIDx8::ResetDXRenderState( void )
 //-----------------------------------------------------------------------------
 bool CShaderAPIDx8::OwnGPUResources( bool bEnable )
 {
-#if defined( _X360 )
-	if ( m_bGPUOwned == bEnable )
-	{
-		return m_bGPUOwned;
-	}
-
-	if ( !bEnable )
-	{
-		Dx9Device()->GpuDisownAll();
-	}
-	else
-	{
-		// owned GPU constants can be set very fast, and must be in blocks of 4
-		// there are 256, but the game only uses 217 (snapped to 220), leaving just enough room for shader literals
-		COMPILE_TIME_ASSERT( VERTEX_SHADER_MODEL + 3*NUM_MODEL_TRANSFORMS == 217 );
-		Dx9Device()->GpuOwnVertexShaderConstantF( 0, AlignValue( VERTEX_SHADER_MODEL + 3*NUM_MODEL_TRANSFORMS, 4 ) );
-		// there are 256, but the game only utilizes 32, leaving lots of room for shader literals
-		Dx9Device()->GpuOwnPixelShaderConstantF( 0, 32 );
-	}
-
-	bool bPrevious = m_bGPUOwned;
-	m_bGPUOwned = bEnable;
-	
-	return bPrevious;
-#else
 	return false;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -3768,7 +3713,6 @@ void CShaderAPIDx8::ForceHardwareSync( void )
 
 	RECORD_COMMAND( DX8_HARDWARE_SYNC, 0 );
 
-#if !defined( _X360 )
 	// How do you query dx9 for how many frames behind the hardware is or, alternatively, how do you tell the hardware to never be more than N frames behind?
 	// 1) The old QueryPendingFrameCount design was removed.  It was
 	// a simple transaction with the driver through the 
@@ -3800,10 +3744,6 @@ void CShaderAPIDx8::ForceHardwareSync( void )
 		UpdateFrameSyncQuery( m_currentSyncQuery, true );
 		VCRSetEnabled( true );
 	} 
-#else
-	DWORD hFence = Dx9Device()->InsertFence();
-	Dx9Device()->BlockOnFence( hFence );
-#endif
 }
 
 
