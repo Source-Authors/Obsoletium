@@ -192,7 +192,7 @@ void CPropPortalStatsDisplay::Spawn( void )
 	m_iSilverObjective = iSilver;
 	m_iGoldObjective = iGold;
 
-	BonusMapChallengeNames( szChallengeFileName.GetForModify(), szChallengeMapName.GetForModify(), szChallengeName.GetForModify() );
+	BonusMapChallengeNames( szChallengeFileName.GetForModify(), szChallengeFileName.Size(), szChallengeMapName.GetForModify(), szChallengeMapName.Size(), szChallengeName.GetForModify(), szChallengeName.Size() );
 
 	m_bEnabled = false;
 
