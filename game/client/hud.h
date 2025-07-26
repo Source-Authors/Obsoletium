@@ -151,7 +151,7 @@ public:
 	void 						MsgFunc_SendAudio(bf_read &msg);
 
 	// Hud Render group
-	int							LookupRenderGroupIndexByName( const char *pszGroupName );
+	intp						LookupRenderGroupIndexByName( const char *pszGroupName );
 	bool						LockRenderGroup( int iGroupIndex, CHudElement *pLocker = NULL );
 	bool						UnlockRenderGroup( int iGroupIndex, CHudElement *pLocker = NULL );
 	bool						IsRenderGroupLockedFor( CHudElement *pHudElement, int iGroupIndex );
