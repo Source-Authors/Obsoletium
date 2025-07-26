@@ -6567,8 +6567,8 @@ void CNPC_Hunter::SetAim( const Vector &aimDir, float flInterval )
 	SetPoseParameter( gm_nAimPitchPoseParam, 0 );
 	SetPoseParameter( gm_nAimYawPoseParam, 0 );
 
-	SetPoseParameter( gm_nBodyPitchPoseParam, clamp( newPitch, -45, 45 ) );
-	SetPoseParameter( gm_nBodyYawPoseParam, clamp( newYaw, -45, 45 ) );
+	SetPoseParameter( gm_nBodyPitchPoseParam, clamp( newPitch, -45.f, 45.f ) );
+	SetPoseParameter( gm_nBodyYawPoseParam, clamp( newYaw, -45.f, 45.f ) );
 }
 
 
@@ -6586,8 +6586,8 @@ void CNPC_Hunter::RelaxAim( float flInterval )
 	SetPoseParameter( gm_nAimPitchPoseParam, 0 );
 	SetPoseParameter( gm_nAimYawPoseParam, 0 );
 
-	SetPoseParameter( gm_nBodyPitchPoseParam, clamp( newPitch, -45, 45 ) );
-	SetPoseParameter( gm_nBodyYawPoseParam, clamp( newYaw, -45, 45 ) );
+	SetPoseParameter( gm_nBodyPitchPoseParam, clamp( newPitch, -45.f, 45.f ) );
+	SetPoseParameter( gm_nBodyYawPoseParam, clamp( newYaw, -45.f, 45.f ) );
 }
 
 
