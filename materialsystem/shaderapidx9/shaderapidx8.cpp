@@ -7016,17 +7016,27 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 	}
 #endif
 
-	RECORD_COMMAND( DX8_CHECK_DEVICE_STATE, 0 );
-	HRESULT hr = Dx9Device()->CheckDeviceState(static_cast<HWND>(m_hWnd));
+	// dimhotepus: No need to check device state here as it 
+	// RECORD_COMMAND( DX8_CHECK_DEVICE_STATE, 0 );
+	// HRESULT hr = Dx9Device()->CheckDeviceState(static_cast<HWND>(m_hWnd));
 	// Possible return values include:
 	// D3D_OK,
-	// D3DERR_DEVICELOST, D3DERR_DEVICEHUNG, D3DERR_DEVICEREMOVED, D3DERR_OUTOFVIDEOMEMORY
-	// S_PRESENT_MODE_CHANGED, or S_PRESENT_OCCLUDED
-	if ( FAILED( hr ) )
-	{
-		MarkDeviceLost();
-		return;
-	}
+	// D3DERR_DEVICELOST,
+	// D3DERR_DEVICEHUNG,
+	// D3DERR_DEVICEREMOVED,
+	// D3DERR_OUTOFVIDEOMEMORY
+	// S_PRESENT_MODE_CHANGED or S_PRESENT_OCCLUDED
+	// if ( hr == D3DERR_DEVICELOST )
+	// {
+	// 	MarkDeviceLost();
+	// 	return;
+	// }
+	// 
+	// if ( hr == D3DERR_DEVICEHUNG )
+	// {
+	// 	MarkDeviceHung();
+	// 	return;
+	// }
 
 	RECORD_COMMAND( DX8_SET_RENDER_TARGET, 3 );
 	RECORD_INT( nRenderTargetID );
@@ -7061,6 +7071,8 @@ void CShaderAPIDx8::SetRenderTargetEx( int nRenderTargetID, ShaderAPITextureHand
 
 		usingTextureTarget = true;
 	}
+
+	HRESULT hr;
 
 	se::win::com::com_ptr<IDirect3DSurface9> pZSurface;
 	if ( depthTextureHandle == SHADER_RENDERTARGET_DEPTHBUFFER )
