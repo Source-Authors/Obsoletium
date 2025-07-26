@@ -2754,11 +2754,11 @@ void CViewRender::ViewDrawScene_PortalStencil( const CViewSetup &viewIn, ViewCus
 		cplane_t glassReflectionPlane;
 		if ( IsReflectiveGlassInView( viewIn, glassReflectionPlane ) )
 		{								    
-			CRefPtr<CReflectiveGlassView> pGlassReflectionView = new CReflectiveGlassView( this );
+			CRefPtr<CReflectiveGlassView> pGlassReflectionView{new CReflectiveGlassView( this )};
 			pGlassReflectionView->Setup( viewIn, VIEW_CLEAR_DEPTH | VIEW_CLEAR_COLOR | VIEW_CLEAR_OBEY_STENCIL, drawSkybox, fogInfo, waterInfo, glassReflectionPlane );
 			AddViewToScene( pGlassReflectionView );
 
-			CRefPtr<CRefractiveGlassView> pGlassRefractionView = new CRefractiveGlassView( this );
+			CRefPtr<CRefractiveGlassView> pGlassRefractionView{new CRefractiveGlassView( this )};
 			pGlassRefractionView->Setup( viewIn, VIEW_CLEAR_DEPTH | VIEW_CLEAR_COLOR | VIEW_CLEAR_OBEY_STENCIL, drawSkybox, fogInfo, waterInfo, glassReflectionPlane );
 			AddViewToScene( pGlassRefractionView );
 		}
@@ -2773,13 +2773,13 @@ void CViewRender::ViewDrawScene_PortalStencil( const CViewSetup &viewIn, ViewCus
 		// We can see water of some sort
 		if ( !fogInfo.m_bEyeInFogVolume )
 		{
-			CRefPtr<CAboveWaterView> pAboveWaterView = new CAboveWaterView( this );
+			CRefPtr<CAboveWaterView> pAboveWaterView{new CAboveWaterView( this )};
 			pAboveWaterView->Setup( viewIn, drawSkybox, fogInfo, waterInfo );
 			AddViewToScene( pAboveWaterView );
 		}
 		else
 		{
-			CRefPtr<CUnderWaterView> pUnderWaterView = new CUnderWaterView( this );
+			CRefPtr<CUnderWaterView> pUnderWaterView{new CUnderWaterView( this )};
 			pUnderWaterView->Setup( viewIn, drawSkybox, fogInfo, waterInfo );
 			AddViewToScene( pUnderWaterView );
 		}
@@ -2818,7 +2818,7 @@ void CViewRender::ViewDrawScene_PortalStencil( const CViewSetup &viewIn, ViewCus
 
 void CViewRender::Draw3dSkyboxworld_Portal( const CViewSetup &view, int &nClearFlags, bool &bDrew3dSkybox, SkyboxVisibility_t &nSkyboxVisible, ITexture *pRenderTarget ) 
 { 
-	CRefPtr<CPortalSkyboxView> pSkyView = new CPortalSkyboxView( this ); 
+	CRefPtr<CPortalSkyboxView> pSkyView{new CPortalSkyboxView( this )}; 
 	if ( ( bDrew3dSkybox = pSkyView->Setup( view, &nClearFlags, &nSkyboxVisible, pRenderTarget ) ) == true )
 	{
 		AddViewToScene( pSkyView );
