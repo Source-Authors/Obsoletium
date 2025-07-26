@@ -1621,7 +1621,7 @@ void C_BaseAnimating::BuildTransformations( CStudioHdr *hdr, Vector *pos, Quater
 				&& pObserverTarget->IsPlayer() 
 				&& static_cast< C_BasePlayer* >( pObserverTarget )->GetRepresentativeRagdoll() == m_pRagdoll )
 			{
-				m_pRagdoll->AcquireOrCopyBoneCache( m_CachedBoneData.Base(), m_CachedBoneData.Count() );
+				m_pRagdoll->AcquireOrCopyBoneCache( m_CachedBoneData );
 }
 		}
 	}
