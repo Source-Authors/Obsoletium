@@ -32,7 +32,7 @@ namespace vgui
 // Purpose: a BuildGroup is a list of panels contained in a window (the contextPanel)
 //			Members of this group are viewable and editable in Build Mode, via the BuildModeDialog wizard
 //-----------------------------------------------------------------------------
-class BuildGroup
+class BuildGroup final
 {
 	DECLARE_HANDLES( BuildGroup, 20 );
 
@@ -44,7 +44,7 @@ public:
 	virtual void SetEnabled(bool state);
 
 	// Check if buildgroup is enabled
-	virtual bool IsEnabled();
+	virtual bool IsEnabled() const;
 
 	// Return the currently selected panel
 	virtual Panel *GetCurrentPanel();
@@ -91,7 +91,7 @@ public:
 	CUtlVector<PHandle> *GetPanelList(); 
 
 	// Get the resource file name used
-	virtual const char *GetResourceName(void) { return m_pResourceName; }
+	virtual const char *GetResourceName(void) const { return m_pResourceName; }
 
 	virtual void PanelAdded(Panel* panel);
 	virtual void PanelRemoved(Panel* panel);
@@ -119,8 +119,8 @@ public:
 	void RegisterControlSettingsFile(const char *controlResourceName, const char *pathID = NULL);
 
 	// iterator for registered files
-	int GetRegisteredControlSettingsFileCount();
-	const char *GetRegisteredControlSettingsFileByIndex(int index);
+	intp GetRegisteredControlSettingsFileCount() const;
+	const char *GetRegisteredControlSettingsFileByIndex(intp index);
 
 	// dialog variables
 	KeyValues *GetDialogVariables();

@@ -128,7 +128,7 @@ void BuildGroup::SetEnabled(bool state)
 //-----------------------------------------------------------------------------
 // Purpose: Check if buildgroup is enabled
 //-----------------------------------------------------------------------------
-bool BuildGroup::IsEnabled()
+bool BuildGroup::IsEnabled() const
 {
 	return _enabled;
 }
@@ -318,7 +318,7 @@ bool BuildGroup::CursorMoved(int x, int y, Panel *panel)
 		}
 		else
 		{
-			for (int i=0; i < _controlGroup.Count(); ++i)
+			for (intp i=0; i < _controlGroup.Count(); ++i)
 			{
 				// now fix offset of member panels with respect to the one we are dragging
 				Panel *groupMember = _controlGroup[i].Get();
@@ -427,7 +427,7 @@ bool BuildGroup::MousePressed(MouseCode code, Panel *panel)
 		Panel *basePanel = NULL;
 		// find the panel we clicked in, that is the base panel
 		// it might already be in the group
-		for (int i=0; i< _controlGroup.Count(); ++i)	
+		for (intp i=0; i< _controlGroup.Count(); ++i)	
 		{
 			if (panel == _controlGroup[i].Get())
 			{
@@ -452,7 +452,7 @@ bool BuildGroup::MousePressed(MouseCode code, Panel *panel)
 		basePanel->GetSize( _dragStartPanelSize[ 0 ], _dragStartPanelSize[ 1 ] );
 
 		// figure out the deltas of the other panels from the base panel
-		for (int i=0; i<_controlGroup.Count(); ++i)
+		for (intp i=0; i<_controlGroup.Count(); ++i)
 		{
 			int cx, cy;
 			_controlGroup[i].Get()->GetPos(cx, cy);
@@ -951,10 +951,10 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 		{
 			// dimhotepus: Do not do costly O(n) lookup every time.
 			static ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
-				if ( cl_hud_minmode.IsValid() && cl_hud_minmode.GetBool() )
-				{
-					rDat->ProcessResolutionKeys( "_minmode" );
-				}
+			if ( cl_hud_minmode.IsValid() && cl_hud_minmode.GetBool() )
+			{
+				rDat->ProcessResolutionKeys( "_minmode" );
+			}
 			bDeleteKeys = true;
 			bShouldCacheKeys = true;
 		}
@@ -1076,7 +1076,7 @@ void BuildGroup::RegisterControlSettingsFile(const char *controlResourceName, co
 //-----------------------------------------------------------------------------
 // Purpose: data accessor / iterator
 //-----------------------------------------------------------------------------
-int BuildGroup::GetRegisteredControlSettingsFileCount()
+intp BuildGroup::GetRegisteredControlSettingsFileCount() const
 {
 	return m_RegisteredControlSettingsFiles.Count();
 }
@@ -1084,7 +1084,7 @@ int BuildGroup::GetRegisteredControlSettingsFileCount()
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-const char *BuildGroup::GetRegisteredControlSettingsFileByIndex(int index)
+const char *BuildGroup::GetRegisteredControlSettingsFileByIndex(intp index)
 {
 	return m_RegisteredControlSettingsFiles[index].String();
 }
@@ -1099,7 +1099,7 @@ void BuildGroup::ReloadControlSettings()
 
 	// loop though objects in the current control group and remove them all
 	// the 0th panel is always the contextPanel which is not deletable 
-	for( int i = 1; i < _panelDar.Count(); i++ )
+	for( intp i = 1; i < _panelDar.Count(); i++ )
 	{	
 		if (!_panelDar[i].Get()) // this can happen if we had two of the same handle in the list
 		{
@@ -1197,7 +1197,7 @@ void BuildGroup::DeleteAllControlsCreatedByControlSettingsFile()
 {
 	// loop though objects in the current control group and remove them all
 	// the 0th panel is always the contextPanel which is not deletable 
-	for ( int i = 1; i < _panelDar.Count(); i++ )
+	for ( intp i = 1; i < _panelDar.Count(); i++ )
 	{	
 		if (!_panelDar[i].Get()) // this can happen if we had two of the same handle in the list
 		{
@@ -1240,7 +1240,7 @@ void BuildGroup::ApplySettings( KeyValues *resourceData )
 		char const *keyName = controlKeys->GetName();
 
 		// check to see if any buildgroup panels have this name
-		for ( int i = 0; i < _panelDar.Count(); i++ )
+		for ( intp i = 0; i < _panelDar.Count(); i++ )
 		{
 			Panel *panel = _panelDar[i].Get();
 
@@ -1386,7 +1386,7 @@ void BuildGroup::GetNewFieldName(char *newFieldName, int newFieldNameSize, Panel
 //-----------------------------------------------------------------------------
 Panel *BuildGroup::FieldNameTaken(const char *fieldName)
 {	 	
-	for ( int i = 0; i < _panelDar.Count(); i++ )
+	for ( intp i = 0; i < _panelDar.Count(); i++ )
 	{
 		Panel *panel = _panelDar[i].Get();
 		if ( !panel )
@@ -1406,7 +1406,7 @@ Panel *BuildGroup::FieldNameTaken(const char *fieldName)
 void BuildGroup::GetSettings( KeyValues *resourceData )
 {
 	// loop through all the objects getting their settings
-	for( int i = 0; i < _panelDar.Count(); i++ )
+	for( intp i = 0; i < _panelDar.Count(); i++ )
 	{
 		Panel *panel = _panelDar[i].Get();
 		if (!panel)
@@ -1452,8 +1452,7 @@ void BuildGroup::GetSettings( KeyValues *resourceData )
 void BuildGroup::RemoveSettings()
 {	
 	// loop though objects in the current control group and remove them all
-	int i;
-	for( i = 0; i < _controlGroup.Count(); i++ )
+	for( intp i = 0; i < _controlGroup.Count(); i++ )
 	{		
 		// only delete delatable panels
 		if ( _controlGroup[i].Get()->IsBuildModeDeletable())
@@ -1465,9 +1464,9 @@ void BuildGroup::RemoveSettings()
 	}
 	
 	// remove deleted panels from the handle list
-	for( i = 0; i < _panelDar.Count(); i++ )
+	for( intp i = 0; i < _panelDar.Count(); i++ )
 	{
-		if ( !_panelDar[i].Get() )	
+		if ( !_panelDar[i].Get() )
 		{	
 		  _panelDar.Remove(i);
 		  --i;
