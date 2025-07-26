@@ -60,7 +60,7 @@ const char *g_PinCornerStrings [] =
 
 COMPILE_TIME_ASSERT( Panel::PIN_LAST == ssize( g_PinCornerStrings ) );
 
-extern int GetBuildModeDialogCount();
+extern intp GetBuildModeDialogCount();
 
 #ifdef STAGING_ONLY
 ConVar tf_strict_mouse_up_events( "tf_strict_mouse_up_events", "0", FCVAR_ARCHIVE, "Only allow Mouse-Release events to happens on panels we also Mouse-Downed in" );
