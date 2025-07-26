@@ -191,7 +191,7 @@ public:
 	void Add( BuildModeDialog *pDlg );
 	void Remove( BuildModeDialog *pDlg );
 
-	int Count() const;
+	intp Count() const;
 
 private:
 	CUtlVector< BuildModeDialog * > m_vecBuildDialogs;
@@ -212,12 +212,12 @@ void CBuildModeDialogMgr::Remove( BuildModeDialog *pDlg )
 	m_vecBuildDialogs.FindAndRemove( pDlg );
 }
 
-int CBuildModeDialogMgr::Count() const
+intp CBuildModeDialogMgr::Count() const
 {
 	return m_vecBuildDialogs.Count();
 }
 
-int GetBuildModeDialogCount()
+intp GetBuildModeDialogCount()
 {
 	return g_BuildModeDialogMgr.Count();
 }
@@ -339,14 +339,13 @@ private:
 //-----------------------------------------------------------------------------
 void BuildModeDialog::CreateControls()
 {
-	int i;
 	m_pPanelList = new PanelList;
 	m_pPanelList->m_pResourceData = new KeyValues( "BuildDialog" );
 	m_pPanelList->m_pControls = new PanelListPanel(this, "BuildModeControls");
 
 	// file to edit combo box is first
 	m_pFileSelectionCombo = new ComboBox(this, "FileSelectionCombo", 10, false);
-	for ( i = 0; i < m_pBuildGroup->GetRegisteredControlSettingsFileCount(); i++)
+	for ( intp i = 0; i < m_pBuildGroup->GetRegisteredControlSettingsFileCount(); i++)
 	{
 		m_pFileSelectionCombo->AddItem(m_pBuildGroup->GetRegisteredControlSettingsFileByIndex(i), NULL);
 	}
@@ -390,12 +389,12 @@ void BuildModeDialog::CreateControls()
 	// Sort the names
 	CUtlRBTree< char const *, int > sorted( 0, 0, StringLessThan );
 
-	for ( i = 0; i < names.Count(); ++i )
+	for ( intp i = 0; i < names.Count(); ++i )
 	{
 		sorted.Insert( names[ i ] );
 	}
 
-	for ( i = sorted.FirstInorder(); i != sorted.InvalidIndex(); i = sorted.NextInorder( i ) )
+	for ( auto i = sorted.FirstInorder(); i != sorted.InvalidIndex(); i = sorted.NextInorder( i ) )
 	{
 		m_pAddNewControlCombo->AddItem( sorted[ i ], NULL );
 	}
