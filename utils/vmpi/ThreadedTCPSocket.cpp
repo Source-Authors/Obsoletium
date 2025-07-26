@@ -4,6 +4,7 @@
 
 #include "IThreadedTCPSocket.h"
 
+#define NOMINMAX
 #include <winsock2.h>
 #include <mswsock.h>
 #include <system_error>
@@ -811,7 +812,7 @@ public:
 		fd_set readSet = {};
 		readSet.fd_count = 1;
 		readSet.fd_array[0] = m_Socket;
-		TIMEVAL timeVal = {0, static_cast<long>(min(LONG_MAX, milliseconds*1000))};
+		TIMEVAL timeVal = {0, static_cast<long>(min(LONG_MAX, static_cast<long>(milliseconds*1000)))};
 
 		// Wait until it connects.
 		int status = select( 0, &readSet, NULL, NULL, &timeVal );
@@ -973,7 +974,7 @@ public:
 		// Ok, see if we're connected now.
 		if ( !m_bConnected )
 		{
-			TIMEVAL timeVal = { 0, static_cast<long>(min(LONG_MAX, milliseconds*1000)) };
+			TIMEVAL timeVal = { 0, static_cast<long>(min(LONG_MAX, static_cast<long>(milliseconds*1000))) };
 			
 			fd_set writeSet = {};
 			writeSet.fd_count = 1;
