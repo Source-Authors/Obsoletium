@@ -284,7 +284,7 @@ void AnimationController::SetupPosition( AnimCmdAnimate_t& cmd, float *output, c
 //-----------------------------------------------------------------------------
 // Purpose: parses a script into sequences
 //-----------------------------------------------------------------------------
-bool AnimationController::ParseScriptFile(char *pMem, int length)
+bool AnimationController::ParseScriptFile(char *pMem, intp length)
 {
 	// get the scheme (for looking up color names)
 	IScheme *scheme = vgui::scheme()->GetIScheme(GetScheme());
