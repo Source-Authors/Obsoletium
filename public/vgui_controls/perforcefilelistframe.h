@@ -66,8 +66,8 @@ public:
 	void DoModal( KeyValues *pContextKeyValues = NULL, const char *pMessage = NULL );
 
 	// Retrieves the number of files, the file names, and operations
-	int GetOperationCount();
-	const char *GetFileName( int i );
+	intp GetOperationCount();
+	const char *GetFileName( intp i );
 	const char *GetOperation( int i );
 
 	// Retreives the description (only if it was shown)
