@@ -237,7 +237,7 @@ public:
 		}
 	}
 
-	virtual int AddMenuItem(const char *itemName, const char *itemText, const char *command, Panel *target, KeyValues *userData = NULL)
+	int AddMenuItem(const char *itemName, const char *itemText, const char *command, Panel *target, const KeyValues *userData = NULL) override
 	{
 		MenuItem *item = new CGameMenuItem(this, itemName);
 		item->AddActionSignalTarget(target);
@@ -247,7 +247,7 @@ public:
 		return BaseClass::AddMenuItem(item);
 	}
 
-	virtual int AddMenuItem(const char *itemName, const char *itemText, KeyValues *command, Panel *target, KeyValues *userData = NULL)
+	int AddMenuItem(const char *itemName, const char *itemText, KeyValues *command, Panel *target, const KeyValues *userData = NULL) override
 	{
 		CGameMenuItem *item = new CGameMenuItem(this, itemName);
 		item->AddActionSignalTarget(target);

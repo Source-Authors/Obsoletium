@@ -292,8 +292,7 @@ int FileCompletionEdit::GetItemIDFromRow(int row)
 
 int FileCompletionEdit::GetRowFromItemID(int itemID)
 {
-	int i;
-	for (i=0;i<GetItemCount();i++)
+	for (int i=0;i<GetItemCount();i++)
 	{
 		if (m_pDropDown->GetMenuID(i) == itemID)
 			return i;
