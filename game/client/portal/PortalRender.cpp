@@ -468,7 +468,7 @@ bool CPortalRender::DrawPortalsUsingStencils( CViewRender *pViewRender )
 	int iNumRenderablePortals = m_ActivePortals.Count();
 
 	// This loop is necessary because tools can suppress rendering without telling the portal system
-	CUtlVector< CPortalRenderable* > actualActivePortals( 0, iNumRenderablePortals );
+	CUtlVector< CPortalRenderable* > actualActivePortals( (intp)0, iNumRenderablePortals );
 	for ( int i = 0; i < iNumRenderablePortals; ++i )
 	{
 		CPortalRenderable *pPortalRenderable = m_ActivePortals[i];
