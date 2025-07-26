@@ -22,6 +22,11 @@
 #include <dxgidebug.h>
 #endif
 
+#if defined(_DEBUG)
+// dimhotepus: For WKPDID_D3DDebugObjectName
+#pragma comment(lib, "dxguid.lib")
+#endif
+
 #include "windows/com_error_category.h"
 
 // NOTE: This has to be the last file included!
