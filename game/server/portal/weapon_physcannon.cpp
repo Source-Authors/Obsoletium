@@ -680,7 +680,7 @@ float CGrabController::ComputeError()
 		QAngle playerAngles = pPortalPlayer->EyeAngles();
 
 		float pitch = AngleDistance(playerAngles.x,0);
-		playerAngles.x = clamp( pitch, -75, 75 );
+		playerAngles.x = clamp( pitch, -75.f, 75.f );
 		AngleVectors( playerAngles, &forward, &right, &up );
 
 		Vector start = pPortalPlayer->Weapon_ShootPosition();
@@ -1178,7 +1178,7 @@ void CPlayerPickupController::Init( CBasePlayer *pPlayer, CBaseEntity *pObject )
 	m_grabController.AttachEntity( pPlayer, pObject, pPhysics, false, vec3_origin, false );
 #ifdef WIN32
 	// NVNT apply a downward force to simulate the mass of the held object.
-	HapticSetConstantForce(m_pPlayer,clamp(m_grabController.GetLoadWeight()*0.1,1,6)*Vector(0,-1,0));
+	HapticSetConstantForce(m_pPlayer,clamp(m_grabController.GetLoadWeight()*0.1f,1.f,6.f)*Vector(0,-1,0));
 #endif	
 	m_pPlayer->m_Local.m_iHideHUD |= HIDEHUD_WEAPONSELECTION;
 	m_pPlayer->SetUseEntity( this );
@@ -1298,7 +1298,7 @@ void CPlayerPickupController::Use( CBaseEntity *pActivator, CBaseEntity *pCaller
 
 			((CPortal_Player *)m_pPlayer)->SetHeldObjectOnOppositeSideOfPortal( false );
 			// JAY: Scale this with mass because some small objects really go flying
-			float massFactor = clamp( pPhys->GetMass(), 0.5, 15 );
+			float massFactor = clamp( pPhys->GetMass(), 0.5f, 15.f );
 			massFactor = RemapVal( massFactor, 0.5, 15, 0.5, 4 );
 			vecLaunch *= player_throwforce.GetFloat() * massFactor;
 
@@ -2570,7 +2570,7 @@ bool CWeaponPhysCannon::AttachObject( CBaseEntity *pObject, const Vector &vPosit
 	{
 #ifdef WIN32
 		// NVNT set the players constant force to simulate holding mass
-		HapticSetConstantForce(pOwner,clamp(m_grabController.GetLoadWeight()*0.05,1,5)*Vector(0,-1,0));
+		HapticSetConstantForce(pOwner,clamp(m_grabController.GetLoadWeight()*0.05f,1.f,5.f)*Vector(0,-1,0));
 #endif
 		pOwner->EnableSprint( false );
 
@@ -2890,11 +2890,11 @@ bool CGrabController::UpdateObject( CBasePlayer *pPlayer, float flError )
 	float pitch = AngleDistance(playerAngles.x,0);
 	if( !m_bAllowObjectOverhead )
 	{
-		playerAngles.x = clamp( pitch, -75, 75 );
+		playerAngles.x = clamp( pitch, -75.f, 75.f );
 	}
 	else
 	{
-		playerAngles.x = clamp( pitch, -90, 75 );
+		playerAngles.x = clamp( pitch, -90.f, 75.f );
 	}
 	AngleVectors( playerAngles, &forward, &right, &up );
 
