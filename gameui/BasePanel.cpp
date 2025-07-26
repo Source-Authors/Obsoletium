@@ -125,7 +125,7 @@ CGameMenuItem::CGameMenuItem(vgui::Menu *parent, const char *name)  : BaseClass(
 void CGameMenuItem::ApplySchemeSettings(IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
-
+	
 	// dimhotepus: Large screens friendly menu.
 	SetProportional(true);
 
@@ -184,7 +184,7 @@ public:
 	void ApplySchemeSettings(IScheme *pScheme) override
 	{
 		BaseClass::ApplySchemeSettings(pScheme);
-
+		
 		// dimhotepus: Large screens friendly menu.
 		const int menuItemHeight = scheme()->GetProportionalScaledValueEx
 		(
@@ -573,8 +573,6 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 	m_BackdropColor = Color(0, 0, 0, 128);
 	m_pConsoleAnimationController = NULL;
 	m_pConsoleControlSettings = NULL;
-	m_bCopyFrameBuffer = false;
-	m_bUseRenderTargetImage = false;
 	m_ExitingFrameCount = 0;
 	m_bXUIVisible = false;
 	m_bUseMatchmaking = false;
@@ -589,9 +587,7 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 	m_pAsyncJob = NULL;
 	m_pStorageDeviceValidatedNotify = NULL;
 
-	m_iRenderTargetImageID = -1;
 	m_iBackgroundImageID = -1;
-	m_iProductImageID = -1;
 	m_iLoadingImageID = -1;
 
 	m_pGameMenuButtons.AddToTail( CreateMenuButton( this, "GameMenuButton", ModInfo().GetGameTitle() ) );
@@ -647,22 +643,10 @@ CBasePanel::~CBasePanel()
 
 	if ( vgui::surface() )
 	{
-		if ( m_iRenderTargetImageID != -1 )
-		{
-			vgui::surface()->DestroyTextureID( m_iRenderTargetImageID );
-			m_iRenderTargetImageID = -1;
-		}
-
 		if ( m_iBackgroundImageID != -1 )
 		{
 			vgui::surface()->DestroyTextureID( m_iBackgroundImageID );
 			m_iBackgroundImageID = -1;
-		}
-
-		if ( m_iProductImageID != -1 )
-		{
-			vgui::surface()->DestroyTextureID( m_iProductImageID );
-			m_iProductImageID = -1;
 		}
 
 		if ( m_iLoadingImageID != -1 )
@@ -737,7 +721,7 @@ static int CC_GameMenuCompletionFunc( char const *partial, char commands[ COMMAN
 		if ( symbols.Count() >= COMMAND_COMPLETION_MAXITEMS )
 			break;
 	}
-
+	
 	char buf[ 512 ];
 	// Now fill in the results
 	int slot = 0;
@@ -941,8 +925,6 @@ void CBasePanel::SetBackgroundRenderState(EBackgroundState state)
 
 	if ( state == BACKGROUND_EXITING )
 	{
-		// hide the menus
-		m_bCopyFrameBuffer = false;
 	}
 	else if ( state == BACKGROUND_DISCONNECTED || state == BACKGROUND_MAINMENU )
 	{
@@ -1331,9 +1313,9 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 	bool bIsWidescreen = aspectRatio >= 1.5999f;
 
 	// work out which background image to use
-		// pc uses blurry backgrounds based on the background level
+	// pc uses blurry backgrounds based on the background level
 	char background[MAX_PATH], filename[MAX_PATH];
-		engine->GetMainMenuBackgroundName( background, sizeof(background) );
+	engine->GetMainMenuBackgroundName( background, sizeof(background) );
 	V_sprintf_safe( filename, "console/%s%s", background, ( bIsWidescreen ? "_widescreen" : "" ) );
 
 	if ( m_iBackgroundImageID == -1 )
@@ -1464,7 +1446,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "OpenLoadCommentaryDialog" ) )
 	{
-		OnOpenLoadCommentaryDialog();	
+		OnOpenLoadCommentaryDialog();
 	}
 	else if ( !Q_stricmp( command, "OpenLoadSingleplayerCommentaryDialog" ) )
 	{
@@ -1477,15 +1459,15 @@ void CBasePanel::RunMenuCommand(const char *command)
 	else if ( !Q_stricmp( command, "OpenAchievementsDialog" ) )
 	{
 #ifndef NO_STEAM
-			if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
-			{
-				vgui::MessageBox *pMessageBox = new vgui::MessageBox("#GameUI_Achievements_SteamRequired_Title", "#GameUI_Achievements_SteamRequired_Message");
-				pMessageBox->DoModal();
-				return;
-			}
-#endif
-			OnOpenAchievementsDialog();
+		if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
+		{
+			vgui::MessageBox *pMessageBox = new vgui::MessageBox("#GameUI_Achievements_SteamRequired_Title", "#GameUI_Achievements_SteamRequired_Message");
+			pMessageBox->DoModal();
+			return;
 		}
+#endif
+		OnOpenAchievementsDialog();
+	}
     //=============================================================================
     // HPE_BEGIN:
     // [dwenger] Use cs-specific achievements dialog
@@ -1493,15 +1475,15 @@ void CBasePanel::RunMenuCommand(const char *command)
 
     else if ( !Q_stricmp( command, "OpenCSAchievementsDialog" ) )
     {
-            if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
-            {
-                vgui::MessageBox *pMessageBox = new vgui::MessageBox("#GameUI_Achievements_SteamRequired_Title", "#GameUI_Achievements_SteamRequired_Message", this );
-                pMessageBox->DoModal();
-                return;
-            }
-
-			OnOpenCSAchievementsDialog();
+        if ( !steamapicontext->SteamUser() || !steamapicontext->SteamUser()->BLoggedOn() )
+        {
+            vgui::MessageBox *pMessageBox = new vgui::MessageBox("#GameUI_Achievements_SteamRequired_Title", "#GameUI_Achievements_SteamRequired_Message", this );
+            pMessageBox->DoModal();
+            return;
         }
+
+		OnOpenCSAchievementsDialog();
+    }
     //=============================================================================
     // HPE_END
     //=============================================================================
@@ -1640,23 +1622,23 @@ void CBasePanel::RunMenuCommand(const char *command)
 		// Set Steam URL for re-launch in registry. Launcher will check this
 		// registry key and exec it in order to re-load the game in the proper language
 #if defined( WIN32 )
-			HKEY hKey;
+		HKEY hKey;
 
 		if ( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_WRITE, &hKey) == ERROR_SUCCESS )
-			{
-				RegSetValueEx( hKey, "Relaunch URL", 0, REG_SZ, (const unsigned char *)szSteamURL, sizeof( szSteamURL ) );
+		{
+			RegSetValueEx( hKey, "Relaunch URL", 0, REG_SZ, (const unsigned char *)szSteamURL, sizeof( szSteamURL ) );
 
-				RegCloseKey(hKey);
-			}
-#elif defined( OSX ) || defined( LINUX )
-			FILE *fp = fopen( "/tmp/hl2_relaunch", "w+" );
-			if ( fp )
-			{
-				fprintf( fp, "%s\n", szSteamURL );
-			}
-			fclose( fp );
-#endif
+			RegCloseKey(hKey);
 		}
+#elif defined( OSX ) || defined( LINUX )
+		FILE *fp = fopen( "/tmp/hl2_relaunch", "w+" );
+		if ( fp )
+		{
+			fprintf( fp, "%s\n", szSteamURL );
+		}
+		fclose( fp );
+#endif
+	}
 	else
 	{
 		BaseClass::OnCommand( command);
@@ -2033,18 +2015,7 @@ void CBasePanel::IssuePostPromptCommand( void )
 	// The device is valid, so launch any pending commands
 	if ( m_strPostPromptCommand.IsEmpty() == false )
 	{
-		if ( m_bSinglePlayer )
-		{
-			OnCommand( m_strPostPromptCommand );
-		}
-		else
-		{
-			CMatchmakingBasePanel *pMatchMaker = GetMatchmakingBasePanel();
-			if ( pMatchMaker )
-			{
-				pMatchMaker->OnCommand( m_strPostPromptCommand );
-			}
-		}
+		OnCommand( m_strPostPromptCommand );
 	}
 }
 
@@ -3844,7 +3815,7 @@ void CMessageDialogHandler::PositionDialog( vgui::PHandle dlg, int wide, int tal
 	int w, t;
 	dlg->GetSize(w, t);
 	dlg->SetPos( (wide - w) / 2, (tall - t) / 2 );
-}			
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Editable panel that can replace the GameMenuButtons in CBasePanel
