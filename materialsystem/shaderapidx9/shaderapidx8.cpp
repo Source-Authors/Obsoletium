@@ -10450,7 +10450,7 @@ void CShaderAPIDx8::HandleDeviceLost()
 		}
 	}
 
-	CheckDeviceLost( m_bOtherAppInitializing );
+	CheckDeviceState( m_bOtherAppInitializing );
 
 	if ( !IsDeactivated() )
 	{

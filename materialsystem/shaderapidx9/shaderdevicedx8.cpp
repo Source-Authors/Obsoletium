@@ -1442,6 +1442,7 @@ CShaderDeviceDx8::CShaderDeviceDx8()
 	m_currentSyncQuery = 0;
 
 	m_bQueuedDeviceLost = false;
+	m_bQueuedDeviceHung = false;
 	m_DeviceState = DEVICE_STATE_OK;
 	m_bOtherAppInitializing = false;
 	m_IsResizing = false;
@@ -2134,8 +2135,6 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 	m_d3d9_device_ex = new CStubD3DDevice( d3d9ex_device, g_pFullFileSystem );
 #endif
 
-	// CheckDeviceLost();
-
 	// Tell all other instances of the material system it's ok to grab memory
 	SendIPCMessage( REACQUIRE_MESSAGE );
 
@@ -2144,6 +2143,7 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 	m_DeviceState = DEVICE_STATE_OK;
 	m_bIsMinimized = false;
 	m_bQueuedDeviceLost = false;
+	m_bQueuedDeviceHung = false;
 
 	m_IsResizing = info.m_bWindowed && info.m_bResizing;
 
@@ -2328,7 +2328,7 @@ void CShaderDeviceDx8::OtherAppInitializing( bool initializing )
 
 	// NOTE: OtherApp is set in this way because we need to know we're
 	// active as we release and restore everything
-	CheckDeviceLost( initializing );
+	CheckDeviceState( initializing );
 
 	if ( !IsDeactivated() )
 	{
@@ -2386,7 +2386,7 @@ bool CShaderDeviceDx8::TryDeviceReset()
 	// FIXME: Make this rebuild the Dx9Device from scratch!
 	// Helps with compatibility
 	const HRESULT hr{ D3D9Device()->Reset( &m_PresentParameters ) };
-	bool bResetSuccess = SUCCEEDED(hr);
+	bool bResetSuccess = SUCCEEDED( hr );
 	if ( !bResetSuccess )
 	{
 		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::Reset failed w/e %s.\n",
@@ -2398,8 +2398,11 @@ bool CShaderDeviceDx8::TryDeviceReset()
 	{
 		// Possible return values include:
 		// D3D_OK,
-		// D3DERR_DEVICELOST, D3DERR_DEVICEHUNG, D3DERR_DEVICEREMOVED, D3DERR_OUTOFVIDEOMEMORY
-		// S_PRESENT_MODE_CHANGED, or S_PRESENT_OCCLUDED
+		// D3DERR_DEVICELOST,
+		// D3DERR_DEVICEHUNG,
+		// D3DERR_DEVICEREMOVED,
+		// D3DERR_OUTOFVIDEOMEMORY
+		// S_PRESENT_MODE_CHANGED or S_PRESENT_OCCLUDED
 		bResetSuccess = SUCCEEDED( D3D9Device()->CheckDeviceState(static_cast<HWND>(m_hWnd)) );
 		if ( bResetSuccess )
 		{
@@ -2562,11 +2565,25 @@ void CShaderDeviceDx8::MarkDeviceLost( )
 
 
 //-----------------------------------------------------------------------------
+// Queue up the fact that the device was hung
+//-----------------------------------------------------------------------------
+void CShaderDeviceDx8::MarkDeviceHung( )
+{
+	m_bQueuedDeviceHung = true;
+}
+
+
+//-----------------------------------------------------------------------------
 // Checks if the device was lost
 //-----------------------------------------------------------------------------
 ConVar mat_forcelostdevice( "mat_forcelostdevice", "0" );
 
-void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
+//-----------------------------------------------------------------------------
+// dimhotepus: Checks if the device was hung
+//-----------------------------------------------------------------------------
+ConVar mat_forcehungdevice( "mat_forcehungdevice", "0" );
+
+void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 {
 	// FIXME: We could also queue up if WM_SIZE changes and look at that
 	// but that seems to only make sense if we have resizable windows where 
@@ -2582,6 +2599,12 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 		mat_forcelostdevice.SetValue( 0 );
 		MarkDeviceLost();
 	}
+
+	if ( mat_forcehungdevice.GetBool() )
+	{
+		mat_forcehungdevice.SetValue( 0 );
+		MarkDeviceHung();
+	}
 #endif
 	
 	HRESULT hr = D3D_OK;
@@ -2589,7 +2612,7 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
 	if ( m_DeviceState == DEVICE_STATE_OK )
 	{
-		// Steady state - PresentEx return value will mark us lost if necessary.
+		// Steady state - PresentEx return value will mark us lost or hung if necessary.
 		// We do not care if we are minimized in this state.
 		m_bIsMinimized = false;
 	}
@@ -2599,30 +2622,57 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 		RECORD_COMMAND( DX8_CHECK_DEVICE_STATE, 0 );
 		// Possible return values include:
 		// D3D_OK,
-		// D3DERR_DEVICELOST, D3DERR_DEVICEHUNG, D3DERR_DEVICEREMOVED, D3DERR_OUTOFVIDEOMEMORY
-		// S_PRESENT_MODE_CHANGED, or S_PRESENT_OCCLUDED
+		// D3DERR_DEVICELOST,
+		// D3DERR_DEVICEHUNG,
+		// D3DERR_DEVICEREMOVED,
+		// D3DERR_OUTOFVIDEOMEMORY
+		// S_PRESENT_MODE_CHANGED or S_PRESENT_OCCLUDED
 		hr = D3D9Device()->CheckDeviceState(static_cast<HWND>(m_hWnd));
 	}
+
+	DeviceState_t newDeviceState = DEVICE_STATE_OK;
 
 	// If some other call returned device lost previously in the frame, spoof the return value from CDS
 	if ( m_bQueuedDeviceLost )
 	{
 		hr = FAILED( hr ) ? hr : D3DERR_DEVICENOTRESET;
 		m_bQueuedDeviceLost = false;
+
+		newDeviceState = DEVICE_STATE_LOST_DEVICE;
+	}
+	else if ( hr == D3DERR_DEVICELOST )
+	{
+		newDeviceState = DEVICE_STATE_LOST_DEVICE;
+	}
+
+	// If some other call returned device hung previously in the frame, spoof the return value from CDS
+	if ( m_bQueuedDeviceHung )
+	{
+		hr = FAILED( hr ) ? hr : D3DERR_DEVICENOTRESET;
+		m_bQueuedDeviceHung = false;
+
+		newDeviceState = DEVICE_STATE_HUNG_DEVICE;
+	}
+	else if ( hr == D3DERR_DEVICEHUNG )
+	{
+		newDeviceState = DEVICE_STATE_HUNG_DEVICE;
 	}
 
 	if ( m_DeviceState == DEVICE_STATE_OK )
 	{
 		// We can transition out of ok if bOtherAppInitializing is set
-		// or if we become minimized, or if CDS returns anything other than D3D_OK.
-		if ( FAILED( hr ) || m_bIsMinimized )
+		// or if we become minimized, or if CDS returns D3DERR_DEVICELOST, D3DERR_DEVICEHUNG or D3DERR_DEVICENOTRESET.
+		if ( hr == D3DERR_DEVICELOST ||
+			 hr == D3DERR_DEVICEHUNG ||
+			 hr == D3DERR_DEVICENOTRESET ||
+			 m_bIsMinimized )
 		{
 			// purge unreferenced materials
 			g_pShaderUtil->UncacheUnusedMaterials( true );
 
 			// We were ok, now we're not. Release resources
 			ReleaseResources();
-			m_DeviceState = DEVICE_STATE_LOST_DEVICE; 
+			m_DeviceState = newDeviceState;
 		}
 		else if ( bOtherAppInitializing )
 		{
@@ -2635,23 +2685,24 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 		}
 	}
 
-	// Immediately checking devicelost after ok helps in the case where we got D3DERR_DEVICENOTRESET
-	// in which case we want to immdiately try to switch out of DEVICE_STATE_LOST and into DEVICE_STATE_NEEDS_RESET
-	if ( m_DeviceState == DEVICE_STATE_LOST_DEVICE )
+	// Immediately checking device lost / hung after ok helps in the case where we got D3DERR_DEVICENOTRESET
+	// in which case we want to immediately try to switch out of DEVICE_STATE_LOST_DEVICE or
+	// DEVICE_STATE_HUNG_DEVICE and into DEVICE_STATE_NEEDS_RESET
+	if ( m_DeviceState == DEVICE_STATE_LOST_DEVICE || m_DeviceState == DEVICE_STATE_HUNG_DEVICE )
 	{
-		// We can only try to reset if we're not minimized and not lost
-		if ( !m_bIsMinimized && hr != D3DERR_DEVICELOST )
+		// We can only try to reset if we're not minimized and not lost and not hung
+		if ( !m_bIsMinimized && hr != D3DERR_DEVICELOST && hr != D3DERR_DEVICEHUNG )
 		{
-			m_DeviceState = DEVICE_STATE_NEEDS_RESET; 
+			m_DeviceState = DEVICE_STATE_NEEDS_RESET;
 		}
 	}
 
 	// Immediately checking needs reset also helps for the case where we got D3DERR_DEVICENOTRESET
 	if ( m_DeviceState == DEVICE_STATE_NEEDS_RESET )
 	{
-		if ( ( hr == D3DERR_DEVICELOST ) || m_bIsMinimized )
+		if ( hr == D3DERR_DEVICELOST || hr == D3DERR_DEVICEHUNG || m_bIsMinimized )
 		{
-			m_DeviceState = DEVICE_STATE_LOST_DEVICE; 
+			m_DeviceState = newDeviceState;
 		}
 		else
 		{
@@ -2675,9 +2726,9 @@ void CShaderDeviceDx8::CheckDeviceLost( bool bOtherAppInitializing )
 
 	if ( m_DeviceState == DEVICE_STATE_OTHER_APP_INIT )
 	{
-		if ( FAILED( hr ) || m_bIsMinimized )
+		if ( hr == D3DERR_DEVICELOST || hr == D3DERR_DEVICEHUNG || m_bIsMinimized )
 		{
-			m_DeviceState = DEVICE_STATE_LOST_DEVICE; 
+			m_DeviceState = newDeviceState;
 		}
 		else if ( !bOtherAppInitializing )
 		{
@@ -2744,7 +2795,7 @@ void CShaderDeviceDx8::Present()
 	if ( !IsDeactivated() )
 	{
 		hr = D3D9Device()->EndScene();
-		if (FAILED(hr))
+		if ( FAILED(hr) )
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
@@ -2763,7 +2814,7 @@ void CShaderDeviceDx8::Present()
 			bValidPresent = false;
 		}
 		// check for lost device early in threaded mode
-		CheckDeviceLost( m_bOtherAppInitializing );
+		CheckDeviceState( m_bOtherAppInitializing );
 		if ( m_DeviceState != DEVICE_STATE_OK )
 		{
 			bValidPresent = false;
@@ -2779,11 +2830,11 @@ void CShaderDeviceDx8::Present()
 			 m_PresentParameters.SwapEffect == D3DSWAPEFFECT_COPY )
 		{
 			RECT destRect;
-			#ifndef DX_TO_GL_ABSTRACTION
-					GetClientRect( ( HWND )m_ViewHWnd, &destRect );
-			#else
-					toglGetClientRect( (VD3DHWND)m_ViewHWnd, &destRect );
-			#endif
+#ifndef DX_TO_GL_ABSTRACTION
+			GetClientRect( ( HWND )m_ViewHWnd, &destRect );
+#else
+			toglGetClientRect( (VD3DHWND)m_ViewHWnd, &destRect );
+#endif
 
 			ShaderViewport_t viewport;
 			g_pShaderAPI->GetViewports( &viewport, 1 );
@@ -2800,35 +2851,52 @@ void CShaderDeviceDx8::Present()
 		{
 			hr = D3D9Device()->PresentEx( nullptr, nullptr, nullptr, nullptr, 0 );
 		}
-	}
 
-	if constexpr ( IsWindows() )
-	{
-		// Sometimes the API calls get loaded into a command buffer and are batched up to be sent
-		// to the GPU (see https://learn.microsoft.com/en-us/windows/win32/direct3d9/accurately-profiling-direct3d-api-calls).
-		// In this case, the errors cannot be relayed to the application when action needs to be
-		// taken, so the error code is consumed by the runtime and a note is made on the device
-		// object that this happened.
-		// 
-		// Later when the application invokes IDirect3DDevice9(Ex)::Present(Ex),
-		// IDirect3DDevice9(Ex)::Present(Ex) will return D3DERR_DRIVERINTERNALERROR.  This is why
-		// the best approach for an application to take when receiving a
-		// D3DERR_DRIVERINTERNALERROR from IDirect3DDevice9::Present is to destroy and recreate the
-		// device.
-		// 
-		// See https://learn.microsoft.com/en-us/windows/win32/direct3d9/driver-internal-errors
-		if ( hr == D3DERR_DRIVERINTERNALERROR )
+		if constexpr ( IsWindows() )
 		{
-			/*	Usually this bug means that the driver has run out of internal video
-				memory, due to leaking it slowly over several application restarts. 
-			*/
-			Error( "GPU internal driver error at Present.\n"
-				   "You're likely out of OS Paged Pool Memory! For more info, see\n"
-				   "https://help.steampowered.com/\n" );
-		}
-		else if ( hr == D3DERR_DEVICELOST )
-		{
-			MarkDeviceLost();
+			// Possible PresentEx return values include:
+			// S_OK,
+			// D3DERR_DEVICELOST,
+			// D3DERR_DEVICEHUNG,
+			// D3DERR_DEVICEREMOVED,
+			// D3DERR_OUTOFVIDEOMEMORY
+			// D3DERR_DRIVERINTERNALERROR
+			// and S_PRESENT_MODE_CHANGED or S_PRESENT_OCCLUDED
+			if ( FAILED( hr ) )
+			{
+				Warning( "IDirect3DDevice9Ex::PresentEx() failed w/e %s.\n", se::win::com::com_error_category().message(hr).c_str() );
+
+				// Sometimes the API calls get loaded into a command buffer and are batched up to be sent
+				// to the GPU (see https://learn.microsoft.com/en-us/windows/win32/direct3d9/accurately-profiling-direct3d-api-calls).
+				// In this case, the errors cannot be relayed to the application when action needs to be
+				// taken, so the error code is consumed by the runtime and a note is made on the device
+				// object that this happened.
+				// 
+				// Later when the application invokes IDirect3DDevice9(Ex)::Present(Ex),
+				// IDirect3DDevice9(Ex)::Present(Ex) will return D3DERR_DRIVERINTERNALERROR.  This is why
+				// the best approach for an application to take when receiving a
+				// D3DERR_DRIVERINTERNALERROR from IDirect3DDevice9::Present is to destroy and recreate the
+				// device.
+				// 
+				// See https://learn.microsoft.com/en-us/windows/win32/direct3d9/driver-internal-errors
+				if ( hr == D3DERR_DRIVERINTERNALERROR )
+				{
+					/*	Usually this bug means that the driver has run out of internal video
+						memory, due to leaking it slowly over several application restarts. 
+					*/
+					Error( "GPU internal driver error at Present.\n"
+						   "You're likely out of OS Paged Pool Memory! For more info, see\n"
+						   "https://help.steampowered.com/\n" );
+				}
+				else if ( hr == D3DERR_DEVICELOST )
+				{
+					MarkDeviceLost();
+				}
+				else if ( hr == D3DERR_DEVICEHUNG )
+				{
+					MarkDeviceHung();
+				}
+			}
 		}
 	}
 
@@ -2836,7 +2904,7 @@ void CShaderDeviceDx8::Present()
 
 	if ( bInMainThread )
 	{
-		CheckDeviceLost( m_bOtherAppInitializing );
+		CheckDeviceState( m_bOtherAppInitializing );
 	}
 
 #ifdef RECORD_KEYFRAMES
@@ -2863,7 +2931,7 @@ void CShaderDeviceDx8::Present()
 #endif
 
 		hr = D3D9Device()->BeginScene();
-		if (FAILED(hr))
+		if ( FAILED(hr) )
 		{
 			Assert(false);
 			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",

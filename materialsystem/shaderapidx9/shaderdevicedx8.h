@@ -208,6 +208,7 @@ protected:
 		DEVICE_STATE_OK = 0,
 		DEVICE_STATE_OTHER_APP_INIT,
 		DEVICE_STATE_LOST_DEVICE,
+		DEVICE_STATE_HUNG_DEVICE,
 		DEVICE_STATE_NEEDS_RESET,
 	};
 
@@ -236,8 +237,11 @@ protected:
 	// Queue up the fact that the device was lost
 	void MarkDeviceLost();
 
+	// Queue up the fact that the device was hung
+	void MarkDeviceHung();
+
 	// Deals with lost devices
-	void CheckDeviceLost( bool bOtherAppInitializing );
+	void CheckDeviceState( bool bOtherAppInitializing );
 
 	// Changes the window size
 	bool ResizeWindow( const ShaderDeviceInfo_t &info );
@@ -268,11 +272,11 @@ protected:
 
 	se::win::com::com_ptr<IDirect3DDevice9Ex> m_d3d9_device_ex;
 
-	UINT m_DisplayAdapter;
-	D3DDEVTYPE m_DeviceType;
+	UINT				  m_DisplayAdapter;
+	D3DDEVTYPE			  m_DeviceType;
 
 	D3DPRESENT_PARAMETERS m_PresentParameters;
-	ImageFormat			m_AdapterFormat;
+	ImageFormat			  m_AdapterFormat;
 
 	// Mode info
 	int					m_DeviceSupportsCreateQuery;
@@ -281,7 +285,10 @@ protected:
 	DeviceState_t		m_DeviceState;
 
 	bool				m_bOtherAppInitializing : 1;
+	// D3DERR_DEVICELOST support.
 	bool				m_bQueuedDeviceLost : 1;
+	// dimhotepus: Add D3DERR_DEVICEHUNG handling support.
+	bool				m_bQueuedDeviceHung : 1;
 	bool				m_IsResizing : 1;
 	bool				m_bPendingVideoModeChange : 1;
 	bool				m_bUsingStencil : 1;
@@ -334,7 +341,7 @@ FORCEINLINE bool CShaderDeviceDx8::IsActive() const
 // used to determine if we're deactivated
 FORCEINLINE bool CShaderDeviceDx8::IsDeactivated() const 
 { 
-	return m_DeviceState != DEVICE_STATE_OK || m_bQueuedDeviceLost || m_numReleaseResourcesRefCount; 
+	return m_DeviceState != DEVICE_STATE_OK || m_bQueuedDeviceLost || m_bQueuedDeviceHung || m_numReleaseResourcesRefCount; 
 }
 
 
