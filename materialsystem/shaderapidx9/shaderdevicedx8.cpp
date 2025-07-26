@@ -1443,6 +1443,7 @@ CShaderDeviceDx8::CShaderDeviceDx8()
 
 	m_bQueuedDeviceLost = false;
 	m_bQueuedDeviceHung = false;
+	m_bRenderingOccluded = false;
 	m_DeviceState = DEVICE_STATE_OK;
 	m_bOtherAppInitializing = false;
 	m_IsResizing = false;
@@ -2144,6 +2145,7 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 	m_bIsMinimized = false;
 	m_bQueuedDeviceLost = false;
 	m_bQueuedDeviceHung = false;
+	m_bRenderingOccluded = false;
 
 	m_IsResizing = info.m_bWindowed && info.m_bResizing;
 
@@ -2555,6 +2557,90 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 }
 
 
+bool CShaderDeviceDx8::IsPresentOccluded()
+{
+	if ( m_bRenderingOccluded )
+	{
+		// Occluded applications can continue rendering and all calls will succeed,
+		// but the occluded presentation window will not be updated.  Preferably
+		// the application should stop rendering to the presentation window using
+		// the device and keep calling CheckDeviceState until S_OK or
+		// S_PRESENT_MODE_CHANGED returns.
+		//
+		// See https://learn.microsoft.com/en-us/windows/win32/direct3d9/device-state-return-codes
+		//
+		// Possible return values include:
+		// D3D_OK,
+		// D3DERR_DEVICELOST,
+		// D3DERR_DEVICEHUNG,
+		// D3DERR_DEVICEREMOVED,
+		// D3DERR_OUTOFVIDEOMEMORY
+		// S_PRESENT_MODE_CHANGED or S_PRESENT_OCCLUDED
+		const HRESULT hr = D3D9Device()->CheckDeviceState(static_cast<HWND>(m_hWnd));
+		if ( hr == S_PRESENT_OCCLUDED )
+		{
+			return true;
+		}
+		
+		// Window not occluded anymore (either S_OK, S_PRESENT_MODE_CHANGED or D3DERR_*).
+		m_bRenderingOccluded = false;
+
+		DMsg( "render", 0, "Window is not occluded anymore. Restore rendering.\n" );
+
+		// We continue rendering here, so need to start scene as PresentEx was set m_bRenderingOccluded == true
+		// and skipped start of new scene at previous frame.
+		EndPresent();
+
+		// D3DERR_DEVICELOST & D3DERR_DEVICEHUNG checked later by CheckDeviceState & PresentEx.
+	}
+
+	return false;
+}
+
+
+void CShaderDeviceDx8::MarkPresentOccluded()
+{
+	m_bRenderingOccluded = true;
+
+	DMsg( "render", 0, "Window is occluded. Skipping rendering to save power...\n" );
+}
+
+
+void CShaderDeviceDx8::BeginPresent()
+{
+	if ( !IsDeactivated() )
+	{
+		if ( const HRESULT hr = D3D9Device()->EndScene(); FAILED(hr) )
+		{
+			Assert(false);
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
+	}
+}
+
+
+void CShaderDeviceDx8::EndPresent()
+{
+	if ( !IsDeactivated() )
+	{
+#ifndef DX_TO_GL_ABSTRACTION
+		if ( ( ShaderUtil()->GetConfig().bMeasureFillRate || ShaderUtil()->GetConfig().bVisualizeFillRate ) )
+		{
+			g_pShaderAPI->ClearBuffers( true, true, true, -1, -1 );
+		}
+#endif
+
+		if ( const HRESULT hr = D3D9Device()->BeginScene(); FAILED(hr) )
+		{
+			Assert(false);
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
+	}
+}
+
+
 //-----------------------------------------------------------------------------
 // Queue up the fact that the device was lost
 //-----------------------------------------------------------------------------
@@ -2788,20 +2874,19 @@ void CShaderDeviceDx8::Present()
 {
 	LOCK_SHADERAPI();
 
-	// need to flush the dynamic buffer
+	// Handle window occlusion.
+	if ( IsPresentOccluded() )
+	{
+		// Window is occluded, take system time to run.
+		ThreadSleep( 30 );
+		return;
+	}
+
+	// Need to flush the dynamic buffer
 	g_pShaderAPI->FlushBufferedPrimitives();
 
-	HRESULT hr = S_OK;
-	if ( !IsDeactivated() )
-	{
-		hr = D3D9Device()->EndScene();
-		if ( FAILED(hr) )
-		{
-			Assert(false);
-			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EndScene failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
-		}
-	}
+	// End current scene.
+	BeginPresent();
 
 	// if we're in queued mode, don't present if the device is already lost
 	bool bValidPresent = true;
@@ -2822,8 +2907,10 @@ void CShaderDeviceDx8::Present()
 	}
 
 	// If we're not iconified, try to present (without this check, we can flicker when Alt-Tabbed away)
-	if ( IsIconic( (VD3DHWND)m_hWnd ) == FALSE && bValidPresent )
+	if ( bValidPresent )
 	{
+		HRESULT hr;
+
 		// Rects work only for D3DSWAPEFFECT_COPY.
 		// See https://learn.microsoft.com/en-us/windows/win32/api/d3d9/nf-d3d9-idirect3ddevice9ex-presentex
 		if ( ( m_IsResizing || m_ViewHWnd != (VD3DHWND)m_hWnd ) &&
@@ -2864,7 +2951,8 @@ void CShaderDeviceDx8::Present()
 			// and S_PRESENT_MODE_CHANGED or S_PRESENT_OCCLUDED
 			if ( FAILED( hr ) )
 			{
-				Warning( "IDirect3DDevice9Ex::PresentEx() failed w/e %s.\n", se::win::com::com_error_category().message(hr).c_str() );
+				Warning( "IDirect3DDevice9Ex::PresentEx() failed w/e %s.\n",
+					se::win::com::com_error_category().message(hr).c_str() );
 
 				// Sometimes the API calls get loaded into a command buffer and are batched up to be sent
 				// to the GPU (see https://learn.microsoft.com/en-us/windows/win32/direct3d9/accurately-profiling-direct3d-api-calls).
@@ -2897,6 +2985,23 @@ void CShaderDeviceDx8::Present()
 					MarkDeviceHung();
 				}
 			}
+			else
+			{
+				// S_OK, S_PRESENT_OCCLUDED and S_PRESENT_MODE_CHANGED
+
+				if ( hr == S_PRESENT_OCCLUDED )
+				{
+					// S_PRESENT_OCCLUDED: The presentation area is occluded. Occlusion means
+					// that the presentation window is minimized or another device entered the
+					// fullscreen mode on the same monitor as the presentation window and the
+					// presentation window is completely on that monitor.  Occlusion will not
+					// occur if the client area is covered by another 2indow.
+					//
+					// Occluded applications can continue rendering and all calls will succeed,
+					// but the occluded presentation window will not be updated.
+					MarkPresentOccluded();
+				}
+			}
 		}
 	}
 
@@ -2921,23 +3026,8 @@ void CShaderDeviceDx8::Present()
 
 	g_pShaderAPI->AdvancePIXFrame();
 
-	if ( !IsDeactivated() )
-	{
-#ifndef DX_TO_GL_ABSTRACTION
-		if ( ( ShaderUtil()->GetConfig().bMeasureFillRate || ShaderUtil()->GetConfig().bVisualizeFillRate ) )
-		{
-			g_pShaderAPI->ClearBuffers( true, true, true, -1, -1 );
-		}
-#endif
-
-		hr = D3D9Device()->BeginScene();
-		if ( FAILED(hr) )
-		{
-			Assert(false);
-			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::BeginScene failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr).c_str() );
-		}
-	}
+	// Start next scene.
+	EndPresent();
 }
 
 

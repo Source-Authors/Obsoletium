@@ -240,11 +240,18 @@ protected:
 	// Queue up the fact that the device was hung
 	void MarkDeviceHung();
 
-	// Deals with lost devices
+	// Deals with lost or hung devices
 	void CheckDeviceState( bool bOtherAppInitializing );
 
 	// Changes the window size
 	bool ResizeWindow( const ShaderDeviceInfo_t &info );
+	
+	// Handle presentation area occlusion.
+	bool IsPresentOccluded();
+	void MarkPresentOccluded();
+
+	void BeginPresent();
+	void EndPresent();
 
 	// Deals with the frame synching object
 	void AllocFrameSyncObjects( void );
@@ -289,6 +296,8 @@ protected:
 	bool				m_bQueuedDeviceLost : 1;
 	// dimhotepus: Add D3DERR_DEVICEHUNG handling support.
 	bool				m_bQueuedDeviceHung : 1;
+	// dimhotepus: Add occluded by another window rendering support.
+	bool				m_bRenderingOccluded : 1;
 	bool				m_IsResizing : 1;
 	bool				m_bPendingVideoModeChange : 1;
 	bool				m_bUsingStencil : 1;
@@ -341,7 +350,11 @@ FORCEINLINE bool CShaderDeviceDx8::IsActive() const
 // used to determine if we're deactivated
 FORCEINLINE bool CShaderDeviceDx8::IsDeactivated() const 
 { 
-	return m_DeviceState != DEVICE_STATE_OK || m_bQueuedDeviceLost || m_bQueuedDeviceHung || m_numReleaseResourcesRefCount; 
+	return m_DeviceState != DEVICE_STATE_OK ||
+		m_bQueuedDeviceLost ||
+		m_bQueuedDeviceHung ||
+		m_bRenderingOccluded ||
+		m_numReleaseResourcesRefCount;
 }
 
 
