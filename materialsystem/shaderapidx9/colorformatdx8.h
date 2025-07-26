@@ -16,7 +16,7 @@
 #define ATIFMT_D16		((D3DFORMAT)(MAKEFOURCC('D','F','1','6')))
 #define ATIFMT_D24S8	((D3DFORMAT)(MAKEFOURCC('D','F','2','4')))
 
-// FOURCC formats for ATI2N and ATI1N compressed textures (360 and DX10 parts also do these)
+// FOURCC formats for ATI2N and ATI1N compressed textures (360 and DX11 parts also do these)
 #define ATIFMT_ATI2N ((D3DFORMAT) MAKEFOURCC('A', 'T', 'I', '2'))
 #define ATIFMT_ATI1N ((D3DFORMAT) MAKEFOURCC('A', 'T', 'I', '1'))
 

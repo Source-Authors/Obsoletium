@@ -139,7 +139,7 @@ abstract_class IShaderAPI : public IShaderDynamicAPI
 {
 public:
 	//
-	// NOTE: These methods have been ported to DX10
+	// NOTE: These methods have been ported to DX11
 	//
 
 	// Viewport methods
@@ -160,7 +160,7 @@ public:
 	virtual void SetRasterState( const ShaderRasterState_t& state ) = 0;
 
 	//
-	// NOTE: These methods have not yet been ported to DX10
+	// NOTE: These methods have not yet been ported to DX11
 	//
 
 	// Sets the mode...
