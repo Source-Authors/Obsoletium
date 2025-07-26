@@ -232,7 +232,7 @@ void AnalogBar::SetAnalogValue(float analogValue)
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-float AnalogBar::GetAnalogValue()
+float AnalogBar::GetAnalogValue() const
 {
 	return _analogValue;
 }

@@ -32,7 +32,7 @@ public:
 
 	// 'analogValue' is in the range [0.0f, 1.0f]
 	MESSAGE_FUNC_FLOAT( SetAnalogValue, "SetAnalogValue", analogValue );
-	float GetAnalogValue();
+	float GetAnalogValue() const;
 	virtual void SetSegmentInfo( int gap, int width );
 
 	// utility function for calculating a time remaining string
