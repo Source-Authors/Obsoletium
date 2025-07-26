@@ -3987,7 +3987,7 @@ void CShaderAPIDx8::ReleaseShaderObjects()
 				{
 					if ( GetTexture( hTexture ).GetTexture( k ) != 0 )
 					{
-						Warning( "Didn't correctly clean up texture 0x%8.8x (%s)\n", hTexture, GetTexture( hTexture ).m_DebugName.String() ); 
+						Warning( "Didn't correctly clean up texture 0x%8.8zx (%s)\n", hTexture, GetTexture( hTexture ).m_DebugName.String() ); 
 						break;
 					}
 				}
@@ -11444,9 +11444,9 @@ void CShaderAPIDx8::EvictManagedResourcesInternal()
 		Warning( "mat_debugalttab: CShaderAPIDx8::EvictManagedResourcesInternal\n" );
 	}
 
-	if ( Dx9Device() )
+	if ( auto *device = Dx9Device(); device )
 	{
-		Dx9Device()->EvictManagedResources();
+		device->EvictManagedResources();
 	}
 }
 
