@@ -18,8 +18,9 @@
 #ifndef HALTON_H
 #define HALTON_H
 
-#include <tier0/platform.h>
-#include <mathlib/vector.h>
+#include "tier0/platform.h"
+#include "mathlib/vector.h"
+#include <DirectXMath.h>
 
 class HaltonSequenceGenerator_t
 {
@@ -57,11 +58,12 @@ public:
 		float phi=acosf(zvalue);
 		// now, generate a random rotation angle for x/y
 		float theta=2.0f*M_PI_F*vrot.NextValue();
-		float sin_p=sinf(phi);
-		return Vector(cosf(theta)*sin_p,
-					  sinf(theta)*sin_p,
-					  zvalue);
 
+		float sinTheta, cosTheta;
+		DirectX::XMScalarSinCos(&sinTheta, &cosTheta, theta);
+
+		const float sinPhi = sinf(phi);
+		return Vector(cosTheta * sinPhi, sinTheta * sinPhi, zvalue);
 	}
 };
 
