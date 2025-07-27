@@ -499,7 +499,7 @@ bool GameData::ParseMapSize(TokenReader &tr)
 //			piIndex - 
 // Output : 
 //-----------------------------------------------------------------------------
-GDclass *GameData::ClassForName(const char *pszName, intp *piIndex)
+GDclass *GameData::ClassForName(const char *pszName, intp *piIndex) const
 {
 	intp nCount = m_Classes.Count();
 	for (intp i = 0; i < nCount; i++)
