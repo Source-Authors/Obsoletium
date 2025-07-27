@@ -195,7 +195,7 @@ void CHammerBar::AdjustControls( void )
 	int nHammerBarHeight = HammerBarPos.Height();
 	int nHammerBarWidth  = HammerBarPos.Width();
 	
-	for( int iControl = 0; iControl < m_ControlList.Size(); iControl++ )
+	for( int iControl = 0; iControl < m_ControlList.Count(); iControl++ )
 	{
 		ControlInfo_t currentControl = m_ControlList[ iControl ];
 		int nDialogID = currentControl.m_nIDDialogItem;		
