@@ -789,6 +789,8 @@ unsigned LightingPreviewThreadFN( void *thread_start_arg )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("LightingPreview");
+
+	CLightingPreviewThread LPreviewObject;
 	ThreadSetPriority( -2 );								// low
 	LPreviewObject.Run();
 	return 0;
