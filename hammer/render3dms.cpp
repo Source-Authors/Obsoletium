@@ -660,12 +660,12 @@ void CRender3D::StartRenderFrame(void)
 	//
 	// Determine the elapsed time since the last frame was rendered.
 	//
-	DWORD dwTimeNow = timeGetTime();
+	ULONGLONG dwTimeNow = GetTickCount64();
 	if (m_dwTimeLastFrame == 0)
 	{
 		m_dwTimeLastFrame = dwTimeNow;
 	}
-	DWORD dwTimeElapsed = dwTimeNow - m_dwTimeLastFrame;
+	ULONGLONG dwTimeElapsed = dwTimeNow - m_dwTimeLastFrame;
 	m_fTimeElapsed = (float)dwTimeElapsed / 1000.0;
 	m_dwTimeLastFrame = dwTimeNow;
 
@@ -1375,8 +1375,8 @@ void CRender3D::EndRenderFrame(void)
 				pRenderContext->SetRenderTarget(dest_rt_other);
 				pRenderContext->ClearColor3ub(0,0,0);
 				pRenderContext->ClearBuffers( true, true );
-				int nlights=min(MAX_PREVIEW_LIGHTS,light_queue.Count());
-				for(int i=0;i<nlights;i++)
+				intp nlights=min((intp)MAX_PREVIEW_LIGHTS,light_queue.Count());
+				for(intp i=0;i<nlights;i++)
 				{
 					IMaterial *src_mat=add_0_to_1;
 					LightDesc_t light = light_queue.ElementAtHead().m_Light;
@@ -1478,8 +1478,8 @@ void CRender3D::EndRenderFrame(void)
 			//
 			if (m_dwTimeLastSample != 0)
 			{
-				DWORD dwTimeNow = timeGetTime();
-				DWORD dwTimeElapsed = dwTimeNow - m_dwTimeLastSample;
+				ULONGLONG dwTimeNow = GetTickCount64();
+				ULONGLONG dwTimeElapsed = dwTimeNow - m_dwTimeLastSample;
 				if ((dwTimeElapsed > 1000) && (m_nFramesThisSample > 0))
 				{
 					float fTimeElapsed = (float)dwTimeElapsed / 1000.0;
@@ -1490,7 +1490,7 @@ void CRender3D::EndRenderFrame(void)
 			}
 			else
 			{
-				m_dwTimeLastSample = timeGetTime();
+				m_dwTimeLastSample = GetTickCount64();
 			}
 		
 			m_nFramesThisSample++;
