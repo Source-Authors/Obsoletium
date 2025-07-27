@@ -122,13 +122,14 @@ static bool ReplaceString(OUT_Z_ARRAY char (&pszOut)[outSize], const char *pszIn
 		ptrdiff_t nOffset = pszStart - pszIn;
 
 		strncpy(pszOut, pszIn, nOffset);
-		pszOut += nOffset;
+
+		char *out = pszOut + nOffset;
 		pszIn += nOffset + strlen(FindObject.strFindText);
 
-		strcpy(pszOut, pszReplace);
-		pszOut += strlen(pszReplace);
+		strcpy(out, pszReplace);
+		out += strlen(pszReplace);
 
-		strcpy(pszOut, pszIn);
+		strcpy(out, pszIn);
 
 		return true;
 	}
