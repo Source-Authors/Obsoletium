@@ -55,7 +55,7 @@ public:
 	// World List
 	//
 	virtual int WorldCount( void ) = 0;
-	virtual CMapDisp *GetFromWorld( int iWorldList ) = 0;
+	virtual CMapDisp *GetFromWorld( intp iWorldList ) = 0;
 	virtual CMapDisp *GetFromWorld( EditDispHandle_t handle ) = 0;
 
 	virtual void AddToWorld( EditDispHandle_t handle ) = 0;

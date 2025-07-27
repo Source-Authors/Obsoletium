@@ -1802,8 +1802,8 @@ void CMapDoc::Postload(const char *pszFileName)
 	IWorldEditDispMgr *pDispMgr = GetActiveWorldEditDispManager();
 	if( pDispMgr )
 	{
-		int count = pDispMgr->WorldCount();
-		for( int ndx = 0; ndx < count; ndx++ )
+		intp count = pDispMgr->WorldCount();
+		for( intp ndx = 0; ndx < count; ndx++ )
 		{
 			CMapDisp *pDisp = pDispMgr->GetFromWorld( ndx );
 			if( pDisp )

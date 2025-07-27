@@ -1251,8 +1251,8 @@ void CFaceEditDispPage::OnSelectAdjacent()
 		//{
 		//	EditDispHandle_t hNeighbor = pDisp->GetEdgeNeighbor( iEdge );
 		
-		int totalDispCount = pDispMgr->WorldCount();
-		for ( int iTestDisp=0; iTestDisp < totalDispCount; iTestDisp++ )
+		intp totalDispCount = pDispMgr->WorldCount();
+		for ( intp iTestDisp=0; iTestDisp < totalDispCount; iTestDisp++ )
 		{
 			int edge1[4], edge2[4];
 			CMapDisp *pNeighbor = pDispMgr->GetFromWorld( iTestDisp );

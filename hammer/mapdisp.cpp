@@ -2522,8 +2522,8 @@ void CMapDisp::UpdateNeighborsOfDispsIntersectingBox( const Vector &bbMin, const
 	Vector bbPaddedMin = bbMin - Vector( flPadding, flPadding, flPadding );
 	Vector bbPaddedMax = bbMax + Vector( flPadding, flPadding, flPadding );
 
-	int count = pDispMgr->WorldCount();
-	for ( int i=0; i < count; i++ )
+	intp count = pDispMgr->WorldCount();
+	for ( intp i=0; i < count; i++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromWorld( i );
 		

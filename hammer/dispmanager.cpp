@@ -146,7 +146,7 @@ public: // functions
 
 	// world list functionals
 	int WorldCount( void );
-	CMapDisp *GetFromWorld( int iWorldList );
+	CMapDisp *GetFromWorld( intp iWorldList );
 	CMapDisp *GetFromWorld( EditDispHandle_t handle );
 
 	void AddToWorld( EditDispHandle_t handle );	
@@ -250,7 +250,7 @@ int CWorldEditDispMgr::WorldCount( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CMapDisp *CWorldEditDispMgr::GetFromWorld( int iWorldList )
+CMapDisp *CWorldEditDispMgr::GetFromWorld( intp iWorldList )
 {
 	// no assert because the .Element( ) takes care of that!
 	EditDispHandle_t handle = m_WorldList.Element( iWorldList );
@@ -321,8 +321,8 @@ void CWorldEditDispMgr::FindWorldNeighbors( EditDispHandle_t handle )
 	//
 	// compare against all of the displacements in the world
 	//
-	int count = WorldCount();
-	for( int ndx = 0; ndx < count; ndx++ )
+	intp count = WorldCount();
+	for( intp ndx = 0; ndx < count; ndx++ )
 	{
 		// get the potential neighbor surface
 		CMapDisp *pNeighborDisp = GetFromWorld( ndx );
