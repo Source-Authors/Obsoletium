@@ -231,7 +231,11 @@ void ScratchPad_DrawLitCone(
 	for ( int i=0; i < nSegments; i++ )
 	{
 		float flAngle = (float)(i+1) * M_PI_F * 2.0F / nSegments;
-		Vector vOffset = vRight * cosf( flAngle ) + vUp * sinf( flAngle );
+		float flSin, flCos;
+
+		DirectX::XMScalarSinCos(&flSin, &flCos, flAngle);
+
+		Vector vOffset = vRight * flCos + vUp * flSin;
 		Vector vCurBottom = vBaseCenter + vOffset;
 
 		const Vector &v1 = vTip;
@@ -298,7 +302,11 @@ void ScratchPad_DrawLitCylinder(
 	for ( int i=0; i < nSegments; i++ )
 	{
 		float flAngle = (float)(i+1) * M_PI_F * 2.0F / nSegments;
-		Vector vOffset = vRight * cosf( flAngle ) + vUp * sinf( flAngle );
+		float flSin, flCos;
+
+		DirectX::XMScalarSinCos(&flSin, &flCos, flAngle);
+
+		Vector vOffset = vRight * flCos + vUp * flSin;
 		Vector vCurTop = v1 + vOffset;
 		Vector vCurBottom = v2 + vOffset;
 
@@ -411,8 +419,11 @@ void ScratchPad_DrawSphere(
 				}
 				else
 				{
-					pt.x = cosf( flAngle ) * sinHalfSliceAngle;
-					pt.y = sinf( flAngle ) * sinHalfSliceAngle;
+					float flSin, flCos;
+					DirectX::XMScalarSinCos(&flSin, &flCos, flAngle);
+
+					pt.x = flCos * sinHalfSliceAngle;
+					pt.y = flSin * sinHalfSliceAngle;
 					pt.z = cosf( flHalfSliceAngle );
 					
 					pt *= flRadius;
