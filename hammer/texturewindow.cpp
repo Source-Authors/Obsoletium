@@ -114,7 +114,7 @@ void CTextureWindow::Create(CWnd *pParentWnd, RECT& rect)
 		TexFont.CreatePointFont(iTexNameFontHeight * 10, "Courier New");
 
 	CDC *pDC = GetDC();
-	CFont* old = pDC->SelectObject(TexFont);
+	HGDIOBJ old = pDC->SelectObject(TexFont);
 	pDC->GetCharWidth('A', 'A', &iTexNameCharWidth);
 	// dimhotepus: Restore old font.
 	pDC->SelectObject(old);
@@ -474,7 +474,7 @@ void CTextureWindow::OnPaint(void)
 	CPaintDC dc(this); // device context for painting
 
 	// setup font
-	CFont *old = dc.SelectObject(TexFont);
+	HGDIOBJ old = dc.SelectObject(TexFont);
 	dc.SetTextColor(RGB(255, 255, 255));
 	//dc.SetBkColor(RGB(0,0,0));
 	dc.SetBkMode(TRANSPARENT);
