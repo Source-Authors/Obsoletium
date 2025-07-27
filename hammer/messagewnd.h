@@ -10,6 +10,7 @@
 
 #include <afxtempl.h>
 #include "GlobalFunctions.h"
+#include "fgdlib/gamedata.h"
 
 const int MAX_MESSAGE_WND_LINES = 5000;
 

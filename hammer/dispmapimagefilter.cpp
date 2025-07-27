@@ -25,6 +25,7 @@
 #include "ChunkFile.h"
 #include "GlobalFunctions.h"
 #include "ToolDisplace.h"
+#include "fgdlib/gamedata.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
