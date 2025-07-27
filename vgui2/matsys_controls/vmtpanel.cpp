@@ -306,11 +306,19 @@ void CVMTPanel::RenderSphere( const Vector &vCenter, float flRadius, int nTheta,
 			float theta = ( j != nTheta-1 ) ? 2.0f * M_PI_F * u : 0.0f;
 			float phi = M_PI_F * v;
 
+			DirectX::XMVECTOR angles = DirectX::XMVectorSet( theta, phi, 0, 0 );
+
+			DirectX::XMVECTOR sin, cos;
+			DirectX::XMVectorSinCos( &sin, &cos, angles );
+
+			float sinTheta = DirectX::XMVectorGetX( sin ), cosTheta = DirectX::XMVectorGetX( cos );
+			float sinPhi = DirectX::XMVectorGetY( sin ), cosPhi = DirectX::XMVectorGetY( cos );
+
 			Vector vecPos;
-			vecPos.x = flRadius * sinf(phi) * cosf(theta);
-			vecPos.y = flRadius * sinf(phi) * sinf(theta); 
-			vecPos.z = flRadius * cosf(phi);
-			    
+			vecPos.x = flRadius * sinPhi * cosTheta;
+			vecPos.y = flRadius * sinPhi * sinTheta;
+			vecPos.z = flRadius * cosPhi;
+
 			Vector vecNormal = vecPos;
 			VectorNormalize( vecNormal );
 
