@@ -113,11 +113,17 @@ void RenderWireframeSphere( const Vector &vCenter, float flRadius, int nTheta, i
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
 
-			float sinPhi = sinf(phi);
+			DirectX::XMVECTOR angles = DirectX::XMVectorSet( theta, phi, 0, 0 );
 
-			meshBuilder.Position3f( vCenter.x + ( flRadius * sinPhi * cosf(theta) ),
-				vCenter.y + ( flRadius * sinPhi * sinf(theta) ), 
-				vCenter.z + ( flRadius * cosf(phi) ) );
+			DirectX::XMVECTOR sin, cos;
+			DirectX::XMVectorSinCos( &sin, &cos, angles );
+
+			float sinTheta = DirectX::XMVectorGetX( sin ), cosTheta = DirectX::XMVectorGetX( cos );
+			float sinPhi = DirectX::XMVectorGetY( sin ), cosPhi = DirectX::XMVectorGetY( cos );
+
+			meshBuilder.Position3f( vCenter.x + ( flRadius * sinPhi * cosTheta ),
+				vCenter.y + ( flRadius * sinPhi * sinTheta ), 
+				vCenter.z + ( flRadius * cosPhi ) );
 			meshBuilder.Color4ub( chRed, chGreen, chBlue, chAlpha );
 			meshBuilder.AdvanceVertex();
 		}
@@ -188,10 +194,18 @@ void RenderSphere( const Vector &vCenter, float flRadius, int nTheta, int nPhi, 
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
 
+			DirectX::XMVECTOR angles = DirectX::XMVectorSet( theta, phi, 0, 0 );
+
+			DirectX::XMVECTOR sin, cos;
+			DirectX::XMVectorSinCos( &sin, &cos, angles );
+
+			float sinTheta = DirectX::XMVectorGetX( sin ), cosTheta = DirectX::XMVectorGetX( cos );
+			float sinPhi = DirectX::XMVectorGetY( sin ), cosPhi = DirectX::XMVectorGetY( cos );
+
 			Vector vecPos;
-			vecPos.x = flRadius * sinf(phi) * cosf(theta);
-			vecPos.y = flRadius * sinf(phi) * sinf(theta); 
-			vecPos.z = flRadius * cosf(phi);
+			vecPos.x = flRadius * sinPhi * cosTheta;
+			vecPos.y = flRadius * sinPhi * sinTheta;
+			vecPos.z = flRadius * cosPhi;
 
 			Vector vecNormal = vecPos;
 			VectorNormalize(vecNormal);
