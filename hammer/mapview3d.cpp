@@ -378,7 +378,7 @@ void CMapView3D::Dump(CDumpContext& dc) const
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMapView3D::OnTimer(UINT nIDEvent) 
+void CMapView3D::OnTimer(uintp nIDEvent) 
 {
 	static bool s_bPicking = false; // picking mutex
 
