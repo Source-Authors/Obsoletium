@@ -51,12 +51,6 @@ int mychdir(LPCTSTR pszDir);
 //
 class CMessageWnd;
 
-enum MWMSGTYPE
-{	mwStatus,
-	mwError,
-	mwWarning
-};
-
 extern CMessageWnd *g_pwndMessage;
 
 void Msg(int type, PRINTF_FORMAT_STRING const char *fmt, ...);
