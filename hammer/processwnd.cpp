@@ -19,7 +19,7 @@
 LPCTSTR GetErrorString();
 
 
-CProcessWnd::CProcessWnd() : pEditBuf{nullptr}, uBufLen{0}, pFont{nullptr}
+CProcessWnd::CProcessWnd() : pEditBuf{nullptr}, uBufLen{0}
 {
 	Font.CreatePointFont(100, "Courier New");
 }
