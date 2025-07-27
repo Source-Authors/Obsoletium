@@ -39,8 +39,8 @@
 
 #define SnapToGrid(line,grid) (line - (line % grid))
 
-#define ZOOM_MIN_DEFAULT	0.02125
-#define ZOOM_MAX			256.0
+#define ZOOM_MIN_DEFAULT	0.02125f
+#define ZOOM_MAX			256.0f
 
 static float s_fDragRestX, s_fDragRestY;
 
