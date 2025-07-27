@@ -43,11 +43,8 @@
 //          pClipper - the clipper tool
 //  Output: successful?? (true/false)
 //-----------------------------------------------------------------------------
-BOOL AddToClipList( CMapClass *mp, DWORD_PTR ctx )
+BOOL AddToClipList( CMapSolid *pSolid, Clipper3D *pClipper )
 {
-    CMapSolid *pSolid = reinterpret_cast<CMapSolid *>(mp);
-    Clipper3D *pClipper = reinterpret_cast<Clipper3D *>(ctx);
-
     CClipGroup *pClipGroup = new CClipGroup;
     if( !pClipGroup )
         return false;
@@ -302,10 +299,10 @@ void Clipper3D::SetClipObjects( const CMapObjectList *pList )
 
         if( pObject->IsMapClass( MAPCLASS_TYPE( CMapSolid ) ) )
         {
-            AddToClipList( pObject, DWORD_PTR( this ) );
+            AddToClipList( static_cast<CMapSolid *>( pObject ), this );
         }
 
-        pObject->EnumChildren( AddToClipList, DWORD_PTR( this ), MAPCLASS_TYPE( CMapSolid ) );
+        pObject->EnumChildren( &AddToClipList, this );
     }
 
     // the clipping list is not empty anymore

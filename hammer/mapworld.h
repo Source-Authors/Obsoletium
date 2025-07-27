@@ -175,7 +175,7 @@ class CMapWorld : public CMapClass, public CEditGameClass
 
 		[[nodiscard]] ChunkFileResult_t LoadSolid(CChunkFile *pFile, bool bVisible);
 
-		static BOOL BuildSaveListsCallback(CMapClass *pObject, DWORD_PTR ctx);
+		static BOOL BuildSaveListsCallback(CMapClass *pObject, SaveLists_t *pSaveLists);
 		[[nodiscard]] ChunkFileResult_t SaveObjectListVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo, const CMapObjectList *pList, int saveFlags);
 
 		//

@@ -740,7 +740,7 @@ static BOOL FindPlayer(CMapEntity *pObject, DWORD)
 static void CheckRequirements(CListBox *pList, CMapWorld *pWorld)
 {
 	// ensure there's a player start .. 
-	if (pWorld->EnumChildren((ENUMMAPCHILDRENPROC)FindPlayer, 0, MAPCLASS_TYPE(CMapEntity)))
+	if (pWorld->EnumChildren(&FindPlayer))
 	{
 		// if rvl is !0, it was not stopped prematurely.. which means there is 
 		// NO player start.
@@ -788,7 +788,7 @@ static BOOL _CheckMixedFaces(CMapSolid *pSolid, CListBox *pList)
 
 static void CheckMixedFaces(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckMixedFaces, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckMixedFaces, pList);
 }
 
 
@@ -906,7 +906,7 @@ static BOOL _CheckDuplicatePlanes(CMapSolid *pSolid, CListBox *pList)
 
 static void CheckDuplicatePlanes(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckDuplicatePlanes, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckDuplicatePlanes, pList);
 }
 
 
@@ -960,7 +960,7 @@ static void CheckDuplicateFaceIDs(CListBox *pList, CMapWorld *pWorld)
 	Lists.All.SetGrowSize(128);
 	Lists.Duplicates.SetGrowSize(128);
 
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckDuplicateFaceIDs, (DWORD)&Lists, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckDuplicateFaceIDs, &Lists);
 
 	for (int i = 0; i < Lists.Duplicates.Count(); i++)
 	{
@@ -1040,7 +1040,7 @@ static BOOL _CheckMissingTargets(CMapEntity *pEntity, CListBox *pList)
 
 static void CheckMissingTargets(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckMissingTargets, (DWORD)pList, MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(&_CheckMissingTargets, pList);
 }
 
 
@@ -1082,7 +1082,7 @@ static BOOL _CheckSolidIntegrity(CMapSolid *pSolid, CListBox *pList)
 
 static void CheckSolidIntegrity(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckSolidIntegrity, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckSolidIntegrity, pList);
 }
 
 
@@ -1121,7 +1121,7 @@ static void CheckSolidContents(CListBox *pList, CMapWorld *pWorld)
 {
 	if (CMapDoc::GetActiveMapDoc() && CMapDoc::GetActiveMapDoc()->GetGame() && CMapDoc::GetActiveMapDoc()->GetGame()->mapformat == mfQuake2)
 	{
-		pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckSolidContents, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+		pWorld->EnumChildren(&_CheckSolidContents, pList);
 	}
 }
 
@@ -1163,7 +1163,7 @@ static BOOL _CheckInvalidTextures(CMapSolid *pSolid, CListBox *pList)
 
 static void CheckInvalidTextures(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckInvalidTextures, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckInvalidTextures, pList);
 }
 
 
@@ -1200,7 +1200,7 @@ static BOOL _CheckUnusedKeyvalues(CMapEntity *pEntity, CListBox *pList)
 
 static void CheckUnusedKeyvalues(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckUnusedKeyvalues, (DWORD)pList, MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(&_CheckUnusedKeyvalues, pList);
 }
 
 
@@ -1226,7 +1226,7 @@ static BOOL _CheckEmptyEntities(CMapEntity *pEntity, CListBox *pList)
 
 static void CheckEmptyEntities(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckEmptyEntities, (DWORD)pList, MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(&_CheckEmptyEntities, pList);
 }
 
 
@@ -1263,7 +1263,7 @@ static BOOL _CheckBadConnections(CMapEntity *pEntity, CListBox *pList)
 
 static void CheckBadConnections(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckBadConnections, (DWORD)pList, MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(&_CheckBadConnections, pList);
 }
 
 
@@ -1356,7 +1356,7 @@ static BOOL _CheckVisGroups(CMapClass *pObject, CListBox *pList)
 
 static void CheckVisGroups(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildrenRecurseGroupsOnly((ENUMMAPCHILDRENPROC)_CheckVisGroups, (DWORD)pList);
+	pWorld->EnumChildrenRecurseGroupsOnly(&_CheckVisGroups, pList);
 }
 
 //-----------------------------------------------------------------------------
@@ -1391,7 +1391,7 @@ static BOOL _CheckOverlayFaceList( CMapEntity *pEntity, CListBox *pList )
 //-----------------------------------------------------------------------------
 static void CheckOverlayFaceList( CListBox *pList, CMapWorld *pWorld )
 {
-	pWorld->EnumChildren( ( ENUMMAPCHILDRENPROC )_CheckOverlayFaceList, ( DWORD )pList, MAPCLASS_TYPE( CMapEntity ));
+	pWorld->EnumChildren(&_CheckOverlayFaceList, pList);
 }
 
 //

@@ -309,11 +309,8 @@ void CEntityReportDlg::OnTimer(UINT_PTR nIDEvent)
 	}
 }
 
-BOOL AddEntityToList(CMapClass *mp, DWORD_PTR ctx)
+BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg)
 {
-	auto *pEntity = reinterpret_cast<CMapEntity *>(mp);
-	auto *pDlg = reinterpret_cast<CEntityReportDlg *>(ctx);
-
 	char szString[256];
 	
 	// nope.
@@ -353,7 +350,7 @@ BOOL AddEntityToList(CMapClass *mp, DWORD_PTR ctx)
 			{
 				CMapWorld	*pWorld = pMapDoc->GetMapWorld();
 
-				pWorld->EnumChildren(AddEntityToList, DWORD_PTR(pDlg), MAPCLASS_TYPE(CMapEntity));
+				pWorld->EnumChildren(&AddEntityToList, pDlg);
 			}
 		}
 	}
@@ -457,7 +454,7 @@ void CEntityReportDlg::UpdateEntityList(void)
 
 	// add items to list
 	CMapWorld *pWorld = m_pDoc->GetMapWorld();
-	pWorld->EnumChildren(AddEntityToList, DWORD_PTR(this), MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(&AddEntityToList, this);
 
 	m_cEntities.SetRedraw(TRUE);
 	m_cEntities.Invalidate();

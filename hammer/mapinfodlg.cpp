@@ -17,8 +17,6 @@
 #include <tier0/memdbgon.h>
 
 
-static BOOL CountObject(CMapClass *pobj);
-
 
 BEGIN_MESSAGE_MAP(CMapInfoDlg, CBaseDlg)
 	//{{AFX_MSG_MAP(CMapInfoDlg)
@@ -33,10 +31,8 @@ END_MESSAGE_MAP()
 // Input  : *pobj - Object to count.
 // Output : Returns TRUE to continue enumerating.
 //-----------------------------------------------------------------------------
-static BOOL CountObject(CMapClass *pobj, unsigned int dwParam)
+static BOOL CountObject(CMapClass *pobj, CMapInfoDlg *pdlg)
 {
-	CMapInfoDlg *pdlg = (CMapInfoDlg *)dwParam;
-
 	if (pdlg != NULL)
 	{
 		if (pobj->IsMapClass(MAPCLASS_TYPE(CMapSolid)))
@@ -202,7 +198,7 @@ BOOL CMapInfoDlg::OnInitDialog(void)
 	m_uTextureMemory = 0;
 
 	// count objects!
-	pWorld->EnumChildren(ENUMMAPCHILDRENPROC(CountObject), (DWORD)this);
+	pWorld->EnumChildren(&CountObject, this);
 
 	char szBuf[128];
 	ultoa(m_uSolidCount, szBuf, 10);

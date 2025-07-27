@@ -315,7 +315,7 @@ void Selection3D::TransformLogicalSelection( const Vector2D &vecTranslation )
 //			pSel - 
 // Output : Returns TRUE to keep enumerating.
 //-----------------------------------------------------------------------------
-static BOOL DrawObject(CMapClass *pobj, CRender *pRender)
+static BOOL DrawObject2D(CMapClass *pobj, CRender2D *pRender)
 {
 	if ( !pobj->IsVisible() )
 		return true;
@@ -323,15 +323,30 @@ static BOOL DrawObject(CMapClass *pobj, CRender *pRender)
 	// switch selection mode so transformed object is drawn normal
 	pobj->SetSelectionState( SELECT_NONE );
 
-	CRender2D *pRender2D = dynamic_cast<CRender2D*>(pRender);
+	pobj->Render2D(pRender);
 
-	if ( pRender2D )
-		pobj->Render2D(pRender2D);
+	pobj->SetSelectionState( SELECT_MODIFY );
 
-	CRender3D *pRender3D = dynamic_cast<CRender3D*>(pRender);
+	return TRUE;
+}
 
-	if ( pRender3D )
-		pobj->Render3D(pRender3D);
+
+//-----------------------------------------------------------------------------
+// Purpose: Draws objects when they are selected. Odd, how this code is stuck
+//			in this obscure place, away from all the other 2D rendering code.
+// Input  : pobj - Object to draw.
+//			pSel - 
+// Output : Returns TRUE to keep enumerating.
+//-----------------------------------------------------------------------------
+static BOOL DrawObject3D(CMapClass *pobj, CRender3D *pRender)
+{
+	if ( !pobj->IsVisible() )
+		return true;
+
+	// switch selection mode so transformed object is drawn normal
+	pobj->SetSelectionState( SELECT_NONE );
+
+	pobj->Render3D(pRender);
 
 	pobj->SetSelectionState( SELECT_MODIFY );
 
@@ -383,8 +398,8 @@ void Selection3D::RenderTool2D(CRender2D *pRender)
 		{
 			CMapClass *pobj = pSelList->Element(i);
 			
-			DrawObject(pobj, pRender);
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObject, (DWORD_PTR)pRender);
+			DrawObject2D(pobj, pRender);
+			pobj->EnumChildren(&DrawObject2D, pRender);
 		}
 
 		pRender->EndLocalTransfrom();
@@ -421,7 +436,7 @@ void Selection3D::RenderToolLogical( CRender2D *pRender )
 			CMapClass *pobj = pSelList->Element(i);
 			
 			DrawObjectLogical(pobj, pRender);
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObjectLogical, (DWORD_PTR)pRender);
+			pobj->EnumChildren(&DrawObjectLogical, pRender);
 		}
 
 		pRender->EndLocalTransfrom();
@@ -490,8 +505,8 @@ void Selection3D::RenderTool3D(CRender3D *pRender)
 		{
 			CMapClass *pobj = pSelList->Element(i);
 
-			DrawObject(pobj, pRender);
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObject, (DWORD_PTR)pRender);
+			DrawObject3D(pobj, pRender);
+			pobj->EnumChildren(&DrawObject3D, pRender);
 		}
 
 		pRender->EndLocalTransfrom();

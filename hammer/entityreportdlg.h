@@ -93,7 +93,7 @@ private:
 
 	CMapDoc *MarkSelectedEntities( void );
 
-	friend BOOL AddEntityToList(CMapClass *mp, DWORD_PTR ctx);
+	friend BOOL AddEntityToList(CMapEntity *pEntity, CEntityReportDlg *pDlg);
 };
 
 

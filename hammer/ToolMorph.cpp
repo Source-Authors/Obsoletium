@@ -38,10 +38,8 @@
 //			pMorph - Morph tool.
 // Output : Returns TRUE to continue enumerating.
 //-----------------------------------------------------------------------------
-static BOOL AddToMorph(CMapClass *mp, DWORD_PTR ctx)
+static BOOL AddToMorph(CMapSolid *pSolid, Morph3D *pMorph)
 {
-	auto *pSolid = reinterpret_cast<CMapSolid *>(mp);
-	auto *pMorph = reinterpret_cast<Morph3D *>(ctx);
 	pMorph->SelectObject(pSolid, scSelect);
 	return TRUE;
 }
@@ -110,7 +108,7 @@ void Morph3D::OnActivate()
 			{
 				SelectObject((CMapSolid *)pobj, scSelect);
 			}
-			pobj->EnumChildren(AddToMorph, (DWORD_PTR)this, MAPCLASS_TYPE(CMapSolid));
+			pobj->EnumChildren(&AddToMorph, this);
 		}
 
 		m_pDocument->SelectObject(NULL, scClear|scSaveChanges );

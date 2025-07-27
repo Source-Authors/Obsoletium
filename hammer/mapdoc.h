@@ -550,7 +550,7 @@ class CMapDoc : public CDocument
 		bool m_bHasInitialUpdate;
 		bool m_bLoading; // Set to true while we are being loaded from VMF.
 
-		static BOOL GetBrushNumberCallback(CMapClass *pObject, void *pFindInfo);
+		static BOOL GetBrushNumberCallback(CMapSolid *pObject, class CFindBrushInfo* pFindInfo);
 
 		//
 		// Serialization.
@@ -576,8 +576,7 @@ class CMapDoc : public CDocument
 		//
 		// Search functions.
 		//
-		static BOOL FindEntityCallback(CMapClass *pObject, FindEntity_t *pFindInfo);
-		static BOOL FindGroupCallback(CMapGroup *pGroup, FindGroup_t *pFindInfo);
+		static BOOL FindEntityCallback(CMapEntity *pEntity, FindEntity_t *pFindInfo);
 
 		void AssignToVisGroups(void);
 		void AssignToGroups(void);

@@ -27,10 +27,10 @@ private:
 	static void			Initialize( void );
 	static void			ConvertSolids( CMapWorld * pWorld );
 	static void			ConvertDecals( CMapWorld * pWorld );
-	static bool			CountMapSolids( CMapSolid * pSolid, DWORD );
-	static bool			CountMapDecals( CMapEntity *, DWORD );
-	static bool			CheckSolidTextures( CMapSolid * pSolid, DWORD );
-	static bool			CheckDecalTextures( CMapEntity * pEnt, DWORD );
+	static BOOL			CountMapSolids( CMapSolid * pSolid );
+	static BOOL			CountMapDecals( CMapEntity * pEnt );
+	static BOOL			CheckSolidTextures( CMapSolid * pSolid );
+	static BOOL			CheckDecalTextures( CMapEntity * pEnt );
 	static void			CheckFaceTexture( CMapFace * pFace );
 	static void			ConvertFaceTexture( CMapFace * pFace );
 	static void			ConvertDecalTexture( CMapEntity * pEnt );
