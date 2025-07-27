@@ -911,7 +911,7 @@ int CEditGameClass::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 
 				if (pVar != NULL)
 				{
-					int iIndex;
+					intp iIndex;
 					MDkeyvalue *pKey;
 					LPCTSTR p = m_KeyValues.GetValue(pVar->GetName(), &iIndex);
 

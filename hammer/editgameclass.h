@@ -59,8 +59,8 @@ class CEditGameClass
 		inline void RemoveKey(int nIndex) { m_KeyValues.RemoveKeyAt(nIndex); }
 		inline void SetKeyValue(LPCTSTR pszKey, int iValue) { m_KeyValues.SetValue(pszKey, iValue); }
 		inline LPCTSTR GetKey(int nIndex) { return(m_KeyValues.GetKey(nIndex)); }
-		inline LPCTSTR GetKeyValue(int nIndex) { return(m_KeyValues.GetValue(nIndex)); }
-		inline LPCTSTR GetKeyValue(LPCTSTR pszKey, int *piIndex = NULL) { return(m_KeyValues.GetValue(pszKey, piIndex)); }
+		inline LPCTSTR GetKeyValue(int nIndex) const { return(m_KeyValues.GetValue(nIndex)); }
+		inline LPCTSTR GetKeyValue(LPCTSTR pszKey, intp *piIndex = NULL) const { return(m_KeyValues.GetValue(pszKey, piIndex)); }
 		
 		// Iterate the list of keyvalues.
 		inline int GetFirstKeyValue() const			{ return m_KeyValues.GetFirst(); }

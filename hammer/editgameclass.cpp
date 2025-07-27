@@ -311,15 +311,15 @@ void CEditGameClass::GetDefaultKeys( void )
 		//
 		// For each variable from the base class...
 		//
-		int nVariableCount = m_pClass->GetVariableCount();
-		for ( int i = 0; i < nVariableCount; i++ )
+		intp nVariableCount = m_pClass->GetVariableCount();
+		for ( intp i = 0; i < nVariableCount; i++ )
 		{
 			GDinputvariable *pVar = m_pClass->GetVariableAt(i);
 			Assert(pVar != NULL);
 
 			if (pVar != NULL)
 			{
-				int iIndex;
+				intp iIndex;
 				LPCTSTR p = m_KeyValues.GetValue(pVar->GetName(), &iIndex);
 
 				//
@@ -478,7 +478,7 @@ ChunkFileResult_t CEditGameClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInf
 
 			if (pVar != NULL)
 			{
-				int iIndex;
+				intp iIndex;
 				LPCTSTR p = m_KeyValues.GetValue(pVar->GetName(), &iIndex);
 
 				//

@@ -861,7 +861,7 @@ void CMapWorld::PostloadWorld(void)
 	//
 	// Set the class name from our "classname" key and discard the key.
 	//
-	int nIndex;
+	intp nIndex;
 	const char *pszValue = pszValue = m_KeyValues.GetValue("classname", &nIndex);
 	if (pszValue != NULL)
 	{

@@ -91,7 +91,7 @@ static BOOL FindKeyValue(CMapEntity *pEntity, MDkeyvalue *pKV)
 //-----------------------------------------------------------------------------
 int CompareEntityNames(const char *szName1, const char *szName2)
 {
-	int nCompareLen = -1;
+	intp nCompareLen = -1;
 
 	const char *pszWildcard1 = strchr(szName1, '*');
 	if (pszWildcard1)
@@ -1083,7 +1083,7 @@ void CMapEntity::EnsureUniqueNodeID(CMapWorld *pWorld)
 //-----------------------------------------------------------------------------
 void CMapEntity::PostloadWorld(CMapWorld *pWorld)
 {
-	int nIndex;
+	intp nIndex;
 
 	//
 	// Set our origin from our "origin" key and discard the key.
@@ -1600,7 +1600,7 @@ CMapEntity *CMapEntity::FindChildByKeyValue( LPCSTR key, LPCSTR value, bool *bIs
 		return(NULL);
 	}
 
-	int index;
+	intp index;
 	LPCSTR val = CEditGameClass::GetKeyValue(key, &index);
 
 	if ( val && value && !stricmp(value, val) )
