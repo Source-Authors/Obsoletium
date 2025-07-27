@@ -1400,9 +1400,10 @@ void CMatSystemSurface::DrawOutlinedCircle(int x, int y, int radius, int segment
 	for ( int i = 1; i <= segments; ++i )
 	{
 		float flRadians = i * invDelta;
-		float ca = cosf( flRadians );
-		float sa = sinf( flRadians );
-					 
+
+		float sa, ca;
+		DirectX::XMScalarSinCos( &sa, &ca, flRadians );
+
 		// Rotate it around the circle
 		vertex[1].m_Position.x = m_nTranslateX + x + (radius * ca);
 		vertex[1].m_Position.y = m_nTranslateY + y + (radius * sa);
