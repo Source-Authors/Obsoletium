@@ -267,7 +267,22 @@ int COptionsConfigs::LoadGameConfigs()
 		return 0;
 
 	// Install the message handler for error messages.
-	GDSetMessageFunc(Msg);
+	GDSetMessageFunc([](MWMSGTYPE level, PRINTF_FORMAT_STRING const char* fmt, ...) {
+		va_list args;
+		va_start( args, fmt );
+		char buf[2048];
+		V_vsprintf_safe( buf, fmt, args );
+		va_end( args );
+
+		if ( level == MWMSGTYPE::mwStatus )
+			Msg( buf );
+		else if ( level == MWMSGTYPE::mwWarning )
+			Warning( buf );
+		else if ( level == MWMSGTYPE::mwError )
+			Error( buf );
+		else
+			Warning( buf );
+	});
 
 	// Load from the blocks
 	nConfigsRead = LoadGameConfigsBlock( pGame );
