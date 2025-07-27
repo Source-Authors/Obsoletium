@@ -532,7 +532,7 @@ bool CMaterial::InitDirectoryRecursive( char const* pDirectoryName,
 // It only finds their names so we can generate shell materials for them
 // that we can load up at a later time 
 //-----------------------------------------------------------------------------
-void CMaterial::EnumerateMaterials( IMaterialEnumerator *pEnum, const char *szRoot, int nContext, int nFlags )
+void CMaterial::EnumerateMaterials( IMaterialEnumerator *pEnum, const char *szRoot, intp nContext, int nFlags )
 {
 	InitDirectoryRecursive( szRoot, pEnum, nContext, nFlags );
 }
