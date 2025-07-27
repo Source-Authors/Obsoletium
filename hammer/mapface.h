@@ -12,10 +12,7 @@
 #endif
 
 
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
 #include "hammer_mathlib.h"
 #include "MapAtom.h"
 #include "DispManager.h"

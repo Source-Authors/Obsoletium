@@ -27,7 +27,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
 
 class CCullTreeNode;

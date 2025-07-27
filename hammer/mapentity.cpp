@@ -584,13 +584,11 @@ void CMapEntity::CalcBounds(BOOL bFullUpdate)
 //-----------------------------------------------------------------------------
 // Purpose: Debugging hook.
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4189)
 void CMapEntity::Debug(void)
 {
 	int i = m_KeyValues.GetFirst();
-	MDkeyvalue &KeyValue = m_KeyValues.GetKeyValue(i);
+	[[maybe_unused]] MDkeyvalue &KeyValue = m_KeyValues.GetKeyValue(i);
 }
-#pragma warning (default:4189)
 
 
 //-----------------------------------------------------------------------------

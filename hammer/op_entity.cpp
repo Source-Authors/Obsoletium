@@ -42,7 +42,6 @@ extern GameData *pGD;		// current game data
 #include <tier0/memdbgon.h>
 
 
-#pragma warning( disable : 4355 )
 
 
 #define IDC_SMARTCONTROL 1

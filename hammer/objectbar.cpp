@@ -27,7 +27,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning( disable : 4355 )
 
 
 CMapClass *CreateArch(BoundBox *pBox, float fStartAngle, int iSides, float fArc,

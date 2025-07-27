@@ -43,7 +43,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#pragma warning(disable:4244 4305)
 
 
 typedef struct

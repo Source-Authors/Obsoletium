@@ -57,7 +57,6 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector *normal, float dist, CCheckFa
 LPCTSTR GetDefaultTextureName();
 
 
-#pragma warning(disable:4244)
 
 
 //

@@ -17,7 +17,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning( disable : 4355 )
 
 
 IMPLEMENT_DYNCREATE(COP_Model, CObjectPage)

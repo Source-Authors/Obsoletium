@@ -41,7 +41,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
 #define _GraphicCacheAllocate(n)	malloc(n)
 
