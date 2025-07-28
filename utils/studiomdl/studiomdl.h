@@ -22,10 +22,8 @@ struct s_combinationcontrol_t;
 class CDmeVertexDeltaData;
 class CDmeCombinationOperator;
 
-#define IDSTUDIOHEADER			(('T'<<24)+('S'<<16)+('D'<<8)+'I')
-														// little-endian "IDST"
-#define IDSTUDIOANIMGROUPHEADER	(('G'<<24)+('A'<<16)+('D'<<8)+'I')
-														// little-endian "IDAG"
+constexpr inline int IDSTUDIOHEADER = MAKEID('I', 'D', 'S', 'T');  // little-endian "IDST"
+constexpr inline int IDSTUDIOANIMGROUPHEADER = MAKEID('I', 'D', 'A', 'G');  // little-endian "IDAG"
 
 
 #define STUDIO_QUADRATIC_MOTION 0x00002000
@@ -680,6 +678,10 @@ struct s_autolayer_t
 	float			end;
 };
 
+struct s_activitymodifier_t
+{
+	char			name[MAXSTUDIONAME];
+};
 
 class s_sequence_t
 {
@@ -740,6 +742,9 @@ public:
 	int				numiklocks;
 
 	int				cycleposeindex;
+
+	s_activitymodifier_t activitymodifier[64];
+	int				numactivitymodifiers;
 
 	CUtlVector< char > KeyValue;
 };
@@ -1446,12 +1451,12 @@ class CLodScriptReplacement_t
 public:
 	void SetSrcName( const char *pSrcName )
 	{
-			delete [] m_pSrcName;
+		delete [] m_pSrcName;
 		m_pSrcName = V_strdup( pSrcName );
-		}
+	}
 	void SetDstName( const char *pDstName )
 	{
-			delete [] m_pDstName;
+		delete [] m_pDstName;
 		m_pDstName = V_strdup( pDstName );
 	}
 
