@@ -397,10 +397,10 @@ void CUtlNTree<T,I>::RemoveAll()
 
 	// Put everything into the free list (even unlinked things )
 	I prev = InvalidIndex();
-	for (int i = (int)m_MaxElementIndex; --i >= 0; prev = (I)i )
+	for (intp i = (intp)m_MaxElementIndex; --i >= 0; prev = (I)i )
 	{
-		Node_t &node = InternalNode( i );
-		if ( IsInTree( i ) )
+		Node_t &node = InternalNode( (I)i );
+		if ( IsInTree( (I)i ) )
 		{
 			Destruct( &node.m_Element );
 		}
