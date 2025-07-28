@@ -42,7 +42,7 @@ public:
 	virtual void SetText(const wchar_t *unicodeString, bool bClearUnlocalizedSymbol = false );
 
 	// Get the current text
-	virtual void GetText(OUT_Z_BYTECAP(bufferLen) char *textOut, int bufferLen);
+	virtual void GetText(OUT_Z_CAP(bufferLen) char *textOut, int bufferLen);
 	template<int bufferSize>
 	void GetText(OUT_Z_ARRAY char (&buf)[bufferSize]) 
 	{
