@@ -1316,7 +1316,12 @@ static bool LoadFaceFromTGA( IVTFTexture *pTexture, CUtlBuffer &tgaBuffer, int z
 			resInfo.m_nFlags |= ImageLoader::RESAMPLE_NICE_FILTER;
 		}
 
-		ResampleRGBA8888( resInfo );
+		// dimhotepus: Warn if resample fails.
+		if ( !ResampleRGBA8888( resInfo ) )
+		{
+			VTexWarning( "Unable to resample texture of size %zd bytes to RGBA8888.\n", pTexture->FileSize() );
+			return false;
+		}
 
 		if ( info.m_bAlphaToDistance )
 		{
