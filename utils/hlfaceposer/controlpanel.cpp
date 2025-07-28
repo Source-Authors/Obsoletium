@@ -732,7 +732,7 @@ void ControlPanel::CenterOnFace( void )
 		}
 	}
 
-	KeyValues *seqKeyValues = new KeyValues("");
+	KeyValuesAD seqKeyValues("");
 	if ( seqKeyValues->LoadFromBuffer( mdl->GetFileName( ), mdl->GetKeyValueText( seq ) ) )
 	{
 		// Do we have a build point section?
@@ -746,8 +746,6 @@ void ControlPanel::CenterOnFace( void )
 			}
 		}
 	}
-
-	seqKeyValues->deleteThis();
 
 	mdl->m_origin.x = size.z * .65f;
 	mdl->m_origin.z += eyeheight;
