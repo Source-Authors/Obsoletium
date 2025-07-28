@@ -2061,7 +2061,7 @@ void CRenderTexturesListViewPanel::OnMousePressed( vgui::MouseCode code )
 		return;
 
 	// Now having the tile retrieve the keyvalues
-	int itemId = m_pListPanel->GetItemIDFromRow( iTile );
+	auto itemId = m_pListPanel->GetItemIDFromRow( iTile );
 	if ( itemId < 0 )
 		return;
 	KeyValues *kv = m_pListPanel->GetItem( itemId );
@@ -2104,7 +2104,7 @@ void CRenderTexturesListViewPanel::GetTileSize( int &wide, int &tall )
 
 KeyValues * CRenderTexturesListViewPanel::GetTileData( int iTile )
 {
-	int iData = m_pListPanel->GetItemIDFromRow( iTile );
+	auto iData = m_pListPanel->GetItemIDFromRow( iTile );
 	if ( iData < 0 )
 		return NULL;
 
@@ -3243,8 +3243,8 @@ void CTextureListPanel::Paint()
 	m_numDisplayedSizeKB = ( cbTotalDisplayedSizeInBytes + 511 ) / 1024;
 
 	// Now remove from view items that weren't used.
-	int iNext, numRemoved = 0;
-	for ( int iCur=m_pListPanel->FirstItem(); iCur != m_pListPanel->InvalidItemID(); iCur=iNext )
+	intp iNext, numRemoved = 0;
+	for ( intp iCur=m_pListPanel->FirstItem(); iCur != m_pListPanel->InvalidItemID(); iCur=iNext )
 	{
 		iNext = m_pListPanel->NextItem( iCur );
 
