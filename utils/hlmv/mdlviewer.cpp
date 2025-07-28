@@ -344,7 +344,8 @@ MDLViewer::MDLViewer ()
 
 	menuView->addSeparator ();
 	menuView->add ("Show Activities", IDC_VIEW_ACTIVITIES);
-	menuView->add ("Show hidden", IDC_VIEW_HIDDEN );
+	// dimhotepus: hidden -> Hidden.
+	menuView->add ("Show Hidden", IDC_VIEW_HIDDEN );
 
 #ifdef WIN32
 	menuHelp->add ("Goto Homepage...", IDC_HELP_GOTOHOMEPAGE);
