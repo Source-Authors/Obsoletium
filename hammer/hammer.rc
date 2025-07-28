@@ -3000,7 +3000,7 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_HELP_EDITINGSITE     "http://halflife.gamedesign.net"
+    ID_HELP_EDITINGSITE     "https://developer.valvesoftware.com/wiki/Category:Level_Design"
     ID_HELP_ORDERNOW        "Order Worldcraft Online using your credit card"
     ID_TOOLS_SNAPSELECTEDTOGRID 
                             "Snap the selected objects to the grid (without altering size/relativity)"
@@ -3019,8 +3019,8 @@ BEGIN
     ID_FLIP_VERTICAL        "Flip the selected objects vertically"
     ID_EDIT_PASTEWC         "Insert Clipboard Contents\nPaste"
     ID_HELP_FIRST_TIME_SETUP 
-                            "http://www.valve-erc.com/srcsdk/Hammer/html/Manually_Config_Hammer.html"
-    ID_HELP_TOPICS          "http://developer.valvesoftware.com/wiki/Category:Hammer"
+                            "https://developer.valvesoftware.com/wiki/Hammer_Manual_Configuration"
+    ID_HELP_TOPICS          "https://developer.valvesoftware.com/wiki/Category:Hammer"
     ID_EDIT_CUTWC           "Cut the selection and put it on the Clipboard\nCut"
     ID_EDIT_COPYWC          "Copy the selection and put it on the Clipboard\nCopy"
     ID_HELP_WEBSITE         "Go to the Worldcraft website"
