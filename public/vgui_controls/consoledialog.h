@@ -77,7 +77,8 @@ public:
 private:
 	enum
 	{
-		MAX_HISTORY_ITEMS = 100,
+		// dimhotepus: Increase history 100 -> 128.
+		MAX_HISTORY_ITEMS = 128,
 	};
 
 	class CompletionItem
