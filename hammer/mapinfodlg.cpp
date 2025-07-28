@@ -55,7 +55,7 @@ static BOOL CountObject(CMapClass *pobj, CMapInfoDlg *pdlg)
 //			pParent
 //-----------------------------------------------------------------------------
 CMapInfoDlg::CMapInfoDlg(CMapWorld *pWorld, CWnd* pParent /*=NULL*/)
-	: CDialog(CMapInfoDlg::IDD, pParent)
+	: CBaseDlg(CMapInfoDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CMapInfoDlg)
 		// NOTE: the ClassWizard will add member initialization here
