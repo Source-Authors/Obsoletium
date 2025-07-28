@@ -16,7 +16,8 @@
 
 #include "tier0/platform.h"
 
-#define null 0L
+// dimhotepus: Drop pesky null define
+// #define null 0L
 
 using uchar = unsigned char;
 using ushort = unsigned short;
