@@ -91,7 +91,7 @@ public:
 	// [menglish] Getters and setters for several item and section objects
 	//=============================================================================	 
 	virtual void SetItemBgColor( int itemID, Color color );
-	virtual int GetColumnIndexByName(int sectionID, char* name);
+	virtual intp GetColumnIndexByName(int sectionID, char* name);
 	virtual int GetLineSpacing() { return m_iLineSpacing; }
 	//=============================================================================
 	// HPE_END
@@ -110,7 +110,7 @@ public:
 	*/
 	
 	// returns the number of columns in a section
-	virtual int GetColumnCountBySection(int sectionID);
+	virtual intp GetColumnCountBySection(int sectionID);
 
 	// returns the name of a column by section and column index; returns NULL if there are no more columns
 	// valid range of columnIndex is [0, GetColumnCountBySection)
@@ -144,10 +144,10 @@ public:
 	virtual int GetHighestItemID();
 
 	// returns the number of items (ignoring section dividers)
-	virtual int GetItemCount();
+	virtual intp GetItemCount();
 
 	// returns the item ID from the row, again ignoring section dividers - valid from [0, GetItemCount )
-	virtual int GetItemIDFromRow(int row);		
+	virtual int GetItemIDFromRow(intp row);		
 
 	// returns the row that this itemID occupies. -1 if the itemID is invalid
 	virtual int GetRowFromItemID(int itemID);

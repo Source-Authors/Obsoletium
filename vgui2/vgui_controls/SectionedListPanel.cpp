@@ -66,7 +66,7 @@ void SectionedListPanelHeader::ApplySchemeSettings(IScheme *pScheme)
 	SetBgColor(GetSchemeColor("SectionedListPanelHeader.BgColor", GetBgColor(), pScheme));
 	SetFont(pScheme->GetFont("DefaultVerySmall", IsProportional()));
 	ClearImages();
-	
+
 	HFont hFont = m_pListPanel->GetHeaderFont();
 	if ( hFont != INVALID_FONT )
 	{
@@ -109,7 +109,7 @@ void SectionedListPanelHeader::PerformLayout()
 	BaseClass::PerformLayout();
 
 	// set up the text in the header
-	int colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
+	intp colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
 	if (colCount != GetImageCount())
 	{
 		// rebuild the image list
@@ -297,7 +297,7 @@ public:
 	void PerformLayout() override
 	{
 		// get our button text
-		int colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
+		intp colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
 		if (!m_pData || colCount < 1)
 		{
 			SetText("< unset >");
@@ -538,7 +538,7 @@ public:
 		surface()->DrawSetColor( 255,255,255,255 );
 		surface()->DrawOutlinedRect(0, 0, wide, tall);
 
-		int colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
+		intp colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
 		if (m_pData && colCount >= 0)
 		{
 			int xpos = 0;
@@ -670,7 +670,7 @@ public:
 	void GetCellBounds(int column, int &xpos, int &columnWide)
 	{
 		xpos = 0; columnWide = 0;
-		int colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
+		intp colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
 		for (int i = 0; i < colCount; i++)
 		{
 			int maxWidth = m_pListPanel->GetColumnWidthBySection(m_iSectionID, i);
@@ -706,7 +706,7 @@ public:
 	void GetMaxCellBounds(int column, int &xpos, int &columnWide)
 	{
 		xpos = 0; columnWide = 0;
-		int colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
+		intp colCount = m_pListPanel->GetColumnCountBySection(m_iSectionID);
 		for (int i = 0; i < colCount; i++)
 		{
 			int maxWidth = m_pListPanel->GetColumnWidthBySection(m_iSectionID, i);
@@ -918,8 +918,8 @@ void SectionedListPanel::LayoutPanels(int &contentTall)
 		wide -= m_pScrollBar->GetWide();
 	}
     
-    int iStart = -1;
-    int iEnd = -1;
+    intp iStart = -1;
+    intp iEnd = -1;
 
 	// layout the buttons
 	bool bFirstVisibleSection = true;
@@ -978,7 +978,7 @@ void SectionedListPanel::LayoutPanels(int &contentTall)
 		else
 		{
 			// arrange all the items in this section underneath
-			for (int i = iStart; i <= iEnd; i++)
+			for (intp i = iStart; i <= iEnd; i++)
 			{
 				CItemButton *item = m_SortedItems[i]; //items[i];
 				item->SetBounds(x, y, wide, m_iLineSpacing);
@@ -1448,7 +1448,7 @@ bool SectionedListPanel::RemoveItem(int itemID)
 //-----------------------------------------------------------------------------
 // Purpose: returns the number of columns in a section
 //-----------------------------------------------------------------------------
-int SectionedListPanel::GetColumnCountBySection(int sectionID)
+intp SectionedListPanel::GetColumnCountBySection(int sectionID)
 {
 	intp index = FindSectionIndexByID(sectionID);
 	if (index < 0)
@@ -1544,7 +1544,7 @@ void SectionedListPanel::SetColumnWidthBySection(int sectionID, const char *colu
 // [menglish] Gets the column index by the string identifier
 //=============================================================================
 
-int SectionedListPanel::GetColumnIndexByName(int sectionID, char* name)
+intp SectionedListPanel::GetColumnIndexByName(int sectionID, char* name)
 {
 	intp index = FindSectionIndexByID(sectionID);
 	if (index < 0)
@@ -1650,7 +1650,7 @@ void SectionedListPanel::MoveSelectionDown( void )
 	if (!m_SortedItems.Count()) // if the list has been emptied
 		return;
 
-	int i;
+	intp i;
 	for (i = 0; i < m_SortedItems.Count(); i++)
 	{
 		if (m_SortedItems[i]->GetID() == itemID)
@@ -1677,7 +1677,7 @@ void SectionedListPanel::MoveSelectionUp( void )
 	if (!m_SortedItems.Count()) // if the list has been emptied
 		return;
 
-	int i;
+	intp i;
 	for (i = 0; i < m_SortedItems.Count(); i++)
 	{
 		if (m_SortedItems[i]->GetID() == itemID)
@@ -1957,7 +1957,7 @@ int SectionedListPanel::GetHighestItemID()
 //-----------------------------------------------------------------------------
 // Purpose: item iterators
 //-----------------------------------------------------------------------------
-int SectionedListPanel::GetItemCount()
+intp SectionedListPanel::GetItemCount()
 {
 	return m_SortedItems.Count();
 }
@@ -1965,7 +1965,7 @@ int SectionedListPanel::GetItemCount()
 //-----------------------------------------------------------------------------
 // Purpose: item iterators
 //-----------------------------------------------------------------------------
-int SectionedListPanel::GetItemIDFromRow(int row)
+int SectionedListPanel::GetItemIDFromRow(intp row)
 {
 	if ( !m_SortedItems.IsValidIndex(row) )
 		return -1;
