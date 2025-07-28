@@ -62,14 +62,14 @@ public:
 	// override to open a custom context menu on a node being selected and right-clicked
 	void GenerateContextMenu( int itemIndex, int x, int y ) override;
 
-	void GenerateDragDataForItem( int itemIndex, KeyValues *msg ) override;
+	void GenerateDragDataForItem( intp itemIndex, KeyValues *msg ) override;
 
-	void OnLabelChanged( int itemIndex, const char *oldString, const char *newString ) override;
+	void OnLabelChanged( intp itemIndex, const char *oldString, const char *newString ) override;
 
-	bool IsItemDroppable( int m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
-	void OnItemDropped( int m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
-	bool GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist ) override;
-	HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	bool IsItemDroppable( intp m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	void OnItemDropped( intp m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	bool GetItemDropContextMenu( intp itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist ) override;
+	HCursor GetItemDropCursor( intp itemIndex, CUtlVector< KeyValues * >& msglist ) override;
 
 	ScrollBar	*GetScrollBar();
 
@@ -107,32 +107,32 @@ ScrollBar *CElementTree::GetScrollBar()
 	return m_pVertSB;
 }
 
-bool CElementTree::IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist )
+bool CElementTree::IsItemDroppable( intp itemIndex, CUtlVector< KeyValues * >& msglist )
 {
 	return m_pParent->IsItemDroppable( itemIndex, msglist );
 }
 
-bool CElementTree::GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist )
+bool CElementTree::GetItemDropContextMenu( intp itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist )
 {
 	return m_pParent->GetItemDropContextMenu( itemIndex, menu, msglist );
 }
 
-void CElementTree::OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist )
+void CElementTree::OnItemDropped( intp itemIndex, CUtlVector< KeyValues * >& msglist )
 {
 	m_pParent->OnItemDropped( itemIndex, msglist );
 }
 
-HCursor CElementTree::GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist )
+HCursor CElementTree::GetItemDropCursor( intp itemIndex, CUtlVector< KeyValues * >& msglist )
 {
 	return m_pParent->GetItemDropCursor( itemIndex, msglist );
 }
 
-void CElementTree::OnLabelChanged( int itemIndex, const char *oldString, const char *newString )
+void CElementTree::OnLabelChanged( intp itemIndex, const char *oldString, const char *newString )
 {
 	m_pParent->OnLabelChanged( itemIndex, oldString, newString );
 }
 
-void CElementTree::GenerateDragDataForItem( int itemIndex, KeyValues *msg )
+void CElementTree::GenerateDragDataForItem( intp itemIndex, KeyValues *msg )
 {
 	m_pParent->GenerateDragDataForItem( itemIndex, msg );
 }

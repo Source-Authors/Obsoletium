@@ -28,8 +28,8 @@ public:
 	CAnimGroupTree( Panel *parent, const char *panelName, CBaseAnimSetControlGroupPanel *groupPanel );
 	virtual ~CAnimGroupTree();
 
-	bool IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
-	void OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	bool IsItemDroppable( intp itemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	void OnItemDropped( intp itemIndex, CUtlVector< KeyValues * >& msglist ) override;
 	void GenerateContextMenu( int itemIndex, int x, int y ) override;
 
 private:
@@ -61,7 +61,7 @@ void CAnimGroupTree::CleanupContextMenu()
 	}
 }
 
-bool CAnimGroupTree::IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist )
+bool CAnimGroupTree::IsItemDroppable( intp itemIndex, CUtlVector< KeyValues * >& msglist )
 {
 	if ( msglist.Count() != 1 )
 		return false;
@@ -83,7 +83,7 @@ bool CAnimGroupTree::IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& 
 	return true;
 }
 
-void CAnimGroupTree::OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist )
+void CAnimGroupTree::OnItemDropped( intp itemIndex, CUtlVector< KeyValues * >& msglist )
 {
 	if ( !IsItemDroppable( itemIndex, msglist ) )
 		return;
