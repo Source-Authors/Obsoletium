@@ -1780,11 +1780,9 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 				  bool isCubeMap, VTexConfigInfo_t &info )
 {
 	// force clamps/clampt for cube maps
-	if( isCubeMap )
+	if ( isCubeMap )
 	{
-		info.m_nFlags |= TEXTUREFLAGS_ENVMAP;
-		info.m_nFlags |= TEXTUREFLAGS_CLAMPS;
-		info.m_nFlags |= TEXTUREFLAGS_CLAMPT;
+		info.m_nFlags |= TEXTUREFLAGS_ENVMAP | TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT;
 	}
 
 	// Create the texture we're gonna store out
