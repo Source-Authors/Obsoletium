@@ -167,7 +167,7 @@ void CElementTree::OnCommand( const char *cmd )
 	GetParent()->OnCommand( cmd );
 }
 
-void CElementTree::GenerateChildrenOfNode(int itemIndex)
+void CElementTree::GenerateChildrenOfNode(intp itemIndex)
 {
 	m_pParent->GenerateChildrenOfNode( itemIndex );
 }
