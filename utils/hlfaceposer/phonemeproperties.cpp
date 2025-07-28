@@ -148,9 +148,11 @@ static void CreateAndLayoutControls( HWND hwndDlg, CPhonemeParams* params )
 	}
 	else
 	{
+		unsigned dpi = GetDpiForWindow( hwndDlg );
+
 		MoveWindow( hwndDlg, 
-			( GetSystemMetrics( SM_CXFULLSCREEN ) - dialogW ) / 2,
-			( GetSystemMetrics( SM_CYFULLSCREEN ) - dialogH ) / 2,
+			( GetSystemMetricsForDpi( SM_CXFULLSCREEN, dpi ) - dialogW ) / 2,
+			( GetSystemMetricsForDpi( SM_CYFULLSCREEN, dpi ) - dialogH ) / 2,
 			dialogW,
 			dialogH,
 			TRUE );

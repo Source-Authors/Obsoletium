@@ -18,13 +18,15 @@ void CBaseDialogParams::PositionSelf( void *self )
 	RECT rcDlg;
 	HWND dlgWindow = (HWND)self;
 	GetWindowRect( dlgWindow, &rcDlg );
+	
+	unsigned dpi = GetDpiForWindow( dlgWindow );
 
 	// Get relative to primary monitor instead of actual window parent
 	RECT rcParent;
 	rcParent.left = 0;
-	rcParent.right = rcParent.left + GetSystemMetrics( SM_CXFULLSCREEN );
+	rcParent.right = rcParent.left + GetSystemMetricsForDpi( SM_CXFULLSCREEN, dpi );
 	rcParent.top = 0;
-	rcParent.bottom = rcParent.top + GetSystemMetrics( SM_CYFULLSCREEN );
+	rcParent.bottom = rcParent.top + GetSystemMetricsForDpi( SM_CYFULLSCREEN, dpi );
 
 	int dialogw, dialogh;
 	int parentw, parenth;
