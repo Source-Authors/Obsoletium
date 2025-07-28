@@ -101,7 +101,7 @@ struct MapError
 {
 	CMapClass *pObjects[3];
 	MapErrorType Type;
-	DWORD dwExtra;
+	DWORD_PTR dwExtra;
 	FIXCODE Fix;
 };
 
@@ -503,7 +503,7 @@ void CMapCheckDlg::OnSelchangeErrors()
 
 	// Figure out which error string we're using.
 	int iErrorStr = (int)pError->Type;
-	iErrorStr = clamp( iErrorStr, 0, ARRAYSIZE( g_MapErrorStrings ) - 1 );
+	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
 	Assert( iErrorStr == (int)pError->Type );
 	
 	str.LoadString(g_MapErrorStrings[iErrorStr].m_DescriptionResourceID);
@@ -587,7 +587,7 @@ static void AddErrorToListBox(CListBox *pList, MapError *pError)
 
 	// Figure out which error string we're using.
 	int iErrorStr = (int)pError->Type;
-	iErrorStr = clamp( iErrorStr, 0, ARRAYSIZE( g_MapErrorStrings ) - 1 );
+	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
 	Assert( iErrorStr == (int)pError->Type );
 	
 	str.LoadString(g_MapErrorStrings[iErrorStr].m_StrResourceID);
@@ -620,7 +620,7 @@ static void AddErrorToListBox(CListBox *pList, MapError *pError)
 //			dwExtra - 
 //			... - 
 //-----------------------------------------------------------------------------
-static void AddError(CListBox *pList, MapErrorType Type, DWORD dwExtra, ...)
+static void AddError(CListBox *pList, MapErrorType Type, DWORD_PTR dwExtra, ...)
 {
 	MapError *pError = new MapError;
 	memset(pError, 0, sizeof(MapError));
@@ -671,7 +671,7 @@ static void AddError(CListBox *pList, MapErrorType Type, DWORD dwExtra, ...)
 		case ErrorKillInputRaceCondition:
 		{
 			pError->pObjects[0] = va_arg(vl, CMapClass *);
-			pError->dwExtra = (DWORD)va_arg(vl, CEntityConnection *);
+			pError->dwExtra = (DWORD_PTR)va_arg(vl, CEntityConnection *);
 			break;
 		}
 	}
@@ -719,7 +719,7 @@ static void AddError(CListBox *pList, MapErrorType Type, DWORD dwExtra, ...)
 //			DWORD - 
 // Output : 
 //-----------------------------------------------------------------------------
-static BOOL FindPlayer(CMapEntity *pObject, DWORD)
+static BOOL FindPlayer(CMapEntity *pObject)
 {
 	if ( !IsCheckVisible( pObject ) )
 		return TRUE;
@@ -839,7 +839,7 @@ static void CheckDuplicateNodeIDs(CListBox *pList, CMapWorld *pWorld)
 		{
 			if (FindDuplicateNodeID(pEntity, pWorld))
 			{
-				AddError(pList, ErrorDuplicateNodeIDs, (DWORD)pWorld, pEntity);
+				AddError(pList, ErrorDuplicateNodeIDs, (DWORD_PTR)pWorld, pEntity);
 			}
 		}
 		
@@ -965,7 +965,7 @@ static void CheckDuplicateFaceIDs(CListBox *pList, CMapWorld *pWorld)
 	for (int i = 0; i < Lists.Duplicates.Count(); i++)
 	{
 		CMapFace *pFace = Lists.Duplicates.Element(i);
-		AddError(pList, ErrorDuplicateFaceIDs, (DWORD)pFace, (CMapSolid *)pFace->GetParent());
+		AddError(pList, ErrorDuplicateFaceIDs, (DWORD_PTR)pFace, (CMapSolid *)pFace->GetParent());
 	}
 }
 
@@ -996,7 +996,7 @@ static void CheckValidTarget(CMapEntity *pEntity, const char *pFieldName, const 
 	if (!bFound)
 	{
 		// No dice, flag it as an error.
-		AddError(pList, ErrorMissingTarget, (DWORD)pFieldName, pEntity);
+		AddError(pList, ErrorMissingTarget, (DWORD_PTR)pFieldName, pEntity);
 	}
 }
 
@@ -1146,7 +1146,7 @@ static BOOL _CheckInvalidTextures(CMapSolid *pSolid, CListBox *pList)
 		IEditorTexture *pTex = pFace->GetTexture();
 		if (pTex->IsDummy())
 		{
-			AddError(pList, ErrorInvalidTexture, (DWORD)pFace->texture.texture, pSolid);
+			AddError(pList, ErrorInvalidTexture, (DWORD_PTR)pFace->texture.texture, pSolid);
 			return TRUE;
 		}
 
@@ -1189,7 +1189,7 @@ static BOOL _CheckUnusedKeyvalues(CMapEntity *pEntity, CListBox *pList)
 	{
 		if (pClass->VarForName(pEntity->GetKey(i)) == NULL)
 		{
-			AddError(pList, ErrorUnusedKeyvalues, (DWORD)pEntity->GetKey(i), pEntity);
+			AddError(pList, ErrorUnusedKeyvalues, (DWORD_PTR)pEntity->GetKey(i), pEntity);
 			return(TRUE);
 		}
 	}
@@ -1217,7 +1217,7 @@ static BOOL _CheckEmptyEntities(CMapEntity *pEntity, CListBox *pList)
 
 	if(!pEntity->IsPlaceholder() && !pEntity->GetChildCount())
 	{
-		AddError(pList, ErrorEmptyEntity, (DWORD)pEntity->GetClassName(), pEntity);
+		AddError(pList, ErrorEmptyEntity, (DWORD_PTR)pEntity->GetClassName(), pEntity);
 	}
 	
 	return(TRUE);
@@ -1243,7 +1243,7 @@ static BOOL _CheckBadConnections(CMapEntity *pEntity, CListBox *pList)
 
 	if (CEntityConnection::ValidateOutputConnections(pEntity, (Options.general.bCheckVisibleMapErrors == TRUE)) == CONNECTION_BAD)
 	{
-		AddError(pList, ErrorBadConnections, (DWORD)pEntity->GetClassName(), pEntity);
+		AddError(pList, ErrorBadConnections, (DWORD_PTR)pEntity->GetClassName(), pEntity);
 	}
 
 	// TODO: Check for a "Kill" input with the same output, target, and delay as another input. This
@@ -1589,7 +1589,7 @@ static void FixKillInputRaceCondition(MapError *pError)
 
 	// Delay the Kill command so that it arrives after the other command,
 	// solving the race condition.
-	pConn->SetDelay(pConn->GetDelay() + 0.01);
+	pConn->SetDelay(pConn->GetDelay() + 0.01f);
 }
 
 //-----------------------------------------------------------------------------
