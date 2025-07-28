@@ -1,4 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+﻿//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -368,7 +368,7 @@ MDLViewer::MDLViewer ()
 	if ( !LoadViewerRootSettings( ) )
 	{
 		// dimhotepus: Center window when no settings.
-
+		
 		const int displayWidth = mx::getDisplayWidth();
 		const int displayHeight = mx::getDisplayHeight();
 		
@@ -380,7 +380,7 @@ MDLViewer::MDLViewer ()
 	else
 	{
 		g_viewerSettings.xpos  = max( 0, g_viewerSettings.xpos );
-	g_viewerSettings.ypos  = max( 0, g_viewerSettings.ypos );
+		g_viewerSettings.ypos  = max( 0, g_viewerSettings.ypos );
 		g_viewerSettings.width = max( 1024, g_viewerSettings.width );
 		g_viewerSettings.height = max( 768, g_viewerSettings.height );
 	}
@@ -1333,6 +1333,10 @@ void MDLViewer::SendLightRotToLinkedHlmv()
 SpewRetval_t HLMVSpewFunc( SpewType_t spewType, char const *pMsg )
 {
 	g_bInError = true;
+
+	// dimhotepus: Dump debug output.
+	Plat_DebugString(pMsg);
+
 	switch (spewType)
 	{
 	case SPEW_ERROR:
@@ -1341,7 +1345,6 @@ SpewRetval_t HLMVSpewFunc( SpewType_t spewType, char const *pMsg )
 		return SPEW_ABORT;
 
 	default:
-		OutputDebugString(pMsg);
 		g_bInError = false;
 #ifdef _DEBUG
 		return spewType == SPEW_ASSERT ? SPEW_DEBUGGER : SPEW_CONTINUE;
@@ -1488,7 +1491,7 @@ bool CHLModelViewerApp::PreInit( )
 	
 	LoadFileSystemDialogModule();
 
-	return true; 
+	return true;
 }
 
 void CHLModelViewerApp::PostShutdown()
