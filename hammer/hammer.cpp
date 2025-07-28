@@ -674,14 +674,14 @@ void CHammer::GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, ptrdiff_t si
 		{
 			V_strncpy(p, g_pGameConfig->m_szModDir, size);
 			EnsureTrailingBackslash(p, size);
-			V_strcat(p, "materials\\", MAX_PATH);
+			V_strcat(p, "materials\\", size);
 			break;
 		}
 
 		case DIR_AUTOSAVE:
 		{			
             V_strncpy( p, m_szAutosaveDir, size );
-			EnsureTrailingBackslash(p, size);			
+			EnsureTrailingBackslash(p, size);
 			break;
 		}
 	}
