@@ -92,7 +92,7 @@ public:
 protected:
 
 	void RecalculateRows();
-	void RecalculateRows_R( int index );
+	void RecalculateRows_R( intp index );
 	void RecalculateColumns();
 
 private:

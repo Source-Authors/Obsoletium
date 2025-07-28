@@ -58,9 +58,9 @@ public:
 	void OnCommand( const char *cmd ) override;
 	void ApplySchemeSettings( IScheme *pScheme ) override;
 	void InvalidateLayout( bool layoutNow = false, bool reloadScheme = false ) override;
-	void GenerateChildrenOfNode(int itemIndex) override;
+	void GenerateChildrenOfNode(intp itemIndex) override;
 	// override to open a custom context menu on a node being selected and right-clicked
-	void GenerateContextMenu( int itemIndex, int x, int y ) override;
+	void GenerateContextMenu( intp itemIndex, int x, int y ) override;
 
 	void GenerateDragDataForItem( intp itemIndex, KeyValues *msg ) override;
 
@@ -138,7 +138,7 @@ void CElementTree::GenerateDragDataForItem( intp itemIndex, KeyValues *msg )
 }
 
 // override to open a custom context menu on a node being selected and right-clicked
-void CElementTree::GenerateContextMenu( int itemIndex, int x, int y )
+void CElementTree::GenerateContextMenu( intp itemIndex, int x, int y )
 {
 	m_pParent->GenerateContextMenu( itemIndex, x, y );
 }

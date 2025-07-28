@@ -30,7 +30,7 @@ public:
 
 	bool IsItemDroppable( intp itemIndex, CUtlVector< KeyValues * >& msglist ) override;
 	void OnItemDropped( intp itemIndex, CUtlVector< KeyValues * >& msglist ) override;
-	void GenerateContextMenu( int itemIndex, int x, int y ) override;
+	void GenerateContextMenu( intp itemIndex, int x, int y ) override;
 
 private:
 	MESSAGE_FUNC( OnImportAnimation, "ImportAnimation" );
@@ -113,7 +113,7 @@ void CAnimGroupTree::OnImportAnimation()
 }
 
 // override to open a custom context menu on a node being selected and right-clicked
-void CAnimGroupTree::GenerateContextMenu( [[maybe_unused]] int itemIndex, [[maybe_unused]] int x, [[maybe_unused]] int y )
+void CAnimGroupTree::GenerateContextMenu( [[maybe_unused]] intp itemIndex, [[maybe_unused]] int x, [[maybe_unused]] int y )
 {
 	CleanupContextMenu();
 	m_hContextMenu = new Menu( this, "ActionMenu" );
@@ -145,15 +145,15 @@ CBaseAnimSetControlGroupPanel::~CBaseAnimSetControlGroupPanel()
 {
 }
 
-static int AddItemToTree( TreeView *tv, const char *label, int parentIndex, const Color& fg, int groupNumber, int handle )
+static intp AddItemToTree( TreeView *tv, const char *label, intp parentIndex, const Color& fg, intp groupNumber, int handle )
 {
 	Color bgColor( 128, 128, 128, 128 );
 
 	KeyValues *kv = new KeyValues( "item", "text", label );
-	kv->SetInt( "groupNumber", groupNumber );
+	kv->SetUint64( "groupNumber", groupNumber );
 	kv->SetInt( "droppable", 1 );
 	kv->SetInt( "handle", handle );
-	int idx = tv->AddItem( kv, parentIndex );
+	intp idx = tv->AddItem( kv, parentIndex );
 	tv->SetItemFgColor( idx, fg );
 	tv->SetItemSelectionTextColor( idx, fg );
 	tv->SetItemSelectionBgColor( idx, bgColor );
@@ -197,7 +197,7 @@ void CBaseAnimSetControlGroupPanel::OnTreeViewItemSelected( int itemIndex )
 	intp groupCount = groups.Count();
 
 	intp i;
-	int rootIndex = m_hGroups->GetRootItemIndex();
+	intp rootIndex = m_hGroups->GetRootItemIndex();
 
 	bool selectionHasRoot = false;
 	for ( i = 0 ; i < selection.Count(); ++i )
@@ -244,7 +244,7 @@ void CBaseAnimSetControlGroupPanel::OnTreeViewItemSelected( int itemIndex )
 			if ( !kv )
 				continue;
 
-			int groupNumber = kv->GetInt( "groupNumber" );
+			intp groupNumber = static_cast<intp>( kv->GetUint64( "groupNumber" ) );
 			if ( groupNumber < 0 || groupNumber >= groupCount )
 			{
 				const char *sliderName = kv->GetString( "text" );
@@ -325,7 +325,7 @@ void CBaseAnimSetControlGroupPanel::ChangeAnimationSet( CDmeAnimationSet *newAni
 
 		// Build a tree of every open item in the tree view
 		OpenItemTree_t openItems;
-		int nRootIndex = m_hGroups->GetRootItemIndex();
+		intp nRootIndex = m_hGroups->GetRootItemIndex();
 		if ( nRootIndex != -1 )
 		{
 			BuildOpenItemList( openItems, openItems.InvalidIndex(), nRootIndex );
@@ -337,13 +337,13 @@ void CBaseAnimSetControlGroupPanel::ChangeAnimationSet( CDmeAnimationSet *newAni
 
 
 		// Create root
-		int rootIndex = AddItemToTree( m_hGroups, "root", -1, Color( 128, 128, 128, 255 ), -1, (int)DMELEMENT_HANDLE_INVALID );
+		intp rootIndex = AddItemToTree( m_hGroups, "root", -1, Color( 128, 128, 128, 255 ), -1, (int)DMELEMENT_HANDLE_INVALID );
 
 		Color defaultColor( 0, 128, 255, 255 );
 
 		CAppUndoScopeGuard *guard = NULL;
 
-		for ( int i = 0; i < c; ++i )
+		for ( intp i = 0; i < c; ++i )
 		{
 			CDmElement *group = groups[ i ];
 			
@@ -355,12 +355,12 @@ void CBaseAnimSetControlGroupPanel::ChangeAnimationSet( CDmeAnimationSet *newAni
 				}
 				group->SetValue< Color >( "treeColor", defaultColor );
 			}
-			int groupIndex = AddItemToTree( m_hGroups, group->GetName(), rootIndex, group->GetValue< Color >( "treeColor" ), i, (int)group->GetHandle() );
+			intp groupIndex = AddItemToTree( m_hGroups, group->GetName(), rootIndex, group->GetValue< Color >( "treeColor" ), i, (int)group->GetHandle() );
 
 			const CDmrStringArray array( group, "selectedControls" );
 			if ( array.IsValid() )
 			{
-				for ( int j = 0 ; j < array.Count(); ++j )
+				for ( intp j = 0 ; j < array.Count(); ++j )
 				{
 					AddItemToTree( m_hGroups, array[ j ], groupIndex, Color( 200, 200, 200, 255 ), -1, (int)DMELEMENT_HANDLE_INVALID );
 				}
@@ -391,7 +391,7 @@ void CBaseAnimSetControlGroupPanel::ChangeAnimationSet( CDmeAnimationSet *newAni
 
 	if ( changed  )
 	{
-		for ( int i = 0; i < m_hSelectableIndices.Count(); ++i )
+		for ( intp i = 0; i < m_hSelectableIndices.Count(); ++i )
 		{
 
 			m_hGroups->AddSelectedItem( m_hSelectableIndices[ i ], 
@@ -406,7 +406,7 @@ void CBaseAnimSetControlGroupPanel::ChangeAnimationSet( CDmeAnimationSet *newAni
 //-----------------------------------------------------------------------------
 // Expands all items in the open item tree if they exist
 //-----------------------------------------------------------------------------
-void CBaseAnimSetControlGroupPanel::ExpandOpenItems( OpenItemTree_t &tree, int nOpenTreeIndex, int nItemIndex, bool makeVisible )
+void CBaseAnimSetControlGroupPanel::ExpandOpenItems( OpenItemTree_t &tree, int nOpenTreeIndex, intp nItemIndex, bool makeVisible )
 {
 	int i = tree.FirstChild( nOpenTreeIndex );
 	if ( nOpenTreeIndex != tree.InvalidIndex() )
@@ -431,7 +431,7 @@ void CBaseAnimSetControlGroupPanel::ExpandOpenItems( OpenItemTree_t &tree, int n
 	{
 		TreeInfo_t& info = tree[ i ];
 		// Look for a match
-		int nChildIndex = FindTreeItem( nItemIndex, info.m_Item );
+		intp nChildIndex = FindTreeItem( nItemIndex, info.m_Item );
 		if ( nChildIndex != -1 )
 		{
 			ExpandOpenItems( tree, i, nChildIndex, makeVisible );
@@ -456,7 +456,7 @@ void CBaseAnimSetControlGroupPanel::ExpandOpenItems( OpenItemTree_t &tree, int n
 	}
 }
 
-void CBaseAnimSetControlGroupPanel::FillInDataForItem( TreeItem_t &item, int nItemIndex )
+void CBaseAnimSetControlGroupPanel::FillInDataForItem( TreeItem_t &item, intp nItemIndex )
 {
 	KeyValues *data = m_hGroups->GetItemData( nItemIndex );
 	if ( !data )
@@ -468,7 +468,7 @@ void CBaseAnimSetControlGroupPanel::FillInDataForItem( TreeItem_t &item, int nIt
 //-----------------------------------------------------------------------------
 // Builds a list of open items
 //-----------------------------------------------------------------------------
-void CBaseAnimSetControlGroupPanel::BuildOpenItemList( OpenItemTree_t &tree, int nParent, int nItemIndex )
+void CBaseAnimSetControlGroupPanel::BuildOpenItemList( OpenItemTree_t &tree, int nParent, intp nItemIndex )
 {
 	KeyValues *data = m_hGroups->GetItemData( nItemIndex );
 	if ( !data )
@@ -493,23 +493,23 @@ void CBaseAnimSetControlGroupPanel::BuildOpenItemList( OpenItemTree_t &tree, int
 	info.m_nFlags = flags;
 
 	// Deal with children
-	int nCount = m_hGroups->GetNumChildren( nItemIndex );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_hGroups->GetNumChildren( nItemIndex );
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		int nChildIndex = m_hGroups->GetChild( nItemIndex, i );
+		intp nChildIndex = m_hGroups->GetChild( nItemIndex, i );
 		BuildOpenItemList( tree, nChild, nChildIndex );
 	}
 }
 //-----------------------------------------------------------------------------
 // Finds the tree index of a child matching the particular element + attribute
 //-----------------------------------------------------------------------------
-int CBaseAnimSetControlGroupPanel::FindTreeItem( int nParentIndex, const TreeItem_t &info )
+intp CBaseAnimSetControlGroupPanel::FindTreeItem( intp nParentIndex, const TreeItem_t &info )
 {
 	// Look for a match
-	int nCount = m_hGroups->GetNumChildren( nParentIndex );
-	for ( int i = nCount; --i >= 0; )
+	intp nCount = m_hGroups->GetNumChildren( nParentIndex );
+	for ( intp i = nCount; --i >= 0; )
 	{
-		int nChildIndex = m_hGroups->GetChild( nParentIndex, i );
+		intp nChildIndex = m_hGroups->GetChild( nParentIndex, i );
 		KeyValues *data = m_hGroups->GetItemData( nChildIndex );
 		Assert( data );
 

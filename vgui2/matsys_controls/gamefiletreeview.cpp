@@ -61,7 +61,7 @@ void CGameFileTreeView::RefreshFileList()
 	pkv->SetString( "text", m_RootFolderName );
 	pkv->SetInt( "root", 1 );
 	pkv->SetInt( "expand", 1 );
-	int iRoot = AddItem( pkv, GetRootItemIndex() );
+	intp iRoot = AddItem( pkv, GetRootItemIndex() );
 	ExpandItem( iRoot, true );
 }
 
@@ -78,7 +78,7 @@ void CGameFileTreeView::SelectRoot()
 //-----------------------------------------------------------------------------
 // Gets the number of root directories
 //-----------------------------------------------------------------------------
-int CGameFileTreeView::GetRootDirectoryCount()
+intp CGameFileTreeView::GetRootDirectoryCount()
 {
 	return GetNumChildren( GetRootItemIndex() );
 }
@@ -87,9 +87,9 @@ int CGameFileTreeView::GetRootDirectoryCount()
 //-----------------------------------------------------------------------------
 // Gets the ith root directory
 //-----------------------------------------------------------------------------
-const char *CGameFileTreeView::GetRootDirectory( int nIndex )
+const char *CGameFileTreeView::GetRootDirectory( intp nIndex )
 {
-	int nItemIndex = GetChild( GetRootItemIndex(), nIndex );
+	intp nItemIndex = GetChild( GetRootItemIndex(), nIndex );
 	KeyValues *kv = GetItemData( nItemIndex );
 	if ( !kv )
 		return NULL;
@@ -100,7 +100,7 @@ const char *CGameFileTreeView::GetRootDirectory( int nIndex )
 //-----------------------------------------------------------------------------
 // Populate the root node (necessary since tree view can't have multiple roots)
 //-----------------------------------------------------------------------------
-void CGameFileTreeView::PopulateRootNode( int itemIndex )
+void CGameFileTreeView::PopulateRootNode( intp itemIndex )
 {
 	AddDirectoriesOfNode( itemIndex, m_RootDir );
 
@@ -142,7 +142,7 @@ bool CGameFileTreeView::DoesDirectoryHaveSubdirectories( const char *pFilePath )
 //-----------------------------------------------------------------------------
 // Populate the root node with directories
 //-----------------------------------------------------------------------------
-void CGameFileTreeView::AddDirectoriesOfNode( int itemIndex, const char *pFilePath )
+void CGameFileTreeView::AddDirectoriesOfNode( intp itemIndex, const char *pFilePath )
 {
 	char pSearchString[MAX_PATH];
 	Q_snprintf( pSearchString, MAX_PATH, "%s\\*", pFilePath );
@@ -171,7 +171,7 @@ void CGameFileTreeView::AddDirectoriesOfNode( int itemIndex, const char *pFilePa
 			kv->SetInt( "dir", 1 );
 			kv->SetInt( "image", IMAGE_FOLDER );
 
-			int itemID = AddItem(kv, itemIndex);
+			intp itemID = AddItem(kv, itemIndex);
 
 			// mark directories in orange
 			SetItemColorForDirectories( itemID );
@@ -187,7 +187,7 @@ void CGameFileTreeView::AddDirectoriesOfNode( int itemIndex, const char *pFilePa
 //-----------------------------------------------------------------------------
 // Populate the root node with files
 //-----------------------------------------------------------------------------
-void CGameFileTreeView::AddFilesOfNode( int itemIndex, const char *pFilePath, const char *pExt )
+void CGameFileTreeView::AddFilesOfNode( intp itemIndex, const char *pFilePath, const char *pExt )
 {
 	char pSearchString[MAX_PATH];
 	Q_snprintf( pSearchString, MAX_PATH, "%s\\*.%s", pFilePath, pExt );
@@ -222,7 +222,7 @@ void CGameFileTreeView::AddFilesOfNode( int itemIndex, const char *pFilePath, co
 //-----------------------------------------------------------------------------
 // override to incremental request and show p4 directories
 //-----------------------------------------------------------------------------
-void CGameFileTreeView::GenerateChildrenOfNode(int itemIndex)
+void CGameFileTreeView::GenerateChildrenOfNode(intp itemIndex)
 {
 	KeyValues *pkv = GetItemData(itemIndex);
 	if ( pkv->GetInt("root") )
@@ -252,7 +252,7 @@ void CGameFileTreeView::GenerateChildrenOfNode(int itemIndex)
 //-----------------------------------------------------------------------------
 // setup a context menu whenever a directory is clicked on
 //-----------------------------------------------------------------------------
-void CGameFileTreeView::GenerateContextMenu( [[maybe_unused]] int itemIndex, [[maybe_unused]] int x, [[maybe_unused]] int y ) 
+void CGameFileTreeView::GenerateContextMenu( [[maybe_unused]] intp itemIndex, [[maybe_unused]] int x, [[maybe_unused]] int y ) 
 {
 	return;
 
@@ -275,7 +275,7 @@ void CGameFileTreeView::GenerateContextMenu( [[maybe_unused]] int itemIndex, [[m
 //-----------------------------------------------------------------------------
 // Sets an item to be colored as if its a menu
 //-----------------------------------------------------------------------------
-void CGameFileTreeView::SetItemColorForDirectories( int itemID )
+void CGameFileTreeView::SetItemColorForDirectories( intp itemID )
 {
 	// mark directories in orange
 	SetItemFgColor( itemID, Color(224, 192, 0, 255) );

@@ -24,7 +24,7 @@ class DirectoryTreeView : public TreeView
 {
 public:
 	DirectoryTreeView(DirectorySelectDialog *parent, const char *name);
-	void GenerateChildrenOfNode(int itemIndex) override;
+	void GenerateChildrenOfNode(intp itemIndex) override;
 
 private:
 	DirectorySelectDialog *m_pParent;
@@ -73,9 +73,9 @@ private:
 	MESSAGE_FUNC_CHARPTR( OnCreateDirectory, "CreateDirectory", dir );
 	void BuildDirTree();
 	void BuildDriveChoices();
-	void ExpandTreeNode(const char *path, int parentNodeIndex);
-	void GenerateChildrenOfDirectoryNode(int nodeIndex);
-	void GenerateFullPathForNode(int nodeIndex, char *path, int pathBufferSize);
+	void ExpandTreeNode(const char *path, intp parentNodeIndex);
+	void GenerateChildrenOfDirectoryNode(intp nodeIndex);
+	void GenerateFullPathForNode(intp nodeIndex, char *path, intp pathBufferSize);
 	bool DoesDirectoryHaveSubdirectories(const char *path, const char *dir);
 
 	char m_szCurrentDir[512];

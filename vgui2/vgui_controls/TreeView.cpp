@@ -433,7 +433,7 @@ public:
 	void OnChildWidthChange();
 	int GetMaxChildrenWidth();
     int GetVisibleMaxWidth();
-    int GetDepth();
+    intp GetDepth();
     bool HasParent(TreeNode *pTreeNode);
     bool IsBeingDisplayed();
 
@@ -459,16 +459,16 @@ public:
 	void OnMouseReleased( MouseCode code) override;
 	void OnCursorMoved( int x, int y ) override;
 	bool IsDragEnabled() const override;
-    void PositionAndSetVisibleNodes(int &nStart, int &nCount, int x, int &y);
+    void PositionAndSetVisibleNodes(int &nStart, intp &nCount, int x, int &y);
 
     // counts items above this item including itself
-    int CountVisibleIndex();
+    intp CountVisibleIndex();
 
 	void OnCreateDragData( KeyValues *msg ) override;
 	// For handling multiple selections...
 	void OnGetAdditionalDragPanels( CUtlVector< Panel * >& dragabbles ) override;
 	void OnMouseDoublePressed( MouseCode code ) override;
-	TreeNode *FindItemUnderMouse( int &nStart, int& nCount, int x, int &y, int mx, int my );
+	TreeNode *FindItemUnderMouse( int &nStart, intp& nCount, int x, int &y, int mx, int my );
 	MESSAGE_FUNC_PARAMS( OnLabelChanged, "LabelChanged", data );
 	void EditLabel();
 	void	SetLabelEditingAllowed( bool state );
@@ -642,7 +642,7 @@ void TreeNode::SetFont(HFont font)
     m_pText->SetFont(font);
 	m_pExpandImage->SetFont(font);
 	InvalidateLayout();
-    int i;
+    intp i;
     for (i=0;i<GetChildrenCount();i++)
     {
         m_Children[i]->SetFont(font);
@@ -923,7 +923,7 @@ void TreeNode::OnChildWidthChange()
 int TreeNode::GetMaxChildrenWidth()
 {
 	int maxWidth = 0;
-	int i;
+	intp i;
     for (i=0;i<GetChildrenCount();i++)
     {
 		int childWidth = m_Children[i]->GetVisibleMaxWidth();
@@ -940,9 +940,9 @@ int TreeNode::GetVisibleMaxWidth()
 	return m_iMaxVisibleWidth;
 }
 
-int TreeNode::GetDepth()
+intp TreeNode::GetDepth()
 {
-    int depth = 0;
+    intp depth = 0;
         TreeNode *pParent = GetParentNode();
     while (pParent)
     {								
@@ -983,7 +983,7 @@ void TreeNode::SetVisible(bool state)
     BaseClass::SetVisible(state);
 
     bool bChildrenVisible = state && m_bExpand;
-    int i;
+    intp i;
     for (i=0;i<GetChildrenCount();i++)
     {
         m_Children[i]->SetVisible(bChildrenVisible);
@@ -1601,7 +1601,7 @@ void TreeNode::FindNodesInRange_R( CUtlVector< TreeNode * >& list, bool& finishe
     }
 }
 
-void TreeNode::PositionAndSetVisibleNodes(int &nStart, int &nCount, int x, int &y)
+void TreeNode::PositionAndSetVisibleNodes(int &nStart, intp &nCount, int x, int &y)
 {
     // position ourselves
     if (nStart == 0)
@@ -1618,7 +1618,7 @@ void TreeNode::PositionAndSetVisibleNodes(int &nStart, int &nCount, int x, int &
     }
 
     x += TREE_INDENT_AMOUNT;
-    int i;
+    intp i;
     for (i=0;i<GetChildrenCount();i++)
     {
         if (nCount > 0 && m_bExpand)
@@ -1632,7 +1632,7 @@ void TreeNode::PositionAndSetVisibleNodes(int &nStart, int &nCount, int x, int &
     }
 }
 
-TreeNode *TreeNode::FindItemUnderMouse( int &nStart, int& nCount, int x, int &y, int mx, int my )
+TreeNode *TreeNode::FindItemUnderMouse( int &nStart, intp& nCount, int x, int &y, int mx, int my )
 {
     // position ourselves
     if (nStart == 0)
@@ -1652,7 +1652,7 @@ TreeNode *TreeNode::FindItemUnderMouse( int &nStart, int& nCount, int x, int &y,
     }
 
     x += TREE_INDENT_AMOUNT;
-    int i;
+    intp i;
     for (i=0;i<GetChildrenCount();i++)
     {
         if (nCount > 0 && m_bExpand)
@@ -1669,12 +1669,12 @@ TreeNode *TreeNode::FindItemUnderMouse( int &nStart, int& nCount, int x, int &y,
 }
 
 // counts items above this item including itself
-int TreeNode::CountVisibleIndex()
+intp TreeNode::CountVisibleIndex()
 {
-    int nCount = 1; // myself
+    intp nCount = 1; // myself
     if (GetParentNode())
     {
-        int i;
+        intp i;
         for (i=0;i<GetParentNode()->GetChildrenCount();i++)
         {
             if (GetParentNode()->m_Children[i] == this)
@@ -1961,7 +1961,7 @@ void TreeView::RemoveItem(intp itemIndex, bool bPromoteChildren, bool bFullDelet
 		}
 		else
 		{		
-			int i;
+			intp i;
 			for (i=0;i<pNode->GetChildrenCount();i++)
 			{
 				TreeNode *pDeleteChild = pNode->m_Children[i];
@@ -1994,7 +1994,7 @@ void TreeView::RemoveItem(intp itemIndex, bool bPromoteChildren, bool bFullDelet
 //-----------------------------------------------------------------------------
 void TreeView::RemoveAll()
 {
-    int i;
+    intp i;
     for (i=0;i<m_NodeList.MaxElementIndex();i++)
     {
         if (!m_NodeList.IsValidIndex(i))
@@ -2049,7 +2049,7 @@ bool TreeView::ModifyItem(intp itemIndex, KeyValues *data)
 // Purpose: set the selection colors of an element in the tree view
 //-----------------------------------------------------------------------------
 
-void TreeView::SetItemSelectionTextColor( int itemIndex, const Color& clr )
+void TreeView::SetItemSelectionTextColor( intp itemIndex, const Color& clr )
 {
 	Assert( m_NodeList.IsValidIndex(itemIndex) );
 	if ( !m_NodeList.IsValidIndex(itemIndex) )
@@ -2059,7 +2059,7 @@ void TreeView::SetItemSelectionTextColor( int itemIndex, const Color& clr )
 	pNode->SetSelectionTextColor( clr );
 }
 
-void TreeView::SetItemSelectionBgColor( int itemIndex, const Color& clr )
+void TreeView::SetItemSelectionBgColor( intp itemIndex, const Color& clr )
 {
 	Assert( m_NodeList.IsValidIndex(itemIndex) );
 	if ( !m_NodeList.IsValidIndex(itemIndex) )
@@ -2069,7 +2069,7 @@ void TreeView::SetItemSelectionBgColor( int itemIndex, const Color& clr )
 	pNode->SetSelectionBgColor( clr );
 }
 
-void TreeView::SetItemSelectionUnfocusedBgColor( int itemIndex, const Color& clr )
+void TreeView::SetItemSelectionUnfocusedBgColor( intp itemIndex, const Color& clr )
 {
 	Assert( m_NodeList.IsValidIndex(itemIndex) );
 	if ( !m_NodeList.IsValidIndex(itemIndex) )
@@ -2082,7 +2082,7 @@ void TreeView::SetItemSelectionUnfocusedBgColor( int itemIndex, const Color& clr
 //-----------------------------------------------------------------------------
 // Purpose: set the fg color of an element in the tree view
 //-----------------------------------------------------------------------------
-void TreeView::SetItemFgColor(int itemIndex, const Color& color)
+void TreeView::SetItemFgColor(intp itemIndex, const Color& color)
 {
 	Assert( m_NodeList.IsValidIndex(itemIndex) );
 	if ( !m_NodeList.IsValidIndex(itemIndex) )
@@ -2095,7 +2095,7 @@ void TreeView::SetItemFgColor(int itemIndex, const Color& color)
 //-----------------------------------------------------------------------------
 // Purpose: set the bg color of an element in the tree view
 //-----------------------------------------------------------------------------
-void TreeView::SetItemBgColor(int itemIndex, const Color& color)
+void TreeView::SetItemBgColor(intp itemIndex, const Color& color)
 {
 	Assert( m_NodeList.IsValidIndex(itemIndex) );
 	if ( !m_NodeList.IsValidIndex(itemIndex) )
@@ -2128,7 +2128,7 @@ void TreeView::SetImageList(ImageList *imageList, bool deleteImageListWhenDone)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-IImage *TreeView::GetImage(int index)
+IImage *TreeView::GetImage(intp index)
 {
     return m_pImageList->GetImage(index);
 }
@@ -2165,7 +2165,7 @@ void TreeView::GetSelectedItemData( CUtlVector< KeyValues * >& list )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool TreeView::IsItemIDValid(int itemIndex)
+bool TreeView::IsItemIDValid(intp itemIndex)
 {
     return m_NodeList.IsValidIndex(itemIndex);
 }
@@ -2181,7 +2181,7 @@ intp TreeView::GetHighestItemID()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void TreeView::ExpandItem(int itemIndex, bool bExpand)
+void TreeView::ExpandItem(intp itemIndex, bool bExpand)
 {
     if (!m_NodeList.IsValidIndex(itemIndex))
         return;
@@ -2190,7 +2190,7 @@ void TreeView::ExpandItem(int itemIndex, bool bExpand)
     InvalidateLayout();
 }
 
-bool TreeView::IsItemExpanded( int itemIndex )
+bool TreeView::IsItemExpanded( intp itemIndex )
 {
     if (!m_NodeList.IsValidIndex(itemIndex))
         return false;
@@ -2270,7 +2270,7 @@ void TreeView::PerformLayout()
     int nodesVisible = tall / m_nRowHeight;
 
 	// count the number of visible items
-	int visibleItemCount = m_pRootNode->CountVisibleNodes();
+	intp visibleItemCount = m_pRootNode->CountVisibleNodes();
     int maxWidth = m_pRootNode->GetVisibleMaxWidth() + 10; // 10 pixel buffer
 
     vbarNeeded = visibleItemCount > nodesVisible;
@@ -2393,7 +2393,7 @@ void TreeView::MakeItemVisible(intp itemIndex)
     if (!m_pVertScrollBar->IsVisible())
         return;
 
-    int visibleIndex = pNode->CountVisibleIndex()-1;
+    intp visibleIndex = pNode->CountVisibleIndex()-1;
     int range = m_pVertScrollBar->GetRangeWindow();
     int vbarPos = m_pVertScrollBar->GetValue();
 
@@ -2459,7 +2459,7 @@ void TreeView::OnSliderMoved( int )
 	Repaint();
 }
 
-void TreeView::GenerateDragDataForItem( int, KeyValues * )
+void TreeView::GenerateDragDataForItem( intp, KeyValues * )
 {
 	// Implemented by subclassed TreeView
 }
@@ -2469,8 +2469,9 @@ void TreeView::SetDragEnabledItems( bool state )
 	m_bDragEnabledItems = state;
 }
 
-void TreeView::OnLabelChanged( int, char const *, char const * )
+void TreeView::OnLabelChanged( intp, char const *, char const * )
 {
+	// Implemented by subclassed TreeView
 }
 
 bool TreeView::IsLabelEditingAllowed() const
@@ -2508,7 +2509,7 @@ intp TreeView::FindItemUnderMouse( int mx, int my )
 		// need to figure out
 		int vbarPos = m_pVertScrollBar->IsVisible() ? m_pVertScrollBar->GetValue() : 0;
 		int hbarPos = m_pHorzScrollBar->IsVisible() ? m_pHorzScrollBar->GetValue() : 0;
-		int count = m_pRootNode->CountVisibleNodes();
+		intp count = m_pRootNode->CountVisibleNodes();
 
 		int y = 0;
 		TreeNode *item = m_pRootNode->FindItemUnderMouse( vbarPos, count, -hbarPos, y, mx, my );
@@ -2538,7 +2539,7 @@ void TreeView::OnMousePressed( MouseCode code )
 			// need to figure out
 			int vbarPos = m_pVertScrollBar->IsVisible() ? m_pVertScrollBar->GetValue() : 0;
 			int hbarPos = m_pHorzScrollBar->IsVisible() ? m_pHorzScrollBar->GetValue() : 0;
-			int count = m_pRootNode->CountVisibleNodes();
+			intp count = m_pRootNode->CountVisibleNodes();
 
 			int y = 0;
 			TreeNode *item = m_pRootNode->FindItemUnderMouse( vbarPos, count, -hbarPos, y, mx, my );
@@ -2734,7 +2735,7 @@ bool TreeView::IsItemSelected( intp itemIndex )
 	return m_SelectedItems.Find( sel ) != m_SelectedItems.InvalidIndex();
 }
 
-void TreeView::SetLabelEditingAllowed( int itemIndex, bool state )
+void TreeView::SetLabelEditingAllowed( intp itemIndex, bool state )
 {
 	if ( !m_NodeList.IsValidIndex( itemIndex ) )
 		return;
@@ -2743,7 +2744,7 @@ void TreeView::SetLabelEditingAllowed( int itemIndex, bool state )
 	sel->SetLabelEditingAllowed( state );
 }
 
-void  TreeView::StartEditingLabel( int itemIndex )
+void  TreeView::StartEditingLabel( intp itemIndex )
 {
 	if ( !m_NodeList.IsValidIndex( itemIndex ) )
 		return;
@@ -2782,22 +2783,22 @@ intp TreeView::GetNextChildItemIndex( intp itemIndex )
 	return parent->GetNextChildItemIndex( sel );
 }
 
-bool TreeView::IsItemDroppable( int, CUtlVector< KeyValues * >& )
+bool TreeView::IsItemDroppable( intp, CUtlVector< KeyValues * >& )
 {
 	// Derived classes should implement
 	return false;
 }
 
-void TreeView::OnItemDropped( int, CUtlVector< KeyValues * >& )
+void TreeView::OnItemDropped( intp, CUtlVector< KeyValues * >& )
 {
 }
 
-bool TreeView::GetItemDropContextMenu( int, Menu *, CUtlVector< KeyValues * >& )
+bool TreeView::GetItemDropContextMenu( intp, Menu *, CUtlVector< KeyValues * >& )
 {
 	return false;
 }
 
-HCursor TreeView::GetItemDropCursor( int, CUtlVector< KeyValues * >& )
+HCursor TreeView::GetItemDropCursor( intp, CUtlVector< KeyValues * >& )
 {
 	return dc_arrow;
 }

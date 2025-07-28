@@ -71,17 +71,17 @@ protected:
 
 	typedef CUtlNTree< TreeInfo_t, int > OpenItemTree_t;
 	// Expands all items in the open item tree if they exist
-	void ExpandOpenItems( OpenItemTree_t &tree, int nOpenTreeIndex, int nItemIndex, bool makeVisible );
+	void ExpandOpenItems( OpenItemTree_t &tree, int nOpenTreeIndex, intp nItemIndex, bool makeVisible );
 	// Builds a list of open items
-	void BuildOpenItemList( OpenItemTree_t &tree, int nParent, int nItemIndex );
-	void FillInDataForItem( TreeItem_t &item, int nItemIndex );
+	void BuildOpenItemList( OpenItemTree_t &tree, int nParent, intp nItemIndex );
+	void FillInDataForItem( TreeItem_t &item, intp nItemIndex );
 	// Finds the tree index of a child matching the particular element + attribute
-	int FindTreeItem( int nParentIndex, const TreeItem_t &info );
+	intp FindTreeItem( intp nParentIndex, const TreeItem_t &info );
 
 	vgui::DHANDLE< CBaseAnimationSetEditor >	m_hEditor;
 
 	vgui::DHANDLE< vgui::TreeView >		m_hGroups;
-	CUtlVector< int >					m_hSelectableIndices;
+	CUtlVector< intp >					m_hSelectableIndices;
 
 	CDmeHandle< CDmeAnimationSet >		m_AnimSet;
 

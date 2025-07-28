@@ -144,7 +144,7 @@ private:
 	vgui::TextEntry *m_pLODEdit;
 	
 	int m_nSelectedSequence;
-	int m_nSelectedColumn;
+	intp m_nSelectedColumn;
 
 	QCInfo m_QCInfo_t;
 };

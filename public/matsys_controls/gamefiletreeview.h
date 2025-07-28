@@ -37,37 +37,37 @@ public:
 	CGameFileTreeView( vgui::Panel *parent, const char *name, const char *pRootFolderName, const char *pRootDir, const char *pExtension = NULL );
 
 	// Inherited from base classes
-	void GenerateChildrenOfNode( int itemIndex ) override;
-	void GenerateContextMenu( int itemIndex, int x, int y ) override; 
+	void GenerateChildrenOfNode( intp itemIndex ) override;
+	void GenerateContextMenu( intp itemIndex, int x, int y ) override; 
 	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	// Purpose: Refreshes the active file list
 	void RefreshFileList();
 
 	// Sets an item to be colored as if its a menu
-	void SetItemColorForDirectories( int itemID );
+	void SetItemColorForDirectories( intp itemID );
 
 	// Gets the number of root directories
-	int GetRootDirectoryCount();
+	intp GetRootDirectoryCount();
 
 	// Gets the ith root directory
-	const char *GetRootDirectory( int nIndex );
+	const char *GetRootDirectory( intp nIndex );
 
 	// Selects the root folder
 	void SelectRoot();
 
 private:
 	// Populate the root node (necessary since tree view can't have multiple roots)
-	void PopulateRootNode( int itemIndex );
+	void PopulateRootNode( intp itemIndex );
 
 	// Populate the root node with directories
-	void AddDirectoriesOfNode( int itemIndex, const char *pFilePath );
+	void AddDirectoriesOfNode( intp itemIndex, const char *pFilePath );
 
 	// Populate the root node with directories
 	bool DoesDirectoryHaveSubdirectories( const char *pFilePath );
 
 	// Populate the root node with files
-	void AddFilesOfNode( int itemIndex, const char *pFilePath, const char *pExt );
+	void AddFilesOfNode( intp itemIndex, const char *pFilePath, const char *pExt );
 
 	CUtlString m_RootDir;
 	CUtlString m_Ext;

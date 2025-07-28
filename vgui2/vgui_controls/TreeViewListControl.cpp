@@ -181,12 +181,12 @@ void CTreeViewListControl::RecalculateRows()
 	if ( !m_pTree || m_pTree->GetRootItemIndex() == -1 )
 		return;
 
-	int iRoot = m_pTree->GetRootItemIndex();
+	intp iRoot = m_pTree->GetRootItemIndex();
 	RecalculateRows_R( iRoot );
 }
 
 
-void CTreeViewListControl::RecalculateRows_R( int index )
+void CTreeViewListControl::RecalculateRows_R( intp index )
 {
 	m_Rows.AddToTail( index );
 	if ( !m_pTree->IsItemExpanded( index ) )
@@ -195,7 +195,7 @@ void CTreeViewListControl::RecalculateRows_R( int index )
 	intp nChildren = m_pTree->GetNumChildren( index );
 	for ( intp i=0; i < nChildren; i++ )
 	{
-		int iChild = m_pTree->GetChild( index, i );
+		intp iChild = m_pTree->GetChild( index, i );
 		RecalculateRows_R( iChild );
 	}
 }

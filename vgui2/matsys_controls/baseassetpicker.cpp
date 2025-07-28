@@ -54,7 +54,7 @@ public:
 	CAssetTreeView( vgui::Panel *parent, const char *name, const char *pRootFolderName, const char *pRootDir );
 
 	// Inherited from base classes
-	void GenerateChildrenOfNode( int itemIndex ) override;
+	void GenerateChildrenOfNode( intp itemIndex ) override;
 	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
 	// Opens and selects the root folder
@@ -76,16 +76,16 @@ private:
 	void AllocateRootNode( );
 
 	// Purpose: Refreshes the active file list
-	DirHandle_t RefreshTreeViewItem( int nItemIndex );
+	DirHandle_t RefreshTreeViewItem( intp nItemIndex );
 
 	// Sets an item to be colored as if its a menu
-	void SetItemColorForDirectories( int nItemID );
+	void SetItemColorForDirectories( intp nItemID );
 
 	// Add a directory into the treeview
-	void AddDirectoryToTreeView( int nParentItemIndex, const char *pFullParentPath, DirHandle_t hPath );
+	void AddDirectoryToTreeView( intp nParentItemIndex, const char *pFullParentPath, DirHandle_t hPath );
 
 	// Selects an item in the tree
-	bool SelectFolder_R( int nItemID, const char *pPath );
+	bool SelectFolder_R( intp nItemID, const char *pPath );
 
 	CUtlString m_RootFolderName;
 	CUtlString m_RootDirectory;
@@ -128,7 +128,7 @@ void CAssetTreeView::OpenRoot()
 	pkv->SetInt( "expand", 1 );
 	pkv->SetInt( "dirHandle", m_DirectoryStructure.Root() );
 	pkv->SetString( "path", pRootDir );
-	int iRoot = AddItem( pkv, GetRootItemIndex() );
+	intp iRoot = AddItem( pkv, GetRootItemIndex() );
 	ExpandItem( iRoot, true );
 }
 
@@ -174,7 +174,7 @@ void CAssetTreeView::ClearDirectories()
 //-----------------------------------------------------------------------------
 // Sets an item to be colored as if its a menu
 //-----------------------------------------------------------------------------
-void CAssetTreeView::SetItemColorForDirectories( int nItemID )
+void CAssetTreeView::SetItemColorForDirectories( intp nItemID )
 {
 	// mark directories in orange
 	SetItemFgColor( nItemID, Color(224, 192, 0, 255) );
@@ -184,7 +184,7 @@ void CAssetTreeView::SetItemColorForDirectories( int nItemID )
 //-----------------------------------------------------------------------------
 // Add a directory into the treeview
 //-----------------------------------------------------------------------------
-void CAssetTreeView::AddDirectoryToTreeView( int nParentItemIndex, const char *pFullParentPath, DirHandle_t hPath )
+void CAssetTreeView::AddDirectoryToTreeView( intp nParentItemIndex, const char *pFullParentPath, DirHandle_t hPath )
 {
 	const char *pDirName = m_DirectoryStructure[hPath].Get();
 	KeyValuesAD kv( new KeyValues( "node", "text", pDirName ) );
@@ -199,7 +199,7 @@ void CAssetTreeView::AddDirectoryToTreeView( int nParentItemIndex, const char *p
 	kv->SetInt( "image", 0 );
 	kv->SetInt( "dirHandle", hPath );
 
-	int nItemID = AddItem( kv, nParentItemIndex );
+	intp nItemID = AddItem( kv, nParentItemIndex );
 
 	// mark directories in orange
 	SetItemColorForDirectories( nItemID );
@@ -209,7 +209,7 @@ void CAssetTreeView::AddDirectoryToTreeView( int nParentItemIndex, const char *p
 //-----------------------------------------------------------------------------
 // override to incremental request and show p4 directories
 //-----------------------------------------------------------------------------
-void CAssetTreeView::GenerateChildrenOfNode( int nItemIndex )
+void CAssetTreeView::GenerateChildrenOfNode( intp nItemIndex )
 {
 	KeyValues *pkv = GetItemData( nItemIndex );
 
@@ -233,7 +233,7 @@ void CAssetTreeView::GenerateChildrenOfNode( int nItemIndex )
 //-----------------------------------------------------------------------------
 // Purpose: Refreshes the active file list
 //-----------------------------------------------------------------------------
-DirHandle_t CAssetTreeView::RefreshTreeViewItem( int nItemIndex )
+DirHandle_t CAssetTreeView::RefreshTreeViewItem( intp nItemIndex )
 {
 	if ( nItemIndex < 0 )
 		return m_DirectoryStructure.InvalidIndex();
@@ -253,12 +253,12 @@ DirHandle_t CAssetTreeView::RefreshTreeViewItem( int nItemIndex )
 		return hPath;
 
 	// Check all children + build a list of children we've already got
-	int nChildCount = GetNumChildren( nItemIndex );
+	intp nChildCount = GetNumChildren( nItemIndex );
 	DirHandle_t *pFoundHandles = (DirHandle_t*)_alloca( nChildCount * sizeof(DirHandle_t) );
 	memset( pFoundHandles, 0xFF, nChildCount * sizeof(DirHandle_t) );
-	for ( int i = 0; i < nChildCount; ++i )
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
-		int nChildItemIndex = GetChild( nItemIndex, i );
+		intp nChildItemIndex = GetChild( nItemIndex, i );
 		pFoundHandles[i] = RefreshTreeViewItem( nChildItemIndex );
 	}
 
@@ -268,7 +268,7 @@ DirHandle_t CAssetTreeView::RefreshTreeViewItem( int nItemIndex )
 	{
 		// Search for existence of this child already
 		bool bFound = false;
-		for ( int j = 0; j < nChildCount; ++j )
+		for ( intp j = 0; j < nChildCount; ++j )
 		{
 			if ( pFoundHandles[j] == hChild )
 			{
@@ -300,7 +300,7 @@ void CAssetTreeView::RefreshFileList()
 //-----------------------------------------------------------------------------
 // Selects a folder
 //-----------------------------------------------------------------------------
-bool CAssetTreeView::SelectFolder_R( int nItemID, const char *pPath )
+bool CAssetTreeView::SelectFolder_R( intp nItemID, const char *pPath )
 {
 	if ( nItemID < 0 )
 		return false;
@@ -321,10 +321,10 @@ bool CAssetTreeView::SelectFolder_R( int nItemID, const char *pPath )
 
 	ExpandItem( nItemID, true );
 
-	int nChildCount = GetNumChildren( nItemID );
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = GetNumChildren( nItemID );
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
-		int nChildItemID = GetChild( nItemID, i );
+		intp nChildItemID = GetChild( nItemID, i );
 		if ( SelectFolder_R( nChildItemID, pPath ) )
 			return true;
 	}
@@ -337,7 +337,7 @@ void CAssetTreeView::SelectFolder( const char *pSubDir, const char *pPath )
 	Q_snprintf( pTemp, sizeof(pTemp), "%s\\%s", pSubDir, pPath );
 	Q_StripTrailingSlash( pTemp );
 
-	int nItem = GetRootItemIndex();
+	intp nItem = GetRootItemIndex();
 	SelectFolder_R( nItem, pTemp );
 }
 
@@ -369,7 +369,7 @@ public:
 	struct CachedAssetInfo_t
 	{
 		CUtlString m_AssetName;
-		int m_nModIndex;
+		intp m_nModIndex;
 	};
 
 	struct ModInfo_t
@@ -381,17 +381,17 @@ public:
 	CAssetCache();
 
 	// Mod iteration
-	int ModCount() const;
-	const ModInfo_t& ModInfo( int nIndex ) const;
+	intp ModCount() const;
+	const ModInfo_t& ModInfo( intp nIndex ) const;
 	
 	// Building the mod list
 	void BuildModList();
 
-	AssetList_t FindAssetList( const char *pAssetType, const char *pSubDir, int nExtCount, const char **ppExt );
+	AssetList_t FindAssetList( const char *pAssetType, const char *pSubDir, intp nExtCount, const char **ppExt );
 	bool BeginAssetScan( AssetList_t hList, bool bForceRescan = false );
 	CAssetTreeView* GetFileTree( AssetList_t hList );
-	int GetAssetCount( AssetList_t hList ) const;
-	const CachedAssetInfo_t& GetAsset( AssetList_t hList, int nIndex ) const;
+	intp GetAssetCount( AssetList_t hList ) const;
+	const CachedAssetInfo_t& GetAsset( AssetList_t hList, intp nIndex ) const;
 
 	void AddAsset( AssetList_t hList, const CachedAssetInfo_t& info );
 
@@ -407,7 +407,7 @@ private:
 	struct CachedAssetList_t
 	{
 		CachedAssetList_t() {}
-		CachedAssetList_t( const char *pSearchSubDir, int nExtCount, const char **ppSearchExt )	:
+		CachedAssetList_t( const char *pSearchSubDir, intp nExtCount, const char **ppSearchExt )	:
 			m_pSubDir( pSearchSubDir, Q_strlen( pSearchSubDir ) + 1 )
 		{
 			m_Ext.AddMultipleToTail( nExtCount, ppSearchExt );
@@ -429,16 +429,16 @@ private:
 	};
 
 private:
-	bool AddFilesInDirectory( CachedAssetList_t& list, const char *pStartingFile, const char *pFilePath, DirHandle_t hDirHandle, float flStartTime, float flDuration );
+	bool AddFilesInDirectory( CachedAssetList_t& list, const char *pStartingFile, const char *pFilePath, DirHandle_t hDirHandle, double flStartTime, float flDuration );
 	bool DoesExtensionMatch( CachedAssetList_t& list, const char *pFileName );
-	void AddAssetToList( CachedAssetList_t& list, const char *pAssetName, int nModIndex );
+	void AddAssetToList( CachedAssetList_t& list, const char *pAssetName, intp nModIndex );
 
 private:
 	// List of known mods
 	CUtlVector< ModInfo_t > m_ModList;
 
 	// List of cached assets
-	CUtlRBTree< CachedAssetList_t > m_CachedAssets;
+	CUtlRBTree< CachedAssetList_t, intp > m_CachedAssets;
 
 	// Have we built the mod list?
 	bool m_bBuiltModList;
@@ -462,12 +462,12 @@ bool CAssetCache::CachedAssetLessFunc( const CAssetCache::CachedAssetList_t& src
 	if ( nRetVal != 0 )
 		return nRetVal > 0;
 
-	int nCount = src1.m_Ext.Count();
-	int nDiff = nCount - src2.m_Ext.Count();
+	intp nCount = src1.m_Ext.Count();
+	intp nDiff = nCount - src2.m_Ext.Count();
 	if ( nDiff != 0 )
 		return nDiff > 0;
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		nRetVal = Q_stricmp( src1.m_Ext[i], src2.m_Ext[i] );
 		if ( nRetVal != 0 )
@@ -490,12 +490,12 @@ CAssetCache::CAssetCache() : m_CachedAssets( 0, 0, CachedAssetLessFunc )
 //-----------------------------------------------------------------------------
 // Mod iteration
 //-----------------------------------------------------------------------------
-int CAssetCache::ModCount() const
+intp CAssetCache::ModCount() const
 {
 	return m_ModList.Count();
 }
 
-const CAssetCache::ModInfo_t& CAssetCache::ModInfo( int nIndex ) const
+const CAssetCache::ModInfo_t& CAssetCache::ModInfo( intp nIndex ) const
 {
 	return m_ModList[nIndex];
 }
@@ -549,7 +549,7 @@ void CAssetCache::BuildModList()
 //-----------------------------------------------------------------------------
 // Adds an asset to the list of assets of this type
 //-----------------------------------------------------------------------------
-void CAssetCache::AddAssetToList( CachedAssetList_t& list, const char *pAssetName, int nModIndex )
+void CAssetCache::AddAssetToList( CachedAssetList_t& list, const char *pAssetName, intp nModIndex )
 {
 	intp i = list.m_AssetList.AddToTail( );
 	CachedAssetInfo_t& info = list.m_AssetList[i];
@@ -567,8 +567,8 @@ bool CAssetCache::DoesExtensionMatch( CachedAssetList_t& info, const char *pFile
 	V_ExtractFileExtension( pFileName, pChildExt );
 
 	// Check the extension matches
-	int nCount = info.m_Ext.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = info.m_Ext.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( info.m_Ext[i], pChildExt ) )
 			return true;
@@ -581,7 +581,7 @@ bool CAssetCache::DoesExtensionMatch( CachedAssetList_t& info, const char *pFile
 //-----------------------------------------------------------------------------
 // Recursively add all files matching the wildcard under this directory
 //-----------------------------------------------------------------------------
-bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pStartingFile, const char *pFilePath, DirHandle_t hCurrentDir, float flStartTime, float flDuration )
+bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pStartingFile, const char *pFilePath, DirHandle_t hCurrentDir, double flStartTime, float flDuration )
 {
 	// Indicates no files found
 	if ( list.m_hFind == FILESYSTEM_INVALID_FIND_HANDLE )
@@ -622,8 +622,8 @@ bool CAssetCache::AddFilesInDirectory( CachedAssetList_t& list, const char *pSta
 				char pFullAssetPath[MAX_PATH];
 				g_pFullFileSystem->RelativePathToFullPath_safe( pRelativeChildPath, "GAME", pFullAssetPath );
 
-				int nModIndex = -1;
-				for ( int i = 0; i < nModCount; ++i )
+				intp nModIndex = -1;
+				for ( intp i = 0; i < nModCount; ++i )
 				{
 					if ( !Q_strnicmp( pFullAssetPath, m_ModList[i].m_Path, m_ModList[i].m_Path.Length() ) )
 					{
@@ -671,7 +671,7 @@ bool CAssetCache::ContinueSearchForAssets( AssetList_t hList, float flDuration )
 {
 	CachedAssetList_t& list = m_CachedAssets[ (intp)hList ];
 
-	float flStartTime = Plat_FloatTime();
+	double flStartTime = Plat_FloatTime();
 	while ( list.m_DirectoriesToCheck.Count() )
 	{
 		const char *pFilePath = list.m_DirectoriesToCheck[ list.m_DirectoriesToCheck.Head() ].m_DirName;
@@ -741,7 +741,7 @@ bool CAssetCache::BeginAssetScan( AssetList_t hList, bool bForceRescan )
 //-----------------------------------------------------------------------------
 // Asset cache iteration
 //-----------------------------------------------------------------------------
-AssetList_t CAssetCache::FindAssetList( const char *pAssetType, const char *pSubDir, int nExtCount, const char **ppExt )
+AssetList_t CAssetCache::FindAssetList( const char *pAssetType, const char *pSubDir, intp nExtCount, const char **ppExt )
 {
 	CachedAssetList_t search( pSubDir, nExtCount, ppExt );
 	auto nIndex = m_CachedAssets.Find( search );
@@ -766,14 +766,14 @@ CAssetTreeView* CAssetCache::GetFileTree( AssetList_t hList )
 	return m_CachedAssets[ (intp)hList ].m_pFileTree;
 }
 
-int CAssetCache::GetAssetCount( AssetList_t hList ) const
+intp CAssetCache::GetAssetCount( AssetList_t hList ) const
 {
 	if ( hList == ASSET_LIST_INVALID )
 		return 0;
 	return m_CachedAssets[ (intp)hList ].m_AssetList.Count();
 }
 
-const CAssetCache::CachedAssetInfo_t& CAssetCache::GetAsset( AssetList_t hList, int nIndex ) const
+const CAssetCache::CachedAssetInfo_t& CAssetCache::GetAsset( AssetList_t hList, intp nIndex ) const
 {
 	Assert( nIndex < GetAssetCount(hList) );
 	return m_CachedAssets[ (intp)hList ].m_AssetList[ nIndex ];
@@ -804,10 +804,15 @@ static int __cdecl AssetBrowserSortFunc( vgui::ListPanel *pPanel, const ListPane
 
 static int __cdecl AssetBrowserModSortFunc( vgui::ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
 {
-	int nMod1 = item1.kv->GetInt("modIndex", -1);
-	int nMod2 = item2.kv->GetInt("modIndex", -1);
+	intp nMod1 = (intp)item1.kv->GetUint64("modIndex", std::numeric_limits<uint64_t>::max());
+	intp nMod2 = (intp)item2.kv->GetUint64("modIndex", std::numeric_limits<uint64_t>::max());
 	if ( nMod1 != nMod2 )
-		return nMod1 - nMod2;
+	{
+		intp diff = nMod1 - nMod2;
+		if (diff > 0) return 1;
+		if (diff < 0) return -1;
+		return 0;
+	}
 	return AssetBrowserSortFunc( pPanel, item1, item2 );
 }
 
@@ -851,7 +856,7 @@ CBaseAssetPicker::~CBaseAssetPicker()
 //-----------------------------------------------------------------------------
 void CBaseAssetPicker::CreateStandardControls( vgui::Panel *pParent, bool bAllowMultiselect )
 {
-	int nExtCount = 1 + m_ExtraAssetExt.Count();
+	intp nExtCount = 1 + m_ExtraAssetExt.Count();
 	const char **ppExt = (const char **)_alloca( nExtCount * sizeof(const char *) );
 	ppExt[0] = m_pAssetExt;
 	if ( nExtCount > 1 )
@@ -927,8 +932,8 @@ void CBaseAssetPicker::ApplyUserConfigSettings( KeyValues *pUserConfig )
 	m_nCurrentModFilter = -1;
 	if ( pMod && pMod[0] )
 	{
-		int nCount = s_AssetCache.ModCount();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = s_AssetCache.ModCount();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			const CAssetCache::ModInfo_t& modInfo = s_AssetCache.ModInfo( i );
 			if ( Q_stricmp( pMod, modInfo.m_ModName ) )
@@ -1005,8 +1010,8 @@ void CBaseAssetPicker::SetInitialSelection( const char *pAssetName )
 	{	
 		// Sometimes we've already refreshed our list with a bunch of cached resources and the item is already in the list,
 		// so in that case just select it here.
-		int cnt = m_pAssetBrowser->GetItemCount();
-		for ( int i=0; i < cnt; i++ )
+		intp cnt = m_pAssetBrowser->GetItemCount();
+		for ( intp i=0; i < cnt; i++ )
 		{
 			KeyValues *kv = m_pAssetBrowser->GetItem( i );
 			if ( !kv )
@@ -1071,12 +1076,12 @@ void CBaseAssetPicker::OnKeyCodePressed( KeyCode code )
 //-----------------------------------------------------------------------------
 // Is a particular asset visible?
 //-----------------------------------------------------------------------------
-bool CBaseAssetPicker::IsAssetVisible( int nAssetIndex )
+bool CBaseAssetPicker::IsAssetVisible( intp nAssetIndex )
 {
 	const CAssetCache::CachedAssetInfo_t& info = s_AssetCache.GetAsset( m_hAssetList, nAssetIndex );
 
 	// Filter based on active mod
-	int nModIndex = info.m_nModIndex;
+	intp nModIndex = info.m_nModIndex;
 	if ( ( m_nCurrentModFilter >= 0 ) && ( m_nCurrentModFilter != nModIndex ) )
 		return false;
 
@@ -1103,7 +1108,7 @@ bool CBaseAssetPicker::IsAssetVisible( int nAssetIndex )
 //-----------------------------------------------------------------------------
 // Adds an asset from the cache to the list
 //-----------------------------------------------------------------------------
-void CBaseAssetPicker::AddAssetToList( int nAssetIndex )
+void CBaseAssetPicker::AddAssetToList( intp nAssetIndex )
 {
 	const CAssetCache::CachedAssetInfo_t& info = s_AssetCache.GetAsset( m_hAssetList, nAssetIndex );
 
@@ -1111,9 +1116,9 @@ void CBaseAssetPicker::AddAssetToList( int nAssetIndex )
 
 	KeyValuesAD kv( new KeyValues( "node", "asset", info.m_AssetName ) );
 	kv->SetString( "mod", s_AssetCache.ModInfo( info.m_nModIndex ).m_ModName );
-	kv->SetInt( "modIndex", info.m_nModIndex );
+	kv->SetUint64( "modIndex", info.m_nModIndex );
 	kv->SetInt( "root", bInRootDir );
-	int nItemID = m_pAssetBrowser->AddItem( kv, 0, false, false );
+	intp nItemID = m_pAssetBrowser->AddItem( kv, 0, false, false );
 	
 	if ( m_pAssetBrowser->GetSelectedItemsCount() == 0 && !Q_strcmp( m_SelectedAsset, info.m_AssetName ) )
 	{
@@ -1147,7 +1152,7 @@ void CBaseAssetPicker::OnTick()
 {
 	BaseClass::OnTick();
 
-	int nPreAssetCount = s_AssetCache.GetAssetCount( m_hAssetList );
+	intp nPreAssetCount = s_AssetCache.GetAssetCount( m_hAssetList );
 
 	// Stop getting called back once all assets have been found
 	float flTime = m_bFirstAssetScan ? ASSET_LIST_DIRECTORY_INITIAL_SEARCH_TIME : ASSET_LIST_DIRECTORY_SEARCH_TIME;
@@ -1159,8 +1164,8 @@ void CBaseAssetPicker::OnTick()
 	}
 	m_bFirstAssetScan = false;
 
-	int nPostAssetCount = s_AssetCache.GetAssetCount( m_hAssetList );
-	for ( int i = nPreAssetCount; i < nPostAssetCount; ++i )
+	intp nPostAssetCount = s_AssetCache.GetAssetCount( m_hAssetList );
+	for ( intp i = nPreAssetCount; i < nPostAssetCount; ++i )
 	{
 		AddAssetToList( i );
 	}
@@ -1200,9 +1205,9 @@ void CBaseAssetPicker::BuildAssetNameList( )
 	s_AssetCache.BuildModList();
 
 	m_pModSelector->RemoveAll();
-	m_pModSelector->AddItem( "All Mods", KeyValuesAD( new KeyValues( "Mod", "mod", -1 ) ) );
-	int nModCount = s_AssetCache.ModCount();
-	for ( int i = 0; i < nModCount; ++i )
+	m_pModSelector->AddItem( "All Mods", KeyValuesAD( new KeyValues( "Mod", "mod", std::numeric_limits<uint64_t>::max() ) ) );
+	intp nModCount = s_AssetCache.ModCount();
+	for ( intp i = 0; i < nModCount; ++i )
 	{
 		const char *pModName = s_AssetCache.ModInfo( i ).m_ModName;
 		m_pModSelector->AddItem( pModName, KeyValuesAD( new KeyValues( "Mod", "mod", i ) ) );
@@ -1222,8 +1227,8 @@ void CBaseAssetPicker::BuildAssetNameList( )
 		m_bFinishedAssetListScan = true;
 	}
 
-	int nAssetCount = s_AssetCache.GetAssetCount( m_hAssetList );
-	for ( int i = 0; i < nAssetCount; ++i )
+	intp nAssetCount = s_AssetCache.GetAssetCount( m_hAssetList );
+	for ( intp i = 0; i < nAssetCount; ++i )
 	{
 		AddAssetToList( i );
 	}
@@ -1252,7 +1257,7 @@ void CBaseAssetPicker::RescanAssets()
 //-----------------------------------------------------------------------------
 // Returns the mod path to the item index
 //-----------------------------------------------------------------------------
-const char *CBaseAssetPicker::GetModPath( int nModIndex )
+const char *CBaseAssetPicker::GetModPath( intp nModIndex )
 {
 	return s_AssetCache.ModInfo( nModIndex ).m_Path.Get();
 }
@@ -1306,9 +1311,9 @@ void CBaseAssetPicker::RefreshAssetList( )
 	BuildAssetNameList();
 
 	// Check the filter matches
-	int nCount = m_AssetList.Count();
+	intp nCount = m_AssetList.Count();
 	m_nMatchingAssets = 0;
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		// Filter based on active mod
 		bool bIsVisible = IsAssetVisible( i );
@@ -1326,7 +1331,7 @@ void CBaseAssetPicker::RefreshAssetList( )
 	{
 		// Invoke a callback if the next selection will be a 'default' selection
 		OnNextSelectionIsDefault();
-		int nItemID = m_pAssetBrowser->GetItemIDFromRow( 0 );
+		intp nItemID = m_pAssetBrowser->GetItemIDFromRow( 0 );
 		m_pAssetBrowser->SetSelectedCell( nItemID, 0 );
 	}
 
@@ -1341,7 +1346,7 @@ void CBaseAssetPicker::OnFileSelected()
 {
 	// update list
 	const char *pFolderFilter = "";
-	int iItem = m_pFileTree->GetFirstSelectedItem();
+	intp iItem = m_pFileTree->GetFirstSelectedItem();
 	if ( iItem >= 0 )
 	{
 		KeyValues *pkv = m_pFileTree->GetItemData( iItem );
@@ -1376,7 +1381,7 @@ void CBaseAssetPicker::OnTextChanged( KeyValues *pKeyValues )
 	vgui::Panel *pSource = (vgui::Panel*)pKeyValues->GetPtr( "panel" );
 	if ( pSource == m_pFilter )
 	{
-		int nLength = m_pFilter->GetTextLength();
+		intp nLength = m_pFilter->GetTextLength();
 		char *pNewFilter = stackallocT( char, nLength+1 );
 		if ( nLength > 0 )
 		{
@@ -1400,7 +1405,7 @@ void CBaseAssetPicker::OnTextChanged( KeyValues *pKeyValues )
 		KeyValues *pKeyValuesActive = m_pModSelector->GetActiveItemUserData();
 		if ( pKeyValuesActive )
 		{
-			m_nCurrentModFilter = pKeyValuesActive->GetInt( "mod", -1 );
+			m_nCurrentModFilter = (intp)pKeyValuesActive->GetUint64( "mod", std::numeric_limits<uint64_t>::max() );
 			RefreshAssetList();
 		}
 		return;
@@ -1421,7 +1426,7 @@ void CBaseAssetPicker::OnItemSelected( KeyValues *kv )
 		const char *pSelectedAsset = GetSelectedAsset( nCount - 1 );
 
 		// Fill in the full path
-		int nModIndex = GetSelectedAssetModIndex();
+		intp nModIndex = GetSelectedAssetModIndex();
 		char pBuf[MAX_PATH];
 		Q_snprintf( pBuf, sizeof(pBuf), "%s\\%s\\%s", 
 			s_AssetCache.ModInfo( nModIndex ).m_Path.Get(), m_pAssetSubDir, pSelectedAsset );
@@ -1476,14 +1481,14 @@ const char *CBaseAssetPicker::GetSelectedAsset( int nAssetIndex )
 //-----------------------------------------------------------------------------
 // Returns the selceted asset mod index
 //-----------------------------------------------------------------------------
-int CBaseAssetPicker::GetSelectedAssetModIndex( )
+intp CBaseAssetPicker::GetSelectedAssetModIndex( )
 {
 	if ( m_pAssetBrowser->GetSelectedItemsCount() == 0 )
 		return 0;
 
 	int nIndex = m_pAssetBrowser->GetSelectedItem( 0 );
 	KeyValues *pItemKeyValues = m_pAssetBrowser->GetItem( nIndex );
-	return pItemKeyValues->GetInt( "modIndex" );
+	return (intp)pItemKeyValues->GetUint64( "modIndex" );
 }
 
 

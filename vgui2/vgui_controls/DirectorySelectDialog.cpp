@@ -39,7 +39,7 @@ DirectoryTreeView::DirectoryTreeView(DirectorySelectDialog *parent, const char *
 	m_pParent = parent;
 }
 
-void DirectoryTreeView::GenerateChildrenOfNode(int itemIndex)
+void DirectoryTreeView::GenerateChildrenOfNode(intp itemIndex)
 {
 	m_pParent->GenerateChildrenOfDirectoryNode(itemIndex);
 }
@@ -170,9 +170,9 @@ void DirectorySelectDialog::ApplySchemeSettings(IScheme *pScheme)
 // Purpose: Move the start string forward until we hit a slash and return the
 //			the first character past the trailing slash
 //-----------------------------------------------------------------------------
-inline const char *MoveToNextSubDir( const char *pStart, int *nCount )
+inline const char *MoveToNextSubDir( const char *pStart, intp *nCount )
 {
-	int nMoved = 0;
+	intp nMoved = 0;
 
 	// Move past pre-pended slash
 	if ( pStart[nMoved] == '\\' )
@@ -225,13 +225,13 @@ void DirectorySelectDialog::ExpandTreeToPath( const char *lpszPath, bool bSelect
 	}
 
 	// Start at the root of our tree
-	int nItemIndex = m_pDirTree->GetRootItemIndex();
+	intp nItemIndex = m_pDirTree->GetRootItemIndex();
 	
 	// Move past the drive letter to the first subdir
-	int nPathPos = 0;
+	intp nPathPos = 0;
 	const char *lpszSubDirName = MoveToNextSubDir( workPath, &nPathPos ); 
 	const char *lpszLastSubDirName = NULL;
-	int nPathIncr = 0;
+	intp nPathIncr = 0;
 	char subDirName[MAX_PATH];
 
 	// While there are subdirectory names present, expand and populate the tree with their subdirectories
@@ -249,10 +249,10 @@ void DirectorySelectDialog::ExpandTreeToPath( const char *lpszPath, bool bSelect
 		nPathPos += nPathIncr;
 
 		// Run through the list and expand to our currently selected directory
-		for ( int i = 0; i < m_pDirTree->GetNumChildren( nItemIndex ); i++ )
+		for ( intp i = 0; i < m_pDirTree->GetNumChildren( nItemIndex ); i++ )
 		{
 			// Get the child and data for it
-			int nChild = m_pDirTree->GetChild( nItemIndex, i );
+			intp nChild = m_pDirTree->GetChild( nItemIndex, i );
 			KeyValues *pValues = m_pDirTree->GetItemData( nChild );
 
 			// See if this matches
@@ -301,7 +301,7 @@ void DirectorySelectDialog::SetStartDirectory(const char *path)
 	BuildDriveChoices();
 
 	// update state of create directory button
-	int selectedIndex = m_pDirTree->GetFirstSelectedItem();
+	intp selectedIndex = m_pDirTree->GetFirstSelectedItem();
 	if (m_pDirTree->IsItemIDValid(selectedIndex))
 	{
 		m_pCreateButton->SetEnabled(true);
@@ -365,7 +365,7 @@ void DirectorySelectDialog::BuildDirTree()
 	// dimhotepus: Do not leak KevValues.
 	KeyValuesAD kv(new KeyValues("root", "Text", m_szCurrentDrive));
 	// add in a root
-	int rootIndex = m_pDirTree->AddItem(kv, -1);
+	intp rootIndex = m_pDirTree->AddItem(kv, -1);
 
 	// build first level of the tree
 	ExpandTreeNode(m_szCurrentDrive, rootIndex);
@@ -377,7 +377,7 @@ void DirectorySelectDialog::BuildDirTree()
 //-----------------------------------------------------------------------------
 // Purpose: expands a path
 //-----------------------------------------------------------------------------
-void DirectorySelectDialog::ExpandTreeNode(const char *path, int parentNodeIndex)
+void DirectorySelectDialog::ExpandTreeNode(const char *path, intp parentNodeIndex)
 {
 	// set the small wait cursor
 	surface()->SetCursor(dc_waitarrow);
@@ -432,7 +432,7 @@ bool DirectorySelectDialog::DoesDirectoryHaveSubdirectories(const char *path, co
 //-----------------------------------------------------------------------------
 // Purpose: Generates the children for the specified node
 //-----------------------------------------------------------------------------
-void DirectorySelectDialog::GenerateChildrenOfDirectoryNode(int nodeIndex)
+void DirectorySelectDialog::GenerateChildrenOfDirectoryNode(intp nodeIndex)
 {
 	// generate path
 	char path[512];
@@ -445,15 +445,15 @@ void DirectorySelectDialog::GenerateChildrenOfDirectoryNode(int nodeIndex)
 //-----------------------------------------------------------------------------
 // Purpose: creates the full path for a node
 //-----------------------------------------------------------------------------
-void DirectorySelectDialog::GenerateFullPathForNode(int nodeIndex, char *path, int pathBufferSize)
+void DirectorySelectDialog::GenerateFullPathForNode(intp nodeIndex, char *path, intp pathBufferSize)
 {
 	// dimhotepus: Do not overflow 0 size buffer.
 	if (pathBufferSize <= 0) return;
 
 	// get all the nodes
-	CUtlLinkedList<int, int> nodes;
+	CUtlLinkedList<intp, intp> nodes;
 	nodes.AddToTail(nodeIndex);
-	int parentIndex = nodeIndex;
+	intp parentIndex = nodeIndex;
 	while (1)
 	{
 		parentIndex = m_pDirTree->GetItemParent(parentIndex);
@@ -499,7 +499,7 @@ void DirectorySelectDialog::OnTextChanged()
 //-----------------------------------------------------------------------------
 void DirectorySelectDialog::OnCreateDirectory(const char *dir)
 {
-	int selectedIndex = m_pDirTree->GetFirstSelectedItem();
+	intp selectedIndex = m_pDirTree->GetFirstSelectedItem();
 	if (m_pDirTree->IsItemIDValid(selectedIndex))
 	{
 		char fullPath[512];
@@ -515,7 +515,7 @@ void DirectorySelectDialog::OnCreateDirectory(const char *dir)
 			// set the folder image
 			kv->SetInt("Image", 1);
 			kv->SetInt("SelectedImage", 1);
-			int itemID = m_pDirTree->AddItem(kv, selectedIndex);
+			intp itemID = m_pDirTree->AddItem(kv, selectedIndex);
 
 			// select the item
 			m_pDirTree->AddSelectedItem( itemID, true );
@@ -550,7 +550,7 @@ void DirectorySelectDialog::OnCommand(const char *command)
 	else if (!stricmp(command, "Select"))
 	{
 		// path selected
-		int selectedIndex = m_pDirTree->GetFirstSelectedItem();
+		intp selectedIndex = m_pDirTree->GetFirstSelectedItem();
 		if (m_pDirTree->IsItemIDValid(selectedIndex))
 		{
 			char fullPath[512];
@@ -561,7 +561,7 @@ void DirectorySelectDialog::OnCommand(const char *command)
 	}
 	else if (!stricmp(command, "Create"))
 	{
-		int selectedIndex = m_pDirTree->GetFirstSelectedItem();
+		intp selectedIndex = m_pDirTree->GetFirstSelectedItem();
 		if (m_pDirTree->IsItemIDValid(selectedIndex))
 		{
 			CreateDirectoryDialog *dlg = new CreateDirectoryDialog(this, m_szDefaultCreateDirName);
@@ -580,7 +580,7 @@ void DirectorySelectDialog::OnCommand(const char *command)
 //-----------------------------------------------------------------------------
 void DirectorySelectDialog::OnTreeViewItemSelected()
 {
-	int selectedIndex = m_pDirTree->GetFirstSelectedItem();
+	intp selectedIndex = m_pDirTree->GetFirstSelectedItem();
 	if (!m_pDirTree->IsItemIDValid(selectedIndex))
 	{
 		m_pCreateButton->SetEnabled(false);
