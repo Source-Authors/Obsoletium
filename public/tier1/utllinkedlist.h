@@ -500,7 +500,7 @@ inline I CUtlLinkedList<T,S,ML,I,M>::Count() const
 template <class T, class S, bool ML, class I, class M>
 inline I CUtlLinkedList<T,S,ML,I,M>::MaxElementIndex() const   
 {
-	return m_Memory.NumAllocated();
+	return (I)m_Memory.NumAllocated();
 }
 
 
