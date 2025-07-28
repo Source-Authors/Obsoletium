@@ -81,8 +81,8 @@ char		global_lights[MAX_PATH] = "";
 char		designer_lights[MAX_PATH] = "";
 char		level_lights[MAX_PATH] = "";
 
-char		vismatfile[_MAX_PATH] = "";
-char		incrementfile[_MAX_PATH] = "";
+char		vismatfile[MAX_PATH] = "";
+char		incrementfile[MAX_PATH] = "";
 
 IIncremental *g_pIncremental = 0;
 std::atomic_bool	g_bInterrupt = false;	// Used with background lighting in WC. Tells VRAD

@@ -366,7 +366,7 @@ void DetailObjects::AddDetailSpriteToFace( const Vector &vecOrigin, const QAngle
 	CSpriteModel	*pSpriteModel = new CSpriteModel;
 	m_DetailSprites.AddToTail(pSpriteModel);
 
-	const char	szSpriteName[_MAX_PATH] = "detail/detailsprites";
+	const char	szSpriteName[MAX_PATH] = "detail/detailsprites";
 
 	pSpriteModel->LoadSprite( szSpriteName );
 

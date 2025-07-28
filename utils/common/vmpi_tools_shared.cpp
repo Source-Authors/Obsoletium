@@ -70,7 +70,7 @@ bool SharedDispatch(MessageBuffer *pBuf, int iSource, int iPacketID) {
           if (!szFolder) szFolder = "c:";
 
           // Base module name
-          char chModuleName[_MAX_PATH] = {}, *pModuleName = chModuleName;
+          char chModuleName[MAX_PATH] = {}, *pModuleName = chModuleName;
           ::GetModuleFileName(NULL, chModuleName,
                               sizeof(chModuleName) / sizeof(chModuleName[0]));
 
@@ -86,7 +86,7 @@ bool SharedDispatch(MessageBuffer *pBuf, int iSource, int iPacketID) {
           static unsigned int s_numMiniDumps = 0;
 
           // Prepare the filename
-          char chSaveFileName[2 * _MAX_PATH] = {0};
+          char chSaveFileName[2 * MAX_PATH] = {0};
           V_sprintf_safe(chSaveFileName,
                          "%s\\vmpi_%s_on_%s_%d%02d%02d_%02d%02d%02d_%u.mdmp",
                          szFolder, pModuleName, VMPI_GetMachineName(iSource),
@@ -210,7 +210,7 @@ void VMPI_HandleCrash(const char *pMessage, void *pvExceptionInfo,
     // Now attempt to create a minidump with the given exception information
     if (pvExceptionInfo) {
       EXCEPTION_POINTERS *pvExPointers = (EXCEPTION_POINTERS *)pvExceptionInfo;
-      tchar tchMinidumpFileName[_MAX_PATH] = {0};
+      tchar tchMinidumpFileName[MAX_PATH] = {0};
 
       bool bSucceededWritingMinidump = WriteMiniDumpUsingExceptionInfo(
           pvExPointers->ExceptionRecord->ExceptionCode, pvExPointers,

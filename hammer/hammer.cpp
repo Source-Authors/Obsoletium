@@ -1198,7 +1198,7 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	LoadFileSystemDialogModule();
 
 	// Load detail object descriptions.
-	char	szGameDir[_MAX_PATH];
+	char	szGameDir[MAX_PATH];
 	APP()->GetDirectory(DIR_MOD, szGameDir);
 	DetailObjects::LoadEmitDetailObjectDictionary( szGameDir );
 	

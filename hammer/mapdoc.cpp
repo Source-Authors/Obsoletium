@@ -3227,7 +3227,7 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	{
 		if (!CopyFile(lpszPathName, szFile, FALSE))
 		{
-			char szError[_MAX_PATH];
+			char szError[MAX_PATH];
 			V_sprintf_safe(szError, "Hammer was unable to backup the existing file \"%s\".\nThe error is '%s'.\n\n"
 				"Please verify that the there is storage space and that the path still exists.",
 				std::system_category().message(::GetLastError()).c_str(), lpszPathName);
@@ -3274,7 +3274,7 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	std::fstream file(lpszPathName, std::ios::out | std::ios::binary);
 	if (!file.is_open())
 	{
-		char szError[_MAX_PATH];
+		char szError[MAX_PATH];
 		V_sprintf_safe(szError, "Hammer was unable to open the file \"%s\" for writing.\n\n"
 			"Please verify that the file is writable and that the path exists.", lpszPathName);
 		AfxMessageBox(szError, MB_ICONERROR);
@@ -5477,7 +5477,7 @@ void CMapDoc::OnFileSaveAs(void)
 		if (access(str, 0) != -1)
 		{
 			// The file exists.
-			char szConfirm[_MAX_PATH];
+			char szConfirm[MAX_PATH];
 
 			if (access(str, 2) == -1)
 			{

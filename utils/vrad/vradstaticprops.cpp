@@ -1270,7 +1270,7 @@ void CVradStaticPropMgr::ApplyLightingToStaticProp( int iStaticProp, CStaticProp
 
 							if (g_bDumpPropLightmaps)
 							{
-								char buffer[_MAX_PATH];
+								char buffer[MAX_PATH];
 								V_sprintf_safe( 
 									buffer, 
 									"staticprop_lightmap_%d_%.0f_%.0f_%.0f_%s_%d_%d_%d_%d_%d.tga", 
