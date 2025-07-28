@@ -101,7 +101,6 @@ int main(int argc, char **argv) {
   if (errc) {
     Error("Unable to open '%s' for reading: %s.\n", actual_vtf_file_name,
           errc.message().c_str());
-    exit(errc.value());
   }
 
   int64 size;
@@ -109,7 +108,6 @@ int main(int argc, char **argv) {
   if (errc || size > std::numeric_limits<intp>::max()) {
     Error("Unable to get size of '%s': %s.\n", actual_vtf_file_name,
           errc.message().c_str());
-    exit(errc.value());
   }
 
   intp correct_size = static_cast<intp>(size);
@@ -123,7 +121,6 @@ int main(int argc, char **argv) {
   if (errc) {
     Error("Unable to read '%s': %s.\n", actual_vtf_file_name,
           errc.message().c_str());
-    exit(errc.value());
   }
 
   vtf_buffer.SeekPut(CUtlBuffer::SEEK_HEAD, bytes_read);
@@ -131,12 +128,10 @@ int main(int argc, char **argv) {
   IVTFTexture *pTex = CreateVTFTexture();
   if (!pTex) {
     Error("Error allocating .VTF for file '%s'.\n", actual_vtf_file_name);
-    exit(ENOMEM);
   }
 
   if (!pTex->Unserialize(vtf_buffer)) {
     Error("Error deserializing .VTF file '%s'.\n", actual_vtf_file_name);
-    exit(-1);
   }
 
   Msg("vtf width: %d\n", pTex->Width());
@@ -222,7 +217,7 @@ int main(int argc, char **argv) {
           }
 
           if (src_frame_count > 1) {
-            char pTemp[4];
+            char pTemp[4]; //-V112
             V_sprintf_safe(pTemp, "%03d", frame_no);
             V_strcat(temp_name.get(), pTemp, tga_name_size + 13);
           }
@@ -275,7 +270,6 @@ int main(int argc, char **argv) {
             Error("Error converting '%s' from '%s' to '%s'.\n",
                   actual_vtf_file_name, ImageLoader::GetName(src_format),
                   ImageLoader::GetName(dst_format));
-            exit(-1);
           }
 
           if (dst_format != IMAGE_FORMAT_RGB323232F) {
@@ -292,7 +286,6 @@ int main(int argc, char **argv) {
                 Error("Error converting '%s' from '%s' to '%s'.\n",
                       actual_vtf_file_name, ImageLoader::GetName(dst_format),
                       ImageLoader::GetName(IMAGE_FORMAT_RGBA8888));
-                exit(-1);
               }
 
               dst_format = IMAGE_FORMAT_RGBA8888;
@@ -309,7 +302,6 @@ int main(int argc, char **argv) {
                 Error("Error converting '%s' from '%s' to '%s'.\n",
                       actual_vtf_file_name, ImageLoader::GetName(dst_format),
                       ImageLoader::GetName(IMAGE_FORMAT_RGB888));
-                exit(-1);
               }
 
               dst_format = IMAGE_FORMAT_RGB888;
