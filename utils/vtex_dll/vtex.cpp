@@ -2434,8 +2434,8 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 			// Convert to full path
 			if ( !getcwd( outputDir, sizeof( outputDir ) ) )
 			{
-				Warning("Unable to get current directory: %s.\n",
-					std::generic_category().message(errno).c_str());
+				VTexWarning( "Unable to get current directory: %s.\n",
+					std::generic_category().message(errno).c_str() );
 				return false;
 			}
 
