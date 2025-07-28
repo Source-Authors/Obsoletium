@@ -1792,7 +1792,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 	char fullNameTemp[512];
 	if ( info.m_bSkyBox )
 	{
-		Q_strncpy( fullNameTemp, pFullNameWithoutExtension, sizeof( fullNameTemp ) );
+		V_strcpy_safe( fullNameTemp, pFullNameWithoutExtension );
 		pFullNameWithoutExtension = fullNameTemp;
 		PreprocessSkyBox( fullNameTemp, &iSkyboxFace );
 	}
