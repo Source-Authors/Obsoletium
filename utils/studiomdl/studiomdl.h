@@ -51,7 +51,6 @@ class CDmeCombinationOperator;
 #endif
 
 EXTERN	char		outname[MAX_PATH];
-//EXTERN	char		g_pPlatformName[1024];
 EXTERN  qboolean	cdset;
 EXTERN  int			numdirs;
 EXTERN	char		cddir[32][MAX_PATH];
@@ -98,10 +97,8 @@ EXTERN  byte		g_constdirectionalightdot;
 
 // Methods associated with the key value text block
 extern CUtlVector< char >	g_KeyValueText;
-int		KeyValueTextSize( CUtlVector< char > *pKeyValue );
+intp		KeyValueTextSize( CUtlVector< char > *pKeyValue );
 const char *KeyValueText( CUtlVector< char > *pKeyValue );
-
-extern vec_t Q_rint (vec_t in);
 
 extern void WriteModelFiles(void);
 void *kalloc( intp num, intp size );
@@ -113,11 +110,11 @@ class CUtlVectorAuto : public CUtlVector< T >
 {
 	// typedef CUtlVectorAuto< T, CUtlVector<T > > BaseClass;
 public:
-	T& operator[]( int i );
+	T& operator[]( intp i );
 };
 
 template< typename T >
-inline T& CUtlVectorAuto<T>::operator[]( int i )
+inline T& CUtlVectorAuto<T>::operator[]( intp i )
 {
 	EnsureCount( i + 1 );
 	Assert( IsValidIndex(i) );
@@ -1115,8 +1112,8 @@ struct s_combinationcontrol_t
 struct s_combinationrule_t
 {
 	// The 'ints' here are indices into the m_Controls array
-	CUtlVector< int > m_Combination;
-	CUtlVector< CUtlVector< int > > m_Dominators;
+	CUtlVector< UtlHashFastHandle_t > m_Combination;
+	CUtlVector< CUtlVector< UtlHashFastHandle_t > > m_Dominators;
 
 	// The index into the flexkeys to put the result in
 	// (should affect both left + right if the key is sided)
@@ -1545,9 +1542,8 @@ extern bool g_bVerifyOnly;
 extern bool g_bUseBoneInBBox;
 extern bool g_bLockBoneLengths;
 extern bool g_bOverridePreDefinedBones;
-extern bool g_bX360;
-extern int g_minLod;
-extern int g_numAllowedRootLODs;
+extern intp g_minLod;
+extern intp g_numAllowedRootLODs;
 extern bool g_bBuildPreview;
 extern bool g_bCenterBonesOnVerts;
 extern float g_flDefaultMotionRollback;
@@ -1575,11 +1571,11 @@ void EnsureDependencyFileCheckedIn( const char *pFileName );
 
 bool ComparePath( const char *a, const char *b );
 
-byte IsByte( int val );
-char IsChar( int val );
-int IsInt24( int val );
-short IsShort( int val );
-unsigned short IsUShort( int val );
+[[nodiscard]] byte IsByte( int val );
+[[nodiscard]] signed char IsChar( intp val );
+[[nodiscard]] int IsInt24( int val );
+[[nodiscard]] short IsShort( int val );
+[[nodiscard]] unsigned short IsUShort( int val );
 
 
 extern CCheckUVCmd g_StudioMdlCheckUVCmd;

@@ -12,7 +12,6 @@
 #include "studio.h"
 #include "tier1/characterset.h"
 #include "studiomdl.h"
-//#include "..\..\dlls\activity.h"
 
 bool IsEnd( char const* pLine );
 int SortAndBalanceBones( int iCount, int iMaxCount, int bones[], float weights[] );
@@ -34,7 +33,7 @@ static CUtlVector<MtlInfo_t> g_MtlLib;
 
 void ParseMtlLib( CUtlBuffer &buf )
 {
-	int nCurrentMtl = -1;
+	intp nCurrentMtl = -1;
 	while ( buf.IsValid() )
 	{
 		buf.GetLine( g_szLine, sizeof(g_szLine) );
@@ -70,8 +69,8 @@ void ParseMtlLib( CUtlBuffer &buf )
 
 const char *FindMtlEntry( const char *pTgaName )
 {
-	int nCount = g_MtlLib.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = g_MtlLib.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( g_MtlLib[i].m_MtlName, pTgaName ) )
 			return g_MtlLib[i].m_TgaName;
@@ -241,7 +240,7 @@ int Load_OBJ( s_source_t *psource )
 
 			// Are we specifying p only, p and t only, p and n only, or p and n and t?
 			char *pData = g_szLine + 2;
-			int nLen = Q_strlen( pData );
+			intp nLen = Q_strlen( pData );
 
 			CUtlBuffer bufParse( pData, nLen, CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY );
 

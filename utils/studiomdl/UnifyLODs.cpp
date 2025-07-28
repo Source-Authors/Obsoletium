@@ -144,30 +144,30 @@ public:
 	CVertexDictionary();
 
 	// Adds a vertex to the dictionary
-	int AddVertex( const VertexInfo_t &srcVertex );
-	int AddVertexFromSource( const s_source_t *pSrc, int nVertexIndex, int nLod );
+	intp AddVertex( const VertexInfo_t &srcVertex );
+	intp AddVertexFromSource( const s_source_t *pSrc, int nVertexIndex, int nLod );
 
 	// Iteration
-	int VertexCount() const;
-	VertexInfo_t &Vertex( int i );
-	const VertexInfo_t &Vertex( int i ) const;
+	intp VertexCount() const;
+	VertexInfo_t &Vertex( intp i );
+	const VertexInfo_t &Vertex( intp i ) const;
 
-	int RootLODVertexStart() const;
-	int RootLODVertexEnd() const;
+	intp RootLODVertexStart() const;
+	intp RootLODVertexEnd() const;
 
 	// Gets the vertex count for the previous LOD
-	int PrevLODVertexCount() const;
+	intp PrevLODVertexCount() const;
 
 	// Marks the dictionary as starting defining vertices for a new LOD
 	void StartNewLOD();
 
-	void SetRootVertexRange( int start, int end );
+	void SetRootVertexRange( intp start, intp end );
 
 private:
 	CUtlVector<VertexInfo_t>	m_Verts;
-	int							m_nPrevLODCount;
-	int							m_nRootLODStart;
-	int							m_nRootLODEnd;
+	intp						m_nPrevLODCount;
+	intp						m_nRootLODStart;
+	intp						m_nRootLODEnd;
 };
 
 
@@ -183,12 +183,12 @@ CVertexDictionary::CVertexDictionary()
 //-----------------------------------------------------------------------------
 // Accessor
 //-----------------------------------------------------------------------------
-inline VertexInfo_t &CVertexDictionary::Vertex( int i )
+inline VertexInfo_t &CVertexDictionary::Vertex( intp i )
 {
 	return m_Verts[i];
 }
 
-inline const VertexInfo_t &CVertexDictionary::Vertex( int i ) const
+inline const VertexInfo_t &CVertexDictionary::Vertex( intp i ) const
 {
 	return m_Verts[i];
 }
@@ -197,19 +197,19 @@ inline const VertexInfo_t &CVertexDictionary::Vertex( int i ) const
 //-----------------------------------------------------------------------------
 // Gets the vertex count for the previous LOD
 //-----------------------------------------------------------------------------
-inline int CVertexDictionary::PrevLODVertexCount() const
+inline intp CVertexDictionary::PrevLODVertexCount() const
 {
 	return m_nPrevLODCount;
 }
 
 
-inline int CVertexDictionary::RootLODVertexStart() const
+inline intp CVertexDictionary::RootLODVertexStart() const
 {
 	return m_nRootLODStart;
 }
 
 
-inline int CVertexDictionary::RootLODVertexEnd() const
+inline intp CVertexDictionary::RootLODVertexEnd() const
 {
 	return m_nRootLODEnd;
 }
@@ -224,7 +224,7 @@ void CVertexDictionary::StartNewLOD()
 }
 
 
-void CVertexDictionary::SetRootVertexRange( int start, int end )
+void CVertexDictionary::SetRootVertexRange( intp start, intp end )
 {
 	m_nRootLODStart = start;
 	m_nRootLODEnd   = end;
@@ -234,9 +234,9 @@ void CVertexDictionary::SetRootVertexRange( int start, int end )
 //-----------------------------------------------------------------------------
 // Adds a vertex to the dictionary
 //-----------------------------------------------------------------------------
-int CVertexDictionary::AddVertex( const VertexInfo_t &srcVertex )
+intp CVertexDictionary::AddVertex( const VertexInfo_t &srcVertex )
 {
-	int nDstVertID = m_Verts.AddToTail( srcVertex );
+	intp nDstVertID = m_Verts.AddToTail( srcVertex );
 	VertexInfo_t &vertex = m_Verts[ nDstVertID ];
 	ValidateBoneWeight( vertex.m_BoneWeight );
 	SortBoneWeightByIndex( vertex.m_BoneWeight );
@@ -249,9 +249,9 @@ int CVertexDictionary::AddVertex( const VertexInfo_t &srcVertex )
 //-----------------------------------------------------------------------------
 // Copies in a particular vertex from the s_source_t
 //-----------------------------------------------------------------------------
-int CVertexDictionary::AddVertexFromSource( const s_source_t *pSrc, int nVertexIndex, int nLod )
+intp CVertexDictionary::AddVertexFromSource( const s_source_t *pSrc, int nVertexIndex, int nLod )
 {
-	int nDstVertID = m_Verts.AddToTail( );
+	intp nDstVertID = m_Verts.AddToTail( );
 	VertexInfo_t &vertex = m_Verts[ nDstVertID ];
 
 	const s_vertexinfo_t &srcVertex = pSrc->m_GlobalVertices[nVertexIndex];
@@ -273,7 +273,7 @@ int CVertexDictionary::AddVertexFromSource( const s_source_t *pSrc, int nVertexI
 //-----------------------------------------------------------------------------
 // How many vertices in the dictionary?
 //-----------------------------------------------------------------------------
-int CVertexDictionary::VertexCount() const
+intp CVertexDictionary::VertexCount() const
 {
 	return m_Verts.Count();
 }
@@ -284,7 +284,7 @@ s_source_t* GetModelLODSource( const char *pModelName,
 {
 	// When doing LOD replacement, ignore all path + extension information
 	V_strdup_stack( pModelName, pTempBuf );
-
+		
 	// Strip off extensions for the source...
 	char* pDot = strrchr( pTempBuf, '.' );
 	if (pDot)
@@ -292,7 +292,7 @@ s_source_t* GetModelLODSource( const char *pModelName,
 		*pDot = 0;
 	}
 
-	for( int i = 0; i < scriptLOD.modelReplacements.Count(); i++ )
+	for( intp i = 0; i < scriptLOD.modelReplacements.Count(); i++ )
 	{
 		// FIXME: Should we strip off path information?
 //		char* pSlash = strrchr( pTempBuf1, '\\' );
@@ -473,12 +473,11 @@ bool CompareBoneWeightsFuzzy( const s_boneweight_t &b1, const s_boneweight_t &b2
 //-----------------------------------------------------------------------------
 int FindMaterialByName( const char *pMaterialName )
 {
-	int i;
-	int allocLen = strlen( pMaterialName ) + 1;
-	char *pBaseName = ( char * )_alloca( allocLen );
-	Q_FileBase( ( char * )pMaterialName, pBaseName, allocLen );
+	intp allocLen = strlen( pMaterialName ) + 1;
+	char *pBaseName = stackallocT( char, allocLen );
+	V_FileBase( pMaterialName, pBaseName, allocLen );
 
-	for( i = 0; i < g_numtextures; i++ )
+	for( int i = 0; i < g_numtextures; i++ )
 	{
 		if( stricmp( pBaseName, g_texture[i].name ) == 0 )
 		{
@@ -514,11 +513,11 @@ static s_mesh_t *FindOrCullMesh( int nLodID, s_source_t *pSrc, int nMaterialID )
 		MdlError( "Unknown Texture for Material %d\n", nMaterialID );
 	}
 
-	Q_FileBase(g_texture[nTextureID].name, baseMeshName, sizeof(baseMeshName)-1);
-	for ( int i = 0; i < g_ScriptLODs[nLodID].meshRemovals.Count(); i++ )
+	Q_FileBase(g_texture[nTextureID].name, baseMeshName );
+	for ( intp i = 0; i < g_ScriptLODs[nLodID].meshRemovals.Count(); i++ )
 	{
 		const char *pMeshRemovalName = g_ScriptLODs[nLodID].meshRemovals[i].GetSrcName();
-		Q_FileBase( pMeshRemovalName, baseRemovalName, sizeof(baseRemovalName)-1);
+		Q_FileBase( pMeshRemovalName, baseRemovalName );
 
 		if (!stricmp( baseRemovalName, baseMeshName ))
 		{
@@ -716,8 +715,8 @@ static void FindBoneWeightWithinModel( const VertexInfo_t &searchVertex, const s
 		flTangentSError    = 0;
 	}
 
-	int nVertexCount = pSrc->m_GlobalVertices.Count();
-	for ( int i = 0; i < nVertexCount; i++ )
+	intp nVertexCount = pSrc->m_GlobalVertices.Count();
+	for ( intp i = 0; i < nVertexCount; i++ )
 	{
 		const s_vertexinfo_t &srcVertex = pSrc->m_GlobalVertices[i];
 
@@ -895,35 +894,6 @@ static void CalculateIdealVert( const VertexInfo_t &searchVertex, CVertexDiction
 }
 
 
-static bool FuzzyFloatCompare( float f1, float f2, float epsilon )
-{
-	if( fabs( f1 - f2 ) < epsilon )
-	{
-		return true;
-	}
-	else
-	{
-		return false;
-	}
-}
-								
-
-//-----------------------------------------------------------------------------
-// Is this bone weight structure sorted by bone?
-//-----------------------------------------------------------------------------
-static bool IsBoneWeightSortedByBone( const s_boneweight_t &src )
-{
-	for ( int i = 1; i < src.numbones; ++i )
-	{
-		Assert( src.bone[i] != -1 );
-		if ( src.bone[ i-1 ] > src.bone[ i ] )
-			return false;
-	}
-
-	return true;
-}
-
-	
 //-----------------------------------------------------------------------------
 // Are two bone-weight structures equal?
 //-----------------------------------------------------------------------------
@@ -1022,22 +992,25 @@ static void PrintBonesUsedInLOD( s_source_t *pSrc )
 {
 	printf( "PrintBonesUsedInLOD\n" );
 
-	int nVertexCount = pSrc->m_GlobalVertices.Count();
-	for( int i = 0; i <nVertexCount; i++ )
+	intp nVertexCount = pSrc->m_GlobalVertices.Count();
+	for( intp i = 0; i <nVertexCount; i++ )
 	{
 		Vector &pos = pSrc->m_GlobalVertices[i].position;
 		Vector &norm = pSrc->m_GlobalVertices[i].normal;
 		Vector2D &texcoord = pSrc->m_GlobalVertices[i].texcoord;
+
 		printf( "pos: %f %f %f norm: %f %f %f texcoord: %f %f\n",
 			pos[0], pos[1], pos[2], norm[0], norm[1], norm[2], texcoord[0], texcoord[1] );
+
 		s_boneweight_t *pBoneWeight = &pSrc->m_GlobalVertices[i].boneweight;
-		int j;
-		for( j = 0; j < pBoneWeight->numbones; j++ )
+
+		for( int j = 0; j < pBoneWeight->numbones; j++ )
 		{
 			int globalBoneID = pBoneWeight->bone[j];
 			const char *pBoneName = g_bonetable[globalBoneID].name;
-			printf( "vert: %d bone: %d boneid: %d weight: %f name: \"%s\"\n", i, ( int )j, ( int )pBoneWeight->bone[j], 
-				( float )pBoneWeight->weight[j], pBoneName );
+
+			printf( "vert: %zd bone: %d boneid: %d weight: %f name: \"%s\"\n", i, j, pBoneWeight->bone[j], 
+				pBoneWeight->weight[j], pBoneName );
 		}
 		printf( "\n" );
 		fflush( stdout );
@@ -1054,6 +1027,7 @@ static void	MarkBonesUsedByLod( const s_boneweight_t &boneWeight, int nLodID )
 	{
 		int nGlobalBoneID = boneWeight.bone[j];
 		s_bonetable_t *pBone = &g_bonetable[nGlobalBoneID];
+
 		pBone->flags |= ( BONE_USED_BY_VERTEX_LOD0 << nLodID );
 	}
 }
@@ -1061,14 +1035,13 @@ static void	MarkBonesUsedByLod( const s_boneweight_t &boneWeight, int nLodID )
 
 static void PrintSBoneWeight( s_boneweight_t *pBoneWeight, const s_source_t *pSrc )
 {
-	int j;
-	for( j = 0; j < pBoneWeight->numbones; j++ )
+	for( int j = 0; j < pBoneWeight->numbones; j++ )
 	{
-		int globalBoneID;
-		globalBoneID = pBoneWeight->bone[j];
+		int globalBoneID = pBoneWeight->bone[j];
 		const char *pBoneName = g_bonetable[globalBoneID].name;
-		printf( "bone: %d boneid: %d weight: %f name: \"%s\"\n", ( int )j, ( int )pBoneWeight->bone[j], 
-			( float )pBoneWeight->weight[j], pBoneName );
+
+		printf( "bone: %d boneid: %d weight: %f name: \"%s\"\n", j, pBoneWeight->bone[j], 
+			pBoneWeight->weight[j], pBoneName );
 	}
 }
 
@@ -1085,7 +1058,7 @@ static void CreateLODVertsInDictionary( int nLodID, const s_source_t *pRootLODSr
 	// this function is specific to lods and not the root
 	Assert( nLodID );
 
-	int nNumCurrentVerts = vertexDict.VertexCount();
+	intp nNumCurrentVerts = vertexDict.VertexCount();
 
 	// Used to control where we look for vertices + merging rules
 	vertexDict.StartNewLOD();
@@ -1139,25 +1112,24 @@ static void CreateLODVertsInDictionary( int nLodID, const s_source_t *pRootLODSr
 		pMeshVertIndexMap[nSrcID] = nMeshVertID;
 	}
 
-	int nNewVertsCreated = vertexDict.VertexCount() - nNumCurrentVerts;
+	intp nNewVertsCreated = vertexDict.VertexCount() - nNumCurrentVerts;
 	if (!g_quiet && nNewVertsCreated)
 	{
-		printf( "Lod %d: vertexes: %d (%d new)\n", nLodID, vertexDict.VertexCount(), nNewVertsCreated);
+		printf( "Lod %d: vertexes: %zd (%zd new)\n", nLodID, vertexDict.VertexCount(), nNewVertsCreated);
 	}
 }
 
 static void PrintSourceVerts( s_source_t *pSrc )
 {
-	int nVertexCount = pSrc->m_GlobalVertices.Count();
-	for( int i = 0; i < nVertexCount; i++ )
+	intp nVertexCount = pSrc->m_GlobalVertices.Count();
+	for( intp i = 0; i < nVertexCount; i++ )
 	{
 		const s_vertexinfo_t &srcVertex = pSrc->m_GlobalVertices[i];
-		printf( "v %d ", i );
+		printf( "v %zd ", i );
 		printf( "pos: %f %f %f ", srcVertex.position[0], srcVertex.position[1], srcVertex.position[2] );
 		printf( "norm: %f %f %f ", srcVertex.normal[0], srcVertex.normal[1], srcVertex.normal[2] );
 		printf( "texcoord: %f %f\n", srcVertex.texcoord[0], srcVertex.texcoord[1] );
-		int j;
-		for( j = 0; j < srcVertex.boneweight.numbones; j++ )
+		for( int j = 0; j < srcVertex.boneweight.numbones; j++ )
 		{
 			printf( "\t%d: %d %f\n", j, ( int )srcVertex.boneweight.bone[j], 
 				srcVertex.boneweight.weight[j] );
@@ -1175,21 +1147,19 @@ static void PrintSourceVerts( s_source_t *pSrc )
 static void SetProcessedWithDictionary( s_model_t* pSrcModel, CVertexDictionary &vertexDict,
 	CUtlVector<s_face_t> &faces, CUtlVector<s_mesh_t> &meshes, int *pMeshVertIndexMaps[MAX_NUM_LODS] )
 {
-	int	i;
-
 	s_loddata_t *pLodData = new s_loddata_t;
 	memset( pLodData, 0, sizeof(s_loddata_t) );
 	
 	pSrcModel->m_pLodData = pLodData;
 
-	int nVertexCount = vertexDict.VertexCount();
+	intp nVertexCount = vertexDict.VertexCount();
 
 	pLodData->vertex = (s_lodvertexinfo_t *)kalloc( nVertexCount, sizeof( s_lodvertexinfo_t ) );
 	pLodData->numvertices = nVertexCount;
 	pLodData->face = (s_face_t *)kalloc( faces.Count(), sizeof( s_face_t ));
 	pLodData->numfaces = faces.Count();
 	
-	for ( i = 0; i < nVertexCount; ++i )
+	for ( intp i = 0; i < nVertexCount; ++i )
 	{
 		const VertexInfo_t &srcVertex = vertexDict.Vertex( i );
 		s_lodvertexinfo_t &dstVertex = pLodData->vertex[i];
@@ -1206,7 +1176,7 @@ static void SetProcessedWithDictionary( s_model_t* pSrcModel, CVertexDictionary 
 	memcpy( pLodData->face, faces.Base(), faces.Count() * sizeof( s_face_t ) );
 	memcpy( pLodData->mesh, meshes.Base(), meshes.Count() * sizeof( s_mesh_t ) );
 
-	for (i=0; i<MAX_NUM_LODS; i++)
+	for (int i=0; i<MAX_NUM_LODS; i++)
 	{
 		pLodData->pMeshVertIndexMaps[i] = pMeshVertIndexMaps[i];
 	}
@@ -1221,17 +1191,16 @@ static void BuildBoneLODMapping( CUtlVector<int> &boneMap, int lodID )
 {
 	boneMap.AddMultipleToTail( g_numbones );
 
-	Assert( lodID < g_ScriptLODs.Size() );
+	Assert( lodID < g_ScriptLODs.Count() );
 	LodScriptData_t& scriptLOD = g_ScriptLODs[lodID];
 
 	// First, create a direct mapping where no bones are collapsed
-	int i;
-	for( i = 0; i < g_numbones; i++ )
+	for( int i = 0; i < g_numbones; i++ )
 	{
 		boneMap[i] = i;
 	}
 
-	for( i = 0; i < scriptLOD.boneReplacements.Size(); i++ )
+	for( intp i = 0; i < scriptLOD.boneReplacements.Count(); i++ )
 	{
 		const char *src, *dst;
 		src = scriptLOD.boneReplacements[i].GetSrcName();
@@ -1292,14 +1261,14 @@ static void UnifyModelLODs( s_model_t *pSrcModel )
 		return;
 
 	// each lod has a unique vertex mapping table
-	int nNumLODs = pSrcModel->m_LodSources.Count();
+	intp nNumLODs = pSrcModel->m_LodSources.Count();
 	int nLodID;
 	int *pMeshVertIndexMaps[MAX_NUM_LODS];
 	for ( nLodID = 0; nLodID < MAX_NUM_LODS; nLodID++ )
 	{
 		if ( nLodID < nNumLODs && pSrcModel->m_LodSources[nLodID] )
 		{
-			int nVertexCount = pSrcModel->m_LodSources[nLodID]->m_GlobalVertices.Count();
+			intp nVertexCount = pSrcModel->m_LodSources[nLodID]->m_GlobalVertices.Count();
 			pMeshVertIndexMaps[nLodID] = new int[ nVertexCount ];
 #ifdef _DEBUG
 			memset( pMeshVertIndexMaps[nLodID], 0xDD, nVertexCount * sizeof(int) );
@@ -1343,7 +1312,7 @@ static void UnifyModelLODs( s_model_t *pSrcModel )
 			continue;
 
 		// populate with all vertices from LOD 0
-		int nStart = vertexDictionary.VertexCount();
+		intp nStart = vertexDictionary.VertexCount();
 		CopyVerts( 0, pLOD0Source, pLOD0Mesh, vertexDictionary, pVertexDictMesh, pMeshVertIndexMaps[0] );
 		vertexDictionary.SetRootVertexRange( nStart, vertexDictionary.VertexCount() );
 	
@@ -1453,10 +1422,9 @@ void SpewBoneUsageStats( void )
 	SpewBoneInfo( 0, 0 );
 	if( g_bPrintBones )
 	{
-		int i;
-		for( i = 0; i < g_ScriptLODs.Count(); i++ )
+		for( intp i = 0; i < g_ScriptLODs.Count(); i++ )
 		{
-			printf( "\t%d bones used in lod %d\n", g_NumBonesInLOD[i], i );
+			printf( "\t%d bones used in lod %zd\n", g_NumBonesInLOD[i], i );
 		}
 	}
 }
@@ -1483,9 +1451,9 @@ void MarkParentBoneLODs( void )
 //-----------------------------------------------------------------------------
 static void GetLODSources( CUtlVector< s_source_t * > &lods, const s_model_t *pSrcModel )
 {
-	int nNumLODs = g_ScriptLODs.Count();
+	intp nNumLODs = g_ScriptLODs.Count();
 	lods.EnsureCount( nNumLODs );
-	for( int lodID = 0; lodID < nNumLODs; lodID++ )
+	for( intp lodID = 0; lodID < nNumLODs; lodID++ )
 	{
 		LodScriptData_t& scriptLOD = g_ScriptLODs[lodID];
 
@@ -1511,9 +1479,9 @@ void LoadLODSources( void )
 	{
 		if ( !Q_stricmp( g_model[modelID]->name, "blank" ) )
 		{
-			int nNumLODs = g_ScriptLODs.Count();
+			intp nNumLODs = g_ScriptLODs.Count();
 			g_model[modelID]->m_LodSources.SetCount( nNumLODs );
-			for ( int i = 0; i < nNumLODs; ++i )
+			for ( intp i = 0; i < nNumLODs; ++i )
 			{
 				g_model[modelID]->m_LodSources[i] = NULL;
 			}
@@ -1561,12 +1529,10 @@ static void ConvertSingleBoneTreeCollapseToReplaceBones( CLodScriptReplacement_t
 
 void ConvertBoneTreeCollapsesToReplaceBones( void )
 {
-	int i;
-	for( i = 0; i < g_ScriptLODs.Size(); i++ )
+	for( intp i = 0; i < g_ScriptLODs.Count(); i++ )
 	{
 		LodScriptData_t& lod = g_ScriptLODs[i];
-		int j;
-		for( j = 0; j < lod.boneTreeCollapses.Size(); j++ )
+		for( intp j = 0; j < lod.boneTreeCollapses.Count(); j++ )
 		{
 			ConvertSingleBoneTreeCollapseToReplaceBones( lod.boneTreeCollapses[j], 
 				lod.boneReplacements );
@@ -1577,8 +1543,7 @@ void ConvertBoneTreeCollapsesToReplaceBones( void )
 /*
 static void PrintReplacedBones( LodScriptData_t &lod )
 {
-	int i;
-	for( i = 0; i < lod.boneReplacements.Count(); i++ )
+	for( intp i = 0; i < lod.boneReplacements.Count(); i++ )
 	{
 		printf( "%s -> %s\n", 
 			lod.boneReplacements[i].GetSrcName(), 
@@ -1594,14 +1559,12 @@ void FixupReplacedBonesForLOD( LodScriptData_t &lod )
 	PrintReplacedBones( lod );
 */
 	bool changed;
-	int i;
-	int j;
 	do
 	{
 		changed = false;
-		for( i = 0; i < lod.boneReplacements.Count(); i++ )
+		for( intp i = 0; i < lod.boneReplacements.Count(); i++ )
 		{
-			for( j = 0; j < lod.boneReplacements.Count(); j++ )
+			for( intp j = 0; j < lod.boneReplacements.Count(); j++ )
 			{
 				if( i == j )
 				{
@@ -1623,8 +1586,7 @@ void FixupReplacedBonesForLOD( LodScriptData_t &lod )
 
 void FixupReplacedBones( void )
 {
-	int i;
-	for( i = 0; i < g_ScriptLODs.Size(); i++ )
+	for( intp i = 0; i < g_ScriptLODs.Count(); i++ )
 	{
 		FixupReplacedBonesForLOD( g_ScriptLODs[i] );
 	}

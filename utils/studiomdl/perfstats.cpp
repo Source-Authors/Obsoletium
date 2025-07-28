@@ -249,8 +249,8 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 				else
 				{
 					printf( "    actual tris:%d\n", ( int )results.m_ActualTriCount );
-					printf( "    texture memory bytes: %d (only valid in a rendering app)\n", ( int )results.m_TextureMemoryBytes );
-					printf( ( char * )statsOutput.Base() );
+					printf( "    texture memory bytes: %zd (only valid in a rendering app)\n", results.m_TextureMemoryBytes );
+					printf( "%s", statsOutput.Base<char>() );
 				}
 			}
 			if( flags & SPEWPERFSTATS_SPREADSHEET )
@@ -262,7 +262,7 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 		free(pVtxHdr);
 	}
 
-		free(pVvdHdr);
+	free(pVvdHdr);
 
 	if( !( flags & SPEWPERFSTATS_SHOWSTUDIORENDERWARNINGS ) )
 	{
