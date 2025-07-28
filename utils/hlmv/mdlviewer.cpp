@@ -365,17 +365,25 @@ MDLViewer::MDLViewer ()
 	loadRecentFiles ();
 	initRecentFiles ();
 
-	LoadViewerRootSettings( );
+	if ( !LoadViewerRootSettings( ) )
+	{
+		// dimhotepus: Center window when no settings.
 
-	// FIXME: where do I actually find the domain size of the viewport, especially for multi-monitor
-	// try to catch weird initialization error
-	if (g_viewerSettings.xpos < -16384)
-		g_viewerSettings.xpos = 20;
-	if (g_viewerSettings.ypos < -16384)
-		g_viewerSettings.ypos = 20;
+		const int displayWidth = mx::getDisplayWidth();
+		const int displayHeight = mx::getDisplayHeight();
+		
+		g_viewerSettings.width  = max( 1024, displayWidth / 2 );
+		g_viewerSettings.height = max( 768, displayHeight / 2 );
+		g_viewerSettings.xpos   = max( ( displayWidth - g_viewerSettings.width ) / 2, 0 );
+		g_viewerSettings.ypos   = max( ( displayHeight - g_viewerSettings.height ) / 2, 0 );
+	}
+	else
+	{
+		g_viewerSettings.xpos  = max( 0, g_viewerSettings.xpos );
 	g_viewerSettings.ypos  = max( 0, g_viewerSettings.ypos );
-	g_viewerSettings.width = max( 640, g_viewerSettings.width );
-	g_viewerSettings.height = max( 700, g_viewerSettings.height );
+		g_viewerSettings.width = max( 1024, g_viewerSettings.width );
+		g_viewerSettings.height = max( 768, g_viewerSettings.height );
+	}
 
 	setBounds( g_viewerSettings.xpos, g_viewerSettings.ypos, g_viewerSettings.width, g_viewerSettings.height );
 	setVisible (true);
