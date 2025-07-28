@@ -43,7 +43,7 @@ constexpr inline size_t Log2Bits() noexcept
 }
 
 constexpr inline int BITS_PER_INT{CHAR_BIT * sizeof(int)};
-constexpr inline int LOG2_BITS_PER_INT{Log2Bits<int>()};
+constexpr inline size_t LOG2_BITS_PER_INT{Log2Bits<int>()};
 
 #if _WIN32
 #include <intrin.h>
