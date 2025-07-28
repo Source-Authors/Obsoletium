@@ -105,7 +105,7 @@ void ClearModel (void)
 
 void processAnimations()
 { 
-	int i, j;
+	int j;
 
 	// find global root bone.
 	if ( !Q_isempty( rootname ) )
@@ -117,7 +117,7 @@ void processAnimations()
 
 	buildAnimationWeights( );
 
-	for (i = 0; i < g_numani; i++)
+	for (int i = 0; i < g_numani; i++)
 	{
 		s_animation_t *panim = g_panimation[i];
 
@@ -293,7 +293,7 @@ void processAnimations()
 	}
 
 	// merge weightlists
-	for (i = 0; i < g_sequence.Count(); i++)
+	for (intp i = 0; i < g_sequence.Count(); i++)
 	{
 		int k, n;
 		for (n = 0; n < g_numbones; n++)
@@ -541,8 +541,9 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 	Vector v = p2;
 	VectorNormalize( v );
 
-	Vector A, B, C;
-	if (motiontype & STUDIO_QUADRATIC_MOTION)
+	Vector A{vec3_invalid}, B{vec3_invalid}, C{vec3_invalid};
+	const bool isQuadraticMotion = motiontype & STUDIO_QUADRATIC_MOTION;
+	if (isQuadraticMotion)
 	{
 		SolveInverseQuadratic( 0, 0, 0.5f, p1.x, 1.0f, p2.x, A.x, B.x, C.x );
 		SolveInverseQuadratic( 0, 0, 0.5f, p1.y, 1.0f, p2.y, A.y, B.y, C.y );
@@ -556,7 +557,7 @@ void extractLinearMotion( s_animation_t *panim, int motiontype, int iStartFrame,
 	{	
 		float t = (j / n);
 
-		if (motiontype & STUDIO_QUADRATIC_MOTION)
+		if (isQuadraticMotion)
 		{
 			adjpos.x = t * t * A.x + t * B.x + C.x;
 			adjpos.y = t * t * A.y + t * B.y + C.y;
@@ -2467,7 +2468,7 @@ static void BuildModelToVAnimMap( s_source_t *pVSource, s_sourceanim_t *pVSource
 		pModelToVAnim[j] = -1;
 	}
 
-	int nMinLod = min( g_minLod, g_ScriptLODs.Count() - 1 );
+	intp nMinLod = min( g_minLod, g_ScriptLODs.Count() - 1 );
 
 	for ( int j = 0; j < pVSource->numvertices; j++ )
 	{
@@ -3318,11 +3319,11 @@ void limitIKChainLength( void )
 //-----------------------------------------------------------------------------
 void MakeTransitions( )
 {
-	int i, j, k;
+	int j, k;
 	bool iHit = g_bMultistageGraph;
 
 	// add in direct node transitions
-	for (i = 0; i < g_sequence.Count(); i++)
+	for (intp i = 0; i < g_sequence.Count(); i++)
 	{
 		if (g_sequence[i].entrynode != g_sequence[i].exitnode)
 		{
@@ -3338,7 +3339,7 @@ void MakeTransitions( )
 	while (iHit)
 	{
 		iHit = false;
-		for (i = 1; i <= g_numxnodes; i++)
+		for (int i = 1; i <= g_numxnodes; i++)
 		{
 			for (j = 1; j <= g_numxnodes; j++)
 			{
@@ -3360,7 +3361,7 @@ void MakeTransitions( )
 			}
 		}
 		// reset previous pass so the links can be used in the next pass
-		for (i = 1; i <= g_numxnodes; i++)
+		for (int i = 1; i <= g_numxnodes; i++)
 		{
 			for (j = 1; j <= g_numxnodes; j++)
 			{
@@ -3370,7 +3371,7 @@ void MakeTransitions( )
 	}
 
 	// add in allowed "skips"
-	for (i = 0; i < g_numxnodeskips; i++)
+	for (int i = 0; i < g_numxnodeskips; i++)
 	{
 		g_xnode[g_xnodeskip[i][0]-1][g_xnodeskip[i][1]-1] = 0;
 	}
@@ -3388,7 +3389,7 @@ void MakeTransitions( )
 		}
 		printf("\n" );
 
-		for (i = 1; i <= g_numxnodes; i++)
+		for (int i = 1; i <= g_numxnodes; i++)
 		{
 			printf("%2d: ", i );
 			for (j = 1; j <= g_numxnodes; j++)
@@ -3567,9 +3568,7 @@ bool BoneIsIK( char const *pname )
 
 bool BoneShouldCollapse( char const *pname )
 {
-	int k;
-
-	for (k = 0; k < g_collapse.Count(); k++)
+	for (intp k = 0; k < g_collapse.Count(); k++)
 	{
 		if (stricmp( g_collapse[k], pname ) == 0)
 		{
@@ -3825,7 +3824,7 @@ void MapFlexDriveBonesToGlobalBoneTable()
 		return;
 
 	// Loop backwards so we can remove elements as we go
-	for ( int i = pDmeBoneFlexDriverList->m_eBoneFlexDriverList.Count() - 1; i >= 0; --i )
+	for ( intp i = pDmeBoneFlexDriverList->m_eBoneFlexDriverList.Count() - 1; i >= 0; --i )
 	{
 		CDmeBoneFlexDriver *pDmeBoneFlexDriver = pDmeBoneFlexDriverList->m_eBoneFlexDriverList[i];
 		if ( !pDmeBoneFlexDriver )
@@ -3847,7 +3846,7 @@ void MapFlexDriveBonesToGlobalBoneTable()
 
 				pDmeBoneFlexDriver->SetValue( "__boneIndex", j );
 				// Map the axis for Y up stuff
-				for ( int k = 0; k < pDmeBoneFlexDriver->m_eControlList.Count(); ++k )
+				for ( intp k = 0; k < pDmeBoneFlexDriver->m_eControlList.Count(); ++k )
 				{
 					pDmeBoneFlexDriver->m_eControlList[k]->m_nBoneComponent = GetRemappedBoneAxis( j, pDmeBoneFlexDriver->m_eControlList[k]->m_nBoneComponent );
 				}
@@ -3885,7 +3884,7 @@ void TagFlexDriverBones( s_source_t *pSource )
 		return;
 
 	// Loop backwards so we can remove elements as we go
-	for ( int i = pDmeBoneFlexDriverList->m_eBoneFlexDriverList.Count() - 1; i >= 0; --i )
+	for ( intp i = pDmeBoneFlexDriverList->m_eBoneFlexDriverList.Count() - 1; i >= 0; --i )
 	{
 		CDmeBoneFlexDriver *pDmeBoneFlexDriver = pDmeBoneFlexDriverList->m_eBoneFlexDriverList[i];
 		if ( !pDmeBoneFlexDriver )
@@ -3894,7 +3893,7 @@ void TagFlexDriverBones( s_source_t *pSource )
 			continue;
 		}
 
-		for ( int j = pDmeBoneFlexDriver->m_eControlList.Count() - 1; j >= 0; --j )
+		for ( intp j = pDmeBoneFlexDriver->m_eControlList.Count() - 1; j >= 0; --j )
 		{
 			CDmeBoneFlexDriverControl *pDmeBoneFlexDriverControl = pDmeBoneFlexDriver->m_eControlList[j];
 			if ( !pDmeBoneFlexDriverControl )
@@ -3950,7 +3949,7 @@ void TagFlexDriverBones( s_source_t *pSource )
 //-----------------------------------------------------------------------------
 void TagUsedBones( )
 {
-	int i, j, k;
+	int i, j;
 	int n;
 
 	// find used bones per g_model
@@ -3958,7 +3957,7 @@ void TagUsedBones( )
 	{
 		s_source_t *psource = g_source[i];
 
-		for (k = 0; k < MAXSTUDIOSRCBONES; k++)
+		for (int k = 0; k < MAXSTUDIOSRCBONES; k++)
 		{
 			psource->boneflags[k] = 0;
 			psource->boneref[k] = 0;
@@ -3970,7 +3969,7 @@ void TagUsedBones( )
 		// printf("active: %s\n", psource->filename );
 		for (j = 0; j < psource->numvertices; j++)
 		{
-			for (k = 0; k < psource->vertex[j].boneweight.numbones; k++)
+			for (int k = 0; k < psource->vertex[j].boneweight.numbones; k++)
 			{
 				psource->boneflags[psource->vertex[j].boneweight.bone[k]] |= BONE_USED_BY_VERTEX_LOD0;
 			}
@@ -3978,12 +3977,12 @@ void TagUsedBones( )
 	}
 
 	// find used bones per g_model
-	for (i = 0; i < g_numsources; i++)
+	for (int i = 0; i < g_numsources; i++)
 	{
 		s_source_t *psource = g_source[i];
 
 		// FIXME: this is in the wrong place.  The attachment may be rigid and it never defined in a reference file
-		for (k = 0; k < g_numattachments; k++)
+		for (int k = 0; k < g_numattachments; k++)
 		{
 			for (j = 0; j < psource->numbones; j++)
 			{
@@ -4010,7 +4009,7 @@ void TagUsedBones( )
 			}
 		}
 
-		for (k = 0; k < g_numikchains; k++)
+		for (int k = 0; k < g_numikchains; k++)
 		{
 			for (j = 0; j < psource->numbones; j++)
 			{
@@ -4023,7 +4022,7 @@ void TagUsedBones( )
 			}
 		}
 
-		for (k = 0; k < g_nummouths; k++)
+		for (int k = 0; k < g_nummouths; k++)
 		{
 			for (j = 0; j < psource->numbones; j++)
 			{
@@ -4037,8 +4036,8 @@ void TagUsedBones( )
 		}
 
 		// Tag all bones marked as being used by bonemerge
-		int nBoneMergeCount = g_BoneMerge.Count(); 
-		for ( k = 0; k < nBoneMergeCount; ++k )
+		intp nBoneMergeCount = g_BoneMerge.Count(); 
+		for ( intp k = 0; k < nBoneMergeCount; ++k )
 		{
 			for ( j = 0; j < psource->numbones; j++ )
 			{
@@ -4054,7 +4053,7 @@ void TagUsedBones( )
 
 		// NOTE: This must come last; after all flags have been set!
 		// tag bonerefs as being used the union of the boneflags all their children
-		for (k = 0; k < psource->numbones; k++)
+		for (int k = 0; k < psource->numbones; k++)
 		{
 			UpdateBonerefRecursive( psource, k, psource->boneflags[k] );
 		}
@@ -4064,7 +4063,7 @@ void TagUsedBones( )
 	for (i = 0; i < g_nummodelsbeforeLOD; i++)
 	{
 		s_source_t *psource = g_model[i]->source;
-		for (k = 0; k < g_model[i]->numeyeballs; k++)
+		for (int k = 0; k < g_model[i]->numeyeballs; k++)
 		{
 			psource->boneref[g_model[i]->eyeball[k].bone] |= BONE_USED_BY_ATTACHMENT;
 		}
@@ -4077,14 +4076,12 @@ void TagUsedBones( )
 //-----------------------------------------------------------------------------
 void RenameBones( )
 {
-	int i, j, k;
-
 	// rename source bones if needed
-	for (i = 0; i < g_numsources; i++)
+	for (int i = 0; i < g_numsources; i++)
 	{
-		for (j = 0; j < g_source[i]->numbones; j++)
+		for (int j = 0; j < g_source[i]->numbones; j++)
 		{
-			for (k = 0; k < g_numrenamedbones; k++)
+			for (int k = 0; k < g_numrenamedbones; k++)
 			{
 				if (!stricmp( g_source[i]->localBone[j].name, g_renamedbone[k].from))
 				{
@@ -4115,13 +4112,12 @@ void TagUsedImportedBones()
 {
 	// NOTE: This has to happen because some bones referenced by bonemerge
 	// can be set up using the importbones feature
-	int k, j;
-
+	// 
 	// Tag all bones marked as being used by bonemerge
-	int nBoneMergeCount = g_BoneMerge.Count(); 
-	for ( k = 0; k < nBoneMergeCount; ++k )
+	intp nBoneMergeCount = g_BoneMerge.Count(); 
+	for ( intp k = 0; k < nBoneMergeCount; ++k )
 	{
-		for ( j = 0; j < g_numbones; j++ )
+		for ( int j = 0; j < g_numbones; j++ )
 		{
 			if ( stricmp( g_BoneMerge[k].bonename, g_bonetable[j].name ) )
 				continue;
@@ -5270,7 +5266,6 @@ void CalcBoneTransforms( s_animation_t *panimation, s_animation_t *pbaseanimatio
 
 	for (int k = 0; k < g_numbones; k++)
 	{
-		Vector angle;
 		matrix3x4_t bonematrix;
 
 		if (!(panimation->flags & STUDIO_DELTA))
@@ -5397,7 +5392,7 @@ void SlerpBones(
 	float s )
 {
 	int			i;
-	Quaternion		q3, q4;
+	Quaternion		q3;
 	float		s1, s2;
 
 	s_sequence_t *pseqdesc = &g_sequence[sequence];
@@ -5736,8 +5731,7 @@ void CalcModelTangentSpaces( s_source_t *pSrc )
 		s_mesh_t *pMesh = &pSrc->mesh[pSrc->meshindex[meshID]];
 		CUtlVector<CIntVector> vertToTriMap;
 		vertToTriMap.AddMultipleToTail( pMesh->numvertices );
-		int triID;
-		for( triID = 0; triID < pMesh->numfaces; triID++ )
+		for( int triID = 0; triID < pMesh->numfaces; triID++ )
 		{
 			s_face_t *pFace = &pSrc->face[triID + pMesh->faceoffset];
 			vertToTriMap[pFace->a].AddToTail( triID );
@@ -5750,7 +5744,7 @@ void CalcModelTangentSpaces( s_source_t *pSrc )
 		CUtlVector<Vector> triTVect;
 		triSVect.AddMultipleToTail( pMesh->numfaces );
 		triTVect.AddMultipleToTail( pMesh->numfaces );
-		for( triID = 0; triID < pMesh->numfaces; triID++ )
+		for( int triID = 0; triID < pMesh->numfaces; triID++ )
 		{
 			s_face_t *pFace = &pSrc->face[triID + pMesh->faceoffset];
 			CalcTriangleTangentSpace( pSrc, 
@@ -5770,7 +5764,7 @@ void CalcModelTangentSpaces( s_source_t *pSrc )
 
 			sVect.Init( 0.0f, 0.0f, 0.0f );
 			tVect.Init( 0.0f, 0.0f, 0.0f );
-			for( triID = 0; triID < vertToTriMap[vertID].Size(); triID++ )
+			for( intp triID = 0; triID < vertToTriMap[vertID].Count(); triID++ )
 			{
 				sVect += triSVect[vertToTriMap[vertID][triID]];
 				tVect += triTVect[vertToTriMap[vertID][triID]];
@@ -5790,8 +5784,7 @@ void CalcModelTangentSpaces( s_source_t *pSrc )
 					Vector vertPos2( pSrc->vertex[vertID2].position[0], pSrc->vertex[vertID2].position[1], pSrc->vertex[vertID2].position[2] );
 					if( vertPos1 == vertPos2 )
 					{
-						int triID2;
-						for( triID2 = 0; triID2 < vertToTriMap[vertID2].Size(); triID2++ )
+						for( intp triID2 = 0; triID2 < vertToTriMap[vertID2].Count(); triID2++ )
 						{
 							sVect += triSVect[vertToTriMap[vertID2][triID2]];
 							tVect += triTVect[vertToTriMap[vertID2][triID2]];
@@ -5945,13 +5938,12 @@ void RemapVerticesToGlobalBones( )
 
 static void FindAutolayers()
 {
-	int i;
-	for (i = 0; i < g_sequence.Count(); i++)
+	for (intp i = 0; i < g_sequence.Count(); i++)
 	{
 		int k;
 		for (k = 0; k < g_sequence[i].numautolayers; k++)
 		{
-			int j;
+			intp j;
 			for ( j = 0; j < g_sequence.Count(); j++)
 			{
 				if (stricmp( g_sequence[i].autolayer[k].name, g_sequence[j].name) == 0)
@@ -6146,12 +6138,11 @@ static float CalcPoseParameterValue( int control, RadianEuler &angle, Vector &po
 
 static void CalcPoseParameters( void )
 {
-	int i;
 	matrix3x4_t boneToWorld[MAXSTUDIOBONES];
 	RadianEuler angles;
 	Vector pos;
 
-	for (i = 0; i < g_sequence.Count(); i++)
+	for (intp i = 0; i < g_sequence.Count(); i++)
 	{
 		s_sequence_t *pseq = &g_sequence[i];
 
@@ -6363,9 +6354,7 @@ static void LinkIKLocks( )
 		g_ikautoplaylock[i].chain = j;
 	}
 
-	int k;
-
-	for (k = 0; k < g_sequence.Count(); k++)
+	for (intp k = 0; k < g_sequence.Count(); k++)
 	{
 		for (i = 0; i < g_sequence[k].numiklocks; i++)
 		{
@@ -6510,10 +6499,10 @@ static void LockBoneLengths()
 //-----------------------------------------------------------------------------
 static void ProcessIKRules( )
 {
-	int i, j, k;
+	int j, k;
 
 	// copy source animations
-	for (i = 0; i < g_numani; i++)
+	for (int i = 0; i < g_numani; i++)
 	{
 		s_animation_t *panim = g_panimation[i];
 		const char *pAnimationName = g_panimation[i]->animationname;
@@ -6663,8 +6652,7 @@ static void ProcessIKRules( )
 
 			pRule->errorData.pError = (s_streamdata_t *)kalloc( pRule->errorData.numerror, sizeof( s_streamdata_t ));
 
-			int n = 0;
-
+			intp n = 0;
 			if (pRule->usesequence)
 			{
 				// FIXME: bah, this is horrendously hacky, add a damn back pointer
@@ -6983,7 +6971,7 @@ static void ProcessIKRules( )
 
 
 	// realign IK across multiple animations
-	for (i = 0; i < g_sequence.Count(); i++)
+	for (intp i = 0; i < g_sequence.Count(); i++)
 	{
 		for (j = 0; j < g_sequence[i].groupsize[0]; j++)
 		{
@@ -7636,11 +7624,11 @@ void DumpDefineBones()
 		bonePriority.m_nGlobalBoneWeight = 0.0f;
 	}
 
-	for ( int i = 0; i < g_ScriptLODs.Count(); ++i )
+	for ( intp i = 0; i < g_ScriptLODs.Count(); ++i )
 	{
 		const LodScriptData_t &scriptLOD = g_ScriptLODs[ i ];
 
-		for ( int j = 0; j < scriptLOD.boneReplacements.Count(); ++j )
+		for ( intp j = 0; j < scriptLOD.boneReplacements.Count(); ++j )
 		{
 			// Ignore Shadow LOD
 			if ( scriptLOD.switchValue <= 0.0f )
@@ -7792,9 +7780,9 @@ void SetupHitBoxes()
 		}
 	}
 
-	if ( g_hitboxsets.Size() == 0 )
+	if ( g_hitboxsets.Count() == 0 )
 	{
-		int index = g_hitboxsets.AddToTail();
+		intp index = g_hitboxsets.AddToTail();
 
 		s_hitboxset *set = &g_hitboxsets[ index ];
 		memset( set, 0, sizeof( *set) );
@@ -7885,7 +7873,7 @@ void SetupHitBoxes()
 	{
 		gflags &= ~STUDIOHDR_FLAGS_AUTOGENERATED_HITBOX;
 
-		for (int s = 0; s < g_hitboxsets.Size(); s++ )
+		for (intp s = 0; s < g_hitboxsets.Count(); s++ )
 		{
 			s_hitboxset *set = &g_hitboxsets[ s ];
 
@@ -7904,7 +7892,7 @@ void SetupHitBoxes()
 		}
 	}
 
-	for (int s = 0; s < g_hitboxsets.Size(); s++ )
+	for (intp s = 0; s < g_hitboxsets.Count(); s++ )
 	{
 		s_hitboxset *set = &g_hitboxsets[ s ];
 
@@ -7937,7 +7925,7 @@ void SetupFullBoneRenderBounds( CUtlVector<CBoneRenderBounds> &boneRenderBounds 
 	// Note: shared animation files will need to include the hitboxes or else their sequence
 	// boxes won't use this stuff.
 	// Now add hitboxes.
-	for ( int i=0; i < g_hitboxsets.Count(); i++ )
+	for ( intp i=0; i < g_hitboxsets.Count(); i++ )
 	{
 		const s_hitboxset *pSet = &g_hitboxsets[i];
 		
@@ -7958,7 +7946,6 @@ void SetupFullBoneRenderBounds( CUtlVector<CBoneRenderBounds> &boneRenderBounds 
 
 void CalcSequenceBoundingBoxes()
 {
-	int i;
 	int	j;
 	int	k;
 	int	n;
@@ -7968,7 +7955,7 @@ void CalcSequenceBoundingBoxes()
 	SetupFullBoneRenderBounds( boneRenderBounds );
 
 	// find bounding box for each g_sequence
-	for (i = 0; i < g_numani; i++)
+	for (int i = 0; i < g_numani; i++)
 	{
 		Vector bmin, bmax;
 		
@@ -8049,7 +8036,7 @@ void CalcSequenceBoundingBoxes()
 		// printf("%s  %.2f\n", g_sequence[i].name, g_sequence[i].panim[0]->pos[9][0][0] / g_bonetable[9].pos[0] );
 	}
 
-	for (i = 0; i < g_sequence.Count(); i++)
+	for (intp i = 0; i < g_sequence.Count(); i++)
 	{
 		Vector bmin, bmax;
 		
