@@ -36,13 +36,15 @@ void ParseMtlLib( CUtlBuffer &buf )
 	intp nCurrentMtl = -1;
 	while ( buf.IsValid() )
 	{
-		buf.GetLine( g_szLine, sizeof(g_szLine) );
+		buf.GetLine( g_szLine );
 
 		if ( !Q_strnicmp( g_szLine, "newmtl ", 7 ) )
 		{
 			char mtlName[1024];
-			if ( sscanf( g_szLine, "newmtl %s", mtlName ) == 1 )
+			// dimhotepus: Prevent buffer overflow.
+			if ( sscanf( g_szLine, "newmtl %1023s", mtlName ) == 1 )
 			{
+				mtlName[ssize(mtlName) - 1] = '\0';
 				nCurrentMtl = g_MtlLib.AddToTail( );
 				g_MtlLib[nCurrentMtl].m_MtlName = mtlName;
 				g_MtlLib[nCurrentMtl].m_TgaName = "debugempty";
@@ -57,9 +59,11 @@ void ParseMtlLib( CUtlBuffer &buf )
 
 			char tgaPath[MAX_PATH];
 			char tgaName[1024];
-			if ( sscanf( g_szLine, "map_Kd %s", tgaPath ) == 1 )
+			// dimhotepus: Prevent buffer overflow.
+			if ( sscanf( g_szLine, "map_Kd %259s", tgaPath ) == 1 )
 			{
-				Q_FileBase( tgaPath, tgaName, sizeof(tgaName) );
+				tgaPath[ssize(tgaPath) - 1] = '\0';
+				Q_FileBase( tgaPath, tgaName );
 				g_MtlLib[nCurrentMtl].m_TgaName = tgaName;
 			}
 			continue;
@@ -200,8 +204,11 @@ int Load_OBJ( s_source_t *psource )
 		
 		if ( !Q_strncmp( g_szLine, "mtllib ", 7 ) )
 		{
-			sscanf( g_szLine, "mtllib %s", &cmd[0] );
-			CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+			// dimhotepus: Prevent buffer overflow.
+			sscanf( g_szLine, "mtllib %1023s", cmd );
+			cmd[ssize(cmd) - 1] = '\0';
+
+			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
 			char pFullMtlLibPath[MAX_PATH];
 			V_ComposeFileName( pFullDir, cmd, pFullMtlLibPath );
@@ -214,7 +221,9 @@ int Load_OBJ( s_source_t *psource )
 
 		if (strncmp( g_szLine, "usemtl ", 7 ) == 0)
 		{
-			sscanf( g_szLine, "usemtl %s", &cmd[0] );
+			// dimhotepus: Prevent buffer overflow.
+			sscanf( g_szLine, "usemtl %1023s", cmd );
+			cmd[ssize(cmd) - 1] = '\0';
 
 			const char *pTexture = FindMtlEntry( cmd );
 			int texture = LookupTexture( pTexture );
@@ -330,7 +339,9 @@ int AppendVTAtoOBJ( s_source_t *psource, char *filename, int frame )
 		}
 		else if (strncmp( g_szLine, "usemtl ", 7 ) == 0)
 		{
-			sscanf( g_szLine, "usemtl %s", &cmd[0] );
+			// dimhotepus: Prevent buffer overflow.
+			sscanf( g_szLine, "usemtl %1023s", cmd );
+			cmd[ssize(cmd) - 1] = '\0';
 
 			int texture = LookupTexture( cmd );
 			psource->texmap[texture] = texture;	// hack, make it 1:1
