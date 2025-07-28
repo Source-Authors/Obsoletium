@@ -44,6 +44,7 @@
 #include "tier0/dbg.h"
 #include "tier0/minidump.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
+#include "materialsystem/materialsystem_config.h"
 #include "istudiorender.h"
 #include "filesystem.h"
 #include "engine_launcher_api.h"
@@ -1173,6 +1174,11 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	g_pGameConfig->ParseGameInfo();
 
 	materials->ModInit();
+	// dimhotepus: Set MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION to use D3DSWAPEFFECT_DISCARD instead of D3DSWAPEFFECT_FLIPEX
+	// dimhotepus: We can't use D3DSWAPEFFECT_FLIPEX because Hammer mix DirectX and GDI :(.
+	const auto &config = materials->GetCurrentConfigForVideoCard();
+	config.SetFlag(MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION, 1);
+	materials->OverrideConfig(config, false);
 
 	//
 	// Initialize the texture manager and load all textures.
