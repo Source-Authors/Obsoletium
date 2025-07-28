@@ -209,7 +209,7 @@ void CKeyBindingHelpDialog::GetMappingList( Panel *panel, CUtlVector< PanelKeyBi
 }
 
 
-void CKeyBindingHelpDialog::AnsiText( char const *token, char *out, size_t buflen )
+void CKeyBindingHelpDialog::AnsiText( char const *token, char *out, int buflen )
 {
 	out[ 0 ] = 0;
 
@@ -288,7 +288,7 @@ void CKeyBindingHelpDialog::PopulateList()
 			Q_snprintf( loc, sizeof( loc ), "#%s", kbMap->bindingname );
 
 			char ansi[ 256 ];
-			AnsiText( loc, ansi, sizeof( ansi ) );
+			AnsiText( loc, ansi );
 
 			item->SetString( "Action", ansi );
 			item->SetWString( "Binding", Panel::KeyCodeModifiersToDisplayString( (KeyCode)kbMap->keycode, kbMap->modifiers ) );
@@ -298,7 +298,7 @@ void CKeyBindingHelpDialog::PopulateList()
 			if ( bindingMap && 
 				 bindingMap->helpstring )
 			{
-				AnsiText( bindingMap->helpstring, ansi, sizeof( ansi ) );
+				AnsiText( bindingMap->helpstring, ansi );
 				item->SetString( "Description", ansi );
 			}
 			
@@ -328,13 +328,13 @@ void CKeyBindingHelpDialog::PopulateList()
 			Q_snprintf( loc, sizeof( loc ), "#%s", kbMap->bindingname );
 
 			char ansi[ 256 ];
-			AnsiText( loc, ansi, sizeof( ansi ) );
+			AnsiText( loc, ansi );
 
 			item->SetString( "Action", ansi );
 			item->SetWString( "Binding", L"" );
 			if ( kbMap->helpstring )
 			{
-				AnsiText( kbMap->helpstring, ansi, sizeof( ansi ) );
+				AnsiText( kbMap->helpstring, ansi );
 				item->SetString( "Description", ansi );
 			}
 

@@ -41,14 +41,14 @@ CKeyBoardEditorPage::SaveMapping_t::SaveMapping_t( const SaveMapping_t& src )
 // Purpose: Special list subclass to handle drawing of trap mode prompt on top of
 //			lists client area
 //-----------------------------------------------------------------------------
-class VControlsListPanel : public ListPanel
+class VControlsListPanel final : public ListPanel
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( VControlsListPanel, ListPanel );
 
 public:
 	// Construction
-					VControlsListPanel( vgui::Panel *parent, const char *listName );
-	virtual			~VControlsListPanel();
+	VControlsListPanel( vgui::Panel *parent, const char *listName );
+	~VControlsListPanel();
 
 	// Start/end capturing
 	virtual void	StartCaptureMode(vgui::HCursor hCursor = NULL);
@@ -551,7 +551,7 @@ static bool BindingLessFunc( KeyValues * const & lhs, KeyValues * const &rhs )
 	return ( Q_stricmp( p1->GetString( "Action" ), p2->GetString( "Action" ) ) < 0 ) ? true : false;
 }
 
-void CKeyBoardEditorPage::AnsiText( char const *token, char *out, size_t buflen )
+void CKeyBoardEditorPage::AnsiText( char const *token, char *out, int buflen )
 {
 	out[ 0 ] = 0;
 
@@ -597,7 +597,7 @@ void CKeyBoardEditorPage::PopulateList()
 			Q_snprintf( loc, sizeof( loc ), "#%s", kbMap->bindingname );
 
 			char ansi[ 256 ];
-			AnsiText( loc, ansi, sizeof( ansi ) );
+			AnsiText( loc, ansi );
 
 			item->SetString( "Action", ansi );
 			item->SetWString( "Binding", Panel::KeyCodeModifiersToDisplayString( (KeyCode)kbMap->keycode, kbMap->modifiers ) );
@@ -607,7 +607,7 @@ void CKeyBoardEditorPage::PopulateList()
 			if ( bindingMap && 
 				 bindingMap->helpstring )
 			{
-				AnsiText( bindingMap->helpstring, ansi, sizeof( ansi ) );
+				AnsiText( bindingMap->helpstring, ansi );
 				item->SetString( "Description", ansi);
 			}
 			
@@ -637,13 +637,13 @@ void CKeyBoardEditorPage::PopulateList()
 			Q_snprintf( loc, sizeof( loc ), "#%s", kbMap->bindingname );
 			
 			char ansi[ 256 ];
-			AnsiText( loc, ansi, sizeof( ansi ) );
+			AnsiText( loc, ansi );
 
 			item->SetString( "Action", ansi );
 			item->SetWString( "Binding", L"" );
 			if ( kbMap->helpstring )
 			{
-				AnsiText( kbMap->helpstring, ansi, sizeof( ansi ) );
+				AnsiText( kbMap->helpstring, ansi );
 				item->SetString( "Description", ansi );
 			}
 
