@@ -97,8 +97,8 @@ ISoundSystem *g_pSoundSystem;
 CreateInterfaceFn g_Factory;
 
 // Filesystem dialog module wrappers.
-CSysModule *g_pFSDialogModule = 0;
-CreateInterfaceFn g_FSDialogFactory = 0;
+CSysModule *g_pFSDialogModule = nullptr;
+CreateInterfaceFnT<IFileSystemOpenDialog> g_FSDialogFactory = nullptr;
 
 
 class CHlmvIpcServer : public CValveIpcServerUtl
@@ -114,7 +114,7 @@ public:
 	void PopCommand();
 
 protected:
-	virtual BOOL ExecuteCommand( CUtlBuffer &cmd, CUtlBuffer &res );
+	BOOL ExecuteCommand( CUtlBuffer &cmd, CUtlBuffer &res ) override;
 
 protected:
 	CThreadFastMutex m_mtx;
@@ -134,7 +134,7 @@ void LoadFileSystemDialogModule()
 	g_pFSDialogModule = Sys_LoadModule( "filesystemopendialog" DLL_EXT_STRING );
 	if ( g_pFSDialogModule )
 	{
-		g_FSDialogFactory = Sys_GetFactory( g_pFSDialogModule );
+		g_FSDialogFactory = Sys_GetFactory<IFileSystemOpenDialog>( g_pFSDialogModule );
 	}
 
 	if ( !g_pFSDialogModule || !g_FSDialogFactory )
@@ -239,7 +239,6 @@ AccelTableEntry_t accelTable[] =					{{VK_F1, IDC_FLUSH_SHADERS,		mx::ACCEL_VIRT
 													{'T', IDC_ACCEL_TANGENTS,		mx::ACCEL_CONTROL | mx::ACCEL_VIRTKEY},
 													{'s', IDC_ACCEL_SHADOW,			mx::ACCEL_CONTROL | mx::ACCEL_VIRTKEY},
 													{'S', IDC_ACCEL_SHADOW,			mx::ACCEL_CONTROL | mx::ACCEL_VIRTKEY}};
-#define NUM_ACCELERATORS ARRAYSIZE( accelTable )
 
 
 MDLViewer::MDLViewer ()
@@ -355,9 +354,6 @@ MDLViewer::MDLViewer ()
 
 
 	d_MatSysWindow = new MatSysWindow (this, 0, 0, 100, 100, "", mxWindow::Normal);
-#ifdef WIN32
-	// SetWindowLong ((HWND) d_MatSysWindow->getHandle (), GWL_EXSTYLE, WS_EX_CLIENTEDGE);
-#endif
 
 	d_cpl = new ControlPanel (this);
 	d_cpl->setMatSysWindow (d_MatSysWindow);
@@ -387,11 +383,11 @@ MDLViewer::MDLViewer ()
 	CUtlVector< mx::Accel_t > accelerators;
 	mx::Accel_t accel;
 
-	for (int i=0; i < NUM_ACCELERATORS; i++)
+	for (auto &t : accelTable)
 	{
-		accel.flags	  = accelTable[i].flags ;
-		accel.key	  = accelTable[i].key;
-		accel.command = accelTable[i].command;
+		accel.flags	  = t.flags;
+		accel.key	  = t.key;
+		accel.command = t.command;
 		accelerators.AddToTail( accel );
 	}
 
@@ -1109,7 +1105,7 @@ MDLViewer::handleEvent (mxEvent *event)
 
 
 
-void TranslateMayaToHLMVCoordinates( const Vector &vMayaPos, const QAngle &vMayaRot, Vector &vHLMVPos, QAngle &vHLMVAngles )
+static void TranslateMayaToHLMVCoordinates( const Vector &vMayaPos, const QAngle &vMayaRot, Vector &vHLMVPos, QAngle &vHLMVAngles )
 {
 	vHLMVPos.Init( vMayaPos.z, vMayaPos.x, vMayaPos.y );
 
@@ -1479,10 +1475,7 @@ bool CHLModelViewerApp::PreInit( )
 	}
 
 	g_pMaterialSystem->SetAdapter( nAdapter, nAdapterFlags );
-
-	g_bOldFileDialogs = true;
-	if ( CommandLine()->FindParm( "-NoSteamdDialog" ) )
-		g_bOldFileDialogs = false;
+	g_bOldFileDialogs = !CommandLine()->FindParm( "-NoSteamdDialog" );
 	
 	LoadFileSystemDialogModule();
 

@@ -510,7 +510,7 @@ MatSysWindow::handleEvent (mxEvent *event)
 				int iSeq = g_pStudioModel->GetSequence ();
 				if (iSeq == g_pStudioModel->SetSequence (iSeq + 1))
 				{
-					g_pStudioModel->SetSequence (0);
+					g_pStudioModel->SetSequence ((intp)0);
 				}
 			}
 			break;

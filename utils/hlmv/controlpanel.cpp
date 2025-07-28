@@ -722,7 +722,7 @@ void CBoneControlWindow::RefreshHitbox( )
 
 void CBoneControlWindow::OnHitboxSelected( int hitbox )
 {
-	if ( m_nHitboxSet < 0 || m_nHitboxSet >= g_pStudioModel->m_HitboxSets.Size() )
+	if ( m_nHitboxSet < 0 || m_nHitboxSet >= g_pStudioModel->m_HitboxSets.Count() )
 	{
 		m_nHitboxSet = 0;
 	}
@@ -2992,7 +2992,7 @@ void ControlPanel::CreateSortedSequenceList( CStudioHdr* hdr, int *pSequence )
 		if ( !pKeyValuesText )
 			continue;
 
-		KeyValues *pKeyValues = new KeyValues( "sort" );
+		KeyValuesAD pKeyValues( "sort" );
 
 		if ( pKeyValues->LoadFromBuffer( "mdl", pKeyValuesText ) )
 		{
@@ -3010,7 +3010,6 @@ void ControlPanel::CreateSortedSequenceList( CStudioHdr* hdr, int *pSequence )
 				}
 			}
 		}
-		pKeyValues->deleteThis();
 	}
 
 	if ( !CommandLine()->CheckParm( "-nosort" ) )
