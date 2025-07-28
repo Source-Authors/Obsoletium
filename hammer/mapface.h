@@ -352,7 +352,7 @@ public:
 
 	virtual void AddShadowingTriangles( CUtlVector<Vector> &tri_list );
 
-	DetailObjects		*m_pDetailObjects;
+	class DetailObjects		*m_pDetailObjects;
 	
 protected:
 
