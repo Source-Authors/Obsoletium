@@ -2008,8 +2008,11 @@ void CRender3D::RenderCone( Vector const &vBasePt, Vector const &vTipPt, float f
 	//
 	for( int i = 0; i < nSlices; i++ )
 	{
-		pPts[i].x = fRadius * cos( ( sliceAngle * -i ) );
-		pPts[i].y = fRadius * sin( ( sliceAngle * -i ) );
+		float sin, cos;
+		DirectX::XMScalarSinCos(&sin, &cos, sliceAngle * -i);
+
+		pPts[i].x = fRadius * cos;
+		pPts[i].y = fRadius * sin;
 		pPts[i].z = 0.0f;
 	}
 
@@ -2145,10 +2148,18 @@ void CRender3D::RenderSphere(Vector const &vCenter, float flRadius, int nTheta, 
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
 
+			DirectX::XMVECTOR angles = DirectX::XMVectorSet( theta, phi, 0, 0 );
+
+			DirectX::XMVECTOR sin, cos;
+			DirectX::XMVectorSinCos( &sin, &cos, angles );
+
+			float sinTheta = DirectX::XMVectorGetX( sin ), cosTheta = DirectX::XMVectorGetX( cos );
+			float sinPhi = DirectX::XMVectorGetY( sin ), cosPhi = DirectX::XMVectorGetY( cos );
+
 			Vector vecPos;
-			vecPos.x = flRadius * sin(phi) * cos(theta);
-			vecPos.y = flRadius * sin(phi) * sin(theta); 
-			vecPos.z = flRadius * cos(phi);
+			vecPos.x = flRadius * sinPhi * cosTheta;
+			vecPos.y = flRadius * sinPhi * sinTheta;
+			vecPos.z = flRadius * cosPhi;
 
 			Vector vecNormal = vecPos;
 			VectorNormalize(vecNormal);
@@ -2233,9 +2244,18 @@ void CRender3D::RenderWireframeSphere(Vector const &vCenter, float flRadius, int
 			float v = i / ( float )( nPhi - 1 );
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
-			meshBuilder3D.Position3f( vCenter.x + ( flRadius * sin(phi) * cos(theta) ),
-				                    vCenter.y + ( flRadius * sin(phi) * sin(theta) ), 
-									vCenter.z + ( flRadius * cos(phi) ) );
+			
+			DirectX::XMVECTOR angles = DirectX::XMVectorSet( theta, phi, 0, 0 );
+
+			DirectX::XMVECTOR sin, cos;
+			DirectX::XMVectorSinCos( &sin, &cos, angles );
+
+			float sinTheta = DirectX::XMVectorGetX( sin ), cosTheta = DirectX::XMVectorGetX( cos );
+			float sinPhi = DirectX::XMVectorGetY( sin ), cosPhi = DirectX::XMVectorGetY( cos );
+
+			meshBuilder3D.Position3f( vCenter.x + ( flRadius * sinPhi * cosTheta ),
+				                    vCenter.y + ( flRadius * sinPhi * sinTheta ), 
+									vCenter.z + ( flRadius * cosPhi ) );
 			meshBuilder3D.Color3ub( chRed, chGreen, chBlue );
 			meshBuilder3D.AdvanceVertex();
 		}

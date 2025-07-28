@@ -55,8 +55,11 @@ void polyMake( float x1, float  y1, float x2, float y2, int npoints, float start
         if( angle > 360 )
             angle -= 360;
 
-        pmPoints[point][0] = V_rint(xCenter + (sin(DEG2RAD(angle)) * (float)xrad));
-        pmPoints[point][1] = V_rint(yCenter + (cos(DEG2RAD(angle)) * (float)yrad));
+        float sin, cos;
+        DirectX::XMScalarSinCos(&sin, &cos, DEG2RAD(angle));
+
+        pmPoints[point][0] = V_rint(xCenter + (sin * (float)xrad));
+        pmPoints[point][1] = V_rint(yCenter + (cos * (float)yrad));
     }
 
     pmPoints[point][0] = pmPoints[0][0];
@@ -103,17 +106,12 @@ float lineangle(float x1, float y1, float x2, float y2)
 //-----------------------------------------------------------------------------
 void AxisAngleMatrix(VMatrix& Matrix, const Vector& Axis, float fAngle)
 {
-	float fRadians;
 	float fAxisXSquared;
 	float fAxisYSquared;
 	float fAxisZSquared;
-	float fSin;
-	float fCos;
 
-	fRadians = fAngle * M_PI / 180.0;
-
-	fSin = sin(fRadians);
-	fCos = cos(fRadians);
+	float fSin, fCos;
+	DirectX::XMScalarSinCos(&fSin, &fCos, DEG2RAD(fAngle));
 
 	fAxisXSquared = Axis[0] * Axis[0];
 	fAxisYSquared = Axis[1] * Axis[1];
