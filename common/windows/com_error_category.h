@@ -255,7 +255,9 @@ inline const char* GetD3DErrorDescription(HRESULT hr) {
              "device entered the fullscreen mode on the same monitor as the "
              "presentation window and the presentation window is completely on "
              "that monitor. Occlusion will not occur if the client area is "
-             "covered by another Window.";
+             "covered by another Window. Occluded applications can continue "
+             "rendering and all calls will succeed, but the occluded "
+             "presentation window will not be updated. Direct3D 9Ex only.";
 
     case D3DERR_UNSUPPORTEDOVERLAY:
       return "D3DERR_UNSUPPORTEDOVERLAY: The device does not support overlay "
