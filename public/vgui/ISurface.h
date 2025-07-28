@@ -278,7 +278,7 @@ public:
 
 	//!! these functions should not be accessed directly, but only through other vgui items
 	//!! need to move these to seperate interface
-	virtual ptrdiff_t GetPopupCount() = 0;
+	virtual intp GetPopupCount() = 0;
 	virtual VPANEL GetPopup(intp index) = 0;
 	virtual bool ShouldPaintChildPanel(VPANEL childPanel) = 0;
 	virtual bool RecreateContext(VPANEL panel) = 0;
