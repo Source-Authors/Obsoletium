@@ -1909,7 +1909,10 @@ void CRender3D::RenderBox(const Vector &Mins, const Vector &Maxs,
 			//
 			// If we are rendering using one of the lit modes, calculate lighting.
 			// 
-			unsigned char color[3];
+			// dimhotepus: 3 -> 4 to prevent out-of-buffer read.
+			unsigned char color[4];
+			// dimhotepus: Alpha is required.
+			color[3] = 255;
 
 			assert( (eRenderModeThisPass != RENDER_MODE_TEXTURED) &&
 					(eRenderModeThisPass != RENDER_MODE_TEXTURED_SHADED) && 
