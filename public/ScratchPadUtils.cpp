@@ -400,7 +400,7 @@ void ScratchPad_DrawSphere(
 		if ( iSlice == 0 )
 		{
 			prevPoints[0] = vCenter + Vector( 0, 0, flRadius );
-			for ( int z=1; z < prevPoints.Count(); z++ )
+			for ( intp z=1; z < prevPoints.Count(); z++ )
 				prevPoints[z] = prevPoints[0];
 		}
 		else
