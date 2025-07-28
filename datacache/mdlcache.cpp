@@ -1946,6 +1946,13 @@ bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlB
 		return false;
 	}
 
+	// dimhotepus: Empty models like hl2/models/weapons/v_hands.mdl should not read past the buffer above. 
+	if ( buf.Size() == 0 )
+	{
+		DevWarning( "Model '%s' is empty and not loaded!\n", pMDLFileName );
+		return false;
+	}
+
 	studiohdr_t *pStudioHdr = (studiohdr_t*)buf.PeekGet();
 	if ( !pStudioHdr )
 	{
