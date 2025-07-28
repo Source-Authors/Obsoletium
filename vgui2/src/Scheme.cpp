@@ -794,10 +794,32 @@ void CScheme::ReloadFontGlyphs()
 	KeyValues *fonts = m_pData->FindKey("Fonts", true);
 	FOR_EACH_DICT_FAST( m_FontAliases, i )
 	{
-		KeyValues *kv = fonts->FindKey( m_FontAliases[i]._trueFontName.String(), true );
+		const char *trueFontName = m_FontAliases[i]._trueFontName.String();
+		KeyValues *kv = fonts->FindKey( trueFontName, true );
+
+		// dimhotepus: Half-Life 2 20th Anniversary Update. Some fonts are without inner subkeys.
+		//
+		//"MenuLargeUnscaled"
+		//{
+		//	"name"		"Verdana"
+		//	...
+		//}
+		KeyValues *sub = kv->GetFirstSubKey();
+		bool hasInnerSubkey = sub && sub->GetDataType() == KeyValues::types_t::TYPE_NONE;
+		KeyValues *fontdata = hasInnerSubkey ? sub : kv;
+		// dimhotepus: Half-Life 2 20th Anniversary Update. Some fonts are empty on PC.
+		//
+		//GameUIButtons
+		//{
+		//	"1"	[$X360]
+		//	{
+		//		...
+		//	}
+		//}
+		fontdata = fontdata->GetFirstSubKey() ? fontdata : nullptr;
 	
 		// walk through creating adding the first matching glyph set to the font
-		for (KeyValues *fontdata = kv->GetFirstSubKey(); fontdata != NULL; fontdata = fontdata->GetNextKey())
+		for ( ; fontdata != nullptr; fontdata = fontdata->GetNextKey())
 		{
 			// skip over fonts not meant for this resolution
 			int fontYResMin = 0, fontYResMax = 0;
