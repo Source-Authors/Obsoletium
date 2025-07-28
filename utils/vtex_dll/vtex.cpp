@@ -1820,13 +1820,13 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 	V_sprintf_safe( dstFileName, "%s/%s%s.vtf", pOutputDir, pBaseName, ( ( Mode::eModePFM == g_eMode ) && isCubeMap ) ? ".hdr" : "" );
 
 	// Now if we are only validating the CRC
-	if( CommandLine()->FindParm( "-crcvalidate" ) )
+	if ( CommandLine()->FindParm( "-crcvalidate" ) )
 	{
 		CUtlBuffer bufFile;
 		bool bLoad = LoadFile( dstFileName, bufFile, false, NULL );
 		if ( !bLoad )
 		{
-			fprintf( stderr, "LOAD ERROR: %s\n", dstFileName );
+			fprintf( stderr, "Unable to load '%s'.\n", dstFileName );
 			return false;
 		}
 
@@ -1834,7 +1834,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 		bLoad = spExistingVtf->Unserialize( bufFile );
 		if ( !bLoad )
 		{
-			fprintf( stderr, "UNSERIALIZE ERROR: %s\n", dstFileName );
+			fprintf( stderr, "Unable to deserialize '%s'.\n", dstFileName );
 			return false;
 		}
 
@@ -1842,23 +1842,22 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 		const void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
 		if ( !pCrcData || numDataBytes != sizeof( CRC32_t ) )
 		{
-			fprintf( stderr, "OLD TEXTURE FORMAT: %s\n", dstFileName );
+			fprintf( stderr, "Old texture format '%s'.\n", dstFileName );
 			return false;
 		}
 
 		CRC32_t crcFile = * reinterpret_cast< CRC32_t const * >( pCrcData );
 		if ( crcFile != crcWritten )
 		{
-			fprintf( stderr, "CRC MISMATCH: %s\n", dstFileName );
+			fprintf( stderr, "CRC32 mismatch '%s'.\n", dstFileName );
 			return false;
 		}
 
-		fprintf( stderr, "OK: %s\n", dstFileName );
 		return true;
 	}
 
 	// Now if we are not forcing the CRC
-	if( !CommandLine()->FindParm( "-crcforce" ) )
+	if ( !CommandLine()->FindParm( "-crcforce" ) )
 	{
 		CUtlBuffer bufFile;
 		if ( LoadFile( dstFileName, bufFile, false, NULL ) )
@@ -1874,10 +1873,9 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 					if ( crcFile == crcWritten )
 					{
 						if( !g_Quiet )
-							printf( "SUCCESS: %s is up-to-date\n", dstFileName );
+							printf( "SUCCESS: '%s' is up-to-date.\n", dstFileName );
 
-						if( !CommandLine()->FindParm( "-crcforce" ) )
-							return true;
+						return true;
 					}
 				}
 			}
@@ -2398,7 +2396,7 @@ static int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedi
 		if ( access( filename, 0 ) != -1 )
 			return FF_TRYAGAIN;
 
-		char texturename[ _MAX_PATH ] = {0};
+		char texturename[ MAX_PATH ] = {0};
 		char *p = ( char * )basedir;
 
 		// Skip over the base path to get a material system relative path
