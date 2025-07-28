@@ -127,7 +127,7 @@ public:
 	virtual void		OnDelete();
 	virtual bool		CanClose();
 
-	virtual void UpdateStatus( char const *pchSceneName, bool bQuiet, int nIndex, int nCount );
+	virtual void UpdateStatus( char const *pchSceneName, bool bQuiet, intp nIndex, intp nCount );
 
 	void OnFileLoaded( char const *pszFile );
 
@@ -142,8 +142,8 @@ public:
 	void InitModelTab( void );
 	void InitGridSettings( void );
 
-	int GetActiveModelTab( void );
-	void SetActiveModelTab( int modelindex );
+	intp GetActiveModelTab( void );
+	void SetActiveModelTab( intp modelindex );
 
 	void Refresh( void );
 	void LoadModelFile( const char *pszFile );

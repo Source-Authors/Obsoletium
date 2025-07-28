@@ -34,14 +34,14 @@ public:
 	virtual void				ActivateExpressionClass( CExpClass *cl ) = 0;
 
 	virtual CExpClass			*AddCExpClass( const char *classname, const char *filename ) = 0;
-	virtual int					GetNumClasses( void ) = 0;
+	virtual intp				GetNumClasses( void ) = 0;
 
 	virtual CExpression			*GetCopyBuffer( void ) = 0;
 
 	virtual bool				CanClose( void ) = 0;
 
 	virtual CExpClass			*GetActiveClass( void ) = 0;
-	virtual CExpClass			*GetClass( int num ) = 0;
+	virtual CExpClass			*GetClass( intp num ) = 0;
 	virtual CExpClass			*FindClass( const char *classname, bool bMatchBaseNameOnly ) = 0;
 
 };

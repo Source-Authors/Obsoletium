@@ -43,17 +43,17 @@ public:
 	int					FindExpressionIndex( CExpression *exp );
 	void				DeleteExpression( const char *name );
 	
-	int					GetNumExpressions( void );
-	CExpression			*GetExpression( int num );
+	intp				GetNumExpressions( void );
+	CExpression			*GetExpression( intp num );
 
 	bool				GetDirty( void );
 	void				SetDirty( bool dirty );
 
-	void				SelectExpression( int num, bool deselect = true );
-	int					GetSelectedExpression( void );
+	void				SelectExpression( intp num, bool deselect = true );
+	intp				GetSelectedExpression( void );
 	void				DeselectExpression( void );
 
-	void				SwapExpressionOrder( int exp1, int exp2 );
+	void				SwapExpressionOrder( intp exp1, intp exp2 );
 
 	// Get index of this class in the global class list
 	int					GetIndex( void );
@@ -68,7 +68,7 @@ private:
 	char				m_szClassName[ 128 ];
 	char				m_szFileName[ 128 ];
 	bool				m_bDirty;
-	int					m_nSelectedExpression;
+	intp				m_nSelectedExpression;
 	CUtlVector < CExpression > m_Expressions;
 
 	bool				m_bIsPhonemeClass;

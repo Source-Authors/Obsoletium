@@ -27,8 +27,8 @@
 #undef ALIGN4
 #define ALIGN4( a ) a = AlignValue(a, 4)
 
-char const *GetGlobalFlexControllerName( int index );
-int GetGlobalFlexControllerCount( void );
+char const *GetGlobalFlexControllerName( intp index );
+intp GetGlobalFlexControllerCount( void );
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -87,14 +87,14 @@ void CExpClass::Save( void )
 
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
-	int i, j;
+	intp i, j;
 
 	int numflexmaps = 0;
-	int flexmap[128]; // maps file local controlls into global controls
+	intp flexmap[128]; // maps file local controlls into global controls
 
 	CExpression *expr = NULL;
 	// find all used controllers
-	int fc = GetGlobalFlexControllerCount();
+	intp fc = GetGlobalFlexControllerCount();
 	for ( j = 0; j < fc; ++j )
 	{
 		for (i = 0; i < GetNumExpressions(); i++)
@@ -198,20 +198,18 @@ void CExpClass::Export( void )
 
 	Con_Printf( "Exporting %s to %s\n", GetName(), vfefilename );
 
-	int i, j;
-
 	int numflexmaps = 0;
-	int flexmap[128]; // maps file local controlls into global controls
+	intp flexmap[128]; // maps file local controlls into global controls
 	CExpression *expr = NULL;
 
 	// find all used controllers
-	int fc_count = GetGlobalFlexControllerCount();
+	intp fc_count = GetGlobalFlexControllerCount();
 
-	for (j = 0; j < fc_count; j++)
+	for (intp j = 0; j < fc_count; j++)
 	{
-		int k = j;
+		intp k = j;
 
-		for (i = 0; i < GetNumExpressions(); i++)
+		for (intp i = 0; i < GetNumExpressions(); i++)
 		{
 			expr = GetExpression( i );
 			Assert( expr );
@@ -248,7 +246,7 @@ void CExpClass::Export( void )
 	fhdr->flexsettingindex = pData - pDataStart;
 	pData += sizeof( flexsetting_t ) * fhdr->numflexsettings;
 	ALIGN4( pData );
-	for (i = 0; i < fhdr->numflexsettings; i++)
+	for (int i = 0; i < fhdr->numflexsettings; i++)
 	{
 		expr = GetExpression( i );
 		Assert( expr );
@@ -263,7 +261,7 @@ void CExpClass::Export( void )
 		Assert( settings );
 		Assert( weights );
 
-		for (j = 0; j < numflexmaps; j++)
+		for (int j = 0; j < numflexmaps; j++)
 		{
 			if (settings[flexmap[j]] != 0 || weights[flexmap[j]] != 0)
 			{
@@ -280,7 +278,7 @@ void CExpClass::Export( void )
 
 	// store indexed table
 	int numindexes = 1;
-	for (i = 0; i < fhdr->numflexsettings; i++)
+	for (int i = 0; i < fhdr->numflexsettings; i++)
 	{
 		if (pSetting[i].index >= numindexes)
 			numindexes = pSetting[i].index + 1;
@@ -291,17 +289,17 @@ void CExpClass::Export( void )
 	fhdr->indexindex = pData - pDataStart;
 	pData += sizeof( int ) * numindexes;
 	ALIGN4( pData );
-	for (i = 0; i < numindexes; i++)
+	for (int i = 0; i < numindexes; i++)
 	{
 		pIndex[i] = -1;
 	}
-	for (i = 0; i < fhdr->numflexsettings; i++)
+	for (int i = 0; i < fhdr->numflexsettings; i++)
 	{
 		pIndex[pSetting[i].index] = i;
 	}
 
 	// store flex setting names
-	for (i = 0; i < fhdr->numflexsettings; i++)
+	for (int i = 0; i < fhdr->numflexsettings; i++)
 	{
 		expr = GetExpression( i );
 		pSetting[i].nameindex = pData - (byte *)(&pSetting[i]);
@@ -316,7 +314,7 @@ void CExpClass::Export( void )
 	fhdr->keynameindex = pData - pDataStart;
 	pData += sizeof( char *) * numflexmaps;
 	
-	for (i = 0; i < numflexmaps; i++)
+	for (int i = 0; i < numflexmaps; i++)
 	{
 		pKeynames[i] = (char *)(pData - pDataStart);
 		strcpy( (char *)pData,  GetGlobalFlexControllerName( flexmap[i] ) );
@@ -328,7 +326,7 @@ void CExpClass::Export( void )
 	int *keymapping = (int *)pData;
 	fhdr->keymappingindex = pData - pDataStart;
 	pData += sizeof( int ) * numflexmaps;
-	for (i = 0; i < numflexmaps; i++)
+	for (int i = 0; i < numflexmaps; i++)
 	{
 		keymapping[i] = -1;
 	}
@@ -395,8 +393,8 @@ void CExpClass::ReloadBitmaps( void )
 {
 	bool bUsingPerPlayerOverrides = IsUsingPerPlayerExpressions();
 
-	int c = models->Count();
-	for ( int model = 0; model < MAX_FP_MODELS; model++ )
+	intp c = models->Count();
+	for ( intp model = 0; model < MAX_FP_MODELS; model++ )
 	{
 		// Only reload bitmaps for current model index
 		if ( bUsingPerPlayerOverrides && model != models->GetActiveModelIndex() )
@@ -404,7 +402,7 @@ void CExpClass::ReloadBitmaps( void )
 
 		models->ForceActiveModelIndex( model );
 
-		for ( int i = 0 ; i < GetNumExpressions(); i++ )
+		for ( intp i = 0 ; i < GetNumExpressions(); i++ )
 		{
 			CExpression *e = GetExpression( i );
 			if ( !e )
@@ -451,7 +449,7 @@ CExpression *CExpClass::AddExpression( const char *name, const char *description
 	}
 
 	// Add to end of list
-	int idx = m_Expressions.AddToTail();
+	intp idx = m_Expressions.AddToTail();
 
 	exp = &m_Expressions[ idx ];
 
@@ -498,7 +496,7 @@ CExpression *CExpClass::AddExpression( const char *name, const char *description
 //-----------------------------------------------------------------------------
 CExpression *CExpClass::FindExpression( const char *name )
 {
-	for ( int i = 0 ; i < m_Expressions.Size(); i++ )
+	for ( intp i = 0 ; i < m_Expressions.Count(); i++ )
 	{
 		CExpression *exp = &m_Expressions[ i ];
 		if ( !stricmp( exp->name, name ) )
@@ -517,7 +515,7 @@ CExpression *CExpClass::FindExpression( const char *name )
 void CExpClass::DeleteExpression( const char *name )
 {
 
-	for ( int i = 0 ; i < m_Expressions.Size(); i++ )
+	for ( intp i = 0 ; i < m_Expressions.Count(); i++ )
 	{
 		CExpression *exp = &m_Expressions[ i ];
 		if ( !stricmp( exp->name, name ) )
@@ -534,9 +532,9 @@ void CExpClass::DeleteExpression( const char *name )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CExpClass::GetNumExpressions( void )
+intp CExpClass::GetNumExpressions( void )
 {
-	return m_Expressions.Size();
+	return m_Expressions.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -544,9 +542,9 @@ int CExpClass::GetNumExpressions( void )
 // Input  : num - 
 // Output : CExpression
 //-----------------------------------------------------------------------------
-CExpression *CExpClass::GetExpression( int num )
+CExpression *CExpClass::GetExpression( intp num )
 {
-	if ( num < 0 || num >= m_Expressions.Size() )
+	if ( num < 0 || num >= m_Expressions.Count() )
 	{
 		return NULL;
 	}
@@ -592,7 +590,7 @@ int CExpClass::GetIndex( void )
 // Purpose: 
 // Input  : num - 
 //-----------------------------------------------------------------------------
-void CExpClass::SelectExpression( int num, bool deselect )
+void CExpClass::SelectExpression( intp num, bool deselect )
 {
 	m_nSelectedExpression = num;
 
@@ -605,7 +603,7 @@ void CExpClass::SelectExpression( int num, bool deselect )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CExpClass::GetSelectedExpression( void )
+intp CExpClass::GetSelectedExpression( void )
 {
 	return m_nSelectedExpression;
 }
@@ -623,7 +621,7 @@ void CExpClass::DeselectExpression( void )
 // Input  : exp1 - 
 //			exp2 - 
 //-----------------------------------------------------------------------------
-void CExpClass::SwapExpressionOrder( int exp1, int exp2 )
+void CExpClass::SwapExpressionOrder( intp exp1, intp exp2 )
 {
 	CExpression temp1 = m_Expressions[ exp1 ];
 	CExpression temp2 = m_Expressions[ exp2 ];
@@ -636,7 +634,7 @@ void CExpClass::SwapExpressionOrder( int exp1, int exp2 )
 
 void CExpClass::BuildValidChecksums( CUtlRBTree< CRC32_t > &tree )
 {
-	for ( int i = 0; i < m_Expressions.Size(); i++ )
+	for ( intp i = 0; i < m_Expressions.Count(); i++ )
 	{
 		CExpression *exp = &m_Expressions[ i ];
 		if ( !exp )
@@ -687,18 +685,18 @@ void CExpClass::CheckBitmapConsistency( void )
 	CUtlRBTree< CRC32_t > tree( 0, 0, DefLessFunc( CRC32_t ) );
 	BuildValidChecksums( tree );
 
-	for ( int i = 0 ; i < workList.Count(); ++i )
+	for ( intp i = 0 ; i < workList.Count(); ++i )
 	{
 		char testname[ 256 ];
-		Q_StripExtension( workList[ i ].String(), testname, sizeof( testname ) );
+		Q_StripExtension( workList[ i ].String(), testname );
 
 		g_pProgressDialog->UpdateText( "%s", testname );
 		g_pProgressDialog->Update( (float)i / (float)workList.Count() );
 
 		CRC32_t check;
-		Q_hextobinary( testname, Q_strlen( testname ), (byte *)&check, sizeof( check ) );
-
-		if ( tree.Find( check ) == tree.InvalidIndex() )
+		// dimhotepus: Check hex -> binary succeeded, too.
+		if ( !V_hextobinary( testname, Q_strlen( testname ), check ) ||
+			 tree.Find( check ) == tree.InvalidIndex() )
 		{
 			char kill[ 512 ];
 			Q_snprintf( kill, sizeof( kill ), "expressions/%s/%s/%s", models->GetActiveModelName(), GetBaseName(), fn );

@@ -31,7 +31,7 @@
 #include "faceposer_models.h"
 
 LocalFlexController_t FindFlexControllerIndexByName( StudioModel *model, char const *searchname );
-char const *GetGlobalFlexControllerName( int index );
+char const *GetGlobalFlexControllerName( intp index );
 
 extern char g_appTitle[];
 
@@ -280,7 +280,7 @@ int FlexPanel::handleEvent (mxEvent *event)
 				CExpClass *active = expressions->GetActiveClass();
 				if ( active )
 				{
-					int index = active->GetSelectedExpression();
+					intp index = active->GetSelectedExpression();
 					if ( pushundo && index != -1 )
 					{
 						CExpression *exp = active->GetExpression( index );
@@ -621,7 +621,7 @@ FlexPanel::LookupPairedFlex( int iFlexController )
 }
 
 void
-FlexPanel::setExpression( int index )
+FlexPanel::setExpression( intp index )
 {
 	if ( !models->GetActiveStudioModel() )
 		return;
@@ -663,7 +663,7 @@ FlexPanel::setExpression( int index )
 	}
 }
 
-void FlexPanel::DeleteExpression( int index )
+void FlexPanel::DeleteExpression( intp index )
 {
 	CStudioHdr *hdr = models->GetActiveStudioModel()->GetStudioHdr();
 	if ( !hdr )
@@ -683,7 +683,7 @@ void FlexPanel::DeleteExpression( int index )
 // Purpose: 
 // Input  : index - 
 //-----------------------------------------------------------------------------
-void FlexPanel::RevertExpression( int index )
+void FlexPanel::RevertExpression( intp index )
 {
 	CStudioHdr *hdr = models->GetActiveStudioModel()->GetStudioHdr();
 	if ( !hdr )
@@ -702,7 +702,7 @@ void FlexPanel::RevertExpression( int index )
 	g_pExpressionTrayTool->redraw();
 }
 
-void FlexPanel::SaveExpression( int index )
+void FlexPanel::SaveExpression( intp index )
 {
 	CStudioHdr *hdr = models->GetActiveStudioModel()->GetStudioHdr();
 	if ( !hdr )
@@ -804,7 +804,7 @@ void FlexPanel::ResetSliders( bool preserveundo, bool bDirtyClass )
 	CExpression *exp = NULL;
 	if ( active )
 	{
-		int index = active->GetSelectedExpression();
+		intp index = active->GetSelectedExpression();
 		if ( index != -1 )
 		{
 			exp = active->GetExpression( index );
@@ -888,7 +888,7 @@ void FlexPanel::PasteControllerSettings( void )
 		return;
 
 	CExpression *exp = NULL;
-	int index = active->GetSelectedExpression();
+	intp index = active->GetSelectedExpression();
 	if ( index != -1 )
 	{
 		exp = active->GetExpression( index );
@@ -948,7 +948,7 @@ void FlexPanel::EditExpression( void )
 	if ( !active )
 		return;
 
-	int index = active->GetSelectedExpression();
+	intp index = active->GetSelectedExpression();
 	if ( index == -1 )
 	{
 		Con_ErrorPrintf( "Can't edit face pose, must select a face from list first!\n" );

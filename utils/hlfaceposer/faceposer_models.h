@@ -27,34 +27,34 @@ public:
 						IFaceposerModels();
 	virtual				~IFaceposerModels();
 
-	virtual int			Count( void ) const;
-	virtual char const	*GetModelName( int index );
-	virtual char const	*GetModelFileName( int index );
-	virtual int			GetActiveModelIndex( void ) const;
+	virtual intp		Count( void ) const;
+	virtual char const	*GetModelName( intp index );
+	virtual char const	*GetModelFileName( intp index );
+	virtual intp		GetActiveModelIndex( void ) const;
 	virtual char const	*GetActiveModelName( void );
 	virtual StudioModel *GetActiveStudioModel( void );
-	virtual void		ForceActiveModelIndex( int index );
+	virtual void		ForceActiveModelIndex( intp index );
 	virtual void		UnForceActiveModelIndex();
-	virtual int			FindModelByFilename( char const *filename );
+	virtual intp		FindModelByFilename( char const *filename );
 
-	virtual int			LoadModel( char const *filename );
-	virtual void		FreeModel( int index );
+	virtual intp		LoadModel( char const *filename );
+	virtual void		FreeModel( intp index );
 
 	virtual void		CloseAllModels( void );
 
-	virtual StudioModel *GetStudioModel( int index );
-	virtual CStudioHdr	*GetStudioHeader( int index );
-	virtual int			GetIndexForStudioModel( StudioModel *model );
+	virtual StudioModel *GetStudioModel( intp index );
+	virtual CStudioHdr	*GetStudioHeader( intp index );
+	virtual intp		GetIndexForStudioModel( StudioModel *model );
 
-	virtual int			GetModelIndexForActor( char const *actorname );
+	virtual intp		GetModelIndexForActor( char const *actorname );
 	virtual StudioModel *GetModelForActor( char const *actorname );
 
-	virtual char const *GetActorNameForModel( int modelindex );
-	virtual void		SetActorNameForModel( int modelindex, char const *actorname );
+	virtual char const *GetActorNameForModel( intp modelindex );
+	virtual void		SetActorNameForModel( intp modelindex, char const *actorname );
 
-	virtual int			CountVisibleModels( void );
-	virtual void		ShowModelIn3DView( int modelindex, bool show );
-	virtual bool		IsModelShownIn3DView( int modelindex );
+	virtual intp		CountVisibleModels( void );
+	virtual void		ShowModelIn3DView( intp modelindex, bool show );
+	virtual bool		IsModelShownIn3DView( intp modelindex );
 
 	virtual void		SaveModelList( void );
 	virtual void		LoadModelList( void );
@@ -67,14 +67,14 @@ public:
 	virtual void		CheckResetFlexes( void );
 	virtual void		ClearOverlaysSequences( void );
 
-	virtual mxbitmapdata_t *GetBitmapForSequence( int modelindex, int sequence );
+	virtual mxbitmapdata_t *GetBitmapForSequence( intp modelindex, intp sequence );
 
-	virtual void		RecreateAllAnimationBitmaps( int modelindex );
-	virtual void		RecreateAnimationBitmap( int modelindex, int sequence );
+	virtual void		RecreateAllAnimationBitmaps( intp modelindex );
+	virtual void		RecreateAnimationBitmap( intp modelindex, intp sequence );
 
-	virtual void		CreateNewBitmap( int modelindex, char const *pchBitmapFilename, int sequence, int nSnapShotSize, bool bZoomInOnFace, class CExpression *pExpression, mxbitmapdata_t *bitmap );
+	virtual void		CreateNewBitmap( intp modelindex, char const *pchBitmapFilename, intp sequence, int nSnapShotSize, bool bZoomInOnFace, class CExpression *pExpression, mxbitmapdata_t *bitmap );
 
-	virtual int			CountActiveSources();
+	virtual intp		CountActiveSources();
 
 	virtual void		SetSolveHeadTurn( int solve );
 
@@ -89,18 +89,18 @@ private:
 
 		void LoadBitmaps();
 		void FreeBitmaps();
-		mxbitmapdata_t *GetBitmapForSequence( int sequence );
+		mxbitmapdata_t *GetBitmapForSequence( intp sequence );
 
-		const char *GetBitmapChecksum( int sequence );
-		CRC32_t GetBitmapCRC( int sequence );
-		const char *GetBitmapFilename( int sequence );
+		const char *GetBitmapChecksum( intp sequence );
+		CRC32_t GetBitmapCRC( intp sequence );
+		const char *GetBitmapFilename( intp sequence );
 		void		RecreateAllAnimationBitmaps();
-		void		RecreateAnimationBitmap( int sequence, bool reconcile );
+		void		RecreateAnimationBitmap( intp sequence, bool reconcile );
 
 
 		void SetActorName( char const *actorname )
 		{
-			strcpy( m_szActorName, actorname );
+			V_strcpy_safe( m_szActorName, actorname );
 		}
 
 		char const *GetActorName( void ) const
@@ -144,11 +144,11 @@ private:
 			Restore();
 		}
 
-		void		CreateNewBitmap( char const *pchBitmapFilename, int sequence, int nSnapShotSize, bool bZoomInOnFace, class CExpression *pExpression, mxbitmapdata_t *bitmap );
+		void		CreateNewBitmap( char const *pchBitmapFilename, intp sequence, int nSnapShotSize, bool bZoomInOnFace, class CExpression *pExpression, mxbitmapdata_t *bitmap );
 
 	private:
 
-		void		LoadBitmapForSequence( mxbitmapdata_t *bitmap, int sequence );
+		void		LoadBitmapForSequence( mxbitmapdata_t *bitmap, intp sequence );
 
 		void		ReconcileAnimationBitmaps();
 		void		BuildValidChecksums( CUtlRBTree< CRC32_t > &tree );
@@ -181,12 +181,12 @@ private:
 		bool			m_bFirstBitmapLoad;
 	};
 
-	CFacePoserModel *GetEntry( int index );
+	CFacePoserModel *GetEntry( intp index );
 
 	CUtlVector< CFacePoserModel * > m_Models;
 
 	int					m_nLastRenderFrame;
-	int					m_nForceModelIndex;
+	intp				m_nForceModelIndex;
 };
 
 extern IFaceposerModels *models;

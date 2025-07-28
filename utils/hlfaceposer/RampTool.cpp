@@ -417,7 +417,7 @@ void RampTool::redraw()
 
 		OffsetRect( &rcText, 0, 12 );
 
-		int current, total;
+		intp current, total;
 
 		g_pChoreoView->GetUndoLevels( current, total );
 		if ( total > 0 )
@@ -505,7 +505,7 @@ void RampTool::ShowContextMenu( mxEvent *event, bool include_track_menus )
 	// Construct main menu
 	mxPopupMenu *pop = new mxPopupMenu();
 
-	int current, total;
+	intp current, total;
 	g_pChoreoView->GetUndoLevels( current, total );
 	if ( total > 0 )
 	{
@@ -552,7 +552,7 @@ void RampTool::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
 
-	for ( int i = 0; i < m_FocusRects.Size(); i++ )
+	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
 		RECT rc = m_FocusRects[ i ].m_rcFocus;
 
@@ -649,7 +649,7 @@ void RampTool::OnMouseMove( mxEvent *event )
 	{
 		DrawFocusRect();
 
-		for ( int i = 0; i < m_FocusRects.Size(); i++ )
+		for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 		{
 			CFocusRect *f = &m_FocusRects[ i ];
 			f->m_rcFocus = f->m_rcOrig;
@@ -1391,8 +1391,8 @@ void RampTool::DrawTimingTags( CChoreoWidgetDrawHelper& drawHelper, RECT& rc )
 
 	// Loop through all events in scene
 
-	int c = scene->GetNumEvents();
-	int i;
+	intp c = scene->GetNumEvents();
+	intp i;
 	for ( i = 0; i < c; i++ )
 	{
 		CChoreoEvent *e = scene->GetEvent( i );
@@ -1809,7 +1809,7 @@ void RampTool::DrawSamples( CChoreoWidgetDrawHelper& drawHelper, RECT &rcSamples
 	if ( !e )
 		return;
 
-	int rampCount = e->GetRampCount();
+	intp rampCount = e->GetRampCount();
 	if ( !rampCount )
 		return;
 
@@ -1868,7 +1868,7 @@ void RampTool::DrawSamples( CChoreoWidgetDrawHelper& drawHelper, RECT &rcSamples
 					false );
 			}
 
-			float value = Hermite_Spline( i0, i1, i2, (t - time10hz + 0.1) / 0.1 );
+			float value = Hermite_Spline( i0, i1, i2, (t - time10hz + 0.1f) / 0.1f );
 
 			int prevx, x;
 
@@ -1914,7 +1914,7 @@ void RampTool::DrawSamples( CChoreoWidgetDrawHelper& drawHelper, RECT &rcSamples
 
 	}
 
-	for ( int sample = 0; sample < rampCount; sample++ )
+	for ( intp sample = 0; sample < rampCount; sample++ )
 	{
 		CExpressionSample *start = e->GetRamp( sample );
 
@@ -1992,8 +1992,8 @@ void RampTool::DrawAutoHighlight( mxEvent *event )
 
 	// Fixme, could look at 1st derivative and do more sampling at high rate of change?
 	// or near actual sample points!
-	int sampleCount = e->GetRampCount();
-	for ( int sample = 0; sample < sampleCount; sample++ )
+	intp sampleCount = e->GetRampCount();
+	for ( intp sample = 0; sample < sampleCount; sample++ )
 	{
 		CExpressionSample *start = e->GetRamp( sample );
 
@@ -2031,7 +2031,7 @@ void RampTool::DrawAutoHighlight( mxEvent *event )
 	}
 }
 
-int RampTool::NumSamples()
+intp RampTool::NumSamples()
 {
 	CChoreoEvent *e = GetSafeEvent();
 	if ( !e )
@@ -2040,7 +2040,7 @@ int RampTool::NumSamples()
 	return e->GetRampCount();
 }
 
-CExpressionSample *RampTool::GetSample( int idx )
+CExpressionSample *RampTool::GetSample( intp idx )
 {
 	CChoreoEvent *e = GetSafeEvent();
 	if ( !e )
@@ -2209,12 +2209,12 @@ void RampTool::MoveSelectedSamples( float dfdx, float dfdy )
 	if ( !e )
 		return;
 
-	int c = e->GetRampCount();
+	intp c = e->GetRampCount();
 
 	float duration = e->GetDuration();
 	//dfdx *= duration;
 
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		CExpressionSample *sample = e->GetRamp( i );
 		if ( !sample || !sample->selected )
@@ -2236,8 +2236,6 @@ void RampTool::MoveSelectedSamples( float dfdx, float dfdy )
 //-----------------------------------------------------------------------------
 void RampTool::DeselectAll( void )
 {
-	int i;
-
 	int selecteditems = CountSelected();
 	if ( !selecteditems )
 		return;
@@ -2247,7 +2245,7 @@ void RampTool::DeselectAll( void )
 	if ( !e )
 		return;
 
-	for ( i = e->GetRampCount() - 1; i >= 0 ; i-- )
+	for ( intp i = e->GetRampCount() - 1; i >= 0 ; i-- )
 	{
 		CExpressionSample *sample = e->GetRamp( i );
 		sample->selected = false;
@@ -2258,14 +2256,12 @@ void RampTool::DeselectAll( void )
 
 void RampTool::SelectAll( void )
 {
-	int i;
-
 	CChoreoEvent *e = GetSafeEvent();
 	Assert( e );
 	if ( !e )
 		return;
 
-	for ( i = e->GetRampCount() - 1; i >= 0 ; i-- )
+	for ( intp i = e->GetRampCount() - 1; i >= 0 ; i-- )
 	{
 		CExpressionSample *sample = e->GetRamp( i );
 		sample->selected = true;
@@ -2276,8 +2272,6 @@ void RampTool::SelectAll( void )
 
 void RampTool::Delete( void )
 {
-	int i;
-
 	CChoreoEvent *e = GetSafeEvent();
 	if ( !e )
 		return;
@@ -2288,7 +2282,7 @@ void RampTool::Delete( void )
 
 	PreDataChanged( "Delete ramp points" );
 
-	for ( i = e->GetRampCount() - 1; i >= 0 ; i-- )
+	for ( intp i = e->GetRampCount() - 1; i >= 0 ; i-- )
 	{
 		CExpressionSample *sample = e->GetRamp( i );
 		if ( !sample->selected )

@@ -91,7 +91,7 @@ public:
 	void				ThumbnailDecrease( void );
 	void				RestoreThumbnailSize( void );
 
-	void				Select( int sequence );
+	void				Select( intp sequence );
 	void				Deselect( void );
 
 	void				SetCellSize( int cellsize );
@@ -106,24 +106,24 @@ private: // Methods
 	void				OnFilter();
 	bool				SequencePassesFilter( StudioModel *model, int sequence, mstudioseqdesc_t &seqdesc );
 
-	int					GetSequenceCount();
-	mstudioseqdesc_t	*GetSeqDesc( int index );
-	int					TranslateSequenceNumber( int index );
+	intp				GetSequenceCount();
+	mstudioseqdesc_t	*GetSeqDesc( intp index );
+	intp				TranslateSequenceNumber( intp index );
 
-	int					GetCellUnderPosition( int x, int y );
+	intp				GetCellUnderPosition( int x, int y );
 
-	bool				ComputeRect( int cell, int& rcx, int& rcy, int& rcw, int& rch );
-	int					ComputePixelsNeeded( void );
+	bool				ComputeRect( intp cell, int& rcx, int& rcy, int& rcw, int& rch );
+	intp				ComputePixelsNeeded( void );
 
 	void				RepositionSlider();
-	void				SetClickedCell( int cell );
+	void				SetClickedCell( intp cell );
 	void				ShowRightClickMenu( int mx, int my );
 
-	void				DrawThumbNail( int sequence, CChoreoWidgetDrawHelper& helper, 
+	void				DrawThumbNail( intp sequence, CChoreoWidgetDrawHelper& helper, 
 							int rcx, int rcy, int rcw, int rch );
 
 	void				DrawSequenceFocusRect( CChoreoWidgetDrawHelper& helper, int x, int y, int w, int h, COLORREF clr );
-	void				DrawSequenceDescription( CChoreoWidgetDrawHelper& helper, int x, int y, int w, int h, int sequence, mstudioseqdesc_t &seqdesc );
+	void				DrawSequenceDescription( CChoreoWidgetDrawHelper& helper, int x, int y, int w, int h, intp sequence, mstudioseqdesc_t &seqdesc );
 
 	void				DrawFocusRect( void );
 
@@ -146,14 +146,14 @@ private: // Data
 	CAnimBrowserTab		*m_pFilterTab;
 	mxLineEdit			*m_pSearchEntry;
 
-	int					m_nTopOffset;
+	intp				m_nTopOffset;
 
-	int					m_nLastNumAnimations;
+	intp				m_nLastNumAnimations;
 
 	int					m_nGranularity;
 
-	int					m_nCurCell;
-	int					m_nClickedCell;
+	intp				m_nCurCell;
+	intp				m_nClickedCell;
 
 	// Formatting
 	int					m_nButtonSquare;
@@ -166,18 +166,19 @@ private: // Data
 	bool				m_bDragging;
 	RECT				m_rcFocus;
 	RECT				m_rcOrig;
-	int					m_nDragCell;
+	intp				m_nDragCell;
 	int					m_nXStart;
 	int					m_nYStart;
 
 	mxButton			*m_pThumbnailIncreaseButton;
 	mxButton			*m_pThumbnailDecreaseButton;
 
-	CUtlVector< int >	m_Filtered;
-	int					m_nCurFilter;
+	CUtlVector< intp >	m_Filtered;
+	intp				m_nCurFilter;
 	char				m_szSearchString[ 256 ];
 
-	float				m_flDragTime;
+	// dimhotepus: float -> double.
+	double				m_flDragTime;
 
 	CUtlVector< CCustomAnim * >		m_CustomAnimationTabs;
 };

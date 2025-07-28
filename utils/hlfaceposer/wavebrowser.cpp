@@ -702,7 +702,7 @@ constexpr inline intp SOUND_PREFIX_LEN{ssize("sound") - 1};
 //-----------------------------------------------------------------------------
 // Finds all .wav files in a particular directory
 //-----------------------------------------------------------------------------
-bool CWaveBrowser::LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName, int nDirectoryNameLen )
+bool CWaveBrowser::LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName, intp nDirectoryNameLen )
 {
 	Assert( Q_strnicmp( pDirectoryName, "sound", SOUND_PREFIX_LEN ) == 0 );
 
@@ -749,15 +749,16 @@ bool CWaveBrowser::LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& sound
 bool CWaveBrowser::InitDirectoryRecursive( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName )
 {
 	// Compute directory name length
-	int nDirectoryNameLen = Q_strlen( pDirectoryName );
+	intp nDirectoryNameLen = Q_strlen( pDirectoryName );
 
 	if (!LoadWaveFilesInDirectory( soundlist, pDirectoryName, nDirectoryNameLen ) )
 		return false;
 
-	char *pWildCard = ( char * )stackalloc( nDirectoryNameLen + 4 );
-	strcpy(pWildCard, pDirectoryName);
-	strcat(pWildCard, "/*.");
-	int nPathStrLen = nDirectoryNameLen + 1;
+	intp sizeWildCard = nDirectoryNameLen + ssize("/*.");
+	char *pWildCard = stackallocT( char, sizeWildCard );
+	V_strncpy(pWildCard, pDirectoryName, sizeWildCard);
+	V_strncat(pWildCard, "/*.", sizeWildCard);
+	intp nPathStrLen = nDirectoryNameLen + 1;
 
 	FileFindHandle_t findHandle;
 	const char *pFileName = filesystem->FindFirst( pWildCard, &findHandle );
@@ -767,8 +768,8 @@ bool CWaveBrowser::InitDirectoryRecursive( CUtlDict< CWaveFile *, int >& soundli
 		{
 			if( filesystem->FindIsDirectory( findHandle ) )
 			{
-				int fileNameStrLen = Q_strlen( pFileName );
-				char *pFileNameWithPath = ( char * )stackalloc( nPathStrLen + fileNameStrLen + 1 );
+				intp fileNameStrLen = Q_strlen( pFileName );
+				char *pFileNameWithPath = stackallocT( char, nPathStrLen + fileNameStrLen + 1 );
 				memcpy( pFileNameWithPath, pWildCard, nPathStrLen );
 				pFileNameWithPath[nPathStrLen] = '\0';
 				strcat( pFileNameWithPath, pFileName );
@@ -829,7 +830,7 @@ void CWaveBrowser::PopulateTree( char const *subdirectory )
 		texttofind = GetSearchString();
 	}
 
-	int len = 0;
+	intp len = 0;
 	if ( subdirectory )
 	{
 		len = Q_strlen( subdirectory );
@@ -1126,7 +1127,7 @@ void CWaveBrowser::Think( float dt )
 		}
 	}
 
-	int c = fileloader->ProcessCompleted();
+	intp c = fileloader->ProcessCompleted();
 	if ( c > 0 )
 	{
 		RepopulateTree();

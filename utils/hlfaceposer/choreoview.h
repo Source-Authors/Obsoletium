@@ -259,7 +259,7 @@ public:
 
 	void				AssociateBSP( void );
 	void				AssociateModel( void );
-	void				AssociateModelToActor( CChoreoActor *actor, int modelindex );
+	void				AssociateModelToActor( CChoreoActor *actor, intp modelindex );
 
 	// UI Layout
 	void				CreateSceneWidgets( void );
@@ -390,12 +390,12 @@ public:
 
 	void				TraverseWidgets( CVMEMBERFUNC pfn, CChoreoWidget *param1 );
 
-	int					CountSelectedEvents( void );
-	int					CountSelectedGlobalEvents( void );
-	int					GetSelectedEvents( CUtlVector< CChoreoEvent * >& events );
-	int					GetSelectedEventWidgets( CUtlVector< CChoreoEventWidget * >& events );
-	int					GetEarliestEventIndex( CUtlVector< CChoreoEventWidget * >& events );
-	int					GetLatestEventIndex( CUtlVector< CChoreoEventWidget * >& events );
+	intp				CountSelectedEvents( void );
+	intp				CountSelectedGlobalEvents( void );
+	intp				GetSelectedEvents( CUtlVector< CChoreoEvent * >& events );
+	intp				GetSelectedEventWidgets( CUtlVector< CChoreoEventWidget * >& events );
+	intp				GetEarliestEventIndex( CUtlVector< CChoreoEventWidget * >& events );
+	intp				GetLatestEventIndex( CUtlVector< CChoreoEventWidget * >& events );
 
 	// Traversal functions
 	void				Deselect( CChoreoWidget *widget, CChoreoWidget *param1 );
@@ -416,7 +416,7 @@ public:
 	void				ClearStatusArea( void );
 	void				RedrawStatusArea( CChoreoWidgetDrawHelper& drawHelper, RECT& rcStatus );
 
-	void				GetUndoLevels( int& current, int& number );
+	void				GetUndoLevels( intp& current, intp& number );
 
 	// Undo/Redo
 	void				Undo( void );
@@ -641,7 +641,7 @@ private:
 	// Relative to the clicked event
 	int					m_nClickedTag;
 	CEventAbsoluteTag	*m_pClickedAbsoluteTag;
-	int					m_nSelectedEvents;
+	intp				m_nSelectedEvents;
 	int					m_nClickedX, m_nClickedY;
 	int					m_nClickedChannelCloseCaptionButton;
 
@@ -715,19 +715,20 @@ private:
 	};
 
 	CUtlVector< CVUndo * >	m_UndoStack;
-	int					m_nUndoLevel;
+	intp				m_nUndoLevel;
 	bool				m_bRedoPending;
 
 	bool				m_bProcessSequences;
 
-	float				m_flLastMouseClickTime;
+	// dimhotepus: float -> double.
+	double				m_flLastMouseClickTime;
 
 	bool				m_bSuppressLayout;
 
 	bool				m_bRampOnly;
 	float				m_flScrubberTimeOffset;
 
-	bool						m_bShowCloseCaptionData;
+	bool				m_bShowCloseCaptionData;
 
 	bool				m_bForceProcess;
 

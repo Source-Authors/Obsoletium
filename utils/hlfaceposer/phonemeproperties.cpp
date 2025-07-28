@@ -14,7 +14,7 @@
 
 static CPhonemeParams g_Params;
 
-static int		g_nPhonemeCount = 0;
+static intp		g_nPhonemeCount = 0;
 static HWND		*g_rgButtons = NULL;
 
 #define IDC_PHONEME			2000

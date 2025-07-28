@@ -22,7 +22,7 @@ bool Sys_Error(const char *pMsg, ...);
 extern char g_appTitle[];
 
 static CUtlVector< CUtlSymbol > g_GlobalFlexControllers;
-static CUtlDict< int, int >		g_GlobalFlexControllerLookup; 
+static CUtlDict< intp, intp >	g_GlobalFlexControllerLookup; 
 
 void ChecksumFlexControllers( bool bSpew, char const *name, CRC32_t &crc, const float *settings, const float *weights )
 {
@@ -70,7 +70,7 @@ void ChecksumFlexControllers( bool bSpew, char const *name, CRC32_t &crc, const 
 // Input  : index - 
 // Output : char const
 //-----------------------------------------------------------------------------
-char const *GetGlobalFlexControllerName( int index )
+char const *GetGlobalFlexControllerName( intp index )
 {
 	return g_GlobalFlexControllers[ index ].String();
 }
@@ -79,7 +79,7 @@ char const *GetGlobalFlexControllerName( int index )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int GetGlobalFlexControllerCount( void )
+intp GetGlobalFlexControllerCount( void )
 {
 	return g_GlobalFlexControllers.Count();
 }
@@ -88,9 +88,9 @@ int GetGlobalFlexControllerCount( void )
 // Input  : *szName - 
 // Output : int
 //-----------------------------------------------------------------------------
-int AddGlobalFlexController( StudioModel *model, const char *szName )
+intp AddGlobalFlexController( StudioModel *model, const char *szName )
 {
-	int idx = g_GlobalFlexControllerLookup.Find( szName );
+	auto idx = g_GlobalFlexControllerLookup.Find( szName );
 	if ( idx != g_GlobalFlexControllerLookup.InvalidIndex() )
 	{
 		return g_GlobalFlexControllerLookup[ idx ];
@@ -126,7 +126,7 @@ void SetupModelFlexcontrollerLinks( StudioModel *model )
 
 	for (LocalFlexController_t i = LocalFlexController_t(0); i < hdr->numflexcontrollers(); i++)
 	{
-		int j = AddGlobalFlexController( model, hdr->pFlexcontroller( i )->pszName() );
+		auto j = AddGlobalFlexController( model, hdr->pFlexcontroller( i )->pszName() );
 		hdr->pFlexcontroller( i )->localToGlobal = j;
 		model->SetFlexController( i, 0.0f );
 	}
@@ -151,14 +151,14 @@ public:
 	bool					CloseClass( CExpClass *cl );
 
 	CExpClass				*AddCExpClass( const char *classname, const char *filename );
-	int						GetNumClasses( void );
+	intp					GetNumClasses( void );
 
 	CExpression				*GetCopyBuffer( void );
 
 	bool					CanClose( void );
 
 	CExpClass				*GetActiveClass( void );
-	CExpClass				*GetClass( int num );
+	CExpClass				*GetClass( intp num );
 	CExpClass				*FindClass( const char *classname, bool bMatchBaseNameOnly );
 
 private:
@@ -204,7 +204,7 @@ CExpressionManager::~CExpressionManager( void )
 //-----------------------------------------------------------------------------
 void CExpressionManager::Reset( void )
 {
-	while ( m_Classes.Size() > 0 )
+	while ( m_Classes.Count() > 0 )
 	{
 		CExpClass *p = m_Classes[ 0 ];
 		m_Classes.Remove( 0 );
@@ -229,7 +229,7 @@ CExpClass	*CExpressionManager::GetActiveClass( void )
 // Input  : num - 
 // Output : CExpClass
 //-----------------------------------------------------------------------------
-CExpClass *CExpressionManager::GetClass( int num )
+CExpClass *CExpressionManager::GetClass( intp num )
 {
 	return m_Classes[ num ];
 }
@@ -261,7 +261,7 @@ CExpClass * CExpressionManager::AddCExpClass( const char *classname, const char 
 //-----------------------------------------------------------------------------
 void CExpressionManager::RemoveCExpClass( CExpClass *cl )
 {
-	for ( int i = 0; i < m_Classes.Size(); i++ )
+	for ( intp i = 0; i < m_Classes.Count(); i++ )
 	{
 		CExpClass *p = m_Classes[ i ];
 		if ( p == cl )
@@ -272,7 +272,7 @@ void CExpressionManager::RemoveCExpClass( CExpClass *cl )
 		}
 	}
 
-	if ( m_Classes.Size() >= 1 )
+	if ( m_Classes.Count() >= 1 )
 	{
 		ActivateExpressionClass( m_Classes[ 0 ] );
 	}
@@ -307,9 +307,9 @@ void CExpressionManager::ActivateExpressionClass( CExpClass *cl )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CExpressionManager::GetNumClasses( void )
+intp CExpressionManager::GetNumClasses( void )
 {
-	return m_Classes.Size();
+	return m_Classes.Count();
 }
 
 //-----------------------------------------------------------------------------
@@ -332,7 +332,7 @@ CExpClass *CExpressionManager::FindClass( const char *classname, bool bMatchBase
 	Q_FixSlashes( search );
 	Q_strlower( search );
 
-	for ( int i = 0; i < m_Classes.Size(); i++ )
+	for ( intp i = 0; i < m_Classes.Count(); i++ )
 	{
 		CExpClass *cl = m_Classes[ i ];
 
@@ -392,7 +392,7 @@ CExpression *CExpressionManager::GetCopyBuffer( void )
 //-----------------------------------------------------------------------------
 bool CExpressionManager::CanClose( void )
 {
-	for ( int i = 0; i < m_Classes.Size(); i++ )
+	for ( intp i = 0; i < m_Classes.Count(); i++ )
 	{
 		CExpClass *pclass = m_Classes[ i ];
 		if ( pclass->GetDirty() )
@@ -443,7 +443,7 @@ void CExpressionManager::LoadClass( const char *inpath )
 	ActivateExpressionClass( active );
 
 	int numflexmaps = 0;
-	int flexmap[128]; // maps file local controls into global controls
+	intp flexmap[128]; // maps file local controls into global controls
 	LocalFlexController_t localflexmap[128]; // maps file local controls into local controls
 	bool bHasWeighting = false;
 	bool bNormalized = false;
