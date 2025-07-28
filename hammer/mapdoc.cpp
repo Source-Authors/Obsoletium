@@ -3483,7 +3483,7 @@ void CMapDoc::SetAnimationTime( float time )
 //-----------------------------------------------------------------------------
 void CMapDoc::UpdateCurrentTime( void )
 {
-	m_flCurrentTime = (float)timeGetTime() / 1000;
+	m_flCurrentTime = (float)((double)GetTickCount64() / 1000);
 }
 
 

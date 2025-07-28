@@ -147,8 +147,8 @@ private:
 	bool m_bRotating;
 	CPoint m_ptLastMouseMovement;	// Last position used for tracking the mouse for camera control.
 
-	DWORD m_dwTimeLastSample;		// Used for calculating rendering framerate.
-	DWORD m_dwTimeLastInputSample;	// Used for framerate-independent input processing.
+	ULONGLONG m_dwTimeLastSample;		// Used for calculating rendering framerate.
+	ULONGLONG m_dwTimeLastInputSample;	// Used for framerate-independent input processing.
 
 	float m_fForwardSpeed;			// Current forward speed, in world units per second.
 	float m_fStrafeSpeed;			// Current side-to-side speed, in world units per second.

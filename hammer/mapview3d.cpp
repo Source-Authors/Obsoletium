@@ -1108,7 +1108,7 @@ bool CMapView3D::ShouldRender()
 		// don't animate ray traced displays
 		if ( Options.view3d.bAnimateModels )
 		{
-			DWORD dwTimeElapsed = timeGetTime() - m_dwTimeLastRender;
+			ULONGLONG dwTimeElapsed = GetTickCount64() - m_dwTimeLastRender;
 			
 			if ( (dwTimeElapsed/1000.0f) > 1.0f/20.0f)
 			{
@@ -1346,10 +1346,10 @@ void CMapView3D::ProcessInput(void)
 {
 	if (m_dwTimeLastInputSample == 0)
 	{
-		m_dwTimeLastInputSample = timeGetTime();
+		m_dwTimeLastInputSample = GetTickCount64();
 	}
 
-	DWORD dwTimeNow = timeGetTime();
+	ULONGLONG dwTimeNow = GetTickCount64();
 
 	float fElapsedTime = (float)(dwTimeNow - m_dwTimeLastInputSample) / 1000.0f;
 

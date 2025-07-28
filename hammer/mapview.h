@@ -102,7 +102,7 @@ public:
 	bool			m_bActive;
 	bool			m_bUpdateView;
 	DrawType_t		m_eDrawType;
-	unsigned int	m_dwTimeLastRender;
+	ULONGLONG		m_dwTimeLastRender;
 	CCamera			*m_pCamera;			// Defines the camera position and settings for this view.
 	CToolManager	*m_pToolManager;	// tool manager for this view
 	int				m_nRenderedFrames;
