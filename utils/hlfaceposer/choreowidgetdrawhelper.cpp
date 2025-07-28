@@ -223,7 +223,7 @@ void CChoreoWidgetDrawHelper::CalcTextRect( const char *font, int pointsize, int
 		 ANSI_CHARSET,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -265,7 +265,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidth( const char *font, int pointsize, int
 		 ANSI_CHARSET,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -318,7 +318,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( const char *font, int pointsize, in
 		 ANSI_CHARSET,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -542,7 +542,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharset( const char *font, int poin
 		 charset,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -585,7 +585,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharsetW( const char *font, int poi
 		 charset,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 
@@ -637,7 +637,7 @@ void CChoreoWidgetDrawHelper::DrawColoredTextMultiline( const char *font, int po
 		 ANSI_CHARSET,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
 

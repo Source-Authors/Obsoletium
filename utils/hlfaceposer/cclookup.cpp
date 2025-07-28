@@ -223,7 +223,8 @@ intp CloseCaptionLookup( CCloseCaptionLookupParams *params )
 		 ANSI_CHARSET,
 		 OUT_TT_PRECIS,
 		 CLIP_DEFAULT_PRECIS,
-		 ANTIALIASED_QUALITY,
+		 // dimhotepus: Antialsed -> ClearType natural.
+		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 "Tahoma" );
 
