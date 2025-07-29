@@ -2150,7 +2150,6 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 	const char	*soundname = NULL;
 	float fvol;
 	bool isshellcasing = false;
-	int zvel;
 
 	switch ( pTemp->hitSound )
 	{
@@ -2229,7 +2228,8 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 #endif
 	}
 
-	zvel = abs( pTemp->GetVelocity()[2] );
+	// dimhtepus: Make velocity float.
+	float zvel = abs( pTemp->GetVelocity()[2] );
 		
 	// only play one out of every n
 
