@@ -540,7 +540,7 @@ void CLuminanceHistogramSystem::Update( void )
 					CMatRenderContextPtr pRenderContext( materials );
 					int np = pRenderContext->OcclusionQuery_GetNumPixelsRendered(
 						CurHistogram[i].m_occ_handle );
-					if ( np !=- 1 ) 						// -1=query not finished. wait until
+					if ( np != -1 ) 						// -1=query not finished. wait until
 						// next time
 					{
 						CurHistogram[i].m_npixels_in_range = np;
