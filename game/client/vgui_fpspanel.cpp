@@ -585,7 +585,7 @@ void CBlockingFileIOPanel::ApplySchemeSettings(vgui::IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
 
-	m_hFont = pScheme->GetFont( "Default" );
+	m_hFont = pScheme->GetFont( "Default", true );
 	Assert( m_hFont );
 
 	SetKeyBoardInputEnabled( false );
