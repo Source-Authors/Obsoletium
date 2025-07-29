@@ -26,10 +26,10 @@
 
 #define WM_INITIALUPDATE 0x0364  // (params unused) - sent to children
 
-IMPLEMENT_DYNCREATE(CChildFrame, CMDIChildWnd)
+IMPLEMENT_DYNCREATE(CChildFrame, CBaseMDIChildWnd)
 
 
-BEGIN_MESSAGE_MAP(CChildFrame, CMDIChildWnd)
+BEGIN_MESSAGE_MAP(CChildFrame, CBaseMDIChildWnd)
 	//{{AFX_MSG_MAP(CChildFrame)
 	ON_WM_SETFOCUS()
 	ON_WM_SIZE()
@@ -575,7 +575,7 @@ BOOL CChildFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 		//
 		CRect r;
 		GetClientRect(r);
-		CSize sizeView((r.Width() / 2) - 3, (r.Height() / 2) - 3);
+		CSize sizeView((r.Width() / 2) - m_dpi_behavior.ScaleOnX( 3 ), (r.Height() / 2) - m_dpi_behavior.ScaleOnY( 3 ));
 
 		//
 		// Create the 4 views as they were when the user last closed the app.
@@ -674,7 +674,7 @@ void CChildFrame::CenterViews(void)
 
 	CRect r;
 	GetClientRect(r);
-	CSize sizeView(r.Width()/2 - 3, r.Height()/2 - 3);
+	CSize sizeView(r.Width()/2 - m_dpi_behavior.ScaleOnX( 3 ), r.Height()/2 - m_dpi_behavior.ScaleOnY( 3 ));
 
 	sizeView.cy = max(0L, sizeView.cy);
 	sizeView.cx = max(0L, sizeView.cx);

@@ -42,9 +42,11 @@ BOOL CBaseToolBar::CreateEx(CWnd* pParentWnd, DWORD dwCtrlStyle, DWORD dwStyle,
   return rc;
 }
 
-BOOL CBaseToolBar::LoadToolBarForDpi(LPCTSTR lpszResourceName) {
+BOOL CBaseToolBar::LoadToolBarForDpi(LPCTSTR lpszResourceName,
+                                     LPCTSTR lpszBitmapName) {
   ASSERT_VALID(this);
   Assert(lpszResourceName != nullptr);
+  Assert(lpszBitmapName != nullptr);
 
   // determine location of the bitmap in resource fork
   HINSTANCE hInst{::AfxFindResourceHandle(lpszResourceName, RT_TOOLBAR)};
@@ -69,7 +71,7 @@ BOOL CBaseToolBar::LoadToolBarForDpi(LPCTSTR lpszResourceName) {
     SetSizesForDpi(sizeButton, sizeImage);
 
     // load bitmap now that sizes are known by the toolbar control
-    bResult = LoadBitmapForDpi(lpszResourceName);
+    bResult = LoadBitmapForDpi(lpszBitmapName);
   }
 
   ::UnlockResource(hGlobal);

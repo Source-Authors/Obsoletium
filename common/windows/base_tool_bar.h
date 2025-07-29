@@ -18,9 +18,12 @@ class CBaseToolBar : public CToolBar {
                 CRect rcBorders = CRect(0, 0, 0, 0),
                 UINT nID = AFX_IDW_TOOLBAR) override;
 
-  BOOL LoadToolBarForDpi(LPCTSTR lpszResourceName);
-  BOOL LoadToolBarForDpi(UINT nIDResource) {
-    return LoadToolBarForDpi(MAKEINTRESOURCE(nIDResource));
+  BOOL LoadToolBarForDpi(LPCTSTR lpszResourceName, LPCTSTR lpszBitmapName);
+  BOOL LoadToolBarForDpi(UINT nIDResource, UINT nIDBitmap = UINT_MAX) {
+    return LoadToolBarForDpi(MAKEINTRESOURCE(nIDResource),
+                             nIDBitmap == UINT_MAX
+                                 ? MAKEINTRESOURCE(nIDResource)
+                                 : MAKEINTRESOURCE(nIDBitmap));
   }
 
  protected:

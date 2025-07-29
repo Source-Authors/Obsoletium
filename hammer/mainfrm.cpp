@@ -141,6 +141,7 @@ BEGIN_MESSAGE_MAP(CMainFrame, CMDIFrameWnd)
 	ON_WM_HELPINFO()
 	ON_WM_SYSCOMMAND()
 	ON_WM_ENTERMENULOOP()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
@@ -292,6 +293,11 @@ void CMainFrame::OnEnterMenuLoop( BOOL bIsTrackPopupMenu )
 	}
 }
 
+LRESULT CMainFrame::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	return m_dpiBehavior.OnWindowDpiChanged(wParam, lParam);
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : lpCreateStruct - 
@@ -305,16 +311,18 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (CMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
+    m_dpiBehavior.OnCreateWindow(m_hWnd);
+
     if(!wndMDIClient.SubclassWindow(m_hWndMDIClient)) 
 	{ 
 		TRACE ("Failed to subclass MDI client window\n");
-		return (-1);                                        
+		return -1;                                        
     }                                                       
 
 	//
 	// Map view toolbar.
 	//
-	if (!m_wndMapToolBar.Create(this, dwDefStyles, IDCB_MAPVIEWBAR) || !m_wndMapToolBar.LoadToolBar(IDR_MAPDOC_VALVE))
+	if (!m_wndMapToolBar.Create(this, dwDefStyles, IDCB_MAPVIEWBAR) || !m_wndMapToolBar.LoadToolBarForDpi(IDR_MAPDOC_VALVE))
 	{
 		TRACE0("Failed to create toolbar\n");
 		return -1;      // fail to create
@@ -324,7 +332,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//
 	// Undo redo toolbar.
 	//
-	if (!m_wndUndoRedoToolBar.Create(this, dwDefStyles, IDCB_UNDO_REDO_BAR) || !m_wndUndoRedoToolBar.LoadToolBar(IDR_UNDOREDO))
+	if (!m_wndUndoRedoToolBar.Create(this, dwDefStyles, IDCB_UNDO_REDO_BAR) || !m_wndUndoRedoToolBar.LoadToolBarForDpi(IDR_UNDOREDO))
 	{
 		TRACE0("Failed to create toolbar\n");
 		return -1;      // fail to create
@@ -336,14 +344,12 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//
 	m_wndMapEditToolBar.Create(this, dwDefStyles, IDCB_MAPTOOLSBAR);
 	m_wndMapEditToolBar.ModifyStyle(0, TBSTYLE_FLAT); 
-	m_wndMapEditToolBar.LoadToolBar(IDR_MAPEDITTOOLS_VALVE);
-    m_bmMapEditTools256.LoadBitmap(IDB_MAPEDITTOOLS_256);
-    m_wndMapEditToolBar.SetBitmap((HBITMAP)m_bmMapEditTools256);
+	m_wndMapEditToolBar.LoadToolBarForDpi(IDR_MAPEDITTOOLS_VALVE, IDB_MAPEDITTOOLS_256);
 
 	//
 	// Map operations toolbar.
 	//
-	if (!m_wndMapOps.Create(this, dwDefStyles, IDCB_MAPOPERATIONS) || !m_wndMapOps.LoadToolBar(IDR_MAPOPERATIONS_VALVE))
+	if (!m_wndMapOps.Create(this, dwDefStyles, IDCB_MAPOPERATIONS) || !m_wndMapOps.LoadToolBarForDpi(IDR_MAPOPERATIONS_VALVE))
 	{
 		TRACE0("Failed to create toolbar\n");
 		return -1;      // fail to create
@@ -361,7 +367,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	for(int i = 0; i < NUMSTATUSPANES; i++)
 	{
-		m_wndStatusBar.SetPaneInfo(paneinfo[i].nIndex, paneinfo[i].nID,	paneinfo[i].nStyle, paneinfo[i].cxWidth);
+		m_wndStatusBar.SetPaneInfo(paneinfo[i].nIndex, paneinfo[i].nID,	paneinfo[i].nStyle, m_dpiBehavior.ScaleOnY( paneinfo[i].cxWidth ));
 	}
 
 	EnableDocking(CBRS_ALIGN_ANY);
@@ -457,7 +463,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//
 	CRect clientrect;
 	wndMDIClient.GetClientRect(clientrect);
-	g_pwndMessage->CreateMessageWindow( this, CRect( 0, clientrect.Height() - 90, clientrect.Width(), clientrect.Height() ) );
+
+	CRect newRect = CRect( 0, clientrect.Height() - m_dpiBehavior.ScaleOnY( 90 ), clientrect.Width(), clientrect.Height() );
+	g_pwndMessage->CreateMessageWindow( this, newRect );
 
 	CPrefabLibrary::LoadAllLibraries();
 
@@ -787,7 +795,8 @@ void CMainFrame::OnSize(UINT nType, int cx, int cy)
 		CRect clientrect;
 		wndMDIClient.GetClientRect(clientrect);
 
-		g_pwndMessage->Resize(CRect(0, clientrect.Height() - 130, clientrect.Width(), clientrect.Height()));
+		CRect newRect(0, clientrect.Height() - m_dpiBehavior.ScaleOnY( 130 ), clientrect.Width(), clientrect.Height());
+		g_pwndMessage->Resize(newRect);
 	}
 }
 
@@ -899,6 +908,7 @@ void CMainFrame::OnClose()
 //-----------------------------------------------------------------------------
 void CMainFrame::OnDestroy(void)
 {
+	m_dpiBehavior.OnDestroyWindow();
 	CMDIFrameWnd::OnDestroy();
 	PostQuitMessage(-1);
 }
@@ -1814,10 +1824,10 @@ bool CMainFrame::VerifyBarState(void)
 
         Assert(pInfo != NULL);
 
-        int nDockedCount = pInfo->m_arrBarID.GetSize();
+        INT_PTR nDockedCount = pInfo->m_arrBarID.GetSize();
         if (nDockedCount > 0)
         {
-            for (int j = 0; j < nDockedCount; j++)
+            for (INT_PTR j = 0; j < nDockedCount; j++)
             {
                 UINT nID = (UINT) pInfo->m_arrBarID[j];
                 if (nID == 0)

@@ -11,6 +11,7 @@
 #include <afxtempl.h>
 #include "GlobalFunctions.h"
 #include "fgdlib/gamedata.h"
+#include "windows/base_mdi_child_wnd.h"
 
 const int MAX_MESSAGE_WND_LINES = 5000;
 
@@ -20,7 +21,7 @@ enum
 };
 
 
-class CMessageWnd : private CMDIChildWnd
+class CMessageWnd : private CBaseMDIChildWnd
 {
 public:
 
@@ -45,7 +46,7 @@ protected:
 		MWMSGTYPE type;
 		TCHAR szMsg[MESSAGE_WND_MESSAGE_LENGTH];
 		int MsgLen;	// length of message w/o 0x0
-	} ;
+	};
 
 // Attributes
 public:

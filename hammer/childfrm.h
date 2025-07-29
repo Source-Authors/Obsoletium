@@ -11,6 +11,7 @@
 #endif
 
 #include <afxwin.h>
+#include "windows/base_mdi_child_wnd.h"
 
 enum DrawType_t;
 
@@ -27,7 +28,7 @@ public:
 };
 
 
-class CChildFrame : public CMDIChildWnd
+class CChildFrame : public CBaseMDIChildWnd
 {
 	DECLARE_DYNCREATE(CChildFrame)
 		

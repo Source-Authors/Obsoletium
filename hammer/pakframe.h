@@ -8,10 +8,12 @@
 // PakFrame.h : header file
 //
 
+#include "windows/base_mdi_child_wnd.h"
+
 /////////////////////////////////////////////////////////////////////////////
 // CPakFrame frame
 
-class CPakFrame : public CMDIChildWnd
+class CPakFrame : public CBaseMDIChildWnd
 {
 	DECLARE_DYNCREATE(CPakFrame)
 protected:

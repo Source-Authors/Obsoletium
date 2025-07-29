@@ -72,8 +72,8 @@ struct ShaderDeviceInfo_t
 	bool m_bWaitForVSync : 1;				// Would we not present until vsync?
 	bool m_bScaleToOutputResolution : 1;	// 360 ONLY: sets up hardware scaling
 	bool m_bProgressive : 1;				// 360 ONLY: interlaced or progressive
-	bool m_bUsingMultipleWindows : 1; 		// Forces D3DPresent to use _COPY instead
-	bool m_bUsingPartialPresentation : 1;	// Allow to use partial presentation mode aka _SEQUENTIAL
+	bool m_bUsingMultipleWindows : 1; 		// Forces D3DPresent to use D3DSWAPEFFECT_COPY instead
+	bool m_bUsingPartialPresentation : 1;	// Forces D3DPresent to use D3DSWAPEFFECT_DISCARD instead
 };
 
 
