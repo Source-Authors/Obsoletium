@@ -1167,7 +1167,11 @@ static bool LoadFaceFromPSD( IVTFTexture *pTexture, CUtlBuffer &psdBuffer, int z
 			resInfo.m_nFlags |= ImageLoader::RESAMPLE_NICE_FILTER;
 		}
 
-		ResampleRGBA8888( resInfo );
+		if ( !ResampleRGBA8888( resInfo ) )
+		{
+			VTexWarning( "%s: resample to RGBA8888 failed.\n", info.m_SrcName );
+			return false;
+		}
 
 		if ( info.m_bAlphaToDistance )
 		{
