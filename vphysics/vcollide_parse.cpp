@@ -21,13 +21,18 @@
 static void ReadVector( const char *pString, Vector& out )
 {
 	float x = 0, y = 0, z = 0;
-	int read = sscanf( pString, "%f %f %f", &x, &y, &z );
-
-	AssertMsg( read == 3, "Unable to read 3D vector components from '%s'.", pString );
-
-	out[0] = x;
-	out[1] = y;
-	out[2] = z;
+	const int read = sscanf( pString, "%f %f %f", &x, &y, &z );
+	if (read == 3)
+	{
+		out[0] = x;
+		out[1] = y;
+		out[2] = z;
+	}
+	else
+	{
+		AssertMsg( false, "Unable to read 3D vector components from '%s'.", pString );
+		Warning( "Unable to read 3D vector components from '%s'.", pString );
+	}
 }
 
 // dimhotepus: Unused.
@@ -43,14 +48,19 @@ static void ReadVector( const char *pString, Vector& out )
 static void ReadVector4D( const char *pString, Vector4D& out )
 {
 	float x = 0, y = 0, z = 0, w = 0;
-	int read = sscanf( pString, "%f %f %f %f", &x, &y, &z, &w );
-
-	AssertMsg( read == 4, "Unable to read 4D vector components from '%s'.", pString );
-
-	out[0] = x;
-	out[1] = y;
-	out[2] = z;
-	out[3] = w;
+	const int read = sscanf( pString, "%f %f %f %f", &x, &y, &z, &w );
+	if (read == 4)
+	{
+		out[0] = x;
+		out[1] = y;
+		out[2] = z;
+		out[3] = w;
+	}
+	else
+	{
+		AssertMsg( false, "Unable to read 4D vector components from '%s'.", pString );
+		Warning( "Unable to read 4D vector components from '%s'.", pString );
+	}
 }
 
 class CVPhysicsParse final : public IVPhysicsKeyParser
