@@ -3317,19 +3317,15 @@ void CTempEnts::MuzzleFlash_RPG_NPC( ClientEntityHandle_t hEntity, int attachmen
 
 void CTempEnts::RocketFlare( const Vector& pos )
 {
-	C_LocalTempEntity	*pTemp;
-	const model_t		*model;
-	int					nframeCount;
-
-	model = (model_t *)engine->LoadModel( "sprites/animglow01.vmt" );
+	const model_t *model = engine->LoadModel( "sprites/animglow01.vmt" );
 	if ( !model )
 	{
 		return;
 	}
 
-	nframeCount = modelinfo->GetModelFrameCount( model );
+	int nframeCount = modelinfo->GetModelFrameCount( model );
 
-	pTemp = TempEntAlloc( pos, model );
+	C_LocalTempEntity *pTemp = TempEntAlloc(pos, model);
 	if ( !pTemp )
 		return;
 
