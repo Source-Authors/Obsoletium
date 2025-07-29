@@ -201,7 +201,7 @@ char* S3TC_GetBlock(
 	int xBlock,
 	int yBlock )
 {
-	return (char*)S3TC_GetBlock( pCompressed, format, nBlocksWidth, xBlock, yBlock );
+	return (char*)S3TC_GetBlock( const_cast<const void*>(pCompressed), format, nBlocksWidth, xBlock, yBlock );
 }
 
 
