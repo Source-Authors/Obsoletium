@@ -6139,7 +6139,7 @@ void CShaderAPIDx8::SetTextureState( Sampler_t sampler, ShaderAPITextureHandle_t
 
 		if ( tex.m_pTextureGroupCounterFrame )
 		{
-			constexpr auto maxCounterValue = std::numeric_limits<
+			[[maybe_unused]] constexpr auto maxCounterValue = std::numeric_limits<
 				std::remove_pointer_t<
 					decltype(tex.m_pTextureGroupCounterFrame)>
 			>::max();
@@ -6652,7 +6652,7 @@ void CShaderAPIDx8::SetupTextureGroup( ShaderAPITextureHandle_t hTexture, const 
 
 	if ( pTexture->m_pTextureGroupCounterGlobal )
 	{
-		constexpr auto maxCounterValue = std::numeric_limits<
+		[[maybe_unused]] constexpr auto maxCounterValue = std::numeric_limits<
 			std::remove_pointer_t<
 				decltype(pTexture->m_pTextureGroupCounterGlobal)>
 		>::max();
@@ -8422,6 +8422,7 @@ void CShaderAPIDx8::ModifyVertexData( )
 #endif
 }
 
+#ifdef _DEBUG
 static const char *TextureArgToString( int arg )
 {
 	static char buf[128];
@@ -8556,6 +8557,7 @@ static const char *BlendModeToString( int blendMode )
 		return "<ERROR>";
 	}
 }
+#endif
 
 //-----------------------------------------------------------------------------
 // Spew Board State

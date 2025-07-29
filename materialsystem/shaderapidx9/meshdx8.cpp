@@ -995,7 +995,7 @@ void Unbind( IDirect3DVertexBuffer9 *pVertexBuffer )
 {
 }
 
-
+#ifdef _DEBUG
 //-----------------------------------------------------------------------------
 // Helpers to count texture coordinates
 //-----------------------------------------------------------------------------
@@ -1010,7 +1010,7 @@ static int NumTextureCoordinates( VertexFormat_t vertexFormat )
 	}
 	return nTexCoordCount;
 }
-
+#endif
 
 //-----------------------------------------------------------------------------
 // Makes sure that the render state is always set next time

@@ -1299,7 +1299,7 @@ private:
 		CUtlMemory< unsigned char > srcBufferAllMips;
 		const intp srcFinestMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, false );
 		const intp srcAllMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, pJob->m_bGenMips );
-		const intp srcPitch = ImageLoader::GetMemRequired( w, 1, 1, srcFmt, false );
+		[[maybe_unused]] const intp srcPitch = ImageLoader::GetMemRequired( w, 1, 1, srcFmt, false );
 
 		const ImageFormat dstFmt = pJob->m_dstFmt;
 		CUtlMemory< unsigned char > dstBufferAllMips;

@@ -1463,7 +1463,7 @@ void CTexture::MakePartiallyResident()
 	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
 
 	ResidencyType_t oldCurrentResidence = m_residenceCurrent;
-	ResidencyType_t oldTargetResidence = m_residenceTarget;
+	[[maybe_unused]] ResidencyType_t oldTargetResidence = m_residenceTarget;
 
 	m_residenceCurrent = m_residenceTarget = RESIDENT_PARTIAL;
 
@@ -1511,7 +1511,7 @@ bool CTexture::MakeFullyResident()
 	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
 
 	ResidencyType_t oldCurrentResidence = m_residenceCurrent;
-	ResidencyType_t oldTargetResidence = m_residenceTarget;
+	[[maybe_unused]] ResidencyType_t oldTargetResidence = m_residenceTarget;
 
 	if ( oldCurrentResidence == RESIDENT_FULL )
 	{
