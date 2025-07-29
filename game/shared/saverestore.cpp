@@ -423,7 +423,7 @@ void CSave::WriteData( const char *pdata , int size )
 
 void CSave::WriteString( const char *pstring )
 {
-	BufferData( pstring, strlen(pstring) + 1 );
+	BufferData( pstring, V_strlen(pstring) + 1 );
 }
 
 //-------------------------------------
@@ -433,7 +433,7 @@ void CSave::WriteString( const string_t *stringId, int count )
 	for ( int i = 0; i < count; i++ )
 	{
 		const char *pString = STRING(stringId[i]);
-		BufferData( pString, strlen(pString)+1 );
+		BufferData( pString, V_strlen(pString)+1 );
 	}
 }
 
@@ -504,7 +504,7 @@ void CSave::WriteFloat( const char *pname, const float *data, int count )
 
 void CSave::WriteString( const char *pname, const char *pdata )
 {
-	BufferField( pname, strlen(pdata) + 1, pdata );
+	BufferField( pname, V_strlen(pdata) + 1, pdata );
 }
 
 //-------------------------------------
@@ -852,7 +852,7 @@ int CSave::WriteFields( const char *pname, const void *pBaseData, datamap_t *pRo
 		count++;
 	}
 
-	int iCurPos = m_pData->GetCurPos();
+	intp iCurPos = m_pData->GetCurPos();
 	int iRewind = iCurPos - iHeaderPos;
 	m_pData->Rewind( iRewind );
 	WriteInt( pname, &count, 1 );
@@ -947,7 +947,7 @@ void CSave::WriteHeader( const char *pname, int size )
 
 //-------------------------------------
 
-void CSave::BufferData( const char *pdata, int size )
+void CSave::BufferData( const char *pdata, intp size )
 {
 	if ( !m_pData )
 		return;
@@ -1152,7 +1152,7 @@ void CSave::WriteFunction( datamap_t *pRootMap, const char *pname, inputfunc_t *
 		functionName = "BADFUNCTIONPOINTER";
 	}
 
-	BufferField( pname, strlen(functionName) + 1, functionName );
+	BufferField( pname, V_strlen(functionName) + 1, functionName );
 }
 
 //-------------------------------------

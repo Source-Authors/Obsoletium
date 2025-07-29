@@ -146,7 +146,7 @@ private:
 	//---------------------------------
 	
 	void			BufferField( const char *pname, int size, const char *pdata );
-	void			BufferData( const char *pdata, int size );
+	void			BufferData( const char *pdata, intp size );
 	void			WriteHeader( const char *pname, int size );
 
 	int				DoWriteAll( const void *pLeafObject, datamap_t *pLeafMap, datamap_t *pCurMap );
