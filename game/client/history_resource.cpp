@@ -438,7 +438,7 @@ void CHudHistoryResource::Paint( void )
 			if ( iAmount )
 			{
 				wchar_t text[16];
-				_snwprintf( text, sizeof( text ) / sizeof(wchar_t), L"%i", m_PickupHistory[i].iCount );
+				V_swprintf_safe( text, L"%i", m_PickupHistory[i].iCount );
 
 				// offset the number to sit properly next to the icon
 				ypos -= ( surface()->GetFontTall( m_hNumberFont ) - itemIcon->Height() ) / 2;
