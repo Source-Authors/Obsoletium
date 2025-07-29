@@ -183,7 +183,7 @@ public:
 						wchar_t wzString[256];
 						wchar_t wzTime[64];
 						char szString[256];
-						_snwprintf( wzTime, sizeof( wzTime ), L"%d", nTime );
+						V_swprintf_safe( wzTime, L"%d", nTime );
 						g_pVGuiLocalize->ConstructString_safe( wzString, g_pVGuiLocalize->Find( "#GameUI_PausedTimer" ), 1, wzTime );
 						g_pVGuiLocalize->ConvertUnicodeToANSI( wzString, szString );
 						m_pPauseDiscPanel->SetText( szString );
