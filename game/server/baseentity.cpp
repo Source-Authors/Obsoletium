@@ -3046,6 +3046,7 @@ static FORCEINLINE bool NamesMatchGood( const char *pszQuery, string_t nameToMat
 	return false;
 }
 
+#ifdef _DEBUG
 static bool NamesMatchBad( const char *pszQuery, string_t nameToMatch )
 {
 	if ( nameToMatch == NULL_STRING )
@@ -3081,6 +3082,7 @@ static bool NamesMatchBad( const char *pszQuery, string_t nameToMatch )
 
 	return false;
 }
+#endif
 
 static FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 {
