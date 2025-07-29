@@ -160,8 +160,8 @@ public:
 	virtual intp GetClipboardTextCount();
 	virtual void SetClipboardText(const char *text, intp textLen);
 	virtual void SetClipboardText(const wchar_t *text, intp textLen);
-	virtual intp GetClipboardText(int offset, char *buf, intp bufLen);
-	virtual intp GetClipboardText(int offset, wchar_t *buf, intp bufLen);
+	virtual intp GetClipboardText(intp offset, char *buf, intp bufLen);
+	virtual intp GetClipboardText(intp offset, wchar_t *buf, intp bufLen);
 
 	virtual void SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 );
 
@@ -451,7 +451,7 @@ intp CSystem::GetClipboardTextCount()
 #endif
 }
 
-intp CSystem::GetClipboardText(int offset, char *buf, intp bufLen)
+intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 {
 #ifndef _X360
 	size_t count = 0;
@@ -498,7 +498,7 @@ intp CSystem::GetClipboardText(int offset, char *buf, intp bufLen)
 //-----------------------------------------------------------------------------
 // Purpose: Retrieves unicode text from the clipboard
 //-----------------------------------------------------------------------------
-intp CSystem::GetClipboardText(int offset, wchar_t *buf, intp bufLen)
+intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 {
 #ifndef _X360
 	intp retVal = 0;
