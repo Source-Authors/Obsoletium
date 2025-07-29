@@ -4778,7 +4778,7 @@ const char *C_BaseEntity::GetClassname( void )
 		const char *mapname =  GetClassMap().Lookup( GetPredDescMap()->dataClassName );
 		if ( mapname && mapname[ 0 ] ) 
 		{
-			Q_strncpy( outstr, mapname, sizeof( outstr ) );
+			V_strcpy_safe( outstr, mapname );
 			gotname = true;
 		}
 	}
@@ -4786,7 +4786,7 @@ const char *C_BaseEntity::GetClassname( void )
 
 	if ( !gotname )
 	{
-		Q_strncpy( outstr, typeid( *this ).name(), sizeof( outstr ) );
+		V_strcpy_safe( outstr, typeid( *this ).name() );
 	}
 
 	return outstr;
@@ -5108,14 +5108,6 @@ void C_BaseEntity::SetDormantPredictable( bool dormant )
 
 	m_bDormantPredictable = true;
 	m_nIncomingPacketEntityBecameDormant = prediction->GetIncomingPacketNumber();
-
-// Do we need to do the following kinds of things?
-#if 0
-	// Remove from collisions
-	SetSolid( SOLID_NOT );
-	// Don't render
-	AddEffects( EF_NODRAW );
-#endif
 #endif
 }
 
