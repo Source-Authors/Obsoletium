@@ -9,8 +9,11 @@
 #include "basehlcombatweapon_shared.h"
 #include "c_basehlcombatweapon.h"
 
-// dimhotepus: For animation events.
+// dimhotepus: For old animation events.
 #include "cl_animevent.h"
+
+// dimhotepus: For new animation events.
+#include "eventlist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -35,7 +38,7 @@ STUB_WEAPON_CLASS_BEGIN( weapon_rpg, WeaponRPG, C_BaseHLCombatWeapon )
 	bool OnFireEventEx( [[maybe_unused]] C_BaseViewModel *pViewModel,
 		[[maybe_unused]] const Vector& origin,
 		[[maybe_unused]] const QAngle& angles,
-		[[maybe_unused]] int event,
+		int event,
 		const char *&options ) override
 	{
 		static const char muzzleFlashRpg[2] = {static_cast<char>('0' + to_underlying(MUZZLEFLASH_RPG)), '\0'};
@@ -65,9 +68,31 @@ STUB_WEAPON_CLASS_BEGIN( weapon_rpg, WeaponRPG, C_BaseHLCombatWeapon )
 	}
 STUB_WEAPON_CLASS_END( weapon_rpg, WeaponRPG, C_BaseHLCombatWeapon );
 
-STUB_WEAPON_CLASS( weapon_pistol, WeaponPistol, C_BaseHLCombatWeapon );
-STUB_WEAPON_CLASS( weapon_shotgun, WeaponShotgun, C_BaseHLCombatWeapon );
-STUB_WEAPON_CLASS( weapon_smg1, WeaponSMG1, C_HLSelectFireMachineGun );
+STUB_WEAPON_CLASS_BEGIN(weapon_pistol, WeaponPistol, C_BaseHLCombatWeapon)
+	bool OnFireEventEx( [[maybe_unused]] C_BaseViewModel *pViewModel,
+		[[maybe_unused]] const Vector& origin,
+		[[maybe_unused]] const QAngle& angles,
+		int event,
+		const char *&options ) override
+	{
+		switch (event)
+		{
+			case AE_MUZZLEFLASH:
+			case AE_NPC_MUZZLEFLASH:
+			{
+				// dimhotepus: Default pistol missed brass ejection.
+				// dimhotepus: Eject brass for player and NPC on muzzle flash.
+				// "0" for default pistol shells.
+				FireEvent( origin, angles, CL_EVENT_EJECTBRASS1, "0" );
+				break;
+			}
+		}
+
+		// dimhotepus: False to continue processing.
+		return false;
+	}
+STUB_WEAPON_CLASS_END(weapon_pistol, WeaponPistol, C_BaseHLCombatWeapon);
+
 STUB_WEAPON_CLASS( weapon_357, Weapon357, C_BaseHLCombatWeapon );
 STUB_WEAPON_CLASS( weapon_crossbow, WeaponCrossbow, C_BaseHLCombatWeapon );
 STUB_WEAPON_CLASS( weapon_slam, Weapon_SLAM, C_BaseHLCombatWeapon );

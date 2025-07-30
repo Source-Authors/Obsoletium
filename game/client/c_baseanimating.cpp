@@ -4107,7 +4107,16 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 				
 				if( GetAttachment( 2, attachOrigin, attachAngles ) )
 				{
-					tempents->EjectBrass( attachOrigin, attachAngles, GetAbsAngles(), atoi( options ) );
+					int brassType = atoi( options );
+					int brassCount = 1;
+
+					// dimhotepus: Some weapons enhance options by brasses count, so two digits.
+					if ( const char *space = V_strstr(options, " ") )
+					{
+						brassCount = atoi( space + 1 );
+					}
+
+					tempents->EjectBrass( attachOrigin, attachAngles, GetAbsAngles(), brassType, brassCount );
 				}
 			}
 		}

@@ -1640,7 +1640,7 @@ void CTempEnts::Sprite_Smoke( C_LocalTempEntity *pTemp, float scale )
 //			angles - 
 //			type - 
 //-----------------------------------------------------------------------------
-void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAngle &gunAngles, int type )
+void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAngle &gunAngles, int type, int count )
 {
 	if ( cl_ejectbrass.GetBool() == false )
 		return;
@@ -1650,6 +1650,8 @@ void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAng
 	if ( pModel == NULL )
 		return;
 
+	for (int i = 0; i < count; ++i)
+	{
 	C_LocalTempEntity	*pTemp = TempEntAlloc( pos1, pModel );
 
 	if ( pTemp == NULL )
@@ -1690,6 +1692,7 @@ void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAng
 						dir[2] + random->RandomFloat(  0,64) ) );
 
 	pTemp->die = gpGlobals->curtime + 1.0f + random->RandomFloat( 0.0f, 1.0f );	// Add an extra 0-1 secs of life	
+	}
 }
 
 //-----------------------------------------------------------------------------
