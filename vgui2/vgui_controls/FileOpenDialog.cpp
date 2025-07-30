@@ -1622,9 +1622,8 @@ void FileOpenDialog::PopulateFileNameCompletion()
 	}
 
 	// what files use current string as a prefix?
-	int nCount = m_pFileList->GetItemCount();
-	int i;
-	for ( i = 0 ; i < nCount ; i++ )
+	intp nCount = m_pFileList->GetItemCount();
+	for ( intp i = 0 ; i < nCount ; i++ )
 	{
 		KeyValues *kv = m_pFileList->GetItem(m_pFileList->GetItemIDFromRow(i));
 		const wchar_t *wszString = kv->GetWString("text");
