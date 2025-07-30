@@ -26,10 +26,10 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // local helper functions
 //-----------------------------------------------------------------------------
-static float UpdateTime( float &flLastTime )
+static float UpdateTime( double &flLastTime )
 {
-	float flTime = vgui::system()->GetFrameTime();
-	float dt = flTime - flLastTime;
+	double flTime = vgui::system()->GetFrameTime();
+	float dt = static_cast<float>(flTime - flLastTime);
 	flLastTime = flTime;
 	return dt;
 }
@@ -62,7 +62,7 @@ CPotteryWheelManip::CPotteryWheelManip( matrix3x4_t *pTransform ) :
 	m_lastx( -1 ), m_lasty( -1 ),
 	m_zoom( 100.0f ), m_altitude( 0.0f ), m_azimuth( 0.0f ),
 	m_prevZoom( 100.0f ), m_prevAltitude( 0.0f ), m_prevAzimuth( 0.0f ),
-	m_flLastMouseTime( 0.0f ), m_flLastTickTime( 0.0f ),
+	m_flLastMouseTime( 0.0 ), m_flLastTickTime( 0.0 ),
 	m_flSpin( 0.0f ), m_bSpin( false )
 {
 }
