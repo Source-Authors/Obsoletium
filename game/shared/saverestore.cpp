@@ -2760,7 +2760,7 @@ void SaveEntityOnTable( CBaseEntity *pEntity, CSaveRestoreData *pSaveData, int &
 
 	pEntInfo->modelname = pEntity->GetModelName();
 	pEntInfo->restoreentityindex = -1;
-	pEntInfo->saveentityindex = pEntity ? pEntity->entindex() : -1;
+	pEntInfo->saveentityindex = pEntity->entindex();
 	pEntInfo->hEnt = pEntity;
 	pEntInfo->flags = 0;
 	pEntInfo->location = 0;
