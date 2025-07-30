@@ -3765,6 +3765,11 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 		{
 			weaponType = MUZZLEFLASH_SMG1;
 		}
+		// dimhotepus: Handle SMG2 muzzle flashes.
+		else if ( Q_stricmp( token, "SMG2" ) == 0 )
+		{
+			weaponType = MUZZLEFLASH_SMG2;
+		}
 		else if ( Q_stricmp( token, "PISTOL" ) == 0 )
 		{
 			weaponType = MUZZLEFLASH_PISTOL;
@@ -3784,13 +3789,15 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 		else
 		{
 			//NOTENOTE: This means you specified an invalid muzzleflash type, check your spelling?
-			Assert( 0 );
+			Warning( "Unknown muzzle flash weapon type %s on %s.\nPlease check spelling.\n", token, GetModelName() );
+			AssertMsg( false, "Unknown muzzle flash weapon type %s on %s.\nPlease check spelling.", token, GetModelName() );
 		}
 	}
 	else
 	{
 		//NOTENOTE: This means that there wasn't a proper parameter passed into the animevent
-		Assert( 0 );
+		Warning( "Missed muzzle flash weapon type %s.\n", token );
+		AssertMsg( false, "Missed muzzle flash weapon type %s.", token );
 		return false;
 	}
 
@@ -3808,14 +3815,16 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 		if ( attachmentIndex <= 0 )
 		{
 			//NOTENOTE: This means that the attachment you're trying to use is invalid
-			Assert( 0 );
+				Warning( "Missed %s attachment on %s.\n", token, GetModelName() );
+				AssertMsg( false, "Missed %s attachment on %s.\n", token, GetModelName() );
 			return false;
 		}
 	}
 	else
 	{
 		//NOTENOTE: This means that there wasn't a proper parameter passed into the animevent
-		Assert( 0 );
+		Warning( "Missed muzzle flash attachment parameter on %s.\n", GetModelName() );
+		AssertMsg( false, "Missed muzzle flash attachment parameter on %s.\n", GetModelName() );
 		return false;
 	}
 

@@ -1741,6 +1741,7 @@ void CTempEnts::MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachm
 		break;
 
 	case MUZZLEFLASH_SMG1:
+	case MUZZLEFLASH_SMG2:
 		if ( firstPerson )
 		{
 			MuzzleFlash_SMG1_Player( hEntity, attachmentIndex );
