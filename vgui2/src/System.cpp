@@ -453,8 +453,7 @@ intp CSystem::GetClipboardTextCount()
 
 intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 {
-#ifndef _X360
-	size_t count = 0;
+	intp count = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
 		if (OpenClipboard(GetDesktopWindow()))
@@ -462,7 +461,7 @@ intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				size_t len = GlobalSize(hmem);
+				intp len = (intp)GlobalSize(hmem);
 				if (len <= offset)
 				{
 					count = 0;
@@ -470,9 +469,9 @@ intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 				else
 				{
 					count = len - offset;
-					if (static_cast<size_t>(bufLen) < count)
+					if (bufLen < count)
 					{
-						count = static_cast<size_t>(bufLen);
+						count = bufLen;
 					}
 					void *ptr = GlobalLock(hmem);
 					if (ptr)
@@ -490,9 +489,6 @@ intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 	VCRGenericValue( "cb", buf, count );
 
 	return count;
-#else
-	return 0;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -500,7 +496,6 @@ intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 //-----------------------------------------------------------------------------
 intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 {
-#ifndef _X360
 	intp retVal = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
@@ -509,7 +504,7 @@ intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				size_t len = GlobalSize(hmem);
+				intp len = (intp)GlobalSize(hmem);
 				if (len > offset)
 				{
 					intp count = len - offset;
@@ -535,9 +530,6 @@ intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 	VCRGenericValue( "cb", buf, retVal*sizeof(wchar_t) );
 
 	return retVal;
-#else
-	return 0;
-#endif
 }
 
 static bool staticSplitRegistryKey(const char *key, char *key0, char *key1)
