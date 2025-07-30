@@ -1652,46 +1652,47 @@ void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAng
 
 	for (int i = 0; i < count; ++i)
 	{
-	C_LocalTempEntity	*pTemp = TempEntAlloc( pos1, pModel );
+		C_LocalTempEntity	*pTemp = TempEntAlloc( pos1, pModel );
 
-	if ( pTemp == NULL )
-		return;
+		if ( pTemp == NULL )
+			return;
 
-	//Keep track of shell type
-	if ( type == 2 )
-	{
-		pTemp->hitSound = BOUNCE_SHOTSHELL;
-	}
-	else
-	{
-		pTemp->hitSound = BOUNCE_SHELL;
-	}
+		//Keep track of shell type
+		if ( type == 2 )
+		{
+			pTemp->hitSound = BOUNCE_SHOTSHELL;
+		}
+		else
+		{
+			pTemp->hitSound = BOUNCE_SHELL;
+		}
 
-	pTemp->m_nBody	= 0;
+		pTemp->m_nBody	= 0;
 
-	pTemp->flags |= ( FTENT_COLLIDEWORLD | FTENT_FADEOUT | FTENT_GRAVITY | FTENT_ROTATE );
+		pTemp->flags |= ( FTENT_COLLIDEWORLD | FTENT_FADEOUT | FTENT_GRAVITY | FTENT_ROTATE );
 
-	pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat(-1024,1024);
-	pTemp->m_vecTempEntAngVelocity[1] = random->RandomFloat(-1024,1024);
-	pTemp->m_vecTempEntAngVelocity[2] = random->RandomFloat(-1024,1024);
+		pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat(-1024,1024);
+		pTemp->m_vecTempEntAngVelocity[1] = random->RandomFloat(-1024,1024);
+		pTemp->m_vecTempEntAngVelocity[2] = random->RandomFloat(-1024,1024);
 
-	//Face forward
-	pTemp->SetAbsAngles( gunAngles );
+		//Face forward
+		pTemp->SetAbsAngles( gunAngles );
 
-	pTemp->SetRenderMode( kRenderNormal );
-	pTemp->tempent_renderamt = 255;		// Set this for fadeout
+		pTemp->SetRenderMode( kRenderNormal );
+		pTemp->tempent_renderamt = 255;		// Set this for fadeout
 
-	Vector	dir;
+		Vector	dir;
 
-	AngleVectors( angles, &dir );
+		AngleVectors( angles, &dir );
 
-	dir *= random->RandomFloat( 150.0f, 200.0f );
+		dir *= random->RandomFloat( 150.0f, 200.0f );
 
-	pTemp->SetVelocity( Vector(dir[0] + random->RandomFloat(-64,64),
-						dir[1] + random->RandomFloat(-64,64),
-						dir[2] + random->RandomFloat(  0,64) ) );
+		pTemp->SetVelocity( Vector(dir[0] + random->RandomFloat(-64,64),
+							dir[1] + random->RandomFloat(-64,64),
+							dir[2] + random->RandomFloat(  0,64) ) );
 
-	pTemp->die = gpGlobals->curtime + 1.0f + random->RandomFloat( 0.0f, 1.0f );	// Add an extra 0-1 secs of life	
+		// dimhotepus: Original brasses died too fast (0..1s). Extend to 10..15 seconds for realism.
+		pTemp->die = gpGlobals->curtime + 1.0f + random->RandomFloat( 10.0f, 15.0f );	// Add an extra 10-15 secs of life	
 	}
 }
 
