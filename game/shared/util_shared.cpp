@@ -949,7 +949,7 @@ void UTIL_StringToFloatArray( float *pVector, intp count, const char *pString )
 	}
 }
 
-void UTIL_StringToVector( float *pVector, const char *pString )
+static void UTIL_StringToVector( float *pVector, const char *pString )
 {
 	UTIL_StringToFloatArray( pVector, 3, pString);
 }
