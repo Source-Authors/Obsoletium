@@ -2468,7 +2468,7 @@ inline void CShaderAPIDx8::SetTextureStageState( int stage, D3DTEXTURESTAGESTATE
 		Assert(false);
 		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::SetTextureStageState(stage = %d, type = 0x%x, value = 0x%x) failed w/e %s.\n",
 			stage, state, val, se::win::com::com_error_category().message(hr).c_str() );
-}
+	}
 }
 
 inline void CShaderAPIDx8::SetRenderState( D3DRENDERSTATETYPE state, DWORD val, bool bFlushIfChanged )
@@ -3446,16 +3446,13 @@ void CShaderAPIDx8::SetDefaultState()
 
 	// FIXME: This is a brutal hack. We only need to load these transforms for fixed-function
 	// hardware. Cap the max here to 4.
-	if ( IsPC() )
+	numTextureStages = min( numTextureStages, 4 );
+	int i;
+	for( i = 0; i < numTextureStages; i++ )
 	{
-		numTextureStages = min( numTextureStages, 4 );
-		int i;
-		for( i = 0; i < numTextureStages; i++ )
-		{
-			CShaderAPIDx8::DisableTextureTransform( (TextureStage_t)i );
-			CShaderAPIDx8::MatrixMode( (MaterialMatrixMode_t)(MATERIAL_TEXTURE0 + i) );
-			CShaderAPIDx8::LoadIdentity( );
-		}
+		CShaderAPIDx8::DisableTextureTransform( (TextureStage_t)i );
+		CShaderAPIDx8::MatrixMode( (MaterialMatrixMode_t)(MATERIAL_TEXTURE0 + i) );
+		CShaderAPIDx8::LoadIdentity( );
 	}
 	CShaderAPIDx8::MatrixMode( MATERIAL_MODEL );
 
@@ -6261,63 +6258,88 @@ void CShaderAPIDx8::ComputeStatsInfo( ShaderAPITextureHandle_t hTexture, bool is
 	textureData.m_SizeTexels = 0;
 	textureData.m_LastBoundFrame = -1;
 
-	IDirect3DBaseTexture* pD3DTex = CShaderAPIDx8::GetD3DTexture( hTexture );
+	IDirect3DBaseTexture9* pD3DTex = CShaderAPIDx8::GetD3DTexture( hTexture );
 
 	{
 		if ( isCubeMap )
 		{
-			IDirect3DCubeTexture* pTex = static_cast<IDirect3DCubeTexture*>(pD3DTex);
+			auto* pTex = static_cast<IDirect3DCubeTexture9*>(pD3DTex);
 			if ( !pTex )
 			{
 				Assert( 0 );
 				return;
 			}
-
+			
+			D3DSURFACE_DESC desc;
 			int numLevels = pTex->GetLevelCount();
 			for (int i = 0; i < numLevels; ++i)
 			{
-				D3DSURFACE_DESC desc;
 				HRESULT hr = pTex->GetLevelDesc( i, &desc );
-				Assert( !FAILED(hr) );
-				textureData.m_SizeBytes += 6 * ImageLoader::GetMemRequired( desc.Width, desc.Height, 1, textureData.GetImageFormat(), false );
-				textureData.m_SizeTexels += 6 * desc.Width * desc.Height;
+				if ( SUCCEEDED(hr) )
+				{
+					textureData.m_SizeBytes += 6 * ImageLoader::GetMemRequired( desc.Width, desc.Height, 1, textureData.GetImageFormat(), false );
+					textureData.m_SizeTexels += 6 * desc.Width * desc.Height;
+				}
+				else
+				{
+					Assert( false );
+					Warning( __FUNCTION__ ": IDirect3DCubeTexture9::GetLevelDesc(level = %d) failed w/e %s",
+						i, se::win::com::com_error_category().message(hr).c_str() );
+				}
 			}
 		}
 		else if ( isVolumeTexture )
 		{
-			IDirect3DVolumeTexture9* pTex = static_cast<IDirect3DVolumeTexture9*>(pD3DTex);
+			auto* pTex = static_cast<IDirect3DVolumeTexture9*>(pD3DTex);
 			if ( !pTex )
 			{
 				Assert( 0 );
 				return;
 			}
+			
+			D3DVOLUME_DESC desc;
 			int numLevels = pTex->GetLevelCount();
 			for (int i = 0; i < numLevels; ++i)
 			{
-				D3DVOLUME_DESC desc;
 				HRESULT hr = pTex->GetLevelDesc( i, &desc );
-				Assert( !FAILED( hr ) );
-				textureData.m_SizeBytes += ImageLoader::GetMemRequired( desc.Width, desc.Height, desc.Depth, textureData.GetImageFormat(), false );
-				textureData.m_SizeTexels += desc.Width * desc.Height;
+				if ( SUCCEEDED(hr) )
+				{
+					textureData.m_SizeBytes += ImageLoader::GetMemRequired( desc.Width, desc.Height, desc.Depth, textureData.GetImageFormat(), false );
+					textureData.m_SizeTexels += desc.Width * desc.Height;
+				}
+				else
+				{
+					Assert( false );
+					Warning( __FUNCTION__ ": IDirect3DVolumeTexture9::GetLevelDesc(level = %d) failed w/e %s",
+						i, se::win::com::com_error_category().message(hr).c_str() );
+				}
 			}
 		}
 		else
 		{
-			IDirect3DTexture* pTex = static_cast<IDirect3DTexture*>(pD3DTex);
+			auto* pTex = static_cast<IDirect3DTexture9*>(pD3DTex);
 			if ( !pTex )
 			{
 				Assert( 0 );
 				return;
 			}
-
+			
+			D3DSURFACE_DESC desc;
 			int numLevels = pTex->GetLevelCount();
 			for (int i = 0; i < numLevels; ++i)
 			{
-				D3DSURFACE_DESC desc;
 				HRESULT hr = pTex->GetLevelDesc( i, &desc );
-				Assert( !FAILED( hr ) );
-				textureData.m_SizeBytes += ImageLoader::GetMemRequired( desc.Width, desc.Height, 1, textureData.GetImageFormat(), false );
-				textureData.m_SizeTexels += desc.Width * desc.Height;
+				if ( SUCCEEDED(hr) )
+				{
+					textureData.m_SizeBytes += ImageLoader::GetMemRequired( desc.Width, desc.Height, 1, textureData.GetImageFormat(), false );
+					textureData.m_SizeTexels += desc.Width * desc.Height;
+				}
+				else
+				{
+					Assert( false );
+					Warning( __FUNCTION__ ": IDirect3DTexture9::GetLevelDesc(level = %d) failed w/e %s",
+						i, se::win::com::com_error_category().message(hr).c_str() );
+				}
 			}
 		}
 	}
@@ -6953,8 +6975,8 @@ se::win::com::com_ptr<IDirect3DSurface9> CShaderAPIDx8::GetTextureSurface( Shade
 		return {};
 	}
 
-	IDirect3DBaseTexture* pD3DTex = CShaderAPIDx8::GetD3DTexture( textureHandle );
-	IDirect3DTexture* pTex = static_cast<IDirect3DTexture*>( pD3DTex );
+	IDirect3DBaseTexture9* pD3DTex = CShaderAPIDx8::GetD3DTexture( textureHandle );
+	auto* pTex = static_cast<IDirect3DTexture9*>( pD3DTex );
 	Assert( pTex );
 	if ( !pTex )
 	{
