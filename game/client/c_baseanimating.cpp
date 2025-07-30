@@ -3842,19 +3842,10 @@ void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolum
 	Vector traceStart;
 	QAngle angles;
 
-	int attachment;
-
 	//!!!PERF - These string lookups here aren't the swiftest, but
 	// this doesn't get called very frequently unless a lot of NPCs
 	// are using this code.
-	if( bLeftFoot )
-	{
-		attachment = pEnt->LookupAttachment( "LeftFoot" );
-	}
-	else
-	{
-		attachment = pEnt->LookupAttachment( "RightFoot" );
-	}
+	int attachment = pEnt->LookupAttachment( bLeftFoot ? "LeftFoot" : "RightFoot" );
 
 	if( attachment == -1 )
 	{
@@ -3871,14 +3862,7 @@ void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolum
 		if( psurf )
 		{
 			EmitSound_t params;
-			if( bLeftFoot )
-			{
-				params.m_pSoundName = physprops->GetString(psurf->sounds.stepleft);
-			}
-			else
-			{
-				params.m_pSoundName = physprops->GetString(psurf->sounds.stepright);
-			}
+			params.m_pSoundName = physprops->GetString(bLeftFoot ? psurf->sounds.stepleft : psurf->sounds.stepright);
 
 			CPASAttenuationFilter filter( pEnt, params.m_pSoundName );
 
