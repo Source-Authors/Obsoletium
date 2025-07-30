@@ -93,6 +93,30 @@ STUB_WEAPON_CLASS_BEGIN(weapon_pistol, WeaponPistol, C_BaseHLCombatWeapon)
 	}
 STUB_WEAPON_CLASS_END(weapon_pistol, WeaponPistol, C_BaseHLCombatWeapon);
 
+
+STUB_WEAPON_CLASS_BEGIN( weapon_smg1, WeaponSMG1, C_HLSelectFireMachineGun )
+	bool OnFireEventEx( [[maybe_unused]] C_BaseViewModel *pViewModel,
+		const Vector& origin,
+		const QAngle& angles,
+		int event,
+		const char *&options ) override
+	{
+		switch (event)
+		{
+			case CL_EVENT_EJECTBRASS1:
+			{
+				// dimhotepus: SMG1 uses pistol "0" brasses which are too small.
+				// dimhotepus: Use riffle brasses "1" as they are closer to SMG1.
+				options = "1";
+				break;
+			}
+		}
+
+		// dimhotepus: False to continue processing.
+		return false;
+	}
+STUB_WEAPON_CLASS_END( weapon_smg1, WeaponSMG1, C_HLSelectFireMachineGun );
+
 STUB_WEAPON_CLASS( weapon_357, Weapon357, C_BaseHLCombatWeapon );
 STUB_WEAPON_CLASS( weapon_crossbow, WeaponCrossbow, C_BaseHLCombatWeapon );
 STUB_WEAPON_CLASS( weapon_slam, Weapon_SLAM, C_BaseHLCombatWeapon );
