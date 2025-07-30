@@ -3814,11 +3814,23 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 		// Found an invalid attachment
 		if ( attachmentIndex <= 0 )
 		{
+			// dimhotepus: Combine have MUZZLE attachment not present on model.
+			// Try to attach them to left hand instead.
+			if ( Q_stricmp( token, "MUZZLE" ) == 0 )
+			{
+				Warning( "Missed %s attachment on %s, fall back to anim_attachment_LH.\n", token, GetModelName() );
+
+				attachmentIndex = LookupAttachment( "anim_attachment_LH" );
+			}
+
+			if (attachmentIndex <= 0)
+			{
 			//NOTENOTE: This means that the attachment you're trying to use is invalid
 				Warning( "Missed %s attachment on %s.\n", token, GetModelName() );
 				AssertMsg( false, "Missed %s attachment on %s.\n", token, GetModelName() );
 			return false;
 		}
+	}
 	}
 	else
 	{
