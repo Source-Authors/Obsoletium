@@ -6684,7 +6684,7 @@ void CShaderAPIDx8::DeleteD3DTexture( ShaderAPITextureHandle_t hTexture )
 
 		if ( texture.GetDepthStencilSurface() )
 		{
-			ULONG nRetVal = texture.GetDepthStencilSurface()->Release();
+			[[maybe_unused]] ULONG nRetVal = texture.GetDepthStencilSurface()->Release();
 			Assert( nRetVal == 0 );
 			texture.GetDepthStencilSurface() = 0;
 			numDeallocated = 1;
@@ -11527,7 +11527,7 @@ void CShaderAPIDx8::DestroyOcclusionQueryObject( ShaderAPIOcclusionQuery_t handl
 {
 	IDirect3DQuery9 *pQuery = (IDirect3DQuery9 *)handle;
 
-	ULONG nRetVal = pQuery->Release();
+	[[maybe_unused]] ULONG nRetVal = pQuery->Release();
 	Assert( nRetVal == 0 );
 }
 
