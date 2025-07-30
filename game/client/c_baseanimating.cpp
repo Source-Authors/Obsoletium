@@ -3539,7 +3539,7 @@ void C_BaseAnimating::ProcessMuzzleFlashEvent()
 			// Make an elight
 			dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + index );
 			el->origin = vAttachment;
-			el->radius = random->RandomInt( 32, 64 ); 
+			el->radius = random->RandomFloat( 32, 64 ); 
 			el->decay = el->radius / 0.05f;
 			el->die = gpGlobals->curtime + 0.05f;
 			el->color.r = 255;
