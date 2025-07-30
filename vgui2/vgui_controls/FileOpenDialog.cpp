@@ -1146,7 +1146,7 @@ void FileOpenDialog::PopulateFileList()
 	// clear the current list
 	m_pFileList->DeleteAllItems();
 	
-	FileFindHandle_t findHandle;
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	char pszFileModified[64];
 
 	// get the current directory

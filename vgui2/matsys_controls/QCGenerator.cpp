@@ -626,7 +626,7 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 
 	g_pFullFileSystem->AddSearchPath( pszPath, "SMD_DIR" );
 
-	FileFindHandle_t pFileHandle = 0;	
+	FileFindHandle_t pFileHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *filename = g_pFullFileSystem->FindFirst( "*.smd", &pFileHandle );	
 
 	bool bFoundReference = false;

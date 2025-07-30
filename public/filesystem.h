@@ -32,7 +32,8 @@ class CMemoryFileBacking;
 
 typedef void * FileHandle_t;
 typedef void * FileCacheHandle_t;
-typedef int FileFindHandle_t;
+// dimhotepus: FileFindHandle_t: int -> unsigned short
+typedef unsigned short FileFindHandle_t;
 typedef void (*FileSystemLoggingFunc_t)( const char *fileName, const char *accessType );
 typedef int WaitForResourcesHandle_t;
 
@@ -85,7 +86,8 @@ enum FileSystemSeek_t
 
 enum
 {
-	FILESYSTEM_INVALID_FIND_HANDLE = -1
+	// dimhotepus: FileFindHandle_t: int -> unsigned short
+	FILESYSTEM_INVALID_FIND_HANDLE = USHRT_MAX
 };
 
 enum FileWarningLevel_t

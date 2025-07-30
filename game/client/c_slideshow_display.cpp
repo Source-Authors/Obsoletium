@@ -196,7 +196,7 @@ void C_SlideshowDisplay::ClientThink( void )
 
 void C_SlideshowDisplay::BuildSlideShowImagesList( void )
 {
-	FileFindHandle_t matHandle;
+	FileFindHandle_t matHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	char szDirectory[MAX_PATH];
 	char szMatFileName[MAX_PATH] = {'\0'};
 

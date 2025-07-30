@@ -451,7 +451,7 @@ void CSlideshowDisplay::RestoreControlPanels( void )
 
 void CSlideshowDisplay::BuildSlideShowImagesList( void )
 {
-	FileFindHandle_t matHandle;
+	FileFindHandle_t matHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	char szDirectory[_MAX_PATH];
 	char szMatFileName[_MAX_PATH] = {'\0'};
 

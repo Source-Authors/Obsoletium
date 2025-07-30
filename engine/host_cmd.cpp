@@ -2205,7 +2205,7 @@ CON_COMMAND( fs_find, "Run virtual filesystem find" )
 	const char *pWildcard = args.Arg(1);
 	const char *pPathID = args.Arg(2);
 
-	FileFindHandle_t findhandle;
+	FileFindHandle_t findhandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFile = NULL;
 	size_t matches = 0;
 	for ( pFile = g_pFullFileSystem->FindFirstEx( pWildcard, pPathID, &findhandle );

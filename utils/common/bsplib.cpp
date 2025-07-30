@@ -868,7 +868,7 @@ void AddDirToPak( IZip *pak, const char *pDirPath, const char *pPakPrefix )
 	V_snprintf( szEnumerateDir, sizeof( szEnumerateDir ), "%s/*.*", pDirPath );
 	V_FixSlashes( szEnumerateDir );
 
-	FileFindHandle_t handle;
+	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *szFindResult = g_pFullFileSystem->FindFirst( szEnumerateDir, &handle );
 	do
 	{

@@ -1288,7 +1288,7 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 	Q_FixSlashes( szDirectory );
 
 	// iterate the saved files
-	FileFindHandle_t handle;
+	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( szDirectory, MOD_DIR, &handle );
 	while (pFileName)
 	{

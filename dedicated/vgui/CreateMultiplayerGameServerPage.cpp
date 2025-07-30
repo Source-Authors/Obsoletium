@@ -523,7 +523,7 @@ void CCreateMultiplayerGameServerPage::LoadModListInDirectory(
   Q_AppendSlash(searchString, sizeof(searchString));
   Q_strncat(searchString, "*.*", sizeof(searchString), COPY_ALL_CHARACTERS);
 
-  FileFindHandle_t findHandle = NULL;
+  FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
   const char *filename =
       g_pFullFileSystem->FindFirst(searchString, &findHandle);
   while (filename) {
@@ -615,18 +615,14 @@ void CCreateMultiplayerGameServerPage::AddMod(const char *pGameDirName,
 int CCreateMultiplayerGameServerPage::LoadMaps(const char *pszMod) {
   // iterate the filesystem getting the list of all the files
   // UNDONE: steam wants this done in a special way, need to support that
-  FileFindHandle_t findHandle = NULL;
   char szSearch[256];
   V_sprintf_safe(szSearch, "%s/maps/*.bsp", pszMod);
 
   int iMapsFound = 0;
 
+  FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
   const char *pszFilename = g_pFullFileSystem->FindFirst(szSearch, &findHandle);
-
-  KeyValues *hiddenMaps = NULL;
-  if (m_pGameInfo) {
-    hiddenMaps = m_pGameInfo->FindKey("hidden_maps");
-  }
+  KeyValues *hiddenMaps = m_pGameInfo ? m_pGameInfo->FindKey("hidden_maps") : nullptr;
 
   while (pszFilename) {
     // remove the text 'maps/' and '.bsp' from the file name to get the map name

@@ -401,7 +401,7 @@ void CShaderSystem::LoadModShaderDLLs( int dxSupportLevel )
 	}
 
 	// Now load the ones with any dx_ prefix.
-	FileFindHandle_t findHandle;
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFilename = g_pFullFileSystem->FindFirstEx( "game_shader_generic*", pModShaderPathID, &findHandle );
 	while ( pFilename )
 	{

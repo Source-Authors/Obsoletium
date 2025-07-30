@@ -386,7 +386,7 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, intp parentNodeInde
 	char searchString[512];
 	V_sprintf_safe(searchString, "%s*.*", path);
 
-	FileFindHandle_t h;
+	FileFindHandle_t h = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( searchString, NULL, &h );
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{
@@ -412,7 +412,7 @@ bool DirectorySelectDialog::DoesDirectoryHaveSubdirectories(const char *path, co
 	char searchString[512];
 	V_sprintf_safe(searchString, "%s%s\\*.*", path, dir);
 
-	FileFindHandle_t h;
+	FileFindHandle_t h = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( searchString, NULL, &h );
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{

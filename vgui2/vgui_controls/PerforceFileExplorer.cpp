@@ -182,7 +182,7 @@ void PerforceFileExplorer::PopulateFileList()
 	V_sprintf_safe( pFilter, "%s\\*.*", m_CurrentDirectory.Get() );
 
 	// Find all files on disk
-	FileFindHandle_t h;
+	FileFindHandle_t h = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( pFilter, NULL, &h );
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{

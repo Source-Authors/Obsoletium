@@ -94,7 +94,7 @@ void CBaseRecordingSession::LoadBlocksForSession()
 	IRecordingSessionBlockManager *pBlockManager = m_pContext->GetRecordingSessionBlockManager();
 
 	// Peek in directory and load files based on what's there
-	FileFindHandle_t hFind;
+	FileFindHandle_t hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 	CFmtStr fmtPath( "%s%s*.%s", pBlockManager->GetBlockPath(), m_strName.Get(), GENERIC_FILE_EXTENSION );
 	const char *pFilename = g_pFullFileSystem->FindFirst( fmtPath.Access(), &hFind );
 	while ( pFilename )

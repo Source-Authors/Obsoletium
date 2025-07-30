@@ -900,8 +900,7 @@ search_for_video:
 	V_strncpy( SearchFileSpec, pFileName, sizeof(SearchFileSpec) );
 	V_SetExtension( SearchFileSpec, ".*", sizeof(SearchFileSpec) );
 	
-	FileFindHandle_t  searchHandle = 0;
-
+	FileFindHandle_t searchHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pMatchingFile = g_pFullFileSystem->FindFirstEx( SearchFileSpec, pPathID, &searchHandle );
 	
 	while ( pMatchingFile != nullptr )

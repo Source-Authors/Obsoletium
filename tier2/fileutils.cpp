@@ -235,7 +235,7 @@ void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, con
 	bool bIsAbsolute = Q_IsAbsolutePath( pDirectory );
 
 	// get the list of files
-	FileFindHandle_t hFind;
+	FileFindHandle_t hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFoundFile = g_pFullFileSystem->FindFirstEx( pSearchString, pPathID, &hFind );
 
 	// add all the items

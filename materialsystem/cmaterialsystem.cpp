@@ -4720,7 +4720,7 @@ void CMaterialSystem::ScanDirForReplacements( const char *pszPathName )
 
 	V_sprintf_safe( szBaseName, "%s/*", pszPathName );
 
-	FileFindHandle_t FindHandle;
+	FileFindHandle_t FindHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFindFileName = g_pFullFileSystem->FindFirst( szBaseName, &FindHandle );
 	
 	char szNextBaseName[ MAX_PATH ];

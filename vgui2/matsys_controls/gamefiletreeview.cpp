@@ -120,7 +120,7 @@ bool CGameFileTreeView::DoesDirectoryHaveSubdirectories( const char *pFilePath )
 	Q_snprintf( pSearchString, MAX_PATH, "%s\\*", pFilePath );
 
 	// get the list of files
-	FileFindHandle_t findHandle;
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 
 	// generate children
 	// add all the items
@@ -148,7 +148,7 @@ void CGameFileTreeView::AddDirectoriesOfNode( intp itemIndex, const char *pFileP
 	Q_snprintf( pSearchString, MAX_PATH, "%s\\*", pFilePath );
 
 	// get the list of files
-	FileFindHandle_t findHandle;
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 
 	// generate children
 	// add all the items
@@ -193,7 +193,7 @@ void CGameFileTreeView::AddFilesOfNode( intp itemIndex, const char *pFilePath, c
 	Q_snprintf( pSearchString, MAX_PATH, "%s\\*.%s", pFilePath, pExt );
 
 	// get the list of files
-	FileFindHandle_t findHandle;
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 
 	// generate children
 	// add all the items

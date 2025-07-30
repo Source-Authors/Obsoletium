@@ -2817,7 +2817,7 @@ void CTextureManager::FindFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 {
 	Assert( pOutFilesToLoad != NULL );
 
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	pFilename = g_pFullFileSystem->FindFirstEx( pFilename, cTextureCachePathDir, &fh );
 
 	while ( pFilename != NULL )

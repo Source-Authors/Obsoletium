@@ -277,7 +277,7 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 	m_CommentaryItems.RemoveAll();
 
 	// iterate the files
-	FileFindHandle_t handle;
+	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirst( szDirectory, &handle );
 	while (pFileName)
 	{

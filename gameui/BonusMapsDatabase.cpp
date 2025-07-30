@@ -707,7 +707,7 @@ void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool b
 	char szDirectory[MAX_PATH];
 	V_sprintf_safe( szDirectory, "%s*", pCurrentPath );
 
-	FileFindHandle_t dirHandle;
+	FileFindHandle_t dirHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pDirFileName = g_pFullFileSystem->FindFirst( szDirectory, &dirHandle );
 
 	while (pDirFileName)
@@ -743,7 +743,7 @@ void CBonusMapsDatabase::BuildBonusMapsList( const char *pCurrentPath, bool bOut
 	char szDirectory[MAX_PATH];
 	V_sprintf_safe( szDirectory, "%s*.bns", pCurrentPath );
 
-	FileFindHandle_t mapHandle;
+	FileFindHandle_t mapHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pMapFileName = g_pFullFileSystem->FindFirst( szDirectory, &mapHandle );
 
 	while ( pMapFileName && !Q_isempty(pMapFileName) )

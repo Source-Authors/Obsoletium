@@ -397,7 +397,7 @@ void CGameUI::PlayGameStartupSound()
 	if ( CommandLine()->FindParm( "-nostartupsound" ) )
 		return;
 
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 
 	CUtlVector<char *> fileNames;
 	char path[ 512 ];

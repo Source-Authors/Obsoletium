@@ -783,7 +783,7 @@ void CMP3Player::DeleteSoundDirectories()
 
 void CMP3Player::RemoveTempSounds()
 {
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 
 	char path[ 512 ];
 	Q_strncpy( path, "sound/_mp3/*.mp3", sizeof( path ) );
@@ -1086,7 +1086,7 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 
 	Q_FixSlashes( path );
 	
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	char const *fn = g_pFullFileSystem->FindFirstEx( path, pathID, &fh );
 	if ( fn )
 	{
