@@ -159,7 +159,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	bool bIsRenderTarget = ( nCreationFlags & TEXTURE_CREATE_RENDERTARGET ) != 0;
 	bool bManaged = ( nCreationFlags & TEXTURE_CREATE_MANAGED ) != 0;
 	bool bSysmem = ( nCreationFlags & TEXTURE_CREATE_SYSMEM ) != 0;
-	bool bIsDepthBuffer = ( nCreationFlags & TEXTURE_CREATE_DEPTHBUFFER ) != 0;
+	[[maybe_unused]] bool bIsDepthBuffer = ( nCreationFlags & TEXTURE_CREATE_DEPTHBUFFER ) != 0;
 	bool isDynamic = ( nCreationFlags & TEXTURE_CREATE_DYNAMIC ) != 0;
 	bool bAutoMipMap = ( nCreationFlags & TEXTURE_CREATE_AUTOMIPMAP ) != 0;
 	bool bVertexTexture = ( nCreationFlags & TEXTURE_CREATE_VERTEXTEXTURE ) != 0;
@@ -378,7 +378,7 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 //-----------------------------------------------------------------------------
 static void ReleaseD3DTexture( IDirect3DBaseTexture* pD3DTex )
 {
-	ULONG ref = pD3DTex->Release();
+	[[maybe_unused]] ULONG ref = pD3DTex->Release();
 	Assert( ref == 0 );
 }
 
