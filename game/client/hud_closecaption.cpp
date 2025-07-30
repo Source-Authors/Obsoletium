@@ -2220,7 +2220,7 @@ private:
 		void		SetStream( const wchar_t *in )
 		{
 			delete[] stream;
-			stream = 0;
+			stream = nullptr;
 			if ( !in )
 				return;
 
