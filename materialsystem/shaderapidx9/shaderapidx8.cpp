@@ -2462,7 +2462,13 @@ inline void CShaderAPIDx8::SetTextureStageState( int stage, D3DTEXTURESTAGESTATE
 	if ( IsDeactivated() )
 		return;
 
-	Dx9Device()->SetTextureStageState( stage, state, val );
+	const HRESULT hr = Dx9Device()->SetTextureStageState( stage, state, val );
+	if ( FAILED(hr) )
+	{
+		Assert(false);
+		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::SetTextureStageState(stage = %d, type = 0x%x, value = 0x%x) failed w/e %s.\n",
+			stage, state, val, se::win::com::com_error_category().message(hr).c_str() );
+}
 }
 
 inline void CShaderAPIDx8::SetRenderState( D3DRENDERSTATETYPE state, DWORD val, bool bFlushIfChanged )
@@ -2490,7 +2496,13 @@ inline void CShaderAPIDx8::SetRenderState( D3DRENDERSTATETYPE state, DWORD val, 
 #ifdef DX_TO_GL_ABSTRACTION
 		Dx9Device()->SetRenderStateInline( state, val );
 #else
-		Dx9Device()->SetRenderState( state, val );
+		const HRESULT hr = Dx9Device()->SetRenderState( state, val );
+		if ( FAILED(hr) )
+		{
+			Assert(false);
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::SetRenderState(state = %d, value = 0x%x) failed w/e %s.\n",
+				state, val, se::win::com::com_error_category().message(hr).c_str() );
+		}
 #endif
 		m_DynamicState.m_RenderState[state] = val;
 	}
