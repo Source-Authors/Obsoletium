@@ -487,26 +487,26 @@ int CHLSelectFireMachineGun::WeaponRangeAttack2Condition( float flDot, float flD
 	return COND_NONE; // FIXME: disabled for now
 
 	// m_iClip2 == -1 when no secondary clip is used
-	if ( m_iClip2 == 0 && UsesSecondaryAmmo() )
-	{
-		return COND_NO_SECONDARY_AMMO;
-	}
-	else if ( flDist < m_fMinRange2 )
-	{
-		// Don't return	COND_TOO_CLOSE_TO_ATTACK only for primary attack
-		return COND_NONE;
-	}
-	else if (flDist > m_fMaxRange2 )
-	{
-		// Don't return COND_TOO_FAR_TO_ATTACK only for primary attack
-		return COND_NONE;
-	}
-	else if ( flDot < 0.5 ) // UNDONE: Why check this here? Isn't the AI checking this already?
-	{
-		return COND_NOT_FACING_ATTACK;
-	}
+	//if ( m_iClip2 == 0 && UsesSecondaryAmmo() )
+	//{
+	//	return COND_NO_SECONDARY_AMMO;
+	//}
+	//else if ( flDist < m_fMinRange2 )
+	//{
+	//	// Don't return	COND_TOO_CLOSE_TO_ATTACK only for primary attack
+	//	return COND_NONE;
+	//}
+	//else if (flDist > m_fMaxRange2 )
+	//{
+	//	// Don't return COND_TOO_FAR_TO_ATTACK only for primary attack
+	//	return COND_NONE;
+	//}
+	//else if ( flDot < 0.5 ) // UNDONE: Why check this here? Isn't the AI checking this already?
+	//{
+	//	return COND_NOT_FACING_ATTACK;
+	//}
 
-	return COND_CAN_RANGE_ATTACK2;
+	//return COND_CAN_RANGE_ATTACK2;
 }
 
 //-----------------------------------------------------------------------------
