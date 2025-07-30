@@ -424,7 +424,7 @@ struct Texture_t
 
 	// stats stuff
 	intp					m_SizeBytes;
-	int						m_SizeTexels;
+	intp					m_SizeTexels;
 	int						m_LastBoundFrame;
 	int						m_nTimesBoundMax;
 	int						m_nTimesBoundThisFrame;
