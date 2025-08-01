@@ -10735,6 +10735,8 @@ se::win::com::com_ptr<IDirect3DSurface> CShaderAPIDx8::GetFrontBufferImage( Imag
 	if (FAILED(hr))
 		return {};
 
+	// May return D3DERR_DEVICELOST since there is no primary surface when
+	// the device is lost.
 	hr = Dx9Device()->GetFrontBufferData( 0, pFullScreenSurfaceBits );
 	if (FAILED(hr))
 		return {};
