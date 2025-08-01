@@ -60,15 +60,22 @@ void COcclusionQueryMgr::FlushQuery( OcclusionQueryObjectHandle_t hOcclusionQuer
 	// Flush out any previous queries
 	intp h = (intp)hOcclusionQuery;
 	
-	AUTO_LOCK(m_Mutex);
+	m_Mutex.Lock();
 
 	const auto &object = m_OcclusionQueryObjects[h];
 	if ( object.m_bHasBeenIssued[nIndex] )
 	{
 		ShaderAPIOcclusionQuery_t hQuery = object.m_QueryHandle[nIndex];
 		
+		m_Mutex.Unlock();
+		
+		// dimhotepus: Slow, may cause wait for a long.
 		while ( OCCLUSION_QUERY_RESULT_PENDING == g_pShaderAPI->OcclusionQuery_GetNumPixelsRendered( hQuery, true ) )
 			continue;
+	}
+	else
+	{
+		m_Mutex.Unlock();
 	}
 }
 
@@ -176,7 +183,7 @@ void COcclusionQueryMgr::BeginOcclusionQueryDrawing( OcclusionQueryObjectHandle_
 {
 	intp h = (intp)hOcclusionQuery;
 
-	AUTO_LOCK(m_Mutex);
+	m_Mutex.Lock();
 
 	Assert( m_OcclusionQueryObjects.IsValidIndex( h ) );
 	if ( m_OcclusionQueryObjects.IsValidIndex( h ) )
@@ -191,8 +198,13 @@ void COcclusionQueryMgr::BeginOcclusionQueryDrawing( OcclusionQueryObjectHandle_
 			// try polling one last time, since we can't poll again after we issue again.
 			if ( object.m_bHasBeenIssued[nCurrent] )
 			{
+				const int frameIssued = object.m_nFrameIssued;
+
+				m_Mutex.Unlock();
+
+				// dimhotepus: Slow, may cause wait for a long.
 				int nPixels = g_pShaderAPI->OcclusionQuery_GetNumPixelsRendered( hQuery, false );
-				if ( ( nPixels == OCCLUSION_QUERY_RESULT_PENDING ) && ( object.m_nFrameIssued == m_nFrameCount ) )
+				if ( ( nPixels == OCCLUSION_QUERY_RESULT_PENDING ) && ( frameIssued == m_nFrameCount ) )
 				{
 					static int s_nWarnCount = 0;
 					if ( s_nWarnCount++ < 5 )
@@ -207,15 +219,36 @@ void COcclusionQueryMgr::BeginOcclusionQueryDrawing( OcclusionQueryObjectHandle_
 					nPixels = g_pShaderAPI->OcclusionQuery_GetNumPixelsRendered( hQuery, true );
 				}
 
-				if ( nPixels >= 0 )
+				AUTO_LOCK(m_Mutex);
+
+				// dimhotepus: During unlocked mutex object can become stale, reestablish the one if any.
+				Assert( m_OcclusionQueryObjects.IsValidIndex( h ) );
+				if ( m_OcclusionQueryObjects.IsValidIndex( h ) )
 				{
-					object.m_LastResult = nPixels;
+					auto &newObject = m_OcclusionQueryObjects[h];
+
+					if ( nPixels >= 0 )
+					{
+						newObject.m_LastResult = nPixels;
+					}
+					newObject.m_bHasBeenIssued[newObject.m_nCurrentIssue] = false;
 				}
-				object.m_bHasBeenIssued[nCurrent] = false;
+			}
+			else
+			{
+				m_Mutex.Unlock();
 			}
 
 			g_pShaderAPI->BeginOcclusionQueryDrawing( hQuery );
 		}
+		else
+		{
+			m_Mutex.Unlock();
+		}
+	}
+	else
+	{
+		m_Mutex.Unlock();
 	}
 }
 
@@ -254,33 +287,70 @@ void COcclusionQueryMgr::EndOcclusionQueryDrawing( OcclusionQueryObjectHandle_t 
 void COcclusionQueryMgr::OcclusionQuery_IssueNumPixelsRenderedQuery( OcclusionQueryObjectHandle_t hOcclusionQuery )
 {
 	intp h = (intp)hOcclusionQuery;
-	
-	AUTO_LOCK(m_Mutex);
+
+	m_Mutex.Lock();
+	bool isLocked = true;
 
 	Assert( m_OcclusionQueryObjects.IsValidIndex( h ) );
 	if ( m_OcclusionQueryObjects.IsValidIndex( h ) )
 	{
 		for( int i = 0; i < COUNT_OCCLUSION_QUERY_STACK; i++ )
 		{
-            auto &object = m_OcclusionQueryObjects[h];
+			auto &object = m_OcclusionQueryObjects[h];
 
 			int nIndex = ( object.m_nCurrentIssue + i ) % COUNT_OCCLUSION_QUERY_STACK;
-            ShaderAPIOcclusionQuery_t hQuery = object.m_QueryHandle[nIndex];
+			ShaderAPIOcclusionQuery_t hQuery = object.m_QueryHandle[nIndex];
 			if ( hQuery != INVALID_SHADERAPI_OCCLUSION_QUERY_HANDLE && object.m_bHasBeenIssued[nIndex] )
 			{
+				if ( isLocked )
+				{
+					m_Mutex.Unlock();
+				}
+
+				// dimhotepus: Slow, may cause wait for a long.
 				int nPixels = g_pShaderAPI->OcclusionQuery_GetNumPixelsRendered( hQuery );
 				if ( nPixels == OCCLUSION_QUERY_RESULT_ERROR )
 				{
-					// In GL mode, it's possible for queries to fail (say when mat_queue_mode is toggled). In this case, just clear m_bHasBeenIssued and forget we ever issued this query.
-					object.m_bHasBeenIssued[nIndex] = false;
+					AUTO_LOCK(m_Mutex);
+
+					// dimhotepus: During unlocked mutex object can become stale, reestablish the one if any.
+					Assert( m_OcclusionQueryObjects.IsValidIndex( h ) );
+					if ( m_OcclusionQueryObjects.IsValidIndex( h ) )
+					{
+						auto &newObject = m_OcclusionQueryObjects[h];
+
+						const int newNIndex = ( newObject.m_nCurrentIssue + i ) % COUNT_OCCLUSION_QUERY_STACK;
+
+						// In GL mode, it's possible for queries to fail (say when mat_queue_mode is toggled). In this case, just clear m_bHasBeenIssued and forget we ever issued this query.
+						newObject.m_bHasBeenIssued[newNIndex] = false;
+					}
 				}
 				else if ( nPixels >= 0 )
 				{
-					object.m_LastResult = nPixels;
-					object.m_bHasBeenIssued[nIndex] = false;
+					AUTO_LOCK(m_Mutex);
+
+					// dimhotepus: During unlocked mutex object can become stale, reestablish the one if any.
+					Assert( m_OcclusionQueryObjects.IsValidIndex( h ) );
+					if ( m_OcclusionQueryObjects.IsValidIndex( h ) )
+					{
+						auto &newObject = m_OcclusionQueryObjects[h];
+
+						const int newNIndex = ( newObject.m_nCurrentIssue + i ) % COUNT_OCCLUSION_QUERY_STACK;
+
+						newObject.m_LastResult = nPixels;
+						newObject.m_bHasBeenIssued[newNIndex] = false;
+					}
 				}
+
+				m_Mutex.Lock();
+				isLocked = true;
 			}
 		}
+	}
+
+	if ( isLocked )
+	{
+		m_Mutex.Unlock();
 	}
 }
 
