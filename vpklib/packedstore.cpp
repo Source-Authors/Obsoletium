@@ -430,7 +430,7 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, intp fnam
 }
 
 
-void CPackedStore::GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const
+void CPackedStore::GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut, intp nFileNumber ) const
 {
 	if ( nFileNumber == VPKFILENUMBER_EMBEDDED_IN_DIR_FILE )
 	{
@@ -1419,7 +1419,7 @@ bool CPackedStore::FindFileHashFraction( int nPackFileNumber, int nFileFraction,
 	return true;
 }
 
-void CPackedStore::GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut ) const
+void CPackedStore::GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut ) const
 {
 	GetDataFileName( pchFileNameOut, cchFileNameOut, handle.m_nFileNumber );
 }

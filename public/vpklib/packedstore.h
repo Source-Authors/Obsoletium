@@ -113,9 +113,9 @@ public:
 		return *pCRC;
 	}
 
-	FORCEINLINE void GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut );
+	FORCEINLINE void GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut );
 
-	template<int outSize>
+	template<intp outSize>
 	FORCEINLINE void GetPackFileName( OUT_Z_ARRAY char (&pchFileNameOut)[outSize] )
 	{
 		GetPackFileName( pchFileNameOut, outSize );
@@ -347,14 +347,14 @@ public:
 	bool FindFileHashFraction( int nPackFileNumber, int nFileFraction, ChunkHashFraction_t &chunkFileHashFraction );
 	void GetPackFileLoadErrorSummary( CUtlString &sErrors );
 
-	void GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut ) const;
-	template<int outSize>
+	void GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut ) const;
+	template<intp outSize>
 	void GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_ARRAY char (&pchFileNameOut)[outSize] ) const
 	{
 		return GetPackFileName( handle, pchFileNameOut, outSize );
 	}
-	void GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const;
-	template<int outSize>
+	void GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut, intp nFileNumber ) const;
+	template<intp outSize>
 	void GetDataFileName( OUT_Z_ARRAY char (&pchFileNameOut)[outSize], intp nFileNumber ) const
 	{
 		return GetDataFileName( pchFileNameOut, outSize, nFileNumber );
@@ -469,7 +469,7 @@ FORCEINLINE int CPackedStoreFileHandle::Read( void *pOutData, int nNumBytes )
 	return m_pOwner->ReadData( *this, pOutData, nNumBytes );
 }
 
-FORCEINLINE void CPackedStoreFileHandle::GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut )
+FORCEINLINE void CPackedStoreFileHandle::GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut )
 {
 	m_pOwner->GetPackFileName( *this, pchFileNameOut, cchFileNameOut );
 }
