@@ -2028,12 +2028,6 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 	switch ( hr )
 	{
 #ifdef _WIN32
-	case D3DERR_INVALIDCALL:
-		more_info = "D3DERR_INVALIDCALL: The device or the device driver may not support Direct3D or may not support the resolution or color depth specified.";
-		break;
-	case D3DERR_NOTAVAILABLE:
-		more_info = "D3DERR_NOTAVAILABLE: Direct3DEx features are not supported (no WDDM driver is installed) or if the SDKVersion does not match the version of the DLL.";
-		break;
 	case E_OUTOFMEMORY:
 		more_info = "E_OUTOFMEMORY: Out of RAM when create device. Close existing RAM consuming apps and retry.";
 		break;
@@ -2049,7 +2043,7 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 		DWarning( "init",
 			0,
 			"IDirect3d9Ex::CreateDeviceEx(adapter = %u, window = 0x%p, device type = 0x%x, flags = 0x%x) failed to create %s device!\nError %s: %s\n\nPlease see the following for more info.\n"
-			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145",
+			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145\n",
 			nAdapter,
 			hWnd,
 			devType,
@@ -2062,8 +2056,8 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 	{
 		DWarning( "init",
 			0,
-			"IDirect3d9Ex::CreateDeviceEx(adapter = %u, window = 0x%p, device type = 0x%x, flags = 0x%x) failed to create %s device!\nError %s.\n\nPlease see the following for more info.\n"
-			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145",
+			"IDirect3d9Ex::CreateDeviceEx(adapter = %u, window = 0x%p, device type = 0x%x, flags = 0x%x) failed to create %s device!\n\nError %s.\n\nPlease see the following for more info:\n"
+			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145\n",
 			nAdapter,
 			hWnd,
 			devType,
