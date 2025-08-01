@@ -173,6 +173,20 @@ IDirect3DBaseTexture* CreateD3DTexture( int width, int height, int nDepth,
 	D3DPOOL pool = bManaged ? D3DPOOL_MANAGED : D3DPOOL_DEFAULT;
 	if ( bSysmem )
 		pool = D3DPOOL_SYSTEMMEM;
+
+#if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
+	if ( pool == D3DPOOL_MANAGED )
+	{
+		Assert( false );
+
+		// Managed textures aren't available under D3D9Ex, but we never lose
+		// texture data, so it's ok to use the default pool. We can't
+		// lock default-pool textures like we normally would to upload, but we
+		// have special logic to blit full updates via XM* helper functions
+		// in D3D9Ex mode (see texturedx8.cpp)
+		pool = D3DPOOL_DEFAULT;
+	}
+#endif
 	
 	const D3DFORMAT d3dFormat = ImageLoader::ImageFormatToD3DFormat( FindNearestSupportedFormat( dstFormat, bVertexTexture, bIsRenderTarget, bAllowNonFilterable ) );
 	if ( d3dFormat == D3DFMT_UNKNOWN )

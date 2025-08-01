@@ -1559,10 +1559,10 @@ bool CVertexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 	Assert( !m_pVertexBuffer );
 	m_nFirstUnwrittenOffset = 0;
 
-	D3DPOOL pool = D3DPOOL_MANAGED;
-
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
-	pool = D3DPOOL_DEFAULT;
+	D3DPOOL pool = D3DPOOL_DEFAULT;
+#else
+	D3DPOOL pool = D3DPOOL_MANAGED;
 #endif
 
 	DWORD usage = D3DUSAGE_WRITEONLY;
