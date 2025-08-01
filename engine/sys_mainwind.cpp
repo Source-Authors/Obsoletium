@@ -1018,7 +1018,7 @@ bool CGame::CreateGameWindow( void )
 	else
 	{
 		// dimhotepus: Match steam_legacy branch behavior.
-		V_strcat_safe( utf8_window_name, " - Direct3D 9" );
+		V_strcat_safe( utf8_window_name, " - Direct3D 9Ex" );
 	}
 
 #if PIX_ENABLE || defined( PIX_INSTRUMENTATION )
