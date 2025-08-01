@@ -1584,7 +1584,6 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 	if ( !info.m_bWindowed )
 	{
 		bool useDefault = ( info.m_DisplayMode.m_nWidth == 0 ) || ( info.m_DisplayMode.m_nHeight == 0 );
-		m_PresentParameters.BackBufferCount = info.m_nBackBufferCount;
 		m_PresentParameters.BackBufferWidth = useDefault ? mode.m_nWidth : info.m_DisplayMode.m_nWidth;
 		m_PresentParameters.BackBufferHeight = useDefault ? mode.m_nHeight : info.m_DisplayMode.m_nHeight;
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
