@@ -1588,6 +1588,7 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 		m_PresentParameters.BackBufferWidth = useDefault ? mode.m_nWidth : info.m_DisplayMode.m_nWidth;
 		m_PresentParameters.BackBufferHeight = useDefault ? mode.m_nHeight : info.m_DisplayMode.m_nHeight;
 		m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( backBufferFormat );
+		m_PresentParameters.BackBufferCount = info.m_nBackBufferCount;
 		if ( !info.m_bWaitForVSync || CommandLine()->FindParm( "-forcenovsync" ) )
 		{
 			m_PresentParameters.PresentationInterval = D3DPRESENT_INTERVAL_IMMEDIATE;
@@ -1599,7 +1600,6 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 
 		m_PresentParameters.FullScreen_RefreshRateInHz = info.m_DisplayMode.m_nRefreshRateDenominator ? 
 			info.m_DisplayMode.m_nRefreshRateNumerator / info.m_DisplayMode.m_nRefreshRateDenominator : D3DPRESENT_RATE_DEFAULT;
-
 	}
 	else
 	{
