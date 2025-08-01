@@ -183,7 +183,7 @@ public:
 	void	SetKeyTime( intp nKeyIndex, DmeTime_t keyTime );
 
 	// Scale + bias key times
-	void ScaleBiasKeyTimes( double flScale, DmeTime_t nBias );
+	void ScaleBiasKeyTimes( float flScale, DmeTime_t nBias );
 
 	// Removes a single key	by index
 	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 ) = 0;
@@ -332,7 +332,7 @@ public:
 	virtual void ClearKeys() = 0;
 
 	// Scale + bias key times
-	void ScaleBiasKeyTimes( double flScale, DmeTime_t nBias );
+	void ScaleBiasKeyTimes( float flScale, DmeTime_t nBias );
 
 	virtual float GetValueThreshold() const = 0;
 	virtual void SetValueThreshold( float thresh ) = 0;
