@@ -2042,13 +2042,31 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 	{
 		DWarning( "init",
 			0,
-			"IDirect3d9Ex::CreateDeviceEx(adapter = %u, window = 0x%p, device type = 0x%x, flags = 0x%x) failed to create %s device!\nError %s: %s\n\nPlease see the following for more info.\n"
+			"IDirect3d9Ex::CreateDeviceEx(adapter = %u, device type = 0x%x, window = 0x%p, flags = 0x%x,"
+				" parameters = (width = %u, height = %u, back buffer format = 0x%x, back buffer count = %u,"
+				" multisample type = %u, multisample quality = %u, swap effect = 0x%x, window = 0x%p,"
+				" windowed = %d, enable auto depth stencil = %d, flags = 0x%x, full screen refresh rate = %u,"
+				" presentation interval = %u)"
+			") failed to create %s device!\n\nError %s: %s\n\nPlease see the following for more info:\n"
 			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145\n",
 			nAdapter,
-			hWnd,
 			devType,
+			hWnd,
 			deviceCreationFlags,
-			IsOpenGL() ? "OpenGL" : "D3D",
+			m_PresentParameters.BackBufferWidth,
+			m_PresentParameters.BackBufferHeight,
+			m_PresentParameters.BackBufferFormat,
+			m_PresentParameters.BackBufferCount,
+			m_PresentParameters.MultiSampleType,
+			m_PresentParameters.MultiSampleQuality,
+			m_PresentParameters.SwapEffect,
+			m_PresentParameters.hDeviceWindow, m_PresentParameters.Windowed,
+			m_PresentParameters.EnableAutoDepthStencil,
+			m_PresentParameters.AutoDepthStencilFormat,
+			m_PresentParameters.Flags,
+			m_PresentParameters.FullScreen_RefreshRateInHz,
+			m_PresentParameters.PresentationInterval,
+			IsOpenGL() ? "OpenGL" : "Direct3D 9Ex",
 			se::win::com::com_error_category().message(hr).c_str(),
 			more_info );
 	}
@@ -2056,13 +2074,31 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 	{
 		DWarning( "init",
 			0,
-			"IDirect3d9Ex::CreateDeviceEx(adapter = %u, window = 0x%p, device type = 0x%x, flags = 0x%x) failed to create %s device!\n\nError %s.\n\nPlease see the following for more info:\n"
+			"IDirect3d9Ex::CreateDeviceEx(adapter = %u, device type = 0x%x, window = 0x%p, flags = 0x%x,"
+				" parameters = (width = %u, height = %u, back buffer format = 0x%x, back buffer count = %u,"
+				" multisample type = %u, multisample quality = %u, swap effect = 0x%x, window = 0x%p,"
+				" windowed = %d, enable auto depth stencil = %d, flags = 0x%x, full screen refresh rate = %u,"
+				" presentation interval = %u)"
+			") failed to create %s device!\n\nError %s\n\nPlease see the following for more info:\n"
 			"https://help.steampowered.com/en/faqs/view/102E-D170-B891-7145\n",
 			nAdapter,
-			hWnd,
 			devType,
+			hWnd,
 			deviceCreationFlags,
-			IsOpenGL() ? "OpenGL" : "D3D",
+			m_PresentParameters.BackBufferWidth,
+			m_PresentParameters.BackBufferHeight,
+			m_PresentParameters.BackBufferFormat,
+			m_PresentParameters.BackBufferCount,
+			m_PresentParameters.MultiSampleType,
+			m_PresentParameters.MultiSampleQuality,
+			m_PresentParameters.SwapEffect,
+			m_PresentParameters.hDeviceWindow, m_PresentParameters.Windowed,
+			m_PresentParameters.EnableAutoDepthStencil,
+			m_PresentParameters.AutoDepthStencilFormat,
+			m_PresentParameters.Flags,
+			m_PresentParameters.FullScreen_RefreshRateInHz,
+			m_PresentParameters.PresentationInterval,
+			IsOpenGL() ? "OpenGL" : "Direct3D 9Ex",
 			se::win::com::com_error_category().message(hr).c_str() );
 	}
 
