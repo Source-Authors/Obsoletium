@@ -1005,8 +1005,12 @@ static void ConvertModeStruct( ShaderDeviceInfo_t *pMode, const MaterialSystem_C
 	pMode->m_DisplayMode.m_Format = config.m_VideoMode.m_Format;
 	pMode->m_DisplayMode.m_nRefreshRateNumerator = config.m_VideoMode.m_RefreshRate;
 	pMode->m_DisplayMode.m_nRefreshRateDenominator = config.m_VideoMode.m_RefreshRate ? 1 : 0;
-	// dimhotepus: All modern FLIP* swap modes need 2+ back buffers.
-	pMode->m_nBackBufferCount = 2;
+	pMode->m_nBackBufferCount = !config.UsingMultipleWindows() && !config.UsingPartialPresentation()
+		// dimhotepus: Use modern D3DSWAPEFFECT_FLIPEX swap effect which requires 2+ back buffers.
+		? 2
+		// dimhotepus: Use old D3DSWAPEFFECT_COPY (UsingMultipleWindows) or D3DSWAPEFFECT_DISCARD (UsingPartialPresentation).
+		// dimhotepus: Such swap effects can work only with 1 back buffer.
+		: 1;
 	// dimhotepus: Note modern FLIP* swap modes do not support MSAA directly.
 	pMode->m_nAASamples = config.m_nAASamples;
 	pMode->m_nAAQuality = config.m_nAAQuality;
