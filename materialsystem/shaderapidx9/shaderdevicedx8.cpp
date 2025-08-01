@@ -1690,12 +1690,12 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 bool CShaderDeviceDx8::InitDevice( void* hwnd, unsigned nAdapter, const ShaderDeviceInfo_t &info )
 {
 	// windowed
-	if ( !CreateD3DDevice( (VD3DHWND)hwnd, nAdapter, info ) )
+	if ( !CreateD3DDevice( hwnd, nAdapter, info ) )
 		return false;
 
 	// Hook up our own windows proc to get at messages to tell us when
 	// other instances of the material system are trying to set the mode
-	InstallWindowHook( (VD3DHWND)m_hWnd );
+	InstallWindowHook( m_hWnd );
 	return true;
 }
 
@@ -2012,9 +2012,27 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 		deviceCreationFlags |= D3DCREATE_MULTITHREADED;
 	}
 	
+	D3DDISPLAYMODEEX full_screen_display_mode_ex, *fullScreenDisplayMode = nullptr;
+
+	// dimhotepus: For fullscreen display mode we must initialize one. Should be nullptr when windowed.
+	// See https://learn.microsoft.com/en-us/windows/win32/api/d3d9/nf-d3d9-idirect3d9ex-createdeviceex
+	if ( !m_PresentParameters.Windowed )
+	{
+		BitwiseClear(full_screen_display_mode_ex);
+
+		full_screen_display_mode_ex.Size = sizeof(full_screen_display_mode_ex);
+		full_screen_display_mode_ex.Width = m_PresentParameters.BackBufferWidth;
+		full_screen_display_mode_ex.Height = m_PresentParameters.BackBufferHeight;
+		full_screen_display_mode_ex.RefreshRate = m_PresentParameters.FullScreen_RefreshRateInHz;
+		full_screen_display_mode_ex.Format = m_PresentParameters.BackBufferFormat;
+		full_screen_display_mode_ex.ScanLineOrdering = D3DSCANLINEORDERING_UNKNOWN;
+
+		fullScreenDisplayMode = &full_screen_display_mode_ex;
+	}
+	
 	se::win::com::com_ptr<IDirect3DDevice9Ex> d3d9_ex_device;
 	HRESULT hr = D3D()->CreateDeviceEx( nAdapter, devType,
-		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, nullptr, &d3d9_ex_device );
+		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, fullScreenDisplayMode, &d3d9_ex_device );
 	if ( SUCCEEDED( hr ) )
 		return d3d9_ex_device;
 
@@ -2022,7 +2040,7 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 	ThreadSleep( 1000 );
 
 	hr = D3D()->CreateDeviceEx( nAdapter, devType,
-		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, nullptr, &d3d9_ex_device );
+		(VD3DHWND)hWnd, deviceCreationFlags, &m_PresentParameters, fullScreenDisplayMode, &d3d9_ex_device );
 	if ( SUCCEEDED( hr ) )
 		return d3d9_ex_device;
 
