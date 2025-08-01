@@ -11596,7 +11596,16 @@ int CShaderAPIDx8::OcclusionQuery_GetNumPixelsRendered( ShaderAPIOcclusionQuery_
 
 	// This means that the query will not finish and resulted in an error, game should use
 	// the previous query's results and not reissue the query
-	if ( ( hr == D3DERR_DEVICELOST ) || ( hr == D3DERR_NOTAVAILABLE ) )
+	// dimhotepus: Handle lost device case.
+	if ( hr == D3DERR_DEVICELOST )
+	{
+		MarkDeviceLost( );
+		return OCCLUSION_QUERY_RESULT_ERROR;
+	}
+
+	// This means that the query will not finish and resulted in an error, game should use
+	// the previous query's results and not reissue the query
+	if ( hr == D3DERR_NOTAVAILABLE )
 		return OCCLUSION_QUERY_RESULT_ERROR;
 
 	// This means the query isn't finished yet, game will have to use the previous query's
