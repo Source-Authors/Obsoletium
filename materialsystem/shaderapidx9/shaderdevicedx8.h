@@ -125,7 +125,7 @@ private:
 	bool m_bAdapterInfoIntialized : 1;
 
 	// D3D format used to enum adapters.
-	static constexpr inline D3DFORMAT m_AdapterEnumImageFormat = D3DFMT_X8R8G8B8;
+	static constexpr inline D3DFORMAT m_AdapterImageFormat = D3DFMT_X8R8G8B8;
 	// D3D adapter scanline ordering used to enum adapters.
 	static constexpr inline D3DSCANLINEORDERING m_AdapterEnumScanlineOrdering = D3DSCANLINEORDERING_UNKNOWN;
 };

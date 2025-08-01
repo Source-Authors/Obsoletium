@@ -328,7 +328,7 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 {
 	// Set a default null texture format...may be overridden below by IHV-specific surface type
 	pCaps->m_NullTextureFormat = IMAGE_FORMAT_ARGB8888;
-	if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, D3DFMT_R5G6B5 ) == S_OK )
+	if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, D3DFMT_R5G6B5 ) == S_OK )
 	{
 		pCaps->m_NullTextureFormat = IMAGE_FORMAT_RGB565;
 	}
@@ -348,7 +348,7 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 		if ( ( pCaps->m_VendorID == VENDORID_NVIDIA ) && ( pCaps->m_SupportsShaderModel_3_0  ) )	// ps_3_0 parts from nVidia
 		{
 			// First, test for null texture support
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, NVFMT_NULL ) == S_OK )
+			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, NVFMT_NULL ) == S_OK )
 			{
 				pCaps->m_NullTextureFormat = IMAGE_FORMAT_NV_NULL;
 			}
@@ -359,7 +359,7 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 			//   NVFMT_INTZ is supported on newer chips as of G8x (just read like ATI non-fetch4 mode)
 			//
 /*
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, NVFMT_INTZ ) == S_OK )
+			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_RENDERTARGET, D3DRTYPE_TEXTURE, NVFMT_INTZ ) == S_OK )
 			{
 				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_INTZ;
 				pCaps->m_bSupportsFetch4 = false;
@@ -367,7 +367,7 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 				return;
 			}
 */
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D16 ) == S_OK )
+			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D16 ) == S_OK )
 			{
 				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_DST16;
 				pCaps->m_bSupportsFetch4 = false;
@@ -378,7 +378,7 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 					return;
 			}
 			
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D24S8 ) == S_OK )
+			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, D3DFMT_D24S8 ) == S_OK )
 			{
 				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_NV_DST24;
 				pCaps->m_bSupportsFetch4 = false;
@@ -393,12 +393,12 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 		{
 			// Initially, check for Fetch4 (tied to ATIFMT_D24S8 support)
 			pCaps->m_bSupportsFetch4 = false;
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D24S8 ) == S_OK )
+			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D24S8 ) == S_OK )
 			{
 				pCaps->m_bSupportsFetch4 = true;
 			}
 
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D16 ) == S_OK )	// Prefer 16-bit
+			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D16 ) == S_OK )	// Prefer 16-bit
 			{
 				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_ATI_DST16;
 				pCaps->m_bSupportsShadowDepthTextures = true;
@@ -408,7 +408,7 @@ void CShaderDeviceMgrDx8::CheckVendorDependentShadowMappingSupport( HardwareCaps
 					return;
 			}
 			
-			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D24S8 ) == S_OK )
+			if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_TEXTURE, ATIFMT_D24S8 ) == S_OK )
 			{
 				pCaps->m_ShadowDepthTextureFormat = IMAGE_FORMAT_ATI_DST24;
 				pCaps->m_bSupportsShadowDepthTextures = true;
@@ -456,14 +456,14 @@ void CShaderDeviceMgrDx8::CheckVendorDependentAlphaToCoverage( HardwareCaps_t *p
 		bool bNVIDIA_SSAA = false;
 
 		if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE,					// Check MSAA version
-			D3DFMT_X8R8G8B8, 0, D3DRTYPE_SURFACE,
+			m_AdapterImageFormat, 0, D3DRTYPE_SURFACE,
 			(D3DFORMAT)MAKEFOURCC('A', 'T', 'O', 'C')) == S_OK )
 		{
 			bNVIDIA_MSAA = true;
 		}
 
 		if ( m_pD3D->CheckDeviceFormat( nAdapter, DX8_DEVTYPE,					// Check SSAA version
-			D3DFMT_X8R8G8B8, 0, D3DRTYPE_SURFACE,
+			m_AdapterImageFormat, 0, D3DRTYPE_SURFACE,
 			(D3DFORMAT)MAKEFOURCC('S', 'S', 'A', 'A')) == S_OK )
 		{
 			bNVIDIA_SSAA = true;
@@ -845,11 +845,11 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 #endif
 	
 	// Query for SRGB support as needed for our DX 9 stuff
-	pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE, D3DFMT_DXT1 ) == S_OK);
+	pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_QUERY_SRGBREAD, D3DRTYPE_TEXTURE, D3DFMT_DXT1 ) == S_OK);
 
 	if ( pCaps->m_SupportsSRGB )
 	{
-		pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_SRGBREAD | D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8 ) == S_OK);
+		pCaps->m_SupportsSRGB = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat, D3DUSAGE_QUERY_SRGBREAD | D3DUSAGE_QUERY_SRGBWRITE, D3DRTYPE_TEXTURE, D3DFMT_A8R8G8B8 ) == S_OK);
 	}
 
 	if ( CommandLine()->CheckParm( "-nosrgb" ) )
@@ -857,7 +857,7 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 		pCaps->m_SupportsSRGB = false;
 	}
 
-	pCaps->m_bSupportsVertexTextures = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, D3DFMT_X8R8G8B8,
+	pCaps->m_bSupportsVertexTextures = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE, m_AdapterImageFormat,
 		D3DUSAGE_QUERY_VERTEXTEXTURE, D3DRTYPE_TEXTURE, D3DFMT_R32F ) == S_OK );
 
 	if ( IsOpenGL() )
@@ -874,24 +874,24 @@ bool CShaderDeviceMgrDx8::ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nA
 	// Does the device support filterable int16 textures?
 	bool bSupportsInteger16Textures = 		
 		( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE,
-		D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER,
+		m_AdapterImageFormat, D3DUSAGE_QUERY_FILTER,
 		D3DRTYPE_TEXTURE, D3DFMT_A16B16G16R16 ) == S_OK );
 
 	// Does the device support filterable fp16 textures?
 	bool bSupportsFloat16Textures = 		
 		( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE,
-		D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_FILTER,
+		m_AdapterImageFormat, D3DUSAGE_QUERY_FILTER,
 		D3DRTYPE_TEXTURE, D3DFMT_A16B16G16R16F ) == S_OK );
 
 	// Does the device support blendable fp16 render targets?
 	bool bSupportsFloat16RenderTargets = 		
 		( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE,
-		D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING | D3DUSAGE_RENDERTARGET,
+		m_AdapterImageFormat, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING | D3DUSAGE_RENDERTARGET,
 		D3DRTYPE_TEXTURE, D3DFMT_A16B16G16R16F ) == S_OK );
 
 	// Essentially a proxy for a DX10+ device running DX9 code path
 	pCaps->m_bSupportsFloat32RenderTargets = ( D3D()->CheckDeviceFormat( nAdapter, DX8_DEVTYPE,
-	D3DFMT_X8R8G8B8, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING | D3DUSAGE_RENDERTARGET,
+	m_AdapterImageFormat, D3DUSAGE_QUERY_POSTPIXELSHADER_BLENDING | D3DUSAGE_RENDERTARGET,
 		D3DRTYPE_TEXTURE, D3DFMT_A32B32G32R32F ) == S_OK );
 
 	pCaps->m_bFogColorSpecifiedInLinearSpace = false;
@@ -1224,7 +1224,7 @@ unsigned CShaderDeviceMgrDx8::GetModeCount( unsigned nAdapter ) const
 
 	D3DDISPLAYMODEFILTER filter = {};
 	filter.Size = sizeof(filter);
-	filter.Format = m_AdapterEnumImageFormat;
+	filter.Format = m_AdapterImageFormat;
 	filter.ScanLineOrdering = m_AdapterEnumScanlineOrdering;
 	return m_pD3D->GetAdapterModeCountEx( nAdapter, &filter );
 }
@@ -1246,7 +1246,7 @@ void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAda
 	
 	D3DDISPLAYMODEFILTER filter = {};
 	filter.Size = sizeof(filter);
-	filter.Format = m_AdapterEnumImageFormat;
+	filter.Format = m_AdapterImageFormat;
 	filter.ScanLineOrdering = m_AdapterEnumScanlineOrdering;
 
 	const HRESULT hr = D3D()->EnumAdapterModesEx( nAdapter, &filter, nMode, &mode );
@@ -1254,7 +1254,7 @@ void CShaderDeviceMgrDx8::GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAda
 	{
 		Error( "IDirect3D9Ex::EnumAdapterModesEx(adapter = %u, format = 0x%x, mode = %u) failed w/e %s.\n",
 			nAdapter,
-			m_AdapterEnumImageFormat,
+			m_AdapterImageFormat,
 			nMode,
 			se::win::com::com_error_category().message(hr).c_str() );
 	}
