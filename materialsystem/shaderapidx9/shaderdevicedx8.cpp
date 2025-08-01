@@ -1533,6 +1533,9 @@ void CShaderDeviceDx8::SetPresentParameters( void* hWnd, unsigned nAdapter, cons
 	D3DSWAPEFFECT swap_effect{D3DSWAPEFFECT_FORCE_DWORD};
 	if (info.m_bUsingMultipleWindows)
 	{
+		// D3DSWAPEFFECT_COPY requires single back buffer.
+		// See https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dpresent-parameters
+		Assert(info.m_nBackBufferCount == 1);
 		swap_effect = D3DSWAPEFFECT_COPY;
 	}
 	else if (info.m_bUsingPartialPresentation)
