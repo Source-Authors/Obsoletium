@@ -233,7 +233,7 @@ protected:
 	bool IsActive() const;
 
 	// Try to reset the device, returned true if it succeeded
-	bool TryDeviceReset();
+	bool TryDeviceReset( DeviceState_t deviceState );
 
 	// Queue up the fact that the device was lost
 	void MarkDeviceLost();
@@ -246,6 +246,9 @@ protected:
 
 	// Deals with lost or hung devices
 	void CheckDeviceState( bool bOtherAppInitializing );
+
+	// Describe device state.
+	[[maybe_unused]] static const char *GetDeviceStateDescription( DeviceState_t state ); 
 
 	// Changes the window size
 	bool ResizeWindow( const ShaderDeviceInfo_t &info );

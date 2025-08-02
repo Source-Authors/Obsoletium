@@ -2427,7 +2427,7 @@ void CShaderDeviceDx8::HandleThreadEvent( uint32 threadEvent )
 //-----------------------------------------------------------------------------
 // We lost the device, but we have a chance to recover
 //-----------------------------------------------------------------------------
-bool CShaderDeviceDx8::TryDeviceReset()
+bool CShaderDeviceDx8::TryDeviceReset( DeviceState_t deviceState )
 {
 	// Don't try to reset the device until we're sure our resources have been released
 	if ( !m_bResourcesReleased )
@@ -2461,7 +2461,8 @@ bool CShaderDeviceDx8::TryDeviceReset()
 		bResetSuccess = SUCCEEDED( D3D9Device()->CheckDeviceState(static_cast<HWND>(m_hWnd)) );
 		if ( bResetSuccess )
 		{
-			Warning("GPU driver has crashed and been reset, re-uploading resources now.\n");
+			Warning("%s. Device has been reset, re-uploading resources now.\n",
+				GetDeviceStateDescription( deviceState ) );
 		}
 	}
 #endif
@@ -2944,6 +2945,26 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 	}
 }
 
+const char *CShaderDeviceDx8::GetDeviceStateDescription( CShaderDeviceDx8::DeviceState_t state )
+{
+	switch ( state )
+	{
+		case DEVICE_STATE_OK:
+			return "Device is ok";
+		case DEVICE_STATE_OTHER_APP_INIT:
+			return "Other app init";
+		case DEVICE_STATE_LOST_DEVICE:
+			return "Device lost";
+		case DEVICE_STATE_HUNG_DEVICE:
+			return "Device hung";
+		case DEVICE_STATE_OUT_OF_GPU_MEMORY:
+			return "Device out of GPU memory";
+		case DEVICE_STATE_NEEDS_RESET:
+			return "Device needs reset";
+		default:
+			return "Unknown";
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Special method to refresh the screen on the XBox360
