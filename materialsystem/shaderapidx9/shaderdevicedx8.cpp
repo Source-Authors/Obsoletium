@@ -1443,6 +1443,7 @@ CShaderDeviceDx8::CShaderDeviceDx8()
 
 	m_bQueuedDeviceLost = false;
 	m_bQueuedDeviceHung = false;
+	m_bQueuedDeviceOutOfGpuMemory = false;
 	m_bRenderingOccluded = false;
 	m_DeviceState = DEVICE_STATE_OK;
 	m_bOtherAppInitializing = false;
@@ -2197,6 +2198,7 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 	m_bIsMinimized = false;
 	m_bQueuedDeviceLost = false;
 	m_bQueuedDeviceHung = false;
+	m_bQueuedDeviceOutOfGpuMemory = false;
 	m_bRenderingOccluded = false;
 
 	m_IsResizing = info.m_bWindowed && info.m_bResizing;
@@ -2643,7 +2645,7 @@ bool CShaderDeviceDx8::IsPresentOccluded()
 		// and skipped start of new scene at previous frame.
 		EndPresent();
 
-		// D3DERR_DEVICELOST & D3DERR_DEVICEHUNG checked later by CheckDeviceState & PresentEx.
+		// D3DERR_DEVICELOST, D3DERR_DEVICEHUNG and D3DERR_OUTOFVIDEOMEMORY checked later by CheckDeviceState & PresentEx.
 	}
 
 	return false;
@@ -2712,6 +2714,15 @@ void CShaderDeviceDx8::MarkDeviceHung( )
 
 
 //-----------------------------------------------------------------------------
+// Queue up the fact that the device was out of GPU memory.
+//-----------------------------------------------------------------------------
+void CShaderDeviceDx8::MarkDeviceOutOfGpuMemory()
+{
+	m_bQueuedDeviceOutOfGpuMemory = true;
+}
+
+
+//-----------------------------------------------------------------------------
 // Checks if the device was lost
 //-----------------------------------------------------------------------------
 ConVar mat_forcelostdevice( "mat_forcelostdevice", "0" );
@@ -2720,6 +2731,11 @@ ConVar mat_forcelostdevice( "mat_forcelostdevice", "0" );
 // dimhotepus: Checks if the device was hung
 //-----------------------------------------------------------------------------
 ConVar mat_forcehungdevice( "mat_forcehungdevice", "0" );
+
+//-----------------------------------------------------------------------------
+// dimhotepus: Checks if the device was out of GPU memory
+//-----------------------------------------------------------------------------
+ConVar mat_forceoutofgpumemorydevice("mat_forceoutofgpumemorydevice", "0");
 
 void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 {
@@ -2743,6 +2759,12 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 		mat_forcehungdevice.SetValue( 0 );
 		MarkDeviceHung();
 	}
+
+	if (mat_forceoutofgpumemorydevice.GetBool())
+	{
+		mat_forceoutofgpumemorydevice.SetValue( 0 );
+		MarkDeviceOutOfGpuMemory();
+	}
 #endif
 	
 	HRESULT hr = D3D_OK;
@@ -2750,7 +2772,7 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 #if defined(IS_WINDOWS_PC) && defined(SHADERAPIDX9)
 	if ( m_DeviceState == DEVICE_STATE_OK )
 	{
-		// Steady state - PresentEx return value will mark us lost or hung if necessary.
+		// Steady state - PresentEx return value will mark us lost, hung or out of GPU memory if necessary.
 		// We do not care if we are minimized in this state.
 		m_bIsMinimized = false;
 	}
@@ -2796,12 +2818,38 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 		newDeviceState = DEVICE_STATE_HUNG_DEVICE;
 	}
 
+	// If some other call returned device out of GPU memory previously in the frame, spoof the return value from CDS
+	if ( m_bQueuedDeviceOutOfGpuMemory )
+	{
+		hr = FAILED( hr ) ? hr : D3DERR_DEVICENOTRESET;
+		m_bQueuedDeviceOutOfGpuMemory = false;
+
+		newDeviceState = DEVICE_STATE_OUT_OF_GPU_MEMORY;
+	}
+	else if ( hr == D3DERR_OUTOFVIDEOMEMORY )
+	{
+		newDeviceState = DEVICE_STATE_OUT_OF_GPU_MEMORY;
+	}
+
+	if ( newDeviceState == DEVICE_STATE_OUT_OF_GPU_MEMORY )
+	{
+		// Don't have the memory for this.  Try flushing all managed resources out of vid mem and try again.
+		// Managed resources here including POOL_MANAGED (not used since Direct3D 9Ex) and driver internal ones (still used in Direct3D 9Ex).
+		const HRESULT hr2 = D3D9Device()->EvictManagedResources();
+		if ( FAILED( hr2 ) )
+		{
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr2).c_str() );
+		}
+	}
+
 	if ( m_DeviceState == DEVICE_STATE_OK )
 	{
 		// We can transition out of ok if bOtherAppInitializing is set
-		// or if we become minimized, or if CDS returns D3DERR_DEVICELOST, D3DERR_DEVICEHUNG or D3DERR_DEVICENOTRESET.
-		if ( hr == D3DERR_DEVICELOST ||
-			 hr == D3DERR_DEVICEHUNG ||
+		// or if we become minimized, or if CDS returns D3DERR_DEVICELOST, D3DERR_DEVICEHUNG, D3DERR_OUTOFVIDEOMEMORY or D3DERR_DEVICENOTRESET.
+		if ( hr == D3DERR_DEVICEHUNG ||
+			 hr == D3DERR_OUTOFVIDEOMEMORY ||
+			 hr == D3DERR_DEVICELOST ||
 			 hr == D3DERR_DEVICENOTRESET ||
 			 m_bIsMinimized )
 		{
@@ -2823,13 +2871,19 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 		}
 	}
 
-	// Immediately checking device lost / hung after ok helps in the case where we got D3DERR_DEVICENOTRESET
-	// in which case we want to immediately try to switch out of DEVICE_STATE_LOST_DEVICE or
-	// DEVICE_STATE_HUNG_DEVICE and into DEVICE_STATE_NEEDS_RESET
-	if ( m_DeviceState == DEVICE_STATE_LOST_DEVICE || m_DeviceState == DEVICE_STATE_HUNG_DEVICE )
+	// Immediately checking device lost / hung / out of GPU memory after ok helps in the case where
+	// we got D3DERR_DEVICENOTRESET in which case we want to immediately try to switch out of DEVICE_STATE_LOST_DEVICE,
+	// DEVICE_STATE_HUNG_DEVICE or DEVICE_STATE_OUT_OF_GPU_MEMORY and into DEVICE_STATE_NEEDS_RESET
+	// Check DEVICE_STATE_LOST_DEVICE last as since Direct3D 9Ex devices are rarely lost.
+	if ( m_DeviceState == DEVICE_STATE_HUNG_DEVICE ||
+		 m_DeviceState == DEVICE_STATE_OUT_OF_GPU_MEMORY ||
+		 m_DeviceState == DEVICE_STATE_LOST_DEVICE )
 	{
-		// We can only try to reset if we're not minimized and not lost and not hung
-		if ( !m_bIsMinimized && hr != D3DERR_DEVICELOST && hr != D3DERR_DEVICEHUNG )
+		// We can only try to reset if we're not minimized and not lost, hung or out of video memory.
+		if ( !m_bIsMinimized &&
+			 hr != D3DERR_DEVICEHUNG &&
+			 hr != D3DERR_OUTOFVIDEOMEMORY &&
+			 hr != D3DERR_DEVICELOST )
 		{
 			m_DeviceState = DEVICE_STATE_NEEDS_RESET;
 		}
@@ -2838,7 +2892,10 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 	// Immediately checking needs reset also helps for the case where we got D3DERR_DEVICENOTRESET
 	if ( m_DeviceState == DEVICE_STATE_NEEDS_RESET )
 	{
-		if ( hr == D3DERR_DEVICELOST || hr == D3DERR_DEVICEHUNG || m_bIsMinimized )
+		if ( hr == D3DERR_DEVICEHUNG ||
+			 hr == D3DERR_OUTOFVIDEOMEMORY ||
+			 hr == D3DERR_DEVICELOST ||
+			 m_bIsMinimized )
 		{
 			m_DeviceState = newDeviceState;
 		}
@@ -2864,7 +2921,10 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 
 	if ( m_DeviceState == DEVICE_STATE_OTHER_APP_INIT )
 	{
-		if ( hr == D3DERR_DEVICELOST || hr == D3DERR_DEVICEHUNG || m_bIsMinimized )
+		if ( hr == D3DERR_DEVICEHUNG ||
+			 hr == D3DERR_OUTOFVIDEOMEMORY ||
+			 hr == D3DERR_DEVICELOST ||
+			 m_bIsMinimized )
 		{
 			m_DeviceState = newDeviceState;
 		}
@@ -3028,15 +3088,20 @@ void CShaderDeviceDx8::Present()
 						   "You're likely out of OS Paged Pool Memory! For more info, see\n"
 						   "https://help.steampowered.com/\n" );
 				}
-				else if ( hr == D3DERR_DEVICELOST )
-				{
-					MarkDeviceLost();
-				}
 				else if ( hr == D3DERR_DEVICEHUNG )
 				{
 					MarkDeviceHung();
 				}
-			}
+				else if ( hr == D3DERR_OUTOFVIDEOMEMORY )
+				{
+					MarkDeviceOutOfGpuMemory();
+				}
+				// Last as since Direct3D 9Ex devices are rarely lost.
+				else if ( hr == D3DERR_DEVICELOST )
+				{
+					MarkDeviceLost();
+				}
+				}
 			else
 			{
 				// S_OK, S_PRESENT_OCCLUDED and S_PRESENT_MODE_CHANGED

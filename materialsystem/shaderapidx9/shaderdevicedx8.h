@@ -209,6 +209,7 @@ protected:
 		DEVICE_STATE_OTHER_APP_INIT,
 		DEVICE_STATE_LOST_DEVICE,
 		DEVICE_STATE_HUNG_DEVICE,
+		DEVICE_STATE_OUT_OF_GPU_MEMORY,
 		DEVICE_STATE_NEEDS_RESET,
 	};
 
@@ -239,6 +240,9 @@ protected:
 
 	// Queue up the fact that the device was hung
 	void MarkDeviceHung();
+
+	// Queue up the fact that the device was out of GPU memory.
+	void MarkDeviceOutOfGpuMemory();
 
 	// Deals with lost or hung devices
 	void CheckDeviceState( bool bOtherAppInitializing );
@@ -296,6 +300,8 @@ protected:
 	bool				m_bQueuedDeviceLost : 1;
 	// dimhotepus: Add D3DERR_DEVICEHUNG handling support.
 	bool				m_bQueuedDeviceHung : 1;
+	// dimhotepus: Add D3DERR_OUTOFVIDEOMEMORY handling support. Similar to D3DERR_DEVICEHUNG + try to free GPU memory.
+	bool				m_bQueuedDeviceOutOfGpuMemory: 1;
 	// dimhotepus: Add occluded by another window rendering support.
 	bool				m_bRenderingOccluded : 1;
 	bool				m_IsResizing : 1;
@@ -353,6 +359,7 @@ FORCEINLINE bool CShaderDeviceDx8::IsDeactivated() const
 	return m_DeviceState != DEVICE_STATE_OK ||
 		m_bQueuedDeviceLost ||
 		m_bQueuedDeviceHung ||
+		m_bQueuedDeviceOutOfGpuMemory ||
 		m_bRenderingOccluded ||
 		m_numReleaseResourcesRefCount;
 }
