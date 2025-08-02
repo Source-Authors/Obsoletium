@@ -179,7 +179,6 @@ protected:
 	void *m_hWnd;
 	void* m_hWndCookie;
 	bool m_bInitialized : 1;
-	bool m_bIsMinimized : 1;
 
 	// The current view hwnd
 	void* m_ViewHWnd;

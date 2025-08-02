@@ -882,7 +882,6 @@ void* CShaderDeviceMgrBase::ShaderInterfaceFactory( const char *pInterfaceName, 
 CShaderDeviceBase::CShaderDeviceBase()
 {
 	m_bInitialized = false;
-	m_bIsMinimized = false;
 	m_ViewHWnd = nullptr;
 	m_nAdapter = UINT_MAX;
 	m_hWnd = nullptr;
@@ -1173,9 +1172,8 @@ void CShaderDeviceBase::GetWindowSize( int& nWidth, int& nHeight ) const
 	g_pShaderAPI->GetBackBufferDimensions( nWidth, nHeight );
 #else
 
-	// If the window was minimized last time swap buffers happened, or if it's iconic now, 
-	// return 0 size
-	if ( !m_bIsMinimized && !IsIconic( (VD3DHWND)m_hWnd ) )
+	// If the window is iconic now, return 0 size
+	if ( !IsIconic( (VD3DHWND)m_hWnd ) )
 	{
 		// NOTE: Use the 'current view' (which may be the same as the main window) 
 		RECT rect;

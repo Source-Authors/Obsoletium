@@ -2195,7 +2195,6 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 	m_hWnd = pHWnd;
 	m_nAdapter = m_DisplayAdapter = nAdapter;
 	m_DeviceState = DEVICE_STATE_OK;
-	m_bIsMinimized = false;
 	m_bQueuedDeviceLost = false;
 	m_bQueuedDeviceHung = false;
 	m_bQueuedDeviceOutOfGpuMemory = false;
@@ -2739,12 +2738,6 @@ ConVar mat_forceoutofgpumemorydevice("mat_forceoutofgpumemorydevice", "0");
 
 void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 {
-	// FIXME: We could also queue up if WM_SIZE changes and look at that
-	// but that seems to only make sense if we have resizable windows where 
-	// we do *not* allocate buffers as large as the entire current video mode
-	// which we're not doing
-	m_bIsMinimized = IsIconic( (VD3DHWND)m_hWnd ) == TRUE;
-
 	m_bOtherAppInitializing = bOtherAppInitializing;
 
 #ifdef _DEBUG
@@ -2773,8 +2766,6 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 	if ( m_DeviceState == DEVICE_STATE_OK )
 	{
 		// Steady state - PresentEx return value will mark us lost, hung or out of GPU memory if necessary.
-		// We do not care if we are minimized in this state.
-		m_bIsMinimized = false;
 	}
 	else
 #endif
@@ -2850,8 +2841,7 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 		if ( hr == D3DERR_DEVICEHUNG ||
 			 hr == D3DERR_OUTOFVIDEOMEMORY ||
 			 hr == D3DERR_DEVICELOST ||
-			 hr == D3DERR_DEVICENOTRESET ||
-			 m_bIsMinimized )
+			 hr == D3DERR_DEVICENOTRESET )
 		{
 			// purge unreferenced materials
 			g_pShaderUtil->UncacheUnusedMaterials( true );
@@ -2879,9 +2869,8 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 		 m_DeviceState == DEVICE_STATE_OUT_OF_GPU_MEMORY ||
 		 m_DeviceState == DEVICE_STATE_LOST_DEVICE )
 	{
-		// We can only try to reset if we're not minimized and not lost, hung or out of video memory.
-		if ( !m_bIsMinimized &&
-			 hr != D3DERR_DEVICEHUNG &&
+		// We can only try to reset if we're not lost, hung or out of video memory.
+		if ( hr != D3DERR_DEVICEHUNG &&
 			 hr != D3DERR_OUTOFVIDEOMEMORY &&
 			 hr != D3DERR_DEVICELOST )
 		{
@@ -2894,8 +2883,7 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 	{
 		if ( hr == D3DERR_DEVICEHUNG ||
 			 hr == D3DERR_OUTOFVIDEOMEMORY ||
-			 hr == D3DERR_DEVICELOST ||
-			 m_bIsMinimized )
+			 hr == D3DERR_DEVICELOST )
 		{
 			m_DeviceState = newDeviceState;
 		}
@@ -2923,8 +2911,7 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 	{
 		if ( hr == D3DERR_DEVICEHUNG ||
 			 hr == D3DERR_OUTOFVIDEOMEMORY ||
-			 hr == D3DERR_DEVICELOST ||
-			 m_bIsMinimized )
+			 hr == D3DERR_DEVICELOST )
 		{
 			m_DeviceState = newDeviceState;
 		}
