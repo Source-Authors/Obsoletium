@@ -2890,7 +2890,7 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 		}
 		else
 		{
-			bool bResetSucceeded = TryDeviceReset();
+			bool bResetSucceeded = TryDeviceReset( newDeviceState );
 			if ( bResetSucceeded )
 			{
 				if ( !bOtherAppInitializing	)
@@ -2954,15 +2954,16 @@ const char *CShaderDeviceDx8::GetDeviceStateDescription( CShaderDeviceDx8::Devic
 		case DEVICE_STATE_OTHER_APP_INIT:
 			return "Other app init";
 		case DEVICE_STATE_LOST_DEVICE:
-			return "Device lost";
+			return "Device is lost";
 		case DEVICE_STATE_HUNG_DEVICE:
-			return "Device hung";
+			return "Device is hung";
 		case DEVICE_STATE_OUT_OF_GPU_MEMORY:
-			return "Device out of GPU memory";
+			return "Device is out of GPU memory";
 		case DEVICE_STATE_NEEDS_RESET:
 			return "Device needs reset";
 		default:
-			return "Unknown";
+			AssertMsg( false, "Unknown device state 0x%x.", state );
+			return "Unknown device state";
 	}
 }
 
