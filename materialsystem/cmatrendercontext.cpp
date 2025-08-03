@@ -255,9 +255,9 @@ void CMatRenderContextBase::InitializeFrom( CMatRenderContextBase *pInitialState
 	m_RenderTargetStack.Clear();
 	m_RenderTargetStack.EnsureCapacity( pInitialState->m_RenderTargetStack.Count() );
 
-	for ( i = 0; i < pInitialState->m_RenderTargetStack.Count(); i++ )
+	for ( auto &rt : pInitialState->m_RenderTargetStack )
 	{
-		m_RenderTargetStack.Push( pInitialState->m_RenderTargetStack[i] );
+		m_RenderTargetStack.Push( rt );
 	}
 
 	m_MatrixMode = pInitialState->m_MatrixMode;

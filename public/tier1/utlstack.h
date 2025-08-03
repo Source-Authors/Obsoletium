@@ -44,6 +44,14 @@ public:
 	T* Base();
 	T const* Base() const;
 
+	// STL compatible member functions. These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	T* begin()					{ return Base(); }
+	const T* begin() const		{ return Base(); }
+
+	T* end()					{ return Base() + Count(); }
+	const T* end() const		{ return Base() + Count(); }
+
 	// Looks at the stack top
 	T& Top();
 	T const& Top() const;
