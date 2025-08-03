@@ -56,20 +56,6 @@ void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001f )
 }
 
 
-void ReportDirtyDisk()
-{
-}
-
-
-//-----------------------------------------------------------------------------
-// Install dirty disk error reporting function (call after SetMode)
-//-----------------------------------------------------------------------------
-void SetupDirtyDiskReportFunc()
-{
-	g_pFullFileSystem->InstallDirtyDiskReportFunc( ReportDirtyDisk );
-}
-
-
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------

@@ -1150,9 +1150,6 @@ bool CMaterialSystem::SetMode( void* hwnd, const MaterialSystem_Config_t &config
 	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, config.VRMode() );
 	WriteConfigIntoConVars( config );
 
-	extern void SetupDirtyDiskReportFunc(); 
-	SetupDirtyDiskReportFunc();
-
 	return true;
 }
 

@@ -33,9 +33,6 @@ namespace {
 
 constexpr inline char kDefaultHalfLife2GameDirectory[]{"hl2"};
 
-// The dirty disk error report function
-void ReportDirtyDiskNoMaterialSystem() {}
-
 }  // namespace
 
 namespace se::launcher {
@@ -48,8 +45,6 @@ bool BootAppSystemGroup::Create() {
 
   IFileSystem *file_system =
       FindSystem<IFileSystem>(FILESYSTEM_INTERFACE_VERSION);
-  file_system->InstallDirtyDiskReportFunc(ReportDirtyDiskNoMaterialSystem);
-
   resource_listing_ = CreateResourceListing(command_line_, file_system);
 
   AppSystemInfo_t app_systems[] = {
