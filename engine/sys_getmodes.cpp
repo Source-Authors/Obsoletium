@@ -1177,8 +1177,9 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 
 	SetWindowLong( (HWND)game->GetMainWindow(), GWL_STYLE, style ); //-V303 //-V2002
 
-	// Compute rect needed for that size client area based on window style
-	AdjustWindowRectEx( &WindowRect, style, FALSE, exStyle );
+    // Compute rect needed for that size client area based on window style
+	// dimhotepus: Honor DPI.
+	AdjustWindowRectExForDpi( &WindowRect, style, FALSE, exStyle, ::GetDpiForWindow((HWND)game->GetMainWindow()) );
 
 	// Prepare to set window pos, which is required when toggling between topmost and not window flags
 	HWND hWndAfter = NULL;

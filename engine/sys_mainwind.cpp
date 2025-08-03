@@ -916,7 +916,10 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			rcWindow.right = rcWindow.left + m_rcLastRestoredClientRect.right;
 			rcWindow.bottom = rcWindow.top + m_rcLastRestoredClientRect.bottom;
 
-			::AdjustWindowRectEx( &rcWindow, ::GetWindowLong( hWnd, GWL_STYLE ), FALSE, ::GetWindowLong( hWnd, GWL_EXSTYLE ) ); //-V303 //-V2002
+			const DWORD windowStyle = ::GetWindowLong( hWnd, GWL_STYLE );
+			const DWORD windowExStyle = ::GetWindowLong( hWnd, GWL_EXSTYLE );
+			// dimhotepus: Honor DPI.
+			::AdjustWindowRectExForDpi( &rcWindow, windowStyle, FALSE, windowExStyle, ::GetDpiForWindow( hWnd ) ); //-V303 //-V2002
 			::MoveWindow( hWnd, rcWindow.left, rcWindow.top,
 				rcWindow.right - rcWindow.left, rcWindow.bottom - rcWindow.top, FALSE );
 		}
