@@ -562,23 +562,7 @@ https://stackoverflow.com/questions/11376795/why-cant-64-bit-windows-unwind-user
 */
 void EnableCrashingOnCrashes()
 {
-	typedef BOOL (WINAPI *tGetProcessUserModeExceptionPolicy)(LPDWORD lpFlags);
-	typedef BOOL (WINAPI *tSetProcessUserModeExceptionPolicy)(DWORD dwFlags);
-	#define PROCESS_CALLBACK_FILTER_ENABLED     0x1
-
-	HMODULE kernel32 = LoadLibraryExA("kernel32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
-	if ( !kernel32 ) return;
-
-	auto pGetProcessUserModeExceptionPolicy = (tGetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "GetProcessUserModeExceptionPolicy");
-	auto pSetProcessUserModeExceptionPolicy = (tSetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "SetProcessUserModeExceptionPolicy");
-	if (pGetProcessUserModeExceptionPolicy && pSetProcessUserModeExceptionPolicy)
-	{
-		DWORD dwFlags;
-		if (pGetProcessUserModeExceptionPolicy(&dwFlags))
-		{
-			pSetProcessUserModeExceptionPolicy(dwFlags & ~PROCESS_CALLBACK_FILTER_ENABLED); // turn off bit 1
-		}
-	}
+	// dimhotepus: Since Windows 7 crashes are propagated in x86-64.
 
 	// If set to FALSE, Windows will not enclose its calls to TimerProc with an exception handler.
 	// A setting of FALSE is recommended. Otherwise, the application could behave unpredictably,
