@@ -904,7 +904,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			}
 
 			// Update restored client rect
-			::GetClientRect( hWnd, &m_rcLastRestoredClientRect );
+			m_rcLastRestoredClientRect = rcClient;
 		}
 		else if ( wParam == SIZE_MINIMIZED )
 		{
