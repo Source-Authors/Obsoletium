@@ -3712,7 +3712,8 @@ void CShaderAPIDx8::UpdateFrameSyncQuery( int queryIndex, bool bIssue )
 			ThreadSleep( 1 );
 		}
 		m_bQueryIssued[queryIndex] = false;
-		Assert(hr == S_OK || hr == D3DERR_DEVICELOST);
+		// dimhotepus: S_FALSE can be returned when driver resetted.
+		Assert(hr == S_OK || hr == S_FALSE || hr == D3DERR_DEVICELOST);
 
 		if ( hr == D3DERR_DEVICELOST )
 		{
