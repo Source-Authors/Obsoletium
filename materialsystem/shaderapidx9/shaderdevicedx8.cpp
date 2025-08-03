@@ -1441,6 +1441,7 @@ CShaderDeviceDx8::CShaderDeviceDx8()
 	m_bQueuedDeviceLost = false;
 	m_bQueuedDeviceHung = false;
 	m_bQueuedDeviceOutOfGpuMemory = false;
+	m_bQueuedDeviceDisplayModeChange = false;
 	m_bRenderingOccluded = false;
 	m_DeviceState = DEVICE_STATE_OK;
 	m_bOtherAppInitializing = false;
@@ -2028,7 +2029,7 @@ se::win::com::com_ptr<IDirect3DDevice9Ex> CShaderDeviceDx8::InvokeCreateDevice( 
 	{
 		deviceCreationFlags |= D3DCREATE_MULTITHREADED;
 	}
-	
+
 	// dimhotepus: For fullscreen display mode we must initialize one. Should be nullptr when windowed.
 	// See https://learn.microsoft.com/en-us/windows/win32/api/d3d9/nf-d3d9-idirect3d9ex-createdeviceex
 	D3DDISPLAYMODEEX fullScreenDisplayMode = GetFullScreenDisplayModeFromPresentParameters( m_PresentParameters );
@@ -2201,6 +2202,7 @@ bool CShaderDeviceDx8::CreateD3DDevice( void* pHWnd, unsigned nAdapter, const Sh
 	m_bQueuedDeviceLost = false;
 	m_bQueuedDeviceHung = false;
 	m_bQueuedDeviceOutOfGpuMemory = false;
+	m_bQueuedDeviceDisplayModeChange = false;
 	m_bRenderingOccluded = false;
 
 	m_IsResizing = info.m_bWindowed && info.m_bResizing;
@@ -2414,6 +2416,10 @@ void CShaderDeviceDx8::HandleThreadEvent( uint32 threadEvent )
 	case SHADER_THREAD_OTHER_APP_END:
 		OtherAppInitializing(false);
 		break;
+	// dimhotepus: Notify engine display mode change.
+	case SHADER_THREAD_DISPLAY_MODE_CHANGE:
+		NotifyDisplayModeChange();
+		break;
 	}
 }
 
@@ -2589,7 +2595,7 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 	if ( info.m_bResizing )
 		return false;
 
-	g_pShaderDeviceMgr->InvokeModeChangeCallbacks();
+	NotifyDisplayModeChange();
 
 	ReleaseResources();
 	SetPresentParameters( m_hWnd, m_DisplayAdapter, info );
@@ -2613,6 +2619,12 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 	DMsg( "render", 0, "IDirect3DDevice9Ex::ResetEx failed w/e %s. Continue GPU resetting...\n",
 			se::win::com::com_error_category().message(hr).c_str() );
 	return false;
+}
+
+
+void CShaderDeviceDx8::NotifyDisplayModeChange()
+{
+	g_pShaderDeviceMgr->InvokeModeChangeCallbacks();
 }
 
 
@@ -2650,7 +2662,8 @@ bool CShaderDeviceDx8::IsPresentOccluded()
 		// and skipped start of new scene at previous frame.
 		EndPresent();
 
-		// D3DERR_DEVICELOST, D3DERR_DEVICEHUNG and D3DERR_OUTOFVIDEOMEMORY checked later by CheckDeviceState & PresentEx.
+		// D3DERR_DEVICELOST, D3DERR_DEVICEHUNG, D3DERR_OUTOFVIDEOMEMORY and S_PRESENT_MODE_CHANGED checked later
+		// by CheckDeviceState & PresentEx.
 	}
 
 	return false;
@@ -2662,6 +2675,41 @@ void CShaderDeviceDx8::MarkPresentOccluded()
 	m_bRenderingOccluded = true;
 
 	DMsg( "render", 0, "Window is occluded. Skipping rendering to save power...\n" );
+}
+
+
+void CShaderDeviceDx8::HandlePresentModeChange()
+{
+	DMsg( "render", 0, "Desktop display mode changed. Adjust GPU display mode.\n" );
+
+	// Pick a back buffer format similar to the current display mode.
+	ShaderDisplayMode_t mode;
+	g_pShaderDeviceMgr->GetCurrentModeInfo( &mode, m_nAdapter );
+
+	m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( mode.m_Format );
+	// Cap max to display dimensions in windowed or full screen modes.
+	m_PresentParameters.BackBufferWidth = MIN( m_PresentParameters.BackBufferWidth, mode.m_nWidth );
+	m_PresentParameters.BackBufferHeight = MIN( m_PresentParameters.BackBufferHeight, mode.m_nHeight );
+
+	if ( !m_PresentParameters.Windowed )
+	{
+		m_PresentParameters.FullScreen_RefreshRateInHz = mode.m_nRefreshRateDenominator ? 
+			mode.m_nRefreshRateNumerator / mode.m_nRefreshRateDenominator : D3DPRESENT_RATE_DEFAULT;
+	}
+
+	// Notify engine about mode change.
+	if ( !ThreadOwnsDevice() || !ThreadInMainThread() )
+	{
+		// We can't invoke mode change callbacks in worker threads as they may modify
+		// window state (requires main thread) and cause deadlocks.
+		ShaderUtil()->OnThreadEvent( SHADER_THREAD_DISPLAY_MODE_CHANGE );
+	}
+	else
+	{
+		NotifyDisplayModeChange();
+	}
+
+	// and call ResetEx to recreate the swap chains in TryReset...
 }
 
 
@@ -2728,6 +2776,15 @@ void CShaderDeviceDx8::MarkDeviceOutOfGpuMemory()
 
 
 //-----------------------------------------------------------------------------
+// Queue up the fact that the display mode changed and device need to adjust.
+//-----------------------------------------------------------------------------
+void CShaderDeviceDx8::MarkDeviceDisplayModeChange()
+{
+	m_bQueuedDeviceDisplayModeChange = true;
+}
+
+
+//-----------------------------------------------------------------------------
 // Checks if the device was lost
 //-----------------------------------------------------------------------------
 ConVar mat_forcelostdevice( "mat_forcelostdevice", "0" );
@@ -2741,6 +2798,11 @@ ConVar mat_forcehungdevice( "mat_forcehungdevice", "0" );
 // dimhotepus: Checks if the device was out of GPU memory
 //-----------------------------------------------------------------------------
 ConVar mat_forceoutofgpumemorydevice("mat_forceoutofgpumemorydevice", "0");
+
+//-----------------------------------------------------------------------------
+// dimhotepus: Checks if the desktop display mode changed
+//-----------------------------------------------------------------------------
+ConVar mat_forcedisplaymodechange("mat_forcedisplaymodechange", "0");
 
 void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 {
@@ -2763,6 +2825,12 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 	{
 		mat_forceoutofgpumemorydevice.SetValue( 0 );
 		MarkDeviceOutOfGpuMemory();
+	}
+
+	if (mat_forcedisplaymodechange.GetBool())
+	{
+		mat_forcedisplaymodechange.SetValue( 0 );
+		MarkDeviceDisplayModeChange();
 	}
 #endif
 	
@@ -2828,26 +2896,32 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 		newDeviceState = DEVICE_STATE_OUT_OF_GPU_MEMORY;
 	}
 
-	if ( newDeviceState == DEVICE_STATE_OUT_OF_GPU_MEMORY )
+	// If some other call returned display mode change previously in the frame, spoof the return value from CDS
+	if ( m_bQueuedDeviceDisplayModeChange )
 	{
-		// Don't have the memory for this.  Try flushing all managed resources out of vid mem and try again.
-		// Managed resources here including POOL_MANAGED (not used since Direct3D 9Ex) and driver internal ones (still used in Direct3D 9Ex).
-		const HRESULT hr2 = D3D9Device()->EvictManagedResources();
-		if ( FAILED( hr2 ) )
-		{
-			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
-				se::win::com::com_error_category().message(hr2).c_str() );
-		}
+		hr = FAILED( hr ) ? hr : D3DERR_DEVICENOTRESET;
+		m_bQueuedDeviceDisplayModeChange = false;
+
+		newDeviceState = DEVICE_STATE_DISPLAY_MODE_CHANGED;
+	}
+	else if ( hr == S_PRESENT_MODE_CHANGED )
+	{
+		newDeviceState = DEVICE_STATE_DISPLAY_MODE_CHANGED;
 	}
 
 	if ( m_DeviceState == DEVICE_STATE_OK )
 	{
-		// We can transition out of ok if bOtherAppInitializing is set
-		// or if we become minimized, or if CDS returns D3DERR_DEVICELOST, D3DERR_DEVICEHUNG, D3DERR_OUTOFVIDEOMEMORY or D3DERR_DEVICENOTRESET.
-		if ( hr == D3DERR_DEVICEHUNG ||
+		// We can transition out of ok if bOtherAppInitializing is set or if CDS returns
+		// S_PRESENT_MODE_CHANGED,
+		// D3DERR_DEVICEHUNG,
+		// D3DERR_OUTOFVIDEOMEMORY,
+		// D3DERR_DEVICELOST,
+		// or D3DERR_DEVICENOTRESET.
+		if ( hr == S_PRESENT_MODE_CHANGED ||
+			 hr == D3DERR_DEVICEHUNG ||
 			 hr == D3DERR_OUTOFVIDEOMEMORY ||
-			 hr == D3DERR_DEVICELOST ||
-			 hr == D3DERR_DEVICENOTRESET )
+			 hr == D3DERR_DEVICENOTRESET ||
+			 hr == D3DERR_DEVICELOST )
 		{
 			// purge unreferenced materials
 			g_pShaderUtil->UncacheUnusedMaterials( true );
@@ -2867,18 +2941,20 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 		}
 	}
 
-	// Immediately checking device lost / hung / out of GPU memory after ok helps in the case where
-	// we got D3DERR_DEVICENOTRESET in which case we want to immediately try to switch out of DEVICE_STATE_LOST_DEVICE,
-	// DEVICE_STATE_HUNG_DEVICE or DEVICE_STATE_OUT_OF_GPU_MEMORY and into DEVICE_STATE_NEEDS_RESET
-	// Check DEVICE_STATE_LOST_DEVICE last as since Direct3D 9Ex devices are rarely lost.
-	if ( m_DeviceState == DEVICE_STATE_HUNG_DEVICE ||
+	// dimhotepus: Check DEVICE_STATE_LOST_DEVICE last as since Direct3D 9Ex devices are rarely lost.
+	if ( m_DeviceState == DEVICE_STATE_DISPLAY_MODE_CHANGED ||
+		 m_DeviceState == DEVICE_STATE_HUNG_DEVICE ||
 		 m_DeviceState == DEVICE_STATE_OUT_OF_GPU_MEMORY ||
 		 m_DeviceState == DEVICE_STATE_LOST_DEVICE )
 	{
-		// We can only try to reset if we're not lost, hung or out of video memory.
-		if ( hr != D3DERR_DEVICEHUNG &&
-			 hr != D3DERR_OUTOFVIDEOMEMORY &&
-			 hr != D3DERR_DEVICELOST )
+		// dimhotepus: Direct3D 9Ex never returns D3DERR_DEVICENOTRESET and we must try reset
+		// device on mode change / errors.
+		if ( hr == S_PRESENT_MODE_CHANGED ||
+			 hr == D3DERR_DEVICEHUNG ||
+			 hr == D3DERR_OUTOFVIDEOMEMORY ||
+			 // dimhotepus: Set when error is queued from previous frame.
+			 hr == D3DERR_DEVICENOTRESET ||
+			 hr == D3DERR_DEVICELOST )
 		{
 			m_DeviceState = DEVICE_STATE_NEEDS_RESET;
 		}
@@ -2887,35 +2963,51 @@ void CShaderDeviceDx8::CheckDeviceState( bool bOtherAppInitializing )
 	// Immediately checking needs reset also helps for the case where we got D3DERR_DEVICENOTRESET
 	if ( m_DeviceState == DEVICE_STATE_NEEDS_RESET )
 	{
-		if ( hr == D3DERR_DEVICEHUNG ||
-			 hr == D3DERR_OUTOFVIDEOMEMORY ||
-			 hr == D3DERR_DEVICELOST )
+		// dimhotepus: Don't try to evict resources or update present mode until we're sure our resources have been released
+		if ( m_bResourcesReleased )
 		{
-			m_DeviceState = newDeviceState;
-		}
-		else
-		{
-			bool bResetSucceeded = TryDeviceReset( newDeviceState );
-			if ( bResetSucceeded )
+			// dimhotepus: Handle out of GPU memory once before reset.
+			if ( newDeviceState == DEVICE_STATE_OUT_OF_GPU_MEMORY )
 			{
-				if ( !bOtherAppInitializing	)
+				// Don't have the memory for this.  Try flushing all managed resources out of vid mem and try again.
+				// Managed resources here including POOL_MANAGED (not used since Direct3D 9Ex) and driver internal ones (still used in Direct3D 9Ex).
+				const HRESULT hr2 = D3D9Device()->EvictManagedResources();
+				if ( FAILED( hr2 ) )
 				{
-					m_DeviceState = DEVICE_STATE_OK;
+					Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
+						se::win::com::com_error_category().message(hr2).c_str() );
+				}
+			}
+			// dimhotepus: Handle display mode change once before reset.
+			else if ( newDeviceState == DEVICE_STATE_DISPLAY_MODE_CHANGED )
+			{
+				HandlePresentModeChange();
+			}
+		}
 
-					// We were bad, now we're ok. Restore resources and reset render state.
-					ReacquireResourcesInternal( true, true, "NeedsReset" );
-				}
-				else
-				{
-					m_DeviceState = DEVICE_STATE_OTHER_APP_INIT;
-				}
+		// dimhotepus: Direct3D 9Ex never returns D3DERR_DEVICENOTRESET and we must try reset
+		// device on mode change / errors.
+		bool bResetSucceeded = TryDeviceReset( newDeviceState );
+		if ( bResetSucceeded )
+		{
+			if ( !bOtherAppInitializing	)
+			{
+				m_DeviceState = DEVICE_STATE_OK;
+
+				// We were bad, now we're ok. Restore resources and reset render state.
+				ReacquireResourcesInternal( true, true, "NeedsReset" );
+			}
+			else
+			{
+				m_DeviceState = DEVICE_STATE_OTHER_APP_INIT;
 			}
 		}
 	}
 
 	if ( m_DeviceState == DEVICE_STATE_OTHER_APP_INIT )
 	{
-		if ( hr == D3DERR_DEVICEHUNG ||
+		if ( hr == S_PRESENT_MODE_CHANGED ||
+		     hr == D3DERR_DEVICEHUNG ||
 			 hr == D3DERR_OUTOFVIDEOMEMORY ||
 			 hr == D3DERR_DEVICELOST )
 		{
@@ -2964,6 +3056,8 @@ const char *CShaderDeviceDx8::GetDeviceStateDescription( CShaderDeviceDx8::Devic
 			return "Device is hung";
 		case DEVICE_STATE_OUT_OF_GPU_MEMORY:
 			return "Device is out of GPU memory";
+		case DEVICE_STATE_DISPLAY_MODE_CHANGED:
+			return "Desktop display mode changed";
 		case DEVICE_STATE_NEEDS_RESET:
 			return "Device needs reset";
 		default:
@@ -3115,7 +3209,7 @@ void CShaderDeviceDx8::Present()
 				{
 					MarkDeviceLost();
 				}
-				}
+			}
 			else
 			{
 				// S_OK, S_PRESENT_OCCLUDED and S_PRESENT_MODE_CHANGED
@@ -3131,6 +3225,15 @@ void CShaderDeviceDx8::Present()
 					// Occluded applications can continue rendering and all calls will succeed,
 					// but the occluded presentation window will not be updated.
 					MarkPresentOccluded();
+				}
+				else if ( hr == S_PRESENT_MODE_CHANGED )
+				{
+					// The desktop display mode has been changed.  The application can continue rendering,
+					// but there might be color conversion/stretching.  Pick a back buffer format similar
+					// to the current display mode, and call ResetEx to recreate the swap chains.
+					//
+					// The device will leave this state after a ResetEx is called.
+					MarkDeviceDisplayModeChange();
 				}
 			}
 		}

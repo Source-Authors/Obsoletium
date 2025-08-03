@@ -208,8 +208,12 @@ protected:
 		DEVICE_STATE_OK = 0,
 		DEVICE_STATE_OTHER_APP_INIT,
 		DEVICE_STATE_LOST_DEVICE,
+		// dimhotepus: Handle D3DERR_DEVICEHUNG.
 		DEVICE_STATE_HUNG_DEVICE,
+		// dimhotepus: Handle D3DERR_OUTOFVIDEOMEMORY.
 		DEVICE_STATE_OUT_OF_GPU_MEMORY,
+		// dimhotepus: Handle S_PRESENT_MODE_CHANGED.
+		DEVICE_STATE_DISPLAY_MODE_CHANGED,
 		DEVICE_STATE_NEEDS_RESET,
 	};
 
@@ -243,11 +247,14 @@ protected:
 
 	// Queue up the fact that the device was hung
 	void MarkDeviceHung();
-
+	
 	// Queue up the fact that the device was out of GPU memory.
 	void MarkDeviceOutOfGpuMemory();
 
-	// Deals with lost or hung devices
+	// Queue up the fact that the display mode changed and device need to adjust.
+	void MarkDeviceDisplayModeChange();
+
+	// Deals with lost or hung or out of GPU memory devices or desktop mode changes.
 	void CheckDeviceState( bool bOtherAppInitializing );
 
 	// Describe device state.
@@ -255,10 +262,15 @@ protected:
 
 	// Changes the window size
 	bool ResizeWindow( const ShaderDeviceInfo_t &info );
+
+	// Invoke display mode change callbacks.
+	void NotifyDisplayModeChange();
 	
 	// Handle presentation area occlusion.
 	bool IsPresentOccluded();
 	void MarkPresentOccluded();
+	// Handle desktop display mode change (ex. resolution or DPI change).
+	void HandlePresentModeChange();
 
 	void BeginPresent();
 	void EndPresent();
@@ -308,7 +320,9 @@ protected:
 	bool				m_bQueuedDeviceHung : 1;
 	// dimhotepus: Add D3DERR_OUTOFVIDEOMEMORY handling support. Similar to D3DERR_DEVICEHUNG + try to free GPU memory.
 	bool				m_bQueuedDeviceOutOfGpuMemory: 1;
-	// dimhotepus: Add occluded by another window rendering support.
+	// dimhotepus: Add S_PRESENT_MODE_CHANGED handling support.
+	bool				m_bQueuedDeviceDisplayModeChange: 1;
+	// dimhotepus: Add S_PRESENT_OCCLUDED handling support.
 	bool				m_bRenderingOccluded : 1;
 	bool				m_IsResizing : 1;
 	bool				m_bPendingVideoModeChange : 1;
