@@ -11466,7 +11466,12 @@ void CShaderAPIDx8::EvictManagedResourcesInternal()
 
 	if ( auto *device = Dx9Device(); device )
 	{
-		device->EvictManagedResources();
+		const HRESULT hr = device->EvictManagedResources();
+		if ( FAILED( hr ) )
+		{
+			Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 	}
 }
 

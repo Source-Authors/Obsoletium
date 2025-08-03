@@ -1147,7 +1147,7 @@ bool CIndexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 			hr = pD3D->EvictManagedResources();
 			if ( FAILED( hr ) )
 			{
-				Warning( "IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
+				Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
 					se::win::com::com_error_category().message(hr).c_str() );
 			}
 

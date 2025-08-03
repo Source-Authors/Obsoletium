@@ -2868,7 +2868,8 @@ void CMaterialSystem::ResetTempHWMemory( bool bExitingLevel )
 //-----------------------------------------------------------------------------
 void CMaterialSystem::CacheUsedMaterials( )
 {
-	g_pShaderAPI->EvictManagedResources();
+	// dimhotepus: Call mateiralsystem EvictManagedResources which calls shaders
+	EvictManagedResources();
 	size_t count = 0;
 	for (MaterialHandle_t i = FirstMaterial(); i != InvalidMaterial(); i = NextMaterial(i) )
 	{
