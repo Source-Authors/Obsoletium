@@ -229,6 +229,9 @@ protected:
 	// Computes the supersample flags
 	D3DMULTISAMPLE_TYPE ComputeMultisampleType( int nSampleCount );
 
+	// Computes display mode from presentation parameters.
+	[[nodiscard]] static D3DDISPLAYMODEEX GetFullScreenDisplayModeFromPresentParameters(const D3DPRESENT_PARAMETERS &paramters);
+
 	// Is the device active?
 	bool IsActive() const;
 
@@ -299,7 +302,7 @@ protected:
 	DeviceState_t		m_DeviceState;
 
 	bool				m_bOtherAppInitializing : 1;
-	// D3DERR_DEVICELOST support.
+	// D3DERR_DEVICELOST support handling support.
 	bool				m_bQueuedDeviceLost : 1;
 	// dimhotepus: Add D3DERR_DEVICEHUNG handling support.
 	bool				m_bQueuedDeviceHung : 1;
