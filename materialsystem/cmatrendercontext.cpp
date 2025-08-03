@@ -181,21 +181,6 @@ void CMatRenderContextBase::MarkRenderDataUnused( bool bFrameBegin )
 		sm_nRenderLockCount = 0;
 	}
 
-
-	// JAY: DO NOT MERGE FROM TF2 - L4D HAS CHANGED THE UNDERLYING INTERFACE IN A WAY THAT DOESN'T REQUIRE THIS
-#if 0
-	// Switch stacks
-	if ( bFrameBegin )
-	{
-		sm_nRenderStack = 1 - sm_nRenderStack;
-	}
-
-	// Clear the new stack
-#ifdef _DEBUG
-	memset( sm_RenderData[sm_nRenderStack].GetBase(), 0xFF, RenderDataSizeUsed() );
-#endif
-	sm_RenderData[ sm_nRenderStack ].FreeAll( false );
-#else
 	// Just for TF2, don't free the stack until the end of frame.  TF2 Allocates render data and holds it over the lock
 	// period because we haven't revised the studiorender interface yet to change patterns.
 	// Switch stacks
@@ -208,9 +193,6 @@ void CMatRenderContextBase::MarkRenderDataUnused( bool bFrameBegin )
 #endif
 		sm_RenderData[ sm_nRenderStack ].FreeAll( false );
 	}
-#endif
-
-
 }
 
 intp CMatRenderContextBase::RenderDataSizeUsed() const
