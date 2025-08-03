@@ -2442,16 +2442,21 @@ bool CShaderDeviceDx8::TryDeviceReset( DeviceState_t deviceState )
 	}
 
 	AssertMsg( m_createDeviceThreadId == ThreadGetCurrentId(),
-		"IDirect3DDevice9Ex::Reset can be perfomed only on same thread which created device." );
+		"IDirect3DDevice9Ex::ResetEx can be perfomed only on same thread which created device." );
+
+	// dimhotepus: For fullscreen display mode we must initialize one. Should be nullptr when windowed.
+	// See https://learn.microsoft.com/en-us/windows/win32/api/d3d9/nf-d3d9-idirect3d9ex-createdeviceex
+	D3DDISPLAYMODEEX fullScreenDisplayMode = GetFullScreenDisplayModeFromPresentParameters( m_PresentParameters );
+	D3DDISPLAYMODEEX *pFullScreenDisplayMode = m_PresentParameters.Windowed ? nullptr : &fullScreenDisplayMode;
 
 	// FIXME: Make this rebuild the Dx9Device from scratch!
 	// Helps with compatibility
-	const HRESULT hr{ D3D9Device()->Reset( &m_PresentParameters ) };
+	const HRESULT hr{ D3D9Device()->ResetEx( &m_PresentParameters, pFullScreenDisplayMode) };
 	bool bResetSuccess = SUCCEEDED( hr );
 	if ( !bResetSuccess )
 	{
 		// May fail, perfectly valid.
-		DMsg( "render", 0, "IDirect3DDevice9Ex::Reset failed w/e %s. Continue GPU resetting...\n",
+		DMsg( "render", 0, "IDirect3DDevice9Ex::ResetEx failed w/e %s. Continue GPU resetting...\n",
 			se::win::com::com_error_category().message(hr).c_str() );
 	}
 
@@ -2603,9 +2608,14 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 	SetPresentParameters( m_hWnd, m_DisplayAdapter, info );
 
 	AssertMsg( m_createDeviceThreadId == ThreadGetCurrentId(),
-		"IDirect3DDevice9Ex::Reset can be perfomed only on same thread which created device." );
+		"IDirect3DDevice9Ex::ResetEx can be perfomed only on same thread which created device." );
 
-	const HRESULT hr{ D3D9Device()->Reset( &m_PresentParameters ) };
+	// dimhotepus: For fullscreen display mode we must initialize one. Should be nullptr when windowed.
+	// See https://learn.microsoft.com/en-us/windows/win32/api/d3d9/nf-d3d9-idirect3d9ex-createdeviceex
+	D3DDISPLAYMODEEX fullScreenDisplayMode = GetFullScreenDisplayModeFromPresentParameters( m_PresentParameters );
+	D3DDISPLAYMODEEX *pFullScreenDisplayMode = m_PresentParameters.Windowed ? nullptr : &fullScreenDisplayMode;
+
+	const HRESULT hr{ D3D9Device()->ResetEx( &m_PresentParameters, pFullScreenDisplayMode ) };
 	if ( SUCCEEDED( hr ) )
 	{
 		ReacquireResourcesInternal( true, true, "ResizeWindow" );
@@ -2613,7 +2623,7 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 	}
 
 	// May fail, perfectly valid.
-	DMsg( "render", 0, "IDirect3DDevice9Ex::Reset failed w/e %s. Continue GPU resetting...\n",
+	DMsg( "render", 0, "IDirect3DDevice9Ex::ResetEx failed w/e %s. Continue GPU resetting...\n",
 			se::win::com::com_error_category().message(hr).c_str() );
 	return false;
 }
