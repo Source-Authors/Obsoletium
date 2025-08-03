@@ -922,6 +922,15 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+	// dimhotepus: Handy when we will add window resize.
+	case WM_GETMINMAXINFO:
+	{
+		auto minmaxInfo = reinterpret_cast<MINMAXINFO*>(lParam);
+		minmaxInfo->ptMinTrackSize.x = BASE_WIDTH;
+		minmaxInfo->ptMinTrackSize.y = BASE_HEIGHT;
+	}
+		break;
+
 	case WM_SYSCHAR:
 		// keep Alt-Space from happening
 		break;
