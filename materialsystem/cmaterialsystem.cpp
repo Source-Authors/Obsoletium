@@ -3417,9 +3417,9 @@ void CMaterialSystem::EndFrame( void )
 
 	if ( m_ThreadMode == MATERIAL_SINGLE_THREADED )
 	{
-		for ( int i = 0; i < m_threadEvents.Count(); i++ )
+		for ( auto ev : m_threadEvents )
 		{
-			g_pShaderDevice->HandleThreadEvent(m_threadEvents[i]);
+			g_pShaderDevice->HandleThreadEvent(ev);
 		}
 		m_threadEvents.RemoveAll();
 	}
