@@ -892,6 +892,17 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	case WM_SIZE:
 		if ( wParam != SIZE_MINIMIZED )
 		{
+			RECT rcClient;
+			::GetClientRect( hWnd, &rcClient );
+			if ( rcClient.top == 0 && rcClient.bottom == 0 )
+			{
+				// Rapidly clicking the task bar to minimize and restore a window
+				// can cause a WM_SIZE message with SIZE_RESTORED when
+				// the window has actually become minimized due to rapid change
+				// so just ignore this message
+				break;
+			}
+
 			// Update restored client rect
 			::GetClientRect( hWnd, &m_rcLastRestoredClientRect );
 		}
