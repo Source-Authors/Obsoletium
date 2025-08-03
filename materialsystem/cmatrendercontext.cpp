@@ -235,15 +235,13 @@ float	CMatRenderContextBase::Knob( char *knobname, float *setvalue )
 
 void CMatRenderContextBase::InitializeFrom( CMatRenderContextBase *pInitialState )
 {
-	int i;
-
 	m_pCurrentMaterial = pInitialState->m_pCurrentMaterial;
 	m_pCurrentProxyData = pInitialState->m_pCurrentProxyData;
 	m_lightmapPageID = pInitialState->m_lightmapPageID;
 	m_pUserDefinedLightmap = pInitialState->m_pUserDefinedLightmap;
 	m_pLocalCubemapTexture = pInitialState->m_pLocalCubemapTexture;
 
-	memcpy( m_pCurrentFrameBufferCopyTexture, pInitialState->m_pCurrentFrameBufferCopyTexture, MAX_FB_TEXTURES * sizeof(ITexture *) );
+	BitwiseCopy(pInitialState->m_pCurrentFrameBufferCopyTexture, m_pCurrentFrameBufferCopyTexture);
 
 	m_bEnableClipping = pInitialState->m_bEnableClipping;
 
@@ -261,7 +259,7 @@ void CMatRenderContextBase::InitializeFrom( CMatRenderContextBase *pInitialState
 	}
 
 	m_MatrixMode = pInitialState->m_MatrixMode;
-	for ( i = 0; i < NUM_MATRIX_MODES; i++ )
+	for ( intp i = 0; i < NUM_MATRIX_MODES; i++ )
 	{
 		m_MatrixStacks[i].CopyFrom( pInitialState->m_MatrixStacks[i] );
 	}

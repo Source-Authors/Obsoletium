@@ -339,7 +339,7 @@ void CommitSetRasterState(
     pDeviceContext->RSSetState(rasterizer_state);
     currentState.m_pRasterState = std::move(rasterizer_state);
 
-    BitwiseCopy(&newState, &currentState.m_RasterState);
+    BitwiseCopy(&newState, &currentState.m_RasterState, 1);
   }
 }
 
