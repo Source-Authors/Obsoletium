@@ -1970,20 +1970,15 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	bool bMonitorGammaChanged = false;
 	bool bVideoModeChange = false;
 	bool bResetTextureFilter = false;
-	bool bForceAltTab = false;
 
 	// internal config settings
-#ifndef _X360
 	MaterialSystem_Config_Internal_t config_internal;
 	config_internal.r_waterforceexpensive = r_waterforceexpensive.GetInt();
-#endif
 
 	if ( !g_pShaderDevice->IsUsingGraphics() )
 	{
 		g_config = config;
-#ifndef _X360
 		g_config_internal = config_internal;
-#endif
 
 		// Shouldn't call this more than once.
 		ColorSpace::SetGamma( 2.2f, 2.2f, OVERBRIGHT, g_config.bAllowCheats, false );
@@ -2023,13 +2018,12 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	{
 		if ( mat_debugalttab.GetBool() )
 		{
-			Warning( "mat_debugalttab: Setting forceUpdate, bReloadMaterials, and bForceAltTab because new hdr level = %d and old hdr level = %d\n",
+			Warning( "mat_debugalttab: Setting forceUpdate and bReloadMaterials because new hdr level = %d and old hdr level = %d\n",
 				( int )config.HDREnabled(), g_config.HDREnabled() );
 		}
 
 		forceUpdate = true;
 		bReloadMaterials = true;
-		bForceAltTab = true;
 	}
 
 	if ( config.ShadowDepthTexture() != g_config.ShadowDepthTexture() )
@@ -2163,7 +2157,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		bReloadMaterials = true;
 	}
 
-#ifndef _X360
 	if ( config_internal.r_waterforceexpensive != g_config_internal.r_waterforceexpensive )
 	{
 		if ( mat_debugalttab.GetBool() )
@@ -2173,7 +2166,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		}
 		bReloadMaterials = true;
 	}
-#endif
 
 	// generic things that cause us to redownload lightmaps
 	if ( config.bAllowCheats != g_config.bAllowCheats )
@@ -2267,9 +2259,7 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 #endif
 
 	g_config = config;
-#ifndef _X360
 	g_config_internal = config_internal;
-#endif
 
 	if ( dxSupportLevelChanged )
 	{
@@ -2284,23 +2274,20 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	if ( bRedownloadTextures || bRedownloadLightmaps )
 	{
 		// Get rid of this?
-		ColorSpace::SetGamma( 2.2f, 2.2f, OVERBRIGHT, g_config.bAllowCheats, false );
+		ColorSpace::SetGamma( GAMMA, TEXGAMMA, OVERBRIGHT, g_config.bAllowCheats, false );
 	}
 
-	// 360 does not support various configuration changes and cannot reload materials
-	if ( !IsX360() )
+	if ( bResetAnisotropy || recomputeSnapshots || bRedownloadLightmaps ||
+		// dimhotepus: Ensure single-threaded material system on dx level change.
+		bRedownloadTextures || dxSupportLevelChanged || bVideoModeChange ||
+		bSetStandardVertexShaderConstants || bResetTextureFilter )
 	{
-		if ( bResetAnisotropy || recomputeSnapshots || bRedownloadLightmaps ||
-			// dimhotepus: Ensure single-threaded material system on dx level change.
-			bRedownloadTextures || dxSupportLevelChanged || bVideoModeChange ||
-			bSetStandardVertexShaderConstants || bResetTextureFilter )
-		{
-			Unlock( hLock );
-			ForceSingleThreaded();
-			hLock = Lock();
-		}
+		Unlock( hLock );
+		ForceSingleThreaded();
+		hLock = Lock();
 	}
-	if ( bReloadMaterials && !IsX360() )
+
+	if ( bReloadMaterials )
 	{
 		if ( mat_debugalttab.GetBool() )
 		{
@@ -2309,10 +2296,7 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		ReloadMaterials();
 	}
 
-	// 360 does not support various configuration changes and cannot reload textures
-	// 360 has no reason to reload textures, it's unnecessary and massively expensive
-	// 360 does not use this path as an init affect to get its textures into memory
-	if ( bRedownloadTextures && !IsX360() )
+	if ( bRedownloadTextures )
 	{
 		if ( mat_debugalttab.GetBool() )
 		{
@@ -2387,13 +2371,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		uint height = info.m_DisplayMode.m_nHeight;
 		g_pLauncherMgr->RenderedSize( width, height, true ); // true = set
 #endif
-	}
-
-	if ( bForceAltTab )
-	{
-		// Simulate an Alt-Tab
-//		g_pShaderAPI->ReleaseResources();
-//		g_pShaderAPI->ReacquireResources();
 	}
 
 	Unlock( hLock );
