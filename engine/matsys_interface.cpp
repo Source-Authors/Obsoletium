@@ -73,8 +73,6 @@ void RestoreMaterialSystemObjects( int nChangeFlags );
 extern ConVar mat_colorcorrection;
 extern ConVar sv_allow_color_correction;
 
-ConVar mat_debugalttab( "mat_debugalttab", "0", FCVAR_CHEAT );
-
 // Static pointers to renderable textures
 static CTextureReference g_PowerOfTwoFBTexture;
 static CTextureReference g_WaterReflectionTexture;
@@ -1114,11 +1112,6 @@ static ITexture *CreateResolvedFullFrameDepthTexture( void )
 void InitWellKnownRenderTargets( void )
 {
 #if !defined( SWDS )
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: InitWellKnownRenderTargets\n" );
-	}
-
 	// Begin block in which all render targets should be allocated
 	materials->BeginRenderTargetAllocation();
 
@@ -1202,11 +1195,6 @@ void InitWellKnownRenderTargets( void )
 void ShutdownWellKnownRenderTargets( void )
 {
 #if !defined( SWDS )
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: ShutdownWellKnownRenderTargets\n" );
-	}
-
 	g_PowerOfTwoFBTexture.Shutdown();
 	g_BuildCubemaps16BitTexture.Shutdown();
 		
@@ -1261,11 +1249,6 @@ CON_COMMAND( mat_reset_rendertargets, "Resets all the render targets" )
 //-----------------------------------------------------------------------------
 static void InitDebugMaterials( void )
 {
-	if ( IsPC() && mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: InitDebugMaterials\n" );
-	}
-
 	g_materialEmpty = GL_LoadMaterial( "debug/debugempty", TEXTURE_GROUP_OTHER );
 #ifndef SWDS
 	g_materialWireframe = GL_LoadMaterial( "debug/debugwireframe", TEXTURE_GROUP_OTHER );
@@ -1368,11 +1351,6 @@ static void InitDebugMaterials( void )
 //-----------------------------------------------------------------------------
 static void ShutdownDebugMaterials( void )
 {
-	if ( IsPC() && mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: ShutdownDebugMaterials\n" );
-	}
-
 	GL_UnloadMaterial( g_materialEmpty );
 #ifndef SWDS
 	GL_UnloadMaterial( g_pMaterialLightSprite );
