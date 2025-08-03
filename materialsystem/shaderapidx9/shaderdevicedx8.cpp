@@ -2450,7 +2450,8 @@ bool CShaderDeviceDx8::TryDeviceReset( DeviceState_t deviceState )
 	bool bResetSuccess = SUCCEEDED( hr );
 	if ( !bResetSuccess )
 	{
-		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::Reset failed w/e %s.\n",
+		// May fail, perfectly valid.
+		DMsg( "render", 0, "IDirect3DDevice9Ex::Reset failed w/e %s. Continue GPU resetting...\n",
 			se::win::com::com_error_category().message(hr).c_str() );
 	}
 
@@ -2467,7 +2468,7 @@ bool CShaderDeviceDx8::TryDeviceReset( DeviceState_t deviceState )
 		bResetSuccess = SUCCEEDED( D3D9Device()->CheckDeviceState(static_cast<HWND>(m_hWnd)) );
 		if ( bResetSuccess )
 		{
-			Warning("%s. Device has been reset, re-uploading resources now.\n",
+			DWarning( "render", 0, "%s. Device has been reset, re-uploading resources now.\n",
 				GetDeviceStateDescription( deviceState ) );
 		}
 	}
@@ -2611,7 +2612,8 @@ bool CShaderDeviceDx8::ResizeWindow( const ShaderDeviceInfo_t &info )
 		return true;
 	}
 
-	Warning( __FUNCTION__ ": IDirect3DDevice9Ex::Reset failed w/e %s.\n",
+	// May fail, perfectly valid.
+	DMsg( "render", 0, "IDirect3DDevice9Ex::Reset failed w/e %s. Continue GPU resetting...\n",
 			se::win::com::com_error_category().message(hr).c_str() );
 	return false;
 }
