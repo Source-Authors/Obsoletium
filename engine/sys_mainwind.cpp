@@ -890,7 +890,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_SIZE:
-		if ( wParam != SIZE_MINIMIZED )
+		if ( wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED )
 		{
 			RECT rcClient;
 			::GetClientRect( hWnd, &rcClient );
@@ -906,7 +906,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			// Update restored client rect
 			::GetClientRect( hWnd, &m_rcLastRestoredClientRect );
 		}
-		else
+		else if ( wParam == SIZE_MINIMIZED )
 		{
 			// Fix the window rect to have same client area as it used to have
 			// before it got minimized
