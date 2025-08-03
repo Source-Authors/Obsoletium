@@ -130,12 +130,6 @@ InitReturnVal_t CMatRenderContextBase::Init( )
 		nSize = nCommitSize = 1024;
 #endif
 
-		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		if ( gamedir && !Q_stricmp( "garrysmod", gamedir ) )
-		{
-			nSize = 4400 * 1024;
-		}
-
 		// dimhotepus: Check initialization succeeded.
 		if ( !sm_RenderData[0].Init( nSize, nCommitSize, 0, 32 ) )
 		{
