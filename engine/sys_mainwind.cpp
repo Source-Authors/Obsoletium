@@ -157,7 +157,7 @@ public:
 	void			SetMainWindow( SDL_Window* window );
 #else
 #ifdef WIN32
-	LRESULT				WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	LRESULT			WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 #endif
 	void			SetMainWindow( HWND window );
 #endif
@@ -813,8 +813,10 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 								display_state == MONITOR_DISPLAY_STATE::PowerMonitorOff
 								? "Off"
 								: display_state == MONITOR_DISPLAY_STATE::PowerMonitorOn
-								? "On"
-								: "Dimmed");
+									? "On"
+									: display_state == MONITOR_DISPLAY_STATE::PowerMonitorDim
+										? "Dimmed"
+										: "Unknown");
 
 							// TODO: Stop rendering when display is off.
 						}
