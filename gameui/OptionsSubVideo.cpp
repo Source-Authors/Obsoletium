@@ -286,7 +286,7 @@ public:
 				// add the configuration in the combo
 				char szDXLevelName[64];
 				GetNameForDXLevel( dxl, szDXLevelName, sizeof(szDXLevelName) );
-				m_pDXLevel->AddItem( szDXLevelName, new KeyValues("dxlevel", "dxlevel", dxl) );
+				m_pDXLevel->AddItem( szDXLevelName, KeyValuesAD( new KeyValues("dxlevel", "dxlevel", dxl) ) );
 			}
 		}
 
@@ -541,7 +541,7 @@ public:
 			box->SetCancelCommand(new KeyValues("ResetDXLevelCombo"));
 			box->DoModal();
 		}
-				}
+	}
 
 	MESSAGE_FUNC( OnGameUIHidden, "GameUIHidden" )	// called when the GameUI is hidden
 	{
@@ -568,7 +568,7 @@ public:
 			Assert( mat_hdr_level.IsValid() );
 			m_pHDR->ActivateItem( clamp( mat_hdr_level.GetInt(), 0, 2 ) );
 		}
-		}
+	}
 
 	MESSAGE_FUNC_PTR( OnControlModified, "ControlModified", panel )
 	{
