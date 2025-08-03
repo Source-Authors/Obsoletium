@@ -57,8 +57,6 @@
 
 #define VERTEX_FORMAT_INVALID	0xFFFFFFFFFFFFFFFFull
 
-// this is hooked into the engines convar
-extern ConVar mat_debugalttab;
 
 //#define DRAW_SELECTION 1
 #ifdef DRAW_SELECTION
@@ -4872,11 +4870,6 @@ void CMeshMgr::Shutdown()
 //-----------------------------------------------------------------------------
 void CMeshMgr::ReleaseBuffers()
 {
-	if ( IsPC() && mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMeshMgr::ReleaseBuffers\n" );
-	}
-
 	CleanUp();
 	m_DynamicMesh.Reset( );
 	m_DynamicFlexMesh.Reset( );
@@ -4884,10 +4877,6 @@ void CMeshMgr::ReleaseBuffers()
 
 void CMeshMgr::RestoreBuffers()
 {
-	if ( IsPC() && mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMeshMgr::RestoreBuffers\n" );
-	}
 	Init();
 }
 

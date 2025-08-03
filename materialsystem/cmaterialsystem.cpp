@@ -28,9 +28,6 @@
 // NOTE: This must be the last file included!!!
 #include "tier0/memdbgon.h"
 
-// this is hooked into the engines convar
-ConVar mat_debugalttab( "mat_debugalttab", "0", FCVAR_CHEAT );
-
 ConVar mat_forcemanagedtextureintohardware( "mat_forcemanagedtextureintohardware", "1", FCVAR_HIDDEN | FCVAR_ALLOWED_IN_COMPETITIVE );
 
 ConVar mat_supportflashlight( "mat_supportflashlight", "-1", FCVAR_HIDDEN, "0 - do not support flashlight (don't load flashlight shader combos), 1 - flashlight is supported" );
@@ -1082,10 +1079,6 @@ void CMaterialSystem::ForceSingleThreaded()
 			Assert( context.IsInitialized() );
 			context.EndQueue(true);
 		}
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning("Forcing queued mode off!\n");
-		}
 
 		// NOTE: Must happen after EndQueue or proxies get bound again, which is bad.
 		m_ThreadMode = MATERIAL_SINGLE_THREADED;
@@ -1222,11 +1215,6 @@ void CMaterialSystem::RemoveRestoreFunc( MaterialBufferRestoreFunc_t func )
 //-----------------------------------------------------------------------------
 void CMaterialSystem::ReleaseShaderObjects()
 {
-	if( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMaterialSystem::ReleaseShaderObjects\n" );
-	}
-
 	m_HardwareRenderContext.OnReleaseShaderObjects();
 
 	g_pOcclusionQueryMgr->FreeOcclusionQueryObjects();
@@ -1256,10 +1244,6 @@ void CMaterialSystem::RestoreShaderObjects( CreateInterfaceFn shaderFactory, int
 	}
 
 
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMaterialSystem::RestoreShaderObjects\n" );
-	}
 	// Shader API sets this to the max value the card supports when it resets
 	// the state, so restore this value.
 	g_pShaderAPI->SetAnisotropicLevel( GetCurrentConfigForVideoCard().m_nForceAnisotropicLevel );
@@ -1995,11 +1979,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle dx emulation level
 	if ( config.dxSupportLevel != g_config.dxSupportLevel )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: Setting dxSupportLevelChanged, bResetAnisotropy, and bReloadMaterials because new dxlevel = %d and old dxlevel = %d\n",
-				( int )config.dxSupportLevel, g_config.dxSupportLevel );
-		}
 		dxSupportLevelChanged = true;
 		bResetAnisotropy = true;
 
@@ -2016,24 +1995,12 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 
 	if ( config.HDREnabled() != g_config.HDREnabled() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: Setting forceUpdate and bReloadMaterials because new hdr level = %d and old hdr level = %d\n",
-				( int )config.HDREnabled(), g_config.HDREnabled() );
-		}
-
 		forceUpdate = true;
 		bReloadMaterials = true;
 	}
 
 	if ( config.ShadowDepthTexture() != g_config.ShadowDepthTexture() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: Setting forceUpdate, bReloadMaterials and recomputeSnapshots (ShadowDepthTexture changed: %d -> %d)\n",
-				g_config.ShadowDepthTexture() ? 1 : 0, config.ShadowDepthTexture() ? 1 : 0 );
-		}
-
 		forceUpdate = true;
 		bReloadMaterials = true;
 		recomputeSnapshots = true;
@@ -2052,10 +2019,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 
 	if ( forceUpdate )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: forceUpdate is true, therefore setting recomputeSnapshots, bRedownloadLightmaps, bRedownloadTextures, bResetAnisotropy, and bSetStandardVertexShaderConstants\n" );
-		}
 		GetLightmaps()->EnableLightmapFiltering( config.bFilterLightmaps );
 		recomputeSnapshots = true;
 		bRedownloadLightmaps = true;
@@ -2067,10 +2030,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle bump mapping
 	if ( config.UseBumpmapping() != g_config.UseBumpmapping() || config.UsePhong() != g_config.UsePhong() )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: forceUpdate is true, therefore setting recomputeSnapshots, bRedownloadLightmaps, bRedownloadTextures, bResetAnisotropy, and bSetStandardVertexShaderConstants\n" );
-		}
 		recomputeSnapshots = true;
 		bReloadMaterials = true;
 		bResetAnisotropy = true;
@@ -2079,11 +2038,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle specularity
 	if ( config.UseSpecular() != g_config.UseSpecular() )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new usespecular=%d, old usespecular=%d, setting recomputeSnapshots, bReloadMaterials, and bResetAnisotropy\n", 
-				( int )config.UseSpecular(), ( int )g_config.UseSpecular() );
-		}
 		recomputeSnapshots = true;
 		bReloadMaterials = true;
 		bResetAnisotropy = true;
@@ -2092,33 +2046,18 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle parallax mapping
 	if ( config.UseParallaxMapping() != g_config.UseParallaxMapping() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new UseParallaxMapping=%d, old UseParallaxMapping=%d, setting bReloadMaterials\n",
-				( int )config.UseParallaxMapping(), ( int )g_config.UseParallaxMapping() );
-		}
 		bReloadMaterials = true;
 	}
 	
 	// Reload materials if we want reduced fillrate
 	if ( config.ReduceFillrate() != g_config.ReduceFillrate() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new ReduceFillrate=%d, old ReduceFillrate=%d, setting bReloadMaterials\n",
-				( int )config.ReduceFillrate(), ( int )g_config.ReduceFillrate() );
-		}
 		bReloadMaterials = true;
 	}
 
 	// toggle reverse depth
 	if ( config.bReverseDepth != g_config.bReverseDepth )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new ReduceFillrate=%d, old ReduceFillrate=%d, setting bReloadMaterials\n",
-				( int )config.ReduceFillrate(), ( int )g_config.ReduceFillrate() );
-		}
 		recomputeSnapshots = true;
 		bResetAnisotropy = true;
 	}
@@ -2126,11 +2065,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle no transparency
 	if ( config.bNoTransparency != g_config.bNoTransparency )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new bNoTransparency=%d, old bNoTransparency=%d, setting recomputeSnapshots and bResetAnisotropy\n",
-				( int )config.bNoTransparency, ( int )g_config.bNoTransparency );
-		}
 		recomputeSnapshots = true;
 		bResetAnisotropy = true;
 	}
@@ -2138,43 +2072,23 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle lightmap filtering
 	if ( config.bFilterLightmaps != g_config.bFilterLightmaps )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new bFilterLightmaps=%d, old bFilterLightmaps=%d, setting EnableLightmapFiltering\n",
-				( int )config.bFilterLightmaps, ( int )g_config.bFilterLightmaps );
-		}
 		GetLightmaps()->EnableLightmapFiltering( config.bFilterLightmaps );
 	}
 	
 	// toggle software lighting
 	if ( config.bSoftwareLighting != g_config.bSoftwareLighting )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new bSoftwareLighting=%d, old bSoftwareLighting=%d, setting bReloadMaterials\n",
-				( int )config.bFilterLightmaps, ( int )g_config.bFilterLightmaps );
-		}
 		bReloadMaterials = true;
 	}
 
 	if ( config_internal.r_waterforceexpensive != g_config_internal.r_waterforceexpensive )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new r_waterforceexpensive=%d, old r_waterforceexpensive=%d, setting bReloadMaterials\n",
-				( int )config_internal.r_waterforceexpensive, ( int )g_config_internal.r_waterforceexpensive );
-		}
 		bReloadMaterials = true;
 	}
 
 	// generic things that cause us to redownload lightmaps
 	if ( config.bAllowCheats != g_config.bAllowCheats )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new bAllowCheats=%d, old bAllowCheats=%d, setting bRedownloadLightmaps\n",
-				( int )config.bAllowCheats, ( int )g_config.bAllowCheats );
-		}
 		bRedownloadLightmaps = true;
 	}
 
@@ -2187,10 +2101,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		config.bShowLowResImage != g_config.bShowLowResImage 
 		)
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: setting bRedownloadTextures, recomputeSnapshots, and bResetAnisotropy\n" );
-		}
 		bRedownloadTextures = true;
 		recomputeSnapshots = true;
 		bResetAnisotropy = true;
@@ -2198,21 +2108,11 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 
 	if ( config.ForceTrilinear() != g_config.ForceTrilinear() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new forcetrilinear: %d, old forcetrilinear: %d, setting bResetTextureFilter\n",
-				( int )config.ForceTrilinear(), ( int )g_config.ForceTrilinear() );
-		}
 		bResetTextureFilter = true;
 	}
 
 	if ( config.m_nForceAnisotropicLevel != g_config.m_nForceAnisotropicLevel )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new m_nForceAnisotropicLevel: %d, old m_nForceAnisotropicLevel: %d, setting bResetAnisotropy and bResetTextureFilter\n",
-				( int )config.ForceTrilinear(), ( int )g_config.ForceTrilinear() );
-		}
 		bResetAnisotropy = true;
 		bResetTextureFilter = true;
 	}
@@ -2221,11 +2121,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		config.m_fGammaTVRangeMax != g_config.m_fGammaTVRangeMax ||	config.m_fGammaTVExponent != g_config.m_fGammaTVExponent ||
 		config.m_bGammaTVEnabled != g_config.m_bGammaTVEnabled )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new monitorgamma: %f, old monitorgamma: %f, setting bMonitorGammaChanged\n",
-				config.m_fMonitorGamma, g_config.m_fMonitorGamma );
-		}
 		bMonitorGammaChanged = true;
 	}
 
@@ -2238,10 +2133,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		config.Borderless() != g_config.Borderless() ||
 		config.Stencil() != g_config.Stencil() )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: video mode changed for one of various reasons\n" );
-		}
 		bVideoModeChange = true;
 	}
 
@@ -2250,10 +2141,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 #if !defined( DX_TO_GL_ABSTRACTION )
 	if ( (!config.Windowed() && !config.Borderless()) && (config.WaitForVSync() != g_config.WaitForVSync()) )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: video mode changed due to toggle of wait for vsync\n" );
-		}
 		bVideoModeChange = true;
 	}
 #endif
@@ -2263,10 +2150,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 
 	if ( dxSupportLevelChanged )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: dx support level changed, clearing snapshots\n" );
-		}
 		// All snapshots have basically become invalid;
 		g_pShaderAPI->ClearSnapshots();
 	}
@@ -2289,20 +2172,11 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 
 	if ( bReloadMaterials )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: ReloadMaterials\n" );
-		}
 		ReloadMaterials();
 	}
 
 	if ( bRedownloadTextures )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: redownloading textures\n" );
-		}
-
 		if ( g_pShaderAPI->CanDownloadTextures() )
 		{
 			TextureManager()->RestoreRenderTargets();
@@ -2311,57 +2185,33 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	}
 	else if ( bResetTextureFilter )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: ResetTextureFilteringState\n" );
-		}
 		TextureManager()->ResetTextureFilteringState();
 	}
 
 	// Recompute all state snapshots
 	if ( recomputeSnapshots )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: RecomputeAllStateSnapshots\n" );
-		}
 		RecomputeAllStateSnapshots();
 	}
 
 	if ( bResetAnisotropy )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: SetAnisotropicLevel\n" );
-		}
 		g_pShaderAPI->SetAnisotropicLevel( config.m_nForceAnisotropicLevel );
 	}
 
 	if ( bSetStandardVertexShaderConstants )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: SetStandardVertexShaderConstants\n" );
-		}
 		g_pShaderAPI->SetStandardVertexShaderConstants( OVERBRIGHT );
 	}
 
 	if ( bMonitorGammaChanged )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: SetHardwareGammaRamp\n" );
-		}
 		g_pShaderDevice->SetHardwareGammaRamp( config.m_fMonitorGamma, config.m_fGammaTVRangeMin, config.m_fGammaTVRangeMax, 
 			config.m_fGammaTVExponent, config.m_bGammaTVEnabled );
 	}
 
 	if ( bVideoModeChange )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: ChangeVideoMode\n" );
-		}
 		ShaderDeviceInfo_t info;
 		ConvertModeStruct( &info, config );
 		g_pShaderAPI->ChangeVideoMode( info );
@@ -2403,20 +2253,12 @@ bool CMaterialSystem::UpdateConfig( bool forceUpdate )
 
 void CMaterialSystem::ReleaseResources()
 {
-	if( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMaterialSystem::ReleaseResources\n" );
-	}
 	g_pShaderAPI->FlushBufferedPrimitives();
 	g_pShaderDevice->ReleaseResources();
 }
 
 void CMaterialSystem::ReacquireResources()
 {
-	if( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMaterialSystem::ReacquireResources\n" );
-	}
 	g_pShaderDevice->ReacquireResources();
 }
 
@@ -3481,10 +3323,6 @@ void CMaterialSystem::EndFrame( void )
 			Assert( nextThreadMode == MATERIAL_SINGLE_THREADED );
 			bRelease = true;
 			nextThreadMode = MATERIAL_SINGLE_THREADED;
-			if( mat_debugalttab.GetBool() )
-			{
-				Warning("Handling alt-tab in queued mode!\n");
-			}
 		}
 	}
 

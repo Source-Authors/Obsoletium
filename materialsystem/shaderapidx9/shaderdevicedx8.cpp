@@ -75,9 +75,6 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CShaderDeviceMgrDx8, IShaderDeviceMgr,
 // hook into mat_forcedynamic from the engine.
 static ConVar mat_forcedynamic( "mat_forcedynamic", "0", FCVAR_CHEAT );
 
-// this is hooked into the engines convar
-ConVar mat_debugalttab( "mat_debugalttab", "0", FCVAR_CHEAT );
-
 
 //-----------------------------------------------------------------------------
 //
@@ -2265,11 +2262,6 @@ void CShaderDeviceDx8::FreeFrameSyncTextureObject()
 
 void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 {
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CShaderAPIDX8::AllocFrameSyncObjects\n" );
-	}
-
 	// Allocate the texture for frame syncing in case we force that to be on.
 	AllocFrameSyncTextureObject();
 
@@ -2312,11 +2304,6 @@ void CShaderDeviceDx8::AllocFrameSyncObjects( void )
 
 void CShaderDeviceDx8::FreeFrameSyncObjects( void )
 {
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CShaderAPIDX8::FreeFrameSyncObjects\n" );
-	}
-
 	FreeFrameSyncTextureObject();
 
 	// FIXME FIXME FIXME!!!!!  Need to record this.

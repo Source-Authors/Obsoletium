@@ -118,8 +118,6 @@ ConVar mat_frame_sync_enable( "mat_frame_sync_enable", "1", FCVAR_CHEAT );
 ConVar mat_frame_sync_force_texture( "mat_frame_sync_force_texture", "0", FCVAR_CHEAT, "Force frame syncing to lock a managed texture." );
 
 
-extern ConVar mat_debugalttab;
-
 #define ALLOW_SMP_ACCESS 0
 
 #if ALLOW_SMP_ACCESS
@@ -1981,10 +1979,6 @@ bool CShaderAPIDx8::CanDownloadTextures() const
 void CShaderAPIDx8::AcquireInternalRenderTargets()
 {
 	GLMPRINTF(( ">-A- CShaderAPIDx8::AcquireInternalRenderTargets... "));
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CShaderAPIDx8::AcquireInternalRenderTargets\n" );
-	}
 
 	if ( !m_pBackBufferSurface )
 	{
@@ -2029,10 +2023,6 @@ void CShaderAPIDx8::AcquireInternalRenderTargets()
 void CShaderAPIDx8::ReleaseInternalRenderTargets( )
 {
 	GLMPRINTF(( ">-A- CShaderAPIDx8::ReleaseInternalRenderTargets... "));
-	if( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CShaderAPIDx8::ReleaseInternalRenderTargets\n" );
-	}
 
 	// Note: This function does not release renderable textures created elsewhere
 	//       Those should be released separately via the texure manager
@@ -11457,11 +11447,6 @@ void CShaderAPIDx8::EvictManagedResourcesInternal()
 	{
 		ShaderUtil()->OnThreadEvent( SHADER_THREAD_EVICT_RESOURCES );
 		return;
-	}
-
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CShaderAPIDx8::EvictManagedResourcesInternal\n" );
 	}
 
 	if ( auto *device = Dx9Device(); device )
