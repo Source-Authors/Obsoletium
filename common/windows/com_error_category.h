@@ -110,21 +110,13 @@ inline const char* GetD3DErrorDescription(HRESULT hr) {
     case D3DERR_DEVICEHUNG:
       return "D3DERR_DEVICEHUNG: The device that returned this code caused the "
              "hardware adapter to be reset by the OS. Most applications should "
-             "destroy the device and quit. Applications that must continue "
-             "should destroy all video memory objects (surfaces, textures, "
-             "state blocks etc) and call Reset() to put the device in a "
-             "default state. If the application then continues rendering in "
-             "the same way, the device will return to this state.";
+             "destroy the device and quit.";
 
     case D3DERR_DEVICELOST:
       return "D3DERR_DEVICELOST: The device has been lost but cannot be reset "
              "at this time. Therefore, rendering is not possible. A Direct3D "
              "device object other than the one that returned this code caused "
-             "the hardware adapter to be reset by the OS. Delete all video "
-             "memory objects (surfaces, textures, state blocks) and call "
-             "Reset() to return the device to a default state. If the "
-             "application continues rendering without a reset, the rendering "
-             "calls will succeed.";
+             "the hardware adapter to be reset by the OS.";
 
     case D3DERR_DEVICENOTRESET:
       return "D3DERR_DEVICENOTRESET: The device has been lost but can be reset "
@@ -133,9 +125,7 @@ inline const char* GetD3DErrorDescription(HRESULT hr) {
     case D3DERR_DEVICEREMOVED:
       return "D3DERR_DEVICEREMOVED: The hardware adapter has been removed. "
              "Application must destroy the device, do enumeration of adapters "
-             "and create another Direct3D device. If application continues "
-             "rendering without calling Reset, the rendering calls will "
-             "succeed.";
+             "and create another Direct3D device.";
 
     case D3DERR_DRIVERINTERNALERROR:
       return "D3DERR_DRIVERINTERNALERROR: Internal driver error. Applications "
@@ -172,10 +162,7 @@ inline const char* GetD3DErrorDescription(HRESULT hr) {
       return "D3DERR_OUTOFVIDEOMEMORY: Direct3D does not have enough display "
              "memory to perform the operation. The device is using more "
              "resources in a single scene than can fit simultaneously into "
-             "video memory. Present, PresentEx, or CheckDeviceState can return "
-             "this error. Recovery is similar to D3DERR_DEVICEHUNG, though the "
-             "application may want to reduce its per-frame memory usage as "
-             "well to avoid having the error recur.";
+             "video memory.";
 
     case D3DERR_TOOMANYOPERATIONS:
       return "D3DERR_TOOMANYOPERATIONS: The application is requesting more "
@@ -244,10 +231,7 @@ inline const char* GetD3DErrorDescription(HRESULT hr) {
     case S_PRESENT_MODE_CHANGED:
       return "S_PRESENT_MODE_CHANGED: The desktop display mode has been "
              "changed. The application can continue rendering, but there might "
-             "be color conversion/stretching. Pick a back buffer format "
-             "similar to the current display mode, and call Reset to recreate "
-             "the swap chains. The device will leave this state after a Reset "
-             "is called. Direct3D 9Ex only.";
+             "be color conversion/stretching.";
 
     case S_PRESENT_OCCLUDED:
       return "S_PRESENT_OCCLUDED: The presentation area is occluded. Occlusion "
@@ -257,7 +241,7 @@ inline const char* GetD3DErrorDescription(HRESULT hr) {
              "that monitor. Occlusion will not occur if the client area is "
              "covered by another Window. Occluded applications can continue "
              "rendering and all calls will succeed, but the occluded "
-             "presentation window will not be updated. Direct3D 9Ex only.";
+             "presentation window will not be updated.";
 
     case D3DERR_UNSUPPORTEDOVERLAY:
       return "D3DERR_UNSUPPORTEDOVERLAY: The device does not support overlay "
