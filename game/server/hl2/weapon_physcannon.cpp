@@ -344,7 +344,7 @@ IPhysicsObject *GetRagdollChildAtPosition( CBaseEntity *pTarget, const Vector &p
 	int count = pTarget->VPhysicsGetObjectList( pList, ARRAYSIZE( pList ) );
 	
 	IPhysicsObject *pBestChild = NULL;
-	float			flBestDist = 99999999.0f;
+	float			flBestDist = std::numeric_limits<float>::max();
 	float			flDist;
 	Vector			vPos;
 
