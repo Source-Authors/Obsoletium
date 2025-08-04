@@ -18,12 +18,14 @@ class CBaseToolBar : public CToolBar {
                 CRect rcBorders = CRect(0, 0, 0, 0),
                 UINT nID = AFX_IDW_TOOLBAR) override;
 
-  BOOL LoadToolBarForDpi(LPCTSTR lpszResourceName, LPCTSTR lpszBitmapName);
-  BOOL LoadToolBarForDpi(UINT nIDResource, UINT nIDBitmap = UINT_MAX) {
+  BOOL LoadToolBarForDpi(LPCTSTR lpszResourceName, LPCTSTR lpszBitmapName,
+                         bool isTransparentBitmap);
+  BOOL LoadToolBarForDpi(UINT nIDResource, UINT nIDBitmap = UINT_MAX,
+                         bool isTransparentBitmap = true) {
     return LoadToolBarForDpi(MAKEINTRESOURCE(nIDResource),
                              nIDBitmap == UINT_MAX
                                  ? MAKEINTRESOURCE(nIDResource)
-                                 : MAKEINTRESOURCE(nIDBitmap));
+                                 : MAKEINTRESOURCE(nIDBitmap), isTransparentBitmap);
   }
 
  protected:
@@ -34,7 +36,7 @@ class CBaseToolBar : public CToolBar {
   DECLARE_MESSAGE_MAP()
 
   void SetSizesForDpi(SIZE sizeButton, SIZE sizeImage);
-  BOOL LoadBitmapForDpi(LPCTSTR lpszResourceName);
+  BOOL LoadBitmapForDpi(LPCTSTR lpszResourceName, bool isTransparent);
 
  private:
   se::windows::ui::CDpiWindowBehavior m_dpi_behavior;

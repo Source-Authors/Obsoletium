@@ -43,7 +43,8 @@ BOOL CBaseToolBar::CreateEx(CWnd* pParentWnd, DWORD dwCtrlStyle, DWORD dwStyle,
 }
 
 BOOL CBaseToolBar::LoadToolBarForDpi(LPCTSTR lpszResourceName,
-                                     LPCTSTR lpszBitmapName) {
+                                     LPCTSTR lpszBitmapName,
+                                     bool isTransparentBitmap) {
   ASSERT_VALID(this);
   Assert(lpszResourceName != nullptr);
   Assert(lpszBitmapName != nullptr);
@@ -71,7 +72,7 @@ BOOL CBaseToolBar::LoadToolBarForDpi(LPCTSTR lpszResourceName,
     SetSizesForDpi(sizeButton, sizeImage);
 
     // load bitmap now that sizes are known by the toolbar control
-    bResult = LoadBitmapForDpi(lpszBitmapName);
+    bResult = LoadBitmapForDpi(lpszBitmapName, isTransparentBitmap);
   }
 
   ::UnlockResource(hGlobal);
@@ -97,7 +98,8 @@ void CBaseToolBar::SetSizesForDpi(SIZE sizeButton, SIZE sizeImage) {
   __super::SetSizes(scaledSizeButton, scaledSizeImage);
 }
 
-BOOL CBaseToolBar::LoadBitmapForDpi(LPCTSTR lpszResourceName) {
+BOOL CBaseToolBar::LoadBitmapForDpi(LPCTSTR lpszResourceName,
+                                    bool isTransparent) {
   ASSERT_VALID(this);
   ASSERT(lpszResourceName != nullptr);
 
@@ -111,7 +113,7 @@ BOOL CBaseToolBar::LoadBitmapForDpi(LPCTSTR lpszResourceName) {
   // load the colored bitmap
   HBITMAP hbmImageWell{(HBITMAP)::LoadImage(
       ::AfxGetInstanceHandle(), lpszResourceName, IMAGE_BITMAP, 0, 0,  // cx, cy
-      LR_CREATEDIBSECTION)};
+      LR_CREATEDIBSECTION | (isTransparent ? LR_LOADTRANSPARENT : 0))};
   if (hbmImageWell == nullptr) return FALSE;
 
   // scale the bitmap

@@ -344,7 +344,8 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	//
 	m_wndMapEditToolBar.Create(this, dwDefStyles, IDCB_MAPTOOLSBAR);
 	m_wndMapEditToolBar.ModifyStyle(0, TBSTYLE_FLAT); 
-	m_wndMapEditToolBar.LoadToolBarForDpi(IDR_MAPEDITTOOLS_VALVE, IDB_MAPEDITTOOLS_256);
+	// dimhotepus: Not transparent as top pixel similar to others and overall image look weird.
+	m_wndMapEditToolBar.LoadToolBarForDpi(IDR_MAPEDITTOOLS_VALVE, IDB_MAPEDITTOOLS_256, false);
 
 	//
 	// Map operations toolbar.
