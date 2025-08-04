@@ -72,6 +72,9 @@ public:
 
 BEGIN_MESSAGE_MAP(CMapView2DBase, CView)
 	//{{AFX_MSG_MAP(CMapView2DBase)
+	ON_WM_CREATE()
+	ON_WM_DESTROY()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	ON_WM_KEYDOWN()
 	ON_WM_LBUTTONDOWN()
 	ON_WM_MOUSEMOVE()
@@ -137,6 +140,31 @@ CMapView2DBase::~CMapView2DBase(void)
 	delete m_pCamera;
 	delete m_pRender;
 }
+
+
+int CMapView2DBase::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	const int rc{__super::OnCreate(lpCreateStruct)};
+	if (!rc) {
+		m_dpiWindowBehavior.OnCreateWindow(m_hWnd);
+	}
+	return rc;
+}
+
+
+void CMapView2DBase::OnDestroy()
+{
+	m_dpiWindowBehavior.OnDestroyWindow();
+	
+	__super::OnDestroy();
+}
+
+
+LRESULT CMapView2DBase::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	return m_dpiWindowBehavior.OnWindowDpiChanged(wParam, lParam);
+}
+
 
 //-----------------------------------------------------------------------------
 // Purpose: 

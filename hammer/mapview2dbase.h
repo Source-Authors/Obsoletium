@@ -18,6 +18,7 @@
 #include "utlvector.h"
 #include "VGuiWnd.h"
 #include "color.h"
+#include "windows/dpi_wnd_behavior.h"
 
 class CTitleWnd;
 class CMapDoc;
@@ -162,8 +163,13 @@ protected:
 	// mouse drag (space + leftbutton):
 	bool	m_bMouseDrag;	// status indicator
 
+	se::windows::ui::CDpiWindowBehavior m_dpiWindowBehavior;
+
 	// Generated message map functions
 	//{{AFX_MSG(CMapView2DBase)
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnDestroy();
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	afx_msg void OnLButtonDblClk(UINT nFlags, CPoint point);

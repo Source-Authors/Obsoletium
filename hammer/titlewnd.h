@@ -47,6 +47,9 @@ class CTitleWnd : public CBaseWnd
 		afx_msg LRESULT OnMouseLeave(WPARAM wParam, LPARAM lParam);
 
 		DECLARE_MESSAGE_MAP()
+
+	private:
+		void CreateFontsOnce();
 };
 
 

@@ -15,6 +15,7 @@
 #include "MapView.h"
 #include "Render3D.h"
 #include "camera.h"
+#include "windows/dpi_wnd_behavior.h"
 
 namespace vgui
 {
@@ -173,8 +174,13 @@ private:
 	bool m_bCameraPosChanged;
 	bool m_bClippingChanged;
 
+	se::windows::ui::CDpiWindowBehavior m_dpiWindowBehavior;
+
 	//{{AFX_MSG(CMapView3D)
 protected:
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnDestroy();
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnTimer(uintp nIDEvent);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
