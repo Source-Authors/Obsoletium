@@ -76,7 +76,7 @@ void CMessageWnd::CreateMessageWindow( CMDIFrameWnd *pwndParent, CRect &rect )
 		if ( ( mws.type == mwError ) || ( mws.type == mwWarning ) )
 		{
 			bErrors = true;
-		}		
+		}
 	}
 	
 	if ( bErrors )
@@ -190,11 +190,8 @@ void CMessageWnd::CalculateScrollSize()
 	if ( m_hWnd == NULL )
 		return;
 
-	int iHorz;
-	int iVert;
-
-	iVert = iNumMsgs * (iMsgPtSize + 2);
-	iHorz = 0;
+	int iVert = iNumMsgs * m_dpi_behavior.ScaleOnY( iMsgPtSize + 2 );
+	int iHorz = 0;
 	for(int i = 0; i < iNumMsgs; i++)
 	{
 		int iTmp = MsgArray[i].MsgLen * iCharWidth;
