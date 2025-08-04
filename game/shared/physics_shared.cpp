@@ -318,7 +318,7 @@ IPhysicsObject *PhysModelCreate( CBaseEntity *pEntity, int modelIndex, const Vec
 			return NULL;
 	}
 
-	int surfaceProp = -1;
+	intp surfaceProp = -1;
 	if ( pSolid->surfaceprop[0] )
 	{
 		surfaceProp = physprops->GetSurfaceIndex( pSolid->surfaceprop );
@@ -376,7 +376,7 @@ IPhysicsObject *PhysModelCreateUnmoveable( CBaseEntity *pEntity, int modelIndex,
 	// collisions are off by default
 	solid.params.enableCollisions = true;
 	//solid.params.mass = 1.0;
-	int surfaceProp = -1;
+	intp surfaceProp = -1;
 	if ( solid.surfaceprop[0] )
 	{
 		surfaceProp = physprops->GetSurfaceIndex( solid.surfaceprop );
@@ -459,7 +459,7 @@ IPhysicsObject *PhysSphereCreate( CBaseEntity *pEntity, float radius, const Vect
 	if ( !physenv )
 		return NULL;
 
-	int surfaceProp = -1;
+	intp surfaceProp = -1;
 	if ( solid.surfaceprop[0] )
 	{
 		surfaceProp = physprops->GetSurfaceIndex( solid.surfaceprop );
@@ -530,7 +530,8 @@ void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pProps, IF
 	}
 	else
 	{
-		Error( "Unable to load surface prop file '%s' (referenced by manifest file '%s')\n", pFileName, SURFACEPROP_MANIFEST_FILE );
+		Error( "Unable to load surface prop file '%s' (referenced by manifest file '%s')\n",
+			pFileName, SURFACEPROP_MANIFEST_FILE );
 	}
 }
 
@@ -591,7 +592,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 	if ( !physenv )
 		return NULL;
 
-	int surfaceData = physprops->GetSurfaceIndex( "default" );
+	intp surfaceData = physprops->GetSurfaceIndex( "default" );
 
 	objectparams_t params = defaultParams;
 	params.pGameData = static_cast<void *>(pWorld);
