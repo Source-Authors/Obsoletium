@@ -201,7 +201,7 @@ void C_TEShatterSurface::PostDataUpdate( DataUpdateType_t updateType )
 	vCurPos.x += 0.5f*m_flShardSize;
 	vCurPos.z += 0.5f*m_flShardSize;
 
-	float flMinSpeed = 9999999999.0f;
+	float flMinSpeed = std::numeric_limits<float>::max();
 	float flMaxSpeed = 0;
 
 	Particle3D *pParticle = NULL;
