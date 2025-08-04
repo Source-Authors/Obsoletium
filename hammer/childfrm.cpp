@@ -198,7 +198,7 @@ void CChildFrame::SetSplitterMode(BOOL bSplitter)
 
 		CRect r;
 		GetClientRect(r);
-		CSize sizeView(r.Width()/2 - 3, r.Height()/2 - 3);
+		CSize sizeView(r.Width()/2 - m_dpi_behavior.ScaleOnX(3), r.Height()/2 -  - m_dpi_behavior.ScaleOnY(3));
 
 		CCreateContext context;
 		context.m_pNewViewClass = NULL;
@@ -566,7 +566,7 @@ BOOL CChildFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 		{
 			delete m_wndSplitter;
 			m_wndSplitter = NULL;
-			TRACE0("Failed to create split bar ");
+			TRACE0("Failed to create 2x2 split bar");
 			return(FALSE);
 		}
 		
