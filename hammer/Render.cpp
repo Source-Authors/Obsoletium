@@ -542,8 +542,9 @@ void CRender::StartRenderFrame()
 
 	pCamera->GetViewMatrix( m_CurrentMatrix );
 
+	const int maxNumLights = MaterialSystemHardwareConfig()->MaxNumLights();
 	// Disable all the lights..
-	for( int i = 0; i < MaterialSystemHardwareConfig()->MaxNumLights(); ++i)
+	for( int i = 0; i < maxNumLights; ++i)
 	{
 		LightDesc_t desc;
 		desc.m_Type = MATERIAL_LIGHT_DISABLE;
