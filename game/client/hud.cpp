@@ -343,7 +343,7 @@ void CHudElement::UnregisterForRenderGroup( const char *pszGroupName )
 void CHudElement::HideLowerPriorityHudElementsInGroup( const char *pszGroupName )
 {
 	// look up the render group
-	int iGroupIndex = gHUD.LookupRenderGroupIndexByName( pszGroupName );
+	intp iGroupIndex = gHUD.LookupRenderGroupIndexByName( pszGroupName );
 
 	// lock the group
 	gHUD.LockRenderGroup( iGroupIndex, this );
@@ -355,7 +355,7 @@ void CHudElement::HideLowerPriorityHudElementsInGroup( const char *pszGroupName 
 void CHudElement::UnhideLowerPriorityHudElementsInGroup( const char *pszGroupName )
 {	
 	// look up the render group
-	int iGroupIndex = gHUD.LookupRenderGroupIndexByName( pszGroupName );
+	intp iGroupIndex = gHUD.LookupRenderGroupIndexByName( pszGroupName );
 
 	// unlock the group
 	gHUD.UnlockRenderGroup( iGroupIndex, this );
@@ -1001,7 +1001,7 @@ intp CHud::LookupRenderGroupIndexByName( const char *pszGroupName )
 // Purpose: A hud element wants to lock this render group so other panels in the
 // group do not draw
 //-----------------------------------------------------------------------------
-bool CHud::LockRenderGroup( int iGroupIndex, CHudElement *pLocker /* = NULL */ )
+bool CHud::LockRenderGroup( intp iGroupIndex, CHudElement *pLocker /* = NULL */ )
 {
 	// does this index exist?
 	if ( !DoesRenderGroupExist(iGroupIndex) )
@@ -1049,7 +1049,7 @@ bool CHud::LockRenderGroup( int iGroupIndex, CHudElement *pLocker /* = NULL */ )
 //-----------------------------------------------------------------------------
 // Purpose: A hud element wants to release the lock on this render group 
 //-----------------------------------------------------------------------------
-bool CHud::UnlockRenderGroup( int iGroupIndex, CHudElement *pLocker /* = NULL */ )
+bool CHud::UnlockRenderGroup( intp iGroupIndex, CHudElement *pLocker /* = NULL */ )
 {
 	// does this index exist?
 	if ( !DoesRenderGroupExist(iGroupIndex) )
@@ -1150,7 +1150,7 @@ int CHud::AddHudRenderGroup( const char *pszGroupName )
 //-----------------------------------------------------------------------------
 // Purpose:  
 //-----------------------------------------------------------------------------
-bool CHud::DoesRenderGroupExist( int iGroupIndex )
+bool CHud::DoesRenderGroupExist( intp iGroupIndex )
 {
 	return ( m_RenderGroups.Find( iGroupIndex ) != m_RenderGroups.InvalidIndex() );
 }

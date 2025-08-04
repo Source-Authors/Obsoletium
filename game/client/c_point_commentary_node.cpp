@@ -147,7 +147,7 @@ public:
 	{
 		if ( !g_CommentaryNodes.Count() )
 		{
-			int iRenderGroup = gHUD.LookupRenderGroupIndexByName( "commentary" );
+			intp iRenderGroup = gHUD.LookupRenderGroupIndexByName( "commentary" );
 			gHUD.LockRenderGroup( iRenderGroup );
 		}
 
@@ -163,7 +163,7 @@ public:
 
 		if ( !g_CommentaryNodes.Count() )
 		{
-			int iRenderGroup = gHUD.LookupRenderGroupIndexByName( "commentary" );
+			intp iRenderGroup = gHUD.LookupRenderGroupIndexByName( "commentary" );
 			gHUD.UnlockRenderGroup( iRenderGroup );
 		}
 	}

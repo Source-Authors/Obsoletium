@@ -152,12 +152,12 @@ public:
 
 	// Hud Render group
 	intp						LookupRenderGroupIndexByName( const char *pszGroupName );
-	bool						LockRenderGroup( int iGroupIndex, CHudElement *pLocker = NULL );
-	bool						UnlockRenderGroup( int iGroupIndex, CHudElement *pLocker = NULL );
+	bool						LockRenderGroup( intp iGroupIndex, CHudElement *pLocker = NULL );
+	bool						UnlockRenderGroup( intp iGroupIndex, CHudElement *pLocker = NULL );
 	bool						IsRenderGroupLockedFor( CHudElement *pHudElement, int iGroupIndex );
 	int							RegisterForRenderGroup( const char *pszGroupName );
 	int							AddHudRenderGroup( const char *pszGroupName );
-	bool						DoesRenderGroupExist( int iGroupIndex );
+	bool						DoesRenderGroupExist( intp iGroupIndex );
 
 	void						SetScreenShotTime( float flTime ){ m_flScreenShotTime = flTime; }
 
@@ -196,7 +196,7 @@ private:
 	CUtlDict< CHudTexture *, int >		m_Icons;
 
 	CUtlVector< const char * >				m_RenderGroupNames;
-	CUtlMap< int, CHudRenderGroup * >		m_RenderGroups;
+	CUtlMap< intp, CHudRenderGroup * >		m_RenderGroups;
 
 	float						m_flScreenShotTime; // used to take end-game screenshots
 };
