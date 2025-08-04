@@ -264,7 +264,7 @@ bool HammerAppSystemGroup::PreInit() {
   search_paths_init.m_pDirectoryName = hammer_->GetDefaultModFullPath();
 
   if (FileSystem_LoadSearchPaths(search_paths_init) != FS_OK) {
-    Error("Unable to load search paths!\n");
+    Error("File system unable to load search paths!\n\nPlease check GameConfig.txt is present and valid.\n");
   }
 
   // Required to run through the editor
