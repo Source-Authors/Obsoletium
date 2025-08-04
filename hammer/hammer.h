@@ -133,10 +133,6 @@ public:
 	void OnActivateApp(bool bActive);
 	bool IsActiveApp();
 
-	void BeginImportWCSettings();
-	void BeginImportVHESettings();
-	void EndImportSettings();
-
 	void BeginClosing();
 	bool IsClosing();
 

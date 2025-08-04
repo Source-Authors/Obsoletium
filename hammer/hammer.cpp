@@ -506,9 +506,6 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 #endif
 
 	// Load the options
-	// NOTE: Have to do this now, because we need it before Inits() are called 
-	// NOTE: SetRegistryKey will cause hammer to look into the registry for its values
-	SetRegistryKey("Valve");
 	Options.Init();
 	return true;
 }
@@ -575,41 +572,6 @@ static void EnsureTrailingBackslash(char *psz, ptrdiff_t size)
 	{
 		V_strncat(psz, "\\", size);
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Tweaks our data members to enable us to import old Hammer settings
-//			from the registry.
-//-----------------------------------------------------------------------------
-static const char *s_pszOldAppName = NULL;
-void CHammer::BeginImportWCSettings(void)
-{
-	s_pszOldAppName = m_pszAppName;
-	m_pszAppName = "Worldcraft";
-	SetRegistryKey("Valve");
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Tweaks our data members to enable us to import old Valve Hammer Editor
-//			settings from the registry.
-//-----------------------------------------------------------------------------
-void CHammer::BeginImportVHESettings(void)
-{
-	s_pszOldAppName = m_pszAppName;
-	m_pszAppName = "Valve Hammer Editor";
-	SetRegistryKey("Valve");
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Restores our tweaked data members to their original state.
-//-----------------------------------------------------------------------------
-void CHammer::EndImportSettings(void)
-{
-	m_pszAppName = s_pszOldAppName;
-	SetRegistryKey("Valve");
 }
 
 
@@ -920,6 +882,17 @@ void UpdatePrefabs_Shutdown()
 //-----------------------------------------------------------------------------
 BOOL CHammer::InitInstance()
 {
+	// dimhotepus: Use Hammer.ini instead of registry to not clash with original Hammer.
+	char szProgram[MAX_PATH], szIniPath[MAX_PATH];
+	APP()->GetDirectory(DIR_PROGRAM, szProgram);
+	V_MakeAbsolutePath( szIniPath, "Hammer.ini", szProgram );
+
+	// dimhotepus: m_pszProfileName allocated and freed internally by MFC so can't use our allocator for it.
+#include "tier0/memdbgoff.h"
+	free((void *)m_pszProfileName);
+	m_pszProfileName = strdup(szIniPath);
+#include "tier0/memdbgon.h"
+
 	return TRUE;
 }
 
@@ -1110,14 +1083,6 @@ InitReturnVal_t CHammer::HammerInternalInit()
 
 	// other init:
 	randomize();
-
-	/*
-#ifdef _AFXDLL
-	Enable3dControls();			// Call this when using MFC in a shared DLL
-#else
-	Enable3dControlsStatic();	// Call this when linking to MFC statically
-#endif
-	*/
 
 	LoadStdProfileSettings();  // Load standard INI file options (including MRU)
 

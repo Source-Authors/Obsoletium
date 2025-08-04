@@ -373,139 +373,15 @@ COptions::COptions(void)
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Looks for the Valve Hammer Editor registry settings and returns whether
-//			they were found.
-//-----------------------------------------------------------------------------
-static bool HammerSettingsFound(void)
-{
-	bool bFound = false;
-	HKEY hkeySoftware;
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_READ | KEY_WRITE, &hkeySoftware) == ERROR_SUCCESS)
-	{
-		HKEY hkeyValve;
-		if (RegOpenKeyEx(hkeySoftware, "Valve", 0, KEY_READ | KEY_WRITE, &hkeyValve) == ERROR_SUCCESS)
-		{
-			HKEY hkeyHammer;
-			if (RegOpenKeyEx(hkeyValve, "Hammer", 0, KEY_READ | KEY_WRITE, &hkeyHammer) == ERROR_SUCCESS)
-			{
-				HKEY hkeyConfigured;
-				if (RegOpenKeyEx(hkeyHammer, "Configured", 0, KEY_READ | KEY_WRITE, &hkeyConfigured) == ERROR_SUCCESS)
-				{
-					bFound = true;
-					RegCloseKey(hkeyConfigured);
-				}
-				RegCloseKey(hkeyHammer);
-			}
-			RegCloseKey(hkeyValve);
-		}
-		RegCloseKey(hkeySoftware);
-	}
-
-	return bFound;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Looks for the Valve Hammer Editor registry settings and returns whether
-//			they were found.
-//-----------------------------------------------------------------------------
-static bool ValveHammerEditorSettingsFound(void)
-{
-	bool bFound = false;
-	HKEY hkeySoftware;
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_READ | KEY_WRITE, &hkeySoftware) == ERROR_SUCCESS)
-	{
-		HKEY hkeyValve;
-		if (RegOpenKeyEx(hkeySoftware, "Valve", 0, KEY_READ | KEY_WRITE, &hkeyValve) == ERROR_SUCCESS)
-		{
-			HKEY hkeyHammer;
-			if (RegOpenKeyEx(hkeyValve, "Valve Hammer Editor", 0, KEY_READ | KEY_WRITE, &hkeyHammer) == ERROR_SUCCESS)
-			{
-				HKEY hkeyConfigured;
-				if (RegOpenKeyEx(hkeyHammer, "Configured", 0, KEY_READ | KEY_WRITE, &hkeyConfigured) == ERROR_SUCCESS)
-				{
-					bFound = true;
-					RegCloseKey(hkeyConfigured);
-				}
-				RegCloseKey(hkeyHammer);
-			}
-			RegCloseKey(hkeyValve);
-		}
-		RegCloseKey(hkeySoftware);
-	}
-
-	return bFound;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Looks for the Worldcraft registry settings and returns whether they
-//			were found.
-//-----------------------------------------------------------------------------
-static bool WorldcraftSettingsFound(void)
-{
-	bool bFound = false;
-	HKEY hkeySoftware;
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_READ | KEY_WRITE, &hkeySoftware) == ERROR_SUCCESS)
-	{
-		HKEY hkeyValve;
-		if (RegOpenKeyEx(hkeySoftware, "Valve", 0, KEY_READ | KEY_WRITE, &hkeyValve) == ERROR_SUCCESS)
-		{
-			HKEY hkeyWorldcraft;
-			if (RegOpenKeyEx(hkeyValve, "Worldcraft", 0, KEY_READ | KEY_WRITE, &hkeyWorldcraft) == ERROR_SUCCESS)
-			{
-				bFound = true;
-				RegCloseKey(hkeyWorldcraft);
-			}
-			RegCloseKey(hkeyValve);
-		}
-		RegCloseKey(hkeySoftware);
-	}
-
-	return bFound;
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 bool COptions::Init(void)
 {
-	//
-	// If the we have no registry settings and the "Valve Hammer Editor" registry tree exists,
-	// import settings from there. If that isn't found, try "Worldcraft".
-	//
-	bool bWCSettingsFound = false;
-	bool bVHESettingsFound = false;
-
-	if (!HammerSettingsFound())
-	{
-		bVHESettingsFound = ValveHammerEditorSettingsFound();
-		if (!bVHESettingsFound)
-		{
-			bWCSettingsFound = WorldcraftSettingsFound();
-		}
-	}
-
-	if (bVHESettingsFound)
-	{
-		APP()->BeginImportVHESettings();
-	}
-	else if (bWCSettingsFound)
-	{
-		APP()->BeginImportWCSettings();
-	}
-
 	SetDefaults();
 	
 	if (!Read())
 	{
 		return false;
-	}
-
-	if (bVHESettingsFound || bWCSettingsFound)
-	{
-		APP()->EndImportSettings();
 	}
 
 	//
