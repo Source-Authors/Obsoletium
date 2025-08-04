@@ -192,7 +192,7 @@ void CChildFrame::SetSplitterMode(BOOL bSplitter)
 		m_wndSplitter = new CMySplitterWnd;
 		if(!m_wndSplitter->CreateStatic(this, 2, 2))
 		{
-			TRACE0("Failed to create split bar ");
+			TRACE0("Failed to create 2x2 split bar.");
 			return;    // failed to create
 		}
 
