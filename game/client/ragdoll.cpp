@@ -28,6 +28,11 @@ CRagdoll::CRagdoll()
 	m_ragdoll.listCount = 0;
 	m_vecLastOrigin.Init();
 	
+	m_mins.Init(-1, -1, -1);
+	m_maxs.Init(-1, -1, -1);
+	m_origin.Init(-1, -1, -1);
+	m_radius = -1;
+	m_allAsleep = false;
 	m_lastUpdate = -FLT_MAX;
 	m_flLastOriginChangeTime = -1.0f;
 	m_flBoneCacheTime = -FLT_MAX;
