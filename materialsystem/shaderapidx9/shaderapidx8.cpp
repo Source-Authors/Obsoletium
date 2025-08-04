@@ -4059,12 +4059,6 @@ void CShaderAPIDx8::BeginPIXEvent( unsigned long color, const char* szName )
 		g_pShaderDeviceMgrDx8->m_pBeginEvent( 0x2F2F2F2F, wszName );
 	}
 #endif
-#elif defined(_X360 )
-#ifndef _DEBUG
-	char szPIXEventName[32];
-	PIXifyName( szPIXEventName, szName );
-	PIXBeginNamedEvent( color, szPIXEventName );
-#endif
 #else // PC
 	if ( PIXError() )
 		return;
@@ -4164,12 +4158,6 @@ void CShaderAPIDx8::SetPIXMarker( unsigned long color, const char* szName )
 		mbstowcs(wszName, szName, 128 );
 		g_pShaderDeviceMgrDx8->m_pSetMarker( 0x2F2F2F2F, wszName );
 	}
-#elif defined( _X360 )
-#ifndef _DEBUG
-	char szPIXMarkerName[32];
-	PIXifyName( szPIXMarkerName, szName );
-	PIXSetMarker( color, szPIXMarkerName );
-#endif
 #else // PC
 	if ( PIXError() )
 		return;
