@@ -64,9 +64,11 @@ SRC_DX_PROXY_API const char* WINAPI GetDllVersion();
 static BOOL ExtractDependencies() { return TRUE; }
 
 // DLL entry point: DllMain
-BOOL WINAPI DllMain(HINSTANCE, DWORD reason, void*) {
+BOOL WINAPI DllMain(HMODULE module, DWORD reason, void*) {
   switch (reason) {
     case DLL_PROCESS_ATTACH:
+      // dimhotepus: No need to notify on thread creation.
+      ::DisableThreadLibraryCalls(module);
       // Process is attaching - make sure it can find the dependencies
       return ExtractDependencies();
   }
