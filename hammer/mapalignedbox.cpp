@@ -119,6 +119,9 @@ CMapAlignedBox::CMapAlignedBox(Vector &Mins, Vector &Maxs)
 	m_bUseKeyName = false;
 	m_bWireframe = false;
 
+	m_MinsKeyName[0] = '\0';
+	m_MaxsKeyName[0] = '\0';
+
 	m_Mins = Mins;
 	m_Maxs = Maxs;
 }
