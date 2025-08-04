@@ -131,14 +131,15 @@ void EditorUtil_ConvertPath(CString &str, bool bExpand)
 // Purpose: Exchanges path data between a CString and an edit control, converting
 //			the Steam path to %STEAM% and back.
 //-----------------------------------------------------------------------------
-void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, OUT_Z_CAP(destSize) char *szDest, intp destSize, bool bExpand)
+void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, INOUT_Z_CAP(destSize) char *szDest, intp destSize, bool bExpand)
 {
-	if (destSize > 0)
-		szDest[0] = '\0';
-
 	CWnd *pwnd = pDlg->GetDlgItem(nIDC);
 	if (!pwnd)
+	{
+		if (bExpand && destSize > 0)
+			szDest[0] = '\0';
 		return;
+	}
 
 	CString str;
 
