@@ -1,4 +1,4 @@
-// Microsoft Visual C++ generated resource script.
+﻿// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -20,7 +20,7 @@
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
-#pragma code_page(1252)
+#pragma code_page(65001)  // Unicode (UTF-8)
 #endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
@@ -52,7 +52,7 @@ BEGIN
     "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
     "#ifdef _WIN32\r\n"
     "LANGUAGE 9, 1\r\n"
-    "#pragma code_page(1252)\r\n"
+    "#pragma code_page(65001)\r\n"
     "#endif\r\n"
     "#include ""afxres.rc""         // Standard components\r\n"
     "#include ""afxprint.rc""       // printing/print preview resources\r\n"
@@ -821,7 +821,7 @@ BEGIN
     PUSHBUTTON      "Close",IDOK,189,49,50,14,WS_GROUP
     ICON            IDR_MAINFRAME,IDC_STATIC,7,7,20,20
     LTEXT           "Valve Hammer Editor is a trademark of Valve Corporation",IDC_STATIC,38,19,186,8
-    LTEXT           "Copyright � 1996-2006, Valve Corporation, All rights reserved.",IDC_STATIC,38,31,201,10
+    LTEXT           "Copyright © 1996-2006, Valve Corporation, All rights reserved.",IDC_STATIC,38,31,201,10
     LTEXT           " ",IDC_REDHERRING,13,47,156,8
     LTEXT           "Build %d",IDC_BUILD_NUMBER,38,7,69,8
 END
@@ -3474,18 +3474,6 @@ BEGIN
     ID_TOGGLE_RADIUSCULLING	"Enable Radius Culling Mode\nRadius Culling"
 END
 
-#endif    // English (U.S.) resources
-/////////////////////////////////////////////////////////////////////////////
-
-
-/////////////////////////////////////////////////////////////////////////////
-// English (Canada) resources
-
-#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENC)
-#ifdef _WIN32
-LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_CAN
-#pragma code_page(1252)
-#endif //_WIN32
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -3494,7 +3482,7 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_CAN
 
 IDC_HANDCURSOR          CURSOR                  "res\\handcurs.cur"
 IDC_HANDCLOSEDCURSOR    CURSOR                  "res\\handclos.cur"
-#endif    // English (Canada) resources
+#endif  // English (U.S.) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -3511,7 +3499,7 @@ IDC_HANDCLOSEDCURSOR    CURSOR                  "res\\handclos.cur"
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
 #ifdef _WIN32
 LANGUAGE 9, 1
-#pragma code_page(1252)
+#pragma code_page(65001)  // Unicode (UTF-8)
 #endif
 #include "afxres.rc"         // Standard components
 #include "afxprint.rc"       // printing/print preview resources
