@@ -37,16 +37,16 @@ set DIRECTX_SDK_BIN_DIR=dx9sdk\utilities
 set DIRECTX_SDK_BIN_DEP=dx9sdk\utilities\D3DX9_43.dll
 
 if /i "%2" == "-dx9_30" goto dx_sdk_dx9_30
-if /i "%2" == "-dx10" goto dx_sdk_dx10
+if /i "%2" == "-dx11" goto dx_sdk_dx11
 goto dx_sdk_end
 :dx_sdk_dx9_30
 			set DIRECTX_SDK_VER=pc09.30
-			set DIRECTX_SDK_BIN_DIR=dx10sdk\utilities\dx9_30
-			set DIRECTX_SDK_BIN_DEP=dx10sdk\utilities\dx9_30\D3DX9_43.dll
+			set DIRECTX_SDK_BIN_DIR=dx9sdk\utilities\dx9_30
+			set DIRECTX_SDK_BIN_DEP=dx9sdk\utilities\dx9_30\D3DX9_43.dll
 			goto dx_sdk_end
-:dx_sdk_dx10
-			set DIRECTX_SDK_VER=pc10.00
-			set DIRECTX_SDK_BIN_DIR=dx10sdk\utilities\dx10_40
+:dx_sdk_dx11
+			set DIRECTX_SDK_VER=pc11.00
+			set DIRECTX_SDK_BIN_DIR=dx11sdk\utilities\dx11
 			set DIRECTX_SDK_BIN_DEP=
 			goto dx_sdk_end
 :dx_sdk_end
@@ -69,7 +69,7 @@ REM USAGE
 REM ****************
 :usage
 echo.
-echo "usage: buildshaders <shaderProjectName> [-dx10 or -game] [gameDir if -game was specified] [-source sourceDir]"
+echo "usage: buildshaders <shaderProjectName> [-dx11 or -game] [gameDir if -game was specified] [-source sourceDir]"
 echo "       gameDir is where gameinfo.txt is (where it will store the compiled shaders)."
 echo "       sourceDir is where the source code is (where it will find scripts and compilers)."
 echo "ex   : buildshaders myshaders"
@@ -169,8 +169,8 @@ REM ****************
 if /i "%DIRECTX_SDK_VER%" == "pc09.00" (
 	rem echo "Copy extra files for dx 9 std
 )
-if /i "%DIRECTX_SDK_VER%" == "pc10.00" (
-	rem echo "Copy extra files for dx 10 std
+if /i "%DIRECTX_SDK_VER%" == "pc11.00" (
+	rem echo "Copy extra files for dx 11 std
 )
 
 echo %SrcDirBase%\%DIRECTX_SDK_BIN_DIR%\dx_proxy.dll >> filestocopy.txt
