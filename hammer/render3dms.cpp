@@ -450,6 +450,8 @@ bool CRender3D::SetView( CMapView *pView )
 
 	m_WinData.hWnd = hwnd;
 
+	m_DpiWindowBehavior.OnCreateWindow(hwnd);
+
 	if ((m_WinData.hDC = GetDCEx(m_WinData.hWnd, NULL, DCX_CACHE | DCX_CLIPSIBLINGS)) == NULL)
 	{
 		ChangeDisplaySettings(NULL, 0);
@@ -1502,7 +1504,7 @@ void CRender3D::EndRenderFrame(void)
 			Vector ViewPoint;
 			GetCamera()->GetViewPoint(ViewPoint);
 			int nLen = V_sprintf_safe(szText, "FPS %3.2f @ Pos [%.2f %.2f %.2f]", m_fFrameRate, ViewPoint[0], ViewPoint[1], ViewPoint[2]);
-			TextOut(m_WinData.hDC, 2, 18, szText, nLen);
+			TextOut(m_WinData.hDC, m_DpiWindowBehavior.ScaleOnX( 2 ), m_DpiWindowBehavior.ScaleOnY( 18 ), szText, nLen);
 		}
 	}
 }
@@ -2864,6 +2866,8 @@ bool CRender3D::NeedsOverlay() const
 //-----------------------------------------------------------------------------
 void CRender3D::ShutDown(void)
 {
+	m_DpiWindowBehavior.OnDestroyWindow();
+
 	MaterialSystemInterface()->RemoveView( m_WinData.hWnd );
 
 	if (m_WinData.hDC)
