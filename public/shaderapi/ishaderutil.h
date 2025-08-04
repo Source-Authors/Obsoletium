@@ -42,6 +42,8 @@ enum shaderthreadevent_t
 	SHADER_THREAD_OTHER_APP_START =		5,
 	SHADER_THREAD_OTHER_APP_END =		6,
 	SHADER_THREAD_RESET_RENDER_STATE =	7,
+	// dimhotepus: Process display mode change on main thread.
+	SHADER_THREAD_DISPLAY_MODE_CHANGE = 8
 };
 
 abstract_class IShaderUtil : public IAppSystem
