@@ -792,24 +792,23 @@ void GunshipImpactCallback( const CEffectData & data )
 
 	FX_GunshipImpact( vecPosition, Vector( 0, 0, 1 ), 100, 0, 200 );
 }
+// A small pink pulse of energy, not sure why its named gunshipimpact.
 DECLARE_CLIENT_EFFECT( "GunshipImpact", GunshipImpactCallback );
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 void CommandPointerCallback( const CEffectData & data )
 {
-	int size = COLOR_TABLE_SIZE( commandercolors );
-
-	for( int i = 0 ; i < size ; i++ )
+	for( const auto &c : commandercolors )
 	{
-		if( commandercolors[ i ].index == data.m_nColor )
+		if( c.index == data.m_nColor )
 		{
-			FX_GunshipImpact( data.m_vOrigin, Vector( 0, 0, 1 ), commandercolors[ i ].r, commandercolors[ i ].g, commandercolors[ i ].b );
+			FX_GunshipImpact( data.m_vOrigin, Vector( 0, 0, 1 ), c.r, c.g, c.b );
 			return;
 		}
 	}
 }
-
+// The small dot seen at the end of the hl2 RPGs laser beam.
 DECLARE_CLIENT_EFFECT( "CommandPointer", CommandPointerCallback );
 
 
