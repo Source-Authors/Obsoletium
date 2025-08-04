@@ -229,7 +229,8 @@ void CTitleWnd::CreateFontsOnce()
 		//
 		// Create two fonts, a normal one and a bold one for when we are active.
 		//
-		m_FontNormal.CreateFont(m_dpi_behavior.ScaleOnY(16), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
-		m_FontActive.CreateFont(m_dpi_behavior.ScaleOnY(16), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
+		// dimhotepus: Use CLEARTYPE_NATURAL_QUALITY antialsing.
+		m_FontNormal.CreateFont(m_dpi_behavior.ScaleOnY(16), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
+		m_FontActive.CreateFont(m_dpi_behavior.ScaleOnY(16), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
 	}
 }
