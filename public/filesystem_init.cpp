@@ -461,20 +461,20 @@ static FSReturnCode_t LoadGameInfoFile(
 	pMainFile = ReadKeyValuesFile( gameinfoFilename );
 	if ( !pMainFile )
 	{
-		return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, "%s is missing.", gameinfoFilename );
+		return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, "Game info file '%s' is missing.", gameinfoFilename );
 	}
 
 	auto *pFileSystemInfo = pMainFile->FindKey( "FileSystem" );
 	if ( !pFileSystemInfo )
 	{
-		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "%s is not a valid format.", gameinfoFilename );
+		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "Game info file '%s' is not a valid format.", gameinfoFilename );
 	}
 
 	// Now read in all the search paths.
 	pSearchPaths = pFileSystemInfo->FindKey( "SearchPaths" );
 	if ( !pSearchPaths )
 	{
-		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "%s is not a valid format.", gameinfoFilename );
+		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "Game info file '%s' is not a valid format.", gameinfoFilename );
 	}
 
 	return FS_OK;
@@ -1098,14 +1098,14 @@ FSReturnCode_t FileSystem_LoadFileSystemModule( CFSLoadModuleInfo &fsInfo )
 		&fsInfo.m_pModule,
 		&fsInfo.m_pFileSystem ) )
 	{
-		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Can't load %s.", fsInfo.m_pFileSystemDLLName );
+		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Can't load filesystem binary '%s'.", fsInfo.m_pFileSystemDLLName );
 	}
 
 	if ( !fsInfo.m_pFileSystem->Connect( fsInfo.m_ConnectFactory ) )
-		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "%s IFileSystem::Connect failed.", fsInfo.m_pFileSystemDLLName );
+		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "'%s' IFileSystem::Connect failed.", fsInfo.m_pFileSystemDLLName );
 
 	if ( fsInfo.m_pFileSystem->Init() != INIT_OK )
-		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "%s IFileSystem::Init failed.", fsInfo.m_pFileSystemDLLName );
+		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "'%s' IFileSystem::Init failed.", fsInfo.m_pFileSystemDLLName );
 
 	return FS_OK;
 }
