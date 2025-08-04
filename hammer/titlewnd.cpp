@@ -127,7 +127,8 @@ void CTitleWnd::OnMouseMove(UINT nFlags, CPoint point)
 		Track.cbSize = sizeof(Track);
 		Track.dwFlags = TME_HOVER | TME_LEAVE;
 		Track.hwndTrack = m_hWnd;
-		Track.dwHoverTime = 0.1;
+		// dimhotepus: Fix hover time from 0.1 (0) to system default.
+		Track.dwHoverTime = HOVER_DEFAULT;
 
 		_TrackMouseEvent(&Track);
 
