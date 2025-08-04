@@ -395,10 +395,9 @@ void CRender::SetInstanceRendering( InstanceRenderingState_t State )
 void CRender::DrawText( const char *text, int x, int y, int nFlags )
 {
 	wchar_t unicode[ 128 ];
+	V_strtowcs( text, -1, unicode );
 
-	mbstowcs( unicode, text, ARRAYSIZE(unicode) );
-
-	int len = min( (ptrdiff_t)127, Q_strlen( text ) );
+	int len = min( (ptrdiff_t)127, V_strlen( text ) );
 
 	Assert( m_DefaultFont != vgui::INVALID_FONT );
 	bool bJustifyText = nFlags & ( TEXT_JUSTIFY_LEFT | TEXT_JUSTIFY_TOP | TEXT_JUSTIFY_HORZ_CENTER | TEXT_JUSTIFY_VERT_CENTER );
