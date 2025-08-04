@@ -108,8 +108,11 @@ BOOL CBaseToolBar::LoadBitmapForDpi(LPCTSTR lpszResourceName) {
       ::FindResource(hInstImageWell, lpszResourceName, RT_BITMAP)};
   if (hRsrcImageWell == nullptr) return FALSE;
 
-  // load the bitmap
-  HBITMAP hbmImageWell{::AfxLoadSysColorBitmap(hInstImageWell, hRsrcImageWell)};
+  // load the colored bitmap
+  HBITMAP hbmImageWell{(HBITMAP)::LoadImage(
+      ::AfxGetInstanceHandle(), lpszResourceName, IMAGE_BITMAP, 0, 0,  // cx, cy
+      LR_CREATEDIBSECTION)};
+  if (hbmImageWell == nullptr) return FALSE;
 
   // scale the bitmap
   HBITMAP scaledBitmap{se::windows::ui::ScaleBitmapForDpi(
