@@ -287,8 +287,9 @@ BEGIN_MESSAGE_MAP(CMapDoc, CDocument)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_QUICKHIDEUNSELECTED, OnUpdateEditSelection)
 	ON_COMMAND( ID_VIEW_QUICKUNHIDE, OnQuickHide_Unhide )
 	ON_UPDATE_COMMAND_UI(ID_VIEW_QUICKUNHIDE, OnQuickHide_UpdateUnHide)
-	ON_COMMAND( ID_TOGGLE_RADIUSCULLING, OnRadiusCulling )
-	ON_UPDATE_COMMAND_UI(ID_TOGGLE_RADIUSCULLING, OnUpdateRadiusCulling )	
+	// dimhotepus: Remove radius culling.
+	// ON_COMMAND( ID_TOGGLE_RADIUSCULLING, OnRadiusCulling )
+	// ON_UPDATE_COMMAND_UI(ID_TOGGLE_RADIUSCULLING, OnUpdateRadiusCulling )	
 	ON_COMMAND( ID_VIEW_QUICKHIDEVISGROUP, OnQuickHide_CreateVisGroupFromHidden )
 	ON_UPDATE_COMMAND_UI(ID_VIEW_QUICKHIDEVISGROUP, OnQuickHide_UpdateCreateVisGroupFromHidden)
 	END_MESSAGE_MAP()
@@ -10122,24 +10123,25 @@ void CMapDoc::SetUndoActive(bool bActive)
 }
 
 
-bool CMapDoc::IsCulledBy3DCameraDistance( CMapClass *pObject, UpdateVisibilityData_t *pData )
-{
-	if ( pObject->IsWorld() || pObject->IsGroup() )
-		return false;
-
-	if ( pObject->IsSelected() )
-		return false;
-
-	Vector objectPos;
-	pObject->GetOrigin( objectPos );
-
-	float flDistance = ( pData->vecRadiusCullCenter - objectPos ).LengthSqr();	
-
-	if ( flDistance >= pData->flRadiusCullDistSq )
-		return true;
-
-	return false;
-}
+// dimhotepus: Remove radius culling.
+// bool CMapDoc::IsCulledBy3DCameraDistance( CMapClass *pObject, UpdateVisibilityData_t *pData )
+// {
+// 	if ( pObject->IsWorld() || pObject->IsGroup() )
+// 		return false;
+// 
+// 	if ( pObject->IsSelected() )
+// 		return false;
+// 
+// 	Vector objectPos;
+// 	pObject->GetOrigin( objectPos );
+// 
+// 	float flDistance = ( pData->vecRadiusCullCenter - objectPos ).LengthSqr();	
+// 
+// 	if ( flDistance >= pData->flRadiusCullDistSq )
+// 		return true;
+// 
+// 	return false;
+// }
 
 
 //-----------------------------------------------------------------------------
@@ -10167,13 +10169,14 @@ bool CMapDoc::ShouldObjectBeVisible(CMapClass *pObject, UpdateVisibilityData_t *
 		return false;
 	}
 
-	if ( pData->bRadiusCullingEnabled )
-	{
-		if ( IsCulledBy3DCameraDistance( pObject, pData ) )
-		{
-			return false;
-		}
-	}
+	// dimhotepus: Remove radius culling.
+	// if ( pData->bRadiusCullingEnabled )
+	// {
+	// 	if ( IsCulledBy3DCameraDistance( pObject, pData ) )
+	// 	{
+	// 		return false;
+	// 	}
+	// }
 
 	//
 	// If hide entities is enabled and the object is an entity, hide the object.
@@ -10308,32 +10311,33 @@ void CMapDoc::InitUpdateVisibilityData( UpdateVisibilityData_t &data )
 	memset( &data, 0, sizeof( data ) );
 
 	data.pDoc = this;
-	data.bRadiusCullingEnabled = ( Options.general.bRadiusCulling == TRUE );
+	// dimhotepus: Remove radius culling.
+	// data.bRadiusCullingEnabled = ( Options.general.bRadiusCulling == TRUE );
 
-	if ( data.bRadiusCullingEnabled )
-	{
-		POSITION viewpos = GetFirstViewPosition();
-		while ( viewpos )
-		{
-			CMapView3D *pView = dynamic_cast<CMapView3D*>( GetNextView( viewpos ) );
-			if ( pView )
-			{
-				CCamera *pCamera = pView->GetCamera();
-				if ( pCamera )
-				{
-					pCamera->GetViewPoint( data.vecRadiusCullCenter );
-
-					data.flRadiusCullDistSq = pCamera->GetFarClip();
-					data.flRadiusCullDistSq *= data.flRadiusCullDistSq;
-
-					return;
-				}
-			}
-		}
-
-		// Can't use radius culling without a 3D view.
-		data.bRadiusCullingEnabled = false;
-	}
+	//if ( data.bRadiusCullingEnabled )
+	//{
+	//	POSITION viewpos = GetFirstViewPosition();
+	//	while ( viewpos )
+	//	{
+	//		CMapView3D *pView = dynamic_cast<CMapView3D*>( GetNextView( viewpos ) );
+	//		if ( pView )
+	//		{
+	//			CCamera *pCamera = pView->GetCamera();
+	//			if ( pCamera )
+	//			{
+	//				pCamera->GetViewPoint( data.vecRadiusCullCenter );
+	//
+	//				data.flRadiusCullDistSq = pCamera->GetFarClip();
+	//				data.flRadiusCullDistSq *= data.flRadiusCullDistSq;
+	//
+	//				return;
+	//			}
+	//		}
+	//	}
+	// 
+	//  // Can't use radius culling without a 3D view.
+	//  data.bRadiusCullingEnabled = false;
+	// }
 };
 
 
@@ -12156,23 +12160,24 @@ void CMapDoc::OnQuickHide_Unhide( void )
 	QuickHide_Unhide();
 }
 
+// dimhotepus: Remove radius culling.
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CMapDoc::OnRadiusCulling( void )
-{
-	Options.general.bRadiusCulling = !Options.general.bRadiusCulling;
-	UpdateVisibilityAll();
-}
+//void CMapDoc::OnRadiusCulling( void )
+//{
+//	Options.general.bRadiusCulling = !Options.general.bRadiusCulling;
+//	UpdateVisibilityAll();
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CMapDoc::OnUpdateRadiusCulling( CCmdUI *pCmdUI )
-{
-	pCmdUI->SetCheck( Options.general.bRadiusCulling ? 1 : 0 );
-	pCmdUI->Enable(!GetMainWnd()->IsShellSessionActive());
-}
+//void CMapDoc::OnUpdateRadiusCulling( CCmdUI *pCmdUI )
+//{
+//	pCmdUI->SetCheck( Options.general.bRadiusCulling ? 1 : 0 );
+//	pCmdUI->Enable(!GetMainWnd()->IsShellSessionActive());
+//}
 
 
 #include <tier0/memdbgoff.h>

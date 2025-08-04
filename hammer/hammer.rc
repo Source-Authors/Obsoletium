@@ -204,8 +204,10 @@ BEGIN
     SEPARATOR
     BUTTON      ID_TOGGLE_CORDON
     BUTTON      ID_TOOLS_EDITCORDON
-	BUTTON		ID_TOGGLE_RADIUSCULLING
-	SEPARATOR
+    // dimhotepus: Can't remove this because need to edit toolbar bitmap
+    // which makes harder to update from original Hammer. Disable it in code.
+    BUTTON		ID_TOGGLE_RADIUSCULLING
+    SEPARATOR
     BUTTON      ID_TOGGLE_SELECTBYHANDLE
     BUTTON      ID_TOGGLE_INFINITESELECT
     BUTTON      ID_TOOLS_TOGGLETEXLOCK
@@ -401,7 +403,8 @@ BEGIN
         MENUITEM "Show Models in 2D",           ID_VIEW_SHOWMODELSIN2D
         MENUITEM "&Hide Items",                 ID_TOOLS_HIDEITEMS
         MENUITEM "Hide Entity &Names",          ID_TOOLS_HIDE_ENTITY_NAMES
-        MENUITEM "Use Radius Culling",          ID_TOGGLE_RADIUSCULLING
+        // dimhotepus: Remove radius culling.
+        // MENUITEM "Use Radius Culling",          ID_TOGGLE_RADIUSCULLING
 		MENUITEM SEPARATOR
         MENUITEM "QuickHide Objects\tH",        ID_VIEW_QUICKHIDE
         MENUITEM "QuickHide Unselected Objects\tCtrl+H", ID_VIEW_QUICKHIDEUNSELECTED
@@ -798,7 +801,8 @@ BEGIN
     "E",            ID_VIEW_CENTER3DVIEWSONSELECTION, VIRTKEY, SHIFT, CONTROL, NOINVERT
     "E",            ID_VIEW_CENTERONSELECTION, VIRTKEY, CONTROL, NOINVERT
     "R",            ID_VIEW_GRID,           VIRTKEY, SHIFT, NOINVERT
-    "C",            ID_TOGGLE_RADIUSCULLING,VIRTKEY, NOINVERT
+    // dimhotepus: Remove radius culling.
+    // "C",            ID_TOGGLE_RADIUSCULLING,VIRTKEY, NOINVERT
     "Z",            ID_VIEW_MAXIMIZERESTOREACTIVEVIEW, VIRTKEY, SHIFT, NOINVERT
     "M",            ID_VIEW_SHOWMODELSIN2D, VIRTKEY, SHIFT, NOINVERT
     VK_F8,          ID_VIEW_TEXTUREBROWSER, VIRTKEY, ALT, NOINVERT
@@ -3471,7 +3475,8 @@ END
 
 STRINGTABLE 
 BEGIN
-    ID_TOGGLE_RADIUSCULLING	"Enable Radius Culling Mode\nRadius Culling"
+    // dimhotepus: Mark radius culling as deprecated.
+    ID_TOGGLE_RADIUSCULLING	"Enable Radius Culling Mode (deprecated)\nRadius Culling (deprecated)"
 END
 
 

@@ -546,7 +546,8 @@ bool COptions::Read(void)
 	general.bClosedCorrectly = APP()->GetProfileInt(pszGeneral, "Closed Correctly", TRUE);
 	general.bUseVGUIModelBrowser = APP()->GetProfileInt(pszGeneral, "VGUI Model Browser", TRUE);	
 	general.bShowHiddenTargetsAsBroken = APP()->GetProfileInt(pszGeneral, "Show Hidden Targets As Broken", TRUE);	
-	general.bRadiusCulling = APP()->GetProfileInt(pszGeneral, "Use Radius Culling", FALSE);
+	// dimhotepus: Remove radius culling.
+	// general.bRadiusCulling = APP()->GetProfileInt(pszGeneral, "Use Radius Culling", FALSE);
 
 	char szDefaultAutosavePath[MAX_PATH];
 	V_strcpy_safe( szDefaultAutosavePath, APP()->GetProfileString( pszGeneral, "Directory", "C:" ) );
@@ -779,7 +780,8 @@ void COptions::Write( BOOL fOverwrite, BOOL fSaveConfigs )
 	APP()->SetDirectory( DIR_AUTOSAVE, general.szAutosaveDir );
 	APP()->WriteProfileInt(pszGeneral, "VGUI Model Browser", general.bUseVGUIModelBrowser );
 	APP()->WriteProfileInt(pszGeneral, "Show Hidden Targets As Broken", general.bShowHiddenTargetsAsBroken);
-	APP()->WriteProfileInt(pszGeneral, "Use Radius Culling", general.bRadiusCulling);
+	// dimhotepus: Remove radius culling.
+	// APP()->WriteProfileInt(pszGeneral, "Use Radius Culling", general.bRadiusCulling);
 
 
 	

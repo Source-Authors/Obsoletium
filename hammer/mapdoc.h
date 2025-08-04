@@ -138,9 +138,12 @@ struct portalfile_t
 struct UpdateVisibilityData_t
 {
 	CMapDoc *pDoc;
-	bool bRadiusCullingEnabled;
-	Vector vecRadiusCullCenter;
-	float flRadiusCullDistSq;
+	// dimhotepus: Remove radius culling.
+	// bool bRadiusCullingEnabled;
+	// dimhotepus: Remove radius culling.
+	// Vector vecRadiusCullCenter;
+	// dimhotepus: Remove radius culling.
+	// float flRadiusCullDistSq;
 };
 
 
@@ -388,7 +391,8 @@ class CMapDoc : public CDocument
 	        void NotifyDependents(CMapClass *pObject, Notify_Dependent_t eNotifyType);
 
 		// Radius culling
-		bool IsCulledBy3DCameraDistance( CMapClass *pObject, UpdateVisibilityData_t *pData );
+		// dimhotepus: Remove radius culling.
+		// bool IsCulledBy3DCameraDistance( CMapClass *pObject, UpdateVisibilityData_t *pData );
 
 		//
 		// Morph tool.

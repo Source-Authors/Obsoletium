@@ -43,7 +43,8 @@ public:
 	BOOL bShowNoDrawBrushes;
 	BOOL bEnableAutosave;
 	BOOL bShowHiddenTargetsAsBroken;
-	BOOL bRadiusCulling;
+	// dimhotepus: Remove radius culling.
+	// BOOL bRadiusCulling;
 }; 
 
 

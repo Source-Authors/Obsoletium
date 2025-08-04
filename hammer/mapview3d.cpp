@@ -961,12 +961,13 @@ void CMapView3D::OnInitialUpdate(void)
 	// Set up the frustum. We set the vertical FOV to zero because the renderer
 	// only uses the horizontal FOV.
 	//
-	if ( Options.general.bRadiusCulling )
-	{
-		// Hack!  Don't use frustum culling when doing radial distance culling (slam the distance to 10K)
-		m_pCamera->SetPerspective( Options.view3d.fFOV, CAMERA_FRONT_PLANE_DISTANCE, 10000);
-	}
-	else
+	// dimhotepus: Remove radius culling.
+	// if ( Options.general.bRadiusCulling )
+	// {
+	// 	// Hack!  Don't use frustum culling when doing radial distance culling (slam the distance to 10K)
+	// 	m_pCamera->SetPerspective( Options.view3d.fFOV, CAMERA_FRONT_PLANE_DISTANCE, 10000);
+	// }
+	// else
 	{
 		m_pCamera->SetPerspective( Options.view3d.fFOV, CAMERA_FRONT_PLANE_DISTANCE, Options.view3d.iBackPlane);
 	}
@@ -1396,10 +1397,11 @@ void CMapView3D::ProcessInput(void)
 
 	ProcessMouse();
 
-	if ( Options.general.bRadiusCulling )
-	{
-		ProcessCulling();
-	}
+	// dimhotepus: Remove radius culling.
+	// if ( Options.general.bRadiusCulling )
+	// {
+	//	ProcessCulling();
+	// }
 }
 
 
@@ -1554,17 +1556,18 @@ void CMapView3D::ProcessKeys(float fElapsedTime)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CMapView3D::ProcessCulling( void )
-{
-	if ( m_bCameraPosChanged || m_bClippingChanged )
-	{
-		CMapDoc *pDoc = GetMapDoc();
-		pDoc->UpdateVisibilityAll();
-
-		m_bClippingChanged = false;
-		m_bCameraPosChanged = false;
-	}
-}
+// dimhotepus: Remove radius culling.
+// void CMapView3D::ProcessCulling( void )
+// {
+// 	if ( m_bCameraPosChanged || m_bClippingChanged )
+// 	{
+// 		CMapDoc *pDoc = GetMapDoc();
+// 		pDoc->UpdateVisibilityAll();
+// 
+// 		m_bClippingChanged = false;
+// 		m_bCameraPosChanged = false;
+// 	}
+// }
 
 //-----------------------------------------------------------------------------
 // Purpose: 

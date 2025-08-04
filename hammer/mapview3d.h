@@ -136,7 +136,8 @@ private:
 	float GetKeyScale(unsigned int uKeyState);
 
 	// Radius culling
-	void ProcessCulling( void );
+	// dimhotepus: Remove radius culling.
+	// void ProcessCulling( void );
 
 	enum
 	{

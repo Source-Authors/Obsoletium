@@ -236,10 +236,11 @@ void CMapView2D::Render()
 
 	GetRender()->StartRenderFrame();
 	
-	if ( Options.general.bRadiusCulling )
-	{
-		DrawCullingCircleHelper2D( GetRender() );
-	}
+	// dimhotepus: Remove radius culling.
+	// if ( Options.general.bRadiusCulling )
+	// {
+	// 	DrawCullingCircleHelper2D( GetRender() );
+	// }
 
 	// Draw grid if enabled.
 	if (pDoc->m_bShowGrid)
@@ -664,27 +665,28 @@ void CMapView2D::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 	CMapView2DBase::OnKeyDown( nChar, nRepCnt, nFlags );
 }
 
-void CMapView2D::DrawCullingCircleHelper2D( CRender2D *pRender )
-{
-	CMapDoc *pDoc = GetMapDoc();
-
-	POSITION viewpos = pDoc->GetFirstViewPosition();
-
-	while ( viewpos )
-	{
-		CMapView3D *pView = dynamic_cast<CMapView3D*>( pDoc->GetNextView( viewpos ) );
-		if ( pView )
-		{
-			CCamera *pCamera = pView->GetCamera();
-
-			Vector cameraPos;
-			pCamera->GetViewPoint( cameraPos );
-			int iClipDist = (int)pCamera->GetFarClip();
-
-			pRender->SetDrawColor( 255, 0, 0 );
-			pRender->DrawCircle( cameraPos, iClipDist );
-		}
-	}
-}
+// dimhotepus: Remove radius culling.
+// void CMapView2D::DrawCullingCircleHelper2D( CRender2D *pRender )
+// {
+// 	CMapDoc *pDoc = GetMapDoc();
+// 
+// 	POSITION viewpos = pDoc->GetFirstViewPosition();
+// 
+// 	while ( viewpos )
+// 	{
+// 		CMapView3D *pView = dynamic_cast<CMapView3D*>( pDoc->GetNextView( viewpos ) );
+// 		if ( pView )
+// 		{
+// 			CCamera *pCamera = pView->GetCamera();
+// 
+// 			Vector cameraPos;
+// 			pCamera->GetViewPoint( cameraPos );
+// 			int iClipDist = (int)pCamera->GetFarClip();
+// 
+// 			pRender->SetDrawColor( 255, 0, 0 );
+// 			pRender->DrawCircle( cameraPos, iClipDist );
+// 		}
+// 	}
+// }
 
 
