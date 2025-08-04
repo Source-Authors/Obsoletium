@@ -43,7 +43,7 @@ CRender::CRender(void)
 	vgui::IScheme * pScheme = vgui::scheme()->GetIScheme( vgui::scheme()->GetDefaultScheme() );
 	if ( pScheme )
 	{	
-		m_DefaultFont = pScheme->GetFont( "Default" );
+		m_DefaultFont = pScheme->GetFont( "Default", true );
 	}
 	else
 	{
