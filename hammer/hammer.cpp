@@ -1183,7 +1183,7 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	// dimhotepus: We can't use D3DSWAPEFFECT_FLIPEX because Hammer mix DirectX and GDI :(.
 	const auto &config = materials->GetCurrentConfigForVideoCard();
 	auto configCopy = config;
-	// dimhotepus: Hammer uses screen splitting and multiple windows, so use special mod efor it.
+	// dimhotepus: Hammer uses screen splitting and multiple windows, so use special mode for it.
 	configCopy.SetFlag(MATSYS_VIDCFG_FLAGS_USING_MULTIPLE_WINDOWS, 1);
 	materials->OverrideConfig(configCopy, false);
 
