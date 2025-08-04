@@ -791,7 +791,7 @@ unsigned LightingPreviewThreadFN( void *thread_start_arg )
 	ThreadSetDebugName("LightingPreview");
 
 	CLightingPreviewThread LPreviewObject;
-	ThreadSetPriority( -2 );								// low
+	ThreadSetPriority( THREAD_PRIORITY_BELOW_NORMAL );	// dimhotepus: lowest -> below normal.
 	LPreviewObject.Run();
 	return 0;
 }
