@@ -573,9 +573,15 @@ BOOL CChildFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 		//
 		// Calculate the size of each view within the splitter,
 		//
+		// Our DPI behavior is not initialized yet, so fallback to parent one.
+		se::windows::ui::CDpiWindowBehavior parentDpiBehavior{false};
+		parentDpiBehavior.OnCreateWindow(lpcs->hwndParent);
+
 		CRect r;
 		GetClientRect(r);
-		CSize sizeView((r.Width() / 2) - m_dpi_behavior.ScaleOnX( 3 ), (r.Height() / 2) - m_dpi_behavior.ScaleOnY( 3 ));
+		CSize sizeView(r.Width() / 2 - parentDpiBehavior.ScaleOnX(3), r.Height() / 2 - parentDpiBehavior.ScaleOnY(3));
+
+		parentDpiBehavior.OnDestroyWindow();
 
 		//
 		// Create the 4 views as they were when the user last closed the app.
@@ -674,7 +680,7 @@ void CChildFrame::CenterViews(void)
 
 	CRect r;
 	GetClientRect(r);
-	CSize sizeView(r.Width()/2 - m_dpi_behavior.ScaleOnX( 3 ), r.Height()/2 - m_dpi_behavior.ScaleOnY( 3 ));
+	CSize sizeView(r.Width()/2 - m_dpi_behavior.ScaleOnX(3), r.Height()/2 - m_dpi_behavior.ScaleOnY(3));
 
 	sizeView.cy = max(0L, sizeView.cy);
 	sizeView.cx = max(0L, sizeView.cx);
