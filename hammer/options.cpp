@@ -718,7 +718,7 @@ bool COptions::Read(void)
 	view3d.nTimeToMaxSpeed = APP()->GetProfileInt(pszView3D, "TimeToMaxSpeed", 500);
 	view3d.bFilterTextures = APP()->GetProfileInt(pszView3D, "FilterTextures", TRUE);
 	view3d.bReverseSelection = APP()->GetProfileInt(pszView3D, "ReverseSelection", FALSE);
-	view3d.fFOV = 90;
+	view3d.fFOV = 110;
 	view3d.fLightConeLength = 10;
 		
 	ReadColorSettings();

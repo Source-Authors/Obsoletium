@@ -43,9 +43,9 @@ COPTView3D::~COPTView3D(void)
 
 void PASCAL DDV_FOVRange(CDataExchange *pDX, int value)
 {
-	if ( ( value > 100 ) | ( value < 30 ) )
+	if ( ( value > 120 ) || ( value < 30 ) )
 	{
-		AfxMessageBox("FOV must be 30-100.", MB_ICONEXCLAMATION | MB_OK);
+		AfxMessageBox("FOV must be 30-120.", MB_ICONEXCLAMATION | MB_OK);
 		pDX->Fail();
 	}
 }

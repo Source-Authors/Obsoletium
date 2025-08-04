@@ -1478,9 +1478,9 @@ BEGIN
     LTEXT           "1000",IDC_FORWARD_ACCEL_TEXT,213,162,28,8
     GROUPBOX        "&General",IDC_STATIC,7,187,242,54
     CONTROL         "Reverse &selection order",IDC_REVERSE_SELECTION,"Button",BS_AUTOCHECKBOX | WS_TABSTOP,15,202,92,10
-    LTEXT           "Camera FOV (30-100)",IDC_STATIC,127,204,73,8n
+    LTEXT           "Camera FOV (30-120)",IDC_STATIC,127,204,73,8
     EDITTEXT        IDC_FOV,203,201,40,14,ES_AUTOHSCROLL
-    LTEXT           "Light_spot Cone Multiplier", IDC_STATIC, 15, 216, 93, 8n
+    LTEXT           "Light_spot Cone Multiplier", IDC_STATIC, 15, 216, 93, 8
     EDITTEXT        IDC_LIGHT_CONE_LENGTH, 123, 215, 40, 14, ES_AUTOHSCROLL
 END
 
