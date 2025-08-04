@@ -317,7 +317,7 @@ int CCoreDispSurface::GenerateSurfPointStartIndex( void )
 	// find the point closest to the minimum, that is the start point
 	//
 	int minIndex = -1;
-	float minDistance = 999999999.0f;
+	float minDistance = std::numeric_limits<float>::max();
 	for( i = 0; i < QUAD_POINT_COUNT; i++ )
 	{
 		Vector segment;
@@ -344,7 +344,7 @@ int CCoreDispSurface::FindSurfPointStartIndex( void )
 		return m_PointStartIndex;
 
 	int minIndex = -1;
-	float minDistance = 999999999.0f;
+	float minDistance = std::numeric_limits<float>::max();
 
 	for( int i = 0; i < QUAD_POINT_COUNT; i++ )
 	{
