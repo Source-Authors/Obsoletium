@@ -12,11 +12,11 @@
 #include <sys/stat.h> 
 #include <cstdio>
 
-#include "interface.h"
 #include "tier0/icommandline.h"
-#include "filesystem_tools.h"
+#include "tier1/interface.h"
 #include "tier1/KeyValues.h"
 #include "tier1/utlbuffer.h"
+#include "filesystem_tools.h"
 #include "SourceAppInfo.h"
 
 #include "winlite.h"
@@ -29,7 +29,7 @@ extern CSteamAPIContext *steamapicontext;
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
-#include <tier0/memdbgon.h>
+#include "tier0/memdbgon.h"
 
 constexpr inline char GAME_CONFIG_FILENAME[]{"GameConfig.txt"};
 constexpr inline char TOKEN_SDK_VERSION[]{"SDKVersion"};
@@ -50,7 +50,12 @@ defaultConfigInfo_t HL2Info =
 	"hl2",
 	"halflife2.fgd",
 	"info_player_start",
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 support.
+	"hl2_win64.exe",
+#else
 	"hl2.exe",
+#endif
 	GetAppSteamAppId( k_App_HL2 )
 };
 
@@ -61,7 +66,12 @@ defaultConfigInfo_t CStrikeInfo =
 	"cstrike",
 	"cstrike.fgd",
 	"info_player_terrorist",
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 support.
+	"hl2_win64.exe",
+#else
 	"hl2.exe",
+#endif
 	GetAppSteamAppId( k_App_CSS )
 };
 
@@ -72,7 +82,12 @@ defaultConfigInfo_t HL2DMInfo =
 	"hl2mp",
 	"hl2mp.fgd",
 	"info_player_deathmatch",
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 support.
+	"hl2_win64.exe",
+#else
 	"hl2.exe",
+#endif
 	GetAppSteamAppId( k_App_HL2MP )
 };
 
@@ -83,7 +98,12 @@ defaultConfigInfo_t DODInfo =
 	"dod",
 	"dod.fgd",
 	"info_player_allies",
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 support.
+	"hl2_win64.exe",
+#else
 	"hl2.exe",
+#endif
 	GetAppSteamAppId( k_App_DODS )
 };
 
@@ -94,7 +114,12 @@ defaultConfigInfo_t Episode1Info =
 	"episodic",
 	"halflife2.fgd",
 	"info_player_start",
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 support.
+	"hl2_win64.exe",
+#else
 	"hl2.exe",
+#endif
 	GetAppSteamAppId( k_App_HL2_EP1 ) 
 };
 
@@ -105,7 +130,12 @@ defaultConfigInfo_t Episode2Info =
 	"ep2",
 	"halflife2.fgd",
 	"info_player_start",
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 support.
+	"hl2_win64.exe",
+#else
 	"hl2.exe",
+#endif
 	GetAppSteamAppId( k_App_HL2_EP2 ) 
 };
 
@@ -116,7 +146,12 @@ defaultConfigInfo_t TF2Info =
 	"tf",
 	"tf.fgd",
 	"info_player_teamspawn",
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 support.
+	"hl2_win64.exe",
+#else
 	"hl2.exe",
+#endif
 	GetAppSteamAppId( k_App_TF2 )
 };
 
@@ -127,7 +162,12 @@ defaultConfigInfo_t PortalInfo =
 	"portal",
 	"portal.fgd",
 	"info_player_start",
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 support.
+	"hl2_win64.exe",
+#else
 	"hl2.exe",
+#endif
 	GetAppSteamAppId( k_App_PORTAL )
 };
 
@@ -138,7 +178,12 @@ defaultConfigInfo_t SourceTestInfo =
 	"sourcetest",
 	"halflife2.fgd",
 	"info_player_start",
+#ifdef PLATFORM_64BITS
+	// dimhotepus: x86-64 support.
+	"hl2_win64.exe",
+#else
 	"hl2.exe",
+#endif
 	243730
 };
 
@@ -407,7 +452,7 @@ bool CGameConfigManager::IsConfigCurrent( void )
 //-----------------------------------------------------------------------------
 // Purpose: Get the base path for a default config's install (handling steam's paths)
 //-----------------------------------------------------------------------------
-void CGameConfigManager::GetRootGameDirectory( char *out, size_t outLen, const char *rootDir )
+void CGameConfigManager::GetRootGameDirectory( OUT_Z_CAP(outLen) char *out, intp outLen, const char *rootDir )
 {
 	Q_strncpy( out, rootDir, outLen );
 }
@@ -415,7 +460,7 @@ void CGameConfigManager::GetRootGameDirectory( char *out, size_t outLen, const c
 //-----------------------------------------------------------------------------
 // Purpose: Get the base path for a default config's content sources (handling steam's paths)
 //-----------------------------------------------------------------------------
-void CGameConfigManager::GetRootContentDirectory( char *out, size_t outLen, const char *rootDir )
+void CGameConfigManager::GetRootContentDirectory( OUT_Z_CAP(outLen) char *out, intp outLen, const char *rootDir )
 {
 	// Steam install is different
 	if ( g_pFullFileSystem )
@@ -471,16 +516,16 @@ bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyV
 	
 	// Game's root directory (with special steam name handling)
 	char rootGameDir[MAX_PATH];
-	GetRootGameDirectory( rootGameDir, sizeof( rootGameDir ), rootDirectory );
+	GetRootGameDirectory( rootGameDir, rootDirectory );
 
 	// Game's content directory
 	char contentRootDir[MAX_PATH];
-	GetRootContentDirectory( contentRootDir, sizeof( contentRootDir ), rootDirectory );
+	GetRootContentDirectory( contentRootDir, rootDirectory );
 
 	char szPath[MAX_PATH];
 
 	// Game directory
-	Q_snprintf( szPath, sizeof( szPath ), "%s\\%s", rootGameDir, info.gameDir );
+	V_sprintf_safe( szPath, "%s\\%s", rootGameDir, info.gameDir );
 
 	if ( !g_pFullFileSystem->IsDirectory( szPath ) )
 	{
@@ -488,7 +533,7 @@ bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyV
 		return false;
 	}
 
-	newConfig->SetString( "GameDir", szPath );
+	newConfig->SetString( TOKEN_GAME_DIRECTORY, szPath );
 
 	// Create the Hammer portion of this block
 	KeyValues *hammerBlock = newConfig->FindKey( "Hammer" );
@@ -519,18 +564,35 @@ bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyV
 	//Fill in game FGDs
 	if ( info.FGD[0] != '\0' )
 	{
+		// dimhotepus: Note we still take *.fgd from x86 dir on x86-64
+		// dimhotepus: This is done because modders usually not copy it to x64. 
 		Q_snprintf( szPath, sizeof( szPath ), "%s\\%s", GetBaseDirectory(), info.FGD );
 		hammerBlock->SetString( "GameData0", szPath );
 	}
 
 	// Fill in the tools path
-	Q_snprintf( szPath, sizeof( szPath ), "%s\\vbsp.exe", GetBaseDirectory() );
+	Q_snprintf( szPath, sizeof( szPath ), "%s\\" 
+#ifdef PLATFORM_64BITS
+		// dimhotepus: x86-64 support.
+		"x64\\"
+#endif
+		"vbsp.exe", GetBaseDirectory() );
 	hammerBlock->SetString( "BSP", szPath );
 
-	Q_snprintf( szPath, sizeof( szPath ), "%s\\vvis.exe", GetBaseDirectory() );
+	Q_snprintf( szPath, sizeof( szPath ), "%s\\"
+#ifdef PLATFORM_64BITS
+		// dimhotepus: x86-64 support.
+		"x64\\"
+#endif
+		"vvis.exe", GetBaseDirectory() );
 	hammerBlock->SetString( "Vis", szPath );
 
-	Q_snprintf( szPath, sizeof( szPath ), "%s\\vrad.exe", GetBaseDirectory() );
+	Q_snprintf( szPath, sizeof( szPath ), "%s\\"
+#ifdef PLATFORM_64BITS
+		// dimhotepus: x86-64 support.
+		"x64\\"
+#endif 
+		"vrad.exe", GetBaseDirectory());
 	hammerBlock->SetString( "Light", szPath );
 
 	// Get our insertion point
@@ -561,7 +623,7 @@ bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyV
 // Input  : nAppID - ID to verify
 // Output : Returns true if installed, false if not.
 //-----------------------------------------------------------------------------
-bool CGameConfigManager::IsAppSubscribed( int nAppID )
+bool CGameConfigManager::IsAppSubscribed( int nAppID ) const
 {
 	bool bIsSubscribed = false;
 
@@ -653,7 +715,7 @@ bool CGameConfigManager::ConvertGameConfigsINI( void )
 			GetPrivateProfileString( szSectionName, "ModDir", "", textBuffer, sizeof(textBuffer), iniFilePath);
 			
 			// Add the mod dir
-			subGame->SetString( "GameDir", textBuffer );
+			subGame->SetString( TOKEN_GAME_DIRECTORY, textBuffer );
 			
 			// Start a block for Hammer settings
 			KeyValues *hammerBlock = subGame->CreateNewKey();
@@ -847,10 +909,10 @@ KeyValues *CGameConfigManager::GetGameSubBlock( const char *keyName )
 const char *CGameConfigManager::GetIniFilePath( void )
 {
 	static char iniFilePath[MAX_PATH] = {0};
-	if ( iniFilePath[0] == 0 )
+	if ( Q_isempty( iniFilePath ) )
 	{
-		Q_strncpy( iniFilePath, GetBaseDirectory(), sizeof( iniFilePath ) );
-		Q_strncat( iniFilePath, "\\gamecfg.ini", sizeof( iniFilePath ), COPY_ALL_CHARACTERS );
+		V_strcpy_safe( iniFilePath, GetBaseDirectory() );
+		V_strcat_safe( iniFilePath, "\\gamecfg.ini" );
 	}
 
 	return iniFilePath;
@@ -927,14 +989,13 @@ bool CGameConfigManager::GetDefaultGameBlock( KeyValues *pIn )
 	char szPath[MAX_PATH];
 
 	// Add all default configs
-	intp nNumConfigs = defaultConfigs.Count();
-	for ( intp i = 0; i < nNumConfigs; i++ )
+	for ( auto &cfg : defaultConfigs )
 	{
 		// If it's installed, add it
-		if ( IsAppSubscribed( defaultConfigs[i].steamAppID ) )
+		if ( IsAppSubscribed( cfg.steamAppID ) )
 		{
-			GetRootGameDirectory( szPath, sizeof( szPath ), GetRootDirectory() );
-			AddDefaultConfig( defaultConfigs[i], pIn, GetRootDirectory(), szPath );
+			GetRootGameDirectory( szPath, GetRootDirectory() );
+			AddDefaultConfig( cfg, pIn, GetRootDirectory(), szPath );
 		}
 	}
 

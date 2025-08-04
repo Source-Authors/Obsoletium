@@ -55,17 +55,13 @@ public:
 		LOADSTATUS_ERROR,		// File was not loaded and was unable to perform the above fail-safe procedures
 	};
 
-			CGameConfigManager( void );
-			CGameConfigManager( const char *fileName );
-
-			~CGameConfigManager( void );
+	CGameConfigManager( void );
+	~CGameConfigManager( void );
 
 	bool	LoadConfigs( const char *baseDir = NULL );
 	bool	SaveConfigs( const char *baseDir = NULL );
 	bool	ResetConfigs( const char *baseDir = NULL );
 	
-	int		GetNumConfigs( void );
-
 	KeyValues	*GetGameBlock( void );
 	KeyValues	*GetGameSubBlock( const char *keyName );
 	bool		GetDefaultGameBlock( KeyValues *pIn );
@@ -79,14 +75,24 @@ public:
 
 	void	SetBaseDirectory( const char *pDirectory );
 
-	void	GetRootGameDirectory( char *out, size_t outLen, const char *rootDir );
+	void	GetRootGameDirectory( OUT_Z_CAP(outLen) char *out, intp outLen, const char *rootDir );
+	template<intp outLen>
+	void	GetRootGameDirectory( OUT_Z_ARRAY char (&out)[outLen], const char *rootDir )
+	{
+		GetRootGameDirectory( out, outLen, rootDir );
+	}
 
 	const char *GetRootDirectory( void );
 	void	SetSDKEpoch( eSDKEpochs epoch ) { m_eSDKEpoch = epoch; };
 
 private:
 
-	void	GetRootContentDirectory( char *out, size_t outLen, const char *rootDir );
+	void	GetRootContentDirectory( OUT_Z_CAP(outLen) char *out, intp outLen, const char *rootDir );
+	template<intp outLen>
+	void	GetRootContentDirectory( OUT_Z_ARRAY char (&out)[outLen], const char *rootDir )
+	{
+		GetRootContentDirectory( out, outLen, rootDir );
+	}
 
 	const char *GetBaseDirectory( void );
 	const char *GetIniFilePath( void );
@@ -98,7 +104,7 @@ private:
 
 	bool	ConvertGameConfigsINI( void );
 	bool	CreateAllDefaultConfigs( void );
-	bool	IsAppSubscribed( int nAppID );
+	bool	IsAppSubscribed( int nAppID ) const;
 
 	loadStatus_t	m_LoadStatus;	// Holds various state about what occured while loading
 	KeyValues		*m_pData;		// Data as read from configuration file
