@@ -12,6 +12,7 @@
 #include <afxtempl.h>
 #include "FaceEdit_MaterialPage.h"
 #include "FaceEdit_DispPage.h"
+#include "windows/base_property_sheet.h"
 
 class CMapFace;
 class CMapSolid;
@@ -20,7 +21,7 @@ class CMapSolid;
 //
 // Face Edit Sheet
 //
-class CFaceEditSheet : public CPropertySheet
+class CFaceEditSheet : public CBasePropertySheet
 {
 	DECLARE_DYNAMIC( CFaceEditSheet )
 

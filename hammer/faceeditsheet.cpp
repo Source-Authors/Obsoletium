@@ -19,9 +19,9 @@
 #include <tier0/memdbgon.h>
 
 
-IMPLEMENT_DYNAMIC( CFaceEditSheet, CPropertySheet )
+IMPLEMENT_DYNAMIC( CFaceEditSheet, CBasePropertySheet )
 
-BEGIN_MESSAGE_MAP( CFaceEditSheet, CPropertySheet )
+BEGIN_MESSAGE_MAP( CFaceEditSheet, CBasePropertySheet )
 	//{{AFX_MSG_MAP( CFaceEdtiSheet )
 	ON_WM_CLOSE()
 	//}}AFX_MSG_MAP
@@ -30,7 +30,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 CFaceEditSheet::CFaceEditSheet( LPCTSTR pszCaption, CWnd *pParentWnd, UINT iSelectPage ) : 
-                CPropertySheet( pszCaption, pParentWnd, iSelectPage )
+                CBasePropertySheet( pszCaption, pParentWnd, iSelectPage )
 {
 	m_ClickMode = -1;
 	m_bEnableUpdate = true;
@@ -68,7 +68,10 @@ void CFaceEditSheet::Setup( void )
 //-----------------------------------------------------------------------------
 BOOL CFaceEditSheet::Create( CWnd *pParentWnd )
 {
-	if( !__super::Create( pParentWnd ) )
+	// dimhotepus: Create invisible by default.
+	constexpr DWORD propStyle = (DS_MODALFRAME | DS_3DLOOK | DS_CONTEXTHELP |
+		DS_SETFONT | WS_POPUP | WS_CAPTION) & ~WS_VISIBLE;
+	if( !__super::Create( pParentWnd, propStyle ) )
 		return FALSE;
 
 	//
@@ -290,7 +293,7 @@ BOOL CFaceEditSheet::PreTranslateMessage( MSG *pMsg )
 			return(TRUE);
 		}
 
-		return CWnd::PreTranslateMessage( pMsg );
+		return __super::PreTranslateMessage( pMsg );
 	}
 
 	return TRUE;
