@@ -1819,7 +1819,7 @@ bool CMainFrame::VerifyBarState(void)
     CDockState state;
     state.LoadState("BarState");
 
-    for (int i = 0; i < state.m_arrBarInfo.GetSize(); i++)
+    for (intp i = 0; i < state.m_arrBarInfo.GetSize(); i++)
     {
         CControlBarInfo* pInfo = (CControlBarInfo*)state.m_arrBarInfo[i];
 
