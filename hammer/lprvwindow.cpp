@@ -70,12 +70,18 @@ void CLightingPreviewResultsWindow::Create( CWnd *pParentWnd, const char *pszTit
 	CString format;
 	format.Format("Lighting Preview - %s", pszTitle);
 
-	RECT rect{500, 500, 600, 600};
+	// dimhotepus: Scale manually by parent DPI as we are not created yet.
+	se::windows::ui::CDpiWindowBehavior dpiWindowBehavior{false};
+	dpiWindowBehavior.OnCreateWindow(pParentWnd->GetSafeHwnd());
 
-	CWnd::CreateEx(0, wndClassName, format.GetString(),
+	CRect rect{dpiWindowBehavior.ScaleOnX(500), dpiWindowBehavior.ScaleOnY(500),
+		dpiWindowBehavior.ScaleOnX(600), dpiWindowBehavior.ScaleOnY(600)};
+
+	__super::CreateEx(0, wndClassName, format.GetString(),
 				   WS_OVERLAPPEDWINDOW|WS_SIZEBOX,
 				   rect, NULL, NULL,NULL);
 
+	dpiWindowBehavior.OnDestroyWindow();
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
