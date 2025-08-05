@@ -17,6 +17,12 @@
 #undef _aligned_free
 #undef _malloc_dbg
 
+// dimhotepus: Undef our strdups, too.
+#undef _strdup
+#undef strdup
+#undef _wcsdup
+#undef wcsdup
+
 #undef MEM_OVERRIDE_ON
 
 #endif
