@@ -1208,7 +1208,7 @@ InitReturnVal_t CHammer::HammerInternalInit()
 		if ( strLastGoodSave.GetLength() != 0 )
 		{
 			char msg[1024];
-			V_sprintf_safe( msg, "Hammer did not shut down correctly the last time it was used.\n\nWould you like to load the last saved file?\n(%s)", strLastGoodSave.GetString() );
+			V_sprintf_safe( msg, "Hammer did not shut down correctly the last time it was used.\n\nWould you like to load the last saved file:\n\n%s?", strLastGoodSave.GetString() );
 			if ( AfxMessageBox( msg, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 			{
 				LoadLastGoodSave();
