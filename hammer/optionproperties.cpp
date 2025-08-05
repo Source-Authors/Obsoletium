@@ -18,16 +18,16 @@
 /////////////////////////////////////////////////////////////////////////////
 // COptionProperties
 
-IMPLEMENT_DYNAMIC(COptionProperties, CPropertySheet)
+IMPLEMENT_DYNAMIC(COptionProperties, CBasePropertySheet)
 
 COptionProperties::COptionProperties(UINT nIDCaption, CWnd* pParentWnd, UINT iSelectPage)
-	:CPropertySheet(nIDCaption, pParentWnd, iSelectPage)
+	: CBasePropertySheet(nIDCaption, pParentWnd, iSelectPage)
 {
 	DoStandardInit();
 }
 
 COptionProperties::COptionProperties(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
-	:CPropertySheet(pszCaption, pParentWnd, iSelectPage)
+	: CBasePropertySheet(pszCaption, pParentWnd, iSelectPage)
 {
 	DoStandardInit();
 }
@@ -37,7 +37,7 @@ COptionProperties::~COptionProperties()
 }
 
 
-BEGIN_MESSAGE_MAP(COptionProperties, CPropertySheet)
+BEGIN_MESSAGE_MAP(COptionProperties, CBasePropertySheet)
 	//{{AFX_MSG_MAP(COptionProperties)
 	ON_WM_CLOSE()
 	//}}AFX_MSG_MAP
