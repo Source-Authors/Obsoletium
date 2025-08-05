@@ -1228,7 +1228,6 @@ void CRender3D::EndRenderFrame(void)
 						m_nLastLPreviewHeight = height;
 						m_nLastLPreviewWidth = width;
 
-
 						g_nBitmapGenerationCounter++;
 
 						Last_SendTime = newtime;
@@ -1240,15 +1239,16 @@ void CRender3D::EndRenderFrame(void)
 															  "_rt_flags" };
 
 						MessageToLPreview Msg(LPREVIEW_MSG_G_BUFFERS);
+						static_assert(std::size(rts_to_transmit) == std::size(Msg.m_pDefferedRenderingBMs));
 						for(size_t i=0; i < std::size( rts_to_transmit ); i++)
 						{
 							SetRenderTargetNamed(0,rts_to_transmit[i]);
 
-							FloatBitMap_t *fbm = new FloatBitMap_t( nTargetWidth, nTargetHeight );
+							auto *fbm = new FloatBitMap_t( nTargetWidth, nTargetHeight );
 							Msg.m_pDefferedRenderingBMs[i]=fbm;
 
-							pRenderContext->ReadPixels(0, 0, nTargetWidth, nTargetHeight, (uint8 *) &(fbm->Pixel(0,0,0)),
-												  IMAGE_FORMAT_RGBA32323232F);
+							pRenderContext->ReadPixels(0, 0, nTargetWidth, nTargetHeight,
+								(uint8 *) &(fbm->Pixel(0,0,0)), IMAGE_FORMAT_RGBA32323232F);
 
 							if ( (i==0) && (! did_dump) )
 							{
@@ -1301,18 +1301,11 @@ void CRender3D::EndRenderFrame(void)
 				Vector eye_pnt;
 				pCamera->GetViewPoint(eye_pnt);
 				// now, add lights in priority order
-				for( int i = 0; i < lightList.Count(); i++ )
+				for( auto &l : lightList )
 				{
-					LightDesc_t *pLight = &lightList[i];
-					if (
-						( pLight->m_Type == MATERIAL_LIGHT_SPOT ) ||
-						( pLight->m_Type == MATERIAL_LIGHT_POINT ) )
+					if ( l.m_Type == MATERIAL_LIGHT_SPOT || l.m_Type == MATERIAL_LIGHT_POINT )
 					{
-						Vector lpnt;
-						CLightPreview_Light tmplight;
-						tmplight.m_Light = *pLight;
-						tmplight.m_flDistanceToEye = pLight->m_Position.DistTo( eye_pnt );
-						light_queue.Insert(tmplight);
+						light_queue.Insert(CLightPreview_Light{l, l.m_Position.DistTo( eye_pnt )});
 					}
 				}
 				if ( light_queue.Count() == 0 )
