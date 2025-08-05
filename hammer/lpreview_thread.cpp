@@ -534,9 +534,8 @@ bool CLightingPreviewThread::AnyUsefulWorkToDo()
 {
 	if (  m_pLightList ) 
 	{
-		for(int i=0;i<m_pLightList->Count();i++)
+		for(const auto &l : *m_pLightList)
 		{
-			CLightingPreviewLightDescription &l=(*m_pLightList)[i];
 			CIncrementalLightInfo *l_info=l.m_pIncrementalInfo;
 			if ( l_info->HasWorkToDo() )
 				return true;
@@ -551,9 +550,8 @@ void CLightingPreviewThread::DoWork()
 	{
 		CLightingPreviewLightDescription *best_l=NULL;
 		CIncrementalLightInfo *best_l_info=NULL;
-		for(int i=0;i<m_pLightList->Count();i++)
+		for(auto &l : *m_pLightList)
 		{
-			CLightingPreviewLightDescription &l=(*m_pLightList)[i];
 			CIncrementalLightInfo *l_info=l.m_pIncrementalInfo;
 			if ( l_info->HasWorkToDo() )
 			{
@@ -591,8 +589,8 @@ void CLightingPreviewThread::HandleGBuffersMessage( MessageToLPreview &msg_in )
 		msg_in.m_pDefferedRenderingBMs[2]->RGBAData);
 
 	m_LastEyePosition = msg_in.m_EyePosition;
-	for( int i = 0;i < ARRAYSIZE( msg_in.m_pDefferedRenderingBMs ); i++ )
-		delete msg_in.m_pDefferedRenderingBMs[i];
+	for( auto *bm : msg_in.m_pDefferedRenderingBMs )
+		delete bm;
 	n_gbufs_queued--;
 	m_nBitmapGenerationCounter = msg_in.m_nBitmapGenerationCounter;
 	CalculateSceneBounds();
@@ -604,10 +602,9 @@ void CLightingPreviewThread::SendResult()
 {
 	m_ResultImage = m_Albedos;
  	m_ResultImage *= EstimatedUnshotAmbient();
-	for( int i = 0 ; i < m_pLightList->Count(); i ++ )
+	for( const auto &l : *m_pLightList )
 	{
-		CLightingPreviewLightDescription & l = ( *m_pLightList )[i];
-		CIncrementalLightInfo * l_info = l.m_pIncrementalInfo;
+		CIncrementalLightInfo *l_info = l.m_pIncrementalInfo;
 		if ( ( l_info->m_fTotalContribution > 0.0 ) &&
 			 ( l_info->m_eIncrState >= INCR_STATE_PARTIAL_RESULTS ) )
 		{
@@ -619,7 +616,7 @@ void CLightingPreviewThread::SendResult()
 				int src_y = ( y & ~( N_INCREMENTAL_STEPS - 1 ))
 					+ m_ClosestLineOffset[l_info->m_PartialResultsStage][yo];
 				FourVectors const * cptr = &( src.CompoundElement( 0, src_y ));
-				FourVectors * dest =& ( m_ResultImage.CompoundElement( 0, y ));
+				FourVectors * dest = &( m_ResultImage.CompoundElement( 0, y ));
 				FourVectors const *pAlbedo =&( m_Albedos.CompoundElement( 0, y ));
 				for( int x = 0;x < m_ResultImage.m_nPaddedWidth;x ++ )
 				{
