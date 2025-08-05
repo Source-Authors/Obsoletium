@@ -285,6 +285,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 	}
 	
 	char *ppParms[32];
+	BitwiseClear(ppParms);
 	INT_PTR iSize = Commands.GetSize(), i = 0;
 	while(iSize--)
 	{
