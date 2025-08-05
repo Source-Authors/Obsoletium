@@ -390,9 +390,9 @@ static bool FileSystem_GetBaseDir( char (&baseDir)[max_size] )
 	return false;
 }
 
-static bool LaunchVConfig()
+template<size_t size>
+static bool LaunchVConfig(OUT_Z_ARRAY char (&vconfigExe)[size])
 {
-	char vconfigExe[MAX_PATH];
 	if ( !FileSystem_GetExecutableDir( vconfigExe ) )
 		return false;
 
@@ -429,9 +429,10 @@ static FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t ret
 		 g_FileSystemErrorMode.load(std::memory_order::memory_order_relaxed) == FS_ERRORMODE_VCONFIG &&
 		 !CommandLine()->FindParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
 	{
-		if ( !LaunchVConfig() )
+		char vconfigExe[MAX_PATH];
+		if ( !LaunchVConfig( vconfigExe ) )
 		{
-			Warning( "Unable to launch VConfig.\n" );
+			Warning( "Unable to launch VConfig executable from '%s' to configure file system paths.\n", vconfigExe );
 			return FS_UNABLE_TO_INIT;
 		}
 	}
