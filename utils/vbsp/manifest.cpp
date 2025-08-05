@@ -407,7 +407,7 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	}
 
 	// no pref message for now
-	//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+	//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest Load Error", MB_OK | MB_ICONEXCLAMATION );
 	return false;
 }
 

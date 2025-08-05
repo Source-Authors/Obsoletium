@@ -688,7 +688,7 @@ void CToolEntity::CreateMapObject(CMapView2D *pView)
 
 		if (pPrefabObject == NULL)
 		{
-			pView->MessageBox("Unable to load prefab.", "Hammer - Error", MB_OK | MB_ICONERROR);
+			pView->MessageBox("Unable to load prefab.", "Hammer - Prefabs Load Error", MB_OK | MB_ICONERROR);
 			SetEmpty();
 			return;
 		}

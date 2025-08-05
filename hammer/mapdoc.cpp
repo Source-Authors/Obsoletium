@@ -1557,7 +1557,7 @@ bool CMapDoc::LoadVMF( const char *pszFileName, int LoadFlags )
 	}
 	else
 	{
-		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Error loading file", MB_OK | MB_ICONEXCLAMATION);
+		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - VMF Load Error", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	if ( bLocked )
@@ -1742,8 +1742,8 @@ void CMapDoc::Postload(const char *pszFileName)
 	{
 		char szError[ 1024 ];
 
-		V_sprintf_safe( szError, "For your information, %d solid(s) were not loaded due to errors in the file.\nWould you like to Re-Save your map with the invalid solids removed?", CMapSolid::GetBadSolidCount() );
-		if ( GetMainWnd()->MessageBox(szError, "Warning", MB_YESNO | MB_ICONQUESTION) == IDYES )
+		V_sprintf_safe( szError, "For your information, %d solid(s) were not loaded due to errors in the file.\n\nWould you like to Re-Save your map with the invalid solids removed?", CMapSolid::GetBadSolidCount() );
+		if ( GetMainWnd()->MessageBox(szError, "Hammer - Resave Without Solids Warning", MB_YESNO | MB_ICONQUESTION) == IDYES )
 		{
 			OnFileSave();
 		}
@@ -5196,7 +5196,7 @@ void CMapDoc::OnToolsGroup(void)
 		CMapClass *pobj = pSelList->Element(i);
 		if ((pobj->GetParent() != NULL) && (!IsWorldObject(pobj->GetParent())))
 		{
-			if (GetMainWnd()->MessageBox("Some selected objects are part of an entity or belong to a group. Grouping them now will remove them from the entity or group! Continue?", "Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
+			if (GetMainWnd()->MessageBox("Some selected objects are part of an entity or belong to a group.\nGrouping them now will remove them from the entity or group!\n\nContinue?", "Hammer - Remove From Group Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
 			{
 				return;
 			}
@@ -5664,7 +5664,7 @@ void CMapDoc::OnFileExport(void)
 
 		if (strFile.CompareNoCase(dlg.GetPathName()) == 0)
 		{
-			if (GetMainWnd()->MessageBox("You are about to export over your current work file. Some data loss will occur if you have any objects hidden. Continue?", "Export Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
+			if (GetMainWnd()->MessageBox("You are about to export over your current work file.\nSome data loss will occur if you have any objects hidden.\n\nContinue?", "Hammer - Export Overwrite File Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
 			{
 				return;
 			}
@@ -7658,7 +7658,7 @@ void CMapDoc::OnViewShowconnections(void)
 //-----------------------------------------------------------------------------
 void CMapDoc::OnMapEntityGallery(void)
 {
-	if (GetMainWnd()->MessageBox("This will place one of every possible point entity in the current map! Performing this operation in an empty map is recommended. Continue?", "Create Entity Gallery", MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
+	if (GetMainWnd()->MessageBox("This will place one of every possible point entity in the current map!\nPerforming this operation in an empty map is recommended.\n\nContinue?", "Hammer - Create Entity Gallery", MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
 	{
 		int x = -1024;
 		int y = -1024;
@@ -9945,7 +9945,7 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 
 	if (eResult != ChunkFile_Ok)
 	{
-		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Error Saving File", MB_OK | MB_ICONERROR);
+		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Saving File Error", MB_OK | MB_ICONERROR);
 	}
 	else
 	{

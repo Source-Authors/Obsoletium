@@ -3881,7 +3881,7 @@ void COP_Entity::PerformMark( const char *szTargetName, bool bClear, bool bNameO
 			}
 			else
 			{
-				MessageBox("No entities were found with that targetname.", "No entities found", MB_ICONINFORMATION | MB_OK);
+				MessageBox("No entities were found with that targetname.", "Hammer - No Entities Found", MB_ICONINFORMATION | MB_OK);
 			}
 		}
 	}
@@ -4531,7 +4531,7 @@ void COP_Entity::UpdatePickFaceText(CToolPickFace *pTool)
 	pTool->GetSelectedFaces(FaceListFull, FaceListPartial);
 	if (!CMapWorld::FaceID_FaceListsToString(szList, sizeof(szList), &FaceListFull, &FaceListPartial))
 	{
-		MessageBox("Too many faces selected for this keyvalue to hold. Deselect some faces.", "Error", MB_OK);
+		MessageBox("Too many faces selected for this keyvalue to hold. Deselect some faces.", "Hammer - Too Many Faces Warning", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	//

@@ -949,7 +949,7 @@ void COP_Output::OnMark(void)
 		}
 		else
 		{
-			MessageBox("No entities were found with that targetname.", "No entities found", MB_ICONINFORMATION | MB_OK);
+			MessageBox("No entities were found with that targetname.", "Hammer - No Entities Found", MB_ICONINFORMATION | MB_OK);
 			return;
 		}
 	}

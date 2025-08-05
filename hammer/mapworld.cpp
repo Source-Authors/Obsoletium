@@ -1692,7 +1692,7 @@ void CMapWorld::PostloadVisGroups()
 	if ( bFoundOrphans == true )
 	{
 		pDoc->VisGroups_CreateNamedVisGroup( orphans, "_orphaned hidden", true, false );
-		GetMainWnd()->MessageBox( "Orphaned objects were found and placed into the \"_orphaned hidden\" visgroup.", "Orphaned Objects Found", MB_OK | MB_ICONEXCLAMATION);
+		GetMainWnd()->MessageBox( "Orphaned objects were found and placed into the \"_orphaned hidden\" visgroup.", "Hammer - Orphaned Objects Found Warning", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	// Link up all the connections to the entities

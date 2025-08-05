@@ -198,8 +198,8 @@ EditorSendResult_t Editor_SendCommand(const char *pszCommand, bool bShowUI)
 			if (bShowUI)
 			{
 				char szError[1024];
-				Q_snprintf(szError,sizeof(szError), "Worldcraft did not accept the command: \n\n\"%s\"\n\n Make sure the command is valid and that Worldcraft is still running properly.", pszCommand);
-				MessageBox(NULL, szError, "Editor_SendCommand Error", MB_OK);
+				Q_snprintf(szError,sizeof(szError), "Hammer did not accept the command: \n\n\"%s\"\n\n Make sure the command is valid and that Hammer is still running properly.", pszCommand);
+				MessageBox(NULL, szError, "Hammer - Send Shell Command Error", MB_OK | MB_ICONERROR);
 			}
 		
 			return(Editor_BadCommand);
@@ -210,8 +210,8 @@ EditorSendResult_t Editor_SendCommand(const char *pszCommand, bool bShowUI)
 		if (bShowUI)
 		{
 			char szError[1024];
-			Q_snprintf(szError,sizeof(szError), "Could not contact Worldcraft to send the command: \n\n\"%s\"\n\n Worldcraft does not appear to be running.", pszCommand);
-			MessageBox(NULL, szError, "Editor_SendCommand Error", MB_OK);
+			Q_snprintf(szError,sizeof(szError), "Could not contact Hammer to send the command: \n\n\"%s\"\n\n Hammer does not appear to be running.", pszCommand);
+			MessageBox(NULL, szError, "Hammer - Send Shell Command Error", MB_OK | MB_ICONERROR);
 		}
 
 		return(Editor_NotRunning);

@@ -598,7 +598,7 @@ const char* MDLViewer::SteamGetOpenFilename()
 	{
 		char str[512];
 		V_sprintf_safe( str, "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
-		MessageBox( NULL, str, "Error", MB_OK );
+		MessageBox( NULL, str, "HLMV - Create Interface Error", MB_OK | MB_ICONERROR );
 		return NULL;
 	}
 	pDlg->Init( g_Factory, NULL );

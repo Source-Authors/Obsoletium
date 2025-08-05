@@ -53,7 +53,7 @@ CRender::CRender(void)
 		if ( !s_bOnce )
 		{
 			s_bOnce = true;
-			MessageBox( NULL, "Failed to load the default scheme file. The map views may be missing some visual elements.", "Hammer - Error", MB_OK | MB_ICONEXCLAMATION );
+			MessageBox( NULL, "Failed to load the default scheme file.\n\nThe map views may be missing some visual elements.", "Hammer - Scheme Load Error", MB_OK | MB_ICONEXCLAMATION );
 		}
 	}
 	
@@ -1376,7 +1376,7 @@ bool CRender::GetRequiredMaterial( const char *pName, IMaterial* &pMaterial )
 	{
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "Missing material '%s'. Go to Tools | Options | Game Configurations and verify that your game directory is correct.", pName );
-		MessageBox( NULL, str, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
+		MessageBox( NULL, str, "Hammer - Missed Material Error", MB_OK | MB_ICONERROR );
 		return false;
 	}
 }

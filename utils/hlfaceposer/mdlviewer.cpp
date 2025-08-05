@@ -1634,7 +1634,7 @@ void MDLViewer::LoadModel_Steam()
 	{
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
-		::MessageBox( NULL, str, "Error", MB_OK );
+		::MessageBox( NULL, str, "HLFacePoser - Interface Create Error", MB_OK | MB_ICONERROR );
 		return;
 	}
 	pDlg->Init( g_Factory, NULL );

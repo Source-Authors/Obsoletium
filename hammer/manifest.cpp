@@ -409,12 +409,12 @@ bool CManifest::LoadVMFManifest( const char *pszFileName )
 	}
 	else
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest Load Error", MB_OK | MB_ICONEXCLAMATION );
 	}
 
 	if ( GetNumMaps() == 0 )
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Manifest file does not contain any maps!", MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest Without Maps Error", MB_OK | MB_ICONEXCLAMATION );
 		return false;
 	}
 
@@ -536,7 +536,7 @@ bool CManifest::LoadVMFManifestUserPrefs( const char *pszFileName )
 	else
 	{
 		// no pref message for now
-//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Error loading manifest!", MB_OK | MB_ICONEXCLAMATION );
+//		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest Load Error", MB_OK | MB_ICONEXCLAMATION );
 	}
 
 	return true;
@@ -610,7 +610,7 @@ bool CManifest::SaveVMFManifest( const char *pszFileName )
 	ChunkFileResult_t eResult = File.Open( pszFileName, ChunkFile_Write );
 	if (eResult != ChunkFile_Ok)
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest", MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest Save Error", MB_OK | MB_ICONEXCLAMATION );
 		bSaved = false;
 	}
 	else
@@ -680,7 +680,7 @@ bool CManifest::SaveVMFManifest( const char *pszFileName )
 		}
 		else
 		{
-			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest", MB_OK | MB_ICONEXCLAMATION );
+			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest Save Error", MB_OK | MB_ICONEXCLAMATION );
 			bSaved = false;
 		}
 
@@ -735,7 +735,7 @@ bool CManifest::SaveVMFManifestMaps( const char *pszFileName )
 
 	if ( !bSaved )
 	{
-		GetMainWnd()->MessageBox( "Not all pieces of the manifest were saved!", "Error saving Manifest!", MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( "Not all pieces of the manifest were saved!", "Hammer - Manifest Save Error", MB_OK | MB_ICONEXCLAMATION );
 	}
 
 	return bSaved;
@@ -767,7 +767,7 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 	ChunkFileResult_t eResult = File.Open( FileName, ChunkFile_Write );
 	if (eResult != ChunkFile_Ok)
 	{
-		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest User Prefs" , MB_OK | MB_ICONEXCLAMATION );
+		GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest User Prefs Save Error" , MB_OK | MB_ICONEXCLAMATION );
 		bSaved = false;
 	}
 	else
@@ -815,7 +815,7 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 		}
 		else
 		{
-			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest User Prefs", MB_OK | MB_ICONEXCLAMATION );
+			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest User Prefs Save Error", MB_OK | MB_ICONEXCLAMATION );
 			bSaved = false;
 		}
 
@@ -850,7 +850,7 @@ bool CManifest::SaveVMFManifestUserPrefs( const char *pszFileName )
 		// dimhotepus: Check result.
 		if (eResult != ChunkFile_Ok)
 		{
-			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Error saving Manifest User Prefs", MB_OK | MB_ICONEXCLAMATION );
+			GetMainWnd()->MessageBox( File.GetErrorText( eResult ), "Hammer - Manifest User Prefs Save Error", MB_OK | MB_ICONEXCLAMATION );
 			bSaved = false;
 		}
 	}

@@ -132,7 +132,7 @@ static bool GetRequiredMaterial( const char *pName, IMaterial* &pMaterial )
 	{
 		char str[512];
 		V_sprintf_safe( str, "Missing material '%s'. Go to Tools | Options | Game Configurations and verify that your game directory is correct.", pName );
-		MessageBox( NULL, str, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
+		MessageBox( NULL, str, "Hammer - Missed Material Error", MB_OK | MB_ICONERROR );
 		return false;
 	}
 }
@@ -455,7 +455,7 @@ bool CRender3D::SetView( CMapView *pView )
 	if ((m_WinData.hDC = GetDCEx(m_WinData.hWnd, NULL, DCX_CACHE | DCX_CLIPSIBLINGS)) == NULL)
 	{
 		ChangeDisplaySettings(NULL, 0);
-		MessageBox(NULL, "GetDC on main window failed", "Hammer - Fatal Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, "GetDC on main window failed.", "Hammer - Graphics Context Acquire Error", MB_OK | MB_ICONERROR);
 		return(false);
 	}
 

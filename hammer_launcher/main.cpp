@@ -86,12 +86,12 @@ SpewRetval_t HammerSpewFunc(SpewType_t type, char const *raw) {
   if (type == SPEW_ASSERT) return SPEW_DEBUGGER;
 
   if (type == SPEW_WARNING) {
-    MessageBoxA(nullptr, message, "Hammer - Warning", MB_OK | MB_ICONWARNING);
+    MessageBox(nullptr, message, "Hammer - Warning", MB_OK | MB_ICONWARNING);
     return SPEW_CONTINUE;
   }
 
   if (type == SPEW_ERROR) {
-    MessageBoxA(nullptr, message, "Hammer - Error", MB_OK | MB_ICONSTOP);
+    MessageBox(nullptr, message, "Hammer - Error", MB_OK | MB_ICONSTOP);
     return SPEW_ABORT;
   }
 

@@ -629,7 +629,7 @@ bool COptions::RunConfigurationDialog()
 {
 	CString strText;
 	strText.LoadString(IDS_NO_CONFIGS_AVAILABLE);
-	if (MessageBox(NULL, strText, "First Time Setup", MB_ICONQUESTION | MB_YESNO) == IDYES)
+	if (MessageBox(NULL, strText, "Hammer - First Time Setup", MB_ICONQUESTION | MB_YESNO) == IDYES)
 	{
 		APP()->OpenURL(ID_HELP_FIRST_TIME_SETUP, GetMainWnd()->GetSafeHwnd());
 	}
@@ -645,7 +645,7 @@ bool COptions::RunConfigurationDialog()
 
 		if (configs.nConfigs == 0)
 		{
-			MessageBox(NULL, "You must create at least one game configuration before using Hammer.", "First Time Setup", MB_ICONEXCLAMATION | MB_OK);
+			MessageBox(NULL, "You must create at least one game configuration before using Hammer.", "Hammer - First Time Setup", MB_ICONEXCLAMATION | MB_OK);
 		}
 
 	} while (configs.nConfigs == 0);

@@ -222,7 +222,7 @@ void CAudioDeviceWave::OpenWaveOut( void )
 		int nRetVal = MessageBox( NULL,
 			"The sound hardware is in use by another app.\n\n"
 			"Select Retry to try to start sound again or Cancel to run with no sound.",
-			"Sound not available",
+			"Game - Sound Not Available Warning",
 			MB_RETRYCANCEL | MB_SETFOREGROUND | MB_ICONEXCLAMATION);
 
 		if ( nRetVal != IDRETRY )
