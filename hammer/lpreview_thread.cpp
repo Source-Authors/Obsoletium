@@ -145,7 +145,7 @@ public:
 	}
 
 	// check if the master has new work for us to do, meaning we should abort rendering
-	bool ShouldAbort()
+	bool ShouldAbort() const
 	{
 		return g_HammerToLPreviewMsgQueue.MessageWaiting();
 	}
