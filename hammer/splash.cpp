@@ -279,6 +279,9 @@ BOOL CSplashWnd::PreTranslateAppMessage(MSG* pMsg)
 	    pMsg->message == WM_LBUTTONDOWN ||
 	    pMsg->message == WM_RBUTTONDOWN ||
 	    pMsg->message == WM_MBUTTONDOWN ||
+		// dimhotepus: Honor X button and mouse wheel.
+	    pMsg->message == WM_XBUTTONDOWN ||
+	    pMsg->message == WM_MOUSEHWHEEL ||
 	    pMsg->message == WM_NCLBUTTONDOWN ||
 	    pMsg->message == WM_NCRBUTTONDOWN ||
 	    pMsg->message == WM_NCMBUTTONDOWN)
