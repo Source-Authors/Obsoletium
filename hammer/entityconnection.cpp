@@ -138,7 +138,7 @@ void CEntityConnection::LinkSourceEntities()
 			CMapEntityList matches;
 			pWorld->FindEntitiesByName( matches, m_szSourceEntity, false );
 		
-			for ( int i = 0; i < matches.Count(); i++ )
+			for ( intp i = 0; i < matches.Count(); i++ )
 			{
 				CMapEntity *pEntity = matches.Element( i );
 
@@ -177,7 +177,7 @@ void CEntityConnection::LinkTargetEntities()
 			CMapEntityList matches;
 			pWorld->FindEntitiesByName( matches, m_szTargetEntity, false );
 		
-			for ( int i = 0; i < matches.Count(); i++ )
+			for ( intp i = 0; i < matches.Count(); i++ )
 			{
 				CMapEntity *pEntity = matches.Element( i );
 		
@@ -197,7 +197,7 @@ void CEntityConnection::LinkTargetEntities()
 bool CEntityConnection::AreAnyTargetEntitiesVisible()
 {
 	CMapEntityList *pList = GetTargetEntityList();
-	for ( int iTarget=0; iTarget < pList->Count(); iTarget++ )
+	for ( intp iTarget=0; iTarget < pList->Count(); iTarget++ )
 	{
 		if ( pList->Element( iTarget )->IsVisible() )
 			return true;
@@ -343,8 +343,8 @@ void CEntityConnection::FindBadConnections(CMapEntity *pEntity, bool bVisibility
 	}
 
 	// For each connection
-	int nConnCount = pEntity->Connections_GetCount();
-	for (int i = 0; i < nConnCount; i++)
+	intp nConnCount = pEntity->Connections_GetCount();
+	for (intp i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConnection = pEntity->Connections_Get(i);
 		if (pConnection != NULL)
@@ -415,8 +415,8 @@ void CEntityConnection::FixBadConnections(CMapEntity *pEntity, bool bVisibilityC
 	FindBadConnections(pEntity, bVisibilityCheck, BadConnectionList);
 
 	// Remove the bad connections.
-	int nBadConnCount = BadConnectionList.Count();
-	for (int i = 0; i < nBadConnCount; i++)
+	intp nBadConnCount = BadConnectionList.Count();
+	for (intp i = 0; i < nBadConnCount; i++)
 	{
 		CEntityConnection *pConnection = BadConnectionList.Element(i);
 		pEntity->Connections_Remove( pConnection );
@@ -492,8 +492,8 @@ int CEntityConnection::ValidateInputConnections(CMapEntity *pEntity, bool bVisib
 		if ( bVisibilityCheck && !pTestEntity->IsVisible() )
 			continue;
 
-		int nConnCount = pTestEntity->Connections_GetCount();
-		for (int i = 0; i < nConnCount; i++)
+		intp nConnCount = pTestEntity->Connections_GetCount();
+		for (intp i = 0; i < nConnCount; i++)
 		{
 			// If the connection targets me
 			CEntityConnection *pConnection = pTestEntity->Connections_Get(i);

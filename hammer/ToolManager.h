@@ -47,8 +47,8 @@ public:
 	void PushTool(ToolID_t nToolID); // activates a new tool and put current tool on stack
 	void PopTool(); // restores last tool on stack
 
-	inline int GetToolCount();
-	inline CBaseTool *GetTool(int nIndex);
+	inline intp GetToolCount();
+	inline CBaseTool *GetTool(intp nIndex);
 
 	void RemoveAllTools();
 	void AddTool(CBaseTool *pTool);
@@ -74,7 +74,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Accessor for iterating tools.
 //-----------------------------------------------------------------------------
-int CToolManager::GetToolCount()
+intp CToolManager::GetToolCount()
 {
 	return m_Tools.Count();
 }
@@ -83,7 +83,7 @@ int CToolManager::GetToolCount()
 //-----------------------------------------------------------------------------
 // Purpose: Accessor for iterating tools.
 //-----------------------------------------------------------------------------
-CBaseTool *CToolManager::GetTool(int nIndex)
+CBaseTool *CToolManager::GetTool(intp nIndex)
 {
 	return m_Tools.Element(nIndex);
 }

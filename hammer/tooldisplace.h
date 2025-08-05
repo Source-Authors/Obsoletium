@@ -156,7 +156,7 @@ private:
 	bool LoadFilters( const char *filename );
 	[[nodiscard]] static ChunkFileResult_t LoadFiltersCallback( CChunkFile *pFile, CToolDisplace *pDisplaceTool );
 
-	int GetSelectedDisps( void );
+	intp GetSelectedDisps( void );
 	EditDispHandle_t CollideWithSelectedDisps( const Vector &rayStart, const Vector &rayEnd );
 	bool RayAABBTest( CMapDisp *pDisp, const Vector &rayStart, const Vector &rayEnd );
 	void BuildParallelepiped( const Vector &boxMin, const Vector &boxMax, PLANE planes[6] );

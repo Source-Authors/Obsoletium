@@ -982,8 +982,8 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 			// copy all texfiles into value
 			tmpkv.szValue[0] = 0;
 			BOOL bFirst = TRUE;
-			int nGraphicsFiles = g_Textures.FilesGetCount();
-			for (int i = 0; i < nGraphicsFiles; i++)
+			intp nGraphicsFiles = g_Textures.FilesGetCount();
+			for (intp i = 0; i < nGraphicsFiles; i++)
 			{
 				char szFile[MAX_PATH];
 				GRAPHICSFILESTRUCT gf;

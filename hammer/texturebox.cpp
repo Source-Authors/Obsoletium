@@ -237,8 +237,8 @@ void CTextureBox::RebuildMRU(void)
 	// Add each texture from the graphics MRU to this list's MRU.
 	//
 	int nStrCount = 0;
-	int nMRUCount = g_Textures.MRUGetCount();
-	for (int nMRU = 0; nMRU < nMRUCount; nMRU++)
+	intp nMRUCount = g_Textures.MRUGetCount();
+	for (intp nMRU = 0; nMRU < nMRUCount; nMRU++)
 	{
 		IEditorTexture *pTex = g_Textures.MRUGet(nMRU);
 		if (pTex != NULL)
@@ -277,7 +277,7 @@ void CTextureBox::NotifyNewMaterial( IEditorTexture *pTex )
 	int iItem = AddString( szStr );
 	if ( iItem != CB_ERR )
 	{
-		SetItemDataPtr( iItem, (void *)pTex );
+		SetItemDataPtr( iItem, pTex );
 	}	
 }
 
@@ -324,8 +324,8 @@ void CTextureBox::LoadGraphicList(void)
 	// Add the MRU textures to the list.
 	//
 	int nStrCount = 0;
-	int nMRUCount = g_Textures.MRUGetCount();
-	for (int nMRU = 0; nMRU < nMRUCount; nMRU++)
+	intp nMRUCount = g_Textures.MRUGetCount();
+	for (intp nMRU = 0; nMRU < nMRUCount; nMRU++)
 	{
 		IEditorTexture *pTex = g_Textures.MRUGet(nMRU);
 		if (pTex != NULL)
@@ -333,7 +333,7 @@ void CTextureBox::LoadGraphicList(void)
 			char szStr[MAX_PATH];
 			pTex->GetShortName(szStr);
 			AddString(szStr);
-			SetItemDataPtr(nStrCount, (void *)pTex);
+			SetItemDataPtr(nStrCount, pTex);
 			nStrCount++;
 		}	
 	}

@@ -799,7 +799,7 @@ public:
 	inline int GetSize( void ) const;
 
 	// Use this disp as a CDispUtils.
-	void SetDispUtilsHelperInfo( CCoreDispInfo **ppListBase, int listSize );
+	void SetDispUtilsHelperInfo( CCoreDispInfo **ppListBase, intp listSize );
 
 	void SetNeighborData( const CDispNeighbor edgeNeighbors[4], const CDispCornerNeighbors cornerNeighbors[4] ) { GetSurface()->SetNeighborData( edgeNeighbors, cornerNeighbors ); }
 
@@ -942,7 +942,7 @@ private:
 
 	// The list that this disp is in (used for CDispUtils::IHelper implementation).
 	CCoreDispInfo		**m_ppListBase;
-	int					m_ListSize;
+	intp					m_ListSize;
 
 	CBitVec<MAX_DISPVERTS>	m_AllowedVerts;		// Built in VBSP. Defines which verts are allowed to exist based on what the neighbors are.
 

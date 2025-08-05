@@ -860,7 +860,7 @@ void CCoreDispInfo::InitDispInfo( int power, int minTess, float smoothingAngle, 
 }
 
 
-void CCoreDispInfo::SetDispUtilsHelperInfo( CCoreDispInfo **ppListBase, int listSize )
+void CCoreDispInfo::SetDispUtilsHelperInfo( CCoreDispInfo **ppListBase, intp listSize )
 {
 	m_ppListBase = ppListBase;
 	m_ListSize = listSize;

@@ -55,7 +55,7 @@ public:
 	void DeselectHandle(MORPHHANDLE *pInfo);
 
 	void MoveSelectedHandles(const Vector &Delta);
-	int GetSelectedHandleCount(void) { return m_SelectedHandles.Count(); }
+	intp GetSelectedHandleCount(void) { return m_SelectedHandles.Count(); }
 	void GetSelectedCenter(Vector& pt);
 	SSHANDLETYPE GetSelectedType() { return m_SelectedType; }
 	bool IsSelected(MORPHHANDLE &mh);

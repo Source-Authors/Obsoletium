@@ -134,8 +134,8 @@ GDinputvariable *Selection3D::ChooseEyedropperVar(CMapView *pView, CUtlVector<GD
 	//
 	CMenu menu;
 	menu.CreatePopupMenu();
-	int nVarCount = VarList.Count();
-	for (int nVar = 0; nVar < nVarCount; nVar++)
+	intp nVarCount = VarList.Count();
+	for (intp nVar = 0; nVar < nVarCount; nVar++)
 	{
 		GDinputvariable *pVar = VarList.Element(nVar);
 		menu.AppendMenu(MF_STRING, nVar + 1, pVar->GetLongName());
@@ -277,7 +277,7 @@ void Selection3D::TransformSelection(void)
 {
 	// Transform the selected objects.
 	const CMapObjectList *pSelList = m_pSelection->GetList();
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		CMapClass *pobj = pSelList->Element(i);
 		pobj->Transform( GetTransformMatrix() );
@@ -294,7 +294,7 @@ void Selection3D::TransformLogicalSelection( const Vector2D &vecTranslation )
 {
 	// Transform the selected objects.
 	const CMapObjectList *pSelList = m_pSelection->GetList();
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		CMapClass *pObj = pSelList->Element(i);
 		Vector2D vecNewPosition;
@@ -394,7 +394,7 @@ void Selection3D::RenderTool2D(CRender2D *pRender)
 		pRender->BeginLocalTransfrom( matrix );
 
 		const CMapObjectList *pSelList = m_pSelection->GetList();
-		for (int i = 0; i < pSelList->Count(); i++)
+		for (intp i = 0; i < pSelList->Count(); i++)
 		{
 			CMapClass *pobj = pSelList->Element(i);
 			
@@ -431,7 +431,7 @@ void Selection3D::RenderToolLogical( CRender2D *pRender )
 		pRender->BeginLocalTransfrom( matrix );
 
 		const CMapObjectList *pSelList = m_pSelection->GetList();
-		for (int i = 0; i < pSelList->Count(); i++)
+		for (intp i = 0; i < pSelList->Count(); i++)
 		{
 			CMapClass *pobj = pSelList->Element(i);
 			
@@ -501,7 +501,7 @@ void Selection3D::RenderTool3D(CRender3D *pRender)
 		pRender->BeginLocalTransfrom( matrix );
 
 		
-		for (int i = 0; i < pSelList->Count(); i++)
+		for (intp i = 0; i < pSelList->Count(); i++)
 		{
 			CMapClass *pobj = pSelList->Element(i);
 
@@ -529,7 +529,7 @@ CBaseTool *Selection3D::GetToolObject( CMapView2D *pView, const Vector2D &vPoint
 {
 
 	const CMapObjectList *pSelList = m_pSelection->GetList();
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		CMapClass *pObject = pSelList->Element(i);
 
@@ -558,7 +558,7 @@ CBaseTool *Selection3D::GetToolObject( CMapView2D *pView, const Vector2D &vPoint
 CBaseTool *Selection3D::GetToolObjectLogical( CMapViewLogical *pView, const Vector2D &vPoint, bool bAttach )
 {
 	const CMapObjectList *pSelList = m_pSelection->GetList();
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		CMapClass *pObject = pSelList->Element(i);
 
@@ -1649,7 +1649,7 @@ void Selection3D::EyedropperPick(CMapView *pView, CMapClass *pObject)
 
 	const CMapObjectList *pSelList = m_pSelection->GetList();
 
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		pObject = pSelList->Element(i);
 		pEntity = dynamic_cast <CMapEntity *> (pObject);
@@ -1673,7 +1673,7 @@ void Selection3D::EyedropperPick(CMapView *pView, CMapClass *pObject)
 	//
 	// Prompt for what keyvalue in the selected entities we are filling out.
 	//
-	int nCount = VarList.Count();
+	intp nCount = VarList.Count();
 	if (nCount <= 0)
 	{
 		//
@@ -1702,7 +1702,7 @@ void Selection3D::EyedropperPick(CMapView *pView, CMapClass *pObject)
 	//
 	// Apply the key to all selected entities with the chosen keyvalue.
 	//
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		pObject = pSelList->Element(i);
 	

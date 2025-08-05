@@ -2089,11 +2089,9 @@ void CMapDoc::CollapseInstances( bool bOnlySelected )
 // Output : Result - returns the $variable if it exists
 //			returns the string index after the variable if one is found, otherwise -1 if not found
 //-----------------------------------------------------------------------------
-int FindInstanceParm( char *Text, ptrdiff_t StartPos, CString &Result )
+intp FindInstanceParm( const char *Text, intp StartPos, CString &Result )
 {
-	char	*found;
-
-	found = strchr( Text + StartPos, '$' );
+	const char *found = strchr( Text + StartPos, '$' );
 	if ( found == NULL )
 	{
 		return -1;
@@ -2129,14 +2127,14 @@ void CMapDoc::PopulateInstanceParms_r( CMapEntity *pEntity, const CMapObjectList
 
 		if ( pInstanceEntity && pInstanceEntity != pEntity )
 		{
-			for ( int i = pInstanceEntity->GetFirstKeyValue(); i != pInstanceEntity->GetInvalidKeyValue(); i = pInstanceEntity->GetNextKeyValue( i ) )
+			for ( auto i = pInstanceEntity->GetFirstKeyValue(); i != pInstanceEntity->GetInvalidKeyValue(); i = pInstanceEntity->GetNextKeyValue( i ) )
 			{
 				LPCTSTR	pValue = pInstanceEntity->GetKeyValue( i );
 
-				int			StartPos = 0;
+				intp		StartPos = 0;
 				CString		Result;
 
-				while( ( StartPos = FindInstanceParm( (char * )pValue, StartPos, Result ) ) != -1 )
+				while( ( StartPos = FindInstanceParm( pValue, StartPos, Result ) ) != -1 )
 				{
 					if ( ParmList.Find( Result ) == -1 )
 					{
@@ -2145,17 +2143,17 @@ void CMapDoc::PopulateInstanceParms_r( CMapEntity *pEntity, const CMapObjectList
 				}
 			}
 
-			int nCount = pInstanceEntity->Connections_GetCount();
-			for ( int j = 0; j < nCount; ++j )
+			intp nCount = pInstanceEntity->Connections_GetCount();
+			for ( intp j = 0; j < nCount; ++j )
 			{
 				CEntityConnection *pConn = pInstanceEntity->Connections_Get( j );
 
 				const char *pValue = pConn->GetTargetName();
 
-				int			StartPos = 0;
+				intp		StartPos = 0;
 				CString		Result;
 
-				while( ( StartPos = FindInstanceParm( (char * )pValue, StartPos, Result ) ) != -1 )
+				while( ( StartPos = FindInstanceParm( pValue, StartPos, Result ) ) != -1 )
 				{
 					if ( ParmList.Find( Result ) == -1 )
 					{
@@ -3757,16 +3755,16 @@ void CMapDoc::BuildCascadingSelectionList( CMapClass *pObj, CUtlRBTree< CMapClas
 	if ( !pClass )
 		return;
 
-	int nCount = pClass->Connections_GetCount();
-	for ( int j = 0; j < nCount; ++j )
+	intp nCount = pClass->Connections_GetCount();
+	for ( intp j = 0; j < nCount; ++j )
 	{
 		CEntityConnection *pConn = pClass->Connections_Get( j );
 
 		CMapEntityList entityList;
 		FindEntitiesByName( entityList, pConn->GetTargetName(), true );
 		
-		int nOutputCount = entityList.Count();
-		for ( int k = 0; k < nOutputCount; ++k )
+		intp nOutputCount = entityList.Count();
+		for ( intp k = 0; k < nOutputCount; ++k )
 		{
 			CMapEntity *pEntity = entityList.Element(k);
 			if ( pEntity == pObj )
@@ -7318,8 +7316,8 @@ void CMapDoc::AddConnectedNodes( CMapClass *pObject, CUtlRBTree< CMapClass*, uns
 				if ( pClass )
 				{
 					// Iterate through each of the upstream connections
-					int nCount = pClass->Upstream_GetCount();
-					for ( int i = 0; i < nCount; ++i )
+					intp nCount = pClass->Upstream_GetCount();
+					for ( intp i = 0; i < nCount; ++i )
 					{
 						CEntityConnection *pConn = pClass->Upstream_Get( i );
 
@@ -7338,7 +7336,7 @@ void CMapDoc::AddConnectedNodes( CMapClass *pObject, CUtlRBTree< CMapClass*, uns
 
 					// Iterate through each of the downstream connections
 					nCount = pClass->Connections_GetCount();
-					for ( int i = 0; i < nCount; ++i )
+					for ( intp i = 0; i < nCount; ++i )
 					{
 						CEntityConnection *pConn = pClass->Connections_Get( i );
 

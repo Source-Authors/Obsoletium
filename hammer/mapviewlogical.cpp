@@ -241,16 +241,16 @@ void CMapViewLogical::PopulateConnectionList( )
 				CEditGameClass *pClass = dynamic_cast< CEditGameClass * >( pObject );
 				if ( pClass )
 				{
-					int nCount = pClass->Connections_GetCount();
-					for ( int i = 0; i < nCount; ++i )
+					intp nCount = pClass->Connections_GetCount();
+					for ( intp i = 0; i < nCount; ++i )
 					{
 						CEntityConnection *pConn = pClass->Connections_Get( i );
 						 
 						// Find the input entity associated with this connection
 						CMapEntityList *pEntityList = pConn->GetTargetEntityList();
 
-						int j;
-						int nInputCount = pEntityList->Count();
+						intp j;
+						intp nInputCount = pEntityList->Count();
 						for ( j = 0; j < nInputCount; ++j )
 						{
 							CMapEntity *pEntity = pEntityList->Element(j);
@@ -345,13 +345,13 @@ void CMapViewLogical::DrawConnectingWire( float x, float y, CMapEntity *pSource,
 	pTarget->GetLogicalConnectionPosition( LOGICAL_CONNECTION_INPUT, vecConnector );
 	vecEndPosition = vecConnector;
 
-	int		nInputs = pTarget->Upstream_GetCount();
+	intp nInputs = pTarget->Upstream_GetCount();
 
 	// Compensate for multiple inputs -- fan-in the connections from the various pSource entities
 	BOOL bFound = false;
 	if ( nInputs )
 	{
-		int nInput;
+		intp nInput;
 		for ( nInput = 0; nInput < nInputs; nInput++ )
 		{
 			CEntityConnection *pInputConnection = pTarget->Upstream_Get(nInput);
@@ -410,9 +410,9 @@ void CMapViewLogical::RenderConnections(const bool bDrawSelected, const bool bAn
 	WorldToClient( pt, Vector( 0.0f, 0.0f, 0.0f ) );
 	WorldToClient( pt2, Vector( 0.0f, LOGICAL_CONN_VERT_SPACING, 0.0f ) );
 	
-	int nCount = m_ConnectionList.Count();
+	intp nCount = m_ConnectionList.Count();
 
-	for ( int i = 0; i < nCount ; ++i )
+	for ( intp i = 0; i < nCount ; ++i )
 	{
 		CMapEntity *pMapClass = dynamic_cast<CMapEntity*>( m_ConnectionList[i] );
 		if ( !pMapClass )
@@ -422,7 +422,7 @@ void CMapViewLogical::RenderConnections(const bool bDrawSelected, const bool bAn
 		if ( !pEditClass )
 			continue;
 
-		int nConnectionCount = pEditClass->Connections_GetCount();
+		intp nConnectionCount = pEditClass->Connections_GetCount();
 		if ( nConnectionCount == 0 )
 			continue;
 
@@ -434,13 +434,13 @@ void CMapViewLogical::RenderConnections(const bool bDrawSelected, const bool bAn
 		float x = vecStartPosition.x + LOGICAL_CONN_SPREAD_DIST + LOGICAL_CONN_TEXT_LENGTH;
 		float y = vecStartPosition.y + ( nConnectionCount - 1 ) * LOGICAL_CONN_VERT_SPACING / 2;
 
-		for ( int j = 0; j < nConnectionCount; ++j )
+		for ( intp j = 0; j < nConnectionCount; ++j )
 		{
 			CEntityConnection *pConn = pEditClass->Connections_Get( j );
 
 			// Find the input entity associated with this connection
 			CMapEntityList *pEntityList = pConn->GetTargetEntityList();
-			int nInputCount = pEntityList->Count();
+			intp nInputCount = pEntityList->Count();
 			bool bBadInput = !MapEntityList_HasInput( pEntityList, pConn->GetInputName() );
 			bool bBadConnection = (nInputCount == 0);
 
@@ -453,7 +453,7 @@ void CMapViewLogical::RenderConnections(const bool bDrawSelected, const bool bAn
 			bool bEntitySelected = ( pMapClass->GetSelectionState() != SELECT_NONE );
 			bool bInputSelected = false;
 
-			for ( int k = 0; k < nInputCount; ++k )
+			for ( intp k = 0; k < nInputCount; ++k )
 			{
 				if ( pEntityList->Element( k )->GetSelectionState() != SELECT_NONE )
 					bInputSelected = true;
@@ -522,7 +522,7 @@ void CMapViewLogical::RenderConnections(const bool bDrawSelected, const bool bAn
 					float my = y + ( nInputCount / 2 ) * LOGICAL_CONN_VERT_SPACING/2;
 
 					Vector vecStart( x + LOGICAL_CONN_MULTI_CIRCLE_RADIUS, y, 0.0f );
-					for ( int k = 0; k < nInputCount; ++k )
+					for ( intp k = 0; k < nInputCount; ++k )
 					{ 
 						// bBadInput = false; // This should be based on whether downstream entity has the specificied named input
 						bInputSelected = ( pEntityList->Element( k )->GetSelectionState() != SELECT_NONE );
@@ -656,8 +656,8 @@ void CMapViewLogical::Render()
 	// render all tools
 	CBaseTool *pCurTool = pDoc->GetTools()->GetActiveTool();
 
-	int nToolCount = pDoc->GetTools()->GetToolCount();
-	for (int i = 0; i < nToolCount; i++)
+	intp nToolCount = pDoc->GetTools()->GetToolCount();
+	for (intp i = 0; i < nToolCount; i++)
 	{
 		CBaseTool *pTool = pDoc->GetTools()->GetTool(i);
 		if ((pTool != NULL) && (pTool != pCurTool))

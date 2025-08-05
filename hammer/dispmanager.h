@@ -54,7 +54,7 @@ public:
 	//
 	// World List
 	//
-	virtual int WorldCount( void ) = 0;
+	virtual intp WorldCount( void ) = 0;
 	virtual CMapDisp *GetFromWorld( intp iWorldList ) = 0;
 	virtual CMapDisp *GetFromWorld( EditDispHandle_t handle ) = 0;
 
@@ -66,9 +66,9 @@ public:
 	//
 	// Selection List
 	//
-	virtual int SelectCount( void ) = 0;
+	virtual intp SelectCount( void ) = 0;
 	virtual void SelectClear( void ) = 0;
-	virtual CMapDisp *GetFromSelect( int iSelectList ) = 0;
+	virtual CMapDisp *GetFromSelect( intp iSelectList ) = 0;
 
 	virtual void AddToSelect( EditDispHandle_t handle ) = 0;
 	virtual void RemoveFromSelect( EditDispHandle_t handle ) = 0;

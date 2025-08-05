@@ -135,7 +135,7 @@ protected:
 	// Selection
 	//
 	void ClearFaceList( void );
-	int FindFaceInList( CMapFace *pFace );
+	intp FindFaceInList( CMapFace *pFace );
 
 	//=========================================================================
 	//

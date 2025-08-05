@@ -1248,8 +1248,8 @@ static BOOL _CheckBadConnections(CMapEntity *pEntity, CListBox *pList)
 
 	// TODO: Check for a "Kill" input with the same output, target, and delay as another input. This
 	//		 creates a race condition in the game where the order of arrival is not guaranteed
-	//int nConnCount = pEntity->Connections_GetCount();
-	//for (int i = 0; i < nConnCount; i++)
+	//intp nConnCount = pEntity->Connections_GetCount();
+	//for (intp i = 0; i < nConnCount; i++)
 	//{
 	//	CEntityConnection *pConn = pEntity->Connections_Get(i);
 	//	if (!stricmp(pConn->GetInputName(), "kill"))

@@ -350,8 +350,8 @@ bool CDispMapImageFilterManager::PreApply( CDispMapImageFilter *pFilter,
 		return false;
 
 	// Get the displacements in the selection set.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -374,8 +374,8 @@ bool CDispMapImageFilterManager::PostApply( bool bSew )
 		return false;
 
 	// Get the displacements in the selection set.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -463,8 +463,8 @@ bool CDispMapImageFilterManager::IsNeighborInSelectionSet( CMapDisp *pNeighborDi
 		return false;
 
 	// Get the displacements in the selection set.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp == pNeighborDisp )

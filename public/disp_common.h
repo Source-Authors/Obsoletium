@@ -248,8 +248,8 @@ bool DoesPointHaveAnyNeighbors(
 	const CVertIndex &index );
 
 
-void FindNeighboringDispSurfs( CCoreDispInfo **ppListBase, int nListSize );
-void SetupAllowedVerts( CCoreDispInfo **ppListBase, int nListSize );
+void FindNeighboringDispSurfs( CCoreDispInfo **ppListBase, intp nListSize );
+void SetupAllowedVerts( CCoreDispInfo **ppListBase, intp nListSize );
 void GetDispBox( CCoreDispInfo *pDisp, CDispBox &box );
 
 // ----------------------------------------------------------------------------- //

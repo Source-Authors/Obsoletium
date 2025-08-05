@@ -250,7 +250,7 @@ void CToolPickEntity::SetEyedropperCursor(void)
 //-----------------------------------------------------------------------------
 void CToolPickEntity::CycleSelectEntity(CMapEntity *pEntity)
 {
-	int nIndex = FindEntity(pEntity);
+	intp nIndex = FindEntity(pEntity);
 	if (nIndex != -1)
 	{
 		//
@@ -298,7 +298,7 @@ void CToolPickEntity::SetSelectedEntities(CMapEntityList &EntityListFull, CMapEn
 {
 	m_Entities.RemoveAll();
 
-	for (int i = 0; i < EntityListFull.Count(); i++)
+	for (intp i = 0; i < EntityListFull.Count(); i++)
 	{
 		CMapEntity *pEntity = EntityListFull.Element(i);
 
@@ -306,7 +306,7 @@ void CToolPickEntity::SetSelectedEntities(CMapEntityList &EntityListFull, CMapEn
 		pEntity->SetSelectionState(SELECT_NORMAL);
 	}
 
-	for (int i = 0; i < EntityListPartial.Count(); i++)
+	for (intp i = 0; i < EntityListPartial.Count(); i++)
 	{
 		CMapEntity *pEntity = EntityListPartial.Element(i);
 
@@ -320,9 +320,9 @@ void CToolPickEntity::SetSelectedEntities(CMapEntityList &EntityListFull, CMapEn
 // Purpose: 
 // Input  : pEntity - 
 //-----------------------------------------------------------------------------
-int CToolPickEntity::FindEntity(CMapEntity *pEntity)
+intp CToolPickEntity::FindEntity(CMapEntity *pEntity)
 {
-	for (int i = 0; i < m_Entities.Count(); i++)
+	for (intp i = 0; i < m_Entities.Count(); i++)
 	{
 		if (m_Entities[i].pEntity == pEntity)
 		{
@@ -339,7 +339,7 @@ int CToolPickEntity::FindEntity(CMapEntity *pEntity)
 //-----------------------------------------------------------------------------
 void CToolPickEntity::DeselectAll(void)
 {
-	for (int i = 0; i < m_Entities.Count(); i++)
+	for (intp i = 0; i < m_Entities.Count(); i++)
 	{
 		m_Entities[i].pEntity->SetSelectionState(SELECT_NONE);
 	}
@@ -354,7 +354,7 @@ void CToolPickEntity::DeselectAll(void)
 //-----------------------------------------------------------------------------
 void CToolPickEntity::SelectEntity(CMapEntity *pEntity)
 {
-	int nIndex = FindEntity(pEntity);
+	intp nIndex = FindEntity(pEntity);
 	if (nIndex != -1)
 	{
 		//
@@ -379,7 +379,7 @@ void CToolPickEntity::SelectEntity(CMapEntity *pEntity)
 //-----------------------------------------------------------------------------
 void CToolPickEntity::DeselectEntity(CMapEntity *pEntity)
 {
-	int nIndex = FindEntity(pEntity);
+	intp nIndex = FindEntity(pEntity);
 	if (nIndex != -1)
 	{
 		DeselectEntity(nIndex);
@@ -391,7 +391,7 @@ void CToolPickEntity::DeselectEntity(CMapEntity *pEntity)
 // Purpose: Removes the entity at the given index from the selection set.
 // Input  : nIndex - Index of the entity in the selection list.
 //-----------------------------------------------------------------------------
-void CToolPickEntity::DeselectEntity(int nIndex)
+void CToolPickEntity::DeselectEntity(intp nIndex)
 {
 	Assert(m_Entities.IsValidIndex(nIndex));
 
@@ -455,13 +455,14 @@ void CToolPickEntity::GetSelectedEntities(CMapEntityList &EntityListFull, CMapEn
 	EntityListFull.RemoveAll();
 	EntityListPartial.RemoveAll();
 
-	for (int i = 0; i < m_Entities.Count(); i++)
+	for (intp i = 0; i < m_Entities.Count(); i++)
 	{
-		if (m_Entities[i].eState == EntityState_Select)
+		EntityState_t eState = m_Entities[i].eState;
+		if (eState == EntityState_Select)
 		{
 			EntityListFull.AddToTail(m_Entities[i].pEntity);
 		}
-		else if (m_Entities[i].eState == EntityState_Partial)
+		else if (eState == EntityState_Partial)
 		{
 			EntityListPartial.AddToTail(m_Entities[i].pEntity);
 		}

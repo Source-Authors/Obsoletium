@@ -889,8 +889,8 @@ void CMapEntity::ReplaceTargetname(const char *szOldName, const char *szNewName)
 	//
 	// Replace any connections that target the old name.
 	//
-	int nConnCount = Connections_GetCount();
-	for (int i = 0; i < nConnCount; i++)
+	intp nConnCount = Connections_GetCount();
+	for (intp i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConn = Connections_Get(i);
 		if (!CompareEntityNames( pConn->GetTargetName(), szOldName ))

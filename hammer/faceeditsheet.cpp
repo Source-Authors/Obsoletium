@@ -124,7 +124,7 @@ void CFaceEditSheet::ClearFaceList( void )
 	//
 	// reset selection state of all faces currently in the list
 	//
-	for( int i = 0; i < m_Faces.Count(); i++ )
+	for( intp i = 0; i < m_Faces.Count(); i++ )
 	{
 		m_Faces[i].pMapFace->SetSelectionState( SELECT_NONE );
 		EditDispHandle_t handle = m_Faces[i].pMapFace->GetDisp();
@@ -149,7 +149,7 @@ void CFaceEditSheet::ClearFaceList( void )
 void CFaceEditSheet::ClearFaceListByMapDoc( CMapDoc *pDoc )
 {
 	// Remove any faces from our list that came from this CMapDoc.
-	for( int i = 0; i < m_Faces.Count(); i++ )
+	for( intp i = 0; i < m_Faces.Count(); i++ )
 	{
 		if ( m_Faces[i].pMapDoc == pDoc )
 		{
@@ -164,9 +164,9 @@ void CFaceEditSheet::ClearFaceListByMapDoc( CMapDoc *pDoc )
 // Purpose: Search for the given face in the face selection list.  If found, 
 //          return the index of the face in the list.  Otherwise, return -1.  
 //-----------------------------------------------------------------------------
-int CFaceEditSheet::FindFaceInList( CMapFace *pFace )
+intp CFaceEditSheet::FindFaceInList( CMapFace *pFace )
 {
-	for( int i = 0; i < m_Faces.Count(); i++ )
+	for( intp i = 0; i < m_Faces.Count(); i++ )
 	{
 		if( m_Faces[i].pMapFace == pFace )
 			return i;
@@ -212,7 +212,7 @@ void CFaceEditSheet::ClickFace( CMapSolid *pSolid, int faceIndex, int cmd, int c
 	// check for face in list, -1 from FindFaceInList indicates face not found
 	//
 	CMapFace *pFace = pSolid->GetFace( faceIndex );
-	int selectIndex = FindFaceInList( pFace );
+	intp selectIndex = FindFaceInList( pFace );
 	bool bFoundInList = ( selectIndex != -1 );
 
 	//

@@ -409,8 +409,8 @@ void COP_Output::AddEntityConnections(CMapEntity *pEntity, bool bFirst)
 	//
 	// The first entity simply adds its connections to the list.
 	//
-	int nConnCount = pEntity->Connections_GetCount();
-	for (int i = 0; i < nConnCount; i++)
+	intp nConnCount = pEntity->Connections_GetCount();
+	for (intp i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConnection = pEntity->Connections_Get(i);
 		if (pConnection != NULL)

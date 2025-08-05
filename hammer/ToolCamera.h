@@ -95,7 +95,7 @@ protected:
 	
 private:
 
-	int GetCameraCount() { return Cameras.Count(); }
+	intp GetCameraCount() { return Cameras.Count(); }
 	void AddCamera(CAMSTRUCT &pCamPos);
 	
 	void SetNextCamera(SNCTYPE next);

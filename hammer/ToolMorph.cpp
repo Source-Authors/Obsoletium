@@ -101,7 +101,7 @@ void Morph3D::OnActivate()
 		// Put all selected objects into morph
 		//
 		const CMapObjectList *pSelection = m_pDocument->GetSelection()->GetList();
-		for (int i = 0; i < pSelection->Count(); i++)
+		for (intp i = 0; i < pSelection->Count(); i++)
 		{
 			CMapClass *pobj = pSelection->Element(i);
 			if (pobj->IsMapClass(MAPCLASS_TYPE(CMapSolid)))
@@ -145,8 +145,8 @@ void Morph3D::OnDeactivate()
 		//
 		// Select the solids that we were morphing.
 		//
-		int nObjectCount = List.Count();
-		for (int i = 0; i < nObjectCount; i++)
+		intp nObjectCount = List.Count();
+		for (intp i = 0; i < nObjectCount; i++)
 		{
 			CMapClass *pSolid = List.Element(i);
 			CMapClass *pSelect = pSolid->PrepareSelection(m_pDocument->GetSelection()->GetMode());
@@ -268,7 +268,7 @@ void Morph3D::SelectObject(CMapSolid *pSolid, UINT cmd)
 			m_StrucSolids.FindAndRemove(pStrucSolid);
 			
 			// make sure none of its handles are selected
-			for(int i = m_SelectedHandles.Count()-1; i >=0; i--)
+			for(intp i = m_SelectedHandles.Count()-1; i >=0; i--)
 			{
 				if(m_SelectedHandles[i].pStrucSolid == pStrucSolid)
 				{
@@ -328,7 +328,7 @@ bool CompareMorphHandles(const MORPHHANDLE &mh1, const MORPHHANDLE &mh2)
 //-----------------------------------------------------------------------------
 bool Morph3D::IsSelected(MORPHHANDLE &mh)
 {
-	for (int i = 0; i < m_SelectedHandles.Count(); i++)
+	for (intp i = 0; i < m_SelectedHandles.Count(); i++)
 	{
 		if (CompareMorphHandles(m_SelectedHandles[i], mh))
 		{
@@ -532,7 +532,7 @@ void Morph3D::SelectHandle2D( CMapView2D *pView, MORPHHANDLE *pInfo, UINT cmd)
 
 	Get2DMatches( pView, pInfo->pStrucSolid, hi, &addSimilarList );
 
-	for (int i = 0; i < addSimilarList.Count(); i++)
+	for (intp i = 0; i < addSimilarList.Count(); i++)
 	{
 		MORPHHANDLE mh;
 		mh.ssh = addSimilarList[i];
@@ -559,7 +559,7 @@ void Morph3D::SelectHandle2D( CMapView2D *pView, MORPHHANDLE *pInfo, UINT cmd)
 //-----------------------------------------------------------------------------
 void Morph3D::DeselectHandle(MORPHHANDLE *pInfo)
 {
-	for (int i = 0; i <m_SelectedHandles.Count(); i++)
+	for (intp i = 0; i <m_SelectedHandles.Count(); i++)
 	{
 		if (!memcmp(&m_SelectedHandles[i], pInfo, sizeof(*pInfo)))
 		{
@@ -1142,7 +1142,7 @@ void Morph3D::GetSelectedCenter(Vector& pt)
 	{
 		SSHANDLEINFO hi;
 
-		for (int i = 0; i < m_SelectedHandles.Count(); i++)
+		for (intp i = 0; i < m_SelectedHandles.Count(); i++)
 		{
 			MORPHHANDLE *mh = &m_SelectedHandles[i];
 			mh->pStrucSolid->GetHandleInfo(&hi, mh->ssh);
@@ -1227,7 +1227,7 @@ void Morph3D::OnScaleCmd(BOOL bReInit)
 	BoundBox box;
 
 	// save original positions of vertices
-	for(int i = 0; i < m_SelectedHandles.Count(); i++)
+	for(intp i = 0; i < m_SelectedHandles.Count(); i++)
 	{
 		MORPHHANDLE &hnd = m_SelectedHandles[i];
 		SSHANDLEINFO hi;
@@ -1260,7 +1260,7 @@ void Morph3D::UpdateScale()
 
 	// match up selected vertices to original position in m_pOrigPosList.
 	int iMoved = 0;
-	for(int i = 0; i < m_SelectedHandles.Count(); i++)
+	for(intp i = 0; i < m_SelectedHandles.Count(); i++)
 	{
 		MORPHHANDLE &hnd = m_SelectedHandles[i];
 		SSHANDLEINFO hi;
@@ -1520,7 +1520,7 @@ void Morph3D::RenderTool3D(CRender3D *pRender)
 		Box3D::RenderTool3D(pRender);
 	}
 
-	for( int pos=0; pos < m_StrucSolids.Count(); pos++ )
+	for( intp pos=0; pos < m_StrucSolids.Count(); pos++ )
 	{
 		RenderSolid3D(pRender, m_StrucSolids[pos] );
 	}

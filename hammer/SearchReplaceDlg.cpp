@@ -240,8 +240,8 @@ bool FindCheck(CMapClass *pObject, FindObject_t &FindObject)
 	//
 	// Search connections.
 	//
-	int nConnCount = pEntity->Connections_GetCount();
-	for (int i = 0; i < nConnCount; i++)
+	intp nConnCount = pEntity->Connections_GetCount();
+	for (intp i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConn = pEntity->Connections_Get(i);
 		if (pConn)
@@ -265,9 +265,9 @@ bool FindCheck(CMapClass *pObject, FindObject_t &FindObject)
 //			pszReplaceText - 
 // Output : Returns the number of occurrences of the find text that were replaced.
 //-----------------------------------------------------------------------------
-int FindReplace(CMapEntity *pEntity, FindObject_t &FindObject, const char *pszReplace)
+intp FindReplace(CMapEntity *pEntity, FindObject_t &FindObject, const char *pszReplace)
 {
-	int nReplacedCount = 0;
+	intp nReplacedCount = 0;
 	
 	//
 	// Replace keyvalues.
@@ -290,8 +290,8 @@ int FindReplace(CMapEntity *pEntity, FindObject_t &FindObject, const char *pszRe
 	//
 	// Replace connections.
 	//
-	int nConnCount = pEntity->Connections_GetCount();
-	for (int i = 0; i < nConnCount; i++)
+	intp nConnCount = pEntity->Connections_GetCount();
+	for (intp i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConn = pEntity->Connections_Get(i);
 		if (pConn)
@@ -442,7 +442,7 @@ BOOL CSearchReplaceDlg::OnFindReplace(UINT uCmd)
 
 	static FindObject_t FindObject;
 	static CMapClass *pLastFound = NULL;
-	static int nReplaceCount = 0;
+	static intp nReplaceCount = 0;
 	FindObject_t TempFindObject;
 
 	bool bDone = false;
@@ -552,7 +552,7 @@ BOOL CSearchReplaceDlg::OnFindReplace(UINT uCmd)
 			else if (uCmd == IDC_REPLACE_ALL)
 			{
 				CString str;
-				str.Format("Replaced %d occurrences of the string '%s' with '%s'.", nReplaceCount, m_strFindText.GetBuffer(), m_strReplaceText.GetBuffer());
+				str.Format("Replaced %zd occurrences of the string '%s' with '%s'.", nReplaceCount, m_strFindText.GetBuffer(), m_strReplaceText.GetBuffer());
 				MessageBox(str, "Hammer - Find/Replace Text", MB_OK | MB_ICONINFORMATION);
 			}
 

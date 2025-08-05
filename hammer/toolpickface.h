@@ -88,9 +88,9 @@ protected:
 
 	void CycleSelectFace(CMapFace *pFace);
 	void DeselectAll(void);
-	void DeselectFace(int nIndex);
+	void DeselectFace(intp nIndex);
 	void DeselectFace(CMapFace *pFace);
-	int FindFace(CMapFace *pFace);
+	intp FindFace(CMapFace *pFace);
 	void SelectFace(CMapFace *pFace);
 
 	void AddToList(CMapFace *pFace, FaceState_t eState);

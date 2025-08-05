@@ -1061,10 +1061,10 @@ void VerifyNeighborConnections( CCoreDispInfo **ppListBase, int nDisps )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void FindNeighboringDispSurfs( CCoreDispInfo **ppListBase, int nListSize )
+void FindNeighboringDispSurfs( CCoreDispInfo **ppListBase, intp nListSize )
 {
 	// First, clear all neighboring data.
-	int iDisp;
+	intp iDisp;
 	for ( iDisp = 0; iDisp < nListSize; ++iDisp )
 	{
 		ClearNeighborData( ppListBase[iDisp] );
@@ -1080,7 +1080,7 @@ void FindNeighboringDispSurfs( CCoreDispInfo **ppListBase, int nListSize )
 	{
 		CCoreDispInfo *pMain = ppListBase[iDisp];
 
-		for ( int iDisp2 = iDisp+1; iDisp2 < nListSize; ++iDisp2 )
+		for ( intp iDisp2 = iDisp+1; iDisp2 < nListSize; ++iDisp2 )
 		{
 			CCoreDispInfo *pOther = ppListBase[iDisp2];
 
@@ -1239,10 +1239,10 @@ void DisableUnallowedVerts_R( CDispUtilsHelper *pDisp, CVertIndex const &nodeInd
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void SetupAllowedVerts( CCoreDispInfo **ppListBase, int nListSize )
+void SetupAllowedVerts( CCoreDispInfo **ppListBase, intp nListSize )
 {
 	// Set all verts to allowed to start with.
-	int iDisp;
+	intp iDisp;
 	for ( iDisp = 0; iDisp < nListSize; ++iDisp )
 	{
 		ppListBase[iDisp]->GetAllowedVerts().SetAll();

@@ -139,8 +139,8 @@ protected:
 
 	bool	LoadStudioModel( char const* pFileName, char const* pEntityType, CUtlBuffer& buf );
 	float	ComputeDisplacementFaceArea( CMapFace *pMapFace );
-	int		SelectGroup( const DetailObject_t& detail, float alpha );
-	int		SelectDetail( DetailObjectGroup_t const& group );
+	intp	SelectGroup( const DetailObject_t& detail, float alpha );
+	intp	SelectDetail( DetailObjectGroup_t const& group );
 	void	PlaceDetail( DetailModel_t const& model, const Vector& pt, const Vector& normal );
 	void	EmitDetailObjectsOnFace( CMapFace *pMapFace, DetailObject_t& detail );
 	void	EmitDetailObjectsOnDisplacementFace( CMapFace *pMapFace, DetailObject_t& detail );

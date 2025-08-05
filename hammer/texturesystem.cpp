@@ -921,9 +921,9 @@ void ScaleBitmap(CSize sizeSrc, CSize sizeDest, char *src, char *dest)
 //			*piIndex - 
 // Output : GRAPHICSFILESTRUCT *
 //-----------------------------------------------------------------------------
-bool CTextureSystem::FindGraphicsFile(GRAPHICSFILESTRUCT *pFileInfo, DWORD id, int *piIndex)
+bool CTextureSystem::FindGraphicsFile(GRAPHICSFILESTRUCT *pFileInfo, DWORD id, intp *piIndex)
 {
-	for (int i = 0; i < m_GraphicsFiles.Count(); i++)
+	for (intp i = 0; i < m_GraphicsFiles.Count(); i++)
 	{
 		if (m_GraphicsFiles[i].id == id)
 		{

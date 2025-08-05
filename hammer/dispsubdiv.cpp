@@ -809,7 +809,7 @@ void CEditDispSubdivMesh::Init( void )
 	if( !pDispMgr )
 		return;
 
-	int selectCount = pDispMgr->SelectCount();	
+	intp selectCount = pDispMgr->SelectCount();	
 	m_Points.EnsureCapacity( SUBDIV_DISPPOINTS * selectCount );
 	m_Edges.EnsureCapacity( SUBDIV_DISPEDGES * selectCount );
 	m_Quads.EnsureCapacity( SUBDIV_DISPQUADS * selectCount );
@@ -875,8 +875,8 @@ void CEditDispSubdivMesh::AddDispTo( CMapDisp *pDisp )
 		// get the point to compare to neighbors
 		pDisp->GetSurfPoint( ndxPt, vPoints[ndxPt] );
 
-		int count = pDispMgr->SelectCount();
-		for( int ndxSelect = 0; ndxSelect < count; ndxSelect++ )
+		intp count = pDispMgr->SelectCount();
+		for( intp ndxSelect = 0; ndxSelect < count; ndxSelect++ )
 		{
 			CMapDisp *pSelectDisp = pDispMgr->GetFromSelect( ndxSelect );
 			if( !pSelectDisp || ( pSelectDisp == pDisp ) )
@@ -1091,9 +1091,9 @@ void CEditDispSubdivMesh::CatmullClarkSubdivision( void )
 //-----------------------------------------------------------------------------
 void CEditDispSubdivMesh::UpdateSubdivisionHierarchy( int ndxLevel )
 {
-	int quadCount = m_Quads.Count();
+	intp quadCount = m_Quads.Count();
 	SubdivQuadHandle_t quadHandle = m_Quads.Head();
-	int ndxQuad = 0;
+	intp ndxQuad = 0;
 
 	while ( ( quadHandle != m_Quads.InvalidIndex() ) && ( ndxQuad < quadCount ) )
 	{

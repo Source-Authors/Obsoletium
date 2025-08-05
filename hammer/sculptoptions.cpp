@@ -262,8 +262,8 @@ bool CSculptTool::PostPaint( bool bAutoSew )
 		return false;
 
 	// Update the modified displacements.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -296,8 +296,8 @@ bool CSculptTool::DoPaint( CMapView3D *pView, const Vector2D &vPoint )
 		return false;
 
 	// For each displacement surface is the selection list attempt to paint on it.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -559,8 +559,8 @@ bool CSculptTool::DoPaintSmoothOneOverExp( const Vector &vNewCenter, Vector &vPa
 	// Calculate the plane dist.
 	float flPaintDist = m_SpatialData.m_vPaintAxis.Dot( vNewCenter );
 
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -690,9 +690,9 @@ void CSculptTool::DuplicateSelectedDisp( )
 	}
 	m_OrigMapDisp.Purge();
 
-	int nDispCount = pDispMgr->SelectCount();
+	intp nDispCount = pDispMgr->SelectCount();
 
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -717,9 +717,9 @@ void CSculptTool::PrepareDispForPainting( )
 		return;
 	}
 
-	int nDispCount = pDispMgr->SelectCount();
+	intp nDispCount = pDispMgr->SelectCount();
 
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -754,10 +754,10 @@ bool CSculptTool::FindCollisionIntercept( CCamera *pCamera, const Vector2D &vPoi
 		return false;
 	}
 
-	int nDispCount = pDispMgr->SelectCount();
+	intp nDispCount = pDispMgr->SelectCount();
 	pCamera->BuildRay( vPoint, vecStart, vecEnd );
 
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -1284,8 +1284,8 @@ void CSculptPushOptions::RenderTool3D( CRender3D *pRender )
 	IWorldEditDispMgr *pDispMgr = GetActiveWorldEditDispManager();
 
 	// For each displacement surface is the selection list attempt to paint on it.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -2639,8 +2639,8 @@ void CSculptCarveOptions::RenderTool3D( CRender3D *pRender )
 	IWorldEditDispMgr *pDispMgr = GetActiveWorldEditDispManager();
 	if( pDispMgr )
 	{
-		int nDispCount = pDispMgr->SelectCount();
-		for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+		intp nDispCount = pDispMgr->SelectCount();
+		for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 		{
 			CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 			if ( pDisp )
@@ -2763,8 +2763,8 @@ void CSculptCarveOptions::RenderTool3D( CRender3D *pRender )
 	IWorldEditDispMgr *pDispMgr = GetActiveWorldEditDispManager();
 
 	// For each displacement surface is the selection list attempt to paint on it.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )

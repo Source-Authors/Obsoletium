@@ -564,7 +564,7 @@ public:
 	inline CMapFaceList(CMapFaceList const &other);
 	inline CMapFaceList &CMapFaceList::operator =(CMapFaceList const &other);
 
-	inline int FindFaceID(int nFaceID);
+	inline intp FindFaceID(int nFaceID);
 	void Intersect(CMapFaceList &IntersectWith, CMapFaceList &In, CMapFaceList &Out);
 };
 
@@ -594,9 +594,9 @@ CMapFaceList &CMapFaceList::operator =(CMapFaceList const &other)
 // Input  : nFaceID - Numeric face ID to search for.
 // Output : Index of found element, -1 if none.
 //-----------------------------------------------------------------------------
-int CMapFaceList::FindFaceID(int nFaceID)
+intp CMapFaceList::FindFaceID(int nFaceID)
 {
-	for (int i = 0; i < Count(); i++)
+	for (intp i = 0; i < Count(); i++)
 	{
 		if ((Element(i) != NULL) && (Element(i)->GetFaceID() == nFaceID))
 		{

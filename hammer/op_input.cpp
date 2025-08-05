@@ -204,14 +204,14 @@ void COP_Input::UpdateItemValidity(int nItem)
 //-----------------------------------------------------------------------------
 void COP_Input::AddEntityConnections(const char *pTargetName, CMapEntity *pTestEntity)
 {
-	int nConnCount = pTestEntity->Connections_GetCount();
+	intp nConnCount = pTestEntity->Connections_GetCount();
 
 	if (nConnCount != 0)
 	{
 		int nItemCount = m_ListCtrl.GetItemCount();	
 		m_ListCtrl.SetItemCount(nItemCount + nConnCount);
 
-		for (int i = 0; i < nConnCount; i++)
+		for (intp i = 0; i < nConnCount; i++)
 		{
 			CEntityConnection *pConnection = pTestEntity->Connections_Get(i);
 			if (pConnection != NULL && !CompareEntityNames(pConnection->GetTargetName(), pTargetName))

@@ -99,9 +99,9 @@ protected:
 
 	void CycleSelectEntity(CMapEntity *pEntity);
 	void DeselectAll(void);
-	void DeselectEntity(int nIndex);
+	void DeselectEntity(intp nIndex);
 	void DeselectEntity(CMapEntity *pEntity);
-	int FindEntity(CMapEntity *pEntity);
+	intp FindEntity(CMapEntity *pEntity);
 	void SelectEntity(CMapEntity *pEntity);
 
 	void AddToList(CMapEntity *pEntity, EntityState_t eState);

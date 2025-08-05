@@ -1708,8 +1708,8 @@ void CMapWorld::PostloadVisGroups()
 			int foo = 0;
 		}
 #endif
-		int nConnections = pEntity->Connections_GetCount();
-		for ( int pos2 = 0; pos2 < nConnections; pos2++ )
+		intp nConnections = pEntity->Connections_GetCount();
+		for ( intp pos2 = 0; pos2 < nConnections; pos2++ )
 		{
 			CEntityConnection	*pEntityConnection = pEntity->Connections_Get(pos2);
 
