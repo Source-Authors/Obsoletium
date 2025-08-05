@@ -190,9 +190,8 @@ public:
 		m_nContributionCounter++;
 		// update distances to lights
 		if ( m_pLightList )
-			for(int i=0;i<m_pLightList->Count();i++)
+			for(auto &l : *m_pLightList)
 			{
-				CLightingPreviewLightDescription &l=(*m_pLightList)[i];
 				CIncrementalLightInfo *l_info=l.m_pIncrementalInfo;
 				if ( l.m_Type == MATERIAL_LIGHT_DIRECTIONAL )
 					l_info->m_fDistanceToEye = 0;			// high priority
