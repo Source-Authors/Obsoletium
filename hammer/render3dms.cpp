@@ -1210,9 +1210,9 @@ void CRender3D::EndRenderFrame(void)
 			{
 
 				static bool did_dump=false;
-				static float Last_SendTime=0;
+				static double Last_SendTime=0;
 				// now, lets create floatbms with the deferred rendering data, so we can pass it to the lpreview thread
-				float newtime=Plat_FloatTime();
+				double newtime=Plat_FloatTime();
 				if (( n_gbufs_queued < 1 ) && ( newtime-Last_SendTime > 1.0) )
 				{
 					SendShadowTriangles();
@@ -1322,10 +1322,10 @@ void CRender3D::EndRenderFrame(void)
 					tmplight.m_Light.m_Type = MATERIAL_LIGHT_POINT;
 					tmplight.m_Light.m_Color = Vector( 10, 10, 10 );
 					tmplight.m_Light.m_Position = Vector( 0, 0, 30000 );
-					tmplight.m_Light.m_Range = 1.0e20;
-					tmplight.m_Light.m_Attenuation0 = 1.0;
-					tmplight.m_Light.m_Attenuation1 = 0.0;
-					tmplight.m_Light.m_Attenuation2 = 0.0;
+					tmplight.m_Light.m_Range = 1.0e20f;
+					tmplight.m_Light.m_Attenuation0 = 1.0f;
+					tmplight.m_Light.m_Attenuation1 = 0.0f;
+					tmplight.m_Light.m_Attenuation2 = 0.0f;
 					tmplight.m_flDistanceToEye = 1;
 					light_queue.Insert(tmplight);
 				}
@@ -1377,8 +1377,8 @@ void CRender3D::EndRenderFrame(void)
 					if ( light.m_Type == MATERIAL_LIGHT_POINT )
 					{
 						// model point as a spot with infinite inner radius
-						SetNamedMaterialVar(src_mat, "$C0_W", 0.5 );
-						SetNamedMaterialVar(src_mat, "$C1_W", 1.0e10 );
+						SetNamedMaterialVar(src_mat, "$C0_W", 0.5f );
+						SetNamedMaterialVar(src_mat, "$C1_W", 1.0e10f );
 					}
 					else
 					{
