@@ -796,10 +796,11 @@ unsigned LightingPreviewThreadFN( void *thread_start_arg )
 
 void HandleLightingPreview()
 {
-	if ( GetMainWnd()->m_pLightingPreviewOutputWindow && !GetMainWnd()->m_bLightingPreviewOutputWindowShowing )
+	if ( auto *&window = GetMainWnd()->m_pLightingPreviewOutputWindow;
+		window && !GetMainWnd()->m_bLightingPreviewOutputWindowShowing )
 	{
-		delete GetMainWnd()->m_pLightingPreviewOutputWindow;
-		GetMainWnd()->m_pLightingPreviewOutputWindow = NULL;
+		delete window;
+		window = nullptr;
 	}
 
 	// called during main loop
@@ -807,17 +808,15 @@ void HandleLightingPreview()
 	{
 		MessageFromLPreview msg;
 		g_LPreviewToHammerMsgQueue.WaitMessage( &msg );
+
 		switch( msg.m_MsgType )
 		{
 			case LPREVIEW_MSG_DISPLAY_RESULT:
 			{
-				if (g_pLPreviewOutputBitmap)
-					delete g_pLPreviewOutputBitmap;
-				g_pLPreviewOutputBitmap = NULL;
-//				if ( msg.m_nBitmapGenerationCounter == g_nBitmapGenerationCounter )
-			{
+				delete g_pLPreviewOutputBitmap;
 				g_pLPreviewOutputBitmap = msg.m_pBitmapToDisplay;
-				if ( g_pLPreviewOutputBitmap && (g_pLPreviewOutputBitmap->Width() > 10) )
+
+				if ( g_pLPreviewOutputBitmap && g_pLPreviewOutputBitmap->Width() > 10 )
 				{
 					SignalUpdate( EVTYPE_BITMAP_RECEIVED_FROM_LPREVIEW );
 
@@ -829,33 +828,33 @@ void HandleLightingPreview()
 
 						GetMainWnd()->m_bLightingPreviewOutputWindowShowing = true;
 					}
-					if (! w->IsWindowVisible() )
+
+					if ( !w->IsWindowVisible() )
 						w->ShowWindow( SW_SHOW );
+
 					RECT existing_rect;
 					w->GetClientRect( &existing_rect );
-					if (
-						(existing_rect.right != g_pLPreviewOutputBitmap->Width()-1) ||
-						(existing_rect.bottom != g_pLPreviewOutputBitmap->Height()-1) )
+
+					const int bitmapWidth = g_pLPreviewOutputBitmap->Width()-1;
+					const int bitmapHeight = g_pLPreviewOutputBitmap->Height()-1;
+
+					if ( existing_rect.right != bitmapWidth || existing_rect.bottom != bitmapHeight )
 					{
-						CRect myRect;
-						myRect.top=0; 
-						myRect.left=0;
-						myRect.right=g_pLPreviewOutputBitmap->Width()-1;
-						myRect.bottom=g_pLPreviewOutputBitmap->Height()-1;
+						CRect myRect{0, 0, bitmapWidth, bitmapHeight};
+
 						w->CalcWindowRect(&myRect);
 						w->SetWindowPos(
 							NULL,0,0,
-							myRect.Width(), myRect.Height(),
+							myRect.Width(),
+							myRect.Height(),
 							SWP_NOMOVE | SWP_NOZORDER );
 					}
 					
 					w->Invalidate( false );
 					w->UpdateWindow();
 				}
-			}
-// 				else
-// 					delete msg.m_pBitmapToDisplay;			// its old
-			break;
+
+				break;
 			}
 		}
 	}
