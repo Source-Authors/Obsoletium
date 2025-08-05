@@ -274,7 +274,9 @@ BOOL CSplashWnd::PreTranslateAppMessage(MSG* pMsg)
 		return FALSE;
 
 	// If we get a keyboard or mouse message, hide the splash screen.
-	if (pMsg->message == WM_KEYDOWN ||
+	// dimhotepus: React on WM_INPUT, too.
+	if (pMsg->message == WM_INPUT ||
+	    pMsg->message == WM_KEYDOWN ||
 	    pMsg->message == WM_SYSKEYDOWN ||
 	    pMsg->message == WM_LBUTTONDOWN ||
 	    pMsg->message == WM_RBUTTONDOWN ||
