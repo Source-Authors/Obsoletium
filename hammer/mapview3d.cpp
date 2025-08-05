@@ -1943,8 +1943,9 @@ void CMapView3D::Render(void)
 	if (m_pwndTitle != NULL)
 	{
 		m_pwndTitle->BringWindowToTop();
-		m_pwndTitle->Invalidate();
-		m_pwndTitle->UpdateWindow();
+		// dimhotepus: Title windows for views should not fliker.
+		//m_pwndTitle->Invalidate();
+		//m_pwndTitle->UpdateWindow();
 	}
 }
 
