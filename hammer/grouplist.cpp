@@ -104,8 +104,8 @@ void CGroupList::AddVisGroupRecursive(CVisGroup *pVisGroup, HTREEITEM hItemParen
 //		m_TreeItems.AddToTail(item);
 		m_VisGroups.AddToTail(pVisGroup);
 		
-		int nCount = pVisGroup->GetChildCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = pVisGroup->GetChildCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CVisGroup *pChild = pVisGroup->GetChild(i);
 			AddVisGroupRecursive(pChild, hItem);

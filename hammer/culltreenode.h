@@ -28,16 +28,16 @@ class CCullTreeNode : public BoundBox
 		//
 		// Children.
 		//
-		inline int GetChildCount(void) { return(m_Children.Count()); }
-		inline CCullTreeNode *GetCullTreeChild(int nChild) { return(m_Children[nChild]); }
+		inline intp GetChildCount(void) { return(m_Children.Count()); }
+		inline CCullTreeNode *GetCullTreeChild(intp nChild) { return(m_Children[nChild]); }
 
 		void AddCullTreeChild(CCullTreeNode *pChild);
 		
 		//
 		// Objects.
 		//
-		inline int GetObjectCount(void) { return(m_Objects.Count()); }
-		inline CMapClass *GetCullTreeObject(int nObject) { return(m_Objects[nObject]); }
+		inline intp GetObjectCount(void) { return(m_Objects.Count()); }
+		inline CMapClass *GetCullTreeObject(intp nObject) { return(m_Objects[nObject]); }
 
 		void AddCullTreeObject(CMapClass *pObject);
 		void AddCullTreeObjectRecurse(CMapClass *pObject);

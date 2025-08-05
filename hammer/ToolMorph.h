@@ -76,8 +76,8 @@ public:
 
 	void GetMorphingObjects(CUtlVector<CMapClass *> &List);
 
-	inline int GetObjectCount(void);
-	inline CSSolid *GetObject(int pos);
+	inline intp GetObjectCount(void);
+	inline CSSolid *GetObject(intp pos);
 	
 	//
 	// Tool3D implementation.
@@ -186,7 +186,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of solids selected for morphing.
 //-----------------------------------------------------------------------------
-inline int Morph3D::GetObjectCount(void)
+inline intp Morph3D::GetObjectCount(void)
 {
 	return(m_StrucSolids.Count());
 }
@@ -195,7 +195,7 @@ inline int Morph3D::GetObjectCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: Iterates the selected solids.
 //-----------------------------------------------------------------------------
-inline CSSolid *Morph3D::GetObject(int pos)
+inline CSSolid *Morph3D::GetObject(intp pos)
 {
 	return(m_StrucSolids.Element(pos));
 }

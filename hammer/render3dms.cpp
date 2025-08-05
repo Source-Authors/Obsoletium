@@ -2634,10 +2634,10 @@ void CRender3D::RenderNode(CCullTreeNode *pNode, bool bForce )
 	// Render all child nodes first.
 	//
 	CCullTreeNode *pChild;
-	int nChildren = pNode->GetChildCount();
+	intp nChildren = pNode->GetChildCount();
 	if (nChildren != 0)
 	{
-		for (int nChild = 0; nChild < nChildren; nChild++)
+		for (intp nChild = 0; nChild < nChildren; nChild++)
 		{
 			pChild = pNode->GetCullTreeChild(nChild);
 			Assert(pChild != NULL);
@@ -2678,8 +2678,8 @@ void CRender3D::RenderNode(CCullTreeNode *pNode, bool bForce )
 		// Now render the contents of this node.
 		//
 		CMapClass *pObject;
-		int nObjects = pNode->GetObjectCount();
-		for (int nObject = 0; nObject < nObjects; nObject++)
+		intp nObjects = pNode->GetObjectCount();
+		for (intp nObject = 0; nObject < nObjects; nObject++)
 		{
 			pObject = pNode->GetCullTreeObject(nObject);
 			Assert(pObject != NULL);

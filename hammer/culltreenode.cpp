@@ -73,12 +73,12 @@ void CCullTreeNode::AddCullTreeObjectRecurse(CMapClass *pObject)
 	pObject->GetCullBox(ObjMins, ObjMaxs);
 	if (BoxesIntersect(ObjMins, ObjMaxs, bmins, bmaxs))
 	{
-		int nChildCount = GetChildCount();
+		intp nChildCount = GetChildCount();
 		if (nChildCount != 0)
 		{
 			// dvs: we should split when appropriate!
 			// otherwise the tree becomes less optimal over time.
-			for (int nChild = 0; nChild < nChildCount; nChild++)
+			for (intp nChild = 0; nChild < nChildCount; nChild++)
 			{
 				CCullTreeNode *pChild = GetCullTreeChild(nChild);
 				pChild->AddCullTreeObjectRecurse(pObject);
@@ -108,8 +108,8 @@ void CCullTreeNode::RemoveAllCullTreeObjectsRecurse(void)
 {
 	RemoveAllCullTreeObjects();
 
-	int nChildCount = GetChildCount();
-	for (int nChild = 0; nChild < nChildCount; nChild++)
+	intp nChildCount = GetChildCount();
+	for (intp nChild = 0; nChild < nChildCount; nChild++)
 	{
 		CCullTreeNode *pChild = GetCullTreeChild(nChild);
 		pChild->RemoveAllCullTreeObjectsRecurse();
@@ -161,8 +161,8 @@ CCullTreeNode *CCullTreeNode::FindCullTreeObjectRecurse(CMapClass *pObject)
 		}
 	}
 
-	int nChildCount = GetChildCount();
-	for (int nChild = 0; nChild < nChildCount; nChild++)
+	intp nChildCount = GetChildCount();
+	for (intp nChild = 0; nChild < nChildCount; nChild++)
 	{
 		CCullTreeNode *pChild = GetCullTreeChild(nChild);
 		CCullTreeNode *pFound = pChild->FindCullTreeObjectRecurse(pObject);
@@ -206,10 +206,10 @@ void CCullTreeNode::UpdateCullTreeObject(CMapClass *pObject)
 //-----------------------------------------------------------------------------
 void CCullTreeNode::UpdateCullTreeObjectRecurse(CMapClass *pObject)
 {
-	int nChildCount = GetChildCount();
+	intp nChildCount = GetChildCount();
 	if (nChildCount != 0)
 	{
-		for (int nChild = 0; nChild < nChildCount; nChild++)
+		for (intp nChild = 0; nChild < nChildCount; nChild++)
 		{
 			CCullTreeNode *pChild = GetCullTreeChild(nChild);
 			pChild->UpdateCullTreeObjectRecurse(pObject);
@@ -228,10 +228,10 @@ void CCullTreeNode::UpdateCullTreeObjectRecurse(CMapClass *pObject)
 //-----------------------------------------------------------------------------
 void CCullTreeNode::UpdateAllCullTreeObjectsRecurse(void)
 {
-	int nChildCount = GetChildCount();
+	intp nChildCount = GetChildCount();
 	if (nChildCount != 0)
 	{
-		for (int nChild = 0; nChild < nChildCount; nChild++)
+		for (intp nChild = 0; nChild < nChildCount; nChild++)
 		{
 			CCullTreeNode *pChild = GetCullTreeChild(nChild);
 			pChild->UpdateAllCullTreeObjectsRecurse();
@@ -239,8 +239,8 @@ void CCullTreeNode::UpdateAllCullTreeObjectsRecurse(void)
 	}
 	else
 	{
-		int nObjectCount = GetObjectCount();
-		for (int nObject = 0; nObject < nObjectCount; nObject++)
+		intp nObjectCount = GetObjectCount();
+		for (intp nObject = 0; nObject < nObjectCount; nObject++)
 		{
 			CMapClass *pObject = GetCullTreeObject(nObject);
 

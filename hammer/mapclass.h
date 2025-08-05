@@ -232,7 +232,7 @@ public:
 	virtual void RemoveChild(CMapClass *pChild, bool bUpdateBounds = true);
 	virtual void UpdateChild(CMapClass *pChild);
 
-	inline int GetChildCount(void) { return( m_Children.Count()); }
+	inline intp GetChildCount(void) { return( m_Children.Count()); }
 	inline const CMapObjectList *GetChildren() { return &m_Children; }
 		
 	CMapClass *GetFirstDescendent(EnumChildrenPos_t &pos);

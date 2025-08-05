@@ -605,10 +605,10 @@ void CMapWorld::CullTree_FreeNode(CCullTreeNode *pNode)
 		return;
 	}
 
-	int nChildCount = pNode->GetChildCount();
+	intp nChildCount = pNode->GetChildCount();
 	if (nChildCount != 0)
 	{
-		for (int nChild = 0; nChild < nChildCount; nChild++)
+		for (intp nChild = 0; nChild < nChildCount; nChild++)
 		{
 			CCullTreeNode *pChild = pNode->GetCullTreeChild(nChild);
 			CullTree_FreeNode(pChild);
@@ -717,8 +717,8 @@ void CMapWorld::CullTree_SplitNode(CCullTreeNode *pNode)
 			// Check all objects in this node against the child's bounding box, adding the
 			// objects that intersect to the child's object list.
 			//
-			int nObjectCount = pNode->GetObjectCount();
-			for (int nObject = 0; nObject < nObjectCount; nObject++)
+			intp nObjectCount = pNode->GetObjectCount();
+			for (intp nObject = 0; nObject < nObjectCount; nObject++)
 			{
 				CMapClass *pObject = pNode->GetCullTreeObject(nObject);
 				Assert(pObject != NULL);
@@ -741,7 +741,7 @@ void CMapWorld::CullTree_SplitNode(CCullTreeNode *pNode)
 		//
 		// Recurse into all children with at least two objects, splitting them.
 		//
-		int nChildCount = pNode->GetChildCount();
+		intp nChildCount = pNode->GetChildCount();
 		for (nChild = 0; nChild < nChildCount; nChild++)
 		{
 			CCullTreeNode *pChild = pNode->GetCullTreeChild(nChild);
@@ -760,15 +760,15 @@ void CMapWorld::CullTree_SplitNode(CCullTreeNode *pNode)
 //-----------------------------------------------------------------------------
 void CMapWorld::CullTree_DumpNode(CCullTreeNode *pNode, int nDepth)
 {
-	int nChildCount = pNode->GetChildCount();
+	intp nChildCount = pNode->GetChildCount();
 	char szText[100];
 
 	if (nChildCount == 0)
 	{
 		// Leaf
 		OutputDebugString("LEAF:\n");
-		int nObjectCount = pNode->GetObjectCount();
-		for (int nObject = 0; nObject < nObjectCount; nObject++)
+		intp nObjectCount = pNode->GetObjectCount();
+		for (intp nObject = 0; nObject < nObjectCount; nObject++)
 		{
 			CMapClass *pMapClass = pNode->GetCullTreeObject(nObject);
 			V_sprintf_safe(szText, "%*c %p %s\n", nDepth, ' ', pMapClass, pMapClass->GetType());

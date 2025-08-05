@@ -580,8 +580,8 @@ void CMapDoc::RemoveEmptyGroups(void)
  	CUtlVector<CMapGroup *> GroupList;
 	m_pWorld->GetGroupList(GroupList);
 
-	int nGroupCount = GroupList.Count();
-	for (int i = nGroupCount - 1; i >= 0; i--)
+	intp nGroupCount = GroupList.Count();
+	for (intp i = nGroupCount - 1; i >= 0; i--)
 	{
 		CMapGroup *pGroup = GroupList.Element(i);
 
@@ -3003,10 +3003,10 @@ static bool IsInVisGroupRecursive(CMapClass *pObject, CVisGroup *pGroup)
 		return true;
 	}
 
-	int nChildCount = pGroup->GetChildCount();
+	intp nChildCount = pGroup->GetChildCount();
 	if (nChildCount > 0)
 	{
-		for (int i = 0; i < nChildCount; i++)
+		for (intp i = 0; i < nChildCount; i++)
 		{
 			CVisGroup *pChild = pGroup->GetChild(i);
 			if (IsInVisGroupRecursive(pObject, pChild))
@@ -7460,7 +7460,7 @@ BOOL CMapDoc::OnViewHideObjects(UINT nID)
 //-----------------------------------------------------------------------------
 bool CMapDoc::GetChildrenToHide(CMapClass *pObject, bool bSelected, CMapObjectList &List)
 {
-	int nAddedCount = 0;
+	intp nAddedCount = 0;
 
 	const CMapObjectList *pChildren = pObject->GetChildren();
 	FOR_EACH_OBJ( *pChildren, pos )
@@ -9506,8 +9506,8 @@ void CMapDoc::AddToAutoVisGroup( CMapClass *pObject, const char *pAutoVisGroup )
 
 	// Find the desired visgroup
 	CVisGroup *pFoundVisGroup = NULL;
-	int nVisGroupCount = pRootVisGroup->GetChildCount();
-	for ( int i = 0; i < nVisGroupCount; ++i )
+	intp nVisGroupCount = pRootVisGroup->GetChildCount();
+	for ( intp i = 0; i < nVisGroupCount; ++i )
 	{
 		CVisGroup *pVisGroup = pRootVisGroup->GetChild(i);
 		if ( !Q_stricmp( pAutoVisGroup, pVisGroup->GetName() ) )
@@ -9545,8 +9545,8 @@ void CMapDoc::AddChildGroupToAutoVisGroup( CMapClass *pObject, const char *pAuto
 
 	// Find the desired visgroup
 	CVisGroup *pFoundVisGroup = NULL;
-	int nVisGroupCount = pRootVisGroup->GetChildCount();
-	for ( int i = 0; i < nVisGroupCount; ++i )
+	intp nVisGroupCount = pRootVisGroup->GetChildCount();
+	for ( intp i = 0; i < nVisGroupCount; ++i )
 	{
 		CVisGroup *pVisGroup = pRootVisGroup->GetChild(i);
 		if ( !Q_stricmp( pAutoVisGroup, pVisGroup->GetName() ) )//&& pVisGroup->IsAutoVisGroup() )
@@ -10717,7 +10717,7 @@ void CMapDoc::VisGroups_DoRemoveOrCombine(CVisGroup *pFrom, CVisGroup *pTo)
 		//
 		// Move child visgroups into pTo.
 		//
-		for (int i = 0; i < pFrom->GetChildCount(); i++)
+		for (intp i = 0; i < pFrom->GetChildCount(); i++)
 		{
 			CVisGroup *pChild = pFrom->GetChild(i);
 			pTo->AddChild(pChild);
@@ -11983,13 +11983,12 @@ void CMapDoc::QuickHide_HideObjects( void )
 	// Now check any parents
 	if ( m_QuickHideGroupedParents.Count() > 0 )
 	{
-		int nHiddenChildCount = 0;
+		intp nHiddenChildCount = 0;
 
-		for ( int index = 0; index < m_QuickHideGroupedParents.Count(); index++ )
+		for ( auto *pParent : m_QuickHideGroupedParents )
 		{
 			EnumChildrenPos_t posParent;
-			CMapClass *pParent = m_QuickHideGroupedParents[ index ];
-			int nChildCount = pParent->GetChildCount();
+			intp nChildCount = pParent->GetChildCount();
 
 			if ( pParent )
 			{
