@@ -140,10 +140,9 @@ void CCullTreeNode::RemoveCullTreeObjectRecurse(CMapClass *pObject)
 {
 	RemoveCullTreeObject(pObject);
 
-	for (int nChild = 0; nChild < m_Children.Count(); nChild++)
+	for (auto *child : m_Children)
 	{
-		CCullTreeNode *pChild = m_Children[nChild];
-		pChild->RemoveCullTreeObjectRecurse(pObject);
+		child->RemoveCullTreeObjectRecurse(pObject);
 	}	
 }
 
@@ -154,12 +153,11 @@ void CCullTreeNode::RemoveCullTreeObjectRecurse(CMapClass *pObject)
 //-----------------------------------------------------------------------------
 CCullTreeNode *CCullTreeNode::FindCullTreeObjectRecurse(CMapClass *pObject)
 {
-	for (int i = 0; i < m_Objects.Count(); i++)
+	for (auto *obj : m_Objects)
 	{
-		CMapClass *pCurrent = m_Objects[i];
-		if (pCurrent == pObject)
+		if (obj == pObject)
 		{
-			return(this);
+			return this;
 		}
 	}
 
