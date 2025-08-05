@@ -53,11 +53,16 @@ struct MessageToLPreview
 {
 	HammerToLightingPreviewMessageType m_MsgType;
 
-	MessageToLPreview( HammerToLightingPreviewMessageType mtype)
+	MessageToLPreview( HammerToLightingPreviewMessageType mtype )
 	{
 		m_MsgType = mtype;
+		BitwiseClear(m_pDefferedRenderingBMs);
+		m_pLightList = nullptr;
+		m_EyePosition = vec3_invalid;
+		m_pShadowTriangleList = nullptr;
+		m_nBitmapGenerationCounter = -1;
 	}
-	MessageToLPreview( void)
+	MessageToLPreview() : MessageToLPreview( LPREVIEW_MSG_STOP )
 	{
 	}
 
