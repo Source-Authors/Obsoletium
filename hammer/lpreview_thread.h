@@ -93,7 +93,6 @@ extern CMessageQueue<MessageFromLPreview> g_LPreviewToHammerMsgQueue;
 extern ThreadHandle_t g_LPreviewThread;
 
 extern CInterlockedInt n_gbufs_queued;
-extern CInterlockedInt n_result_bms_queued;
 
 extern Bitmap_t *g_pLPreviewOutputBitmap;
 

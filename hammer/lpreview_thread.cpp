@@ -16,7 +16,6 @@
 #include <tier0/memdbgon.h>
 
 CInterlockedInt n_gbufs_queued;
-CInterlockedInt n_result_bms_queued;
 
 // the current lighting preview output, if we have one
 Bitmap_t *g_pLPreviewOutputBitmap;
@@ -774,7 +773,6 @@ void CLightingPreviewThread::SendVectorMatrixAsRendering( CSIMDVectorMatrix cons
 			*(ret_bm->GetPixel( x, y )+3)=0;
 		}
 	MessageFromLPreview ret_msg( LPREVIEW_MSG_DISPLAY_RESULT );
-//	n_result_bms_queued++;
 	ret_msg.m_pBitmapToDisplay = ret_bm;
 	ret_msg.m_nBitmapGenerationCounter = m_nBitmapGenerationCounter;
 	g_LPreviewToHammerMsgQueue.QueueMessage( ret_msg );
@@ -813,7 +811,6 @@ void HandleLightingPreview()
 		{
 			case LPREVIEW_MSG_DISPLAY_RESULT:
 			{
-				n_result_bms_queued--;
 				if (g_pLPreviewOutputBitmap)
 					delete g_pLPreviewOutputBitmap;
 				g_pLPreviewOutputBitmap = NULL;
