@@ -49,11 +49,14 @@ public:
 
 	CIncrementalLightInfo()
 	{
+		m_pNext = nullptr;
+		m_pLight = nullptr;
 		m_nObjectID = -1;
-		m_pNext = NULL;
 		m_eIncrState = INCR_STATE_NEW;
 		m_fTotalContribution = 0.;
 		m_PartialResultsStage = 0;
+		m_nBitmapGenerationCounter = -1;
+		m_fDistanceToEye = 0.0f;
 		m_nMostRecentNonZeroContributionTimeStamp = 0;
 	}
 
