@@ -11,13 +11,10 @@
 #endif
 
 #include "tier0/threadtools.h"
+#include "tier1/utlvector.h"
 #include "bitmap/bitmap.h"
 #include "bitmap/float_bm.h"
-#include "tier1/utlvector.h"
 #include "mathlib/lightdesc.h"
-
-
-
 
 
 class CLightingPreviewLightDescription : public LightDesc_t
@@ -27,8 +24,8 @@ public:
 	class CIncrementalLightInfo *m_pIncrementalInfo;
 	void Init( int obj_id )
 	{
-		m_pIncrementalInfo = NULL;
 		m_nObjectID = obj_id;
+		m_pIncrementalInfo = nullptr;
 	}
 };
 
