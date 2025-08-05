@@ -468,6 +468,14 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 	if ( !g_pMDLCache || !g_pFileSystem || !g_pFullFileSystem || !materials || !g_pMaterialSystemHardwareConfig || !g_pStudioRender )
 		return false;
 
+#if defined ( _WIN32 )
+	// dimhotepus: Crash on crashes in timer.
+	// Ensure that we crash when we do something naughty in a callback
+	// such as a window proc. Otherwise on a 64-bit OS the crashes will be
+	// silently swallowed.
+	EnableCrashingOnCrashes();
+#endif
+
 	// ensure we're in the same directory as the .EXE
 	GetModuleFileName(NULL, m_szAppDir, MAX_PATH);
 	char *p = strrchr(m_szAppDir, '\\');
