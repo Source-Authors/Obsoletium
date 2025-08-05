@@ -1209,7 +1209,8 @@ void CRender3D::EndRenderFrame(void)
 			if (m_pView->m_bUpdateView && (m_eCurrentRenderMode == RENDER_MODE_LIGHT_PREVIEW_RAYTRACED))
 			{
 
-				static bool did_dump=false;
+				// dimhotepus: Disable dumping of images to files for performance.
+				static bool did_dump=true;
 				static double Last_SendTime=0;
 				// now, lets create floatbms with the deferred rendering data, so we can pass it to the lpreview thread
 				double newtime=Plat_FloatTime();
