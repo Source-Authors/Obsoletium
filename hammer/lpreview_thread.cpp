@@ -762,14 +762,15 @@ void CLightingPreviewThread::SendVectorMatrixAsRendering( CSIMDVectorMatrix cons
 {
 	Bitmap_t *ret_bm=new Bitmap_t;
 	ret_bm->Init( src.m_nWidth, src.m_nHeight, IMAGE_FORMAT_RGBA8888 );
+	constexpr float scale = 1 / 2.2f;
 	// lets copy into the output bitmap
 	for(int y=0;y<src.m_nHeight;y++)
 		for(int x=0;x<src.m_nWidth;x++)
 		{
 			Vector color=src.Element( x, y );
-			*(ret_bm->GetPixel( x, y )+0)= (uint8) min(255, (int)(255.0*pow(color.z,(float) (1/2.2))));
-			*(ret_bm->GetPixel( x, y )+1)= (uint8) min(255, (int)(255.0*pow(color.y,(float) (1/2.2))));
-			*(ret_bm->GetPixel( x, y )+2)= (uint8) min(255, (int)(255.0*pow(color.x,(float) (1/2.2))));
+			*(ret_bm->GetPixel( x, y )+0)= (uint8) min(255, (int)(255.0*pow(color.z,scale)));
+			*(ret_bm->GetPixel( x, y )+1)= (uint8) min(255, (int)(255.0*pow(color.y,scale)));
+			*(ret_bm->GetPixel( x, y )+2)= (uint8) min(255, (int)(255.0*pow(color.x,scale)));
 			*(ret_bm->GetPixel( x, y )+3)=0;
 		}
 	MessageFromLPreview ret_msg( LPREVIEW_MSG_DISPLAY_RESULT );
