@@ -357,7 +357,7 @@ class CHammerCmdLine : public CCommandLineInfo
 			m_bConfigDir = false;
 		}
 
-		void ParseParam(LPCTSTR lpszParam, BOOL bFlag, BOOL bLast)
+		void ParseParam(LPCTSTR lpszParam, BOOL bFlag, BOOL bLast) override
 		{
 			if ((!m_bGame) && (bFlag && !stricmp(lpszParam, "game")))
 			{
