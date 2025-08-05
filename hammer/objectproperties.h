@@ -14,6 +14,7 @@
 #include "ObjectPage.h"
 #include "OP_Groups.h"
 #include "AnchorMgr.h"
+#include "windows/base_property_sheet.h"
 
 
 class COP_Entity;
@@ -46,7 +47,7 @@ class editCEditGameClass : public CObject, public CEditGameClass
 };
 
 
-class CObjectProperties : public CPropertySheet
+class CObjectProperties : public CBasePropertySheet
 {
 	DECLARE_DYNAMIC(CObjectProperties)
 
@@ -83,7 +84,7 @@ public:
 	// Overrides
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CObjectProperties)
-	virtual BOOL OnInitDialog();
+	BOOL OnInitDialog() override;
 	//}}AFX_VIRTUAL
 
 protected:
