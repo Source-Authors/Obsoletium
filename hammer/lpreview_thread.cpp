@@ -47,7 +47,7 @@ public:
 	float m_fDistanceToEye;
 	int m_nMostRecentNonZeroContributionTimeStamp;
 
-	CIncrementalLightInfo( void )
+	CIncrementalLightInfo()
 	{
 		m_nObjectID = -1;
 		m_pNext = NULL;
@@ -58,21 +58,21 @@ public:
 	}
 
 
-	void DiscardResults( void )
+	void DiscardResults()
 	{
 		m_CalculatedContribution.SetSize(0,0);
 		if ( m_eIncrState != INCR_STATE_NEW )
 			m_eIncrState = INCR_STATE_NO_RESULTS;
 	}
 
-	void ClearIncremental( void )
+	void ClearIncremental()
 	{
 		m_eIncrState = INCR_STATE_NEW;
 		// free calculated lighting matrix
 		DiscardResults();
 	}
 
-	bool HasWorkToDo( void ) const
+	bool HasWorkToDo() const
 	{
 		return ( m_eIncrState != INCR_STATE_HAVE_FULL_RESULTS );
 	}
@@ -114,7 +114,7 @@ public:
 	Vector m_MinViewCoords;
 	Vector m_MaxViewCoords;
 	
-	CLightingPreviewThread(void)
+	CLightingPreviewThread()
 	{
 		m_nBitmapGenerationCounter = -1;
 		m_pLightList = NULL;
@@ -127,12 +127,11 @@ public:
 		InitIncrementalInformation();
 	}
 	
-	void InitIncrementalInformation( void );
+	void InitIncrementalInformation();
 
-	~CLightingPreviewThread( void )
+	~CLightingPreviewThread()
 	{
-		if ( m_pLightList )
-			delete m_pLightList;
+		delete m_pLightList;
 		while ( m_pIncrementalLightInfoList )
 		{
 			CIncrementalLightInfo *n=m_pIncrementalLightInfoList->m_pNext;
@@ -142,13 +141,13 @@ public:
 	}
 
 	// check if the master has new work for us to do, meaning we should abort rendering
-	bool ShouldAbort( void )
+	bool ShouldAbort()
 	{
 		return g_HammerToLPreviewMsgQueue.MessageWaiting();
 	}
 
 	// main loop
-	void Run(void);
+	void Run();
 
 	// handle new g-buffers from master
 	void HandleGBuffersMessage( MessageToLPreview &msg_in );
@@ -160,7 +159,7 @@ public:
 	void SendVectorMatrixAsRendering( CSIMDVectorMatrix const &src );
 
 	// calculate m_MinViewCoords, m_MaxViewCoords - the bounding box of the rendered pixels+the eye
-	void CalculateSceneBounds( void );
+	void CalculateSceneBounds();
 
 	// inner lighting loop. meant to be multithreaded on dual-core (or more)
 	void CalculateForLightTask( int nLineMask, int nLineMatch,
@@ -171,11 +170,11 @@ public:
 	void CalculateForLight( CLightingPreviewLightDescription &l );
 
 	// send our current output back
-	void SendResult( void );
+	void SendResult();
 
-	void UpdateIncrementalForNewLightList( void );
+	void UpdateIncrementalForNewLightList();
 
-	void DiscardResults( void )
+	void DiscardResults()
 	{
 		// invalidate all per light result data
 		for( CIncrementalLightInfo *i=m_pIncrementalLightInfoList; i; i=i->m_pNext)
@@ -201,15 +200,15 @@ public:
 	}
 	
 	// handle a message. returns true if the thread shuold exit
-	bool HandleAMessage( void );
+	bool HandleAMessage();
 
 	// returns whether or not there is useful work to do
-	bool AnyUsefulWorkToDo( void );
+	bool AnyUsefulWorkToDo();
 
 	// do some work, like a rendering for one light
 	void DoWork(void);
 
-	Vector EstimatedUnshotAmbient( void )
+	Vector EstimatedUnshotAmbient()
 	{
 //		return Vector( 1,1,1 );
 		float sum_weights=0.0001;
@@ -342,7 +341,7 @@ bool CIncrementalLightInfo::IsLowerPriorityThan( CLightingPreviewThread *pLPV,
 	return false;
 }
 
-void CLightingPreviewThread::InitIncrementalInformation( void )
+void CLightingPreviewThread::InitIncrementalInformation()
 {
 	int calculated_bit_mask=0;
 	for(int i=0;i<N_INCREMENTAL_STEPS;i++)
@@ -410,7 +409,7 @@ void CLightingPreviewThread::HandleGeomMessage( MessageToLPreview &msg_in )
 }
 
 
-void CLightingPreviewThread::CalculateSceneBounds( void )
+void CLightingPreviewThread::CalculateSceneBounds()
 {
 	FourVectors minbound, maxbound;
 	minbound.DuplicateVector( m_LastEyePosition );
@@ -440,7 +439,7 @@ void CLightingPreviewThread::CalculateSceneBounds( void )
 }
 
 
-void CLightingPreviewThread::UpdateIncrementalForNewLightList( void )
+void CLightingPreviewThread::UpdateIncrementalForNewLightList()
 {
 	for( int iLight=0; iLight<m_pLightList->Count(); iLight++)
 	{
@@ -495,7 +494,7 @@ void CLightingPreviewThread::Run(void)
 	}
 }
 
-bool CLightingPreviewThread::HandleAMessage( void )
+bool CLightingPreviewThread::HandleAMessage()
 {
 	MessageToLPreview msg_in;
 	g_HammerToLPreviewMsgQueue.WaitMessage( &msg_in );
@@ -528,7 +527,7 @@ bool CLightingPreviewThread::HandleAMessage( void )
 	return false;
 }
 
-bool CLightingPreviewThread::AnyUsefulWorkToDo( void )
+bool CLightingPreviewThread::AnyUsefulWorkToDo()
 {
 	if (  m_pLightList ) 
 	{
@@ -543,7 +542,7 @@ bool CLightingPreviewThread::AnyUsefulWorkToDo( void )
 	return false;
 }
 
-void CLightingPreviewThread::DoWork( void )
+void CLightingPreviewThread::DoWork()
 {
 	if (  m_pLightList ) 
 	{
@@ -598,7 +597,7 @@ void CLightingPreviewThread::HandleGBuffersMessage( MessageToLPreview &msg_in )
 }
 
 
-void CLightingPreviewThread::SendResult( void )
+void CLightingPreviewThread::SendResult()
 {
 	m_ResultImage = m_Albedos;
  	m_ResultImage *= EstimatedUnshotAmbient();
@@ -797,7 +796,7 @@ unsigned LightingPreviewThreadFN( void *thread_start_arg )
 }
 
 
-void HandleLightingPreview( void )
+void HandleLightingPreview()
 {
 	if ( GetMainWnd()->m_pLightingPreviewOutputWindow && !GetMainWnd()->m_bLightingPreviewOutputWindowShowing )
 	{
