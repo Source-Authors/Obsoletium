@@ -1210,6 +1210,9 @@ InitReturnVal_t CHammer::HammerInternalInit()
 		}
 	}
 
+	// dimhotepus: Hide splash before we can start to load broken save.
+	CSplashWnd::HideSplashScreen();
+
 	if ( Options.general.bClosedCorrectly == FALSE )
 	{
 		CString strLastGoodSave = APP()->GetProfileString("General", "Last Good Save", "");
@@ -1227,8 +1230,6 @@ InitReturnVal_t CHammer::HammerInternalInit()
 #ifdef VPROF_HAMMER
 	g_VProfCurrentProfile.Start();
 #endif
-	
-	CSplashWnd::HideSplashScreen();
 
 	// create the lighting preview thread
 	g_LPreviewThread = CreateSimpleThread( LightingPreviewThreadFN, 0 );
