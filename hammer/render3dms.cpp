@@ -1235,16 +1235,21 @@ void CRender3D::EndRenderFrame(void)
 
 						delete g_pLPreviewOutputBitmap;
 						g_pLPreviewOutputBitmap = NULL;
-						static char const *rts_to_transmit[]={"_rt_albedo","_rt_normal","_rt_position",
+
+						constexpr char const *rts_to_transmit[]={"_rt_albedo","_rt_normal","_rt_position",
 															  "_rt_flags" };
+
 						MessageToLPreview Msg(LPREVIEW_MSG_G_BUFFERS);
-						for(int i=0; i < NELEMS( rts_to_transmit ); i++)
+						for(size_t i=0; i < std::size( rts_to_transmit ); i++)
 						{
 							SetRenderTargetNamed(0,rts_to_transmit[i]);
+
 							FloatBitMap_t *fbm = new FloatBitMap_t( nTargetWidth, nTargetHeight );
 							Msg.m_pDefferedRenderingBMs[i]=fbm;
+
 							pRenderContext->ReadPixels(0, 0, nTargetWidth, nTargetHeight, (uint8 *) &(fbm->Pixel(0,0,0)),
 												  IMAGE_FORMAT_RGBA32323232F);
+
 							if ( (i==0) && (! did_dump) )
 							{
 								fbm->WriteTGAFile("albedo.tga");
