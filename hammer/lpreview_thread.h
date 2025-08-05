@@ -33,16 +33,16 @@ enum HammerToLightingPreviewMessageType
 {
 	// messages from hammer to preview task
 	LPREVIEW_MSG_STOP,									// no lighting previews open - stop working
-	LPREVIEW_MSG_EXIT,										// we're exiting program - shut down
-	LPREVIEW_MSG_GEOM_DATA,									  // we have new shadow geometry data
-	LPREVIEW_MSG_G_BUFFERS,							 // we have new g buffer data from the renderer
-	LPREVIEW_MSG_LIGHT_DATA,								// new light data in m_pLightList
+	LPREVIEW_MSG_EXIT,									// we're exiting program - shut down
+	LPREVIEW_MSG_GEOM_DATA,								// we have new shadow geometry data
+	LPREVIEW_MSG_G_BUFFERS,								// we have new g buffer data from the renderer
+	LPREVIEW_MSG_LIGHT_DATA,							// new light data in m_pLightList
 };
 
 enum LightingPreviewToHammerMessageType
 {
 	// messages from preview task to hammer
-	LPREVIEW_MSG_DISPLAY_RESULT,							// we have a result image
+	LPREVIEW_MSG_DISPLAY_RESULT,						// we have a result image
 };
 
 
