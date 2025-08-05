@@ -72,19 +72,9 @@ int g_nBitmapGenerationCounter = 1;
 //			pHit2 - Second hit to compare.
 // Output : Sorts by increasing depth value. Returns -1, 0, or 1 per qsort spec.
 //-----------------------------------------------------------------------------
-static int _CompareHits(const void *pHit1, const void *pHit2)
+static int _CompareHits(const HitInfo_t &pHit1, const HitInfo_t &pHit2)
 {
-	if (((HitInfo_t *)pHit1)->nDepth < ((HitInfo_t *)pHit2)->nDepth)
-	{
-		return(-1);
-	}
-
-	if (((HitInfo_t *)pHit1)->nDepth > ((HitInfo_t *)pHit2)->nDepth)
-	{
-		return(1);
-	}
-
-	return(0);
+	return pHit1.nDepth < pHit2.nDepth;
 }
 
 
@@ -96,19 +86,9 @@ static int _CompareHits(const void *pHit1, const void *pHit2)
 //			pHit2 - Second hit to compare.
 // Output : Sorts by decreasing depth value. Returns -1, 0, or 1 per qsort spec.
 //-----------------------------------------------------------------------------
-static int _CompareHitsReverse(const void *pHit1, const void *pHit2)
+static int _CompareHitsReverse(const HitInfo_t &pHit1, const HitInfo_t &pHit2)
 {
-	if (((HitInfo_t *)pHit1)->nDepth > ((HitInfo_t *)pHit2)->nDepth)
-	{
-		return(-1);
-	}
-
-	if (((HitInfo_t *)pHit1)->nDepth < ((HitInfo_t *)pHit2)->nDepth)
-	{
-		return(1);
-	}
-
-	return(0);
+	return pHit1.nDepth > pHit2.nDepth;
 }
 
 static bool TranslucentObjectsLessFunc( TranslucentObjects_t const&a, TranslucentObjects_t const&b )
@@ -1170,14 +1150,8 @@ void CRender3D::EndRenderFrame(void)
 		//
 		if (m_Pick.nNumHits > 1)
 		{
-			if (!m_RenderState.bReverseSelection)
-			{
-				qsort(m_Pick.Hits, m_Pick.nNumHits, sizeof(m_Pick.Hits[0]), _CompareHits);
-			}
-			else
-			{
-				qsort(m_Pick.Hits, m_Pick.nNumHits, sizeof(m_Pick.Hits[0]), _CompareHitsReverse);
-			}
+			std::sort(m_Pick.Hits, m_Pick.Hits + m_Pick.nNumHits,
+				!m_RenderState.bReverseSelection ? _CompareHits : _CompareHitsReverse);
 		}
 
 		//
