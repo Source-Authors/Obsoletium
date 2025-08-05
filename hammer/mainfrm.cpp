@@ -308,7 +308,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	const DWORD dwDefStyles = WS_CHILD | WS_VISIBLE | CBRS_TOP;
 	lpCreateStruct->lpszClass = "VALVEWORLDCRAFT";
 
-	if (CMDIFrameWnd::OnCreate(lpCreateStruct) == -1)
+	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
     m_dpiBehavior.OnCreateWindow(m_hWnd);
