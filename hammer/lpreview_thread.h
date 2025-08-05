@@ -78,9 +78,11 @@ struct MessageFromLPreview
 	int m_nBitmapGenerationCounter;							// for LPREVIEW_MSG_DISPLAY_RESULT
 	MessageFromLPreview( LightingPreviewToHammerMessageType msgtype )
 	{
+		m_pBitmapToDisplay = nullptr;
 		m_MsgType = msgtype;
+		m_nBitmapGenerationCounter = -1;
 	}
-	MessageFromLPreview( void )
+	MessageFromLPreview() : MessageFromLPreview( LPREVIEW_MSG_DISPLAY_RESULT )
 	{
 	}
 
