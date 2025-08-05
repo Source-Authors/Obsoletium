@@ -209,7 +209,7 @@ public:
 	bool AnyUsefulWorkToDo();
 
 	// do some work, like a rendering for one light
-	void DoWork(void);
+	void DoWork();
 
 	Vector EstimatedUnshotAmbient()
 	{
@@ -472,7 +472,7 @@ void CLightingPreviewThread::UpdateIncrementalForNewLightList()
 }
 
 
-void CLightingPreviewThread::Run(void)
+void CLightingPreviewThread::Run()
 {
 	bool should_quit = false;
 	while(! should_quit )
