@@ -103,7 +103,8 @@ public:
 	Vector m_LastEyePosition;
 
 	bool m_bResultChangedSinceLastSend;
-	float m_fLastSendTime;
+	// dimhotepus: float -> double.
+	double m_fLastSendTime;
 
 	int m_LineMask[N_INCREMENTAL_STEPS];
 	int m_ClosestLineOffset[N_INCREMENTAL_STEPS][N_INCREMENTAL_STEPS];
@@ -196,7 +197,7 @@ public:
 					l_info->m_fDistanceToEye = m_LastEyePosition.DistTo( l.m_Position );
 			}
 		m_bResultChangedSinceLastSend = true;
-		m_fLastSendTime = Plat_FloatTime()-9;				// force send
+		m_fLastSendTime = Plat_FloatTime()-9.0;				// force send
 	}
 	
 	// handle a message. returns true if the thread shuold exit
@@ -482,7 +483,7 @@ void CLightingPreviewThread::Run(void)
 			DoWork();
 		if ( m_bResultChangedSinceLastSend )
 		{
-			float newtime=Plat_FloatTime();
+			double newtime=Plat_FloatTime();
 			if ( (newtime-m_fLastSendTime > 10.0) || ( ! AnyUsefulWorkToDo() ) )
 			{
 				SendResult();
