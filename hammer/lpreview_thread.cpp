@@ -77,7 +77,7 @@ public:
 
 	bool HasWorkToDo() const
 	{
-		return ( m_eIncrState != INCR_STATE_HAVE_FULL_RESULTS );
+		return m_eIncrState != INCR_STATE_HAVE_FULL_RESULTS;
 	}
 
 	
