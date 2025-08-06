@@ -1085,7 +1085,7 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 		
 		CString caption;
 		[[maybe_unused]] const BOOL rc{caption.LoadString(IDS_LOADINGFILE)};
-		Assert(rc > 0);
+		VERIFY(rc);
 
 		pProgDlg->SetWindowText(caption);
 

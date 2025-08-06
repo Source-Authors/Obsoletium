@@ -71,7 +71,7 @@ BOOL CScenePreviewDlg::OnInitDialog()
 	SetDlgItemText( IDC_SCENE_NAME, str );
 
 	CString strNone;
-	strNone.LoadString( IDS_NONE );
+	VERIFY(strNone.LoadString( IDS_NONE ));
 	SetDlgItemText( IDC_CURRENT_SOUND, strNone );
 	SetDlgItemText( IDC_NEXT_SOUND, strNone );
 
@@ -159,7 +159,7 @@ void CScenePreviewDlg::OnIdle()
 			if ( !bRet )
 			{
 				CString strErrorPlaying;
-				strErrorPlaying.LoadString( IDS_ERROR_PLAYING );
+				VERIFY( strErrorPlaying.LoadString( IDS_ERROR_PLAYING ) );
 				curSound += " " + strErrorPlaying;
 			}
 			SetDlgItemText( IDC_CURRENT_SOUND, curSound );
@@ -167,7 +167,7 @@ void CScenePreviewDlg::OnIdle()
 
 		// Find the next sound event.
 		CString str;
-		str.LoadString( IDS_NONE );
+		VERIFY( str.LoadString( IDS_NONE ) );
 		for ( int i=iLastSound+1; i < m_pScene->GetNumEvents(); i++ )
 		{
 			CChoreoEvent *e = m_pScene->GetEvent( i );

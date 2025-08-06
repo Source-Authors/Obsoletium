@@ -747,6 +747,7 @@ void CHammer::OpenURL(UINT nID, HWND hwnd)
 {
 	CString str;
 	const BOOL rc{str.LoadString(nID)};
+	VERIFY(rc);
 	// dimhotepus: Open URL only if found.
 	if (rc)
 	{

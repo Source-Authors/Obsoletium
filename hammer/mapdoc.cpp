@@ -1479,7 +1479,7 @@ bool CMapDoc::LoadVMF( const char *pszFileName, int LoadFlags )
 
 	// Set the progress dialog title
 	CString caption;
-	caption.LoadString(IDS_LOADINGFILE);
+	VERIFY(caption.LoadString(IDS_LOADINGFILE));
 	pProgDlg->SetWindowText(caption);
 
 	g_nFileFormatVersion = 0;

@@ -628,7 +628,7 @@ bool COptions::Read(void)
 bool COptions::RunConfigurationDialog()
 {
 	CString strText;
-	strText.LoadString(IDS_NO_CONFIGS_AVAILABLE);
+	VERIFY(strText.LoadString(IDS_NO_CONFIGS_AVAILABLE));
 	if (MessageBox(NULL, strText, "Hammer - First Time Setup", MB_ICONQUESTION | MB_YESNO) == IDYES)
 	{
 		APP()->OpenURL(ID_HELP_FIRST_TIME_SETUP, GetMainWnd()->GetSafeHwnd());

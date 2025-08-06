@@ -506,7 +506,7 @@ void CMapCheckDlg::OnSelchangeErrors()
 	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
 	Assert( iErrorStr == (int)pError->Type );
 	
-	str.LoadString(g_MapErrorStrings[iErrorStr].m_DescriptionResourceID);
+	VERIFY(str.LoadString(g_MapErrorStrings[iErrorStr].m_DescriptionResourceID));
 	m_Description.SetWindowText(str);
 
 	m_Go.EnableWindow(pError->pObjects[0] != NULL);
@@ -590,7 +590,7 @@ static void AddErrorToListBox(CListBox *pList, MapError *pError)
 	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
 	Assert( iErrorStr == (int)pError->Type );
 	
-	str.LoadString(g_MapErrorStrings[iErrorStr].m_StrResourceID);
+	VERIFY(str.LoadString(g_MapErrorStrings[iErrorStr].m_StrResourceID));
 
 	if (str.Find('%') != -1)
 	{
