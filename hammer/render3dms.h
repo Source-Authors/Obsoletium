@@ -265,7 +265,6 @@ protected:
 	Vector4D m_FrustumPlanes[6];		// Plane normals and constants for the current view frustum.
 	
 	MatWinData_t m_WinData;				// Defines our render window parameters.
-	se::windows::ui::CDpiWindowBehavior m_DpiWindowBehavior; // DPI handling.
 	PickInfo_t m_Pick;					// Contains information used when rendering in pick mode.
 	RenderStateInfo_t m_RenderState;	// Render state set via RenderEnable.
 

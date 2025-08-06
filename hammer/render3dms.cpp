@@ -430,8 +430,6 @@ bool CRender3D::SetView( CMapView *pView )
 
 	m_WinData.hWnd = hwnd;
 
-	m_DpiWindowBehavior.OnCreateWindow(hwnd);
-
 	if ((m_WinData.hDC = GetDCEx(m_WinData.hWnd, NULL, DCX_CACHE | DCX_CLIPSIBLINGS)) == NULL)
 	{
 		ChangeDisplaySettings(NULL, 0);
@@ -1477,7 +1475,13 @@ void CRender3D::EndRenderFrame(void)
 			Vector ViewPoint;
 			GetCamera()->GetViewPoint(ViewPoint);
 			int nLen = V_sprintf_safe(szText, "FPS %3.2f @ Pos [%.2f %.2f %.2f]", m_fFrameRate, ViewPoint[0], ViewPoint[1], ViewPoint[2]);
-			TextOut(m_WinData.hDC, m_DpiWindowBehavior.ScaleOnX( 2 ), m_DpiWindowBehavior.ScaleOnY( 18 ), szText, nLen);
+			
+			unsigned dpi = GetDpiForWindow(m_WinData.hWnd);
+			TextOut(m_WinData.hDC,
+				se::windows::ui::CDpiWindowBehavior::ScaleByDpi( USER_DEFAULT_SCREEN_DPI, 2, dpi ),
+				se::windows::ui::CDpiWindowBehavior::ScaleByDpi( USER_DEFAULT_SCREEN_DPI, 18, dpi ),
+				szText,
+				nLen);
 		}
 	}
 }
@@ -1887,7 +1891,7 @@ void CRender3D::RenderBox(const Vector &Mins, const Vector &Maxs,
 			// dimhotepus: 3 -> 4 to prevent out-of-buffer read.
 			unsigned char color[4];
 			// dimhotepus: Alpha is required.
-			color[3] = 255;
+			color[3] = 0;
 
 			assert( (eRenderModeThisPass != RENDER_MODE_TEXTURED) &&
 					(eRenderModeThisPass != RENDER_MODE_TEXTURED_SHADED) && 
@@ -2839,8 +2843,6 @@ bool CRender3D::NeedsOverlay() const
 //-----------------------------------------------------------------------------
 void CRender3D::ShutDown(void)
 {
-	m_DpiWindowBehavior.OnDestroyWindow();
-
 	MaterialSystemInterface()->RemoveView( m_WinData.hWnd );
 
 	if (m_WinData.hDC)

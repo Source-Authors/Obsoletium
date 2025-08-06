@@ -57,6 +57,15 @@ class CDpiWindowBehavior {
   BOOL ApplyDpiToWindow(bool recompute_window_size);
 
   /**
+   * @brief Scale value from old DPI to new one.
+   * @param odlDpi Old DPI.
+   * @param value Value.
+   * @param newDpi New DPI.
+   * @return Scaled value.
+   */
+  [[nodiscard]] static int ScaleByDpi(unsigned odlDpi, int value, unsigned newDpi);
+
+  /**
    * @brief Previous X DPI.
    * @return
    */
@@ -101,6 +110,10 @@ class CDpiWindowBehavior {
   unsigned m_current_dpi_x, m_current_dpi_y;
 
   const bool m_apply_dpi_on_create;
+
+#ifdef _DEBUG
+  bool m_is_destroyed;
+#endif
 };
 
 }  // namespace se::windows::ui
