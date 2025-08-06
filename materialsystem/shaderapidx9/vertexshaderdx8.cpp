@@ -2954,7 +2954,7 @@ void CShaderManager::SetVertexShader( VertexShader_t shader )
 #endif
 	}
 
-	Assert( dxshader );
+	AssertMsg( dxshader != INVALID_HARDWARE_SHADER, "Failed to set vertex shader '%s'.\n", m_ShaderSymbolTable.String( vshLookup.m_Name ) );
 
 #ifndef DYNAMIC_SHADER_COMPILE
 	if( !dxshader )
@@ -3042,7 +3042,7 @@ void CShaderManager::SetPixelShader( PixelShader_t shader )
 #endif
 	}
 
-	AssertMsg( dxshader != INVALID_HARDWARE_SHADER, "Failed to set pixel shader." );
+	AssertMsg( dxshader != INVALID_HARDWARE_SHADER, "Failed to set pixel shader '%s'.\n", m_ShaderSymbolTable.String( pshLookup.m_Name ) );
 	SetPixelShaderState( dxshader );
 }
 
