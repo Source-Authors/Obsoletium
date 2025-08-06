@@ -477,8 +477,8 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 #endif
 
 	// ensure we're in the same directory as the .EXE
-	GetModuleFileName(NULL, m_szAppDir, MAX_PATH);
-	char *p = strrchr(m_szAppDir, '\\');
+	Plat_GetModuleFilename(m_szAppDir, MAX_PATH);
+	char *p = strrchr(m_szAppDir, CORRECT_PATH_SEPARATOR);
 	if(p)
 	{
 		// chop off \hammer.exe
@@ -489,9 +489,9 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 	{
 #ifdef PLATFORM_64BITS
 		// dimhotepus: x86-64 support.
-		strcat( m_szAppDir, "\\bin\\x64" );
+		strcat( m_szAppDir, CORRECT_PATH_SEPARATOR_S "bin" CORRECT_PATH_SEPARATOR_S "x64" );
 #else
-		strcat( m_szAppDir, "\\bin" );
+		strcat( m_szAppDir, CORRECT_PATH_SEPARATOR_S "bin" );
 #endif
 	}
 	
