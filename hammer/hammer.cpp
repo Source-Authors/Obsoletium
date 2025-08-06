@@ -521,20 +521,21 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 
 void CHammer::Disconnect()
 {
-	g_pStudioRender = NULL;
-	g_pFileSystem = NULL;
-	g_pEngineAPI = NULL;
-	g_pMDLCache = NULL;
+	g_Factory = nullptr;
+	g_pMDLCache = nullptr;
+	g_pEngineAPI = nullptr;
+	g_pStudioRender = nullptr;
+	g_pFileSystem = nullptr;
 	BaseClass::Disconnect();
 }
 
 void *CHammer::QueryInterface( const char *pInterfaceName )
 {
 	// We also implement the IMatSystemSurface interface
-	if (!Q_strncmp(	pInterfaceName, INTERFACEVERSION_HAMMER, Q_strlen(INTERFACEVERSION_HAMMER) + 1))
-		return (IHammer*)this;
+	if (!Q_strncmp(	pInterfaceName, INTERFACEVERSION_HAMMER, std::size(INTERFACEVERSION_HAMMER)))
+		return static_cast<IHammer*>(this);
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -546,12 +547,8 @@ bool CHammer::HammerPreTranslateMessage(MSG * pMsg)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	// Copy this into the current message, needed for MFC
-#if _MSC_VER >= 1300
 	_AFX_THREAD_STATE* pState = AfxGetThreadState();
 	pState->m_msgCur = *pMsg;
-#else
-	m_msgCur = *pMsg;
-#endif
 
 	return (/*pMsg->message == WM_KICKIDLE ||*/ PreTranslateMessage(pMsg) != FALSE);
 }
