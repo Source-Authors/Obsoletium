@@ -987,7 +987,6 @@ float CMapDisp::CollideWithTriangles( const Vector& RayStart, const Vector& RayE
 	ray.m_Delta = RayEnd - RayStart;
 	ray.m_IsRay = true;
 
-	Vector vNormal;
 	float minFraction = 1.0f;
 	for( int ndxTri = 0; ndxTri < triCount; ndxTri++ )
 	{
