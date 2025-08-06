@@ -588,7 +588,7 @@ static void EnsureTrailingBackslash(char *psz, ptrdiff_t size)
 // Input  : dir - Enumerated directory to retrieve.
 //			p - Pointer to buffer that receives the full path to the directory.
 //-----------------------------------------------------------------------------
-void CHammer::GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, ptrdiff_t size) const
+void CHammer::GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, intp size) const
 {
 	// dimhotepus: Always zero-terminate
 	if (size > 0)
