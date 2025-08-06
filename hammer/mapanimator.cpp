@@ -307,15 +307,8 @@ void CMapAnimator::GetAnimationAtTime( float animTime, Vector& newOrigin, Quater
 void CMapAnimator::GetAnimationAtTime( CMapKeyFrame *currentKey, CMapKeyFrame *pPrevKey, float partialTime, Vector& newOrigin, Quaternion &newAngles, int posInterpolator, int rotInterpolator )
 {
 	// calculate the proportion of time to be spent on this keyframe
-	float animTime;
-	if ( currentKey->MoveTime() < 0.01 )
-	{
-		animTime = 1.0f;
-	}
-	else
-	{
-		animTime = partialTime / currentKey->MoveTime();
-	}
+	const float moveTime = currentKey->MoveTime();
+	const float animTime = moveTime < 0.01f ? 1.0f : partialTime / moveTime;
 
 	Assert( animTime >= 0.0f && animTime <= 1.0f );
 
