@@ -102,19 +102,6 @@ CChildFrame::~CChildFrame(void)
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Input  : cs - 
-// Output : Returns TRUE on success, FALSE on failure.
-//-----------------------------------------------------------------------------
-BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
-{
-	//cs.style |= WS_MAXIMIZE;
-
-	return(__super::PreCreateWindow(cs));
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
 // Input  : 
 // Output : CView *
 //-----------------------------------------------------------------------------
@@ -198,7 +185,7 @@ void CChildFrame::SetSplitterMode(BOOL bSplitter)
 
 		CRect r;
 		GetClientRect(r);
-		CSize sizeView(r.Width()/2 - m_dpi_behavior.ScaleOnX(3), r.Height()/2 -  - m_dpi_behavior.ScaleOnY(3));
+		CSize sizeView(r.Width()/2 - m_dpi_behavior.ScaleOnX(3), r.Height()/2 - m_dpi_behavior.ScaleOnY(3));
 
 		CCreateContext context;
 		context.m_pNewViewClass = NULL;

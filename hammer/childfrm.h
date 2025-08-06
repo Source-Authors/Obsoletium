@@ -48,12 +48,6 @@ class CChildFrame : public CBaseMDIChildWnd
 	BOOL m_bReady;
 	BOOL m_bNeedsCentered;
 
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CChildFrame)
-public:
-	BOOL PreCreateWindow(CREATESTRUCT& cs);
-	//}}AFX_VIRTUAL
-
 public:
 
 	virtual ~CChildFrame(void);
@@ -97,7 +91,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-		CMySplitterWnd *m_wndSplitter;
+	CMySplitterWnd *m_wndSplitter;
 };
 
 
