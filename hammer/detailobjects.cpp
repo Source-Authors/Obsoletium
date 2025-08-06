@@ -228,7 +228,7 @@ void DetailObjects::ParseDetailObjectFile( KeyValues& keyValues )
 		if (!pIter->GetFirstSubKey())
 			continue;
 
-		int i = s_DetailObjectDict.AddToTail( );
+		intp i = s_DetailObjectDict.AddToTail( );
 		s_DetailObjectDict[i].m_Name = pIter->GetName() ;
 		s_DetailObjectDict[i].m_Density = pIter->GetFloat( "density", 0.0f );
 

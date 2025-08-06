@@ -1268,7 +1268,7 @@ CTextureGroup::CTextureGroup(const char *pszName)
 //-----------------------------------------------------------------------------
 void CTextureGroup::AddTexture(IEditorTexture *pTexture)
 {
-	int index = m_Textures.AddToTail(pTexture);
+	intp index = m_Textures.AddToTail(pTexture);
 	m_TextureNameMap.Insert( pTexture->GetName(), index );
 }
 

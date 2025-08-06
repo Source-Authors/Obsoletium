@@ -2106,7 +2106,7 @@ bool PrePlanarizeDependentVerts( void )
 		CMapDisp *pDisp = EditDispMgr()->GetDisp( pFace->GetDisp() );
 		Assert( pDisp );
 
-		int iDisp = m_aCoreDispInfos.AddToTail();
+		intp iDisp = m_aCoreDispInfos.AddToTail();
 		pDisp->GetCoreDispInfo()->SetListIndex( iDisp );
 		m_aCoreDispInfos[iDisp] = pDisp->GetCoreDispInfo();
 	}

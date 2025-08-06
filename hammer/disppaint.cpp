@@ -164,7 +164,7 @@ bool CDispPaintMgr::DoPaint( SpatialPaintData_t &spatialData )
 //-----------------------------------------------------------------------------
 void CDispPaintMgr::NudgeAdd( CMapDisp *pDisp, int iVert )
 {
-	int iNudge = m_aNudgeData.AddToTail();
+	intp iNudge = m_aNudgeData.AddToTail();
 	m_aNudgeData[iNudge].m_hDisp = pDisp->GetEditHandle();
 	m_aNudgeData[iNudge].m_iVert = iVert;
 }
