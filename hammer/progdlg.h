@@ -29,7 +29,7 @@ public:
     // Checking for Cancel button
     BOOL CheckCancelButton();
     // Progress Dialog manipulation
-    void SetRange(short nLower,short nUpper);
+    void SetRange(int nLower,int nUpper);
     int  SetStep(int nStep);
     int  SetPos(int nPos);
     int  OffsetPos(int nPos);
@@ -45,17 +45,16 @@ public:
     // ClassWizard generated virtual function overrides
     //{{AFX_VIRTUAL(CProgressDlg)
     public:
-    virtual BOOL DestroyWindow();
+    BOOL DestroyWindow() override;
     protected:
-    virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV support
+    void DoDataExchange(CDataExchange* pDX) override;    // DDX/DDV support
     //}}AFX_VIRTUAL
 
 // Implementation
 protected:
 	UINT m_nCaptionID;
-    // dimhotepus: int -> short as Window control expects.
-    short m_nLower;
-    short m_nUpper;
+    int m_nLower;
+    int m_nUpper;
     int m_nStep;
     
     BOOL m_bCancel;
@@ -63,14 +62,14 @@ protected:
 
     void ReEnableParent();
 
-    virtual void OnCancel();
-    virtual void OnOK() {}; 
+    void OnCancel() override;
+    void OnOK() override {}; 
     void UpdatePercent(int nCurrent);
     void PumpMessages();
 
     // Generated message map functions
     //{{AFX_MSG(CProgressDlg)
-    virtual BOOL OnInitDialog();
+    BOOL OnInitDialog() override;
     //}}AFX_MSG
     DECLARE_MESSAGE_MAP()
 };

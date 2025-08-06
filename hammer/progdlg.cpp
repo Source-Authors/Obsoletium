@@ -55,7 +55,7 @@ void CProgressDlg::ReEnableParent()
 BOOL CProgressDlg::Create(CWnd *pParent)
 {
     // Get the true parent of the dialog
-    m_pParentWnd = CWnd::GetSafeOwner(pParent);
+    m_pParentWnd = __super::GetSafeOwner(pParent);
 
     // m_bParentDisabled is used to re-enable the parent window
     // when the dialog is destroyed. So we don't want to set
@@ -95,11 +95,11 @@ void CProgressDlg::OnCancel()
     m_bCancel=TRUE;
 }
 
-void CProgressDlg::SetRange(short nLower,short nUpper)
+void CProgressDlg::SetRange(int nLower,int nUpper)
 {
     m_nLower = nLower;
     m_nUpper = nUpper;
-    m_Progress.SetRange(nLower,nUpper);
+    m_Progress.SetRange32(nLower,nUpper);
 }
   
 int CProgressDlg::SetPos(int nPos)
@@ -171,7 +171,7 @@ void CProgressDlg::UpdatePercent(int nNewPos)
 {
     CWnd *pWndPercent = GetDlgItem(CG_IDC_PROGDLG_PERCENT);
     
-    short nDivisor = m_nUpper - m_nLower;
+    int nDivisor = m_nUpper - m_nLower;
     Assert(nDivisor>0);  // m_nLower should be smaller than m_nUpper
 
     int nDividend = (nNewPos - m_nLower);
@@ -201,7 +201,7 @@ void CProgressDlg::UpdatePercent(int nNewPos)
 BOOL CProgressDlg::OnInitDialog() 
 {
     __super::OnInitDialog();
-    m_Progress.SetRange(m_nLower,m_nUpper);
+    m_Progress.SetRange32(m_nLower,m_nUpper);
     m_Progress.SetStep(m_nStep);
     m_Progress.SetPos(m_nLower);
 
