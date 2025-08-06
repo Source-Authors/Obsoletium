@@ -218,6 +218,30 @@ LPCTSTR GetErrorString()
 
 CProcessWnd procWnd;
 
+template<intp nameSize, intp extensionSize>
+void* SplitFileNameFromPath(char* szDocLongPath,
+	char (&name)[nameSize],
+	char (&extension)[extensionSize])
+{
+	char *p = strrchr(szDocLongPath, '.');
+	if(p && strrchr(szDocLongPath, '\\') < p && strrchr(szDocLongPath, '/') < p)
+	{
+		// got the extension
+		V_strcpy_safe(extension, p+1);
+		p[0] = '\0';
+	}
+
+	p = strrchr(szDocLongPath, '\\');
+	if(!p)
+		p = strrchr(szDocLongPath, '/');
+	if(p)
+	{
+		// got the filepart
+		V_strcpy_safe(name, p+1);
+		p[0] = '\0';
+	}
+}
+
 bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 {
 	s_bRunsCommands = true;
@@ -247,43 +271,9 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 	GetShortPathName(pszOrigDocName, szDocShortPath, MAX_PATH);
 
 	// split them up
-	char *p = strrchr(szDocLongPath, '.');
-	if(p && strrchr(szDocLongPath, '\\') < p && strrchr(szDocLongPath, '/') < p)
-	{
-		// got the extension
-		V_strcpy_safe(szDocLongExt, p+1);
-		p[0] = 0;
-	}
+	SplitFileNameFromPath(szDocLongPath, szDocLongName, szDocLongExt);
+	SplitFileNameFromPath(szDocShortPath, szDocShortName, szDocShortExt);
 
-	p = strrchr(szDocLongPath, '\\');
-	if(!p)
-		p = strrchr(szDocLongPath, '/');
-	if(p)
-	{
-		// got the filepart
-		V_strcpy_safe(szDocLongName, p+1);
-		p[0] = 0;
-	}
-
-	// split the short part up
-	p = strrchr(szDocShortPath, '.');
-	if(p && strrchr(szDocShortPath, '\\') < p && strrchr(szDocShortPath, '/') < p)
-	{
-		// got the extension
-		V_strcpy_safe(szDocShortExt, p+1);
-		p[0] = 0;
-	}
-
-	p = strrchr(szDocShortPath, '\\');
-	if(!p)
-		p = strrchr(szDocShortPath, '/');
-	if(p)
-	{
-		// got the filepart
-		V_strcpy_safe(szDocShortName, p+1);
-		p[0] = 0;
-	}
-	
 	char *ppParms[32];
 	BitwiseClear(ppParms);
 	INT_PTR iSize = Commands.GetSize(), i = 0;
