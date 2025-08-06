@@ -136,8 +136,6 @@ public:
 	void BeginClosing();
 	bool IsClosing();
 
-	void Enable3DRender(bool bEnable);
-	
 	void ReleaseVideoMemory();
 	void SuppressVideoAllocation( bool bSuppress );
 	bool CanAllocateVideo() const;
