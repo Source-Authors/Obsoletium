@@ -476,7 +476,7 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	// HACK: Spackle up the maximized window position to (0, 0) to fix an intermittent bug. =(
 	WINDOWPLACEMENT wp;
-	ZeroMemory(&wp, sizeof(wp));
+	BitwiseClear(wp);
 	wp.length = sizeof(wp);
 	SetWindowPlacement(&wp);
 
