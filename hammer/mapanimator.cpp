@@ -308,9 +308,11 @@ void CMapAnimator::GetAnimationAtTime( CMapKeyFrame *currentKey, CMapKeyFrame *p
 {
 	// calculate the proportion of time to be spent on this keyframe
 	const float moveTime = currentKey->MoveTime();
-	const float animTime = moveTime < 0.01f ? 1.0f : partialTime / moveTime;
+	float animTime = moveTime < 0.01f ? 1.0f : partialTime / moveTime;
 
-	Assert( animTime >= 0.0f && animTime <= 1.0f );
+	// dimhotepus: A bit more than 1 to handle rounding issues.
+	Assert( animTime >= 0.0f && animTime <= 1.000001f );
+	animTime = Clamp(animTime, 0.0f, 1.0f);
 
 	IPositionInterpolator *pInterp = currentKey->SetupPositionInterpolator( posInterpolator );
 
