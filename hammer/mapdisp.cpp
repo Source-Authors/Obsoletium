@@ -3082,7 +3082,7 @@ ChunkFileResult_t CMapDisp::LoadDispTriangleTagsKeyCallback(const char *szKey, c
 
 		while ( pszNext != NULL ) 
 		{
-			nTriTag = ( unsigned int )atoi( pszNext );
+			nTriTag = ( unsigned short )strtoull( pszNext, nullptr, 10 );
 			pDisp->m_CoreDispInfo.SetTriTagValue( iTri, nTriTag );
 			pszNext = strtok( NULL, " " );
 			iTri++;
