@@ -219,7 +219,7 @@ LPCTSTR GetErrorString()
 CProcessWnd procWnd;
 
 template<intp nameSize, intp extensionSize>
-void* SplitFileNameFromPath(char* szDocLongPath,
+void SplitFileNameFromPath(char* szDocLongPath,
 	char (&name)[nameSize],
 	char (&extension)[extensionSize])
 {
@@ -312,7 +312,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 		// create a parameter list (not always required)
 		if(!cmd.bUseProcessWnd || cmd.iSpecialCmd)
 		{
-			p = szNewParms;
+			char *p = szNewParms;
 			ppParms[0] = szNewRun;
 			int iArg = 1;
 			BOOL bDone = FALSE;
