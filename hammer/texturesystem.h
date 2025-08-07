@@ -54,7 +54,7 @@ public:
 	void AddTexture(IEditorTexture *pTexture);
 	void Sort(void);
 
-	IEditorTexture *GetTexture(int nIndex);
+	IEditorTexture *GetTexture(intp nIndex);
 	IEditorTexture* GetTexture( char const* pName );
 
 	// Fast find texture..
@@ -71,7 +71,7 @@ protected:
 	CUtlDict<intp,intp> m_TextureNameMap;	// Maps the texture name to an index into m_Textures (the key is IEditorTexture::GetName).
 
 	// Used to lazily load the textures in the group
-	int	m_nTextureToLoad;
+	intp	m_nTextureToLoad;
 };
 
 

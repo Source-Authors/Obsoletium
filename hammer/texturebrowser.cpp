@@ -193,7 +193,7 @@ void CTextureBrowser::SetUsed(BOOL bUsed)
 		GetActiveWorld()->GetUsedTextures(Used);
 
 		m_TextureSubList.RemoveAll();
-		for (int i = 0; i < Used.Count(); i++)
+		for (intp i = 0; i < Used.Count(); i++)
 		{
 			TextureWindowTex_t Tex;
 			Tex.pTex = Used.Element(i).pTex;

@@ -140,16 +140,16 @@ void CTextureSystem::FreeAllTextures()
 		m_pCubemapTexture = NULL;
 	}
 
-	int nContextCount = m_TextureContexts.Count();
-	for (int nContext = 0; nContext < nContextCount; nContext++)
+	intp nContextCount = m_TextureContexts.Count();
+	for (intp nContext = 0; nContext < nContextCount; nContext++)
 	{
 		TextureContext_t *pContext = &m_TextureContexts.Element(nContext);
 
 		//
 		// Delete all the texture groups for this context.
 		//
-		int nGroupCount = pContext->Groups.Count();
-		for (int nGroup = 0; nGroup < nGroupCount; nGroup++)
+		intp nGroupCount = pContext->Groups.Count();
+		for (intp nGroup = 0; nGroup < nGroupCount; nGroup++)
 		{
 			delete pContext->Groups.Element(nGroup);
 		}
@@ -157,8 +157,8 @@ void CTextureSystem::FreeAllTextures()
 		//
 		// Delete dummy textures.
 		//
-		int nDummyCount = pContext->Dummies.Count();
-		for (int nDummy = 0; nDummy < nDummyCount; nDummy++)
+		intp nDummyCount = pContext->Dummies.Count();
+		for (intp nDummy = 0; nDummy < nDummyCount; nDummy++)
 		{
 			IEditorTexture *pTex = pContext->Dummies.Element(nDummy);
 			delete pTex;
@@ -168,7 +168,7 @@ void CTextureSystem::FreeAllTextures()
 	//
 	// Delete all the textures from the master list.
 	//
-	for (int i = 0; i < m_Textures.Count(); i++)
+	for (intp i = 0; i < m_Textures.Count(); i++)
 	{
 		IEditorTexture *pTex = m_Textures[i];
 		delete pTex;
@@ -369,8 +369,8 @@ IEditorTexture *CTextureSystem::FindActiveTexture(LPCSTR pszInputName, int *piIn
 	//
 	if (m_pActiveContext)
 	{
-		int nDummyCount = m_pActiveContext->Dummies.Count();
-		for (int nDummy = 0; nDummy < nDummyCount; nDummy++)
+		intp nDummyCount = m_pActiveContext->Dummies.Count();
+		for (intp nDummy = 0; nDummy < nDummyCount; nDummy++)
 		{
 			IEditorTexture *pTexDummy = m_pActiveContext->Dummies.Element(nDummy);
 			if (!strcmpi(pszName, pTexDummy->GetName()))
@@ -1020,7 +1020,7 @@ DWORD CTextureSystem::LoadGraphicsFile(const char *pFilename)
 	//
 	// Make sure it's not already there.
 	//
-	int i = m_GraphicsFiles.Count() - 1;
+	intp i = m_GraphicsFiles.Count() - 1;
 	while (i > -1)
 	{
 		if (!strcmp(m_GraphicsFiles[i].filename, pFilename))
@@ -1177,7 +1177,7 @@ void CTextureSystem::RegisterTextureKeywords( IEditorTexture *pTexture )
 			// dvs: hide in a Find function
 			bool bFound = false;
 			
-			for( int pos=0; pos < m_Keywords.Count(); pos++ )
+			for( intp pos=0; pos < m_Keywords.Count(); pos++ )
 			{
 				const char *pszTest = m_Keywords.Element(pos);
 				if (!stricmp(pszTest, pch))
@@ -1282,7 +1282,7 @@ void CTextureGroup::Sort(void)
 
 	// Redo the name map.
 	m_TextureNameMap.RemoveAll();
-	for ( int i=0; i < m_Textures.Count(); i++ )
+	for ( intp i=0; i < m_Textures.Count(); i++ )
 	{
 		IEditorTexture *pTex = m_Textures[i];
 		m_TextureNameMap.Insert( pTex->GetName(), i );
@@ -1297,7 +1297,7 @@ void CTextureGroup::Sort(void)
 // Purpose: Retrieves a texture by index.
 // Input  : nIndex - Index of the texture in this group.
 //-----------------------------------------------------------------------------
-IEditorTexture *CTextureGroup::GetTexture(int nIndex)
+IEditorTexture *CTextureGroup::GetTexture(intp nIndex)
 {
 	if ((nIndex >= m_Textures.Count()) || (nIndex < 0))
 	{

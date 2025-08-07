@@ -602,7 +602,7 @@ void CSelection::SelectObjectList( const CMapObjectList *pList, int cmd )
 
 	if ( pList != NULL )
 	{
-		for (int pos=0;pos<pList->Count();pos++)
+		for (intp pos=0;pos<pList->Count();pos++)
 		{
 			CMapClass *pObject = pList->Element(pos);
 			CMapClass *pSelObject = pObject->PrepareSelection( m_eSelectMode );

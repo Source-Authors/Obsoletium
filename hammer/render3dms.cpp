@@ -2067,7 +2067,7 @@ void CRender3D::RenderCone( Vector const &vBasePt, Vector const &vTipPt, float f
 	// set to a flat shaded render mode
 	PushRenderMode( RENDER_MODE_FLAT );
 
-	for ( int i = 0; i < m_Faces.Count(); i++ )
+	for ( intp i = 0; i < m_Faces.Count(); i++ )
 	{
 		CMapFace *pFace = m_Faces.Element( i );
 		if( !pFace )
