@@ -145,6 +145,9 @@ BOOL CDpiWindowBehavior::OnCreateWindow(HWND window) {
   Assert(window);
 
   m_window_handle = window;
+#ifdef _DEBUG
+  m_is_destroyed = false;
+#endif
   // Windows docs say DPI is same for X and Y.
   m_previous_dpi_x = m_previous_dpi_y =
       std::exchange(m_current_dpi_x, ::GetDpiForWindow(window));
