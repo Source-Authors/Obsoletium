@@ -34,8 +34,7 @@ public:
 
 	void Clear();
 	void Append(CString str);
-	void GetReady();
-	void GetReady(LPCTSTR pszDocName);
+	void GetReady(LPCTSTR pszDocName, CWnd *parent);
 
 // Overrides
 	// ClassWizard generated virtual function overrides
@@ -53,10 +52,16 @@ protected:
 
 	CString m_EditText;
 	CButton m_btnCopyAll;
+	
+	// Need additional one as controls created dynamically after DPI is applied.
+	se::windows::ui::CDpiWindowBehavior m_edit_dpi_behavior{false};
+	se::windows::ui::CDpiWindowBehavior m_copy_all_dpi_behavior{false};
 
 	//{{AFX_MSG(CProcessWnd)
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
 	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnDestroy();
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
 	afx_msg void OnCopyAll();
 	//}}AFX_MSG

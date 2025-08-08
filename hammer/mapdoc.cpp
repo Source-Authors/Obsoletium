@@ -5868,7 +5868,7 @@ void CMapDoc::OnFileRunmap(void)
 			else if (dlgExpert.m_pActiveSequence) // clicked ok
 			{
 				// run the commands in the active sequence
-				RunCommands(dlgExpert.m_pActiveSequence->m_Commands, strFile);
+				RunCommands(dlgExpert.m_pActiveSequence->m_Commands, strFile, AfxGetApp()->GetMainWnd());
 				return;
 			}
 			else
@@ -5959,7 +5959,7 @@ void CMapDoc::OnFileRunmap(void)
 		cmds.Add(cmd);
 	}
 
-	RunCommands(cmds, GetPathName());
+	RunCommands(cmds, GetPathName(), AfxGetApp()->GetMainWnd());
 }
 
 

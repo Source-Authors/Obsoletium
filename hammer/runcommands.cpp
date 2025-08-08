@@ -242,7 +242,7 @@ void SplitFileNameFromPath(char* szDocLongPath,
 	}
 }
 
-bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
+bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 {
 	s_bRunsCommands = true;
 
@@ -254,7 +254,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 			std::generic_category().message(errno).c_str() );
 	}
 
-	procWnd.GetReady(pszOrigDocName);
+	procWnd.GetReady(pszOrigDocName, parent);
 
 	// cut up document name into file and extension components.
 	//  create two sets of buffers - one set with the long filename
