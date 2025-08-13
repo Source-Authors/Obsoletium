@@ -2894,7 +2894,7 @@ int main(int argc, char **argv) {
 
   // Verbose stuff
   if (!g_quiet) {
-    vprint(stdout, 0, "%s, %s, %s, path %s\n", qdir, gamedir, g_outfile);
+    vprint(stdout, 0, "%s, %s, %s\n", qdir, gamedir, g_outfile);
   }
 
   // ??
