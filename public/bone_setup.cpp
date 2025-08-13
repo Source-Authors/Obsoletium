@@ -5261,7 +5261,6 @@ bool SweepBoxToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, CStudioHd
 		if ( ( fBoneContents & fContentsMask ) == 0 )
 			continue;
 		
-		//FIXME: Won't work with scaling!
 		trace_t obbTrace;
 		if ( IntersectRayWithOBB( clippedRay, *hitboxbones[pbox->bone], pbox->bbmin, pbox->bbmax, 0.0f, &obbTrace ) )
 		{
