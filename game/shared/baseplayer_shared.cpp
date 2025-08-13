@@ -266,14 +266,17 @@ void CBasePlayer::ItemPostFrame()
 		return;
 	}
 
-    if ( gpGlobals->curtime < m_flNextAttack )
+	if ( gpGlobals->curtime < m_flNextAttack )
 	{
 		if ( GetActiveWeapon() )
 		{
 			GetActiveWeapon()->ItemBusyFrame();
 		}
 	}
-	else
+
+	// dimhotepus: replace if/else with if/if as ItemBusyFrame() can do m_flNextAttack = gpGlobals->curtime
+	// and we must fire immediately instead of waiting for next tick. 
+	if ( gpGlobals->curtime >= m_flNextAttack )
 	{
 		if ( GetActiveWeapon() && (!IsInAVehicle() || UsingStandardWeaponsInVehicle()) )
 		{
