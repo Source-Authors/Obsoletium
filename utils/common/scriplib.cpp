@@ -371,7 +371,7 @@ bool ExpandVariableToken( char *&token_p )
 		}
 
 		// paste token into 
-		len = strlen( g_definevariable[index].value );
+		len = V_strlen( g_definevariable[index].value );
 		strcpy( token_p, g_definevariable[index].value );
 		token_p += len;
 		
