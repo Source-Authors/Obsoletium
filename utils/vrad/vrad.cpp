@@ -2423,7 +2423,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			}
 			else
 			{
-				Error( "Expected a value after '-StaticPropIndirectMode'\n" );
+				Error( "Expected a value after '-StaticPropIndirectMode'.\n" );
 				return -1;
 			}
 		}
