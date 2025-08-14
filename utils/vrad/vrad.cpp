@@ -104,7 +104,9 @@ qboolean	do_extra = true;
 bool		debug_extra = false;
 qboolean	do_fast = false;
 qboolean	do_centersamples = false;
-int			extrapasses = 4;
+// dimhotepus: Original VRAD has 4 supersampling passes count.
+// Increased to 6 to make lightmaps less sharp in some areas.
+int			extrapasses = 6;
 float		smoothing_threshold = 0.7071067; // cos(45.0*(M_PI/180)) 
 // Cosine of smoothing angle(in radians)
 float		coring = 1.0;	// Light threshold to force to blackness(minimizes lightmaps)
@@ -2540,6 +2542,25 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 				return -1;
 			}
 		}
+		else if (!Q_stricmp(argv[i], "-extrapasses"))
+		{
+			if (++i < argc)
+			{
+				int extrapassesParam = atoi(argv[i]);
+				if (extrapassesParam < 0)
+				{
+					Error("Expected non-negative supersampling passes count value after '-extrapasses'\n");
+					return 1;
+				}
+				extrapasses = extrapassesParam;
+				Msg( "--extra-supersampling-passes: %d\n", extrapasses );
+			}
+			else
+			{
+				Error("Expected a supersampling passes count value after '-extrapasses'\n");
+				return -1;
+			}
+		}
 		else if (!Q_stricmp(argv[i],"-centersamples"))
 		{
 			Msg( "--center-samples: true\n" );
@@ -2904,6 +2925,7 @@ void PrintUsage( int argc, char **argv )
 		"  -noextra               : Disable supersampling.\n"
 		"  -debugextra            : Places debugging data in lightmaps to visualize\n"
 		"                           supersampling.\n"
+		"  -extrapasses #         : How many extra passes supersampling passes to do (default 6), differences above this value are minimal.\n"
 		"  -smooth #              : Set the threshold for smoothing groups, in degrees\n"
 		"                           (default 45).\n"
 		"  -dlightmap             : Force direct lighting into different lightmap than\n"
