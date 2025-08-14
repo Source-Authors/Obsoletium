@@ -1656,9 +1656,6 @@ void ExportDirectLightsToWorldLights()
 
 #define CONSTANT_DOT (.7/2)
 
-#define NSAMPLES_SUN_AREA_LIGHT 30							// number of samples to take for an
-                                                            // non-point sun light
-
 // Helper function - gathers light from sun (emit_skylight)
 void GatherSampleSkyLightSSE( SSE_sampleLightOutput_t &out, directlight_t *dl, int facenum, 
 							 FourVectors const& pos, FourVectors *pNormals, int normalCount, int iThread,
@@ -1683,7 +1680,8 @@ void GatherSampleSkyLightSSE( SSE_sampleLightOutput_t &out, directlight_t *dl, i
 	int nsamples = 1;
 	if ( g_SunAngularExtent > 0.0f )
 	{
-		nsamples = NSAMPLES_SUN_AREA_LIGHT;
+		// dimhotepus: Configurable number of samples to take for an non-point sun light.
+		nsamples = g_sunSamplesAreaLight; 
 		if ( do_fast || force_fast )
 			nsamples /= 4;
 	}
@@ -1696,7 +1694,7 @@ void GatherSampleSkyLightSSE( SSE_sampleLightOutput_t &out, directlight_t *dl, i
 	for ( int d = 0; d < nsamples; d++ )
 	{
 		// determine visibility of skylight
-		// serach back to see if we can hit a sky brush
+		// search back to see if we can hit a sky brush
 		Vector delta;
 		VectorScale( dl->light.normal, -MAX_TRACE_LENGTH, delta );
 		if ( d )

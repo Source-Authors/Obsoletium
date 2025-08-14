@@ -46,6 +46,8 @@
 
 extern float dispchop; // "-dispchop" tightest number of luxel widths for a patch, used on edges
 extern float g_MaxDispPatchRadius;
+// dimhotepus: Make non-point sun light samples count configurable.
+extern int g_sunSamplesAreaLight;
 
 //-----------------------------------------------------------------------------
 // forward declarations
