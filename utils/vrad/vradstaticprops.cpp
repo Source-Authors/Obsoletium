@@ -709,9 +709,21 @@ public:
 			if ( pVMT->LoadFromBuffer( pMaterialName, buf ) )
 			{
 				bFound = true;
-				if ( pVMT->FindKey("$translucent") || pVMT->FindKey("$alphatest") )
+				// dimhotepus: Support alpha textures for materials that are translucent enough for
+				// light to pass through, but are opaque to the human eye.
+				//
+				// Used on static props when the prop is flagged for texture shadows and compiling
+				// VRAD with -textureshadows.  The alpha channel of the specified VTF will be used
+				// instead of $basetexture, even if $alphatest and $translucent are absent.
+				//
+				// See https://developer.valvesoftware.com/wiki/Alphatexture
+				KeyValues *pBaseTexture = pVMT->FindKey("%alphatexture");
+				if ( pBaseTexture || pVMT->FindKey("$translucent") || pVMT->FindKey("$alphatest") )
 				{
-					KeyValues *pBaseTexture = pVMT->FindKey("$basetexture");
+					if ( !pBaseTexture )
+					{
+						pBaseTexture = pVMT->FindKey("$basetexture");
+					}
 					if ( pBaseTexture )
 					{
 						const char *pBaseTextureName = pBaseTexture->GetString();
