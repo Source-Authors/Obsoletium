@@ -2404,6 +2404,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			Msg( "--no-self-shadow-props: true\n");
 			g_bDisablePropSelfShadowing = true;
 		}
+		// dimhotepus: Allow to specify indirect static props lighting mode.
 		else if ( !Q_stricmp( argv[i], "-StaticPropIndirectMode" ) )
 		{
 			if ( ++i < argc )
