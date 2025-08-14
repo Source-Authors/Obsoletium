@@ -16,6 +16,7 @@
 #include "mxtk/mxevent.h"
 #include "mxtk/mxlinkedlist.h"
 #include <windows.h>
+#include <shellapi.h>
 #include <commctrl.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -189,6 +190,35 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 
 	switch (uMessage)
 	{
+	// dimhotepus: CS:GO
+	case WM_DROPFILES:
+	{
+		mxWindow *window = (mxWindow *) GetWindowLongPtr (hwnd, GWLP_USERDATA);
+		if (window)
+		{
+			SwitchToThisWindow(hwnd,1);
+
+			TCHAR lpszFile[MAX_PATH] = {0};
+			UINT uFile = 0;
+			HDROP hDrop = (HDROP)wParam;
+
+			uFile = DragQueryFile( hDrop, 0xFFFFFFFF, NULL, NULL );
+			for ( UINT i=0; i<uFile; i++ )
+			{
+				if ( DragQueryFile( hDrop, i, lpszFile, MAX_PATH ) )
+				{
+					mxEvent event;
+					event.event = mxEvent::DropFile;
+					V_strcpy_safe( event.szChars, lpszFile );
+					window->handleEvent (&event);
+				}
+			}
+
+			DragFinish(hDrop);
+		}
+	}
+	break;
+
 	case WM_SETFOCUS:
 	case WM_KILLFOCUS:
 	{

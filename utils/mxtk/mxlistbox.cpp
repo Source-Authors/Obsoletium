@@ -153,3 +153,9 @@ mxListBox::getItemData (int index) const
 {
 	return (void *) SendMessage ((HWND) getHandle (), LB_GETITEMDATA, (WPARAM) index, 0L);
 }
+
+int
+mxListBox::getTopIndex () const
+{
+	return (int) SendMessage ((HWND) getHandle (), LB_GETTOPINDEX, 0, 0L);
+}

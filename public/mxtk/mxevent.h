@@ -47,7 +47,9 @@ public:
 		Close,
 		PosChanged,
 		Char,
-		ParentNotify
+		ParentNotify,
+		// dimhotepus: CS:GO
+		DropFile
 	};
 
 	enum { MouseLeftButton = 1, MouseRightButton = 2, MouseMiddleButton = 4};
@@ -63,6 +65,8 @@ public:
 	int key;
 	int modifiers;
 	int flags;
+	// dimhotepus: CS:GO
+	char szChars[MAX_PATH];
 
 	// NO CREATORS
 	mxEvent () : event (0), widget (0), action (0), width (0), height (0), x (0), y (0), buttons (0), key (0), modifiers (0), flags (0) {}

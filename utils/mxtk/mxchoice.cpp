@@ -99,3 +99,12 @@ mxChoice::getSelectedIndex () const
 {
 	return (int) SendMessage ((HWND) getHandle (), CB_GETCURSEL, 0, 0L);
 }
+
+
+const char*
+mxChoice::getItemText (int index) const
+{
+	static char text[256];
+	SendMessage ((HWND) getHandle (), CB_GETLBTEXT, (WPARAM) index, (LPARAM) (LPCTSTR) text);
+	return text;
+}

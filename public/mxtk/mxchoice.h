@@ -45,6 +45,9 @@ public:
 	// ACCESSORS
 	int getItemCount () const;
 	int getSelectedIndex () const;
+	
+	// dimhotepus: CS:GO
+	const char *getItemText (int index) const;
 
 private:
 	// NOT IMPLEMENTED
