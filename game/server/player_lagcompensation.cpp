@@ -181,6 +181,7 @@ public:
 	CLagCompensationManager( char const *name ) : CAutoGameSystemPerFrame( name ), m_flTeleportDistanceSqr( 64 *64 )
 	{
 		m_isCurrentlyDoingCompensation = false;
+		m_pCurrentPlayer = nullptr;
 	}
 
 	// IServerSystem stuff
