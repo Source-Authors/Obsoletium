@@ -767,11 +767,12 @@ void CNetGraphPanel::DrawTextFields( int graphvalue, int x, int y, int w, netban
 	int textWidth = g_pMatSystemSurface->DrawTextLen( font, "%s", sz );
 
 	g_pMatSystemSurface->DrawColoredText( font, x, y, GRAPH_RED, GRAPH_GREEN, GRAPH_BLUE, 255, "%s", sz );
-
-	Q_snprintf( sz, sizeof( sz ), "lerp: %5.1f ms", GetClientInterpAmount() * 1000.0f );
+	
+	// dimhotepus: Round lerp to ticks as game actually does.
+	const float flInterp = ROUND_TO_TICKS( GetClientInterpAmount() );
+	Q_snprintf( sz, sizeof( sz ), "lerp: %5.1f ms", flInterp * 1000.0f );
 
 	int interpcolor[ 3 ] = { (int)GRAPH_RED, (int)GRAPH_GREEN, (int)GRAPH_BLUE }; 
-	float flInterp = GetClientInterpAmount();
 	if ( flInterp > 0.001f )
 	{
 		// Server framerate is lower than interp can possibly deal with
