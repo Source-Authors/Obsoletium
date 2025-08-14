@@ -737,10 +737,41 @@ void ComputeIndirectLightingAtPoint( Vector &position, Vector &normal, Vector &o
 			ColorRGBExp32ToVector( *pLightmap, lightmapColor );
 		}
 
-		float invLengthSqr = 1.0f / (1.0f + ((vEnd - position) * surfEnum.m_HitFrac / 128.0).LengthSqr());
-		// Include falloff using invsqrlaw.
-		VectorMultiply( lightmapColor, invLengthSqr * dtexdata[pTex->texdata].reflectivity, lightmapColor );
-		VectorAdd( outColor, lightmapColor, outColor );
+		// The calculation for indirect prop lighting has went through a handful of iterations
+		// For the sake of compatibility with maps that may be calibrated against the incorrect forms of indirect lightings,
+		// the user may optionally switch to the old methods of indirect prop lighting
+		switch ( g_nIndirectPropLightingMode )
+		{
+			// Mode 0: CSGO
+			// This mode factors in only the dot.
+			// The practical result is this ends up being a middleground of Orangebox and TF2 lighting,
+			// and most closely matches indirect lighting on brush lightmaps
+			case IndirectPropLightingMode::CsGo:
+			{
+				VectorMultiply( lightmapColor, dot * dtexdata[pTex->texdata].reflectivity, lightmapColor );
+				break;
+			}
+			// Mode 1: SteamPipe
+			// TF2 attempted to include falloff using inverse square law.
+			// Unfortunately, this leads to pretty harsh and unnatural bounced light on props
+			case IndirectPropLightingMode::SteamPipe:
+			{
+				float invLengthSqr = 1.0f / ( 1.0f + ( ( vEnd - position ) * surfEnum.m_HitFrac / 128.0f ).LengthSqr() );
+				VectorMultiply( lightmapColor, invLengthSqr * dtexdata[pTex->texdata].reflectivity, lightmapColor );
+				break;
+			}
+			// Mode 2: Orangebox (and earlier)
+			// Here, indirect lighting simply took the reflectivity and did not factor in falloff or dot.
+			// This created an unnaturally bright result, but this is what TF2 shipped with on release.
+			case IndirectPropLightingMode::OrangeBox:
+			{
+				VectorMultiply( lightmapColor, dtexdata[pTex->texdata].reflectivity, lightmapColor );
+				break;
+			}
+
+			default:
+				Error( "Unknown indirect lighting mode %d.\n", to_underlying(g_nIndirectPropLightingMode) );
+		}
 	}
 
 	if ( totalDot )

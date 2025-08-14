@@ -285,6 +285,23 @@ extern bool g_bTextureShadows;
 extern bool g_bShowStaticPropNormals;
 extern bool g_bDisablePropSelfShadowing;
 
+enum class IndirectPropLightingMode
+{
+	LowestValue = 0,
+
+	// Uses dot, best results.
+	CsGo = LowestValue,
+	// SteamPipe Half-Life 2 / Team Fortress 2 lighting.
+	// Uses inverse square law causing lights to be too dark.
+	SteamPipe = 1,
+	// Orange box. Just reflectivity, too bright.
+	OrangeBox = 2,
+
+	MaxValue = OrangeBox
+};
+
+extern IndirectPropLightingMode g_nIndirectPropLightingMode;
+
 extern CUtlVector<char const *> g_NonShadowCastingMaterialStrings;
 extern void ForceTextureShadowsOnModel( const char *pModelName );
 extern bool IsModelTextureShadowsForced( const char *pModelName );

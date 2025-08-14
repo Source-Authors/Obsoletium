@@ -126,6 +126,8 @@ bool		g_bStaticPropLighting = false;
 bool        g_bStaticPropPolys = false;
 bool        g_bTextureShadows = false;
 bool        g_bDisablePropSelfShadowing = false;
+// dimhotepus: Use CS:GO mode by default instead of SteamPipe one. 
+IndirectPropLightingMode g_nIndirectPropLightingMode = IndirectPropLightingMode::CsGo;
 
 
 CUtlVector<byte> g_FacesVisibleToLights;
@@ -2402,6 +2404,29 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			Msg( "--no-self-shadow-props: true\n");
 			g_bDisablePropSelfShadowing = true;
 		}
+		else if ( !Q_stricmp( argv[i], "-StaticPropIndirectMode" ) )
+		{
+			if ( ++i < argc )
+			{
+				int lightingMode = atoi( argv[i] );
+				if ( lightingMode < to_underlying(IndirectPropLightingMode::LowestValue) ||
+					 lightingMode > to_underlying(IndirectPropLightingMode::MaxValue) )
+				{
+					Error( "Expected a value in range [%d...%d] after '-StaticPropIndirectMode', got %d.\n",
+						to_underlying(IndirectPropLightingMode::LowestValue),
+						to_underlying(IndirectPropLightingMode::MaxValue),
+						lightingMode );
+					return -1;
+				}
+				g_nIndirectPropLightingMode = static_cast<IndirectPropLightingMode>( lightingMode );
+				Msg( "--static-props-indirect-mode: %d\n", lightingMode );
+			}
+			else
+			{
+				Error( "Expected a value after '-StaticPropIndirectMode'\n" );
+				return -1;
+			}
+		}
 		else if ( !Q_stricmp( argv[i], "-textureshadows" ) )
 		{
 			Msg( "--texture-shadows: true\n");
@@ -2900,69 +2925,70 @@ void PrintUsage( int argc, char **argv )
 		"\n"
 		"Common options:\n"
 		"\n"
-		"  -v (or -verbose)       : Turn on verbose output (also shows more command\n"
-		"  -bounce #              : Set max number of bounces (default: 100).\n"
-		"  -fast                  : Quick and dirty lighting.\n"
-		"  -fastambient           : Per-leaf ambient sampling is lower quality to save compute time.\n"
-		"  -final                 : High quality processing. equivalent to -extrasky 16.\n"
-		"  -extrasky n            : trace N times as many rays for indirect light and sky ambient.\n"
-		"  -low                   : Run as an idle-priority process.\n"
-		"  -mpi                   : Use VMPI to distribute computations.\n"
-		"  -rederror              : Show errors in red.\n"
+		"  -v (or -verbose)        : Turn on verbose output (also shows more command).\n"
+		"  -bounce #               : Set max number of bounces (default: 100).\n"
+		"  -fast                   : Quick and dirty lighting.\n"
+		"  -fastambient            : Per-leaf ambient sampling is lower quality to save compute time.\n"
+		"  -final                  : High quality processing. equivalent to -extrasky 16.\n"
+		"  -extrasky n             : Trace N times as many rays for indirect light and sky ambient.\n"
+		"  -low                    : Run as an idle-priority process.\n"
+		"  -mpi                    : Use VMPI to distribute computations.\n"
+		"  -rederror               : Show errors in red.\n"
 		"\n"
-		"  -vproject <directory>  : Override the VPROJECT environment variable.\n"
-		"  -game <directory>      : Same as -vproject.\n"
+		"  -vproject <directory>   : Override the VPROJECT environment variable.\n"
+		"  -game <directory>       : Same as -vproject.\n"
 		"\n"
 		"Other options:\n"
-		"  -novconfig             : Don't bring up graphical UI on vproject errors.\n"
-		"  -dump                  : Write debugging .txt files.\n"
-		"  -dumpnormals           : Write normals to debug files.\n"
-		"  -dumptrace             : Write ray-tracing environment to debug files.\n"
-		"  -threads               : Control the number of threads vbsp uses (defaults to the #\n"
-		"                           or processors on your machine).\n"
-		"  -lights <file>         : Load a lights file in addition to lights.rad and the\n"
-		"                           level lights file.\n"
-		"  -noextra               : Disable supersampling.\n"
-		"  -debugextra            : Places debugging data in lightmaps to visualize\n"
-		"                           supersampling.\n"
-		"  -extrapasses #         : How many extra passes supersampling passes to do (default 6), differences above this value are minimal.\n"
-		"  -smooth #              : Set the threshold for smoothing groups, in degrees\n"
-		"                           (default 45).\n"
-		"  -dlightmap             : Force direct lighting into different lightmap than\n"
-		"                           radiosity.\n"
-		"  -stoponexit	          : Wait for a keypress on exit.\n"
-		"  -mpi_pw <pw>           : Use a password to choose a specific set of VMPI workers.\n"
-		"  -nodetaillight         : Don't light detail props.\n"
-		"  -centersamples         : Move sample centers.\n"
-		"  -luxeldensity #        : Rescale all luxels by the specified amount (default: 1.0).\n"
-		"                           The number specified must be less than 1.0 or it will be\n"
-		"                           ignored.\n"
-		"  -loghash               : Log the sample hash table to samplehash.txt.\n"
-		"  -onlydetail            : Only light detail props and per-leaf lighting.\n"
-		"  -maxdispsamplesize #   : Set max displacement sample size (default: 512).\n"
-		"  -softsun <n>           : Treat the sun as an area light source of size <n> degrees."
-		"                           Produces soft shadows.\n"
-		"                           Recommended values are between 0 and 5 (default: 0).\n"
-		"  -sunSamplesAreaLight # : Set max number of samples from the light_enviroment (default: 1024).\n"
-		"  -FullMinidumps         : Write large minidumps on crash.\n"
-		"  -chop                  : Smallest number of luxel widths for a bounce patch, used on edges\n"
-		"  -maxchop               : Coarsest allowed number of luxel widths for a patch, used in face interiors\n"
+		"  -novconfig              : Don't bring up graphical UI on vproject errors.\n"
+		"  -dump                   : Write debugging .txt files.\n"
+		"  -dumpnormals            : Write normals to debug files.\n"
+		"  -dumptrace              : Write ray-tracing environment to debug files.\n"
+		"  -threads                : Control the number of threads vbsp uses (defaults to the #\n"
+		"                            or processors on your machine).\n"
+		"  -lights <file>          : Load a lights file in addition to lights.rad and the\n"
+		"                            level lights file.\n"
+		"  -noextra                : Disable supersampling.\n"
+		"  -debugextra             : Places debugging data in lightmaps to visualize\n"
+		"                            supersampling.\n"
+		"  -extrapasses #          : How many extra passes supersampling passes to do (default 6), differences above this value are minimal.\n"
+		"  -smooth #               : Set the threshold for smoothing groups, in degrees\n"
+		"                            (default 45).\n"
+		"  -dlightmap              : Force direct lighting into different lightmap than\n"
+		"                            radiosity.\n"
+		"  -stoponexit	           : Wait for a keypress on exit.\n"
+		"  -mpi_pw <pw>            : Use a password to choose a specific set of VMPI workers.\n"
+		"  -nodetaillight          : Don't light detail props.\n"
+		"  -centersamples          : Move sample centers.\n"
+		"  -luxeldensity #         : Rescale all luxels by the specified amount (default: 1.0).\n"
+		"                            The number specified must be less than 1.0 or it will be\n"
+		"                            ignored.\n"
+		"  -loghash                : Log the sample hash table to samplehash.txt.\n"
+		"  -onlydetail             : Only light detail props and per-leaf lighting.\n"
+		"  -maxdispsamplesize #    : Set max displacement sample size (default: 512).\n"
+		"  -softsun <n>            : Treat the sun as an area light source of size <n> degrees."
+		"                            Produces soft shadows.\n"
+		"                            Recommended values are between 0 and 5 (default: 0).\n"
+		"  -sunSamplesAreaLight #  : Set max number of samples from the light_enviroment (default: 1024).\n"
+		"  -FullMinidumps          : Write large minidumps on crash.\n"
+		"  -chop                   : Smallest number of luxel widths for a bounce patch, used on edges.\n"
+		"  -maxchop                : Coarsest allowed number of luxel widths for a patch, used in face interiors.\n"
 		"\n"
-		"  -LargeDispSampleRadius : This can be used if there are splotches of bounced light\n"
-		"                           on terrain. The compile will take longer, but it will gather\n"
-		"                           light across a wider area.\n"
-        "  -StaticPropLighting    : generate backed static prop vertex lighting\n"
-        "  -StaticPropPolys       : Perform shadow tests of static props at polygon precision\n"
-        "  -OnlyStaticProps       : Only perform direct static prop lighting (vrad debug option)\n"
-		"  -StaticPropNormals     : when lighting static props, just show their normal vector\n"
-		"  -textureshadows        : Allows texture alpha channels to block light - rays intersecting alpha surfaces will sample the texture\n"
-		"  -noskyboxrecurse       : Turn off recursion into 3d skybox (skybox shadows on world)\n"
-		"  -nossprops             : Globally disable self-shadowing on static props\n"
+		"  -LargeDispSampleRadius  : This can be used if there are splotches of bounced light\n"
+		"                            on terrain. The compile will take longer, but it will gather\n"
+		"                            light across a wider area.\n"
+        "  -StaticPropLighting     : Generate backed static prop vertex lighting.\n"
+        "  -StaticPropPolys        : Perform shadow tests of static props at polygon precision.\n"
+        "  -StaticPropIndirectMode : Override prop indirect lighting algorithm (0 - Balanced [CS:GO], 1 - Dark [SteamPipe], 2 - Bright [Orangebox]).\n"
+		"  -OnlyStaticProps        : Only perform direct static prop lighting (vrad debug option).\n"
+		"  -StaticPropNormals      : When lighting static props, just show their normal vector.\n"
+		"  -textureshadows         : Allows texture alpha channels to block light - rays intersecting alpha surfaces will sample the texture.\n"
+		"  -noskyboxrecurse        : Turn off recursion into 3d skybox (skybox shadows on world).\n"
+		"  -nossprops              : Globally disable self-shadowing on static props.\n"
 		"\n"
 #if 1 // Disabled for the initial SDK release with VMPI so we can get feedback from selected users.
 		);
 #else
-		"  -mpi_ListParams       : Show a list of VMPI parameters.\n"
+		"  -mpi_ListParams        : Show a list of VMPI parameters.\n"
 		"\n"
 		);
 
