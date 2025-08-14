@@ -2332,7 +2332,9 @@ CBoneCache *C_BaseAnimating::GetBoneCache( CStudioHdr *pStudioHdr )
 	CBoneCache *pcache = Studio_GetBoneCache( m_hitboxBoneCacheHandle );
 	if ( pcache )
 	{
-		if ( pcache->IsValid( gpGlobals->curtime, 0.0 ) )
+		// dimhotepus: Use default 0.1 jitter as server does and ensure (as server does) bone cache
+		// is not from future (due to prediction).
+		if ( pcache->IsValid( gpGlobals->curtime ) && pcache->m_timeValid <= gpGlobals->curtime )
 		{
 			// in memory and still valid, use it!
 			return pcache;

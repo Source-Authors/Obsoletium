@@ -455,7 +455,8 @@ void CBaseAnimating::StudioFrameAdvanceInternal( CStudioHdr *pStudioHdr, float f
 void CBaseAnimating::InvalidateBoneCacheIfOlderThan( float deltaTime )
 {
 	CBoneCache *pcache = Studio_GetBoneCache( m_boneCacheHandle );
-	if ( !pcache || !pcache->IsValid( gpGlobals->curtime, deltaTime ) )
+	// dimhotepus: Invalidate bone cache if its old or in the future.
+	if ( !pcache || !pcache->IsValid( gpGlobals->curtime, deltaTime ) || pcache->m_timeValid > gpGlobals->curtime )
 	{
 		InvalidateBoneCache();
 	}
@@ -2623,6 +2624,7 @@ CBoneCache *CBaseAnimating::GetBoneCache( void )
 #endif
 	if ( pcache )
 	{
+		// dimhotepus: If you change this, sync with C_BaseAnimating::GetBoneCache
 		if ( pcache->IsValid( gpGlobals->curtime ) && (pcache->m_boneMask & boneMask) == boneMask && pcache->m_timeValid <= gpGlobals->curtime)
 		{
 			// Msg("%s:%s:%s (%x:%x:%8.4f) cache\n", GetClassname(), GetDebugName(), STRING(GetModelName()), boneMask, pcache->m_boneMask, pcache->m_timeValid );
