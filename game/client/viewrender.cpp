@@ -1923,7 +1923,7 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 		if ( bFirstTime )
 		{
 			bFirstTime = false;
-			Msg( "This game has a minimum requirement of DirectX 8.0 to run properly.\n" );
+			Msg( "This game has a minimum GPU requirement of DirectX 9.0 Shader Model 2 to run properly.\n" );
 		}
 		return;
 	}
@@ -2102,7 +2102,7 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 			rect.height = viewRender.height;
 
 			pRenderContext = materials->GetRenderContext();
-				pRenderContext->CopyRenderTargetToTextureEx( GetFullscreenTexture(), 0, &rect, &rect );
+			pRenderContext->CopyRenderTargetToTextureEx( GetFullscreenTexture(), 0, &rect, &rect );
 			pRenderContext.SafeRelease();
 			m_rbTakeFreezeFrame[viewRender.m_eStereoEye ] = false;
 		}
@@ -5420,7 +5420,7 @@ void CBaseWorldView::SSAO_DepthPass()
 	pRenderContext->ClearColor4ub( 255, 255, 255, 255 );
 	pRenderContext.SafeRelease();
 
-		render->Push3DView( (*this), VIEW_CLEAR_DEPTH | VIEW_CLEAR_COLOR, pSSAO, GetFrustum() );
+	render->Push3DView( (*this), VIEW_CLEAR_DEPTH | VIEW_CLEAR_COLOR, pSSAO, GetFrustum() );
 
 	MDLCACHE_CRITICAL_SECTION();
 
