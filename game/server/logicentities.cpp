@@ -897,7 +897,9 @@ BEGIN_DATADESC( CEnvGlobal )
 	DEFINE_INPUTFUNC( FIELD_INTEGER, "AddToCounter",	InputAddToCounter ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "GetCounter",	InputGetCounter ),
 	
-	DEFINE_OUTPUT( m_outCounter, "Counter" ),
+	// dimhotepus: Original output had name Counter which conflicted with
+	// counter keyvalue which was returned instead.
+	DEFINE_OUTPUT( m_outCounter, "OnCounter" ),
 
 END_DATADESC()
 
