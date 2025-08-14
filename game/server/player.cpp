@@ -639,6 +639,13 @@ CBasePlayer::CBasePlayer( )
 	m_flMovementTimeForUserCmdProcessingRemaining = 0.0f;
 
 	m_flLastObjectiveTime = -1.f;
+
+	// dimhotepus: Do not break think functions when server attempts to run frame-based
+	// think functions on a player before they have received a command.
+	//
+	// It was breaking due to m_nTickBase was 0 and think functions were skipped in such
+	// case.
+	SetTimeBase( gpGlobals->curtime );
 }
 
 CBasePlayer::~CBasePlayer( )
