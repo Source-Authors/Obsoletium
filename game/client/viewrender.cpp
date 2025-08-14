@@ -2102,15 +2102,7 @@ void CViewRender::RenderView( const CViewSetup &viewRender, int nClearFlags, int
 			rect.height = viewRender.height;
 
 			pRenderContext = materials->GetRenderContext();
-			if ( IsX360() )
-			{
-				// 360 doesn't create the Fullscreen texture
-				pRenderContext->CopyRenderTargetToTextureEx( GetFullFrameFrameBufferTexture( 1 ), 0, &rect, &rect );
-			}
-			else
-			{
 				pRenderContext->CopyRenderTargetToTextureEx( GetFullscreenTexture(), 0, &rect, &rect );
-			}
 			pRenderContext.SafeRelease();
 			m_rbTakeFreezeFrame[viewRender.m_eStereoEye ] = false;
 		}
@@ -5425,24 +5417,10 @@ void CBaseWorldView::SSAO_DepthPass()
 	ITexture *pSSAO = materials->FindTexture( "_rt_ResolvedFullFrameDepth", TEXTURE_GROUP_RENDER_TARGET );
 
 	CMatRenderContextPtr pRenderContext( materials );
-
 	pRenderContext->ClearColor4ub( 255, 255, 255, 255 );
-
-#if defined( _X360 )
-	Assert(0); // rebalance this if we ever use this on 360
-	pRenderContext->PushVertexShaderGPRAllocation( 112 ); //almost all work is done in vertex shaders for depth rendering, max out their threads
-#endif
-
 	pRenderContext.SafeRelease();
 
-	if( IsPC() )
-	{
 		render->Push3DView( (*this), VIEW_CLEAR_DEPTH | VIEW_CLEAR_COLOR, pSSAO, GetFrustum() );
-	}
-	else if( IsX360() )
-	{
-		render->Push3DView( (*this), VIEW_CLEAR_DEPTH | VIEW_CLEAR_COLOR, pSSAO, GetFrustum() );
-	}
 
 	MDLCACHE_CRITICAL_SECTION();
 
