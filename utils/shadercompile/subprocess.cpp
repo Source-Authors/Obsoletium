@@ -96,6 +96,11 @@ void *SubProcessKernelObjects_Memory::Lock() {
       case WAIT_OBJECT_0: {
         m_pLockData = MapViewOfFile(m_pObjs->m_hMemorySection,
                                     FILE_MAP_ALL_ACCESS, 0, 0, 0);
+        if (!m_pLockData) {
+          // dimhotepus: CS:GO backport.
+          Warning("MapViewOfFile failed with error 0x%x\n",
+                  HRESULT_FROM_WIN32(GetLastError()));
+        }
 
         if (m_pLockData && *(const DWORD *)m_pLockData != m_pObjs->m_dwCookie) {
           // Yes, this is our turn, set our cookie in that memory segment
@@ -143,7 +148,13 @@ BOOL SubProcessKernelObjects_Memory::Unlock() {
     // Assert that the memory hasn't been spoiled
     Assert(m_pObjs->m_dwCookie == *(const DWORD *)m_pLockData);
 
-    UnmapViewOfFile(m_pLockData);
+    DWORD rc = UnmapViewOfFile(m_pLockData);
+    if (rc == 0) {
+      // dimhotepus: CS:GO backport.
+      Warning("UnmapViewOfFile failed with error 0x%x\n",
+              HRESULT_FROM_WIN32(GetLastError()));
+    }
+
     m_pMemory = NULL;
     m_pLockData = NULL;
 
