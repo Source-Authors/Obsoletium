@@ -553,9 +553,22 @@ bool CHammer::HammerPreTranslateMessage(MSG * pMsg)
 	return (/*pMsg->message == WM_KICKIDLE ||*/ PreTranslateMessage(pMsg) != FALSE);
 }
 
+//-----------------------------------------------------------------------------
+// Return true if the message just dispatched should cause OnIdle to run.
+//
+// Return false for messages which do not usually affect the state of the user
+// interface and happen very often.
+//-----------------------------------------------------------------------------
 bool CHammer::HammerIsIdleMessage(MSG * pMsg)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	// dimhotepus: Skip WM_TIMER idle processing to allow tools to work faster. CS:GO
+	// We generate lots of WM_TIMER messages and shouldn't call OnIdle because of them.
+	// This fixes tool tips not popping up when a map is open.
+	if ( pMsg->message == WM_TIMER )
+		return false;
+
 	return IsIdleMessage(pMsg) != FALSE;
 }
 
@@ -1269,9 +1282,16 @@ int CHammer::InternalMainLoop()
 	{
 		RunFrame();
 
+		// Do idle processing at most once per frame, incrementing the counter until we get an
+		// idle message. The counter is used as a general indication of how idle the application is,
+		// so critical idle processing is done for lower values of lIdleCount, and less important
+		// stuff is done as lIdleCount increases.
+		//
+		// When there's no more idle work to do, OnIdle returns false and we stop doing idle
+		// processing until another idle message is processed by the message loop.
 		if ( bIdle && !HammerOnIdle(lIdleCount++) )
 		{
-			bIdle = false;
+			bIdle = false; // done with idle work for now
 		}
 
 		//
