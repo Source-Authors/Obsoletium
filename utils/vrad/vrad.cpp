@@ -282,7 +282,7 @@ void ReadLightFile (char *filename)
 				{
 					if ( strcmp( texlights[j].filename, filename ) == 0 )
 					{
-						Warning( "\aDuplication of '%s' in file '%s'!\n",
+						Warning( "Duplication of '%s' in file '%s'!\n",
 							 texlights[j].name, texlights[j].filename );
 					}
 					else if ( texlights[j].value != value )
