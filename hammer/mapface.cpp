@@ -1679,7 +1679,7 @@ void CMapFace::ComputeColor( CRender3D* pRender, bool bRenderAsSelected,
 		}
 
 	default:
-		assert(0);
+		Assert(0);
 		break;
 	}
 }

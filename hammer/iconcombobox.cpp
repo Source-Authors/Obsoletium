@@ -178,7 +178,7 @@ int CIconComboBox::DeleteIcon( int ndx )
 //-----------------------------------------------------------------------------
 int CIconComboBox::AddString( LPCTSTR lpszString )
 {
-	assert( FALSE ); 
+	Assert( FALSE ); 
 	return CB_ERR;
 }
 
@@ -188,7 +188,7 @@ int CIconComboBox::AddString( LPCTSTR lpszString )
 //-----------------------------------------------------------------------------
 int CIconComboBox::InsertString( int nIndex, LPCTSTR lpszString )
 {
-	assert( FALSE );
+	Assert( FALSE );
 	return CB_ERR;
 }
 
@@ -198,7 +198,7 @@ int CIconComboBox::InsertString( int nIndex, LPCTSTR lpszString )
 //-----------------------------------------------------------------------------
 int CIconComboBox::DeleteString( int nIndex )
 {
-	assert( FALSE );
+	Assert( FALSE );
 	return CB_ERR;
 }
 

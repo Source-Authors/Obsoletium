@@ -522,7 +522,7 @@ void DetailObjects::EmitDetailObjectsOnFace( CMapFace *pMapFace, DetailObject_t&
 				// Triangle is out of bounds, flip the coordinates so they are in the near half of the parallelogram
 				u = 1.0f - u;
 				v = 1.0f - v;
-				assert( u + v <= 1.0f );
+				Assert( u + v <= 1.0f );
 			}
 
 			// Compute alpha - assumed to be 1.0 across entire face for non-displacement map faces, since there is no alpha channel
@@ -580,7 +580,7 @@ float DetailObjects::ComputeDisplacementFaceArea( CMapFace *pMapFace )
 void DetailObjects::EmitDetailObjectsOnDisplacementFace( CMapFace *pMapFace, 
 						DetailObject_t& detail )
 {
-	assert(pMapFace->GetPointCount() == 4);
+	Assert(pMapFace->GetPointCount() == 4);
 
 	// We're going to pick a bunch of random points, and then probabilistically
 	// decide whether or not to plant a detail object there.

@@ -143,8 +143,8 @@ bool EdgeCompare( Vector *pEdgePts1, Vector *pEdgePts2, int &edgeType1, int &edg
 					continue;
 
 				// sanity check
-				assert( overlapCount >= 0 );
-				assert( overlapCount < 2 );
+				Assert( overlapCount >= 0 );
+				Assert( overlapCount < 2 );
 
 				ndxEdge1[overlapCount] = ndx1;
 				ndxEdge2[overlapCount] = ndx2;

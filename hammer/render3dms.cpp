@@ -1893,7 +1893,7 @@ void CRender3D::RenderBox(const Vector &Mins, const Vector &Maxs,
 			// dimhotepus: Alpha is required.
 			color[3] = 0;
 
-			assert( (eRenderModeThisPass != RENDER_MODE_TEXTURED) &&
+			Assert( (eRenderModeThisPass != RENDER_MODE_TEXTURED) &&
 					(eRenderModeThisPass != RENDER_MODE_TEXTURED_SHADED) && 
 					(eRenderModeThisPass != RENDER_MODE_LIGHT_PREVIEW2) && 
 					(eRenderModeThisPass != RENDER_MODE_LIGHT_PREVIEW_RAYTRACED) && 
@@ -2883,7 +2883,7 @@ void CRender3D::RenderEnable(RenderState_t eRenderState, bool bEnable)
 
 		case RENDER_POLYGON_OFFSET_LINE:
 		{
-			assert(0);
+			Assert(0);
 			/* FIXME:
 			   Think we'll need to have two versions of the wireframe material
 			   one which ztests with offset + culling, the other which doesn't

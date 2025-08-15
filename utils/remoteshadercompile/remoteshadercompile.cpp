@@ -18,6 +18,9 @@
 #include <thread>
 #include <vector>
 
+#include "windows/com_error_category.h"
+#include "tier0/dbg.h"
+
 #include "tier0/memdbgon.h"
 
 namespace {
@@ -101,7 +104,7 @@ class ScopedAcceptSocket {
   template <int max_size>
   [[nodiscard]] std::error_code Send(uint32_t (&buffer)[max_size], int size,
                                      int flags, int &send_bytes) noexcept {
-    assert(size <= max_size);
+    Assert(size <= max_size);
     if (size > max_size) {
       return std::error_code{EINVAL, std::generic_category()};
     }
@@ -135,7 +138,7 @@ class ScopedListenSocket {
       : s_{socket(info->ai_family, info->ai_socktype, info->ai_protocol)},
         rc_{s_ != INVALID_SOCKET ? std::error_code{}
                                  : GetSystemError(WSAGetLastError())} {
-    assert(info);
+    Assert(info);
 
     if (!rc_) {
       // Setup the TCP listening socket
@@ -189,7 +192,7 @@ class ScopedAddressInfo {
  public:
   ScopedAddressInfo(const char *port, int family, int socket_type,
                     IPPROTO proto, int flags) noexcept {
-    assert(port);
+    Assert(port);
 
     addrinfo hints = {};
     hints.ai_family = family;
@@ -222,7 +225,7 @@ class ScopedSetIsServerExitFlag {
  public:
   explicit ScopedSetIsServerExitFlag(std::atomic_bool &is_server_exit) noexcept
       : is_server_exit_{is_server_exit} {
-    assert(is_server_exit == false);
+    Assert(is_server_exit == false);
   }
   ~ScopedSetIsServerExitFlag() noexcept { is_server_exit_ = true; }
 
@@ -233,29 +236,9 @@ class ScopedSetIsServerExitFlag {
   std::atomic_bool &is_server_exit_;
 };
 
-class ComErrorCategory : public std::error_category {
- public:
-  ComErrorCategory() noexcept = default;
-
-  [[nodiscard]] const char *name() const noexcept override { return "com"; }
-
-  [[nodiscard]] std::string message(int error_value) const override {
-    const _com_error com_error{static_cast<HRESULT>(error_value)};
-    return std::string{com_error.ErrorMessage()};
-  }
-
-  ComErrorCategory(ComErrorCategory &) = delete;
-  ComErrorCategory &operator=(ComErrorCategory &) = delete;
-};
-
-[[nodiscard]] inline ComErrorCategory &com_error_category() {
-  static ComErrorCategory com_error_category;
-  return com_error_category;
-}
-
 [[nodiscard]] inline std::error_code get_com_error_code(
     const HRESULT result) noexcept {
-  return std::error_code{result, com_error_category()};
+  return std::error_code{result, se::win::com::com_error_category()};
 }
 
 class ScopedThreadName {
@@ -308,7 +291,7 @@ class ScopedThreadName {
 
 [[nodiscard]] std::error_code GetMultibyteAsWide(const char *mb,
                                                  std::wstring &result) {
-  assert(mb);
+  Assert(mb);
 
   const size_t required_size{mbstowcs(nullptr, mb, 0)};
   result.resize(required_size + 1);
