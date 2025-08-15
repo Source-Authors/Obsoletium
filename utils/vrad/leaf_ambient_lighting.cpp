@@ -553,7 +553,7 @@ static void ThreadComputeLeafAmbient( int iThread, void *pUserData )
 		ComputeAmbientForLeaf(iThread, leafID, list);
 		// copy to the output array
 		g_LeafAmbientSamples[leafID].SetCount( list.Count() );
-		for ( int i = 0; i < list.Count(); i++ )
+		for ( intp i = 0; i < list.Count(); i++ )
 		{
 			g_LeafAmbientSamples[leafID].Element(i) = list.Element(i);
 		}
