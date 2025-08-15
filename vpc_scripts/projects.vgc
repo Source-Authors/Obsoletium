@@ -260,6 +260,16 @@ $Project "finddbgdll"
 	"utils\finddbgdll\finddbgdll.vpc" [$WINDOWS]
 }
 
+$Project "vfont"
+{
+	"utils/vfont/vfont.vpc" [$WINDOWS]
+}
+
+$Project "vfont_decompiler"
+{
+	"utils/vfont/vfont_decompiler.vpc" [$WINDOWS]
+}
+
 $Project "floatbm"
 {
 	"floatbm\floatbm.vpc" [$WINDOWS]
