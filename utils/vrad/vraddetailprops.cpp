@@ -668,7 +668,7 @@ void ComputeIndirectLightingAtPoint( Vector &position, Vector &normal, Vector &o
 	if ( do_fast || force_fast )
 		nSamples /= 4;
 	else
-		nSamples *= g_flSkySampleScale;
+		nSamples *= g_flStaticPropSampleScale;
 
 	float totalDot = 0;
 	DirectionalSampler_t sampler;
@@ -678,7 +678,7 @@ void ComputeIndirectLightingAtPoint( Vector &position, Vector &normal, Vector &o
 		float dot;
 
 		if ( bIgnoreNormals )
-			dot = (0.7071/2);
+			dot = 0.7071f/2;
 		else
 			dot = DotProduct( normal, samplingNormal );
 

@@ -90,6 +90,7 @@ std::atomic_bool	g_bInterrupt = false;	// Used with background lighting in WC. T
 float g_SunAngularExtent=0.0;
 
 float g_flSkySampleScale = 1.0;
+float g_flStaticPropSampleScale = 4.0f;
 
 bool g_bLargeDispSampleRadius = false;
 
@@ -2433,7 +2434,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			Msg( "--texture-shadows: true\n");
 			g_bTextureShadows = true;
 		}
-		else if ( !strcmp(argv[i], "-dump") )
+		else if ( !strcmp( argv[i], "-dump" ) )
 		{
 			Msg( "--dump-patches: true\n");
 			g_bDumpPatches = true;
@@ -2552,7 +2553,8 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 		else if (!Q_stricmp(argv[i],"-final"))
 		{
 			Msg( "--final: true\n" );
-			g_flSkySampleScale = 16.0;
+			g_flSkySampleScale = 16.0f;
+			g_flStaticPropSampleScale = 16.0f;
 		}
 		else if (!Q_stricmp(argv[i],"-extrasky"))
 		{
@@ -2565,6 +2567,19 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			else
 			{
 				Error("Expected a scale factor after '-extrasky'.\n" );
+				return -1;
+			}
+		}
+		else if ( !Q_stricmp( argv[i], "-StaticPropSampleScale" ) )
+		{
+			if ( ++i < argc && *argv[i] )
+			{
+				g_flStaticPropSampleScale = strtof( argv[i], nullptr );
+				Msg( "--static-prop-sample-scale: %f\n", g_flStaticPropSampleScale );
+			}
+			else
+			{
+				Error( "Expected a float scale factor after '-StaticPropSampleScale'.\n" );
 				return -1;
 			}
 		}
@@ -2980,6 +2995,7 @@ void PrintUsage( int argc, char **argv )
         "  -StaticPropLighting     : Generate baked static prop vertex lighting.\n"
         "  -StaticPropPolys        : Perform shadow tests of static props at polygon precision.\n"
         "  -StaticPropIndirectMode : Override prop indirect lighting algorithm (0 - Balanced [CS:GO], 1 - Dark [SteamPipe], 2 - Bright [Orangebox]).\n"
+        "  -StaticPropSampleScale  : Override prop indirect lighting sample scale factor (default 4).\n"
 		"  -OnlyStaticProps        : Only perform direct static prop lighting (vrad debug option).\n"
 		"  -StaticPropNormals      : When lighting static props, just show their normal vector.\n"
 		"  -textureshadows         : Allows texture alpha channels to block light - rays intersecting alpha surfaces will sample the texture.\n"

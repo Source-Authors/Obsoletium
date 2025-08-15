@@ -278,6 +278,7 @@ extern IIncremental *g_pIncremental;	// null if not doing incremental lighting
 extern bool			g_bDumpPropLightmaps;
 
 extern float g_flSkySampleScale;								// extra sampling factor for indirect light
+extern float g_flStaticPropSampleScale;							// extra sampling factor for indirect light (for static props)
 
 extern bool g_bLargeDispSampleRadius;
 extern bool g_bStaticPropPolys;
