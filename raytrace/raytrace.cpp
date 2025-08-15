@@ -6,6 +6,10 @@
 #include <cmdlib.h>
 #include <cstdio>
 
+// NOTE: This has to be the last file included!
+#include "tier0/memdbgon.h"
+
+
 static bool SameSign(float a, float b)
 {
 	int32 aa=*((int *) &a);

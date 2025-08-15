@@ -4,6 +4,10 @@
 #include <bspfile.h>
 #include "bsplib.h"
 
+// NOTE: This has to be the last file included!
+#include "tier0/memdbgon.h"
+
+
 static Vector VertCoord(dface_t const &f, int vnum)
 {
 	int eIndex = dsurfedges[f.firstedge+vnum];
