@@ -877,7 +877,8 @@ bool Morph3D::UpdateTranslation(const Vector &vUpdate, UINT uFlags)
 	if ( !Tool3D::UpdateTranslation( vUpdate, uFlags) )
 		return false;
 
-	bool bSnap =  uFlags & constrainSnap;
+	// dimhotepus: Explicit true / false assignment. CS:GO backport.
+	bool bSnap = ( uFlags & constrainSnap ) ? true : false;
 	
 	if (m_DragHandle.ssh == SSH_SCALEORIGIN)
 	{
