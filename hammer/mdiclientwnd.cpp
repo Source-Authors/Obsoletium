@@ -15,10 +15,20 @@
 
 BEGIN_MESSAGE_MAP(CMDIClientWnd, CBaseWnd)
 	//{{AFX_MSG_MAP(CMDIClientWnd)
+	ON_WM_LBUTTONDOWN()
 	ON_WM_ERASEBKGND()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
 
+
+//-----------------------------------------------------------------------------
+// Purpose: Handles the left mouse button click event.
+//-----------------------------------------------------------------------------
+void CMDIClientWnd::OnLButtonDown(UINT nFlags, CPoint point)
+{
+	// user clicked on the Hammer background so open a new map
+	APP()->OnFileOpen();
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor.
