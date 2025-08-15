@@ -800,7 +800,7 @@ static void WriteShaderFiles(const char *pShaderName) {
     V_strncpy(chShaderName, pShaderName, sizeof(chShaderName));
     V_strncpy(chShaderName + sizeof(chShaderName) - 4, "...", 4);
 
-    // dimhotepus: Correctly rewrite long strings. 
+    // dimhotepus: Correctly rewrite long strings.
     Msg("\r%s %s\t\t\t\t\r", szShaderFileOperation, chShaderName);
   }
 
@@ -1123,8 +1123,12 @@ static std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
             std::generic_category().message(errno).c_str());
   }
 
-  FILE *batFp = fopen("temp.bat", "w");
-  if (!batFp) Error("Unable to create writable temp.bat.\n");
+  // dimhotepus: temp.bat -> multi thread/process capable name. CS:GO
+  char szTempFileName[100];
+  V_sprintf_safe(szTempFileName, "sc%lu_%lu.bat", GetCurrentProcessId(),
+                 GetCurrentThreadId());
+  FILE *batFp = fopen(szTempFileName, "w");
+  if (!batFp) Error("Unable to create writable %s.\n", szTempFileName);
 
   // dimhotepus: Honor command (fxc) exit code.
   fprintf(batFp, "%s\nexit %%errorlevel%%\n", pCommand);
@@ -1136,7 +1140,7 @@ static std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
   // Start the child process.
   if (!CreateProcess(
           NULL,            // No module name (use command line).
-          "\"temp.bat\"",  // Command line.
+          szTempFileName,  // Command line.
           NULL,            // Process handle not inheritable.
           NULL,            // Thread handle not inheritable.
           FALSE,           // Set handle inheritance to FALSE.
@@ -1161,6 +1165,11 @@ static std::unique_ptr<se::shader_compile::command_sink::IResponse> MySystem(
   // Close process and thread handles.
   CloseHandle(pi.hThread);
   CloseHandle(pi.hProcess);
+
+  if (unlink(szTempFileName) && errno != ENOENT) {
+    Warning("Unable to remove '%s': %s.\n", pCommand,
+            std::generic_category().message(errno).c_str());
+  }
 
   return std::make_unique<se::shader_compile::command_sink::CResponseFiles>(
       se::shader_compile::fxc_intercept::kShaderArtefactOutputName,
