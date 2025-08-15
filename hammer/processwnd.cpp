@@ -237,7 +237,7 @@ int CProcessWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	m_btnCopyAll.Create("Copy to Clipboard", WS_CHILD | WS_VISIBLE, rctButton, this, IDC_PROCESSWND_COPYALL);
 	m_btnCopyAll.SetButtonStyle(BS_PUSHBUTTON);
-	m_edit_dpi_behavior.OnCreateWindow(m_btnCopyAll.GetSafeHwnd());
+	m_copy_all_dpi_behavior.OnCreateWindow(m_btnCopyAll.GetSafeHwnd());
 	
 	return 0;
 }
