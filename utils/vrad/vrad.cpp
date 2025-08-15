@@ -2977,7 +2977,7 @@ void PrintUsage( int argc, char **argv )
 		"  -LargeDispSampleRadius  : This can be used if there are splotches of bounced light\n"
 		"                            on terrain. The compile will take longer, but it will gather\n"
 		"                            light across a wider area.\n"
-        "  -StaticPropLighting     : Generate backed static prop vertex lighting.\n"
+        "  -StaticPropLighting     : Generate baked static prop vertex lighting.\n"
         "  -StaticPropPolys        : Perform shadow tests of static props at polygon precision.\n"
         "  -StaticPropIndirectMode : Override prop indirect lighting algorithm (0 - Balanced [CS:GO], 1 - Dark [SteamPipe], 2 - Bright [Orangebox]).\n"
 		"  -OnlyStaticProps        : Only perform direct static prop lighting (vrad debug option).\n"
