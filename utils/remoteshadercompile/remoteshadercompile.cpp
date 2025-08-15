@@ -554,8 +554,8 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
         if (FAILED(hr)) {
           args.send_buffer[0] = '\0';
 
-          fprintf(stderr, "%s compilation error 0x%.8lx!\n", shader_file_name,
-                  hr);
+          fprintf(stderr, "%s compilation error 0x%.8lx: %s!\n", shader_file_name,
+                  hr, se::win::com::com_error_category().message(hr).c_str());
 
           if (errors) {
             // Null-terminated string
