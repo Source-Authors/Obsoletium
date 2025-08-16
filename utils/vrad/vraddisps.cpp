@@ -140,8 +140,8 @@ private:
 	//
 	// BSP Tree Helpers
 	//
-	void InsertDispIntoTree( int ndxDisp );
-	void RemoveDispFromTree( int ndxDisp );
+	void InsertDispIntoTree( intp ndxDisp );
+	void RemoveDispFromTree( intp ndxDisp );
 
 	//=========================================================================
 	//
@@ -288,7 +288,7 @@ CVRadDispMgr::~CVRadDispMgr()
 //-----------------------------------------------------------------------------
 // Insert a displacement into the tree for collision
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::InsertDispIntoTree( int ndxDisp )
+void CVRadDispMgr::InsertDispIntoTree( intp ndxDisp )
 {
 	DispCollTree_t &dispTree = m_DispTrees[ndxDisp];
 	CDispCollTree *pDispTree = dispTree.m_pDispTree;
@@ -305,7 +305,7 @@ void CVRadDispMgr::InsertDispIntoTree( int ndxDisp )
 //-----------------------------------------------------------------------------
 // Remove a displacement from the tree for collision
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::RemoveDispFromTree( int ndxDisp )
+void CVRadDispMgr::RemoveDispFromTree( intp ndxDisp )
 {
 	// release the tree handle
 	if( m_DispTrees[ndxDisp].m_Handle != TREEDATA_INVALID_HANDLE )
@@ -333,7 +333,7 @@ void CVRadDispMgr::Init( void )
 void CVRadDispMgr::Shutdown( void )
 {
 	// remove all displacements from the tree
-	for( int ndxDisp = m_DispTrees.Count(); ndxDisp >= 0; ndxDisp-- )
+	for( intp ndxDisp = m_DispTrees.Count(); ndxDisp >= 0; ndxDisp-- )
 	{
 		RemoveDispFromTree( ndxDisp );
 	}
@@ -429,10 +429,10 @@ void CVRadDispMgr::DispBuilderInit( CCoreDispInfo *pBuilderDisp, dface_t *pFace,
 void CVRadDispMgr::UnserializeDisps( void ) 
 {
 	// temporarily create the "builder" displacements
-	CUtlVector<CCoreDispInfo*> builderDisps;
-	for ( int iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
+	CUtlVector<CCoreDispInfo*> builderDisps( 0, g_dispinfo.Count() );
+	for ( auto &info : g_dispinfo )
 	{
-		CCoreDispInfo *pDisp = new CCoreDispInfo;
+		auto *pDisp = new CCoreDispInfo;
 		if ( !pDisp )
 		{
 			builderDisps.Purge();
@@ -445,7 +445,7 @@ void CVRadDispMgr::UnserializeDisps( void )
 	}
 
 	// Set them up as CDispUtilsHelpers.
-	for ( int iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
+	for ( intp iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
 	{
 		builderDisps[iDisp]->SetDispUtilsHelperInfo( builderDisps.Base(), g_dispinfo.Count() );
 	}
@@ -463,7 +463,7 @@ void CVRadDispMgr::UnserializeDisps( void )
 	}
 
 	// generate the displacement surfaces
-	for( int iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
+	for( intp iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
 	{
 		builderDisps[iDisp]->Create();
 	}
