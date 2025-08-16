@@ -506,11 +506,11 @@ void CVRadDispMgr::MakePatches( void )
 	float flTotalArea = 0.0f;
 
 	// Create patches for all of the displacements.
-	int nTreeCount = m_DispTrees.Count();
-	for( int iTree = 0; iTree < nTreeCount; ++iTree )
+	const intp nTreeCount = m_DispTrees.Count();
+	for( auto &tree : m_DispTrees )
 	{
 		// Get the current displacement collision tree.
-		CVRADDispColl *pDispTree = m_DispTrees[iTree].m_pDispTree;
+		CVRADDispColl *pDispTree = tree.m_pDispTree;
 		if( !pDispTree )
 			continue;
 
@@ -518,7 +518,7 @@ void CVRadDispMgr::MakePatches( void )
 	}
 
 	// Print stats.
-	qprintf( "%i Displacements\n", nTreeCount );
+	qprintf( "%zd Displacements\n", nTreeCount );
 	qprintf( "%i Square Feet [%.2f Square Inches]\n", ( int )( flTotalArea / 144.0f ), flTotalArea );
 }
 //-----------------------------------------------------------------------------
@@ -619,11 +619,10 @@ void CVRadDispMgr::ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &r
 
 void CVRadDispMgr::AddPolysForRayTrace( void )
 {
-	int nTreeCount = m_DispTrees.Count();
-	for( int iTree = 0; iTree < nTreeCount; ++iTree )
+	for( auto &tree : m_DispTrees )
 	{
 		// Get the current displacement collision tree.
-		CVRADDispColl *pDispTree = m_DispTrees[iTree].m_pDispTree;
+		CVRADDispColl *pDispTree = tree.m_pDispTree;
 
 		// Add the triangles of the tree to the RT environment
 		pDispTree->AddPolysForRayTrace();
