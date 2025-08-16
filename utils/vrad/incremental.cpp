@@ -42,14 +42,14 @@ static bool CompareLights( dworldlight_t *a, dworldlight_t *b )
 }
 
 
-long FileOpen( char const *pFilename, bool bRead )
+static intp FileOpen( char const *pFilename, bool bRead )
 {
 	g_bFileError = false;
-	return (long)g_pFileSystem->Open( pFilename, bRead ? "rb" : "wb" );
+	return (intp)g_pFileSystem->Open( pFilename, bRead ? "rb" : "wb" );
 }
 
 
-void FileClose( long fp )
+static void FileClose( intp fp )
 {
 	if( fp )
 		g_pFileSystem->Close( (FILE*)fp );
@@ -57,12 +57,12 @@ void FileClose( long fp )
 
 
 // Returns true if there was an error reading from the file.
-bool FileError()
+static bool FileError()
 {
 	return g_bFileError;
 }
 
-static inline void FileRead( long fp, void *pOut, int size )
+static inline void FileRead( intp fp, void *pOut, int size )
 {
 	if( g_bFileError || g_pFileSystem->Read( pOut, size, (FileHandle_t)fp ) != size )
 	{
@@ -73,13 +73,13 @@ static inline void FileRead( long fp, void *pOut, int size )
 
 
 template<class T>
-static inline void FileRead( long fp, T &out )
+static inline void FileRead( intp fp, T &out )
 {
 	FileRead( fp, &out, sizeof(out) );
 }
 
 
-static inline void FileWrite( long fp, void const *pData, int size )
+static inline void FileWrite( intp fp, void const *pData, int size )
 {
 	if( g_bFileError || g_pFileSystem->Write( pData, size, (FileHandle_t)fp ) != size )
 	{
@@ -89,7 +89,7 @@ static inline void FileWrite( long fp, void const *pData, int size )
 
 
 template<class T>
-static inline void FileWrite( long fp, T out )
+static inline void FileWrite( intp fp, T out )
 {
 	FileWrite( fp, &out, sizeof(out) );
 }
@@ -144,8 +144,8 @@ bool CIncremental::PrepareForLighting()
 		LoadIncrementalFile();
 
 	// unmatched = a list of the lights we have
-	CUtlLinkedList<int,int> unmatched;
-	for( int i=m_Lights.Head(); i != m_Lights.InvalidIndex(); i = m_Lights.Next(i) )
+	CUtlLinkedList<int,IncrementalLightID> unmatched;
+	for( auto i=m_Lights.Head(); i != m_Lights.InvalidIndex(); i = m_Lights.Next(i) )
 		unmatched.AddToTail( i );
 
 	// Match the light lists and get rid of lights that we already have all the data for.
@@ -159,7 +159,7 @@ bool CIncremental::PrepareForLighting()
 		//CIncLight *pClosest = 0;
 
 		// Look for this light in our light list.
-		int iNextUnmatched, iUnmatched;
+		IncrementalLightID iNextUnmatched, iUnmatched;
 		for( iUnmatched=unmatched.Head(); iUnmatched != unmatched.InvalidIndex(); iUnmatched = iNextUnmatched )
 		{
 			iNextUnmatched = unmatched.Next( iUnmatched );
@@ -196,12 +196,12 @@ bool CIncremental::PrepareForLighting()
 	}
 
 	// Remove any of our lights that were unmatched.
-	for( int iUnmatched=unmatched.Head(); iUnmatched != unmatched.InvalidIndex(); iUnmatched = unmatched.Next( iUnmatched ) )
+	for( auto iUnmatched=unmatched.Head(); iUnmatched != unmatched.InvalidIndex(); iUnmatched = unmatched.Next( iUnmatched ) )
 	{
 		CIncLight *pLight = m_Lights[ unmatched[iUnmatched] ];
 		
 		// First tag faces that it touched so they get recomposited.
-		for( unsigned short iFace=pLight->m_LightFaces.Head(); iFace != pLight->m_LightFaces.InvalidIndex(); iFace = pLight->m_LightFaces.Next( iFace ) )
+		for( auto iFace=pLight->m_LightFaces.Head(); iFace != pLight->m_LightFaces.InvalidIndex(); iFace = pLight->m_LightFaces.Next( iFace ) )
 		{
 			m_FacesTouched[ pLight->m_LightFaces[iFace]->m_FaceIndex ] = 1;
 		}
@@ -217,7 +217,7 @@ bool CIncremental::PrepareForLighting()
 }
 
 
-bool CIncremental::ReadIncrementalHeader( long fp, CIncrementalHeader *pHeader )
+bool CIncremental::ReadIncrementalHeader( intp fp, CIncrementalHeader *pHeader )
 {
 	int version;
 	FileRead( fp, version );
@@ -234,7 +234,7 @@ bool CIncremental::ReadIncrementalHeader( long fp, CIncrementalHeader *pHeader )
 }
 
 
-bool CIncremental::WriteIncrementalHeader( long fp )
+bool CIncremental::WriteIncrementalHeader( intp fp )
 {
 	int version = INCREMENTALFILE_VERSION;
 	FileWrite( fp, version );
@@ -259,7 +259,7 @@ bool CIncremental::WriteIncrementalHeader( long fp )
 
 bool CIncremental::IsIncrementalFileValid()
 {
-	long fp = FileOpen( m_pIncrementalFilename, true );
+	intp fp = FileOpen( m_pIncrementalFilename, true );
 	if( !fp )
 		return false;
 
@@ -584,7 +584,7 @@ bool CIncremental::LoadIncrementalFile()
 	if( !IsIncrementalFileValid() )
 		return false;
 
-	long fp = FileOpen( m_pIncrementalFilename, true );
+	intp fp = FileOpen( m_pIncrementalFilename, true );
 	if( !fp )
 		return false;
 
@@ -646,7 +646,7 @@ bool CIncremental::LoadIncrementalFile()
 
 bool CIncremental::SaveIncrementalFile()
 {
-	long fp = FileOpen( m_pIncrementalFilename, false );
+	intp fp = FileOpen( m_pIncrementalFilename, false );
 	if( !fp )
 		return false;
 
@@ -657,23 +657,23 @@ bool CIncremental::SaveIncrementalFile()
 	}
 
 	// Write the lights.
-	int nLights = m_Lights.Count();
+	intp nLights = m_Lights.Count();
 	FileWrite( fp, nLights );
-	for( int iLight=m_Lights.Head(); iLight != m_Lights.InvalidIndex(); iLight = m_Lights.Next( iLight ) )
+	for( auto iLight=m_Lights.Head(); iLight != m_Lights.InvalidIndex(); iLight = m_Lights.Next( iLight ) )
 	{
 		CIncLight *pLight = m_Lights[iLight];
 		
 		FileWrite( fp, pLight->m_Light );
 
-		int nFaces = pLight->m_LightFaces.Count();
+		auto nFaces = pLight->m_LightFaces.Count();
 		FileWrite( fp, nFaces );
-		for( int iFace=pLight->m_LightFaces.Head(); iFace != pLight->m_LightFaces.InvalidIndex(); iFace = pLight->m_LightFaces.Next( iFace ) )
+		for( auto iFace=pLight->m_LightFaces.Head(); iFace != pLight->m_LightFaces.InvalidIndex(); iFace = pLight->m_LightFaces.Next( iFace ) )
 		{
 			CLightFace *pFace = pLight->m_LightFaces[iFace];
 
 			FileWrite( fp, pFace->m_FaceIndex );
 			
-			int dataSize = pFace->m_CompressedData.TellPut();
+			intp dataSize = pFace->m_CompressedData.TellPut();
 			FileWrite( fp, dataSize );
 
 			pFace->m_CompressedData.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
