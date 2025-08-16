@@ -2347,6 +2347,8 @@ void VRAD_Finish()
 
 	CloseDispLuxels();
 
+	// dimhotepus: Shutdown static displacements manage, too.
+	StaticDispMgr()->Shutdown();
 	StaticPropMgr()->Shutdown();
 
 	double end = Plat_FloatTime();
