@@ -1434,10 +1434,10 @@ void COP_Entity::RemoveBlankKeys(void)
 		MDkeyvalue &KeyValue = m_kv.GetKeyValue(i);
 		if ( Q_isempty( KeyValue.szValue ) )
 		{
-				m_kv.RemoveKeyAt(i);
-			}
+			m_kv.RemoveKeyAt(i);
 		}
 	}
+}
 
 
 //-----------------------------------------------------------------------------
@@ -2900,14 +2900,15 @@ void COP_Entity::UpdateKeyValue(const char *szKey, const char *szValue)
 	m_kv.SetValue(szKey, szValue);
 
 	auto index = m_InstanceParmData.Find( szKey );
-	
+
 	if ( index != m_InstanceParmData.InvalidIndex() )
 	{
-		CString NewValue = m_InstanceParmData[ index ].m_VariableName + " " + szValue;
+		const auto &data = m_InstanceParmData[ index ];
+		CString NewValue = data.m_VariableName + " " + szValue;
 
-		m_kvAdded.SetValue( m_InstanceParmData[ index ].m_ParmKey, "1" );
-		m_kv.SetValue( m_InstanceParmData[ index ].m_ParmKey, NewValue );
-		RefreshKVListValues( m_InstanceParmData[ index ].m_ParmKey );
+		m_kvAdded.SetValue( data.m_ParmKey, "1" );
+		m_kv.SetValue( data.m_ParmKey, NewValue );
+		RefreshKVListValues( data.m_ParmKey );
 	}
 	
 	RefreshKVListValues( szKey );
