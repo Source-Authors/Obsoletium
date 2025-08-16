@@ -333,7 +333,7 @@ void CVRadDispMgr::Init( void )
 void CVRadDispMgr::Shutdown( void )
 {
 	// remove all displacements from the tree
-	for( intp ndxDisp = m_DispTrees.Count(); ndxDisp >= 0; ndxDisp-- )
+	for( intp ndxDisp = m_DispTrees.Count() - 1; ndxDisp >= 0; ndxDisp-- )
 	{
 		RemoveDispFromTree( ndxDisp );
 	}
