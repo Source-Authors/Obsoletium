@@ -439,7 +439,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 				char szDir[MAX_PATH];
 				V_strcpy_safe(szDir, szNewRun);
 				// dimhotepus: Strip quotes around dir.
-				RemoveQuotes(szDir, ssize(szDir));
+				RemoveQuotes(szDir, V_strlen(szDir));
 				V_StripFilename(szDir);
 
 				mychdir(szDir);
@@ -447,8 +447,16 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 				// YWB Force asynchronous operation so that engine doesn't hang on
 				//  exit???  Seems to work.
 				// spawnv doesn't like quotes
-				RemoveQuotes(szNewRun, ssize(szNewRun));
-				_spawnv(/*cmd.bNoWait ?*/ _P_NOWAIT /*: P_WAIT*/, szNewRun, ppParms);
+				RemoveQuotes(szNewRun, V_strlen(szNewRun));
+				intptr_t rc = _spawnv(/*cmd.bNoWait ?*/ _P_NOWAIT /*: P_WAIT*/, szNewRun, ppParms);
+				if (rc == -1)
+				{
+					const int err = errno;
+					CString str;
+					str.Format("The command failed:\r\n  \"%s\"\r\n", std::generic_category().message(err).c_str());
+					procWnd.Append(str);
+					procWnd.SetForegroundWindow();
+				}
 			}
 		}
 		else
