@@ -294,8 +294,8 @@ void CProcessWnd::GetReady(LPCTSTR pszDocName, CWnd *parent)
 		unsigned newDpi = ::GetDpiForWindow(parent->GetSafeHwnd());
 
 		CreateEx(0, strClass, title.GetString(), WS_OVERLAPPEDWINDOW,
-			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 50, newDpi),
-			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 50, newDpi),
+			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 44, newDpi),
+			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 68, newDpi),
 			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 800, newDpi),
 			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 600, newDpi),
 			AfxGetMainWnd()->GetSafeHwnd(), nullptr);
