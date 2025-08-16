@@ -565,7 +565,7 @@ void COP_Entity::GetKeyState( const char *pShortName, EKeyState *pState, bool *p
 	// Missing targetname?
 	if ((pVar->GetType() == ivTargetSrc) || (pVar->GetType() == ivTargetDest))
 	{
-		if ( pszCurValue[0] && !IsValidTargetName( pszCurValue ) )
+		if ( !Q_isempty( pszCurValue ) && !IsValidTargetName( pszCurValue ) )
 			*pMissingTarget = true;
 	}
 	
@@ -1432,35 +1432,12 @@ void COP_Entity::RemoveBlankKeys(void)
 		iNext = m_kv.GetNext( i );
 		
 		MDkeyvalue &KeyValue = m_kv.GetKeyValue(i);
-		if (KeyValue.szValue[0] == '\0')
+		if ( Q_isempty( KeyValue.szValue ) )
 		{
-			bool bRemove = true;
-
-#if 0
-			// Only remove keys that are blank and whose default value is not blank,
-			// because Hammer assigns any missing key with the FGD's default value.
-			//
-			// dvs: disabled for now because deleting the value text is the currently
-			//      accepted way of reverting a key to its default value.
-			GDinputvariable *pVar = m_pDisplayClass->VarForName( KeyValue.szKey );
-			if ( pVar )
-			{
-				char szDefault[MAX_KEYVALUE_LEN];
-				pVar->GetDefault( szDefault );
-				if ( szDefault[0] != '\0' )
-				{
-					bRemove = false;
-				}
-			}
-#endif
-
-			if ( bRemove )
-			{
 				m_kv.RemoveKeyAt(i);
 			}
 		}
 	}
-}
 
 
 //-----------------------------------------------------------------------------
@@ -3151,7 +3128,7 @@ void COP_Entity::BrowseTextures( const char *szFilter, bool bSprite )
 	CTextureBrowser browser(GetMainWnd());
 
 	// setup filter - if any
-	if( szFilter[0] != '\0' )
+	if( !Q_isempty( szFilter ) )
 	{
 		browser.SetFilter( szFilter );
 	}
@@ -3288,7 +3265,7 @@ void COP_Entity::OnChangeInstanceVariableControl( void )
 		m_pEditInstanceVariable->GetWindowText( szVariable, sizeof( szVariable ) );
 		m_pEditInstanceValue->GetWindowText( szValue, sizeof( szValue ) );
 
-		if ( szValue[ 0 ] )
+		if ( !Q_isempty( szValue ) )
 		{
 			V_strcat_safe( szVariable, " " );
 			V_strcat_safe( szVariable, szValue );
@@ -3302,7 +3279,7 @@ void COP_Entity::OnChangeInstanceVariableControl( void )
 		}
 
 		char szKey[ KEYVALUE_MAX_KEY_LENGTH ];
-		V_strncpy( szKey, pVar->GetName(), sizeof( szKey ) );
+		V_strcpy_safe( szKey, pVar->GetName() );
 
 		UpdateKeyValue( szKey, szVariable );
 	}
@@ -3330,7 +3307,7 @@ void COP_Entity::OnChangeInstanceParmControl( void )
 			m_pComboInstanceParmType->GetWindowText( szValue, sizeof( szValue ) );
 		}
 
-		if ( szValue[ 0 ] )
+		if ( !Q_isempty( szValue ) )
 		{
 			V_strcat_safe( szVariable, " " );
 			V_strcat_safe( szVariable, szValue );
@@ -3344,7 +3321,7 @@ void COP_Entity::OnChangeInstanceParmControl( void )
 		}
 
 		char szKey[ KEYVALUE_MAX_KEY_LENGTH ];
-		V_strncpy( szKey, pVar->GetName(), sizeof( szKey ) );
+		V_strcpy_safe( szKey, pVar->GetName() );
 
 		UpdateKeyValue( szKey, szVariable );
 	}
@@ -3458,7 +3435,7 @@ void COP_Entity::OnPlaySound(void)
 	// Get the name of the sound or VCD.
 	char szCurrentSound[256];
 	m_pSmartControl->GetWindowText(szCurrentSound, 256);
-	if (!szCurrentSound[0])
+	if ( Q_isempty( szCurrentSound ) )
 		return;
 	
 	// Get rid of "scenes/" for scenes.
@@ -3809,7 +3786,7 @@ void COP_Entity::OnKillfocusKey(void)
 		return;
 
 	char szSaveValue[KEYVALUE_MAX_VALUE_LENGTH];
-	memset(szSaveValue, 0, sizeof(szSaveValue));
+	BitwiseClear(szSaveValue);
 	V_strcpy_safe(szSaveValue, m_kv.GetValue(m_szOldKeyName, NULL));
 
 	int iSel = GetCurVarListSelection();
@@ -3847,7 +3824,7 @@ void COP_Entity::PerformMark( const char *szTargetName, bool bClear, bool bNameO
 
 	if (pDoc != NULL)
 	{
-		if (szTargetName[0] != '\0')
+		if ( !Q_isempty( szTargetName ) )
 		{
 			CMapEntityList Found;
 			
@@ -4363,7 +4340,7 @@ void COP_Entity::OnPickColor(void)
 	int iCurToken = 0;
 	while(pTmp)
 	{
-		if(pTmp[0])
+		if( !Q_isempty( pTmp ) )
 		{
 			if(iCurToken == 3)
 			{
