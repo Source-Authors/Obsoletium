@@ -200,9 +200,11 @@ static void RemoveQuotes(IN_Z_CAP(bufferSize) char *pBuf, intp bufferSize)
 	if (pBuf[0] == '"')
 		V_memmove(pBuf, pBuf + 1, bufferSize - 1);
 
-	const size_t end = strlen(pBuf) - 1;
+	const intp end = bufferSize - 2;
 
-	if (pBuf[end] == '"')
+	if (end <= 0)
+		pBuf[0] = '\0';
+	else if (pBuf[end] == '"')
 		pBuf[end] = '\0';
 }
 
@@ -234,6 +236,7 @@ void SplitFileNameFromPath(char* szDocLongPath,
 	p = strrchr(szDocLongPath, '\\');
 	if(!p)
 		p = strrchr(szDocLongPath, '/');
+
 	if(p)
 	{
 		// got the filepart
@@ -267,8 +270,8 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 	char szDocShortPath[MAX_PATH] = {0}, szDocShortName[MAX_PATH] = {0}, 
 		szDocShortExt[MAX_PATH] = {0};
 
-	GetFullPathName(pszOrigDocName, MAX_PATH, szDocLongPath, NULL);
-	GetShortPathName(pszOrigDocName, szDocShortPath, MAX_PATH);
+	GetFullPathName(pszOrigDocName, std::size(szDocLongPath), szDocLongPath, nullptr);
+	GetShortPathName(pszOrigDocName, szDocShortPath, std::size(szDocShortPath));
 
 	// split them up
 	SplitFileNameFromPath(szDocLongPath, szDocLongName, szDocLongExt);
@@ -324,7 +327,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 					if(p[0] == ' ')
 					{
 						// found a space-separator
-						p[0] = 0;
+						p[0] = '\0';
 
 						p++;
 
@@ -344,7 +347,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 							if(p[0] == '\"')
 							{
 								// found the end
-								if(p[1] == 0)
+								if(p[1] == '\0')
 									bDone = TRUE;
 								p[1] = 0;	// kick its ass
 								p += 2;
@@ -376,8 +379,8 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 
 				if(cmd.iSpecialCmd == CCCopyFile && iArg == 3)
 				{
-					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
-					RemoveQuotes(ppParms[2], ssize(ppParms) - 2);
+					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
+					RemoveQuotes(ppParms[2], V_strlen(ppParms[2]));
 					
 					// don't copy if we're already there
 					if (stricmp(ppParms[1], ppParms[2]) != 0 && 
@@ -389,7 +392,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 				}
 				else if(cmd.iSpecialCmd == CCDelFile && iArg == 2)
 				{
-					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
+					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
 					if(!DeleteFile(ppParms[1]))
 					{
 						bError = TRUE;
@@ -398,8 +401,8 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 				}
 				else if(cmd.iSpecialCmd == CCRenameFile && iArg == 3)
 				{
-					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
-					RemoveQuotes(ppParms[2], ssize(ppParms) - 2);
+					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
+					RemoveQuotes(ppParms[2], V_strlen(ppParms[2]));
 					if(rename(ppParms[1], ppParms[2]))
 					{
 						bError = TRUE;
@@ -408,7 +411,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 				}
 				else if(cmd.iSpecialCmd == CCChangeDir && iArg == 2)
 				{
-					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
+					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
 					if(mychdir(ppParms[1]) == -1)
 					{
 						bError = TRUE;
@@ -433,7 +436,9 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 				// This is necessary for Steam to find the correct Steam DLL (it
 				// uses the current working directory to search).
 				char szDir[MAX_PATH];
-				Q_strncpy(szDir, szNewRun, sizeof(szDir));
+				V_strcpy_safe(szDir, szNewRun);
+				// dimhotepus: Strip quotes around dir.
+				RemoveQuotes(szDir, ssize(szDir));
 				V_StripFilename(szDir);
 
 				mychdir(szDir);
