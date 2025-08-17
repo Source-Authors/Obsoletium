@@ -420,7 +420,7 @@ void CompressLightData(
 
 void MultiplyValues( CUtlVector<CLightValue> &values, float scale )
 {
-	for( int i=0; i < values.Count(); i++ )
+	for( intp i=0; i < values.Count(); i++ )
 		values[i].m_Dot *= scale;
 }
 
@@ -695,11 +695,11 @@ void CIncremental::LinkLightsToFaces( CUtlVector<CFaceLightList> &faceLights )
 {
 	faceLights.SetSize( numfaces );
 	
-	for( int iLight=m_Lights.Head(); iLight != m_Lights.InvalidIndex(); iLight = m_Lights.Next( iLight ) )
+	for( auto iLight=m_Lights.Head(); iLight != m_Lights.InvalidIndex(); iLight = m_Lights.Next( iLight ) )
 	{
 		CIncLight *pLight = m_Lights[iLight];
 
-		for( int iFace=pLight->m_LightFaces.Head(); iFace != pLight->m_LightFaces.InvalidIndex(); iFace = pLight->m_LightFaces.Next( iFace ) )
+		for( auto iFace=pLight->m_LightFaces.Head(); iFace != pLight->m_LightFaces.InvalidIndex(); iFace = pLight->m_LightFaces.Next( iFace ) )
 		{
 			CLightFace *pFace = pLight->m_LightFaces[iFace];
 
