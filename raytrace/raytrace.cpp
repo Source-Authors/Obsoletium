@@ -2,9 +2,11 @@
 // $Id$
 
 #include "raytrace.h"
-#include <filesystem_tools.h>
-#include <cmdlib.h>
+#include "filesystem_tools.h"
+#include "cmdlib.h"
+
 #include <cstdio>
+#include <memory>
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -829,7 +831,7 @@ void RayTracingEnvironment::RefineNode(intp node_number,int32 const *tri_list,in
 // 			   0.5*(MinBound[split_plane]+MaxBound[split_plane]),ntris,tri_skip);
 		// its worth splitting!
 		// we will achieve the splitting without sorting by using a selection algorithm.
-		int32 *new_triangle_list=new int32[ntris];
+		std::unique_ptr<int32[]> new_triangle_list = std::make_unique<int32[]>(ntris);
 
 		// now, perform surface area/cost check to determine whether this split was worth it
 		Vector LeftMins=MinBound;
@@ -886,31 +888,29 @@ void RayTracingEnvironment::RefineNode(intp node_number,int32 const *tri_list,in
 		if ( (ntris<20) && ((best_nleft==0) || (best_nright==0)) )
 			depth+=100;
 
-		RefineNode(left_child,new_triangle_list,best_nleft+best_nboth,LeftMins,LeftMaxes,depth+1);
-		RefineNode(right_child,new_triangle_list+best_nleft,best_nright+best_nboth,
+		RefineNode(left_child,new_triangle_list.get(),best_nleft+best_nboth,LeftMins,LeftMaxes,depth+1);
+		RefineNode(right_child,new_triangle_list.get()+best_nleft,best_nright+best_nboth,
 				   RightMins,RightMaxes,depth+1);
-
-		delete[] new_triangle_list;
 	}
 }
 
 
-void RayTracingEnvironment::SetupAccelerationStructure(void)
+void RayTracingEnvironment::SetupAccelerationStructure()
 {
 	CacheOptimizedKDNode root;
 	OptimizedKDTree.AddToTail(root);
 
 	const intp trianglesCount = OptimizedTriangleList.Count();
 
-	int32 *root_triangle_list = new int32[trianglesCount];
-	for(intp t = 0; t < trianglesCount; t++)
-		root_triangle_list[t] = t;
+	{
+		std::unique_ptr<int32[]> root_triangle_list = std::make_unique<int32[]>(trianglesCount);
+		for(intp t = 0; t < trianglesCount; t++)
+			root_triangle_list[t] = t;
 
-	CalculateTriangleListBounds(root_triangle_list,trianglesCount,m_MinBound,
-								m_MaxBound);
-	RefineNode(0,root_triangle_list,trianglesCount,m_MinBound,m_MaxBound,0);
-
-	delete[] root_triangle_list;
+		CalculateTriangleListBounds(root_triangle_list.get(),trianglesCount,m_MinBound,
+									m_MaxBound);
+		RefineNode(0,root_triangle_list.get(),trianglesCount,m_MinBound,m_MaxBound,0);
+	}
 
 	// now, convert all triangles to "intersection format"
 	for(intp i = 0; i < OptimizedTriangleList.Count(); i++)
