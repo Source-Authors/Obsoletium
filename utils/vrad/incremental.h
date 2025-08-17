@@ -26,10 +26,9 @@
 
 class CIncLight;
 
-
-class CLightValue
+// dimhotepus: class -> struct
+struct CLightValue
 {
-public:
 	float m_Dot;
 };
 
@@ -58,8 +57,8 @@ typedef RTL_CRITICAL_SECTION CRITICAL_SECTION;
 class CIncLight
 {
 public:
-					CIncLight();
-					~CIncLight();
+	CIncLight();
+	~CIncLight();
 
 	CIncLight(const CIncLight &) = delete;
 	CIncLight& operator=(const CIncLight &) = delete;
@@ -88,9 +87,8 @@ public:
 class CIncrementalHeader
 {
 public:
-	class CLMSize
+	struct CLMSize
 	{
-	public:
 		unsigned char m_Width;
 		unsigned char m_Height;
 	};
@@ -102,8 +100,8 @@ public:
 class CIncremental : public IIncremental
 {
 public:
-						CIncremental();
-						~CIncremental();
+	CIncremental();
+	~CIncremental();
 
 // IIncremental overrides.
 public:
