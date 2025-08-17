@@ -16,7 +16,7 @@ class CNodeVert
 {
 public:
 	CNodeVert() = default;
-	CNodeVert( int ix, int iy ) {x=ix; y=iy;}
+	CNodeVert( int ix, int iy ) : x{ix}, y{iy} {}
 
 	inline int&			operator[]( int i )			{return ((int*)this)[i];}
 	inline int const&	operator[]( int i ) const	{return ((int*)this)[i];}
@@ -96,7 +96,7 @@ int g_EdgeSideLenMul[4] =
 // Helper functions.
 // --------------------------------------------------------------------------------- //
 
-inline int SignedBitShift( int val, int shift )
+static constexpr inline int SignedBitShift( int val, int shift )
 {
 	if( shift > 0 )
 		return val << shift;
@@ -152,7 +152,7 @@ int GetEdgeIndexFromPoint( CVertIndex const &index, int iMaxPower )
 }
 
 
-int GetCornerIndexFromPoint( CVertIndex const &index, int iPower )
+static int GetCornerIndexFromPoint( CVertIndex const &index, int iPower )
 {
 	int sideLengthMinus1 = 1 << iPower;
 
