@@ -16,6 +16,7 @@
 #include "iincremental.h"
 #include "threads.h"
 #include "bspfile.h"
+#include "tier0/threadtools.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlvector.h"
 #include "tier1/utlbuffer.h"
@@ -50,8 +51,6 @@ public:
 };
 
 
-typedef struct _RTL_CRITICAL_SECTION RTL_CRITICAL_SECTION;
-typedef RTL_CRITICAL_SECTION CRITICAL_SECTION;
 
 
 class CIncLight
@@ -68,7 +67,7 @@ public:
 
 public:
 
-	CRITICAL_SECTION	*m_pCS;
+	CThreadMutex	m_pCS;
 
 	// This is the light for which m_LightFaces was built.
 	dworldlight_t	m_Light;
