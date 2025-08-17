@@ -16,7 +16,7 @@ $Configuration
 		$AdditionalIncludeDirectories		"$BASE,.\"
 		$PreprocessorDefinitions			"$BASE;NO_WARN_MBCS_MFC_DEPRECATION"
 		$Create/UsePrecompiledHeader		"Use Precompiled Header (/Yu)"
-		$PrecompiledHeaderFile				"Debug/QC_Eyes.pch"
+		$PrecompiledHeaderFile				"$(IntDir)/QC_Eyes.pch"
 		$EnableC++Exceptions				"Yes (/EHsc)"
 
 		// Advanced
