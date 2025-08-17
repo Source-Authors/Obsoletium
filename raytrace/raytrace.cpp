@@ -719,14 +719,12 @@ float RayTracingEnvironment::CalculateCostsOfSplit(
 		split_value=min_coord;
 
 	// now, perform surface area/cost check to determine whether this split was worth it
-	Vector LeftMins=MinBound;
 	Vector LeftMaxes=MaxBound;
 	Vector RightMins=MinBound;
-	Vector RightMaxes=MaxBound;
 	LeftMaxes[split_plane]=split_value;
 	RightMins[split_plane]=split_value;
-	float SA_L=BoxSurfaceArea(LeftMins,LeftMaxes);
-	float SA_R=BoxSurfaceArea(RightMins,RightMaxes);
+	float SA_L=BoxSurfaceArea(MinBound,LeftMaxes);
+	float SA_R=BoxSurfaceArea(RightMins,MaxBound);
 	float ISA=1.0f/BoxSurfaceArea(MinBound,MaxBound);
 	float cost_of_split=COST_OF_TRAVERSAL+COST_OF_INTERSECTION*(nboth+
 		(SA_L*ISA*(nleft))+(SA_R*ISA*(nright)));
