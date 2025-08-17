@@ -102,43 +102,39 @@ public:
 class CIncremental : public IIncremental
 {
 public:
-
 						CIncremental();
 						~CIncremental();
-
-
 
 // IIncremental overrides.
 public:
 
-	virtual bool		Init( char const *pBSPFilename, char const *pIncrementalFilename );
+	bool Init( char const *pBSPFilename, char const *pIncrementalFilename ) override;
 
 	// Load the light definitions out of the incremental file.
 	// Figure out which lights have changed.
 	// Change 'activelights' to only consist of new or changed lights.
-	virtual bool		PrepareForLighting();
+	bool PrepareForLighting() override;
 
-	virtual void		AddLightToFace( 
+	void AddLightToFace( 
 		IncrementalLightID lightID, 
 		int iFace, 
 		int iSample,
 		int lmSize,
 		float dot,
-		int iThread );
+		int iThread ) override;
 
-	virtual void		FinishFace(
+	void FinishFace(
 		IncrementalLightID lightID,
 		int iFace,
-		int iThread );
+		int iThread ) override;
 
 	// For each face that was changed during the lighting process, save out
 	// new data for it in the incremental file.
-	virtual bool		Finalize();
+	bool Finalize() override;
 
-	virtual void		GetFacesTouched( CUtlVector<unsigned char> &touched );
+	void GetFacesTouched( CUtlVector<unsigned char> &touched ) override;
 
-	virtual bool		Serialize();
-
+	bool Serialize() override;
 
 private:
 
@@ -167,8 +163,7 @@ private:
 	char const		*m_pIncrementalFilename;
 	char const		*m_pBSPFilename;
 	
-	CUtlLinkedList<CIncLight*, IncrementalLightID>	
-					m_Lights;
+	CUtlLinkedList<CIncLight*, IncrementalLightID>	m_Lights;
 
 	// The face index is set to 1 if a face has new lighting data applied to it.
 	// This is used to optimize the set of lightmaps we recomposite.
