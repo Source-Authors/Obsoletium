@@ -283,9 +283,8 @@ bool CBSPTreeData::IsElementInTree( BSPTreeDataHandle_t handle ) const
 //-----------------------------------------------------------------------------
 int CBSPTreeData::CountElementsInLeaf( int leaf )
 {
-	int i;
 	int nCount = 0;
-	for( i = m_Leaf[leaf].m_FirstElement; i != m_LeafElements.InvalidIndex(); i = m_LeafElements.Next(i) )
+	for( auto i = m_Leaf[leaf].m_FirstElement; i != m_LeafElements.InvalidIndex(); i = m_LeafElements.Next(i) )
 	{
 		++nCount;
 	}
