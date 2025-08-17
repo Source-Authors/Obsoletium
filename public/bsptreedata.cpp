@@ -19,35 +19,35 @@
 //-----------------------------------------------------------------------------
 // The BSP tree leaf data system
 //-----------------------------------------------------------------------------
-class CBSPTreeData : public IBSPTreeData, public ISpatialLeafEnumerator
+class CBSPTreeData final : public IBSPTreeData, public ISpatialLeafEnumerator
 {
 public:
 	// constructor, destructor
 	CBSPTreeData();
-	virtual ~CBSPTreeData();
+	~CBSPTreeData();
 
 	// Methods of IBSPTreeData
-	void Init( ISpatialQuery* pBSPTree );
-	void Shutdown();
+	void Init( ISpatialQuery* pBSPTree ) override;
+	void Shutdown() override;
 
-	BSPTreeDataHandle_t Insert( int userId, Vector const& mins, Vector const& maxs );
-	void Remove( BSPTreeDataHandle_t handle );
-	void ElementMoved( BSPTreeDataHandle_t handle, Vector const& mins, Vector const& maxs );
+	BSPTreeDataHandle_t Insert( int userId, Vector const& mins, Vector const& maxs ) override;
+	void Remove( BSPTreeDataHandle_t handle ) override;
+	void ElementMoved( BSPTreeDataHandle_t handle, Vector const& mins, Vector const& maxs ) override;
 
 	// Enumerate elements in a particular leaf
-	bool EnumerateElementsInLeaf( int leaf, IBSPTreeDataEnumerator* pEnum, intp context );
+	bool EnumerateElementsInLeaf( int leaf, IBSPTreeDataEnumerator* pEnum, intp context ) override;
 
 	// For convenience, enumerates the leaves along a ray, box, etc.
-	bool EnumerateLeavesAtPoint( Vector const& pt, ISpatialLeafEnumerator* pEnum, intp context );
-	bool EnumerateLeavesInBox( Vector const& mins, Vector const& maxs, ISpatialLeafEnumerator* pEnum, intp context );
-	bool EnumerateLeavesInSphere( Vector const& center, float radius, ISpatialLeafEnumerator* pEnum, intp context );
-	bool EnumerateLeavesAlongRay( Ray_t const& ray, ISpatialLeafEnumerator* pEnum, intp context );
+	bool EnumerateLeavesAtPoint( Vector const& pt, ISpatialLeafEnumerator* pEnum, intp context ) override;
+	bool EnumerateLeavesInBox( Vector const& mins, Vector const& maxs, ISpatialLeafEnumerator* pEnum, intp context ) override;
+	bool EnumerateLeavesInSphere( Vector const& center, float radius, ISpatialLeafEnumerator* pEnum, intp context ) override;
+	bool EnumerateLeavesAlongRay( Ray_t const& ray, ISpatialLeafEnumerator* pEnum, intp context ) override;
 
 	// methods of IBSPLeafEnumerator
-	bool EnumerateLeaf( int leaf, intp context );
+	bool EnumerateLeaf( int leaf, intp context ) override;
 
 	// Is the element in any leaves at all?
-	bool IsElementInTree( BSPTreeDataHandle_t handle ) const;
+	bool IsElementInTree( BSPTreeDataHandle_t handle ) const override;
 
 private:
 	// Creates a new handle
