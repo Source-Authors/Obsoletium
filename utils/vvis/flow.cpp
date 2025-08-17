@@ -47,7 +47,9 @@ int		c_chop, c_nochop;
 
 int		active;
 
+#ifdef MPI
 extern bool g_bVMPIEarlyExit;
+#endif
 
 
 void CheckStack (leaf_t *leaf, threaddata_t *thread)
@@ -454,13 +456,15 @@ void RecursiveLeafFlow (int leafnum, threaddata_t *thread, pstack_t *prevstack)
 	pstack_t	stack;
 	plane_t		backplane;
 	int			j;
-	long		*test, *might, *vis, more;
-	
+	intp		*test, *might, *vis, more;
+
+#ifdef MPI
 	// Early-out if we're a VMPI worker that's told to exit. If we don't do this here, then the
 	// worker might spin its wheels for a while on an expensive work unit and not be available to the pool.
 	// This is pretty common in vis.
 	if ( g_bVMPIEarlyExit )
 		return;
+#endif
 
 	if ( leafnum == g_TraceClusterStop )
 	{
@@ -477,8 +481,8 @@ void RecursiveLeafFlow (int leafnum, threaddata_t *thread, pstack_t *prevstack)
 	stack.leaf = leaf;
 	stack.portal = NULL;
 
-	might = (long *)stack.mightsee;
-	vis = (long *)thread->base->portalvis;
+	might = (intp *)stack.mightsee;
+	vis = (intp *)thread->base->portalvis;
 	
 	// check all portals for flowing into other leafs	
 	for (intp i=0 ; i<leaf->portals.Count() ; i++)
@@ -494,17 +498,17 @@ void RecursiveLeafFlow (int leafnum, threaddata_t *thread, pstack_t *prevstack)
 		// if the portal can't see anything we haven't allready seen, skip it
 		if (p->status == stat_done)
 		{
-			test = (long *)p->portalvis;
+			test = (intp *)p->portalvis;
 		}
 		else
 		{
-			test = (long *)p->portalflood;
+			test = (intp *)p->portalflood;
 		}
 
 		more = 0;
-		for (j=0 ; j<portallongs ; j++)
+		for (j=0 ; j<portalarchwords ; j++)
 		{
-			might[j] = ((long *)prevstack->mightsee)[j] & test[j];
+			might[j] = ((intp *)prevstack->mightsee)[j] & test[j];
 			more |= (might[j] & ~vis[j]);
 		}
 		
@@ -608,8 +612,8 @@ void PortalFlow (int iThread, int portalnum)
 	data.pstack_head.portal = p;
 	data.pstack_head.source = p->winding;
 	data.pstack_head.portalplane = p->plane;
-	for (int i=0 ; i<portallongs ; i++)
-		((long *)data.pstack_head.mightsee)[i] = ((long *)p->portalflood)[i];
+	for (int i=0 ; i<portalarchwords ; i++)
+		((intp *)data.pstack_head.mightsee)[i] = ((intp *)p->portalflood)[i];
 
 	RecursiveLeafFlow (p->leaf, &data, &data.pstack_head);
 
@@ -778,7 +782,7 @@ RecursiveLeafBitFlow
 */
 void RecursiveLeafBitFlow (int leafnum, byte *mightsee, byte *cansee)
 {
-	alignas(long) byte		newmight[MAX_PORTALS/8];
+	alignas(intp) byte		newmight[MAX_PORTALS/8];
 
 	leaf_t *leaf = &leafs[leafnum];
 	
@@ -792,12 +796,12 @@ void RecursiveLeafBitFlow (int leafnum, byte *mightsee, byte *cansee)
 			continue;
 
 		// if this portal can see some portals we mightsee, recurse
-		long more = 0;
-		for (int j=0 ; j<portallongs ; j++)
+		intp more = 0;
+		for (int j=0 ; j<portalarchwords ; j++)
 		{
-			((long *)newmight)[j] = ((long *)mightsee)[j] 
-				& ((long *)p->portalflood)[j];
-			more |= ((long *)newmight)[j] & ~((long *)cansee)[j];
+			((intp *)newmight)[j] = ((intp *)mightsee)[j] 
+				& ((intp *)p->portalflood)[j];
+			more |= ((intp *)newmight)[j] & ~((intp *)cansee)[j];
 		}
 
 		if (!more)
