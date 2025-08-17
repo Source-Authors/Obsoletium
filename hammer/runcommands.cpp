@@ -293,7 +293,8 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 		pszDocName = szDocLongName;
 		pszDocPath = szDocLongPath;
 		
-		static char szNewParms[MAX_PATH*5], szNewRun[MAX_PATH*5];
+		// dimhotepus: x5 -> x4
+		static char szNewParms[MAX_PATH*4], szNewRun[MAX_PATH*4];
 		szNewParms[0] = szNewRun[0] = '\0';
 
 		// HACK: force the spawnv call for launching the game
