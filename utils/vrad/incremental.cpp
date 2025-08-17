@@ -134,7 +134,7 @@ bool CIncremental::PrepareForLighting()
 		return false;
 
 	// Clear the touched faces list.
-	m_FacesTouched.SetSize( numfaces );
+	m_FacesTouched.SetCount( numfaces );
 	memset( m_FacesTouched.Base(), 0, numfaces );
 
 	// If we haven't done a complete successful run yet, then we either haven't
@@ -227,7 +227,7 @@ bool CIncremental::ReadIncrementalHeader( intp fp, CIncrementalHeader *pHeader )
 	int nFaces;
 	FileRead( fp, nFaces );
 
-	pHeader->m_FaceLightmapSizes.SetSize( nFaces );
+	pHeader->m_FaceLightmapSizes.SetCount( nFaces );
 	FileRead( fp, pHeader->m_FaceLightmapSizes.Base(), sizeof(CIncrementalHeader::CLMSize) * nFaces );
 
 	return !FileError();
@@ -243,7 +243,7 @@ bool CIncremental::WriteIncrementalHeader( intp fp )
 	FileWrite( fp, nFaces );
 
 	CIncrementalHeader hdr;
-	hdr.m_FaceLightmapSizes.SetSize( nFaces );
+	hdr.m_FaceLightmapSizes.SetCount( nFaces );
 
 	for( int i=0; i < nFaces; i++ )
 	{
