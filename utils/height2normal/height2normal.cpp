@@ -102,7 +102,7 @@ void Pause() {
       if (*scan == '\"') {
         *scan = '\0';
         scan++;
-        // got a key and a value, so get the hell out of here.
+        // got a key and a value, so get out of here.
         return true;
       }
 
