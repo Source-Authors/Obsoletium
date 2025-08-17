@@ -22,8 +22,8 @@
 class CVertIndex
 {
 public:
-				CVertIndex() = default;
-				CVertIndex( short ix, short iy );
+	CVertIndex() = default;
+	constexpr CVertIndex( short ix, short iy ) : x{ix}, y{iy} {}
 	
 	void		Init( short ix, short iy );
 
@@ -67,14 +67,6 @@ inline CVertIndex BuildOffsetVertIndex(
 // ------------------------------------------------------------------ //
 // CVertIndex inlines.
 // ------------------------------------------------------------------ //
-
-inline CVertIndex::CVertIndex( short ix, short iy )
-{
-	x = ix;
-	y = iy;
-}
-
-
 inline void CVertIndex::Init( short ix, short iy )
 {
 	x = ix;

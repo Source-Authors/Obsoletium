@@ -17,9 +17,9 @@
 // ------------------------------------------------------------------------ //
 
 // These point at the vertices connecting to each of the [north,south,east,west] vertices.
-class CVertCorners
+// dimhotepus: class -> struct.
+struct CVertCorners
 {
-public:
 	short	m_Corner1[2];
 	short	m_Corner2[2];
 };
@@ -30,9 +30,9 @@ public:
 // ------------------------------------------------------------------------ //
 
 // This points at vertices to the side of a node (north, south, east, west).
-static short g_SideVertMul[4][2] = { {1,0}, {0,1}, {-1,0}, {0,-1} };
+static constexpr short g_SideVertMul[4][2] = { {1,0}, {0,1}, {-1,0}, {0,-1} };
 
-static CVertCorners g_SideVertCorners[4] =
+static constexpr CVertCorners g_SideVertCorners[4] =
 {
 	{ {1,-1},  {1,1} },
 	{ {1,1},   {-1,1} },
@@ -45,7 +45,7 @@ static CVertCorners g_SideVertCorners[4] =
 // 1 = upper-left
 // 2 = lower-left
 // 3 = lower-right
-static CVertIndex g_ChildNodeIndexMul[4] = 
+static constexpr CVertIndex g_ChildNodeIndexMul[4] = 
 { 
 	CVertIndex(1,1), 
 	CVertIndex(-1,1), 
@@ -54,7 +54,7 @@ static CVertIndex g_ChildNodeIndexMul[4] =
 };
 
 // These are multipliers on vertMul (not nodeMul).
-static CVertIndex g_ChildNodeDependencies[4][2] =
+static constexpr CVertIndex g_ChildNodeDependencies[4][2] =
 {
 	{ CVertIndex(1,0),  CVertIndex(0,1) },
 	{ CVertIndex(0,1),  CVertIndex(-1,0) },
@@ -63,7 +63,7 @@ static CVertIndex g_ChildNodeDependencies[4][2] =
 };
 
 // 2x2 rotation matrices for each orientation.
-static int g_OrientationRotations[4][2][2] =
+static constexpr int g_OrientationRotations[4][2][2] =
 {
 	{{1, 0},		// CCW_0
 	{0, 1}},
@@ -211,14 +211,6 @@ static void AddDependency(
 // --------------------------------------------------------------------------------- //
 // CTesselateWinding stuff.
 // --------------------------------------------------------------------------------- //
-
-CTesselateVert::CTesselateVert( CVertIndex const &index, int iNode )
-	: m_Index( index )
-{
-	m_iNode = iNode;
-}
-
-
 CVertInfo::CVertInfo()
 {
 	for( auto& d : m_Dependencies )
@@ -237,8 +229,8 @@ CVertInfo::CVertInfo()
 	m_iNodeLevel = -1;
 }
 
-
-CTesselateVert g_TesselateVerts[] =
+// dimhotepus: constexpr.
+constexpr CTesselateVert g_TesselateVerts[] =
 {
 	CTesselateVert( CVertIndex(1,-1),  CHILDNODE_LOWER_RIGHT),
 	CTesselateVert( CVertIndex(0,-1),  -1),
@@ -254,7 +246,7 @@ CTesselateVert g_TesselateVerts[] =
 CTesselateWinding g_TWinding =
 {
 	g_TesselateVerts,
-	sizeof( g_TesselateVerts ) / sizeof( g_TesselateVerts[0] )
+	std::size( g_TesselateVerts )
 };
 
 
@@ -289,10 +281,11 @@ DECLARE_TABLES( 17 );
 
 
 // Index by m_Power.
-CPowerInfo *g_PowerInfos[NUM_POWERINFOS] =
+// dimhotepus: static.
+static CPowerInfo *g_PowerInfos[NUM_POWERINFOS] =
 {
-	NULL,
-	NULL,
+	nullptr,
+	nullptr,
 	POWERINFO_ENTRY(5),
 	POWERINFO_ENTRY(9),
 	POWERINFO_ENTRY(17)

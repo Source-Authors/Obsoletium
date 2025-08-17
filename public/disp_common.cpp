@@ -16,7 +16,7 @@ class CNodeVert
 {
 public:
 	CNodeVert() = default;
-	CNodeVert( int ix, int iy ) : x{ix}, y{iy} {}
+	constexpr CNodeVert( int ix, int iy ) : x{ix}, y{iy} {}
 
 	inline int&			operator[]( int i )			{return ((int*)this)[i];}
 	inline int const&	operator[]( int i ) const	{return ((int*)this)[i];}
@@ -24,7 +24,7 @@ public:
 	int x, y;
 };
 
-static CNodeVert const g_NodeChildLookup[4][2] =
+static constexpr CNodeVert g_NodeChildLookup[4][2] =
 {
 	{CNodeVert(0,0), CNodeVert(1,1)},
 	{CNodeVert(1,0), CNodeVert(2,1)},
@@ -32,7 +32,7 @@ static CNodeVert const g_NodeChildLookup[4][2] =
 	{CNodeVert(1,1), CNodeVert(2,2)}
 };
 
-static CNodeVert const g_NodeTriWinding[9] =
+static constexpr CNodeVert g_NodeTriWinding[9] =
 {
 	CNodeVert(0, 1), 
 	CNodeVert(0, 0), 
@@ -46,7 +46,7 @@ static CNodeVert const g_NodeTriWinding[9] =
 };
 
 // Indexed by CORNER_. These store NEIGHBOREDGE_ defines and tell which edges butt up against the corner.
-static int g_CornerEdges[4][2] =
+static constexpr int g_CornerEdges[4][2] =
 {
 	{ NEIGHBOREDGE_BOTTOM,	NEIGHBOREDGE_LEFT },	// CORNER_LOWER_LEFT
 	{ NEIGHBOREDGE_TOP,		NEIGHBOREDGE_LEFT },	// CORNER_UPPER_LEFT
