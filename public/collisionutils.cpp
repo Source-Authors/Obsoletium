@@ -1547,6 +1547,7 @@ bool IntersectRayWithOBB( const Ray_t &ray, const matrix3x4_t &matOBBToWorld,
 	Vector vecBoxExtents, vecOBBCenter;
 	VectorAdd( vecOBBMins, vecOBBMaxs, vecBoxExtents );
 	vecBoxExtents *= 0.5f;
+	// dimhotepus: Map local to world.
 	VectorTransform( vecBoxExtents, matOBBToWorld, vecOBBCenter );
 
 	Vector vecOBBHalfDiagonal;
@@ -1733,6 +1734,7 @@ bool IntersectRayWithOBB( const Ray_t &ray, const matrix3x4_t &matOBBToWorld,
 		}
 		temp.type = 3;
 
+		// dimhotepus: Do not inverse as not needed.
 		MatrixTransformPlane( matOBBToWorld, temp, pTrace->plane );
 		return true;
 	}
