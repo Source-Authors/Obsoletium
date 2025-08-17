@@ -23,7 +23,8 @@ int FindNeighborCornerVert( CCoreDispInfo *pDisp, const Vector &vTest )
 	CDispUtilsHelper *pDispHelper = pDisp;
 
 	int iClosest = 0;
-	float flClosest = 1e24;
+	// dimhotepus: 1e24 -> FLT_MAX.
+	float flClosest = FLT_MAX;
 	for ( int iCorner=0; iCorner < 4; iCorner++ )
 	{
 		// Has it been touched?
