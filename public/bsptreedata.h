@@ -9,13 +9,12 @@
 //
 //=============================================================================//
 
-#include "tier0/platform.h"
-
-#if !defined( BSPTREEDATA )
+#ifndef BSPTREEDATA
 #define BSPTREEDATA
-#ifdef _WIN32
-#pragma once
-#endif
+
+#include <memory>
+
+#include "tier0/platform.h"
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -127,8 +126,8 @@ public:
 // Class factory
 //-----------------------------------------------------------------------------
 
-IBSPTreeData* CreateBSPTreeData();
-void DestroyBSPTreeData( IBSPTreeData* pTreeData );
+// dimhotepus: Return unique_ptr instead of raw owning pointer.
+std::unique_ptr<IBSPTreeData> CreateBSPTreeData();
 
 
 #endif	// BSPTREEDATA

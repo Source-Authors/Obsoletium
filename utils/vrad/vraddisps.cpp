@@ -13,7 +13,6 @@
 #include "CollisionUtils.h"
 #include "lightmap.h"
 #include "Radial.h"
-#include "CollisionUtils.h"
 #include "mathlib/bumpvects.h"
 #include "utlrbtree.h"
 #include "tier0/fasttimer.h"
@@ -80,7 +79,6 @@ public:
 	// Construction/Deconstruction
 	//
 	CVRadDispMgr();
-	virtual ~CVRadDispMgr();
 
 	// creation/destruction
 	void Init( void );
@@ -187,7 +185,8 @@ private:
 
 	CUtlVector<DispCollTree_t>	m_DispTrees;
 
-	IBSPTreeData				*m_pBSPTreeData;
+	// dimhotepus: raw -> unique_ptr
+	std::unique_ptr<IBSPTreeData> m_pBSPTreeData;
 
 	CBSPDispRayEnumerator		m_EnumDispRay;
 	CBSPDispFaceListEnumerator	m_EnumDispFaceList;
@@ -269,19 +268,10 @@ public:
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-CVRadDispMgr::CVRadDispMgr()
+CVRadDispMgr::CVRadDispMgr() : m_pBSPTreeData{CreateBSPTreeData()}
 {
-	m_pBSPTreeData = CreateBSPTreeData();
 	sampleCount = -1;
 	m_pSamplePos = nullptr;
-}
-
-
-//-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-CVRadDispMgr::~CVRadDispMgr()
-{
-	DestroyBSPTreeData( m_pBSPTreeData );
 }
 
 

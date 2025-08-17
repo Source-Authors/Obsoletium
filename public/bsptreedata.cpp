@@ -105,14 +105,9 @@ private:
 // Class factory
 //-----------------------------------------------------------------------------
 
-IBSPTreeData* CreateBSPTreeData()
+std::unique_ptr<IBSPTreeData> CreateBSPTreeData()
 {
-	return new CBSPTreeData;
-}
-
-void DestroyBSPTreeData( IBSPTreeData* pTreeData )
-{
-	delete pTreeData;
+	return std::make_unique<CBSPTreeData>();
 }
 
 
