@@ -669,21 +669,18 @@ void RayTracingEnvironment::CalculateTriangleListBounds(int32 const *tris,intp n
 
 
 float RayTracingEnvironment::CalculateCostsOfSplit(
-	int split_plane,int32 const *tri_list,int ntris,
-	Vector MinBound,Vector MaxBound, float &split_value,
+	int split_plane, int32 const *tri_list, int ntris,
+	Vector MinBound, Vector MaxBound, float &split_value,
 	int &nleft, int &nright, int &nboth)
 {
 	// determine the costs of splitting on a given axis, and label triangles with respect to
 	// that axis by storing the value in coordselect0. It will also return the number of
 	// tris in the left, right, and nboth groups, in order to facilitate memory
-	nleft=nboth=nright=0;
+	nleft=nright=nboth=0;
 	
 	// now, label each triangle. Since we have not converted the triangles into
 	// intersection fromat yet, we can use the CoordSelect0 field of each as a temp.
-	nleft=0;
-	nright=0;
-	nboth=0;
-	float min_coord=1.0e23f,max_coord=-1.0e23f;
+	float min_coord=FLT_MAX,max_coord=FLT_MIN;
 
 	for(int t=0;t<ntris;t++)
 	{
