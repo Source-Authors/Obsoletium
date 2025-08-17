@@ -144,7 +144,8 @@ bool CIncremental::PrepareForLighting()
 		LoadIncrementalFile();
 
 	// unmatched = a list of the lights we have
-	CUtlLinkedList<int,IncrementalLightID> unmatched;
+	// dimhotepus: int, int -> IncrementalLightID, IncrementalLightID
+	CUtlLinkedList<IncrementalLightID,IncrementalLightID> unmatched;
 	for( auto i=m_Lights.Head(); i != m_Lights.InvalidIndex(); i = m_Lights.Next(i) )
 		unmatched.AddToTail( i );
 
