@@ -312,7 +312,7 @@ bool ExpandMacroToken( char *&token_p )
 		}
 
 		// paste token into 
-		len = strlen( script->macrovalue[index] );
+		len = V_strlen( script->macrovalue[index] );
 		strcpy( token_p, script->macrovalue[index] );
 		token_p += len;
 		
@@ -949,7 +949,7 @@ public:
 	bool ReadFileToBuffer( const char *pSourceName, CUtlBuffer &buffer, bool bText = false, bool bNoOpenFailureWarning = false ) override;
 	bool WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer, DiskWriteMode_t writeMode ) override;
 	intp FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList ) override;
-	char *MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize ) override;
+	[[deprecated]] char *MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize ) override;
 	void DeleteTemporaryFiles( const char *pFileMask ) override;
 	int CompareFileTime( const char *pFilenameA, const char *pFilenameB ) override;
 	bool DoesFileExist( const char *pFilename ) override;
@@ -1081,8 +1081,9 @@ int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB 
 //-----------------------------------------------------------------------------
 // Make a temporary filename
 //-----------------------------------------------------------------------------
-char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize )
+[[deprecated]] char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize )
 {
+#if 0
 	char *pBuffer = _tempnam( pchModPath, "mgd_" );
 	if ( pBuffer[0] == '\\' )
 	{
@@ -1099,6 +1100,11 @@ char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, in
 	free( pBuffer );
 
 	return pPath;
+#else
+	AssertMsg( false, "Deprecated MakeTemporaryFilename." );
+
+	return nullptr;
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1213,7 +1219,7 @@ intp CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVe
 	FIND_DATA findData;
 	Q_FixSlashes( fullPath );
 	void *h = FindFirstFile( fullPath, &findData );
-	if ( (int)h == -1 )
+	if ( (intp)h == -1 )
 	{
 		return 0;
 	}

@@ -458,8 +458,8 @@ void Q_mkdir(char *path) {
   if (!mkdir(path, 0777) || errno == EEXIST) return;
 #endif
 
-  Error( "Unable to create directory '%s': %s.\n",
-      path, std::generic_category().message(errno).c_str() );
+  Error("Unable to create directory '%s': %s.\n", path,
+        std::generic_category().message(errno).c_str());
 }
 
 void CmdLib_InitFileSystem(const char *pFilename, int maxMemoryUsage) {
@@ -545,9 +545,9 @@ bool CmdLib_HasBasePath(const char *pFileName_, intp &pathLength) {
 
   for (intp i = 0; i < g_NumBasePaths; i++) {
     // see if we can rip the base off of the filename.
-    if (Q_strncasecmp(g_pBasePaths[i], pFileName, strlen(g_pBasePaths[i])) ==
-        0) {
-      pathLength = strlen(g_pBasePaths[i]);
+    const intp len = V_strlen(g_pBasePaths[i]);
+    if (Q_strncasecmp(g_pBasePaths[i], pFileName, len) == 0) {
+      pathLength = len;
       return true;
     }
   }
@@ -718,7 +718,7 @@ void CreatePath(char *path) {
 }
 
 #if defined(_WIN32) || defined(WIN32)
-// Creates a path, path may already exist
+// Creates a path, path may already exist. This is kinda janky, avoid.
 void SafeCreatePath(char *path) {
   char *ptr;
 
@@ -735,6 +735,24 @@ void SafeCreatePath(char *path) {
       *ptr = '\0';
       Q_mkdir(path);
       *ptr = '\\';
+    }
+  }
+}
+#elif defined(POSIX)
+// dimhotepus: TF2 backport.
+void SafeCreatePath(char *path) {
+  char *ptr = path;
+  // Ignore leading slashes (don't mkdir /)
+  while (*ptr == '/') {
+    ptr++;
+  };
+
+  while (ptr && *ptr) {
+    ptr = strchr(ptr + 1, '/');
+    if (ptr) {
+      *ptr = '\0';
+      Q_mkdir(path);
+      *ptr = '/';
     }
   }
 }

@@ -2286,6 +2286,12 @@ bool LoadBSPFile( const char *filename )
 	CopyLump( header, FIELD_CHARACTER, LUMP_TEXDATA_STRING_DATA, g_TexDataStringData );
 	CopyLump( header, FIELD_INTEGER, LUMP_TEXDATA_STRING_TABLE, g_TexDataStringTable );
 
+	// It's assumed by other code that the data lump is filled with C strings. We need to make sure that 
+	// the buffer as a whole ends with a '\0'.
+	// dimhotepus: TF2 backport.
+	if ( g_TexDataStringData.Count() > 0 && g_TexDataStringData.Tail() != '\0' )
+		Error( "BSP file %s is corrupted", filename );
+	
 	g_nOverlayCount = CopyLump(header, LUMP_OVERLAYS, g_Overlays);
 	g_nWaterOverlayCount = CopyLump( header, LUMP_WATEROVERLAYS, g_WaterOverlays );
 	CopyLump( header, LUMP_OVERLAY_FADES, g_OverlayFades );
@@ -3123,7 +3129,8 @@ Generates the dentdata string from all the entities
 void UnparseEntities (void)
 {
 	epair_t	*ep;
-	char	line[2048];
+	// dimhotepus: +16 is from TF2 backport.
+	char	line[2048 + 16];
 	int		i;
 	char	key[1020], value[1020];
 
