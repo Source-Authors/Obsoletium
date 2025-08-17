@@ -895,7 +895,7 @@ void RayTracingEnvironment::RefineNode(intp node_number,int32 const *tri_list,in
 
 void RayTracingEnvironment::SetupAccelerationStructure()
 {
-	CacheOptimizedKDNode root;
+	CacheOptimizedKDNode root{};
 	OptimizedKDTree.AddToTail(root);
 
 	const intp trianglesCount = OptimizedTriangleList.Count();
