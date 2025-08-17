@@ -24,7 +24,7 @@ class CBSPDispRayDistanceEnumerator;
 //
 // Displacement/Face List
 //
-class CBSPDispFaceListEnumerator : public ISpatialLeafEnumerator, public IBSPTreeDataEnumerator
+class CBSPDispFaceListEnumerator final : public ISpatialLeafEnumerator, public IBSPTreeDataEnumerator
 {
 public:
 
@@ -32,18 +32,18 @@ public:
 	//
 	// Construction/Deconstruction
 	//
-	CBSPDispFaceListEnumerator() {};
-	virtual ~CBSPDispFaceListEnumerator()
+	CBSPDispFaceListEnumerator() = default;
+	~CBSPDispFaceListEnumerator()
 	{
 		m_DispList.Purge();
 		m_FaceList.Purge();
 	}
 
 	// ISpatialLeafEnumerator
-	bool EnumerateLeaf( int ndxLeaf, intp context ); 
+	bool EnumerateLeaf( int ndxLeaf, intp context ) override;
 
 	// IBSPTreeDataEnumerator
-	bool FASTCALL EnumerateElement( int userId, intp context );
+	bool FASTCALL EnumerateElement( int userId, intp context ) override;
 
 public:
 
@@ -56,21 +56,21 @@ public:
 //
 // RayEnumerator
 //
-class CBSPDispRayEnumerator : public ISpatialLeafEnumerator, public IBSPTreeDataEnumerator
+class CBSPDispRayEnumerator final : public ISpatialLeafEnumerator, public IBSPTreeDataEnumerator
 {
 public:
 	// ISpatialLeafEnumerator
-	bool EnumerateLeaf( int ndxLeaf, intp context );
+	bool EnumerateLeaf( int ndxLeaf, intp context ) override;
 
 	// IBSPTreeDataEnumerator
-	bool FASTCALL EnumerateElement( int userId, intp context );
+	bool FASTCALL EnumerateElement( int userId, intp context ) override;
 };
 
 //=============================================================================
 //
 // VRad Displacement Manager
 //
-class CVRadDispMgr : public IVRadDispMgr
+class CVRadDispMgr final : public IVRadDispMgr
 {
 public:
 
@@ -81,45 +81,45 @@ public:
 	CVRadDispMgr();
 
 	// creation/destruction
-	void Init( void );
-	void Shutdown( void );
+	void Init() override;
+	void Shutdown() override;
 
 	// "CalcPoints"
-	bool BuildDispSamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace );
-	bool BuildDispLuxels( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace );
-	bool BuildDispSamplesAndLuxels_DoFast( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace );
+	bool BuildDispSamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace ) override;
+	bool BuildDispLuxels( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace ) override;
+	bool BuildDispSamplesAndLuxels_DoFast( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace ) override;
 
 	// patching functions
-	void MakePatches( void );
-	void SubdividePatch( int iPatch );
+	void MakePatches() override;
+	void SubdividePatch( int iPatch ) override;
 
 	// pre "FinalLightFace"
-	void InsertSamplesDataIntoHashTable( void );
-	void InsertPatchSampleDataIntoHashTable( void );
+	void InsertSamplesDataIntoHashTable() override;
+	void InsertPatchSampleDataIntoHashTable() override;
 
 	// "FinalLightFace"
 	radial_t *BuildLuxelRadial( int ndxFace, int ndxStyle, bool bBump );
-	bool SampleRadial( int ndxFace, radial_t *pRadial, Vector const &vPos, int ndxLxl, LightingValue_t *pLightSample, int sampleCount, bool bPatch );
-	radial_t *BuildPatchRadial( int ndxFace, bool bBump );
+	bool SampleRadial( int ndxFace, radial_t *pRadial, Vector const &vPos, int ndxLxl, LightingValue_t *pLightSample, int sampleCount, bool bPatch ) override;
+	radial_t *BuildPatchRadial( int ndxFace, bool bBump ) override;
 
 	// utility
-	void GetDispSurfNormal( int ndxFace, Vector &pt, Vector &ptNormal, bool bInside );
-	void GetDispSurf( int ndxFace, CVRADDispColl **ppDispTree );
+	void GetDispSurfNormal( int ndxFace, Vector &pt, Vector &ptNormal, bool bInside ) override;
+	void GetDispSurf( int ndxFace, CVRADDispColl **ppDispTree ) override;
 
 	// bsp tree functions
-	bool ClipRayToDisp( DispTested_t &dispTested, Ray_t const &ray );
-	bool ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &ray, int ndxLeaf );
+	bool ClipRayToDisp( DispTested_t &dispTested, Ray_t const &ray ) override;
+	bool ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &ray, int ndxLeaf ) override;
 	void ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &ray, int ndxLeaf,  
-					float& dist, dface_t*& pFace, Vector2D& luxelCoord );
+					float& dist, dface_t*& pFace, Vector2D& luxelCoord ) override;
 	void ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &ray, 
-		int ndxLeaf, float& dist, Vector *pNormal );
+		int ndxLeaf, float& dist, Vector *pNormal ) override;
 
-	void StartRayTest( DispTested_t &dispTested );
-	void AddPolysForRayTrace( void );
+	void StartRayTest( DispTested_t &dispTested ) override;
+	void AddPolysForRayTrace() override;
 
 	// general timing -- should be moved!!
-	void StartTimer( const char *name );
-	void EndTimer( void );
+	void StartTimer( const char *name ) override;
+	void EndTimer() override;
 
 	//=========================================================================
 	//
@@ -203,7 +203,7 @@ private:
 
 static CVRadDispMgr	s_DispMgr;
 
-IVRadDispMgr *StaticDispMgr( void )
+IVRadDispMgr *StaticDispMgr()
 {
 	return &s_DispMgr;
 }
@@ -245,14 +245,14 @@ bool FASTCALL CBSPDispRayEnumerator::EnumerateElement( int userId, intp context 
 // Here's an enumerator that we use for testing against disps in a leaf...
 //-----------------------------------------------------------------------------
 
-class CBSPDispRayDistanceEnumerator : public IBSPTreeDataEnumerator
+class CBSPDispRayDistanceEnumerator final : public IBSPTreeDataEnumerator
 {
 public:
 	CBSPDispRayDistanceEnumerator() : m_Distance(1.0f), m_pSurface(nullptr),
 		m_pDispTested{nullptr}, m_pRay{nullptr} {}
 
 	// IBSPTreeDataEnumerator
-	bool FASTCALL EnumerateElement( int userId, intp context )
+	bool FASTCALL EnumerateElement( int userId, intp context ) override
 	{
 		return s_DispMgr.DispRayDistance_EnumerateElement( userId, this );
 	}
@@ -308,7 +308,7 @@ void CVRadDispMgr::RemoveDispFromTree( intp ndxDisp )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::Init( void )
+void CVRadDispMgr::Init()
 {
 	// initialize the bsp tree
 	m_pBSPTreeData->Init( ToolBSPTree() );
@@ -320,7 +320,7 @@ void CVRadDispMgr::Init( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::Shutdown( void )
+void CVRadDispMgr::Shutdown()
 {
 	// remove all displacements from the tree
 	for( intp ndxDisp = m_DispTrees.Count() - 1; ndxDisp >= 0; ndxDisp-- )
@@ -416,7 +416,7 @@ void CVRadDispMgr::DispBuilderInit( CCoreDispInfo *pBuilderDisp, dface_t *pFace,
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::UnserializeDisps( void ) 
+void CVRadDispMgr::UnserializeDisps() 
 {
 	// temporarily create the "builder" displacements
 	CUtlVector<CCoreDispInfo*> builderDisps( 0, g_dispinfo.Count() );
@@ -490,7 +490,7 @@ void CVRadDispMgr::UnserializeDisps( void )
 // Purpose: create a set of patches for each displacement surface to transfer
 //          bounced light around with
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::MakePatches( void )
+void CVRadDispMgr::MakePatches()
 {
 	// Collect stats - keep track of the total displacement surface area.
 	float flTotalArea = 0.0f;
@@ -607,7 +607,7 @@ void CVRadDispMgr::ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &r
 	}
 }
 
-void CVRadDispMgr::AddPolysForRayTrace( void )
+void CVRadDispMgr::AddPolysForRayTrace()
 {
 	for( auto &tree : m_DispTrees )
 	{
@@ -825,9 +825,6 @@ bool CVRadDispMgr::DispFaceList_EnumerateElement( int userId, intp context )
 inline void GetSampleLight( facelight_t *pFaceLight, int ndxStyle, bool bBumped, 
 			                int ndxSample, LightingValue_t *pSampleLight )
 {
-//	SampleLight[0].Init( 20.0f, 10.0f, 10.0f );
-//	return;
-
 	// get sample from bumped lighting data
 	if( bBumped )
 	{
@@ -1483,7 +1480,7 @@ void CVRadDispMgr::InsertSamplesDataIntoHashTable( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::InsertPatchSampleDataIntoHashTable( void )
+void CVRadDispMgr::InsertPatchSampleDataIntoHashTable()
 {
 	// don't insert patch samples if we are not bouncing light
 	if( numbounce <= 0 )
@@ -1541,7 +1538,7 @@ void CVRadDispMgr::StartTimer( const char *name )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::EndTimer( void )
+void CVRadDispMgr::EndTimer()
 {
 	m_Timer.End();
 	CCycleCount duration = m_Timer.GetDuration();
