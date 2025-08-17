@@ -688,8 +688,11 @@ float RayTracingEnvironment::CalculateCostsOfSplit(
 		// determine max and min coordinate values for later optimization
 		for(int v=0;v<3;v++)
 		{
-			min_coord = min( min_coord, tri.Vertex(v)[split_plane] );
-			max_coord = max( max_coord, tri.Vertex(v)[split_plane] );
+			const float vertex = tri.Vertex(v)[split_plane];
+			if ( min_coord > vertex )
+				min_coord = vertex;
+			if ( max_coord < vertex )
+				max_coord = vertex;
 		}
 		switch(tri.ClassifyAgainstAxisSplit(split_plane,split_value))
 		{
