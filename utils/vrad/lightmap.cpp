@@ -2898,7 +2898,7 @@ static void BuildSupersampleFaceLights( lightinfo_t& l, SSE_SampleInfo_t& info, 
 				continue;
 
 			// Don't supersample if the lighting is pretty uniform near the sample
-			if (pGradient[i] < 0.0625)
+			if (pGradient[i] < 0.0625f)
 				continue;
 
 			// Joy! We're supersampling now, and we therefore must do another pass
@@ -2925,12 +2925,15 @@ static void BuildSupersampleFaceLights( lightinfo_t& l, SSE_SampleInfo_t& info, 
 			// In this case, just use what we already have
 			if ( ambientSupersampleCount > 0 && directSupersampleCount > 0 )
 			{
+				const float directSupersampleInverse = 1.0f / directSupersampleCount;
+				const float ambientSupersampleInverse = 1.0f / ambientSupersampleCount;
+
 				// Add the ambient + directional terms together, stick it back into the lightmap
 				for (int n = 0; n < info.m_NormalCount; ++n)
 				{
 					ppLightSamples[n][i].Zero();
-					ppLightSamples[n][i].AddWeighted( pDirectLight[n],1.0f / directSupersampleCount );
-					ppLightSamples[n][i].AddWeighted( pAmbientLight[n], 1.0f / ambientSupersampleCount );
+					ppLightSamples[n][i].AddWeighted( pDirectLight[n], directSupersampleInverse );
+					ppLightSamples[n][i].AddWeighted( pAmbientLight[n], ambientSupersampleInverse );
 				}
 
 				// Recompute the luxel intensity based on the supersampling
