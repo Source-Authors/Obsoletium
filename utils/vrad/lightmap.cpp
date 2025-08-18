@@ -3176,13 +3176,9 @@ void BuildFacelights (int iThread, int facenum)
 
 void BuildPatchLights( int facenum )
 {
-	int i, k;
-
-	CPatch		*patch;
+	int k;
 
 	dface_t	*f = &g_pFaces[facenum];
-	facelight_t	*fl = &facelight[facenum];
-
 	for( k = 0; k < MAXLIGHTMAPS; k++ )
 	{
 		if (f->styles[k] == 0)
@@ -3191,8 +3187,9 @@ void BuildPatchLights( int facenum )
 
 	if (k >= MAXLIGHTMAPS)
 		return;
-
-	for (i = 0; i < fl->numsamples; i++)
+	
+	facelight_t	*fl = &facelight[facenum];
+	for (int i = 0; i < fl->numsamples; i++)
 	{
 		AddSampleToPatch( &fl->sample[i], fl->light[k][0][i], facenum);
 	}
@@ -3203,10 +3200,10 @@ void BuildPatchLights( int facenum )
 
 	// push up sampled light to parents (children always exist first in the list)
 	CPatch *pNextPatch;
-	for( patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
+	for( CPatch	*patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
 	{
 		// next patch
-		pNextPatch = NULL;
+		pNextPatch = nullptr;
 		if( patch->ndxNext != g_Patches.InvalidIndex() )
 		{
 			pNextPatch = &g_Patches.Element( patch->ndxNext );
@@ -3214,7 +3211,6 @@ void BuildPatchLights( int facenum )
 
 		// skip patches without parents
 		if( patch->parent == g_Patches.InvalidIndex() )
-//		if (patch->parent == -1)
 			continue;
 
 		CPatch *parent = &g_Patches.Element( patch->parent );
@@ -3226,10 +3222,10 @@ void BuildPatchLights( int facenum )
 	// average up the direct light on each patch for radiosity
 	if (numbounce > 0)
 	{
-		for( patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
+		for( CPatch	*patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
 		{
 			// next patch
-			pNextPatch = NULL;
+			pNextPatch = nullptr;
 			if( patch->ndxNext != g_Patches.InvalidIndex() )
 			{
 				pNextPatch = &g_Patches.Element( patch->ndxNext );
@@ -3237,9 +3233,8 @@ void BuildPatchLights( int facenum )
 
 			if (patch->samplearea)
 			{ 
-				float scale;
 				Vector v;
-				scale = 1.0f / patch->samplearea;
+				float scale = 1.0f / patch->samplearea;
 
 				VectorScale( patch->samplelight, scale, v );
 				VectorAdd( patch->totallight.light[0], v, patch->totallight.light[0] );
@@ -3249,10 +3244,10 @@ void BuildPatchLights( int facenum )
 	}
 
 	// pull totallight from children (children always exist first in the list)
-	for( patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
+	for( CPatch	*patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
 	{
 		// next patch
-		pNextPatch = NULL;
+		pNextPatch = nullptr;
 		if( patch->ndxNext != g_Patches.InvalidIndex() )
 		{
 			pNextPatch = &g_Patches.Element( patch->ndxNext );
@@ -3260,15 +3255,11 @@ void BuildPatchLights( int facenum )
 
 		if ( patch->child1 != g_Patches.InvalidIndex() )
 		{
-			float s1, s2;
-			CPatch *child1;
-			CPatch *child2;
+			CPatch *child1 = &g_Patches.Element( patch->child1 );
+			CPatch *child2 = &g_Patches.Element( patch->child2 );
 
-			child1 = &g_Patches.Element( patch->child1 );
-			child2 = &g_Patches.Element( patch->child2 );
-
-			s1 = child1->area / (child1->area + child2->area);
-			s2 = child2->area / (child1->area + child2->area);
+			const float s1 = child1->area / (child1->area + child2->area);
+			const float s2 = child2->area / (child1->area + child2->area);
 
 			VectorScale( child1->totallight.light[0], s1, patch->totallight.light[0] );
 			VectorMA( patch->totallight.light[0], s2, child2->totallight.light[0], patch->totallight.light[0] );
@@ -3277,30 +3268,44 @@ void BuildPatchLights( int facenum )
 		}
 	}
 
-	bool needsBumpmap = false;
-	if( texinfo[f->texinfo].flags & SURF_BUMPLIGHT )
-	{
-		needsBumpmap = true;
-	}
+	const bool needsBumpmap = ( texinfo[f->texinfo].flags & SURF_BUMPLIGHT ) ? true : false;
 
 	// add an ambient term if desired
 	if (ambient[0] || ambient[1] || ambient[2])
 	{
-		for( int j=0; j < MAXLIGHTMAPS && f->styles[j] != 255; j++ )
+		if( needsBumpmap )
 		{
-			if ( f->styles[j] == 0 )
+			for( int j=0; j < MAXLIGHTMAPS && f->styles[j] != 255; j++ )
 			{
-				for (i = 0; i < fl->numsamples; i++)
+				if ( f->styles[j] == 0 )
 				{
-					fl->light[j][0][i].m_vecLighting += ambient;
-					if( needsBumpmap )
+					for (int i = 0; i < fl->numsamples; i++)
 					{
-						fl->light[j][1][i].m_vecLighting += ambient;
-						fl->light[j][2][i].m_vecLighting += ambient;
-						fl->light[j][3][i].m_vecLighting += ambient;
+						auto &light = fl->light[j];
+
+						light[0][i].m_vecLighting += ambient;
+						light[1][i].m_vecLighting += ambient;
+						light[2][i].m_vecLighting += ambient;
+						light[3][i].m_vecLighting += ambient;
 					}
+					break;
 				}
-				break;
+			}
+		}
+		else
+		{
+			for( int j=0; j < MAXLIGHTMAPS && f->styles[j] != 255; j++ )
+			{
+				if ( f->styles[j] == 0 )
+				{
+					for (int i = 0; i < fl->numsamples; i++)
+					{
+						auto &light = fl->light[j];
+
+						light[0][i].m_vecLighting += ambient;
+					}
+					break;
+				}
 			}
 		}
 	}
