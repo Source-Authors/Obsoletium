@@ -24,6 +24,8 @@ enum InputOutputType_t
 	iotVector,
 	iotEHandle,
 	iotColor,
+	// dimhotepus: TF2 backport.
+	iotScript
 };
 
 
