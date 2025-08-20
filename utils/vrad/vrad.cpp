@@ -2489,7 +2489,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			Msg( "--dump-prop-maps: true\n");
 			g_bDumpPropLightmaps = true;
 		}
-		else if (!Q_stricmp(argv[i],"-bounce"))
+		else if (!Q_stricmp(argv[i], "-bounce"))
 		{
 			if ( ++i < argc )
 			{
