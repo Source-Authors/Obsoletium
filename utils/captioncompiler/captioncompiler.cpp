@@ -31,7 +31,9 @@
 
 #include "filesystem.h"
 #include "cmdlib.h"
+
 #include "tools_minidump.h"
+#include "scoped_app_locale.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -151,11 +153,31 @@ class CompileCaptionsApp : public CTier3SteamApp {
       scoped_default_minidumps_;
   const ScopedSpewOutputFunc scoped_spew_output_;
 
+  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+  //
+  // Printf/sscanf functions expect en_US UTF8 localization.
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  static constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+
   bool m_UseLogFile;
 };
 
 bool CompileCaptionsApp::Create() {
   SpewActivate("kvc", 2);
+
+  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+  //
+  // Printf/sscanf functions expect en_US UTF8 localization.
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    Warning("setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
 
   AppSystemInfo_t appSystems[] = {
       {"vgui2" DLL_EXT_STRING, VGUI_IVGUI_INTERFACE_VERSION}, {"", ""}

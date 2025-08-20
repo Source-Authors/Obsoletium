@@ -26,6 +26,7 @@
 #include "filesystem.h"
 #include "../common/tools_minidump.h"
 #include "posix_file_stream.h"
+#include "scoped_app_locale.h"
 
 #include "tier0/memdbgon.h"
 
@@ -59,6 +60,20 @@ int main(int argc, char **argv) {
       scoped_default_minidumps;
 
   const ScopedSpewOutputFunc scoped_spew_output{VTF2TGAOutputFunc};
+
+  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+  //
+  // Printf/sscanf functions expect en_US UTF8 localization.
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
 
   CommandLine()->CreateCmdLine(argc, argv);
   MathLib_Init(2.2f, 2.2f, 0.0f, 1, false, false, false, false);
@@ -217,7 +232,7 @@ int main(int argc, char **argv) {
           }
 
           if (src_frame_count > 1) {
-            char pTemp[4]; //-V112
+            char pTemp[4];  //-V112
             V_sprintf_safe(pTemp, "%03d", frame_no);
             V_strcat(temp_name.get(), pTemp, tga_name_size + 13);
           }
@@ -264,7 +279,7 @@ int main(int argc, char **argv) {
           std::unique_ptr<unsigned char[]> dst_data =
               std::make_unique<unsigned char[]>(ImageLoader::GetMemRequired(
                   mip_width, mip_height, 1, dst_format, false));
-          if (!ImageLoader::ConvertImageFormat(src_data, src_format, //-V1051
+          if (!ImageLoader::ConvertImageFormat(src_data, src_format,  //-V1051
                                                dst_data.get(), dst_format,
                                                mip_width, mip_height, 0, 0)) {
             Error("Error converting '%s' from '%s' to '%s'.\n",

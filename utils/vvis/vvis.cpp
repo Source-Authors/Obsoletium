@@ -23,6 +23,8 @@
 #include "byteswap.h"
 #include "bspflags.h"
 
+#include "scoped_app_locale.h"
+
 #include "winlite.h"
 
 int			g_numportals;
@@ -1258,10 +1260,25 @@ int main (int argc, char **argv)
 {
 	CommandLine()->CreateCmdLine( argc, argv );
 
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );
-
 	InstallSpewFunction();
 	SpewActivate( "developer", 1 );
+	
+	// dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+	//
+	// Printf/sscanf functions expect en_US UTF8 localization.
+	//
+	// Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+	// supports using a UTF-8 code page.
+	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+		Warning("setlocale('%s') failed, current locale is '%s'.\n",
+				kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+	}
+
+	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );
+
 
 #ifdef MPI
 	VVIS_SetupMPI( argc, argv );

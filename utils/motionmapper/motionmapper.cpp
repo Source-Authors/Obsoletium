@@ -26,6 +26,7 @@
 #include "tier1/utlsymbol.h"
 
 #include "tools_minidump.h"
+#include "scoped_app_locale.h"
 
 #include "tier0/memdbgon.h"
 
@@ -530,7 +531,7 @@ int material_to_texture(int material) {
   return -1;
 }
 
-template<intp maxlen>
+template <intp maxlen>
 int lookup_texture(char (&texturename)[maxlen]) {
   int i;
 
@@ -1442,17 +1443,18 @@ void M_ConcatTransforms(const M_matrix4x4_t &in1, const M_matrix4x4_t &in2,
 void M_AngleMatrix(RadianEuler const &angles, const Vector &position,
                    M_matrix4x4_t &matrix) {
   // Assert( s_bMathlibInitialized );
-  DirectX::XMVECTOR vecAngles = DirectX::XMVectorSet( angles[0], angles[1], angles[2], 0 );
+  DirectX::XMVECTOR vecAngles =
+      DirectX::XMVectorSet(angles[0], angles[1], angles[2], 0);
 
   DirectX::XMVECTOR sin, cos;
-  DirectX::XMVectorSinCos( &sin, &cos, vecAngles );
+  DirectX::XMVectorSinCos(&sin, &cos, vecAngles);
 
-  float sx = DirectX::XMVectorGetX( sin );
-  float cx = DirectX::XMVectorGetX( cos );
-  float sy = DirectX::XMVectorGetY( sin );
-  float cy = DirectX::XMVectorGetY( cos );
-  float sz = DirectX::XMVectorGetZ( sin );
-  float cz = DirectX::XMVectorGetZ( cos );
+  float sx = DirectX::XMVectorGetX(sin);
+  float cx = DirectX::XMVectorGetX(cos);
+  float sy = DirectX::XMVectorGetY(sin);
+  float cy = DirectX::XMVectorGetY(cos);
+  float sz = DirectX::XMVectorGetZ(sin);
+  float cz = DirectX::XMVectorGetZ(cos);
 
   // SinCos( angles[0], &sx, &cx ); // 2
   // SinCos( angles[1], &sy, &cy ); // 1
@@ -2802,6 +2804,20 @@ int main(int argc, char **argv) {
 
   // Header
   PrintHeader();
+
+  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+  //
+  // Printf/sscanf functions expect en_US UTF8 localization.
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
 
   // Init command line stuff
   CommandLine()->CreateCmdLine(argc, argv);

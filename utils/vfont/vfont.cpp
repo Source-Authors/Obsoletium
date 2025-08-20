@@ -18,11 +18,13 @@ int Usage() {
 
 int main(int argc, char **argv) {
 #ifdef PLATFORM_64BITS
-  printf("Valve Software - vfont.exe [64 bit] (" __DATE__ ")\n");
+  printf("Valve Software - vfont [64 bit] (" __DATE__ ")\n");
 #else
-  printf("Valve Software - vfont.exe (" __DATE__ ")\n");
+  printf("Valve Software - vfont (" __DATE__ ")\n");
 #endif
 
+  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+  // 
   // Printf/sscanf functions expect en_US UTF8 localization.
   //
   // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
