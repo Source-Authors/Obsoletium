@@ -8,9 +8,12 @@
 #include "tier1/utlbuffer.h"
 #include "valvefont.h"
 
+#include "scoped_app_locale.h"
+#include "posix_file_stream.h"
+
 int Usage() {
   fprintf(stderr, "Usage:   vfont inputfont.ttf [outputfont.vfont]\n");
-  return -1;
+  return EINVAL;
 }
 
 int main(int argc, char **argv) {
@@ -19,6 +22,18 @@ int main(int argc, char **argv) {
 #else
   printf("Valve Software - vfont.exe (" __DATE__ ")\n");
 #endif
+
+  // Printf/sscanf functions expect en_US UTF8 localization.
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
 
   int iArg = 1;
   if (iArg >= argc) return Usage();
@@ -63,24 +78,49 @@ int main(int argc, char **argv) {
     V_strcpy_safe(szOutput, argv[iArg]);
   }
 
-  //
-  //	Read the input
-  //
-  FILE *fin = fopen(szInput, "rb");
-  if (!fin) {
-    fprintf(stderr, "Error: cannot open input file '%s'!\n", szInput);
-    return -2;
-  }
-
-  fseek(fin, 0, SEEK_END);
-  long lSize = ftell(fin);
-  fseek(fin, 0, SEEK_SET);
-
   CUtlBuffer buf;
-  buf.EnsureCapacity(lSize);
-  fread(buf.Base(), 1, lSize, fin);
-  buf.SeekPut(CUtlBuffer::SEEK_HEAD, lSize);
-  fclose(fin);
+
+  {
+    //
+    //	Read the input
+    //
+    auto [fin, errc] =
+        se::posix::posix_file_stream_factory::open(szInput, "rb");
+    if (errc) {
+      fprintf(stderr, "Error: cannot open input file '%s': %s!\n", szInput,
+              errc.message().c_str());
+      return errc.value();
+    }
+
+    std::int64_t lSize;
+    std::tie(lSize, errc) = fin.size();
+    if (errc) {
+      fprintf(stderr, "Error: cannot get input file '%s' size: %s!\n", szInput,
+              errc.message().c_str());
+      return errc.value();
+    }
+    if (lSize > std::numeric_limits<intp>::max()) {
+      fprintf(
+          stderr,
+          "Error: input file '%s' size %lld is too large. Max supported size "
+          "is %zd!\n",
+          szInput, lSize, std::numeric_limits<intp>::max());
+      return errc.value();
+    }
+
+    const intp readSize = static_cast<intp>(lSize);
+    buf.EnsureCapacity(readSize);
+
+    std::tie(std::ignore, errc) = fin.read(buf.Base(), 1, readSize, readSize);
+    if (errc) {
+      fprintf(stderr,
+              "Error: cannot read %zd bytes from input file '%s': %s!\n",
+              readSize, szInput, errc.message().c_str());
+      return errc.value();
+    }
+
+    buf.SeekPut(CUtlBuffer::SEEK_HEAD, readSize);
+  }
 
   //
   //	Compile
@@ -98,17 +138,28 @@ int main(int argc, char **argv) {
   ValveFont::EncodeFont(buf);
 #endif
 
-  //
-  //	Write the output
-  //
-  FILE *fout = fopen(szOutput, "wb");
-  if (!fout) {
-    fprintf(stderr, "Error: cannot open output file '%s'!\n", szOutput);
-    return -3;
-  }
+  {
+    //
+    //	Write the output
+    //
+    auto [fout, errc] =
+        se::posix::posix_file_stream_factory::open(szOutput, "wb");
+    if (errc) {
+      fprintf(stderr, "Error: cannot open output file '%s': %s!\n", szOutput,
+              errc.message().c_str());
+      return errc.value();
+    }
 
-  fwrite(buf.Base(), 1, buf.TellPut(), fout);
-  fclose(fout);
+    const intp writeSize = buf.TellPut();
+
+    std::tie(std::ignore, errc) = fout.write(buf.Base(), 1, writeSize);
+    if (errc) {
+      fprintf(stderr,
+              "Error: cannot write %zd bytes to output file '%s': %s!\n",
+              writeSize, szOutput, errc.message().c_str());
+      return errc.value();
+    }
+  }
 
   printf("vfont successfully %scompiled '%s' as '%s'.\n",
 #if VFONT_DECOMPILER
