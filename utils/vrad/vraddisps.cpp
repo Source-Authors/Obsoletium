@@ -162,7 +162,8 @@ private:
 											radial_t *pRadial, int ndxRadial, bool bBump,
 											CUtlVector<CPatch*> &interestingPatches );
 
-	bool IsNeighbor( int iDispFace, int iNeighborFace );
+	// dimhotepus: Add large sample radius support. CS:GO
+	bool IsNeighbor( int iDispFace, int iNeighborFace, bool bCheck2ndDegreeNeighbors = false );
 
 	void GetInterestingPatchesForLuxels( 
 		int ndxFace,
@@ -898,7 +899,8 @@ void AddSampleLightToRadial( Vector const &samplePos, Vector const &sampleNormal
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CVRadDispMgr::IsNeighbor( int iFace, int iNeighborFace )
+// dimhotepus: Add large sample radius support. CS:GO
+bool CVRadDispMgr::IsNeighbor( int iFace, int iNeighborFace, bool bCheck2ndDegreeNeighbors )
 {
 	if ( iFace == iNeighborFace )
 		return true;
@@ -908,6 +910,20 @@ bool CVRadDispMgr::IsNeighbor( int iFace, int iNeighborFace )
 	{
 		if ( pFaceNeighbor->neighbor[iNeighbor] == iNeighborFace )
 			return true;
+	}
+
+	// dimhotepus: Add large sample radius support. CS:GO
+	if ( bCheck2ndDegreeNeighbors )
+	{
+		for ( int iNeighbor = 0; iNeighbor < pFaceNeighbor->numneighbors; iNeighbor++ )
+		{
+			faceneighbor_t *pFaceNeighbor2 = &faceneighbor[ pFaceNeighbor->neighbor[ iNeighbor ] ];
+			for ( int iNeighbor2 = 0; iNeighbor2 < pFaceNeighbor2->numneighbors; iNeighbor2++ )
+			{
+				if ( pFaceNeighbor2->neighbor[ iNeighbor2 ] == iNeighborFace )
+					return true;
+			}
+		}
 	}
 
 	return false;
@@ -1332,7 +1348,8 @@ void CVRadDispMgr::GetInterestingPatchesForLuxels(
 						{
 							pPatch->m_IterationKey = curIterationKey;
 							
-							if ( IsNeighbor( ndxFace, pPatch->faceNumber ) )
+							// dimhotepus: Add large sample radius support. CS:GO
+							if ( IsNeighbor( ndxFace, pPatch->faceNumber, g_bLargeDispSampleRadius ) )
 							{
 								interestingPatches.AddToTail( pPatch );
 							}

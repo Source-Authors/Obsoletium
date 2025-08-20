@@ -5932,7 +5932,8 @@ void CMapDoc::OnFileRunmap(void)
 	if ((dlg.m_iLight) && (m_pGame->szLIGHT[0] != '\0'))
 	{
 		V_strcpy_safe(cmd.szRun, "$light_exe");
-		V_sprintf_safe(cmd.szParms, "%s -game $gamedir %s$path\\$file", dlg.m_bHDRLight ? "-both" : "", dlg.m_iLight == 2 ? "-noextra " : "" );
+		// dimhotepus: As we have fixed -LargeDispSampleRadius applciation for VRAD, set it by default as it work before.
+		V_sprintf_safe(cmd.szParms, "%s -game $gamedir -LargeDispSampleRadius %s$path\\$file", dlg.m_bHDRLight ? "-both" : "", dlg.m_iLight == 2 ? "-noextra " : "" );
 		cmds.Add(cmd);
 	}
 
