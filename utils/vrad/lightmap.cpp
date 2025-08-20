@@ -1049,17 +1049,39 @@ int LightForKey (entity_t *ent, char *key, Vector& intensity )
 	return LightForString( pLight, intensity );
 }
 
+// dimhotepus: Dispatch vec_t type.
+using vector_type_t = std::conditional_t<
+	std::is_same_v<float, vec_t>,
+	float,
+	std::conditional_t<
+		std::is_same_v<double, vec_t>,
+		double,
+		void
+	>
+>;
+
+static constexpr const char* GetLight8FormatSpecifier() {
+	if constexpr (std::is_same_v<float, vector_type_t>)
+		return "%f %f %f %f %f %f %f %f";
+
+	if constexpr (std::is_same_v<double, vector_type_t>)
+		return "%lf %lf %lf %lf %lf %lf %lf %lf";
+
+	return "";
+};
+
 int LightForString( const char *pLight, Vector& intensity )
 {
-	double r, g, b, scaler;
-	int argCnt;
+	vector_type_t r, g, b, scaler;
 
 	VectorFill( intensity, 0 );
 
 	// scanf into doubles, then assign, so it is vec_t size independent
 	r = g = b = scaler = 0;
-	double r_hdr,g_hdr,b_hdr,scaler_hdr;
-	argCnt = sscanf ( pLight, "%lf %lf %lf %lf %lf %lf %lf %lf", 
+	// dimhotepus: Strongly-typed light types.
+	constexpr auto format = GetLight8FormatSpecifier();
+	vector_type_t r_hdr,g_hdr,b_hdr,scaler_hdr;
+	int argCnt = sscanf ( pLight, format, 
 					  &r, &g, &b, &scaler, &r_hdr,&g_hdr,&b_hdr,&scaler_hdr );
 
 	if (argCnt==8) 											// 2 4-tuples
