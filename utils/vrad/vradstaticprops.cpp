@@ -1187,6 +1187,8 @@ void ComputeDirectLightingAtPoint( Vector &position, Vector &normal, Vector &out
 		Vector adjusted_pos = position;
 		float flEpsilon = 0.0;
 
+		constexpr float flFudgeFactor = 4.0f;
+
 		if  (dl->light.type != emit_skyambient)
 		{
 			// push towards the light
@@ -1198,13 +1200,13 @@ void ComputeDirectLightingAtPoint( Vector &position, Vector &normal, Vector &out
 				fudge = dl->light.origin-position;
 				VectorNormalize( fudge );
 			}
-			fudge *= 4.0;
+			fudge *= flFudgeFactor;
 			adjusted_pos += fudge;
 		}
 		else 
 		{
 			// push out along normal
-			adjusted_pos += 4.0 * normal;
+			adjusted_pos += flFudgeFactor * normal;
 //			flEpsilon = 1.0;
 		}
 
