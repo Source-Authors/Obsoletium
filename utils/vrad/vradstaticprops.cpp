@@ -1519,7 +1519,7 @@ void CVradStaticPropMgr::ComputeLighting( CStaticProp &prop, int iThread, int pr
 }
 
 //-----------------------------------------------------------------------------
-// Write the lighitng to bsp pak lump
+// Write the lighting to bsp pak lump
 //-----------------------------------------------------------------------------
 void CVradStaticPropMgr::SerializeLighting()
 {
