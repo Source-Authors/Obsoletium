@@ -1345,16 +1345,18 @@ void CSentence::SetTextFromWords( void )
 #if PHONEME_EDITOR
 	char fulltext[ 1024 ];
 	fulltext[ 0 ] = '\0';
-	for ( intp i = 0 ; i < m_Words.Count(); i++ )
-	{
-		CWordTag *word = m_Words[ i ];
 
-		Q_strncat( fulltext, word->GetWord(), sizeof( fulltext ), COPY_ALL_CHARACTERS );
+	intp i = 0;
+	for ( auto *word : m_Words )
+	{
+		V_strcat_safe( fulltext, word->GetWord() );
 
 		if ( i != m_Words.Count() )
 		{
-			Q_strncat( fulltext, " ", sizeof( fulltext ), COPY_ALL_CHARACTERS );
+			V_strcat_safe( fulltext, " " );
 		}
+
+		++i;
 	}
 
 	SetText( fulltext );
