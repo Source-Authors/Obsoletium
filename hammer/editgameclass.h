@@ -211,16 +211,7 @@ void CEditGameClass::SetComments(const char *pszComments)
 
 	if (pszComments != NULL)
 	{
-		int nLen = strlen(pszComments);
-		if (nLen == 0)
-		{
-			m_pszComments = NULL;
-		}
-		else
-		{
-			m_pszComments = new char [nLen + 1];
-			strcpy(m_pszComments, pszComments);
-		}
+		m_pszComments = Q_isempty( pszComments ) ? NULL : V_strdup( pszComments );
 	}
 	else
 	{

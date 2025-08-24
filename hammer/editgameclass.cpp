@@ -400,7 +400,7 @@ void CEditGameClass::ImportAngle(int nAngle)
 void CEditGameClass::SetAngles(const QAngle &vecAngles)
 {
 	char szAngles[80];	
-	sprintf(szAngles, "%g %g %g", (double)vecAngles[PITCH], (double)vecAngles[YAW], (double)vecAngles[ROLL]);
+	V_sprintf_safe(szAngles, "%g %g %g", (double)vecAngles[PITCH], (double)vecAngles[YAW], (double)vecAngles[ROLL]);
 	SetKeyValue("angles", szAngles);
 }
 

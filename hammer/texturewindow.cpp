@@ -361,7 +361,7 @@ void CTextureWindow::SetNameFilter(LPCTSTR pszFilter)
 	}
 
 	// set filter
-	strcpy(m_szFilter, pszFilter);
+	V_strcpy_safe(m_szFilter, pszFilter);
 	strupr(m_szFilter);
 
 	// delimit the filter
@@ -400,7 +400,7 @@ void CTextureWindow::SetKeywords(LPCTSTR pszKeywords)
 	}
 
 	// set keyword filter
-	strcpy(m_szKeywords, pszKeywords);
+	V_strcpy_safe(m_szKeywords, pszKeywords);
 	strupr(m_szKeywords);
 
 	// delimit the filter
