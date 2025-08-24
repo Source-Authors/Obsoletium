@@ -1351,7 +1351,8 @@ void CSentence::SetTextFromWords( void )
 	{
 		V_strcat_safe( fulltext, word->GetWord() );
 
-		if ( i != m_Words.Count() )
+		// dimhptepus: Correctly append " " between words, but not after last one.
+		if ( i != m_Words.Count() - 1 )
 		{
 			V_strcat_safe( fulltext, " " );
 		}
