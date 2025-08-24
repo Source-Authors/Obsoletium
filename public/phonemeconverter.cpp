@@ -11,13 +11,14 @@
 struct PhonemeMap_t
 {
 	const char		*string;
-	int				code;
+	// dimhotepus: int -> unsigned short.
+	unsigned short	code;
 	float			weight;
 	bool			isStandard;
 	const char		*desc;
 };
 
-static PhonemeMap_t g_Phonemes[] =
+static constexpr PhonemeMap_t g_Phonemes[] =
 {
 	{ "b", 'b', 0.8f, true, "Big : voiced alveolar stop" },
 	{ "m", 'm', 1.0f, true, "Mat : voiced bilabial nasal" },
@@ -101,7 +102,8 @@ const char *ConvertPhoneme( int code )
 // Input  : *text - 
 // Output : int
 //-----------------------------------------------------------------------------
-int TextToPhoneme( const char *text )
+// dimhotepus: int -> unsigned short.
+unsigned short TextToPhoneme( const char *text )
 {
 	for ( auto &&p : g_Phonemes )
 	{
@@ -167,7 +169,7 @@ int TextToPhonemeIndex( const char *text )
 {
 	for ( int i = 0; i < static_cast<int>(std::size( g_Phonemes )); ++i )
 	{
-		PhonemeMap_t *test = &g_Phonemes[ i ];
+		const PhonemeMap_t *test = &g_Phonemes[ i ];
 		if ( !stricmp( test->string, text ) )
 			return i;
 	}
