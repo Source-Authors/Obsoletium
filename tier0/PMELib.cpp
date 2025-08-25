@@ -354,7 +354,7 @@ extern int64 QueryCurrentCpuFrequency();
 
 double PME::GetCPUClockSpeedFast(void)
 {
-	return QueryCurrentCpuFrequency();
+	return static_cast<double>( QueryCurrentCpuFrequency() );
 }
 
 
