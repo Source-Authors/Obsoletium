@@ -26,6 +26,25 @@ public:
 void RecvProxy_UtlVectorLength( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
 	CRecvPropExtra_UtlVector *pExtra = (CRecvPropExtra_UtlVector*)pData->m_pRecvProp->GetExtraData();
+	// dimhotepus: Prevent overflows. TF2 backport.
+	if ( pData->m_Value.m_Int < 0 || pData->m_Value.m_Int >= pExtra->m_nMaxElements )
+	{
+		// If this happens we're most likely talking to a malicious server.
+		// Protect against remote code execution by crashing ourselves.
+		// A malicious server can send an invalid lengthprop attribute and cause the below code
+		// to "successfully" resize the vector to -1, which eventually translates into a call to realloc(0)
+		// due to integer math overflow.
+		// Then the remaining payload ( the actual elements of the vector ) can be used
+		// to write arbitrary data to out of bounds memory.
+		// There isn't much we can do at this point - we're deep in the networking stack, it's hard to recover
+		// gracefully and we shouldn't be talking to this server anymore.
+		//
+		// So we notify client.
+		Error("Server send utlvector length value %d which is not in range [%d...%d). Crashing client to prevent RCE...\n",
+			pData->m_Value.m_Int, 0, pExtra->m_nMaxElements);
+		// And crash.
+		*(int *) 1 = 2;
+	}
 	pExtra->m_ResizeFn( pStruct, pExtra->m_Offset, pData->m_Value.m_Int );
 }
 
