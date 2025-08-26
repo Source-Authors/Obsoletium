@@ -286,7 +286,7 @@ public:
 	void AddAllLocks( Vector pos[], Quaternion q[] );
 	void SolveAllLocks( Vector pos[], Quaternion q[] );
 
-	void SolveLock( const mstudioiklock_t *plock, int i, Vector pos[], Quaternion q[], matrix3x4_t boneToWorld[], CBoneBitList &boneComputed );
+	void SolveLock( const mstudioiklock_t *plock, intp i, Vector pos[], Quaternion q[], matrix3x4_t boneToWorld[], CBoneBitList &boneComputed );
 
 	CUtlVectorFixed< CIKTarget, 12 >	m_target;
 
@@ -353,7 +353,7 @@ float Studio_GetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 float Studio_SetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, float flValue, float &ctlValue );
 
 // converts a global 0..1 pose parameter into the local sequences blending value
-void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, int iSequence, int iLocalIndex, float &flSetting, int &index );
+void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, intp iSequence, int iLocalIndex, float &flSetting, int &index );
 
 void Studio_SeqAnims( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[], mstudioanimdesc_t *panim[4], float *weight );
 int Studio_MaxFrame( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
@@ -367,9 +367,9 @@ float Studio_Duration( const CStudioHdr *pStudioHdr, intp iSequence, const float
 //void Studio_AnimVelocity( mstudioanimdesc_t *panim, float flCycle, Vector &vecVelocity );
 //float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist );
 bool Studio_AnimMovement( mstudioanimdesc_t *panim, float flCycleFrom, float flCycleTo, Vector &deltaPos, QAngle &deltaAngle );
-bool Studio_SeqMovement( const CStudioHdr *pStudioHdr, int iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector &deltaMovement, QAngle &deltaAngle );
-bool Studio_SeqVelocity( const CStudioHdr *pStudioHdr, int iSequence, float flCycle, const float poseParameter[], Vector &vecVelocity );
-float Studio_FindSeqDistance( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], float flDist );
+bool Studio_SeqMovement( const CStudioHdr *pStudioHdr, intp iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector &deltaMovement, QAngle &deltaAngle );
+bool Studio_SeqVelocity( const CStudioHdr *pStudioHdr, intp iSequence, float flCycle, const float poseParameter[], Vector &vecVelocity );
+float Studio_FindSeqDistance( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[], float flDist );
 int Studio_FindAttachment( const CStudioHdr *pStudioHdr, const char *pAttachmentName );
 int Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAttachmentName );
 int Studio_BoneIndexByName( const CStudioHdr *pStudioHdr, const char *pName );
@@ -438,7 +438,7 @@ bool TraceToStudio( class IPhysicsSurfaceProps *pProps, const Ray_t& ray, CStudi
 void QuaternionSM( float s, const Quaternion &p, const Quaternion &q, Quaternion &qt );
 void QuaternionMA( const Quaternion &p, float s, const Quaternion &q, Quaternion &qt );
 
-bool Studio_PrefetchSequence( const CStudioHdr *pStudioHdr, int iSequence );
+bool Studio_PrefetchSequence( const CStudioHdr *pStudioHdr, intp iSequence );
 
 void Studio_RunBoneFlexDrivers( float *pFlexController, const CStudioHdr *pStudioHdr, const Vector *pPositions, const matrix3x4_t *pBoneToWorld, const matrix3x4_t &mRootToWorld );
 
