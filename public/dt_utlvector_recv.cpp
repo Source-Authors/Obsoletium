@@ -27,7 +27,7 @@ void RecvProxy_UtlVectorLength( const CRecvProxyData *pData, void *pStruct, void
 {
 	CRecvPropExtra_UtlVector *pExtra = (CRecvPropExtra_UtlVector*)pData->m_pRecvProp->GetExtraData();
 	// dimhotepus: Prevent overflows. TF2 backport.
-	if ( pData->m_Value.m_Int < 0 || pData->m_Value.m_Int >= pExtra->m_nMaxElements )
+	if ( pData->m_Value.m_Int < 0 || pData->m_Value.m_Int > pExtra->m_nMaxElements )
 	{
 		// If this happens we're most likely talking to a malicious server.
 		// Protect against remote code execution by crashing ourselves.
@@ -40,7 +40,7 @@ void RecvProxy_UtlVectorLength( const CRecvProxyData *pData, void *pStruct, void
 		// gracefully and we shouldn't be talking to this server anymore.
 		//
 		// So we notify client.
-		Error("Server send utlvector length value %d which is not in range [%d...%d). Crashing client to prevent RCE...\n",
+		Error("Server send utlvector length value %d which is not in range [%d...%d]. Crashing client to prevent RCE...\n",
 			pData->m_Value.m_Int, 0, pExtra->m_nMaxElements);
 		// And crash.
 		*(int *) 1 = 2;
