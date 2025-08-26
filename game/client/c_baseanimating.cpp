@@ -756,7 +756,7 @@ C_BaseAnimating::C_BaseAnimating() :
 //-----------------------------------------------------------------------------
 C_BaseAnimating::~C_BaseAnimating()
 {
-	int i = g_PreviousBoneSetups.Find( this );
+	intp i = g_PreviousBoneSetups.Find( this );
 	if ( i != -1 )
 		g_PreviousBoneSetups.FastRemove( i );
 
@@ -1127,8 +1127,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 
 	m_iv_flPoseParameter.SetMaxCount( hdr->GetNumPoseParameters() );
 	
-	int i;
-	for ( i = 0; i < hdr->GetNumPoseParameters() ; i++ )
+	for ( intp i = 0; i < hdr->GetNumPoseParameters() ; i++ )
 	{
 		const mstudioposeparamdesc_t &Pose = hdr->pPoseParameter( i );
 		m_iv_flPoseParameter.SetLooping( Pose.loop != 0.0f, i );
@@ -1145,7 +1144,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 
 	m_iv_flEncodedController.SetMaxCount( boneControllerCount );
 
-	for ( i = 0; i < boneControllerCount ; i++ )
+	for ( int i = 0; i < boneControllerCount ; i++ )
 	{
 		bool loop = (hdr->pBonecontroller( i )->type & (STUDIO_XR | STUDIO_YR | STUDIO_ZR)) != 0;
 		m_iv_flEncodedController.SetLooping( loop, i );
@@ -1867,7 +1866,7 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 
 
 	// process previous sequences
-	for (int i = m_SequenceTransitioner.m_animationQueue.Count() - 2; i >= 0; i--)
+	for (intp i = m_SequenceTransitioner.m_animationQueue.Count() - 2; i >= 0; i--)
 	{
 		C_AnimationLayer *blend = &m_SequenceTransitioner.m_animationQueue[i];
 
@@ -2420,11 +2419,11 @@ void C_BaseAnimating::UpdateIKLocks( float currentTime )
 	if (!m_pIk) 
 		return;
 
-	int targetCount = m_pIk->m_target.Count();
+	intp targetCount = m_pIk->m_target.Count();
 	if ( targetCount == 0 )
 		return;
 
-	for (int i = 0; i < targetCount; i++)
+	for (intp i = 0; i < targetCount; i++)
 	{
 		CIKTarget *pTarget = &m_pIk->m_target[i];
 
@@ -2451,7 +2450,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	if (!m_pIk) 
 		return;
 
-	int targetCount = m_pIk->m_target.Count();
+	intp targetCount = m_pIk->m_target.Count();
 	if ( targetCount == 0 )
 		return;
 
@@ -2473,7 +2472,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	float minHeight = FLT_MAX;
 	float maxHeight = -FLT_MAX;
 
-	for (int i = 0; i < targetCount; i++)
+	for (intp i = 0; i < targetCount; i++)
 	{
 		trace_t trace;
 		CIKTarget *pTarget = &m_pIk->m_target[i];
@@ -2717,12 +2716,12 @@ void C_BaseAnimating::ControlMouth( CStudioHdr *pstudiohdr )
 
 	if ( index_ != -1 )
 	{
-		float value = GetMouth()->mouthopen / 64.0;
+		float value = GetMouth()->mouthopen / 64.0f;
 
 		float raw = value;
 
-		if ( value > 1.0 )  
-			 value = 1.0;
+		if ( value > 1.0f )  
+			 value = 1.0f;
 
 		float start, end;
 		GetPoseParameterRange( index_, start, end );
@@ -2787,7 +2786,7 @@ void C_BaseAnimating::ThreadedBoneSetup()
 	g_bDoThreadedBoneSetup = cl_threaded_bone_setup.GetBool();
 	if ( g_bDoThreadedBoneSetup )
 	{
-		int nCount = g_PreviousBoneSetups.Count();
+		intp nCount = g_PreviousBoneSetups.Count();
 		if ( nCount > 1 )
 		{
 			g_bInThreadedBoneSetup = true;
@@ -2901,7 +2900,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 #endif
 	}
 
-	int nBoneCount = m_CachedBoneData.Count();
+	intp nBoneCount = m_CachedBoneData.Count();
 	if ( g_bDoThreadedBoneSetup && !g_bInThreadedBoneSetup && ( nBoneCount >= 16 ) && !GetMoveParent() && m_iMostRecentBoneSetupRequest != g_iPreviousBoneCounter )
 	{
 		m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter;
@@ -3135,7 +3134,7 @@ void C_BaseAnimating::PopBoneAccess( char const *tagPop )
 
 	// Validate that pop matches the push
 	Assert( ( g_BoneAcessBase.tag == tagPop ) || ( g_BoneAcessBase.tag && g_BoneAcessBase.tag != ( char const * ) 1 && tagPop && tagPop != ( char const * ) 1 && !strcmp( g_BoneAcessBase.tag, tagPop ) ) );
-	int lastIndex = g_BoneAccessStack.Count() - 1;
+	intp lastIndex = g_BoneAccessStack.Count() - 1;
 	if ( lastIndex < 0 )
 	{
 		AssertMsg( false, "C_BaseAnimating::PopBoneAccess:  Stack is empty!!!" );
@@ -3592,7 +3591,7 @@ void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
 		return;
 
 	// If we don't have any sequences, don't do anything
-	int nStudioNumSeq = pStudioHdr->GetNumSeq();
+	intp nStudioNumSeq = pStudioHdr->GetNumSeq();
 	if ( nStudioNumSeq < 1 )
 	{
 		Warning( "%s[%d]: no sequences?\n", GetDebugName(), entindex() );
@@ -3604,7 +3603,7 @@ void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
 	if ( nSeqNum >= nStudioNumSeq )
 	{
 		// This can happen e.g. while reloading Heavy's shotgun, switch to the minigun.
-		Warning( "%s[%d]: Playing sequence %d but there's only %d in total?\n", GetDebugName(), entindex(), nSeqNum, nStudioNumSeq );
+		Warning( "%s[%d]: Playing sequence %d but there's only %zd in total?\n", GetDebugName(), entindex(), nSeqNum, nStudioNumSeq );
 		return;
 	}
 
