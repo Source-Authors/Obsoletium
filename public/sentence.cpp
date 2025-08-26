@@ -175,13 +175,10 @@ void CWordTag::SetWord( const char *word )
 {
 	delete[] m_pszWord;
 	m_pszWord = NULL;
-	if ( !word || !word[ 0 ] )
+	if ( Q_isempty( word ) )
 		return;
 
-	size_t len = strlen( word ) + 1;
-	m_pszWord = new char[ len ];
-	Assert( m_pszWord );
-	Q_strncpy( m_pszWord, word, len );
+	m_pszWord = V_strdup( word );
 }
 
 //-----------------------------------------------------------------------------
@@ -550,7 +547,8 @@ void CSentence::ParseEmphasis( CUtlBuffer& buf )
 	}
 }
 
-// This is obsolete, so it doesn't do anything with the data which is parsed.
+// This is obsolete, so it doesn't do anything with the data which is parsed, but is needed to advance the correct
+// amount in the stream.
 void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 {
 	char token[ 4096 ];
@@ -583,10 +581,10 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 			char cc_stream[ 4096 ];
 			int cc_length;
 
-			memset( cc_stream, 0, sizeof( cc_stream ) );
+			BitwiseClear( cc_stream );
 
 			buf.GetString( token );
-			Q_strncpy( cc_type, token, sizeof( cc_type ) );
+			V_strcpy_safe( cc_type, token );
 
 			bool unicode = false;
 			if ( !stricmp( cc_type, "unicode" ) )
@@ -600,7 +598,14 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 
 			buf.GetString( token );
 			cc_length = atoi( token );
-			Assert( cc_length >= 0 && cc_length < ssize( cc_stream ) );
+			// dimhotepus: Ensure no out of buffer access. TF2 backport.
+			if ( cc_length < 0 || cc_length >= ssize( cc_stream ) )
+			{
+				Warning( "Invalid CloseCaption data - segment length %d is out of bounds\n", cc_length );
+				AssertMsg( false, "Invalid CloseCaption data" );
+				break;
+			}
+
 			// Skip space
 			(void)buf.GetChar();
 			buf.Get( cc_stream, cc_length );
