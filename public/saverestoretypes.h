@@ -102,7 +102,8 @@ struct levellist_t
 
 struct EHandlePlaceholder_t // Engine does some of the game writing (alas, probably shouldn't), but can't see ehandle.h
 {
-	unsigned long i;
+	// dimhotepus: unsigned long -> uint32. TF2 backport.
+	uint32 i;
 };
 
 //-------------------------------------
