@@ -85,7 +85,7 @@ int CRegistry::ReadInt( const char *pKeyBase, const char *pKey, int defaultValue
 {
 	intp nLen = V_strlen( pKeyBase );
 	intp nKeyLen = V_strlen( pKey );
-	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
+	char *pFullKey = stackallocT( char, nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	return ReadInt( pFullKey, defaultValue );
 }
@@ -94,7 +94,7 @@ void CRegistry::WriteInt( const char *pKeyBase, const char *pKey, int value )
 {
 	intp nLen = V_strlen( pKeyBase );
 	intp nKeyLen = V_strlen( pKey );
-	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
+	char *pFullKey = stackallocT( char, nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	WriteInt( pFullKey, value );
 }
@@ -103,7 +103,7 @@ const char *CRegistry::ReadString( const char *pKeyBase, const char *pKey, const
 {
 	intp nLen = V_strlen( pKeyBase );
 	intp nKeyLen = V_strlen( pKey );
-	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
+	char *pFullKey = stackallocT( char, nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	return ReadString( pFullKey, defaultValue );
 }
@@ -112,7 +112,7 @@ void CRegistry::WriteString( const char *pKeyBase, const char *pKey, const char 
 {
 	intp nLen = V_strlen( pKeyBase );
 	intp nKeyLen = V_strlen( pKey );
-	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
+	char *pFullKey = stackallocT( char, nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	WriteString( pFullKey, value );
 }
