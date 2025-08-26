@@ -338,7 +338,8 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	
 	if ( FStrEq( szKeyName, "renderamt" ) )
 	{
-		SetRenderColorA( atoi( szValue ) );
+		// dimhotepus: atoi -> strtoull.
+		SetRenderColorA( static_cast<byte>(strtoul( szValue, nullptr, 10 )) );
 		return true;
 	}
 
