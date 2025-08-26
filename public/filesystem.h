@@ -143,7 +143,7 @@ enum DVDMode_t
 {
 	DVDMODE_OFF    = 0, // not using dvd
 	DVDMODE_STRICT = 1, // dvd device only
-	DVDMODE_DEV    = 2, // dev mode, mutiple devices ok
+	DVDMODE_DEV    = 2, // dev mode, multiple devices ok
 };
 
 // In non-retail builds, enable the file blocking access tracking stuff...
@@ -732,7 +732,7 @@ public:
 	virtual void AsyncRemoveFetcher( IAsyncFileFetch *pFetcher ) = 0;
 
 	//------------------------------------
-	// Functions to hold a file open if planning on doing mutiple reads. Use is optional,
+	// Functions to hold a file open if planning on doing multiple reads. Use is optional,
 	// and is taken only as a hint
 	//------------------------------------
 	virtual FSAsyncStatus_t	AsyncBeginRead( const char *pszFile, FSAsyncFile_t *phFile ) = 0;
@@ -1002,7 +1002,7 @@ inline unsigned IFileSystem::GetOptimalReadSize( FileHandle_t hFile, unsigned nL
 // Async memory tracking
 //-----------------------------------------------------------------------------
 
-#if defined(_DEBUG) || defined(USE_MEM_DEBUG)
+#if defined(USE_MEM_DEBUG)
 #define AsyncRead( a, b ) AsyncReadCreditAlloc( a, __FILE__, __LINE__, b )
 #define AsyncReadMutiple( a, b, c ) AsyncReadMultipleCreditAlloc( a, b, __FILE__, __LINE__, c )
 #endif

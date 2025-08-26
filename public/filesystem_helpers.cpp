@@ -28,13 +28,17 @@ static void InitializeCharacterSets()
 
 const char* ParseFileInternal( const char* pFileBytes, OUT_Z_CAP(nMaxTokenLen) char* pTokenOut, bool* pWasQuoted, characterset_t *pCharSet, size_t nMaxTokenLen )
 {
-	pTokenOut[0] = 0;
+	pTokenOut[0] = '\0';
 
 	if (pWasQuoted)
 		*pWasQuoted = false;
 
 	if (!pFileBytes)
-		return 0;
+		return nullptr;
+
+	// dimhotepus: TF2 backport.
+	if ( nMaxTokenLen <= 1 )
+		return nullptr;
 
 	InitializeCharacterSets();
 
@@ -51,7 +55,7 @@ skipwhite:
 	while ( (c = *pFileBytes) <= ' ')
 	{
 		if (c == 0)
-			return 0;                    // end of file;
+			return nullptr;                    // end of file;
 		pFileBytes++;
 	}
 	
@@ -96,11 +100,19 @@ skipwhite:
 			c = *pFileBytes++;
 			if (c=='\"' || !c)
 			{
-				pTokenOut[len] = 0;
+				pTokenOut[len] = '\0';
 				return pFileBytes;
 			}
 			pTokenOut[len] = c;
-			len += ( len < nMaxTokenLen-1 ) ? 1 : 0;
+			len++;
+			
+			// dimhotepus: TF2: Ensure buffer length is not overrunning!
+			if ( len == nMaxTokenLen - 1 )
+			{
+				pTokenOut[len] = '\0';
+				Assert(0);
+				return pFileBytes;
+			}
 		}
 	}
 
@@ -109,7 +121,7 @@ skipwhite:
 	{
 		pTokenOut[len] = c;
 		len += ( len < nMaxTokenLen-1 ) ? 1 : 0;
-		pTokenOut[len] = 0;
+		pTokenOut[len] = '\0';
 		return pFileBytes+1;
 	}
 
@@ -118,12 +130,21 @@ skipwhite:
 	{
 		pTokenOut[len] = c;
 		pFileBytes++;
-		len += ( len < nMaxTokenLen-1 ) ? 1 : 0;
+		len++;
+		
+		// dimhotepus: TF2: Ensure buffer length is not overrunning!
+		if ( len == nMaxTokenLen - 1 )
+		{
+			pTokenOut[len] = '\0';
+			Assert(0);
+			return pFileBytes;
+		}
+
 		c = *pFileBytes;
 		if ( IN_CHARACTERSET( breaks, c ) )
 			break;
 	} while (c>32);
 	
-	pTokenOut[len] = 0;
+	pTokenOut[len] = '\0';
 	return pFileBytes;
 }
