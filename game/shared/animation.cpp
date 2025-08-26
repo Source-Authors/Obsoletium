@@ -509,7 +509,7 @@ int LookupSequence( CStudioHdr *pstudiohdr, const char *label )
 	return ACT_INVALID;
 }
 
-void GetSequenceLinearMotion( CStudioHdr *pstudiohdr, int iSequence, const float poseParameter[], Vector *pVec )
+void GetSequenceLinearMotion( CStudioHdr *pstudiohdr, intp iSequence, const float poseParameter[], Vector *pVec )
 {
 	if ( !pstudiohdr)
 	{
@@ -525,7 +525,7 @@ void GetSequenceLinearMotion( CStudioHdr *pstudiohdr, int iSequence, const float
 		// Don't spam on bogus model
 		if ( pstudiohdr->GetNumSeq() > 0 )
 		{
-			ExecuteNTimes( 20, Msg( "Bad sequence (%i out of %i max) in GetSequenceLinearMotion() for model '%s'!\n", iSequence, pstudiohdr->GetNumSeq(), pstudiohdr->pszName() ) );
+			ExecuteNTimes( 20, Msg( "Bad sequence (%zd out of %zd max) in GetSequenceLinearMotion() for model '%s'!\n", iSequence, pstudiohdr->GetNumSeq(), pstudiohdr->pszName() ) );
 		}
 		pVec->Init();
 		return;
@@ -551,7 +551,7 @@ const char *GetSequenceName( CStudioHdr *pstudiohdr, int iSequence )
 	return seqdesc.pszLabel();
 }
 
-const char *GetSequenceActivityName( CStudioHdr *pstudiohdr, int iSequence )
+const char *GetSequenceActivityName( CStudioHdr *pstudiohdr, intp iSequence )
 {
 	if( !pstudiohdr || iSequence < 0 || iSequence >= pstudiohdr->GetNumSeq() )
 	{

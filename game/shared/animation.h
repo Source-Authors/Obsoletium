@@ -32,10 +32,10 @@ int LookupActivity( CStudioHdr *pstudiohdr, const char *label );
 int LookupSequence( CStudioHdr *pstudiohdr, const char *label );
 
 #define NOMOTION 99999
-void GetSequenceLinearMotion( CStudioHdr *pstudiohdr, int iSequence, const float poseParameter[], Vector *pVec );
+void GetSequenceLinearMotion( CStudioHdr *pstudiohdr, intp iSequence, const float poseParameter[], Vector *pVec );
 
 const char *GetSequenceName( CStudioHdr *pstudiohdr, int sequence );
-const char *GetSequenceActivityName( CStudioHdr *pstudiohdr, int iSequence );
+const char *GetSequenceActivityName( CStudioHdr *pstudiohdr, intp iSequence );
 
 int GetSequenceFlags( CStudioHdr *pstudiohdr, int sequence );
 int GetAnimationEvent( CStudioHdr *pstudiohdr, int sequence, animevent_t *pNPCEvent, float flStart, float flEnd, int index );
