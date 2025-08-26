@@ -428,6 +428,7 @@ bool CVoteController::SubmitPendingVote( VoteParams_t params )
 //-----------------------------------------------------------------------------
 bool CVoteController::CreateVote( int iEntIndex, const char *pszTypeString, const char *pszDetailString )
 {
+	// dimhotepus: See https://github.com/ValveSoftware/source-sdk-2013/pull/1197
 	// Terrible Hack:  Dedicated servers pass 99 as the EntIndex
 	bool bDedicatedServer = ( iEntIndex == DEDICATED_SERVER ) ? true : false;
 
