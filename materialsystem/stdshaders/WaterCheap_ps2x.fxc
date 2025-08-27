@@ -69,23 +69,9 @@ float4 main( PS_INPUT i ) : COLOR
 	HALF3 worldSpaceNormal = mul( vNormal, i.tangentSpaceTranspose );
 	HALF3 worldSpaceEye;
 	
-	HALF flWorldSpaceDist = 1.0f;	
+	HALF flWorldSpaceDist = 1.0f;
 	
-#ifdef NV3X
-	// for some reason, fxc doesn't convert length( half3 v ) into all _pp opcodes.
-	if (bBlend) 
-	{
-		worldSpaceEye = i.worldSpaceEyeVect;
-		HALF  worldSpaceDistSqr = dot( worldSpaceEye, worldSpaceEye );
-		HALF  rcpWorldSpaceDist = rsqrt( worldSpaceDistSqr );
-		worldSpaceEye *= rcpWorldSpaceDist;
-		flWorldSpaceDist = worldSpaceDistSqr * rcpWorldSpaceDist;
-	}
-	else
-	{
-		worldSpaceEye  = NormalizeWithCubemap( NormalizeSampler, i.worldSpaceEyeVect );
-	}
-#else  // !NV3X
+	// dimhotepus: Drop NV3X.
 	if (bBlend) 
 	{
 		worldSpaceEye = i.worldSpaceEyeVect;
@@ -96,7 +82,6 @@ float4 main( PS_INPUT i ) : COLOR
 	{
 		worldSpaceEye  = NormalizeWithCubemap( NormalizeSampler, i.worldSpaceEyeVect );
 	}
-#endif
 	
 	HALF3 reflectVect = CalcReflectionVectorUnnormalized( worldSpaceNormal, worldSpaceEye );
 	HALF3 specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect );

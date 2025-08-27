@@ -73,15 +73,12 @@ float4 main( PS_INPUT i ) : COLOR
 	float2 vRefractTexCoord;
 
 	// vectorize the dependent UV calculations (reflect = .xy, refract = .wz)
-#ifdef NV3X
-	float4 vDependentTexCoords = vNormal.xyxy * vNormalSample.a * reflectRefractScale;
-#else
+	// dimhotepus: Drop NV3X.
 	float4 vN;
 	vN.xy = vNormal.xy;
 	vN.w = vNormal.x;
 	vN.z = vNormal.y;
 	float4 vDependentTexCoords = vN * vNormalSample.a * reflectRefractScale;
-#endif
 
 	vDependentTexCoords += ( i.vReflectXY_vRefractYX * ooW );
 	vReflectTexCoord = vDependentTexCoords.xy;

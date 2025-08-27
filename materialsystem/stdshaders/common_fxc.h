@@ -11,25 +11,15 @@
 #include "common_pragmas.h"
 #include "common_hlsl_cpp_consts.h"
 
-#ifdef NV3X
-#	define HALF half
-#	define HALF2 half2
-#	define HALF3 half3
-#	define HALF4 half4
-#	define HALF3x3 half3x3
-#	define HALF3x4 half3x4
-#	define HALF4x3 half4x3
-#	define HALF_CONSTANT( _constant )	((HALF)_constant)
-#else
-#	define HALF float
-#	define HALF2 float2
-#	define HALF3 float3
-#	define HALF4 float4
-#	define HALF3x3 float3x3
-#	define HALF3x4 float3x4
-#	define HALF4x3 float4x3
-#	define HALF_CONSTANT( _constant )	_constant
-#endif
+// dimhotepus: Drop NV3X.
+#define HALF float
+#define HALF2 float2
+#define HALF3 float3
+#define HALF4 float4
+#define HALF3x3 float3x3
+#define HALF3x4 float3x4
+#define HALF4x3 float4x3
+#define HALF_CONSTANT( _constant )	_constant
 
 // This is where all common code for both vertex and pixel shaders.
 #define OO_SQRT_3 0.57735025882720947f

@@ -8,13 +8,9 @@
 #ifndef COMMON_HLSL_CONSTS_H_
 #define COMMON_HLSL_CONSTS_H_
 
-#ifdef NV3X
-  #define PSHADER_VECT_SCALE 20.0
-  #define VSHADER_VECT_SCALE (1.0 / (PSHADER_VECT_SCALE) )
-#else
-  #define PSHADER_VECT_SCALE 1.0
-  #define VSHADER_VECT_SCALE 1.0
-#endif
+// dimhotepus: Drop NV3X.
+#define PSHADER_VECT_SCALE 1.0
+#define VSHADER_VECT_SCALE 1.0
 
 // GR - HDR luminance maps to 0..n range
 // IMPORTANT: Keep the same value as in materialsystem_global.h
