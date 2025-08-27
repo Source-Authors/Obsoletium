@@ -65,3 +65,6 @@
 [submodule "thirdparty/lua"]
 	path = thirdparty/lua
 	url = git@github.com:Source-Authors/Lua.git
+[submodule "thirdparty/shadercompile"]
+	path = thirdparty/shadercompile
+	url = git@github.com:Source-Authors/ShaderCompile.git

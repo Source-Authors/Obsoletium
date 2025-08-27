@@ -106,7 +106,8 @@ public:
 		m_flFogStart( 0 ),
 		m_flFogEnd( 0 ),
 		m_flFogZ( 0 ),
-		m_flFogMaxDensity( 1.0 )
+		m_flFogMaxDensity( 1.0 ),
+		m_bFogRadial( false )
 	{
 		memset( &m_FogColor, 0, sizeof(m_FogColor) );
 	}
@@ -575,6 +576,19 @@ public:
 	DEFINE_QUEUED_CALL_2(					SetNonInteractiveTempFullscreenBuffer, ITexture *, MaterialNonInteractiveMode_t, IMatRenderContext, m_pHardwareContext );
 	DEFINE_QUEUED_CALL_1(					EnableNonInteractiveMode, MaterialNonInteractiveMode_t, IMatRenderContext, m_pHardwareContext );
 	DEFINE_QUEUED_CALL_0(					RefreshFrontBufferNonInteractive, IMatRenderContext, m_pHardwareContext );
+	
+	// dimhotepus: TF2 backport.
+	void FogRadial( bool bRadial ) override
+	{
+		m_bFogRadial = bRadial;
+		m_queue.QueueCall( m_pHardwareContext, &IMatRenderContext::FogRadial, bRadial );
+	}
+	
+	// dimhotepus: TF2 backport.
+	bool GetFogRadial() override
+	{
+		return m_bFogRadial;
+	}
 
 	//--------------------------------------------------------
 	// Memory allocation calls for queued mesh, et. al.
@@ -619,6 +633,7 @@ private:
 	float m_flFogZ;
 	float m_flFogMaxDensity;
 	color24 m_FogColor;
+	bool m_bFogRadial;
 
 	CMemoryStack m_Vertices;
 	CMemoryStack m_Indices;

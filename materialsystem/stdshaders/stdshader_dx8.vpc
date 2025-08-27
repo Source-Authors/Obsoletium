@@ -6,33 +6,12 @@
 
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
-$Macro OUTBUILDDIR	"$SRCDIR\..\out"
 
-$MacroRequired				"PLATSUBDIR"
-$MacroRequiredAllowEmpty	"GAMENAME"
-$MacroRequiredAllowEmpty	"INTERMEDIATESUBDIR"
-$MacroRequiredAllowEmpty	"_UNITYSUBDIR"
-$Macro						"_SUBDIRSUFFIX"		"$INTERMEDIATESUBDIR$GAMENAME$PLATSUBDIR$_UNITYSUBDIR"
+// shader_dll_verify.cpp defines a function called _ftol3. This means that we can't
+// link with the bug-fixed ftol3.obj. It also means we can't convert float-to-unsigned.
+$Conditional DISABLE_FTOL3_OVERRIDE "1"
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
-
-$Configuration	"Debug"
-{
-	$General
-	{
-		$OutputDirectory		"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME"	
-		$IntermediateDirectory	"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i"
-	}
-}
-
-$Configuration	"Release"
-{
-	$General
-	{
-		$OutputDirectory		"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME"
-		$IntermediateDirectory	"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i"
-	}
-}
 
 // Common Configuration
 $Configuration
@@ -131,6 +110,7 @@ $Project "stdshader_dx8"
 	{
 		$Lib mathlib
 		$Lib shaderlib
+		$Lib tier2
 	}
 
 	$File	"$SRCDIR\devtools\bin\fxc_prep.pl"

@@ -7,7 +7,7 @@
 
 #include "BaseVSShader.h"
 
-#include "BumpmappedEnvmap.inc"
+#include "bumpmappedenvmap.inc"
 
 #include "lightmappedgeneric_vs11.inc"
 

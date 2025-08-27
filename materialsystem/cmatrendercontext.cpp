@@ -989,6 +989,7 @@ CMatRenderContext::CMatRenderContext()
 	m_flNormalizedX = 0.0F;
 	m_flNormalizedY = 0.0F;
 	m_flNormalizedSize = 0.0F;
+	m_bFogRadial = false;
 }
 
 InitReturnVal_t CMatRenderContext::Init( CMaterialSystem *pMaterialSystem )
@@ -2834,6 +2835,18 @@ void CMatRenderContext::AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, co
 	}
 
 	TextureManager()->AsyncCreateTextureFromRenderTarget( pSrcRt, pDstName, dstFmt, bGenMips, nAdditionalCreationFlags, pRecipient, pExtraArgs );
+}
+
+// dimhotepus: TF2 backport.
+void CMatRenderContext::FogRadial( bool bRadial )
+{
+	m_bFogRadial = bRadial;
+}
+
+// dimhotepus: TF2 backport.
+bool CMatRenderContext::GetFogRadial()
+{
+	return m_bFogRadial;
 }
 
 void CMatRenderContext::AsyncMap( ITextureInternal* pTexToMap, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs )

@@ -1,162 +1,107 @@
+// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
+// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
+// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
+
+#pragma once
 #include "shaderlib/cshader.h"
 class teeth_bump_ps30_Static_Index
 {
-private:
-	int m_nCONVERT_TO_SRGB;
-#ifdef _DEBUG
-	bool m_bCONVERT_TO_SRGB;
-#endif
+	unsigned int m_nCONVERT_TO_SRGB : 2;
 public:
 	void SetCONVERT_TO_SRGB( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONVERT_TO_SRGB = i;
-#ifdef _DEBUG
-		m_bCONVERT_TO_SRGB = true;
-#endif
 	}
-	void SetCONVERT_TO_SRGB( bool i )
+
+	teeth_bump_ps30_Static_Index(  )
 	{
-		m_nCONVERT_TO_SRGB = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bCONVERT_TO_SRGB = true;
-#endif
+		m_nCONVERT_TO_SRGB = g_pHardwareConfig->NeedsShaderSRGBConversion();
 	}
-public:
-	teeth_bump_ps30_Static_Index( )
+
+	int GetIndex() const
 	{
-#ifdef _DEBUG
-		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
-		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
-	}
-	int GetIndex()
-	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB;
-		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
-		return ( 40 * m_nCONVERT_TO_SRGB ) + 0;
+		return ( 60 * m_nCONVERT_TO_SRGB ) + 0;
 	}
 };
-#define shaderStaticTest_teeth_bump_ps30 0
+
+#define shaderStaticTest_teeth_bump_ps30 1
+
+
 class teeth_bump_ps30_Dynamic_Index
 {
-private:
-	int m_nPIXELFOGTYPE;
+	unsigned int m_nPIXELFOGTYPE : 2;
+	unsigned int m_nNUM_LIGHTS : 3;
+	unsigned int m_nAMBIENT_LIGHT : 2;
+	unsigned int m_nWRITE_DEPTH_TO_DESTALPHA : 2;
 #ifdef _DEBUG
-	bool m_bPIXELFOGTYPE;
-#endif
+	bool m_bPIXELFOGTYPE : 1;
+	bool m_bNUM_LIGHTS : 1;
+	bool m_bAMBIENT_LIGHT : 1;
+	bool m_bWRITE_DEPTH_TO_DESTALPHA : 1;
+#endif	// _DEBUG
 public:
 	void SetPIXELFOGTYPE( int i )
 	{
-		Assert( i >= 0 && i <= 1 );
+		Assert( i >= 0 && i <= 2 );
 		m_nPIXELFOGTYPE = i;
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetPIXELFOGTYPE( bool i )
-	{
-		m_nPIXELFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bPIXELFOGTYPE = true;
-#endif
-	}
-private:
-	int m_nNUM_LIGHTS;
-#ifdef _DEBUG
-	bool m_bNUM_LIGHTS;
-#endif
-public:
+
 	void SetNUM_LIGHTS( int i )
 	{
 		Assert( i >= 0 && i <= 4 );
 		m_nNUM_LIGHTS = i;
 #ifdef _DEBUG
 		m_bNUM_LIGHTS = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetNUM_LIGHTS( bool i )
-	{
-		m_nNUM_LIGHTS = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bNUM_LIGHTS = true;
-#endif
-	}
-private:
-	int m_nAMBIENT_LIGHT;
-#ifdef _DEBUG
-	bool m_bAMBIENT_LIGHT;
-#endif
-public:
+
 	void SetAMBIENT_LIGHT( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nAMBIENT_LIGHT = i;
 #ifdef _DEBUG
 		m_bAMBIENT_LIGHT = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetAMBIENT_LIGHT( bool i )
-	{
-		m_nAMBIENT_LIGHT = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bAMBIENT_LIGHT = true;
-#endif
-	}
-private:
-	int m_nWRITE_DEPTH_TO_DESTALPHA;
-#ifdef _DEBUG
-	bool m_bWRITE_DEPTH_TO_DESTALPHA;
-#endif
-public:
+
 	void SetWRITE_DEPTH_TO_DESTALPHA( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nWRITE_DEPTH_TO_DESTALPHA = i;
 #ifdef _DEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetWRITE_DEPTH_TO_DESTALPHA( bool i )
+
+	teeth_bump_ps30_Dynamic_Index(  )
 	{
-		m_nWRITE_DEPTH_TO_DESTALPHA = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bWRITE_DEPTH_TO_DESTALPHA = true;
-#endif
-	}
-public:
-	teeth_bump_ps30_Dynamic_Index()
-	{
+		m_nPIXELFOGTYPE = 0;
+		m_nNUM_LIGHTS = 0;
+		m_nAMBIENT_LIGHT = 0;
+		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
-		m_nPIXELFOGTYPE = 0;
-#ifdef _DEBUG
 		m_bNUM_LIGHTS = false;
-#endif // _DEBUG
-		m_nNUM_LIGHTS = 0;
-#ifdef _DEBUG
 		m_bAMBIENT_LIGHT = false;
-#endif // _DEBUG
-		m_nAMBIENT_LIGHT = 0;
-#ifdef _DEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
-#endif // _DEBUG
-		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
+#endif	// _DEBUG
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bNUM_LIGHTS && m_bAMBIENT_LIGHT && m_bWRITE_DEPTH_TO_DESTALPHA;
-		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
-		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nNUM_LIGHTS ) + ( 10 * m_nAMBIENT_LIGHT ) + ( 20 * m_nWRITE_DEPTH_TO_DESTALPHA ) + 0;
+		Assert( m_bPIXELFOGTYPE && m_bNUM_LIGHTS && m_bAMBIENT_LIGHT && m_bWRITE_DEPTH_TO_DESTALPHA );
+		return ( 1 * m_nPIXELFOGTYPE ) + ( 3 * m_nNUM_LIGHTS ) + ( 15 * m_nAMBIENT_LIGHT ) + ( 30 * m_nWRITE_DEPTH_TO_DESTALPHA ) + 0;
 	}
 };
-#define shaderDynamicTest_teeth_bump_ps30 psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_NUM_LIGHTS + psh_forgot_to_set_dynamic_AMBIENT_LIGHT + psh_forgot_to_set_dynamic_WRITE_DEPTH_TO_DESTALPHA + 0
+
+#define shaderDynamicTest_teeth_bump_ps30 psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_NUM_LIGHTS + psh_forgot_to_set_dynamic_AMBIENT_LIGHT + psh_forgot_to_set_dynamic_WRITE_DEPTH_TO_DESTALPHA
+

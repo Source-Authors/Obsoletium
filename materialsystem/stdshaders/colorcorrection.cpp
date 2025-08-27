@@ -82,12 +82,6 @@ BEGIN_VS_SHADER_FLAGS( ColorCorrection, "Help for ColorCorrection", SHADER_NOT_E
 			int fmt = VERTEX_POSITION;
 			pShaderShadow->VertexShaderVertexFormat( fmt, 1, 0, 0 );
 
-			if ( IsOpenGL() )
-			{
-				// TODO: JasonM...do we use this shader?  If so, it needs some sRGB adapter love
-				Assert(0);
-			}
-
 			// Render targets are always sRGB on OSX GL
 			bool bForceSRGBWrite = IsOSX() && g_pHardwareConfig->CanDoSRGBReadFromRTs();
 			pShaderShadow->EnableSRGBWrite( bForceSRGBWrite );

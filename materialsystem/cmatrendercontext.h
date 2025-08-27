@@ -537,6 +537,11 @@ public:
 	DELEGATE_TO_OBJECT_0V(					EndFrame, g_pShaderAPI );
 
 	virtual void							AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs );
+	
+	// dimhotepus: TF2 backport.
+	virtual void							FogRadial( bool bRadial );
+	// dimhotepus: TF2 backport.
+	virtual bool							GetFogRadial();
 
 	virtual void							AsyncMap( ITextureInternal* pTexToMap, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) override;
 	virtual void							AsyncUnmap( ITextureInternal* pTexToUnmap ) override;
@@ -628,6 +633,7 @@ protected:
 	float m_flNormalizedX;
 	float m_flNormalizedY;
 	float m_flNormalizedSize;
+	bool m_bFogRadial;
 };
 
 

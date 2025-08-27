@@ -1771,6 +1771,197 @@ bool CHalfLife2::ShouldBurningPropsEmitLight()
 
 #endif//CLIENT_DLL
 
+
+#ifdef GAME_DLL
+// dimhotepus: TF2 backport + add maps.
+bool CHalfLife2::IsOfficialMap( void )
+{ 
+	static constexpr char *s_OfficialMaps[] =
+	{
+#ifdef HL2_EPISODIC
+		// Half-Life 2 Episode 1.
+		"credits",
+		"ep1_background01",
+		"ep1_background01a",
+		"ep1_background02",
+		"ep1_c17_00",
+		"ep1_c17_00a",
+		"ep1_c17_01",
+		"ep1_c17_01a",
+		"ep1_c17_02",
+		"ep1_c17_02a",
+		"ep1_c17_02b",
+		"ep1_c17_05",
+		"ep1_c17_06",
+		"ep1_citadel_00",
+		"ep1_citadel_00_demo",
+		"ep1_citadel_01",
+		"ep1_citadel_02",
+		"ep1_citadel_02b",
+		"ep1_citadel_03",
+		"ep1_citadel_04",
+
+		// Half-Life 2 Episode 2.
+		"ep2_background01",
+		"ep2_background02",
+		"ep2_background02a",
+		"ep2_background03",
+		"ep2_outland_01",
+		"ep2_outland_01a",
+		"ep2_outland_02",
+		"ep2_outland_03",
+		"ep2_outland_04",
+		"ep2_outland_05",
+		"ep2_outland_06",
+		"ep2_outland_06a",
+		"ep2_outland_07",
+		"ep2_outland_08",
+		"ep2_outland_09",
+		"ep2_outland_10",
+		"ep2_outland_10a",
+		"ep2_outland_11",
+		"ep2_outland_11a",
+		"ep2_outland_11b",
+		"ep2_outland_12",
+		"ep2_outland_12a"
+#elif defined(HL2_LOSTCOAST)
+		// Half-Life 2 Lost Coast.
+		"background01",
+		"d2_lostcoast",
+		"test_hardware",
+		"vst_lostcoast"
+#elif defined(PORTAL)
+		// Portal.
+		// TODO(dimhotepus): Need to check on real Portal game.
+		"background1",
+		"background2",
+		"testchmb_a_00",
+		"testchmb_a_01",
+		"testchmb_a_02",
+		"testchmb_a_03",
+		"testchmb_a_04",
+		"testchmb_a_05",
+		"testchmb_a_06",
+		"testchmb_a_07",
+		"testchmb_a_08",
+		"testchmb_a_09",
+		"testchmb_a_10",
+		"testchmb_a_11",
+		"testchmb_a_12",
+		"testchmb_a_13",
+		"testchmb_a_14",
+		"testchmb_a_15",
+		"escape_00",
+		"escape_01",
+		"escape_02"
+
+		// TODO(dimhotepus): Need to check on real Portal game. Advanced maps.
+		"testchmb_a_08_advanced",
+		"testchmb_a_09_advanced",
+		"testchmb_a_10_advanced",
+		"testchmb_a_11_advanced",
+		"testchmb_a_13_advanced",
+		"testchmb_a_14_advanced"
+#else
+		// Half-Life 2.
+		"background01",
+		"background02",
+		"background03",
+		"background04",
+		"background05",
+		"background06",
+		"background07",
+		"credits",
+		"d1_canals_01",
+		"d1_canals_01a",
+		"d1_canals_02",
+		"d1_canals_03",
+		"d1_canals_05",
+		"d1_canals_06",
+		"d1_canals_07",
+		"d1_canals_08",
+		"d1_canals_09",
+		"d1_canals_10",
+		"d1_canals_11",
+		"d1_canals_12",
+		"d1_canals_13",
+		"d1_eli_01",
+		"d1_eli_02",
+		"d1_town_01",
+		"d1_town_01a",
+		"d1_town_02",
+		"d1_town_02a",
+		"d1_town_03",
+		"d1_town_04",
+		"d1_town_05",
+		"d1_trainstation_01",
+		"d1_trainstation_02",
+		"d1_trainstation_03",
+		"d1_trainstation_04",
+		"d1_trainstation_05",
+		"d1_trainstation_06",
+		"d2_coast_01",
+		"d2_coast_02",
+		"d2_coast_03",
+		"d2_coast_04",
+		"d2_coast_05",
+		"d2_coast_07",
+		"d2_coast_08",
+		"d2_coast_09",
+		"d2_coast_10",
+		"d2_coast_11",
+		"d2_coast_12",
+		"d2_prison_01",
+		"d2_prison_02",
+		"d2_prison_03",
+		"d2_prison_04",
+		"d2_prison_05",
+		"d2_prison_06",
+		"d2_prison_07",
+		"d2_prison_08",
+		"d3_breen_01",
+		"d3_c17_01",
+		"d3_c17_02",
+		"d3_c17_02_camera",
+		"d3_c17_03",
+		"d3_c17_04",
+		"d3_c17_05",
+		"d3_c17_06a",
+		"d3_c17_06b",
+		"d3_c17_07",
+		"d3_c17_08",
+		"d3_c17_09",
+		"d3_c17_10a",
+		"d3_c17_10b",
+		"d3_c17_11",
+		"d3_c17_12",
+		"d3_c17_12b",
+		"d3_c17_13",
+		"d3_citadel_01",
+		"d3_citadel_02",
+		"d3_citadel_03",
+		"d3_citadel_04",
+		"d3_citadel_05",
+		"intro"
+#endif
+	};
+
+	char szCurrentMap[MAX_MAP_NAME];
+	V_strcpy_safe( szCurrentMap, STRING( gpGlobals->mapname ) );
+
+	for ( const auto *officialMap : s_OfficialMaps )
+	{
+		if ( !Q_stricmp( officialMap, szCurrentMap ) )
+		{
+			return true;
+		}
+	}
+
+	return BaseClass::IsOfficialMap();
+}
+#endif
+
+
 // ------------------------------------------------------------------------------------ //
 // Global functions.
 // ------------------------------------------------------------------------------------ //

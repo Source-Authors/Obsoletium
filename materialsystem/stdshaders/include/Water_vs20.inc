@@ -1,11 +1,17 @@
+// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// $MULTITEXTURE && $BASETEXTURE
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+
+#pragma once
 #include "shaderlib/cshader.h"
 class water_vs20_Static_Index
 {
-private:
-	int m_nBASETEXTURE;
+	unsigned int m_nBASETEXTURE : 2;
+	unsigned int m_nMULTITEXTURE : 2;
 #ifdef _DEBUG
-	bool m_bBASETEXTURE;
-#endif
+	bool m_bBASETEXTURE : 1;
+	bool m_bMULTITEXTURE : 1;
+#endif	// _DEBUG
 public:
 	void SetBASETEXTURE( int i )
 	{
@@ -13,73 +19,51 @@ public:
 		m_nBASETEXTURE = i;
 #ifdef _DEBUG
 		m_bBASETEXTURE = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetBASETEXTURE( bool i )
-	{
-		m_nBASETEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bBASETEXTURE = true;
-#endif
-	}
-private:
-	int m_nMULTITEXTURE;
-#ifdef _DEBUG
-	bool m_bMULTITEXTURE;
-#endif
-public:
+
 	void SetMULTITEXTURE( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nMULTITEXTURE = i;
 #ifdef _DEBUG
 		m_bMULTITEXTURE = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetMULTITEXTURE( bool i )
+
+	water_vs20_Static_Index(  )
 	{
-		m_nMULTITEXTURE = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bMULTITEXTURE = true;
-#endif
-	}
-public:
-	water_vs20_Static_Index( )
-	{
+		m_nBASETEXTURE = 0;
+		m_nMULTITEXTURE = 0;
 #ifdef _DEBUG
 		m_bBASETEXTURE = false;
-#endif // _DEBUG
-		m_nBASETEXTURE = 0;
-#ifdef _DEBUG
 		m_bMULTITEXTURE = false;
-#endif // _DEBUG
-		m_nMULTITEXTURE = 0;
+#endif	// _DEBUG
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bBASETEXTURE && m_bMULTITEXTURE;
-		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+		Assert( m_bBASETEXTURE && m_bMULTITEXTURE );
+		AssertMsg( !( m_nMULTITEXTURE && m_nBASETEXTURE ), "Invalid combo combination ( MULTITEXTURE && BASETEXTURE )" );
 		return ( 1 * m_nBASETEXTURE ) + ( 2 * m_nMULTITEXTURE ) + 0;
 	}
 };
-#define shaderStaticTest_water_vs20 vsh_forgot_to_set_static_BASETEXTURE + vsh_forgot_to_set_static_MULTITEXTURE + 0
+
+#define shaderStaticTest_water_vs20 vsh_forgot_to_set_static_BASETEXTURE + vsh_forgot_to_set_static_MULTITEXTURE
+
+
 class water_vs20_Dynamic_Index
 {
 public:
-	water_vs20_Dynamic_Index()
+	water_vs20_Dynamic_Index(  )
 	{
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-#endif // _DEBUG
 		return 0;
 	}
 };
-#define shaderDynamicTest_water_vs20 0
+
+#define shaderDynamicTest_water_vs20 1
+

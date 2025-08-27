@@ -205,7 +205,7 @@ void DrawCloak_DX9( CBaseVSShader *pShader, IMaterialVar** params, IShaderDynami
 			}
 			else
 			{
-				// TODO: JasonM Hack
+				// JasonM Hack
 				//
 				// In general, cloaking on ps_2_0 needs re-working for multipass...yuck...
 				//

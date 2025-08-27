@@ -922,6 +922,7 @@ public:
 	MaterialFogMode_t GetSceneFogMode( );
 	MaterialFogMode_t GetPixelFogMode( );
 	int GetPixelFogCombo( );//0 is either range fog, or no fog simulated with rigged range fog values. 1 is height fog
+	int GetPixelFogCombo1( bool bSupportsRadial );//0 is either range fog, or no fog simulated with rigged range fog values. 1 is height fog. 2 is radial fog.
 	bool ShouldUsePixelFogForMode( MaterialFogMode_t fogMode );
 	void SceneFogColor3ub( unsigned char r, unsigned char g, unsigned char b );
 	void GetSceneFogColor( unsigned char *rgb );
@@ -5390,6 +5391,15 @@ int CShaderAPIDx8::GetPixelFogCombo( void )
 		return MATERIAL_FOG_NONE;
 }
 
+int CShaderAPIDx8::GetPixelFogCombo1( bool bSupportsRadial )
+{
+	// dimhotepus: TF2 backport. Support radial fog.
+	if( ( ShouldUsePixelFogForMode( m_SceneFogMode ) && bSupportsRadial ) )
+		return MATERIAL_FOG_LINEAR_BELOW_FOG_Z;  // MATERIAL_FOG_LINEAR_BELOW_FOG_Z is for PIXEL_FOG_TYPE_RANGE_RADIAL
+	else	
+		// Fallback to previous fog.
+		return GetPixelFogCombo();
+}
 
 static ConVar r_pixelfog( "r_pixelfog", "1" );
 

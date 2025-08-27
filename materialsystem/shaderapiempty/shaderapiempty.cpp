@@ -589,6 +589,7 @@ public:
 	virtual void GetSceneFogColor( unsigned char *rgb );
 	virtual MaterialFogMode_t GetSceneFogMode( );
 	virtual int GetPixelFogCombo( );
+	virtual int GetPixelFogCombo1( bool bRadial );
 
 	void SetHeightClipZ( float z ); 
 	void SetHeightClipMode( enum MaterialHeightClipMode_t heightClipMode ); 
@@ -2565,6 +2566,11 @@ MaterialFogMode_t CShaderAPIEmpty::GetSceneFogMode( )
 }
 
 int CShaderAPIEmpty::GetPixelFogCombo( )
+{
+	return 0;
+}
+
+int CShaderAPIEmpty::GetPixelFogCombo1( bool bRadial )
 {
 	return 0;
 }

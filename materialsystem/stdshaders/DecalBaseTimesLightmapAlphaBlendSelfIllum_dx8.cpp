@@ -6,7 +6,7 @@
 
 #include "BaseVSShader.h"
 #include "lightmappedgeneric_vs11.inc"
-#include "LightmappedGeneric_Decal.inc"
+#include "lightmappedgeneric_decal.inc"
 #include "mathlib/bumpvects.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

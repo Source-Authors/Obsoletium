@@ -1,11 +1,14 @@
+// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+
+#pragma once
 #include "shaderlib/cshader.h"
 class watercheap_vs20_Static_Index
 {
-private:
-	int m_nBLEND;
+	unsigned int m_nBLEND : 2;
 #ifdef _DEBUG
-	bool m_bBLEND;
-#endif
+	bool m_bBLEND : 1;
+#endif	// _DEBUG
 public:
 	void SetBLEND( int i )
 	{
@@ -13,48 +16,39 @@ public:
 		m_nBLEND = i;
 #ifdef _DEBUG
 		m_bBLEND = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetBLEND( bool i )
+
+	watercheap_vs20_Static_Index(  )
 	{
-		m_nBLEND = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bBLEND = true;
-#endif
-	}
-public:
-	watercheap_vs20_Static_Index( )
-	{
+		m_nBLEND = 0;
 #ifdef _DEBUG
 		m_bBLEND = false;
-#endif // _DEBUG
-		m_nBLEND = 0;
+#endif	// _DEBUG
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bBLEND;
-		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+		Assert( m_bBLEND );
 		return ( 1 * m_nBLEND ) + 0;
 	}
 };
-#define shaderStaticTest_watercheap_vs20 vsh_forgot_to_set_static_BLEND + 0
+
+#define shaderStaticTest_watercheap_vs20 vsh_forgot_to_set_static_BLEND
+
+
 class watercheap_vs20_Dynamic_Index
 {
 public:
-	watercheap_vs20_Dynamic_Index()
+	watercheap_vs20_Dynamic_Index(  )
 	{
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-#endif // _DEBUG
 		return 0;
 	}
 };
-#define shaderDynamicTest_watercheap_vs20 0
+
+#define shaderDynamicTest_watercheap_vs20 1
+

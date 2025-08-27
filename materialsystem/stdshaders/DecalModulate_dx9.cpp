@@ -95,6 +95,8 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 				SET_STATIC_VERTEX_SHADER_COMBO( SEPARATE_DETAIL_UVS, false );
 				SET_STATIC_VERTEX_SHADER_COMBO( USE_STATIC_CONTROL_FLOW, bUseStaticControlFlow );
 				SET_STATIC_VERTEX_SHADER_COMBO( DONT_GAMMA_CONVERT_VERTEX_COLOR, 0 );
+				// dimhotepus: TF2 backport.
+				SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, 0 );
 				SET_STATIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs20 );
 
 				if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
@@ -121,6 +123,8 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 				SET_STATIC_VERTEX_SHADER_COMBO( SEPARATE_DETAIL_UVS, false );
 				SET_STATIC_VERTEX_SHADER_COMBO( DECAL, true );
 				SET_STATIC_VERTEX_SHADER_COMBO( DONT_GAMMA_CONVERT_VERTEX_COLOR, 0 );
+				// dimhotepus: TF2 backport.
+				SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, 0 );
 				SET_STATIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs30 );
 
 				DECLARE_STATIC_PIXEL_SHADER( decalmodulate_ps30 );
@@ -192,7 +196,7 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 				if( g_pHardwareConfig->SupportsPixelShaders_2_b() )
 				{
 					DECLARE_DYNAMIC_PIXEL_SHADER( decalmodulate_ps20b );
-					SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo() );
+					SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
 					SET_DYNAMIC_PIXEL_SHADER( decalmodulate_ps20b );
 				}
 				else
@@ -219,7 +223,7 @@ BEGIN_VS_SHADER( DecalModulate_dx9,
 				SET_DYNAMIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs30 );
 
 				DECLARE_DYNAMIC_PIXEL_SHADER( decalmodulate_ps30 );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo() );
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
 				SET_DYNAMIC_PIXEL_SHADER( decalmodulate_ps30 );
 
 				bool bUnusedTexCoords[3] = { false, false, !pShaderAPI->IsHWMorphingEnabled() };

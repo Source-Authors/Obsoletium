@@ -837,6 +837,17 @@ public:
 
 	void									TextureManagerUpdate( void ) { }
 
+	// dimhotepus: TF2 backport.
+	void FogRadial( bool bRadial ) override
+	{
+	}
+	
+	// dimhotepus: TF2 backport.
+	bool GetFogRadial() override
+	{
+		return false;
+	}
+
 	int m_WidthBackBuffer, m_HeightBackBuffer;
 };
 

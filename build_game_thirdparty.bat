@@ -229,6 +229,26 @@ if ERRORLEVEL 1 (
 POPD
 
 
+REM Build shadercompile2.
+MKDIR thirdparty\shadercompile\out
+PUSHD thirdparty\shadercompile\out
+cmake -G %CMAKE_MSVC_GEN_NAME% -A x64 ..
+if ERRORLEVEL 1 (
+  ECHO cmake generation for thirdparty\shadercompile failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Release
+if ERRORLEVEL 1 (
+  ECHO cmake --build Release for thirdparty\shadercompile failed.
+  EXIT /B 1
+)
+POPD
+COPY /Y thirdparty\shadercompile\out\Release\D3DX9_43.dll devtools\bin\D3DX9_43.dll
+COPY /Y thirdparty\shadercompile\out\Release\D3DCompiler_43.dll devtools\bin\D3DCompiler_43.dll
+COPY /Y thirdparty\shadercompile\out\Release\ShaderCompile.exe devtools\bin\ShaderCompile2.exe
+
+
 REM Build snappy.
 MKDIR thirdparty\snappy\out
 PUSHD thirdparty\snappy\out

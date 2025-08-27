@@ -1,137 +1,106 @@
+// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
+// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
+// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
+// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
+// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
+// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
+// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
+
+#pragma once
 #include "shaderlib/cshader.h"
 class teeth_flashlight_ps30_Static_Index
 {
-private:
-	int m_nCONVERT_TO_SRGB;
+	unsigned int m_nCONVERT_TO_SRGB : 2;
+	unsigned int m_nFLASHLIGHTDEPTHFILTERMODE : 2;
 #ifdef _DEBUG
-	bool m_bCONVERT_TO_SRGB;
-#endif
+	bool m_bFLASHLIGHTDEPTHFILTERMODE : 1;
+#endif	// _DEBUG
 public:
 	void SetCONVERT_TO_SRGB( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONVERT_TO_SRGB = i;
-#ifdef _DEBUG
-		m_bCONVERT_TO_SRGB = true;
-#endif
 	}
-	void SetCONVERT_TO_SRGB( bool i )
-	{
-		m_nCONVERT_TO_SRGB = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bCONVERT_TO_SRGB = true;
-#endif
-	}
-private:
-	int m_nFLASHLIGHTDEPTHFILTERMODE;
-#ifdef _DEBUG
-	bool m_bFLASHLIGHTDEPTHFILTERMODE;
-#endif
-public:
+
 	void SetFLASHLIGHTDEPTHFILTERMODE( int i )
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nFLASHLIGHTDEPTHFILTERMODE = i;
 #ifdef _DEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetFLASHLIGHTDEPTHFILTERMODE( bool i )
+
+	teeth_flashlight_ps30_Static_Index(  )
 	{
-		m_nFLASHLIGHTDEPTHFILTERMODE = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bFLASHLIGHTDEPTHFILTERMODE = true;
-#endif
-	}
-public:
-	teeth_flashlight_ps30_Static_Index( )
-	{
-#ifdef _DEBUG
-		m_bCONVERT_TO_SRGB = true;
-#endif // _DEBUG
-		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
+		m_nCONVERT_TO_SRGB = g_pHardwareConfig->NeedsShaderSRGBConversion();
+		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
 #ifdef _DEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = false;
-#endif // _DEBUG
-		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
+#endif	// _DEBUG
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bFLASHLIGHTDEPTHFILTERMODE;
-		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
-		return ( 4 * m_nCONVERT_TO_SRGB ) + ( 8 * m_nFLASHLIGHTDEPTHFILTERMODE ) + 0;
+		Assert( m_bFLASHLIGHTDEPTHFILTERMODE );
+		return ( 6 * m_nCONVERT_TO_SRGB ) + ( 12 * m_nFLASHLIGHTDEPTHFILTERMODE ) + 0;
 	}
 };
-#define shaderStaticTest_teeth_flashlight_ps30 psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE + 0
+
+#define shaderStaticTest_teeth_flashlight_ps30 psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE
+
+
 class teeth_flashlight_ps30_Dynamic_Index
 {
-private:
-	int m_nPIXELFOGTYPE;
+	unsigned int m_nPIXELFOGTYPE : 2;
+	unsigned int m_nFLASHLIGHTSHADOWS : 2;
 #ifdef _DEBUG
-	bool m_bPIXELFOGTYPE;
-#endif
+	bool m_bPIXELFOGTYPE : 1;
+	bool m_bFLASHLIGHTSHADOWS : 1;
+#endif	// _DEBUG
 public:
 	void SetPIXELFOGTYPE( int i )
 	{
-		Assert( i >= 0 && i <= 1 );
+		Assert( i >= 0 && i <= 2 );
 		m_nPIXELFOGTYPE = i;
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetPIXELFOGTYPE( bool i )
-	{
-		m_nPIXELFOGTYPE = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bPIXELFOGTYPE = true;
-#endif
-	}
-private:
-	int m_nFLASHLIGHTSHADOWS;
-#ifdef _DEBUG
-	bool m_bFLASHLIGHTSHADOWS;
-#endif
-public:
+
 	void SetFLASHLIGHTSHADOWS( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHTSHADOWS = i;
 #ifdef _DEBUG
 		m_bFLASHLIGHTSHADOWS = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetFLASHLIGHTSHADOWS( bool i )
+
+	teeth_flashlight_ps30_Dynamic_Index(  )
 	{
-		m_nFLASHLIGHTSHADOWS = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bFLASHLIGHTSHADOWS = true;
-#endif
-	}
-public:
-	teeth_flashlight_ps30_Dynamic_Index()
-	{
+		m_nPIXELFOGTYPE = 0;
+		m_nFLASHLIGHTSHADOWS = 0;
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = false;
-#endif // _DEBUG
-		m_nPIXELFOGTYPE = 0;
-#ifdef _DEBUG
 		m_bFLASHLIGHTSHADOWS = false;
-#endif // _DEBUG
-		m_nFLASHLIGHTSHADOWS = 0;
+#endif	// _DEBUG
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bFLASHLIGHTSHADOWS;
-		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
-		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nFLASHLIGHTSHADOWS ) + 0;
+		Assert( m_bPIXELFOGTYPE && m_bFLASHLIGHTSHADOWS );
+		return ( 1 * m_nPIXELFOGTYPE ) + ( 3 * m_nFLASHLIGHTSHADOWS ) + 0;
 	}
 };
-#define shaderDynamicTest_teeth_flashlight_ps30 psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_FLASHLIGHTSHADOWS + 0
+
+#define shaderDynamicTest_teeth_flashlight_ps30 psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_FLASHLIGHTSHADOWS
+

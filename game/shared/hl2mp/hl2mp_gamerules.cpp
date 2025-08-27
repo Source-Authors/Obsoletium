@@ -870,6 +870,38 @@ void CHL2MPRules::Precache( void )
 	CBaseEntity::PrecacheScriptSound( "AlyxEmp.Charge" );
 }
 
+// dimhotepus: TF2 backport.
+#ifdef GAME_DLL
+bool CHL2MPRules::IsOfficialMap( void )
+{ 
+	static constexpr char *s_OfficialMaps[] =
+	{
+		"devtest",
+		"dm_lockdown",
+		"dm_overwatch",
+		"dm_powerhouse",
+		"dm_resistance",
+		"dm_runoff",
+		"dm_steamlab",
+		"dm_underpass",
+		"halls3",
+	};
+
+	char szCurrentMap[MAX_MAP_NAME];
+	V_strcpy_safe( szCurrentMap, STRING( gpGlobals->mapname ) );
+
+	for ( const auto *officialMap : s_OfficialMaps )
+	{
+		if ( !Q_stricmp( officialMap, szCurrentMap ) )
+		{
+			return true;
+		}
+	}
+
+	return BaseClass::IsOfficialMap();
+}
+#endif
+
 bool CHL2MPRules::ShouldCollide( int collisionGroup0, int collisionGroup1 )
 {
 	if ( collisionGroup0 > collisionGroup1 )

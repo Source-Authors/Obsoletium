@@ -2439,30 +2439,23 @@ void CL_SetSteamCrashComment()
 	ConVarRef r_shadowrendertotexture( "r_shadowrendertotexture" );
 	ConVarRef r_flashlightdepthtexture( "r_flashlightdepthtexture" );
 	ConVarRef r_waterforceexpensive( "r_waterforceexpensive" );
-		ConVarRef r_waterforcereflectentities( "r_waterforcereflectentities" );
-		ConVarRef mat_vsync( "mat_vsync" );
-		ConVarRef r_rootlod( "r_rootlod" );
-		ConVarRef mat_reducefillrate( "mat_reducefillrate" );
-		ConVarRef mat_motion_blur_enabled( "mat_motion_blur_enabled" );
-		ConVarRef mat_queue_mode( "mat_queue_mode" );
+	ConVarRef r_waterforcereflectentities( "r_waterforcereflectentities" );
+	ConVarRef mat_vsync( "mat_vsync" );
+	ConVarRef r_rootlod( "r_rootlod" );
+	ConVarRef mat_reducefillrate( "mat_reducefillrate" );
+	// dimhotepus: Dump r_lightmap_bicubic state.
+	ConVarRef r_lightmap_bicubic( "r_lightmap_bicubic" );
+	ConVarRef mat_motion_blur_enabled( "mat_motion_blur_enabled" );
+	ConVarRef mat_queue_mode( "mat_queue_mode" );
 
-#ifdef _X360
-	Q_snprintf( videoinfo, sizeof(videoinfo), "picmip: %i forceansio: %i trilinear: %i antialias: %i vsync: %i rootlod: %i reducefillrate: %i\n"\
-		"shadowrendertotexture: %i r_flashlightdepthtexture %i waterforcereflectentities: %i mat_motion_blur_enabled: %i",
-										mat_picmip.GetInt(), mat_forceaniso.GetInt(), mat_trilinear.GetInt(), mat_antialias.GetInt(), mat_aaquality.GetInt(),
-										mat_vsync.GetInt(), r_rootlod.GetInt(), mat_reducefillrate.GetInt(), 
-										r_shadowrendertotexture.GetInt(), r_flashlightdepthtexture.GetInt(),
-										r_waterforcereflectentities.GetInt(),
-										mat_motion_blur_enabled.GetInt() );
-#else
-		Q_snprintf( videoinfo, sizeof(videoinfo), "picmip: %i forceansio: %i trilinear: %i antialias: %i vsync: %i rootlod: %i reducefillrate: %i\n"\
-			"shadowrendertotexture: %i r_flashlightdepthtexture %i waterforceexpensive: %i waterforcereflectentities: %i mat_motion_blur_enabled: %i mat_queue_mode %i",
-											mat_picmip.GetInt(), mat_forceaniso.GetInt(), mat_trilinear.GetInt(), mat_antialias.GetInt(), 
-											mat_vsync.GetInt(), r_rootlod.GetInt(), mat_reducefillrate.GetInt(), 
-											r_shadowrendertotexture.GetInt(), r_flashlightdepthtexture.GetInt(),
-											r_waterforceexpensive.GetInt(), r_waterforcereflectentities.GetInt(),
-											mat_motion_blur_enabled.GetInt(), mat_queue_mode.GetInt() );
-#endif
+	V_sprintf_safe( videoinfo, "picmip: %i forceansio: %i trilinear: %i antialias: %i vsync: %i rootlod: %i reducefillrate: %i\n"\
+		"shadowrendertotexture: %i r_flashlightdepthtexture %i waterforceexpensive: %i waterforcereflectentities: %i r_lightmap_bicubic: %i mat_motion_blur_enabled: %i mat_queue_mode %i",
+			mat_picmip.GetInt(), mat_forceaniso.GetInt(), mat_trilinear.GetInt(), mat_antialias.GetInt(), 
+			mat_vsync.GetInt(), r_rootlod.GetInt(), mat_reducefillrate.GetInt(), 
+			r_shadowrendertotexture.GetInt(), r_flashlightdepthtexture.GetInt(),
+			r_waterforceexpensive.GetInt(), r_waterforcereflectentities.GetInt(),
+			r_lightmap_bicubic.GetInt(),
+			mat_motion_blur_enabled.GetInt(), mat_queue_mode.GetInt() );
 	int latency = 0;
 	if ( cl.m_NetChannel )
 	{

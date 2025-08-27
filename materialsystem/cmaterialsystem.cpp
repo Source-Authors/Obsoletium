@@ -1643,6 +1643,11 @@ void CMaterialSystem::ReadConfigFromConVars( MaterialSystem_Config_t *pConfig )
 	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_DISABLE_PHONG, !mat_phong.GetBool() );
 	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_ENABLE_PARALLAX_MAPPING, mat_parallaxmap.GetBool() );
 	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE, mat_reducefillrate.GetBool() );
+
+	// dimhotepus: TF2 backport.
+	ConVarRef r_lightmap_bicubic( "r_lightmap_bicubic" );
+	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_LIGHTMAP_BICUBIC, r_lightmap_bicubic.GetBool() );
+
 	pConfig->m_nForceAnisotropicLevel = max( mat_forceaniso.GetInt(), 1 );
 	pConfig->dxSupportLevel = MAX( ABSOLUTE_MINIMUM_DXLEVEL, mat_dxlevel.GetInt() );
 	pConfig->skipMipLevels = mat_picmip.GetInt();
@@ -1703,6 +1708,14 @@ void CMaterialSystem::ReadConfigFromConVars( MaterialSystem_Config_t *pConfig )
 		pConfig->m_bShadowDepthTexture = false;
 		pConfig->m_bMotionBlur = false;
 		pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_ENABLE_HDR, false );
+	}
+	
+	// dimhotepus: TF2 backport.
+	// Disable bicubic filtering if no support.
+	if ( pConfig->dxSupportLevel < 95 && ( pConfig->dxSupportLevel < 90 || !IsLinux() ) )
+	{
+		r_lightmap_bicubic.SetValue( 0 );
+		pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_LIGHTMAP_BICUBIC, false );
 	}
 
 	// VR mode adapter will generally be -1 if VR mode is not disabled
@@ -1880,6 +1893,11 @@ void CMaterialSystem::WriteConfigIntoConVars( const MaterialSystem_Config_t &con
 	mat_phong.SetValue( config.UsePhong() );
 	mat_parallaxmap.SetValue( config.UseParallaxMapping() );
 	mat_reducefillrate.SetValue( config.ReduceFillrate() );
+	
+	// dimhotepus: TF2 backport.
+	ConVarRef r_lightmap_bicubic( "r_lightmap_bicubic" );
+	r_lightmap_bicubic.SetValue( config.LightmapBicubic() );
+
 	mat_forceaniso.SetValue( config.m_nForceAnisotropicLevel );
 	mat_dxlevel.SetValue( MAX( ABSOLUTE_MINIMUM_DXLEVEL, config.dxSupportLevel ) );
 	mat_picmip.SetValue( config.skipMipLevels );

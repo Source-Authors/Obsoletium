@@ -1,11 +1,16 @@
+// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+
+#pragma once
 #include "shaderlib/cshader.h"
 class sprite_vs20_Static_Index
 {
-private:
-	int m_nVERTEXCOLOR;
+	unsigned int m_nVERTEXCOLOR : 2;
+	unsigned int m_nSRGB : 2;
 #ifdef _DEBUG
-	bool m_bVERTEXCOLOR;
-#endif
+	bool m_bVERTEXCOLOR : 1;
+	bool m_bSRGB : 1;
+#endif	// _DEBUG
 public:
 	void SetVERTEXCOLOR( int i )
 	{
@@ -13,67 +18,44 @@ public:
 		m_nVERTEXCOLOR = i;
 #ifdef _DEBUG
 		m_bVERTEXCOLOR = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetVERTEXCOLOR( bool i )
-	{
-		m_nVERTEXCOLOR = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bVERTEXCOLOR = true;
-#endif
-	}
-private:
-	int m_nSRGB;
-#ifdef _DEBUG
-	bool m_bSRGB;
-#endif
-public:
+
 	void SetSRGB( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSRGB = i;
 #ifdef _DEBUG
 		m_bSRGB = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetSRGB( bool i )
+
+	sprite_vs20_Static_Index(  )
 	{
-		m_nSRGB = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bSRGB = true;
-#endif
-	}
-public:
-	sprite_vs20_Static_Index( )
-	{
+		m_nVERTEXCOLOR = 0;
+		m_nSRGB = 0;
 #ifdef _DEBUG
 		m_bVERTEXCOLOR = false;
-#endif // _DEBUG
-		m_nVERTEXCOLOR = 0;
-#ifdef _DEBUG
 		m_bSRGB = false;
-#endif // _DEBUG
-		m_nSRGB = 0;
+#endif	// _DEBUG
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bVERTEXCOLOR && m_bSRGB;
-		Assert( bAllStaticVarsDefined );
-#endif // _DEBUG
+		Assert( m_bVERTEXCOLOR && m_bSRGB );
 		return ( 2 * m_nVERTEXCOLOR ) + ( 4 * m_nSRGB ) + 0;
 	}
 };
-#define shaderStaticTest_sprite_vs20 vsh_forgot_to_set_static_VERTEXCOLOR + vsh_forgot_to_set_static_SRGB + 0
+
+#define shaderStaticTest_sprite_vs20 vsh_forgot_to_set_static_VERTEXCOLOR + vsh_forgot_to_set_static_SRGB
+
+
 class sprite_vs20_Dynamic_Index
 {
-private:
-	int m_nDOWATERFOG;
+	unsigned int m_nDOWATERFOG : 2;
 #ifdef _DEBUG
-	bool m_bDOWATERFOG;
-#endif
+	bool m_bDOWATERFOG : 1;
+#endif	// _DEBUG
 public:
 	void SetDOWATERFOG( int i )
 	{
@@ -81,32 +63,23 @@ public:
 		m_nDOWATERFOG = i;
 #ifdef _DEBUG
 		m_bDOWATERFOG = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetDOWATERFOG( bool i )
+
+	sprite_vs20_Dynamic_Index(  )
 	{
-		m_nDOWATERFOG = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bDOWATERFOG = true;
-#endif
-	}
-public:
-	sprite_vs20_Dynamic_Index()
-	{
+		m_nDOWATERFOG = 0;
 #ifdef _DEBUG
 		m_bDOWATERFOG = false;
-#endif // _DEBUG
-		m_nDOWATERFOG = 0;
+#endif	// _DEBUG
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-		bool bAllDynamicVarsDefined = m_bDOWATERFOG;
-		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+		Assert( m_bDOWATERFOG );
 		return ( 1 * m_nDOWATERFOG ) + 0;
 	}
 };
-#define shaderDynamicTest_sprite_vs20 vsh_forgot_to_set_dynamic_DOWATERFOG + 0
+
+#define shaderDynamicTest_sprite_vs20 vsh_forgot_to_set_dynamic_DOWATERFOG
+

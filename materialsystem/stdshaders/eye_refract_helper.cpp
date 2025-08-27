@@ -274,7 +274,7 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 		if ( bDrawFlashlightAdditivePass == true )
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_4, flashlightState.m_vecLightOrigin.Base(), 1 );
 
-		LightState_t lightState = {};
+		LightState_t lightState = { 0, false, false };
 		if ( bDrawFlashlightAdditivePass == false )
 		{
 			pShaderAPI->GetDX9LightState( &lightState );
@@ -364,6 +364,7 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 				DECLARE_DYNAMIC_PIXEL_SHADER( eye_refract_ps20b );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, lightState.m_nNumLights );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
+				SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
 				SET_DYNAMIC_PIXEL_SHADER( eye_refract_ps20b );
 			}
 			else // ps.2.0
@@ -379,6 +380,7 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 			DECLARE_DYNAMIC_PIXEL_SHADER( eye_refract_ps30 );
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, lightState.m_nNumLights );
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
+			SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
 			SET_DYNAMIC_PIXEL_SHADER( eye_refract_ps30 );
 		}
 #endif

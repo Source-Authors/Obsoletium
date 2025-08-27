@@ -373,6 +373,7 @@ class CShaderAPIDx11 final : public CShaderAPIBase, public IDebugTextureInfo {
   void GetSceneFogColor(unsigned char *rgb) override;
   MaterialFogMode_t GetSceneFogMode() override;
   int GetPixelFogCombo() override;
+  int GetPixelFogCombo1(bool bRadial) override;
 
   void SetHeightClipZ(float z) override;
   void SetHeightClipMode(enum MaterialHeightClipMode_t heightClipMode) override;

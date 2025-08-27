@@ -1,27 +1,30 @@
+// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
+// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
+
+#pragma once
 #include "shaderlib/cshader.h"
 class lightmappedgeneric_decal_vs20_Static_Index
 {
 public:
-	lightmappedgeneric_decal_vs20_Static_Index( )
+	lightmappedgeneric_decal_vs20_Static_Index(  )
 	{
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-#endif // _DEBUG
 		return 0;
 	}
 };
-#define shaderStaticTest_lightmappedgeneric_decal_vs20 0
+
+#define shaderStaticTest_lightmappedgeneric_decal_vs20 1
+
+
 class lightmappedgeneric_decal_vs20_Dynamic_Index
 {
-private:
-	int m_nDOWATERFOG;
+	unsigned int m_nDOWATERFOG : 2;
 #ifdef _DEBUG
-	bool m_bDOWATERFOG;
-#endif
+	bool m_bDOWATERFOG : 1;
+#endif	// _DEBUG
 public:
 	void SetDOWATERFOG( int i )
 	{
@@ -29,32 +32,23 @@ public:
 		m_nDOWATERFOG = i;
 #ifdef _DEBUG
 		m_bDOWATERFOG = true;
-#endif
+#endif	// _DEBUG
 	}
-	void SetDOWATERFOG( bool i )
+
+	lightmappedgeneric_decal_vs20_Dynamic_Index(  )
 	{
-		m_nDOWATERFOG = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bDOWATERFOG = true;
-#endif
-	}
-public:
-	lightmappedgeneric_decal_vs20_Dynamic_Index()
-	{
+		m_nDOWATERFOG = 0;
 #ifdef _DEBUG
 		m_bDOWATERFOG = false;
-#endif // _DEBUG
-		m_nDOWATERFOG = 0;
+#endif	// _DEBUG
 	}
-	int GetIndex()
+
+	int GetIndex() const
 	{
-		// Asserts to make sure that we aren't using any skipped combinations.
-		// Asserts to make sure that we are setting all of the combination vars.
-#ifdef _DEBUG
-		bool bAllDynamicVarsDefined = m_bDOWATERFOG;
-		Assert( bAllDynamicVarsDefined );
-#endif // _DEBUG
+		Assert( m_bDOWATERFOG );
 		return ( 1 * m_nDOWATERFOG ) + 0;
 	}
 };
-#define shaderDynamicTest_lightmappedgeneric_decal_vs20 vsh_forgot_to_set_dynamic_DOWATERFOG + 0
+
+#define shaderDynamicTest_lightmappedgeneric_decal_vs20 vsh_forgot_to_set_dynamic_DOWATERFOG
+

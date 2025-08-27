@@ -25,7 +25,8 @@ extern ConVar	my_mat_fullbright;
 template<int N> class CFixedCommandStorageBuffer
 {
 public:
-	uint8 m_Data[N];
+	// dimhotepus: alignas( 8 ) from TF2 backport.
+	alignas( 8 ) uint8 m_Data[N];
 
 	uint8 *m_pDataOut;
 #ifdef DBGFLAG_ASSERT
@@ -49,8 +50,8 @@ public:
 	template<class T> FORCEINLINE void Put( T const &nValue )
 	{
 		EnsureCapacity( sizeof( T ) );
-		// dimhotepus: Fix UB when reinterepret_cast value to out.
-		memcpy( m_pDataOut, &nValue, sizeof(T) );
+		// dimhotepus: Fix UB when reinterpret_cast value to out.
+		memcpy( m_pDataOut, &nValue, sizeof( nValue ) );
 		m_pDataOut += sizeof( nValue );
 #ifdef DBGFLAG_ASSERT
 		m_nNumBytesRemaining -= sizeof( nValue );
@@ -62,6 +63,7 @@ public:
 		Put( nValue );
 	}
 
+	// dimhotepus: Add explicit version for intp.
 	FORCEINLINE void PutIntPtr( intp nValue )
 	{
 		Put( nValue );

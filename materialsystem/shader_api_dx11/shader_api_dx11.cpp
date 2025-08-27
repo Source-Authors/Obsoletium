@@ -1042,6 +1042,10 @@ int CShaderAPIDx11::GetPixelFogCombo() {
   return 0;  // FIXME
 }
 
+int CShaderAPIDx11::GetPixelFogCombo1(bool bRadial) {
+  return 0;  // FIXME
+}
+
 void CShaderAPIDx11::FogColor3f(float r, float g, float b) {}
 
 void CShaderAPIDx11::FogColor3fv(float const *rgb) {}

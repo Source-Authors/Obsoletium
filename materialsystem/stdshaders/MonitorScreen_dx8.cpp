@@ -6,7 +6,7 @@
 
 #include "BaseVSShader.h"
 
-#include "UnlitTwoTexture.inc"
+#include "unlittwotexture.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -50,7 +50,7 @@ BEGIN_VS_SHADER( MonitorScreen_DX8,
 
 	SHADER_FALLBACK
 	{
-		if( g_pHardwareConfig->GetDXSupportLevel() < 80 || (params && !params[BASETEXTURE]->IsDefined()) )
+		if( IsPC() && g_pHardwareConfig->GetDXSupportLevel() < 80 || (params && !params[BASETEXTURE]->IsDefined()) )
 		{
 			if( IS_FLAG_DEFINED( MATERIAL_VAR_MODEL ) )
 			{

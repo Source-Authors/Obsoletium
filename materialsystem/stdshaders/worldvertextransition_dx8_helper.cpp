@@ -61,7 +61,7 @@ void DrawWorldVertexTransitionEditor_DX8( CBaseVSShader *pShader, [[maybe_unused
 		
 		pShader->EnablePixelShaderOverbright( 0, true, true );
 		
-		// TODO: JasonM - Gnarly hack since we're calling this legacy shader from DX9
+		// JasonM - Gnarly hack since we're calling this legacy shader from DX9
 		int nTextureTransformConst  = VERTEX_SHADER_SHADER_SPECIFIC_CONST_0;
 		int nTextureTransformConst2 = VERTEX_SHADER_SHADER_SPECIFIC_CONST_2;
 		if ( g_pHardwareConfig->GetDXSupportLevel() >= 90)

@@ -31,9 +31,6 @@ struct CompositorInfo_t
 	int m_bDebug;
 };
 
-#ifdef STAGING_ONLY
-	ConVar r_texcomp_debug_stickers( "r_texcomp_debug_stickers", "0" );
-#endif
 
 static void DrawCompositorStage_ps20( CBaseVSShader *pShader, IMaterialVar **params, IShaderShadow* pShaderShadow, IShaderDynamicAPI* pShaderAPI, VertexCompressionType_t vertexCompression, const CompositorInfo_t &info );
 static void DrawCompositorStage_ps20b( CBaseVSShader *pShader, IMaterialVar **params, IShaderShadow* pShaderShadow, IShaderDynamicAPI* pShaderAPI, VertexCompressionType_t vertexCompression, const CompositorInfo_t &info );
@@ -442,11 +439,7 @@ static void DrawCompositorStage_ps20b( CBaseVSShader *pShader, IMaterialVar **pa
 		if ( textureCountThisPass > 3 ) pShader->SetPixelShaderConstant( 5, info.m_nTexAdjustLevels[ 3 ] );
 			
 		DECLARE_DYNAMIC_PIXEL_SHADER( compositor_ps20b );
-		#ifdef STAGING_ONLY
-			SET_DYNAMIC_PIXEL_SHADER_COMBO( DEBUG_MODE, r_texcomp_debug_stickers.GetBool() ? 1 : 0 );
-		#else
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( DEBUG_MODE, 0 );
-		#endif
 		SET_DYNAMIC_PIXEL_SHADER( compositor_ps20b );
 
 		pShader->Draw();

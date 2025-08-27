@@ -18,6 +18,10 @@ if exist debug_dx9 rd /s /q debug_dx9
 
 if exist include rd /s /q include
 
+if exist fxctmp9 rd /s /q fxctmp9
+if exist vshtmp9 rd /s /q vshtmp9
+if exist pshtmp9 rd /s /q pshtmp9
+
 if exist fxctmp9_tmp rd /s /q fxctmp9_tmp
 if exist vshtmp9_tmp rd /s /q vshtmp9_tmp
 if exist pshtmp9_tmp rd /s /q pshtmp9_tmp

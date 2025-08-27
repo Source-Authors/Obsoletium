@@ -2336,6 +2336,17 @@ public:
 	{
 		return true;
 	}
+	
+	// dimhotepus: TF2 backport.
+	void FogRadial( bool bRadial ) override
+	{
+	}
+	
+	// dimhotepus: TF2 backport.
+	bool GetFogRadial() override
+	{
+		return false;
+	}
 };
 
 
