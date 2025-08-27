@@ -1610,7 +1610,7 @@ void COptionsSubVideo::OnResetData()
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
 	int ItemIndex;
 
-	if ( config.Borderless() )
+	if ( config.NoWindowBorder() )
 	{
 		// Last before one item in the combobox is window borderless.
 		ItemIndex = ( m_pWindowed->GetItemCount() - 1 );
@@ -1634,7 +1634,7 @@ void COptionsSubVideo::OnResetData()
 
     m_pWindowed->ActivateItem( ItemIndex );
 #else
-	if (config.Borderless())
+	if (config.NoWindowBorder())
 	{
 		m_pWindowed->ActivateItem( 2 );
 	}
@@ -1649,7 +1649,7 @@ void COptionsSubVideo::OnResetData()
 #endif
 
 	// reset gamma control
-	m_pGammaButton->SetEnabled( !config.Windowed() && !config.Borderless() );
+	m_pGammaButton->SetEnabled( !config.Windowed() && !config.NoWindowBorder() );
 
 	m_pHDContent->SetSelected( BUseHDContent() );
 
@@ -1781,7 +1781,7 @@ void COptionsSubVideo::OnApplyChanges()
 	if ( config.m_VideoMode.m_Width != width
 		|| config.m_VideoMode.m_Height != height
 		|| config.Windowed() != windowed
-		|| config.Borderless() != borderless )
+		|| config.NoWindowBorder() != borderless )
 	{
 		bConfigChanged = true;
 	}
@@ -1853,7 +1853,7 @@ void COptionsSubVideo::PerformLayout()
 	if ( m_pGammaButton )
 	{
 		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-		m_pGammaButton->SetEnabled( !config.Windowed() && !config.Borderless() );
+		m_pGammaButton->SetEnabled( !config.Windowed() && !config.NoWindowBorder() );
 	}
 }
 

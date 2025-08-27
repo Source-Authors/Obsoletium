@@ -2107,7 +2107,7 @@ bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed
 #endif
 
     config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, bWindowed );
-	config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, bBorderless );
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, bBorderless );
 
     // FIXME: This is trash. We have to do *different* things depending on how we're setting the mode!
     if ( !m_bSetModeOnce )
@@ -2144,7 +2144,7 @@ void CVideoMode_MaterialSystem::AdjustForModeChange( void )
     int nNewWidth = g_pMaterialSystemConfig->m_VideoMode.m_Width;
     int nNewHeight = g_pMaterialSystemConfig->m_VideoMode.m_Height;
     bool bWindowed = g_pMaterialSystemConfig->Windowed();
-    bool bBorderless = g_pMaterialSystemConfig->Borderless();
+    bool bBorderless = g_pMaterialSystemConfig->NoWindowBorder();
 
     // reset the window size
     CMatRenderContextPtr pRenderContext( materials );

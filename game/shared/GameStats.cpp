@@ -1261,7 +1261,8 @@ void CBaseGameStats_Driver::ResetData()
 	pKV->SetInt( "Height", dest_height );
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 	pKV->SetInt( "Windowed", config.Windowed() == true );
-	pKV->SetInt( "Borderless", config.Borderless() == true );
+	// dimhotepus: Add no window border flag.
+	pKV->SetInt( "NoWindowBorder", config.NoWindowBorder() == true );
 	pKV->SetInt( "MaxDxLevel", g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel() );
 
 	engine->SetGamestatsData( m_pGamestatsData );

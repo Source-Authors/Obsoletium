@@ -1808,7 +1808,7 @@ void CDemoPlayer::WriteTimeDemoResults( void )
 	g_pFileSystem->FPrintf( fileHandle, "%i,", frames );
 	g_pFileSystem->FPrintf( fileHandle, "%i,", width );
 	g_pFileSystem->FPrintf( fileHandle, "%i,", height );
-	g_pFileSystem->FPrintf( fileHandle, "%s,", config.Windowed() ? (config.Borderless() ? "windowed borderless" : "windowed") : "fullscreen");
+	g_pFileSystem->FPrintf( fileHandle, "%s,", config.Windowed() ? (config.NoWindowBorder() ? "windowed borderless" : "windowed") : "fullscreen");
 	g_pFileSystem->FPrintf( fileHandle, "%s,", mat_vsync.GetBool() ? "on" : "off" );
 	g_pFileSystem->FPrintf( fileHandle, "%d,", mat_antialias.GetInt() );
 	g_pFileSystem->FPrintf( fileHandle, "%d,", mat_forceaniso.GetInt() );

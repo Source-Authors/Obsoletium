@@ -1699,7 +1699,7 @@ bool CEngineAPI::ModInit( const char *pModName, const char *pGameDir )
 	bool bWindowed = g_pMaterialSystemConfig->Windowed() ||
 		// at init time we never want to start up full screen
 		g_pMaterialSystemConfig->m_nVRModeAdapter != UINT_MAX;
-	bool bBorderless = g_pMaterialSystemConfig->Borderless() ||
+	bool bBorderless = g_pMaterialSystemConfig->NoWindowBorder() ||
 		// at init time we never want to start up full screen
 		g_pMaterialSystemConfig->m_nVRModeAdapter != UINT_MAX;
 

@@ -388,7 +388,7 @@ static void ReadMaterialSystemConfigFromRegistry( MaterialSystem_Config_t &confi
 	ReadVideoConfigInt( "ScreenWidth", &config.m_VideoMode.m_Width );
 	ReadVideoConfigInt( "ScreenHeight", &config.m_VideoMode.m_Height );
 	config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, ReadVideoConfigInt( "ScreenWindowed", 0 ) != 0 );
-	config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, ReadVideoConfigInt( "ScreenNoBorder", 0 ) != 0 );
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, ReadVideoConfigInt( "ScreenNoBorder", 0 ) != 0 );
 #if defined( USE_SDL ) && !defined( SWDS )
 	// Read the ScreenDisplayIndex and set sdl_displayindex if it's there.
 	static ConVarRef conVar( "sdl_displayindex" );
@@ -517,7 +517,7 @@ static void WriteMaterialSystemConfigToRegistry( const MaterialSystem_Config_t &
 	WriteVideoConfigInt( "ScreenWidth", config.m_VideoMode.m_Width );
 	WriteVideoConfigInt( "ScreenHeight", config.m_VideoMode.m_Height );
 	WriteVideoConfigInt( "ScreenWindowed", config.Windowed() );
-	WriteVideoConfigInt( "ScreenNoBorder", config.Borderless() );
+	WriteVideoConfigInt( "ScreenNoBorder", config.NoWindowBorder() );
 	WriteVideoConfigInt( "ScreenMSAA", config.m_nAASamples );
 	WriteVideoConfigInt( "ScreenMSAAQuality", config.m_nAAQuality );
 	WriteVideoConfigInt( "MotionBlur", config.m_bMotionBlur ? 1 : 0 );
@@ -574,7 +574,7 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 	// Check window is borderless
 	if ( CommandLine()->FindParm( "-noborder" ) )
 	{
-		config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, true );
+		config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, true );
 	}
 
 	// Get width and height
@@ -832,7 +832,8 @@ void GetMaterialSystemConfigForBenchmarkUpload(KeyValues *dataToUpload)
 	dataToUpload->SetInt( "ShadowDepthTexture", g_pMaterialSystemConfig->ShadowDepthTexture() );
 	dataToUpload->SetInt( "MotionBlur", g_pMaterialSystemConfig->MotionBlur() );
 	dataToUpload->SetInt( "Windowed", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_WINDOWED) ? 1 : 0 );
-	dataToUpload->SetInt( "Borderless", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_BORDERLESS) ? 1 : 0 );
+	// dimhotepus: Send no window border flags, too.
+	dataToUpload->SetInt( "NoWindowBorder", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER) ? 1 : 0 );
 	dataToUpload->SetInt( "Trilinear", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_FORCE_TRILINEAR) ? 1 : 0 );
 	dataToUpload->SetInt( "ForceHWSync", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_FORCE_HWSYNC) ? 1 : 0 );
 	dataToUpload->SetInt( "NoWaitForVSync", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_NO_WAIT_FOR_VSYNC) ? 1 : 0 );
@@ -864,7 +865,8 @@ void PrintMaterialSystemConfig( const MaterialSystem_Config_t &config )
 	Warning( "dxSupportLevel: %d\n", config.dxSupportLevel );
 	Warning( "monitorGamma: %f\n", config.m_fMonitorGamma );
 	Warning( "MATSYS_VIDCFG_FLAGS_WINDOWED: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_WINDOWED ) ? "true" : "false" );
-	Warning( "MATSYS_VIDCFG_FLAGS_BORDERLESS: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_BORDERLESS ) ? "true" : "false" );
+	// dimhotepus: Print no window border flag, too.
+	Warning( "MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_FORCE_TRILINEAR: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_FORCE_TRILINEAR ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_FORCE_HWSYNC: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_FORCE_HWSYNC ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_DISABLE_SPECULAR: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_DISABLE_SPECULAR ) ? "true" : "false" );
