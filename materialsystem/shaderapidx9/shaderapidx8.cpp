@@ -4351,12 +4351,6 @@ void CShaderAPIDx8::ApplyZBias( const ShadowState_t& shaderState )
 			fDepthBias = d;
 		}
 
-		if( ReverseDepthOnX360() )
-		{
-			fSlopeScaleDepthBias = -fSlopeScaleDepthBias;
-			fDepthBias = -fDepthBias;
-		}
-
 		SetRenderStateConstMacro( this, D3DRS_SLOPESCALEDEPTHBIAS, *((DWORD*) (&fSlopeScaleDepthBias)) );
 		SetRenderStateConstMacro( this, D3DRS_DEPTHBIAS, *((DWORD*) (&fDepthBias)) );
 	} 
@@ -10255,18 +10249,7 @@ static void CommitSetViewports( IDirect3DDevice9 *pDevice, const DynamicState_t 
 	// The width + height can be zero at startup sometimes.
 	if ( bChanged && ( desiredState.m_Viewport.Width != 0 ) && ( desiredState.m_Viewport.Height != 0 ) )
 	{
-		if( ReverseDepthOnX360() ) //reverse depth on 360 for better perf through hierarchical z
-		{
-			D3DVIEWPORT9 reverseDepthViewport;
-			reverseDepthViewport = desiredState.m_Viewport;
-			reverseDepthViewport.MinZ = 1.0f - desiredState.m_Viewport.MinZ;
-			reverseDepthViewport.MaxZ = 1.0f - desiredState.m_Viewport.MaxZ;
-			Dx9Device()->SetViewport( &reverseDepthViewport );
-		}
-		else
-		{
 			Dx9Device()->SetViewport( &desiredState.m_Viewport );
-		}
 		memcpy( &currentState.m_Viewport, &desiredState.m_Viewport, sizeof( D3DVIEWPORT9 ) );
 	}
 }
@@ -10586,7 +10569,7 @@ void CShaderAPIDx8::ClearBuffers( bool bClearColor, bool bClearDepth, bool bClea
 	FlushBufferedPrimitives();
 	CallCommitFuncs( COMMIT_PER_DRAW, true );
 
-	float depth = (ShaderUtil()->GetConfig().bReverseDepth ^ ReverseDepthOnX360()) ? 0.0f : 1.0f;
+	float depth = ShaderUtil()->GetConfig().bReverseDepth ? 0.0f : 1.0f;
 	DWORD mask = 0;
 
 	if ( bClearColor )

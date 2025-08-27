@@ -779,29 +779,6 @@ float DepthFeathering( sampler DepthSampler, const float2 vScreenPos, float fPro
 #define flSceneDepth flDepths.x
 #define flSpriteDepth flDepths.y
 
-#		if ( defined( _X360 ) )
-		{
-			//Get depth from the depth texture. Need to sample with the offset of (0.5, 0.5) to fix rounding errors
-			asm {
-				tfetch2D flDepths.x___, vScreenPos, DepthSampler, OffsetX=0.5, OffsetY=0.5, MinFilter=point, MagFilter=point, MipFilter=point
-			};
-
-#			if(	!defined( REVERSE_DEPTH_ON_X360 ) )
-				flSceneDepth = 1.0f - flSceneDepth;
-#			endif
-
-			//get the sprite depth into the same range as the texture depth
-			flSpriteDepth = fProjZ / fProjW;
-
-			//unproject to get at the pre-projection z. This value is much more linear than depth
-			flDepths = vDepthBlendConstants.z / flDepths;
-			flDepths = vDepthBlendConstants.y - flDepths;
-
-			flFeatheredAlpha = flSceneDepth - flSpriteDepth;
-			flFeatheredAlpha *= vDepthBlendConstants.x;
-			flFeatheredAlpha = saturate( flFeatheredAlpha );
-		}
-#		else
 		{
 			flSceneDepth = tex2D( DepthSampler, vScreenPos ).a;	// PC uses dest alpha of the frame buffer
 			flSpriteDepth = SoftParticleDepth( fProjZ );
@@ -810,7 +787,6 @@ float DepthFeathering( sampler DepthSampler, const float2 vScreenPos, float fPro
 			flFeatheredAlpha = max( smoothstep( 0.75f, 1.0f, flSceneDepth ), flFeatheredAlpha ); //as the sprite approaches the edge of our compressed depth space, the math stops working. So as the sprite approaches the far depth, smoothly remove feathering.
 			flFeatheredAlpha = saturate( flFeatheredAlpha );
 		}
-#		endif
 
 #undef flSceneDepth
 #undef flSpriteDepth

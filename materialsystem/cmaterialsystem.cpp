@@ -3026,10 +3026,8 @@ void CMaterialSystem::AllocateStandardTextures()
 		g_pShaderAPI->TexMinFilter( SHADER_TEXFILTERMODE_LINEAR );
 		g_pShaderAPI->TexMagFilter( SHADER_TEXFILTERMODE_LINEAR );
 		
-		//360 gets depth out of the red channel (which doubles as depth in D24S8) and may be 0/1 depending on REVERSE_DEPTH_ON_X360
 		//PC gets depth out of the alpha channel
-		texel[0] = texel[1] = texel[2] = ReverseDepthOnX360() ? 0 : 255;
-		texel[3] = 255;
+		texel[0] = texel[1] = texel[2] = texel[3] = 255;
 
 		g_pShaderAPI->TexImage2D( 0, 0, IMAGE_FORMAT_RGBA8888, 0, 1, 1, IMAGE_FORMAT_RGBA8888, false, texel );
 	}
