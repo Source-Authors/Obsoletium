@@ -27,7 +27,7 @@ struct PS_INPUT
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	HALF4 color;
+	float4 color;
 	color.xyz = ENV_MAP_SCALE * texCUBE( EnvmapSampler, i.eyeToVertVector );
 	color.a = 1.0f;
 	color *= i.vertexColor;

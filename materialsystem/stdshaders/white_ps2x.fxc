@@ -7,7 +7,7 @@ struct PS_INPUT
 {
 };
 
-HALF4 main( PS_INPUT i ) : COLOR
+float4 main( PS_INPUT i ) : COLOR
 {
 	return FinalOutput( float4( 1.0f, 1.0f, 1.0f, 1.0f ), 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
 }

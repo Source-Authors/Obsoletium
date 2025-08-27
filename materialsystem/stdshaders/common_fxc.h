@@ -23,18 +23,18 @@
 
 // This is where all common code for both vertex and pixel shaders.
 #define OO_SQRT_3 0.57735025882720947f
-static const HALF3 bumpBasis[3] = {
-	HALF3( 0.81649661064147949f, 0.0f, OO_SQRT_3 ),
-	HALF3(  -0.40824833512306213f, 0.70710676908493042f, OO_SQRT_3 ),
-	HALF3(  -0.40824821591377258f, -0.7071068286895752f, OO_SQRT_3 )
+static const float3 bumpBasis[3] = {
+	float3( 0.81649661064147949f, 0.0f, OO_SQRT_3 ),
+	float3(  -0.40824833512306213f, 0.70710676908493042f, OO_SQRT_3 ),
+	float3(  -0.40824821591377258f, -0.7071068286895752f, OO_SQRT_3 )
 };
-static const HALF3 bumpBasisTranspose[3] = {
-	HALF3( 0.81649661064147949f, -0.40824833512306213f, -0.40824833512306213f ),
-	HALF3(  0.0f, 0.70710676908493042f, -0.7071068286895752f ),
-	HALF3(  OO_SQRT_3, OO_SQRT_3, OO_SQRT_3 )
+static const float3 bumpBasisTranspose[3] = {
+	float3( 0.81649661064147949f, -0.40824833512306213f, -0.40824833512306213f ),
+	float3(  0.0f, 0.70710676908493042f, -0.7071068286895752f ),
+	float3(  OO_SQRT_3, OO_SQRT_3, OO_SQRT_3 )
 };
 
-HALF3 CalcReflectionVectorNormalized( HALF3 normal, HALF3 eyeVector )
+float3 CalcReflectionVectorNormalized( float3 normal, float3 eyeVector )
 {
 	// FIXME: might be better of normalizing with a normalizing cube map and
 	// get rid of the dot( normal, normal )
@@ -42,7 +42,7 @@ HALF3 CalcReflectionVectorNormalized( HALF3 normal, HALF3 eyeVector )
 	return 2.0 * ( dot( normal, eyeVector ) / dot( normal, normal ) ) * normal - eyeVector;
 }
 
-HALF3 CalcReflectionVectorUnnormalized( HALF3 normal, HALF3 eyeVector )
+float3 CalcReflectionVectorUnnormalized( float3 normal, float3 eyeVector )
 {
 	// FIXME: might be better of normalizing with a normalizing cube map and
 	// get rid of the dot( normal, normal )
@@ -60,7 +60,7 @@ float3 HuePreservingColorClamp( float3 c )
 	return (c / maximum);
 }
 
-HALF3 HuePreservingColorClamp( HALF3 c, HALF maxVal )
+float3 HuePreservingColorClamp( float3 c, float maxVal )
 {
 	// Get the max of all of the color components and a specified maximum amount
 	float maximum = max( max( c.x, c.y ), max( c.z, maxVal ) );
@@ -68,34 +68,34 @@ HALF3 HuePreservingColorClamp( HALF3 c, HALF maxVal )
 }
 
 #if (AA_CLAMP==1)
-HALF2 ComputeLightmapCoordinates( HALF4 Lightmap1and2Coord, HALF2 Lightmap3Coord ) 
+float2 ComputeLightmapCoordinates( float4 Lightmap1and2Coord, float2 Lightmap3Coord ) 
 {
-    HALF2 result = saturate(Lightmap1and2Coord.xy) * Lightmap1and2Coord.wz * 0.99;
+    float2 result = saturate(Lightmap1and2Coord.xy) * Lightmap1and2Coord.wz * 0.99;
     result += Lightmap3Coord;
     return result;
 }
 
-void ComputeBumpedLightmapCoordinates( HALF4 Lightmap1and2Coord, HALF2 Lightmap3Coord,
-									  out HALF2 bumpCoord1,
-									  out HALF2 bumpCoord2,
-									  out HALF2 bumpCoord3 ) 
+void ComputeBumpedLightmapCoordinates( float4 Lightmap1and2Coord, float2 Lightmap3Coord,
+									  out float2 bumpCoord1,
+									  out float2 bumpCoord2,
+									  out float2 bumpCoord3 ) 
 {
-    HALF2 result = saturate(Lightmap1and2Coord.xy) * Lightmap1and2Coord.wz * 0.99;
+    float2 result = saturate(Lightmap1and2Coord.xy) * Lightmap1and2Coord.wz * 0.99;
     result += Lightmap3Coord;
-    bumpCoord1 = result + HALF2(Lightmap1and2Coord.z, 0);
-    bumpCoord2 = result + 2*HALF2(Lightmap1and2Coord.z, 0);
-    bumpCoord3 = result + 3*HALF2(Lightmap1and2Coord.z, 0);
+    bumpCoord1 = result + float2(Lightmap1and2Coord.z, 0);
+    bumpCoord2 = result + 2*float2(Lightmap1and2Coord.z, 0);
+    bumpCoord3 = result + 3*float2(Lightmap1and2Coord.z, 0);
 }
 #else
-HALF2 ComputeLightmapCoordinates( HALF4 Lightmap1and2Coord, HALF2 Lightmap3Coord ) 
+float2 ComputeLightmapCoordinates( float4 Lightmap1and2Coord, float2 Lightmap3Coord ) 
 {
     return Lightmap1and2Coord.xy;
 }
 
-void ComputeBumpedLightmapCoordinates( HALF4 Lightmap1and2Coord, HALF2 Lightmap3Coord,
-									  out HALF2 bumpCoord1,
-									  out HALF2 bumpCoord2,
-									  out HALF2 bumpCoord3 ) 
+void ComputeBumpedLightmapCoordinates( float4 Lightmap1and2Coord, float2 Lightmap3Coord,
+									  out float2 bumpCoord1,
+									  out float2 bumpCoord2,
+									  out float2 bumpCoord3 ) 
 {
     bumpCoord1 = Lightmap1and2Coord.xy;
     bumpCoord2 = Lightmap1and2Coord.wz; // reversed order!!!

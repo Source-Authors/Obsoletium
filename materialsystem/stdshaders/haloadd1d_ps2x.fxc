@@ -11,7 +11,7 @@ float g_flDimValue : register( c0 );
 
 struct PS_INPUT
 {
-	HALF2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
+	float2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
 };
 
 float4 main( PS_INPUT i ) : COLOR

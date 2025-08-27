@@ -25,23 +25,23 @@
 #include "common_flashlight_fxc.h"
 #include "common_vertexlitgeneric_dx9.h"
 
-const HALF4 g_EnvmapTint						: register( c0 );
-const HALF4 g_DiffuseModulation					: register( c1 );
+const float4 g_EnvmapTint						: register( c0 );
+const float4 g_DiffuseModulation				: register( c1 );
 #if !FLASHLIGHT
-		const HALF3 g_EnvmapContrast			: register( c2 );
-		const HALF3 g_EnvmapSaturation			: register( c3 );
+		const float3 g_EnvmapContrast			: register( c2 );
+		const float3 g_EnvmapSaturation			: register( c3 );
 #endif
-const HALF4 g_SelfIllumTint						: register( c4 );
+const float4 g_SelfIllumTint					: register( c4 );
 const float3 cAmbientCube[6]					: register( c5 );
 
 // 2 registers each - 6 register total
 PixelShaderLightInfo cLightInfo[3]				: register( c13 );  // through c18
-const HALF3 g_EyePos							: register( c20 );
-const HALF4 g_FogParams							: register( c21 );
+const float3 g_EyePos							: register( c20 );
+const float4 g_FogParams						: register( c21 );
 
 #if FLASHLIGHT
 const float4 g_FlashlightAttenuationFactors	    : register( c22 );
-const HALF3 g_FlashlightPos						: register( c23 );
+const float3 g_FlashlightPos					: register( c23 );
 const float4x4 g_FlashlightWorldToTexture		: register( c24 ); // through c27
 #else
 const float g_Time : register( c22 );
@@ -58,7 +58,7 @@ sampler FlashlightSampler		: register( s7 );
 
 struct PS_INPUT
 {
-	HALF4 baseTexCoord2_tangentSpaceVertToEyeVectorXY			: TEXCOORD0;
+	float4 baseTexCoord2_tangentSpaceVertToEyeVectorXY			: TEXCOORD0;
 
 	// bump mapping and a separate envmap mask texture are mutually exclusive.
 	float4 lightAtten											: TEXCOORD1;
@@ -81,18 +81,18 @@ float4 main( PS_INPUT i ) : COLOR
 	bool bAmbientLight = AMBIENT_LIGHT ? true : false;
 	int nNumLights = NUM_LIGHTS;
 
-	HALF4 baseColor = HALF4( 1.0f, 1.0f, 1.0f, 1.0f );
+	float4 baseColor = float4( 1.0f, 1.0f, 1.0f, 1.0f );
 	if( bBaseTexture )
 		baseColor = tex2D( BaseTextureSampler, i.baseTexCoord2_tangentSpaceVertToEyeVectorXY.xy );
 	
 	float specularFactor = 1.0f;
-	HALF4 normalTexel = tex2D( BumpmapSampler, i.baseTexCoord2_tangentSpaceVertToEyeVectorXY.xy );
-	HALF3 tangentSpaceNormal = 2.0f * normalTexel - 1.0f;
+	float4 normalTexel = tex2D( BumpmapSampler, i.baseTexCoord2_tangentSpaceVertToEyeVectorXY.xy );
+	float3 tangentSpaceNormal = 2.0f * normalTexel - 1.0f;
 
 	if( bNormalMapAlphaEnvmapMask )
 		specularFactor = normalTexel.a;
 
-	HALF3 diffuseLighting = HALF3( 1.0f, 1.0f, 1.0f );
+	float3 diffuseLighting = float3( 1.0f, 1.0f, 1.0f );
 	if( bDiffuseLighting )
 	{
 		float3 worldSpaceNormal = mul( i.tangentSpaceTranspose, tangentSpaceNormal );
@@ -103,8 +103,8 @@ float4 main( PS_INPUT i ) : COLOR
 			   false, 0, false, NormalizeSampler );
 	}
 
-	HALF3 albedo = HALF3( 1.0f, 1.0f, 1.0f );
-	HALF alpha = 1.0f;
+	float3 albedo = float3( 1.0f, 1.0f, 1.0f );
+	float alpha = 1.0f;
 	if( bBaseTexture )
 	{
 		albedo *= baseColor;
@@ -115,7 +115,7 @@ float4 main( PS_INPUT i ) : COLOR
 	// get alpha from the envmapmask
 	if( !bBaseTexture && bCubemap )
 	{
-		diffuseLighting = HALF3( 0.0f, 0.0f, 0.0f );
+		diffuseLighting = float3( 0.0f, 0.0f, 0.0f );
 		if( bNormalMapAlphaEnvmapMask )
 		{
 			alpha *= specularFactor;
@@ -138,43 +138,43 @@ float4 main( PS_INPUT i ) : COLOR
 	diffuseLighting *= g_DiffuseModulation.rgb;
 	alpha *= g_DiffuseModulation.a;
 	
-	HALF3 diffuseComponent = albedo * diffuseLighting;
+	float3 diffuseComponent = albedo * diffuseLighting;
 	
-	HALF4 flowmapSample = tex2D( FlowMapSampler, i.baseTexCoord2_tangentSpaceVertToEyeVectorXY.xy );
+	float4 flowmapSample = tex2D( FlowMapSampler, i.baseTexCoord2_tangentSpaceVertToEyeVectorXY.xy );
 #if !FLASHLIGHT
 	flowmapSample.xy += float2( .11, .124 ) * g_Time.xx;
 #endif
-	HALF4 selfIllumSample = tex2D( SelfIllumMapSampler, flowmapSample.xy );
+	float4 selfIllumSample = tex2D( SelfIllumMapSampler, flowmapSample.xy );
 
 //	float thing = ( 0.5f * ( cos( g_Time * 3 ) + 1.0f ) );
 //	diffuseComponent.xyz += albedo * 10.0f * pow( selfIllumSample.xyz, thing );
 	diffuseComponent.xyz += albedo * g_SelfIllumTint.xyz * selfIllumSample.xyz;
 
-	HALF3 specularLighting = HALF3( 0.0f, 0.0f, 0.0f );
+	float3 specularLighting = float3( 0.0f, 0.0f, 0.0f );
 #if !FLASHLIGHT
 	if( bCubemap )
 	{
 		// If we've *only* specified a cubemap, blow off the diffuse component
 		if ( !bBaseTexture && !bDiffuseLighting && !bFlashlight )
 		{
-			diffuseComponent = HALF3( 0.0f, 0.0f, 0.0f );
+			diffuseComponent = float3( 0.0f, 0.0f, 0.0f );
 		}
 
-		HALF3 worldSpaceNormal = mul( i.tangentSpaceTranspose, tangentSpaceNormal );
+		float3 worldSpaceNormal = mul( i.tangentSpaceTranspose, tangentSpaceNormal );
 
-		HALF3 reflectVect = CalcReflectionVectorUnnormalized( worldSpaceNormal, i.worldVertToEyeVectorXYZ_tangentSpaceVertToEyeVectorZ.xyz );
+		float3 reflectVect = CalcReflectionVectorUnnormalized( worldSpaceNormal, i.worldVertToEyeVectorXYZ_tangentSpaceVertToEyeVectorZ.xyz );
 
 		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect );
 		specularLighting *= specularFactor;
 		specularLighting *= g_EnvmapTint;
-		HALF3 specularLightingSquared = specularLighting * specularLighting;
+		float3 specularLightingSquared = specularLighting * specularLighting;
 		specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast );
-		HALF3 greyScale = dot( specularLighting, HALF3( 0.299f, 0.587f, 0.114f ) );
+		float3 greyScale = dot( specularLighting, float3( 0.299f, 0.587f, 0.114f ) );
 		specularLighting = lerp( greyScale, specularLighting, g_EnvmapSaturation );
 	}
 #endif
 
-	HALF3 result = diffuseComponent + specularLighting;
+	float3 result = diffuseComponent + specularLighting;
 
 	float fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos.z, i.worldPos_projPosZ.z, i.worldPos_projPosZ.w );
 #if WRITEWATERFOGTODESTALPHA && (PIXELFOGTYPE == PIXEL_FOG_TYPE_HEIGHT)

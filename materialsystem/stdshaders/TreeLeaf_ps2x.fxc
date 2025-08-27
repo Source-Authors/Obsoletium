@@ -12,7 +12,7 @@ struct PS_INPUT
 
 sampler BaseTextureSampler	: register( s0 );
 
-HALF4 main( PS_INPUT i ) : COLOR
+float4 main( PS_INPUT i ) : COLOR
 {
 	float4 baseTex = tex2D( BaseTextureSampler, i.texCoord0 );	
 	return FinalOutput( baseTex * float4( i.color, 1 ), 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );

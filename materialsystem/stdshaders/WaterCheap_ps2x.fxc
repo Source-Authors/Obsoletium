@@ -13,9 +13,9 @@
 
 #include "common_ps_fxc.h"
 
-const HALF3 g_WaterFogColor			: register( c0 );
-const HALF4 g_CheapWaterParams		: register( c1 );
-const HALF4 g_ReflectTint			: register( c2 );
+const float3 g_WaterFogColor		: register( c0 );
+const float4 g_CheapWaterParams		: register( c1 );
+const float4 g_ReflectTint			: register( c2 );
 const float4 g_PixelFogParams		: register( c3 );
 const float3 g_EyePos				: register( c4 );
 
@@ -34,8 +34,8 @@ sampler NormalizeSampler	: register( s6 );
 struct PS_INPUT
 {
 	float2 normalMapTexCoord		: TEXCOORD0;
-	HALF3 worldSpaceEyeVect			: TEXCOORD1;
-	HALF3x3 tangentSpaceTranspose	: TEXCOORD2;
+	float3 worldSpaceEyeVect		: TEXCOORD1;
+	float3x3 tangentSpaceTranspose	: TEXCOORD2;
 	float4 vRefract_W_ProjZ			: TEXCOORD5;
 
 #if MULTITEXTURE
@@ -66,10 +66,10 @@ float4 main( PS_INPUT i ) : COLOR
 	float3 vNormal = DecompressNormal( NormalMapSampler, i.normalMapTexCoord, NORMAL_DECODE_MODE );
 #endif
 	
-	HALF3 worldSpaceNormal = mul( vNormal, i.tangentSpaceTranspose );
-	HALF3 worldSpaceEye;
+	float3 worldSpaceNormal = mul( vNormal, i.tangentSpaceTranspose );
+	float3 worldSpaceEye;
 	
-	HALF flWorldSpaceDist = 1.0f;
+	float flWorldSpaceDist = 1.0f;
 	
 	// dimhotepus: Drop NV3X.
 	if (bBlend) 
@@ -83,27 +83,27 @@ float4 main( PS_INPUT i ) : COLOR
 		worldSpaceEye  = NormalizeWithCubemap( NormalizeSampler, i.worldSpaceEyeVect );
 	}
 	
-	HALF3 reflectVect = CalcReflectionVectorUnnormalized( worldSpaceNormal, worldSpaceEye );
-	HALF3 specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect );
+	float3 reflectVect = CalcReflectionVectorUnnormalized( worldSpaceNormal, worldSpaceEye );
+	float3 specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect );
 	specularLighting *= g_ReflectTint;
 	
 #if FRESNEL
 	// FIXME: It's unclear that we want to do this for cheap water
 	// but the code did this previously and I didn't want to change it
-	HALF flDotResult = dot( worldSpaceEye, worldSpaceNormal ); 
+	float flDotResult = dot( worldSpaceEye, worldSpaceNormal ); 
 	flDotResult = 1.0f - max( 0.0f, flDotResult );
 
-	HALF flFresnelFactor = flDotResult * flDotResult;
+	float flFresnelFactor = flDotResult * flDotResult;
 	flFresnelFactor *= flFresnelFactor;
 	flFresnelFactor *= flDotResult;
 #else
-	HALF flFresnelFactor = g_ReflectTint.a;
+	float flFresnelFactor = g_ReflectTint.a;
 #endif
 	
-	HALF flAlpha;
+	float flAlpha;
 	if (bBlend)
 	{
-		HALF flReflectAmount = saturate( flWorldSpaceDist * g_CheapWaterDeltaRecip - g_CheapWaterStartDivDelta );
+		float flReflectAmount = saturate( flWorldSpaceDist * g_CheapWaterDeltaRecip - g_CheapWaterStartDivDelta );
 		flAlpha = saturate( flFresnelFactor + flReflectAmount );
 
 #if REFRACTALPHA

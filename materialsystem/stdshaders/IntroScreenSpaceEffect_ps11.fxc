@@ -13,12 +13,12 @@ struct PS_INPUT
 	float2 baseTexCoord2			: TEXCOORD1;
 };
 
-HALF Grey( HALF3 input )
+float Grey( float3 input )
 {
 	return dot( ( float3 )( 1.0f / 3.0f ), input );
 }
 
-HALF4 main( PS_INPUT i ) : COLOR
+float4 main( PS_INPUT i ) : COLOR
 {
 	float3 scene = tex2D( BaseTextureSampler, i.baseTexCoord );
 	float3 gman = tex2D( BaseTextureSampler2, i.baseTexCoord2 );

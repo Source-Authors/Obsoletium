@@ -74,7 +74,7 @@ struct VS_OUTPUT
 	float  fog						: FOG;
 #endif
 
-	HALF4 baseTexCoord2_tangentSpaceVertToEyeVectorXY			: TEXCOORD0;
+	float4 baseTexCoord2_tangentSpaceVertToEyeVectorXY			: TEXCOORD0;
 	// bump mapping and a separate envmap mask texture are mutually exclusive.
 	float4 lightAtten											: TEXCOORD1;
 	float4 worldVertToEyeVectorXYZ_tangentSpaceVertToEyeVectorZ	: TEXCOORD2;

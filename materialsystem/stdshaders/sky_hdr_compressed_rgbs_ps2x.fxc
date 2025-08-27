@@ -9,7 +9,7 @@
 #endif
 
 sampler RGBSTextureSampler	: register( s0 );
-HALF4 InputScale : register( c0 );
+float4 InputScale : register( c0 );
 
 float2 texWidthHeight : register( c1 );
 

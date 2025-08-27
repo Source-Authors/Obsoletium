@@ -7,7 +7,7 @@ sampler TexSampler	: register( s0 );
 
 struct PS_INPUT
 {
-	HALF2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
+	float2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
 	
 #if defined( _X360 ) //matching pixel shader inputs to vertex shader outputs to avoid shader patches	
 	float2 ZeroTexCoord				: TEXCOORD1;

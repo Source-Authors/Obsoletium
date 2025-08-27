@@ -6,9 +6,9 @@
 #define HDRTYPE HDR_TYPE_NONE
 #include "common_ps_fxc.h"
 
-const HALF4 g_ShadowColor						: register( c1 );
-const HALF3 g_EyePos							: register( c2 );
-const HALF4 g_FogParams							: register( c3 );
+const float4 g_ShadowColor						: register( c1 );
+const float3 g_EyePos							: register( c2 );
+const float4 g_FogParams						: register( c3 );
 
 sampler ShadowSampler	: register( s0 );
 
@@ -24,14 +24,14 @@ struct PS_INPUT
 	float2 texCoord2				: TEXCOORD2;
 	float2 texCoord3				: TEXCOORD3;
 	float2 texCoord4				: TEXCOORD4;
-	HALF4 worldPos_projPosZ		    : TEXCOORD5;
-	HALF4 shadowColor				: COLOR0;
-	HALF4 fogFactorW				: COLOR1;
+	float4 worldPos_projPosZ		: TEXCOORD5;
+	float4 shadowColor				: COLOR0;
+	float4 fogFactorW				: COLOR1;
 };
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	HALF4 samples[5];
+	float4 samples[5];
 	samples[0] = tex2D( ShadowSampler, i.texCoord0 );
 	samples[1] = tex2D( ShadowSampler, i.texCoord1 );
 	samples[2] = tex2D( ShadowSampler, i.texCoord2 );
@@ -39,7 +39,7 @@ float4 main( PS_INPUT i ) : COLOR
 	samples[4] = tex2D( ShadowSampler, i.texCoord4 );
 
 	// Interpolate between a bunch of jittered shadow samples.
-	HALF shadowCoverage = (samples[0].a + samples[1].a + samples[2].a + samples[3].a + samples[4].a) * 0.2;
+	float shadowCoverage = (samples[0].a + samples[1].a + samples[2].a + samples[3].a + samples[4].a) * 0.2;
 
 	// To accomplish shadow fading, subtract vertex alpha from texture alpha
 	shadowCoverage = saturate( shadowCoverage - i.shadowColor.a );
@@ -48,7 +48,7 @@ float4 main( PS_INPUT i ) : COLOR
 	// return lerp( 1.0-shadowCoverage, 1.0, g_ShadowColor );  
 	
 	// this is equivalent, and saves an instruction
-	HALF4 result = shadowCoverage*g_ShadowColor - shadowCoverage;
+	float4 result = shadowCoverage*g_ShadowColor - shadowCoverage;
 	result = 1.0 + result;
 
 	float alpha = 1.0f;

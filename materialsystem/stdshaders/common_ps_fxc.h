@@ -82,58 +82,58 @@ struct LPREVIEW_PS_OUT
 
 /*
 // unused
-HALF Luminance( HALF3 color )
+float Luminance( float3 color )
 {
-	return dot( color, HALF3( HALF_CONSTANT(0.30f), HALF_CONSTANT(0.59f), HALF_CONSTANT(0.11f) ) );
+	return dot( color, float3( 0.30f, 0.59f, 0.11f ) );
 }
 */
 
 /*
 // unused
-HALF LuminanceScaled( HALF3 color )
+float LuminanceScaled( float3 color )
 {
-	return dot( color, HALF3( HALF_CONSTANT(0.30f) / MAX_HDR_OVERBRIGHT, HALF_CONSTANT(0.59f) / MAX_HDR_OVERBRIGHT, HALF_CONSTANT(0.11f) / MAX_HDR_OVERBRIGHT ) );
+	return dot( color, float3( 0.30f / MAX_HDR_OVERBRIGHT, 0.59f / MAX_HDR_OVERBRIGHT, 0.11f / MAX_HDR_OVERBRIGHT ) );
 }
 */
 
 /*
 // unused
-HALF AvgColor( HALF3 color )
+float AvgColor( float3 color )
 {
-	return dot( color, HALF3( HALF_CONSTANT(0.33333f), HALF_CONSTANT(0.33333f), HALF_CONSTANT(0.33333f) ) );
+	return dot( color, float3( 0.33333f, 0.33333f, 0.33333f ) );
 }
 */
 
 /*
 // unused
-HALF4 DiffuseBump( sampler lightmapSampler,
+float4 DiffuseBump( sampler lightmapSampler,
                    float2  lightmapTexCoord1,
                    float2  lightmapTexCoord2,
                    float2  lightmapTexCoord3,
-                   HALF3   normal )
+                   float3   normal )
 {
-	HALF3 lightmapColor1 = tex2D( lightmapSampler, lightmapTexCoord1 );
-	HALF3 lightmapColor2 = tex2D( lightmapSampler, lightmapTexCoord2 );
-	HALF3 lightmapColor3 = tex2D( lightmapSampler, lightmapTexCoord3 );
+	float3 lightmapColor1 = tex2D( lightmapSampler, lightmapTexCoord1 );
+	float3 lightmapColor2 = tex2D( lightmapSampler, lightmapTexCoord2 );
+	float3 lightmapColor3 = tex2D( lightmapSampler, lightmapTexCoord3 );
 
-	HALF3 diffuseLighting;
+	float3 diffuseLighting;
 	diffuseLighting = saturate( dot( normal, bumpBasis[0] ) ) * lightmapColor1 +
 					  saturate( dot( normal, bumpBasis[1] ) ) * lightmapColor2 +
 					  saturate( dot( normal, bumpBasis[2] ) ) * lightmapColor3;
 
-	return HALF4( diffuseLighting, LuminanceScaled( diffuseLighting ) );
+	return float4( diffuseLighting, LuminanceScaled( diffuseLighting ) );
 }
 */
 
 
 /*
 // unused
-HALF Fresnel( HALF3 normal,
-              HALF3 eye,
-              HALF2 scaleBias )
+float Fresnel( float3 normal,
+              float3 eye,
+              float2 scaleBias )
 {
-	HALF fresnel = HALF_CONSTANT(1.0f) - dot( normal, eye );
-	fresnel = pow( fresnel, HALF_CONSTANT(5.0f) );
+	float fresnel = 1.0f - dot( normal, eye );
+	fresnel = pow( fresnel, 5.0f );
 
 	return fresnel * scaleBias.x + scaleBias.y;
 }
@@ -141,11 +141,11 @@ HALF Fresnel( HALF3 normal,
 
 /*
 // unused
-HALF4 GetNormal( sampler normalSampler,
+float4 GetNormal( sampler normalSampler,
                  float2 normalTexCoord )
 {
-	HALF4 normal = tex2D( normalSampler, normalTexCoord );
-	normal.rgb = HALF_CONSTANT(2.0f) * normal.rgb - HALF_CONSTANT(1.0f);
+	float4 normal = tex2D( normalSampler, normalTexCoord );
+	normal.rgb = 2.0f * normal.rgb - 1.0f;
 
 	return normal;
 }
@@ -187,24 +187,24 @@ float4 DecompressNormal( sampler NormalSampler, float2 tc, int nDecompressionMod
 }
 
 
-HALF3 NormalizeWithCubemap( sampler normalizeSampler, HALF3 input )
+float3 NormalizeWithCubemap( sampler normalizeSampler, float3 input )
 {
 //	return texCUBE( normalizeSampler, input ) * 2.0f - 1.0f;
 	// dimhotepus: Fix float4 -> float3 truncation warning.
 	float4 res = texCUBE( normalizeSampler, input );
-	return HALF3( res.x, res.y, res.z );
+	return float3( res.x, res.y, res.z );
 }
 
 /*
-HALF4 EnvReflect( sampler envmapSampler,
+float4 EnvReflect( sampler envmapSampler,
 				 sampler normalizeSampler,
-				 HALF3 normal,
+				 float3 normal,
 				 float3 eye,
-				 HALF2 fresnelScaleBias )
+				 float2 fresnelScaleBias )
 {
-	HALF3 normEye = NormalizeWithCubemap( normalizeSampler, eye );
-	HALF fresnel = Fresnel( normal, normEye, fresnelScaleBias );
-	HALF3 reflect = CalcReflectionVectorUnnormalized( normal, eye );
+	float3 normEye = NormalizeWithCubemap( normalizeSampler, eye );
+	float fresnel = Fresnel( normal, normEye, fresnelScaleBias );
+	float3 reflect = CalcReflectionVectorUnnormalized( normal, eye );
 	return texCUBE( envmapSampler, reflect );
 }
 */

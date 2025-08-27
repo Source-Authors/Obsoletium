@@ -19,7 +19,7 @@ sampler NormalMapSampler			: register( s3 );
 sampler NormalizingCubemapSampler2	: register( s3 );
 #endif
 
-static const HALF g_OverbrightFactor = 2.0f;
+static const float g_OverbrightFactor = 2.0f;
 
 struct PS_INPUT
 {

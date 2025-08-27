@@ -35,11 +35,11 @@ sampler LightmapSampler			: register( s3 );
 #endif
 sampler NormalSampler			: register( s4 );
 
-const HALF4 vRefractTint			: register( c1 );
-const HALF4 vReflectTint			: register( c4 );
+const float4 vRefractTint			: register( c1 );
+const float4 vReflectTint			: register( c4 );
 const float4 g_ReflectRefractScale	: register( c5 ); // xy - reflect scale, zw - refract scale
-const HALF4 g_WaterFogColor			: register( c6 );
-const HALF4 g_WaterFogParams		: register( c7 );
+const float4 g_WaterFogColor		: register( c6 );
+const float4 g_WaterFogParams		: register( c7 );
 
 const float4 g_PixelFogParams		: register( c8 );
 
@@ -62,9 +62,9 @@ struct PS_INPUT
 #endif
 #if BASETEXTURE
 // CENTROID: TEXCOORD6
-	HALF4 lightmapTexCoord1And2		: TEXCOORD6;
+	float4 lightmapTexCoord1And2	: TEXCOORD6;
 // CENTROID: TEXCOORD7
-	HALF4 lightmapTexCoord3			: TEXCOORD7;
+	float4 lightmapTexCoord3		: TEXCOORD7;
 #endif
 
 	float4 fogFactorW				: COLOR1;

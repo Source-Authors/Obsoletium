@@ -98,7 +98,7 @@ const float4 g_FogParams						: register( c21 );
 #define g_SelfIllumMaskControl		g_EnvmapSaturation_SelfIllumMask.w
 
 const float4 g_FlashlightAttenuationFactors	    : register( c22 );
-const HALF3 g_FlashlightPos						: register( c23 );
+const float3 g_FlashlightPos					: register( c23 );
 const float4x4 g_FlashlightWorldToTexture		: register( c24 ); // through c27
 
 
@@ -116,14 +116,14 @@ sampler LightMapSampler			: register( s12 );
 struct PS_INPUT
 {
 #if SEAMLESS_BASE
-	HALF3 baseTexCoord				: TEXCOORD0;	// Base texture coordinate
+	float3 baseTexCoord				: TEXCOORD0;	// Base texture coordinate
 #else
-	HALF2 baseTexCoord				: TEXCOORD0;	// Base texture coordinate
+	float2 baseTexCoord				: TEXCOORD0;	// Base texture coordinate
 #endif
 #if SEAMLESS_DETAIL
-	HALF3 detailTexCoord			: TEXCOORD1;	// Seamless texture coordinate
+	float3 detailTexCoord			: TEXCOORD1;	// Seamless texture coordinate
 #else
-	HALF2 detailTexCoord			: TEXCOORD1;	// Detail texture coordinate
+	float2 detailTexCoord			: TEXCOORD1;	// Detail texture coordinate
 #endif
 	float4 color					: TEXCOORD2;	// Vertex color (from lighting or unlit)
 	float3 worldVertToEyeVector		: TEXCOORD3;	// Necessary for reflection
@@ -238,7 +238,7 @@ float4 main( PS_INPUT i ) : COLOR
 	bool bFlashlight = FLASHLIGHT ? true : false;
 	bool bBlendTintByBaseAlpha = BLENDTINTBYBASEALPHA ? true : false;
 
-	HALF4 baseColor = HALF4( 1.0f, 1.0f, 1.0f, 1.0f );
+	float4 baseColor = float4( 1.0f, 1.0f, 1.0f, 1.0f );
 #if SEAMLESS_BASE
 	baseColor =
 		i.SeamlessWeights.x * tex2D( BaseTextureSampler, i.baseTexCoord.yz )+
@@ -425,14 +425,14 @@ float4 main( PS_INPUT i ) : COLOR
 		TextureCombinePostLighting( diffuseComponent, detailColor, DETAIL_BLEND_MODE, g_DetailBlendFactor );
 #endif
 
-	HALF3 specularLighting = HALF3( 0.0f, 0.0f, 0.0f );
+	float3 specularLighting = float3( 0.0f, 0.0f, 0.0f );
 
 #if !FLASHLIGHT || defined ( _X360 )
 	#if SELFILLUM_ENVMAPMASK_ALPHA
 		// range of alpha:
 	    // 0 - 0.125 = lerp(diffuse,selfillum,alpha*8)
 	    // 0.125-1.0 = selfillum*(1+alpha-0.125)*8 (over bright glows)
-		HALF3 selfIllumComponent = g_SelfIllumTint * albedo;
+		float3 selfIllumComponent = g_SelfIllumTint * albedo;
 		half Adj_Alpha=8*envmapMaskTexel.a;
 		diffuseComponent=( max( 0, 1-Adj_Alpha ) * diffuseComponent) + Adj_Alpha * selfIllumComponent;
 	#else
@@ -447,24 +447,24 @@ float4 main( PS_INPUT i ) : COLOR
 	if( bCubemap )
 	{
 #if CUBEMAP_SPHERE_LEGACY
-		HALF3 reflectVect = normalize(CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz ));
+		float3 reflectVect = normalize(CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz ));
 
 		specularLighting = 0.5 * tex2D( EnvmapSampler, float2(reflectVect.x, reflectVect.y) ) * g_DiffuseModulation.rgb * diffuseLighting;
 #else
-		HALF3 reflectVect = CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz );
+		float3 reflectVect = CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz );
 
 		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect );
 		specularLighting *= specularFactor;
 		specularLighting *= g_EnvmapTint_TintReplaceFactor.rgb;
-		HALF3 specularLightingSquared = specularLighting * specularLighting;
+		float3 specularLightingSquared = specularLighting * specularLighting;
 		specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast_ShadowTweaks );
-		HALF3 greyScale = dot( specularLighting, HALF3( 0.299f, 0.587f, 0.114f ) );
+		float3 greyScale = dot( specularLighting, float3( 0.299f, 0.587f, 0.114f ) );
 		specularLighting = lerp( greyScale, specularLighting, g_EnvmapSaturation );
 #endif
 	}
 #endif
 
-	HALF3 result = diffuseComponent + specularLighting;
+	float3 result = diffuseComponent + specularLighting;
 
 #if LIGHTING_PREVIEW
 # if LIGHTING_PREVIEW == 1

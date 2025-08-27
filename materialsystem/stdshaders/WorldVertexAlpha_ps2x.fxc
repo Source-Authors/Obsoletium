@@ -27,7 +27,7 @@ float4 main( PS_INPUT i ) : COLOR
 
 	float4 color;
 
-	base.a = dot( base, HALF3( HALF_CONSTANT(0.33333f), HALF_CONSTANT(0.33333f), HALF_CONSTANT(0.33333f) ) );
+	base.a = dot( base, float3( 0.33333f, 0.33333f, 0.33333f ) );
 	color = 2.0f * base * lightmap; // The 2x is for an assumed overbright 2 (it's always 2 on dx9)
 
 	if( bAlphaPass )

@@ -9,7 +9,7 @@
 #include "common_ps_fxc.h"
 #include "shader_constant_register_map.h"
 
-const HALF3 g_StaticAmount	: register( c0 ); //x is static, y is 1.0 - static
+const float3 g_StaticAmount	: register( c0 ); //x is static, y is 1.0 - static
 
 const float4 g_FogParams				: register( PSREG_FOG_PARAMS );
 const float4 g_EyePos_SpecExponent		: register( PSREG_EYEPOS_SPEC_EXPONENT );
@@ -52,7 +52,7 @@ struct PS_INPUT
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	HALF4 result;
+	float4 result;
 	
 #	if( HASSTATICTEXTURE )
 		result.rgb = tex2D( StaticTextureSampler, i.vStaticTexCoord ).rgb;

@@ -29,14 +29,14 @@ sampler FlowmapSampler			: register( s6 );
 sampler CoreColorSampler			: register( s7 );
 #endif
 
-const HALF3 g_EnvmapTint			: register( c0 );
-const HALF3 g_RefractTint : register( c1 );
-const HALF3 g_EnvmapContrast		: register( c2 );
-const HALF3 g_EnvmapSaturation		: register( c3 );
-const HALF2  g_RefractScale : register( c5 );
+const float3 g_EnvmapTint			: register( c0 );
+const float3 g_RefractTint			: register( c1 );
+const float3 g_EnvmapContrast		: register( c2 );
+const float3 g_EnvmapSaturation		: register( c3 );
+const float2  g_RefractScale		: register( c5 );
 #if FLOWMAP
-const float g_Time								: register( c6 );
-const float2 g_FlowScrollRate	: register( c7 );
+const float g_Time					: register( c6 );
+const float2 g_FlowScrollRate		: register( c7 );
 //const float3 g_SphereCenter		: register( c9 );
 //const float3 g_SphereRadius		: register( c10 );
 const float g_CoreColorTexCoordOffset : register( c9 );
@@ -111,8 +111,8 @@ float LengthThroughSphere( float3 vecRayOrigin, float3 vecRayDelta,
 struct PS_INPUT
 {
 	float2 vBumpTexCoord			: TEXCOORD0; // dudvMapAndNormalMapTexCoord
-	HALF3 vWorldVertToEyeVector		: TEXCOORD1;
-	HALF3x3 tangentSpaceTranspose	: TEXCOORD2;
+	float3 vWorldVertToEyeVector	: TEXCOORD1;
+	float3x3 tangentSpaceTranspose	: TEXCOORD2;
 	float3 vRefractXYW				: TEXCOORD5; 
 	float3 projNormal				: TEXCOORD6;
 	float4 worldPos_projPosZ		: TEXCOORD7;
@@ -120,9 +120,9 @@ struct PS_INPUT
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	HALF3 result = 0.0f;
+	float3 result = 0.0f;
 
-	HALF blend = 1.0f;
+	float blend = 1.0f;
 
 #if FLOWMAP
 	// hack
@@ -157,11 +157,11 @@ float4 main( PS_INPUT i ) : COLOR
 #endif
 
 	// Load normal and expand range
-	HALF4 vNormalSample = tex2D( NormalSampler, i.vBumpTexCoord );
+	float4 vNormalSample = tex2D( NormalSampler, i.vBumpTexCoord );
 	//	return vNormalSample;
-	HALF3 tangentSpaceNormal = vNormalSample * 2.0 - 1.0;
+	float3 tangentSpaceNormal = vNormalSample * 2.0 - 1.0;
 
-	HALF3 refractTintColor = g_RefractTint;
+	float3 refractTintColor = g_RefractTint;
 
 	// Perform division by W only once
 	float ooW = 1.0f / i.vRefractXYW.z;
@@ -169,7 +169,7 @@ float4 main( PS_INPUT i ) : COLOR
 	// Compute coordinates for sampling refraction
 	float2 vRefractTexCoordNoWarp = i.vRefractXYW.xy * ooW;
 	float2 vRefractTexCoord = tangentSpaceNormal.xy;
-	HALF scale = vNormalSample.a * g_RefractScale.x;
+	float scale = vNormalSample.a * g_RefractScale.x;
 #if FLOWMAP
 	scale *= normalizedLengthThroughSphere;
 #endif
@@ -189,26 +189,26 @@ float4 main( PS_INPUT i ) : COLOR
 #endif
 
 #if CUBEMAP
-	HALF specularFactor = vNormalSample.a;
+	float specularFactor = vNormalSample.a;
 
-	HALF3 worldSpaceNormal = mul( i.tangentSpaceTranspose, tangentSpaceNormal );
+	float3 worldSpaceNormal = mul( i.tangentSpaceTranspose, tangentSpaceNormal );
 
-	HALF3 reflectVect = CalcReflectionVectorUnnormalized( worldSpaceNormal, i.vWorldVertToEyeVector );
-	HALF3 specularLighting = texCUBE( EnvmapSampler, reflectVect );
+	float3 reflectVect = CalcReflectionVectorUnnormalized( worldSpaceNormal, i.vWorldVertToEyeVector );
+	float3 specularLighting = texCUBE( EnvmapSampler, reflectVect );
 	specularLighting *= specularFactor;
 	specularLighting *= g_EnvmapTint;
-	HALF3 specularLightingSquared = specularLighting * specularLighting;
+	float3 specularLightingSquared = specularLighting * specularLighting;
 	specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast );
-	HALF3 greyScale = dot( specularLighting, HALF3( 0.299f, 0.587f, 0.114f ) );
+	float3 greyScale = dot( specularLighting, float3( 0.299f, 0.587f, 0.114f ) );
 	specularLighting = lerp( greyScale, specularLighting, g_EnvmapSaturation );
 	result += specularLighting;
 #endif
 
 #if CORECOLORTEXTURE && FLOWMAP
 	float4 coreColorTexel = tex2D( CoreColorSampler, hackOffset + float2( normalizedLengthThroughSphere, g_CoreColorTexCoordOffset ) );
-	HALF4 rgba = HALF4( lerp( result, coreColorTexel, coreColorTexel.a /*normalizedLengthThroughSphere*/ ), sphereAlpha );
+	float4 rgba = float4( lerp( result, coreColorTexel, coreColorTexel.a /*normalizedLengthThroughSphere*/ ), sphereAlpha );
 #else
-	HALF4 rgba = HALF4( result, vNormalSample.a );
+	float4 rgba = float4( result, vNormalSample.a );
 #endif
 
 

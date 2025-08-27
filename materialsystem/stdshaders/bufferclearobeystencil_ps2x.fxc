@@ -8,7 +8,7 @@ struct PS_INPUT
 	float4 vColor	: COLOR0;
 };
 
-HALF4 main( PS_INPUT i ) : COLOR
+float4 main( PS_INPUT i ) : COLOR
 {
 	return i.vColor;
 }
