@@ -37,10 +37,6 @@
 
 // System defined pixel shader constants
 
-#if defined( _X360 )
-const bool g_bHighQualityShadows : register( b0 );
-#endif
-
 // NOTE: w == 1.0f / (Dest alpha compressed depth range).
 const float4 g_LinearFogColor : register( c29 );
 #define OO_DESTALPHA_DEPTH_RANGE (g_LinearFogColor.w)

@@ -146,12 +146,6 @@ sampler AlphaMaskSampler		: register( s11 );	// alpha
 #endif
 #endif
 
-#if defined( _X360 ) && FLASHLIGHT
-sampler FlashlightSampler		: register( s13 );
-sampler ShadowDepthSampler		: register( s14 );
-sampler RandRotSampler			: register( s15 );
-#endif
-
 struct PS_INPUT
 {
 #if SEAMLESS
@@ -174,12 +168,6 @@ struct PS_INPUT
 	// tangentSpaceTranspose		: TEXCOORD7
 	HALF4 vertexColor				: COLOR;
 	float4 vertexBlendX_fogFactorW	: COLOR1;
-
-	// Extra iterators on 360, used in flashlight combo
-#if defined( _X360 ) && FLASHLIGHT
-	float4 flashlightSpacePos		: TEXCOORD8;
-	float4 vProjPos					: TEXCOORD9;
-#endif
 };
 
 #if LIGHTING_PREVIEW == 2
@@ -475,42 +463,11 @@ HALF4 main( PS_INPUT i ) : COLOR
 	diffuseLighting *= 2.0*tex2D(WarpLightingSampler,float2(len,0));
 #endif
 
-#if CUBEMAP || LIGHTING_PREVIEW || ( defined( _X360 ) && FLASHLIGHT )
+#if CUBEMAP || LIGHTING_PREVIEW
 	float3 worldSpaceNormal = mul( vNormal, i.tangentSpaceTranspose );
 #endif
 
 	float3 diffuseComponent = albedo.xyz * diffuseLighting;
-
-#if defined( _X360 ) && FLASHLIGHT
-
-	// ssbump doesn't pass a normal to the flashlight...it computes shadowing a different way
-#if ( BUMPMAP == 2 )
-	bool bHasNormal = false;
-
-	float3 worldPosToLightVector = g_FlashlightPos - i.worldPos_projPosZ.xyz;
-
-	float3 tangentPosToLightVector;
-	tangentPosToLightVector.x = dot( worldPosToLightVector, i.tangentSpaceTranspose[0] );
-	tangentPosToLightVector.y = dot( worldPosToLightVector, i.tangentSpaceTranspose[1] );
-	tangentPosToLightVector.z = dot( worldPosToLightVector, i.tangentSpaceTranspose[2] );
-
-	tangentPosToLightVector = normalize( tangentPosToLightVector );
-
-	float nDotL = saturate( vSSBumpVector.x*dot( tangentPosToLightVector, bumpBasis[0]) +
-							vSSBumpVector.y*dot( tangentPosToLightVector, bumpBasis[1]) +
-							vSSBumpVector.z*dot( tangentPosToLightVector, bumpBasis[2]) );
-#else
-	bool bHasNormal = true;
-	float nDotL = 1.0f;
-#endif
-
-	float fFlashlight = DoFlashlight( g_FlashlightPos, i.worldPos_projPosZ.xyz, i.flashlightSpacePos,
-		worldSpaceNormal, g_FlashlightAttenuationFactors.xyz, 
-		g_FlashlightAttenuationFactors.w, FlashlightSampler, ShadowDepthSampler,
-		RandRotSampler, 0, true, false, i.vProjPos.xy / i.vProjPos.w, false, g_ShadowTweaks, bHasNormal );
-
-	diffuseComponent = albedo.xyz * ( diffuseLighting + ( fFlashlight * nDotL ) );
-#endif
 
 	if( bSelfIllum )
 	{

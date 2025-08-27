@@ -111,22 +111,12 @@ void ComputeBumpedLightmapCoordinates( HALF4 Lightmap1and2Coord, HALF2 Lightmap3
 
 float3 mul3x3(float3 v, float3x3 m)
 {
-#if !defined( _X360 )
     return float3(dot(v, transpose(m)[0]), dot(v, transpose(m)[1]), dot(v, transpose(m)[2]));
-#else
-	// xbox360 fxc.exe (new back end) borks with transposes, generates bad code
-	return mul( v, m );
-#endif
 }
 
 float3 mul4x3(float4 v, float4x3 m)
 {
-#if !defined( _X360 )
 	return float3(dot(v, transpose(m)[0]), dot(v, transpose(m)[1]), dot(v, transpose(m)[2]));
-#else
-	// xbox360 fxc.exe (new back end) borks with transposes, generates bad code
-	return mul( v, m );
-#endif
 }
 
 float3 DecompressHDR( float4 input )
