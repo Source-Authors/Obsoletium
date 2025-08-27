@@ -622,11 +622,8 @@ void SkinPosition( bool bSkinning, const float4 modelPos,
                    const float4 boneWeights, float4 fBoneIndices,
 				   out float3 worldPos )
 {
-#if !defined( _X360 )
-	int3 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
-#else
-	int3 boneIndices = fBoneIndices;
-#endif
+	// dimhotepus: int3 -> int4 to fix warnings.
+	int4 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
 
 	// Needed for invariance issues caused by multipass rendering
 	{ 
@@ -655,12 +652,7 @@ void SkinPositionAndNormal( bool bSkinning, const float4 modelPos, const float3 
 {
 	// Needed for invariance issues caused by multipass rendering
 	{ 
-
-#if !defined( _X360 )
-		int3 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
-#else
-		int3 boneIndices = fBoneIndices;
-#endif
+		int4 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
 
 		if ( !bSkinning )
 		{
@@ -694,11 +686,8 @@ void SkinPositionNormalAndTangentSpace(
 						    out float3 worldPos, out float3 worldNormal, 
 							out float3 worldTangentS, out float3 worldTangentT )
 {
-#if !defined( _X360 )
-	int3 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
-#else
-	int3 boneIndices = fBoneIndices;
-#endif
+	// dimhotepus: int3 -> int4 to fix warnings.
+	int4 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
 
 	// Needed for invariance issues caused by multipass rendering
 	{ 
