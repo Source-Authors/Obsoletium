@@ -1199,7 +1199,7 @@ void CViewRender::Render( vrect_t *rect )
 		    materials->GetDisplayAdapterInfo( materials->GetCurrentAdapter(), adapterInfo );
 
 		    // On Posix, on ATI, we always clear color if we're antialiasing
-		    if ( adapterInfo.m_VendorID == 0x1002 )
+		    if ( adapterInfo.m_VendorID == VENDORID_ATI )
 		    {
 			    if ( g_pMaterialSystem->GetCurrentConfigForVideoCard().m_nAASamples > 0 )
 			    {

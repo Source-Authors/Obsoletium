@@ -4319,7 +4319,7 @@ void CShaderAPIDx8::ApplyZBias( const ShadowState_t& shaderState )
 	// FIXME: No longer necessary; may be necessary if you want to use cat 4.3 drivers?
 	// GR - hack for R200
 	bool bPS14Only = g_pHardwareConfig->Caps().m_SupportsPixelShaders_1_4 && !g_pHardwareConfig->Caps().m_SupportsPixelShaders_2_0;
-	if( ( g_pHardwareConfig->Caps().m_VendorID == 0x1002 ) && bPS14Only )
+	if( ( g_pHardwareConfig->Caps().m_VendorID == VENDORID_ATI ) && bPS14Only )
 	{
 		// Slam to m_SlopeScaleDepthBias_Decal = 0, m_DepthBias_Decal = -4096
 		// which empirically is what appears to look good on r200
