@@ -651,7 +651,7 @@ void SkinPositionAndNormal( bool bSkinning, const float4 modelPos, const float3 
 						    out float3 worldPos, out float3 worldNormal )
 {
 	// Needed for invariance issues caused by multipass rendering
-	{ 
+	{
 		int4 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
 
 		if ( !bSkinning )
@@ -737,8 +737,9 @@ float VertexAttenInternal( const float3 worldPos, int lightNum )
 {
 	float result = 0.0f;
 
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
 	// Get light direction
-	float3 lightDir = cLightInfo[lightNum].pos - worldPos;
+	float3 lightDir = cLightInfo[lightNum].pos.xyz - worldPos;
 
 	// Get light distance squared.
 	float lightDistSquared = dot( lightDir, lightDir );
@@ -749,7 +750,8 @@ float VertexAttenInternal( const float3 worldPos, int lightNum )
 	// Normalize light direction
 	lightDir *= ooLightDist;
 
-	float3 vDist = dst( lightDistSquared, ooLightDist );
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	float3 vDist = dst( lightDistSquared, ooLightDist ).xyz;
 
 	float flDistanceAtten = 1.0f / dot( cLightInfo[lightNum].atten.xyz, vDist );
 
@@ -772,10 +774,16 @@ float VertexAttenInternal( const float3 worldPos, int lightNum )
 float CosineTermInternal( const float3 worldPos, const float3 worldNormal, int lightNum, bool bHalfLambert )
 {
 	// Calculate light direction assuming this is a point or spot
-	float3 lightDir = normalize( cLightInfo[lightNum].pos - worldPos );
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	float3 lightDir = normalize( cLightInfo[lightNum].pos.xyz - worldPos );
+
+	// dimhotepus: fix float4 -> float3 downcast warnings.
+	float4 dirInv = -cLightInfo[lightNum].dir;
+	float4 color = cLightInfo[lightNum].color;
 
 	// Select the above direction or the one in the structure, based upon light type
-	lightDir = lerp( lightDir, -cLightInfo[lightNum].dir, cLightInfo[lightNum].color.w );
+	// dimhotepus: fix float4 -> float3 downcast warnings.
+	lightDir = lerp( lightDir, dirInv.xyz, color.www );
 
 	// compute N dot L
 	float NDotL = dot( worldNormal, lightDir );
@@ -815,7 +823,8 @@ float GetVertexAttenForLight( const float3 worldPos, int lightNum, bool bUseStat
 
 float3 DoLightInternal( const float3 worldPos, const float3 worldNormal, int lightNum, bool bHalfLambert )
 {
-	return cLightInfo[lightNum].color *
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	return cLightInfo[lightNum].color.xyz *
 		CosineTermInternal( worldPos, worldNormal, lightNum, bHalfLambert ) *
 		VertexAttenInternal( worldPos, lightNum );
 }

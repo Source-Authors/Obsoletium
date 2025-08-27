@@ -192,7 +192,7 @@ float3 NormalizeWithCubemap( sampler normalizeSampler, float3 input )
 //	return texCUBE( normalizeSampler, input ) * 2.0f - 1.0f;
 	// dimhotepus: Fix float4 -> float3 truncation warning.
 	float4 res = texCUBE( normalizeSampler, input );
-	return float3( res.x, res.y, res.z );
+	return res.xyz;
 }
 
 /*
