@@ -2381,18 +2381,13 @@ void DisplaySystemVersion( char *osversion, int maxlen );
 
 void CL_SetPagedPoolInfo()
 {
-	if ( IsX360() )
-		return;
-#if !defined( _X360 ) && !defined(NO_STEAM) && !defined(SWDS)
+#if !defined(NO_STEAM) && !defined(SWDS)
 	Plat_GetPagedPoolInfo( &g_pagedpoolinfo );
 #endif
 }
 
 void CL_SetSteamCrashComment()
 {
-	if ( IsX360() )
-		return;
-
 	char map[ 80 ];
 	char videoinfo[ 2048 ];
 	char misc[ 256 ];
@@ -2420,13 +2415,13 @@ void CL_SetSteamCrashComment()
 
 	// Make a string out of the high part and low parts of driver version
 	char szDXDriverVersion[ 64 ];
-	Q_snprintf( szDXDriverVersion, sizeof( szDXDriverVersion ), "%u.%u.%u.%u", 
+	V_sprintf_safe( szDXDriverVersion, "%u.%u.%u.%u", 
 		( info.m_nDriverVersionHigh>>16 ), 
 		( info.m_nDriverVersionHigh & 0xffffU ), 
 		( info.m_nDriverVersionLow>>16 ), 
 		( info.m_nDriverVersionLow & 0xffffU ) );
 
-	Q_snprintf( driverinfo, sizeof(driverinfo), "Driver Name:  %s\nDriver Version: %s\nVendorId / DeviceId:  0x%x / 0x%x\nSubSystem / Rev:  0x%x / 0x%x\nDXLevel:  %s [%d]\nVid:  %i x %i",
+	V_sprintf_safe( driverinfo, "Driver Name:  %s\nDriver Version: %s\nVendorId / DeviceId:  0x%x / 0x%x\nSubSystem / Rev:  0x%x / 0x%x\nDXLevel:  %s [%d]\nVid:  %i x %i",
 		info.m_pDriverName,
 		szDXDriverVersion,
 		info.m_VendorID,
@@ -2443,9 +2438,7 @@ void CL_SetSteamCrashComment()
 	ConVarRef mat_aaquality( "mat_aaquality" );
 	ConVarRef r_shadowrendertotexture( "r_shadowrendertotexture" );
 	ConVarRef r_flashlightdepthtexture( "r_flashlightdepthtexture" );
-#ifndef _X360
 	ConVarRef r_waterforceexpensive( "r_waterforceexpensive" );
-#endif
 		ConVarRef r_waterforcereflectentities( "r_waterforcereflectentities" );
 		ConVarRef mat_vsync( "mat_vsync" );
 		ConVarRef r_rootlod( "r_rootlod" );
@@ -2476,7 +2469,7 @@ void CL_SetSteamCrashComment()
 		latency = (int)( 1000.0f * cl.m_NetChannel->GetAvgLatency( FLOW_OUTGOING ) );
 	}
 
-	Q_snprintf( misc, sizeof( misc ), "skill:%i rate %i update %i cmd %i latency %i msec", 
+	V_sprintf_safe( misc, "skill:%i rate %i update %i cmd %i latency %i msec", 
 		skill.GetInt(),
 		cl_rate->GetInt(),
 		(int)cl_updaterate->GetFloat(),
@@ -2492,7 +2485,7 @@ void CL_SetSteamCrashComment()
 
 		CL_SetPagedPoolInfo();
 
-		Q_snprintf( g_minidumpinfo, sizeof(g_minidumpinfo),
+		V_sprintf_safe( g_minidumpinfo,
 				"Map: %s\n"\
 				"Game: %s\n"\
 				"Build: %i\n"\
@@ -2505,7 +2498,7 @@ void CL_SetSteamCrashComment()
 				map, com_gamedir, build_number(), misc, pNetChannel, CommandLine()->GetCmdLine(), driverinfo, videoinfo, osversion );
 
 		char full[ 4096 ];
-		Q_snprintf( full, sizeof( full ), "%sPP PAGES: used: %d, free %d\n", g_minidumpinfo, (int)g_pagedpoolinfo.numPagesUsed, (int)g_pagedpoolinfo.numPagesFree );
+		V_sprintf_safe( full, "%sPP PAGES: used: %d, free %d\n", g_minidumpinfo, (int)g_pagedpoolinfo.numPagesUsed, (int)g_pagedpoolinfo.numPagesFree );
 
 #ifndef NO_STEAM
 	SteamAPI_SetMiniDumpComment( full );
