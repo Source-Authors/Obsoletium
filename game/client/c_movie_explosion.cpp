@@ -141,8 +141,8 @@ void C_MovieExplosion::Update(float fTimeDelta)
 	m_EmitterLifetime += fTimeDelta;
 	if(m_EmitterLifetime > EXPLOSION_EMITTER_LIFETIME)
 		return;
-
-	m_EmitterAlpha = (float)sin(m_EmitterLifetime * 3.14159f / EXPLOSION_EMITTER_LIFETIME);
+	// dimhotepus: Use M_PI_F.
+	m_EmitterAlpha = sinf(m_EmitterLifetime * M_PI_F / EXPLOSION_EMITTER_LIFETIME);
 
 	// Simulate the emitters and have them spit out particles.
 	for(int iEmitter=0; iEmitter < NUM_MOVIEEXPLOSION_EMITTERS; iEmitter++)

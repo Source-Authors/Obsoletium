@@ -406,8 +406,8 @@ void C_SteamJet::RenderParticles( CParticleRenderIterator *pIterator )
 		vRampColor[0] = MIN( 1.0f, vRampColor[0] );
 		vRampColor[1] = MIN( 1.0f, vRampColor[1] );
 		vRampColor[2] = MIN( 1.0f, vRampColor[2] );
-
-		float sinLifetime = sin(pParticle->m_Lifetime * 3.14159f / pParticle->m_DieTime);
+		// dimhotepus: Use M_PI_F.
+		float sinLifetime = sinf(pParticle->m_Lifetime * M_PI_F / pParticle->m_DieTime);
 
 		if ( m_nType == STEAM_HEATWAVE )
 		{

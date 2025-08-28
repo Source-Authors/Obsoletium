@@ -541,7 +541,8 @@ void C_ParticleSmokeGrenade::Update(float fTimeDelta)
 	else if(flLifetime < m_FadeEndTime)
 	{
 		float fadePercent = (flLifetime - m_FadeStartTime) / (m_FadeEndTime - m_FadeStartTime);
-		m_FadeAlpha = cos(fadePercent * 3.14159f) * 0.5f + 0.5f;
+		// dimhotepus: Use M_PI_F.
+		m_FadeAlpha = cosf(fadePercent * M_PI_F) * 0.5f + 0.5f;
 	}
 	else
 	{

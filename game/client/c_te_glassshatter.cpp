@@ -17,7 +17,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define PI 3.14159265359
+// dimhotepus: Drop PI.
 #define GLASS_SHARD_MIN_LIFE 2
 #define GLASS_SHARD_MAX_LIFE 5
 #define GLASS_SHARD_NOISE	 0.3
