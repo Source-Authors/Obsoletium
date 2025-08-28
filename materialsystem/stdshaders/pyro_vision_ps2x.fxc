@@ -428,7 +428,8 @@ float4 main( PS_INPUT i ) : COLOR
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	float	flVignetteAmount = tex2D( VignetteSampler, i.vBaseTexCoord.xy );
+	// dimhotepus: Fix float4 -> float truncation warning.
+	float	flVignetteAmount = tex2D( VignetteSampler, i.vBaseTexCoord.xy ).x;
 	float4	vVignetteTile = tex2D( VignetteTileSampler, i.vBaseTexCoord.xy * 50.0f );
 
 #if HEATHAZE == 1
