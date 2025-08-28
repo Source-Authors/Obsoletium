@@ -420,7 +420,8 @@ bool ApplyMorph( sampler2D morphSampler, const float3 vMorphTargetTextureDim, co
 	vPosition	+= vPosDelta.xyz;
 #else
 	float4 t = float4( vMorphTexCoord.x, vMorphTexCoord.y, 0.0f, 0.0f );
-	float3 vPosDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vPosDelta = tex2Dlod( morphSampler, t ).xyz;
 	vPosition	+= vPosDelta.xyz * vMorphTexCoord.z;
 #endif // DECAL
 
@@ -444,9 +445,11 @@ bool ApplyMorph( sampler2D morphSampler, const float3 vMorphTargetTextureDim, co
 	vNormal		+= vNormalDelta.xyz;
 #else
 	float4 t = float4( vMorphTexCoord.x, vMorphTexCoord.y, 0.0f, 0.0f );
-	float3 vPosDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vPosDelta = tex2Dlod( morphSampler, t ).xyz;
 	t.x += 1.0f / vMorphTargetTextureDim.x;
-	float3 vNormalDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vNormalDelta = tex2Dlod( morphSampler, t ).xyz;
 	vPosition	+= vPosDelta.xyz * vMorphTexCoord.z;
 	vNormal		+= vNormalDelta.xyz * vMorphTexCoord.z;
 #endif // DECAL
@@ -472,9 +475,11 @@ bool ApplyMorph( sampler2D morphSampler, const float3 vMorphTargetTextureDim, co
 	vTangent	+= vNormalDelta.xyz;
 #else
 	float4 t = float4( vMorphTexCoord.x, vMorphTexCoord.y, 0.0f, 0.0f );
-	float3 vPosDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vPosDelta = tex2Dlod( morphSampler, t ).xyz;
 	t.x += 1.0f / vMorphTargetTextureDim.x;
-	float3 vNormalDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vNormalDelta = tex2Dlod( morphSampler, t ).xyz;
 	vPosition	+= vPosDelta.xyz * vMorphTexCoord.z;
 	vNormal		+= vNormalDelta.xyz * vMorphTexCoord.z;
 	vTangent	+= vNormalDelta.xyz * vMorphTexCoord.z;
@@ -505,7 +510,8 @@ bool ApplyMorph( sampler2D morphSampler, const float3 vMorphTargetTextureDim, co
 	float4 t = float4( vMorphTexCoord.x, vMorphTexCoord.y, 0.0f, 0.0f );
 	float4 vPosDelta = tex2Dlod( morphSampler, t );
 	t.x += 1.0f / vMorphTargetTextureDim.x;
-	float3 vNormalDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vNormalDelta = tex2Dlod( morphSampler, t ).xyz;
 
 	vPosition	+= vPosDelta.xyz * vMorphTexCoord.z;
 	vNormal		+= vNormalDelta.xyz * vMorphTexCoord.z;
