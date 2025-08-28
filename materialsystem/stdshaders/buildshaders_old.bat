@@ -16,12 +16,11 @@ set tt_chkpt=%tt_start%
 
 
 REM ****************
-REM usage: buildshaders_x64 <shaderProjectName>
+REM usage: buildshaders_old <shaderProjectName>
 REM ****************
 
 setlocal
 set arg_filename=%1
-rem set shadercompilecommand=echo shadercompile.exe -mpi_graphics -mpi_TrackEvents
 set shadercompilecommand=shadercompile.exe
 set shadercompileworkers=128
 set targetdir=..\..\..\game\hl2\shaders
@@ -100,20 +99,20 @@ REM ****************
 REM ERRORS
 REM ****************
 :InvalidGameDirectory
-echo -
-echo Error: "%~3" is not a valid game directory.
-echo (The -game directory must have a gameinfo.txt file)
-echo -
+echo "-"
+echo "Error: "%~3" is not a valid game directory."
+echo "(The -game directory must have a gameinfo.txt file)"
+echo "-"
 goto end
 
 :NoSourceDirSpecified
-echo ERROR: If you specify -game on the command line, you must specify -source.
+echo "ERROR: If you specify -game on the command line, you must specify -source."
 goto usage
 goto end
 
 :NoShaderCompile
 echo -
-echo - ERROR: shadercompile.exe doesn't exist in %sourcesdk%\bin\x64
+echo "- ERROR: shadercompile.exe doesn't exist in %sourcesdk%\bin\x64"
 echo -
 goto end
 
@@ -148,14 +147,14 @@ REM ****************
 REM Run the makefile, generating minimal work/build list for fxc files, go ahead and compile vsh and psh files.
 REM ****************
 rem nmake /S /C -f makefile.%inputbase% clean > clean.txt 2>&1
-echo Building inc files, asm vcs files, and VMPI worklist for %inputbase%...
+echo "Building inc files, asm vcs files, and VMPI worklist for %inputbase%..."
 nmake /S /C -f makefile.%inputbase%
 
 REM ****************
 REM Copy the inc files to their target
 REM ****************
 if exist "inclist.txt" (
-	echo Publishing shader inc files to target...
+	echo "Publishing shader inc files to target..."
 	perl %SrcDirBase%\devtools\bin\copyshaderincfiles.pl inclist.txt
 )
 
@@ -163,10 +162,10 @@ REM ****************
 REM Add the executables to the worklist.
 REM ****************
 if /i "%DIRECTX_SDK_VER%" == "pc09.00" (
-	rem echo "Copy extra files for dx 9 std
+	rem echo "Copy extra files for dx 9 std"
 )
 if /i "%DIRECTX_SDK_VER%" == "pc11.00" (
-	rem echo "Copy extra files for dx 11 std
+	rem echo "Copy extra files for dx 11 std"
 )
 
 echo %SrcDirBase%\%DIRECTX_SDK_BIN_DIR%\dx_proxy.dll >> filestocopy.txt
@@ -184,7 +183,7 @@ REM Cull duplicate entries in work/build list
 REM ****************
 if exist filestocopy.txt type filestocopy.txt | perl "%SrcDirBase%\devtools\bin\uniqifylist.pl" > uniquefilestocopy.txt
 if exist filelistgen.txt if not "%dynamic_shaders%" == "1" (
-    echo Generating action list...
+    echo "Generating action list..."
     copy filelistgen.txt filelist.txt >nul
     rem %SrcDirBase%\devtools\bin\fxccombogen.exe <filelistgen.txt 1>nul 2>filelist.txt
 )
@@ -195,7 +194,7 @@ REM ****************
 
 set shader_path_cd=%cd%
 if exist "filelist.txt" if exist "uniquefilestocopy.txt" if not "%dynamic_shaders%" == "1" (
-	echo Running distributed shader compilation...
+	echo "Running distributed shader compilation..."
 	cd %ChangeToDir%
 	%shadercompilecommand% -mpi_workercount %shadercompileworkers% -allowdebug -shaderpath "%shader_path_cd:/=\%" %SDKArgs%
 	cd %shader_path_cd%
@@ -208,7 +207,7 @@ REM Publish the generated files to the output dir using ROBOCOPY (smart copy) or
 REM This batch file may have been invoked standalone or slaved (master does final smart mirror copy)
 REM ****************
 if not "%dynamic_shaders%" == "1" (
-	if exist makefile.%inputbase%.copy echo Publishing shaders to target...
+	if exist makefile.%inputbase%.copy echo "Publishing shaders to target..."
 	if exist makefile.%inputbase%.copy perl %SrcDirBase%\devtools\bin\copyshaders.pl makefile.%inputbase%.copy
 )
 
