@@ -23,12 +23,6 @@ float DoShadow( sampler DepthSampler, float4 texCoord )
 										tex2D( DepthSampler, projTexCoord - uoffset + voffset ).x,
 										tex2D( DepthSampler, projTexCoord - uoffset - voffset ).x	);
 
-#	if ( defined( REVERSE_DEPTH_ON_X360 ) )
-	{
-		flashlightDepth = 1.0f - flashlightDepth;
-	}
-#	endif
-
 	float shadowed = 0.0f;
 	float z = texCoord.z/texCoord.w;
 	float4 dz = float4(z,z,z,z) - (flashlightDepth + float4( g_flShadowBias, g_flShadowBias, g_flShadowBias, g_flShadowBias));
@@ -349,257 +343,10 @@ TODO: Fix this contact hardening stuff
 	return fResult;
 }
 
-#if defined( _X360 )
-
-// Poisson disc, randomly rotated at different UVs
-float DoShadow360Simple( sampler DepthSampler, const float3 vProjCoords )
-{
-	float fLOD;
-	float2 shadowMapCenter = vProjCoords.xy;			// Center of shadow filter
-	float objDepth = min( vProjCoords.z, 0.99999 );		// Object depth in shadow space
-
-#if defined( REVERSE_DEPTH_ON_X360 )
-	objDepth = 1.0f - objDepth;
-#endif	
-
-	float4 vSampledDepths, vWeights;
-
-	asm {
-		getCompTexLOD2D fLOD.x, shadowMapCenter.xy, DepthSampler, AnisoFilter=max16to1
-			setTexLOD fLOD.x
-
-			tfetch2D vSampledDepths.x___, shadowMapCenter, DepthSampler, OffsetX = -0.5, OffsetY = -0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepths._x__, shadowMapCenter, DepthSampler, OffsetX =  0.5, OffsetY = -0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepths.__x_, shadowMapCenter, DepthSampler, OffsetX = -0.5, OffsetY =  0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepths.___x, shadowMapCenter, DepthSampler, OffsetX =  0.5, OffsetY =  0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-
-			getWeights2D vWeights, shadowMapCenter.xy, DepthSampler, MagFilter=linear, MinFilter=linear, UseComputedLOD=false, UseRegisterLOD=true
-	};
-
-	vWeights = float4( (1-vWeights.x)*(1-vWeights.y), vWeights.x*(1-vWeights.y), (1-vWeights.x)*vWeights.y, vWeights.x*vWeights.y );
-
-#if defined( REVERSE_DEPTH_ON_X360 )
-	float4 vCompare = (vSampledDepths < objDepth.xxxx);
-#else
-	float4 vCompare = (vSampledDepths > objDepth.xxxx);
-#endif
-
-	return dot( vCompare, vWeights );
-}
-
-
-float Do360PCFFetch( sampler DepthSampler, float2 tc, float objDepth )
-{
-	float fLOD;
-	float4 vSampledDepths, vWeights;
-
-	asm {
-			getCompTexLOD2D fLOD.x, tc.xy, DepthSampler, AnisoFilter=max16to1
-			setTexLOD fLOD.x
-
-			tfetch2D vSampledDepths.x___, tc, DepthSampler, OffsetX = -0.5, OffsetY = -0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepths._x__, tc, DepthSampler, OffsetX =  0.5, OffsetY = -0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepths.__x_, tc, DepthSampler, OffsetX = -0.5, OffsetY =  0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepths.___x, tc, DepthSampler, OffsetX =  0.5, OffsetY =  0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-
-			getWeights2D vWeights, tc.xy, DepthSampler, MagFilter=linear, MinFilter=linear, UseComputedLOD=false, UseRegisterLOD=true
-	};
-
-	vWeights = float4( (1-vWeights.x)*(1-vWeights.y), vWeights.x*(1-vWeights.y), (1-vWeights.x)*vWeights.y, vWeights.x*vWeights.y );
-
-#if defined( REVERSE_DEPTH_ON_X360 )
-	float4 vCompare = (vSampledDepths < objDepth.xxxx);
-#else
-	float4 vCompare = (vSampledDepths > objDepth.xxxx);
-#endif
-
-	return dot( vCompare, vWeights );
-}
-
-
-
-float Do360NearestFetch( sampler DepthSampler, float2 tc, float objDepth )
-{
-	float fLOD;
-	float4 vSampledDepth;
-
-	asm {
-		getCompTexLOD2D fLOD.x, tc.xy, DepthSampler, AnisoFilter=max16to1
-		setTexLOD fLOD.x
-
-		tfetch2D vSampledDepth.x___, tc, DepthSampler, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-	};
-
-#if defined( REVERSE_DEPTH_ON_X360 )
-	return (vSampledDepth.x < objDepth.x);
-#else
-	return (vSampledDepth.x > objDepth.x);
-#endif
-
-}
-
-
-float AmountShadowed_8Tap_360( sampler DepthSampler, float2 tc, float objDepth )
-{
-	float fLOD;
-	float4 vSampledDepthsA, vSampledDepthsB;
-
-	// Optimal 8 rooks pattern to get an idea about whether we're at a penumbra or not
-	// From [Kallio07] "Scanline Edge-Flag Algorithm for Antialiasing" 
-	//
-	//        +---+---+---+---+---+---+---+---+
-	//        |   |   |   |   |   | o |   |   |
-	//        +---+---+---+---+---+---+---+---+
-	//        | o |   |   |   |   |   |   |   |
-	//        +---+---+---+---+---+---+---+---+
-	//        |   |   |   | o |   |   |   |   |
-	//        +---+---+---+---+---+---+---+---+
-	//        |   |   |   |   |   |   | o |   |
-	//        +---+---+---+---+---+---+---+---+
-	//        |   | o |   |   |   |   |   |   |
-	//        +---+---+---+---+---+---+---+---+
-	//        |   |   |   |   | o |   |   |   |
-	//        +---+---+---+---+---+---+---+---+
-	//        |   |   |   |   |   |   |   | o |
-	//        +---+---+---+---+---+---+---+---+
-	//        |   |   | o |   |   |   |   |   |
-	//        +---+---+---+---+---+---+---+---+
-	//
-	asm {
-			getCompTexLOD2D fLOD.x, tc.xy, DepthSampler, AnisoFilter=max16to1
-			setTexLOD fLOD.x
-
-			tfetch2D vSampledDepthsA.x___, tc, DepthSampler, OffsetX = -2.0, OffsetY = -1.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepthsA._x__, tc, DepthSampler, OffsetX = -1.5, OffsetY =  0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepthsA.__x_, tc, DepthSampler, OffsetX = -1.0, OffsetY =  2.0, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepthsA.___x, tc, DepthSampler, OffsetX = -0.5, OffsetY = -1.0, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-
-			tfetch2D vSampledDepthsB.x___, tc, DepthSampler, OffsetX =  0.5, OffsetY =  1.0, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepthsB._x__, tc, DepthSampler, OffsetX =  1.0, OffsetY = -2.0, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepthsB.__x_, tc, DepthSampler, OffsetX =  1.5, OffsetY = -0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepthsB.___x, tc, DepthSampler, OffsetX =  2.0, OffsetY =  1.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-	};
-
-#if defined( REVERSE_DEPTH_ON_X360 )
-	float4 vCompareA = (vSampledDepthsA < objDepth.xxxx);
-	float4 vCompareB = (vSampledDepthsB < objDepth.xxxx);
-#else
-	float4 vCompareA = (vSampledDepthsA > objDepth.xxxx);
-	float4 vCompareB = (vSampledDepthsB > objDepth.xxxx);
-#endif
-
-	return dot( vCompareA, float4(0.125,0.125,0.125,0.125) ) + dot( vCompareB, float4(0.125,0.125,0.125,0.125) );
-}
-
-
-float AmountShadowed_4Tap_360( sampler DepthSampler, float2 tc, float objDepth )
-{
-	float fLOD;
-	float4 vSampledDepths;
-
-	// Rotated grid pattern to get an idea about whether we're at a penumbra or not
-	asm {
-		getCompTexLOD2D fLOD.x, tc.xy, DepthSampler, AnisoFilter=max16to1
-			setTexLOD fLOD.x
-
-			tfetch2D vSampledDepths.x___, tc, DepthSampler, OffsetX = -1.0, OffsetY =  0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepths._x__, tc, DepthSampler, OffsetX = -0.5, OffsetY = -1.0, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepths.__x_, tc, DepthSampler, OffsetX =  0.5, OffsetY =  1.0, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-			tfetch2D vSampledDepths.___x, tc, DepthSampler, OffsetX =  1.0, OffsetY = -0.5, UseComputedLOD=false, UseRegisterLOD=true, MagFilter = point, MinFilter = point
-	};
-
-#if defined( REVERSE_DEPTH_ON_X360 )
-	float4 vCompare = (vSampledDepths < objDepth.xxxx);
-#else
-	float4 vCompare = (vSampledDepths > objDepth.xxxx);
-#endif
-
-	return dot( vCompare, float4(0.25,0.25,0.25,0.25) );
-}
-
-// Poisson disc, randomly rotated at different UVs
-float DoShadowPoisson360( sampler DepthSampler, sampler RandomRotationSampler, const float3 vProjCoords, const float2 vScreenPos, const float4 vShadowTweaks )
-{
-	float2 vPoissonOffset[8] = { float2(  0.3475f,  0.0042f ), float2(  0.8806f,  0.3430f ),
-								 float2( -0.0041f, -0.6197f ), float2(  0.0472f,  0.4964f ),
-								 float2( -0.3730f,  0.0874f ), float2( -0.9217f, -0.3177f ),
-								 float2( -0.6289f,  0.7388f ), float2(  0.5744f, -0.7741f ) };
-
-	float2 shadowMapCenter = vProjCoords.xy;		// Center of shadow filter
-	float objDepth = min( vProjCoords.z, 0.99999 );	// Object depth in shadow space
-
-#if defined( REVERSE_DEPTH_ON_X360 )
-	objDepth = 1.0f - objDepth;
-#endif
-
-	float fAmountShadowed = AmountShadowed_4Tap_360( DepthSampler, shadowMapCenter, objDepth );
-
-	if ( fAmountShadowed >= 1.0f )			// Fully in light
-	{
-		return 1.0f;
-	}
-	else	// Do the expensive filtering since we're at least partially shadowed
-	{
-		float flScaleOverMapSize = 1.7f / 512.0f;		// Tweak parameters to shader
-
-		// 2D Rotation Matrix setup
-		float3 RMatTop = 0, RMatBottom = 0;
-#if defined(SHADER_MODEL_PS_2_0) || defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)
-		RMatTop.xy = tex2D( RandomRotationSampler, cFlashlightScreenScale.xy * (vScreenPos * 0.5 + 0.5)) * 2.0 - 1.0;
-		RMatBottom.xy = float2(-1.0, 1.0) * RMatTop.yx;	// 2x2 rotation matrix in 4-tuple
-#endif
-
-		RMatTop *= flScaleOverMapSize;					// Scale up kernel while accounting for texture resolution
-		RMatBottom *= flScaleOverMapSize;
-		RMatTop.z = shadowMapCenter.x;					// To be added in d2adds generated below
-		RMatBottom.z = shadowMapCenter.y;
-		float2 rotOffset = float2(0,0);
-		float4 vAccum = 0;
-
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[0].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[0].xy) + RMatBottom.z;
-		vAccum.x  = Do360NearestFetch( DepthSampler, rotOffset, objDepth );
-
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[1].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[1].xy) + RMatBottom.z;
-		vAccum.y  = Do360NearestFetch( DepthSampler, rotOffset, objDepth );
-
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[2].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[2].xy) + RMatBottom.z;
-		vAccum.z  = Do360NearestFetch( DepthSampler, rotOffset, objDepth );
-
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[3].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[3].xy) + RMatBottom.z;
-		vAccum.w  = Do360NearestFetch( DepthSampler, rotOffset, objDepth );
-
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[4].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[4].xy) + RMatBottom.z;
-		vAccum.x += Do360NearestFetch( DepthSampler, rotOffset, objDepth );
-
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[5].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[5].xy) + RMatBottom.z;
-		vAccum.y += Do360NearestFetch( DepthSampler, rotOffset, objDepth );
-
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[6].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[6].xy) + RMatBottom.z;
-		vAccum.z += Do360NearestFetch( DepthSampler, rotOffset, objDepth );
-
-		rotOffset.x = dot (RMatTop.xy,    vPoissonOffset[7].xy) + RMatTop.z;
-		rotOffset.y = dot (RMatBottom.xy, vPoissonOffset[7].xy) + RMatBottom.z;
-		vAccum.w += Do360NearestFetch( DepthSampler, rotOffset, objDepth );
-
-		return dot( vAccum, float4( 0.25, 0.25, 0.25, 0.25) );
-	}
-}
-
-#endif // _X360
-
-
 float DoFlashlightShadow( sampler DepthSampler, sampler RandomRotationSampler, float3 vProjCoords, float2 vScreenPos, int nShadowLevel, float4 vShadowTweaks, bool bAllowHighQuality )
 {
 	float flShadow = 1.0f;
 
-#if !defined( _X360 ) //PC
 	if( nShadowLevel == NVIDIA_PCF_POISSON )
 		flShadow = DoShadowPoisson16Sample( DepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, vShadowTweaks, true, false );
 	else if( nShadowLevel == ATI_NOPCF )
@@ -608,29 +355,6 @@ float DoFlashlightShadow( sampler DepthSampler, sampler RandomRotationSampler, f
 		flShadow = DoShadowPoisson16Sample( DepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, vShadowTweaks, false, true );
 
 	return flShadow;
-#else
-
-	// Compile-time switch for shaders which allow high quality modes on 360
-	if ( bAllowHighQuality )
-	{
-		// Static control flow switch for shadow quality.  Some non-interactive sequences use the high quality path
-		if ( g_bHighQualityShadows )
-		{
-			flShadow = DoShadowPoisson360( DepthSampler, RandomRotationSampler, vProjCoords, vScreenPos, vShadowTweaks );
-		}
-		else
-		{
-			flShadow = DoShadow360Simple( DepthSampler, vProjCoords );
-		}
-	}
-	else
-	{
-		flShadow = DoShadow360Simple( DepthSampler, vProjCoords );
-	}
-
-	return flShadow;
-
-#endif
 }
 
 float3 SpecularLight( const float3 vWorldNormal, const float3 vLightDir, const float fSpecularExponent,
@@ -661,34 +385,7 @@ void DoSpecularFlashlight( float3 flashlightPos, float3 worldPos, float4 flashli
 	float3 vProjCoords = flashlightSpacePosition.xyz / flashlightSpacePosition.w;
 	float3 flashlightColor = float3(1,1,1);
 
-#if ( defined( _X360 ) )
-
-	float3 ltz = vProjCoords.xyz < float3( 0.0f, 0.0f, 0.0f );
-	float3 gto = vProjCoords.xyz > float3( 1.0f, 1.0f, 1.0f );
-
-	[branch]
-	if ( dot(ltz + gto, float3(1,1,1)) > 0 )
-	{
-		clip(-1);
-		diffuseLighting = specularLighting = float3(0,0,0);
-		return;
-	}
-	else
-	{
-		flashlightColor = tex2D( FlashlightSampler, vProjCoords );
-
-		[branch]
-		if ( dot(flashlightColor.xyz, float3(1,1,1)) <= 0 )
-		{
-			clip(-1);
-			diffuseLighting = specularLighting = float3(0,0,0);
-			return;
-		}
-	}
-#else
 	flashlightColor = tex2D( FlashlightSampler, vProjCoords );
-#endif
-
 
 #if defined(SHADER_MODEL_PS_2_0) || defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)
 	flashlightColor *= cFlashlightColor.xyz;						// Flashlight color
@@ -737,37 +434,7 @@ float3 DoFlashlight( float3 flashlightPos, float3 worldPos, float4 flashlightSpa
 	float3 vProjCoords = flashlightSpacePosition.xyz / flashlightSpacePosition.w;
 	float3 flashlightColor = float3(1,1,1);
 
-#if ( defined( _X360 ) )
-
-	float3 ltz = vProjCoords.xyz < float3( 0.0f, 0.0f, 0.0f );
-	float3 gto = vProjCoords.xyz > float3( 1.0f, 1.0f, 1.0f );
-
-	[branch]
-	if ( dot(ltz + gto, float3(1,1,1)) > 0 )
-	{
-		if ( bClip )
-		{
-			clip(-1);
-		}
-		return float3(0,0,0);
-	}
-	else
-	{
-		flashlightColor = tex2D( FlashlightSampler, vProjCoords );
-
-		[branch]
-		if ( dot(flashlightColor.xyz, float3(1,1,1)) <= 0 )
-		{
-			if ( bClip )
-			{
-				clip(-1);
-			}
-			return float3(0,0,0);
-		}
-	}
-#else
 	flashlightColor = tex2D( FlashlightSampler, vProjCoords );
-#endif
 
 #if defined(SHADER_MODEL_PS_2_0) || defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0)
 	flashlightColor *= cFlashlightColor.xyz;						// Flashlight color
