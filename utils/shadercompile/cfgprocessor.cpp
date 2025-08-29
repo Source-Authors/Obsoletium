@@ -662,8 +662,8 @@ struct ComboEmission {
   std::string m_sSuffix;
 } g_comboEmission;
 
-size_t const g_lenTmpBuffer = 1 * 1024 * 1024;  // 1Mb buffer for tmp storage
-char g_chTmpBuffer[g_lenTmpBuffer];
+// 1Mb buffer for tmp storage
+char g_chTmpBuffer[1 * 1024 * 1024];
 
 void ComboGenerator::RunAllCombos(CComplexExpression const &skipExpr) {
   // Combo numbers
@@ -888,7 +888,8 @@ bool ComboHandleImpl::NextNotSkipped(uint64_t iTotalCommand) {
   }
 }
 
-void ComboHandleImpl::FormatCommand(OUT_Z_CAP(buffer_size) char *pchBuffer, intp bufferSize) {
+void ComboHandleImpl::FormatCommand(OUT_Z_CAP(bufferSize) char *pchBuffer,
+                                    intp bufferSize) {
   // Get the pointers
   int *const pnValues = m_arrVarSlots.ArrayBaseForEdit();
   int *const pnValuesEnd = pnValues + m_arrVarSlots.Size();
@@ -926,22 +927,24 @@ struct CAutoDestroyEntries {
 } s_autoDestroyEntries;
 
 FILE *&GetInputStream(FILE *) {
-  static FILE *s_fInput = stdin;
-  return s_fInput;
+  static FILE *in = stdin;
+  return in;
 }
 
 CUtlInplaceBuffer *&GetInputStream(CUtlInplaceBuffer *) {
-  static CUtlInplaceBuffer *s_fInput = nullptr;
-  return s_fInput;
+  static CUtlInplaceBuffer *in = nullptr;
+  return in;
 }
 
 char *GetLinePtr_Private() {
-  if (CUtlInplaceBuffer *pUtlBuffer =
-          GetInputStream((CUtlInplaceBuffer *)nullptr))
-    return pUtlBuffer->InplaceGetLinePtr();
+  if (CUtlInplaceBuffer *buffer =
+          GetInputStream((CUtlInplaceBuffer *)nullptr)) {
+    return buffer->InplaceGetLinePtr();
+  }
 
-  if (FILE *fInput = GetInputStream((FILE *)nullptr))
-    return fgets(g_chTmpBuffer, g_lenTmpBuffer, fInput);
+  if (FILE *file = GetInputStream((FILE *)nullptr)) {
+    return fgets(g_chTmpBuffer, std::size(g_chTmpBuffer), file);
+  }
 
   return nullptr;
 }
@@ -953,7 +956,7 @@ bool LineEquals(char const *sz1, char const *sz2, int nLen) {
 char *NextLine() {
   if (char *szLine = GetLinePtr_Private()) {
     // Trim trailing whitespace as well
-    size_t len = (size_t)strlen(szLine);
+    size_t len = strlen(szLine);
     while (len-- > 0 && V_isspace(szLine[len])) {
       szLine[len] = 0;
     }
@@ -1155,15 +1158,9 @@ ComboHandle AsHandle(CPCHI_t *pImpl) {
   return reinterpret_cast<ComboHandle>(pImpl);
 }
 
-void ReadConfiguration(FILE *fInputStream) {
-  CAutoPushPop<FILE *> pushInputStream(internal::GetInputStream(fInputStream),
-                                       fInputStream);
-  internal::ProcessConfiguration();
-}
+void ReadConfiguration(CUtlInplaceBuffer *in) {
+  CAutoPushPop<CUtlInplaceBuffer *> stream{internal::GetInputStream(in), in};
 
-void ReadConfiguration(CUtlInplaceBuffer *fInputStream) {
-  CAutoPushPop<CUtlInplaceBuffer *> pushInputStream(
-      internal::GetInputStream(fInputStream), fInputStream);
   internal::ProcessConfiguration();
 }
 
@@ -1283,7 +1280,8 @@ ComboHandle Combo_GetNext(uint64_t &riCommandNumber, ComboHandle &rhCombo,
   }
 }
 
-void Combo_FormatCommand(ComboHandle hCombo, OUT_Z_CAP(buffer_size) char *pchBuffer,
+void Combo_FormatCommand(ComboHandle hCombo,
+                         OUT_Z_CAP(buffer_size) char *pchBuffer,
                          intp buffer_size) {
   CPCHI_t *impl = FromHandle(hCombo);
 

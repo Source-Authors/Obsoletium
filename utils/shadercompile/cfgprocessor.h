@@ -36,9 +36,11 @@ class CUtlInplaceBuffer;
 namespace se::shader_compile::shader_combo_processor {
 
 // Working with configuration
-void ReadConfiguration(FILE *fInputStream);
-void ReadConfiguration(CUtlInplaceBuffer *fInputStream);
+void ReadConfiguration(CUtlInplaceBuffer *in);
 
+/**
+ * @brief Config entry info.
+ */
 struct CfgEntryInfo {
   char const *m_szName;  // Name of the shader, e.g. "shader_ps20b"
   // Name of the src file, e.g. "shader_psxx.fxc"

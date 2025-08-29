@@ -68,10 +68,6 @@ static constexpr inline UtlSymId_t ushort_as_symid(unsigned short x) {
 #define SHADERHADERROR_PACKETID 8
 #define MACHINE_NAME 9
 
-#ifdef _DEBUG
-// #define DEBUGFP
-#endif
-
 // Dealing with job list
 namespace {
 
@@ -116,9 +112,6 @@ char *PrettyPrintNumber(uint64_t k) {
 const char *g_pShaderPath = NULL;
 char g_WorkerTempPath[MAX_PATH];
 char g_ExeDir[MAX_PATH];
-#ifdef DEBUGFP
-FILE *g_WorkerDebugFp = NULL;
-#endif
 bool g_bGotStartWorkPacket = false;
 double g_flStartTime;
 bool g_bVerbose = false;
@@ -581,11 +574,6 @@ void DebugOut(const char *pMsg, ...) {
     va_end(marker);
 
     Msg("%s", msg);
-
-#ifdef DEBUGFP
-    fprintf(g_WorkerDebugFp, "%s", msg);
-    fflush(g_WorkerDebugFp);
-#endif
   }
 }
 
@@ -2114,7 +2102,7 @@ void Worker_GetLocalCopyOfBinaries() {
 }
 
 void Shared_ParseListOfCompileCommands() {
-  double tt_start = Plat_FloatTime();
+  const double tt_start = Plat_FloatTime();
 
   char fileListFileName[MAX_PATH];
   sprintf_s(fileListFileName, "%s\\filelist.txt", g_pShaderPath);
@@ -2179,18 +2167,6 @@ void SetupPaths(int argc, char **argv) {
 
   g_pShaderPath = CommandLine()->ParmValue("-shaderpath", "");
   g_bVerbose = CommandLine()->FindParm("-verbose") != 0;
-}
-
-void SetupDebugFile() {
-#ifdef DEBUGFP
-  const char *pComputerName = getenv("COMPUTERNAME");
-  char filename[MAX_PATH];
-  V_sprintf_safe(filename, "\\\\fileserver\\user\\gary\\debug\\%s.txt",
-                 pComputerName);
-  g_WorkerDebugFp = fopen(filename, "w");
-  Assert(g_WorkerDebugFp);
-  DebugOut("opened debug file '%s'.\n", filename);
-#endif
 }
 
 void CompileShaders_NoVMPI() {
@@ -2332,11 +2308,11 @@ void CDistributeShaderCompileMaster::ThreadProc() {
 class ScopedConsoleCtrlHandler {
  public:
   explicit ScopedConsoleCtrlHandler(PHANDLER_ROUTINE handler) noexcept
-      : handler_{handler}, ok_{SetConsoleCtrlHandler(handler, TRUE)} {
+      : handler_{handler}, ok_{::SetConsoleCtrlHandler(handler, TRUE)} {
     AssertMsg(ok_, "Unable to set console ctrl handler for process.");
   }
   ~ScopedConsoleCtrlHandler() noexcept {
-    ok_ = SetConsoleCtrlHandler(handler_, FALSE);
+    ok_ = ::SetConsoleCtrlHandler(handler_, FALSE);
     AssertMsg(ok_, "Unable to reset console ctrl handler for process.");
   }
 
@@ -2344,11 +2320,11 @@ class ScopedConsoleCtrlHandler {
   ScopedConsoleCtrlHandler &operator=(ScopedConsoleCtrlHandler &) = delete;
 
  private:
-  PHANDLER_ROUTINE handler_;
+  const PHANDLER_ROUTINE handler_;
   BOOL ok_;
 };
 
-static BOOL WINAPI OnConsoleControlSignal(DWORD ctrl_type) {
+static BOOL WINAPI OnCtrlBreak(DWORD ctrl_type) {
   // Because the system creates a new thread in the process to execute the
   // handler function, it is possible that the handler function will be
   // terminated by another thread in the process.  Be sure to synchronize
@@ -2368,7 +2344,7 @@ static BOOL WINAPI OnConsoleControlSignal(DWORD ctrl_type) {
 }
 
 int ShaderCompile_Main(int argc, char *argv[]) {
-  const ScopedConsoleCtrlHandler scoped_ctrl_handler{OnConsoleControlSignal};
+  const ScopedConsoleCtrlHandler scoped_ctrl_handler{OnCtrlBreak};
 
   EnableCrashingOnCrashes();
 
@@ -2377,8 +2353,6 @@ int ShaderCompile_Main(int argc, char *argv[]) {
 
   g_bSuppressPrintfOutput = false;
   g_flStartTime = Plat_FloatTime();
-
-  SetupDebugFile();
 
   // managed specifically in
   // Worker_ProcessCommandRange_Singleton::Startup
@@ -2430,11 +2404,12 @@ int ShaderCompile_Main(int argc, char *argv[]) {
     se::utils::common::SetupDefaultToolsMinidumpHandler();
 
   if (CommandLine()->FindParm("-game") == 0) {
-    // Used with filesystem_stdio.dll
-    FileSystem_Init(nullptr, 0, FS_INIT_COMPATIBILITY_MODE);
-  } else {
-    // SDK uses this since it only has filesystem_steam.dll.
-    FileSystem_Init(nullptr, 0, FS_INIT_FULL);
+    FileSystem_Init(nullptr, 0,
+                    CommandLine()->FindParm("-game") == 0
+                        // Used with filesystem_stdio.dll
+                        ? FS_INIT_COMPATIBILITY_MODE
+                        // SDK uses this since it only has filesystem_steam.dll.
+                        : FS_INIT_FULL);
   }
 
   DebugOut("After VMPI_FileSystem_Init\n");
