@@ -937,38 +937,43 @@ CUtlInplaceBuffer *&GetInputStream(CUtlInplaceBuffer *) {
 }
 
 char *GetLinePtr_Private() {
-  if (CUtlInplaceBuffer *buffer =
-          GetInputStream((CUtlInplaceBuffer *)nullptr)) {
+  if (auto *buffer = GetInputStream((CUtlInplaceBuffer *)nullptr)) {
     return buffer->InplaceGetLinePtr();
   }
 
-  if (FILE *file = GetInputStream((FILE *)nullptr)) {
+  if (auto *file = GetInputStream((FILE *)nullptr)) {
     return fgets(g_chTmpBuffer, std::size(g_chTmpBuffer), file);
   }
 
   return nullptr;
 }
 
-bool LineEquals(char const *sz1, char const *sz2, int nLen) {
-  return 0 == strncmp(sz1, sz2, nLen);
+template <intp size>
+bool LineEquals(char const *l1, const char (&l2)[size]) {
+  return 0 == V_strncmp(l1, l2, size - 1);
 }
 
 char *NextLine() {
   if (char *szLine = GetLinePtr_Private()) {
     // Trim trailing whitespace as well
     size_t len = strlen(szLine);
+
     while (len-- > 0 && V_isspace(szLine[len])) {
-      szLine[len] = 0;
+      szLine[len] = '\0';
     }
+
     return szLine;
   }
 
-  return NULL;
+  return nullptr;
 }
 
-char *WaitFor(char const *szWaitString, int nMatchLength) {
-  while (char *pchResult = NextLine()) {
-    if (LineEquals(pchResult, szWaitString, nMatchLength)) return pchResult;
+template <intp size>
+const char *WaitFor(const char (&wait)[size]) {
+  while (const char *line = NextLine()) {
+    if (LineEquals(line, wait)) {
+      return line;
+    }
   }
 
   return nullptr;
@@ -978,11 +983,11 @@ bool ProcessSection(CfgEntry &cfge) {
   bool bStaticDefines;
 
   // Read the next line for the section src file
-  if (char *szLine = NextLine()) {
+  if (const char *szLine = NextLine()) {
     cfge.m_szShaderSrc = s_strPool.AddLookup(szLine);
   }
 
-  if (char *szLine = WaitFor("#DEFINES-", 9)) {
+  if (const char *szLine = WaitFor("#DEFINES-")) {
     bStaticDefines = (szLine[9] == 'S');
   } else
     return false;
@@ -993,10 +998,10 @@ bool ProcessSection(CfgEntry &cfge) {
 
   // #DEFINES:
   while (char *szLine = NextLine()) {
-    if (LineEquals(szLine, "#SKIP", 5)) break;
+    if (LineEquals(szLine, "#SKIP")) break;
 
     // static defines
-    if (LineEquals(szLine, "#DEFINES-", 9)) {
+    if (LineEquals(szLine, "#DEFINES-")) {
       bStaticDefines = (szLine[9] == 'S');
       continue;
     }
@@ -1030,18 +1035,18 @@ bool ProcessSection(CfgEntry &cfge) {
   }
 
   // #SKIP:
-  if (char *szLine = NextLine()) {
+  if (const char *szLine = NextLine()) {
     exprSkip.Parse(szLine);
   } else
     return false;
 
   // #COMMAND:
-  if (!WaitFor("#COMMAND", 8)) return false;
-  if (char *szLine = NextLine()) cfge.m_sPrefix = szLine;
-  if (char *szLine = NextLine()) cfge.m_sSuffix = szLine;
+  if (!WaitFor("#COMMAND")) return false;
+  if (const char *szLine = NextLine()) cfge.m_sPrefix = szLine;
+  if (const char *szLine = NextLine()) cfge.m_sSuffix = szLine;
 
   // #END
-  if (!WaitFor("#END", 4)) return false;
+  if (!WaitFor("#END")) return false;
 
   return true;
 }
@@ -1097,7 +1102,7 @@ void RunSection(CfgEntry const &cfge) {
 void ProcessConfiguration() {
   static bool s_bProcessOnce = false;
 
-  while (char *szLine = WaitFor("#BEGIN", 6)) {
+  while (const char *szLine = WaitFor("#BEGIN")) {
     if (' ' == szLine[6] && !s_uniqueSections.Add(szLine + 7)) continue;
 
     CfgEntry cfge;
