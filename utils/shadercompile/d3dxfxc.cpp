@@ -225,7 +225,7 @@ ExecuteCommand(const char *in_command) {
   if (in_shader_model) {
     V_strcpy_safe(out_shader_model, in_shader_model);
   }
-  Q_strlower(out_shader_model);
+  V_strlower(out_shader_model);
 
   // Determine the file name (at the end of the command line before
   // redirection).
