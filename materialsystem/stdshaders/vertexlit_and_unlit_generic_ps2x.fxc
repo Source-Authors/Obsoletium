@@ -358,7 +358,8 @@ float4 main( PS_INPUT i ) : COLOR
 	diffuseLighting = f3LightmapColor;
 #endif
 
-	float3 albedo = baseColor;
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	float3 albedo = baseColor.rgb;
 
 	if (bBlendTintByBaseAlpha)
 	{
@@ -438,7 +439,8 @@ float4 main( PS_INPUT i ) : COLOR
 	#else
 		if ( bSelfIllum )
 		{
-			float3 vSelfIllumMask = tex2D( SelfIllumMaskSampler, i.baseTexCoord.xy );
+			// dimhotepus: Fix float4 -> float3 downcast warnings.
+			float3 vSelfIllumMask = tex2D( SelfIllumMaskSampler, i.baseTexCoord.xy ).xyz;
 			vSelfIllumMask = lerp( baseColor.aaa, vSelfIllumMask, g_SelfIllumMaskControl );
 			diffuseComponent = lerp( diffuseComponent, g_SelfIllumTint * albedo, vSelfIllumMask );
 		}
@@ -449,15 +451,18 @@ float4 main( PS_INPUT i ) : COLOR
 #if CUBEMAP_SPHERE_LEGACY
 		float3 reflectVect = normalize(CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz ));
 
-		specularLighting = 0.5 * tex2D( EnvmapSampler, float2(reflectVect.x, reflectVect.y) ) * g_DiffuseModulation.rgb * diffuseLighting;
+		// dimhotepus: Fix float4 -> float3 downcast warnings.
+		specularLighting = 0.5 * tex2D( EnvmapSampler, float2(reflectVect.x, reflectVect.y) ).xyz * g_DiffuseModulation.rgb * diffuseLighting;
 #else
 		float3 reflectVect = CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz );
 
-		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect );
+		// dimhotepus: Fix float4 -> float3 downcast warnings.
+		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect ).xyz;
 		specularLighting *= specularFactor;
 		specularLighting *= g_EnvmapTint_TintReplaceFactor.rgb;
 		float3 specularLightingSquared = specularLighting * specularLighting;
-		specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast_ShadowTweaks );
+		// dimhotepus: Fix float4 -> float3 downcast warnings.
+		specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast_ShadowTweaks.xyz );
 		float3 greyScale = dot( specularLighting, float3( 0.299f, 0.587f, 0.114f ) );
 		specularLighting = lerp( greyScale, specularLighting, g_EnvmapSaturation );
 #endif
