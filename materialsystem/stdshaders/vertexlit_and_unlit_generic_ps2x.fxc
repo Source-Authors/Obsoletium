@@ -222,7 +222,9 @@ float4 FinalOutputConst( const float4 vShaderColor, float pixelFogFactor, float 
 
 
 #if LIGHTING_PREVIEW == 2
-LPREVIEW_PS_OUT main( PS_INPUT i ) : COLOR
+// dimhotepus: Drop COLOR semantics as we have a struct, not COLOR to return
+// dimhotepus: Fixes warning X3576: semantics in type overridden by variable/function or enclosing type
+LPREVIEW_PS_OUT main( PS_INPUT i )
 #else
 float4 main( PS_INPUT i ) : COLOR
 #endif
@@ -450,7 +452,7 @@ float4 main( PS_INPUT i ) : COLOR
 	{
 #if CUBEMAP_SPHERE_LEGACY
 		float3 reflectVect = normalize(CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz ));
-
+		
 		// dimhotepus: Fix float4 -> float3 downcast warnings.
 		specularLighting = 0.5 * tex2D( EnvmapSampler, float2(reflectVect.x, reflectVect.y) ).xyz * g_DiffuseModulation.rgb * diffuseLighting;
 #else
