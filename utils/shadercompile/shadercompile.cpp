@@ -578,10 +578,9 @@ void GetVCSFilenames(OUT_Z_ARRAY char (&pszMainOutFileName)[outSize],
     }
   }
 
-  V_strcat(pszMainOutFileName, "\\", outSize);
-  V_strcat(pszMainOutFileName, si.m_pShaderName, outSize);
-  V_strcat(pszMainOutFileName, ".vcs",
-           outSize);  // Different extensions for main output file
+  V_strcat_safe(pszMainOutFileName, "\\");
+  V_strcat_safe(pszMainOutFileName, si.m_pShaderName);
+  V_strcat_safe(pszMainOutFileName, ".vcs");  // Different extensions for main output file
 
   // Check status of vcs file...
   if (_stat(pszMainOutFileName, &buf) != -1) {
@@ -979,7 +978,7 @@ class CWorkerAccumState
   ~CWorkerAccumState() { QuitSubs(); }
 
   void RangeBegin(uint64_t iFirstCommand, uint64_t iEndCommand);
-  void RangeFinished(void);
+  void RangeFinished();
 
   void ExecuteCompileCommand(
       se::shader_compile::shader_combo_processor::ComboHandle hCombo);
@@ -1071,8 +1070,8 @@ void CWorkerAccumState<TMutexType>::QuitSubs() {
   }
 
   if (m_arrWait.Count()) {
-    DWORD dwWait = WaitForMultipleObjects(m_arrWait.Count(), m_arrWait.Base(),
-                                          TRUE, 2 * 1000);
+    DWORD dwWait = WaitForMultipleObjects(static_cast<DWORD>(m_arrWait.Count()),
+                                          m_arrWait.Base(), TRUE, 2 * 1000);
     if (WAIT_TIMEOUT == dwWait) {
       Warning("Timed out while waiting for sub-processes to shut down!\n");
     }
@@ -1110,7 +1109,7 @@ void CWorkerAccumState<TMutexType>::PrepareSubProcess(
     objects = sub_process->pCommObjs =
         new SubProcessKernelObjects_Create(base_name);
 
-    ZeroMemory(&sub_process->pi, sizeof(sub_process->pi));
+    BitwiseClear(sub_process->pi);
 
     STARTUPINFO si{(DWORD)sizeof(si)};
 
@@ -1128,9 +1127,8 @@ void CWorkerAccumState<TMutexType>::PrepareSubProcess(
             std::system_category().message(GetLastError()).c_str());
     }
 
-    m_pMutex->Lock();
+    AUTO_LOCK(*m_pMutex);
     sub_process->dwIndex = m_arrSubProcessInfos.AddToTail(sub_process);
-    m_pMutex->Unlock();
   }
 
   if (out_sub_process) *out_sub_process = sub_process;
@@ -1340,10 +1338,12 @@ void CWorkerAccumState<TMutexType>::TryToPackageData(uint64_t iCommandNumber) {
 
 template <typename TMutexType>
 bool CWorkerAccumState<TMutexType>::OnProcess() {
-  m_pMutex->Lock();
-  se::shader_compile::shader_combo_processor::ComboHandle hThreadCombo =
-      m_hCombo ? Combo_Alloc(m_hCombo) : NULL;
-  m_pMutex->Unlock();
+  se::shader_compile::shader_combo_processor::ComboHandle hThreadCombo;
+
+  {
+    AUTO_LOCK(*m_pMutex);
+    hThreadCombo = m_hCombo ? Combo_Alloc(m_hCombo) : NULL;
+  }
 
   uint64_t iThreadCommand = ~uint64_t(0);
 
@@ -1351,18 +1351,19 @@ bool CWorkerAccumState<TMutexType>::OnProcess() {
   PrepareSubProcess(&pSp, NULL);
 
   for (;;) {
-    m_pMutex->Lock();
+    {
+      AUTO_LOCK(*m_pMutex);
 
-    if (m_hCombo) {
-      Combo_Assign(hThreadCombo, m_hCombo);
-      pSp->iRunningCommand = Combo_GetCommandNum(hThreadCombo);
-      Combo_GetNext(iThreadCommand, m_hCombo, m_iEndCommand);
-    } else {
-      Combo_Free(hThreadCombo);
-      iThreadCommand = ~uint64_t(0);
-      pSp->iRunningCommand = ~uint64_t(0);
+      if (m_hCombo) {
+        Combo_Assign(hThreadCombo, m_hCombo);
+        pSp->iRunningCommand = Combo_GetCommandNum(hThreadCombo);
+        Combo_GetNext(iThreadCommand, m_hCombo, m_iEndCommand);
+      } else {
+        Combo_Free(hThreadCombo);
+        iThreadCommand = ~uint64_t(0);
+        pSp->iRunningCommand = ~uint64_t(0);
+      }
     }
-    m_pMutex->Unlock();
 
     if (hThreadCombo) {
       ExecuteCompileCommandThreaded(hThreadCombo);

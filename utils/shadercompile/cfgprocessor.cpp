@@ -762,7 +762,7 @@ class CfgEntry {
 QuickStrUnique s_uniqueSections, s_strPool;
 std::multiset<CfgEntry> s_setEntries;
 
-class ComboHandleImpl : public IEvaluationContext {
+class ComboHandleImpl final : public IEvaluationContext {
  public:
   uint64_t m_iTotalCommand;
   uint64_t m_iComboNumber;

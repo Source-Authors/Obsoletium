@@ -222,9 +222,7 @@ ExecuteCommand(const char *in_command) {
 
   // Convert shader model to lowercase.
   char out_shader_model[16] = {};
-  if (in_shader_model) {
-    V_strcpy_safe(out_shader_model, in_shader_model);
-  }
+  if (in_shader_model) V_strcpy_safe(out_shader_model, in_shader_model);
   V_strlower(out_shader_model);
 
   // Determine the file name (at the end of the command line before
