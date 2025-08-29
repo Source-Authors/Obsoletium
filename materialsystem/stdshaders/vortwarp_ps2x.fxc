@@ -87,7 +87,8 @@ float4 main( PS_INPUT i ) : COLOR
 	
 	float specularFactor = 1.0f;
 	float4 normalTexel = tex2D( BumpmapSampler, i.baseTexCoord2_tangentSpaceVertToEyeVectorXY.xy );
-	float3 tangentSpaceNormal = 2.0f * normalTexel - 1.0f;
+	// dimhotepus: Fix float4 -> float3 donwcast warnings.
+	float3 tangentSpaceNormal = 2.0f * normalTexel.xyz - 1.0f;
 
 	if( bNormalMapAlphaEnvmapMask )
 		specularFactor = normalTexel.a;
@@ -107,7 +108,8 @@ float4 main( PS_INPUT i ) : COLOR
 	float alpha = 1.0f;
 	if( bBaseTexture )
 	{
-		albedo *= baseColor;
+		// dimhotepus: Fix float4 -> float3 donwcast warnings.
+		albedo *= baseColor.rgb;
 		alpha *= baseColor.a;
 	}
 
@@ -163,10 +165,11 @@ float4 main( PS_INPUT i ) : COLOR
 		float3 worldSpaceNormal = mul( i.tangentSpaceTranspose, tangentSpaceNormal );
 
 		float3 reflectVect = CalcReflectionVectorUnnormalized( worldSpaceNormal, i.worldVertToEyeVectorXYZ_tangentSpaceVertToEyeVectorZ.xyz );
-
-		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect );
+		// dimhotepus: Fix float4 -> float3 donwcast warnings.
+		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect ).xyz;
 		specularLighting *= specularFactor;
-		specularLighting *= g_EnvmapTint;
+		// dimhotepus: Fix float4 -> float3 donwcast warnings.
+		specularLighting *= g_EnvmapTint.xyz;
 		float3 specularLightingSquared = specularLighting * specularLighting;
 		specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast );
 		float3 greyScale = dot( specularLighting, float3( 0.299f, 0.587f, 0.114f ) );
