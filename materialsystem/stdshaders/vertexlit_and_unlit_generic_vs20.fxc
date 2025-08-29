@@ -181,8 +181,9 @@ VS_OUTPUT main( const VS_INPUT v )
 #if !defined( SHADER_MODEL_VS_3_0 ) || !MORPHING
 	ApplyMorph( v.vPosFlex, v.vNormalFlex, vPosition.xyz, vNormal );
 #else
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
 	ApplyMorph( morphSampler, cMorphTargetTextureDim, cMorphSubrect, 
-		v.vVertexID, v.vTexCoord2, vPosition.xyz, vNormal );
+		v.vVertexID, v.vTexCoord2.xyz, vPosition.xyz, vNormal );
 #endif
 
 	// dimhotepus: TF2 backport.
@@ -218,7 +219,8 @@ VS_OUTPUT main( const VS_INPUT v )
 	vProjPos.z = dot( float4( worldPos, 1 ), cViewProjZ );
 
 	o.vProjPos = vProjPos;
-	o.fogFactorW.w = CalcFog( worldPos, vProjPos, g_FogType );
+	// dimhotepus: Fix float3 -> float downcast warnings.
+	o.fogFactorW.w = CalcFog( worldPos, vProjPos.xyz, g_FogType );
 #if !defined( _X360 )
 	o.fog = o.fogFactorW.w;
 #endif	
@@ -278,7 +280,8 @@ VS_OUTPUT main( const VS_INPUT v )
 #endif
 
 #if LIGHTING_PREVIEW
-	float dot=0.5+0.5*worldNormal*float3(0.7071,0.7071,0);
+	// dimhotepus: Fix float3 -> float downcast warnings.
+	float dot=(0.5+0.5*worldNormal*float3(0.7071,0.7071,0)).x;
 	o.color.xyz=float3(dot,dot,dot);
 #endif
 
