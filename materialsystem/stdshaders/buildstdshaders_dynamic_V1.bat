@@ -1,3 +1,3 @@
 set dynamic_shaders=1
-call buildstdshaders.bat
+call buildstdshaders_V1.bat
 set dynamic_shaders=

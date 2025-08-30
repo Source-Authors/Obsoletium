@@ -43,25 +43,6 @@ ToolsExceptionHandler SetupToolsMinidumpHandler(
     ToolsExceptionHandler new_handler);
 
 /**
- * @brief Set default minidump handler for scope.
- */
-class ScopedDefaultMinidumpHandler {
- public:
-  ScopedDefaultMinidumpHandler() noexcept
-      : old_handler_{SetupDefaultToolsMinidumpHandler()} {}
-  ~ScopedDefaultMinidumpHandler() noexcept {
-    SetupToolsMinidumpHandler(old_handler_);
-  }
-
-  ScopedDefaultMinidumpHandler(ScopedDefaultMinidumpHandler &) = delete;
-  ScopedDefaultMinidumpHandler &operator=(ScopedDefaultMinidumpHandler &) =
-      delete;
-
- private:
-  const ToolsExceptionHandler old_handler_;
-};
-
-/**
  * @brief Set minidump handler for scope.
  */
 class ScopedMinidumpHandler {
@@ -75,6 +56,23 @@ class ScopedMinidumpHandler {
 
  private:
   const ToolsExceptionHandler old_handler_;
+};
+
+/**
+ * @brief Set default minidump handler for scope.
+ */
+class ScopedDefaultMinidumpHandler {
+ public:
+  ScopedDefaultMinidumpHandler() noexcept
+      : handler_{SetupDefaultToolsMinidumpHandler()} {}
+  ~ScopedDefaultMinidumpHandler() noexcept = default;
+
+  ScopedDefaultMinidumpHandler(ScopedDefaultMinidumpHandler &) = delete;
+  ScopedDefaultMinidumpHandler &operator=(ScopedDefaultMinidumpHandler &) =
+      delete;
+
+ private:
+  const ScopedMinidumpHandler handler_;
 };
 
 }  // namespace se::utils::common

@@ -9,14 +9,14 @@ set TTEXE=time /t
 :no_ttexe_end
 
 echo.
-echo ==================== buildshaders %* ==================
+echo ==================== buildshaders_V2 %* ==================
 %TTEXE% -cur-Q
 set tt_start=%ERRORLEVEL%
 set tt_chkpt=%tt_start%
 
 
 REM ****************
-REM usage: buildshaders <shaderProjectName>
+REM usage: buildshaders_V2 <shaderProjectName>
 REM ****************
 
 setlocal
@@ -48,11 +48,11 @@ REM USAGE
 REM ****************
 :usage
 echo.
-echo "usage: buildshaders <shaderProjectName> [-game] [gameDir if -game was specified] [-source sourceDir]"
+echo "usage: buildshaders_V2 <shaderProjectName> [-game] [gameDir if -game was specified] [-source sourceDir]"
 echo "       gameDir is where gameinfo.txt is (where it will store the compiled shaders)."
 echo "       sourceDir is where the source code is (where it will find scripts and compilers)."
-echo "ex   : buildshaders myshaders"
-echo "ex   : buildshaders myshaders -game c:\steam\steamapps\sourcemods\mymod -source c:\mymod\src"
+echo "ex   : buildshaders_V2 myshaders"
+echo "ex   : buildshaders_V2 myshaders -game c:\steam\steamapps\sourcemods\mymod -source c:\mymod\src"
 goto :end
 
 REM ****************

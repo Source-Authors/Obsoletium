@@ -2053,18 +2053,12 @@ CThread::ThreadProc_t CThread::GetThreadProc()
 unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 {
 	// dimhotepus: std::auto_ptr -> std::unique_ptr
-  std::unique_ptr<ThreadInit_t> pInit((ThreadInit_t *)pv);
-  
-#ifdef _X360
-        // Make sure all threads are consistent w.r.t floating-point math
-	SetupFPUControlWord();
-#endif
-	
+	std::unique_ptr<ThreadInit_t> pInit((ThreadInit_t *)pv);
+ 
 	CThread *pThread = pInit->pThread;
 	g_pCurThread = pThread;
 	
 	pThread->m_pStackBase = AlignValue(&pThread, 4096);
-	
 	pThread->m_result = -1;
 	
 	bool bInitSuccess = true;

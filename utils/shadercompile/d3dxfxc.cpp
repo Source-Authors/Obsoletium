@@ -4,7 +4,6 @@
 
 #include "d3dxfxc.h"
 
-#include "shadercompile.h"
 #include "cmdsink.h"
 
 #include "dx_proxy/dx_proxy.h"

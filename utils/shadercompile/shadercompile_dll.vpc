@@ -17,7 +17,7 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\common;..\vmpi;$SRCDIR\dx9sdk\include"
+		$AdditionalIncludeDirectories		"$BASE;..\;..\common;$SRCDIR\dx9sdk\include"
 		$AdditionalIncludeDirectories		"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
 		
 		$PreprocessorDefinitions			"$BASE;SHADERCOMPILE_EXPORTS"
@@ -35,7 +35,6 @@ $Project "shader-compiler-core"
 	$Folder	"Source Files"
 	{
 		$File	"..\common\cmdlib.cpp"
-		$File	"..\common\threads.cpp"
 		$File	"..\common\tools_minidump.cpp"
 		$File	"..\common\filesystem_tools.cpp"
 		$File	"..\common\pacifier.cpp"
@@ -45,14 +44,12 @@ $Project "shader-compiler-core"
 		$File	"cmdsink.cpp"
 		$File	"d3dxfxc.cpp"
 		$File	"shadercompile.cpp"
-		$File	"subprocess.cpp"
 		$File	"cfgprocessor.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
 		$File	"..\common\cmdlib.h"
-		$File	"..\common\threads.h"
 		$File	"..\common\tools_minidump.h"
 		$File	"..\common\filesystem_tools.h"
 		$File	"..\common\pacifier.h"
@@ -62,9 +59,7 @@ $Project "shader-compiler-core"
 		$File	"$SRCDIR\public\ishadercompiledll.h"
 		$File	"cmdsink.h"
 		$File	"d3dxfxc.h"
-		$File	"shadercompile.h"
 		$File	"cfgprocessor.h"
-		$File	"subprocess.h"
 		$File	"utlnodehash.h"
 		$File	"resource.h"
 	}

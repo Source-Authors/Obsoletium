@@ -954,7 +954,8 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 
 	if ( nThreads <= 0 )
 	{
-		return true;
+		// dimhotepus: Correctly report start failure.
+		return false;
 	}
 
 	int nStackSize = startParams.nStackSize;

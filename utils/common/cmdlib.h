@@ -68,7 +68,13 @@ char *ExpandPathAndArchive(char *path);
 
 // Fills in pOut with "X hours, Y minutes, Z seconds". Leaves out hours or
 // minutes if they're zero.
-void GetHourMinuteSecondsString(int nInputSeconds, char *pOut, int outLen);
+void GetHourMinuteSecondsString(int inSeconds, char *out, intp size);
+
+template<intp size>
+void GetHourMinuteSecondsString(int inSeconds, char (&out)[size])
+{
+    GetHourMinuteSecondsString( inSeconds, out, size );
+}
 
 int CheckParm(char *check);
 

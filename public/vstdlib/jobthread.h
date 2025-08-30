@@ -1089,10 +1089,12 @@ protected:
 	typedef Derived ThisParallelProcessorDerived_t;
 
 public:
-	CParallelProcessorBase()
+	// dimhotepus: Allow to choose thread pool to run on.
+	explicit CParallelProcessorBase(IThreadPool *pPool = nullptr)
 	{
 		m_nActive.store( 0, std::memory_order::memory_order_relaxed );
-		m_szDescription = NULL;
+		m_pThreadPool = pPool ? pPool : g_pThreadPool;
+		m_szDescription = nullptr;
 	}
 	void SetDescription( const char *pszDescription )
 	{
@@ -1102,7 +1104,7 @@ public:
 protected:
 	void Run( intp nMaxParallel = PTRDIFF_MAX, intp threadOverride = -1 )
 	{
-		intp i = g_pThreadPool->NumIdleThreads();
+		intp i = m_pThreadPool->NumIdleThreads();
 
 		if ( nMaxParallel < i)
 		{
@@ -1113,14 +1115,14 @@ protected:
 		{
 			if ( threadOverride == -1 || i == threadOverride - 1 )
 			{
-				m_nActive.fetch_add( 1, std::memory_order::memory_order_relaxed );
+				m_nActive.fetch_add( 1, std::memory_order::memory_order_acquire );
 				ThreadExecute( this, &ThisParallelProcessorBase_t::DoExecute )->Release();
 			}
 		}
 
 		if ( threadOverride == -1 || threadOverride == 0 )
 		{
-			m_nActive.fetch_add( 1, std::memory_order::memory_order_relaxed );
+			m_nActive.fetch_add( 1, std::memory_order::memory_order_acquire );
 			DoExecute();
 		}
 
@@ -1135,6 +1137,9 @@ protected:
 	bool OnProcess() { return false; }
 	void OnEnd() {}
 
+	// dimhotepus: Allow to choose thread pool to run on.
+	IThreadPool *				m_pThreadPool;
+
 private:
 	void DoExecute()
 	{
@@ -1147,15 +1152,15 @@ private:
 
 		static_cast<Derived *>( this )->OnEnd();
 
-		m_nActive.fetch_sub(1, std::memory_order::memory_order_relaxed);
+		m_nActive.fetch_sub(1, std::memory_order::memory_order_release);
 	}
 
+	const char *				m_szDescription;
 #ifdef PLATFORM_64BITS
 	std::atomic_int64_t			m_nActive;
 #else
 	std::atomic_int32_t			m_nActive;
 #endif
-	const char *				m_szDescription;
 };
 
 

@@ -138,8 +138,13 @@ CDpiWindowBehavior::CDpiWindowBehavior(bool applyDpiOnCreate)
       m_previous_dpi_y{USER_DEFAULT_SCREEN_DPI},
       m_current_dpi_x{USER_DEFAULT_SCREEN_DPI},
       m_current_dpi_y{USER_DEFAULT_SCREEN_DPI},
-      m_apply_dpi_on_create{applyDpiOnCreate},
-      m_is_destroyed{false} {}
+      m_apply_dpi_on_create{applyDpiOnCreate}
+#ifdef _DEBUG
+      ,
+      m_is_destroyed{false}
+#endif
+{
+}
 
 BOOL CDpiWindowBehavior::OnCreateWindow(HWND window) {
   Assert(window);
@@ -228,7 +233,8 @@ BOOL CDpiWindowBehavior::ApplyDpiToWindow(bool recompute_window_size) {
   return rc;
 }
 
-int CDpiWindowBehavior::ScaleByDpi(unsigned oldDpi, int value, unsigned newDpi) {
+int CDpiWindowBehavior::ScaleByDpi(unsigned oldDpi, int value,
+                                   unsigned newDpi) {
   return ::MulDiv(value, newDpi, oldDpi);
 }
 

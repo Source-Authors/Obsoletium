@@ -18,7 +18,7 @@ class CUtlNodeHash {
 
   CUtlNodeHash() { m_nNumNodes = 0; }
 
-  T *FindByKey(K key, int *found_chain = nullptr) {
+  T *FindByKey(K key, int *found_chain = nullptr) const {
     unsigned int chain = (unsigned int)key;
 
     chain %= HASHSIZE;

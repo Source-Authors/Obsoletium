@@ -431,9 +431,9 @@ char *copystring(const char *s) {
 
 void GetHourMinuteSeconds(int, int &, int &, int &) {}
 
-void GetHourMinuteSecondsString(int nInputSeconds, char *pOut, int outLen) {
-  int nMinutes = nInputSeconds / 60;
-  int nSeconds = nInputSeconds - nMinutes * 60;
+void GetHourMinuteSecondsString(int inSecounds, char *out, intp size) {
+  int nMinutes = inSecounds / 60;
+  int nSeconds = inSecounds - nMinutes * 60;
   int nHours = nMinutes / 60;
 
   nMinutes -= nHours * 60;
@@ -441,14 +441,14 @@ void GetHourMinuteSecondsString(int nInputSeconds, char *pOut, int outLen) {
   const char *extra[2]{"", "s"};
 
   if (nHours > 0)
-    Q_snprintf(pOut, outLen, "%d hour%s, %d minute%s, %d second%s", nHours,
+    V_snprintf(out, size, "%d hour%s, %d minute%s, %d second%s", nHours,
                extra[nHours != 1], nMinutes, extra[nMinutes != 1], nSeconds,
                extra[nSeconds != 1]);
   else if (nMinutes > 0)
-    Q_snprintf(pOut, outLen, "%d minute%s, %d second%s", nMinutes,
+    V_snprintf(out, size, "%d minute%s, %d second%s", nMinutes,
                extra[nMinutes != 1], nSeconds, extra[nSeconds != 1]);
   else
-    Q_snprintf(pOut, outLen, "%d second%s", nSeconds, extra[nSeconds != 1]);
+    V_snprintf(out, size, "%d second%s", nSeconds, extra[nSeconds != 1]);
 }
 
 void Q_mkdir(char *path) {

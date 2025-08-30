@@ -53,12 +53,9 @@ CachedFileData *CachedFileData::Create(char const *file_path) {
   void *buffer{malloc(kDataOffset + file_size_safe)};
   if (!buffer) return nullptr;
 
-  // Placement new.
-  auto *data = new (buffer) CachedFileData();
-  strcpy_s(data->m_chFilename, file_path);
-
   std::tie(std::ignore, errc) =
-      f.read(data->m_data, file_size_safe, 1, file_size_safe);
+      f.read(static_cast<byte *>(buffer) + kDataOffset, file_size_safe, 1,
+             file_size_safe);
   if (errc) {
     free(buffer);
 
@@ -70,10 +67,8 @@ CachedFileData *CachedFileData::Create(char const *file_path) {
     return nullptr;
   }
 
-  data->m_numRefs = 0;
-  data->m_numDataBytes = file_size_safe;
-
-  return data;
+  // Placement new.
+  return new (buffer) CachedFileData{file_path, file_size_safe};
 }
 
 CachedFileData::~CachedFileData() { free(this); }
@@ -88,34 +83,69 @@ CachedFileData *CachedFileData::GetByDataPtr(const void *data_ptr) {
   return const_cast<CachedFileData *>(data);
 }
 
-char const *CachedFileData::GetFileName() const { return m_chFilename; }
+char const *CachedFileData::GetFileName() const { return m_file_name; }
 
 void const *CachedFileData::GetDataPtr() const { return m_data; }
 
-unsigned CachedFileData::GetDataLen() const {
-  return m_numDataBytes != UINT_MAX ? m_numDataBytes : 0U;
-}
-
-bool CachedFileData::IsValid() const { return m_numDataBytes != UINT_MAX; }
+unsigned CachedFileData::GetDataLen() const { return m_data_count; }
 
 CachedFileData *FileCache::Get(char const *file_name) {
-  // Search the cache first
-  auto it = m_map.find(file_name);
-  if (it != m_map.end()) return it->second;
+  {
+    AUTO_LOCK(m_mutex);
 
-  // Create the cached file data
-  CachedFileData *data = CachedFileData::Create(file_name);
-  if (data) m_map.emplace(data->GetFileName(), data);
+    // Search the cache first.
+    auto it = m_file_name_2_data_map.find(file_name);
+    if (it != m_file_name_2_data_map.end()) {
+      CachedFileData *data{it->second};
+      data->AddRef();
+      return data;
+    }
+  }
 
-  return data;
+  // Create the cached file data.
+  CachedFileData *expected_data = CachedFileData::Create(file_name);
+  if (expected_data) {
+    CachedFileData *actual_data;
+
+    {
+      AUTO_LOCK(m_mutex);
+
+      auto pair = m_file_name_2_data_map.emplace(expected_data->GetFileName(),
+                                                 expected_data);
+
+      actual_data = pair.first->second;
+    }
+
+    // May already be inserted by other thread, so need to cleanup.
+    if (expected_data != actual_data) expected_data->Release();
+
+    return actual_data;
+  }
+
+  return nullptr;
+}
+
+void FileCache::Close(const void *data_ptr) {
+  if (CachedFileData *data = CachedFileData::GetByDataPtr(data_ptr)) {
+    char file_name[256];
+    strcpy_s(file_name, data->GetFileName());
+
+    if (data->Release() == 0) {
+      AUTO_LOCK(m_mutex);
+
+      m_file_name_2_data_map.erase(file_name);
+    }
+  }
 }
 
 void FileCache::Clear() {
-  for (auto &[_, data] : m_map) {
+  AUTO_LOCK(m_mutex);
+
+  for (auto &[_, data] : m_file_name_2_data_map) {
     data->~CachedFileData();
   }
 
-  m_map.clear();
+  m_file_name_2_data_map.clear();
 }
 
 }  // namespace se::dx_proxy
