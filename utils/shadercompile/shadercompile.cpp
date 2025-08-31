@@ -1068,21 +1068,20 @@ void CWorkerAccumState<TMutexType>::HandleCommandResponse(
   uint64_t iComboIndex = Combo_GetComboNum(hCombo);
   uint64_t iCommandNumber = Combo_GetCommandNum(hCombo);
 
-  if (pResponse->Succeeded()) {
+  {
     GLOBAL_DATA_MTX_LOCK_AUTO;
-    uint64_t nStComboIdx = iComboIndex / pEntryInfo->m_numDynamicCombos;
-    uint64_t nDyComboIdx =
-        iComboIndex - (nStComboIdx * pEntryInfo->m_numDynamicCombos);
-    StaticComboFromDictAdd(*m_byte_code, pEntryInfo->m_szName, nStComboIdx)
-        ->AddDynamicCombo(nDyComboIdx, pResponse->GetResultBuffer(),
-                          pResponse->GetResultBufferLen());
-  }
-
-  // Tell the master that this shader failed
-  if (!pResponse->Succeeded()) {
-    GLOBAL_DATA_MTX_LOCK_AUTO;
-    ShaderHadErrorDispatchInt(pEntryInfo->m_szName,
-                              m_compiler_stats->shader_had_error_map);
+    if (pResponse->Succeeded()) {
+      uint64_t nStComboIdx = iComboIndex / pEntryInfo->m_numDynamicCombos;
+      uint64_t nDyComboIdx =
+          iComboIndex - (nStComboIdx * pEntryInfo->m_numDynamicCombos);
+      StaticComboFromDictAdd(*m_byte_code, pEntryInfo->m_szName, nStComboIdx)
+          ->AddDynamicCombo(nDyComboIdx, pResponse->GetResultBuffer(),
+                            pResponse->GetResultBufferLen());
+    } else {
+      // Tell the master that this shader failed
+      ShaderHadErrorDispatchInt(pEntryInfo->m_szName,
+                                m_compiler_stats->shader_had_error_map);
+    }
   }
 
   // Process listing even if the shader succeeds for warnings
@@ -1943,7 +1942,6 @@ int ShaderCompileMain(int argc, char *argv[]) {
       shader_path, temp_path, parseResult.configs, is_verbose, compiler_stats)};
 
   Msg("\r                                                                \r");
-
 
   // Write all the errors
   //////////////////////////////////////////////////////////////////////////
