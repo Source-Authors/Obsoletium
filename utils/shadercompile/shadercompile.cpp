@@ -1088,7 +1088,7 @@ void CWorkerAccumState<TMutexType>::HandleCommandResponse(
   char const *szListing = pResponse->GetListing();
   if (szListing || !pResponse->Succeeded()) {
     char chCommandNumber[32];
-    V_sprintf_safe(chCommandNumber, "%I64u", iCommandNumber);
+    V_to_chars(chCommandNumber, iCommandNumber);
 
     char chUnreportedListing[0xFF];
     if (!szListing) {
