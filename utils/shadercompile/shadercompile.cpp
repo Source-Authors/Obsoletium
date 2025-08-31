@@ -41,7 +41,7 @@ namespace {
 
 struct CByteCodeBlock {
   CByteCodeBlock *m_pNext, *m_pPrev;
-  int m_nCRC32;
+  CRC32_t m_nCRC32;
   uint64_t m_nComboID;
   size_t m_nCodeSize;
   uint8_t *m_ByteCode;
@@ -580,7 +580,7 @@ void GetVCSFilenames(ShaderInfo_t const &si, const char *shader_path,
 #define STATIC_COMBO_HASH_SIZE 73
 
 struct StaticComboAuxInfo_t : StaticComboRecord_t {
-  uint32_t m_nCRC32;  // CRC32 of packed data
+  CRC32_t m_nCRC32;  // CRC32 of packed data
   struct CStaticCombo *m_pByteCode;
 };
 
@@ -702,7 +702,7 @@ void WriteShaderFiles(
         Hdr.m_nCRC32 =
             CRC32_ProcessSingleBuffer(pStatic->m_abPackedCode.GetData(),
                                       pStatic->m_abPackedCode.GetLength());
-        int nHashIdx = Hdr.m_nCRC32 % STATIC_COMBO_HASH_SIZE;
+        CRC32_t nHashIdx = Hdr.m_nCRC32 % STATIC_COMBO_HASH_SIZE;
         Hdr.m_pByteCode = pStatic;
         // now, see if we have an identical static combo
         bool bIsDuplicate = false;
