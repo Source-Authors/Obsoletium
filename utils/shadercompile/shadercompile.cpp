@@ -184,7 +184,7 @@ void ParseShaderInfoFromCompileCommands(
     se::shader_compile::shader_combo_processor::CfgEntryInfo const *pEntry,
     ShaderInfo_t &shaderInfo);
 
-struct CShaderMap : public CUtlStringMap<StaticComboNodeHash_t *> {};
+using CShaderMap = CUtlStringMap<StaticComboNodeHash_t *>;
 
 CStaticCombo *StaticComboFromDictAdd(CShaderMap &byte_code,
                                      char const *pszShaderName,
@@ -1716,11 +1716,11 @@ uint64_t CompileShaders(
     const char *shader_path, const char *temp_path,
     const std::unique_ptr<
         se::shader_compile::shader_combo_processor::CfgEntryInfo[]> &configs,
-    bool is_verbose, CUtlStringMap<ShaderInfo_t> &shader_info_map,
-    CShaderMap &byte_code, CompilerShaderStats &compiler_stats) {
+    bool is_verbose, CompilerShaderStats &compiler_stats) {
   ProcessCommandRange_Singleton pcr;
   uint64_t completed_commands_num{0};
 
+  CUtlStringMap<ShaderInfo_t> shader_info_map;
   char chCommands[32], chStaticCombos[32], chDynamicCombos[32];
 
   //
@@ -1748,6 +1748,8 @@ uint64_t CompileShaders(
           "%s...\n",
           chCommands, chStaticCombos, chDynamicCombos, pEntry->m_szName);
     }
+
+    CShaderMap byte_code;
 
     //
     // Compile stuff
@@ -1935,24 +1937,13 @@ int ShaderCompileMain(int argc, char *argv[]) {
         commands_no, static_combos_no, dynamic_combos_no);
   }
 
-  CUtlStringMap<ShaderInfo_t> shader_info_map;
-  CShaderMap byte_code;
   CompilerShaderStats compiler_stats;
 
-  const uint64_t completed_commands_num{
-      CompileShaders(shader_path, temp_path, parseResult.configs, is_verbose,
-                     shader_info_map, byte_code, compiler_stats)};
+  const uint64_t completed_commands_num{CompileShaders(
+      shader_path, temp_path, parseResult.configs, is_verbose, compiler_stats)};
 
   Msg("\r                                                                \r");
 
-  // Write everything that succeeded
-  for (unsigned short i = 0, byte_code_strings_num = byte_code.GetNumStrings();
-       i < byte_code_strings_num; i++) {
-    WriteShaderFiles(shader_path, byte_code.String(i), parseResult.configs,
-                     shader_info_map, byte_code, compiler_stats,
-                     parseResult.compile_commands_num, completed_commands_num,
-                     is_verbose);
-  }
 
   // Write all the errors
   //////////////////////////////////////////////////////////////////////////

@@ -1116,7 +1116,7 @@ protected:
 			if ( threadOverride == -1 || i == threadOverride - 1 )
 			{
 				m_nActive.fetch_add( 1, std::memory_order::memory_order_acquire );
-				ThreadExecute( this, &ThisParallelProcessorBase_t::DoExecute )->Release();
+				m_pThreadPool->QueueCall( this, &ThisParallelProcessorBase_t::DoExecute )->Release();
 			}
 		}
 
