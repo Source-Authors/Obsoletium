@@ -1792,8 +1792,41 @@ class ScopedConsoleCtrlHandler {
   BOOL ok_;
 };
 
+enum class ThreadExecutionState : unsigned long {
+  None = 0x80000000,
+  SystemRequired = 0x00000001,
+  DisplayRequired = 0x00000002,
+  AwayModeRequired = 0x00000040
+};
+
+class ScopedThreadExecutionState {
+ public:
+  explicit ScopedThreadExecutionState(ThreadExecutionState new_state)
+      : old_state_{static_cast<ThreadExecutionState>(::SetThreadExecutionState(
+            ES_CONTINUOUS | to_underlying(new_state)))},
+        new_state_{new_state} {}
+  ~ScopedThreadExecutionState() {
+    const auto old_state = ::SetThreadExecutionState(
+        ES_CONTINUOUS | ((old_state_ == ThreadExecutionState::None)
+                             ? 0
+                             : to_underlying(old_state_)));
+    AssertMsg(old_state == to_underlying(new_state_),
+              "Unbalanced SetThreadExecutionState, smth changed it from "
+              "expected 0x%lu to actual 0x%lu.",
+              to_underlying(new_state_), old_state);
+  }
+
+  ScopedThreadExecutionState(ScopedThreadExecutionState &) = delete;
+  ScopedThreadExecutionState &operator=(ScopedThreadExecutionState &) = delete;
+  ScopedThreadExecutionState(ScopedThreadExecutionState &&) = delete;
+  ScopedThreadExecutionState &operator=(ScopedThreadExecutionState &&) = delete;
+
+ private:
+  const ThreadExecutionState old_state_, new_state_;
+};
+
 BOOL WINAPI OnCtrlBreak(DWORD ctrl_type) {
-  fprintf(stderr, "Stopping compilation.\n");
+  Warning("Stopping compilation due to Ctrl+C.\n");
   return FALSE;
 }
 
@@ -1807,12 +1840,16 @@ int ShaderCompileMain(int argc, char *argv[]) {
   const double compile_start_time{Plat_FloatTime()};
 
   // Setting up the minidump handler.
-  se::utils::common::ScopedDefaultMinidumpHandler scoped_minidump_handler;
+  const se::utils::common::ScopedDefaultMinidumpHandler scoped_minidump_handler;
   const ScopedConsoleCtrlHandler scoped_ctrl_handler{OnCtrlBreak};
 
   EnableCrashingOnCrashes();
 
   ThreadSetDebugName("ShaderCompile_Main");
+
+  // Do not go to sleep when compiling.
+  const ScopedThreadExecutionState scoped_execution_state{
+      ThreadExecutionState::SystemRequired};
 
   ICommandLine *cmd_line{CommandLine()};
   cmd_line->CreateCmdLine(argc, argv);
