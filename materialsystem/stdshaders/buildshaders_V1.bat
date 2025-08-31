@@ -1,4 +1,4 @@
-@echo on
+@echo off
 
 set TTEXE=..\..\devtools\bin\timeprecise.exe
 if not exist %TTEXE% goto no_ttexe
