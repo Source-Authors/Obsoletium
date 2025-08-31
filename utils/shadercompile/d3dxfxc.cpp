@@ -246,9 +246,7 @@ ExecuteCommand(const char *in_command) {
 
 std::unique_ptr<se::shader_compile::command_sink::IResponse> TryExecuteCommand(
     const char *command) {
-  static int dummy{(Msg("[shadercompile] Using new faster Vitaliy's "
-                        "implementation.\n"),
-                    1)};
+  static int dummy{(Msg("Using new faster Vitaliy's implementation.\n"), 1)};
 
   const bool ok{!strncmp(command,
                          se::shader_compile::fxc_intercept::kFxcCommand,
