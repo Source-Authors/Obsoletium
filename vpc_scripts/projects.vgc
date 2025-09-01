@@ -1627,11 +1627,6 @@ $Project "xwad"
 	"utils\xwad\xwad.vpc" [$WINDOWS]
 }
 
-$Project "ZipAlign"
-{
-	"utils\zipalign\ZipAlign.vpc" [$WINDOWS]
-}
-
 $Project "socketlib"
 {
 	"socketlib/socketlib.vpc" [$WINDOWS]
