@@ -998,11 +998,9 @@ class CWorkerAccumState
     m_arrSubProcessInfos.Purge();
   }
 
- public:
-  bool OnProcess();
-  bool OnProcessST();
-
  protected:
+  bool OnProcess();
+
   TMutexType *m_pMutex;
 
  protected:
@@ -1236,160 +1234,61 @@ bool CWorkerAccumState<TMutexType>::OnProcess() {
   return false;
 }
 
-template <typename TMutexType>
-bool CWorkerAccumState<TMutexType>::OnProcessST() {
-  while (m_hCombo) {
-    ExecuteCompileCommand(m_hCombo);
-
-    Combo_GetNext(m_iNextCommand, m_hCombo, m_iEndCommand);
-  }
-  return false;
-}
-
 //
-// ProcessCommandRange_Singleton
+// Processor
 //
-class ProcessCommandRange_Singleton {
+class RangeProcessor {
  public:
-  static ProcessCommandRange_Singleton *&Instance() {
-    static ProcessCommandRange_Singleton *s_ptr = nullptr;
-    return s_ptr;
+  explicit RangeProcessor(IThreadPool *pool)
+      : m_worker{nullptr}, m_thread_pool{pool} {
+    // Make sure that our mutex is in multi-threaded mode
+    threading::g_mtxGlobal.SetThreadedMode(threading::Mode::MultiThreaded);
+
+    m_worker = new WorkerClass_t(&m_mutex, pool);
   }
-  static ProcessCommandRange_Singleton *GetInstance() {
-    ProcessCommandRange_Singleton *p = Instance();
-    Assert(p);
-    return p;
+  ~RangeProcessor() {
+    delete m_worker;
+
+    m_thread_pool->Stop();
+    m_thread_pool = nullptr;
   }
 
- public:
-  ProcessCommandRange_Singleton() {
-    Assert(!Instance());
-    Instance() = this;
-    Startup(g_pThreadPool);
-  }
-  ~ProcessCommandRange_Singleton() {
-    Assert(Instance() == this);
-    Instance() = nullptr;
-    Shutdown();
-  }
-
- public:
   void ProcessCommandRange(uint64_t shaderStart, uint64_t shaderEnd,
                            const char *temp_path, bool is_verbose,
                            CShaderMap &byte_code,
                            CompilerShaderStats &compiler_stats) const;
 
- protected:
-  void Startup(IThreadPool *pool);
-  void Shutdown();
-
   //
   // Multi-threaded section
- protected:
-  struct MT {
-    MT() : pWorkerObj(nullptr), pThreadPool(nullptr) {}
+ private:
+  using MultiThreadMutex_t = CThreadFastMutex;
+  MultiThreadMutex_t m_mutex;
 
-    typedef CThreadFastMutex MultiThreadMutex_t;
-    MultiThreadMutex_t mtx;
+  using WorkerClass_t = CWorkerAccumState<MultiThreadMutex_t>;
+  WorkerClass_t *m_worker;
 
-    typedef CWorkerAccumState<MultiThreadMutex_t> WorkerClass_t;
-    WorkerClass_t *pWorkerObj;
-
-    IThreadPool *pThreadPool;
-    ThreadPoolStartParams_t tpsp;
-  } m_MT;
-
-  //
-  // Single-threaded section
- protected:
-  struct ST {
-    ST() : pWorkerObj(nullptr) {}
-
-    typedef CThreadNullMutex NullMutex_t;
-    NullMutex_t mtx;
-
-    typedef CWorkerAccumState<NullMutex_t> WorkerClass_t;
-    WorkerClass_t *pWorkerObj;
-  } m_ST;
+  IThreadPool *m_thread_pool;
 };
 
-void ProcessCommandRange_Singleton::Startup(IThreadPool *pool) {
-  bool is_thread_pool = false;
-  CPUInformation const &cpu = *GetCPUInformation();
-
-  if (cpu.m_nLogicalProcessors > 1) {
-    // Attempt to initialize thread pool
-    m_MT.pThreadPool = pool;
-    if (m_MT.pThreadPool) {
-      m_MT.tpsp.bIOThreads = false;
-      m_MT.tpsp.nThreads = cpu.m_nLogicalProcessors - 1;
-
-      if (m_MT.pThreadPool->Start(m_MT.tpsp)) {
-        if (m_MT.pThreadPool->NumThreads() >= 1) {
-          // Make sure that our mutex is in multi-threaded mode
-          threading::g_mtxGlobal.SetThreadedMode(
-              threading::Mode::MultiThreaded);
-
-          m_MT.pWorkerObj = new MT::WorkerClass_t(&m_MT.mtx, pool);
-
-          is_thread_pool = true;
-
-          // Thread pools threads # + main thread.
-          Msg("Using %zd threads to compile shaders.\n",
-              m_MT.pThreadPool->NumThreads() + 1);
-        } else {
-          m_MT.pThreadPool->Stop();
-        }
-      }
-
-      if (!is_thread_pool) m_MT.pThreadPool = nullptr;
-    }
-  }
-
-  // Otherwise initialize single-threaded mode
-  if (!is_thread_pool)
-    m_ST.pWorkerObj = new ST::WorkerClass_t(&m_ST.mtx, nullptr);
-}
-
-void ProcessCommandRange_Singleton::Shutdown() {
-  if (m_MT.pThreadPool) {
-    if (m_MT.pWorkerObj) delete m_MT.pWorkerObj;
-
-    m_MT.pThreadPool->Stop();
-    m_MT.pThreadPool = nullptr;
-  } else {
-    if (m_ST.pWorkerObj) delete m_ST.pWorkerObj;
-  }
-}
-
-void ProcessCommandRange_Singleton::ProcessCommandRange(
+void RangeProcessor::ProcessCommandRange(
     uint64_t shaderStart, uint64_t shaderEnd, const char *temp_path,
     bool is_verbose, CShaderMap &byte_code,
     CompilerShaderStats &compiler_stats) const {
-  if (m_MT.pThreadPool) {
-    MT::WorkerClass_t *pWorkerObj = m_MT.pWorkerObj;
-
-    pWorkerObj->RangeBegin(shaderStart, shaderEnd, temp_path, is_verbose,
-                           byte_code, compiler_stats);
-    pWorkerObj->Run();
-    pWorkerObj->RangeFinished();
-  } else {
-    ST::WorkerClass_t *pWorkerObj = m_ST.pWorkerObj;
-
-    pWorkerObj->RangeBegin(shaderStart, shaderEnd, temp_path, is_verbose,
-                           byte_code, compiler_stats);
-    pWorkerObj->OnProcessST();
-    pWorkerObj->RangeFinished();
+  if (m_thread_pool) {
+    m_worker->RangeBegin(shaderStart, shaderEnd, temp_path, is_verbose,
+                         byte_code, compiler_stats);
+    m_worker->Run();
+    m_worker->RangeFinished();
   }
 }
 
 // You must process the work unit range.
-void ProcessCommandRange(uint64_t shaderStart, uint64_t shaderEnd,
-                         const char *temp_path, bool is_verbose,
-                         CShaderMap &byte_code,
+void ProcessCommandRange(RangeProcessor &processor, uint64_t shaderStart,
+                         uint64_t shaderEnd, const char *temp_path,
+                         bool is_verbose, CShaderMap &byte_code,
                          CompilerShaderStats &compiler_stats) {
-  ProcessCommandRange_Singleton::GetInstance()->ProcessCommandRange(
-      shaderStart, shaderEnd, temp_path, is_verbose, byte_code, compiler_stats);
+  processor.ProcessCommandRange(shaderStart, shaderEnd, temp_path, is_verbose,
+                                byte_code, compiler_stats);
 }
 
 void ParseShaderInfoFromCompileCommands(
@@ -1711,13 +1610,12 @@ int SetupTempPath(int argc, char **argv, char (&temp_path)[size]) {
   return 0;
 }
 
-uint64_t CompileShaders(
-    const char *shader_path, const char *temp_path,
+void CompileShaders(
+    IThreadPool *thread_pool, const char *shader_path, const char *temp_path,
     const std::unique_ptr<
         se::shader_compile::shader_combo_processor::CfgEntryInfo[]> &configs,
     bool is_verbose, CompilerShaderStats &compiler_stats) {
-  ProcessCommandRange_Singleton pcr;
-  uint64_t completed_commands_num{0};
+  RangeProcessor processor{thread_pool};
 
   CUtlStringMap<ShaderInfo_t> shader_info_map;
   char chCommands[32], chStaticCombos[32], chDynamicCombos[32];
@@ -1743,8 +1641,7 @@ uint64_t CompileShaders(
       V_sprintf_safe(chDynamicCombos, "%s",
                      PrettyPrintNumber(pEntry->m_numDynamicCombos));
 
-      Msg("Compiling %s commands in %s static, %s dynamic combos for "
-          "%s...\n",
+      Msg("Compiling %s commands in %s static, %s dynamic combos in %s...\n",
           chCommands, chStaticCombos, chDynamicCombos, pEntry->m_szName);
     }
 
@@ -1753,25 +1650,22 @@ uint64_t CompileShaders(
     //
     // Compile stuff
     //
-    ProcessCommandRange(pEntry->m_iCommandStart, pEntry->m_iCommandEnd,
-                        temp_path, is_verbose, byte_code, compiler_stats);
+    ProcessCommandRange(processor, pEntry->m_iCommandStart,
+                        pEntry->m_iCommandEnd, temp_path, is_verbose, byte_code,
+                        compiler_stats);
 
     //
     // Now when the whole shader is finished we can write it
     //
-    char const *szShaderToWrite = pEntry->m_szName;
+    char const *shader_name = pEntry->m_szName;
 
-    WriteShaderFiles(shader_path, szShaderToWrite, configs, shader_info_map,
+    WriteShaderFiles(shader_path, shader_name, configs, shader_info_map,
                      byte_code, compiler_stats, pEntry->m_iCommandEnd,
                      pEntry->m_iCommandEnd, is_verbose);
-
-    completed_commands_num += pEntry->m_iCommandEnd - pEntry->m_iCommandStart;
   }
 
   // dimhotepus: Correctly rewrite long strings.
   Msg("\r                                                                \r");
-
-  return completed_commands_num;
 }
 
 class ScopedConsoleCtrlHandler {
@@ -1826,6 +1720,25 @@ class ScopedThreadExecutionState {
   const ThreadExecutionState old_state_, new_state_;
 };
 
+IThreadPool *StartThreadPool(const CPUInformation *cpu) {
+  ThreadPoolStartParams_t args;
+  args.bIOThreads = false;
+  args.nThreads = cpu->m_nLogicalProcessors - 1;
+
+  auto pool = g_pThreadPool;
+  if (pool->Start(args)) {
+    // Make sure that our mutex is in multi-threaded mode
+    threading::g_mtxGlobal.SetThreadedMode(threading::Mode::MultiThreaded);
+
+    // Thread pools threads # + main thread.
+    Msg("Using %zd threads to compile shaders.\n", pool->NumThreads() + 1);
+    return pool;
+  }
+
+  Warning("Unable to start thread pool with %d threads.\n", args.nThreads);
+  return nullptr;
+}
+
 BOOL WINAPI OnCtrlBreak(DWORD ctrl_type) {
   Warning("Stopping compilation due to Ctrl+C.\n");
   return FALSE;
@@ -1845,6 +1758,7 @@ int ShaderCompileMain(int argc, char *argv[]) {
   const ScopedConsoleCtrlHandler scoped_ctrl_handler{OnCtrlBreak};
 
   EnableCrashingOnCrashes();
+  InstallSpewFunction();
 
   ThreadSetDebugName("ShaderCompile_Main");
 
@@ -1854,6 +1768,8 @@ int ShaderCompileMain(int argc, char *argv[]) {
 
   ICommandLine *cmd_line{CommandLine()};
   cmd_line->CreateCmdLine(argc, argv);
+
+  const CPUInformation *cpu = GetCPUInformation();
 
   {
     Msg("\nCmd line: ");
@@ -1865,17 +1781,16 @@ int ShaderCompileMain(int argc, char *argv[]) {
     constexpr char kThreadsArg[]{"-threads"};
 
     if (!cmd_line->HasParm(kThreadsArg)) {
-      const CPUInformation &ci = *GetCPUInformation();
-
       char threads_arg[12];
-      V_to_chars(threads_arg, ci.m_nLogicalProcessors);
+      V_to_chars(threads_arg, cpu->m_nLogicalProcessors);
 
       // Ensure thread pool does not cap threads count to default.
       cmd_line->AppendParm(kThreadsArg, threads_arg);
     }
   }
 
-  InstallSpewFunction();
+  IThreadPool *thread_pool = StartThreadPool(cpu);
+  if (!thread_pool) return EINVAL;
 
   char exe_dir[MAX_PATH];
   SetupExeDir(argc, argv, exe_dir);
@@ -1937,9 +1852,8 @@ int ShaderCompileMain(int argc, char *argv[]) {
   }
 
   CompilerShaderStats compiler_stats;
-
-  const uint64_t completed_commands_num{CompileShaders(
-      shader_path, temp_path, parseResult.configs, is_verbose, compiler_stats)};
+  CompileShaders(thread_pool, shader_path, temp_path, parseResult.configs,
+                 is_verbose, compiler_stats);
 
   Msg("\r                                                                \r");
 
@@ -2041,12 +1955,14 @@ int ShaderCompileMain(int argc, char *argv[]) {
   // End
   const double compile_end_time{Plat_FloatTime()};
 
-  GetHourMinuteSecondsString(
-      static_cast<int>(compile_end_time - compile_start_time), command);
+  if (is_verbose) {
+    GetHourMinuteSecondsString(
+        static_cast<int>(compile_end_time - compile_start_time), command);
 
-  DebugOut(is_verbose, "%s elapsed\n", command);
-  DebugOut(is_verbose, "precise timing = %.5fs\n",
-           (compile_end_time - compile_start_time));
+    DebugOut(is_verbose, "%s elapsed.\n", command);
+    DebugOut(is_verbose, "precise timing = %.5fs\n",
+             (compile_end_time - compile_start_time));
+  }
 
   return shader_had_error_map.GetNumStrings();
 }
