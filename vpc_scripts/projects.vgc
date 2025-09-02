@@ -205,11 +205,6 @@ $Project "dumpmatsyshelp"
 
 $Include "utils\dx_proxy\dx_proxy_all.vgc"
 
-$Project "dxsupportclean"
-{
-	"utils\dxsupportclean\dxsupportclean.vpc" [$WINDOWS]
-}
-
 $Project "elementviewer"
 {
 	"utils\elementviewer\elementviewer.vpc" [$WINDOWS]
@@ -253,11 +248,6 @@ $Project "filesystem_stdio"
 $Project "filesystem_steam"
 {
         "filesystem\filesystem_steam.vpc" [$WINDOWS||$POSIX]
-}
-
-$Project "finddbgdll"
-{
-	"utils\finddbgdll\finddbgdll.vpc" [$WINDOWS]
 }
 
 $Project "vfont"
