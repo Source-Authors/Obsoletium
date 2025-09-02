@@ -280,10 +280,10 @@ public:
 // The CUtlVectorFixed class:
 // A array class with a fixed allocation scheme
 //-----------------------------------------------------------------------------
-template< class T, size_t MAX_SIZE >
-class CUtlVectorFixed : public CUtlVector< T, CUtlMemoryFixed<T, MAX_SIZE > >
+template< class T, size_t TMaxSize >
+class CUtlVectorFixed : public CUtlVector< T, CUtlMemoryFixed<T, TMaxSize > >
 {
-	typedef CUtlVector< T, CUtlMemoryFixed<T, MAX_SIZE > > BaseClass;
+	typedef CUtlVector< T, CUtlMemoryFixed<T, TMaxSize > > BaseClass;
 public:
 
 	// constructor, destructor
@@ -296,14 +296,14 @@ public:
 // The CUtlVectorFixedGrowable class:
 // A array class with a fixed allocation scheme backed by a dynamic one
 //-----------------------------------------------------------------------------
-template< class T, size_t MAX_SIZE >
-class CUtlVectorFixedGrowable : public CUtlVector< T, CUtlMemoryFixedGrowable<T, MAX_SIZE > >
+template< class T, size_t TMaxSize >
+class CUtlVectorFixedGrowable : public CUtlVector< T, CUtlMemoryFixedGrowable<T, TMaxSize > >
 {
-	typedef CUtlVector< T, CUtlMemoryFixedGrowable<T, MAX_SIZE > > BaseClass;
+	typedef CUtlVector< T, CUtlMemoryFixedGrowable<T, TMaxSize > > BaseClass;
 
 public:
 	// constructor, destructor
-	explicit CUtlVectorFixedGrowable( intp growSize = 0 ) : BaseClass( growSize, MAX_SIZE ) {}
+	explicit CUtlVectorFixedGrowable( intp growSize = 0 ) : BaseClass( growSize, TMaxSize ) {}
 };
 
 
@@ -631,10 +631,10 @@ public:
 //  WARNING - this class lets you copy construct which can be an expensive operation if you don't carefully control when it happens
 // Only use this when nesting a CUtlVector() inside of another one of our container classes (i.e a CUtlMap)
 //-----------------------------------------------------------------------------
-template< class T, size_t MAX_SIZE >
-class CCopyableUtlVectorFixed : public CUtlVectorFixed< T, MAX_SIZE >
+template< class T, size_t TMaxSize >
+class CCopyableUtlVectorFixed : public CUtlVectorFixed< T, TMaxSize >
 {
-	typedef CUtlVectorFixed< T, MAX_SIZE > BaseClass;
+	typedef CUtlVectorFixed< T, TMaxSize > BaseClass;
 public:
 	explicit CCopyableUtlVectorFixed( intp growSize = 0, intp initSize = 0 ) : BaseClass( growSize, initSize ) {}
 	CCopyableUtlVectorFixed( T* pMemory, intp numElements ) : BaseClass( pMemory, numElements ) {}

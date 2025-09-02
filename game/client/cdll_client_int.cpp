@@ -87,6 +87,7 @@
 #include "ihudlcd.h"
 #include "toolframework_client.h"
 #include "hltvcamera.h"
+#include "vscript/ivscript.h"
 #if defined( REPLAY_ENABLED )
 #include "replay/replaycamera.h"
 #include "replay/replay_ragdoll.h"
@@ -207,6 +208,7 @@ IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;
 IUploadGameStats *gamestatsuploader = NULL;
 IClientReplayContext *g_pClientReplayContext = NULL;
+IScriptManager *scriptmanager = NULL;
 #if defined( REPLAY_ENABLED )
 IReplayManager *g_pReplayManager = NULL;
 IReplayMovieManager *g_pReplayMovieManager = NULL;
@@ -952,6 +954,12 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 		return false;
 	InitFbx();
 #endif
+
+	if ( !CommandLine()->CheckParm( "-noscripting") )
+	{
+		if ( (scriptmanager = (IScriptManager *)appSystemFactory( VSCRIPT_INTERFACE_VERSION, NULL )) == NULL )
+			return false;
+	}
 
 	// it's ok if this is NULL. That just means the sourcevr.dll wasn't found
 	if ( CommandLine()->CheckParm( "-vr" ) )

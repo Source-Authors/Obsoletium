@@ -1362,6 +1362,12 @@ $Project "vrad_launcher"
 	"utils\vrad_launcher\vrad_launcher.vpc" [$WINDOWS]
 }
 
+$Project "vscript"
+{
+	"vscript/vscript.vpc"		[($WINDOWS || $POSIX) && !$SOB]
+	"vscript/vscript_sob.vpc"	[($WINDOWS) && $SOB]
+}
+
 $Project "vs_python2.5"
 {
 	"sdktools\python\vs\vs_python2.5.vpc" [$WINDOWS]

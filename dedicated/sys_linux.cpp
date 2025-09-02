@@ -32,6 +32,7 @@
 #include "vphysics_interface.h"
 #include "icvar.h"
 #include "filesystem/IQueuedLoader.h"
+#include "vscript/ivscript.h"
 
 #include "scoped_app_locale.h"
 
@@ -110,6 +111,7 @@ IDedicatedServerAPI *UnixSystem::LoadModules(
       {"datacache" DLL_EXT_STRING, STUDIO_DATA_CACHE_INTERFACE_VERSION},
       {"dedicated" DLL_EXT_STRING, QUEUEDLOADER_INTERFACE_VERSION},
       {"engine" DLL_EXT_STRING, VENGINE_HLDS_API_VERSION},
+      {"vscript" DLL_EXT_STRING, VSCRIPT_INTERFACE_VERSION},
       {"", ""}  // Required to terminate the list
   };
 

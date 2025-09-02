@@ -180,17 +180,19 @@ public:
 	//		read for strings until a null character is reached.
 	// Text mode: it'll parse the file, turning text #s into real numbers.
 	//		GetString will read a string until a space is reached
-	[[nodiscard]] char			GetChar( );
-	[[nodiscard]] unsigned char	GetUnsignedChar( );
-	[[nodiscard]] short			GetShort( );
+	[[nodiscard]] char				GetChar( );
+	[[nodiscard]] unsigned char		GetUnsignedChar( );
+	[[nodiscard]] short				GetShort( );
 	[[nodiscard]] unsigned short	GetUnsignedShort( );
 	[[nodiscard]] int				GetInt( );
-	[[nodiscard]] int64			GetInt64( );
+	[[nodiscard]] int64				GetInt64( );
 	[[nodiscard]] int				GetIntHex( );
-	[[nodiscard]] unsigned int	GetUnsignedInt( );
+	[[nodiscard]] unsigned int		GetUnsignedInt( );
 	[[nodiscard]] uint64			GetUint64( );
-	[[nodiscard]] float			GetFloat( );
+	[[nodiscard]] float				GetFloat( );
 	[[nodiscard]] double			GetDouble( );
+	// dimhotepus: CS:GO backport.
+	[[nodiscard]] void *			GetPtr();
 	template <size_t maxLenInChars> void GetString( OUT_Z_ARRAY char( &pString )[maxLenInChars] )
 	{
 		GetStringInternal( pString, maxLenInChars );
@@ -311,6 +313,8 @@ public:
 	void			PutFloat( float f );
 	void			PutDouble( double d );
 	void			PutString( const char* pString );
+	// dimhotepus: CS:GO backport.
+	void			PutPtr( void * ); // Writes the pointer, not the pointed to
 	void			Put( const void* pMem, intp size );
 	template<typename T> 
 	std::enable_if_t<!std::is_pointer_v<T>> Put( const T &pMem )
@@ -799,6 +803,18 @@ inline double CUtlBuffer::GetDouble( )
 	return d;
 }
 
+// dimhotepus: CS:GO backport.
+inline void *CUtlBuffer::GetPtr( )
+{
+	void *p;
+	// LEGACY WARNING: in text mode, PutPtr writes 32 bit pointers in hex, while GetPtr reads 32 or 64 bit pointers in decimal
+#if !defined(X64BITS) && !defined(PLATFORM_64BITS)
+	p = ( void* )GetUnsignedInt();
+#else
+	p = ( void* )GetInt64();
+#endif
+	return p;
+}
 
 //-----------------------------------------------------------------------------
 // Where am I writing?
@@ -1021,6 +1037,19 @@ inline void CUtlBuffer::PutDouble( double d )
 	PutType( d, "%f" );
 }
 
+// dimhotepus: CS:GO backport.
+inline void CUtlBuffer::PutPtr( void *p )
+{
+	// LEGACY WARNING: in text mode, PutPtr writes 32 bit pointers in hex, while GetPtr reads 32 or 64 bit pointers in decimal
+	if (!IsText())
+	{
+		PutTypeBin( p );
+	}
+	else
+	{
+		Printf( "0x%p", p );
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Am I a text buffer?

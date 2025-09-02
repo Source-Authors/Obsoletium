@@ -34,6 +34,8 @@
 #include "console/conproc.h"
 #include "console/textconsole.h"
 
+#include "vscript/ivscript.h"
+
 #include "scoped_app_locale.h"
 
 namespace se::dedicated {
@@ -170,6 +172,7 @@ IDedicatedServerAPI *WindowsSystem::LoadModules(
       {"vgui2" DLL_EXT_STRING, VGUI_IVGUI_INTERFACE_VERSION},
       {"engine" DLL_EXT_STRING, VENGINE_HLDS_API_VERSION},
       {"dedicated" DLL_EXT_STRING, QUEUEDLOADER_INTERFACE_VERSION},
+      {"vscript" DLL_EXT_STRING, VSCRIPT_INTERFACE_VERSION},
       {"", ""}  // Required to terminate the list
   };
 
