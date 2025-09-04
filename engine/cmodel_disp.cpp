@@ -215,48 +215,93 @@ void DispCollTrees_FreeLeafList( CCollisionBSPData *pBSPData )
 }
 
 // Virtual collision models for terrain
-class CVirtualTerrain : public IVirtualMeshEvent
+class CVirtualTerrain final : public IVirtualMeshEvent
 {
 public:
 	CVirtualTerrain()
 	{
-		m_pDispHullData =  NULL;
+		m_pDispHullData = nullptr;
 	}
+
 	// Fill out the meshlist for this terrain patch
-	virtual void GetVirtualMesh( void *userData, virtualmeshlist_t *pList )
+	void GetVirtualMesh( void *userData, virtualmeshlist_t *pList ) override
 	{
-		intp index = (intp)userData;
-		Assert(index >= 0 && index < g_DispCollTreeCount );
-		g_pDispCollTrees[index].GetVirtualMeshList( pList );
-		pList->pHull = NULL;
-		if ( m_pDispHullData )
+		const intp index = (intp)userData;
+
+		if ( index >= 0 && index < g_DispCollTreeCount )
 		{
-			if ( m_dispHullOffset[index] >= 0 )
+			g_pDispCollTrees[index].GetVirtualMeshList( pList );
+			pList->pHull = nullptr;
+
+			if ( m_pDispHullData && m_dispHullOffset[index] >= 0 )
 			{
 				pList->pHull = m_pDispHullData + m_dispHullOffset[index];
 			}
 		}
+		else
+		{
+			// dimhotepus: Verify index is in range.
+			AssertMsg( false, "(%zd) Out of bounds (%zd) virtual mesh query.\n",
+				index, g_DispCollTreeCount );
+			Warning( "(%zd) Out of bounds (%zd) virtual mesh query.\n",
+				index, g_DispCollTreeCount );
+
+			pList->pHull = nullptr;
+		}
 	}
 	// returns the bounds for the terrain patch
-	virtual void GetWorldspaceBounds( void *userData, Vector *pMins, Vector *pMaxs )
+	void GetWorldspaceBounds( void *userData, Vector *pMins, Vector *pMaxs ) override
 	{
-		intp index = (intp)userData;
-		*pMins = g_pDispBounds[index].mins;
-		*pMaxs = g_pDispBounds[index].maxs;
+		const intp index = (intp)userData;
+
+		if ( index >= 0 && index < g_DispCollTreeCount )
+		{
+			*pMins = g_pDispBounds[index].mins;
+			*pMaxs = g_pDispBounds[index].maxs;
+		}
+		else
+		{
+			// dimhotepus: Verify index is in range.
+			AssertMsg( false, "(%zd) Out of bounds (%zd) worldspace bounds query.\n",
+				index, g_DispCollTreeCount );
+			Warning( "(%zd) Out of bounds (%zd) worldspace bounds query.\n",
+				index, g_DispCollTreeCount );
+
+			*pMins = vec3_invalid;
+			*pMaxs = vec3_invalid;
+		}
 	}
+
 	// Query against the AABB tree to find the list of triangles for this patch in a sphere
-	virtual void GetTrianglesInSphere( void *userData, const Vector &center, float radius, virtualmeshtrianglelist_t *pList )
+	void GetTrianglesInSphere( void *userData, const Vector &center, float radius, virtualmeshtrianglelist_t *pList ) override
 	{
-		intp index = (intp)userData;
-		pList->triangleCount = g_pDispCollTrees[index].AABBTree_GetTrisInSphere( center, radius, pList->triangleIndices, ARRAYSIZE(pList->triangleIndices) );
+		const intp index = (intp)userData;
+
+		if ( index >= 0 && index < g_DispCollTreeCount )
+		{
+			pList->triangleCount = g_pDispCollTrees[index]
+				.AABBTree_GetTrisInSphere( center, radius, pList->triangleIndices, std::size(pList->triangleIndices) );
+		}
+		else
+		{
+			// dimhotepus: Verify index is in range.
+			AssertMsg( false, "(%zd) Out of bounds (%zd) triangles in sphere query.\n",
+				index, g_DispCollTreeCount );
+			Warning( "(%zd) Out of bounds (%zd) triangles in sphere query.\n",
+				index, g_DispCollTreeCount );
+
+			pList->triangleCount = -1;
+		}
 	}
+
 	void LevelInit( dphysdisp_t *pLump, int lumpSize )
 	{
 		if ( !pLump )
 		{
-			m_pDispHullData = NULL;
+			m_pDispHullData = nullptr;
 			return;
 		}
+
 		int totalHullData = 0;
 		m_dispHullOffset.SetCount(g_DispCollTreeCount);
 		Assert(pLump->numDisplacements==g_DispCollTreeCount);
@@ -264,7 +309,7 @@ public:
 		unsigned short *pDataSize = (unsigned short *)(pLump+1);
 		for ( int i = 0; i < pLump->numDisplacements; i++ )
 		{
-			if ( pDataSize[i] == (unsigned short)-1 )
+			if ( pDataSize[i] == std::numeric_limits<unsigned short>::max() )
 			{
 				m_dispHullOffset[i] = -1;
 				continue;
@@ -280,11 +325,12 @@ public:
 		Assert( offset + totalHullData == lumpSize );
 #endif
 	}
+
 	void LevelShutdown()
 	{
 		m_dispHullOffset.Purge();
 		delete[] m_pDispHullData;
-		m_pDispHullData = NULL;
+		m_pDispHullData = nullptr;
 	}
 
 private:
