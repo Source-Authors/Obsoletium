@@ -378,7 +378,8 @@ void CVoiceStatus::UpdateServerState(bool bForce)
 
 			player_info_t pi;
 
-			if ( !engine->GetPlayerInfo( i+1, &pi ) )
+			// dimhotepus: Correctly get player info.
+			if ( !engine->GetPlayerInfo( playerIndex+1, &pi ) )
 				continue;
 
 			if ( m_BanMgr.GetPlayerBan( pi.guid ) )
