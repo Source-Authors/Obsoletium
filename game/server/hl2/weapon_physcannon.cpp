@@ -1221,7 +1221,8 @@ public:
 	void	ForceDrop( void );
 	bool	DropIfEntityHeld( CBaseEntity *pTarget );	// Drops its held entity if it matches the entity passed in
 	CGrabController &GetGrabController() { return m_grabController; }
-
+	
+	// dimhotepus: Add const as it was not overriding base!
 	bool	CanHolster( void ) const override;
 	bool	Holster( CBaseCombatWeapon *pSwitchingTo = NULL ) override;
 	bool	Deploy( void ) override;

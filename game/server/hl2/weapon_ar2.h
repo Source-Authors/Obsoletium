@@ -45,6 +45,7 @@ public:
 	int		GetMaxBurst( void ) override { return 5; }
 	float	GetFireRate( void ) override { return 0.1f; }
 
+	// dimhotepus: Add const as it was not overriding base!
 	bool	CanHolster( void ) const override;
 	bool	Reload( void ) override;
 
