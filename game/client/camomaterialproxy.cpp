@@ -120,7 +120,6 @@ CCamoMaterialProxy::CCamoMaterialProxy() : m_TextureRegen(this)
 #if 0
 	memset( &m_camoImageDataCache, 0,sizeof( m_camoImageDataCache ) );
 #endif
-	m_pointsInNormalizedBox = NULL;
 #if 0
 	m_InstanceDataListHead = NULL;
 #endif
@@ -154,9 +153,11 @@ CCamoMaterialProxy::~CCamoMaterialProxy()
 		if (pCamoTexture)
 			pCamoTexture->SetTextureRegenerator( NULL );
 	}
-
-	delete m_pCamoPatternImage;
-	delete m_pointsInNormalizedBox;
+	
+	// dimhotepus: Correctly delete array.
+	delete[] m_pCamoPatternImage;
+	// dimhotepus: Correctly delete array.
+	delete[] m_pointsInNormalizedBox;
 }
 
 
