@@ -648,7 +648,7 @@ static FORCEINLINE double fsel(double fComparand, double fValGE, double fLT)
 //-----------------------------------------------------------------------------
 // dimhotepus: CS:GO backport.
 template < typename Tdst, typename Tsrc >
-FORCEINLINE [[nodiscard]]
+[[nodiscard]] FORCEINLINE
 #ifndef DEBUG
 constexpr
 #endif
