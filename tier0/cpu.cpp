@@ -425,7 +425,11 @@ unsigned CountSetBits( ULONG_PTR mask, bool is_popcnt_supported )
 
 CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
 {
-	SYSTEM_LOGICAL_PROCESSOR_INFORMATION *buffer{nullptr};
+	HANDLE heap = ::GetProcessHeap();
+
+	auto *buffer =
+		static_cast<SYSTEM_LOGICAL_PROCESSOR_INFORMATION*>(
+			::HeapAlloc( heap, 0, sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION) * 32 ) );
 	DWORD size{0};
 
 	while ( true )
@@ -435,10 +439,10 @@ CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
  
 		if ( ::GetLastError() == ERROR_INSUFFICIENT_BUFFER )
 		{
-			if ( buffer ) ::HeapFree( ::GetProcessHeap(), 0, buffer );
+			if ( buffer ) ::HeapFree( heap, 0, buffer );
 
 			buffer = static_cast<SYSTEM_LOGICAL_PROCESSOR_INFORMATION*>(
-				::HeapAlloc( ::GetProcessHeap(), 0, static_cast<size_t>( size ) ) );
+				::HeapAlloc( heap, 0, static_cast<size_t>( size ) ) );
 			if ( !buffer )
 			{
 				// Allocation failure.
@@ -475,7 +479,7 @@ CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
 		++it;
 	}
 
-	::HeapFree( GetProcessHeap(), 0, buffer );
+	::HeapFree( heap, 0, buffer );
 
 	return { physical_cores_num, logical_cores_num };
 }
