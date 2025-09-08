@@ -5328,7 +5328,7 @@ void CShaderAPIDx8::ApplyFogMode( ShaderFogMode_t fogMode, bool bSRGBWritesEnabl
 	}
 
 
-	const float fColorScale = 1.0f / 255.0f;
+	constexpr float fColorScale = 1.0f / 255.0f;
 	m_DynamicState.m_PixelFogColor[0] = (float)(r) * fColorScale;
 	m_DynamicState.m_PixelFogColor[1] = (float)(g) * fColorScale;
 	m_DynamicState.m_PixelFogColor[2] = (float)(b) * fColorScale;

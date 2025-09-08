@@ -421,7 +421,7 @@ void CShaderAPIDx11::ResetRenderState(bool bFullReset) {
   blend_desc.RenderTarget[0].RenderTargetWriteMask =
       D3D11_COLOR_WRITE_ENABLE_ALL;
 
-  const FLOAT blend_factor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+  constexpr FLOAT blend_factor[4] = {1.0f, 1.0f, 1.0f, 1.0f};
   ID3D11BlendState *blend_state;
   hr = g_pShaderDeviceDx11->D3D11Device()->CreateBlendState(&blend_desc,
                                                             &blend_state);
