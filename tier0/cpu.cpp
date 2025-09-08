@@ -426,11 +426,11 @@ unsigned CountSetBits( ULONG_PTR mask, bool is_popcnt_supported )
 CpuCoreInfo GetProcessorCoresInfo( bool is_popcnt_supported )
 {
 	HANDLE heap = ::GetProcessHeap();
-
+	
+	DWORD size{sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION) * 36};
 	auto *buffer =
 		static_cast<SYSTEM_LOGICAL_PROCESSOR_INFORMATION*>(
-			::HeapAlloc( heap, 0, sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION) * 32 ) );
-	DWORD size{0};
+			::HeapAlloc( heap, 0, size ) );
 
 	while ( true )
 	{
