@@ -303,7 +303,7 @@ PLATFORM_INTERFACE bool ThreadInterlockedAssignPointerIf( void * volatile *, voi
 
 #if defined( PLATFORM_64BITS )
 #if defined (_WIN32) && defined( _XM_SSE_INTRINSICS_ )
-typedef __m128i int128;
+using int128 = __m128i;
 inline int128 int128_zero()	{ return _mm_setzero_si128(); }
 #else
 typedef __int128_t int128;
@@ -408,7 +408,7 @@ public:
 	CThreadLocalBase();
 	~CThreadLocalBase();
 
-	void * Get() const;
+	[[nodiscard]] void * Get() const;
 	void   Set(void *);
 
 private:
@@ -592,8 +592,8 @@ private:
 	std::atomic<T> m_value;
 };
 
-typedef CInterlockedIntT<int> CInterlockedInt;
-typedef CInterlockedIntT<unsigned> CInterlockedUInt;
+using CInterlockedInt = CInterlockedIntT<int>;
+using CInterlockedUInt = CInterlockedIntT<unsigned int>;
 
 //-----------------------------------------------------------------------------
 
@@ -694,13 +694,13 @@ public:
 	void Unlock() const		{ (const_cast<CThreadMutex *>(this))->Unlock(); }
 
 	bool TryLock();
-	bool TryLock() const	{ return (const_cast<CThreadMutex *>(this))->TryLock(); }
+	[[nodiscard]] bool TryLock() const	{ return (const_cast<CThreadMutex *>(this))->TryLock(); }
 
 	//------------------------------------------------------
 	// Use this to make deadlocks easier to track by asserting
 	// when it is expected that the current thread owns the mutex
 	//------------------------------------------------------
-	bool AssertOwnedByCurrentThread() const;
+	[[nodiscard]] bool AssertOwnedByCurrentThread() const;
 
 	//------------------------------------------------------
 	// Enable tracing to track deadlock problems
@@ -751,8 +751,7 @@ class CThreadFastMutex
 {
 public:
 	CThreadFastMutex()
-	  :	m_ownerID( 0 ),
-	  	m_depth( 0 )
+	  :	m_ownerID( 0 )
 	{
 	}
 
@@ -850,7 +849,7 @@ public:
 	int	GetDepth() const				{ return m_depth; }
 private:
 	CInterlockedUInt m_ownerID;
-	int				m_depth;
+	int				m_depth{ 0 };
 };
 
 // dimhotepus: Fix aligned alloc.
@@ -905,7 +904,7 @@ public:
 	void Unlock() const		{ if ( *pCondition ) BaseClass::Unlock(); }
 
 	bool TryLock()			{ if ( *pCondition ) return BaseClass::TryLock(); else return true; }
-	bool TryLock() const 	{ if ( *pCondition ) return BaseClass::TryLock(); else return true; }
+	[[nodiscard]] bool TryLock() const 	{ if ( *pCondition ) return BaseClass::TryLock(); else return true; }
 	bool AssertOwnedByCurrentThread() { if ( *pCondition ) return BaseClass::AssertOwnedByCurrentThread(); else return true; }
 	void SetTrace( bool b ) { if ( *pCondition ) BaseClass::SetTrace( b ); }
 };
@@ -919,7 +918,7 @@ class CThreadTerminalMutex : public BaseClass
 {
 public:
 	bool TryLock()			{ if ( !BaseClass::TryLock() ) { DebuggerBreak(); return false; } return true; }
-	bool TryLock() const 	{ if ( !BaseClass::TryLock() ) { DebuggerBreak(); return false; } return true; }
+	[[nodiscard]] bool TryLock() const 	{ if ( !BaseClass::TryLock() ) { DebuggerBreak(); return false; } return true; }
 	void Lock()				{ if ( !TryLock() ) BaseClass::Lock(); }
 	void Lock() const 		{ if ( !TryLock() ) BaseClass::Lock(); }
 
@@ -990,7 +989,7 @@ private:
 	CAutoLockT<MUTEX_TYPE> &operator=( CAutoLockT<MUTEX_TYPE> && ) = delete;
 };
 
-typedef CAutoLockT<CThreadMutex> CAutoLock;
+using CAutoLock = CAutoLockT<CThreadMutex>;
 
 template < typename MUTEX_TYPE >
 inline CAutoLockT<MUTEX_TYPE> make_auto_lock( MUTEX_TYPE& lock, const char* pMutexname, const char* pFilename, int nLineNum, uint64 nMinReportDurationUs = 1 )
@@ -1035,7 +1034,7 @@ public:
 	//-----------------------------------------------------
 #ifdef _WIN32
 	operator HANDLE() { return GetHandle(); }
-	HANDLE GetHandle() const { return m_hSyncObject; }
+	[[nodiscard]] HANDLE GetHandle() const { return m_hSyncObject; }
 #endif
 	//-----------------------------------------------------
 	// Wait for a signal from the object
@@ -1220,9 +1219,9 @@ private:
 	CThreadEvent m_CanWrite;
 	CThreadEvent m_CanRead;
 
-	int m_nWriters;
-	int m_nActiveReaders;
-	int m_nPendingReaders;
+	int m_nWriters{ 0 };
+	int m_nActiveReaders{ 0 };
+	int m_nPendingReaders{ 0 };
 };
 
 //-----------------------------------------------------------------------------
@@ -1394,7 +1393,7 @@ protected:
 	bool WaitForCreateComplete( CThreadEvent *pEvent );
 
 	// "Virtual static" facility
-	typedef unsigned (__stdcall *ThreadProc_t)( void * );
+	using ThreadProc_t = unsigned int (__stdcall *)(void *);
 	virtual ThreadProc_t GetThreadProc();
 	virtual bool IsThreadRunning();
 
@@ -1532,7 +1531,7 @@ protected:
 #ifndef _WIN32
 #define __stdcall
 #endif
-	typedef uint32 (__stdcall *WaitFunc_t)( int nEvents, CThreadEvent * const *pEvents, int bWaitAll, uint32 timeout );
+	using WaitFunc_t = uint32 (__stdcall *)(int, CThreadEvent *const *, int, uint32);
 	
 	int Call( unsigned, unsigned timeout, bool fBoost, WaitFunc_t = nullptr, CFunctor *pParamFunctor = nullptr );
 	int WaitForReply( unsigned timeout, WaitFunc_t );
@@ -1569,13 +1568,13 @@ template<class T> class CMessageQueue
 	MsgNode *Tail;
 
 public:
-	CMessageQueue( void )
+	CMessageQueue( )
 	{
 		Head = Tail = nullptr;
 	}
 
 	// check for a message. not 100% reliable - someone could grab the message first
-	bool MessageWaiting( void ) 
+	bool MessageWaiting( ) 
 	{
 		return ( Head != nullptr );
 	}
@@ -1634,8 +1633,8 @@ public:
 //-----------------------------------------------------------------------------
 
 #ifdef _WIN32
-typedef struct _RTL_CRITICAL_SECTION RTL_CRITICAL_SECTION;
-typedef RTL_CRITICAL_SECTION CRITICAL_SECTION;
+using RTL_CRITICAL_SECTION = struct _RTL_CRITICAL_SECTION;
+using CRITICAL_SECTION = RTL_CRITICAL_SECTION;
 
 #ifndef _X360
 extern "C"
@@ -1766,10 +1765,7 @@ inline void CThreadMutex::SetTrace(bool fTrace)
 //-----------------------------------------------------------------------------
 
 inline CThreadRWLock::CThreadRWLock()
-:	m_CanRead( true ),
-	m_nWriters( 0 ),
-	m_nActiveReaders( 0 ),
-	m_nPendingReaders( 0 )
+:	m_CanRead( true )
 {
 }
 

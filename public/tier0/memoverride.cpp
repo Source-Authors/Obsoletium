@@ -780,7 +780,7 @@ ALLOC_CALL void *__cdecl _aligned_malloc_base( size_t size, size_t align )
 
 inline void *MemAlloc_Unalign( void *pMemBlock )
 {
-	alignas(unsigned **) unsigned *pAlloc = static_cast<unsigned *>(pMemBlock);
+	alignas(unsigned **) auto *pAlloc = static_cast<unsigned *>(pMemBlock);
 
 	// pAlloc points to the pointer to starting of the memory block
 	pAlloc = reinterpret_cast<unsigned *>((reinterpret_cast<uintp>(pAlloc) & ~(sizeof( void * ) - 1)) - sizeof( void * ));

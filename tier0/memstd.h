@@ -18,17 +18,21 @@
 
 #include "mem_helpers.h"
 
+// dimhotepus: Apply alignment only here.
+#pragma pack(push)
 #pragma pack(4)
 
 
 // #define NO_SBH	1
 
 
-#define MIN_SBH_BLOCK	8
-#define MIN_SBH_ALIGN	8
-#define MAX_SBH_BLOCK	2048
-#define MAX_POOL_REGION (4*1024*1024)
-#define SBH_PAGE_SIZE		(4*1024)
+enum {
+  MIN_SBH_BLOCK =	8,
+  MIN_SBH_ALIGN =	8,
+  MAX_SBH_BLOCK =	2048,
+  MAX_POOL_REGION = (4*1024*1024),
+  SBH_PAGE_SIZE =		(4*1024)
+};
 #define COMMIT_SIZE		(16*SBH_PAGE_SIZE)
 
 #ifdef _M_X64
@@ -69,7 +73,7 @@ public:
 
 private:
 
-	typedef TSLNodeBase_t FreeBlock_t;
+	using FreeBlock_t = TSLNodeBase_t;
 	class CFreeList : public CTSListBase
 	{
 	public:
@@ -124,7 +128,7 @@ public:
 		// Make sure that we return 64-bit addresses in 64-bit builds.
 		ReserveBottomMemory();
 	}
-	virtual ~CStdMemAlloc() {}
+	virtual ~CStdMemAlloc() = default;
 
 	// Release versions
 	void *Alloc( size_t nSize ) override;
@@ -149,7 +153,7 @@ public:
 	int CrtSetReportMode( int nReportType, int nReportMode ) override;
 	int CrtIsValidHeapPointer( const void *pMem ) override;
 	int CrtIsValidPointer( const void *pMem, unsigned int size, int access ) override;
-	int CrtCheckMemory( void ) override;
+	int CrtCheckMemory( ) override;
 	int CrtSetDbgFlag( int nNewFlag ) override;
 	void CrtMemCheckpoint( _CrtMemState *pState ) override;
 	void* CrtSetReportFile( int nRptType, void* hFile ) override;
@@ -198,4 +202,5 @@ public:
 	size_t				m_sMemoryAllocFailed;
 } ALIGN16_POST;
 
-
+// dimhotepus: Apply alignment only here.
+#pragma pack(pop)

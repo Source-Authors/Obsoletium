@@ -320,7 +320,7 @@ static VCREvent VCR_ReadEvent()
 
 static void VCR_WriteEvent( VCREvent event )
 {
-	unsigned char cEvent = (unsigned char)event;
+	auto cEvent = (unsigned char)event;
 	
 	unsigned short threadID = GetCurrentVCRThreadIndex();
 	if ( threadID == 0 )
@@ -366,7 +366,7 @@ static void VCR_Event(VCREvent type)
 class CVCRTrace : public IVCRTrace
 {
 public:
-	virtual ~CVCRTrace() {}
+	virtual ~CVCRTrace() = default;
 
 	VCREvent ReadEvent() override
 	{
@@ -1291,7 +1291,7 @@ void VCR_GenericRecord( const char *pEventName, const void *pData, int len )
 		VCR_Error( "VCR_GenericRecord( %s ): nameLen too long (%zu)", pEventName, nameLen );
 		return;
 	}
-	unsigned char ucNameLen = (unsigned char)nameLen;
+	auto ucNameLen = (unsigned char)nameLen;
 	VCR_WriteVal( ucNameLen );
 	VCR_Write( pEventName, ucNameLen );
 
@@ -1412,7 +1412,7 @@ void WriteShortString( const char *pStr )
 		Error( "VCR_WriteShortString, string too long (%zu characters).", len );
 	}
 
-	unsigned short twobytes = (unsigned short)len;
+	auto twobytes = (unsigned short)len;
 	VCR_WriteVal( twobytes );
 	VCR_Write( pStr, len );
 }
@@ -1526,7 +1526,7 @@ void* VCR_CreateThread(
 	{
 		if ( g_VCRMode == VCR_Disabled )
 		{
-			HANDLE hThread = (void *)_beginthreadex( 
+			auto hThread = (void *)_beginthreadex( 
 				(LPSECURITY_ATTRIBUTES)lpThreadAttributes,
 				dwStackSize,
 				(unsigned (__stdcall *) (void *))lpStartAddress,
@@ -1562,7 +1562,7 @@ void* VCR_CreateThread(
 	VCR_Event( VCREvent_CreateThread );
 
 	// Create the thread.
-	HANDLE hThread = (void*)_beginthreadex( 
+	auto hThread = (void*)_beginthreadex( 
 		(LPSECURITY_ATTRIBUTES)lpThreadAttributes,
 		dwStackSize,
 		(unsigned (__stdcall *) (void *))lpStartAddress,
@@ -1671,7 +1671,7 @@ unsigned long VCR_WaitForMultipleObjects( uint32 nHandles, const void **pHandles
 
 void VCR_EnterCriticalSection( void *pInputCS )
 {
-	CRITICAL_SECTION *pCS = (CRITICAL_SECTION*)pInputCS;
+	auto *pCS = (CRITICAL_SECTION*)pInputCS;
 
 	if ( !IsVCRModeEnabledForThisThread() )
 	{

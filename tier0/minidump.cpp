@@ -57,7 +57,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 
 	bool bReturnValue = false;
 
-	MINIDUMPWRITEDUMP pfnMiniDumpWrite =
+	auto pfnMiniDumpWrite =
 		reinterpret_cast<MINIDUMPWRITEDUMP>( ::GetProcAddress( hDbgHelpDll, V_STRINGIFY(MiniDumpWriteDump) ) );
 	if ( pfnMiniDumpWrite )
 	{
@@ -349,7 +349,7 @@ struct CatchAndWriteContext_t
 		ErrorIfNot( m_pfn, ( "CatchAndWriteContext_t::Set w/o a function pointer!" ) )
 	}
 
-	int							Invoke() const
+	[[nodiscard]] int							Invoke() const
 	{
 		switch ( m_eType )
 		{

@@ -359,7 +359,7 @@ public:
 	[[nodiscard]] inline HandleType	GetHandleValue()					{ return m_Handle; }
 	inline void			SetHandleValue( HandleType val )	{ m_Handle = val; }
 
-	typedef HandleType	HANDLE_TYPE;
+	using HANDLE_TYPE = HandleType;
 
 protected:
 

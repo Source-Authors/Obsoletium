@@ -172,7 +172,7 @@ static bool AreAssertsEnabledInFileLine( const tchar *pFilename, int iLine )
 
 static CAssertDisable* CreateNewAssertDisable( const tchar *pFilename )
 {
-	CAssertDisable *pDisable = new CAssertDisable;
+	auto *pDisable = new CAssertDisable;
 	pDisable->m_pNext = g_pAssertDisables;
 	g_pAssertDisables = pDisable;
 

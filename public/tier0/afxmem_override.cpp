@@ -237,7 +237,7 @@ struct _AFX_ENUM_CONTEXT {
 };
 
 AFX_STATIC void _AfxDoForAllObjectsProxy(void* pObject, void* pContext) {
-  _AFX_ENUM_CONTEXT* p = (_AFX_ENUM_CONTEXT*)pContext;
+  auto* p = (_AFX_ENUM_CONTEXT*)pContext;
   (*p->m_pfn)((CObject*)pObject, p->m_pContext);
 }
 

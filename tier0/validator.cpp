@@ -6,9 +6,7 @@
 //=============================================================================//
 
 
-#include "pch_tier0.h"
-
-#include "tier0/memblockhdr.h"
+#include "stdafx.h"
 
 
 #ifdef DBGFLAG_VALIDATE

@@ -175,11 +175,12 @@ void Plat_ExitProcess( int nCode )
 #if defined( _WIN32 )
 	// We don't want global destructors in our process OR in any DLL to get executed.
 	// _exit() avoids calling global destructors in our module, but not in other DLLs.
-	const char *pchCmdLineA = Plat_GetCommandLineA();
-	if ( nCode || ( strstr( pchCmdLineA, "gc.exe" ) && strstr( pchCmdLineA, "gc.dll" ) && strstr( pchCmdLineA, "-gc" ) ) )
-	{
-		int *x = nullptr; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll //-V522
-	}
+	// dimhotepus: Drop UB on gc.
+	// const char *pchCmdLineA = Plat_GetCommandLineA();
+	// if ( nCode || ( strstr( pchCmdLineA, "gc.exe" ) && strstr( pchCmdLineA, "gc.dll" ) && strstr( pchCmdLineA, "-gc" ) ) )
+	// {
+	// 	int *x = nullptr; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll //-V522
+	// }
 	TerminateProcess( GetCurrentProcess(), nCode );
 #else	
 	_exit( nCode );
@@ -422,7 +423,7 @@ bool Is64BitOS()
 // -------------------------------------------------------------------------------------------------- //
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
-typedef void (*Plat_AllocErrorFn)( unsigned long size );
+using Plat_AllocErrorFn = void (*)(unsigned long);
 
 void Plat_DefaultAllocErrorFn( [[maybe_unused]] unsigned long size )
 {

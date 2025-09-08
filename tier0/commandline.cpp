@@ -23,13 +23,13 @@ class CCommandLine : public ICommandLine
 {
 public:
 	// Construction
-						CCommandLine( void );
-	virtual 			~CCommandLine( void );
+						CCommandLine( );
+	virtual 			~CCommandLine( );
 
 	// Implements ICommandLine
 	void		CreateCmdLine( const char *commandline  ) override;
 	void		CreateCmdLine( int argc, char **argv ) override;
-	const char	*GetCmdLine( void ) const override;
+	[[nodiscard]] const char	*GetCmdLine( ) const override;
 	const char	*CheckParm( const char *psz, const char **ppszValue = nullptr ) const override;
 	// A bool return of whether param exists, useful for just checking if param that is just a flag is set
 	bool		HasParm( const char *psz ) const override;
@@ -37,9 +37,9 @@ public:
 	void		RemoveParm( const char *parm ) override;
 	void		AppendParm( const char *pszParm, const char *pszValues ) override;
 
-	int			ParmCount() const override;
+	[[nodiscard]] int			ParmCount() const override;
 	int			FindParm( const char *psz ) const override;
-	const char* GetParm( int nIndex ) const override;
+	[[nodiscard]] const char* GetParm( int nIndex ) const override;
 
 	const char	*ParmValue( const char *psz, const char *pDefaultVal = nullptr ) const override;
 	int			ParmValue( const char *psz, int nDefaultVal ) const override;
@@ -89,7 +89,7 @@ ICommandLine *CommandLine_Tier0()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CCommandLine::CCommandLine( void )
+CCommandLine::CCommandLine( )
 {
 	m_pszCmdLine = nullptr;
 	m_nParmCount = 0;
@@ -99,7 +99,7 @@ CCommandLine::CCommandLine( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CCommandLine::~CCommandLine( void )
+CCommandLine::~CCommandLine( )
 {
 	CleanUpParms();
 	delete[] m_pszCmdLine;
@@ -379,7 +379,7 @@ void CCommandLine::RemoveParm( const char *pszParm )
 	size_t len = strlen( m_pszCmdLine );
 
 	// Strip and trailing ' ' characters left over.
-	while ( 1 )
+	while ( true )
 	{
 		if ( len == 0 || m_pszCmdLine[ len - 1 ] != ' ' )
 			break;
@@ -453,7 +453,7 @@ void CCommandLine::AppendParm( const char *pszParm, const char *pszValues )
 // Purpose: Return current command line
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *CCommandLine::GetCmdLine( void ) const
+const char *CCommandLine::GetCmdLine( ) const
 {
 	return m_pszCmdLine;
 }

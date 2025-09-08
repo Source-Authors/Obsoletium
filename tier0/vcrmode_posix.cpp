@@ -15,12 +15,13 @@
 #define PROTECTED_THINGS_DISABLE
 #include "tier0/vcrmode.h"
 #include "tier0/dbg.h"
-#include "extendedtrace.h"
 
 // FIXME: We totally have a bad tier dependency here
 #include "inputsystem/InputEnums.h"
 
-#define VCRFILE_VERSION		2
+enum {
+  VCRFILE_VERSION =		2
+};
 
 #define VCR_RuntimeAssert(x)	VCR_RuntimeAssertFn(x, #x)
 #define PvAlloc malloc
@@ -190,12 +191,12 @@ static void VCR_Event(VCREvent type)
 class CVCRTrace : public IVCRTrace
 {
 public:
-	virtual VCREvent	ReadEvent()
+	VCREvent	ReadEvent() override
 	{
 		return VCR_ReadEvent();
 	}
 
-	virtual void		Read( void *pDest, int size )
+	void		Read( void *pDest, int size ) override
 	{
 		VCR_Read( pDest, size );
 	}
@@ -215,8 +216,6 @@ static int VCR_Start( char const *pFilename, bool bRecord, IVCRHelpers *pHelpers
 	g_pHelpers = pHelpers;
 	
 	VCREnd();
-
-	EXTENDEDTRACEINITIALIZE( "/tmp/hl2" );
 
 	g_OldVCRMode = (VCRMode_t)-1;
 	if(bRecord)
@@ -276,7 +275,6 @@ static void VCR_End()
 	}
 
 	g_VCRMode = VCR_Disabled;
-	EXTENDEDTRACEUNINITIALIZE();
 }
 
 
@@ -431,7 +429,7 @@ static void VCR_Hook_ScreenToClient(void *hWnd, struct tagPOINT *pt)
 }
 
 
-static int VCR_Hook_recvfrom(int s, char *buf, int len, int flags, struct sockaddr *from, int *fromlen)
+static int VCR_Hook_recvfrom(socket_handle s, char *buf, int len, int flags, struct sockaddr *from, int *fromlen)
 {
 	VCR_Event(VCREvent_recvfrom);
 
@@ -524,8 +522,10 @@ static void VCR_Hook_Cmd_Exec(char **f)
 	}
 }
 
-#define MAX_LINUX_CMDLINE 512
-static char linuxCmdline[ MAX_LINUX_CMDLINE +7 ]; // room for -steam
+enum {
+  MAX_LINUX_CMDLINE = 512
+};
+static char linuxCmdline[ MAX_LINUX_CMDLINE + 7 ]; // room for -steam
 
 const char * BuildCmdLine( int argc, char **argv, bool fAddSteam )
 {
@@ -698,7 +698,7 @@ void VCR_GenericRecord( const char *pEventName, const void *pData, int len )
                         return;
                 }
         }
-        unsigned char ucNameLen = (unsigned char)nameLen;
+        auto ucNameLen = (unsigned char)nameLen;
         VCR_WriteVal( ucNameLen );
         VCR_Write( pEventName, ucNameLen );
 
@@ -755,7 +755,7 @@ void VCR_GenericValue( const char *pEventName, void *pData, int maxLen )
 }
 
 
-static int VCR_Hook_recv(int s, char *buf, int len, int flags)
+static int VCR_Hook_recv(socket_handle s, char *buf, int len, int flags)
 {
         VCR_Event(VCREvent_recv);
 
@@ -797,7 +797,7 @@ static int VCR_Hook_recv(int s, char *buf, int len, int flags)
         return ret;
 }
 
-static int VCR_Hook_send(int s, const char *buf, int len, int flags)
+static int VCR_Hook_send(socket_handle s, const char *buf, int len, int flags)
 {
         VCR_Event(VCREvent_send);
 

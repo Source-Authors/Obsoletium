@@ -97,7 +97,7 @@ class PLATFORM_CLASS CStackTop_CopyParentStack : public CStackTop_Base
 {
 public:
 	CStackTop_CopyParentStack( void * const * pParentStackTrace, intp iParentStackTraceLength );
-	~CStackTop_CopyParentStack( void );
+	~CStackTop_CopyParentStack( );
 };
 
 //just references the parent stack. Assuming that you'll keep that memory around as long as you're keeping this Stack Top marker.
@@ -105,8 +105,8 @@ class PLATFORM_CLASS CStackTop_ReferenceParentStack : public CStackTop_Base
 {
 public:
 	CStackTop_ReferenceParentStack( void * const * pParentStackTrace = nullptr, intp iParentStackTraceLength = 0 );
-	~CStackTop_ReferenceParentStack( void );
-	void ReleaseParentStackReferences( void ); //in case you need to delete the parent stack trace before this class goes out of scope
+	~CStackTop_ReferenceParentStack( );
+	void ReleaseParentStackReferences( ); //in case you need to delete the parent stack trace before this class goes out of scope
 };
 
 

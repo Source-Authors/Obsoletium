@@ -29,7 +29,7 @@ PME* PME::Instance()
 //---------------------------------------------------------------------------
 // Open the device driver and detect the processor
 //---------------------------------------------------------------------------
-HRESULT PME::Init( void )
+HRESULT PME::Init( )
 {
     if ( bDriverOpen )
         return E_DRIVER_ALREADY_OPEN;
@@ -44,7 +44,7 @@ HRESULT PME::Init( void )
     }
 
     hFile = CreateFile(						// WINDOWS NT
-            "\\\\.\\GDPERF",
+            R"(\\.\GDPERF)",
             GENERIC_READ,
             0,
             nullptr,
@@ -87,7 +87,7 @@ HRESULT PME::Init( void )
 //---------------------------------------------------------------------------
 // Close the device driver
 //---------------------------------------------------------------------------
-HRESULT PME::Close(void)
+HRESULT PME::Close()
 {
 	if (bDriverOpen == false)				// driver is not going
 		return E_DRIVER_NOT_OPEN;
@@ -352,7 +352,7 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const uint64 & i64_value)
 
 extern int64 QueryCurrentCpuFrequency();
 
-double PME::GetCPUClockSpeedFast(void)
+double PME::GetCPUClockSpeedFast()
 {
 	return static_cast<double>( QueryCurrentCpuFrequency() );
 }
@@ -360,7 +360,7 @@ double PME::GetCPUClockSpeedFast(void)
 
 
 // takes 1 second
-double PME::GetCPUClockSpeedSlow(void)
+double PME::GetCPUClockSpeedSlow()
 {
 
     if (m_CPUClockSpeed != 0)

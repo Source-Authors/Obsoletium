@@ -136,13 +136,13 @@ using HWND = void *;
 // RTime32
 // We use this 32 bit time representing real world time.
 // It offers 1 second resolution beginning on January 1, 1970 (Unix time)
-typedef uint32 RTime32;
+using RTime32 = uint32;
 
-typedef float				float32;
-typedef double				float64;
+using float32 = float;
+using float64 = double;
 
 // for when we don't care about how many bits we use
-typedef unsigned int		uint;
+using uint = unsigned int;
 
 // This can be used to ensure the size of pointers to members when declaring
 // a pointer type for a class that has only been forward declared
@@ -1013,7 +1013,7 @@ PLATFORM_INTERFACE void				Plat_ExitProcessWithError( int nCode, bool bGenerateM
 //sets the callback that will be triggered by Plat_ExitProcessWithError. NULL is valid. The return value true indicates that
 //the exit has been handled and no further processing should be performed. False will cause a minidump to be generated, and the process
 //to be terminated
-typedef bool (*ExitProcessWithErrorCBFn)( int nCode );
+using ExitProcessWithErrorCBFn = bool (*)(int);
 PLATFORM_INTERFACE void				Plat_SetExitProcessWithErrorCB( ExitProcessWithErrorCBFn pfnCB );
 
 PLATFORM_INTERFACE struct tm *		Plat_gmtime( const time_t *timep, struct tm *result );
@@ -1372,7 +1372,7 @@ PLATFORM_INTERFACE bool Is64BitOS();
 #define WM_XMP_PLAYBACKBEHAVIORCHANGED		(WM_USER + 122)
 #define WM_XMP_PLAYBACKCONTROLLERCHANGED	(WM_USER + 123)
 
-inline const char *GetPlatformExt( void )
+inline const char *GetPlatformExt( )
 {
 	return IsX360() ? ".360" : "";
 }

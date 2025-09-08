@@ -114,14 +114,15 @@ unsigned __stdcall MeasureThread( void* vThreadNum )
 /*
 Note that this structure definition was accidentally omitted from WinNT.h. This error will be corrected in the future. In the meantime, to compile your application, include the structure definition contained in this topic in your source code.
 */
-typedef struct _PROCESSOR_POWER_INFORMATION {
+using PROCESSOR_POWER_INFORMATION = struct _PROCESSOR_POWER_INFORMATION {
   ULONG Number;
   ULONG MaxMhz;
   ULONG CurrentMhz;
   ULONG MhzLimit;
   ULONG MaxIdleState;
   ULONG CurrentIdleState;
-} PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
+};
+using PPROCESSOR_POWER_INFORMATION = PROCESSOR_POWER_INFORMATION*;
 
 // Master control thread to periodically wake the measurement threads.
 unsigned __stdcall HeartbeatThread( void* )
@@ -222,7 +223,7 @@ PLATFORM_INTERFACE CPUFrequencyResults GetCPUFrequencyResults( bool fGetDisabled
 	}
 
 	// Return zero initialized struct.
-	return CPUFrequencyResults();
+	return {};
 }
 
 PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
@@ -257,7 +258,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		// ensure that they will run promptly on a specific CPU.
 		for ( int i = 0; i < g_numCPUs; ++i )
 		{
-			HANDLE thread = (HANDLE)_beginthreadex( nullptr, 0x10000, MeasureThread, (void*)static_cast<intp>(i), 0, nullptr );
+			auto thread = (HANDLE)_beginthreadex( nullptr, 0x10000, MeasureThread, (void*)static_cast<intp>(i), 0, nullptr );
 			if (thread)
 			{
 				SetThreadAffinityMask( thread, static_cast<size_t>(1u) << i );

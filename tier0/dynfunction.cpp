@@ -8,7 +8,7 @@
 #if defined(WIN32)
 #include "winlite.h"
 
-typedef HMODULE LibraryHandle;
+using LibraryHandle = HMODULE;
 #define LoadLibraryHandle(libname) LoadLibrary(libname)
 #define CloseLibraryHandle(handle) FreeLibrary(handle)
 #define LookupInLibraryHandle(handle, fn) GetProcAddress(handle, fn)
@@ -63,7 +63,7 @@ public:
 		LibraryHandle m_handle;
 	};
 
-	CSharedLibraryCache() : m_pList(nullptr) {}
+	CSharedLibraryCache()  = default;
 	~CSharedLibraryCache() { CloseAllLibraries(); }
 
 	LibraryHandle GetHandle(const char *name)
@@ -127,7 +127,7 @@ private:
 		return nullptr;  // not found.
 	}
 
-	CSharedLibraryItem *m_pList;
+	CSharedLibraryItem *m_pList{nullptr};
 };
 
 void *VoidFnPtrLookup_Tier0(const char *libname, const char *fn, void *fallback)

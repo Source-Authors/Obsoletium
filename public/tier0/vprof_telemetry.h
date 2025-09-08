@@ -38,7 +38,7 @@ class CTelemetryLock
 {
 public:
 	CTelemetryLock(void *, const char *) {}
-	~CTelemetryLock() {}
+	~CTelemetryLock() = default;
 	void Locked() {}
 	void Unlocked() {}
 };
@@ -47,7 +47,7 @@ class CTelemetrySpikeDetector
 {
 public:
 	CTelemetrySpikeDetector( const char *, [[maybe_unused]] uint32 threshold = 50 ) {}
-	~CTelemetrySpikeDetector() { }
+	~CTelemetrySpikeDetector() = default;
 };
 
 #define TM_ZONE_DEFAULT( context ) 

@@ -94,7 +94,7 @@ static int64 GetQPCTime()
 static float QPCToMS( int64 nDelta )
 {
 	// Convert from a QPC delta to seconds.
-	float flSeconds = ( float )( nDelta / double( g_ETWRegister.m_frequency.QuadPart ) );
+	auto flSeconds = ( float )( nDelta / double( g_ETWRegister.m_frequency.QuadPart ) );
 
 	// Convert from seconds to milliseconds
 	return flSeconds * 1000;

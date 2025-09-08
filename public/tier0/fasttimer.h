@@ -32,22 +32,22 @@ public:
 	void			Init( float initTimeMsec );
 	void			Init( double initTimeMsec )		{ Init( static_cast<float>( initTimeMsec ) ); }
 	void			Init( uint64 cycles );
-	bool			IsLessThan( CCycleCount const &other ) const;					// Compare two counts.
+	[[nodiscard]] bool			IsLessThan( CCycleCount const &other ) const;					// Compare two counts.
 
 	// Convert to other time representations. These functions are slow, so it's preferable to call them
 	// during display rather than inside a timing block.
-	unsigned long	GetCycles()  const;
-	uint64			GetLongCycles() const;
+	[[nodiscard]] unsigned long	GetCycles()  const;
+	[[nodiscard]] uint64			GetLongCycles() const;
 
-	unsigned long	GetMicroseconds() const;
-	uint64			GetUlMicroseconds() const;
-	double			GetMicrosecondsF() const; 	
+	[[nodiscard]] unsigned long	GetMicroseconds() const;
+	[[nodiscard]] uint64			GetUlMicroseconds() const;
+	[[nodiscard]] double			GetMicrosecondsF() const; 	
 	void			SetMicroseconds( unsigned long nMicroseconds );
 
-	unsigned long	GetMilliseconds() const;
-	double			GetMillisecondsF() const;
+	[[nodiscard]] unsigned long	GetMilliseconds() const;
+	[[nodiscard]] double			GetMillisecondsF() const;
 
-	double			GetSeconds() const;
+	[[nodiscard]] double			GetSeconds() const;
 
 	CCycleCount&	operator+=( CCycleCount const &other );
 
@@ -80,8 +80,8 @@ public:
 	void				Start();
 	void				End();
 
-	const CCycleCount &	GetDuration() const;	// Get the elapsed time between Start and End calls.
-	CCycleCount 		GetDurationInProgress() const; // Call without ending. Not that cheap.
+	[[nodiscard]] const CCycleCount &	GetDuration() const;	// Get the elapsed time between Start and End calls.
+	[[nodiscard]] CCycleCount 		GetDurationInProgress() const; // Call without ending. Not that cheap.
 
 	// Return number of cycles per second on this processor.
 	static inline int64	GetClockSpeed();
@@ -203,14 +203,14 @@ public:
 	void Init();
 	void MarkIter( const CCycleCount &duration );
 	
-	unsigned GetIters() const;
+	[[nodiscard]] unsigned GetIters() const;
 	
-	double GetAverageMilliseconds() const;
-	double GetTotalMilliseconds() const;
-	double GetPeakMilliseconds() const;
+	[[nodiscard]] double GetAverageMilliseconds() const;
+	[[nodiscard]] double GetTotalMilliseconds() const;
+	[[nodiscard]] double GetPeakMilliseconds() const;
 
 private:
-	unsigned	m_nIters;
+	unsigned	m_nIters{ 0 };
 	CCycleCount m_Total;
 	CCycleCount	m_Peak;
 };
@@ -404,10 +404,7 @@ inline CCycleCount const& CFastTimer::GetDuration() const
 // -------------------------------------------------------------------------- // 
 // CAverageCycleCounter inlines
 
-inline CAverageCycleCounter::CAverageCycleCounter()
- :	m_nIters( 0 )
-{
-}
+inline CAverageCycleCounter::CAverageCycleCounter() = default;
 
 inline void CAverageCycleCounter::Init()
 {
@@ -471,10 +468,10 @@ public:
 	CLimitTimer() = default;
 	explicit CLimitTimer( uint64 cMicroSecDuration ) { SetLimit( cMicroSecDuration ); }
 	void SetLimit( uint64 m_cMicroSecDuration );
-	bool BLimitReached() const;
+	[[nodiscard]] bool BLimitReached() const;
 
-	int CMicroSecOverage() const;
-	uint64 CMicroSecLeft() const; 
+	[[nodiscard]] int CMicroSecOverage() const;
+	[[nodiscard]] uint64 CMicroSecLeft() const; 
 
 private:
 	uint64 m_lCycleLimit;

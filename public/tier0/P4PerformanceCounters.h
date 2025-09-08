@@ -70,7 +70,7 @@ enum Counters
 
 #pragma pack(push, 1)
 // access to these bits is through the methods
-typedef union ESCR
+using ESCR = union ESCR
 {
     struct
     {
@@ -87,9 +87,9 @@ typedef union ESCR
     };
     uint64 flat;
 
-} ESCR;
+};
 
-typedef union CCCR
+using CCCR = union CCCR
 {
     struct
     {
@@ -112,7 +112,7 @@ typedef union CCCR
     };
     uint64 flat;
 
-} CCCR;
+};
 
 #pragma pack(pop)
 

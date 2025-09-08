@@ -548,11 +548,17 @@ void Error( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_ERROR, pMsgFormat, args );
 	va_end(args);
+
+	// dimhotepus: Fix UB as ERROR must not return.
+	abort();
 }
 
 void ErrorV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist )
 {
 	_SpewMessage( SPEW_ERROR, pMsg, arglist );
+
+	// dimhotepus: Fix UB as ERROR must not return.
+	abort();
 }
 
 //-----------------------------------------------------------------------------

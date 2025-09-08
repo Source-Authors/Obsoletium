@@ -14,13 +14,13 @@ public:
 	CL2Cache();
 	~CL2Cache();
 
-	void Start( void );
-	void End( void );
+	void Start( );
+	void End( );
 
 	//-------------------------------------------------------------------------
 	// GetL2CacheMisses
 	//-------------------------------------------------------------------------
-	int GetL2CacheMisses() const
+	[[nodiscard]] int GetL2CacheMisses() const
 	{
 		return m_iL2CacheMissCount;
 	}

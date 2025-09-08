@@ -22,7 +22,7 @@
 
 #define Li2Double(x) ((double)((x).HighPart) * 4.294967296E9 + (double)((x).LowPart))
 
-typedef struct
+using SYSTEM_BASIC_INFORMATION = struct 
 {
 	DWORD dwUnknown1;
 	ULONG uKeMaximumIncrement;
@@ -37,24 +37,24 @@ typedef struct
 	BYTE bKeNumberProcessors;
 	BYTE bUnknown2;
 	WORD wUnknown3;
-} SYSTEM_BASIC_INFORMATION;
+};
 
-typedef struct
+using SYSTEM_PERFORMANCE_INFORMATION = struct
 {
 	LARGE_INTEGER liIdleTime;
 	DWORD dwSpare[80];
-} SYSTEM_PERFORMANCE_INFORMATION;
+};
 
-typedef struct
+using SYSTEM_TIME_INFORMATION = struct
 {
 	LARGE_INTEGER liKeBootTime;
 	LARGE_INTEGER liKeSystemTime;
 	LARGE_INTEGER liExpTimeZoneBias;
 	ULONG uCurrentTimeZoneId;
 	DWORD dwReserved;
-} SYSTEM_TIME_INFORMATION;
+};
 
-typedef LONG (WINAPI *PROCNTQSI)(UINT,PVOID,ULONG,PULONG);
+using PROCNTQSI = LONG (__stdcall *)(UINT, PVOID, ULONG, PULONG);
 
 static PROCNTQSI NtQuerySystemInformation;
 

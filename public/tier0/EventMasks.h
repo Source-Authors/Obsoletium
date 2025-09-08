@@ -8,7 +8,7 @@
 #define EVENT_TYPE(mode) EventType##mode
 #define EVENT_MASK(mode) EventMask##mode
 
-typedef union EVENT_MASK(TC_deliver_mode)
+using EVENT_MASK(TC_deliver_mode) = union EVENT_MASK(TC_deliver_mode)
 {
     struct 
     {
@@ -22,9 +22,9 @@ typedef union EVENT_MASK(TC_deliver_mode)
         uint16 IB:1; // logical processor 0 is inactive, 1 in build mode } 
     };
     uint16 flat;
-} EVENT_MASK(TC_deliver_mode);
+};
 
-typedef union EVENT_MASK(BPU_fetch_request)
+using EVENT_MASK(BPU_fetch_request) = union EVENT_MASK(BPU_fetch_request)
 {
 
     struct 
@@ -32,10 +32,10 @@ typedef union EVENT_MASK(BPU_fetch_request)
         uint16 TCMISS:1; // Trace cache lookup miss },
     };
     uint16 flat;
-} EVENT_MASK(BPU_fetch_request);
+};
 
 
-typedef union EVENT_MASK(ITLB_reference)
+using EVENT_MASK(ITLB_reference) = union EVENT_MASK(ITLB_reference)
 {
     struct 
     {
@@ -44,9 +44,9 @@ typedef union EVENT_MASK(ITLB_reference)
         uint16 HIT_UC :1; // Uncacheable ITLB hit } 
     };
     uint16 flat;
-} EVENT_MASK(ITLB_reference);
+};
 
-typedef union EVENT_MASK(memory_cancel)
+using EVENT_MASK(memory_cancel) = union EVENT_MASK(memory_cancel)
 {
     struct 
     {
@@ -56,9 +56,9 @@ typedef union EVENT_MASK(memory_cancel)
         uint16  _64K_CONF:1; //Conflicts due to 64K aliasing }         
     };
     uint16 flat;
-}EVENT_MASK(memory_cancel);
+};
 
-typedef union EVENT_MASK(memory_complete)
+using EVENT_MASK(memory_complete) = union EVENT_MASK(memory_complete)
 {
     struct 
     {
@@ -66,9 +66,9 @@ typedef union EVENT_MASK(memory_complete)
         uint16  SSC:1; //Any split stores completed } }
     };
     uint16 flat;
-} EVENT_MASK(memory_complete);
+};
 
-typedef union EVENT_MASK(load_port_replay)
+using EVENT_MASK(load_port_replay) = union EVENT_MASK(load_port_replay)
 {
     struct 
     {
@@ -76,9 +76,9 @@ typedef union EVENT_MASK(load_port_replay)
         uint16 SPLIT_LD:1; //Split load } }
     };
     uint16 flat;
-} EVENT_MASK(load_port_replay);
+};
 
-typedef union EVENT_MASK(store_port_replay)
+using EVENT_MASK(store_port_replay) = union EVENT_MASK(store_port_replay)
 {
     struct 
     {
@@ -87,9 +87,9 @@ typedef union EVENT_MASK(store_port_replay)
 
     };
     uint16 flat;
-} EVENT_MASK(store_port_replay);
+};
 
-typedef union EVENT_MASK(MOB_load_replay) 
+using EVENT_MASK(MOB_load_replay) = union EVENT_MASK(MOB_load_replay) 
 {
     struct 
     {
@@ -104,9 +104,9 @@ typedef union EVENT_MASK(MOB_load_replay)
         uint16 UNALGN_ADDR:1; //Replayed because the lower 4 bits of the linear address do not match between the load and store operations } }
     };
     uint16 flat;
-}EVENT_MASK(MOB_load_replay);
+};
 
-typedef union EVENT_MASK(page_walk_type)
+using EVENT_MASK(page_walk_type) = union EVENT_MASK(page_walk_type)
 {
     struct 
     {
@@ -114,10 +114,10 @@ typedef union EVENT_MASK(page_walk_type)
         uint16 ITMISS:1; // Page walk for an instruction TLB miss } }
     };
     uint16 flat;
-}EVENT_MASK(page_walk_type);
+};
 
 
-typedef union EVENT_MASK(BSQ_cache_reference) 
+using EVENT_MASK(BSQ_cache_reference) = union EVENT_MASK(BSQ_cache_reference) 
 {
     struct 
     {
@@ -134,9 +134,9 @@ typedef union EVENT_MASK(BSQ_cache_reference)
         uint16 WR_2ndL_MISS:1; // Writeback lookup from DAC misses the 2nd level cache } }
     };
     uint16 flat;
-} EVENT_MASK(BSQ_cache_reference) ;
+} ;
 
-typedef union EVENT_MASK(IOQ) 
+using EVENT_MASK(IOQ) = union EVENT_MASK(IOQ) 
 {
     struct 
     {
@@ -159,9 +159,9 @@ typedef union EVENT_MASK(IOQ)
         uint16 PREFETCH:1; // Include HW and SW prefetch requests } }
     };
     uint16 flat;
-} EVENT_MASK(IOQ) ;
+} ;
 
-typedef union EVENT_MASK(FSB_data_activity) 
+using EVENT_MASK(FSB_data_activity) = union EVENT_MASK(FSB_data_activity) 
 {
     struct 
     {
@@ -175,9 +175,9 @@ typedef union EVENT_MASK(FSB_data_activity)
         uint16 DBSY_OTHER:1; // Count when the bus is reserved for driving data this processor will not sample } }
     };
     uint16 flat;
-}EVENT_MASK(FSB_data_activity);
+};
 
-typedef union EVENT_MASK(BSQ) 
+using EVENT_MASK(BSQ) = union EVENT_MASK(BSQ) 
 {
     struct 
     {
@@ -197,9 +197,9 @@ typedef union EVENT_MASK(BSQ)
         uint16 MEM_TYPE2:1; // Memory type encoding bit 2 } }
     };
     uint16 flat;
-} EVENT_MASK(BSQ);
+};
 
-typedef union EVENT_MASK(firm_uop)
+using EVENT_MASK(firm_uop) = union EVENT_MASK(firm_uop)
 {
     struct 
     {
@@ -207,11 +207,11 @@ typedef union EVENT_MASK(firm_uop)
         uint16 ALL:1; // count all uops of this type } }
     };
     uint16 flat;
-} EVENT_MASK(firm_uop);
+};
 
 
 
-typedef union EVENT_MASK(TC_misc)
+using EVENT_MASK(TC_misc) = union EVENT_MASK(TC_misc)
 {
     struct 
     {
@@ -219,29 +219,29 @@ typedef union EVENT_MASK(TC_misc)
         uint16 FLUSH:1; // Number of flushes } }
     };
     uint16 flat;
-} EVENT_MASK(TC_misc);
+};
 
-typedef union EVENT_MASK(global_power_events)
+using EVENT_MASK(global_power_events) = union EVENT_MASK(global_power_events)
 {
     struct 
     {
         uint16 Running:1; // The processor is active } }
     };
     uint16 flat;
-} EVENT_MASK(global_power_events);
+};
 
-typedef union EVENT_MASK(tc_ms_xfer)
+using EVENT_MASK(tc_ms_xfer) = union EVENT_MASK(tc_ms_xfer)
 {
     struct 
     {
         uint16 CISC:1; // A TC to MS transfer ocurred } }
     };
     uint16 flat;
-}EVENT_MASK(tc_ms_xfer);
+};
 
 
 
-typedef union EVENT_MASK(uop_queue_writes) 
+using EVENT_MASK(uop_queue_writes) = union EVENT_MASK(uop_queue_writes) 
 {
     struct 
     {
@@ -250,9 +250,9 @@ typedef union EVENT_MASK(uop_queue_writes)
         uint16 FROM_ROM:1; // uops written from microcode ROM } }
     };
     uint16 flat;
-} EVENT_MASK(uop_queue_writes);
+};
 
-typedef union EVENT_MASK(branch_type) 
+using EVENT_MASK(branch_type) = union EVENT_MASK(branch_type) 
 {
     struct 
     {
@@ -263,11 +263,11 @@ typedef union EVENT_MASK(branch_type)
         uint16 INDIRECT:1; // Returns, indirect calls, or indirect jumps 
     };
     uint16 flat;
-} EVENT_MASK(branch_type);
+};
 
 
 
-typedef union EVENT_MASK(resource_stall) 
+using EVENT_MASK(resource_stall) = union EVENT_MASK(resource_stall) 
 {
     struct 
     {
@@ -275,12 +275,12 @@ typedef union EVENT_MASK(resource_stall)
         uint16 SBFULL:1; // A Stall due to lack of store buffers } }
     };
     uint16 flat;
-} EVENT_MASK(resource_stall);
+};
 
 
 
 
-typedef union EVENT_MASK(WC_Buffer) 
+using EVENT_MASK(WC_Buffer) = union EVENT_MASK(WC_Buffer) 
 {
     struct 
     {
@@ -291,10 +291,10 @@ typedef union EVENT_MASK(WC_Buffer)
         uint16 WCB_HITM_EVICT : 1; // store encountered a Hit Modified condition } }
     };
     uint16 flat;
-} EVENT_MASK(WC_Buffer);
+};
 
 
-typedef union EVENT_MASK(b2b_cycles) 
+using EVENT_MASK(b2b_cycles) = union EVENT_MASK(b2b_cycles) 
 {
     struct 
     {
@@ -308,9 +308,9 @@ typedef union EVENT_MASK(b2b_cycles)
 
     };
     uint16 flat;
-} EVENT_MASK(b2b_cycles);
+};
 
-typedef union EVENT_MASK(bnr) 
+using EVENT_MASK(bnr) = union EVENT_MASK(bnr) 
 {
     struct 
     {
@@ -319,10 +319,10 @@ typedef union EVENT_MASK(bnr)
         uint16 bit2:1; // 
     };
     uint16 flat;
-} EVENT_MASK(bnr);
+};
 
 
-typedef union EVENT_MASK(snoop)
+using EVENT_MASK(snoop) = union EVENT_MASK(snoop)
 {
     struct 
     {
@@ -337,10 +337,10 @@ typedef union EVENT_MASK(snoop)
         uint16 bit7:1; // 
     };
     uint16 flat;
-} EVENT_MASK(snoop);
+};
 
 
-typedef union EVENT_MASK(response) 
+using EVENT_MASK(response) = union EVENT_MASK(response) 
 {
     struct 
     {
@@ -356,10 +356,10 @@ typedef union EVENT_MASK(response)
         uint16 bit9:1; // 
     };
     uint16 flat;
-} EVENT_MASK(response);
+};
 
 
-typedef union EVENT_MASK(nbogus_bogus) 
+using EVENT_MASK(nbogus_bogus) = union EVENT_MASK(nbogus_bogus) 
 {
     struct 
     {
@@ -367,10 +367,10 @@ typedef union EVENT_MASK(nbogus_bogus)
         uint16 BOGUS:1; // The marked uops are bogus 
     };
     uint16 flat;
-} EVENT_MASK(nbogus_bogus);
+};
 
 
-typedef union EVENT_MASK(execution_event) 
+using EVENT_MASK(execution_event) = union EVENT_MASK(execution_event) 
 {
     struct 
     {
@@ -384,9 +384,9 @@ typedef union EVENT_MASK(execution_event)
         uint16 BOGUS3:1; // bogus uops with tag bit 3 set } }
     };
     uint16 flat;
-}EVENT_MASK(execution_event);
+};
 
-typedef union EVENT_MASK(instr_retired)
+using EVENT_MASK(instr_retired) = union EVENT_MASK(instr_retired)
 {
     struct 
     {
@@ -396,10 +396,10 @@ typedef union EVENT_MASK(instr_retired)
         uint16 BOGUSTAG:1; // Bogus instructions that are tagged } }
     };
     uint16 flat;
-} EVENT_MASK(instr_retired);
+};
 
 
-typedef union EVENT_MASK(uop_type) 
+using EVENT_MASK(uop_type) = union EVENT_MASK(uop_type) 
 {
     struct 
     {
@@ -408,9 +408,9 @@ typedef union EVENT_MASK(uop_type)
         uint16 TAGSTORES:1; // The uop is a store operation } }
     };
     uint16 flat;
-} EVENT_MASK(uop_type);
+};
 
-typedef union EVENT_MASK(branch_retired) 
+using EVENT_MASK(branch_retired) = union EVENT_MASK(branch_retired) 
 {
     struct 
     {
@@ -420,19 +420,19 @@ typedef union EVENT_MASK(branch_retired)
         uint16 MMTM:1; // Branch Taken Mispredicted 
     };
     uint16 flat;
-} EVENT_MASK(branch_retired);
+};
 
-typedef union EVENT_MASK(mispred_branch_retired) 
+using EVENT_MASK(mispred_branch_retired) = union EVENT_MASK(mispred_branch_retired) 
 {
     struct 
     {
         uint16 NBOGUS:1; // The retired branch is not bogus } }
     };
     uint16 flat;
-} EVENT_MASK(mispred_branch_retired);
+};
 
 
-typedef union EVENT_MASK(x87_assist) 
+using EVENT_MASK(x87_assist) = union EVENT_MASK(x87_assist) 
 {
     struct 
     {
@@ -443,9 +443,9 @@ typedef union EVENT_MASK(x87_assist)
         uint16 PREA:1; // x87 input assist } }
     };
     uint16 flat;
-}EVENT_MASK(x87_assist);
+};
 
-typedef union EVENT_MASK(machine_clear) 
+using EVENT_MASK(machine_clear) = union EVENT_MASK(machine_clear) 
 {
     struct 
     {
@@ -459,10 +459,10 @@ typedef union EVENT_MASK(machine_clear)
         uint16 SMCLEAR:1;// Count clears due to self-modifying code issues } }
     };
     uint16 flat;
-} EVENT_MASK(machine_clear);
+};
 
 
-typedef union EVENT_MASK(x87_SIMD_moves_uop) 
+using EVENT_MASK(x87_SIMD_moves_uop) = union EVENT_MASK(x87_SIMD_moves_uop) 
 {
     struct 
     {
@@ -471,6 +471,6 @@ typedef union EVENT_MASK(x87_SIMD_moves_uop)
         uint16 ALLP2:1; // count all x87/SIMD load uops } }
     };
     uint16 flat;
-} EVENT_MASK(x87_SIMD_moves_uop);
+};
 
 #endif  // !SE_PUBLIC_TIER0_EVENTMASKS_H_

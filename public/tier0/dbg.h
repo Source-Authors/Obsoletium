@@ -167,7 +167,7 @@ enum SpewRetval_t
 };
 
 /* type of externally defined function used to display debug spew */
-typedef SpewRetval_t (*SpewOutputFunc_t)( SpewType_t spewType, const tchar *pMsg );
+using SpewOutputFunc_t = SpewRetval_t (*)(SpewType_t, const tchar *);
 
 /* Used to redirect spew output */
 DBG_INTERFACE void SpewOutputFunc(SpewOutputFunc_t func);
@@ -233,7 +233,7 @@ DBG_INTERFACE bool AreAllAssertsDisabled();
 DBG_INTERFACE void SetAllAssertsDisabled( bool bAssertsEnabled );
 
 // Provides a callback that is called on asserts regardless of spew levels
-typedef void (*AssertFailedNotifyFunc_t)( const char *pchFile, int nLine, const char *pchMessage );
+using AssertFailedNotifyFunc_t = void (*)(const char *, int, const char *);
 DBG_INTERFACE void SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func );
 // dimhotepus: Add ^ which returns old assert failed notify.
 DBG_INTERFACE AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc2( AssertFailedNotifyFunc_t func );

@@ -96,8 +96,8 @@ public:
         Close();
     }
 
-    double GetCPUClockSpeedSlow( void );
-    double GetCPUClockSpeedFast( void );
+    double GetCPUClockSpeedSlow( );
+    double GetCPUClockSpeedFast( );
 
     long SelectP5P6PerformanceEvent( uint32 dw_event, uint32 dw_counter, bool b_user, bool b_kernel );
 
@@ -112,12 +112,12 @@ public:
     //---------------------------------------------------------------------------
     // Return the family of the processor
     //---------------------------------------------------------------------------
-    CPUVendor GetVendor() const
+    [[nodiscard]] CPUVendor GetVendor() const
     {
         return vendor;
     }
 
-    int GetProcessorFamily() const
+    [[nodiscard]] int GetProcessorFamily() const
     {
         return version.Family;
     }

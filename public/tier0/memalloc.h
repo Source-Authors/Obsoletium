@@ -36,7 +36,7 @@ struct _CrtMemState;
 
 constexpr inline int MEMALLOC_VERSION{1};
 
-typedef size_t (*MemAllocFailHandler_t)( size_t );
+using MemAllocFailHandler_t = size_t (*)(size_t);
 
 //-----------------------------------------------------------------------------
 // NOTE! This should never be called directly from leaf code
@@ -70,7 +70,7 @@ public:
 	virtual	int CrtSetReportMode( int nReportType, int nReportMode ) = 0;
 	virtual int CrtIsValidHeapPointer( const void *pMem ) = 0;
 	virtual int CrtIsValidPointer( const void *pMem, unsigned int size, int access ) = 0;
-	virtual int CrtCheckMemory( void ) = 0;
+	virtual int CrtCheckMemory( ) = 0;
 	virtual int CrtSetDbgFlag( int nNewFlag ) = 0;
 	virtual void CrtMemCheckpoint( _CrtMemState *pState ) = 0;
 
@@ -178,7 +178,7 @@ inline void *MemAlloc_AllocAligned( size_t size, size_t align )
 	if ( (pAlloc = static_cast<unsigned char*>(g_pMemAlloc->Alloc( sizeof(void *) + align + size ) )) == nullptr)
 		return nullptr;
 
-	alignas(unsigned char**) unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
+	alignas(unsigned char**) auto *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
 	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc; //-V206
 
 	return pResult;
@@ -195,7 +195,7 @@ inline void *MemAlloc_AllocAligned( size_t size, size_t align, const char *pszFi
 	if ( (pAlloc = static_cast<unsigned char*>(g_pMemAlloc->Alloc( sizeof(void *) + align + size, pszFile, nLine ) )) == nullptr)
 		return nullptr;
 
-	alignas(unsigned char**) unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
+	alignas(unsigned char**) auto *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
 	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc; //-V206
 
 	return pResult;
@@ -212,7 +212,7 @@ inline void *MemAlloc_AllocAlignedUnattributed( size_t size, size_t align )
 	if ( (pAlloc = static_cast<unsigned char*>(MemAlloc_Alloc( sizeof(void *) + align + size ) )) == nullptr)
 		return nullptr;
 
-	alignas(unsigned char**) unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
+	alignas(unsigned char**) auto *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
 	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc; //-V206
 
 	return pResult;
@@ -229,7 +229,7 @@ inline void *MemAlloc_AllocAlignedFileLine( size_t size, size_t align, const cha
 	if ( (pAlloc = static_cast<unsigned char*>(MemAlloc_Alloc( sizeof(void *) + align + size, pszFile, nLine ) )) == nullptr)
 		return nullptr;
 
-	alignas(unsigned char**) unsigned char *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
+	alignas(unsigned char**) auto *pResult = reinterpret_cast<unsigned char*>( reinterpret_cast<size_t>(pAlloc + sizeof(void *) + align ) & ~align );
 	(reinterpret_cast<unsigned char**>(pResult))[-1] = pAlloc; //-V206
 
 	return pResult;

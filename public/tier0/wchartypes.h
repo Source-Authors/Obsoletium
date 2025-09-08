@@ -22,18 +22,18 @@ typedef unsigned short wchar_t;
 // char8 is equivalent to char, and should be used when you really need a char
 // (for example, when calling an external function that's declared to take
 // chars).
-typedef char char8;
+using char8 = char;
 
 // uint8
 // uint8 is equivalent to byte (but is preferred over byte for clarity).  Use this
 // whenever you mean a byte (for example, one byte of a network packet).
-typedef unsigned char uint8;
-typedef unsigned char byte;
+using uint8 = unsigned char;
+using byte = unsigned char;
 
 // wchar
 // wchar is a single character of text (currently 16 bits, as all of our text is
 // Unicode).  Use this whenever you mean a piece of text (for example, in a string).
-typedef wchar_t wchar;
+using wchar = wchar_t;
 //typedef char wchar;
 
 // __WFILE__
@@ -74,15 +74,15 @@ typedef wchar tchar;
 #define __TFILE__ __WFILE__
 #define TCHAR_IS_WCHAR
 #else
-typedef char tchar;
+using tchar = char;
 #define tstring std::string
 #define __TFILE__ __FILE__
 #define TCHAR_IS_CHAR
 #endif
 
 #if defined( WIN32 )
-typedef wchar_t uchar16;
-typedef unsigned int uchar32;
+using uchar16 = wchar_t;
+using uchar32 = unsigned int;
 #else
 typedef unsigned short uchar16;
 typedef wchar_t uchar32;

@@ -66,10 +66,12 @@ void Plat_SetBenchmarkMode( bool bBenchmark )
 }
 
 
-#define N_ITERATIONS_OF_RDTSC_TEST_TO_RUN 5					// should be odd
-#define TEST_RDTSC_FLOATTIME 0
+enum {
+  N_ITERATIONS_OF_RDTSC_TEST_TO_RUN = 5,					// should be odd
+  TEST_RDTSC_FLOATTIME = 0
+};
 
-size_t ApproximateProcessMemoryUsage( void )
+size_t ApproximateProcessMemoryUsage( )
 {
 /*
 From https://man7.org/linux/man-pages/man5/proc.5.html:
@@ -369,7 +371,7 @@ struct tm *Plat_localtime( const time_t *timep, struct tm *result )
 
 bool vtune( bool resume )
 {
-  return 0;
+  return false;
 }
 
 
@@ -383,7 +385,7 @@ PLATFORM_INTERFACE void Plat_DefaultAllocErrorFn( unsigned long size )
 {
 }
 
-typedef void (*Plat_AllocErrorFn)( unsigned long size );
+using Plat_AllocErrorFn = void (*)(unsigned long);
 Plat_AllocErrorFn g_AllocError = Plat_DefaultAllocErrorFn;
 
 PLATFORM_INTERFACE void* Plat_Alloc( unsigned long size )
@@ -660,7 +662,7 @@ static bool s_bInittedWD = false;
 static int s_WatchdogTime = 0;
 static Plat_WatchDogHandlerFunction_t s_pWatchDogHandlerFunction;
 
-static void InitWatchDogTimer( void )
+static void InitWatchDogTimer( )
 {
 	if( !strstr( g_CmdLine, "-nowatchdog" ) )
 	{
@@ -739,7 +741,7 @@ PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFun
 #include <tier1/utlvector.h>
      
 #define MEMALLOC_HASHSIZE 8193
-typedef uint32 ptrint_t;
+using ptrint_t = uint32;
 
 
 
@@ -767,7 +769,7 @@ struct CLinuxMallocContext
 	int m_nLastAllocSize;
 
 
-	CLinuxMallocContext( void )
+	CLinuxMallocContext( )
 	{
 		memset( this, 0, sizeof( *this ) );
 	}
@@ -807,7 +809,7 @@ static CUtlIntrusiveDList<RememberedAlloc_t> s_AddressData[MEMALLOC_HASHSIZE];
 
 static struct RememberedAlloc_t *FindAddress( void *pAdr, int *pHash = nullptr )
 {
-	ptrint_t nAdr = ( ptrint_t ) pAdr;
+	auto nAdr = ( ptrint_t ) pAdr;
 	int nHash = AddressHash( nAdr );
 	if ( pHash )
 		*pHash = nHash;
@@ -865,7 +867,7 @@ static void AddMemoryAllocation( void *pResult, size_t size )
 		g_LinuxMemStats.nNumMallocsInUse++;
 		g_LinuxMemStats.nTotalMallocInUse += size;
 
-		RememberedAlloc_t *pNew = new RememberedAlloc_t;
+		auto *pNew = new RememberedAlloc_t;
 		pNew->m_nAddress = ( ptrint_t ) pResult;
 		pNew->m_nSize = size;
 		s_AddressData[AddressHash( pNew->m_nAddress )].AddToHead( pNew );
@@ -878,9 +880,9 @@ static void AddMemoryAllocation( void *pResult, size_t size )
 			pTraceBack[n] = nullptr;
 
 		uint32 nHash = 0;
-		for( int i = 0; i < MAX_STACK_TRACEBACK; i++ )
+		for(auto & i : pTraceBack)
 		{
-			nHash = ( nHash * 3 ) + ( ( ptrint_t ) pTraceBack[i] );
+			nHash = ( nHash * 3 ) + ( ( ptrint_t ) i );
 		}
 		nHash %= MEMALLOC_HASHSIZE;
 
@@ -1111,7 +1113,7 @@ void DumpChangedMemory( int nThresh )
 	InstallHooks();
 }
 
-void SetMemoryMark( void )
+void SetMemoryMark( )
 {
 	AUTO_LOCK( s_MemoryMutex );
 	for( int i =0 ; i < MEMALLOC_HASHSIZE; i++ )
@@ -1124,7 +1126,7 @@ void SetMemoryMark( void )
 }
 
 
-void DumpMemorySummary( void )
+void DumpMemorySummary( )
 {
 	Msg( "Total memory in use = %d, NumMallocs=%d, Num Frees=%d approx process usage=%ul\n", g_LinuxMemStats.nTotalMallocInUse, g_LinuxMemStats.nNumMallocs, g_LinuxMemStats.nNumFrees,
 		 (unsigned int)ApproximateProcessMemoryUsage() );

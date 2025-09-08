@@ -417,7 +417,7 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 		{
 			const size_t wcharsNeeded = mbstowcs( nullptr, pszName, INT_MAX );
 			const size_t descriptionSize = (wcharsNeeded + 1) * sizeof(wchar_t);
-			wchar_t *description = static_cast<wchar_t*>( stackalloc( descriptionSize ) );
+			auto *description = static_cast<wchar_t*>( stackalloc( descriptionSize ) );
 
 			[[maybe_unused]] const size_t wcharsConverted = mbstowcs( description, pszName, descriptionSize );
 			Assert( wcharsNeeded == wcharsConverted );
@@ -955,9 +955,9 @@ bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, 
 {
 	Assert( ( (size_t)pDest % 16 ) == 0 );
 
-	volatile int64 *pDest64 = ( volatile int64 * )pDest;
-	int64 *pValue64 = ( int64 * )&value;
-	int64 *pComperand64 = ( int64 * )&comperand;
+	volatile auto *pDest64 = ( volatile int64 * )pDest;
+	auto *pValue64 = ( int64 * )&value;
+	auto *pComperand64 = ( int64 * )&comperand;
 
 	// Description:
 	//  The CMPXCHG16B instruction compares the 128-bit value in the RDX:RAX and RCX:RBX registers
@@ -1293,7 +1293,9 @@ bool CThreadMutex::TryLock()
 //
 //-----------------------------------------------------------------------------
 
-#define THREAD_SPIN (8*1024)
+enum {
+  THREAD_SPIN = (8*1024)
+};
 
 void CThreadFastMutex::Lock( const ThreadId_t threadId, unsigned nSpinSleepTime ) 
 {

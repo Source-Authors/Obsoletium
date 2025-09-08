@@ -84,7 +84,7 @@ public:
 	virtual void		Read( void *pDest, int size ) = 0;
 };
 
-typedef struct VCR_s
+using VCR_t = struct VCR_s
 {
 	// Start VCR record or play.
 	int			(*Start)( tchar const *pFilename, bool bRecord, IVCRHelpers *pHelpers );
@@ -205,7 +205,7 @@ typedef struct VCR_s
 
 	unsigned long (*Hook_WaitForMultipleObjects)( uint32 nHandles, const void **pHandles, int bWaitAll, uint32 timeout );
 
-} VCR_t;
+};
 
 #ifndef NO_VCR
 

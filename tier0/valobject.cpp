@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include "pch_tier0.h"
+#include "stdafx.h"
 #include "vstdlib/pch_vstdlib.h"
 
 #ifdef DBGFLAG_VALIDATE

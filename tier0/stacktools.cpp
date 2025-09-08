@@ -113,7 +113,7 @@ public:
 
 inline intp AppendParentStackTrace( void **pReturnAddressesOut, intp iArrayCount, intp iAlreadyFilled )
 {
-	CStackTop_FriendFuncs *pTop = (CStackTop_FriendFuncs *)(CStackTop_Base *)g_StackTop;
+	auto *pTop = (CStackTop_FriendFuncs *)(CStackTop_Base *)g_StackTop;
 	if( pTop != nullptr )
 	{
 		if( pTop->m_pReplaceAddress != nullptr )
@@ -356,7 +356,7 @@ USHORT WINAPI CaptureStackBackTrace_DummyFn( IN ULONG, IN ULONG, OUT PVOID *, OU
 class CHelperFunctionsLoader
 {
 public:
-	CHelperFunctionsLoader( void )
+	CHelperFunctionsLoader( )
 	{
 		m_bIsInitialized = false;
 		m_bShouldReloadSymbols = false;
@@ -386,7 +386,7 @@ public:
 #endif
 	}
 
-	~CHelperFunctionsLoader( void )
+	~CHelperFunctionsLoader( )
 	{
 		m_pSymCleanup( m_hProcess );
 
@@ -416,7 +416,7 @@ public:
 		return TRUE;
 	}
 
-	void TryLoadingNewSymbols( void )
+	void TryLoadingNewSymbols( )
 	{
 		AUTO_LOCK( m_Mutex );
 
@@ -524,7 +524,7 @@ public:
 	}
 
 	//only returns false if we ran out of buffer space.
-	bool TranslatePointer( const void * const pAddress, tchar *pTranslationOut, intp iTranslationBufferLength, TranslateStackInfo_StyleFlags_t style )
+	bool TranslatePointer( const void * const pAddress, tchar *pTranslationOut, intp &iTranslationBufferLength, TranslateStackInfo_StyleFlags_t style )
 	{
 		//AUTO_LOCK( m_Mutex );
 
@@ -663,7 +663,6 @@ public:
 						return false;
 					}
 
-					pWrite += nBytesWritten;
 					iTranslationBufferLength -= nBytesWritten;
 				}
 			}
@@ -681,7 +680,7 @@ public:
 
 
 	//about to actually use the functions, load if necessary
-	void EnsureReady( void )
+	void EnsureReady( )
 	{
 		if( m_bIsInitialized )
 		{
@@ -1047,7 +1046,7 @@ CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStack
 #endif //#if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 }
 
-CStackTop_CopyParentStack::~CStackTop_CopyParentStack( void )
+CStackTop_CopyParentStack::~CStackTop_CopyParentStack( )
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	Assert( (CStackTop_Base *)g_StackTop == this );
@@ -1095,7 +1094,7 @@ CStackTop_ReferenceParentStack::CStackTop_ReferenceParentStack( void * const *pP
 #endif //#if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 }
 
-CStackTop_ReferenceParentStack::~CStackTop_ReferenceParentStack( void )
+CStackTop_ReferenceParentStack::~CStackTop_ReferenceParentStack( )
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	Assert( (CStackTop_Base *)g_StackTop == this );
@@ -1105,7 +1104,7 @@ CStackTop_ReferenceParentStack::~CStackTop_ReferenceParentStack( void )
 #endif
 }
 
-void CStackTop_ReferenceParentStack::ReleaseParentStackReferences( void )
+void CStackTop_ReferenceParentStack::ReleaseParentStackReferences( )
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	m_pParentStackTrace = nullptr;
@@ -1129,7 +1128,7 @@ intp EncodeBinaryToString( const void *pToEncode, intp iDataLength, char *pEncod
 	if( (iEncodedSize > iEncodeBufferSize) || (pEncodeOut == nullptr) || (pToEncode == nullptr) )
 		return -iEncodedSize; //not enough room
 
-	uint8 *pEncodeWrite = (uint8 *)pEncodeOut;	
+	auto *pEncodeWrite = (uint8 *)pEncodeOut;	
 
 	//first encode the data size. Encodes lowest 28 bits and discards the high 4
 	pEncodeWrite[0] = ((iDataLength >> 21) & 0xFF) | 0x80;
@@ -1138,7 +1137,7 @@ intp EncodeBinaryToString( const void *pToEncode, intp iDataLength, char *pEncod
 	pEncodeWrite[3] = ((iDataLength >> 0) & 0xFF) | 0x80;
 	pEncodeWrite += 4;
 
-	const uint8 *pEncodeRead = (const uint8 *)pToEncode;
+	const auto *pEncodeRead = (const uint8 *)pToEncode;
 	const uint8 *pEncodeStop = pEncodeRead + iDataLength;
 	uint8 *pEncodeWriteLastControlByte = pEncodeWrite;
 	intp iControl = 0;
@@ -1174,7 +1173,7 @@ intp EncodeBinaryToString( const void *pToEncode, intp iDataLength, char *pEncod
 //	all other negative values are the negative of how much dest buffer size is necessary.
 intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestBufferSize, const char **ppParseFinishOut )
 {
-	const uint8 *pDecodeRead = (const uint8 *)pString;
+	const auto *pDecodeRead = (const uint8 *)pString;
 
 	if( (pDecodeRead[0] < 0x80) || (pDecodeRead[1] < 0x80) || (pDecodeRead[2] < 0x80) || (pDecodeRead[3] < 0x80) )
 	{
@@ -1215,7 +1214,7 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 	}
 
 	const uint8 *pStopDecoding = pDecodeRead + iTextLength;		
-	uint8 *pDecodeWrite = (uint8 *)pDestBuffer;
+	auto *pDecodeWrite = (uint8 *)pDestBuffer;
 	intp iControl = 0;
 	intp iLSBXOR = 0;
 

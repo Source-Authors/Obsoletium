@@ -15,16 +15,16 @@ PLATFORM_INTERFACE void SetMinidumpComment( const char *pszComment );
 // writes out a minidump of the current stack trace with a unique filename
 PLATFORM_INTERFACE void WriteMiniDump( const char *pszFilenameSuffix = nullptr );
 
-typedef void (*FnWMain)( int , tchar *[] );
-typedef void (*FnVoidPtrFn)( void * );
+using FnWMain = void (*)(int, tchar **);
+using FnVoidPtrFn = void (*)(void *);
 
 #if defined(_WIN32) && !defined(_X360)
 
 // calls the passed in function pointer and catches any exceptions/crashes thrown by it, and writes a minidump
 // use from wmain() to protect the whole program
-typedef void (*FnWMain)( int , tchar *[] );
-typedef int (*FnWMainIntRet)( int , tchar *[] );
-typedef void (*FnVoidPtrFn)( void * );
+using FnWMain = void (*)(int, tchar **);
+using FnWMainIntRet = int (*)(int, tchar **);
+using FnVoidPtrFn = void (*)(void *);
 
 enum ECatchAndWriteMinidumpAction
 {
@@ -48,7 +48,7 @@ struct _EXCEPTION_POINTERS;
 // Returns the previously-set function.
 // The function is called internally by WriteMiniDump() and CatchAndWriteMiniDump()
 // The default is the built-in function that uses DbgHlp.dll's MiniDumpWriteDump function
-typedef void (*FnMiniDump)( unsigned int uStructuredExceptionCode, _EXCEPTION_POINTERS * pExceptionInfo, const char *pszFilenameSuffix );
+using FnMiniDump = void (*)(unsigned int, _EXCEPTION_POINTERS *, const char *);
 PLATFORM_INTERFACE FnMiniDump SetMiniDumpFunction( FnMiniDump pfn );
 
 // Use this to write a minidump explicitly.

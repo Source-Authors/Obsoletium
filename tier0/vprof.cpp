@@ -64,7 +64,7 @@ CVProfNode *CVProfNode::GetSubNode( const tchar *pszName, int detailLevel, const
 	}
 
 	// We didn't find it, so add it
-	CVProfNode * node = new CVProfNode( pszName, detailLevel, this, pBudgetGroupName, budgetFlags );
+	auto * node = new CVProfNode( pszName, detailLevel, this, pBudgetGroupName, budgetFlags );
 	node->m_pSibling = m_pChild;
 	m_pChild = node;
 	return node;
@@ -476,7 +476,7 @@ void CVProfile::DumpNodes( CVProfNode *pNode, int indent, bool bAverageAndCountO
 
 	if ( !fIsRoot )
 	{
-		map<CVProfNode *, double>::iterator iterTimeLessChildren = g_TimesLessChildren.find( pNode );
+		auto iterTimeLessChildren = g_TimesLessChildren.find( pNode );
 		
 		indent = Max( indent, 0 );
 		indent = Min( indent, (int)ssize( s_indentText ) - 1 );
@@ -830,14 +830,14 @@ int CVProfile::FindBudgetGroupName( const tchar *pBudgetGroupName )
 int CVProfile::AddBudgetGroupName( const tchar *pBudgetGroupName, int budgetFlags )
 {
 	MEM_ALLOC_CREDIT();
-	tchar *pNewString = new tchar[ _tcslen( pBudgetGroupName ) + 1 ];
+	auto *pNewString = new tchar[ _tcslen( pBudgetGroupName ) + 1 ];
 	_tcscpy( pNewString, pBudgetGroupName );
 	if( m_nBudgetGroupNames + 1 > m_nBudgetGroupNamesAllocated )
 	{
 		m_nBudgetGroupNamesAllocated *= 2;
 		m_nBudgetGroupNamesAllocated = max( m_nBudgetGroupNames + 6, m_nBudgetGroupNamesAllocated );
 		
-		CBudgetGroup *pNew = new CBudgetGroup[ m_nBudgetGroupNamesAllocated ];
+		auto *pNew = new CBudgetGroup[ m_nBudgetGroupNamesAllocated ];
 		for ( int i=0; i < m_nBudgetGroupNames; i++ )
 			pNew[i] = m_pBudgetGroups[i];
 		
@@ -875,12 +875,12 @@ int CVProfile::BudgetGroupNameToBudgetGroupID( const tchar *pBudgetGroupName )
 	return BudgetGroupNameToBudgetGroupID( pBudgetGroupName, BUDGETFLAG_OTHER );
 }
 
-int CVProfile::GetNumBudgetGroups( void )
+int CVProfile::GetNumBudgetGroups( )
 {
 	return m_nBudgetGroupNames;
 }
 
-void CVProfile::RegisterNumBudgetGroupsChangedCallBack( void (*pCallBack)(void) )
+void CVProfile::RegisterNumBudgetGroupsChangedCallBack( void (*pCallBack)() )
 {
 	m_pNumBudgetGroupsChangedCallBack = pCallBack;
 }
@@ -916,7 +916,7 @@ uintp *CVProfile::FindOrCreateCounter( const tchar *pName, CounterGroup_t eCount
 
 	// NOTE: These get freed in ~CVProfile.
 	MEM_ALLOC_CREDIT();
-	tchar *pNewName = new tchar[_tcslen( pName ) + 1];
+	auto *pNewName = new tchar[_tcslen( pName ) + 1];
 	_tcscpy( pNewName, pName );
 	m_Counters[m_NumCounters] = 0;
 	m_CounterGroups[m_NumCounters] = static_cast<char>(to_underlying(eCounterGroup));
