@@ -26,7 +26,7 @@
 #include <tchar.h>
 #include <ImageHlp.h>
 #include "tier0/valve_on.h"
-#include "ExtendedTrace.h"
+#include "extendedtrace.h"
 
 #define BUFFERSIZE   0x200
 
@@ -209,7 +209,7 @@ BOOL GetFunctionInfoFromAddresses( ULONG fnAddress, ULONG stackAddress, LPTSTR l
 				*lpszParamSep = _T('\0');
 
 				_tcscat( lpszSymbol, lpszParsed );
-				_stprintf( lpszSymbol + _tcslen(lpszSymbol), _T("=0x%08X,"), *((ULONG*)(stackAddress) + 2 + index) );
+				_stprintf( lpszSymbol + _tcslen(lpszSymbol), _T("=0x%08lX,"), *((ULONG*)(stackAddress) + 2 + index) );
 
 				lpszParsed = lpszParamSep + 1;
 			}
@@ -220,7 +220,7 @@ BOOL GetFunctionInfoFromAddresses( ULONG fnAddress, ULONG stackAddress, LPTSTR l
 				*lpszParamSep = _T('\0');
 
 				_tcscat( lpszSymbol, lpszParsed );
-				_stprintf( lpszSymbol + _tcslen(lpszSymbol), _T("=0x%08X)"), *((ULONG*)(stackAddress) + 2 + index) );
+				_stprintf( lpszSymbol + _tcslen(lpszSymbol), _T("=0x%08lX)"), *((ULONG*)(stackAddress) + 2 + index) );
 
 				lpszParsed = lpszParamSep + 1;
 			}
@@ -257,7 +257,7 @@ BOOL GetSourceInfoFromAddress( UINT address, LPTSTR lpszSourceInfo )
 	{
 	   // Got it. Let's use "sourcefile(linenumber)" format
 		PCSTR2LPTSTR( lineInfo.FileName, lpszFileName );
-		_stprintf( lpszSourceInfo, _T("%s(%d)"), lpszFileName, lineInfo.LineNumber );
+		_stprintf( lpszSourceInfo, _T("%s(%lu)"), lpszFileName, lineInfo.LineNumber );
 		ret = TRUE;
 	}
 	else
