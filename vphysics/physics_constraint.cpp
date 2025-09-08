@@ -59,7 +59,7 @@ extern void qh_srand( int seed);
 #include "tier0/memdbgon.h"
 
 
-const float UNBREAKABLE_BREAK_LIMIT = 1e12f;
+constexpr inline float UNBREAKABLE_BREAK_LIMIT = 1e12f;
 
 hk_Vector3 TransformHLWorldToHavanaLocal( const Vector &hlWorld, IVP_Real_Object *pObject )
 {

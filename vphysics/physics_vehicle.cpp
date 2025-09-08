@@ -221,7 +221,7 @@ inline bool IsMoveable( IVP_Real_Object *pObject )
 
 inline bool IVPFloatPointIsZero( const IVP_U_Float_Point &test )
 {
-	const float eps = 1e-4f;
+	constexpr float eps = 1e-4f;
 	return test.quad_length() < eps ? true : false;
 }
 

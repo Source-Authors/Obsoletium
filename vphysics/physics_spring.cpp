@@ -177,7 +177,7 @@ void CPhysicsSpring::SetSpringLength( float flSpringLength )
 		float desiredLengthIVP = ConvertDistanceToIVP(flSpringLength);
 
 		// must change enough, or skip to keep objects sleeping
-		const float SPRING_LENGTH_EPSILON = 1e-3f;
+		constexpr float SPRING_LENGTH_EPSILON = 1e-3f;
 		if ( fabs(desiredLengthIVP-currentLengthIVP) < ConvertDistanceToIVP(SPRING_LENGTH_EPSILON)  )
 			return;
 
