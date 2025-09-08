@@ -313,14 +313,20 @@ void StackTrace( HANDLE hThread, LPCTSTR lpszMessage )
 
 	if ( !GetThreadContext( hThread, &context ) )
 	{
-      OutputDebugStringFormat( _T("Call stack info(thread=0x%X) failed.\n") );
+	   OutputDebugStringFormat( _T("Call stack info(thread=0x%X) failed.\n") );
 	   return;
 	}
 	
 	::ZeroMemory( &callStack, sizeof(callStack) );
+#ifndef _WIN64
 	callStack.AddrPC.Offset    = context.Eip;
 	callStack.AddrStack.Offset = context.Esp;
 	callStack.AddrFrame.Offset = context.Ebp;
+#else	
+	callStack.AddrPC.Offset    = context.Rip;
+	callStack.AddrStack.Offset = context.Rsp;
+	callStack.AddrFrame.Offset = context.Rbp;
+#endif
 	callStack.AddrPC.Mode      = AddrModeFlat;
 	callStack.AddrStack.Mode   = AddrModeFlat;
 	callStack.AddrFrame.Mode   = AddrModeFlat;
@@ -373,9 +379,15 @@ void FunctionParameterInfo()
 	}
 	
 	::ZeroMemory( &callStack, sizeof(callStack) );
+#ifndef _WIN64
 	callStack.AddrPC.Offset    = context.Eip;
 	callStack.AddrStack.Offset = context.Esp;
 	callStack.AddrFrame.Offset = context.Ebp;
+#else	
+	callStack.AddrPC.Offset    = context.Rip;
+	callStack.AddrStack.Offset = context.Rsp;
+	callStack.AddrFrame.Offset = context.Rbp;
+#endif
 	callStack.AddrPC.Mode      = AddrModeFlat;
 	callStack.AddrStack.Mode   = AddrModeFlat;
 	callStack.AddrFrame.Mode   = AddrModeFlat;
