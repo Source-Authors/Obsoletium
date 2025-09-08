@@ -12,11 +12,6 @@
 #include "vphysics/constraints.h"
 #include "isaverestore.h"
 
-// HACKHACK: Mathlib defines this too!
-#undef clamp
-#undef max
-#undef min
-
 // new havana constraint class
 #include "hk_physics/physics.h"
 #include "hk_physics/constraint/constraint.h"
