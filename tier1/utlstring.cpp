@@ -209,7 +209,8 @@ bool CUtlString::operator==( const CUtlString &src ) const
 			return false;
 		}
 
-		return Q_strcmp( m_pString, src.m_pString ) == 0;
+		// dimhotepus: Speedup equality check by directly comparing pointers.
+		return m_pString == src.m_pString || Q_strcmp(m_pString, src.m_pString) == 0;
 	}
 }
 
