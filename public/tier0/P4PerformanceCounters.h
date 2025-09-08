@@ -1,7 +1,10 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_P4PERFORMANCECOUNTERS_H_
-#define TIER0_P4PERFORMANCECOUNTERS_H_
+#ifndef SE_PUBLIC_TIER0_P4PERFORMANCECOUNTERS_H_
+#define SE_PUBLIC_TIER0_P4PERFORMANCECOUNTERS_H_
+
+#include "basetypes.h"
+#include "PMELib.h"
 
 // Pentium 4 support
 
@@ -305,7 +308,7 @@ public:
     }
 };
 
-#include "tier0/EventMasks.h" 
-#include "tier0/EventModes.h" 
+#include "EventMasks.h" 
+#include "EventModes.h" 
 
-#endif   // TIER0_P4PERFORMANCECOUNTERS_H_
+#endif   // !SE_PUBLIC_TIER0_P4PERFORMANCECOUNTERS_H_

@@ -3,15 +3,15 @@
 // Purpose:	All of our code is completely Unicode.  Instead of char, you should
 // use wchar, uint8, or char8, as explained below.
 
-#ifndef TIER0_WCHARTYPES_H_
-#define TIER0_WCHARTYPES_H_
+#ifndef SE_PUBLIC_TIER0_WCHARTYPES_H_
+#define SE_PUBLIC_TIER0_WCHARTYPES_H_
 
 #ifdef _INC_TCHAR
 #error "Must include tier0 type headers before tchar.h"
 #endif
 
 // Temporarily turn off Valve defines
-#include "tier0/valve_off.h"
+#include "valve_off.h"
 
 #if !defined(_WCHAR_T_DEFINED) && !defined(GNUC)
 typedef unsigned short wchar_t;
@@ -93,7 +93,7 @@ typedef wchar_t uchar32;
 #endif
 
 // Turn valve defines back on
-#include "tier0/valve_on.h"
+#include "valve_on.h"
 
 
-#endif  // TIER0_WCHARTYPES_H_
+#endif  // !SE_PUBLIC_TIER0_WCHARTYPES_H_

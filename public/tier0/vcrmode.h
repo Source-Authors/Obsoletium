@@ -7,16 +7,16 @@
 // Most of the VCR mode functionality is accomplished through hooks
 // called at various points in the engine.
 
-#ifndef TIER0_VCRMODE_H_
-#define TIER0_VCRMODE_H_
+#ifndef SE_PUBLIC_TIER0_VCRMODE_H_
+#define SE_PUBLIC_TIER0_VCRMODE_H_
 
 #ifdef _WIN32
 #include <process.h>
 #endif
 
-#include "tier0/platform.h"
-#include "tier0/vcr_shared.h"
-#include "tier0/dbg.h"
+#include "platform.h"
+#include "vcr_shared.h"
+#include "dbg.h"
 
 #ifdef _WIN32
 using socket_handle = uintp;
@@ -296,4 +296,4 @@ PLATFORM_INTERFACE VCR_t *g_pVCR;
 #define VCRHook_Time							Time
 #endif
 
-#endif  // TIER0_VCRMODE_H_
+#endif  // !SE_PUBLIC_TIER0_VCRMODE_H_

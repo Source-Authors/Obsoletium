@@ -1,28 +1,28 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_BASETYPES_H_
-#define TIER0_BASETYPES_H_
+#ifndef SE_PUBLIC_TIER0_BASETYPES_H_
+#define SE_PUBLIC_TIER0_BASETYPES_H_
 
-#include "tier0/commonmacros.h"
-#include "tier0/wchartypes.h"
+#include "commonmacros.h"
+#include "wchartypes.h"
 
 #include <cstdint>
 #include <cstddef>  // std::ptrdiff_t
 #include <limits>   // std::numeric_limits
 
-#include "tier0/valve_off.h"
+#include "valve_off.h"
 
 // This is a trick to get the DLL extension off the -D option on the command line.
 #define DLLExtTokenPaste(x) #x
 #define DLLExtTokenPaste2(x) DLLExtTokenPaste(x)
 #define DLL_EXT_STRING DLLExtTokenPaste2( _DLL_EXT )
 
-#include "tier0/protected_things.h"
+#include "protected_things.h"
 
 // There's a different version of this file in the xbox codeline
 // so the PC version built in the xbox branch includes things like 
 // tickrate changes.
-#include "tier0/xbox_codeline_defines.h"
+#include "xbox_codeline_defines.h"
 
 #ifdef IN_XBOX_CODELINE
 #define XBOX_CODELINE_ONLY()
@@ -72,7 +72,7 @@ constexpr inline double M_PI{3.14159265358979323846};
 constexpr inline float M_PI_F{3.14159265358979323846f};
 #endif
 
-#include "tier0/valve_minmax_on.h"
+#include "valve_minmax_on.h"
 
 #ifdef __cplusplus
 
@@ -448,6 +448,6 @@ protected:
 	inline Type  operator++( Type &a, int ) { Type t{a}; ++a; return t; } \
 	inline Type  operator--( Type &a, int ) { Type t{a}; --a; return t; }
 
-#include "tier0/valve_on.h"
+#include "valve_on.h"
 
-#endif  // TIER0_BASETYPES_H_
+#endif  // !SE_PUBLIC_TIER0_BASETYPES_H_

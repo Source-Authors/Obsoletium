@@ -1,11 +1,11 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_DBG_H_
-#define TIER0_DBG_H_
+#ifndef SE_PUBLIC_TIER0_DBG_H_
+#define SE_PUBLIC_TIER0_DBG_H_
 
-#include "tier0/basetypes.h"
-#include "tier0/dbgflag.h"
-#include "tier0/platform.h"
+#include "basetypes.h"
+#include "dbgflag.h"
+#include "platform.h"
 
 #include <cstdio>
 #include <cstdarg>
@@ -664,7 +664,7 @@ private:
 // Purpose: Inline string formatter
 //
 
-#include "tier0/valve_off.h"
+#include "valve_off.h"
 class CDbgFmtMsg
 {
 public:
@@ -687,7 +687,7 @@ public:
 private:
 	tchar m_szBuf[256];
 };
-#include "tier0/valve_on.h"
+#include "valve_on.h"
 
 //-----------------------------------------------------------------------------
 //
@@ -839,4 +839,4 @@ private:
 #define DEFINE_LOGGING_CHANNEL_NO_TAGS( ... );
 #define Plat_FatalError( ... ) do { Log_Error( LOG_GENERAL, __VA_ARGS__ ); Plat_ExitProcess( EXIT_FAILURE ); } while( 0 )
 
-#endif  // TIER0_DBG_H_
+#endif  // !SE_PUBLIC_TIER0_DBG_H_

@@ -1,9 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_MINIDUMP_H_
-#define TIER0_MINIDUMP_H_
+#ifndef SE_PUBLIC_TIER0_MINIDUMP_H_
+#define SE_PUBLIC_TIER0_MINIDUMP_H_
 
-#include "tier0/platform.h"
+#include "platform.h"
 
 // Set prefix to use for minidump files.  If you don't set one, it is defaulted for you,
 // using the current module name
@@ -93,5 +93,5 @@ PLATFORM_INTERFACE void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
 //  Empty strings ("\0") can be returned if comment hasn't been set
 PLATFORM_INTERFACE const char *MinidumpUserStreamInfoGet( intp Index );
 
-#endif  // TIER0_MINIDUMP_H_
+#endif  // !SE_PUBLIC_TIER0_MINIDUMP_H_
 

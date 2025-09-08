@@ -1,9 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_ICOMMANDLINE_H_
-#define TIER0_ICOMMANDLINE_H_
+#ifndef SE_PUBLIC_TIER0_ICOMMANDLINE_H_
+#define SE_PUBLIC_TIER0_ICOMMANDLINE_H_
 
-#include "tier0/platform.h"
+#include "platform.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Interface to engine command line
@@ -49,5 +49,5 @@ PLATFORM_INTERFACE ICommandLine *CommandLine_Tier0();
 #define CommandLine CommandLine_Tier0
 #endif
 
-#endif  // TIER0_ICOMMANDLINE_H_
+#endif  // !SE_PUBLIC_TIER0_ICOMMANDLINE_H_
 

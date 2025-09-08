@@ -2,14 +2,14 @@
 //
 // Purpose: Real-Time Hierarchical Profiling
 
-#ifndef TIER0_VPROF_H_
-#define TIER0_VPROF_H_
+#ifndef SE_PUBLIC_TIER0_VPROF_H_
+#define SE_PUBLIC_TIER0_VPROF_H_
 
-#include "tier0/dbg.h"
-#include "tier0/fasttimer.h"
-#include "tier0/l2cache.h"
-#include "tier0/threadtools.h"
-#include "tier0/vprof_telemetry.h"
+#include "dbg.h"
+#include "fasttimer.h"
+#include "l2cache.h"
+#include "threadtools.h"
+#include "vprof_telemetry.h"
 
 // VProf is enabled by default in all configurations.
 #define VPROF_ENABLED
@@ -1159,4 +1159,4 @@ private:
 #endif
 
 
-#endif  // TIER0_VPROF_H_
+#endif  // !SE_PUBLIC_TIER0_VPROF_H_

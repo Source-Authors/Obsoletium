@@ -65,7 +65,7 @@
 	#endif // defined(POSIX)
 #endif
 
-#include "tier0/memdbgoff.h"
+#include "memdbgoff.h"
 
 // --------------------------------------------------------
 // Debug/non-debug agnostic elements
@@ -243,7 +243,7 @@ inline wchar_t *MemAlloc_WcStrDup(const wchar_t *pString)
 #if !defined( VALVE_ALLOCS_DEFINED )
 #define VALVE_ALLOCS_DEFINED
 
-#include "tier0/mem.h"
+#include "mem.h"
 
 inline void *valve_malloc_check_oom( size_t size )
 {

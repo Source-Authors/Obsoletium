@@ -1,9 +1,12 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_IA32DETECT_H_
-#define TIER0_IA32DETECT_H_
+#ifndef SE_PUBLIC_TIER0_IA32DETECT_H_
+#define SE_PUBLIC_TIER0_IA32DETECT_H_
 
-#include "tier0/wchartypes.h"
+#include <string>
+
+#include "basetypes.h"
+#include "wchartypes.h"
 
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -338,4 +341,4 @@ private:
 	}
 };
 
-#endif  // TIER0_IA32DETECT_H_
+#endif  // !SE_PUBLIC_TIER0_IA32DETECT_H_

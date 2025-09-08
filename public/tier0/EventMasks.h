@@ -1,6 +1,12 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#pragma once
+#ifndef SE_PUBLIC_TIER0_EVENTMASKS_H_
+#define SE_PUBLIC_TIER0_EVENTMASKS_H_
+
+#include "basetypes.h"
+
+#define EVENT_TYPE(mode) EventType##mode
+#define EVENT_MASK(mode) EventMask##mode
 
 typedef union EVENT_MASK(TC_deliver_mode)
 {
@@ -467,9 +473,4 @@ typedef union EVENT_MASK(x87_SIMD_moves_uop)
     uint16 flat;
 } EVENT_MASK(x87_SIMD_moves_uop);
 
-
-
-
-
-
-
+#endif  // !SE_PUBLIC_TIER0_EVENTMASKS_H_

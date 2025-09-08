@@ -1,7 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_CL2CACHE_H_
-#define TIER0_CL2CACHE_H_
+#ifndef SE_PUBLIC_TIER0_L2CACHE_H_
+#define SE_PUBLIC_TIER0_L2CACHE_H_
+
+#include "basetypes.h"
 
 class P4Event_BSQ_cache_reference;
 
@@ -36,4 +38,4 @@ private:
 	int								m_nID;
 };
 
-#endif   // TIER0_CL2CACHE_H_
+#endif   // !SE_PUBLIC_TIER0_L2CACHE_H_

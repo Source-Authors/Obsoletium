@@ -1,14 +1,14 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_FASTTIMER_H_
-#define TIER0_FASTTIMER_H_
+#ifndef SE_PUBLIC_TIER0_FASTTIMER_H_
+#define SE_PUBLIC_TIER0_FASTTIMER_H_
 
 #ifdef _WIN32
 #include <intrin.h>
 #endif
 
-#include "tier0/platform.h"
-#include "tier0/dbg.h"
+#include "platform.h"
+#include "dbg.h"
 
 PLATFORM_INTERFACE uint64 g_ClockSpeed;
 
@@ -540,4 +540,4 @@ inline uint64 CLimitTimer::CMicroSecLeft() const
 }
 
 
-#endif  // TIER0_FASTTIMER_H_
+#endif  // !SE_PUBLIC_TIER0_FASTTIMER_H_

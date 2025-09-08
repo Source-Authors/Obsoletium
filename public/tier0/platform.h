@@ -1,14 +1,14 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_PLATFORM_H_
-#define TIER0_PLATFORM_H_
+#ifndef SE_PUBLIC_TIER0_PLATFORM_H_
+#define SE_PUBLIC_TIER0_PLATFORM_H_
 
 #define __STDC_LIMIT_MACROS
 #include <cstdint>
 
-#include "tier0/wchartypes.h"
-#include "tier0/basetypes.h"
-#include "tier0/valve_off.h"
+#include "wchartypes.h"
+#include "basetypes.h"
+#include "valve_off.h"
 
 #ifndef PLAT_COMPILE_TIME_ASSERT
 #define PLAT_COMPILE_TIME_ASSERT( pred )	static_assert(pred);
@@ -35,7 +35,7 @@
 #include <x86intrin.h>  // __rdtsc, __rdtscp
 #endif
 
-#include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
+#include "valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
 
 #ifdef _RETAIL
 #define IsRetail() true
@@ -1023,8 +1023,13 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 #if defined( _WIN32 )
 	extern "C" unsigned __int64 __rdtsc();
 	extern "C" unsigned __int64 __rdtscp(unsigned *aux);
-	#pragma intrinsic(__rdtsc)
+
+// dimhotepus: Clang does not have __rdtscp intrinsic for now.
+#if defined(_MSC_VER) && !defined(__clang__) 
 	#pragma intrinsic(__rdtscp)
+#endif  // _MSC_VER) && !defined(__clang__) 
+
+	#pragma intrinsic(__rdtsc)
 #endif
 
 FORCEINLINE uint64_t Plat_Rdtsc()
@@ -1391,7 +1396,7 @@ inline const char *GetPlatformExt( void )
 //-----------------------------------------------------------------------------
 // Include additional dependant header components.
 //-----------------------------------------------------------------------------
-#include "tier0/fasttimer.h"
+#include "fasttimer.h"
 
 //-----------------------------------------------------------------------------
 // Methods to invoke the constructor, copy constructor, and destructor
@@ -1643,7 +1648,7 @@ PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFun
 
 //-----------------------------------------------------------------------------
 
-#include "tier0/valve_on.h"
+#include "valve_on.h"
 
 #if defined(TIER0_DLL_EXPORT)
 extern "C" int V_tier0_stricmp(const char *s1, const char *s2 );
@@ -1654,4 +1659,4 @@ extern "C" int V_tier0_stricmp(const char *s1, const char *s2 );
 #endif
 
 
-#endif  // TIER0_PLATFORM_H_
+#endif  // !SE_PUBLIC_TIER0_PLATFORM_H_

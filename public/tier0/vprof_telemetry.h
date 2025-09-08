@@ -5,8 +5,11 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#ifndef VPROF_TELEMETRY_H
-#define VPROF_TELEMETRY_H
+#ifndef SE_PUBLIC_TIER0_VPROF_TELEMETRY_H_
+#define SE_PUBLIC_TIER0_VPROF_TELEMETRY_H_
+
+#include "basetypes.h"
+#include "platform.h"
 
 #if !defined( MAKE_VPC )
 
@@ -168,4 +171,4 @@ private:
 
 #endif // RAD_TELEMETRY_ENABLED
 
-#endif // VPROF_TELEMETRY_H
+#endif // !SE_PUBLIC_TIER0_VPROF_TELEMETRY_H_

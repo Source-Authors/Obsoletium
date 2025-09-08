@@ -3,8 +3,8 @@
 // This should contain ONLY general purpose macros that are
 // appropriate for use in engine/launcher/all tools.
 
-#ifndef TIER0_COMMONMACROS_H_
-#define TIER0_COMMONMACROS_H_
+#ifndef SE_PUBLIC_TIER0_COMMONMACROS_H_
+#define SE_PUBLIC_TIER0_COMMONMACROS_H_
 
 #include <cassert>  // assert
 #include <cstddef>  // memcmp, std::ptrdiff_t
@@ -451,4 +451,4 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
 #define SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 #endif
 
-#endif  // TIER0_COMMONMACROS_H_
+#endif  // !SE_PUBLIC_TIER0_COMMONMACROS_H_

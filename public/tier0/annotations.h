@@ -1,6 +1,7 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-#ifndef ANALYSIS_ANNOTATIONS_H
-#define ANALYSIS_ANNOTATIONS_H
+
+#ifndef SE_PUBLIC_TIER0_ANNOTATIONS_H_
+#define SE_PUBLIC_TIER0_ANNOTATIONS_H_
 
 #if _MSC_VER >= 1600 // VS 2010 and above.
 //-----------------------------------------------------------------------------
@@ -62,4 +63,4 @@
 
 #endif // _MSC_VER >= 1600 // VS 2010 and above.
 
-#endif // ANALYSIS_ANNOTATIONS_H
+#endif // !SE_PUBLIC_TIER0_ANNOTATIONS_H_

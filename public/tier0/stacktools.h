@@ -5,14 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#ifndef TIER0_STACKTOOLS_H
-#define TIER0_STACKTOOLS_H
+#ifndef SE_PUBLIC_TIER0_STACKTOOLS_H
+#define SE_PUBLIC_TIER0_STACKTOOLS_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "tier0/platform.h"
+#include "platform.h"
 
 #if (defined( PLATFORM_WINDOWS ) || defined( PLATFORM_X360 )) && !defined( STEAM ) && !defined( _CERT ) && defined( TCHAR_IS_CHAR ) //designed for windows/x360, not built/tested with wide characters, not intended for release builds (but probably wouldn't damage anything)
 #	define ENABLE_RUNTIME_STACK_TRANSLATION //uncomment to enable runtime stack translation tools. All of which use on-demand loading of necessary dll's and pdb's
@@ -154,4 +150,4 @@ struct FullStackInfo_t
 };
 #pragma pack(pop)
 
-#endif //#ifndef TIER0_STACKTOOLS_H
+#endif // !SE_PUBLIC_TIER0_STACKTOOLS_H

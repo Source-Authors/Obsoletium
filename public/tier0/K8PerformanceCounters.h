@@ -1,7 +1,13 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_K8PERFORMANCECOUNTERS_H_
-#define TIER0_K8PERFORMANCECOUNTERS_H_
+#ifndef SE_PUBLIC_TIER0_K8PERFORMANCECOUNTERS_H_
+#define SE_PUBLIC_TIER0_K8PERFORMANCECOUNTERS_H_
+
+#include "basetypes.h"
+#include "PMELib.h"
+
+#define EVENT_TYPE(mode) EventType##mode
+#define EVENT_MASK(mode) EventMask##mode
 
 /*
  * AMD K8 events.
@@ -82,8 +88,8 @@ public:
 
     unsigned short m_eventMask;
     int event_id;
-    const tchar * name;
-    tchar revRequired;
+    const char * name;
+    char revRequired;
     int eventSelectNum;
     UnitEncode unitEncode;
 
@@ -1969,4 +1975,4 @@ public:
 
 };
 
-#endif  // TIER0_K8PERFORMANCECOUNTERS_H_
+#endif  // !SE_PUBLIC_TIER0_K8PERFORMANCECOUNTERS_H_

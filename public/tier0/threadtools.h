@@ -4,20 +4,20 @@
 // as much as possible contain portability problems.  Here avoiding including
 // windows.h.
 
-#ifndef TIER0_THREADTOOLS_H_
-#define TIER0_THREADTOOLS_H_
+#ifndef SE_PUBLIC_TIER0_THREADTOOLS_H_
+#define SE_PUBLIC_TIER0_THREADTOOLS_H_
 
-#include "tier0/type_traits.h"
+#include "type_traits.h"
 
 #include <DirectXMath.h>
 #include <atomic>
 #include <climits>
 
-#include "tier0/platform.h"
-#include "tier0/memalloc.h"
-#include "tier0/dbg.h"
-#include "tier0/vcrmode.h"
-#include "tier0/vprof_telemetry.h"
+#include "platform.h"
+#include "memalloc.h"
+#include "dbg.h"
+#include "vcrmode.h"
+#include "vprof_telemetry.h"
 
 #ifdef PLATFORM_WINDOWS_PC
 #include <intrin.h>
@@ -1926,4 +1926,4 @@ private:
 
 //-----------------------------------------------------------------------------
 
-#endif  // TIER0_THREADTOOLS_H_
+#endif  // !SE_PUBLIC_TIER0_THREADTOOLS_H_

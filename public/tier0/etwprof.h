@@ -16,10 +16,10 @@
 //  wevtutil um src\tier0\ValveETWProvider.man
 //  wevtutil im src\tier0\ValveETWProvider.man
 
-#ifndef TIER0_ETWPROF_H_
-#define TIER0_ETWPROF_H_
+#ifndef SE_PUBLIC_TIER0_ETWPROF_H_
+#define SE_PUBLIC_TIER0_ETWPROF_H_
 
-#include "tier0/platform.h"
+#include "platform.h"
 
 #ifdef	IS_WINDOWS_PC
 // ETW support should be compiled in for all Windows PC platforms. It isn't
@@ -151,4 +151,4 @@ private:
 
 #endif
 
-#endif  // TIER0_ETWPROF_H_
+#endif  // !SE_PUBLIC_TIER0_ETWPROF_H_

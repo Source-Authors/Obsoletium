@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_PROTECTED_THINGS_H_
-#define TIER0_PROTECTED_THINGS_H_
+#ifndef SE_PUBLIC_TIER0_PROTECTED_THINGS_H_
+#define SE_PUBLIC_TIER0_PROTECTED_THINGS_H_
 
 // This header tries to prevent people from using potentially dangerous functions
 // (like the notorious non-null-terminating strncpy) and functions that will break
@@ -259,4 +259,4 @@
 #endif
 
 
-#endif  // TIER0_PROTECTED_THINGS_H_
+#endif  // !SE_PUBLIC_TIER0_PROTECTED_THINGS_H_

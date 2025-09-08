@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_VCR_SHARED_H_
-#define TIER0_VCR_SHARED_H_
+#ifndef SE_PUBLIC_TIER0_VCR_SHARED_H_
+#define SE_PUBLIC_TIER0_VCR_SHARED_H_
 
 constexpr inline int VCRFILE_VERSION{2};
 
@@ -42,4 +42,4 @@ enum VCREvent
 };
 
 
-#endif  // TIER0_VCR_SHARED_H_
+#endif  // !SE_PUBLIC_TIER0_VCR_SHARED_H_

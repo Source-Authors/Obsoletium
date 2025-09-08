@@ -4,8 +4,8 @@
 // Instead, just add the file memoverride.cpp into your project and all this
 // will automagically be used
 
-#ifndef TIER0_MEMALLOC_H_
-#define TIER0_MEMALLOC_H_
+#ifndef SE_PUBLIC_TIER0_MEMALLOC_H_
+#define SE_PUBLIC_TIER0_MEMALLOC_H_
 
 // These memory debugging switches aren't relevant under Linux builds since memoverride.cpp
 // isn't built into Linux projects
@@ -28,7 +28,7 @@
 #include <malloc/malloc.h>
 #endif
 
-#include "tier0/mem.h"
+#include "mem.h"
 
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 
@@ -644,4 +644,4 @@ public:
 };
 
 
-#endif  // TIER0_MEMALLOC_H_
+#endif  // !SE_PUBLIC_TIER0_MEMALLOC_H_
