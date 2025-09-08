@@ -3657,12 +3657,12 @@ static void DrawClippedDepthBox( IClientRenderable *pEnt, float *pClipPlane )
 
 
 #ifdef DEBUG_DRAWCLIPPEDDEPTHBOX
-	static const float fColors[6][3] = {	{ 1.0f, 0.0f, 0.0f },
-											{ 0.0f, 1.0f, 1.0f },
-											{ 0.0f, 1.0f, 0.0f },
-											{ 1.0f, 0.0f, 1.0f },
-											{ 0.0f, 0.0f, 1.0f },
-											{ 1.0f, 1.0f, 0.0f } };
+	static constexpr float fColors[6][3] = {	{ 1.0f, 0.0f, 0.0f },
+												{ 0.0f, 1.0f, 1.0f },
+												{ 0.0f, 1.0f, 0.0f },
+												{ 1.0f, 0.0f, 1.0f },
+												{ 0.0f, 0.0f, 1.0f },
+												{ 1.0f, 1.0f, 0.0f } };
 #endif
 
 	

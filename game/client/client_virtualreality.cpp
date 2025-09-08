@@ -694,7 +694,7 @@ bool CClientVirtualReality::OverrideStereoView( CViewSetup *pViewMiddle, CViewSe
 	// Figure out the HUD vectors and frustum.
 
 	// The aspect ratio of the HMD may be something bizarre (e.g. Rift is 640x800), and the pixels may not be square, so don't use that!
-	static const float fAspectRatio = 4.f/3.f;
+	static constexpr float fAspectRatio = 4.f/3.f;
 	float fHFOV = m_fHudHorizontalFov;
 	float fVFOV = m_fHudHorizontalFov / fAspectRatio;
 

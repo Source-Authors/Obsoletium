@@ -68,7 +68,7 @@ static ConVar cl_SetupAllBones( "cl_SetupAllBones", "0" );
 ConVar r_sequence_debug( "r_sequence_debug", "" );
 
 // If an NPC is moving faster than this, he should play the running footstep sound
-const float RUN_SPEED_ESTIMATE_SQR = 150.0f * 150.0f;
+constexpr inline float RUN_SPEED_ESTIMATE_SQR = 150.0f * 150.0f;
 
 // Removed macro used by shared code stuff
 #if defined( CBaseAnimating )
