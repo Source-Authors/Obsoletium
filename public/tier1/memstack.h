@@ -80,7 +80,7 @@ FORCEINLINE RESTRICT_FUNC void * CMemoryStack::Alloc( size_t bytes, bool bClear 
 	{
 		if ( !CommitTo( pNextAlloc ) )
 		{
-			return NULL;
+			return nullptr;
 		}
 	}
 

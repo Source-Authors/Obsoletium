@@ -26,10 +26,10 @@ public:
 	// Flag clearing
 	void ClearFlag( int nFlagMask );
 	void ClearAllFlags();
-	bool IsFlagSet( int nFlagMask ) const;
+	[[nodiscard]] bool IsFlagSet( int nFlagMask ) const;
 
 	// Is any flag set?
-	bool IsAnyFlagSet() const;
+	[[nodiscard]] bool IsAnyFlagSet() const;
 
 private:
 	T m_nFlags;

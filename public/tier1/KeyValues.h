@@ -217,7 +217,7 @@ public:
 	[[nodiscard]] bool ReadAsBinary( CUtlBuffer &buffer, int nStackDepth = 0 );
 
 	// Allocate & create a new copy of the keys
-	[[nodiscard]] KeyValues *MakeCopy( void ) const;
+	[[nodiscard]] KeyValues *MakeCopy( ) const;
 
 	// Allocate & create a new copy of the keys, including the next keys. This is useful for top level files
 	// that don't use the usual convention of a root key with lots of children (like soundscape files).
@@ -227,7 +227,7 @@ public:
 	void CopySubkeys( KeyValues *pParent ) const;
 
 	// Clear out all subkeys, and the current value
-	void Clear( void );
+	void Clear( );
 
 	// Data type
 	enum types_t : char
@@ -451,7 +451,7 @@ public:
 class IKeyValuesDumpContextAsText : public IKeyValuesDumpContext
 {
 public:
-	virtual ~IKeyValuesDumpContextAsText() {}
+	virtual ~IKeyValuesDumpContextAsText() = default;
 
 	bool KvBeginKey( KeyValues *pKey, int nIndentLevel ) override;
 	bool KvWriteValue( KeyValues *pValue, int nIndentLevel ) override;
@@ -467,7 +467,7 @@ class CKeyValuesDumpContextAsDevMsg : public IKeyValuesDumpContextAsText
 public:
 	// Overrides developer level to dump in DevMsg, zero to dump as Msg
 	CKeyValuesDumpContextAsDevMsg( int nDeveloperLevel = 1 ) : m_nDeveloperLevel( nDeveloperLevel ) {}
-	virtual ~CKeyValuesDumpContextAsDevMsg() {}
+	~CKeyValuesDumpContextAsDevMsg() override = default;
 
 public:
 	bool KvBeginKey( KeyValues *pKey, int nIndentLevel ) override;

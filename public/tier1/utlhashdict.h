@@ -29,13 +29,13 @@ public:
 	const T&   operator[]( unsigned i ) const;
 
 	// gets element names
-	char const *GetElementName( unsigned i ) const;
+	[[nodiscard]] char const *GetElementName( unsigned i ) const;
 
 	// Number of elements
-	int Count() const;
+	[[nodiscard]] int Count() const;
 	
 	// Checks if a node is valid and in the tree
-	bool  IsValidIndex( unsigned i ) const;
+	[[nodiscard]] bool  IsValidIndex( unsigned i ) const;
 	
 	// Invalid index
 	static unsigned InvalidHandle();
@@ -57,8 +57,8 @@ public:
 	void	PurgeAndDeleteElements();	// Call delete on each element.
 
 	// Iteration methods
-	unsigned		First() const;
-	unsigned		Next( unsigned i ) const;
+	[[nodiscard]] unsigned		First() const;
+	[[nodiscard]] unsigned		Next( unsigned i ) const;
 
 protected:
 	struct Entry_t
@@ -91,7 +91,7 @@ protected:
 		}
 	};
 
-	typedef CUtlHash<Entry_t, CCompare<bCaseInsensitive>, CHash<bCaseInsensitive> > CHashTable;
+	using CHashTable = CUtlHash<Entry_t, CCompare<bCaseInsensitive>, CHash<bCaseInsensitive>>;
 	CHashTable m_Elements;
 	int m_nCount;
 };

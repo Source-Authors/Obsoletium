@@ -75,7 +75,7 @@ public:
 	inline static size_t ElementSize() { return sizeof(Node_t); }
 
 	// list statistics
-	int	Count() const;
+	[[nodiscard]] int	Count() const;
 	I	MaxElementIndex() const;
 
 	// Traversing the list
@@ -98,10 +98,9 @@ protected:
 		I  m_FirstChild;
 		I  m_PrevSibling;
 		I  m_NextSibling;
-
-	private:
+		
 		// No copy constructor for these...
-		Node_t( const Node_t& );
+		Node_t( const Node_t& ) = delete;
 	};
 	
 	// constructs the class

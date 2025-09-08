@@ -378,7 +378,7 @@ void V_strcpy_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars], IN_Z const char *p
 [[nodiscard]] RET_MAY_BE_NULL inline wchar_t *V_wcsdup( IN_Z const wchar_t *pSrc )
 {
 	const intp nLen = V_wcslen( pSrc );
-	wchar_t *pResult = new wchar_t [ nLen+1 ];
+	auto *pResult = new wchar_t [ nLen+1 ];
 	if (pResult) //-V668
 		V_memcpy( pResult, pSrc, (nLen+1) * static_cast<intp>(sizeof(wchar_t)) );
 	return pResult;

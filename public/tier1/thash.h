@@ -82,7 +82,7 @@ public:
 	Data *PvRecordFind( I unKey ) const;
 
 	// How many records do we have
-	int Count() const { return m_cRecordInUse; }
+	[[nodiscard]] int Count() const { return m_cRecordInUse; }
 
 	// Iterate through our members
 	Data *PvRecordFirst() const;

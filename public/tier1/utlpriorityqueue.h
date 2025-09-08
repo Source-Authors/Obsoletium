@@ -44,7 +44,7 @@ public:
 	void		SetLessFunc( LessFunc_t func );
 
 	// Returns the count of elements in the queue
-	inline intp	Count() const { return m_heap.Count(); }
+	[[nodiscard]] inline intp	Count() const { return m_heap.Count(); }
 	
 	// doesn't deallocate memory
 	void		RemoveAll() { m_heap.RemoveAll(); }

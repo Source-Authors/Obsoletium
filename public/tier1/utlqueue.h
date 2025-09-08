@@ -48,18 +48,18 @@ public:
 	bool		Check( T const element ) const;
 
 	// iterators may be invalidated by Insert()
-	QueueIter_t First() const;
-	QueueIter_t Next( QueueIter_t it ) const;
-	QueueIter_t Last() const;
-	QueueIter_t Previous( QueueIter_t it ) const;
-	bool IsValid( QueueIter_t it ) const;
+	[[nodiscard]] QueueIter_t First() const;
+	[[nodiscard]] QueueIter_t Next( QueueIter_t it ) const;
+	[[nodiscard]] QueueIter_t Last() const;
+	[[nodiscard]] QueueIter_t Previous( QueueIter_t it ) const;
+	[[nodiscard]] bool IsValid( QueueIter_t it ) const;
 	T const& Element( QueueIter_t it ) const;
 
 	// Returns the count of elements in the queue
-	intp			Count() const;
+	[[nodiscard]] intp		Count() const;
 
 	// Return whether the queue is empty or not, faster than Count().
-	bool		IsEmpty() const;
+	[[nodiscard]] bool		IsEmpty() const;
 
 	// doesn't deallocate memory
 	void		RemoveAll();
@@ -68,8 +68,8 @@ public:
 	void		Purge();
 
 protected:
-	QueueIter_t Next_Unchecked( QueueIter_t it ) const;
-	QueueIter_t Previous_Unchecked( QueueIter_t it ) const;
+	[[nodiscard]] QueueIter_t Next_Unchecked( QueueIter_t it ) const;
+	[[nodiscard]] QueueIter_t Previous_Unchecked( QueueIter_t it ) const;
 
 	M					m_memory;
 
@@ -89,7 +89,7 @@ protected:
 template< class T, size_t MAX_SIZE >
 class CUtlQueueFixed : public CUtlQueue< T, CUtlMemoryFixed<T, MAX_SIZE > >
 {
-	typedef CUtlQueue< T, CUtlMemoryFixed<T, MAX_SIZE > > BaseClass;
+	using BaseClass = CUtlQueue<T, CUtlMemoryFixed<T, MAX_SIZE>>;
 public:
 
 	// constructor, destructor

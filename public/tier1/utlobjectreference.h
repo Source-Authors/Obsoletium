@@ -56,7 +56,7 @@ public:
 		}
 	}
   
-	FORCEINLINE T * operator()(void) const
+	FORCEINLINE T * operator()() const
 	{
 		return m_pObject;
 	}
@@ -114,7 +114,7 @@ public:
 		}
 	}
 
-	FORCEINLINE void KillRef(void)
+	FORCEINLINE void KillRef()
 	{
 		if ( m_pObject )
 		{
@@ -128,7 +128,7 @@ public:
 template<class T> class CUtlReferenceList : public CUtlIntrusiveDList< CUtlReference<T> >
 {
 public:
-	~CUtlReferenceList( void )
+	~CUtlReferenceList( )
 	{
 		CUtlReference<T> *i = CUtlIntrusiveDList<CUtlReference<T> >::m_pHead;
 		while( i )

@@ -220,24 +220,24 @@ inline OutputClass horrible_cast(const InputClass input)
 typedef const void * DefaultVoid;
 #else
 // On any other compiler, just use a normal void.
-typedef void DefaultVoid;
+using DefaultVoid = void;
 #endif
 
 // Translate from 'DefaultVoid' to 'void'.
 // Everything else is unchanged
 template <class T>
-struct DefaultVoidToVoid { typedef T type; };
+struct DefaultVoidToVoid { using type = T; };
 
 template <>
-struct DefaultVoidToVoid<DefaultVoid> {	typedef void type; };
+struct DefaultVoidToVoid<DefaultVoid> {	using type = void; };
 
 // Translate from 'void' into 'DefaultVoid'
 // Everything else is unchanged
 template <class T>
-struct VoidToDefaultVoid { typedef T type; };
+struct VoidToDefaultVoid { using type = T; };
 
 template <>
-struct VoidToDefaultVoid<void> { typedef DefaultVoid type; };
+struct VoidToDefaultVoid<void> { using type = DefaultVoid; };
 
 
 
@@ -394,7 +394,7 @@ struct MicrosoftVirtualMFP
 // It has a trival member function that returns the value of the 'this' pointer.
 struct GenericVirtualClass : virtual public GenericClass
 {
-	typedef GenericVirtualClass * (GenericVirtualClass::*ProbePtrType)();
+	using ProbePtrType = GenericVirtualClass *(GenericVirtualClass::*)();
 	GenericVirtualClass * GetThis() { return this; }
 };
 
@@ -587,9 +587,9 @@ class CUtlAbstractDelegate
 protected: 
 	// the data is protected, not private, because many
 	// compilers have problems with template friends.
-	typedef void (detail::GenericClass::*GenericMemFuncType)(); // arbitrary MFP.
-	detail::GenericClass *m_pthis;
-	GenericMemFuncType m_pFunction;
+	using GenericMemFuncType = void (detail::GenericClass::*)(); // arbitrary MFP.
+	detail::GenericClass *m_pthis{nullptr};
+	GenericMemFuncType m_pFunction{nullptr};
 
 #if !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)
 	typedef void (*GenericFuncPtr)(); // arbitrary code pointer
@@ -604,8 +604,8 @@ public:
 		m_pthis=0; m_pFunction=0; m_pStaticFunction=0;
 	}
 #else
-	CUtlAbstractDelegate() : m_pthis(0), m_pFunction(0) {};
-	void Clear() {	m_pthis=0; m_pFunction=0;	}
+	CUtlAbstractDelegate() = default;
+	void Clear() {	m_pthis=nullptr; m_pFunction=nullptr;	}
 #endif
 public:
 #if !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)
@@ -623,13 +623,13 @@ public:
 			return true;
 	}
 #else // Evil Method
-	inline bool IsEqual (const CUtlAbstractDelegate &x) const
+	[[nodiscard]] inline bool IsEqual (const CUtlAbstractDelegate &x) const
 	{
 		return m_pthis==x.m_pthis && m_pFunction==x.m_pFunction;
 	}
 #endif
 	// Provide a strict weak ordering for DelegateMementos.
-	inline bool IsLess(const CUtlAbstractDelegate &right) const 
+	[[nodiscard]] inline bool IsLess(const CUtlAbstractDelegate &right) const 
 	{
 		// deal with static function pointers first
 #if !defined(FASTDELEGATE_USESTATICFUNCTIONHACK)
@@ -649,11 +649,11 @@ public:
 	// m_pFunction can be zero even if the delegate is not empty!
 	inline bool operator ! () const		// Is it bound to anything?
 	{ 
-		return m_pthis==0 && m_pFunction==0; 
+		return m_pthis==nullptr && m_pFunction==nullptr; 
 	}
-	inline bool IsEmpty() const		// Is it bound to anything?
+	[[nodiscard]] inline bool IsEmpty() const		// Is it bound to anything?
 	{ 
-		return m_pthis==0 && m_pFunction==0; 
+		return m_pthis==nullptr && m_pFunction==nullptr; 
 	}
 public:
 	CUtlAbstractDelegate & operator = (const CUtlAbstractDelegate &right)  
@@ -760,7 +760,7 @@ public:
 	}
 #endif
 	// These functions are required for invoking the stored function
-	inline GenericClass *GetClosureThis() const { return m_pthis; }
+	[[nodiscard]] inline GenericClass *GetClosureThis() const { return m_pthis; }
 	inline GenericMemFunc GetClosureMemPtr() const { return reinterpret_cast<GenericMemFunc>(m_pFunction); }
 
 // There are a few ways of dealing with static function pointers.
@@ -930,15 +930,15 @@ template<class RetType=detail::DefaultVoid>
 class FastDelegate0 
 {
 private:
-	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;
-	typedef DesiredRetType (*StaticFunctionPtr)();
-	typedef RetType (*UnvoidStaticFunctionPtr)();
-	typedef RetType (detail::GenericClass::*GenericMemFn)();
-	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;
+	using DesiredRetType = typename detail::DefaultVoidToVoid<RetType>::type;
+	using StaticFunctionPtr = DesiredRetType (*)();
+	using UnvoidStaticFunctionPtr = RetType (*)();
+	using GenericMemFn = RetType (detail::GenericClass::*)();
+	using ClosureType = detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr>;
 	ClosureType m_Closure;
 public:
 	// Typedefs to aid generic programming
-	typedef FastDelegate0 type;
+	using type = FastDelegate0;
 
 	// Construction and comparison functions
 	FastDelegate0() { Clear(); }
@@ -1011,12 +1011,12 @@ public:
 	}
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
-	typedef struct SafeBoolStruct 
+	using UselessTypedef = struct SafeBoolStruct 
 	{
 		int a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
-	} UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+	};
+    using unspecified_bool_type = StaticFunctionPtr SafeBoolStruct::*;
 public:
 	operator unspecified_bool_type() const 
 	{
@@ -1035,7 +1035,7 @@ public:
 	{	// Is it bound to anything?
 		return !m_Closure; 
 	}
-	inline bool IsEmpty() const	
+	[[nodiscard]] inline bool IsEmpty() const	
 	{
 		return !m_Closure; 
 	}
@@ -1056,15 +1056,15 @@ template<class Param1, class RetType=detail::DefaultVoid>
 class FastDelegate1 
 {
 private:
-	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;
-	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1);
-	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1);
-	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1);
-	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;
+	using DesiredRetType = typename detail::DefaultVoidToVoid<RetType>::type;
+	using StaticFunctionPtr = DesiredRetType (*)(Param1);
+	using UnvoidStaticFunctionPtr = RetType (*)(Param1);
+	using GenericMemFn = RetType (detail::GenericClass::*)(Param1);
+    using ClosureType = detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr>;
 	ClosureType m_Closure;
 public:
 	// Typedefs to aid generic programming
-	typedef FastDelegate1 type;
+	using type = FastDelegate1;
 
 	// Construction and comparison functions
 	FastDelegate1() { Clear(); }
@@ -1137,12 +1137,12 @@ public:
 	}
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
-	typedef struct SafeBoolStruct 
+	using UselessTypedef = struct SafeBoolStruct 
 	{
 		int a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
-	} UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+	};
+    using unspecified_bool_type = StaticFunctionPtr SafeBoolStruct::*;
 public:
 	operator unspecified_bool_type() const 
 	{
@@ -1161,7 +1161,7 @@ public:
 	{	// Is it bound to anything?
 		return !m_Closure; 
 	}
-	inline bool IsEmpty() const	
+	[[nodiscard]] inline bool IsEmpty() const	
 	{
 		return !m_Closure; 
 	}
@@ -1182,15 +1182,15 @@ template<class Param1, class Param2, class RetType=detail::DefaultVoid>
 class FastDelegate2 
 {
 private:
-	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;
-	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2);
-	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2);
-	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2);
-	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;
+	using DesiredRetType = typename detail::DefaultVoidToVoid<RetType>::type;
+	using StaticFunctionPtr = DesiredRetType (*)(Param1, Param2);
+	using UnvoidStaticFunctionPtr = RetType (*)(Param1, Param2);
+	using GenericMemFn = RetType (detail::GenericClass::*)(Param1, Param2);
+    using ClosureType = detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr>;
 	ClosureType m_Closure;
 public:
 	// Typedefs to aid generic programming
-	typedef FastDelegate2 type;
+	using type = FastDelegate2;
 
 	// Construction and comparison functions
 	FastDelegate2() { Clear(); }
@@ -1263,12 +1263,12 @@ public:
 	}
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
-	typedef struct SafeBoolStruct 
+	using UselessTypedef = struct SafeBoolStruct 
 	{
 		int a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
-	} UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+	};
+    using unspecified_bool_type = StaticFunctionPtr SafeBoolStruct::*;
 public:
 	operator unspecified_bool_type() const
 	{
@@ -1287,7 +1287,7 @@ public:
 	{	// Is it bound to anything?
 		return !m_Closure; 
 	}
-	inline bool IsEmpty() const	
+	[[nodiscard]] inline bool IsEmpty() const	
 	{
 		return !m_Closure; 
 	}
@@ -1308,15 +1308,15 @@ template<class Param1, class Param2, class Param3, class RetType=detail::Default
 class FastDelegate3 
 {
 private:
-	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;
-	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3);
-	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3);
-	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3);
-	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;
+	using DesiredRetType = typename detail::DefaultVoidToVoid<RetType>::type;
+	using StaticFunctionPtr = DesiredRetType (*)(Param1, Param2, Param3);
+	using UnvoidStaticFunctionPtr = RetType (*)(Param1, Param2, Param3);
+	using GenericMemFn = RetType (detail::GenericClass::*)(Param1, Param2, Param3);
+	using ClosureType = detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr>;
 	ClosureType m_Closure;
 public:
 	// Typedefs to aid generic programming
-	typedef FastDelegate3 type;
+	using type = FastDelegate3;
 
 	// Construction and comparison functions
 	FastDelegate3() { Clear(); }
@@ -1389,12 +1389,12 @@ public:
 	}
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
-	typedef struct SafeBoolStruct 
+	using UselessTypedef = struct SafeBoolStruct 
 	{
 		int a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
-	} UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+	};
+    using unspecified_bool_type = StaticFunctionPtr SafeBoolStruct::*;
 public:
 	operator unspecified_bool_type() const 
 	{
@@ -1413,7 +1413,7 @@ public:
 	{	// Is it bound to anything?
 		return !m_Closure; 
 	}
-	inline bool IsEmpty() const	
+	[[nodiscard]] inline bool IsEmpty() const	
 	{
 		return !m_Closure; 
 	}
@@ -1434,15 +1434,15 @@ template<class Param1, class Param2, class Param3, class Param4, class RetType=d
 class FastDelegate4 
 {
 private:
-	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;
-	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4);
-	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4);
-	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4);
-	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;
+	using DesiredRetType = typename detail::DefaultVoidToVoid<RetType>::type;
+	using StaticFunctionPtr = DesiredRetType (*)(Param1, Param2, Param3, Param4);
+	using UnvoidStaticFunctionPtr = RetType (*)(Param1, Param2, Param3, Param4);
+	using GenericMemFn = RetType (detail::GenericClass::*)(Param1, Param2, Param3, Param4);
+	using ClosureType = detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr>;
 	ClosureType m_Closure;
 public:
 	// Typedefs to aid generic programming
-	typedef FastDelegate4 type;
+	using type = FastDelegate4;
 
 	// Construction and comparison functions
 	FastDelegate4() { Clear(); }
@@ -1515,12 +1515,12 @@ public:
 	}
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
-	typedef struct SafeBoolStruct 
+	using UselessTypedef = struct SafeBoolStruct 
 	{
 		int a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
-	} UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+	};
+    using unspecified_bool_type = StaticFunctionPtr SafeBoolStruct::*;
 public:
 	operator unspecified_bool_type() const 
 	{
@@ -1539,7 +1539,7 @@ public:
 	{	// Is it bound to anything?
 		return !m_Closure; 
 	}
-	inline bool IsEmpty() const	
+	[[nodiscard]] inline bool IsEmpty() const	
 	{
 		return !m_Closure; 
 	}
@@ -1560,15 +1560,15 @@ template<class Param1, class Param2, class Param3, class Param4, class Param5, c
 class FastDelegate5
 {
 private:
-	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;
-	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5);
-	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5);
-	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5);
-	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;
+	using DesiredRetType = typename detail::DefaultVoidToVoid<RetType>::type;
+	using StaticFunctionPtr = DesiredRetType (*)(Param1, Param2, Param3, Param4, Param5);
+	using UnvoidStaticFunctionPtr = RetType (*)(Param1, Param2, Param3, Param4, Param5);
+	using GenericMemFn = RetType (detail::GenericClass::*)(Param1, Param2, Param3, Param4, Param5);
+    using ClosureType = detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr>;
 	ClosureType m_Closure;
 public:
 	// Typedefs to aid generic programming
-	typedef FastDelegate5 type;
+	using type = FastDelegate5;
 
 	// Construction and comparison functions
 	FastDelegate5() { Clear(); }
@@ -1641,12 +1641,12 @@ public:
 	}
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
-	typedef struct SafeBoolStruct
+	using UselessTypedef = struct SafeBoolStruct
 	{
 		int a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
-	} UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+	};
+    using unspecified_bool_type = StaticFunctionPtr SafeBoolStruct::*;
 public:
 	operator unspecified_bool_type() const 
 	{
@@ -1665,7 +1665,7 @@ public:
 	{	// Is it bound to anything?
 		return !m_Closure; 
 	}
-	inline bool IsEmpty() const	
+	[[nodiscard]] inline bool IsEmpty() const	
 	{
 		return !m_Closure; 
 	}
@@ -1686,15 +1686,15 @@ template<class Param1, class Param2, class Param3, class Param4, class Param5, c
 class FastDelegate6 
 {
 private:
-	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;
-	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6);
-	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6);
-	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6);
-	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;
+	using DesiredRetType = typename detail::DefaultVoidToVoid<RetType>::type;
+	using StaticFunctionPtr = DesiredRetType (*)(Param1, Param2, Param3, Param4, Param5, Param6);
+	using UnvoidStaticFunctionPtr = RetType (*)(Param1, Param2, Param3, Param4, Param5, Param6);
+	using GenericMemFn = RetType (detail::GenericClass::*)(Param1, Param2, Param3, Param4, Param5, Param6);
+    using ClosureType = detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr>;
 	ClosureType m_Closure;
 public:
 	// Typedefs to aid generic programming
-	typedef FastDelegate6 type;
+	using type = FastDelegate6;
 
 	// Construction and comparison functions
 	FastDelegate6() { Clear(); }
@@ -1767,12 +1767,12 @@ public:
 	}
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
-	typedef struct SafeBoolStruct 
+	using UselessTypedef = struct SafeBoolStruct 
 	{
 		int a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
-	} UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+	};
+    using unspecified_bool_type = StaticFunctionPtr SafeBoolStruct::*;
 public:
 	operator unspecified_bool_type() const 
 	{
@@ -1791,7 +1791,7 @@ public:
 	{	// Is it bound to anything?
 		return !m_Closure;
 	}
-	inline bool IsEmpty() const	
+	[[nodiscard]] inline bool IsEmpty() const	
 	{
 		return !m_Closure;
 	}
@@ -1812,15 +1812,15 @@ template<class Param1, class Param2, class Param3, class Param4, class Param5, c
 class FastDelegate7
 {
 private:
-	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;
-	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7);
-	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7);
-	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7);
-	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;
+	using DesiredRetType = typename detail::DefaultVoidToVoid<RetType>::type;
+	using StaticFunctionPtr = DesiredRetType (*)(Param1, Param2, Param3, Param4, Param5, Param6, Param7);
+	using UnvoidStaticFunctionPtr = RetType (*)(Param1, Param2, Param3, Param4, Param5, Param6, Param7);
+	using GenericMemFn = RetType (detail::GenericClass::*)(Param1, Param2, Param3, Param4, Param5, Param6, Param7);
+	using ClosureType = detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr>;
 	ClosureType m_Closure;
 public:
 	// Typedefs to aid generic programming
-	typedef FastDelegate7 type;
+	using type = FastDelegate7;
 
 	// Construction and comparison functions
 	FastDelegate7() { Clear(); }
@@ -1893,12 +1893,12 @@ public:
 	}
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
-	typedef struct SafeBoolStruct
+	using UselessTypedef = struct SafeBoolStruct
 	{
 		int a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
-	} UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+	};
+    using unspecified_bool_type = StaticFunctionPtr SafeBoolStruct::*;
 public:
 	operator unspecified_bool_type() const
 	{
@@ -1917,7 +1917,7 @@ public:
 	{	// Is it bound to anything?
 		return !m_Closure; 
 	}
-	inline bool IsEmpty() const	
+	[[nodiscard]] inline bool IsEmpty() const	
 	{
 		return !m_Closure;
 	}
@@ -1938,15 +1938,15 @@ template<class Param1, class Param2, class Param3, class Param4, class Param5, c
 class FastDelegate8 
 {
 private:
-	typedef typename detail::DefaultVoidToVoid<RetType>::type DesiredRetType;
-	typedef DesiredRetType (*StaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8);
-	typedef RetType (*UnvoidStaticFunctionPtr)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8);
-	typedef RetType (detail::GenericClass::*GenericMemFn)(Param1 p1, Param2 p2, Param3 p3, Param4 p4, Param5 p5, Param6 p6, Param7 p7, Param8 p8);
-	typedef detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr> ClosureType;
+	using DesiredRetType = typename detail::DefaultVoidToVoid<RetType>::type;
+	using StaticFunctionPtr = DesiredRetType (*)(Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8);
+	using UnvoidStaticFunctionPtr = RetType (*)(Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8);
+	using GenericMemFn = RetType (detail::GenericClass::*)(Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8);
+    using ClosureType = detail::ClosurePtr<GenericMemFn, StaticFunctionPtr, UnvoidStaticFunctionPtr>;
 	ClosureType m_Closure;
 public:
 	// Typedefs to aid generic programming
-	typedef FastDelegate8 type;
+	using type = FastDelegate8;
 
 	// Construction and comparison functions
 	FastDelegate8() { Clear(); }
@@ -2019,12 +2019,12 @@ public:
 	}
 	// Implicit conversion to "bool" using the safe_bool idiom
 private:
-	typedef struct SafeBoolStruct
+	using UselessTypedef = struct SafeBoolStruct
 	{
 		int a_data_pointer_to_this_is_0_on_buggy_compilers;
 		StaticFunctionPtr m_nonzero;
-	} UselessTypedef;
-    typedef StaticFunctionPtr SafeBoolStruct::*unspecified_bool_type;
+	};
+    using unspecified_bool_type = StaticFunctionPtr SafeBoolStruct::*;
 public:
 	operator unspecified_bool_type() const
 	{
@@ -2043,7 +2043,7 @@ public:
 	{	// Is it bound to anything?
 		return !m_Closure;
 	}
-	inline bool IsEmpty() const	
+	[[nodiscard]] inline bool IsEmpty() const	
 	{
 		return !m_Closure; 
 	}
@@ -2090,10 +2090,10 @@ class CUtlDelegate< R (  ) >
 {
 public:
 	// Make using the base type a bit easier via typedef.
-	typedef FastDelegate0 < R > BaseType;
+	using BaseType = FastDelegate0<R>;
 
 	// Allow users access to the specific type of this delegate.
-	typedef CUtlDelegate SelfType;
+	using SelfType = CUtlDelegate;
 
 	// Mimic the base class constructors.
 	CUtlDelegate() : BaseType() { }
@@ -2130,10 +2130,10 @@ class CUtlDelegate< R ( Param1 ) >
 {
 	public:
 	// Make using the base type a bit easier via typedef.
-	typedef FastDelegate1 < Param1, R > BaseType;
+	using BaseType = FastDelegate1<Param1, R>;
 
 	// Allow users access to the specific type of this delegate.
-	typedef CUtlDelegate SelfType;
+	using SelfType = CUtlDelegate;
 
 	// Mimic the base class constructors.
 	CUtlDelegate() : BaseType() { }
@@ -2170,10 +2170,10 @@ class CUtlDelegate< R ( Param1, Param2 ) >
 {
 	public:
 	// Make using the base type a bit easier via typedef.
-	typedef FastDelegate2 < Param1, Param2, R > BaseType;
+	using BaseType = FastDelegate2<Param1, Param2, R>;
 
 	// Allow users access to the specific type of this delegate.
-	typedef CUtlDelegate SelfType;
+	using SelfType = CUtlDelegate;
 
 	// Mimic the base class constructors.
 	CUtlDelegate() : BaseType() { }
@@ -2210,10 +2210,10 @@ class CUtlDelegate< R ( Param1, Param2, Param3 ) >
 {
 public:
 	// Make using the base type a bit easier via typedef.
-	typedef FastDelegate3 < Param1, Param2, Param3, R > BaseType;
+	using BaseType = FastDelegate3<Param1, Param2, Param3, R>;
 
 	// Allow users access to the specific type of this delegate.
-	typedef CUtlDelegate SelfType;
+	using SelfType = CUtlDelegate;
 
 	// Mimic the base class constructors.
 	CUtlDelegate() : BaseType() { }
@@ -2250,10 +2250,10 @@ class CUtlDelegate< R ( Param1, Param2, Param3, Param4 ) >
 {
 public:
 	// Make using the base type a bit easier via typedef.
-	typedef FastDelegate4 < Param1, Param2, Param3, Param4, R > BaseType;
+	using BaseType = FastDelegate4<Param1, Param2, Param3, Param4, R>;
 
 	// Allow users access to the specific type of this delegate.
-	typedef CUtlDelegate SelfType;
+	using SelfType = CUtlDelegate;
 
 	// Mimic the base class constructors.
 	CUtlDelegate() : BaseType() { }
@@ -2290,10 +2290,10 @@ class CUtlDelegate< R ( Param1, Param2, Param3, Param4, Param5 ) >
 {
 public:
 	// Make using the base type a bit easier via typedef.
-	typedef FastDelegate5 < Param1, Param2, Param3, Param4, Param5, R > BaseType;
+	using BaseType = FastDelegate5<Param1, Param2, Param3, Param4, Param5, R>;
 
 	// Allow users access to the specific type of this delegate.
-	typedef CUtlDelegate SelfType;
+	using SelfType = CUtlDelegate;
 
 	// Mimic the base class constructors.
 	CUtlDelegate() : BaseType() { }
@@ -2330,10 +2330,10 @@ class CUtlDelegate< R ( Param1, Param2, Param3, Param4, Param5, Param6 ) >
 {
 public:
 	// Make using the base type a bit easier via typedef.
-	typedef FastDelegate6 < Param1, Param2, Param3, Param4, Param5, Param6, R > BaseType;
+	using BaseType = FastDelegate6<Param1, Param2, Param3, Param4, Param5, Param6, R>;
 
 	// Allow users access to the specific type of this delegate.
-	typedef CUtlDelegate SelfType;
+	using SelfType = CUtlDelegate;
 
 	// Mimic the base class constructors.
 	CUtlDelegate() : BaseType() { }
@@ -2370,10 +2370,10 @@ class CUtlDelegate< R ( Param1, Param2, Param3, Param4, Param5, Param6, Param7 )
 {
 public:
 	// Make using the base type a bit easier via typedef.
-	typedef FastDelegate7 < Param1, Param2, Param3, Param4, Param5, Param6, Param7, R > BaseType;
+	using BaseType = FastDelegate7<Param1, Param2, Param3, Param4, Param5, Param6, Param7, R>;
 
 	// Allow users access to the specific type of this delegate.
-	typedef CUtlDelegate SelfType;
+	using SelfType = CUtlDelegate;
 
 	// Mimic the base class constructors.
 	CUtlDelegate() : BaseType() { }
@@ -2410,10 +2410,10 @@ class CUtlDelegate< R ( Param1, Param2, Param3, Param4, Param5, Param6, Param7, 
 {
 public:
 	// Make using the base type a bit easier via typedef.
-	typedef FastDelegate8 < Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, R > BaseType;
+	using BaseType = FastDelegate8<Param1, Param2, Param3, Param4, Param5, Param6, Param7, Param8, R>;
 
 	// Allow users access to the specific type of this delegate.
-	typedef CUtlDelegate SelfType;
+	using SelfType = CUtlDelegate;
 
 	// Mimic the base class constructors.
 	CUtlDelegate() : BaseType() { }

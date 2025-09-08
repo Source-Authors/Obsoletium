@@ -40,13 +40,13 @@ public:
 	T *GetHandle( UtlHandle_t h, bool checkValidity ) const;
 
 	// Is a handle valid?
-	bool IsHandleValid( UtlHandle_t h ) const;
+	[[nodiscard]] bool IsHandleValid( UtlHandle_t h ) const;
 
 	// Iterate over handles; they may not be valid
-	int GetValidHandleCount() const;
-	int GetHandleCount() const;
-	UtlHandle_t GetHandleFromIndex( int i ) const;
-	int GetIndexFromHandle( UtlHandle_t h ) const;
+	[[nodiscard]] int GetValidHandleCount() const;
+	[[nodiscard]] int GetHandleCount() const;
+	[[nodiscard]] UtlHandle_t GetHandleFromIndex( int i ) const;
+	[[nodiscard]] int GetIndexFromHandle( UtlHandle_t h ) const;
 
 	void MarkHandleInvalid( UtlHandle_t h );
 	void MarkHandleValid( UtlHandle_t h );
@@ -396,7 +396,7 @@ public:
 	const T* Get() const;
 
 	// Is the handle valid?
-	bool IsValid() const;
+	[[nodiscard]] bool IsValid() const;
 
 	// Casting
 	operator T*();

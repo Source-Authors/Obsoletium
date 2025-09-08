@@ -207,10 +207,10 @@ struct HasClassAltArgumentType
 };
 
 template < typename T, bool = HasClassAltArgumentType< T >::value >
-struct GetClassAltArgumentType { typedef typename T::AltArgumentType_t Result_t; };
+struct GetClassAltArgumentType { using Result_t = typename T::AltArgumentType_t; };
 
 template < typename T >
-struct GetClassAltArgumentType< T, false > { typedef undefined_t Result_t; };
+struct GetClassAltArgumentType< T, false > { using Result_t = undefined_t; };
 
 // Unwrap references; reference types don't have member typedefs.
 template < typename T >
@@ -221,8 +221,8 @@ template < typename ArgT, typename AltT = typename GetClassAltArgumentType<ArgT>
 struct ArgumentTypeInfoImpl
 {
 	enum { has_alt = 1 };
-	typedef ArgT Arg_t;
-	typedef AltT Alt_t;
+	using Arg_t = ArgT;
+	using Alt_t = AltT;
 };
 
 // Handle cases where AltArgumentType_t is typedef'd to undefined_t
@@ -230,8 +230,8 @@ template < typename ArgT >
 struct ArgumentTypeInfoImpl< ArgT, undefined_t >
 {
 	enum { has_alt = 0 };
-	typedef ArgT Arg_t;
-	typedef undefined_t Alt_t;
+	using Arg_t = ArgT;
+	using Alt_t = undefined_t;
 };
 
 // Handle cases where AltArgumentType_t is typedef'd to the primary type
@@ -239,8 +239,8 @@ template < typename ArgT >
 struct ArgumentTypeInfoImpl< ArgT, ArgT >
 {
 	enum { has_alt = 0 };
-	typedef ArgT Arg_t;
-	typedef undefined_t Alt_t;
+	using Arg_t = ArgT;
+	using Alt_t = undefined_t;
 };
 
 

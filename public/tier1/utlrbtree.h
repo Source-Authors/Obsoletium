@@ -188,14 +188,14 @@ public:
 	bool  IsValidIndex( I i ) const;
 
 	// Checks if the tree as a whole is valid
-	bool  IsValid() const;
+	[[nodiscard]] bool  IsValid() const;
 
 	// Invalid index
 	static constexpr I InvalidIndex();
 
 	// returns the tree depth (not a very fast operation)
 	intp   Depth( I node ) const;
-	intp   Depth() const;
+	[[nodiscard]] intp   Depth() const;
 
 	// Sets the less func
 	void SetLessFunc( const LessFunc_t &func );
@@ -244,8 +244,10 @@ public:
 
 	// swap in place
 	void Swap( CUtlRBTree< T, I, L > &that );
+	
+	// copy constructors not allowed
+	CUtlRBTree( CUtlRBTree<T, I, L, M> const &tree ) = delete;
 
-private:
 	// Can't copy the tree this way!
 	CUtlRBTree<T, I, L, M>& operator=( const CUtlRBTree<T, I, L, M> &other ) = delete;
 
@@ -256,8 +258,8 @@ protected:
 		BLACK
 	};
 
-	typedef UtlRBTreeNode_t< T, I > Node_t;
-	typedef UtlRBTreeLinks_t< I > Links_t;
+	using Node_t = UtlRBTreeNode_t<T, I>;
+	using Links_t = UtlRBTreeLinks_t<I>;
 
 	// Sets the children
 	void  SetParent( I i, I parent );
@@ -286,9 +288,6 @@ protected:
 	// Insertion, removal
 	I  InsertAt( I parent, bool leftchild );
 
-	// copy constructors not allowed
-	CUtlRBTree( CUtlRBTree<T, I, L, M> const &tree ) = delete;
-
 	// Inserts a node into the tree, doesn't copy the data in.
 	void FindInsertionPosition( T const &insert, I &parent, bool &leftchild );
 
@@ -307,7 +306,7 @@ protected:
 
 	Node_t* m_pElements;
 
-	FORCEINLINE M const &Elements( void ) const
+	FORCEINLINE M const &Elements( ) const
 	{
 		return m_Elements;
 	}
@@ -325,14 +324,14 @@ class CUtlFixedRBTree : public CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNo
 {
 public:
 
-	typedef L LessFunc_t;
+	using LessFunc_t = L;
 
 	CUtlFixedRBTree( intp growSize = 0, intp initSize = 0, const LessFunc_t &lessfunc = 0 )
 		: CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > >( growSize, initSize, lessfunc ) {}
 	CUtlFixedRBTree( const LessFunc_t &lessfunc )
 		: CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > >( lessfunc ) {}
 
-	typedef CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > > BaseClass;
+	using BaseClass = CUtlRBTree<T, I, L, CUtlFixedMemory<UtlRBTreeNode_t<T, I>>>;
 	bool IsValidIndex( I i ) const
 	{
 		if ( !BaseClass::Elements().IsIdxValid( i ) )
@@ -348,13 +347,12 @@ public:
 
 		return LeftChild(i) != i; 
 	}
+	
+	// this doesn't make sense for fixed rbtrees, since there's no useful max pointer, and the index space isn't contiguous anyways
+	I  MaxElement() const = delete;
 
 protected:
 	void ResetDbgInfo() {}
-
-private:
-	// this doesn't make sense for fixed rbtrees, since there's no useful max pointer, and the index space isn't contiguous anyways
-	I  MaxElement() const = delete;
 };
 
 template < class T, class I = unsigned short, typename L = bool (*)( const T &, const T & )  >

@@ -77,7 +77,7 @@ public:
 		return m_pMemory->rgub; 
 	}
 
-	const uint8* Base() const
+	[[nodiscard]] const uint8* Base() const
 	{ 
 		if ( m_pMemory == nullptr ) 
 			return nullptr; 
@@ -85,7 +85,7 @@ public:
 	}
 
 	// Size
-	int Count() const
+	[[nodiscard]] int Count() const
 	{ 
 		if ( m_pMemory == nullptr ) 
 			return 0; 

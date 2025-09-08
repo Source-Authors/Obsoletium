@@ -59,10 +59,10 @@ public:
 	T const& Top() const;
 
 	// Size
-	intp Count() const;
+	[[nodiscard]] intp Count() const;
 
 	// Is element index valid?
-	bool IsIdxValid( intp i ) const;
+	[[nodiscard]] bool IsIdxValid( intp i ) const;
 
 	// Adds an element, uses default constructor
 	intp Push();

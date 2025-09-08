@@ -9,8 +9,8 @@
 
 #include "checksum_sha1.h"
 
-typedef unsigned char BigPasswordHash_t[32];
-typedef unsigned char PBKDF2Hash_t[32];
+using BigPasswordHash_t = unsigned char [32];
+using PBKDF2Hash_t = unsigned char [32];
 
 //
 // A union of all the possible password hash types.

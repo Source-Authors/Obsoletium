@@ -77,7 +77,7 @@ public:
 	void LimitArgumentBufferSize( intp nSize );
 
 	void SetWaitEnabled( bool bEnable )		{ m_bWaitEnabled = bEnable; }
-	[[nodiscard]] bool IsWaitEnabled( void ) const		{ return m_bWaitEnabled; }
+	[[nodiscard]] bool IsWaitEnabled( ) const		{ return m_bWaitEnabled; }
 
 	[[nodiscard]] intp GetArgumentBufferSize() const { return m_nArgSBufferSize; }
 	[[nodiscard]] intp GetMaxArgumentBufferSize() const { return m_nMaxArgSBufferLength; }

@@ -40,7 +40,7 @@ public:
 	};
 
 	CUtlCharConversion( char nEscapeChar, const char *pDelimiter, intp nCount, ConversionArray_t *pArray );
-	virtual ~CUtlCharConversion() {}
+	virtual ~CUtlCharConversion() = default;
 
 	[[nodiscard]] char GetEscapeChar() const;
 	[[nodiscard]] const char *GetDelimiter() const;
@@ -692,7 +692,7 @@ inline void CUtlBuffer::GetTypeBin< float >( float &dest )
 {
 	if ( CheckGet( sizeof( float ) ) )
 	{
-		uintptr_t pData = (uintptr_t)PeekGet();
+		auto pData = (uintptr_t)PeekGet();
 		// aligned read
 		dest = *(float *)pData;
 

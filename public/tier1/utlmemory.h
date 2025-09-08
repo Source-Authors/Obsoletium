@@ -104,8 +104,8 @@ public:
 	void ConvertToGrowableMemory( intp nGrowSize );
 
 	// Size
-	intp NumAllocated() const;
-	intp Count() const;
+	[[nodiscard]] intp NumAllocated() const;
+	[[nodiscard]] intp Count() const;
 
 	// Grows the memory, so that at least allocated + num elements are allocated
 	void Grow( intp num = 1 );
@@ -120,10 +120,10 @@ public:
 	void Purge( intp numElements );
 
 	// is the memory externally allocated?
-	bool IsExternallyAllocated() const;
+	[[nodiscard]] bool IsExternallyAllocated() const;
 
 	// is the memory read only?
-	bool IsReadOnly() const;
+	[[nodiscard]] bool IsReadOnly() const;
 
 	// Set the size by which the memory grows
 	void SetGrowSize( intp size );
@@ -152,7 +152,7 @@ protected:
 template< class T, size_t SIZE, class I = intp >
 class CUtlMemoryFixedGrowable : public CUtlMemory< T, I >
 {
-	typedef CUtlMemory< T, I > BaseClass;
+	using BaseClass = CUtlMemory<T, I>;
 
 public:
 	CUtlMemoryFixedGrowable( intp nGrowSize = 0, intp nInitSize = SIZE ) : BaseClass( m_pFixedMemory, SIZE )  //-V730 Buffer passed as pointer and not used in base ctor.
@@ -203,7 +203,7 @@ public:
 
 	// Can we use this index?
 	// Use unsigned math to improve performance
-	bool IsIdxValid( intp i ) const							{ return (size_t)i < SIZE; }
+	[[nodiscard]] bool IsIdxValid( intp i ) const							{ return (size_t)i < SIZE; }
 
 	// Specify the invalid ('null') index that we'll only return on failure
 	static constexpr intp INVALID_INDEX = -1; // For use with COMPILE_TIME_ASSERT
@@ -224,8 +224,8 @@ public:
 	void SetExternalBuffer( T* pMemory, intp numElements )	{ Assert( 0 ); }
 
 	// Size
-	intp NumAllocated() const								{ return SIZE; }
-	intp Count() const										{ return SIZE; }
+	[[nodiscard]] intp NumAllocated() const								{ return SIZE; }
+	[[nodiscard]] intp Count() const										{ return SIZE; }
 
 	// Grows the memory, so that at least allocated + num elements are allocated
 	void Grow( intp num = 1 )								{ Assert( 0 ); }
@@ -240,7 +240,7 @@ public:
 	void Purge( intp numElements )							{ Assert( 0 ); }
 
 	// is the memory externally allocated?
-	bool IsExternallyAllocated() const						{ return false; }
+	[[nodiscard]] bool IsExternallyAllocated() const						{ return false; }
 
 	// Set the size by which the memory grows
 	void SetGrowSize( intp size )							{}
@@ -291,7 +291,7 @@ public:
 	~CUtlMemoryConservative()								{ free( m_pMemory ); }
 
 	// Can we use this index?
-	bool IsIdxValid( intp i ) const							{ return ( IsDebug() ) ? ( i >= 0 && i < NumAllocated() ) : ( i >= 0 ); }
+	[[nodiscard]] bool IsIdxValid( intp i ) const							{ return ( IsDebug() ) ? ( i >= 0 && i < NumAllocated() ) : ( i >= 0 ); }
 	static intp InvalidIndex()								{ return -1; }
 
 	// Gets the base address
@@ -313,16 +313,16 @@ public:
 		m_nCurAllocSize = sz;
 	}
 
-	size_t AllocSize( void ) const
+	[[nodiscard]] size_t AllocSize( ) const
 	{
 		return m_nCurAllocSize;
 	}
 
-	intp NumAllocated() const
+	[[nodiscard]] intp NumAllocated() const
 	{
 		return AllocSize() / sizeof( T );
 	}
-	intp Count() const
+	[[nodiscard]] intp Count() const
 	{
 		return NumAllocated();
 	}
@@ -358,7 +358,7 @@ public:
 	void Purge( intp numElements )							{ ReAlloc( numElements * sizeof(T) ); }
 
 	// is the memory externally allocated?
-	bool IsExternallyAllocated() const						{ return false; }
+	[[nodiscard]] bool IsExternallyAllocated() const						{ return false; }
 
 	// Set the size by which the memory grows
 	void SetGrowSize( intp size )							{}

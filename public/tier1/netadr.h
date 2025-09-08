@@ -45,7 +45,7 @@ public:
 	[[nodiscard]] unsigned short	GetPort() const;
 
 	// DON'T CALL THIS
-	const char*		ToString( bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
+	[[nodiscard]] const char*		ToString( bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
 
 	void	ToString( char *pchBuffer, size_t unBufferSize, bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
 	template< size_t maxLenInChars >

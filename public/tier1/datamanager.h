@@ -82,9 +82,9 @@ protected:
 	virtual					~CDataManagerBase();
 	
 	
-	inline size_t			MemTotal_Inline() const { return m_targetMemorySize; }
-	inline size_t			MemAvailable_Inline() const { return m_targetMemorySize - m_memUsed; }
-	inline size_t			MemUsed_Inline() const { return m_memUsed; }
+	[[nodiscard]] inline size_t			MemTotal_Inline() const { return m_targetMemorySize; }
+	[[nodiscard]] inline size_t			MemAvailable_Inline() const { return m_targetMemorySize - m_memUsed; }
+	[[nodiscard]] inline size_t			MemUsed_Inline() const { return m_memUsed; }
 
 // Implemented by derived class:
 	virtual void			DestroyResourceStorage( void * ) = 0;
@@ -133,7 +133,7 @@ public:
 	CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>( size_t size = std::numeric_limits<size_t>::max() ) : BaseClass(size) {}
 	
 
-	~CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>()
+	~CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>() override
 	{
 		// NOTE: This must be called in all implementations of CDataManager
 		FreeAllLists();
@@ -250,7 +250,7 @@ inline unsigned short CDataManagerBase::FromHandle( memhandle_t handle )
 {
 	Assert((uintp)handle <= std::numeric_limits<unsigned>::max() || handle == INVALID_MEMHANDLE);
 
-	unsigned int fullWord = (unsigned int)(uintp)handle; //-V221
+	auto fullWord = (unsigned int)(uintp)handle; //-V221
 	unsigned short serial = fullWord>>16;
 	unsigned short index = fullWord & 0xFFFF;
 

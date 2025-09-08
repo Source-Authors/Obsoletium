@@ -100,7 +100,6 @@ public:
 	template< typename TKey >
 	intp	FindUnsorted( const TKey &src ) const;
 
-protected:
 	// No copy constructor
 	CUtlSortVector( const CUtlSortVector<T, LessFunc> & ) = delete;
 
@@ -123,7 +122,8 @@ protected:
 	intp InsertMultipleBefore( intp elem, intp num, const T *pToCopy=nullptr ) = delete;
 	intp InsertMultipleAfter( intp elem, intp num ) = delete;
 	intp AddVectorToTail( CUtlVector<T> const &src ) = delete;
-
+	
+protected:
 	struct QSortContext_t
 	{
 		void		*m_pLessContext;

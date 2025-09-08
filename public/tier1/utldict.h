@@ -96,10 +96,10 @@ public:
 
 	// Nested typedefs, for code that might need 
 	// to fish out the index type from a given dict
-	typedef I IndexType_t;
+	using IndexType_t = I;
 
 protected:
-	typedef CUtlMap<const char *, T, I> DictElementMap_t;
+	using DictElementMap_t = CUtlMap<const char *, T, I>;
 	DictElementMap_t m_Elements;
 };
 

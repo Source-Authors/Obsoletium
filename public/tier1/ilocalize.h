@@ -195,7 +195,7 @@ private:
 
 #else
 
-	typedef wchar_t locchar_t;
+	using locchar_t = wchar_t;
 
 	#define loc_snprintf	V_snwprintf
 	#define loc_sprintf_safe V_swprintf_safe

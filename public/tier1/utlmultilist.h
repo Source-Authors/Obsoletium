@@ -113,7 +113,7 @@ public:
 
 	// list statistics
 	intp	Count( ListHandle_t list ) const;
-	intp	TotalCount( ) const;
+	[[nodiscard]] intp	TotalCount( ) const;
 	I	MaxElementIndex() const;
 
 	// Traversing the list
@@ -125,6 +125,9 @@ public:
 	// Are nodes in a list or valid?
 	bool  IsValidIndex( I i ) const;
 	bool  IsInList( I i ) const;
+
+	// copy constructors not allowed
+	CUtlMultiList( CUtlMultiList<T, I> const& list ) = delete;
    
 protected:
 	// constructs the class
@@ -137,9 +140,6 @@ protected:
 	// A test for debug mode only...
 	bool IsElementInList( ListHandle_t list, I elem ) const;
 
-	// copy constructors not allowed
-	CUtlMultiList( CUtlMultiList<T, I> const& list ) = delete;
-	   
 	M							m_Memory;
 	CUtlLinkedList<List_t, I>	m_List;
 	I*	m_pElementList;

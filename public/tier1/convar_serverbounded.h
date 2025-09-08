@@ -34,14 +34,14 @@ public:
 		: ConVar( pName, pDefaultValue, flags, pHelpString, bMin, fMin, bMax, fMax ) {}
 
 	// You must implement GetFloat.
-	virtual float GetFloat() const = 0;
+	[[nodiscard]] virtual float GetFloat() const = 0;
 	
 	// You can optionally implement these.
-	virtual int  GetInt() const		{ return (int)GetFloat(); }
-	virtual bool GetBool() const	{  return ( GetInt() != 0 ); }
+	[[nodiscard]] virtual int  GetInt() const		{ return (int)GetFloat(); }
+	[[nodiscard]] virtual bool GetBool() const	{  return ( GetInt() != 0 ); }
 
 	// Use this to get the underlying cvar's value.
-	float GetBaseFloatValue() const
+	[[nodiscard]] float GetBaseFloatValue() const
 	{
 		return ConVar::GetFloat();
 	}

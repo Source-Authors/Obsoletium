@@ -68,11 +68,11 @@ public:
 	const T* Base() const;
 
 	// Returns the number of elements in the array, NumAllocated() is included for consistency with UtlVector
-	int Count() const;
-	int NumAllocated() const;
+	[[nodiscard]] int Count() const;
+	[[nodiscard]] int NumAllocated() const;
 
 	// Is element index valid?
-	bool IsValidIndex( int i ) const;
+	[[nodiscard]] bool IsValidIndex( int i ) const;
 	static int InvalidIndex();
 
 	void CopyArray( const T *pArray, size_t count );

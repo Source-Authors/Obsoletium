@@ -69,43 +69,43 @@ public:
 	T& operator[]( intp i );
 	const T& operator[]( intp i ) const;
 	T& Element( intp i );
-	const T& Element( intp i ) const;
+	[[nodiscard]] const T& Element( intp i ) const;
 	T& Head();
-	const T& Head() const;
+	[[nodiscard]] const T& Head() const;
 	T& Tail();
-	const T& Tail() const;
+	[[nodiscard]] const T& Tail() const;
 	T& Random();
-	const T& Random() const;
+	[[nodiscard]] const T& Random() const;
 
 	// STL compatible member functions. These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
 	std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, iterator, void*>
 	begin()					{ return Base(); }
-	std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, const_iterator, const void*>
+	[[nodiscard]] std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, const_iterator, const void*>
 	begin() const			{ return Base(); }
 
 	std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, iterator, void*>
 	end()					{ return Base() + Count(); }
-	std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, const_iterator, const void*>
+	[[nodiscard]] std::conditional_t<!std::is_same_v<A, CUtlBlockMemory<T, intp>>, const_iterator, const void*>
 	end() const				{ return Base() + Count(); }
 
 	// Gets the base address (can change when adding elements!)
 	T* Base()								{ return m_Memory.Base(); }
-	const T* Base() const					{ return m_Memory.Base(); }
+	[[nodiscard]] const T* Base() const					{ return m_Memory.Base(); }
 
 	// Returns the number of elements in the vector
 	// SIZE IS DEPRECATED!
-	intp Count() const;
-	[[deprecated]] intp Size() const;	// don't use me!
+	[[nodiscard]] intp Count() const;
+	[[deprecated]] [[nodiscard]] intp Size() const;	// don't use me!
 
 	/// are there no elements? For compatibility with lists.
-	inline bool IsEmpty( void ) const
+	[[nodiscard]] inline bool IsEmpty( ) const
 	{
 		return ( Count() == 0 );
 	}
 
 	// Is element index valid?
-	bool IsValidIndex( intp i ) const;
+	[[nodiscard]] bool IsValidIndex( intp i ) const;
 	static constexpr intp InvalidIndex();
 
 	// Adds an element, uses default constructor
@@ -157,7 +157,7 @@ public:
 	intp AddVectorToTail( CUtlVector<T, A>&& src );
 
 	// Finds an element (element needs operator== defined)
-	intp Find( const T& src ) const;
+	[[nodiscard]] intp Find( const T& src ) const;
 
 	// Helper to find using std::find_if with a predicate
 	//   e.g. [] -> bool ( T &a ) { return a.IsTheThingIWant(); }
@@ -168,7 +168,7 @@ public:
 
 	void FillWithValue( const T& src );
 
-	bool HasElement( const T& src ) const;
+	[[nodiscard]] bool HasElement( const T& src ) const;
 
 	// Makes sure we have enough memory allocated to store a requested # of elements
 	// Use NumAllocated() to retrieve the current capacity.
@@ -202,7 +202,7 @@ public:
 	// Set the size by which it grows when it needs to allocate more memory.
 	void SetGrowSize( intp size )			{ m_Memory.SetGrowSize( size ); }
 
-	intp NumAllocated() const;	// Only use this if you really know what you're doing!
+	[[nodiscard]] intp NumAllocated() const;	// Only use this if you really know what you're doing!
 
 	void Sort( int (__cdecl *pfnCompare)(const T *, const T *) );
 
@@ -218,14 +218,15 @@ public:
 #endif // DBGFLAG_VALIDATE
 
 	/// sort using std:: and expecting a "<" function to be defined for the type
-	void Sort( void );
+	void Sort( );
 
 	/// sort using std:: with a predicate. e.g. [] -> bool ( T &a, T &b ) { return a < b; }
 	template <class F> void SortPredicate( F &&predicate );
-
-protected:
+	
 	// Can't copy this unless we explicitly do it!
 	CUtlVector( CUtlVector const& ) = delete;
+
+protected:
 
 	// Grows the vector
 	void GrowVector( intp num = 1 );
@@ -264,7 +265,7 @@ using CUtlBlockVector = CUtlVector< T, CUtlBlockMemory< T, intp > >;
 template< class BASE_UTLVECTOR, class MUTEX_TYPE = CThreadFastMutex >
 class CUtlVectorMT : public BASE_UTLVECTOR, public MUTEX_TYPE
 {
-	typedef BASE_UTLVECTOR BaseClass;
+	using BaseClass = BASE_UTLVECTOR;
 public:
 	// MUTEX_TYPE Mutex_t;
 
@@ -281,7 +282,7 @@ public:
 template< class T, size_t TMaxSize >
 class CUtlVectorFixed : public CUtlVector< T, CUtlMemoryFixed<T, TMaxSize > >
 {
-	typedef CUtlVector< T, CUtlMemoryFixed<T, TMaxSize > > BaseClass;
+	using BaseClass = CUtlVector<T, CUtlMemoryFixed<T, TMaxSize>>;
 public:
 
 	// constructor, destructor
@@ -297,7 +298,7 @@ public:
 template< class T, size_t TMaxSize >
 class CUtlVectorFixedGrowable : public CUtlVector< T, CUtlMemoryFixedGrowable<T, TMaxSize > >
 {
-	typedef CUtlVector< T, CUtlMemoryFixedGrowable<T, TMaxSize > > BaseClass;
+	using BaseClass = CUtlVector<T, CUtlMemoryFixedGrowable<T, TMaxSize>>;
 
 public:
 	// constructor, destructor
@@ -312,7 +313,7 @@ public:
 template< class T >
 class CUtlVectorConservative : public CUtlVector< T, CUtlMemoryConservative<T> >
 {
-	typedef CUtlVector< T, CUtlMemoryConservative<T> > BaseClass;
+	using BaseClass = CUtlVector<T, CUtlMemoryConservative<T>>;
 public:
 
 	// constructor, destructor
@@ -370,7 +371,7 @@ public:
 		RemoveAll();
 	}
 
-	intp Count() const
+	[[nodiscard]] intp Count() const
 	{
 		return m_pData->m_Size;
 	}
@@ -380,7 +381,7 @@ public:
 		return -1;
 	}
 
-	inline bool IsValidIndex( intp i ) const
+	[[nodiscard]] inline bool IsValidIndex( intp i ) const
 	{
 		return (i >= 0) && (i < Count());
 	}
@@ -389,16 +390,16 @@ public:
 	// STL compatible member functions. These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
 	T* begin()					{ return Base(); }
-	const T* begin() const		{ return Base(); }
+	[[nodiscard]] const T* begin() const		{ return Base(); }
 	
 	// dimhotepus: Add STL compatible member functions. 
 	T *end()					{ return Base() + Count(); }
-	const T *end() const		{ return Base() + Count(); }
+	[[nodiscard]] const T *end() const		{ return Base() + Count(); }
 
 	// dimhotepus: Add CUtlVector compatible member functions. 
 	// Gets the base address (can change when adding elements!)
 	T* Base()								{ return m_pData->m_Elements; }
-	const T* Base() const					{ return m_pData->m_Elements; }
+	[[nodiscard]] const T* Base() const					{ return m_pData->m_Elements; }
 
 	T& operator[]( intp i )
 	{
@@ -418,7 +419,7 @@ public:
 		return m_pData->m_Elements[i];
 	}
 
-	const T& Element( intp i ) const
+	[[nodiscard]] const T& Element( intp i ) const
 	{
 		Assert( IsValidIndex( i ) );
 		return m_pData->m_Elements[i];
@@ -533,7 +534,7 @@ public:
 		}
 	}
 
-	intp Find( const T& src ) const
+	[[nodiscard]] intp Find( const T& src ) const
 	{
 		intp nCount = Count();
 		for ( intp i = 0; i < nCount; ++i )
@@ -567,7 +568,7 @@ public:
 		return false;
 	}
 
-	bool DebugCompileError_ANonVectorIsUsedInThe_FOR_EACH_VEC_Macro( void ) const { return true; }
+	[[nodiscard]] bool DebugCompileError_ANonVectorIsUsedInThe_FOR_EACH_VEC_Macro( ) const { return true; }
 
 	struct Data_t
 	{
@@ -615,7 +616,7 @@ COMPILE_TIME_ASSERT( sizeof(CUtlVectorUltraConservative<intp>) == sizeof(void*) 
 template< class T >
 class CCopyableUtlVector : public CUtlVector< T, CUtlMemory<T> >
 {
-	typedef CUtlVector< T, CUtlMemory<T> > BaseClass;
+	using BaseClass = CUtlVector<T, CUtlMemory<T>>;
 public:
 	explicit CCopyableUtlVector( intp growSize = 0, intp initSize = 0 ) : BaseClass( growSize, initSize ) {}
 	CCopyableUtlVector( T* pMemory, intp numElements ) : BaseClass( pMemory, numElements ) {}
@@ -632,7 +633,7 @@ public:
 template< class T, size_t TMaxSize >
 class CCopyableUtlVectorFixed : public CUtlVectorFixed< T, TMaxSize >
 {
-	typedef CUtlVectorFixed< T, TMaxSize > BaseClass;
+	using BaseClass = CUtlVectorFixed<T, TMaxSize>;
 public:
 	explicit CCopyableUtlVectorFixed( intp growSize = 0, intp initSize = 0 ) : BaseClass( growSize, initSize ) {}
 	CCopyableUtlVectorFixed( T* pMemory, intp numElements ) : BaseClass( pMemory, numElements ) {}
@@ -962,7 +963,7 @@ void CUtlVector<T, A>::InPlaceQuickSort( int (__cdecl *pfnCompare)(const T *, co
 }
 
 template< typename T, class A >
-void CUtlVector<T, A>::Sort( void )
+void CUtlVector<T, A>::Sort( )
 {
 	//STACK STATS TODO: Do we care about allocation tracking precision enough to match element origins across a sort?
 	std::sort( begin(), end() );
@@ -1126,7 +1127,7 @@ template< typename T, class A >
 inline intp CUtlVector<T, A>::AddToTail( T&& src )
 {
 	// Can't insert something that's in the list... reallocation may hose us
-	Assert( (Base() == NULL) || (&src < Base()) || (&src >= (Base() + Count()) ) ); 
+	Assert( (Base() == nullptr) || (&src < Base()) || (&src >= (Base() + Count()) ) ); 
 	return InsertBefore( m_Size, std::move( src ) );
 }
 
@@ -1142,7 +1143,7 @@ template< typename T, class A >
 intp CUtlVector<T, A>::InsertBefore( intp elem, T&& src )
 {
 	// Can't insert something that's in the list... reallocation may hose us
-	Assert( (Base() == NULL) || (&src < Base()) || (&src >= (Base() + Count()) ) ); 
+	Assert( (Base() == nullptr) || (&src < Base()) || (&src >= (Base() + Count()) ) ); 
 
 	// Can insert at the end
 	Assert( (elem == Count()) || IsValidIndex(elem) );
@@ -1545,7 +1546,7 @@ void CUtlVector<T, A>::Validate( CValidator &validator, char *pchName )
 template<class T> class CUtlVectorAutoPurge : public CUtlVector< std::enable_if_t<std::is_pointer_v<T>, T>, CUtlMemory< T, intp> >
 {
 public:
-	~CUtlVectorAutoPurge( void )
+	~CUtlVectorAutoPurge( )
 	{
 		this->PurgeAndDeleteElements();
 	}
@@ -1557,7 +1558,7 @@ public:
 template<class T> class CUtlVectorAutoPurgeArray : public CUtlVector< std::enable_if_t<std::is_pointer_v<T>, T>, CUtlMemory< T, intp> >
 {
 public:
-	~CUtlVectorAutoPurgeArray( void )
+	~CUtlVectorAutoPurgeArray( )
 	{
 		this->PurgeAndDeleteElementsArray();
 	}
@@ -1606,8 +1607,8 @@ public:
 	{
 		SplitString2( pString, pSeparators, separatorsSize );
 	}
-private:
-	CUtlStringList( const CUtlStringList &other ); // copying directly will cause double-release of the same strings; maybe we need to do a deep copy, but unless and until such need arises, this will guard against double-release
+
+	CUtlStringList( const CUtlStringList &other ) = delete; // copying directly will cause double-release of the same strings; maybe we need to do a deep copy, but unless and until such need arises, this will guard against double-release
 };
 
 

@@ -38,10 +38,10 @@ public:
 
 	// invalid handle
 	static UtlHashHandle_t InvalidHandle()  { return ( UtlHashHandle_t )~0; }
-	bool IsValidHandle( UtlHashHandle_t handle ) const;
+	[[nodiscard]] bool IsValidHandle( UtlHashHandle_t handle ) const;
 
 	// size
-	intp Count() const;
+	[[nodiscard]] intp Count() const;
 
 	// memory
 	void Purge();
@@ -63,17 +63,17 @@ public:
 	Data &operator[]( UtlHashHandle_t handle );
 	Data const &operator[]( UtlHashHandle_t handle ) const;
 
-	UtlHashHandle_t GetFirstHandle() const;
-	UtlHashHandle_t GetNextHandle( UtlHashHandle_t h ) const;
+	[[nodiscard]] UtlHashHandle_t GetFirstHandle() const;
+	[[nodiscard]] UtlHashHandle_t GetNextHandle( UtlHashHandle_t h ) const;
 
 	// debugging!!
 	void Log( const char *filename );
 
 protected:
 
-	intp GetBucketIndex( UtlHashHandle_t handle ) const;
-	intp GetKeyDataIndex( UtlHashHandle_t handle ) const;
-	UtlHashHandle_t BuildHandle( intp ndxBucket, intp ndxKeyData ) const;
+	[[nodiscard]] intp GetBucketIndex( UtlHashHandle_t handle ) const;
+	[[nodiscard]] intp GetKeyDataIndex( UtlHashHandle_t handle ) const;
+	[[nodiscard]] UtlHashHandle_t BuildHandle( intp ndxBucket, intp ndxKeyData ) const;
 
 	bool DoFind( Data const &src, uintp *pBucket, intp *pIndex ) const;
 
@@ -81,7 +81,7 @@ protected:
 
 	// handle upper 32 (on 64 bit arch) / 16 (on 32 bit arch) bits = bucket index (bucket heads)
 	// handle lower 32 (on 64 bit arch) / 16 (on 32 bit arch) bits = key index (bucket list)
-	typedef CUtlVector<Data> HashBucketList_t;
+	using HashBucketList_t = CUtlVector<Data>;
 	CUtlVector<HashBucketList_t>	m_Buckets;
 	
 	CompareFunc_t					m_CompareFunc;			// function used to handle unique compares on data
@@ -479,7 +479,7 @@ inline void CUtlHash<Data, C, K>::Log( const char *filename )
 // Number of buckets must be a power of 2.
 // Key must be native int-bits (unsigned int / unsigned long long int).
 //
-typedef intp UtlHashFastHandle_t;
+using UtlHashFastHandle_t = intp;
 
 #define UTLHASH_POOL_SCALAR		2
 
@@ -552,7 +552,7 @@ public:
 		HashData	m_Data;
 	};
 
-	typedef HashFastData_t_<Data> HashFastData_t;
+	using HashFastData_t = HashFastData_t_<Data>;
 
 	uintp						m_uiBucketMask;
 	CUtlVector<UtlHashFastHandle_t>		m_aBuckets;
@@ -679,7 +679,7 @@ template<class Data, class HashFuncs> inline void CUtlHashFast<Data,HashFuncs>::
 //-----------------------------------------------------------------------------
 // Purpose: Remove all elements from the hash
 //-----------------------------------------------------------------------------
-template<class Data, class HashFuncs> inline void CUtlHashFast<Data,HashFuncs>::RemoveAll( void )
+template<class Data, class HashFuncs> inline void CUtlHashFast<Data,HashFuncs>::RemoveAll( )
 {
 	m_aBuckets.RemoveAll();
 	m_aDataPool.RemoveAll();
@@ -740,7 +740,7 @@ template<class Data, class HashFuncs> inline Data const &CUtlHashFast<Data,HashF
 // Number of buckets must be a power of 2.
 // Key must be native int-bits (unsigned int / unsigned long long int).
 //
-typedef intp UtlHashFixedHandle_t;
+using UtlHashFixedHandle_t = intp;
 
 template <intp NUM_BUCKETS>
 class CUtlHashFixedGenericHash
@@ -815,7 +815,7 @@ public:
 		Data_t			m_Data;
 	};
 
-	typedef HashFixedData_t_<Data> HashFixedData_t;
+	using HashFixedData_t = HashFixedData_t_<Data>;
 
 	enum
 	{
@@ -907,7 +907,7 @@ template<class Data, intp NUM_BUCKETS, class HashFuncs> inline void CUtlHashFixe
 //-----------------------------------------------------------------------------
 // Purpose: Remove all elements from the hash
 //-----------------------------------------------------------------------------
-template<class Data, intp NUM_BUCKETS, class HashFuncs> inline void CUtlHashFixed<Data,NUM_BUCKETS,HashFuncs>::RemoveAll( void )
+template<class Data, intp NUM_BUCKETS, class HashFuncs> inline void CUtlHashFixed<Data,NUM_BUCKETS,HashFuncs>::RemoveAll( )
 {
 	for ( intp i = 0; i < NUM_BUCKETS; i++ )
 	{

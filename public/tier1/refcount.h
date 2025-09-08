@@ -285,15 +285,15 @@ private:
 };
 
 
-typedef CRefCountServiceBase<true, CRefST>	CRefCountServiceST;
-typedef CRefCountServiceBase<false, CRefST>	CRefCountServiceNoDeleteST;
+using CRefCountServiceST = CRefCountServiceBase<true, CRefST>;
+using CRefCountServiceNoDeleteST = CRefCountServiceBase<false, CRefST>;
 
-typedef CRefCountServiceBase<true, CRefMT>	CRefCountServiceMT;
-typedef CRefCountServiceBase<false, CRefMT> CRefCountServiceNoDeleteMT;
+using CRefCountServiceMT = CRefCountServiceBase<true, CRefMT>;
+using CRefCountServiceNoDeleteMT = CRefCountServiceBase<false, CRefMT>;
 
 // Default to threadsafe
-typedef CRefCountServiceNoDeleteMT			CRefCountServiceNoDelete;
-typedef CRefCountServiceMT					CRefCountService;
+using CRefCountServiceNoDelete = CRefCountServiceNoDeleteMT;
+using CRefCountService = CRefCountServiceMT;
 
 //-----------------------------------------------------------------------------
 // Purpose:	Base classes to implement reference counting

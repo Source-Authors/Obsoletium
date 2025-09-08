@@ -116,7 +116,7 @@ public:
 	storage_t flags_and_hash;
 	storage_t data[ ( sizeof(KVPair) + sizeof(storage_t) - 1 ) / sizeof(storage_t) ];
 
-	bool IsValid() const { return flags_and_hash >= 0; }
+	[[nodiscard]] bool IsValid() const { return flags_and_hash >= 0; }
 	void MarkInvalid() { constexpr auto flag = FLAG_FREE; flags_and_hash = (storage_t)flag; }
 	const KVPair *Raw() const { return reinterpret_cast< const KVPair * >( &data[0] ); }
 	const KVPair *operator->() const { Assert( IsValid() ); return reinterpret_cast< const KVPair * >( &data[0] ); }
@@ -124,7 +124,7 @@ public:
 	KVPair *operator->() { Assert( IsValid() ); return reinterpret_cast< KVPair * >( &data[0] ); }
 
 	// Returns the ideal index of the data in this slot, or all bits set if invalid
-	size_t FORCEINLINE IdealIndex( size_t slotmask ) const
+	[[nodiscard]] size_t FORCEINLINE IdealIndex( size_t slotmask ) const
 	{
 //#ifdef PLATFORM_64BITS
 //		return IdealIndex( flags_and_hash, slotmask ) | ( (int64)flags_and_hash >> 63 );
@@ -237,15 +237,15 @@ public:
 	KeyIsEqualT const &GetEqualRef() const { return m_eq; }
 
 	// Handle validation
-	bool IsValidHandle( handle_t idx ) const { return (unsigned)idx < (unsigned)m_table.Count() && m_table[idx].IsValid(); }
+	[[nodiscard]] bool IsValidHandle( handle_t idx ) const { return (unsigned)idx < (unsigned)m_table.Count() && m_table[idx].IsValid(); }
 	static handle_t InvalidHandle() { return (handle_t) -1; }
 
 	// Iteration functions
-	handle_t FirstHandle() const { return NextHandle( (handle_t) -1 ); }
-	handle_t NextHandle( handle_t start ) const;
+	[[nodiscard]] handle_t FirstHandle() const { return NextHandle( (handle_t) -1 ); }
+	[[nodiscard]] handle_t NextHandle( handle_t start ) const;
 
 	// Returns the number of unique keys in the table
-	intp Count() const { return m_nUsed; }
+	[[nodiscard]] intp Count() const { return m_nUsed; }
 
 
 	// Key lookup, returns InvalidHandle() if not found
@@ -261,12 +261,12 @@ public:
 	
 	// Key insertion or lookup, always returns a valid handle
 	handle_t Insert( KeyArg_t k ) { return DoInsert<KeyArg_t>( k, m_hash(k) ); }
-	handle_t Insert( KeyArg_t k, ValueArg_t v, bool *pDidInsert = NULL ) { return DoInsert<KeyArg_t>( k, v, m_hash(k), pDidInsert ); }
-	handle_t Insert( KeyArg_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = NULL ) { Assert( hash == m_hash(k) ); return DoInsert<KeyArg_t>( k, v, hash, pDidInsert ); }
+	handle_t Insert( KeyArg_t k, ValueArg_t v, bool *pDidInsert = nullptr ) { return DoInsert<KeyArg_t>( k, v, m_hash(k), pDidInsert ); }
+	handle_t Insert( KeyArg_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = nullptr ) { Assert( hash == m_hash(k) ); return DoInsert<KeyArg_t>( k, v, hash, pDidInsert ); }
 	// Alternate-type key insertion or lookup, always returns a valid handle
 	handle_t Insert( KeyAlt_t k ) { return DoInsert<KeyAlt_t>( k, m_hash(k) ); }
-	handle_t Insert( KeyAlt_t k, ValueArg_t v, bool *pDidInsert = NULL ) { return DoInsert<KeyAlt_t>( k, v, m_hash(k), pDidInsert ); }
-	handle_t Insert( KeyAlt_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = NULL ) { Assert( hash == m_hash(k) ); return DoInsert<KeyAlt_t>( k, v, hash, pDidInsert ); }
+	handle_t Insert( KeyAlt_t k, ValueArg_t v, bool *pDidInsert = nullptr ) { return DoInsert<KeyAlt_t>( k, v, m_hash(k), pDidInsert ); }
+	handle_t Insert( KeyAlt_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = nullptr ) { Assert( hash == m_hash(k) ); return DoInsert<KeyAlt_t>( k, v, hash, pDidInsert ); }
 
 	// Key removal, returns false if not found
 	bool Remove( KeyArg_t k ) { return DoRemove<KeyArg_t>( k, m_hash(k) ) >= 0; }
@@ -295,7 +295,7 @@ public:
 	void Compact( bool bMinimal ) { DoRealloc( bMinimal ? m_nUsed : ( m_nUsed * 4 / 3 ) ); }
 
 	// Access functions. Note: if ValueT is empty_t, all functions return const keys.
-	typedef typename KVPair::ValueReturn_t Element_t;
+	using Element_t = typename KVPair::ValueReturn_t;
 	KeyT const &Key( handle_t idx ) const { return m_table[idx]->m_key; }
 	Element_t const &Element( handle_t idx ) const { return m_table[idx]->GetValue(); }
 	Element_t &Element(handle_t idx) { return m_table[idx]->GetValue(); }
@@ -320,12 +320,12 @@ public:
 
     // GetMemoryUsage returns all memory held by this class
     // and its held classes.  It does not include sizeof(*this).
-    size_t GetMemoryUsage() const
+    [[nodiscard]] size_t GetMemoryUsage() const
     {
         return m_table.AllocSize();
     }
 
-	size_t GetReserveCount( )const
+	[[nodiscard]] size_t GetReserveCount( )const
 	{
 		return m_table.Count();
 	}
@@ -336,7 +336,6 @@ public:
 	void DbgCheckIntegrity() const;
 #endif
 
-private:
 	CUtlHashtable(const CUtlHashtable& copyConstructorIsNotImplemented) = delete;
 };
 
@@ -821,21 +820,21 @@ template <typename KeyT, typename ValueT = empty_t, typename KeyHashT = DefaultH
 class CUtlStableHashtable
 {
 public:
-	typedef typename ArgumentTypeInfo<KeyT>::Arg_t KeyArg_t;
-	typedef typename ArgumentTypeInfo<ValueT>::Arg_t ValueArg_t;
-	typedef typename ArgumentTypeInfo<AlternateKeyT>::Arg_t KeyAlt_t;
-	typedef typename CTypeSelect< sizeof( IndexStorageT ) == 2, uint16, uint32 >::type IndexStorage_t;
+	using KeyArg_t = typename ArgumentTypeInfo<KeyT>::Arg_t;
+	using ValueArg_t = typename ArgumentTypeInfo<ValueT>::Arg_t;
+	using KeyAlt_t = typename ArgumentTypeInfo<AlternateKeyT>::Arg_t;
+	using IndexStorage_t = typename CTypeSelect<sizeof(IndexStorageT) == 2, uint16, uint32>::type;
 
 protected:
 	COMPILE_TIME_ASSERT( sizeof( IndexStorage_t ) == sizeof( IndexStorageT ) );
 
-	typedef CUtlKeyValuePair< KeyT, ValueT > KVPair;
+	using KVPair = CUtlKeyValuePair<KeyT, ValueT>;
 	struct HashProxy;
 	struct EqualProxy;
 	struct IndirectIndex;
 
-	typedef CUtlHashtable< IndirectIndex, empty_t, HashProxy, EqualProxy, AlternateKeyT > Hashtable_t;
-	typedef CUtlLinkedList< KVPair, IndexStorage_t > LinkedList_t;
+	using Hashtable_t = CUtlHashtable<IndirectIndex, empty_t, HashProxy, EqualProxy, AlternateKeyT>;
+	using LinkedList_t = CUtlLinkedList<KVPair, IndexStorage_t>;
 
 	template <typename KeyArgumentT> bool DoRemove( KeyArgumentT k );
 	template <typename KeyArgumentT> UtlHashHandle_t DoFind( KeyArgumentT k ) const;
@@ -860,9 +859,9 @@ public:
 
 	void RemoveAll() { m_table.RemoveAll(); m_data.RemoveAll(); }
 	void Purge() { m_table.Purge(); m_data.Purge(); }
-	intp Count() const { return m_table.Count(); }
+	[[nodiscard]] intp Count() const { return m_table.Count(); }
 
-	typedef typename KVPair::ValueReturn_t Element_t;
+	using Element_t = typename KVPair::ValueReturn_t;
 	KeyT const &Key( UtlHashHandle_t idx ) const { return m_data[idx].m_key; }
 	Element_t const &Element( UtlHashHandle_t idx ) const { return m_data[idx].GetValue(); }
 	Element_t &Element( UtlHashHandle_t idx ) { return m_data[idx].GetValue(); }
@@ -880,10 +879,10 @@ public:
 	Element_t *GetPtr( KeyArg_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
 	Element_t *GetPtr( KeyAlt_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
 
-	UtlHashHandle_t FirstHandle() const { return ExtendInvalidHandle( m_data.Head() ); }
-	UtlHashHandle_t NextHandle( UtlHashHandle_t h ) const { return ExtendInvalidHandle( m_data.Next( h ) ); }
-	bool IsValidHandle( UtlHashHandle_t h ) const { return m_data.IsValidIndex( h ); }
-	UtlHashHandle_t InvalidHandle() const { return (UtlHashHandle_t)-1; }
+	[[nodiscard]] UtlHashHandle_t FirstHandle() const { return ExtendInvalidHandle( m_data.Head() ); }
+	[[nodiscard]] UtlHashHandle_t NextHandle( UtlHashHandle_t h ) const { return ExtendInvalidHandle( m_data.Next( h ) ); }
+	[[nodiscard]] bool IsValidHandle( UtlHashHandle_t h ) const { return m_data.IsValidIndex( h ); }
+	[[nodiscard]] UtlHashHandle_t InvalidHandle() const { return (UtlHashHandle_t)-1; }
 
 	UtlHashHandle_t RemoveAndAdvance( UtlHashHandle_t h )
 	{

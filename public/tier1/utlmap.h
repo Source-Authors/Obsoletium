@@ -87,7 +87,7 @@ public:
 	bool  IsValidIndex( IndexType_t i ) const				{ return m_Tree.IsValidIndex( i ); }
 	
 	// Checks if the map as a whole is valid
-	bool  IsValid() const									{ return m_Tree.IsValid(); }
+	[[nodiscard]] bool  IsValid() const									{ return m_Tree.IsValid(); }
 	
 	// Invalid index
 	static constexpr IndexType_t InvalidIndex()				{ return CTree::InvalidIndex(); }
@@ -203,7 +203,7 @@ public:
 		LessFunc_t m_LessFunc;
 	};
 
-	typedef CUtlRBTree<Node_t, I, CKeyLess> CTree;
+	using CTree = CUtlRBTree<Node_t, I, CKeyLess>;
 
 	CTree *AccessTree()	{ return &m_Tree; }
 

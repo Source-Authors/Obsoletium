@@ -97,11 +97,11 @@ public:
 		return u.m_Id != UTL_INVAL_SYMBOL_LARGE;
 	}
 
-private:
 	// Disallowed
 	CUtlSymbolLarge( const char* pStr ) = delete;       // they need to go through the table to assign the ptr
 	bool operator==( const char* pStr ) const = delete; // disallow since we don't know if the table this is from was case sensitive or not... maybe we don't care
 
+private:
 	union
 	{
 		UtlSymLargeId_t m_Id;
@@ -303,7 +303,7 @@ public:
 	// Remove all symbols in the table.
 	void  RemoveAll();
 
-	[[nodiscard]] intp GetNumStrings( void ) const
+	[[nodiscard]] intp GetNumStrings( ) const
 	{
 		return m_Lookup.Count();
 	}

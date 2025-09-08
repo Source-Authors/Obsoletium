@@ -36,14 +36,14 @@ public:
 
 	void AdjustAllRowIndicesAfter( int nStartRow, int nDelta );
 public:
-	FORCEINLINE float Element( int nRow, int nCol ) const;
+	[[nodiscard]] FORCEINLINE float Element( int nRow, int nCol ) const;
 	void SetElement( int nRow, int nCol, float flValue );
 	void SetDimensions( int nNumRows, int nNumCols );
 	void AppendElement( int nRow, int nCol, float flValue );
-	void FinishedAppending( void );
+	void FinishedAppending( );
 
-	FORCEINLINE int Height( void ) const { return m_nNumRows; }
-	FORCEINLINE int Width( void ) const { return m_nNumCols; }
+	[[nodiscard]] FORCEINLINE int Height( ) const { return m_nNumRows; }
+	[[nodiscard]] FORCEINLINE int Width( ) const { return m_nNumCols; }
 
 };
 

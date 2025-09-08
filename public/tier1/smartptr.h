@@ -62,24 +62,24 @@ class CPlainAutoPtr
 {
 public:
 	explicit CPlainAutoPtr( T *p = nullptr )		: m_p( p ) {}
-	~CPlainAutoPtr( void )						{ Delete(); }
+	~CPlainAutoPtr( )						{ Delete(); }
 
 public:
-	void Delete( void )							{ delete Detach(); }
+	void Delete( )							{ delete Detach(); }
 
-private:	// Disallow copying, use Detach() instead to avoid ambiguity
+	// Disallow copying, use Detach() instead to avoid ambiguity
 	CPlainAutoPtr( CPlainAutoPtr const &x ) = delete;
 	CPlainAutoPtr & operator = ( CPlainAutoPtr const &x ) = delete;
 
 public:
 	void Attach( T *p )							{ m_p = p; }
-	T * Detach( void )							{ T * p( m_p ); m_p = nullptr; return p; }
+	T * Detach( )							{ T * p( m_p ); m_p = nullptr; return p; }
 
 public:
-	[[nodiscard]] bool IsValid( void ) const					{ return m_p != nullptr; }
-	[[nodiscard]] T * Get( void ) const							{ return m_p; }
-	[[nodiscard]] T * operator -> ( void ) const				{ return Get(); }
-	[[nodiscard]] T & operator *  ( void ) const				{ return *Get(); }
+	[[nodiscard]] bool IsValid( ) const					{ return m_p != nullptr; }
+	[[nodiscard]] T * Get( ) const						{ return m_p; }
+	[[nodiscard]] T * operator -> ( ) const				{ return Get(); }
+	[[nodiscard]] T & operator *  ( ) const				{ return *Get(); }
 
 private:
 	T * m_p;
@@ -104,10 +104,10 @@ class CArrayAutoPtr : public CPlainAutoPtr < T > // Warning: no polymorphic dest
 {
 public:
 	explicit CArrayAutoPtr( T *p = nullptr )	{ this->Attach( p ); }
-	~CArrayAutoPtr( void )						{ this->Delete(); }
+	~CArrayAutoPtr( )						{ this->Delete(); }
 
 public:
-	void Delete( void )							{ delete [] CPlainAutoPtr < T >::Detach(); }
+	void Delete( )							{ delete [] CPlainAutoPtr < T >::Detach(); }
 
 public:
 	T & operator [] ( int k ) const				{ return CPlainAutoPtr < T >::Get()[ k ]; }
@@ -259,7 +259,7 @@ public:
 
 	~CAutoPushPop() { m_rVar = m_valPop; }
 
-private:	// forbid copying
+	// forbid copying
 	CAutoPushPop( CAutoPushPop const &x ) = delete;
 	CAutoPushPop & operator = ( CAutoPushPop const &x ) = delete;
 

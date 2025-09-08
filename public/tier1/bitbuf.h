@@ -632,7 +632,7 @@ public:
 	// pOutNumChars is set to the number of characters left in pStr when the routine is 
 	// complete (this will never exceed bufLen-1).
 	//
-	bool			ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine=false, intp *pOutNumChars=NULL );
+	bool			ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine=false, intp *pOutNumChars=nullptr );
 
 	// dimhotepus: Bounds-safe interface.
 	template<intp bufLen>
@@ -643,7 +643,7 @@ public:
 
 	// Reads a string and allocates memory for it. If the string in the buffer
 	// is > 2048 bytes, then pOverflow is set to true (if it's not NULL).
-	[[nodiscard]] char*			ReadAndAllocateString( bool *pOverflow = 0 );
+	[[nodiscard]] char*			ReadAndAllocateString( bool *pOverflow = nullptr );
 
 	// Returns nonzero if any bits differ
 	[[nodiscard]] int			CompareBits( bf_read * RESTRICT other, int bits );

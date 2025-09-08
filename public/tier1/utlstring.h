@@ -84,7 +84,7 @@ public:
 
 	~CUtlString();
 
-	const char	*Get() const;
+	[[nodiscard]] const char	*Get() const;
 	void		Set( const char *pValue );
 
 	operator const char*() const;
@@ -93,9 +93,9 @@ public:
 	// STL compatible member functions.  These allow easier use of std::sort
 	// and they are forward compatible with the C++ 11 range-based for loops.
 	char* begin()					{ return GetForModify(); }
-	const char* begin() const		{ return Get(); }
+	[[nodiscard]] const char* begin() const		{ return Get(); }
 	char* end()						{ return GetForModify() + Length(); }
-	const char* end() const			{ return Get() + Length(); }
+	[[nodiscard]] const char* end() const			{ return Get() + Length(); }
 
 	// Set directly and don't look for a null terminator in pValue.
 	// nChars does not include the nul and this will only copy
@@ -105,12 +105,12 @@ public:
 	void		SetDirect( const char *pValue, intp nChars );
 
 	// for compatibility switching items from UtlSymbol
-	const char  *String() const { return Get(); } //-V524
+	[[nodiscard]] const char  *String() const { return Get(); } //-V524
 
 	// Returns strlen
-	intp			Length() const;
+	[[nodiscard]] intp			Length() const;
 	// IsEmpty() is more efficient than Length() == 0
-	bool		IsEmpty() const;
+	[[nodiscard]] bool		IsEmpty() const;
 
 	// Sets the length (used to serialize into the buffer )
 	// Note: If nLen != 0, then this adds an extra byte for a null-terminator.	
@@ -158,7 +158,7 @@ public:
 	CUtlString operator+( const CUtlString &other ) const;
 	CUtlString operator+( int rhs ) const;
 
-	bool MatchesPattern( const CUtlString &Pattern, int nFlags = 0 ) const;		// case SENSITIVE, use * for wildcard in pattern string
+	[[nodiscard]] bool MatchesPattern( const CUtlString &Pattern, int nFlags = 0 ) const;		// case SENSITIVE, use * for wildcard in pattern string
 
 	char operator[]( intp i ) const;
 
@@ -178,14 +178,14 @@ public:
 	// Get a copy of part of the string.
 	// If you only specify nStart, it'll go from nStart to the end.
 	// You can use negative numbers and it'll wrap around to the start.
-	CUtlString Slice( intp nStart=0, intp nEnd=PTRDIFF_MAX ) const;
+	[[nodiscard]] CUtlString Slice( intp nStart=0, intp nEnd=PTRDIFF_MAX ) const;
 
 	// Get a substring starting from the left or the right side.
-	CUtlString Left( intp nChars ) const;
-	CUtlString Right( intp nChars ) const;
+	[[nodiscard]] CUtlString Left( intp nChars ) const;
+	[[nodiscard]] CUtlString Right( intp nChars ) const;
 
 	// Get a string with all instances of one character replaced with another.
-	CUtlString Replace( char cFrom, char cTo ) const;
+	[[nodiscard]] CUtlString Replace( char cFrom, char cTo ) const;
 
 	// Replace all instances of specified string with another.
 	CUtlString Replace( const char *pszFrom, const char *pszTo ) const;
@@ -194,22 +194,22 @@ public:
 	CUtlString AbsPath( const char *pStartingDir=nullptr ) const;	
 
 	// Gets the filename (everything except the path.. c:\a\b\c\somefile.txt -> somefile.txt).
-	CUtlString UnqualifiedFilename() const;
+	[[nodiscard]] CUtlString UnqualifiedFilename() const;
 	
 	// Gets a string with one directory removed. Uses V_StripLastDir but strips the last slash also!
-	CUtlString DirName() const;
+	[[nodiscard]] CUtlString DirName() const;
 
 	// Get a string with the extension removed (with V_StripExtension).
-	CUtlString StripExtension() const;
+	[[nodiscard]] CUtlString StripExtension() const;
 
 	// Get a string with the filename removed (uses V_UnqualifiedFileName and also strips the last slash)
-	CUtlString StripFilename() const;
+	[[nodiscard]] CUtlString StripFilename() const;
 
 	// Get a string with the base filename (with V_FileBase).
-	CUtlString GetBaseFilename() const;
+	[[nodiscard]] CUtlString GetBaseFilename() const;
 
 	// Get a string with the file extension (with V_FileBase).
-	CUtlString GetExtension() const;
+	[[nodiscard]] CUtlString GetExtension() const;
 
 	// Works like V_ComposeFileName.
 	static CUtlString PathJoin( const char *pStr1, const char *pStr2 );
@@ -400,7 +400,7 @@ public:
 	const T *Get() const { return m_pString ? m_pString : StringFuncs<T>::EmptyString(); }
 	operator const T*() const { return m_pString ? m_pString : StringFuncs<T>::EmptyString(); }
 
-	bool IsEmpty() const { return m_pString == NULL; } // Note: empty strings are never stored by Set
+	[[nodiscard]] bool IsEmpty() const { return m_pString == NULL; } // Note: empty strings are never stored by Set
 
 	int Compare( const T *rhs ) const;
 

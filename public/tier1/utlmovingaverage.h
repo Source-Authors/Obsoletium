@@ -27,7 +27,7 @@ public:
 		m_flTotal = 0.0f;
 	}
 
-	uint32 GetTotalValuesPushed() const 
+	[[nodiscard]] uint32 GetTotalValuesPushed() const 
 	{ 
 		return m_nValuesPushed; 
 	}

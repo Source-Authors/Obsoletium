@@ -100,14 +100,14 @@ public:
 	~CUtlTSHash();
 
 	// Invalid handle.
-	static UtlTSHashHandle_t InvalidHandle( void )	{ return ( UtlTSHashHandle_t )0; }
+	static UtlTSHashHandle_t InvalidHandle( )	{ return ( UtlTSHashHandle_t )0; }
 
 	// Retrieval. Super fast, is thread-safe
 	UtlTSHashHandle_t Find( KEYTYPE uiKey );
 
 	// Insertion ( find or add ).
-	UtlTSHashHandle_t Insert( KEYTYPE uiKey, const T &data, bool *pDidInsert = NULL );
-	UtlTSHashHandle_t Insert( KEYTYPE uiKey, ITSHashConstructor<T> *pConstructor, bool *pDidInsert = NULL );
+	UtlTSHashHandle_t Insert( KEYTYPE uiKey, const T &data, bool *pDidInsert = nullptr );
+	UtlTSHashHandle_t Insert( KEYTYPE uiKey, ITSHashConstructor<T> *pConstructor, bool *pDidInsert = nullptr );
 
 	// This insertion method assumes the element is not in the hash table, skips 
 	UtlTSHashHandle_t FastInsert( KEYTYPE uiKey, const T &data );
@@ -120,8 +120,8 @@ public:
 	// Removal.	Only call when you're certain no threads are accessing the hash table
 	void FindAndRemove( KEYTYPE uiKey );
 	void Remove( UtlTSHashHandle_t hHash ) { FindAndRemove( GetID( hHash ) ); }
-	void RemoveAll( void );
-	void Purge( void );
+	void RemoveAll( );
+	void Purge( );
 
 	// Returns the number of elements in the hash table
 	int Count() const;
@@ -214,7 +214,7 @@ CUtlTSHash<T,BUCKET_COUNT,KEYTYPE,HashFuncs,nAlignment>::~CUtlTSHash()
 // Purpose: Destroy dynamically allocated hash data.
 //-----------------------------------------------------------------------------
 template<class T, int BUCKET_COUNT, class KEYTYPE, class HashFuncs, int nAlignment> 
-inline void CUtlTSHash<T,BUCKET_COUNT,KEYTYPE,HashFuncs,nAlignment>::Purge( void )
+inline void CUtlTSHash<T,BUCKET_COUNT,KEYTYPE,HashFuncs,nAlignment>::Purge( )
 {
 	RemoveAll();
 }
@@ -496,7 +496,7 @@ inline void CUtlTSHash<T,BUCKET_COUNT,KEYTYPE,HashFuncs,nAlignment>::FindAndRemo
 // Purpose: Remove all elements from the hash
 //-----------------------------------------------------------------------------
 template<class T, int BUCKET_COUNT, class KEYTYPE, class HashFuncs, int nAlignment> 
-inline void CUtlTSHash<T,BUCKET_COUNT,KEYTYPE,HashFuncs,nAlignment>::RemoveAll( void )
+inline void CUtlTSHash<T,BUCKET_COUNT,KEYTYPE,HashFuncs,nAlignment>::RemoveAll( )
 {
 	m_bNeedsCommit = false;
 	if ( m_EntryMemory.Count() == 0 )
