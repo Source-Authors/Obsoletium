@@ -145,7 +145,6 @@ unsigned FASTCALL HashStringCaselessConventional( const char *pszKey )
 unsigned FASTCALL HashInt( const int n )
 {
 	unsigned		even, odd;
-	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
 	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
@@ -166,7 +165,6 @@ unsigned FASTCALL Hash4( const void *pKey )
 					odd,
 					n;
 	n     = *p;
-	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
 	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
@@ -188,7 +186,6 @@ unsigned FASTCALL Hash8( const void *pKey )
 					odd,
 					n;
 	n     = *p;
-	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
 	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
@@ -216,7 +213,6 @@ unsigned FASTCALL Hash12( const void *pKey )
 					odd,
 					n;
 	n     = *p;
-	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
 	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
@@ -250,7 +246,6 @@ unsigned FASTCALL Hash16( const void *pKey )
 					odd,
 					n;
 	n     = *p;
-	even  = g_nRandomValues[n & 0xff];
 	odd   = g_nRandomValues[((n >> 8) & 0xff)];
 
 	even  = g_nRandomValues[odd ^ (n >> 24)]; //-V519
