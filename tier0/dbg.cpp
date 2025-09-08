@@ -48,7 +48,7 @@ struct SpewGroup_t
 // Skip forward past the directory
 static const char *SkipToFname( const tchar* pFile )
 {
-	if ( pFile == NULL )
+	if ( pFile == nullptr )
 		return "unknown";
 	const tchar* pSlash = _tcsrchr( pFile, '\\' );
 	const tchar* pSlash2 = _tcsrchr( pFile, '/' );
@@ -235,7 +235,7 @@ const tchar* GetSpewOutputGroup( void )
 	assert( pSpewInfo );
 	if ( pSpewInfo )
 		return pSpewInfo->m_pSpewOutputGroup;
-	return NULL;
+	return nullptr;
 }
 
 int GetSpewOutputLevel( void )
@@ -911,7 +911,7 @@ void* Plat_SimpleLog( const tchar* file, int line )
 		ExecuteOnce( Warning("Unable to open '%s' as 'at+'.\n", kLogFileName) )
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 #ifdef DBGFLAG_VALIDATE

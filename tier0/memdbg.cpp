@@ -456,7 +456,7 @@ public:
 	const_pointer address (const_reference value) const { return &value;}
 	size_type max_size() const { return INT_MAX; }
 
-	pointer allocate(size_type num, const void* = 0)  { return (pointer)DebugAlloc(num * sizeof(T)); }
+	pointer allocate(size_type num, const void* = nullptr)  { return (pointer)DebugAlloc(num * sizeof(T)); }
 	void deallocate (pointer p, size_type num) { DebugFree(p); }
 	void construct(pointer p, const T& value) {	new((void*)p)T(value); }
 	void destroy (pointer p) { p->~T(); }
@@ -811,7 +811,7 @@ void CDbgMemAlloc::Initialize()
 		// a bug-finding point of view. Do this always on Windows since the heap is
 		// used by video drivers and other in-proc components.
 #if defined(PLATFORM_WINDOWS_PC)
-		HeapSetInformation( NULL, HeapEnableTerminationOnCorruption, NULL, 0 );
+		HeapSetInformation( nullptr, HeapEnableTerminationOnCorruption, nullptr, 0 );
 #endif
 	}
 }
@@ -905,7 +905,7 @@ void CDbgMemAlloc::Free( void *pMem )
 
 void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t )
 {
-	return NULL;
+	return nullptr;
 }
 
 void SetupDebugInfoStack(DbgInfoStack_t *&stack, int &stack_depth)
@@ -919,7 +919,7 @@ void SetupDebugInfoStack(DbgInfoStack_t *&stack, int &stack_depth)
 //-----------------------------------------------------------------------------
 void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -935,7 +935,7 @@ void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 
 void CDbgMemAlloc::PopAllocDbgInfo()
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -955,7 +955,7 @@ uint32 CDbgMemAlloc::GetDebugInfoSize()
 
 void CDbgMemAlloc::SaveDebugInfo( void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -967,7 +967,7 @@ void CDbgMemAlloc::SaveDebugInfo( void *pvDebugInfo )
 
 void CDbgMemAlloc::RestoreDebugInfo( const void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -1007,7 +1007,7 @@ void CDbgMemAlloc::GetActualDbgInfo( const char *&pFileName, int &nLine )
 	return;
 #endif
 
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -1252,7 +1252,7 @@ void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize, const char *pFileName, in
 	if ( !m_bInitialized )
 		return InternalRealloc( pMem, nSize, pFileName, nLine );
 
-	if ( pMem != 0 )
+	if ( pMem != nullptr )
 	{
 		RegisterDeallocation( GetAllocatonFileName( pMem ), GetAllocatonLineNumber( pMem ), InternalLogicalSize( pMem ), InternalMSize( pMem ), 0 );
 	}
@@ -1308,7 +1308,7 @@ void  CDbgMemAlloc::Free( void *pMem, const char * /*pFileName*/, int )
 
 void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t, const char *, int )
 {
-	return NULL;
+	return nullptr;
 }
 
 

@@ -1409,7 +1409,7 @@ void ReserveBottomMemory()
 	{
 		for (;;)
 		{
-			void* p = VirtualAlloc( 0, blockSize, MEM_RESERVE, PAGE_NOACCESS );
+			void* p = VirtualAlloc( nullptr, blockSize, MEM_RESERVE, PAGE_NOACCESS );
 			if ( !p )
 				break;
 

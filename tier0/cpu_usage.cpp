@@ -82,17 +82,17 @@ float GetCPUUsage()
 	}
 
 	// get number of processors in the system
-	status = NtQuerySystemInformation( SystemBasicInformation,&SysBaseInfo,sizeof(SysBaseInfo),NULL );
+	status = NtQuerySystemInformation( SystemBasicInformation,&SysBaseInfo,sizeof(SysBaseInfo),nullptr );
 	if ( status != NO_ERROR )
 		return(0);
 
 	// get new system time
-	status = NtQuerySystemInformation( SystemTimeInformation,&SysTimeInfo,sizeof(SysTimeInfo),0 );
+	status = NtQuerySystemInformation( SystemTimeInformation,&SysTimeInfo,sizeof(SysTimeInfo),nullptr );
 	if ( status!=NO_ERROR )
 		return(0);
 
 	// get new CPU's idle time
-	status = NtQuerySystemInformation( SystemPerformanceInformation,&SysPerfInfo,sizeof(SysPerfInfo),NULL );
+	status = NtQuerySystemInformation( SystemPerformanceInformation,&SysPerfInfo,sizeof(SysPerfInfo),nullptr );
 	if ( status != NO_ERROR )
 		return(0);
 

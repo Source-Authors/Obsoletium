@@ -113,7 +113,7 @@ static void VCR_End()
 
 static IVCRTrace* VCR_GetVCRTraceInterface()
 {
-	return 0;
+	return nullptr;
 }
 
 static VCRMode VCR_GetMode()

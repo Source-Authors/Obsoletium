@@ -79,7 +79,7 @@ CL2Cache::~CL2Cache()
 	if ( m_pL2CacheEvent )
 	{
 		delete m_pL2CacheEvent;
-		m_pL2CacheEvent = NULL;
+		m_pL2CacheEvent = nullptr;
 	}
 }
 

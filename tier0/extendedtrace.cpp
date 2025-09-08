@@ -91,7 +91,7 @@ void InitSymbolPath( PSTR lpszSymbolPath, PCSTR lpszIniPath )
 	}
 
    // Add user defined path
-	if ( lpszIniPath != NULL )
+	if ( lpszIniPath != nullptr )
 		if ( lpszIniPath[0] != '\0' )
 		{
 		   strcat( lpszSymbolPath, ";" );
@@ -151,7 +151,7 @@ BOOL GetFunctionInfoFromAddresses( ULONG fnAddress, ULONG stackAddress, LPTSTR l
 	DWORD             dwSymSize = 10000;
    TCHAR             lpszUnDSymbol[BUFFERSIZE]=_T("?");
 	CHAR              lpszNonUnicodeUnDSymbol[BUFFERSIZE]="?";
-	LPTSTR            lpszParamSep = NULL;
+	LPTSTR            lpszParamSep = nullptr;
 	LPCTSTR           lpszParsed = lpszUnDSymbol;
 	PIMAGEHLP_SYMBOL  pSym = (PIMAGEHLP_SYMBOL)GlobalAlloc( GMEM_FIXED, dwSymSize );
 
@@ -197,13 +197,13 @@ BOOL GetFunctionInfoFromAddresses( ULONG fnAddress, ULONG stackAddress, LPTSTR l
 
       // Let's go through the stack, and modify the function prototype, and insert the actual
       // parameter values from the stack
-		if ( _tcsstr( lpszUnDSymbol, _T("(void)") ) == NULL && _tcsstr( lpszUnDSymbol, _T("()") ) == NULL)
+		if ( _tcsstr( lpszUnDSymbol, _T("(void)") ) == nullptr && _tcsstr( lpszUnDSymbol, _T("()") ) == nullptr)
 		{
 			ULONG index = 0;
 			for( ; ; index++ )
 			{
 				lpszParamSep = _tcschr( lpszParsed, _T(',') );
-				if ( lpszParamSep == NULL )
+				if ( lpszParamSep == nullptr )
 					break;
 
 				*lpszParamSep = _T('\0');
@@ -215,7 +215,7 @@ BOOL GetFunctionInfoFromAddresses( ULONG fnAddress, ULONG stackAddress, LPTSTR l
 			}
 
 			lpszParamSep = _tcschr( lpszParsed, _T(')') );
-			if ( lpszParamSep != NULL )
+			if ( lpszParamSep != nullptr )
 			{
 				*lpszParamSep = _T('\0');
 
@@ -332,11 +332,11 @@ void StackTrace( HANDLE hThread, LPCTSTR lpszMessage )
 			hProcess,
 			hThread,
 	      &callStack,
-			NULL, 
-			NULL,
+			nullptr, 
+			nullptr,
 			SymFunctionTableAccess,
 			SymGetModuleBase,
-			NULL);
+			nullptr);
 
 		if ( index == 0 )
 		   continue;
@@ -387,11 +387,11 @@ void FunctionParameterInfo()
 			hProcess,
 			hThread,
 			&callStack,
-			NULL, 
-			NULL,
+			nullptr, 
+			nullptr,
 			SymFunctionTableAccess,
 			SymGetModuleBase,
-			NULL);
+			nullptr);
 	}
 
 	if ( bResult && callStack.AddrFrame.Offset != 0) 

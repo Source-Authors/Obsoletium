@@ -117,7 +117,7 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadI
 	ThreadId_t idIgnored;
 	if ( !pID )
 		pID = &idIgnored;
-	HANDLE h = VCRHook_CreateThread(NULL, stackSize, reinterpret_cast<void*>(ThreadProcConvert), new ThreadProcInfo_t( pfnThread, pParam ), CREATE_SUSPENDED, pID);
+	HANDLE h = VCRHook_CreateThread(nullptr, stackSize, reinterpret_cast<void*>(ThreadProcConvert), new ThreadProcInfo_t( pfnThread, pParam ), CREATE_SUSPENDED, pID);
 	if ( h != INVALID_HANDLE_VALUE )
 	{
 		Plat_ApplyHardwareDataBreakpointsToNewThread( *pID );
@@ -150,7 +150,7 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadI
 
 ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, unsigned stackSize )
 {
-	return CreateSimpleThread( pfnThread, pParam, NULL, stackSize );
+	return CreateSimpleThread( pfnThread, pParam, nullptr, stackSize );
 }
 
 PLATFORM_INTERFACE void ThreadDetach( [[maybe_unused]] ThreadHandle_t hThread )
@@ -473,7 +473,7 @@ int ThreadWaitForObjects( int nEvents, const HANDLE *pHandles, bool bWaitAll, un
 //-----------------------------------------------------------------------------
 // Used to thread LoadLibrary on the 360
 //-----------------------------------------------------------------------------
-static ThreadedLoadLibraryFunc_t s_ThreadedLoadLibraryFunc = 0;
+static ThreadedLoadLibraryFunc_t s_ThreadedLoadLibraryFunc = nullptr;
 PLATFORM_INTERFACE void SetThreadedLoadLibraryFunc( ThreadedLoadLibraryFunc_t func )
 {
 	s_ThreadedLoadLibraryFunc = func;
@@ -491,7 +491,7 @@ PLATFORM_INTERFACE ThreadedLoadLibraryFunc_t GetThreadedLoadLibraryFunc()
 
 CThreadSyncObject::CThreadSyncObject()
 #ifdef _WIN32
-  : m_hSyncObject( NULL ), m_bCreatedHandle(false)
+  : m_hSyncObject( nullptr ), m_bCreatedHandle(false)
 #elif defined(POSIX)
   : m_bInitalized( false )
 #endif
@@ -614,7 +614,7 @@ bool CThreadSyncObject::Wait( uint32 dwTimeout )
 CThreadEvent::CThreadEvent( bool bManualReset )
 {
 #ifdef _WIN32
-    m_hSyncObject = CreateEvent( NULL, bManualReset, FALSE, NULL );
+    m_hSyncObject = CreateEvent( nullptr, bManualReset, FALSE, nullptr );
 	m_bCreatedHandle = true;
     AssertMsg1(m_hSyncObject, "Failed to create event: %s",
 		std::system_category().message(::GetLastError()).c_str() );
@@ -715,14 +715,14 @@ CThreadSemaphore::CThreadSemaphore( long initialValue, long maxValue )
 		AssertMsg( maxValue > 0, "Invalid max value for semaphore" );
 		AssertMsg( initialValue >= 0 && initialValue <= maxValue, "Invalid initial value for semaphore" );
 
-		m_hSyncObject = CreateSemaphore( NULL, initialValue, maxValue, NULL );
+		m_hSyncObject = CreateSemaphore( nullptr, initialValue, maxValue, nullptr );
 
 		AssertMsg1(m_hSyncObject, "Failed to create semaphore: %s",
 			std::system_category().message(::GetLastError()).c_str() );
 	}
 	else
 	{
-		m_hSyncObject = NULL;
+		m_hSyncObject = nullptr;
 	}
 }
 
@@ -742,7 +742,7 @@ bool CThreadSemaphore::Release( long releaseCount, long *pPreviousCount )
 
 CThreadFullMutex::CThreadFullMutex( bool bEstablishInitialOwnership, const char *pszName )
 {
-   m_hSyncObject = CreateMutex( NULL, bEstablishInitialOwnership, pszName );
+   m_hSyncObject = CreateMutex( nullptr, bEstablishInitialOwnership, pszName );
 
    AssertMsg1( m_hSyncObject, "Failed to create mutex: %s",
 	   std::system_category().message(::GetLastError()).c_str() );
@@ -799,7 +799,7 @@ void * CThreadLocalBase::Get() const
 	if ( m_index != TLS_OUT_OF_INDEXES )
 		return TlsGetValue( m_index );
 	AssertMsg( 0, "Bad thread local" );
-	return NULL;
+	return nullptr;
 #elif defined(POSIX)
 	void *value = pthread_getspecific( m_index );
 	return value;
@@ -1568,7 +1568,7 @@ static thread_local CThread *g_pCurThread;
 CThread::CThread()
 :	
 #ifdef _WIN32
-	m_hThread( NULL ),
+	m_hThread( nullptr ),
 #endif
 	m_threadId( 0 ),
 	m_result( 0 ),
@@ -1660,7 +1660,7 @@ bool CThread::Start( unsigned nBytesStack )
 
 #ifdef _WIN32
 	HANDLE       hThread;
-	m_hThread = hThread = (HANDLE)VCRHook_CreateThread( NULL,
+	m_hThread = hThread = (HANDLE)VCRHook_CreateThread( nullptr,
 														nBytesStack,
 														reinterpret_cast<void*>(GetThreadProc()),
 														new ThreadInit_t(init),
@@ -1700,7 +1700,7 @@ bool CThread::Start( unsigned nBytesStack )
 		Msg( "Thread failed to initialize\n" );
 #ifdef _WIN32
 		CloseHandle( m_hThread );
-		m_hThread = NULL;
+		m_hThread = nullptr;
 		m_threadId = 0;
 #elif defined(POSIX)
 		m_threadId = 0;
@@ -1713,7 +1713,7 @@ bool CThread::Start( unsigned nBytesStack )
 		Msg( "Thread failed to initialize\n" );
 #ifdef _WIN32
 		CloseHandle( m_hThread );
-		m_hThread = NULL;
+		m_hThread = nullptr;
 		m_threadId = 0;
 #elif defined(POSIX)
 		m_threadId = 0;
@@ -1819,11 +1819,11 @@ void CThread::Stop(int exitCode)
 		if ( !( m_flags & SUPPORT_STOP_PROTOCOL ) )
 		{
 			OnExit();
-			g_pCurThread = NULL;
+			g_pCurThread = nullptr;
 
 #ifdef _WIN32
 			CloseHandle( m_hThread );
-			m_hThread = NULL;
+			m_hThread = nullptr;
 #endif
 			Cleanup();
 		}
@@ -1945,7 +1945,7 @@ bool CThread::Terminate(int exitCode)
 	if (!TerminateThread(m_hThread, exitCode))
 		return false;
 	CloseHandle( m_hThread );
-	m_hThread = NULL;
+	m_hThread = nullptr;
 	Cleanup();
 #elif defined(POSIX)
 	pthread_kill( m_threadId, SIGKILL );
@@ -2098,7 +2098,7 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 	}
 	
 	pThread->OnExit();
-	g_pCurThread = NULL;
+	g_pCurThread = nullptr;
 	pThread->Cleanup();
 	
 	return pThread->m_result;
@@ -2112,7 +2112,7 @@ CWorkerThread::CWorkerThread()
 :	m_EventSend(true),                 // must be manual-reset for PeekCall()
 	m_EventComplete(true),             // must be manual-reset to handle multiple wait with thread properly
 	m_Param(0),
-	m_pParamFunctor(NULL),
+	m_pParamFunctor(nullptr),
 	m_ReturnVal(0)
 {
 }
@@ -2121,7 +2121,7 @@ CWorkerThread::CWorkerThread()
 
 int CWorkerThread::CallWorker(unsigned dw, unsigned timeout, bool fBoostWorkerPriorityToMaster, CFunctor *pParamFunctor)
 {
-	return Call(dw, timeout, fBoostWorkerPriorityToMaster, NULL, pParamFunctor);
+	return Call(dw, timeout, fBoostWorkerPriorityToMaster, nullptr, pParamFunctor);
 }
 
 //---------------------------------------------------------
@@ -2207,7 +2207,7 @@ int CWorkerThread::Call(unsigned dwParam, unsigned timeout, bool fBoostPriority,
 //---------------------------------------------------------
 int CWorkerThread::WaitForReply( unsigned timeout )
 {
-	return WaitForReply( timeout, NULL );
+	return WaitForReply( timeout, nullptr );
 }
 
 int CWorkerThread::WaitForReply( unsigned timeout, WaitFunc_t pfnWait )

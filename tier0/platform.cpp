@@ -150,7 +150,7 @@ void GetCurrentDate( int *pDay, int *pMonth, int *pYear )
 char *Plat_ctime( const time_t *timep, char *buf, size_t bufsize )
 {
 	if ( EINVAL == ctime_s( buf, bufsize, timep ) )
-		return NULL;
+		return nullptr;
 	else
 		return buf;
 }
@@ -159,7 +159,7 @@ void Plat_GetModuleFilename( char *pOut, int nMaxBytes )
 {
 #ifdef PLATFORM_WINDOWS_PC
 	SetLastError( ERROR_SUCCESS ); // clear the error code
-	GetModuleFileName( NULL, pOut, nMaxBytes );
+	GetModuleFileName( nullptr, pOut, nMaxBytes );
 	if ( GetLastError() != ERROR_SUCCESS )
 		Error( "Plat_GetModuleFilename: Unable to read exe file name: %s.", 
 			std::system_category().message(GetLastError()).c_str());
@@ -178,7 +178,7 @@ void Plat_ExitProcess( int nCode )
 	const char *pchCmdLineA = Plat_GetCommandLineA();
 	if ( nCode || ( strstr( pchCmdLineA, "gc.exe" ) && strstr( pchCmdLineA, "gc.dll" ) && strstr( pchCmdLineA, "-gc" ) ) )
 	{
-		int *x = NULL; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll //-V522
+		int *x = nullptr; *x = 1; // cause a hard crash, GC is not allowed to exit voluntarily from gc.dll //-V522
 	}
 	TerminateProcess( GetCurrentProcess(), nCode );
 #else	
@@ -216,7 +216,7 @@ void Plat_SetExitProcessWithErrorCB( ExitProcessWithErrorCBFn pfnCB )
 struct tm *Plat_gmtime( const time_t *timep, struct tm *result )
 {
 	if ( EINVAL == gmtime_s( result, timep ) )
-		return NULL;
+		return nullptr;
 	else
 		return result;
 }
@@ -232,7 +232,7 @@ time_t Plat_timegm( struct tm *timeptr )
 struct tm *Plat_localtime( const time_t *timep, struct tm *result )
 {
 	if ( EINVAL == localtime_s( result, timep ) )
-		return NULL;
+		return nullptr;
 	else
 		return result;
 }
@@ -242,8 +242,8 @@ bool vtune( bool resume )
 {
 #ifndef _X360
 	static bool bInitialized = false;
-	static void (__cdecl *VTResume)(void) = NULL;
-	static void (__cdecl *VTPause) (void) = NULL;
+	static void (__cdecl *VTResume)(void) = nullptr;
+	static void (__cdecl *VTPause) (void) = nullptr;
 
 	// Grab the Pause and Resume function pointers from the VTune DLL the first time through:
 	if( !bInitialized )
@@ -300,7 +300,7 @@ static BOOL IsUserAdmin() {
       0, 0, 0, 0, 0, &administratorsGroup);
 
   if (ok) {
-    if (!CheckTokenMembership(NULL, administratorsGroup, &ok)) {
+    if (!CheckTokenMembership(nullptr, administratorsGroup, &ok)) {
       ok = FALSE;
     }
 
@@ -447,7 +447,7 @@ PLATFORM_INTERFACE void* Plat_Alloc( unsigned long size )
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 	g_AllocError( size );
 #endif
-	return 0;
+	return nullptr;
 }
 
 PLATFORM_INTERFACE void* Plat_Realloc( void *ptr, unsigned long size )
@@ -466,7 +466,7 @@ PLATFORM_INTERFACE void* Plat_Realloc( void *ptr, unsigned long size )
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 	g_AllocError( size );
 #endif
-	return 0;
+	return nullptr;
 }
 
 PLATFORM_INTERFACE void Plat_Free( void *ptr )

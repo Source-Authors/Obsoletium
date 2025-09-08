@@ -64,7 +64,7 @@ inline void Wrap_EnterCriticalSection( CRITICAL_SECTION *pSection )
 // ------------------------------------------------------------------------------------------ //
 // Threadsafe debugging file output.
 // ------------------------------------------------------------------------------------------ //
-FILE *g_pDebugFile = 0;
+FILE *g_pDebugFile = nullptr;
 CThreadMutex g_DebugFileMutex;
 
 void VCR_Debug( const char *pMsg, ... )
@@ -110,7 +110,7 @@ public:
 	HANDLE m_hWaitEvent;	// Used to get the signal that there is an event for this thread.
 	bool m_bEnabled;		// By default, this is true, but it can be set to false to temporarily disable a thread's VCR usage.
 };
-CVCRThreadInfo *g_pVCRThreads = NULL;	// This gets allocated to MAX_VCR_THREADS size if we're doing any VCR recording or playback.
+CVCRThreadInfo *g_pVCRThreads = nullptr;	// This gets allocated to MAX_VCR_THREADS size if we're doing any VCR recording or playback.
 int g_nVCRThreads = 0;
 
 // Used to avoid writing the thread ID into events that are for the main thread.
@@ -397,7 +397,7 @@ static int VCR_Start( char const *pFilename, bool bRecord, IVCRHelpers *pHelpers
 	// Setup the initial VCR thread list.
 	g_pVCRThreads = new CVCRThreadInfo[MAX_VCR_THREADS];
 	g_pVCRThreads[0].m_ThreadID = GetCurrentThreadId();
-	g_pVCRThreads[0].m_hWaitEvent = CreateEvent( NULL, false, false, NULL );
+	g_pVCRThreads[0].m_hWaitEvent = CreateEvent( nullptr, false, false, nullptr );
 	g_pVCRThreads[0].m_bEnabled = true;
 	g_nVCRThreads = 1;
 
@@ -465,7 +465,7 @@ static void VCR_End()
 	if ( g_pVCRFile )
 	{
 		fclose(g_pVCRFile);
-		g_pVCRFile = NULL;
+		g_pVCRFile = nullptr;
 	}
 
 	if ( g_VCRMode == VCR_Playback )
@@ -914,7 +914,7 @@ static void VCR_Hook_Cmd_Exec(char **f)
 		VCR_Read(&len, sizeof(len));
 		if(len == -1)
 		{
-			*f = NULL;
+			*f = nullptr;
 		}
 		else
 		{
@@ -1428,7 +1428,7 @@ void ReadAndVerifyShortString( const char *pStr )
 	if ( incomingSize != len )
 		VCR_Error( "ReadAndVerifyShortString (%s), lengths different.", pStr );
 
-	static char *pTempData = 0;
+	static char *pTempData = nullptr;
 	static size_t tempDataLen = 0;
 	if ( tempDataLen < len )
 	{
@@ -1579,13 +1579,13 @@ void* VCR_CreateThread(
 		if ( g_VCRMode == VCR_Playback || g_VCRMode == VCR_Record )
 			Error( "VCR_CreateThread: CreateThread() failed." );
 
-		return NULL;
+		return nullptr;
 	}
 
 	// Register this thread so we can write its ID into future VCR events.
 	int iNewThread = g_nVCRThreads++;
 	g_pVCRThreads[iNewThread].m_ThreadID = dwThreadID;
-	g_pVCRThreads[iNewThread].m_hWaitEvent = CreateEvent( NULL, false, false, NULL );
+	g_pVCRThreads[iNewThread].m_hWaitEvent = CreateEvent( nullptr, false, false, nullptr );
 	g_pVCRThreads[iNewThread].m_bEnabled = true;
 
 	// Now resume the thread.

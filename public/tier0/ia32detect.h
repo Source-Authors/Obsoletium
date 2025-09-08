@@ -141,7 +141,7 @@ public:
 		memset(&misc, 0, sizeof(misc));
 		memset(&feature, 0, sizeof(feature));
 
-		cache = 0;
+		cache = nullptr;
 		uint32 m = init0();
 
 		uint32 *d = new uint32[m * 4];

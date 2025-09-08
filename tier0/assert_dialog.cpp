@@ -64,7 +64,7 @@ static HINSTANCE g_hTier0Instance = nullptr;
 
 static bool g_bAssertsEnabled = true;
 
-static CAssertDisable *g_pAssertDisables = NULL;
+static CAssertDisable *g_pAssertDisables = nullptr;
 
 #if ( defined( _WIN32 ) && !defined( _X360 ) )
 static int g_iLastLineRange = 5;
@@ -113,15 +113,15 @@ BOOL WINAPI DllMain( HINSTANCE module, DWORD fdwReason, LPVOID lpvReserved )
 
 static bool IsDebugBreakEnabled()
 {
-	static bool bResult = ( _tcsstr( Plat_GetCommandLine(), _T("-debugbreak") )    != NULL ) || \
-	                      ( _tcsstr( Plat_GetCommandLine(), _T("-raiseonassert") ) != NULL ) || \
+	static bool bResult = ( _tcsstr( Plat_GetCommandLine(), _T("-debugbreak") )    != nullptr ) || \
+	                      ( _tcsstr( Plat_GetCommandLine(), _T("-raiseonassert") ) != nullptr ) || \
 	                      getenv( "RAISE_ON_ASSERT" );
 	return bResult;
 }
 
 static bool AreAssertsDisabled()
 {
-	static bool bResult = ( _tcsstr( Plat_GetCommandLine(), _T("-noassert") ) != NULL );
+	static bool bResult = ( _tcsstr( Plat_GetCommandLine(), _T("-noassert") ) != nullptr );
 	return bResult;
 }
 
@@ -374,7 +374,7 @@ static BOOL CALLBACK ParentWindowEnumProc(
 static HWND FindLikelyParentWindow()
 {
 	// Enumerate top-level windows and take the first visible one with our processID.
-	g_hBestParentWindow = NULL;
+	g_hBestParentWindow = nullptr;
 	EnumWindows( ParentWindowEnumProc, GetCurrentProcessId() );
 	return g_hBestParentWindow;
 }
@@ -411,7 +411,7 @@ DBG_INTERFACE struct SDL_Window * GetAssertDialogParent()
 
 DBG_INTERFACE bool ShouldUseNewAssertDialog()
 {
-	static bool bMPIWorker = ( _tcsstr( Plat_GetCommandLine(), _T("-mpi_worker") ) != NULL );
+	static bool bMPIWorker = ( _tcsstr( Plat_GetCommandLine(), _T("-mpi_worker") ) != nullptr );
 	if ( bMPIWorker )
 	{
 		return false;
@@ -504,7 +504,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 	if ( !ThreadInMainThread() )
 	{
-		int result = MessageBox( NULL, pExpression, "Source - Assertion Failed", MB_SYSTEMMODAL | MB_CANCELTRYCONTINUE | MB_ICONQUESTION );
+		int result = MessageBox( nullptr, pExpression, "Source - Assertion Failed", MB_SYSTEMMODAL | MB_CANCELTRYCONTINUE | MB_ICONQUESTION );
 
 		if ( result == IDCANCEL )
 		{

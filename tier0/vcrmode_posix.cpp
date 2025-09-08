@@ -272,7 +272,7 @@ static void VCR_End()
 	if(g_pVCRFile)
 	{
 		fclose(g_pVCRFile);
-		g_pVCRFile = NULL;
+		g_pVCRFile = nullptr;
 	}
 
 	g_VCRMode = VCR_Disabled;
@@ -497,7 +497,7 @@ static void VCR_Hook_Cmd_Exec(char **f)
 		VCR_Read(&len, sizeof(len));
 		if(len == -1)
 		{
-			*f = NULL;
+			*f = nullptr;
 		}
 		else
 		{

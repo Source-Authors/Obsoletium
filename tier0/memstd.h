@@ -99,7 +99,7 @@ public:
 	void *Realloc( void *p, size_t nBytes );
 	void Free( void *p );
 	uintp GetSize( void *p ) const;
-	void DumpStats( FILE *pFile = NULL );
+	void DumpStats( FILE *pFile = nullptr );
 	intp Compact();
 
 private:

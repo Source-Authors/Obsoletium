@@ -482,7 +482,7 @@ public:
 	// Set the output function used for all vprof reports. Call this with NULL
 	// to set it to the default output function.
 	void SetOutputStream( StreamOut_t outputStream );
-	void OutputReport( int type = VPRT_FULL, const tchar *pszStartNode = NULL, int budgetGroupID = -1 );
+	void OutputReport( int type = VPRT_FULL, const tchar *pszStartNode = nullptr, int budgetGroupID = -1 );
 
 	const tchar *GetBudgetGroupName( int budgetGroupID );
 	int GetBudgetGroupFlags( int budgetGroupID ) const;	// Returns a combination of BUDGETFLAG_ defines.
@@ -685,8 +685,8 @@ inline CVProfNode::CVProfNode( const tchar * pszName, int detailLevel, CVProfNod
 	m_nCurFrameCalls( 0 ),
 	m_nPrevFrameCalls( 0 ),
 	m_pParent( pParent ),
-	m_pChild( NULL ),
-	m_pSibling( NULL ),
+	m_pChild( nullptr ),
+	m_pSibling( nullptr ),
 	m_iClientData( -1 )
 {
 	m_iUniqueNodeID = s_iCurrentUniqueNodeID++;

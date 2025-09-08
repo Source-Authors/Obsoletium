@@ -396,7 +396,7 @@ PLATFORM_INTERFACE void* Plat_Alloc( unsigned long size )
 	else
 	{
 		g_AllocError( size );
-		return 0;
+		return nullptr;
 	}
 }
 
@@ -411,7 +411,7 @@ PLATFORM_INTERFACE void* Plat_Realloc( void *ptr, unsigned long size )
 	else
 	{
 		g_AllocError( size );
-		return 0;
+		return nullptr;
 	}
 }
 
@@ -805,7 +805,7 @@ static inline int AddressHash( ptrint_t nAdr )
 
 static CUtlIntrusiveDList<RememberedAlloc_t> s_AddressData[MEMALLOC_HASHSIZE];
 
-static struct RememberedAlloc_t *FindAddress( void *pAdr, int *pHash = NULL )
+static struct RememberedAlloc_t *FindAddress( void *pAdr, int *pHash = nullptr )
 {
 	ptrint_t nAdr = ( ptrint_t ) pAdr;
 	int nHash = AddressHash( nAdr );
@@ -816,7 +816,7 @@ static struct RememberedAlloc_t *FindAddress( void *pAdr, int *pHash = NULL )
 		if ( i->m_nAddress == nAdr )
 			return i;
 	}
-	return NULL;
+	return nullptr;
 }
 
 #ifdef LINUX
@@ -875,7 +875,7 @@ static void AddMemoryAllocation( void *pResult, size_t size )
 		void *pTraceBack[MAX_STACK_TRACEBACK];
 		int nNumGot = backtrace( pTraceBack, std::size( pTraceBack ) );
 		for( int n = MAX( 0, nNumGot - 1 ); n < MAX_STACK_TRACEBACK; n++ )
-			pTraceBack[n] = NULL;
+			pTraceBack[n] = nullptr;
 
 		uint32 nHash = 0;
 		for( int i = 0; i < MAX_STACK_TRACEBACK; i++ )
@@ -884,7 +884,7 @@ static void AddMemoryAllocation( void *pResult, size_t size )
 		}
 		nHash %= MEMALLOC_HASHSIZE;
 
-		CLinuxMallocContext *pFoundCtx = NULL;
+		CLinuxMallocContext *pFoundCtx = nullptr;
 		// see if we have this context
 		for( CLinuxMallocContext *i = s_ContextHash[nHash].m_pHead; i ; i = i->m_pNext )
 		{
