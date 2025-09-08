@@ -1469,7 +1469,7 @@ void CRagdollPropAttached::Detach()
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	physenv->DestroyConstraint( m_pAttachConstraint );
 	m_pAttachConstraint = NULL;
-	const float dampingScale = 1.0f / ATTACHED_DAMPING_SCALE;
+	constexpr float dampingScale = 1.0f / ATTACHED_DAMPING_SCALE;
 	for ( int i = 0; i < m_ragdoll.listCount; i++ )
 	{
 		float damping, rotdamping;

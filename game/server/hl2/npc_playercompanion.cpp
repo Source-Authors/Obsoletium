@@ -2869,7 +2869,7 @@ bool CNPC_PlayerCompanion::ValidateNavGoal()
 	return result;
 }
 
-const float AVOID_TEST_DIST = 18.0f*12.0f;
+constexpr inline float AVOID_TEST_DIST = 18.0f*12.0f;
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------

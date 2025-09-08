@@ -18,7 +18,7 @@
 
 ConVar ai_debug_directnavprobe("ai_debug_directnavprobe", "0");
 
-const float TIME_DELAY_FULL_DIRECT_PROBE[2] = { 0.25, 0.35 };
+constexpr inline float TIME_DELAY_FULL_DIRECT_PROBE[2] = { 0.25, 0.35 };
 
 //-----------------------------------------------------------------------------
 

@@ -3022,9 +3022,9 @@ bool CAI_Navigator::SimplifyPathQuick()
 //-------------------------------------
 
 // Second entry is the strong opt version
-const float ROUTE_SIMPLIFY_TIME_DELAY[2]		= { 0.5, 1.0f };
-const float NO_PVS_ROUTE_SIMPLIFY_TIME_DELAY[2]	= { 1.0, 2.0f };
-const float QUICK_SIMPLIFY_TIME_DELAY[2]		= { FLT_MIN, 0.3f };
+constexpr inline float ROUTE_SIMPLIFY_TIME_DELAY[2]		= { 0.5, 1.0f };
+constexpr inline float NO_PVS_ROUTE_SIMPLIFY_TIME_DELAY[2]	= { 1.0, 2.0f };
+constexpr inline float QUICK_SIMPLIFY_TIME_DELAY[2]		= { FLT_MIN, 0.3f };
 
 int g_iFrameLastSimplified;
 

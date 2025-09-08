@@ -67,13 +67,13 @@ DECLARE_POINTER_HANDLE( AI_PathNode_t );
 //-------------------------------------
 
 // Navigator should use the default or previously set tolerance
-const float AIN_DEF_TOLERANCE  = -1.0;
+constexpr inline float AIN_DEF_TOLERANCE  = -1.0;
 
 // Navigator should use the hull size as the tolerance
-const float AIN_HULL_TOLERANCE = -2.0;
+constexpr inline float AIN_HULL_TOLERANCE = -2.0;
 
 // Goal does not specify a new activity
-const Activity AIN_DEF_ACTIVITY = ACT_INVALID;
+constexpr inline Activity AIN_DEF_ACTIVITY = ACT_INVALID;
 
 // Goal has no target
 CBaseEntity * const AIN_NO_TARGET  = NULL;

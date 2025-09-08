@@ -1085,7 +1085,7 @@ float CAI_BaseNPC::GetReasonableFacingDist( void )
 {
 	if ( GetTask() && GetTask()->iTask == TASK_FACE_ENEMY )
 	{
-		const float dist = 3.5*12;
+		constexpr float dist = 3.5*12;
 		if ( GetEnemy() )
 		{
 			float distEnemy = ( GetEnemy()->GetAbsOrigin().AsVector2D() - GetAbsOrigin().AsVector2D() ).Length() - 1.0f; 

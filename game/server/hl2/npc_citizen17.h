@@ -348,7 +348,7 @@ protected:
 //---------------------------------------------------------
 inline bool CNPC_Citizen::NearCommandGoal()
 {
-	const float flDistSqr = COMMAND_GOAL_TOLERANCE * COMMAND_GOAL_TOLERANCE;
+	constexpr float flDistSqr = COMMAND_GOAL_TOLERANCE * COMMAND_GOAL_TOLERANCE;
 	return ( ( GetAbsOrigin() - GetCommandGoal() ).LengthSqr() <= flDistSqr );
 }
 
@@ -356,7 +356,7 @@ inline bool CNPC_Citizen::NearCommandGoal()
 //---------------------------------------------------------
 inline bool CNPC_Citizen::VeryFarFromCommandGoal()
 {
-	const float flDistSqr = (12*50) * (12*50);
+	constexpr float flDistSqr = (12*50) * (12*50);
 	return ( ( GetAbsOrigin() - GetCommandGoal() ).LengthSqr() > flDistSqr );
 }
 

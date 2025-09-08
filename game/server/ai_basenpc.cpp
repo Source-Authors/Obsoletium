@@ -3477,7 +3477,7 @@ int __cdecl ThinkRebalanceCompare( const AIRebalanceInfo_t *pLeft, const AIRebal
 	if ( pRight->dotPlayer < 0 )
 		return -1;
 
-	const float NEAR_PLAYER = 50*12;
+	constexpr float NEAR_PLAYER = 50*12;
 
 	if ( pLeft->distPlayer < NEAR_PLAYER && pRight->distPlayer >= NEAR_PLAYER )
 		return -1;
@@ -3685,9 +3685,9 @@ bool CAI_BaseNPC::PreNPCThink()
 	bool bUseThinkLimits = ( !m_bInChoreo && ShouldUseFrameThinkLimits() );
 
 #ifdef _DEBUG
-	const float NPC_THINK_LIMIT = 30.0 / 1000.0;
+	constexpr float NPC_THINK_LIMIT = 30.0 / 1000.0;
 #else
-	const float NPC_THINK_LIMIT = ( !IsXbox() ) ? (10.0 / 1000.0) : (12.5 / 1000.0);
+	constexpr float NPC_THINK_LIMIT = 10.0 / 1000.0;
 #endif
 
 	g_StartTimeCurThink = 0;
@@ -7386,7 +7386,7 @@ void CAI_BaseNPC::StartNPC( void )
 		gm_flTimeLastSpawn = gpGlobals->curtime;
 	}
 
-	static const float nextThinkTimes[20] = 
+	static constexpr float nextThinkTimes[20] = 
 	{
 		.0, .150, .075, .225, .030, .180, .120, .270, .045, .210, .105, .255, .015, .165, .090, .240, .135, .060, .195, .285
 	};
@@ -7720,7 +7720,7 @@ CBaseEntity *CAI_BaseNPC::BestEnemy( void )
 
 		if ( m_bIgnoreUnseenEnemies )
 		{
-			const float TIME_CONSIDER_ENEMY_UNSEEN = .4;
+			constexpr float TIME_CONSIDER_ENEMY_UNSEEN = .4;
 			if ( pEMemory->timeLastSeen < gpGlobals->curtime - TIME_CONSIDER_ENEMY_UNSEEN )
 			{
 				DbgEnemyMsg( this, "    %s rejected: not seen and set to ignore unseen enemies\n", pEnemy->GetDebugName() );

@@ -109,7 +109,7 @@ constexpr inline float HEAL_TARGET_RANGE_Z = 72; // a second check that Gordon i
 #endif
 
 // player must be at least this distance away from an enemy before we fire an RPG at him
-const float RPG_SAFE_DISTANCE = CMissile::EXPLOSION_RADIUS + 64.0;
+constexpr inline float RPG_SAFE_DISTANCE = CMissile::EXPLOSION_RADIUS + 64.0;
 
 // Animation events
 int AE_CITIZEN_GET_PACKAGE;
