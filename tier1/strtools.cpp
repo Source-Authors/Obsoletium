@@ -3424,7 +3424,13 @@ const Tier1FullHTMLEntity_t g_Tier1_FullHTMLEntities[] =
 
 bool V_BasicHtmlEntityEncode( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDestSize, IN_Z_CAP(nInSize) char const *pIn, const intp nInSize, bool bPreserveWhitespace /*= false*/ )
 {
-	Assert( nDestSize == 0 || pDest != NULL );
+	// dimhotepus: Ensure no out of bounds access to 
+	if ( nDestSize <= 0 || pDest == nullptr )
+	{
+		Assert( nDestSize <= 0 || pDest == nullptr );
+		return false;
+	}
+
 	intp iOutput = 0;
 	for ( intp iInput = 0; iInput < nInSize; ++iInput )
 	{
@@ -3483,7 +3489,13 @@ bool V_BasicHtmlEntityEncode( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDe
 
 bool V_HtmlEntityDecodeToUTF8( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDestSize, IN_Z_CAP(nInSize) char const *pIn, const intp nInSize )
 {
-	Assert( nDestSize == 0 || pDest != NULL );
+	// dimhotepus: Ensure no out of bounds access to 
+	if ( nDestSize <= 0 || pDest == nullptr )
+	{
+		Assert( nDestSize <= 0 || pDest == nullptr );
+		return false;
+	}
+
 	intp iOutput = 0;
 	char rgchReplacement[8];
 	for ( intp iInput = 0; iInput < nInSize && iOutput < nDestSize; ++iInput )
@@ -3602,7 +3614,13 @@ static const char * const g_pszSimpleBBCodeReplacements[] = {
 // Converts BBCode tags to HTML tags
 bool V_BBCodeToHTML( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDestSize, IN_Z_CAP(nInSize) char const *pIn, const intp nInSize )
 {
-	Assert( nDestSize == 0 || pDest != NULL );
+	// dimhotepus: Ensure no out of bounds access to 
+	if ( nDestSize <= 0 || pDest == nullptr )
+	{
+		Assert( nDestSize <= 0 || pDest == nullptr );
+		return false;
+	}
+
 	intp iOutput = 0;
 
 	for ( intp iInput = 0; iInput < nInSize && iOutput < nDestSize && pIn[ iInput ]; ++iInput )
