@@ -21,9 +21,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#undef max
-#undef min
-
 // Minimum time between leader nags
 constexpr inline float LEAD_NAG_TIME{3.0f};
 
