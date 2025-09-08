@@ -9,10 +9,6 @@
 #ifndef MOVING_AVERAGE_H
 #define MOVING_AVERAGE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/platform.h"
 #include "tier0/basetypes.h"
 

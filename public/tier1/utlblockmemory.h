@@ -10,15 +10,12 @@
 #ifndef UTLBLOCKMEMORY_H
 #define UTLBLOCKMEMORY_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/dbg.h"
 #include "tier0/platform.h"
+#include "tier0/memalloc.h"
+
 #include "mathlib/mathlib.h"
 
-#include "tier0/memalloc.h"
 #include "tier0/memdbgon.h"
 
 //-----------------------------------------------------------------------------

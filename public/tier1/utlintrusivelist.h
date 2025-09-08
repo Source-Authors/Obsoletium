@@ -9,10 +9,6 @@
 #ifndef UTILINTRUSIVELIST_H
 #define UTILINTRUSIVELIST_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/basetypes.h"
 #include "utlmemory.h"
 #include "tier0/dbg.h"

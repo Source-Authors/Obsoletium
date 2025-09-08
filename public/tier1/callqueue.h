@@ -8,11 +8,7 @@
 #define CALLQUEUE_H
 
 #include "tier0/tslist.h"
-#include "tier1/functors.h"
-
-#if defined( _WIN32 )
-#pragma once
-#endif
+#include "functors.h"
 
 //-----------------------------------------------------
 // Avert thy eyes! Imagine rather:

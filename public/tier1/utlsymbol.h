@@ -9,13 +9,9 @@
 #ifndef UTLSYMBOL_H
 #define UTLSYMBOL_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/threadtools.h"
-#include "tier1/utlrbtree.h"
-#include "tier1/utlvector.h"
+#include "utlrbtree.h"
+#include "utlvector.h"
 
 
 //-----------------------------------------------------------------------------
@@ -28,7 +24,7 @@ class CUtlSymbolTableMT;
 //-----------------------------------------------------------------------------
 // This is a symbol, which is a easier way of dealing with strings.
 //-----------------------------------------------------------------------------
-typedef unsigned short UtlSymId_t;
+using UtlSymId_t = unsigned short;
 
 constexpr inline UtlSymId_t UTL_INVAL_SYMBOL{(UtlSymId_t)~0};
 
@@ -223,7 +219,7 @@ private:
 
 // The handle is a CUtlSymbol for the dirname and the same for the filename, the accessor
 //  copies them into a static char buffer for return.
-typedef void* FileNameHandle_t;
+using FileNameHandle_t = void *;
 #define FILENAMEHANDLE_INVALID nullptr
 
 // Symbol table for more efficiently storing filenames by breaking paths and filenames apart.

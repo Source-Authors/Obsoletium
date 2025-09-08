@@ -9,10 +9,6 @@
 #ifndef UTLMULTILIST_H
 #define UTLMULTILIST_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "utllinkedlist.h"
 
 // memdbgon must be the last include file in a .h file!!!
@@ -45,9 +41,9 @@ protected:
 		I m_Count;
 	};
 
-	typedef CUtlMemory<ListElem_t> M; // Keep naming similar to CUtlLinkedList
+	using M = CUtlMemory<ListElem_t>; // Keep naming similar to CUtlLinkedList
 public:
-	typedef I ListHandle_t;
+	using ListHandle_t = I;
 
 	// constructor, destructor
 	CUtlMultiList( intp growSize = 0, intp initSize = 0 );
@@ -351,7 +347,7 @@ inline bool CUtlMultiList<T,I>::IsValidIndex( I i ) const
 
 	if constexpr (std::is_signed<I>())
 	{
-		res = res && (x >= 0);
+		res = res && (i >= 0);
 	}
 
 	if (res)

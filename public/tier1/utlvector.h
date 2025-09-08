@@ -11,20 +11,18 @@
 #ifndef UTLVECTOR_H
 #define UTLVECTOR_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <algorithm>
-
 #include <cstring>
+
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
-#include "tier1/utlmemory.h"
-#include "tier1/utlblockmemory.h"
-#include "tier1/strtools.h"
+
 #include "vstdlib/random.h"
+
+#include "utlmemory.h"
+#include "utlblockmemory.h"
+#include "strtools.h"
 
 #define FOR_EACH_VEC( vecName, iteratorName ) \
 	for ( intp iteratorName = 0; (vecName).IsUtlVector && iteratorName < (vecName).Count(); iteratorName++ )
@@ -48,11 +46,11 @@ struct base_vector_t
 template< class T, class A = CUtlMemory<T> >
 class CUtlVector : public base_vector_t
 {
-	typedef A CAllocator;
+	using CAllocator = A;
 public:
-	typedef T ElemType_t;
-	typedef T* iterator;
-	typedef const T* const_iterator;
+	using ElemType_t = T;
+	using iterator = T *;
+	using const_iterator = const T *;
 
 	// Set the growth policy and initial capacity. Count will always be zero. This is different from std::vector
 	// where the constructor sets count as well as capacity.

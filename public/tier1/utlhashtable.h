@@ -55,18 +55,17 @@
 
 #ifndef UTLHASHTABLE_H
 #define UTLHASHTABLE_H
-#pragma once
 
-#include "tier1/utlcommon.h"
-#include "tier1/utlmemory.h"
+#include "utlcommon.h"
+#include "utlmemory.h"
+#include "utllinkedlist.h"
 #include "mathlib/mathlib.h"
-#include "tier1/utllinkedlist.h"
 
 //-----------------------------------------------------------------------------
 // Henry Goffin (henryg) was here. Questions? Bugs? Go slap him around a bit.
 //-----------------------------------------------------------------------------
 
-typedef uintp UtlHashHandle_t;
+using UtlHashHandle_t = uintp;
 
 #define FOR_EACH_HASHTABLE( table, iter ) \
 	for ( UtlHashHandle_t iter = (table).FirstHandle(); iter != (table).InvalidHandle(); iter = (table).NextHandle( iter ) )
@@ -77,7 +76,7 @@ template < typename KeyT, typename ValueT = empty_t >
 class CUtlHashtableEntry
 {
 public:
-	typedef CUtlKeyValuePair< KeyT, ValueT > KVPair;
+	using KVPair = CUtlKeyValuePair<KeyT, ValueT>;
 
 	enum
 	{
@@ -86,15 +85,7 @@ public:
 //		INT32_STORAGE = ( sizeof( KVPair ) >= 2 && sizeof( KVPair ) <= 4 )
 //#endif
 	};
-	typedef typename CTypeSelect<
-		INT16_STORAGE,
-		int16,
-//#ifdef PLATFORM_64BITS
-//		typename CTypeSelect< INT32_STORAGE, int32, int64 >::type
-//#else
-		int32
-//#endif
-	>::type storage_t;
+	using storage_t = typename CTypeSelect<INT16_STORAGE, int16, int32>::type;
 
 	enum
 	{
@@ -147,8 +138,8 @@ public:
 	// sometimes have trouble removing the constant branch, which is dumb... but whatever.
 	// 16-bit hashes are simply too narrow for large hashtables; more mask bits than hash bits!
 	// So we duplicate the hash bits. (Note: h *= MASK_HASH+2 is the same as h += h<<HASH_BITS)
-	typedef typename CTypeSelect< INT16_STORAGE, int16, undefined_t >::type uint32_if16BitStorage;
-	typedef typename CTypeSelect< INT16_STORAGE, undefined_t, int32 >::type uint32_if32BitStorage;
+	using uint32_if16BitStorage = typename CTypeSelect<INT16_STORAGE, int16, undefined_t>::type;
+	using uint32_if32BitStorage = typename CTypeSelect<INT16_STORAGE, undefined_t, int32>::type;
 	//typedef typename CTypeSelect< INT32_STORAGE, undefined_t, int64 >::type uint32_if64BitStorage;
 	static FORCEINLINE uint32 IdealIndex( uint32_if16BitStorage h, size_t m )
 	{
@@ -176,14 +167,14 @@ template <typename KeyT, typename ValueT = empty_t, typename KeyHashT = DefaultH
 class CUtlHashtable
 {
 public:
-	typedef UtlHashHandle_t handle_t;
+	using handle_t = UtlHashHandle_t;
 
 protected:
-	typedef CUtlKeyValuePair<KeyT, ValueT> KVPair;
-	typedef typename ArgumentTypeInfo<KeyT>::Arg_t KeyArg_t;
-	typedef typename ArgumentTypeInfo<ValueT>::Arg_t ValueArg_t;
-	typedef typename ArgumentTypeInfo<AlternateKeyT>::Arg_t KeyAlt_t;
-	typedef CUtlHashtableEntry< KeyT, ValueT > entry_t;
+	using KVPair = CUtlKeyValuePair<KeyT, ValueT>;
+	using KeyArg_t = typename ArgumentTypeInfo<KeyT>::Arg_t;
+	using ValueArg_t = typename ArgumentTypeInfo<ValueT>::Arg_t;
+	using KeyAlt_t = typename ArgumentTypeInfo<AlternateKeyT>::Arg_t;
+	using entry_t = CUtlHashtableEntry<KeyT, ValueT>;
 
 	enum { FLAG_FREE = entry_t::FLAG_FREE };
 	enum { FLAG_LAST = entry_t::FLAG_LAST };

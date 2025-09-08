@@ -9,10 +9,6 @@
 #ifndef UTLMAP_H
 #define UTLMAP_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/dbg.h"
 #include "utlrbtree.h"
 
@@ -48,13 +44,13 @@ template <typename K, typename T, typename I = unsigned short>
 class CUtlMap : public base_utlmap_t
 {
 public:
-	typedef K KeyType_t;
-	typedef T ElemType_t;
-	typedef I IndexType_t;
+	using KeyType_t = K;
+	using ElemType_t = T;
+	using IndexType_t = I;
 
 	// Less func typedef
 	// Returns true if the first parameter is "less" than the second
-	typedef bool (*LessFunc_t)( const KeyType_t &, const KeyType_t & );
+	using LessFunc_t = bool (*)(const KeyType_t &, const KeyType_t &);
 	
 	// constructor, destructor
 	// Left at growSize = 0, the memory will first allocate 1 element and double in size

@@ -21,7 +21,7 @@ enum netadrtype_t
 	NA_IP,
 };
 
-typedef struct netadr_s
+using netadr_t = struct netadr_s
 {
 public:
 	netadr_s() { SetIP( 0 ); SetPort( 0 ); SetType( NA_IP ); }
@@ -84,7 +84,7 @@ public:	// members are public to avoid to much changes
 	netadrtype_t	type;
 	alignas(unsigned) unsigned char	ip[4];
 	unsigned short	port;
-} netadr_t;
+};
 
 
 /// Helper class to render a netadr_t.  Use this when formatting a net address

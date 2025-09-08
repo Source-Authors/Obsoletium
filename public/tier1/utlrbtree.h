@@ -9,10 +9,10 @@
 #ifndef UTLRBTREE_H
 #define UTLRBTREE_H
 
-#include "tier1/utlmemory.h"
-#include "tier1/utlfixedmemory.h"
-#include "tier1/utlblockmemory.h"
-#include "tier1/strtools.h"
+#include "utlmemory.h"
+#include "utlfixedmemory.h"
+#include "utlblockmemory.h"
+#include "strtools.h"
 
 //-----------------------------------------------------------------------------
 // Tool to generate a default compare function for any type that implements
@@ -133,13 +133,13 @@ class CUtlRBTree
 {
 public:
 
-	typedef T KeyType_t;
-	typedef T ElemType_t;
-	typedef I IndexType_t;
+	using KeyType_t = T;
+	using ElemType_t = T;
+	using IndexType_t = I;
 
 	// Less func typedef
 	// Returns true if the first parameter is "less" than the second
-	typedef L LessFunc_t;
+	using LessFunc_t = L;
 
 	// constructor, destructor
 	// Left at growSize = 0, the memory will first allocate 1 element and double in size

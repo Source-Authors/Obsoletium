@@ -7,15 +7,14 @@
 
 #ifndef UTLQUEUE_H
 #define UTLQUEUE_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "utlmemory.h"
 
 //#define TEST_UTLQUEUE
 
-enum QueueIter_t : intp { QUEUE_ITERATOR_INVALID = std::numeric_limits<intp>::max() };
+// dimhotepus: Do not use enum as assingning invalid values is UB.
+using QueueIter_t = intp;
+constexpr inline QueueIter_t QUEUE_ITERATOR_INVALID = std::numeric_limits<intp>::max();
 
 // T is the type stored in the queue
 template< class T, class M = CUtlMemory< T > > 

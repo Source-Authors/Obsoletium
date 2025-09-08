@@ -11,12 +11,8 @@
 #ifndef COMMANDBUFFER_H
 #define COMMANDBUFFER_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "tier1/utllinkedlist.h"
-#include "tier1/convar.h"
+#include "utllinkedlist.h"
+#include "convar.h"
 
 
 //-----------------------------------------------------------------------------
@@ -28,7 +24,7 @@ class CUtlBuffer;
 //-----------------------------------------------------------------------------
 // Invalid command handle
 //-----------------------------------------------------------------------------
-typedef intp CommandHandle_t;
+using CommandHandle_t = intp;
 enum
 {
 	COMMAND_BUFFER_INVALID_COMMAND_HANDLE = 0

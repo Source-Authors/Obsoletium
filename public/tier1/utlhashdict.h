@@ -7,12 +7,8 @@
 #ifndef UTLHASHDICT_H
 #define UTLHASHDICT_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
-#include "tier1/utlhash.h"
-#include "tier1/generichash.h"
+#include "utlhash.h"
+#include "generichash.h"
 #include "mathlib/mathlib.h"
 
 //-----------------------------------------------------------------------------
@@ -71,7 +67,7 @@ protected:
 		T value;
 	};
 
-	template <bool bCaseInsensitive>
+	template <bool isCaseInsensitive>
 	class CCompare
 	{
 	public:
@@ -79,11 +75,11 @@ protected:
 
 		bool operator()( const Entry_t &entry1, const Entry_t &entry2 ) const
 		{
-			return !( ( bCaseInsensitive ) ? stricmp( entry1.pszSymbol, entry2.pszSymbol ) : strcmp( entry1.pszSymbol, entry2.pszSymbol ) );
+			return !( ( isCaseInsensitive ) ? stricmp( entry1.pszSymbol, entry2.pszSymbol ) : strcmp( entry1.pszSymbol, entry2.pszSymbol ) );
 		}
 	};
 
-	template <bool bCaseInsensitive>
+	template <bool isCaseInsensitive>
 	class CHash
 	{
 	public:
@@ -91,7 +87,7 @@ protected:
 
 		unsigned operator()( const Entry_t &entry ) const
 		{
-			return !( ( bCaseInsensitive ) ? HashStringCaseless( entry.pszSymbol ) : HashString( entry.pszSymbol ) );
+			return !( ( isCaseInsensitive ) ? HashStringCaseless( entry.pszSymbol ) : HashString( entry.pszSymbol ) );
 		}
 	};
 
@@ -104,7 +100,7 @@ protected:
 // constructor, destructor
 //-----------------------------------------------------------------------------
 template <typename T, bool bCaseInsensitive, bool bDupeStrings>
-CUtlHashDict<T, bCaseInsensitive, bDupeStrings>::CUtlHashDict( int bucketCount = 16, int growCount = 0, int initCount = 0 ) : 
+CUtlHashDict<T, bCaseInsensitive, bDupeStrings>::CUtlHashDict( int bucketCount, int growCount, int initCount ) : 
 	m_Elements( SmallestPowerOfTwoGreaterOrEqual(bucketCount), growCount, initCount )
 {
 	Assert( SmallestPowerOfTwoGreaterOrEqual(bucketCount) <= 0xffff );

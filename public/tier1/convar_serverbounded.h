@@ -6,10 +6,8 @@
 
 #ifndef CONVAR_SERVERBOUNDED_H
 #define CONVAR_SERVERBOUNDED_H
-#ifdef _WIN32
-#pragma once
-#endif
 
+#include "convar.h"
 
 // This class is used to virtualize a ConVar's value, so the client can restrict its 
 // value while connected to a server. When using this across modules, it's important

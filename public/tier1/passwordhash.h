@@ -4,13 +4,8 @@
 //
 //=============================================================================
 
-#ifndef PASSWORDHASH_H
-#define PASSWORDHASH_H
-
-#if defined( _WIN32 )
-#pragma once
-#endif
-
+#ifndef SE_PUBLIC_TIER1_PASSWORDHASH_H_
+#define SE_PUBLIC_TIER1_PASSWORDHASH_H_
 
 #include "checksum_sha1.h"
 
@@ -37,12 +32,12 @@ typedef unsigned char PBKDF2Hash_t[32];
 // it may not be sufficient at the time you actually change the size of the
 // type, so look around.
 //
-typedef union
+using PasswordHash_t = union
 {
 	SHADigest_t sha;
 	BigPasswordHash_t bigpassword;
 	PBKDF2Hash_t pbkdf2;
-} PasswordHash_t;
+};
 
 
 //
@@ -88,7 +83,7 @@ const size_t k_HashLengths[] = {
 // hash type and properly updated k_EHashMax, but you forgot to add the length
 // of the new hash type into k_HashLengths.  So do that.
 //
-C_ASSERT( ( ( sizeof(k_HashLengths) / sizeof(size_t) ) == k_EHashMax + 1 ) );
+static_assert( ( ( sizeof(k_HashLengths) / sizeof(size_t) ) == k_EHashMax + 1 ) );
 #endif
 
-#endif // PASSWORDHASH_H
+#endif  // !SE_PUBLIC_TIER1_PASSWORDHASH_H_

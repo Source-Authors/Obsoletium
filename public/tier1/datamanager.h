@@ -6,13 +6,10 @@
 
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "tier0/threadtools.h"
-#include "tier1/utlmultilist.h"
-#include "tier1/utlvector.h"
+#include "utlmultilist.h"
+#include "utlvector.h"
 
 FORWARD_DECLARE_HANDLE( memhandle_t );
 
@@ -106,7 +103,7 @@ protected:
 		{
 			lockCount = 0;
 			serial = 1;
-			pStore = 0;
+			pStore = nullptr;
 		}
 
 		unsigned short lockCount;
@@ -130,7 +127,7 @@ protected:
 template< class STORAGE_TYPE, class CREATE_PARAMS, class LOCK_TYPE = STORAGE_TYPE *, class MUTEX_TYPE = CThreadNullMutex>
 class CDataManager : public CDataManagerBase
 {
-	typedef CDataManagerBase BaseClass;
+	using BaseClass = CDataManagerBase;
 public:
 
 	CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>( size_t size = std::numeric_limits<size_t>::max() ) : BaseClass(size) {}

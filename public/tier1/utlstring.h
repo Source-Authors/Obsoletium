@@ -6,14 +6,11 @@
 
 #ifndef UTLSTRING_H
 #define UTLSTRING_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include <string_view>
 
-#include "tier1/utlmemory.h"
-#include "tier1/strtools.h"
+#include "utlmemory.h"
+#include "strtools.h"
 
 // Matched with the memdbgoff at end of header
 #include "tier0/memdbgon.h"
@@ -176,7 +173,7 @@ public:
 
 	// Defining AltArgumentType_t hints that associative container classes should
 	// also implement Find/Insert/Remove functions that take const char* params.
-	typedef const char *AltArgumentType_t;
+	using AltArgumentType_t = const char *;
 
 	// Get a copy of part of the string.
 	// If you only specify nStart, it'll go from nStart to the end.
@@ -426,7 +423,7 @@ public:
 
 	// Defining AltArgumentType_t is a hint to containers that they should
 	// implement Find/Insert/Remove functions that take const char* params.
-	typedef const T *AltArgumentType_t;
+	using AltArgumentType_t = const T *;
 
 protected:
 	// dimhotepus: const T* -> T* as it is not a const! See Set API
@@ -458,8 +455,8 @@ int CUtlConstStringBase<T>::Compare( const T *rhs ) const
 	return StringFuncs<T>::Compare( m_pString, rhs );
 }
 
-typedef	CUtlConstStringBase<char>		CUtlConstString;
-typedef	CUtlConstStringBase<wchar_t>	CUtlConstWideString;
+using CUtlConstString = CUtlConstStringBase<char>;
+using CUtlConstWideString = CUtlConstStringBase<wchar_t>;
 
 //-----------------------------------------------------------------------------
 // Helper functor objects.

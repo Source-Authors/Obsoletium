@@ -6,9 +6,6 @@
 
 #ifndef UTLSTRINGMAP_H
 #define UTLSTRINGMAP_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "utlsymbol.h"
 

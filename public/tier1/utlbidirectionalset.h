@@ -10,12 +10,8 @@
 #ifndef UTLBIDIRECTIONALSET_H
 #define UTLBIDIRECTIONALSET_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/dbg.h"
-#include "tier1/utllinkedlist.h"
+#include "utllinkedlist.h"
 
 //-----------------------------------------------------------------------------
 // Templatized helper class to deal with the kinds of things that spatial
@@ -49,11 +45,11 @@ class CBidirectionalSet
 public:
 	// Install methods to get at the first bucket given a element
 	// and vice versa...
-	typedef S& (*FirstElementFunc_t)(CBucketHandle);
-	typedef S& (*FirstBucketFunc_t)(CElementHandle);
+	using FirstElementFunc_t = S &(*)(CBucketHandle);
+	using FirstBucketFunc_t = S &(*)(CElementHandle);
 
-	typedef CBucketHandle  CBucketHandlePram;
-	typedef CElementHandle CElementHandlePram;
+	using CBucketHandlePram = CBucketHandle;
+	using CElementHandlePram = CElementHandle;
 
 	// Constructor
 	CBidirectionalSet();

@@ -9,10 +9,6 @@
 #ifndef UTLLINKEDLIST_H
 #define UTLLINKEDLIST_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/basetypes.h"
 #include "utlmemory.h"
 #include "utlfixedmemory.h"
@@ -61,10 +57,10 @@ template <class T, class S = unsigned short, bool ML = false, class I = S, class
 class CUtlLinkedList
 {
 public:
-	typedef T ElemType_t;
-	typedef S IndexType_t; // should really be called IndexStorageType_t, but that would be a huge change
-	typedef I IndexLocalType_t;
-	typedef M MemoryAllocator_t;
+	using ElemType_t = T;
+	using IndexType_t = S; // should really be called IndexStorageType_t, but that would be a huge change
+	using IndexLocalType_t = I;
+	using MemoryAllocator_t = M;
 	static const bool IsUtlLinkedList = true; // Used to match this at compiletime 
 
 	// constructor, destructor

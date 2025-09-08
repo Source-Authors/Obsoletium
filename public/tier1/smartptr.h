@@ -7,10 +7,6 @@
 
 #ifndef SMARTPTR_H
 #define SMARTPTR_H
-#ifdef _WIN32
-#pragma once
-#endif
-
 
 class CRefCountAccessor
 {
@@ -72,8 +68,8 @@ public:
 	void Delete( void )							{ delete Detach(); }
 
 private:	// Disallow copying, use Detach() instead to avoid ambiguity
-	CPlainAutoPtr( CPlainAutoPtr const &x );
-	CPlainAutoPtr & operator = ( CPlainAutoPtr const &x );
+	CPlainAutoPtr( CPlainAutoPtr const &x ) = delete;
+	CPlainAutoPtr & operator = ( CPlainAutoPtr const &x ) = delete;
 
 public:
 	void Attach( T *p )							{ m_p = p; }
@@ -81,7 +77,7 @@ public:
 
 public:
 	[[nodiscard]] bool IsValid( void ) const					{ return m_p != nullptr; }
-	[[nodiscard]] T * Get( void ) const						{ return m_p; }
+	[[nodiscard]] T * Get( void ) const							{ return m_p; }
 	[[nodiscard]] T * operator -> ( void ) const				{ return Get(); }
 	[[nodiscard]] T & operator *  ( void ) const				{ return *Get(); }
 
@@ -107,7 +103,7 @@ template < typename T >
 class CArrayAutoPtr : public CPlainAutoPtr < T > // Warning: no polymorphic destructor (delete on base class will be a mistake)
 {
 public:
-	explicit CArrayAutoPtr( T *p = NULL )		{ this->Attach( p ); }
+	explicit CArrayAutoPtr( T *p = nullptr )	{ this->Attach( p ); }
 	~CArrayAutoPtr( void )						{ this->Delete(); }
 
 public:
@@ -149,20 +145,20 @@ private:
 template< class T, class RefCountAccessor >
 inline CSmartPtr<T,RefCountAccessor>::CSmartPtr()
 {
-	m_pObj = NULL;
+	m_pObj = nullptr;
 }
 
 template< class T, class RefCountAccessor >
 inline CSmartPtr<T,RefCountAccessor>::CSmartPtr( T *pObj )
 {
-	m_pObj = NULL;
+	m_pObj = nullptr;
 	*this = pObj;
 }
 
 template< class T, class RefCountAccessor >
 inline CSmartPtr<T,RefCountAccessor>::CSmartPtr( const CSmartPtr<T,RefCountAccessor> &other )
 {
-	m_pObj = NULL;
+	m_pObj = nullptr;
 	*this = other;
 }
 
@@ -196,7 +192,7 @@ inline T* CSmartPtr<T,RefCountAccessor>::operator=( T *pObj )
 template< class T, class RefCountAccessor >
 inline void	CSmartPtr<T,RefCountAccessor>::MarkDeleted()
 {
-	m_pObj = NULL;
+	m_pObj = nullptr;
 }
 
 template< class T, class RefCountAccessor >
@@ -232,7 +228,7 @@ inline bool CSmartPtr<T,RefCountAccessor>::operator==( const T *pOther ) const
 template< class T, class RefCountAccessor >
 inline bool CSmartPtr<T,RefCountAccessor>::IsValid() const
 {
-	return m_pObj != NULL;
+	return m_pObj != nullptr;
 }
 
 template< class T, class RefCountAccessor >
@@ -264,8 +260,8 @@ public:
 	~CAutoPushPop() { m_rVar = m_valPop; }
 
 private:	// forbid copying
-	CAutoPushPop( CAutoPushPop const &x );
-	CAutoPushPop & operator = ( CAutoPushPop const &x );
+	CAutoPushPop( CAutoPushPop const &x ) = delete;
+	CAutoPushPop & operator = ( CAutoPushPop const &x ) = delete;
 
 public:
 	[[nodiscard]] T & Get() { return m_rVar; }

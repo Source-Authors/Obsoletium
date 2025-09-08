@@ -10,13 +10,10 @@
 #ifndef UTLTSHASH_H
 #define UTLTSHASH_H
 
-#ifdef _WIN32
-#pragma once
-#endif
+#include <climits>
 
-#include <limits.h>
 #include "tier0/threadtools.h"
-#include "tier1/mempool.h"
+#include "mempool.h"
 #include "generichash.h"
 
 
@@ -35,7 +32,7 @@
 // Elements are never individually removed; clears must occur at a time
 // where we and guaranteed no queries are occurring
 //
-typedef intp UtlTSHashHandle_t;
+using UtlTSHashHandle_t = intp;
 
 template < class T >
 abstract_class ITSHashConstructor
@@ -152,7 +149,7 @@ private:
 		Data_t	m_Data;
 	};
 
-	typedef HashFixedDataInternal_t<T> HashFixedData_t;
+	using HashFixedData_t = HashFixedDataInternal_t<T>;
 
 	enum
 	{

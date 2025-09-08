@@ -10,11 +10,6 @@
 #ifndef UTLDELEGATE_H
 #define UTLDELEGATE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 //-----------------------------------------------------------------------------
 // The delegate system: A method of invoking methods, whether they are
 // member methods of classes, static methods of classes, or free functions,

@@ -10,10 +10,6 @@
 
 #include "tier0/platform.h"
 
-#if defined(_WIN32)
-#pragma once
-#endif
-
 //-----------------------------------------------------------------------------
 
 [[nodiscard]] unsigned FASTCALL HashString( const char *pszKey );

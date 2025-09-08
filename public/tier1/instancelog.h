@@ -4,17 +4,21 @@
 //
 // $NoKeywords: $
 //===========================================================================//
-#pragma once
+#ifndef SE_PUBLIC_TIER1_INSTANCE_LOG_H_
+#define SE_PUBLIC_TIER1_INSTANCE_LOG_H_
 
 #include <tuple>
 #include <string>
 #include <sstream>
 
+#include "utlvector.h"
+#include "utlstring.h"
+
 template <class Object, class RecordType>
 class InstanceLogger
 {
 public:
-    typedef RecordType RecordType_t;
+    using RecordType_t = RecordType;
 
 protected:
     void InstanceLog( const char* pMsg )
@@ -35,7 +39,7 @@ protected:
         Msg( "========\nInstance log complete for 0x%08p\n", this );
     }
 
-	virtual RecordType_t BuildRecord( const char* pMsg ) = 0;
+	virtual auto BuildRecord( const char* pMsg ) -> RecordType_t = 0;
 
 private:
     CUtlVector< RecordType > m_records;
@@ -82,3 +86,5 @@ void FormatRecord( CUtlString *pOutStr, const RecordType& rt )
     format( stream, rt );
 	( *pOutStr ) = stream.str().c_str();
 }
+
+#endif  // !SE_PUBLIC_TIER1_INSTANCE_LOG_H_

@@ -7,20 +7,15 @@
 #ifndef UTLHANDLETABLE_H
 #define	UTLHANDLETABLE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
-#include "tier1/utlvector.h"
-#include "tier1/utlqueue.h"
+#include "utlvector.h"
+#include "utlqueue.h"
 
 
 //-----------------------------------------------------------------------------
 // Handles are 32 bits. Invalid handles are all 1s
 //-----------------------------------------------------------------------------
-typedef unsigned int UtlHandle_t;
-#define UTLHANDLE_INVALID ((UtlHandle_t)~0)
+using UtlHandle_t = unsigned int;
+constexpr inline UtlHandle_t UTLHANDLE_INVALID{(UtlHandle_t)~0};
 
 
 //-----------------------------------------------------------------------------

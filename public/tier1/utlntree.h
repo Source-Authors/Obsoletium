@@ -9,12 +9,8 @@
 #ifndef UTLNTREE_H
 #define UTLNTREE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/basetypes.h"
-#include "tier1/utlmemory.h"
+#include "utlmemory.h"
 #include "tier0/dbg.h"
 
 
@@ -30,8 +26,8 @@ template <class T, class I = unsigned short>
 class CUtlNTree
 {
 public:
-	typedef T ElemType_t;
-	typedef I IndexType_t;
+	using ElemType_t = T;
+	using IndexType_t = I;
 
 	// constructor, destructor
 	CUtlNTree( int growSize = 0, int initSize = 0 );

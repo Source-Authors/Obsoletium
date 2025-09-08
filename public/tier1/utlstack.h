@@ -11,8 +11,10 @@
 #define UTLSTACK_H
 
 #include <cstring>
-#include "utlmemory.h"
+
 #include "tier0/dbg.h"
+
+#include "utlmemory.h"
 
 
 //-----------------------------------------------------------------------------

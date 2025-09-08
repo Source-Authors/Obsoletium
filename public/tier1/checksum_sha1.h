@@ -7,10 +7,6 @@
 #ifndef CHECKSUM_SHA1_H
 #define CHECKSUM_SHA1_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 /*
 	100% free public domain implementation of the SHA-1
 	algorithm by Dominik Reichl <dominik.reichl@t-online.de>

@@ -8,10 +8,6 @@
 #ifndef KVPACKER_H
 #define KVPACKER_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "KeyValues.h"
 
 //-----------------------------------------------------------------------------

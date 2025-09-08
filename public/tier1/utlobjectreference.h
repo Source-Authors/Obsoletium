@@ -7,11 +7,7 @@
 #ifndef UTLOBJECTREFERENCE_H
 #define UTLOBJECTREFERENCE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "tier1/utlintrusivelist.h"
+#include "utlintrusivelist.h"
 #include "mathlib/mathlib.h"
 
 
@@ -34,7 +30,7 @@
 template<class T> class CUtlReference
 {
 public:
-	FORCEINLINE CUtlReference(void)
+	FORCEINLINE CUtlReference()
 	{
 		m_pNext = m_pPrev = NULL;
 		m_pObject = NULL;
@@ -46,7 +42,7 @@ public:
 		AddRef( pObj );
 	}
 
-	FORCEINLINE ~CUtlReference(void)
+	FORCEINLINE ~CUtlReference()
 	{
 		KillRef();
 	}

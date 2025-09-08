@@ -36,12 +36,8 @@
 #define FUNCTORS_H
 
 #include "tier0/platform.h"
-#include "tier1/refcount.h"
-#include "tier1/utlenvelope.h"
-
-#if defined( _WIN32 )
-#pragma once
-#endif
+#include "refcount.h"
+#include "utlenvelope.h"
 
 //-----------------------------------------------------------------------------
 //
@@ -271,12 +267,7 @@
 abstract_class CFunctor : public IRefCounted
 {
 public:
-	CFunctor()
-#ifdef DEBUG
-     : m_nUserID{}
-#endif
-	{
-	}
+	CFunctor() = default;
 
 	// Add a virtual destructor to silence the clang warning.
 	// This is harmless but not important since the only derived class
@@ -285,7 +276,7 @@ public:
 
 	virtual void operator()() = 0;
 
-	unsigned m_nUserID; // For debugging
+	unsigned m_nUserID{0}; // For debugging
 };
 
 
@@ -419,7 +410,7 @@ FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNC_PROXY );
 
 #include "tier0/memdbgon.h"
 
-typedef CRefCounted1<CFunctor, CRefCountServiceMT> CFunctorBase;
+using CFunctorBase = CRefCounted1<CFunctor, CRefCountServiceMT>;
 
 #define DEFINE_FUNCTOR_TEMPLATE(N) \
 	template <typename FUNC_TYPE FUNC_TEMPLATE_ARG_PARAMS_##N, class FUNCTOR_BASE = CFunctorBase> \

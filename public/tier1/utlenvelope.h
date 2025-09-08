@@ -5,15 +5,11 @@
 //
 //=============================================================================
 
-#include "tier1/utlstring.h"
-#include "tier0/basetypes.h"
-
 #ifndef UTLENVELOPE_H
 #define UTLENVELOPE_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
+#include "tier0/basetypes.h"
+#include "utlstring.h"
 
 //-----------------------------------------------------------------------------
 

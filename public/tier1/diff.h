@@ -9,7 +9,6 @@
 
 #ifndef DIFF_H
 #define DIFF_H
-#pragma once
 
 #include "tier0/basetypes.h"
 #include "tier0/wchartypes.h"

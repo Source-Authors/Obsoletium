@@ -6,9 +6,6 @@
 //=============================================================================
 #ifndef BYTESWAP_H
 #define BYTESWAP_H
-#if defined(_WIN32)
-#pragma once
-#endif
 
 #include "datamap.h"	// Needed for typedescription_t.  Note datamap.h is tier1 as well.
 #include "tier0/basetypes.h"

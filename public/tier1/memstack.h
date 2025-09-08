@@ -9,13 +9,9 @@
 
 #include "tier0/platform.h"
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 //-----------------------------------------------------------------------------
 
-typedef size_t MemoryStackMark_t;
+using MemoryStackMark_t = size_t;
 
 class CMemoryStack
 {

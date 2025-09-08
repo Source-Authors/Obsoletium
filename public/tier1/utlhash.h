@@ -9,17 +9,16 @@
 
 #ifndef UTLHASH_H
 #define UTLHASH_H
-#pragma once
 
 #include <climits>
 #include "utlmemory.h"
-#include "tier1/utlvector.h"
-#include "tier1/utllinkedlist.h"
-#include "tier1/generichash.h"
+#include "utlvector.h"
+#include "utllinkedlist.h"
+#include "generichash.h"
 #include "tier0/commonmacros.h"
 #include "tier0/dbg.h"
 
-typedef uintp UtlHashHandle_t;
+using UtlHashHandle_t = uintp;
 
 template<
 	typename Data,
@@ -29,8 +28,8 @@ template<
 class CUtlHash
 {
 public:
-	typedef C CompareFunc_t;
-	typedef K KeyFunc_t;
+	using CompareFunc_t = C;
+	using KeyFunc_t = K;
 	
 	// constructor/deconstructor
 	CUtlHash( intp bucketCount = 0, intp growCount = 0, intp initCount = 0,

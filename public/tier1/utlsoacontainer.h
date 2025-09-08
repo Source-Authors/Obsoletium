@@ -11,17 +11,14 @@
 #ifndef UTLSOACONTAINER_H
 #define UTLSOACONTAINER_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
-#include "tier1/utlmemory.h"
-#include "tier1/utlblockmemory.h"
+
 #include "mathlib/ssemath.h"
+
+#include "utlmemory.h"
+#include "utlblockmemory.h"
 
 
 // strided pointers. gives you a class that acts like a pointer, but the ++ and += operators do the

@@ -9,11 +9,7 @@
 #ifndef UTLSORTVECTOR_H
 #define UTLSORTVECTOR_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "tier1/utlvector.h"
+#include "utlvector.h"
 
 
 //-----------------------------------------------------------------------------
@@ -40,7 +36,7 @@ public:
 template <class T, class LessFunc = CUtlSortVectorDefaultLess<T>, class BaseVector = CUtlVector<T> >
 class CUtlSortVector : public BaseVector
 {
-	typedef BaseVector BaseClass;
+	using BaseClass = BaseVector;
 public:
 	/// constructor
 	CUtlSortVector( intp nGrowSize = 0, intp initSize = 0 );

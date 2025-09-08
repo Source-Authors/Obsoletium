@@ -8,12 +8,8 @@
 #ifndef STRINGPOOL_H
 #define STRINGPOOL_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
-#include "tier1/utlrbtree.h"
-#include "tier1/utlvector.h"
+#include "utlrbtree.h"
+#include "utlvector.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Allocates memory for strings, checking for duplicates first,
@@ -35,7 +31,7 @@ public:
 	[[nodiscard]] const char * Find( const char *pszValue );
 
 protected:
-	typedef CUtlRBTree<const char *, unsigned short> CStrSet;
+	using CStrSet = CUtlRBTree<const char *, unsigned short>;
 
 	CStrSet m_Strings;
 };

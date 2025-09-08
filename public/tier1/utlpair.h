@@ -7,11 +7,6 @@
 #ifndef UTLPAIR_H
 #define UTLPAIR_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 // std::pair style container; exists to work easily in our CUtlMap/CUtlHashMap classes
 template<typename T1, typename T2>
 class CUtlPair

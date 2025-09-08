@@ -8,7 +8,8 @@
 
 #ifndef UTLCOMMON_H
 #define UTLCOMMON_H
-#pragma once
+
+#include "strtools.h"
 
 //-----------------------------------------------------------------------------
 // Henry Goffin (henryg) was here. Questions? Bugs? Go slap him around a bit.
@@ -24,10 +25,10 @@ struct undefined_t;
 
 // CTypeSelect<sel,A,B>::type is a typedef of A if sel is nonzero, else B
 template <int sel, typename A, typename B>
-struct CTypeSelect { typedef A type; };
+struct CTypeSelect { using type = A; };
 
 template <typename A, typename B>
-struct CTypeSelect<0, A, B> { typedef B type; };
+struct CTypeSelect<0, A, B> { using type = B; };
 
 // CTypeEquals<A, B>::value is nonzero if A and B are the same type
 template <typename A, typename B, bool bIgnoreConstVolatile = false, bool bIgnoreReference = false>
@@ -53,7 +54,7 @@ template <typename K, typename V>
 class CUtlKeyValuePair
 {
 public:
-	typedef V ValueReturn_t;
+	using ValueReturn_t = V;
 	K m_key;
 	V m_value;
 
@@ -73,7 +74,7 @@ template <typename K>
 class CUtlKeyValuePair<K, empty_t>
 {
 public:
-	typedef const K ValueReturn_t;
+	using ValueReturn_t = const K;
 	K m_key;
 
 	constexpr CUtlKeyValuePair() = default;

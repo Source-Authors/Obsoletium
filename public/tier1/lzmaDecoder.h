@@ -8,9 +8,10 @@
 //
 //========================================================================//
 
-#ifndef _LZMADECODER_H
-#define _LZMADECODER_H
-#pragma once
+#ifndef SE_PUBLIC_TIER1_LZMADECODER_H_
+#define SE_PUBLIC_TIER1_LZMADECODER_H_
+
+#include "tier0/annotations.h"
 
 // Thanks for the useful define namespacing, LZMA
 #include "../thirdparty/7zip/C/7zVersion.h"

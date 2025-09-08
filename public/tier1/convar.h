@@ -12,14 +12,10 @@
 #ifndef CONVAR_H
 #define CONVAR_H
 
-#if _WIN32
-#pragma once
-#endif
-
 #include "tier0/dbg.h"
-#include "tier1/iconvar.h"
-#include "tier1/utlvector.h"
-#include "tier1/utlstring.h"
+#include "iconvar.h"
+#include "utlvector.h"
+#include "utlstring.h"
 #include "icvar.h"
 
 #ifdef _WIN32
@@ -57,8 +53,8 @@ public:
 //-----------------------------------------------------------------------------
 // Called when a ConCommand needs to execute
 //-----------------------------------------------------------------------------
-typedef void ( *FnCommandCallbackVoid_t )( void );
-typedef void ( *FnCommandCallback_t )( const CCommand &command );
+using FnCommandCallbackVoid_t = void (*)();
+using FnCommandCallback_t = void (*)(const CCommand &);
 
 #define COMMAND_COMPLETION_MAXITEMS		64
 #define COMMAND_COMPLETION_ITEM_LENGTH	64
@@ -66,7 +62,7 @@ typedef void ( *FnCommandCallback_t )( const CCommand &command );
 //-----------------------------------------------------------------------------
 // Returns 0 to COMMAND_COMPLETION_MAXITEMS worth of completion strings
 //-----------------------------------------------------------------------------
-typedef int  ( *FnCommandCompletionCallback )( const char *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] );
+using FnCommandCompletionCallback = int (*)(const char *, char (*)[64]);
 
 
 //-----------------------------------------------------------------------------
@@ -99,7 +95,7 @@ class ConCommandBase
 	friend class CDefaultCvar;
 
 public:
-								ConCommandBase( void );
+								ConCommandBase( );
 								ConCommandBase( const char *pName, const char *pHelpString = nullptr, 
 									int flags = 0 );
 
@@ -254,7 +250,7 @@ class ConCommand : public ConCommandBase
 friend class CCvar;
 
 public:
-	typedef ConCommandBase BaseClass;
+	using BaseClass = ConCommandBase;
 
 	ConCommand( const char *pName, FnCommandCallbackVoid_t callback, 
 		const char *pHelpString = nullptr, int flags = 0, FnCommandCompletionCallback completionFunc = nullptr );
@@ -312,7 +308,7 @@ friend class CCvar;
 friend class ConVarRef;
 
 public:
-	typedef ConCommandBase BaseClass;
+	using BaseClass = ConCommandBase;
 
 	ConVar( const char *pName, const char *pDefaultValue, int flags = 0);
 
@@ -620,9 +616,9 @@ void ConVar_PrintDescription( const ConCommandBase *pVar );
 template< class T >
 class CConCommandMemberAccessor : public ConCommand, public ICommandCallback, public ICommandCompletionCallback
 {
-	typedef ConCommand BaseClass;
-	typedef void ( T::*FnMemberCommandCallback_t )( const CCommand &command );
-	typedef int  ( T::*FnMemberCommandCompletionCallback_t )( const char *pPartial, CUtlVector< CUtlString > &commands );
+	using BaseClass = ConCommand;
+	using FnMemberCommandCallback_t = void (T::*)(const CCommand &);
+	using FnMemberCommandCompletionCallback_t = int (T::*)(const char *, CUtlVector<CUtlString> &);
 
 public:
 	CConCommandMemberAccessor( T* pOwner, const char *pName, FnMemberCommandCallback_t callback, const char *pHelpString = nullptr,

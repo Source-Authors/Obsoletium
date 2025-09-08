@@ -8,11 +8,7 @@
 #ifndef KEYVALUES_H
 #define KEYVALUES_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "tier1/utlvector.h"
+#include "utlvector.h"
 #include "Color.h"
 
 #define FOR_EACH_SUBKEY( kvRoot, kvSubKey ) \
@@ -25,11 +21,11 @@
 	for ( KeyValues * kvValue = kvRoot->GetFirstValue(); kvValue != nullptr; kvValue = kvValue->GetNextValue() )
 
 // handle to a KeyValues key name symbol
-typedef intp HKeySymbol;
+using HKeySymbol = intp;
 class IBaseFileSystem;
 class CUtlBuffer;
 class Color;
-typedef void * FileHandle_t;
+using FileHandle_t = void *;
 class CKeyValuesGrowableStringTable;
 
 //-----------------------------------------------------------------------------
@@ -357,7 +353,7 @@ public:
 	[[nodiscard]] static const char *CallGetStringForSymbol( HKeySymbol symbol ) { return s_pfGetStringForSymbol( symbol ); }
 };
 
-typedef KeyValues::AutoDelete KeyValuesAD;
+using KeyValuesAD = KeyValues::AutoDelete;
 
 enum KeyValuesUnpackDestinationTypes_t
 {

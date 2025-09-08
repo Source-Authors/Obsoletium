@@ -5,13 +5,13 @@
 // $NoKeywords: $
 //=============================================================================
 
-#ifndef THASH_H
-#define THASH_H
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_PUBLIC_TIER1_THASH_H_
+#define SE_PUBLIC_TIER1_THASH_H_
 
 #include <typeinfo>
+
+#include "tier0/basetypes.h"
+#include "mempool.h"
 
 //#define DBGFLAG_THASH			// Perform extra sanity checks on the THash
 
@@ -34,7 +34,7 @@ private:
 	// RecHdr
 	// We insert one of these at the beginning of every record.  It's used for
 	// keeping the records in a linked list.
-	typedef struct RecHdr_t
+	using RecHdr_t = struct RecHdr_t
 	{
 		RecHdr_t *m_pRecHdrNext;		// Next item in our linked list
 		RecHdr_t *m_pRecHdrPrev;		// Previous item in our linked list
@@ -45,15 +45,15 @@ private:
 #ifdef DBGFLAG_THASH
 		uint m_iCycleLast;				// Last cycle we were visited (whether or not we ran)
 #endif
-	} RecHdr_t;
+	};
 
 	// Bucket
 	// Each hash bucket is represented by a Bucket structure, which points to the 
 	// first record with the bucket's hash.
-	typedef struct Bucket_t
+	using Bucket_t = struct Bucket_t
 	{
 		RecHdr_t *m_pRecHdrFirst;		// First record in our list
-	} Bucket_t;
+	};
 
 
 public:
