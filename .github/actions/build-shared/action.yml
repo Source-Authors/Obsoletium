@@ -21,7 +21,7 @@ runs:
       msbuild-architecture: ${{inputs.platform-name}}
 
   - name: Add MASM ${{inputs.platform-name}} to PATH
-    uses: Source-Authors/setup-masm@v1.1
+    uses: Source-Authors/setup-masm@v1.3
     with:
       vs-architecture: ${{inputs.platform-name}}
 
