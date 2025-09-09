@@ -32,6 +32,8 @@
 
 #include "vscript/ivscript.h"
 
+#include <atomic>
+
 //#include "init_nut.h"
 
 #include "memdbgon.h"
@@ -44,8 +46,8 @@ static int lastType;
 class CLuaVM final : public IScriptVM
 {
 	lua_State			*m_LuaState;
-	ScriptOutputFunc_t	m_OutputFunc;
-	ScriptErrorFunc_t	m_ErrorFunc;
+	std::atomic<ScriptOutputFunc_t>	m_OutputFunc;
+	std::atomic<ScriptErrorFunc_t>	m_ErrorFunc;
 	lua_CFunction		m_OldPanicFunc;
 	int64				m_iUniqueIdSerialNumber;
 
@@ -70,7 +72,7 @@ public:
 
 	static int PrintFunc( lua_State *pState ) 
 	{
-		ScriptOutputFunc_t	m_OutputFunc = *( ( ScriptOutputFunc_t * )lua_touserdata( pState, lua_upvalueindex( 1 ) ) );
+		ScriptOutputFunc_t	m_OutputFunc = *( static_cast<ScriptOutputFunc_t *>( lua_touserdata( pState, lua_upvalueindex( 1 ) ) ) );
 		CUtlString			Output;
 
 		int n = lua_gettop( pState );  /* number of arguments */
@@ -82,7 +84,7 @@ public:
 			lua_pushvalue( pState, i );   /* value to print */
 			lua_call( pState, 1, 1 );
 			const char *s = lua_tostring( pState, -1 );  /* get result */
-			if ( s == nullptr )
+			if ( !s )
 			{
 				return luaL_error( pState, "'tostring' must return a string to 'print'" );
 			}
@@ -114,9 +116,9 @@ public:
 
 	void HandleError( const char *pszErrorText ) const
 	{
-		if ( m_ErrorFunc )
+		if ( const auto err = m_ErrorFunc.load( std::memory_order::memory_order_relaxed ); err )
 		{
-			m_ErrorFunc( SCRIPT_LEVEL_WARNING, pszErrorText );
+			err( SCRIPT_LEVEL_WARNING, pszErrorText );
 		}
 		else
 		{
@@ -128,16 +130,16 @@ public:
 	{
 		const char *err = lua_tostring( pState, 1 );
 
-		Warning( "Fatal lua error:\n%s\n" );
+		Warning( "Fatal lua error:\n%s\n", err );
 
 		throw err;
 	}
 
 	void FatalError( const char *pszError ) const
 	{
-		if ( m_ErrorFunc )
+		if ( const auto err = m_ErrorFunc.load( std::memory_order::memory_order_relaxed ); err )
 		{
-			m_ErrorFunc( SCRIPT_LEVEL_ERROR, pszError );
+			err( SCRIPT_LEVEL_ERROR, pszError );
 		}
 		else
 		{
@@ -1172,14 +1174,14 @@ public:
 
 	void SetOutputCallback( ScriptOutputFunc_t pFunc ) override
 	{
-		m_OutputFunc = pFunc;
+		m_OutputFunc.store( pFunc, std::memory_order::memory_order_seq_cst );
 
 		lua_pushstring( m_LuaState, "print" );
 		ScriptOutputFunc_t *pOutputCallback = static_cast<ScriptOutputFunc_t *>
 		(
 			lua_newuserdata( m_LuaState, sizeof( ScriptOutputFunc_t ) )
 		);
-		*pOutputCallback = m_OutputFunc;
+		*pOutputCallback = pFunc;
 
 		lua_pushcclosure( m_LuaState, PrintFunc, 1 );
 		lua_setglobal( m_LuaState, "print" );
@@ -1187,7 +1189,7 @@ public:
 
 	void SetErrorCallback( ScriptErrorFunc_t pFunc ) override
 	{
-		m_ErrorFunc = pFunc;
+		m_ErrorFunc.store( pFunc, std::memory_order::memory_order_relaxed );
 	}
 };
 
