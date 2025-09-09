@@ -177,8 +177,10 @@ $Project "stdshader_dx9"
 		$Lib	tier2
     }
 
-	$File	"buildstdshaders.bat"
-	$File	"buildshaders.bat"
+	$File	"buildstdshaders_V1.bat"
+	$File	"buildstdshaders_V2.bat"
+	$File	"buildshaders_V1.bat"
+	$File	"buildshaders_V2.bat"
 
 	$Shaders	"stdshader_dx9_20b.txt"
 	$Shaders	"stdshader_dx9_30.txt"
