@@ -32,8 +32,8 @@ public:
 		}
 		else
 		{
-			Warning( "Unknown script language %d.\n", language );
-			AssertMsg( 0, "Unknown script language %d.\n", language );
+			Warning( "Unsupported script language %d.\n", language );
+			AssertMsg( 0, "Unsupported script language %d.\n", language );
 			return nullptr;
 		}
 
@@ -65,8 +65,8 @@ public:
 			}
 			else
 			{
-				Warning( "Unknown script language %d.\n", language );
-				AssertMsg( 0, "Unknown script language %d.\n", language );
+				Warning( "Unsupported script language %d.\n", language );
+				AssertMsg( 0, "Unsupported script language %d.\n", language );
 			}
 		}
 	}
