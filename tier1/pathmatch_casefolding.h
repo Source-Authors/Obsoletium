@@ -10,19 +10,19 @@
 #define CASEFOLDING_ARRAYLEN(x) (sizeof (x) / sizeof ((x)[0]))
 
 // dimhotepus: Move here as used in header.
-typedef struct CaseFoldMapping
+using CaseFoldMapping = struct CaseFoldMapping
 {
 	uint32_t from;
 	uint32_t to0;
 	uint32_t to1;
 	uint32_t to2;
-} CaseFoldMapping;
+};
 
-typedef struct CaseFoldHashBucket
+using CaseFoldHashBucket = struct CaseFoldHashBucket
 {
 	const uint8_t count;
 	const CaseFoldMapping *list;
-} CaseFoldHashBucket;
+};
 
 static const CaseFoldMapping case_fold_000[] = {
 	{ 0x0202, 0x0203, 0x0000, 0x0000 },
@@ -1889,11 +1889,11 @@ static const CaseFoldHashBucket case_fold_hash[256] = {
 	{ CASEFOLDING_ARRAYLEN(case_fold_120), case_fold_120 },
 	{ CASEFOLDING_ARRAYLEN(case_fold_121), case_fold_121 },
 	{ CASEFOLDING_ARRAYLEN(case_fold_122), case_fold_122 },
-	{ 0, NULL },
+	{ 0, nullptr },
 	{ CASEFOLDING_ARRAYLEN(case_fold_124), case_fold_124 },
-	{ 0, NULL },
+	{ 0, nullptr },
 	{ CASEFOLDING_ARRAYLEN(case_fold_126), case_fold_126 },
-	{ 0, NULL },
+	{ 0, nullptr },
 	{ CASEFOLDING_ARRAYLEN(case_fold_128), case_fold_128 },
 	{ CASEFOLDING_ARRAYLEN(case_fold_129), case_fold_129 },
 	{ CASEFOLDING_ARRAYLEN(case_fold_130), case_fold_130 },

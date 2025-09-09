@@ -35,7 +35,9 @@
 
 #include "tier1/strtools.h"
 
-#define MAX_FILE_READ_BUFFER 8000
+enum {
+  MAX_FILE_READ_BUFFER = 8000
+};
 
 // Rotate x bits to the left
 #ifndef ROL32
@@ -260,7 +262,7 @@ void CSHA1::ReportHash(char *szReport, std::ptrdiff_t nReportSize, unsigned char
 	unsigned char i = 0;
 	char szTemp[12];
 
-	if(szReport == NULL) return;
+	if(szReport == nullptr) return;
 
 	if(uReportType == REPORT_HEX)
 	{

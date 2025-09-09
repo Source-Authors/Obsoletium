@@ -37,25 +37,25 @@ KeyValues *KeyValuesJSONParser::ParseFile()
 	if ( m_eToken == kToken_EOF )
 	{
 		V_sprintf_safe( m_szErrMsg, "Input contains no data" );
-		return NULL;
+		return nullptr;
 	}
 	if ( m_eToken == kToken_Err )
-		return NULL;
+		return nullptr;
 	if ( m_eToken == '{' )
 	{
 		// Parse the the entire file as one big object
-		KeyValues *pResult = new KeyValues("");
+		auto *pResult = new KeyValues("");
 		if ( !ParseObject( pResult ) )
 		{
 			pResult->deleteThis();
-			return NULL;
+			return nullptr;
 		}
 		if ( m_eToken == kToken_EOF )
 			return pResult;
 		pResult->deleteThis();
 	}
 	V_sprintf_safe( m_szErrMsg, "%s not expected here.  A valid JSON document should be a single object, which begins with '{' and ends with '}'", GetTokenDebugText() );
-	return NULL;
+	return nullptr;
 }
 
 bool KeyValuesJSONParser::ParseObject( KeyValues *pObject )
@@ -63,7 +63,7 @@ bool KeyValuesJSONParser::ParseObject( KeyValues *pObject )
 	Assert( m_eToken == '{' );
 	int nOpenDelimLine = m_nLine;
 	NextToken();
-	KeyValues *pLastChild = NULL;
+	KeyValues *pLastChild = nullptr;
 	while ( m_eToken != '}' )
 	{
 		// Parse error?
@@ -86,7 +86,7 @@ bool KeyValuesJSONParser::ParseObject( KeyValues *pObject )
 			return false;
 		}
 
-		KeyValues *pChildValue = new KeyValues( m_vecTokenChars.Base() );
+		auto *pChildValue = new KeyValues( m_vecTokenChars.Base() );
 		NextToken();
 
 		// Expect and eat colon
@@ -136,7 +136,7 @@ bool KeyValuesJSONParser::ParseArray( KeyValues *pArray )
 	Assert( m_eToken == '[' );
 	int nOpenDelimLine = m_nLine;
 	NextToken();
-	KeyValues *pLastChild = NULL;
+	KeyValues *pLastChild = nullptr;
 	int idx = 0;
 	while ( m_eToken != ']' )
 	{
@@ -157,7 +157,7 @@ bool KeyValuesJSONParser::ParseArray( KeyValues *pArray )
 		char szKeyName[ 32 ];
 		V_to_chars( szKeyName, idx );
 		++idx;
-		KeyValues *pChildValue = new KeyValues( szKeyName );
+		auto *pChildValue = new KeyValues( szKeyName );
 
 		// Recursively parse the value
 		if ( !ParseValue( pChildValue ) )
@@ -207,7 +207,7 @@ bool KeyValuesJSONParser::ParseValue( KeyValues *pValue )
 		case '{': return ParseObject( pValue );
 		case '[': return ParseArray( pValue );
 		case kToken_String:
-			pValue->SetString( NULL, m_vecTokenChars.Base() );
+			pValue->SetString( nullptr, m_vecTokenChars.Base() );
 			NextToken();
 			return true;
 
@@ -226,18 +226,18 @@ bool KeyValuesJSONParser::ParseValue( KeyValues *pValue )
 					return false;
 				}
 
-				pValue->SetInt( NULL, (int)val64 );
+				pValue->SetInt( nullptr, (int)val64 );
 			}
 			else
 			{
 				uint64 val64 = V_atoui64( pszNum );
 				if ( val64 > 0x7fffffffU )
 				{
-					pValue->SetUint64( NULL, val64 );
+					pValue->SetUint64( nullptr, val64 );
 				}
 				else
 				{
-					pValue->SetInt( NULL, (int)val64 );
+					pValue->SetInt( nullptr, (int)val64 );
 				}
 			}
 			NextToken();
@@ -247,23 +247,23 @@ bool KeyValuesJSONParser::ParseValue( KeyValues *pValue )
 		case kToken_NumberFloat:
 		{
 			float f = V_atof( m_vecTokenChars.Base() );
-			pValue->SetFloat( NULL, f );
+			pValue->SetFloat( nullptr, f );
 			NextToken();
 			return true;
 		}
 
 		case kToken_True:
-			pValue->SetBool( NULL, true );
+			pValue->SetBool( nullptr, true );
 			NextToken();
 			return true;
 
 		case kToken_False:
-			pValue->SetBool( NULL, false );
+			pValue->SetBool( nullptr, false );
 			NextToken();
 			return true;
 
 		case kToken_Null:
-			pValue->SetPtr( NULL, NULL );
+			pValue->SetPtr( nullptr, nullptr );
 			NextToken();
 			return true;
 
@@ -673,8 +673,8 @@ static void JSONTest_ParseInvalid( const char *pszData, const char *pszExpectedE
 {
 	KeyValuesJSONParser parser( pszData );
 	KeyValues *pFile = parser.ParseFile();
-	Assert( pFile == NULL );
-	Assert( V_stristr( parser.m_szErrMsg, pszExpectedErrMsgSnippet ) != NULL );
+	Assert( pFile == nullptr );
+	Assert( V_stristr( parser.m_szErrMsg, pszExpectedErrMsgSnippet ) != nullptr );
 	Assert( parser.m_nLine == nExpectedFailureLine );
 }
 

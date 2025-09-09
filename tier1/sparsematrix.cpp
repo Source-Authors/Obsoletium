@@ -106,7 +106,7 @@ void CSparseMatrix::SetElement( int nRow, int nCol, float flValue )
 	}
 }
 
-void CSparseMatrix::FinishedAppending( void )
+void CSparseMatrix::FinishedAppending( )
 {
 	// set all pointers to space for subsequent rows to the right value
 	for( int i = m_nHighestRowAppendedTo + 1 ; i < Height(); i++ )

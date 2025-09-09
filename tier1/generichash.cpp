@@ -7,7 +7,7 @@
 
 #include "tier1/generichash.h"
 
-#include <ctype.h>
+#include <cctype>
 #include <cstdlib>
 
 #include "tier0/basetypes.h"
@@ -84,7 +84,7 @@ static unsigned g_nRandomValues[256] =
 //-----------------------------------------------------------------------------
 unsigned FASTCALL HashString( const char *pszKey )
 {
-	const uint8 *k =   (const uint8 *)pszKey;
+	const auto *k =   (const uint8 *)pszKey;
 	unsigned 	even = 0,
 				odd  = 0,
 				n;
@@ -107,7 +107,7 @@ unsigned FASTCALL HashString( const char *pszKey )
 //-----------------------------------------------------------------------------
 unsigned FASTCALL HashStringCaseless( const char *pszKey )
 {
-	const uint8 *k = (const uint8 *) pszKey;
+	const auto *k = (const uint8 *) pszKey;
 	unsigned	even = 0,
 				odd  = 0,
 				n;
@@ -160,7 +160,7 @@ unsigned FASTCALL HashInt( const int n )
 //-----------------------------------------------------------------------------
 unsigned FASTCALL Hash4( const void *pKey )
 {
-	const uint32 *	p = (const uint32 *) pKey;
+	const auto *	p = (const uint32 *) pKey;
 	unsigned		even,
 					odd,
 					n;
@@ -181,7 +181,7 @@ unsigned FASTCALL Hash4( const void *pKey )
 //-----------------------------------------------------------------------------
 unsigned FASTCALL Hash8( const void *pKey )
 {
-	const uint32 *	p = (const uint32 *) pKey;
+	const auto *	p = (const uint32 *) pKey;
 	unsigned		even,
 					odd,
 					n;
@@ -208,7 +208,7 @@ unsigned FASTCALL Hash8( const void *pKey )
 //-----------------------------------------------------------------------------
 unsigned FASTCALL Hash12( const void *pKey )
 {
-	const uint32 *	p = (const uint32 *) pKey;
+	const auto *	p = (const uint32 *) pKey;
 	unsigned		even,
 					odd,
 					n;
@@ -241,7 +241,7 @@ unsigned FASTCALL Hash12( const void *pKey )
 //-----------------------------------------------------------------------------
 unsigned FASTCALL Hash16( const void *pKey )
 {
-	const uint32 *	p = (const uint32 *) pKey;
+	const auto *	p = (const uint32 *) pKey;
 	unsigned		even,
 					odd,
 					n;
@@ -280,7 +280,7 @@ unsigned FASTCALL Hash16( const void *pKey )
 //-----------------------------------------------------------------------------
 unsigned FASTCALL HashBlock( const void *pKey, unsigned size )
 {
-	const uint8 *	k    = (const uint8 *) pKey;
+	const auto *	k    = (const uint8 *) pKey;
 	unsigned 		even = 0,
 					odd  = 0,
 					n;
@@ -321,7 +321,7 @@ uint32 MurmurHash2( const void * key, int len, uint32 seed )
 
 	// Mix 4 bytes at a time into the hash
 
-	const unsigned char * data = (const unsigned char *)key;
+	const auto * data = (const unsigned char *)key;
 
 	while(len >= 4)
 	{
@@ -391,7 +391,7 @@ uint64 MurmurHash64( const void * key, int len, uint32 seed )
 
 	// Mix 4 bytes at a time into the hash
 
-	const uint32 * data = (const uint32 *)key;
+	const auto * data = (const uint32 *)key;
 	while ( len >= 8 )
 	{
 		uint32 k1 = LittleDWord( *data++ );

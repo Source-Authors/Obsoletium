@@ -42,7 +42,7 @@
 // ------------------------------------------------------------------------------------ //
 // InterfaceReg.
 // ------------------------------------------------------------------------------------ //
-InterfaceReg *InterfaceReg::s_pInterfaceRegs = NULL;
+InterfaceReg *InterfaceReg::s_pInterfaceRegs = nullptr;
 
 InterfaceReg::InterfaceReg( InstantiateInterfaceFn fn, const char *pName ) :
 	m_pName(pName)
@@ -132,7 +132,7 @@ void *GetModuleHandle(const char *name)
 //-----------------------------------------------------------------------------
 static void *Sys_GetProcAddress( const char *pModuleName, const char *pName )
 {
-	HMODULE hModule = (HMODULE)GetModuleHandle(pModuleName);
+	auto hModule = (HMODULE)GetModuleHandle(pModuleName);
 #ifdef WIN32
 	return hModule ? (void *)GetProcAddress( hModule, pName ) : nullptr;
 #else
@@ -170,14 +170,14 @@ static HMODULE InternalLoadLibrary( const char *pName, Sys_Flags flags )
 	if ( flags & SYS_NOLOAD )
 		return GetModuleHandle( pName );
 	else
-		return LoadLibraryExA( pName, NULL, LOAD_WITH_ALTERED_SEARCH_PATH );
+		return LoadLibraryExA( pName, nullptr, LOAD_WITH_ALTERED_SEARCH_PATH );
 }
 
 unsigned ThreadedLoadLibraryFunc( void *pParam )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("ModuleLoader");
-	ThreadedLoadLibaryContext_t *pContext = (ThreadedLoadLibaryContext_t*)pParam;
+	auto *pContext = (ThreadedLoadLibaryContext_t*)pParam;
 	pContext->m_hLibrary = InternalLoadLibrary( pContext->m_pLibraryName, SYS_NOFLAGS );
 	return 0;
 }
@@ -209,7 +209,7 @@ HMODULE Sys_LoadLibrary( const char *pLibraryName, Sys_Flags flags )
 
 	ThreadedLoadLibaryContext_t context;
 	context.m_pLibraryName = str;
-	context.m_hLibrary = 0;
+	context.m_hLibrary = nullptr;
 
 	ThreadHandle_t h = CreateSimpleThread( ThreadedLoadLibraryFunc, &context );
 
@@ -254,7 +254,7 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 	// file in the depot (MFP) or a filesystem GetLocalCopy() call must be made
 	// prior to the call to this routine.
 	char szCwd[1024];
-	HMODULE hDLL = NULL;
+	HMODULE hDLL = nullptr;
 
 	if ( !Q_IsAbsolutePath( pModuleName ) )
 	{
@@ -365,7 +365,7 @@ void Sys_UnloadModule( CSysModule *pModule )
 	if ( !pModule )
 		return;
 
-	HMODULE	hDLL = reinterpret_cast<HMODULE>(pModule);
+	auto	hDLL = reinterpret_cast<HMODULE>(pModule);
 
 #ifdef _WIN32
 	FreeLibrary( hDLL );
@@ -385,7 +385,7 @@ CreateInterfaceFn Sys_GetFactory( CSysModule *pModule )
 	if ( !pModule )
 		return nullptr;
 
-	HMODULE	hDLL = reinterpret_cast<HMODULE>(pModule);
+	auto	hDLL = reinterpret_cast<HMODULE>(pModule);
 #ifdef _WIN32
 	SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
 	SRC_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING()
@@ -471,7 +471,7 @@ bool Sys_LoadInterface(
 //-----------------------------------------------------------------------------
 CDllDemandLoader::CDllDemandLoader( char const *pchModuleName ) : 
 	m_pchModuleName( pchModuleName ), 
-	m_hModule( 0 ),
+	m_hModule( nullptr ),
 	m_bLoadAttempted( false )
 {
 }
@@ -491,7 +491,7 @@ CreateInterfaceFn CDllDemandLoader::GetFactory()
 
 	if ( !m_hModule )
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	return Sys_GetFactory( m_hModule );
@@ -502,7 +502,7 @@ void CDllDemandLoader::Unload()
 	if ( m_hModule )
 	{
 		Sys_UnloadModule( m_hModule );
-		m_hModule = 0;
+		m_hModule = nullptr;
 	}
 }
 

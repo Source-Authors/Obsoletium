@@ -16,7 +16,7 @@
 
 #if defined(_WIN32)
 #include <winsock.h>
-typedef int socklen_t;
+using socklen_t = int;
 #elif defined(POSIX)
 #include <netinet/in.h> // ntohs()
 #include <netdb.h>		// gethostbyname()

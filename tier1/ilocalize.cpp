@@ -43,7 +43,7 @@ void ConstructStringVArgsInternal_Impl(T *unicodeOutput, intp unicodeBufferSizeI
 	Assert( numFormatParameters <= k_cMaxFormatStringArguments );
 
 	// Safety check
-	if ( unicodeOutput == NULL || unicodeBufferSizeInBytes < 1 )
+	if ( unicodeOutput == nullptr || unicodeBufferSizeInBytes < 1 )
 	{
 		return;
 	}
@@ -87,7 +87,7 @@ void ConstructStringVArgsInternal_Impl(T *unicodeOutput, intp unicodeBufferSizeI
 			{
 				T const *param = argParams[argindex];
 
-				if ( param == NULL )
+				if ( param == nullptr )
 					param = StringFuncs<T>::NullDebugString();
 
 				intp paramSize = StringFuncs<T>::Length(param);

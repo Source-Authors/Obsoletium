@@ -28,10 +28,10 @@ MEMALLOC_DEFINE_EXTERNAL_TRACKING(CMemoryStack);
 //-----------------------------------------------------------------------------
 
 CMemoryStack::CMemoryStack()
- : 	m_pNextAlloc( NULL ),
-	m_pCommitLimit( NULL ),
-	m_pAllocLimit( NULL ),
-	m_pBase( NULL ),
+ : 	m_pNextAlloc( nullptr ),
+	m_pCommitLimit( nullptr ),
+	m_pAllocLimit( nullptr ),
+	m_pBase( nullptr ),
  	m_maxSize( 0 ),
 	m_alignment( 16 )
 #if defined(_WIN32)
@@ -87,7 +87,7 @@ bool CMemoryStack::Init( size_t maxSize, size_t commitSize, size_t initialCommit
 	
 	Assert( m_maxSize % pageSize == 0 && m_commitSize % pageSize == 0 && m_commitSize <= m_maxSize );
 
-	m_pBase = (unsigned char *)VirtualAlloc( NULL, m_maxSize, VA_RESERVE_FLAGS, PAGE_NOACCESS );
+	m_pBase = (unsigned char *)VirtualAlloc( nullptr, m_maxSize, VA_RESERVE_FLAGS, PAGE_NOACCESS );
 	Assert( m_pBase );
 	m_pCommitLimit = m_pNextAlloc = m_pBase;
 
@@ -110,7 +110,7 @@ bool CMemoryStack::Init( size_t maxSize, size_t commitSize, size_t initialCommit
 
 	m_pAllocLimit = m_pBase + m_maxSize;
 
-	return ( m_pBase != NULL );
+	return ( m_pBase != nullptr );
 }
 
 //-------------------------------------
@@ -125,7 +125,7 @@ void CMemoryStack::Term()
 #else
 		MemAlloc_FreeAligned( m_pBase );
 #endif
-		m_pBase = NULL;
+		m_pBase = nullptr;
 	}
 }
 

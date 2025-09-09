@@ -285,7 +285,7 @@ bool CUtlString::MatchesPattern( const CUtlString &Pattern, int nFlags ) const
 	const char *pszPattern = Pattern.String();
 	bool	bExact = true;
 
-	while( 1 )
+	while( true )
 	{
 		if ( ( *pszPattern ) == '\0' )
 		{
@@ -313,7 +313,7 @@ bool CUtlString::MatchesPattern( const CUtlString &Pattern, int nFlags ) const
 			pszPattern++;
 		}
 
-		while( 1 )
+		while( true )
 		{
 			const char *pszStartPattern = pszPattern - nLength;
 			const char *pszSearch = pszSource;
@@ -541,7 +541,7 @@ CUtlString CUtlString::Slice( intp nStart, intp nEnd ) const
 	intp length = Length();
 	if ( length == 0 )
 	{
-		return CUtlString();
+		return {};
 	}
 
 	if ( nStart < 0 )
@@ -557,7 +557,7 @@ CUtlString CUtlString::Slice( intp nStart, intp nEnd ) const
 		nEnd = length;
 	
 	if ( nStart >= nEnd )
-		return CUtlString();
+		return {};
 
 	const char *pIn = String();
 
@@ -581,7 +581,7 @@ CUtlString CUtlString::Replace( char cFrom, char cTo ) const
 {
 	if (!m_pString)
 	{
-		return CUtlString();
+		return {};
 	}
 
 	CUtlString ret = *this;
@@ -659,13 +659,13 @@ CUtlString CUtlString::AbsPath( const char *pStartingDir ) const
 {
 	char szNew[MAX_PATH];
 	V_MakeAbsolutePath( szNew, this->String(), pStartingDir );
-	return CUtlString( szNew );
+	return { szNew };
 }
 
 CUtlString CUtlString::UnqualifiedFilename() const
 {
 	const char *pFilename = V_UnqualifiedFileName( this->String() );
-	return CUtlString( pFilename );
+	return { pFilename };
 }
 
 CUtlString CUtlString::DirName() const
@@ -680,7 +680,7 @@ CUtlString CUtlString::StripExtension() const
 {
 	char szTemp[MAX_PATH];
 	V_StripExtension( String(), szTemp );
-	return CUtlString( szTemp );
+	return { szTemp };
 }
 
 CUtlString CUtlString::StripFilename() const
@@ -697,14 +697,14 @@ CUtlString CUtlString::GetBaseFilename() const
 {
 	char szTemp[MAX_PATH];
 	V_FileBase( String(), szTemp );
-	return CUtlString( szTemp );
+	return { szTemp };
 }
 
 CUtlString CUtlString::GetExtension() const
 {
 	char szTemp[MAX_PATH];
 	V_ExtractFileExtension( String(), szTemp );
-	return CUtlString( szTemp );
+	return { szTemp };
 }
 
 
@@ -712,7 +712,7 @@ CUtlString CUtlString::PathJoin( const char *pStr1, const char *pStr2 )
 {
 	char szPath[MAX_PATH];
 	V_ComposeFileName( pStr1, pStr2, szPath );
-	return CUtlString( szPath );
+	return { szPath };
 }
 
 CUtlString CUtlString::operator+( const char *pOther ) const

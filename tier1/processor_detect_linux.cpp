@@ -9,7 +9,7 @@
 #define cpuid(in,a,b,c,d)												\
 	asm("pushl %%ebx\n\t" "cpuid\n\t" "movl %%ebx,%%esi\n\t" "pop %%ebx": "=a" (a), "=S" (b), "=c" (c), "=d" (d) : "a" (in));
 
-bool CheckMMXTechnology(void)
+bool CheckMMXTechnology()
 {
     unsigned long eax,ebx,edx,unused;
     cpuid(1,eax,ebx,unused,edx);
@@ -17,7 +17,7 @@ bool CheckMMXTechnology(void)
     return edx & 0x800000;
 }
 
-bool CheckSSETechnology(void)
+bool CheckSSETechnology()
 {
     unsigned long eax,ebx,edx,unused;
     cpuid(1,eax,ebx,unused,edx);
@@ -25,7 +25,7 @@ bool CheckSSETechnology(void)
     return edx & 0x2000000L;
 }
 
-bool CheckSSE2Technology(void)
+bool CheckSSE2Technology()
 {
     unsigned long eax,ebx,edx,unused;
     cpuid(1,eax,ebx,unused,edx);
@@ -33,7 +33,7 @@ bool CheckSSE2Technology(void)
     return edx & 0x04000000;
 }
 
-bool Check3DNowTechnology(void)
+bool Check3DNowTechnology()
 {
     unsigned long eax, unused;
     cpuid(0x80000000,eax,unused,unused,unused);

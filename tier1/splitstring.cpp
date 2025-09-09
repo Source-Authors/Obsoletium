@@ -32,10 +32,10 @@ void CSplitString::Construct( const char *pString, const char **pSeparators, int
 
 	this->Purge();
 	const char *pCurPos = pString;
-	while ( 1 )
+	while ( true )
 	{
 		intp iFirstSeparator = -1;
-		const char *pFirstSeparator = 0;
+		const char *pFirstSeparator = nullptr;
 		for ( intp i=0; i < nSeparators; i++ )
 		{
 			const char *pTest = V_stristr( pCurPos, pSeparators[i] );

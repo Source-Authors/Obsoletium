@@ -30,8 +30,10 @@
 // note - this algorithm uses storage equal to 8* the old buffer size. 64k=.5mb
 
 
-#define MIN_MATCH_LEN 8
-#define ACCEPTABLE_MATCH_LEN 4096
+enum {
+  MIN_MATCH_LEN = 8,
+  ACCEPTABLE_MATCH_LEN = 4096
+};
 
 struct BlockPtr
 {
@@ -178,9 +180,9 @@ int FindDiffsForLargeFiles(uint8 const *NewBlock, uint8 const *OldBlock,
   if (OldSize!=NewSize)
     ret=1;
   // first, build the hash table
-  BlockPtr **HashedMatches=new BlockPtr* [hashsize];
+  auto **HashedMatches=new BlockPtr* [hashsize];
   memset(HashedMatches,0,sizeof(HashedMatches[0])*hashsize);
-  BlockPtr *Blocks=0;
+  BlockPtr *Blocks=nullptr;
   if (OldSize)
     Blocks=new BlockPtr[OldSize];
   BlockPtr *FreeList=Blocks;
@@ -207,7 +209,7 @@ int FindDiffsForLargeFiles(uint8 const *NewBlock, uint8 const *OldBlock,
   while(walk<NewBlock+NewSize)
   {
     intp longest=0;
-    BlockPtr *longest_block=0;
+    BlockPtr *longest_block=nullptr;
     if (walk<NewBlock+NewSize-MIN_MATCH_LEN)
     {
       // check for a match
@@ -316,7 +318,7 @@ int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
   // first, build the hash table
   BlockPtr *HashedMatches[65536];
   memset(HashedMatches,0,sizeof(HashedMatches));
-  BlockPtr *Blocks=0;
+  BlockPtr *Blocks=nullptr;
   if (OldSize)
     Blocks=new BlockPtr[OldSize];
   BlockPtr *FreeList=Blocks;
@@ -342,7 +344,7 @@ int FindDiffs(uint8 const *NewBlock, uint8 const *OldBlock,
   while(walk<NewBlock+NewSize)
   {
     intp longest=0;
-    BlockPtr *longest_block=0;
+    BlockPtr *longest_block=nullptr;
     if (walk<NewBlock+NewSize-MIN_MATCH_LEN)
     {
       // check for a match
@@ -457,7 +459,7 @@ int FindDiffsLowMemory(uint8 const *NewBlock, uint8 const *OldBlock,
       oldptr++;
     }
     intp longest=0;
-    uint8 const *longest_block=0;
+    uint8 const *longest_block=nullptr;
     if (walk<NewBlock+NewSize-MIN_MATCH_LEN)
     {
       // check for a match

@@ -13,10 +13,15 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define CRC32_INIT_VALUE 0xFFFFFFFFUL
-#define CRC32_XOR_VALUE  0xFFFFFFFFUL
+enum {
+  CRC32_INIT_VALUE = 0xFFFFFFFFUL,
+  CRC32_XOR_VALUE =  0xFFFFFFFFUL
+};
 
-#define NUM_BYTES 256
+enum {
+  NUM_BYTES = 256
+};
+
 static const CRC32_t pulCRCTable[NUM_BYTES] =
 {
     0x00000000, 0x77073096, 0xee0e612c, 0x990951ba,
@@ -103,7 +108,7 @@ CRC32_t	CRC32_GetTableEntry( unsigned int slot )
 void CRC32_ProcessBuffer(CRC32_t *pulCRC, IN_BYTECAP(nBuffer) const void *pBuffer, intp nBuffer)
 {
 	CRC32_t ulCrc = *pulCRC;
-	unsigned char *pb = (unsigned char *)pBuffer;
+	auto *pb = (unsigned char *)pBuffer;
     unsigned int nFront;
     intp nMain;
 

@@ -361,7 +361,7 @@ void TokenReader::IgnoreTill(trtoken_t ttype, const char *pszToken)
 	trtoken_t _ttype;
 	char szBuf[1024];
 
-	while(1)
+	while(true)
 	{
 		_ttype = NextToken(szBuf);
 		if(_ttype == TOKENEOF)
@@ -436,7 +436,7 @@ trtoken_t TokenReader::PeekTokenType(OUT_Z_CAP(maxlen) char *pszStore, intp maxl
 // Output : Returns true if the whitespace contained the combine strings
 //			character '\', which is used to merge consecutive quoted strings.
 //-----------------------------------------------------------------------------
-bool TokenReader::SkipWhiteSpace(void)
+bool TokenReader::SkipWhiteSpace()
 {
 	bool bCombineStrings = false;
 

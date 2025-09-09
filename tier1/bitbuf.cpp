@@ -278,9 +278,9 @@ void bf_write::WriteVarInt64( uint64 data )
 
 		// Splitting into 32-bit pieces gives better performance on 32-bit
 		// processors.
-		uint32 part0 = static_cast<uint32>(data      );
-		uint32 part1 = static_cast<uint32>(data >> 28);
-		uint32 part2 = static_cast<uint32>(data >> 56);
+		auto part0 = static_cast<uint32>(data      );
+		auto part1 = static_cast<uint32>(data >> 28);
+		auto part2 = static_cast<uint32>(data >> 56);
 
 		int size;
 
@@ -734,7 +734,7 @@ void bf_write::WriteULong(uint32 val)
 
 void bf_write::WriteLongLong(int64 val)
 {
-	uint32 *pLongs = (uint32*)&val;
+	auto *pLongs = (uint32*)&val;
 
 	// dimhotepus: Fix writing int64 bits in LP64 model.
 	// Insert the two DWORDS according to network endian
@@ -746,7 +746,7 @@ void bf_write::WriteLongLong(int64 val)
 
 void bf_write::WriteULongLong(uint64 val)
 {
-	uint32 *pLongs = (uint32*)&val;
+	auto *pLongs = (uint32*)&val;
 
 	// dimhotepus: Fix writing int64 bits in LP64 model.
 	// Insert the two DWORDS according to network endian
@@ -793,13 +793,13 @@ bool bf_write::WriteString(const char *pStr)
 
 bf_read::bf_read()
 {
-	m_pData = NULL;
+	m_pData = nullptr;
 	m_nDataBytes = 0;
 	m_nDataBits = -1; // set to -1 so we overflow on any operation
 	m_iCurBit = 0;
 	m_bOverflow = false;
 	m_bAssertOnOverflow = true;
-	m_pDebugName = NULL;
+	m_pDebugName = nullptr;
 }
 
 bf_read::bf_read( const void *pData, intp nBytes, intp nBits )
@@ -884,7 +884,7 @@ void bf_read::ReadBits(void *pOutData, intp nBits)
 	VPROF( "bf_read::ReadBits" );
 #endif
 
-	uint8 *pOut = static_cast<uint8 *>(pOutData);
+	auto *pOut = static_cast<uint8 *>(pOutData);
 	intp nBitsLeft = nBits;
 	
 	// align output to dword boundary
@@ -948,7 +948,7 @@ intp bf_read::ReadBitsClamped_ptr(void *pOutData, intp outSizeBytes, intp nBits)
 
 float bf_read::ReadBitAngle( int numbits )
 {
-	float shift = (float)( BitForBitnum(numbits) );
+	auto shift = (float)( BitForBitnum(numbits) );
 
 	int i = ReadUBitLong( numbits );
 	float fReturn = (float)i * (360.0f / shift);
@@ -1073,7 +1073,7 @@ unsigned int bf_read::ReadBitLong(int numbits, bool bSigned)
 
 
 // Basic Coordinate Routines (these contain bit-field size AND fixed point scaling constants)
-float bf_read::ReadBitCoord (void)
+float bf_read::ReadBitCoord ()
 {
 #if defined( BB_PROFILING )
 	VPROF( "bf_read::ReadBitCoord" );
@@ -1202,7 +1202,7 @@ float bf_read::ReadBitCoordMP( bool bIntegral, bool bLowPrecision )
 	return (int)bits * multiply;
 }
 
-unsigned int bf_read::ReadBitCoordBits (void)
+unsigned int bf_read::ReadBitCoordBits ()
 {
 #if defined( BB_PROFILING )
 	VPROF( "bf_read::ReadBitCoordBits" );
@@ -1279,7 +1279,7 @@ void bf_read::ReadBitVec3Coord( Vector& fa )
 		fa[2] = ReadBitCoord();
 }
 
-float bf_read::ReadBitNormal (void)
+float bf_read::ReadBitNormal ()
 {
 	// Read the sign bit
 	int	signbit = ReadOneBit();
@@ -1335,7 +1335,7 @@ void bf_read::ReadBitAngles( QAngle& fa )
 int64 bf_read::ReadLongLong()
 {
 	int64 retval;
-	uint32 *pLongs = (uint32*)&retval;
+	auto *pLongs = (uint32*)&retval;
 	
 	// dimhotepus: Fix reading int64 bits in LP64 model.
 	// Read the two DWORDs according to network endian
@@ -1350,7 +1350,7 @@ int64 bf_read::ReadLongLong()
 uint64 bf_read::ReadULongLong()
 {
 	uint64 retval;
-	uint32 *pLongs = (uint32*)&retval;
+	auto *pLongs = (uint32*)&retval;
 	
 	// dimhotepus: Fix reading int64 bits in LP64 model.
 	// Read the two DWORDs according to network endian
@@ -1385,7 +1385,7 @@ bool bf_read::ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine,
 
 	bool bTooSmall = false;
 	intp iChar = 0;
-	while(1)
+	while(true)
 	{
 		char val = ReadChar();
 		if ( val == 0 )

@@ -122,7 +122,7 @@ CUtlCharConversion::CUtlCharConversion( char nEscapeChar, const char *pDelimiter
 	{
 		m_pList[i] = pArray[i].m_nActualChar;
 		ConversionInfo_t &info = m_pReplacements[ (unsigned char) m_pList[i] ];
-		Assert( info.m_pReplacementString == 0 );
+		Assert( info.m_pReplacementString == nullptr );
 		info.m_pReplacementString = pArray[i].m_pReplacementString;
 		info.m_nLength = Q_strlen( info.m_pReplacementString );
 		if ( info.m_nLength > m_nMaxConversionLength )
@@ -863,7 +863,7 @@ bool CUtlBuffer::CheckArbitraryPeekGet( intp nOffset, intp &nIncrement )
 const void* CUtlBuffer::PeekGet( intp nMaxSize, intp nOffset )
 {
 	if ( !CheckPeekGet( nOffset, nMaxSize ) )
-		return NULL;
+		return nullptr;
 
 	intp Index = m_Get + nOffset - m_nOffset;
 	Assert( m_Memory.IsIdxValid( Index ) && m_Memory.IsIdxValid( Index + nMaxSize - 1 ) );
@@ -1589,7 +1589,7 @@ void CUtlBuffer::PutString( const char* pString )
 				}
 				else
 				{
-					pEndl = NULL;
+					pEndl = nullptr;
 				}
 			}
 		}
@@ -1801,7 +1801,7 @@ bool CUtlBuffer::IsBigEndian()
 //-----------------------------------------------------------------------------
 // null terminate the buffer
 //-----------------------------------------------------------------------------
-void CUtlBuffer::AddNullTermination( void )
+void CUtlBuffer::AddNullTermination( )
 {
 	if ( m_Put > m_nMaxPut )
 	{
@@ -1974,9 +1974,9 @@ bool CUtlInplaceBuffer::InplaceGetLinePtr( char **ppszInBufferPtr, intp *pnLineL
 	return true;
 }
 
-char * CUtlInplaceBuffer::InplaceGetLinePtr( void )
+char * CUtlInplaceBuffer::InplaceGetLinePtr( )
 {
-	char *pszLine = NULL;
+	char *pszLine = nullptr;
 	intp nLineLen = 0;
 	
 	if ( InplaceGetLinePtr( &pszLine, &nLineLen ) )
