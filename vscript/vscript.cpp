@@ -12,8 +12,7 @@
 #include "tier1/interface.h"
 #include "tier1/tier1.h"
 
-#include "vstdlib/random.h"
-
+namespace {
 
 class CScriptManager final : public CTier1AppSystem<IScriptManager>
 {
@@ -32,14 +31,19 @@ public:
 		}
 		else
 		{
-			Warning( "Unsupported script language %d.\n", language );
-			AssertMsg( 0, "Unsupported script language %d.\n", language );
+			DWarning( "vscript", 0, "Unsupported script language 0x%x.\n", language );
+			AssertMsg( 0, "Unsupported script language %d.", language );
 			return nullptr;
 		}
 
 		if ( pVM )
 		{
-			pVM->Init();
+			// dimhotepus: Handle init failure.
+			if ( !pVM->Init() )
+			{
+				DestroyVM( pVM );
+				return nullptr;
+			}
 
 			ScriptRegisterFunction( pVM, RandomFloat, "Generate a random floating point number within a range, inclusive" );
 			ScriptRegisterFunction( pVM, RandomInt, "Generate a random integer within a range, inclusive" );
@@ -65,8 +69,8 @@ public:
 			}
 			else
 			{
-				Warning( "Unsupported script language %d.\n", language );
-				AssertMsg( 0, "Unsupported script language %d.\n", language );
+				DWarning( "vscript", 0, "Unsupported script language 0x%x.\n", language );
+				AssertMsg( 0, "Unsupported script language 0x%x.", language );
 			}
 		}
 	}
@@ -74,5 +78,7 @@ public:
 
 // Singleton
 CScriptManager g_ScriptManager;
+
+}  // namespace
 
 EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CScriptManager, IScriptManager, VSCRIPT_INTERFACE_VERSION, g_ScriptManager );

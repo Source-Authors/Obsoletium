@@ -5,7 +5,7 @@
 #ifndef _INC_WINDOWS
 #define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
-#include <windows.h>
+#include "winlite.h"
 #endif
 #ifndef __IUnknown_INTERFACE_DEFINED__
 #include <unknwn.h>

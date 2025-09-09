@@ -16,7 +16,12 @@
 #include <lstate.h>
 #include <ldo.h>
 
+#include "vec2.h"
 #include "vec3.h"
+#include "vec4.h"
+#include "uint64.h"
+#include "qangle.h"
+#include "quaternion.h"
 
 #include "datamap.h"
 #include "tier0/platform.h"
@@ -72,7 +77,8 @@ public:
 
 	static int PrintFunc( lua_State *pState ) 
 	{
-		ScriptOutputFunc_t	m_OutputFunc = *( static_cast<ScriptOutputFunc_t *>( lua_touserdata( pState, lua_upvalueindex( 1 ) ) ) );
+		ScriptOutputFunc_t	m_OutputFunc = *( static_cast<ScriptOutputFunc_t *>(
+			lua_touserdata( pState, lua_upvalueindex( 1 ) ) ) );
 		CUtlString			Output;
 
 		int n = lua_gettop( pState );  /* number of arguments */
@@ -89,7 +95,7 @@ public:
 				return luaL_error( pState, "'tostring' must return a string to 'print'" );
 			}
 
-			if ( i > 1 ) 
+			if ( i > 1 )
 			{
 				Output += "\t";
 			}
@@ -108,7 +114,7 @@ public:
 		}
 		else
 		{
-			Msg( "%s\n", Output.Get() );
+			DMsg( "vscript:lua", 0, "%s\n", Output.Get() );
 		}
 
 		return 0;
@@ -122,7 +128,7 @@ public:
 		}
 		else
 		{
-			Warning( pszErrorText );
+			DWarning( "vscript:lua", 0, "%s\n", pszErrorText );
 		}
 	}
 
@@ -130,7 +136,7 @@ public:
 	{
 		const char *err = lua_tostring( pState, 1 );
 
-		Warning( "Fatal lua error:\n%s\n", err );
+		DWarning( "vscript:lua", 0, "Fatal VLua error:\n%s\n", err );
 
 		throw err;
 	}
@@ -143,7 +149,7 @@ public:
 		}
 		else
 		{
-			Warning( pszError );
+			DWarning( "vscript:lua", 0, "%s.\n", pszError );
 		}
 	}
 
@@ -160,25 +166,25 @@ public:
 
 			switch (t) {
 			  case LUA_TSTRING:  /* strings */
-				  printf("`%s'", lua_tostring(L, i));
+				  DMsg( "vscript:lua", 0, "`%s'", lua_tostring(L, i));
 				  break;
 
 			  case LUA_TBOOLEAN:  /* booleans */
-				  printf(lua_toboolean(L, i) ? "true" : "false");
+				  DMsg( "vscript:lua", 0, lua_toboolean(L, i) ? "true" : "false");
 				  break;
 
 			  case LUA_TNUMBER:  /* numbers */
-				  printf("%g", lua_tonumber(L, i));
+				  DMsg( "vscript:lua", 0, "%g", lua_tonumber(L, i));
 				  break;
 
 			  default:  /* other values */
-				  printf("%s", lua_typename(L, t));
+				  DMsg( "vscript:lua", 0, "%s", lua_typename(L, t));
 				  break;
 			}
 
-			printf("  ");  /* put a separator */
+			DMsg( "vscript:lua", 0, "  ");  /* put a separator */
 		}
-		printf("\n");  /* end the listing */
+		DMsg( "vscript:lua", 0, "\n");  /* end the listing */
 	}
 
 	//-------------------------------------------------------------
@@ -196,12 +202,12 @@ public:
 				lua_pushnumber( pState, value.m_float );
 				break;
 
-			case FIELD_CSTRING:
-				lua_pushstring( pState, value );
-				break;
-
 			case FIELD_VECTOR:
 				lua_newvec3( pState, value.m_pVector );
+				break;
+
+			case FIELD_QUATERNION:
+				lua_newquat( pState, static_cast<Quaternion *>( value.m_pData ) );
 				break;
 
 			case FIELD_INTEGER:
@@ -219,6 +225,14 @@ public:
 					break; 
 				}
 
+			case FIELD_VECTOR2D:
+				lua_newvec2( pState, static_cast<Vector2D *>( value.m_pData ) );
+				break;
+
+			case FIELD_CSTRING:
+				lua_pushstring( pState, value );
+				break;
+
 			case FIELD_HSCRIPT:
 				if ( !value.m_hScript )
 				{
@@ -229,6 +243,30 @@ public:
 					lua_rawgeti( pState, LUA_REGISTRYINDEX, ( intp )value.m_hScript );
 					Assert( lua_isnil( pState, -1 ) == false );
 				}
+				break;
+
+			case FIELD_UINT64:
+				lua_newuint64( pState, value.m_uint64 );
+				break;
+
+			case FIELD_FLOAT64:
+				lua_pushnumber( pState, value.m_float64 );
+				break;
+
+			case FIELD_UINT:
+				lua_pushinteger( pState, size_cast<lua_Integer>( value.m_uint ) );
+				break;
+				
+			/*case FIELD_UTLSTRINGTOKEN:
+				lua_pushinteger( pState, value.m_utlStringToken );
+				break;*/
+
+			case FIELD_QANGLE:
+				lua_newqangle( pState, static_cast<QAngle*>( value.m_pData ) );
+				break;
+
+			case FIELD_VECTOR4D:
+				lua_newvec4( pState, static_cast<Vector4D*>( value.m_pData ) );
 				break;
 		}
 	}
@@ -252,12 +290,9 @@ public:
 			case LUA_TSTRING:
 				{
 					const char *string = lua_tostring( pState, nStackIndex );
-					const intp size = V_strlen( string ) + 1;
-					char *buffer = new char[ size ];
-					pReturn->m_pszString = buffer;
+					pReturn->m_pszString = V_strdup( string );
 					pReturn->m_type = FIELD_CSTRING;
 					pReturn->m_flags |= SV_FREE;
-					memcpy( buffer, string, size );
 				}
 				break;
 			default:
@@ -288,16 +323,23 @@ public:
 		m_LuaState = luaL_newstate();
 		if ( !m_LuaState )
 		{
-			Warning( "Unable to create Lua VM state. Out of memory?" );
+			DMsg( "vscript:lua", 0, "Unable to create %s VM. Out of memory?\n", LUA_RELEASE );
 			return false;
 		}
 
 		m_OldPanicFunc = lua_atpanic( m_LuaState, FatalErrorHandler );
 
 		luaL_openlibs( m_LuaState );
+		luaopen_vec2( m_LuaState );
 		luaopen_vec3( m_LuaState );
+		luaopen_vec4( m_LuaState );
+		luaopen_qangle( m_LuaState );
+		luaopen_quat( m_LuaState );
+		luaopen_uint64( m_LuaState );
 
 		SetOutputCallback( nullptr );
+		
+		DMsg( "vscript:lua", 0, "Created %s VM.\n", LUA_RELEASE );
 
 		return true;
 	}
@@ -311,6 +353,8 @@ public:
 		{
 			lua_close( m_LuaState );
 			m_LuaState = nullptr;
+
+			DMsg( "vscript:lua", 0, "Shutdown %s VM.\n", LUA_RELEASE );
 		}
 	}
 
@@ -369,8 +413,13 @@ public:
 	{
 		if ( m_LuaState )
 		{
-			Msg( "Garbage Collecting...\n" );
+			DMsg( "vscript:lua", 0, "Garbage collecting...\n" );
+
+			const double start = Plat_FloatTime();
 			lua_gc( m_LuaState, LUA_GCCOLLECT, 0 );
+			const double end = Plat_FloatTime();
+
+			DMsg( "vscript:lua", 0, "Garbage collected in %.2f mcs.\n", ( end - start ) * 1000000.0 );
 		}
 
 #if 0
@@ -406,8 +455,7 @@ public:
 		}
 		else
 		{
-			const char *pszErrorText = lua_tostring( m_LuaState, -1 );
-			HandleError( pszErrorText );
+			HandleError( lua_tostring( m_LuaState, -1 ) );
 		}
 
 		return INVALID_HSCRIPT;
@@ -426,6 +474,7 @@ public:
 		switch( nResult )
 		{
 			case LUA_ERRRUN:
+			case LUA_ERRSYNTAX:
 				{
 					const char *pszErrorText = lua_tostring( m_LuaState, -1 );
 					HandleError( pszErrorText );
@@ -523,7 +572,7 @@ public:
 	{
 		if ( hScope == INVALID_HSCRIPT )
 		{
-			DevWarning( "ExecuteFunction: Invalid scope handed to script VM\n" );
+			DWarning( "vscript:lua", 0, "Invalid scope passed to script VM.\n" );
 			return SCRIPT_ERROR;
 		}
 
@@ -610,7 +659,7 @@ public:
 
 				if ( pInstanceContext->pClassDesc->pHelper )
 				{
-					pObject = pInstanceContext->pClassDesc->pHelper->GetProxied( pObject );
+					pObject = pInstanceContext->pClassDesc->pHelper->GetProxied( pObject, pVMScriptFunction );
 				}
 
 				if ( !pObject )
@@ -631,18 +680,44 @@ public:
 				switch ( *pCurParamType )
 				{
 					case FIELD_FLOAT:
-						params[ i ] = ( float )lua_tonumber( pState, i + nOffset );
+						params[ i ] = size_cast<float >( lua_tonumber( pState, i + nOffset ) );
+						break;
+
+					case FIELD_FLOAT64:
+						params[ i ] = lua_tonumber( pState, i + nOffset );
 						break;
 
 					case FIELD_CSTRING:
 						params[ i ] = lua_tostring( pState, i + nOffset ); 
 						break;
 
+					case FIELD_UINT:
+						params[ i ] = size_cast<unsigned>( lua_tonumber( pState, i + nOffset ) );
+						break;
+
+					case FIELD_UINT64:
+						params[ i ] = lua_getuint64( pState, i + nOffset ); 
+						break;
+
 					case FIELD_VECTOR:
-						{
-							params[ i ] = lua_getvec3( pState, i + nOffset );
-							break;
-						}
+						params[ i ] = lua_getvec3( pState, i + nOffset );
+						break;
+
+					case FIELD_VECTOR2D:
+						params[ i ] = lua_getvec2( pState, i + nOffset );
+						break;
+
+					case FIELD_VECTOR4D:
+						params[ i ] = lua_getvec4( pState, i + nOffset );
+						break;
+
+					case FIELD_QANGLE:
+						params[ i ] = lua_getqangle( pState, i + nOffset ); 
+						break;
+						
+					case FIELD_QUATERNION:
+						params[ i ] = lua_getquat( pState, i + nOffset ); 
+						break;
 
 					case FIELD_INTEGER:
 						params[ i ] = size_cast<int>( lua_tonumber( pState, i + nOffset ) );
@@ -666,6 +741,8 @@ public:
 						}
 
 					default:
+						AssertMsg( false, "Unknown argument type 0%x in function call.\n", *pCurParamType ); 
+						DWarning( "vscript:lua", 0, "Unknown argument type 0%x in function call.\n", *pCurParamType ); 
 						break;
 				}
 			}
@@ -700,39 +777,81 @@ public:
 
 		if ( pScriptFunction->m_desc.m_Parameters.Count() > ssize(szTypeMask) - 1 )
 		{
-			AssertMsg1( 0, "Too many agruments for script function %s\n", pScriptFunction->m_desc.m_pszFunction );
+			AssertMsg( 0, "Too many arguments (%zd > %zd max) for script function %s.",
+				pScriptFunction->m_desc.m_Parameters.Count(),
+				ssize(szTypeMask) - 1,
+				pScriptFunction->m_desc.m_pszFunction );
+			DWarning( "vscript:lua", 0,
+				"Too many arhuments (%zd > %zd max) for script function %s.\n",
+				pScriptFunction->m_desc.m_Parameters.Count(),
+				ssize(szTypeMask) - 1,
+				pScriptFunction->m_desc.m_pszFunction );
+			
 			return;
 		}
 
 		szTypeMask[0] = '.';
-		char *pCurrent = &szTypeMask[1];
-		for ( intp i = 0; i < pScriptFunction->m_desc.m_Parameters.Count(); i++, pCurrent++ )
+		char *pCurrent = &szTypeMask[1], *pEnd = szTypeMask + ssize(szTypeMask);
+		for ( intp i = 0; pCurrent != pEnd && i < pScriptFunction->m_desc.m_Parameters.Count(); i++, pCurrent++ )
 		{
 			switch ( pScriptFunction->m_desc.m_Parameters[i] )
 			{
 				case FIELD_CSTRING:
 					*pCurrent = 's';
 					break;
+
 				case FIELD_FLOAT:
 				case FIELD_INTEGER:
+				case FIELD_UINT64:
+				case FIELD_FLOAT64:
+				case FIELD_POSITIVEINTEGER_OR_NULL:
+				case FIELD_UINT:
 					*pCurrent = 'n';
 					break;
+
+				case FIELD_VECTOR:
+					*pCurrent++ = 'x';
+					if (pCurrent == pEnd) break;
+					*pCurrent = '3';
+					break;
+
+				case FIELD_QUATERNION:
+					*pCurrent++ = 'q';
+					if (pCurrent == pEnd) break;
+					*pCurrent = 't';
+					break;
+
 				case FIELD_BOOLEAN:
 					*pCurrent = 'b';
 					break;
 
-				case FIELD_VECTOR:
-					*pCurrent = 'x';
+				case FIELD_VECTOR2D:
+					*pCurrent++ = 'x';
+					if (pCurrent == pEnd) break;
+					*pCurrent = '2';
 					break;
 
 				case FIELD_HSCRIPT:
 					*pCurrent = '.';
 					break;
 
+				case FIELD_QANGLE:
+					*pCurrent++ = 'q';
+					if (pCurrent == pEnd) break;
+					*pCurrent = 'a';
+					break;
+
+				case FIELD_VECTOR4D:
+					*pCurrent++ = 'x';
+					if (pCurrent == pEnd) break;
+					*pCurrent = '4';
+					break;
+
 				case FIELD_CHARACTER:
 				default:
 					*pCurrent = FIELD_VOID;
-					AssertMsg( 0 , "Not supported" );
+					AssertMsg( 0, "Unsupported function arg type 0%x.\n", pScriptFunction->m_desc.m_Parameters[i] );
+					DWarning( "vscript:lua", 0, "Unsupported function arg type 0%x.\n", pScriptFunction->m_desc.m_Parameters[i] );
 					break;
 			}
 		}
@@ -748,7 +867,11 @@ public:
 		}
 
 		Assert( pCurrent - szTypeMask < ssize(szTypeMask) - 1 );
-		*pCurrent = 0;
+		if ( pCurrent != pEnd )
+			*pCurrent = 0;
+		else
+			*(--pCurrent) = 0;
+
 		lua_pushstring( m_LuaState, pScriptFunction->m_desc.m_pszScriptName );
 		lua_pushlightuserdata( m_LuaState, pScriptFunction );
 		lua_pushcclosure( m_LuaState, &TranslateCall, 1 );
@@ -765,11 +888,11 @@ public:
 
 		if ( nStackIndex == -1 )
 		{
-			Msg( "VLua: Registered GLOBAL function %s\n", pScriptFunction->m_desc.m_pszScriptName );
+			DMsg( "vscript:lua", 0, "Registered GLOBAL function %s\n", pScriptFunction->m_desc.m_pszScriptName );
 		}
 		else
 		{
-			Msg( "VLua: Registered TABLE function %s\n", pScriptFunction->m_desc.m_pszScriptName );
+			DMsg( "vscript:lua", 0, "Registered TABLE function %s\n", pScriptFunction->m_desc.m_pszScriptName );
 		}
 
 #if 0
@@ -824,7 +947,7 @@ public:
 
 	static int custom_index( lua_State *pState )
 	{
-		InstanceContext_t *pInstanceContext = ( ( InstanceContext_t * )lua_touserdata( pState, 1 ) );
+		auto *pInstanceContext = static_cast<InstanceContext_t *>( lua_touserdata( pState, 1 ) );
 		ScriptClassDesc_t *pVMScriptFunction = pInstanceContext->pClassDesc;
 		const char	*pszKey = luaL_checkstring( pState, 2 );
 
@@ -889,10 +1012,16 @@ public:
 	{
 		if ( !RegisterClass( pClassDesc ) )
 		{
-			return NULL;
+			return nullptr;
 		}
 
-		InstanceContext_t *pInstanceContext = ( InstanceContext_t * )lua_newuserdata( m_LuaState, sizeof( InstanceContext_t ) );
+		auto *pInstanceContext = static_cast<InstanceContext_t *>( lua_newuserdata( m_LuaState, sizeof( InstanceContext_t ) ) );
+		if ( !pInstanceContext )
+		{
+			luaL_error( m_LuaState, "out of memory when alloc InstanceContext_t" );
+			return nullptr;
+		}
+
 		pInstanceContext->pInstance = pInstance;
 		pInstanceContext->pClassDesc = pClassDesc;
 		luaL_getmetatable( m_LuaState, pClassDesc->m_pszScriptName );
@@ -1039,13 +1168,11 @@ public:
 		int nCount = 0;
 
 		lua_rawgeti( m_LuaState, LUA_REGISTRYINDEX, ( intp )hScope );
-//		int count = lua_objlen( m_LuaState, -1 );
 
 		lua_pushnil( m_LuaState ); /* first key */
 		while ( lua_next( m_LuaState, -2 ) != 0 ) 
 		{
 			/* key is at index -2 and value at index -1 */
-//			Msg ("%s - %s\n", lua_typename(m_LuaState, lua_type(m_LuaState, -2)), lua_typename(m_LuaState, lua_type(m_LuaState, -1)));
 			nCount++;
 			lua_pop( m_LuaState, 1 ); /* removes value; keeps key for next iteration */
 		}
@@ -1062,7 +1189,6 @@ public:
 		intp nStackSize = GetStackSize();
 
 		lua_rawgeti( m_LuaState, LUA_REGISTRYINDEX, ( intp )hScope );
-		//		int count = lua_objlen( m_LuaState, -1 );
 
 		lua_pushnil( m_LuaState ); /* first key */
 		while ( lua_next( m_LuaState, -2 ) != 0 && nCount < nIterator )
@@ -1071,13 +1197,10 @@ public:
 			lua_pop( m_LuaState, 1 ); /* removes value; keeps key for next iteration */
 		}
 
-//		Msg ("%s - %s\n", lua_typename(m_LuaState, lua_type(m_LuaState, -2)), lua_typename(m_LuaState, lua_type(m_LuaState, -1)));
-
 		ConvertToVariant( -2, m_LuaState, pKey );
 		ConvertToVariant( -1, m_LuaState, pValue );
 
 		lua_pop( m_LuaState, 3 ); /* removes value; keeps key for next iteration */
-
 		lua_pop( m_LuaState, nStackSize - GetStackSize() );
 
 		return nCount + 1;
@@ -1174,13 +1297,18 @@ public:
 
 	void SetOutputCallback( ScriptOutputFunc_t pFunc ) override
 	{
-		m_OutputFunc.store( pFunc, std::memory_order::memory_order_seq_cst );
-
 		lua_pushstring( m_LuaState, "print" );
-		ScriptOutputFunc_t *pOutputCallback = static_cast<ScriptOutputFunc_t *>
+		auto *pOutputCallback = static_cast<ScriptOutputFunc_t *>
 		(
 			lua_newuserdata( m_LuaState, sizeof( ScriptOutputFunc_t ) )
 		);
+		if ( !pOutputCallback )
+		{
+			luaL_error( m_LuaState, "out of memory when alloc ScriptOutputFunc_t" );
+			return;
+		}
+		
+		m_OutputFunc.store( pFunc, std::memory_order::memory_order_seq_cst );
 		*pOutputCallback = pFunc;
 
 		lua_pushcclosure( m_LuaState, PrintFunc, 1 );
@@ -1241,7 +1369,7 @@ static void FromScript_AddBehavior( const char *pBehaviorName, HSCRIPT hTable )
 	{
 		nInterator = g_pScriptVM->GetKeyValue( hTable, nInterator, &KeyVariant, &ValueVariant );
 
-		Msg( "   %d: %s / %s\n", i, KeyVariant.m_pszString, ValueVariant.m_pszString );
+		Msg( "   %d: %s / %s\n", i, static_cast<const char*>(KeyVariant), static_cast<const char*>(ValueVariant) );
 
 		g_pScriptVM->ReleaseValue( KeyVariant );
 		g_pScriptVM->ReleaseValue( ValueVariant );
@@ -1287,11 +1415,7 @@ bool CMyClass::Foo( int test  )
 
 void CMyClass::Bar( HSCRIPT TableA, HSCRIPT TableB )
 {
-	ScriptVariant_t MyValue;
-
-//	g_pScriptVM->CreateTable( MyTable );
-
-	MyValue = 10;
+	ScriptVariant_t MyValue = 10;
 	g_pScriptVM->SetValue( TableA, "1", MyValue );
 	MyValue = 20;
 	g_pScriptVM->SetValue( TableA, "2", MyValue );
@@ -1304,8 +1428,6 @@ void CMyClass::Bar( HSCRIPT TableA, HSCRIPT TableB )
 	g_pScriptVM->SetValue( TableB, "2", MyValue );
 	MyValue = 300;
 	g_pScriptVM->SetValue( TableB, "3", MyValue );
-
-//	return MyTable;
 }
 
 float CMyClass::FooBar( int test1, const char *test2 )
@@ -1359,7 +1481,11 @@ int main( int argc, const char **argv)
 		return EINVAL;
 	}
 
-	g_pScriptVM->Init();
+	if ( !g_pScriptVM->Init() )
+	{
+		fprintf( stderr, "Lua VM init failure.\n" );
+		return EINVAL;
+	}
 
 	g_pScriptVM->SetOutputCallback( TestOutput );
 	g_pScriptVM->SetErrorCallback( TestError );
@@ -1412,9 +1538,10 @@ int main( int argc, const char **argv)
 			return EINVAL;
 		}
 
-		std::unique_ptr<char[]> pBuf = std::make_unique<char[]>(nFileLen + 1);
-		std::tie(std::ignore, rc) = hFile.read( pBuf.get(), nFileLen, 1, nFileLen );
-		pBuf[nFileLen] = '\0';
+		const auto fileLenTyped = static_cast<unsigned>( nFileLen );
+		std::unique_ptr<char[]> pBuf = std::make_unique<char[]>(fileLenTyped + 1);
+		std::tie(std::ignore, rc) = hFile.read( pBuf.get(), fileLenTyped, 1, fileLenTyped );
+		pBuf[fileLenTyped] = '\0';
 
 		if (1)
 		{
@@ -1444,7 +1571,13 @@ int main( int argc, const char **argv)
  		key = _getch(); // Keypress before exit
 		if ( key == 'm' )
 		{
-			Msg( "%d\n", g_pMemAlloc->GetSize( nullptr ) );
+			Msg( "%zu bytes.\n", g_pMemAlloc->GetSize( NULL ) );
+		}
+
+		if ( key == 'r' )
+		{
+			scope.Term();
+			scope.Init( "TestScope" );
 		}
 	} while ( key != 'q' );
 

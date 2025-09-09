@@ -50,19 +50,29 @@ SQInteger sq_aux_invalidtype(HSQUIRRELVM v,SQObjectType type)
 HSQUIRRELVM sq_open(SQInteger initialstacksize)
 {
 	SQSharedState *ss;
-	SQVM *v;
 	sq_new(ss, SQSharedState);
-	ss->Init();
-	v = (SQVM *)SQ_MALLOC(sizeof(SQVM));
-	new (v) SQVM(ss);
-	ss->_root_vm = v;
-	if(v->Init(NULL, initialstacksize)) {
-		return v;
-	} else {
-		sq_delete(v, SQVM);
+	if (ss)
+		ss->Init();
+	else
+		return NULL;
+
+	SQVM *v = (SQVM *)SQ_MALLOC(sizeof(SQVM));
+	if (!v)
+	{
+		sq_delete(ss, SQSharedState);
 		return NULL;
 	}
-	return v;
+
+	new (v) SQVM(ss);
+	ss->_root_vm = v;
+
+	if(v->Init(NULL, initialstacksize)) {
+		return v;
+	} 
+	
+	sq_delete(v, SQVM);
+	sq_delete(ss, SQSharedState);
+	return NULL;
 }
 
 HSQUIRRELVM sq_newthread(HSQUIRRELVM friendvm, SQInteger initialstacksize)

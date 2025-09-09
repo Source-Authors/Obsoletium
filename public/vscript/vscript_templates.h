@@ -75,302 +75,33 @@ FUNC_GENERATE_ALL( DEFINE_CONST_MEMBER_FUNC_TYPE_DEDUCER );
 template <typename FUNCPTR_TYPE>
 inline ScriptFunctionBindingStorageType_t ScriptConvertFreeFuncPtrToVoid( FUNCPTR_TYPE pFunc )
 {
-#if defined(_PS3) || defined(POSIX)
-	COMPILE_TIME_ASSERT( sizeof( FUNCPTR_TYPE ) == sizeof( void* ) * 2 || sizeof( FUNCPTR_TYPE ) == sizeof( void* ) );
-	
-	if ( sizeof( FUNCPTR_TYPE ) == 4 )
-	{
-		union FuncPtrConvertMI
-		{
-			FUNCPTR_TYPE pFunc;
-			ScriptFunctionBindingStorageType_t stype;
-		};
+	ScriptFunctionBindingStorageType_t type = { };
+	COMPILE_TIME_ASSERT( sizeof( type ) >= sizeof( pFunc ) );
 
-		FuncPtrConvertMI convert;
-		convert.pFunc = pFunc;
-		return convert.stype;
-	}
-	else
-	{
-		union FuncPtrConvertMI
-		{
-			FUNCPTR_TYPE pFunc;
-			struct
-			{
-				ScriptFunctionBindingStorageType_t stype;
-				intptr_t iToc;
-			} fn8;
-		};
-
-		FuncPtrConvertMI convert;
-		convert.fn8.iToc = 0;
-		convert.pFunc = pFunc;
-		if ( !convert.fn8.iToc )
-			return convert.fn8.stype;
-		
-		Assert( 0 );
-		DebuggerBreak();
-		return 0;
-	}
-#else
-	return ( ScriptFunctionBindingStorageType_t ) pFunc;
-#endif
+	memcpy( &type, &pFunc, sizeof( pFunc ) );
+	return type;
 }
 
 template <typename FUNCPTR_TYPE>
 inline FUNCPTR_TYPE ScriptConvertFreeFuncPtrFromVoid( ScriptFunctionBindingStorageType_t p )
 {
-#if defined(_PS3) || defined(POSIX)
-	COMPILE_TIME_ASSERT( sizeof( FUNCPTR_TYPE ) == sizeof(void*)*2 || sizeof( FUNCPTR_TYPE ) == sizeof(void*) );
+	FUNCPTR_TYPE func = { };
+	COMPILE_TIME_ASSERT( sizeof( func ) <= sizeof( p ) );
 
-	if ( sizeof( FUNCPTR_TYPE ) == 4 )
-	{
-		union FuncPtrConvertMI
-		{
-			FUNCPTR_TYPE pFunc;
-			ScriptFunctionBindingStorageType_t stype;
-		};
-
-		FuncPtrConvertMI convert;
-		convert.pFunc = 0;
-		convert.stype = p;
-		return convert.pFunc;
-	}
-	else
-	{
-		union FuncPtrConvertMI
-		{
-			FUNCPTR_TYPE pFunc;
-			struct
-			{
-				ScriptFunctionBindingStorageType_t stype;
-				intptr_t iToc;
-			} fn8;
-		};
-
-		FuncPtrConvertMI convert;
-		convert.pFunc = 0;
-		convert.fn8.stype = p;
-		convert.fn8.iToc = 0;
-		return convert.pFunc;
-	}
-
-
-#else
-	return (FUNCPTR_TYPE) p;
-#endif
+	memcpy( &func, &p, sizeof( func ) );
+	return func;
 }
 
 template <typename FUNCPTR_TYPE>
 inline ScriptFunctionBindingStorageType_t ScriptConvertFuncPtrToVoid( FUNCPTR_TYPE pFunc )
 {
-	typedef FUNCPTR_TYPE FuncPtr_t;
-	size_t funcPtrSize = sizeof( FuncPtr_t ); funcPtrSize;
-
-#if defined(_PS3) || defined(POSIX)
 	return ScriptConvertFreeFuncPtrToVoid<FUNCPTR_TYPE>( pFunc );
-#else
-
-	if constexpr ( ( sizeof( FUNCPTR_TYPE ) == sizeof( void * ) ) )
-	{
-		// simple inheritance
-		union FuncPtrConvert
-		{
-			void *p;
-			FUNCPTR_TYPE pFunc;
-		};
-
-		FuncPtrConvert convert;
-		convert.pFunc = pFunc;
-		return convert.p;
-	}
-#if COMPILER_MSVC
-	else if constexpr ( ( IsPlatformWindowsPC32() && ( sizeof( FUNCPTR_TYPE ) == sizeof( void * ) + sizeof( int ) ) ) ||
-	          ( IsPlatformWindowsPC64() && ( sizeof( FUNCPTR_TYPE ) == sizeof( void * ) + sizeof( int ) * 2 ) ) )
-	{
-		// multiple and virtual inheritance
-		struct MicrosoftUnknownMFP
-		{
-			void *p;
-			int m_delta;
-		};
-	
-		union FuncPtrConvertMI
-		{
-			MicrosoftUnknownMFP mfp;
-			FUNCPTR_TYPE pFunc;
-		};
-
-		FuncPtrConvertMI convert;
-		convert.pFunc = pFunc;
-		if ( convert.mfp.m_delta == 0 )
-		{
-			return convert.mfp.p;
-		}
-		AssertMsg( 0, "Function pointer must be from primary vtable" );
-	}
-	else if constexpr ( ( IsPlatformWindowsPC32() && ( sizeof( FUNCPTR_TYPE ) == sizeof( void * ) + ( sizeof( int ) * 3 ) ) ) || 
-	          ( IsPlatformWindowsPC64() && ( sizeof( FUNCPTR_TYPE ) == sizeof( void * ) + ( sizeof( int ) * 4 ) ) ) )
-	{
-		// unknown_inheritance case
-		struct MicrosoftUnknownMFP
-		{
-			void *p;
-			int m_delta;
-			int m_vtordisp;
-			int m_vtable_index;
-		};
-
-		union FuncPtrConvertMI
-		{
-			MicrosoftUnknownMFP mfp;
-			FUNCPTR_TYPE pFunc;
-		};
-
-		FuncPtrConvertMI convert;
-		convert.pFunc = pFunc;
-		if ( convert.mfp.m_delta == 0 )
-		{
-			return convert.mfp.p;
-		}
-		AssertMsg( 0, "Function pointer must be from primary vtable" );
-	}
-#elif defined( GNUC )
-	else if constexpr ( ( sizeof( FUNCPTR_TYPE ) == sizeof( void * ) + sizeof( int ) ) )
-	{
-		AssertMsg( 0, "Note: This path has not been verified yet. See comments below in #else case." );
-	
-		struct GnuMFP
-		{
-			union
-			{
-				void *funcadr;		// If vtable_index_2 is even, then this is the function pointer.
-				int vtable_index_2;		// If vtable_index_2 is odd, then this = vindex*2+1.
-			};
-			int delta;
-		};
-	
-		GnuMFP *p = (GnuMFP*)&pFunc;
-		if ( p->vtable_index_2 & 1 )
-		{
-			char **delta = (char**)p->delta;
-			char *pCur = *delta + (p->vtable_index_2+1)/2;
-			return (void*)( pCur + 4 );
-		}
-		else
-		{
-			return p->funcadr;
-		}
-	}
-#else
-#error "Need to implement code to crack non-offset member function pointer case"
-	// For gcc, see: http://www.codeproject.com/KB/cpp/FastDelegate.aspx
-	//
-	// Current versions of the GNU compiler use a strange and tricky 
-	// optimization. It observes that, for virtual inheritance, you have to look 
-	// up the vtable in order to get the voffset required to calculate the this 
-	// pointer. While you're doing that, you might as well store the function 
-	// pointer in the vtable. By doing this, they combine the m_func_address and 
-	// m_vtable_index fields into one, and they distinguish between them by 
-	// ensuring that function pointers always point to even addresses but vtable 
-	// indices are always odd:
-	// 
-	// 	// GNU g++ uses a tricky space optimisation, also adopted by IBM's VisualAge and XLC.
-	// 	struct GnuMFP {
-	// 	   union {
-	// 	     CODEPTR funcadr; // always even
-	// 	     int vtable_index_2; //  = vindex*2+1, always odd
-	// 	   };
-	// 	   int delta;
-	// 	};
-	// 	adjustedthis = this + delta
-	// 	if (funcadr & 1) CALL (* ( *delta + (vindex+1)/2) + 4)
-	// 	else CALL funcadr
-	// 
-	// The G++ method is well documented, so it has been adopted by many other 
-	// vendors, including IBM's VisualAge and XLC compilers, recent versions of 
-	// Open64, Pathscale EKO, and Metrowerks' 64-bit compilers. A simpler scheme 
-	// used by earlier versions of GCC is also very common. SGI's now 
-	// discontinued MIPSPro and Pro64 compilers, and Apple's ancient MrCpp 
-	// compiler used this method. (Note that the Pro64 compiler has become the 
-	// open source Open64 compiler).
-
-#endif
-	else
-		AssertMsg( 0, "Member function pointer not supported. Why on earth are you using virtual inheritance!?" );
-	return NULL;
-#endif
 }
 
 template <typename FUNCPTR_TYPE>
 inline FUNCPTR_TYPE ScriptConvertFuncPtrFromVoid( ScriptFunctionBindingStorageType_t p )
 {
-#if defined(_PS3) || defined(POSIX)
 	return ScriptConvertFreeFuncPtrFromVoid<FUNCPTR_TYPE>( p );
-#else
-
-	if ( ( sizeof( FUNCPTR_TYPE ) == sizeof( void * ) ) )
-	{
-		union FuncPtrConvert
-		{
-			void *p;
-			FUNCPTR_TYPE pFunc;
-		};
-
-		FuncPtrConvert convert;
-		convert.p = p;
-		return convert.pFunc;
-	}
-
-#if COMPILER_MSVC
-	if constexpr ( ( sizeof( FUNCPTR_TYPE ) == sizeof( void * ) + sizeof( int ) ) )
-	{
-		struct MicrosoftUnknownMFP
-		{
-			void *p;
-			int m_delta;
-		};
-
-		union FuncPtrConvertMI
-		{
-			MicrosoftUnknownMFP mfp;
-			FUNCPTR_TYPE pFunc;
-		};
-
-		FuncPtrConvertMI convert;
-		convert.mfp.p = p;
-		convert.mfp.m_delta = 0;
-		return convert.pFunc;
-	}
-	if constexpr ( ( sizeof( FUNCPTR_TYPE ) == sizeof( void * ) + ( sizeof( int ) * 3 ) ) )
-	{
-		struct MicrosoftUnknownMFP
-		{
-			void *p;
-			int m_delta;
-			int m_vtordisp;
-			int m_vtable_index;
-		};
-
-		union FuncPtrConvertMI
-		{
-			MicrosoftUnknownMFP mfp;
-			FUNCPTR_TYPE pFunc;
-		};
-
-		FuncPtrConvertMI convert;
-		convert.mfp.p = p;
-		convert.mfp.m_delta = 0;
-		return convert.pFunc;
-	}
-#elif defined( POSIX )
-	AssertMsg( 0, "Note: This path has not been implemented yet." );
-#else
-#error "Need to implement code to crack non-offset member function pointer case"
-#endif
-	Assert( 0 );
-	return NULL;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -415,7 +146,7 @@ inline FUNCPTR_TYPE ScriptConvertFuncPtrFromVoid( ScriptFunctionBindingStorageTy
 	class CNonMemberScriptBinding##N \
 	{ \
 	public: \
- 		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, intp nArguments, ScriptVariant_t *pReturn ) \
+ 		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, int nArguments, ScriptVariant_t *pReturn ) \
  		{ \
 			Assert( nArguments == N ); \
 			Assert( pReturn ); \
@@ -426,8 +157,8 @@ inline FUNCPTR_TYPE ScriptConvertFuncPtrFromVoid( ScriptFunctionBindingStorageTy
 				return false; \
 			} \
 			*pReturn = (ScriptConvertFreeFuncPtrFromVoid<FUNC_TYPE>(pFunction))( SCRIPT_BINDING_ARGS_##N ); \
-			if ( pReturn->m_type == FIELD_VECTOR ) \
-				pReturn->m_pVector = new Vector(*pReturn->m_pVector); \
+			if ( pReturn->GetType() == FIELD_VECTOR2D || pReturn->GetType() == FIELD_VECTOR || pReturn->GetType() == FIELD_VECTOR4D || pReturn->GetType() == FIELD_QANGLE || pReturn->GetType() == FIELD_QUATERNION ) \
+				pReturn->ConvertToCopiedData(); \
  			return true; \
  		} \
 	}; \
@@ -466,8 +197,8 @@ inline FUNCPTR_TYPE ScriptConvertFuncPtrFromVoid( ScriptFunctionBindingStorageTy
 				return false; \
 			} \
 			*pReturn = (((OBJECT_TYPE_PTR)(pContext))->*ScriptConvertFuncPtrFromVoid<FUNC_TYPE>(pFunction))( SCRIPT_BINDING_ARGS_##N ); \
-			if ( pReturn->m_type == FIELD_VECTOR ) \
-				pReturn->m_pVector = new Vector(*pReturn->m_pVector); \
+			if ( pReturn->GetType() == FIELD_VECTOR2D || pReturn->GetType() == FIELD_VECTOR || pReturn->GetType() == FIELD_VECTOR4D || pReturn->GetType() == FIELD_QANGLE || pReturn->GetType() == FIELD_QUATERNION ) \
+				pReturn->ConvertToCopiedData(); \
  			return true; \
  		} \
 	}; \

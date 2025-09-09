@@ -112,6 +112,11 @@ public:
 
 	// negate the Vector4D components
 	void	Negate();
+	[[nodiscard]] Vector4D XM_CALLCONV operator-() const
+	{
+		Assert( IsValid() );
+		return { -x, -y, -z, -w };
+	}
 
 	// Get the Vector4D's magnitude.
 	[[nodiscard]] vec_t XM_CALLCONV Length() const;
@@ -226,7 +231,7 @@ void XM_CALLCONV Vector4DMA( Vector4D const& start, float s, Vector4D const& dir
 #define Vector4DExpand( v ) (v).x, (v).y, (v).z, (v).w
 
 // Normalization
-[[nodiscard]] vec_t XM_CALLCONV Vector4DNormalize(Vector4D& v);
+vec_t XM_CALLCONV Vector4DNormalize(Vector4D& v);
 
 // Length
 [[nodiscard]] vec_t XM_CALLCONV Vector4DLength(Vector4D const& v);
@@ -707,7 +712,7 @@ inline vec_t Vector4D::Length() const
 //-----------------------------------------------------------------------------
 // Normalization
 //-----------------------------------------------------------------------------
-[[nodiscard]] inline vec_t XM_CALLCONV Vector4DNormalize( Vector4D& v )
+inline vec_t XM_CALLCONV Vector4DNormalize( Vector4D& v )
 {
 	Assert( v.IsValid() );
 	

@@ -84,7 +84,7 @@ $Project "vscript"
 	$Folder	"Source Files"
 	{
 		$File	"vscript.cpp"
-		$File	".\languages\lua\vlua\vlua.cpp" [!$LINUX]
+		$File	".\languages\lua\vlua\vlua.cpp"
 		{
 			$Configuration
 			{
@@ -296,8 +296,18 @@ $Project "vscript"
 	{
 		$Folder "Support"
 		{
+			$File 	".\languages\lua\vlua\qangle.cpp"
+			$File 	".\languages\lua\vlua\qangle.h"
+			$File 	".\languages\lua\vlua\quaternion.cpp"
+			$File 	".\languages\lua\vlua\quaternion.h"
+			$File 	".\languages\lua\vlua\uint64.cpp"
+			$File 	".\languages\lua\vlua\uint64.h"
+			$File 	".\languages\lua\vlua\vec2.cpp"
+			$File 	".\languages\lua\vlua\vec2.h"
 			$File 	".\languages\lua\vlua\vec3.cpp"
 			$File 	".\languages\lua\vlua\vec3.h"
+			$File 	".\languages\lua\vlua\vec4.cpp"
+			$File 	".\languages\lua\vlua\vec4.h"
 		}
 	}
 	

@@ -99,6 +99,7 @@
 #include "appframework/iappsystem.h"
 #include "tier0/platform.h"
 #include "tier1/functors.h"
+#include "vscript/variant.h"
 #include "tier0/memdbgon.h"
 
 #if defined( _WIN32 )
@@ -132,10 +133,10 @@ class IScriptVM;
 enum ScriptLanguage_t
 {
 	SL_NONE,
-	// SL_GAMEMONKEY,
+	SL_GAMEMONKEY,
 	SL_SQUIRREL,
 	SL_LUA,
-	// SL_PYTHON,
+	SL_PYTHON,
 
 	SL_DEFAULT = SL_SQUIRREL
 };
@@ -154,73 +155,29 @@ public:
 DECLARE_POINTER_HANDLE( HSCRIPT );
 #define INVALID_HSCRIPT ((HSCRIPT)-1)
 
+inline bool IsValid( HSCRIPT hScript )
+{
+	return ( hScript != NULL && hScript != INVALID_HSCRIPT );
+}
+
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
 
-enum ExtendedFieldType
-{
-	FIELD_TYPEUNKNOWN = FIELD_TYPECOUNT,
-	FIELD_CSTRING,
-	FIELD_HSCRIPT,
-	FIELD_VARIANT,
-};
-
 typedef int ScriptDataType_t;
-struct ScriptVariant_t;
-
-template <typename T> struct ScriptDeducer { /*enum { FIELD_TYPE = FIELD_TYPEUNKNOWN };*/ };
-#define DECLARE_DEDUCE_FIELDTYPE( fieldType, type ) template<> struct ScriptDeducer<type> { enum { FIELD_TYPE = fieldType }; };
-
-DECLARE_DEDUCE_FIELDTYPE( FIELD_VOID,		void );
-DECLARE_DEDUCE_FIELDTYPE( FIELD_FLOAT,		float );
-DECLARE_DEDUCE_FIELDTYPE( FIELD_CSTRING,	const char * );
-DECLARE_DEDUCE_FIELDTYPE( FIELD_CSTRING,	char * );
-DECLARE_DEDUCE_FIELDTYPE( FIELD_VECTOR,		Vector );
-DECLARE_DEDUCE_FIELDTYPE( FIELD_VECTOR,		const Vector &);
-DECLARE_DEDUCE_FIELDTYPE( FIELD_INTEGER,	int );
-DECLARE_DEDUCE_FIELDTYPE( FIELD_BOOLEAN,	bool );
-DECLARE_DEDUCE_FIELDTYPE( FIELD_CHARACTER,	char );
-DECLARE_DEDUCE_FIELDTYPE( FIELD_HSCRIPT,	HSCRIPT );
-DECLARE_DEDUCE_FIELDTYPE( FIELD_VARIANT,	ScriptVariant_t );
-
-#define ScriptDeduceType( T ) ScriptDeducer<T>::FIELD_TYPE
+typedef CVariant ScriptVariant_t;
+#define SCRIPT_VARIANT_NULL VARIANT_NULL
+#define ScriptDeduceType( T ) VariantDeduceType( T )
 
 template <typename T>
 inline const char * ScriptFieldTypeName() 
 {
-	T::using_unknown_script_type(); 
-	return NULL;
+	return VariantFieldTypeName< T >();
 }
 
-#define DECLARE_NAMED_FIELDTYPE( fieldType, strName ) template <> inline const char * ScriptFieldTypeName<fieldType>() { return strName; }
-DECLARE_NAMED_FIELDTYPE( void,	"void" );
-DECLARE_NAMED_FIELDTYPE( float,	"float" );
-DECLARE_NAMED_FIELDTYPE( const char *,	"cstring" );
-DECLARE_NAMED_FIELDTYPE( char *,	"cstring" );
-DECLARE_NAMED_FIELDTYPE( Vector,	"vector" );
-DECLARE_NAMED_FIELDTYPE( const Vector&,	"vector" );
-DECLARE_NAMED_FIELDTYPE( int,	"integer" );
-DECLARE_NAMED_FIELDTYPE( bool,	"boolean" );
-DECLARE_NAMED_FIELDTYPE( char,	"character" );
-DECLARE_NAMED_FIELDTYPE( HSCRIPT,	"hscript" );
-DECLARE_NAMED_FIELDTYPE( ScriptVariant_t,	"variant" );
-
-inline const char * ScriptFieldTypeName( int16 eType)
+inline const char * ScriptFieldTypeName( int16 eType )
 {
-	switch( eType )
-	{
-	case FIELD_VOID:	return "void";
-	case FIELD_FLOAT:	return "float";
-	case FIELD_CSTRING:	return "cstring";
-	case FIELD_VECTOR:	return "vector";
-	case FIELD_INTEGER:	return "integer";
-	case FIELD_BOOLEAN:	return "boolean";
-	case FIELD_CHARACTER:	return "character";
-	case FIELD_HSCRIPT:	return "hscript";
-	case FIELD_VARIANT:	return "variant";
-	default:	return "unknown_script_type";
-	}
+	return VariantFieldTypeName( eType );
 }
 
 //---------------------------------------------------------
@@ -261,8 +218,21 @@ enum ScriptFuncBindingFlags_t
 	SF_MEMBER_FUNC	= 0x01,
 };
 
-typedef void* ScriptFunctionBindingStorageType_t;
-typedef bool (*ScriptBindingFunc_t)( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, intp nArguments, ScriptVariant_t *pReturn );
+struct ScriptFunctionBindingStorageType_t
+{
+	intptr_t val_0;
+	intptr_t val_1;
+	// Josh:
+	// Why do we need *even more* space for a function pointer?
+	// MSVC is very special.
+	// Read https://rants.vastheman.com/2021/09/21/msvc/
+	// This accounts for the "Unknown Inheritance" case, which
+	// CTFPlayer hits.
+	intptr_t val_2;
+	intptr_t val_3;
+};
+
+typedef bool (*ScriptBindingFunc_t)( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, int nArguments, ScriptVariant_t *pReturn );
 
 struct ScriptFunctionBinding_t
 {
@@ -273,10 +243,10 @@ struct ScriptFunctionBinding_t
 };
 
 //---------------------------------------------------------
-abstract_class IScriptInstanceHelper
+class IScriptInstanceHelper
 {
 public:
-	virtual void *GetProxied( void *p )												{ return p; }
+	virtual void *GetProxied( void *p, ScriptFunctionBinding_t *pBinding )			{ return p; }
 	virtual bool ToString( void *p, char *pBuf, int bufSize )						{ return false; }
 	virtual void *BindOnRead( HSCRIPT hInstance, void *pOld, const char *pszId )	{ return NULL; }
 };
@@ -311,191 +281,6 @@ struct ScriptClassDesc_t
 		return &pHead;
 	}
 };
-
-//---------------------------------------------------------
-// A simple variant type. Intentionally not full featured (no implicit conversion, no memory management)
-//---------------------------------------------------------
-
-enum SVFlags_t
-{
-	SV_FREE = 0x01,
-};
-
-struct ScriptVariant_t
-{
-	ScriptVariant_t() :						m_flags( 0 ), m_type( FIELD_VOID )		{ m_pVector = 0; }
-	ScriptVariant_t( int val ) :			m_flags( 0 ), m_type( FIELD_INTEGER )	{ m_int = val;}
-	ScriptVariant_t( float val ) :			m_flags( 0 ), m_type( FIELD_FLOAT )		{ m_float = val; }
-	ScriptVariant_t( double val ) :			m_flags( 0 ), m_type( FIELD_FLOAT )		{ m_float = (float)val; }
-	ScriptVariant_t( char val ) :			m_flags( 0 ), m_type( FIELD_CHARACTER )	{ m_char = val; }
-	ScriptVariant_t( bool val ) :			m_flags( 0 ), m_type( FIELD_BOOLEAN )	{ m_bool = val; }
-	ScriptVariant_t( HSCRIPT val ) :		m_flags( 0 ), m_type( FIELD_HSCRIPT )	{ m_hScript = val; }
-
-	ScriptVariant_t( const Vector &val, bool bCopy = false ) :	m_flags( 0 ), m_type( FIELD_VECTOR )	{ if ( !bCopy ) { m_pVector = &val; } else { m_pVector = new Vector( val ); m_flags |= SV_FREE; } }
-	ScriptVariant_t( const Vector *val, bool bCopy = false ) :	m_flags( 0 ), m_type( FIELD_VECTOR )	{ if ( !bCopy ) { m_pVector = val; } else { m_pVector = new Vector( *val ); m_flags |= SV_FREE; } }
-	ScriptVariant_t( const char *val , bool bCopy = false ) :	m_flags( 0 ), m_type( FIELD_CSTRING )	{ if ( !bCopy ) { m_pszString = val; } else { m_pszString = strdup( val ); m_flags |= SV_FREE; } }
-
-	bool IsNull() const						{ return (m_type == FIELD_VOID ); }
-
-	operator int() const					{ Assert( m_type == FIELD_INTEGER );	return m_int; }
-	operator int64() const					{ Assert( m_type == FIELD_INTEGER );	return static_cast<int64>(m_int); }
-	operator float() const					{ Assert( m_type == FIELD_FLOAT );		return m_float; }
-	operator const char *() const			{ Assert( m_type == FIELD_CSTRING );	return ( m_pszString ) ? m_pszString : ""; }
-	operator const Vector &() const			{ Assert( m_type == FIELD_VECTOR );		static Vector vecNull(0, 0, 0); return (m_pVector) ? *m_pVector : vecNull; }
-	operator char() const					{ Assert( m_type == FIELD_CHARACTER );	return m_char; }
-	operator bool() const					{ Assert( m_type == FIELD_BOOLEAN );	return m_bool; }
-	operator HSCRIPT() const				{ Assert( m_type == FIELD_HSCRIPT );	return m_hScript; }
-
-	void operator=( int i ) 				{ m_type = FIELD_INTEGER; m_int = i; }
-	void operator=( int64 i ) 				{ m_type = FIELD_INTEGER; m_int = size_cast<int>(i); }
-	void operator=( float f ) 				{ m_type = FIELD_FLOAT; m_float = f; }
-	void operator=( double f ) 				{ m_type = FIELD_FLOAT; m_float = (float)f; }
-	void operator=( const Vector &vec )		{ m_type = FIELD_VECTOR; m_pVector = &vec; }
-	void operator=( const Vector *vec )		{ m_type = FIELD_VECTOR; m_pVector = vec; }
-	void operator=( const char *psz )		{ m_type = FIELD_CSTRING; m_pszString = psz; }
-	void operator=( char c )				{ m_type = FIELD_CHARACTER; m_char = c; }
-	void operator=( bool b ) 				{ m_type = FIELD_BOOLEAN; m_bool = b; }
-	void operator=( HSCRIPT h ) 			{ m_type = FIELD_HSCRIPT; m_hScript = h; }
-
-	void Free()								{ if ( ( m_flags & SV_FREE ) && ( m_type == FIELD_HSCRIPT || m_type == FIELD_VECTOR || m_type == FIELD_CSTRING ) ) delete m_pszString; } // Generally only needed for return results
-
-	template <typename T>
-	T Get()
-	{
-		T value;
-		AssignTo( &value );
-		return value;
-	}
-
-	template <typename T>
-	bool AssignTo( T *pDest )
-	{
-		ScriptDataType_t destType = ScriptDeduceType( T );
-		if ( destType == FIELD_TYPEUNKNOWN )
-		{
-			DevWarning( "Unable to convert script variant to unknown type\n" );
-		}
-		if ( destType == m_type )
-		{
-			*pDest = *this;
-			return true;
-		}
-
-		if ( m_type != FIELD_VECTOR && m_type != FIELD_CSTRING && destType != FIELD_VECTOR && destType != FIELD_CSTRING )
-		{
-			switch ( m_type )
-			{
-			case FIELD_VOID:		*pDest = 0; break;
-			case FIELD_INTEGER:		*pDest = m_int; return true;
-			case FIELD_FLOAT:		*pDest = m_float; return true;
-			case FIELD_CHARACTER:	*pDest = m_char; return true;
-			case FIELD_BOOLEAN:		*pDest = m_bool; return true;
-			case FIELD_HSCRIPT:		*pDest = m_hScript; return true;
-			}
-		}
-		else
-		{
-			DevWarning( "No free conversion of %s script variant to %s right now\n",
-				ScriptFieldTypeName( m_type ), ScriptFieldTypeName<T>() );
-			if ( destType != FIELD_VECTOR )
-			{
-				*pDest = 0;
-			}
-		}
-		return false;
-	}
-
-	bool AssignTo( float *pDest )
-	{
-		switch( m_type )
-		{
-		case FIELD_VOID:		*pDest = 0; return false;
-		case FIELD_INTEGER:		*pDest = static_cast<float>(m_int); return true;
-		case FIELD_FLOAT:		*pDest = m_float; return true;
-		case FIELD_BOOLEAN:		*pDest = m_bool; return true;
-		default:
-			DevWarning( "No conversion from %s to float now\n", ScriptFieldTypeName( m_type ) );
-			return false;
-		}
-	}
-
-	bool AssignTo( int *pDest )
-	{
-		switch( m_type )
-		{
-		case FIELD_VOID:		*pDest = 0; return false;
-		case FIELD_INTEGER:		*pDest = m_int; return true;
-		case FIELD_FLOAT:		*pDest = ( int )m_float; return true;
-		case FIELD_BOOLEAN:		*pDest = m_bool; return true;
-		default:
-			DevWarning( "No conversion from %s to int now\n", ScriptFieldTypeName( m_type ) );
-			return false;
-		}
-	}
-
-	bool AssignTo( bool *pDest )
-	{
-		switch( m_type )
-		{
-		case FIELD_VOID:		*pDest = 0; return false;
-		case FIELD_INTEGER:		*pDest = m_int; return true;
-		case FIELD_FLOAT:		*pDest = m_float; return true;
-		case FIELD_BOOLEAN:		*pDest = m_bool; return true;
-		default:
-			DevWarning( "No conversion from %s to bool now\n", ScriptFieldTypeName( m_type ) );
-			return false;
-		}
-	}
-
-	bool AssignTo( char **pDest )
-	{
-		DevWarning( "No free conversion of string or vector script variant right now\n" );
-		// If want to support this, probably need to malloc string and require free on other side [3/24/2008 tom]
-		*pDest = "";
-		return false;
-	}
-
-	bool AssignTo( ScriptVariant_t *pDest )
-	{
-		pDest->m_type = m_type;
-		if ( m_type == FIELD_VECTOR ) 
-		{
-			pDest->m_pVector = new Vector;
-			((Vector *)(pDest->m_pVector))->Init( m_pVector->x, m_pVector->y, m_pVector->z );
-			pDest->m_flags |= SV_FREE;
-		}
-		else if ( m_type == FIELD_CSTRING ) 
-		{
-			pDest->m_pszString = strdup( m_pszString );
-			pDest->m_flags |= SV_FREE;
-		}
-		else
-		{
-			pDest->m_int = m_int;
-		}
-		return false;
-	}
-
-	union
-	{
-		int				m_int;
-		float			m_float;
-		const char *	m_pszString;
-		const Vector *	m_pVector;
-		char			m_char;
-		bool			m_bool;
-		HSCRIPT			m_hScript;
-	};
-
-	int16				m_type;
-	int16				m_flags;
-
-private:
-};
-
-#define SCRIPT_VARIANT_NULL ScriptVariant_t()
-
-
 
 //-----------------------------------------------------------------------------
 // 
@@ -594,7 +379,11 @@ inline IScriptInstanceHelper *GetScriptInstanceHelper_ScriptNoBase_t()
 		return; \
 	}
 
+#define SCRIPTFUNC_CONCAT_(x, y) x##y
+#define SCRIPTFUNC_CONCAT(x, y) SCRIPTFUNC_CONCAT_(x, y)
+
 #define DEFINE_SCRIPTFUNC( func, description )												DEFINE_SCRIPTFUNC_NAMED( func, #func, description )
+#define DEFINE_SCRIPTFUNC_WRAPPED( func, description )										DEFINE_SCRIPTFUNC_NAMED( SCRIPTFUNC_CONCAT( Script, func ), #func, description )
 #define DEFINE_SCRIPTFUNC_NAMED( func, scriptName, description )							ScriptAddFunctionToClassDescNamed( pDesc, _className, func, scriptName, description );
 #define DEFINE_SCRIPT_CONSTRUCTOR()															ScriptAddConstructorToClassDesc( pDesc, _className );
 #define DEFINE_SCRIPT_INSTANCE_HELPER( className, p )										template <> IScriptInstanceHelper *GetScriptInstanceHelperOverride< className >( IScriptInstanceHelper * ) { return p; }
@@ -732,7 +521,7 @@ public:
 	template <typename T> HSCRIPT RegisterInstance( T *pInstance, const char *pszInstance, HSCRIPT hScope = NULL)					{ HSCRIPT hInstance = RegisterInstance( GetScriptDesc( pInstance ), pInstance ); SetValue( hScope, pszInstance, hInstance ); return hInstance; }
 	virtual void RemoveInstance( HSCRIPT ) = 0;
 	void RemoveInstance( HSCRIPT hInstance, const char *pszInstance, HSCRIPT hScope = NULL )										{ ClearValue( hScope, pszInstance ); RemoveInstance( hInstance ); }
-	void RemoveInstance( const char *pszInstance, HSCRIPT hScope = NULL )															{ ScriptVariant_t val; if ( GetValue( hScope, pszInstance, &val ) ) { if ( val.m_type == FIELD_HSCRIPT ) { RemoveInstance( val, pszInstance, hScope ); } ReleaseValue( val ); } }
+	void RemoveInstance( const char *pszInstance, HSCRIPT hScope = NULL )															{ ScriptVariant_t val; if ( GetValue( hScope, pszInstance, &val ) ) { if ( val.GetType() == FIELD_HSCRIPT ) { RemoveInstance( val, pszInstance, hScope ); } ReleaseValue( val ); } }
 
 	virtual void *GetInstanceValue( HSCRIPT hInstance, ScriptClassDesc_t *pExpectedType = NULL ) = 0;
 

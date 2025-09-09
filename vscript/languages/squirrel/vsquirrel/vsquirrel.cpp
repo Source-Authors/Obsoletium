@@ -1,4 +1,4 @@
- //========== Copyright (c) Valve Corporation, All rights reserved. ========
+//========== Copyright (c) Valve Corporation, All rights reserved. ========
 //
 // Purpose:
 //
@@ -82,7 +82,7 @@ SQRESULT sqstd_loadfile(HSQUIRRELVM,const SQChar *,SQBool)
 // Helpers
 //-------------------------------------------------------------------------
 
-const char *FieldTypeToString( int type )
+static constexpr const char *FieldTypeToString( int type )
 {
 	switch( type )
 	{
@@ -98,7 +98,7 @@ const char *FieldTypeToString( int type )
 	}
 }
 
-static const char *SQTypeToString( SQObjectType sqType )
+static constexpr const char *SQTypeToString( SQObjectType sqType )
 {
 	switch( sqType )
 	{
@@ -203,11 +203,12 @@ SQInteger VectorSet( HSQUIRRELVM hVM )
 
 SQInteger VectorIterate( HSQUIRRELVM hVM )
 {
-	StackHandler sa(hVM);
-	static const char *results[] =
+	static constexpr char *results[] =
 	{
 		"x", "y", "z"
 	};
+
+	StackHandler sa(hVM);
 	const char *pszKey = (sa.GetType( 2 ) == OT_NULL ) ? "w" : sa.GetString( 2 );
 	if ( pszKey && *pszKey && !*(pszKey + 1) )
 	{
@@ -490,26 +491,30 @@ bool RegisterVector( HSQUIRRELVM hVM )
 	int top = sq_gettop( hVM );
 
 	sq_pushroottable(hVM);
-	sq_pushstring(hVM,"Vector",-1);
+	sq_pushstring(hVM, "Vector", -1);
 
 	if (SQ_FAILED(sq_newclass(hVM,0))) 
 	{
 		sq_settop(hVM,top);
+		DMsg( "vscript:squirrel", 0, "Unable to register Vector class in %s VM.\n", SQUIRREL_VERSION );
 		return false;
 	}
+
 	HSQOBJECT hClass;
 	sq_getstackobj(hVM,-1, &hClass);
 	sq_settypetag(hVM,-1,TYPETAG_VECTOR);
 	sq_createslot(hVM,-3);
 
 	sq_pushobject( hVM, hClass );
-	for ( int i = 0; i < ARRAYSIZE(g_VectorFuncs); i++ )
+	for ( auto &func : g_VectorFuncs )
 	{
-		sq_pushstring(hVM,g_VectorFuncs[i].name,-1);
-		sq_newclosure(hVM,g_VectorFuncs[i].f,0);
-		if ( g_VectorFuncs[i].nparamscheck )
-			sq_setparamscheck(hVM,g_VectorFuncs[i].nparamscheck,g_VectorFuncs[i].typemask);
-		sq_setnativeclosurename(hVM,-1,g_VectorFuncs[i].name);
+		sq_pushstring(hVM,func.name,-1);
+		sq_newclosure(hVM,func.f,0);
+
+		if ( func.nparamscheck )
+			sq_setparamscheck(hVM,func.nparamscheck,func.typemask);
+
+		sq_setnativeclosurename(hVM,-1,func.name);
 		sq_createslot(hVM,-3);
 	}
 
@@ -549,35 +554,94 @@ public:
 
 	bool Init() override
 	{
+		constexpr SQInteger stackSize{1024};
+
 		m_hVM = sq_open(1024);
+		if ( !m_hVM )
+		{
+			DWarning( "vscript:squirrel",
+				0,
+				"Unable to create %s VM with 0x%x stack bytes. Out of memory?\n",
+				SQUIRREL_VERSION, stackSize );
+			return false;
+		}
 
 		m_hVM->_sharedstate->m_pOwnerData = this;
 		m_hVM->SetQuerySuspendFn( &QueryContinue );
-		// Need to make this conditional on convar or commandline [2/11/2008 tom]
-		//m_hDbg = sq_rdbg_init( m_hVM, 1234, SQTrue);
-		sq_setprintfunc(m_hVM, &PrintFunc);
+
+		// Display script compile errors.
+		sq_setcompilererrorhandler(m_hVM, &CompileErrorHandler);
+		// sq_notifyallexceptions(m_hVM, _debug_script_level > 5);
+		// Dump output.
+		sq_setprintfunc(m_hVM, &PrintHandler);
+		// Display runtime errors to client.
+		sq_newclosure(m_hVM, &RuntimeErrorHandler, 0);
+		sq_seterrorhandler(m_hVM);
+
+
 		sq_pushroottable(m_hVM);
-		sqstd_register_mathlib(m_hVM);
-		sqstd_register_stringlib(m_hVM);
-		sqstd_seterrorhandlers(m_hVM);
-		sq_pop(m_hVM,1);
+		if (SQ_FAILED(sqstd_register_mathlib(m_hVM)))
+		{
+			DWarning( "vscript:squirrel",
+				0,
+				"Unable to register math library for %s VM.\n",
+				SQUIRREL_VERSION );
+			return false;
+		}
+		if (SQ_FAILED(sqstd_register_stringlib(m_hVM)))
+		{
+			DWarning( "vscript:squirrel",
+				0,
+				"Unable to register string library for %s VM.\n",
+				SQUIRREL_VERSION );
+			return false;
+		}
+		sq_pop(m_hVM, 1);
+
+
 		if ( IsDebug() || developer.GetInt() > 0 )
 		{
 			sq_enabledebuginfo( m_hVM, SQTrue );
+
+			DMsg( "vscript:squirrel",
+				0,
+				"Enabled debug info due to "
+#ifdef _DEBUG
+				"DEBUG build"
+#else
+				"developer convar set to non-zero"
+#endif
+				".\n" );
 		}
-		sq_pushroottable( m_hVM);
+
+		sq_pushroottable( m_hVM );
 
 		sq_pushstring( m_hVM, "developer", -1 );
 		sq_newclosure( m_hVM, &GetDeveloper, 0 );
-		sq_setnativeclosurename(m_hVM, -1, "developer" );
+		if (SQ_FAILED(sq_setnativeclosurename(m_hVM, -1, "developer")))
+		{
+			DWarning( "vscript:squirrel",
+				0,
+				"Unable to set native 'developer' closure name %s VM.\n",
+				SQUIRREL_VERSION );
+			return false;
+		}
 		sq_createslot( m_hVM, -3 );
 
 		sq_pushstring( m_hVM, "GetFunctionSignature", -1 );
 		sq_newclosure( m_hVM, &GetFunctionSignature, 0 );
-		sq_setnativeclosurename(m_hVM, -1, "GetFunctionSignature" );
+		if (SQ_FAILED(sq_setnativeclosurename(m_hVM, -1, "GetFunctionSignature")))
+		{
+			DWarning( "vscript:squirrel",
+				0,
+				"Unable to set native 'GetFunctionSignature' closure name %s VM.\n",
+				SQUIRREL_VERSION );
+			return false;
+		}
 		sq_createslot( m_hVM, -3 );
 
 		sq_pop( m_hVM, 1 );
+
 
 		m_TypeMap.Init( 256 );
 
@@ -596,37 +660,51 @@ public:
 		m_hOnCreateScopeFunc = LookupObject( "VSquirrel_OnCreateScope" );
 		m_hOnReleaseScopeFunc = LookupObject( "VSquirrel_OnReleaseScope" );
 
+		DMsg( "vscript:squirrel", 0, "Created %s VM.\n", SQUIRREL_VERSION );
+
 		return true;
 	}
 
 	bool Frame( float simTime ) override
 	{
+		// <sergiy> removed garbage collection that was called at least 2
+		// times a frame (60 fps server tick / 30fps game = 2 calls a frame).
 		//
-		// <sergiy> removed garbage collection that was called at least 2 times a frame (60 fps server tick / 30fps game = 2 calls a frame)
-		//          and took 1 ms on PS3 PPU. It's not necessary because our scripts are supposed to never create circular references
-		//          and everything else is handled with ref counting. For the case of bugs creating circular references, the plan is to add
-		//          diagnostics that detects such loops and warns the developer.
+		// It's not necessary because our scripts are supposed to never create
+		// circular references and everything else is handled with ref counting.
 		//
+		// For the case of bugs creating circular references, the plan is to add
+		// diagnostics that detects such loops and warns the developer.
 		if ( m_hDbg )
 		{
-			sq_rdbg_update( m_hDbg );
+			if (SQ_FAILED(sq_rdbg_update( m_hDbg )))
+			{
+				DWarning( "vscript:squirrel", 0, "Remote debugger lost connection...\n" );
+			}
+
 			if ( !m_hDbg->IsConnected() )
 				DisconnectDebugger();
 		}
+
 		return false;
 	}
 
 	void Shutdown() override
 	{
-		if ( m_hVM ) 
+		if ( m_hVM )
 		{
-			sq_collectgarbage( m_hVM );
-			sq_pushnull(m_hVM);
-			sq_setroottable(m_hVM);
 			DisconnectDebugger();
+
+			sq_collectgarbage( m_hVM );
+			sq_pushnull( m_hVM );
+			sq_setroottable( m_hVM );
+
 			sq_close( m_hVM );
 			m_hVM = nullptr;
+
+			DMsg( "vscript:squirrel", 0, "Shutdown %s VM.\n", SQUIRREL_VERSION );
 		}
+
 		m_TypeMap.Purge();
 	}
 
@@ -653,17 +731,22 @@ public:
 	{
 		if ( developer.GetInt() > 0 )
 		{
+			constexpr unsigned short port{ 1234 };
+
 			if ( !m_hDbg )
 			{
-				m_hDbg = sq_rdbg_init( m_hVM, 1234, SQTrue);
+				m_hDbg = sq_rdbg_init( m_hVM, port, SQTrue );
 			}
 
 			if ( !m_hDbg )
 			{
 				return false;
 			}
+
+			DMsg( "vscript:squirrel", 0, "Waiting for remote debugger to connect on localhost:%hu....", port );
+
 			//!! SUSPENDS THE APP UNTIL THE DEBUGGER CLIENT CONNECTS
-			return SQ_SUCCEEDED(sq_rdbg_waitforconnections(m_hDbg));
+			return SQ_SUCCEEDED( sq_rdbg_waitforconnections(m_hDbg) );
 		}
 		return false;
 	}
@@ -672,7 +755,7 @@ public:
 	{
 		if ( m_hDbg )
 		{
-			sq_rdbg_shutdown( m_hDbg );
+			sq_rdbg_shutdown( &m_hDbg );
 			m_hDbg = nullptr;
 		}
 	}
@@ -680,7 +763,10 @@ public:
 	ScriptStatus_t Run( const char *pszScript, bool bWait = true ) override
 	{
 		Assert( bWait );
-		if(SQ_SUCCEEDED(sq_compilebuffer(m_hVM,pszScript,(int)V_strlen(pszScript)*sizeof(SQChar),"unnamed",1))) 
+
+		const SQInteger rc = sq_compilebuffer(m_hVM,
+			pszScript,(int)V_strlen(pszScript)*sizeof(SQChar),"unnamed",1);
+		if (SQ_SUCCEEDED(rc))
 		{
 			HSQOBJECT hScript;
 			sq_getstackobj(m_hVM,-1, &hScript);
@@ -694,7 +780,6 @@ public:
 			return result;
 		}
 		return SCRIPT_ERROR;
-
 	}
 
 	HSCRIPT CompileScript( const char *pszScript, const char *pszId = nullptr ) override
@@ -704,9 +789,11 @@ public:
 			return nullptr;
 		}
 
-		if(SQ_SUCCEEDED(sq_compilebuffer(m_hVM,pszScript,(int)V_strlen(pszScript)*sizeof(SQChar),(pszId) ? pszId : "unnamed",1))) 
+		const SQInteger rc = sq_compilebuffer(m_hVM,
+			pszScript,(int)V_strlen(pszScript)*sizeof(SQChar),(pszId) ? pszId : "unnamed",1);
+		if (SQ_SUCCEEDED(rc)) 
 		{
-			HSQOBJECT *pRet = new HSQOBJECT;
+			auto *pRet = new HSQOBJECT;
 			sq_getstackobj(m_hVM,-1,pRet);
 			sq_addref(m_hVM, pRet);
 			sq_pop(m_hVM,1);
@@ -811,7 +898,7 @@ public:
 		{
 			if ( sq_isclosure(result) )
 			{
-				HSQOBJECT *pResult = new HSQOBJECT;
+				auto *pResult = new HSQOBJECT;
 				*pResult = result;
 				return (HSCRIPT)pResult;
 			}
@@ -829,7 +916,7 @@ public:
 	{
 		if ( hScope == INVALID_HSCRIPT )
 		{
-			DevWarning( "Invalid scope handed to script VM\n" );
+			DWarning( "vscript:squirrel", 0, "Invalid scope handed to script VM.\n" );
 			return SCRIPT_ERROR;
 		}
 		if ( m_hDbg )
@@ -879,7 +966,7 @@ public:
 					sq_getstackobj(m_hVM,-1,&ret);
 					if ( !ConvertToVariant( ret, pReturn ) )
 					{
-						DevMsg( "Script function returned unsupported type\n" );
+						DWarning( "vscript:squirrel", 0, "Script function returned unsupported type\n" );
 					}
 
 					sq_pop(m_hVM,2);
@@ -890,7 +977,7 @@ public:
 				}
 				if ( m_hVM->_top != initialTop )
 				{
-					Warning( "Callstack mismatch in VScript/Squirrel!\n" );
+					DWarning( "vscript:squirrel", 0, "Callstack mismatch in VScript/Squirrel!\n" );
 					Assert( m_hVM->_top == initialTop );
 				}
 				if ( !sq_isnull( m_ErrorString ) )
@@ -1008,7 +1095,7 @@ public:
 			return NULL;
 		}
 
-		InstanceContext_t *pInstanceContext = new InstanceContext_t;
+		auto *pInstanceContext = new InstanceContext_t;
 		pInstanceContext->pInstance = pInstance;
 		pInstanceContext->pClassDesc = pDesc;
 		pInstanceContext->name = _null_;
@@ -1024,7 +1111,7 @@ public:
 		sq_addref( m_hVM, &hObject );
 		sq_pop( m_hVM, 1 );
 
-		HSQOBJECT *pResult = new HSQOBJECT;
+		auto *pResult = new HSQOBJECT;
 		*pResult = hObject;
 		return (HSCRIPT)pResult;
 	}
@@ -1033,7 +1120,7 @@ public:
 	{
 		if ( !hInstance )
 		{
-			ExecuteOnce( DevMsg( "NULL instance passed to vscript!\n" ) );
+			ExecuteOnce( DMsg( "vscript:squirrel", 0, "NULL instance passed to vscript!\n" ) );
 			return;
 		}
 		HSQOBJECT *pInstance = (HSQOBJECT *)hInstance;
@@ -1046,7 +1133,7 @@ public:
 	{
 		if ( !hInstance )
 		{
-			ExecuteOnce( DevMsg( "NULL instance passed to vscript!\n" ) );
+			ExecuteOnce( DMsg( "vscript:squirrel", 0, "NULL instance passed to vscript!\n" ) );
 			return;
 		}
 		HSQOBJECT *pInstance = (HSQOBJECT *)hInstance;
@@ -1060,7 +1147,7 @@ public:
 	{
 		if ( !hInstance )
 		{
-			ExecuteOnce( DevMsg( "NULL instance passed to vscript!\n" ) );
+			ExecuteOnce( DMsg( "vscript:squirrel", 0, "NULL instance passed to vscript!\n" ) );
 			return NULL;
 		}
 		HSQOBJECT *pInstance = (HSQOBJECT *)hInstance;
@@ -1089,8 +1176,9 @@ public:
 
 	bool GenerateUniqueKey( const char *pszRoot, char *pBuf, int nBufSize ) override
 	{
-		Assert( V_strlen(pszRoot) + 40 + 1 <= nBufSize );
-		if ( V_strlen(pszRoot) + 40 + 1 <= nBufSize )
+		const intp minSize = V_strlen(pszRoot) + 40 + 1;
+		Assert( minSize <= nBufSize );
+		if ( minSize <= nBufSize )
 		{
 			Q_snprintf( pBuf, nBufSize, "%x%x%llx_%s", RandomInt(0, 0xfff), Plat_MSTime(), m_iUniqueIdSerialNumber++, pszRoot ); // random to limit key compare when serial number gets large
 			return true;
@@ -1099,7 +1187,7 @@ public:
 		{
 			*pBuf = 0;
 		}
-		Error( "GenerateUniqueKey: buffer too small" );
+		Error( "squirrel: GenerateUniqueKey: buffer is too small. Need at least %zd, got %d.\n", minSize, nBufSize );
 		return false;
 	}
 
@@ -1333,14 +1421,14 @@ public:
 			{
 				for ( int i = 0; i < indent; i++)
 				{
-					Msg( "  " );
+					DMsg( "vscript:squirrel", 0, "  " );
 				}
 			}
 
 			void PsuedoKey( const char *pszPsuedoKey ) override
 			{
 				Indent();
-				Msg( "%s: ", pszPsuedoKey );
+				DMsg( "vscript:squirrel", 0, "%s: ", pszPsuedoKey );
 				m_bKey = true;
 			}
 
@@ -1349,7 +1437,7 @@ public:
 				Indent();
 				SQObjectPtr res;
 				m_hVM->ToString( key, res );
-				Msg( "%s: ", res._unVal.pString->_val );
+				DMsg( "vscript:squirrel", 0, "%s: ", res._unVal.pString->_val );
 				m_bKey = true;
 			}
 
@@ -1363,20 +1451,20 @@ public:
 				SQObjectPtr res;
 				m_hVM->ToString( value, res );
 				if ( ISREFCOUNTED(value._type) )
-					Msg( "%s [%d]\n", res._unVal.pString->_val, value._unVal.pRefCounted->_uiRef );
+					DMsg( "vscript:squirrel", 0, "%s [%d]\n", res._unVal.pString->_val, value._unVal.pRefCounted->_uiRef );
 				else
-					Msg( "%s\n", res._unVal.pString->_val );
+					DMsg( "vscript:squirrel", 0, "%s\n", res._unVal.pString->_val );
 			}
 
 			bool BeginContained() override
 			{
 				if ( m_bKey )
 				{
-					Msg( "\n" );
+					DMsg( "vscript:squirrel", 0, "\n" );
 				}
 				m_bKey = false;
 				Indent();
-				Msg( "{\n" );
+				DMsg( "vscript:squirrel", 0, "{\n" );
 				indent++;
 				return true;
 			}
@@ -1385,7 +1473,7 @@ public:
 			{
 				indent--;
 				Indent();
-				Msg( "}\n" );
+				DMsg( "vscript:squirrel", 0, "}\n" );
 			}
 
 			int indent;
@@ -1400,7 +1488,7 @@ public:
 	void WriteState( CUtlBuffer *pBuffer ) override
 	{
 #ifdef VSQUIRREL_DEBUG_SERIALIZATION
-		Msg( "BEGIN WRITE\n" );
+		DMsg( "vscript:squirrel", 0, "BEGIN WRITE\n" );
 #endif
 		m_pBuffer = pBuffer;
 		sq_collectgarbage( m_hVM );
@@ -1429,12 +1517,16 @@ public:
 		int flags = g_pMemAlloc->CrtSetDbgFlag( _CRTDBG_REPORT_FLAG );
 		g_pMemAlloc->CrtSetDbgFlag( flags | _CRTDBG_DELAY_FREE_MEM_DF | _CRTDBG_CHECK_ALWAYS_DF | _CRTDBG_CHECK_CRT_DF );
 #endif
-		Msg( "BEGIN READ\n" );
+		DMsg( "vscript:squirrel", 0, "BEGIN READ\n" );
 #endif
 
-		if ( pBuffer->GetInt() != SAVEVERSION )
+		if ( const int version = pBuffer->GetInt(); version != SAVEVERSION )
 		{
-			DevMsg( "Incompatible script version\n" );
+			DMsg( "vscript:squirrel",
+				0,
+				"Incompatible script version. Expected 0x%x, got 0x%x.\n",
+				SAVEVERSION,
+				version );
 			return;
 		}
 		sq_collectgarbage( m_hVM );
@@ -1478,15 +1570,94 @@ private:
 	//---------------------------------------------------------
 	// Callbacks
 	//---------------------------------------------------------
-	static void PrintFunc(HSQUIRRELVM m_hVM,const SQChar* s,...)
+	static void PrintHandler(HSQUIRRELVM m_hVM,const SQChar* s,...)
 	{
 		char string[2048];
 		va_list		argptr;
 		va_start (argptr,s);
-		Q_vsnprintf (string,sizeof(string),s,argptr);
+		V_vsprintf_safe (string,s,argptr);
 		va_end (argptr);
 		
-		Msg( "%s", string );
+		DMsg( "vscript:squirrel", 0, "%s.\n", string );
+	}
+
+	static void CompileErrorHandler(HSQUIRRELVM m_hVM,
+		const SQChar *desc,
+		const SQChar *source,
+		SQInteger line,
+		SQInteger column)
+	{
+		DWarning( "vscript:squirrel",
+			0,
+			"%s(%d,%d): compile error: %s.\n",
+			source, desc, line, column );
+	}
+
+	static SQInteger RuntimeErrorHandler(HSQUIRRELVM m_hVM)
+	{
+		if ( sq_gettop( m_hVM ) <= 0 )
+		{
+			DWarning( "vscript:squirrel", 0, "runtime error: unknown.\n" );
+			return 0;
+		}
+
+		CUtlString msg;
+
+		if ( const SQChar *err{nullptr}; SQ_SUCCEEDED( sq_getstring( m_hVM, -1, &err ) ) )
+		{
+			msg += err;
+			msg += "\n";
+		}
+		
+		char line[12];
+		SQStackInfos si;
+		// Unwind the stack.
+		SQInteger stackLevel = sq_gettop( m_hVM ), lineNo = 1;
+		while ( stackLevel >= 1 )
+		{
+			V_to_chars( line, lineNo );
+			msg += line;
+			msg += "#   ";
+
+			if ( SQ_SUCCEEDED( sq_stackinfos( m_hVM, stackLevel, &si ) ) )
+			{
+				if ( si.funcname )
+				{
+					msg += si.funcname;
+					msg += "() ";
+				}
+				else
+				{
+					msg += "unknown";
+				}
+
+				if ( si.source )
+				{
+					msg += "at ";
+					msg += si.source;
+				}
+				else
+				{
+					msg += "unknown";
+				}
+				
+				msg += ":";
+
+				V_to_chars( line, si.line );
+				msg.Append( line );
+			}
+			else
+			{
+				msg += "<missed stack trace frames>";
+			}
+
+			--stackLevel;
+			++lineNo;
+		} 
+
+		DWarning( "vscript:squirrel", 0, "runtime error: %s.\n", !msg.IsEmpty() ? msg.Get() : "unknown" );
+
+		return 0;
 	}
 
 	//-------------------------------------------------------------
@@ -1532,12 +1703,10 @@ private:
 		SQClosure *pClosure = hFunction._unVal.pClosure;
 		SQFunctionProto *pProto = pClosure->_function._unVal.pFunctionProto;
 
-		V_strcat_safe( result,
-			"function " );
+		V_strcat_safe( result, "function " );
 		if ( pszName && *pszName )
 		{
-			V_strcat_safe( result,
-				pszName );
+			V_strcat_safe( result, pszName );
 		}
 		else if ( sq_isstring( pProto->_name ) )
 		{
@@ -1546,18 +1715,15 @@ private:
 		}
 		else
 		{
-			V_strcat_safe( result,
-				"<unnamed>" );
+			V_strcat_safe( result, "<unnamed>" );
 		}
-		V_strcat_safe( result,
-			"(" );
+		V_strcat_safe( result, "(" );
 
 		for ( int i = 1; i < pProto->_nparameters; i++ )
 		{
 			if ( i != 1 )
 			{
-				V_strcat_safe( result,
-					", " );
+				V_strcat_safe( result, ", " );
 			}
 			if ( sq_isstring( pProto->_parameters[i] ) )
 			{
@@ -1566,12 +1732,10 @@ private:
 			}
 			else
 			{
-				V_strcat_safe( result,
-					"arg" );
+				V_strcat_safe( result, "arg" );
 			}
 		}
-		V_strcat_safe( result,
-			")" );
+		V_strcat_safe( result, ")" );
 
 		result[ sizeof( result ) - 1 ] = 0;
 		sa.Return( result );
@@ -1597,7 +1761,7 @@ private:
 		StackHandler sa(hVM);
 		int nActualParams = sa.GetParamCount();
 		ScriptClassDesc_t *pClassDesc = *((ScriptClassDesc_t **)sa.GetUserData( nActualParams ));
-		InstanceContext_t *pInstanceContext = new InstanceContext_t;
+		auto *pInstanceContext = new InstanceContext_t;
 		pInstanceContext->pInstance = pClassDesc->m_pfnConstruct();
 		pInstanceContext->pClassDesc = pClassDesc;
 		sq_setinstanceup(hVM, 1, pInstanceContext);
@@ -1658,7 +1822,7 @@ private:
 						}
 						else
 						{
-							HSQOBJECT *pObject = new HSQOBJECT;
+							auto *pObject = new HSQOBJECT;
 							*pObject = object;
 							params[i] = (HSCRIPT)pObject;
 							params[i].m_flags |= SV_FREE;
@@ -1701,7 +1865,7 @@ private:
 
 			if ( pContext->pClassDesc->pHelper )
 			{
-				pObject = pContext->pClassDesc->pHelper->GetProxied( pObject );
+				pObject = pContext->pClassDesc->pHelper->GetProxied( pObject, pVMScriptFunction );
 			}
 
 			if ( !pObject )
@@ -1783,9 +1947,11 @@ private:
 		CSquirrelVM *pVM = ((CSquirrelVM *)hVM->_sharedstate->m_pOwnerData);
 		if ( !pVM->m_hDbg )
 		{
-			if ( pVM->m_TimeStartExecute != 0.0 && Plat_FloatTime() - pVM->m_TimeStartExecute > 0.03 )
+			constexpr double maxRunTimeSeconds = 0.03;
+
+			if ( pVM->m_TimeStartExecute != 0.0 && Plat_FloatTime() - pVM->m_TimeStartExecute > maxRunTimeSeconds )
 			{
-				DevMsg( "Script running too long, terminating\n" );
+				DMsg( "vscript:squirrel", 0, "Script running too long (> %.2f ms), terminating.\n", maxRunTimeSeconds * 1000 );
 				// @TODO: Mark the offending closure so that it won't be executed again [5/13/2008 tom]
 				return SQ_QUERY_BREAK;
 			}
@@ -2050,6 +2216,7 @@ private:
 					break;
 				}
 			}
+			[[fallthrough]];
 			// fall through
 		default:
 			{
@@ -2112,7 +2279,7 @@ private:
 #ifdef VSQUIRREL_DEBUG_SERIALIZATION
 		SQObjectPtr res;
 		m_hVM->ToString( object, res );
-		Msg( "%d: %s\n", m_pBuffer->TellPut(),  res._unVal.pString->_val );
+		DMsg( "vscript:squirrel", 0, "%d: %s\n", m_pBuffer->TellPut(),  res._unVal.pString->_val );
 #endif
 	}
 
@@ -2325,7 +2492,7 @@ private:
 	//-------------------------------------------------------------
 	void WriteGenerator( SQGenerator *pGenerator )
 	{
-		ExecuteOnce( Msg( "Save load of generators not well tested. caveat emptor\n" ) );
+		ExecuteOnce( DMsg( "vscript:squirrel", 0, "Save load of generators not well tested. caveat emptor\n" ) );
 		WriteObject(pGenerator->_closure);
 
 		m_pBuffer->PutInt( OT_GENERATOR );
@@ -2586,7 +2753,9 @@ private:
 			}
 			if ( !object._unVal.pUserPointer )
 			{
-				DevMsg( "Failed to restore a Squirrel object of type %s\n", SQTypeToString( object._type ) );
+				DWarning( "vscript:squirrel",
+					0,
+					"Failed to restore a Squirrel object of type %s\n", SQTypeToString( object._type ) );
 				object._type = OT_NULL;
 				bResult = false;
 			}
@@ -2606,7 +2775,7 @@ private:
 			object._unVal.pRefCounted->_uiRef--;
 			SQ_VALIDATE_REF_COUNT( object._unVal.pRefCounted );
 		}
-		Msg( "%d: %s [%d]\n", m_pBuffer->TellGet(),  res._unVal.pString->_val, ( ISREFCOUNTED(object._type) ) ? object._unVal.pRefCounted->_uiRef : -1 );
+		DMsg( "vscript:squirrel", 0, "%d: %s [%d]\n", m_pBuffer->TellGet(),  res._unVal.pString->_val, ( ISREFCOUNTED(object._type) ) ? object._unVal.pRefCounted->_uiRef : -1 );
 #ifdef VSQUIRREL_DEBUG_SERIALIZATION_HEAPCHK
 		_heapchk();
 #endif
@@ -2682,7 +2851,10 @@ private:
 			ReadObject( key );
 			if ( !ReadObject( value, ( key._type == OT_STRING ) ? key._unVal.pString->_val : NULL ) )
 			{
-				DevMsg( "Failed to read Squirrel table entry %s\n", ( key._type == OT_STRING ) ? key._unVal.pString->_val : SQTypeToString( key._type ) );
+				DWarning( "vscript:squirrel",
+					0,
+					"Failed to read Squirrel table entry %s\n",
+					( key._type == OT_STRING ) ? key._unVal.pString->_val : SQTypeToString( key._type ) );
 			}
 			if ( key._type != OT_NULL )
 			{
@@ -3174,22 +3346,15 @@ void ScriptDestroySquirrelVM( IScriptVM *pVM )
 
 #ifdef VSQUIRREL_TEST
 
-#include "fasttimer.h"
+#include <ctime>
+#include <conio.h>
+
+#include "posix_file_stream.h"
+#include "tier0/fasttimer.h"
 
 CSquirrelVM g_SquirrelVM;
 IScriptVM *g_pScriptVM = &g_SquirrelVM;
 
-
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-
-//-----------------------------------------------------------------------------
-// 
-//-----------------------------------------------------------------------------
-
-#include <time.h>
-#include "fasttimer.h"
 
 static void FromScript_AddBehavior( const char *pBehaviorName, HSCRIPT hTable )
 {
@@ -3203,7 +3368,7 @@ static void FromScript_AddBehavior( const char *pBehaviorName, HSCRIPT hTable )
 	{
 		nInterator = g_pScriptVM->GetKeyValue( hTable, nInterator, &KeyVariant, &ValueVariant );
 
-		Msg( "   %d: %s / %s\n", i, KeyVariant.m_pszString, ValueVariant.m_pszString );
+		Msg( "   %d: %s / %s\n", i, static_cast<const char*>(KeyVariant), static_cast<const char*>(ValueVariant) );
 
 		g_pScriptVM->ReleaseValue( KeyVariant );
 		g_pScriptVM->ReleaseValue( ValueVariant );
@@ -3249,11 +3414,7 @@ bool CMyClass::Foo( int test  )
 
 void CMyClass::Bar( HSCRIPT TableA, HSCRIPT TableB )
 {
-	ScriptVariant_t MyValue;
-
-	//	g_pScriptVM->CreateTable( MyTable );
-
-	MyValue = 10;
+	ScriptVariant_t MyValue = 10;
 	g_pScriptVM->SetValue( TableA, "1", MyValue );
 	MyValue = 20;
 	g_pScriptVM->SetValue( TableA, "2", MyValue );
@@ -3266,8 +3427,6 @@ void CMyClass::Bar( HSCRIPT TableA, HSCRIPT TableB )
 	g_pScriptVM->SetValue( TableB, "2", MyValue );
 	MyValue = 300;
 	g_pScriptVM->SetValue( TableB, "3", MyValue );
-
-	//	return MyTable;
 }
 
 float CMyClass::FooBar( int test1, const char *test2 )
@@ -3280,7 +3439,7 @@ float CMyClass::OverlyTechnicalName( bool test )
 	return 4.56f;
 }
 
-BEGIN_SCRIPTDESC_ROOT_NAMED( CMyClass , "CMyClass", SCRIPT_SINGLETON "" )
+BEGIN_SCRIPTDESC_ROOT_NAMED( CMyClass, "CMyClass", SCRIPT_SINGLETON "" )
 DEFINE_SCRIPTFUNC( Foo, "" )
 DEFINE_SCRIPTFUNC( Bar, "" )
 DEFINE_SCRIPTFUNC( FooBar, "" )
@@ -3317,10 +3476,15 @@ int main( int argc, const char **argv)
 {
 	if ( argc < 2 )
 	{
-		printf( "No script specified" );
-		return 1;
+		fprintf( stderr, "No script specified.\n" );
+		return EINVAL;
 	}
-	g_pScriptVM->Init();
+
+	if ( !g_pScriptVM->Init() )
+	{
+		fprintf( stderr, "Squirrel VM init failure.\n" );
+		return EINVAL;
+	}
 
 	g_pScriptVM->SetOutputCallback( TestOutput );
 
@@ -3340,63 +3504,80 @@ int main( int argc, const char **argv)
 	{
 		g_pScriptVM->ConnectDebugger();
 	}
+	
+	const char *pszScript = argv[1];
+	const char *scriptName{ strrchr( pszScript, '\\' ) };
+
+	scriptName = scriptName ? scriptName + 1 : pszScript;
 
 	int key;
 	CScriptScope scope;
 	scope.Init( "TestScope" );
 	do 
 	{
-		const char *pszScript = argv[1];
-		FILE *hFile = fopen( pszScript, "rb" );
-		if ( !hFile )
+		auto [hFile, rc] = se::posix::posix_file_stream_factory::open( pszScript, "rb" );
+		if ( rc )
 		{
-			printf( "\"%s\" not found.\n", pszScript );
-			return 1;
+			fprintf( stderr, "Can't open \"%s\" (%d): %s.\n",
+				pszScript, rc.value(), rc.message().c_str() );
+			return rc.value();
 		}
 
-		int nFileLen = _filelength( _fileno( hFile ) );
-		char *pBuf = new char[nFileLen + 1];
-		fread( pBuf, 1, nFileLen, hFile );
-		pBuf[nFileLen] = 0;
-		fclose( hFile );
+		int64_t nFileLen;
+		std::tie(nFileLen, rc) = hFile.size();
+		if ( rc )
+		{
+			fprintf( stderr, "Can't get \"%s\" size (%d): %s.\n",
+				pszScript, rc.value(), rc.message().c_str() );
+			return rc.value();
+		}
+		if ( nFileLen > std::numeric_limits<unsigned>::max() )
+		{
+			fprintf( stderr, "File \"%s\" is too large.\n",	pszScript );
+			return EINVAL;
+		}
+		
+		const auto fileLenTyped = static_cast<unsigned>( nFileLen );
+		std::unique_ptr<char[]> pBuf = std::make_unique<char[]>(fileLenTyped + 1);
+		std::tie(std::ignore, rc) = hFile.read( pBuf.get(), fileLenTyped, 1, fileLenTyped );
+		pBuf[fileLenTyped] = '\0';
 
 		if (1)
 		{
 			printf( "Executing script \"%s\"\n----------------------------------------\n", pszScript );
-			HSCRIPT hScript = g_pScriptVM->CompileScript( pBuf, ( strrchr( pszScript, '\\' ) ? strrchr( pszScript, '\\' ) + 1 : pszScript ) );
+			HSCRIPT hScript = g_pScriptVM->CompileScript( pBuf.get(), scriptName );
 			if ( hScript )
 			{
-				ScriptVariant_t	Table;
-
 				if ( scope.Run( hScript ) != SCRIPT_ERROR )
 				{
 					printf( "----------------------------------------\n" );
-					printf("Script complete.  Press q to exit, r to reset the scope, m to dump memory usage, enter to run again.\n");
+					printf("Script complete.  Press q to exit, m to dump memory usage, enter to run again.\n");
 				}
 				else
 				{
-					printf( "----------------------------------------\n" );
-					printf("Script execution error.  Press q to exit, r to reset the scope, m to dump memory usage, enter to run again.\n");
+					fprintf( stderr, "----------------------------------------\n" );
+					fprintf( stderr, "Script execution error.  Press q to exit, m to dump memory usage, enter to run again.\n");
 				}
 				g_pScriptVM->ReleaseScript( hScript );
 			}
 			else
 			{
-				printf( "----------------------------------------\n" );
-				printf("Script failed to compile.  Press q to exit, r to reset the scope, m to dump memory usage, enter to run again.\n");
+				fprintf( stderr, "----------------------------------------\n" );
+				fprintf( stderr, "Script failed to compile.  Press q to exit, m to dump memory usage, enter to run again.\n");
 			}
 		}
+
 		key = _getch(); // Keypress before exit
 		if ( key == 'm' )
 		{
-			Msg( "%d\n", g_pMemAlloc->GetSize( NULL ) );
+			Msg( "%zu bytes.\n", g_pMemAlloc->GetSize( NULL ) );
 		}
+
 		if ( key == 'r' )
 		{
 			scope.Term();
 			scope.Init( "TestScope" );
 		}
-		delete pBuf;
 	} while ( key != 'q' );
 
 	scope.Term();

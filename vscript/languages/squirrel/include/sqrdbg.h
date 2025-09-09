@@ -28,25 +28,29 @@ to the following restrictions:
 		altered from any source distribution.
 
 */
+
 #ifndef _SQ_RDBG_H_
 #define _SQ_RDBG_H_
 
-#ifdef __cplusplus
+#include <cstdlib>
+
 extern "C" {
-#endif
-#ifndef _GAMECONSOLE
+#ifdef _WIN32
 #pragma comment(lib, "WSOCK32.LIB")
 #endif
+
 struct SQDbgServer;
 typedef SQDbgServer* HSQREMOTEDBG;
+typedef struct SQVM* HSQUIRRELVM;
+typedef int SQRESULT;
+typedef std::size_t SQBool;
 
 HSQREMOTEDBG sq_rdbg_init(HSQUIRRELVM v,unsigned short port,SQBool autoupdate);
+SQRESULT sq_rdbg_shutdown(HSQREMOTEDBG *rdbg);
+
 SQRESULT sq_rdbg_waitforconnections(HSQREMOTEDBG rdbg);
-SQRESULT sq_rdbg_shutdown(HSQREMOTEDBG rdbg);
 SQRESULT sq_rdbg_update(HSQREMOTEDBG rdbg);
 
-#ifdef __cplusplus
-} /*extern "C"*/
-#endif
+}
 
 #endif //_SQ_RDBG_H_

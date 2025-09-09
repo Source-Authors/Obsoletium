@@ -1,64 +1,52 @@
 #include "vec3.h"
 
+#include "tier1/strtools.h"
+#include "mathlib/mathlib.h"
+
 #include <lua.h>
 #include <lauxlib.h>
 
+namespace {
 
-constexpr char VEC3_TYPE[]{"Vec3"};
-constexpr char VEC3_NAME[]{"Vec3"};
-
-
-Vector *lua_getvec3( lua_State *pState, int i )
-{
-	if ( luaL_checkudata( pState, i, VEC3_TYPE ) == nullptr )
-	{
-		luaL_typeerror( pState, i, VEC3_TYPE );
-	}
-
-	return static_cast<Vector *>( lua_touserdata( pState, i ) );
-}
+constexpr inline char VECTOR3D_TYPE[]{"Vector"};
+constexpr inline char VECTOR3D_NAME[]{"Vector"};
 
 
 Vector lua_getvec3ByValue( lua_State *pState, int i )
 {
 	if ( lua_isnumber( pState, i ) )
 	{
-		lua_Number flValue = lua_tonumber( pState, i );
+		const lua_Number flValue = lua_tonumber( pState, i );
+		const float flArg = size_cast<float>( flValue );
 
-		return Vector( size_cast<float>( flValue ), size_cast<float>( flValue ), size_cast<float>( flValue ) );
+		return Vector( flArg, flArg, flArg );
 	}
-	if ( luaL_checkudata( pState, i, VEC3_TYPE ) == nullptr )
+
+	if ( luaL_checkudata( pState, i, VECTOR3D_TYPE ) == nullptr )
 	{
-		luaL_typeerror( pState, i, VEC3_TYPE );
+		luaL_typeerror( pState, i, VECTOR3D_TYPE );
 	}
 
-	return *( Vector * )lua_touserdata( pState, i );
+	return *static_cast<Vector *>( lua_touserdata( pState, i ) );
 }
 
 
-static Vector *lua_allocvec3( lua_State *pState )
+Vector *lua_allocvec3( lua_State *pState )
 {
-	Vector *v = static_cast<Vector *>( lua_newuserdata( pState, sizeof( Vector ) ) );
-	luaL_getmetatable( pState, VEC3_TYPE );
+	auto *v = static_cast<Vector *>( lua_newuserdata( pState, sizeof( Vector ) ) );
+	if ( !v )
+	{
+		luaL_error( pState, "out of memory when alloc %s", VECTOR3D_TYPE );
+	}
+
+	luaL_getmetatable( pState, VECTOR3D_TYPE );
 	lua_setmetatable( pState, -2 );
 
 	return v;
 }
 
 
-Vector *lua_newvec3( lua_State *pState, const Vector *Value )
-{
-	Vector *v = lua_allocvec3( pState );
-
-	v->x = Value->x;
-	v->y = Value->y;
-	v->z = Value->z;
-
-	return v;
-}
-
-
-static int vec3_new( lua_State *pState )
+int vec3_new( lua_State *pState )
 {
 	lua_settop( pState, 3 );
 
@@ -71,13 +59,13 @@ static int vec3_new( lua_State *pState )
 }
 
 
-static int vec3_index( lua_State *pState )
+int vec3_index( lua_State *pState )
 {
-	const char	*pszKey = luaL_checkstring( pState, 2 );
+	const char *pszKey = luaL_checkstring( pState, 2 );
 
-	if ( pszKey[ 1 ] == '\0' )
+	if ( pszKey && !Q_isempty( pszKey ) && pszKey[ 1 ] == '\0' )
 	{
-		Vector	*v = lua_getvec3( pState, 1 );
+		const Vector *v = lua_getvec3( pState, 1 );
 		switch ( pszKey[ 0 ] ) 
 		{
 			case '1': case 'x': case 'r':
@@ -91,10 +79,17 @@ static int vec3_index( lua_State *pState )
 			case '3': case 'z': case 'b':
 				lua_pushnumber( pState, v->z );
 				return 1;
+
+			default:
+			{
+				char error[32];
+				V_sprintf_safe(error, "unknown %s index %c", VECTOR3D_TYPE, pszKey[0] );
+				luaL_argcheck( pState, false, 1, error );
+			}
 		}
 	}
 
-	lua_getfield( pState, LUA_REGISTRYINDEX, VEC3_TYPE );
+	lua_getfield( pState, LUA_REGISTRYINDEX, VECTOR3D_TYPE );
 	lua_pushstring( pState, pszKey );
 	lua_rawget( pState, -2 );
 
@@ -102,14 +97,14 @@ static int vec3_index( lua_State *pState )
 }
 
 
-static int vec3_newindex( lua_State *pState ) 
+int vec3_newindex( lua_State *pState ) 
 {
 	const char *pszKey = luaL_checkstring( pState, 2 );
 
-	if ( pszKey[ 1 ] == '\0' )
+	if ( pszKey && !Q_isempty( pszKey ) && pszKey[ 1 ] == '\0' )
 	{
 		Vector	*v = lua_getvec3( pState, 1 );
-		lua_Number	flValue = luaL_checknumber( pState, 3 );
+		const lua_Number flValue = luaL_checknumber( pState, 3 );
 		switch ( pszKey[ 0 ] ) 
 		{
 			case '1': case 'x': case 'r':
@@ -124,20 +119,25 @@ static int vec3_newindex( lua_State *pState )
 				v->z = size_cast<float>( flValue ); 
 				break;
 
-			default: 
-				break;
+			default:
+			{
+				char error[32];
+				V_sprintf_safe(error, "unknown %s index %c", VECTOR3D_TYPE, pszKey[0] );
+				luaL_argcheck( pState, false, 1, error );
+			}
 		}
 	}
 
 	return 1;
 }
 
-static int vec3_tostring( lua_State *pState )
-{
-	char	s[ 64 ];
-	Vector	*v = lua_getvec3( pState, 1 );
 
-	sprintf( s, "%s %p", VEC3_TYPE, v );
+int vec3_tostring( lua_State *pState )
+{
+	char s[ 64 ];
+	const Vector *v = lua_getvec3( pState, 1 );
+
+	V_sprintf_safe( s, "%s (%f, %f, %f)", VECTOR3D_TYPE, v->x, v->y, v->z );
 
 	lua_pushstring( pState, s );
 
@@ -145,12 +145,12 @@ static int vec3_tostring( lua_State *pState )
 }
 
 
-static int vec3_add( lua_State *pState )
+int vec3_add( lua_State *pState )
 {
-	Vector v1 = lua_getvec3ByValue( pState, 1 );
-	Vector v2 = lua_getvec3ByValue( pState, 2 );
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+	const Vector v2 = lua_getvec3ByValue( pState, 2 );
 
-	Vector vResult = v1 + v2;
+	const Vector vResult = v1 + v2;
 
 	lua_newvec3( pState, &vResult );
 
@@ -158,12 +158,12 @@ static int vec3_add( lua_State *pState )
 }
 
 
-static int vec3_subtract( lua_State *pState )
+int vec3_subtract( lua_State *pState )
 {
-	Vector v1 = lua_getvec3ByValue( pState, 1 );
-	Vector v2 = lua_getvec3ByValue( pState, 2 );
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+	const Vector v2 = lua_getvec3ByValue( pState, 2 );
 
-	Vector vResult = v1 - v2;
+	const Vector vResult = v1 - v2;
 
 	lua_newvec3( pState, &vResult );
 
@@ -171,12 +171,12 @@ static int vec3_subtract( lua_State *pState )
 }
 
 
-static int vec3_multiply( lua_State *pState )
+int vec3_multiply( lua_State *pState )
 {
-	Vector v1 = lua_getvec3ByValue( pState, 1 );
-	Vector v2 = lua_getvec3ByValue( pState, 2 );
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+	const Vector v2 = lua_getvec3ByValue( pState, 2 );
 
-	Vector vResult = v1 * v2;
+	const Vector vResult = v1 * v2;
 
 	lua_newvec3( pState, &vResult );
 
@@ -184,12 +184,12 @@ static int vec3_multiply( lua_State *pState )
 }
 
 
-static int vec3_divide( lua_State *pState )
+int vec3_divide( lua_State *pState )
 {
-	Vector v1 = lua_getvec3ByValue( pState, 1 );
-	Vector v2 = lua_getvec3ByValue( pState, 2 );
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+	const Vector v2 = lua_getvec3ByValue( pState, 2 );
 
-	Vector vResult = v1 / v2;
+	const Vector vResult = v1 / v2;
 
 	lua_newvec3( pState, &vResult );
 
@@ -197,11 +197,23 @@ static int vec3_divide( lua_State *pState )
 }
 
 
-static int vec3_length( lua_State *pState )
+int vec3_unaryminus( lua_State *pState )
 {
-	Vector v1 = lua_getvec3ByValue( pState, 1 );
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
 
-	float flResult = v1.Length();
+	const Vector vResult = -v1;
+
+	lua_newvec3( pState, &vResult );
+
+	return 1;
+}
+
+
+int vec3_length( lua_State *pState )
+{
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+
+	const float flResult = v1.Length();
 
 	lua_pushnumber( pState, flResult );
 
@@ -209,21 +221,11 @@ static int vec3_length( lua_State *pState )
 }
 
 
-static int vec3_equal( lua_State *pState )
+int vec3_length2d( lua_State *pState )
 {
-	Vector v1 = lua_getvec3ByValue( pState, 1 );
-	Vector v2 = lua_getvec3ByValue( pState, 2 );
-
-	return ( v1 == v2 ? 1 : 0 );
-}
-
-
-static int vec3_dot( lua_State *pState )
-{
-	Vector v1 = lua_getvec3ByValue( pState, 1 );
-	Vector v2 = lua_getvec3ByValue( pState, 2 );
-
-	float flResult = v1.Dot( v2 );
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+	
+	const float flResult = sqrtf( v1.x * v1.x + v1.y * v1.y );
 
 	lua_pushnumber( pState, flResult );
 
@@ -231,19 +233,67 @@ static int vec3_dot( lua_State *pState )
 }
 
 
-static int vec3_cross( lua_State *pState )
+int vec3_lerp( lua_State* pState )
 {
-	Vector v1 = lua_getvec3ByValue( pState, 1 );
-	Vector v2 = lua_getvec3ByValue( pState,2 );
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+	const Vector v2 = lua_getvec3ByValue( pState, 2 );
+	const lua_Number flValue = luaL_checknumber( pState, 3 );
 
-	Vector vResult = v1,Cross( v2 );
+	const Vector vResult = Lerp( size_cast<float>( flValue ), v1, v2 );
 
 	lua_newvec3( pState, &vResult );
 
 	return 1;
 }
 
-static constexpr luaL_Reg Registrations[] =
+
+int vec3_normalized( lua_State *pState )
+{
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+
+	const Vector vResult = v1.Normalized();
+	
+	lua_newvec3( pState, &vResult );
+
+	return 1;
+}
+
+
+int vec3_equal( lua_State *pState )
+{
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+	const Vector v2 = lua_getvec3ByValue( pState, 2 );
+
+	return v1 == v2 ? 1 : 0;
+}
+
+
+int vec3_dot( lua_State *pState )
+{
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+	const Vector v2 = lua_getvec3ByValue( pState, 2 );
+
+	const float flResult = v1.Dot( v2 );
+
+	lua_pushnumber( pState, flResult );
+
+	return 1;
+}
+
+
+int vec3_cross( lua_State *pState )
+{
+	const Vector v1 = lua_getvec3ByValue( pState, 1 );
+	const Vector v2 = lua_getvec3ByValue( pState, 2 );
+
+	const Vector vResult = v1.Cross( v2 );
+
+	lua_newvec3( pState, &vResult );
+
+	return 1;
+}
+
+constexpr luaL_Reg Vec3Functions[] =
 {
 	{ "__index",	vec3_index		},
 	{ "__newindex",	vec3_newindex	},
@@ -252,19 +302,49 @@ static constexpr luaL_Reg Registrations[] =
 	{ "__sub",		vec3_subtract	},
 	{ "__mul",		vec3_multiply	},
 	{ "__div",		vec3_divide		},
+	{ "__unm",		vec3_unaryminus	},
 	{ "__len",		vec3_length		},
 	{ "__eq",		vec3_equal		},
-	{ "dot",		vec3_dot		},
-	{ "cross",		vec3_cross		},
+	{ "Dot",		vec3_dot		},
+	{ "Cross",		vec3_cross		},
+	{ "Length",		vec3_length		},
+	{ "Length2D",	vec3_length2d	},
+	{ "Lerp",		vec3_lerp		},
+	{ "Normalized",	vec3_normalized	},
 	{ nullptr,		nullptr			}
 };
+
+}  // namespace
 
 
 int luaopen_vec3( lua_State *pState )
 {
-	luaL_newmetatable( pState, VEC3_TYPE );
-	luaL_setfuncs( pState, Registrations, 0 );
-	lua_register( pState, VEC3_NAME, vec3_new );
+	luaL_newmetatable( pState, VECTOR3D_TYPE );
+	luaL_setfuncs( pState, Vec3Functions, 0 );
+	lua_register( pState, VECTOR3D_NAME, vec3_new );
 
 	return 1;
+}
+
+
+Vector *lua_getvec3( lua_State *pState, int i )
+{
+	if ( luaL_checkudata( pState, i, VECTOR3D_TYPE ) == nullptr )
+	{
+		luaL_typeerror( pState, i, VECTOR3D_TYPE );
+	}
+
+	return static_cast<Vector *>( lua_touserdata( pState, i ) );
+}
+
+
+Vector *lua_newvec3( lua_State *pState, const Vector *Value )
+{
+	Vector *v = lua_allocvec3( pState );
+
+	v->x = Value->x;
+	v->y = Value->y;
+	v->z = Value->z;
+
+	return v;
 }
