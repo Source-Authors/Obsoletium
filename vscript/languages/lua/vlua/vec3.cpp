@@ -262,9 +262,7 @@ static constexpr luaL_Reg Registrations[] =
 
 int luaopen_vec3( lua_State *pState )
 {
-	if ( luaL_newmetatable( pState, VEC3_TYPE ) != 0 )
-	{
-	}
+	luaL_newmetatable( pState, VEC3_TYPE );
 	luaL_setfuncs( pState, Registrations, 0 );
 	lua_register( pState, VEC3_NAME, vec3_new );
 
