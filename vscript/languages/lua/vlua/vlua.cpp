@@ -322,10 +322,16 @@ public:
 	bool Init() override
 	{
 		m_LuaState = luaL_newstate();
-		luaL_openlibs( m_LuaState );
-		luaopen_vec3( m_LuaState );
+		if ( !m_LuaState )
+		{
+			Warning( "Unable to create Lua VM state. Out of memory?" );
+			return false;
+		}
 
 		m_OldPanicFunc = lua_atpanic( m_LuaState, FatalErrorHandler );
+
+		luaL_openlibs( m_LuaState );
+		luaopen_vec3( m_LuaState );
 
 		SetOutputCallback( nullptr );
 
@@ -334,7 +340,8 @@ public:
 
 	void Shutdown() override
 	{
-		lua_atpanic( m_LuaState, m_OldPanicFunc );
+		const auto oldPanicFunc = lua_atpanic( m_LuaState, m_OldPanicFunc );
+		Assert( oldPanicFunc == FatalErrorHandler );
 
 		if ( m_LuaState )
 		{
