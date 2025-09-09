@@ -41,44 +41,6 @@ static int lastType;
 #endif
 
 
-//-------------------------------------------------------------------------
-// Helpers
-//-------------------------------------------------------------------------
-#if 0
-static const char *FieldTypeToString( int type )
-{
-	switch( type )
-	{
-		case FIELD_VOID:		return "void";
-		case FIELD_FLOAT:		return "float";
-		case FIELD_CSTRING:		return "string";
-		case FIELD_VECTOR:		return "Vector";
-		case FIELD_INTEGER:		return "int";
-		case FIELD_BOOLEAN:		return "bool";
-		case FIELD_CHARACTER:	return "char";
-		case FIELD_HSCRIPT:		return "handle";
-		default:				return "<unknown>";
-	}
-}
-
-
-static const char *LUATypeToString( int nLUAType )
-{
-	switch( nLUAType )
-	{
-		case LUA_TNUMBER:			return "FLOAT";
-		case LUA_TBOOLEAN:			return "BOOL";
-		case LUA_TSTRING:			return "STRING";
-		case LUA_TNIL:				return "NULL";
-		case LUA_TTABLE:			return "TABLE";
-		case LUA_TUSERDATA:			return "USERDATA";
-		case LUA_TTHREAD:			return "THREAD";
-	}
-	return "<unknown>";
-}
-#endif
-
-
 class CLuaVM final : public IScriptVM
 {
 	lua_State			*m_LuaState;
