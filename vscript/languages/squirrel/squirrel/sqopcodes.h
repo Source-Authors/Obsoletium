@@ -20,7 +20,8 @@ enum CmpOP {
 	CMP_L = 3,
 	CMP_LE = 4
 };
-enum SQOpcode
+// dimhotepus: int -> unsigned char to match types.
+enum SQOpcode : unsigned char
 {
 	_OP_LINE=				0x00,	
 	_OP_LOAD=				0x01,

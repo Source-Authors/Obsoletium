@@ -115,7 +115,7 @@ $Project "vscript"
 					$CustomBuildStep
 					{
 						$CommandLine	"$SRCDIR\devtools\bin\texttoarray.bat $(InputPath) g_Script_$(InputName)> $(InputDir)$(InputName)_nut.h" [$WINDOWS]
-						$CommandLine	"$SRCDIR\devtools\bin\texttoarray.bat $(InputPath) g_Script_$(InputName)> $(InputDir)$(InputName)_nut.h" [$POSIX]
+						$CommandLine	"$SRCDIR\devtools\bin\texttoarray.sh $(InputPath) g_Script_$(InputName)> $(InputDir)$(InputName)_nut.h" [$POSIX]
 						$Description	"$(InputFileName) produces $(InputName)_nut.h"
 						$Outputs		"$(InputDir)$(InputName)_nut.h"
 					}
@@ -138,6 +138,12 @@ $Project "vscript"
 
 	$Folder "Squirrel"
 	{
+		$Folder "Support"
+		{
+			$File 	".\languages\squirrel\vsquirrel\vsq_vec3.cpp"
+			$File 	".\languages\squirrel\vsquirrel\vsq_vec3.h"
+		}
+
 		$Folder "Header Files"
 		{
 			$File 	".\languages\squirrel\include\sqdbgserver.h"
@@ -175,7 +181,6 @@ $Project "vscript"
 						$Compiler
 						{
 							$WarningLevel						"Level 3 (/W3)"
-//							$Detect64bitPortabilityIssues		"No"	[$WIN32||$LINUX]
 						}
 
 						$Compiler
@@ -223,7 +228,6 @@ $Project "vscript"
 						$Compiler
 						{
 							$WarningLevel						"Level 3 (/W3)"
-//							$Detect64bitPortabilityIssues		"No"	[$WIN32||$LINUX]
 						}
 						
 						$Compiler
@@ -247,7 +251,6 @@ $Project "vscript"
 						{
 							$AdditionalIncludeDirectories		"$BASE,.\languages\squirrel3\include"
 							$WarningLevel						"Level 3 (/W3)"
-//							$Detect64bitPortabilityIssues		"No"	[$WIN32||$LINUX]
 							 // "SQPlus" need exceptions. If commit to squirrel, look into removing that
 							$AdditionalOptions					"$BASE /EHsc"
 							$AdditionalIncludeDirectories		"$BASE;.\languages\squirrel\include;.\languages\squirrel\sqplus"
@@ -266,7 +269,6 @@ $Project "vscript"
 						$Compiler
 						{
 							$WarningLevel						"Level 3 (/W3)"
-//							$Detect64bitPortabilityIssues		"No"	[$WIN32||$LINUX]
 							 // "SQPlus" need exceptions. If commit to squirrel, look into removing that
 							$AdditionalOptions					"$BASE /EHsc"
 						}

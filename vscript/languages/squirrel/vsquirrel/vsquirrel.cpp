@@ -12,6 +12,8 @@
 // dimhotepus: Allow exceptions.
 // #define _HAS_EXCEPTIONS 0
 
+#include "vsq_vec3.h"
+
 #include "datamap.h"
 #include "tier0/platform.h"
 #include "tier0/vprof.h"
@@ -53,13 +55,6 @@
 static SQObjectType lastType;
 #endif
 
-#if defined( POSIX )
-constexpr inline int64 max( int64 a, int64 b)
-{
-	return a > b ? a : b;
-}
-
-#endif
 //-----------------------------------------------------------------------------
 // Stub out unwanted features
 //-----------------------------------------------------------------------------
@@ -123,407 +118,6 @@ static constexpr const char *SQTypeToString( SQObjectType sqType )
 }
 
 
-//-------------------------------------------------------------------------
-// Vector
-//-------------------------------------------------------------------------
-#define TYPETAG_VECTOR ((SQUserPointer)1)
-SQInteger VectorRelease( SQUserPointer p, SQInteger size )
-{
-	delete (Vector *)p;
-	return 0;
-}
-
-SQInteger VectorConstruct( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = new Vector;
-
-	int i;
-	for ( i = 0; i < 3 && i < sa.GetParamCount() - 1; i++ )
-	{
-		(*pVector)[i] = sa.GetFloat(i + 2);
-	}
-
-	for ( ; i < 3 ; i++ )
-	{
-		(*pVector)[i] = 0;
-	}
-
-	sq_setinstanceup(hVM, 1, pVector);
-	sq_setreleasehook( hVM, 1, &VectorRelease );
-	return 0;
-}
-
-SQInteger VectorGet( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = (Vector *)sa.GetInstanceUp(1,0);
-	if ( !pVector )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	const char *pszKey = sa.GetString( 2 );
-	if ( pszKey && *pszKey && !*(pszKey + 1) )
-	{
-		int index = *pszKey - 'x';
-		if ( index >=0 && index <= 2)
-		{
-			sq_pushfloat( hVM, (*pVector)[index] );
-			return 1;
-		}
-	}
-	return SQ_ERROR;
-}
-
-SQInteger VectorSet( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = (Vector *)sa.GetInstanceUp(1,0);
-	if ( !pVector )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	const char *pszKey = sa.GetString( 2 );
-	if ( pszKey && *pszKey && !*(pszKey + 1) )
-	{
-		int index = *pszKey - 'x';
-		if ( index >=0 && index <= 2)
-		{
-			(*pVector)[index] = sa.GetFloat(3);
-			sq_pushfloat( hVM, (*pVector)[index] );
-			return 0;
-		}
-	}
-	return SQ_ERROR;
-}
-
-SQInteger VectorIterate( HSQUIRRELVM hVM )
-{
-	static constexpr char *results[] =
-	{
-		"x", "y", "z"
-	};
-
-	StackHandler sa(hVM);
-	const char *pszKey = (sa.GetType( 2 ) == OT_NULL ) ? "w" : sa.GetString( 2 );
-	if ( pszKey && *pszKey && !*(pszKey + 1) )
-	{
-		int index = (*pszKey - 'x' ) + 1;
-		if ( index >=0 && index <= 2)
-		{
-			sa.Return( results[index] );
-			return 1;
-		}
-		sq_pushnull( hVM );
-		return 1;
-	}
-	return SQ_ERROR;
-}
-
-SQInteger VectorToString( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = (Vector *)sa.GetInstanceUp(1,0);
-	if ( !pVector )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	sa.Return( (static_cast<const char *>(CFmtStr("(vector : (%f, %f, %f))", pVector->x, pVector->y, pVector->z))) );
-	return 1;
-}
-
-SQInteger VectorTypeOf( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	sa.Return( "Vector" );
-	return 1;
-}
-
-SQInteger VectorToKeyValueString( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = (Vector *)sa.GetInstanceUp(1,0);
-	if ( !pVector )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	sa.Return( (static_cast<const char *>(CFmtStr("%f %f %f))", pVector->x, pVector->y, pVector->z))) );
-	return 1;
-}
-
-SQInteger VectorAdd( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVectorSrc = (Vector *)sa.GetInstanceUp(1,0);
-	Vector *pVectorAdd = (Vector *)sa.GetInstanceUp(2,0);
-
-	if ( !pVectorSrc || !pVectorAdd )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	Vector *pResult = new Vector;
-
-	*pResult = *pVectorSrc + *pVectorAdd;
-
-	sq_getclass( hVM, -1 );
-	sq_createinstance( hVM, -1 );
-	sq_setinstanceup( hVM, -1, (SQUserPointer)pResult );
-	sq_setreleasehook( hVM, -1, &VectorRelease );
-	sq_remove( hVM, -2 );
-
-	return 1;
-}
-
-SQInteger VectorSubtract( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVectorSrc = (Vector *)sa.GetInstanceUp(1,0);
-	Vector *pVectorAdd = (Vector *)sa.GetInstanceUp(2,0);
-
-	if ( !pVectorSrc || !pVectorAdd )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	Vector *pResult = new Vector;
-
-	*pResult = *pVectorSrc - *pVectorAdd;
-
-	sq_getclass( hVM, -1 );
-	sq_createinstance( hVM, -1 );
-	sq_setinstanceup( hVM, -1, (SQUserPointer)pResult );
-	sq_setreleasehook( hVM, -1, &VectorRelease );
-	sq_remove( hVM, -2 );
-
-	return 1;
-}
-
-SQInteger VectorScale( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVectorSrc = (Vector *)sa.GetInstanceUp(1,0);
-
-	if ( !pVectorSrc )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	float scale = sa.GetFloat( 2 );
-	Vector *pResult = new Vector;
-
-	*pResult = *pVectorSrc * scale;
-
-	sq_getclass( hVM, -2 );
-	sq_createinstance( hVM, -1 );
-	sq_setinstanceup( hVM, -1, (SQUserPointer)pResult );
-	sq_setreleasehook( hVM, -1, &VectorRelease );
-	sq_remove( hVM, -2 );
-
-	return 1;
-}
-
-SQInteger VectorLength( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = (Vector *)sa.GetInstanceUp(1,0);
-	
-	if ( !pVector )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	float flLength = pVector->Length();
-	sa.Return( flLength );
-	
-	return 1;
-}
-
-SQInteger VectorLengthSqr( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = (Vector *)sa.GetInstanceUp(1,0);
-
-	if ( !pVector )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	float flLength = pVector->LengthSqr();
-	sa.Return( flLength );
-
-	return 1;
-}
-
-SQInteger VectorLength2D( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = (Vector *)sa.GetInstanceUp(1,0);
-
-	if ( !pVector )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	float flLength = pVector->Length2D();
-	sa.Return( flLength );
-
-	return 1;
-}
-
-SQInteger VectorLength2DSqr( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = (Vector *)sa.GetInstanceUp(1,0);
-
-	if ( !pVector )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	float flLength = pVector->Length2DSqr();
-	sa.Return( flLength );
-
-	return 1;
-}
-
-SQInteger VectorCross( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVectorSrc = (Vector *)sa.GetInstanceUp(1,0);
-	Vector *pVectorAdd = (Vector *)sa.GetInstanceUp(2,0);
-
-	if ( !pVectorSrc || !pVectorAdd )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	Vector *pResult = new Vector;
-
-	*pResult = (*pVectorSrc).Cross( *pVectorAdd );
-
-	sq_getclass( hVM, -1 );
-	sq_createinstance( hVM, -1 );
-	sq_setinstanceup( hVM, -1, (SQUserPointer)pResult );
-	sq_setreleasehook( hVM, -1, &VectorRelease );
-	sq_remove( hVM, -2 );
-
-	return 1;
-}
-
-SQInteger VectorDot( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVectorSrc = (Vector *)sa.GetInstanceUp(1,0);
-	Vector *pVectorAdd = (Vector *)sa.GetInstanceUp(2,0);
-	
-	if ( !pVectorSrc || !pVectorAdd )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	float flResult = (*pVectorSrc).Dot( *pVectorAdd );
-	sa.Return( flResult );
-
-	return 1;
-}
-
-SQInteger VectorNorm( HSQUIRRELVM hVM )
-{
-	StackHandler sa(hVM);
-	Vector *pVector = (Vector *)sa.GetInstanceUp(1,0);
-
-	if ( !pVector )
-	{
-		sq_throwerror( hVM, "null vector" );
-		return SQ_ERROR;
-	}
-
-	float flLength = pVector->NormalizeInPlace();
-	sa.Return( flLength );
-
-	return 1;
-}
-
-
-SQRegFunction g_VectorFuncs[] =
-{
-	{ "constructor",	VectorConstruct,	0, NULL },
-	{ "_get",			VectorGet,			2, ".." },
-	{ "_set",			VectorSet,			3, "..n" },
-	{ "_tostring",		VectorToString,		0, NULL },
-	{ "_typeof",		VectorTypeOf,		0, NULL },
-	{ "_nexti",			VectorIterate,		0, NULL },
-	{ "_add",			VectorAdd,			2, NULL },
-	{ "_sub",			VectorSubtract,		2, NULL },
-	{ "_mul",			VectorScale,		2, NULL },
-	{ "ToKVString",		VectorToKeyValueString, 0, NULL },
-	{ "Length",			VectorLength,		0, NULL },
-	{ "LengthSqr",		VectorLengthSqr,	0, NULL },
-	{ "Length2D",		VectorLength2D,		0, NULL },
-	{ "Length2DSqr",	VectorLength2DSqr,	0, NULL },
-	{ "Length2DSqr",	VectorLength2DSqr,	0, NULL },
-	{ "Dot",			VectorDot,			2, NULL },
-	{ "Cross",			VectorCross,		2, NULL },
-	{ "Norm",			VectorNorm,			0, NULL },
-};
-
-
-bool RegisterVector( HSQUIRRELVM hVM )
-{
-	int top = sq_gettop( hVM );
-
-	sq_pushroottable(hVM);
-	sq_pushstring(hVM, "Vector", -1);
-
-	if (SQ_FAILED(sq_newclass(hVM,0))) 
-	{
-		sq_settop(hVM,top);
-		DMsg( "vscript:squirrel", 0, "Unable to register Vector class in %s VM.\n", SQUIRREL_VERSION );
-		return false;
-	}
-
-	HSQOBJECT hClass;
-	sq_getstackobj(hVM,-1, &hClass);
-	sq_settypetag(hVM,-1,TYPETAG_VECTOR);
-	sq_createslot(hVM,-3);
-
-	sq_pushobject( hVM, hClass );
-	for ( auto &func : g_VectorFuncs )
-	{
-		sq_pushstring(hVM,func.name,-1);
-		sq_newclosure(hVM,func.f,0);
-
-		if ( func.nparamscheck )
-			sq_setparamscheck(hVM,func.nparamscheck,func.typemask);
-
-		sq_setnativeclosurename(hVM,-1,func.name);
-		sq_createslot(hVM,-3);
-	}
-
-	sq_pop(hVM,1);
-
-	sq_settop( hVM, top );
-	return true;
-}
-
 //-----------------------------------------------------------------------------
 // Bridge code, some cribbed from SqPlus
 //-----------------------------------------------------------------------------
@@ -556,7 +150,7 @@ public:
 	{
 		constexpr SQInteger stackSize{1024};
 
-		m_hVM = sq_open(1024);
+		m_hVM = sq_open(stackSize);
 		if ( !m_hVM )
 		{
 			DWarning( "vscript:squirrel",
@@ -582,6 +176,7 @@ public:
 		sq_pushroottable(m_hVM);
 		if (SQ_FAILED(sqstd_register_mathlib(m_hVM)))
 		{
+			sq_pop(m_hVM, 1);
 			DWarning( "vscript:squirrel",
 				0,
 				"Unable to register math library for %s VM.\n",
@@ -590,6 +185,7 @@ public:
 		}
 		if (SQ_FAILED(sqstd_register_stringlib(m_hVM)))
 		{
+			sq_pop(m_hVM, 1);
 			DWarning( "vscript:squirrel",
 				0,
 				"Unable to register string library for %s VM.\n",
@@ -620,6 +216,7 @@ public:
 		sq_newclosure( m_hVM, &GetDeveloper, 0 );
 		if (SQ_FAILED(sq_setnativeclosurename(m_hVM, -1, "developer")))
 		{
+			sq_pop(m_hVM, 1);
 			DWarning( "vscript:squirrel",
 				0,
 				"Unable to set native 'developer' closure name %s VM.\n",
@@ -632,6 +229,7 @@ public:
 		sq_newclosure( m_hVM, &GetFunctionSignature, 0 );
 		if (SQ_FAILED(sq_setnativeclosurename(m_hVM, -1, "GetFunctionSignature")))
 		{
+			sq_pop(m_hVM, 1);
 			DWarning( "vscript:squirrel",
 				0,
 				"Unable to set native 'GetFunctionSignature' closure name %s VM.\n",
@@ -645,14 +243,10 @@ public:
 
 		m_TypeMap.Init( 256 );
 
-		RegisterVector( m_hVM );
-
-		sq_pushroottable(m_hVM );
-		sq_pushstring( m_hVM, "Vector", -1 );
-		sq_get(m_hVM,-2); //get the function from the root table
-		sq_getstackobj(m_hVM,-1,&m_hClassVector);
-		sq_addref(m_hVM,&m_hClassVector);
-		sq_pop(m_hVM, 2);
+		if (SQ_FAILED(vsq_openvec3(m_hVM, &m_hClassVector)))
+		{
+			return false;
+		}
 
 		// Initialization scripts & hookup
 		Run( (const char *)g_Script_init, "init.nut" );
@@ -1187,7 +781,7 @@ public:
 		{
 			*pBuf = 0;
 		}
-		Error( "squirrel: GenerateUniqueKey: buffer is too small. Need at least %zd, got %d.\n", minSize, nBufSize );
+		Warning( "squirrel: GenerateUniqueKey: buffer is too small. Need at least %zd, got %d.\n", minSize, nBufSize );
 		return false;
 	}
 
@@ -1798,17 +1392,12 @@ private:
 				case FIELD_CSTRING:		params[i] = sa.GetString( i + 2 ); break;
 				case FIELD_VECTOR:		
 					{
-						Vector *pVector = (Vector *)sa.GetInstanceUp( i + 2, TYPETAG_VECTOR );
-						if ( pVector )
-						{
-							params[i] = pVector;
-							break;
+						Vector vec{};
+						if (const auto rc = vsq_getvec3( hVM, sa, i + 2, vec ); SQ_FAILED(rc)) {
+							return rc;
 						}
-						else
-						{
-							sq_throwerror( hVM, "Vector argument expected" );
-							return SQ_ERROR;
-						}
+
+						params[i] = vec;
 					}
 				case FIELD_INTEGER:		params[i] = sa.GetInt( i + 2 ); break;
 				case FIELD_BOOLEAN:		params[i] = sa.GetBool( i + 2 ); break;
@@ -1892,7 +1481,7 @@ private:
 					sq_pushobject( hVM, ((CSquirrelVM *)hVM->_sharedstate->m_pOwnerData)->m_hClassVector );
 					sq_createinstance( hVM, -1 );
 					sq_setinstanceup( hVM, -1, (SQUserPointer)returnValue.m_pVector );
-					sq_setreleasehook( hVM, -1, &VectorRelease );
+					sq_setreleasehook( hVM, -1, &vsq_releasevec3 );
 					sq_remove( hVM, -2 );
 					break;
 				}
@@ -2169,8 +1758,8 @@ private:
 				}
 				else
 				{
-					sq_setinstanceup( m_hVM, -1, (SQUserPointer)new Vector( *value.m_pVector ) );
-					sq_setreleasehook( m_hVM, -1, &VectorRelease );
+					sq_setinstanceup( m_hVM, -1, new Vector( *value.m_pVector ) );
+					sq_setreleasehook( m_hVM, -1, &vsq_releasevec3 );
 				}
 				sq_remove( m_hVM, -2 );
 				break;
@@ -2204,11 +1793,11 @@ private:
 			break;
 		case OT_INSTANCE:
 			{
-				SQUserPointer pVector;
 				sq_pushobject( m_hVM, object );
-				SQRESULT getResult = sq_getinstanceup( m_hVM, -1, &pVector, TYPETAG_VECTOR );
+				SQUserPointer pVector;
+				SQRESULT rc = sq_getinstanceup( m_hVM, -1, &pVector, TYPETAG_VECTOR );
 				sq_poptop( m_hVM );
-				if ( getResult == SQ_OK )
+				if ( SQ_SUCCEEDED( rc ) )
 				{
 					pReturn->m_type = FIELD_VECTOR;
 					pReturn->m_pVector = new Vector( *((Vector *)pVector) ); 
@@ -2221,7 +1810,7 @@ private:
 		default:
 			{
 				pReturn->m_type = FIELD_HSCRIPT;
-				HSQOBJECT *pObject = new HSQOBJECT;
+				auto *pObject = new HSQOBJECT;
 				*pObject = object;
 				pReturn->m_hScript = (HSCRIPT)pObject;
 			}
@@ -2417,7 +2006,7 @@ private:
 			{
 				if ( pClass->_typetag == TYPETAG_VECTOR )
 				{
-					m_pBuffer->PutString( "Vector" );
+					m_pBuffer->PutString( TYPENAME_VECTOR );
 				}
 				else
 				{
@@ -3000,7 +2589,7 @@ private:
 			{
 				if ( pInstance->_class->_typetag == TYPETAG_VECTOR )
 				{
-					Vector *pValue = new Vector;
+					auto *pValue = new Vector;
 					pValue->x = m_pBuffer->GetFloat();
 					pValue->y = m_pBuffer->GetFloat();
 					pValue->z = m_pBuffer->GetFloat();

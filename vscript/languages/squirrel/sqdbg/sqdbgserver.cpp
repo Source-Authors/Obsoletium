@@ -12,6 +12,10 @@
 #include "memdbgon.h"
 #endif
 
+#ifdef _WIN32
+#include <winsock.h>
+#endif
+
 #ifndef _UNICODE
 #define scstrcpy strcpy
 #else
