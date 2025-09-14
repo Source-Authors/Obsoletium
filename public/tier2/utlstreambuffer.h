@@ -10,10 +10,6 @@
 #ifndef UTLSTREAMBUFFER_H
 #define UTLSTREAMBUFFER_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier1/utlbuffer.h"
 #include "filesystem.h"
 
@@ -23,7 +19,7 @@
 //-----------------------------------------------------------------------------
 class CUtlStreamBuffer : public CUtlBuffer
 {
-	typedef CUtlBuffer BaseClass;
+	using BaseClass = CUtlBuffer;
 
 public:
 	// See CUtlBuffer::BufferFlags_t for flags

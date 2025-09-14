@@ -4,8 +4,6 @@
 
 #ifndef SE_TIER2_KEYVALUESMACROS_H_
 #define SE_TIER2_KEYVALUESMACROS_H_
-#pragma once
-
 
 //--------------------------------------------------------------------------------------------------
 // Returns true if the passed string matches the filename style glob, false otherwise

@@ -7,10 +7,6 @@
 #ifndef MESHUTILS_H
 #define MESHUTILS_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 
 //-----------------------------------------------------------------------------
 // Helper methods to create various standard index buffer types

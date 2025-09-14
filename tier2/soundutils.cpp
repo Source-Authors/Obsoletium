@@ -184,7 +184,7 @@ float GetWavSoundDuration( const char *pWavFile )
 	if ( !bFound )
 		return 0.0f;
 
-	const WAVEFORMATEX *pHeader = (const WAVEFORMATEX *)pFormatBuffer;
+	const auto *pHeader = (const WAVEFORMATEX *)pFormatBuffer;
 
 	int format = pHeader->wFormatTag;
 
@@ -206,7 +206,7 @@ float GetWavSoundDuration( const char *pWavFile )
 	{
 		nSampleSize = 1;
 
-		ADPCMWAVEFORMAT *pFormat = (ADPCMWAVEFORMAT *)pFormatBuffer;
+		auto *pFormat = (ADPCMWAVEFORMAT *)pFormatBuffer;
 		int blockSize = ((pFormat->wSamplesPerBlock - 2) * pFormat->wfx.nChannels ) / 2;
 		blockSize += 7 * pFormat->wfx.nChannels;
 

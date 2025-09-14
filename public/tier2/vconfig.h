@@ -4,12 +4,8 @@
 //
 //===========================================================================//
 
-#ifndef _VCONFIG_H
-#define _VCONFIG_H
-
-#ifdef _WIN32
-#pragma once
-#endif
+#ifndef SE_PUBLIC_TIER2_VCONFIG_H_
+#define SE_PUBLIC_TIER2_VCONFIG_H_
 
 // The registry keys that vconfig uses to store the current vproject directory.
 //#define VPROJECT_REG_KEY	"SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment"
@@ -39,4 +35,4 @@ template<unsigned long size>
 bool ConvertObsoleteVConfigRegistrySetting( const char *pValueName );
 
 
-#endif // _VCONFIG_H
+#endif  // !SE_PUBLIC_TIER2_VCONFIG_H_

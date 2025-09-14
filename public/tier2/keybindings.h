@@ -5,13 +5,10 @@
 // $NoKeywords: $
 //
 //===========================================================================//
-	   
+
 #ifndef KEYBINDINGS_H
 #define KEYBINDINGS_H
 
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "tier1/utlstring.h"
 #include "inputsystem/ButtonCode.h"

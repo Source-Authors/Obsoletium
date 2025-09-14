@@ -49,7 +49,7 @@ T* ConnectLibrary( T **library,
 {
 	if ( !*library )
 	{
-		return (*library = static_cast<T*>(factory_list[index]( interface_name, NULL )));
+		return (*library = static_cast<T*>(factory_list[index]( interface_name, nullptr )));
 	}
 
 	return *library;

@@ -186,7 +186,7 @@ int UpdateOrCreate( const char *pSourceName, char *pTargetName, int targetLen, [
 //-----------------------------------------------------------------------------
 void GetSearchPath( CUtlVector< CUtlString > &path, const char *pPathID )
 {
-	int nMaxLen = g_pFullFileSystem->GetSearchPath( pPathID, false, NULL, 0 );
+	int nMaxLen = g_pFullFileSystem->GetSearchPath( pPathID, false, nullptr, 0 );
 	char *pBuf = (char*)stackalloc( nMaxLen );
 	g_pFullFileSystem->GetSearchPath( pPathID, false, pBuf, nMaxLen );
 

@@ -8,10 +8,6 @@
 
 #ifndef P4HELPERS_H
 #define P4HELPERS_H
-#ifdef _WIN32
-#pragma once
-#endif
-
 
 #include "tier1/utlstring.h"
 #include "tier1/smartptr.h"
@@ -28,13 +24,13 @@ public:
 
 public:
 	// Opens the file for edit
-	virtual bool Edit( void );
+	virtual bool Edit( );
 	
 	// Opens the file for add
-	virtual bool Add( void );
+	virtual bool Add( );
 
 	// Reverts the file
-	virtual bool Revert( void );
+	virtual bool Revert( );
 
 	// Is the file in perforce?
 	virtual bool IsFileInPerforce();
@@ -56,10 +52,10 @@ public:
 	explicit CP4File_Dummy( char const *szFilename ) : CP4File( szFilename ) {}
 
 public:
-	virtual bool Edit( void ) { return true; }
-	virtual bool Add( void ) { return true; }
-	virtual bool IsFileInPerforce() { return false; }
-	virtual bool SetFileType(const CUtlString&) { return true; }
+	bool Edit( ) override { return true; }
+	bool Add( ) override { return true; }
+	bool IsFileInPerforce() override { return false; }
+	bool SetFileType(const CUtlString&) override { return true; }
 };
 
 
@@ -103,7 +99,7 @@ class CP4AutoEditFile
 public:
 	explicit CP4AutoEditFile( char const *szFilename ) : m_spImpl( g_p4factory->AccessFile( szFilename ) ) { m_spImpl->Edit(); }
 
-	CP4File * File() const { return m_spImpl.Get(); }
+	[[nodiscard]] CP4File * File() const { return m_spImpl.Get(); }
 
 protected:
 	CPlainAutoPtr< CP4File > m_spImpl;
@@ -117,7 +113,7 @@ class CP4AutoAddFile
 public:
 	explicit CP4AutoAddFile( char const *szFilename ) : m_spImpl( g_p4factory->AccessFile( szFilename ) ) { m_spImpl->Add(); }
 
-	CP4File * File() const { return m_spImpl.Get(); }
+	[[nodiscard]] CP4File * File() const { return m_spImpl.Get(); }
 
 protected:
 	CPlainAutoPtr< CP4File > m_spImpl;
@@ -145,14 +141,14 @@ public:
 		m_spImpl->SetFileType( m_sFileType );
 	}
 
-	~CP4AutoEditAddFile( void ) 
+	~CP4AutoEditAddFile( ) 
 	{ 
 		m_spImpl->Add(); 
 		if ( m_bHasDesiredFileType )
 			m_spImpl->SetFileType( m_sFileType );
 	}
 
-	CP4File * File() const { return m_spImpl.Get(); }
+	[[nodiscard]] CP4File * File() const { return m_spImpl.Get(); }
 
 protected:
 	CPlainAutoPtr< CP4File > m_spImpl;
@@ -169,7 +165,7 @@ class CP4AutoRevertFile
 public:
 	explicit CP4AutoRevertFile( char const *szFilename ) : m_spImpl( g_p4factory->AccessFile( szFilename ) ) { m_spImpl->Revert(); }
 
-	CP4File * File() const { return m_spImpl.Get(); }
+	[[nodiscard]] CP4File * File() const { return m_spImpl.Get(); }
 
 protected:
 	CPlainAutoPtr< CP4File > m_spImpl;

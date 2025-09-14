@@ -32,10 +32,10 @@ void CBeamSegDraw::Start( IMatRenderContext *pRenderContext, int nSegs, IMateria
 	}
 	else
 	{
-		m_pMeshBuilder = NULL;
+		m_pMeshBuilder = nullptr;
 		m_nMeshVertCount = 0;
 
-		IMesh *pMesh = m_pRenderContext->GetDynamicMesh( true, NULL, NULL, pMaterial );
+		IMesh *pMesh = m_pRenderContext->GetDynamicMesh( true, nullptr, nullptr, pMaterial );
 		m_Mesh.Begin( pMesh, MATERIAL_TRIANGLE_STRIP, (nSegs-1) * 2 );
 	}
 }
@@ -95,7 +95,7 @@ inline void CBeamSegDraw::SpecifySeg( const Vector &vecCameraPos, const Vector &
 			Assert(nBase >= std::numeric_limits<unsigned short>::min() &&
 				   nBase <= std::numeric_limits<unsigned short>::max());
 
-			const unsigned short usBase = static_cast<unsigned short>(nBase);
+			const auto usBase = static_cast<unsigned short>(nBase);
 
 			m_pMeshBuilder->FastIndex( usBase );
 			m_pMeshBuilder->FastIndex( usBase + 1 );
@@ -167,7 +167,7 @@ void CBeamSegDraw::End()
 {
 	if ( m_pMeshBuilder )
 	{
-		m_pMeshBuilder = NULL;
+		m_pMeshBuilder = nullptr;
 		return;
 	}
 

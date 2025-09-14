@@ -29,8 +29,8 @@ CUtlStreamBuffer::CUtlStreamBuffer( ) : BaseClass( DEFAULT_STREAM_CHUNK_SIZE, DE
 {
 	SetUtlBufferOverflowFuncs( &CUtlStreamBuffer::StreamGetOverflow, &CUtlStreamBuffer::StreamPutOverflow );
 	m_hFileHandle = FILESYSTEM_INVALID_HANDLE;
-	m_pFileName = NULL;
-	m_pPath = NULL;
+	m_pFileName = nullptr;
+	m_pPath = nullptr;
 }
 
 CUtlStreamBuffer::CUtlStreamBuffer( const char *pFileName, const char *pPath, unsigned char nFlags, bool bDelayOpen ) :
@@ -56,8 +56,8 @@ CUtlStreamBuffer::CUtlStreamBuffer( const char *pFileName, const char *pPath, un
 	}
 	else
 	{
-		m_pFileName = NULL;
-		m_pPath = NULL;
+		m_pFileName = nullptr;
+		m_pPath = nullptr;
 		m_hFileHandle = OpenFile( pFileName, pPath );
 		if ( m_hFileHandle == FILESYSTEM_INVALID_HANDLE )
 		{
@@ -121,13 +121,13 @@ void CUtlStreamBuffer::Close()
 	if ( m_pFileName )
 	{
 		delete[] m_pFileName;
-		m_pFileName = NULL;
+		m_pFileName = nullptr;
 	}
 
 	if ( m_pPath )
 	{
 		delete[] m_pPath;
-		m_pPath = NULL;
+		m_pPath = nullptr;
 	}
 
 	m_Error = 0;
@@ -195,7 +195,7 @@ bool CUtlStreamBuffer::IsOpen() const
 		return true;
 
 	// Delayed open case
-	return ( m_pFileName != 0 );
+	return ( m_pFileName != nullptr );
 }
 
 

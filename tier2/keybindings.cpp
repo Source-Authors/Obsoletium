@@ -58,9 +58,9 @@ void CKeyBindings::Unbind( const char *pButtonName )
 
 void CKeyBindings::UnbindAll()
 {
-	for ( int i = 0; i < BUTTON_CODE_LAST; i++ )
+	for (auto &i : m_KeyInfo)
 	{
-		m_KeyInfo[i] = "";
+		i = "";
 	}
 }
 
@@ -71,9 +71,9 @@ void CKeyBindings::UnbindAll()
 int CKeyBindings::GetBindingCount( ) const
 {
 	int	nCount = 0;
-	for ( int i = 0; i < BUTTON_CODE_LAST; i++ )
+	for (const auto &i : m_KeyInfo)
 	{
-		if ( !m_KeyInfo[i].IsEmpty() )
+		if ( !i.IsEmpty() )
 		{
 			nCount++;
 		}
@@ -128,13 +128,13 @@ const char *CKeyBindings::ButtonNameForBinding( const char *pBinding )
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 const char *CKeyBindings::GetBindingForButton( ButtonCode_t code )
 {
 	if ( m_KeyInfo[code].IsEmpty() )
-		return NULL;
+		return nullptr;
 
 	return m_KeyInfo[ code ];
 }
