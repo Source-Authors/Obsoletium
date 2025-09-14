@@ -8,13 +8,8 @@
 #ifndef TGAWRITER_H
 #define TGAWRITER_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 #include "tier0/wchartypes.h"
-#include "bitmap/imageformat.h" //ImageFormat enum definition
+#include "imageformat.h" //ImageFormat enum definition
 
 class CUtlBuffer;
 

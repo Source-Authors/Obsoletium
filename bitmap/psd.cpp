@@ -302,7 +302,7 @@ static int s_pChannelIndex[MODE_COUNT+1][4] =
 
 static void PSDReadUncompressedChannels( CUtlBuffer &buf, int nChannelsCount, PSDMode_t mode, PSDPalette_t &palette, Bitmap_t &bitmap )
 {
-	unsigned char *pChannelRow = (unsigned char*)_alloca( bitmap.Width() );
+	auto *pChannelRow = (unsigned char*)_alloca( bitmap.Width() );
 	for ( int i=0; i<nChannelsCount; ++i )
 	{
 		int nIndex = s_pChannelIndex[mode][i];
@@ -330,7 +330,7 @@ static void PSDReadUncompressedChannels( CUtlBuffer &buf, int nChannelsCount, PS
 //-----------------------------------------------------------------------------
 static void PSDReadCompressedChannels( CUtlBuffer &buf, int nChannelsCount, PSDMode_t mode, PSDPalette_t &palette, Bitmap_t &bitmap )
 {
-	unsigned char *pChannelRow = (unsigned char*)_alloca( bitmap.Width() );
+	auto *pChannelRow = (unsigned char*)_alloca( bitmap.Width() );
 	for ( int i=0; i<nChannelsCount; ++i )
 	{
 		int nIndex = s_pChannelIndex[mode][i];
@@ -390,7 +390,7 @@ bool PSDReadFileRGBA8888( CUtlBuffer &buf, Bitmap_t &bitmap )
 	if ( BigShort( header.m_nDepth ) != 8 )
 		return false;
 
-	PSDMode_t mode = (PSDMode_t)BigShort( header.m_nMode );
+	auto mode = (PSDMode_t)BigShort( header.m_nMode );
 	int nChannelsCount = BigShort( header.m_nChannels );
 
 	if ( mode == MODE_MULTICHANNEL || mode == MODE_LAB )
@@ -425,7 +425,7 @@ bool PSDReadFileRGBA8888( CUtlBuffer &buf, Bitmap_t &bitmap )
 	// Skip parts of memory we don't care about
 	int nColorModeSize = BigLong( buf.GetUnsignedInt() );
 	Assert( nColorModeSize % 3 == 0 );
-	unsigned char *pPaletteBits = (unsigned char*)_alloca( nColorModeSize );
+	auto *pPaletteBits = (unsigned char*)_alloca( nColorModeSize );
 	PSDPalette_t palette{nullptr, nullptr, nullptr};
 	if ( nColorModeSize )
 	{

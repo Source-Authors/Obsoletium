@@ -112,7 +112,7 @@ bool WriteToBuffer( unsigned char *pImageData, CUtlBuffer &buffer, int width, in
 
 	const int nSizeInBytes = width * height * ImageLoader::SizeInBytes( dstFormat );
 	buffer.EnsureCapacity( buffer.TellPut() + nSizeInBytes );
-	unsigned char *pDst = (unsigned char*)buffer.PeekPut();
+	auto *pDst = (unsigned char*)buffer.PeekPut();
 
 	if ( !ImageLoader::ConvertImageFormat( pImageData, srcFormat, pDst, dstFormat, width, height ) )
 		return false;

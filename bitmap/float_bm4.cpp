@@ -138,7 +138,7 @@ static unsigned SSBumpCalculationThreadFN( void * ctx1 )
 
 void FloatBitMap_t::ComputeVertexPositionsAndNormals( float flHeightScale, Vector * RESTRICT *ppPosOut, Vector * RESTRICT *ppNormalOut ) const
 {
-	Vector * RESTRICT verts = new Vector[Width * Height];
+	auto * RESTRICT verts = new Vector[Width * Height];
 	if (!verts)
 		Error("Unable to allocate vertex pos & normals for bitmap %dx%d.\n", Width, Height);
 
@@ -152,7 +152,7 @@ void FloatBitMap_t::ComputeVertexPositionsAndNormals( float flHeightScale, Vecto
 			out->z = flHeightScale * Pixel( x, y, 3 );
 		}
 
-	Vector * RESTRICT normals = new Vector[Width * Height];
+	auto * RESTRICT normals = new Vector[Width * Height];
 	if (!verts)
 		Error("Unable to allocate vertex pos & normals for bitmap %dx%d.\n", Width, Height);
 
@@ -209,7 +209,7 @@ ALLOC_CALL FloatBitMap_t *FloatBitMap_t::ComputeSelfShadowedBumpmapFromHeightInA
 	float bump_scale, int nrays_to_trace_per_pixel, 
 	uint32 nOptionFlags ) const
 {
-	FloatBitMap_t * ret = new FloatBitMap_t( Width, Height );
+	auto * ret = new FloatBitMap_t( Width, Height );
 	if (!ret)
 		Error("Unable to allocate bitmap %dx%d for self shadow bump map.\n", Width, Height);
 
@@ -354,7 +354,7 @@ ALLOC_CALL FloatBitMap_t *FloatBitMap_t::ComputeBumpmapFromHeightInAlphaChannel(
 	Vector * RESTRICT normals;
 	ComputeVertexPositionsAndNormals( bump_scale, &verts, &normals );
 
-	FloatBitMap_t *ret=new FloatBitMap_t( Width, Height );
+	auto *ret=new FloatBitMap_t( Width, Height );
 	if (!ret)
 		Error("Unable to allocate bitmap %dx%d for normal map.\n", Width, Height);
 

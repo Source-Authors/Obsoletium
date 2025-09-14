@@ -43,8 +43,8 @@ typedef int32 *DWORD_PTR;
 // Various important function types for each color format
 //-----------------------------------------------------------------------------
 
-typedef void (*UserFormatToRGBA8888Func_t )( const uint8 *src, uint8 *dst, int numPixels );
-typedef void (*RGBA8888ToUserFormatFunc_t )( const uint8 *src, uint8 *dst, int numPixels );
+using UserFormatToRGBA8888Func_t = void (*)(const uint8 *, uint8 *, int);
+using RGBA8888ToUserFormatFunc_t = void (*)(const uint8 *, uint8 *, int);
 
 
 namespace ImageLoader
@@ -1184,7 +1184,7 @@ void ConvertImageFormat_RGBA16161616_To_RGBA16161616F( unsigned short *pSrcImage
 	int srcSize = width * height * 4;
 	unsigned short *pSrcEnd = pSrcImage + srcSize;
 	unsigned short *pSrcScan = pSrcImage;
-	float16 *pDstScan = ( float16 * )pDstImage;
+	auto *pDstScan = ( float16 * )pDstImage;
 	for( ; pSrcScan < pSrcEnd; pSrcScan += 4, pDstScan += 4 )
 	{
 		pDstScan[0].SetFloat( pSrcScan[0] * ( 1.0f / ( float )( 1 << 16 ) ) );
@@ -1489,7 +1489,7 @@ bool ConvertImageFormat( const uint8 *src, ImageFormat srcImageFormat,
 		}
 		
 		// format conversion
-		uint8 *lineBufRGBA8888 = (uint8 *)_alloca(width*4);
+		auto *lineBufRGBA8888 = stackallocT(uint8, width*4);
 		
 		UserFormatToRGBA8888Func_t userFormatToRGBA8888Func;
 		RGBA8888ToUserFormatFunc_t RGBA8888ToUserFormatFunc;
@@ -1598,7 +1598,7 @@ void ConvertNormalMapRGBA8888ToDUDVMapUVLX8888( const uint8 *src, int width, int
 		dst[0] = ( char )( ( ( int )src[0] ) - 127 );
 		dst[1] = ( char )( ( ( int )src[1] ) - 127 );
 
-		uint8 *pUDst = (uint8 *)dst;
+		auto *pUDst = (uint8 *)dst;
 		pUDst[2] = src[3];
 		pUDst[3] = 0xFF;
 	}
@@ -1701,11 +1701,11 @@ bool FlipImageVertically( void *pSrc, void *pDst, int nWidth, int nHeight, Image
 		nDstStride = nRowBytes;
 	}
 
-	uint8 *pSrcRow = (uint8*)pSrc;
+	auto *pSrcRow = (uint8*)pSrc;
 	uint8 *pDstRow = (uint8*)pDst + ((nHeight-1) * nDstStride);
 	if ( pSrc == pDst )
 	{
-		uint8* pTemp = (uint8*)_alloca( nRowBytes );
+		auto* pTemp = stackallocT( uint8, nRowBytes );
 		int nHalfHeight = nHeight >> 1;
 		for ( int i = 0; i < nHalfHeight; i++ )
 		{
@@ -1746,8 +1746,8 @@ bool FlipImageHorizontally( void *pSrc, void *pDst, int nWidth, int nHeight, Ima
 	}
 
 	int x, y;
-	uint8 *pSrcRow = (uint8*)pSrc;
-	uint8 *pDstRow = (uint8*)pDst;
+	auto *pSrcRow = (uint8*)pSrc;
+	auto *pDstRow = (uint8*)pDst;
 	if ( pSrc == pDst )
 	{
 		int nHalfWidth = nWidth >> 1;
@@ -1965,7 +1965,7 @@ void RGBA8888ToBGRX8888( const uint8 *src, uint8 *dst, int numPixels )
 
 void RGBA8888ToBGR565( const uint8 *src, uint8 *dst, int numPixels )
 {
-	unsigned short* pDstShort = (unsigned short*)dst;
+	auto* pDstShort = (unsigned short*)dst;
 	const uint8 *endSrc = src + numPixels * 4;
 	for ( ; src < endSrc; src += 4, pDstShort ++ )
 	{
@@ -1977,7 +1977,7 @@ void RGBA8888ToBGR565( const uint8 *src, uint8 *dst, int numPixels )
 
 void RGBA8888ToBGRX5551( const uint8 *src, uint8 *dst, int numPixels )
 {
-	unsigned short* pDstShort = (unsigned short*)dst;
+	auto* pDstShort = (unsigned short*)dst;
 	const uint8 *endSrc = src + numPixels * 4;
 	for ( ; src < endSrc; src += 4, pDstShort ++ )
 	{
@@ -1989,7 +1989,7 @@ void RGBA8888ToBGRX5551( const uint8 *src, uint8 *dst, int numPixels )
 
 void RGBA8888ToBGRA5551( const uint8 *src, uint8 *dst, int numPixels )
 {
-	unsigned short* pDstShort = (unsigned short*)dst;
+	auto* pDstShort = (unsigned short*)dst;
 	const uint8 *endSrc = src + numPixels * 4;
 	for ( ; src < endSrc; src += 4, pDstShort ++ )
 	{
@@ -2002,7 +2002,7 @@ void RGBA8888ToBGRA5551( const uint8 *src, uint8 *dst, int numPixels )
 
 void RGBA8888ToBGRA4444( const uint8 *src, uint8 *dst, int numPixels )
 {
-	unsigned short* pDstShort = (unsigned short*)dst;
+	auto* pDstShort = (unsigned short*)dst;
 	const uint8 *endSrc = src + numPixels * 4;
 	for ( ; src < endSrc; src += 4, pDstShort ++ )
 	{
@@ -2187,7 +2187,7 @@ void BGRX8888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 
 void BGR565ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 {
-	unsigned short* pSrcShort = (unsigned short*)src;
+	auto* pSrcShort = (unsigned short*)src;
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
@@ -2205,7 +2205,7 @@ void BGR565ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 
 void BGRX5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 {
-	unsigned short* pSrcShort = (unsigned short*)src;
+	auto* pSrcShort = (unsigned short*)src;
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
@@ -2223,7 +2223,7 @@ void BGRX5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 
 void BGRA5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 {
-	unsigned short* pSrcShort = (unsigned short*)src;
+	auto* pSrcShort = (unsigned short*)src;
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
@@ -2250,7 +2250,7 @@ void BGRA5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 
 void BGRA4444ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 {
-	unsigned short* pSrcShort = (unsigned short*)src;
+	auto* pSrcShort = (unsigned short*)src;
 	unsigned short* pEndSrc = pSrcShort + numPixels;
 	for ( ; pSrcShort < pEndSrc; pSrcShort++, dst += 4 )
 	{
@@ -2293,7 +2293,7 @@ void UVLX8888ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 // HDRFIXME: This assumes that the 16-bit integer values are 4.12 fixed-point.
 void RGBA16161616ToRGBA8888( const uint8 *src_, uint8 *dst, int numPixels )
 {
-	unsigned short *src = ( unsigned short * )src_;
+	auto *src = ( unsigned short * )src_;
 	unsigned short *pEndSrc = src + numPixels * 4;
 	for ( ; src < pEndSrc; src += 4, dst += 4 )
 	{

@@ -256,7 +256,7 @@ void FloatBitMap_t::ReSize(int NewWidth, int NewHeight)
 	float SourceX, SourceY, Xfrac, Yfrac;
 	int Top, Bot, Left, Right;
 
-	float * RESTRICT newrgba=new float[NewWidth * NewHeight * 4];
+	auto * RESTRICT newrgba=new float[NewWidth * NewHeight * 4];
 	if (!newrgba)
 		Error( "Unable to allocate new bitmap %dx%d for resize from %dx%d.\n",
 			NewWidth, NewHeight, Width, Height );
@@ -401,7 +401,7 @@ FloatBitMap_t::~FloatBitMap_t()
 ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSize() const
 {
 	// generate a new bitmap half on each axis
-	FloatBitMap_t * RESTRICT newbm=new FloatBitMap_t(Width/2,Height/2);
+	auto * RESTRICT newbm=new FloatBitMap_t(Width/2,Height/2);
 	if (!newbm)
 		Error( "Unable to allocate new bitmap %dx%d.\n", Width/2, Height/2 );
 
@@ -415,10 +415,10 @@ ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSize() const
 	return newbm;
 }
 
-ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSizeBlocky(void) const
+ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSizeBlocky() const
 {
 	// generate a new bitmap half on each axis
-	FloatBitMap_t * RESTRICT newbm=new FloatBitMap_t(Width/2,Height/2);
+	auto * RESTRICT newbm=new FloatBitMap_t(Width/2,Height/2);
 	if (!newbm)
 		Error( "Unable to allocate new bitmap %dx%d.\n", Width/2, Height/2 );
 
@@ -431,7 +431,7 @@ ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSizeBlocky(void) const
 	return newbm;
 }
 
-Vector FloatBitMap_t::AverageColor(void) const
+Vector FloatBitMap_t::AverageColor() const
 {
 	Vector ret(0,0,0);
 	for(int y=0;y<Height;y++)
@@ -442,7 +442,7 @@ Vector FloatBitMap_t::AverageColor(void) const
 	return ret;
 }
 
-float FloatBitMap_t::BrightestColor(void) const
+float FloatBitMap_t::BrightestColor() const
 {
 	float ret=0.0;
 	for(int y=0;y<Height;y++)
@@ -463,7 +463,7 @@ void FloatBitMap_t::RaiseToPower(float power) const
 
 }
 
-void FloatBitMap_t::Logize(void) const
+void FloatBitMap_t::Logize() const
 {
 	for(int y=0;y<Height;y++)
 		for(int x=0;x<Width;x++)
@@ -472,7 +472,7 @@ void FloatBitMap_t::Logize(void) const
 
 }
 
-void FloatBitMap_t::UnLogize(void) const
+void FloatBitMap_t::UnLogize() const
 {
 	for(int y=0;y<Height;y++)
 		for(int x=0;x<Width;x++)
@@ -573,7 +573,7 @@ void FloatBitMap_t::SmartPaste(FloatBitMap_t const &b, int xofs, int yofs, uint3
 	Poisson(deltas,6000,Flags);
 }
 
-void FloatBitMap_t::ScaleGradients(void)
+void FloatBitMap_t::ScaleGradients()
 {
 	// now, need to make Difference map
 	FloatBitMap_t DiffMap0(this);
@@ -602,10 +602,10 @@ void FloatBitMap_t::ScaleGradients(void)
 		for(int y=0;y<Height;y++)
 			for(int c=0;c<3;c++)
 			{
-				for(int i=0;i<NDELTAS;i++)
+				for(auto &delta : deltas)
 				{
-					float norml=1.1f*deltas[i]->Pixel(x,y,c);
-					deltas[i]->Pixel(x,y,c)=norml;
+					float norml=1.1f*delta->Pixel(x,y,c);
+					delta->Pixel(x,y,c)=norml;
 				}
 			}
 
@@ -628,7 +628,7 @@ void FloatBitMap_t::ScaleGradients(void)
 
 
 
-void FloatBitMap_t::MakeTileable(void) const
+void FloatBitMap_t::MakeTileable() const
 {
 	FloatBitMap_t rslta(this);
 	// now, need to make Difference map
@@ -770,8 +770,8 @@ void FloatBitMap_t::Poisson(FloatBitMap_t *deltas[4],
 			Warning("Unable to write submerged TGA '%s'.\n", fname);
 
 		delete tmp;
-		for(int i=0;i<NDELTAS;i++)
-			delete lowdeltas[i];
+		for(auto &lowdelta : lowdeltas)
+			delete lowdelta;
 	}
 	FloatBitMap_t work1(this);
 	FloatBitMap_t work2(this);

@@ -9,10 +9,6 @@
 #ifndef FLOAT_BM_H
 #define FLOAT_BM_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <algorithm>  // clamp
 #include <cstring>
 #include <utility>    // min, max
@@ -190,7 +186,7 @@ public:
 	void SmartPaste(FloatBitMap_t const &brush, int xofs, int yofs, uint32 flags);
 
 	// force to be tileable using poisson formula
-	void MakeTileable(void) const;
+	void MakeTileable() const;
 
 	void ReSize(int NewXSize, int NewYSize);
 
@@ -212,9 +208,9 @@ public:
 
 
 	void RaiseToPower(float pow) const;
-	void ScaleGradients(void);
-	void Logize(void) const;                                        // pix=log(1+pix)
-	void UnLogize(void) const;                                      // pix=exp(pix)-1
+	void ScaleGradients();
+	void Logize() const;                                        // pix=log(1+pix)
+	void UnLogize() const;                                      // pix=exp(pix)-1
 
 	// compress to 8 bits converts the hdr texture to an 8 bit texture, encoding a scale factor
 	// in the alpha channel. upon return, the original pixel can be (approximately) recovered
@@ -278,8 +274,8 @@ public:
 	FloatCubeMap_t(int xfsize, int yfsize)
 	{
 		// make an empty one with face dimensions xfsize x yfsize
-		for(int f=0;f<6;f++)
-			face_maps[f].AllocateRGB(xfsize,yfsize);
+		for(auto &face_map : face_maps)
+			face_map.AllocateRGB(xfsize,yfsize);
 	}
 
 	// load basenamebk,pfm, basenamedn.pfm, basenameft.pfm, ...

@@ -145,7 +145,7 @@ intp GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, 
 
 	// Mipmap version
 	intp memSize = 0;
-	while ( 1 )
+	while ( true )
 	{
 		memSize += GetMemRequired( width, height, depth, imageFormat, false );
 		if ( width == 1 && height == 1 && depth == 1 )
@@ -231,7 +231,7 @@ int GetNumMipMapLevels( int width, int height, int depth )
 		return 0;
 
 	int numMipLevels = 1;
-	while( 1 )
+	while( true )
 	{
 		if( width == 1 && height == 1 && depth == 1 )
 			break;

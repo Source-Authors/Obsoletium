@@ -35,7 +35,7 @@ static constexpr float kernel[] = {.05f, .25f, .4f, .25f, .05f};
 ALLOC_CALL FloatBitMap_t *FloatBitMap_t::QuarterSizeWithGaussian() const
 {
 	// generate a new bitmap half on each axis, using a separable gaussian.
-	FloatBitMap_t *newbm=new FloatBitMap_t(Width/2,Height/2);
+	auto *newbm=new FloatBitMap_t(Width/2,Height/2);
 	if (!newbm)
 		Error( "Unable to allocate new bitmap %dx%d.\n", Width/2, Height/2 );
 	

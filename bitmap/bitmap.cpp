@@ -136,14 +136,14 @@ Color Bitmap_t::GetColor( int x, int y ) const
 	switch ( m_ImageFormat )
 	{
 		case IMAGE_FORMAT_RGBA8888:
-			return Color( ptr[0], ptr[1], ptr[2], ptr[3] );
+			return { ptr[0], ptr[1], ptr[2], ptr[3] };
 
 		case IMAGE_FORMAT_ABGR8888:
-			return Color( ptr[3], ptr[2], ptr[1], ptr[0] );
+			return { ptr[3], ptr[2], ptr[1], ptr[0] };
 
 		default:
 			AssertMsg( false, "Unsupport image format!");
-			return Color( 255,0,255,255 );
+			return { 255,0,255,255 };
 	}
 }
 
