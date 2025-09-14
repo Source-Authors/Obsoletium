@@ -24,7 +24,7 @@ const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName 
 	return g_pMDLCache->GetStudioHdr( handle );
 }
 
-virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
+virtualmodel_t *studiohdr_t::GetVirtualModel( ) const
 {
 	return g_pMDLCache->GetVirtualModel( (MDLHandle_t)((intp)virtualModel&0xffff) );
 }
@@ -39,13 +39,13 @@ intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 	return g_pMDLCache->GetAutoplayList( (MDLHandle_t)((intp)virtualModel&0xffff), pOut );
 }
 
-const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
+const studiohdr_t *virtualgroup_t::GetStudioHdr( ) const
 {
 	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)((intp)cache&0xffff) );
 }
 
 // dimhotepus: Add const-correct API.
-studiohdr_t *virtualgroup_t::GetStudioHdr( void )
+studiohdr_t *virtualgroup_t::GetStudioHdr( )
 {
 	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)((intp)cache&0xffff) );
 }

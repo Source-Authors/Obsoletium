@@ -7,11 +7,6 @@
 #ifndef CHOREOUTILS_H
 #define CHOREOUTILS_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
-
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------

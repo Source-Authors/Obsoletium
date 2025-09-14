@@ -8,11 +8,7 @@
 #ifndef TIER3DM_H
 #define TIER3DM_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
-#include "tier3/tier3.h"
+#include "tier3.h"
 #include "tier2/tier2dm.h"
 
 //-----------------------------------------------------------------------------
@@ -21,7 +17,7 @@
 template< class IInterface, int ConVarFlag = 0 > 
 class CTier3DmAppSystem : public CTier2DmAppSystem< IInterface, ConVarFlag >
 {
-	typedef CTier2DmAppSystem< IInterface, ConVarFlag > BaseClass;
+	using BaseClass = CTier2DmAppSystem<IInterface, ConVarFlag>;
 
 public:
 	CTier3DmAppSystem( bool bIsPrimaryAppSystem = true ) : BaseClass(	bIsPrimaryAppSystem )

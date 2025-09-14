@@ -8,10 +8,6 @@
 #ifndef TIER3_H
 #define TIER3_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 #include "tier2/tier2.h"
 
 
@@ -80,7 +76,7 @@ void DisconnectTier3Libraries();
 template< class IInterface, int ConVarFlag = 0 > 
 class CTier3AppSystem : public CTier2AppSystem< IInterface, ConVarFlag >
 {
-	typedef CTier2AppSystem< IInterface, ConVarFlag > BaseClass;
+	using BaseClass = CTier2AppSystem<IInterface, ConVarFlag>;
 
 public:
 	CTier3AppSystem( bool bIsPrimaryAppSystem = true ) : BaseClass(	bIsPrimaryAppSystem )
