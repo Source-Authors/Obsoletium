@@ -26,17 +26,13 @@
 #ifndef VMATRIX_H
 #define VMATRIX_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <DirectXMath.h>
 #include <cstring>
 
-#include "mathlib/vector.h"
-#include "mathlib/vplane.h"
-#include "mathlib/vector4d.h"
-#include "mathlib/mathlib.h"
+#include "vector.h"
+#include "vplane.h"
+#include "vector4d.h"
+#include "mathlib.h"
 
 struct cplane_t;
 
@@ -583,17 +579,17 @@ inline void VMatrix::Init( const matrix3x4_t& matrix3x4 )
 
 inline Vector VMatrix::GetForward() const
 {
-	return Vector(m[0][0], m[1][0], m[2][0]);
+	return {m[0][0], m[1][0], m[2][0]};
 }
 
 inline Vector VMatrix::GetLeft() const
 {
-	return Vector(m[0][1], m[1][1], m[2][1]);
+	return {m[0][1], m[1][1], m[2][1]};
 }
 
 inline Vector VMatrix::GetUp() const
 {
-	return Vector(m[0][2], m[1][2], m[2][2]);
+	return {m[0][2], m[1][2], m[2][2]};
 }
 
 #endif
@@ -641,7 +637,7 @@ inline void VMatrix::SetBasisVectors(const Vector &vForward, const Vector &vLeft
 
 inline Vector VMatrix::GetTranslation() const
 {
-	return Vector(m[0][3], m[1][3], m[2][3]);
+	return {m[0][3], m[1][3], m[2][3]};
 }
 
 #endif
@@ -794,29 +790,29 @@ inline Vector VMatrix::VMul4x3Transpose(const Vector &vVec) const
 	tmp.y -= m[1][3];
 	tmp.z -= m[2][3];
 
-	return Vector(
+	return {
 		m[0][0]*tmp.x + m[1][0]*tmp.y + m[2][0]*tmp.z,
 		m[0][1]*tmp.x + m[1][1]*tmp.y + m[2][1]*tmp.z,
 		m[0][2]*tmp.x + m[1][2]*tmp.y + m[2][2]*tmp.z
-		);
+	};
 }
 
 inline Vector VMatrix::VMul3x3(const Vector &vVec) const
 {
-	return Vector(
+	return {
 		m[0][0]*vVec.x + m[0][1]*vVec.y + m[0][2]*vVec.z,
 		m[1][0]*vVec.x + m[1][1]*vVec.y + m[1][2]*vVec.z,
 		m[2][0]*vVec.x + m[2][1]*vVec.y + m[2][2]*vVec.z
-		);
+	};
 }
 
 inline Vector VMatrix::VMul3x3Transpose(const Vector &vVec) const
 {
-	return Vector(
+	return {
 		m[0][0]*vVec.x + m[1][0]*vVec.y + m[2][0]*vVec.z,
 		m[0][1]*vVec.x + m[1][1]*vVec.y + m[2][1]*vVec.z,
 		m[0][2]*vVec.x + m[1][2]*vVec.y + m[2][2]*vVec.z
-		);
+	};
 }
 
 #endif // VECTOR_NO_SLOW_OPERATIONS

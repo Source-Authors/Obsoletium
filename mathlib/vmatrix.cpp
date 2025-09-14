@@ -27,31 +27,32 @@
 
 VMatrix SetupMatrixIdentity()
 {
-	return VMatrix(
+	return {
 		1.0f, 0.0f, 0.0f, 0.0f,
 		0.0f, 1.0f, 0.0f, 0.0f,
 		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f);
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
 }
 
 VMatrix SetupMatrixTranslation(const Vector &vTranslation)
 {
-	return VMatrix(
+	return {
 		1.0f, 0.0f, 0.0f, vTranslation.x,
 		0.0f, 1.0f, 0.0f, vTranslation.y,
 		0.0f, 0.0f, 1.0f, vTranslation.z,
 		0.0f, 0.0f, 0.0f, 1.0f
-		);
+	};
 }
 
 VMatrix SetupMatrixScale(const Vector &vScale)
 {
-	return VMatrix(
+	return {
 		vScale.x, 0.0f,     0.0f,     0.0f,
 		0.0f,     vScale.y, 0.0f,     0.0f,
 		0.0f,     0.0f,     vScale.z, 0.0f,
 		0.0f,     0.0f,     0.0f,     1.0f
-		);
+	};
 }
 
 VMatrix SetupMatrixReflection(const VPlane &thePlane)
@@ -132,11 +133,12 @@ VMatrix SetupMatrixAxisRot(const Vector &vAxis, vec_t fDegrees)
 	tx = t * vAxis.x;	ty = t * vAxis.y;	tz = t * vAxis.z;
 	sx = s * vAxis.x;	sy = s * vAxis.y;	sz = s * vAxis.z;
 
-	return VMatrix(
+	return {
 		tx*vAxis.x + c,  tx*vAxis.y - sz, tx*vAxis.z + sy, 0.0f,
 		tx*vAxis.y + sz, ty*vAxis.y + c,  ty*vAxis.z - sx, 0.0f,
 		tx*vAxis.z - sy, ty*vAxis.z + sx, tz*vAxis.z + c,  0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f);
+		0.0f, 0.0f, 0.0f, 1.0f
+	};
 }
 
 VMatrix SetupMatrixAngles(const QAngle &vAngles)
@@ -391,21 +393,21 @@ Vector VMatrix::GetScale() const
 
 	GetBasisVectors(vecs[0], vecs[1], vecs[2]);
 
-	return Vector(
+	return {
 		vecs[0].Length(),
 		vecs[1].Length(),
 		vecs[2].Length()
-		);
+	};
 }
 
 VMatrix VMatrix::Scale(const Vector &vScale)
 {
-	return VMatrix(
+	return {
 		m[0][0]*vScale.x, m[0][1]*vScale.y, m[0][2]*vScale.z, m[0][3],
 		m[1][0]*vScale.x, m[1][1]*vScale.y, m[1][2]*vScale.z, m[1][3],
 		m[2][0]*vScale.x, m[2][1]*vScale.y, m[2][2]*vScale.z, m[2][3],
 		m[3][0]*vScale.x, m[3][1]*vScale.y, m[3][2]*vScale.z, 1.0f
-		);
+	};
 }
 
 VMatrix VMatrix::NormalizeBasisVectors() const
@@ -431,21 +433,23 @@ VMatrix VMatrix::NormalizeBasisVectors() const
 
 VMatrix VMatrix::Transpose() const
 {
-	return VMatrix(
+	return {
 		m[0][0], m[1][0], m[2][0], m[3][0],
 		m[0][1], m[1][1], m[2][1], m[3][1],
 		m[0][2], m[1][2], m[2][2], m[3][2],
-		m[0][3], m[1][3], m[2][3], m[3][3]);
+		m[0][3], m[1][3], m[2][3], m[3][3]
+	};
 }
 
 // Transpose upper-left 3x3.
 VMatrix VMatrix::Transpose3x3() const
 {
-	return VMatrix(
+	return {
 		m[0][0], m[1][0], m[2][0], m[0][3],
 		m[0][1], m[1][1], m[2][1], m[1][3],
 		m[0][2], m[1][2], m[2][2], m[2][3],
-		m[3][0], m[3][1], m[3][2], m[3][3]);
+		m[3][0], m[3][1], m[3][2], m[3][3]
+	};
 }
 
 #endif // VECTOR_NO_SLOW_OPERATIONS
@@ -453,9 +457,9 @@ VMatrix VMatrix::Transpose3x3() const
 
 bool VMatrix::IsRotationMatrix() const
 {
-	Vector &v1 = (Vector&)m[0][0];
-	Vector &v2 = (Vector&)m[1][0];
-	Vector &v3 = (Vector&)m[2][0];
+	auto &v1 = (Vector&)m[0][0];
+	auto &v2 = (Vector&)m[1][0];
+	auto &v3 = (Vector&)m[2][0];
 
 	return 
 		FloatMakePositive( 1 - v1.Length() ) < 0.01f && 

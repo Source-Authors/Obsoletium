@@ -8,7 +8,8 @@
 #ifndef MATRIXMATH_H
 #define MATRIXMATH_H
 
-#include <stdarg.h>
+#include <cstdarg>
+#include "tier0/platform.h"
 
 // The operations in this file can perform basic matrix operations on matrices represented
 // using any class that supports the necessary operations:
@@ -169,14 +170,14 @@ namespace MatrixMath
 			m_nRow = nRow;
 		}
 
-		FORCEINLINE float Element( int nRow, int nCol ) const
+		[[nodiscard]] FORCEINLINE float Element( int nRow, int nCol ) const
 		{
 			Assert( nCol == 0 );
 			return m_pMatrix->Element( m_nRow, nRow );
 		}
 
-		FORCEINLINE int Width( void ) const { return 1; };
-		FORCEINLINE int Height( void ) const { return m_pMatrix->Width(); }
+		[[nodiscard]] FORCEINLINE int Width( ) const { return 1; };
+		[[nodiscard]] FORCEINLINE int Height( ) const { return m_pMatrix->Width(); }
 
 	private:
 		MATRIXTYPE const *m_pMatrix;
@@ -192,14 +193,14 @@ namespace MatrixMath
 			m_nColumn = nColumn;
 		}
 
-		FORCEINLINE float Element( int nRow, int nColumn ) const
+		[[nodiscard]] FORCEINLINE float Element( int nRow, int nColumn ) const
 		{
 			Assert( nColumn == 0 );
 			return m_pMatrix->Element( nRow, m_nColumn );
 		}
 
-		FORCEINLINE int Width( void ) const { return 1; }
-		FORCEINLINE int Height( void ) const { return m_pMatrix->Height(); }
+		[[nodiscard]] FORCEINLINE int Width( ) const { return 1; }
+		[[nodiscard]] FORCEINLINE int Height( ) const { return m_pMatrix->Height(); }
 	private:
 		MATRIXTYPE const *m_pMatrix;
 		int m_nColumn;
@@ -214,13 +215,13 @@ namespace MatrixMath
 			m_pMatrix = &matrix;
 		}
 
-		FORCEINLINE float Element( int nRow, int nColumn ) const
+		[[nodiscard]] FORCEINLINE float Element( int nRow, int nColumn ) const
 		{
 			return m_pMatrix->Element( nColumn, nRow );
 		}
 
-		FORCEINLINE int Width( void ) const { return m_pMatrix->Height(); }
-		FORCEINLINE int Height( void ) const { return m_pMatrix->Width(); }
+		[[nodiscard]] FORCEINLINE int Width( ) const { return m_pMatrix->Height(); }
+		[[nodiscard]] FORCEINLINE int Height( ) const { return m_pMatrix->Width(); }
 	private:
 		MATRIXTYPE const *m_pMatrix;
 	};
@@ -370,9 +371,9 @@ namespace MatrixMath
 template<int NUMROWS, int NUMCOLS> class CFixedMatrix
 {
 public:
-	FORCEINLINE int Width( void ) const { return NUMCOLS; }
-	FORCEINLINE int Height( void ) const { return NUMROWS; }
-	FORCEINLINE float Element( int nRow, int nCol ) const { return m_flValues[nRow][nCol]; }
+	[[nodiscard]] FORCEINLINE int Width( ) const { return NUMCOLS; }
+	[[nodiscard]] FORCEINLINE int Height( ) const { return NUMROWS; }
+	[[nodiscard]] FORCEINLINE float Element( int nRow, int nCol ) const { return m_flValues[nRow][nCol]; }
 	FORCEINLINE void SetElement( int nRow, int nCol, float flValue ) { m_flValues[nRow][nCol] = flValue; }
 	FORCEINLINE void SetDimensions( int nNumRows, int nNumCols ) { Assert( ( nNumRows == NUMROWS ) && ( nNumCols == NUMCOLS ) ); }
 

@@ -22,7 +22,9 @@
 
 #include "noisedata.h"
 
-#define N_IMPULSES_PER_CELL 5
+enum {
+  N_IMPULSES_PER_CELL = 5
+};
 
 //(0.5/N_IMPULSES_PER_CELL)
 

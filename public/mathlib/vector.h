@@ -9,10 +9,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <DirectXMath.h>
 
 #include <cstdlib>  // rand
@@ -21,8 +17,8 @@
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
 
-#include "mathlib/vector2d.h"
-#include "mathlib/math_pfns.h"
+#include "vector2d.h"
+#include "math_pfns.h"
 
 // Uncomment this to add extra Asserts to check for NANs, uninitialized vecs, etc.
 //#define VECTOR_PARANOIA	1
@@ -540,7 +536,7 @@ void XM_CALLCONV VectorLerp(const Vector& src1, const Vector& src2, vec_t t, Vec
 
 [[nodiscard]] FORCEINLINE Vector XM_CALLCONV ReplicateToVector( float x )
 {
-	return Vector( x, x, x );
+	return { x, x, x };
 }
 
 // check if a point is in the field of a view of an object. supports up to 180 degree fov.
@@ -1474,7 +1470,7 @@ inline vec_t DotProductAbs( const Vector &v0, const float *v1 ) = delete;
 }
 
 
-inline vec_t Vector::Length(void) const
+inline vec_t Vector::Length() const
 {
 	CHECK_VALID(*this);
 	return VectorLength( *this );
@@ -1596,7 +1592,7 @@ inline Vector Vector::Max(const Vector &vOther) const
 // arithmetic operations
 //-----------------------------------------------------------------------------
 
-inline Vector Vector::operator-(void) const
+inline Vector Vector::operator-() const
 { 
 	DirectX::XMVECTOR result = DirectX::XMVectorNegate
 	(
@@ -1670,12 +1666,12 @@ inline Vector Vector::Cross(const Vector& vOther) const
 // 2D
 //-----------------------------------------------------------------------------
 
-inline vec_t Vector::Length2D(void) const
+inline vec_t Vector::Length2D() const
 { 
 	return FastSqrt(x*x + y*y); 
 }
 
-inline vec_t Vector::Length2DSqr(void) const
+inline vec_t Vector::Length2DSqr() const
 { 
 	return (x*x + y*y); 
 }
@@ -1745,7 +1741,7 @@ inline bool operator!=( const Vector&, float const* ) = delete;
 // AngularImpulse
 //-----------------------------------------------------------------------------
 // AngularImpulse are exponetial maps (an axis scaled by a "twist" angle in degrees)
-typedef Vector AngularImpulse;
+using AngularImpulse = Vector;
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
@@ -1945,7 +1941,7 @@ public:
 
 	// Conversion to qangle
 	[[nodiscard]] QAngle XM_CALLCONV ToQAngle() const;
-	bool XM_CALLCONV IsValid() const;
+	[[nodiscard]] bool XM_CALLCONV IsValid() const;
 	void Invalidate();
 
 	// array access...
@@ -2161,7 +2157,7 @@ class QAngleByValue : public QAngle
 {
 public:
 	// Construction/destruction:
-	QAngleByValue(void) : QAngle() {} 
+	QAngleByValue() : QAngle() {} 
 	QAngleByValue(vec_t X, vec_t Y, vec_t Z) : QAngle( X, Y, Z ) {}
 	QAngleByValue(const QAngleByValue& vOther) = default;
 };

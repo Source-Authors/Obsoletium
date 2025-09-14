@@ -9,10 +9,6 @@
 #ifndef VECTOR4D_H
 #define VECTOR4D_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <DirectXMath.h>
 
 #include <cmath>
@@ -22,8 +18,8 @@
 #include "tier0/dbg.h"
 #include "tier0/memalloc.h"  // CAlignedNewDelete<X>
 
-#include "mathlib/vector.h"
-#include "mathlib/math_pfns.h"
+#include "vector.h"
+#include "math_pfns.h"
 
 // forward declarations
 class Vector;
@@ -185,7 +181,7 @@ public:
 	// dimhotepus: Unsafe cast. Use XmBase.
 	inline DirectX::XMVECTOR& XM_CALLCONV AsM128() = delete; // { return *(DirectX::XMVECTOR*)&x; }
 	// dimhotepus: Unsafe cast. Use XmBase.
-	inline const DirectX::XMVECTOR& XM_CALLCONV AsM128() const = delete; // { return *(const DirectX::XMVECTOR*)&x; }
+	[[nodiscard]] inline const DirectX::XMVECTOR& XM_CALLCONV AsM128() const = delete; // { return *(const DirectX::XMVECTOR*)&x; }
 
 	// dimhotepus: Better DirectX math integration.
 	[[nodiscard]] DirectX::XMFLOAT4A* XM_CALLCONV XmBase()
@@ -200,8 +196,7 @@ public:
 		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(Vector4DAligned));
 		return reinterpret_cast<DirectX::XMFLOAT4A const*>(this);
 	}
-
-private:
+	
 	// No copy constructors allowed if we're in optimal mode
 	Vector4DAligned( Vector4DAligned const& vOther ) = delete;
 

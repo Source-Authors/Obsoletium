@@ -9,10 +9,6 @@
 #ifndef COMPRESSED_VECTOR_H
 #define COMPRESSED_VECTOR_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <cmath>
 #include <cfloat>
 
@@ -23,9 +19,9 @@
 #include <cstdlib>
 
 #include "tier0/dbg.h"
-#include "mathlib/vector.h"
 
-#include "mathlib/mathlib.h"
+#include "vector.h"
+#include "mathlib.h"
 
 // Fit a 3D vector into 32 bits
 class Vector32
@@ -409,7 +405,7 @@ protected:
 			{
 				// this maps to a denorm
 				output.bits.biased_exponent = 0;
-				unsigned int exp_val = ( unsigned int )( -14 - ( inFloat.bits.biased_exponent - float32bias ) );
+				auto exp_val = ( unsigned int )( -14 - ( inFloat.bits.biased_exponent - float32bias ) );
 				if( exp_val > 0 && exp_val < 11 )
 				{
 					output.bits.mantissa = ( 1 << ( 10 - exp_val ) ) + ( inFloat.bits.mantissa >> ( 13 + exp_val ) );

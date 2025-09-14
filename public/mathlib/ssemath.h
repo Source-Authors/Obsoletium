@@ -9,8 +9,8 @@
 #include <DirectXMath.h>
 #include <xmmintrin.h>
 
-#include <mathlib/vector.h>
-#include <mathlib/mathlib.h>
+#include "vector.h"
+#include "mathlib.h"
 
 #define USE_STDC_FOR_SIMD 0
 
@@ -36,9 +36,9 @@ typedef fltx4 u32x4;
 
 #else
 
-typedef DirectX::XMVECTOR fltx4;
-typedef DirectX::XMVECTOR i32x4;
-typedef DirectX::XMVECTOR u32x4;
+using fltx4 = DirectX::XMVECTOR;
+using i32x4 = DirectX::XMVECTOR;
+using u32x4 = DirectX::XMVECTOR;
 
 #endif
 
@@ -72,7 +72,7 @@ struct alignas(16) intx4 : public CAlignedNewDelete<16>
 		return m_i32;
 	}
 
-	inline const int32 *Base() const
+	[[nodiscard]] inline const int32 *Base() const
 	{
 		return m_i32;
 	}
@@ -1773,14 +1773,14 @@ public:
 		y=MulSIMD(y,b.y);
 		z=MulSIMD(z,b.z);
 	}
-	FORCEINLINE void MakeReciprocal(void)						//< (x,y,z)=(1/x,1/y,1/z)
+	FORCEINLINE void MakeReciprocal()						//< (x,y,z)=(1/x,1/y,1/z)
 	{
 		x=ReciprocalSIMD(x);
 		y=ReciprocalSIMD(y);
 		z=ReciprocalSIMD(z);
 	}
 
-	FORCEINLINE void MakeReciprocalSaturate(void)				//< (x,y,z)=(1/x,1/y,1/z), 1/0=1.0e23
+	FORCEINLINE void MakeReciprocalSaturate()				//< (x,y,z)=(1/x,1/y,1/z), 1/0=1.0e23
 	{
 		x=ReciprocalSaturateSIMD(x);
 		y=ReciprocalSaturateSIMD(y);
@@ -1855,7 +1855,7 @@ public:
 	[[nodiscard]]
 	FORCEINLINE Vector XM_CALLCONV Vec(int idx) const						//< unpack one of the vectors
 	{
-		return Vector( X(idx), Y(idx), Z(idx) );
+		return { X(idx), Y(idx), Z(idx) };
 	}
 	
 	FourVectors() = default;
@@ -1922,20 +1922,20 @@ public:
 
 	/// return the squared length of all 4 vectors
 	[[nodiscard]]
-	FORCEINLINE fltx4 XM_CALLCONV length2(void) const
+	FORCEINLINE fltx4 XM_CALLCONV length2() const
 	{
 		return (*this)*(*this);
 	}
 
 	/// return the approximate length of all 4 vectors. uses the sqrt approximation instruction
 	[[nodiscard]]
-	FORCEINLINE fltx4 XM_CALLCONV length(void) const
+	FORCEINLINE fltx4 XM_CALLCONV length() const
 	{
 		return SqrtEstSIMD(length2());
 	}
 
 	/// normalize all 4 vectors in place. not mega-accurate (uses reciprocal approximation instruction)
-	FORCEINLINE void VectorNormalizeFast(void)
+	FORCEINLINE void VectorNormalizeFast()
 	{
 		fltx4 mag_sq=(*this)*(*this);						// length^2
 		// dimhotepus: Ensure no zero division.
@@ -1943,7 +1943,7 @@ public:
 	}
 
 	/// normalize all 4 vectors in place.
-	FORCEINLINE void VectorNormalize(void)
+	FORCEINLINE void VectorNormalize()
 	{
 		fltx4 mag_sq=(*this)*(*this);						// length^2
 		// dimhotepus: Ensure no zero division.

@@ -8,6 +8,7 @@
 #define MATH_LIB_H
 
 #include <DirectXMath.h>
+#include <algorithm>
 #include <cmath>
 
 #include "minmax.h"
@@ -15,10 +16,10 @@
 #include "tier0/commonmacros.h"
 #include "tier0/dbg.h"
 
-#include "mathlib/vector.h"
-#include "mathlib/vector2d.h"
-#include "mathlib/vplane.h"
-#include "mathlib/math_pfns.h"
+#include "vector.h"
+#include "vector2d.h"
+#include "vplane.h"
+#include "math_pfns.h"
 
 
 // Uncomment this to enable FP exceptions in parts of the code.
@@ -50,8 +51,7 @@ private:
 	FPExceptionDisabler() = default;
 	~FPExceptionDisabler() = default;
 #endif
-
-private:
+	
 	// Make the copy constructor and assignment operator private
 	// and unimplemented to prohibit copying.
 	FPExceptionDisabler(const FPExceptionDisabler&) = delete;
@@ -79,8 +79,7 @@ private:
 	}
 	~FPExceptionEnabler() = default;
 #endif
-
-private:
+	
 	// Make the copy constructor and assignment operator private
 	// and unimplemented to prohibit copying.
 	FPExceptionEnabler(const FPExceptionEnabler&) = delete;
@@ -235,11 +234,11 @@ struct matrix3x4_t
 
 	inline void Invalidate()
 	{
-		for (int i = 0; i < 3; i++)
+		for (auto &i : m_flMatVal)
 		{
-			for (int j = 0; j < 4; j++) //-V112
+			for (float &j : i) //-V112
 			{
-				m_flMatVal[i][j] = VEC_T_NAN;
+				j = VEC_T_NAN;
 			}
 		}
 	}
@@ -354,7 +353,7 @@ FORCEINLINE float VectorMaximum(const vec_t *v) = delete;
 
 [[nodiscard]] FORCEINLINE float XM_CALLCONV VectorMaximum(const Vector& v)
 {
-	return max( v.x, max( v.y, v.z ) );
+	return max( {v.x, v.y, v.z } );
 }
 
 FORCEINLINE void XM_CALLCONV VectorScale (const float* in, vec_t scale, float* out)
@@ -1582,7 +1581,7 @@ inline void XM_CALLCONV GetBarycentricCoords2D(
 
 FORCEINLINE void XM_CALLCONV ColorClamp( Vector& color )
 {
-	float maxc = max( color.x, max( color.y, color.z ) );
+	float maxc = max( {color.x, color.y, color.z } );
 	if ( maxc > 1.0f )
 	{
 		float ooMax = 1.0f / maxc;
@@ -1871,10 +1870,10 @@ void  XM_CALLCONV CalcClosestPointOnLineSegment2D( Vector2D const &P, Vector2D c
 
 // Init the mathlib
 void XM_CALLCONV MathLib_Init( float gamma = 2.2f, float texGamma = 2.2f, float brightness = 0.0f, int overbright = 2.0f, bool bAllow3DNow = true, bool bAllowSSE = true, bool bAllowSSE2 = true, bool bAllowMMX = true );
-[[nodiscard]] bool XM_CALLCONV MathLib_3DNowEnabled( void );
-[[nodiscard]] bool XM_CALLCONV MathLib_MMXEnabled( void );
-[[nodiscard]] bool XM_CALLCONV MathLib_SSEEnabled( void );
-[[nodiscard]] bool XM_CALLCONV MathLib_SSE2Enabled( void );
+[[nodiscard]] bool XM_CALLCONV MathLib_3DNowEnabled( );
+[[nodiscard]] bool XM_CALLCONV MathLib_MMXEnabled( );
+[[nodiscard]] bool XM_CALLCONV MathLib_SSEEnabled( );
+[[nodiscard]] bool XM_CALLCONV MathLib_SSE2Enabled( );
 
 [[nodiscard]] float XM_CALLCONV Approach( float target, float value, float speed );
 [[nodiscard]] float XM_CALLCONV ApproachAngle( float target, float value, float speed );
@@ -2102,8 +2101,8 @@ FORCEINLINE unsigned int * XM_CALLCONV PackNormal_SHORT2( float nx, float ny, fl
 	ny *= binormalSign;			// Set the sign bit for the binormal (use when encoding a tangent vector)
 
 	// FIXME: short math is slow on 360 - use ints here instead (bit-twiddle to deal w/ the sign bits), also use Float2Int()
-	short sX = (short)nx;		// signed short [1,32767]
-	short sY = (short)ny;
+	auto sX = (short)nx;		// signed short [1,32767]
+	auto sY = (short)ny;
 
 	*pPackedNormal = ( sX & 0x0000FFFF ) | ( sY << 16 ); // NOTE: The mask is necessary (if sX is negative and cast to an int...)
 
@@ -2215,8 +2214,8 @@ FORCEINLINE unsigned int * XM_CALLCONV PackNormal_UBYTE4( float nx, float ny, fl
 	xbits += 128.0f;								// 0..255 range
 	ybits += 128.0f;
 
-	unsigned char cX = (unsigned char) xbits;
-	unsigned char cY = (unsigned char) ybits;
+	auto cX = (unsigned char) xbits;
+	auto cY = (unsigned char) ybits;
 
 	if ( !bIsTangent )
 		*pPackedNormal = (cX <<  0) | (cY <<  8);	// xy for normal

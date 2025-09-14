@@ -244,7 +244,7 @@ static void UpdateWorst(QuantizedValue *q)
 	}
 }
 
-static int FindWorst(void)
+static int FindWorst()
 {
 	ErrorVal=-1.;
 	UpdateWorst(current_root);
@@ -545,7 +545,7 @@ void DownHeap(int k, FHeap *h)
 
 void *RemoveHeapItem(FHeap *h)
 {
-  void *ret=0;
+  void *ret=nullptr;
   if (h->heap_n!=0)
     {
       ret=h->heap[1];

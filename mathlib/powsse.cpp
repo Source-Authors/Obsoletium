@@ -25,7 +25,7 @@ fltx4 XM_CALLCONV Pow_FixedPoint_Exponent_SIMD( DirectX::FXMVECTOR x, int expone
 	xp>>=2;													// strip fraction
 	fltx4 curpower=x;										// curpower iterates through  x,x^2,x^4,x^8,x^16...
 
-	while(1)
+	while(true)
 	{
 		if (xp & 1)
 			rslt=MulSIMD(rslt,curpower);

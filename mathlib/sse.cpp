@@ -4,7 +4,7 @@
 //
 //=====================================================================================//
 
-#include <float.h>	// Needed for FLT_EPSILON
+#include <cfloat>	// Needed for FLT_EPSILON
 #include <DirectXMath.h>
 
 #include "tier0/platform.h"

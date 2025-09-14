@@ -10,15 +10,10 @@
 #ifndef SIMDVECTORMATRIX_H
 #define SIMDVECTORMATRIX_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "tier1/utlsoacontainer.h"
-#include "mathlib/ssemath.h"
+#include "ssemath.h"
 
 class CSIMDVectorMatrix
 {
@@ -31,27 +26,27 @@ public:
 	FourVectors *m_pData;
 
 protected:
-	void Init( void )
+	void Init( )
 	{
-		m_pData = NULL;
+		m_pData = nullptr;
 		m_nWidth = 0;
 		m_nHeight = 0;
 		m_nPaddedWidth = 0;
 	}
 
-	[[nodiscard]] int NVectors( void ) const
+	[[nodiscard]] int NVectors( ) const
 	{
 		return m_nHeight * m_nPaddedWidth;
 	}
 
 public:
 	// constructors and destructors
-	CSIMDVectorMatrix( void )
+	CSIMDVectorMatrix( )
 	{
 		Init();
 	}
 
-	~CSIMDVectorMatrix( void )
+	~CSIMDVectorMatrix( )
 	{
 		delete[] m_pData;
 	}
@@ -67,7 +62,7 @@ public:
 			m_nHeight = height;
 			
 			m_nPaddedWidth = ( m_nWidth + 3) >> 2;
-			m_pData = NULL;
+			m_pData = nullptr;
 			if ( width && height )
 				m_pData = new FourVectors[ m_nPaddedWidth * m_nHeight ];
 		}
@@ -125,7 +120,7 @@ public:
 	}
 
 	// math operations on the whole image
-	void Clear( void )
+	void Clear( )
 	{
 		Assert( m_pData );
 		memset( m_pData, 0, m_nHeight*m_nPaddedWidth*sizeof(m_pData[0]) );

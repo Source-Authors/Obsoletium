@@ -6,13 +6,9 @@
 
 #ifndef ANORMS_H
 #define ANORMS_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-
-#include "mathlib/mathlib.h"
-#include "mathlib/vector.h"
+#include "mathlib.h"
+#include "vector.h"
 
 
 #define NUMVERTEXNORMALS	162

@@ -8,7 +8,9 @@
 #include "quantize.h"
 #include "minmax.h"
 
-#define N_EXTRAVALUES 1
+enum {
+  N_EXTRAVALUES = 1
+};
 #define N_DIMENSIONS (3+N_EXTRAVALUES)
 
 #define PIXEL(x,y,c) Image[4*((x)+((Width*(y))))+(c)]
@@ -20,7 +22,9 @@ static int ExtraValueXForms[3*N_EXTRAVALUES]={
 
   
 
-#define MAX_QUANTIZE_IMAGE_WIDTH 4096
+enum {
+  MAX_QUANTIZE_IMAGE_WIDTH = 4096
+};
 
 void ColorQuantize(uint8 const *Image,
 				   int Width,

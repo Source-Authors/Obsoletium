@@ -10,11 +10,7 @@
 #ifndef BUMPVECTS_H
 #define BUMPVECTS_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "mathlib/vector.h"
+#include "vector.h"
 
 constexpr inline float OO_SQRT_2{0.70710676908493042f};
 constexpr inline float OO_SQRT_3{0.57735025882720947f};
