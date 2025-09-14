@@ -80,7 +80,7 @@ enum JobStatusEnum_t
 	JOB_STATUS_UNSERVICED,		// file is not yet queued
 };
 
-typedef int JobStatus_t;
+using JobStatus_t = int;
 
 enum JobFlags_t
 {
@@ -102,7 +102,6 @@ struct ThreadPoolStartParams_t
 {
 	ThreadPoolStartParams_t( bool bIOThreads_ = false, unsigned nThreads_ = -1, int *pAffinities = nullptr, ThreeState_t fDistribute_ = TRS_NONE, unsigned nStackSize_ = -1, int iThreadPriority_ = SHRT_MIN )
 		: nThreads( nThreads_ ),
-		  nThreadsMax( -1 ),
 		  fDistribute( fDistribute_ ),
 		  nStackSize( nStackSize_ ),
 		  iThreadPriority( iThreadPriority_ ),
@@ -128,7 +127,7 @@ struct ThreadPoolStartParams_t
 	}
 
 	int				nThreads;
-	int				nThreadsMax;
+	int				nThreadsMax{ -1 };
 	ThreeState_t	fDistribute;
 	int				nStackSize;
 	int				iThreadPriority;
@@ -145,7 +144,7 @@ struct ThreadPoolStartParams_t
 //
 //-----------------------------------------------------------------------------
 
-typedef bool (*JobFilter_t)( CJob * );
+using JobFilter_t = bool (*)(CJob *);
 
 //---------------------------------------------------------
 // Messages supported through the CallWorker() method
@@ -162,7 +161,7 @@ enum ThreadPoolMessages_t
 abstract_class IThreadPool : public IRefCounted
 {
 public:
-	virtual ~IThreadPool() {};
+	virtual ~IThreadPool() = default;
 
 	//-----------------------------------------------------
 	// Thread functions
@@ -173,9 +172,9 @@ public:
 	//-----------------------------------------------------
 	// Functions for any thread
 	//-----------------------------------------------------
-	virtual unsigned GetJobCount() const = 0;
-	virtual intp NumThreads() const = 0;
-	virtual intp NumIdleThreads() const = 0;
+	[[nodiscard]] virtual unsigned GetJobCount() const = 0;
+	[[nodiscard]] virtual intp NumThreads() const = 0;
+	[[nodiscard]] virtual intp NumIdleThreads() const = 0;
 
 	//-----------------------------------------------------
 	// Pause/resume processing jobs
@@ -208,7 +207,7 @@ public:
 	//-----------------------------------------------------
 	// Add an function object to the queue (master thread)
 	//-----------------------------------------------------
-	virtual void AddFunctor( CFunctor *pFunctor, CJob **ppJob = NULL, const char *pszDescription = NULL, unsigned flags = 0 ) { AddFunctorInternal( RetAddRef( pFunctor ), ppJob, pszDescription, flags ); }
+	virtual void AddFunctor( CFunctor *pFunctor, CJob **ppJob = nullptr, const char *pszDescription = nullptr, unsigned flags = 0 ) { AddFunctorInternal( RetAddRef( pFunctor ), ppJob, pszDescription, flags ); }
 
 	//-----------------------------------------------------
 	// Change the priority of an active job
@@ -218,8 +217,8 @@ public:
 	//-----------------------------------------------------
 	// Bulk job manipulation (blocking)
 	//-----------------------------------------------------
-	int ExecuteAll( JobFilter_t pfnFilter = NULL )	{ return ExecuteToPriority( JP_LOW, pfnFilter ); }
-	virtual int ExecuteToPriority( JobPriority_t toPriority, JobFilter_t pfnFilter = NULL  ) = 0;
+	int ExecuteAll( JobFilter_t pfnFilter = nullptr )	{ return ExecuteToPriority( JP_LOW, pfnFilter ); }
+	virtual int ExecuteToPriority( JobPriority_t toPriority, JobFilter_t pfnFilter = nullptr  ) = 0;
 	virtual int AbortAll() = 0;
 
 	//-----------------------------------------------------
@@ -414,7 +413,7 @@ public:
 	#undef DEFINE_REF_COUNTING_CONST_MEMBER_QUEUE_CALL
 
 private:
-	virtual void AddFunctorInternal( CFunctor *, CJob ** = NULL, const char *pszDescription = NULL, unsigned flags = 0 ) = 0;
+	virtual void AddFunctorInternal( CFunctor *, CJob ** = nullptr, const char *pszDescription = nullptr, unsigned flags = 0 ) = 0;
 
 	//-----------------------------------------------------
 	// Services for internal use by job instances
@@ -424,7 +423,7 @@ private:
 	virtual CJob *GetDummyJob() = 0;
 
 public:
-	virtual void Distribute( bool bDistribute = true, int *pAffinityTable = NULL ) = 0;
+	virtual void Distribute( bool bDistribute = true, int *pAffinityTable = nullptr ) = 0;
 
 	virtual bool Start( const ThreadPoolStartParams_t &startParams, const char *pszNameOverride ) = 0;
 };
@@ -449,12 +448,8 @@ class CJob : public CRefCounted1<IRefCounted, CRefCountServiceMT>
 {
 public:
 	CJob( JobPriority_t priority = JP_NORMAL )
-	  : m_status( JOB_STATUS_UNSERVICED ),
-		m_priority( priority ),
-		m_flags( 0 ),
-		m_iServicingThread( -1 ),
+	  : m_priority( priority ),
 		m_ThreadPoolData( JOB_NO_DATA ),
-		m_pThreadPool( NULL ),
 		m_CompleteEvent( true )
 	{
 		m_szDescription[ 0 ] = 0;
@@ -534,22 +529,21 @@ private:
 	//-----------------------------------------------------
 	friend class CThreadPool;
 
-	JobStatus_t			m_status;
+	JobStatus_t			m_status{ JOB_STATUS_UNSERVICED };
 	JobPriority_t		m_priority;
 	CThreadMutex		m_mutex;
-	unsigned char		m_flags;
-	char				m_iServicingThread;
+	unsigned char		m_flags{ 0 };
+	char				m_iServicingThread{ -1 };
 	[[maybe_unused]] short				m_reserved;  //-V730_NOINIT
 	ThreadPoolData_t	m_ThreadPoolData;
-	IThreadPool *		m_pThreadPool;
+	IThreadPool *		m_pThreadPool{ nullptr };
 	CThreadEvent		m_CompleteEvent;
 	char				m_szDescription[ 32 ];
 
-private:
 	//-----------------------------------------------------
-	CJob( const CJob &fromRequest );
-	void operator=(const CJob &fromRequest );
-
+	CJob( const CJob &fromRequest ) = delete;
+	void operator=(const CJob &fromRequest ) = delete;
+private:
 	virtual JobStatus_t DoExecute() = 0;
 	virtual JobStatus_t DoAbort( [[maybe_unused]] bool bDiscard ) { return JOB_STATUS_ABORTED; }
 	virtual void DoCleanup() {}
@@ -560,7 +554,7 @@ private:
 class CFunctorJob : public CJob
 {
 public:
-	CFunctorJob( CFunctor *pFunctor, const char *pszDescription = NULL )
+	CFunctorJob( CFunctor *pFunctor, const char *pszDescription = nullptr )
 		: m_pFunctor( pFunctor )
 	{
 		if ( pszDescription )
@@ -596,7 +590,7 @@ private:
 class CJobSet
 {
 public:
-	CJobSet( CJob *pJob = NULL )
+	CJobSet( CJob *pJob = nullptr )
 	{
 		if ( pJob )
 		{
@@ -794,7 +788,7 @@ template <typename T>
 class CJobItemProcessor
 {
 public:
-	typedef T ItemType_t;
+	using ItemType_t = T;
 	void Begin() {}
 	// void Process( ItemType_t & ) {}
 	void End() {}
@@ -948,7 +942,7 @@ private:
 };
 
 template <typename ITEM_TYPE> 
-inline void ParallelProcess( const char *pszDescription, ITEM_TYPE *pItems, size_t nItems, void (*pfnProcess)( ITEM_TYPE & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL, intp nMaxParallel = PTRDIFF_MAX )
+inline void ParallelProcess( const char *pszDescription, ITEM_TYPE *pItems, size_t nItems, void (*pfnProcess)( ITEM_TYPE & ), void (*pfnBegin)() = nullptr, void (*pfnEnd)() = nullptr, intp nMaxParallel = PTRDIFF_MAX )
 {
 	CParallelProcessor<ITEM_TYPE, CFuncJobItemProcessor<ITEM_TYPE> > processor( pszDescription );
 	processor.m_ItemProcessor.Init( pfnProcess, pfnBegin, pfnEnd );
@@ -966,7 +960,7 @@ inline void ParallelProcess( const char *pszDescription, ITEM_TYPE *pItems, size
 
 // Parallel Process that lets you specify threadpool
 template <typename ITEM_TYPE> 
-inline void ParallelProcess( const char *pszDescription, IThreadPool *pPool, ITEM_TYPE *pItems, size_t nItems, void (*pfnProcess)( ITEM_TYPE & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL, intp nMaxParallel = PTRDIFF_MAX )
+inline void ParallelProcess( const char *pszDescription, IThreadPool *pPool, ITEM_TYPE *pItems, size_t nItems, void (*pfnProcess)( ITEM_TYPE & ), void (*pfnBegin)() = nullptr, void (*pfnEnd)() = nullptr, intp nMaxParallel = PTRDIFF_MAX )
 {
 	CParallelProcessor<ITEM_TYPE, CFuncJobItemProcessor<ITEM_TYPE> > processor( pszDescription );
 	processor.m_ItemProcessor.Init( pfnProcess, pfnBegin, pfnEnd );
@@ -1064,7 +1058,7 @@ private:
 	const char *				m_szDescription;
 };
 
-inline void ParallelLoopProcess( const char *szDescription, intp lBegin, size_t nItems, void (*pfnProcess)( intp const & ), void (*pfnBegin)() = NULL, void (*pfnEnd)() = NULL, intp nMaxParallel = PTRDIFF_MAX )
+inline void ParallelLoopProcess( const char *szDescription, intp lBegin, size_t nItems, void (*pfnProcess)( intp const & ), void (*pfnBegin)() = nullptr, void (*pfnEnd)() = nullptr, intp nMaxParallel = PTRDIFF_MAX )
 {
 	CParallelLoopProcessor< CFuncJobItemProcessor< intp const > > processor( szDescription );
 	processor.m_ItemProcessor.Init( pfnProcess, pfnBegin, pfnEnd );
@@ -1085,8 +1079,8 @@ template <class Derived>
 class CParallelProcessorBase
 {
 protected:
-	typedef CParallelProcessorBase<Derived> ThisParallelProcessorBase_t;
-	typedef Derived ThisParallelProcessorDerived_t;
+	using ThisParallelProcessorBase_t = CParallelProcessorBase<Derived>;
+	using ThisParallelProcessorDerived_t = Derived;
 
 public:
 	// dimhotepus: Allow to choose thread pool to run on.
@@ -1172,13 +1166,13 @@ private:
 
 inline unsigned FunctorExecuteThread( void *pParam )
 {
-	CFunctor *pFunctor = (CFunctor *)pParam;
+	auto *pFunctor = (CFunctor *)pParam;
 	(*pFunctor)();
 	pFunctor->Release();
 	return 0;
 }
 
-inline ThreadHandle_t ThreadExecuteSoloImpl( CFunctor *pFunctor, const char *pszName = NULL )
+inline ThreadHandle_t ThreadExecuteSoloImpl( CFunctor *pFunctor, const char *pszName = nullptr )
 {
 	ThreadId_t threadId;
 	ThreadHandle_t hThread = CreateSimpleThread( FunctorExecuteThread, pFunctor, &threadId );

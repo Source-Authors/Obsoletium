@@ -39,7 +39,7 @@ public:
 	{
 		if ( !Q_stricmp( pInterfaceName, CVAR_QUERY_INTERFACE_VERSION ) )
 			return (ICvarQuery*)this;
-		return NULL;
+		return nullptr;
 	
 	}
 
@@ -50,7 +50,7 @@ public:
 };
 
 static CDefaultCvarQuery s_DefaultCvarQuery;
-static ICvarQuery *s_pCVarQuery = NULL;
+static ICvarQuery *s_pCVarQuery = nullptr;
 
 
 //-----------------------------------------------------------------------------
@@ -80,8 +80,8 @@ public:
 	const ConVar	*FindVar ( const char *var_name ) const override;
 	ConCommand		*FindCommand( const char *name ) override;
 	const ConCommand *FindCommand( const char *name ) const override;
-	ConCommandBase	*GetCommands( void ) override;
-	const ConCommandBase *GetCommands( void ) const override;
+	ConCommandBase	*GetCommands( ) override;
+	const ConCommandBase *GetCommands( ) const override;
 	void			InstallGlobalChangeCallback( FnChangeCallback_t callback ) override;
 	void			RemoveGlobalChangeCallback( FnChangeCallback_t callback ) override;
 	void			CallGlobalChangeCallbacks( ConVar *var, const char *pOldString, float flOldValue ) override;
@@ -126,20 +126,20 @@ protected:
 			: m_pOuter( outer )
 			//, m_pHash( &outer->m_CommandHash ), // remember my CCvar,
 			//m_hashIter( -1, -1 ) // and invalid iterator
-			, m_pCur( NULL )
+			 
 		{}
-		void		SetFirst( void ) RESTRICT override;
-		void		Next( void ) RESTRICT override;
-		bool		IsValid( void ) RESTRICT override;
-		RESTRICT_FUNC ConCommandBase *Get( void ) override;
+		void		SetFirst( ) RESTRICT override;
+		void		Next( ) RESTRICT override;
+		bool		IsValid( ) RESTRICT override;
+		RESTRICT_FUNC ConCommandBase *Get( ) override;
 	protected:
 		CCvar * const m_pOuter;
 		//CConCommandHash * const m_pHash;
 		//CConCommandHash::CCommandHashIterator_t m_hashIter;
-		ConCommandBase *m_pCur;
+		ConCommandBase *m_pCur{ nullptr };
 	};
 
-	ICVarIteratorInternal	*FactoryInternalIterator( void ) override;
+	ICVarIteratorInternal	*FactoryInternalIterator( ) override;
 	friend class CCVarIteratorInternal;
 
 	enum ConVarSetType_t
@@ -164,33 +164,33 @@ private:
 	CON_COMMAND_MEMBER_F( CCvar, "find", Find, "Find concommands with the specified string in their name/help text.", 0 )
 };
 
-void CCvar::CCVarIteratorInternal::SetFirst( void ) RESTRICT
+void CCvar::CCVarIteratorInternal::SetFirst( ) RESTRICT
 {
 	//m_hashIter = m_pHash->First();
 	m_pCur = m_pOuter->GetCommands();
 }
 
-void CCvar::CCVarIteratorInternal::Next( void ) RESTRICT
+void CCvar::CCVarIteratorInternal::Next( ) RESTRICT
 {
 	//m_hashIter = m_pHash->Next( m_hashIter );
 	if ( m_pCur )
 		m_pCur = m_pCur->GetNext();
 }
 
-bool CCvar::CCVarIteratorInternal::IsValid( void ) RESTRICT
+bool CCvar::CCVarIteratorInternal::IsValid( ) RESTRICT
 {
 	//return m_pHash->IsValidIterator( m_hashIter );
-	return m_pCur != NULL;
+	return m_pCur != nullptr;
 }
 
-RESTRICT_FUNC ConCommandBase *CCvar::CCVarIteratorInternal::Get( void )
+RESTRICT_FUNC ConCommandBase *CCvar::CCVarIteratorInternal::Get( )
 {
 	Assert( IsValid( ) );
 	//return (*m_pHash)[m_hashIter];
 	return m_pCur;
 }
 
-ICvar::ICVarIteratorInternal *CCvar::FactoryInternalIterator( void )
+ICvar::ICVarIteratorInternal *CCvar::FactoryInternalIterator( )
 {
 	return new CCVarIteratorInternal( this );
 }
@@ -220,7 +220,7 @@ CCvar::CCvar() : m_TempConsoleBuffer( (intp)0, 1024 )
 	m_DisplayFuncs.EnsureCapacity( 2 );
 
 	m_nNextDLLIdentifier = 0;
-	m_pConCommandList = NULL;
+	m_pConCommandList = nullptr;
 
 	m_bMaterialSystemThreadSetAllowed = false;
 }
@@ -233,7 +233,7 @@ bool CCvar::Connect( CreateInterfaceFn factory )
 {
 	ConnectTier1Libraries( &factory, 1 );
 
-	s_pCVarQuery = (ICvarQuery*)factory( CVAR_QUERY_INTERFACE_VERSION, NULL );
+	s_pCVarQuery = (ICvarQuery*)factory( CVAR_QUERY_INTERFACE_VERSION, nullptr );
 	if ( !s_pCVarQuery )
 	{
 		s_pCVarQuery = &s_DefaultCvarQuery;
@@ -246,7 +246,7 @@ bool CCvar::Connect( CreateInterfaceFn factory )
 void CCvar::Disconnect()
 {
 	ConVar_Unregister();
-	s_pCVarQuery = NULL;
+	s_pCVarQuery = nullptr;
 	DisconnectTier1Libraries();
 }
 
@@ -265,7 +265,7 @@ void *CCvar::QueryInterface( const char *pInterfaceName )
 	if ( !V_strcmp( pInterfaceName, CVAR_INTERFACE_VERSION ) )
 		return (ICvar*)this;
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -303,7 +303,7 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 	const char *pName = variable->GetName();
 	if ( !pName || !pName[0] )
 	{
-		variable->m_pNext = NULL;
+		variable->m_pNext = nullptr;
 		return;
 	}
 
@@ -318,8 +318,8 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 		else
 		{
 			// This cast is ok because we make sure they're ConVars above.
-			const ConVar *pChildVar = static_cast< const ConVar* >( variable );
-			const ConVar *pParentVar = static_cast< const ConVar* >( pOther );
+			const auto *pChildVar = static_cast< const ConVar* >( variable );
+			const auto *pParentVar = static_cast< const ConVar* >( pOther );
 
 			// See if it's a valid linkage
 			if ( s_pCVarQuery->AreConVarsLinkable( pChildVar, pParentVar ) )
@@ -397,7 +397,7 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 			}
 		}
 
-		variable->m_pNext = NULL;
+		variable->m_pNext = nullptr;
 		return;
 	}
 
@@ -415,7 +415,7 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 	pCommandToRemove->m_bRegistered = false;
 
 	// FIXME: Should we make this a doubly-linked list? Would remove faster
-	ConCommandBase *pPrev = NULL;
+	ConCommandBase *pPrev = nullptr;
 	for( ConCommandBase *pCommand = m_pConCommandList; pCommand; pCommand = pCommand->m_pNext )
 	{
 		if ( pCommand != pCommandToRemove )
@@ -424,7 +424,7 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 			continue;
 		}
 
-		if ( pPrev == NULL )
+		if ( pPrev == nullptr )
 		{
 			m_pConCommandList = pCommand->m_pNext;
 		}
@@ -432,14 +432,14 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 		{
 			pPrev->m_pNext = pCommand->m_pNext;
 		}
-		pCommand->m_pNext = NULL;
+		pCommand->m_pNext = nullptr;
 		break;
 	}
 }
 
 void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 {
-	ConCommandBase *pNewList = NULL;
+	ConCommandBase *pNewList = nullptr;
 	ConCommandBase  *pCommand = m_pConCommandList;
 	while ( pCommand )
 	{
@@ -453,7 +453,7 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 		{
 			// Unlink
 			pCommand->m_bRegistered = false;
-			pCommand->m_pNext = NULL;
+			pCommand->m_pNext = nullptr;
 		}
 
 		pCommand = pNext;
@@ -474,7 +474,7 @@ const ConCommandBase *CCvar::FindCommandBase( const char *name ) const
 		if ( !Q_stricmp( name, cmd->GetName() ) )
 			return cmd;
 	}
-	return NULL;
+	return nullptr;
 }
 
 ConCommandBase *CCvar::FindCommandBase( const char *name )
@@ -485,7 +485,7 @@ ConCommandBase *CCvar::FindCommandBase( const char *name )
 		if ( !Q_stricmp( name, cmd->GetName() ) )
 			return cmd;
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -498,7 +498,7 @@ const ConVar *CCvar::FindVar( const char *var_name ) const
 	VPROF( "CCvar::FindVar" );
 	const ConCommandBase *var = FindCommandBase( var_name );
 	if ( !var || var->IsCommand() )
-		return NULL;
+		return nullptr;
 	
 	return static_cast<const ConVar*>(var);
 }
@@ -509,7 +509,7 @@ ConVar *CCvar::FindVar( const char *var_name )
 	VPROF( "CCvar::FindVar" );
 	ConCommandBase *var = FindCommandBase( var_name );
 	if ( !var || var->IsCommand() )
-		return NULL;
+		return nullptr;
 	
 	return static_cast<ConVar*>( var );
 }
@@ -522,7 +522,7 @@ const ConCommand *CCvar::FindCommand( const char *pCommandName ) const
 {
 	const ConCommandBase *var = FindCommandBase( pCommandName );
 	if ( !var || !var->IsCommand() )
-		return NULL;
+		return nullptr;
 
 	return static_cast<const ConCommand*>(var);
 }
@@ -531,7 +531,7 @@ ConCommand *CCvar::FindCommand( const char *pCommandName )
 {
 	ConCommandBase *var = FindCommandBase( pCommandName );
 	if ( !var || !var->IsCommand() )
-		return NULL;
+		return nullptr;
 
 	return static_cast<ConCommand*>( var );
 }
@@ -550,12 +550,12 @@ const char* CCvar::GetCommandLineValue( const char *pVariableName )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-ConCommandBase *CCvar::GetCommands( void )
+ConCommandBase *CCvar::GetCommands( )
 {
 	return m_pConCommandList;
 }
 
-const ConCommandBase *CCvar::GetCommands( void ) const
+const ConCommandBase *CCvar::GetCommands( ) const
 {
 	return m_pConCommandList;
 }
@@ -599,7 +599,7 @@ void CCvar::RevertFlaggedConVars( int nFlag )
 		if ( var->IsCommand() )
 			continue;
 
-		ConVar *pCvar = ( ConVar * )var;
+		auto *pCvar = ( ConVar * )var;
 
 		if ( !pCvar->IsFlagSet( nFlag ) )
 			continue;

@@ -157,7 +157,7 @@ const char *GetOSDetailString( char *pchOutBuf, int cchOutBuf )
 	(void)( pchOutBuf );
 	(void)( cchOutBuf );
 	// no interesting details
-	return NULL;
+	return nullptr;
 #else
 #if defined LINUX
 	// we're about to go poking around to see if we can figure out distribution

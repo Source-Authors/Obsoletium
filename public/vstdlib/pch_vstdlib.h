@@ -11,16 +11,12 @@
 // $NoKeywords: $
 //=============================================================================
 
-
-#pragma warning(disable: 4514)
-
 // First include standard libraries
-#include <stdio.h>
-#include <ctype.h>
-#include <math.h>
+#include <cstdio>
+#include <cctype>
+#include <cmath>
 #include <malloc.h>
 #include <memory.h>
-#include <ctype.h>
 
 // Next, include public
 #include "tier0/basetypes.h"
@@ -29,8 +25,8 @@
 
 // Next, include vstdlib
 #include "vstdlib/vstdlib.h"
-#include "tier1/strtools.h"
 #include "vstdlib/random.h"
+#include "tier1/strtools.h"
 #include "tier1/KeyValues.h"
 #include "tier1/utlmemory.h"
 #include "tier1/utlrbtree.h"

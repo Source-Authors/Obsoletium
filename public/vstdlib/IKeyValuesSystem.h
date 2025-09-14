@@ -13,7 +13,7 @@
 #include "vstdlib/vstdlib.h"
 
 // handle to a KeyValues key name symbol
-typedef intp HKeySymbol;
+using HKeySymbol = intp;
 constexpr inline HKeySymbol INVALID_KEY_SYMBOL{static_cast<HKeySymbol>(-1)};
 
 class IBaseFileSystem;

@@ -118,7 +118,7 @@ CKeyValuesSystem::CKeyValuesSystem()
 	for ( auto &t : m_HashTable )
 	{
 		t.stringIndex = 0;
-		t.next = NULL;
+		t.next = nullptr;
 	}
 
 	constexpr size_t size = 4u * 1024 * 1024; //-V112
@@ -242,14 +242,14 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 
 	intp hash = CaseInsensitiveHash(name, m_HashTable.Count());
 	hash_item_t *item = &m_HashTable[hash];
-	while (1)
+	while (true)
 	{
 		if (!stricmp(name, (char *)m_Strings.GetBase() + item->stringIndex ))
 		{
 			return (HKeySymbol)item->stringIndex;
 		}
 
-		if (item->next == NULL)
+		if (item->next == nullptr)
 		{
 			if ( !bCreate )
 			{
@@ -266,7 +266,7 @@ HKeySymbol CKeyValuesSystem::GetSymbolForString( const char *name, bool bCreate 
 			}
 
 			// build up the new item
-			item->next = NULL;
+			item->next = nullptr;
 			const intp stringSize = V_strlen(name) + 1;
 			char *pString = static_cast<char *>(m_Strings.Alloc( stringSize ));
 			if ( !pString )

@@ -41,7 +41,7 @@ class VSTDLIB_CLASS CUniformRandomStream : public IUniformRandomStream
 {
 public:
 	CUniformRandomStream();
-	virtual ~CUniformRandomStream() {}
+	virtual ~CUniformRandomStream() = default;
 
 	// Sets the seed of the random number generator
 	void	SetSeed( int iSeed ) override;
@@ -109,7 +109,7 @@ VSTDLIB_INTERFACE float	RandomGaussianFloat( float flMean = 0.0f, float flStdDev
 class VSTDLIB_CLASS CDefaultUniformRandomStream : public IUniformRandomStream
 {
 public:
-	virtual ~CDefaultUniformRandomStream() {}
+	virtual ~CDefaultUniformRandomStream() = default;
 	void	SetSeed( int iSeed ) override												{ RandomSeed( iSeed ); }
 	float	RandomFloat( float flMinVal, float flMaxVal ) override						{ return ::RandomFloat( flMinVal, flMaxVal ); }
 	int		RandomInt( int iMinVal, int iMaxVal ) override								{ return ::RandomInt( iMinVal, iMaxVal ); }

@@ -48,9 +48,7 @@ inline void ServiceJobAndRelease( CJob *pJob, intp iThread = -1 )
 class alignas(16) CJobQueue final : public CAlignedNewDelete<16>
 {
 public:
-	CJobQueue() :
-		m_nItems( 0 ),
-		m_nMaxItems( INT_MAX )
+	CJobQueue()
 	{
 		for ( auto &queue : m_pQueues )
 		{
@@ -66,12 +64,12 @@ public:
 		}
 	}
 
-	int Count() const
+	[[nodiscard]] int Count() const
 	{
 		return m_nItems;
 	}
 
-	int Count( JobPriority_t priority ) const
+	[[nodiscard]] int Count( JobPriority_t priority ) const
 	{
 		return m_pQueues[priority]->Count();
 	}
@@ -87,7 +85,7 @@ public:
 				return pOverflowJob;
 			}
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	int Push( CJob *pJob, [[maybe_unused]] int iThread = -1 )
@@ -96,7 +94,7 @@ public:
 
 		CJob *pOverflowJob;
 		int nOverflow = 0;
-		while ( ( pOverflowJob = PrePush() ) != NULL )
+		while ( ( pOverflowJob = PrePush() ) != nullptr )
 		{
 			ServiceJobAndRelease( pJob );
 			nOverflow++;
@@ -120,7 +118,7 @@ public:
 		if ( !m_nItems )
 		{
 			m_mutex.Unlock();
-			*ppJob = NULL;
+			*ppJob = nullptr;
 			return false;
 		}
 		if ( --m_nItems == 0 )
@@ -139,7 +137,7 @@ public:
 
 
 		AssertMsg( 0, "Expected at least one queue item" );
-		*ppJob = NULL;
+		*ppJob = nullptr;
 		return false;
 	}
 
@@ -168,8 +166,8 @@ public:
 
 private:
 	CTSQueue<CJob *>	*m_pQueues[JP_HIGH + 1];
-	int					m_nItems;
-	int					m_nMaxItems;
+	int					m_nItems{ 0 };
+	int					m_nMaxItems{ INT_MAX };
 	CThreadMutex		m_mutex;
 	CThreadManualEvent	m_JobAvailableEvent;
 
@@ -185,15 +183,15 @@ class CThreadPool : public CAlignedNewDelete<16, CRefCounted1<IThreadPool, CRefC
 {
 public:
 	CThreadPool();
-	~CThreadPool();
+	~CThreadPool() override;
 
 	//-----------------------------------------------------
 	// Thread functions
 	//-----------------------------------------------------
-	bool Start( const ThreadPoolStartParams_t &startParams = ThreadPoolStartParams_t() ) override { return Start( startParams, NULL ); }
+	bool Start( const ThreadPoolStartParams_t &startParams = ThreadPoolStartParams_t() ) override { return Start( startParams, nullptr ); }
 	bool Start( const ThreadPoolStartParams_t &startParams, const char *pszNameOverride ) override;
 	bool Stop( int timeout = TT_INFINITE ) override;
-	void Distribute( bool bDistribute = true, int *pAffinityTable = NULL ) override;
+	void Distribute( bool bDistribute = true, int *pAffinityTable = nullptr ) override;
 
 	//-----------------------------------------------------
 	// Functions for any thread
@@ -231,7 +229,7 @@ public:
 	//-----------------------------------------------------
 	// Add an function object to the queue (master thread)
 	//-----------------------------------------------------
-	void AddFunctorInternal( CFunctor *, CJob ** = NULL, const char *pszDescription = NULL, unsigned flags = 0 ) override;
+	void AddFunctorInternal( CFunctor *, CJob ** = nullptr, const char *pszDescription = nullptr, unsigned flags = 0 ) override;
 
 	//-----------------------------------------------------
 	// Remove a job from the queue (master thread)
@@ -241,7 +239,7 @@ public:
 	//-----------------------------------------------------
 	// Bulk job manipulation (blocking)
 	//-----------------------------------------------------
-	int ExecuteToPriority( JobPriority_t toPriority, JobFilter_t pfnFilter = NULL ) override;
+	int ExecuteToPriority( JobPriority_t toPriority, JobFilter_t pfnFilter = nullptr ) override;
 	int AbortAll() override;
 
 	void Reserved1() override {}
@@ -275,13 +273,13 @@ private:
 	CUtlVector<CThreadEvent *>		m_IdleEvents;
 
 	CThreadMutex			m_SuspendMutex;
-	int						m_nSuspend;
+	int						m_nSuspend{ 0 };
 	CInterlockedInt			m_nJobs;
 
 	// Some jobs should only be executed on the threadpool thread(s). Ie: the rendering thread has the GL context
 	//	and the main thread coming in and "helping" with jobs breaks that pretty nicely. This flag states that
 	//	only the threadpool threads should execute these jobs.
-	bool					m_bExecOnThreadPoolThreadsOnly;
+	bool					m_bExecOnThreadPoolThreadsOnly{ 0 };
 };
 
 //-----------------------------------------------------------------------------
@@ -301,7 +299,7 @@ JOB_INTERFACE void DestroyThreadPool( IThreadPool *pPool )
 class CGlobalThreadPool : public CThreadPool
 {
 public:
-	virtual bool Start( const ThreadPoolStartParams_t &startParamsIn )
+	bool Start( const ThreadPoolStartParams_t &startParamsIn ) override
 	{
 		int nThreads = ( CommandLine()->ParmValue( "-threads", -1 ) - 1 );
 		ThreadPoolStartParams_t startParams = startParamsIn;
@@ -318,7 +316,7 @@ public:
 		return CThreadPool::Start( startParams, "GlobJob" );
 	}
 
-	virtual bool OnFinalRelease()
+	bool OnFinalRelease() override
 	{
 		AssertMsg( 0, "Releasing global thread pool object!" );
 		return false;
@@ -400,7 +398,7 @@ private:
 		return waitResult;
 	}
 
-	int Run()
+	int Run() override
 	{
 
 
@@ -416,7 +414,7 @@ private:
 		{
 			if ( PeekCall() )
 			{
-				CFunctor *pFunctor = NULL;
+				CFunctor *pFunctor = nullptr;
 				tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s PeekCall():%d", __FUNCTION__, GetCallParam() );
 
 				switch ( GetCallParam( &pFunctor ) )
@@ -508,9 +506,7 @@ IThreadPool *g_pThreadPool = &g_ThreadPool;
 
 CThreadPool::CThreadPool() :
 	m_nIdleThreads( 0 ),
-	m_nSuspend( 0 ),
-	m_nJobs( 0 ),
-	m_bExecOnThreadPoolThreadsOnly( 0 )
+	m_nJobs( 0 )
 {
 }
 
@@ -1024,7 +1020,7 @@ bool CThreadPool::Start( const ThreadPoolStartParams_t &startParams, const char 
 #endif
 	}
 
-	Distribute( bDistribute, startParams.bUseAffinityTable ? (int *)startParams.iAffinityTable : NULL );
+	Distribute( bDistribute, startParams.bUseAffinityTable ? (int *)startParams.iAffinityTable : nullptr );
 
 	return true;
 }
@@ -1147,7 +1143,7 @@ CJob *CThreadPool::GetDummyJob()
 			Execute();
 		}
 
-		virtual JobStatus_t DoExecute() { return JOB_OK; }
+		JobStatus_t DoExecute() override { return JOB_OK; }
 	};
 
 	static CDummyJob dummyJob;
