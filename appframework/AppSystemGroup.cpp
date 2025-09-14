@@ -67,7 +67,7 @@ AppModule_t CAppSystemGroup::LoadModule( const char *pDLLName )
 
 	auto nIndex = m_Modules.AddToTail();
 	m_Modules[nIndex].m_pModule = pSysModule;
-	m_Modules[nIndex].m_Factory = 0;
+	m_Modules[nIndex].m_Factory = nullptr;
 	m_Modules[nIndex].m_pModuleName = (char*)malloc( nLen );
 	Q_strncpy( m_Modules[nIndex].m_pModuleName, pModuleName, nLen );
 
@@ -128,7 +128,7 @@ void CAppSystemGroup::UnloadAllModules()
 IAppSystem *CAppSystemGroup::AddSystem( AppModule_t module, const char *pInterfaceName )
 {
 	if (module == APP_MODULE_INVALID)
-		return NULL;
+		return nullptr;
 
 	Assert( (module >= 0) && (module < m_Modules.Count()) );
 	CreateInterfaceFn pFactory = m_Modules[module].m_pModule
@@ -140,7 +140,7 @@ IAppSystem *CAppSystemGroup::AddSystem( AppModule_t module, const char *pInterfa
 	if ((retval != IFACE_OK) || (!pSystem))
 	{
 		Warning("AppFramework: Unable to create system %s!\n", pInterfaceName );
-		return NULL;
+		return nullptr;
 	}
 
 	auto *pAppSystem = static_cast<IAppSystem*>(pSystem);
@@ -261,7 +261,7 @@ void *CAppSystemGroup::FindSystem( const char *pSystemName )
 	}
 
 	// No dice..
-	return NULL;
+	return nullptr;
 }
 
 

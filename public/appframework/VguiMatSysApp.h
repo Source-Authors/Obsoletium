@@ -37,8 +37,8 @@ public:
 	void* GetAppWindow();
 
 	// Gets the window size
-	int GetWindowWidth() const;
-	int GetWindowHeight() const;
+	[[nodiscard]] int GetWindowWidth() const;
+	[[nodiscard]] int GetWindowHeight() const;
 
 protected:
 	void AppPumpMessages();
