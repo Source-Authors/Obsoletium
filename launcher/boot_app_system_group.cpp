@@ -44,7 +44,7 @@ std::unique_ptr<FileLogger> BootAppSystemGroup::file_logger_ = nullptr;
 bool BootAppSystemGroup::Create() {
   double start_time{Plat_FloatTime()};
 
-  IFileSystem *file_system =
+  auto *file_system =
       FindSystem<IFileSystem>(FILESYSTEM_INTERFACE_VERSION);
   resource_listing_ = CreateResourceListing(command_line_, file_system);
 

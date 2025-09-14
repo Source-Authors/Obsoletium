@@ -101,7 +101,7 @@ enum class State { BuildingListing = 0, GeneratingCaches, Done };
 class ResourceListing : public IResourceListing {
  public:
   ResourceListing(ICommandLine *command_line, IFileSystem *file_system);
-  virtual ~ResourceListing() = default;
+  ~ResourceListing() override = default;
 
   void Init(const char *pchBaseDir, const char *pchGameDir) override;
   bool IsActive() override;
@@ -129,13 +129,13 @@ class ResourceListing : public IResourceListing {
   CUtlString original_command_line_;
   CUtlString initial_start_map_;
 
-  intp current_wi_;
+  intp current_wi_{0};
   CUtlVector<WorkItem> work_items_;
 
   CUtlVector<CUtlString> map_list_;
-  State current_state_;
-  bool is_initialized_;
-  bool is_active_;
+  State current_state_{State::BuildingListing};
+  bool is_initialized_{false};
+  bool is_active_{false};
 };
 
 std::unique_ptr<IResourceListing> CreateResourceListing(
@@ -150,11 +150,8 @@ ResourceListing::ResourceListing(ICommandLine *command_line,
     : command_line_{command_line},
       file_system_{file_system},
       final_dir_{"reslists"},
-      working_dir_{"reslists_work"},
-      current_wi_(0),
-      current_state_(State::BuildingListing),
-      is_initialized_(false),
-      is_active_(false) {
+      working_dir_{"reslists_work"}
+      {
   MEM_ALLOC_CREDIT();
 }
 
@@ -163,7 +160,7 @@ void ResourceListing::CollateFiles(const char *pchResListFilename) {
   char fn[MAX_PATH];
 
   for (auto &wi : work_items_) {
-    Q_snprintf(fn, sizeof(fn), "%s\\%s\\%s\\%s", full_game_path_.String(),
+    Q_snprintf(fn, sizeof(fn), R"(%s\%s\%s\%s)", full_game_path_.String(),
                working_dir_.String(), wi.m_sSubDir.String(),
                pchResListFilename);
 
