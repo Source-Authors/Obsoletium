@@ -22,7 +22,7 @@ public:
 	CCvarSlider( vgui::Panel *parent, const char *panelName );
 	CCvarSlider( vgui::Panel *parent, const char *panelName, char const *caption,
 		float minValue, float maxValue, char const *cvarname, bool bAllowOutOfRange=false );
-	~CCvarSlider();
+	~CCvarSlider() override;
 
 	void			SetupSlider( float minValue, float maxValue, const char *cvarname, bool bAllowOutOfRange );
 

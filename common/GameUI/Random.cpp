@@ -5,18 +5,20 @@
 // $NoKeywords: $
 //===========================================================================//
 
-
-#include <time.h>
 #include "Random.h"
+
+#include <ctime>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define IA 16807
-#define IM 2147483647
-#define IQ 127773
-#define IR 2836
-#define NTAB 32
+enum {
+  IA = 16807,
+  IM = 2147483647,
+  IQ = 127773,
+  IR = 2836,
+  NTAB = 32
+};
 #define NDIV (1+(IM-1)/NTAB)
 
 static long idum = 0;
@@ -29,7 +31,7 @@ void SeedRandomNumberGenerator(long lSeed)
 	}
 	else
 	{
-		idum = -time(NULL);
+		idum = -time(nullptr);
 	}
 	if (1000 < idum)
 	{
@@ -41,7 +43,7 @@ void SeedRandomNumberGenerator(long lSeed)
 	}
 }
 
-long ran1(void)
+long ran1()
 {
 	int j;
 	long k;
@@ -76,7 +78,7 @@ long ran1(void)
 #define AM (1.0/IM)
 #define EPS 1.2e-7
 #define RNMX (1.0-EPS)
-float fran1(void)
+float fran1()
 {
 	float temp = (float)AM*ran1();
 	if (temp > RNMX) return (float)RNMX;

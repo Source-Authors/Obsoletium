@@ -80,20 +80,20 @@ public:
 	virtual void ShowMessageDialog( const uint nType, vgui::Panel *pOwner ) = 0;
 	virtual void UpdatePlayerInfo( uint64 nPlayerId, const char *pName, int nTeam, byte cVoiceState, int nPlayersNeeded, bool bHost ) = 0;
 	virtual void SessionSearchResult( int searchIdx, void *pHostData, XSESSION_SEARCHRESULT *pResult, int ping ) = 0;
-	virtual void OnCreditsFinished( void ) = 0;
+	virtual void OnCreditsFinished() = 0;
 
 	// inserts specified panel as background for level load dialog
 	virtual void SetLoadingBackgroundDialog( vgui::VPANEL panel ) = 0;
 
 	// Bonus maps interfaces
-	virtual void BonusMapUnlock( const char *pchFileName = NULL, const char *pchMapName = NULL ) = 0;
-	virtual void BonusMapComplete( const char *pchFileName = NULL, const char *pchMapName = NULL ) = 0;
+	virtual void BonusMapUnlock( const char *pchFileName = nullptr, const char *pchMapName = nullptr ) = 0;
+	virtual void BonusMapComplete( const char *pchFileName = nullptr, const char *pchMapName = nullptr ) = 0;
 	virtual void BonusMapChallengeUpdate( const char *pchFileName, const char *pchMapName, const char *pchChallengeName, int iBest ) = 0;
 	[[deprecated("Use BonusMapChallengeNames2 as former doesn't check bounds")]]
 	virtual void BonusMapChallengeNames( char *pchFileName, char *pchMapName, char *pchChallengeName ) = 0;
 	virtual void BonusMapChallengeObjectives( int &iBronze, int &iSilver, int &iGold ) = 0;
-	virtual void BonusMapDatabaseSave( void ) = 0;
-	virtual int BonusMapNumAdvancedCompleted( void ) = 0;
+	virtual void BonusMapDatabaseSave() = 0;
+	virtual int BonusMapNumAdvancedCompleted() = 0;
 	virtual void BonusMapNumMedals( int piNumMedals[ 3 ] ) = 0;
 
 	virtual void OnConnectToServer2(const char *game, int IP, int connectionPort, int queryPort) = 0;
@@ -107,9 +107,9 @@ public:
 	virtual void SetProgressOnStart() = 0;
 	virtual void OnDisconnectFromServer( uint8 eSteamLoginFailure ) = 0;
 
-	virtual void OnConfirmQuit( void ) = 0;
+	virtual void OnConfirmQuit() = 0;
 
-	virtual bool IsMainMenuVisible( void ) = 0;
+	virtual bool IsMainMenuVisible() = 0;
 
 	// Client DLL is providing us with a panel that it wants to replace the main menu with
 	virtual void SetMainMenuOverride( vgui::VPANEL panel ) = 0;

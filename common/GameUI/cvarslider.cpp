@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 #include "cvarslider.h"
-#include <stdio.h>
+#include <cstdio>
 #include "tier1/KeyValues.h"
 #include "tier1/convar.h"
 #include <vgui/IVGui.h>
@@ -95,9 +95,7 @@ void CCvarSlider::SetupSlider( float minValue, float maxValue, const char *cvarn
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CCvarSlider::~CCvarSlider()
-{
-}
+CCvarSlider::~CCvarSlider() = default;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -326,7 +324,7 @@ void CCvarSlider::OnSliderMoved()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CCvarSlider::OnSliderDragEnd( void )
+void CCvarSlider::OnSliderDragEnd()
 {
 	if ( !m_bCreatedInCode )
 	{

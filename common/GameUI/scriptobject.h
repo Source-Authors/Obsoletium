@@ -17,7 +17,7 @@ class CPanelListPanel;
 
 #define SCRIPT_VERSION 1.0f
 
-typedef void * FileHandle_t;
+using FileHandle_t = void *;
 
 enum objtype_t
 {
@@ -31,11 +31,11 @@ enum objtype_t
 	O_CATEGORY,
 };
 
-typedef struct
+using objtypedesc_t = struct
 {
 	objtype_t type;
 	char szDescription[32];
-} objtypedesc_t;
+};
 
 class CScriptListItem
 {
@@ -53,9 +53,9 @@ class CScriptObject : public vgui::Panel
 {
 public:
 	void AddItem( CScriptListItem *pItem );
-	void RemoveAndDeleteAllItems( void );
-	CScriptObject( void );
-	~CScriptObject();
+	void RemoveAndDeleteAllItems();
+	CScriptObject();
+	~CScriptObject() override;
 
 	bool ReadFromBuffer( const char **pBuffer, bool isNewObject );
 	void WriteToConfig();
@@ -90,7 +90,7 @@ public:
 abstract_class CDescription
 {
 public:
-	CDescription( void );
+	CDescription();
 	virtual ~CDescription();
 
 	bool ReadFromBuffer( const char **pBuffer, bool bAllowNewObject );
@@ -108,8 +108,8 @@ public:
 	void setDescription( const char *pszDesc );
 	void setHint( const char *pszHint );
 
-	const char *GetDescription( void ) { return m_pszDescriptionType; };
-	const char *getHint( void ) { return m_pszHintText; } ;
+	const char *GetDescription() { return m_pszDescriptionType; }
+	const char *getHint() { return m_pszHintText; }
 public:
 	CScriptObject *pObjList;
 	CScriptObject *FindObject( const char *pszObjectName );
@@ -131,7 +131,7 @@ class mpcontrol_t : public vgui::Panel
 public:
 	mpcontrol_t( vgui::Panel *parent, char const *panelName );
 
-	virtual	void	OnSizeChanged( int wide, int tall ) override;
+	void	OnSizeChanged( int wide, int tall ) override;
 
 	objtype_t		type;
 	vgui::Panel		*pControl;
@@ -144,10 +144,10 @@ public:
 class CInfoDescription : public CDescription
 {
 public:
-	CInfoDescription( void );
+	CInfoDescription( );
 
-	virtual void WriteScriptHeader( FileHandle_t fp ) override;
-	virtual void WriteFileHeader( FileHandle_t fp ) override; 
+	void WriteScriptHeader( FileHandle_t fp ) override;
+	void WriteFileHeader( FileHandle_t fp ) override; 
 };
 
 void UTIL_StripInvalidCharacters( char *pszInput, int maxlen );
