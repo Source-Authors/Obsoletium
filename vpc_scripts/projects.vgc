@@ -53,11 +53,6 @@ $Project "bspzip"
 	"utils\bspzip\bspzip.vpc" [$WINDOWS]
 }
 
-$Project "bugreporter"
-{
-	"utils\bugreporter\bugreporter.vpc" [$WINDOWS]
-}
-
 $Project "bugreporter_public"
 {
 	"utils\bugreporter_public\bugreporter_public.vpc" [$WINDOWS||$POSIX]
