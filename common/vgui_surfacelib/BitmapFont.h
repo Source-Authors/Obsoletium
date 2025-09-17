@@ -19,7 +19,7 @@ class CBitmapFont : public font_t
 {
 public:
 	CBitmapFont();
-	virtual ~CBitmapFont();
+	~CBitmapFont() override;
 
 	// creates the font.  returns false if the compiled font does not exist.
 	virtual bool Create(const char *windowsFontName, float scalex, float scaley, int flags);

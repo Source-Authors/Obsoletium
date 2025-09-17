@@ -151,8 +151,8 @@ private:
 	{
 		font_name_entry()
 		{
-			m_pchFile = NULL;
-			m_pchFriendlyName = NULL;
+			m_pchFile = nullptr;
+			m_pchFriendlyName = nullptr;
 		}
 		
 		char *m_pchFile;

@@ -71,7 +71,7 @@ public:
 
 	// gets the name of this font
 	const char *GetName() { return m_szName.String(); }
-	const char *GetFamilyName() { return NULL; }
+	const char *GetFamilyName() { return nullptr; }
 
 	// gets the width of ch given its position around before and after chars
 	void GetKernedCharWidth( wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &abcA );
