@@ -36,7 +36,7 @@ class CBlacklistedServerManager final
 public:
 	CBlacklistedServerManager();
 
-	void Reset( void );
+	void Reset();
 
 	blacklisted_server_t *AddServer( gameserveritem_t &server );
 	blacklisted_server_t *AddServer( const char *serverName, uint32 serverIP, int serverPort );
@@ -48,11 +48,11 @@ public:
 	int LoadServersFromFile( const char *pszFilename, bool bResetTimes );		// returns count of appended servers, zero for failure
 
 	blacklisted_server_t *GetServer( intp iServerID );		// return server with matching 'server id'
-	intp GetServerCount( void ) const;
+	[[nodiscard]] intp GetServerCount() const;
 
-	const CUtlVector< blacklisted_server_t > &GetServerVector( void ) const;
+	[[nodiscard]] const CUtlVector< blacklisted_server_t > &GetServerVector() const;
 
-	bool IsServerBlacklisted( const gameserveritem_t &server ) const;
+	[[nodiscard]] bool IsServerBlacklisted( const gameserveritem_t &server ) const;
 	bool IsServerBlacklisted( uint32 serverIP, int serverPort, const char *serverName ) const;
 
 	bool CanServerBeBlacklisted( gameserveritem_t &server ) const;
@@ -63,7 +63,7 @@ private:
 	int m_iNextServerID;		// for vgui use
 };
 
-inline intp CBlacklistedServerManager::GetServerCount( void ) const
+inline intp CBlacklistedServerManager::GetServerCount() const
 {
 	return m_Blacklist.Count();
 }
