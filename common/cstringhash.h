@@ -9,7 +9,7 @@
 #define CSTRINGHASH_H
 #pragma once
 
-#include "string.h"
+#include <cstring>
 
 #define STRING_HASH_TABLE_SIZE 701
 
@@ -105,12 +105,12 @@ private:
 		}
 		return result % STRING_HASH_TABLE_SIZE;
 	}
-	typedef struct StringHashNode_s
+	using StringHashNode_t = struct StringHashNode_s
 	{
 		char *string;
 		T data;
 		struct StringHashNode_s *next;
-	} StringHashNode_t;
+	};
 	StringHashNode_t *m_HashTable[STRING_HASH_TABLE_SIZE];
 };
 

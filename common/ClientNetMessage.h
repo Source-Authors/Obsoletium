@@ -32,10 +32,10 @@ class bf_write;
 class CNetMessage : public INetMessage
 {
 public:
-	CNetMessage() {  m_bReliable = 0; m_bOwnData = false; };
-	virtual ~CNetMessage() {};
+	CNetMessage() {  m_bReliable = false; m_bOwnData = false; };
+	~CNetMessage() override = default;
 	
-	void	SetReliable( bool state = true) {m_bReliable = state;};
+	void	SetReliable( bool state = true) override {m_bReliable = state;};
 	bool	IsReliable() { return m_bReliable; };
 	bool	IsConnectionless() { return false;};
 		

@@ -16,7 +16,7 @@
 	#define C2M_REPORT_GAMESTATISTICS_PROTOCOL_VERSION_1	1
 	#define C2M_REPORT_GAMESTATISTICS_PROTOCOL_VERSION	2
 
-	typedef enum
+	using EGameStatsEnum = enum
 	{
 		GS_UNKNOWN = 0,
 		GS_NO_UPLOAD,
@@ -24,7 +24,7 @@
 
 		// Must be last
 		GS_NUM_TYPES
-	} EGameStatsEnum;
+	};
 
 	// C2M_REPORT_GAMESTATISTICS details (OLD VERSION)
 	//		u8(C2M_REPORT_GAMESTATISTICS_PROTOCOL_VERSION_1)
@@ -118,7 +118,7 @@
 
 #define M2C_ACKBUGREPORT					'p'
 
-	typedef enum
+	using EBugReportAckEnum = enum
 	{
 		BR_UNKNOWN = 0,
 		BR_NO_FILES,
@@ -126,7 +126,7 @@
 
 		// Must be last
 		BR_NUM_TYPES
-	} EBugReportAckEnum;
+	};
 
 		// M2C_ACKBUGREPORT details
 		//	u8(protocol okay (bool))

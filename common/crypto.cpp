@@ -77,7 +77,7 @@ constexpr inline int k_cMedBuff = 1024;					// medium buffer
 #include "../thirdparty/cryptopp/gzip.h"
 #include "../thirdparty/cryptopp/pwdbased.h"
 using namespace CryptoPP;
-typedef AutoSeededX917RNG<AES> CAutoSeededRNG;
+using CAutoSeededRNG = AutoSeededX917RNG<AES>;
 
 #if defined(GNUC)
 #pragma GCC diagnostic warning "-Wshadow"
@@ -119,7 +119,7 @@ public:
 		g_tslistPAutoSeededRNG.Push( m_pRNGNode );
 	}
 
-	CAutoSeededRNG &GetRNG() const
+	[[nodiscard]] CAutoSeededRNG &GetRNG() const
 	{
 		return m_pRNGNode->elem;
 	}
@@ -195,13 +195,13 @@ bool CCrypto::SymmetricEncryptWithIV( const uint8 *pubPlaintextData, const size_
 
 	try		// handle any exceptions crypto++ may throw
 	{	
-		if ( pTemp != NULL )
+		if ( pTemp != nullptr )
 		{
 			AESEncryption aesEncrypt( pubKey, cubKey );
 
 			byte rgubIVEncrypted[k_cMedBuff];
 			Assert( std::size( rgubIVEncrypted ) >= aesEncrypt.BlockSize() );
-			Assert( pIV != NULL && cubIV >= aesEncrypt.BlockSize() );
+			Assert( pIV != nullptr && cubIV >= aesEncrypt.BlockSize() );
 
 			ArraySink pOutputSink( pTemp, *pcubEncryptedData );
 
@@ -400,7 +400,7 @@ static bool SymmetricDecryptWorker( const uint8 *pubEncryptedData, size_t cubEnc
 
 	try		// handle any exceptions crypto++ may throw
 	{
-		if ( pTemp != NULL )
+		if ( pTemp != nullptr )
 		{
 			CryptoPP::ArraySink pOutputSink( pTemp, *pcubPlaintextData );
 			CryptoPP::CBC_Mode_ExternalCipher::Decryption cbc( aesDecrypt, pIV );
@@ -663,7 +663,7 @@ bool CCrypto::EncryptWithPasswordAndHMACWithIV( const uint8 *pubPlaintextData, s
 		if ( cubBuffer < *pcubEncryptedData )
 			return false;
 
-		SHADigest_t *pHMAC = (SHADigest_t*)( pubEncryptedData + cubEncrypted );
+		auto *pHMAC = (SHADigest_t*)( pubEncryptedData + cubEncrypted );
 		bRet = CCrypto::GenerateHMAC( pubEncryptedData, cubEncrypted, rgubKey, k_nSymmetricKeyLen, pHMAC );
 	}
 
@@ -707,7 +707,7 @@ bool CCrypto::DecryptWithPasswordAndAuthenticate( const uint8 * pubEncryptedData
 	}
 
 	size_t cubCiphertext = cubEncryptedData - sizeof(SHADigest_t);
-	SHADigest_t *pHMAC = (SHADigest_t*)( pubEncryptedData + cubCiphertext  );
+	auto *pHMAC = (SHADigest_t*)( pubEncryptedData + cubCiphertext  );
 	SHADigest_t hmacActual;
 	bool bRet = CCrypto::GenerateHMAC( pubEncryptedData, cubCiphertext, rgubKey, k_nSymmetricKeyLen, &hmacActual );
 
@@ -1258,7 +1258,7 @@ size_t CCrypto::Base64EncodeMaxOutput( const size_t cubData, const char *pszLine
 //-----------------------------------------------------------------------------
 bool CCrypto::Base64Encode( const uint8 *pubData, size_t cubData, char *pchEncodedData, size_t cchEncodedData, bool bInsertLineBreaks )
 {
-	const char *pszLineBreak = bInsertLineBreaks ? "\n" : NULL;
+	const char *pszLineBreak = bInsertLineBreaks ? "\n" : nullptr;
 	[[maybe_unused]] size_t cchRequired = Base64EncodeMaxOutput( cubData, pszLineBreak );
 	AssertMsg2( cchEncodedData >= cchRequired, "CCrypto::Base64Encode: insufficient output buffer for encoding, needed %zu got %zu\n", cchRequired, cchEncodedData );
 	return Base64Encode( pubData, cubData, pchEncodedData, &cchEncodedData, pszLineBreak );
@@ -1279,7 +1279,7 @@ bool CCrypto::Base64Encode( const uint8 *pubData, size_t cubData, char *pchEncod
 {
 	VPROF_BUDGET( "CCrypto::Base64Encode", VPROF_BUDGETGROUP_ENCRYPTION );
 	
-	if ( pchEncodedData == NULL )
+	if ( pchEncodedData == nullptr )
 	{
 		AssertMsg( *pcchEncodedData == 0, "NULL output buffer with non-zero size passed to Base64Encode" );
 		*pcchEncodedData = Base64EncodeMaxOutput( cubData, pszLineBreak );
@@ -1411,7 +1411,7 @@ bool CCrypto::Base64Decode( const char *pchData, size_t cchDataMax, uint8 *pubDe
 	size_t cubDecodedData = *pcubDecodedData;
 	size_t cubDecodedDataOrig = cubDecodedData;
 
-	if ( pubDecodedData == NULL )
+	if ( pubDecodedData == nullptr )
 	{
 		AssertMsg( *pcubDecodedData == 0, "NULL output buffer with non-zero size passed to Base64Decode" );
 		cubDecodedDataOrig = cubDecodedData = ~0u;
@@ -2034,7 +2034,7 @@ bool CCrypto::BValidatePasswordHash( const char *pchInput, EPasswordHashAlg hash
 	Assert( cDigest != 0 );
 	PasswordHash_t tmpDigest;
 	PasswordHash_t *pOutputDigest = pDigestComputed;
-	if ( pOutputDigest == NULL )
+	if ( pOutputDigest == nullptr )
 	{
 		pOutputDigest = &tmpDigest;
 	}
