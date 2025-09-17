@@ -35,9 +35,7 @@ CBudgetBarGraphPanel::CBudgetBarGraphPanel( CBaseBudgetPanel *pParent, const cha
 	SetBgColor( Color( 255, 0, 0, budget_bargraph_background_alpha.GetInt() ) );
 }
 
-CBudgetBarGraphPanel::~CBudgetBarGraphPanel()
-{
-}
+CBudgetBarGraphPanel::~CBudgetBarGraphPanel() = default;
 
 void CBudgetBarGraphPanel::GetBudgetGroupTopAndBottom( intp id, int &top, int &bottom )
 {
@@ -102,7 +100,7 @@ void CBudgetBarGraphPanel::DrawTickAtIndex( intp id, float percent, int red, int
 	vgui::surface()->DrawFilledRect( left, top+2, right, bottom-2 );
 }
 
-void CBudgetBarGraphPanel::DrawTimeLines( void )
+void CBudgetBarGraphPanel::DrawTimeLines()
 {
 	int panelWidth, panelHeight;
 	GetSize( panelWidth, panelHeight );
@@ -231,7 +229,7 @@ void CBudgetBarGraphPanel::DrawAverages()
 	}
 }
 
-void CBudgetBarGraphPanel::Paint( void )
+void CBudgetBarGraphPanel::Paint()
 {
 	int width, height;
 	GetSize( width, height );

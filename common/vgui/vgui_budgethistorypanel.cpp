@@ -39,9 +39,7 @@ CBudgetHistoryPanel::CBudgetHistoryPanel( CBaseBudgetPanel *pParent, const char 
 	SetMinimumSize( 0, 0 );
 }
 
-CBudgetHistoryPanel::~CBudgetHistoryPanel()
-{
-}
+CBudgetHistoryPanel::~CBudgetHistoryPanel() = default;
 
 void CBudgetHistoryPanel::Paint()
 {

@@ -25,17 +25,15 @@ CBaseBudgetPanel::CBaseBudgetPanel( vgui::Panel *pParent, const char *pElementNa
 	vgui::HScheme scheme = vgui::scheme()->LoadSchemeFromFile("resource/SourceScheme.res", "Client");
 	SetScheme( scheme );
 
-	m_pBudgetHistoryPanel = NULL;
-	m_pBudgetBarGraphPanel = NULL;
+	m_pBudgetHistoryPanel = nullptr;
+	m_pBudgetBarGraphPanel = nullptr;
 	SetZPos( 1001 );
 
 	m_bDedicated = false;
 }
 
 
-CBaseBudgetPanel::~CBaseBudgetPanel()
-{
-}
+CBaseBudgetPanel::~CBaseBudgetPanel() = default;
 
 
 float CBaseBudgetPanel::GetBudgetGroupPercent( float value )
@@ -53,7 +51,7 @@ const double *CBaseBudgetPanel::GetBudgetGroupData( intp &nGroups, int &nSamples
 	nSampleOffset = m_BudgetHistoryOffset;
 	if( m_BudgetGroupTimes.Count() == 0 )
 	{
-		return NULL;
+		return nullptr;
 	}
 	else
 	{
@@ -62,7 +60,7 @@ const double *CBaseBudgetPanel::GetBudgetGroupData( intp &nGroups, int &nSamples
 }
 
 
-void CBaseBudgetPanel::ClearTimesForAllGroupsForThisFrame( void )
+void CBaseBudgetPanel::ClearTimesForAllGroupsForThisFrame()
 {
 	intp i;
 	for( i = 0; i < m_ConfigData.m_BudgetGroupInfo.Count(); i++ )

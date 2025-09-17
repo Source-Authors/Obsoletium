@@ -21,28 +21,28 @@ class IConVar;
 // Shared between the engine and dedicated server.
 class CBudgetPanelShared : public CBaseBudgetPanel
 {
-	typedef CBaseBudgetPanel BaseClass;
+	using BaseClass = CBaseBudgetPanel;
 
 public:
 
 	// budgetFlagsFilter is a combination of BUDGETFLAG_ defines that filters out which budget groups we are interested in.
 	CBudgetPanelShared( vgui::Panel *pParent, const char *pElementName, int budgetFlagsFilter );
-	virtual ~CBudgetPanelShared();
+	~CBudgetPanelShared() override;
 
 	// Override this to set the window position.
 	virtual void SetupCustomConfigData( CBudgetPanelConfigData &data );
 
-	virtual void SetTimeLabelText();
-	virtual void SetHistoryLabelText();
+	void SetTimeLabelText() override;
+	void SetHistoryLabelText() override;
 
 	void PaintBackground() override;
-	void Paint( void ) override;
+	void Paint() override;
 	void PostChildPaint() override;
 
 	virtual void SnapshotVProfHistory( float filteredtime  );
 
 	// Command handlers
-	void OnNumBudgetGroupsChanged( void );
+	void OnNumBudgetGroupsChanged();
 
 	void SendConfigDataToBase();
 

@@ -18,20 +18,20 @@ class CBaseBudgetPanel;
 
 class CBudgetBarGraphPanel : public vgui::Panel
 {
-	typedef vgui::Panel BaseClass;
+	using BaseClass = vgui::Panel;
 
 public:
 	CBudgetBarGraphPanel( CBaseBudgetPanel *pParent, const char *pPanelName );
-	virtual ~CBudgetBarGraphPanel();
+	~CBudgetBarGraphPanel() override;
 
-	void Paint( void ) override;
+	void Paint() override;
 
 private:
 
 	void DrawInstantaneous();
 	void DrawPeaks();
 	void DrawAverages();
-	void DrawTimeLines( void );
+	void DrawTimeLines();
 	void GetBudgetGroupTopAndBottom( intp id, int &top, int &bottom );
 	void DrawBarAtIndex( intp id, float percent );
 	void DrawTickAtIndex( intp id, float percent, int red, int green, int blue, int alpha );
