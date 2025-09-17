@@ -25,7 +25,7 @@ public:
 	virtual void		BeginPerformancePlay( CReplayPerformance *pPerformance ) = 0;
 	virtual void		EndPerformancePlay() = 0;
 
-	virtual bool		IsPlaying() const = 0;
+	[[nodiscard]] virtual bool		IsPlaying() const = 0;
 };
 
 //----------------------------------------------------------------------------------------

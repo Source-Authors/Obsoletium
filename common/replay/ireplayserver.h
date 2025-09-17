@@ -33,7 +33,7 @@ class CServerReplay;
 class IReplayServer : public IBaseInterface
 {
 public:
-	virtual	~IReplayServer() {}
+	~IReplayServer() override = default;
 
 	virtual	IServer	*GetBaseServer() = 0; // get Replay base server interface
 	virtual	IReplayDirector *GetDirector() = 0;	// get director interface

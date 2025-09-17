@@ -18,14 +18,14 @@
 
 //----------------------------------------------------------------------------------------
 
-typedef unsigned int MovieHandle_t;
+using MovieHandle_t = unsigned int;
 
 struct RenderMovieParams_t
 {
-	inline RenderMovieParams_t() : m_iPerformance( -1 ) { V_memset( this, 0, sizeof( RenderMovieParams_t ) ); m_Settings.m_FPS.SetFPS( 0, false ); }
+	inline RenderMovieParams_t()  { V_memset( this, 0, sizeof( RenderMovieParams_t ) ); m_Settings.m_FPS.SetFPS( 0, false ); }
 
 	ReplayHandle_t		m_hReplay;
-	int					m_iPerformance;		// -1 for default view, otherwise this is an index into the replay's m_vecPerformances vector.
+	int					m_iPerformance{ -1 };		// -1 for default view, otherwise this is an index into the replay's m_vecPerformances vector.
 	wchar_t				m_wszTitle[MAX_REPLAY_TITLE_LENGTH];
 	char				m_szVideoPreset[64];
 	char				m_szExtension[16];	// File extension
@@ -48,7 +48,7 @@ struct RenderMovieParams_t
 	m_Settings;
 };
 
-typedef RenderMovieParams_t::ReplayRenderSettings_t ReplayRenderSettings_t;
+using ReplayRenderSettings_t = RenderMovieParams_t::ReplayRenderSettings_t;
 
 //----------------------------------------------------------------------------------------
 

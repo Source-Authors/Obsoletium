@@ -29,7 +29,7 @@ class CReplayPerformance;
 class CReplay : public CBaseReplaySerializeable,
 				public IQueryableReplayItem
 {
-	typedef CBaseReplaySerializeable BaseClass;
+	using BaseClass = CBaseReplaySerializeable;
 
 public:
 	enum ReplayStatus_t
@@ -44,16 +44,16 @@ public:
 	};
 
 	CReplay();
-	virtual ~CReplay() {}
+	~CReplay() override = default;
 
 	//
 	// IReplaySerializeable
 	//
-	virtual const char	*GetSubKeyTitle() const;
-	virtual const char	*GetPath() const;
-	virtual void		OnDelete();
-	virtual bool		Read( KeyValues *pIn );
-	virtual void		Write( KeyValues *pOut );
+	const char	*GetSubKeyTitle() const override;
+	const char	*GetPath() const override;
+	void		OnDelete() override;
+	bool		Read( KeyValues *pIn ) override;
+	void		Write( KeyValues *pOut ) override;
 
 	virtual void DumpGameSpecificData() const {}
 
@@ -95,17 +95,17 @@ public:
 	inline int GetDeathTick() const { return m_nDeathTick; }
 
 	// IQueryableReplayItem implementation:
-	virtual const CReplayTime &GetItemDate() const;
-	virtual bool IsItemRendered() const;
-	virtual CReplay *GetItemReplay();
-	virtual ReplayHandle_t	GetItemReplayHandle() const;
-	virtual QueryableReplayItemHandle_t	GetItemHandle() const;
-	virtual const wchar_t *GetItemTitle() const;
-	virtual void SetItemTitle( const wchar_t *pTitle );
-	virtual float GetItemLength() const;
-	virtual void *GetUserData();
-	virtual void SetUserData( void* pUserData );
-	virtual bool IsItemAMovie() const;
+	const CReplayTime &GetItemDate() const override;
+	bool IsItemRendered() const override;
+	CReplay *GetItemReplay() override;
+	ReplayHandle_t	GetItemReplayHandle() const override;
+	QueryableReplayItemHandle_t	GetItemHandle() const override;
+	const wchar_t *GetItemTitle() const override;
+	void SetItemTitle( const wchar_t *pTitle ) override;
+	float GetItemLength() const override;
+	void *GetUserData() override;
+	void SetUserData( void* pUserData ) override;
+	bool IsItemAMovie() const override;
 
 	// Non-persistent data
 	mutable IReplayDownloadEventHandler *m_pDownloadEventHandler;	// Implemented by replay browser - the reason we've got one per replay rather than

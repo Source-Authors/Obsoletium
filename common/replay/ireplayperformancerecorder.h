@@ -30,7 +30,7 @@ public:
 	virtual void		NotifyPauseState( bool bPaused ) = 0;
 
 	virtual CReplayPerformance	*GetPerformance() = 0;
-	virtual bool		IsRecording() const = 0;
+	[[nodiscard]] virtual bool		IsRecording() const = 0;
 
 	virtual void		SnipAtTime( float flTime ) = 0;
 	virtual void		NotifySkipping() = 0;

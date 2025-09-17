@@ -38,12 +38,12 @@ public:
 	virtual IReplayMovie	*GetPendingMovie() = 0;
 	virtual void			FlagMovieForFlush( IReplayMovie *pMovie, bool bImmediate ) = 0;
 	virtual void			GetMoviesAsQueryableItems( CUtlLinkedList< IQueryableReplayItem *, int > &lstMovies ) = 0;
-	virtual const char		*GetRenderDir() const = 0;
-	virtual const char		*GetRawExportDir() const = 0;
+	[[nodiscard]] virtual const char		*GetRenderDir() const = 0;
+	[[nodiscard]] virtual const char		*GetRawExportDir() const = 0;
 
 	// TODO: Is this the best place for code that actually manages rendering?
-	virtual bool			IsRendering() const = 0;
-	virtual bool			RenderingCancelled() const = 0;
+	[[nodiscard]] virtual bool			IsRendering() const = 0;
+	[[nodiscard]] virtual bool			RenderingCancelled() const = 0;
 	virtual void			RenderMovie( RenderMovieParams_t const& params ) = 0;	// Renders the given replay - or if params.hReplay is -1, render all unrendered replays
 	virtual void			RenderNextMovie() = 0;
 	virtual void			CompleteRender( bool bSuccess, bool bShowBrowser ) = 0;

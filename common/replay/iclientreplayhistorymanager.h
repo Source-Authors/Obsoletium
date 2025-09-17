@@ -18,7 +18,7 @@
 #include "engine/http.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/checksum_crc.h"
-#include <time.h>
+#include <ctime>
 
 //----------------------------------------------------------------------------------------
 
@@ -45,7 +45,7 @@ public:
 	virtual void			Shutdown() = 0;
 	virtual void			Think() = 0;
 
-	virtual bool			IsInitialized() const = 0;
+	[[nodiscard]] virtual bool			IsInitialized() const = 0;
 	virtual bool			Commit( CBaseReplay *pNewReplay ) = 0;
 	
 	virtual void			Save() = 0;	// Write the entire index and any replays/groups/movies that are marked as dirty
@@ -60,7 +60,7 @@ public:
 	virtual const char		*GetReplaysSubDir() = 0;	// Returns "client" or "server"
 
 	// For loop through all replays - indices should not be cached
-	virtual int				GetReplayCount() const = 0;
+	[[nodiscard]] virtual int				GetReplayCount() const = 0;
 //	virtual CBaseReplay		*GetReplayAtIndex( int nIndex ) = 0;
 
 	virtual const char		*GetFullReplayPath() = 0;		// Get c:\...\game\tf\replays\<client or server>\
