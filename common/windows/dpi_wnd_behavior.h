@@ -10,17 +10,19 @@
 FORWARD_DECLARE_HANDLE(HWND);
 
 #if defined(_WIN64)
-typedef unsigned __int64 UINT_PTR, *PUINT_PTR;
-typedef __int64 LONG_PTR, *PLONG_PTR;
+using UINT_PTR = unsigned long long;
+using PUINT_PTR = UINT_PTR*;
+using LONG_PTR = long long;
+using PLONG_PTR = LONG_PTR*;
 #else
 typedef unsigned int UINT_PTR, *PUINT_PTR; //-V677
 typedef long LONG_PTR, *PLONG_PTR; //-V677
 #endif
 
 /* Types use for passing & returning polymorphic values */
-typedef UINT_PTR WPARAM; //-V677
-typedef LONG_PTR LPARAM; //-V677
-typedef LONG_PTR LRESULT; //-V677
+using WPARAM = UINT_PTR; //-V677
+using LPARAM = LONG_PTR; //-V677
+using LRESULT = LONG_PTR; //-V677
 
 namespace se::windows::ui {
 
