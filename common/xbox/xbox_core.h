@@ -5,22 +5,30 @@
 //=============================================================================
 #pragma once
 
-#define XBOX_DONTCARE					0		// for functions with don't care params
+enum {
+XBOX_DONTCARE =					0		// for functions with don't care params
+};
 
-#define XBX_MAX_DPORTS					4
-#define XBX_MAX_BUTTONSAMPLE			32768
-#define XBX_MAX_ANALOGSAMPLE			255
-#define XBX_MAX_MESSAGE					2048
+enum {
+XBX_MAX_DPORTS =					4,
+XBX_MAX_BUTTONSAMPLE =			32768,
+XBX_MAX_ANALOGSAMPLE =			255,
+XBX_MAX_MESSAGE =					2048
+};
 #define XBX_MAX_PATH					MAX_PATH
-#define XBX_MAX_RCMDLENGTH				256
-#define XBX_MAX_RCMDNAMELEN				32
-#define XBX_HDD_CLUSTERSIZE				16384
+enum {
+XBX_MAX_RCMDLENGTH =				256,
+XBX_MAX_RCMDNAMELEN =				32,
+XBX_HDD_CLUSTERSIZE =				16384
+};
 
 // could be dvd or hdd, actual device depends on source of xex launch
 #define XBX_DVD_DRIVE					"D:\\"
 #define XBX_BOOT_DRIVE					"D:\\"
 
-#define XBX_IOTHREAD_STACKSIZE			32768
+enum {
+XBX_IOTHREAD_STACKSIZE =			32768
+};
 #define XBX_IOTHREAD_PRIORITY			THREAD_PRIORITY_HIGHEST
 
 // scale by screen dimension to get an inset
@@ -38,14 +46,18 @@
 #define XBX_XEX_BASE_FILENAME			"default.xex"
 #define XBX_XEX_PATH					XBX_BOOT_DRIVE XBX_XEX_BASE_FILENAME
 
-#define XBX_CLR_DEFAULT					0xFF000000
-#define XBX_CLR_WARNING					0x0000FFFF
-#define XBX_CLR_ERROR					0x000000FF
+enum {
+XBX_CLR_DEFAULT =					0xFF000000,
+XBX_CLR_WARNING =					0x0000FFFF,
+XBX_CLR_ERROR =						0x000000FF
+};
 
 // disk space requirements
-#define XBX_SAVEGAME_BYTES				( 1024 * 1024 * 2 )
-#define XBX_CONFIGFILE_BYTES			( 1024 * 100 )
-#define XBX_USER_STATS_BYTES			( 1024 * 28 )
+enum {
+XBX_SAVEGAME_BYTES =			( 1024 * 1024 * 2 ),
+XBX_CONFIGFILE_BYTES =			( 1024 * 100 ),
+XBX_USER_STATS_BYTES =			( 1024 * 28 )
+};
 #define XBX_USER_SETTINGS_BYTES			( XBX_CONFIGFILE_BYTES + XBX_USER_STATS_BYTES )
 
 #define XBX_PERSISTENT_BYTES_NEEDED		( XBX_SAVEGAME_BYTES * 10 )	// 8 save games, 1 autosave, 1 autosavedangerous
@@ -55,23 +67,23 @@
 #define MAKE_NON_SRGB_FMT(x)			((D3DFORMAT)( ((unsigned int)(x)) & ~(D3DFORMAT_SIGNX_MASK | D3DFORMAT_SIGNY_MASK | D3DFORMAT_SIGNZ_MASK)))
 #define IS_D3DFORMAT_SRGB( x )			( MAKESRGBFMT(x) == (x) )
 
-typedef enum
+using xevent_e = enum
 {
 	XEV_NULL,
 	XEV_REMOTECMD,
 	XEV_QUIT,
 	XEV_LISTENER_NOTIFICATION,
-} xevent_e;
+};
 
-typedef struct xevent_s
+using xevent_t = struct xevent_s
 {
 	xevent_e	event;
 	int			arg1;
 	int			arg2;
 	int			arg3;
-} xevent_t;
+};
 
-typedef enum
+using xKey_t = enum
 {
 	XK_NULL,
 	XK_BUTTON_UP,
@@ -99,9 +111,9 @@ typedef enum
 	XK_STICK2_LEFT,
 	XK_STICK2_RIGHT,
 	XK_MAX_KEYS,
-} xKey_t;
+};
 
-typedef struct
+using xTextureList_t = struct
 {
 	const char	*pName;
 	const char	*pGroupName;
@@ -119,16 +131,16 @@ typedef struct
 	int			fallback;
 	int			final;
 	int			failed;
-} xTextureList_t;
+};
 
-typedef struct
+using xMaterialList_t = struct
 {
 	const char	*pName;
 	const char	*pShaderName;
 	int			refCount;
-} xMaterialList_t;
+};
 
-typedef struct
+using xSoundList_t = struct
 {
 	char		name[MAX_PATH];
 	char		formatName[32];
@@ -139,9 +151,9 @@ typedef struct
 	int			dataSize;
 	int			numSamples;
 	int			streamed;
-} xSoundList_t;
+};
 
-typedef struct
+using xMapInfo_t = struct
 {
 	float	position[3];
 	float	angle[3];
@@ -149,7 +161,7 @@ typedef struct
 	char	savePath[256];
 	int		build;
 	int		skill;
-} xMapInfo_t;
+};
 
 /******************************************************************************
 	XBOX_SYSTEM.CPP

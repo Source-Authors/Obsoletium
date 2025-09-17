@@ -228,7 +228,7 @@ public:
 		return m_Launch.header.flags;
 	}
 
-	int GetStorageID( void )
+	int GetStorageID()
 	{
 		RestoreOrResetLaunchData();
 		return m_Launch.header.nStorageID;
@@ -239,7 +239,7 @@ public:
 		m_Launch.header.nStorageID = storageID;
 	}
 
-	int GetUserID( void )
+	int GetUserID()
 	{
 		RestoreOrResetLaunchData();
 		return m_Launch.header.nUserID;
@@ -250,7 +250,7 @@ public:
 		m_Launch.header.nUserID = userID;
 	}
 
-	bool GetForceEnglish( void )
+	bool GetForceEnglish()
 	{
 		RestoreOrResetLaunchData();
 		return m_Launch.header.bForceEnglish ? true : false;
