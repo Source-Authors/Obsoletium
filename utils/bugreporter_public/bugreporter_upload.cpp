@@ -39,9 +39,9 @@
 
 #include "tier0/memdbgon.h"
 
-typedef unsigned int u32;
-typedef unsigned char u8;
-typedef unsigned short u16;
+using u32 = unsigned int;
+using u8 = unsigned char;
+using u16 = unsigned short;
 
 namespace BugReportHarvester
 {
@@ -68,25 +68,25 @@ using namespace BugReportHarvester;
 
 // TODO: cut protocol version down to u8 if possible, to reduce bandwidth usage 
 // for very frequent but tiny commands.
-typedef u32		ProtocolVersion_t;
+using ProtocolVersion_t = u32;
 
-typedef u8		ProtocolAcceptanceFlag_t;
-typedef u8		ProtocolUnacceptableAck_t;
+using ProtocolAcceptanceFlag_t = u8;
+using ProtocolUnacceptableAck_t = u8;
 
-typedef u32		MessageSequenceId_t;
+using MessageSequenceId_t = u32;
 
-typedef u32		ServerSessionHandle_t;
-typedef u32		ClientSessionHandle_t;
+using ServerSessionHandle_t = u32;
+using ClientSessionHandle_t = u32;
 
-typedef u32		NetworkTransactionId_t;
+using NetworkTransactionId_t = u32;
 
 // Command codes are intentionally as small as possible to minimize bandwidth usage 
 // for very frequent but tiny commands (e.g. GDS 'FindServer' commands).
-typedef u8		Command_t;
+using Command_t = u8;
 
 // ... likewise response codes are as small as possible - we use this when we 
 // ... can and revert to large types on a case by case basis.
-typedef u8		CommandResponse_t;
+using CommandResponse_t = u8;
 
 
 // This define our standard type for length prefix for variable length messages 
@@ -99,11 +99,11 @@ typedef u8		CommandResponse_t;
 
 // We support u16 or u32 (obviously switching between them breaks existing protocols 
 // unless all components are switched simultaneously).
-typedef	u32		NetworkMessageLengthPrefix_t;
+using NetworkMessageLengthPrefix_t = u32;
 
 
 // Similarly, strings should be preceeded by their length.
-typedef u16		StringLengthPrefix_t;
+using StringLengthPrefix_t = u16;
 
 
 [[maybe_unused]] constexpr ProtocolAcceptanceFlag_t	cuProtocolIsNotAcceptable
@@ -119,7 +119,7 @@ constexpr Command_t cuMaxCommand
 								= static_cast<CommandResponse_t>(255);
 
 // This is for mapping requests back to error ids for placing into the database appropriately.
-typedef u32								ContextID_t;
+using ContextID_t = u32;
 
 // This is the version of the protocol used by latest-build clients.
 constexpr ProtocolVersion_t cuCurrentProtocolVersion = 1;
@@ -143,16 +143,16 @@ namespace Commands
 
 namespace HarvestFileCommand
 {
-	typedef u32							SenderTypeId_t;
-	typedef u32							SenderTypeUniqueId_t;
-	typedef u32							SenderSourceCodeControlId_t;
-	typedef u32							FileSize_t;
+	using SenderTypeId_t = u32;
+	using SenderTypeUniqueId_t = u32;
+	using SenderSourceCodeControlId_t = u32;
+	using FileSize_t = u32;
 
 	// Legal values defined by EFileType
-	typedef u32							FileType_t;
+	using FileType_t = u32;
 
 	// Legal values defined by ESendMethod
-	typedef u32							SendMethod_t;
+	using SendMethod_t = u32;
 
 	constexpr CommandResponse_t		cuOkToSendFile					= 0;
 	constexpr CommandResponse_t		cuFileTooBig					= 1;
@@ -177,7 +177,7 @@ namespace HarvestFileCommand
 //		Handles uploading bug report data blobs to the CSERServer
 //		(Client Stats & Error Reporting Server)
 
-typedef enum
+using EBugReportUploadStatus = enum
 {
 	// General status
 	eBugReportUploadSucceeded = 0,
@@ -194,7 +194,7 @@ typedef enum
 	eBugReportConnectToCSERServerFailed,
 	eBugReportUploadingBugReportSucceeded,
 	eBugReportUploadingBugReportFailed
-} EBugReportUploadStatus;
+};
 
 struct TBugReportProgress
 {
@@ -202,7 +202,7 @@ struct TBugReportProgress
 	char			m_sStatus[ 512 ];
 };
 
-typedef void ( *BUGREPORTREPORTPROGRESSFUNC )( u32 uContext, const TBugReportProgress & rBugReportProgress );
+using BUGREPORTREPORTPROGRESSFUNC = void (*)(u32, const TBugReportProgress &);
 
 static void BugUploadProgress( u32, const TBugReportProgress & )
 {
@@ -410,7 +410,7 @@ private:
 	bool	SendGracefulClose( EBugReportUploadStatus& status, CUtlBuffer& buf );
 	bool	CloseTCPSocket( EBugReportUploadStatus& status, CUtlBuffer& buf );
 
-	typedef bool ( CWin32UploadBugReport::*pfnProtocolStateHandler )( EBugReportUploadStatus& status, CUtlBuffer& buf );
+	using pfnProtocolStateHandler = bool (CWin32UploadBugReport::*)(EBugReportUploadStatus &, CUtlBuffer &);
 	struct FSMState_t
 	{
 		FSMState_t( uint f, pfnProtocolStateHandler s ) :
@@ -428,9 +428,9 @@ private:
 	bool	DoBlockingReceive( uint bytesExpected, CUtlBuffer& buf );
 
 	CUtlVector< FSMState_t >		m_States;
-	uint							m_uCurrentState;
+	uint							m_uCurrentState{ eCreateTCPSocket };
 	struct sockaddr_in				m_HarvesterSockAddr;
-	uintp							m_SocketTCP;
+	uintp							m_SocketTCP{ 0 };
 	const TBugReportParameters	&m_rBugReportParameters; //lint !e1725
 	u32								m_ContextID;
 };
@@ -440,9 +440,7 @@ CWin32UploadBugReport::CWin32UploadBugReport(
 	const TBugReportParameters & rBugReportParameters, 
 	u32 contextid ) :
 	m_States(),
-	m_uCurrentState( eCreateTCPSocket ),
 	m_HarvesterSockAddr(),
-	m_SocketTCP( 0 ),
 	m_rBugReportParameters( rBugReportParameters ),
 	m_ContextID( contextid )
 {
@@ -506,7 +504,7 @@ EBugReportUploadStatus CWin32UploadBugReport::Upload( CUtlBuffer& buf )
 
 	EBugReportUploadStatus result = eBugReportUploadSucceeded;
 	// Run the state machine
-	while ( 1 )
+	while ( true )
 	{
 		Assert( m_States[ m_uCurrentState ].first == m_uCurrentState );
 		pfnProtocolStateHandler handler = m_States[ m_uCurrentState ].second;
@@ -656,7 +654,7 @@ bool CWin32UploadBugReport::ReceiveOKToSendFile( EBugReportUploadStatus& status,
 	}
 
 	bool dosend = false;
-	CommandResponse_t cmd = (CommandResponse_t)buf.GetChar();
+	auto cmd = (CommandResponse_t)buf.GetChar();
 	switch ( cmd )
 	{
 	case HarvestFileCommand::cuOkToSendFile:
@@ -688,7 +686,7 @@ bool CWin32UploadBugReport::SendWholeFile( EBugReportUploadStatus& status, CUtlB
 {
 	UpdateProgress( m_rBugReportParameters, "Uploading bug report data." );
 	// Send to server
-	char *filebuf = NULL;
+	char *filebuf = nullptr;
 	size_t sizeactual = g_pFileSystem->Size( m_rBugReportParameters.m_sAttachmentFile );
 	if ( sizeactual > 0 )
 	{
