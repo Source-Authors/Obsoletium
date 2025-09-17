@@ -5,20 +5,25 @@
 //=============================================================================
 
 #include "tgaloader.h"
+
+#include <cstdint>
+
 #include "tier0/dbg.h"
 
 #pragma pack(1)
-typedef struct _TargaHeader {
-	unsigned char 	id_length, colormap_type, image_type;
-	unsigned short	colormap_index, colormap_length;
-	unsigned char	colormap_size;
-	unsigned short	x_origin, y_origin, width, height;
-	unsigned char	pixel_size, attributes;
-} TargaHeader;
+using TargaHeader = struct _TargaHeader {
+	uint8_t 	id_length, colormap_type, image_type;
+	uint16_t	colormap_index, colormap_length;
+	uint8_t		colormap_size;
+	uint16_t	x_origin, y_origin, width, height;
+	uint8_t		pixel_size, attributes;
+};
 #pragma pack()
 
-#define TGA_ATTRIBUTE_HFLIP		16
-#define TGA_ATTRIBUTE_VFLIP		32
+enum {
+  TGA_ATTRIBUTE_HFLIP =		16,
+  TGA_ATTRIBUTE_VFLIP =		32
+};
 
 
 int fgetLittleShort (unsigned char **p)
@@ -47,7 +52,7 @@ int fgetLittleLong (unsigned char **p)
 bool GetTGADimensions( int32 iBytes, char *pData, int * width, int *height )
 {
 	TargaHeader header;
-	unsigned char *p = (unsigned char *)pData;
+	auto *p = (unsigned char *)pData;
 	if (width) *width = 0;
 	if (height) *height = 0;
 
@@ -86,7 +91,7 @@ bool GetTGADimensions( int32 iBytes, char *pData, int * width, int *height )
 bool LoadTGA( int32 iBytes, char *pData, byte **rawImage, int * rawImageBytes, int * width, int *height )
 {
 	TargaHeader header;
-	unsigned char *p = (unsigned char *)pData;
+	auto *p = (unsigned char *)pData;
 	if (width) *width = 0;
 	if (height) *height = 0;
 

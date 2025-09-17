@@ -9,6 +9,7 @@
 
 #include "simplecodec.h"
 #include <ctime>
+#include <array>
 
 namespace ValveFont
 {
@@ -18,13 +19,13 @@ namespace ValveFont
 //
 inline void EncodeFont( CUtlBuffer &buffer )
 {
-	srand( (unsigned) time( NULL ) );
+	srand( (unsigned) time( nullptr ) );
 
 	intp numBytes = buffer.TellPut();
 	int numSultBytes = 0x10 + ( rand() % 0x10 );
 	
-	char const *szTag = "VFONT1";
-	intp numTagBytes = V_strlen( szTag );
+	constexpr char szTag[]{"VFONT1"};
+	constexpr intp numTagBytes = std::size( szTag ) - 1;
 
 	for ( int k = 0; k < numSultBytes; ++ k )
 		buffer.PutUnsignedChar( k );
@@ -43,8 +44,8 @@ inline bool DecodeFont( CUtlBuffer &buffer )
 {
 	intp numTotalBytes = buffer.TellPut();
 
-	char const *szTag = "VFONT1";
-	intp numTagBytes = V_strlen( szTag );
+	constexpr char szTag[]{"VFONT1"};
+	constexpr intp numTagBytes = std::size( szTag ) - 1;
 	
 	if ( numTotalBytes <= numTagBytes )
 		return false;

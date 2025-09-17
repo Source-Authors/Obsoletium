@@ -23,10 +23,10 @@
 #define IDTYPE_VALVE	2
 #define IDTYPE_HLTV		3		
 #define IDTYPE_REPLAY	4
-typedef struct USERID_s
+using USERID_t = struct USERID_s
 {
 	int			idtype;
 	CSteamID steamid;
-} USERID_t;
+};
 
 #endif // USERID_H

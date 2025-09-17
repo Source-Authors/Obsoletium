@@ -17,11 +17,11 @@ bool GetJpegDimensions( const byte *pubData, int cubData, uint32 &width, uint32 
 
 // Convert Jpeg data to raw RGBA, pubData is the jpeg data, cubData is it's size, buf is for output, and width/height are output as well.
 // pcubUsed is an optional output param for how many bytes of data were used in the image
-bool ConvertJpegToRGBA( const byte *pubJpegData, int cubJpegData, CUtlBuffer &bufOutput, int &width, int &height, int *pcubUsed = NULL );
+bool ConvertJpegToRGBA( const byte *pubJpegData, int cubJpegData, CUtlBuffer &bufOutput, int &width, int &height, int *pcubUsed = nullptr );
 
 // Convert Jpeg data to raw RGB, pubData is the jpeg data, cubData is it's size, buf is for output, and width/height are output as well. 
 // pcubUsed is an optional output param for how many bytes of data were used in the image
-bool ConvertJpegToRGB( const byte *pubJpegData, int cubJpegData, CUtlBuffer &bufOutput, int &width, int &height, int *pcubUsed = NULL );
+bool ConvertJpegToRGB( const byte *pubJpegData, int cubJpegData, CUtlBuffer &bufOutput, int &width, int &height, int *pcubUsed = nullptr );
 
 // Write a Jpeg to disk, quality is 0-100
 bool ConvertRGBToJpeg( const char *pchFileOut, int quality, int width, int height, CUtlBuffer &bufRGB );

@@ -13,7 +13,7 @@
 class IObjectContainer  
 {
 public:
-	virtual ~IObjectContainer() {};
+	virtual ~IObjectContainer() = default;
 	
 	virtual void		Init() = 0;
 

@@ -9,7 +9,7 @@
 #include "tier1/utlvector.h"
 #include "tier0/vprof.h"
 #include "libjpeg-turbo/jpeglib.h"
-#include <setjmp.h>
+#include <csetjmp>
 //#include "fileio.h"
 
 class CFileWriter
@@ -22,13 +22,13 @@ class CJpegDestMgr : public jpeg_destination_mgr
 public:
 	CJpegDestMgr( CFileWriter &refOutputFileWriter )
 		: m_pOutputFileWriter( &refOutputFileWriter ),
-		m_pOutputBuffer( NULL )
+		m_pOutputBuffer( nullptr )
 	{
 		Init();
 	}
 
 	CJpegDestMgr( CUtlBuffer &refOutputBuffer )
-		: m_pOutputFileWriter( NULL ),
+		: m_pOutputFileWriter( nullptr ),
 		m_pOutputBuffer( &refOutputBuffer )
 	{
 		Init();
@@ -46,7 +46,7 @@ public:
 
 	static void imp_init_dest( j_compress_ptr cinfo )
 	{
-		CJpegDestMgr *pInstance = (CJpegDestMgr*)cinfo->dest;
+		auto *pInstance = (CJpegDestMgr*)cinfo->dest;
 
 		if ( pInstance->m_pOutputBuffer )
 			 pInstance->m_pOutputBuffer->EnsureCapacity( cinfo->image_width*cinfo->image_height*3 );
@@ -153,7 +153,7 @@ public:
 		// to actually do that.  The library tries to be robust and skip obviously bad data on its own
 		// one byte at a time as well, but faster here, and safer as the library can't always do it 
 		// correctly if we fail these calls.
-		CJpegSourceMgr *pInstance = (CJpegSourceMgr*)cinfo->src;
+		auto *pInstance = (CJpegSourceMgr*)cinfo->src;
 		pInstance->bytes_in_buffer -= num_bytes;
 		pInstance->next_input_byte += num_bytes;
 	}

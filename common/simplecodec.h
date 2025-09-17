@@ -7,7 +7,7 @@
 #ifndef COMMON_SIMPLE_CODEC
 #define COMMON_SIMPLE_CODEC
 
-#include <stdlib.h>
+#include <cstdlib>
 
 namespace SimpleCodec
 {

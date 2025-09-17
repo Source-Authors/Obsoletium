@@ -72,19 +72,19 @@ public:
 	void AppendBits( const uint8 * pData, uint32 NumBitsOfData );
 
 	void ReversiblyObfusticateBitsFromStart( uint32 NumBits, const uint8 * pObfusticationData, size_t uSizeOfObfusticationData );
-	uint8	 GetByteChecksumFromStart( uint32 NumBits ) const;
+	[[nodiscard]] uint8	 GetByteChecksumFromStart( uint32 NumBits ) const;
 
-	uint GetCurrNumBits() const
+	[[nodiscard]] int GetCurrNumBits() const
 	{
 		return m_uNumBits;
 	}
 
-	const uint8 * data() const
+	[[nodiscard]] const uint8 * data() const
 	{
 		return & m_vecU8[0];
 	}
 
-	size_t size() const
+	[[nodiscard]] size_t size() const
 	{
 		return m_vecU8.Count();
 	}
@@ -111,12 +111,12 @@ public:
 			m_uNextBitIdx = 0;
 		}
 
-		uint32 GetNumConsumedBits() const
+		[[nodiscard]] uint32 GetNumConsumedBits() const
 		{
 			return m_uNextBitIdx;
 		}
 
-		uint32 GetNumRemainingBits() const
+		[[nodiscard]] uint32 GetNumRemainingBits() const
 		{
 			return m_rSimpleBitString.m_uNumBits - m_uNextBitIdx;
 		}

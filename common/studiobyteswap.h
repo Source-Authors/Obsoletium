@@ -21,7 +21,7 @@ void	SourceIsNative( bool bActivate );
 void	SetVerbose( bool bVerbose );
 void	SetCollisionInterface( IPhysicsCollision *pPhysicsCollision );
 
-intp		ByteswapStudioFile( const char *pFilename, void *pOutBase, const void *pFileBase, intp fileSize, studiohdr_t *pHdr, CompressFunc_t pCompressFunc = NULL );
+intp		ByteswapStudioFile( const char *pFilename, void *pOutBase, const void *pFileBase, intp fileSize, studiohdr_t *pHdr, CompressFunc_t pCompressFunc = nullptr );
 intp		ByteswapPHY( void *pOutBase, const void *pFileBase, intp fileSize );
 intp		ByteswapANI( studiohdr_t* pHdr, void *pOutBase, const void *pFileBase, intp filesize );
 intp		ByteswapVVD( void *pOutBase, const void *pFileBase, intp fileSize );

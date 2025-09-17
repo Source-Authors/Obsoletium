@@ -43,9 +43,9 @@ extern "C"
 	ESteamError	SteamWeakVerifyNewValveCDKey
 					(
 						const char *	pszCDKeyFormattedForCDLabel,
-						uint *			pReceiveGameCode,
-						uint *			pReceiveSalesTerritoryCode,
-						uint *			pReceiveUniqueSerialNumber
+						unsigned *		pReceiveGameCode,
+						unsigned *		pReceiveSalesTerritoryCode,
+						unsigned *		pReceiveUniqueSerialNumber
 					);
 
 	// This returns data ready to send to the validation server.  
