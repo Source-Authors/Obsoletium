@@ -6,7 +6,7 @@
 #define HFX_VERSION_MINOR 5
 #define HFX_VERSION_MINOR_SZ "5"
 #define HFX_VERSION_FLOAT 0.5
-#include "util/HFXInterfaceHelper.h"
+#include "util/hfxinterfacehelper.h"
 
 //( NovintHFX )
 #include "HFXConfig.h"
@@ -31,9 +31,9 @@ class EffectTag;
 
 //ensure these are not int he NovintHFX namespace.
 #include "IHFXParam.h"
-#include "IHFXEffect.h"
+#include "ihfxeffect.h"
 
-typedef int _declspec(dllimport) (*LinkHFX_Fn)( const char * password, const char *cmdline, void **effects, void **system );
+using LinkHFX_Fn = int (*)(const char *, const char *, void **, void **);
 //temporarily disable warning regarding to data classes
 // needing external classes
 #pragma warning(disable:4661)
@@ -43,13 +43,13 @@ class IStack;
 struct IBaseEffectParams;
 class IBaseEffect;
 //( HapticsMath )
-#include "Types/hfxVec3.h"
+#include "types/hfxvec3.h"
 //( HapticsSystem )
 struct IHapticEffectParamGroup;
-typedef IHapticEffectParamGroup IHFXParamGroup;
-typedef int DeviceIndex;
-typedef unsigned long hfxPreciseTime;
-typedef bool (*EnableMouseFn)( void );
+using IHFXParamGroup = IHapticEffectParamGroup;
+using DeviceIndex = int;
+using hfxPreciseTime = unsigned long;
+using EnableMouseFn = bool (*)();
 
 enum eMouseMove
 {
@@ -81,24 +81,12 @@ enum eMouseClick
 	eHFXMC_Fourth,
 	eHFXMC_COUNT,
 };
-typedef bool (*MouseEmulationFn)( const double &devicex_pos, 
-								 const double &devicey_pos, 
-								 const double &devicez_pos, 
-								 const double &devicex_delta, 
-								 const double &devicey_delta, 
-								 const double &devicez_delta, 
-								 const int &buttons_down, 
-								 const int &buttons_pressed, 
-								 const int &buttons_released,
-								 bool moved,
-								 /* adjust if you would liek to send a mouse button */
-								 bool buttonsDown[eHFXMC_COUNT]
-								 );
+using MouseEmulationFn = bool (*)(const double &, const double &, const double &, const double &, const double &, const double &, const int &, const int &, const int &, bool, bool *);
 
 struct ApplicationData
 {
 };
-typedef void (*RollCallIndexSetCallBack)(IDevice *pDevice, const int devices_left);
+using RollCallIndexSetCallBack = void (*)(IDevice *, const int);
 class HFX_PURE_INTERFACE IHapticsSystem 
 {
 public:
@@ -115,7 +103,7 @@ public:
 	//HFX_VIRTUAL bool SetOptionalDeviceCount( unsigned int nDevices );
 
 	// Use this function to create a device. (note: when making multiple devices they must be connected in numerical order.)
-	virtual bool RunDevice(IDevice **ppDevice, const char *deviceName=0, const char *configDir=0) =0;
+	virtual bool RunDevice(IDevice **ppDevice, const char *deviceName=nullptr, const char *configDir=nullptr) =0;
 
 	// When using multiple devices you _MUST_ lock devices after device connection attempts are made.
 	virtual void LockDevices() =0;
@@ -124,7 +112,7 @@ public:
 	virtual void UnlockDevices() =0;
 
 	// Note: this will return the max number of devices specified in the constructor of HapticsSystem.
-	virtual unsigned int GetTargetDeviceCount() const =0;
+	[[nodiscard]] virtual unsigned int GetTargetDeviceCount() const =0;
 
 	// connects multiple devices at once. returns number of devices connected.
 	// if targetNumber==-1 then all connected devices will be ran.
@@ -141,10 +129,10 @@ public:
 	// of falcons the user has minus one.
 	// note: without roll call devices are ordered by their serial number.
 	// returns false if only one falcon is connected.
-	virtual bool RollCallDevices(RollCallIndexSetCallBack CallBackFn=0,bool bCreateThread=false) =0;
+	virtual bool RollCallDevices(RollCallIndexSetCallBack CallBackFn=nullptr,bool bCreateThread=false) =0;
 
 	// will return true untill roll call is over.
-	virtual bool IsInRollCall() const =0;
+	[[nodiscard]] virtual bool IsInRollCall() const =0;
 
 	// updates roll call data. only call this if your in a roll call and the roll call was not started
 	// with bCreateThread set to true.
@@ -168,7 +156,7 @@ public:
 	virtual void StopMouse() =0;
 
 	// returns if we are in cursor emulation. If pDevice is null it will return weather any device is in mouse emulation.
-	virtual bool IsMouseMode(const IDevice *pDevice=0) =0;
+	virtual bool IsMouseMode(const IDevice *pDevice=nullptr) =0;
 
 	//returns true if forces are allowed.
 	virtual bool ForcesAllowed() =0;
@@ -184,29 +172,29 @@ public:
 	//HFX_VIRTUAL void DisableForces() HFX_PURE;
 	//HFX_VIRTUAL void EnableForces() HFX_PURE;
 	//returns device of index nDevice
-	virtual IDevice *GetRunningDeviceByIndex(const DeviceIndex nDevice) const =0;
+	[[nodiscard]] virtual IDevice *GetRunningDeviceByIndex(const DeviceIndex nDevice) const =0;
 
 	//returns device on hardware index.
-	virtual IDevice *GetRunningDeviceByHardwareIndex(const int nSerialOrder) const =0;
+	[[nodiscard]] virtual IDevice *GetRunningDeviceByHardwareIndex(const int nSerialOrder) const =0;
 
 	//returns number of running devices.
-	virtual int RunningDeviceCount() const =0;
+	[[nodiscard]] virtual int RunningDeviceCount() const =0;
 
 	//returns number of devices connected to the users computer.
-	virtual int ConnectedDeviceCount() const =0;
+	[[nodiscard]] virtual int ConnectedDeviceCount() const =0;
 
 	// this will re count available devices.
 	// use ConnectedDeviceCount() to get the count.
 	virtual void RecountConnectedDevices() =0;
 
-	virtual bool AllocateEffectParameter(IHFXParamGroup *&pIEffectParam, HFXEffectID associatedClass, const char *copyCachedSettings=0, const char *storageName=0) =0;
-	HFX_INLINE bool AllocateEffectParameter(IHFXParamGroup *&pIEffectParam, const char *copyCachedSettings=(const char*)0, const char *storageName=0 ){return AllocateEffectParameter(pIEffectParam, 0, copyCachedSettings, storageName);}
+	virtual bool AllocateEffectParameter(IHFXParamGroup *&pIEffectParam, HFXEffectID associatedClass, const char *copyCachedSettings=nullptr, const char *storageName=nullptr) =0;
+	HFX_INLINE bool AllocateEffectParameter(IHFXParamGroup *&pIEffectParam, const char *copyCachedSettings=(const char*)nullptr, const char *storageName=nullptr ){return AllocateEffectParameter(pIEffectParam, 0, copyCachedSettings, storageName);}
 	virtual bool DeallocateEffectParameter(IHFXParamGroup *&ppIEffectParam) =0;
 
-	virtual unsigned int GetCachedParameterCount() const =0;
+	[[nodiscard]] virtual unsigned int GetCachedParameterCount() const =0;
 	virtual IHFXParamGroup *GetCachedParameter(const char *name) =0;
 	virtual IHFXParamGroup *GetCachedParameter(const unsigned int name) =0;
-	virtual const char *GetCachedParameterName(const unsigned int id) const =0;
+	[[nodiscard]] virtual const char *GetCachedParameterName(const unsigned int id) const =0;
 
 	// Note: any format ( besides Bitfile ) where it cannot find the file specified will try to 
 	// load a encoded bitfile if it does not exist. A bit file will be generated when you load any
@@ -220,10 +208,10 @@ public:
 	virtual bool SaveCache( const char *file ) =0;
 
 	//HFX_VIRTUAL bool LoadHFXModule( const char *moduleName, const char *modulePassword=0 ) HFX_PURE;
-	virtual hfxPreciseTime GetBaseTime() const =0;
-	virtual hfxPreciseTime GetRunTime() const =0;
-	virtual double GetRunTimeSeconds() const =0;
-	virtual double GetBaseTimeSeconds() const =0;
+	[[nodiscard]] virtual hfxPreciseTime GetBaseTime() const =0;
+	[[nodiscard]] virtual hfxPreciseTime GetRunTime() const =0;
+	[[nodiscard]] virtual double GetRunTimeSeconds() const =0;
+	[[nodiscard]] virtual double GetBaseTimeSeconds() const =0;
 
 	virtual bool CreateNewEffectStack(const char *uniqueName, IStack**ppStack, unsigned int inputDevices=0) =0;
 	virtual bool DeleteEffectStack(IStack**ppStack) =0;
@@ -244,18 +232,18 @@ public:
 	#endif
 	virtual bool ScaleDeviceCoordsForCursor( double &x, double &y, double width=-1, double height=-1, double offsetx=-1, double offsety=-1 ) =0;
 	// try and put device to sleep. if null all devices will try to sleep. devices will sleep untill touched.
-	virtual void AttemptSlumber(IDevice *device=0) =0;
+	virtual void AttemptSlumber(IDevice *device=nullptr) =0;
 
 	virtual void ActivateDynamicWindowHandler(const char *windowClassName, const char *windowText, unsigned int msHeartInterval=70) =0;
 	virtual void DeactivateDynamicWindowHandler() =0;
-	virtual bool IsDynamicWindowHandlerRunning() const =0;
+	[[nodiscard]] virtual bool IsDynamicWindowHandlerRunning() const =0;
 
-	virtual HFXEffectID RegisterEffectClass(const char *tag, HFXCreate_t alloc, HFXDestroy_t dealloc, HFXNEED needs, IHFXParamGroup *defaults=0) =0;
+	virtual HFXEffectID RegisterEffectClass(const char *tag, HFXCreate_t alloc, HFXDestroy_t dealloc, HFXNEED needs, IHFXParamGroup *defaults=nullptr) =0;
 #define HFX_NON_ELEMENT 0xFFFFF0
 	virtual bool SetParameterGroupVar(IHFXParamGroup &params, HFXParamID var, const char *string, unsigned int element=HFX_NON_ELEMENT) =0;
 	virtual bool SetParameterGroupVar(IHFXParamGroup &params, const char *varString, const char *string, unsigned int element=HFX_NON_ELEMENT) =0;
 	virtual HFXEffectID LookupEffectIDByName(const char *name) const =0;
-	virtual const char *LookupEffectNameByID(HFXEffectID id) const =0;
+	[[nodiscard]] virtual const char *LookupEffectNameByID(HFXEffectID id) const =0;
 
 	// only call if explicit stack syncs are enabled
 	virtual void SyncEffectStacks() =0;
@@ -289,25 +277,25 @@ namespace NovintHFX{
 };
 // This function callback type will be used with SetServoLoopCallbackFunction.
 //   The main difference between hdlServoOp and this is that you get the device.
-typedef int (*OldServoLoopFn) (void *pParam, class IDevice *pDevice, double outforces[3]);
+using OldServoLoopFn = int (*)(void *, class IDevice *, double *);
 class HFX_PURE_INTERFACE IDevice 
 {
 public:
 	//Is this device able to output forces?
-	virtual bool AcceptingForces() const =0;
+	[[nodiscard]] virtual bool AcceptingForces() const =0;
 
 	//The device is connected.
-	virtual bool IsConnected() const =0;
+	[[nodiscard]] virtual bool IsConnected() const =0;
 
 	//Sets pos to the tool Position.
 	virtual void GetToolPosition(double pos[3]) const =0;
 	virtual void GetToolPositionWorkspace(double pos[3]) const =0;
-	virtual void GetButtonData(int *down=0, int *pressed=0, int *released=0) const =0;
+	virtual void GetButtonData(int *down=nullptr, int *pressed=nullptr, int *released=nullptr) const =0;
 	virtual void GetCurrentForce(double force[3]) const =0;
-	virtual bool IsButtonDown( int nButton ) const =0;
+	[[nodiscard]] virtual bool IsButtonDown( int nButton ) const =0;
 	virtual IStack *GetEffectStack() =0;
-	virtual const DeviceIndex GetIndex() const =0;
-	virtual int GetHardwareIndex() const =0;
+	[[nodiscard]] virtual const DeviceIndex GetIndex() const =0;
+	[[nodiscard]] virtual int GetHardwareIndex() const =0;
 	virtual void InputUpdate() =0;
 
 	virtual bool ConnectStack( IStack *stack ) =0;
@@ -320,19 +308,19 @@ public:
 	// you should never call this unless your in a callback running on servo.
 	virtual void _GetServoData(double toolpos[3], int &buttons) =0;
 
-	virtual __int64 GetSerialNumber() const =0;
+	[[nodiscard]] virtual __int64 GetSerialNumber() const =0;
 
-	virtual BoundingBox3 GetWorkspace() const =0;
+	[[nodiscard]] virtual BoundingBox3 GetWorkspace() const =0;
 
 	virtual void SetEngineData(void *data) =0;
-	virtual void *GetEngineData() const =0;
+	[[nodiscard]] virtual void *GetEngineData() const =0;
 
-	virtual bool HasRested( unsigned int msDur=1 ) const =0;
-	virtual bool IsSleeping(bool justForces=false) const =0;
+	[[nodiscard]] virtual bool HasRested( unsigned int msDur=1 ) const =0;
+	[[nodiscard]] virtual bool IsSleeping(bool justForces=false) const =0;
 	virtual bool TriggerFade(unsigned int msMuteTime, unsigned int msDuration, bool forceOverride=false) =0;
 	virtual void ForceSlumber() =0;
 	virtual void SetForceScale(const double &scale) =0;
-	virtual double GetForceScale() const =0;
+	[[nodiscard]] virtual double GetForceScale() const =0;
 };
 
 //( HapticsStack )
@@ -352,24 +340,24 @@ public:
 	// ANYTHING WAS SET TO IT, NOT NECCISARILLY IF
 	// THE EFFECT WAS CREATED.
 	// --
-	virtual bool CreateCachedEffect(IHFXEffect *&pHandle, const char *entry, const char *instancename=0 );
+	virtual bool CreateCachedEffect(IHFXEffect *&pHandle, const char *entry, const char *instancename=nullptr );
 
 	template<typename T>
-	HFX_INLINE bool CreateCachedEffect(T *&pTypedHandle, const char *entry, const char *instanceName=0)
+	HFX_INLINE bool CreateCachedEffect(T *&pTypedHandle, const char *entry, const char *instanceName=nullptr)
 	{
 		return CreateCachedEffect((IHFXEffect*&)pTypedHandle, entry, instanceName);
 	}
 	HFX_INLINE bool CreateCachedEffect(const char *entry){ return CreateCachedEffect(hfxNoHandle, entry); }
 
-	virtual bool CreateNewEffect(IHFXEffect *&ppHandle, HFXEffectID effectName, IHFXParamGroup *params, const char *instanceName=0);
+	virtual bool CreateNewEffect(IHFXEffect *&ppHandle, HFXEffectID effectName, IHFXParamGroup *params, const char *instanceName=nullptr);
 
 	template<typename T>
-	HFX_INLINE bool CreateNewEffect(T *&pTypedHandle, HFXEffectID effectName, IHFXParamGroup *params, const char *instanceName=0)
+	HFX_INLINE bool CreateNewEffect(T *&pTypedHandle, HFXEffectID effectName, IHFXParamGroup *params, const char *instanceName=nullptr)
 	{
 		return CreateNewEffect((IHFXEffect*&)pTypedHandle, effectName, params, instanceName);
 	}
 
-	HFX_INLINE bool CreateNewEffect(HFXEffectID effectName, IHFXParamGroup *params){ return CreateNewEffect(hfxNoHandle, effectName, params, 0); };
+	HFX_INLINE bool CreateNewEffect(HFXEffectID effectName, IHFXParamGroup *params){ return CreateNewEffect(hfxNoHandle, effectName, params, nullptr); };
 	// Returns NULL if there was no effect using that name.
 	// --
 	// NOTE: YOU SHOULD ONLY HAVE ONE HANDLE OF A EFFECT
@@ -395,31 +383,31 @@ public:
 	virtual void GetLastForce(double force[3])const =0;
 
 	virtual void SetDeviceLock(bool state) =0;
-	virtual bool IsDeviceListLocked() const =0;
+	[[nodiscard]] virtual bool IsDeviceListLocked() const =0;
 
 	// returns true if device was added or is already a member. if slot is -1 it will just enter the device
 	// as the next available slot.
 	virtual bool AddDevice(IDevice*pDevice, int slot=-1) =0;
 
 	// returns the device in slot
-	virtual IDevice *GetDeviceInSlot(unsigned int id=0) const =0;
+	[[nodiscard]] virtual IDevice *GetDeviceInSlot(unsigned int id=0) const =0;
 
 	virtual void GetCalclatedForces(double force[3]) =0;
-	virtual const char *Name() const =0;
+	[[nodiscard]] virtual const char *Name() const =0;
 
 	//command support
 	//HFX_VIRTUAL int RunCommand( const char *cmd ) HFX_PURE;
 
-	virtual void *GetUserData() const =0;
+	[[nodiscard]] virtual void *GetUserData() const =0;
 	virtual void SetUserData(void*data) =0;
 
 	virtual void SetVolume( const double &scale ) =0;
-	virtual double GetVolume() const =0;
+	[[nodiscard]] virtual double GetVolume() const =0;
 
-	virtual unsigned int GetTargetDeviceCount() const =0;
+	[[nodiscard]] virtual unsigned int GetTargetDeviceCount() const =0;
 
 	virtual void SetEngineData(void *data) =0;
-	virtual void *GetEngineData() const =0;
+	[[nodiscard]] virtual void *GetEngineData() const =0;
 
 	virtual void SetEffectUserData(IHFXEffect *pEffect, void *pData) =0;
 	virtual void *GetEffectUserData(IHFXEffect *pEffect) =0;
@@ -433,7 +421,7 @@ public:
 	virtual void DeallocateEffect(IHFXEffect *&pEffectPtr) =0;
 	virtual void AllocateParameterGroup(IHFXParamGroup *&pEffectPtr) =0;
 	virtual void DeallocateParameterGroup(IHFXParamGroup *&pEffectPtr) =0;
-	virtual const char *GetTagName() const =0;
+	[[nodiscard]] virtual const char *GetTagName() const =0;
 };
 
 #define HFX_PROCESSOR_PARAM_FORCESCALE 4294967293
@@ -449,30 +437,30 @@ public:
 	virtual void SetPaused(bool pause) =0;
 
 	// see if the effect is muted.
-	HFX_INLINE bool IsMuted() const { return ((GetEffectState() & HFXSTATE_MUTE)!=0); }
+	[[nodiscard]] HFX_INLINE bool IsMuted() const { return ((GetEffectState() & HFXSTATE_MUTE)!=0); }
 
 	// see if the effect is explicitly paused.
-	HFX_INLINE bool IsPaused() const { return ((GetEffectState() & HFXSTATE_PAUSE)!=0); }
+	[[nodiscard]] HFX_INLINE bool IsPaused() const { return ((GetEffectState() & HFXSTATE_PAUSE)!=0); }
 
 	// scale this force (NOTE: THIS IS SEPERATE FROM PARAMETER SCALE!)
 	virtual void SetForceScale( double scale ) =0;
-	virtual double GetForceScale( ) const =0;
+	[[nodiscard]] virtual double GetForceScale( ) const =0;
 
-	virtual const char *GetEffectTypeName() const =0;
+	[[nodiscard]] virtual const char *GetEffectTypeName() const =0;
 
 	// override this function to return the number of falcons this
 	// effect requires.
-	HFX_INLINE unsigned int RequiredDeviceCount() const 
+	[[nodiscard]] HFX_INLINE unsigned int RequiredDeviceCount() const 
 	{
 		HFXNEED needs= GetEffectNeeds();
 		return HFXNEED_UTIL_COUNT_DEVICES(needs);
 	}
 
 	// returns true if the effect is running. 
-	HFX_INLINE bool IsRunning() const {return ( (GetEffectState() & (HFXSTATE_RUNNING)) != 0 );}
+	[[nodiscard]] HFX_INLINE bool IsRunning() const {return ( (GetEffectState() & (HFXSTATE_RUNNING)) != 0 );}
 
 	// if your effect is not self deleting and requires runtime data you should override this to true.
-	HFX_INLINE  bool CanBeHandled() const { return (GetEffectNeeds() & HFXNEED_ENCAPSULATED)==0; }
+	[[nodiscard]] HFX_INLINE  bool CanBeHandled() const { return (GetEffectNeeds() & HFXNEED_ENCAPSULATED)==0; }
 
 	// this lets the haptic effect stack know you are done with this effect and it is waiting to be deleted.
 	// CANNOT BE OVERRIDDEN ( see OnFlaggedForRemoval() )
@@ -486,39 +474,39 @@ public:
 	//HFX_VIRTUAL bool Stop() HFX_PURE;
 
 	// DO NOT OVERRIDE!
-	HFX_INLINE bool NeedsRemoval() const 
+	[[nodiscard]] HFX_INLINE bool NeedsRemoval() const 
 	{	return ( ( GetEffectNeeds() & HFXNEED_REMOVE ) ? ( ( ( GetEffectState() & HFXSTATE_RUNNING ) ) ? false : true ) : false ); }
 
 	// DO NOT OVERRIDE!
-	HFX_INLINE bool WantsSyncOp() const 
+	[[nodiscard]] HFX_INLINE bool WantsSyncOp() const 
 	{
 		return (((GetEffectNeeds() & HFXNEED_SYNC)!=0) && ((GetEffectState() & HFXSTATE_WANT_SYNC)!=0)); 
 	}
 	// DO NOT OVERRIDE!
-	virtual bool WantsUpdate() const {return (((GetEffectNeeds() & HFXNEED_PROCESS)!=0) && ((GetEffectState() & HFXSTATE_WANT_UPDATE)!=0) && ((GetEffectState() & HFXSTATE_RUNNING)!=0));} 
+	[[nodiscard]] virtual bool WantsUpdate() const {return (((GetEffectNeeds() & HFXNEED_PROCESS)!=0) && ((GetEffectState() & HFXSTATE_WANT_UPDATE)!=0) && ((GetEffectState() & HFXSTATE_RUNNING)!=0));} 
 
-	virtual HFXSTATE GetEffectState() const =0;
-	virtual const HFXNEED &GetEffectNeeds() const =0;
+	[[nodiscard]] virtual HFXSTATE GetEffectState() const =0;
+	[[nodiscard]] virtual const HFXNEED &GetEffectNeeds() const =0;
 
-	virtual void *_output() const =0;
+	[[nodiscard]] virtual void *_output() const =0;
 
-	virtual const double &Runtime() const =0;
-	virtual const double &Frametime() const =0;
+	[[nodiscard]] virtual const double &Runtime() const =0;
+	[[nodiscard]] virtual const double &Frametime() const =0;
 
 	virtual IStack *GetStack() =0;
 	virtual IHFXSystem *GetSystem() =0;
 	virtual void *GetUserData() =0;
 	virtual void SetUserData(void *userData) =0;
 	HFX_INLINE hfxVec3 &Output() { return *(reinterpret_cast<hfxVec3*>(_output())); }
-	HFX_INLINE const hfxVec3 &Output() const{return *(reinterpret_cast<const hfxVec3*>(_output()));}
+	[[nodiscard]] HFX_INLINE const hfxVec3 &Output() const{return *(reinterpret_cast<const hfxVec3*>(_output()));}
 	HFX_INLINE double &operator[](int i){ return (Output().m[i]); };
 	HFX_INLINE const double &operator[](int i)const{ return (Output()[i]); };
-	HFX_INLINE bool IsOutputValid() const { return !IsOutputNaN();}
-	HFX_INLINE bool IsOutputNaN() const { const double *o=Output(); return(o[0]!=o[0]||o[1]!=o[1]||o[2]!=o[2]);}
+	[[nodiscard]] HFX_INLINE bool IsOutputValid() const { return !IsOutputNaN();}
+	[[nodiscard]] HFX_INLINE bool IsOutputNaN() const { const double *o=Output(); return(o[0]!=o[0]||o[1]!=o[1]||o[2]!=o[2]);}
 	HFX_INLINE hfxVec3 &operator =(const hfxVec3 &vect){hfxVec3 &out = Output(); out = vect; return out;}
 };
-typedef IProcessor IHFXProcessor;
-typedef char HFX_VarType;
+using IHFXProcessor = IProcessor;
+using HFX_VarType = char;
 
 #define HFX_Double 'd'
 #define HFX_Float 'f'

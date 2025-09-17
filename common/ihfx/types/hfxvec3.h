@@ -91,7 +91,7 @@ struct hfxVec3
 	HFX_INLINE hfxVec3(const hfxVec3 &_copy);
 #ifdef HFX_ZERO_INIT
 	HFX_INLINE HFX_EXPLICIT hfxVec3();
-#endif HFX_ZERO_INIT
+#endif  // HFX_ZERO_INIT
 	HFX_INLINE hfxVec3();
 #endif
 	
@@ -137,14 +137,14 @@ struct hfxVec3
 	HFX_INLINE double *operator *();
 	
 	HFX_INLINE hfxVec3 Cross(const hfxVec3 &vect) const;
-	HFX_INLINE double Dot( const hfxVec3 &vect ) const;
-	HFX_INLINE double Magnitude() const;
+	[[nodiscard]] HFX_INLINE double Dot( const hfxVec3 &vect ) const;
+	[[nodiscard]] HFX_INLINE double Magnitude() const;
 	// get normalize
 	HFX_INLINE hfxVec3 Normalized() const;
 	// normalize in place
 	HFX_INLINE hfxVec3 &Normalize();
-	HFX_INLINE bool IsValid() const;
-	HFX_INLINE bool IsNaN() const;
+	[[nodiscard]] HFX_INLINE bool IsValid() const;
+	[[nodiscard]] HFX_INLINE bool IsNaN() const;
 #ifdef HFX_INTERNAL
 	HFX_INLINE hfxVec3internal *GetVec3Pointer(){ return (this); };
 	HFX_INLINE const hfxVec3internal *GetVec3Pointer()const{ return (this); };
@@ -152,13 +152,13 @@ struct hfxVec3
 	HFX_INLINE operator const hfxVec3 &()const { return *(reinterpret_cast<const hfxVec3*>(this)); }
 #endif
 #ifndef HFX_PAT_DOESNT_KNOW
-	HFX_INLINE double Length() const;
+	[[nodiscard]] HFX_INLINE double Length() const;
 	HFX_INLINE hfxVec3 Normal() const;
 #endif
 };
 #ifndef HFX_INTERNAL
 #ifndef HFX_NO_TYPEDEFS
-typedef hfxVec3 Vect3;
+using Vect3 = hfxVec3;
 #endif
 struct hfxVec3F : public HFX_vect3Base32
 {
@@ -210,16 +210,16 @@ struct hfxVec3F : public HFX_vect3Base32
 	HFX_INLINE float *operator *();
 	
 	HFX_INLINE hfxVec3F Cross(const hfxVec3F &vect) const;
-	HFX_INLINE float Dot( const hfxVec3F &vect ) const;
-	HFX_INLINE float Magnitude() const;
+	[[nodiscard]] HFX_INLINE float Dot( const hfxVec3F &vect ) const;
+	[[nodiscard]] HFX_INLINE float Magnitude() const;
 	// get normalize
 	HFX_INLINE hfxVec3F Normalized() const;
 	// normalize in place
 	HFX_INLINE hfxVec3F &Normalize();
-	HFX_INLINE bool IsValid() const;
-	HFX_INLINE bool IsNaN() const;
+	[[nodiscard]] HFX_INLINE bool IsValid() const;
+	[[nodiscard]] HFX_INLINE bool IsNaN() const;
 #ifndef HFX_PAT_DOESNT_KNOW
-	HFX_INLINE float Length() const;
+	[[nodiscard]] HFX_INLINE float Length() const;
 	HFX_INLINE hfxVec3F Normal() const;
 #endif
 };
@@ -263,13 +263,13 @@ struct BoundingBox3 : public _box3Base
 		BoxMax() = bMax;
 	}
 	inline hfxVec3 &BoxMin(){return (hfxVec3&)box.bound_min;};
-	inline const hfxVec3 &BoxMin() const {return (const hfxVec3&)box.bound_min;};
+	[[nodiscard]] inline const hfxVec3 &BoxMin() const {return (const hfxVec3&)box.bound_min;};
 	inline hfxVec3 &BoxMax(){return (hfxVec3&)box.bound_max;};
-	inline const hfxVec3 &BoxMax() const {return (const hfxVec3&)box.bound_max;};
-	inline hfxVec3 Center() const { return (BoxMin() + BoxMax())/(double)2.0; };
-	inline hfxVec3 Dimensions() const { return BoxMax() - BoxMin();};
-	inline hfxVec3 SpaceBetweenCentered(const BoundingBox3 &other) const {return other.Dimensions() - Dimensions();};
-	inline BoundingBox3 SpaceBetween(const BoundingBox3 &other) const {return other - *this;}
+	[[nodiscard]] inline const hfxVec3 &BoxMax() const {return (const hfxVec3&)box.bound_max;};
+	[[nodiscard]] inline hfxVec3 Center() const { return (BoxMin() + BoxMax())/(double)2.0; };
+	[[nodiscard]] inline hfxVec3 Dimensions() const { return BoxMax() - BoxMin();};
+	[[nodiscard]] inline hfxVec3 SpaceBetweenCentered(const BoundingBox3 &other) const {return other.Dimensions() - Dimensions();};
+	[[nodiscard]] inline BoundingBox3 SpaceBetween(const BoundingBox3 &other) const {return other - *this;}
 	inline BoundingBox3 &SetDimensions(const hfxVec3 &dimm) { hfxVec3 cent = Center(); hfxVec3 dim = dimm/2.0; BoxMin() = cent - dim; BoxMax() = cent + dim; return *this; }
 	inline BoundingBox3 &SetCenter(const hfxVec3 &cent) { hfxVec3 dim = Dimensions(); BoxMin() = cent - dim; BoxMax() = cent + dim; return *this; }
 	inline operator hfxVec3 *(){return (hfxVec3*)min_max;};

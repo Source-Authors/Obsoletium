@@ -5,11 +5,11 @@
 #include ".\\IHFXParam.h"
  
 struct IHapticEffectParamGroup; 
-typedef IHapticEffectParamGroup IHFXParamGroup; 
+using IHFXParamGroup = IHapticEffectParamGroup; 
 class IProcessor; 
-typedef IProcessor IHFXProcessor; 
+using IHFXProcessor = IProcessor; 
 class IStack; 
-typedef IStack IHFXStack; 
+using IHFXStack = IStack; 
 enum HFXStateBits
 {
 	// when a state variable is made it uses the below value
@@ -30,13 +30,13 @@ enum HFXStateBits
 	HFXSTATE_COUNT			=8, 
 	// number of state bits before non servo controlled bits
 }; 
-typedef unsigned __int8 HFXSTATE; 
-typedef HFXSTATE HFXStateStorage; 
+using HFXSTATE = unsigned char; 
+using HFXStateStorage = HFXSTATE; 
  
 #if WIN64
 typedef const HFXStateStorage &HFXStateTransfer; 
 #else
-typedef const HFXStateStorage HFXStateTransfer; 
+using HFXStateTransfer = const HFXStateStorage; 
 #endif
  
 // utility union, takes up same memory as a flagset but gives you
@@ -112,9 +112,9 @@ public:
 	HFX_INLINE bool operator !(){return (Storage==0);}
 	HFX_INLINE operator bool(){return (Storage!=0);}
 	HFX_INLINE HFXStateFlags *UtilPointer(){return this;}; 
-	HFX_INLINE const HFXStateFlags *UtilPointer()const{return this;}; 
+	[[nodiscard]] HFX_INLINE const HFXStateFlags *UtilPointer()const{return this;}; 
 	HFX_INLINE HFXStateFlags &Util(){return *this;}; 
-	HFX_INLINE const HFXStateFlags &Util()const{return *this;}; 
+	[[nodiscard]] HFX_INLINE const HFXStateFlags &Util()const{return *this;}; 
 }; 
  
 enum HFXNeeds
@@ -217,7 +217,7 @@ enum HFXNeeds
 		( ( ( (flags) & HFXNEED_DEVICE8 ) != 0) ? 1 : 0 ) ) \
 		: 0 ) 
  
-typedef unsigned __int32 HFXNEED; 
+using HFXNEED = unsigned int; 
  
 #define HFX_XCHANGE 16
 #define HFX_YCHANGE 17
@@ -251,7 +251,7 @@ enum HFXResult
 	HFXRESULT_CHANGED		=HFXRESULT_XYZCHANGED,	 
 }; 
  
-typedef int HFXRESULT; 
+using HFXRESULT = int; 
  
  
 class HFX_PURE_INTERFACE IHapticEffect
@@ -276,11 +276,11 @@ public:
 	//   note: state will be only one bit. for every bit changed on sync this function will be called.
 	virtual void OnStateChange(IHFXProcessor &processor, HFXSTATE state, bool flagged)=0; 
 }; 
-typedef IHapticEffect IHFXEffect; 
+using IHFXEffect = IHapticEffect; 
  
-typedef void (*hfxFilterFunction)(double outvect[3]); 
-typedef void (*HFXCreate_t)(IHFXEffect*&ptr); 
-typedef void (*HFXDestroy_t)(IHFXEffect*&ptr); 
+using hfxFilterFunction = void (*)(double *); 
+using HFXCreate_t = void (*)(IHFXEffect *&); 
+using HFXDestroy_t = void (*)(IHFXEffect *&); 
  
 template<typename T> 
 void HFXDefaultAllocateEffect(IHFXEffect *&ptr){ptr = new T;}; 
@@ -289,11 +289,11 @@ template<typename T>
 void HFXDefaultDeallocateEffect(IHFXEffect *&ptr){if(!ptr)return; delete ((T*)ptr); ptr=0;}; 
  
 class IHapticsSystem; 
-typedef IHapticsSystem IHFXSystem; 
+using IHFXSystem = IHapticsSystem; 
 class IDevice; 
-typedef IDevice IHFXDevice; 
+using IHFXDevice = IDevice; 
 class IStack; 
-typedef IStack IHFXStack; 
+using IHFXStack = IStack; 
  
 // T == effect class
 template<typename T>  
@@ -311,7 +311,7 @@ inline HFXEffectID HFXDefaultRegisterEffect(IHFXSystem &hfxSystem, const char *t
 // T == effect class
 // P == parametergroup class
 template<typename T, typename P>  
-inline HFXEffectID HFXDefaultRegisterEffect(IHFXSystem &hfxSystem, const char *tag, HFXNEED needs, HFXCreate_t specialCreate = 0, HFXDestroy_t specialDestroy = 0)  
+inline HFXEffectID HFXDefaultRegisterEffect(IHFXSystem &hfxSystem, const char *tag, HFXNEED needs, HFXCreate_t specialCreate = nullptr, HFXDestroy_t specialDestroy = nullptr)  
 {
 	P *pGroup = new P;  
 	HFXEffectID retval=0;  
