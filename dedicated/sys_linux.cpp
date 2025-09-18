@@ -43,7 +43,7 @@ namespace se::dedicated {
 // Loose implementation for operating system specific layer.
 class UnixSystem : public ISystem {
  public:
-  virtual ~UnixSystem();
+  ~UnixSystem() override;
 
   IDedicatedServerAPI *LoadModules(DedicatedAppSystemGroup *group) override;
 
@@ -60,7 +60,7 @@ class UnixSystem : public ISystem {
   void Printf(PRINTF_FORMAT_STRING const char *fmt, ...) override;
 };
 
-UnixSystem::~UnixSystem() {}
+UnixSystem::~UnixSystem() = default;
 
 void UnixSystem::ErrorMessage(int level, const char *msg) {
   Error("%s\n", msg);
@@ -115,7 +115,7 @@ IDedicatedServerAPI *UnixSystem::LoadModules(
       {"", ""}  // Required to terminate the list
   };
 
-  if (!pAppSystemGroup->AddSystems(appSystems)) return false;
+  if (!pAppSystemGroup->AddSystems(appSystems)) return nullptr;
 
   auto *api = pAppSystemGroup->FindSystem<IDedicatedServerAPI>(
       VENGINE_HLDS_API_VERSION);

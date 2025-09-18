@@ -51,15 +51,15 @@ class CCreateMultiplayerGameServerPage : public vgui::Frame {
 
  public:
   CCreateMultiplayerGameServerPage(vgui::Panel *parent, const char *name);
-  ~CCreateMultiplayerGameServerPage();
+  ~CCreateMultiplayerGameServerPage() override;
 
   // returns currently entered information about the server
-  int GetMaxPlayers() const { return m_iMaxPlayers; }
-  const char *GetPassword() const { return m_szPassword; }
-  const char *GetHostName() const { return m_szHostName; }
+  [[nodiscard]] int GetMaxPlayers() const { return m_iMaxPlayers; }
+  [[nodiscard]] const char *GetPassword() const { return m_szPassword; }
+  [[nodiscard]] const char *GetHostName() const { return m_szHostName; }
   const char *GetMapName();
-  const char *GetModName() const { return m_szMod; }
-  const char *GetGameName() const { return m_szGameName; }
+  [[nodiscard]] const char *GetModName() const { return m_szMod; }
+  [[nodiscard]] const char *GetGameName() const { return m_szGameName; }
   void LoadMapList();
   int LoadMaps(const char *pszMod);
 
@@ -68,7 +68,7 @@ class CCreateMultiplayerGameServerPage : public vgui::Frame {
   virtual void OnResetData();
 
   void GetServer(serveritem_t &s) const;
-  const char *GetRconPassword() const;
+  [[nodiscard]] const char *GetRconPassword() const;
 
  private:
   enum { MAX_PLAYERS = 32 };

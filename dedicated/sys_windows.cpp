@@ -47,9 +47,8 @@ class WindowsSystem : public ISystem {
  public:
   explicit WindowsSystem(ICommandLine *command_line, bool is_console_mode)
       : command_line_{command_line},
-        api_{nullptr},
         is_console_mode_{is_console_mode} {}
-  virtual ~WindowsSystem() = default;
+  ~WindowsSystem() override = default;
 
   IDedicatedServerAPI *LoadModules(
       DedicatedAppSystemGroup *app_system_group) override;
@@ -68,7 +67,7 @@ class WindowsSystem : public ISystem {
 
  private:
   ICommandLine *command_line_;
-  IDedicatedServerAPI *api_;
+  IDedicatedServerAPI *api_{nullptr};
   const bool is_console_mode_;
 };
 

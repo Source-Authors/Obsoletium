@@ -24,7 +24,7 @@ class CMainPanel : public vgui::Panel {
  public:
   // Construction/destruction
   CMainPanel();
-  virtual ~CMainPanel();
+  ~CMainPanel() override;
 
   virtual void Initialize();
 
@@ -42,14 +42,14 @@ class CMainPanel : public vgui::Panel {
 
   void AddConsoleText(const char *msg);
 
-  bool Stopping() const { return m_bClosing; }
+  [[nodiscard]] bool Stopping() const { return m_bClosing; }
 
-  bool IsInConfig() const { return m_bIsInConfig; }
+  [[nodiscard]] bool IsInConfig() const { return m_bIsInConfig; }
 
  private:
   // called when dialog is shut down
   virtual void OnClose();
-  virtual void OnTick();
+  void OnTick() override;
   void DoStop();
 
   // GUI elements
@@ -70,7 +70,7 @@ class CMainPanel : public vgui::Panel {
   int m_hResourceWaitHandle;
   float m_flPreviousSteamProgress;
 
-  DECLARE_PANELMAP();
+  DECLARE_PANELMAP_OVERRIDE();
 };
 
 }  // namespace se::dedicated

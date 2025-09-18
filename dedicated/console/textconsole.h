@@ -7,8 +7,8 @@ namespace se::dedicated {
 
 class CTextConsole {
  public:
-  CTextConsole() : m_ConsoleVisible(true) {}
-  virtual ~CTextConsole(){};
+  CTextConsole() = default;
+  virtual ~CTextConsole()= default;
 
   virtual bool Init();
   virtual void ShutDown() = 0;
@@ -26,7 +26,7 @@ class CTextConsole {
   virtual bool IsVisible() { return m_ConsoleVisible; }
 
  protected:
-  bool m_ConsoleVisible;
+  bool m_ConsoleVisible{true};
 };
 
 }  // namespace se::dedicated

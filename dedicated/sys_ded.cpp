@@ -301,6 +301,8 @@ bool DedicatedAppSystemGroup::PreInit() {
 
   if (!BaseClass::PreInit()) return false;
 
+  if (!g_pFullFileSystem) return false;
+
   CFSSteamSetupInfo steamInfo;
   steamInfo.m_pDirectoryName = nullptr;
   steamInfo.m_bOnlyUseDirectoryName = false;

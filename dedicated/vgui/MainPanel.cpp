@@ -40,12 +40,12 @@ char *gpszCvars = nullptr;
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CMainPanel::CMainPanel() : Panel(NULL, "CMainPanel") {
+CMainPanel::CMainPanel() : Panel(nullptr, "CMainPanel") {
   SetPaintBackgroundEnabled(false);
   SetFgColor(Color(0, 0, 0, 0));
   m_bStarting = false;
   m_flPreviousSteamProgress = 0.0f;
-  m_pGameServer = NULL;
+  m_pGameServer = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -58,13 +58,13 @@ CMainPanel::~CMainPanel() { free(se::dedicated::gpszCvars); }
 //-----------------------------------------------------------------------------
 void CMainPanel::Initialize() {
   s_InternetDlg = this;
-  m_pGameServer = NULL;
+  m_pGameServer = nullptr;
 
   m_bStarted = false;
   m_bIsInConfig = true;
   m_bClosing = false;
-  m_pProgressBox = NULL;
-  m_hShutdown = NULL;
+  m_pProgressBox = nullptr;
+  m_hShutdown = nullptr;
 
   MoveToFront();
 
@@ -74,7 +74,7 @@ void CMainPanel::Initialize() {
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CMainPanel::Open(void) {
+void CMainPanel::Open() {
   m_pConfigPage->SetVisible(true);
   m_pConfigPage->MoveToFront();
 }
@@ -120,7 +120,7 @@ void CMainPanel::StartServer(const char *cvars) {
 
   m_pProgressBox->SetCancelButtonEnabled(false);
 
-  m_hShutdown = CreateEvent(NULL, TRUE, FALSE, NULL);
+  m_hShutdown = CreateEvent(nullptr, TRUE, FALSE, nullptr);
   ivgui()->AddTickSignal(GetVPanel());
 }
 
@@ -185,7 +185,7 @@ void CMainPanel::OnTick() {
 
         if (m_pProgressBox) {
           m_pProgressBox->Close();
-          m_pProgressBox = NULL;
+          m_pProgressBox = nullptr;
         }
       } else  // must be stopping the server
       {
@@ -212,7 +212,7 @@ void CMainPanel::DoStop() {
 
   if (m_pProgressBox) {
     m_pProgressBox->Close();
-    m_pProgressBox = NULL;
+    m_pProgressBox = nullptr;
   }
 
   ivgui()->Stop();

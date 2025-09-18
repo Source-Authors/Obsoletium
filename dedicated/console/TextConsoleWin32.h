@@ -19,21 +19,21 @@ namespace se::dedicated {
 class CTextConsoleWin32 : public CTextConsole {
  public:
   CTextConsoleWin32();
-  virtual ~CTextConsoleWin32(){};
+  ~CTextConsoleWin32() override = default;
 
   // CTextConsole
-  bool Init();
-  void ShutDown();
-  void Print(const char *pszMsg);
+  bool Init() override;
+  void ShutDown() override;
+  void Print(const char *pszMsg) override;
 
-  void SetTitle(const char *pszTitle);
-  void SetStatusLine(const char *pszStatus);
-  void UpdateStatus();
+  void SetTitle(const char *pszTitle) override;
+  void SetStatusLine(const char *pszStatus) override;
+  void UpdateStatus() override;
 
-  char *GetLine(int index, char *buf, size_t buflen);
-  int GetWidth();
+  char *GetLine(int index, char *buf, size_t buflen) override;
+  int GetWidth() override;
 
-  void SetVisible(bool visible);
+  void SetVisible(bool visible) override;
 
  protected:
   // CTextConsoleWin32
