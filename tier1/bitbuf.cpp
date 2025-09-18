@@ -1134,10 +1134,10 @@ float bf_read::ReadBitCoordMP( bool bIntegral, bool bLowPrecision )
 		if ( flags & INTVAL )
 		{
 			// Read the third bit and the integer portion together at once
-			unsigned int bits = ReadUBitLong( (flags & INBOUNDS) ? COORD_INTEGER_BITS_MP+1 : COORD_INTEGER_BITS+1 );
+			const unsigned int bits = ReadUBitLong( (flags & INBOUNDS) ? COORD_INTEGER_BITS_MP+1 : COORD_INTEGER_BITS+1 );
 			// Remap from [0,N] to [1,N+1]
-			int intval = (bits >> 1) + 1;
-			return (bits & 1) ? -intval : intval;
+			const int intval = (bits >> 1) + 1;
+			return static_cast<float>((bits & 1) ? -intval : intval);
 		}
 		return 0.f;
 	}
