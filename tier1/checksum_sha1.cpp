@@ -191,12 +191,12 @@ bool CSHA1::HashFile(char *szFileName)
 
 	int64_t ulFileSize;
 	std::tie(ulFileSize, errc) = fIn.size();
-	if(errc) return false;
+	if(errc || ulFileSize > std::numeric_limits<unsigned>::max()) return false;
 
-	unsigned ulRest = ulFileSize % std::size(uData);
-	unsigned ulBlocks = ulFileSize / std::size(uData);
+	const size_t ulRest = static_cast<size_t>(ulFileSize % std::size(uData));
+	const uint64_t ulBlocks = ulFileSize / std::size(uData);
 
-	for(unsigned i = 0; i < ulBlocks; i++)
+	for(uint64_t i = 0; i < ulBlocks; i++)
 	{
 		std::tie(std::ignore, errc) = fIn.read(uData);
 		if(errc) return false;
