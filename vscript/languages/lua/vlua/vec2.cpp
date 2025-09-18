@@ -19,7 +19,7 @@ Vector2D lua_getvec2ByValue( lua_State *pState, int i )
 		const lua_Number flValue = lua_tonumber( pState, i );
 		const float flArg = size_cast<float>( flValue );
 
-		return Vector2D( flArg, flArg );
+		return { flArg, flArg };
 	}
 
 	if ( luaL_checkudata( pState, i, VECTOR2D_TYPE ) == nullptr )

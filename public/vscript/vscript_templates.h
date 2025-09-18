@@ -7,11 +7,10 @@
 #ifndef VSCRIPT_TEMPLATES_H
 #define VSCRIPT_TEMPLATES_H
 
-#include "tier0/basetypes.h"
+#include "ivscript.h"
 
-#if defined( _WIN32 )
-#pragma once
-#endif
+#include "tier0/basetypes.h"
+#include "tier1/functors.h"
 
 #define	FUNC_APPEND_PARAMS_0	
 #define	FUNC_APPEND_PARAMS_1	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 1 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) );

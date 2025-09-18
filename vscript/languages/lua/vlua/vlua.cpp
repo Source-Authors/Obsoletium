@@ -153,7 +153,7 @@ public:
 		}
 	}
 
-	intp GetStackSize() const
+	[[nodiscard]] intp GetStackSize() const
 	{
 		return ( ( char * )m_LuaState->stack_last.p - ( char * )m_LuaState->top.p ) / sizeof( TValue );
 	}
@@ -466,7 +466,7 @@ public:
 		luaL_unref( m_LuaState, LUA_REGISTRYINDEX, size_cast<int>( ( intp )hScript ) );
 	}
 
-	ScriptStatus_t Run( HSCRIPT hScript, HSCRIPT hScope = NULL, bool bWait = true ) override
+	ScriptStatus_t Run( HSCRIPT hScript, HSCRIPT hScope = nullptr, bool bWait = true ) override
 	{
 		lua_rawgeti( m_LuaState, LUA_REGISTRYINDEX, ( intp )hScript );
 		int nResult = lua_pcall( m_LuaState, 0, LUA_MULTRET, 0 );
@@ -638,7 +638,7 @@ public:
 	static int TranslateCall( lua_State *pState )
 	{
 		int										nActualParams = lua_gettop( pState );
-		ScriptFunctionBinding_t					*pVMScriptFunction = ( ScriptFunctionBinding_t * )lua_touserdata( pState, lua_upvalueindex( 1 ) );
+		auto									*pVMScriptFunction = ( ScriptFunctionBinding_t * )lua_touserdata( pState, lua_upvalueindex( 1 ) );
 		int										nFormalParams = pVMScriptFunction->m_desc.m_Parameters.Count();
 		CUtlVectorFixed<ScriptVariant_t, 14>	params;
 		ScriptVariant_t							returnValue;
@@ -654,7 +654,7 @@ public:
 
 			if ( ( pVMScriptFunction->m_flags & SF_MEMBER_FUNC ) )
 			{
-				InstanceContext_t *pInstanceContext = ( InstanceContext_t * )lua_touserdata( pState, nOffset );
+				auto *pInstanceContext = ( InstanceContext_t * )lua_touserdata( pState, nOffset );
 				pObject = pInstanceContext->pInstance;
 
 				if ( pInstanceContext->pClassDesc->pHelper )
@@ -771,7 +771,7 @@ public:
 	//
 	//-------------------------------------------------------------
 	// stack good
-	void RegisterFunctionGuts( ScriptFunctionBinding_t *pScriptFunction, HSCRIPT pOwningClass = NULL )
+	void RegisterFunctionGuts( ScriptFunctionBinding_t *pScriptFunction, HSCRIPT pOwningClass = nullptr )
 	{
 		char szTypeMask[ 64 ];
 
@@ -1083,7 +1083,7 @@ public:
 		Assert( 0 );
 	}
 
-	void *GetInstanceValue( HSCRIPT hInstance, ScriptClassDesc_t *pExpectedType = NULL ) override
+	void *GetInstanceValue( HSCRIPT hInstance, ScriptClassDesc_t *pExpectedType = nullptr ) override
 	{
 		Assert( 0 );
 		return nullptr;

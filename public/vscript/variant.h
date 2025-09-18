@@ -54,7 +54,7 @@ DECLARE_FIELD_SIZE( FIELD_UINT,						sizeof(uint) )
 DECLARE_FIELD_SIZE( FIELD_UTLSTRINGTOKEN,			sizeof(uint32) )
 DECLARE_FIELD_SIZE( FIELD_QANGLE,					sizeof(QAngle) )
 
-typedef int VariantDataType_t;
+using VariantDataType_t = int;
 
 
 
@@ -110,7 +110,7 @@ public:
 	CVariantBase( const CVariantBase<CValueAllocator> &variant ) :m_flags( 0 ), m_type( FIELD_VOID )	{ variant.AssignTo( this ); }
 	void operator=( const CVariantBase<CValueAllocator> &variant )										{ variant.AssignTo( this ); }
 
-	bool IsNull() const						{ return (m_type == FIELD_VOID ); }
+	[[nodiscard]] bool IsNull() const						{ return (m_type == FIELD_VOID ); }
 
 	operator int() const					{ Assert( m_type == FIELD_INTEGER || m_type == FIELD_FLOAT );	return ( m_type == FIELD_INTEGER ) ? m_int : (int)m_float; }
 	operator uint() const					{ Assert( m_type == FIELD_UINT );		return m_uint; }
@@ -185,8 +185,8 @@ public:
 //	bool AssignTo( CUtlStringToken *pDest ) const;
 	template< typename T > bool AssignTo( CVariantBase<T> *pDest ) const;
 
-	int GetType() const						{ return m_type; }
-	uint16 GetFlags() const					{ return m_flags; }
+	[[nodiscard]] int GetType() const						{ return m_type; }
+	[[nodiscard]] uint16 GetFlags() const					{ return m_flags; }
 
 	void ConvertToCopiedData(bool silent = false );
 
@@ -230,7 +230,7 @@ private:
 	friend class CSquirrelVM;
 };
 
-typedef CVariantBase<> CVariant;
+using CVariant = CVariantBase<>;
 
 template <typename T> struct VariantDeducer_t { enum { FIELD_TYPE = FIELD_TYPEUNKNOWN }; };
 #define DECLARE_DEDUCE_FIELDTYPE( fieldType, type ) template<> struct VariantDeducer_t<type> { enum { FIELD_TYPE = fieldType }; };
@@ -321,7 +321,7 @@ inline const char * VariantFieldTypeName( int16 eType )
 	}
 }
 
-typedef CVariantBase<> CVariant;
+using CVariant = CVariantBase<>;
 
 #define VARIANT_NULL CVariant()
 

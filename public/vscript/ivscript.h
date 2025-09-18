@@ -96,15 +96,11 @@
 #define IVSCRIPT_H
 
 #include "datamap.h"
-#include "appframework/iappsystem.h"
+#include "appframework/IAppSystem.h"
 #include "tier0/platform.h"
 #include "tier1/functors.h"
 #include "vscript/variant.h"
 #include "tier0/memdbgon.h"
-
-#if defined( _WIN32 )
-#pragma once
-#endif
 
 #ifdef VSCRIPT_DLL_EXPORT
 #define VSCRIPT_INTERFACE	DLL_EXPORT
@@ -157,15 +153,15 @@ DECLARE_POINTER_HANDLE( HSCRIPT );
 
 inline bool IsValid( HSCRIPT hScript )
 {
-	return ( hScript != NULL && hScript != INVALID_HSCRIPT );
+	return ( hScript != nullptr && hScript != INVALID_HSCRIPT );
 }
 
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
 
-typedef int ScriptDataType_t;
-typedef CVariant ScriptVariant_t;
+using ScriptDataType_t = int;
+using ScriptVariant_t = CVariant;
 #define SCRIPT_VARIANT_NULL VARIANT_NULL
 #define ScriptDeduceType( T ) VariantDeduceType( T )
 
@@ -186,9 +182,9 @@ struct ScriptFuncDescriptor_t
 {
 	ScriptFuncDescriptor_t()
 	{
-		m_pszScriptName = NULL;
-		m_pszFunction = NULL;
-		m_pszDescription = NULL;
+		m_pszScriptName = nullptr;
+		m_pszFunction = nullptr;
+		m_pszDescription = nullptr;
 		m_ReturnType = FIELD_TYPEUNKNOWN;
 	}
 
@@ -232,7 +228,7 @@ struct ScriptFunctionBindingStorageType_t
 	intptr_t val_3;
 };
 
-typedef bool (*ScriptBindingFunc_t)( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, int nArguments, ScriptVariant_t *pReturn );
+using ScriptBindingFunc_t = bool (*)(ScriptFunctionBindingStorageType_t, void *, ScriptVariant_t *, int, ScriptVariant_t *);
 
 struct ScriptFunctionBinding_t
 {
@@ -248,14 +244,14 @@ class IScriptInstanceHelper
 public:
 	virtual void *GetProxied( void *p, ScriptFunctionBinding_t *pBinding )			{ return p; }
 	virtual bool ToString( void *p, char *pBuf, int bufSize )						{ return false; }
-	virtual void *BindOnRead( HSCRIPT hInstance, void *pOld, const char *pszId )	{ return NULL; }
+	virtual void *BindOnRead( HSCRIPT hInstance, void *pOld, const char *pszId )	{ return nullptr; }
 };
 
 //---------------------------------------------------------
 
 struct ScriptClassDesc_t
 {
-	explicit ScriptClassDesc_t( void (*pfnInitializer)() ) : m_pszScriptName( 0 ), m_pszClassname( 0 ), m_pszDescription( 0 ), m_pBaseDesc( 0 ), m_pfnConstruct( 0 ), m_pfnDestruct( 0 ), pHelper(NULL) 
+	explicit ScriptClassDesc_t( void (*pfnInitializer)() )
 	{
 		(*pfnInitializer)();
 		ScriptClassDesc_t **ppHead = GetDescList();
@@ -263,15 +259,15 @@ struct ScriptClassDesc_t
 		*ppHead = this;
 	}
 
-	const char *						m_pszScriptName;
-	const char *						m_pszClassname;
-	const char *						m_pszDescription;
-	ScriptClassDesc_t *					m_pBaseDesc;
+	const char *						m_pszScriptName{nullptr};
+	const char *						m_pszClassname{nullptr};
+	const char *						m_pszDescription{nullptr};
+	ScriptClassDesc_t *					m_pBaseDesc{nullptr};
 	CUtlVector<ScriptFunctionBinding_t> m_FunctionBindings;
 
-	void *(*m_pfnConstruct)();
-	void (*m_pfnDestruct)( void *);
-	IScriptInstanceHelper *				pHelper; // optional helper
+	void *(*m_pfnConstruct)(){nullptr};
+	void (*m_pfnDestruct)( void *){nullptr};
+	IScriptInstanceHelper *				pHelper{nullptr}; // optional helper
 
 	ScriptClassDesc_t *					m_pNextDesc;
 
@@ -339,7 +335,7 @@ IScriptInstanceHelper *GetScriptInstanceHelperOverride( IScriptInstanceHelper *p
 
 inline IScriptInstanceHelper *GetScriptInstanceHelper_ScriptNoBase_t()
 {
-	return NULL;
+	return nullptr;
 }
 
 #define BEGIN_SCRIPTDESC_NAMED( className, baseClass, scriptName, description ) \
@@ -391,9 +387,9 @@ inline IScriptInstanceHelper *GetScriptInstanceHelper_ScriptNoBase_t()
 template <typename T> ScriptClassDesc_t *GetScriptDesc(T *);
 
 template <>
-inline ScriptClassDesc_t *GetScriptDesc<ScriptNoBase_t>( ScriptNoBase_t *) { return NULL; }
+inline ScriptClassDesc_t *GetScriptDesc<ScriptNoBase_t>( ScriptNoBase_t *) { return nullptr; }
 
-#define GetScriptDescForClass( className ) GetScriptDesc( ( className *)NULL )
+#define GetScriptDescForClass( className ) GetScriptDesc( ( className *)nullptr )
 
 //-----------------------------------------------------------------------------
 // 
@@ -419,8 +415,8 @@ enum ScriptErrorLevel_t
 	SCRIPT_LEVEL_ERROR,
 };
 
-typedef void ( *ScriptOutputFunc_t )( const char *pszText );
-typedef bool ( *ScriptErrorFunc_t )( ScriptErrorLevel_t eLevel, const char *pszText );
+using ScriptOutputFunc_t = void (*)(const char *);
+using ScriptErrorFunc_t = bool (*)(ScriptErrorLevel_t, const char *);
 
 //-----------------------------------------------------------------------------
 // 
@@ -464,26 +460,26 @@ public:
 	//--------------------------------------------------------
 	// Compilation
 	//--------------------------------------------------------
- 	virtual HSCRIPT CompileScript( const char *pszScript, const char *pszId = NULL ) = 0;
-	inline HSCRIPT CompileScript( const unsigned char *pszScript, const char *pszId = NULL ) { return CompileScript( (char *)pszScript, pszId ); }
+ 	virtual HSCRIPT CompileScript( const char *pszScript, const char *pszId = nullptr ) = 0;
+	inline HSCRIPT CompileScript( const unsigned char *pszScript, const char *pszId = nullptr ) { return CompileScript( (char *)pszScript, pszId ); }
 	virtual void ReleaseScript( HSCRIPT ) = 0;
 
 	//--------------------------------------------------------
 	// Execution of compiled
 	//--------------------------------------------------------
-	virtual ScriptStatus_t Run( HSCRIPT hScript, HSCRIPT hScope = NULL, bool bWait = true ) = 0;
+	virtual ScriptStatus_t Run( HSCRIPT hScript, HSCRIPT hScope = nullptr, bool bWait = true ) = 0;
 	virtual ScriptStatus_t Run( HSCRIPT hScript, bool bWait ) = 0;
 
 	//--------------------------------------------------------
 	// Scope
 	//--------------------------------------------------------
-	virtual HSCRIPT CreateScope( const char *pszScope, HSCRIPT hParent = NULL ) = 0;
+	virtual HSCRIPT CreateScope( const char *pszScope, HSCRIPT hParent = nullptr ) = 0;
 	virtual void ReleaseScope( HSCRIPT hScript ) = 0;
 
 	//--------------------------------------------------------
 	// Script functions
 	//--------------------------------------------------------
-	virtual HSCRIPT LookupFunction( const char *pszFunction, HSCRIPT hScope = NULL ) = 0;
+	virtual HSCRIPT LookupFunction( const char *pszFunction, HSCRIPT hScope = nullptr ) = 0;
 	virtual void ReleaseFunction( HSCRIPT hScript ) = 0;
 
 	//--------------------------------------------------------
@@ -518,12 +514,12 @@ public:
 	virtual HSCRIPT RegisterInstance( ScriptClassDesc_t *pDesc, void *pInstance ) = 0;
 	virtual void SetInstanceUniqeId( HSCRIPT hInstance, const char *pszId ) = 0;
 	template <typename T> HSCRIPT RegisterInstance( T *pInstance )																	{ return RegisterInstance( GetScriptDesc( pInstance ), pInstance );	}
-	template <typename T> HSCRIPT RegisterInstance( T *pInstance, const char *pszInstance, HSCRIPT hScope = NULL)					{ HSCRIPT hInstance = RegisterInstance( GetScriptDesc( pInstance ), pInstance ); SetValue( hScope, pszInstance, hInstance ); return hInstance; }
+	template <typename T> HSCRIPT RegisterInstance( T *pInstance, const char *pszInstance, HSCRIPT hScope = nullptr)					{ HSCRIPT hInstance = RegisterInstance( GetScriptDesc( pInstance ), pInstance ); SetValue( hScope, pszInstance, hInstance ); return hInstance; }
 	virtual void RemoveInstance( HSCRIPT ) = 0;
-	void RemoveInstance( HSCRIPT hInstance, const char *pszInstance, HSCRIPT hScope = NULL )										{ ClearValue( hScope, pszInstance ); RemoveInstance( hInstance ); }
-	void RemoveInstance( const char *pszInstance, HSCRIPT hScope = NULL )															{ ScriptVariant_t val; if ( GetValue( hScope, pszInstance, &val ) ) { if ( val.GetType() == FIELD_HSCRIPT ) { RemoveInstance( val, pszInstance, hScope ); } ReleaseValue( val ); } }
+	void RemoveInstance( HSCRIPT hInstance, const char *pszInstance, HSCRIPT hScope = nullptr )										{ ClearValue( hScope, pszInstance ); RemoveInstance( hInstance ); }
+	void RemoveInstance( const char *pszInstance, HSCRIPT hScope = nullptr )															{ ScriptVariant_t val; if ( GetValue( hScope, pszInstance, &val ) ) { if ( val.GetType() == FIELD_HSCRIPT ) { RemoveInstance( val, pszInstance, hScope ); } ReleaseValue( val ); } }
 
-	virtual void *GetInstanceValue( HSCRIPT hInstance, ScriptClassDesc_t *pExpectedType = NULL ) = 0;
+	virtual void *GetInstanceValue( HSCRIPT hInstance, ScriptClassDesc_t *pExpectedType = nullptr ) = 0;
 
 	//----------------------------------------------------------------------------
 
@@ -532,22 +528,22 @@ public:
 	//----------------------------------------------------------------------------
 
 	virtual bool ValueExists( HSCRIPT hScope, const char *pszKey ) = 0;
-	bool ValueExists( const char *pszKey )																							{ return ValueExists( NULL, pszKey ); }
+	bool ValueExists( const char *pszKey )																							{ return ValueExists( nullptr, pszKey ); }
 
 	virtual bool SetValue( HSCRIPT hScope, const char *pszKey, const char *pszValue ) = 0;
 	virtual bool SetValue( HSCRIPT hScope, const char *pszKey, const ScriptVariant_t &value ) = 0;
-	bool SetValue( const char *pszKey, const ScriptVariant_t &value )																{ return SetValue(NULL, pszKey, value ); }
+	bool SetValue( const char *pszKey, const ScriptVariant_t &value )																{ return SetValue(nullptr, pszKey, value ); }
 
 	virtual void CreateTable( ScriptVariant_t &Table ) = 0;
 	virtual int	GetNumTableEntries( HSCRIPT hScope ) = 0;
 	virtual int GetKeyValue( HSCRIPT hScope, int nIterator, ScriptVariant_t *pKey, ScriptVariant_t *pValue ) = 0;
 
 	virtual bool GetValue( HSCRIPT hScope, const char *pszKey, ScriptVariant_t *pValue ) = 0;
-	bool GetValue( const char *pszKey, ScriptVariant_t *pValue )																	{ return GetValue(NULL, pszKey, pValue ); }
+	bool GetValue( const char *pszKey, ScriptVariant_t *pValue )																	{ return GetValue(nullptr, pszKey, pValue ); }
 	virtual void ReleaseValue( ScriptVariant_t &value ) = 0;
 
 	virtual bool ClearValue( HSCRIPT hScope, const char *pszKey ) = 0;
-	bool ClearValue( const char *pszKey)																							{ return ClearValue( NULL, pszKey ); }
+	bool ClearValue( const char *pszKey)																							{ return ClearValue( nullptr, pszKey ); }
 
 	//----------------------------------------------------------------------------
 
@@ -569,9 +565,9 @@ public:
 	//
 	// Note for string and vector return types, the caller must delete the pointed to memory
 	//----------------------------------------------------------------------------
-	ScriptStatus_t Call( HSCRIPT hFunction, HSCRIPT hScope = NULL, bool bWait = true, ScriptVariant_t *pReturn = NULL )
+	ScriptStatus_t Call( HSCRIPT hFunction, HSCRIPT hScope = nullptr, bool bWait = true, ScriptVariant_t *pReturn = nullptr )
 	{
-		return ExecuteFunction( hFunction, NULL, 0, pReturn, hScope, bWait );
+		return ExecuteFunction( hFunction, nullptr, 0, pReturn, hScope, bWait );
 	}
 
 	template <typename... TArgs>
@@ -694,7 +690,7 @@ public:
 		return GetVM()->Run( hScript, m_hScope );
 	}
 
-	ScriptStatus_t Run( const char *pszScriptText, const char *pszScriptName = NULL )
+	ScriptStatus_t Run( const char *pszScriptText, const char *pszScriptName = nullptr )
 	{
 		InvalidateCachedValues();
 		HSCRIPT hScript = GetVM()->CompileScript( pszScriptText, pszScriptName );
@@ -707,7 +703,7 @@ public:
 		return SCRIPT_ERROR;
 	}
 
-	ScriptStatus_t Run( const unsigned char *pszScriptText, const char *pszScriptName = NULL )
+	ScriptStatus_t Run( const unsigned char *pszScriptText, const char *pszScriptName = nullptr )
 	{
 		return Run( (const char *)pszScriptText, pszScriptName);
 	}
@@ -738,7 +734,7 @@ public:
 
 	//-----------------------------------------------------
 
-	ScriptStatus_t Call( HSCRIPT hFunction, ScriptVariant_t *pReturn = NULL )
+	ScriptStatus_t Call( HSCRIPT hFunction, ScriptVariant_t *pReturn = nullptr )
 	{
 		return GetVM()->ExecuteFunction( hFunction, NULL, 0, pReturn, m_hScope, true );
 	}
@@ -753,7 +749,7 @@ public:
 		return GetVM()->ExecuteFunction( hFunction, vars, ARRAYSIZE(vars), pReturn, m_hScope, true );
 	}
 
-	ScriptStatus_t Call( const char *pszFunction, ScriptVariant_t *pReturn = NULL )
+	ScriptStatus_t Call( const char *pszFunction, ScriptVariant_t *pReturn = nullptr )
 	{
 		HSCRIPT hFunction = GetVM()->LookupFunction( pszFunction, m_hScope );
 		if ( !hFunction )
@@ -784,7 +780,7 @@ protected:
 	CUtlVectorConservative<HSCRIPT *> m_FuncHandles;
 };
 
-typedef CScriptScopeT<> CScriptScope;
+using CScriptScope = CScriptScopeT<>;
 
 #define VScriptAddEnumToScope_( scope, enumVal, scriptName )	(scope).SetValue( scriptName, (int)enumVal )
 #define VScriptAddEnumToScope( scope, enumVal )					VScriptAddEnumToScope_( scope, enumVal, #enumVal )

@@ -401,7 +401,7 @@ public:
 		ReleaseScriptObject( hScript );
 	}
 
-	ScriptStatus_t Run( HSCRIPT hScript, HSCRIPT hScope = NULL, bool bWait = true ) override
+	ScriptStatus_t Run( HSCRIPT hScript, HSCRIPT hScope = nullptr, bool bWait = true ) override
 	{
 		return CSquirrelVM::ExecuteFunction( hScript, NULL, 0, NULL, hScope, bWait );
 	}
@@ -409,10 +409,10 @@ public:
 	ScriptStatus_t Run( HSCRIPT hScript, bool bWait ) override
 	{
 		Assert( bWait );
-		return CSquirrelVM::Run( hScript, (HSCRIPT)NULL, bWait );
+		return CSquirrelVM::Run( hScript, (HSCRIPT)nullptr, bWait );
 	}
 
-	HSCRIPT CreateScope( const char *pszScope, HSCRIPT hParent = NULL ) override
+	HSCRIPT CreateScope( const char *pszScope, HSCRIPT hParent = nullptr ) override
 	{
 		if ( !hParent )
 		{
@@ -458,7 +458,7 @@ public:
 		ReleaseScriptObject( hScript );
 	}
 
-	HSQOBJECT LookupObject( const char *pszObject, HSCRIPT hScope = NULL, bool bAddRef = true )
+	HSQOBJECT LookupObject( const char *pszObject, HSCRIPT hScope = nullptr, bool bAddRef = true )
 	{
 		HSQOBJECT result = { OT_NULL, NULL };
 		if ( !hScope )
@@ -485,7 +485,7 @@ public:
 		return result;
 	}
 
-	HSCRIPT LookupFunction( const char *pszFunction, HSCRIPT hScope = NULL ) override
+	HSCRIPT LookupFunction( const char *pszFunction, HSCRIPT hScope = nullptr ) override
 	{
 		HSQOBJECT result = LookupObject( pszFunction, hScope );
 		if ( !sq_isnull( result ) )
@@ -498,7 +498,7 @@ public:
 			}
 			sq_release( m_hVM, &result );
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	void ReleaseFunction( HSCRIPT hScript ) override
@@ -506,7 +506,7 @@ public:
 		ReleaseScriptObject( hScript );
 	}
 
-	ScriptStatus_t ExecuteFunction( HSCRIPT hFunction, ScriptVariant_t *pArgs, intp nArgs, ScriptVariant_t *pReturn, HSCRIPT hScope = NULL, bool bWait = true ) override
+	ScriptStatus_t ExecuteFunction( HSCRIPT hFunction, ScriptVariant_t *pArgs, intp nArgs, ScriptVariant_t *pReturn, HSCRIPT hScope = nullptr, bool bWait = true ) override
 	{
 		if ( hScope == INVALID_HSCRIPT )
 		{
@@ -686,7 +686,7 @@ public:
 	{
 		if ( !CSquirrelVM::RegisterClass( pDesc ) )
 		{
-			return NULL;
+			return nullptr;
 		}
 
 		auto *pInstanceContext = new InstanceContext_t;
@@ -697,7 +697,7 @@ public:
 		if ( !CreateNativeInstance( pDesc, pInstanceContext, &ExternalInstanceReleaseHook ) )
 		{
 			delete pInstanceContext;
-			return NULL;
+			return nullptr;
 		}
 
 		HSQOBJECT hObject;
@@ -733,7 +733,7 @@ public:
 		HSQOBJECT *pInstance = (HSQOBJECT *)hInstance;
 		Assert( pInstance->_type == OT_INSTANCE );
 		if ( pInstance->_type == OT_INSTANCE )
-			((InstanceContext_t *)(pInstance->_unVal.pInstance->_userpointer))->pInstance = NULL;
+			((InstanceContext_t *)(pInstance->_unVal.pInstance->_userpointer))->pInstance = nullptr;
 		ReleaseScriptObject( hInstance );
 	}
 
@@ -742,7 +742,7 @@ public:
 		if ( !hInstance )
 		{
 			ExecuteOnce( DMsg( "vscript:squirrel", 0, "NULL instance passed to vscript!\n" ) );
-			return NULL;
+			return nullptr;
 		}
 		HSQOBJECT *pInstance = (HSQOBJECT *)hInstance;
 		if ( pInstance->_type == OT_INSTANCE && pInstance->_unVal.pInstance->_userpointer )
@@ -751,7 +751,7 @@ public:
 			if ( !pExpectedType || pContext->pClassDesc == pExpectedType || IsClassDerivedFrom( pContext->pClassDesc, pExpectedType ) )
 				return pContext->pInstance;
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	bool IsClassDerivedFrom( const ScriptClassDesc_t *pDerivedClass, const ScriptClassDesc_t *pBaseClass )
@@ -839,7 +839,7 @@ public:
 				SQInstance *pInstance = hObject._unVal.pInstance;
 				if ( pInstance->_class->_typetag && pInstance->_class->_typetag != TYPETAG_VECTOR )
 				{
-					InstanceContext_t *pContext = (InstanceContext_t *)pInstance->_userpointer;
+					auto *pContext = (InstanceContext_t *)pInstance->_userpointer;
 					if ( sq_isnull( pContext->name ) )
 					{
 						pContext->name = m_hVM->_stack[m_hVM->_top - 1];
@@ -1091,7 +1091,7 @@ public:
 		m_pBuffer->PutInt64( (int64)m_iUniqueIdSerialNumber );
 		WriteVM( m_hVM );
 
-		m_pBuffer = NULL;
+		m_pBuffer = nullptr;
 
 		SQCollectable *t = m_hVM->_sharedstate->_gc_chain;
 		while(t) 
@@ -1126,12 +1126,12 @@ public:
 		sq_collectgarbage( m_hVM );
 		m_hVM->_sharedstate->_gc_disableDepth++;
 		m_pBuffer = pBuffer;
-		uint64 uniqueIdSerialNumber = (uint64)m_pBuffer->GetInt64();
+		auto uniqueIdSerialNumber = (uint64)m_pBuffer->GetInt64();
 		m_iUniqueIdSerialNumber = max( m_iUniqueIdSerialNumber, uniqueIdSerialNumber );
 		Verify( pBuffer->GetInt() == OT_THREAD );
 		m_PtrMap.Insert( pBuffer->GetPtr(), m_hVM );
 		ReadVM( m_hVM );
-		m_pBuffer = NULL;
+		m_pBuffer = nullptr;
 		m_PtrMap.Purge();
 		m_hVM->_sharedstate->_gc_disableDepth--;
 		sq_collectgarbage( m_hVM );
@@ -1259,7 +1259,7 @@ private:
 	//-------------------------------------------------------------
 	static SQInteger ReleaseHook( SQUserPointer p, SQInteger size )
 	{
-		InstanceContext_t *pInstanceContext = (InstanceContext_t *)p;
+		auto *pInstanceContext = (InstanceContext_t *)p;
 		pInstanceContext->pClassDesc->m_pfnDestruct( pInstanceContext->pInstance );
 		delete pInstanceContext;
 		return 0;
@@ -1270,7 +1270,7 @@ private:
 	//-------------------------------------------------------------
 	static SQInteger ExternalInstanceReleaseHook( SQUserPointer p, SQInteger size )
 	{
-		InstanceContext_t *pInstanceContext = (InstanceContext_t *)p;
+		auto *pInstanceContext = (InstanceContext_t *)p;
 		delete pInstanceContext;
 		return 0;
 	}
@@ -1407,7 +1407,7 @@ private:
 						HSQOBJECT object = sa.GetObjectHandle( i+2 );
 						if ( object._type == OT_NULL)
 						{
-							params[i] = (HSCRIPT)NULL;
+							params[i] = (HSCRIPT)nullptr;
 						}
 						else
 						{
@@ -1465,7 +1465,7 @@ private:
 		}
 		else
 		{
-			pObject = NULL;
+			pObject = nullptr;
 		}
 
 		(*pVMScriptFunction->m_pfnBinding)( pVMScriptFunction->m_pFunction, pObject, params.Base(), params.Count(), ( pVMScriptFunction->m_desc.m_ReturnType != FIELD_VOID ) ? &returnValue : NULL );
@@ -1554,7 +1554,7 @@ private:
 	static SQInteger InstanceToString( HSQUIRRELVM hVM )
 	{
 		StackHandler sa(hVM);
-		InstanceContext_t *pContext = (InstanceContext_t *)sa.GetInstanceUp(1,0);
+		auto *pContext = (InstanceContext_t *)sa.GetInstanceUp(1,0);
 		char szBuf[64];
 
 		if ( pContext && pContext->pInstance && pContext->pClassDesc->pHelper && pContext->pClassDesc->pHelper->ToString( pContext->pInstance, szBuf, ARRAYSIZE(szBuf) ) )
@@ -1575,7 +1575,7 @@ private:
 	static SQInteger InstanceIsValid( HSQUIRRELVM hVM )
 	{
 		StackHandler sa(hVM);
-		InstanceContext_t *pContext = (InstanceContext_t *)sa.GetInstanceUp(1,0);
+		auto *pContext = (InstanceContext_t *)sa.GetInstanceUp(1,0);
 		sq_pushbool( hVM, ( pContext && pContext->pInstance ) );
 		return 1;
 	}
@@ -1617,7 +1617,7 @@ private:
 	//-------------------------------------------------------------
 	//
 	//-------------------------------------------------------------
-	void RegisterFunctionGuts( ScriptFunctionBinding_t *pScriptFunction, ScriptClassDesc_t *pClassDesc = NULL )
+	void RegisterFunctionGuts( ScriptFunctionBinding_t *pScriptFunction, ScriptClassDesc_t *pClassDesc = nullptr )
 	{
 		char szTypeMask[64];
 
@@ -1974,7 +1974,7 @@ private:
 		m_pBuffer->PutInt( bIsNative );
 		if ( !bIsNative )
 		{
-			m_pBuffer->PutInt( pClass->_base != NULL );
+			m_pBuffer->PutInt( pClass->_base != nullptr );
 			if ( pClass->_base )
 			{
 				WriteObject( pClass->_base );
@@ -2010,7 +2010,7 @@ private:
 				}
 				else
 				{
-					ScriptClassDesc_t *pDesc = (ScriptClassDesc_t *)pClass->_typetag;
+					auto *pDesc = (ScriptClassDesc_t *)pClass->_typetag;
 					m_pBuffer->PutString( pDesc->m_pszScriptName );
 				}
 			}
@@ -2058,7 +2058,7 @@ private:
 		{
 			if ( pInstance->_class->_typetag == TYPETAG_VECTOR )
 			{
-				Vector *pVector = (Vector *)pInstance->_userpointer;
+				auto *pVector = (Vector *)pInstance->_userpointer;
 				m_pBuffer->PutFloat( pVector->x );
 				m_pBuffer->PutFloat( pVector->y );
 				m_pBuffer->PutFloat( pVector->z );
@@ -2164,7 +2164,7 @@ private:
 	//-------------------------------------------------------------
 	static SQInteger SqWriteFunc(SQUserPointer up,SQUserPointer data, SQInteger size)
 	{
-		CSquirrelVM *pThis = (CSquirrelVM *)up;
+		auto *pThis = (CSquirrelVM *)up;
 		pThis->m_pBuffer->Put( data, size );
 		return size;
 	}
@@ -2223,7 +2223,7 @@ private:
 	//-------------------------------------------------------------
 	//
 	//-------------------------------------------------------------
-	bool ReadObject( SQObjectPtr &objectOut, const char *pszName = NULL )
+	bool ReadObject( SQObjectPtr &objectOut, const char *pszName = nullptr )
 	{
 		SQObject object;
 		bool bResult = true;
@@ -2495,7 +2495,7 @@ private:
 			}
 		}
 
-		SQClass *pBase = NULL;
+		SQClass *pBase = nullptr;
  		bool bIsNative = !!m_pBuffer->GetInt();
 		// If it's not a C++ defined type...
 		if ( !bIsNative )
@@ -2554,9 +2554,9 @@ private:
 				MapPtr( pOld, value._unVal.pClass );
 				return value._unVal.pClass;
 			}
-			MapPtr( pOld, NULL );
+			MapPtr( pOld, nullptr );
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	//-------------------------------------------------------------
@@ -2597,8 +2597,8 @@ private:
 				}
 				else
 				{
-					InstanceContext_t *pContext = new InstanceContext_t;
-					pContext->pInstance = NULL;
+					auto *pContext = new InstanceContext_t;
+					pContext->pInstance = nullptr;
 					ReadObject( pContext->name );
 					pContext->pClassDesc = (ScriptClassDesc_t *)( pInstance->_class->_typetag );
 					void *pOldInstance = m_pBuffer->GetPtr();
@@ -2635,7 +2635,7 @@ private:
 								return hExistingObject._unVal.pInstance;	
 							}
 
-							pContext->pInstance = NULL;
+							pContext->pInstance = nullptr;
 						}
 					}
 					pInstance->_userpointer = pContext;
@@ -2652,7 +2652,7 @@ private:
 		}
 		else
 		{
-			MapPtr( pOld, NULL );
+			MapPtr( pOld, nullptr );
 			n = m_pBuffer->GetUnsignedInt();
 			for ( i = 0; i < n; i++ ) 
 			{
@@ -2681,7 +2681,7 @@ private:
 				Verify( m_pBuffer->GetInt() == OT_USERPOINTER );
 				ReadUserPointer();
 			}
-			pInstance = NULL;
+			pInstance = nullptr;
 		}
 		return pInstance;
 	}
@@ -2777,8 +2777,8 @@ private:
 			MapPtr( pOld, value._unVal.pNativeClosure );
 			return value._unVal.pNativeClosure;
 		}
-		MapPtr( pOld, NULL );
-		return NULL; // @TBD [4/15/2008 tom]
+		MapPtr( pOld, nullptr );
+		return nullptr; // @TBD [4/15/2008 tom]
 	}
 
 	//-------------------------------------------------------------
@@ -2787,7 +2787,7 @@ private:
 	SQUserData *ReadUserData()
 	{
 		m_pBuffer->GetPtr();
-		return NULL; // @TBD [4/15/2008 tom]
+		return nullptr; // @TBD [4/15/2008 tom]
 	}
 
 	//-------------------------------------------------------------
@@ -2796,7 +2796,7 @@ private:
 	SQUserPointer *ReadUserPointer()
 	{
 		m_pBuffer->GetPtr();
-		return NULL; // @TBD [4/15/2008 tom]
+		return nullptr; // @TBD [4/15/2008 tom]
 	}
 
 	//-------------------------------------------------------------
@@ -2804,7 +2804,7 @@ private:
 	//-------------------------------------------------------------
 	static SQInteger SqReadFunc(SQUserPointer up,SQUserPointer data, SQInteger size)
  	{
- 		CSquirrelVM *pThis = (CSquirrelVM *)up;
+ 		auto *pThis = (CSquirrelVM *)up;
  		pThis->m_pBuffer->Get( data, size );
  		return size;
  	}
@@ -2842,7 +2842,7 @@ private:
 		ReadObject( obj );
 		if ( !obj._unVal.pRefCounted )
 		{
-			return NULL;
+			return nullptr;
 		}
 
 		// Need to up ref count if read order has weak ref loading first

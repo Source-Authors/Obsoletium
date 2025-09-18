@@ -128,7 +128,7 @@ SQInteger vsq_typeofvec3(HSQUIRRELVM hVM) {
 SQInteger vsq_tokvstringvec3(HSQUIRRELVM hVM) {
   StackHandler sa(hVM);
 
-  Vector *vec = (Vector *)sa.GetInstanceUp(1, 0);
+  auto *vec = (Vector *)sa.GetInstanceUp(1, 0);
   if (!vec) {
     return sq_throwerror(hVM, "null vector");
   }
@@ -200,7 +200,7 @@ SQInteger vsq_scalevec3(HSQUIRRELVM hVM) {
 
   float scale = sa.GetFloat(2);
 
-  Vector *vec = new Vector;
+  auto *vec = new Vector;
   *vec = *src * scale;
 
   sq_getclass(hVM, -2);

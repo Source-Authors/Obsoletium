@@ -19,7 +19,7 @@ Vector4D lua_getvec4ByValue( lua_State *pState, int i )
 		const lua_Number flValue = lua_tonumber( pState, i );
 		const float flArg = size_cast<float>( flValue );
 
-		return Vector4D( flArg, flArg, flArg, flArg );
+		return { flArg, flArg, flArg, flArg };
 	}
 
 	if ( luaL_checkudata( pState, i, VECTOR4D_TYPE ) == nullptr )
