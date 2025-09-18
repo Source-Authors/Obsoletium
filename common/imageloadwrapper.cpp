@@ -20,7 +20,7 @@ bool ConvertImageToRGB( const byte *pubImageData, int cubImageData, CUtlBuffer &
 	}
 	else if ( GetTGADimensions( cubImageData, (char*)pubImageData, &width, &height ) )
 	{
-		byte *pubRGB = NULL;
+		byte *pubRGB = nullptr;
 		int cubRGB = 0;
 		bSuccess = LoadTGA( cubImageData, (char*)pubImageData, &pubRGB, &cubRGB, &width, &height );
 		if ( bSuccess )
@@ -46,7 +46,7 @@ bool ConvertImageToRGBA( const byte *pubImageData, int cubImageData, CUtlBuffer 
 	}
 	else if ( GetTGADimensions( cubImageData, (char*)pubImageData, &width, &height ) )
 	{
-		byte *pubRGB = NULL;
+		byte *pubRGB = nullptr;
 		int cubRGB = 0;
 		bSuccess = LoadTGA( cubImageData, (char*)pubImageData, &pubRGB, &cubRGB, &width, &height );
 		if ( bSuccess )

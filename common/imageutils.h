@@ -94,6 +94,6 @@ ConversionErrorType ImgUtl_LoadPNGBitmapFromBuffer( CUtlBuffer &fileData, Bitmap
 ConversionErrorType ImgUtl_SavePNGBitmapToBuffer( CUtlBuffer &fileData, const Bitmap_t &bitmap );
 
 /// Resize a bitmap.  This currently only works for RGBA images!
-ConversionErrorType ImgUtl_ResizeBitmap( Bitmap_t &destBitmap, int nWidth, int nHeight, const Bitmap_t *pImgSource = NULL );
+ConversionErrorType ImgUtl_ResizeBitmap( Bitmap_t &destBitmap, int nWidth, int nHeight, const Bitmap_t *pImgSource = nullptr );
 
 #endif // IMAGECONVERSION_H

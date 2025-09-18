@@ -65,7 +65,7 @@ extern void longjmp( jmp_buf, int ) __attribute__((noreturn));
 
 #include "libpng/png.h"
 
-#include <setjmp.h>
+#include <csetjmp>
 
 #include "bitmap/tgawriter.h"
 #include "ivtex.h"
@@ -90,7 +90,9 @@ struct ValveJpegErrorHandler_t
 	jmp_buf					m_ErrorContext;
 };
 
-#define JPEG_OUTPUT_BUF_SIZE  4096   
+enum {
+  JPEG_OUTPUT_BUF_SIZE = 4096   
+};
 
 struct JPEGDestinationManager_t
 {
@@ -106,7 +108,7 @@ struct JPEGDestinationManager_t
 //-----------------------------------------------------------------------------
 static void ValveJpegErrorHandler( j_common_ptr cinfo )
 {
-	ValveJpegErrorHandler_t *pError = reinterpret_cast< ValveJpegErrorHandler_t * >( cinfo->err );
+	auto *pError = reinterpret_cast< ValveJpegErrorHandler_t * >( cinfo->err );
 
 	char buffer[ JMSG_LENGTH_MAX ];
 
@@ -141,7 +143,7 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 
 	// open the jpeg image file.
 	FILE *infile = fopen(jpegpath, "rb");
-	if (infile == NULL)
+	if (infile == nullptr)
 	{
 		return CE_CANT_OPEN_SOURCE_FILE;
 	}
@@ -198,8 +200,8 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	int mem_required = jpegInfo.image_height * jpegInfo.image_width * jpegInfo.output_components;
 
 	// allocate the memory to read the image data into.
-	unsigned char *buf = (unsigned char *)malloc(mem_required);
-	if (buf == NULL)
+	auto *buf = (unsigned char *)malloc(mem_required);
+	if (buf == nullptr)
 	{
 		jpeg_destroy_decompress(&jpegInfo);
 		fclose(infile);
@@ -235,7 +237,7 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	bool bRetVal = TGAWriter::WriteToBuffer( buf, outBuf, image_width, image_height, IMAGE_FORMAT_RGB888, IMAGE_FORMAT_RGB888 );
 	if ( bRetVal )
 	{
-		if ( !g_pFullFileSystem->WriteFile( tgaPath, NULL, outBuf ) )
+		if ( !g_pFullFileSystem->WriteFile( tgaPath, nullptr, outBuf ) )
 		{
 			bRetVal = false;
 		}
@@ -275,7 +277,7 @@ ConversionErrorType ImgUtl_ConvertBMPToTGA(const char *bmpPath, const char *tgaP
 
 	if ( retval )
 	{
-		if ( !g_pFullFileSystem->WriteFile( tgaPath, NULL, outBuf ) )
+		if ( !g_pFullFileSystem->WriteFile( tgaPath, nullptr, outBuf ) )
 		{
 			retval = false;
 		}
@@ -292,10 +294,10 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 {
 	// Just load the whole file into a memory buffer
 	CUtlBuffer bufFileContents;
-	if ( !g_pFullFileSystem->ReadFile( vtfPath, NULL, bufFileContents ) )
+	if ( !g_pFullFileSystem->ReadFile( vtfPath, nullptr, bufFileContents ) )
 	{
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
-		return NULL;
+		return nullptr;
 	}
 
 	IVTFTexture *pVTFTexture = CreateVTFTexture();
@@ -303,7 +305,7 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 	{
 		DestroyVTFTexture( pVTFTexture );
 		errcode = CE_ERROR_PARSING_SOURCE;
-		return NULL;
+		return nullptr;
 	}
 
 	width = pVTFTexture->Width();
@@ -311,12 +313,12 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 	pVTFTexture->ConvertImageFormat( IMAGE_FORMAT_RGBA8888, false );
 
 	intp nMemSize = ImageLoader::GetMemRequired( width, height, 1, IMAGE_FORMAT_RGBA8888, false );
-	unsigned char *pMemImage = (unsigned char *)malloc(nMemSize);
-	if ( pMemImage == NULL )
+	auto *pMemImage = (unsigned char *)malloc(nMemSize);
+	if ( pMemImage == nullptr )
 	{
 		DestroyVTFTexture( pVTFTexture );
 		errcode = CE_MEMORY_ERROR;
-		return NULL;
+		return nullptr;
 	}
 	Q_memcpy( pMemImage, pVTFTexture->ImageData(), nMemSize );
 
@@ -329,7 +331,7 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 // read a TGA header from the current point in the file stream.
 static void ImgUtl_ReadTGAHeader(FILE *infile, TGAHeader &header)
 {
-	if (infile == NULL)
+	if (infile == nullptr)
 	{
 		return;
 	}
@@ -351,7 +353,7 @@ static void ImgUtl_ReadTGAHeader(FILE *infile, TGAHeader &header)
 // write a TGA header to the current point in the file stream.
 static void WriteTGAHeader(FILE *outfile, TGAHeader &header)
 {
-	if (outfile == NULL)
+	if (outfile == nullptr)
 	{
 		return;
 	}
@@ -374,10 +376,10 @@ static void WriteTGAHeader(FILE *outfile, TGAHeader &header)
 unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &height, ConversionErrorType &errcode, TGAHeader &tgaHeader )
 {
 	FILE *tgaFile = fopen(tgaPath, "rb");
-	if (tgaFile == NULL)
+	if (tgaFile == nullptr)
 	{
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
-		return NULL;
+		return nullptr;
 	}
 
 	// read header for TGA file.
@@ -392,17 +394,17 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 		fclose(tgaFile);
 
 		errcode = CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
-		return NULL;
+		return nullptr;
 	}
 
 	int tgaDataSize = tgaHeader.width * tgaHeader.height * tgaHeader.bits / 8;
-	unsigned char *tgaData = (unsigned char *)malloc(tgaDataSize);
-	if (tgaData == NULL)
+	auto *tgaData = (unsigned char *)malloc(tgaDataSize);
+	if (tgaData == nullptr)
 	{
 		fclose(tgaFile);
 
 		errcode = CE_MEMORY_ERROR;
-		return NULL;
+		return nullptr;
 	}
 
 	fread(tgaData, 1, tgaDataSize, tgaFile);
@@ -417,13 +419,13 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 	{
 		// image needs to be converted to a 32-bit image.
 
-		unsigned char *retBuf = (unsigned char *)malloc(numPixels * 4);
-		if (retBuf == NULL)
+		auto *retBuf = (unsigned char *)malloc(numPixels * 4);
+		if (retBuf == nullptr)
 		{
 			free(tgaData);
 
 			errcode = CE_MEMORY_ERROR;
-			return NULL;
+			return nullptr;
 		}
 
 		// convert from BGR to RGBA color format.
@@ -487,10 +489,10 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 
 	// open the jpeg image file.
 	FILE *infile = fopen(jpegPath, "rb");
-	if (infile == NULL)
+	if (infile == nullptr)
 	{
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
-		return NULL;
+		return nullptr;
 	}
 
 	//CJpegSourceMgr src;
@@ -524,7 +526,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 		//g_pFullFileSystem->Close( fileHandle );
 
 		errcode = CE_ERROR_PARSING_SOURCE;
-		return NULL;
+		return nullptr;
 	}
 
 	jpeg_stdio_src(&jpegInfo, infile);
@@ -536,7 +538,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 		fclose( infile );
 		//g_pFullFileSystem->Close( fileHandle );
 		errcode = CE_ERROR_PARSING_SOURCE;
-		return NULL;
+		return nullptr;
 	}
 
 	// start the decompress with the jpeg engine.
@@ -546,7 +548,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 		fclose( infile );
 		//g_pFullFileSystem->Close( fileHandle );
 		errcode = CE_ERROR_PARSING_SOURCE;
-		return NULL;
+		return nullptr;
 	}
 
 	// We only support 24-bit JPEG's
@@ -556,7 +558,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 		fclose( infile );
 		//g_pFullFileSystem->Close( fileHandle );
 		errcode = CE_SOURCE_FILE_SIZE_NOT_SUPPORTED;
-		return NULL;
+		return nullptr;
 	}
 
 	// now that we've started the decompress with the jpeg lib, we have the attributes of the
@@ -567,14 +569,14 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	int mem_required = jpegInfo.image_height * row_stride;
 
 	// allocate the memory to read the image data into.
-	unsigned char *buf = (unsigned char *)malloc(mem_required);
-	if (buf == NULL)
+	auto *buf = (unsigned char *)malloc(mem_required);
+	if (buf == nullptr)
 	{
 		jpeg_destroy_decompress(&jpegInfo);
 		fclose( infile );
 		//g_pFullFileSystem->Close( fileHandle );
 		errcode = CE_MEMORY_ERROR;
-		return NULL;
+		return nullptr;
 	}
 
 	// read in all the scan lines of the image into our image data buffer.
@@ -610,7 +612,7 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	{
 		free(buf);
 		errcode = CE_ERROR_PARSING_SOURCE;
-		return NULL;
+		return nullptr;
 	}
 
 	// OK!
@@ -629,7 +631,7 @@ static void ReadPNGData( png_structp png_ptr, png_bytep outBytes, png_size_t byt
 {
 
 	// Cast pointer
-	CUtlBuffer *pBuf = (CUtlBuffer *)png_get_io_ptr( png_ptr );
+	auto *pBuf = (CUtlBuffer *)png_get_io_ptr( png_ptr );
 	Assert( pBuf );
 
 	// Check for IO error
@@ -651,10 +653,10 @@ unsigned char *ImgUtl_ReadPNGAsRGBA( const char *pngPath, int &width, int &heigh
 
 	// Just load the whole file into a memory buffer
 	CUtlBuffer bufFileContents;
-	if ( !g_pFullFileSystem->ReadFile( pngPath, NULL, bufFileContents ) )
+	if ( !g_pFullFileSystem->ReadFile( pngPath, nullptr, bufFileContents ) )
 	{
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
-		return NULL;
+		return nullptr;
 	}
 
 	// Load it
@@ -674,11 +676,11 @@ unsigned char		*ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, 
 	if (png_sig_cmp( pngData, 0, 8))
 	{
         errcode = CE_ERROR_PARSING_SOURCE;
-		return NULL;
+		return nullptr;
 	}
 
-	png_structp png_ptr = NULL;
-	png_infop info_ptr = NULL;
+	png_structp png_ptr = nullptr;
+	png_infop info_ptr = nullptr;
 
     /* could pass pointers to user-defined error handlers instead of NULLs: */
 
@@ -686,18 +688,18 @@ unsigned char		*ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, 
     if (!png_ptr)
     {
         errcode = CE_MEMORY_ERROR;
-		return NULL;
+		return nullptr;
 	}
 
-	unsigned char *pResultData = NULL;
-	png_bytepp  row_pointers = NULL;
+	unsigned char *pResultData = nullptr;
+	png_bytepp  row_pointers = nullptr;
 
     info_ptr = png_create_info_struct( png_ptr );
     if ( !info_ptr ) 
 	{
         errcode = CE_MEMORY_ERROR;
 fail:
-        png_destroy_read_struct( &png_ptr, &info_ptr, NULL );
+        png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
         if ( row_pointers )
         {
 			free( row_pointers );
@@ -706,7 +708,7 @@ fail:
         {
 			free( pResultData );
 		}
-        return NULL;
+        return nullptr;
     }
 
     /* setjmp() must be called in every function that calls a PNG-reading
@@ -783,7 +785,7 @@ fail:
 	row_pointers = (png_bytepp)malloc( height*sizeof(png_bytep) );
 	pResultData = (unsigned char *)malloc( rowbytes*height );
 
-	if ( row_pointers == NULL || pResultData == NULL ) 
+	if ( row_pointers == nullptr || pResultData == nullptr ) 
 	{
         errcode = CE_MEMORY_ERROR;
         goto fail;
@@ -801,10 +803,10 @@ fail:
     png_read_end(png_ptr, NULL);
 
 	free( row_pointers );
-	row_pointers = NULL;
+	row_pointers = nullptr;
 
 	// Clean up
-	png_destroy_read_struct( &png_ptr, &info_ptr, NULL );
+	png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
 
 	// OK!
 	width = png_width;
@@ -822,15 +824,15 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 {
 #ifdef WIN32
 	// Load up bitmap
-	HBITMAP hBitmap = (HBITMAP)LoadImage(NULL, bmpPath, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE | LR_DEFAULTSIZE);
+	auto hBitmap = (HBITMAP)LoadImage(nullptr, bmpPath, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE | LR_DEFAULTSIZE);
 
 	// Handle failure
-	if ( hBitmap == NULL)
+	if ( hBitmap == nullptr)
 	{
 
 		// !KLUDGE! Try to detect what went wrong
 		FILE *fp = fopen( bmpPath, "rb" );
-		if (fp == NULL)
+		if (fp == nullptr)
 		{
 			errcode = CE_CANT_OPEN_SOURCE_FILE;
 		}
@@ -840,7 +842,7 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 			fclose( fp );
 			errcode = CE_ERROR_PARSING_SOURCE;
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	BITMAP bitmap;
@@ -864,7 +866,7 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	{
 		DeleteObject(hBitmap);
 		errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
-		return NULL;
+		return nullptr;
 	}
 
 	memset(bitmapInfo, 0, sizeof(BITMAPINFO));
@@ -874,9 +876,9 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		bitmapInfo->bmiHeader.biBitCount = bitmap.bmBitsPixel; // need to specify the bits per pixel so GDI will generate a color table for us.
 	}
 
-	HDC dc = CreateCompatibleDC(NULL);
+	HDC dc = CreateCompatibleDC(nullptr);
 
-	int retcode = GetDIBits(dc, hBitmap, 0, bitmap.bmHeight, NULL, bitmapInfo, DIB_RGB_COLORS);
+	int retcode = GetDIBits(dc, hBitmap, 0, bitmap.bmHeight, nullptr, bitmapInfo, DIB_RGB_COLORS);
 
 	DeleteDC(dc);
 
@@ -885,18 +887,18 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		// error getting the bitmap info for some reason.
 		free(bitmapInfo);
 		errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
-		return NULL;
+		return nullptr;
 	}
 
 	int nDestStride = 4 * bitmap.bmWidth;
 	int mem_required = nDestStride * bitmap.bmHeight;  // mem required for copying the data out into RGBA format.
 
-	unsigned char *buf = (unsigned char *)malloc(mem_required);
-	if (buf == NULL)
+	auto *buf = (unsigned char *)malloc(mem_required);
+	if (buf == nullptr)
 	{
 		free(bitmapInfo);
 		errcode = CE_MEMORY_ERROR;
-		return NULL;
+		return nullptr;
 	}
 
 	if (bitmapInfo->bmiHeader.biBitCount == 32)
@@ -1031,7 +1033,7 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 			while (x < bitmap.bmWidth)
 			{
 
-				RGBQUAD *rgbQuad = NULL;
+				RGBQUAD *rgbQuad = nullptr;
 				int bitMask = 0x80;
 
 				// go through all 8 bits in this byte to get all 8 pixel colors.
@@ -1072,7 +1074,7 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		free(buf);
 		DeleteObject(hBitmap);
 		errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
-		return NULL;
+		return nullptr;
 	}
 
 	free(bitmapInfo);
@@ -1120,7 +1122,7 @@ unsigned char *ImgUtl_ReadImageAsRGBA( const char *path, int &width, int &height
 	}
 
 	errcode = CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-	return NULL;
+	return nullptr;
 }
 
 // resizes the file specified by tgaPath so that it has dimensions that are
@@ -1133,7 +1135,7 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 	TGAHeader tgaHeader;
 	unsigned char *srcBuffer = ImgUtl_ReadTGAAsRGBA(tgaPath, tgaWidth, tgaHeight, errcode, tgaHeader);
 
-	if (srcBuffer == NULL)
+	if (srcBuffer == nullptr)
 	{
 		return errcode;
 	}
@@ -1213,7 +1215,7 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 		finalWidth = paddedImageWidth;
 	}
 
-	unsigned char *resizeBuffer = (unsigned char *)malloc(finalWidth * finalHeight * 4);
+	auto *resizeBuffer = (unsigned char *)malloc(finalWidth * finalHeight * 4);
 
 	// do the actual stretching
 	ImgUtl_StretchRGBAImage(srcBuffer, tgaWidth, tgaHeight, resizeBuffer, finalWidth, finalHeight);
@@ -1223,11 +1225,11 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 	///////////////////////////////////////////////////////////////////////
 	///// need to pad the image so both dimensions are power of two's /////
 	///////////////////////////////////////////////////////////////////////
-	unsigned char *finalBuffer = (unsigned char *)malloc(paddedImageWidth * paddedImageHeight * 4);
+	auto *finalBuffer = (unsigned char *)malloc(paddedImageWidth * paddedImageHeight * 4);
 	ImgUtl_PadRGBAImage(resizeBuffer, finalWidth, finalHeight, finalBuffer, paddedImageWidth, paddedImageHeight);
 
 	FILE *outfile = fopen(tgaPath, "wb");
-	if (outfile == NULL)
+	if (outfile == nullptr)
 	{
 		free(resizeBuffer);
 		free(finalBuffer);
@@ -1263,7 +1265,7 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 ConversionErrorType ImgUtl_StretchRGBAImage(const unsigned char *srcBuf, const int srcWidth, const int srcHeight,
 									 unsigned char *destBuf, const int destWidth, const int destHeight)
 {
-	if ((srcBuf == NULL) || (destBuf == NULL))
+	if ((srcBuf == nullptr) || (destBuf == nullptr))
 	{
 		return CE_CANT_OPEN_SOURCE_FILE;
 	}
@@ -1320,7 +1322,7 @@ ConversionErrorType ImgUtl_StretchRGBAImage(const unsigned char *srcBuf, const i
 			//// loop for the parts of the source image that will contribute color to the destination pixel.
 			while (srcCurrentY < srcEndY)
 			{
-				float srcCurrentEndY = (float)((int)srcCurrentY + 1);
+				auto srcCurrentEndY = (float)((int)srcCurrentY + 1);
 				if (srcCurrentEndY > srcEndY)
 				{
 					srcCurrentEndY = srcEndY;
@@ -1332,7 +1334,7 @@ ConversionErrorType ImgUtl_StretchRGBAImage(const unsigned char *srcBuf, const i
 
 				while (srcCurrentX < srcEndX)
 				{
-					float srcCurrentEndX = (float)((int)srcCurrentX + 1);
+					auto srcCurrentEndX = (float)((int)srcCurrentX + 1);
 					if (srcCurrentEndX > srcEndX)
 					{
 						srcCurrentEndX = srcEndX;
@@ -1377,7 +1379,7 @@ ConversionErrorType ImgUtl_StretchRGBAImage(const unsigned char *srcBuf, const i
 ConversionErrorType ImgUtl_PadRGBAImage(const unsigned char *srcBuf, const int srcWidth, const int srcHeight,
 								 unsigned char *destBuf, const int destWidth, const int destHeight)
 {
-	if ((srcBuf == NULL) || (destBuf == NULL))
+	if ((srcBuf == nullptr) || (destBuf == nullptr))
 	{
 		return CE_CANT_OPEN_SOURCE_FILE;
 	}
@@ -1424,7 +1426,7 @@ ConversionErrorType ImgUtl_PadRGBAImage(const unsigned char *srcBuf, const int s
 ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=-1*/, int nMaxHeight/*=-1*/ )
 {
 	FILE *infile = fopen(tgaPath, "rb");
-	if (infile == NULL)
+	if (infile == nullptr)
 	{
 		Msg( "Failed to open TGA: %s\n", tgaPath);
 		return CE_CANT_OPEN_SOURCE_FILE;
@@ -1462,7 +1464,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 
 	// load vtex_dll.dll and get the interface to it.
 	CSysModule *vtexmod = Sys_LoadModule("vtex_dll");
-	if (vtexmod == NULL)
+	if (vtexmod == nullptr)
 	{
 		Msg( "Failed to open TGA conversion module vtex_dll: %s\n", tgaPath);
 		return CE_ERROR_LOADING_DLL;
@@ -1477,7 +1479,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	}
 
 	IVTex *vtex = factory(IVTEX_VERSION_STRING, NULL);
-	if (vtex == NULL)
+	if (vtex == nullptr)
 	{
 		Sys_UnloadModule(vtexmod);
 		Msg( "Failed to open TGA conversion module vtex_dll Factory (is null): %s\n", tgaPath);
@@ -1528,7 +1530,7 @@ static void DoDeleteFile( const char *filename )
 ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const char *pMaterialsSubDir, int nMaxWidth/*=-1*/, int nMaxHeight/*=-1*/ )
 {
 #ifndef _XBOX
-	if ((pInPath == NULL) || (pInPath[0] == 0))
+	if ((pInPath == nullptr) || (pInPath[0] == 0))
 	{
 		return CE_ERROR_PARSING_SOURCE;
 	}
@@ -1766,7 +1768,7 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 
 ConversionErrorType ImgUtl_WriteGenericVMT( const char *vtfPath, const char *pMaterialsSubDir )
 {
-	if (vtfPath == NULL || pMaterialsSubDir == NULL )
+	if (vtfPath == nullptr || pMaterialsSubDir == nullptr )
 	{
 		return CE_ERROR_WRITING_OUTPUT_FILE;
 	}
@@ -1797,7 +1799,7 @@ ConversionErrorType ImgUtl_WriteGenericVMT( const char *vtfPath, const char *pMa
 
 	// create the vmt file.
 	FILE *vmtFile = fopen(vmtPath, "w");
-	if (vmtFile == NULL)
+	if (vmtFile == nullptr)
 	{
 		return CE_ERROR_WRITING_OUTPUT_FILE;
 	}
@@ -1822,7 +1824,7 @@ static void WritePNGData( png_structp png_ptr, png_bytep inBytes, png_size_t byt
 {
 
 	// Cast pointer
-	CUtlBuffer *pBuf = (CUtlBuffer *)png_get_io_ptr( png_ptr );
+	auto *pBuf = (CUtlBuffer *)png_get_io_ptr( png_ptr );
 	Assert( pBuf );
 
 	// Write the bytes
@@ -1848,14 +1850,14 @@ ConversionErrorType ImgUtl_WriteRGBAAsPNGToBuffer( const unsigned char *pRGBADat
     /* could pass pointers to user-defined error handlers instead of NULLs: */
 	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
 		NULL, NULL, NULL);
-	if (png_ptr == NULL)
+	if (png_ptr == nullptr)
 	{
 		return CE_MEMORY_ERROR;
 	}
 
 	ConversionErrorType errcode = CE_MEMORY_ERROR;
 
-	png_bytepp  row_pointers = NULL;
+	png_bytepp  row_pointers = nullptr;
 
 	png_infop info_ptr = png_create_info_struct(png_ptr);
     if ( !info_ptr ) 
@@ -1894,7 +1896,7 @@ fail:
 	png_write_info(png_ptr, info_ptr);
 
 	row_pointers = (png_bytepp)malloc( nHeight*sizeof(png_bytep) );
-	if ( row_pointers == NULL  ) 
+	if ( row_pointers == nullptr  ) 
 	{
         errcode = CE_MEMORY_ERROR;
         goto fail;
@@ -1912,7 +1914,7 @@ fail:
 
 	// Clean up, and we're done
 	free( row_pointers );
-	row_pointers = NULL;
+	row_pointers = nullptr;
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 	return CE_SUCCESS;
 #else
@@ -1926,7 +1928,7 @@ fail:
 //-----------------------------------------------------------------------------
 METHODDEF(void) init_destination (j_compress_ptr cinfo)
 {
-	JPEGDestinationManager_t *dest = ( JPEGDestinationManager_t *) cinfo->dest;
+	auto *dest = ( JPEGDestinationManager_t *) cinfo->dest;
 
 	// Allocate the output buffer --- it will be released when done with image
 	dest->buffer = (byte *)
@@ -1943,7 +1945,7 @@ METHODDEF(void) init_destination (j_compress_ptr cinfo)
 //-----------------------------------------------------------------------------
 METHODDEF(boolean) empty_output_buffer (j_compress_ptr cinfo)
 {
-	JPEGDestinationManager_t *dest = ( JPEGDestinationManager_t * ) cinfo->dest;
+	auto *dest = ( JPEGDestinationManager_t * ) cinfo->dest;
 
 	CUtlBuffer *buf = dest->pBuffer;
 
@@ -1966,7 +1968,7 @@ METHODDEF(boolean) empty_output_buffer (j_compress_ptr cinfo)
 //-----------------------------------------------------------------------------
 METHODDEF(void) term_destination (j_compress_ptr cinfo)
 {
-	JPEGDestinationManager_t *dest = (JPEGDestinationManager_t *) cinfo->dest;
+	auto *dest = (JPEGDestinationManager_t *) cinfo->dest;
 	size_t datacount = JPEG_OUTPUT_BUF_SIZE - dest->pub.free_in_buffer;
 
 	CUtlBuffer *buf = dest->pBuffer;
@@ -1991,7 +1993,7 @@ GLOBAL(void) jpeg_UtlBuffer_dest (j_compress_ptr cinfo, CUtlBuffer *pBuffer )
     * manager serially with the same JPEG object, because their private object
     * sizes may be different.  Caveat programmer.
     */
-    if (cinfo->dest == NULL) {  /* first time for this JPEG object? */
+    if (cinfo->dest == nullptr) {  /* first time for this JPEG object? */
         cinfo->dest = (struct jpeg_destination_mgr *)
             (*cinfo->mem->alloc_small) ((j_common_ptr) cinfo, JPOOL_PERMANENT,
             sizeof(JPEGDestinationManager_t));
@@ -2103,7 +2105,7 @@ ConversionErrorType ImgUtl_WriteRGBAAsJPEGToBuffer( const unsigned char *pRGBADa
 	jpeg_start_compress(&cinfo, TRUE);
 
 	// Write scanlines
-	unsigned char *pDstRow = (unsigned char *)malloc( sizeof(unsigned char) * nWidth * 4 );
+	auto *pDstRow = (unsigned char *)malloc( sizeof(unsigned char) * nWidth * 4 );
 	while ( cinfo.next_scanline < cinfo.image_height ) 
 	{
 		const unsigned char *pSrcRow = &(pRGBAData[cinfo.next_scanline * row_stride]);
@@ -2251,7 +2253,7 @@ ConversionErrorType ImgUtl_ResizeBitmap( Bitmap_t &destBitmap, int nWidth, int n
 
 	// Check for resizing in place, then save off data into a temp
 	Bitmap_t temp;
-	if ( pImgSource == NULL || pImgSource == &destBitmap )
+	if ( pImgSource == nullptr || pImgSource == &destBitmap )
 	{
 		temp.MakeLogicalCopyOf( destBitmap, destBitmap.GetOwnsBuffer() );
 		pImgSource = &temp;

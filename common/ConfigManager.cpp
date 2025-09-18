@@ -41,7 +41,9 @@ constexpr inline char TOKEN_SDK_VERSION[]{"SDKVersion"};
 //	3 - Ep2, TF2, and Portal added
 //  4 - TF2 moved to its own engine
 
-#define SDK_LAUNCHER_VERSION 5
+enum {
+  SDK_LAUNCHER_VERSION = 5
+};
 
 // Half-Life 2
 defaultConfigInfo_t HL2Info =
@@ -191,10 +193,10 @@ defaultConfigInfo_t SourceTestInfo =
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CGameConfigManager::CGameConfigManager( void ) : m_pData( NULL ), m_LoadStatus( LOADSTATUS_NONE )
+CGameConfigManager::CGameConfigManager( ) : m_pData( nullptr ), m_LoadStatus( LOADSTATUS_NONE )
 {
 	// Start with default directory
-	GetModuleFileName( GetModuleHandle( NULL ), m_szBaseDirectory, sizeof( m_szBaseDirectory ) );
+	GetModuleFileName( GetModuleHandle( nullptr ), m_szBaseDirectory, sizeof( m_szBaseDirectory ) );
 	V_StripLastDir( m_szBaseDirectory );	// Get rid of the filename.
 	V_StripTrailingSlash( m_szBaseDirectory );
 	m_eSDKEpoch = (eSDKEpochs) SDK_LAUNCHER_VERSION;
@@ -203,10 +205,10 @@ CGameConfigManager::CGameConfigManager( void ) : m_pData( NULL ), m_LoadStatus( 
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
-CGameConfigManager::~CGameConfigManager( void )
+CGameConfigManager::~CGameConfigManager( )
 {
 	// Release the keyvalues
-	if ( m_pData != NULL )
+	if ( m_pData != nullptr )
 	{
 		m_pData->deleteThis();
 	}
@@ -302,7 +304,7 @@ bool CGameConfigManager::LoadConfigsInternal( const char *baseDir, bool bRecursi
 	m_pData->Clear();
 
 	// Build our default directory
-	if ( baseDir != NULL && baseDir[0] != NULL )
+	if ( !Q_isempty( baseDir ) )
 	{
 		SetBaseDirectory( baseDir );
 	}
@@ -316,7 +318,7 @@ bool CGameConfigManager::LoadConfigsInternal( const char *baseDir, bool bRecursi
 	CUtlBuffer buffer( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	if ( ReadUtlBufferFromFile( buffer, szPath ) )
 	{
-		bLoaded = m_pData->LoadFromBuffer( szPath, buffer, NULL, NULL );
+		bLoaded = m_pData->LoadFromBuffer( szPath, buffer, nullptr, nullptr );
 	}
 
 	if ( !bLoaded )
@@ -347,7 +349,7 @@ bool CGameConfigManager::LoadConfigsInternal( const char *baseDir, bool bRecursi
 //-----------------------------------------------------------------------------
 // Purpose: Add to the current config.
 //-----------------------------------------------------------------------------
-void CGameConfigManager::UpdateConfigsInternal( void )
+void CGameConfigManager::UpdateConfigsInternal()
 {
 	// Check to a valid gameconfig.txt file buffer.
 	if ( !IsLoaded() )
@@ -373,7 +375,7 @@ void CGameConfigManager::UpdateConfigsInternal( void )
 
 		// Compare our default block to our current configs
 		KeyValues *pNextSubKey = pDefaultBlock->GetFirstTrueSubKey();
-		while ( pNextSubKey != NULL )
+		while ( pNextSubKey != nullptr )
 		{
 			// If we already have the name, we don't care about it
 			if ( pGameBlock->FindKey( pNextSubKey->GetName() ) )
@@ -402,7 +404,7 @@ void CGameConfigManager::UpdateConfigsInternal( void )
 //-----------------------------------------------------------------------------
 // Purpose: Update the gameconfig.txt version number.
 //-----------------------------------------------------------------------------
-void CGameConfigManager::VersionConfig( void )
+void CGameConfigManager::VersionConfig()
 {
 	// Check to a valid gameconfig.txt file buffer.
 	if ( !IsLoaded() )
@@ -432,7 +434,7 @@ void CGameConfigManager::VersionConfig( void )
 //-----------------------------------------------------------------------------
 // Purpose: Check to see if the version of the gameconfig.txt is up to date.
 //-----------------------------------------------------------------------------
-bool CGameConfigManager::IsConfigCurrent( void )
+bool CGameConfigManager::IsConfigCurrent()
 {
 	// Check to a valid gameconfig.txt file buffer.
 	if ( !IsLoaded() )
@@ -505,7 +507,7 @@ const char szDefaultConfigText[] =
 bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyValues *out, const char *rootDirectory, const char *gameExeDir )
 {	
 	// NOTE: Freed by head keyvalue
-	KeyValues *newConfig = new KeyValues( info.gameName );
+	auto *newConfig = new KeyValues( info.gameName );
 	if ( newConfig->LoadFromBuffer( "defaultcfg.txt", szDefaultConfigText ) == false )
 	{
 		newConfig->deleteThis();
@@ -538,7 +540,7 @@ bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyV
 	// Create the Hammer portion of this block
 	KeyValues *hammerBlock = newConfig->FindKey( "Hammer" );
 
-	if ( hammerBlock == NULL )
+	if ( hammerBlock == nullptr )
 	{
 		newConfig->deleteThis();
 		return false;
@@ -599,7 +601,7 @@ bool CGameConfigManager::AddDefaultConfig( const defaultConfigInfo_t &info, KeyV
 	KeyValues *insertSpot = out->GetFirstTrueSubKey();
 	
 	// Set this as the sub key if there's nothing already there
-	if ( insertSpot == NULL )
+	if ( insertSpot == nullptr )
 	{
 		out->AddSubKey( newConfig );
 	}
@@ -650,7 +652,7 @@ bool CGameConfigManager::IsAppSubscribed( int nAppID ) const
 //-----------------------------------------------------------------------------
 // Purpose: Create default configurations for all Valve retail applications
 //-----------------------------------------------------------------------------
-bool CGameConfigManager::CreateAllDefaultConfigs( void )
+bool CGameConfigManager::CreateAllDefaultConfigs()
 {
 	// Start our new block
 	KeyValuesAD configBlock( "Configs" );
@@ -677,7 +679,7 @@ bool CGameConfigManager::CreateAllDefaultConfigs( void )
 //-----------------------------------------------------------------------------
 // Purpose: Load game information from an INI file
 //-----------------------------------------------------------------------------
-bool CGameConfigManager::ConvertGameConfigsINI( void )
+bool CGameConfigManager::ConvertGameConfigsINI()
 {
 	const char *iniFilePath = GetIniFilePath();
 
@@ -687,7 +689,7 @@ bool CGameConfigManager::ConvertGameConfigsINI( void )
 		return false;
 
 	// Build a new keyvalue file
-	KeyValues *headBlock = new KeyValues( "Configs" );
+	auto *headBlock = new KeyValues( "Configs" );
 
 	// Create the block for games
 	KeyValues *gamesBlock = headBlock->CreateNewKey( );
@@ -833,7 +835,7 @@ bool CGameConfigManager::SaveConfigs( const char *baseDir )
 		return false;
 
 	// Build our default directory
-	if ( baseDir != NULL && baseDir[0] != NULL )
+	if ( !Q_isempty( baseDir ) )
 	{
 		SetBaseDirectory( baseDir );
 	}
@@ -853,7 +855,7 @@ bool CGameConfigManager::SaveConfigs( const char *baseDir )
 //-----------------------------------------------------------------------------
 // Purpose: Find the directory our .exe is based out of
 //-----------------------------------------------------------------------------
-const char *CGameConfigManager::GetBaseDirectory( void )
+const char *CGameConfigManager::GetBaseDirectory( )
 {
 	return m_szBaseDirectory;
 }
@@ -861,7 +863,7 @@ const char *CGameConfigManager::GetBaseDirectory( void )
 //-----------------------------------------------------------------------------
 // Purpose: Find the root directory
 //-----------------------------------------------------------------------------
-const char *CGameConfigManager::GetRootDirectory( void )
+const char *CGameConfigManager::GetRootDirectory( )
 {
 	static char path[MAX_PATH] = {0};
 	if ( path[0] == 0 )
@@ -876,10 +878,10 @@ const char *CGameConfigManager::GetRootDirectory( void )
 //-----------------------------------------------------------------------------
 // Purpose: Returns the game configuation block
 //-----------------------------------------------------------------------------
-KeyValues *CGameConfigManager::GetGameBlock( void )
+KeyValues *CGameConfigManager::GetGameBlock( )
 {
 	if ( !IsLoaded() )
-		return NULL;
+		return nullptr;
 
 	return ( m_pData->FindKey( TOKEN_GAMES, true ) );
 }
@@ -891,11 +893,11 @@ KeyValues *CGameConfigManager::GetGameBlock( void )
 KeyValues *CGameConfigManager::GetGameSubBlock( const char *keyName )
 {
 	if ( !IsLoaded() )
-		return NULL;
+		return nullptr;
 
 	KeyValues *pGameBlock = GetGameBlock();
-	if ( pGameBlock == NULL )
-		return NULL;
+	if ( pGameBlock == nullptr )
+		return nullptr;
 
 	// Return the data
 	KeyValues *pSubBlock = pGameBlock->FindKey( keyName );
@@ -906,7 +908,7 @@ KeyValues *CGameConfigManager::GetGameSubBlock( const char *keyName )
 //-----------------------------------------------------------------------------
 // Purpose: Get the gamecfg.ini file for conversion
 //-----------------------------------------------------------------------------
-const char *CGameConfigManager::GetIniFilePath( void )
+const char *CGameConfigManager::GetIniFilePath( )
 {
 	static char iniFilePath[MAX_PATH] = {0};
 	if ( Q_isempty( iniFilePath ) )
@@ -924,7 +926,7 @@ const char *CGameConfigManager::GetIniFilePath( void )
 bool CGameConfigManager::ResetConfigs( const char *baseDir /*= NULL*/ )
 {
 	// Build our default directory
-	if ( baseDir != NULL && baseDir[0] != NULL )
+	if ( baseDir != nullptr && baseDir[0] != NULL )
 	{
 		SetBaseDirectory( baseDir );
 	}
@@ -951,7 +953,7 @@ bool CGameConfigManager::ResetConfigs( const char *baseDir /*= NULL*/ )
 void CGameConfigManager::SetBaseDirectory( const char *pDirectory )
 {
 	// Clear it
-	if ( pDirectory == NULL || pDirectory[0] == '\0' )
+	if ( Q_isempty( pDirectory ) )
 	{
 		m_szBaseDirectory[0] = '\0';
 		return;
@@ -968,7 +970,7 @@ void CGameConfigManager::SetBaseDirectory( const char *pDirectory )
 //-----------------------------------------------------------------------------
 bool CGameConfigManager::GetDefaultGameBlock( KeyValues *pIn )
 {
-	if ( pIn == NULL )
+	if ( pIn == nullptr )
 		return false;
 
 	CUtlVector<defaultConfigInfo_t> defaultConfigs;

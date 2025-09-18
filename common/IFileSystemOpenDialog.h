@@ -24,7 +24,7 @@ public:
 
 	// Use these to configure the dialog.
 	virtual void AddFileMask( const char *pMask ) = 0;
-	virtual void SetInitialDir( const char *pDir, const char *pPathID = NULL ) = 0;
+	virtual void SetInitialDir( const char *pDir, const char *pPathID = nullptr ) = 0;
 	virtual void SetFilterMdlAndJpgFiles( bool bFilter ) = 0;
 	virtual void GetFilename( OUT_Z_CAP(outLen) char *pOut, intp outLen ) const = 0;	// Get the filename they choose.
 	template<intp outSize>

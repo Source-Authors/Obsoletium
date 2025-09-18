@@ -40,7 +40,7 @@ public:
 
 	// get a handle to refer to this connection to the gameserver data interface
 	// is authConnection is true the SERVERDATA_AUTH command needs to succeed before other commands
-	virtual ra_listener_id GetNextListenerID( bool authConnection = true, const netadr_t *adr = NULL ) = 0;
+	virtual ra_listener_id GetNextListenerID( bool authConnection = true, const netadr_t *adr = nullptr ) = 0;
 	// tell the remote access class that this ID is the special dedicated server UI callback (and not an rcon one)
 	virtual void RegisterAdminUIID( ra_listener_id listener ) = 0;
 };
