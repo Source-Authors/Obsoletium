@@ -79,6 +79,8 @@ public:
 	virtual int Init(
 		IVoiceStatusHelper *m_pHelper,
 		vgui::VPANEL pParentPanel);
+	// dimhotepus: Pair with cleanup.
+	virtual void Shutdown();
 	
 	// ackPosition is the bottom position of where CVoiceStatus will draw the voice acknowledgement labels.
 	virtual void VidInit();

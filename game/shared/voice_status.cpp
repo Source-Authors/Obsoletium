@@ -126,7 +126,7 @@ CVoiceStatus::~CVoiceStatus()
 		m_pHeadLabelMaterial->DecrementReferenceCount();
 	}
 
-	g_pInternalVoiceStatus = NULL;			
+	g_pInternalVoiceStatus = NULL;
 
 	const char *pGameDir = engine->GetGameDirectory();
 	if( pGameDir )
@@ -165,6 +165,37 @@ int CVoiceStatus::Init(
 	HOOK_MESSAGE(RequestState);
 
 	return 1;
+}
+
+
+// dimhotepus: Pair with shutdown to cleanup.
+void CVoiceStatus::Shutdown()
+{
+	UNHOOK_MESSAGE(RequestState);
+	UNHOOK_MESSAGE(VoiceMask);
+	
+	m_pParentPanel = INVALID_PANEL;
+	m_pHelper = nullptr;
+
+	if ( m_pHeadLabelMaterial )
+	{
+		m_pHeadLabelMaterial->DecrementReferenceCount();
+		m_pHeadLabelMaterial = nullptr;
+	}
+
+	g_pInternalVoiceStatus = nullptr;
+
+	const char *pGameDir = engine->GetGameDirectory();
+	if( pGameDir )
+	{
+		if(m_bBanMgrInitialized)
+		{
+			m_BanMgr.SaveState( pGameDir );
+			m_BanMgr.Term();
+
+			m_bBanMgrInitialized = false;
+		}
+	}
 }
 
 

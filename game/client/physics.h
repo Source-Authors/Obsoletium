@@ -20,6 +20,8 @@ struct solid_t;
 
 // HACKHACK: Make this part of IClientSystem somehow???
 extern bool PhysicsDLLInit( CreateInterfaceFn physicsFactory );
+// dimhotepus: Add shutdown method to cleanup.
+extern void PhysicsDLLShutdown();
 extern void PhysicsReset();
 extern void PhysicsSimulate();
 extern float PhysGetSyncCreateTime();

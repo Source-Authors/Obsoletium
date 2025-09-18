@@ -68,8 +68,8 @@ public:
     void *operator new( size_t stAllocateBlock )	
 	{												
 		Assert( stAllocateBlock != 0 );				
-		void *pMem = malloc( stAllocateBlock );
-		memset( pMem, 0, stAllocateBlock );
+		// dimhotepus: malloc + memset -> calloc
+		void *pMem = calloc( 1, stAllocateBlock );
 		return pMem;												
 	}
 	

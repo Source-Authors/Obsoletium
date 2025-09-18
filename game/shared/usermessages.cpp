@@ -185,6 +185,33 @@ bool CUserMessages::DispatchUserMessage( int msg_type, bf_read &msg_data )
 #endif
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+// Input  : *name - 
+//			hook - 
+//-----------------------------------------------------------------------------
+// dimhotepus: Unhook message for cleanup.
+void CUserMessages::UnhookMessage( const char *name, pfnUserMsgHook hook )
+{
+#if defined( CLIENT_DLL )
+	Assert( name );
+	Assert( hook );
+
+	int idx = m_UserMessages.Find( name );
+	if ( idx == m_UserMessages.InvalidIndex() )
+	{
+		DevMsg( "CUserMessages::UnhookMessage:  no such message %s\n", name );
+		Assert( 0 );
+		return;
+	}
+
+	intp i = m_UserMessages[ idx ]->clienthooks.FindAndFastRemove( hook );
+
+#else
+	Error( "CUserMessages::UnhookMessage called from server code!!!\n" );
+#endif
+}
+
 // Singleton
 static CUserMessages g_UserMessages;
 // Expose to rest of .dll

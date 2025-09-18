@@ -60,17 +60,6 @@ class IEngineClientReplay;
 class IReplayScreenshotManager;
 class CSteamID;
 
-//=============================================================================
-// HPE_BEGIN
-// [dwenger] Necessary for stats display
-//=============================================================================
-
-class AchievementsAndStatsInterface;
-
-//=============================================================================
-// HPE_END
-//=============================================================================
-
 extern IVModelRender *modelrender;
 extern IVEngineClient	*engine;
 extern IVModelRender *modelrender;
@@ -110,17 +99,6 @@ extern IReplayManager *g_pReplayManager;
 extern IReplayScreenshotManager *g_pReplayScreenshotManager;
 extern IEngineReplay *g_pEngineReplay;
 extern IEngineClientReplay *g_pEngineClientReplay;
-
-//=============================================================================
-// HPE_BEGIN
-// [dwenger] Necessary for stats display
-//=============================================================================
-
-extern AchievementsAndStatsInterface* g_pAchievementsAndStatsInterface;
-
-//=============================================================================
-// HPE_END
-//=============================================================================
 
 // Set to true between LevelInit and LevelShutdown.
 extern bool	g_bLevelInitialized;

@@ -107,7 +107,7 @@ void HapticMsg_MeleeContact(CBasePlayer* pPlayer)
 // Client
 //-----------------------------------------------------------------------------
 #ifdef CLIENT_DLL
-void HookHapticMessages(void)
+void HookHapticMessages()
 {
 	HOOK_MESSAGE(SPHapWeapEvent);
 	HOOK_MESSAGE(HapDmg);
@@ -115,6 +115,18 @@ void HookHapticMessages(void)
 	HOOK_MESSAGE(HapSetDrag);
 	HOOK_MESSAGE(HapSetConst);
 	HOOK_MESSAGE(HapMeleeContact);
+
+}
+
+// dimhotepus: Cleanup support.
+void UnhookHapticMessages()
+{
+	UNHOOK_MESSAGE(HapMeleeContact);
+	UNHOOK_MESSAGE(HapSetConst);
+	UNHOOK_MESSAGE(HapSetDrag);
+	UNHOOK_MESSAGE(HapPunch);
+	UNHOOK_MESSAGE(HapDmg);
+	UNHOOK_MESSAGE(SPHapWeapEvent);
 
 }
 

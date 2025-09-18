@@ -54,6 +54,8 @@ public:
 	// Client only
 	void	HookMessage( const char *name, pfnUserMsgHook hook );
 	bool	DispatchUserMessage( int msg_type, bf_read &msg_data );
+	// dimhotepus: Unhook message for cleanup.
+	void	UnhookMessage( const char *name, pfnUserMsgHook hook );
 
 private:
 
