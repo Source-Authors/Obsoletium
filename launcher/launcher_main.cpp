@@ -71,7 +71,7 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
 }
 
 // Spew function!
-SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type, const char *raw) {
+SpewRetval_t DefaultSpew(SpewType_t spew_type, const char *raw) {
   char message[4096];
 
   Plat_DebugString(PrefixMessageGroup(message, "launcher", raw));
@@ -364,7 +364,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
 
   // Hook the debug output stuff.
-  SpewOutputFunc(LauncherDefaultSpewFunc);
+  const ScopedSpewOutputFunc scoped_spew_output(DefaultSpew);
 
   // Dump compiler / libs / app versions.
 #ifdef WIN32
@@ -553,8 +553,6 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
                           InitTextMode()};
 
   rc = RunApp(command_line, base_directory, is_text_mode);
-
-  SpewOutputFunc(nullptr);
 
   return rc;
 }
