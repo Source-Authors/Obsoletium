@@ -1434,7 +1434,7 @@ void CBasePanel::RunMenuCommand(const char *command)
 	}
 	else if ( !Q_stricmp( command, "OpenLoadDemoDialog" ) )
 	{
-		OnOpenDemoDialog();
+		// dimhotepus: Drop empty function.
 	}
 	else if ( !Q_stricmp( command, "OpenCreateMultiplayerGameDialog" ) )
 	{
@@ -2341,19 +2341,6 @@ void CBasePanel::OnOpenServerBrowser()
 void CBasePanel::OnOpenFriendsDialog()
 {
 	g_VModuleLoader.ActivateModule("Friends");
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-//-----------------------------------------------------------------------------
-void CBasePanel::OnOpenDemoDialog()
-{
-/*	if ( !m_hDemoPlayerDialog.Get() )
-	{
-		m_hDemoPlayerDialog = new CDemoPlayerDialog(this);
-		PositionDialog( m_hDemoPlayerDialog );
-	}
-	m_hDemoPlayerDialog->Activate();*/
 }
 
 //-----------------------------------------------------------------------------

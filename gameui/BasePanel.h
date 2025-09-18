@@ -216,7 +216,6 @@ public:
 	void OnOpenSaveGameDialog();
 	void OnOpenServerBrowser();
 	void OnOpenFriendsDialog();
-	void OnOpenDemoDialog();
 	void OnOpenCreateMultiplayerGameDialog();
 	void OnOpenQuitConfirmationDialog();
 	void OnOpenDisconnectConfirmationDialog();
@@ -358,7 +357,6 @@ private:
 	vgui::DHANDLE<vgui::Frame> m_hSaveGameDialog;
 	vgui::DHANDLE<vgui::PropertyDialog> m_hOptionsDialog;
 	vgui::DHANDLE<vgui::Frame> m_hCreateMultiplayerGameDialog;
-	//vgui::DHANDLE<vgui::Frame> m_hDemoPlayerDialog;
 	vgui::DHANDLE<vgui::Frame> m_hChangeGameDialog;
 	vgui::DHANDLE<vgui::Frame> m_hPlayerListDialog;
 	vgui::DHANDLE<vgui::Frame> m_hBenchmarkDialog;
