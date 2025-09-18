@@ -13,7 +13,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-enum {
+enum : unsigned int {
   CRC32_INIT_VALUE = 0xFFFFFFFFUL,
   CRC32_XOR_VALUE =  0xFFFFFFFFUL
 };
