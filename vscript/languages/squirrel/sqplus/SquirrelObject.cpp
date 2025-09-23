@@ -516,10 +516,10 @@ SQUserPointer SquirrelObject::GetInstanceUP(SQUserPointer tag) const
 {
 	SQUserPointer up;
 	sq_pushobject(SquirrelVM::_VM,_o);
-  if (SQ_FAILED(sq_getinstanceup(SquirrelVM::_VM,-1,(SQUserPointer*)&up,tag))) {
-    sq_reseterror(SquirrelVM::_VM);
-    up = NULL;
-  } // if
+	if (SQ_FAILED(sq_getinstanceup(SquirrelVM::_VM,-1,(SQUserPointer*)&up,tag,1))) {
+	  sq_reseterror(SquirrelVM::_VM);
+	  up = NULL;
+	} // if
 	sq_pop(SquirrelVM::_VM,1);
 	return up;
 }

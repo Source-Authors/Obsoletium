@@ -56,14 +56,14 @@ marked with other licenses or externally maintained libraries.
 
 Externally maintained by Source 1 libraries are:
 
-- bink2 located at thirdparty/bink is licensed as:
+- bink2, bik1/2 video player, located at thirdparty/bink is licensed as:
 """
   RAD Game Tools.
 
   See https://www.radgametools.com/bnkmain.htm
 """
 
-- bzip2 located at thirdparty/bzip2 is licensed as:
+- bzip2, bz2 compressor, located at thirdparty/bzip2 is licensed as:
 """
   This program, "bzip2", the associated library "libbzip2", and all
   documentation, are copyright (C) 1996-2019 Julian R Seward.  All
@@ -104,7 +104,7 @@ Externally maintained by Source 1 libraries are:
   bzip2/libbzip2 version 1.0.8 of 13 July 2019
 """
 
-- celt located at thirdparty/celt is licensed as:
+- celt, voice codec, located at thirdparty/celt is licensed as:
 """
   Copyright 2001-2009 Jean-Marc Valin, Timothy B. Terriberry,
                     CSIRO, and other contributors
@@ -133,7 +133,7 @@ Externally maintained by Source 1 libraries are:
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-- cryptopp located at thirdparty/cryptopp is licensed as:
+- cryptopp, crypto primitives, located at thirdparty/cryptopp is licensed as:
 """
   Compilation Copyright (c) 1995-2019 by Wei Dai.  All rights reserved.
   This copyright applies only to this software distribution package
@@ -221,7 +221,7 @@ Externally maintained by Source 1 libraries are:
     derived from this software without specific prior written permission.
 """
 
-- DirectXMath located at thirdparty/DirectXMath is licensed as:
+- DirectXMath, hw accelerated math, located at thirdparty/DirectXMath is licensed as:
 """
   MIT License
   
@@ -246,7 +246,7 @@ Externally maintained by Source 1 libraries are:
   SOFTWARE
 """
 
-- libjpeg-turbo located at thirdparty/libjpeg-turbo is licensed as:
+- libjpeg-turbo, hw accelerated JPEG reader, located at thirdparty/libjpeg-turbo is licensed as:
 """
   libjpeg-turbo Licenses
   ======================
@@ -382,7 +382,7 @@ Externally maintained by Source 1 libraries are:
   that were granted to the IJG for code derived from their software.
 """
 
-- libpng located at thirdparty/libpng is licensed as:
+- libpng, PNG reader, located at thirdparty/libpng is licensed as:
 """
   COPYRIGHT NOTICE, DISCLAIMER, and LICENSE
   =========================================
@@ -520,7 +520,7 @@ Externally maintained by Source 1 libraries are:
   be appreciated.
 """
 
-- lua located at thirdparty/lua is licensed as:
+- lua, script language, located at thirdparty/lua is licensed as:
 """
   Copyright © 1994–2024 Lua.org, PUC-Rio.
   
@@ -543,7 +543,7 @@ Externally maintained by Source 1 libraries are:
   SOFTWARE.
 """
 
-- LZMA SDK located at thirdparty/7zip is licensed as:
+- LZMA SDK, compression SDK, located at thirdparty/7zip is licensed as:
 """
   LZMA SDK is written and placed in the public domain by Igor Pavlov.
 
@@ -566,7 +566,7 @@ Externally maintained by Source 1 libraries are:
   Contact RAD Game Tools at 425-893-4300 for technical support.
 """
 
-- minimp3 located at thirdparty/minimp3 is licensed as:
+- minimp3, MP3 reader, located at thirdparty/minimp3 is licensed as:
 """
   CC0 1.0 Universal
 
@@ -686,7 +686,7 @@ Externally maintained by Source 1 libraries are:
   <http://creativecommons.org/publicdomain/zero/1.0/>
 """
 
-- mpaheaderinfo 2.2 located at thirdparty/mpaheaderinfo is licensed as:
+- mpaheaderinfo, MP3 tags reader, located at thirdparty/mpaheaderinfo is licensed as:
 """
   GNU LESSER GENERAL PUBLIC LICENSE
   Version 3, 29 June 2007
@@ -701,7 +701,7 @@ Externally maintained by Source 1 libraries are:
   additional permissions listed below.
 """
 
-- NvTriStrip located at thirdparty/nvtristrip is licensed as:
+- NvTriStrip, geometry stripper, located at thirdparty/nvtristrip is licensed as:
 """
   Copyright NVIDIA Corporation 2008
 
@@ -714,7 +714,7 @@ Externally maintained by Source 1 libraries are:
   SOFTWARE, EVEN IF NVIDIA HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 """
 
-- openvr 0.9.11 located at thirdparty/openvr is licensed as:
+- openvr, VR support, located at thirdparty/openvr is licensed as:
 """
   Copyright (c) 2015, Valve Corporation
   All rights reserved.
@@ -745,7 +745,7 @@ Externally maintained by Source 1 libraries are:
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-- protobuf 2.6.1 located at thirdparty/protobuf-2.6.1 is licensed as:
+- protobuf 2.6.1, message protocol, located at thirdparty/protobuf-2.6.1 is licensed as:
 """
   Copyright 2008, Google Inc.
   All rights reserved.
@@ -782,7 +782,7 @@ Externally maintained by Source 1 libraries are:
   support library is itself covered by the above license.
 """
 
-- sdl3 located at thirdparty/sdl is licensed as:
+- sdl3, media library, located at thirdparty/sdl is licensed as:
 """
   Copyright (C) 1997-2023 Sam Lantinga <slouken@libsdl.org>
   
@@ -803,7 +803,7 @@ Externally maintained by Source 1 libraries are:
   3. This notice may not be removed or altered from any source distribution.
 """
 
-- snappy located at thirdparty/snappy is licensed as:
+- snappy, compressor, located at thirdparty/snappy is licensed as:
 """
   Copyright 2005 and onwards Google Inc.
  
@@ -844,7 +844,7 @@ Externally maintained by Source 1 libraries are:
   Snappy.
 """
 
-- speex located at thirdparty/speex is licensed as:
+- speex, voice codec, located at thirdparty/speex is licensed as:
 """
   Copyright 2002-2008 	Xiph.org Foundation
   Copyright 2002-2008 	Jean-Marc Valin
@@ -883,7 +883,7 @@ Externally maintained by Source 1 libraries are:
   SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 
-- speedtree located at thirdparty/speedtree is licensed as:
+- speedtree, tree renderer, located at thirdparty/speedtree is licensed as:
 """
   This software is supplied under the terms of a license agreement or
   nondisclosure agreement with Interactive Data Visualization and may
@@ -899,7 +899,32 @@ Externally maintained by Source 1 libraries are:
   Release version 1.8.0
 """
 
-- stb located at thirdparty/stb is licensed as:
+- squirrel, script language, located at thirdparty/squirrel is licensed ast:
+"""
+  Copyright (c) 2003-2022 Alberto Demichelis
+  
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+  
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+  
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+  -----------------------------------------------------
+  END OF COPYRIGHT
+"""
+
+- stb, building blocks library, located at thirdparty/stb is licensed as:
 """
   This software is available under 2 licenses -- choose whichever you prefer.
   ------------------------------------------------------------------------------
@@ -940,7 +965,7 @@ Externally maintained by Source 1 libraries are:
   WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 
-- zip-utils located at thirdparty/zip-utils is licensed as:
+- zip-utils, zipper, located at thirdparty/zip-utils is licensed as:
 """
   XZip & XUnzip  Version 1.1
   
@@ -1025,7 +1050,7 @@ Externally maintained by Source 1 libraries are:
         own source and binary releases.
 """
 
-- zlib located at thirdparty/zlib is licensed as:
+- zlib, zip library, located at thirdparty/zlib is licensed as:
 """
   Copyright notice:
   

@@ -97,22 +97,24 @@ static constexpr const char *SQTypeToString( SQObjectType sqType )
 {
 	switch( sqType )
 	{
-		case OT_FLOAT:			return "FLOAT";
+		case OT_NULL:			return "NULL";
 		case OT_INTEGER:		return "INTEGER";
+		case OT_FLOAT:			return "FLOAT";
 		case OT_BOOL:			return "BOOL";
 		case OT_STRING:			return "STRING";
-		case OT_NULL:			return "NULL";
 		case OT_TABLE:			return "TABLE";
 		case OT_ARRAY:			return "ARRAY";
+		case OT_USERDATA:		return "USERDATA";
 		case OT_CLOSURE:		return "CLOSURE";
 		case OT_NATIVECLOSURE:	return "NATIVECLOSURE";
-		case OT_USERDATA:		return "USERDATA";
 		case OT_GENERATOR:		return "GENERATOR";
-		case OT_THREAD:			return "THREAD";
 		case OT_USERPOINTER:	return "USERPOINTER";
+		case OT_THREAD:			return "THREAD";
+		case OT_FUNCPROTO:		return "FUNCPROTO";
 		case OT_CLASS:			return "CLASS";
 		case OT_INSTANCE:		return "INSTANCE";
 		case OT_WEAKREF:		return "WEAKREF";
+		case OT_OUTER:			return "OUTER";
 	}
 	return "<unknown>";
 }
@@ -123,6 +125,7 @@ static constexpr const char *SQTypeToString( SQObjectType sqType )
 //-----------------------------------------------------------------------------
 
 const HSQOBJECT INVALID_HSQOBJECT = { (SQObjectType)-1, (SQTable *)-1 };
+const HSQOBJECT NULL_HSQOBJECT = { SQObjectType::OT_NULL, nullptr };
 
 inline bool operator==( const HSQOBJECT &lhs, const HSQOBJECT &rhs ) { static_assert( sizeof(lhs._unVal) == sizeof(lhs._unVal.pTable) ); return ( lhs._type == rhs._type && lhs._unVal.pTable == rhs._unVal.pTable ); }
 inline bool operator!=( const HSQOBJECT &lhs, const HSQOBJECT &rhs ) { return !operator==( lhs, rhs ); }
@@ -138,10 +141,10 @@ public:
 	    , developer( "developer", "1" )
 #endif
 	{
-		m_hOnCreateScopeFunc = _null_;
-		m_hOnReleaseScopeFunc = _null_;
-		m_hClassVector = _null_;
-		m_ErrorString = _null_;
+		m_hOnCreateScopeFunc = NULL_HSQOBJECT;
+		m_hOnReleaseScopeFunc = NULL_HSQOBJECT;
+		m_hClassVector = NULL_HSQOBJECT;
+		m_ErrorString = NULL_HSQOBJECT;
 		m_TimeStartExecute = 0.0;
 		m_pBuffer = nullptr;
 	}
@@ -160,14 +163,13 @@ public:
 			return false;
 		}
 
-		m_hVM->_sharedstate->m_pOwnerData = this;
-		m_hVM->SetQuerySuspendFn( &QueryContinue );
+		_ss( m_hVM )->_foreignptr = this;
 
 		// Display script compile errors.
 		sq_setcompilererrorhandler(m_hVM, &CompileErrorHandler);
 		// sq_notifyallexceptions(m_hVM, _debug_script_level > 5);
 		// Dump output.
-		sq_setprintfunc(m_hVM, &PrintHandler);
+		sq_setprintfunc(m_hVM, &PrintHandler, &ErrorHandler);
 		// Display runtime errors to client.
 		sq_newclosure(m_hVM, &RuntimeErrorHandler, 0);
 		sq_seterrorhandler(m_hVM);
@@ -292,6 +294,8 @@ public:
 			sq_collectgarbage( m_hVM );
 			sq_pushnull( m_hVM );
 			sq_setroottable( m_hVM );
+
+			_ss( m_hVM )->_foreignptr = nullptr;
 
 			sq_close( m_hVM );
 			m_hVM = nullptr;
@@ -431,7 +435,7 @@ public:
 		}
 		else
 		{
-			result = _null_;
+			result = NULL_HSQOBJECT;
 			sq_pop(m_hVM,1);
 		}
 
@@ -469,7 +473,7 @@ public:
 		{
 			if ( hScope == INVALID_HSCRIPT || *((HSQOBJECT *)hScope) == INVALID_HSQOBJECT || !sq_istable( *((HSQOBJECT *)hScope) ) )
 			{
-				return _null_;
+				return NULL_HSQOBJECT;
 			}
 			sq_pushobject( m_hVM, *((HSQOBJECT *)hScope) );
 		}
@@ -515,12 +519,13 @@ public:
 		}
 		if ( m_hDbg )
 		{
-			extern bool g_bSqDbgTerminateScript;
+			// TODO: How to implement this without squirrel src modification?
+			/*extern bool g_bSqDbgTerminateScript;
 			if ( g_bSqDbgTerminateScript )
 			{
 				DisconnectDebugger();
 				g_bSqDbgTerminateScript = false;
-			}
+			}*/
 		}
 
 		Assert( bWait );
@@ -584,7 +589,7 @@ public:
 					{
 						sq_throwerror( m_hVM, "Internal error" );
 					}
-					m_ErrorString = _null_;
+					m_ErrorString = NULL_HSQOBJECT;
 					return SCRIPT_ERROR;
 				}
 				return SCRIPT_DONE;
@@ -692,7 +697,7 @@ public:
 		auto *pInstanceContext = new InstanceContext_t;
 		pInstanceContext->pInstance = pInstance;
 		pInstanceContext->pClassDesc = pDesc;
-		pInstanceContext->name = _null_;
+		pInstanceContext->name = NULL_HSQOBJECT;
 
 		if ( !CreateNativeInstance( pDesc, pInstanceContext, &ExternalInstanceReleaseHook ) )
 		{
@@ -1002,7 +1007,8 @@ public:
 
 	void DumpState() override
 	{
-		struct CIterator final : public CSQStateIterator
+		// TODO: How to do it?
+		/*struct CIterator final : public CSQStateIterator
 		{
 			explicit CIterator( HSQUIRRELVM hVM )
 			{
@@ -1076,7 +1082,7 @@ public:
 		};
 
 		CIterator iter( m_hVM );
-		m_hVM->_sharedstate->Iterate( m_hVM, &iter );
+		m_hVM->_sharedstate->Iterate( m_hVM, &iter );*/
 	}
 
 	void WriteState( CUtlBuffer *pBuffer ) override
@@ -1124,7 +1130,7 @@ public:
 			return;
 		}
 		sq_collectgarbage( m_hVM );
-		m_hVM->_sharedstate->_gc_disableDepth++;
+		//m_hVM->_sharedstate->_gc_disableDepth++;
 		m_pBuffer = pBuffer;
 		auto uniqueIdSerialNumber = (uint64)m_pBuffer->GetInt64();
 		m_iUniqueIdSerialNumber = max( m_iUniqueIdSerialNumber, uniqueIdSerialNumber );
@@ -1133,7 +1139,7 @@ public:
 		ReadVM( m_hVM );
 		m_pBuffer = nullptr;
 		m_PtrMap.Purge();
-		m_hVM->_sharedstate->_gc_disableDepth--;
+		// m_hVM->_sharedstate->_gc_disableDepth--;
 		sq_collectgarbage( m_hVM );
 
 #ifdef VSQUIRREL_DEBUG_SERIALIZATION_HEAPCHK
@@ -1173,6 +1179,17 @@ private:
 		va_end (argptr);
 		
 		DMsg( "vscript:squirrel", 0, "%s.\n", string );
+	}
+
+	static void ErrorHandler(HSQUIRRELVM m_hVM,const SQChar* s,...)
+	{
+		char string[2048];
+		va_list		argptr;
+		va_start (argptr,s);
+		V_vsprintf_safe (string,s,argptr);
+		va_end (argptr);
+		
+		DWarning( "vscript:squirrel", 0, "%s.\n", string );
 	}
 
 	static void CompileErrorHandler(HSQUIRRELVM m_hVM,
@@ -1295,7 +1312,7 @@ private:
 		char result[ 512 ] = {0};
 		const char *pszName = sa.GetString( 3 );
 		SQClosure *pClosure = hFunction._unVal.pClosure;
-		SQFunctionProto *pProto = pClosure->_function._unVal.pFunctionProto;
+		SQFunctionProto *pProto = pClosure->_function;
 
 		V_strcat_safe( result, "function " );
 		if ( pszName && *pszName )
@@ -1343,7 +1360,7 @@ private:
 	static SQInteger GetDeveloper( HSQUIRRELVM hVM )
 	{
 		StackHandler sa(hVM);
-		sa.Return( ((CSquirrelVM *)hVM->_sharedstate->m_pOwnerData)->developer.GetInt() );
+		sa.Return( ((CSquirrelVM *)_ss( hVM )->_foreignptr)->developer.GetInt() );
 		return 1;
 	}
 
@@ -1478,7 +1495,7 @@ private:
 			case FIELD_CSTRING:		sa.Return( (const char *)returnValue ); break;
 			case FIELD_VECTOR:		
 				{
-					sq_pushobject( hVM, ((CSquirrelVM *)hVM->_sharedstate->m_pOwnerData)->m_hClassVector );
+					sq_pushobject( hVM, ((CSquirrelVM *)_ss( hVM )->_foreignptr)->m_hClassVector );
 					sq_createinstance( hVM, -1 );
 					sq_setinstanceup( hVM, -1, (SQUserPointer)returnValue.m_pVector );
 					sq_setreleasehook( hVM, -1, &vsq_releasevec3 );
@@ -1512,40 +1529,21 @@ private:
 			}
 		}
 
-		if ( !sq_isnull( ((CSquirrelVM *)hVM->_sharedstate->m_pOwnerData)->m_ErrorString ) )
+		if ( !sq_isnull( ((CSquirrelVM *)_ss( hVM )->_foreignptr)->m_ErrorString ) )
 		{
-			if ( sq_isstring( ((CSquirrelVM *)hVM->_sharedstate->m_pOwnerData)->m_ErrorString ) )
+			if ( sq_isstring( ((CSquirrelVM *)_ss( hVM )->_foreignptr)->m_ErrorString ) )
 			{
-				sq_throwerror( hVM, ((CSquirrelVM *)hVM->_sharedstate->m_pOwnerData)->m_ErrorString._unVal.pString->_val );
+				sq_throwerror( hVM, ((CSquirrelVM *)_ss( hVM )->_foreignptr)->m_ErrorString._unVal.pString->_val );
 			}
 			else
 			{
 				sq_throwerror( hVM, "Internal error" );
 			}
-			((CSquirrelVM *)hVM->_sharedstate->m_pOwnerData)->m_ErrorString = _null_;
+			((CSquirrelVM *)_ss( hVM )->_foreignptr)->m_ErrorString = NULL_HSQOBJECT;
 			return SQ_ERROR;
 		}
 
 		return ( pVMScriptFunction->m_desc.m_ReturnType != FIELD_VOID );
-	}
-
-	//-------------------------------------------------------------
-
-	static int QueryContinue( HSQUIRRELVM hVM )
-	{
-		CSquirrelVM *pVM = ((CSquirrelVM *)hVM->_sharedstate->m_pOwnerData);
-		if ( !pVM->m_hDbg )
-		{
-			constexpr double maxRunTimeSeconds = 0.03;
-
-			if ( pVM->m_TimeStartExecute != 0.0 && Plat_FloatTime() - pVM->m_TimeStartExecute > maxRunTimeSeconds )
-			{
-				DMsg( "vscript:squirrel", 0, "Script running too long (> %.2f ms), terminating.\n", maxRunTimeSeconds * 1000 );
-				// @TODO: Mark the offending closure so that it won't be executed again [5/13/2008 tom]
-				return SQ_QUERY_BREAK;
-			}
-		}
-		return SQ_QUERY_CONTINUE;
 	}
 
 	//-------------------------------------------------------------
@@ -1795,7 +1793,7 @@ private:
 			{
 				sq_pushobject( m_hVM, object );
 				SQUserPointer pVector;
-				SQRESULT rc = sq_getinstanceup( m_hVM, -1, &pVector, TYPETAG_VECTOR );
+				SQRESULT rc = sq_getinstanceup( m_hVM, -1, &pVector, TYPETAG_VECTOR, 1 );
 				sq_poptop( m_hVM );
 				if ( SQ_SUCCEEDED( rc ) )
 				{
@@ -1894,11 +1892,11 @@ private:
 		{
 			WriteObject( pVM->_stack[i] );
 		}
-		m_pBuffer->PutUnsignedInt( pVM->_vargsstack.size() );
-		for( i = 0; i < pVM->_vargsstack.size(); i++ ) 
-		{
-			WriteObject( pVM->_vargsstack[i] );
-		}
+		//m_pBuffer->PutUnsignedInt( pVM->_vargsstack.size() );
+		//for( i = 0; i < pVM->_vargsstack.size(); i++ ) 
+		//{
+		//	WriteObject( pVM->_vargsstack[i] );
+		//}
 	}
 
 	//-------------------------------------------------------------
@@ -1937,12 +1935,15 @@ private:
 			WriteObject( pTable->_delegate );
 		}
 
-		int len = pTable->_numofnodes;
+		int len = pTable->CountUsed();
 		m_pBuffer->PutInt( len );
-		for(int i = 0; i < len; i++)
+
+		SQObjectPtr out_key, out_val;
+
+		while ( pTable->Next( true, NULL_HSQOBJECT, out_key, out_val ) )
 		{
-			WriteObject( pTable->_nodes[i].key );
-			WriteObject( pTable->_nodes[i].val );
+			WriteObject( out_key );
+			WriteObject( out_val );
 		}
 	}
 
@@ -1994,8 +1995,8 @@ private:
 				WriteObject(pClass->_methods[i].val);
 				WriteObject(pClass->_methods[i].attrs);
 			}
-			m_pBuffer->PutInt( pClass->_metamethods.size() );
-			for( i = 0; i < pClass->_metamethods.size(); i++) 
+			m_pBuffer->PutInt( std::size( pClass->_metamethods ) );
+			for( i = 0; i < std::size( pClass->_metamethods ); i++) 
 			{
 				WriteObject(pClass->_metamethods[i]);
 			}
@@ -2092,10 +2093,12 @@ private:
 		pGenerator->_uiRef |= MARK_FLAG;
 		
 		WriteObject( pGenerator->_closure );
-		m_pBuffer->PutInt( pGenerator->_stack.size() );
-		for(SQUnsignedInteger i = 0; i < pGenerator->_stack.size(); i++) WriteObject(pGenerator->_stack[i]);
-		m_pBuffer->PutInt( pGenerator->_vargsstack.size() );
-		for(SQUnsignedInteger j = 0; j < pGenerator->_vargsstack.size(); j++) WriteObject(pGenerator->_vargsstack[j]);
+		m_pBuffer->PutUnsignedInt( pGenerator->_stack.size() );
+		for(SQUnsignedInteger i = 0; i < pGenerator->_stack.size(); i++)
+			WriteObject(pGenerator->_stack[i]);
+		//m_pBuffer->PutInt( pGenerator->_vargsstack.size() );
+		//for(SQUnsignedInteger j = 0; j < pGenerator->_vargsstack.size(); j++)
+		//	WriteObject(pGenerator->_vargsstack[j]);
 	}
 
 	//-------------------------------------------------------------
@@ -2111,11 +2114,14 @@ private:
 
 		WriteObject( pClosure->_function );
 		WriteObject( pClosure->_env );
+		WriteObject( pClosure->_root );
 
-		m_pBuffer->PutInt( pClosure->_outervalues.size() );
-		for(SQUnsignedInteger i = 0; i < pClosure->_outervalues.size(); i++) WriteObject(pClosure->_outervalues[i]);
-		m_pBuffer->PutInt( pClosure->_defaultparams.size() );
-		for(SQUnsignedInteger i = 0; i < pClosure->_defaultparams.size(); i++) WriteObject(pClosure->_defaultparams[i]);
+		m_pBuffer->PutInt( pClosure->_function->_noutervalues );
+		for(SQInteger i = 0; i < pClosure->_function->_noutervalues; i++)
+			WriteObject(pClosure->_outervalues[i]);
+		m_pBuffer->PutInt( pClosure->_function->_ndefaultparams );
+		for(SQInteger i = 0; i < pClosure->_function->_ndefaultparams; i++)
+			WriteObject(pClosure->_defaultparams[i]);
 	}
 
 	//-------------------------------------------------------------
@@ -2399,11 +2405,11 @@ private:
 		{
 			ReadObject( pVM->_stack[i] );
 		}
-		stackSize = m_pBuffer->GetUnsignedInt();
+		/*stackSize = m_pBuffer->GetUnsignedInt();
 		for( i = 0; i < pVM->_vargsstack.size(); i++ ) 
 		{
 			ReadObject( pVM->_vargsstack[i] );
-		}
+		}*/
 	}
 
 	//-------------------------------------------------------------
@@ -2536,7 +2542,6 @@ private:
 			}
 
 			n = m_pBuffer->GetUnsignedInt();
-			pClass->_metamethods.resize( n );
 			for ( i = 0; i < n; i++ ) 
 			{
 				ReadObject(pClass->_metamethods[i]);
@@ -2613,11 +2618,11 @@ private:
 							pContext->pInstance = pContext->pClassDesc->pHelper->BindOnRead( (HSCRIPT)pInstanceHandle, pOldInstance, pszName );
 							if ( pContext->pInstance )
 							{
-								SQ_VALIDATE_REF_COUNT( pInstance );
+								///SQ_VALIDATE_REF_COUNT( pInstance );
 								pInstance->_uiRef++;
 								sq_addref( m_hVM, pInstanceHandle );
 								pInstance->_uiRef--;
-								SQ_VALIDATE_REF_COUNT( pInstance );
+								//SQ_VALIDATE_REF_COUNT( pInstance );
 							}
 							else
 							{
@@ -2711,12 +2716,12 @@ private:
 		{
 			ReadObject(pGenerator->_stack[i]);
 		}
-		n = m_pBuffer->GetUnsignedInt();
+		/*n = m_pBuffer->GetUnsignedInt();
 		pGenerator->_vargsstack.resize( n );
 		for ( i = 0; i < n; i++ ) 
 		{
 			ReadObject(pGenerator->_vargsstack[i]);
-		}
+		}*/
 		return pGenerator;
 	}
 
@@ -2734,22 +2739,28 @@ private:
 
 		SQObjectPtr proto;
 		ReadObject( proto );
-		pClosure = SQClosure::Create( _ss(m_hVM), proto._unVal.pFunctionProto );
+
+		SQObjectPtr env;
+		ReadObject( env );
+		
+		SQObjectPtr root;
+		ReadObject( root );
+
+		pClosure = SQClosure::Create( _ss(m_hVM), proto._unVal.pFunctionProto, root._unVal.pWeakRef );
 		MapPtr( pOld, pClosure );
 
-		ReadObject( pClosure->_env );
+		pClosure->_env = env._unVal.pWeakRef;
 
-		unsigned i, n;
-		n = m_pBuffer->GetUnsignedInt();
-		pClosure->_outervalues.resize( n );
-		for ( i = 0; i < n; i++ ) 
+		int n = m_pBuffer->GetInt();
+		pClosure->_function->_noutervalues = n;
+		for ( int i = 0; i < n; i++ ) 
 		{
 			ReadObject(pClosure->_outervalues[i]);
 		}
 
-		n = m_pBuffer->GetUnsignedInt();
-		pClosure->_defaultparams.resize( n );
-		for ( i = 0; i < n; i++ ) 
+		n = m_pBuffer->GetInt();
+		pClosure->_function->_ndefaultparams = n;
+		for ( int i = 0; i < n; i++ ) 
 		{
 			ReadObject(pClosure->_defaultparams[i]);
 		}
@@ -2786,17 +2797,15 @@ private:
 	//-------------------------------------------------------------
 	SQUserData *ReadUserData()
 	{
-		m_pBuffer->GetPtr();
-		return nullptr; // @TBD [4/15/2008 tom]
+		return static_cast<SQUserData *>(m_pBuffer->GetPtr()); // @TBD [4/15/2008 tom]
 	}
 
 	//-------------------------------------------------------------
 	//
 	//-------------------------------------------------------------
-	SQUserPointer *ReadUserPointer()
+	SQUserPointer ReadUserPointer()
 	{
-		m_pBuffer->GetPtr();
-		return nullptr; // @TBD [4/15/2008 tom]
+		return m_pBuffer->GetPtr(); // @TBD [4/15/2008 tom]
 	}
 
 	//-------------------------------------------------------------
@@ -2824,11 +2833,11 @@ private:
 		SQObjectPtr result;
 		SQFunctionProto::Load( m_hVM, this, &SqReadFunc, result );
 		pResult = result._unVal.pFunctionProto;
-		SQ_VALIDATE_REF_COUNT( pResult );
+		//SQ_VALIDATE_REF_COUNT( pResult );
 		pResult->_uiRef++;
 		result.Null();
 		pResult->_uiRef--;
-		SQ_VALIDATE_REF_COUNT( pResult );
+		//SQ_VALIDATE_REF_COUNT( pResult );
 		MapPtr( pOld, pResult );
 		return pResult;
 	}
@@ -2847,15 +2856,12 @@ private:
 
 		// Need to up ref count if read order has weak ref loading first
 		Assert( ISREFCOUNTED(obj._type) );
-		SQRefCounted *pRefCounted = obj._unVal.pRefCounted;
-		SQ_VALIDATE_REF_COUNT( pRefCounted );
-		pRefCounted->_uiRef++;
+		__AddRef(obj._type, obj._unVal);
 
 		SQWeakRef *pResult = obj._unVal.pRefCounted->GetWeakRef( obj._type );
 
 		obj.Null();
-		pRefCounted->_uiRef--;
-		SQ_VALIDATE_REF_COUNT( pRefCounted );
+		__Release(obj._type, obj._unVal);
 
 		return pResult;
 	}
@@ -2866,17 +2872,20 @@ private:
 	bool FindKeyForObject( const SQObjectPtr &table, void *p, SQObjectPtr &key )
 	{
 		SQTable *pTable = table._unVal.pTable;
-		int len = pTable->_numofnodes;
-		for(int i = 0; i < len; i++)
+
+		SQObjectPtr out_key, out_val;
+
+		while ( pTable->Next( true, NULL_HSQOBJECT, out_key, out_val ) )
 		{
-			if ( pTable->_nodes[i].val._unVal.pUserPointer == p )
+			if ( out_val._unVal.pUserPointer == p )
 			{
-				key = pTable->_nodes[i].key;
+				key = out_key;
 				return true;
 			}
-			if ( sq_istable( pTable->_nodes[i].val ) )
+
+			if ( sq_istable( out_val ) )
 			{
-				if ( FindKeyForObject( pTable->_nodes[i].val, p, key ) )
+				if ( FindKeyForObject( out_val, p, key ) )
 				{
 					return true;
 				}

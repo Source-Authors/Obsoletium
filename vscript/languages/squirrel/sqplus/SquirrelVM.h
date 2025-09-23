@@ -26,6 +26,7 @@ public:
 	static SquirrelObject CompileBuffer(const SQChar *s,const SQChar * debugInfo=_T("console_buffer"));
 	static SquirrelObject RunScript(const SquirrelObject &o,SquirrelObject *_this = NULL);
 	static void PrintFunc(HSQUIRRELVM v,const SQChar* s,...);
+	static void ErrorFunc(HSQUIRRELVM v,const SQChar* s,...);
 	static BOOL BeginCall(const SquirrelObject &func);
 	static BOOL BeginCall(const SquirrelObject &func,SquirrelObject &_this);
 	static void PushParam(const SquirrelObject &o);

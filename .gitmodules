@@ -68,3 +68,6 @@
 [submodule "thirdparty/shadercompile"]
 	path = thirdparty/shadercompile
 	url = git@github.com:Source-Authors/ShaderCompile.git
+[submodule "thirdparty/squirrel"]
+	path = thirdparty/squirrel
+	url = git@github.com:Source-Authors/squirrel.git

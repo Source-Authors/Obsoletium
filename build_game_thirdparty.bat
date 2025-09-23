@@ -286,6 +286,29 @@ if ERRORLEVEL 1 (
 )
 
 
+REM Build squirrel.
+MKDIR thirdparty\squirrel\out
+PUSHD thirdparty\squirrel\out
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DBUILD_SHARED_LIBS=ON -DDISABLE_STATIC=ON -DLONG_OUTPUT_NAMES=ON -DSQ_DISABLE_INTERPRETER=ON ..
+if ERRORLEVEL 1 (
+  ECHO cmake generation for thirdparty\squirrel failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Debug
+if ERRORLEVEL 1 (
+  ECHO cmake --build Debug for thirdparty\squirrel failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Release
+if ERRORLEVEL 1 (
+  ECHO cmake --build Release for thirdparty\squirrel failed.
+  EXIT /B 1
+)
+POPD
+
+
 REM Build zip-utils.
 MKDIR thirdparty\zip-utils\out
 PUSHD thirdparty\zip-utils\out

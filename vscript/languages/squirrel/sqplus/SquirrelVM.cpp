@@ -40,14 +40,14 @@ SquirrelError::SquirrelError()
 void SquirrelVM::Init()
 {
 	_VM = sq_open(1024);
-	sq_setprintfunc(_VM,SquirrelVM::PrintFunc);
+	sq_setprintfunc(_VM,SquirrelVM::PrintFunc, SquirrelVM::ErrorFunc);
 	sq_pushroottable(_VM);
 	sqstd_register_iolib(_VM);
 	sqstd_register_bloblib(_VM);
 	sqstd_register_mathlib(_VM);
 	sqstd_register_stringlib(_VM);
 	sqstd_seterrorhandlers(_VM);
-  _root = new SquirrelObject();
+	_root = new SquirrelObject();
 	_root->AttachToStackObject(-1);
 	sq_pop(_VM,1);
 	//TODO error handler, compiler error handler
@@ -87,8 +87,18 @@ void SquirrelVM::PrintFunc(HSQUIRRELVM v,const SQChar* s,...)
 	static SQChar temp[2048];
 	va_list vl;
 	va_start(vl, s);
-	scvsprintf( temp,s, vl);
+	scvsprintf( temp, sizeof(temp), s, vl);
 	SCPUTS(temp);
+	va_end(vl);
+}
+
+void SquirrelVM::ErrorFunc(HSQUIRRELVM v,const SQChar* s,...)
+{
+	static SQChar temp[2048];
+	va_list vl;
+	va_start(vl, s);
+	scvsprintf( temp, sizeof(temp), s, vl);
+	SCFPUTS(temp, stderr);
 	va_end(vl);
 }
 

@@ -30,9 +30,11 @@
   #ifndef UNICODE
     #define SCSNPRINTF _snprintf
     #define SCPUTS puts
+    #define SCFPUTS fputs
   #else
     #define SCSNPRINTF _snwprintf
     #define SCPUTS _putws
+    #define SCFPUTS _fputws
   #endif
 #else
   #ifdef _T

@@ -180,7 +180,6 @@ SQInteger error_handler(HSQUIRRELVM v) {
     if (si.funcname) fn = si.funcname;
     if (si.source) src = si.source;
 
-    int line = si.line;
     scprintf(_SC("*FUNCTION [%s] %s line [%d]\n"), fn, src, si.line);
   }
 

@@ -14,6 +14,13 @@ $Macro LUASRCINTERNALDIR	"$LUABASEDIR\lua-5.4.7\src"
 $Macro LUAOUTDIRDEBUG		"$LUABASEDIR\out\lua-5.4.7\Debug"
 $Macro LUAOUTDIRRELEASE		"$LUABASEDIR\out\lua-5.4.7\Release"
 
+$Macro SQUIRRELBASEDIR			"$SRCDIR\thirdparty\squirrel"
+$Macro SQUIRRELSRCDIR			"$SQUIRRELBASEDIR\include"
+$Macro SQUIRRELOUTLIBDIRDEBUG	"$SQUIRRELBASEDIR\out\lib\Debug"
+$Macro SQUIRRELOUTLIBDIRRELEASE	"$SQUIRRELBASEDIR\out\lib\Release"
+$Macro SQUIRRELOUTBINDIRDEBUG	"$SQUIRRELBASEDIR\out\bin\Debug"
+$Macro SQUIRRELOUTBINDIRRELEASE	"$SQUIRRELBASEDIR\out\bin\Release"
+
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 
 
@@ -22,27 +29,35 @@ $Configuration	"Debug"
 	$Compiler
 	{
 		$PreprocessorDefinitions		"$BASE;VSCRIPT_DLL_EXPORT" 
-		$PreprocessorDefinitions		"$BASE;$LUASRCDIR;LUA_BUILD_AS_DLL=1;LUA_MOD_CASE_INSENSITIVE" 
-		$AdditionalIncludeDirectories	"$BASE;.\languages\squirrel\include;.\languages\squirrel\sqplus;..\thirdparty\lua\lua-5.4.7\include"
+		$PreprocessorDefinitions		"$BASE;LUA_BUILD_AS_DLL=1;LUA_MOD_CASE_INSENSITIVE" 
+		$AdditionalIncludeDirectories	"$BASE;$LUASRCDIR"
+		$AdditionalIncludeDirectories	"$BASE;$SQUIRRELSRCDIR;.\languages\squirrel\include;.\languages\squirrel\sqplus"
 
 		// dimhotepus: Enable exceptions as we use them in a single place
 		$EnableC++Exceptions			"Yes (/EHsc)"
-
 	}
 
-	$Linker [$OSXALL]
+	$Linker
 	{
-		$AdditionalLibraryDirectories	"$BASE;$LUAOUTDIRDEBUG"
-		$AdditionalDependencies			"$BASE lua_shared.lib"
-		$SystemLibraries				"iconv"
+		$AdditionalLibraryDirectories	"$BASE;$LUAOUTDIRDEBUG;$SQUIRRELOUTLIBDIRDEBUG"
+		$AdditionalDependencies			"$BASE lua_shared.lib squirrel3.lib sqstdlib3.lib"
+		$SystemLibraries				"iconv" [$OSXALL]
 	}
 
 	$PostBuildEvent
 	{
 		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
-							"COPY $LUAOUTDIRDEBUG\lua_shared.dll $OUTBINDIR\lua_shared.dll" "\n"					\
+							"COPY $QUOTE$LUAOUTDIRDEBUG\lua_shared.dll$QUOTE $QUOTE$OUTBINDIR\lua_shared.dll$QUOTE" "\n"					\
 							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"IF EXIST $LUAOUTDIRDEBUG\lua_shared.pdb COPY $LUAOUTDIRDEBUG\lua_shared.pdb $OUTBINDIR\lua_shared.pdb" "\n"					\
+							"IF EXIST $QUOTE$LUAOUTDIRDEBUG\lua_shared.pdb$QUOTE COPY $QUOTE$LUAOUTDIRDEBUG\lua_shared.pdb$QUOTE $QUOTE$OUTBINDIR\lua_shared.pdb$QUOTE" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"COPY $QUOTE$SQUIRRELOUTBINDIRDEBUG\squirrel3.dll$QUOTE $QUOTE$OUTBINDIR\squirrel3.dll$QUOTE" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $QUOTE$SQUIRRELOUTBINDIRDEBUG\squirrel3.pdb$QUOTE COPY $QUOTE$SQUIRRELOUTBINDIRDEBUG\squirrel3.pdb$QUOTE $QUOTE$OUTBINDIR\squirrel3.pdb$QUOTE" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"COPY $QUOTE$SQUIRRELOUTBINDIRDEBUG\sqstdlib3.dll$QUOTE $QUOTE$OUTBINDIR\sqstdlib3.dll$QUOTE" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $QUOTE$SQUIRRELOUTBINDIRDEBUG\sqstdlib3.pdb$QUOTE COPY $QUOTE$SQUIRRELOUTBINDIRDEBUG\sqstdlib3.pdb$QUOTE $QUOTE$OUTBINDIR\sqstdlib3.pdb$QUOTE" "\n"					\
 							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
 							"$BASE"
 	}
@@ -53,27 +68,35 @@ $Configuration	"Release"
 	$Compiler
 	{
 		$PreprocessorDefinitions		"$BASE;VSCRIPT_DLL_EXPORT" 
-		$PreprocessorDefinitions		"$BASE;$LUASRCDIR;LUA_BUILD_AS_DLL=1;LUA_MOD_CASE_INSENSITIVE" 
-		$AdditionalIncludeDirectories	"$BASE;.\languages\squirrel\include;.\languages\squirrel\sqplus;..\thirdparty\lua\lua-5.4.7\include"
+		$PreprocessorDefinitions		"$BASE;LUA_BUILD_AS_DLL=1;LUA_MOD_CASE_INSENSITIVE" 
+		$AdditionalIncludeDirectories	"$BASE;$LUASRCDIR"
+		$AdditionalIncludeDirectories	"$BASE;$SQUIRRELSRCDIR;.\languages\squirrel\include;.\languages\squirrel\sqplus"
 
 		// dimhotepus: Enable exceptions as we use them in a single place
 		$EnableC++Exceptions			"Yes (/EHsc)"
-
 	}
 
-	$Linker [$OSXALL]
+	$Linker
 	{
-		$AdditionalLibraryDirectories	"$BASE;$LUAOUTDIRRELEASE"
-		$AdditionalDependencies			"$BASE lua_shared.lib"
-		$SystemLibraries				"iconv"
+		$AdditionalLibraryDirectories	"$BASE;$LUAOUTDIRRELEASE;$SQUIRRELOUTLIBDIRRELEASE"
+		$AdditionalDependencies			"$BASE lua_shared.lib squirrel3.lib sqstdlib3.lib"
+		$SystemLibraries				"iconv" [$OSXALL]
 	}
 
 	$PostBuildEvent
 	{
 		$CommandLine		"IF NOT EXIST $QUOTE$OUTBINDIR$QUOTE MKDIR $QUOTE$OUTBINDIR$QUOTE" "\n" \
-							"COPY $LUAOUTDIRRELEASE\lua_shared.dll $OUTBINDIR\lua_shared.dll" "\n"					\
+							"COPY $QUOTE$LUAOUTDIRRELEASE\lua_shared.dll$QUOTE $QUOTE$OUTBINDIR\lua_shared.dll$QUOTE" "\n"					\
 							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
-							"IF EXIST $LUAOUTDIRRELEASE\lua_shared.pdb COPY $LUAOUTDIRRELEASE\lua_shared.pdb $OUTBINDIR\lua_shared.pdb" "\n"					\
+							"IF EXIST $QUOTE$LUAOUTDIRRELEASE\lua_shared.pdb$QUOTE COPY $QUOTE$LUAOUTDIRRELEASE\lua_shared.pdb$QUOTE $QUOTE$OUTBINDIR\lua_shared.pdb$QUOTE" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"COPY $QUOTE$SQUIRRELOUTBINDIRRELEASE\squirrel3.dll$QUOTE $QUOTE$OUTBINDIR\squirrel3.dll$QUOTE" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $QUOTE$SQUIRRELOUTBINDIRRELEASE\squirrel3.pdb$QUOTE COPY $QUOTE$SQUIRRELOUTBINDIRRELEASE\squirrel3.pdb$QUOTE $QUOTE$OUTBINDIR\squirrel3.pdb$QUOTE" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"COPY $QUOTE$SQUIRRELOUTBINDIRRELEASE\sqstdlib3.dll$QUOTE $QUOTE$OUTBINDIR\sqstdlib3.dll$QUOTE" "\n"					\
+							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
+							"IF EXIST $QUOTE$SQUIRRELOUTBINDIRRELEASE\sqstdlib3.pdb$QUOTE COPY $QUOTE$SQUIRRELOUTBINDIRRELEASE\sqstdlib3.pdb$QUOTE $QUOTE$OUTBINDIR\sqstdlib3.pdb$QUOTE" "\n"					\
 							"IF ERRORLEVEL 1 GOTO BuildEventFailed" "\n" \
 							"$BASE"
 	}
@@ -95,16 +118,6 @@ $Project "vscript"
 			}
 		}
 		$File	".\languages\squirrel\vsquirrel\vsquirrel.cpp"
-		{
-			$Configuration
-			{
-				$Compiler
-				{
-					$AdditionalIncludeDirectories	"$BASE;.\languages\squirrel\include;.\languages\squirrel\sqplus"
-				}
-			}
-		}
-
 
 		$Folder "Script Files"
 		{
@@ -148,91 +161,24 @@ $Project "vscript"
 		{
 			$File 	".\languages\squirrel\include\sqdbgserver.h"
 			$File 	".\languages\squirrel\include\sqrdbg.h"
-			$File 	".\languages\squirrel\include\sqstdaux.h"
-			$File 	".\languages\squirrel\include\sqstdblob.h"
-			$File 	".\languages\squirrel\include\sqstdio.h"
-			$File 	".\languages\squirrel\include\sqstdmath.h"
-			$File 	".\languages\squirrel\include\sqstdstring.h"
-			$File 	".\languages\squirrel\include\sqstdsystem.h"
-			$File 	".\languages\squirrel\include\squirrel.h"
 		}
 		
 		$Folder "squirrel"
 		{
 			$Folder	"Source Files"
 			{
-				$File 	".\languages\squirrel\squirrel\sqapi.cpp" \
-						".\languages\squirrel\squirrel\sqbaselib.cpp" \
-						".\languages\squirrel\squirrel\sqclass.cpp" \
-						".\languages\squirrel\squirrel\sqcompiler.cpp" \
-						".\languages\squirrel\squirrel\sqdebug.cpp" \
-						".\languages\squirrel\squirrel\sqfuncstate.cpp" \
-						".\languages\squirrel\squirrel\sqlexer.cpp" \
-						".\languages\squirrel\squirrel\sqmem.cpp" \
-						".\languages\squirrel\squirrel\sqobject.cpp" \
-						".\languages\squirrel\squirrel\sqstate.cpp" \
-						".\languages\squirrel\squirrel\sqtable.cpp" \
-						".\languages\squirrel\squirrel\sqvm.cpp" \
-						".\languages\squirrel\sqdbg\sqrdbg.cpp" \
+				$File 	".\languages\squirrel\sqdbg\sqrdbg.cpp" \
 						".\languages\squirrel\sqdbg\sqdbgserver.cpp"
 				{
 					$Configuration
 					{
 						$Compiler
 						{
-							$WarningLevel						"Level 3 (/W3)"
+							$WarningLevel						"Level 4 (/W4)"
 						}
 
 						$Compiler
-{	
-							$AdditionalIncludeDirectories		"$BASE;.\languages\squirrel\include;.\languages\squirrel\sqplus"
-							$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE;VSCRIPT_DLL_EXPORT"
-						}
-					}
-				}
-			}
-
-			$Folder	"Header Files"
-			{
-				$File 	".\languages\squirrel\squirrel\sqarray.h" \
-						".\languages\squirrel\squirrel\sqclass.h" \
-						".\languages\squirrel\squirrel\sqclosure.h" \
-						".\languages\squirrel\squirrel\sqcompiler.h" \
-						".\languages\squirrel\squirrel\sqfuncproto.h" \
-						".\languages\squirrel\squirrel\sqfuncstate.h" \
-						".\languages\squirrel\squirrel\sqlexer.h" \
-						".\languages\squirrel\squirrel\sqobject.h" \
-						".\languages\squirrel\squirrel\sqopcodes.h" \
-						".\languages\squirrel\squirrel\sqpcheader.h" \
-						".\languages\squirrel\squirrel\sqstate.h" \
-						".\languages\squirrel\squirrel\sqstring.h" \
-						".\languages\squirrel\squirrel\sqtable.h" \
-						".\languages\squirrel\squirrel\squserdata.h" \
-						".\languages\squirrel\squirrel\squtils.h" \
-						".\languages\squirrel\squirrel\sqvm.h"
-			}
-		}
-		$Folder "sqstdlib"
-		{
-			$Folder	"Source Files"
-			{
-				$File 	".\languages\squirrel\sqstdlib\sqstdaux.cpp"\
-						".\languages\squirrel\sqstdlib\sqstdblob.cpp" \
-						".\languages\squirrel\sqstdlib\sqstdmath.cpp" \
-						".\languages\squirrel\sqstdlib\sqstdrex.cpp" \
-						".\languages\squirrel\sqstdlib\sqstdstream.cpp" \
-						".\languages\squirrel\sqstdlib\sqstdstring.cpp"
-				{
-					$Configuration
-					{
-						$Compiler
-						{
-							$WarningLevel						"Level 3 (/W3)"
-						}
-						
-						$Compiler
-						{
-							$AdditionalIncludeDirectories		"$BASE;.\languages\squirrel\include;.\languages\squirrel\sqplus"
+						{	
 							$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE;VSCRIPT_DLL_EXPORT"
 						}
 					}
@@ -250,10 +196,9 @@ $Project "vscript"
 						$Compiler
 						{
 							$AdditionalIncludeDirectories		"$BASE,.\languages\squirrel3\include"
-							$WarningLevel						"Level 3 (/W3)"
+							$WarningLevel						"Level 4 (/W4)"
 							 // "SQPlus" need exceptions. If commit to squirrel, look into removing that
 							$AdditionalOptions					"$BASE /EHsc"
-							$AdditionalIncludeDirectories		"$BASE;.\languages\squirrel\include;.\languages\squirrel\sqplus"
 							$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE;VSCRIPT_DLL_EXPORT"
 						}
 					}
@@ -268,14 +213,13 @@ $Project "vscript"
 					{
 						$Compiler
 						{
-							$WarningLevel						"Level 3 (/W3)"
+							$WarningLevel						"Level 4 (/W4)"
 							 // "SQPlus" need exceptions. If commit to squirrel, look into removing that
 							$AdditionalOptions					"$BASE /EHsc"
 						}
 						
 						$Compiler
 						{
-							$AdditionalIncludeDirectories		"$BASE;.\languages\squirrel\include;.\languages\squirrel\sqplus"
 							$PreprocessorDefinitions			"$BASE;PROTECTED_THINGS_DISABLE;VSCRIPT_DLL_EXPORT"
 						}
 					}
@@ -317,5 +261,7 @@ $Project "vscript"
 	{
 		$Lib			mathlib
 		$Libexternal	"$LUAOUTDIRRELEASE/lua_shared"
+		$Libexternal	"$SQUIRRELOUTLIBDIRRELEASE/squirrel3"
+		$Libexternal	"$SQUIRRELOUTLIBDIRRELEASE/sqstdlib3"
 	}
 }

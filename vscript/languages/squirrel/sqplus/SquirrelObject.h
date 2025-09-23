@@ -168,7 +168,7 @@ struct StackHandler {
 	SQUserPointer GetInstanceUp(int idx,SQUserPointer tag)
 	{
 		SQUserPointer self;
-		if(SQ_FAILED(sq_getinstanceup(v,idx,(SQUserPointer*)&self,tag)))
+		if(SQ_FAILED(sq_getinstanceup(v,idx,(SQUserPointer*)&self,tag,1)))
 			return NULL;
 		return self;
 	}
