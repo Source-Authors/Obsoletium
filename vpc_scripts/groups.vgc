@@ -295,6 +295,14 @@ $Group "hammer"
 	"vtf2tga"
 	"vvis_dll"
 	"vvis_launcher"
+
+	// shader compile
+	"dx_proxy_dx9_v00_pc"
+	"dx_proxy_dx9_v30_pc"
+	"dx_proxy_dx11_v00_pc"
+	"shadercompile_dll"
+	"shadercompile_launcher"
+	"remoteshadercompile"
 }	
 
 $Group "everything"
