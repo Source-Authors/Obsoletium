@@ -67,7 +67,7 @@ if ERRORLEVEL 1 (
 REM Build libjpeg-turbo.
 MKDIR thirdparty\libjpeg-turbo\out
 PUSHD thirdparty\libjpeg-turbo\out
-cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DWITH_CDJPEG=OFF -DWITH_TURBOJPEG=OFF ..
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DWITH_TOOLS=OFF -DWITH_TURBOJPEG=OFF ..
 if ERRORLEVEL 1 (
   ECHO cmake generation for thirdparty\libjpeg-turbo failed.
   EXIT /B 1
