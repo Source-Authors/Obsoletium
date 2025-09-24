@@ -100,6 +100,7 @@
 #include "tier0/platform.h"
 #include "tier1/functors.h"
 #include "vscript/variant.h"
+#include <functional>
 #include "tier0/memdbgon.h"
 
 #ifdef VSCRIPT_DLL_EXPORT
@@ -118,7 +119,7 @@ class CUtlBuffer;
 //
 //-----------------------------------------------------------------------------
 
-constexpr inline char VSCRIPT_INTERFACE_VERSION[]{"VScriptManager009"};
+constexpr inline char VSCRIPT_INTERFACE_VERSION[]{"VScriptManager010"};
 
 //-----------------------------------------------------------------------------
 //
@@ -474,6 +475,7 @@ public:
 	// Scope
 	//--------------------------------------------------------
 	virtual HSCRIPT CreateScope( const char *pszScope, HSCRIPT hParent = nullptr ) = 0;
+	virtual HSCRIPT ReferenceScope( HSCRIPT hScript ) = 0;
 	virtual void ReleaseScope( HSCRIPT hScript ) = 0;
 
 	//--------------------------------------------------------
@@ -544,6 +546,45 @@ public:
 
 	virtual bool ClearValue( HSCRIPT hScope, const char *pszKey ) = 0;
 	bool ClearValue( const char *pszKey)																							{ return ClearValue( nullptr, pszKey ); }
+
+	//----------------------------------------------------------------------------
+
+	// Josh: Some extra helpers here.
+	template <typename T>
+	T Get( HSCRIPT hScope, const char *pszKey )
+	{
+		ScriptVariant_t variant;
+		GetValue( hScope, pszKey, &variant );
+		return variant.Get<T>();
+	}
+
+	template <typename T>
+	T Get( const char *pszKey )
+	{
+		return Get<T>( nullptr, pszKey );
+	}
+
+	bool Has( HSCRIPT hScope, const char* pszKey )
+	{
+		return ValueExists( hScope, pszKey );
+	}
+
+	bool Has( const char* pszKey )
+	{
+		return Has( nullptr, pszKey );
+	}
+
+	template <typename T>
+	using IfHasFuncType = std::function<void(T)>;
+
+	template <typename T>
+	void IfHas( HSCRIPT hScope, const char *pszKey, IfHasFuncType<T> func )
+	{
+		if ( Has( hScope, pszKey ) )
+		{
+			func( Get<T>( hScope, pszKey ) );
+		}
+	}
 
 	//----------------------------------------------------------------------------
 
@@ -900,6 +941,16 @@ public:
 #define DEFINE_SCRIPT_PROXY_14V( FuncName ) DEFINE_SCRIPT_PROXY_GUTS_NO_RETVAL( FuncName, 14 )
 
 //-----------------------------------------------------------------------------
+
+template <>
+inline HSCRIPT IScriptVM::Get<HSCRIPT>( HSCRIPT hScope, const char *pszKey )
+{
+	ScriptVariant_t variant;
+	GetValue( hScope, pszKey, &variant );
+	if ( variant.GetType() == FIELD_VOID )
+		return nullptr;
+	return variant.Get<HSCRIPT>();
+}
 
 #include "tier0/memdbgoff.h"
 

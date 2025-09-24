@@ -450,6 +450,22 @@ public:
 		return (HSCRIPT)pRet;
 	}
 
+	HSCRIPT ReferenceScope( HSCRIPT hScript ) override
+	{
+		if ( hScript == nullptr ) return nullptr;
+
+		HSQOBJECT *pObj = reinterpret_cast<HSQOBJECT *>( hScript );
+		if ( sq_isnull( *pObj ) )
+		{
+			return nullptr;
+		}
+
+		sq_addref(m_hVM, pObj);
+		HSQOBJECT *pRet = new HSQOBJECT;
+		*pRet = *pObj;
+		return (HSCRIPT)pRet;
+	}
+
 	void ReleaseScope( HSCRIPT hScript ) override
 	{
 		HSQOBJECT &o = *((HSQOBJECT *)hScript);

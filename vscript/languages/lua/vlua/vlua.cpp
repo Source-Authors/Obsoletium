@@ -511,6 +511,11 @@ public:
 		return nullptr;
 	}
 
+	HSCRIPT ReferenceScope( HSCRIPT hScript ) override
+	{
+		return hScript;
+	}
+
 	void ReleaseScope( HSCRIPT hScript ) override
 	{
 	}
