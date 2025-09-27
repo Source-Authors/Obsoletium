@@ -63,11 +63,6 @@ $Project "bugreporter_text"
 	"utils\bugreporter_text\bugreporter_text.vpc" [$WINDOWS]
 }
 
-$Project "bugreporter_filequeue"
-{
-	"utils\bugreporter_filequeue\bugreporter_filequeue.vpc" [$WINDOWS||$POSIX]
-}
-
 // dimhotepus: Thirdparty.
 //$Project "bzip2"
 //{
