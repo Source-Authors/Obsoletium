@@ -8,6 +8,8 @@ if "%~2"=="" (
 set "filename=%~1"
 set "objname=%~2"
 
+set PATH=%PATH%;%windir%\System32\WindowsPowerShell\v1.0\
+
 powershell -Command ^
     "$data = Get-Content -Path '%filename%' -Encoding Byte;" ^
     "$out = 'static constexpr unsigned char %objname%[] = {';" ^

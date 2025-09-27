@@ -256,6 +256,12 @@ $Project "vscript"
 			$File 	".\languages\lua\vlua\vec4.h"
 		}
 	}
+
+	$Folder "Support"
+	{
+		$File "$SRCDIR\devtools\bin\texttoarray.bat" [$WINDOWS]
+		$File "$SRCDIR\devtools\bin\texttoarray.sh" [$POSIX]
+	}
 	
 	$Folder	"Link Libraries"
 	{
