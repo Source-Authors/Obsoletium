@@ -57,9 +57,33 @@ $Project "vstdlib"
 {
 	$Folder	"Source Files"
 	{
-		// dimhotepus: Drop custom build tool, vpc recognizes MASM now.
 		$File "GetStackPtr64.masm" [$WIN64]
+		{
+			$Configuration
+			{   
+				$CustomBuildStep
+				{
+					// General
+					$CommandLine                "$QUOTE$(VC_ExecutablePath_x64_x64)\ml64.exe$QUOTE /nologo /c /D_M_X64 /W3 /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE%(FullPath)$QUOTE"
+					$Description                "Compiling $(InputName).masm"
+					$Outputs                    "$(IntDir)\$(InputName).obj;%(Outputs)"
+				}
+			}
+		}
+
 		$File "coroutine_win64.masm" [$WIN64]
+		{
+			$Configuration
+			{   
+				$CustomBuildStep
+				{
+					// General
+					$CommandLine                "$QUOTE$(VC_ExecutablePath_x64_x64)\ml64.exe$QUOTE /nologo /c /D_M_X64 /W3 /Fo$QUOTE$(IntDir)\$(InputName).obj$QUOTE $QUOTE%(FullPath)$QUOTE"
+					$Description                "Compiling $(InputName).masm"
+					$Outputs                    "$(IntDir)\$(InputName).obj;%(Outputs)"
+				}
+			}
+		}
 
 		$File	"coroutine.cpp"				[!$OSXALL]
 		{
