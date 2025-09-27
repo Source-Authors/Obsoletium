@@ -726,11 +726,6 @@ $Project "rt_test"
 	"unittests\rt_test\rt_test.vpc" [$WINDOWS]
 }
 
-$Project "runme"
-{
-	"utils\runme\runme.vpc" [$WINDOWS]
-}
-
 $Project "sampletool"
 {
 	"tools\sampletool\sampletool.vpc" [$WINDOWS]
