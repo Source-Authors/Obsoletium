@@ -315,11 +315,6 @@ $Project "genrandomvectors"
 	"utils\genrandomvectors\genrandomvectors.vpc" [$WINDOWS]
 }
 
-$Project "getbugs"
-{
-	"utils\getbugs\getbugs.vpc" [$WINDOWS]
-}
-
 $Project "glview"
 {
 	"utils\glview\glview.vpc" [$WINDOWS]
