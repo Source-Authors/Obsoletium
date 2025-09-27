@@ -517,8 +517,7 @@ struct PlayerStats_t
 	int				iDisconnectTime;
 };
 
-// reported stats structure that contains all stats data uploaded from TF server to Steam.  Note that this
-// code is shared between TF server and processgamestats, which cracks the data file on the back end
+// reported stats structure that contains all stats data uploaded from TF server to Steam.
 struct TFReportedStats_t
 {
 	TFReportedStats_t();

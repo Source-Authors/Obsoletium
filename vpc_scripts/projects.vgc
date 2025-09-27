@@ -681,11 +681,6 @@ $Project "printbones"
 	"utils\printbones\printbones.vpc" [$WINDOWS]
 }
 
-$Project "processgamestats"
-{
-	"devtools\processgamestats\processgamestats.vpc" [$WINDOWS]
-}
-
 $Project "psdinfo"
 {
 	"utils\psdinfo\psdinfo.vpc" [$WINDOWS]
