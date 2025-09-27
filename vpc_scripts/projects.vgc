@@ -270,11 +270,6 @@ $Project "gameevents"
 	"tools\gameevents\gameevents.vpc" [$WINDOWS]
 }
 
-$Project "gamestats_reader"
-{
-	"utils\gamestats_reader\gamestats_reader.vpc" [$WINDOWS]
-}
-
 $Project "gameUI"
 {
 	"gameui\GameUI.vpc" [$WINDOWS||$POSIX]
