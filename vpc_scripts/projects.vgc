@@ -981,11 +981,6 @@ $Project "SteamBackup"
 	"SteamBackup\SteamBackup.vpc" [$WINDOWS]
 }
 
-$Project "SteamDebugHelper"
-{
-	"utils\SteamDebugHelper\SteamDebugHelper.vpc" [$WINDOWS]
-}
-
 $Project "SteamUI"
 {
 	"SteamUI\SteamUI.vpc" [$WINDOWS]
