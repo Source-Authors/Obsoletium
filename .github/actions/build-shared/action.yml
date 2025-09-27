@@ -44,3 +44,12 @@ runs:
     working-directory: ${{env.GITHUB_WORKSPACE}}
     run: msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.sln /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}}
     shell: cmd
+
+  - name: 'Upload ${{inputs.solution-name}}_${{inputs.platform-name}} build artifacts'
+    uses: actions/upload-artifact@v4
+    with:
+      name: '${{inputs.solution-name}}_${{inputs.platform-name}}'
+      path: ..\game\
+      if-no-files-found: error
+      retention-days: 1
+      compression-level: 9
