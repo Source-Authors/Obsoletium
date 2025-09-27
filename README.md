@@ -49,7 +49,7 @@
   build for.  Supported values are `x86` and `x64`. `x64` is **experimental**.
 * Run `create_hammer_<ARCH>.bat` in opened command prompt where `<ARCH>` is same
   as in step above.
-* Open `<GAME_NAME>_<ARCH>.sln`.
+* Open `hammer_<ARCH>.sln`.
 * Build by selecting `Build` menu, `Build Solution` submenu.
 
 
