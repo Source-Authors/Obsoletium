@@ -103,8 +103,10 @@ extern	int			testlevel;
 
 extern	byte		*uncompressed;
 
-extern	int		leafbytes, leaflongs;
-extern	int		portalbytes, portallongs;
+// dimhotepus: longs -> intps.
+extern	int		leafbytes, leafarchwords;
+// dimhotepus: longs -> intps.
+extern	int		portalbytes, portalarchwords;
 
 
 void LeafFlow (int leafnum);

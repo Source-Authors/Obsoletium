@@ -43,9 +43,9 @@ byte		*vismap, *vismap_p, *vismap_end;	// past visfile
 int			originalvismapsize;
 
 int			leafbytes;				// (portalclusters+63)>>3
-int			leaflongs;
+int			leafarchwords;
 
-int			portalbytes, portallongs;
+int			portalbytes, portalarchwords;
 
 bool		fastvis;
 bool		nosort;
@@ -175,7 +175,7 @@ Merges the portal visibility for a leaf
 */
 void ClusterMerge (int clusternum)
 {
-	alignas(long) byte portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
+	alignas(intp) byte portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
 	byte		uncompressed[MAX_MAP_LEAFS/8];
 	int			numvis;
 	int			pnum;
@@ -190,8 +190,8 @@ void ClusterMerge (int clusternum)
 	{
 		if (p->status != stat_done)
 			Error ("portal not done %zd 0x%p 0x%p\n", i, p, portals);
-		for (int j=0 ; j<portallongs ; j++)
-			((long *)portalvector)[j] |= ((long *)p->portalvis)[j];
+		for (int j=0 ; j<portalarchwords ; j++)
+			((intp *)portalvector)[j] |= ((intp *)p->portalvis)[j];
 		pnum = p - portals;
 		SetBit( portalvector, pnum );
 
@@ -441,12 +441,12 @@ void LoadPortals (char *name)
 		f = fopen( tempFile, "wt" );
 		if (f)
 		{
-		fwrite( data.Base(), 1, data.Count(), f );
-		fclose( f );
+			fwrite( data.Base(), 1, data.Count(), f );
+			fclose( f );
 
-		// Open the temp file up.
-		f = fopen( tempFile, "rSTD" ); // read only, sequential, temporary, delete on close
-	}
+			// Open the temp file up.
+			f = fopen( tempFile, "rSTD" ); // read only, sequential, temporary, delete on close
+		}
 	}
 	else
 #endif
@@ -476,10 +476,16 @@ void LoadPortals (char *name)
 
 	// these counts should take advantage of 64 bit systems automatically
 	leafbytes = ((portalclusters+63)&~63)>>3;
-	leaflongs = leafbytes/sizeof(long);
+	// dimhotepus: long -> intp.
+	leafarchwords = leafbytes / sizeof(intp);
+	AssertMsg(leafbytes % sizeof(intp) == 0,
+		"Can't use CPU arch dependent type to copy leafs.");
 	
 	portalbytes = ((g_numportals*2+63)&~63)>>3;
-	portallongs = portalbytes/sizeof(long);
+	// dimhotepus: long -> intp.
+	portalarchwords = portalbytes / sizeof(intp);
+	AssertMsg(portalbytes % sizeof(intp) == 0,
+		"Can't use CPU arch dependent type to copy portals.");
 
 	// each file portal is split into two memory portals
 	portals = (portal_t*)calloc(2*g_numportals, sizeof(portal_t));
@@ -573,10 +579,10 @@ by ORing together all the PVS visible from a leaf
 */
 void CalcPAS (void)
 {
-	alignas(long) byte	uncompressed[MAX_MAP_LEAFS/8];
+	alignas(intp) byte	uncompressed[MAX_MAP_LEAFS/8];
 	byte	compressed[MAX_MAP_LEAFS/8];
 	
-	long *dest, *src;
+	intp *dest, *src;
 
 	Msg ("Building PAS...\n");
 
@@ -590,7 +596,7 @@ void CalcPAS (void)
 		memcpy (uncompressed, scan, leafbytes);
 
 		// dimhotepus: Add size check to catch usage issues.
-		Assert(leaflongs * static_cast<intp>(sizeof(long)) <= ssize(uncompressed));
+		Assert(leafarchwords * static_cast<intp>(sizeof(intp)) <= ssize(uncompressed));
 		for (int j=0 ; j<leafbytes ; j++)
 		{
 			int bitbyte = scan[j];
@@ -607,11 +613,11 @@ void CalcPAS (void)
 				if (index >= portalclusters)
 					Error ("Bad bit %d (>= %d) in PVS", index, portalclusters);	// pad bits should be 0
 
-				src = (long *)(uncompressedvis + index*leafbytes);
-				dest = (long *)uncompressed;
+				src = (intp *)(uncompressedvis + index*leafbytes);
+				dest = (intp *)uncompressed;
 
-				for (int l=0 ; l<leaflongs ; l++)
-					((long *)uncompressed)[l] |= src[l];
+				for (int l=0 ; l<leafarchwords ; l++)
+					((intp *)uncompressed)[l] |= src[l];
 			}
 		}
 		for (int j=0 ; j<portalclusters ; j++)
@@ -627,7 +633,7 @@ void CalcPAS (void)
 	//
 		int j = CompressVis (uncompressed, compressed);
 
-		dest = (long *)vismap_p;
+		dest = (intp *)vismap_p;
 		vismap_p += j;
 		
 		if (vismap_p > vismap_end)
@@ -1259,7 +1265,7 @@ int RunVVis( int argc, char **argv )
 int main (int argc, char **argv)
 {
 	CommandLine()->CreateCmdLine( argc, argv );
-
+	
 	InstallSpewFunction();
 	SpewActivate( "developer", 1 );
 	
