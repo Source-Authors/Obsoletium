@@ -545,11 +545,6 @@ $Project "mdlinfo"
 	"utils\mdlinfo\mdlinfo.vpc" [$WINDOWS]
 }
 
-$Project "mdmpRipper"
-{
-	"utils\mdmpRipper\mdmpRipper.vpc" [$WINDOWS]
-}
-
 $Project "mkentitypatch"
 {
 	"utils\mkentitypatch\mkentitypatch.vpc" [$WINDOWS]
