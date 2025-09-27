@@ -58,7 +58,15 @@ SET "WIN_X64= "
 if ["%CMAKE_MSVC_ARCH_NAME%"]==["x64"] (
   SET "WIN_X64=/windows"
 
-  echo Add /windows arg to VPC as generating x64 solution. 
+  ECHO Add /windows arg to VPC as generating x64 solution.
+
+  ECHO Searching for ml64 in PATH...
+  WHERE ml64.exe
+
+  if ERRORLEVEL 1 (
+    ECHO Unable to find ml64 in PATH.
+    EXIT /B 1
+  )
 )
 
 
