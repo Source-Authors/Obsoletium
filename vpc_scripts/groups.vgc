@@ -20,14 +20,6 @@ $Group "modo302"
 	"lxVsDmxIO_Modo302"
 }
 
-$Group "python"
-{
-	"valvePython_python2.5"
-	"vp_python2.5"
-	"vslib_python2.5"
-	"vs_python2.5"
-}
-
 $Group "shaders"
 {
 	"shadercompile_dll"
@@ -466,7 +458,6 @@ $Group "everything"
 	"valvemaya_maya2011"
 	"valvemaya_maya2012"
 	"valvemaya_maya2013"
-	"valvePython_python2.5"
 	"vaudio_miles"
 	"vaudio_speex"
 	"vaudio_celt"
@@ -497,7 +488,6 @@ $Group "everything"
 	"vmpi_transfer"
 	"vmt"
 	"vmtcheck"
-	"vp_python2.5"
 	"vphysics"
 	"vpk"
 	"vpklib"
@@ -551,9 +541,6 @@ $Group "everything"
 // dimhotepus: thirdparty.
 //	"zlib"
 	"coroutine_osx"
-
-//	"vs_python2.5"
-//	"vslib_python2.5"
 }
 
 $Group "dedicated"

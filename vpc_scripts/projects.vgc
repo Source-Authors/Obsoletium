@@ -1116,11 +1116,6 @@ $Project "valvemaya_maya2013"
 	"sdktools\maya\valvemaya\valvemaya_maya2013.vpc" [$WINDOWS]
 }
 
-$Project "valvepython_python2.5"
-{
-	"sdktools\python\valvePython\valvePython_python2.5.vpc" [$WINDOWS]
-}
-
 $Project "vaudio_miles"
 {
 	"engine\voice_codecs\miles\vaudio_miles.vpc" [$WINDOWS||$POSIX]
@@ -1281,11 +1276,6 @@ $Project "voice_tweak"
 	"utils\voice_tweak\voice_tweak.vpc" [$WINDOWS]
 }
 
-$Project "vp_python2.5"
-{
-	"sdktools\python\vp\vp_python2.5.vpc" [$WINDOWS]
-}
-
 $Project "vphysics"
 {
 	"vphysics\vphysics.vpc"  [$WINDOWS||$POSIX]
@@ -1317,11 +1307,6 @@ $Project "vscript"
 	"vscript/vscript_sob.vpc"	[($WINDOWS) && $SOB]
 }
 
-$Project "vs_python2.5"
-{
-	"sdktools\python\vs\vs_python2.5.vpc" [$WINDOWS]
-}
-
 $Project "vsblendeditor_maya2009"
 {
 	"sdktools\maya\vsblendeditor\vsblendeditor_maya2009.vpc"	[$WINDOWS]
@@ -1350,11 +1335,6 @@ $Project "vsdmxio_maya2012"
 $Project "vsdmxio_maya2013"
 {
 	"sdktools\maya\vsdmxio\vsdmxio_maya2013.vpc" [$WINDOWS]
-}
-
-$Project "vslib_python2.5"
-{
-	"sdktools\python\vs\vslib_python2.5.vpc" [$WINDOWS]
 }
 
 $Project "vsmaster_maya2009"
