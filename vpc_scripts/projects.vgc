@@ -976,16 +976,6 @@ $Project "studiorender"
 	"studiorender\studiorender.vpc" [$WINDOWS||$POSIX]
 }
 
-$Project "SymbolStoreUpdate"
-{
-	"utils\SymbolStoreUpdate\SymbolStoreUpdate.vpc" [$WINDOWS]
-}
-
-//$Project "test"
-//{
-//	"shell\uninstall\uninstalltester\test.vpc" [$WINDOWS]
-//}
-
 $Project "test_binaries"
 {
 	"devtools\test_binaries\test_binaries.vpc" [$WINDOWS]
