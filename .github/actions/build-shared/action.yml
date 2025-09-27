@@ -42,5 +42,5 @@ runs:
 
   - name: '${{inputs.configuration-name}} build solution ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
     working-directory: ${{env.GITHUB_WORKSPACE}}
-    run: msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.sln /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}}
+    run: msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.sln /m -verbosity:detailed /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}}
     shell: cmd
