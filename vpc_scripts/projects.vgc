@@ -1296,12 +1296,6 @@ $Project "vp_python2.5"
 	"sdktools\python\vp\vp_python2.5.vpc" [$WINDOWS]
 }
 
-$Project "vpccrccheck"
-{
-	"utils/vpccrccheck/vpccrccheck.vpc"   [$WINDOWS]
-}
-
-
 $Project "vphysics"
 {
 	"vphysics\vphysics.vpc"  [$WINDOWS||$POSIX]
