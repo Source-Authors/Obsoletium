@@ -39,6 +39,14 @@ public:
 
 	// This uses the standard windows file open dialog.
 	virtual bool DoModal_WindowsDialog() = 0;
+	
+	// dimhotepus: CS:GO backport below.
+
+	// Mark the dialog as allowing us to multi-select
+	virtual void AllowMultiSelect( bool bAllow ) = 0;
+
+	// Request the length of the buffer sufficient enough to hold the entire filename result
+	[[nodiscard]] virtual intp GetFilenameBufferSize() const = 0;
 };
 
 
