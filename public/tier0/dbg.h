@@ -836,6 +836,8 @@ private:
 #define Log_Warning( ignore, ... )	::Msg( __VA_ARGS__ ); ::Log( __VA_ARGS__ );
 #define Log_Msg( ignore, ... )		::Warning( __VA_ARGS__ ); ::Log( __VA_ARGS__ );
 #define Log_Error( ignore, ... )		::Error( __VA_ARGS__ );
+// dimhotepus: TF2 backport.
+#define DECLARE_LOGGING_CHANNEL(...);
 #define DEFINE_LOGGING_CHANNEL_NO_TAGS( ... );
 #define Plat_FatalError( ... ) do { Log_Error( LOG_GENERAL, __VA_ARGS__ ); Plat_ExitProcess( EXIT_FAILURE ); } while( 0 )
 
