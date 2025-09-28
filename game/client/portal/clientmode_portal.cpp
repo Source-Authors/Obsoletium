@@ -133,7 +133,7 @@ public:
 	virtual void	LevelShutdown( void );
 
 	// dimhotepus: Cleanup support.
-	virtual void	Shutdown( void ) = 0;
+	virtual void	Shutdown( void );
 };
 
 CHLModeManager::CHLModeManager( void )
