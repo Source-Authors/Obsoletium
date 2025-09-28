@@ -19,6 +19,7 @@
 #include "vec2.h"
 #include "vec3.h"
 #include "vec4.h"
+#include "int64.h"
 #include "uint64.h"
 #include "qangle.h"
 #include "quaternion.h"
@@ -268,6 +269,10 @@ public:
 			case FIELD_VECTOR4D:
 				lua_newvec4( pState, static_cast<Vector4D*>( value.m_pData ) );
 				break;
+			
+			case FIELD_INT64:
+				lua_newint64( pState, value.m_int64 );
+				break;
 		}
 	}
 
@@ -335,6 +340,7 @@ public:
 		luaopen_vec4( m_LuaState );
 		luaopen_qangle( m_LuaState );
 		luaopen_quat( m_LuaState );
+		luaopen_int64( m_LuaState );
 		luaopen_uint64( m_LuaState );
 
 		SetOutputCallback( nullptr );
@@ -745,6 +751,10 @@ public:
 							break;
 						}
 
+					case FIELD_INT64:
+						params[ i ] = lua_getint64( pState, i + nOffset ); 
+						break;
+
 					default:
 						AssertMsg( false, "Unknown argument type 0%x in function call.\n", *pCurParamType ); 
 						DWarning( "vscript:lua", 0, "Unknown argument type 0%x in function call.\n", *pCurParamType ); 
@@ -807,6 +817,7 @@ public:
 
 				case FIELD_FLOAT:
 				case FIELD_INTEGER:
+				case FIELD_INT64:
 				case FIELD_UINT64:
 				case FIELD_FLOAT64:
 				case FIELD_POSITIVEINTEGER_OR_NULL:

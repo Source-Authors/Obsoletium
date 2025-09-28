@@ -1778,7 +1778,7 @@ private:
 				sq_remove( m_hVM, -2 );
 				break;
 			}
-		case FIELD_INTEGER:		sq_pushinteger( m_hVM, value ); break;
+		case FIELD_INTEGER:		sq_pushinteger( m_hVM, value.m_int ); break;
 		case FIELD_BOOLEAN:		sq_pushbool( m_hVM, value.m_bool ); break;
 		case FIELD_CHARACTER:	{ char sz[2]; sz[0] = value.m_char; sz[1] = 0; sq_pushstring( m_hVM, sz, 1 ); break; }
 		case FIELD_HSCRIPT:		if ( value.m_hScript ) sq_pushobject( m_hVM, *((HSQOBJECT *)value.m_hScript) ); else sq_pushnull( m_hVM ); break;

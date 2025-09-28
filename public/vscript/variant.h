@@ -44,7 +44,11 @@ enum ExtendedFieldType_t
 	FIELD_UTLSTRINGTOKEN,
 	FIELD_QANGLE,
 	// dimhotepus: Add FIELD_VECTOR4D support.
-	FIELD_VECTOR4D
+	FIELD_VECTOR4D,
+	// dimhotepus: Add FIELD_INTEGER64 support.
+	FIELD_INTEGER64,
+	// dimhotepus: Same name schema as FIELD_UINT64.
+	FIELD_INT64 = FIELD_INTEGER64
 };
 
 DECLARE_FIELD_SIZE( FIELD_UINT64,					sizeof(uint64) )
@@ -53,6 +57,8 @@ DECLARE_FIELD_SIZE( FIELD_POSITIVEINTEGER_OR_NULL,	sizeof(int) )
 DECLARE_FIELD_SIZE( FIELD_UINT,						sizeof(uint) )
 DECLARE_FIELD_SIZE( FIELD_UTLSTRINGTOKEN,			sizeof(uint32) )
 DECLARE_FIELD_SIZE( FIELD_QANGLE,					sizeof(QAngle) )
+DECLARE_FIELD_SIZE( FIELD_VECTOR4D,					sizeof(Vector4D) )
+DECLARE_FIELD_SIZE( FIELD_INT64,					sizeof(int64) )
 
 using VariantDataType_t = int;
 
@@ -90,7 +96,8 @@ public:
 	CVariantBase() :					m_flags( 0 ), m_type( FIELD_VOID )		{ m_pVector = 0; }
 	CVariantBase( int val ) :			m_flags( 0 ), m_type( FIELD_INTEGER )	{ m_int = val; }
 	CVariantBase( uint32 val ) :		m_flags( 0 ), m_type( FIELD_UINT )		{ m_uint = val; }
-//	CVariantBase( int64 val ) :			m_flags( 0 ), m_type( FIELD_INTEGER64 )	{ m_int64 = val; }
+	// dimhotepus: Uncomment int64 support.
+	CVariantBase( int64 val ) :			m_flags( 0 ), m_type( FIELD_INT64 )		{ m_int64 = val; }
 	CVariantBase( uint64 val ) :		m_flags( 0 ), m_type( FIELD_UINT64 )	{ m_uint64 = val; }
 	CVariantBase( float val ) :			m_flags( 0 ), m_type( FIELD_FLOAT )		{ m_float = val; }
 	CVariantBase( float64 val ) :		m_flags( 0 ), m_type( FIELD_FLOAT64 )	{ m_float64 = val; }
@@ -114,7 +121,8 @@ public:
 
 	operator int() const					{ Assert( m_type == FIELD_INTEGER || m_type == FIELD_FLOAT );	return ( m_type == FIELD_INTEGER ) ? m_int : (int)m_float; }
 	operator uint() const					{ Assert( m_type == FIELD_UINT );		return m_uint; }
-//	operator int64() const					{ Assert( m_type == FIELD_INTEGER64 );	return m_int64; }
+	// dimhotepus: Uncomment int64 support.
+	operator int64() const					{ Assert( m_type == FIELD_INT64 );		return m_int64; }
 	operator uint64() const					{ Assert( m_type == FIELD_UINT64 );		return m_uint64; }
 	operator float() const					{ Assert( m_type == FIELD_INTEGER || m_type == FIELD_FLOAT );	return ( m_type == FIELD_FLOAT ) ? m_float : (float)m_int; }
 	operator float64() const				{ Assert( m_type == FIELD_FLOAT64 );	return m_float64; }
@@ -134,7 +142,8 @@ public:
 
 	void operator=( int i ) 				{ Free(); m_type = FIELD_INTEGER; m_int = i; }
 	void operator=( uint i ) 				{ Free(); m_type = FIELD_UINT; m_uint = i; }
-//	void operator=( int64 i ) 				{ Free(); m_type = FIELD_INTEGER64; m_int64 = i; }
+	// dimhotepus: Uncomment int64 support.
+	void operator=( int64 i ) 				{ Free(); m_type = FIELD_INT64; m_int64 = i; }
 	void operator=( uint64 i ) 				{ Free(); m_type = FIELD_UINT64; m_uint64 = i; }
 	void operator=( float f ) 				{ Free(); m_type = FIELD_FLOAT; m_float = f; }
 	void operator=( float64 f ) 			{ Free(); m_type = FIELD_FLOAT64; m_float64 = f; }
@@ -168,6 +177,9 @@ public:
 	bool AssignTo( float *pDest ) const;
 	bool AssignTo( uint *pDest ) const;
 	bool AssignTo( int *pDest ) const;
+	// dimhotepus: Add strongly-typed {u}int64 assignments.
+	bool AssignTo( uint64 *pDest ) const;
+	bool AssignTo( int64 *pDest ) const;
 	bool AssignTo( bool *pDest ) const;
 	bool AssignTo( Vector2D *pDest ) const;
 	bool AssignTo( Vector *pDest ) const;
@@ -237,7 +249,8 @@ template <typename T> struct VariantDeducer_t { enum { FIELD_TYPE = FIELD_TYPEUN
 
 DECLARE_DEDUCE_FIELDTYPE( FIELD_VOID,		void );
 DECLARE_DEDUCE_FIELDTYPE( FIELD_FLOAT,		float );
-//DECLARE_DEDUCE_FIELDTYPE( FIELD_INTEGER64,	int64 );
+// dimhotepus: Uncomment int64 support.
+DECLARE_DEDUCE_FIELDTYPE( FIELD_INT64,		int64 );
 DECLARE_DEDUCE_FIELDTYPE( FIELD_UINT64,		uint64 );
 DECLARE_DEDUCE_FIELDTYPE( FIELD_FLOAT64,	float64 );
 DECLARE_DEDUCE_FIELDTYPE( FIELD_CSTRING,	const char * );
@@ -306,7 +319,8 @@ inline const char * VariantFieldTypeName( int16 eType )
 	case FIELD_QANGLE:	return "qangle";
 	case FIELD_INTEGER:	return "integer";
 	case FIELD_UINT:	return "unsigned";
-//	case FIELD_INTEGER64:	return "int64";
+	// dimhotepus: Uncomment int64 support.
+	case FIELD_INT64:	return "int64";
 	case FIELD_UINT64:	return "uint64";
 	case FIELD_FLOAT64:	return "float64";
 	case FIELD_BOOLEAN:	return "boolean";
@@ -816,7 +830,8 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( uint *pDest ) const
 	switch( m_type )
 	{
 	case FIELD_VOID:		*pDest = 0; return false;
-//	case FIELD_INTEGER64:	*pDest = (uint)clamp( m_int, UINT_MIN, UINT_MAX ); return true;
+    // dimhotepus: Uncomment int64 support.
+	case FIELD_INT64:		*pDest = (int)clamp( m_int64, 0LL, (long long)INT_MAX ); return true;
 	case FIELD_UINT64:		*pDest = (uint)clamp( m_uint64, 0ULL/*UINT_MIN*/, (unsigned long long)UINT_MAX ); return true;
 	case FIELD_BOOLEAN:		*pDest = m_bool; return true;
 	case FIELD_INTEGER:		if ( m_int < 0 ) return false; *pDest = clamp( (unsigned)m_int, 0U, UINT_MAX ); return true;
@@ -826,6 +841,42 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( uint *pDest ) const
 		return false;
 	}
 }
+
+template< class CValueAllocator >
+inline bool CVariantBase<CValueAllocator>::AssignTo( int64 *pDest ) const
+{
+	switch( m_type )
+	{
+	case FIELD_VOID:		*pDest = 0; return false;
+	case FIELD_INTEGER:		*pDest = m_int; return true;
+	case FIELD_UINT:		*pDest = m_uint; return true;
+	case FIELD_FLOAT:		*pDest = m_float; return true;
+	case FIELD_BOOLEAN:		*pDest = m_bool; return true;
+	case FIELD_CSTRING:		*pDest = atoi( m_pszString ); return true;
+	case FIELD_UINT64:		*pDest = (int64)min( m_uint64, (uint64)LLONG_MAX ); return true;
+	case FIELD_INT64:		*pDest = m_int64; return true;
+	default:
+		Warning( "No conversion from %s to int now\n", VariantFieldTypeName( m_type ) );
+		return false;
+	}
+}
+
+template< class CValueAllocator >
+inline bool CVariantBase<CValueAllocator>::AssignTo( uint64 *pDest ) const
+{
+	switch( m_type )
+	{
+	case FIELD_VOID:		*pDest = 0; return false; return true;
+	case FIELD_BOOLEAN:		*pDest = m_bool; return true;
+	case FIELD_INTEGER:		if ( m_int < 0 ) return false; *pDest = clamp( (unsigned)m_int, 0U, UINT_MAX ); return true;
+	case FIELD_UINT:		*pDest = m_uint; return true;
+	case FIELD_UINT64:		*pDest = m_uint64; return true;
+	case FIELD_INT64:		if ( m_int64 < 0) return false; *pDest = clamp( (uint64)m_int64, 0ULL, ULLONG_MAX ); return true;
+	default:
+		Warning( "No conversion from %s to int now\n", VariantFieldTypeName( m_type ) );
+		return false;
+	}
+}	
 
 template< class CValueAllocator >
 inline bool CVariantBase<CValueAllocator>::AssignTo( bool *pDest ) const
@@ -981,6 +1032,9 @@ inline bool operator ==( const CVariantBase<CValueAllocator1> & v1, const CVaria
 	case FIELD_CHARACTER:	{ return v1.m_char == v2.m_char; }
 	case FIELD_BOOLEAN:		{ return v1.m_bool == v2.m_bool; }
 	case FIELD_HSCRIPT:		{ return v1.m_hScript == v2.m_hScript; }
+	// dimhotepus: Add {u}int64 == support. 
+	case FIELD_UINT64:		{ return v1.m_uint64 == v2.m_uint64; }
+	case FIELD_INT64:		{ return v1.m_int64 == v2.m_int64; }
 	case FIELD_UTLSTRINGTOKEN:	{ return v1.m_utlStringToken == v2.m_utlStringToken; }
 	}
 

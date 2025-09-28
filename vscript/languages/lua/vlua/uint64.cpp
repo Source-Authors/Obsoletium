@@ -28,7 +28,7 @@ Uint64 lua_getuint64ByValue( lua_State *pState, int i )
 }
 
 
-Uint64 *lua_allocUint64( lua_State *pState )
+Uint64 *lua_allocuint64( lua_State *pState )
 {
 	auto *v = static_cast<Uint64 *>( lua_newuserdata( pState, sizeof( Uint64 ) ) );
 	if ( !v )
@@ -47,7 +47,7 @@ int uint64_new( lua_State *pState )
 {
 	lua_settop( pState, 3 );
 
-	Uint64 *v = lua_allocUint64( pState );
+	Uint64 *v = lua_allocuint64( pState );
 	v->value = luaL_optinteger( pState, 1, 0 );
 
 	return 1;
@@ -181,8 +181,8 @@ int uint64_clearbit( lua_State *pState )
 	if ( n < 0 || n > 63 )
 	{
 		char err[64];
-		V_sprintf_safe( err, "ClearBit accepts bit value in range [0...63], got %llu",
-			static_cast<unsigned long long>( n ) );
+		V_sprintf_safe( err, "ClearBit accepts bit value in range [0...63], got %lld",
+			static_cast<long long>( n ) );
 
 		return luaL_argerror( pState, 2, err );
 	}
@@ -201,8 +201,8 @@ int uint64_isbitset( lua_State *pState )
 	if ( n < 0 || n > 63 )
 	{
 		char err[64];
-		V_sprintf_safe( err, "IsBitSet accepts bit value in range [0...63], got %llu",
-			static_cast<unsigned long long>( n ) );
+		V_sprintf_safe( err, "IsBitSet accepts bit value in range [0...63], got %lld",
+			static_cast<long long>( n ) );
 
 		return luaL_argerror( pState, 2, err );
 	}
@@ -221,8 +221,8 @@ int uint64_setbit( lua_State *pState )
 	if ( n < 0 || n > 63 )
 	{
 		char err[64];
-		V_sprintf_safe( err, "SetBit accepts bit value in range [0...63], got %llu",
-			static_cast<unsigned long long>( n ) );
+		V_sprintf_safe( err, "SetBit accepts bit value in range [0...63], got %lld",
+			static_cast<long long>( n ) );
 
 		return luaL_argerror( pState, 2, err );
 	}
@@ -241,8 +241,8 @@ int uint64_togglebit( lua_State *pState )
 	if ( n < 0 || n > 63 )
 	{
 		char err[64];
-		V_sprintf_safe( err, "ToggleBit accepts bit value in range [0...63], got %llu",
-			static_cast<unsigned long long>( n ) );
+		V_sprintf_safe( err, "ToggleBit accepts bit value in range [0...63], got %lld",
+			static_cast<long long>( n ) );
 
 		return luaL_argerror( pState, 2, err );
 	}
@@ -315,7 +315,7 @@ Uint64 *lua_getuint64( lua_State *pState, int i )
 
 Uint64 *lua_newuint64( lua_State *pState, uint64 Value )
 {
-	Uint64 *v = lua_allocUint64( pState );
+	Uint64 *v = lua_allocuint64( pState );
 
 	v->value = Value;
 
