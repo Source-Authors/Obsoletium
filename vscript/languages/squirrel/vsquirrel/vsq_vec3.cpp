@@ -11,7 +11,10 @@ namespace {
 SQInteger vsq_constructvec3(HSQUIRRELVM hVM) {
   StackHandler sa(hVM);
 
-  auto *vec = new Vector;
+  auto *vec = new (std::nothrow) Vector;
+  if (!vec) {
+    return sq_throwerror(hVM, "out of memory when allocating Vector");
+  }
 
   int i;
   for (i = 0; i < 3 && i < sa.GetParamCount() - 1; i++) {
@@ -407,19 +410,19 @@ SQInteger vsq_openvec3(HSQUIRRELVM hVM, HSQOBJECT *hExternalClass) {
     sq_pop(hVM, 2);
   }
 
-  return 0;
+  return SQ_OK;
 }
 
 SQInteger vsq_releasevec3(SQUserPointer p, SQInteger size) {
   delete (Vector *)p;
-  return 0;
+  return SQ_OK;
 }
 
 SQInteger vsq_getvec3(HSQUIRRELVM hVM, StackHandler &sh, int idx, Vector &vec) {
   auto *instance = (Vector *)sh.GetInstanceUp(idx, TYPETAG_VECTOR);
   if (instance) {
     vec = *instance;
-    return 0;
+    return SQ_OK;
   }
 
   return sq_throwerror(hVM, "Vector argument expected");

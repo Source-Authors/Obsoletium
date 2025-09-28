@@ -22,6 +22,8 @@ Uint64 lua_getuint64ByValue( lua_State *pState, int i )
 	if ( luaL_checkudata( pState, i, UINT64_TYPE ) == nullptr )
 	{
 		luaL_typeerror( pState, i, UINT64_TYPE );
+
+		return Uint64{ 0 };
 	}
 
 	return *static_cast<Uint64 *>( lua_touserdata( pState, i ) );
@@ -34,6 +36,8 @@ Uint64 *lua_allocuint64( lua_State *pState )
 	if ( !v )
 	{
 		luaL_error( pState, "out of memory when alloc %s", UINT64_TYPE );
+
+		return nullptr;
 	}
 
 	luaL_getmetatable( pState, UINT64_TYPE );
@@ -48,6 +52,8 @@ int uint64_new( lua_State *pState )
 	lua_settop( pState, 3 );
 
 	Uint64 *v = lua_allocuint64( pState );
+	if (!v) return 0;
+
 	v->value = luaL_optinteger( pState, 1, 0 );
 
 	return 1;
@@ -58,6 +64,7 @@ int uint64_tostring( lua_State *pState )
 {
 	char s[ 32 ];
 	const Uint64 *v = lua_getuint64( pState, 1 );
+	if (!v) return 0;
 
 	V_sprintf_safe( s, "%s (%llu)", UINT64_TYPE, v->value );
 
@@ -307,6 +314,7 @@ Uint64 *lua_getuint64( lua_State *pState, int i )
 	if ( luaL_checkudata( pState, i, UINT64_TYPE ) == nullptr )
 	{
 		luaL_typeerror( pState, i, UINT64_TYPE );
+		return nullptr;
 	}
 
 	return static_cast<Uint64 *>( lua_touserdata( pState, i ) );
@@ -316,6 +324,7 @@ Uint64 *lua_getuint64( lua_State *pState, int i )
 Uint64 *lua_newuint64( lua_State *pState, uint64 Value )
 {
 	Uint64 *v = lua_allocuint64( pState );
+	if (!v) return nullptr;
 
 	v->value = Value;
 

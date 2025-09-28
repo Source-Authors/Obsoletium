@@ -25,6 +25,8 @@ Vector4D lua_getvec4ByValue( lua_State *pState, int i )
 	if ( luaL_checkudata( pState, i, VECTOR4D_TYPE ) == nullptr )
 	{
 		luaL_typeerror( pState, i, VECTOR4D_TYPE );
+
+		return { VEC_T_NAN, VEC_T_NAN, VEC_T_NAN, VEC_T_NAN };
 	}
 
 	return *static_cast<Vector4D *>( lua_touserdata( pState, i ) );
@@ -37,6 +39,8 @@ Vector4D *lua_allocvec4( lua_State *pState )
 	if ( !v )
 	{
 		luaL_error( pState, "out of memory when alloc %s", VECTOR4D_TYPE );
+
+		return nullptr;
 	}
 
 	luaL_getmetatable( pState, VECTOR4D_TYPE );
@@ -51,6 +55,8 @@ int vec4_new( lua_State *pState )
 	lua_settop( pState, 3 );
 
 	Vector4D *v = lua_allocvec4( pState );
+	if (!v) return 0;
+
 	v->x = size_cast<float>( luaL_optnumber( pState, 1, 0 ) );
 	v->y = size_cast<float>( luaL_optnumber( pState, 2, 0 ) );
 	v->z = size_cast<float>( luaL_optnumber( pState, 3, 0 ) );
@@ -67,6 +73,8 @@ int vec4_index( lua_State *pState )
 	if ( pszKey && !Q_isempty( pszKey ) && pszKey[ 1 ] == '\0' )
 	{
 		const Vector4D *v = lua_getvec4( pState, 1 );
+		if (!v) return 0;
+
 		switch ( pszKey[ 0 ] ) 
 		{
 			case '1': case 'x': case 'r':
@@ -109,6 +117,8 @@ int vec4_newindex( lua_State *pState )
 	if ( pszKey && !Q_isempty( pszKey ) && pszKey[ 1 ] == '\0' )
 	{
 		Vector4D	*v = lua_getvec4( pState, 1 );
+		if (!v) return 0;
+
 		const lua_Number flValue = luaL_checknumber( pState, 3 );
 		switch ( pszKey[ 0 ] ) 
 		{
@@ -145,6 +155,7 @@ int vec4_tostring( lua_State *pState )
 {
 	char s[ 64 ];
 	const Vector4D *v = lua_getvec4( pState, 1 );
+	if (!v) return 0;
 
 	V_sprintf_safe( s, "%s (%f, %f, %f, %f)", VECTOR4D_TYPE, v->x, v->y, v->z, v->w );
 
@@ -341,6 +352,8 @@ Vector4D *lua_getvec4( lua_State *pState, int i )
 	if ( luaL_checkudata( pState, i, VECTOR4D_TYPE ) == nullptr )
 	{
 		luaL_typeerror( pState, i, VECTOR4D_TYPE );
+
+		return nullptr;
 	}
 
 	return static_cast<Vector4D *>( lua_touserdata( pState, i ) );
@@ -350,6 +363,7 @@ Vector4D *lua_getvec4( lua_State *pState, int i )
 Vector4D *lua_newvec4( lua_State *pState, const Vector4D *Value )
 {
 	Vector4D *v = lua_allocvec4( pState );
+	if (!v) return nullptr;
 
 	v->x = Value->x;
 	v->y = Value->y;

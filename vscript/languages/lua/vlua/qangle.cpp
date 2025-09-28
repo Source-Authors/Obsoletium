@@ -17,6 +17,8 @@ QAngle *lua_getqangle( lua_State *pState, int i )
 	if ( luaL_checkudata( pState, i, QANGLE_TYPE ) == nullptr )
 	{
 		luaL_typeerror( pState, i, QANGLE_TYPE );
+
+		return nullptr;
 	}
 
 	return static_cast<QAngle *>( lua_touserdata( pState, i ) );
@@ -34,6 +36,8 @@ QAngle lua_getqangleByValue( lua_State *pState, int i )
 	if ( luaL_checkudata( pState, i, QANGLE_TYPE ) == nullptr )
 	{
 		luaL_typeerror( pState, i, QANGLE_TYPE );
+
+		return { VEC_T_NAN, VEC_T_NAN, VEC_T_NAN };
 	}
 
 	return *( QAngle * )lua_touserdata( pState, i );
@@ -46,6 +50,7 @@ static QAngle *lua_allocqangle( lua_State *pState )
 	if ( !v )
 	{
 		luaL_error( pState, "out of memory when alloc %s", QANGLE_TYPE );
+		return nullptr;
 	}
 
 	luaL_getmetatable( pState, QANGLE_TYPE );
@@ -58,6 +63,7 @@ static QAngle *lua_allocqangle( lua_State *pState )
 QAngle *lua_newqangle( lua_State *pState, const QAngle *Value )
 {
 	QAngle *v = lua_allocqangle( pState );
+	if (!v) return nullptr;
 
 	v->x = Value->x;
 	v->y = Value->y;
@@ -72,6 +78,8 @@ static int qangle_new( lua_State *pState )
 	lua_settop( pState, 3 );
 
 	QAngle *v = lua_allocqangle( pState );
+	if (!v) return 0;
+
 	v->x = size_cast<float>( luaL_optnumber( pState, 1, 0 ) );
 	v->y = size_cast<float>( luaL_optnumber( pState, 2, 0 ) );
 	v->z = size_cast<float>( luaL_optnumber( pState, 3, 0 ) );
@@ -87,6 +95,8 @@ static int qangle_index( lua_State *pState )
 	if ( pszKey[ 1 ] == '\0' )
 	{
 		QAngle	*v = lua_getqangle( pState, 1 );
+		if (!v) return 0;
+
 		switch ( pszKey[ 0 ] ) 
 		{
 			case '1': case 'x': case 'r':
@@ -118,6 +128,8 @@ static int qangle_newindex( lua_State *pState )
 	if ( pszKey[ 1 ] == '\0' )
 	{
 		QAngle	*v = lua_getqangle( pState, 1 );
+		if (!v) return 0;
+
 		lua_Number	flValue = luaL_checknumber( pState, 3 );
 		switch ( pszKey[ 0 ] ) 
 		{
@@ -145,6 +157,7 @@ static int qangle_tostring( lua_State *pState )
 {
 	char	s[ 64 ];
 	QAngle	*v = lua_getqangle( pState, 1 );
+	if (!v) return 0;
 
 	sprintf( s, "%s (%f, %f, %f)", QANGLE_TYPE, v->x, v->y, v->z );
 
