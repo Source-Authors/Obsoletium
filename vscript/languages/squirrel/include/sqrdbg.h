@@ -42,7 +42,24 @@ extern "C" {
 struct SQDbgServer;
 typedef SQDbgServer* HSQREMOTEDBG;
 typedef struct SQVM* HSQUIRRELVM;
-typedef int SQRESULT;
+
+#if (defined(_WIN64) || defined(_LP64))
+#ifndef _SQ64
+#define _SQ64
+#endif
+#endif
+
+#ifdef _SQ64
+#ifdef _MSC_VER
+typedef __int64 SQInteger;
+#else
+typedef long long SQInteger;
+#endif
+#else
+typedef int SQInteger;
+#endif
+
+typedef SQInteger SQRESULT;
 typedef std::size_t SQBool;
 
 HSQREMOTEDBG sq_rdbg_init(HSQUIRRELVM v,unsigned short port,SQBool autoupdate);

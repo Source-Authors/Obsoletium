@@ -30,9 +30,29 @@ runs:
     with:
       arch: ${{inputs.platform-name}}
 
+  - name: Cache VPC output
+    uses: actions/cache@v4
+    id: cache-vpc
+    with:
+      path: .\external\vpc\out
+      key: Vpc-${{runner.os}}-${{inputs.platform-name}}-${{ hashFiles('.git\modules\external\vpc\refs\heads\main') }}
+
+  - name: 'Cache dependencies output for ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
+    uses: actions/cache@v4
+    id: cache-dependencies
+    with:
+      path: .\thirdparty\**\out
+      key: Thirdparty-${{runner.os}}-${{inputs.platform-name}}-${{ hashFiles('.git\modules\thirdparty\**\refs\heads\main') }}
+
   - name: 'Build dependencies for ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
     working-directory: ${{env.GITHUB_WORKSPACE}}
+    if: steps.cache-dependencies.outputs.cache-hit != 'true'
     run: .\build_game_thirdparty.bat ${{inputs.platform-name}}
+    shell: cmd
+
+  - name: Generate build version information
+    working-directory: ${{env.GITHUB_WORKSPACE}}
+    run: .\generate_build_info.bat
     shell: cmd
 
   - name: 'Generate solution ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
@@ -45,11 +65,22 @@ runs:
     run: msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.sln /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}}
     shell: cmd
 
-  - name: 'Upload ${{inputs.solution-name}}_${{inputs.platform-name}} build artifacts'
+  - name: Get build artifacts path
+    working-directory: ${{env.GITHUB_WORKSPACE}}
+    id: get-build-artifacts-path
+    run: |
+      pushd "..\game"
+      set ABS_PATH=%CD%
+      popd
+      @chcp 65001>nul
+      echo BUILD_ARTIFACTS_PATH=%ABS_PATH% >> %GITHUB_OUTPUT%
+    shell: cmd
+
+  - name: 'Upload ${{inputs.solution-name}}_${{inputs.platform-name}}_${{inputs.configuration-name}} build artifacts'
     uses: actions/upload-artifact@v4
     with:
-      name: '${{inputs.solution-name}}_${{inputs.platform-name}}'
-      path: ..\game\
+      name: '${{inputs.solution-name}}_${{inputs.platform-name}}_${{inputs.configuration-name}}'
+      path: '${{steps.get-build-artifacts-path.outputs.BUILD_ARTIFACTS_PATH}}'
       if-no-files-found: error
       retention-days: 1
       compression-level: 9

@@ -6,6 +6,12 @@ IF ERRORLEVEL 1 (
   EXIT /B 1
 )
 
+CALL generate_build_info.bat
+IF ERRORLEVEL 1 (
+  ECHO Generating build info failed.
+  EXIT /B 1
+)
+
 CALL create_game_projects.bat portal x86
 IF ERRORLEVEL 1 (
   ECHO Generating Portal x86 portal.sln failed.
