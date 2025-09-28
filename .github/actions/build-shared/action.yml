@@ -52,7 +52,7 @@ runs:
       for /f %%i in ('git rev-list --branches HEAD ^| findstr /R /N "^" ^| find /C ":"') do set PATCH_VERSION=%%i
 
       set PATCH_VERSION=1.0.0.%PATCH_VERSION%
-      echo BUILD_ARTIFACTS_PATH=%PATCH_VERSION% >> %GITHUB_OUTPUT%
+      echo BUILD_VERSION=%PATCH_VERSION% >> %GITHUB_OUTPUT%
 
       echo Building ${{inputs.solution-name}} v.%PATCH_VERSION%
     shell: cmd
