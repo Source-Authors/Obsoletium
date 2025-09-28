@@ -42,10 +42,13 @@ runs:
     run: |
       for /d %%d in (".git\modules\thirdparty\*") do (
         if exist "%%d\refs\heads\main" (
-          echo "%%d\refs\heads\main"
-          type "%%d\refs\heads\main"
+          echo %%d\refs\heads\main >> dependencies.shas.txt
+          type "%%d\refs\heads\main" >> dependencies.shas.txt
         )
       )
+
+      echo Dependencies SHAs
+      type dependencies.shas.txt
     shell: cmd
 
   - name: 'Cache dependencies output for ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
@@ -53,7 +56,7 @@ runs:
     uses: actions/cache@v4
     with:
       path: .\thirdparty\**\out
-      key: Thirdparty-${{runner.os}}-${{inputs.platform-name}}-${{ hashFiles('.git\modules\thirdparty\*\refs\heads\main') }}
+      key: Thirdparty-${{runner.os}}-${{inputs.platform-name}}-${{ hashFiles('dependencies.shas.txt') }}
 
   - name: Get build version
     id: get-build-version
