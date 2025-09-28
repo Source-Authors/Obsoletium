@@ -188,6 +188,8 @@ public:
 	bool AssignTo( Quaternion *pDest ) const;
 	bool AssignTo( QuaternionAligned *pDest ) const { return AssignTo( (Quaternion*)pDest ); }
 	bool AssignTo( VectorAligned *pDest ) const		{ return AssignTo( (Vector*)pDest ); }
+	// dimhotepus: Add Vector4DAligned overload.
+	bool AssignTo( Vector4DAligned *pDest ) const	{ return AssignTo( (Vector4D*)pDest ); }
 	bool AssignTo( char *pDest, uint nBufLen ) const;
 	bool AssignTo( CUtlString *pString ) const;
 	bool AssignTo( const char **pszString ) const;
@@ -830,11 +832,12 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( uint *pDest ) const
 	switch( m_type )
 	{
 	case FIELD_VOID:		*pDest = 0; return false;
-    // dimhotepus: Uncomment int64 support.
-	case FIELD_INT64:		*pDest = (int)clamp( m_int64, 0LL, (long long)INT_MAX ); return true;
-	case FIELD_UINT64:		*pDest = (uint)clamp( m_uint64, 0ULL/*UINT_MIN*/, (unsigned long long)UINT_MAX ); return true;
+	// dimhotepus: Uncomment int64 support.
+	case FIELD_INT64:		if ( m_int64 < 0 || m_int64 > static_cast<int64>( UINT_MAX ) ) return false; *pDest = static_cast<uint>( m_int64 ); return true;
+	// dimhotepus: Check overflow / underflow.
+	case FIELD_UINT64:		if ( m_uint64 > UINT_MAX ) return false; *pDest = static_cast<uint>( m_uint64 ); return true;
 	case FIELD_BOOLEAN:		*pDest = m_bool; return true;
-	case FIELD_INTEGER:		if ( m_int < 0 ) return false; *pDest = clamp( (unsigned)m_int, 0U, UINT_MAX ); return true;
+	case FIELD_INTEGER:		if ( m_int < 0 ) return false; *pDest = static_cast<uint>( m_int ); return true;
 	case FIELD_UINT:		*pDest = m_uint; return true;
 	default:
 		Warning( "No conversion from %s to int now\n", VariantFieldTypeName( m_type ) );
@@ -852,8 +855,10 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( int64 *pDest ) const
 	case FIELD_UINT:		*pDest = m_uint; return true;
 	case FIELD_FLOAT:		*pDest = m_float; return true;
 	case FIELD_BOOLEAN:		*pDest = m_bool; return true;
-	case FIELD_CSTRING:		*pDest = atoi( m_pszString ); return true;
-	case FIELD_UINT64:		*pDest = (int64)min( m_uint64, (uint64)LLONG_MAX ); return true;
+	// dimhotepus: Check overflow / underflow.
+	case FIELD_CSTRING:		*pDest = strtoll( m_pszString, nullptr, 10 ); return true;
+	// dimhotepus: Check overflow / underflow.
+	case FIELD_UINT64:		if ( m_uint64 > static_cast<uint64>( LLONG_MAX ) ) return false; *pDest = static_cast<int64>( m_uint64 ); return true;
 	case FIELD_INT64:		*pDest = m_int64; return true;
 	default:
 		Warning( "No conversion from %s to int now\n", VariantFieldTypeName( m_type ) );
@@ -871,7 +876,7 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( uint64 *pDest ) const
 	case FIELD_INTEGER:		if ( m_int < 0 ) return false; *pDest = clamp( (unsigned)m_int, 0U, UINT_MAX ); return true;
 	case FIELD_UINT:		*pDest = m_uint; return true;
 	case FIELD_UINT64:		*pDest = m_uint64; return true;
-	case FIELD_INT64:		if ( m_int64 < 0) return false; *pDest = clamp( (uint64)m_int64, 0ULL, ULLONG_MAX ); return true;
+	case FIELD_INT64:		if ( m_int64 < 0 ) return false; *pDest = static_cast<uint64>( m_int64 ); return true;
 	default:
 		Warning( "No conversion from %s to int now\n", VariantFieldTypeName( m_type ) );
 		return false;
