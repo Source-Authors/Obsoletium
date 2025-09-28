@@ -2672,8 +2672,16 @@ void RichText::OnTextClicked(const wchar_t *wszText)
 	}
 	else
 	{
+		// dimhotepus: TF2 backport. Do not try to open invalid URLs.
+		if ( Q_strncmp( ansi, "http://", 7 ) != 0 && Q_strncmp( ansi, "https://", 8 ) != 0 )
+		{
+			Warning( "Invalid URL '%s'\n", ansi );
+		}
+		else
+		{
 		system()->ShellExecute( "open", ansi );
 	}
+}
 }
 
 //-----------------------------------------------------------------------------
