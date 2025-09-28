@@ -37,12 +37,23 @@ runs:
       path: .\external\vpc\out
       key: Vpc-${{runner.os}}-${{inputs.platform-name}}-${{ hashFiles('.git\modules\external\vpc\refs\heads\main') }}
 
+  - name: Show dependencies SHAs
+    id: get-dependencies-sha
+    run: |
+      for /d %%d in (".git\modules\thirdparty\*") do (
+        if exist "%%d\refs\heads\main" (
+          echo "%%d\refs\heads\main"
+          type "%%d\refs\heads\main"
+        )
+      )
+    shell: cmd
+
   - name: 'Cache dependencies output for ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
     id: cache-dependencies
     uses: actions/cache@v4
     with:
       path: .\thirdparty\**\out
-      key: Thirdparty-${{runner.os}}-${{inputs.platform-name}}-${{ hashFiles('.git\modules\thirdparty\**\refs\heads\main') }}
+      key: Thirdparty-${{runner.os}}-${{inputs.platform-name}}-${{ hashFiles('.git\modules\thirdparty\*\refs\heads\main') }}
 
   - name: Get build version
     id: get-build-version
