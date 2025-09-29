@@ -257,18 +257,10 @@ typedef void * HINSTANCE;
 #endif
 #define	DebuggerBreakIfDebugging() if ( !Plat_IsInDebugSession() ) ; else DebuggerBreak()
 
-#ifdef STAGING_ONLY
-#define	DebuggerBreakIfDebugging_StagingOnly() if ( !Plat_IsInDebugSession() ) ; else DebuggerBreak()
-#else
 #define	DebuggerBreakIfDebugging_StagingOnly()
-#endif
 
 // Allows you to specify code that should only execute if we are in a staging build. Otherwise the code noops.
-#ifdef STAGING_ONLY
-#define STAGING_ONLY_EXEC( _exec ) do { _exec; } while (0)
-#else
 #define STAGING_ONLY_EXEC( _exec ) do { } while (0)
-#endif
 
 // C functions for external declarations that call the appropriate C++ methods
 #ifndef EXPORT
