@@ -644,39 +644,6 @@ static FORCEINLINE double fsel(double fComparand, double fValGE, double fLT)
 #endif // _X360
 
 //-----------------------------------------------------------------------------
-// Portability casting
-//-----------------------------------------------------------------------------
-// dimhotepus: CS:GO backport.
-template < typename Tdst, typename Tsrc >
-[[nodiscard]] FORCEINLINE
-#ifndef DEBUG
-constexpr
-#endif
-Tdst size_cast( Tsrc val )
-{
-	static_assert( sizeof( Tdst ) <= sizeof( uint64 ) && sizeof( Tsrc ) <= sizeof( uint64 ),
-		"Okay in my defense there weren't any types larger than 64-bits when this code was written." );
-
-#ifdef DEBUG
-	if constexpr ( sizeof ( Tdst ) < sizeof ( Tsrc ) )
-	{
-		Tdst cmpValDst = ( Tdst )val;
-
-		// If this fails, the source value didn't actually fit in the destination value--you'll need to 
-		// change the return type's size to match the source type in the calling code. 
-		if ( val != ( Tsrc )cmpValDst )
-		{
-			// Can't use assert here, and if this happens when running on a machine internally we should crash 
-			// in preference to missing the problem ( so not DebuggerBreakIfDebugging() ).
-			DebuggerBreak();
-		}
-	}
-#endif
-
-	return ( Tdst )val;
-}
-
-//-----------------------------------------------------------------------------
 // Purpose: Standard functions for handling endian-ness
 //-----------------------------------------------------------------------------
 

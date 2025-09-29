@@ -73,11 +73,47 @@
 
 // dimhotepus: Require Visual Studio 2022 version 17.2+ for C++17 support.
 // See https://en.cppreference.com/w/cpp/compiler_support/17.html
-// See https://learn.microsoft.com/en-us/cpp/overview/visual-cpp-language-conformance?view=msvc-170
+// See
+// https://learn.microsoft.com/en-us/cpp/overview/visual-cpp-language-conformance?view=msvc-170
 #if _MSC_VER < 1932
 #error "Please install Visual Studio 2022 version 17.2+ to support C++ 17"
 #endif
 #endif
+
+//-----------------------------------------------------------------------------
+// Portability casting
+//-----------------------------------------------------------------------------
+// dimhotepus: TF2 & CS:GO backport.
+template <typename Tdst, typename Tsrc>
+[[nodiscard]] inline
+#ifndef DEBUG
+    constexpr
+#endif
+    Tdst
+    size_cast(Tsrc val) noexcept {
+  static_assert(
+      sizeof(Tdst) <= sizeof(uint64) && sizeof(Tsrc) <= sizeof(uint64),
+      "Okay in my defense there weren't any types larger than 64-bits when "
+      "this code was written.");
+
+#ifdef DEBUG
+  if constexpr (sizeof(Tdst) < sizeof(Tsrc)) {
+    Tdst cmpValDst = (Tdst)val;
+
+    // If this fails, the source value didn't actually fit in the destination
+    // value--you'll need to change the return type's size to match the source
+    // type in the calling code.
+    if (val != (Tsrc)cmpValDst) {
+      // Can't use assert here, and if this happens when running on a machine
+      // internally we should crash in preference to missing the problem ( so
+      // not DebuggerBreakIfDebugging() ).
+      DebuggerBreak();
+    }
+  }
+#endif
+
+  return (Tdst)val;
+}
 
 /**
  * @brief Makes a signed 4-byte "packed ID" int out of 4 characters.
@@ -199,7 +235,7 @@ constexpr inline bool IsPowerOfTwo(T value) noexcept {
 // C++20 ssize
 using std::ssize;
 #else
-#include <type_traits> 
+#include <type_traits>
 
 template <class C>
 constexpr auto ssize(const C& c) noexcept(noexcept(c.size()))
@@ -447,7 +483,7 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
  */
 #define SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
 
- /*
+/*
  * @brief Do nothing.
  */
 #define SRC_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING()
