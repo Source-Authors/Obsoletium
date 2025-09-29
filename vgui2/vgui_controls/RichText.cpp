@@ -2037,7 +2037,7 @@ void RichText::InsertString(const char *text)
 
 	// upgrade the ansi text to unicode to display it
 	intp len = V_strlen(text);
-	wchar_t *unicode = (wchar_t *)_alloca((len + 1) * sizeof(wchar_t));
+	wchar_t *unicode = stackallocT(wchar_t, len + 1);
 	Q_UTF8ToUnicode(text, unicode, ((len + 1) * sizeof(wchar_t)));
 	InsertString(unicode);
 }
@@ -2679,9 +2679,9 @@ void RichText::OnTextClicked(const wchar_t *wszText)
 		}
 		else
 		{
-		system()->ShellExecute( "open", ansi );
+			system()->ShellExecute( "open", ansi );
+		}
 	}
-}
 }
 
 //-----------------------------------------------------------------------------
