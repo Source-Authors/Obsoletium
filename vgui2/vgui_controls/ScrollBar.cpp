@@ -400,6 +400,8 @@ void ScrollBar::SetButton(Button *button, int index)
 	if(_button[index]!=nullptr)
 	{
 		_button[index]->SetParent((Panel *)NULL);
+		// dimhotepus: Try to not leak button.
+		_button[index]->MarkForDeletion();
 	}
 	_button[index]=button;
 	_button[index]->SetParent(this);
@@ -428,6 +430,8 @@ void ScrollBar::SetSlider(ScrollBarSlider *slider)
 	if(_slider!=nullptr)
 	{
 		_slider->SetParent((Panel *)NULL);
+		// dimhotepus: Try not to leak slider.
+		_slider->MarkForDeletion();
 	}
 	_slider=slider;
 	_slider->AddActionSignalTarget(this);
