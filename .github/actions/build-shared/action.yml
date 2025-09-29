@@ -34,7 +34,9 @@ runs:
     id: cache-vpc
     uses: actions/cache@v4
     with:
-      path: .\external\vpc\out
+      path: |
+        .\external\vpc\out
+        .\devtools\bin\vpc*
       key: Vpc-${{runner.os}}-${{inputs.platform-name}}-${{ hashFiles('.git\modules\external\vpc\refs\heads\main') }}
 
   - name: Show dependencies SHAs
@@ -47,7 +49,7 @@ runs:
         )
       )
 
-      echo Dependencies SHAs
+      echo Dependencies referenced SHAs
       type dependencies.shas.txt
     shell: cmd
 
@@ -79,6 +81,12 @@ runs:
     working-directory: ${{env.GITHUB_WORKSPACE}}
     if: steps.cache-dependencies.outputs.cache-hit != 'true'
     run: .\build_game_thirdparty.bat ${{inputs.platform-name}}
+    shell: cmd
+
+  - name: Build VPC
+    working-directory: ${{env.GITHUB_WORKSPACE}}
+    if: steps.cache-vpc.outputs.cache-hit != 'true'
+    run: .\build_vpc.bat
     shell: cmd
 
   - name: Generate build version information
