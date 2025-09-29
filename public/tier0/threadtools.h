@@ -90,7 +90,14 @@ constexpr unsigned TT_INFINITE = 0xffffffff; //-V112
 
 #endif // NO_THREAD_LOCAL
 
-using ThreadId_t = unsigned long;
+// dimhotepus: Backport from TF2. Was unsigned long.
+#ifdef PLATFORM_64BITS
+using ThreadId_t = uint64;
+#else
+using ThreadId_t = uint32;
+#endif
+
+constexpr inline ThreadId_t INVALID_THREAD_ID{~ThreadId_t(0)};
 
 //-----------------------------------------------------------------------------
 //
@@ -171,7 +178,7 @@ PLATFORM_INTERFACE bool ThreadJoin( ThreadHandle_t, unsigned timeout = TT_INFINI
 PLATFORM_INTERFACE void ThreadDetach( ThreadHandle_t );
 
 PLATFORM_INTERFACE void ThreadSetDebugName( ThreadId_t id, const char *pszName );
-inline void ThreadSetDebugName( const char *pszName ) { ThreadSetDebugName( static_cast<ThreadId_t>(-1), pszName ); }
+inline void ThreadSetDebugName( const char *pszName ) { ThreadSetDebugName( INVALID_THREAD_ID, pszName ); }
 
 PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, intp nAffinityMask );
 

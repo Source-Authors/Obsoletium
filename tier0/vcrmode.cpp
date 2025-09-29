@@ -1514,9 +1514,9 @@ void* VCR_CreateThread(
 	void *lpStartAddress,
 	void *lpParameter,
 	unsigned long dwCreationFlags,
-	unsigned long *lpThreadID )
+	VCRThreadId_t *lpThreadID )
 {
-	unsigned dwThreadID = 0;
+	VCRThreadId_t dwThreadID = 0;
 
 	// Use _beginthreadex because it sets up C runtime
 	// correctly, and is safer than _beginthread. See MSDN.
