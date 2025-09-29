@@ -11,11 +11,28 @@
 #include <cstring>  // strlen
 #include <utility>  // to_underlying
 
-#if defined(__x86_64__) || defined(_WIN64)
+// dimhotepus: Backport from TF2. Detect the architecture we are running on
+#if defined(__aarch64__) || defined(_M_ARM64)
+#define PLATFORM_ARM 1
+// dimhotepus: ARM64 detection.
+#define PLATFORM_ARM_64 1
+#elif defined(__arm__) || defined(_M_ARM)
+#define PLATFORM_ARM 1
+// dimhotepus: ARM detection.
+#define PLATFORM_ARM_32 1
+#elif defined(_M_X64) || defined(__x86_64__)
+#define PLATFORM_INTEL
+#define PLATFORM_X86 64
+
 /**
  * @brief Defined when x86-64 CPU architecture used.
  */
 #define PLATFORM_64BITS 1
+#elif defined(_M_IX86) || defined(__i386__)
+#define PLATFORM_INTEL
+#define PLATFORM_X86 32
+#else
+#error "Please define your processor architecture."
 #endif
 
 #if defined(__GCC__) || defined(__GNUC__)
