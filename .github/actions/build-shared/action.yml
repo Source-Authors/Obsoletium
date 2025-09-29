@@ -55,7 +55,11 @@ runs:
     id: cache-dependencies
     uses: actions/cache@v4
     with:
-      path: .\thirdparty\**\out
+      path: |
+        .\thirdparty\**\out
+        .\thirdparty\**\*.lib
+        .\thirdparty\**\*.dll
+        .\thirdparty\**\*.exe
       key: Thirdparty-${{runner.os}}-${{inputs.platform-name}}-${{ hashFiles('dependencies.shas.txt') }}
 
   - name: Get build version
