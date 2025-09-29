@@ -449,9 +449,17 @@ constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) n
 	#define  FORCEINLINE_TEMPLATE		__forceinline
 #else
 	#define FORCEINLINE inline __attribute__((always_inline))
-	// GCC 3.4.1 has a bug in supporting forced inline of templated functions
-	// this macro lets us not force inlining in that case
-	#define  FORCEINLINE_TEMPLATE		__forceinline
+	// dimhotepus: TF2 backport. Drop workaround for old GCC.
+	#define FORCEINLINE_TEMPLATE		FORCEINLINE
+#endif
+
+// dimhotepus: TF2 backport.
+#if ( defined(__SANITIZE_ADDRESS__) && __SANITIZE_ADDRESS__ )
+	#define NO_ASAN __attribute__((no_sanitize("address")))
+	#define NO_ASAN_FORCEINLINE NO_ASAN inline
+#else
+	#define NO_ASAN
+	#define NO_ASAN_FORCEINLINE FORCEINLINE
 #endif
 
 // Force a function call site -not- to inlined. (useful for profiling)
