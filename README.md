@@ -145,9 +145,5 @@ license text.
 
 * [PVS-Studio](https://pvs-studio.com/en/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.
 
-## SAST Tools
-
-[PVS-Studio](https://pvs-studio.com/en/pvs-studio/?utm_source=website&utm_medium=github&utm_campaign=open_source) - static analyzer for C, C++, C#, and Java code.
-
 [Code of Conduct]: https://github.com/Source-Authors/Obsoletium/blob/HEAD/docs/contributing/CODE_OF_CONDUCT.md
 [Contributing to the project]: ./CONTRIBUTING.md
