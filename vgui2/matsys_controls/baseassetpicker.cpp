@@ -254,7 +254,7 @@ DirHandle_t CAssetTreeView::RefreshTreeViewItem( intp nItemIndex )
 
 	// Check all children + build a list of children we've already got
 	intp nChildCount = GetNumChildren( nItemIndex );
-	DirHandle_t *pFoundHandles = (DirHandle_t*)_alloca( nChildCount * sizeof(DirHandle_t) );
+	DirHandle_t *pFoundHandles = stackallocT( DirHandle_t, nChildCount );
 	memset( pFoundHandles, 0xFF, nChildCount * sizeof(DirHandle_t) );
 	for ( intp i = 0; i < nChildCount; ++i )
 	{
@@ -515,7 +515,7 @@ void CAssetCache::BuildModList()
 
 	// Add all mods
 	int nLen = g_pFullFileSystem->GetSearchPath( "GAME", false, NULL, 0 );
-	char *pSearchPath = (char*)stackalloc( nLen * sizeof(char) );
+	char *pSearchPath = stackallocT( char, nLen );
 	g_pFullFileSystem->GetSearchPath( "GAME", false, pSearchPath, nLen );
 	char *pPath = pSearchPath;
 	while( pPath )
@@ -857,7 +857,7 @@ CBaseAssetPicker::~CBaseAssetPicker()
 void CBaseAssetPicker::CreateStandardControls( vgui::Panel *pParent, bool bAllowMultiselect )
 {
 	intp nExtCount = 1 + m_ExtraAssetExt.Count();
-	const char **ppExt = (const char **)_alloca( nExtCount * sizeof(const char *) );
+	const char **ppExt = stackallocT( const char*, nExtCount );
 	ppExt[0] = m_pAssetExt;
 	if ( nExtCount > 1 )
 	{
