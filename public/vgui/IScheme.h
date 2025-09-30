@@ -114,6 +114,14 @@ public:
 	virtual int GetProportionalScaledValueEx( HScheme scheme, int normalizedValue ) = 0;
 	virtual int GetProportionalNormalizedValueEx( HScheme scheme, int scaledValue ) = 0;
 
+	// dimhotepus: TF2 backport.
+	int QuickPropScaleCond( bool bScale, HScheme scheme, int normalizedValue )
+	{
+		if ( !bScale )
+			return normalizedValue;
+		return this->GetProportionalScaledValueEx( scheme, normalizedValue );
+	}
+	
 	// Returns true if image evicted, false otherwise
 	virtual bool DeleteImage( const char *pImageName ) = 0;
 };
@@ -121,5 +129,11 @@ public:
 } // namespace vgui
 
 constexpr inline char VGUI_SCHEME_INTERFACE_VERSION[]{"VGUI_Scheme011"};
+
+// dimhotepus: TF2 backport.
+// misyl: Added this to scale much quicker and easier
+// lots of things were broken with scaling.
+// Not a real virtual method etc, just a helper to derp into existing code.
+#define QuickPropScale( x ) ( ::vgui::scheme()->QuickPropScaleCond( this->IsProportional(), this->GetScheme(), ( x ) ) )
 
 #endif // ISCHEME_H

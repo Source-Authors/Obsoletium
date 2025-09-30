@@ -183,7 +183,8 @@ void CClientScoreBoardDialog::PostApplySchemeSettings( vgui::IScheme *pScheme )
 	{
 		int wide, tall;
 		m_pImageList->GetImage(i)->GetSize(wide, tall);
-		m_pImageList->GetImage(i)->SetSize(scheme()->GetProportionalScaledValueEx( GetScheme(),wide), scheme()->GetProportionalScaledValueEx( GetScheme(),tall));
+		// dimhotepus: TF2 scale backport.
+		m_pImageList->GetImage(i)->SetSize(QuickPropScale(wide), QuickPropScale(tall));
 	}
 
 	m_pPlayerList->SetImageList( m_pImageList, false );
@@ -278,15 +279,20 @@ void CClientScoreBoardDialog::Update( void )
 	m_pPlayerList->GetContentSize(wide, tall);
 	tall += GetAdditionalHeight();
 	wide = GetWide();
-	if (m_iDesiredHeight < tall)
+	
+	// dimhotepus: TF2 scale backport.
+	if ( m_bAllowGrowth )
 	{
-		SetSize(wide, tall);
-		m_pPlayerList->SetSize(wide, tall);
-	}
-	else
-	{
-		SetSize(wide, m_iDesiredHeight);
-		m_pPlayerList->SetSize(wide, m_iDesiredHeight);
+		if ( m_iDesiredHeight < tall )
+		{
+			SetSize( wide, tall );
+			m_pPlayerList->SetSize( wide, tall );
+		}
+		else
+		{
+			SetSize( wide, m_iDesiredHeight );
+			m_pPlayerList->SetSize( wide, m_iDesiredHeight );
+		}
 	}
 
 	MoveToCenterOfScreen();
@@ -376,10 +382,11 @@ void CClientScoreBoardDialog::AddHeader()
 	// add the top header
 	m_pPlayerList->AddSection(m_iSectionId, "");
 	m_pPlayerList->SetSectionAlwaysVisible(m_iSectionId);
-	m_pPlayerList->AddColumnToSection(m_iSectionId, "name", "#PlayerName", 0, scheme()->GetProportionalScaledValueEx( GetScheme(),NAME_WIDTH) );
-	m_pPlayerList->AddColumnToSection(m_iSectionId, "frags", "#PlayerScore", 0, scheme()->GetProportionalScaledValueEx( GetScheme(),SCORE_WIDTH) );
-	m_pPlayerList->AddColumnToSection(m_iSectionId, "deaths", "#PlayerDeath", 0, scheme()->GetProportionalScaledValueEx( GetScheme(),DEATH_WIDTH) );
-	m_pPlayerList->AddColumnToSection(m_iSectionId, "ping", "#PlayerPing", 0, scheme()->GetProportionalScaledValueEx( GetScheme(),PING_WIDTH) );
+	// dimhotepus: TF2 scale backport.
+	m_pPlayerList->AddColumnToSection(m_iSectionId, "name", "#PlayerName", 0, QuickPropScale(NAME_WIDTH) );
+	m_pPlayerList->AddColumnToSection(m_iSectionId, "frags", "#PlayerScore", 0, QuickPropScale(SCORE_WIDTH) );
+	m_pPlayerList->AddColumnToSection(m_iSectionId, "deaths", "#PlayerDeath", 0, QuickPropScale(DEATH_WIDTH) );
+	m_pPlayerList->AddColumnToSection(m_iSectionId, "ping", "#PlayerPing", 0, QuickPropScale(PING_WIDTH) );
 }
 
 //-----------------------------------------------------------------------------
@@ -414,11 +421,11 @@ void CClientScoreBoardDialog::AddSection(int teamType, int teamNumber)
 		{
 			m_pPlayerList->AddColumnToSection( m_iSectionId, "avatar", "", SectionedListPanel::COLUMN_IMAGE | SectionedListPanel::COLUMN_RIGHT, m_iAvatarWidth );
 		}
-
-		m_pPlayerList->AddColumnToSection(m_iSectionId, "name", string1, 0, scheme()->GetProportionalScaledValueEx( GetScheme(),NAME_WIDTH) - m_iAvatarWidth );
-		m_pPlayerList->AddColumnToSection(m_iSectionId, "frags", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(),SCORE_WIDTH) );
-		m_pPlayerList->AddColumnToSection(m_iSectionId, "deaths", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(),DEATH_WIDTH) );
-		m_pPlayerList->AddColumnToSection(m_iSectionId, "ping", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(),PING_WIDTH) );
+		// dimhotepus: TF2 scale backport.
+		m_pPlayerList->AddColumnToSection(m_iSectionId, "name", string1, 0, QuickPropScale(NAME_WIDTH) - m_iAvatarWidth );
+		m_pPlayerList->AddColumnToSection(m_iSectionId, "frags", "", 0, QuickPropScale(SCORE_WIDTH) );
+		m_pPlayerList->AddColumnToSection(m_iSectionId, "deaths", "", 0, QuickPropScale(DEATH_WIDTH) );
+		m_pPlayerList->AddColumnToSection(m_iSectionId, "ping", "", 0, QuickPropScale(PING_WIDTH) );
 	}
 	else if ( teamType == TYPE_SPECTATORS )
 	{
@@ -429,8 +436,9 @@ void CClientScoreBoardDialog::AddSection(int teamType, int teamNumber)
 		{
 			m_pPlayerList->AddColumnToSection( m_iSectionId, "avatar", "", SectionedListPanel::COLUMN_IMAGE | SectionedListPanel::COLUMN_RIGHT, m_iAvatarWidth );
 		}
-		m_pPlayerList->AddColumnToSection(m_iSectionId, "name", "#Spectators", 0, scheme()->GetProportionalScaledValueEx( GetScheme(),NAME_WIDTH) - m_iAvatarWidth );
-		m_pPlayerList->AddColumnToSection(m_iSectionId, "frags", "", 0, scheme()->GetProportionalScaledValueEx( GetScheme(),SCORE_WIDTH) );
+		// dimhotepus: TF2 scale backport.
+		m_pPlayerList->AddColumnToSection(m_iSectionId, "name", "#Spectators", 0, QuickPropScale( NAME_WIDTH ) - m_iAvatarWidth );
+		m_pPlayerList->AddColumnToSection(m_iSectionId, "frags", "", 0, QuickPropScale( SCORE_WIDTH ) );
 	}
 }
 
@@ -504,7 +512,9 @@ void CClientScoreBoardDialog::UpdatePlayerAvatar( int playerIndex, KeyValues *kv
 				{
 					CAvatarImage *pImage = new CAvatarImage();
 					pImage->SetAvatarSteamID( steamIDForPlayer );
-					pImage->SetAvatarSize( 32, 32 );	// Deliberately non scaling
+					// dimhotepus: TF2 scale backport.
+					const int nSize = QuickPropScale( 16 );
+					pImage->SetAvatarSize( nSize, nSize );
 					iImageIndex = m_pImageList->AddImage( pImage );
 
 					m_mapAvatarsToImageList.Insert( steamIDForPlayer, iImageIndex );

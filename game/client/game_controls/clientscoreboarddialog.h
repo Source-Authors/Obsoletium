@@ -101,13 +101,17 @@ protected:
 	int m_ReplaySpectators;
 	float m_fNextUpdateTime;
 
+	// dimhotepus: TF2 scale backport.
+	bool m_bAllowGrowth = true;
+	
 	void MoveLabelToFront(const char *textEntryName);
 	void MoveToCenterOfScreen();
 
 	vgui::ImageList				*m_pImageList;
 	CUtlMap<CSteamID,intp>		m_mapAvatarsToImageList;
-
-	CPanelAnimationVar( int, m_iAvatarWidth, "avatar_width", "34" );		// Avatar width doesn't scale with resolution
+	
+	// dimhotepus: TF2 scale backport.
+	CPanelAnimationVarAliasType( int, m_iAvatarWidth, "avatar_width", "18", "proportional_int" );
 	CPanelAnimationVarAliasType( int, m_iNameWidth, "name_width", "136", "proportional_int" );
 	CPanelAnimationVarAliasType( int, m_iClassWidth, "class_width", "35", "proportional_int" );
 	CPanelAnimationVarAliasType( int, m_iScoreWidth, "score_width", "35", "proportional_int" );
