@@ -65,11 +65,11 @@ enum VCRMode_t
 };
 
 // dimhotepus: Backport from TF2. Was unsigned long.
-#ifdef PLATFORM_64BITS
-using VCRThreadId_t = uint64;
-#else
+//#ifdef PLATFORM_64BITS
+//using VCRThreadId_t = uint64;
+//#else
 using VCRThreadId_t = uint32;
-#endif
+//#endif
 
 //-----------------------------------------------------------------------------
 // Functions.

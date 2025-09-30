@@ -91,11 +91,11 @@ constexpr unsigned TT_INFINITE = 0xffffffff; //-V112
 #endif // NO_THREAD_LOCAL
 
 // dimhotepus: Backport from TF2. Was unsigned long.
-#ifdef PLATFORM_64BITS
-using ThreadId_t = uint64;
-#else
+//#ifdef PLATFORM_64BITS
+//using ThreadId_t = uint64;
+//#else
 using ThreadId_t = uint32;
-#endif
+//#endif
 
 constexpr inline ThreadId_t INVALID_THREAD_ID{~ThreadId_t(0)};
 
