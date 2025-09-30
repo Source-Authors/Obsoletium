@@ -912,12 +912,12 @@ void CDownloadManager::StartNewDownload()
 		m_lastPercent = 0;
 
 		// Start the thread
-		DWORD threadID;
+		ThreadId_t threadID;
 		VCRHook_CreateThread(NULL, 0, 
 #ifdef POSIX
 			(void *)
 #endif
-			reinterpret_cast<void*>(DownloadThread), m_activeRequest, 0, (unsigned long int *)&threadID );
+			reinterpret_cast<void*>(DownloadThread), m_activeRequest, 0, &threadID );
 
 		ThreadDetach( ( ThreadHandle_t )static_cast<intp>(threadID) );
 	}
@@ -1055,17 +1055,17 @@ bool CL_IsGamePathValidAndSafeForDownload( const char *pGamePath )
 
 //--------------------------------------------------------------------------------------------------------------
 
-class CDownloadSystem : public IDownloadSystem
+class CDownloadSystem final : public IDownloadSystem
 {
 public:
-	virtual DWORD CreateDownloadThread( RequestContext_t *pContext )
+	ThreadId_t CreateDownloadThread( RequestContext_t *pContext ) override
 	{
-		DWORD nThreadID;
+		ThreadId_t nThreadID;
 		VCRHook_CreateThread(NULL, 0,
 #ifdef POSIX
 		 	(void*)
 #endif
-		 	reinterpret_cast<void*>(DownloadThread), pContext, 0, (unsigned long int *)&nThreadID );
+		 	reinterpret_cast<void*>(DownloadThread), pContext, 0, &nThreadID );
 
 		ThreadDetach( ( ThreadHandle_t )static_cast<intp>(nThreadID) );
 		return nThreadID;

@@ -10,8 +10,8 @@
 
 //----------------------------------------------------------------------------------------
 
-#include "interface.h"
-#include "platform.h"
+#include "tier1/interface.h"
+#include "tier0/threadtools.h"
 
 //----------------------------------------------------------------------------------------
 
@@ -26,7 +26,8 @@ struct RequestContext_t;
 class IDownloadSystem : public IBaseInterface
 {
 public:
-	virtual unsigned long CreateDownloadThread( RequestContext_t *pContext ) = 0;
+	// dimhotepus: unsigned long -> ThreadId_t.
+	virtual ThreadId_t CreateDownloadThread( RequestContext_t *pContext ) = 0;
 };
 
 //----------------------------------------------------------------------------------------
