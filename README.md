@@ -3,6 +3,12 @@
 [![Build](https://github.com/Source-Authors/Obsoletium/actions/workflows/build.yml/badge.svg)](https://github.com/Source-Authors/Obsoletium/actions/workflows/build.yml)
 [![GitHub Repo Size in Bytes](https://img.shields.io/github/repo-size/Source-Authors/Obsoletium.svg)](https://github.com/Source-Authors/Obsoletium)
 
+## Notes
+
+Valve, the Valve logo, Half-Life, the Half-Life logo, the Lambda logo, Steam, the Steam logo, Team Fortress, the Team Fortress logo, Opposing Force, Day of Defeat, the Day of Defeat logo, Counter-Strike, the Counter-Strike logo, Source, the Source logo, Counter-Strike: Condition Zero, Portal, the Portal logo, Dota, the Dota 2 logo, and Defense of the Ancients are trademarks and/or registered trademarks of Valve Corporation. All other trademarks are property of their respective owners. See https://store.steampowered.com/legal for Valve Corporation legal details.
+
+This repo is based on Valve's Source Engine from 2018. Please, use this for studying only, not for commercial purposes.
+See https://partner.steamgames.com/doc/sdk/uploading/distributing_source_engine if you want to distribute something using Source Engine.
 
 ## Prerequisites [Windows]
 
