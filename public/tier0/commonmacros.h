@@ -80,41 +80,6 @@
 #endif
 #endif
 
-//-----------------------------------------------------------------------------
-// Portability casting
-//-----------------------------------------------------------------------------
-// dimhotepus: TF2 & CS:GO backport.
-template <typename Tdst, typename Tsrc>
-[[nodiscard]] inline
-#ifndef DEBUG
-    constexpr
-#endif
-    Tdst
-    size_cast(Tsrc val) noexcept {
-  static_assert(
-      sizeof(Tdst) <= sizeof(uint64) && sizeof(Tsrc) <= sizeof(uint64),
-      "Okay in my defense there weren't any types larger than 64-bits when "
-      "this code was written.");
-
-#ifdef DEBUG
-  if constexpr (sizeof(Tdst) < sizeof(Tsrc)) {
-    Tdst cmpValDst = (Tdst)val;
-
-    // If this fails, the source value didn't actually fit in the destination
-    // value--you'll need to change the return type's size to match the source
-    // type in the calling code.
-    if (val != (Tsrc)cmpValDst) {
-      // Can't use assert here, and if this happens when running on a machine
-      // internally we should crash in preference to missing the problem ( so
-      // not DebuggerBreakIfDebugging() ).
-      DebuggerBreak();
-    }
-  }
-#endif
-
-  return (Tdst)val;
-}
-
 /**
  * @brief Makes a signed 4-byte "packed ID" int out of 4 characters.
  * @param d
