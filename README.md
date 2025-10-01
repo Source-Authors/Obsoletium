@@ -10,7 +10,11 @@ Valve, the Valve logo, Half-Life, the Half-Life logo, the Lambda logo, Steam, th
 This repo is based on Valve's Source Engine from 2018. Please, use this for studying only, not for commercial purposes.
 See https://partner.steamgames.com/doc/sdk/uploading/distributing_source_engine if you want to distribute something using Source Engine.
 
+## Abstract
+
 Obsoletium is an open-source, cross-platform game engine.
+
+The Obsoletium project uses an [open governance model](./GOVERNANCE.md).
 
 Contributors are expected to act in a collaborative manner to move
 the project forward. We encourage the constructive exchange of contrary
@@ -96,6 +100,9 @@ For information on reporting security vulnerabilities in Obsoletium, see
 * [Contributing to the project][]
 
 ## Current project team members
+
+For information about the governance of the Obsoletium project, see
+[GOVERNANCE.md](./GOVERNANCE.md).
 
 ### Collaborators
 
