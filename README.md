@@ -1,6 +1,7 @@
 # Obsoletium
 
 [![Build](https://github.com/Source-Authors/Obsoletium/actions/workflows/build.yml/badge.svg)](https://github.com/Source-Authors/Obsoletium/actions/workflows/build.yml)
+[![Coverity](https://img.shields.io/coverity/scan/32472.svg)](https://scan.coverity.com/projects/source-authors-obsoletium)
 [![Repo Size](https://img.shields.io/github/repo-size/Source-Authors/Obsoletium.svg)](https://github.com/Source-Authors/Obsoletium)
 
 ## Notes
