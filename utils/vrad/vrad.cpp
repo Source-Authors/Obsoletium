@@ -1863,21 +1863,22 @@ void BuildFacesVisibleToLights( bool bAllVisible )
 	aggregate.SetSize( (dvis->numclusters/8) + 1 );
 	memset( aggregate.Base(), 0, aggregate.Count() );
 
-	int nDWords = aggregate.Count() / 4;
-	int nBytes = aggregate.Count() - nDWords*4;
+	intp nDWords = aggregate.Count() / sizeof(uintp);
+	intp nBytes = aggregate.Count() - nDWords*sizeof(uintp);
 
 	for( directlight_t *dl = activelights; dl != NULL; dl = dl->next )
 	{
 		byte *pIn  = dl->pvs;
 		byte *pOut = aggregate.Base();
-		for( int iDWord=0; iDWord < nDWords; iDWord++ )
+		for( intp iDWord=0; iDWord < nDWords; iDWord++ )
 		{
-			*((unsigned long*)pOut) |= *((unsigned long*)pIn);
-			pIn  += 4;
-			pOut += 4;
+			// dimhotepus: Use uintp instead of unsigned long to scale on x86-64.
+			*((uintp*)pOut) |= *((uintp*)pIn);
+			pIn  += sizeof(uintp);
+			pOut += sizeof(uintp);
 		}
 
-		for( int iByte=0; iByte < nBytes; iByte++ )
+		for( intp iByte=0; iByte < nBytes; iByte++ )
 		{
 			*pOut |= *pIn;
 			++pOut;
