@@ -30,7 +30,46 @@ The **Obsoletium** repository on GitHub contains several top-level folders, each
 | **gcsdk**             | Game connection SDK. |
 | **hammer**            | Hammer engine. |
 | **hammer_launcher**   | Hammer app launcher. |
-
-| **README.md**         | A markdown file that provides an overview of the project, including its purpose, how to get started, and other essential information for users and contributors. |
-| **SECURITY.md**       | Contains guidelines for reporting security vulnerabilities and best practices for maintaining security within the project. |
-| **GOVERNANCE.md**     | Outlines the governance model of the project, detailing how decisions are made and how contributors can participate in the project’s direction. |
+| **inputsystem**       | Input handling (keyboard, mouse, joystick, xbox controller). |
+| **ivp**               | Physics engine core. |
+| **launcher**          | Singleplayer app boostrapper. |
+| **launcher_main**     | Singleplayer app. |
+| **lib**               | Temporary object libraries. |
+| **linux**             | Linux makefiles. |
+| **linux_sdk**         | Linux SDK makefiles. |
+| **materialsystem**    | Material system and rendering APIs. |
+| **mathlib**           | Math library. |
+| **mdlib**             | Model library. |
+| **mdobjects**         | Model objects library. |
+| **movieobjects**      | Movie objects library. |
+| **networksystem**     | Network system. |
+| **particles**         | Particles library. |
+| **public**            | Public system headers. |
+| **raytrace**          | Ray tracing. |
+| **replay**            | Replay support. |
+| **scenefilecache**    | Caches scene files. |
+| **sdklauncher**       | Launch SDK project creator. |
+| **serverbrowser**     | Multiplayer server browser. |
+| **sfmobjects**        | Source Film Maker objects. |
+| **soundemittersystem**| Sound emitting system. |
+| **soundsystem**       | Sound system. |
+| **sourceVR**          | Virtual Reality support. |
+| **studiorender**      | High-level renderer. |
+| **thirdparty**        | Thirdparty dependencies. |
+| **tier0**             | 0 tier dependencies. |
+| **tier1**             | 1 tier dependencies. |
+| **tier2**             | 2 tier dependencies. |
+| **tier3**             | 3 tier dependencies. |
+| **togl**              | DirectX -> openGL translator. |
+| **tools**             | Support tools for app. |
+| **tracker**           | Server administration and tracking. |
+| **utils**             | Support utils. |
+| **vgui2**             | Valve GUI. |
+| **vguimatsurface**    | VGUI <-> material system integration. |
+| **video**             | System-dependent video players. |
+| **vpc_scripts**       | VPC build scripts. |
+| **vphysics**          | Valve physics engine. |
+| **vpklib**            | *.vpk read/write library. |
+| **vscript**           | Valve scripting engine. |
+| **vstdlib**           | Valve standard library. |
+| **vtf**               | *.vtf read/write library. |
