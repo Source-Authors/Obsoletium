@@ -1100,8 +1100,8 @@ void CMDLCache::AllocateAnimBlocks( studiodata_t *pStudioData, int nCount )
 	pStudioData->m_pAnimBlock = new DataCacheHandle_t[pStudioData->m_nAnimBlockCount];
 	memset( pStudioData->m_pAnimBlock, 0, sizeof(DataCacheHandle_t) * pStudioData->m_nAnimBlockCount );
 
-	pStudioData->m_iFakeAnimBlockStall = new unsigned long long [pStudioData->m_nAnimBlockCount];
-	memset( pStudioData->m_iFakeAnimBlockStall, 0, sizeof( unsigned long long ) * pStudioData->m_nAnimBlockCount );
+	pStudioData->m_iFakeAnimBlockStall = new uint64 [pStudioData->m_nAnimBlockCount];
+	memset( pStudioData->m_iFakeAnimBlockStall, 0, sizeof( uint64 ) * pStudioData->m_nAnimBlockCount );
 }
 
 void CMDLCache::FreeAnimBlocks( MDLHandle_t handle )

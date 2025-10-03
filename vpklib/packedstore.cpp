@@ -943,7 +943,7 @@ int CPackedStoreReadCache::FindBufferToUse()
 	int idxLRU = 0;
 	auto idxToRemove = m_treeCachedVPKRead.InvalidIndex();
 	// dimhotepus: uint -> ullong as former overflows in 49.7 days.
-	auto uTimeLowest = std::numeric_limits<unsigned long long>::max();
+	auto uTimeLowest = std::numeric_limits<uint64>::max();
 	// find the oldest item, reuse its buffer
 	for ( int i = 0; i < m_cItemsInCache; i++ )
 	{

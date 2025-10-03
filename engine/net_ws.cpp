@@ -1571,7 +1571,8 @@ void NET_ProcessPending( void )
 		bf_read		header( headerBuf, sizeof(headerBuf) );
 
 		int cmd = header.ReadByte();
-		unsigned long challengeNr = header.ReadLong();
+		// dimhotepus: unsigned long -> uint32
+		uint32 challengeNr = header.ReadLong();
 		bool bOK = false;	
 
 		if ( cmd == STREAM_CMD_ACKN )

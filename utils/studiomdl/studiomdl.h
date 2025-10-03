@@ -141,14 +141,16 @@ struct s_boneweight_t
 struct s_tmpface_t
 {
 	int	material;
-	unsigned long		a, b, c;
-	unsigned long		ta, tb, tc;
-	unsigned long		na, nb, nc;
+	// dimhotepus: unsigned long -> uint32
+	uint32 a, b, c;
+	uint32 ta, tb, tc;
+	uint32 na, nb, nc;
 };
 
 struct s_face_t
 {
-	unsigned long		a, b, c;
+	// dimhotepus: unsigned long -> uint32
+	uint32 a, b, c;
 };
 
 

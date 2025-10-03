@@ -189,7 +189,7 @@ ConVar mat_hdr_level( "mat_hdr_level", "2", FCVAR_ARCHIVE,
 MaterialSystem_SortInfo_t *materialSortInfoArray = 0;
 static bool s_bConfigLightingChanged = false;
 
-extern unsigned long GetRam();
+extern unsigned GetRam();
 
 
 //-----------------------------------------------------------------------------

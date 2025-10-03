@@ -653,9 +653,11 @@ void C_ClientRagdoll::Release( void )
 //-----------------------------------------------------------------------------
 // Incremented each frame in InvalidateModelBones. Models compare this value to what it
 // was last time they setup their bones to determine if they need to re-setup their bones.
-static unsigned long	g_iModelBoneCounter = 0;
+// dimhotepus: unsigned long -> uint64.
+static uint64 g_iModelBoneCounter = 0;
 CUtlVector<C_BaseAnimating *> g_PreviousBoneSetups;
-static unsigned long	g_iPreviousBoneCounter = (unsigned)-1;
+// dimhotepus: unsigned long -> uint64.
+static uint64 g_iPreviousBoneCounter = std::numeric_limits<uint64>::max();
 
 class C_BaseAnimatingGameSystem : public CAutoGameSystem
 {
@@ -697,7 +699,7 @@ C_BaseAnimating::C_BaseAnimating() :
 
 	AddBaseAnimatingInterpolatedVars();
 
-	m_iMostRecentModelBoneCounter = 0xFFFFFFFF;
+	m_iMostRecentModelBoneCounter = std::numeric_limits<uint64>::max();
 	m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter - 1;
 	m_flLastBoneSetupTime = -FLT_MAX;
 

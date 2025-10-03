@@ -90,8 +90,9 @@ struct FileJob_t
 	unsigned int			m_nStartOffset;
 	LoaderPriority_t		m_Priority;
 
-	unsigned long long		m_SubmitTime;
-	unsigned long long		m_FinishTime;
+	// dimhotepus: unsigned long -> uint64.
+	uint64					m_SubmitTime;
+	uint64					m_FinishTime;
 	int						m_SubmitTag;
 	int						m_nActualBytesRead;
 	LoaderError_t			m_LoaderError;
@@ -190,8 +191,9 @@ private:
 	bool								m_bDoProgress;
 	bool								m_bSameMap;
 	int									m_nSubmitCount;
-	unsigned long long					m_StartTime;
-	unsigned long long					m_EndTime;
+	// dimhotepus: unsigned long -> uint64.
+	uint64								m_StartTime;
+	uint64								m_EndTime;
 	char								m_szMapNameToCompareSame[MAX_PATH];
 
 	DynamicResourceCallback_t			m_pfnDynamicCallback;
@@ -1204,7 +1206,7 @@ void CQueuedLoader::SpewInfo()
 			FileJob_t *pFileJob = m_SubmittedJobs[iIndex];	
 
 			// dimhotepus: Use mcs as ms overflows in 49.7 days.
-			auto asyncDuration = std::numeric_limits<unsigned long long>::max();
+			auto asyncDuration = std::numeric_limits<uint64>::max();
 			if ( pFileJob->m_FinishTime )
 			{
 				asyncDuration = pFileJob->m_FinishTime - pFileJob->m_SubmitTime;
@@ -1247,7 +1249,7 @@ void CQueuedLoader::SpewInfo()
 			char szFilename[MAX_PATH];
 			Msg( "Submit:%5llums AsyncDuration:%5lldms Tag:%d Thread:%8.8x Size:%7d %s%s\n", 
 					(pFileJob->m_SubmitTime - m_StartTime) / 1000, 
-					static_cast<long long>(asyncDuration != std::numeric_limits<unsigned long long>::max() ? asyncDuration / 1000 : -1), 
+					static_cast<int64>(asyncDuration != std::numeric_limits<uint64>::max() ? asyncDuration / 1000 : -1), 
 					pFileJob->m_SubmitTag,
 					pFileJob->m_ThreadId,
 					pFileJob->m_nActualBytesRead,

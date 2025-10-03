@@ -513,8 +513,9 @@ protected:
 
 	// Is bone cache valid
 	// bone transformation matrix
-	unsigned long					m_iMostRecentModelBoneCounter;
-	unsigned long					m_iMostRecentBoneSetupRequest;
+	// dimhotepus: unsigned long -> uint64.
+	uint64							m_iMostRecentModelBoneCounter;
+	uint64							m_iMostRecentBoneSetupRequest;
 	int								m_iPrevBoneMask;
 	int								m_iAccumulatedBoneMask;
 

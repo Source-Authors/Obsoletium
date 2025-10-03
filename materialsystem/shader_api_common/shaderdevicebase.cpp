@@ -661,7 +661,7 @@ void CShaderDeviceMgrBase::LoadConfig( KeyValues *pKeyValues, KeyValues *pConfig
 //-----------------------------------------------------------------------------
 // Computes amount of ram
 //-----------------------------------------------------------------------------
-static unsigned long GetRam()
+static unsigned GetRam()
 {
 	MemoryInformation info;
 	if ( GetMemoryInformation( &info ) )

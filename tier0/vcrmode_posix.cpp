@@ -211,7 +211,7 @@ static CVCRTrace g_VCRTrace;
 
 static int VCR_Start( char const *pFilename, bool bRecord, IVCRHelpers *pHelpers )
 {
-	unsigned long version;
+	unsigned version;
 
 	g_pHelpers = pHelpers;
 	

@@ -300,7 +300,7 @@ void VCR_TraceEvents() {
 
       case VCREvent_RegQueryValueEx: {
         long ret;
-        unsigned long type, cbData;
+        unsigned type, cbData;
         char dummy;
 
         VCRTrace_ReadVal(ret);
@@ -361,7 +361,7 @@ void VCR_TraceEvents() {
 
       case VCREvent_GetNumberOfConsoleInputEvents: {
         char val;
-        unsigned long nEvents;
+        unsigned nEvents;
 
         VCRTrace_ReadVal(val);
         VCRTrace_ReadVal(nEvents);
@@ -372,7 +372,7 @@ void VCR_TraceEvents() {
 
       case VCREvent_ReadConsoleInput: {
         char val;
-        unsigned long nRead;
+        unsigned nRead;
         INPUT_RECORD recs[1024];
 
         VCRTrace_ReadVal(val);
@@ -523,7 +523,7 @@ int main(int argc, char *argv[]) {
     return 2;
   }
 
-  unsigned long version;
+  unsigned version;
   VCRTrace_ReadVal(version);
 
   if (version != VCRFILE_VERSION) {

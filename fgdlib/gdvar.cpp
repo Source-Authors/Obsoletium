@@ -551,7 +551,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		}
 		
 		// Set the default value.
-		unsigned long nDefault = 0;
+		unsigned nDefault = 0;
 		for (const auto &i : m_Items)
 		{
 			if (i.bDefault)

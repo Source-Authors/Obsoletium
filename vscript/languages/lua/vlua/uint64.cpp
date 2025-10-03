@@ -254,7 +254,7 @@ int uint64_togglebit( lua_State *pState )
 		return luaL_argerror( pState, 2, err );
 	}
 
-	const unsigned long long bitMask = 1ULL << n;
+	const uint64 bitMask = 1ULL << n;
 
 	lua_pushinteger( pState,
 		FBitSet( v1.value, bitMask ) ? CLEARBITS( v1.value, bitMask ) : SETBITS( v1.value, bitMask ) );

@@ -5668,7 +5668,7 @@ bool CModelLoader::CancelDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod 
 
 void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
 {
-	const unsigned long long now = Plat_USTime() / 1000;
+	const uint64 now = Plat_USTime() / 1000;
 	const uint delay = bIgnoreTime ? 0 : (int)( clamp( mod_dynamicunloadtime.GetFloat(), 1.f, 600.f ) * 1000 );
 
 	UpdateDynamicModelLoadQueue();
@@ -5687,7 +5687,7 @@ void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
 
 		// UNLOAD THIS MODEL if zero refcount and not currently loading, and either timed out or never loaded
 		if ( dyn.m_iRefCount <= 0 && !(dyn.m_nLoadFlags & CDynamicModelInfo::LOADING) &&
-			 ( ( now - ((unsigned long long)dyn.m_uLastTouchedMS_Div256 << 8) ) >= delay || !( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) ) )
+			 ( ( now - ((uint64)dyn.m_uLastTouchedMS_Div256 << 8) ) >= delay || !( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) ) )
 		{
 			// Remove from load queue
 			if ( dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED )

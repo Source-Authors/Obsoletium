@@ -1344,27 +1344,28 @@ int32x4_t
 	return (unsigned char) nResult;
 }
 
-[[nodiscard]] FORCEINLINE unsigned long XM_CALLCONV RoundFloatToUnsignedLong(float f)
+// dimhotepus: unsigned long -> unsigned.
+[[nodiscard]] FORCEINLINE unsigned XM_CALLCONV RoundFloatToUnsignedLong(float f)
 {
 #if defined( PLATFORM_WINDOWS_PC64 )
 	uint nRet = ( uint ) f;
 	if ( nRet & 1 )
 	{
-		if ( ( f - floor( f ) >= 0.5 ) )
+		if ( ( f - floor( f ) >= 0.5f ) )
 		{
 			nRet++;
 		}
 	}
 	else
 	{
-		if ( ( f - floor( f ) > 0.5 ) )
+		if ( ( f - floor( f ) > 0.5f ) )
 		{
 			nRet++;
 		}
 	}
 	return nRet;
 #else // PLATFORM_WINDOWS_PC64
-	alignas(unsigned long) unsigned char nResult[8];
+	alignas(unsigned) unsigned char nResult[8];
 
 	#if defined( _WIN32 )
 		__asm
@@ -1378,7 +1379,7 @@ int32x4_t
 		);
 	#endif
 
-	return *((unsigned long*)nResult);
+	return *((unsigned*)nResult);
 #endif // PLATFORM_WINDOWS_PC64
 }
 
