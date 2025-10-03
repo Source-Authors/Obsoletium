@@ -34,35 +34,7 @@
 #include "studiobyteswap.h"
 #include "filesystem/IQueuedLoader.h"
 
-// XXX remove this later. (henryg)
-#if 0 && defined(_DEBUG) && defined(_WIN32) && !defined(_X360)
-typedef struct LARGE_INTEGER { unsigned long long QuadPart; } LARGE_INTEGER;
-extern "C" void __stdcall OutputDebugStringA( const char *lpOutputString );
-extern "C" long __stdcall QueryPerformanceCounter( LARGE_INTEGER *lpPerformanceCount );
-extern "C" long __stdcall QueryPerformanceFrequency( LARGE_INTEGER *lpPerformanceCount );
-namespace {
-	class CDebugMicroTimer
-	{
-	public:
-		CDebugMicroTimer(const char* n) : name(n) { QueryPerformanceCounter(&start); }
-		~CDebugMicroTimer() {
-			LARGE_INTEGER end;
-			char outbuf[128];
-			QueryPerformanceCounter(&end);
-			if (!freq) QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
-			V_snprintf(outbuf, 128, "%s %6d us\n", name, (int)((end.QuadPart - start.QuadPart) * 1000000 / freq));
-			OutputDebugStringA(outbuf);
-		}
-		LARGE_INTEGER start;
-		const char* name;
-		static long long freq;
-	};
-	long long CDebugMicroTimer::freq = 0;
-}
-#define DEBUG_SCOPE_TIMER(name) CDebugMicroTimer dbgLocalTimer(#name)
-#else
 #define DEBUG_SCOPE_TIMER(name) (void)0
-#endif
 
 #ifdef _RETAIL
 #define NO_LOG_MDLCACHE 1
@@ -121,7 +93,7 @@ struct studiodata_t
 	// array of cache handles to demand loaded virtual model data
 	int					m_nAnimBlockCount;
 	DataCacheHandle_t	*m_pAnimBlock;
-	unsigned long long 	*m_iFakeAnimBlockStall;
+	uint64 				*m_iFakeAnimBlockStall;
 
 	// vertex data is usually compressed to save memory (model decal code only needs some data)
 	DataCacheHandle_t	m_VertexCache;
@@ -1260,7 +1232,7 @@ unsigned char *CMDLCache::GetAnimBlock( MDLHandle_t handle, intp nBlock )
 	if (mod_load_fakestall.GetInt())
 	{
 		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
-		unsigned long long t = Plat_USTime();
+		uint64 t = Plat_USTime();
 		if (pStudioData->m_iFakeAnimBlockStall[nBlock] == 0 || pStudioData->m_iFakeAnimBlockStall[nBlock] > t)
 		{
 			pStudioData->m_iFakeAnimBlockStall[nBlock] = t;
