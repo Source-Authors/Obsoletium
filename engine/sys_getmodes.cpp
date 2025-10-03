@@ -1067,16 +1067,6 @@ typedef struct tagRGBQUAD {
 #define BI_RLE4       2L
 #define BI_BITFIELDS  3L
 
-#if 0
-typedef struct _GUID
-{
-    unsigned long Data1;
-    unsigned short Data2;
-    unsigned short Data3;
-    unsigned char Data4[8];
-} GUID;
-
-#endif
 typedef GUID UUID;
 
 #endif //WIN32
