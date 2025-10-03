@@ -956,7 +956,7 @@ static void FlipFacing(s_source_t *pSrc) {
       s_face_t &f = pSrc->face[pMesh->faceoffset + j];
 
       // dimhotepus: Original code used swap with unsigned short variable which
-      // causes leaks as f.b/f.c are unsigned long.
+      // causes leaks as f.b/f.c are uint32.
       std::swap(f.b, f.c);
     }
   }

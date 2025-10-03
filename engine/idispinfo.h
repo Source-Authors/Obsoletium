@@ -130,7 +130,7 @@ void			DispInfo_ClearAllTags( HDISPINFOARRAY hArray );
 
 // Call this to render a list of displacements.
 // If bOrtho is true, then no backface removal is done on dispinfos.
-void			DispInfo_RenderList( int nSortGroup, SurfaceHandle_t *pList, int listCount, bool bOrtho, unsigned long flags, ERenderDepthMode DepthMode );
+void			DispInfo_RenderList( int nSortGroup, SurfaceHandle_t *pList, int listCount, bool bOrtho, unsigned flags, ERenderDepthMode DepthMode );
 
 
 // This should be called from Map_LoadDisplacements (while the map file is open).

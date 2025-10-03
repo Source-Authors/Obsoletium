@@ -38,11 +38,11 @@ static constexpr inline float THUMBNAIL_SAFE_ZONE_HEIGHT_SCALE = (float)THUMBNAI
 //-----------------------------------------------------------------------------
 float GetAutoPlayTime( void )
 {
-	static unsigned long long g_prevTicks;
+	static uint64 g_prevTicks;
 	static float g_time;
 
 	// dimhotepus: ms -> mcs to not overflow in 49.7 days.
-	unsigned long long ticks = Plat_USTime();
+	uint64 ticks = Plat_USTime();
 
 	// limit delta so that float time doesn't overflow
 	if (g_prevTicks == 0)

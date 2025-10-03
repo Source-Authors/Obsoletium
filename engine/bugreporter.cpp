@@ -125,7 +125,7 @@ static ConVar bugreporter_uploadasync( "bugreporter_uploadasync", "0", FCVAR_ARC
 
 using namespace vgui;
 
-unsigned long GetRam()
+unsigned GetRam()
 {
 	MemoryInformation info;
 	if (GetMemoryInformation(&info))
@@ -1922,7 +1922,7 @@ void CBugUIPanel::OnSubmit()
 		char gd[ 256 ];
 		Q_FileBase( com_gamedir, gd );
 		buginfo.Printf( "GameDirectory:  %s\n", gd );
-		buginfo.Printf( "Ram:  %lu\n", GetRam() );
+		buginfo.Printf( "Ram:  %u\n", GetRam() );
 		buginfo.Printf( "CPU:  %i\n", (int)fFrequency );
 		buginfo.Printf( "Processor Vendor:  %s\n", pi.m_szProcessorID );
 		buginfo.Printf( "Processor Name:  %s\n", pi.m_szProcessorBrand );

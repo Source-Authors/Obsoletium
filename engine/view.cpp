@@ -377,7 +377,7 @@ public:
 		g_EngineRenderer->BuildWorldLists( pList, pInfo, iForceFViewLeaf, pVisData, bShadowDepth, pReflectionWaterHeight );
 	}
 
-	void DrawWorldLists( IWorldRenderList *pList, unsigned long flags, float waterZAdjust )
+	void DrawWorldLists( IWorldRenderList *pList, unsigned flags, float waterZAdjust )
 	{
 		g_EngineRenderer->DrawWorldLists( pList, flags, waterZAdjust );
 	}
@@ -408,12 +408,12 @@ public:
 		// R_DrawMaskEntities()
 	}
 
-	void DrawTranslucentSurfaces( IWorldRenderList *pList, int sortIndex, unsigned long flags, bool bShadowDepth )
+	void DrawTranslucentSurfaces( IWorldRenderList *pList, int sortIndex, unsigned flags, bool bShadowDepth )
 	{
 		Shader_DrawTranslucentSurfaces( pList, sortIndex, flags, bShadowDepth );
 	}
 
-	bool LeafContainsTranslucentSurfaces( IWorldRenderList *pList, int sortIndex, unsigned long flags )
+	bool LeafContainsTranslucentSurfaces( IWorldRenderList *pList, int sortIndex, unsigned flags )
 	{
 		return Shader_LeafContainsTranslucentSurfaces( pList, sortIndex, flags );
 	}
