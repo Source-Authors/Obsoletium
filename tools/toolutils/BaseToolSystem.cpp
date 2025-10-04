@@ -1128,7 +1128,8 @@ CMiniViewport *CBaseToolSystem::CreateMiniViewport( vgui::Panel *parent )
 	int w, h;
 	surface()->GetScreenSize( w, h );
 
-	CMiniViewport *vp = new CMiniViewport( parent, "MiniViewport" );
+	// dimhotepus: Fix view port initialization.
+	CMiniViewport *vp = new CMiniViewport( parent, true, nullptr, nullptr, "MiniViewport" );
 	Assert( vp );
 	vp->SetVisible( true );
 	// dimhotepus: Scale UI.
