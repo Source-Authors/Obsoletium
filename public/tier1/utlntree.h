@@ -119,7 +119,7 @@ protected:
 	}
 	
 	// copy constructors not allowed
-	CUtlNTree( CUtlNTree<T, I> const& tree ) { Assert(0); }
+	CUtlNTree( CUtlNTree<T, I> const& tree ) = delete;
 	   
 	CUtlMemory<Node_t> m_Memory;
 	I	m_Root;
