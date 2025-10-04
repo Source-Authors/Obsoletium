@@ -121,7 +121,7 @@ bool CActBusyDoc::LoadFromFile( const char *pFileName )
 
 void CActBusyDoc::SaveToFile( )
 {
-	if ( m_hRoot.Get() && m_pFileName && m_pFileName[0] )
+	if ( m_hRoot.Get() && !Q_isempty( m_pFileName ) )
 	{
 		g_pDataModel->SaveToFile( m_pFileName, NULL, "keyvalues", "actbusy", m_hRoot );
 	}
