@@ -647,7 +647,7 @@ protected:
 protected:
 	// this really only makes sense for some of our subclasses, basically those which have float data
 	// anything else's threshhold is almost certainly 0, and that class just ignores m_threshold
-	float m_threshold;
+	float m_threshold{0.0f};
 
 	CDmaVar< bool >	m_UseDefaultValue;
 	CDmaVar< T >	m_DefaultValue;

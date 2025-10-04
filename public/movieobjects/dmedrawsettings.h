@@ -133,7 +133,7 @@ protected:
 	CUtlRBTree< CUtlSymbol > m_NotDrawable;
 
 	CUtlStack< DrawType_t > m_drawTypeStack;
-	bool m_IsAMaterialBound;
+	bool m_IsAMaterialBound{false};
 
 	// Points to highlight
 	CUtlVector< Vector > m_vHighlightPoints;

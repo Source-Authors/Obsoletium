@@ -73,7 +73,7 @@ private:
 	void UpdateMDL();
 
 	CMDL m_MDL;
-	bool m_bDrawInEngine;
+	bool m_bDrawInEngine{false};
 };
 
 #endif // DMEMDL_H

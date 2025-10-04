@@ -68,7 +68,7 @@ private:
 	CDmElement *CreateOutputElement( ) override;
 	void DestroyOutputElement( CDmElement *pOutput ) override;
 	const char *GetOutputDirectoryID() override { return "makefiledir:..\\dmx"; }
-	bool m_bFlushFile;
+	bool m_bFlushFile{false};
 };
 
 

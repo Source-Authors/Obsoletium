@@ -38,7 +38,7 @@ protected:
 	// Debuggin
 	CDmaVar< bool >  m_bSpewResult;
 
-	float m_flDefaultValue;
+	float m_flDefaultValue{FLT_MAX};
 };
 
 

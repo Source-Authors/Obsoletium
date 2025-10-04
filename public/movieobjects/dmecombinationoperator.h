@@ -410,7 +410,7 @@ private:
 	CUtlVector< DominatorInfo_t > m_DominatorInfo;
 
 	// dimhotepus: float -> double.
-	double m_flLastLaggedComputationTime;
+	double m_flLastLaggedComputationTime{DBL_MIN};
 };
 
 

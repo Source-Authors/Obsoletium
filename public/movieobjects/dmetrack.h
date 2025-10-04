@@ -158,7 +158,7 @@ private:
 	CDmaVar< int >	m_ClipType;
 
 	CUtlFlags< unsigned char > m_Flags;
-	DmElementHandle_t m_hOwner;
+	DmElementHandle_t m_hOwner{DMELEMENT_HANDLE_INVALID};
 
 	static DmElementHandle_t m_hSoloTrack[DMECLIP_TYPE_COUNT];
 
