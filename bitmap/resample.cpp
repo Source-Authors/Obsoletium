@@ -394,7 +394,7 @@ public:
 		int nInitialY = (hratio >> 1) - ((hratio * kernel.m_nDiameter) >> 1);
 		int nInitialX = (wratio >> 1) - ((wratio * kernel.m_nDiameter) >> 1);
 
-		float flAlphaThreshhold = (info.m_flAlphaHiFreqThreshhold >= 0 ) ? 255.0f * info.m_flAlphaHiFreqThreshhold : 255.0f * 0.4f;
+		float flAlphaThreshhold = (info.m_flAlphaHiFreqThreshhold >= 0.0f) ? 255.0f * info.m_flAlphaHiFreqThreshhold : 255.0f * 0.4f;
 
 		float flInvFactor = (dratio == 0) ? 1.0f / (hratio * wratio) : 1.0f / (hratio * wratio * dratio);
 
@@ -452,7 +452,7 @@ public:
 		int nInitialY = (hratio >> 1) - ((hratio * kernel.m_nDiameter) >> 1);
 		int nInitialX = (wratio >> 1) - ((wratio * kernel.m_nDiameter) >> 1);
 
-		float flAlphaThreshhold = (info.m_flAlphaThreshhold >= 0 ) ? 255.0f * info.m_flAlphaThreshhold : 255.0f * 0.4f;
+		float flAlphaThreshhold = (info.m_flAlphaThreshhold >= 0.0f) ? 255.0f * info.m_flAlphaThreshhold : 255.0f * 0.4f;
 		for ( int k = 0; k < info.m_nDestDepth; ++k )
 		{
 			int startZ = dratio * k + nInitialZ;
