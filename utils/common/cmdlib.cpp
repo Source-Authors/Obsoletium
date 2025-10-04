@@ -637,18 +637,14 @@ int LoadFile(const char *filename, void **bufferptr) {
   unsigned length = 0;
 
   FileHandle_t f = SafeOpenRead(filename);
-  if (f) {
-    length = Q_filelength(f);
+  length = Q_filelength(f);
 
-    void *buffer = malloc(length + 1);
-    ((char *)buffer)[length] = 0;
-    SafeRead(f, buffer, length);
-    g_pFileSystem->Close(f);
+  void *buffer = malloc(length + 1);
+  ((char *)buffer)[length] = 0;
+  SafeRead(f, buffer, length);
+  g_pFileSystem->Close(f);
 
-    *bufferptr = buffer;
-  } else {
-    *bufferptr = nullptr;
-  }
+  *bufferptr = buffer;
 
   return length;
 }
