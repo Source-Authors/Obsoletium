@@ -1401,7 +1401,7 @@ static void UnserializeOcclusionLumpV2( CUtlBuffer &buf )
 	{
 		if ( g_bSwapOnLoad )
 		{
-			g_Swap.SwapBufferToTargetEndian( (int*)buf.PeekGet(), (int*)buf.PeekGet(), nCount );
+			g_Swap.SwapBufferToTargetEndian( (int*)buf.PeekGet(), (const int*)buf.PeekGet(), nCount );
 		}
 		g_OccluderVertexIndices.SetCount( nCount );
 		buf.Get( g_OccluderVertexIndices.Base(), nCount * sizeof(g_OccluderVertexIndices[0]) );
@@ -5090,8 +5090,8 @@ static thread_local dheader_t *s_sort_header;
 // compare function for qsort below
 static int LumpOffsetCompare( const void *pElem1, const void *pElem2 )
 {
-	int lump1 = *(byte *)pElem1;
-	int lump2 = *(byte *)pElem2;
+	const int lump1 = *(const byte *)pElem1;
+	const int lump2 = *(const byte *)pElem2;
 
 	if ( lump1 != lump2 )
 	{
