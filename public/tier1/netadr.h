@@ -47,9 +47,9 @@ public:
 	// DON'T CALL THIS
 	[[nodiscard]] const char*		ToString( bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
 
-	void	ToString( char *pchBuffer, size_t unBufferSize, bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
+	void	ToString( OUT_Z_CAP(unBufferSize) char *pchBuffer, size_t unBufferSize, bool onlyBase = false ) const; // returns xxx.xxx.xxx.xxx:ppppp
 	template< size_t maxLenInChars >
-	void	ToString_safe( char (&pDest)[maxLenInChars], bool onlyBase = false ) const
+	void	ToString_safe( OUT_Z_ARRAY char (&pDest)[maxLenInChars], bool onlyBase = false ) const
 	{
 		ToString( &pDest[0], maxLenInChars, onlyBase );
 	}
@@ -94,26 +94,26 @@ class CUtlNetAdrRender
 public:
 	CUtlNetAdrRender( const netadr_t &obj, bool bBaseOnly = false )
 	{
-		obj.ToString( m_rgchString, sizeof(m_rgchString), bBaseOnly );
+		obj.ToString_safe( m_rgchString, bBaseOnly );
 	}
 
 	CUtlNetAdrRender( uint32 unIP )
 	{
 		netadr_t addr( unIP, 0 );
-		addr.ToString( m_rgchString, sizeof(m_rgchString), true );
+		addr.ToString_safe( m_rgchString, true );
 	}
 
 	CUtlNetAdrRender( uint32 unIP, uint16 unPort )
 	{
 		netadr_t addr( unIP, unPort );
-		addr.ToString( m_rgchString, sizeof(m_rgchString), false );
+		addr.ToString_safe( m_rgchString, false );
 	}
 
 	CUtlNetAdrRender( const struct sockaddr &s )
 	{
 		netadr_t addr;
 		if ( addr.SetFromSockadr( &s ) )
-			addr.ToString( m_rgchString, sizeof(m_rgchString), false );
+			addr.ToString_safe( m_rgchString, false );
 		else
 			m_rgchString[0] = '\0';
 	}
