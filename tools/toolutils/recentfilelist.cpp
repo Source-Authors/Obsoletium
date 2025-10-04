@@ -100,7 +100,7 @@ void CRecentFileList::LoadFromRegistry( const char *pToolKeyName )
 		// NOTE: Can't call registry->ReadString twice in a row!
 		char pFileName[MAX_PATH];
 		V_strcpy_safe( pFileName, registry->ReadString( sz, "" ) );
-		if ( pFileName && pFileName[ 0 ] )
+		if ( !Q_isempty( pFileName ) )
 		{
 			const char *valType = registry->ReadString( szType, "" );
 			const char *pFormat = (valType && valType[0]) ? valType : "dmx";
