@@ -720,7 +720,7 @@ skipspace:
 					// Only add the first set of glob matches from the first base path
 					for ( intp j = 0; j < findFileList.Count(); ++j )
 					{
-						AddScriptToStack( const_cast< char * >( findFileList[j].String() ) );
+						AddScriptToStack( findFileList[j].String() );
 					}
 
 					break;
