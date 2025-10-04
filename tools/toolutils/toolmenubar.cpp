@@ -69,12 +69,13 @@ void CToolMenuBar::PerformLayout()
 
 	int cw, ch;
 	m_pInfo->GetContentSize( cw, ch );
-
-	int right = w - cw - 20;
+	
+	// dimhotepus: Scale UI.
+	int right = w - cw - QuickPropScale( 20 );
 	m_pInfo->SetBounds( right, 0, cw, h );
 
 	m_pToolName->GetContentSize( cw, ch );
-	m_pToolName->SetBounds( right - cw - 5, 0, cw, h );
+	m_pToolName->SetBounds( right - cw - QuickPropScale( 5 ), 0, cw, h );
 }
 
 
@@ -115,15 +116,16 @@ void CToolFileMenuBar::PerformLayout()
 	int cw, ch;
 	m_pInfo->GetContentSize( cw, ch );
 
-	int right = w - cw - 20;
+	// dimhotepus: Scale UI.
+	int right = w - cw - QuickPropScale( 20 );
 
 	m_pToolName->GetContentSize( cw, ch );
 
 	int barx, bary;
 	GetContentSize( barx, bary );
 
-	int faredge = right - cw - 5- 2;
-	int nearedge = barx + 2;
+	int faredge = right - cw - QuickPropScale( 5 + 2 );
+	int nearedge = barx + QuickPropScale( 2 );
 
 	int mid = ( nearedge + faredge ) * 0.5f;
 

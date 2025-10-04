@@ -47,7 +47,7 @@ const char *CActBusyDoc::GetFileName()
 
 void CActBusyDoc::SetFileName( const char *pFileName )
 {
-	Q_strncpy( m_pFileName, pFileName, sizeof( m_pFileName ) );
+	V_strcpy_safe( m_pFileName, pFileName );
 	SetDirty( true );
 }
 
@@ -76,7 +76,7 @@ void CActBusyDoc::CreateNew()
 	// This is not undoable
 	CDisableUndoScopeGuard guard;
 
-	Q_strncpy( m_pFileName, "untitled", sizeof( m_pFileName ) );
+	V_strcpy_safe( m_pFileName, "untitled" );
 	DmFileId_t fileid = g_pDataModel->FindOrCreateFileId( m_pFileName );
 
 	// Create the main element
@@ -104,7 +104,7 @@ bool CActBusyDoc::LoadFromFile( const char *pFileName )
 	SetDirty( false );
 	m_hRoot = NULL;
 
-	Q_strncpy( m_pFileName, pFileName, sizeof( m_pFileName ) );
+	V_strcpy_safe( m_pFileName, pFileName );
 	if ( !m_pFileName[0] )
 		return false;
 

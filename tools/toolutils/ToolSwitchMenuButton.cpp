@@ -25,7 +25,7 @@ class CToolSwitchMenuButton : public CToolMenuButton
 
 public:
 	CToolSwitchMenuButton( vgui::Panel *parent, const char *panelName, const char *text, vgui::Panel *pActionTarget );
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 };
 
 
@@ -63,7 +63,7 @@ void CToolSwitchMenuButton::OnShowMenu(vgui::Menu *menu)
 		char const *toolname = enginetools->GetToolName( i );
 
 		char toolcmd[ 32 ];
-		Q_snprintf( toolcmd, sizeof( toolcmd ), "OnTool%i", i );
+		V_sprintf_safe( toolcmd, "OnTool%i", i );
 
 		int id = AddCheckableMenuItem( toolname, toolname, new KeyValues ( "Command", "command", toolcmd ), m_pActionTarget );
 		m_pMenu->SetItemEnabled( id, true );

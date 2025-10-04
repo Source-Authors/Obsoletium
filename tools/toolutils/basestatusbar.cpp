@@ -34,7 +34,7 @@ CBaseStatusBar::CBaseStatusBar( vgui::Panel *parent, char const *panelName )
 
 	MakePopup( false );
 
-	UpdateMemoryUsage( 9.999 );
+	UpdateMemoryUsage( 9.999f );
 }
 
 //-----------------------------------------------------------------------------
@@ -50,36 +50,37 @@ void CBaseStatusBar::PerformLayout()
 
 	int oldw = w;
 
-	w *= 0.45f;
+	w = w * 45 / 100;
 
-	int x = 8;
+	// dimhotepus: Scale UI.
+	int x = QuickPropScale( 8 );
 
 	int cw, ch;
 	m_pLabel->GetContentSize( cw, ch );
-	m_pLabel->SetBounds( x, 4, cw, h - 8 );
+	m_pLabel->SetBounds( x, QuickPropScale( 4 ), cw, h - QuickPropScale( 8 ) );
 
-	x += cw + 4;
+	x += cw + QuickPropScale( 4 );
 
-	int consoleWide = w - x - 8;
+	int consoleWide = w - x - QuickPropScale( 8 );
 
-	m_pConsole->SetBounds( x, 2, consoleWide, h - 4 );
+	m_pConsole->SetBounds( x, QuickPropScale( 2 ), consoleWide, h - QuickPropScale( 4 ) );
 
-	x += consoleWide + 4;
+	x += consoleWide + QuickPropScale( 4 );
 
-	int infoW = 85;
+	int infoW = QuickPropScale( 85 );
 
-	int rightx = oldw - infoW - 10;
-	m_pFPS->SetBounds( rightx, 2, infoW - 2 - 10, h - 8 );
+	int rightx = oldw - infoW - QuickPropScale( 10 );
+	m_pFPS->SetBounds( rightx, QuickPropScale( 2 ), infoW - QuickPropScale( 2 + 10 ), h - QuickPropScale( 8 ) );
 	rightx -= infoW;
-	m_pGameTime->SetBounds( rightx, 2, infoW - 2, h - 8 );
+	m_pGameTime->SetBounds( rightx, QuickPropScale( 2 ), infoW - QuickPropScale( 2 ), h - QuickPropScale( 8 ) );
 	rightx -= infoW;
-	m_pMemory->SetBounds( rightx, 2, infoW - 2, h - 8 );
+	m_pMemory->SetBounds( rightx, QuickPropScale( 2 ), infoW - QuickPropScale( 2 ), h - QuickPropScale( 8 ) );
 }
 
 void CBaseStatusBar::UpdateMemoryUsage( float mbUsed )
 {
 	char mem[ 256 ];
-	Q_snprintf( mem, sizeof( mem ), "[mem: %.2f Mb]", mbUsed );
+	V_sprintf_safe( mem, "[mem: %.2f Mb]", mbUsed );
 	m_pMemory->SetText( mem );
 }
 
@@ -111,7 +112,7 @@ void CBaseStatusBar::OnThink()
 	float curtime = enginetools->GetRealTime();
 
 	char gt[ 32 ];
-	Q_snprintf( gt, sizeof( gt ), "[game: %.3f]", enginetools->ServerTime() );
+	V_sprintf_safe( gt, "[game: %.3f]", enginetools->ServerTime() );
 	m_pGameTime->SetText( gt );
 
 	float elapsed = curtime - m_flLastFPSSnapShot;
@@ -128,14 +129,14 @@ void CBaseStatusBar::OnThink()
 	else
 	{
 		char fps[ 32 ];
-		Q_snprintf( fps, sizeof( fps ), "[fps:  %.1f]", 1.0f / ft );
+		V_sprintf_safe( fps, "[fps:  %.1f]", 1.0f / ft );
 		m_pFPS->SetText( fps );
 	}
 
 	UpdateMemoryUsage( GetMemoryUsage() );
 }
 
-#include <windows.h>
+#include "winlite.h"
 #include <psapi.h>
 static float GetMemoryUsage()
 {

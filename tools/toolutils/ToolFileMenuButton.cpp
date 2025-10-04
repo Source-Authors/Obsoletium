@@ -13,7 +13,8 @@
 #include "vgui_controls/button.h"
 #include "vgui_controls/listpanel.h"
 #include "toolutils/enginetools_int.h"
-#include "p4lib/ip4.h"
+// dimhotepus: Drop p4.
+// #include "p4lib/ip4.h"
 #include "vgui_controls/perforcefilelistframe.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -106,7 +107,8 @@ void CToolFileMenuButton::OnShowMenu( vgui::Menu *menu )
 	}
 
 	// We only have the Perforce menu items if we have valid p4 interface
-	if ( p4 )
+	// dimhotepus: Drop p4.
+	/*if ( p4 )
 	{
 		bool bP4Connected = p4->IsConnectedToServer();
 		char pPerforceFile[MAX_PATH];
@@ -132,7 +134,7 @@ void CToolFileMenuButton::OnShowMenu( vgui::Menu *menu )
 			m_pPerforce->SetItemEnabled( m_nPerforceP4Win, false );
 			m_pPerforce->SetItemEnabled( m_nPerforceListOpenFiles, bP4Connected );
 		}
-	}
+	}*/
 }
 
 
@@ -204,10 +206,11 @@ void CToolFileMenuButton::OnPerforceP4Win( )
 	char pPerforceFile[MAX_PATH];
 	if ( m_pFileMenuCallback->GetPerforceFileName( pPerforceFile, sizeof(pPerforceFile) ) )
 	{
-		if ( p4->IsFileInPerforce( pPerforceFile ) )
-		{
-			p4->OpenFileInP4Win( pPerforceFile );
-		}
+		// dimhotepus: Drop p4.
+		//if ( p4->IsFileInPerforce( pPerforceFile ) )
+		//{
+		//	p4->OpenFileInP4Win( pPerforceFile );
+		//}
 	}
 }
 
@@ -217,7 +220,8 @@ void CToolFileMenuButton::OnPerforceP4Win( )
 //-----------------------------------------------------------------------------
 void CToolFileMenuButton::OnPerforceListOpenFiles( )
 {
-	CUtlVector<P4File_t> openedFiles;
+	// dimhotepus: Drop p4.
+	/*CUtlVector<P4File_t> openedFiles;
 	p4->GetOpenedFileListInPath( "GAME", openedFiles );
 	COperationFileListFrame *pOpenedFiles = new COperationFileListFrame( m_pFileMenuCallback->GetRootPanel(), "Opened Files In Perforce", "File Name", false, true );
 
@@ -247,5 +251,5 @@ void CToolFileMenuButton::OnPerforceListOpenFiles( )
 		}
 	}
 
-	pOpenedFiles->DoModal( );
+	pOpenedFiles->DoModal( );*/
 }

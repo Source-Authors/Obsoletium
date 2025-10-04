@@ -45,7 +45,7 @@ class CMiniViewportPropertyPage : public vgui::EditablePanel
 public:
 	CMiniViewportPropertyPage( Panel *parent, const char *panelName );
 
-	virtual Color GetBgColor();
+	Color GetBgColor() override;
 
 	void	GetEngineBounds( int& x, int& y, int& w, int& h );
 
@@ -54,7 +54,7 @@ public:
 	CMiniViewportEngineRenderArea *GetViewportArea() { return m_pViewportArea; }
 
 private:
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	Color	m_bgColor;
 
@@ -74,9 +74,9 @@ public:
 	CMiniViewportEngineRenderArea( Panel *parent, const char *panelName );
 	~CMiniViewportEngineRenderArea();
 
-	virtual void PaintBackground();
+	void PaintBackground() override;
 	virtual void GetEngineBounds( int& x, int& y, int& w, int& h );
-	virtual void ApplySchemeSettings( IScheme *pScheme );
+	void ApplySchemeSettings( IScheme *pScheme ) override;
 
 	void	RenderFrameBegin();
 	void	SetOverlayText( const char *pText );
@@ -114,6 +114,7 @@ CMiniViewportEngineRenderArea::CMiniViewportEngineRenderArea( Panel *parent, con
 	SetPaintBackgroundEnabled( true );
 
 	m_nEngineOutputTexture = vgui::surface()->CreateNewTextureID();
+	m_OverlayTextFont = INVALID_FONT;
 }
 
 CMiniViewportEngineRenderArea::~CMiniViewportEngineRenderArea()
@@ -167,7 +168,8 @@ void CMiniViewportEngineRenderArea::InitSceneMaterials()
 		int nBackBufferWidth, nBackBufferHeight;
 		g_pMaterialSystem->GetBackBufferDimensions( nBackBufferWidth, nBackBufferHeight );
 		float flAspect = nBackBufferWidth / (float)nBackBufferHeight;
-		int nPreviewWidth = min( DEFAULT_PREVIEW_WIDTH, nBackBufferWidth );
+		// dimhotepus: Scale UI.
+		int nPreviewWidth = min( QuickPropScale( DEFAULT_PREVIEW_WIDTH ), nBackBufferWidth );
 		int nPreviewHeight = ( int )( nPreviewWidth / flAspect + 0.5f );
 
 		g_pMaterialSystem->BeginRenderTargetAllocation();								// Begin allocating RTs which IFM can scribble into
@@ -260,17 +262,17 @@ void CMiniViewportEngineRenderArea::PaintOverlayText( )
 	GetSize( cw, ch );
 
 	int nTextWidth, nTextHeight;
-	int nBufLen = m_OverlayText.Length()+1;
-	wchar_t *pTemp = (wchar_t*)_alloca( nBufLen * sizeof(wchar_t) );
-	::MultiByteToWideChar( CP_UTF8, 0, m_OverlayText.Get(), -1, pTemp, nBufLen );
+	intp nBufLen = m_OverlayText.Length()+1;
+	wchar_t *pTemp = stackallocT( wchar_t, nBufLen );
+	V_UTF8ToUCS2( m_OverlayText.Get(), -1, pTemp, sizeof(wchar_t) * nBufLen );
 
 	g_pMatSystemSurface->GetTextSize( m_OverlayTextFont, pTemp, nTextWidth, nTextHeight );
 	int lx = (cw - nTextWidth) / 2;
-	if ( lx < 10 )
+	if ( lx < QuickPropScale( 10 ) )
 	{
-		lx = 10;
+		lx = QuickPropScale( 10 );
 	}
-	int ly = ch - 10 - nTextHeight;
+	int ly = ch - QuickPropScale( 10 ) - nTextHeight;
 	g_pMatSystemSurface->DrawColoredTextRect( m_OverlayTextFont, 
 		lx, ly, cw - lx, ch - ly,
 		255, 255, 255, 255, "%s", m_OverlayText.Get() );

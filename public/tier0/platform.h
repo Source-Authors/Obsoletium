@@ -154,41 +154,9 @@ using uint = unsigned int;
 #define MULTIPLE_INHERITANCE
 #endif
 
-#ifdef _MSC_VER
-#define NO_VTABLE __declspec( novtable )
-#else
-#define NO_VTABLE
-#endif
-
 // This indicates that a function never returns, which helps with
 // generating accurate compiler warnings
 #define NORETURN				[[noreturn]]
-
-// This can be used to declare an abstract (interface only) class.
-// Classes marked abstract should not be instantiated.  If they are, and access violation will occur.
-//
-// Example of use:
-//
-// abstract_class CFoo
-// {
-//      ...
-// }
-//
-// MSDN __declspec(novtable) documentation: https://docs.microsoft.com/en-us/cpp/cpp/novtable
-//
-// This form of __declspec can be applied to any class declaration, but should only be applied to
-// pure interface classes, that is, classes that will never be instantiated on their own.  The
-// __declspec stops the compiler from generating code to initialize the vfptr in the constructor(s)
-// and destructor of the class.  In many cases, this removes the only references to the vtable that
-// are associated with the class and, thus, the linker will remove it.  Using this form of
-// __declspec can result in a significant reduction in code size.
-//
-// If you attempt to instantiate a class marked with novtable and then access a class member, you
-// will receive an access violation(AV).
-//
-// dimhotepus: Enable for PC to reduce code size.
-#define abstract_class class NO_VTABLE
-
 
 // MSVC CRT uses 0x7fff while gcc uses MAX_INT, leading to mismatches between platforms
 // As a result, we pick the least common denominator here.  This should be used anywhere

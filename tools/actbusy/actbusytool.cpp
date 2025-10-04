@@ -239,8 +239,8 @@ void CActBusyTool::Shutdown()
 
 	{
 		CDisableUndoScopeGuard guard;
-		int nElements = m_toolElements.Count();
-		for ( int i = 0; i < nElements; ++i )
+		intp nElements = m_toolElements.Count();
+		for ( intp i = 0; i < nElements; ++i )
 		{
 			g_pDataModel->DestroyElement( m_toolElements[ i ] );
 		}
@@ -484,19 +484,17 @@ void CActBusyMenuButton::OnShowMenu(vgui::Menu *menu)
 	BaseClass::OnShowMenu( menu );
 
 	// Update the menu
-	int id;
-
 	CActBusyDoc *pDoc = m_pTool->GetDocument();
 	if ( pDoc )
 	{
-		id = m_Items.Find( "NewActBusy" );
+		auto id = m_Items.Find( "NewActBusy" );
 		m_pMenu->SetItemEnabled( id, true );
 		id = m_Items.Find( "DeleteActBusy" );
 		m_pMenu->SetItemEnabled( id, true );
 	}
 	else
 	{
-		id = m_Items.Find( "NewActBusy" );
+		auto id = m_Items.Find( "NewActBusy" );
 		m_pMenu->SetItemEnabled( id, false );
 		id = m_Items.Find( "DeleteActBusy" );
 		m_pMenu->SetItemEnabled( id, false );
@@ -549,7 +547,7 @@ void CActBusyTool::UpdateMenuBar( )
 	if ( m_pDoc->IsDirty() )
 	{
 		char sz[ 512 ];
-		Q_snprintf( sz, sizeof( sz ), "* %s", m_pDoc->GetFileName() );
+		V_sprintf_safe( sz, "* %s", m_pDoc->GetFileName() );
 		m_pMenuBar->SetFileName( sz );
 	}
 	else
@@ -848,7 +846,8 @@ void CActBusyTool::OnCloseNoSave()
 
 	if ( m_pDoc )
 	{
-		CAppNotifyScopeGuard( "CActBusyTool::OnCloseNoSave", 0 );
+		// dimhotepus: named guard.
+		CAppNotifyScopeGuard guard( "CActBusyTool::OnCloseNoSave", 0 );
 
 		delete m_pDoc;
 		m_pDoc = NULL;
@@ -945,9 +944,9 @@ void CActBusyTool::OnDescribeUndo()
 	CUtlVector< UndoInfo_t > list;
 	g_pDataModel->GetUndoInfo( list );
 
-	Msg( "%i operations in stack\n", list.Count() );
+	Msg( "%zi operations in stack\n", list.Count() );
 
-	for ( int i = list.Count() - 1; i >= 0; --i )
+	for ( intp i = list.Count() - 1; i >= 0; --i )
 	{
 		UndoInfo_t& entry = list[ i ];
 		if ( entry.terminator )
@@ -1103,8 +1102,8 @@ void CActBusyTool::ShowElementProperties( )
 
 void CActBusyTool::DestroyTools()
 {
-	int c = ToolWindow::GetToolWindowCount();
-	for ( int i = c - 1; i >= 0 ; --i )
+	intp c = ToolWindow::GetToolWindowCount();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		ToolWindow *kill = ToolWindow::GetToolWindow( i );
 		delete kill;
@@ -1175,8 +1174,8 @@ void CActBusyTool::ToggleToolWindow( Panel *tool, const char *toolName )
 
 void CActBusyTool::DestroyToolContainers()
 {
-	int c = ToolWindow::GetToolWindowCount();
-	for ( int i = c - 1; i >= 0 ; --i )
+	intp c = ToolWindow::GetToolWindowCount();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		ToolWindow *kill = ToolWindow::GetToolWindow( i );
 		delete kill;

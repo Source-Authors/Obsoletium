@@ -51,12 +51,12 @@ extern IMaterialSystem *MaterialSystem();
 class CGlobalFlexController : public IGlobalFlexController
 {
 public:
-	virtual int	FindGlobalFlexController( const char *name )
+	UtlSymId_t FindGlobalFlexController( const char *name ) override
 	{
 		return clienttools->FindGlobalFlexcontroller( name );
 	}
 
-	virtual const char *GetGlobalFlexControllerName( int idx )
+	const char *GetGlobalFlexControllerName( UtlSymId_t idx ) override
 	{
 		return clienttools->GetGlobalFlexControllerName( idx );
 	}
@@ -83,9 +83,10 @@ void RegisterTool( IToolSystem *tool );
 // Base tool system constructor
 //-----------------------------------------------------------------------------
 CBaseToolSystem::CBaseToolSystem( const char *pToolName /*="CBaseToolSystem"*/ ) :
-	BaseClass( NULL, pToolName ),
-	m_pBackground( 0 ),
-	m_pLogo( 0 )
+	BaseClass( nullptr, pToolName ),
+	m_pToolUI( nullptr ),
+	m_pBackground( nullptr ),
+	m_pLogo( nullptr )
 {
 	RegisterTool( this );
 	SetAutoDelete( false );
@@ -137,7 +138,7 @@ bool CBaseToolSystem::Init( )
 	const char *pszBackground = GetBackgroundTextureName();
 	if ( pszBackground )
 	{
-		m_pBackground = materials->FindMaterial( GetBackgroundTextureName() , TEXTURE_GROUP_VGUI );
+		m_pBackground = materials->FindMaterial( GetBackgroundTextureName(), TEXTURE_GROUP_VGUI );
 		m_pBackground->IncrementReferenceCount();
 	}
 	const char *pszLogo = GetLogoTextureName();
@@ -592,7 +593,7 @@ void CBaseToolSystem::OnKeyBindingHelp()
 //-----------------------------------------------------------------------------
 void CBaseToolSystem::RegisterToolWindow( vgui::PHandle hPanel )
 {
-	int i = m_Tools.AddToTail( hPanel );
+	intp i = m_Tools.AddToTail( hPanel );
 	m_Tools[i]->SetKeyBindingsContext( m_KeyBindingsHandle );
 }
 
@@ -605,8 +606,8 @@ void CBaseToolSystem::UnregisterAllToolWindows()
 Panel *CBaseToolSystem::GetMostRecentlyFocusedTool()
 {
 	VPANEL focus = input()->GetFocus();
-	int c = m_Tools.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Tools.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		Panel *p = m_Tools[ i ].Get();
 		if ( !p )
@@ -663,8 +664,8 @@ void CBaseToolSystem::OnThink()
 	BaseClass::OnThink();
 
 	VPANEL focus = input()->GetFocus();
-	int c = m_Tools.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Tools.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		Panel *p = m_Tools[ i ].Get();
 		if ( !p )
@@ -849,7 +850,7 @@ bool CBaseToolSystem::ShowUI( bool bVisible )
 	//  single player anyway...
 	if ( bVisible )
 	{
-		ConVar *pCv = ( ConVar * )cvar->FindVar( "cl_showpausedimage" );
+		ConVar *pCv = cvar->FindVar( "cl_showpausedimage" );
 		if ( pCv )
 		{
 			pCv->SetValue( 0 );
@@ -1087,8 +1088,9 @@ void CBaseToolSystem::PaintBackground()
 			int logoW = texWide / 2;
 			int logoH = logoW * logoAspectRatio;
 
-			x = w - logoW - 15;
-			y = h - logoH - 30;
+			// dimhotepus: Scale UI.
+			x = w - logoW - QuickPropScale( 15 );
+			y = h - logoH - QuickPropScale( 30 );
 
 			w = logoW;
 			h = logoH;
@@ -1129,9 +1131,10 @@ CMiniViewport *CBaseToolSystem::CreateMiniViewport( vgui::Panel *parent )
 	CMiniViewport *vp = new CMiniViewport( parent, "MiniViewport" );
 	Assert( vp );
 	vp->SetVisible( true );
-	int menuBarHeight = 28;
-	int titleBarHeight = 22;
-	int offset = 4;
+	// dimhotepus: Scale UI.
+	int menuBarHeight = QuickPropScale( 28 );
+	int titleBarHeight = QuickPropScale( 22 );
+	int offset = QuickPropScale( 4 );
 	vp->SetBounds( ( 2 * w / 3  ) - offset, menuBarHeight + offset, w / 3, h / 3 + titleBarHeight);
 	return vp;
 }

@@ -13,7 +13,6 @@
 #include "vgui/Cursor.h"
 #include "vgui/ISurface.h"
 #include "tier1/KeyValues.h"
-#include "toolutils/toolmenubar.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -38,7 +37,8 @@ CToolUI::CToolUI( vgui::Panel *pParent, const char *panelName, CBaseToolSystem *
 
 	m_pMenuBar = m_pBaseToolSystem->CreateMenuBar( m_pBaseToolSystem );
 	m_pMenuBar->SetParent( this );
-	m_pMenuBar->SetSize( w, MENU_HEIGHT );
+	// dimhotepus: Scale UI.
+	m_pMenuBar->SetSize( w, QuickPropScale( MENU_HEIGHT ) );
 	// This can be NULL if no status bar should be included
 	m_pStatusBar = m_pBaseToolSystem->CreateStatusBar( this );
 	m_pStatusBar->SetParent( this );
@@ -46,7 +46,7 @@ CToolUI::CToolUI( vgui::Panel *pParent, const char *panelName, CBaseToolSystem *
 	m_pClientArea = new vgui::Panel( this, "ClientArea" );
 	m_pClientArea->SetMouseInputEnabled( false );
 	m_pClientArea->SetCursor( vgui::dc_none );
-	m_pClientArea->SetBounds( 0, MENU_HEIGHT, w, h - MENU_HEIGHT );
+	m_pClientArea->SetBounds( 0, QuickPropScale( MENU_HEIGHT ), w, h - QuickPropScale( MENU_HEIGHT ) );
 }
 
 vgui::Panel *CToolUI::GetClientArea()
@@ -67,12 +67,12 @@ void CToolUI::PerformLayout()
 	vgui::VPANEL parent = GetParent() ? GetParent()->GetVPanel() : vgui::surface()->GetEmbeddedPanel(); 
 	vgui::ipanel()->GetSize( parent, iWidth, iHeight );
 	SetSize( iWidth, iHeight );
-	int insettop = MENU_HEIGHT;
+	int insettop = QuickPropScale( MENU_HEIGHT );
 	int insetbottom = 0;
 	m_pMenuBar->SetSize( iWidth, insettop );
 	if ( m_pStatusBar )
 	{
-		insetbottom = STATUS_HEIGHT;
+		insetbottom = QuickPropScale( STATUS_HEIGHT );
 		m_pStatusBar->SetBounds( 0, iHeight - insetbottom, iWidth, insetbottom );
 	}
 	m_pClientArea->SetBounds( 0, insettop, iWidth, iHeight - insettop - insetbottom );

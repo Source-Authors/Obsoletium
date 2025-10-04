@@ -1359,12 +1359,13 @@ int C_BaseFlex::AddGlobalFlexController( const char *szName )
 	if ( g_numflexcontrollers < MAXSTUDIOFLEXCTRL * 4 )
 	{
 		g_flexcontroller[g_numflexcontrollers++] = strdup( szName );
+		return i;
 	}
-	else
-	{
-		// FIXME: missing runtime error condition
-	}
-	return i;
+
+	// dimhotepus: Handle out of capacity error.
+	AssertMsg( g_numflexcontrollers < MAXSTUDIOFLEXCTRL * 4, "Flex controllers out of max capacity %d", MAXSTUDIOFLEXCTRL * 4 );
+	Warning( "Flex controllers out of max capacity %d", MAXSTUDIOFLEXCTRL * 4 );
+	return -1;
 }
 
 char const *C_BaseFlex::GetGlobalFlexControllerName( int idx )

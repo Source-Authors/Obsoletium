@@ -62,10 +62,7 @@ void CToolEditMenuButton::OnShowMenu( vgui::Menu *menu )
 	BaseClass::OnShowMenu( menu );
 
 	// Update the menu
-	char sz[ 512 ];
-
-	int id;
-	id = m_Items.Find( "undo" );
+	auto id = m_Items.Find( "undo" );
 	if ( g_pDataModel->CanUndo() )
 	{
 		m_pMenu->SetItemEnabled( id, true );
@@ -110,7 +107,8 @@ void CToolEditMenuButton::OnShowMenu( vgui::Menu *menu )
 		}
 		else
 		{
-			m_pMenu->UpdateMenuItem( id, sz, new KeyValues( "Command", "command", "OnRedo" ) );
+			// dimhotepus: Do not read uninitialized buffer, use ToolEditRedo.
+			m_pMenu->UpdateMenuItem( id, "#ToolEditRedo", new KeyValues( "Command", "command", "OnRedo" ) );
 		}
 	}
 	else

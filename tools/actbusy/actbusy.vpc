@@ -17,7 +17,7 @@ $Configuration
 	}
 }
 
-$Project "Actbusy"
+$Project "actbusy"
 {
 	$Folder	"Source Files"
 	{

@@ -4,21 +4,22 @@
 //
 //=============================================================================
 
+#include "toolframework/itooldictionary.h"
+
 #include "tier1/utlvector.h"
 #include "tier1/convar.h"
 #include "icvar.h"
 #include "toolframework/itoolsystem.h"
-#include "toolframework/itooldictionary.h"
 #include "toolframework/ienginetool.h"
 #include "toolutils/enginetools_int.h"
-#include "ienginevgui.h"
-#include "icvar.h"
 #include "toolutils/vgui_tools.h"
+#include "ienginevgui.h"
 #include "mathlib/mathlib.h"
 #include "iregistry.h"
 #include "datamodel/idatamodel.h"
 #include "filesystem.h"
-#include "p4lib/ip4.h"
+// dimhotepus: Drop p4.
+//#include "p4lib/ip4.h"
 #include "engine/ivdebugoverlay.h"
 #include "tier3/tier3dm.h"
 #include "datamodel/dmelementfactoryhelper.h"
@@ -85,16 +86,16 @@ public:
 	CToolDictionary();
 
 	// Inherited from IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual void *QueryInterface( const char *pInterfaceName );
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	void *QueryInterface( const char *pInterfaceName ) override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	// Inherited from IToolDictionary
-	virtual void CreateTools();
-	virtual int	GetToolCount() const;
-	virtual IToolSystem	*GetTool( int index );
+	void CreateTools() override;
+	int	GetToolCount() const override;
+	IToolSystem	*GetTool( int index ) override;
 
 public:
 	void RegisterTool( IToolSystem *tool );
@@ -114,9 +115,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CToolDictionary, IToolDictionary, VTOOLDICTIO
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CToolDictionary::CToolDictionary()
-{
-}
+CToolDictionary::CToolDictionary() = default;
 
 
 //-----------------------------------------------------------------------------
@@ -157,7 +156,7 @@ void CToolDictionary::Disconnect()
 void *CToolDictionary::QueryInterface( const char *pInterfaceName )
 {
 	if ( !V_strcmp( pInterfaceName, VTOOLDICTIONARY_INTERFACE_VERSION ) )
-		return (IToolDictionary*)this;
+		return static_cast<IToolDictionary*>(this);
 
 	return NULL;
 }
@@ -168,7 +167,7 @@ InitReturnVal_t CToolDictionary::Init()
 	if ( nRetVal != INIT_OK )
 		return nRetVal;
 
-	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f );
+	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 
 	// Init registry
 	if ( !registry->Init( "Source\\Tools" ) )

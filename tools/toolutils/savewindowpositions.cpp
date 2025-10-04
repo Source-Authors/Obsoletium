@@ -29,16 +29,17 @@ class CWindowPositionMgr : public IWindowPositionMgr
 {
 public:
 	// Inherited from IWindowPositionMgr
-	virtual void	SavePositions( char const *filename, char const *key );
-	virtual bool	LoadPositions( char const *filename, Panel *parent, vgui::IToolWindowFactory *factory, char const *key, bool force = false );
-	virtual void	RegisterPanel( char const *saveName, Panel *panel, bool contextMenu );
-	virtual void	UnregisterPanel( vgui::Panel *panel );
+	void	SavePositions( char const *filename, char const *key ) override;
+	bool	LoadPositions( char const *filename, Panel *parent, vgui::IToolWindowFactory *factory, char const *key, bool force = false ) override;
+	void	RegisterPanel( char const *saveName, Panel *panel, bool contextMenu ) override;
+	void	UnregisterPanel( vgui::Panel *panel ) override;
 
 private:
 	struct LoadInfo_t
 	{
-		CUtlSymbol		m_Name;
+		// dimhotepus: Reorder m_hPanel and m_Name to reduce size.
 		PHandle			m_hPanel;
+		CUtlSymbol		m_Name;
 		bool			m_bLoaded;
 		bool			m_bContextMenu;
 	};
@@ -61,8 +62,8 @@ CWindowPositionMgr::LoadInfo_t *CWindowPositionMgr::Find( Panel *panel )
 	if ( !panel )
 		return NULL;
 
-	int c = m_Panels.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Panels.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		LoadInfo_t *info = &m_Panels[ i ];
 		if ( info->m_hPanel.Get() == panel )
@@ -76,8 +77,8 @@ CWindowPositionMgr::LoadInfo_t *CWindowPositionMgr::Find( char const *panelName 
 	if ( !panelName )
 		return NULL;
 
-	int c = m_Panels.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Panels.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		LoadInfo_t *info = &m_Panels[ i ];
 		if ( !Q_stricmp( info->m_Name.String(), panelName ) )
@@ -91,9 +92,8 @@ static void BufPrint( CUtlBuffer& buf, int level, char const *fmt, ... )
 	char string[ 2048 ];
 	va_list argptr;
 	va_start( argptr, fmt );
-	_vsnprintf( string, sizeof( string ) - 1, fmt, argptr );
+	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
-	string[ sizeof( string ) - 1 ] = 0;
 
 	while ( --level >= 0 )
 	{
@@ -190,7 +190,7 @@ bool CWindowPositionMgr::LoadPositions( char const *filename, vgui::Panel *paren
 	int sw, sh;
 	vgui::surface()->GetScreenSize( sw, sh );
 
-	KeyValues *kv = new KeyValues( key );
+	KeyValuesAD kv( key );
 	if ( kv->LoadFromFile( g_pFullFileSystem, filename, "GAME" ) )
 	{
 		// Walk through tools
@@ -249,7 +249,6 @@ bool CWindowPositionMgr::LoadPositions( char const *filename, vgui::Panel *paren
 			}
 		}
 	}
-	kv->deleteThis();
 
 	return success;
 }
@@ -274,8 +273,8 @@ void CWindowPositionMgr::RegisterPanel( char const *saveName, Panel *panel, bool
 
 void CWindowPositionMgr::UnregisterPanel( vgui::Panel *panel )
 {
-	int c = m_Panels.Count();
-	for ( int i = c - 1; i >= 0; --i )
+	intp c = m_Panels.Count();
+	for ( intp i = c - 1; i >= 0; --i )
 	{
 		if ( m_Panels[ i ].m_hPanel.Get() != panel )
 			continue;
