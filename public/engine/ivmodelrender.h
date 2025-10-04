@@ -78,6 +78,14 @@ struct ModelRenderInfo_t
 	ModelInstanceHandle_t instance;
 
 	ModelRenderInfo_t()
+		: origin{vec3_invalid},
+		angles{vec3_angle},
+		flags{0},
+		entity_index{-1},
+		skin{-1},
+		body{-1},
+		hitboxset{-1},
+		instance{MODEL_INSTANCE_INVALID}
 	{
 		pRenderable = NULL;
 		pModel = NULL;
