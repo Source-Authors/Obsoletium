@@ -30,12 +30,14 @@ public:
 	CHistoryItem( void );
 	CHistoryItem( const char *text, const char *extra = NULL );
 	CHistoryItem( const CHistoryItem& src );
+	// dimhotepus: Add operator=
+	CHistoryItem &operator=( const CHistoryItem& src );
 	~CHistoryItem( void );
 
-	const char *GetText() const;
-	const char *GetExtra() const;
+	[[nodiscard]] const char *GetText() const;
+	[[nodiscard]] const char *GetExtra() const;
 	void SetText( const char *text, const char *extra );
-	bool HasExtra() { return m_bHasExtra; }
+	[[nodiscard]] bool HasExtra() const { return m_bHasExtra; }
 
 private:
 	char		*m_text;
