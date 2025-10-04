@@ -805,9 +805,9 @@ inline void *CUtlBuffer::GetPtr( )
 	void *p;
 	// LEGACY WARNING: in text mode, PutPtr writes 32 bit pointers in hex, while GetPtr reads 32 or 64 bit pointers in decimal
 #if !defined(X64BITS) && !defined(PLATFORM_64BITS)
-	p = ( void* )GetUnsignedInt();
+	p = ( void* )(intp)GetUnsignedInt();
 #else
-	p = ( void* )GetInt64();
+	p = ( void* )(intp)GetInt64();
 #endif
 	return p;
 }
