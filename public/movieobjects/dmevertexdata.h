@@ -189,7 +189,7 @@ protected:
 	CDmaVar< int > m_nJointCount;
 	CDmaVar< bool > m_bFlipVCoordinates;
 	CUtlVector< FieldInfo_t > m_FieldInfo;
-	FieldIndex_t m_pStandardFieldIndex[STANDARD_FIELD_COUNT];
+	FieldIndex_t m_pStandardFieldIndex[STANDARD_FIELD_COUNT]{-1};
 	int m_nVertexCount{0};
 };
 
