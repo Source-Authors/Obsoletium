@@ -50,12 +50,12 @@ public:
 	CDmaVar< float >	m_flexWeight;
 	CDmaElement< CDmeGameModel >	m_gameModel;
 	
-	DmAttributeHandle_t m_ToAttributeHandle;
+	DmAttributeHandle_t m_ToAttributeHandle{DMATTRIBUTE_HANDLE_INVALID};
 
 private:
 	int FindGlobalFlexControllerIndex() const;
 
-	int m_nFlexControllerIndex;
+	int m_nFlexControllerIndex{-1};
 };
 
 //-----------------------------------------------------------------------------

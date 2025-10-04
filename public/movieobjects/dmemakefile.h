@@ -194,8 +194,8 @@ private:
 
 	CDmaElementArray< CDmeSource > m_Sources;
 	CDmeHandle< CDmElement > m_hOutput;
-	ProcessHandle_t m_hCompileProcess;
-	bool m_bIsDirty;
+	ProcessHandle_t m_hCompileProcess{PROCESS_HANDLE_INVALID};
+	bool m_bIsDirty{false};
 };
 
 

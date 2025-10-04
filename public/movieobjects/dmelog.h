@@ -222,9 +222,9 @@ protected:
 
 	void OnUsingCurveTypesChanged();
 
-	CDmeLog *m_pOwnerLog;
+	CDmeLog *m_pOwnerLog{nullptr};
 
-	mutable intp m_lastKey;
+	mutable intp m_lastKey{0};
 	CDmaArray< int > m_times;
 	CDmaArray< int > m_CurveTypes;
 };

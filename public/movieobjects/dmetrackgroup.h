@@ -127,8 +127,8 @@ private:
 	CDmaVar< float > m_Volume;
 	CDmaVar<int> m_nDisplaySize;
 
-	DmElementHandle_t m_hOwner;
-	intp m_nMaxTrackCount;
+	DmElementHandle_t m_hOwner{DMELEMENT_HANDLE_INVALID};
+	intp m_nMaxTrackCount{std::numeric_limits<intp>::max()};
 };
 
 
