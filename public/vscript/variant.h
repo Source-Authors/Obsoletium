@@ -30,7 +30,8 @@ FORWARD_DECLARE_HANDLE( HSCRIPT );
 //-----------------------------------------------------------------------------
 // Types not supported in datamap.h
 //-----------------------------------------------------------------------------
-enum ExtendedFieldType_t
+// dimhotepus: Use int16 instead of int.
+enum ExtendedFieldType_t : int16
 {
 	FIELD_TYPEUNKNOWN = FIELD_TYPECOUNT,
 	FIELD_CSTRING,
@@ -433,7 +434,7 @@ inline void CVariantBase<CValueAllocator>::CopyData( const T &src, bool bForceCo
 	COMPILE_TIME_ASSERT( ( ExtendedFieldType_t )VariantDeduceType( T ) != FIELD_TYPEUNKNOWN );
 
 	Free();
-	m_type = VariantDeduceType( T );
+	m_type = to_underlying( VariantDeduceType( T ) );
 	if ( CValueAllocator::ALWAYS_COPY || bForceCopy )
 	{
 		m_pData = Allocate<T>();
