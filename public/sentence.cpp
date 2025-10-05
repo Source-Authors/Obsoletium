@@ -1601,7 +1601,7 @@ intp CSentence::CountWords( char const *str )
 
 	intp c = 1;
 	
-	unsigned char *p = (unsigned char *)str;
+	const unsigned char *p = (const unsigned char *)str;
 	while ( *p )
 	{
 		if ( *p <= 32 )
@@ -1664,7 +1664,7 @@ void CSentence::CreateEventWordDistribution( char const *pszText, float flSenten
 	Reset();
 
 	char word[ 256 ];
-	unsigned char const *in = (unsigned char *)pszText;
+	const unsigned char *in = (const unsigned char *)pszText;
 	char *out = word;
 	
 	while ( *in )
