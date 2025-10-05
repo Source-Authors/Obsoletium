@@ -90,8 +90,13 @@
   typedef int BOOL;
   typedef int INT;
   typedef float FLOAT;
+  // dimhotepus: Wrap and check already defined.
+  #ifndef TRUE
   #define TRUE 1
+  #endif
+  #ifndef FALSE
   #define FALSE 0
+  #endif
 #endif
 
 #if 1
@@ -157,9 +162,11 @@ struct Temporary<T&> {
 // === Do not use directly: use one of the predefined sizes below ===
 
 struct ScriptStringVarBase {
-  const unsigned char MaxLength; // Real length is MaxLength+1.
+  // dimhotepus: unsigned char -> unsigned short.
+  const unsigned short MaxLength;  // Real length is MaxLength+1.
   SQChar s[1];
-  ScriptStringVarBase(int _MaxLength) : MaxLength(_MaxLength) {}
+  // dimhotepus: unsigned char -> unsigned short.
+  explicit ScriptStringVarBase(unsigned short _MaxLength) : MaxLength(_MaxLength) {}
   operator SQChar * () { return &s[0]; }
   operator void * () { return (void *)&s[0]; }
   const SQChar * operator = (const SQChar * _s) {
@@ -181,7 +188,8 @@ struct ScriptStringVarBase {
 
 // === Do not use directly: use one of the predefined sizes below ===
 
-template<int MAXLENGTH> // MAXLENGTH is max printable characters (trailing NULL is accounted for in ScriptStringVarBase::s[1]).
+// dimhotepus: int -> unsigned short.
+template<unsigned short MAXLENGTH> // MAXLENGTH is max printable characters (trailing NULL is accounted for in ScriptStringVarBase::s[1]).
 struct ScriptStringVar : ScriptStringVarBase {
   SQChar ps[MAXLENGTH];
   ScriptStringVar() : ScriptStringVarBase(MAXLENGTH) {
@@ -388,7 +396,8 @@ struct TypeInfo<ScriptStringVar<N> > {
   #define SQPLUS_SMARTPOINTER_ACCESSTYPE
   #include "SqPlusSmartPointer.h"
 #else
-  enum VarAccessType {VAR_ACCESS_READ_WRITE=0,VAR_ACCESS_READ_ONLY=1<<0,VAR_ACCESS_CONSTANT=1<<1,VAR_ACCESS_STATIC=1<<2};
+  // dimhotepus: int -> short.
+  enum VarAccessType : short {VAR_ACCESS_READ_WRITE=0,VAR_ACCESS_READ_ONLY=1<<0,VAR_ACCESS_CONSTANT=1<<1,VAR_ACCESS_STATIC=1<<2};
 #endif // SQPLUS_SMARTPOINTER_OPT
 
 // See VarRef and ClassType<> below: for instance assignment.
@@ -506,7 +515,8 @@ struct VarRef {
   short m_access;              // VarAccessType.
 
   VarRef() : offsetOrAddrOrConst(0), m_type(VAR_TYPE_NONE), instanceType(0/*(SQUserPointer)-1*/), /*copyFunc(0),*/ m_size(0), m_access(VAR_ACCESS_READ_WRITE) {}
-  VarRef(void * _offsetOrAddrOrConst, ScriptVarType _type, ClassTypeBase* _instanceType, ClassTypeBase* _varType, int _size, VarAccessType _access) :
+  // dimhotepus: int _size -> short.
+  VarRef(void * _offsetOrAddrOrConst, ScriptVarType _type, ClassTypeBase* _instanceType, ClassTypeBase* _varType, short _size, VarAccessType _access) :
          offsetOrAddrOrConst(_offsetOrAddrOrConst), m_type(_type), instanceType(_instanceType), varType(_varType), m_size(_size), m_access(_access) {
 #ifdef SQ_SUPPORT_INSTANCE_TYPE_INFO
     SquirrelObject typeTable = SquirrelVM::GetRootTable().GetValue(SQ_PLUS_TYPE_TABLE);

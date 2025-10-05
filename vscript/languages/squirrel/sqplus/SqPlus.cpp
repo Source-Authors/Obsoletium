@@ -131,7 +131,6 @@ static int setVar(StackHandler & sa,VarRef * vr,void * data) {
     break;
   } // case
   case VAR_TYPE_INSTANCE: {
-    HSQUIRRELVM v = sa.GetVMPtr();
     SQUserPointer src = sa.GetInstanceUp(3,(SQUserPointer)vr->varType); // Effectively performs: ClassType<>::type() == ClassType<>().
     if (!src) {
       throw SquirrelError(_SC("INSTANCE type assignment mismatch"));
@@ -335,7 +334,6 @@ int getInstanceVarFunc(HSQUIRRELVM v) {
 // === Classes ===
 
 BOOL CreateClass(HSQUIRRELVM v,SquirrelObject & newClass,SQUserPointer classType,const SQChar * name,const SQChar * baseName) {
-  int n = 0;
   int oldtop = sq_gettop(v);
   sq_pushroottable(v);
   sq_pushstring(v,name,-1);
