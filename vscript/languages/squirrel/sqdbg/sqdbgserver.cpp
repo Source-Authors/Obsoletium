@@ -106,6 +106,7 @@ const SQChar *EscapeXMLString(HSQUIRRELVM v,const SQChar *s)
 
 SQDbgServer::SQDbgServer(HSQUIRRELVM v)
 {
+	_xmlcurrentement = 0;
 	_ready = false;
 	_nestedcalls = 0;
 	_autoupdate = false;
@@ -113,6 +114,7 @@ SQDbgServer::SQDbgServer(HSQUIRRELVM v)
 	_state = eDBG_Running;
 	_accept = INVALID_SOCKET;
 	_endpoint = INVALID_SOCKET;
+	_recursionlevel = 0;
 	_maxrecursion = 10;
 	sq_resetobject(&_debugroot);
 	sq_resetobject(&_serializefunc);
