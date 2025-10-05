@@ -2460,7 +2460,7 @@ bool CMDLCache::VerifyHeaders( studiohdr_t *pStudioHdr )
 		return false;
 	}
 
-	vertexFileHeader_t *pVertexHdr = (vertexFileHeader_t*)vvdHeader.PeekGet();
+	const vertexFileHeader_t *pVertexHdr = (const vertexFileHeader_t*)vvdHeader.PeekGet();
 
 	// check
 	if (( pVertexHdr->id != MODEL_VERTEX_FILE_ID ) ||
@@ -2484,7 +2484,7 @@ bool CMDLCache::VerifyHeaders( studiohdr_t *pStudioHdr )
 	}
 
 	// check
-	OptimizedModel::FileHeader_t *pVtxHdr = (OptimizedModel::FileHeader_t*)vtxHeader.PeekGet();
+	const OptimizedModel::FileHeader_t *pVtxHdr = (const OptimizedModel::FileHeader_t*)vtxHeader.PeekGet();
 	if (( pVtxHdr->version != OPTIMIZED_MODEL_FILE_VERSION ) ||
 		( pVtxHdr->checkSum != pStudioHdr->checksum ))
 	{
