@@ -1435,7 +1435,7 @@ static bool ArrayIndexLessFunc( KeyValues * const &lhs, KeyValues* const &rhs )
 
 struct OwnerAttribute_t
 {
-	OwnerAttribute_t() : sortedData( 0, 0, ArrayIndexLessFunc )
+	OwnerAttribute_t() : pOwner{ nullptr }, sortedData( 0, 0, ArrayIndexLessFunc )
 	{
 	}
 

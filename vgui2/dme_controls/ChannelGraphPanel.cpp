@@ -28,7 +28,8 @@ CChannelGraphPanel::CChannelGraphPanel( Panel *parent, const char *name )
 	m_graphMinValue( 0.0f ), m_graphMaxValue( 0.0f ),
 	m_nMouseStartX( -1 ), m_nMouseStartY( -1 ),
 	m_nMouseLastX( -1 ), m_nMouseLastY( -1 ),
-	m_nTextBorder( 2 ), m_nGraphOriginX( 40 ), m_nGraphOriginY( 10 )
+	m_nTextBorder( 2 ), m_nGraphOriginX( 40 ), m_nGraphOriginY( 10 ),
+	m_flTimeToPixel( 0 ), m_flValueToPixel( 0 )
 {
 }
 
