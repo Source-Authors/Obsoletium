@@ -312,8 +312,8 @@ CPositionInterpolator_Rope::CPositionInterpolator_Rope()
 	m_bChange = false;
 	m_nSegments = 5;
 
-	for( int i=0; i < 2; i++ )
-		m_Delegate.m_CurEndPoints[i] = Vector( 1e24, 1e24, 1e24 );
+	for( auto &p : m_Delegate.m_CurEndPoints )
+		p = Vector( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
 }
 
 void CPositionInterpolator_Rope::Release()

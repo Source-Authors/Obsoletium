@@ -743,8 +743,8 @@ void ClearNeighborData( CCoreDispInfo *pDisp )
 void GetDispBox( CCoreDispInfo *pDisp, CDispBox &box )
 {
 	// Calculate the bbox for this displacement.
-	Vector vMin(  1e24,  1e24,  1e24 );
-	Vector vMax( -1e24, -1e24, -1e24 );
+	Vector vMin( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
+	Vector vMax( std::numeric_limits<vec_t>::min(), std::numeric_limits<vec_t>::min(), std::numeric_limits<vec_t>::min() );
 
 	for ( int iVert = 0; iVert < 4; ++iVert )
 	{
