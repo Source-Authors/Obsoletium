@@ -1,7 +1,4 @@
 #include "sqplus.h"
-#if defined(VSCRIPT_DLL_EXPORT) || defined(VSQUIRREL_TEST)
-#include "memdbgon.h"
-#endif
 
 SquirrelObject::SquirrelObject(void)
 {
@@ -10,11 +7,10 @@ SquirrelObject::SquirrelObject(void)
 
 SquirrelObject::~SquirrelObject()
 {
-	if(SquirrelVM::_VM)
-		sq_release(SquirrelVM::_VM,&_o);
+    Reset();
 }
 
-SquirrelObject::SquirrelObject(SquirrelObject &o)
+SquirrelObject::SquirrelObject(const SquirrelObject &o)
 {
 	_o = o._o;
 	sq_addref(SquirrelVM::_VM,&_o);
@@ -29,6 +25,8 @@ SquirrelObject::SquirrelObject(HSQOBJECT o)
 void SquirrelObject::Reset(void) {
   if(SquirrelVM::_VM)
     sq_release(SquirrelVM::_VM,&_o);
+  else if( _o._type!=OT_NULL && _o._unVal.pRefCounted )
+    printf( "SquirrelObject::~SquirrelObject - Cannot release\n" ); 
   sq_resetobject(&_o);
 } // SquirrelObject::Reset
 
@@ -48,11 +46,21 @@ SquirrelObject SquirrelObject::Clone()
 
 SquirrelObject & SquirrelObject::operator =(const SquirrelObject &o)
 {
-	HSQOBJECT t;
-	t = o._o;
-	sq_addref(SquirrelVM::_VM,&t);
+	//HSQOBJECT t;
+	//t = o._o;
+	//sq_addref(SquirrelVM::_VM,&t);
+	sq_addref(SquirrelVM::_VM, (HSQOBJECT*)&o._o);
 	sq_release(SquirrelVM::_VM,&_o);
-	_o = t;
+	//_o = t;
+	_o = o._o;
+	return *this;
+}
+
+SquirrelObject & SquirrelObject::operator =(HSQOBJECT ho)
+{
+	sq_addref(SquirrelVM::_VM,&ho);
+	sq_release(SquirrelVM::_VM,&_o);
+	_o = ho;
 	return *this;
 }
 
@@ -62,6 +70,44 @@ SquirrelObject & SquirrelObject::operator =(int n)
 	AttachToStackObject(-1);
 	sq_pop(SquirrelVM::_VM,1);
 	return *this;
+}
+
+#include <assert.h>
+#include "../squirrel/sqstate.h"
+#include "../squirrel/sqvm.h"
+SquirrelObject & SquirrelObject::operator =(HSQUIRRELVM v)
+{
+    if( v && SquirrelVM::_VM ){
+    	SquirrelVM::_VM->Push(v);
+        AttachToStackObject(-1);
+        sq_poptop(SquirrelVM::_VM);
+    }
+    else Reset();
+	return *this;
+}
+
+bool SquirrelObject::operator == (const SquirrelObject &o)
+{
+    bool cmp = false;
+    HSQUIRRELVM v = SquirrelVM::GetVMPtr();
+    int oldtop = sq_gettop(v);
+    
+    sq_pushobject(v, GetObjectHandle());
+    sq_pushobject(v, o.GetObjectHandle());
+    if(sq_cmp(v) == 0)
+        cmp = true;
+   
+    sq_settop(v, oldtop);
+    return cmp;
+}
+
+bool SquirrelObject::CompareUserPointer( const SquirrelObject &o )
+{
+    if( _o._type == o.GetObjectHandle()._type )
+        if( _o._unVal.pUserPointer == o.GetObjectHandle()._unVal.pUserPointer )
+            return true;
+
+    return false;
 }
 
 void SquirrelObject::ArrayAppend(const SquirrelObject &o)
@@ -92,11 +138,14 @@ BOOL SquirrelObject::SetDelegate(SquirrelObject &obj)
 				case OT_TABLE:
 					sq_pushobject(SquirrelVM::_VM,_o);
 					sq_pushobject(SquirrelVM::_VM,obj._o);
-					if(SQ_SUCCEEDED(sq_setdelegate(SquirrelVM::_VM,-2)))
-						return TRUE;
+					if(SQ_SUCCEEDED(sq_setdelegate(SquirrelVM::_VM,-2))) {
+					  sq_pop(SquirrelVM::_VM,1);
+					  return TRUE;
+					}
+					sq_pop(SquirrelVM::_VM,1);
 					break;
 			}
-		}
+	}
 	return FALSE;
 }
 
@@ -383,7 +432,7 @@ SquirrelObject SquirrelObject::GetValue(INT key)const
 
 FLOAT SquirrelObject::GetFloat(INT key) const
 {
-	SQFloat ret = 0.0f;
+	FLOAT ret = 0.0f;
 	if(GetSlot(key)) {
 		sq_getfloat(SquirrelVM::_VM,-1,&ret);
 		sq_pop(SquirrelVM::_VM,1);
@@ -394,7 +443,7 @@ FLOAT SquirrelObject::GetFloat(INT key) const
 
 INT SquirrelObject::GetInt(INT key) const
 {
-	intp ret = 0;
+	INT ret = 0;
 	if(GetSlot(key)) {
 		sq_getinteger(SquirrelVM::_VM,-1,&ret);
 		sq_pop(SquirrelVM::_VM,1);
@@ -427,12 +476,13 @@ bool SquirrelObject::GetBool(INT key) const
 
 BOOL SquirrelObject::Exists(const SQChar *key) const
 {
-	BOOL ret = FALSE;
 	if(GetSlot(key)) {
-		ret = TRUE;
+  	sq_pop(SquirrelVM::_VM,2);
+		return TRUE;
+	} else {
+  	sq_pop(SquirrelVM::_VM,1);
+		return FALSE;
 	}
-	sq_pop(SquirrelVM::_VM,1);
-	return ret;
 }
 ////////////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////
@@ -470,7 +520,7 @@ SquirrelObject SquirrelObject::GetValue(const SQChar *key)const
 
 FLOAT SquirrelObject::GetFloat(const SQChar *key) const
 {
-	SQFloat ret = 0.0f;
+	FLOAT ret = 0.0f;
 	if(GetSlot(key)) {
 		sq_getfloat(SquirrelVM::_VM,-1,&ret);
 		sq_pop(SquirrelVM::_VM,1);
@@ -481,7 +531,7 @@ FLOAT SquirrelObject::GetFloat(const SQChar *key) const
 
 INT SquirrelObject::GetInt(const SQChar *key) const
 {
-	intp ret = 0;
+	INT ret = 0;
 	if(GetSlot(key)) {
 		sq_getinteger(SquirrelVM::_VM,-1,&ret);
 		sq_pop(SquirrelVM::_VM,1);
@@ -514,14 +564,14 @@ bool SquirrelObject::GetBool(const SQChar *key) const
 
 SQUserPointer SquirrelObject::GetInstanceUP(SQUserPointer tag) const
 {
-	SQUserPointer up;
-	sq_pushobject(SquirrelVM::_VM,_o);
-	if (SQ_FAILED(sq_getinstanceup(SquirrelVM::_VM,-1,(SQUserPointer*)&up,tag,1))) {
-	  sq_reseterror(SquirrelVM::_VM);
-	  up = NULL;
-	} // if
-	sq_pop(SquirrelVM::_VM,1);
-	return up;
+    SQUserPointer up;
+    sq_pushobject(SquirrelVM::_VM,_o);
+    if (SQ_FAILED(sq_getinstanceup(SquirrelVM::_VM,-1,(SQUserPointer*)&up,tag,1))) {
+        sq_reseterror(SquirrelVM::_VM);
+        up = NULL;
+    } // if
+    sq_pop(SquirrelVM::_VM,1);
+    return up;
 }
 
 BOOL SquirrelObject::SetInstanceUP(SQUserPointer up)
@@ -586,7 +636,7 @@ const SQChar * SquirrelObject::GetTypeName(const SQChar * key) {
     return NULL;
   } // if
   SqPlus::VarRefPtr vr = (SqPlus::VarRefPtr)data;
-  return vr->typeName;
+  return vr->varType->GetTypeName();
 #else // This version will only work if SQ_SUPPORT_INSTANCE_TYPE_INFO is enabled.
   SquirrelObject so = GetValue(key);
   if (so.IsNull()) return NULL;
@@ -611,6 +661,17 @@ const SQChar * SquirrelObject::GetTypeName(void) {
   } // if
   return NULL;
 } // SquirrelObject::GetTypeName
+
+SquirrelObject SquirrelObject::GetBase(void)
+{
+   SquirrelObject ret;
+   sq_pushobject(SquirrelVM::_VM,_o);
+   sq_getbase(SquirrelVM::_VM,-1);
+   ret.AttachToStackObject(-1);
+   sq_pop(SquirrelVM::_VM,2);
+
+   return ret;
+}
 
 const SQChar* SquirrelObject::ToString()
 {

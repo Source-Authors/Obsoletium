@@ -185,6 +185,12 @@
 				RelativePath=".\SqPlus.cpp">
 			</File>
 			<File
+				RelativePath=".\SqPlusOCharBuf.cpp">
+			</File>
+			<File
+				RelativePath=".\SqPlusUtf8.cpp">
+			</File>
+			<File
 				RelativePath=".\SquirrelBindingsUtils.cpp">
 			</File>
 			<File

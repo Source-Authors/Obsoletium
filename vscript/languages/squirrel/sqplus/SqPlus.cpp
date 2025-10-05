@@ -1,10 +1,9 @@
 #include "sqplus.h"
-#ifdef _PS3
-#undef _STD_USING
-#endif
 #include <stdio.h>
-#if defined(VSCRIPT_DLL_EXPORT) || defined(VSQUIRREL_TEST)
-#include "memdbgon.h"
+
+#ifdef SQPLUS_SMARTPOINTER_OPT
+#define SQPLUS_SMARTPOINTER_CPP_DECLARATION
+#include "SqPlusSmartPointer.h"
 #endif
 
 namespace SqPlus {
@@ -12,17 +11,13 @@ namespace SqPlus {
 static int getVarInfo(StackHandler & sa,VarRefPtr & vr) {
   HSQOBJECT htable = sa.GetObjectHandle(1);
   SquirrelObject table(htable);
-#ifdef _DEBUG
-  [[maybe_unused]] SQObjectType type = sa.GetType(2);
-#endif
   const SQChar * el = sa.GetString(2);
   ScriptStringVar256 varNameTag;
   getVarNameTag(varNameTag,sizeof(varNameTag),el);
   SQUserPointer data=0;
   if (!table.RawGetUserData(varNameTag,&data)) {
-//    throw SquirrelError("getVarInfo: Could not retrieve UserData");
-    return sa.ThrowError(_T("getVarInfo: Could not retrieve UserData")); // Results in variable not being found error.
-  } // if
+    return sa.ThrowError(_SC("getVarInfo: Could not retrieve UserData")); // Results in variable not being found error.
+  }
   vr = (VarRefPtr)data;
   return SQ_OK;
 } // getVarInfo
@@ -30,57 +25,94 @@ static int getVarInfo(StackHandler & sa,VarRefPtr & vr) {
 static int getInstanceVarInfo(StackHandler & sa,VarRefPtr & vr,SQUserPointer & data) {
   HSQOBJECT ho = sa.GetObjectHandle(1);
   SquirrelObject instance(ho);
-#ifdef _DEBUG
-  [[maybe_unused]] SQObjectType type = sa.GetType(2);
-#endif
   const SQChar * el = sa.GetString(2);
   ScriptStringVar256 varNameTag;
   getVarNameTag(varNameTag,sizeof(varNameTag),el);
   SQUserPointer ivrData=0;
   if (!instance.RawGetUserData(varNameTag,&ivrData)) {
-//    throw SquirrelError("getInstanceVarInfo: Could not retrieve UserData");
-    return sa.ThrowError(_T("getInstanceVarInfo: Could not retrieve UserData")); // Results in variable not being found error.
-  } // if
+    return sa.ThrowError(_SC("getInstanceVarInfo: Could not retrieve UserData")); // Results in variable not being found error.
+  }
   vr = (VarRefPtr)ivrData;
-  unsigned char * up;
-  if (!(vr->access & (VAR_ACCESS_STATIC|VAR_ACCESS_CONSTANT))) {
-#ifdef SQ_USE_CLASS_INHERITANCE
-    SQUserPointer typetag; instance.GetTypeTag(&typetag);
+
+  char * up;
+  if (!(vr->m_access & (VAR_ACCESS_STATIC|VAR_ACCESS_CONSTANT))) {
+    SQUserPointer typetag; 
+    instance.GetTypeTag(&typetag);
+
+#if defined(SQ_USE_CLASS_INHERITANCE) 
     if (typetag != vr->instanceType) {
       SquirrelObject typeTable = instance.GetValue(SQ_CLASS_OBJECT_TABLE_NAME);
-      up = (unsigned char *)typeTable.GetUserPointer(INT((size_t)vr->instanceType)); // <TODO> 64-bit compatible version.
+      up = (char *)typeTable.GetUserPointer(INT((size_t)vr->instanceType)); // <TODO> 64-bit compatible version.
       if (!up) {
-        throw SquirrelError(_T("Invalid Instance Type"));
-      } // if
+        throw SquirrelError(_SC("Invalid Instance Type"));
+      }
     } else {
-      up = (unsigned char *)instance.GetInstanceUP(0);
+      up = (char *)instance.GetInstanceUP(0);
     } // if
+
+#elif defined(SQ_USE_CLASS_INHERITANCE_SIMPLE)
+    ClassTypeBase *ctb = (ClassTypeBase*)vr->instanceType;
+    up = (char *)instance.GetInstanceUP(0);
+    // Walk base classes until type tag match, adjust for inheritence offset
+    while(ctb && typetag!=ctb) {
+      up = (char*)up - ctb->m_offset;
+      ctb = ctb->m_pbase;
+    }
+    if (!ctb) {
+      throw SquirrelError(_SC("Invalid Instance Type"));
+    }
 #else
-    up = (unsigned char *)instance.GetInstanceUP(0);
+    up = (char *)instance.GetInstanceUP(0);
 #endif
+
+#ifdef SQPLUS_SMARTPOINTER_OPT
+#define SQPLUS_SMARTPOINTER_INSTANCE_VARINFO
+#include "SqPlusSmartPointer.h"
+#endif
+
     up += (size_t)vr->offsetOrAddrOrConst;         // Offset
   } else {
-    up = (unsigned char *)vr->offsetOrAddrOrConst; // Address
+    up = (char *)vr->offsetOrAddrOrConst; // Address
   } // if
   data = up;
   return SQ_OK;
 } // getInstanceVarInfo
 
+
+// If not static/global, message can (and will) disappear before arriving at catch (G++)
+static ScriptStringVar256 g_msg_throw;
+
 static int setVar(StackHandler & sa,VarRef * vr,void * data) {
-  if (vr->access & (VAR_ACCESS_READ_ONLY|VAR_ACCESS_CONSTANT)) {
-    ScriptStringVar256 msg;
+  if (vr->m_access & (VAR_ACCESS_READ_ONLY|VAR_ACCESS_CONSTANT)) {
     const SQChar * el = sa.GetString(2);
-    SCSNPRINTF(msg.s,sizeof(msg),_T("setVar(): Cannot write to constant: %s"),el);
-    throw SquirrelError(msg.s);
+    SCSNPRINTF(g_msg_throw.s,sizeof(g_msg_throw),_SC("setVar(): Cannot write to constant: %s"),el);
+    throw SquirrelError(g_msg_throw.s);
   } // if
-  switch (vr->type) {
+  switch (vr->m_type) {
   case TypeInfo<INT>::TypeID: {
     INT * val = (INT *)data; // Address
     if (val) {
-      *val = sa.GetInt(3);
-      return sa.Return(*val);
+        INT v = sa.GetInt(3);
+        // Support for different int sizes
+        switch( vr->m_size ) {
+          case 1: v = (*(char*)val = (char)v); break;  
+          case 2: v = (*(short*)val = (short)v); break;  
+#ifdef _SQ64
+          case 4: v = (*(int*)val = (int)v); break;
+#endif            
+          default: *val = v;
+       }
+       return sa.Return(v);
     } // if
     break;
+  } // case
+  case TypeInfo<unsigned>::TypeID: {
+	  unsigned * val = (unsigned *)data; // Address
+	  if (val) {
+		  *val = sa.GetInt(3);
+		  return sa.Return(static_cast<INT>(*val));
+	  } // if
+	  break;
   } // case
   case TypeInfo<FLOAT>::TypeID: {
     FLOAT * val = (FLOAT *)data; // Address
@@ -99,27 +131,18 @@ static int setVar(StackHandler & sa,VarRef * vr,void * data) {
     break;
   } // case
   case VAR_TYPE_INSTANCE: {
-    // vr->copyFunc is the LHS variable type: the RHS var's type is ClassType<>::type() (both point to ClassType<>::copy()).
-    // src will be null if the LHS and RHS types don't match.
-    SQUserPointer src = sa.GetInstanceUp(3,(SQUserPointer)vr->copyFunc); // Effectively performs: ClassType<>::type() == ClassType<>getCopyFunc().
-    if (!src) throw SquirrelError(_T("INSTANCE type assignment mismatch"));
-    vr->copyFunc(data,src);
-#if 0 // Return an instance on the stack (allocates memory)
-    if (!CreateNativeClassInstance(sa.GetVMPtr(),vr->typeName,data,0)) { // data = address
-      ScriptStringVar256 msg;
-      SCSNPRINTF(msg.s,sizeof(msg),_T("getVar(): Could not create instance: %s"),vr->typeName);
-      throw SquirrelError(msg.s);
-    } // if
-    return 1;
-#else // Don't return on stack.
+    HSQUIRRELVM v = sa.GetVMPtr();
+    SQUserPointer src = sa.GetInstanceUp(3,(SQUserPointer)vr->varType); // Effectively performs: ClassType<>::type() == ClassType<>().
+    if (!src) {
+      throw SquirrelError(_SC("INSTANCE type assignment mismatch"));
+    }
+    vr->varType->vgetCopyFunc()(data,src);
     return 0;
-#endif
   }
   case TypeInfo<SQUserPointer>::TypeID: {
-    ScriptStringVar256 msg;
     const SQChar * el = sa.GetString(2);
-    SCSNPRINTF(msg.s,sizeof(msg),_T("setVar(): Cannot write to an SQUserPointer: %s"),el);
-    throw SquirrelError(msg.s);
+    SCSNPRINTF(g_msg_throw.s,sizeof(g_msg_throw),_SC("setVar(): Cannot write to an SQUserPointer: %s"),el);
+    throw SquirrelError(g_msg_throw.s);
   } // case
   case TypeInfo<ScriptStringVarBase>::TypeID: {
     ScriptStringVarBase * val = (ScriptStringVarBase *)data; // Address
@@ -132,17 +155,39 @@ static int setVar(StackHandler & sa,VarRef * vr,void * data) {
     } // if
     break;
   } // case
+#if defined(SQPLUS_SUPPORT_STD_STRING) && !defined(SQUNICODE)
+  case TypeInfo<std::string>::TypeID: {
+    std::string *val = (std::string*)data; // Address
+    if (val) {
+      const SQChar *strVal = sa.GetString(3);
+      if (strVal) {
+        *val = strVal;
+        return sa.Return(val->c_str());
+      } // if
+   } // if
+   break;
+  } // case
+#endif      
   } // switch
   return SQ_ERROR;
 } // setVar
 
 static int getVar(StackHandler & sa,VarRef * vr,void * data) {
-  switch (vr->type) {
+  switch (vr->m_type) {
   case TypeInfo<INT>::TypeID: {
-    if (!(vr->access & VAR_ACCESS_CONSTANT)) {
-      INT * val = (INT *)data; // Address
-      if (val) {
-        return sa.Return(*val);
+    if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
+      if (data) {
+          INT v;
+          // Support for different int sizes
+          switch( vr->m_size ){
+            case 1: v = *(char*)data; break;  
+            case 2: v = *(short*)data; break;  
+#ifdef _SQ64
+            case 4: v = *(int*)data; break;
+#endif            
+            default: v = *(INT*)data;
+          }
+          return sa.Return(v);
       } // if
     } else {
       INT * val = (INT *)&data; // Constant value
@@ -150,8 +195,20 @@ static int getVar(StackHandler & sa,VarRef * vr,void * data) {
     } // if
     break;
   } // case
+  case TypeInfo<unsigned>::TypeID: {
+	  if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
+		  unsigned * val = (unsigned *)data; // Address
+		  if (val){
+            return sa.Return(static_cast<INT>(*val));
+          }
+	  } else {
+		  unsigned * val = (unsigned *)&data; // Constant value
+		  return sa.Return(static_cast<INT>(*val));
+	  } // if
+	  break;
+  } // case
   case TypeInfo<FLOAT>::TypeID: {
-    if (!(vr->access & VAR_ACCESS_CONSTANT)) {
+    if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
       FLOAT * val = (FLOAT *)data; // Address
       if (val) {
         return sa.Return(*val);
@@ -163,7 +220,7 @@ static int getVar(StackHandler & sa,VarRef * vr,void * data) {
     break;
   } // case
   case TypeInfo<bool>::TypeID: {
-    if (!(vr->access & VAR_ACCESS_CONSTANT)) {
+    if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
       bool * val = (bool *)data; // Address
       if (val) {
         return sa.Return(*val);
@@ -175,41 +232,56 @@ static int getVar(StackHandler & sa,VarRef * vr,void * data) {
     break;
   } // case
   case VAR_TYPE_INSTANCE:
-    if (!CreateNativeClassInstance(sa.GetVMPtr(),vr->typeName,data,0)) { // data = address. Allocates memory.
-      ScriptStringVar256 msg;
-      SCSNPRINTF(msg.s,sizeof(msg),_T("getVar(): Could not create instance: %s"),vr->typeName);
-      throw SquirrelError(msg.s);
+    if (!CreateNativeClassInstance(sa.GetVMPtr(),vr->varType->GetTypeName(),data,0)) { // data = address. Allocates memory.
+      SCSNPRINTF(g_msg_throw.s,sizeof(g_msg_throw),_SC("getVar(): Could not create instance: %s"),vr->varType->GetTypeName());
+      throw SquirrelError(g_msg_throw.s);
     } // if
     return 1;
-  case TypeInfo<SQUserPointer>::TypeID: {
+  case TypeInfo<SQUserPointer>::TypeID: 
     return sa.Return(data); // The address of member variable, not the variable itself.
-  } // case
   case TypeInfo<ScriptStringVarBase>::TypeID: {
-    if (!(vr->access & VAR_ACCESS_CONSTANT)) {
+    if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
       ScriptStringVarBase * val = (ScriptStringVarBase *)data; // Address
       if (val) {
         return sa.Return(val->s);
       } // if
     } else {
-      throw SquirrelError(_T("getVar(): Invalid type+access: 'ScriptStringVarBase' with VAR_ACCESS_CONSTANT (use VAR_ACCESS_READ_ONLY instead)"));
-    } // if
+      throw SquirrelError(_SC("getVar(): Invalid type+access: 'ScriptStringVarBase' with VAR_ACCESS_CONSTANT (use VAR_ACCESS_READ_ONLY instead)"));
+    }
     break;
   } // case
   case TypeInfo<const SQChar *>::TypeID: {
-    if (!(vr->access & VAR_ACCESS_CONSTANT)) {
-      throw SquirrelError(_T("getVar(): Invalid type+access: 'const SQChar *' without VAR_ACCESS_CONSTANT"));
+    if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
+      if( vr->m_access==VAR_ACCESS_READ_WRITE )
+        throw SquirrelError(_SC("getVar(): Invalid type+access: 'const SQChar *' without VAR_ACCESS_CONSTANT"));
+      // It is OK to read from a SQChar* if requested
+      return sa.Return(*(const SQChar **)data); // Address
     } else {
       return sa.Return((const SQChar *)data); // Address
-    } // if
+    }
     break;
   } // case
+#ifdef SQPLUS_SUPPORT_STD_STRING
+  case TypeInfo<std::string>::TypeID: {
+    if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
+      std::string *val = (std::string *)data; // Address
+      if (val) {
+        return sa.Return(val->c_str());
+      }
+    } else {
+      throw SquirrelError(_SC("getVar(): Invalid type+access: 'std::string' with VAR_ACCESS_CONSTANT (use VAR_ACCESS_READ_ONLY instead)"));
+    }
+    break;
+  } // case
+#endif
   } // switch
   return SQ_ERROR;
 } // getVar
 
 // === Global Vars ===
 
-SQInteger setVarFunc(HSQUIRRELVM v) {
+int setVarFunc(HSQUIRRELVM v) {
+  SquirrelVM::Init(v);  // For handling multi-VM setting right
   StackHandler sa(v);
   if (sa.GetType(1) == OT_TABLE) {
     VarRefPtr vr;
@@ -220,7 +292,8 @@ SQInteger setVarFunc(HSQUIRRELVM v) {
   return SQ_ERROR;
 } // setVarFunc
 
-SQInteger getVarFunc(HSQUIRRELVM v) {
+int getVarFunc(HSQUIRRELVM v) {
+  SquirrelVM::Init(v);  // For handling multi-VM setting right
   StackHandler sa(v);
   if (sa.GetType(1) == OT_TABLE) {
     VarRefPtr vr;
@@ -233,7 +306,8 @@ SQInteger getVarFunc(HSQUIRRELVM v) {
 
 // === Instance Vars ===
 
-SQInteger setInstanceVarFunc(HSQUIRRELVM v) {
+int setInstanceVarFunc(HSQUIRRELVM v) {
+  SquirrelVM::Init(v);  // For handling multi-VM setting right
   StackHandler sa(v);
   if (sa.GetType(1) == OT_INSTANCE) {
     VarRefPtr vr;
@@ -245,7 +319,8 @@ SQInteger setInstanceVarFunc(HSQUIRRELVM v) {
   return SQ_ERROR;
 } // setInstanceVarFunc
 
-SQInteger getInstanceVarFunc(HSQUIRRELVM v) {
+int getInstanceVarFunc(HSQUIRRELVM v) {
+  SquirrelVM::Init(v);  // For handling multi-VM setting right
   StackHandler sa(v);
   if (sa.GetType(1) == OT_INSTANCE) {
     VarRefPtr vr;
@@ -260,6 +335,7 @@ SQInteger getInstanceVarFunc(HSQUIRRELVM v) {
 // === Classes ===
 
 BOOL CreateClass(HSQUIRRELVM v,SquirrelObject & newClass,SQUserPointer classType,const SQChar * name,const SQChar * baseName) {
+  int n = 0;
   int oldtop = sq_gettop(v);
   sq_pushroottable(v);
   sq_pushstring(v,name,-1);
@@ -282,15 +358,25 @@ BOOL CreateClass(HSQUIRRELVM v,SquirrelObject & newClass,SQUserPointer classType
 } // CreateClass
 
 SquirrelObject RegisterClassType(HSQUIRRELVM v,const SQChar * scriptClassName,SQUserPointer classType,SQFUNCTION constructor) {
+  SquirrelVM::Init(v);  // For handling multi-VM setting right
   int top = sq_gettop(v);
   SquirrelObject newClass;
   if (CreateClass(v,newClass,classType,scriptClassName)) {
-    SquirrelVM::CreateFunction(newClass,constructor,_T("constructor"));
+    SquirrelVM::CreateFunction(newClass,constructor,_SC("constructor"));
   } // if
   sq_settop(v,top);
   return newClass;
 } // RegisterClassType
 
-}; // namespace SqPlus
 
-// sqPlus
+///////////////////////////////////////////////////////////////////////////
+// GCC sometimes has problems with finding inline functions at link time
+// (that also have a template definition). To solve the problem,
+// non-inlines goes here.
+#ifdef GCC_INLINE_WORKAROUND
+# include "SqPlusFunctionCallImpl.h"
+#endif  // GCC_INLINE_WORKAROUND 
+///////////////////////////////////////////////////////////////////////////
+
+} // namespace SqPlus
+

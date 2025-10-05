@@ -3,11 +3,8 @@
 //#include "SquirrelObject.h"
 //#include "SquirrelVM.h"
 #include "SquirrelBindingsUtilsWin32.h"
-#if defined(VSCRIPT_DLL_EXPORT) || defined(VSQUIRREL_TEST)
-#include "memdbgon.h"
-#endif
 
-SQInteger refcounted_release_hook(SQUserPointer p, SQInteger size)
+int refcounted_release_hook(SQUserPointer p, int size)
 {
 	IUnknown *pRC = (IUnknown*)p;
 	pRC->Release();
