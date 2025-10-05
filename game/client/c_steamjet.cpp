@@ -147,11 +147,18 @@ C_SteamJet::C_SteamJet()
 	m_Rate = 26;
 	m_JetLength = 80;
 	m_bEmit = true;
+	m_nType = STEAM_NORMAL;
 	m_bFaceLeft = false;
+
+	m_spawnflags = 0;
+	m_flRollSpeed = 0.0f;
+
 	m_ParticleEffect.SetAlwaysSimulate( false ); // Don't simulate outside the PVS or frustum.
 
 	m_vLastRampUpdatePos.Init( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
 	m_vLastRampUpdateAngles.Init( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
+
+	m_Lifetime = 0.0f;
 }
 
 
