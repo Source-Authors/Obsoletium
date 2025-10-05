@@ -288,7 +288,7 @@ void CModelPanel::SetupVCD( void )
 	{
 		// we failed to initialize this entity so just return gracefully
 		pEnt->Remove();
-		return;
+		return; //-V773
 	}
 
 	// setup the handle
@@ -401,7 +401,7 @@ void CModelPanel::SetupModel( void )
 	{
 		// we failed to initialize this entity so just return gracefully
 		pEnt->Remove();
-		return;
+		return; //-V773
 	}
 	
 	// setup the handle
