@@ -93,6 +93,7 @@ STUB_WEAPON_CLASS_BEGIN(weapon_pistol, WeaponPistol, C_BaseHLCombatWeapon)
 	}
 STUB_WEAPON_CLASS_END(weapon_pistol, WeaponPistol, C_BaseHLCombatWeapon);
 
+STUB_WEAPON_CLASS( weapon_shotgun, WeaponShotgun, C_BaseHLCombatWeapon );
 
 STUB_WEAPON_CLASS_BEGIN( weapon_smg1, WeaponSMG1, C_HLSelectFireMachineGun )
 	bool OnFireEventEx( [[maybe_unused]] C_BaseViewModel *pViewModel,
