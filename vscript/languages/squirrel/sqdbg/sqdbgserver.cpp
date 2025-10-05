@@ -225,7 +225,7 @@ void SQDbgServer::BusyWait()
 void SQDbgServer::SendChunk(const SQChar *chunk)
 {
 #ifndef _GAMECONSOLE
-	char *buf=NULL;
+	const char *buf=NULL;
 	int buf_len=0;
 #ifdef _UNICODE
 	buf_len=(int)scstrlen(chunk)+1;
@@ -233,9 +233,9 @@ void SQDbgServer::SendChunk(const SQChar *chunk)
 	wcstombs((char *)buf,chunk,buf_len);
 #else
 	buf_len=(int)scstrlen(chunk);
-	buf=(char *)chunk;
+	buf=chunk;
 #endif
-	send(_endpoint,(const char*)buf,(int)strlen((const char *)buf),0);
+	send(_endpoint,buf,(int)strlen((const char *)buf),0);
 #endif
 }
 
@@ -323,7 +323,7 @@ void SQDbgServer::Hook(int type,int line,const SQChar *src,const SQChar *func)
 void SQDbgServer::ParseMsg(const char *msg)
 {
 
-	switch(*((unsigned short *)msg)){
+	switch(*((const unsigned short *)msg)){
 		case MSG_ID('a','b'): {
 			BreakPoint bp;
 			if(ParseBreakpoint(msg+3,bp)){
@@ -580,7 +580,7 @@ void SQDbgServer::SerializeState()
 	sq_setdebughook(_v);
 	sq_pushnull(_v);
 	sq_seterrorhandler(_v);
-	const SQChar *sz;
+	SQChar *sz;
 	sq_pushobject(_v,_serializefunc);
 	sq_pushobject(_v,_debugroot);
 	sq_pushstring(_v,_SC("watches"),-1);
