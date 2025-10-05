@@ -547,7 +547,7 @@ void DataTable_Warning( PRINTF_FORMAT_STRING const char *pInMessage, ... )
 	va_list marker;
 	
 	va_start(marker, pInMessage);
-	V_sprintf_safe( msg, pInMessage, marker);
+	V_vsprintf_safe( msg, pInMessage, marker);
 	va_end(marker);
 
 	Warning( "DataTable warning: %s", msg );
