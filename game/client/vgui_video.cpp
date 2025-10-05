@@ -23,6 +23,8 @@ VideoPanel::VideoPanel( unsigned int nXPos, unsigned int nYPos, unsigned int nHe
 	m_pMaterial( NULL ),
 	m_nPlaybackHeight( 0 ),
 	m_nPlaybackWidth( 0 ),
+	m_flU( 0 ),
+	m_flV( 0 ),
 	m_bAllowAlternateMedia( allowAlternateMedia )
 {
 	// dimhotepus: Play video not only in menu, but in game

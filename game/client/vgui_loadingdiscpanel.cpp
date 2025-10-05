@@ -120,6 +120,7 @@ public:
 	{
 		loadingDiscPanel = NULL;
 		m_pPauseDiscPanel = NULL;
+		m_hParent = std::numeric_limits<vgui::VPANEL>::max();
 		m_nPrevTimeRemaining = -1;
 	}
 
