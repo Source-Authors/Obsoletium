@@ -1087,7 +1087,7 @@ void CViewRender::DrawViewModels( const CViewSetup &viewRender, bool drawViewmod
 
 	// dimhotepus: TF2 backport.
 	// Josh: Reset modulation color + blend
-	float one[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	constexpr float one[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 	render->SetColorModulation(	one );
 	render->SetBlend( 1.0f );
 
