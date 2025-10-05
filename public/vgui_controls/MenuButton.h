@@ -41,7 +41,7 @@ public:
 	virtual void HideMenu(void);
 	void DrawFocusBorder(int tx0, int ty0, int tx1, int ty1) override;
 	MESSAGE_FUNC( OnMenuClose, "MenuClose" );
-	MESSAGE_FUNC_PARAMS( OnKillFocus, "KillFocus", kv );		// called after the panel loses the keyboard focus
+	MESSAGE_FUNC_PARAMS( OnKillFocus, "KillFocus", kv );		// called after the panel loses the keyboard focus //-V762
 	void DoClick() override;
 	virtual void SetOpenOffsetY(int yOffset);
 

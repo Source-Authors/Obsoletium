@@ -32,7 +32,7 @@ public:
 	BaseInputDialog( vgui::Panel *parent, const char *title );
 	~BaseInputDialog();
 
-	void DoModal( KeyValues *pContextKeyValues = NULL );
+	void DoModal( KeyValues *pContextKeyValues = NULL ); //-V762
 
 protected:
 	void PerformLayout() override;
