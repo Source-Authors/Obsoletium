@@ -311,7 +311,8 @@ constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) n
 // Stack-based allocation related helpers
 //-----------------------------------------------------------------------------
 #if defined( GNUC )
-	#define stackalloc( _size )		alloca( AlignValue( _size, 16 ) )
+	// dimhotepus: Align at 16 bytes boundary for performance and SIMD.
+	#define stackalloc( _size )		AlignValue( alloca( AlignValue( _size, 16 ) ), 16 )
 #ifdef _LINUX
 	#define mallocsize( _p )	( malloc_usable_size( _p ) )
 #elif defined(OSX)
@@ -320,7 +321,8 @@ constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) n
 #error "Please define your platform"
 #endif
 #elif defined ( _WIN32 )
-	#define stackalloc( _size )		_alloca( AlignValue( _size, 16 ) )
+	// dimhotepus: Align at 16 bytes boundary for performance and SIMD. 
+	#define stackalloc( _size )		AlignValue( _alloca( AlignValue( _size, 16 ) ), 16 )
 	#define mallocsize( _p )		( _msize( _p ) )
 #endif
 
