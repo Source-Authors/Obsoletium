@@ -23,7 +23,7 @@ $Configuration
 	}
 }
 
-$Project "Pet"
+$Project "pet"
 {
 	$Folder	"Source Files"
 	{

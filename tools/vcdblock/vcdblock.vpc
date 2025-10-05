@@ -23,7 +23,7 @@ $Configuration
 	}
 }
 
-$Project "Vcdblock"
+$Project "vcdblock"
 {
 	$Folder	"Source Files"
 	{

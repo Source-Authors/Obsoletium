@@ -23,7 +23,7 @@ $Configuration
 	}
 }
 
-$Project "Commedit"
+$Project "commedit"
 {
 	$Folder	"Source Files"
 	{

@@ -22,7 +22,7 @@ $Configuration
 	}
 }
 
-$Project "Vmt"
+$Project "vmt"
 {
 	$Folder	"Source Files"
 	{

@@ -23,7 +23,7 @@ $Configuration
 	}
 }
 
-$Project "GameEvents"
+$Project "gameevents"
 {
 	$Folder	"Source Files"
 	{
