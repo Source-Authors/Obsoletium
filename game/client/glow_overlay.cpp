@@ -95,19 +95,22 @@ CGlowOverlay::CGlowOverlay()
 
 	m_flHDRColorScale = 1.0f;
 
+	m_bCacheGlowObstruction = false;
+	m_bCacheSkyObstruction = false;
+
 	//Init our sprites
-	for ( int i = 0; i < MAX_SUN_LAYERS; i++ )
+	for ( auto &s : m_Sprites )
 	{
-		m_Sprites[i].m_vColor.Init();
-		m_Sprites[i].m_flHorzSize	= 1.0f;
-		m_Sprites[i].m_flVertSize	= 1.0f;
-		m_Sprites[i].m_pMaterial	= NULL;
+		s.m_vColor.Init();
+		s.m_flHorzSize	= 1.0f;
+		s.m_flVertSize	= 1.0f;
+		s.m_pMaterial	= nullptr;
 	}
 
 #ifdef PORTAL
-	for( int i = 0; i != MAX_PORTAL_RECURSIVE_VIEWS; ++i )
+	for( auto &b : m_skyObstructionScaleBackups )
 	{
-		m_skyObstructionScaleBackups[i] = 1.0f;
+		b = 1.0f;
 	}
 #endif
 }
