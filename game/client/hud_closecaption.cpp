@@ -109,11 +109,13 @@ private:
 	bool			m_bBold;
 	bool			m_bItalic;
 	wchar_t			*m_pszStream;
-	vgui::HFont			m_hFont;
+	vgui::HFont		m_hFont;
 	Color			m_Color;
 };
 
 CCloseCaptionWorkUnit::CCloseCaptionWorkUnit() :
+	m_nX(0),
+	m_nY(0),
 	m_nWidth(0),
 	m_nHeight(0),
 	m_flFadeStartTime(0),
@@ -1962,7 +1964,8 @@ public:
 	CAsyncCaption() : 
 		m_flDuration( 0.0f ),
 		m_bIsStream( false ),
-		m_bFromPlayer( false )
+		m_bFromPlayer( false ),
+		m_bDirect( false )
 	{
 	}
 

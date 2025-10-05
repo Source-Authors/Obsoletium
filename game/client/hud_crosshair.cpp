@@ -43,16 +43,19 @@ DECLARE_HUDELEMENT( CHudCrosshair );
 #endif
 
 CHudCrosshair::CHudCrosshair( const char *pElementName ) :
-		CHudElement( pElementName ), BaseClass( NULL, "HudCrosshair" )
+	CHudElement( pElementName ), BaseClass( NULL, "HudCrosshair" )
 {
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
 	SetParent( pParent );
 
-	m_pCrosshair = 0;
+	m_pCrosshair = nullptr;
+	m_pDefaultCrosshair = nullptr;
 
 	m_clrCrosshair = Color( 0, 0, 0, 0 );
 
 	m_vecCrossHairOffsetAngle.Init();
+
+	m_bHideCrosshair = false;
 
 	SetHiddenBits( HIDEHUD_PLAYERDEAD | HIDEHUD_CROSSHAIR );
 }

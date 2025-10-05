@@ -204,11 +204,13 @@ wchar_t* ReadChatTextString( bf_read &msg, OUT_Z_BYTECAP(outSizeInBytes) wchar_t
 CBaseHudChatLine::CBaseHudChatLine( vgui::Panel *parent, const char *panelName ) : 
 	vgui::RichText( parent, panelName )
 {
-	m_hFont = m_hFontMarlett = 0;
-	m_flExpireTime = 0.0f;
-	m_flStartTime = 0.0f;
+	m_hFont = m_hFontMarlett = vgui::INVALID_FONT;
+	m_flExpireTime	= 0.0f;
+	m_iNameStart	= 0;
+	m_flStartTime	= 0.0f;
+	m_nCount		= 0;
 	m_iNameLength	= 0;
-	m_text = NULL;
+	m_text			= nullptr;
 
 	SetPaintBackgroundEnabled( true );
 	
