@@ -1002,8 +1002,8 @@ bool CViewRender::ShouldDrawViewModel( bool bDrawViewmodel )
 //-----------------------------------------------------------------------------
 bool CViewRender::UpdateRefractIfNeededByList( CUtlVector< IClientRenderable * > &list )
 {
-	int nCount = list.Count();
-	for( int i=0; i < nCount; ++i )
+	intp nCount = list.Count();
+	for( intp i=0; i < nCount; ++i )
 	{
 		IClientUnknown *pUnk = list[i]->GetIClientUnknown();
 		Assert( pUnk );
@@ -1027,8 +1027,8 @@ bool CViewRender::UpdateRefractIfNeededByList( CUtlVector< IClientRenderable * >
 void CViewRender::DrawRenderablesInList( CUtlVector< IClientRenderable * > &list, int flags )
 {
 	Assert( m_pCurrentlyDrawingEntity == NULL );
-	int nCount = list.Count();
-	for( int i=0; i < nCount; ++i )
+	intp nCount = list.Count();
+	for( intp i=0; i < nCount; ++i )
 	{
 		IClientUnknown *pUnk = list[i]->GetIClientUnknown();
 		Assert( pUnk );
@@ -1122,8 +1122,8 @@ void CViewRender::DrawViewModels( const CViewSetup &viewRender, bool drawViewmod
 
 		if ( ToolsEnabled() && ( !bShouldDrawPlayerViewModel || !bShouldDrawToolViewModels ) )
 		{
-			int nOpaque = opaqueViewModelList.Count();
-			for ( int i = nOpaque-1; i >= 0; --i )
+			intp nOpaque = opaqueViewModelList.Count();
+			for ( intp i = nOpaque-1; i >= 0; --i )
 			{
 				IClientRenderable *pRenderable = opaqueViewModelList[ i ];
 				bool bEntity = pRenderable->GetIClientUnknown()->GetBaseEntity();
@@ -1133,8 +1133,8 @@ void CViewRender::DrawViewModels( const CViewSetup &viewRender, bool drawViewmod
 				}
 			}
 
-			int nTranslucent = translucentViewModelList.Count();
-			for ( int i = nTranslucent-1; i >= 0; --i )
+			intp nTranslucent = translucentViewModelList.Count();
+			for ( intp i = nTranslucent-1; i >= 0; --i )
 			{
 				IClientRenderable *pRenderable = translucentViewModelList[ i ];
 				bool bEntity = pRenderable->GetIClientUnknown()->GetBaseEntity();
@@ -5820,7 +5820,7 @@ void CAboveWaterView::Setup( const CViewSetup &viewRender, bool bDrawSkybox, con
 	m_waterInfo = waterInfo;
 }
 
-		 
+
 //-----------------------------------------------------------------------------
 // 
 //-----------------------------------------------------------------------------
