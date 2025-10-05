@@ -236,7 +236,7 @@ float CDmeLogEditPanel::GetValue( float flIn )
 	switch( m_hLog->GetDataType() )
 	{
 	case AT_BOOL:
- 		flValue = CastElement<CDmeBoolLog >( m_hLog )->GetValue( time );
+ 		flValue = CastElement<CDmeBoolLog >( m_hLog )->GetValue( time ) ? 1.0f : 0.0f;
 		break;
 
 	case AT_INT:
@@ -300,7 +300,7 @@ void CDmeLogEditPanel::GetControlPoint( intp nPoint, float *pIn, float *pOut )
 	switch( m_hLog->GetDataType() )
 	{
 	case AT_BOOL:
- 		flValue = CastElement<CDmeBoolLog >( m_hLog )->GetKeyValue( nPoint );
+ 		flValue = CastElement<CDmeBoolLog >( m_hLog )->GetKeyValue( nPoint ) ? 1.0f : 0.0f;
 		break;
 
 	case AT_INT:
