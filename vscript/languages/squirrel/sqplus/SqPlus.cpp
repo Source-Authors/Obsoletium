@@ -8,7 +8,7 @@
 
 namespace SqPlus {
 
-static int getVarInfo(StackHandler & sa,VarRefPtr & vr) {
+static SQRESULT getVarInfo(StackHandler & sa,VarRefPtr & vr) {
   HSQOBJECT htable = sa.GetObjectHandle(1);
   SquirrelObject table(htable);
   const SQChar * el = sa.GetString(2);
@@ -22,7 +22,7 @@ static int getVarInfo(StackHandler & sa,VarRefPtr & vr) {
   return SQ_OK;
 } // getVarInfo
 
-static int getInstanceVarInfo(StackHandler & sa,VarRefPtr & vr,SQUserPointer & data) {
+static SQRESULT getInstanceVarInfo(StackHandler & sa,VarRefPtr & vr,SQUserPointer & data) {
   HSQOBJECT ho = sa.GetObjectHandle(1);
   SquirrelObject instance(ho);
   const SQChar * el = sa.GetString(2);
@@ -82,7 +82,7 @@ static int getInstanceVarInfo(StackHandler & sa,VarRefPtr & vr,SQUserPointer & d
 // If not static/global, message can (and will) disappear before arriving at catch (G++)
 static ScriptStringVar256 g_msg_throw;
 
-static int setVar(StackHandler & sa,VarRef * vr,void * data) {
+static SQRESULT setVar(StackHandler &sa, VarRef *vr, void *data) {
   if (vr->m_access & (VAR_ACCESS_READ_ONLY|VAR_ACCESS_CONSTANT)) {
     const SQChar * el = sa.GetString(2);
     SCSNPRINTF(g_msg_throw.s,sizeof(g_msg_throw),_SC("setVar(): Cannot write to constant: %s"),el ? el : "N/A");
@@ -173,7 +173,7 @@ static int setVar(StackHandler & sa,VarRef * vr,void * data) {
   return SQ_ERROR;
 } // setVar
 
-static int getVar(StackHandler & sa,VarRef * vr,void * data) {
+static SQRESULT getVar(StackHandler &sa, VarRef *vr, void *data) {
   switch (vr->m_type) {
   case TypeInfo<INT>::TypeID: {
     if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
@@ -283,7 +283,7 @@ static int getVar(StackHandler & sa,VarRef * vr,void * data) {
 
 // === Global Vars ===
 
-int setVarFunc(HSQUIRRELVM v) {
+SQInteger setVarFunc(HSQUIRRELVM v) {
   SquirrelVM::Init(v);  // For handling multi-VM setting right
   StackHandler sa(v);
   if (sa.GetType(1) == OT_TABLE) {
@@ -295,7 +295,7 @@ int setVarFunc(HSQUIRRELVM v) {
   return SQ_ERROR;
 } // setVarFunc
 
-int getVarFunc(HSQUIRRELVM v) {
+SQInteger getVarFunc(HSQUIRRELVM v) {
   SquirrelVM::Init(v);  // For handling multi-VM setting right
   StackHandler sa(v);
   if (sa.GetType(1) == OT_TABLE) {
@@ -309,7 +309,7 @@ int getVarFunc(HSQUIRRELVM v) {
 
 // === Instance Vars ===
 
-int setInstanceVarFunc(HSQUIRRELVM v) {
+SQRESULT setInstanceVarFunc(HSQUIRRELVM v) {
   SquirrelVM::Init(v);  // For handling multi-VM setting right
   StackHandler sa(v);
   if (sa.GetType(1) == OT_INSTANCE) {
@@ -322,7 +322,7 @@ int setInstanceVarFunc(HSQUIRRELVM v) {
   return SQ_ERROR;
 } // setInstanceVarFunc
 
-int getInstanceVarFunc(HSQUIRRELVM v) {
+SQRESULT getInstanceVarFunc(HSQUIRRELVM v) {
   SquirrelVM::Init(v);  // For handling multi-VM setting right
   StackHandler sa(v);
   if (sa.GetType(1) == OT_INSTANCE) {

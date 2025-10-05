@@ -240,20 +240,20 @@ struct StackHandler {
 		sq_pushbool(v,b);
 		return 1;
 	}
-  int Return(SQUserPointer p) {
-    sq_pushuserpointer(v,p);
-    return 1;
-  }
+    int Return(SQUserPointer p) {
+        sq_pushuserpointer(v,p);
+        return 1;
+    }
 	int Return(SquirrelObject &o)
 	{
 		sq_pushobject(v,o.GetObjectHandle());
 		return 1;
 	}
 	int Return() { return 0; }
-	int ThrowError(const SQChar *error) {
+	SQRESULT ThrowError(const SQChar *error) {
 		return sq_throwerror(v,error);
 	}
-  HSQUIRRELVM GetVMPtr() { return v; }
+    HSQUIRRELVM GetVMPtr() { return v; }
 private:
 	int _top;
 	HSQUIRRELVM v;

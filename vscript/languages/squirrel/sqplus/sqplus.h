@@ -591,10 +591,10 @@ inline void getVarNameTag(SQChar * buff,INT maxSize,const SQChar * scriptName) {
 } // getVarNameTag
 
 // Internal use only.
-int setVarFunc(HSQUIRRELVM v);
-int getVarFunc(HSQUIRRELVM v);
-int setInstanceVarFunc(HSQUIRRELVM v);
-int getInstanceVarFunc(HSQUIRRELVM v);
+SQRESULT setVarFunc(HSQUIRRELVM v);
+SQRESULT getVarFunc(HSQUIRRELVM v);
+SQRESULT setInstanceVarFunc(HSQUIRRELVM v);
+SQRESULT getInstanceVarFunc(HSQUIRRELVM v);
 
 // === BEGIN Helpers ===
 
