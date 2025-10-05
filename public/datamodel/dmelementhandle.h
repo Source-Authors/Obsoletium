@@ -23,20 +23,21 @@
 // the other solution would be to redefine DmElementHandle_t s.t. DMELEMENT_HANDLE_INVALID==0
 struct DmElementHandle_t
 {
-	DmElementHandle_t() : handle( 0xffffffff ) {}
-	explicit DmElementHandle_t( int h ) : handle( h ) {}
+	DmElementHandle_t() : handle( -1 ) {}
+	explicit DmElementHandle_t( std::nullptr_t ) : handle( -1 ) {}
+	explicit DmElementHandle_t( intp h ) : handle( h ) {}
 	inline bool operator==( const DmElementHandle_t &h ) const { return handle == h.handle; }
 	inline bool operator!=( const DmElementHandle_t &h ) const { return handle != h.handle; }
 	inline bool operator<( const DmElementHandle_t &h ) const { return handle < h.handle; }
 //	inline operator int() const { return handle; } // if we're okay with implicit int casts, uncomment this method
-	int handle;
+	intp handle;
 };
 const DmElementHandle_t DMELEMENT_HANDLE_INVALID;
 
 #else // PERFORM_HANDLE_TYPECHECKING
 
-// dimhotepus: Make int.
-enum DmElementHandle_t : int
+// dimhotepus: Make intp.
+enum DmElementHandle_t : intp
 {
 	DMELEMENT_HANDLE_INVALID = -1
 };
