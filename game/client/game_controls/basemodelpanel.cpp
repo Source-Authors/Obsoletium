@@ -45,9 +45,10 @@ DECLARE_BUILD_FACTORY( CModelPanel );
 CModelPanel::CModelPanel( vgui::Panel *pParent, const char *pName ) : vgui::EditablePanel( pParent, pName )
 {
 	m_nFOV = 54;
-	m_hModel = NULL;
-	m_pModelInfo = NULL;
-	m_hScene = NULL;
+	m_flFrameDistance = 0;
+	m_hModel = nullptr;
+	m_pModelInfo = nullptr;
+	m_hScene = nullptr;
 	m_iDefaultAnimation = 0;
 	m_bPanelDirty = true;
 	m_bStartFramed = false;

@@ -23,6 +23,10 @@ CBaseModelPanel::CBaseModelPanel( vgui::Panel *pParent, const char *pName )
 	: BaseClass( pParent, pName )
 	, m_nActiveSequence( ACT_INVALID )
 	, m_flActiveSequenceDuration( 0.f )
+	, m_bStartFramed( false )
+	, m_bDisableManipulation( false )
+	, m_bUseParticle( false )
+	, m_flMaxPitch( false )
 {
 	m_bForcePos = false;
 	m_bMousePressed = false;
