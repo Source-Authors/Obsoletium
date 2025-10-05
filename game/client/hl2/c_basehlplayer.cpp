@@ -613,14 +613,8 @@ void C_BaseHLPlayer::PerformClientSideNPCSpeedModifiers( float flFrameTime, CUse
 		}
 	}
 
-	if ( pCmd->forwardmove > 0.0f )
-	{
-		pCmd->forwardmove = clamp( pCmd->forwardmove, -m_flSpeedMod, m_flSpeedMod );
-	}
-	else
-	{
-		pCmd->forwardmove = clamp( pCmd->forwardmove, -m_flSpeedMod, m_flSpeedMod );
-	}
+	// dimhotepus: Simplify clamp.
+	pCmd->forwardmove = clamp( pCmd->forwardmove, -m_flSpeedMod, m_flSpeedMod );
 	pCmd->sidemove = clamp( pCmd->sidemove, -m_flSpeedMod, m_flSpeedMod );
    
 	//Msg( "fwd %f right %f\n", pCmd->forwardmove, pCmd->sidemove );
