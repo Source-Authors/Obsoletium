@@ -67,6 +67,8 @@ CPrediction::CPrediction( void )
 #if !defined( NO_ENTITY_PREDICTION )
 	m_bInPrediction = false;
 	m_bFirstTimePredicted = false;
+	m_bOldCLPredictValue = false;
+	m_bEnginePaused = false;
 
 	m_nIncomingPacketNumber = 0;
 	m_flIdealPitch = 0.0f;
