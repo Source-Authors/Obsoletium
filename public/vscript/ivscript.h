@@ -618,7 +618,7 @@ public:
 
 		ScriptVariant_t vars[size] = {std::forward(args)...};
 		
-		return ExecuteFunction( hFunction, args, ARRAYSIZE(args), pReturn, hScope, bWait );
+		return ExecuteFunction( hFunction, vars, ARRAYSIZE(vars), pReturn, hScope, bWait );
 	}
 };
 
