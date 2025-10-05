@@ -936,7 +936,7 @@ void CBaseAnimSetAttributeSliderPanel::GetChannelsForControl( CDmElement *contro
 	{
 		channels[ LOG_PREVIEW_MULTILEVEL ] = NULL;
 	}
-	for ( int i = 3; i < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++i )
+	for ( int i = 3; i < LOG_PREVIEW_MAX_CHANNEL_COUNT; ++i ) //-V654 //-V621
 	{
 		channels[i] = NULL;
 	}
