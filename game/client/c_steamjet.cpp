@@ -150,8 +150,8 @@ C_SteamJet::C_SteamJet()
 	m_bFaceLeft = false;
 	m_ParticleEffect.SetAlwaysSimulate( false ); // Don't simulate outside the PVS or frustum.
 
-	m_vLastRampUpdatePos.Init( 1e24, 1e24, 1e24 );
-	m_vLastRampUpdateAngles.Init( 1e24, 1e24, 1e24 );
+	m_vLastRampUpdatePos.Init( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
+	m_vLastRampUpdateAngles.Init( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
 }
 
 
