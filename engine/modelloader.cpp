@@ -1445,8 +1445,10 @@ static void CalcSurfaceExtents ( CMapLoadHelper& lh, SurfaceHandle_t surfID )
 	mtexinfo_t	*tex;
 	int		bmins[2], bmaxs[2];
 
-	textureMins[0] = textureMins[1] = 999999;
-	textureMaxs[0] = textureMaxs[1] = -99999;
+	// dimhotepus: 999999 -> max
+	textureMins[0] = textureMins[1] = std::numeric_limits<float>::max();
+	// dimhotepus: -99999 -> min
+	textureMaxs[0] = textureMaxs[1] = std::numeric_limits<float>::min();
 
 	worldbrushdata_t *pBrushData = lh.GetMap();
 	tex = MSurf_TexInfo( surfID, pBrushData );
