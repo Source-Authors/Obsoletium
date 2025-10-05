@@ -101,10 +101,7 @@ public:
 				Output += "\t";
 			}
 
-			if ( s )
-			{
-				Output += s;
-			}
+			Output += s;
 
 			lua_pop( pState, 1 );  /* pop result */
 		}
