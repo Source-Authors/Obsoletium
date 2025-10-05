@@ -36,7 +36,7 @@ CAttributeDetailTypePickerPanel::~CAttributeDetailTypePickerPanel()
 //-----------------------------------------------------------------------------
 void CAttributeDetailTypePickerPanel::AddDetailTypesToList( PickerList_t &list )
 {
-	KeyValues *pDetailTypes = new KeyValues( DETAILTYPE_FILE );
+	KeyValuesAD pDetailTypes( DETAILTYPE_FILE );
 	if ( pDetailTypes->LoadFromFile( g_pFullFileSystem, DETAILTYPE_FILE, "GAME" ) )
 	{
 		for ( KeyValues *sub = pDetailTypes->GetFirstTrueSubKey(); sub != NULL; sub = sub->GetNextTrueSubKey() )
@@ -50,8 +50,6 @@ void CAttributeDetailTypePickerPanel::AddDetailTypesToList( PickerList_t &list )
 	{
 		Warning( "Unable to load detail prop file '%s'\n", DETAILTYPE_FILE );
 	}
-
-	pDetailTypes->deleteThis();
 }
 
 
