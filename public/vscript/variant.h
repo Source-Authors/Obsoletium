@@ -434,7 +434,8 @@ inline void CVariantBase<CValueAllocator>::CopyData( const T &src, bool bForceCo
 	COMPILE_TIME_ASSERT( ( ExtendedFieldType_t )VariantDeduceType( T ) != FIELD_TYPEUNKNOWN );
 
 	Free();
-	m_type = to_underlying( VariantDeduceType( T ) );
+	// dimhotepus: Fix int -> int16 downcast warning.
+	m_type = static_cast<int16>( to_underlying( VariantDeduceType( T ) ) );
 	if ( CValueAllocator::ALWAYS_COPY || bForceCopy )
 	{
 		m_pData = Allocate<T>();
