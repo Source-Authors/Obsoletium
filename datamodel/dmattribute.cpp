@@ -160,6 +160,9 @@ public:
 //-----------------------------------------------------------------------------
 CUtlMemoryPool g_DataAlloc4( sizeof( CDmAttribute ), 4, CUtlMemoryPool::GROW_SLOW, "4-byte data pool" );
 CUtlMemoryPool g_DataAlloc8( sizeof( CDmAttribute ), 8, CUtlMemoryPool::GROW_SLOW, "8-byte data pool" );
+#ifdef PLATFORM_64BITS
+CUtlMemoryPool g_DataAlloc16( sizeof( CDmAttribute ), 16, CUtlMemoryPool::GROW_SLOW, "16-byte data pool" );
+#endif
 
 template< class T > void* NewData()
 {
@@ -194,7 +197,12 @@ struct CSizeTest
 		COMPILE_TIME_ASSERT( sizeof( float )		== 4 );
 		COMPILE_TIME_ASSERT( sizeof( bool )			<= 4 );
 		COMPILE_TIME_ASSERT( sizeof( Color )		== 4 );
+		// dimhotepus: x86-64 support for DmElementAttribute_t
+#ifndef PLATFORM_64BITS
 		COMPILE_TIME_ASSERT( sizeof( DmElementAttribute_t ) <= 8 );
+#else
+		COMPILE_TIME_ASSERT( sizeof( DmElementAttribute_t ) <= 16 );
+#endif
 		COMPILE_TIME_ASSERT( sizeof( Vector2D )		== 8 );
 	}
 };
@@ -206,7 +214,12 @@ static CSizeTest g_sizeTest;
 USE_SPECIAL_ALLOCATOR( bool, g_DataAlloc4 )
 USE_SPECIAL_ALLOCATOR( int, g_DataAlloc4 )
 USE_SPECIAL_ALLOCATOR( float, g_DataAlloc4 )
-USE_SPECIAL_ALLOCATOR( DmElementHandle_t, g_DataAlloc4 )
+// dimhotepus: x86-64 support for DmElementAttribute_t
+#ifndef PLATFORM_64BITS
+USE_SPECIAL_ALLOCATOR( DmElementHandle_t, g_DataAlloc8 )
+#else
+USE_SPECIAL_ALLOCATOR( DmElementHandle_t, g_DataAlloc16 )
+#endif
 USE_SPECIAL_ALLOCATOR( Color, g_DataAlloc4 )
 USE_SPECIAL_ALLOCATOR( Vector2D, g_DataAlloc8 )
 
