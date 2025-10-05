@@ -91,7 +91,7 @@ static void BufPrint( CUtlBuffer& buf, int level, char const *fmt, ... )
 {
 	char string[ 2048 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2018 //-V2019
 	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
 
@@ -206,7 +206,7 @@ bool CWindowPositionMgr::LoadPositions( char const *filename, vgui::Panel *paren
 			if ( !bounds || !bounds[ 0 ] )
 				continue;
 
-			if ( 4 != sscanf( bounds, "%f %f %f %f", &fx, &fy, &fw, &fh ) )
+			if ( 4 != sscanf( bounds, "%f %f %f %f", &fx, &fy, &fw, &fh ) ) //-V112
 				continue;
 
 			x = (int)( sw * fx + 0.5f );

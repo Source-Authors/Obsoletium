@@ -1135,7 +1135,7 @@ CMiniViewport *CBaseToolSystem::CreateMiniViewport( vgui::Panel *parent )
 	// dimhotepus: Scale UI.
 	int menuBarHeight = QuickPropScale( 28 );
 	int titleBarHeight = QuickPropScale( 22 );
-	int offset = QuickPropScale( 4 );
+	int offset = QuickPropScale( 4 ); //-V112
 	vp->SetBounds( ( 2 * w / 3  ) - offset, menuBarHeight + offset, w / 3, h / 3 + titleBarHeight);
 	return vp;
 }

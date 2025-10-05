@@ -57,15 +57,15 @@ void CBaseStatusBar::PerformLayout()
 
 	int cw, ch;
 	m_pLabel->GetContentSize( cw, ch );
-	m_pLabel->SetBounds( x, QuickPropScale( 4 ), cw, h - QuickPropScale( 8 ) );
+	m_pLabel->SetBounds( x, QuickPropScale( 4 ), cw, h - QuickPropScale( 8 ) ); //-V112
 
-	x += cw + QuickPropScale( 4 );
+	x += cw + QuickPropScale( 4 ); //-V112
 
 	int consoleWide = w - x - QuickPropScale( 8 );
 
-	m_pConsole->SetBounds( x, QuickPropScale( 2 ), consoleWide, h - QuickPropScale( 4 ) );
+	m_pConsole->SetBounds( x, QuickPropScale( 2 ), consoleWide, h - QuickPropScale( 4 ) ); //-V112
 
-	x += consoleWide + QuickPropScale( 4 );
+	x += consoleWide + QuickPropScale( 4 ); //-V112
 
 	int infoW = QuickPropScale( 85 );
 
