@@ -40,7 +40,7 @@ void Scene_Printf( const char *pFormat, ... )
 	va_list marker;
 	char msg[8192];
 
-	va_start(marker, pFormat);
+	va_start(marker, pFormat); //-V2019 //-V2018
 	V_vsprintf_safe(msg, pFormat, marker);
 	va_end(marker);	
 	
@@ -104,7 +104,7 @@ void CSceneTokenProcessor::Error( PRINTF_FORMAT_STRING const char *fmt, ... )
 {
 	char string[ 2048 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( string, fmt, argptr );
 	va_end( argptr );
 

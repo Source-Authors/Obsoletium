@@ -249,7 +249,7 @@ public:
 
 		va_list	argptr;
 		char string[256];
-		va_start (argptr, fmt);
+		va_start (argptr, fmt); //-V2019 //-V2018
 		V_vsprintf_safe( string, fmt, argptr );
 		va_end (argptr);
 
@@ -1123,11 +1123,11 @@ static int GamesoundCompletion( const char *partial, char commands[ COMMAND_COMP
 	int current = 0;
 
 	const char *cmdname = "playgamesound";
-	char *substring = NULL;
+	const char *substring = NULL;
 	intp substringLen = 0;
 	if ( Q_strstr( partial, cmdname ) && strlen(partial) > strlen(cmdname) + 1 )
 	{
-		substring = (char *)partial + strlen( cmdname ) + 1;
+		substring = partial + strlen( cmdname ) + 1;
 		substringLen = strlen(substring);
 	}
 	
@@ -1138,7 +1138,7 @@ static int GamesoundCompletion( const char *partial, char commands[ COMMAND_COMP
 		{
 			if ( !substring || !Q_strncasecmp( pSoundName, substring, substringLen ) )
 			{
-				Q_snprintf( commands[ current ], sizeof( commands[ current ] ), "%s %s", cmdname, pSoundName );
+				V_sprintf_safe( commands[ current ], "%s %s", cmdname, pSoundName );
 				current++;
 			}
 		}

@@ -180,7 +180,7 @@ void CBaseGameStats::StatsLog( char const *fmt, ... )
 
 	char buf[ 2048 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2018 //-V2019
 	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 

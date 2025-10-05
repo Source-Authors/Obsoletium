@@ -119,7 +119,7 @@ void CPredictionCopy::ReportFieldsDiffer( const char *fmt, ... )
 	va_list argptr;
 	char data[ 4096 ];
 	int len;
-	va_start(argptr, fmt);
+	va_start(argptr, fmt); //-V2018 //-V2019
 	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
@@ -165,7 +165,7 @@ void CPredictionCopy::DescribeFields( difftype_t dt, const char *fmt, ... )
 	va_list argptr;
 	char data[ 4096 ];
 	int len;
-	va_start(argptr, fmt);
+	va_start(argptr, fmt); //-V2019 //-V2018
 	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
@@ -1047,7 +1047,7 @@ void CPredictionCopy::CopyFields( int chain_count, datamap_t *pRootMap, typedesc
 		fieldSize = m_pCurrentField->fieldSize;
 
 		pOutputData = (void *)((char *)m_pDest + fieldOffsetDest );
-		pInputData = (void const *)((char *)m_pSrc + fieldOffsetSrc );
+		pInputData = (void const *)((const char *)m_pSrc + fieldOffsetSrc );
 
 		// Assume we can report
 		m_bShouldReport = m_bReportErrors;
@@ -1343,7 +1343,7 @@ void CPredictionCopy::WatchMsg( PRINTF_FORMAT_STRING const char *fmt, ... )
 	va_list argptr;
 	char data[ 4096 ];
 	int len;
-	va_start(argptr, fmt);
+	va_start(argptr, fmt); //-V2019 //-V2018
 	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
@@ -1470,7 +1470,7 @@ void CPredictionDescribeData::Describe( const char *fmt, ... )
 	va_list argptr;
 	char data[ 4096 ];
 	int len;
-	va_start(argptr, fmt);
+	va_start(argptr, fmt); //-V2019 //-V2018
 	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
@@ -1634,7 +1634,7 @@ void CPredictionDescribeData::DescribeFields_R( int chain_count, datamap_t *pRoo
 		fieldOffsetSrc = m_pCurrentField->fieldOffset[ m_nSrcOffsetIndex ];
 		fieldSize = m_pCurrentField->fieldSize;
 		
-		pInputData = (void const *)((char *)m_pSrc + fieldOffsetSrc );
+		pInputData = (void const *)((const char *)m_pSrc + fieldOffsetSrc );
 		
 		// Assume we can report
 		m_bShouldReport = true;
@@ -1783,7 +1783,7 @@ void CValueChangeTracker::GetValue( char *buf, size_t bufsize )
 		Assert( ( i == ( m_FieldStack.Count() -1 ) ) || 
 			( td->fieldType & FIELD_EMBEDDED ) );
 		int fieldOffsetSrc = td->fieldOffset[ TD_OFFSET_NORMAL ];
-		const void *pSaveSrc = (const void *)( (char *)pInputData + fieldOffsetSrc );
+		const void *pSaveSrc = (const void *)( (const char *)pInputData + fieldOffsetSrc );
 		if ( ( td->flags & FTYPEDESC_PTR ) && 
 			 ( td->fieldType & FIELD_EMBEDDED ) )
 		{
@@ -1791,7 +1791,7 @@ void CValueChangeTracker::GetValue( char *buf, size_t bufsize )
 		}
 		else
 		{
-			pInputData = (void const *)((char *)pSaveSrc );
+			pInputData = (void const *)((const char *)pSaveSrc );
 		}
 	}
 

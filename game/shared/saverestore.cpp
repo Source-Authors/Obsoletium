@@ -214,7 +214,7 @@ inline int CSave::DataEmpty( const char *pdata, int size )
 		return 1;
 	}
 
-	return ( *((int *)pdata) == 0 );
+	return ( *((const int *)pdata) == 0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -299,7 +299,7 @@ void CSave::Log( const char *pName, fieldtype_t fieldType, void *value, int coun
 		case FIELD_STRING:
 			{
 				string_t *pValue = ( string_t* )( value );
-				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "%s", ( char* )STRING( *pValue ) );
+				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "%s", ( const char* )STRING( *pValue ) );
 				Q_strncat( szBuf, szTempBuf, sizeof( szTempBuf ), COPY_ALL_CHARACTERS );
 				break;					
 			}
@@ -647,7 +647,7 @@ bool CSave::ShouldSaveField( const void *pData, typedescription_t *pField )
 			}
 
 			int nFieldCount = pField->fieldSize;
-			char *pTestData = (char *)( ( !(pField->flags & FTYPEDESC_PTR) ) ? pData : *((void **)pData) );
+			const char *pTestData = (char *)( ( !(pField->flags & FTYPEDESC_PTR) ) ? pData : *((const void **)pData) );
 			while ( --nFieldCount >= 0 )
 			{
 				typedescription_t *pTestField = pField->td->dataDesc;
@@ -686,7 +686,7 @@ bool CSave::ShouldSaveField( const void *pData, typedescription_t *pField )
 				Assert( 0 );
 			}
 
-			int *pEHandle = (int *)pData;
+			const int *pEHandle = (const int *)pData;
 			for ( int i = 0; i < pField->fieldSize; ++i, ++pEHandle )
 			{
 				if ( (*pEHandle) != -1 )
@@ -1215,7 +1215,7 @@ void CSave::WriteEHandle( const char *pname, const EHANDLE *pEHandle, int count 
 	int entityArray[MAX_ENTITYARRAY];
 	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
 	{
-		entityArray[i] = EntityIndex( (CBaseEntity *)(const_cast<EHANDLE *>(pEHandle)[i]) );
+		entityArray[i] = EntityIndex( static_cast<const CBaseEntity *>(pEHandle[i]) );
 	}
 	WriteInt( pname, entityArray, count );
 }
@@ -1228,7 +1228,7 @@ void CSave::WriteEHandle( const EHANDLE *pEHandle, int count )
 	int entityArray[MAX_ENTITYARRAY];
 	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
 	{
-		entityArray[i] = EntityIndex( (CBaseEntity *)(const_cast<EHANDLE *>(pEHandle)[i]) );
+		entityArray[i] = EntityIndex( static_cast<const CBaseEntity *>(pEHandle[i]) );
 	}
 	WriteInt( entityArray, count );
 }

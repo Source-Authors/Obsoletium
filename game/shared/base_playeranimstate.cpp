@@ -463,7 +463,7 @@ int CBasePlayerAnimState::CalcSequenceIndex( PRINTF_FORMAT_STRING const char *pB
 {
 	char szFullName[512];
 	va_list marker;
-	va_start( marker, pBaseName );
+	va_start( marker, pBaseName ); //-V2018 //-V2019
 	V_vsprintf_safe( szFullName, pBaseName, marker );
 	va_end( marker );
 	int iSequence = GetOuter()->LookupSequence( szFullName );
@@ -940,7 +940,7 @@ void CBasePlayerAnimState::AnimStateLog( PRINTF_FORMAT_STRING const char *pMsg, 
 	// Format the string.
 	char str[4096];
 	va_list marker;
-	va_start( marker, pMsg );
+	va_start( marker, pMsg ); //-V2018 //-V2019
 	V_vsprintf_safe( str, pMsg, marker );
 	va_end( marker );
 
@@ -970,7 +970,7 @@ void CBasePlayerAnimState::AnimStatePrintf( int iLine, PRINTF_FORMAT_STRING cons
 	// Format the string.
 	char str[4096];
 	va_list marker;
-	va_start( marker, pMsg );
+	va_start( marker, pMsg ); //-V2018 //-V2019
 	V_vsprintf_safe( str, pMsg, marker );
 	va_end( marker );
 
