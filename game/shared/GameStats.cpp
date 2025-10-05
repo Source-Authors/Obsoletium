@@ -144,8 +144,11 @@ CBaseGameStats_Driver::CBaseGameStats_Driver( void ) :
 	m_bStationary( false ),
 	m_flLastMovementTime( 0.0f ),
 	m_bGamePaused( false ),
-	m_pGamestatsData( NULL )
+	m_flPauseStartTime( -1 ),
+	m_pGamestatsData( nullptr )
 {
+	BitwiseClear(m_StatsBuffer);
+
 	m_szLoadedUserID[0] = 0;
 	m_tLastUpload = 0;
 	m_LastUserCmd.Reset();
