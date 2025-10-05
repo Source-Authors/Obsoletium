@@ -802,7 +802,8 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( float *pDest ) const
 	case FIELD_UINT:		*pDest = m_uint; return true;
 	case FIELD_FLOAT:		*pDest = m_float; return true;
 	case FIELD_FLOAT64:		*pDest = m_float64; return true;
-	case FIELD_BOOLEAN:		*pDest = m_bool; return true;
+	// dimhotepus: Do not mix float and bool.
+	case FIELD_BOOLEAN:		*pDest = m_bool ? 1.f : 0.f; return true;
 	default:
 		Warning( "No conversion from %s to float now\n", VariantFieldTypeName( m_type ) );
 		return false;
