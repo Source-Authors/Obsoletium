@@ -2861,7 +2861,7 @@ struct flexsetting_t
 	//			**weights - 
 	// Output : int
 	//-----------------------------------------------------------------------------
-	inline int psetting( byte *base, int i, flexweight_t **weights ) const;
+	inline int psetting( const byte *base, int i, flexweight_t **weights ) const;
 };
 
 
@@ -2918,7 +2918,7 @@ struct flexsettinghdr_t
 //			**weights - destination for weights array starting at index i.
 // Output : int
 //-----------------------------------------------------------------------------
-inline int flexsetting_t::psetting( [[maybe_unused]] byte *base, int i, flexweight_t **weights ) const
+inline int flexsetting_t::psetting( [[maybe_unused]] const byte *base, int i, flexweight_t **weights ) const
 { 
 	// Grab array pointer
 	*weights = (flexweight_t *)(((byte *)this) + settingindex) + i;

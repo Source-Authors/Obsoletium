@@ -245,7 +245,7 @@ char* AllocateStringHelper2( const char *pFormat, va_list marker )
 char* AllocateStringHelper( PRINTF_FORMAT_STRING const char *pFormat, ... )
 {
 	va_list marker;
-	va_start( marker, pFormat );
+	va_start( marker, pFormat ); //-V2018 //-V2019
 	char *pRet = AllocateStringHelper2( pFormat, marker );
 	va_end( marker );
 
@@ -257,7 +257,7 @@ char* AllocateUniqueDataTableName( bool bSendTable, PRINTF_FORMAT_STRING const c
 {
 	// Setup the string.
 	va_list marker;
-	va_start( marker, pFormat );
+	va_start( marker, pFormat ); //-V2018 //-V2019
 	char *pRet = AllocateStringHelper2( pFormat, marker );
 	va_end( marker );
 

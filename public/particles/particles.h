@@ -1759,7 +1759,7 @@ inline int *CParticleCollection::GetIntAttributePtrForWrite( int nAttribute, int
 
 inline const int *CParticleCollection::GetIntAttributePtr( int nAttribute, int nParticleNumber ) const
 {
-	return (int*)GetFloatAttributePtr( nAttribute, nParticleNumber );
+	return (const int*)GetFloatAttributePtr( nAttribute, nParticleNumber );
 }
 
 inline const fltx4 *CParticleCollection::GetM128AttributePtr( int nAttribute, size_t *pStrideOut ) const

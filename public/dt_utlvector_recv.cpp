@@ -25,7 +25,7 @@ public:
 
 void RecvProxy_UtlVectorLength( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
-	CRecvPropExtra_UtlVector *pExtra = (CRecvPropExtra_UtlVector*)pData->m_pRecvProp->GetExtraData();
+	const auto *pExtra = (const CRecvPropExtra_UtlVector*)pData->m_pRecvProp->GetExtraData();
 	// dimhotepus: Prevent overflows. TF2 backport.
 	if ( pData->m_Value.m_Int < 0 || pData->m_Value.m_Int > pExtra->m_nMaxElements )
 	{
@@ -50,7 +50,7 @@ void RecvProxy_UtlVectorLength( const CRecvProxyData *pData, void *pStruct, void
 
 void RecvProxy_UtlVectorElement( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
-	CRecvPropExtra_UtlVector *pExtra = (CRecvPropExtra_UtlVector*)pData->m_pRecvProp->GetExtraData();
+	const auto *pExtra = (const CRecvPropExtra_UtlVector*)pData->m_pRecvProp->GetExtraData();
 
 	// Kind of lame overloading element stride to hold the element index,
 	// but we can easily move it into its SetExtraData stuff if we need to.
@@ -67,7 +67,7 @@ void RecvProxy_UtlVectorElement( const CRecvProxyData *pData, void *pStruct, voi
 
 void RecvProxy_UtlVectorElement_DataTable( const RecvProp *pProp, void **pOut, void *pData, int objectID )
 {
-	CRecvPropExtra_UtlVector *pExtra = (CRecvPropExtra_UtlVector*)pProp->GetExtraData();
+	const auto *pExtra = (const CRecvPropExtra_UtlVector*)pProp->GetExtraData();
 
 	int iElement = pProp->GetElementStride();
 	Assert( iElement < pExtra->m_nMaxElements );
@@ -86,7 +86,7 @@ void DataTableRecvProxy_LengthProxy( const RecvProp *pProp, void **pOut, void *p
 	// particularly BEFORE it calls our array length proxy, we need to make sure we return 
 	// valid pointers that aren't going to change when it starts to copy the data into 
 	// the datatable elements.
-	CRecvPropExtra_UtlVector *pExtra = (CRecvPropExtra_UtlVector*)pProp->GetExtraData();
+	const auto *pExtra = (const CRecvPropExtra_UtlVector*)pProp->GetExtraData();
 	pExtra->m_EnsureCapacityFn( pData, pExtra->m_Offset, pExtra->m_nMaxElements );
 	
 	*pOut = pData;

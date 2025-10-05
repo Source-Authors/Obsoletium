@@ -746,9 +746,9 @@ inline bool bf_read::CheckForOverflow(intp nBits)
 inline int bf_read::ReadOneBitNoCheck()
 {
 #if VALVE_LITTLE_ENDIAN
-	unsigned int value = ((unsigned * RESTRICT)m_pData)[m_iCurBit >> 5] >> (m_iCurBit & 31);
+	const unsigned int value = ((const unsigned * RESTRICT)m_pData)[m_iCurBit >> 5] >> (m_iCurBit & 31);
 #else
-	unsigned char value = m_pData[m_iCurBit >> 3] >> (m_iCurBit & 7);
+	const unsigned char value = m_pData[m_iCurBit >> 3] >> (m_iCurBit & 7);
 #endif
 	++m_iCurBit;
 	return value & 1;
