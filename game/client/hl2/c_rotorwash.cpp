@@ -107,10 +107,12 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 C_RotorWashEmitter::C_RotorWashEmitter( void )
 {
+	m_flAltitude = 0.0f;
+	m_hWaterMaterial[0] = nullptr;
+	m_hWaterMaterial[1] = nullptr;
+
 #ifndef _XBOX
 	m_pSimple =  NULL;
-	m_hWaterMaterial[0] = NULL;
-	m_hWaterMaterial[1] = NULL;
 #endif // !_XBOX
 }
 

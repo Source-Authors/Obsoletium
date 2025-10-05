@@ -36,7 +36,7 @@ C_BaseHelicopter::C_BaseHelicopter()
 class CHeliBladeMaterialProxy : public CEntityMaterialProxy
 {
 public:
-	CHeliBladeMaterialProxy() { m_AlphaVar = NULL; }
+	CHeliBladeMaterialProxy() { m_AlphaVar = nullptr; m_bFadeOut = false; }
 	virtual ~CHeliBladeMaterialProxy() {}
 	virtual bool Init( IMaterial *pMaterial, KeyValues *pKeyValues );
 	virtual void OnBind( C_BaseEntity *pEntity );

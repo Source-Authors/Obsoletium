@@ -92,6 +92,13 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 C_ScriptIntro::C_ScriptIntro( void )
 {
+	m_iNextFOV = 0;
+	m_iFOV = 0;
+	m_iPrevFOV = 0;
+	m_iStartFOV = 0;
+	m_flNextFOVBlendTime = 0.0f;
+	m_flFOVBlendStartTime = 0.0f;
+	m_bAlternateFOV = false;
 	m_bActive = false;
 	m_vecCameraView = vec3_origin;
 	m_vecCameraViewAngles = vec3_angle;
@@ -100,14 +107,15 @@ C_ScriptIntro::C_ScriptIntro( void )
 	m_flNextBlendTime = 0;
 	m_flBlendStartTime = 0;
 	m_IntroData.m_playerViewFOV = 0;
+
+	BitwiseClear(m_flFadeColor);
+
 	m_flFadeAlpha = 0;
 	m_flPrevServerFadeAlpha = 0;
 	m_flFadeDuration = 0;
 	m_flFadeTimeStartedAt = 0;
 	m_flFadeAlphaStartedAt = 0;
 	m_hCameraEntity = NULL;
-	m_iPrevFOV = 0;
-	m_iStartFOV = 0;
 
 	g_pIntroData = NULL;
 
