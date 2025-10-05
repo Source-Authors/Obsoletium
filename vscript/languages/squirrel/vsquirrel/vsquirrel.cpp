@@ -333,7 +333,7 @@ public:
 
 			if ( !m_hDbg )
 			{
-				m_hDbg = sq_rdbg_init( m_hVM, port, SQTrue );
+				m_hDbg = sq::dbg::sq_rdbg_init( m_hVM, port, SQTrue );
 			}
 
 			if ( !m_hDbg )
@@ -353,7 +353,7 @@ public:
 	{
 		if ( m_hDbg )
 		{
-			sq_rdbg_shutdown( &m_hDbg );
+			sq::dbg::sq_rdbg_shutdown( &m_hDbg );
 			m_hDbg = nullptr;
 		}
 	}
@@ -2915,7 +2915,7 @@ private:
 	//-------------------------------------------------------------------------
 
 	HSQUIRRELVM		m_hVM;
-	HSQREMOTEDBG	m_hDbg;
+	sq::dbg::HSQREMOTEDBG	m_hDbg;
 	HSQOBJECT		m_hOnCreateScopeFunc;
 	HSQOBJECT		m_hOnReleaseScopeFunc;
 	HSQOBJECT		m_hClassVector;

@@ -1,161 +1,195 @@
-#ifndef _SQ_DBGSERVER_H_
-#define _SQ_DBGSERVER_H_
+#ifndef SQ_INCLUDE_SQDBGSERVER_H_
+#define SQ_INCLUDE_SQDBGSERVER_H_
 
-#define MAX_BP_PATH 512
-#define MAX_MSG_LEN 2049
+constexpr inline int MAX_BP_PATH{512};
+constexpr inline int MAX_MSG_LEN{2049};
 
-#if defined( POSIX )
+#if defined(POSIX)
 #include <ctype.h>
 #include <unistd.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include "tier0/threadtools.h"
-typedef int SOCKET;
+
+using SOCKET = int;
 #define INVALID_SOCKET -1
-#define SOCKET_ERROR   -1
+#define SOCKET_ERROR -1
 #endif
 
 #include "squirrel.h"
 
-// Parts of squirrel do a #define of type, which leads to compile warnings/errors when STL files are included.
-// -- at least in VS 2013. Luckily we can temporarily #undef it and avoid the problem.
-// VALVE BUILD
-#undef type
 #include <set>
 #include <string>
 #include <vector>
-// Redefine type
-#define type SQ_TYPE
 
-typedef std::size_t SOCKET;
+using SOCKET = std::size_t;
+using SQDBGString = std::basic_string<SQChar>;
 
-typedef std::basic_string<SQChar> SQDBGString;
+inline bool dbg_less(const SQChar *x, const SQChar *y) {
+  do {
+    const int xl = *x == '\\' ? '/' : tolower(*x);
+    const int yl = *y == '\\' ? '/' : tolower(*y);
+    const int diff = xl - yl;
 
-inline bool dbg_less(const SQChar *x,const SQChar *y)
-{
-	do {
-		int xl = *x == '\\' ? '/' : tolower(*x);
-		int yl = *y == '\\' ? '/' : tolower(*y);
-		int diff = xl - yl;
-		if(diff != 0)
-			return diff > 0?true:false;
-		x++; y++;
-	}while(*x != 0 && *y != 0);
-	return false;
+    if (diff != 0) return diff > 0;
+
+    x++;
+    y++;
+  } while (*x != '\0' && *y != '\0');
+
+  return false;
 }
 
-struct BreakPoint{
-	BreakPoint(){_line=0;}
-	BreakPoint(int line, const SQChar *src){ _line = line; _src = src; }
-	BreakPoint(const BreakPoint& bp){ _line = bp._line; _src=bp._src; }
-	inline bool operator<(const BreakPoint& bp) const
-	{
-		if(_line<bp._line)
-			return true;
-		if(_line==bp._line){
-			return dbg_less(_src.c_str(),bp._src.c_str());
-		}
-		return false;
-	}
+namespace sq::dbg {
 
-	int _line;
-	SQDBGString _src;
+struct BreakPoint {
+  BreakPoint() { _line = 0; }
+  BreakPoint(int line, const SQChar *src) {
+    _line = line;
+    _src = src;
+  }
+  BreakPoint(const BreakPoint &bp) {
+    _line = bp._line;
+    _src = bp._src;
+  }
+
+  BreakPoint &operator=(const BreakPoint &bp) {
+    _line = bp._line;
+    _src = bp._src;
+    return *this;
+  }
+
+  [[nodiscard]] inline bool operator<(const BreakPoint &bp) const {
+    if (_line < bp._line) return true;
+
+    if (_line == bp._line) {
+      return dbg_less(_src.c_str(), bp._src.c_str());
+    }
+
+    return false;
+  }
+
+  [[nodiscard]] inline bool operator=(const BreakPoint &bp) const {
+    return _line == bp._line && _src == bp._src;
+  }
+
+  int _line;
+  SQDBGString _src;
 };
 
-struct Watch{
-	Watch() { _id = 0; }
-	Watch(int id,const SQChar *exp) { _id = id; _exp = exp; }
-	Watch(const Watch &w) { _id = w._id; _exp = w._exp; }
-	bool operator<(const Watch& w) const { return _id<w._id; }
-	bool operator==(const Watch& w) const { return _id == w._id; }
-	int _id;
-	SQDBGString _exp;
+struct Watch {
+  Watch() { _id = 0; }
+  Watch(int id, const SQChar *exp) {
+    _id = id;
+    _exp = exp;
+  }
+  Watch(const Watch &w) {
+    _id = w._id;
+    _exp = w._exp;
+  }
+
+  Watch &operator=(const Watch &w) {
+    _id = w._id;
+    _exp = w._exp;
+    return *this;
+  }
+
+  bool operator<(const Watch &w) const { return _id < w._id; }
+  bool operator==(const Watch &w) const { return _id == w._id; }
+
+  int _id;
+  SQDBGString _exp;
 };
 
-typedef std::set<BreakPoint> BreakPointSet;
-typedef BreakPointSet::iterator BreakPointSetItor;
+using BreakPointSet = std::set<BreakPoint>;
+using BreakPointSetItor = BreakPointSet::iterator;
 
-typedef std::set<Watch> WatchSet;
-typedef WatchSet::iterator WatchSetItor;
+using WatchSet = std::set<Watch>;
+using WatchSetItor = WatchSet::iterator;
 
-typedef std::vector<SQChar> SQCharVec;
-struct SQDbgServer{
-public:
-	enum eDbgState{
-		eDBG_Running,
-		eDBG_StepOver,
-		eDBG_StepInto,
-		eDBG_StepReturn,
-		eDBG_Suspended,
-		eDBG_Disabled,
-	};
+using SQCharVec = std::vector<SQChar>;
 
-	SQDbgServer(HSQUIRRELVM v);
-	~SQDbgServer();
-	bool Init();
-	bool IsConnected();
-	//returns true if a message has been received
-	bool WaitForClient();
-	bool ReadMsg();
-	void BusyWait();
-	void Hook(int type,int line,const SQChar *src,const SQChar *func);
-	void ParseMsg(const char *msg);
-	bool ParseBreakpoint(const char *msg,BreakPoint &out);
-	bool ParseWatch(const char *msg,Watch &out);
-	bool ParseRemoveWatch(const char *msg,int &id);
-	void Terminated();
-	//
-	void BreakExecution();
-	void Send(const SQChar *s,...);
-	void SendChunk(const SQChar *chunk);
-	void Break(int line,const SQChar *src,const SQChar *type,const SQChar *error=NULL);
+struct SQDbgServer {
+ public:
+  enum class eDbgState {
+    eDBG_Running,
+    eDBG_StepOver,
+    eDBG_StepInto,
+    eDBG_StepReturn,
+    eDBG_Suspended,
+    eDBG_Disabled,
+  };
 
+  SQDbgServer(HSQUIRRELVM v);
+  ~SQDbgServer();
 
-	void SerializeState();
-	//COMMANDS
-	void AddBreakpoint(BreakPoint &bp);
-	void AddWatch(Watch &w);
-	void RemoveWatch(int id);
-	void RemoveBreakpoint(BreakPoint &bp);
+  bool Init();
+  bool IsConnected();
 
-	//
-	void SetErrorHandlers();
+  bool ReadMsg();
+  void BusyWait();
+  void Hook(int type, int line, const SQChar *src, const SQChar *func);
+  void ParseMsg(const char *msg);
+  bool ParseBreakpoint(const char *msg, BreakPoint &out);
+  bool ParseWatch(const char *msg, Watch &out);
+  bool ParseRemoveWatch(const char *msg, int &id);
+  void Terminated();
+  //
+  void BreakExecution();
+  void Send(const SQChar *s, ...);
+  void SendChunk(const SQChar *chunk);
+  void Break(int line, const SQChar *src, const SQChar *type,
+             const SQChar *error = nullptr);
 
-	//XML RELATED STUFF///////////////////////
-	#define MAX_NESTING 10
-	struct XMLElementState {
-		SQChar name[256];
-		bool haschildren;
-	};
+  void SerializeState();
+  // COMMANDS
+  void AddBreakpoint(BreakPoint &bp);
+  void AddWatch(Watch &w);
+  void RemoveWatch(int id);
+  void RemoveBreakpoint(BreakPoint &bp);
 
-	XMLElementState xmlstate[MAX_NESTING];
-	int _xmlcurrentement;
+  //
+  void SetErrorHandlers();
 
-	void BeginDocument() { _xmlcurrentement = -1; }
-	void BeginElement(const SQChar *name);
-	void Attribute(const SQChar *name, const SQChar *value);
-	void EndElement(const SQChar *name);
-	void EndDocument();
+  // XML RELATED STUFF///////////////////////
 
-	const SQChar *escape_xml(const SQChar *x);
-	//////////////////////////////////////////////
-	HSQUIRRELVM _v;
-	HSQOBJECT _debugroot;
-	eDbgState _state;
-	SOCKET _accept;
-	SOCKET _endpoint;
-	BreakPointSet _breakpoints;
-	WatchSet _watches;
-	int _recursionlevel;
-	int _maxrecursion;
-	int _nestedcalls;
-	bool _ready;
-	bool _autoupdate;
-	HSQOBJECT _serializefunc;
-	SQCharVec _scratchstring;
+  static constexpr inline int MAX_NESTING{10};
 
+  struct XMLElementState {
+    SQChar name[256];
+    bool haschildren;
+  };
+
+  XMLElementState xmlstate[MAX_NESTING];
+  int _xmlcurrentement;
+
+  void BeginDocument() { _xmlcurrentement = -1; }
+  void BeginElement(const SQChar *name);
+  void Attribute(const SQChar *name, const SQChar *value);
+  void EndElement(const SQChar *name);
+  void EndDocument();
+
+  const SQChar *escape_xml(const SQChar *x) const;
+  //////////////////////////////////////////////
+
+  HSQUIRRELVM _v;
+  HSQOBJECT _debugroot;
+  eDbgState _state;
+  SOCKET _accept;
+  SOCKET _endpoint;
+  BreakPointSet _breakpoints;
+  WatchSet _watches;
+  int _recursionlevel;
+  int _maxrecursion;
+  int _nestedcalls;
+  bool _ready;
+  bool _autoupdate;
+  HSQOBJECT _serializefunc;
+  SQCharVec _scratchstring;
 };
+
+}  // namespace sq::dbg
 
 #ifdef _WIN32
 #define sqdbg_closesocket(x) closesocket((x))
@@ -163,4 +197,4 @@ public:
 #define sqdbg_closesocket(x) close((x))
 #endif
 
-#endif //_SQ_DBGSERVER_H_
+#endif  // !SQ_INCLUDE_SQDBGSERVER_H_

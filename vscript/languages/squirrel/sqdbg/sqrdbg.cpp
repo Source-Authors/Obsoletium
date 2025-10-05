@@ -1,27 +1,26 @@
 /*
-        see copyright notice in sqrdbg.h
+   See copyright notice in sqrdbg.h
 */
 
 #include "sqrdbg.h"
 
-#include <squirrel.h>
 #include "sqdbgserver.h"
+#include "serialize_state_nut.h"
+
+#include <squirrel.h>
 
 #ifndef POSIX
 #include <winsock.h>
-typedef int socklen_t;
+using socklen_t = int;
 #endif
 
 #include "tier0/basetypes.h"
 
-SQInteger debug_hook(HSQUIRRELVM v);
-SQInteger error_handler(HSQUIRRELVM v);
-
-#include "serialize_state.inl"
-
 #if defined(VSCRIPT_DLL_EXPORT) || defined(VSQUIRREL_TEST)
 #include "tier0/memdbgon.h"
 #endif
+
+namespace sq::dbg {
 
 HSQREMOTEDBG sq_rdbg_init(HSQUIRRELVM v, unsigned short port,
                           SQBool autoupdate) {
@@ -59,9 +58,10 @@ HSQREMOTEDBG sq_rdbg_init(HSQUIRRELVM v, unsigned short port,
 }
 
 SQRESULT sq_rdbg_waitforconnections(HSQREMOTEDBG rdbg) {
-  const SQRESULT rc{sq_compilebuffer(rdbg->_v, serialize_state_nut,
-                                     (SQInteger)scstrlen(serialize_state_nut),
-                                     _SC("SERIALIZE_STATE"), SQFalse)};
+  const SQRESULT rc{sq_compilebuffer(
+      rdbg->_v, (const SQChar *)g_Script_serialize_state,
+      (SQInteger)scstrlen((const SQChar *)g_Script_serialize_state),
+      _SC("SERIALIZE_STATE"), SQFalse)};
   if (SQ_FAILED(rc)) {
     sq_throwerror(rdbg->_v, _SC("error compiling the serialization function"));
     return rc;
@@ -213,3 +213,5 @@ SQRESULT sq_rdbg_shutdown(HSQREMOTEDBG *rdbg) {
 
   return SQ_OK;
 }
+
+}  // namespace sq::dbg

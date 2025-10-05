@@ -134,6 +134,20 @@ $Project "vscript"
 					}
 				}
 			}
+			// dimhotepus: Generate state serializer from nut.
+			$File	".\languages\squirrel\sqdbg\serialize_state.nut"
+			{
+				$Configuration
+				{
+					$CustomBuildStep
+					{
+						$CommandLine	"$SRCDIR\devtools\bin\texttoarray.bat $(InputPath) g_Script_$(InputName)> $(InputDir)$(InputName)_nut.h" [$WINDOWS]
+						$CommandLine	"$SRCDIR\devtools\bin\texttoarray.sh $(InputPath) g_Script_$(InputName)> $(InputDir)$(InputName)_nut.h" [$POSIX]
+						$Description	"$(InputFileName) produces $(InputName)_nut.h"
+						$Outputs		"$(InputDir)$(InputName)_nut.h"
+					}
+				}
+			}
 		}
 	}
 
