@@ -193,12 +193,13 @@ struct StackHandler {
 		}
 		return false;
 	}
-	int GetType(int idx)
+	// dimhotepus: Return type instead of int.
+	SQObjectType GetType(int idx) const
 	{
 		if(idx > 0 && idx <= _top) {
 			return sq_gettype(v,idx);
 		}
-		return -1;
+		return (SQObjectType)-1;
 	}
 	
 	int GetParamCount() {
