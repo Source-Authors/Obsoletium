@@ -181,7 +181,7 @@ struct CSoundParametersInternal
 	const SoundFile *GetConvertedNames() const				{ return ( m_nConvertedNames == 1 ) ? (SoundFile *)&m_pConvertedNames : m_pConvertedNames; }
 
 private:
-	void operator=( const CSoundParametersInternal& src ); // disallow implicit copies
+	CSoundParametersInternal& operator=( const CSoundParametersInternal& src ) = delete; // disallow implicit copies
 	CSoundParametersInternal( const CSoundParametersInternal& src );
 
 	void		AddToTail( SoundFile **pDest, uint16 *pDestCount, const SoundFile &source );
