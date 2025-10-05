@@ -388,7 +388,7 @@ void CModelPanel::SetupModel( void )
 	DeleteModelData();
 
 	const char *pszModelName = GetModelName();
-	if ( !pszModelName || !pszModelName[0] )
+	if ( Q_isempty( pszModelName ) )
 		return;
 
 	// create the new model
