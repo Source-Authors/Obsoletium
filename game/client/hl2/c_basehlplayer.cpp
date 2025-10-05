@@ -61,11 +61,16 @@ C_BaseHLPlayer::C_BaseHLPlayer()
 	AddVar( &m_Local.m_vecPunchAngle, &m_Local.m_iv_vecPunchAngle, LATCH_SIMULATION_VAR );
 	AddVar( &m_Local.m_vecPunchAngleVel, &m_Local.m_iv_vecPunchAngleVel, LATCH_SIMULATION_VAR );
 
+	m_hClosestNPC		= nullptr;
+	m_flSpeedModTime	= 0.0f;
+	m_fIsSprinting		= false;
 	m_flZoomStart		= 0.0f;
 	m_flZoomEnd			= 0.0f;
 	m_flZoomRate		= 0.0f;
 	m_flZoomStartTime	= 0.0f;
+	m_bPlayUseDenySound	= false;
 	m_flSpeedMod		= cl_forwardspeed.GetFloat();
+	m_flExitSpeedMod	= 0.0f;
 }
 
 //-----------------------------------------------------------------------------
