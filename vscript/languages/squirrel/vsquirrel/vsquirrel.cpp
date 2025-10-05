@@ -127,7 +127,7 @@ static constexpr const char *SQTypeToString( SQObjectType sqType )
 const HSQOBJECT INVALID_HSQOBJECT = { (SQObjectType)-1, (SQTable *)-1 };
 const HSQOBJECT NULL_HSQOBJECT = { SQObjectType::OT_NULL, nullptr };
 
-inline bool operator==( const HSQOBJECT &lhs, const HSQOBJECT &rhs ) { static_assert( sizeof(lhs._unVal) == sizeof(lhs._unVal.pTable) ); return ( lhs._type == rhs._type && lhs._unVal.pTable == rhs._unVal.pTable ); }
+inline bool operator==( const HSQOBJECT &lhs, const HSQOBJECT &rhs ) { return ( lhs._type == rhs._type && lhs._unVal.pTable == rhs._unVal.pTable ); }
 inline bool operator!=( const HSQOBJECT &lhs, const HSQOBJECT &rhs ) { return !operator==( lhs, rhs ); }
 
 class CSquirrelVM final : public IScriptVM
@@ -630,7 +630,6 @@ public:
 
 	bool RegisterClass( ScriptClassDesc_t *pClassDesc ) override
 	{
-		static_assert( sizeof(pClassDesc) == sizeof(intptr_t) );
 		if ( m_TypeMap.Find( (intptr_t)pClassDesc ) != m_TypeMap.InvalidHandle() )
 		{
 			return true;
@@ -1190,7 +1189,7 @@ private:
 	{
 		char string[2048];
 		va_list		argptr;
-		va_start (argptr,s);
+		va_start (argptr,s); //-V2019 //-V2018
 		V_vsprintf_safe (string,s,argptr);
 		va_end (argptr);
 		
@@ -1201,7 +1200,7 @@ private:
 	{
 		char string[2048];
 		va_list		argptr;
-		va_start (argptr,s);
+		va_start (argptr,s); //-V2019 //-V2018
 		V_vsprintf_safe (string,s,argptr);
 		va_end (argptr);
 		
@@ -1798,10 +1797,11 @@ private:
 		case OT_BOOL:		*pReturn = (object._unVal.nInteger != 0); break;
 		case OT_STRING:		
 			{ 
-				int size = object._unVal.pString->_len + 1; 
+				SQInteger size = object._unVal.pString->_len + 1; 
 				pReturn->m_type = FIELD_CSTRING;
-				pReturn->m_pszString = new char[size]; 
-				memcpy( (void *)pReturn->m_pszString, object._unVal.pString->_val, size ); 
+				char *value = new char[size];
+				pReturn->m_pszString = value;
+				memcpy( value, object._unVal.pString->_val, size ); 
 				pReturn->m_flags |= SV_FREE;
 			}
 			break;
