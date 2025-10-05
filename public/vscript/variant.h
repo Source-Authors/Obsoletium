@@ -571,7 +571,7 @@ template< class CValueAllocator >
 template <typename T>
 inline bool CVariantBase<CValueAllocator>::AssignTo( T *pDest ) const
 {
-	VariantDataType_t destType = VariantDeduceType( T );
+	VariantDataType_t destType = to_underlying( VariantDeduceType( T ) );
 	if ( destType == FIELD_TYPEUNKNOWN )
 	{
 		Warning( "Unable to convert variant to unknown type\n" );
