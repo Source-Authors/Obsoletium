@@ -99,6 +99,7 @@ C_TEShatterSurface::C_TEShatterSurface( void )
 	m_flWidth			= 16.0;
 	m_flHeight			= 16.0;
 	m_flShardSize		= 3;
+	m_pMaterialHandle	= nullptr;
 	m_nSurfaceType		= SHATTERSURFACE_GLASS;
 	m_uchFrontColor[0]	= 255;
 	m_uchFrontColor[1]	= 255;
