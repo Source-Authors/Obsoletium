@@ -626,16 +626,16 @@ void CModelPanel::Paint()
 	}
 
 	pRenderContext->SetLightingOrigin( vec3_origin );
-	pRenderContext->SetAmbientLight( 0.4, 0.4, 0.4 );
+	pRenderContext->SetAmbientLight( 0.4f, 0.4f, 0.4f );
 
 	static Vector white[6] = 
 	{
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
 	};
 
 	g_pStudioRender->SetAmbientLightColors( white );
@@ -653,7 +653,7 @@ void CModelPanel::Paint()
 	render->Push3DView( view, 0, NULL, dummyFrustum );
 
 	modelrender->SuppressEngineLighting( true );
-	float color[3] = { 1.0f, 1.0f, 1.0f };
+	const float color[3] = { 1.0f, 1.0f, 1.0f };
 	render->SetColorModulation( color );
 	render->SetBlend( 1.0f );
 	m_hModel->DrawModel( STUDIO_RENDER );
