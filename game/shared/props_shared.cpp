@@ -525,7 +525,9 @@ class CBreakParser : public IVPhysicsKeyHandler
 {
 public:
 	CBreakParser( float defaultBurstScale, int defaultCollisionGroup ) 
-		: m_defaultCollisionGroup(defaultCollisionGroup), m_defaultBurstScale(defaultBurstScale) {}
+		: m_defaultCollisionGroup(defaultCollisionGroup),
+		m_defaultBurstScale(defaultBurstScale),
+		m_wroteCollisionGroup(false) {}
 
 	void ParseModelName( breakmodel_t *pModel, const char *pValue )
 	{

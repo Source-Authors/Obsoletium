@@ -703,6 +703,7 @@ public:
 	CSoundControllerImp( void ) : CAutoGameSystemPerFrame( "CSoundControllerImp" )
 	{
 		m_commandList.SetLessFunc( SoundCommandLessFunc );
+		m_flLastTime = 1;
 	}
 
 	void ProcessCommand( SoundCommand_t *pCmd );

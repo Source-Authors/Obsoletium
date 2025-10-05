@@ -104,7 +104,9 @@ CVoiceStatus::CVoiceStatus()
 	m_nControlSize = 0;
 	m_bBanMgrInitialized = false;
 	m_LastUpdateServerState = 0;
+	m_pParentPanel = std::numeric_limits<vgui::VPANEL>::max();
 
+	m_bInSquelchMode = false;
 	m_bTalking = m_bServerAcked = false;
 
 #ifdef VOICE_VOX_ENABLE
