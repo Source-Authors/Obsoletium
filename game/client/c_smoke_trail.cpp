@@ -557,6 +557,8 @@ C_RocketTrail::C_RocketTrail()
 
 	m_pRocketEmitter = NULL;
 	m_pParticleMgr	= NULL;
+
+	m_flFlareScale = 0.0f;
 }
 
 C_RocketTrail::~C_RocketTrail()
@@ -910,6 +912,7 @@ C_SporeExplosion::C_SporeExplosion( void )
 	m_flStartSize			= 32;
 	m_flEndSize				= 64;
 	m_flSpawnRadius			= 32;
+	m_flPreviousSpawnRate	= m_flSpawnRate;
 	m_hMaterial				= NULL;
 	m_pSporeEffect			= NULL;
 
@@ -1226,6 +1229,7 @@ C_SporeTrail::C_SporeTrail( void )
 	m_flEndSize				= 55;
 	m_flSpawnRadius			= 2;
 
+	m_hMaterial = nullptr;
 	m_teParticleSpawn.Init( 5 );
 	m_vecEndColor.Init();
 	m_vecPos.Init();
