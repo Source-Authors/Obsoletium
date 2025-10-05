@@ -1041,6 +1041,8 @@ CEffectMaterial* CParticleEffectBinding::GetEffectMaterial( CParticleSubTexture 
 //-----------------------------------------------------------------------------
 CParticleMgr::CParticleMgr()
 {
+	m_bStatsRunning = false;
+	m_nStatsFramesSinceLastAlert = 0;
 	m_nToolParticleEffectId = 0;
 	m_bUpdatingEffects = false;
 	m_bRenderParticleEffects = true;
