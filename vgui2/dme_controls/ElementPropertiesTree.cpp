@@ -1208,7 +1208,7 @@ void CElementPropertiesTreeInternal::OnPaste_( bool reference )
 	if ( !pAttribute )
 		return;
 
-	DmAttributeType_t attType = pAttribute ? pAttribute->GetType() : AT_UNKNOWN;
+	DmAttributeType_t attType = pAttribute->GetType();
 	bool isElementAttribute = attType == AT_ELEMENT || attType == AT_ELEMENT_ARRAY;
 	if ( !isElementAttribute )
 		return;
@@ -1555,7 +1555,8 @@ bool CElementPropertiesTreeInternal::OnRemoveFromData( KeyValues *item )
 		return true;
 	}
 
-	if ( !pAttribute->IsFlagSet( FATTRIB_EXTERNAL )
+	if ( pAttribute
+		&& !pAttribute->IsFlagSet( FATTRIB_EXTERNAL )
 		&& !pAttribute->IsFlagSet( FATTRIB_TOPOLOGICAL )
 		&& !pAttribute->IsFlagSet( FATTRIB_READONLY ) )
 	{
@@ -2867,7 +2868,7 @@ void CElementPropertiesTreeInternal::UpdateTree()
 
 		char label[ 256 ];
 		Q_snprintf( label, sizeof( label ), "%s", m_hObject->GetValueString( "name" ) );
-		bool editableLabel = true;
+		constexpr bool editableLabel = true;
 
 		KeyValues *kv = new KeyValues( "item" );
 		kv->SetString( "Text", label );

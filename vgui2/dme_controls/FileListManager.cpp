@@ -437,9 +437,10 @@ void CFileListManager::OnAddToPerforce( KeyValues * )
 		//++nFileCount;
 		ppFileNames[ i ] = pFilename;
 	}
-
-	bool bSuccess = false; // p4->OpenFilesForAdd( nFileCount, ppFileNames );
-	if ( !bSuccess )
+	
+	// dimhotepus: Drop Perforce support.
+	constexpr bool bSuccess = false; // p4->OpenFilesForAdd( nFileCount, ppFileNames );
+	if constexpr ( !bSuccess )
 	{
 		// dimhotepus: Drop Perforce support.
 		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", "No Perforce Support" /*p4->GetLastError()*/, GetParent() );
@@ -469,8 +470,8 @@ void CFileListManager::OnOpenForEdit( KeyValues * )
 	}
 	
 	// dimhotepus: Drop Perforce support.
-	bool bSuccess = false; // p4->OpenFilesForEdit( nFileCount, ppFileNames );
-	if ( !bSuccess )
+	constexpr bool bSuccess = false; // p4->OpenFilesForEdit( nFileCount, ppFileNames );
+	if constexpr ( !bSuccess )
 	{
 		// dimhotepus: Drop Perforce support.
 		vgui::MessageBox *pError = new vgui::MessageBox( "Perforce Error!", "No Perforce Support" /*p4->GetLastError()*/, GetParent() );
