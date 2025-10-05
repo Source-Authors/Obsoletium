@@ -13,7 +13,7 @@ static int getVarInfo(StackHandler & sa,VarRefPtr & vr) {
   HSQOBJECT htable = sa.GetObjectHandle(1);
   SquirrelObject table(htable);
 #ifdef _DEBUG
-  SQObjectType type = (SQObjectType)sa.GetType(2);
+  [[maybe_unused]] SQObjectType type = sa.GetType(2);
 #endif
   const SQChar * el = sa.GetString(2);
   ScriptStringVar256 varNameTag;
@@ -31,7 +31,7 @@ static int getInstanceVarInfo(StackHandler & sa,VarRefPtr & vr,SQUserPointer & d
   HSQOBJECT ho = sa.GetObjectHandle(1);
   SquirrelObject instance(ho);
 #ifdef _DEBUG
-  SQObjectType type = (SQObjectType)sa.GetType(2);
+  [[maybe_unused]] SQObjectType type = sa.GetType(2);
 #endif
   const SQChar * el = sa.GetString(2);
   ScriptStringVar256 varNameTag;
@@ -99,7 +99,6 @@ static int setVar(StackHandler & sa,VarRef * vr,void * data) {
     break;
   } // case
   case VAR_TYPE_INSTANCE: {
-    HSQUIRRELVM v = sa.GetVMPtr();
     // vr->copyFunc is the LHS variable type: the RHS var's type is ClassType<>::type() (both point to ClassType<>::copy()).
     // src will be null if the LHS and RHS types don't match.
     SQUserPointer src = sa.GetInstanceUp(3,(SQUserPointer)vr->copyFunc); // Effectively performs: ClassType<>::type() == ClassType<>getCopyFunc().
@@ -261,7 +260,6 @@ SQInteger getInstanceVarFunc(HSQUIRRELVM v) {
 // === Classes ===
 
 BOOL CreateClass(HSQUIRRELVM v,SquirrelObject & newClass,SQUserPointer classType,const SQChar * name,const SQChar * baseName) {
-  int n = 0;
   int oldtop = sq_gettop(v);
   sq_pushroottable(v);
   sq_pushstring(v,name,-1);
