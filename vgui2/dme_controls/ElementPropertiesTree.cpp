@@ -1673,7 +1673,7 @@ void CElementPropertiesTreeInternal::OnSortByName()
 			continue;
 
 		bRefreshNeeded = true;
-		CDmElement **pArray = ( CDmElement** )_alloca( nCount * sizeof( CDmElement* ) );
+		CDmElement **pArray = stackallocT( CDmElement*, nCount );
 		for ( intp i = 0; i < nCount; ++i )
 		{
 			pArray[i] = elementArray[i];
