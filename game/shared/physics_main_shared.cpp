@@ -1953,6 +1953,8 @@ struct ThinkSync
 	ThinkSync()
 	{
 		thinktime = 0;
+		// dimhotepus: Initialize missed member to 0.
+		thinktick = 0;
 	}
 
 	ThinkSync( const ThinkSync& src )
