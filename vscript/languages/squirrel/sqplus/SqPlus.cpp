@@ -42,7 +42,7 @@ static int getInstanceVarInfo(StackHandler & sa,VarRefPtr & vr,SQUserPointer & d
 #if defined(SQ_USE_CLASS_INHERITANCE) 
     if (typetag != vr->instanceType) {
       SquirrelObject typeTable = instance.GetValue(SQ_CLASS_OBJECT_TABLE_NAME);
-      up = (char *)typeTable.GetUserPointer(INT((size_t)vr->instanceType)); // <TODO> 64-bit compatible version.
+      up = (char *)typeTable.GetUserPointer(INT((size_t)vr->instanceType));
       if (!up) {
         throw SquirrelError(_SC("Invalid Instance Type"));
       }
@@ -85,7 +85,7 @@ static ScriptStringVar256 g_msg_throw;
 static int setVar(StackHandler & sa,VarRef * vr,void * data) {
   if (vr->m_access & (VAR_ACCESS_READ_ONLY|VAR_ACCESS_CONSTANT)) {
     const SQChar * el = sa.GetString(2);
-    SCSNPRINTF(g_msg_throw.s,sizeof(g_msg_throw),_SC("setVar(): Cannot write to constant: %s"),el);
+    SCSNPRINTF(g_msg_throw.s,sizeof(g_msg_throw),_SC("setVar(): Cannot write to constant: %s"),el ? el : "N/A");
     throw SquirrelError(g_msg_throw.s);
   } // if
   switch (vr->m_type) {
@@ -99,6 +99,8 @@ static int setVar(StackHandler & sa,VarRef * vr,void * data) {
           case 2: v = (*(short*)val = (short)v); break;  
 #ifdef _SQ64
           case 4: v = (*(int*)val = (int)v); break;
+          // dimhotepus: x64 long long int.
+          case 8: v = (*(int64_t*)val = (int64_t)v); break;
 #endif            
           default: *val = v;
        }
@@ -140,7 +142,7 @@ static int setVar(StackHandler & sa,VarRef * vr,void * data) {
   }
   case TypeInfo<SQUserPointer>::TypeID: {
     const SQChar * el = sa.GetString(2);
-    SCSNPRINTF(g_msg_throw.s,sizeof(g_msg_throw),_SC("setVar(): Cannot write to an SQUserPointer: %s"),el);
+    SCSNPRINTF(g_msg_throw.s,sizeof(g_msg_throw),_SC("setVar(): Cannot write to an SQUserPointer: %s"),el ? el : "N/A");
     throw SquirrelError(g_msg_throw.s);
   } // case
   case TypeInfo<ScriptStringVarBase>::TypeID: {
@@ -183,6 +185,8 @@ static int getVar(StackHandler & sa,VarRef * vr,void * data) {
             case 2: v = *(short*)data; break;  
 #ifdef _SQ64
             case 4: v = *(int*)data; break;
+            // dimhotepus: x64 long long int.
+            case 8: v = *(int64_t*)data; break;
 #endif            
             default: v = *(INT*)data;
           }

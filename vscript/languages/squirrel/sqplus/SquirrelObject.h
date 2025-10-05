@@ -133,9 +133,9 @@ private:
 };
 
 struct StackHandler {
-  StackHandler(HSQUIRRELVM v) {
-    _top = sq_gettop(v);
-    this->v = v;
+  StackHandler(HSQUIRRELVM vm) {
+    _top = sq_gettop(vm);
+    this->v = vm;
   }
   SQFloat GetFloat(int idx) {
     SQFloat x = 0.0f;

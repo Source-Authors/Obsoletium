@@ -47,8 +47,8 @@ SQINLINE bool	Match(TypeWrapper<int>,HSQUIRRELVM v,int idx)            { return 
 SQINLINE bool	Match(TypeWrapper<unsigned int>,HSQUIRRELVM v,int idx)   { return sq_gettype(v,idx) == OT_INTEGER; }
 SQINLINE bool	Match(TypeWrapper<long>,HSQUIRRELVM v,int idx)           { return sq_gettype(v,idx) == OT_INTEGER; }
 SQINLINE bool	Match(TypeWrapper<unsigned long>,HSQUIRRELVM v,int idx)  { return sq_gettype(v,idx) == OT_INTEGER; }
-SQINLINE bool	Match(TypeWrapper<float>,HSQUIRRELVM v,int idx)          { int type = sq_gettype(v,idx); return type == OT_FLOAT; }
-SQINLINE bool	Match(TypeWrapper<double>,HSQUIRRELVM v,int idx)         { int type = sq_gettype(v,idx); return type == OT_FLOAT; }
+SQINLINE bool	Match(TypeWrapper<float>,HSQUIRRELVM v,int idx)          { SQObjectType type = sq_gettype(v,idx); return type == OT_FLOAT; }
+SQINLINE bool	Match(TypeWrapper<double>,HSQUIRRELVM v,int idx)         { SQObjectType type = sq_gettype(v,idx); return type == OT_FLOAT; }
 SQINLINE bool	Match(TypeWrapper<const SQChar *>,HSQUIRRELVM v,int idx) { return sq_gettype(v,idx) == OT_STRING; }
 SQINLINE bool	Match(TypeWrapper<SQChar *>,HSQUIRRELVM v,int idx)       { return sq_gettype(v,idx) == OT_STRING; }
 SQINLINE bool	Match(TypeWrapper<HSQUIRRELVM>,HSQUIRRELVM v,int idx)    { return true; } // See Get() for HSQUIRRELVM below (v is always present).

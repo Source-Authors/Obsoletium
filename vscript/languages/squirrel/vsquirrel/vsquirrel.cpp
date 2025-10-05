@@ -363,7 +363,7 @@ public:
 		Assert( bWait );
 
 		const SQInteger rc = sq_compilebuffer(m_hVM,
-			pszScript,(int)V_strlen(pszScript)*sizeof(SQChar),"unnamed",1);
+			pszScript,(intp)V_strlen(pszScript)*sizeof(SQChar),"unnamed",1);
 		if (SQ_SUCCEEDED(rc))
 		{
 			HSQOBJECT hScript;
@@ -388,7 +388,7 @@ public:
 		}
 
 		const SQInteger rc = sq_compilebuffer(m_hVM,
-			pszScript,(int)V_strlen(pszScript)*sizeof(SQChar),(pszId) ? pszId : "unnamed",1);
+			pszScript,(intp)V_strlen(pszScript)*sizeof(SQChar),(pszId) ? pszId : "unnamed",1);
 		if (SQ_SUCCEEDED(rc)) 
 		{
 			auto *pRet = new HSQOBJECT;
@@ -1387,6 +1387,9 @@ private:
 		StackHandler sa(hVM);
 		int nActualParams = sa.GetParamCount();
 		ScriptClassDesc_t *pClassDesc = *((ScriptClassDesc_t **)sa.GetUserData( nActualParams ));
+		// dimhotepus: Check class desc exists.
+		if (!pClassDesc)
+			return sq_throwerror(hVM, _SC("Unable to create object without class desc."));
 		auto *pInstanceContext = new InstanceContext_t;
 		pInstanceContext->pInstance = pClassDesc->m_pfnConstruct();
 		pInstanceContext->pClassDesc = pClassDesc;
@@ -1403,6 +1406,9 @@ private:
 		StackHandler sa(hVM);
 		int nActualParams = sa.GetParamCount();
 		ScriptFunctionBinding_t *pVMScriptFunction = *((ScriptFunctionBinding_t **)sa.GetUserData( nActualParams ));
+		// dimhotepus: Check function binding exists.
+		if (!pVMScriptFunction)
+			return sq_throwerror(hVM, _SC("Unable to translate function call without binding."));
 		int nFormalParams = pVMScriptFunction->m_desc.m_Parameters.Count();
 		CUtlVectorFixed<ScriptVariant_t, 14> params;
 		ScriptVariant_t returnValue;
@@ -1431,6 +1437,8 @@ private:
 
 						params[i] = vec;
 					}
+					// dimhotepus: Add missed break.
+					break;
 				case FIELD_INTEGER:		params[i] = sa.GetInt( i + 2 ); break;
 				case FIELD_BOOLEAN:		params[i] = sa.GetBool( i + 2 ); break;
 				case FIELD_CHARACTER:	params[i] = sa.GetString( i + 2 )[0]; break;

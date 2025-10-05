@@ -88,7 +88,8 @@
 
 #ifndef _WINDEF_
   typedef int BOOL;
-  typedef int INT;
+  // dimhotepus: int -> SQInteger for x86-64.
+  typedef SQInteger INT;
   typedef float FLOAT;
   // dimhotepus: Wrap and check already defined.
   #ifndef TRUE
@@ -166,7 +167,7 @@ struct ScriptStringVarBase {
   const unsigned short MaxLength;  // Real length is MaxLength+1.
   SQChar s[1];
   // dimhotepus: unsigned char -> unsigned short.
-  explicit ScriptStringVarBase(unsigned short _MaxLength) : MaxLength(_MaxLength) {}
+  explicit ScriptStringVarBase(unsigned short _MaxLength) : MaxLength(_MaxLength) { s[0] = '\0'; }
   operator SQChar * () { return &s[0]; }
   operator void * () { return (void *)&s[0]; }
   const SQChar * operator = (const SQChar * _s) {
@@ -193,6 +194,8 @@ template<unsigned short MAXLENGTH> // MAXLENGTH is max printable characters (tra
 struct ScriptStringVar : ScriptStringVarBase {
   SQChar ps[MAXLENGTH];
   ScriptStringVar() : ScriptStringVarBase(MAXLENGTH) {
+    // dimhotepus: Ensure string is zero initialized.
+    memset(ps, 0, sizeof(ps));
     s[0] = 0;
   }
   ScriptStringVar(const SQChar * _s) : ScriptStringVarBase(MAXLENGTH) {
@@ -250,7 +253,9 @@ template<>
 struct TypeInfo<INT> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("int")) {}
-  enum {TypeID=VAR_TYPE_INT,Size=sizeof(INT),TypeMask='i', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_INT;
+  enum {Size=sizeof(INT),TypeMask='i', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -258,7 +263,9 @@ template<>
 struct TypeInfo<unsigned> {
 	const SQChar * typeName;
 	TypeInfo() : typeName(_SC("uint")) {}
-	enum {TypeID=VAR_TYPE_UINT,Size=sizeof(unsigned), IsInstance=0};
+    // dimhotepus: Type-safe enum.
+	static constexpr inline ScriptVarType TypeID = VAR_TYPE_UINT;
+	enum {Size=sizeof(unsigned), IsInstance=0};
 	operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -266,7 +273,9 @@ template<>
 struct TypeInfo<FLOAT> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("float")) {}
-  enum {TypeID=VAR_TYPE_FLOAT,Size=sizeof(FLOAT),TypeMask='f', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_FLOAT;
+  enum {Size=sizeof(FLOAT),TypeMask='f', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -274,7 +283,9 @@ template<>
 struct TypeInfo<bool> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("bool")) {}
-  enum {TypeID=VAR_TYPE_BOOL,Size=sizeof(bool),TypeMask='b', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_BOOL;
+  enum {Size=sizeof(bool),TypeMask='b', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -282,7 +293,9 @@ template<>
 struct TypeInfo<short> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("short")) {}
-  enum {TypeID=VAR_TYPE_INT,Size=sizeof(short),TypeMask='i', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_INT;
+  enum {Size=sizeof(short),TypeMask='i', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -290,7 +303,9 @@ template<>
 struct TypeInfo<char> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("char")) {}
-  enum {TypeID=VAR_TYPE_INT,Size=sizeof(char),TypeMask='i', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_INT;
+  enum {Size=sizeof(char),TypeMask='i', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -298,7 +313,9 @@ template<>
 struct TypeInfo<SQUserPointer> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("SQUserPointer")) {}
-  enum {TypeID=VAR_TYPE_USER_POINTER,Size=sizeof(SQUserPointer),TypeMask='u', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_USER_POINTER;
+  enum {Size=sizeof(SQUserPointer),TypeMask='u', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -306,7 +323,9 @@ template<>
 struct TypeInfo<SQAnything> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("SQUserPointer")) {}
-  enum {TypeID=VAR_TYPE_USER_POINTER,Size=sizeof(SQUserPointer),TypeMask='u', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_USER_POINTER;
+  enum {Size=sizeof(SQUserPointer),TypeMask='u', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -314,7 +333,9 @@ template<>
 struct TypeInfo<SQNoBaseClass> {
   const SQChar * typeName;
   TypeInfo() : typeName(0) {}
-  enum {TypeID=-1,Size=0,TypeMask=' ', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = (ScriptVarType)-1;
+  enum {Size=0,TypeMask=' ', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -322,7 +343,9 @@ template<>
 struct TypeInfo<const SQChar *> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("const SQChar *")) {}
-  enum {TypeID=VAR_TYPE_CONST_STRING,Size=sizeof(const SQChar *),TypeMask='s', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_CONST_STRING;
+  enum {Size=sizeof(const SQChar *),TypeMask='s', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -331,7 +354,9 @@ template<>
 struct TypeInfo<const SQOtherChar *> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("const SQOtherChar *")) {}
-  enum {TypeID=VAR_TYPE_CONST_STRING,Size=sizeof(const SQOtherChar *),TypeMask='s', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_CONST_STRING;
+  enum {Size=sizeof(const SQOtherChar *),TypeMask='s', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 template<>
@@ -349,7 +374,9 @@ template<typename T, int is_inst>
 struct TypeInfoPtrBase {
   const SQChar * typeName;
   TypeInfoPtrBase() : typeName(TypeInfo<T>().typeName) {}
-  enum {TypeID=VAR_TYPE_USER_POINTER,Size=sizeof(T*),TypeMask='u'};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_USER_POINTER;
+  enum {Size=sizeof(T*),TypeMask='u'};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -369,7 +396,9 @@ template<>
 struct TypeInfo<std::string> {
     const SQChar *typeName;
     TypeInfo() : typeName(_SC("std::string")) {}
-    enum {TypeID=SqPlus::VAR_TYPE_STD_STRING,Size=sizeof(std::string),TypeMask='s'};
+    // dimhotepus: Type-safe enum.
+    static constexpr inline ScriptVarType TypeID = VAR_TYPE_STD_STRING;
+    enum {Size=sizeof(std::string),TypeMask='s'};
     operator ScriptVarType() {return ScriptVarType(TypeID);}
 };
 #endif 
@@ -378,7 +407,9 @@ template<>
 struct TypeInfo<ScriptStringVarBase> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("ScriptStringVarBase")) {}
-  enum {TypeID=VAR_TYPE_STRING,Size=sizeof(ScriptStringVarBase),TypeMask='s', IsInstance=0};
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_STRING;
+  enum {Size=sizeof(ScriptStringVarBase),TypeMask='s', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -387,8 +418,10 @@ struct TypeInfo<ScriptStringVarBase> {
 template<int N>
 struct TypeInfo<ScriptStringVar<N> > {
   SQChar typeName[24];
-  TypeInfo() { scsprintf(typeName,_SC("ScriptStringVar<%d>"),N); }
-  enum {TypeID=VAR_TYPE_STRING,Size=N*sizeof(ScriptStringVar<N>),TypeMask='s', IsInstance=0};
+  TypeInfo() { scsprintf(typeName, _SC("ScriptStringVar<%d>"), N); }
+  // dimhotepus: Type-safe enum.
+  static constexpr inline ScriptVarType TypeID = VAR_TYPE_STRING;
+  enum {Size=N*sizeof(ScriptStringVar<N>),TypeMask='s', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -514,7 +547,8 @@ struct VarRef {
   short m_size;                // ATS: Use for short and char support. For debugging only (size of item when pointer to item is dereferenced). Could be used for variable max string buffer length.
   short m_access;              // VarAccessType.
 
-  VarRef() : offsetOrAddrOrConst(0), m_type(VAR_TYPE_NONE), instanceType(0/*(SQUserPointer)-1*/), /*copyFunc(0),*/ m_size(0), m_access(VAR_ACCESS_READ_WRITE) {}
+  // dimhotepus: Add varType init.
+  VarRef() : offsetOrAddrOrConst(0), m_type(VAR_TYPE_NONE), instanceType(0/*(SQUserPointer)-1*/), /*copyFunc(0),*/ varType(0), m_size(0), m_access(VAR_ACCESS_READ_WRITE) {}
   // dimhotepus: int _size -> short.
   VarRef(void * _offsetOrAddrOrConst, ScriptVarType _type, ClassTypeBase* _instanceType, ClassTypeBase* _varType, short _size, VarAccessType _access) :
          offsetOrAddrOrConst(_offsetOrAddrOrConst), m_type(_type), instanceType(_instanceType), varType(_varType), m_size(_size), m_access(_access) {
@@ -542,10 +576,14 @@ inline void getVarNameTag(SQChar * buff,INT maxSize,const SQChar * scriptName) {
   d = &d[2];
   maxSize -= (2+1); // +1 = space for null.
   int pos=0;
-  while (scriptName[pos] && pos < maxSize) {
-    d[pos] = scriptName[pos];
-    pos++;
-  } // while
+  // dimhotepus: Prevent null script name deref.
+  if (scriptName) {
+    // dimhotepus: Check first, access later.
+    while (pos < maxSize && scriptName[pos]) {
+      d[pos] = scriptName[pos];
+      pos++;
+    }  // while
+  }
   d[pos] = 0; // null terminate.
 #else
   SCSNPRINTF(buff,maxSize,_SC("_v%s"),scriptName);
@@ -607,7 +645,7 @@ inline void createInstanceSetGetHandlers(SquirrelObject & so) {
 template<typename T>
 struct ObjectCloner {
   static T* Clone(T* src){ return new T(src); }
-  static void Delete(T* dst){ if(dst) delete dst; }
+  static void Delete(T* dst){ delete dst; }
 };
 
 // specialization for void type
@@ -814,6 +852,7 @@ void Push(HSQUIRRELVM v, SquirrelObject &so);
 #define USE_ARGUMENT_DEPENDANT_OVERLOADS
 #ifdef USE_ARGUMENT_DEPENDANT_OVERLOADS
 #ifdef _MSC_VER
+#pragma warning(push) // Disable warning: "resolved overload was found by argument-dependent lookup" when class/struct pointers are used as function arguments.
 #pragma warning(disable:4675) // Disable warning: "resolved overload was found by argument-dependent lookup" when class/struct pointers are used as function arguments.
 #endif
 // === BEGIN Argument Dependent Overloads ===
@@ -1375,6 +1414,10 @@ struct DirectCallFunction {
     StackHandler sa(v);
     int paramCount = sa.GetParamCount();
     Func * func = (Func *)sa.GetUserData(paramCount);
+    // dimhotepus: Disallow null function exec.
+    if (!func) {
+        return sq_throwerror(v, _SC("SqPlus: Cannot exec null function"));
+    }
     return Call(*func,v,2);
   } // Dispatch
 };
@@ -1393,6 +1436,10 @@ public:
     StackHandler sa(v);
     int paramCount = sa.GetParamCount();
     unsigned char * ud = (unsigned char *)sa.GetUserData(paramCount);
+    // dimhotepus: Disallow null function exec.
+    if (!ud) {
+        return sq_throwerror(v, _SC("SqPlus: Cannot exec null member function"));
+    }
     return Call(**(Callee**)ud,*(Func*)(ud + sizeof(Callee*)),v,2);
   } // Dispatch
 };
@@ -1425,7 +1472,6 @@ struct DirectCallInstanceFuncPicker {
     if (typetag != calleeType) {
       SquirrelObject typeTable = so.GetValue(SQ_CLASS_OBJECT_TABLE_NAME);
       instance = static_cast<Callee*>(
-          // <TODO> 64-bit compatible version.
           typeTable.GetUserPointer(INT((size_t)ClassType<Callee>::type()))
         );
     }
@@ -1701,6 +1747,7 @@ inline void RegisterInstanceGlobalFuncVarArgs(HSQUIRRELVM v,HSQOBJECT hclass,Cal
 #endif
 
 #ifdef _MSC_VER
+#pragma warning(push) // Deprecated _snprintf
 #pragma warning(disable : 4995) // Deprecated _snprintf
 #endif
 
@@ -1741,7 +1788,7 @@ inline void RegisterInstanceVarArgs(HSQUIRRELVM v,HSQOBJECT hclass,Callee & call
 } // RegisterInstanceVarArgs
 
 #ifdef _MSC_VER
-#pragma warning(default : 4995)
+#pragma warning(pop)
 #endif
 
 // === Call Squirrel Functions from C/C++ ===
@@ -1909,7 +1956,6 @@ inline void PopulateAncestry(HSQUIRRELVM v,
 {
   // 11/2/05: Create a new table for this instance.
   SquirrelObject newObjectTable = SquirrelVM::CreateTable();
-  // <TODO> 64-bit compatible version.
   newObjectTable.SetUserPointer(INT((size_t)ClassType<T>::type()), newClass);
   instance.SetValue(SQ_CLASS_OBJECT_TABLE_NAME, newObjectTable);
 
@@ -2298,7 +2344,7 @@ static int _##CLASSNAME##_constructor(HSQUIRRELVM v) {               \
   RegisterInstanceVariable(NEWSQCLASS,&((CCLASS *)0)->VARNAME,_SC(#VARNAME));
 
 #if defined(USE_ARGUMENT_DEPENDANT_OVERLOADS) && defined(_MSC_VER)
-#pragma warning (default:4675)
+#pragma warning (pop)
 #endif
 
 }; // namespace SqPlus

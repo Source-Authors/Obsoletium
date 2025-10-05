@@ -240,7 +240,7 @@ void SquirrelVM::PrintFunc(HSQUIRRELVM v,const SQChar* s,...)
 {
     static SQChar temp[2048];
     va_list vl;
-    va_start(vl, s);
+    va_start(vl, s); //-V2018 //-V2019
     scvsprintf( temp, sizeof(temp), s, vl);
     SCPUTS(temp);
     va_end(vl);
@@ -270,7 +270,7 @@ SquirrelObject SquirrelVM::CompileScript(const SQChar *s)
 SquirrelObject SquirrelVM::CompileBuffer(const SQChar *s,const SQChar * debugInfo)
 {
     SquirrelObject ret;
-    if(SQ_SUCCEEDED(sq_compilebuffer(_VM,s,(int)scstrlen(s)*sizeof(SQChar),debugInfo,1))) {
+    if(SQ_SUCCEEDED(sq_compilebuffer(_VM,s,(rsize_t)scstrlen(s)*sizeof(SQChar),debugInfo,1))) {
         ret.AttachToStackObject(-1);
         sq_pop(_VM,1);
         return ret;

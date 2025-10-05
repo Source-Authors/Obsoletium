@@ -11,7 +11,7 @@
 #include "squirrel.h"
 #include "sqplus.h"
 
-const inline SQUserPointer TYPETAG_VECTOR{(SQUserPointer)1};
+const inline SQUserPointer TYPETAG_VECTOR{(SQUserPointer)1}; //-V566
 constexpr inline char TYPENAME_VECTOR[]{"Vector"};
 
 SQInteger vsq_openvec3(HSQUIRRELVM hVM, HSQOBJECT *hExternalClass);

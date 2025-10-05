@@ -12,7 +12,7 @@ struct SquirrelError {
 // This class can hold a reference to a SquirrelVM. It keeps a Squirrel ref
 // to the VM to protect it from being deleted while held.
 struct SquirrelVMSys { 
-    SquirrelVMSys() { }
+    SquirrelVMSys() = default;
     ~SquirrelVMSys();
     
     void Set( HSQUIRRELVM v );

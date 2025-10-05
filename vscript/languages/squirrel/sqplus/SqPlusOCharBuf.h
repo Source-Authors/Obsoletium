@@ -83,7 +83,8 @@ struct SQCharBufImpl {
 		else {
 			int sl = poc ? ol_buflen(poc) : 0;
 			if( poc ){
-				m_poc = poc ? new SQT[sl+1] : NULL; 
+				// dimhotepus: Use std::nothrow
+				m_poc = new (std::nothrow) SQT[sl+1]; 
 				if( m_poc ) memcpy( m_poc, poc, (sl+1)*sizeof(SQT) );
 			}
 			else
@@ -94,7 +95,7 @@ struct SQCharBufImpl {
 	void Init( const SQOT *ps ){
 		m_own = true;
         if( ps ){
-            int sl = ps ? ol_strlen(ps) : 0;	// Length of string in characters (not bytes)
+            int sl = ol_strlen(ps);	// Length of string in characters (not bytes)
 		    int scl = 0;                        // Length of converted string in char/wchar_t count
 			// How much storage needed? 
 			if( !use_latin1 && sizeof(SQT)<sizeof(SQOT) ){
@@ -111,8 +112,9 @@ struct SQCharBufImpl {
 				}
 			}
 			else scl = sl;  // Converting to wchar_t or Latin1, keep length 
-
-            m_poc = new SQT[scl+1]; 
+			
+			// dimhotepus: Use std::nothrow
+            m_poc = new (std::nothrow) SQT[scl+1]; 
 			if( !m_poc ) return;
 
 			// Convert 
