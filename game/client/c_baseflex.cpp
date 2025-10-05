@@ -755,7 +755,7 @@ void C_BaseFlex::AddViseme( Emphasized_Phoneme *classes, float emphasis_intensit
 
 		flexweight_t *pWeights = NULL;
 
-		int truecount = pSetting->psetting( (byte *)actual_flexsetting_header, 0, &pWeights );
+		int truecount = pSetting->psetting( (const byte *)actual_flexsetting_header, 0, &pWeights );
 		if ( pWeights )
 		{
 			for ( int i = 0; i < truecount; i++)
@@ -1876,7 +1876,7 @@ void C_BaseFlex::AddFlexSetting( const char *expr, float scale,
 	}
 
 	flexweight_t *pWeights = NULL;
-	int truecount = pSetting->psetting( (byte *)pSettinghdr, 0, &pWeights );
+	int truecount = pSetting->psetting( (const byte *)pSettinghdr, 0, &pWeights );
 	if ( !pWeights )
 		return;
 
@@ -1992,7 +1992,7 @@ void C_BaseFlex::AddFlexAnimation( CSceneEventInfo *info )
 			}
 			else
 			{
-				track->SetFlexControllerIndex( MAX( FindFlexController( (char *)track->GetFlexControllerName() ), LocalFlexController_t(0)), 0 );
+				track->SetFlexControllerIndex( MAX( FindFlexController( track->GetFlexControllerName() ), LocalFlexController_t(0)), 0 );
 			}
 		}
 

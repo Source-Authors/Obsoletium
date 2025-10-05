@@ -902,7 +902,7 @@ void CDescribeData::Describe( const char *fmt, ... )
 	va_list argptr;
 	char data[ 4096 ];
 	int len;
-	va_start(argptr, fmt);
+	va_start(argptr, fmt); //-V2018 //-V2019
 	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
@@ -1082,7 +1082,7 @@ void CDescribeData::DescribeFields_R( int chain_count, datamap_t *pRootMap, type
 		fieldOffsetSrc = m_pCurrentField->fieldOffset[ m_nSrcOffsetIndex ];
 		fieldSize = m_pCurrentField->fieldSize;
 		
-		pInputData = (void const *)((char *)m_pSrc + fieldOffsetSrc );
+		pInputData = (void const *)((const char *)m_pSrc + fieldOffsetSrc );
 		
 		switch( m_pCurrentField->fieldType )
 		{
@@ -1355,7 +1355,7 @@ void CLCD::LookupToken( char const *in, CUtlString& value )
 	switch ( td->fieldType )
 	{
 	case FIELD_FLOAT:
-		Q_snprintf( sz, sizeof( sz ), "%.2f", *((float *)pInputData + iIndex ) );
+		Q_snprintf( sz, sizeof( sz ), "%.2f", *((const float *)pInputData + iIndex ) );
 		break;
 	case FIELD_STRING:
 		{
@@ -1365,26 +1365,26 @@ void CLCD::LookupToken( char const *in, CUtlString& value )
 		break;
 	case FIELD_VECTOR:
 		{
-			Vector v = *((Vector *)pInputData + iIndex );
+			Vector v = *((const Vector *)pInputData + iIndex );
             Q_snprintf( sz, sizeof( sz ), "%.2f %.2f %.2f", v.x, v.y, v.z );
 		}
 		break;
 	case FIELD_COLOR32:
 		{
-			Color c = *(( Color * )pInputData + iIndex );
+			Color c = *(( const Color * )pInputData + iIndex );
 			Q_snprintf( sz, sizeof( sz ), "%hhu %hhu %hhu %hhu", c.r(), c.g(), c.b(), c.a() );
 		}
 		break;
 		
 	case FIELD_BOOLEAN:
-		Q_snprintf( sz, sizeof( sz ), "%s", *( ( bool *)pInputData + iIndex ) ? "true" : "false" );
+		Q_snprintf( sz, sizeof( sz ), "%s", *( ( const bool *)pInputData + iIndex ) ? "true" : "false" );
 		break;
 	case FIELD_INTEGER:
-		Q_snprintf( sz, sizeof( sz ), "%i", *( (int *)pInputData + iIndex ));
+		Q_snprintf( sz, sizeof( sz ), "%i", *( (const int *)pInputData + iIndex ));
 		break;
 		
 	case FIELD_SHORT:
-		Q_snprintf( sz, sizeof( sz ), "%i", *( (short *)pInputData + iIndex ) );
+		Q_snprintf( sz, sizeof( sz ), "%i", *( (const short *)pInputData + iIndex ) );
 		break;
 		
 	case FIELD_CHARACTER:
@@ -1422,10 +1422,10 @@ void CLCD::BuildUpdatedText( char const *in, CUtlString& out )
 			CUtlString value;
 			LookupToken( token, value );
 
-			to = (char *)value.String();
-			while ( *to )
+			const char *rest = value.String();
+			while ( *rest )
 			{
-				*o++ = *to++;
+				*o++ = *rest++;
 			}
 		}
 		else

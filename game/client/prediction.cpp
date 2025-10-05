@@ -138,7 +138,7 @@ void CPrediction::CheckError( int commands_acknowledged )
 		return;
 
 	Vector predicted_origin;
-	memcpy( &predicted_origin, (Vector *)( (byte *)slot + td->fieldOffset[ PC_DATA_PACKED ] ), sizeof( Vector ) );
+	memcpy( &predicted_origin, (const Vector *)( (const byte *)slot + td->fieldOffset[ PC_DATA_PACKED ] ), sizeof( Vector ) );
 	
 	// Compare what the server returned with what we had predicted it to be
 	VectorSubtract ( predicted_origin, origin, delta );

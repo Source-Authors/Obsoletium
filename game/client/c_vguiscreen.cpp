@@ -833,7 +833,7 @@ void CVGuiScreenPanel::OnCommand( const char *command)
 {
 	if ( Q_stricmp( command, "vguicancel" ) )
 	{
-		engine->ClientCmd( const_cast<char *>( command ) );
+		engine->ClientCmd( command );
 	}
 
 	BaseClass::OnCommand(command);

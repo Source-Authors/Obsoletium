@@ -290,7 +290,7 @@ void C_BreakableSurface::FindCrackedMaterial()
 	m_pCrackedMaterial = 0;
 
 	// First time we've seen it, get the material on the brush model
-	int materialCount = modelinfo->GetModelMaterialCount( const_cast<model_t*>(GetModel()) );
+	int materialCount = modelinfo->GetModelMaterialCount( GetModel() );
 	if( materialCount != 1 )
 	{
 		Warning( "Encountered func_breakablesurf that has a material applied to more than one surface!\n" );
@@ -300,7 +300,7 @@ void C_BreakableSurface::FindCrackedMaterial()
 
 	// Get at the first material; even if there are more than one.
 	IMaterial* pMaterial;
-	modelinfo->GetModelMaterials( const_cast<model_t*>(GetModel()), 1, &pMaterial );
+	modelinfo->GetModelMaterials( GetModel(), 1, &pMaterial );
 
 	// The material should point to a cracked version of itself
 	bool foundVar;

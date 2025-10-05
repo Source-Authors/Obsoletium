@@ -56,7 +56,7 @@ char *VarArgs( const char *format, ... )
 	va_list		argptr;
 	static char		string[1024];
 	
-	va_start (argptr, format);
+	va_start (argptr, format); //-V2018 //-V2019
 	V_vsprintf_safe (string, format, argptr);
 	va_end (argptr);
 
@@ -410,7 +410,7 @@ void UTIL_ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpa
 //-----------------------------------------------------------------------------
 int UTIL_PrecacheDecal( const char *name, bool preload )
 {
-	return effects->Draw_DecalIndexFromName( (char*)name );
+	return effects->Draw_DecalIndexFromName( name );
 }
 
 extern short g_sModelIndexSmoke;

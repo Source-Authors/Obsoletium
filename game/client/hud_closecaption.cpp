@@ -2642,11 +2642,11 @@ static int EmitCaptionCompletion( const char *partial, char commands[ COMMAND_CO
 		return current;
 
 	const char *cmdname = "cc_emit";
-	char *substring = NULL;
+	const char *substring = NULL;
 	intp substringLen = 0;
 	if ( Q_strstr( partial, cmdname ) && strlen(partial) > strlen(cmdname) + 1 )
 	{
-		substring = (char *)partial + strlen( cmdname ) + 1;
+		substring = partial + strlen( cmdname ) + 1;
 		substringLen = V_strlen(substring);
 	}
 	

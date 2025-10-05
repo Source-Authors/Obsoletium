@@ -1905,7 +1905,7 @@ static void bpr( int level, CUtlBuffer& buf, PRINTF_FORMAT_STRING char const *fm
 {
 	char txt[ 4096 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2018 //-V2019
 	V_vsprintf_safe( txt, fmt, argptr );
 	va_end( argptr );
 

@@ -566,7 +566,7 @@ void CClientLeafSystem::PreRender()
 		else
 		{
 			// InsertIntoTree can result in new renderables being added, so copy:
-			ClientRenderHandle_t *pDirtyRenderables = (ClientRenderHandle_t *)alloca( sizeof(ClientRenderHandle_t) * nDirty );
+			ClientRenderHandle_t *pDirtyRenderables = stackallocT(ClientRenderHandle_t, nDirty );
 			memcpy( pDirtyRenderables, m_DirtyRenderables.Base(), sizeof(ClientRenderHandle_t) * nDirty );
 			ParallelProcess( "CClientLeafSystem::PreRender", pDirtyRenderables, nDirty, this, &CClientLeafSystem::InsertIntoTree, &CClientLeafSystem::FrameLock, &CClientLeafSystem::FrameUnlock );
 		}

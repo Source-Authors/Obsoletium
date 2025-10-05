@@ -736,7 +736,7 @@ void C_ParticleSmokeGrenade::RenderParticles( CParticleRenderIterator *pIterator
 				);
 		}
 
-		pParticle = (SmokeGrenadeParticle*)pIterator->GetNext( sortKey );
+		pParticle = (const SmokeGrenadeParticle*)pIterator->GetNext( sortKey );
 	}
 }
 

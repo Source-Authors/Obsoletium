@@ -419,11 +419,11 @@ static int SoundscapeCompletion( const char *partial, char commands[ COMMAND_COM
 	int current = 0;
 
 	const char *cmdname = "playsoundscape";
-	char *substring = NULL;
+	const char *substring = NULL;
 	intp substringLen = 0;
 	if ( Q_strstr( partial, cmdname ) && strlen(partial) > strlen(cmdname) + 1 )
 	{
-		substring = (char *)partial + strlen( cmdname ) + 1;
+		substring = partial + strlen( cmdname ) + 1;
 		substringLen = strlen(substring);
 	}
 	
@@ -433,7 +433,7 @@ static int SoundscapeCompletion( const char *partial, char commands[ COMMAND_COM
 	{
 		if ( !substring || !Q_strncasecmp( pSoundscapeName, substring, substringLen ) )
 		{
-			Q_snprintf( commands[ current ], sizeof( commands[ current ] ), "%s %s", cmdname, pSoundscapeName );
+			V_sprintf_safe( commands[ current ], "%s %s", cmdname, pSoundscapeName );
 			current++;
 		}
 		i++;

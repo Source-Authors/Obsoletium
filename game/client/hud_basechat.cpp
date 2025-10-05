@@ -1123,7 +1123,7 @@ void CBaseHudChat::Printf( int iFilter, PRINTF_FORMAT_STRING const char *fmt, ..
 	va_list marker;
 	char msg[4096];
 
-	va_start(marker, fmt);
+	va_start(marker, fmt); //-V2018 //-V2019
 	V_vsprintf_safe(msg, fmt, marker);
 	va_end(marker);
 
@@ -1684,7 +1684,7 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, PRINTF_FORMAT_STRI
 	va_list marker;
 	char msg[4096];
 
-	va_start(marker, fmt);
+	va_start(marker, fmt); //-V2018 //-V2019
 	V_vsprintf_safe(msg, fmt, marker);
 	va_end(marker);
 

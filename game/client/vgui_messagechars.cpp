@@ -215,7 +215,7 @@ int CMessageCharsPanel::AddText(
 	char data[ MAX_MESSAGECHARSPANEL_LEN ];
 	int len;
 
-	va_start(argptr, messageID);
+	va_start(argptr, messageID); //-V2019 //-V2018
 	len = V_vsprintf_safe(data, fmt, argptr);
 	va_end(argptr);
 
@@ -270,7 +270,7 @@ void CMessageCharsPanel::GetTextExtents( vgui::HFont hCustomFont, int *wide, int
 
 	Assert( hCustomFont );
 
-	*wide = g_pMatSystemSurface->DrawTextLen( hCustomFont, "%s", (char *)string );
+	*wide = g_pMatSystemSurface->DrawTextLen( hCustomFont, "%s", string );
 	*tall = vgui::surface()->GetFontTall( hCustomFont );
 }
 
@@ -387,7 +387,7 @@ public:
 		char data[ MAX_MESSAGECHARSPANEL_LEN ];
 		int len;
 
-		va_start(argptr, messageID);
+		va_start(argptr, messageID); //-V2019 //-V2018
 		len = V_vsprintf_safe(data, fmt, argptr);
 		va_end(argptr);
 
@@ -402,7 +402,7 @@ public:
 		int r = 192, g = 192, b = 192;
 
 		va_list argptr;
-		va_start(argptr, messageID);
+		va_start(argptr, messageID); //-V2019 //-V2018
 		int result = DrawString( hCustomFont, x, y, r, g, b, 255, fmt, messageID, argptr );
 		va_end( argptr );
 		return result;
@@ -416,7 +416,7 @@ public:
 	int DrawString( vgui::HFont hCustomFont, int x, int y, int r, int g, int b, int a, const char *fmt, int messageID, ... )
 	{
 		va_list argptr;
-		va_start(argptr, messageID);
+		va_start(argptr, messageID); //-V2019 //-V2018
 		int result = DrawStringForTime( 0, hCustomFont, x, y, r, g, b, a, fmt, messageID, argptr );
 		va_end( argptr );
 		return result;
@@ -425,7 +425,7 @@ public:
 	int DrawString( vgui::HFont hCustomFont, int x, int y, const char *fmt, int messageID, ... )
 	{
 		va_list argptr;
-		va_start(argptr, messageID);
+		va_start(argptr, messageID); //-V2019 //-V2018
 		int result = DrawStringForTime( 0, hCustomFont, x, y, fmt, messageID, argptr );
 		va_end( argptr );
 		return result;
@@ -442,7 +442,7 @@ public:
 		char data[ MAX_MESSAGECHARSPANEL_LEN ];
 		int len;
 
-		va_start(argptr, fmt);
+		va_start(argptr, fmt); //-V2019 //-V2018
 		len = V_vsprintf_safe(data, fmt, argptr);
 		va_end(argptr);
 

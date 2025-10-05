@@ -15,7 +15,7 @@
 void RecvProxy_IntToColor32( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
 	color32 *pOutColor = (color32*)pOut;
-	unsigned int inColor = *((unsigned int*)&pData->m_Value.m_Int);
+	unsigned int inColor = *((const unsigned int*)&pData->m_Value.m_Int);
 
 	pOutColor->r = (unsigned char)(inColor >> 24);
 	pOutColor->g = (unsigned char)((inColor >> 16) & 0xFF);

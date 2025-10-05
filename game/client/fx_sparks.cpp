@@ -314,7 +314,7 @@ void FX_ElectricSpark( const Vector &pos, int nMagnitude, int nTrailLength, cons
 	}
 
 	//Setup our collision information
-	pSparkEmitter->Setup( (Vector &) pos, 
+	pSparkEmitter->Setup( pos, 
 							NULL, 
 							SPARK_ELECTRIC_SPREAD, 
 							SPARK_ELECTRIC_MINSPEED, 
@@ -749,7 +749,7 @@ void FX_Sparks( const Vector &pos, int nMagnitude, int nTrailLength, const Vecto
 	}
 
 	//Setup our collision information
-	pSparkEmitter->Setup( (Vector &) pos, 
+	pSparkEmitter->Setup( pos, 
 							NULL, 
 							SPARK_SPREAD, 
 							flMinSpeed, 

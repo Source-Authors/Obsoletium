@@ -321,7 +321,7 @@ void C_Plasma::Start( void )
 		
 		int	nModelIndex = ( i % 2 ) ? m_nPlasmaModelIndex : m_nPlasmaModelIndex2;
 
-		model_t *pModel	= (model_t *) modelinfo->GetModel( nModelIndex );
+		const model_t *pModel	= modelinfo->GetModel( nModelIndex );
 		maxFrames	= modelinfo->GetModelFrameCount( pModel );
 
 		// Setup all the information for the client entity
@@ -407,7 +407,7 @@ void C_Plasma::UpdateFlames( void )
 		offset[2] = m_entFlames[i].GetAbsOrigin()[2];
 
 		// Note: Sprite render assumes 0 scale means 1.0
-		m_entFlames[i].SetScale ( MAX(0.000001,newScale) );
+		m_entFlames[i].SetScale ( max(0.000001f,newScale) );
 		
 		if ( i != 0 )
 		{

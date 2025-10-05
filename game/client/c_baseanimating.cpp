@@ -6314,7 +6314,7 @@ void DevMsgRT( char const* pMsg, ... )
 	if (gpGlobals->frametime != 0.0f)
 	{
 		va_list argptr;
-		va_start( argptr, pMsg );
+		va_start( argptr, pMsg ); //-V2018 //-V2019
 		// 
 		{
 			static char	string[1024];
