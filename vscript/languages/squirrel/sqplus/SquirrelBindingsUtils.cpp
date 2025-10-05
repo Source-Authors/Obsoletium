@@ -37,15 +37,14 @@ BOOL CreateStaticNamespace(HSQUIRRELVM v,ScriptNamespaceDecl *sn)
 		n++;
 	}
 	if(sn->delegate) {
-		const ScriptClassMemberDecl *members = sn->delegate;
-		const ScriptClassMemberDecl *m = NULL;
+		const ScriptClassMemberDecl *ms = sn->delegate;
 		sq_newtable(v);
-		while(members[n].name) {
-			m = &members[n];
-			sq_pushstring(v,m->name,-1);
-			sq_newclosure(v,m->func,0);
-			sq_setparamscheck(v,m->params,m->typemask);
-			sq_setnativeclosurename(v,-1,m->name);
+		while(ms[n].name) {
+			const ScriptClassMemberDecl *mr = mr = &ms[n];
+			sq_pushstring(v,mr->name,-1);
+			sq_newclosure(v,mr->func,0);
+			sq_setparamscheck(v,mr->params,mr->typemask);
+			sq_setnativeclosurename(v,-1,mr->name);
 			sq_createslot(v,-3);
 			n++;
 		}
