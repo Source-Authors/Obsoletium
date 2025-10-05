@@ -102,10 +102,10 @@ protected:
 protected:
 
 	CDmaVar<bool> m_bWantsToBeDrawnInEngine;
-	bool m_bIsDrawingInEngine;
+	bool m_bIsDrawingInEngine{false};
 
 	CBaseHandle m_RefEHandle;	// Reference ehandle. Used to generate ehandles off this entity.
-	ClientRenderHandle_t m_hRenderHandle;
+	ClientRenderHandle_t m_hRenderHandle{INVALID_CLIENT_RENDER_HANDLE};
 };
 
 
