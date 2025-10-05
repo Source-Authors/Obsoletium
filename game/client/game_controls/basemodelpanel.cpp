@@ -235,11 +235,7 @@ void CModelPanel::SwapModel( const char *pszName, const char *pszAttached )
 	if ( !m_pModelInfo || !pszName || !pszName[0] )
 		return;
 
-	intp len = Q_strlen( pszName ) + 1;
-	char *pAlloced = new char[ len ];
-	Assert( pAlloced );
-	Q_strncpy( pAlloced, pszName, len );
-	m_pModelInfo->m_pszModelName = pAlloced;
+	m_pModelInfo->m_pszModelName = V_strdup( pszName );
 
 	ClearAttachedModelInfos();
 
@@ -248,11 +244,7 @@ void CModelPanel::SwapModel( const char *pszName, const char *pszAttached )
 		CModelPanelAttachedModelInfo *pAttachedModelInfo = new CModelPanelAttachedModelInfo;
 		if ( pAttachedModelInfo )
 		{
-			len = Q_strlen( pszAttached ) + 1;
-			pAlloced = new char[ len ];
-			Assert( pAlloced );
-			Q_strncpy( pAlloced, pszAttached, len );
-			pAttachedModelInfo->m_pszModelName = pAlloced;
+			pAttachedModelInfo->m_pszModelName = V_strdup( pszAttached );
 			pAttachedModelInfo->m_nSkin = 0;
 
 			m_pModelInfo->m_AttachedModelsInfo.AddToTail( pAttachedModelInfo );
