@@ -478,7 +478,7 @@ int Beam_t::DrawModel( int ignored )
 //-----------------------------------------------------------------------------
 
 CViewRenderBeams::CViewRenderBeams(void)
-	: m_pBeamTrails(0), m_pActiveTrails(0), m_pFreeTrails(0) {
+    : m_pBeamTrails(0), m_pActiveTrails(0), m_pFreeTrails(0), m_nNumBeamTrails(0) {
 	m_pFreeBeams = NULL;
 	m_pActiveBeams = NULL;
 	m_nBeamFreeListLength = 0;

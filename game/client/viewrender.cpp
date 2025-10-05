@@ -379,7 +379,7 @@ class CSkyboxView : public CRendering3dView
 {
 	DECLARE_CLASS( CSkyboxView, CRendering3dView );
 public:
-	CSkyboxView(CViewRender *pMainView) : 
+	explicit CSkyboxView(CViewRender *pMainView) : 
 		CRendering3dView( pMainView ),
 		m_pSky3dParams( NULL )
 	  {
@@ -414,7 +414,7 @@ class CPortalSkyboxView : public CSkyboxView
 {
 	DECLARE_CLASS( CPortalSkyboxView, CSkyboxView );
 public:
-	CPortalSkyboxView(CViewRender *pMainView) : 
+	explicit CPortalSkyboxView(CViewRender *pMainView) : 
 	  CSkyboxView( pMainView ),
 		  m_pRenderTarget( NULL )
 	  {}
@@ -439,7 +439,7 @@ class CShadowDepthView : public CRendering3dView
 {
 	DECLARE_CLASS( CShadowDepthView, CRendering3dView );
 public:
-	CShadowDepthView(CViewRender *pMainView) : CRendering3dView( pMainView ) {}
+	explicit CShadowDepthView(CViewRender *pMainView) : CRendering3dView( pMainView ) {}
 
 	void Setup( const CViewSetup &shadowViewIn, ITexture *pRenderTarget, ITexture *pDepthTexture );
 	void Draw();
@@ -456,7 +456,7 @@ class CFreezeFrameView : public CRendering3dView
 {
 	DECLARE_CLASS( CFreezeFrameView, CRendering3dView );
 public:
-	CFreezeFrameView(CViewRender *pMainView) : CRendering3dView( pMainView ) {}
+	explicit CFreezeFrameView(CViewRender *pMainView) : CRendering3dView( pMainView ) {}
 
 	void Setup( const CViewSetup &view );
 	void Draw();
@@ -473,7 +473,7 @@ class CBaseWorldView : public CRendering3dView
 {
 	DECLARE_CLASS( CBaseWorldView, CRendering3dView );
 protected:
-	CBaseWorldView(CViewRender *pMainView) : CRendering3dView( pMainView ) {}
+	explicit CBaseWorldView(CViewRender *pMainView) : CRendering3dView( pMainView ) {}
 
 	virtual bool	AdjustView( float waterHeight );
 
@@ -495,7 +495,10 @@ class CSimpleWorldView : public CBaseWorldView
 {
 	DECLARE_CLASS( CSimpleWorldView, CBaseWorldView );
 public:
-	CSimpleWorldView(CViewRender *pMainView) : CBaseWorldView( pMainView ) {}
+	explicit CSimpleWorldView(CViewRender *pMainView) : CBaseWorldView( pMainView )
+	{
+		BitwiseClear(m_fogInfo);
+	}
 
 	void			Setup( const CViewSetup &view, int nClearFlags, bool bDrawSkybox, const VisibleFogVolumeInfo_t &fogInfo, const WaterRenderInfo_t& info, ViewCustomVisibility_t *pCustomVisibility = NULL );
 	void			Draw();
@@ -513,7 +516,7 @@ class CBaseWaterView : public CBaseWorldView
 {
 	DECLARE_CLASS( CBaseWaterView, CBaseWorldView );
 public:
-	CBaseWaterView(CViewRender *pMainView) : 
+	explicit CBaseWaterView(CViewRender *pMainView) : 
 		CBaseWorldView( pMainView ),
 		m_SoftwareIntersectionView( pMainView )
 	{}
@@ -555,7 +558,7 @@ class CAboveWaterView : public CBaseWaterView
 {
 	DECLARE_CLASS( CAboveWaterView, CBaseWaterView );
 public:
-	CAboveWaterView(CViewRender *pMainView) : 
+	explicit CAboveWaterView(CViewRender *pMainView) : 
 		CBaseWaterView( pMainView ),
 		m_ReflectionView( pMainView ),
 		m_RefractionView( pMainView ),
@@ -622,7 +625,7 @@ class CUnderWaterView : public CBaseWaterView
 {
 	DECLARE_CLASS( CUnderWaterView, CBaseWaterView );
 public:
-	CUnderWaterView(CViewRender *pMainView) : 
+	explicit CUnderWaterView(CViewRender *pMainView) : 
 		CBaseWaterView( pMainView ),
 		// dimhotepus: Draw skybox by default.
 		m_bDrawSkybox( true ),
@@ -660,8 +663,9 @@ class CReflectiveGlassView : public CSimpleWorldView
 {
 	DECLARE_CLASS( CReflectiveGlassView, CSimpleWorldView );
 public:
-	CReflectiveGlassView( CViewRender *pMainView ) : BaseClass( pMainView )
+	explicit CReflectiveGlassView( CViewRender *pMainView ) : BaseClass( pMainView )
 	{
+		BitwiseClear(m_ReflectionPlane);
 	}
 
 	virtual bool AdjustView( float flWaterHeight );
@@ -677,8 +681,9 @@ class CRefractiveGlassView : public CSimpleWorldView
 {
 	DECLARE_CLASS( CRefractiveGlassView, CSimpleWorldView );
 public:
-	CRefractiveGlassView( CViewRender *pMainView ) : BaseClass( pMainView )
+	explicit CRefractiveGlassView( CViewRender *pMainView ) : BaseClass( pMainView )
 	{
+		BitwiseClear(m_ReflectionPlane);
 	}
 
 	virtual bool AdjustView( float flWaterHeight );
