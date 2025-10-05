@@ -3240,7 +3240,7 @@ void CMDLCache::FreeData( MDLCacheDataType_t type, void *pData )
 {
 	if ( type != MDLCACHE_ANIMBLOCK )
 	{
-		_aligned_free( (void *)pData );
+		_aligned_free( pData );
 	}
 	else
 	{
