@@ -192,7 +192,7 @@ bool CCommEditDoc::LoadFromFile( const char *pFileName )
 
 void CCommEditDoc::SaveToFile( )
 {
-	if ( m_hRoot.Get() && m_pTXTFileName && m_pTXTFileName[0] )
+	if ( m_hRoot.Get() && !Q_isempty( m_pTXTFileName ) )
 	{
 		g_pDataModel->SaveToFile( m_pTXTFileName, NULL, "keyvalues", "keyvalues", m_hRoot );
 	}
