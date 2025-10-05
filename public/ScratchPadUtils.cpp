@@ -391,12 +391,15 @@ void ScratchPad_DrawSphere(
 {
 	CUtlVector<Vector> prevPoints;
 	prevPoints.SetSize( nSubDivs );
+
+	Assert( nSubDivs > 1 );
+
+	// dimhotepus: Cache coefficient and ensure no zero division.
+	const float coefficient = 1.0f / (max(nSubDivs, 2) - 1);
 	
 	// For each vertical slice.. (the top and bottom ones are just a single point).
 	for ( int iSlice=0; iSlice < nSubDivs; iSlice++ )
 	{
-		float flHalfSliceAngle = M_PI_F * (float)iSlice / (nSubDivs - 1);
-
 		if ( iSlice == 0 )
 		{
 			prevPoints[0] = vCenter + Vector( 0, 0, flRadius );
@@ -405,11 +408,13 @@ void ScratchPad_DrawSphere(
 		}
 		else
 		{
+			// dimhotepus: Compute only when needed.
+			const float flHalfSliceAngle = M_PI_F * (float)iSlice * coefficient;
 			const float sinHalfSliceAngle = sinf( flHalfSliceAngle );
 
 			for ( int iSubPt=0; iSubPt < nSubDivs; iSubPt++ )
 			{
-				float flHalfAngle = M_PI_F * (float)iSubPt / (nSubDivs - 1);
+				float flHalfAngle = M_PI_F * (float)iSubPt * coefficient;
 				float flAngle = flHalfAngle * 2;
 				
 				Vector pt;
