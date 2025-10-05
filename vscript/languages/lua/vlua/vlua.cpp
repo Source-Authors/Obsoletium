@@ -1153,7 +1153,7 @@ public:
 		return true;
 	}
 
-	virtual bool SetValue( HSCRIPT hScope, int nIndex, const ScriptVariant_t &value )
+	bool SetValue( HSCRIPT hScope, int nIndex, const ScriptVariant_t &value )
 	{
 		Assert( hScope );
 
@@ -1249,7 +1249,7 @@ public:
 		return true;
 	}
 
-	virtual bool GetValue( HSCRIPT hScope, int nIndex, ScriptVariant_t *pValue )
+	bool GetValue( HSCRIPT hScope, int nIndex, ScriptVariant_t *pValue )
 	{
 		if ( hScope )
 		{
