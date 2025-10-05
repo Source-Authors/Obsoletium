@@ -565,32 +565,6 @@ void C_BaseHLPlayer::PerformClientSideNPCSpeedModifiers( float flFrameTime, CUse
 				float flDot = DotProduct( los, facingDir );
 				if ( flDot > 0.8 )
 				{
-					/*
-					// Velocity check (abort if the target isn't moving)
-					Vector vecTargetVelocity;
-					pNPC->EstimateAbsVelocity( vecTargetVelocity );
-					float flSpeed = VectorNormalize(vecTargetVelocity);
-					Vector vecMyVelocity = GetAbsVelocity();
-					VectorNormalize(vecMyVelocity);
-					if ( flSpeed > 1.0 )
-					{
-						// Velocity roughly parallel?
-						if ( DotProduct(vecTargetVelocity,vecMyVelocity) > 0.4  )
-						{
-							bShouldModSpeed = true;
-						}
-					} 
-					else
-					{
-						// NPC's not moving, slow down if we're moving at him
-						//Msg("Dot: %.2f\n", DotProduct( los, vecMyVelocity ) );
-						if ( DotProduct( los, vecMyVelocity ) > 0.8 )
-						{
-							bShouldModSpeed = true;
-						} 
-					}
-					*/
-
 					bShouldModSpeed = true;
 				}
 			}
