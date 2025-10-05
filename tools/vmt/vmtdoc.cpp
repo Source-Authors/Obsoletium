@@ -246,9 +246,9 @@ void CVMTDoc::CopyParamsFromVMT( CDmElement *pVMT )
 				int r, g, b;
 				Vector v = pSrc->GetValue<Vector>( );
 				v *= 255.0f;
-				r = clamp( v[0], 0, 255 );
-				g = clamp( v[1], 0, 255 );
-				b = clamp( v[2], 0, 255 );
+				r = clamp( v[0], 0.f, 255.f );
+				g = clamp( v[1], 0.f, 255.f );
+				b = clamp( v[2], 0.f, 255.f );
 				c.SetColor( r, g, b, 255 );
 				pDst->SetValue( c );
 			}
@@ -839,9 +839,9 @@ bool CVMTDoc::SetColorParamValue( CDmAttribute *pAttribute, const char *pValue )
 	if ( count == 3 )
 	{
 		vec *= 255.0f;
-		r = clamp( vec[0], 0, 255 );
-		g = clamp( vec[1], 0, 255 );
-		b = clamp( vec[2], 0, 255 );
+		r = clamp( vec[0], 0.f, 255.f );
+		g = clamp( vec[1], 0.f, 255.f );
+		b = clamp( vec[2], 0.f, 255.f );
 		c.SetColor( r, g, b, 255 );
 		pAttribute->SetValue( c );
 		return true;
