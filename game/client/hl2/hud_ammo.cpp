@@ -366,6 +366,7 @@ class CHudSecondaryAmmo : public CHudNumericDisplay, public CHudElement
 public:
 	CHudSecondaryAmmo( const char *pElementName ) : BaseClass( NULL, "HudAmmoSecondary" ), CHudElement( pElementName )
 	{
+		m_iconSecondaryAmmo = nullptr;
 		m_iAmmo = -1;
 
 		SetHiddenBits( HIDEHUD_HEALTH | HIDEHUD_WEAPONSELECTION | HIDEHUD_PLAYERDEAD | HIDEHUD_NEEDSUIT );
