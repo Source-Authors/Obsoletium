@@ -86,7 +86,7 @@ void SquirrelVM::PrintFunc(HSQUIRRELVM v,const SQChar* s,...)
 {
 	static SQChar temp[2048];
 	va_list vl;
-	va_start(vl, s);
+	va_start(vl, s); //-V2019 //-V2018
 	scvsprintf( temp, sizeof(temp), s, vl);
 	SCPUTS(temp);
 	va_end(vl);
@@ -96,7 +96,7 @@ void SquirrelVM::ErrorFunc(HSQUIRRELVM v,const SQChar* s,...)
 {
 	static SQChar temp[2048];
 	va_list vl;
-	va_start(vl, s);
+	va_start(vl, s); //-V2019 //-V2018
 	scvsprintf( temp, sizeof(temp), s, vl);
 	SCFPUTS(temp, stderr);
 	va_end(vl);
