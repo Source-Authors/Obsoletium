@@ -72,6 +72,7 @@ void CreateTools()
 CCommEditTool::CCommEditTool()
 {
 	m_bInNodeDropMode = false;
+	m_bDroppingCommentaryNodes = false;
 	m_pMenuBar = NULL;
 	m_pDoc = NULL;
 }
