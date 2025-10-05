@@ -456,13 +456,13 @@ public:
 	// Simple script usage
 	//--------------------------------------------------------
 	virtual ScriptStatus_t Run( const char *pszScript, bool bWait = true ) = 0;
-	inline ScriptStatus_t Run( const unsigned char *pszScript, bool bWait = true ) { return Run( (char *)pszScript, bWait ); }
+	inline ScriptStatus_t Run( const unsigned char *pszScript, bool bWait = true ) { return Run( (const char *)pszScript, bWait ); }
 
 	//--------------------------------------------------------
 	// Compilation
 	//--------------------------------------------------------
  	virtual HSCRIPT CompileScript( const char *pszScript, const char *pszId = nullptr ) = 0;
-	inline HSCRIPT CompileScript( const unsigned char *pszScript, const char *pszId = nullptr ) { return CompileScript( (char *)pszScript, pszId ); }
+	inline HSCRIPT CompileScript( const unsigned char *pszScript, const char *pszId = nullptr ) { return CompileScript( (const char *)pszScript, pszId ); }
 	virtual void ReleaseScript( HSCRIPT ) = 0;
 
 	//--------------------------------------------------------
