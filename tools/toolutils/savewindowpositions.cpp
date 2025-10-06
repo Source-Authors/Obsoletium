@@ -104,7 +104,7 @@ static void BufPrint( CUtlBuffer& buf, int level, char const *fmt, ... )
 
 void CWindowPositionMgr::SavePositions( char const *filename, char const *key )
 {
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, (intp)0, CUtlBuffer::TEXT_BUFFER );
 	buf.Printf( "%s\n", key );
 	buf.Printf( "{\n" );
 
