@@ -36,8 +36,8 @@ const DmElementHandle_t DMELEMENT_HANDLE_INVALID;
 
 #else // PERFORM_HANDLE_TYPECHECKING
 
-// dimhotepus: Make intp.
-enum DmElementHandle_t : intp
+// dimhotepus: Make int. NOTE: If intp, breaks compatibility as serialized to buffer.
+enum DmElementHandle_t : int
 {
 	DMELEMENT_HANDLE_INVALID = -1
 };
