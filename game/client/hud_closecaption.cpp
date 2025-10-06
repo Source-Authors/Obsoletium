@@ -201,7 +201,7 @@ void CCloseCaptionWorkUnit::SetStream( const wchar_t *stream )
 	m_pszStream = NULL;
 
 	Assert( V_wcslen( stream ) < 4096 );
-	m_pszStream = V_wcsdup( m_pszStream );
+	m_pszStream = V_wcsdup( stream );
 }
 
 const wchar_t *CCloseCaptionWorkUnit::GetStream() const
