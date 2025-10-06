@@ -1645,7 +1645,7 @@ void CPhysicsCollision::VCollideLoad( vcollide_t *pOutput, int solidCount, const
 
 		if (size > currentSize || !tmpbuf)
 		{
-				delete[] tmpbuf;
+			delete[] tmpbuf; //-V575
 			tmpbuf = new char[size];
 			currentSize = size;
 		}
