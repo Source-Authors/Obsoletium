@@ -296,10 +296,10 @@ private:
 	int m_nHolidayLightsStyle;
 };
 
-static CRopeManager s_RopeManager;
 
 IRopeManager *RopeManager()
 {
+	static CRopeManager s_RopeManager;
 	return &s_RopeManager;
 }
 
@@ -329,16 +329,15 @@ CRopeManager::CRopeManager()
 //-----------------------------------------------------------------------------
 CRopeManager::~CRopeManager()
 {
-	int nRenderCacheCount = m_aRenderCache.Count();
-	for ( int iRenderCache = 0; iRenderCache < nRenderCacheCount; ++iRenderCache )
+	for ( auto &c : m_aRenderCache )
 	{
-		if ( m_aRenderCache[iRenderCache].m_pSolidMaterial )
+		if ( c.m_pSolidMaterial )
 		{
-			m_aRenderCache[iRenderCache].m_pSolidMaterial->DecrementReferenceCount();
+			c.m_pSolidMaterial->DecrementReferenceCount();
 		}
-		if ( m_aRenderCache[iRenderCache].m_pBackMaterial )
+		if ( c.m_pBackMaterial )
 		{
-			m_aRenderCache[iRenderCache].m_pBackMaterial->DecrementReferenceCount();
+			c.m_pBackMaterial->DecrementReferenceCount();
 		}
 	}
 
@@ -351,10 +350,9 @@ CRopeManager::~CRopeManager()
 //-----------------------------------------------------------------------------
 void CRopeManager::ResetRenderCache( void )
 {
-	int nRenderCacheCount = m_aRenderCache.Count();
-	for ( int iRenderCache = 0; iRenderCache < nRenderCacheCount; ++iRenderCache )
+	for ( auto &c : m_aRenderCache )
 	{
-		m_aRenderCache[iRenderCache].m_nCacheCount = 0;
+		c.m_nCacheCount = 0;
 	}
 }
 
@@ -1068,7 +1066,7 @@ C_RopeKeyframe::C_RopeKeyframe()
 
 C_RopeKeyframe::~C_RopeKeyframe()
 {
-	s_RopeManager.RemoveRopeFromQueuedRenderCaches( this );	
+	static_cast<CRopeManager *>(RopeManager())->RemoveRopeFromQueuedRenderCaches( this );	
 	g_Ropes.FindAndRemove( this );
 
 	if ( m_pBackMaterial )
