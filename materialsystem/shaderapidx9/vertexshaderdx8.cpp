@@ -1398,7 +1398,7 @@ HRESULT CDxInclude::Open( D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOI
 		pFileName = pTemp;
 	}
 
-	CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+	CUtlBuffer buf( (intp)0, (intp)0, CUtlBuffer::TEXT_BUFFER );
 	if ( !g_pFullFileSystem->ReadFile( pFileName, NULL, buf ) )
 		return E_FAIL;
 

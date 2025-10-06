@@ -474,7 +474,7 @@ bool CReplayRagdollRecorder::DumpRagdollsToDisk( char const* pFilename ) const
 
 	{
 		MEM_ALLOC_CREDIT();
-		CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer buf( (intp)0, (intp)0, CUtlBuffer::TEXT_BUFFER );
 		if ( !SerializeDMX( buf, pSimulations, pFilename ) )
 		{
 			Warning( "Replay: Failed to write ragdoll cache, %s.\n", pFilename );
