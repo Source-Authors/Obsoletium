@@ -66,9 +66,18 @@ void CreateTools()
 //-----------------------------------------------------------------------------
 CVcdBlockTool::CVcdBlockTool()
 {
-	m_bInNodeDropMode = false;
-	m_pMenuBar = NULL;
 	m_pDoc = NULL;
+	m_pMenuBar = NULL;
+	
+	m_bInNodeDropMode = false;
+	m_bInNodeDragMode = false;
+	m_iDragX = 0;
+	m_iDragY = 0;
+
+	m_bRememberPlayerPosition = false;
+	m_bHasPlayerPosition = false;
+	m_vecPlayerOrigin = vec3_origin;
+	m_vecPlayerAngles = vec3_angle;
 }
 
 
