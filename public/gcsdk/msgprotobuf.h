@@ -126,7 +126,7 @@ public:
 	void ExpectingReply( JobID_t jobId )		{ SetJobIDSource( jobId ); }
 
 	EResult		GetEResult() const { return (EResult)ConstHdr().eresult(); }
-	void		SetEResult( EResult eResult ) { Hdr().set_eresult( eResult ); }
+	void		SetEResult( EResult eResult ) { Hdr().set_eresult( to_underlying( eResult ) ); }
 	const char *GetErrorMessage() const { return ConstHdr().error_message().c_str(); }
 	void		SetErrorMessage( const char *pchErrorMessage ) { Hdr().set_error_message( pchErrorMessage ); }
 	void		AppendErrorMessage( const char *pchErrorMessage ) { Hdr().mutable_error_message()->append( pchErrorMessage ); }
