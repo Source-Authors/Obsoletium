@@ -742,7 +742,7 @@ static void BuildGroupMappings( CDmeAnimationSet *pAnimationSet )
 	intp nCount = defaultGroupOrdering.Count();
 	for ( intp i = 0; i < nCount; ++i )
 	{
-		const char *pGroupName = (const char *)defaultGroupOrdering[ i ];
+		const char *pGroupName = static_cast<const char *>(defaultGroupOrdering[ i ]);
 		if ( !Q_stricmp( pGroupName, "IGNORE" ) )
 			continue;
 
