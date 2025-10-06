@@ -372,7 +372,7 @@ bool CGCClientSharedObjectCache::BParseCacheSubscribedMsg( const CMsgSOCacheSubs
 	for ( int i = FirstTypeCacheIndex(); i != InvalidTypeCacheIndex(); i = NextTypeCacheIndex( i ) )
 	{
 		CGCClientSharedObjectTypeCache *pTypeCache = GetTypeCacheByIndex( i );
-		if ( vecUntouchedTypes.Find( pTypeCache->GetTypeID() ) != vecUntouchedTypes.InvalidIndex() )
+		if ( pTypeCache && vecUntouchedTypes.Find( pTypeCache->GetTypeID() ) != vecUntouchedTypes.InvalidIndex() )
 		{
 			pTypeCache->RemoveAllObjects( vecObjectsToDestroy );
 		}
@@ -550,6 +550,8 @@ void CGCClientSharedObjectCache::AddListener( ISharedObjectListener *pListener )
 		for ( int i = FirstTypeCacheIndex(); i != InvalidTypeCacheIndex(); i = NextTypeCacheIndex( i ) )
 		{
 			CGCClientSharedObjectTypeCache *pTypeCache = GetTypeCacheByIndex( i );
+			if (!pTypeCache) continue;
+
 			for ( uint32 j = 0 ; j < pTypeCache->GetCount() ; ++j )
 			{
 				CSharedObject *pObject = pTypeCache->GetObject( j );
