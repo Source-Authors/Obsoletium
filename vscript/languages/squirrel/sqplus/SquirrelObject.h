@@ -35,30 +35,30 @@ public:
   BOOL SetValue(const SquirrelObject &key,const SquirrelObject &val);
   
   BOOL SetValue(SQInteger key,const SquirrelObject &val);
-  BOOL SetValue(INT key,bool b); // Compiler treats SQBool as INT.
-  BOOL SetValue(INT key,INT n);
-  BOOL SetValue(INT key,FLOAT f);
-  BOOL SetValue(INT key,const SQChar *s);
+  BOOL SetValue(SQ_INT key,bool b); // Compiler treats SQBool as SQ_INT.
+  BOOL SetValue(SQ_INT key,SQ_INT n);
+  BOOL SetValue(SQ_INT key,FLOAT f);
+  BOOL SetValue(SQ_INT key,const SQChar *s);
 
   BOOL SetValue(const SQChar *key,const SquirrelObject &val);
   BOOL SetValue(const SQChar *key,bool b);
-  BOOL SetValue(const SQChar *key,INT n);
+  BOOL SetValue(const SQChar *key,SQ_INT n);
   BOOL SetValue(const SQChar *key,FLOAT f);
   BOOL SetValue(const SQChar *key,const SQChar *s);
 
   BOOL SetUserPointer(const SQChar * key,SQUserPointer up);
   SQUserPointer GetUserPointer(const SQChar * key);
-  BOOL SetUserPointer(INT key,SQUserPointer up);
-  SQUserPointer GetUserPointer(INT key);
+  BOOL SetUserPointer(SQ_INT key,SQUserPointer up);
+  SQUserPointer GetUserPointer(SQ_INT key);
 
-  BOOL NewUserData(const SQChar * key,INT size,SQUserPointer * typetag=0);
+  BOOL NewUserData(const SQChar * key,SQ_INT size,SQUserPointer * typetag=0);
   BOOL GetUserData(const SQChar * key,SQUserPointer * data,SQUserPointer * typetag=0);
   BOOL RawGetUserData(const SQChar * key,SQUserPointer * data,SQUserPointer * typetag=0);
 
   // === BEGIN Arrays ===
 
-  BOOL ArrayResize(INT newSize);
-  BOOL ArrayExtend(INT amount);
+  BOOL ArrayResize(SQ_INT newSize);
+  BOOL ArrayExtend(SQ_INT amount);
   BOOL ArrayReverse(void);
   SquirrelObject ArrayPop(SQBool returnPoppedVal=SQTrue);
 
@@ -83,14 +83,14 @@ public:
   SquirrelObject GetValue(const SQChar *key) const;
   BOOL Exists(const SQChar *key) const;
   FLOAT GetFloat(const SQChar *key) const;
-  INT GetInt(const SQChar *key) const;
+  SQ_INT GetInt(const SQChar *key) const;
   const SQChar *GetString(const SQChar *key) const;
   bool GetBool(const SQChar *key) const;
-  SquirrelObject GetValue(INT key) const;
-  FLOAT GetFloat(INT key) const;
-  INT GetInt(INT key) const;
-  const SQChar *GetString(INT key) const;
-  bool GetBool(INT key) const;
+  SquirrelObject GetValue(SQ_INT key) const;
+  FLOAT GetFloat(SQ_INT key) const;
+  SQ_INT GetInt(SQ_INT key) const;
+  const SQChar *GetString(SQ_INT key) const;
+  bool GetBool(SQ_INT key) const;
   SquirrelObject GetAttributes(const SQChar *key = NULL);
   SQObjectType GetType();
   HSQOBJECT & GetObjectHandle() const {return *(HSQOBJECT*)&_o;}
@@ -102,8 +102,8 @@ public:
 
   // === Get the type name of item/object through string key in a table or class. Returns NULL if the type name is not set (not an SqPlus registered type).
   const SQChar * GetTypeName(const SQChar * key);
-  // === Get the type name of item/object through INT key in a table or class. Returns NULL if the type name is not set (not an SqPlus registered type).
-  const SQChar * GetTypeName(INT key);
+  // === Get the type name of item/object through SQ_INT key in a table or class. Returns NULL if the type name is not set (not an SqPlus registered type).
+  const SQChar * GetTypeName(SQ_INT key);
   // === Get the type name of this object, else return NULL if not an SqPlus registered type.
   const SQChar * GetTypeName(void);
 
@@ -128,7 +128,7 @@ public:
 private:
   BOOL GetSlot(const SQChar *name) const;
   BOOL RawGetSlot(const SQChar *name) const;
-  BOOL GetSlot(INT key) const;
+  BOOL GetSlot(SQ_INT key) const;
   HSQOBJECT _o;
 };
 
@@ -230,7 +230,7 @@ struct StackHandler {
     sq_pushfloat(v,f);
     return 1;
   }
-  int Return(INT i)
+  int Return(SQ_INT i)
   {
     sq_pushinteger(v,i);
     return 1;

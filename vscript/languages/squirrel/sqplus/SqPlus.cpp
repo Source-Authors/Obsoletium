@@ -42,7 +42,7 @@ static SQRESULT getInstanceVarInfo(StackHandler & sa,VarRefPtr & vr,SQUserPointe
 #if defined(SQ_USE_CLASS_INHERITANCE) 
     if (typetag != vr->instanceType) {
       SquirrelObject typeTable = instance.GetValue(SQ_CLASS_OBJECT_TABLE_NAME);
-      up = (char *)typeTable.GetUserPointer(INT((size_t)vr->instanceType));
+      up = (char *)typeTable.GetUserPointer(SQ_INT((size_t)vr->instanceType));
       if (!up) {
         throw SquirrelError(_SC("Invalid Instance Type"));
       }
@@ -89,10 +89,10 @@ static SQRESULT setVar(StackHandler &sa, VarRef *vr, void *data) {
     throw SquirrelError(g_msg_throw.s);
   } // if
   switch (vr->m_type) {
-  case TypeInfo<INT>::TypeID: {
-    INT * val = (INT *)data; // Address
+  case TypeInfo<SQ_INT>::TypeID: {
+    SQ_INT * val = (SQ_INT *)data; // Address
     if (val) {
-        INT v = sa.GetInt(3);
+        SQ_INT v = sa.GetInt(3);
         // Support for different int sizes
         switch( vr->m_size ) {
           case 1: v = (*(char*)val = (char)v); break;  
@@ -112,7 +112,7 @@ static SQRESULT setVar(StackHandler &sa, VarRef *vr, void *data) {
 	  unsigned * val = (unsigned *)data; // Address
 	  if (val) {
 		  *val = sa.GetInt(3);
-		  return sa.Return(static_cast<INT>(*val));
+		  return sa.Return(static_cast<SQ_INT>(*val));
 	  } // if
 	  break;
   } // case
@@ -175,10 +175,10 @@ static SQRESULT setVar(StackHandler &sa, VarRef *vr, void *data) {
 
 static SQRESULT getVar(StackHandler &sa, VarRef *vr, void *data) {
   switch (vr->m_type) {
-  case TypeInfo<INT>::TypeID: {
+  case TypeInfo<SQ_INT>::TypeID: {
     if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
       if (data) {
-          INT v;
+          SQ_INT v;
           // Support for different int sizes
           switch( vr->m_size ){
             case 1: v = *(char*)data; break;  
@@ -188,12 +188,12 @@ static SQRESULT getVar(StackHandler &sa, VarRef *vr, void *data) {
             // dimhotepus: x64 long long int.
             case 8: v = *(int64_t*)data; break;
 #endif            
-            default: v = *(INT*)data;
+            default: v = *(SQ_INT*)data;
           }
           return sa.Return(v);
       } // if
     } else {
-      INT * val = (INT *)&data; // Constant value
+      SQ_INT * val = (SQ_INT *)&data; // Constant value
       return sa.Return(*val);
     } // if
     break;
@@ -202,11 +202,11 @@ static SQRESULT getVar(StackHandler &sa, VarRef *vr, void *data) {
 	  if (!(vr->m_access & VAR_ACCESS_CONSTANT)) {
 		  unsigned * val = (unsigned *)data; // Address
 		  if (val){
-            return sa.Return(static_cast<INT>(*val));
+            return sa.Return(static_cast<SQ_INT>(*val));
           }
 	  } else {
 		  unsigned * val = (unsigned *)&data; // Constant value
-		  return sa.Return(static_cast<INT>(*val));
+		  return sa.Return(static_cast<SQ_INT>(*val));
 	  } // if
 	  break;
   } // case

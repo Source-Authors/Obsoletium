@@ -198,35 +198,35 @@ int SquirrelObject::Len() const
 	sq_settop(SquirrelVM::_VM,top); \
 	return ret;
 
-BOOL SquirrelObject::SetValue(INT key,const SquirrelObject &val)
+BOOL SquirrelObject::SetValue(SQ_INT key,const SquirrelObject &val)
 {
 	_SETVALUE_INT_BEGIN
 	sq_pushobject(SquirrelVM::_VM,val._o);
 	_SETVALUE_INT_END
 }
 
-BOOL SquirrelObject::SetValue(INT key,INT n)
+BOOL SquirrelObject::SetValue(SQ_INT key,SQ_INT n)
 {
 	_SETVALUE_INT_BEGIN
 	sq_pushinteger(SquirrelVM::_VM,n);
 	_SETVALUE_INT_END
 }
 
-BOOL SquirrelObject::SetValue(INT key,FLOAT f)
+BOOL SquirrelObject::SetValue(SQ_INT key,FLOAT f)
 {
 	_SETVALUE_INT_BEGIN
 	sq_pushfloat(SquirrelVM::_VM,f);
 	_SETVALUE_INT_END
 }
 
-BOOL SquirrelObject::SetValue(INT key,const SQChar *s)
+BOOL SquirrelObject::SetValue(SQ_INT key,const SQChar *s)
 {
 	_SETVALUE_INT_BEGIN
 	sq_pushstring(SquirrelVM::_VM,s,-1);
 	_SETVALUE_INT_END
 }
 
-BOOL SquirrelObject::SetValue(INT key,bool b)
+BOOL SquirrelObject::SetValue(SQ_INT key,bool b)
 {
 	_SETVALUE_INT_BEGIN
 	sq_pushbool(SquirrelVM::_VM,b);
@@ -267,7 +267,7 @@ BOOL SquirrelObject::SetValue(const SQChar *key,const SquirrelObject &val)
 	_SETVALUE_STR_END
 }
 
-BOOL SquirrelObject::SetValue(const SQChar *key,INT n)
+BOOL SquirrelObject::SetValue(const SQChar *key,SQ_INT n)
 {
 	_SETVALUE_STR_BEGIN
 	sq_pushinteger(SquirrelVM::_VM,n);
@@ -313,13 +313,13 @@ SQUserPointer SquirrelObject::GetUserPointer(const SQChar * key) {
   return ret;
 } // SquirrelObject::GetUserPointer
 
-BOOL SquirrelObject::SetUserPointer(INT key,SQUserPointer up) {
+BOOL SquirrelObject::SetUserPointer(SQ_INT key,SQUserPointer up) {
   _SETVALUE_INT_BEGIN
   sq_pushuserpointer(SquirrelVM::_VM,up);
   _SETVALUE_INT_END
 } // SquirrelObject::SetUserPointer
 
-SQUserPointer SquirrelObject::GetUserPointer(INT key) {
+SQUserPointer SquirrelObject::GetUserPointer(SQ_INT key) {
   SQUserPointer ret = NULL;
   if (GetSlot(key)) {
     sq_getuserpointer(SquirrelVM::_VM,-1,&ret);
@@ -331,7 +331,7 @@ SQUserPointer SquirrelObject::GetUserPointer(INT key) {
 
 // === User Data ===
 
-BOOL SquirrelObject::NewUserData(const SQChar * key,INT size,SQUserPointer * typetag) {
+BOOL SquirrelObject::NewUserData(const SQChar * key,SQ_INT size,SQUserPointer * typetag) {
   _SETVALUE_STR_BEGIN
   sq_newuserdata(SquirrelVM::_VM,size);
   if (typetag) {
@@ -366,7 +366,7 @@ BOOL SquirrelObject::RawGetUserData(const SQChar * key,SQUserPointer * data,SQUs
 
 // === BEGIN Arrays ===
 
-BOOL SquirrelObject::ArrayResize(INT newSize) {
+BOOL SquirrelObject::ArrayResize(SQ_INT newSize) {
 //  int top = sq_gettop(SquirrelVM::_VM);
   sq_pushobject(SquirrelVM::_VM,GetObjectHandle());
   BOOL res = sq_arrayresize(SquirrelVM::_VM,-1,newSize) == SQ_OK;
@@ -375,7 +375,7 @@ BOOL SquirrelObject::ArrayResize(INT newSize) {
   return res;
 } // SquirrelObject::ArrayResize
 
-BOOL SquirrelObject::ArrayExtend(INT amount) {
+BOOL SquirrelObject::ArrayExtend(SQ_INT amount) {
   int newLen = Len()+amount;
   return ArrayResize(newLen);
 } // SquirrelObject::ArrayExtend
@@ -407,7 +407,7 @@ SQObjectType SquirrelObject::GetType()
 	return _o._type;
 }
 
-BOOL SquirrelObject::GetSlot(INT key) const
+BOOL SquirrelObject::GetSlot(SQ_INT key) const
 {
 	sq_pushobject(SquirrelVM::_VM,_o);
 	sq_pushinteger(SquirrelVM::_VM,key);
@@ -419,7 +419,7 @@ BOOL SquirrelObject::GetSlot(INT key) const
 }
 
 
-SquirrelObject SquirrelObject::GetValue(INT key)const
+SquirrelObject SquirrelObject::GetValue(SQ_INT key)const
 {
 	SquirrelObject ret;
 	if(GetSlot(key)) {
@@ -430,7 +430,7 @@ SquirrelObject SquirrelObject::GetValue(INT key)const
 	return ret;
 }
 
-FLOAT SquirrelObject::GetFloat(INT key) const
+FLOAT SquirrelObject::GetFloat(SQ_INT key) const
 {
 	FLOAT ret = 0.0f;
 	if(GetSlot(key)) {
@@ -441,9 +441,9 @@ FLOAT SquirrelObject::GetFloat(INT key) const
 	return ret;
 }
 
-INT SquirrelObject::GetInt(INT key) const
+SQ_INT SquirrelObject::GetInt(SQ_INT key) const
 {
-	INT ret = 0;
+	SQ_INT ret = 0;
 	if(GetSlot(key)) {
 		sq_getinteger(SquirrelVM::_VM,-1,&ret);
 		sq_pop(SquirrelVM::_VM,1);
@@ -452,7 +452,7 @@ INT SquirrelObject::GetInt(INT key) const
 	return ret;
 }
 
-const SQChar *SquirrelObject::GetString(INT key) const
+const SQChar *SquirrelObject::GetString(SQ_INT key) const
 {
 	const SQChar *ret = NULL;
 	if(GetSlot(key)) {
@@ -463,7 +463,7 @@ const SQChar *SquirrelObject::GetString(INT key) const
 	return ret;
 }
 
-bool SquirrelObject::GetBool(INT key) const
+bool SquirrelObject::GetBool(SQ_INT key) const
 {
 	SQBool ret = FALSE;
 	if(GetSlot(key)) {
@@ -529,9 +529,9 @@ FLOAT SquirrelObject::GetFloat(const SQChar *key) const
 	return ret;
 }
 
-INT SquirrelObject::GetInt(const SQChar *key) const
+SQ_INT SquirrelObject::GetInt(const SQChar *key) const
 {
-	INT ret = 0;
+	SQ_INT ret = 0;
 	if(GetSlot(key)) {
 		sq_getinteger(SquirrelVM::_VM,-1,&ret);
 		sq_pop(SquirrelVM::_VM,1);
@@ -644,7 +644,7 @@ const SQChar * SquirrelObject::GetTypeName(const SQChar * key) {
 #endif
 } // SquirrelObject::GetTypeName
 
-const SQChar * SquirrelObject::GetTypeName(INT key) {
+const SQChar * SquirrelObject::GetTypeName(SQ_INT key) {
   SquirrelObject so = GetValue(key);
   if (so.IsNull()) return NULL;
   return so.GetTypeName();
@@ -657,7 +657,7 @@ const SQChar * SquirrelObject::GetTypeName(void) {
     if (typeTable.IsNull()) {
       return NULL; // Not compiled with SQ_SUPPORT_INSTANCE_TYPE_INFO enabled.
     } // if
-    return typeTable.GetString(INT((size_t)typeTag));
+    return typeTable.GetString(SQ_INT((size_t)typeTag));
   } // if
   return NULL;
 } // SquirrelObject::GetTypeName

@@ -117,13 +117,13 @@ public:
           Init( v );
     } // SetVMSys
 
-    static void PushValue(INT val) {
+    static void PushValue(SQ_INT val) {
         sq_pushinteger(_VM,val);
     } // PushValue
     static void PushValue(FLOAT val) {
         sq_pushfloat(_VM,val);
     } // PushValue
-    static void PushValue(bool val) { // Compiler treats SQBool as INT.
+    static void PushValue(bool val) { // Compiler treats SQBool as SQ_INT.
         sq_pushbool(_VM,val);
     } // PushValue
     static void PushValue(SQChar * val) {

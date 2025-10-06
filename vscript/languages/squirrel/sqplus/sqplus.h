@@ -89,7 +89,7 @@
 #ifndef _WINDEF_
   typedef int BOOL;
   // dimhotepus: int -> SQInteger for x86-64.
-  typedef SQInteger INT;
+  typedef SQInteger SQ_INT;
   typedef float FLOAT;
   // dimhotepus: Wrap and check already defined.
   #ifndef TRUE
@@ -250,12 +250,12 @@ struct TypeInfo {
 // === Common Variable Types ===
 
 template<>
-struct TypeInfo<INT> {
+struct TypeInfo<SQ_INT> {
   const SQChar * typeName;
   TypeInfo() : typeName(_SC("int")) {}
   // dimhotepus: Type-safe enum.
   static constexpr inline ScriptVarType TypeID = VAR_TYPE_INT;
-  enum {Size=sizeof(INT),TypeMask='i', IsInstance=0};
+  enum {Size=sizeof(SQ_INT),TypeMask='i', IsInstance=0};
   operator ScriptVarType() { return ScriptVarType(TypeID); }
 };
 
@@ -559,7 +559,7 @@ struct VarRef {
       SquirrelObject root = SquirrelVM::GetRootTable();
       root.SetValue(SQ_PLUS_TYPE_TABLE,typeTable);
     } // if
-	typeTable.SetValue(INT((size_t)varType),varType->GetTypeName());
+	typeTable.SetValue(SQ_INT((size_t)varType),varType->GetTypeName());
 #endif // SQ_SUPPORT_INSTANCE_TYPE_INFO
   }
 };
@@ -567,7 +567,7 @@ struct VarRef {
 typedef VarRef * VarRefPtr;
 
 // Internal use only.
-inline void getVarNameTag(SQChar * buff,INT maxSize,const SQChar * scriptName) {
+inline void getVarNameTag(SQChar * buff,SQ_INT maxSize,const SQChar * scriptName) {
 //  assert(maxSize > 3);
 #if 1
   SQChar * d = buff;
@@ -627,7 +627,7 @@ void validateConstantType(T constant) {
   case VAR_TYPE_CONST_STRING:
     break;
   default:
-    throw SquirrelError(_SC("validateConstantType(): type must be INT, FLOAT, BOOL, or CONST CHAR *."));
+    throw SquirrelError(_SC("validateConstantType(): type must be SQ_INT, FLOAT, BOOL, or CONST CHAR *."));
   } // case
 } // validateConstantType
 
@@ -662,7 +662,7 @@ void BindVariable(SquirrelObject & so,T * var,const SQChar * scriptVarName,VarAc
   createTableSetGetHandlers(so);
 } // BindVariable
 
-// === Bind a constant by value: INT, FLOAT, BOOL, or CONST CHAR * (for tables only (not classes)) ===
+// === Bind a constant by value: SQ_INT, FLOAT, BOOL, or CONST CHAR * (for tables only (not classes)) ===
 
 template<typename T>
 void BindConstant(SquirrelObject & so,T constant,const SQChar * scriptVarName) {
@@ -1472,7 +1472,7 @@ struct DirectCallInstanceFuncPicker {
     if (typetag != calleeType) {
       SquirrelObject typeTable = so.GetValue(SQ_CLASS_OBJECT_TABLE_NAME);
       instance = static_cast<Callee*>(
-          typeTable.GetUserPointer(INT((size_t)ClassType<Callee>::type()))
+          typeTable.GetUserPointer(SQ_INT((size_t)ClassType<Callee>::type()))
         );
     }
 #elif defined(SQ_USE_CLASS_INHERITANCE_SIMPLE)
@@ -1956,22 +1956,22 @@ inline void PopulateAncestry(HSQUIRRELVM v,
 {
   // 11/2/05: Create a new table for this instance.
   SquirrelObject newObjectTable = SquirrelVM::CreateTable();
-  newObjectTable.SetUserPointer(INT((size_t)ClassType<T>::type()), newClass);
+  newObjectTable.SetUserPointer(SQ_INT((size_t)ClassType<T>::type()), newClass);
   instance.SetValue(SQ_CLASS_OBJECT_TABLE_NAME, newObjectTable);
 
   SquirrelObject classHierArray = instance.GetValue(SQ_CLASS_HIER_ARRAY);
-  INT count = classHierArray.Len();
+  SQ_INT count = classHierArray.Len();
 
   // This will be true when more than one C/C++ class is in the hierarchy.
   if (count > 1) {
     --count; // Skip the most-derived class.
-    for (INT i = 0; i < count; i++) {
+    for (SQ_INT i = 0; i < count; i++) {
       // Kamaitati's changes for C++ inheritance support. jcs 5/28/06
       SquirrelObject so = classHierArray.GetValue(i);
       sq_pushobject(v,so.GetObjectHandle());
       SQUserPointer typeTag;
       sq_gettypetag(v,-1,&typeTag);
-      newObjectTable.SetUserPointer(INT(size_t(typeTag)),newClass);
+      newObjectTable.SetUserPointer(SQ_INT(size_t(typeTag)),newClass);
       sq_poptop(v);
     }
   }
@@ -2236,7 +2236,7 @@ struct SQClassDefBase {
     return *this;
   }
   
-  // Register a constant (read-only in script, passed by value (only INT, FLOAT, or BOOL types)).
+  // Register a constant (read-only in script, passed by value (only SQ_INT, FLOAT, or BOOL types)).
   template<typename ConstantType>
   SQClassDefBase & constant(ConstantType constant,const SQChar * name) {
     RegisterInstanceConstant(newClass,ClassType<TClassType>::type(),constant,name);

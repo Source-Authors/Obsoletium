@@ -1375,7 +1375,7 @@ private:
 	static SQInteger GetDeveloper( HSQUIRRELVM hVM )
 	{
 		StackHandler sa(hVM);
-		sa.Return( (INT)((CSquirrelVM *)_ss( hVM )->_foreignptr)->developer.GetInt() );
+		sa.Return( (SQ_INT)((CSquirrelVM *)_ss( hVM )->_foreignptr)->developer.GetInt() );
 		return 1;
 	}
 
@@ -1525,7 +1525,7 @@ private:
 					sq_remove( hVM, -2 );
 					break;
 				}
-			case FIELD_INTEGER:		sa.Return( (INT)returnValue ); break;
+			case FIELD_INTEGER:		sa.Return( (SQ_INT)returnValue ); break;
 			case FIELD_BOOLEAN:		sa.Return( (bool)returnValue ); break;
 			case FIELD_CHARACTER:	Assert( 0 ); sq_pushnull( hVM ); break;
 			case FIELD_HSCRIPT:
