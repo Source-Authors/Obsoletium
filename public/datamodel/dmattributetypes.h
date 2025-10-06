@@ -123,13 +123,13 @@ inline bool IsTopological( DmAttributeType_t type )
 inline DmAttributeType_t ValueTypeToArrayType( DmAttributeType_t type )
 {
 	Assert( IsValueType( type ) );
-	return ( DmAttributeType_t )( ( type - AT_FIRST_VALUE_TYPE ) + AT_FIRST_ARRAY_TYPE );
+	return ( DmAttributeType_t )( ( to_underlying( type ) - to_underlying( AT_FIRST_VALUE_TYPE ) ) + to_underlying( AT_FIRST_ARRAY_TYPE ) );
 }
 
 inline DmAttributeType_t ArrayTypeToValueType( DmAttributeType_t type )
 {
 	Assert( IsArrayType( type ) );
-	return ( DmAttributeType_t )( ( type - AT_FIRST_ARRAY_TYPE ) + AT_FIRST_VALUE_TYPE );
+	return ( DmAttributeType_t )( ( to_underlying( type ) - to_underlying( AT_FIRST_ARRAY_TYPE ) ) + to_underlying( AT_FIRST_VALUE_TYPE ) );
 }
 
 inline int NumComponents( DmAttributeType_t type )
