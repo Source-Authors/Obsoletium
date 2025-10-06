@@ -375,7 +375,7 @@ bool CProtoBufSharedObjectBase::BIsKeyLess( const CSharedObject & soRHS  ) const
 
 		// if the fields are less when reversed it means we know the keys aren't equal and don't
 		// need to keep looping
-		if( IsProtoBufFieldLess( msgRHS, msgLHS, pFieldDescriptor, pFieldDescriptor ) )
+		if( IsProtoBufFieldLess( msgRHS, msgLHS, pFieldDescriptor, pFieldDescriptor ) ) //-V764
 			return false;
 	}
 
@@ -638,7 +638,7 @@ bool CProtoBufSharedObjectBase::BAddDestroyToMessage( std::string *pBuffer ) con
 void CProtoBufSharedObjectBase::Copy( const CSharedObject & soRHS )
 {
 	Assert( GetTypeID() == soRHS.GetTypeID() );
-	const CProtoBufSharedObjectBase & soRHSBase = (CProtoBufSharedObjectBase &)soRHS;
+	const CProtoBufSharedObjectBase & soRHSBase = (const CProtoBufSharedObjectBase &)soRHS;
 	GetPObject()->CopyFrom( *soRHSBase.GetPObject() );
 }
 
