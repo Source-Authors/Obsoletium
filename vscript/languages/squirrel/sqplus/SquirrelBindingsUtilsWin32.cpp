@@ -4,7 +4,7 @@
 //#include "SquirrelVM.h"
 #include "SquirrelBindingsUtilsWin32.h"
 
-int refcounted_release_hook(SQUserPointer p, int size)
+int refcounted_release_hook(SQUserPointer p, SQInteger size)
 {
 	IUnknown *pRC = (IUnknown*)p;
 	pRC->Release();
