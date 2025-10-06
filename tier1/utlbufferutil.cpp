@@ -137,6 +137,32 @@ bool Unserialize( CUtlBuffer &buf, int &dest )
 	return buf.IsValid();
 }
 
+
+bool Serialize( CUtlBuffer &buf, const int64 &src )
+{
+	if ( buf.IsText() )
+	{
+		buf.Printf( "%lld", src );
+	}
+	else
+	{
+		buf.PutInt64( src );
+	}
+	return buf.IsValid();
+}
+
+bool Unserialize( CUtlBuffer &buf, int64 &dest )
+{
+	if ( buf.IsText() )
+	{
+		intp nRetVal = buf.Scanf( "%lld", &dest );
+		return (nRetVal == 1) && buf.IsValid();
+	}
+
+	dest = buf.GetInt64( );
+	return buf.IsValid();
+}
+
 bool Serialize( CUtlBuffer &buf, const float &src )
 {
 	if ( buf.IsText() )

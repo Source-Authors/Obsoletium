@@ -45,6 +45,9 @@ void SetSerializationArrayDelimiter( const char *pDelimiter );
 [[nodiscard]] bool Serialize( CUtlBuffer &buf, const int &src );
 [[nodiscard]] bool Unserialize( CUtlBuffer &buf, int &dest );
 
+[[nodiscard]] bool Serialize( CUtlBuffer &buf, const int64 &src );
+[[nodiscard]] bool Unserialize( CUtlBuffer &buf, int64 &dest );
+
 [[nodiscard]] bool Serialize( CUtlBuffer &buf, const float &src );
 [[nodiscard]] bool Unserialize( CUtlBuffer &buf, float &dest );
 
