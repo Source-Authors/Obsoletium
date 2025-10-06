@@ -291,7 +291,8 @@ bool CDmePackVMatrixOperator::IsDirty()
 	const VMatrix &v = m_vmatrix.Get();
 	for ( uint i = 0; i < 16; ++i )
 	{
-		if ( *( v[ i ] ) != m_cells[ i ].Get() )
+		// dimhotepus: Fix UB on assiging out of scope.
+		if ( v[ i / 4 ][ i % 4 ] != m_cells[ i ].Get() )
 			return true;
 	}
 	return false;
@@ -302,7 +303,8 @@ void CDmePackVMatrixOperator::Operate()
 	VMatrix v;
 	for ( uint i = 0; i < 16; ++i )
 	{
-		*( v[ i ] ) = m_cells[ i ].Get();
+		// dimhotepus: Fix UB on assiging out of scope.
+		v[ i / 4 ][ i % 4 ] = m_cells[ i ].Get();
 	}
 	m_vmatrix.Set( v );
 }
