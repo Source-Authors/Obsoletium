@@ -493,29 +493,29 @@ static void staticNotifyIconProc(HWND hwnd, WPARAM wparam, LPARAM lparam);
 //-----------------------------------------------------------------------------
 // Purpose: Handles drag and drop
 //-----------------------------------------------------------------------------
-class CSurfaceDragDropTarget : public IDropTarget
+class CSurfaceDragDropTarget final : public IDropTarget
 {
 public:
-	CSurfaceDragDropTarget()
+	CSurfaceDragDropTarget() : _hr{OleInitialize(nullptr)}
 	{
 		_refCount = 0;
-		_dragData = NULL;
+		_dragData = nullptr;
 
-		HRESULT hr = OleInitialize(NULL);
-		if (FAILED(hr)) Warning("OleInitialize failed w/e %ld", hr);
+		if (FAILED(_hr)) Warning("OleInitialize failed w/e 0x%x", _hr);
 	}
 	~CSurfaceDragDropTarget()
 	{
-		OleUninitialize();
+		if (SUCCEEDED(_hr))	OleUninitialize();
 	}
 
 private:
 	CInterlockedUInt _refCount;
 	KeyValues *_dragData;
+	HRESULT _hr;
 
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface( 
+    HRESULT STDMETHODCALLTYPE QueryInterface( 
         /* [in] */ REFIID riid,
-        /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject)
+        /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject) override
 	{
 		if (riid == IID_IDropTarget)
 		{
@@ -536,7 +536,7 @@ private:
 		return --_refCount;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE DragEnter(IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+	HRESULT STDMETHODCALLTYPE DragEnter(IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override
 	{
 		if (_dragData)
 		{
@@ -546,7 +546,7 @@ private:
 		return DragOver(grfKeyState, pt, pdwEffect);
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE DragOver(DWORD, POINTL, DWORD *pdwEffect)
+	HRESULT STDMETHODCALLTYPE DragOver(DWORD, POINTL, DWORD *pdwEffect) override
 	{
 		*pdwEffect = DROPEFFECT_NONE;
 
@@ -567,12 +567,12 @@ private:
 		return S_OK;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE DragLeave()
+	HRESULT STDMETHODCALLTYPE DragLeave() override
 	{
 		return S_OK;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE Drop(IDataObject *, DWORD, POINTL, DWORD * pdwEffect)
+	HRESULT STDMETHODCALLTYPE Drop(IDataObject *, DWORD, POINTL, DWORD * pdwEffect) override
 	{
 		*pdwEffect = DROPEFFECT_NONE;
 
@@ -599,7 +599,7 @@ private:
 	}
 
 	// internal methods
-	virtual KeyValues *calculateData(IDataObject *pDataObject)
+	KeyValues *calculateData(IDataObject *pDataObject)
 	{
 		KeyValues *dragData = NULL;
 
@@ -611,13 +611,13 @@ private:
 			DVASPECT_CONTENT,
 			-1,
 			TYMED_HGLOBAL
-    		};
+    	};
 		STGMEDIUM storage;
 
 		if (pDataObject->GetData(&format, &storage) == S_OK)
 		{
 			// we got some data
-			if (storage.tymed == TYMED_HGLOBAL)
+			if (storage.tymed & TYMED_HGLOBAL)
 			{
 				const char *buf = (const char *)GlobalLock(storage.hGlobal);
 				if (buf)
@@ -633,7 +633,7 @@ private:
 		{
 			// try getting a file
 			format.cfFormat = CF_HDROP;
-			if (pDataObject->GetData(&format, &storage) == S_OK && storage.tymed == TYMED_HGLOBAL)
+			if (pDataObject->GetData(&format, &storage) == S_OK && storage.tymed & TYMED_HGLOBAL)
 			{
 				dragData = new KeyValues("DragDrop", "type", "files");
 				KeyValues *fileList = dragData->FindKey("list", true);
@@ -658,8 +658,6 @@ private:
 		return dragData;
 	}
 };
-
-static CSurfaceDragDropTarget staticDragDropTarget;
 
 bool CWin32Surface::TextureLessFunc(const Texture &lhs, const Texture &rhs)
 {
@@ -2481,7 +2479,9 @@ void CWin32Surface::CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIc
 
 	// create the context
 	RecreateContext(panel);
-
+	
+	// dimhotepus: Moved here as dtor calls OleUninitialize which is prohibited on DLL unload.
+	static CSurfaceDragDropTarget staticDragDropTarget;
 	::RegisterDragDrop(plat->hwnd, &staticDragDropTarget);
 
 	// add the panel to the popup list
