@@ -711,11 +711,12 @@ KeyValues *CBaseAnimating::GetSequenceKeyValues( int iSequence )
 
 	if (szText)
 	{
-		KeyValuesAD seqKeyValues("");
+		KeyValues *seqKeyValues = new KeyValues("");
 		if ( seqKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), szText ) )
 		{
 			return seqKeyValues;
 		}
+		seqKeyValues->deleteThis();
 	}
 	return NULL;
 }
