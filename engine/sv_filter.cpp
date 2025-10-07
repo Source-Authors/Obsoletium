@@ -902,7 +902,7 @@ CON_COMMAND( banid, "Add a user ID to the ban list." )
 		g_GameEventManager.FireEvent( event );
 	}
 
-	if ( bKick && bPlaying && client )
+	if ( bKick && bPlaying )
 	{
 		client->ClientPrintf ( "You have been kicked and banned %s by the server.\n", szDuration );
 		client->Disconnect( "Kicked and banned" );
