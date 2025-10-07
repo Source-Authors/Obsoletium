@@ -126,6 +126,7 @@ CAudioSourceMP3::CAudioSourceMP3( CSfxTable *pSfx, CAudioSourceCachedInfo *info 
 
 	m_nCachedDataSize = 0;
 	m_bIsPlayOnce = false;
+	m_bIsSentenceWord = false;
 	m_bCheckedForPendingSentence = false;
 
 	CAudioSourceMP3::CheckAudioSourceCache();

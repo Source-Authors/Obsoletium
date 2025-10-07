@@ -288,6 +288,7 @@ CVoiceChannel::CVoiceChannel()
 {
 	m_iEntity = -1;
 	m_pVoiceCodec = NULL;
+	m_pNext = nullptr;
 	m_nViewEntityIndex = -1;
 	m_nSoundGuid = -1;
 }
