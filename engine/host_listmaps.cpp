@@ -517,23 +517,19 @@ static intp MapList_CountMaps( const char *pszSubString, bool listobsolete, intp
 //  If the substring is empty, or "*", then lists all maps
 // Input  : *pszSubString - 
 //-----------------------------------------------------------------------------
-intp MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose, intp maxcount, intp maxitemlength, char maplist[][ 64 ] )
+intp MapList_ListMaps( const char *pszSubString, bool listobsolete,	bool verbose, intp maxcount, intp maxitemlength, char maplist[][ 64 ] )
 {
-	g_MapListMgr.RefreshList();
-	intp substringlength = 0;
-	if (pszSubString && pszSubString[0])
-	{
-		substringlength = V_strlen(pszSubString);
-	}
+	auto &mapMgr = g_MapListMgr; 
 
-	//
+	mapMgr.RefreshList();
+
 	// search through the path, one element at a time
-	//
-
 	if ( verbose )
 	{
 		ConMsg( "-------------\n");
 	}
+	
+	const intp substringlength = !Q_isempty( pszSubString ) ? V_strlen( pszSubString ) : 0;
 
 	intp count = 0;
 	int showOutdated;
@@ -543,22 +539,24 @@ intp MapList_ListMaps( const char *pszSubString, bool listobsolete, bool verbose
 			break;
 
 		//search the directory structure.
-		for ( int i = 0; i < g_MapListMgr.GetMapCount(); i++ )
+		for ( int i = 0; i < mapMgr.GetMapCount(); i++ )
 		{
 			if ( count >= maxcount )
 				break;
 
-			char const *mapname = g_MapListMgr.GetMapName( i );
-			int valid = g_MapListMgr.IsMapValid( i );
+			const char *mapname = mapMgr.GetMapName( i );
+			const int valid = mapMgr.IsMapValid( i );
 
 			if ( !substringlength || V_stristr( mapname, pszSubString ) )
 			{
 				if ( MapList_CheckPrintMap( "(fs)", mapname, valid, showOutdated ? true : false, verbose ) )
 				{
-					if ( maxitemlength != 0 )
+					// dimhotepus: Fix nullptr deref.
+					if ( maplist )
 					{
-						Q_strncpy( maplist[ count ], mapname, maxitemlength );
+						V_strncpy( maplist[ count ], mapname, maxitemlength );
 					}
+
 					count++;
 				}
 			}
@@ -681,7 +679,7 @@ static void Host_Maps_f( const CCommand &args )
 	if ( args.ArgC() == 2 )
 	{
 		pszSubString = args[1];
-		if (!pszSubString || !pszSubString[0])
+		if ( Q_isempty( pszSubString ) )
 			return;
 	}
 
