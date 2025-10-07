@@ -132,7 +132,7 @@ struct PointerEqualFunctor { [[nodiscard]] bool operator()( const void *a, const
 #if defined( PLATFORM_64BITS )
 struct PointerHashFunctor { [[nodiscard]] unsigned int operator()( const void* s ) const { return Mix64HashFunctor()( ( uintp ) s ); } };
 #else
-struct PointerHashFunctor { [[nodiscard]] unsigned int operator()( const void* s ) const { return Mix32HashFunctor()( ( uintp ) s ); } };
+struct PointerHashFunctor { [[nodiscard]] unsigned int operator()( const void* s ) const { return Mix32HashFunctor()( ( uint32 ) s ); } }; //-V221
 #endif
 
 
