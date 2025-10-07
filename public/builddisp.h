@@ -752,10 +752,10 @@ public:
 // CDispUtilsHelper implementation.
 public:
 
-	virtual CDispNeighbor*			GetEdgeNeighbor( int index );
-	virtual CDispCornerNeighbors*	GetCornerNeighbors( int index );
-	virtual const CPowerInfo* 		GetPowerInfo() const;
-	virtual CDispUtilsHelper*		GetDispUtilsByIndex( int index );
+	CDispNeighbor*			GetEdgeNeighbor( int index );
+	CDispCornerNeighbors*	GetCornerNeighbors( int index );
+	const CPowerInfo* 		GetPowerInfo() const;
+	CDispUtilsHelper*		GetDispUtilsByIndex( int index );
 
 
 public:
@@ -765,7 +765,7 @@ public:
 	// Creation/Destruction
 	//
 	CCoreDispInfo();
-	virtual ~CCoreDispInfo();
+	~CCoreDispInfo();
 
 	void InitSurf( int parentIndex, Vector points[4], Vector normals[4],
 		           Vector2D texCoords[4], Vector2D lightCoords[4][4], int contents, int flags,
