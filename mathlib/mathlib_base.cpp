@@ -437,28 +437,15 @@ void XM_CALLCONV MatrixSetColumn( const Vector &in, int column, matrix3x4_t& out
 
 void XM_CALLCONV MatrixScaleBy ( const float flScale, matrix3x4_t &out )
 {
-	out[0][0] *= flScale;
-	out[1][0] *= flScale;
-	out[2][0] *= flScale;
-	out[0][1] *= flScale;
-	out[1][1] *= flScale;
-	out[2][1] *= flScale;
-	out[0][2] *= flScale;
-	out[1][2] *= flScale;
-	out[2][2] *= flScale;
+	DirectX::XMMATRIX m = DirectX::XMLoadFloat3x4( out.XmMBase() );
+	DirectX::XMStoreFloat3x4( out.XmMBase(), m *= flScale ); 
 }
 
 void XM_CALLCONV MatrixScaleByZero ( matrix3x4_t &out )
 {
-	out[0][0] = 0.0f;
-	out[1][0] = 0.0f;
-	out[2][0] = 0.0f;
-	out[0][1] = 0.0f;
-	out[1][1] = 0.0f;
-	out[2][1] = 0.0f;
-	out[0][2] = 0.0f;
-	out[1][2] = 0.0f;
-	out[2][2] = 0.0f;
+	DirectX::XMStoreFloat4( out.XmBase(), DirectX::g_XMZero );
+	DirectX::XMStoreFloat4( out.XmBase() + 1, DirectX::g_XMZero );
+	DirectX::XMStoreFloat4( out.XmBase() + 2, DirectX::g_XMZero );
 }
 
 
