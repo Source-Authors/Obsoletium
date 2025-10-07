@@ -463,7 +463,7 @@ void CLog::Printf( const char *fmt, ... )
 		return;
 	}
 
-	va_start ( argptr, fmt );
+	va_start ( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe ( string, fmt, argptr );
 	va_end   ( argptr );
 

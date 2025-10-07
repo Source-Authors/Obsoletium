@@ -755,7 +755,7 @@ void Host_EndGame (bool bShowMainMenu, PRINTF_FORMAT_STRING const char *message,
 	va_list		argptr;
 	char		string[1024];
 
-	va_start (argptr,message);
+	va_start (argptr,message); //-V2019 //-V2018
 	V_vsprintf_safe (string,message,argptr);
 	va_end (argptr);
 	ConMsg ("Host_EndGame: %s\n",string);
@@ -825,7 +825,7 @@ void Host_Error ( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2
 	//	CL_WriteMessageHistory();	TODO must be done by network layer
 #endif
 
-	va_start (argptr,error);
+	va_start (argptr,error); //-V2019 //-V2018
 	V_vsprintf_safe(string,error,argptr);
 	va_end (argptr);
 

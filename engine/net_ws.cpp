@@ -2348,7 +2348,7 @@ void NET_OutOfBandPrintf(intp sock, const netadr_t &adr, PRINTF_FORMAT_STRING co
 	
 	*(unsigned int*)string = CONNECTIONLESS_HEADER;
 
-	va_start (argptr, format);
+	va_start (argptr, format); //-V2019 //-V2018
 	V_vsnprintf (string+4, sizeof( string ) - 4, format,argptr);
 	va_end (argptr);
 

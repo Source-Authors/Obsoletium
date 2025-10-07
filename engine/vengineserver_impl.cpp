@@ -912,7 +912,7 @@ public:
 		va_list		argptr; 
 		static char	szOut[1024];
 		
-		va_start(argptr, szFmt);
+		va_start(argptr, szFmt); //-V2019 //-V2018
 		V_vsprintf_safe(szOut, szFmt, argptr);
 		va_end(argptr);
 
@@ -1180,7 +1180,7 @@ public:
 
 		va_list		argptr;
 		char		text[4096];
-		va_start (argptr, fmt);
+		va_start (argptr, fmt); //-V2019 //-V2018
 		V_vsprintf_safe(text, fmt, argptr);
 		va_end (argptr);
 
@@ -1194,7 +1194,7 @@ public:
 
 		va_list		argptr;
 		char		text[4096];
-		va_start (argptr, fmt);
+		va_start (argptr, fmt); //-V2019 //-V2018
 		V_vsprintf_safe(text, fmt, argptr);
 		va_end (argptr);
 

@@ -65,7 +65,7 @@ void DebugWarn(PRINTF_FORMAT_STRING const char *format, ...) {
   tmp[0] = '\0';
 
   va_list argptr;
-  va_start(argptr, format);
+  va_start(argptr, format); //-V2019 //-V2018
   V_vsprintf_safe(tmp, format, argptr);
   va_end(argptr);
 

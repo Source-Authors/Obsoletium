@@ -74,7 +74,7 @@ void Thread_DPrintf (char *fmt, ...)
 	va_list		argptr;
 	char		msg[4096];
 		
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( msg, fmt, argptr );
 	va_end( argptr );
 	Plat_DebugString( msg );

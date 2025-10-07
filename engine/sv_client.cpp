@@ -692,7 +692,7 @@ void CGameClient::Disconnect( const char *fmt, ... )
 	if ( m_nSignonState == SIGNONSTATE_NONE )
 		return;	// no recursion
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe (reason, fmt,argptr);
 	va_end (argptr);
 

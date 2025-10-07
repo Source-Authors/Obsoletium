@@ -94,7 +94,7 @@ void COM_ExplainDisconnection( bool bPrint, PRINTF_FORMAT_STRING const char *fmt
 {
 	va_list		argptr;
 
-	va_start (argptr, fmt);
+	va_start (argptr, fmt); //-V2019 //-V2018
 	V_vsprintf_safe(gszDisconnectReason, fmt, argptr);
 	va_end (argptr);
 
@@ -334,7 +334,7 @@ char *va( PRINTF_FORMAT_STRING const char *format, ... )
 {
 	char* outbuf = tmpstr512();
 	va_list argptr;
-	va_start (argptr, format);
+	va_start (argptr, format); //-V2019 //-V2018
 	V_vsnprintf( outbuf, 512, format, argptr );
 	va_end (argptr);
 	return outbuf;
@@ -1056,7 +1056,7 @@ void COM_Log( const char *pszFile, PRINTF_FORMAT_STRING const char *fmt, ...) FM
 	va_list		argptr;
 	char		string[8192];
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe(string, fmt, argptr);
 	va_end (argptr);
 

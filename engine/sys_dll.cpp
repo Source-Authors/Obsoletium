@@ -320,7 +320,7 @@ void Sys_Printf(const char *fmt, ...)
 	va_list		argptr;
 	char		text[1024];
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe (text, fmt, argptr);
 	va_end (argptr);
 		
@@ -515,7 +515,7 @@ void Sys_Error( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2 )
 {
 	va_list		argptr;
 
-	va_start( argptr, error );
+	va_start( argptr, error ); //-V2019 //-V2018
 	Sys_Error_Internal( true, error, argptr );
 	va_end( argptr );
 }
@@ -531,7 +531,7 @@ void Sys_Exit( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2 )
 {
 	va_list		argptr;
 
-	va_start( argptr, error );
+	va_start( argptr, error ); //-V2019 //-V2018
 	Sys_Error_Internal( false, error, argptr );
 	va_end( argptr );
 

@@ -127,7 +127,7 @@ void CBaseClient::ClientPrintf (PRINTF_FORMAT_STRING const char *fmt, ...)
 	va_list		argptr;
 	char		string[1024];
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe (string, fmt,argptr);
 	va_end (argptr);
 
@@ -616,7 +616,7 @@ void CBaseClient::Disconnect( PRINTF_FORMAT_STRING const char *fmt, ... )
 	// clear user info 
 	m_Server->UserInfoChanged( m_nClientSlot );
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
 	va_end (argptr);
 
@@ -1102,7 +1102,7 @@ void CBaseClient::TraceNetworkData( bf_write &msg, char const *fmt, ... )
 	VPROF_BUDGET( "CBaseClient::TraceNetworkData", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	char buf[ 64 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
@@ -1120,7 +1120,7 @@ void CBaseClient::TraceNetworkMsg( int nBits, char const *fmt, ... )
 	VPROF_BUDGET( "CBaseClient::TraceNetworkMsg", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	char buf[ 64 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 

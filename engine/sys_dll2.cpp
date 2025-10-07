@@ -352,7 +352,7 @@ public:
 	void CommentPrintf( const char *fmt, ... )
 	{
 		va_list args;
-		va_start( args, fmt );
+		va_start( args, fmt ); //-V2019 //-V2018
 		
 		size_t len = strlen( m_errorText );
 		V_vsnprintf( m_errorText + len, sizeof( m_errorText ) - len, fmt, args );

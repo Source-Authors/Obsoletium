@@ -546,7 +546,7 @@ void DataTable_Warning( PRINTF_FORMAT_STRING const char *pInMessage, ... )
 	char msg[4096];
 	va_list marker;
 	
-	va_start(marker, pInMessage);
+	va_start(marker, pInMessage); //-V2019 //-V2018
 	V_vsprintf_safe( msg, pInMessage, marker);
 	va_end(marker);
 

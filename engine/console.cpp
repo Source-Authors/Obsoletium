@@ -419,7 +419,7 @@ void Con_DebugLog( const char *fmt, ...)
     va_list argptr; 
 	char data[MAXPRINTMSG];
     
-    va_start(argptr, fmt);
+    va_start(argptr, fmt); //-V2019 //-V2018
     V_vsprintf_safe(data, fmt, argptr);
     va_end(argptr);
 
@@ -621,7 +621,7 @@ void Con_Printf( const char *fmt, ... )
 	char		msg[MAXPRINTMSG];
 	static bool	inupdate;
 	
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( msg, fmt, argptr );
 	va_end( argptr );
 
@@ -666,7 +666,7 @@ void Con_ColorPrintf( const Color& clr, const char *fmt, ... )
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe (msg, fmt, argptr);
 	va_end (argptr);
 
@@ -694,7 +694,7 @@ void Con_DPrintf (const char *fmt, ...)
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe(msg, fmt,argptr);
 	va_end (argptr);
 	
@@ -730,7 +730,7 @@ void Con_SafePrintf (const char *fmt, ...)
 	va_list		argptr;
 	char		msg[MAXPRINTMSG];
 		
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe(msg, fmt,argptr);
 	va_end (argptr);
 
@@ -758,7 +758,7 @@ void Con_NPrintf( int idx, const char *fmt, ... )
 	va_list argptr; 
 	char outtext[MAXPRINTMSG];
 
-	va_start(argptr, fmt);
+	va_start(argptr, fmt); //-V2019 //-V2018
     V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 
@@ -770,7 +770,7 @@ void Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... )
 	va_list argptr; 
 	char outtext[MAXPRINTMSG];
 
-	va_start(argptr, fmt);
+	va_start(argptr, fmt); //-V2019 //-V2018
     V_vsprintf_safe( outtext, fmt, argptr);
     va_end(argptr);
 

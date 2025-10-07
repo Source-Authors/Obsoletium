@@ -271,7 +271,7 @@ void CL_FlushEntityPacket( CClientFrame *packet, char const *errorString, ... )
 	va_list marker;
 
 	// Spit out an error.
-	va_start(marker, errorString);
+	va_start(marker, errorString); //-V2019 //-V2018
 	V_vsprintf_safe(str, errorString, marker);
 	va_end(marker);
 	

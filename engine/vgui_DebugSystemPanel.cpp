@@ -59,7 +59,7 @@ public:
 
 	virtual void OnCommand( const char *command )
 	{
-		Cbuf_AddText( va( "%s\n", (char *)command ) );
+		Cbuf_AddText( va( "%s\n", command ) );
 	}
 
 	virtual void OnTick( void )

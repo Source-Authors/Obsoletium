@@ -520,7 +520,7 @@ void UpdateProgress( const TGameStatsParameters & params, char const *fmt, ... )
 
 	char str[ 2048 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( str, fmt, argptr );
 	va_end( argptr );
 

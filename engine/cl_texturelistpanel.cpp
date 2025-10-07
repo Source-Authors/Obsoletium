@@ -686,7 +686,7 @@ struct ViewParamsLast
 	struct VarMap : public CUtlMap< UtlSymId_t, TxInfo >
 	{
 		VarMap() : CUtlMap< UtlSymId_t, TxInfo >( DefLessFunc( UtlSymId_t ) ) {}
-		VarMap( VarMap const &x ) { const_cast< VarMap & >( x ).Swap( *this ); m_matInfo = x.m_matInfo; } // Fast-swap data
+		VarMap( VarMap const &x ) { const_cast< VarMap & >( x ).Swap( *this ); m_matInfo = x.m_matInfo; } // Fast-swap data //-V2018
 
 		struct MatInfo
 		{

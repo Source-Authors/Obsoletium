@@ -1176,7 +1176,7 @@ private:
 public:
 	void AddEntityTextOverlay(int ent_index, int line_offset, float duration, int r, int g, int b, int a, PRINTF_FORMAT_STRING const char *format, ...)
 	{
-		va_start( m_argptr, format );
+		va_start( m_argptr, format ); //-V2019 //-V2018
 		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
@@ -1205,7 +1205,7 @@ public:
 
 	void AddTextOverlay(const Vector& origin, float duration, PRINTF_FORMAT_STRING const char *format, ...)
 	{
-		va_start( m_argptr, format );
+		va_start( m_argptr, format ); //-V2019 //-V2018
 		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
@@ -1214,7 +1214,7 @@ public:
 
 	void AddTextOverlay(const Vector& origin, int line_offset, float duration, PRINTF_FORMAT_STRING const char *format, ...)
 	{
-		va_start( m_argptr, format );
+		va_start( m_argptr, format ); //-V2019 //-V2018
 		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
@@ -1223,7 +1223,7 @@ public:
 
 	void AddTextOverlayRGB(const Vector& origin, int line_offset, float duration, float r, float g, float b, float alpha, PRINTF_FORMAT_STRING const char *format, ...)
 	{
-		va_start( m_argptr, format );
+		va_start( m_argptr, format ); //-V2019 //-V2018
 		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
@@ -1232,7 +1232,7 @@ public:
 
 	void AddTextOverlayRGB(const Vector& origin, int line_offset, float flDuration, int r, int g, int b, int alpha, PRINTF_FORMAT_STRING const char *format, ...)
 	{
-		va_start( m_argptr, format );
+		va_start( m_argptr, format ); //-V2019 //-V2018
 		V_vsprintf_safe( m_text, format, m_argptr );
 		va_end( m_argptr );
 
