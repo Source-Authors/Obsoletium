@@ -575,20 +575,20 @@ void ConcatRotations (const float in1[3][3], const float in2[3][3], float out[3]
 				in1[2][2] * in2[2][2];
 }
 
-void ConcatTransforms_Aligned( const matrix3x4_t &m0, const matrix3x4_t &m1, matrix3x4_t &out )
+void XM_CALLCONV ConcatTransforms_Aligned( const matrix3x4_t &m0, const matrix3x4_t &m1, matrix3x4_t &out )
 {
-	Assert( (((size_t)&m0) % 16) == 0 );
-	Assert( (((size_t)&m1) % 16) == 0 );
-	Assert( (((size_t)&out) % 16) == 0 );
+	Assert( (((uintp)&m0) % 16) == 0 );
+	Assert( (((uintp)&m1) % 16) == 0 );
+	Assert( (((uintp)&out) % 16) == 0 );
 
 	fltx4 lastMask = *(fltx4 *)(&g_SIMD_ComponentMask[3]);
-	fltx4 rowA0 = DirectX::XMLoadFloat4( m0.XmBase() );
-	fltx4 rowA1 = DirectX::XMLoadFloat4( m0.XmBase() + 1 );
-	fltx4 rowA2 = DirectX::XMLoadFloat4( m0.XmBase() + 2 );
+	fltx4 rowA0 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m0.XmBase()) );
+	fltx4 rowA1 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m0.XmBase()) + 1 );
+	fltx4 rowA2 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m0.XmBase()) + 2 );
 
-	fltx4 rowB0 = DirectX::XMLoadFloat4( m1.XmBase() );
-	fltx4 rowB1 = DirectX::XMLoadFloat4( m1.XmBase() + 1 );
-	fltx4 rowB2 = DirectX::XMLoadFloat4( m1.XmBase() + 2 );
+	fltx4 rowB0 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m1.XmBase()) );
+	fltx4 rowB1 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m1.XmBase()) + 1 );
+	fltx4 rowB2 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m1.XmBase()) + 2 );
 
 	// now we have the rows of m0 and the columns of m1
 	// first output row
@@ -623,9 +623,9 @@ void ConcatTransforms_Aligned( const matrix3x4_t &m0, const matrix3x4_t &m1, mat
 	out1 = AddSIMD(out1, A1);
 	out2 = AddSIMD(out2, A2);
 
-	DirectX::XMStoreFloat4(out.XmBase(), out0);
-	DirectX::XMStoreFloat4(out.XmBase() + 1, out1 );
-	DirectX::XMStoreFloat4(out.XmBase() + 2, out2 );
+	DirectX::XMStoreFloat4A(reinterpret_cast<DirectX::XMFLOAT4A *>(out.XmBase()), out0);
+	DirectX::XMStoreFloat4A(reinterpret_cast<DirectX::XMFLOAT4A *>(out.XmBase()) + 1, out1 );
+	DirectX::XMStoreFloat4A(reinterpret_cast<DirectX::XMFLOAT4A *>(out.XmBase()) + 2, out2 );
 }
 
 /*

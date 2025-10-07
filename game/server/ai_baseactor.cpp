@@ -927,8 +927,8 @@ void CAI_BaseActor::UpdateHeadControl( const Vector &vHeadTarget, float flHeadIn
 	int iChest = LookupAttachment( "chest" );
 	int iForward = LookupAttachment( "forward" );
 
-	matrix3x4_t eyesToWorld;
-	matrix3x4_t forwardToWorld, worldToForward;
+	alignas(16) matrix3x4_t eyesToWorld;
+	alignas(16) matrix3x4_t forwardToWorld, worldToForward;
 
 	if (iEyes <= 0 || iForward <= 0)
 	{
@@ -947,11 +947,11 @@ void CAI_BaseActor::UpdateHeadControl( const Vector &vHeadTarget, float flHeadIn
 	// Lookup chest attachment to do compounded range limit checks
 	if (iChest > 0)
 	{
-		matrix3x4_t chestToWorld, worldToChest;
+		alignas(16) matrix3x4_t chestToWorld, worldToChest;
 		GetAttachment( iChest, chestToWorld );
 		MatrixInvert( chestToWorld, worldToChest );
-		matrix3x4_t tmpM;
-		ConcatTransforms( worldToChest, eyesToWorld, tmpM );
+		alignas(16) matrix3x4_t tmpM;
+		ConcatTransforms_Aligned( worldToChest, eyesToWorld, tmpM );
 		MatrixAngles( tmpM, angBias );
 
 		angBias.y -= Get( m_ParameterHeadYaw );
@@ -982,7 +982,7 @@ void CAI_BaseActor::UpdateHeadControl( const Vector &vHeadTarget, float flHeadIn
 		angBias.Init( 0, 0, 0 );
 	}
 
-	matrix3x4_t targetXform;
+	alignas(16) matrix3x4_t targetXform;
 	targetXform = forwardToWorld;
 	Vector vTargetDir = vHeadTarget - EyePosition();
 
@@ -1002,8 +1002,8 @@ void CAI_BaseActor::UpdateHeadControl( const Vector &vHeadTarget, float flHeadIn
 
 	Studio_AlignIKMatrix( targetXform, vTargetDir );
 
-	matrix3x4_t headXform;
-	ConcatTransforms( worldToForward, targetXform, headXform );
+	alignas(16) matrix3x4_t headXform;
+	ConcatTransforms_Aligned( worldToForward, targetXform, headXform );
 	MatrixAngles( headXform, vTargetAngles );
 
 	// partially debounce head goal

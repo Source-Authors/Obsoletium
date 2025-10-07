@@ -624,6 +624,7 @@ void XM_CALLCONV MatrixScaleByZero ( matrix3x4_t &out );
 //void DecomposeRotation( const matrix3x4_t &mat, float *out );
 void XM_CALLCONV ConcatRotations (const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out);
 void XM_CALLCONV ConcatTransforms (const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out);
+void XM_CALLCONV ConcatTransforms_Aligned (const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out);
 
 // For identical interface w/ VMatrix
 inline void XM_CALLCONV MatrixMultiply ( const matrix3x4_t &in1, const matrix3x4_t &in2, matrix3x4_t &out )
