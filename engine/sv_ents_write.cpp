@@ -747,7 +747,7 @@ static inline int SV_WriteDeletions( CEntityWriteInfo &u )
 
 		// Looks like it should be gone
 		bool bNeedsExplicitDelete = SV_NeedsExplicitDestroy( i, pFromSnapShot, pToSnapShot );
-		if ( !bNeedsExplicitDelete && u.m_pTo )
+		if ( !bNeedsExplicitDelete )
 		{
 			bNeedsExplicitDelete = ( pToSnapShot->m_iExplicitDeleteSlots.Find(i) != pToSnapShot->m_iExplicitDeleteSlots.InvalidIndex() );
 			// We used to do more stuff here as a sanity check, but I don't think it was necessary since the only thing that would unset the bould would be a "recreate" in the same slot which is
