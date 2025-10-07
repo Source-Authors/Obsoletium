@@ -867,7 +867,16 @@ void CRagdollProp::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 
 		matrix3x4_t matBoneLocal;
 		AngleMatrix( pbones[i].rot, pbones[i].pos, matBoneLocal );
-		ConcatTransforms( pBoneToWorld[pbones[i].parent], matBoneLocal, pBoneToWorld[i]);
+
+		if ( pbones[i].parent != -1 )
+		{
+			ConcatTransforms( pBoneToWorld[pbones[i].parent], matBoneLocal, pBoneToWorld[i] );
+		} 
+		else 
+		{
+			// dimhotepus: Well, some mods create ragdolls without parent bones, so fallback to ragdoll ones.
+			ConcatTransforms( EntityToWorldTransform(), matBoneLocal, pBoneToWorld[i] );
+		}
 	}
 }
 
