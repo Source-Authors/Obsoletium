@@ -6066,12 +6066,11 @@ KeyValues *C_BaseAnimating::GetSequenceKeyValues( int iSequence )
 
 	if (szText)
 	{
-		KeyValues *seqKeyValues = new KeyValues("");
+		KeyValuesAD seqKeyValues("");
 		if ( seqKeyValues->LoadFromBuffer( modelinfo->GetModelName( GetModel() ), szText ) )
 		{
 			return seqKeyValues;
 		}
-		seqKeyValues->deleteThis();
 	}
 	return NULL;
 }
