@@ -516,7 +516,8 @@ void C_ClientRagdoll::HandleAnimatedFriction( void )
 	}
 }
 
-ConVar g_ragdoll_fadespeed( "g_ragdoll_fadespeed", "600" );
+// dimhotepus: 10x times slower ragdolls fade speed for realism.
+ConVar g_ragdoll_fadespeed( "g_ragdoll_fadespeed", "6000" );
 ConVar g_ragdoll_lvfadespeed( "g_ragdoll_lvfadespeed", "100" );
 
 void C_ClientRagdoll::OnPVSStatusChanged( bool bInPVS )
