@@ -213,7 +213,7 @@ public:
 #ifdef PLATFORM_64BITS
 			return Mix64HashFunctor()( (uintp)( p->fnHandle ) );
 #else
-			return Mix32HashFunctor()( (uint32)( p->fnHandle ) );
+			return Mix32HashFunctor()( (uint32)( p->fnHandle ) ); //-V205
 #endif
 		}
 		uint operator()( FileNameHandle_t fn ) const
@@ -221,7 +221,7 @@ public:
 #ifdef PLATFORM_64BITS
 			return Mix64HashFunctor()( (uintp) fn );
 #else
-			return Mix32HashFunctor()( (uint32) fn );
+			return Mix32HashFunctor()( (uint32) fn ); //-V205
 #endif
 		}
 	};

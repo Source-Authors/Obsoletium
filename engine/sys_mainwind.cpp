@@ -1242,8 +1242,8 @@ void CGame::AttachToWindow()
 		std::make_unique<source::engine::win::ScopedPowerSettingNotificationsRegistrator>(m_hWindow, GUID_SESSION_DISPLAY_STATUS));
 
 #if !defined( USE_SDL )
-	m_ChainedWindowProc = (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC );
-	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)HLEngineWindowProc );
+	m_ChainedWindowProc = (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC ); //-V204
+	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)HLEngineWindowProc ); //-V221
 #endif
 #endif // WIN32
 
@@ -1298,8 +1298,8 @@ void CGame::DetachFromWindow()
 	}
 
 #if defined( WIN32 ) && !defined( USE_SDL )
-	Assert( (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC ) == HLEngineWindowProc );
-	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)m_ChainedWindowProc );
+	Assert( (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC ) == HLEngineWindowProc ); //-V204
+	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)m_ChainedWindowProc ); //-V221
 #endif
 }
 
