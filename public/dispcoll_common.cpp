@@ -1421,6 +1421,7 @@ CDispCollTree::CDispCollTree()
 	m_hCache = INVALID_MEMHANDLE;
 #endif
 
+	BitwiseClear(m_Helper);
 	m_nSize = 0;
 }
 
