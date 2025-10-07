@@ -70,6 +70,8 @@ public:
 #endif
 	Vector(vec_t X, vec_t Y, vec_t Z);
 	explicit Vector(vec_t XYZ); ///< broadcast initialize
+	// dimhotepus: Dummy unsafe ctor, do not use directly!
+	constexpr Vector(vec_t X, vec_t Y, vec_t Z, vec_t) : x{X}, y{Y}, z{Z} {}
 
 	// Initialization
 	void Init(vec_t ix=0.0f, vec_t iy=0.0f, vec_t iz=0.0f);
@@ -1776,8 +1778,11 @@ public:
 #else
 	Quaternion() = default;
 #endif
-	inline Quaternion(vec_t ix, vec_t iy, vec_t iz, vec_t iw) : x(ix), y(iy), z(iz), w(iw) { }
-	inline Quaternion(RadianEuler const &angle);	// evil auto type promotion!!!
+	// dimhotepus: Add validation.
+	Quaternion(vec_t ix, vec_t iy, vec_t iz, vec_t iw) : x(ix), y(iy), z(iz), w(iw) { CHECK_VALID(*this); }
+	Quaternion(RadianEuler const &angle);	// evil auto type promotion!!!
+	// dimhotepus: Dummy unsafe ctor, do not use directly!
+	constexpr Quaternion(vec_t ix, vec_t iy, vec_t iz, vec_t iw, vec_t) : x(ix), y(iy), z(iz), w(iw) {}
 
 	inline void XM_CALLCONV Init(vec_t ix=0.0f, vec_t iy=0.0f, vec_t iz=0.0f, vec_t iw=0.0f)	{ x = ix; y = iy; z = iz; w = iw; }
 
@@ -2072,6 +2077,8 @@ public:
 #endif
 	QAngle(vec_t X, vec_t Y, vec_t Z);
 //	QAngle(RadianEuler const &angles);	// evil auto type promotion!!!
+	// dimhotepus: Dummy unsafe ctor, do not use directly!
+	constexpr QAngle(vec_t X, vec_t Y, vec_t Z, vec_t) : x{X}, y{Y}, z{Z} {}
 
 	// Allow pass-by-value
 	[[nodiscard]] XM_CALLCONV operator QAngleByValue &()

@@ -39,11 +39,6 @@ bool s_bMathlibInitialized = false;
 void Sys_Error (char *error, ...);
 #endif
 
-const Vector vec3_origin(0,0,0);
-const QAngle vec3_angle(0,0,0);
-const Vector vec3_invalid( FLT_MAX, FLT_MAX, FLT_MAX );
-const int nanmask = 255<<23;
-
 // dimhotepus: Unsafe.
 //qboolean VectorsEqual( const float *v1, const float *v2 )
 //{

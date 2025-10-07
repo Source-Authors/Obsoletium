@@ -304,11 +304,12 @@ struct matrix3x4_t
 
 extern bool s_bMathlibInitialized;
 
-extern  const Vector vec3_origin;
-extern  const QAngle vec3_angle;
-extern	const Quaternion quat_identity;
-extern const Vector vec3_invalid;
-extern	const int nanmask;
+constexpr inline Vector vec3_origin{0, 0, 0, 0};
+constexpr inline QAngle vec3_angle{0, 0, 0, 0};
+constexpr inline Vector vec3_invalid{FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX};
+constexpr inline Quaternion quat_identity{0, 0, 0, 0, 0};
+
+constexpr inline int nanmask = 255 << 23;
 
 template<typename T>
 [[nodiscard]] inline bool IS_NAN(T x)
