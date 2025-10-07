@@ -56,14 +56,31 @@ static const char *SkipToFname( const tchar* pFile )
 	return pSlash ? pSlash + 1: pFile;
 }
 
+template <size_t out_size>
+const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
+                               const char *message) {
+  const char *out_group{GetSpewOutputGroup()};
+
+  out_group = out_group && out_group[0] ? out_group : group;
+
+  const size_t length{strlen(message)};
+  if (length > 1 && message[length - 1] == '\n') {
+    snprintf(out, std::size(out) - 1, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
+  } else {
+    snprintf(out, std::size(out) - 1, "[%.3f] %s", Plat_FloatTime(), message);
+  }
+
+  return out;
+}
 
 //-----------------------------------------------------------------------------
 DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 {
-	_tprintf( _T("%s"), pMsg );
+	_tprintf( _T("[%.3f] %s"), Plat_FloatTime(), pMsg );
 
 #ifdef _WIN32
-	Plat_DebugString( pMsg );
+	char msg[4096];
+	Plat_DebugString( PrefixMessageGroup( msg, "default", pMsg ) );
 #endif
 
 	if ( type == SPEW_ASSERT )
