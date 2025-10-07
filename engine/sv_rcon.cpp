@@ -279,7 +279,7 @@ void CRConServer::RunFrame()
 		{
 			CUtlBuffer & response = pData->packetbuffer;
 			response.EnsureCapacity( response.TellPut() + readLen );
-			char *recvBuf = (char *)_alloca( min( 1024ul, readLen ) ); // a buffer used for recv()
+			char *recvBuf = stackallocT( char, min( 1024ul, readLen ) ); // a buffer used for recv()
 			unsigned int len = 0;
 			while ( len < readLen )
 			{
