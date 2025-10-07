@@ -108,13 +108,13 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
                                const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 
-  out_group = out_group && out_group[0] ? out_group : group;
+  out_group = !Q_isempty( out_group ) ? out_group : group;
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+    Q_snprintf(out, std::size(out), "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
   } else {
-    Q_snprintf(out, std::size(out), "%s", message);
+    Q_snprintf(out, std::size(out), "[%.3f] %s", Plat_FloatTime(), message);
   }
 
   return out;
