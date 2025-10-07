@@ -3686,19 +3686,16 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 {
 	// get our preserved data
 	Assert( pContext );
-	staticPropAsyncContext_t *pStaticPropContext = (staticPropAsyncContext_t *)pContext;
+	auto *pStaticPropContext = (staticPropAsyncContext_t *)pContext;
 
-	HardwareVerts::FileHeader_t *pVhvHdr;
 	byte *pOriginalData = NULL;
-	int numLightingComponents = 1;
 
+	auto *pVhvHdr = (HardwareVerts::FileHeader_t *)pData;
 	if ( asyncStatus != FSASYNC_OK )
 	{
 		// any i/o error
 		goto cleanUp;
 	}
-
-	pVhvHdr = (HardwareVerts::FileHeader_t *)pData;
 
 	int startMesh;
 	for ( startMesh=0; startMesh<pVhvHdr->m_nMeshes; startMesh++ )
@@ -3711,8 +3708,7 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 		}
 	}
 
-	int meshID;
-	for ( meshID = startMesh; meshID<pVhvHdr->m_nMeshes; meshID++ )
+	for ( int meshID = startMesh; meshID<pVhvHdr->m_nMeshes; meshID++ )
 	{
 		int numVertexes = pVhvHdr->pMesh( meshID )->m_nVertexes;
 		if ( numVertexes != pStaticPropContext->m_pColorMeshData->m_pMeshInfos[meshID-startMesh].m_nNumVerts )
@@ -3724,22 +3720,14 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 		int nID = meshID-startMesh;
 
 		unsigned char *pIn = (unsigned char *) pVhvHdr->pVertexBase( meshID );
-		unsigned char *pOut = NULL;
 			
 		CMeshBuilder meshBuilder;
 		meshBuilder.Begin( pStaticPropContext->m_pColorMeshData->m_pMeshInfos[ nID ].m_pMesh, MATERIAL_HETEROGENOUS, numVertexes, 0 );
-		if ( numLightingComponents > 1 )
-		{
-			pOut = reinterpret_cast< unsigned char * >( const_cast< float * >( meshBuilder.Normal() ) );
-		}
-		else
-		{
-			pOut = meshBuilder.Specular();
-		}
+		unsigned char *pOut = meshBuilder.Specular();
 
 #ifdef DX_TO_GL_ABSTRACTION
 		// OPENGL_SWAP_COLORS
-		for ( int i=0; i < (numVertexes * numLightingComponents ); i++ )
+		for ( int i=0; i < numVertexes; i++ )
 		{
 			unsigned char red = *pIn++;
 			unsigned char green = *pIn++;
@@ -3750,7 +3738,7 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 			*pOut++ = *pIn++; // Alpha goes straight across
 		}
 #else
-		V_memcpy( pOut, pIn, numVertexes * 4 * numLightingComponents );
+		V_memcpy( pOut, pIn, numVertexes * 4 );
 #endif
 		meshBuilder.End();
 	}
