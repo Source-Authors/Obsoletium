@@ -618,10 +618,10 @@ void CRagdollProp::HandleFirstCollisionInteractions( int index, gamevcollisionev
 	bool bAlienBloodSplat = HasPhysgunInteraction( "onfirstimpact", "alienbloodsplat" );
 	if( bAlienBloodSplat || HasPhysgunInteraction( "onfirstimpact", "bloodsplat" ) )
 	{
-		IPhysicsObject *pObj = VPhysicsGetObject();
+		IPhysicsObject *phys = VPhysicsGetObject();
  
 		Vector vecPos;
-		pObj->GetPosition( &vecPos, NULL );
+		phys->GetPosition( &vecPos, NULL );
  
 		trace_t tr;
 		UTIL_TraceLine( vecPos, vecPos + pEvent->preVelocity[0] * 1.5, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
