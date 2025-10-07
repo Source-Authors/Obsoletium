@@ -475,19 +475,19 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	BaseClass::VPhysicsCollision( index, pEvent );
 
-	CBaseEntity *pHitEntity = pEvent->pEntities[!index];
-	if ( pHitEntity == this )
+	CBaseEntity *pHitEntity1 = pEvent->pEntities[!index];
+	if ( pHitEntity1 == this )
 		return;
 
 	// Don't take physics damage from whoever's holding him with the physcannon.
 	if ( VPhysicsGetObject() && (VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
 	{
-		if ( pHitEntity && (pHitEntity == HasPhysicsAttacker( FLT_MAX )) )
+		if ( pHitEntity1 && (pHitEntity1 == HasPhysicsAttacker( FLT_MAX )) )
 			return;
 	}
 
 	// Don't bother taking damage from the physics attacker
-	if ( pHitEntity && HasPhysicsAttacker( 0.5f ) == pHitEntity )
+	if ( pHitEntity1 && HasPhysicsAttacker( 0.5f ) == pHitEntity1 )
 		return;
 
 	if( m_bFirstCollisionAfterLaunch )
@@ -593,8 +593,6 @@ void CRagdollProp::HandleFirstCollisionInteractions( int index, gamevcollisionev
 
 	if( HasPhysgunInteraction( "onfirstimpact", "paintsplat" ) )
 	{
-		IPhysicsObject *pObj = VPhysicsGetObject();
- 
 		Vector vecPos;
 		pObj->GetPosition( &vecPos, NULL );
  
