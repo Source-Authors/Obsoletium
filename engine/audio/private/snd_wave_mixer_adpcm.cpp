@@ -372,7 +372,8 @@ bool CAudioMixerWaveADPCM::DecodeBlock( void )
 	m_sampleCount = m_pFormat->wSamplesPerBlock;
 
 	// short block?, fixup sample count (2 samples per byte, divided by number of channels per sample set)
-	m_sampleCount -= ((m_blockSize - available) * 2) / channelCount;
+	// dimhotepus: Prevent division by zero.
+	m_sampleCount -= ((m_blockSize - available) * 2) / max(channelCount, 1);
 
 	// new block, start at the first sample
 	m_samplePosition = firstSample;
