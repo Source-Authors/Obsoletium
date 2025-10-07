@@ -343,7 +343,7 @@ public:
 
 			g_pVGuiLocalize->ConstructString_safe( 
 				constructed, 
-				( wchar_t * )format,
+				format,
 				1,
 				file );
 

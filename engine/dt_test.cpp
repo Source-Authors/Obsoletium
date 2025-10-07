@@ -208,7 +208,7 @@ REGISTER_SEND_PROXY_NON_MODIFIED_POINTER( SendProxy_DTTestServerSub );
 
 int ArrayLengthSendProxy_VLALength( const void *pStruct, int objectID )
 {
-	DTTestServer *pServer = (DTTestServer*)pStruct;
+	const DTTestServer *pServer = (const DTTestServer*)pStruct;
 	return pServer->m_VLALength;
 }
 

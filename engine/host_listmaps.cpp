@@ -577,10 +577,10 @@ intp MapList_ListMaps( const char *pszSubString, bool listobsolete,	bool verbose
 //-----------------------------------------------------------------------------
 int _Host_Map_f_CompletionFunc( char const *cmdname, char const *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] )
 {
-	char *substring = (char *)partial;
+	const char *substring = partial;
 	if ( Q_strstr( partial, cmdname ) )
 	{
-		substring = (char *)partial + strlen( cmdname );
+		substring = partial + V_strlen( cmdname );
 	}
 
 	intp longest = 0;

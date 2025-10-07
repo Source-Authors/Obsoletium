@@ -355,7 +355,7 @@ void CRConClient::SendQueuedData()
 	SocketHandle_t hSocket = GetSocketHandle();
 	while ( m_SendBuffer.TellMaxPut() - m_SendBuffer.TellGet() > static_cast<intp>(sizeof(int)) )
 	{
-		size_t nSize = *(int*)m_SendBuffer.PeekGet();
+		size_t nSize = *(const int*)m_SendBuffer.PeekGet();
 		Assert( nSize >= m_SendBuffer.TellMaxPut() - m_SendBuffer.TellGet() - sizeof( int ) );
 		int ret = send( hSocket, (const char *)m_SendBuffer.PeekGet(), nSize + sizeof( int ), 0 );
 		if ( ret != -1 )
@@ -652,7 +652,7 @@ void CRConClient::Authenticate()
 			Assert( cl.m_pUserInfoTable );
 			if ( cl.m_pUserInfoTable )
 			{
-				player_info_t *pi = (player_info_t*) cl.m_pUserInfoTable->GetStringUserData( cl.m_nPlayerSlot, NULL );
+				const auto *pi = (const player_info_t*) cl.m_pUserInfoTable->GetStringUserData( cl.m_nPlayerSlot, NULL );
 				if ( pi )
 				{
 					addedUserID = true;

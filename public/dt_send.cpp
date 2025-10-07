@@ -71,9 +71,7 @@ CStandardSendProxies g_StandardSendProxies;
 // ---------------------------------------------------------------------- //
 void SendProxy_AngleToFloat( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	float angle;
-
-	angle = *((float*)pData);
+	float angle = *((const float*)pData);
 	pOut->m_Float = anglemod( angle );
 
 	Assert( IsFinite( pOut->m_Float ) );
@@ -81,13 +79,13 @@ void SendProxy_AngleToFloat( const SendProp *pProp, const void *pStruct, const v
 
 void SendProxy_FloatToFloat( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	pOut->m_Float = *((float*)pData);
+	pOut->m_Float = *((const float*)pData);
 	Assert( IsFinite( pOut->m_Float ) );
 }
 
 void SendProxy_QAngles( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
 {
-	QAngle *v = (QAngle*)pData;
+	const QAngle *v = (const QAngle*)pData;
 	pOut->m_Vector[0] = anglemod( v->x );
 	pOut->m_Vector[1] = anglemod( v->y );
 	pOut->m_Vector[2] = anglemod( v->z );
@@ -95,7 +93,7 @@ void SendProxy_QAngles( const SendProp *pProp, const void *pStruct, const void *
 
 void SendProxy_VectorToVector( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	Vector& v = *(Vector*)pData;
+	const Vector& v = *(const Vector*)pData;
 	Assert( v.IsValid() );
 	pOut->m_Vector[0] = v[0];
 	pOut->m_Vector[1] = v[1];
@@ -104,7 +102,7 @@ void SendProxy_VectorToVector( const SendProp *pProp, const void *pStruct, const
 
 void SendProxy_VectorXYToVectorXY( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	Vector& v = *(Vector*)pData;
+	const Vector& v = *(const Vector*)pData;
 	Assert( v.IsValid() );
 	pOut->m_Vector[0] = v[0];
 	pOut->m_Vector[1] = v[1];
@@ -113,7 +111,7 @@ void SendProxy_VectorXYToVectorXY( const SendProp *pProp, const void *pStruct, c
 #if 0 // We can't ship this since it changes the size of DTVariant to be 20 bytes instead of 16 and that breaks MODs!!!
 void SendProxy_QuaternionToQuaternion( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	Quaternion& q = *(Quaternion*)pData;
+	const Quaternion& q = *(const Quaternion*)pData;
 	Assert( q.IsValid() );
 	pOut->m_Vector[0] = q[0];
 	pOut->m_Vector[1] = q[1];
@@ -129,18 +127,18 @@ void SendProxy_Int8ToInt32( const SendProp *pProp, const void *pStruct, const vo
 
 void SendProxy_Int16ToInt32( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	pOut->m_Int = *((short*)pData);
+	pOut->m_Int = *((const short*)pData);
 }
 
 void SendProxy_Int32ToInt32( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	pOut->m_Int = *((int*)pData);
+	pOut->m_Int = *((const int*)pData);
 }
 
 #ifdef SUPPORTS_INT64
 void SendProxy_Int64ToInt64( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	pOut->m_Int64 = *((int64*)pData);
+	pOut->m_Int64 = *((const int64*)pData);
 }
 #endif
 
@@ -151,17 +149,17 @@ void SendProxy_UInt8ToInt32( const SendProp *pProp, const void *pStruct, const v
 
 void SendProxy_UInt16ToInt32( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	pOut->m_Int = *((unsigned short*)pData);
+	pOut->m_Int = *((const unsigned short*)pData);
 }
 
 void SendProxy_UInt32ToInt32( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	*((unsigned long*)&pOut->m_Int) = *((unsigned long*)pData);
+	*((uint32*)&pOut->m_Int) = *((const uint32*)pData);
 }
 #ifdef SUPPORTS_INT64
 void SendProxy_UInt64ToInt64( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID)
 {
-	*((int64*)&pOut->m_Int64) = *((uint64*)pData);
+	*((int64*)&pOut->m_Int64) = *((const uint64*)pData);
 }
 #endif
 

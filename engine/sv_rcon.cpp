@@ -470,7 +470,7 @@ bool CRConServer::SendRCONResponse( int nIndex, const void *data, int len, bool 
 					// yet, add a new one
 			{
 				auto index = pSocketData->m_OutstandingSends.AddToHead();
-				pSocketData->m_OutstandingSends[index].Put( (void *)((char *)data + sendLen), len - sendLen );
+				pSocketData->m_OutstandingSends[index].Put( (const char *)data + sendLen, len - sendLen );
 			}
 			else // update the existing queued item to show we 
 			     // sent some of it (we only ever send the head of the list)

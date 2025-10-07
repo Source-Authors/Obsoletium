@@ -171,8 +171,8 @@ void CQueuedPacketSender::QueuePacket( INetChannel *pChan, SOCKET s, const char 
 		pPacket->m_unSendTime = mcsNow + msecDelay * 1000LLU;
 		pPacket->m_Socket = s;
 		pPacket->m_pChannel = pChan;
-		pPacket->buf.CopyArray( (char*)buf, len );
-		pPacket->to.CopyArray( (char*)to, tolen );
+		pPacket->buf.CopyArray( buf, len );
+		pPacket->to.CopyArray( (const char*)to, tolen );
 		m_QueuedPackets.Insert( pPacket );
 	}
 	else

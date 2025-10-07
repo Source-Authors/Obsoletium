@@ -855,14 +855,6 @@ void EnableHDR( bool bEnable )
 
 	g_pMaterialSystemHardwareConfig->SetHDREnabled( bEnable );
 
-	if ( IsX360() )
-	{
-		// cannot do what the pc does and ditch resources, we're loading!
-		// can safely do the state update only, knowing that the state change won't affect 360 resources
-		((MaterialSystem_Config_t *)g_pMaterialSystemConfig)->SetFlag( MATSYS_VIDCFG_FLAGS_ENABLE_HDR, bEnable );
-		return;
-	}
-
 	ShutdownWellKnownRenderTargets();
 	InitWellKnownRenderTargets();
 
@@ -5972,7 +5964,7 @@ void CModelLoader::DebugPrintDynamicModels()
 		for ( int i = 0; i < sv.GetDynamicModelsTable()->GetNumStrings(); ++i )
 		{
 			intp dummy = 0;
-			char* data = (char*) sv.GetDynamicModelsTable()->GetStringUserData( i, &dummy );
+			const char* data = (const char*) sv.GetDynamicModelsTable()->GetStringUserData( i, &dummy );
 			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
 			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', sv.GetDynamicModelsTable()->GetString(i) );
 		}
@@ -5985,7 +5977,7 @@ void CModelLoader::DebugPrintDynamicModels()
 		for ( int i = 0; i < cl.m_pDynamicModelsTable->GetNumStrings(); ++i )
 		{
 			intp dummy = 0;
-			char* data = (char*) cl.m_pDynamicModelsTable->GetStringUserData( i, &dummy );
+			const char* data = (const char*) cl.m_pDynamicModelsTable->GetStringUserData( i, &dummy );
 			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
 			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', cl.m_pDynamicModelsTable->GetString(i) );
 		}

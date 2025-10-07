@@ -559,7 +559,7 @@ public:
 				if ( var->IsCommand() )
 					continue;
 
-				ConVar *pCvar = ( ConVar * )var;
+				const ConVar *pCvar = ( const ConVar * )var;
 				if ( pCvar->IsFlagSet( FCVAR_SERVER_CANNOT_QUERY | FCVAR_PROTECTED ) )
 					continue;
 

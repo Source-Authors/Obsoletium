@@ -499,7 +499,7 @@ void LocalTransfer_TransferEntity(
 		if ( nChangeOffsets == 0 )
 			return;
 		
-		AddToPartialChangeEntsList( (edict_t*)pEdict - sv.edicts, true );
+		AddToPartialChangeEntsList( (const edict_t*)pEdict - sv.edicts, true );
 		FastSortList( propIndices, nChangeOffsets );
 
 		// Setup the structure to traverse the source tree.
@@ -553,7 +553,7 @@ void LocalTransfer_TransferEntity(
 		CClientDatatableStack clientStack( pDecoder, (unsigned char*)pDestEnt, objectID );
 		clientStack.Init();
 
-		AddToPartialChangeEntsList( (edict_t*)pEdict - sv.edicts, false );
+		AddToPartialChangeEntsList( (const edict_t*)pEdict - sv.edicts, false );
 
 		// Copy the properties that require proxies.
 		CFastLocalTransferPropInfo *pPropList = pPrecalc->m_FastLocalTransfer.m_OtherProps.Base();

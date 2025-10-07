@@ -915,7 +915,7 @@ void Array_Encode( const unsigned char *pStruct, DVariant *pVar, const SendProp 
 	// Write the number of elements.
 	pOut->WriteUBitLong( nElements, pProp->GetNumArrayLengthBits() );
 
-	unsigned char *pCurStructOffset = (unsigned char*)pStruct + pArrayProp->GetOffset();
+	const unsigned char *pCurStructOffset = (const unsigned char*)pStruct + pArrayProp->GetOffset();
 	for ( int iElement=0; iElement < nElements; iElement++ )
 	{
 		DVariant var;

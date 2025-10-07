@@ -42,7 +42,7 @@ void SendProxy_UtlVectorElement(
 	int iElement, 
 	int objectID )
 {
-	CSendPropExtra_UtlVector *pExtra = (CSendPropExtra_UtlVector*)pProp->GetExtraData();
+	const auto *pExtra = (const CSendPropExtra_UtlVector*)pProp->GetExtraData();
 	Assert( pExtra );
 
 	// Kind of lame overloading element stride to hold the element index,
@@ -70,7 +70,7 @@ void* SendProxy_UtlVectorElement_DataTable(
 	CSendProxyRecipients *pRecipients, 
 	int objectID )
 {
-	CSendPropExtra_UtlVector *pExtra = (CSendPropExtra_UtlVector*)pProp->GetExtraData();
+	const auto *pExtra = (const CSendPropExtra_UtlVector*)pProp->GetExtraData();
 
 	int iElement = pProp->m_ElementStride;
 	Assert( iElement < pExtra->m_nMaxElements );
@@ -82,10 +82,10 @@ void* SendProxy_UtlVectorElement_DataTable(
 #endif
 
 	// NOTE: this is cheesy because we're assuming the type of the template class, but it does the trick.
-	CUtlVector<int> *pUtlVec = (CUtlVector<int>*)((char*)pStructBase + pExtra->m_Offset);
+	const CUtlVector<int> *pUtlVec = (const CUtlVector<int>*)((const char*)pStructBase + pExtra->m_Offset);
 
 	// Call through to the proxy they passed in, making pStruct=the CUtlVector and forcing iElement to 0.
-	return pExtra->m_DataTableProxyFn( pProp, pData, (char*)pUtlVec->Base() + iElement*pExtra->m_ElementStride, pRecipients, objectID );
+	return pExtra->m_DataTableProxyFn( pProp, pData, (const char*)pUtlVec->Base() + iElement*pExtra->m_ElementStride, pRecipients, objectID );
 }
 
 void SendProxy_UtlVectorLength( 
@@ -96,10 +96,10 @@ void SendProxy_UtlVectorLength(
 	int iElement, 
 	int objectID )
 {
-	CSendPropExtra_UtlVector *pExtra = (CSendPropExtra_UtlVector*)pProp->GetExtraData();
+	const auto *pExtra = (const CSendPropExtra_UtlVector*)pProp->GetExtraData();
 	
 	// NOTE: this is cheesy because we're assuming the type of the template class, but it does the trick.
-	CUtlVector<int> *pUtlVec = (CUtlVector<int>*)((char*)pStruct + pExtra->m_Offset);
+	const CUtlVector<int> *pUtlVec = (const CUtlVector<int>*)((const char*)pStruct + pExtra->m_Offset);
 	
 	// Don't let them overflow the buffer because they might expect that to get transmitted to the client.
 	pOut->m_Int = pUtlVec->Count();
@@ -114,7 +114,7 @@ void SendProxy_UtlVectorLength(
 void* SendProxy_LengthTable( const SendProp *pProp, const void *pStructBase, const void *pData, CSendProxyRecipients *pRecipients, int objectID )
 {
 	// Make sure the array has space to hold all the elements.
-	CSendPropExtra_UtlVector *pExtra = (CSendPropExtra_UtlVector*)pProp->GetExtraData();
+	const CSendPropExtra_UtlVector *pExtra = (const CSendPropExtra_UtlVector*)pProp->GetExtraData();
 	pExtra->m_EnsureCapacityFn( (void*)pStructBase, pExtra->m_Offset, pExtra->m_nMaxElements );
 	return (void*)pData;
 }

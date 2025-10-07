@@ -1147,7 +1147,7 @@ void LoadEntityDLLs( const char *szBaseDir, bool bIsServerOnly )
 
 	if ( serverGameDLL )
 	{
-		Msg("server%s loaded for \"%s\"\n", DLL_EXT_STRING, (char *)serverGameDLL->GetGameDescription());
+		Msg("server%s loaded for \"%s\"\n", DLL_EXT_STRING, serverGameDLL->GetGameDescription());
 	}
 	else
 	{
@@ -1271,7 +1271,7 @@ void Sys_GetRegKeyValueUnderRootInt( HKEY rootKey, const char *pszSubKey, const 
 			// Didn't find it, so write out new value
 		{
 			// Just Set the Values according to the defaults
-			lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_DWORD, (LPBYTE)&lDefaultValue, sizeof( DWORD ) ); 
+			lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_DWORD, (const LPBYTE)&lDefaultValue, sizeof( DWORD ) ); 
 		}
 	};
 

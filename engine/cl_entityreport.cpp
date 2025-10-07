@@ -66,8 +66,8 @@ static ENTITYBITS s_EntityBits[ MAX_EDICTS ];
 // Used to sort by average
 int CompareEntityBits(const void* pIndexA, const void* pIndexB )
 {
-	int indexA = *(int*)pIndexA;
-	int indexB = *(int*)pIndexB;
+	int indexA = *(const int*)pIndexA;
+	int indexB = *(const int*)pIndexB;
 
 	ENTITYBITS *pEntryA = &s_EntityBits[indexA];
 	ENTITYBITS *pEntryB = &s_EntityBits[indexB];

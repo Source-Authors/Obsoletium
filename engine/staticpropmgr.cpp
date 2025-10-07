@@ -2295,7 +2295,7 @@ void CStaticPropMgr::GetStaticPropMaterialColorAndLighting( trace_t* pTrace,
 	CStaticProp& prop = m_StaticProps[staticPropIndex];
 
 	// Ask the model info about what we need to know
-	modelinfoclient->GetModelMaterialColorAndLighting( (model_t*)prop.GetModel(), 
+	modelinfoclient->GetModelMaterialColorAndLighting( prop.GetModel(), 
 		prop.GetRenderOrigin(), prop.GetRenderAngles(), pTrace, lighting, matColor );
 #endif
 }

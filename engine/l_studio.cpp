@@ -1133,7 +1133,7 @@ void CModelRender::SuppressEngineLighting( bool bSuppress )
 //-----------------------------------------------------------------------------
 bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, size_t nMaxLen )
 {
-	CColorMeshData *pColorMeshData = (CColorMeshData *)pItem;
+	const CColorMeshData *pColorMeshData = (const CColorMeshData *)pItem;
 	g_pFileSystem->String( pColorMeshData->m_fnHandle, pDest, nMaxLen );
 	return true;
 }
@@ -1835,7 +1835,7 @@ matrix3x4_t* CModelRender::SetupModelState( IClientRenderable *pRenderable )
 	if ( !pModel )
 		return NULL;
 
-	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( const_cast<model_t*>(pModel) );
+	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pModel );
 	if ( pStudioHdr->numbodyparts == 0 )
 		return NULL;
 
@@ -1950,13 +1950,6 @@ void AddModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_t
 void ClearSaveModelDebugOverlays( void )
 {
 	s_SavedModelInfo.RemoveAll();
-}
-
-int SavedModelInfo_Compare_f( const void *l, const void *r )
-{
-	ModelDebugOverlayData_t *left = ( ModelDebugOverlayData_t * )l;
-	ModelDebugOverlayData_t *right = ( ModelDebugOverlayData_t * )r;
-	return left->m_ModelResults.m_RenderTime.GetDuration().GetSeconds() < right->m_ModelResults.m_RenderTime.GetDuration().GetSeconds();
 }
 
 static ConVar r_drawmodelstatsoverlaymin( "r_drawmodelstatsoverlaymin", "0.1", FCVAR_ARCHIVE, "time in milliseconds that a model must take to render before showing an overlay in r_drawmodelstatsoverlay 2" );

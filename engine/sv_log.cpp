@@ -435,7 +435,7 @@ void CLog::PrintServerVars( void )
 		if ( !( var->IsFlagSet( FCVAR_NOTIFY ) ) )
 			continue;
 
-		Printf( "\"%s\" = \"%s\"\n", var->GetName(), ((ConVar*)var)->GetString() );
+		Printf( "\"%s\" = \"%s\"\n", var->GetName(), ((const ConVar*)var)->GetString() );
 	}
 
 	Printf( "server cvars end\n" );

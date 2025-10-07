@@ -890,7 +890,7 @@ bool CBaseServer::GetPlayerInfo( int nClientIndex, player_info_t *pinfo )
 		return false;
 	}
 
-	player_info_t *pi = (player_info_t*) GetUserInfoTable()->GetStringUserData( nClientIndex, NULL );
+	const auto *pi = (const player_info_t*) GetUserInfoTable()->GetStringUserData( nClientIndex, NULL );
 
 	if ( !pi )
 	{

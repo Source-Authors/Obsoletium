@@ -1547,7 +1547,7 @@ void CAsyncWavDataCache::OnMixEnd()
 //-----------------------------------------------------------------------------
 bool CAsyncWavDataCache::GetItemName( DataCacheClientID_t, const void *pItem, char *pDest, size_t nMaxLen  )
 {
-	CAsyncWaveData *pWaveData = (CAsyncWaveData *)pItem;
+	const CAsyncWaveData *pWaveData = (const CAsyncWaveData *)pItem;
 	Q_strncpy( pDest, pWaveData->GetFileName(), nMaxLen );
 	return true;
 }
@@ -1958,7 +1958,7 @@ int CWaveDataStreamAsync::ReadSourceData( void **pData, int sampleIndex, int sam
 					// Mark how many we are returning
 					m_bufferCount = availSamples;
 					// Copy raw sample data directly out of cache
-					Q_memcpy( m_buffer, ( char * )cacheddata + cacheddatastartpos, availSamples * m_sampleSize );
+					Q_memcpy( m_buffer, ( const char * )cacheddata + cacheddatastartpos, availSamples * m_sampleSize );
 
 					startupCacheUsed = true;
 				}

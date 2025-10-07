@@ -295,7 +295,7 @@ void Snd_Restart_f()
 
 	// Flush soundscapes so they don't stop. We don't insert text in the buffer here because 
 	// cl_soundscape_flush is normally cheat-protected.
-	ConCommand *pCommand = (ConCommand*)dynamic_cast< const ConCommand* >( g_pCVar->FindCommand( "cl_soundscape_flush" ) );
+	ConCommand *pCommand = dynamic_cast< ConCommand* >( g_pCVar->FindCommand( "cl_soundscape_flush" ) );
 	if ( pCommand )
 	{
 		char const *argv[ 1 ] = { "cl_soundscape_flush" };
@@ -755,7 +755,7 @@ void Host_EndGame (bool bShowMainMenu, PRINTF_FORMAT_STRING const char *message,
 	va_list		argptr;
 	char		string[1024];
 
-	va_start (argptr,message); //-V2019 //-V2018
+	va_start (argptr,message); //-V2019
 	V_vsprintf_safe (string,message,argptr);
 	va_end (argptr);
 	ConMsg ("Host_EndGame: %s\n",string);
@@ -825,7 +825,7 @@ void Host_Error ( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2
 	//	CL_WriteMessageHistory();	TODO must be done by network layer
 #endif
 
-	va_start (argptr,error); //-V2019 //-V2018
+	va_start (argptr,error); //-V2019
 	V_vsprintf_safe(string,error,argptr);
 	va_end (argptr);
 

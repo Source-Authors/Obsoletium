@@ -276,7 +276,7 @@ ConCommand whitelist( "whitelist", whitelist_f );
 const CPrecacheUserData* CL_GetPrecacheUserData( INetworkStringTable *table, int index )
 {
 	intp testLength;
-	const CPrecacheUserData *data = ( CPrecacheUserData * )table->GetStringUserData( index, &testLength );
+	const CPrecacheUserData *data = ( const CPrecacheUserData * )table->GetStringUserData( index, &testLength );
 	if ( data )
 	{
 		ErrorIfNot( 
@@ -2815,7 +2815,7 @@ void Callback_UserInfoChanged( void *object, INetworkStringTable *stringTable, i
 
 	// stringnumber == player slot
 
-	player_info_t *player = (player_info_t*)newData;
+	const auto *player = (const player_info_t*)newData;
 
 	if ( !player )
 		return; // player left the game

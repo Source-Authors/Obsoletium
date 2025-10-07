@@ -415,7 +415,7 @@ int COM_FindFile( const char *filename, FileHandle_t *file )
 //-----------------------------------------------------------------------------
 int COM_OpenFile(IN_Z const char *filename, FileHandle_t *file )
 {
-	return COM_FindFile( (char *)filename, file );
+	return COM_FindFile( filename, file );
 }
 
 /*

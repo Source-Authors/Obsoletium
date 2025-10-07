@@ -739,7 +739,7 @@ bool CEngineClient::GetPlayerInfo( int ent_num, player_info_t *pinfo )
 	}
 
 	intp cubPlayerInfo;
-	player_info_t *pi = (player_info_t*) cl.m_pUserInfoTable->GetStringUserData( ent_num, &cubPlayerInfo );
+	const auto *pi = (const player_info_t*) cl.m_pUserInfoTable->GetStringUserData( ent_num, &cubPlayerInfo );
 
 	if ( !pi || cubPlayerInfo < static_cast<intp>(sizeof( player_info_t )) )
 	{
@@ -1136,7 +1136,7 @@ int	CEngineClient::GetPlayerForUserID(int userID)
 	int nMaxClients = Min( cl.m_nMaxClients, cl.m_pUserInfoTable->GetNumStrings() );
 	for ( int i = 0; i < nMaxClients; i++ )
 	{
-		player_info_t *pi = (player_info_t*) cl.m_pUserInfoTable->GetStringUserData( i, NULL );
+		const auto *pi = (const player_info_t*) cl.m_pUserInfoTable->GetStringUserData( i, NULL );
 
 		if ( !pi )
 			continue;
