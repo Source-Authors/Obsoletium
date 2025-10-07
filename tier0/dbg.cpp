@@ -70,6 +70,8 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
     snprintf(out, std::size(out) - 1, "[%.3f] %s", Plat_FloatTime(), message);
   }
 
+  out[std::size(out) - 1] = '\0';
+
   return out;
 }
 
