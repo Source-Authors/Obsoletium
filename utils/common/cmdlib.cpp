@@ -171,13 +171,13 @@ static const char *PrefixMessageGroup(
     const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 
-  out_group = out_group && out_group[0] ? out_group : group;
+  out_group = !Q_isempty( out_group ) ? out_group : group;
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    V_sprintf_safe(out, "[%s] %s", out_group, message);
+    V_sprintf_safe(out, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
   } else {
-    V_sprintf_safe(out, "%s", message);
+    V_sprintf_safe(out, "[%.3f] %s", Plat_FloatTime(), message);
   }
 
   return out;
