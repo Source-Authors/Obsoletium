@@ -879,7 +879,17 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 		{
 			if ( bUserVox )
 			{
-				pSfx->pSource = Voice_SetupAudioSource( ch->soundsource, ch->entchannel );
+				// dimhotepus: Check channel exists.
+				if ( ch )
+				{
+					pSfx->pSource = Voice_SetupAudioSource( ch->soundsource, ch->entchannel );
+				}
+				else
+				{
+					AssertMsg( ch, "Missed channel to load user VOX %s.", pSfx->getname() );
+
+					Warning( "Missed channel to load user VOX %s.", pSfx->getname() );
+				}
 			}
 			else
 			{
