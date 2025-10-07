@@ -1124,9 +1124,7 @@ void CStaticProp::InsertPropIntoKDTree()
 		}
 		else
 		{
-			char szModel[MAX_PATH];
-			Q_strncpy( szModel, m_pModel ? modelloader->GetName( m_pModel ) : "unknown model", sizeof( szModel ) );
-			Warning( "SOLID_VPHYSICS static prop with no vphysics model! (%s)\n", szModel );
+			Warning( "SOLID_VPHYSICS static prop with no vphysics model! (%s)\n", modelloader->GetName( m_pModel ) );
 			m_nSolidType = SOLID_NONE;
 			return;
 		}
@@ -1236,7 +1234,7 @@ CStaticPropMgr::CStaticPropMgr()
 	m_bLevelInitialized = false;
 	m_bClientInitialized = false;
 	m_vecLastViewOrigin = vec3_invalid;
-	m_flLastViewFactor = false;
+	m_flLastViewFactor = 0;
 }
 
 CStaticPropMgr::~CStaticPropMgr()
