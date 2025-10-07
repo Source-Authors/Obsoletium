@@ -551,7 +551,7 @@ void VectorAngles( const float *forward, float *angles )
 R_ConcatRotations
 ================
 */
-void ConcatRotations (const float in1[3][3], const float in2[3][3], float out[3][3])
+void XM_CALLCONV ConcatRotations (const float in1[3][3], const float in2[3][3], float out[3][3])
 {
 	Assert( in1 != out );
 	Assert( in2 != out );
