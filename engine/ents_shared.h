@@ -23,6 +23,8 @@ class CEntityInfo
 public:
 
 	CEntityInfo() {
+		m_pFrom = nullptr;
+		m_pTo = nullptr;
 		m_nOldEntity = -1;
 		m_nNewEntity = -1;
 		m_nHeaderBase = -1;
