@@ -1644,9 +1644,9 @@ void CMaterialSystem::ReadConfigFromConVars( MaterialSystem_Config_t *pConfig )
 	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_ENABLE_PARALLAX_MAPPING, mat_parallaxmap.GetBool() );
 	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE, mat_reducefillrate.GetBool() );
 
-	// dimhotepus: TF2 backport.
-	ConVarRef r_lightmap_bicubic( "r_lightmap_bicubic" );
-	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_LIGHTMAP_BICUBIC, r_lightmap_bicubic.GetBool() );
+	// dimhotepus: TF2 backport. Do not spam with missed r_lightmap_bicubic when use old branch stdshader_dx9.dll.
+	ConVarRef r_lightmap_bicubic( "r_lightmap_bicubic", true );
+	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_LIGHTMAP_BICUBIC, r_lightmap_bicubic.IsValid() ? r_lightmap_bicubic.GetBool() : false );
 
 	pConfig->m_nForceAnisotropicLevel = max( mat_forceaniso.GetInt(), 1 );
 	pConfig->dxSupportLevel = MAX( ABSOLUTE_MINIMUM_DXLEVEL, mat_dxlevel.GetInt() );
