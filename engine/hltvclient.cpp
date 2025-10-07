@@ -43,6 +43,7 @@ CHLTVClient::CHLTVClient(int slot, CBaseServer *pServer)
 	m_nLastSendTick = 0;
 	m_fLastSendTime = 0.0f;
 	m_flLastChatTime = 0.0f;
+	m_szPassword[0] = '\0';
 	m_bNoChat = false;
 
 	if ( tv_chatgroupsize.GetInt() > 0  )

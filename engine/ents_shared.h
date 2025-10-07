@@ -89,7 +89,9 @@ class CEntityReadInfo : public CEntityInfo
 public:
 
 	CEntityReadInfo() 
-	{	m_nPostDataUpdateCalls = 0;
+	{	
+		m_pBuf = nullptr;
+		m_nPostDataUpdateCalls = 0;
 		m_nLocalPlayerBits = 0;
 		m_nOtherPlayerBits = 0;
 		m_UpdateType = PreserveEnt;

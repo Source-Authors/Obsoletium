@@ -67,7 +67,7 @@ constexpr inline int VISCACHE_SIZE = 8;
 class VisCacheEntry
 {
 public:
-	VisCacheEntry() { nClusters = 0; }
+	VisCacheEntry() { nClusters = 0; BitwiseClear(originclusters); }
 
 	int nClusters;
 	int originclusters[MAX_VIS_LEAVES];

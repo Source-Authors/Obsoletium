@@ -42,6 +42,7 @@ CDownloadListGenerator::CDownloadListGenerator()
 {
 	m_hReslistFile = FILESYSTEM_INVALID_HANDLE;
 	m_pStringTable = NULL;
+	m_gameDir[0] = 0;
 	m_mapName[0] = 0;
 }
 

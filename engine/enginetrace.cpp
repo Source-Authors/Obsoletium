@@ -1192,6 +1192,7 @@ public:
 	CEntityListAlongRay() 
 	{
 		m_nCount = 0;
+		BitwiseClear(m_EntityHandles);
 	}
 
 	void Reset()

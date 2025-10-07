@@ -33,6 +33,7 @@ CSession::CSession()
 	m_hSession				= INVALID_HANDLE_VALUE;
 	m_SessionState			= SESSION_STATE_NONE;
 	m_pRegistrationResults	= NULL;
+	m_hCreateHandle         = nullptr;
 
 	ResetSession();
 }
