@@ -102,7 +102,7 @@ public:
 		return m_bNoQueue;
 	}
 
-	[[nodiscard]] int Count()
+	[[nodiscard]] int Count() const
 	{
 		return m_queue.Count();
 	}
@@ -114,7 +114,7 @@ public:
 			return;
 		}
 
-		m_queue.PushItem( NULL );
+		m_queue.PushItem( nullptr );
 
 		CFunctor *pFunctor;
 
@@ -140,11 +140,11 @@ public:
 
 	void Flush()
 	{
-		m_queue.PushItem( NULL );
+		m_queue.PushItem( nullptr );
 
 		CFunctor *pFunctor;
 
-		while ( m_queue.PopItem( &pFunctor ) && pFunctor != NULL )
+		while ( m_queue.PopItem( &pFunctor ) && pFunctor != nullptr )
 		{
 			pFunctor->Release();
 		}
