@@ -190,7 +190,8 @@ VertexFormat_t ComputeDisplacementStaticMeshVertexFormat( const IMaterial * pMat
 	VertexFormat_t vertexFormat = pMaterial->GetVertexFormat();
 
 	// FIXME: set VERTEX_FORMAT_COMPRESSED if there are no artifacts and if it saves enough memory (use 'mem_dumpvballocs')
-	vertexFormat &= ~VERTEX_FORMAT_COMPRESSED;
+	// dimhotepus: Ensure higher bits are not lost.
+	vertexFormat &= ~static_cast<decltype(vertexFormat)>(VERTEX_FORMAT_COMPRESSED);
 	// FIXME: check for and strip unused vertex elements (TANGENT_S/T?)
 
 	return vertexFormat;
