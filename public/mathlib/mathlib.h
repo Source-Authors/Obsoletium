@@ -304,6 +304,7 @@ struct matrix3x4_t
 
 extern bool s_bMathlibInitialized;
 
+// dimhotepus: Use constexpr inline for performance.
 constexpr inline Vector vec3_origin{0, 0, 0, 0};
 constexpr inline QAngle vec3_angle{0, 0, 0, 0};
 constexpr inline Vector vec3_invalid{FLT_MAX, FLT_MAX, FLT_MAX, FLT_MAX};
