@@ -1445,6 +1445,19 @@ inline T* CopyConstruct( T* pMemory, T const& src )
 	HINT( pMemory != nullptr );
 	return ::new( pMemory ) T{src};
 }
+
+template <class T>
+inline void CopyConstruct( T* pMemory, T&& src )
+{
+	HINT( pMemory != nullptr );
+  ::new (pMemory) T{std::forward<T>(src)};
+}
+
+template <class T, typename... Args>
+inline void CopyConstruct( T* pMemory, Args&&... src )
+{
+	HINT( pMemory != nullptr );
+	::new( pMemory ) T{std::forward<Args...>( src )...};
 }
 
 template <class T>
