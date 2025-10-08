@@ -1375,42 +1375,49 @@ inline const char *GetPlatformExt( )
 template <class T>
 inline T* Construct( T* pMemory )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T); //-V572
 }
 
 template <class T, typename ARG1>
 inline T* Construct( T* pMemory, ARG1 a1 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1 )); //-V572
 }
 
 template <class T, typename ARG1, typename ARG2>
 inline T* Construct( T* pMemory, ARG1 a1, ARG2 a2 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1, a2 )); //-V572
 }
 
 template <class T, typename ARG1, typename ARG2, typename ARG3>
 inline T* Construct( T* pMemory, ARG1 a1, ARG2 a2, ARG3 a3 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1, a2, a3 )); //-V572
 }
 
 template <class T, typename ARG1, typename ARG2, typename ARG3, typename ARG4>
 inline T* Construct( T* pMemory, ARG1 a1, ARG2 a2, ARG3 a3, ARG4 a4 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1, a2, a3, a4 )); //-V572
 }
 
 template <class T, typename ARG1, typename ARG2, typename ARG3, typename ARG4, typename ARG5>
 inline T* Construct( T* pMemory, ARG1 a1, ARG2 a2, ARG3 a3, ARG4 a4, ARG5 a5 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1, a2, a3, a4, a5 )); //-V572
 }
 
 template <typename T, typename... Args>
 inline void Construct( T *memory, Args &&... args )
 {
+	HINT( pMemory != nullptr );
 	::new (memory) T{std::forward<Args>(args)...};
 }
 
@@ -1435,18 +1442,23 @@ template <class T, class P1, class P2, class P3 >
 template <class T>
 inline T* CopyConstruct( T* pMemory, T const& src )
 {
-	return reinterpret_cast<T*>(::new( pMemory ) T{src}); //-V572
+	HINT( pMemory != nullptr );
+	return ::new( pMemory ) T{src};
+}
 }
 
 template <class T>
 inline T* MoveConstruct( T* pMemory, T&& src )
 {
-	return reinterpret_cast<T*>(::new( pMemory ) T{std::move(src)}); //-V572
+	HINT( pMemory != nullptr );
+	return ::new( pMemory ) T{std::forward<T>( src )};
 }
 
 template <class T>
 inline void Destruct( T* pMemory )
 {
+	HINT( pMemory != nullptr );
+
 	pMemory->~T();
 
 #ifdef _DEBUG
