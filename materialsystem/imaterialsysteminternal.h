@@ -52,7 +52,7 @@ public:
 		}
 #endif
 		m_FunctorFactory.SetAllocator( &m_Allocator );
-		m_pHead = m_pTail = NULL;
+		m_pHead = m_pTail = nullptr;
 
 #ifdef _DEBUG
 		m_nCurSerialNumber = 0;
@@ -60,12 +60,12 @@ public:
 #endif
 	}
 
-	size_t GetMemoryUsed()
+	size_t GetMemoryUsed() const
 	{
 		return m_Allocator.GetUsed();
 	}
 
-	int Count()
+	int Count() const
 	{
 		int i = 0;
 		Elem_t *pCurrent = m_pHead;
@@ -84,24 +84,23 @@ public:
 			return;
 		}
 
-		CFunctor *pFunctor;
-
 		Elem_t *pCurrent = m_pHead;
 		while ( pCurrent )
 		{
-			pFunctor = pCurrent->pFunctor;
+			CFunctor *pFunctor = pCurrent->pFunctor;
 #ifdef _DEBUG
 			if ( pFunctor->m_nUserID == m_nBreakSerialNumber)
 			{
-				m_nBreakSerialNumber = (unsigned)-1;
+				m_nBreakSerialNumber = std::numeric_limits<unsigned>::max();
 			}
 #endif
 			(*pFunctor)();
 			pFunctor->Release();
 			pCurrent = pCurrent->pNext;
 		}
+
 		m_Allocator.FreeAll( false );
-		m_pHead = m_pTail = NULL;
+		m_pHead = m_pTail = nullptr;
 	}
 
 	void QueueFunctor( CFunctor *pFunctor )
@@ -117,18 +116,16 @@ public:
 			return;
 		}
 
-		CFunctor *pFunctor;
-
 		Elem_t *pCurrent = m_pHead;
 		while ( pCurrent )
 		{
-			pFunctor = pCurrent->pFunctor;
+			CFunctor *pFunctor = pCurrent->pFunctor;
 			pFunctor->Release();
 			pCurrent = pCurrent->pNext;
 		}
 
 		m_Allocator.FreeAll( false );
-		m_pHead = m_pTail = NULL;
+		m_pHead = m_pTail = nullptr;
 	}
 
 	#define DEFINE_MATCALLQUEUE_NONMEMBER_QUEUE_CALL(N) \
@@ -179,7 +176,8 @@ private:
 		{
 			m_pHead = m_pTail = pNew;
 		}
-		pNew->pNext = NULL;
+
+		pNew->pNext = nullptr;
 		pNew->pFunctor = pFunctor;
 	}
 
