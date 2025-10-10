@@ -4123,11 +4123,12 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 	// NOTE! NOTE! NOTE! or by the streaming texture code!
 	Assert( ppOutVtfTexture != NULL && *ppOutVtfTexture != NULL );
 
-	if ( V_strstr( pName, "c_rocketlauncher/c_rocketlauncher" ) )
-	{
-		int i = 0;
-		i = 3;
-	}
+	// dimhotepus: Drop debug code.
+	//if ( V_strstr( pName, "c_rocketlauncher/c_rocketlauncher" ) )
+	//{
+	//	int i = 0;
+	//	i = 3;
+	//}
 
 	CUtlBuffer buf;
 
