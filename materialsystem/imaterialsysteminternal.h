@@ -128,36 +128,118 @@ public:
 		m_pHead = m_pTail = nullptr;
 	}
 
-	#define DEFINE_MATCALLQUEUE_NONMEMBER_QUEUE_CALL(N) \
-		template <typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-		void QueueCall(FUNCTION_RETTYPE (*pfnProxied)( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-			QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N ) ); \
-		}
+	template <typename RetType, typename... FuncArgs, typename... Args>
+	auto QueueCall( RetType( *pfnProxied )( FuncArgs... ), Args&&... args ) ->
+		std::enable_if_t<
+			std::is_invocable_r_v<
+				RetType,
+				decltype(pfnProxied),
+				Args...
+			>
+		>
+	{
+		QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pfnProxied, std::forward<Args>( args )... ) );
+	}
 
-		//-------------------------------------
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	auto QueueCall(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ),
+		Args&&... args
+	) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				FUNCTION_CLASS&,
+				Args...
+			>
+		>
+	{
+		QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pObject, pfnProxied, std::forward<Args>( args )... ) );
+	}
 
-	#define DEFINE_MATCALLQUEUE_MEMBER_QUEUE_CALL(N) \
-		template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-		void QueueCall(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-			QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N ) ); \
-		}
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	auto QueueCall(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ) const,
+		Args&&... args
+	) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				const FUNCTION_CLASS&,
+				Args...
+			>
+		>
+	{
+		QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pObject, pfnProxied, std::forward<Args>( args )... ) );
+	}
 
-		//-------------------------------------
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	auto QueueCall(
+		CLateBoundPtr<OBJECT_TYPE_PTR> pObject,
+		FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ),
+		Args&&... args
+	) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				FUNCTION_CLASS&,
+				Args...
+			>
+		>
+	{
+		QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pObject, pfnProxied, std::forward<Args>( args )... ) );
+	}
 
-	#define DEFINE_MATCALLQUEUE_CONST_MEMBER_QUEUE_CALL(N) \
-		template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-		void QueueCall(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) const FUNC_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-			QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N ) ); \
-		}
-
-		//-------------------------------------
-
-	FUNC_GENERATE_ALL( DEFINE_MATCALLQUEUE_NONMEMBER_QUEUE_CALL );
-	FUNC_GENERATE_ALL( DEFINE_MATCALLQUEUE_MEMBER_QUEUE_CALL );
-	FUNC_GENERATE_ALL( DEFINE_MATCALLQUEUE_CONST_MEMBER_QUEUE_CALL );
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	auto QueueCall(
+		CLateBoundPtr<OBJECT_TYPE_PTR> pObject,
+		FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ) const,
+		Args&&... args
+	) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				const FUNCTION_CLASS&,
+				Args...
+			>
+		>
+	{
+		QueueFunctorInternal( m_FunctorFactory.CreateFunctor( pObject, pfnProxied, std::forward<Args>( args )... ) );
+	}
 
 private:
 	void QueueFunctorInternal( CFunctor *pFunctor )

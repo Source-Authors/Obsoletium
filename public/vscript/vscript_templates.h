@@ -12,53 +12,52 @@
 #include "tier0/basetypes.h"
 #include "tier1/functors.h"
 
-#define	FUNC_APPEND_PARAMS_0	
-#define	FUNC_APPEND_PARAMS_1	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 1 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) );
-#define	FUNC_APPEND_PARAMS_2	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 2 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) );
-#define	FUNC_APPEND_PARAMS_3	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 3 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );
-#define	FUNC_APPEND_PARAMS_4	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 4 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) );
-#define	FUNC_APPEND_PARAMS_5	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 5 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) );
-#define	FUNC_APPEND_PARAMS_6	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 6 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_6 ) );
-#define	FUNC_APPEND_PARAMS_7	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 7 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_6 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_7 ) );
-#define	FUNC_APPEND_PARAMS_8	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 8 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_6 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_7 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_8 ) );
-#define	FUNC_APPEND_PARAMS_9	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 9 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_6 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_7 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_8 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_9 ) );
-#define	FUNC_APPEND_PARAMS_10	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 10 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_6 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_7 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_8 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_9 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_10 ) );
-#define	FUNC_APPEND_PARAMS_11	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 11 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_6 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_7 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_8 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_9 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_10 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_11 ) );
-#define	FUNC_APPEND_PARAMS_12	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 12 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_6 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_7 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_8 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_9 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_10 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_11 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_12 ) );
-#define	FUNC_APPEND_PARAMS_13	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 13 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_6 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_7 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_8 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_9 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_10 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_11 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_12 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_13 ) );
-#define	FUNC_APPEND_PARAMS_14	pDesc->m_Parameters.SetGrowSize( 1 ); pDesc->m_Parameters.EnsureCapacity( 14 ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_1 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_2 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_3 ) );	pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_4 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_5 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_6 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_7 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_8 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_9 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_10 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_11 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_12 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_13 ) ); pDesc->m_Parameters.AddToTail( ScriptDeduceType( FUNC_ARG_TYPE_14 ) );
+template <typename FUNCTION_RETTYPE, typename... FuncArgs>
+void ScriptDeduceFunctionSignature( ScriptFuncDescriptor_t *pDesc, FUNCTION_RETTYPE( *pfnProxied )( FuncArgs... ) )
+{
+	pDesc->m_ReturnType = ScriptDeduceType(FUNCTION_RETTYPE);
 
-#define DEFINE_NONMEMBER_FUNC_TYPE_DEDUCER(N) \
-	template <typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N> \
-	inline void ScriptDeduceFunctionSignature(ScriptFuncDescriptor_t *pDesc, FUNCTION_RETTYPE (*pfnProxied)( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) ) \
-	{ \
-		pDesc->m_ReturnType = ScriptDeduceType(FUNCTION_RETTYPE); \
-		FUNC_APPEND_PARAMS_##N \
-	}
+	pDesc->m_Parameters.SetGrowSize( 1 );
+	pDesc->m_Parameters.EnsureCapacity( static_cast<intp>( sizeof...(FuncArgs) ) );
 
-FUNC_GENERATE_ALL( DEFINE_NONMEMBER_FUNC_TYPE_DEDUCER );
+	(pDesc->m_Parameters.AddToTail( VariantDeducer_t<FuncArgs>::FIELD_TYPE ), ...);
+}
 
-#define DEFINE_MEMBER_FUNC_TYPE_DEDUCER(N) \
-	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N> \
-	inline void ScriptDeduceFunctionSignature(ScriptFuncDescriptor_t *pDesc, OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) ) \
-	{ \
-		pDesc->m_ReturnType = ScriptDeduceType(FUNCTION_RETTYPE); \
-		FUNC_APPEND_PARAMS_##N \
-	}
+template <
+	typename OBJECT_TYPE_PTR,
+	typename FUNCTION_CLASS,
+	typename FUNCTION_RETTYPE,
+	typename... FuncArgs>
+auto ScriptDeduceFunctionSignature(
+	ScriptFuncDescriptor_t *pDesc,
+	OBJECT_TYPE_PTR* pObject,
+	FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ) )
+{
+	pDesc->m_ReturnType = ScriptDeduceType(FUNCTION_RETTYPE);
 
-FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNC_TYPE_DEDUCER );
+	pDesc->m_Parameters.SetGrowSize( 1 );
+	pDesc->m_Parameters.EnsureCapacity( static_cast<intp>( sizeof...(FuncArgs) ) );
+	
+	(pDesc->m_Parameters.AddToTail( VariantDeducer_t<FuncArgs>::FIELD_TYPE ), ...);
+}
 
-//-------------------------------------
+template <
+	typename OBJECT_TYPE_PTR,
+	typename FUNCTION_CLASS,
+	typename FUNCTION_RETTYPE,
+	typename... FuncArgs>
+auto ScriptDeduceFunctionSignature(
+	ScriptFuncDescriptor_t *pDesc,
+	OBJECT_TYPE_PTR* pObject,
+	FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ) const )
+{
+	pDesc->m_ReturnType = ScriptDeduceType(FUNCTION_RETTYPE);
 
-#define DEFINE_CONST_MEMBER_FUNC_TYPE_DEDUCER(N) \
-	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N> \
-	inline void ScriptDeduceFunctionSignature(ScriptFuncDescriptor_t *pDesc, OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) const ) \
-	{ \
-		pDesc->m_ReturnType = ScriptDeduceType(FUNCTION_RETTYPE); \
-		FUNC_APPEND_PARAMS_##N \
-	}
-
-FUNC_GENERATE_ALL( DEFINE_CONST_MEMBER_FUNC_TYPE_DEDUCER );
+	pDesc->m_Parameters.SetGrowSize( 1 );
+	pDesc->m_Parameters.EnsureCapacity( static_cast<intp>( sizeof...(FuncArgs) ) );
+	
+	(pDesc->m_Parameters.AddToTail( VariantDeducer_t<FuncArgs>::FIELD_TYPE ), ...);
+}
 
 #define ScriptInitMemberFuncDescriptor_( pDesc, class, func, scriptName )	if ( 0 ) {} else { (pDesc)->m_pszScriptName = scriptName; (pDesc)->m_pszFunction = #func; ScriptDeduceFunctionSignature( pDesc, (class *)(0), &class::func ); }
 
@@ -75,7 +74,7 @@ template <typename FUNCPTR_TYPE>
 inline ScriptFunctionBindingStorageType_t ScriptConvertFreeFuncPtrToVoid( FUNCPTR_TYPE pFunc )
 {
 	ScriptFunctionBindingStorageType_t type = { };
-	COMPILE_TIME_ASSERT( sizeof( type ) >= sizeof( pFunc ) );
+	static_assert( sizeof( type ) >= sizeof( pFunc ) );
 
 	memcpy( &type, &pFunc, sizeof( pFunc ) );
 	return type;
@@ -85,7 +84,7 @@ template <typename FUNCPTR_TYPE>
 inline FUNCPTR_TYPE ScriptConvertFreeFuncPtrFromVoid( ScriptFunctionBindingStorageType_t p )
 {
 	FUNCPTR_TYPE func = { };
-	COMPILE_TIME_ASSERT( sizeof( func ) <= sizeof( p ) );
+	static_assert( sizeof( func ) <= sizeof( p ) );
 
 	memcpy( &func, &p, sizeof( func ) );
 	return func;

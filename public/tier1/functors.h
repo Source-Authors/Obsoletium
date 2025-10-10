@@ -38,6 +38,7 @@
 #include "tier0/platform.h"
 #include "refcount.h"
 #include "utlenvelope.h"
+#include "utlcommon.h"
 
 //-----------------------------------------------------------------------------
 //
@@ -290,7 +291,7 @@ public:
 
 // convert a reference to a passable value
 template <typename T>
-inline T RefToVal(const T &item)
+[[nodiscard]] constexpr inline T RefToVal( const T& item )
 {
    return item;
 }
@@ -316,6 +317,15 @@ public:
 	[[nodiscard]] operator T *() const { return *m_ppObject;	}
 	[[nodiscard]] operator void *() { return *m_ppObject;	}
 
+	[[nodiscard]] bool operator ==(std::nullptr_t) const
+	{
+		return *m_ppObject == nullptr;
+	}
+	[[nodiscard]] bool operator !=(std::nullptr_t) const
+	{
+		return !(*this == nullptr);
+	}
+
 private:
 	T **m_ppObject;
 };
@@ -334,73 +344,13 @@ public:
 	static void OnRelease(void *)	{}
 };
 
-template <class OBJECT_TYPE_PTR = IRefCounted *>
+template <typename OBJECT_TYPE_PTR = IRefCounted*>
 class CFuncMemPolicyRefCount
 {
 public:
-	static void OnAcquire(OBJECT_TYPE_PTR pObject)	{ pObject->AddRef(); }
-	static void OnRelease(OBJECT_TYPE_PTR pObject)	{ pObject->Release(); }
+	static void OnAcquire( OBJECT_TYPE_PTR pObject ) { pObject->AddRef(); }
+	static void OnRelease( OBJECT_TYPE_PTR pObject ) { pObject->Release(); }
 };
-
-//-----------------------------------------------------------------------------
-//
-// Purpose: Function proxy is a generic facility for holding a function
-//			pointer. Can be used on own, though primarily for use
-//			by this file
-//
-//-----------------------------------------------------------------------------
-
-template <class OBJECT_TYPE_PTR, typename FUNCTION_TYPE, class MEM_POLICY = CFuncMemPolicyNone >
-class CMemberFuncProxyBase
-{
-protected:
-	CMemberFuncProxyBase( OBJECT_TYPE_PTR pObject, FUNCTION_TYPE pfnProxied )
-	  : m_pfnProxied( pfnProxied ),
-		m_pObject( pObject )
-	{
-		MEM_POLICY::OnAcquire(m_pObject);
-	}
-
-	~CMemberFuncProxyBase()
-	{
-		MEM_POLICY::OnRelease(m_pObject);
-	}
-	
-	void Set( OBJECT_TYPE_PTR pObject, FUNCTION_TYPE pfnProxied )
-	{
-		m_pfnProxied = pfnProxied;
-		m_pObject = pObject;
-	}
-
-	void OnCall()
-	{
-		Assert( static_cast<void *>(m_pObject) != nullptr );
-	}
-
-	FUNCTION_TYPE m_pfnProxied;
-	OBJECT_TYPE_PTR m_pObject;
-};
-
-
-#define DEFINE_MEMBER_FUNC_PROXY( N ) \
-	template <class OBJECT_TYPE_PTR, typename FUNCTION_TYPE FUNC_TEMPLATE_ARG_PARAMS_##N, class MEM_POLICY = CFuncMemPolicyNone> \
-	class CMemberFuncProxy##N : public CMemberFuncProxyBase<OBJECT_TYPE_PTR, FUNCTION_TYPE, MEM_POLICY> \
-	{ \
-	public: \
-		CMemberFuncProxy##N( OBJECT_TYPE_PTR pObject = NULL, FUNCTION_TYPE pfnProxied = NULL ) \
-		: CMemberFuncProxyBase<OBJECT_TYPE_PTR, FUNCTION_TYPE, MEM_POLICY >( pObject, pfnProxied ) \
-		{ \
-		} \
-	\
-		void operator()( FUNC_PROXY_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-			this->OnCall(); \
-			((*this->m_pObject).*this->m_pfnProxied)( FUNC_CALL_ARGS_##N ); \
-		} \
-	}
-
-FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNC_PROXY );
-
 
 //-----------------------------------------------------------------------------
 //
@@ -409,39 +359,88 @@ FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNC_PROXY );
 //-----------------------------------------------------------------------------
 
 #include "tier0/memdbgon.h"
+#include <tuple>
 
 using CFunctorBase = CRefCounted1<CFunctor, CRefCountServiceMT>;
 
-#define DEFINE_FUNCTOR_TEMPLATE(N) \
-	template <typename FUNC_TYPE FUNC_TEMPLATE_ARG_PARAMS_##N, class FUNCTOR_BASE = CFunctorBase> \
-	class CFunctor##N : public CFunctorBase \
-	{ \
-	public: \
-		CFunctor##N( FUNC_TYPE pfnProxied FUNC_ARG_FORMAL_PARAMS_##N ) : m_pfnProxied( pfnProxied ) FUNC_CALL_ARGS_INIT_##N {} \
-		void operator()() { m_pfnProxied(FUNC_CALL_MEMBER_ARGS_##N); } \
-	\
-	private: \
-		FUNC_TYPE m_pfnProxied; \
-		FUNC_ARG_MEMBERS_##N; \
+template <typename FUNC_TYPE, typename FUNCTOR_BASE = CFunctorBase, typename... Args>
+class CFunctorI : public FUNCTOR_BASE
+{
+public:
+	CFunctorI( FUNC_TYPE pfnProxied, Args&&... args )
+		: m_pfnProxied( pfnProxied ), m_params( std::forward<Args>( args )... ) {}
+	~CFunctorI() = default;
+	void operator()() override { apply(); }
+
+private:
+	template<size_t... S>
+	FORCEINLINE void apply( std::index_sequence<S...> )
+	{
+		m_pfnProxied( std::get<S>( m_params )... );
 	}
 
-FUNC_GENERATE_ALL( DEFINE_FUNCTOR_TEMPLATE );
+	FORCEINLINE void apply()
+	{
+		apply( std::make_index_sequence<sizeof...( Args )>() );
+	}
+	
+	FUNC_TYPE m_pfnProxied;
+	std::tuple<std::decay_t<Args>...> m_params;
+};
 
-#define DEFINE_MEMBER_FUNCTOR( N ) \
-	template <class OBJECT_TYPE_PTR, typename FUNCTION_TYPE FUNC_TEMPLATE_ARG_PARAMS_##N, class FUNCTOR_BASE = CFunctorBase, class MEM_POLICY = CFuncMemPolicyNone> \
-	class CMemberFunctor##N : public FUNCTOR_BASE \
-	{ \
-	public: \
-		CMemberFunctor##N( OBJECT_TYPE_PTR pObject, FUNCTION_TYPE pfnProxied FUNC_ARG_FORMAL_PARAMS_##N ) : m_Proxy( pObject, pfnProxied ) FUNC_CALL_ARGS_INIT_##N {} \
-		void operator()() { m_Proxy(FUNC_CALL_MEMBER_ARGS_##N); } \
-		\
-	private: \
-		CMemberFuncProxy##N<OBJECT_TYPE_PTR, FUNCTION_TYPE FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, MEM_POLICY> m_Proxy; \
-		FUNC_ARG_MEMBERS_##N; \
+template <
+	typename OBJECT_TYPE_PTR,
+	typename FUNCTION_TYPE,
+	typename FUNCTOR_BASE = CFunctorBase,
+	typename MEM_POLICY = CFuncMemPolicyNone,
+	typename... Args>
+class CMemberFunctorI : public FUNCTOR_BASE
+{
+public:
+	CMemberFunctorI( OBJECT_TYPE_PTR pObject, FUNCTION_TYPE pfnProxied, Args&&... args )
+		: m_Proxy( pObject, pfnProxied ), m_params( std::forward<Args>( args )... ) {}
+	~CMemberFunctorI() = default;
+	void operator()() override { apply(); }
+
+private:
+	template<size_t... S>
+	FORCEINLINE void apply( std::index_sequence<S...> )
+	{
+		m_Proxy( std::get<S>( m_params )... );
+	}
+
+	FORCEINLINE void apply()
+	{
+		apply( std::make_index_sequence<sizeof...( Args )>() );
+	}
+
+	class CMemberFuncProxy
+	{
+	public:
+		CMemberFuncProxy( OBJECT_TYPE_PTR pObject, FUNCTION_TYPE pfnProxied )
+			: m_pfnProxied( pfnProxied ), m_pObject( pObject )
+		{
+			MEM_POLICY::OnAcquire( m_pObject );
+		}
+
+		~CMemberFuncProxy()
+		{
+			MEM_POLICY::OnRelease( m_pObject );
+		}
+
+		void operator()( const Args&... args )
+		{
+			Assert( m_pObject != nullptr );
+			( ( *m_pObject ).*m_pfnProxied )( args... );
+		}
+
+		FUNCTION_TYPE m_pfnProxied;
+		OBJECT_TYPE_PTR m_pObject;
 	};
 
-
-FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNCTOR );
+	CMemberFuncProxy m_Proxy;
+	std::tuple<std::decay_t<Args>...> m_params;
+};
 
 //-----------------------------------------------------------------------------
 //
@@ -449,59 +448,127 @@ FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNCTOR );
 //
 //-----------------------------------------------------------------------------
 
-#define DEFINE_NONMEMBER_FUNCTOR_FACTORY(N) \
-	template <typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-	inline CFunctor *CreateFunctor(FUNCTION_RETTYPE (*pfnProxied)( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-	{ \
-		typedef FUNCTION_RETTYPE (*Func_t)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N); \
-		return new CFunctor##N<Func_t FUNC_BASE_TEMPLATE_ARG_PARAMS_##N>( pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N ); \
-	}
-
-FUNC_GENERATE_ALL( DEFINE_NONMEMBER_FUNCTOR_FACTORY );
-
-//-------------------------------------
-
-#define DEFINE_MEMBER_FUNCTOR_FACTORY(N) \
-template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-inline CFunctor *CreateFunctor(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-{ \
-	return new CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) FUNC_BASE_TEMPLATE_ARG_PARAMS_##N>(pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N); \
+template <
+	typename FUNCTION_RETTYPE,
+	typename... FuncArgs,
+	typename... Args>
+inline auto CreateFunctor( FUNCTION_RETTYPE( *pfnProxied )( FuncArgs... ), Args&&... args )	->
+	std::enable_if_t<
+		std::is_invocable_r_v<
+			FUNCTION_RETTYPE,
+			decltype(pfnProxied),
+			Args...
+		>,
+		CFunctor*
+	>
+{
+	using Func_t = FUNCTION_RETTYPE( * )( FuncArgs... );
+	return new CFunctorI<Func_t, CFunctorBase, Args...>( pfnProxied, std::forward<Args>( args )... );
 }
 
-FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNCTOR_FACTORY );
+template <
+	typename OBJECT_TYPE_PTR,
+	typename FUNCTION_CLASS,
+	typename FUNCTION_RETTYPE,
+	typename... FuncArgs,
+	typename... Args>
+inline auto CreateFunctor(
+	OBJECT_TYPE_PTR pObject,
+	FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ),
+	Args&&... args ) ->
+	std::enable_if_t<
+		std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+		&&
+		std::is_invocable_r_v<
+			FUNCTION_RETTYPE,
+			decltype(pfnProxied),
+			FUNCTION_CLASS&,
+			Args...
+		>,
+		CFunctor*
+	>
+{
+	using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... );
+	return new CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CFunctorBase, CFuncMemPolicyNone, Args...>( pObject, pfnProxied, std::forward<Args>( args )... );
+}
 
-//-------------------------------------
+template <
+	typename OBJECT_TYPE_PTR,
+	typename FUNCTION_CLASS,
+	typename FUNCTION_RETTYPE,
+	typename... FuncArgs,
+	typename... Args>
+inline auto CreateFunctor(
+	OBJECT_TYPE_PTR pObject,
+	FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ) const,
+	Args&&... args ) ->
+	std::enable_if_t<
+		std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+		&&
+		std::is_invocable_r_v<
+			FUNCTION_RETTYPE,
+			decltype(pfnProxied),
+			const FUNCTION_CLASS&,
+			Args...
+		>,
+		CFunctor*
+	>
+{
+	using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... ) const;
+	return new CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CFunctorBase, CFuncMemPolicyNone, Args...>( pObject, pfnProxied, std::forward<Args>( args )... );
+}
 
-#define DEFINE_CONST_MEMBER_FUNCTOR_FACTORY(N) \
-	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-	inline CFunctor *CreateFunctor(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) const FUNC_ARG_FORMAL_PARAMS_##N ) \
-	{ \
-		return new CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) const FUNC_BASE_TEMPLATE_ARG_PARAMS_##N>(pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N); \
-	}
+template <
+	typename OBJECT_TYPE_PTR,
+	typename FUNCTION_CLASS,
+	typename FUNCTION_RETTYPE,
+	typename... FuncArgs,
+	typename... Args>
+inline auto CreateRefCountingFunctor(
+	OBJECT_TYPE_PTR pObject,
+	FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ),
+	Args&&... args ) ->
+	std::enable_if_t<
+		std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+		&&
+		std::is_invocable_r_v<
+			FUNCTION_RETTYPE,
+			decltype(pfnProxied),
+			FUNCTION_CLASS&,
+			Args...
+		>,
+		CFunctor*
+	>
+{
+	using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... );
+	return new CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR>, Args...>( pObject, pfnProxied, std::forward<Args>( args )... );
+}
 
-FUNC_GENERATE_ALL( DEFINE_CONST_MEMBER_FUNCTOR_FACTORY );
-
-//-------------------------------------
-
-#define DEFINE_REF_COUNTING_MEMBER_FUNCTOR_FACTORY(N) \
-	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-	inline CFunctor *CreateRefCountingFunctor(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-	{ \
-		return new CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR> >(pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N); \
-	}
-
-FUNC_GENERATE_ALL( DEFINE_REF_COUNTING_MEMBER_FUNCTOR_FACTORY );
-
-//-------------------------------------
-
-#define DEFINE_REF_COUNTING_CONST_MEMBER_FUNCTOR_FACTORY(N) \
-	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-	inline CFunctor *CreateRefCountingFunctor(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) const FUNC_ARG_FORMAL_PARAMS_##N ) \
-	{ \
-		return new CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) const FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR> >(pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N); \
-	}
-
-FUNC_GENERATE_ALL( DEFINE_REF_COUNTING_CONST_MEMBER_FUNCTOR_FACTORY );
+template <
+	typename OBJECT_TYPE_PTR,
+	typename FUNCTION_CLASS,
+	typename FUNCTION_RETTYPE,
+	typename... FuncArgs,
+	typename... Args>
+inline auto CreateRefCountingFunctor(
+	OBJECT_TYPE_PTR pObject,
+	FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ) const,
+	Args&&... args ) ->
+	std::enable_if_t<
+		std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+		&&
+		std::is_invocable_r_v<
+			FUNCTION_RETTYPE,
+			decltype(pfnProxied),
+			const FUNCTION_CLASS&,
+			Args...
+		>,
+		CFunctor*
+	>
+{
+	using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... ) const;
+	return new CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR>, Args...>( pObject, pfnProxied, std::forward<Args>( args )... );
+}
 
 //-----------------------------------------------------------------------------
 //
@@ -509,37 +576,67 @@ FUNC_GENERATE_ALL( DEFINE_REF_COUNTING_CONST_MEMBER_FUNCTOR_FACTORY );
 //
 //-----------------------------------------------------------------------------
 
-#define DEFINE_NONMEMBER_FUNCTOR_DIRECT(N) \
-	template <typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-	inline void FunctorDirectCall(FUNCTION_RETTYPE (*pfnProxied)( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-{ \
-	(*pfnProxied)( FUNC_CALL_ARGS_##N ); \
+template <typename FUNCTION_RETTYPE, typename... FuncArgs, typename... Args>
+inline auto FunctorDirectCall( FUNCTION_RETTYPE( *pfnProxied )( FuncArgs... ), Args&&... args ) ->
+	std::enable_if_t<
+		std::is_invocable_r_v<
+			FUNCTION_RETTYPE,
+			decltype(pfnProxied),
+			Args...
+		>,
+		CFunctor*
+	>
+{
+	( *pfnProxied )( std::forward<Args>( args )... );
 }
 
-FUNC_GENERATE_ALL( DEFINE_NONMEMBER_FUNCTOR_DIRECT );
-
-
-//-------------------------------------
-
-#define DEFINE_MEMBER_FUNCTOR_DIRECT(N) \
-	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-	inline void FunctorDirectCall(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-{ \
-	((*pObject).*pfnProxied)(FUNC_CALL_ARGS_##N); \
+template <
+	typename OBJECT_TYPE_PTR,
+	typename FUNCTION_CLASS,
+	typename FUNCTION_RETTYPE,
+	typename... FuncArgs,
+	typename... Args>
+inline auto FunctorDirectCall(
+	OBJECT_TYPE_PTR pObject,
+	FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ),
+	Args&&... args ) ->
+	std::enable_if_t<
+		std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+		&&
+		std::is_invocable_r_v<
+			FUNCTION_RETTYPE,
+			decltype(pfnProxied),
+			FUNCTION_CLASS&,
+			Args...
+		>
+	>
+{
+	( ( *pObject ).*pfnProxied )( std::forward<Args>( args )... );
 }
 
-FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNCTOR_DIRECT );
-
-//-------------------------------------
-
-#define DEFINE_CONST_MEMBER_FUNCTOR_DIRECT(N) \
-	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-	inline void FunctorDirectCall(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) const FUNC_ARG_FORMAL_PARAMS_##N ) \
-{ \
-	((*pObject).*pfnProxied)(FUNC_CALL_ARGS_##N); \
+template <
+	typename OBJECT_TYPE_PTR,
+	typename FUNCTION_CLASS,
+	typename FUNCTION_RETTYPE,
+	typename... FuncArgs,
+	typename... Args>
+inline auto FunctorDirectCall(
+	OBJECT_TYPE_PTR pObject,
+	FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ) const,
+	Args&&... args ) ->
+	std::enable_if_t<
+		std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+		&&
+		std::is_invocable_r_v<
+			FUNCTION_RETTYPE,
+			decltype(pfnProxied),
+			const FUNCTION_CLASS&,
+			Args...
+		>
+	>
+{
+	( ( *pObject ).*pfnProxied )( std::forward<Args>( args )... );
 }
-
-FUNC_GENERATE_ALL( DEFINE_CONST_MEMBER_FUNCTOR_DIRECT );
 
 #include "tier0/memdbgoff.h"
 
@@ -550,14 +647,127 @@ FUNC_GENERATE_ALL( DEFINE_CONST_MEMBER_FUNCTOR_DIRECT );
 class CDefaultFunctorFactory
 {
 public:
-	FUNC_GENERATE_ALL( DEFINE_NONMEMBER_FUNCTOR_FACTORY );
-	FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNCTOR_FACTORY );
-	FUNC_GENERATE_ALL( DEFINE_CONST_MEMBER_FUNCTOR_FACTORY );
-	FUNC_GENERATE_ALL( DEFINE_REF_COUNTING_MEMBER_FUNCTOR_FACTORY );
-	FUNC_GENERATE_ALL( DEFINE_REF_COUNTING_CONST_MEMBER_FUNCTOR_FACTORY );
+	template <typename FUNCTION_RETTYPE, typename... FuncArgs, typename... Args>
+	inline auto CreateFunctor( FUNCTION_RETTYPE( *pfnProxied )( FuncArgs... ), Args&&... args ) ->
+		std::enable_if_t<
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE(*)( FuncArgs... );
+		return new CFunctorI<Func_t, CFunctorBase, Args...>( pfnProxied, std::forward<Args>( args )... );
+	}
+
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateFunctor(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ),
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE(FUNCTION_CLASS::*)( FuncArgs... );
+		return new CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CFunctorBase, CFuncMemPolicyNone, Args...>( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
+
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateFunctor(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ) const,
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				const FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE(FUNCTION_CLASS::*)( FuncArgs... ) const;
+		return new CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CFunctorBase, CFuncMemPolicyNone, Args...>( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
+
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateRefCountingFunctor(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ),
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE(FUNCTION_CLASS::*)( FuncArgs... );
+		return new CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR>, Args...>( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
+
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateRefCountingFunctor(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE( FUNCTION_CLASS::* pfnProxied )( FuncArgs... ) const,
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				const FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE(FUNCTION_CLASS::*)( FuncArgs... ) const;
+		return new CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR>, Args...>( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
 };
 
-template <class CAllocator, class CCustomFunctorBase = CFunctorBase>
+template <typename CAllocator, typename CCustomFunctorBase = CFunctorBase>
 class CCustomizedFunctorFactory
 {
 public:
@@ -566,62 +776,248 @@ public:
 		m_pAllocator = pAllocator;
 	}
 	
-	#define DEFINE_NONMEMBER_FUNCTOR_FACTORY_CUSTOM(N) \
-		template <typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-		inline CFunctor *CreateFunctor( FUNCTION_RETTYPE (*pfnProxied)( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-			using Func_t = FUNCTION_RETTYPE (*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N); \
-			return new (m_pAllocator->Alloc( sizeof(CFunctor##N<Func_t FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase>) )) CFunctor##N<Func_t FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase>( pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N ); \
-		}
-
-	FUNC_GENERATE_ALL( DEFINE_NONMEMBER_FUNCTOR_FACTORY_CUSTOM );
-
-	//-------------------------------------
-
-	#define DEFINE_MEMBER_FUNCTOR_FACTORY_CUSTOM(N) \
-		template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-		inline CFunctor *CreateFunctor(OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-		return new (m_pAllocator->Alloc( sizeof(CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase>) )) CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase>(pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N); \
-		}
-
-	FUNC_GENERATE_ALL( DEFINE_MEMBER_FUNCTOR_FACTORY_CUSTOM );
+	template <typename FUNCTION_RETTYPE, typename... FuncArgs, typename... Args>
+	inline auto CreateFunctor( FUNCTION_RETTYPE (*pfnProxied)( FuncArgs... ), Args&&... args ) ->
+		std::enable_if_t<
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE( * )( FuncArgs... );
+		using Functor_t = CFunctorI<Func_t, CCustomFunctorBase, Args...>;
+		return new ( m_pAllocator->Alloc( sizeof( Functor_t ) ) ) Functor_t( pfnProxied, std::forward<Args>( args )... );
+	}
 
 	//-------------------------------------
 
-	#define DEFINE_CONST_MEMBER_FUNCTOR_FACTORY_CUSTOM(N) \
-		template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-		inline CFunctor *CreateFunctor( OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) const FUNC_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-			return new (m_pAllocator->Alloc( sizeof(CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) const FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase>) )) CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) const FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase>(pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N); \
-		}
-
-	FUNC_GENERATE_ALL( DEFINE_CONST_MEMBER_FUNCTOR_FACTORY_CUSTOM );
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateFunctor(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FuncArgs... ),
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... );
+		using Functor_t = CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CCustomFunctorBase, CFuncMemPolicyNone, Args...>;
+		return new ( m_pAllocator->Alloc( sizeof( Functor_t ) ) ) Functor_t( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
 
 	//-------------------------------------
 
-	#define DEFINE_REF_COUNTING_MEMBER_FUNCTOR_FACTORY_CUSTOM(N) \
-		template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-		inline CFunctor *CreateRefCountingFunctor( OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) FUNC_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-			return new (m_pAllocator->Alloc( sizeof(CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR> >) )) CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR> >(pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N); \
-		}
-
-	FUNC_GENERATE_ALL( DEFINE_REF_COUNTING_MEMBER_FUNCTOR_FACTORY_CUSTOM );
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateFunctor(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FuncArgs... ) const,
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				const FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... ) const;
+		using Functor_t = CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CCustomFunctorBase, CFuncMemPolicyNone, Args...>;
+		return new ( m_pAllocator->Alloc( sizeof( Functor_t ) ) ) Functor_t( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
 
 	//-------------------------------------
 
-	#define DEFINE_REF_COUNTING_CONST_MEMBER_FUNCTOR_FACTORY_CUSTOM(N) \
-		template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE FUNC_TEMPLATE_FUNC_PARAMS_##N FUNC_TEMPLATE_ARG_PARAMS_##N> \
-		inline CFunctor *CreateRefCountingFunctor( OBJECT_TYPE_PTR pObject, FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N ) const FUNC_ARG_FORMAL_PARAMS_##N ) \
-		{ \
-			return new (m_pAllocator->Alloc( sizeof(CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) const FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR> >) )) CMemberFunctor##N<OBJECT_TYPE_PTR, FUNCTION_RETTYPE (FUNCTION_CLASS::*)(FUNC_BASE_TEMPLATE_FUNC_PARAMS_##N) const FUNC_BASE_TEMPLATE_ARG_PARAMS_##N, CCustomFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR> >(pObject, pfnProxied FUNC_FUNCTOR_CALL_ARGS_##N); \
-		}
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateFunctor(
+		CLateBoundPtr<OBJECT_TYPE_PTR> pObject,
+		FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FuncArgs... ),
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... );
+		using Functor_t = CMemberFunctorI<CLateBoundPtr<OBJECT_TYPE_PTR>, Func_t, CCustomFunctorBase, CFuncMemPolicyNone, Args...>;
+		return new ( m_pAllocator->Alloc( sizeof( Functor_t ) ) ) Functor_t( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
 
-	FUNC_GENERATE_ALL( DEFINE_REF_COUNTING_CONST_MEMBER_FUNCTOR_FACTORY_CUSTOM );
+	//-------------------------------------
+
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateFunctor(
+		CLateBoundPtr<OBJECT_TYPE_PTR> pObject,
+		FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FuncArgs... ) const,
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				const FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... ) const;
+		using Functor_t = CMemberFunctorI<CLateBoundPtr<OBJECT_TYPE_PTR>, Func_t, CCustomFunctorBase, CFuncMemPolicyNone, Args...>;
+		return new ( m_pAllocator->Alloc( sizeof( Functor_t ) ) ) Functor_t( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
+
+	//-------------------------------------
+
+	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE, typename... FuncArgs, typename... Args>
+	inline auto CreateRefCountingFunctor(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FuncArgs... ),
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... );
+		using Functor_t = CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CCustomFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR>, Args...>;
+		return new ( m_pAllocator->Alloc( sizeof( Functor_t ) ) ) Functor_t( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
+
+	//-------------------------------------
+
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateRefCountingFunctor(
+		OBJECT_TYPE_PTR pObject,
+		FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FuncArgs... ) const,
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				const FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... ) const;
+		using Functor_t = CMemberFunctorI<OBJECT_TYPE_PTR, Func_t, CCustomFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR>, Args...>;
+		return new ( m_pAllocator->Alloc( sizeof( Functor_t ) ) ) Functor_t( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
+
+	//-------------------------------------
+
+	template <typename OBJECT_TYPE_PTR, typename FUNCTION_CLASS, typename FUNCTION_RETTYPE, typename... FuncArgs, typename... Args>
+	inline auto CreateRefCountingFunctor(
+		CLateBoundPtr<OBJECT_TYPE_PTR> pObject,
+		FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FuncArgs... ),
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... );
+		using Functor_t = CMemberFunctorI<CLateBoundPtr<OBJECT_TYPE_PTR>, Func_t, CCustomFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR>, Args...>;
+		return new ( m_pAllocator->Alloc( sizeof( Functor_t ) ) ) Functor_t( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
+
+	//-------------------------------------
+
+	template <
+		typename OBJECT_TYPE_PTR,
+		typename FUNCTION_CLASS,
+		typename FUNCTION_RETTYPE,
+		typename... FuncArgs,
+		typename... Args>
+	inline auto CreateRefCountingFunctor(
+		CLateBoundPtr<OBJECT_TYPE_PTR> pObject,
+		FUNCTION_RETTYPE ( FUNCTION_CLASS::*pfnProxied )( FuncArgs... ) const,
+		Args&&... args ) ->
+		std::enable_if_t<
+			std::is_base_of_v<FUNCTION_CLASS, std::remove_pointer_t<OBJECT_TYPE_PTR>>
+			&&
+			std::is_invocable_r_v<
+				FUNCTION_RETTYPE,
+				decltype(pfnProxied),
+				const FUNCTION_CLASS&,
+				Args...
+			>,
+			CFunctor*
+		>
+	{
+		using Func_t = FUNCTION_RETTYPE( FUNCTION_CLASS::* )( FuncArgs... ) const;
+		using Functor_t = CMemberFunctorI<CLateBoundPtr<OBJECT_TYPE_PTR>, Func_t, CCustomFunctorBase, CFuncMemPolicyRefCount<OBJECT_TYPE_PTR>, Args...>;
+		return new ( m_pAllocator->Alloc( sizeof( Functor_t ) ) ) Functor_t( pObject, pfnProxied, std::forward<Args>( args )... );
+	}
+
+	//-------------------------------------
 
 private:
-	CAllocator *m_pAllocator;
+	CAllocator* m_pAllocator;
 	
 };
 

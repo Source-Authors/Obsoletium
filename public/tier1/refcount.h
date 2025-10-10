@@ -93,8 +93,11 @@ private:
 
 // Do a an inline AddRef then return the pointer, useful when returning an
 // object from a function.
-#define RetAddRef( p ) ( (p)->AddRef(), (p) )
-#define InlineAddRef( p ) ( (p)->AddRef(), (p) )
+template<typename T>
+inline T* RetAddRef( T *p ) { p->AddRef(); return p; }
+
+template<typename T>
+inline T* InlineAddRef( T *p ) { p->AddRef(); return p; }
 
 
 // A class to both hold a pointer to an object and its reference.  Base exists
