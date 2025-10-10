@@ -5379,7 +5379,7 @@ MaterialFogMode_t CShaderAPIDx8::GetPixelFogMode()
 
 int CShaderAPIDx8::GetPixelFogCombo( void )
 {
-	if( (m_SceneFogMode != MATERIAL_FOG_NONE) && ShouldUsePixelFogForMode( m_SceneFogMode ) )
+	if( ShouldUsePixelFogForMode( m_SceneFogMode ) )
 		return m_SceneFogMode - 1; //PIXELFOGTYPE dynamic combos are shifted down one. MATERIAL_FOG_NONE is simulated by range fog with rigged parameters. Gets rid of a dynamic combo across the ps2x set
 	else	
 		return MATERIAL_FOG_NONE;
@@ -5388,7 +5388,7 @@ int CShaderAPIDx8::GetPixelFogCombo( void )
 int CShaderAPIDx8::GetPixelFogCombo1( bool bSupportsRadial )
 {
 	// dimhotepus: TF2 backport. Support radial fog.
-	if( ( ShouldUsePixelFogForMode( m_SceneFogMode ) && bSupportsRadial ) )
+	if( ShouldUsePixelFogForMode( m_SceneFogMode ) && bSupportsRadial )
 		return MATERIAL_FOG_LINEAR_BELOW_FOG_Z;  // MATERIAL_FOG_LINEAR_BELOW_FOG_Z is for PIXEL_FOG_TYPE_RANGE_RADIAL
 	else	
 		// Fallback to previous fog.
