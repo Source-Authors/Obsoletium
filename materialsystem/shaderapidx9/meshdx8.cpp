@@ -3355,14 +3355,14 @@ void CMeshDX8::CheckIndices( CPrimList *pPrim, int numPrimitives )
 
 		for (int j = pPrim->m_FirstIndex; j < upperPrimIndexBound; j++)
 		{
-			const unsigned index = g_pLastIndex->GetShadowIndex( j );
+			const unsigned short index{g_pLastIndex->GetShadowIndex( j )};
 
-			if (index >= s_FirstVertex && index < upperShadowIndexBound)
+			if (index >= s_FirstVertex && static_cast<int>(index) < upperShadowIndexBound)
 			{
 				continue;
 			}
 
-			Warning("%s invalid index: %u [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, upperShadowIndexBound - 1);
+			Warning("%s invalid index: %hu [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, upperShadowIndexBound - 1);
 
 			Assert( false );
 		}
