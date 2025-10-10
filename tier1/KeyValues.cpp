@@ -842,7 +842,7 @@ void KeyValues::WriteConvertedString( IBaseFileSystem *filesystem, FileHandle_t 
 	// handle double quote chars within the string
 	// the worst possible case is that the whole string is quotes
 	intp len = Q_strlen(pszString);
-	char *convertedString = (char *) _alloca ((len + 1)  * sizeof(char) * 2);
+	char *convertedString = stackallocT( char, (len + 1) * 2);
 	intp j=0;
 	for (intp i=0; i <= len; i++)
 	{
@@ -1558,7 +1558,7 @@ const wchar_t *KeyValues::GetWString( const char *keyName, const wchar_t *defaul
 		{
 			intp bufSize = Q_strlen(dat->m_sValue) + 1;
 			// dimhotepus: Speedup by using stack alloc. String is copied in SetWString.
-			auto *pWBuf = static_cast<wchar_t*>( _alloca( sizeof(wchar_t) * bufSize ));
+			auto *pWBuf = stackallocT( wchar_t, bufSize );
 			intp result = Q_UTF8ToUnicode(dat->m_sValue, pWBuf, bufSize * sizeof( wchar_t ) );
 			if ( result >= 0 ) // may be a zero length string
 			{
@@ -2151,7 +2151,7 @@ void KeyValues::ParseIncludedKeys( char const *resourceName, const char *filetoi
 
 	// Get relative subdirectory
 	char fullpath[ 512 ];
-	Q_strncpy( fullpath, resourceName, sizeof( fullpath ) );
+	V_strcpy_safe( fullpath, resourceName );
 
 	// Strip off characters back to start or first /
 	intp len = Q_strlen( fullpath );
@@ -2174,7 +2174,7 @@ void KeyValues::ParseIncludedKeys( char const *resourceName, const char *filetoi
 	}
 
 	// Append included file
-	Q_strncat( fullpath, filetoinclude, sizeof( fullpath ), COPY_ALL_CHARACTERS );
+	V_strcat_safe( fullpath, filetoinclude );
 
 	auto *newKV = new KeyValues( fullpath );
 
@@ -2203,8 +2203,7 @@ void KeyValues::ParseIncludedKeys( char const *resourceName, const char *filetoi
 void KeyValues::MergeBaseKeys( CUtlVector< KeyValues * >& baseKeys )
 {
 	intp includeCount = baseKeys.Count();
-	intp i;
-	for ( i = 0; i < includeCount; i++ )
+	for ( intp i = 0; i < includeCount; i++ )
 	{
 		KeyValues *kv = baseKeys[ i ];
 		Assert( kv );
@@ -2316,7 +2315,7 @@ bool EvaluateConditional( const char *str )
 		return IsPosix() ^ bNot;
 
 	// dimhotepus: Basic SteamDeck support.
-	if ( Q_stristr(str, "$DECK" ) )
+	if ( Q_stristr( str, "$DECK" ) )
 		return IsSteamDeck() ^ bNot;
 	
 	return false;
@@ -2334,7 +2333,7 @@ bool KeyValues::LoadFromBuffer( char const *resourceName, CUtlBuffer &buf, IBase
 	CUtlVector< KeyValues * > baseKeys;
 	bool wasQuoted;
 	bool wasConditional;
-	g_KeyValuesErrorStack.SetFilename( resourceName );	
+	g_KeyValuesErrorStack.SetFilename( resourceName );
 	do 
 	{
 		bool bAccepted = true;
@@ -2434,8 +2433,7 @@ bool KeyValues::LoadFromBuffer( char const *resourceName, CUtlBuffer &buf, IBase
 	AppendIncludedKeys( includedKeys );
 	{
 		// delete included keys!
-		intp i;
-		for ( i = includedKeys.Count() - 1; i > 0; i-- )
+		for ( intp i = includedKeys.Count() - 1; i > 0; i-- )
 		{
 			KeyValues *kv = includedKeys[ i ];
 			kv->deleteThis();
@@ -2445,15 +2443,14 @@ bool KeyValues::LoadFromBuffer( char const *resourceName, CUtlBuffer &buf, IBase
 	MergeBaseKeys( baseKeys );
 	{
 		// delete base keys!
-		intp i;
-		for ( i = baseKeys.Count() - 1; i >= 0; i-- )
+		for ( intp i = baseKeys.Count() - 1; i >= 0; i-- )
 		{
 			KeyValues *kv = baseKeys[ i ];
 			kv->deleteThis();
 		}
 	}
 
-	g_KeyValuesErrorStack.SetFilename( "" );	
+	g_KeyValuesErrorStack.SetFilename( "" );
 
 	return true;
 }
@@ -2817,7 +2814,7 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 		{
 			char token[KEYVALUES_TOKEN_SIZE];
 			buffer.GetString( token );
-			token[KEYVALUES_TOKEN_SIZE-1] = 0;
+			token[KEYVALUES_TOKEN_SIZE-1] = '\0';
 			dat->SetName( token );
 		}
 
@@ -2839,7 +2836,7 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 				intp len = Q_strlen( token );
 				dat->m_sValue = new char[len + 1];
 				Q_memcpy( dat->m_sValue, token, len+1 );
-								
+
 				break;
 			}
 		case TYPE_WSTRING:
@@ -3082,7 +3079,7 @@ bool KeyValues::ProcessResolutionKeys( const char *pResString )
 		if ( Q_stristr( pSubKey->GetName(), pResString ) != nullptr )
 		{
 			char normalKeyName[128];
-			V_strncpy( normalKeyName, pSubKey->GetName(), sizeof( normalKeyName ) );
+			V_strcpy_safe( normalKeyName, pSubKey->GetName() );
 
 			// substring must match exactly, otherwise keys like "_lodef" and "_lodef_wide" would clash.
 			char *pString = Q_stristr( normalKeyName, pResString );
@@ -3218,7 +3215,7 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 	case KeyValues::TYPE_INT:
 		{
 			int n = val->GetInt();
-			char *chBuffer = ( char * ) stackalloc( 32 );
+			char *chBuffer = stackallocT( char, 32 );
 			V_snprintf( chBuffer, 32, "int( %d = 0x%X )", n, n );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
@@ -3228,7 +3225,7 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 	case KeyValues::TYPE_FLOAT:
 		{
 			float fl = val->GetFloat();
-			char *chBuffer = ( char * ) stackalloc( 32 );
+			char *chBuffer = stackallocT( char, 32 );
 			V_snprintf( chBuffer, 32, "float( %f )", fl );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
@@ -3238,7 +3235,7 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 	case KeyValues::TYPE_PTR:
 		{
 			void *ptr = val->GetPtr();
-			char *chBuffer = ( char * ) stackalloc( 32 );
+			char *chBuffer = stackallocT( char, 32 );
 			V_snprintf( chBuffer, 32, "ptr( 0x%p )", ptr );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
@@ -3250,7 +3247,7 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 			wchar_t const *wsz = val->GetWString();
 			intp nLen = V_wcslen( wsz );
 			intp numBytes = nLen*2 + 64;
-			char *chBuffer = ( char * ) stackalloc( numBytes );
+			char *chBuffer = stackallocT( char, numBytes );
 			V_snprintf( chBuffer, numBytes, "%ls [wstring, len = %zd]", wsz, nLen );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
@@ -3260,7 +3257,7 @@ bool IKeyValuesDumpContextAsText::KvWriteValue( KeyValues *val, int nIndentLevel
 	case KeyValues::TYPE_UINT64:
 		{
 			uint64 n = val->GetUint64();
-			char *chBuffer = ( char * ) stackalloc( 32 );
+			char *chBuffer = stackallocT( char, 32 );
 			V_snprintf( chBuffer, 32, "u64( %lld = 0x%llX )", n, n );
 			if ( !KvWriteText( chBuffer ) )
 				return false;
@@ -3300,9 +3297,9 @@ bool IKeyValuesDumpContextAsText::KvEndKey( KeyValues *pKey, int nIndentLevel )
 bool IKeyValuesDumpContextAsText::KvWriteIndent( int nIndentLevel )
 {
 	int numIndentBytes = ( nIndentLevel * 2 + 1 );
-	char *pchIndent = ( char * ) stackalloc( numIndentBytes );
+	char *pchIndent = stackallocT( char, numIndentBytes );
 	memset( pchIndent, ' ', numIndentBytes - 1 );
-	pchIndent[ numIndentBytes - 1 ] = 0;
+	pchIndent[ numIndentBytes - 1 ] = '\0';
 	return KvWriteText( pchIndent );
 }
 
