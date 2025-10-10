@@ -1630,7 +1630,7 @@ bool CVertexBufferDx8::Allocate( IDirect3DDevice9Ex *pD3D )
 	g_VBAllocTracker->CountVB( m_pVertexBuffer, m_bIsDynamic, m_nBufferSize, VertexSize(), GetVertexFormat() );
 
 #ifdef VPROF_ENABLED
-	if ( IsX360() || !m_bIsDynamic )
+	if ( !m_bIsDynamic )
 	{
 		Assert( m_pGlobalCounter );
 		*m_pGlobalCounter += m_nBufferSize;
@@ -1657,7 +1657,7 @@ void CVertexBufferDx8::Free()
 		g_VBAllocTracker->UnCountVB( m_pVertexBuffer );
 
 #ifdef VPROF_ENABLED
-		if ( IsX360() || !m_bIsDynamic )
+		if ( !m_bIsDynamic )
 		{
 			Assert( m_pGlobalCounter );
 			*m_pGlobalCounter -= m_nBufferSize;
@@ -2840,7 +2840,7 @@ void CMeshDX8::UseVertexBuffer( CVertexBuffer* pBuffer )
 //-----------------------------------------------------------------------------
 void CMeshDX8::SetPrimitiveType( MaterialPrimitiveType_t type )
 {
-	Assert( IsX360() || ( type != MATERIAL_INSTANCED_QUADS ) );
+	Assert( type != MATERIAL_INSTANCED_QUADS );
 	if ( !ShaderUtil()->OnSetPrimitiveType( this, type ) )
 	{
 		return;
@@ -3038,10 +3038,6 @@ bool CMeshDX8::IsValidVertexFormat( VertexFormat_t vertexFormat )
 void CMeshDX8::SetVertexIDStreamState()
 {
 	// FIXME: this method duplicates the code in CMeshMgr::SetVertexIDStreamState
-
-	if ( IsX360() )
-		return;
-
 	bool bUsingVertexID = IsUsingVertexID();
 	if ( bUsingVertexID != g_bUsingVertexID )
 	{
@@ -4006,8 +4002,7 @@ void CTempMeshDX8::UnlockMesh( int nVertexCount, int nIndexCount, MeshDesc_t& de
 //-----------------------------------------------------------------------------
 void CTempMeshDX8::SetPrimitiveType( MaterialPrimitiveType_t type )
 {
-	// FIXME: Support MATERIAL_INSTANCED_QUADS for CTempMeshDX8 (X360 only)
-	Assert( ( type != MATERIAL_INSTANCED_QUADS ) /* || IsX360() */ );
+	Assert( type != MATERIAL_INSTANCED_QUADS );
 	m_Type = type;
 }
 
@@ -4638,8 +4633,7 @@ void CBufferedMeshDX8::Draw( int nFirstIndex, int nIndexCount )
 
 void CBufferedMeshDX8::SetPrimitiveType( MaterialPrimitiveType_t type )
 {
-	Assert( IsX360() || ( type != MATERIAL_INSTANCED_QUADS ) );
-	Assert( type != MATERIAL_HETEROGENOUS );
+	Assert( type != MATERIAL_INSTANCED_QUADS && type != MATERIAL_HETEROGENOUS );
 
 	if (type != GetPrimitiveType())
 	{
@@ -4862,7 +4856,7 @@ void CMeshMgr::Init()
 
 	CreateZeroVertexBuffer();
 		
-	m_BufferedMode = !IsX360();
+	m_BufferedMode = true;
 }
 
 void CMeshMgr::Shutdown()
@@ -4906,9 +4900,6 @@ void CMeshMgr::CleanUp()
 //-----------------------------------------------------------------------------
 void CMeshMgr::FillVertexIDBuffer( CVertexBuffer *pVertexIDBuffer, int nCount )
 {
-	if ( IsX360() )
-		return;
-
 	// Fill the buffer with the values 0->(nCount-1)
 	int nBaseVertexIndex = 0;
 	float *pBuffer = (float*)pVertexIDBuffer->Lock( nCount, nBaseVertexIndex );	
@@ -5195,11 +5186,6 @@ IMesh* CMeshMgr::GetDynamicMesh( IMaterial* pMaterial, VertexFormat_t vertexForm
 	tmZoneFiltered( TELEMETRY_LEVEL0, 50, TMZF_NONE, "%s", __FUNCTION__ );
 
 	Assert( (pMaterial == NULL) || ((IMaterialInternal *)pMaterial)->IsRealTimeVersion() );
-
-	if ( IsX360() )
-	{
-		buffered = false;
-	}
 
 	// Can't be buffered if we're overriding the buffers
 	if ( pVertexOverride || pIndexOverride )
@@ -5578,11 +5564,6 @@ void CMeshMgr::DestroyIndexBuffer( IIndexBuffer *pIndexBuffer )
 // Do we need to specify the stream here in the case of locking multiple dynamic VBs on different streams?
 IVertexBuffer *CMeshMgr::GetDynamicVertexBuffer( int streamID, VertexFormat_t vertexFormat, bool bBuffered )
 {
-	if ( IsX360() )
-	{
-		bBuffered = false;
-	}
-
 	if ( CompressionType( vertexFormat ) != VERTEX_COMPRESSION_NONE )
 	{
 		// UNDONE: support compressed dynamic meshes if needed (pro: less VB memory, con: time spent compressing)
@@ -5640,11 +5621,6 @@ IVertexBuffer *CMeshMgr::GetDynamicVertexBuffer( int streamID, VertexFormat_t ve
 
 IIndexBuffer *CMeshMgr::GetDynamicIndexBuffer( MaterialIndexFormat_t fmt, bool bBuffered )
 {
-	if ( IsX360() )
-	{
-		bBuffered = false;
-	}
-
 	m_BufferedMode = bBuffered;
 
 	Assert( !m_BufferedMode );
