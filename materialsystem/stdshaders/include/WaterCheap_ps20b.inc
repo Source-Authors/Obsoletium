@@ -1,129 +1,204 @@
-// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
-// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
-// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
-// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
-// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
-
-#pragma once
 #include "shaderlib/cshader.h"
 class watercheap_ps20b_Static_Index
 {
-	unsigned int m_nCONVERT_TO_SRGB : 2;
-	unsigned int m_nMULTITEXTURE : 2;
-	unsigned int m_nFRESNEL : 2;
-	unsigned int m_nBLEND : 2;
-	unsigned int m_nREFRACTALPHA : 2;
-	unsigned int m_nHDRTYPE : 2;
-	unsigned int m_nNORMAL_DECODE_MODE : 1;
+private:
+	int m_nCONVERT_TO_SRGB;
 #ifdef _DEBUG
-	bool m_bMULTITEXTURE : 1;
-	bool m_bFRESNEL : 1;
-	bool m_bBLEND : 1;
-	bool m_bREFRACTALPHA : 1;
-	bool m_bHDRTYPE : 1;
-	bool m_bNORMAL_DECODE_MODE : 1;
-#endif	// _DEBUG
+	bool m_bCONVERT_TO_SRGB;
+#endif
 public:
 	void SetCONVERT_TO_SRGB( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONVERT_TO_SRGB = i;
+#ifdef _DEBUG
+		m_bCONVERT_TO_SRGB = true;
+#endif
 	}
-
+	void SetCONVERT_TO_SRGB( bool i )
+	{
+		m_nCONVERT_TO_SRGB = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bCONVERT_TO_SRGB = true;
+#endif
+	}
+private:
+	int m_nMULTITEXTURE;
+#ifdef _DEBUG
+	bool m_bMULTITEXTURE;
+#endif
+public:
 	void SetMULTITEXTURE( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nMULTITEXTURE = i;
 #ifdef _DEBUG
 		m_bMULTITEXTURE = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetMULTITEXTURE( bool i )
+	{
+		m_nMULTITEXTURE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bMULTITEXTURE = true;
+#endif
+	}
+private:
+	int m_nFRESNEL;
+#ifdef _DEBUG
+	bool m_bFRESNEL;
+#endif
+public:
 	void SetFRESNEL( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFRESNEL = i;
 #ifdef _DEBUG
 		m_bFRESNEL = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetFRESNEL( bool i )
+	{
+		m_nFRESNEL = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bFRESNEL = true;
+#endif
+	}
+private:
+	int m_nBLEND;
+#ifdef _DEBUG
+	bool m_bBLEND;
+#endif
+public:
 	void SetBLEND( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBLEND = i;
 #ifdef _DEBUG
 		m_bBLEND = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetBLEND( bool i )
+	{
+		m_nBLEND = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bBLEND = true;
+#endif
+	}
+private:
+	int m_nREFRACTALPHA;
+#ifdef _DEBUG
+	bool m_bREFRACTALPHA;
+#endif
+public:
 	void SetREFRACTALPHA( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nREFRACTALPHA = i;
 #ifdef _DEBUG
 		m_bREFRACTALPHA = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetREFRACTALPHA( bool i )
+	{
+		m_nREFRACTALPHA = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bREFRACTALPHA = true;
+#endif
+	}
+private:
+	int m_nHDRTYPE;
+#ifdef _DEBUG
+	bool m_bHDRTYPE;
+#endif
+public:
 	void SetHDRTYPE( int i )
 	{
 		Assert( i >= 0 && i <= 2 );
 		m_nHDRTYPE = i;
 #ifdef _DEBUG
 		m_bHDRTYPE = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetHDRTYPE( bool i )
+	{
+		m_nHDRTYPE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bHDRTYPE = true;
+#endif
+	}
+private:
+	int m_nNORMAL_DECODE_MODE;
+#ifdef _DEBUG
+	bool m_bNORMAL_DECODE_MODE;
+#endif
+public:
 	void SetNORMAL_DECODE_MODE( int i )
 	{
 		Assert( i >= 0 && i <= 0 );
 		m_nNORMAL_DECODE_MODE = i;
 #ifdef _DEBUG
 		m_bNORMAL_DECODE_MODE = true;
-#endif	// _DEBUG
+#endif
 	}
-
-	watercheap_ps20b_Static_Index(  )
+	void SetNORMAL_DECODE_MODE( bool i )
 	{
-		m_nCONVERT_TO_SRGB = g_pHardwareConfig->NeedsShaderSRGBConversion();
-		m_nMULTITEXTURE = 0;
-		m_nFRESNEL = 0;
-		m_nBLEND = 0;
-		m_nREFRACTALPHA = 0;
-		m_nHDRTYPE = 0;
-		m_nNORMAL_DECODE_MODE = 0;
+		m_nNORMAL_DECODE_MODE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bNORMAL_DECODE_MODE = true;
+#endif
+	}
+public:
+	watercheap_ps20b_Static_Index( )
+	{
+#ifdef _DEBUG
+		m_bCONVERT_TO_SRGB = true;
+#endif // _DEBUG
+		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifdef _DEBUG
 		m_bMULTITEXTURE = false;
+#endif // _DEBUG
+		m_nMULTITEXTURE = 0;
+#ifdef _DEBUG
 		m_bFRESNEL = false;
+#endif // _DEBUG
+		m_nFRESNEL = 0;
+#ifdef _DEBUG
 		m_bBLEND = false;
+#endif // _DEBUG
+		m_nBLEND = 0;
+#ifdef _DEBUG
 		m_bREFRACTALPHA = false;
+#endif // _DEBUG
+		m_nREFRACTALPHA = 0;
+#ifdef _DEBUG
 		m_bHDRTYPE = false;
+#endif // _DEBUG
+		m_nHDRTYPE = 0;
+#ifdef _DEBUG
 		m_bNORMAL_DECODE_MODE = false;
-#endif	// _DEBUG
+#endif // _DEBUG
+		m_nNORMAL_DECODE_MODE = 0;
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
-		Assert( m_bMULTITEXTURE && m_bFRESNEL && m_bBLEND && m_bREFRACTALPHA && m_bHDRTYPE && m_bNORMAL_DECODE_MODE );
-		return ( 6 * m_nCONVERT_TO_SRGB ) + ( 12 * m_nMULTITEXTURE ) + ( 24 * m_nFRESNEL ) + ( 48 * m_nBLEND ) + ( 96 * m_nREFRACTALPHA ) + ( 192 * m_nHDRTYPE ) + ( 576 * m_nNORMAL_DECODE_MODE ) + 0;
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bMULTITEXTURE && m_bFRESNEL && m_bBLEND && m_bREFRACTALPHA && m_bHDRTYPE && m_bNORMAL_DECODE_MODE;
+		Assert( bAllStaticVarsDefined );
+#endif // _DEBUG
+		return ( 4 * m_nCONVERT_TO_SRGB ) + ( 8 * m_nMULTITEXTURE ) + ( 16 * m_nFRESNEL ) + ( 32 * m_nBLEND ) + ( 64 * m_nREFRACTALPHA ) + ( 128 * m_nHDRTYPE ) + ( 384 * m_nNORMAL_DECODE_MODE ) + 0;
 	}
 };
-
-#define shaderStaticTest_watercheap_ps20b psh_forgot_to_set_static_MULTITEXTURE + psh_forgot_to_set_static_FRESNEL + psh_forgot_to_set_static_BLEND + psh_forgot_to_set_static_REFRACTALPHA + psh_forgot_to_set_static_HDRTYPE + psh_forgot_to_set_static_NORMAL_DECODE_MODE
-
-
+#define shaderStaticTest_watercheap_ps20b psh_forgot_to_set_static_MULTITEXTURE + psh_forgot_to_set_static_FRESNEL + psh_forgot_to_set_static_BLEND + psh_forgot_to_set_static_REFRACTALPHA + psh_forgot_to_set_static_HDRTYPE + psh_forgot_to_set_static_NORMAL_DECODE_MODE + 0
 class watercheap_ps20b_Dynamic_Index
 {
-	unsigned int m_nHDRENABLED : 2;
-	unsigned int m_nPIXELFOGTYPE : 2;
+private:
+	int m_nHDRENABLED;
 #ifdef _DEBUG
-	bool m_bHDRENABLED : 1;
-	bool m_bPIXELFOGTYPE : 1;
-#endif	// _DEBUG
+	bool m_bHDRENABLED;
+#endif
 public:
 	void SetHDRENABLED( int i )
 	{
@@ -131,34 +206,57 @@ public:
 		m_nHDRENABLED = i;
 #ifdef _DEBUG
 		m_bHDRENABLED = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetHDRENABLED( bool i )
+	{
+		m_nHDRENABLED = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bHDRENABLED = true;
+#endif
+	}
+private:
+	int m_nPIXELFOGTYPE;
+#ifdef _DEBUG
+	bool m_bPIXELFOGTYPE;
+#endif
+public:
 	void SetPIXELFOGTYPE( int i )
 	{
-		Assert( i >= 0 && i <= 2 );
+		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = true;
-#endif	// _DEBUG
+#endif
 	}
-
-	watercheap_ps20b_Dynamic_Index(  )
+	void SetPIXELFOGTYPE( bool i )
 	{
-		m_nHDRENABLED = 0;
-		m_nPIXELFOGTYPE = 0;
+		m_nPIXELFOGTYPE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bPIXELFOGTYPE = true;
+#endif
+	}
+public:
+	watercheap_ps20b_Dynamic_Index()
+	{
 #ifdef _DEBUG
 		m_bHDRENABLED = false;
+#endif // _DEBUG
+		m_nHDRENABLED = 0;
+#ifdef _DEBUG
 		m_bPIXELFOGTYPE = false;
-#endif	// _DEBUG
+#endif // _DEBUG
+		m_nPIXELFOGTYPE = 0;
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
-		Assert( m_bHDRENABLED && m_bPIXELFOGTYPE );
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+		bool bAllDynamicVarsDefined = m_bHDRENABLED && m_bPIXELFOGTYPE;
+		Assert( bAllDynamicVarsDefined );
+#endif // _DEBUG
 		return ( 1 * m_nHDRENABLED ) + ( 2 * m_nPIXELFOGTYPE ) + 0;
 	}
 };
-
-#define shaderDynamicTest_watercheap_ps20b psh_forgot_to_set_dynamic_HDRENABLED + psh_forgot_to_set_dynamic_PIXELFOGTYPE
-
+#define shaderDynamicTest_watercheap_ps20b psh_forgot_to_set_dynamic_HDRENABLED + psh_forgot_to_set_dynamic_PIXELFOGTYPE + 0

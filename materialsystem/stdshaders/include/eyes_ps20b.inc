@@ -1,45 +1,27 @@
-// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
-// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
-// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
-// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
-// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
-// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
-// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
-// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
-// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
-
-#pragma once
 #include "shaderlib/cshader.h"
 class eyes_ps20b_Static_Index
 {
 public:
-	eyes_ps20b_Static_Index(  )
+	eyes_ps20b_Static_Index( )
 	{
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+#endif // _DEBUG
 		return 0;
 	}
 };
-
-#define shaderStaticTest_eyes_ps20b 1
-
-
+#define shaderStaticTest_eyes_ps20b 0
 class eyes_ps20b_Dynamic_Index
 {
-	unsigned int m_nWRITE_DEPTH_TO_DESTALPHA : 2;
-	unsigned int m_nPIXELFOGTYPE : 2;
+private:
+	int m_nWRITE_DEPTH_TO_DESTALPHA;
 #ifdef _DEBUG
-	bool m_bWRITE_DEPTH_TO_DESTALPHA : 1;
-	bool m_bPIXELFOGTYPE : 1;
-#endif	// _DEBUG
+	bool m_bWRITE_DEPTH_TO_DESTALPHA;
+#endif
 public:
 	void SetWRITE_DEPTH_TO_DESTALPHA( int i )
 	{
@@ -47,34 +29,57 @@ public:
 		m_nWRITE_DEPTH_TO_DESTALPHA = i;
 #ifdef _DEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetWRITE_DEPTH_TO_DESTALPHA( bool i )
+	{
+		m_nWRITE_DEPTH_TO_DESTALPHA = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bWRITE_DEPTH_TO_DESTALPHA = true;
+#endif
+	}
+private:
+	int m_nPIXELFOGTYPE;
+#ifdef _DEBUG
+	bool m_bPIXELFOGTYPE;
+#endif
+public:
 	void SetPIXELFOGTYPE( int i )
 	{
-		Assert( i >= 0 && i <= 2 );
+		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = true;
-#endif	// _DEBUG
+#endif
 	}
-
-	eyes_ps20b_Dynamic_Index(  )
+	void SetPIXELFOGTYPE( bool i )
 	{
-		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
-		m_nPIXELFOGTYPE = 0;
+		m_nPIXELFOGTYPE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bPIXELFOGTYPE = true;
+#endif
+	}
+public:
+	eyes_ps20b_Dynamic_Index()
+	{
 #ifdef _DEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
+#endif // _DEBUG
+		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
+#ifdef _DEBUG
 		m_bPIXELFOGTYPE = false;
-#endif	// _DEBUG
+#endif // _DEBUG
+		m_nPIXELFOGTYPE = 0;
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
-		Assert( m_bWRITE_DEPTH_TO_DESTALPHA && m_bPIXELFOGTYPE );
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+		bool bAllDynamicVarsDefined = m_bWRITE_DEPTH_TO_DESTALPHA && m_bPIXELFOGTYPE;
+		Assert( bAllDynamicVarsDefined );
+#endif // _DEBUG
 		return ( 1 * m_nWRITE_DEPTH_TO_DESTALPHA ) + ( 2 * m_nPIXELFOGTYPE ) + 0;
 	}
 };
-
-#define shaderDynamicTest_eyes_ps20b psh_forgot_to_set_dynamic_WRITE_DEPTH_TO_DESTALPHA + psh_forgot_to_set_dynamic_PIXELFOGTYPE
-
+#define shaderDynamicTest_eyes_ps20b psh_forgot_to_set_dynamic_WRITE_DEPTH_TO_DESTALPHA + psh_forgot_to_set_dynamic_PIXELFOGTYPE + 0

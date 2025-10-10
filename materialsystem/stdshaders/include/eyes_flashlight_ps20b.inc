@@ -1,27 +1,11 @@
-// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
-// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
-// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
-// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
-// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
-// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
-// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
-// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
-// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
-
-#pragma once
 #include "shaderlib/cshader.h"
 class eyes_flashlight_ps20b_Static_Index
 {
-	unsigned int m_nFLASHLIGHTDEPTHFILTERMODE : 2;
+private:
+	int m_nFLASHLIGHTDEPTHFILTERMODE;
 #ifdef _DEBUG
-	bool m_bFLASHLIGHTDEPTHFILTERMODE : 1;
-#endif	// _DEBUG
+	bool m_bFLASHLIGHTDEPTHFILTERMODE;
+#endif
 public:
 	void SetFLASHLIGHTDEPTHFILTERMODE( int i )
 	{
@@ -29,70 +13,100 @@ public:
 		m_nFLASHLIGHTDEPTHFILTERMODE = i;
 #ifdef _DEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = true;
-#endif	// _DEBUG
+#endif
 	}
-
-	eyes_flashlight_ps20b_Static_Index(  )
+	void SetFLASHLIGHTDEPTHFILTERMODE( bool i )
 	{
-		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
+		m_nFLASHLIGHTDEPTHFILTERMODE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bFLASHLIGHTDEPTHFILTERMODE = true;
+#endif
+	}
+public:
+	eyes_flashlight_ps20b_Static_Index( )
+	{
 #ifdef _DEBUG
 		m_bFLASHLIGHTDEPTHFILTERMODE = false;
-#endif	// _DEBUG
+#endif // _DEBUG
+		m_nFLASHLIGHTDEPTHFILTERMODE = 0;
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
-		Assert( m_bFLASHLIGHTDEPTHFILTERMODE );
-		return ( 6 * m_nFLASHLIGHTDEPTHFILTERMODE ) + 0;
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+		bool bAllStaticVarsDefined = m_bFLASHLIGHTDEPTHFILTERMODE;
+		Assert( bAllStaticVarsDefined );
+#endif // _DEBUG
+		return ( 4 * m_nFLASHLIGHTDEPTHFILTERMODE ) + 0;
 	}
 };
-
-#define shaderStaticTest_eyes_flashlight_ps20b psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE
-
-
+#define shaderStaticTest_eyes_flashlight_ps20b psh_forgot_to_set_static_FLASHLIGHTDEPTHFILTERMODE + 0
 class eyes_flashlight_ps20b_Dynamic_Index
 {
-	unsigned int m_nPIXELFOGTYPE : 2;
-	unsigned int m_nFLASHLIGHTSHADOWS : 2;
+private:
+	int m_nPIXELFOGTYPE;
 #ifdef _DEBUG
-	bool m_bPIXELFOGTYPE : 1;
-	bool m_bFLASHLIGHTSHADOWS : 1;
-#endif	// _DEBUG
+	bool m_bPIXELFOGTYPE;
+#endif
 public:
 	void SetPIXELFOGTYPE( int i )
 	{
-		Assert( i >= 0 && i <= 2 );
+		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetPIXELFOGTYPE( bool i )
+	{
+		m_nPIXELFOGTYPE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bPIXELFOGTYPE = true;
+#endif
+	}
+private:
+	int m_nFLASHLIGHTSHADOWS;
+#ifdef _DEBUG
+	bool m_bFLASHLIGHTSHADOWS;
+#endif
+public:
 	void SetFLASHLIGHTSHADOWS( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nFLASHLIGHTSHADOWS = i;
 #ifdef _DEBUG
 		m_bFLASHLIGHTSHADOWS = true;
-#endif	// _DEBUG
+#endif
 	}
-
-	eyes_flashlight_ps20b_Dynamic_Index(  )
+	void SetFLASHLIGHTSHADOWS( bool i )
 	{
-		m_nPIXELFOGTYPE = 0;
-		m_nFLASHLIGHTSHADOWS = 0;
+		m_nFLASHLIGHTSHADOWS = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bFLASHLIGHTSHADOWS = true;
+#endif
+	}
+public:
+	eyes_flashlight_ps20b_Dynamic_Index()
+	{
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = false;
+#endif // _DEBUG
+		m_nPIXELFOGTYPE = 0;
+#ifdef _DEBUG
 		m_bFLASHLIGHTSHADOWS = false;
-#endif	// _DEBUG
+#endif // _DEBUG
+		m_nFLASHLIGHTSHADOWS = 0;
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
-		Assert( m_bPIXELFOGTYPE && m_bFLASHLIGHTSHADOWS );
-		return ( 1 * m_nPIXELFOGTYPE ) + ( 3 * m_nFLASHLIGHTSHADOWS ) + 0;
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bFLASHLIGHTSHADOWS;
+		Assert( bAllDynamicVarsDefined );
+#endif // _DEBUG
+		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nFLASHLIGHTSHADOWS ) + 0;
 	}
 };
-
-#define shaderDynamicTest_eyes_flashlight_ps20b psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_FLASHLIGHTSHADOWS
-
+#define shaderDynamicTest_eyes_flashlight_ps20b psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_FLASHLIGHTSHADOWS + 0

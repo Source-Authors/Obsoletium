@@ -1,34 +1,27 @@
-// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
-
-#pragma once
 #include "shaderlib/cshader.h"
 class eyes_flashlight_vs20_Static_Index
 {
 public:
-	eyes_flashlight_vs20_Static_Index(  )
+	eyes_flashlight_vs20_Static_Index( )
 	{
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+#endif // _DEBUG
 		return 0;
 	}
 };
-
-#define shaderStaticTest_eyes_flashlight_vs20 1
-
-
+#define shaderStaticTest_eyes_flashlight_vs20 0
 class eyes_flashlight_vs20_Dynamic_Index
 {
-	unsigned int m_nCOMPRESSED_VERTS : 2;
-	unsigned int m_nSKINNING : 2;
-	unsigned int m_nDOWATERFOG : 2;
+private:
+	int m_nCOMPRESSED_VERTS;
 #ifdef _DEBUG
-	bool m_bCOMPRESSED_VERTS : 1;
-	bool m_bSKINNING : 1;
-	bool m_bDOWATERFOG : 1;
-#endif	// _DEBUG
+	bool m_bCOMPRESSED_VERTS;
+#endif
 public:
 	void SetCOMPRESSED_VERTS( int i )
 	{
@@ -36,45 +29,82 @@ public:
 		m_nCOMPRESSED_VERTS = i;
 #ifdef _DEBUG
 		m_bCOMPRESSED_VERTS = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetCOMPRESSED_VERTS( bool i )
+	{
+		m_nCOMPRESSED_VERTS = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bCOMPRESSED_VERTS = true;
+#endif
+	}
+private:
+	int m_nSKINNING;
+#ifdef _DEBUG
+	bool m_bSKINNING;
+#endif
+public:
 	void SetSKINNING( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nSKINNING = i;
 #ifdef _DEBUG
 		m_bSKINNING = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetSKINNING( bool i )
+	{
+		m_nSKINNING = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bSKINNING = true;
+#endif
+	}
+private:
+	int m_nDOWATERFOG;
+#ifdef _DEBUG
+	bool m_bDOWATERFOG;
+#endif
+public:
 	void SetDOWATERFOG( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nDOWATERFOG = i;
 #ifdef _DEBUG
 		m_bDOWATERFOG = true;
-#endif	// _DEBUG
+#endif
 	}
-
-	eyes_flashlight_vs20_Dynamic_Index(  )
+	void SetDOWATERFOG( bool i )
 	{
-		m_nCOMPRESSED_VERTS = 0;
-		m_nSKINNING = 0;
-		m_nDOWATERFOG = 0;
+		m_nDOWATERFOG = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bDOWATERFOG = true;
+#endif
+	}
+public:
+	eyes_flashlight_vs20_Dynamic_Index()
+	{
 #ifdef _DEBUG
 		m_bCOMPRESSED_VERTS = false;
+#endif // _DEBUG
+		m_nCOMPRESSED_VERTS = 0;
+#ifdef _DEBUG
 		m_bSKINNING = false;
+#endif // _DEBUG
+		m_nSKINNING = 0;
+#ifdef _DEBUG
 		m_bDOWATERFOG = false;
-#endif	// _DEBUG
+#endif // _DEBUG
+		m_nDOWATERFOG = 0;
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
-		Assert( m_bCOMPRESSED_VERTS && m_bSKINNING && m_bDOWATERFOG );
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bSKINNING && m_bDOWATERFOG;
+		Assert( bAllDynamicVarsDefined );
+#endif // _DEBUG
 		return ( 1 * m_nCOMPRESSED_VERTS ) + ( 2 * m_nSKINNING ) + ( 4 * m_nDOWATERFOG ) + 0;
 	}
 };
-
-#define shaderDynamicTest_eyes_flashlight_vs20 vsh_forgot_to_set_dynamic_COMPRESSED_VERTS + vsh_forgot_to_set_dynamic_SKINNING + vsh_forgot_to_set_dynamic_DOWATERFOG
-
+#define shaderDynamicTest_eyes_flashlight_vs20 vsh_forgot_to_set_dynamic_COMPRESSED_VERTS + vsh_forgot_to_set_dynamic_SKINNING + vsh_forgot_to_set_dynamic_DOWATERFOG + 0

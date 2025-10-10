@@ -1,73 +1,21 @@
 #include "shaderlib/cshader.h"
-class teeth_bump_vs20_Static_Index
+class pbr_vs30_Static_Index
 {
-private:
-	int m_nINTRO;
-#ifdef _DEBUG
-	bool m_bINTRO;
-#endif
 public:
-	void SetINTRO( int i )
+	pbr_vs30_Static_Index( )
 	{
-		Assert( i >= 0 && i <= 1 );
-		m_nINTRO = i;
-#ifdef _DEBUG
-		m_bINTRO = true;
-#endif
-	}
-	void SetINTRO( bool i )
-	{
-		m_nINTRO = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bINTRO = true;
-#endif
-	}
-private:
-	int m_nUSE_STATIC_CONTROL_FLOW;
-#ifdef _DEBUG
-	bool m_bUSE_STATIC_CONTROL_FLOW;
-#endif
-public:
-	void SetUSE_STATIC_CONTROL_FLOW( int i )
-	{
-		Assert( i >= 0 && i <= 1 );
-		m_nUSE_STATIC_CONTROL_FLOW = i;
-#ifdef _DEBUG
-		m_bUSE_STATIC_CONTROL_FLOW = true;
-#endif
-	}
-	void SetUSE_STATIC_CONTROL_FLOW( bool i )
-	{
-		m_nUSE_STATIC_CONTROL_FLOW = i ? 1 : 0;
-#ifdef _DEBUG
-		m_bUSE_STATIC_CONTROL_FLOW = true;
-#endif
-	}
-public:
-	teeth_bump_vs20_Static_Index( )
-	{
-#ifdef _DEBUG
-		m_bINTRO = false;
-#endif // _DEBUG
-		m_nINTRO = 0;
-#ifdef _DEBUG
-		m_bUSE_STATIC_CONTROL_FLOW = false;
-#endif // _DEBUG
-		m_nUSE_STATIC_CONTROL_FLOW = 0;
 	}
 	int GetIndex()
 	{
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllStaticVarsDefined = m_bINTRO && m_bUSE_STATIC_CONTROL_FLOW;
-		Assert( bAllStaticVarsDefined );
 #endif // _DEBUG
-		return ( 48 * m_nINTRO ) + ( 96 * m_nUSE_STATIC_CONTROL_FLOW ) + 0;
+		return 0;
 	}
 };
-#define shaderStaticTest_teeth_bump_vs20 vsh_forgot_to_set_static_INTRO + vsh_forgot_to_set_static_USE_STATIC_CONTROL_FLOW + 0
-class teeth_bump_vs20_Dynamic_Index
+#define shaderStaticTest_pbr_vs30 0
+class pbr_vs30_Dynamic_Index
 {
 private:
 	int m_nCOMPRESSED_VERTS;
@@ -133,24 +81,24 @@ public:
 #endif
 	}
 private:
-	int m_nSTATIC_LIGHT;
+	int m_nLIGHTING_PREVIEW;
 #ifdef _DEBUG
-	bool m_bSTATIC_LIGHT;
+	bool m_bLIGHTING_PREVIEW;
 #endif
 public:
-	void SetSTATIC_LIGHT( int i )
+	void SetLIGHTING_PREVIEW( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
-		m_nSTATIC_LIGHT = i;
+		m_nLIGHTING_PREVIEW = i;
 #ifdef _DEBUG
-		m_bSTATIC_LIGHT = true;
+		m_bLIGHTING_PREVIEW = true;
 #endif
 	}
-	void SetSTATIC_LIGHT( bool i )
+	void SetLIGHTING_PREVIEW( bool i )
 	{
-		m_nSTATIC_LIGHT = i ? 1 : 0;
+		m_nLIGHTING_PREVIEW = i ? 1 : 0;
 #ifdef _DEBUG
-		m_bSTATIC_LIGHT = true;
+		m_bLIGHTING_PREVIEW = true;
 #endif
 	}
 private:
@@ -161,7 +109,7 @@ private:
 public:
 	void SetNUM_LIGHTS( int i )
 	{
-		Assert( i >= 0 && i <= 2 );
+		Assert( i >= 0 && i <= 4 );
 		m_nNUM_LIGHTS = i;
 #ifdef _DEBUG
 		m_bNUM_LIGHTS = true;
@@ -175,7 +123,7 @@ public:
 #endif
 	}
 public:
-	teeth_bump_vs20_Dynamic_Index()
+	pbr_vs30_Dynamic_Index()
 	{
 #ifdef _DEBUG
 		m_bCOMPRESSED_VERTS = false;
@@ -190,9 +138,9 @@ public:
 #endif // _DEBUG
 		m_nSKINNING = 0;
 #ifdef _DEBUG
-		m_bSTATIC_LIGHT = false;
+		m_bLIGHTING_PREVIEW = false;
 #endif // _DEBUG
-		m_nSTATIC_LIGHT = 0;
+		m_nLIGHTING_PREVIEW = 0;
 #ifdef _DEBUG
 		m_bNUM_LIGHTS = false;
 #endif // _DEBUG
@@ -203,10 +151,10 @@ public:
 		// Asserts to make sure that we aren't using any skipped combinations.
 		// Asserts to make sure that we are setting all of the combination vars.
 #ifdef _DEBUG
-		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bDOWATERFOG && m_bSKINNING && m_bSTATIC_LIGHT && m_bNUM_LIGHTS;
+		bool bAllDynamicVarsDefined = m_bCOMPRESSED_VERTS && m_bDOWATERFOG && m_bSKINNING && m_bLIGHTING_PREVIEW && m_bNUM_LIGHTS;
 		Assert( bAllDynamicVarsDefined );
 #endif // _DEBUG
-		return ( 1 * m_nCOMPRESSED_VERTS ) + ( 2 * m_nDOWATERFOG ) + ( 4 * m_nSKINNING ) + ( 8 * m_nSTATIC_LIGHT ) + ( 16 * m_nNUM_LIGHTS ) + 0;
+		return ( 1 * m_nCOMPRESSED_VERTS ) + ( 2 * m_nDOWATERFOG ) + ( 4 * m_nSKINNING ) + ( 8 * m_nLIGHTING_PREVIEW ) + ( 16 * m_nNUM_LIGHTS ) + 0;
 	}
 };
-#define shaderDynamicTest_teeth_bump_vs20 vsh_forgot_to_set_dynamic_COMPRESSED_VERTS + vsh_forgot_to_set_dynamic_DOWATERFOG + vsh_forgot_to_set_dynamic_SKINNING + vsh_forgot_to_set_dynamic_STATIC_LIGHT + vsh_forgot_to_set_dynamic_NUM_LIGHTS + 0
+#define shaderDynamicTest_pbr_vs30 vsh_forgot_to_set_dynamic_COMPRESSED_VERTS + vsh_forgot_to_set_dynamic_DOWATERFOG + vsh_forgot_to_set_dynamic_SKINNING + vsh_forgot_to_set_dynamic_LIGHTING_PREVIEW + vsh_forgot_to_set_dynamic_NUM_LIGHTS + 0

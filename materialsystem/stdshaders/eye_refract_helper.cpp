@@ -364,7 +364,6 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 				DECLARE_DYNAMIC_PIXEL_SHADER( eye_refract_ps20b );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, lightState.m_nNumLights );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
 				SET_DYNAMIC_PIXEL_SHADER( eye_refract_ps20b );
 			}
 			else // ps.2.0
@@ -380,7 +379,6 @@ void Draw_Eyes_Refract_Internal( CBaseVSShader *pShader, IMaterialVar** params, 
 			DECLARE_DYNAMIC_PIXEL_SHADER( eye_refract_ps30 );
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, lightState.m_nNumLights );
 			SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
-			SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
 			SET_DYNAMIC_PIXEL_SHADER( eye_refract_ps30 );
 		}
 #endif

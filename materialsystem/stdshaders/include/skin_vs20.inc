@@ -2,8 +2,13 @@
 // $USE_STATIC_CONTROL_FLOW && ( $NUM_LIGHTS > 0 )
 // defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
 
-#pragma once
-#include "shaderlib/cshader.h"
+#ifndef SKIN_VS20_H
+#define SKIN_VS20_H
+
+#include "shaderapi/ishaderapi.h"
+#include "shaderapi/ishadershadow.h"
+#include "materialsystem/imaterialvar.h"
+
 class skin_vs20_Static_Index
 {
 	unsigned int m_nUSE_STATIC_CONTROL_FLOW : 2;
@@ -20,7 +25,7 @@ public:
 #endif	// _DEBUG
 	}
 
-	skin_vs20_Static_Index(  )
+	skin_vs20_Static_Index()
 	{
 		m_nUSE_STATIC_CONTROL_FLOW = 0;
 #ifdef _DEBUG
@@ -98,7 +103,7 @@ public:
 #endif	// _DEBUG
 	}
 
-	skin_vs20_Dynamic_Index(  )
+	skin_vs20_Dynamic_Index()
 	{
 		m_nCOMPRESSED_VERTS = 0;
 		m_nDOWATERFOG = 0;
@@ -123,3 +128,5 @@ public:
 
 #define shaderDynamicTest_skin_vs20 vsh_forgot_to_set_dynamic_COMPRESSED_VERTS + vsh_forgot_to_set_dynamic_DOWATERFOG + vsh_forgot_to_set_dynamic_SKINNING + vsh_forgot_to_set_dynamic_LIGHTING_PREVIEW + vsh_forgot_to_set_dynamic_NUM_LIGHTS
 
+
+#endif	// SKIN_VS20_H

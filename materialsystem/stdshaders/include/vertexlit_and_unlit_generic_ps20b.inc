@@ -1,43 +1,10 @@
-// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
-// ($DETAILTEXTURE == 0 ) && ( $DETAIL_BLEND_MODE != 0 )
-// ($DETAILTEXTURE == 0 ) && ( $SEAMLESS_DETAIL )
-// ($ENVMAPMASK || $SELFILLUM_ENVMAPMASK_ALPHA) && ($SEAMLESS_BASE || $SEAMLESS_DETAIL)
-// $BASEALPHAENVMAPMASK && $ENVMAPMASK
-// $BASEALPHAENVMAPMASK && $SELFILLUM
-// $SELFILLUM && $SELFILLUM_ENVMAPMASK_ALPHA
-// $SELFILLUM_ENVMAPMASK_ALPHA && (! $ENVMAPMASK)
-// $ENVMAPMASK && ($FLASHLIGHT || $FLASHLIGHTSHADOWS)
-// $BASEALPHAENVMAPMASK && ($SEAMLESS_BASE || $SEAMLESS_DETAIL)
-// ($DISTANCEALPHA == 0) && ($DISTANCEALPHAFROMDETAIL || $SOFT_MASK || $OUTLINE || $OUTER_GLOW)
-// ($DETAILTEXTURE == 0) && ($DISTANCEALPHAFROMDETAIL)
-// ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTSHADOWS == 1 )
-// ( $FLASHLIGHT == 0 ) && ( $FLASHLIGHTDEPTHFILTERMODE != 0 )
-// ($DISTANCEALPHA) && ($ENVMAPMASK || $BASEALPHAENVMAPMASK || $SELFILLUM || $SELFILLUM_ENVMAPMASK_ALPHA )
-// ($DISTANCEALPHA) && ($SEAMLESS_BASE || $SEAMLESS_DETAIL || $CUBEMAP || $LIGHTING_PREVIEW )
-// ($DISTANCEALPHA) && ($WRITEWATERFOGTODESTALPHA || $FLASHLIGHT || $FLASHLIGHTSHADOWS || $SRGB_INPUT_ADAPTER )
-// $SEAMLESS_BASE && $SRGB_INPUT_ADAPTER
-// $SEAMLESS_BASE && ($BLENDTINTBYBASEALPHA )
-// ($BLENDTINTBYBASEALPHA) && ($SELFILLUM || (($DISTANCEALPHA) && ($DISTANCEALPHAFROMDETAIL == 0)) || $BASEALPHAENVMAPMASK)
-// $FLASHLIGHT && $CUBEMAP
-// $CUBEMAP_SPHERE_LEGACY && ($CUBEMAP == 0)
-// ($STATIC_LIGHT_LIGHTMAP == 0) && ($DEBUG_LUXELS == 1)
-// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
-// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
-// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
-// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
-// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
-// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
-// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
-// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
+#ifndef VERTEXLIT_AND_UNLIT_GENERIC_PS20B_H
+#define VERTEXLIT_AND_UNLIT_GENERIC_PS20B_H
 
-#pragma once
-#include "shaderlib/cshader.h"
+#include "shaderapi/ishaderapi.h"
+#include "shaderapi/ishadershadow.h"
+#include "materialsystem/imaterialvar.h"
+
 class vertexlit_and_unlit_generic_ps20b_Static_Index
 {
 	unsigned int m_nDETAILTEXTURE : 2;
@@ -285,7 +252,7 @@ public:
 #endif	// _DEBUG
 	}
 
-	vertexlit_and_unlit_generic_ps20b_Static_Index(  )
+	vertexlit_and_unlit_generic_ps20b_Static_Index( )
 	{
 		m_nDETAILTEXTURE = 0;
 		m_nCUBEMAP = 0;
@@ -338,24 +305,7 @@ public:
 	int GetIndex() const
 	{
 		Assert( m_bDETAILTEXTURE && m_bCUBEMAP && m_bDIFFUSELIGHTING && m_bENVMAPMASK && m_bBASEALPHAENVMAPMASK && m_bSELFILLUM && m_bVERTEXCOLOR && m_bFLASHLIGHT && m_bSELFILLUM_ENVMAPMASK_ALPHA && m_bDETAIL_BLEND_MODE && m_bSEAMLESS_BASE && m_bSEAMLESS_DETAIL && m_bDISTANCEALPHA && m_bDISTANCEALPHAFROMDETAIL && m_bSOFT_MASK && m_bOUTLINE && m_bOUTER_GLOW && m_bFLASHLIGHTDEPTHFILTERMODE && m_bDEPTHBLEND && m_bBLENDTINTBYBASEALPHA && m_bSRGB_INPUT_ADAPTER && m_bCUBEMAP_SPHERE_LEGACY );
-		AssertMsg( !( ( m_nDETAILTEXTURE == 0 ) && ( m_nDETAIL_BLEND_MODE != 0 ) ), "Invalid combo combination ( ( DETAILTEXTURE == 0 ) && ( DETAIL_BLEND_MODE != 0 ) )" );
-		AssertMsg( !( ( m_nDETAILTEXTURE == 0 ) && m_nSEAMLESS_DETAIL ), "Invalid combo combination ( ( DETAILTEXTURE == 0 ) && SEAMLESS_DETAIL )" );
-		AssertMsg( !( ( m_nENVMAPMASK || m_nSELFILLUM_ENVMAPMASK_ALPHA ) && ( m_nSEAMLESS_BASE || m_nSEAMLESS_DETAIL ) ), "Invalid combo combination ( ( ENVMAPMASK || SELFILLUM_ENVMAPMASK_ALPHA ) && ( SEAMLESS_BASE || SEAMLESS_DETAIL ) )" );
-		AssertMsg( !( m_nBASEALPHAENVMAPMASK && m_nENVMAPMASK ), "Invalid combo combination ( BASEALPHAENVMAPMASK && ENVMAPMASK )" );
-		AssertMsg( !( m_nBASEALPHAENVMAPMASK && m_nSELFILLUM ), "Invalid combo combination ( BASEALPHAENVMAPMASK && SELFILLUM )" );
-		AssertMsg( !( m_nSELFILLUM && m_nSELFILLUM_ENVMAPMASK_ALPHA ), "Invalid combo combination ( SELFILLUM && SELFILLUM_ENVMAPMASK_ALPHA )" );
-		AssertMsg( !( m_nSELFILLUM_ENVMAPMASK_ALPHA && !m_nENVMAPMASK ), "Invalid combo combination ( SELFILLUM_ENVMAPMASK_ALPHA && !ENVMAPMASK )" );
-		AssertMsg( !( m_nBASEALPHAENVMAPMASK && ( m_nSEAMLESS_BASE || m_nSEAMLESS_DETAIL ) ), "Invalid combo combination ( BASEALPHAENVMAPMASK && ( SEAMLESS_BASE || SEAMLESS_DETAIL ) )" );
-		AssertMsg( !( ( m_nDISTANCEALPHA == 0 ) && ( m_nDISTANCEALPHAFROMDETAIL || ( m_nSOFT_MASK || ( m_nOUTLINE || m_nOUTER_GLOW ) ) ) ), "Invalid combo combination ( ( DISTANCEALPHA == 0 ) && ( DISTANCEALPHAFROMDETAIL || ( SOFT_MASK || ( OUTLINE || OUTER_GLOW ) ) ) )" );
-		AssertMsg( !( ( m_nDETAILTEXTURE == 0 ) && m_nDISTANCEALPHAFROMDETAIL ), "Invalid combo combination ( ( DETAILTEXTURE == 0 ) && DISTANCEALPHAFROMDETAIL )" );
-		AssertMsg( !( ( m_nFLASHLIGHT == 0 ) && ( m_nFLASHLIGHTDEPTHFILTERMODE != 0 ) ), "Invalid combo combination ( ( FLASHLIGHT == 0 ) && ( FLASHLIGHTDEPTHFILTERMODE != 0 ) )" );
-		AssertMsg( !( m_nDISTANCEALPHA && ( m_nENVMAPMASK || ( m_nBASEALPHAENVMAPMASK || ( m_nSELFILLUM || m_nSELFILLUM_ENVMAPMASK_ALPHA ) ) ) ), "Invalid combo combination ( DISTANCEALPHA && ( ENVMAPMASK || ( BASEALPHAENVMAPMASK || ( SELFILLUM || SELFILLUM_ENVMAPMASK_ALPHA ) ) ) )" );
-		AssertMsg( !( m_nSEAMLESS_BASE && m_nSRGB_INPUT_ADAPTER ), "Invalid combo combination ( SEAMLESS_BASE && SRGB_INPUT_ADAPTER )" );
-		AssertMsg( !( m_nSEAMLESS_BASE && m_nBLENDTINTBYBASEALPHA ), "Invalid combo combination ( SEAMLESS_BASE && BLENDTINTBYBASEALPHA )" );
-		AssertMsg( !( m_nBLENDTINTBYBASEALPHA && ( m_nSELFILLUM || ( ( m_nDISTANCEALPHA && ( m_nDISTANCEALPHAFROMDETAIL == 0 ) ) || m_nBASEALPHAENVMAPMASK ) ) ), "Invalid combo combination ( BLENDTINTBYBASEALPHA && ( SELFILLUM || ( ( DISTANCEALPHA && ( DISTANCEALPHAFROMDETAIL == 0 ) ) || BASEALPHAENVMAPMASK ) ) )" );
-		AssertMsg( !( m_nFLASHLIGHT && m_nCUBEMAP ), "Invalid combo combination ( FLASHLIGHT && CUBEMAP )" );
-		AssertMsg( !( m_nCUBEMAP_SPHERE_LEGACY && ( m_nCUBEMAP == 0 ) ), "Invalid combo combination ( CUBEMAP_SPHERE_LEGACY && ( CUBEMAP == 0 ) )" );
-		return ( 72 * m_nDETAILTEXTURE ) + ( 144 * m_nCUBEMAP ) + ( 288 * m_nDIFFUSELIGHTING ) + ( 576 * m_nENVMAPMASK ) + ( 1152 * m_nBASEALPHAENVMAPMASK ) + ( 2304 * m_nSELFILLUM ) + ( 4608 * m_nVERTEXCOLOR ) + ( 9216 * m_nFLASHLIGHT ) + ( 18432 * m_nSELFILLUM_ENVMAPMASK_ALPHA ) + ( 36864 * m_nDETAIL_BLEND_MODE ) + ( 368640 * m_nSEAMLESS_BASE ) + ( 737280 * m_nSEAMLESS_DETAIL ) + ( 1474560 * m_nDISTANCEALPHA ) + ( 2949120 * m_nDISTANCEALPHAFROMDETAIL ) + ( 5898240 * m_nSOFT_MASK ) + ( 11796480 * m_nOUTLINE ) + ( 23592960 * m_nOUTER_GLOW ) + ( 47185920 * m_nFLASHLIGHTDEPTHFILTERMODE ) + ( 141557760 * m_nDEPTHBLEND ) + ( 283115520 * m_nBLENDTINTBYBASEALPHA ) + ( 566231040 * m_nSRGB_INPUT_ADAPTER ) + ( 1132462080 * m_nCUBEMAP_SPHERE_LEGACY ) + 0;
+		return ( 6 * m_nDETAILTEXTURE ) + ( 12 * m_nCUBEMAP ) + ( 24 * m_nDIFFUSELIGHTING ) + ( 48 * m_nENVMAPMASK ) + ( 96 * m_nBASEALPHAENVMAPMASK ) + ( 192 * m_nSELFILLUM ) + ( 384 * m_nVERTEXCOLOR ) + ( 768 * m_nFLASHLIGHT ) + ( 1536 * m_nSELFILLUM_ENVMAPMASK_ALPHA ) + ( 3072 * m_nDETAIL_BLEND_MODE ) + ( 30720 * m_nSEAMLESS_BASE ) + ( 61440 * m_nSEAMLESS_DETAIL ) + ( 122880 * m_nDISTANCEALPHA ) + ( 245760 * m_nDISTANCEALPHAFROMDETAIL ) + ( 491520 * m_nSOFT_MASK ) + ( 983040 * m_nOUTLINE ) + ( 1966080 * m_nOUTER_GLOW ) + ( 3932160 * m_nFLASHLIGHTDEPTHFILTERMODE ) + ( 11796480 * m_nDEPTHBLEND ) + ( 23592960 * m_nBLENDTINTBYBASEALPHA ) + ( 47185920 * m_nSRGB_INPUT_ADAPTER ) + ( 94371840 * m_nCUBEMAP_SPHERE_LEGACY ) + 0;
 	}
 };
 
@@ -364,28 +314,13 @@ public:
 
 class vertexlit_and_unlit_generic_ps20b_Dynamic_Index
 {
-	unsigned int m_nPIXELFOGTYPE : 2;
 	unsigned int m_nLIGHTING_PREVIEW : 2;
 	unsigned int m_nFLASHLIGHTSHADOWS : 2;
-	unsigned int m_nSTATIC_LIGHT_LIGHTMAP : 2;
-	unsigned int m_nDEBUG_LUXELS : 2;
 #ifdef _DEBUG
-	bool m_bPIXELFOGTYPE : 1;
 	bool m_bLIGHTING_PREVIEW : 1;
 	bool m_bFLASHLIGHTSHADOWS : 1;
-	bool m_bSTATIC_LIGHT_LIGHTMAP : 1;
-	bool m_bDEBUG_LUXELS : 1;
 #endif	// _DEBUG
 public:
-	void SetPIXELFOGTYPE( int i )
-	{
-		Assert( i >= 0 && i <= 2 );
-		m_nPIXELFOGTYPE = i;
-#ifdef _DEBUG
-		m_bPIXELFOGTYPE = true;
-#endif	// _DEBUG
-	}
-
 	void SetLIGHTING_PREVIEW( int i )
 	{
 		Assert( i >= 0 && i <= 2 );
@@ -404,47 +339,24 @@ public:
 #endif	// _DEBUG
 	}
 
-	void SetSTATIC_LIGHT_LIGHTMAP( int i )
+	vertexlit_and_unlit_generic_ps20b_Dynamic_Index( )
 	{
-		Assert( i >= 0 && i <= 1 );
-		m_nSTATIC_LIGHT_LIGHTMAP = i;
-#ifdef _DEBUG
-		m_bSTATIC_LIGHT_LIGHTMAP = true;
-#endif	// _DEBUG
-	}
-
-	void SetDEBUG_LUXELS( int i )
-	{
-		Assert( i >= 0 && i <= 1 );
-		m_nDEBUG_LUXELS = i;
-#ifdef _DEBUG
-		m_bDEBUG_LUXELS = true;
-#endif	// _DEBUG
-	}
-
-	vertexlit_and_unlit_generic_ps20b_Dynamic_Index(  )
-	{
-		m_nPIXELFOGTYPE = 0;
 		m_nLIGHTING_PREVIEW = 0;
 		m_nFLASHLIGHTSHADOWS = 0;
-		m_nSTATIC_LIGHT_LIGHTMAP = 0;
-		m_nDEBUG_LUXELS = 0;
 #ifdef _DEBUG
-		m_bPIXELFOGTYPE = false;
 		m_bLIGHTING_PREVIEW = false;
 		m_bFLASHLIGHTSHADOWS = false;
-		m_bSTATIC_LIGHT_LIGHTMAP = false;
-		m_bDEBUG_LUXELS = false;
 #endif	// _DEBUG
 	}
 
 	int GetIndex() const
 	{
-		Assert( m_bPIXELFOGTYPE && m_bLIGHTING_PREVIEW && m_bFLASHLIGHTSHADOWS && m_bSTATIC_LIGHT_LIGHTMAP && m_bDEBUG_LUXELS );
-		AssertMsg( !( ( m_nSTATIC_LIGHT_LIGHTMAP == 0 ) && ( m_nDEBUG_LUXELS == 1 ) ), "Invalid combo combination ( ( STATIC_LIGHT_LIGHTMAP == 0 ) && ( DEBUG_LUXELS == 1 ) )" );
-		return ( 1 * m_nPIXELFOGTYPE ) + ( 3 * m_nLIGHTING_PREVIEW ) + ( 9 * m_nFLASHLIGHTSHADOWS ) + ( 18 * m_nSTATIC_LIGHT_LIGHTMAP ) + ( 36 * m_nDEBUG_LUXELS ) + 0;
+		Assert( m_bLIGHTING_PREVIEW && m_bFLASHLIGHTSHADOWS );
+		return ( 1 * m_nLIGHTING_PREVIEW ) + ( 3 * m_nFLASHLIGHTSHADOWS ) + 0;
 	}
 };
 
-#define shaderDynamicTest_vertexlit_and_unlit_generic_ps20b psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_LIGHTING_PREVIEW + psh_forgot_to_set_dynamic_FLASHLIGHTSHADOWS + psh_forgot_to_set_dynamic_STATIC_LIGHT_LIGHTMAP + psh_forgot_to_set_dynamic_DEBUG_LUXELS
+#define shaderDynamicTest_vertexlit_and_unlit_generic_ps20b psh_forgot_to_set_dynamic_LIGHTING_PREVIEW + psh_forgot_to_set_dynamic_FLASHLIGHTSHADOWS
 
+
+#endif	// VERTEXLIT_AND_UNLIT_GENERIC_PS20B_H

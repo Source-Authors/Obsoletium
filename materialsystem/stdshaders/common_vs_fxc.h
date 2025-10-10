@@ -583,28 +583,25 @@ float CalcFog( const float3 worldPos, const float3 projPos, const int fogType )
 	}
 }
 
-// dimhotepus: TF2 backport.
-// Unused.
-//
-// float CalcFog( const float3 worldPos, const float3 projPos, const bool bWaterFog )
-// {
-// 	float flFog;
-// 	if( !bWaterFog )
-// 	{
-// 		flFog = RangeFog( projPos );
-// 	}
-// 	else
-// 	{
-// #if SHADERMODEL_VS_2_0 == 1
-// 		// We do this work in the pixel shader in dx9, so don't do any fog here.
-// 		flFog = 1.0f;
-// #else
-// 		flFog = WaterFog( worldPos, projPos );
-// #endif
-// 	}
+float CalcFog( const float3 worldPos, const float3 projPos, const bool bWaterFog )
+{
+	float flFog;
+	if( !bWaterFog )
+	{
+		flFog = RangeFog( projPos );
+	}
+	else
+	{
+#if SHADERMODEL_VS_2_0 == 1
+		// We do this work in the pixel shader in dx9, so don't do any fog here.
+		flFog = 1.0f;
+#else
+		flFog = WaterFog( worldPos, projPos );
+#endif
+	}
 
-// 	return flFog;
-// }
+	return flFog;
+}
 
 float4 DecompressBoneWeights( const float4 weights )
 {

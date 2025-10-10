@@ -54,7 +54,6 @@ struct VertexLitGeneric_DX9_Vars_t
 	int m_nFlashlightNoLambert;
 	int m_nFlashlightTexture;
 	int m_nFlashlightTextureFrame;
-	int m_nLightmap;
 
 	int m_nSelfIllumTint;
 	int m_nSelfIllumFresnel;
@@ -68,7 +67,6 @@ struct VertexLitGeneric_DX9_Vars_t
 	int m_nPhongWarpTexture;	
 	int m_nPhongBoost;
 	int m_nPhongFresnelRanges;
-	int m_nPhongExponentFactor;
 	int m_nSelfIllumEnvMapMask_Alpha;
 	int m_nAmbientOnly;
 	int m_nHDRColorScale;
@@ -132,23 +130,7 @@ struct VertexLitGeneric_DX9_Vars_t
 	int m_nBlendTintByBaseAlpha;
 
 	int m_nTintReplacesBaseColor;
-	// dimhotepus: TF2 backport.
-	int m_nTreeSway;
-	int m_nTreeSwayHeight;
-	int m_nTreeSwayStartHeight;
-	int m_nTreeSwayRadius;
-	int m_nTreeSwayStartRadius;
-	int m_nTreeSwaySpeed;
-	int m_nTreeSwaySpeedHighWindMultiplier;
-	int m_nTreeSwayStrength;
-	int m_nTreeSwayScrumbleSpeed;
-	int m_nTreeSwayScrumbleStrength;
-	int m_nTreeSwayScrumbleFrequency;
-	int m_nTreeSwayFalloffExp;
-	int m_nTreeSwayScrumbleFalloffExp;
-	int m_nTreeSwaySpeedLerpStart;
-	int m_nTreeSwaySpeedLerpEnd;
-	int m_nTreeSwayStatic;
+
 };
 
 void InitParamsVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** params, const char *pMaterialName, bool bVertexLitGeneric, VertexLitGeneric_DX9_Vars_t &info );

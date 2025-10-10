@@ -158,7 +158,7 @@ To run the games you need to _own_ ones. Check Steam store pages for Half-Life 2
 ```
 * Open `<GAME_NAME>_<ARCH>.sln` in source directory.
 * Set `launcher_main` project `Command` property to `$(SolutionDir)..\game\hl2.exe`.
-* Set `launcher_main` project `Command Arguments` property to `+mat_dxlevel 85 -windowed`.
+* Set `launcher_main` project `Command Arguments` property to `+mat_dxlevel 95 -windowed`.
 * Set `launcher_main` project `Working Directory` property to `$(SolutionDir)..\game\`.
 * Click on `Set as Startup Project` menu for `launcher_main` project.
 * Start debugging.

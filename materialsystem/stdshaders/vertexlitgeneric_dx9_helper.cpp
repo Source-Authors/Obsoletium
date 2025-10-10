@@ -32,9 +32,6 @@
 
 static ConVar mat_fullbright( "mat_fullbright","0", FCVAR_CHEAT );
 static ConVar r_lightwarpidentity( "r_lightwarpidentity","0", FCVAR_CHEAT );
-static ConVar mat_luxels( "mat_luxels", "0", FCVAR_CHEAT );
-// dimhotepus: TF2 backport.
-//static ConVar r_treesway( "r_treesway", "1" );
 
 static inline bool WantsSkinShader( IMaterialVar** params, const VertexLitGeneric_DX9_Vars_t &info )
 {
@@ -225,24 +222,6 @@ void InitParamsVertexLitGeneric_DX9( CBaseVSShader *pShader, IMaterialVar** para
 
 	InitIntParam( info.m_nDepthBlend, params, 0 );
 	InitFloatParam( info.m_nDepthBlendScale, params, 50.0f );
-	// dimhotepus: TF2 backport.
-	InitIntParam( info.m_nTreeSway, params, 0 );
-	InitFloatParam( info.m_nTreeSwayHeight, params, 1000.0f );
-	InitFloatParam( info.m_nTreeSwayStartHeight, params, 0.1f );
-	InitFloatParam( info.m_nTreeSwayRadius, params, 300.0f );
-	InitFloatParam( info.m_nTreeSwayStartRadius, params, 0.2f );
-	InitFloatParam( info.m_nTreeSwaySpeed, params, 1.0f );
-	InitFloatParam( info.m_nTreeSwaySpeedHighWindMultiplier, params, 2.0f );
-	InitFloatParam( info.m_nTreeSwayStrength, params, 10.0f );
-	InitFloatParam( info.m_nTreeSwayScrumbleSpeed, params, 5.0f );
-	InitFloatParam( info.m_nTreeSwayScrumbleStrength, params, 10.0f );
-	InitFloatParam( info.m_nTreeSwayScrumbleFrequency, params, 12.0f );
-	InitFloatParam( info.m_nTreeSwayFalloffExp, params, 1.5f );
-	InitFloatParam( info.m_nTreeSwayScrumbleFalloffExp, params, 1.0f );
-	InitFloatParam( info.m_nTreeSwaySpeedLerpStart, params, 3.0f );
-	InitFloatParam( info.m_nTreeSwaySpeedLerpEnd, params, 6.0f );
-	// dimhotepus: TF2 backport.
-	InitIntParam( info.m_nTreeSwayStatic, params, 0 );
 }
 
 
@@ -402,8 +381,6 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 
 	bool bIsAlphaTested = IS_FLAG_SET( MATERIAL_VAR_ALPHATEST ) != 0;
 	bool bHasDiffuseWarp = (!bHasFlashlight || IsX360() ) && hasDiffuseLighting && (info.m_nDiffuseWarpTexture != -1) && params[info.m_nDiffuseWarpTexture]->IsTexture();
-	bool bHasLightmapTexture = IsTextureSet( info.m_nLightmap, params );
-	bool bHasMatLuxel = bHasLightmapTexture && mat_luxels.GetBool();
 
 	//bool bNoCull = IS_FLAG_SET( MATERIAL_VAR_NOCULL );
 	bool bFlashlightNoLambert = false;
@@ -413,14 +390,9 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 	}
 
 	bool bAmbientOnly = IsBoolSet( info.m_nAmbientOnly, params );
-	// dimhotepus: TF2 backport.
-	bool bTreeSway = ( GetIntParam( info.m_nTreeSway, params, 0 ) != 0 );// && r_treesway.GetBool();
-	int nTreeSwayMode = GetIntParam( info.m_nTreeSway, params, 0 );
-	nTreeSwayMode = clamp( nTreeSwayMode, 0, 2 );
 
 	float fBlendFactor = GetFloatParam( info.m_nDetailTextureBlendFactor, params, 1.0 );
-	// dimhotepus: TF2 backport.
-	bool bHasDetailTexture = IsTextureSet( info.m_nDetail, params ) && !bTreeSway;
+	bool bHasDetailTexture = IsTextureSet( info.m_nDetail, params );
 	int nDetailBlendMode = bHasDetailTexture ? GetIntParam( info.m_nDetailTextureCombineMode, params ) : 0;
 	int nDetailTranslucencyTexture = -1;
 
@@ -461,9 +433,8 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 	if ( pShader->IsSnapshotting() || (! pContextData ) || ( pContextData->m_bMaterialVarsChanged ) )
 	{
 /*^*/ // 	printf("\t\t[1] snapshotting=%d  pContextData=%08x  pContextData->m_bMaterialVarsChanged=%d \n",(int)pShader->IsSnapshotting(), (int)pContextData, pContextData ? (int)pContextData->m_bMaterialVarsChanged : -1 );
-		// dimhotepus: TF2 backport.
-		bool bSeamlessBase = IsBoolSet( info.m_nSeamlessBase, params ) && !bTreeSway;
-		bool bSeamlessDetail = IsBoolSet( info.m_nSeamlessDetail, params ) && !bTreeSway;
+		bool bSeamlessBase = IsBoolSet( info.m_nSeamlessBase, params );
+		bool bSeamlessDetail = IsBoolSet( info.m_nSeamlessDetail, params );
 		bool bDistanceAlpha = IsBoolSet( info.m_nDistanceAlpha, params );
 		bool bHasSelfIllum = (!bHasFlashlight || IsX360() ) && IS_FLAG_SET( MATERIAL_VAR_SELFILLUM );
 		bool bHasEnvmapMask = (!bHasFlashlight || IsX360() ) && info.m_nEnvmapMask != -1 && params[info.m_nEnvmapMask]->IsTexture();
@@ -649,11 +620,6 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				pShaderShadow->EnableTexture( SHADER_SAMPLER11, true );	// self illum mask
 			}
 
-
-			// Always enable this sampler, used for lightmaps depending on the dynamic combo.
-			// Lightmaps are generated in gamma space, but not sRGB, so leave that disabled. Conversion is done in the shader.
-			pShaderShadow->EnableTexture( SHADER_SAMPLER12, true );
-
 			bool bSRGBWrite = true;
 			if( (info.m_nLinearWrite != -1) && (params[info.m_nLinearWrite]->GetIntValue() == 1) )
 			{
@@ -806,8 +772,6 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 					SET_STATIC_VERTEX_SHADER_COMBO( SEPARATE_DETAIL_UVS, IsBoolSet( info.m_nSeparateDetailUVs, params ) );
 					SET_STATIC_VERTEX_SHADER_COMBO( USE_STATIC_CONTROL_FLOW, bUseStaticControlFlow );
 					SET_STATIC_VERTEX_SHADER_COMBO( DONT_GAMMA_CONVERT_VERTEX_COLOR, (! bSRGBWrite ) && bHasVertexColor );
-					// dimhotepus: TF2 backport.
-					SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, bTreeSway ? nTreeSwayMode : 0 );
 					SET_STATIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs20 );
 
 					if ( g_pHardwareConfig->SupportsPixelShaders_2_b() || g_pHardwareConfig->ShouldAlwaysUseShaderModel2bShaders() ) // Always send Gl this way
@@ -878,8 +842,6 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 					SET_STATIC_VERTEX_SHADER_COMBO( SEPARATE_DETAIL_UVS, IsBoolSet( info.m_nSeparateDetailUVs, params ) );
 					SET_STATIC_VERTEX_SHADER_COMBO( DECAL, bIsDecal );
 					SET_STATIC_VERTEX_SHADER_COMBO( DONT_GAMMA_CONVERT_VERTEX_COLOR, bSRGBWrite ? 0 : 1 );
-					// dimhotepus: TF2 backport.
-					SET_STATIC_VERTEX_SHADER_COMBO( TREESWAY, bTreeSway ? nTreeSwayMode : 0 );
 					SET_STATIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs30 );
 
 					DECLARE_STATIC_PIXEL_SHADER( vertexlit_and_unlit_generic_ps30 );
@@ -1137,36 +1099,6 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				}
 			}
 
-			// dimhotepus: TF2 backport.
-			if ( bTreeSway )
-			{
-				float flParams[ 4 ] = { 0.0f, 0.0f, 0.0f, 0.0f };
-
-				flParams[ 0 ] = GetFloatParam( info.m_nTreeSwaySpeedHighWindMultiplier, params, 2.0f );
-				flParams[ 1 ] = GetFloatParam( info.m_nTreeSwayScrumbleFalloffExp, params, 1.0f );
-				flParams[ 2 ] = GetFloatParam( info.m_nTreeSwayFalloffExp, params, 1.0f );
-				flParams[ 3 ] = GetFloatParam( info.m_nTreeSwayScrumbleSpeed, params, 3.0f );
-				pContextData->m_SemiStaticCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_3, flParams );
-
-				flParams[ 0 ] = GetFloatParam( info.m_nTreeSwaySpeedLerpStart, params, 3.0f );
-				flParams[ 1 ] = GetFloatParam( info.m_nTreeSwaySpeedLerpEnd, params, 6.0f );
-				flParams[ 2 ] = 0.0f;
-				flParams[ 3 ] = 0.0f;
-				pContextData->m_SemiStaticCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_4, flParams );
-
-				flParams[ 0 ] = GetFloatParam( info.m_nTreeSwayHeight, params, 1000.0f );
-				flParams[ 1 ] = GetFloatParam( info.m_nTreeSwayStartHeight, params, 0.1f );
-				flParams[ 2 ] = GetFloatParam( info.m_nTreeSwayRadius, params, 300.0f );
-				flParams[ 3 ] = GetFloatParam( info.m_nTreeSwayStartRadius, params, 0.2f );
-				pContextData->m_SemiStaticCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_10, flParams );
-
-				flParams[ 0 ] = GetFloatParam( info.m_nTreeSwaySpeed, params, 1.0f );
-				flParams[ 1 ] = GetFloatParam( info.m_nTreeSwayStrength, params, 10.0f );
-				flParams[ 2 ] = GetFloatParam( info.m_nTreeSwayScrumbleFrequency, params, 12.0f );
-				flParams[ 3 ] = GetFloatParam( info.m_nTreeSwayScrumbleStrength, params, 10.0f );
-				pContextData->m_SemiStaticCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_11, flParams );
-			}
-
 			if ( bHasFlashlight )
 			{
 				// Tweaks associated with a given flashlight
@@ -1260,26 +1192,6 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			pShaderAPI->GetDX9LightState( &lightState );
 		}
 
-		// Override the lighting desired if we have a lightmap set!
-		if ( bHasLightmapTexture )
-		{
-			lightState.m_bStaticLightVertex = false;
-			lightState.m_bStaticLightTexel = true;
-			
-			// Usual case, not debugging.
-			if (!bHasMatLuxel)
-			{
-				pShader->BindTexture(SHADER_SAMPLER12, info.m_nLightmap);
-			}
-			else
-			{
-				float dimensions[] = { 0.0f, 0.0f, 0.0f, 0.0f };
-				DynamicCmdsOut.BindStandardTexture( SHADER_SAMPLER12, TEXTURE_DEBUG_LUXELS );
-				pShader->GetTextureDimensions( &dimensions[0], &dimensions[1], info.m_nLightmap );
-				DynamicCmdsOut.SetPixelShaderConstant( 11, dimensions, 1 );
-			}
-		}
-
 		MaterialFogMode_t fogType = pShaderAPI->GetSceneFogMode();
 		int fogIndex = ( fogType == MATERIAL_FOG_LINEAR_BELOW_FOG_Z ) ? 1 : 0;
 		int numBones = pShaderAPI->GetCurrentNumBones();
@@ -1297,17 +1209,6 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 			//can't write a special value to dest alpha if we're actually using as-intended alpha
 			bWriteDepthToAlpha = false;
 			bWriteWaterFogToAlpha = false;
-		}
-
-		// dimhotepus: TF2 backport.
-		if ( bTreeSway )
-		{
-			float flParams[ 4 ] = { 0.0f, 0.0f, 0.0f, 0.0f };
-			flParams[ 1 ] = pShaderAPI->CurrentTime();
-			Vector windDir = IsBoolSet( info.m_nTreeSwayStatic, params ) ? Vector( 0.5f, 0.5f, 0 ) : pShaderAPI->GetVectorRenderingParameter( VECTOR_RENDERPARM_WIND_DIRECTION );
-			flParams[ 2 ] = windDir.x;
-			flParams[ 3 ] = windDir.y;
-			DynamicCmdsOut.SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_2, flParams );
 		}
 
 		if ( bHasBump || bHasDiffuseWarp )
@@ -1332,7 +1233,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 					SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, lightState.m_nNumLights );
 					SET_DYNAMIC_PIXEL_SHADER_COMBO( AMBIENT_LIGHT, lightState.m_bAmbientLight ? 1 : 0 );
 					SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
-					SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
+//					SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo() );
 					SET_DYNAMIC_PIXEL_SHADER_CMD( DynamicCmdsOut, vertexlit_and_unlit_generic_bump_ps20b );
 				}
 				else
@@ -1353,8 +1254,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				DECLARE_DYNAMIC_VERTEX_SHADER( vertexlit_and_unlit_generic_bump_vs30 );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( DOWATERFOG,  fogIndex );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,  numBones > 0 );
-				// dimhotepus: TF2 backport.
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( MORPHING, pShaderAPI->IsHWMorphingEnabled() && !bTreeSway );
+				SET_DYNAMIC_VERTEX_SHADER_COMBO( MORPHING, pShaderAPI->IsHWMorphingEnabled() );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
 				SET_DYNAMIC_VERTEX_SHADER( vertexlit_and_unlit_generic_bump_vs30 );
 
@@ -1362,7 +1262,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( NUM_LIGHTS, lightState.m_nNumLights );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( AMBIENT_LIGHT, lightState.m_bAmbientLight ? 1 : 0 );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
+//				SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo() );
 				SET_DYNAMIC_PIXEL_SHADER_CMD( DynamicCmdsOut, vertexlit_and_unlit_generic_bump_ps30 );
 
 				bool bUnusedTexCoords[3] = { false, false, !pShaderAPI->IsHWMorphingEnabled() || !bIsDecal };
@@ -1387,8 +1287,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 
 				DECLARE_DYNAMIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs20 );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( DYNAMIC_LIGHT, lightState.HasDynamicLight() );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( STATIC_LIGHT_VERTEX,  lightState.m_bStaticLightVertex  ? 1 : 0 );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( STATIC_LIGHT_LIGHTMAP, lightState.m_bStaticLightTexel ? 1 : 0);
+				SET_DYNAMIC_VERTEX_SHADER_COMBO( STATIC_LIGHT,  lightState.m_bStaticLightVertex  ? 1 : 0 );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( DOWATERFOG,  fogIndex );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,  numBones > 0 );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO(
@@ -1403,10 +1302,8 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				{
 					DECLARE_DYNAMIC_PIXEL_SHADER( vertexlit_and_unlit_generic_ps20b );
 
-					SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
+//					SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo() );
 					SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
-					SET_DYNAMIC_PIXEL_SHADER_COMBO( STATIC_LIGHT_LIGHTMAP, lightState.m_bStaticLightTexel ? 1 : 0 );
-					SET_DYNAMIC_PIXEL_SHADER_COMBO( DEBUG_LUXELS, bHasMatLuxel ? 1 : 0 );
 					SET_DYNAMIC_PIXEL_SHADER_COMBO(
 						LIGHTING_PREVIEW,
 						pShaderAPI->GetIntRenderingParameter(INT_RENDERPARM_ENABLE_FIXED_LIGHTING) );
@@ -1416,7 +1313,6 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 				{
 					DECLARE_DYNAMIC_PIXEL_SHADER( vertexlit_and_unlit_generic_ps20 );
 					SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo() );
-					SET_DYNAMIC_PIXEL_SHADER_COMBO( STATIC_LIGHT_LIGHTMAP, lightState.m_bStaticLightTexel ? 1 : 0 );
 					SET_DYNAMIC_PIXEL_SHADER_COMBO(
 						LIGHTING_PREVIEW,
 						pShaderAPI->GetIntRenderingParameter(INT_RENDERPARM_ENABLE_FIXED_LIGHTING) );
@@ -1430,22 +1326,18 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 
 				DECLARE_DYNAMIC_VERTEX_SHADER( vertexlit_and_unlit_generic_vs30 );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( DYNAMIC_LIGHT, lightState.HasDynamicLight() );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( STATIC_LIGHT_VERTEX,  lightState.m_bStaticLightVertex  ? 1 : 0 );
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( STATIC_LIGHT_LIGHTMAP,  lightState.m_bStaticLightTexel  ? 1 : 0 );
+				SET_DYNAMIC_VERTEX_SHADER_COMBO( STATIC_LIGHT,  lightState.m_bStaticLightVertex  ? 1 : 0 );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( DOWATERFOG,  fogIndex );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( SKINNING,  numBones > 0 );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( LIGHTING_PREVIEW, 
 					pShaderAPI->GetIntRenderingParameter(INT_RENDERPARM_ENABLE_FIXED_LIGHTING)!=0);
-				// dimhotepus: TF2 backport.
-				SET_DYNAMIC_VERTEX_SHADER_COMBO( MORPHING, pShaderAPI->IsHWMorphingEnabled() && !bTreeSway );
+				SET_DYNAMIC_VERTEX_SHADER_COMBO( MORPHING, pShaderAPI->IsHWMorphingEnabled() );
 				SET_DYNAMIC_VERTEX_SHADER_COMBO( COMPRESSED_VERTS, (int)vertexCompression );
 				SET_DYNAMIC_VERTEX_SHADER_CMD( DynamicCmdsOut, vertexlit_and_unlit_generic_vs30 );
 
 				DECLARE_DYNAMIC_PIXEL_SHADER( vertexlit_and_unlit_generic_ps30 );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo1( true ) );
+//				SET_DYNAMIC_PIXEL_SHADER_COMBO( PIXELFOGTYPE, pShaderAPI->GetPixelFogCombo() );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO( FLASHLIGHTSHADOWS, bFlashlightShadows );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( STATIC_LIGHT_LIGHTMAP,  lightState.m_bStaticLightTexel  ? 1 : 0 );
-				SET_DYNAMIC_PIXEL_SHADER_COMBO( DEBUG_LUXELS, bHasMatLuxel ? 1 : 0 );
 				SET_DYNAMIC_PIXEL_SHADER_COMBO(	LIGHTING_PREVIEW,
 					pShaderAPI->GetIntRenderingParameter(INT_RENDERPARM_ENABLE_FIXED_LIGHTING) );
 				SET_DYNAMIC_PIXEL_SHADER_CMD( DynamicCmdsOut, vertexlit_and_unlit_generic_ps30 );

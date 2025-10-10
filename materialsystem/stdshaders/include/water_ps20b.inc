@@ -1,179 +1,287 @@
-// ALL SKIP STATEMENTS THAT AFFECT THIS SHADER!!!
-// $MULTITEXTURE && $BASETEXTURE
-// defined $HDRTYPE && defined $HDRENABLED && !$HDRTYPE && $HDRENABLED
-// defined $PIXELFOGTYPE && defined $WRITEWATERFOGTODESTALPHA && ( $PIXELFOGTYPE != 1 ) && $WRITEWATERFOGTODESTALPHA
-// defined $LIGHTING_PREVIEW && defined $HDRTYPE && $LIGHTING_PREVIEW && $HDRTYPE != 0
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPTINT && $LIGHTING_PREVIEW && $FASTPATHENVMAPTINT
-// defined $LIGHTING_PREVIEW && defined $FASTPATHENVMAPCONTRAST && $LIGHTING_PREVIEW && $FASTPATHENVMAPCONTRAST
-// defined $LIGHTING_PREVIEW && defined $FASTPATH && $LIGHTING_PREVIEW && $FASTPATH
-// ($FLASHLIGHT || $FLASHLIGHTSHADOWS) && $LIGHTING_PREVIEW
-
-#pragma once
 #include "shaderlib/cshader.h"
 class water_ps20b_Static_Index
 {
-	unsigned int m_nCONVERT_TO_SRGB : 2;
-	unsigned int m_nBASETEXTURE : 2;
-	unsigned int m_nMULTITEXTURE : 2;
-	unsigned int m_nREFLECT : 2;
-	unsigned int m_nREFRACT : 2;
-	unsigned int m_nABOVEWATER : 2;
-	unsigned int m_nBLURRY_REFRACT : 2;
-	unsigned int m_nNORMAL_DECODE_MODE : 1;
+private:
+	int m_nCONVERT_TO_SRGB;
 #ifdef _DEBUG
-	bool m_bBASETEXTURE : 1;
-	bool m_bMULTITEXTURE : 1;
-	bool m_bREFLECT : 1;
-	bool m_bREFRACT : 1;
-	bool m_bABOVEWATER : 1;
-	bool m_bBLURRY_REFRACT : 1;
-	bool m_bNORMAL_DECODE_MODE : 1;
-#endif	// _DEBUG
+	bool m_bCONVERT_TO_SRGB;
+#endif
 public:
 	void SetCONVERT_TO_SRGB( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nCONVERT_TO_SRGB = i;
+#ifdef _DEBUG
+		m_bCONVERT_TO_SRGB = true;
+#endif
 	}
-
+	void SetCONVERT_TO_SRGB( bool i )
+	{
+		m_nCONVERT_TO_SRGB = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bCONVERT_TO_SRGB = true;
+#endif
+	}
+private:
+	int m_nBASETEXTURE;
+#ifdef _DEBUG
+	bool m_bBASETEXTURE;
+#endif
+public:
 	void SetBASETEXTURE( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBASETEXTURE = i;
 #ifdef _DEBUG
 		m_bBASETEXTURE = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetBASETEXTURE( bool i )
+	{
+		m_nBASETEXTURE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bBASETEXTURE = true;
+#endif
+	}
+private:
+	int m_nMULTITEXTURE;
+#ifdef _DEBUG
+	bool m_bMULTITEXTURE;
+#endif
+public:
 	void SetMULTITEXTURE( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nMULTITEXTURE = i;
 #ifdef _DEBUG
 		m_bMULTITEXTURE = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetMULTITEXTURE( bool i )
+	{
+		m_nMULTITEXTURE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bMULTITEXTURE = true;
+#endif
+	}
+private:
+	int m_nREFLECT;
+#ifdef _DEBUG
+	bool m_bREFLECT;
+#endif
+public:
 	void SetREFLECT( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nREFLECT = i;
 #ifdef _DEBUG
 		m_bREFLECT = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetREFLECT( bool i )
+	{
+		m_nREFLECT = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bREFLECT = true;
+#endif
+	}
+private:
+	int m_nREFRACT;
+#ifdef _DEBUG
+	bool m_bREFRACT;
+#endif
+public:
 	void SetREFRACT( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nREFRACT = i;
 #ifdef _DEBUG
 		m_bREFRACT = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetREFRACT( bool i )
+	{
+		m_nREFRACT = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bREFRACT = true;
+#endif
+	}
+private:
+	int m_nABOVEWATER;
+#ifdef _DEBUG
+	bool m_bABOVEWATER;
+#endif
+public:
 	void SetABOVEWATER( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nABOVEWATER = i;
 #ifdef _DEBUG
 		m_bABOVEWATER = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetABOVEWATER( bool i )
+	{
+		m_nABOVEWATER = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bABOVEWATER = true;
+#endif
+	}
+private:
+	int m_nBLURRY_REFRACT;
+#ifdef _DEBUG
+	bool m_bBLURRY_REFRACT;
+#endif
+public:
 	void SetBLURRY_REFRACT( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nBLURRY_REFRACT = i;
 #ifdef _DEBUG
 		m_bBLURRY_REFRACT = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetBLURRY_REFRACT( bool i )
+	{
+		m_nBLURRY_REFRACT = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bBLURRY_REFRACT = true;
+#endif
+	}
+private:
+	int m_nNORMAL_DECODE_MODE;
+#ifdef _DEBUG
+	bool m_bNORMAL_DECODE_MODE;
+#endif
+public:
 	void SetNORMAL_DECODE_MODE( int i )
 	{
 		Assert( i >= 0 && i <= 0 );
 		m_nNORMAL_DECODE_MODE = i;
 #ifdef _DEBUG
 		m_bNORMAL_DECODE_MODE = true;
-#endif	// _DEBUG
+#endif
 	}
-
-	water_ps20b_Static_Index(  )
+	void SetNORMAL_DECODE_MODE( bool i )
 	{
-		m_nCONVERT_TO_SRGB = g_pHardwareConfig->NeedsShaderSRGBConversion();
-		m_nBASETEXTURE = 0;
-		m_nMULTITEXTURE = 0;
-		m_nREFLECT = 0;
-		m_nREFRACT = 0;
-		m_nABOVEWATER = 0;
-		m_nBLURRY_REFRACT = 0;
-		m_nNORMAL_DECODE_MODE = 0;
+		m_nNORMAL_DECODE_MODE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bNORMAL_DECODE_MODE = true;
+#endif
+	}
+public:
+	water_ps20b_Static_Index( )
+	{
+#ifdef _DEBUG
+		m_bCONVERT_TO_SRGB = true;
+#endif // _DEBUG
+		m_nCONVERT_TO_SRGB =  g_pHardwareConfig->NeedsShaderSRGBConversion();
 #ifdef _DEBUG
 		m_bBASETEXTURE = false;
+#endif // _DEBUG
+		m_nBASETEXTURE = 0;
+#ifdef _DEBUG
 		m_bMULTITEXTURE = false;
+#endif // _DEBUG
+		m_nMULTITEXTURE = 0;
+#ifdef _DEBUG
 		m_bREFLECT = false;
+#endif // _DEBUG
+		m_nREFLECT = 0;
+#ifdef _DEBUG
 		m_bREFRACT = false;
+#endif // _DEBUG
+		m_nREFRACT = 0;
+#ifdef _DEBUG
 		m_bABOVEWATER = false;
+#endif // _DEBUG
+		m_nABOVEWATER = 0;
+#ifdef _DEBUG
 		m_bBLURRY_REFRACT = false;
+#endif // _DEBUG
+		m_nBLURRY_REFRACT = 0;
+#ifdef _DEBUG
 		m_bNORMAL_DECODE_MODE = false;
-#endif	// _DEBUG
+#endif // _DEBUG
+		m_nNORMAL_DECODE_MODE = 0;
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
-		Assert( m_bBASETEXTURE && m_bMULTITEXTURE && m_bREFLECT && m_bREFRACT && m_bABOVEWATER && m_bBLURRY_REFRACT && m_bNORMAL_DECODE_MODE );
-		AssertMsg( !( m_nMULTITEXTURE && m_nBASETEXTURE ), "Invalid combo combination ( MULTITEXTURE && BASETEXTURE )" );
-		return ( 6 * m_nCONVERT_TO_SRGB ) + ( 12 * m_nBASETEXTURE ) + ( 24 * m_nMULTITEXTURE ) + ( 48 * m_nREFLECT ) + ( 96 * m_nREFRACT ) + ( 192 * m_nABOVEWATER ) + ( 384 * m_nBLURRY_REFRACT ) + ( 768 * m_nNORMAL_DECODE_MODE ) + 0;
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+		bool bAllStaticVarsDefined = m_bCONVERT_TO_SRGB && m_bBASETEXTURE && m_bMULTITEXTURE && m_bREFLECT && m_bREFRACT && m_bABOVEWATER && m_bBLURRY_REFRACT && m_bNORMAL_DECODE_MODE;
+		Assert( bAllStaticVarsDefined );
+#endif // _DEBUG
+		return ( 4 * m_nCONVERT_TO_SRGB ) + ( 8 * m_nBASETEXTURE ) + ( 16 * m_nMULTITEXTURE ) + ( 32 * m_nREFLECT ) + ( 64 * m_nREFRACT ) + ( 128 * m_nABOVEWATER ) + ( 256 * m_nBLURRY_REFRACT ) + ( 512 * m_nNORMAL_DECODE_MODE ) + 0;
 	}
 };
-
-#define shaderStaticTest_water_ps20b psh_forgot_to_set_static_BASETEXTURE + psh_forgot_to_set_static_MULTITEXTURE + psh_forgot_to_set_static_REFLECT + psh_forgot_to_set_static_REFRACT + psh_forgot_to_set_static_ABOVEWATER + psh_forgot_to_set_static_BLURRY_REFRACT + psh_forgot_to_set_static_NORMAL_DECODE_MODE
-
-
+#define shaderStaticTest_water_ps20b psh_forgot_to_set_static_BASETEXTURE + psh_forgot_to_set_static_MULTITEXTURE + psh_forgot_to_set_static_REFLECT + psh_forgot_to_set_static_REFRACT + psh_forgot_to_set_static_ABOVEWATER + psh_forgot_to_set_static_BLURRY_REFRACT + psh_forgot_to_set_static_NORMAL_DECODE_MODE + 0
 class water_ps20b_Dynamic_Index
 {
-	unsigned int m_nPIXELFOGTYPE : 2;
-	unsigned int m_nWRITE_DEPTH_TO_DESTALPHA : 2;
+private:
+	int m_nPIXELFOGTYPE;
 #ifdef _DEBUG
-	bool m_bPIXELFOGTYPE : 1;
-	bool m_bWRITE_DEPTH_TO_DESTALPHA : 1;
-#endif	// _DEBUG
+	bool m_bPIXELFOGTYPE;
+#endif
 public:
 	void SetPIXELFOGTYPE( int i )
 	{
-		Assert( i >= 0 && i <= 2 );
+		Assert( i >= 0 && i <= 1 );
 		m_nPIXELFOGTYPE = i;
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = true;
-#endif	// _DEBUG
+#endif
 	}
-
+	void SetPIXELFOGTYPE( bool i )
+	{
+		m_nPIXELFOGTYPE = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bPIXELFOGTYPE = true;
+#endif
+	}
+private:
+	int m_nWRITE_DEPTH_TO_DESTALPHA;
+#ifdef _DEBUG
+	bool m_bWRITE_DEPTH_TO_DESTALPHA;
+#endif
+public:
 	void SetWRITE_DEPTH_TO_DESTALPHA( int i )
 	{
 		Assert( i >= 0 && i <= 1 );
 		m_nWRITE_DEPTH_TO_DESTALPHA = i;
 #ifdef _DEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = true;
-#endif	// _DEBUG
+#endif
 	}
-
-	water_ps20b_Dynamic_Index(  )
+	void SetWRITE_DEPTH_TO_DESTALPHA( bool i )
 	{
-		m_nPIXELFOGTYPE = 0;
-		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
+		m_nWRITE_DEPTH_TO_DESTALPHA = i ? 1 : 0;
+#ifdef _DEBUG
+		m_bWRITE_DEPTH_TO_DESTALPHA = true;
+#endif
+	}
+public:
+	water_ps20b_Dynamic_Index()
+	{
 #ifdef _DEBUG
 		m_bPIXELFOGTYPE = false;
+#endif // _DEBUG
+		m_nPIXELFOGTYPE = 0;
+#ifdef _DEBUG
 		m_bWRITE_DEPTH_TO_DESTALPHA = false;
-#endif	// _DEBUG
+#endif // _DEBUG
+		m_nWRITE_DEPTH_TO_DESTALPHA = 0;
 	}
-
-	int GetIndex() const
+	int GetIndex()
 	{
-		Assert( m_bPIXELFOGTYPE && m_bWRITE_DEPTH_TO_DESTALPHA );
-		return ( 1 * m_nPIXELFOGTYPE ) + ( 3 * m_nWRITE_DEPTH_TO_DESTALPHA ) + 0;
+		// Asserts to make sure that we aren't using any skipped combinations.
+		// Asserts to make sure that we are setting all of the combination vars.
+#ifdef _DEBUG
+		bool bAllDynamicVarsDefined = m_bPIXELFOGTYPE && m_bWRITE_DEPTH_TO_DESTALPHA;
+		Assert( bAllDynamicVarsDefined );
+#endif // _DEBUG
+		return ( 1 * m_nPIXELFOGTYPE ) + ( 2 * m_nWRITE_DEPTH_TO_DESTALPHA ) + 0;
 	}
 };
-
-#define shaderDynamicTest_water_ps20b psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_WRITE_DEPTH_TO_DESTALPHA
-
+#define shaderDynamicTest_water_ps20b psh_forgot_to_set_dynamic_PIXELFOGTYPE + psh_forgot_to_set_dynamic_WRITE_DEPTH_TO_DESTALPHA + 0

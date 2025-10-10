@@ -23,8 +23,6 @@ struct DrawWater_params_t
 	float4 pixelFogParams;
 	float fWaterFogStart;
 	float fWaterFogEndMinusStart;
-	float3 vEyePos;
-	float3 vWorldPos;
 };
 
 void DrawWater( in DrawWater_params_t i, 
@@ -233,6 +231,9 @@ void DrawWater( in DrawWater_params_t i,
 		result = float4( 0.0f, 0.0f, 0.0f, 0.0f );
 	}
 
-	fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, i.pixelFogParams, i.vEyePos.xyz, i.vWorldPos.xyz, i.vProjPos.z );
-
+#if (PIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE)
+	fogFactor = CalcRangeFog( i.vProjPos.z, i.pixelFogParams.x, i.pixelFogParams.z, i.pixelFogParams.w );
+#else
+	fogFactor = 0;
+#endif
 }
