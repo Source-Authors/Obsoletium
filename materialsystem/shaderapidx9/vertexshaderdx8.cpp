@@ -2229,8 +2229,11 @@ bool CShaderManager::CreateDynamicCombos_Ver5( void *pContext, uint8 *pComboBuff
 			
 			default:
 			{
-				Assert( 0 );
-				Error(" unrecognized shader compression type = file corrupt?");
+				// dimhotepus: Detailed assert and error when compression type is unknown.
+				AssertMsg( 0, "Unrecognized shader %s compression type %u = file corrupt?",
+					(debugLabel) ? debugLabel : "none", nBlockSize & 0xc0000000U );
+				Error("Unrecognized shader %s compression type %u = file corrupt?",
+					(debugLabel) ? debugLabel : "none", nBlockSize & 0xc0000000U);
 				bOK = false;
 			}
 		}
@@ -2930,13 +2933,18 @@ void CShaderManager::SetVertexShader( VertexShader_t shader )
 	}
 #ifdef _DEBUG
 	vshDebugIndex = (vshDebugIndex + 1) % MAX_SHADER_HISTORY;
-	Q_strncpy( vshDebugName[vshDebugIndex], m_ShaderSymbolTable.String( vshLookup.m_Name ), sizeof( vshDebugName[0] ) );
+	V_strcpy_safe( vshDebugName[vshDebugIndex], m_ShaderSymbolTable.String( vshLookup.m_Name ) );
 #endif
-	Assert( vshIndex < vshLookup.m_ShaderStaticCombos.m_nCount );
+	// dimhotepus: Check vertex shader in range.
+	AssertMsg( vshIndex < vshLookup.m_ShaderStaticCombos.m_nCount,
+		"Vertex shader '%s' on index %d is out of pixel shaders range [0, %d).",
+		vshDebugName[pshDebugIndex],
+		vshIndex,
+		vshLookup.m_ShaderStaticCombos.m_nCount );
 	HardwareShader_t dxshader = vshLookup.m_ShaderStaticCombos.m_pHardwareShaders[vshIndex];
 #endif
 
-	if ( IsPC() && ( dxshader == INVALID_HARDWARE_SHADER ) && m_bCreateShadersOnDemand )
+	if ( dxshader == INVALID_HARDWARE_SHADER && m_bCreateShadersOnDemand )
 	{
 #ifdef DYNAMIC_SHADER_COMPILE
 		ShaderStaticCombos_t::ShaderCreationData_t *pCreationData = &m_VertexShaderDict[shader].m_ShaderStaticCombos.m_pCreationData[vshIndex];
@@ -3018,12 +3026,18 @@ void CShaderManager::SetPixelShader( PixelShader_t shader )
 	}
 #ifdef _DEBUG
 	pshDebugIndex = (pshDebugIndex + 1) % MAX_SHADER_HISTORY;
-	Q_strncpy( pshDebugName[pshDebugIndex], m_ShaderSymbolTable.String( pshLookup.m_Name ), sizeof( pshDebugName[0] ) );
+	V_strcpy_safe( pshDebugName[pshDebugIndex], m_ShaderSymbolTable.String( pshLookup.m_Name ) );
 #endif
+	// dimhotepus: Check pixel shader in range.
+	AssertMsg( pshIndex < pshLookup.m_ShaderStaticCombos.m_nCount,
+		"Pixel shader '%s' on index %d is out of pixel shaders range [0, %d).",
+		pshDebugName[pshDebugIndex],
+		pshIndex,
+		pshLookup.m_ShaderStaticCombos.m_nCount );
 	HardwareShader_t dxshader = pshLookup.m_ShaderStaticCombos.m_pHardwareShaders[pshIndex];
 #endif
 
-	if ( IsPC() && ( dxshader == INVALID_HARDWARE_SHADER ) && m_bCreateShadersOnDemand )
+	if ( dxshader == INVALID_HARDWARE_SHADER && m_bCreateShadersOnDemand )
 	{
 #ifdef DYNAMIC_SHADER_COMPILE
 		ShaderStaticCombos_t::ShaderCreationData_t *pCreationData = &m_PixelShaderDict[shader].m_ShaderStaticCombos.m_pCreationData[pshIndex];
