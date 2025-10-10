@@ -984,7 +984,7 @@ static inline void D3DSetStreamSource( unsigned int streamNumber, IDirect3DVerte
 		Warning( __FUNCTION__ ": IDirect3D9DeviceEx::SetStreamSource(stream_number = %u, stream_data = 0x%p, offset = 0x%x, stride = %u) failed w/e %s.\n",
 			streamNumber, pStreamData, nVertexOffsetInBytes, stride,
 			se::win::com::com_error_category().message(hr).c_str() );
-}
+	}
 }
 
 
@@ -4088,7 +4088,7 @@ void CTempMeshDX8::CopyToMeshBuilder(
 	{
 		builder.Index( m_IndexData[iStartIndex+i] + indexOffset );
 		builder.AdvanceIndex();
-	}		
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -4855,7 +4855,7 @@ void CMeshMgr::Init()
 	CreateVertexIDBuffer();
 
 	CreateZeroVertexBuffer();
-		
+
 	m_BufferedMode = true;
 }
 
@@ -5709,7 +5709,7 @@ void CMeshMgr::SetVertexStreamState( int nVertOffsetInBytes, int nVertexStride )
 		// cFlexScale.x masks flex in vertex shader
 		if ( g_pHardwareConfig->Caps().m_SupportsVertexShaders_2_0 )
 		{
-			float c[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+			constexpr float c[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
 			ShaderAPI()->SetVertexShaderConstant( VERTEX_SHADER_FLEXSCALE, c, 1 );
 		}
 
