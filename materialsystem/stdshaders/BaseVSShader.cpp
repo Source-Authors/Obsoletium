@@ -733,10 +733,10 @@ void CBaseVSShader::SetEnvMapTintPixelShaderDynamicState( int pixelReg, int tint
 		if( alphaVar >= 0 )
 		{
 			pAlphaVar = s_ppParams[alphaVar];
-		if( pAlphaVar )
-		{
-			color[3] = pAlphaVar->GetFloatValue();
-		}
+			if( pAlphaVar )
+			{
+				color[3] = pAlphaVar->GetFloatValue();
+			}
 		}
 
 		IMaterialVar* pTintVar = s_ppParams[tintVar];
@@ -1133,8 +1133,8 @@ void CBaseVSShader::DrawWorldBumpedDiffuseLighting( int bumpmapVar, int bumpFram
 			s_pShaderShadow->SetPixelShader( "LightmappedGeneric_SSBumpmappedLightmap" );
 		else
 			s_pShaderShadow->SetPixelShader( "LightmappedGeneric_BumpmappedLightmap" );
-
-			FogToFogColor();
+			
+		FogToFogColor();
 	}
 	else
 	{
