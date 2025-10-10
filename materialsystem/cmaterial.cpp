@@ -1185,6 +1185,11 @@ bool CMaterial::ShouldSkipVar( KeyValues *pVar, bool *pWasConditional )
 		{
 			bShouldSkip = !IsX360();
 		}
+		// dimhotepus: Check for game console.
+		else if ( ! stricmp( pCond, "gameconsole" ) )
+		{
+			bShouldSkip = !IsGameConsole();
+		}
 		else
 		{
 			Warning( "unrecognized conditional test %s in %s\n", pVarName, GetName() );
