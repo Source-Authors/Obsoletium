@@ -394,7 +394,10 @@ static inline void DecodeAlpha3BitLinear( CDestPixel *pImPos, DXTAlphaBlock3BitL
 	// pRows = (Alpha3BitRows*) & ( pAlphaBlock->stuff[0] );
 	constexpr dword mask = 0x00000007;		// bits = 00 00 01 11
 
-	dword bits = *( (dword*) & ( pAlphaBlock->stuff[0] ));
+	dword bits;
+	// dimhotepus: Use memcpy as cast + copy violates pointer alignment rules. dimhotepus: Read 3 bytes as we need only 3! dimhotepus: Read 3
+    // dimhotepus: Read 3 bytes as we need only 3!
+	memcpy( &bits, &(pAlphaBlock->stuff[0]), 3 );
 
 	gBits[0][0] = (byte)( bits & mask );
 	bits >>= 3;
@@ -413,7 +416,9 @@ static inline void DecodeAlpha3BitLinear( CDestPixel *pImPos, DXTAlphaBlock3BitL
 	gBits[1][3] = (byte)( bits & mask );
 
 	// now for last two rows:
-	bits = *( (dword*) & ( pAlphaBlock->stuff[3] ));		// last 3 bytes
+	// dimhotepus: Use memcpy as cast + copy violates pointer alignment rules.
+	// dimhotepus: Read 3 bytes as we need only 3!
+	memcpy( &bits, &(pAlphaBlock->stuff[3]), 3 ); // last 3 bytes
 
 	gBits[2][0] = (byte)( bits & mask );
 	bits >>= 3;
