@@ -975,10 +975,16 @@ static bool g_bUsingVertexID = false;
 static bool g_bFlexMeshStreamSet = false;
 static VertexFormat_t g_LastVertexFormat = 0;
 
-inline void D3DSetStreamSource( unsigned int streamNumber, IDirect3DVertexBuffer9 *pStreamData,
+static inline void D3DSetStreamSource( unsigned int streamNumber, IDirect3DVertexBuffer9 *pStreamData,
 								unsigned int nVertexOffsetInBytes, unsigned int stride )
 {
-	Dx9Device()->SetStreamSource( streamNumber, pStreamData, nVertexOffsetInBytes, stride );
+	const HRESULT hr = Dx9Device()->SetStreamSource( streamNumber, pStreamData, nVertexOffsetInBytes, stride );
+	if (FAILED(hr))
+	{
+		Warning( __FUNCTION__ ": IDirect3D9DeviceEx::SetStreamSource(stream_number = %u, stream_data = 0x%p, offset = 0x%x, stride = %u) failed w/e %s.\n",
+			streamNumber, pStreamData, nVertexOffsetInBytes, stride,
+			se::win::com::com_error_category().message(hr).c_str() );
+}
 }
 
 
