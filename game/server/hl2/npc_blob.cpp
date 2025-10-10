@@ -698,9 +698,9 @@ void CNPC_Blob::ComputeCentroid()
 {
 	m_vecCentroid = vec3_origin;
 
-	for( int i = 0 ; i < m_Elements.Count() ; i++ )
+	for( auto &e : m_Elements )
 	{
-		m_vecCentroid += m_Elements[ i ]->GetAbsOrigin();
+		m_vecCentroid += e->GetAbsOrigin();
 	}
 
 	m_vecCentroid /= m_Elements.Count();
