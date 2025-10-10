@@ -4948,9 +4948,9 @@ void CMeshMgr::CreateZeroVertexBuffer()
 	{
 		// In GL glVertexAttribPointer() doesn't support strides of 0, so we need to allocate a dummy vertex buffer large enough to handle 16-bit indices with a stride of 4 byte per vertex, plus a bit more for safety (in case basevertexindex is > 0).
 		// We could also try just disabling any vertex attribs that fetch from stream 2 and need 0's, but AMD reports this could hit a slow path in the driver. Argh.
-		uint nBufSize = IsOpenGL() ? ( 65536 * 2 * 4 ) : 4096;
+		const uint nBufSize = IsOpenGL() ? ( 65536 * 2 * 4 ) : 4096;
 		HRESULT hr = Dx9Device()->CreateVertexBuffer( nBufSize, D3DUSAGE_WRITEONLY, 0, D3DPOOL_DEFAULT, &m_pZeroVertexBuffer, NULL );
-		if ( !FAILED( hr ) )
+		if ( SUCCEEDED( hr ) )
 		{
 			void *pData = NULL;
 			m_pZeroVertexBuffer->Lock( 0, nBufSize, &pData, D3DLOCK_NOSYSLOCK );
