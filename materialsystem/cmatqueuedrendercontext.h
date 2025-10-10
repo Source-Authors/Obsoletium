@@ -566,11 +566,6 @@ public:
 	void DeferredDrawPrimList( IMesh *pMesh, CPrimList *pLists, int nLists );
 	void DeferredSetFlexMesh( IMesh *pStaticMesh, int nVertexOffsetInBytes );
 
-#if defined( _X360 )
-	DEFINE_QUEUED_CALL_1(					PushVertexShaderGPRAllocation, int, IMatRenderContext, m_pHardwareContext );
-	DEFINE_QUEUED_CALL_0(					PopVertexShaderGPRAllocation, IMatRenderContext, m_pHardwareContext );
-#endif
-
 	// A special path used to tick the front buffer while loading on the 360
 	DEFINE_QUEUED_CALL_4(					SetNonInteractivePacifierTexture, ITexture *, float, float, float, IMatRenderContext, m_pHardwareContext );
 	DEFINE_QUEUED_CALL_2(					SetNonInteractiveTempFullscreenBuffer, ITexture *, MaterialNonInteractiveMode_t, IMatRenderContext, m_pHardwareContext );

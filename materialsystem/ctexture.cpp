@@ -2397,11 +2397,12 @@ bool CTexture::AsyncReadTextureFromFile( IVTFTexture* pVTFTexture, unsigned int 
 		return false;
 	}
 
-	if ( V_strstr( GetName(), "c_sniperrifle_scope" ) )
-	{
-		int i = 0;
-		i = 3;
-	}
+	// dimhotepus: Drop debug code.
+	// if ( V_strstr( GetName(), "c_sniperrifle_scope" ) )
+	// {
+	// 	int i = 0;
+	// 	i = 3;
+	// }
 
 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, tmDynamicString( TELEMETRY_LEVEL0, pCacheFileName ) );
