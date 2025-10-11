@@ -949,11 +949,6 @@ void UTIL_StringToFloatArray( float *pVector, intp count, const char *pString )
 	}
 }
 
-static void UTIL_StringToVector( float *pVector, const char *pString )
-{
-	UTIL_StringToFloatArray( pVector, 3, pString);
-}
-
 void UTIL_StringToVector( Vector &vector, const char *pString )
 {
 	UTIL_StringToFloatArray( vector.Base(), 3, pString );
