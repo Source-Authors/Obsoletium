@@ -183,9 +183,9 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 		m_iFlags |= vgui::ISurface::FONTFLAG_ADDITIVE;
 	}
 
-	m_iMaxCharWidth = pFontTable->m_pBitmapFont->m_MaxCharWidth * m_scalex;
-	m_iHeight       = pFontTable->m_pBitmapFont->m_MaxCharHeight * m_scaley;
-	m_iAscent       = pFontTable->m_pBitmapFont->m_Ascent * m_scaley;
+	m_iMaxCharWidth = static_cast<unsigned>(pFontTable->m_pBitmapFont->m_MaxCharWidth * m_scalex);
+	m_iHeight       = static_cast<unsigned>(pFontTable->m_pBitmapFont->m_MaxCharHeight * m_scaley);
+	m_iAscent       = static_cast<unsigned>(pFontTable->m_pBitmapFont->m_Ascent * m_scaley);
 
 	// mark as valid
 	m_szName = fontName;
