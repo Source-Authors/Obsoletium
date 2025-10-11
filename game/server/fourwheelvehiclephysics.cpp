@@ -670,7 +670,8 @@ void CFourWheelVehiclePhysics::PlaceWheelDust( int wheelIndex, bool ignoreSpeed 
 
 	// Old dust
 	Vector	vecPos, vecVel;
-	m_pVehicle->GetWheelContactPoint( wheelIndex, &vecPos, NULL );
+	// dimhotepus: Only if has wheel contact point.
+	if ( !m_pVehicle->GetWheelContactPoint( wheelIndex, &vecPos, NULL ) ) return;
 
 	vecVel.Random( -1.0f, 1.0f );
 	vecVel.z = random->RandomFloat( 0.3f, 1.0f );
