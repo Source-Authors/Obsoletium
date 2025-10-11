@@ -363,7 +363,7 @@ int CPhysConstraint::DrawDebugTextOverlays()
 		else
 		{
 			// dimhotepus: If constraint params missed, warn.
-			NDebugOverlay::EntityTextAtPosition( GetAbsOrigin(), pos, "<missed constraint parameters", 0, 255, 255, 0, 255 );
+			NDebugOverlay::EntityTextAtPosition( GetAbsOrigin(), pos, "<no constraint params>", 0, 255, 255, 0, 255 );
 		}
 		
 		pos++;
