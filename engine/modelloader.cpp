@@ -3203,7 +3203,7 @@ model_t *CModelLoader::GetModelForIndex( int i )
 {
 	Assert( m_Models.IsValidIndex( i ) );
 
-	if ( i < 0 || (size_t)i >= m_Models.Count() )
+	if ( i < 0 || i >= m_Models.Count() )
 	{
 		return NULL;
 	}
