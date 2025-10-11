@@ -2688,8 +2688,8 @@ void CShaderDeviceDx8::HandlePresentModeChange()
 
 	m_PresentParameters.BackBufferFormat = ImageLoader::ImageFormatToD3DFormat( mode.m_Format );
 	// Cap max to display dimensions in windowed or full screen modes.
-	m_PresentParameters.BackBufferWidth = MIN( m_PresentParameters.BackBufferWidth, mode.m_nWidth );
-	m_PresentParameters.BackBufferHeight = MIN( m_PresentParameters.BackBufferHeight, mode.m_nHeight );
+	m_PresentParameters.BackBufferWidth = min( m_PresentParameters.BackBufferWidth, static_cast<unsigned>(mode.m_nWidth) );
+	m_PresentParameters.BackBufferHeight = min( m_PresentParameters.BackBufferHeight, static_cast<unsigned>(mode.m_nHeight) );
 
 	if ( !m_PresentParameters.Windowed )
 	{
