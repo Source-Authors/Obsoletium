@@ -253,8 +253,9 @@ void CSoundPicker::RefreshGameSoundList()
 	for ( int nItemID = m_pGameSoundList->FirstItem(); nItemID != m_pGameSoundList->InvalidItemID(); nItemID = m_pGameSoundList->NextItem( nItemID ) )
 	{
 		KeyValues *kv = m_pGameSoundList->GetItem( nItemID );
-		int hGameSound = kv->GetInt( "gameSoundHandle", SoundEmitterSystem()->InvalidIndex() );
-		if ( hGameSound == SoundEmitterSystem()->InvalidIndex() )
+		// dimhotepus: Use -1 as missed sound indicator. See CSoundPicker::BuildGameSoundList.
+		int hGameSound = kv->GetInt( "gameSoundHandle", -1 );
+		if ( hGameSound == -1 )
 			continue;
 		bool bIsVisible = IsGameSoundVisible( hGameSound );
 		m_pGameSoundList->SetItemVisible( nItemID, bIsVisible );
