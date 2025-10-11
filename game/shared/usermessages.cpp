@@ -104,7 +104,7 @@ void CUserMessages::Register( const char *name, int size )
 		Error( __FUNCTION__ ": message '%s' already registered.\n", name );
 	}
 
-	auto *entry = new CUserMessage{size, name};
+	auto *entry = new CUserMessage{size, name, CUtlVector<pfnUserMsgHook>{}};
 	m_UserMessages.Insert( name, entry );
 }
 
