@@ -69,6 +69,7 @@ void InitEyes_DX8_DX9( CBaseVSShader *pShader, IMaterialVar** params, Eyes_DX8_D
 	}
 }
 
+#ifdef STDSHADER_DX9_DLL_EXPORT
 static void SetDepthFlashlightParams( CBaseVSShader *pShader, IShaderDynamicAPI *pShaderAPI, const VMatrix& worldToTexture, const FlashlightState_t& flashlightState ) 
 {
 	float atten[4], pos[4], tweaks[4];
@@ -104,6 +105,7 @@ static void SetDepthFlashlightParams( CBaseVSShader *pShader, IShaderDynamicAPI 
 		pShaderAPI->SetBooleanPixelShaderConstant( 0, &flashlightState.m_nShadowQuality, 1 );
 	}
 }
+#endif
 
 static void DrawFlashlight( bool bDX9, CBaseVSShader *pShader,  [[maybe_unused]] IMaterialVar** params, IShaderDynamicAPI *pShaderAPI, 
 						   IShaderShadow* pShaderShadow, Eyes_DX8_DX9_Vars_t &info, VertexCompressionType_t vertexCompression )
