@@ -1049,12 +1049,13 @@ void CVMTDoc::UpdatePreviewMaterial()
 	g_pDataModel->Serialize( vmtBuf, "vmt", "vmt", m_hRoot );
 
 	// Now use the text format to create a keyvalues
-	KeyValues *pVMTKeyValues = new KeyValues( "ShaderName" );
-	pVMTKeyValues->LoadFromBuffer( "VMT Preview", vmtBuf, g_pFileSystem, "GAME" );
-
-	// Finally, hook the keyvalues into the material.
-	m_pPreviewMaterial->SetShaderAndParams( pVMTKeyValues );
-	pVMTKeyValues->deleteThis();
+	KeyValuesAD pVMTKeyValues( "ShaderName" );
+	// dimhotepus: Set shader and params only if they are loaded successfully.
+	if ( pVMTKeyValues->LoadFromBuffer( "VMT Preview", vmtBuf, g_pFileSystem, "GAME" ) )
+	{
+		// Finally, hook the keyvalues into the material.
+		m_pPreviewMaterial->SetShaderAndParams( pVMTKeyValues );
+	}
 }
 
 	
