@@ -262,7 +262,7 @@ void CReplayTime::Write( KeyValues *pOut )
 	int nSecs = (int)flSecs;
 	int nMins = ( nSecs % 3600 ) / 60;
 	int nSeconds = nSecs % 60;
-	int nMilliseconds = (flSecs - (float)nSecs) * 10.0f;
+	int nMilliseconds = static_cast<int>((flSecs - (float)nSecs) * 10.0f);
 
 	V_snprintf( pResult, nStrLen, "%02i:%02i:%02i", nMins, nSeconds, nMilliseconds );
 
