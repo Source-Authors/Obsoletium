@@ -2036,7 +2036,7 @@ public:
 	}
 
 	// converts the void * stored in the hash to a list in the multilist
-	unsigned short HashToListIndex( void *pHash )
+	unsigned short HashToListIndex( void *pHash ) const
 	{
 		if ( !pHash )
 			return m_objectList.InvalidIndex();
