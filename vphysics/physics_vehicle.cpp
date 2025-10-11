@@ -17,7 +17,6 @@
 #include "physics_vehicle.h"
 #include "physics_controller_raycast_vehicle.h"
 #include "physics_airboat.h"
-#include "ivp_car_system.hxx"
 #include "ivp_listener_object.hxx"
 
 // memdbgon must be the last include file in a .cpp file!!!
