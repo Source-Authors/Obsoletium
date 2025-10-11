@@ -888,7 +888,7 @@ void CFlexControlBuilder::SetupLogs( CDmeChannelsClip *pChannelsClip, bool bUseE
 				pFloatLog = info.m_pExistingLog[j].m_pLog;
 
 				// Apply transform to get the log into the space of the current channel
-				double flTotalScale = info.m_pExistingLog[j].m_flGlobalScale * flOOTargetScale;
+				float flTotalScale = info.m_pExistingLog[j].m_flGlobalScale * flOOTargetScale;
 				DmeTime_t totalOffset = info.m_pExistingLog[j].m_GlobalOffset - targetOffset;
 				totalOffset.SetSeconds( totalOffset.GetSeconds() * flOOTargetScale );
 				pFloatLog->ScaleBiasKeyTimes( flTotalScale, totalOffset );
