@@ -63,11 +63,13 @@ protected:
 			  m_KeyBinding( UTL_INVAL_SYMBOL )
 		{
 		}
-		unsigned short	m_ItemID;
+		// dimhotepus: unsigned short -> int.
+		int	m_ItemID;
 		CUtlSymbol		m_KeyBinding;
 	};
-
-	CUtlDict< MenuItem_t, unsigned short >	m_Items;
+	
+	// dimhotepus: unsigned short -> int.
+	CUtlDict< MenuItem_t, int >	m_Items;
 };
 
 
