@@ -548,7 +548,6 @@ void CModelPanel::Paint()
 	if ( !m_hModel.Get() )
 		return;
 
-	int i = 0;
 	int x, y, w, h;
 
 	GetBounds( x, y, w, h );
