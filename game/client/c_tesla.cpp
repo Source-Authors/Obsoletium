@@ -38,7 +38,8 @@ void C_Tesla::ReceiveMessage( int classID, bf_read &msg )
 	teslaInfo.m_vColor.y = msg.ReadByte() / 255.0f;
 	teslaInfo.m_vColor.z = msg.ReadByte() / 255.0f;
 	
-	float flAlpha = msg.ReadByte() / 255.0f;
+	// dimhotepus: Alpha is send but not used.
+	[[maybe_unused]] float flAlpha = msg.ReadByte() / 255.0f;
 
 	teslaInfo.m_nBeams = msg.ReadChar();
 	
