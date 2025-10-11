@@ -504,12 +504,6 @@ void CNewGameDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 		m_pCommentaryLabel->SetVisible( m_bCommentaryMode );
 }
 
-static float GetArrowAlpha( void )
-{
-	// X360TBD: Pulsing arrows
-	return 255.f;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: sets the correct properties for visible components
 //-----------------------------------------------------------------------------
