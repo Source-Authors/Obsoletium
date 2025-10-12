@@ -1018,7 +1018,7 @@ void CVehicleController::UpdateEngineTurboFinish( void )
 	{
 		if ( m_currentState.boostDelay > 0 )
 		{
-			m_currentState.boostTimeLeft = 100 - 100 * ( m_currentState.boostDelay / ( m_vehicleData.engine.boostDuration +  m_vehicleData.engine.boostDelay ) );
+			m_currentState.boostTimeLeft = static_cast<int>(100 - 100 * ( m_currentState.boostDelay / ( m_vehicleData.engine.boostDuration + m_vehicleData.engine.boostDelay ) ) );
 		}
 		else
 		{
