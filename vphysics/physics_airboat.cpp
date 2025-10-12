@@ -125,7 +125,6 @@ CPhysics_Airboat::CPhysics_Airboat( IVP_Environment *pEnv, const IVP_Template_Ca
 	m_flThrust = 0;
 
 	m_bAirborne = false;
-	m_flAirTime = 0;
 	m_bWeakJump = false;
 
 	m_flPitchErrorPrev = 0;
@@ -194,8 +193,8 @@ float CPhysics_Airboat::ComputeFrontPontoonWaveNoise( int nPontoonIndex, float f
 	IVP_FLOAT flNoiseScale = RemapValClamped( 1.0f - flSpeedRatio, 0, 1, AIRBOAT_WATER_NOISE_MIN, AIRBOAT_WATER_NOISE_MAX );
 
 	// Apply a phase shift between left and right pontoons to simulate waves passing under the boat.
-	IVP_FLOAT flPhaseShift = 0;
-	if ( flSpeedRatio < 0.3 )
+	IVP_FLOAT flPhaseShift = 0.0f;
+	if ( flSpeedRatio < 0.3f )
 	{
 		// BUG: this allows a discontinuity in the waveform - use two superimposed sine waves instead?
 		flPhaseShift = nPontoonIndex * AIRBOAT_WATER_PHASE_MAX;
@@ -517,7 +516,6 @@ void CPhysics_Airboat::UpdateAirborneState( IVP_Raycast_Airboat_Impact *pImpacts
 		if (!m_bAirborne)
 		{
 			m_bAirborne = true;
-			m_flAirTime = 0;
 
 			IVP_FLOAT flSpeed = ( IVP_FLOAT )m_pCore->speed.real_length();
 			if (flSpeed < 11.0f)
@@ -529,10 +527,6 @@ void CPhysics_Airboat::UpdateAirborneState( IVP_Raycast_Airboat_Impact *pImpacts
 			{
 				//Msg("Strong JUMP at %f\n", flSpeed);
 			}
-		}
-		else
-		{
-			m_flAirTime += pEventSim->delta_time;
 		}
 	}
 	else
