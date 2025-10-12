@@ -189,7 +189,8 @@ public:
 
 	// local functions
 	[[nodiscard]] inline	IVP_Real_Object *GetObject( void ) const { return m_pObject; }
-	[[nodiscard]] inline int		CallbackFlags( void ) const { return m_callbacks; }
+	// dimhotepus: int -> unsigned short.
+	[[nodiscard]] inline unsigned short	CallbackFlags( void ) const { return m_callbacks; }
 	inline void		AddCallbackFlags( unsigned short flags ) { m_callbacks |= flags; }
 	inline void		RemoveCallbackFlags( unsigned short flags ) { m_callbacks &= ~flags; }
 	[[nodiscard]] inline bool		HasTouchedDynamic();

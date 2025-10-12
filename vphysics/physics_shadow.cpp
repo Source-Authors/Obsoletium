@@ -992,7 +992,8 @@ private:
 	CPhysicsObject		*m_pObject;
 	float				m_secondsToArrival;
 	float				m_savedMass;
-	unsigned int		m_savedFlags;
+	// dimhotepus: unsigned int -> unsigned short.
+	unsigned short		m_savedFlags;
 
 	// dimhotepus: unsigned short -> int.
 	int					m_savedMaterialIndex;

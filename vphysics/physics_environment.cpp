@@ -470,8 +470,8 @@ public:
 		if ( !pObject1 || !pObject2 )
 			return;
 
-		unsigned int flags1 = pObject1->CallbackFlags();
-		unsigned int flags2 = pObject2->CallbackFlags();
+		unsigned short flags1{pObject1->CallbackFlags()};
+		unsigned short flags2{pObject2->CallbackFlags()};
 
 		m_event.isCollision = (flags1 & flags2 & CALLBACK_GLOBAL_COLLISION) ? true : false;
 		
@@ -555,9 +555,9 @@ public:
 		if ( !pObject1 || !pObject2 )
 			return;
 
-		unsigned int flags1 = pObject1->CallbackFlags();
-		unsigned int flags2 = pObject2->CallbackFlags();
-		unsigned int allflags = flags1|flags2;
+		unsigned short flags1{pObject1->CallbackFlags()};
+		unsigned short flags2{pObject2->CallbackFlags()};
+		unsigned short allflags{static_cast<unsigned short>(flags1 | flags2)};
 
 		if ( !pObject1->IsStatic() || !pObject2->IsStatic() )
 		{
@@ -594,10 +594,10 @@ public:
 		if ( !pObject1 || !pObject2 )
 			return;
 
-		unsigned int flags1 = pObject1->CallbackFlags();
-		unsigned int flags2 = pObject2->CallbackFlags();
+		unsigned short flags1{pObject1->CallbackFlags()};
+		unsigned short flags2{pObject2->CallbackFlags()};
 
-		unsigned int allflags = flags1|flags2;
+		unsigned short allflags{static_cast<unsigned short>(flags1 | flags2)};
 
 		bool calltouch = ( allflags & CALLBACK_GLOBAL_TOUCH ) ? true : false;
 		if ( !calltouch )

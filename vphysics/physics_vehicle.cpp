@@ -560,10 +560,10 @@ IVP_Real_Object *CVehicleController::CreateWheel( int wheelIndex, vehicle_axlepa
 	params.volume = (4.0f / 3) * M_PI_F * r3;
 
 	CPhysicsObject *pWheel = (CPhysicsObject *)m_pEnv->CreateSphereObject( radius, axle.wheels.materialIndex, wheelPositionHL, bodyAngles, &params, false );
-    pWheel->Wake();
+	pWheel->Wake();
 
 	// UNDONE: only mask off some of these flags?
-	unsigned int flags = pWheel->CallbackFlags();
+	unsigned short flags{pWheel->CallbackFlags()};
 	flags = 0;
 	pWheel->SetCallbackFlags( flags );
 	// copy the body's game flags
