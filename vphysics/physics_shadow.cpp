@@ -994,7 +994,8 @@ private:
 	float				m_savedMass;
 	unsigned int		m_savedFlags;
 
-	unsigned short		m_savedMaterialIndex;
+	// dimhotepus: unsigned short -> int.
+	int					m_savedMaterialIndex;
 	bool				m_enabled : 1;
 	bool				m_allowsTranslation : 1;
 	bool				m_allowsRotation : 1;
@@ -1011,7 +1012,7 @@ CShadowController::CShadowController()
 	m_secondsToArrival = FP_NAN;
 	m_savedMass = FP_NAN;
 	m_savedFlags = 0;
-	m_savedMaterialIndex = USHRT_MAX;
+	m_savedMaterialIndex = INT_MIN;
 	m_enabled = true;
 	m_allowsTranslation = true;
 	m_allowsRotation = true;
