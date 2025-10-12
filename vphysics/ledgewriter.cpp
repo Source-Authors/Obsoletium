@@ -88,13 +88,13 @@ static void BuildVertMap( vertmap_t &out, const Vector *pVerts, int vertexCount,
 // Each IVP_Compact_Triangle and IVP_Compact_Edge occupies an index 
 // 0,1,2,3 is tri, edge, edge, edge (tris and edges are both 16 bytes)
 // So you can just add the index to get_first_triangle to get a pointer 
-inline intp EdgeIndex( const IVP_Compact_Ledge *pLedge, const IVP_Compact_Edge *pEdge )
+static inline intp EdgeIndex( const IVP_Compact_Ledge *pLedge, const IVP_Compact_Edge *pEdge )
 {
 	return pEdge - (const IVP_Compact_Edge *)pLedge->get_first_triangle();
 }
 
 // Builds a packedhull_t from a IVP_Compact_Ledge.  Assumes that the utlbuffer points at the memory following pHull (pHull is the header, utlbuffer is the body)
-void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP_Compact_Ledge *pLedge, const virtualmeshlist_t &list )
+static void PackLedgeIntoBuffer( packedhull_t *pHull, CUtlBuffer &buf, const IVP_Compact_Ledge *pLedge, const virtualmeshlist_t &list )
 {
 	if ( !pLedge )
 		return;
@@ -250,7 +250,7 @@ void CVPhysicsVirtualMeshWriter::UnpackCompactLedgeFromHull( IVP_Compact_Ledge *
 		pOut[i].set_pierce_index(pPackedTris[i].opposite);
 		Assert(pPackedTris[i].opposite<pHull->triangleCount);
 		int edges[3] = {pPackedTris[i].e0, pPackedTris[i].e1, pPackedTris[i].e2};
-		for ( int j = 0; j < 3; j++ )
+		for ( int j = 0; j < ssize(edges); j++ )
 		{
 			Assert(edges[j]<pHull->edgeCount);
 			if ( forwardEdgeIndex[edges[j]] < 0 )
@@ -332,7 +332,7 @@ virtualmeshhull_t *CVPhysicsVirtualMeshWriter::CreatePackedHullFromLedges( const
 		Assert(LedgeCanBePacked(pLedges[i], list));
 	}
 
-	unsigned int totalSize = sizeof(packedtriangle_t)*triCount + sizeof(packededge_t)*edgeCount + sizeof(packedhull_t)*ledgeCount + sizeof(virtualmeshhull_t);
+	const unsigned int totalSize = sizeof(packedtriangle_t)*triCount + sizeof(packededge_t)*edgeCount + sizeof(packedhull_t)*ledgeCount + sizeof(virtualmeshhull_t);
 	byte *pBuf = new byte[totalSize];
 
 	CUtlBuffer buf;
