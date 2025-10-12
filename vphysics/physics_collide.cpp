@@ -929,15 +929,12 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 		pReturn->pPolygons[i].iFirstIndex = iInsertIndex;
 		pReturn->pPolygons[i].iIndexCount = 3;
 
-		Vector *p1, *p2, *p3;
-		p1 = &pReturn->pVertices[pTriangles[i].Edges[0].iPointIndices[0]];
-		p2 = &pReturn->pVertices[pTriangles[i].Edges[1].iPointIndices[0]];
-		p3 = &pReturn->pVertices[pTriangles[i].Edges[2].iPointIndices[0]];
+		const Vector &p1 = pReturn->pVertices[pTriangles[i].Edges[0].iPointIndices[0]];
+		const Vector &p2 = pReturn->pVertices[pTriangles[i].Edges[1].iPointIndices[0]];
+		const Vector &p3 = pReturn->pVertices[pTriangles[i].Edges[2].iPointIndices[0]];
 
-		Vector v1to2, v1to3;
-
-		v1to2 = *p2 - *p1;
-		v1to3 = *p3 - *p1;
+		Vector v1to2 = p2 - p1;
+		Vector v1to3 = p3 - p1;
 
 		pReturn->pPolygons[i].polyNormal = v1to3.Cross( v1to2 );
 		pReturn->pPolygons[i].polyNormal.NormalizeInPlace();
