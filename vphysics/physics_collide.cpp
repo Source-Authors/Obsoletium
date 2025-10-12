@@ -942,7 +942,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 		for( int j = 0; j != 3; ++j, ++iInsertIndex )
 		{
 			const int *pIndices = pTriangles[i].Edges[j].iPointIndices;
-			int iLow = (pIndices[0] > pIndices[1])?1:0;
+			byte iLow = (pIndices[0] > pIndices[1]) ? 1 : 0;
 			int iLineIndex;
 			for( iLineIndex = pStartIndices[pIndices[iLow]]; iLineIndex != iLinkCount; ++iLineIndex )
 			{
