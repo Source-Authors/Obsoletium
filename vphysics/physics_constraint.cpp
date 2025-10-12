@@ -179,7 +179,7 @@ END_DATADESC()
 // the constraints are restored and added to the groups
 static CUtlVector<CPhysicsConstraintGroup *> g_ConstraintGroupActivateList;
 
-class CPhysicsConstraintGroup: public IPhysicsConstraintGroup 
+class CPhysicsConstraintGroup final : public IPhysicsConstraintGroup 
 {
 public:
 	hk_Local_Constraint_System *GetLCS() { return m_pLCS; }
@@ -447,7 +447,7 @@ struct vphysics_save_constraint_t
 
 // UNDONE: May need to change interface to specify limits before construction
 // UNDONE: Refactor constraints to contain a separate object for the various constraint types?
-class CPhysicsConstraint: public IPhysicsConstraint, public IVP_Listener_Object
+class CPhysicsConstraint final : public IPhysicsConstraint, public IVP_Listener_Object
 {
 public:
 	CPhysicsConstraint( CPhysicsObject *pReferenceObject, CPhysicsObject *pAttachedObject );
