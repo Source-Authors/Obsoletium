@@ -17,15 +17,16 @@
 #include "ledgewriter.h"
 
 // gets the max vertex index referenced by a compact ledge
-static int MaxLedgeVertIndex( const IVP_Compact_Ledge *pLedge )
+// dimhotepus: int -> unsigned short.
+[[nodiscard]] static unsigned short MaxLedgeVertIndex( const IVP_Compact_Ledge *pLedge )
 {
-	int maxIndex = -1;
+	unsigned short maxIndex = 0;
 	for ( int i = 0; i < pLedge->get_n_triangles(); i++ )
 	{
 		const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle() + i;
 		for ( int j = 0; j < 3; j++ )
 		{
-			int ivpIndex = pTri->get_edge(j)->get_start_point_index();
+			const unsigned short ivpIndex{pTri->get_edge(j)->get_start_point_index()};
 			maxIndex = max(maxIndex, ivpIndex);
 		}
 	}
@@ -59,7 +60,7 @@ static void BuildVertMap( vertmap_t &out, const Vector *pVerts, int vertexCount,
 		const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle() + i;
 		for ( int j = 0; j < 3; j++ )
 		{
-			int ivpIndex = pTri->get_edge(j)->get_start_point_index();
+			const unsigned short ivpIndex{pTri->get_edge(j)->get_start_point_index()};
 			if ( out.map[ivpIndex] < 0 )
 			{
 				int index = -1;
