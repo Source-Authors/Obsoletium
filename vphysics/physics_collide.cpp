@@ -154,11 +154,11 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CPhysicsCollision, IPhysicsCollision, VPHYSIC
 //-----------------------------------------------------------------------------
 // Abstract compact_surface vs. compact_mopp
 //-----------------------------------------------------------------------------
-#define IVP_COMPACT_SURFACE_ID			MAKEID('I','V','P','S')
-#define IVP_COMPACT_SURFACE_ID_SWAPPED	MAKEID('S','P','V','I')
-#define IVP_COMPACT_MOPP_ID				MAKEID('M','O','P','P')
-#define VPHYSICS_COLLISION_ID			MAKEID('V','P','H','Y')
-#define VPHYSICS_COLLISION_VERSION		0x0100
+constexpr inline int IVP_COMPACT_SURFACE_ID = MAKEID('I', 'V', 'P', 'S');
+constexpr inline int IVP_COMPACT_SURFACE_ID_SWAPPED	= MAKEID('S', 'P', 'V', 'I');
+constexpr inline int IVP_COMPACT_MOPP_ID = MAKEID('M', 'O', 'P', 'P');
+constexpr inline int VPHYSICS_COLLISION_ID = MAKEID('V', 'P', 'H', 'Y');
+constexpr inline int VPHYSICS_COLLISION_VERSION = 0x0100;
 // You can disable all of the havok Mopp collision model building by undefining this symbol
 #define ENABLE_IVP_MOPP	0
 
