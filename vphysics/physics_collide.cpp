@@ -41,7 +41,7 @@ struct bboxcache_t
 	CPhysCollideCompactSurface	*pCollide;
 };
 
-class CPhysicsCollision : public IPhysicsCollision
+class CPhysicsCollision final : public IPhysicsCollision
 {
 public:
 	CPhysicsCollision()
@@ -207,7 +207,7 @@ BEGIN_BYTESWAP_DATADESC_( compactsurfaceheader_t, physcollideheader_t )
 END_BYTESWAP_DATADESC()
 
 #if ENABLE_IVP_MOPP
-struct moppheader_t : public physcollideheader_t
+struct moppheader_t final : public physcollideheader_t
 {
 	int moppSize;
 	void Mopp( const IVP_Compact_Mopp *pMopp )
@@ -219,7 +219,7 @@ struct moppheader_t : public physcollideheader_t
 #endif
 
 #if ENABLE_IVP_MOPP
-class CPhysCollideMopp : public CPhysCollide
+class CPhysCollideMopp final : public CPhysCollide
 {
 public:
 	CPhysCollideMopp( const moppheader_t *pHeader );
@@ -244,7 +244,7 @@ private:
 };
 #endif
 
-class CPhysCollideCompactSurface : public CPhysCollide
+class CPhysCollideCompactSurface final : public CPhysCollide
 {
 public:
 	~CPhysCollideCompactSurface();
