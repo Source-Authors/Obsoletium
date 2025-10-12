@@ -199,7 +199,7 @@ BEGIN_SIMPLE_DATADESC( vehicleparams_t )
 END_DATADESC()
 
 
-bool IsVehicleWheel( IVP_Real_Object *pivp )
+[[nodiscard]] static bool IsVehicleWheel( IVP_Real_Object *pivp )
 {
 	CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pivp->client_data);
 
@@ -210,7 +210,7 @@ bool IsVehicleWheel( IVP_Real_Object *pivp )
 	return (pObject->CallbackFlags() & CALLBACK_IS_VEHICLE_WHEEL) ? true : false;
 }
 
-inline bool IsMoveable( IVP_Real_Object *pObject )
+[[nodiscard]] static inline bool IsMoveable( IVP_Real_Object *pObject )
 {
 	IVP_Core *pCore = pObject->get_core();
 	if ( pCore->pinned || pCore->physical_unmoveable )
@@ -218,7 +218,7 @@ inline bool IsMoveable( IVP_Real_Object *pObject )
 	return true;
 }
 
-inline bool IVPFloatPointIsZero( const IVP_U_Float_Point &test )
+[[nodiscard]] static inline bool IVPFloatPointIsZero( const IVP_U_Float_Point &test )
 {
 	constexpr float eps = 1e-4f;
 	return test.quad_length() < eps ? true : false;
