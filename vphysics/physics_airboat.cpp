@@ -7,21 +7,15 @@
 #include "cbase.h"
 #include "physics_airboat.h"
 #include "cmodel.h"
-#include <ivp_ray_solver.hxx>
+#include "ivp_ray_solver.hxx"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef _X360 
-	#define AIRBOAT_STEERING_RATE_MIN			0.000225f
-	#define AIRBOAT_STEERING_RATE_MAX			(10.0f * AIRBOAT_STEERING_RATE_MIN)
-	#define AIRBOAT_STEERING_INTERVAL			1.5f
-#else
-	#define AIRBOAT_STEERING_RATE_MIN			0.00045f
-	#define AIRBOAT_STEERING_RATE_MAX			(5.0f * AIRBOAT_STEERING_RATE_MIN)
-	#define AIRBOAT_STEERING_INTERVAL			0.5f
-#endif //_X360
+#define AIRBOAT_STEERING_RATE_MIN			0.00045f
+#define AIRBOAT_STEERING_RATE_MAX			(5.0f * AIRBOAT_STEERING_RATE_MIN)
+#define AIRBOAT_STEERING_INTERVAL			0.5f
 
 #define AIRBOAT_ROT_DRAG					0.00004f
 #define AIRBOAT_ROT_DAMPING					0.001f
@@ -125,7 +119,7 @@ CPhysics_Airboat::CPhysics_Airboat( IVP_Environment *pEnv, const IVP_Template_Ca
 	InitAirboat( pCarSystem );
 	m_pGameTrace = pGameTrace;
 
-    m_SteeringAngle = 0;
+	m_SteeringAngle = 0;
 	m_bSteeringReversed = false;
 
 	m_flThrust = 0;
@@ -144,7 +138,7 @@ CPhysics_Airboat::CPhysics_Airboat( IVP_Environment *pEnv, const IVP_Template_Ca
 //-----------------------------------------------------------------------------
 CPhysics_Airboat::~CPhysics_Airboat()
 {
-    m_pAirboatBody->get_environment()->get_controller_manager()->remove_controller_from_environment( this, IVP_TRUE );
+	m_pAirboatBody->get_environment()->get_controller_manager()->remove_controller_from_environment( this, IVP_TRUE );
 }
 
 
