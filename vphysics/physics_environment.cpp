@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "tier0/threadtools.h"
 #include "physics_constraint.h"
 #include "physics_spring.h"
 #include "physics_fluid.h"
@@ -13,7 +12,6 @@
 #include "physics_motioncontroller.h"
 #include "physics_vehicle.h"
 #include "physics_virtualmesh.h"
-#include "tier1/utlmultilist.h"
 #include "vphysics/constraints.h"
 #include "vphysics/vehicles.h"
 #include "vphysics/object_hash.h"
@@ -36,6 +34,9 @@
 #include "ivp_phantom.hxx"
 #include "ivp_range_manager.hxx"
 #include "ivp_clustering_visualizer.hxx"
+
+#include "tier0/threadtools.h"
+#include "tier1/utlmultilist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
