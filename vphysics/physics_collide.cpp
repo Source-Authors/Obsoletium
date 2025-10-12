@@ -784,7 +784,8 @@ struct PolyhedronMesh_Triangle
 {
 	struct
 	{
-		int iPointIndices[2];
+		// dimhotepus: int -> unsigned.
+		unsigned iPointIndices[2];
 	} Edges[3];
 };
 
@@ -794,11 +795,13 @@ struct PolyhedronMesh_Triangle
 CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConvex, bool bUseTempPolyhedron )
 {
 	IVP_Compact_Ledge *pLedge = (IVP_Compact_Ledge *)pConvex;
-	int iTriangles = pLedge->get_n_triangles();
+	// dimhotepus: int -> short.
+	const short iTriangles{pLedge->get_n_triangles()};
 
 	PolyhedronMesh_Triangle *pTriangles = stackallocT( PolyhedronMesh_Triangle, iTriangles );
 	
-	int iHighestPointIndex = 0;
+	// dimhotepus: int -> unsigned.
+	unsigned iHighestPointIndex = 0;
 	const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle();
 	for( int i = 0; i < iTriangles; ++i )
 	{
@@ -830,7 +833,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 
 	int iInsertIndex = 0;
 
-	for( int i = 0; i != iHighestPointIndex; ++i )
+	for( unsigned i = 0; i != iHighestPointIndex; ++i )
 	{
 		if( pPointRemapping[i] )
 		{
@@ -863,8 +866,8 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	{
 		for( int j = 0; j != 3; ++j )
 		{
-			const int *pIndices = pTriangles[i].Edges[j].iPointIndices;
-			int iLow = ((pIndices[0] > pIndices[1])?1:(0));
+			const unsigned *pIndices = pTriangles[i].Edges[j].iPointIndices;
+			byte iLow = pIndices[0] > pIndices[1] ? 1 : 0;
 			++iLinkCount; //this will technically make the link count double the actual number
 			bLinks[(pIndices[iLow] * iNumPoints) + pIndices[1-iLow]] = true;
 		}
@@ -881,7 +884,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	//copy/convert vertices
 	const IVP_Compact_Poly_Point *pLedgePoints = pLedge->get_point_array();
 	Vector *pWriteVertices = pReturn->pVertices;
-	for( int i = 0; i != iHighestPointIndex; ++i )
+	for( unsigned i = 0; i != iHighestPointIndex; ++i )
 	{
 		if( pPointRemapping[i] != -1 )
 			ConvertPositionToHL( pLedgePoints[i], pWriteVertices[pPointRemapping[i]] );
@@ -941,7 +944,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 
 		for( int j = 0; j != 3; ++j, ++iInsertIndex )
 		{
-			const int *pIndices = pTriangles[i].Edges[j].iPointIndices;
+			const unsigned *pIndices = pTriangles[i].Edges[j].iPointIndices;
 			byte iLow = (pIndices[0] > pIndices[1]) ? 1 : 0;
 			int iLineIndex;
 			for( iLineIndex = pStartIndices[pIndices[iLow]]; iLineIndex != iLinkCount; ++iLineIndex )
