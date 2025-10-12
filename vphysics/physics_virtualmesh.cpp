@@ -6,22 +6,26 @@
 
 
 #include "cbase.h"
-#include "convert.h"
 #include "ivp_surface_manager.hxx"
 #include "ivp_surman_polygon.hxx"
 #include "ivp_template_surbuild.hxx"
 #include "ivp_compact_surface.hxx"
-#include <ivp_compact_ledge.hxx>
-#include <ivp_ray_solver.hxx>
-#include <ivp_compact_ledge_solver.hxx>
+#include "ivp_compact_ledge.hxx"
+#include "ivp_ray_solver.hxx"
+#include "ivp_compact_ledge_solver.hxx"
 #include "ivp_surbuild_pointsoup.hxx"
 #include "ivp_surbuild_ledge_soup.hxx"
+
+#include "convert.h"
 #include "physics_trace.h"
 #include "collisionutils.h"
+#include "ledgewriter.h"
+
 #include "tier1/datamanager.h"
 #include "tier1/utlbuffer.h"
-#include "ledgewriter.h"
 #include "tier1/mempool.h"
+
+// memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 class CPhysCollideVirtualMesh;

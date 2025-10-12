@@ -12,9 +12,12 @@
 #include "ivp_compact_ledge.hxx"
 #include "ivp_compact_ledge_solver.hxx"
 #include "ivp_compact_surface.hxx"
-#include "tier0/vprof.h"
+
 #include "mathlib/ssemath.h"
+
+#include "tier0/vprof.h"
 #include "tier0/tslist.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
