@@ -41,7 +41,7 @@ END_DATADESC()
 // BUGBUG: No way to delete a spring because springs get auto-deleted without notification
 // when an object they are attached to is deleted.
 // So there is no way to tell if the pointer is valid.
-class CPhysicsSpring : public IPhysicsSpring, public IVP_Listener_Object
+class CPhysicsSpring final : public IPhysicsSpring, public IVP_Listener_Object
 {
 public:
 	CPhysicsSpring( CPhysicsObject *pObjectStart, CPhysicsObject *pObjectEnd, IVP_Actuator_Spring *pSpring );

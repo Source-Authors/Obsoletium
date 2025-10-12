@@ -259,7 +259,7 @@ bool ShouldOverrideWheelContactFriction( float *pFrictionOut, IVP_Real_Object *p
 }
 
 
-class CVehicleController : public IPhysicsVehicleController, public IVP_Listener_Object
+class CVehicleController final : public IPhysicsVehicleController, public IVP_Listener_Object
 {
 public:
 	CVehicleController( );
