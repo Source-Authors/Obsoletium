@@ -904,7 +904,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	}
 
 	
-	int *pStartIndices = (int *)stackalloc( iNumPoints * sizeof( int ) ); //for quicker lookup of which edges to use in polygons
+	int *pStartIndices = stackallocT( int, iNumPoints ); //for quicker lookup of which edges to use in polygons
 
 	pStartIndices[0] = 0; //the lowest index point drives links, so if the first point isn't the first link, then something is extremely messed up
 	Assert( pReturn->pLines[0].iPointIndices[0] == 0 );
