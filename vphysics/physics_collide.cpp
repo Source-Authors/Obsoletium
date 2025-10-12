@@ -1257,11 +1257,11 @@ void CPhysicsCollision::InitBBoxCache()
 	IVP_Compact_Poly_Point *pPoints = reinterpret_cast<IVP_Compact_Ledge *>(pConvex)->get_point_array();
 	for ( int i = 0; i < 8; i++ )
 	{
-		int nearest = -1;
+		byte nearest = std::numeric_limits<byte>::max();
 		float minDist = 0.1f;
 		Vector tmp;
 		ConvertPositionToHL( pPoints[i], tmp );
-		for ( int j = 0; j < 8; j++ )
+		for ( byte j = 0; j < 8; j++ )
 		{
 			float dist = (boxVerts[j] - tmp).Length();
 			if ( dist < minDist )
