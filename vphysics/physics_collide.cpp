@@ -1064,30 +1064,24 @@ static void LedgeInsidePoint( IVP_Compact_Ledge *pLedge, Vector& out )
 //			p3 - 
 // Output : float (volume in units^3)
 //-----------------------------------------------------------------------------
-static float TetrahedronVolume( const Vector &p0, const Vector &p1, const Vector &p2, const Vector &p3 )
+[[nodiscard]] static float TetrahedronVolume( const Vector &p0, const Vector &p1, const Vector &p2, const Vector &p3 )
 {
-	Vector a, b, c, cross;
-	float volume = 1.0f / 6.0f;
+	const Vector a = p1 - p0;
+	const Vector b = p2 - p0;
+	const Vector c = p3 - p0;
+	const Vector cross = b.Cross( c );
 
-	a = p1 - p0;
-	b = p2 - p0;
-	c = p3 - p0;
-	cross = CrossProduct( b, c );
-
-	volume *= DotProduct( a, cross );
-	if ( volume < 0 )
-		return -volume;
-	return volume;
+	const float volume = 1.0f / 6.0f * DotProduct( a, cross );
+	return volume < 0 ? -volume : volume;
 }
 
 
-static float TriangleArea( const Vector &p0, const Vector &p1, const Vector &p2 )
+[[nodiscard]] static float TriangleArea( const Vector &p0, const Vector &p1, const Vector &p2 )
 {
-	Vector e0 = p1 - p0;
-	Vector e1 = p2 - p0;
-	Vector cross;
+	const Vector e0 = p1 - p0;
+	const Vector e1 = p2 - p0;
+	const Vector cross = e0.Cross( e1 );
 
-	CrossProduct( e0, e1, cross );
 	return 0.5f * cross.Length();
 }
 
