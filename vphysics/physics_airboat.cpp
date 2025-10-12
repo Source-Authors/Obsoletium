@@ -574,7 +574,7 @@ bool CPhysics_Airboat::PostRaycasts( IVP_Ray_Solver_Template *pRaySolverTemplate
 
 			// Get the inverse portion of the surface normal in the direction of the ray cast (shock - used in the shock simulation code for the sign
 			// and percentage of force applied to the shock).
-			pImpact->inv_normal_dot_dir = 1.1f / ( IVP_Inline_Math::fabsd( pImpact->raycast_dir_ws.dot_product( &pImpact->vecImpactNormalWS ) ) + 0.1f );
+			pImpact->inv_normal_dot_dir = 1.1f / ( IVP_Inline_Math::fabsd( pImpact->raycast_dir_ws.dot_product( &pImpact->vecImpactNormalWS ) ) + 0.1 );
 
 			// Set the wheel friction - ground friction (if any) + wheel friction.
 			pImpact->friction_value = pImpact->flFriction * pPontoonPoint->friction_of_wheel;
