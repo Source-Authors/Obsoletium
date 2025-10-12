@@ -345,7 +345,7 @@ void TransformLocalToIVP( const IVP_U_Float_Point &pointIn, IVP_U_Float_Point &p
 	pointOut.set( &tmpOut );
 }
 
-static char axisMap[] = {0,2,1,3};
+static constexpr inline char axisMap[] = {0,2,1,3};
 
 int ConvertCoordinateAxisToIVP( int axisIndex )
 {
