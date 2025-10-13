@@ -19,7 +19,8 @@ class SurfInfo
 public:
 	// Shape of the surface.
 	Vector			m_Verts[ MAX_SURFINFO_VERTS ];
-	unsigned long	m_nVerts;
+	// dimhotepus: unsigned long -> unsigned. x86-64.
+	unsigned		m_nVerts;
 
 	// Plane of the surface.
 	VPlane			m_Plane;

@@ -128,7 +128,7 @@ static int IntersectSegmentWithSurfInfos(
 			Vector vIntersection = vStart + (vEnd - vStart) * t;
 			
 			// If the intersection is behind any edge plane, then it's not inside the polygon.
-			unsigned long iEdge;
+			unsigned iEdge;
 			for(iEdge=0; iEdge < pSurf->m_nVerts; iEdge++)
 			{
 				VPlane edgePlane;

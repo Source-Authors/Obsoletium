@@ -112,7 +112,7 @@ bool Helper_LoadFile( IBaseFileSystem *pFileSystem, const char *pFilename, CUtlV
 		return false;
 	}
 
-	unsigned long len = pFileSystem->Size( hFile );
+	unsigned len = pFileSystem->Size( hFile );
 	buf.SetSize( len );
 	pFileSystem->Read( buf.Base(), buf.Count(), hFile );
 	pFileSystem->Close( hFile );
