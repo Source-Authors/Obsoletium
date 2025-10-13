@@ -284,6 +284,10 @@ static const char *ParseKeyvalue( const char *pBuffer, char (&key)[size], char (
 //-----------------------------------------------------------------------------
 CQCGenerator::CQCGenerator( vgui::Panel *pParent, const char *pszPath, const char *pszScene ) : BaseClass( pParent, "QCGenerator" )
 {	
+	m_szTargetField[0] = 0;
+	m_nSelectedSequence = 0;
+	m_nSelectedColumn = 0;
+
 	m_QCInfo_t.Init( this );
 
 	SetMinimumSize(846, 770);
