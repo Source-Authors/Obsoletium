@@ -638,7 +638,7 @@ bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 		return false;
 	}
 
-	ulong len=valueLen;
+	unsigned long len=valueLen;
 	if(VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)value,&len)==ERROR_SUCCESS)
 	{		
 		VCRHook_RegCloseKey(hKey);
@@ -712,7 +712,7 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 		return false;
 	}
 
-	ulong len=4;
+	unsigned long len=4;
 	if(VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)&value,&len)==ERROR_SUCCESS)
 	{		
 		VCRHook_RegCloseKey(hKey);
