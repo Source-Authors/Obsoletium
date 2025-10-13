@@ -36,6 +36,8 @@ protected:
 	void ApplySchemeSettings(IScheme *pScheme) override;
 	const char *GetDescription() override;
 
+	// dimhotepus: TF2 backport.
+	bool IsValidURL( const char *pszURL ) const;
 	const char *GetURL( void ) { return m_pszURL; }
 
 private:
