@@ -54,7 +54,8 @@ public:
 private:
 	struct OpenedManageDialog_t
 	{
-		unsigned long handle;
+		// dimhotepus: unsigned long -> HPanel for x86-64 portability.
+		vgui::HPanel handle;
 		IManageServer *manageInterface;
 	};
 	CUtlVector<OpenedManageDialog_t> m_OpenedManageDialog;
