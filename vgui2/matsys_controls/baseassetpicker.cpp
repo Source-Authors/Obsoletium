@@ -671,7 +671,7 @@ bool CAssetCache::ContinueSearchForAssets( AssetList_t hList, float flDuration )
 {
 	CachedAssetList_t& list = m_CachedAssets[ (intp)hList ];
 
-	double flStartTime = Plat_FloatTime();
+	const double flStartTime = Plat_FloatTime();
 	while ( list.m_DirectoriesToCheck.Count() )
 	{
 		const auto &it = list.m_DirectoriesToCheck[ list.m_DirectoriesToCheck.Head() ];
@@ -757,7 +757,7 @@ AssetList_t CAssetCache::FindAssetList( const char *pAssetType, const char *pSub
 		list.m_pFileTree = new CAssetTreeView( NULL, "FolderFilter", pAssetType, pSubDir );
 	}
 
-	return (AssetList_t)static_cast<size_t>(nIndex);
+	return (AssetList_t)(intp)nIndex;
 }
 
 CAssetTreeView* CAssetCache::GetFileTree( AssetList_t hList )
