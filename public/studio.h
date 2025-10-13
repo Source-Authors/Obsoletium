@@ -100,6 +100,38 @@ struct mstudiodata_t
 #define STUDIO_PROC_AIMATATTACH 4
 #define STUDIO_PROC_JIGGLE 5
 
+// If you want to embed a pointer into one of the structures that is serialized, use this class! It will ensure that the pointers consume the 
+// right amount of space and work correctly across 32 and 64 bit. It also makes sure that there is no surprise about how large the structure
+// is when placed in the middle of another structure, and supports Intel's desired behavior on 64-bit that pointers are always 8-byte aligned.
+#pragma pack( push, 4 )
+template < class T > 
+struct ALIGN4 serializedstudioptr_t
+{
+	T* m_pData;
+#ifndef PLATFORM_64BITS
+	int32 padding;
+#endif
+
+	serializedstudioptr_t() 
+	{ 
+		m_pData = nullptr; 
+		#if _DEBUG && !defined( PLATFORM_64BITS )
+			padding = 0; 
+		#endif
+	}
+
+	inline operator       T*()             { return m_pData; }
+	inline operator const T*() const       { return m_pData; }
+
+	inline       T* operator->( )          { return m_pData; }
+	inline const T* operator->( ) const    { return m_pData; }
+
+	inline T* operator=( T* ptr )          { return m_pData = ptr; }
+	
+} ALIGN4_POST;
+
+#pragma pack( pop )
+
 struct mstudioaxisinterpbone_t
 {
 	DECLARE_BYTESWAP_DATADESC();
