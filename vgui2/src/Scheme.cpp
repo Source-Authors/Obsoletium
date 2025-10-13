@@ -856,10 +856,12 @@ void CScheme::ReloadFontGlyphs()
 			{
 				flags |= ISurface::FONTFLAG_ANTIALIAS;
 			}
+			// dimhotepus: Add ClearType support.
 			if (fontdata->GetInt( "cleartype" ) && g_pSurface->SupportsFeature(ISurface::CLEARTYPE_FONTS))
 			{
 				flags |= ISurface::FONTFLAG_CLEARTYPE;
 			}
+			// dimhotepus: Add ClearType natural support.
 			if (fontdata->GetInt( "cleartype_natural" ) && g_pSurface->SupportsFeature(ISurface::CLEARTYPE_FONTS))
 			{
 				flags |= ISurface::FONTFLAG_CLEARTYPE_NATURAL;
