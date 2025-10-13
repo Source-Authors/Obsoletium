@@ -234,9 +234,7 @@ void CBrowseButton::SetCharVar( char **pVar, const char *pszNewText )
 
 	if ( pszNewText )
 	{
-		intp len = Q_strlen( pszNewText ) + 1;
-		*pVar = new char[ len ];
-		Q_strncpy( *pVar, pszNewText, len );
+		*pVar = V_strdup( pszNewText );
 	}
 }
 
