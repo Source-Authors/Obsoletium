@@ -171,7 +171,7 @@ BEGIN_BYTESWAP_DATADESC( ddispinfo_t )
 	DEFINE_FIELD( m_iLightmapSamplePositionStart, FIELD_INTEGER ),
 	DEFINE_EMBEDDED_ARRAY( m_EdgeNeighbors, 4 ),
 	DEFINE_EMBEDDED_ARRAY( m_CornerNeighbors, 4 ),
-	DEFINE_ARRAY( m_AllowedVerts, FIELD_INTEGER, ddispinfo_t::ALLOWEDVERTS_SIZE ),	// unsigned long
+	DEFINE_ARRAY( m_AllowedVerts, FIELD_INTEGER, ddispinfo_t::ALLOWEDVERTS_SIZE ),	// uint32
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( CDispNeighbor )
