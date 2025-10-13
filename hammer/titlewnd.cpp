@@ -54,6 +54,9 @@ CTitleWnd *CTitleWnd::CreateTitleWnd(CWnd *pwndParent, UINT uID)
 	if (pWnd != NULL)
 	{
 		pWnd->Create(strTitleWndClass, "Title Window", WS_CHILD | WS_VISIBLE, CRect(0, 0, 5, 5), pwndParent, uID);
+		
+		// dimhotepus: Apply DPI as it is available only after create.	
+		pWnd->CreateFontsOnce();
 	}
 
 	return(pWnd);
@@ -65,15 +68,6 @@ CTitleWnd *CTitleWnd::CreateTitleWnd(CWnd *pwndParent, UINT uID)
 //-----------------------------------------------------------------------------
 CTitleWnd::CTitleWnd(void)
 {
-	if (!m_FontNormal.m_hObject)
-	{
-		//
-		// Create two fonts, a normal one and a bold one for when we are active.
-		//
-		m_FontNormal.CreateFont(16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "MS Sans Serif");
-		m_FontActive.CreateFont(16, 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "MS Sans Serif");
-	}
-
 	m_bMenuOpen = false;
 	m_bMouseOver = false;
 	m_szTitle[0] = '\0';
@@ -133,7 +127,8 @@ void CTitleWnd::OnMouseMove(UINT nFlags, CPoint point)
 		Track.cbSize = sizeof(Track);
 		Track.dwFlags = TME_HOVER | TME_LEAVE;
 		Track.hwndTrack = m_hWnd;
-		Track.dwHoverTime = 0.1;
+		// dimhotepus: Fix hover time from 0.1 (0) to system default.
+		Track.dwHoverTime = HOVER_DEFAULT;
 
 		_TrackMouseEvent(&Track);
 
@@ -226,3 +221,16 @@ void CTitleWnd::OnMouseButton(void)
 	m_bMenuOpen = false;
 }
 
+
+void CTitleWnd::CreateFontsOnce()
+{
+	if (!m_FontNormal.m_hObject)
+	{
+		//
+		// Create two fonts, a normal one and a bold one for when we are active.
+		//
+		// dimhotepus: Use CLEARTYPE_NATURAL_QUALITY antialsing.
+		m_FontNormal.CreateFont(m_dpi_behavior.ScaleOnY(16), 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
+		m_FontActive.CreateFont(m_dpi_behavior.ScaleOnY(16), 0, 0, 0, FW_BOLD, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, CLEARTYPE_NATURAL_QUALITY, DEFAULT_PITCH | FF_DONTCARE, "Segoe UI");
+	}
+}

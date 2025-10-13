@@ -8,11 +8,7 @@
 #ifndef PSD_H
 #define PSD_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "bitmap/imageformat.h"   // ImageFormat enum definition
+#include "imageformat.h"   // ImageFormat enum definition
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -39,7 +35,7 @@ public:
 		: m_numBytes( numBytes ), m_pvBuffer( pvBuffer ) {}
 
 public:
-	ResElement FindElement( Resource eType ) const;
+	[[nodiscard]] ResElement FindElement( Resource eType ) const;
 
 protected:
 	unsigned int			m_numBytes;
@@ -69,7 +65,7 @@ public:
 	explicit PSDResFileInfo( PSDImageResources::ResElement res ) : m_res( res ) {}
 
 public:
-	ResFileInfoElement FindElement( ResFileInfo eType ) const;
+	[[nodiscard]] ResFileInfoElement FindElement( ResFileInfo eType ) const;
 
 protected:
 	PSDImageResources::ResElement m_res;

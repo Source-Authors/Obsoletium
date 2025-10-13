@@ -9,10 +9,6 @@
 #ifndef VECTOR2D_H
 #define VECTOR2D_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <DirectXMath.h>
 
 #include <cmath>
@@ -20,7 +16,7 @@
 
 #include "tier0/basetypes.h"  // vec_t
 #include "tier0/dbg.h"
-#include "mathlib/math_pfns.h"
+#include "math_pfns.h"
 
 //=========================================================
 // 2D Vector2D

@@ -5,11 +5,11 @@
 //=============================================================================
 
 #include "pngloader.h"
-#include <stdio.h>
-#include <stdlib.h>
+#include <cstdio>
+#include <cstdlib>
 //#include "vstdlib/strtools.h"
 
-#include <setjmp.h>
+#include <csetjmp>
 
 // clang3 on OSX folks the attribute into the prototype, causing a compile failure
 // filed radar bug 10397783
@@ -42,10 +42,10 @@ struct PngDataStream_t
 // helper function to nibble some more png data from our memory buffer
 void ReadPNGData( png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead )
 {
-	if(png_ptr->io_ptr == NULL)
+	if(png_ptr->io_ptr == nullptr)
 		return;   // we didn't have our mem buffer set
 
-	PngDataStream_t *pData = (PngDataStream_t *)png_ptr->io_ptr;
+	auto *pData = (PngDataStream_t *)png_ptr->io_ptr;
 
 	if ( byteCountToRead + pData->m_iPNGData > pData->m_cbPNGData )
 		return;
@@ -73,14 +73,14 @@ static void PNGWarningFunction(png_structp png_ptr, png_const_charp msg)
 // Get dimensions out of PNG header
 bool GetPNGDimensions( const byte *pubPNGData, int cubPNGData, uint32 &width, uint32 &height )
 {
-	png_const_bytep pngData = (png_const_bytep)pubPNGData;
+	auto pngData = (png_const_bytep)pubPNGData;
 	if (png_sig_cmp( pngData, 0, 8))
         return false;   /* bad signature */
 
 	PngDataStream_t pngDataStream( pubPNGData, cubPNGData ); // keeps a local copy of the data we a reading
 
-	png_structp png_ptr = NULL;
-	png_infop info_ptr = NULL;
+	png_structp png_ptr = nullptr;
+	png_infop info_ptr = nullptr;
 
     png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, &PNGErrorFunction, &PNGWarningFunction );
     if (!png_ptr)
@@ -89,7 +89,7 @@ bool GetPNGDimensions( const byte *pubPNGData, int cubPNGData, uint32 &width, ui
     info_ptr = png_create_info_struct( png_ptr );
     if ( !info_ptr ) 
 	{
-        png_destroy_read_struct(&png_ptr, NULL, NULL);
+        png_destroy_read_struct(&png_ptr, nullptr, nullptr);
         return false;   /* out of memory */
     }
 
@@ -97,7 +97,7 @@ bool GetPNGDimensions( const byte *pubPNGData, int cubPNGData, uint32 &width, ui
      * libpng function */
     if ( setjmp( png_jmpbuf(png_ptr) ) ) 
 	{
-        png_destroy_read_struct( &png_ptr, &info_ptr, NULL );
+        png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
         return false;
     }
 
@@ -106,7 +106,7 @@ bool GetPNGDimensions( const byte *pubPNGData, int cubPNGData, uint32 &width, ui
 
 	width = png_get_image_width( png_ptr, info_ptr );
 	height = png_get_image_height( png_ptr, info_ptr );
-	png_destroy_read_struct( &png_ptr, &info_ptr, NULL );
+	png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
 
 	return true;
 }
@@ -115,14 +115,14 @@ bool GetPNGDimensions( const byte *pubPNGData, int cubPNGData, uint32 &width, ui
 // given a png formatted memory buffer return a raw rgba buffer
 bool ConvertPNGToRGBA( const byte *pubPNGData, int cubPNGData, CUtlBuffer &bufOutput, int &width, int &height )
 {
-	png_const_bytep pngData = (png_const_bytep)pubPNGData;
+	auto pngData = (png_const_bytep)pubPNGData;
 	if (png_sig_cmp( pngData, 0, 8))
         return false;   /* bad signature */
 
 	PngDataStream_t pngDataStream( pubPNGData, cubPNGData ); // keeps a local copy of the data we a reading
 
-	png_structp png_ptr = NULL;
-	png_infop info_ptr = NULL;
+	png_structp png_ptr = nullptr;
+	png_infop info_ptr = nullptr;
 
     /* could pass pointers to user-defined error handlers instead of NULLs: */
 
@@ -133,7 +133,7 @@ bool ConvertPNGToRGBA( const byte *pubPNGData, int cubPNGData, CUtlBuffer &bufOu
     info_ptr = png_create_info_struct( png_ptr );
     if ( !info_ptr ) 
 	{
-        png_destroy_read_struct(&png_ptr, NULL, NULL);
+        png_destroy_read_struct(&png_ptr, nullptr, nullptr);
         return false;   /* out of memory */
     }
 
@@ -142,7 +142,7 @@ bool ConvertPNGToRGBA( const byte *pubPNGData, int cubPNGData, CUtlBuffer &bufOu
 
     if ( setjmp( png_jmpbuf(png_ptr) ) ) 
 	{
-        png_destroy_read_struct( &png_ptr, &info_ptr, NULL );
+        png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
         return false;
     }
 
@@ -199,11 +199,11 @@ bool ConvertPNGToRGBA( const byte *pubPNGData, int cubPNGData, CUtlBuffer &bufOu
 	if ( channels != 4 )
 		return false;
 
-	png_bytepp  row_pointers = NULL;
+	png_bytepp  row_pointers = nullptr;
 
-	if ( ( row_pointers = (png_bytepp)malloc(height*sizeof(png_bytep) ) ) == NULL ) 
+	if ( ( row_pointers = (png_bytepp)malloc(height*sizeof(png_bytep) ) ) == nullptr ) 
 	{
-        png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+        png_destroy_read_struct(&png_ptr, &info_ptr, nullptr);
 		return false;
     }
 
@@ -221,15 +221,15 @@ bool ConvertPNGToRGBA( const byte *pubPNGData, int cubPNGData, CUtlBuffer &bufOu
     png_read_image( png_ptr, row_pointers );
 
     free( row_pointers );
-    row_pointers = NULL;
+    row_pointers = nullptr;
 
     png_read_end(png_ptr, NULL);
 
 	if ( png_ptr && info_ptr ) 
 	{
-		png_destroy_read_struct( &png_ptr, &info_ptr, NULL );
-		png_ptr = NULL;
-		info_ptr = NULL;
+		png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
+		png_ptr = nullptr;
+		info_ptr = nullptr;
 	}
 
 	return true;

@@ -160,8 +160,8 @@ public:
 	virtual intp GetClipboardTextCount();
 	virtual void SetClipboardText(const char *text, intp textLen);
 	virtual void SetClipboardText(const wchar_t *text, intp textLen);
-	virtual intp GetClipboardText(int offset, char *buf, intp bufLen);
-	virtual intp GetClipboardText(int offset, wchar_t *buf, intp bufLen);
+	virtual intp GetClipboardText(intp offset, char *buf, intp bufLen);
+	virtual intp GetClipboardText(intp offset, wchar_t *buf, intp bufLen);
 
 	virtual void SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 );
 
@@ -375,7 +375,7 @@ void CSystem::SetClipboardText(const char *text, intp textLen)
 	if (hmem)
 	{
 		void *ptr = GlobalLock(hmem);
-		if (ptr != null)
+		if (ptr != nullptr)
 		{
 			memset(ptr, 0, textLen + 1);
 			memcpy(ptr, text, textLen);
@@ -411,7 +411,7 @@ void CSystem::SetClipboardText(const wchar_t *text, intp textLen)
 	if (hmem)
 	{
 		void *ptr = GlobalLock(hmem);
-		if (ptr != null)
+		if (ptr != nullptr)
 		{
 			memset(ptr, 0, (textLen + 1) * sizeof(wchar_t));
 			memcpy(ptr, text, textLen * sizeof(wchar_t));
@@ -451,10 +451,9 @@ intp CSystem::GetClipboardTextCount()
 #endif
 }
 
-intp CSystem::GetClipboardText(int offset, char *buf, intp bufLen)
+intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 {
-#ifndef _X360
-	size_t count = 0;
+	intp count = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
 		if (OpenClipboard(GetDesktopWindow()))
@@ -462,7 +461,7 @@ intp CSystem::GetClipboardText(int offset, char *buf, intp bufLen)
 			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				size_t len = GlobalSize(hmem);
+				intp len = (intp)GlobalSize(hmem);
 				if (len <= offset)
 				{
 					count = 0;
@@ -470,9 +469,9 @@ intp CSystem::GetClipboardText(int offset, char *buf, intp bufLen)
 				else
 				{
 					count = len - offset;
-					if (static_cast<size_t>(bufLen) < count)
+					if (bufLen < count)
 					{
-						count = static_cast<size_t>(bufLen);
+						count = bufLen;
 					}
 					void *ptr = GlobalLock(hmem);
 					if (ptr)
@@ -490,17 +489,13 @@ intp CSystem::GetClipboardText(int offset, char *buf, intp bufLen)
 	VCRGenericValue( "cb", buf, count );
 
 	return count;
-#else
-	return 0;
-#endif
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Retrieves unicode text from the clipboard
 //-----------------------------------------------------------------------------
-intp CSystem::GetClipboardText(int offset, wchar_t *buf, intp bufLen)
+intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 {
-#ifndef _X360
 	intp retVal = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
@@ -509,7 +504,7 @@ intp CSystem::GetClipboardText(int offset, wchar_t *buf, intp bufLen)
 			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				size_t len = GlobalSize(hmem);
+				intp len = (intp)GlobalSize(hmem);
 				if (len > offset)
 				{
 					intp count = len - offset;
@@ -535,14 +530,11 @@ intp CSystem::GetClipboardText(int offset, wchar_t *buf, intp bufLen)
 	VCRGenericValue( "cb", buf, retVal*sizeof(wchar_t) );
 
 	return retVal;
-#else
-	return 0;
-#endif
 }
 
 static bool staticSplitRegistryKey(const char *key, char *key0, char *key1)
 {
-	if(key==null)
+	if(key==nullptr)
 	{
 		return false;
 	}
@@ -599,7 +591,7 @@ bool CSystem::SetRegistryString(const char *key, const char *value)
 		return false;
 	}
 
-	if(VCRHook_RegCreateKeyEx(hSlot,key0,null,null,REG_OPTION_NON_VOLATILE, value ? KEY_WRITE : KEY_ALL_ACCESS,null,&hKey,null)!=ERROR_SUCCESS)
+	if(VCRHook_RegCreateKeyEx(hSlot,key0,0,nullptr,REG_OPTION_NON_VOLATILE, value ? KEY_WRITE : KEY_ALL_ACCESS,0,&hKey,0)!=ERROR_SUCCESS)
 	{
 		return false;
 	}
@@ -641,13 +633,13 @@ bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 		return false;
 	}
 
-	if(VCRHook_RegOpenKeyEx(hSlot,key0,null,KEY_READ,&hKey)!=ERROR_SUCCESS)
+	if(VCRHook_RegOpenKeyEx(hSlot,key0,0,KEY_READ,&hKey)!=ERROR_SUCCESS)
 	{
 		return false;
 	}
 
-	ulong len=valueLen;
-	if(VCRHook_RegQueryValueEx(hKey,key1,null,null,(uchar*)value,&len)==ERROR_SUCCESS)
+	unsigned long len=valueLen;
+	if(VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)value,&len)==ERROR_SUCCESS)
 	{		
 		VCRHook_RegCloseKey(hKey);
 		return true;
@@ -679,12 +671,12 @@ bool CSystem::SetRegistryInteger(const char *key, int value)
 		return false;
 	}
 
-	if(VCRHook_RegCreateKeyEx(hSlot,key0,null,null,REG_OPTION_NON_VOLATILE,KEY_WRITE,null,&hKey,null)!=ERROR_SUCCESS)
+	if(VCRHook_RegCreateKeyEx(hSlot,key0,0,nullptr,REG_OPTION_NON_VOLATILE,KEY_WRITE,nullptr,&hKey,0)!=ERROR_SUCCESS)
 	{
 		return false;
 	}
 		
-	if(VCRHook_RegSetValueEx(hKey,key1,null,REG_DWORD,(uchar*)&value,4)==ERROR_SUCCESS)
+	if(VCRHook_RegSetValueEx(hKey,key1,0,REG_DWORD,(uchar*)&value,4)==ERROR_SUCCESS)
 	{
 		VCRHook_RegCloseKey(hKey);
 		return true;
@@ -715,13 +707,13 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 		return false;
 	}
 
-	if(VCRHook_RegOpenKeyEx(hSlot,key0,null,KEY_READ,&hKey)!=ERROR_SUCCESS)
+	if(VCRHook_RegOpenKeyEx(hSlot,key0,0,KEY_READ,&hKey)!=ERROR_SUCCESS)
 	{
 		return false;
 	}
 
-	ulong len=4;
-	if(VCRHook_RegQueryValueEx(hKey,key1,null,null,(uchar*)&value,&len)==ERROR_SUCCESS)
+	unsigned long len=4;
+	if(VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)&value,&len)==ERROR_SUCCESS)
 	{		
 		VCRHook_RegCloseKey(hKey);
 		return true;
@@ -807,7 +799,7 @@ int CSystem::GetAvailableDrives(char *buf, int bufLen)
 //-----------------------------------------------------------------------------
 double CSystem::GetFreeDiskSpace(const char *path)
 {
-	char buf[_MAX_PATH];
+	char buf[MAX_PATH];
 	V_strcpy_safe(buf, path);
 	// strip of to first slash (to make it look like 'x:\')
 	char *slash = strstr(buf, "\\");

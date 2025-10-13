@@ -291,7 +291,7 @@ CSoundParametersInternal::CSoundParametersInternal()
 	play_to_owner_only = false;
 	had_missing_wave_files = false;
 	uses_gender_token = false;
-
+	m_bShouldPreload = false;
 }
 
 CSoundParametersInternal::CSoundParametersInternal( const CSoundParametersInternal& src )

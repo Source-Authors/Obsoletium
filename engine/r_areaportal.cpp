@@ -121,8 +121,8 @@ struct portalclip_t
 static inline bool GetPortalScreenExtents( dareaportal_t *pPortal, 
 	portalclip_t * RESTRICT clip, CPortalRect &portalRect , float *pReflectionWaterHeight )
 {
-	portalRect.left = portalRect.bottom = 1e24;
-	portalRect.right = portalRect.top   = -1e24;
+	portalRect.left = portalRect.bottom = std::numeric_limits<decltype(portalRect.bottom)>::max();
+	portalRect.right = portalRect.top   = std::numeric_limits<decltype(portalRect.top)>::min();
 	bool bValidExtents = false;
 	
 	int nStartVerts = min( (int)pPortal->m_nClipPortalVerts, MAX_PORTAL_VERTS );

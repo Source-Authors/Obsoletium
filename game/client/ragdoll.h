@@ -60,6 +60,8 @@ public:
 		bool bFixedConstraints=false );
 
 	virtual void RagdollBone( C_BaseEntity *ent, mstudiobone_t *pbones, int boneCount, bool *boneSimulated, CBoneAccessor &pBoneToWorld );
+	// dimhotepus: Fix jittery model rendering when spectating a ragdoll.
+	void    AcquireOrCopyBoneCache( CUtlVector<matrix3x4_t> &bonesToWorld );
 	virtual const Vector& GetRagdollOrigin( );
 	virtual void GetRagdollBounds( Vector &theMins, Vector &theMaxs );
 	void	BuildRagdollBounds( C_BaseEntity *ent );
@@ -101,6 +103,10 @@ private:
 	bool		m_allAsleep;
 	Vector		m_vecLastOrigin;
 	float		m_flLastOriginChangeTime;
+
+	// dimhotepus: Fix jittery model rendering when spectating a ragdoll.
+	CUtlVector< matrix3x4_t > m_BoneCache;
+	float		m_flBoneCacheTime;
 
 #if RAGDOLL_VISUALIZE
 	matrix3x4_t			m_savedBone1[MAXSTUDIOBONES];

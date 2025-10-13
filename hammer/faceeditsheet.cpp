@@ -19,9 +19,9 @@
 #include <tier0/memdbgon.h>
 
 
-IMPLEMENT_DYNAMIC( CFaceEditSheet, CPropertySheet )
+IMPLEMENT_DYNAMIC( CFaceEditSheet, CBasePropertySheet )
 
-BEGIN_MESSAGE_MAP( CFaceEditSheet, CPropertySheet )
+BEGIN_MESSAGE_MAP( CFaceEditSheet, CBasePropertySheet )
 	//{{AFX_MSG_MAP( CFaceEdtiSheet )
 	ON_WM_CLOSE()
 	//}}AFX_MSG_MAP
@@ -30,7 +30,7 @@ END_MESSAGE_MAP()
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 CFaceEditSheet::CFaceEditSheet( LPCTSTR pszCaption, CWnd *pParentWnd, UINT iSelectPage ) : 
-                CPropertySheet( pszCaption, pParentWnd, iSelectPage )
+                CBasePropertySheet( pszCaption, pParentWnd, iSelectPage )
 {
 	m_ClickMode = -1;
 	m_bEnableUpdate = true;
@@ -68,7 +68,10 @@ void CFaceEditSheet::Setup( void )
 //-----------------------------------------------------------------------------
 BOOL CFaceEditSheet::Create( CWnd *pParentWnd )
 {
-	if( !__super::Create( pParentWnd ) )
+	// dimhotepus: Create invisible by default.
+	constexpr DWORD propStyle = (DS_MODALFRAME | DS_3DLOOK | DS_CONTEXTHELP |
+		DS_SETFONT | WS_POPUP | WS_CAPTION) & ~WS_VISIBLE;
+	if( !__super::Create( pParentWnd, propStyle ) )
 		return FALSE;
 
 	//
@@ -121,7 +124,7 @@ void CFaceEditSheet::ClearFaceList( void )
 	//
 	// reset selection state of all faces currently in the list
 	//
-	for( int i = 0; i < m_Faces.Count(); i++ )
+	for( intp i = 0; i < m_Faces.Count(); i++ )
 	{
 		m_Faces[i].pMapFace->SetSelectionState( SELECT_NONE );
 		EditDispHandle_t handle = m_Faces[i].pMapFace->GetDisp();
@@ -146,7 +149,7 @@ void CFaceEditSheet::ClearFaceList( void )
 void CFaceEditSheet::ClearFaceListByMapDoc( CMapDoc *pDoc )
 {
 	// Remove any faces from our list that came from this CMapDoc.
-	for( int i = 0; i < m_Faces.Count(); i++ )
+	for( intp i = 0; i < m_Faces.Count(); i++ )
 	{
 		if ( m_Faces[i].pMapDoc == pDoc )
 		{
@@ -161,9 +164,9 @@ void CFaceEditSheet::ClearFaceListByMapDoc( CMapDoc *pDoc )
 // Purpose: Search for the given face in the face selection list.  If found, 
 //          return the index of the face in the list.  Otherwise, return -1.  
 //-----------------------------------------------------------------------------
-int CFaceEditSheet::FindFaceInList( CMapFace *pFace )
+intp CFaceEditSheet::FindFaceInList( CMapFace *pFace )
 {
-	for( int i = 0; i < m_Faces.Count(); i++ )
+	for( intp i = 0; i < m_Faces.Count(); i++ )
 	{
 		if( m_Faces[i].pMapFace == pFace )
 			return i;
@@ -209,7 +212,7 @@ void CFaceEditSheet::ClickFace( CMapSolid *pSolid, int faceIndex, int cmd, int c
 	// check for face in list, -1 from FindFaceInList indicates face not found
 	//
 	CMapFace *pFace = pSolid->GetFace( faceIndex );
-	int selectIndex = FindFaceInList( pFace );
+	intp selectIndex = FindFaceInList( pFace );
 	bool bFoundInList = ( selectIndex != -1 );
 
 	//
@@ -290,7 +293,7 @@ BOOL CFaceEditSheet::PreTranslateMessage( MSG *pMsg )
 			return(TRUE);
 		}
 
-		return CWnd::PreTranslateMessage( pMsg );
+		return __super::PreTranslateMessage( pMsg );
 	}
 
 	return TRUE;

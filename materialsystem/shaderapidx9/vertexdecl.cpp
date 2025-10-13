@@ -10,15 +10,20 @@
 #define NOMINMAX
 #include "vertexdecl.h" // this includes <windows.h> inside the dx headers
 #define PROTECTED_THINGS_ENABLE
-#include "materialsystem/imaterialsystemhardwareconfig.h"
-#include "shaderapidx8_global.h"
+
 #include "tier0/dbg.h"
-#include "utlrbtree.h"
-#include "recording.h"
-#include "tier1/strtools.h"
 #include "tier0/vprof.h"
+#include "tier1/utlrbtree.h"
+#include "tier1/strtools.h"
+
+#include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "materialsystem/imesh.h"
+
+#include "recording.h"
+#include "shaderapidx8_global.h"
 #include "shaderdevicedx8.h"
+
+#include "windows/com_error_category.h"
 
 // NOTE: This has to be the last file included!
 #include "tier0/memdbgon.h"
@@ -238,22 +243,13 @@ void PrintVertexDeclaration( const D3DVERTEXELEMENT9 *pDecl )
 //-----------------------------------------------------------------------------
 // Converts format to a vertex decl
 //-----------------------------------------------------------------------------
-void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStaticLit, bool bUsingFlex, bool bUsingMorph )
+template<unsigned declSize>
+void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 (&pDecl)[declSize], bool bStaticLit, bool bUsingFlex, bool bUsingMorph )
 {
-	int i = 0;
+	unsigned i = 0;
 	WORD offset = 0;
 
 	VertexCompressionType_t compressionType = CompressionType( fmt );
-
-	if ( IsX360() )
-	{
-		// On 360, there's a performance penalty for reading more than 2 streams in the vertex shader
-		// (we don't do this yet, but we should be aware if we start doing it)
-#ifdef _DEBUG
-		int numStreams = 1 + ( bStaticLit ? 1 : 0 ) + ( bUsingFlex ? 1 : 0 ) + ( bUsingMorph ? 1 : 0 );
-		Assert( numStreams <= 2 );
-#endif
-	}
 
 	if ( fmt & VERTEX_POSITION )
 	{
@@ -465,9 +461,8 @@ void ComputeVertexSpec( VertexFormat_t fmt, D3DVERTEXELEMENT9 *pDecl, bool bStat
 	}
 
 	static D3DVERTEXELEMENT9 declEnd = D3DDECL_END();
-	pDecl[i] = declEnd;
 
-	//PrintVertexDeclaration( pDecl );
+	pDecl[i] = declEnd;
 }
 
 //-----------------------------------------------------------------------------
@@ -484,7 +479,7 @@ struct VertexDeclLookup_t
 
 	VertexFormat_t				m_VertexFormat;
 	int							m_nFlags;
-	IDirect3DVertexDeclaration9 *m_pDecl;
+	se::win::com::com_ptr<IDirect3DVertexDeclaration9> m_pDecl;
 
 	bool operator==( const VertexDeclLookup_t &src ) const
 	{
@@ -511,7 +506,12 @@ static CUtlRBTree<VertexDeclLookup_t, int> s_VertexDeclDict( 0, 256, VertexDeclL
 //-----------------------------------------------------------------------------
 // Gets the declspec associated with a vertex format
 //-----------------------------------------------------------------------------
-IDirect3DVertexDeclaration9 *FindOrCreateVertexDecl( VertexFormat_t fmt, bool bStaticLit, bool bUsingFlex, bool bUsingMorph )
+se::win::com::com_ptr<IDirect3DVertexDeclaration9> FindOrCreateVertexDecl(
+	IDirect3DDevice9Ex *pD3D,
+	VertexFormat_t fmt,
+	bool bStaticLit,
+	bool bUsingFlex,
+	bool bUsingMorph )
 {
 	MEM_ALLOC_D3D_CREDIT();
 
@@ -531,7 +531,7 @@ IDirect3DVertexDeclaration9 *FindOrCreateVertexDecl( VertexFormat_t fmt, bool bS
 		lookup.m_nFlags |= VertexDeclLookup_t::USING_FLEX;
 	}
 
-	int i = s_VertexDeclDict.Find( lookup );
+	auto i = s_VertexDeclDict.Find( lookup );
 	if ( i != s_VertexDeclDict.InvalidIndex() )
 	{
 		// found
@@ -541,20 +541,23 @@ IDirect3DVertexDeclaration9 *FindOrCreateVertexDecl( VertexFormat_t fmt, bool bS
 	D3DVERTEXELEMENT9 decl[32];
 	ComputeVertexSpec( fmt, decl, bStaticLit, bUsingFlex, bUsingMorph );
 
-	HRESULT hr = 
-		Dx9Device()->CreateVertexDeclaration( decl, &lookup.m_pDecl );
+	Assert(pD3D);
+	const HRESULT hr = pD3D->CreateVertexDeclaration( decl, &lookup.m_pDecl );
+	if ( FAILED( hr ) )
+	{
+		Assert(false);
+		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateVertexDeclaration(format = 0x%x, static = %s, flex = %s, morph = %s) failed w/e %s. You'll probably see messed-up mesh rendering - to diagnose, build shaderapidx9.dll in debug.\n",
+			fmt,
+			bStaticLit ? "true" : "false",
+			bUsingFlex ? "true" : "false",
+			bUsingMorph ? "true" : "false",
+			se::win::com::com_error_category().message(hr).c_str() );
+	}
 
 	// NOTE: can't record until we have m_pDecl!
 	RECORD_COMMAND( DX8_CREATE_VERTEX_DECLARATION, 2 );
-	RECORD_INT( ( int )lookup.m_pDecl );
+	RECORD_PTR( lookup.m_pDecl );
 	RECORD_STRUCT( decl, sizeof( decl ) );
-	COMPILE_TIME_ASSERT( sizeof( decl ) == sizeof( D3DVERTEXELEMENT9 ) * 32 );
-
-	Assert( hr == D3D_OK );
-	if ( hr != D3D_OK )
-	{
-		Warning( " ERROR: failed to create vertex decl for vertex format 0x%08llX! You'll probably see messed-up mesh rendering - to diagnose, build shaderapidx9.dll in debug.\n", fmt );
-	}
 
 	s_VertexDeclDict.Insert( lookup );
 	return lookup.m_pDecl;
@@ -566,11 +569,13 @@ IDirect3DVertexDeclaration9 *FindOrCreateVertexDecl( VertexFormat_t fmt, bool bS
 //-----------------------------------------------------------------------------
 void ReleaseAllVertexDecl()
 {
-	int i = s_VertexDeclDict.FirstInorder();
+	auto i = s_VertexDeclDict.FirstInorder();
 	while ( i != s_VertexDeclDict.InvalidIndex() )
 	{
-		if ( s_VertexDeclDict[i].m_pDecl )
-			s_VertexDeclDict[i].m_pDecl->Release();
+		auto &e = s_VertexDeclDict[i];
+		if ( e.m_pDecl )
+			e.m_pDecl.Release();
+
 		i = s_VertexDeclDict.NextInorder( i );
 	}
 }

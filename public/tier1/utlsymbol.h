@@ -9,13 +9,9 @@
 #ifndef UTLSYMBOL_H
 #define UTLSYMBOL_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/threadtools.h"
-#include "tier1/utlrbtree.h"
-#include "tier1/utlvector.h"
+#include "utlrbtree.h"
+#include "utlvector.h"
 
 
 //-----------------------------------------------------------------------------
@@ -28,7 +24,7 @@ class CUtlSymbolTableMT;
 //-----------------------------------------------------------------------------
 // This is a symbol, which is a easier way of dealing with strings.
 //-----------------------------------------------------------------------------
-typedef unsigned short UtlSymId_t;
+using UtlSymId_t = unsigned short;
 
 constexpr inline UtlSymId_t UTL_INVAL_SYMBOL{(UtlSymId_t)~0};
 
@@ -39,10 +35,10 @@ public:
 	CUtlSymbol() : m_Id(UTL_INVAL_SYMBOL) {}
 	CUtlSymbol( UtlSymId_t id ) : m_Id(id) {}
 	CUtlSymbol( const char* pStr );
-	CUtlSymbol( CUtlSymbol const& sym ) : m_Id(sym.m_Id) {}
+	CUtlSymbol( CUtlSymbol const& sym )  = default;
 	
 	// operator=
-	CUtlSymbol& operator=( CUtlSymbol const& src ) { m_Id = src.m_Id; return *this; }
+	CUtlSymbol& operator=( CUtlSymbol const& src ) = default;
 	
 	// operator==
 	bool operator==( CUtlSymbol const& src ) const { return m_Id == src.m_Id; }
@@ -51,13 +47,13 @@ public:
 	bool operator==( std::nullptr_t ) const { return m_Id == UTL_INVAL_SYMBOL; }
 	
 	// Is valid?
-	bool IsValid() const { return m_Id != UTL_INVAL_SYMBOL; }
+	[[nodiscard]] bool IsValid() const { return m_Id != UTL_INVAL_SYMBOL; }
 	
 	// Gets at the symbol
 	operator UtlSymId_t const() const { return m_Id; }
 	
 	// Gets the string associated with the symbol
-	const char* String( ) const;
+	[[nodiscard]] const char* String( ) const;
 
 	// Modules can choose to disable the static symbol table so to prevent accidental use of them.
 	static void DisableStaticSymbolTable();
@@ -108,7 +104,7 @@ public:
 	// Remove all symbols in the table.
 	void  RemoveAll();
 
-	unsigned short GetNumStrings( void ) const
+	[[nodiscard]] unsigned short GetNumStrings() const
 	{
 		return m_Lookup.Count();
 	}
@@ -223,7 +219,7 @@ private:
 
 // The handle is a CUtlSymbol for the dirname and the same for the filename, the accessor
 //  copies them into a static char buffer for return.
-typedef void* FileNameHandle_t;
+using FileNameHandle_t = void *;
 #define FILENAMEHANDLE_INVALID nullptr
 
 // Symbol table for more efficiently storing filenames by breaking paths and filenames apart.

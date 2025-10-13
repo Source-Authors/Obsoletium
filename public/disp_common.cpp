@@ -16,7 +16,7 @@ class CNodeVert
 {
 public:
 	CNodeVert() = default;
-	CNodeVert( int ix, int iy ) {x=ix; y=iy;}
+	constexpr CNodeVert( int ix, int iy ) : x{ix}, y{iy} {}
 
 	inline int&			operator[]( int i )			{return ((int*)this)[i];}
 	inline int const&	operator[]( int i ) const	{return ((int*)this)[i];}
@@ -24,7 +24,7 @@ public:
 	int x, y;
 };
 
-static CNodeVert const g_NodeChildLookup[4][2] =
+static constexpr CNodeVert g_NodeChildLookup[4][2] =
 {
 	{CNodeVert(0,0), CNodeVert(1,1)},
 	{CNodeVert(1,0), CNodeVert(2,1)},
@@ -32,7 +32,7 @@ static CNodeVert const g_NodeChildLookup[4][2] =
 	{CNodeVert(1,1), CNodeVert(2,2)}
 };
 
-static CNodeVert const g_NodeTriWinding[9] =
+static constexpr CNodeVert g_NodeTriWinding[9] =
 {
 	CNodeVert(0, 1), 
 	CNodeVert(0, 0), 
@@ -46,7 +46,7 @@ static CNodeVert const g_NodeTriWinding[9] =
 };
 
 // Indexed by CORNER_. These store NEIGHBOREDGE_ defines and tell which edges butt up against the corner.
-static int g_CornerEdges[4][2] =
+static constexpr int g_CornerEdges[4][2] =
 {
 	{ NEIGHBOREDGE_BOTTOM,	NEIGHBOREDGE_LEFT },	// CORNER_LOWER_LEFT
 	{ NEIGHBOREDGE_TOP,		NEIGHBOREDGE_LEFT },	// CORNER_UPPER_LEFT
@@ -96,7 +96,7 @@ int g_EdgeSideLenMul[4] =
 // Helper functions.
 // --------------------------------------------------------------------------------- //
 
-inline int SignedBitShift( int val, int shift )
+static constexpr inline int SignedBitShift( int val, int shift )
 {
 	if( shift > 0 )
 		return val << shift;
@@ -152,7 +152,7 @@ int GetEdgeIndexFromPoint( CVertIndex const &index, int iMaxPower )
 }
 
 
-int GetCornerIndexFromPoint( CVertIndex const &index, int iPower )
+static int GetCornerIndexFromPoint( CVertIndex const &index, int iPower )
 {
 	int sideLengthMinus1 = 1 << iPower;
 
@@ -743,8 +743,8 @@ void ClearNeighborData( CCoreDispInfo *pDisp )
 void GetDispBox( CCoreDispInfo *pDisp, CDispBox &box )
 {
 	// Calculate the bbox for this displacement.
-	Vector vMin(  1e24,  1e24,  1e24 );
-	Vector vMax( -1e24, -1e24, -1e24 );
+	Vector vMin( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
+	Vector vMax( std::numeric_limits<vec_t>::min(), std::numeric_limits<vec_t>::min(), std::numeric_limits<vec_t>::min() );
 
 	for ( int iVert = 0; iVert < 4; ++iVert )
 	{
@@ -1061,10 +1061,10 @@ void VerifyNeighborConnections( CCoreDispInfo **ppListBase, int nDisps )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void FindNeighboringDispSurfs( CCoreDispInfo **ppListBase, int nListSize )
+void FindNeighboringDispSurfs( CCoreDispInfo **ppListBase, intp nListSize )
 {
 	// First, clear all neighboring data.
-	int iDisp;
+	intp iDisp;
 	for ( iDisp = 0; iDisp < nListSize; ++iDisp )
 	{
 		ClearNeighborData( ppListBase[iDisp] );
@@ -1080,7 +1080,7 @@ void FindNeighboringDispSurfs( CCoreDispInfo **ppListBase, int nListSize )
 	{
 		CCoreDispInfo *pMain = ppListBase[iDisp];
 
-		for ( int iDisp2 = iDisp+1; iDisp2 < nListSize; ++iDisp2 )
+		for ( intp iDisp2 = iDisp+1; iDisp2 < nListSize; ++iDisp2 )
 		{
 			CCoreDispInfo *pOther = ppListBase[iDisp2];
 
@@ -1239,10 +1239,10 @@ void DisableUnallowedVerts_R( CDispUtilsHelper *pDisp, CVertIndex const &nodeInd
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void SetupAllowedVerts( CCoreDispInfo **ppListBase, int nListSize )
+void SetupAllowedVerts( CCoreDispInfo **ppListBase, intp nListSize )
 {
 	// Set all verts to allowed to start with.
-	int iDisp;
+	intp iDisp;
 	for ( iDisp = 0; iDisp < nListSize; ++iDisp )
 	{
 		ppListBase[iDisp]->GetAllowedVerts().SetAll();

@@ -7,11 +7,13 @@
 
 #include "info_key.h"
 
-#include <stdio.h>
-#include <string.h>
+#include <cstdio>
+#include <cstring>
 #include "tier1/strtools.h"
 
-#define MAX_KV_LEN 127
+enum {
+  MAX_KV_LEN = 127
+};
 /*
 ===============
 Info_ValueForKey
@@ -31,7 +33,7 @@ const char *Info_ValueForKey ( const char *s, const char *key )
 	valueindex = (valueindex + 1) % 4;
 	if (*s == '\\')
 		s++;
-	while (1)
+	while (true)
 	{
 		o = pkey;
 		while (*s != '\\')
@@ -74,7 +76,7 @@ void Info_RemoveKey ( char *s, const char *key )
 		return;
 	}
 
-	while (1)
+	while (true)
 	{
 		start = s;
 		if (*s == '\\')
@@ -120,7 +122,7 @@ void Info_RemovePrefixedKeys (char *start, char prefix)
 
 	s = start;
 
-	while (1)
+	while (true)
 	{
 		if (*s == '\\')
 			s++;

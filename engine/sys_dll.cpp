@@ -320,7 +320,7 @@ void Sys_Printf(const char *fmt, ...)
 	va_list		argptr;
 	char		text[1024];
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe (text, fmt, argptr);
 	va_end (argptr);
 		
@@ -515,7 +515,7 @@ void Sys_Error( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2 )
 {
 	va_list		argptr;
 
-	va_start( argptr, error );
+	va_start( argptr, error ); //-V2019 //-V2018
 	Sys_Error_Internal( true, error, argptr );
 	va_end( argptr );
 }
@@ -531,7 +531,7 @@ void Sys_Exit( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2 )
 {
 	va_list		argptr;
 
-	va_start( argptr, error );
+	va_start( argptr, error ); //-V2019 //-V2018
 	Sys_Error_Internal( false, error, argptr );
 	va_end( argptr );
 
@@ -728,13 +728,13 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
                                const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 
-  out_group = out_group && out_group[0] ? out_group : group;
+  out_group = !Q_isempty( out_group ) ? out_group : group;
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+    Q_snprintf(out, std::size(out), "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
   } else {
-    Q_snprintf(out, std::size(out), "%s", message);
+    Q_snprintf(out, std::size(out), "[%.3f] %s", Plat_FloatTime(), message);
   }
 
   return out;
@@ -1147,7 +1147,7 @@ void LoadEntityDLLs( const char *szBaseDir, bool bIsServerOnly )
 
 	if ( serverGameDLL )
 	{
-		Msg("server%s loaded for \"%s\"\n", DLL_EXT_STRING, (char *)serverGameDLL->GetGameDescription());
+		Msg("server%s loaded for \"%s\"\n", DLL_EXT_STRING, serverGameDLL->GetGameDescription());
 	}
 	else
 	{
@@ -1271,7 +1271,7 @@ void Sys_GetRegKeyValueUnderRootInt( HKEY rootKey, const char *pszSubKey, const 
 			// Didn't find it, so write out new value
 		{
 			// Just Set the Values according to the defaults
-			lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_DWORD, (LPBYTE)&lDefaultValue, sizeof( DWORD ) ); 
+			lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_DWORD, (const LPBYTE)&lDefaultValue, sizeof( DWORD ) ); 
 		}
 	};
 

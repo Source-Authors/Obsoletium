@@ -50,11 +50,9 @@ CP4File::CP4File( char const *szFilename )
 	m_sFilename = szFilename;
 }
 
-CP4File::~CP4File()
-{
-}
+CP4File::~CP4File() = default;
 
-bool CP4File::Edit( void )
+bool CP4File::Edit( )
 {
   // dimhotepus: No perforce
   /*if (!p4)
@@ -64,7 +62,7 @@ bool CP4File::Edit( void )
   return true;
 }
 
-bool CP4File::Add( void )
+bool CP4File::Add( )
 {
   // dimhotepus: No perforce
   /*if (!p4)
@@ -74,7 +72,7 @@ bool CP4File::Add( void )
   return true;
 }
 
-bool CP4File::Revert( void )
+bool CP4File::Revert( )
 {
   // dimhotepus: No perforce
   /*if (!p4) return true;
@@ -116,9 +114,7 @@ CP4Factory::CP4Factory() : m_bDummyMode{false}
 {
 }
 
-CP4Factory::~CP4Factory()
-{
-}
+CP4Factory::~CP4Factory() = default;
 
 bool CP4Factory::SetDummyMode( bool bDummyMode )
 {

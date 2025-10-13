@@ -36,15 +36,15 @@ CAttributeSurfacePropertyPickerPanel::~CAttributeSurfacePropertyPickerPanel()
 //-----------------------------------------------------------------------------
 void CAttributeSurfacePropertyPickerPanel::AddSurfacePropertiesToList( PickerList_t &list )
 {
-	KeyValues *manifest = new KeyValues( SURFACEPROP_MANIFEST_FILE );
+	KeyValuesAD manifest( SURFACEPROP_MANIFEST_FILE );
 	if ( manifest->LoadFromFile( g_pFullFileSystem, SURFACEPROP_MANIFEST_FILE, "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
 		{
 			if ( Q_stricmp( sub->GetName(), "file" ) )
 				continue;
-							  
-			KeyValues *file = new KeyValues( SURFACEPROP_MANIFEST_FILE );
+
+			KeyValuesAD file( SURFACEPROP_MANIFEST_FILE );
 			if ( file->LoadFromFile( g_pFullFileSystem, sub->GetString(), "GAME" ) )
 			{
 				for ( KeyValues *pTrav = file; pTrav; pTrav = pTrav->GetNextKey() )
@@ -58,15 +58,12 @@ void CAttributeSurfacePropertyPickerPanel::AddSurfacePropertiesToList( PickerLis
 			{
 				Warning( "Unable to load surface properties file '%s'\n", sub->GetString() );
 			}
-			file->deleteThis();
 		}
 	}
 	else
 	{
 		Warning( "Unable to load manifest file '%s'\n", SURFACEPROP_MANIFEST_FILE );
 	}
-
-	manifest->deleteThis();
 }
 
 

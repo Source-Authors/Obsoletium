@@ -1713,7 +1713,7 @@ ClientClass *CBaseClientState::GetClientClass( int index )
 	return m_pServerClasses[index].m_pClientClass;
 }
 
-bool CBaseClientState::GetClassBaseline( int iClass, void const **pData, int *pDatalen )
+bool CBaseClientState::GetClassBaseline( int iClass, void const **pData, intp *pDatalen )
 {
 	ErrorIfNot( 
 		iClass >= 0 && iClass < m_nServerClasses, 

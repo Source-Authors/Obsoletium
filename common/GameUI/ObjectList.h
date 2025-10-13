@@ -19,32 +19,32 @@
 class ObjectList : public IObjectContainer  
 {
 public:
-	void	Init();
-	bool	Add( void * newObject );
-	void *	GetFirst();
-	void *	GetNext();
+	void	Init() override;
+	bool	Add( void * newObject ) override;
+	void *	GetFirst() override;
+	void *	GetNext() override;
 	
 
 
 	ObjectList();
-	virtual ~ObjectList();
+	~ObjectList() override;
 
-	void	Clear( bool freeElementsMemory );
-	int		CountElements();
+	void	Clear( bool freeElementsMemory ) override;
+	int		CountElements() override;
 	void *	RemoveTail();
 	void *	RemoveHead();
 
 	bool	AddTail(void * newObject);
 	bool	AddHead(void * newObject);
-	bool	Remove(void * object);
-	bool	Contains(void * object);
-	bool	IsEmpty();
+	bool	Remove(void * object) override;
+	bool	Contains(void * object) override;
+	bool	IsEmpty() override;
 
-	typedef struct element_s {
+	using element_t = struct element_s {
 		element_s *	prev;	// pointer to the last element or NULL
 		element_s *	next;	// pointer to the next elemnet or NULL
 		void *		object;	// the element's object
-	} element_t;
+	};
 
 protected:
 

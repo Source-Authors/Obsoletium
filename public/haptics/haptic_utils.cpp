@@ -139,11 +139,15 @@ void ConnectHaptics(CreateInterfaceFn appFactory)
 	{
 		Assert( (void*)haptics == inputsystem->GetHapticsInterfaceAddress() );
 	}
+
 	HookHapticMessages();
 }
 
 void DisconnectHaptics()
 {
+	// dimhotepus: Pair with connect haptics - cleanup message hooks.
+	UnhookHapticMessages();
+
 	haptics->ShutdownHaptics();
 	if(pFalconModule)
 	{

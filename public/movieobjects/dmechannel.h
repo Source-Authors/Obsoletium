@@ -200,15 +200,15 @@ protected:
 	CDmaVar< int > m_mode;
 	CDmaElement< CDmeLog > m_log;
 
-	DmAttributeHandle_t m_FromAttributeHandle;
-	DmAttributeHandle_t m_ToAttributeHandle;
+	DmAttributeHandle_t m_FromAttributeHandle{DMATTRIBUTE_HANDLE_INVALID};
+	DmAttributeHandle_t m_ToAttributeHandle{DMATTRIBUTE_HANDLE_INVALID};
 
 	DmeTime_t m_timeOutsideTimeframe;
 	DmeTime_t m_tCurrentTime;
 	DmeTime_t m_tPreviousTime;
 
-	intp m_nRecordLayerIndex;
-	int m_nNextCurveType;
+	intp m_nRecordLayerIndex{-1};
+	int m_nNextCurveType{CURVE_DEFAULT};
 
 	friend class CDmeChannelRecordingMgr;
 };

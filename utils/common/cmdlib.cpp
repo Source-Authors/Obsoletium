@@ -171,13 +171,13 @@ static const char *PrefixMessageGroup(
     const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 
-  out_group = out_group && out_group[0] ? out_group : group;
+  out_group = !Q_isempty( out_group ) ? out_group : group;
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    V_sprintf_safe(out, "[%s] %s", out_group, message);
+    V_sprintf_safe(out, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
   } else {
-    V_sprintf_safe(out, "%s", message);
+    V_sprintf_safe(out, "[%.3f] %s", Plat_FloatTime(), message);
   }
 
   return out;
@@ -431,9 +431,9 @@ char *copystring(const char *s) {
 
 void GetHourMinuteSeconds(int, int &, int &, int &) {}
 
-void GetHourMinuteSecondsString(int nInputSeconds, char *pOut, int outLen) {
-  int nMinutes = nInputSeconds / 60;
-  int nSeconds = nInputSeconds - nMinutes * 60;
+void GetHourMinuteSecondsString(int inSecounds, char *out, intp size) {
+  int nMinutes = inSecounds / 60;
+  int nSeconds = inSecounds - nMinutes * 60;
   int nHours = nMinutes / 60;
 
   nMinutes -= nHours * 60;
@@ -441,14 +441,14 @@ void GetHourMinuteSecondsString(int nInputSeconds, char *pOut, int outLen) {
   const char *extra[2]{"", "s"};
 
   if (nHours > 0)
-    Q_snprintf(pOut, outLen, "%d hour%s, %d minute%s, %d second%s", nHours,
+    V_snprintf(out, size, "%d hour%s, %d minute%s, %d second%s", nHours,
                extra[nHours != 1], nMinutes, extra[nMinutes != 1], nSeconds,
                extra[nSeconds != 1]);
   else if (nMinutes > 0)
-    Q_snprintf(pOut, outLen, "%d minute%s, %d second%s", nMinutes,
+    V_snprintf(out, size, "%d minute%s, %d second%s", nMinutes,
                extra[nMinutes != 1], nSeconds, extra[nSeconds != 1]);
   else
-    Q_snprintf(pOut, outLen, "%d second%s", nSeconds, extra[nSeconds != 1]);
+    V_snprintf(out, size, "%d second%s", nSeconds, extra[nSeconds != 1]);
 }
 
 void Q_mkdir(char *path) {
@@ -458,8 +458,8 @@ void Q_mkdir(char *path) {
   if (!mkdir(path, 0777) || errno == EEXIST) return;
 #endif
 
-  Error( "Unable to create directory '%s': %s.\n",
-      path, std::generic_category().message(errno).c_str() );
+  Error("Unable to create directory '%s': %s.\n", path,
+        std::generic_category().message(errno).c_str());
 }
 
 void CmdLib_InitFileSystem(const char *pFilename, int maxMemoryUsage) {
@@ -545,9 +545,9 @@ bool CmdLib_HasBasePath(const char *pFileName_, intp &pathLength) {
 
   for (intp i = 0; i < g_NumBasePaths; i++) {
     // see if we can rip the base off of the filename.
-    if (Q_strncasecmp(g_pBasePaths[i], pFileName, strlen(g_pBasePaths[i])) ==
-        0) {
-      pathLength = strlen(g_pBasePaths[i]);
+    const intp len = V_strlen(g_pBasePaths[i]);
+    if (Q_strncasecmp(g_pBasePaths[i], pFileName, len) == 0) {
+      pathLength = len;
       return true;
     }
   }
@@ -637,18 +637,14 @@ int LoadFile(const char *filename, void **bufferptr) {
   unsigned length = 0;
 
   FileHandle_t f = SafeOpenRead(filename);
-  if (f) {
-    length = Q_filelength(f);
+  length = Q_filelength(f);
 
-    void *buffer = malloc(length + 1);
-    ((char *)buffer)[length] = 0;
-    SafeRead(f, buffer, length);
-    g_pFileSystem->Close(f);
+  void *buffer = malloc(length + 1);
+  ((char *)buffer)[length] = 0;
+  SafeRead(f, buffer, length);
+  g_pFileSystem->Close(f);
 
-    *bufferptr = buffer;
-  } else {
-    *bufferptr = nullptr;
-  }
+  *bufferptr = buffer;
 
   return length;
 }
@@ -718,7 +714,7 @@ void CreatePath(char *path) {
 }
 
 #if defined(_WIN32) || defined(WIN32)
-// Creates a path, path may already exist
+// Creates a path, path may already exist. This is kinda janky, avoid.
 void SafeCreatePath(char *path) {
   char *ptr;
 
@@ -735,6 +731,24 @@ void SafeCreatePath(char *path) {
       *ptr = '\0';
       Q_mkdir(path);
       *ptr = '\\';
+    }
+  }
+}
+#elif defined(POSIX)
+// dimhotepus: TF2 backport.
+void SafeCreatePath(char *path) {
+  char *ptr = path;
+  // Ignore leading slashes (don't mkdir /)
+  while (*ptr == '/') {
+    ptr++;
+  };
+
+  while (ptr && *ptr) {
+    ptr = strchr(ptr + 1, '/');
+    if (ptr) {
+      *ptr = '\0';
+      Q_mkdir(path);
+      *ptr = '/';
     }
   }
 }

@@ -100,7 +100,7 @@ bool CShadowControl::KeyValue( const char *szKeyName, const char *szValue )
 	if ( FStrEq( szKeyName, "angles" ) )
 	{
 		QAngle angles;
-		UTIL_StringToVector( angles.Base(), szValue );
+		UTIL_StringToVector( angles, szValue );
 		if (angles == vec3_angle)
 		{
 			angles.Init( 80, 30, 0 );
@@ -118,7 +118,7 @@ bool CShadowControl::KeyValue( const char *szKeyName, const char *szValue )
 		if ( fabs(m_shadowDirection->LengthSqr() - 1.0f) > 1e-3 )
 		{
 			Vector vTemp;
-			UTIL_StringToVector( vTemp.Base(), szValue );
+			UTIL_StringToVector( vTemp, szValue );
 			m_shadowDirection = vTemp;
 		}
 		return true;
@@ -144,7 +144,7 @@ void CShadowControl::InputSetAngles( inputdata_t &inputdata )
 	const char *pAngles = inputdata.value.String();
 
 	QAngle angles;
-	UTIL_StringToVector( angles.Base(), pAngles );
+	UTIL_StringToVector( angles, pAngles );
 
 	Vector vTemp;
 	AngleVectors( angles, &vTemp );

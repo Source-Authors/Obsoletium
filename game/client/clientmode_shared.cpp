@@ -279,6 +279,7 @@ ClientModeShared::ClientModeShared()
 {
 	m_pViewport = NULL;
 	m_pChatElement = NULL;
+	m_CursorNone = vgui::dc_none;
 	m_pWeaponSelection = NULL;
 	m_nRootSize[ 0 ] = m_nRootSize[ 1 ] = -1;
 

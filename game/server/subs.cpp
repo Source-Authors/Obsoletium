@@ -285,7 +285,7 @@ void CBaseToggle::AngularMove( const QAngle &vecDestAngle, float flSpeed )
 	// divide by speed to get time to reach dest
 	float flTravelTime = vecDestDelta.Length() / flSpeed;
 
-	const float MinTravelTime = 0.01f;
+	constexpr float MinTravelTime = 0.01f;
 	if ( flTravelTime < MinTravelTime )
 	{
 		// If we only travel for a short time, we can fail WillSimulateGamePhysics()

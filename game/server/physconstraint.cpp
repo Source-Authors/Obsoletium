@@ -352,13 +352,20 @@ int CPhysConstraint::DrawDebugTextOverlays()
 	{
 		constraint_breakableparams_t params;
 		Q_memset(&params,0,sizeof(params));
-		m_pConstraint->GetConstraintParams( &params );
-		
-		if ( (params.bodyMassScale[0] != 1.0f && params.bodyMassScale[0] != 0.0f) || (params.bodyMassScale[1] != 1.0f && params.bodyMassScale[1] != 0.0f) )
+		if ( m_pConstraint->GetConstraintParams( &params ) )
 		{
-			CFmtStr str("mass ratio %.4f:%.4f\n", params.bodyMassScale[0], params.bodyMassScale[1] );
-			NDebugOverlay::EntityTextAtPosition( GetAbsOrigin(), pos, str.Access(), 0, 255, 255, 0, 255 );
+			if ( (params.bodyMassScale[0] != 1.0f && params.bodyMassScale[0] != 0.0f) || (params.bodyMassScale[1] != 1.0f && params.bodyMassScale[1] != 0.0f) )
+			{
+				CFmtStr str("mass ratio %.4f:%.4f\n", params.bodyMassScale[0], params.bodyMassScale[1] );
+				NDebugOverlay::EntityTextAtPosition( GetAbsOrigin(), pos, str.Access(), 0, 255, 255, 0, 255 );
+			}
 		}
+		else
+		{
+			// dimhotepus: If constraint params missed, warn.
+			NDebugOverlay::EntityTextAtPosition( GetAbsOrigin(), pos, "<no constraint params>", 0, 255, 255, 0, 255 );
+		}
+		
 		pos++;
 	}
 	return pos;

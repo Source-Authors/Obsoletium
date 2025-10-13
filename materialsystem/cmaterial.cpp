@@ -1185,6 +1185,11 @@ bool CMaterial::ShouldSkipVar( KeyValues *pVar, bool *pWasConditional )
 		{
 			bShouldSkip = !IsX360();
 		}
+		// dimhotepus: Check for game console.
+		else if ( ! stricmp( pCond, "gameconsole" ) )
+		{
+			bShouldSkip = !IsGameConsole();
+		}
 		else
 		{
 			Warning( "unrecognized conditional test %s in %s\n", pVarName, GetName() );
@@ -2840,7 +2845,9 @@ IMaterialVar *CMaterial::FindVarFast( char const *pVarName, unsigned int *pCache
 		{
 			if (m_pShaderParams[i]->GetNameAsSymbol() == pToken->symbol)
 			{
-				pToken->varIndex = i;
+				static_assert(std::is_same_v<decltype(m_VarCount), unsigned char>);
+		
+				pToken->varIndex = static_cast<unsigned char>(i);
 				return m_pShaderParams[i];
 			}
 		}

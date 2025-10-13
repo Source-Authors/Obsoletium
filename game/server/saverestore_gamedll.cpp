@@ -50,35 +50,64 @@ bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, c
 			case FIELD_MODELNAME:
 			case FIELD_SOUNDNAME:
 			case FIELD_STRING:
-				(*(string_t *)((char *)pObject + fieldOffset)) = AllocPooledString( szValue );
+			{
+				// dimhotepus: Fix UB on cast to different type pointer & write to.
+				const string_t string = AllocPooledString( szValue );
+				V_memcpy( (byte *)pObject + fieldOffset, &string, sizeof(string) );
 				return true;
+			}
 
 			case FIELD_TIME:
 			case FIELD_FLOAT:
-				(*(float *)((char *)pObject + fieldOffset)) = strtof( szValue, nullptr );
+			{
+				// dimhotepus: Fix UB on cast to different type pointer & write to.
+				const float val = strtof( szValue, nullptr );
+				V_memcpy( (byte *)pObject + fieldOffset, &val, sizeof(float) );
 				return true;
+			}
 
 			case FIELD_BOOLEAN:
-				(*(bool *)((char *)pObject + fieldOffset)) = (bool)(atoi( szValue ) != 0);
+			{
+				// dimhotepus: Fix UB on cast to different type pointer & write to.
+				const bool b = atoi( szValue ) != 0;
+				V_memcpy( (byte *)pObject + fieldOffset, &b, sizeof(b) );
 				return true;
+			}
 
 			case FIELD_CHARACTER:
-				(*(char *)((char *)pObject + fieldOffset)) = (char)atoi( szValue );
+			{
+				// dimhotepus: Fix UB on cast to different type pointer & write to.
+				const char c = (char)atoi( szValue );
+				V_memcpy( (byte *)pObject + fieldOffset, &c, sizeof(c) );
 				return true;
+			}
 
 			case FIELD_SHORT:
-				(*(short *)((char *)pObject + fieldOffset)) = (short)atoi( szValue );
+			{
+				// dimhotepus: Fix UB on cast to different type pointer & write to.
+				const short s = (short)atoi( szValue );
+				V_memcpy( (byte *)pObject + fieldOffset, &s, sizeof(s) );
 				return true;
+			}
 
 			case FIELD_INTEGER:
 			case FIELD_TICK:
-				(*(int *)((char *)pObject + fieldOffset)) = atoi( szValue );
+			{
+				// dimhotepus: Fix UB on cast to different type pointer & write to.
+				const int tick = atoi( szValue );
+				V_memcpy( (byte *)pObject + fieldOffset, &tick, sizeof(tick) );
 				return true;
+			}
 
 			case FIELD_POSITION_VECTOR:
 			case FIELD_VECTOR:
-				UTIL_StringToVector( (float *)((char *)pObject + fieldOffset), szValue );
+			{
+				// dimhotepus: Fix UB on cast to different type pointer & write to.
+				Vector vec;
+				UTIL_StringToVector( vec, szValue );
+				V_memcpy( (byte *)pObject + fieldOffset, &vec, sizeof(vec) );
 				return true;
+			}
 
 			case FIELD_VMATRIX:
 			case FIELD_VMATRIX_WORLDSPACE:
@@ -97,7 +126,7 @@ bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, c
 			{
 				SaveRestoreFieldInfo_t fieldInfo =
 				{
-					(char *)pObject + fieldOffset,
+					(byte *)pObject + fieldOffset,
 					pObject,
 					pField
 				};

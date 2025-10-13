@@ -116,8 +116,10 @@ protected:
 	float m_prevZoom;
 	float m_prevAltitude, m_prevAzimuth;
 
-	float m_flLastMouseTime;
-	float m_flLastTickTime;
+	// dimhotepus: float -> double.
+	double m_flLastMouseTime;
+	// dimhotepus: float -> double.
+	double m_flLastTickTime;
 	float m_flSpin;
 	bool m_bSpin;
 

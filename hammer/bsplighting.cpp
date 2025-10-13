@@ -258,7 +258,7 @@ bool CBSPLighting::Load( char const *pFilename )
 	sortInfos.SetSize( pMatSys->GetNumSortIDs() );
 	pMatSys->GetSortInfo( sortInfos.Base() );
 
-	for( int iFace=0; iFace < faces.Count(); iFace++ )
+	for( intp iFace=0; iFace < faces.Count(); iFace++ )
 	{
 		m_StoredFaces[iFace].m_LightmapPageID = sortInfos[faces[iFace].m_LightmapSortID].lightmapPageID;
 	}
@@ -268,7 +268,7 @@ bool CBSPLighting::Load( char const *pFilename )
 
 
 	// Set lightmap texture coordinates.
-	for( int iFace=0; iFace < faces.Count(); iFace++ )
+	for( intp iFace=0; iFace < faces.Count(); iFace++ )
 	{
 		CFace *pFace = &faces[iFace];
 		CStoredFace *pStoredFace = &m_StoredFaces[iFace];
@@ -518,12 +518,10 @@ void CBSPLighting::Draw()
 		{
 			CMaterialBuf *pBuf = pMat->m_MaterialBufs[iBuf];
 
-			for( int iCmd=0; iCmd < pBuf->m_DrawCommands.Count(); iCmd++ )
+			for( auto *cmd : pBuf->m_DrawCommands )
 			{
-				CDrawCommand *pCmd = pBuf->m_DrawCommands[iCmd];
-
-				pRenderContext->BindLightmapPage( pCmd->m_LightmapPageID );
-				pBuf->m_pMesh->Draw( pCmd->m_PrimLists.Base(), pCmd->m_PrimLists.Count() );
+				pRenderContext->BindLightmapPage( cmd->m_LightmapPageID );
+				pBuf->m_pMesh->Draw( cmd->m_PrimLists.Base(), cmd->m_PrimLists.Count() );
 			}
 		}
 	}
@@ -634,7 +632,7 @@ void CBSPLighting::BuildLMGroups(
 			mb.Begin( pBuf->m_pMesh, MATERIAL_TRIANGLES, pBuf->m_nVerts, pBuf->m_nIndices );
 
 				// Write all the faces in.
-				int iCurBaseVert = 0;
+				intp iCurBaseVert = 0;
 
 				FOR_EACH_LL( pBuf->m_Faces, iFace )
 				{
@@ -713,7 +711,7 @@ void CBSPLighting::BuildLMGroups(
 
 bool FindDrawCommand( CUtlVector<CBSPLighting::CDrawCommand*> &drawCommands, int lmPageID, int &index )
 {
-	for( int i=0; i < drawCommands.Count(); i++ )
+	for( intp i=0; i < drawCommands.Count(); i++ )
 	{
 		if( drawCommands[i]->m_LightmapPageID == lmPageID )
 		{
@@ -740,7 +738,7 @@ void CBSPLighting::BuildDrawCommands()
 			{
 				CStoredFace *pFace = pBuf->m_Faces[iFace];
 				
-				int index;
+				intp index;
 				if( !FindDrawCommand( pBuf->m_DrawCommands, pFace->m_LightmapPageID, index ) )
 				{
 					index = pBuf->m_DrawCommands.AddToTail( new CDrawCommand );
@@ -774,20 +772,18 @@ void CBSPLighting::ReloadLightmaps()
 
 	Vector4D blocklights[4][MAX_LIGHTMAP_DIM_INCLUDING_BORDER * MAX_LIGHTMAP_DIM_INCLUDING_BORDER];
 
-	for( int iFace=0; iFace < m_StoredFaces.Count(); iFace++ )
+	for( auto &face : m_StoredFaces )
 	{
-		CStoredFace *pFace = &m_StoredFaces[iFace];
-
 		// Avoid updating lightmaps in faces that weren't touched.
-		if( bspInfo.m_pFacesTouched && !bspInfo.m_pFacesTouched[pFace->m_iMapFace] )
+		if( bspInfo.m_pFacesTouched && !bspInfo.m_pFacesTouched[face.m_iMapFace] )
 			continue;
 
-		dface_t *pIn = &bspInfo.dfaces[ pFace->m_iMapFace ];
-		int nLuxels = pFace->m_LightmapSize[0] * pFace->m_LightmapSize[1];
+		dface_t *pIn = &bspInfo.dfaces[ face.m_iMapFace ];
+		int nLuxels = face.m_LightmapSize[0] * face.m_LightmapSize[1];
 
-		bool bNeedsBumpmap = pFace->m_pMaterial->m_pMaterial->GetPropertyFlag( MATERIAL_PROPERTY_NEEDS_BUMPED_LIGHTMAPS );
+		bool bNeedsBumpmap = face.m_pMaterial->m_pMaterial->GetPropertyFlag( MATERIAL_PROPERTY_NEEDS_BUMPED_LIGHTMAPS );
 
-		texinfo_t *pTexInfo = &bspInfo.texinfo[ bspInfo.dfaces[pFace->m_iMapFace].texinfo ];
+		texinfo_t *pTexInfo = &bspInfo.texinfo[ bspInfo.dfaces[face.m_iMapFace].texinfo ];
 		bool bHasBumpmap = SurfHasBumpedLightmaps( pTexInfo->flags );
 			
 		int nLightmaps = 1;
@@ -821,17 +817,17 @@ void CBSPLighting::ReloadLightmaps()
 		if( bNeedsBumpmap )
 		{
 			pMatSys->UpdateLightmap(
-				pFace->m_LightmapPageID,
-				pFace->m_LightmapSize,
-				pFace->m_OffsetIntoLightmapPage,
+				face.m_LightmapPageID,
+				face.m_LightmapSize,
+				face.m_OffsetIntoLightmapPage,
 				(float*)blocklights[0], (float*)blocklights[1], (float*)blocklights[2], (float*)blocklights[3] );
 		}
 		else
 		{
 			pMatSys->UpdateLightmap(
-				pFace->m_LightmapPageID,
-				pFace->m_LightmapSize,
-				pFace->m_OffsetIntoLightmapPage,
+				face.m_LightmapPageID,
+				face.m_LightmapSize,
+				face.m_OffsetIntoLightmapPage,
 				(float*)blocklights[0], NULL, NULL, NULL );
 		}
 	}
@@ -920,8 +916,8 @@ void CBSPLighting::CreateDisplacements( CBSPInfo &file, CUtlVector<CFace> &faces
 void CBSPLighting::InitMaterialLUT( CBSPInfo &file )
 {
 	m_StringTableIDToMaterial.SetSize( file.nTexDataStringTable );
-	for( int i=0; i < m_StringTableIDToMaterial.Count(); i++ )
-		m_StringTableIDToMaterial[i] = 0;
+	for( auto &idm : m_StringTableIDToMaterial )
+		idm = 0;
 }
 
 

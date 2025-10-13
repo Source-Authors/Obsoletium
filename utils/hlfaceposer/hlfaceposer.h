@@ -39,22 +39,19 @@ void MakeFileWriteable( const char *filename );
 bool MakeFileWriteablePrompt( const char *filename, char const *promptTitle );
 bool IsFileWriteable( const char *filename );
 void FPCopyFile( const char *source, const char *dest, bool bCheckOut );
-class mxWindow;
-void FacePoser_MakeToolWindow( mxWindow *w, bool smallcaption );
+class mxWidget;
+void FacePoser_MakeToolWindow( mxWidget *w, bool smallcaption );
 void FacePoser_LoadWindowPositions( char const *name, bool& visible, int& x, int& y, int& w, int& h, bool& locked, bool& zoomed );
 void FacePoser_SaveWindowPositions( char const *name, bool visible, int x, int y, int w, int h, bool locked, bool zoomed );
-void FacePoser_AddWindowStyle( mxWindow *w, int addbits );
-void FacePoser_AddWindowExStyle( mxWindow *w, int addbits );
-void FacePoser_RemoveWindowStyle( mxWindow *w, int removebits );
-void FacePoser_RemoveWindowExStyle( mxWindow *w, int removebits );
-bool FacePoser_HasWindowStyle( mxWindow *w, int bits );
-bool FacePoser_HasWindowExStyle( mxWindow *w, int bits );
+void FacePoser_AddWindowStyle( mxWidget *w, int addbits );
+void FacePoser_AddWindowExStyle( mxWidget *w, int addbits );
+void FacePoser_RemoveWindowStyle( mxWidget *w, int removebits );
+void FacePoser_RemoveWindowExStyle( mxWidget *w, int removebits );
+bool FacePoser_HasWindowStyle( mxWidget *w, int bits );
+bool FacePoser_HasWindowExStyle( mxWidget *w, int bits );
 
 void FacePoser_EnsurePhonemesLoaded( void );
 void FacePoser_SetPhonemeRootDir( char const *pchRootDir );
-
-int ConvertANSIToUnicode(const char *ansi, wchar_t *unicode, int unicodeBufferSize);
-int ConvertUnicodeToANSI(const wchar_t *unicode, char *ansi, int ansiBufferSize);
 
 float FacePoser_SnapTime( float t );
 char const *FacePoser_DescribeSnappedTime( float t );

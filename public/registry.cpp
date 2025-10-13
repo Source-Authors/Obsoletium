@@ -5,17 +5,17 @@
 // $NoKeywords: $
 //===========================================================================//
 
-#if defined( WIN32 ) && !defined( _X360 )
-#include "winlite.h"
-#endif
+#include "iregistry.h"
+
+#include <cstdio>
+
 #include "tier0/platform.h"
 #include "tier0/vcrmode.h"
-#include "iregistry.h"
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
-#include <stdio.h>
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
+
+#if defined(WIN32) && !defined(_X360)
+#include "winlite.h"
 #endif
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -85,7 +85,7 @@ int CRegistry::ReadInt( const char *pKeyBase, const char *pKey, int defaultValue
 {
 	intp nLen = V_strlen( pKeyBase );
 	intp nKeyLen = V_strlen( pKey );
-	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
+	char *pFullKey = stackallocT( char, nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	return ReadInt( pFullKey, defaultValue );
 }
@@ -94,7 +94,7 @@ void CRegistry::WriteInt( const char *pKeyBase, const char *pKey, int value )
 {
 	intp nLen = V_strlen( pKeyBase );
 	intp nKeyLen = V_strlen( pKey );
-	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
+	char *pFullKey = stackallocT( char, nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	WriteInt( pFullKey, value );
 }
@@ -103,7 +103,7 @@ const char *CRegistry::ReadString( const char *pKeyBase, const char *pKey, const
 {
 	intp nLen = V_strlen( pKeyBase );
 	intp nKeyLen = V_strlen( pKey );
-	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
+	char *pFullKey = stackallocT( char, nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	return ReadString( pFullKey, defaultValue );
 }
@@ -112,7 +112,7 @@ void CRegistry::WriteString( const char *pKeyBase, const char *pKey, const char 
 {
 	intp nLen = V_strlen( pKeyBase );
 	intp nKeyLen = V_strlen( pKey );
-	char *pFullKey = (char*)_alloca( nLen + nKeyLen + 2 );
+	char *pFullKey = stackallocT( char, nLen + nKeyLen + 2 );
 	Q_snprintf( pFullKey, nLen + nKeyLen + 2, "%s\\%s", pKeyBase, pKey );
 	WriteString( pFullKey, value );
 }
@@ -265,7 +265,7 @@ void CRegistry::WriteString( const char *key, const char *value )
 		key,	// value name
 		0,			// reserved
 		REG_SZ,		// type buffer
-		(LPBYTE)value,    // data buffer
+		(const LPBYTE)value,    // data buffer
 		dwSize );  // size of data buffer
 }
 

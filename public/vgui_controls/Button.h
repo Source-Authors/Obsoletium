@@ -119,17 +119,17 @@ public:
 	// Get button background color
 	virtual Color GetButtonBgColor();
 
-	Color		  GetButtonDefaultFgColor() { return _defaultFgColor; }
-	Color		  GetButtonDefaultBgColor() { return _defaultBgColor; }
+	Color		  GetButtonDefaultFgColor() const { return _defaultFgColor; }
+	Color		  GetButtonDefaultBgColor() const { return _defaultBgColor; }
 
-	Color		  GetButtonArmedFgColor() { return _armedFgColor; }
-	Color		  GetButtonArmedBgColor() { return _armedBgColor; }
+	Color		  GetButtonArmedFgColor() const { return _armedFgColor; }
+	Color		  GetButtonArmedBgColor() const { return _armedBgColor; }
 
-	Color		  GetButtonSelectedFgColor() { return _selectedFgColor; }
-	Color		  GetButtonSelectedBgColor() { return _selectedBgColor; }
+	Color		  GetButtonSelectedFgColor() const { return _selectedFgColor; }
+	Color		  GetButtonSelectedBgColor() const { return _selectedBgColor; }
 
-	Color		  GetButtonDepressedFgColor() { return _depressedFgColor; }
-	Color		  GetButtonDepressedBgColor() { return _depressedBgColor; }
+	Color		  GetButtonDepressedFgColor() const { return _depressedFgColor; }
+	Color		  GetButtonDepressedBgColor() const { return _depressedBgColor; }
 
 	// Set default button border attributes.
 	virtual void SetDefaultBorder(IBorder *border);

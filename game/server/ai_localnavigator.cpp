@@ -18,7 +18,7 @@
 
 ConVar ai_debug_directnavprobe("ai_debug_directnavprobe", "0");
 
-const float TIME_DELAY_FULL_DIRECT_PROBE[2] = { 0.25, 0.35 };
+constexpr inline float TIME_DELAY_FULL_DIRECT_PROBE[2] = { 0.25, 0.35 };
 
 //-----------------------------------------------------------------------------
 
@@ -265,7 +265,7 @@ bool CAI_LocalNavigator::MoveCalcSteer( AILocalMoveGoal_t *pMoveGoal, float dist
 		{
 			float dot = moveSolution.AsVector2D().Dot( pMoveGoal->dir.AsVector2D() );
 
-			const float COS_HALF_30 = 0.966;
+			constexpr float COS_HALF_30 = 0.966;
 			if ( dot > COS_HALF_30 )
 			{
 				float probeDist = m_pPlaneSolver->CalcProbeDist( pMoveGoal->speed );

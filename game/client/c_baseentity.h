@@ -94,6 +94,7 @@ struct VarMapping_t
 	VarMapping_t()
 	{
 		m_nInterpolatedEntries = 0;
+		m_lastInterpolationTime = -1;
 	}
 
 	CUtlVector< VarMapEntry_t >	m_Entries;

@@ -56,7 +56,7 @@ static void ImportCombinationControls( CDmeCombinationOperator *pDestComboOp, CD
 
 		int nRawControls = pSrcComboOp->GetRawControlCount( i );
 		int nMatchCount = 0; 
-		bool *pFoundMatch = (bool*)_alloca( nRawControls * sizeof(bool) );
+		bool *pFoundMatch = stackallocT( bool, nRawControls );
 		for ( int j = 0; j < nRawControls; ++j )
 		{
 			const char *pRawControl = pSrcComboOp->GetRawControlName( i, j );
@@ -1674,7 +1674,7 @@ void CDmeCombinationDominationRulesPanel::RefreshCombinationOperator()
 		int nLen = 0;
 		int nControlCount = pRule->DominatorCount();
 		pTemp[0] = 0;
-		const char **ppStrings = (const char**)_alloca( nControlCount * sizeof(const char*) );
+		const char **ppStrings = stackallocT( const char *, nControlCount );
 		for ( int j = 0; j < nControlCount; ++j )
 		{
 			ppStrings[j] = pRule->GetDominator(j);
@@ -1690,7 +1690,7 @@ void CDmeCombinationDominationRulesPanel::RefreshCombinationOperator()
 		nLen = 0;
 		nControlCount = pRule->SuppressedCount();
 		pTemp[0] = 0;
-		ppStrings = (const char**)_alloca( nControlCount * sizeof(const char*) );
+		ppStrings = stackallocT( const char *, nControlCount );
 		for ( int j = 0; j < nControlCount; ++j )
 		{
 			ppStrings[j] = pRule->GetSuppressed(j);

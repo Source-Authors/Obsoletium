@@ -405,12 +405,11 @@ void CMapCylinder::ComputeCylinderPoints( int nCount, Vector *pStartVerts, Vecto
 	}
 	VectorVectors( zvec, xvec, yvec );
 
-	int i;
 	float flDAngle = 2.0f * M_PI / nCount;
-	for ( i = 0; i < nCount; ++i )
+	for ( int i = 0; i < nCount; ++i )
 	{
-		float flCosAngle = cos( flDAngle * i );
-		float flSinAngle = sin( flDAngle * i );
+		float flSinAngle, flCosAngle;
+		DirectX::XMScalarSinCos(&flSinAngle, &flCosAngle, flDAngle * i);
 
 		VectorMA( vecStart, flCosAngle * m_flStartRadius, xvec, pStartVerts[i] );
 		VectorMA( pStartVerts[i], flSinAngle * m_flStartRadius, yvec, pStartVerts[i] );

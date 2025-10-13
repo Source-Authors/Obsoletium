@@ -26,7 +26,7 @@ CBlacklistedServerManager::CBlacklistedServerManager()
 //-----------------------------------------------------------------------------
 // Purpose: Reset the list of blacklisted servers to empty.
 //-----------------------------------------------------------------------------
-void CBlacklistedServerManager::Reset( void )
+void CBlacklistedServerManager::Reset()
 {
 	m_Blacklist.RemoveAll();
 	m_iNextServerID = 0;
@@ -45,7 +45,7 @@ int CBlacklistedServerManager::LoadServersFromFile( const char *pszFilename, boo
 
 	int count = 0;
 
-	for ( KeyValues *pData = pKV->GetFirstSubKey(); pData != NULL; pData = pData->GetNextKey() )
+	for ( KeyValues *pData = pKV->GetFirstSubKey(); pData != nullptr; pData = pData->GetNextKey() )
 	{
 		const char *pszName = pData->GetString( "name" );
 
@@ -112,7 +112,7 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( gameserveritem_t &se
 
 	// Don't let them add reserved addresses to their blacklists
  	if ( netAdr.IsReservedAdr() )
- 		return NULL;
+ 		return nullptr;
 
 	auto iIdx = m_Blacklist.AddToTail();
 	V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, server.GetName() );
@@ -136,7 +136,7 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
 
 	// Don't let them add reserved addresses to their blacklists
  	if ( netAdr.IsReservedAdr() )
- 		return NULL;
+ 		return nullptr;
 
 	auto iIdx = m_Blacklist.AddToTail();
 	V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, serverName );
@@ -159,11 +159,11 @@ blacklisted_server_t *CBlacklistedServerManager::AddServer( const char *serverNa
 	netadr_t netAdr;
 	// dimhotepus: If not net address, return.
 	if ( !netAdr.SetFromString( netAddressString ) )
-		return NULL;
+		return nullptr;
 
 	// Don't let them add reserved addresses to their blacklists
 	if ( netAdr.IsReservedAdr() )
-		return NULL;
+		return nullptr;
 
 	auto iIdx = m_Blacklist.AddToTail();
 	V_strcpy_safe( m_Blacklist[iIdx].m_szServerName, serverName );
@@ -203,7 +203,7 @@ blacklisted_server_t *CBlacklistedServerManager::GetServer( intp iServerID )
 			return &bl;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -284,7 +284,7 @@ bool CBlacklistedServerManager::CanServerBeBlacklisted( uint32 serverIP, int ser
 //-----------------------------------------------------------------------------
 // Purpose: Returns vector of blacklisted servers
 //-----------------------------------------------------------------------------
-const CUtlVector< blacklisted_server_t > &CBlacklistedServerManager::GetServerVector( void ) const
+const CUtlVector< blacklisted_server_t > &CBlacklistedServerManager::GetServerVector() const
 {
 	return m_Blacklist;
 }

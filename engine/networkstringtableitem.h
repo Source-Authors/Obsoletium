@@ -32,9 +32,9 @@ public:
 	};
 
 	struct itemchange_s {
-		int				tick;
-		int				length;
+		intp			length;
 		unsigned char	*data;
+		int				tick;
 	};
 
 	CNetworkStringTableItem( void );
@@ -42,14 +42,14 @@ public:
 
 #ifndef SHARED_NET_STRING_TABLES
 	void			EnableChangeHistory( void );
-	void 			UpdateChangeList( int tick, int length, const void *userData );
+	void 			UpdateChangeList( int tick, intp length, const void *userData );
 	int				RestoreTick( int tick );
 	inline int		GetTickCreated( void ) const { return m_nTickCreated; }
 #endif
 	
-	bool			SetUserData( int tick, int length, const void *userdata );
-	const void		*GetUserData( int *length=0 );
-	inline int		GetUserDataLength() const { return m_nUserDataLength; }
+	bool			SetUserData( int tick, intp length, const void *userdata );
+	const void		*GetUserData( intp *length=0 );
+	inline intp		GetUserDataLength() const { return m_nUserDataLength; }
 	
 	// Used by server only
 	// void			SetTickCount( int count ) ;
@@ -57,7 +57,7 @@ public:
 
 public:
 	unsigned char	*m_pUserData;
-	int				m_nUserDataLength;
+	intp			m_nUserDataLength;
 	int				m_nTickChanged;
 
 #ifndef SHARED_NET_STRING_TABLES

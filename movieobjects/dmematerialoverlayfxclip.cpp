@@ -163,7 +163,7 @@ void CDmeMaterialOverlayFXClip::ApplyEffect( DmeTime_t time, Rect_t &currentRect
 
 	if ( m_flMovementSpeed )
 	{
-		float flRadians = M_PI * m_flMovementAngle / 180.0f;
+		float flRadians = M_PI_F * m_flMovementAngle / 180.0f;
 		float dUdT = -m_flMovementSpeed * cos( flRadians );
 		float dVdT = m_flMovementSpeed * sin( flRadians );
 		float dU = time.GetSeconds() * dUdT;

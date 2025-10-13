@@ -95,8 +95,12 @@ void CVRADDispColl::CalcSampleRadius2AndBox( dface_t *pFace )
 	m_flSampleWidth = flWidth;
 	m_flSampleHeight = flHeight;
 
+	const float radiusScale = g_bLargeDispSampleRadius ? 2.2f : 1.0f;
+
 	// Calculate the sample radius squared.
-	float flSampleRadius = sqrt( ( ( flWidth * flWidth ) + ( flHeight * flHeight ) ) ) * 2.2f;//RADIALDIST2; 
+	// dimhotepus: Add large sample radius support. CS:GO always uses 1.0f here.
+	// CS:GO: AV - Removing the 2.2 scalar since 1.0 works better with CS:GO
+	float flSampleRadius = sqrt( ( ( flWidth * flWidth ) + ( flHeight * flHeight ) ) ) * radiusScale;//RADIALDIST2; 
 	if ( flSampleRadius > g_flMaxDispSampleSize )
 	{
 		flSampleRadius = g_flMaxDispSampleSize;
@@ -105,7 +109,10 @@ void CVRADDispColl::CalcSampleRadius2AndBox( dface_t *pFace )
 
 	// Calculate the patch radius - the max sample edge length * the number of luxels per edge "chop."
 	float flSampleSize = max( m_flSampleWidth, m_flSampleHeight );
-	float flPatchSampleRadius = flSampleSize * dispchop * 2.2f;
+	// dimhotepus: Add large sample radius support. CS:GO
+	// CS:GO: AV - Removing the 2.2 scalar since 1.0 works better with CS:GO.
+	// CS:GO: TS - It fixes lighting artefacts in maps with many small displacements.
+	float flPatchSampleRadius = flSampleSize * dispchop * radiusScale;
 	if ( flPatchSampleRadius > g_MaxDispPatchRadius )
 	{
 		flPatchSampleRadius = g_MaxDispPatchRadius;

@@ -48,7 +48,7 @@ struct SpewGroup_t
 // Skip forward past the directory
 static const char *SkipToFname( const tchar* pFile )
 {
-	if ( pFile == NULL )
+	if ( pFile == nullptr )
 		return "unknown";
 	const tchar* pSlash = _tcsrchr( pFile, '\\' );
 	const tchar* pSlash2 = _tcsrchr( pFile, '/' );
@@ -56,14 +56,33 @@ static const char *SkipToFname( const tchar* pFile )
 	return pSlash ? pSlash + 1: pFile;
 }
 
+template <size_t out_size>
+const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
+                               const char *message) {
+  const char *out_group{GetSpewOutputGroup()};
+
+  out_group = out_group && out_group[0] ? out_group : group;
+
+  const size_t length{strlen(message)};
+  if (length > 1 && message[length - 1] == '\n') {
+    snprintf(out, std::size(out) - 1, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
+  } else {
+    snprintf(out, std::size(out) - 1, "[%.3f] %s", Plat_FloatTime(), message);
+  }
+
+  out[std::size(out) - 1] = '\0';
+
+  return out;
+}
 
 //-----------------------------------------------------------------------------
 DBG_INTERFACE SpewRetval_t DefaultSpewFunc( SpewType_t type, const tchar *pMsg )
 {
-	_tprintf( _T("%s"), pMsg );
+	_tprintf( _T("[%.3f] %s"), Plat_FloatTime(), pMsg );
 
 #ifdef _WIN32
-	Plat_DebugString( pMsg );
+	char msg[4096];
+	Plat_DebugString( PrefixMessageGroup( msg, "default", pMsg ) );
 #endif
 
 	if ( type == SPEW_ASSERT )
@@ -235,7 +254,7 @@ const tchar* GetSpewOutputGroup( void )
 	assert( pSpewInfo );
 	if ( pSpewInfo )
 		return pSpewInfo->m_pSpewOutputGroup;
-	return NULL;
+	return nullptr;
 }
 
 int GetSpewOutputLevel( void )
@@ -548,11 +567,17 @@ void Error( PRINTF_FORMAT_STRING const tchar *pMsgFormat, ... )
 	va_start( args, pMsgFormat ); //-V2018 //-V2019
 	_SpewMessage( SPEW_ERROR, pMsgFormat, args );
 	va_end(args);
+
+	// dimhotepus: Fix UB as ERROR must not return.
+	abort();
 }
 
 void ErrorV( PRINTF_FORMAT_STRING const tchar *pMsg, va_list arglist )
 {
 	_SpewMessage( SPEW_ERROR, pMsg, arglist );
+
+	// dimhotepus: Fix UB as ERROR must not return.
+	abort();
 }
 
 //-----------------------------------------------------------------------------
@@ -911,7 +936,7 @@ void* Plat_SimpleLog( const tchar* file, int line )
 		ExecuteOnce( Warning("Unable to open '%s' as 'at+'.\n", kLogFileName) )
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 #ifdef DBGFLAG_VALIDATE

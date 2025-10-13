@@ -298,9 +298,9 @@ void EmitInitialDispInfos( void )
 
 	// Clear the output arrays..
 	g_dispinfo.Purge();
-	g_dispinfo.SetSize( nummapdispinfo );
-	g_DispVerts.SetSize( nTotalVerts );
-	g_DispTris.SetSize( nTotalTris );
+	g_dispinfo.SetCount( nummapdispinfo );
+	g_DispVerts.SetCount( nTotalVerts );
+	g_DispTris.SetCount( nTotalTris );
 
 	int iCurVert = 0;
 	int iCurTri = 0;

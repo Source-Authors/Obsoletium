@@ -59,8 +59,8 @@ class CEditGameClass
 		inline void RemoveKey(int nIndex) { m_KeyValues.RemoveKeyAt(nIndex); }
 		inline void SetKeyValue(LPCTSTR pszKey, int iValue) { m_KeyValues.SetValue(pszKey, iValue); }
 		inline LPCTSTR GetKey(int nIndex) { return(m_KeyValues.GetKey(nIndex)); }
-		inline LPCTSTR GetKeyValue(int nIndex) { return(m_KeyValues.GetValue(nIndex)); }
-		inline LPCTSTR GetKeyValue(LPCTSTR pszKey, int *piIndex = NULL) { return(m_KeyValues.GetValue(pszKey, piIndex)); }
+		inline LPCTSTR GetKeyValue(int nIndex) const { return(m_KeyValues.GetValue(nIndex)); }
+		inline LPCTSTR GetKeyValue(LPCTSTR pszKey, intp *piIndex = NULL) const { return(m_KeyValues.GetValue(pszKey, piIndex)); }
 		
 		// Iterate the list of keyvalues.
 		inline int GetFirstKeyValue() const			{ return m_KeyValues.GetFirst(); }
@@ -79,8 +79,8 @@ class CEditGameClass
 		// Interface to entity connections.
 		//
 		void Connections_Add(CEntityConnection *pConnection);
-		inline int Connections_GetCount(void);
-		inline CEntityConnection *Connections_Get(int nIndex);
+		inline intp Connections_GetCount(void);
+		inline CEntityConnection *Connections_Get(intp nIndex);
 		bool Connections_Remove(CEntityConnection *pConnection);
 		void Connections_RemoveAll(void);
 		void Connections_FixBad(bool bRelink = true);
@@ -89,8 +89,8 @@ class CEditGameClass
 		// Interface to entity connections.
 		//
 		void Upstream_Add(CEntityConnection *pConnection);
-		inline int Upstream_GetCount(void);
-		inline CEntityConnection *Upstream_Get(int nIndex);
+		inline intp Upstream_GetCount(void);
+		inline CEntityConnection *Upstream_Get(intp nIndex);
 		bool Upstream_Remove(CEntityConnection *pConnection);
 		void Upstream_RemoveAll(void);
 		void Upstream_FixBad();
@@ -139,7 +139,7 @@ class CEditGameClass
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of input/output connections that this object has.
 //-----------------------------------------------------------------------------
-int CEditGameClass::Connections_GetCount(void)
+intp CEditGameClass::Connections_GetCount(void)
 {
 	return m_Connections.Count();
 }
@@ -148,7 +148,7 @@ int CEditGameClass::Connections_GetCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of input/output connections that this object has.
 //-----------------------------------------------------------------------------
-CEntityConnection *CEditGameClass::Connections_Get(int nIndex)
+CEntityConnection *CEditGameClass::Connections_Get(intp nIndex)
 {
 	return m_Connections.Element(nIndex);
 }
@@ -157,7 +157,7 @@ CEntityConnection *CEditGameClass::Connections_Get(int nIndex)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of input/output connections that this object has.
 //-----------------------------------------------------------------------------
-int CEditGameClass::Upstream_GetCount(void)
+intp CEditGameClass::Upstream_GetCount(void)
 {
 	return m_Upstream.Count();
 }
@@ -166,7 +166,7 @@ int CEditGameClass::Upstream_GetCount(void)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of input/output connections that this object has.
 //-----------------------------------------------------------------------------
-CEntityConnection *CEditGameClass::Upstream_Get(int nIndex)
+CEntityConnection *CEditGameClass::Upstream_Get(intp nIndex)
 {
 	return m_Upstream.Element(nIndex);
 }
@@ -211,16 +211,7 @@ void CEditGameClass::SetComments(const char *pszComments)
 
 	if (pszComments != NULL)
 	{
-		int nLen = strlen(pszComments);
-		if (nLen == 0)
-		{
-			m_pszComments = NULL;
-		}
-		else
-		{
-			m_pszComments = new char [nLen + 1];
-			strcpy(m_pszComments, pszComments);
-		}
+		m_pszComments = Q_isempty( pszComments ) ? NULL : V_strdup( pszComments );
 	}
 	else
 	{

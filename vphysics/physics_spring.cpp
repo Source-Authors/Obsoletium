@@ -41,7 +41,7 @@ END_DATADESC()
 // BUGBUG: No way to delete a spring because springs get auto-deleted without notification
 // when an object they are attached to is deleted.
 // So there is no way to tell if the pointer is valid.
-class CPhysicsSpring : public IPhysicsSpring, public IVP_Listener_Object
+class CPhysicsSpring final : public IPhysicsSpring, public IVP_Listener_Object
 {
 public:
 	CPhysicsSpring( CPhysicsObject *pObjectStart, CPhysicsObject *pObjectEnd, IVP_Actuator_Spring *pSpring );
@@ -177,7 +177,7 @@ void CPhysicsSpring::SetSpringLength( float flSpringLength )
 		float desiredLengthIVP = ConvertDistanceToIVP(flSpringLength);
 
 		// must change enough, or skip to keep objects sleeping
-		const float SPRING_LENGTH_EPSILON = 1e-3f;
+		constexpr float SPRING_LENGTH_EPSILON = 1e-3f;
 		if ( fabs(desiredLengthIVP-currentLengthIVP) < ConvertDistanceToIVP(SPRING_LENGTH_EPSILON)  )
 			return;
 

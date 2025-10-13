@@ -23,8 +23,8 @@ class FileLogger {
   void Init();
   void LogAllResources(const char *line);
 
-  char current_dir_[_MAX_PATH];
-  char base_dir_[_MAX_PATH];
+  char current_dir_[MAX_PATH];
+  char base_dir_[MAX_PATH];
   ICommandLine *command_line_;
   IFileSystem *file_system_;
 

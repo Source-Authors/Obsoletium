@@ -32,14 +32,14 @@ public:
 	void	Draw( double frametime ) override;
 	bool	IsActive( void ) override;
 	void	Destroy( void ) override;
-	virtual	void	Update( double frametime );
+	virtual	void	Update( float frametime );
 
 protected:
 
 	IMaterial		*m_pMaterial;
 	Vector			m_vecStart, m_vecEnd;
 	unsigned int	m_uiFlags;
-	double			m_fLife;
+	float			m_fLife;
 	float			m_fScale;
 };
 

@@ -13,7 +13,6 @@
 #include "CollisionUtils.h"
 #include "lightmap.h"
 #include "Radial.h"
-#include "CollisionUtils.h"
 #include "mathlib/bumpvects.h"
 #include "utlrbtree.h"
 #include "tier0/fasttimer.h"
@@ -25,7 +24,7 @@ class CBSPDispRayDistanceEnumerator;
 //
 // Displacement/Face List
 //
-class CBSPDispFaceListEnumerator : public ISpatialLeafEnumerator, public IBSPTreeDataEnumerator
+class CBSPDispFaceListEnumerator final : public ISpatialLeafEnumerator, public IBSPTreeDataEnumerator
 {
 public:
 
@@ -33,18 +32,18 @@ public:
 	//
 	// Construction/Deconstruction
 	//
-	CBSPDispFaceListEnumerator() {};
-	virtual ~CBSPDispFaceListEnumerator()
+	CBSPDispFaceListEnumerator() = default;
+	~CBSPDispFaceListEnumerator()
 	{
 		m_DispList.Purge();
 		m_FaceList.Purge();
 	}
 
 	// ISpatialLeafEnumerator
-	bool EnumerateLeaf( int ndxLeaf, intp context ); 
+	bool EnumerateLeaf( int ndxLeaf, intp context ) override;
 
 	// IBSPTreeDataEnumerator
-	bool FASTCALL EnumerateElement( int userId, intp context );
+	bool FASTCALL EnumerateElement( int userId, intp context ) override;
 
 public:
 
@@ -57,21 +56,21 @@ public:
 //
 // RayEnumerator
 //
-class CBSPDispRayEnumerator : public ISpatialLeafEnumerator, public IBSPTreeDataEnumerator
+class CBSPDispRayEnumerator final : public ISpatialLeafEnumerator, public IBSPTreeDataEnumerator
 {
 public:
 	// ISpatialLeafEnumerator
-	bool EnumerateLeaf( int ndxLeaf, intp context );
+	bool EnumerateLeaf( int ndxLeaf, intp context ) override;
 
 	// IBSPTreeDataEnumerator
-	bool FASTCALL EnumerateElement( int userId, intp context );
+	bool FASTCALL EnumerateElement( int userId, intp context ) override;
 };
 
 //=============================================================================
 //
 // VRad Displacement Manager
 //
-class CVRadDispMgr : public IVRadDispMgr
+class CVRadDispMgr final : public IVRadDispMgr
 {
 public:
 
@@ -80,48 +79,47 @@ public:
 	// Construction/Deconstruction
 	//
 	CVRadDispMgr();
-	virtual ~CVRadDispMgr();
 
 	// creation/destruction
-	void Init( void );
-	void Shutdown( void );
+	void Init() override;
+	void Shutdown() override;
 
 	// "CalcPoints"
-	bool BuildDispSamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace );
-	bool BuildDispLuxels( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace );
-	bool BuildDispSamplesAndLuxels_DoFast( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace );
+	bool BuildDispSamples( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace ) override;
+	bool BuildDispLuxels( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace ) override;
+	bool BuildDispSamplesAndLuxels_DoFast( lightinfo_t *pLightInfo, facelight_t *pFaceLight, int ndxFace ) override;
 
 	// patching functions
-	void MakePatches( void );
-	void SubdividePatch( int iPatch );
+	void MakePatches() override;
+	void SubdividePatch( int iPatch ) override;
 
 	// pre "FinalLightFace"
-	void InsertSamplesDataIntoHashTable( void );
-	void InsertPatchSampleDataIntoHashTable( void );
+	void InsertSamplesDataIntoHashTable() override;
+	void InsertPatchSampleDataIntoHashTable() override;
 
 	// "FinalLightFace"
 	radial_t *BuildLuxelRadial( int ndxFace, int ndxStyle, bool bBump );
-	bool SampleRadial( int ndxFace, radial_t *pRadial, Vector const &vPos, int ndxLxl, LightingValue_t *pLightSample, int sampleCount, bool bPatch );
-	radial_t *BuildPatchRadial( int ndxFace, bool bBump );
+	bool SampleRadial( int ndxFace, radial_t *pRadial, Vector const &vPos, int ndxLxl, LightingValue_t *pLightSample, int sampleCount, bool bPatch ) override;
+	radial_t *BuildPatchRadial( int ndxFace, bool bBump ) override;
 
 	// utility
-	void GetDispSurfNormal( int ndxFace, Vector &pt, Vector &ptNormal, bool bInside );
-	void GetDispSurf( int ndxFace, CVRADDispColl **ppDispTree );
+	void GetDispSurfNormal( int ndxFace, Vector &pt, Vector &ptNormal, bool bInside ) override;
+	void GetDispSurf( int ndxFace, CVRADDispColl **ppDispTree ) override;
 
 	// bsp tree functions
-	bool ClipRayToDisp( DispTested_t &dispTested, Ray_t const &ray );
-	bool ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &ray, int ndxLeaf );
+	bool ClipRayToDisp( DispTested_t &dispTested, Ray_t const &ray ) override;
+	bool ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &ray, int ndxLeaf ) override;
 	void ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &ray, int ndxLeaf,  
-					float& dist, dface_t*& pFace, Vector2D& luxelCoord );
+					float& dist, dface_t*& pFace, Vector2D& luxelCoord ) override;
 	void ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &ray, 
-		int ndxLeaf, float& dist, Vector *pNormal );
+		int ndxLeaf, float& dist, Vector *pNormal ) override;
 
-	void StartRayTest( DispTested_t &dispTested );
-	void AddPolysForRayTrace( void );
+	void StartRayTest( DispTested_t &dispTested ) override;
+	void AddPolysForRayTrace() override;
 
 	// general timing -- should be moved!!
-	void StartTimer( const char *name );
-	void EndTimer( void );
+	void StartTimer( const char *name ) override;
+	void EndTimer() override;
 
 	//=========================================================================
 	//
@@ -140,8 +138,8 @@ private:
 	//
 	// BSP Tree Helpers
 	//
-	void InsertDispIntoTree( int ndxDisp );
-	void RemoveDispFromTree( int ndxDisp );
+	void InsertDispIntoTree( intp ndxDisp );
+	void RemoveDispFromTree( intp ndxDisp );
 
 	//=========================================================================
 	//
@@ -164,7 +162,8 @@ private:
 											radial_t *pRadial, int ndxRadial, bool bBump,
 											CUtlVector<CPatch*> &interestingPatches );
 
-	bool IsNeighbor( int iDispFace, int iNeighborFace );
+	// dimhotepus: Add large sample radius support. CS:GO
+	bool IsNeighbor( int iDispFace, int iNeighborFace, bool bCheck2ndDegreeNeighbors = false );
 
 	void GetInterestingPatchesForLuxels( 
 		int ndxFace,
@@ -187,7 +186,8 @@ private:
 
 	CUtlVector<DispCollTree_t>	m_DispTrees;
 
-	IBSPTreeData				*m_pBSPTreeData;
+	// dimhotepus: raw -> unique_ptr
+	std::unique_ptr<IBSPTreeData> m_pBSPTreeData;
 
 	CBSPDispRayEnumerator		m_EnumDispRay;
 	CBSPDispFaceListEnumerator	m_EnumDispFaceList;
@@ -204,7 +204,7 @@ private:
 
 static CVRadDispMgr	s_DispMgr;
 
-IVRadDispMgr *StaticDispMgr( void )
+IVRadDispMgr *StaticDispMgr()
 {
 	return &s_DispMgr;
 }
@@ -246,14 +246,14 @@ bool FASTCALL CBSPDispRayEnumerator::EnumerateElement( int userId, intp context 
 // Here's an enumerator that we use for testing against disps in a leaf...
 //-----------------------------------------------------------------------------
 
-class CBSPDispRayDistanceEnumerator : public IBSPTreeDataEnumerator
+class CBSPDispRayDistanceEnumerator final : public IBSPTreeDataEnumerator
 {
 public:
 	CBSPDispRayDistanceEnumerator() : m_Distance(1.0f), m_pSurface(nullptr),
 		m_pDispTested{nullptr}, m_pRay{nullptr} {}
 
 	// IBSPTreeDataEnumerator
-	bool FASTCALL EnumerateElement( int userId, intp context )
+	bool FASTCALL EnumerateElement( int userId, intp context ) override
 	{
 		return s_DispMgr.DispRayDistance_EnumerateElement( userId, this );
 	}
@@ -269,26 +269,17 @@ public:
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-CVRadDispMgr::CVRadDispMgr()
+CVRadDispMgr::CVRadDispMgr() : m_pBSPTreeData{CreateBSPTreeData()}
 {
-	m_pBSPTreeData = CreateBSPTreeData();
 	sampleCount = -1;
 	m_pSamplePos = nullptr;
 }
 
 
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
-CVRadDispMgr::~CVRadDispMgr()
-{
-	DestroyBSPTreeData( m_pBSPTreeData );
-}
-
-
-//-----------------------------------------------------------------------------
 // Insert a displacement into the tree for collision
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::InsertDispIntoTree( int ndxDisp )
+void CVRadDispMgr::InsertDispIntoTree( intp ndxDisp )
 {
 	DispCollTree_t &dispTree = m_DispTrees[ndxDisp];
 	CDispCollTree *pDispTree = dispTree.m_pDispTree;
@@ -305,7 +296,7 @@ void CVRadDispMgr::InsertDispIntoTree( int ndxDisp )
 //-----------------------------------------------------------------------------
 // Remove a displacement from the tree for collision
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::RemoveDispFromTree( int ndxDisp )
+void CVRadDispMgr::RemoveDispFromTree( intp ndxDisp )
 {
 	// release the tree handle
 	if( m_DispTrees[ndxDisp].m_Handle != TREEDATA_INVALID_HANDLE )
@@ -318,7 +309,7 @@ void CVRadDispMgr::RemoveDispFromTree( int ndxDisp )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::Init( void )
+void CVRadDispMgr::Init()
 {
 	// initialize the bsp tree
 	m_pBSPTreeData->Init( ToolBSPTree() );
@@ -330,10 +321,10 @@ void CVRadDispMgr::Init( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::Shutdown( void )
+void CVRadDispMgr::Shutdown()
 {
 	// remove all displacements from the tree
-	for( int ndxDisp = m_DispTrees.Count(); ndxDisp >= 0; ndxDisp-- )
+	for( intp ndxDisp = m_DispTrees.Count() - 1; ndxDisp >= 0; ndxDisp-- )
 	{
 		RemoveDispFromTree( ndxDisp );
 	}
@@ -426,13 +417,13 @@ void CVRadDispMgr::DispBuilderInit( CCoreDispInfo *pBuilderDisp, dface_t *pFace,
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::UnserializeDisps( void ) 
+void CVRadDispMgr::UnserializeDisps() 
 {
 	// temporarily create the "builder" displacements
-	CUtlVector<CCoreDispInfo*> builderDisps;
-	for ( int iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
+	CUtlVector<CCoreDispInfo*> builderDisps( 0, g_dispinfo.Count() );
+	for ( auto &info : g_dispinfo )
 	{
-		CCoreDispInfo *pDisp = new CCoreDispInfo;
+		auto *pDisp = new CCoreDispInfo;
 		if ( !pDisp )
 		{
 			builderDisps.Purge();
@@ -445,7 +436,7 @@ void CVRadDispMgr::UnserializeDisps( void )
 	}
 
 	// Set them up as CDispUtilsHelpers.
-	for ( int iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
+	for ( intp iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
 	{
 		builderDisps[iDisp]->SetDispUtilsHelperInfo( builderDisps.Base(), g_dispinfo.Count() );
 	}
@@ -463,7 +454,7 @@ void CVRadDispMgr::UnserializeDisps( void )
 	}
 
 	// generate the displacement surfaces
-	for( int iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
+	for( intp iDisp = 0; iDisp < g_dispinfo.Count(); ++iDisp )
 	{
 		builderDisps[iDisp]->Create();
 	}
@@ -500,17 +491,17 @@ void CVRadDispMgr::UnserializeDisps( void )
 // Purpose: create a set of patches for each displacement surface to transfer
 //          bounced light around with
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::MakePatches( void )
+void CVRadDispMgr::MakePatches()
 {
 	// Collect stats - keep track of the total displacement surface area.
 	float flTotalArea = 0.0f;
 
 	// Create patches for all of the displacements.
-	int nTreeCount = m_DispTrees.Count();
-	for( int iTree = 0; iTree < nTreeCount; ++iTree )
+	const intp nTreeCount = m_DispTrees.Count();
+	for( auto &tree : m_DispTrees )
 	{
 		// Get the current displacement collision tree.
-		CVRADDispColl *pDispTree = m_DispTrees[iTree].m_pDispTree;
+		CVRADDispColl *pDispTree = tree.m_pDispTree;
 		if( !pDispTree )
 			continue;
 
@@ -518,7 +509,7 @@ void CVRadDispMgr::MakePatches( void )
 	}
 
 	// Print stats.
-	qprintf( "%i Displacements\n", nTreeCount );
+	qprintf( "%zd Displacements\n", nTreeCount );
 	qprintf( "%i Square Feet [%.2f Square Inches]\n", ( int )( flTotalArea / 144.0f ), flTotalArea );
 }
 //-----------------------------------------------------------------------------
@@ -617,13 +608,12 @@ void CVRadDispMgr::ClipRayToDispInLeaf( DispTested_t &dispTested, Ray_t const &r
 	}
 }
 
-void CVRadDispMgr::AddPolysForRayTrace( void )
+void CVRadDispMgr::AddPolysForRayTrace()
 {
-	int nTreeCount = m_DispTrees.Count();
-	for( int iTree = 0; iTree < nTreeCount; ++iTree )
+	for( auto &tree : m_DispTrees )
 	{
 		// Get the current displacement collision tree.
-		CVRADDispColl *pDispTree = m_DispTrees[iTree].m_pDispTree;
+		CVRADDispColl *pDispTree = tree.m_pDispTree;
 
 		// Add the triangles of the tree to the RT environment
 		pDispTree->AddPolysForRayTrace();
@@ -836,9 +826,6 @@ bool CVRadDispMgr::DispFaceList_EnumerateElement( int userId, intp context )
 inline void GetSampleLight( facelight_t *pFaceLight, int ndxStyle, bool bBumped, 
 			                int ndxSample, LightingValue_t *pSampleLight )
 {
-//	SampleLight[0].Init( 20.0f, 10.0f, 10.0f );
-//	return;
-
 	// get sample from bumped lighting data
 	if( bBumped )
 	{
@@ -912,7 +899,8 @@ void AddSampleLightToRadial( Vector const &samplePos, Vector const &sampleNormal
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CVRadDispMgr::IsNeighbor( int iFace, int iNeighborFace )
+// dimhotepus: Add large sample radius support. CS:GO
+bool CVRadDispMgr::IsNeighbor( int iFace, int iNeighborFace, bool bCheck2ndDegreeNeighbors )
 {
 	if ( iFace == iNeighborFace )
 		return true;
@@ -922,6 +910,20 @@ bool CVRadDispMgr::IsNeighbor( int iFace, int iNeighborFace )
 	{
 		if ( pFaceNeighbor->neighbor[iNeighbor] == iNeighborFace )
 			return true;
+	}
+
+	// dimhotepus: Add large sample radius support. CS:GO
+	if ( bCheck2ndDegreeNeighbors )
+	{
+		for ( int iNeighbor = 0; iNeighbor < pFaceNeighbor->numneighbors; iNeighbor++ )
+		{
+			faceneighbor_t *pFaceNeighbor2 = &faceneighbor[ pFaceNeighbor->neighbor[ iNeighbor ] ];
+			for ( int iNeighbor2 = 0; iNeighbor2 < pFaceNeighbor2->numneighbors; iNeighbor2++ )
+			{
+				if ( pFaceNeighbor2->neighbor[ iNeighbor2 ] == iNeighborFace )
+					return true;
+			}
+		}
 	}
 
 	return false;
@@ -1346,7 +1348,8 @@ void CVRadDispMgr::GetInterestingPatchesForLuxels(
 						{
 							pPatch->m_IterationKey = curIterationKey;
 							
-							if ( IsNeighbor( ndxFace, pPatch->faceNumber ) )
+							// dimhotepus: Add large sample radius support. CS:GO
+							if ( IsNeighbor( ndxFace, pPatch->faceNumber, g_bLargeDispSampleRadius ) )
 							{
 								interestingPatches.AddToTail( pPatch );
 							}
@@ -1494,7 +1497,7 @@ void CVRadDispMgr::InsertSamplesDataIntoHashTable( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::InsertPatchSampleDataIntoHashTable( void )
+void CVRadDispMgr::InsertPatchSampleDataIntoHashTable()
 {
 	// don't insert patch samples if we are not bouncing light
 	if( numbounce <= 0 )
@@ -1552,7 +1555,7 @@ void CVRadDispMgr::StartTimer( const char *name )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void CVRadDispMgr::EndTimer( void )
+void CVRadDispMgr::EndTimer()
 {
 	m_Timer.End();
 	CCycleCount duration = m_Timer.GetDuration();

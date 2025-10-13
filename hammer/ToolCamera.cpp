@@ -62,7 +62,7 @@ void Camera3D::SetEmpty(void)
 //-----------------------------------------------------------------------------
 int Camera3D::HitTest(CMapView *pView, const Vector2D &ptClient, bool bTestHandles)
 {
-	for(int i = 0; i < Cameras.Count(); i++)
+	for(intp i = 0; i < Cameras.Count(); i++)
 	{
 		for ( int j=0; j<2; j++ )
 		{
@@ -182,7 +182,7 @@ void Camera3D::AddCamera(CAMSTRUCT &camera)
 //-----------------------------------------------------------------------------
 void Camera3D::RenderTool2D(CRender2D *pRender)
 {
-	for (int i = 0; i < Cameras.Count(); i++)
+	for (intp i = 0; i < Cameras.Count(); i++)
 	{
 		CAMSTRUCT *pDrawCam = &Cameras[i];
 
@@ -411,7 +411,9 @@ void Camera3D::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 {
 	float fVersion = 0.2f, fThisVersion;
 
-	int nCameras = Cameras.Count();
+	// dimhotepus: Ensure not overflow in DEBUG.
+	Assert(Cameras.Count() <= INT_MAX);
+	int nCameras = static_cast<int>(Cameras.Count());
 
 	if(fIsStoring)
 	{
@@ -466,7 +468,7 @@ ChunkFileResult_t Camera3D::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	
 	if (eResult == ChunkFile_Ok)
 	{
-		for (int i = 0; i < Cameras.Count(); i++)
+		for (intp i = 0; i < Cameras.Count(); i++)
 		{
 			eResult = pFile->BeginChunk("camera");
 

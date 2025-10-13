@@ -40,6 +40,8 @@ public:
 C_TEBeamEntPoint::C_TEBeamEntPoint( void )
 {
 	m_nStartEntity	= 0;
+	m_nEndEntity = -1;
+	m_vecStartPoint.Init();
 	m_vecEndPoint.Init();
 }
 

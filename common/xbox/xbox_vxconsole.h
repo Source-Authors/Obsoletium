@@ -6,31 +6,33 @@
 #pragma once
 
 // sent during connection, used to explicitly guarantee a binary compatibility
-#define VXCONSOLE_PROTOCOL_VERSION	103
+enum {
+VXCONSOLE_PROTOCOL_VERSION =	103
+};
 
-typedef struct
+using xrProfile_t = struct
 {
 	char		labelString[128];
 	COLORREF	color;
-} xrProfile_t;
+};
 
-typedef struct
+using xrTimeStamp_t = struct
 {
 	char		messageString[256];
 	float		time;
 	float		deltaTime;
 	int			memory;
 	int			deltaMemory;
-} xrTimeStamp_t;
+};
 
-typedef struct
+using xrMaterial_t = struct
 {
 	char		nameString[256];
 	char		shaderString[256];
 	int			refCount;
-} xrMaterial_t;
+};
 
-typedef struct
+using xrTexture_t = struct
 {
 	char		nameString[256];
 	char		groupString[64];
@@ -48,9 +50,9 @@ typedef struct
 	int			fallback;
 	int			final;
 	int			failed;
-} xrTexture_t;
+};
 
-typedef struct
+using xrSound_t = struct
 {
 	char		nameString[256];
 	char		formatString[64];
@@ -61,15 +63,15 @@ typedef struct
 	int			dataSize;
 	int			numSamples;
 	int			streamed;
-} xrSound_t;
+};
 
-typedef struct
+using xrCommand_t = struct
 {
 	char		nameString[128];
 	char		helpString[256];	
-} xrCommand_t;
+};
 
-typedef struct
+using xrMapInfo_t = struct
 {
 	float	position[3];
 	float	angle[3];
@@ -77,7 +79,7 @@ typedef struct
 	char	savePath[256];
 	int		build;
 	int		skill;
-} xrMapInfo_t;
+};
 
 // Types of action taken in response to an rc_Assert() message
 enum AssertAction_t

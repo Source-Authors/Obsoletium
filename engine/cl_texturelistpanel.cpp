@@ -146,7 +146,7 @@ public:
 	virtual bool GetTileOrg( int iTile, int &x, int &y );
 
 protected: // Overrides for contents
-	virtual int GetNumTiles() = 0;
+	virtual intp GetNumTiles() = 0;
 	virtual void GetTileSize( int &wide, int &tall ) = 0;
 	virtual void RenderTile( int iTile, int x, int y ) = 0;
 
@@ -161,7 +161,7 @@ protected:
 
 protected:
 	virtual bool ComputeLayoutInfo();
-	int m_li_numTiles;							//!< Total number of tiles
+	intp m_li_numTiles;							//!< Total number of tiles
 	int m_li_numVisibleTiles;					//!< Number of tiles fitting in the client area
 	int m_li_wide, m_li_tall;					//!< Tile area width/height
 	int m_li_wideItem, m_li_tallItem;			//!< Every item width/height
@@ -262,7 +262,7 @@ void TileViewPanelEx::OnSizeChanged( int wide, int tall )
 
 void TileViewPanelEx::PerformLayout()
 {
-	int numTiles = GetNumTiles();
+	intp numTiles = GetNumTiles();
 	m_hbar->SetVisible( false );
 
 	int wide, tall;
@@ -686,7 +686,7 @@ struct ViewParamsLast
 	struct VarMap : public CUtlMap< UtlSymId_t, TxInfo >
 	{
 		VarMap() : CUtlMap< UtlSymId_t, TxInfo >( DefLessFunc( UtlSymId_t ) ) {}
-		VarMap( VarMap const &x ) { const_cast< VarMap & >( x ).Swap( *this ); m_matInfo = x.m_matInfo; } // Fast-swap data
+		VarMap( VarMap const &x ) { const_cast< VarMap & >( x ).Swap( *this ); m_matInfo = x.m_matInfo; } // Fast-swap data //-V2018
 
 		struct MatInfo
 		{
@@ -1979,7 +1979,7 @@ public:
 	~CRenderTexturesListViewPanel();
 
 protected:
-	int GetNumTiles() override;
+	intp GetNumTiles() override;
 	void GetTileSize( int &wide, int &tall ) override;
 	void RenderTile( int iTile, int x, int y ) override;
 
@@ -2061,7 +2061,7 @@ void CRenderTexturesListViewPanel::OnMousePressed( vgui::MouseCode code )
 		return;
 
 	// Now having the tile retrieve the keyvalues
-	int itemId = m_pListPanel->GetItemIDFromRow( iTile );
+	auto itemId = m_pListPanel->GetItemIDFromRow( iTile );
 	if ( itemId < 0 )
 		return;
 	KeyValues *kv = m_pListPanel->GetItem( itemId );
@@ -2091,7 +2091,7 @@ void CRenderTexturesListViewPanel::OnMousePressed( vgui::MouseCode code )
 	m_pRenderTxEditor->Activate();
 }
 
-int CRenderTexturesListViewPanel::GetNumTiles()
+intp CRenderTexturesListViewPanel::GetNumTiles()
 {
 	return m_pListPanel ? m_pListPanel->GetItemCount() : 0;
 }
@@ -2104,7 +2104,7 @@ void CRenderTexturesListViewPanel::GetTileSize( int &wide, int &tall )
 
 KeyValues * CRenderTexturesListViewPanel::GetTileData( int iTile )
 {
-	int iData = m_pListPanel->GetItemIDFromRow( iTile );
+	auto iData = m_pListPanel->GetItemIDFromRow( iTile );
 	if ( iData < 0 )
 		return NULL;
 
@@ -2503,7 +2503,7 @@ CTextureListPanel::CTextureListPanel( vgui::Panel *parent ) :
 	SetSize( videomode->GetModeStereoWidth() - 20, videomode->GetModeStereoHeight() - 20 );
 	SetPos( 10, 10 );
 	SetVisible( true );
-	SetCursor( null );
+	SetCursor( 0 );
 
 	SetTitle( "Texture list", false );
 	SetMenuButtonVisible( false );
@@ -3243,8 +3243,8 @@ void CTextureListPanel::Paint()
 	m_numDisplayedSizeKB = ( cbTotalDisplayedSizeInBytes + 511 ) / 1024;
 
 	// Now remove from view items that weren't used.
-	int iNext, numRemoved = 0;
-	for ( int iCur=m_pListPanel->FirstItem(); iCur != m_pListPanel->InvalidItemID(); iCur=iNext )
+	intp iNext, numRemoved = 0;
+	for ( intp iCur=m_pListPanel->FirstItem(); iCur != m_pListPanel->InvalidItemID(); iCur=iNext )
 	{
 		iNext = m_pListPanel->NextItem( iCur );
 

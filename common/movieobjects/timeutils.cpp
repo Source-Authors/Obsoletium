@@ -5,7 +5,7 @@
 #include "tier0/dbg.h"
 #include "mathlib/mathlib.h"
 
-#include <math.h>
+#include <cmath>
 
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -80,7 +80,7 @@ float DmeFramerate_t::GetFramesPerSecond() const
 
 DmeTime_t::DmeTime_t( int frame, DmeFramerate_t framerate )
 {
-	int64 num = int64( framerate.m_num );
+	auto num = int64( framerate.m_num );
 	int64 prod = frame * int64( framerate.m_den );
 	// add signed offset to force integer truncation (towards 0) to give us truncation towards -inf
 	if ( frame < 0 )
@@ -148,8 +148,8 @@ int FrameForTime( DmeTime_t t, DmeFramerate_t framerate )
 
 int DmeTime_t::CurrentFrame( DmeFramerate_t framerate, bool bRoundDown ) const
 {
-	int64 den = int64( framerate.m_den );
-	int64 num = int64( framerate.m_num );
+	auto den = int64( framerate.m_den );
+	auto num = int64( framerate.m_num );
 	int64 prod = int64( m_tms ) * num;
 
 	// times within this range are considered on a frame: (frame*den/num - 1, frame*den/num]
@@ -174,18 +174,18 @@ int DmeTime_t::CurrentFrame( DmeFramerate_t framerate, bool bRoundDown ) const
 DmeTime_t DmeTime_t::TimeAtCurrentFrame( DmeFramerate_t framerate, bool bRoundDown ) const
 {
 	int frame = CurrentFrame( framerate, bRoundDown );
-	return DmeTime_t( frame, framerate );
+	return { frame, framerate };
 }
 DmeTime_t DmeTime_t::TimeAtNextFrame( DmeFramerate_t framerate ) const
 {
 	// since we always round towards -inf, go to next frame whether we're on a frame or not
 	int frame = CurrentFrame( framerate, true );
-	return DmeTime_t( frame + 1, framerate );
+	return { frame + 1, framerate };
 }
 DmeTime_t DmeTime_t::TimeAtPrevFrame( DmeFramerate_t framerate ) const
 {
 	int frame = CurrentFrame( framerate, false );
-	return DmeTime_t( frame - 1, framerate ); // we're exactly on a frame
+	return { frame - 1, framerate }; // we're exactly on a frame
 }
 
 

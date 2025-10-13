@@ -95,7 +95,7 @@ void CToolMenuButton::SetItemEnabled( int itemID, bool state )
 
 int CToolMenuButton::FindMenuItem( char const *itemName )
 {
-	int id = m_Items.Find( itemName );
+	auto id = m_Items.Find( itemName );
 	if ( id == m_Items.InvalidIndex() )
 		return -1;
 	return m_Items[ id ].m_ItemID;
@@ -131,8 +131,8 @@ void CToolMenuButton::UpdateMenuItemKeyBindings()
 	if ( !m_pActionTarget )
 		return;
 
-	int c = m_Items.Count();
-	for ( int i = 0; i < c; ++i )
+	auto c = m_Items.Count();
+	for ( decltype(c) i = 0; i < c; ++i )
 	{
 		if ( !m_Items[ i ].m_KeyBinding.IsValid() )
 			continue;
@@ -150,8 +150,7 @@ void CToolMenuButton::UpdateMenuItemKeyBindings()
 		// Found it, now convert to binding string
 		// First do modifiers
 		wchar_t sz[ 256 ];
-		wcsncpy( sz, Panel::KeyCodeModifiersToDisplayString( (KeyCode)kb->keycode, kb->modifiers ), 256 );
-		sz[ 255 ] = L'\0';
+		V_wcscpy_safe( sz, Panel::KeyCodeModifiersToDisplayString( (KeyCode)kb->keycode, kb->modifiers ) );
 
 		char ansi[ 512 ];
 		g_pVGuiLocalize->ConvertUnicodeToANSI( sz, ansi, sizeof( ansi ) );

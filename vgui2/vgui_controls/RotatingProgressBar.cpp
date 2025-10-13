@@ -174,8 +174,8 @@ void RotatingProgressBar::Paint()
 	vert[2].Init( Vector2D( m_flRotatingX+m_flRotatingWide, m_flRotatingY+m_flRotatingTall ), Vector2D(1,1) );
 	vert[3].Init( Vector2D( m_flRotatingX, m_flRotatingY+m_flRotatingTall ), Vector2D(0,1) );
 
-	float flCosA = cos(m_flLastAngle);
-	float flSinA = sin(m_flLastAngle);
+	float flSinA, flCosA;
+	DirectX::XMScalarSinCos(&flSinA, &flCosA, m_flLastAngle);
 
 	// rotate each point around (mid_x, mid_y) by flAngle radians
 	for ( int i=0;i<4;i++ )

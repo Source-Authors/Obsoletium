@@ -58,18 +58,18 @@ public:
 	void OnCommand( const char *cmd ) override;
 	void ApplySchemeSettings( IScheme *pScheme ) override;
 	void InvalidateLayout( bool layoutNow = false, bool reloadScheme = false ) override;
-	void GenerateChildrenOfNode(int itemIndex) override;
+	void GenerateChildrenOfNode(intp itemIndex) override;
 	// override to open a custom context menu on a node being selected and right-clicked
-	void GenerateContextMenu( int itemIndex, int x, int y ) override;
+	void GenerateContextMenu( intp itemIndex, int x, int y ) override;
 
-	void GenerateDragDataForItem( int itemIndex, KeyValues *msg ) override;
+	void GenerateDragDataForItem( intp itemIndex, KeyValues *msg ) override;
 
-	void OnLabelChanged( int itemIndex, const char *oldString, const char *newString ) override;
+	void OnLabelChanged( intp itemIndex, const char *oldString, const char *newString ) override;
 
-	bool IsItemDroppable( int m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
-	void OnItemDropped( int m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
-	bool GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist ) override;
-	HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	bool IsItemDroppable( intp m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	void OnItemDropped( intp m_ItemIndex, CUtlVector< KeyValues * >& msglist ) override;
+	bool GetItemDropContextMenu( intp itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist ) override;
+	HCursor GetItemDropCursor( intp itemIndex, CUtlVector< KeyValues * >& msglist ) override;
 
 	ScrollBar	*GetScrollBar();
 
@@ -107,38 +107,38 @@ ScrollBar *CElementTree::GetScrollBar()
 	return m_pVertSB;
 }
 
-bool CElementTree::IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist )
+bool CElementTree::IsItemDroppable( intp itemIndex, CUtlVector< KeyValues * >& msglist )
 {
 	return m_pParent->IsItemDroppable( itemIndex, msglist );
 }
 
-bool CElementTree::GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist )
+bool CElementTree::GetItemDropContextMenu( intp itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist )
 {
 	return m_pParent->GetItemDropContextMenu( itemIndex, menu, msglist );
 }
 
-void CElementTree::OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist )
+void CElementTree::OnItemDropped( intp itemIndex, CUtlVector< KeyValues * >& msglist )
 {
 	m_pParent->OnItemDropped( itemIndex, msglist );
 }
 
-HCursor CElementTree::GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist )
+HCursor CElementTree::GetItemDropCursor( intp itemIndex, CUtlVector< KeyValues * >& msglist )
 {
 	return m_pParent->GetItemDropCursor( itemIndex, msglist );
 }
 
-void CElementTree::OnLabelChanged( int itemIndex, const char *oldString, const char *newString )
+void CElementTree::OnLabelChanged( intp itemIndex, const char *oldString, const char *newString )
 {
 	m_pParent->OnLabelChanged( itemIndex, oldString, newString );
 }
 
-void CElementTree::GenerateDragDataForItem( int itemIndex, KeyValues *msg )
+void CElementTree::GenerateDragDataForItem( intp itemIndex, KeyValues *msg )
 {
 	m_pParent->GenerateDragDataForItem( itemIndex, msg );
 }
 
 // override to open a custom context menu on a node being selected and right-clicked
-void CElementTree::GenerateContextMenu( int itemIndex, int x, int y )
+void CElementTree::GenerateContextMenu( intp itemIndex, int x, int y )
 {
 	m_pParent->GenerateContextMenu( itemIndex, x, y );
 }
@@ -167,7 +167,7 @@ void CElementTree::OnCommand( const char *cmd )
 	GetParent()->OnCommand( cmd );
 }
 
-void CElementTree::GenerateChildrenOfNode(int itemIndex)
+void CElementTree::GenerateChildrenOfNode(intp itemIndex)
 {
 	m_pParent->GenerateChildrenOfNode( itemIndex );
 }
@@ -1208,7 +1208,7 @@ void CElementPropertiesTreeInternal::OnPaste_( bool reference )
 	if ( !pAttribute )
 		return;
 
-	DmAttributeType_t attType = pAttribute ? pAttribute->GetType() : AT_UNKNOWN;
+	DmAttributeType_t attType = pAttribute->GetType();
 	bool isElementAttribute = attType == AT_ELEMENT || attType == AT_ELEMENT_ARRAY;
 	if ( !isElementAttribute )
 		return;
@@ -1435,7 +1435,7 @@ static bool ArrayIndexLessFunc( KeyValues * const &lhs, KeyValues* const &rhs )
 
 struct OwnerAttribute_t
 {
-	OwnerAttribute_t() : sortedData( 0, 0, ArrayIndexLessFunc )
+	OwnerAttribute_t() : pOwner{ nullptr }, sortedData( 0, 0, ArrayIndexLessFunc )
 	{
 	}
 
@@ -1555,7 +1555,8 @@ bool CElementPropertiesTreeInternal::OnRemoveFromData( KeyValues *item )
 		return true;
 	}
 
-	if ( !pAttribute->IsFlagSet( FATTRIB_EXTERNAL )
+	if ( pAttribute
+		&& !pAttribute->IsFlagSet( FATTRIB_EXTERNAL )
 		&& !pAttribute->IsFlagSet( FATTRIB_TOPOLOGICAL )
 		&& !pAttribute->IsFlagSet( FATTRIB_READONLY ) )
 	{
@@ -1673,7 +1674,7 @@ void CElementPropertiesTreeInternal::OnSortByName()
 			continue;
 
 		bRefreshNeeded = true;
-		CDmElement **pArray = ( CDmElement** )_alloca( nCount * sizeof( CDmElement* ) );
+		CDmElement **pArray = stackallocT( CDmElement*, nCount );
 		for ( intp i = 0; i < nCount; ++i )
 		{
 			pArray[i] = elementArray[i];
@@ -2867,7 +2868,7 @@ void CElementPropertiesTreeInternal::UpdateTree()
 
 		char label[ 256 ];
 		Q_snprintf( label, sizeof( label ), "%s", m_hObject->GetValueString( "name" ) );
-		bool editableLabel = true;
+		constexpr bool editableLabel = true;
 
 		KeyValues *kv = new KeyValues( "item" );
 		kv->SetString( "Text", label );
@@ -2882,7 +2883,7 @@ void CElementPropertiesTreeInternal::UpdateTree()
 		vgui::Panel *widget = CreateAttributeDataWidget( pElement, "element", pElement, NULL );
 
 		CUtlVector< Panel * >	columns;
-		columns.AddToTail( NULL );
+		columns.AddToTail( nullptr );
 		columns.AddToTail( widget );
 		int rootIndex = m_pTree->AddItem( kv, editableLabel, -1, columns );
 
@@ -4159,7 +4160,7 @@ void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmEl
 	}
 
 	CUtlVector< vgui::Panel * >	columns;
-	columns.AddToTail( NULL );
+	columns.AddToTail( nullptr );
 	columns.AddToTail( widgets.m_pValueWidget );
 	int itemIndex = m_pTree->AddItem( kv, bEditableLabel, parentNodeIndex, columns );
 	SetTreeItemColor( itemIndex, pEntryElement, bIsElementArrayItem, bEditableLabel );

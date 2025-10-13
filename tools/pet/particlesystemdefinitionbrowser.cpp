@@ -409,7 +409,7 @@ void CParticleSystemDefinitionBrowser::CopyToClipboard( )
 	{
 		CDmeParticleSystemDefinition *pParticleSystem = GetSelectedParticleSystem( i );
 
-		CUtlBuffer buf( 0, 0, CUtlBuffer::TEXT_BUFFER );
+		CUtlBuffer buf( (intp)0, (intp)0, CUtlBuffer::TEXT_BUFFER );
 		if ( g_pDataModel->Serialize( buf, "keyvalues2", "pcf", pParticleSystem->GetHandle() ) )
 		{
 			KeyValues *pData = new KeyValues( "Clipboard" );

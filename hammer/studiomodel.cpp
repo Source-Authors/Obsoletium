@@ -354,7 +354,7 @@ void CStudioFileChangeWatcher::Update()
 			}
 		}
 		
-		m_ChangedModels.Purge();	
+		m_ChangedModels.Purge();
 	
 		for ( int i=0; i < CMapDoc::GetDocumentCount(); i++ )
 		{
@@ -1088,8 +1088,8 @@ int StudioModel::SetSkin( int iValue )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
 
-		int numStrips = materialBatch.m_TriListIndices.Count() / 3;
-		int numVertices = materialBatch.m_Verts.Count();
+		intp numStrips = materialBatch.m_TriListIndices.Count() / 3;
+		intp numVertices = materialBatch.m_Verts.Count();
 	
 		POINT *points = (POINT*)_alloca( sizeof(POINT) * numVertices );
 		

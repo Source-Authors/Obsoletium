@@ -193,7 +193,7 @@ bool CVcdBlockDoc::LoadFromFile( const char *pFileName )
 
 void CVcdBlockDoc::SaveToFile( )
 {
-	if ( m_hEditRoot.Get() && m_pEditFileName && m_pEditFileName[0] )
+	if ( m_hEditRoot.Get() && !Q_isempty( m_pEditFileName ) )
 	{
 		g_pDataModel->SaveToFile( m_pEditFileName, NULL, "keyvalues", "vmf", m_hEditRoot );
 	}

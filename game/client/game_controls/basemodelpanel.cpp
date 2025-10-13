@@ -13,7 +13,6 @@
 #include <vgui_controls/AnimationController.h>
 #include <vgui_controls/EditablePanel.h>
 #include <vgui_controls/ImagePanel.h>
-#include <vgui/ISurface.h>
 #include <vgui/IImage.h>
 #include <vgui_controls/Label.h>
 
@@ -45,9 +44,10 @@ DECLARE_BUILD_FACTORY( CModelPanel );
 CModelPanel::CModelPanel( vgui::Panel *pParent, const char *pName ) : vgui::EditablePanel( pParent, pName )
 {
 	m_nFOV = 54;
-	m_hModel = NULL;
-	m_pModelInfo = NULL;
-	m_hScene = NULL;
+	m_flFrameDistance = 0;
+	m_hModel = nullptr;
+	m_pModelInfo = nullptr;
+	m_hScene = nullptr;
 	m_iDefaultAnimation = 0;
 	m_bPanelDirty = true;
 	m_bStartFramed = false;
@@ -64,7 +64,7 @@ CModelPanel::~CModelPanel()
 	if ( m_pModelInfo )
 	{
 		delete m_pModelInfo;
-		m_pModelInfo = NULL;
+		m_pModelInfo = nullptr;
 	}
 
 	DeleteVCDData();
@@ -211,7 +211,7 @@ void CModelPanel::SetDefaultAnimation( const char *pszName )
 {
 	if ( m_pModelInfo )
 	{
-		for ( int i = 0; i < m_pModelInfo->m_Animations.Count(); i++ )
+		for ( intp i = 0; i < m_pModelInfo->m_Animations.Count(); i++ )
 		{
 			if ( m_pModelInfo->m_Animations[i] && m_pModelInfo->m_Animations[i]->m_pszName )
 			{
@@ -235,24 +235,16 @@ void CModelPanel::SwapModel( const char *pszName, const char *pszAttached )
 	if ( !m_pModelInfo || !pszName || !pszName[0] )
 		return;
 
-	intp len = Q_strlen( pszName ) + 1;
-	char *pAlloced = new char[ len ];
-	Assert( pAlloced );
-	Q_strncpy( pAlloced, pszName, len );
-	m_pModelInfo->m_pszModelName = pAlloced;
+	m_pModelInfo->m_pszModelName = V_strdup( pszName );
 
 	ClearAttachedModelInfos();
 
 	if ( pszAttached )
 	{
-		CModelPanelAttachedModelInfo *pAttachedModelInfo = new CModelPanelAttachedModelInfo;
+		auto *pAttachedModelInfo = new CModelPanelAttachedModelInfo;
 		if ( pAttachedModelInfo )
 		{
-			len = Q_strlen( pszAttached ) + 1;
-			pAlloced = new char[ len ];
-			Assert( pAlloced );
-			Q_strncpy( pAlloced, pszAttached, len );
-			pAttachedModelInfo->m_pszModelName = pAlloced;
+			pAttachedModelInfo->m_pszModelName = V_strdup( pszAttached );
 			pAttachedModelInfo->m_nSkin = 0;
 
 			m_pModelInfo->m_AttachedModelsInfo.AddToTail( pAttachedModelInfo );
@@ -295,7 +287,7 @@ void CModelPanel::SetupVCD( void )
 	{
 		// we failed to initialize this entity so just return gracefully
 		pEnt->Remove();
-		return;
+		return; //-V773
 	}
 
 	// setup the handle
@@ -328,7 +320,7 @@ void CModelPanel::DeleteModelData( void )
 		m_flFrameDistance = 0;
 	}
 
-	for ( int i = 0 ; i < m_AttachedModels.Count() ; i++ )
+	for ( intp i = 0 ; i < m_AttachedModels.Count() ; i++ )
 	{
 		if ( m_AttachedModels[i].Get() )
 		{
@@ -395,11 +387,11 @@ void CModelPanel::SetupModel( void )
 	DeleteModelData();
 
 	const char *pszModelName = GetModelName();
-	if ( !pszModelName || !pszModelName[0] )
+	if ( Q_isempty( pszModelName ) )
 		return;
 
 	// create the new model
-	CModelPanelModel *pEnt = new CModelPanelModel;
+	auto *pEnt = new CModelPanelModel;
 
 	if ( !pEnt )
 		return;
@@ -408,7 +400,7 @@ void CModelPanel::SetupModel( void )
 	{
 		// we failed to initialize this entity so just return gracefully
 		pEnt->Remove();
-		return;
+		return; //-V773
 	}
 	
 	// setup the handle
@@ -448,7 +440,7 @@ void CModelPanel::SetupModel( void )
 
 			if ( pAnim->m_pPoseParameters )
 			{
-				for ( KeyValues *pData = pAnim->m_pPoseParameters->GetFirstSubKey(); pData != NULL; pData = pData->GetNextKey() )
+				for ( auto *pData = pAnim->m_pPoseParameters->GetFirstSubKey(); pData != NULL; pData = pData->GetNextKey() )
 				{
 					const char *pName = pData->GetName();
 					float flValue = pData->GetFloat();
@@ -462,10 +454,10 @@ void CModelPanel::SetupModel( void )
 	}
 
 	// setup any attached models
-	for ( int i = 0 ; i < m_pModelInfo->m_AttachedModelsInfo.Count() ; i++ )
+	for ( intp i = 0 ; i < m_pModelInfo->m_AttachedModelsInfo.Count() ; i++ )
 	{
 		CModelPanelAttachedModelInfo *pInfo = m_pModelInfo->m_AttachedModelsInfo[i];
-		C_BaseAnimating *pTemp = new C_BaseAnimating;
+		auto *pTemp = new C_BaseAnimating;
 
 		if ( pTemp )
 		{
@@ -555,7 +547,6 @@ void CModelPanel::Paint()
 	if ( !m_hModel.Get() )
 		return;
 
-	int i = 0;
 	int x, y, w, h;
 
 	GetBounds( x, y, w, h );
@@ -633,16 +624,16 @@ void CModelPanel::Paint()
 	}
 
 	pRenderContext->SetLightingOrigin( vec3_origin );
-	pRenderContext->SetAmbientLight( 0.4, 0.4, 0.4 );
+	pRenderContext->SetAmbientLight( 0.4f, 0.4f, 0.4f );
 
 	static Vector white[6] = 
 	{
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
-		Vector( 0.4, 0.4, 0.4 ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
+		Vector( 0.4f, 0.4f, 0.4f ),
 	};
 
 	g_pStudioRender->SetAmbientLightColors( white );
@@ -660,16 +651,16 @@ void CModelPanel::Paint()
 	render->Push3DView( view, 0, NULL, dummyFrustum );
 
 	modelrender->SuppressEngineLighting( true );
-	float color[3] = { 1.0f, 1.0f, 1.0f };
+	const float color[3] = { 1.0f, 1.0f, 1.0f };
 	render->SetColorModulation( color );
 	render->SetBlend( 1.0f );
 	m_hModel->DrawModel( STUDIO_RENDER );
 
-	for ( i = 0 ; i < m_AttachedModels.Count() ; i++ )
+	for ( auto &m : m_AttachedModels )
 	{
-		if ( m_AttachedModels[i].Get() )
+		if ( m.Get() )
 		{
-			m_AttachedModels[i]->DrawModel( STUDIO_RENDER );
+			m->DrawModel( STUDIO_RENDER );
 		}
 	}
 
@@ -692,7 +683,7 @@ void CModelPanel::Paint()
 int CModelPanel::FindAnimByName( const char *pszName )
 {
 	// first try to find the sequence using pszName as the friendly name 
-	for ( int iIndex = 0 ; iIndex <  m_pModelInfo->m_Animations.Count() ; iIndex++ )
+	for ( intp iIndex = 0; iIndex <  m_pModelInfo->m_Animations.Count(); iIndex++ )
 	{
 		CModelPanelModelAnimation *pAnimation = m_pModelInfo->m_Animations[ iIndex ];
 		if ( FStrEq( pAnimation->m_pszName, pszName ) )

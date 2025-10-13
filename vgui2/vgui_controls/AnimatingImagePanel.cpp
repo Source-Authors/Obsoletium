@@ -68,13 +68,13 @@ void AnimatingImagePanel::AddImage(IImage *image)
 //			file extension, (e.g. c1.tga becomes just c.)
 //		framecount: number of frames in the animation
 //-----------------------------------------------------------------------------
-void AnimatingImagePanel::LoadAnimation(const char *baseName, int frameCount)
+void AnimatingImagePanel::LoadAnimation(const char *baseName, intp frameCount)
 {
 	m_Frames.RemoveAll();
-	for (int i = 1; i <= frameCount; i++)
+	for (intp i = 1; i <= frameCount; i++)
 	{
 		char imageName[512];
-		V_sprintf_safe(imageName, "%s%d", baseName, i);
+		V_sprintf_safe(imageName, "%s%zd", baseName, i);
 		AddImage(scheme()->GetImage(imageName, m_bFiltered));
 	}
 }
@@ -198,7 +198,7 @@ void AnimatingImagePanel::StopAnimation()
 //-----------------------------------------------------------------------------
 // Purpose: Resets the animation to the start of the sequence.
 //-----------------------------------------------------------------------------
-void AnimatingImagePanel::ResetAnimation(int frame)
+void AnimatingImagePanel::ResetAnimation(intp frame)
 {
 	if(m_Frames.IsValidIndex(frame))
 	{

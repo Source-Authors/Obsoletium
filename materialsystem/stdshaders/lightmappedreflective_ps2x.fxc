@@ -26,9 +26,9 @@ sampler EnvMapMaskSampler		: register( s6 );
 #endif
 sampler NormalSampler			: register( s4 );
 
-const HALF4 vRefractTint			: register( c1 );
+const float4 vRefractTint			: register( c1 );
 const float4 g_FresnelConstants		: register( c3 );
-const HALF4 vReflectTint			: register( c4 );
+const float4 vReflectTint			: register( c4 );
 const float4 g_ReflectRefractScale	: register( c5 ); // xy - reflect scale, zw - refract scale
 
 const float4 g_PixelFogParams		: register( c8 );
@@ -47,9 +47,9 @@ struct PS_INPUT
 	float screenCoord				: TEXCOORD5;
 #if BASETEXTURE
 // CENTROID: TEXCOORD6
-	HALF4 lightmapTexCoord1And2		: TEXCOORD6;
+	float4 lightmapTexCoord1And2		: TEXCOORD6;
 // CENTROID: TEXCOORD7
-	HALF4 lightmapTexCoord3			: TEXCOORD7;
+	float4 lightmapTexCoord3			: TEXCOORD7;
 #endif
 
 	float4 fogFactorW				: COLOR1;
@@ -58,8 +58,8 @@ struct PS_INPUT
 float4 main( PS_INPUT i ) : COLOR
 {
 	// Load normal and expand range
-	HALF4 vNormalSample = tex2D( NormalSampler, i.vBumpTexCoordXY_vTexCoordXY.xy );
-	HALF3 vNormal = normalize( vNormalSample * 2.0 - 1.0 );
+	float4 vNormalSample = tex2D( NormalSampler, i.vBumpTexCoordXY_vTexCoordXY.xy );
+	float3 vNormal = normalize( vNormalSample * 2.0 - 1.0 );
 
 	// Perform division by W only once
 	float ooW = 1.0f / i.W;
@@ -73,23 +73,20 @@ float4 main( PS_INPUT i ) : COLOR
 	float2 vRefractTexCoord;
 
 	// vectorize the dependent UV calculations (reflect = .xy, refract = .wz)
-#ifdef NV3X
-	float4 vDependentTexCoords = vNormal.xyxy * vNormalSample.a * reflectRefractScale;
-#else
+	// dimhotepus: Drop NV3X.
 	float4 vN;
 	vN.xy = vNormal.xy;
 	vN.w = vNormal.x;
 	vN.z = vNormal.y;
 	float4 vDependentTexCoords = vN * vNormalSample.a * reflectRefractScale;
-#endif
 
 	vDependentTexCoords += ( i.vReflectXY_vRefractYX * ooW );
 	vReflectTexCoord = vDependentTexCoords.xy;
 	vRefractTexCoord = vDependentTexCoords.wz;
 
 	// Sample reflection and refraction
-	HALF4 vReflectColor = tex2D( ReflectSampler, vReflectTexCoord );
-	HALF4 vRefractColor = tex2D( RefractSampler, vRefractTexCoord );
+	float4 vReflectColor = tex2D( ReflectSampler, vReflectTexCoord );
+	float4 vRefractColor = tex2D( RefractSampler, vRefractTexCoord );
 	vReflectColor *= vReflectTint;
 	vRefractColor *= vRefractTint;
 	
@@ -97,22 +94,22 @@ float4 main( PS_INPUT i ) : COLOR
 	vEyeVect = normalize( i.vTangentEyeVect );
 
 	// Fresnel term
-	HALF fNdotV = saturate( dot( vEyeVect, vNormal ) );
-	HALF fFresnelScalar = g_FresnelConstants.x * pow( 1.0 - fNdotV, g_FresnelConstants.y ) + g_FresnelConstants.z;
-	HALF4 fFresnel = HALF4( fFresnelScalar, fFresnelScalar, fFresnelScalar, fFresnelScalar ); 
+	float fNdotV = saturate( dot( vEyeVect, vNormal ) );
+	float fFresnelScalar = g_FresnelConstants.x * pow( 1.0 - fNdotV, g_FresnelConstants.y ) + g_FresnelConstants.z;
+	float4 fFresnel = float4( fFresnelScalar, fFresnelScalar, fFresnelScalar, fFresnelScalar ); 
 
 #if BASETEXTURE
 	float4 baseSample = tex2D( BaseTextureSampler, i.vBumpTexCoordXY_vTexCoordXY.zw );
-	HALF2 bumpCoord1;
-	HALF2 bumpCoord2;
-	HALF2 bumpCoord3;
+	float2 bumpCoord1;
+	float2 bumpCoord2;
+	float2 bumpCoord3;
 	ComputeBumpedLightmapCoordinates( i.lightmapTexCoord1And2, i.lightmapTexCoord3.xy,
 		bumpCoord1, bumpCoord2, bumpCoord3 );
 	
-	HALF4 lightmapSample1 = tex2D( LightmapSampler, bumpCoord1 );
-	HALF3 lightmapColor1 = lightmapSample1.rgb;
-	HALF3 lightmapColor2 = tex2D( LightmapSampler, bumpCoord2 );
-	HALF3 lightmapColor3 = tex2D( LightmapSampler, bumpCoord3 );
+	float4 lightmapSample1 = tex2D( LightmapSampler, bumpCoord1 );
+	float3 lightmapColor1 = lightmapSample1.rgb;
+	float3 lightmapColor2 = tex2D( LightmapSampler, bumpCoord2 );
+	float3 lightmapColor3 = tex2D( LightmapSampler, bumpCoord3 );
 
 	float3 dp;
 	dp.x = saturate( dot( vNormal, bumpBasis[0] ) );
@@ -125,7 +122,7 @@ float4 main( PS_INPUT i ) : COLOR
 						dp.z * lightmapColor3;
 	float sum = dot( dp, float3( 1.0f, 1.0f, 1.0f ) );
 	diffuseLighting *= LIGHT_MAP_SCALE / sum;
-	HALF3 diffuseComponent = baseSample.rgb * diffuseLighting;
+	float3 diffuseComponent = baseSample.rgb * diffuseLighting;
 #endif
 
 	float4 flMask;

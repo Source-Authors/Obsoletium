@@ -7,10 +7,6 @@
 #ifndef DELEGATES_H
 #define DELEGATES_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 #define DELEGATE_TO_OBJECT_0( RetType, FuncName, pDelegated ) RetType FuncName()	{ return (pDelegated)->FuncName(); }
 #define DELEGATE_TO_OBJECT_0V( FuncName, pDelegated ) void FuncName()	{ (pDelegated)->FuncName(); }
 #define DELEGATE_TO_OBJECT_1( RetType, FuncName, ArgType1, pDelegated ) RetType FuncName( ArgType1 a1 )	{ return (pDelegated)->FuncName( a1 ); }

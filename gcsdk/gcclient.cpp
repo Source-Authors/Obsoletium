@@ -528,13 +528,12 @@ public:
 		{
 			SOCDebug( "CGCSOCacheSubscribedJob(owner=%s) [in cache]\n", CSteamID( msg.Body().owner() ).Render() );
 			DbgVerify( pSOCache->BParseCacheSubscribedMsg( msg.Body() ) );
+			m_pGCClient->Test_CacheSubscribed( pSOCache->GetOwner() );
 		}
 		else
 		{
 			SOCDebug( "CGCSOCacheSubscribedJob(owner=%s) [not in cache]\n", CSteamID( msg.Body().owner() ).Render() );
 		}
-
-		m_pGCClient->Test_CacheSubscribed( pSOCache->GetOwner() );
 
 		return true;
 	}

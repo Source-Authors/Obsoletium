@@ -523,7 +523,7 @@ int CPrefabVMF::Load(DWORD dwFlags)
 	}
 	else
 	{
-		//GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Error loading prefab", MB_OK | MB_ICONEXCLAMATION);
+		//GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Prefab Load Error", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	return(eResult == ChunkFile_Ok);

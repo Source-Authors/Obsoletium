@@ -1771,6 +1771,197 @@ bool CHalfLife2::ShouldBurningPropsEmitLight()
 
 #endif//CLIENT_DLL
 
+
+#ifdef GAME_DLL
+// dimhotepus: TF2 backport + add maps.
+bool CHalfLife2::IsOfficialMap( void )
+{ 
+	static constexpr char *s_OfficialMaps[] =
+	{
+#ifdef HL2_EPISODIC
+		// Half-Life 2 Episode 1.
+		"credits",
+		"ep1_background01",
+		"ep1_background01a",
+		"ep1_background02",
+		"ep1_c17_00",
+		"ep1_c17_00a",
+		"ep1_c17_01",
+		"ep1_c17_01a",
+		"ep1_c17_02",
+		"ep1_c17_02a",
+		"ep1_c17_02b",
+		"ep1_c17_05",
+		"ep1_c17_06",
+		"ep1_citadel_00",
+		"ep1_citadel_00_demo",
+		"ep1_citadel_01",
+		"ep1_citadel_02",
+		"ep1_citadel_02b",
+		"ep1_citadel_03",
+		"ep1_citadel_04",
+
+		// Half-Life 2 Episode 2.
+		"ep2_background01",
+		"ep2_background02",
+		"ep2_background02a",
+		"ep2_background03",
+		"ep2_outland_01",
+		"ep2_outland_01a",
+		"ep2_outland_02",
+		"ep2_outland_03",
+		"ep2_outland_04",
+		"ep2_outland_05",
+		"ep2_outland_06",
+		"ep2_outland_06a",
+		"ep2_outland_07",
+		"ep2_outland_08",
+		"ep2_outland_09",
+		"ep2_outland_10",
+		"ep2_outland_10a",
+		"ep2_outland_11",
+		"ep2_outland_11a",
+		"ep2_outland_11b",
+		"ep2_outland_12",
+		"ep2_outland_12a"
+#elif defined(HL2_LOSTCOAST)
+		// Half-Life 2 Lost Coast.
+		"background01",
+		"d2_lostcoast",
+		"test_hardware",
+		"vst_lostcoast"
+#elif defined(PORTAL)
+		// Portal.
+		// TODO(dimhotepus): Need to check on real Portal game.
+		"background1",
+		"background2",
+		"testchmb_a_00",
+		"testchmb_a_01",
+		"testchmb_a_02",
+		"testchmb_a_03",
+		"testchmb_a_04",
+		"testchmb_a_05",
+		"testchmb_a_06",
+		"testchmb_a_07",
+		"testchmb_a_08",
+		"testchmb_a_09",
+		"testchmb_a_10",
+		"testchmb_a_11",
+		"testchmb_a_12",
+		"testchmb_a_13",
+		"testchmb_a_14",
+		"testchmb_a_15",
+		"escape_00",
+		"escape_01",
+		"escape_02"
+
+		// TODO(dimhotepus): Need to check on real Portal game. Advanced maps.
+		"testchmb_a_08_advanced",
+		"testchmb_a_09_advanced",
+		"testchmb_a_10_advanced",
+		"testchmb_a_11_advanced",
+		"testchmb_a_13_advanced",
+		"testchmb_a_14_advanced"
+#else
+		// Half-Life 2.
+		"background01",
+		"background02",
+		"background03",
+		"background04",
+		"background05",
+		"background06",
+		"background07",
+		"credits",
+		"d1_canals_01",
+		"d1_canals_01a",
+		"d1_canals_02",
+		"d1_canals_03",
+		"d1_canals_05",
+		"d1_canals_06",
+		"d1_canals_07",
+		"d1_canals_08",
+		"d1_canals_09",
+		"d1_canals_10",
+		"d1_canals_11",
+		"d1_canals_12",
+		"d1_canals_13",
+		"d1_eli_01",
+		"d1_eli_02",
+		"d1_town_01",
+		"d1_town_01a",
+		"d1_town_02",
+		"d1_town_02a",
+		"d1_town_03",
+		"d1_town_04",
+		"d1_town_05",
+		"d1_trainstation_01",
+		"d1_trainstation_02",
+		"d1_trainstation_03",
+		"d1_trainstation_04",
+		"d1_trainstation_05",
+		"d1_trainstation_06",
+		"d2_coast_01",
+		"d2_coast_02",
+		"d2_coast_03",
+		"d2_coast_04",
+		"d2_coast_05",
+		"d2_coast_07",
+		"d2_coast_08",
+		"d2_coast_09",
+		"d2_coast_10",
+		"d2_coast_11",
+		"d2_coast_12",
+		"d2_prison_01",
+		"d2_prison_02",
+		"d2_prison_03",
+		"d2_prison_04",
+		"d2_prison_05",
+		"d2_prison_06",
+		"d2_prison_07",
+		"d2_prison_08",
+		"d3_breen_01",
+		"d3_c17_01",
+		"d3_c17_02",
+		"d3_c17_02_camera",
+		"d3_c17_03",
+		"d3_c17_04",
+		"d3_c17_05",
+		"d3_c17_06a",
+		"d3_c17_06b",
+		"d3_c17_07",
+		"d3_c17_08",
+		"d3_c17_09",
+		"d3_c17_10a",
+		"d3_c17_10b",
+		"d3_c17_11",
+		"d3_c17_12",
+		"d3_c17_12b",
+		"d3_c17_13",
+		"d3_citadel_01",
+		"d3_citadel_02",
+		"d3_citadel_03",
+		"d3_citadel_04",
+		"d3_citadel_05",
+		"intro"
+#endif
+	};
+
+	char szCurrentMap[MAX_MAP_NAME];
+	V_strcpy_safe( szCurrentMap, STRING( gpGlobals->mapname ) );
+
+	for ( const auto *officialMap : s_OfficialMaps )
+	{
+		if ( !Q_stricmp( officialMap, szCurrentMap ) )
+		{
+			return true;
+		}
+	}
+
+	return BaseClass::IsOfficialMap();
+}
+#endif
+
+
 // ------------------------------------------------------------------------------------ //
 // Global functions.
 // ------------------------------------------------------------------------------------ //
@@ -1798,26 +1989,26 @@ CAmmoDef *GetAmmoDef()
 	{
 		bInitted = true;
 
-		def.AddAmmoType("AR2",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_ar2",			"sk_npc_dmg_ar2",			"sk_max_ar2",			BULLET_IMPULSE(200, 1225), 0 );
-		def.AddAmmoType("AlyxGun",			DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_alyxgun",		"sk_npc_dmg_alyxgun",		"sk_max_alyxgun",		BULLET_IMPULSE(200, 1225), 0 );
-		def.AddAmmoType("Pistol",			DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_pistol",		"sk_npc_dmg_pistol",		"sk_max_pistol",		BULLET_IMPULSE(200, 1225), 0 );
-		def.AddAmmoType("SMG1",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_smg1",			"sk_npc_dmg_smg1",			"sk_max_smg1",			BULLET_IMPULSE(200, 1225), 0 );
-		def.AddAmmoType("357",				DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_357",			"sk_npc_dmg_357",			"sk_max_357",			BULLET_IMPULSE(800, 5000), 0 );
-		def.AddAmmoType("XBowBolt",			DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_crossbow",		"sk_npc_dmg_crossbow",		"sk_max_crossbow",		BULLET_IMPULSE(800, 8000), 0 );
+		def.AddAmmoType("AR2",						DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_ar2",				"sk_npc_dmg_ar2",				"sk_max_ar2",			BULLET_IMPULSE(200, 1225), 0 );
+		def.AddAmmoType("AlyxGun",					DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_alyxgun",			"sk_npc_dmg_alyxgun",			"sk_max_alyxgun",		BULLET_IMPULSE(200, 1225), 0 );
+		def.AddAmmoType("Pistol",					DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_pistol",			"sk_npc_dmg_pistol",			"sk_max_pistol",		BULLET_IMPULSE(200, 1225), 0 );
+		def.AddAmmoType("SMG1",						DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_smg1",				"sk_npc_dmg_smg1",				"sk_max_smg1",			BULLET_IMPULSE(200, 1225), 0 );
+		def.AddAmmoType("357",						DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_plr_dmg_357",				"sk_npc_dmg_357",				"sk_max_357",			BULLET_IMPULSE(800, 5000), 0 );
+		def.AddAmmoType("XBowBolt",					DMG_BULLET,					TRACER_LINE,			"sk_plr_dmg_crossbow",			"sk_npc_dmg_crossbow",			"sk_max_crossbow",		BULLET_IMPULSE(800, 8000), 0 );
 
-		def.AddAmmoType("Buckshot",			DMG_BULLET | DMG_BUCKSHOT,	TRACER_LINE,			"sk_plr_dmg_buckshot",		"sk_npc_dmg_buckshot",		"sk_max_buckshot",		BULLET_IMPULSE(400, 1200), 0 );
-		def.AddAmmoType("RPG_Round",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_rpg_round",		"sk_npc_dmg_rpg_round",		"sk_max_rpg_round",		0, 0 );
-		def.AddAmmoType("SMG1_Grenade",		DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_smg1_grenade",	"sk_npc_dmg_smg1_grenade",	"sk_max_smg1_grenade",	0, 0 );
-		def.AddAmmoType("SniperRound",		DMG_BULLET | DMG_SNIPER,	TRACER_NONE,			"sk_plr_dmg_sniper_round",	"sk_npc_dmg_sniper_round",	"sk_max_sniper_round",	BULLET_IMPULSE(650, 6000), 0 );
-		def.AddAmmoType("SniperPenetratedRound", DMG_BULLET | DMG_SNIPER, TRACER_NONE,			"sk_dmg_sniper_penetrate_plr", "sk_dmg_sniper_penetrate_npc", "sk_max_sniper_round", BULLET_IMPULSE(150, 6000), 0 );
-		def.AddAmmoType("Grenade",			DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_grenade",		0, 0);
-		def.AddAmmoType("Thumper",			DMG_SONIC,					TRACER_NONE,			10, 10, 2, 0, 0 );
-		def.AddAmmoType("Gravity",			DMG_CLUB,					TRACER_NONE,			0,	0, 8, 0, 0 );
-//		def.AddAmmoType("Extinguisher",		DMG_BURN,					TRACER_NONE,			0,	0, 100, 0, 0 );
-		def.AddAmmoType("Battery",			DMG_CLUB,					TRACER_NONE,			NULL, NULL, NULL, 0, 0 );
-		def.AddAmmoType("GaussEnergy",		DMG_SHOCK,					TRACER_NONE,			"sk_jeep_gauss_damage",		"sk_jeep_gauss_damage", "sk_max_gauss_round", BULLET_IMPULSE(650, 8000), 0 ); // hit like a 10kg weight at 400 in/s
-		def.AddAmmoType("CombineCannon",	DMG_BULLET,					TRACER_LINE,			"sk_npc_dmg_gunship_to_plr", "sk_npc_dmg_gunship", NULL, 1.5 * 750 * 12, 0 ); // hit like a 1.5kg weight at 750 ft/s
-		def.AddAmmoType("AirboatGun",		DMG_AIRBOAT,				TRACER_LINE,			"sk_plr_dmg_airboat",		"sk_npc_dmg_airboat",		NULL,					BULLET_IMPULSE(10, 600), 0 );
+		def.AddAmmoType("Buckshot",					DMG_BULLET | DMG_BUCKSHOT,	TRACER_LINE,			"sk_plr_dmg_buckshot",			"sk_npc_dmg_buckshot",			"sk_max_buckshot",		BULLET_IMPULSE(400, 1200), 0 );
+		def.AddAmmoType("RPG_Round",				DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_rpg_round",			"sk_npc_dmg_rpg_round",			"sk_max_rpg_round",		0, 0 );
+		def.AddAmmoType("SMG1_Grenade",				DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_smg1_grenade",		"sk_npc_dmg_smg1_grenade",		"sk_max_smg1_grenade",	0, 0 );
+		def.AddAmmoType("SniperRound",				DMG_BULLET | DMG_SNIPER,	TRACER_NONE,			"sk_plr_dmg_sniper_round",		"sk_npc_dmg_sniper_round",		"sk_max_sniper_round",	BULLET_IMPULSE(650, 6000), 0 );
+		def.AddAmmoType("SniperPenetratedRound",	DMG_BULLET | DMG_SNIPER,	TRACER_NONE,			"sk_dmg_sniper_penetrate_plr",	"sk_dmg_sniper_penetrate_npc",	"sk_max_sniper_round",	BULLET_IMPULSE(150, 6000), 0 );
+		def.AddAmmoType("Grenade",					DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_grenade",			"sk_npc_dmg_grenade",			"sk_max_grenade",		0, 0);
+		def.AddAmmoType("Thumper",					DMG_SONIC,					TRACER_NONE,			10, 10, 2, 0, 0 );
+		def.AddAmmoType("Gravity",					DMG_CLUB,					TRACER_NONE,			0,	0, 8, 0, 0 );
+//		def.AddAmmoType("Extinguisher",				DMG_BURN,					TRACER_NONE,			0,	0, 100, 0, 0 );
+		def.AddAmmoType("Battery",					DMG_CLUB,					TRACER_NONE,			nullptr,						nullptr,						nullptr,				0, 0 );
+		def.AddAmmoType("GaussEnergy",				DMG_SHOCK,					TRACER_NONE,			"sk_jeep_gauss_damage",			"sk_jeep_gauss_damage",			"sk_max_gauss_round",	BULLET_IMPULSE(650, 8000), 0 ); // hit like a 10kg weight at 400 in/s
+		def.AddAmmoType("CombineCannon",			DMG_BULLET,					TRACER_LINE,			"sk_npc_dmg_gunship_to_plr",	"sk_npc_dmg_gunship",			nullptr,				 1.5 * 750 * 12, 0 ); // hit like a 1.5kg weight at 750 ft/s
+		def.AddAmmoType("AirboatGun",				DMG_AIRBOAT,				TRACER_LINE,			"sk_plr_dmg_airboat",			"sk_npc_dmg_airboat",			nullptr,				BULLET_IMPULSE(10, 600), 0 );
 
 		//=====================================================================
 		// STRIDER MINIGUN DAMAGE - Pull up a chair and I'll tell you a tale.
@@ -1857,19 +2048,19 @@ CAmmoDef *GetAmmoDef()
 		//
 		//=====================================================================
 #ifdef HL2_EPISODIC
-		def.AddAmmoType("StriderMinigun",	DMG_BULLET,					TRACER_LINE,			5, 5, 15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
+		def.AddAmmoType("StriderMinigun",		DMG_BULLET,					TRACER_LINE,			5, 5, 15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
 #else
-		def.AddAmmoType("StriderMinigun",	DMG_BULLET,					TRACER_LINE,			5, 15,15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
+		def.AddAmmoType("StriderMinigun",		DMG_BULLET,					TRACER_LINE,			5, 15,15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
 #endif//HL2_EPISODIC
 
-		def.AddAmmoType("StriderMinigunDirect",	DMG_BULLET,				TRACER_LINE,			2, 2, 15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
-		def.AddAmmoType("HelicopterGun",	DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_npc_dmg_helicopter_to_plr", "sk_npc_dmg_helicopter",	"sk_max_smg1",	BULLET_IMPULSE(400, 1225), AMMO_FORCE_DROP_IF_CARRIED | AMMO_INTERPRET_PLRDAMAGE_AS_DAMAGE_TO_PLAYER );
-		def.AddAmmoType("AR2AltFire",		DMG_DISSOLVE,				TRACER_NONE,			0, 0, "sk_max_ar2_altfire", 0, 0 );
-		def.AddAmmoType("Grenade",			DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_grenade",		0, 0);
+		def.AddAmmoType("StriderMinigunDirect",	DMG_BULLET,					TRACER_LINE,			2, 2, 15, 1.0 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 1.0kg weight at 750 ft/s
+		def.AddAmmoType("HelicopterGun",		DMG_BULLET,					TRACER_LINE_AND_WHIZ,	"sk_npc_dmg_helicopter_to_plr", "sk_npc_dmg_helicopter",	"sk_max_smg1",	BULLET_IMPULSE(400, 1225), AMMO_FORCE_DROP_IF_CARRIED | AMMO_INTERPRET_PLRDAMAGE_AS_DAMAGE_TO_PLAYER );
+		def.AddAmmoType("AR2AltFire",			DMG_DISSOLVE,				TRACER_NONE,			nullptr, nullptr, "sk_max_ar2_altfire", 0, 0 );
+		def.AddAmmoType("Grenade",				DMG_BURN,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_grenade",		0, 0);
 #ifdef HL2_EPISODIC
-		def.AddAmmoType("Hopwire",			DMG_BLAST,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_hopwire",		0, 0);
-		def.AddAmmoType("CombineHeavyCannon",	DMG_BULLET,				TRACER_LINE,			40,	40, NULL, 10 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 10 kg weight at 750 ft/s
-		def.AddAmmoType("ammo_proto1",			DMG_BULLET,				TRACER_LINE,			0, 0, 10, 0, 0 );
+		def.AddAmmoType("Hopwire",				DMG_BLAST,					TRACER_NONE,			"sk_plr_dmg_grenade",		"sk_npc_dmg_grenade",		"sk_max_hopwire",		0, 0);
+		def.AddAmmoType("CombineHeavyCannon",	DMG_BULLET,					TRACER_LINE,			40,	40, NULL, 10 * 750 * 12, AMMO_FORCE_DROP_IF_CARRIED ); // hit like a 10 kg weight at 750 ft/s
+		def.AddAmmoType("ammo_proto1",			DMG_BULLET,					TRACER_LINE,			0, 0, 10, 0, 0 );
 #endif // HL2_EPISODIC
 	}
 

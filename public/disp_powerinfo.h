@@ -45,9 +45,13 @@ struct DispNodeInfo_t
 class CTesselateVert
 {
 public:
-				CTesselateVert( CVertIndex const &index, int iNode );
+	// dimhotepus: constexpr. int -> short
+	constexpr inline  CTesselateVert(CVertIndex index, short iNode)
+		: m_Index{ index }, m_iNode{ iNode }
+	{
+	}
 
-	CVertIndex	m_Index;
+	CVertIndex		m_Index;
 	short			m_iNode;	// Which node this vert is a part of (-1 on left, right, up, and down).
 };
 
@@ -55,7 +59,8 @@ public:
 class CTesselateWinding
 {
 public:
-	CTesselateVert	*m_Verts;
+	// dimhotepus: Add const.
+	const CTesselateVert	*m_Verts;
 	short			m_nVerts;	// (includes the last vert)
 };
 

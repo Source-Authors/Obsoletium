@@ -83,6 +83,7 @@
 #include "engine/imatchmaking.h"
 #include "hl2orange.spa.h"
 #include "particle_parse.h"
+#include "vscript/ivscript.h"
 #ifndef NO_STEAM
 #include "steam/steam_gameserver.h"
 #endif
@@ -182,6 +183,7 @@ IServerEngineTools *serverenginetools = NULL;
 ISceneFileCache *scenefilecache = NULL;
 IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;	// Xbox 360 only
+IScriptManager *scriptmanager = NULL;
 #if defined( REPLAY_ENABLED )
 IReplaySystem *g_pReplay = NULL;
 IServerReplayContext *g_pReplayServerContext = NULL;
@@ -306,23 +308,26 @@ CBasePlayer *UTIL_GetCommandClient( void )
 // Purpose: Retrieves the MOD directory for the active game (ie. "hl2")
 //-----------------------------------------------------------------------------
 
-bool UTIL_GetModDir( char *lpszTextOut, unsigned int nSize )
+bool UTIL_GetModDir( OUT_Z_CAP(nSize) char *lpszTextOut, intp nSize )
 {
 	// Must pass in a buffer at least large enough to hold the desired string
 	const char *pGameDir = CommandLine()->ParmValue( "-game", "hl2" );
-	Assert( strlen(pGameDir) <= nSize );
-	if ( strlen(pGameDir) > nSize )
+	const intp gameDirLen = V_strlen( pGameDir );
+
+	Assert( gameDirLen <= nSize );
+	if ( gameDirLen > nSize )
 		return false;
 
-	Q_strncpy( lpszTextOut, pGameDir, nSize );
-	if ( Q_strnchr( lpszTextOut, '/', nSize ) || Q_strnchr( lpszTextOut, '\\', nSize ) )
+	V_strncpy( lpszTextOut, pGameDir, nSize );
+	if ( V_strnchr( lpszTextOut, '/', nSize ) || V_strnchr( lpszTextOut, '\\', nSize ) )
 	{
 		// Strip the last directory off (which will be our game dir)
 		V_StripLastDir( lpszTextOut, nSize );
 		
 		// Find the difference in string lengths and take that difference from the original string as the mod dir
-		intp dirlen = Q_strlen( lpszTextOut );
-		Q_strncpy( lpszTextOut, pGameDir + dirlen, Q_strlen( pGameDir ) - dirlen + 1 );
+		const intp dirlen = V_strlen( lpszTextOut );
+
+		V_strncpy( lpszTextOut, pGameDir + dirlen, gameDirLen - dirlen + 1 );
 	}
 
 	return true;
@@ -620,6 +625,12 @@ bool CServerGameDLL::DLLInit( CreateInterfaceFn appSystemFactory,
 		return false;
 	if ( (scenefilecache = (ISceneFileCache *)appSystemFactory( SCENE_FILE_CACHE_INTERFACE_VERSION, NULL )) == NULL )
 		return false;
+
+	if ( !CommandLine()->CheckParm( "-noscripting") )
+	{
+		if ( (scriptmanager = (IScriptManager *)appSystemFactory( VSCRIPT_INTERFACE_VERSION, NULL )) == NULL )
+			return false;
+	}
 
 	// If not running dedicated, grab the engine vgui interface
 	if ( !engine->IsDedicatedServer() )
@@ -2125,7 +2136,7 @@ void UpdateChapterRestrictions( const char *mapname )
 	
 	// Get our active mod directory name
 	char modDir[MAX_PATH];
-	if ( UTIL_GetModDir( modDir, sizeof(modDir) ) == false )
+	if ( UTIL_GetModDir( modDir ) == false )
 		return;
 
 	char chapterNumberPrefix[64];
@@ -2195,7 +2206,7 @@ void UpdateRichPresence ( void )
 
 	// Get our active mod directory name
 	char modDir[MAX_PATH];
-	if ( UTIL_GetModDir( modDir, sizeof(modDir) ) == false )
+	if ( UTIL_GetModDir( modDir ) == false )
 		return;
 
 	// Get presence data based on the game we're playing

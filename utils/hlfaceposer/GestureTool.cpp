@@ -445,7 +445,7 @@ void GestureTool::redraw()
 
 		OffsetRect( &rcText, 0, 12 );
 
-		int current, total;
+		intp current, total;
 
 		g_pChoreoView->GetUndoLevels( current, total );
 		if ( total > 0 )
@@ -454,7 +454,7 @@ void GestureTool::redraw()
 			OffsetRect( &rcUndo, 0, 2 );
 
 			drawHelper.DrawColoredText( "Small Fonts", 8, FW_NORMAL, RGB( 0, 100, 0 ), rcUndo,
-				"Undo:  %i/%i", current, total );
+				"Undo:  %zi/%zi", current, total );
 		}
 
 		rcText.left += 60;
@@ -548,7 +548,7 @@ void GestureTool::ShowContextMenu( mxEvent *event, bool include_track_menus )
 	// Construct main menu
 	mxPopupMenu *pop = new mxPopupMenu();
 
-	int current, total;
+	intp current, total;
 	g_pChoreoView->GetUndoLevels( current, total );
 	if ( total > 0 )
 	{
@@ -592,7 +592,7 @@ void GestureTool::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
 
-	for ( int i = 0; i < m_FocusRects.Size(); i++ )
+	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
 		RECT rc = m_FocusRects[ i ].m_rcFocus;
 
@@ -690,7 +690,7 @@ void GestureTool::OnMouseMove( mxEvent *event )
 	{
 		DrawFocusRect();
 
-		for ( int i = 0; i < m_FocusRects.Size(); i++ )
+		for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 		{
 			CFocusRect *f = &m_FocusRects[ i ];
 			f->m_rcFocus = f->m_rcOrig;
@@ -1079,8 +1079,8 @@ void GestureTool::CalcBounds( int movetype )
 					CChoreoEvent::AbsTagType tagtype = (CChoreoEvent::AbsTagType)t;
 
 					CEventAbsoluteTag *prevTag = NULL, *nextTag = NULL;
-					int c = e->GetNumAbsoluteTags( tagtype );
-					int i;
+					intp c = e->GetNumAbsoluteTags( tagtype );
+					intp i;
 					for ( i = 0; i < c; i++ )
 					{
 						CEventAbsoluteTag *t = e->GetAbsoluteTag( tagtype, i );
@@ -1620,8 +1620,8 @@ void GestureTool::OnRevert()
 
 	g_pChoreoView->PushUndo( "Revert Gesture Tags" );
 
-	int c = event->GetNumAbsoluteTags( CChoreoEvent::PLAYBACK );
-	for ( int i = 0; i < c; i++ )
+	intp c = event->GetNumAbsoluteTags( CChoreoEvent::PLAYBACK );
+	for ( intp i = 0; i < c; i++ )
 	{
 		CEventAbsoluteTag *original = event->GetAbsoluteTag( CChoreoEvent::ORIGINAL, i );
 		CEventAbsoluteTag *playback = event->GetAbsoluteTag( CChoreoEvent::PLAYBACK, i );
@@ -1684,8 +1684,8 @@ void GestureTool::DrawRelativeTags( CChoreoWidgetDrawHelper& drawHelper, RECT& r
 
 	// Loop through all events in scene
 
-	int c = scene->GetNumEvents();
-	int i;
+	intp c = scene->GetNumEvents();
+	intp i;
 	for ( i = 0; i < c; i++ )
 	{
 		CChoreoEvent *e = scene->GetEvent( i );

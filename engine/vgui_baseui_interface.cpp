@@ -73,19 +73,16 @@
 #include "vgui/ISurface.h"
 #include "vgui/IInput.h"
 #include "vgui/IInputInternal.h"
-#include "vgui/Cursor.h"
 
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/MenuButton.h"
 #include "vgui_controls/Menu.h"
 #include "vgui_controls/PHandle.h"
 #include "vgui_controls/Panel.h"
-#include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/AnimationController.h"
 
 #include "IVguiModule.h"
 #include "vgui_baseui_interface.h"
-#include "vgui_DebugSystemPanel.h"
 #include "toolframework/itoolframework.h"
 #include "filesystem/IQueuedLoader.h"
 
@@ -118,7 +115,6 @@ IGameConsole *staticGameConsole = NULL;
 bool s_bWindowsInputEnabled = true;
 
 ConVar r_drawvgui( "r_drawvgui", "1", FCVAR_CHEAT, "Enable the rendering of vgui panels", true, 0, true, 1 );
-ConVar gameui_xbox( "gameui_xbox", "0", 0 );
 
 void Con_CreateConsolePanel( vgui::Panel *parent );
 void CL_CreateEntityReportPanel( vgui::Panel *parent );

@@ -9,10 +9,6 @@
 #ifndef VECTOR4D_H
 #define VECTOR4D_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <DirectXMath.h>
 
 #include <cmath>
@@ -22,8 +18,8 @@
 #include "tier0/dbg.h"
 #include "tier0/memalloc.h"  // CAlignedNewDelete<X>
 
-#include "mathlib/vector.h"
-#include "mathlib/math_pfns.h"
+#include "vector.h"
+#include "math_pfns.h"
 
 // forward declarations
 class Vector;
@@ -112,6 +108,11 @@ public:
 
 	// negate the Vector4D components
 	void	Negate();
+	[[nodiscard]] Vector4D XM_CALLCONV operator-() const
+	{
+		Assert( IsValid() );
+		return { -x, -y, -z, -w };
+	}
 
 	// Get the Vector4D's magnitude.
 	[[nodiscard]] vec_t XM_CALLCONV Length() const;
@@ -180,7 +181,7 @@ public:
 	// dimhotepus: Unsafe cast. Use XmBase.
 	inline DirectX::XMVECTOR& XM_CALLCONV AsM128() = delete; // { return *(DirectX::XMVECTOR*)&x; }
 	// dimhotepus: Unsafe cast. Use XmBase.
-	inline const DirectX::XMVECTOR& XM_CALLCONV AsM128() const = delete; // { return *(const DirectX::XMVECTOR*)&x; }
+	[[nodiscard]] inline const DirectX::XMVECTOR& XM_CALLCONV AsM128() const = delete; // { return *(const DirectX::XMVECTOR*)&x; }
 
 	// dimhotepus: Better DirectX math integration.
 	[[nodiscard]] DirectX::XMFLOAT4A* XM_CALLCONV XmBase()
@@ -195,8 +196,7 @@ public:
 		static_assert(alignof(DirectX::XMFLOAT4A) == alignof(Vector4DAligned));
 		return reinterpret_cast<DirectX::XMFLOAT4A const*>(this);
 	}
-
-private:
+	
 	// No copy constructors allowed if we're in optimal mode
 	Vector4DAligned( Vector4DAligned const& vOther ) = delete;
 
@@ -226,7 +226,7 @@ void XM_CALLCONV Vector4DMA( Vector4D const& start, float s, Vector4D const& dir
 #define Vector4DExpand( v ) (v).x, (v).y, (v).z, (v).w
 
 // Normalization
-[[nodiscard]] vec_t XM_CALLCONV Vector4DNormalize(Vector4D& v);
+vec_t XM_CALLCONV Vector4DNormalize(Vector4D& v);
 
 // Length
 [[nodiscard]] vec_t XM_CALLCONV Vector4DLength(Vector4D const& v);
@@ -707,7 +707,7 @@ inline vec_t Vector4D::Length() const
 //-----------------------------------------------------------------------------
 // Normalization
 //-----------------------------------------------------------------------------
-[[nodiscard]] inline vec_t XM_CALLCONV Vector4DNormalize( Vector4D& v )
+inline vec_t XM_CALLCONV Vector4DNormalize( Vector4D& v )
 {
 	Assert( v.IsValid() );
 	

@@ -2,9 +2,15 @@
 // $Id$
 
 #include "raytrace.h"
-#include <filesystem_tools.h>
-#include <cmdlib.h>
+#include "filesystem_tools.h"
+#include "cmdlib.h"
+
 #include <cstdio>
+#include <memory>
+
+// NOTE: This has to be the last file included!
+#include "tier0/memdbgon.h"
+
 
 static bool SameSign(float a, float b)
 {
@@ -663,21 +669,18 @@ void RayTracingEnvironment::CalculateTriangleListBounds(int32 const *tris,intp n
 
 
 float RayTracingEnvironment::CalculateCostsOfSplit(
-	int split_plane,int32 const *tri_list,int ntris,
-	Vector MinBound,Vector MaxBound, float &split_value,
+	int split_plane, int32 const *tri_list, int ntris,
+	Vector MinBound, Vector MaxBound, float &split_value,
 	int &nleft, int &nright, int &nboth)
 {
 	// determine the costs of splitting on a given axis, and label triangles with respect to
 	// that axis by storing the value in coordselect0. It will also return the number of
 	// tris in the left, right, and nboth groups, in order to facilitate memory
-	nleft=nboth=nright=0;
+	nleft=nright=nboth=0;
 	
 	// now, label each triangle. Since we have not converted the triangles into
 	// intersection fromat yet, we can use the CoordSelect0 field of each as a temp.
-	nleft=0;
-	nright=0;
-	nboth=0;
-	float min_coord=1.0e23f,max_coord=-1.0e23f;
+	float min_coord=FLT_MAX,max_coord=FLT_MIN;
 
 	for(int t=0;t<ntris;t++)
 	{
@@ -685,8 +688,11 @@ float RayTracingEnvironment::CalculateCostsOfSplit(
 		// determine max and min coordinate values for later optimization
 		for(int v=0;v<3;v++)
 		{
-			min_coord = min( min_coord, tri.Vertex(v)[split_plane] );
-			max_coord = max( max_coord, tri.Vertex(v)[split_plane] );
+			const float vertex = tri.Vertex(v)[split_plane];
+			if ( min_coord > vertex )
+				min_coord = vertex;
+			if ( max_coord < vertex )
+				max_coord = vertex;
 		}
 		switch(tri.ClassifyAgainstAxisSplit(split_plane,split_value))
 		{
@@ -713,14 +719,12 @@ float RayTracingEnvironment::CalculateCostsOfSplit(
 		split_value=min_coord;
 
 	// now, perform surface area/cost check to determine whether this split was worth it
-	Vector LeftMins=MinBound;
 	Vector LeftMaxes=MaxBound;
 	Vector RightMins=MinBound;
-	Vector RightMaxes=MaxBound;
 	LeftMaxes[split_plane]=split_value;
 	RightMins[split_plane]=split_value;
-	float SA_L=BoxSurfaceArea(LeftMins,LeftMaxes);
-	float SA_R=BoxSurfaceArea(RightMins,RightMaxes);
+	float SA_L=BoxSurfaceArea(MinBound,LeftMaxes);
+	float SA_R=BoxSurfaceArea(RightMins,MaxBound);
 	float ISA=1.0f/BoxSurfaceArea(MinBound,MaxBound);
 	float cost_of_split=COST_OF_TRAVERSAL+COST_OF_INTERSECTION*(nboth+
 		(SA_L*ISA*(nleft))+(SA_R*ISA*(nright)));
@@ -825,7 +829,7 @@ void RayTracingEnvironment::RefineNode(intp node_number,int32 const *tri_list,in
 // 			   0.5*(MinBound[split_plane]+MaxBound[split_plane]),ntris,tri_skip);
 		// its worth splitting!
 		// we will achieve the splitting without sorting by using a selection algorithm.
-		int32 *new_triangle_list=new int32[ntris];
+		std::unique_ptr<int32[]> new_triangle_list = std::make_unique<int32[]>(ntris);
 
 		// now, perform surface area/cost check to determine whether this split was worth it
 		Vector LeftMins=MinBound;
@@ -882,31 +886,29 @@ void RayTracingEnvironment::RefineNode(intp node_number,int32 const *tri_list,in
 		if ( (ntris<20) && ((best_nleft==0) || (best_nright==0)) )
 			depth+=100;
 
-		RefineNode(left_child,new_triangle_list,best_nleft+best_nboth,LeftMins,LeftMaxes,depth+1);
-		RefineNode(right_child,new_triangle_list+best_nleft,best_nright+best_nboth,
+		RefineNode(left_child,new_triangle_list.get(),best_nleft+best_nboth,LeftMins,LeftMaxes,depth+1);
+		RefineNode(right_child,new_triangle_list.get()+best_nleft,best_nright+best_nboth,
 				   RightMins,RightMaxes,depth+1);
-
-		delete[] new_triangle_list;
 	}
 }
 
 
-void RayTracingEnvironment::SetupAccelerationStructure(void)
+void RayTracingEnvironment::SetupAccelerationStructure()
 {
-	CacheOptimizedKDNode root;
+	CacheOptimizedKDNode root{};
 	OptimizedKDTree.AddToTail(root);
 
 	const intp trianglesCount = OptimizedTriangleList.Count();
 
-	int32 *root_triangle_list = new int32[trianglesCount];
-	for(intp t = 0; t < trianglesCount; t++)
-		root_triangle_list[t] = t;
+	{
+		std::unique_ptr<int32[]> root_triangle_list = std::make_unique<int32[]>(trianglesCount);
+		for(intp t = 0; t < trianglesCount; t++)
+			root_triangle_list[t] = t;
 
-	CalculateTriangleListBounds(root_triangle_list,trianglesCount,m_MinBound,
-								m_MaxBound);
-	RefineNode(0,root_triangle_list,trianglesCount,m_MinBound,m_MaxBound,0);
-
-	delete[] root_triangle_list;
+		CalculateTriangleListBounds(root_triangle_list.get(),trianglesCount,m_MinBound,
+									m_MaxBound);
+		RefineNode(0,root_triangle_list.get(),trianglesCount,m_MinBound,m_MaxBound,0);
+	}
 
 	// now, convert all triangles to "intersection format"
 	for(intp i = 0; i < OptimizedTriangleList.Count(); i++)

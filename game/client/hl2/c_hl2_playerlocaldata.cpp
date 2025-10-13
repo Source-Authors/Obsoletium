@@ -39,10 +39,15 @@ C_HL2PlayerLocalData::C_HL2PlayerLocalData()
 {
 	m_flSuitPower = 0.0;
 	m_bZooming = false;
+	m_bitsActiveDevices = false;
 	m_iSquadMemberCount = 0;
 	m_iSquadMedicCount = 0;
 	m_fSquadInFollowMode = false;
 	m_bWeaponLowered = false;
+	m_vecAutoAimPoint = vec3_origin;
+	m_bDisplayReticle = false;
+	m_bStickyAutoAim = false;
+	m_bAutoAimTarget = false;
 	m_hLadder = NULL;
 #ifdef HL2_EPISODIC
 	m_flFlashBattery = 0.0f;

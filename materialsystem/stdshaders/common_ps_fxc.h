@@ -37,10 +37,6 @@
 
 // System defined pixel shader constants
 
-#if defined( _X360 )
-const bool g_bHighQualityShadows : register( b0 );
-#endif
-
 // NOTE: w == 1.0f / (Dest alpha compressed depth range).
 const float4 g_LinearFogColor : register( c29 );
 #define OO_DESTALPHA_DEPTH_RANGE (g_LinearFogColor.w)
@@ -68,6 +64,8 @@ const float4 cLightScale : register( c30 );
 #define PIXEL_FOG_TYPE_NONE -1 //MATERIAL_FOG_NONE is handled by PIXEL_FOG_TYPE_RANGE, this is for explicitly disabling fog in the shader
 #define PIXEL_FOG_TYPE_RANGE 0 //range+none packed together in ps2b. Simply none in ps20 (instruction limits)
 #define PIXEL_FOG_TYPE_HEIGHT 1
+// dimhotepus: TF2 backport.
+#define PIXEL_FOG_TYPE_RANGE_RADIAL 2
 
 // If you change these, make the corresponding change in hardwareconfig.cpp
 #define NVIDIA_PCF_POISSON	0
@@ -84,58 +82,58 @@ struct LPREVIEW_PS_OUT
 
 /*
 // unused
-HALF Luminance( HALF3 color )
+float Luminance( float3 color )
 {
-	return dot( color, HALF3( HALF_CONSTANT(0.30f), HALF_CONSTANT(0.59f), HALF_CONSTANT(0.11f) ) );
+	return dot( color, float3( 0.30f, 0.59f, 0.11f ) );
 }
 */
 
 /*
 // unused
-HALF LuminanceScaled( HALF3 color )
+float LuminanceScaled( float3 color )
 {
-	return dot( color, HALF3( HALF_CONSTANT(0.30f) / MAX_HDR_OVERBRIGHT, HALF_CONSTANT(0.59f) / MAX_HDR_OVERBRIGHT, HALF_CONSTANT(0.11f) / MAX_HDR_OVERBRIGHT ) );
+	return dot( color, float3( 0.30f / MAX_HDR_OVERBRIGHT, 0.59f / MAX_HDR_OVERBRIGHT, 0.11f / MAX_HDR_OVERBRIGHT ) );
 }
 */
 
 /*
 // unused
-HALF AvgColor( HALF3 color )
+float AvgColor( float3 color )
 {
-	return dot( color, HALF3( HALF_CONSTANT(0.33333f), HALF_CONSTANT(0.33333f), HALF_CONSTANT(0.33333f) ) );
+	return dot( color, float3( 0.33333f, 0.33333f, 0.33333f ) );
 }
 */
 
 /*
 // unused
-HALF4 DiffuseBump( sampler lightmapSampler,
+float4 DiffuseBump( sampler lightmapSampler,
                    float2  lightmapTexCoord1,
                    float2  lightmapTexCoord2,
                    float2  lightmapTexCoord3,
-                   HALF3   normal )
+                   float3   normal )
 {
-	HALF3 lightmapColor1 = tex2D( lightmapSampler, lightmapTexCoord1 );
-	HALF3 lightmapColor2 = tex2D( lightmapSampler, lightmapTexCoord2 );
-	HALF3 lightmapColor3 = tex2D( lightmapSampler, lightmapTexCoord3 );
+	float3 lightmapColor1 = tex2D( lightmapSampler, lightmapTexCoord1 );
+	float3 lightmapColor2 = tex2D( lightmapSampler, lightmapTexCoord2 );
+	float3 lightmapColor3 = tex2D( lightmapSampler, lightmapTexCoord3 );
 
-	HALF3 diffuseLighting;
+	float3 diffuseLighting;
 	diffuseLighting = saturate( dot( normal, bumpBasis[0] ) ) * lightmapColor1 +
 					  saturate( dot( normal, bumpBasis[1] ) ) * lightmapColor2 +
 					  saturate( dot( normal, bumpBasis[2] ) ) * lightmapColor3;
 
-	return HALF4( diffuseLighting, LuminanceScaled( diffuseLighting ) );
+	return float4( diffuseLighting, LuminanceScaled( diffuseLighting ) );
 }
 */
 
 
 /*
 // unused
-HALF Fresnel( HALF3 normal,
-              HALF3 eye,
-              HALF2 scaleBias )
+float Fresnel( float3 normal,
+              float3 eye,
+              float2 scaleBias )
 {
-	HALF fresnel = HALF_CONSTANT(1.0f) - dot( normal, eye );
-	fresnel = pow( fresnel, HALF_CONSTANT(5.0f) );
+	float fresnel = 1.0f - dot( normal, eye );
+	fresnel = pow( fresnel, 5.0f );
 
 	return fresnel * scaleBias.x + scaleBias.y;
 }
@@ -143,11 +141,11 @@ HALF Fresnel( HALF3 normal,
 
 /*
 // unused
-HALF4 GetNormal( sampler normalSampler,
+float4 GetNormal( sampler normalSampler,
                  float2 normalTexCoord )
 {
-	HALF4 normal = tex2D( normalSampler, normalTexCoord );
-	normal.rgb = HALF_CONSTANT(2.0f) * normal.rgb - HALF_CONSTANT(1.0f);
+	float4 normal = tex2D( normalSampler, normalTexCoord );
+	normal.rgb = 2.0f * normal.rgb - 1.0f;
 
 	return normal;
 }
@@ -189,22 +187,24 @@ float4 DecompressNormal( sampler NormalSampler, float2 tc, int nDecompressionMod
 }
 
 
-HALF3 NormalizeWithCubemap( sampler normalizeSampler, HALF3 input )
+float3 NormalizeWithCubemap( sampler normalizeSampler, float3 input )
 {
 //	return texCUBE( normalizeSampler, input ) * 2.0f - 1.0f;
-	return texCUBE( normalizeSampler, input );
+	// dimhotepus: Fix float4 -> float3 truncation warning.
+	float4 res = texCUBE( normalizeSampler, input );
+	return res.xyz;
 }
 
 /*
-HALF4 EnvReflect( sampler envmapSampler,
+float4 EnvReflect( sampler envmapSampler,
 				 sampler normalizeSampler,
-				 HALF3 normal,
+				 float3 normal,
 				 float3 eye,
-				 HALF2 fresnelScaleBias )
+				 float2 fresnelScaleBias )
 {
-	HALF3 normEye = NormalizeWithCubemap( normalizeSampler, eye );
-	HALF fresnel = Fresnel( normal, normEye, fresnelScaleBias );
-	HALF3 reflect = CalcReflectionVectorUnnormalized( normal, eye );
+	float3 normEye = NormalizeWithCubemap( normalizeSampler, eye );
+	float fresnel = Fresnel( normal, normEye, fresnelScaleBias );
+	float3 reflect = CalcReflectionVectorUnnormalized( normal, eye );
 	return texCUBE( envmapSampler, reflect );
 }
 */
@@ -237,23 +237,43 @@ float CalcRangeFog( const float flProjPosZ, const float flFogStartOverRange, con
 #endif
 }
 
-float CalcPixelFogFactor( int iPIXELFOGTYPE, const float4 fogParams, const float flEyePosZ, const float flWorldPosZ, const float flProjPosZ )
+float CalcPixelFogFactor( int iPIXELFOGTYPE, const float4 fogParams, const float3 vEyePos, const float3 vWorldPos, const float flProjPosZ )
 {
 	float retVal;
 	if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_NONE )
 	{
 		retVal = 0.0f;
 	}
-	if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE ) //range fog, or no fog depending on fog parameters
+	else if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE ) //range fog, or no fog depending on fog parameters
 	{
 		retVal = CalcRangeFog( flProjPosZ, fogParams.x, fogParams.z, fogParams.w );
 	}
+	// dimhotepus: TF2 backport.
+	else if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE_RADIAL )
+	{
+		float flFogMaxDensity = fogParams.z;
+		float flFogEndOverRange = fogParams.x;
+		float flFogOORange = fogParams.w;
+
+		retVal = CalcRadialFog_NonFixedFunction( vWorldPos, vEyePos, flFogMaxDensity, flFogEndOverRange, flFogOORange );
+	}
 	else if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_HEIGHT ) //height fog
 	{
-		retVal = CalcWaterFogAlpha( fogParams.y, flEyePosZ, flWorldPosZ, flProjPosZ, fogParams.w );
+		retVal = CalcWaterFogAlpha( fogParams.y, vEyePos.z, vWorldPos.z, flProjPosZ, fogParams.w );
 	}
 
 	return retVal;
+}
+
+// dimhotepus: TF2 backport.
+// Legacy support overload, without range fog support.
+float CalcPixelFogFactor( int iPIXELFOGTYPE, const float4 fogParams, const float flEyePosZ, const float flWorldPosZ, const float flProjPosZ )
+{
+	// Old HLSL hack support... Can't just set here.
+	if ( iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE_RADIAL )
+		return CalcPixelFogFactor( PIXEL_FOG_TYPE_RANGE, fogParams, float3( 0, 0, flEyePosZ ), float3( 0, 0, flWorldPosZ ), flProjPosZ );
+
+	return CalcPixelFogFactor( iPIXELFOGTYPE, fogParams, float3( 0, 0, flEyePosZ ), float3( 0, 0, flWorldPosZ ), flProjPosZ );
 }
 
 //g_FogParams not defined by default, but this is the same layout for every shader that does define it
@@ -264,7 +284,8 @@ float CalcPixelFogFactor( int iPIXELFOGTYPE, const float4 fogParams, const float
 
 float3 BlendPixelFog( const float3 vShaderColor, float pixelFogFactor, const float3 vFogColor, const int iPIXELFOGTYPE )
 {
-	if( iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE ) //either range fog or no fog depending on fog parameters and whether this is ps20 or ps2b
+	// dimhotepus: TF2 backport.
+	if( iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE || iPIXELFOGTYPE == PIXEL_FOG_TYPE_RANGE_RADIAL ) //either range fog or no fog depending on fog parameters and whether this is ps20 or ps2b
 	{
 #	if !(defined(SHADER_MODEL_PS_1_1) || defined(SHADER_MODEL_PS_1_4) || defined(SHADER_MODEL_PS_2_0)) //Minimum requirement of ps2b
 		pixelFogFactor = saturate( pixelFogFactor );
@@ -756,29 +777,6 @@ float DepthFeathering( sampler DepthSampler, const float2 vScreenPos, float fPro
 #define flSceneDepth flDepths.x
 #define flSpriteDepth flDepths.y
 
-#		if ( defined( _X360 ) )
-		{
-			//Get depth from the depth texture. Need to sample with the offset of (0.5, 0.5) to fix rounding errors
-			asm {
-				tfetch2D flDepths.x___, vScreenPos, DepthSampler, OffsetX=0.5, OffsetY=0.5, MinFilter=point, MagFilter=point, MipFilter=point
-			};
-
-#			if(	!defined( REVERSE_DEPTH_ON_X360 ) )
-				flSceneDepth = 1.0f - flSceneDepth;
-#			endif
-
-			//get the sprite depth into the same range as the texture depth
-			flSpriteDepth = fProjZ / fProjW;
-
-			//unproject to get at the pre-projection z. This value is much more linear than depth
-			flDepths = vDepthBlendConstants.z / flDepths;
-			flDepths = vDepthBlendConstants.y - flDepths;
-
-			flFeatheredAlpha = flSceneDepth - flSpriteDepth;
-			flFeatheredAlpha *= vDepthBlendConstants.x;
-			flFeatheredAlpha = saturate( flFeatheredAlpha );
-		}
-#		else
 		{
 			flSceneDepth = tex2D( DepthSampler, vScreenPos ).a;	// PC uses dest alpha of the frame buffer
 			flSpriteDepth = SoftParticleDepth( fProjZ );
@@ -787,7 +785,6 @@ float DepthFeathering( sampler DepthSampler, const float2 vScreenPos, float fPro
 			flFeatheredAlpha = max( smoothstep( 0.75f, 1.0f, flSceneDepth ), flFeatheredAlpha ); //as the sprite approaches the edge of our compressed depth space, the math stops working. So as the sprite approaches the far depth, smoothly remove feathering.
 			flFeatheredAlpha = saturate( flFeatheredAlpha );
 		}
-#		endif
 
 #undef flSceneDepth
 #undef flSpriteDepth

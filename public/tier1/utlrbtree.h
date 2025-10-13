@@ -9,10 +9,10 @@
 #ifndef UTLRBTREE_H
 #define UTLRBTREE_H
 
-#include "tier1/utlmemory.h"
-#include "tier1/utlfixedmemory.h"
-#include "tier1/utlblockmemory.h"
-#include "tier1/strtools.h"
+#include "utlmemory.h"
+#include "utlfixedmemory.h"
+#include "utlblockmemory.h"
+#include "strtools.h"
 
 //-----------------------------------------------------------------------------
 // Tool to generate a default compare function for any type that implements
@@ -133,13 +133,13 @@ class CUtlRBTree
 {
 public:
 
-	typedef T KeyType_t;
-	typedef T ElemType_t;
-	typedef I IndexType_t;
+	using KeyType_t = T;
+	using ElemType_t = T;
+	using IndexType_t = I;
 
 	// Less func typedef
 	// Returns true if the first parameter is "less" than the second
-	typedef L LessFunc_t;
+	using LessFunc_t = L;
 
 	// constructor, destructor
 	// Left at growSize = 0, the memory will first allocate 1 element and double in size
@@ -188,14 +188,14 @@ public:
 	bool  IsValidIndex( I i ) const;
 
 	// Checks if the tree as a whole is valid
-	bool  IsValid() const;
+	[[nodiscard]] bool  IsValid() const;
 
 	// Invalid index
 	static constexpr I InvalidIndex();
 
 	// returns the tree depth (not a very fast operation)
 	intp   Depth( I node ) const;
-	intp   Depth() const;
+	[[nodiscard]] intp   Depth() const;
 
 	// Sets the less func
 	void SetLessFunc( const LessFunc_t &func );
@@ -205,8 +205,10 @@ public:
 
 	// Insert method (inserts in order)
 	I  Insert( T const &insert );
+	I  Insert( T&& insert );
 	void Insert( const T *pArray, intp nItems );
 	I  InsertIfNotFound( T const &insert );
+	I  InsertIfNotFound( T&& insert );
 
 	// Find method
 	I  Find( T const &search ) const;
@@ -242,8 +244,10 @@ public:
 
 	// swap in place
 	void Swap( CUtlRBTree< T, I, L > &that );
+	
+	// copy constructors not allowed
+	CUtlRBTree( CUtlRBTree<T, I, L, M> const &tree ) = delete;
 
-private:
 	// Can't copy the tree this way!
 	CUtlRBTree<T, I, L, M>& operator=( const CUtlRBTree<T, I, L, M> &other ) = delete;
 
@@ -254,8 +258,8 @@ protected:
 		BLACK
 	};
 
-	typedef UtlRBTreeNode_t< T, I > Node_t;
-	typedef UtlRBTreeLinks_t< I > Links_t;
+	using Node_t = UtlRBTreeNode_t<T, I>;
+	using Links_t = UtlRBTreeLinks_t<I>;
 
 	// Sets the children
 	void  SetParent( I i, I parent );
@@ -284,9 +288,6 @@ protected:
 	// Insertion, removal
 	I  InsertAt( I parent, bool leftchild );
 
-	// copy constructors not allowed
-	CUtlRBTree( CUtlRBTree<T, I, L, M> const &tree ) = delete;
-
 	// Inserts a node into the tree, doesn't copy the data in.
 	void FindInsertionPosition( T const &insert, I &parent, bool &leftchild );
 
@@ -305,7 +306,7 @@ protected:
 
 	Node_t* m_pElements;
 
-	FORCEINLINE M const &Elements( void ) const
+	FORCEINLINE M const &Elements( ) const
 	{
 		return m_Elements;
 	}
@@ -323,14 +324,14 @@ class CUtlFixedRBTree : public CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNo
 {
 public:
 
-	typedef L LessFunc_t;
+	using LessFunc_t = L;
 
 	CUtlFixedRBTree( intp growSize = 0, intp initSize = 0, const LessFunc_t &lessfunc = 0 )
 		: CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > >( growSize, initSize, lessfunc ) {}
 	CUtlFixedRBTree( const LessFunc_t &lessfunc )
 		: CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > >( lessfunc ) {}
 
-	typedef CUtlRBTree< T, I, L, CUtlFixedMemory< UtlRBTreeNode_t< T, I > > > BaseClass;
+	using BaseClass = CUtlRBTree<T, I, L, CUtlFixedMemory<UtlRBTreeNode_t<T, I>>>;
 	bool IsValidIndex( I i ) const
 	{
 		if ( !BaseClass::Elements().IsIdxValid( i ) )
@@ -346,13 +347,12 @@ public:
 
 		return LeftChild(i) != i; 
 	}
+	
+	// this doesn't make sense for fixed rbtrees, since there's no useful max pointer, and the index space isn't contiguous anyways
+	I  MaxElement() const = delete;
 
 protected:
 	void ResetDbgInfo() {}
-
-private:
-	// this doesn't make sense for fixed rbtrees, since there's no useful max pointer, and the index space isn't contiguous anyways
-	I  MaxElement() const = delete;
 };
 
 template < class T, class I = unsigned short, typename L = bool (*)( const T &, const T & )  >
@@ -691,7 +691,7 @@ I  CUtlRBTree<T, I, L, M>::NewNode()
 	node.m_Left = node.m_Right = node.m_Parent = InvalidIndex();
 #endif
 
-	Construct( &Element( elem ) );
+	Construct( std::addressof( Element( elem ) ) );
 	ResetDbgInfo();
 
 	return elem;
@@ -701,7 +701,7 @@ template < class T, class I, typename L, class M >
 void  CUtlRBTree<T, I, L, M>::FreeNode( I i )
 {
 	Assert( IsValidIndex(i) && (i != InvalidIndex()) );
-	Destruct( &Element(i) );
+	Destruct( std::addressof( Element(i) ) );
 	SetLeftChild( i, i ); // indicates it's in not in the tree
 	SetRightChild( i, m_FirstFree );
 	m_FirstFree = i;
@@ -1123,7 +1123,7 @@ void CUtlRBTree<T, I, L, M>::RemoveAll()
 		I i = m_Elements.GetIndex( it );
 		if ( IsValidIndex( i ) ) // skip elements in the free list
 		{
-			Destruct( &Element( i ) );
+			Destruct( std::addressof( Element( i ) ) );
 			SetRightChild( i, m_FirstFree );
 			SetLeftChild( i, i );
 			m_FirstFree = i;
@@ -1488,7 +1488,19 @@ I CUtlRBTree<T, I, L, M>::Insert( T const &insert )
 	bool leftchild;
 	FindInsertionPosition( insert, parent, leftchild );
 	I newNode = InsertAt( parent, leftchild );
-	CopyConstruct( &Element( newNode ), insert );
+	CopyConstruct( std::addressof( Element( newNode ) ), insert );
+	return newNode;
+}
+
+template < class T, class I, typename L, class M > 
+I CUtlRBTree<T, I, L, M>::Insert( T&& insert )
+{
+	// use copy constructor to copy it in
+	I parent;
+	bool leftchild;
+	FindInsertionPosition( insert, parent, leftchild );
+	I newNode = InsertAt( parent, leftchild );
+	MoveConstruct( std::addressof( Element( newNode ) ), std::move( insert ) );
 	return newNode;
 }
 
@@ -1530,7 +1542,39 @@ I CUtlRBTree<T, I, L, M>::InsertIfNotFound( T const &insert )
 	}
 
 	I newNode = InsertAt( parent, leftchild );
-	CopyConstruct( &Element( newNode ), insert );
+	CopyConstruct( std::addressof( Element( newNode ) ), insert );
+	return newNode;
+}
+
+
+template < class T, class I, typename L, class M > 
+I CUtlRBTree<T, I, L, M>::InsertIfNotFound( T&& insert )
+{
+	// use move constructor to move it in
+	I parent;
+	bool leftchild;
+
+	I current = m_Root;
+	parent = InvalidIndex();
+	leftchild = false;
+	while (current != InvalidIndex()) 
+	{
+		parent = current;
+		if (m_LessFunc( insert, Element(current) ))
+		{
+			leftchild = true; current = LeftChild(current);
+		}
+		else if (m_LessFunc( Element(current), insert ))
+		{
+			leftchild = false; current = RightChild(current);
+		}
+		else
+			// Match found, no insertion
+			return InvalidIndex();
+	}
+
+	I newNode = InsertAt( parent, leftchild );
+	MoveConstruct( std::addressof( Element( newNode ) ), std::move( insert ) );
 	return newNode;
 }
 

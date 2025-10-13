@@ -27,13 +27,9 @@ const char *COM_GetModDirectory(); // return the mod dir (rather than the comple
 
 struct MumbleSharedMemory_t
 {
-#ifdef WIN32
-	uint32	uiVersion;
-	ulong	uiTick;
-#else
+	// dimhotepus: Use uint32_t instead of ulong as latter is unportable to LP64
 	uint32_t uiVersion;
 	uint32_t uiTick;
-#endif
 	float	fAvatarPosition[3];
 	float	fAvatarFront[3];
 	float	fAvatarTop[3];

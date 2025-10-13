@@ -692,7 +692,7 @@ void CCurveData::Parse( ISceneTokenProcessor *tokenizer, ICurveDataAccessor *dat
 		if ( tokenizer->TokenAvailable() )
 		{
 			tokenizer->GetToken( false );
-			int curveType = Interpolator_CurveTypeForName( tokenizer->CurrentToken() );
+			unsigned short curveType = Interpolator_CurveTypeForName( tokenizer->CurrentToken() );
 			s->SetCurveType( curveType );
 		}
 
@@ -759,7 +759,7 @@ void CChoreoScene::ParseFlexAnimations( ISceneTokenProcessor *tokenizer, CChoreo
 	float endtime		= e->GetEndTime();
 	float starttime		= e->GetStartTime();
 	float event_time	= endtime - starttime;
-	int nDefaultCurveType = CURVE_DEFAULT;
+	unsigned short nDefaultCurveType = CURVE_DEFAULT;
 
 	// Is it the new file format?
 	if ( !Q_stricmp( tokenizer->CurrentToken(), "samples_use_time" ) )
@@ -903,7 +903,7 @@ void CChoreoScene::ParseFlexAnimations( ISceneTokenProcessor *tokenizer, CChoreo
 				if ( tokenizer->TokenAvailable() )
 				{
 					tokenizer->GetToken( false );
-					int curveType = Interpolator_CurveTypeForName( tokenizer->CurrentToken() );
+					unsigned short curveType = Interpolator_CurveTypeForName( tokenizer->CurrentToken() );
 					s->SetCurveType( curveType );
 				}
 				else

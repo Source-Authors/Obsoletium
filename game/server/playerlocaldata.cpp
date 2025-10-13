@@ -62,6 +62,7 @@ BEGIN_SEND_TABLE_NOBASE( CPlayerLocalData, DT_Local )
 	SendPropInt	(SENDINFO_STRUCTELEM(m_skybox3d.area),	8, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO_STRUCTELEM( m_skybox3d.fog.enable ), 1, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO_STRUCTELEM( m_skybox3d.fog.blend ), 1, SPROP_UNSIGNED ),
+	SendPropInt( SENDINFO_STRUCTELEM( m_skybox3d.fog.radial ), 1, SPROP_UNSIGNED ),
 	SendPropVector( SENDINFO_STRUCTELEM(m_skybox3d.fog.dirPrimary), -1, SPROP_COORD),
 	SendPropInt( SENDINFO_STRUCTELEM( m_skybox3d.fog.colorPrimary ), 32, SPROP_UNSIGNED ),
 	SendPropInt( SENDINFO_STRUCTELEM( m_skybox3d.fog.colorSecondary ), 32, SPROP_UNSIGNED ),
@@ -113,6 +114,7 @@ BEGIN_SIMPLE_DATADESC( fogparams_t )
 	DEFINE_FIELD( endLerpTo, FIELD_FLOAT ),
 	DEFINE_FIELD( lerptime, FIELD_TIME ),
 	DEFINE_FIELD( duration, FIELD_FLOAT ),
+	DEFINE_FIELD( radial, FIELD_BOOLEAN ),
 END_DATADESC()
 
 BEGIN_SIMPLE_DATADESC( sky3dparams_t )

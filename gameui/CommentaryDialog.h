@@ -15,7 +15,6 @@
 #include <vgui/KeyCode.h>
 
 class CGameChapterPanel;
-class CSkillSelectionDialog;
 
 //-----------------------------------------------------------------------------
 // Purpose: Handles selection of commentary mode on/off

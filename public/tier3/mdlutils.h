@@ -8,10 +8,6 @@
 #ifndef MDLUTILS_H
 #define MDLUTILS_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 #include "datacache/imdlcache.h"
 #include "mathlib/vector.h"
 #include "Color.h"
@@ -52,7 +48,7 @@ public:
 	void Draw( const matrix3x4_t& rootToWorld, const matrix3x4_t *pBoneToWorld );
 
 
-	void SetUpBones( const matrix3x4_t& shapeToWorld, int nMaxBoneCount, matrix3x4_t *pOutputMatrices, const float *pPoseParameters = NULL, MDLSquenceLayer_t *pSequenceLayers = NULL, int nNumSequenceLayers = 0 );
+	void SetUpBones( const matrix3x4_t& shapeToWorld, int nMaxBoneCount, matrix3x4_t *pOutputMatrices, const float *pPoseParameters = nullptr, MDLSquenceLayer_t *pSequenceLayers = nullptr, int nNumSequenceLayers = 0 );
 	void SetupBonesWithBoneMerge( const CStudioHdr *pMergeHdr, matrix3x4_t *pMergeBoneToWorld, 
 		const CStudioHdr *pFollow, const matrix3x4_t *pFollowBoneToWorld, const matrix3x4_t &matModelToWorld );
 	

@@ -29,7 +29,8 @@ class BoundBox
 		void UpdateBounds(const Vector& pt);
 		void UpdateBounds(const BoundBox *pBox);
 		void GetBoundsCenter(Vector& ptdest);
-		inline void GetBounds(Vector& Mins, Vector& Maxs);
+		// dimhotepus: Make const. CS:GO backport.
+		inline void GetBounds(Vector& Mins, Vector& Maxs) const;
 
 		virtual bool IsIntersectingBox(const Vector& pfMins, const Vector& pfMaxs) const;
 		bool IsInsideBox(const Vector& pfMins, const Vector& pfMaxs) const;
@@ -49,7 +50,7 @@ class BoundBox
 // Input  : Mins - Receives the box's minima.
 //			Maxs - Receives the box's maxima.
 //-----------------------------------------------------------------------------
-void BoundBox::GetBounds(Vector &Mins, Vector &Maxs)
+void BoundBox::GetBounds(Vector &Mins, Vector &Maxs) const
 {
 	Mins = bmins;
 	Maxs = bmaxs;

@@ -8,9 +8,9 @@
 sampler FBSampler	: register( s0 );
 sampler BloomSampler	: register( s1 );
 
-const HALF4 settings : register( c0 );
+const float4 settings : register( c0 );
 						// x=sharpness,y=woodcut,z=bloom_amt,w=alpha sharpen factor
-const HALF4 settings2 : register( c1 );						// x=bloom exp,y=vignette min scale z=vignette_power
+const float4 settings2 : register( c1 );						// x=bloom exp,y=vignette min scale z=vignette_power
 
 struct PS_INPUT
 {

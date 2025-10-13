@@ -12,13 +12,9 @@
 #ifndef ICONVAR_H
 #define ICONVAR_H
 
-#if _WIN32
-#pragma once
-#endif
-
 #include "tier0/dbg.h"
 #include "tier0/platform.h"
-#include "tier1/strtools.h"
+#include "strtools.h"
 
 
 //-----------------------------------------------------------------------------
@@ -90,7 +86,7 @@ class CCommand;
 // Called when a ConVar changes value
 // NOTE: For FCVAR_NEVER_AS_STRING ConVars, pOldValue == NULL
 //-----------------------------------------------------------------------------
-typedef void ( *FnChangeCallback_t )( IConVar *var, const char *pOldValue, float flOldValue );
+using FnChangeCallback_t = void (*)(IConVar *, const char *, float);
 
 
 //-----------------------------------------------------------------------------
@@ -105,7 +101,7 @@ public:
 	virtual void SetValue( int nValue ) = 0;
 
 	// Return name of command
-	[[nodiscard]] virtual const char *GetName( void ) const = 0;
+	[[nodiscard]] virtual const char *GetName( ) const = 0;
 
 	// Accessors.. not as efficient as using GetState()/GetInfo()
 	// if you call these methods multiple times on the same IConVar

@@ -25,11 +25,11 @@ class CReplayPerformance
 public:
 	CReplayPerformance( CReplay *pReplay );
 
-	inline bool HasInTick() const { return m_nTickIn >= 0; }
-	inline bool HasOutTick() const { return m_nTickOut >= 0; }
+	[[nodiscard]] inline bool HasInTick() const { return m_nTickIn >= 0; }
+	[[nodiscard]] inline bool HasOutTick() const { return m_nTickOut >= 0; }
 
-	inline int	GetTickIn() const { return m_nTickIn; }
-	inline int	GetTickOut() const { return m_nTickOut; }
+	[[nodiscard]] inline int	GetTickIn() const { return m_nTickIn; }
+	[[nodiscard]] inline int	GetTickOut() const { return m_nTickOut; }
 
 	void		Copy( const CReplayPerformance *pSrc );
 	void		CopyTicks( const CReplayPerformance *pSrc );
@@ -41,7 +41,7 @@ public:
 	void		SetTitle( const wchar_t *pTitle );
 	
 	// NOTE: Doesn't copy exactly - gets a valid filename for the returned performance.
-	CReplayPerformance *MakeCopy() const;
+	[[nodiscard]] CReplayPerformance *MakeCopy() const;
 
 	void		Read( KeyValues *pIn );
 	void		Write( KeyValues *pOut );

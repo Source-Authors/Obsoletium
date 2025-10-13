@@ -24,9 +24,10 @@ using com_interface_concept =
 /**
  * @brief COM smart pointer with automatic IID deducing from TInterface.
  */
-template <typename TInterface, const IID *TIid = &__uuidof(TInterface),
-          typename = com_interface_concept<TInterface>>
-class com_ptr : public _com_ptr_t<_com_IIID<TInterface, TIid>> {};
+template <typename TInterface, const IID *TIid = &__uuidof(TInterface)>
+class com_ptr : public _com_ptr_t<_com_IIID<TInterface, TIid>> {
+  using interface_concept = com_interface_concept<TInterface>;
+};
 
 }  // namespace se::win::com
 

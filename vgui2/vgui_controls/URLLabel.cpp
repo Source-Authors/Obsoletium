@@ -49,7 +49,7 @@ URLLabel::URLLabel(Panel *parent, const char *panelName, const wchar_t *wszText,
     m_pszURL = NULL;
 	m_bUnderline = false;
     m_iURLSize = 0;
-    if (pszURL && pszURL[0])
+    if ( !Q_isempty( pszURL ) )
     {
         SetURL(pszURL);
     }
@@ -63,11 +63,33 @@ URLLabel::~URLLabel()
 	delete [] m_pszURL;
 }
 
+// dimhotepus: TF2 backport.
+//-----------------------------------------------------------------------------
+// Purpose: checks the URL
+//-----------------------------------------------------------------------------
+bool URLLabel::IsValidURL( const char *pszURL ) const
+{
+	if ( Q_isempty( pszURL ) )
+		return false;
+
+	if ( ( Q_strncmp( pszURL, "http://", 7 ) != 0 ) && ( Q_strncmp( pszURL, "https://", 8 ) != 0 ) )
+		return false;
+
+	return true;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: sets the URL
 //-----------------------------------------------------------------------------
 void URLLabel::SetURL(const char *pszURL)
 {
+	// dimhotepus: TF2 backport.
+	if ( !IsValidURL( pszURL ) )
+	{
+		Warning( "Invalid URL in URLLabel '%s'\n", pszURL );
+		return;
+	}
+
 	intp iNewURLSize = V_strlen(pszURL);
 	if (iNewURLSize > m_iURLSize || !m_pszURL)
 	{
@@ -89,9 +111,18 @@ void URLLabel::OnMousePressed(MouseCode code)
 {
     if (code == MOUSE_LEFT)
     {
-        if (m_pszURL)
+		if (m_pszURL)
 		{
-	        system()->ShellExecute("open", m_pszURL);
+			// dimhotepus: TF2 backport.
+			// URL should have already been validated in SetURL()
+			if ( !IsValidURL( m_pszURL ) )
+			{
+				Warning( "Invalid URL '%s'\n", m_pszURL );
+			}
+			else
+			{
+				system()->ShellExecute( "open", m_pszURL );
+			}
 		}
     }
 }

@@ -99,10 +99,14 @@ void __MsgFunc_RequestState(bf_read &msg)
 
 CVoiceStatus::CVoiceStatus()
 {
+	m_pHelper = nullptr;
+
 	m_nControlSize = 0;
 	m_bBanMgrInitialized = false;
 	m_LastUpdateServerState = 0;
+	m_pParentPanel = std::numeric_limits<vgui::VPANEL>::max();
 
+	m_bInSquelchMode = false;
 	m_bTalking = m_bServerAcked = false;
 
 #ifdef VOICE_VOX_ENABLE
@@ -124,7 +128,7 @@ CVoiceStatus::~CVoiceStatus()
 		m_pHeadLabelMaterial->DecrementReferenceCount();
 	}
 
-	g_pInternalVoiceStatus = NULL;			
+	g_pInternalVoiceStatus = NULL;
 
 	const char *pGameDir = engine->GetGameDirectory();
 	if( pGameDir )
@@ -163,6 +167,37 @@ int CVoiceStatus::Init(
 	HOOK_MESSAGE(RequestState);
 
 	return 1;
+}
+
+
+// dimhotepus: Pair with shutdown to cleanup.
+void CVoiceStatus::Shutdown()
+{
+	UNHOOK_MESSAGE(RequestState);
+	UNHOOK_MESSAGE(VoiceMask);
+	
+	m_pParentPanel = INVALID_PANEL;
+	m_pHelper = nullptr;
+
+	if ( m_pHeadLabelMaterial )
+	{
+		m_pHeadLabelMaterial->DecrementReferenceCount();
+		m_pHeadLabelMaterial = nullptr;
+	}
+
+	g_pInternalVoiceStatus = nullptr;
+
+	const char *pGameDir = engine->GetGameDirectory();
+	if( pGameDir )
+	{
+		if(m_bBanMgrInitialized)
+		{
+			m_BanMgr.SaveState( pGameDir );
+			m_BanMgr.Term();
+
+			m_bBanMgrInitialized = false;
+		}
+	}
 }
 
 
@@ -364,11 +399,13 @@ void CVoiceStatus::UpdateServerState(bool bForce)
 	Q_strncpy(str,"vban",sizeof(str));
 	bool bChange = false;
 
-	for(unsigned long dw=0; dw < VOICE_MAX_PLAYERS_DW; dw++)
+	// dimhotepus: unsigned long -> unsigned. x86-64.
+	for(unsigned dw=0; dw < VOICE_MAX_PLAYERS_DW; dw++)
 	{	
-		unsigned long serverBanMask = 0;
-		unsigned long banMask = 0;
-		for(unsigned long i=0; i < 32; i++)
+		// dimhotepus: unsigned long -> unsigned. x86-64.
+		unsigned serverBanMask = 0;
+		unsigned banMask = 0;
+		for(unsigned i=0; i < 32; i++)
 		{
 			int playerIndex = ( dw * 32 + i );
 			if ( playerIndex >= MAX_PLAYERS )
@@ -376,7 +413,8 @@ void CVoiceStatus::UpdateServerState(bool bForce)
 
 			player_info_t pi;
 
-			if ( !engine->GetPlayerInfo( i+1, &pi ) )
+			// dimhotepus: Correctly get player info.
+			if ( !engine->GetPlayerInfo( playerIndex+1, &pi ) )
 				continue;
 
 			if ( m_BanMgr.GetPlayerBan( pi.guid ) )
@@ -426,8 +464,10 @@ void CVoiceStatus::HandleVoiceMaskMsg(bf_read &msg)
 	unsigned int dw;
 	for(dw=0; dw < VOICE_MAX_PLAYERS_DW; dw++)
 	{
-		m_AudiblePlayers.SetDWord(dw, (unsigned long)msg.ReadLong());
-		m_ServerBannedPlayers.SetDWord(dw, (unsigned long)msg.ReadLong());
+		// dimhotepus: unsigned long -> unsigned. x86-64.
+		m_AudiblePlayers.SetDWord(dw, msg.ReadULong());
+		// dimhotepus: unsigned long -> unsigned. x86-64.
+		m_ServerBannedPlayers.SetDWord(dw, msg.ReadULong());
 
 		if( voice_clientdebug.GetInt())
 		{

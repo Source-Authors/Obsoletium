@@ -3317,9 +3317,9 @@ void CAI_BaseNPC::UpdateEfficiency( bool bInPVS )
 					AIE_VERY_EFFICIENT,	
 	};
 
-	static const int stateBase[] = { 0, 9, 18 };
-	const int NOT_FACING_OFFSET = 3;
-	const int NO_PVS_OFFSET = 6;
+	static constexpr int stateBase[] = { 0, 9, 18 };
+	constexpr int NOT_FACING_OFFSET = 3;
+	constexpr int NO_PVS_OFFSET = 6;
 
 	int iStateOffset = stateBase[state - NPC_STATE_IDLE] ;
 	int iFacingOffset = (!bInPVS || bPlayerFacing) ? 0 : NOT_FACING_OFFSET;
@@ -3477,7 +3477,7 @@ int __cdecl ThinkRebalanceCompare( const AIRebalanceInfo_t *pLeft, const AIRebal
 	if ( pRight->dotPlayer < 0 )
 		return -1;
 
-	const float NEAR_PLAYER = 50*12;
+	constexpr float NEAR_PLAYER = 50*12;
 
 	if ( pLeft->distPlayer < NEAR_PLAYER && pRight->distPlayer >= NEAR_PLAYER )
 		return -1;
@@ -3685,9 +3685,9 @@ bool CAI_BaseNPC::PreNPCThink()
 	bool bUseThinkLimits = ( !m_bInChoreo && ShouldUseFrameThinkLimits() );
 
 #ifdef _DEBUG
-	const float NPC_THINK_LIMIT = 30.0 / 1000.0;
+	constexpr float NPC_THINK_LIMIT = 30.0 / 1000.0;
 #else
-	const float NPC_THINK_LIMIT = ( !IsXbox() ) ? (10.0 / 1000.0) : (12.5 / 1000.0);
+	constexpr float NPC_THINK_LIMIT = 10.0 / 1000.0;
 #endif
 
 	g_StartTimeCurThink = 0;
@@ -5971,7 +5971,7 @@ Activity CAI_BaseNPC::NPC_TranslateActivity( Activity eNewActivity )
 
 Activity CAI_BaseNPC::TranslateActivity( Activity idealActivity, Activity *pIdealWeaponActivity )
 {
-	const int MAX_TRIES = 5;
+	constexpr int MAX_TRIES = 5;
 	int count = 0;
 
 	bool bIdealWeaponRequired = false;
@@ -7386,7 +7386,7 @@ void CAI_BaseNPC::StartNPC( void )
 		gm_flTimeLastSpawn = gpGlobals->curtime;
 	}
 
-	static const float nextThinkTimes[20] = 
+	static constexpr float nextThinkTimes[20] = 
 	{
 		.0, .150, .075, .225, .030, .180, .120, .270, .045, .210, .105, .255, .015, .165, .090, .240, .135, .060, .195, .285
 	};
@@ -7720,7 +7720,7 @@ CBaseEntity *CAI_BaseNPC::BestEnemy( void )
 
 		if ( m_bIgnoreUnseenEnemies )
 		{
-			const float TIME_CONSIDER_ENEMY_UNSEEN = .4;
+			constexpr float TIME_CONSIDER_ENEMY_UNSEEN = .4;
 			if ( pEMemory->timeLastSeen < gpGlobals->curtime - TIME_CONSIDER_ENEMY_UNSEEN )
 			{
 				DbgEnemyMsg( this, "    %s rejected: not seen and set to ignore unseen enemies\n", pEnemy->GetDebugName() );
@@ -10910,13 +10910,13 @@ void CAI_BaseNPC::Precache( void )
 
 //-----------------------------------------------------------------------------
 
-const short AI_EXTENDED_SAVE_HEADER_VERSION = 5;
-const short AI_EXTENDED_SAVE_HEADER_RESET_VERSION = 3;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_VERSION = 5;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_RESET_VERSION = 3;
 
-const short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_CONDITIONS = 2;
-const short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SCHEDULE_ID_FIXUP = 3;
-const short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SEQUENCE = 4;
-const short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_NAVIGATOR_SAVE = 5;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_CONDITIONS = 2;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SCHEDULE_ID_FIXUP = 3;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_SEQUENCE = 4;
+constexpr inline short AI_EXTENDED_SAVE_HEADER_FIRST_VERSION_WITH_NAVIGATOR_SAVE = 5;
 
 struct AIExtendedSaveHeader_t
 {
@@ -12995,14 +12995,14 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 
 				// Origin
 				const char *pszOrigin = pkvNode->GetString( "origin_relative", "0 0 0" );
-				UTIL_StringToVector( sInteraction.vecRelativeOrigin.Base(), pszOrigin );
+				UTIL_StringToVector( sInteraction.vecRelativeOrigin, pszOrigin );
 
 				// Angles
 				const char *pszAngles = pkvNode->GetString( "angles_relative", NULL );
 				if ( pszAngles )
 				{
 					sInteraction.iFlags |= SCNPC_FLAG_TEST_OTHER_ANGLES;
-					UTIL_StringToVector( sInteraction.angRelativeAngles.Base(), pszAngles );
+					UTIL_StringToVector( sInteraction.angRelativeAngles, pszAngles );
 				}
 
 				// Velocity 
@@ -13010,7 +13010,7 @@ void CAI_BaseNPC::ParseScriptedNPCInteractions( void )
 				if ( pszVelocity )
 				{
 					sInteraction.iFlags |= SCNPC_FLAG_TEST_OTHER_VELOCITY;
-					UTIL_StringToVector( sInteraction.vecRelativeVelocity.Base(), pszVelocity );
+					UTIL_StringToVector( sInteraction.vecRelativeVelocity, pszVelocity );
 				}
 
 				// Entry Sequence

@@ -17,7 +17,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define PI 3.14159265359
+// dimhotepus: Drop PI.
 #define GLASS_SHARD_MIN_LIFE 2
 #define GLASS_SHARD_MAX_LIFE 5
 #define GLASS_SHARD_NOISE	 0.3
@@ -99,6 +99,7 @@ C_TEShatterSurface::C_TEShatterSurface( void )
 	m_flWidth			= 16.0;
 	m_flHeight			= 16.0;
 	m_flShardSize		= 3;
+	m_pMaterialHandle	= nullptr;
 	m_nSurfaceType		= SHATTERSURFACE_GLASS;
 	m_uchFrontColor[0]	= 255;
 	m_uchFrontColor[1]	= 255;
@@ -201,7 +202,7 @@ void C_TEShatterSurface::PostDataUpdate( DataUpdateType_t updateType )
 	vCurPos.x += 0.5f*m_flShardSize;
 	vCurPos.z += 0.5f*m_flShardSize;
 
-	float flMinSpeed = 9999999999.0f;
+	float flMinSpeed = std::numeric_limits<float>::max();
 	float flMaxSpeed = 0;
 
 	Particle3D *pParticle = NULL;

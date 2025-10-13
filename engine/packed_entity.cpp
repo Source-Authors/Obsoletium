@@ -50,11 +50,11 @@ PackedEntity::~PackedEntity()
 }
 
 
-bool PackedEntity::AllocAndCopyPadded( const void *pData, unsigned long size )
+bool PackedEntity::AllocAndCopyPadded( const void *pData, intp size )
 {
 	FreeData();
 	
-	unsigned long nBytes = PAD_NUMBER( size, 4 );
+	intp nBytes = PAD_NUMBER( size, 4 );
 
 	// allocate the memory
 	m_pData = malloc( nBytes );
@@ -66,7 +66,7 @@ bool PackedEntity::AllocAndCopyPadded( const void *pData, unsigned long size )
 	}
 	
 	Q_memcpy( m_pData, pData, size );
-	SetNumBits( nBytes * 8 );
+	SetNumBits( nBytes * CHAR_BIT );
 	
 	return true;
 }

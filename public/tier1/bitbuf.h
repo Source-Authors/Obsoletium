@@ -11,11 +11,6 @@
 #ifndef BITBUF_H
 #define BITBUF_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 #include "mathlib/mathlib.h"
 #include "mathlib/vector.h"
 #include "tier0/basetypes.h"
@@ -158,7 +153,7 @@ public:
 	void			Reset();
 
 	// Get the base pointer.
-	[[nodiscard]] unsigned char*	GetBasePointer() { return (unsigned char*) m_pData; }
+	[[nodiscard]] RESTRICT_FUNC byte*	GetBasePointer() { return (byte*) m_pData; }
 
 	// Enable or disable assertion on overflow. 99% of the time, it's a bug that we need to catch,
 	// but there may be the occasional buffer that is allowed to overflow gracefully.
@@ -169,32 +164,31 @@ public:
 	void			SetDebugName( const char *pDebugName );
 
 
-// Seek to a specific position.
 public:
-	
+	// Seek to a specific position.	
 	void			SeekToBit( intp bitPos );
 
 
 // Bit functions.
 public:
 
-	void			WriteOneBit(int nValue);
-	void			WriteOneBitNoCheck(int nValue);
+	void			WriteOneBit( int nValue );
+	void			WriteOneBitNoCheck( int nValue );
 	void			WriteOneBitAt( int iBit, int nValue );
 	
 	// Write signed or unsigned. Range is only checked in debug.
-	void			WriteUBitLong( unsigned int data, int numbits, bool bCheckRange=true );
-	void			WriteSBitLong( int data, int numbits );
+	void			WriteUBitLong( uint32 data, int numbits, bool bCheckRange=true );
+	void			WriteSBitLong( int32 data, int numbits );
 	
 	// Tell it whether or not the data is unsigned. If it's signed,
 	// cast to unsigned before passing in (it will cast back inside).
-	void			WriteBitLong(unsigned int data, int numbits, bool bSigned);
+	void			WriteBitLong( uint32 data, int numbits, bool bSigned );
 
 	// Write a list of bits in.
-	bool			WriteBits(const void *pIn, int nBits);
+	bool			WriteBits( const void *pIn, intp nBits );
 
 	// writes an unsigned integer with variable bit length
-	void			WriteUBitVar( unsigned int data );
+	void			WriteUBitVar( uint32 data );
 
 	// writes a varint encoded integer
 	void			WriteVarInt32( uint32 data );
@@ -208,12 +202,12 @@ public:
 
 	// Copy the bits straight out of pIn. This seeks pIn forward by nBits.
 	// Returns an error if this buffer or the read buffer overflows.
-	bool			WriteBitsFromBuffer( class bf_read *pIn, int nBits );
+	bool			WriteBitsFromBuffer( class bf_read *pIn, intp nBits );
 	
 	void			WriteBitAngle( float fAngle, int numbits );
-	void			WriteBitCoord (const float f);
+	void			WriteBitCoord( const float f );
 	void			WriteBitCoordMP( const float f, bool bIntegral, bool bLowPrecision );
-	void			WriteBitFloat(float val);
+	void			WriteBitFloat( float val );
 	void			WriteBitVec3Coord( const Vector& fa );
 	void			WriteBitNormal( float f );
 	void			WriteBitVec3Normal( const Vector& fa );
@@ -223,14 +217,16 @@ public:
 // Byte functions.
 public:
 
-	void			WriteChar(int val);
-	void			WriteByte(int val);
-	void			WriteShort(int val);
-	void			WriteWord(int val);
-	void			WriteLong(long val);
+	void			WriteChar(char val);
+	void			WriteByte(uint8 val);
+	void			WriteShort(int16 val);
+	void			WriteWord(uint16 val);
+	void			WriteLong(int32 val);
+	void			WriteULong(uint32 val);
 	void			WriteLongLong(int64 val);
+	void			WriteULongLong(uint64 val);
 	void			WriteFloat(float val);
-	bool			WriteBytes( const void *pBuf, int nBytes );
+	bool			WriteBytes( const void *pBuf, intp nBytes );
 
 	// Returns false if it overflows the buffer.
 	bool			WriteString(const char *pStr);
@@ -245,8 +241,8 @@ public:
 	[[nodiscard]] intp				GetMaxNumBits() const;
 	[[nodiscard]] intp				GetNumBitsLeft() const;
 	[[nodiscard]] intp				GetNumBytesLeft() const;
-	[[nodiscard]] unsigned char*	GetData();
-	[[nodiscard]] const unsigned char*	GetData() const;
+	[[nodiscard]] byte*	GetData();
+	[[nodiscard]] const byte*	GetData() const;
 
 	// Has the buffer overflowed?
 	[[nodiscard]] bool			CheckForOverflow(intp nBits);
@@ -304,14 +300,14 @@ inline intp bf_write::GetNumBytesLeft() const
 	return GetNumBitsLeft() >> 3;
 }
 
-inline unsigned char* bf_write::GetData() //-V524
+inline byte* bf_write::GetData() //-V524
 {
-	return (unsigned char*) m_pData;
+	return (byte*) m_pData;
 }
 
-inline const unsigned char* bf_write::GetData()	const
+inline const byte* bf_write::GetData()	const
 {
-	return (unsigned char*) m_pData;
+	return (byte*) m_pData;
 }
 
 BITBUF_INLINE bool bf_write::CheckForOverflow(intp nBits)
@@ -389,7 +385,7 @@ inline void	bf_write::WriteOneBitAt( int iBit, int nValue )
 #endif
 }
 
-BITBUF_INLINE void bf_write::WriteUBitLong( unsigned int curData, int numbits, [[maybe_unused]] bool bCheckRange )
+BITBUF_INLINE void bf_write::WriteUBitLong( uint32 curData, int numbits, [[maybe_unused]] bool bCheckRange )
 {
 #ifdef _DEBUG
 	// Make sure it doesn't overflow.
@@ -442,7 +438,7 @@ BITBUF_INLINE void bf_write::WriteUBitLong( unsigned int curData, int numbits, [
 }
 
 // writes an unsigned integer with variable bit length
-BITBUF_INLINE void bf_write::WriteUBitVar( unsigned int data )
+BITBUF_INLINE void bf_write::WriteUBitVar( uint32 data )
 {
 	/* Reference:
 	if ( data < 0x10u )
@@ -542,7 +538,7 @@ public:
 	// Get the base pointer.
 	[[nodiscard]] const unsigned char*	GetBasePointer() const { return m_pData; }
 
-	[[nodiscard]] BITBUF_INLINE intp TotalBytesAvailable( void ) const
+	[[nodiscard]] BITBUF_INLINE intp TotalBytesAvailable() const
 	{
 		return m_nDataBytes;
 	}
@@ -552,23 +548,23 @@ public:
 	// Read a list of bits in, but don't overrun the destination buffer.
 	// Returns the number of bits read into the buffer. The remaining
 	// bits are skipped over.
-	int             ReadBitsClamped_ptr(void *pOut, size_t outSizeBytes, size_t nBits);
+	intp            ReadBitsClamped_ptr(void *pOut, intp outSizeBytes, intp nBits);
 	// Helper 'safe' template function that infers the size of the destination
 	// array. This version of the function should be preferred.
 	// Usage: char databuffer[100];
 	//        ReadBitsClamped( dataBuffer, msg->m_nLength );
-	template <typename T, size_t N>
-	int ReadBitsClamped( T (&pOut)[N], size_t nBits )
+	template <typename T, intp N>
+	intp ReadBitsClamped( T (&pOut)[N], intp nBits )
 	{
 		return ReadBitsClamped_ptr( pOut, N * sizeof(T), nBits );
 	}
 	
 	[[nodiscard]] float			ReadBitAngle( int numbits );
 
-	[[nodiscard]] unsigned int	ReadUBitLong( int numbits );
-	[[nodiscard]] unsigned int	ReadUBitLongNoInline( int numbits );
-	[[nodiscard]] unsigned int	PeekUBitLong( int numbits );
-	[[nodiscard]] int			ReadSBitLong( int numbits );
+	[[nodiscard]] uint32		ReadUBitLong( int numbits );
+	[[nodiscard]] uint32		ReadUBitLongNoInline( int numbits );
+	[[nodiscard]] uint32		PeekUBitLong( int numbits );
+	[[nodiscard]] int32			ReadSBitLong( int numbits );
 
 	// reads an unsigned integer with variable bit length
 	[[nodiscard]] unsigned int	ReadUBitVar();
@@ -599,12 +595,14 @@ public:
 // Byte functions (these still read data in bit-by-bit).
 public:
 	
-	[[nodiscard]] BITBUF_INLINE char	ReadChar() { return (char)ReadUBitLong(8); }
-	[[nodiscard]] BITBUF_INLINE int	ReadByte() { return ReadUBitLong(8); }
-	[[nodiscard]] BITBUF_INLINE short	ReadShort() { return (short)ReadUBitLong(16); }
-	[[nodiscard]] BITBUF_INLINE int	ReadWord() { return ReadUBitLong(16); }
-	[[nodiscard]] BITBUF_INLINE long ReadLong() { return ReadUBitLong(32); }
+	[[nodiscard]] BITBUF_INLINE char	ReadChar() { return (char)ReadUBitLong(CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE byte	ReadByte() { return (byte)ReadUBitLong(CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE int16	ReadShort() { return (int16)ReadUBitLong(sizeof(int16) * CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE uint16	ReadWord() { return (uint16)ReadUBitLong(sizeof(uint16) * CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE int32	ReadLong() { return (int32)ReadUBitLong(sizeof(int32) * CHAR_BIT); }
+	[[nodiscard]] BITBUF_INLINE uint32	ReadULong() { return (uint32)ReadUBitLong(sizeof(uint32) * CHAR_BIT); }
 	[[nodiscard]] int64			ReadLongLong();
+	[[nodiscard]] uint64		ReadULongLong();
 	[[nodiscard]] float			ReadFloat();
 
 	bool			ReadBytes( OUT_CAP(nBytes) void *pOut, intp nBytes);
@@ -634,7 +632,7 @@ public:
 	// pOutNumChars is set to the number of characters left in pStr when the routine is 
 	// complete (this will never exceed bufLen-1).
 	//
-	bool			ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine=false, intp *pOutNumChars=NULL );
+	bool			ReadString( OUT_Z_CAP(maxLen) char *pStr, intp maxLen, bool bLine=false, intp *pOutNumChars=nullptr );
 
 	// dimhotepus: Bounds-safe interface.
 	template<intp bufLen>
@@ -645,7 +643,7 @@ public:
 
 	// Reads a string and allocates memory for it. If the string in the buffer
 	// is > 2048 bytes, then pOverflow is set to true (if it's not NULL).
-	[[nodiscard]] char*			ReadAndAllocateString( bool *pOverflow = 0 );
+	[[nodiscard]] char*			ReadAndAllocateString( bool *pOverflow = nullptr );
 
 	// Returns nonzero if any bits differ
 	[[nodiscard]] int			CompareBits( bf_read * RESTRICT other, int bits );
@@ -748,9 +746,9 @@ inline bool bf_read::CheckForOverflow(intp nBits)
 inline int bf_read::ReadOneBitNoCheck()
 {
 #if VALVE_LITTLE_ENDIAN
-	unsigned int value = ((unsigned * RESTRICT)m_pData)[m_iCurBit >> 5] >> (m_iCurBit & 31);
+	const unsigned int value = ((const unsigned * RESTRICT)m_pData)[m_iCurBit >> 5] >> (m_iCurBit & 31);
 #else
-	unsigned char value = m_pData[m_iCurBit >> 3] >> (m_iCurBit & 7);
+	const unsigned char value = m_pData[m_iCurBit >> 3] >> (m_iCurBit & 7);
 #endif
 	++m_iCurBit;
 	return value & 1;
@@ -788,7 +786,7 @@ BITBUF_INLINE unsigned int bf_read::ReadUBitVar()
 	return sixbits >> 2;
 }
 
-BITBUF_INLINE unsigned int bf_read::ReadUBitLong( int numbits )
+BITBUF_INLINE uint32 bf_read::ReadUBitLong( int numbits )
 {
 	Assert( numbits > 0 && numbits <= 32 );
 

@@ -322,8 +322,8 @@ void CCustomGames::RecalculateCommonTags( void )
 	// Loop through our servers, and build a list of all the tags
 	CUtlVector<tagentry_t> aTagsInUse;
 
-	int iCount = m_pGameList->GetItemCount();
-	for ( int i = 0; i < iCount; i++ )
+	intp iCount = m_pGameList->GetItemCount();
+	for ( intp i = 0; i < iCount; i++ )
 	{
 		uintp serverID = m_pGameList->GetItemUserData( i );
 		gameserveritem_t *pServer = GetServer( serverID ); 

@@ -9,12 +9,8 @@
 #ifndef UTLNTREE_H
 #define UTLNTREE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/basetypes.h"
-#include "tier1/utlmemory.h"
+#include "utlmemory.h"
 #include "tier0/dbg.h"
 
 
@@ -30,8 +26,8 @@ template <class T, class I = unsigned short>
 class CUtlNTree
 {
 public:
-	typedef T ElemType_t;
-	typedef I IndexType_t;
+	using ElemType_t = T;
+	using IndexType_t = I;
 
 	// constructor, destructor
 	CUtlNTree( int growSize = 0, int initSize = 0 );
@@ -79,7 +75,7 @@ public:
 	inline static size_t ElementSize() { return sizeof(Node_t); }
 
 	// list statistics
-	int	Count() const;
+	[[nodiscard]] int	Count() const;
 	I	MaxElementIndex() const;
 
 	// Traversing the list
@@ -102,10 +98,9 @@ protected:
 		I  m_FirstChild;
 		I  m_PrevSibling;
 		I  m_NextSibling;
-
-	private:
+		
 		// No copy constructor for these...
-		Node_t( const Node_t& );
+		Node_t( const Node_t& ) = delete;
 	};
 	
 	// constructs the class
@@ -124,7 +119,7 @@ protected:
 	}
 	
 	// copy constructors not allowed
-	CUtlNTree( CUtlNTree<T, I> const& tree ) { Assert(0); }
+	CUtlNTree( CUtlNTree<T, I> const& tree ) = delete;
 	   
 	CUtlMemory<Node_t> m_Memory;
 	I	m_Root;
@@ -397,10 +392,10 @@ void CUtlNTree<T,I>::RemoveAll()
 
 	// Put everything into the free list (even unlinked things )
 	I prev = InvalidIndex();
-	for (int i = (int)m_MaxElementIndex; --i >= 0; prev = (I)i )
+	for (intp i = (intp)m_MaxElementIndex; --i >= 0; prev = (I)i )
 	{
-		Node_t &node = InternalNode( i );
-		if ( IsInTree( i ) )
+		Node_t &node = InternalNode( (I)i );
+		if ( IsInTree( (I)i ) )
 		{
 			Destruct( &node.m_Element );
 		}

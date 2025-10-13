@@ -60,11 +60,11 @@ public:
 
 class CBaseBudgetPanel : public vgui::Panel
 {
-	typedef vgui::Panel BaseClass;
+	using BaseClass = vgui::Panel;
 
 public:
 	CBaseBudgetPanel( vgui::Panel *pParent, const char *pElementName );
-	virtual ~CBaseBudgetPanel();
+	~CBaseBudgetPanel() override;
 
 	// This should be called when starting up and whenever this data changes.
 	void OnConfigDataChanged( const CBudgetPanelConfigData &data );
@@ -81,7 +81,7 @@ public:
 	void PaintBackground() override;
 	void PerformLayout() override;
 	void MarkAsDedicatedServer() { m_bDedicated = true; } // plays nicer as part of a vgui window setup
-	bool IsDedicated() const { return m_bDedicated; }
+	[[nodiscard]] bool IsDedicated() const { return m_bDedicated; }
 
 	const double *GetBudgetGroupData( intp &nGroups, int &nSamplesPerGroup, int &nSampleOffset ) const;
 	
@@ -91,17 +91,17 @@ public:
 	float GetBudgetGroupPercent( float value );
 
 	// Get the current config data.
-	const CBudgetPanelConfigData& GetConfigData() const;
+	[[nodiscard]] const CBudgetPanelConfigData& GetConfigData() const;
 
 	// Returns the number of budget groups in the last OnConfigDataChanged call.
-	intp GetNumCachedBudgetGroups() const;
+	[[nodiscard]] intp GetNumCachedBudgetGroups() const;
 
 	// (Used by dedicated server, mark everything for a repaint).
 	void MarkForFullRepaint();
 
 protected:
 	void UpdateWindowGeometry();
-	void ClearTimesForAllGroupsForThisFrame( void );
+	void ClearTimesForAllGroupsForThisFrame();
 	void ClearAllTimesForGroup( intp groupID );
 	void Rebuild( const CBudgetPanelConfigData &data );
 	

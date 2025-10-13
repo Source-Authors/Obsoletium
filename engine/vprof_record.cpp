@@ -642,7 +642,7 @@ public:
 	void Playback_Average( int nFrames )
 	{
 		// Remember where we started.
-		unsigned long seekPos = g_pFileSystem->Tell( m_hFile );
+		unsigned seekPos = g_pFileSystem->Tell( m_hFile );
 		int iOldLastTick = m_iLastTick;
 		int iOldPlaybackTick = m_iPlaybackTick;
 		

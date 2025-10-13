@@ -440,6 +440,8 @@ void CalcRenderableWorldSpaceAABB_Fast( IClientRenderable *pRenderable, Vector &
 //-----------------------------------------------------------------------------
 CClientLeafSystem::CClientLeafSystem() : m_DrawStaticProps(true), m_DrawSmallObjects(true)
 {
+	m_ShadowEnum = 0;
+
 	// Set up the bi-directional lists...
 	m_RenderablesInLeaf.Init( FirstRenderableInLeaf, FirstLeafInRenderable );
 	m_ShadowsInLeaf.Init( FirstShadowInLeaf, FirstLeafInShadow ); 
@@ -564,7 +566,7 @@ void CClientLeafSystem::PreRender()
 		else
 		{
 			// InsertIntoTree can result in new renderables being added, so copy:
-			ClientRenderHandle_t *pDirtyRenderables = (ClientRenderHandle_t *)alloca( sizeof(ClientRenderHandle_t) * nDirty );
+			ClientRenderHandle_t *pDirtyRenderables = stackallocT(ClientRenderHandle_t, nDirty );
 			memcpy( pDirtyRenderables, m_DirtyRenderables.Base(), sizeof(ClientRenderHandle_t) * nDirty );
 			ParallelProcess( "CClientLeafSystem::PreRender", pDirtyRenderables, nDirty, this, &CClientLeafSystem::InsertIntoTree, &CClientLeafSystem::FrameLock, &CClientLeafSystem::FrameUnlock );
 		}

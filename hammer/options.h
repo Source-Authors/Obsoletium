@@ -9,10 +9,7 @@
 #pragma once
 
 
-#pragma warning(push, 1)
-#pragma warning(disable:4701 4702 4530)
 #include <fstream>
-#pragma warning(pop)
 #include <afxtempl.h>
 
 
@@ -46,7 +43,8 @@ public:
 	BOOL bShowNoDrawBrushes;
 	BOOL bEnableAutosave;
 	BOOL bShowHiddenTargetsAsBroken;
-	BOOL bRadiusCulling;
+	// dimhotepus: Remove radius culling.
+	// BOOL bRadiusCulling;
 }; 
 
 

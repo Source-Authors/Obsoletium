@@ -113,10 +113,10 @@ public:
 
 inline intp AppendParentStackTrace( void **pReturnAddressesOut, intp iArrayCount, intp iAlreadyFilled )
 {
-	CStackTop_FriendFuncs *pTop = (CStackTop_FriendFuncs *)(CStackTop_Base *)g_StackTop;
-	if( pTop != NULL )
+	auto *pTop = (CStackTop_FriendFuncs *)(CStackTop_Base *)g_StackTop;
+	if( pTop != nullptr )
 	{
-		if( pTop->m_pReplaceAddress != NULL )
+		if( pTop->m_pReplaceAddress != nullptr )
 		{
 			for( intp i = iAlreadyFilled; --i >= 0; )
 			{
@@ -356,13 +356,13 @@ USHORT WINAPI CaptureStackBackTrace_DummyFn( IN ULONG, IN ULONG, OUT PVOID *, OU
 class CHelperFunctionsLoader
 {
 public:
-	CHelperFunctionsLoader( void )
+	CHelperFunctionsLoader( )
 	{
 		m_bIsInitialized = false;
 		m_bShouldReloadSymbols = false;
 		m_hProcess = INVALID_HANDLE_VALUE;
-		m_hDbgHelpDll = NULL;
-		m_szPDBSearchPath = NULL;
+		m_hDbgHelpDll = nullptr;
+		m_szPDBSearchPath = nullptr;
 		m_pSymInitialize = SymInitialize_DummyFn;
 		m_pSymCleanup = SymCleanup_DummyFn;
 		m_pSymSetOptions = SymSetOptions_DummyFn;
@@ -386,11 +386,11 @@ public:
 #endif
 	}
 
-	~CHelperFunctionsLoader( void )
+	~CHelperFunctionsLoader( )
 	{
 		m_pSymCleanup( m_hProcess );
 
-		if( m_hDbgHelpDll != NULL )
+		if( m_hDbgHelpDll != nullptr )
 			::FreeLibrary( m_hDbgHelpDll );
 
 #if defined( USE_CAPTURESTACKBACKTRACE )
@@ -412,11 +412,11 @@ public:
 	{
 		const CHelperFunctionsLoader *pThis = ((CHelperFunctionsLoader *)UserContext);
 		//SymLoadModule64( IN HANDLE hProcess, IN HANDLE hFile, IN PSTR ImageName, IN PSTR ModuleName, IN DWORD64 BaseOfDll, IN DWORD SizeOfDll );
-		pThis->m_pSymLoadModule64( pThis->m_hProcess, NULL, ModuleName, ModuleName, ModuleBase, ModuleSize );
+		pThis->m_pSymLoadModule64( pThis->m_hProcess, nullptr, ModuleName, ModuleName, ModuleBase, ModuleSize );
 		return TRUE;
 	}
 
-	void TryLoadingNewSymbols( void )
+	void TryLoadingNewSymbols( )
 	{
 		AUTO_LOCK( m_Mutex );
 
@@ -434,9 +434,9 @@ public:
 
 		delete []m_szPDBSearchPath;
 
-		if( szSemicolonSeparatedList == NULL )
+		if( szSemicolonSeparatedList == nullptr )
 		{
-			m_szPDBSearchPath = NULL;
+			m_szPDBSearchPath = nullptr;
 			return;
 		}
 
@@ -453,7 +453,7 @@ public:
 
 	bool GetSymbolNameFromAddress( const void *pAddress, tchar *pSymbolNameOut, intp iMaxSymbolNameLength, uint64 *pDisplacementOut )
 	{
-		if( pAddress == NULL )
+		if( pAddress == nullptr )
 			return false;
 
 		AUTO_LOCK( m_Mutex );
@@ -468,7 +468,7 @@ public:
 		{
 			strncpy( pSymbolNameOut, ((PSYMBOL_INFO)genericbuffer)->Name, iMaxSymbolNameLength );
 			pSymbolNameOut[iMaxSymbolNameLength - 1] = 0;
-			if( pDisplacementOut != NULL )
+			if( pDisplacementOut != nullptr )
 				*pDisplacementOut = dwDisplacement;
 			return true;
 		}
@@ -478,7 +478,7 @@ public:
 
 	bool GetFileAndLineFromAddress( const void *pAddress, tchar *pFileNameOut, intp iMaxFileNameLength, uint32 &iLineNumberOut, uint32 *pDisplacementOut )
 	{
-		if( pAddress == NULL )
+		if( pAddress == nullptr )
 			return false;
 
 		AUTO_LOCK( m_Mutex );
@@ -497,7 +497,7 @@ public:
 			pFileNameOut[iMaxFileNameLength - 1] = 0;
 			iLineNumberOut = imageHelpLine64.LineNumber;
 			
-			if( pDisplacementOut != NULL )
+			if( pDisplacementOut != nullptr )
 				*pDisplacementOut = dwDisplacement;
 
 			return true;
@@ -524,11 +524,11 @@ public:
 	}
 
 	//only returns false if we ran out of buffer space.
-	bool TranslatePointer( const void * const pAddress, tchar *pTranslationOut, intp iTranslationBufferLength, TranslateStackInfo_StyleFlags_t style )
+	bool TranslatePointer( const void * const pAddress, tchar *pTranslationOut, intp &iTranslationBufferLength, TranslateStackInfo_StyleFlags_t style )
 	{
 		//AUTO_LOCK( m_Mutex );
 
-		if( pTranslationOut == NULL )
+		if( pTranslationOut == nullptr )
 			return false;
 
 		if( iTranslationBufferLength <= 0 )
@@ -567,7 +567,7 @@ public:
 		}
 
 		//use symbol name to test if the rest is going to work. So grab it whether they want it or not
-		if( !this->GetSymbolNameFromAddress( pAddress, pWrite, iTranslationBufferLength, NULL ) )
+		if( !this->GetSymbolNameFromAddress( pAddress, pWrite, iTranslationBufferLength, nullptr ) )
 		{
 			int nBytesWritten = _snprintf( pWrite, iTranslationBufferLength, "0x%p", pAddress );
 			if ( nBytesWritten < 0 )
@@ -663,7 +663,6 @@ public:
 						return false;
 					}
 
-					pWrite += nBytesWritten;
 					iTranslationBufferLength -= nBytesWritten;
 				}
 			}
@@ -681,7 +680,7 @@ public:
 
 
 	//about to actually use the functions, load if necessary
-	void EnsureReady( void )
+	void EnsureReady( )
 	{
 		if( m_bIsInitialized )
 		{
@@ -703,7 +702,7 @@ public:
 		}
 
 		m_hProcess = GetCurrentProcess();
-		if( m_hProcess == NULL )
+		if( m_hProcess == nullptr )
 			return;
 
 		m_bIsInitialized = true;
@@ -714,69 +713,69 @@ public:
 		if ( !m_hDbgHelpDll )
 		{
 			//it's possible it's just way too early to initialize (as shown with attempts at using these tools in the memory allocator)
-			if( m_szPDBSearchPath == NULL ) //not a rock solid check, but pretty good compromise between endless failing initialization and general failure due to trying too early
+			if( m_szPDBSearchPath == nullptr ) //not a rock solid check, but pretty good compromise between endless failing initialization and general failure due to trying too early
 				m_bIsInitialized = false; 
 
 			return;
 		}
 
 		m_pSymInitialize = (PFN_SymInitialize) ::GetProcAddress( m_hDbgHelpDll, "SymInitialize" );
-		if( m_pSymInitialize == NULL )
+		if( m_pSymInitialize == nullptr )
 		{
 			//very bad
 			::FreeLibrary( m_hDbgHelpDll );
-			m_hDbgHelpDll = NULL;
+			m_hDbgHelpDll = nullptr;
 			m_pSymInitialize = SymInitialize_DummyFn;
 			return;
 		}
 
 		m_pSymCleanup = (PFN_SymCleanup) ::GetProcAddress( m_hDbgHelpDll, "SymCleanup" );
-		if( m_pSymCleanup == NULL )
+		if( m_pSymCleanup == nullptr )
 			m_pSymCleanup = SymCleanup_DummyFn;
 
 		m_pSymGetOptions = (PFN_SymGetOptions) ::GetProcAddress( m_hDbgHelpDll, "SymGetOptions" );
-		if( m_pSymGetOptions == NULL )
+		if( m_pSymGetOptions == nullptr )
 			m_pSymGetOptions = SymGetOptions_DummyFn;
 
 		m_pSymSetOptions = (PFN_SymSetOptions) ::GetProcAddress( m_hDbgHelpDll, "SymSetOptions" );
-		if( m_pSymSetOptions == NULL )
+		if( m_pSymSetOptions == nullptr )
 			m_pSymSetOptions = SymSetOptions_DummyFn;
 
 		m_pSymSetSearchPath = (PFN_SymSetSearchPath) ::GetProcAddress( m_hDbgHelpDll, "SymSetSearchPath" );
-		if( m_pSymSetSearchPath == NULL )
+		if( m_pSymSetSearchPath == nullptr )
 			m_pSymSetSearchPath = SymSetSearchPath_DummyFn;
 
 		m_pSymEnumerateModules64 = (PFN_SymEnumerateModules64) ::GetProcAddress( m_hDbgHelpDll, "SymEnumerateModules64" );
-		if( m_pSymEnumerateModules64 == NULL )
+		if( m_pSymEnumerateModules64 == nullptr )
 			m_pSymEnumerateModules64 = SymEnumerateModules64_DummyFn;
 
 		m_pEnumerateLoadedModules64 = (PFN_EnumerateLoadedModules64) ::GetProcAddress( m_hDbgHelpDll, "EnumerateLoadedModules64" );
-		if( m_pEnumerateLoadedModules64 == NULL )
+		if( m_pEnumerateLoadedModules64 == nullptr )
 			m_pEnumerateLoadedModules64 = EnumerateLoadedModules64_DummyFn;
 
 		m_pSymLoadModule64 = (PFN_SymLoadModule64) ::GetProcAddress( m_hDbgHelpDll, "SymLoadModule64" );
-		if( m_pSymLoadModule64 == NULL )
+		if( m_pSymLoadModule64 == nullptr )
 			m_pSymLoadModule64 = SymLoadModule64_DummyFn;
 
 		m_pSymUnloadModule64 = (PFN_SymUnloadModule64) ::GetProcAddress( m_hDbgHelpDll, "SymUnloadModule64" );
-		if( m_pSymUnloadModule64 == NULL )
+		if( m_pSymUnloadModule64 == nullptr )
 			m_pSymUnloadModule64 = SymUnloadModule64_DummyFn;
 
 		m_pSymFromAddr = (PFN_SymFromAddr) ::GetProcAddress( m_hDbgHelpDll, "SymFromAddr" );
-		if( m_pSymFromAddr == NULL )
+		if( m_pSymFromAddr == nullptr )
 			m_pSymFromAddr = SymFromAddr_DummyFn;
 
 		m_pSymGetLineFromAddr64 = (PFN_SymGetLineFromAddr64) ::GetProcAddress( m_hDbgHelpDll, "SymGetLineFromAddr64" );
-		if( m_pSymGetLineFromAddr64 == NULL )
+		if( m_pSymGetLineFromAddr64 == nullptr )
 			m_pSymGetLineFromAddr64 = SymGetLineFromAddr64_DummyFn;
 
 		m_pSymGetModuleInfo64 = (PFN_SymGetModuleInfo64) ::GetProcAddress( m_hDbgHelpDll, "SymGetModuleInfo64" );
-		if( m_pSymGetModuleInfo64 == NULL )
+		if( m_pSymGetModuleInfo64 == nullptr )
 			m_pSymGetModuleInfo64 = SymGetModuleInfo64_DummyFn;
 
 #if defined( USE_STACKWALK64 )
 		m_pStackWalk64 = (PFN_StackWalk64) ::GetProcAddress( m_hDbgHelpDll, "StackWalk64" );
-		if( m_pStackWalk64 == NULL )
+		if( m_pStackWalk64 == nullptr )
 			m_pStackWalk64 = StackWalk64_DummyFn;
 #endif
 
@@ -858,7 +857,7 @@ intp CrawlStack_StackWalk64( CONTEXT *pExceptionContext, void **pReturnAddresses
 	intp i;
 	for( i = 0; i != iSkipCount; ++i ) //skip entries that the requesting function thinks are uninformative
 	{
-		if(!s_HelperFunctions.m_pStackWalk64( STACKWALK64_MACHINETYPE, s_HelperFunctions.m_hProcess, hThread, &sfFrame, &currentContext, NULL, NULL, NULL, NULL ) ||
+		if(!s_HelperFunctions.m_pStackWalk64( STACKWALK64_MACHINETYPE, s_HelperFunctions.m_hProcess, hThread, &sfFrame, &currentContext, nullptr, nullptr, nullptr, nullptr ) ||
 			(sfFrame.AddrFrame.Offset == 0) )
 		{
 			return 0;
@@ -867,7 +866,7 @@ intp CrawlStack_StackWalk64( CONTEXT *pExceptionContext, void **pReturnAddresses
 
 	for( i = 0; i != iArrayCount; ++i )
 	{
-		if(!s_HelperFunctions.m_pStackWalk64( STACKWALK64_MACHINETYPE, s_HelperFunctions.m_hProcess, hThread, &sfFrame, &currentContext, NULL, NULL, NULL, NULL ) ||
+		if(!s_HelperFunctions.m_pStackWalk64( STACKWALK64_MACHINETYPE, s_HelperFunctions.m_hProcess, hThread, &sfFrame, &currentContext, nullptr, nullptr, nullptr, nullptr ) ||
 			(sfFrame.AddrFrame.Offset == 0) )
 		{
 			break;
@@ -907,7 +906,7 @@ intp GetCallStack( void **pReturnAddressesOut, intp iArrayCount, intp iSkipCount
 		intp iInOutArrayCount = iArrayCount; //array count becomes both input and output with exception handler version
 		__try
 		{
-			::RaiseException( 0, EXCEPTION_NONCONTINUABLE, 0, NULL );
+			::RaiseException( 0, EXCEPTION_NONCONTINUABLE, 0, nullptr );
 		}
 		__except ( GetCallStackReturnAddresses_Exception( pReturnAddressesOut, &iInOutArrayCount, iSkipCount, GetExceptionInformation() ), EXCEPTION_EXECUTE_HANDLER )
 		{
@@ -934,7 +933,7 @@ intp TranslateStackInfo( const void * const *pCallStack, intp iCallStackCount, t
 	s_HelperFunctions.EnsureReady();
 	tchar *szStartOutput = szOutput;
 
-	if( szEntrySeparator == NULL )
+	if( szEntrySeparator == nullptr )
 		szEntrySeparator = _T("");
 
 	intp iSeparatorSize = (intp)strlen( szEntrySeparator );
@@ -1017,15 +1016,15 @@ CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStack
 	m_pReplaceAddress = *((void **)pStackCrawlEBP + 1);
 	m_pStackBase = (void *)((void **)pStackCrawlEBP + 1);
 #else
-	m_pReplaceAddress = NULL;
+	m_pReplaceAddress = nullptr;
 	m_pStackBase = this;
 #endif
 
-	m_pParentStackTrace = NULL;
+	m_pParentStackTrace = nullptr;
 
-	if( (pParentStackTrace != NULL) && (iParentStackTraceLength > 0) )
+	if( (pParentStackTrace != nullptr) && (iParentStackTraceLength > 0) )
 	{
-		while( (iParentStackTraceLength > 0) && (pParentStackTrace[iParentStackTraceLength - 1] == NULL) )
+		while( (iParentStackTraceLength > 0) && (pParentStackTrace[iParentStackTraceLength - 1] == nullptr) )
 		{
 			--iParentStackTraceLength;
 		}
@@ -1047,7 +1046,7 @@ CStackTop_CopyParentStack::CStackTop_CopyParentStack( void * const *pParentStack
 #endif //#if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 }
 
-CStackTop_CopyParentStack::~CStackTop_CopyParentStack( void )
+CStackTop_CopyParentStack::~CStackTop_CopyParentStack( )
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	Assert( (CStackTop_Base *)g_StackTop == this );
@@ -1073,15 +1072,15 @@ CStackTop_ReferenceParentStack::CStackTop_ReferenceParentStack( void * const *pP
 	m_pReplaceAddress = *((void **)pStackCrawlEBP + 1);
 	m_pStackBase = (void *)((void **)pStackCrawlEBP + 1);
 #else
-	m_pReplaceAddress = NULL;
+	m_pReplaceAddress = nullptr;
 	m_pStackBase = this;
 #endif
 
 	m_pParentStackTrace = pParentStackTrace;
 
-	if( (pParentStackTrace != NULL) && (iParentStackTraceLength > 0) )
+	if( (pParentStackTrace != nullptr) && (iParentStackTraceLength > 0) )
 	{
-		while( (iParentStackTraceLength > 0) && (pParentStackTrace[iParentStackTraceLength - 1] == NULL) )
+		while( (iParentStackTraceLength > 0) && (pParentStackTrace[iParentStackTraceLength - 1] == nullptr) )
 		{
 			--iParentStackTraceLength;
 		}
@@ -1095,7 +1094,7 @@ CStackTop_ReferenceParentStack::CStackTop_ReferenceParentStack( void * const *pP
 #endif //#if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 }
 
-CStackTop_ReferenceParentStack::~CStackTop_ReferenceParentStack( void )
+CStackTop_ReferenceParentStack::~CStackTop_ReferenceParentStack( )
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
 	Assert( (CStackTop_Base *)g_StackTop == this );
@@ -1105,10 +1104,10 @@ CStackTop_ReferenceParentStack::~CStackTop_ReferenceParentStack( void )
 #endif
 }
 
-void CStackTop_ReferenceParentStack::ReleaseParentStackReferences( void )
+void CStackTop_ReferenceParentStack::ReleaseParentStackReferences( )
 {
 #if defined( ENABLE_RUNTIME_STACK_TRANSLATION )
-	m_pParentStackTrace = NULL;
+	m_pParentStackTrace = nullptr;
 	m_iParentStackTraceLength = 0;
 #endif
 }
@@ -1126,10 +1125,10 @@ intp EncodeBinaryToString( const void *pToEncode, intp iDataLength, char *pEncod
 	iEncodedSize += (iEncodedSize + 6) / 7; //Have 1 control byte for every 7 actual bytes
 	iEncodedSize += sizeof( uint32 ) + 1; //data size at the beginning of the blob and null terminator at the end
 
-	if( (iEncodedSize > iEncodeBufferSize) || (pEncodeOut == NULL) || (pToEncode == NULL) )
+	if( (iEncodedSize > iEncodeBufferSize) || (pEncodeOut == nullptr) || (pToEncode == nullptr) )
 		return -iEncodedSize; //not enough room
 
-	uint8 *pEncodeWrite = (uint8 *)pEncodeOut;	
+	auto *pEncodeWrite = (uint8 *)pEncodeOut;	
 
 	//first encode the data size. Encodes lowest 28 bits and discards the high 4
 	pEncodeWrite[0] = ((iDataLength >> 21) & 0xFF) | 0x80;
@@ -1138,7 +1137,7 @@ intp EncodeBinaryToString( const void *pToEncode, intp iDataLength, char *pEncod
 	pEncodeWrite[3] = ((iDataLength >> 0) & 0xFF) | 0x80;
 	pEncodeWrite += 4;
 
-	const uint8 *pEncodeRead = (const uint8 *)pToEncode;
+	const auto *pEncodeRead = (const uint8 *)pToEncode;
 	const uint8 *pEncodeStop = pEncodeRead + iDataLength;
 	uint8 *pEncodeWriteLastControlByte = pEncodeWrite;
 	intp iControl = 0;
@@ -1174,11 +1173,11 @@ intp EncodeBinaryToString( const void *pToEncode, intp iDataLength, char *pEncod
 //	all other negative values are the negative of how much dest buffer size is necessary.
 intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestBufferSize, const char **ppParseFinishOut )
 {
-	const uint8 *pDecodeRead = (const uint8 *)pString;
+	const auto *pDecodeRead = (const uint8 *)pString;
 
 	if( (pDecodeRead[0] < 0x80) || (pDecodeRead[1] < 0x80) || (pDecodeRead[2] < 0x80) || (pDecodeRead[3] < 0x80) )
 	{
-		if( ppParseFinishOut != NULL )
+		if( ppParseFinishOut != nullptr )
 			*ppParseFinishOut = pString;
 
 		return INT_MIN; //Don't know what the string is, but it's not our format
@@ -1199,7 +1198,7 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 	{
 		if( pDecodeRead[i] < 0x80 ) //encoded data always has MSB set
 		{
-			if( ppParseFinishOut != NULL )
+			if( ppParseFinishOut != nullptr )
 				*ppParseFinishOut = pString;
 
 			return INT_MIN; //either not our data, or part of the string is missing
@@ -1208,14 +1207,14 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 
 	if( iDestBufferSize < iDecodedSize )
 	{
-		if( ppParseFinishOut != NULL )
+		if( ppParseFinishOut != nullptr )
 			*ppParseFinishOut = reinterpret_cast<const char*>(pDecodeRead);
 
 		return -iDecodedSize; //dest buffer not big enough to hold the data
 	}
 
 	const uint8 *pStopDecoding = pDecodeRead + iTextLength;		
-	uint8 *pDecodeWrite = (uint8 *)pDestBuffer;
+	auto *pDecodeWrite = (uint8 *)pDestBuffer;
 	intp iControl = 0;
 	intp iLSBXOR = 0;
 
@@ -1236,7 +1235,7 @@ intp DecodeBinaryFromString( const char *pString, void *pDestBuffer, intp iDestB
 		iControl &= 7; //8->0
 	}
 
-	if( ppParseFinishOut != NULL )
+	if( ppParseFinishOut != nullptr )
 		*ppParseFinishOut = reinterpret_cast<const char*>(pDecodeRead);
 
 	return iDecodedSize;	

@@ -151,7 +151,7 @@ BOOL WriteText(LPCTSTR szText) {
     // 13 is the code for a carriage return (\n) instead of 10.
     if (*sz == 10) *sz = 13;
 
-    unsigned short upper = static_cast<unsigned short>(toupper(*sz));
+    auto upper = static_cast<unsigned short>(toupper(*sz));
 
     rec.EventType = KEY_EVENT;
     rec.Event.KeyEvent.bKeyDown = TRUE;

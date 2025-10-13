@@ -4,9 +4,9 @@
 //
 //=====================================================================================//
 
-#include <float.h>	// Needed for FLT_EPSILON
-#include <memory.h>
+#include <cfloat>	// Needed for FLT_EPSILON
 #include <cmath>
+#include <memory.h>
 
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
@@ -20,7 +20,9 @@
 #include "noisedata.h"
 
 
-#define MAGIC_NUMBER (1<<15)								// gives 8 bits of fraction
+enum {
+  MAGIC_NUMBER = (1<<15)								// gives 8 bits of fraction
+};
 
 static fltx4 Four_MagicNumbers = { MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER, MAGIC_NUMBER };
 

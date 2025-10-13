@@ -72,8 +72,8 @@ CSendNode::CSendNode()
 
 CSendNode::~CSendNode()
 {
-	int c = GetNumChildren();
-	for ( int i = c - 1 ; i >= 0 ; i-- )
+	intp c = GetNumChildren();
+	for ( intp i = c - 1 ; i >= 0 ; i-- )
 	{
 		delete GetChild( i );
 	}
@@ -161,7 +161,7 @@ static void SetDataTableProxyIndices_R(
 	CSendNode *pCurTable,
 	CBuildHierarchyStruct *bhs )
 {
-	for ( int i=0; i < pCurTable->GetNumChildren(); i++ )
+	for ( intp i=0; i < pCurTable->GetNumChildren(); i++ )
 	{
 		CSendNode *pNode = pCurTable->GetChild( i );
 		const SendProp *pProp = bhs->m_pDatatableProps[pNode->m_iDatatableProp];
@@ -192,7 +192,7 @@ static void SetRecursiveProxyIndices_R(
 	pCurTable->SetRecursiveProxyIndex( iCurProxyIndex );
 	iCurProxyIndex++;
 	
-	for ( int i=0; i < pCurTable->GetNumChildren(); i++ )
+	for ( intp i=0; i < pCurTable->GetNumChildren(); i++ )
 	{
 		CSendNode *pNode = pCurTable->GetChild( i );
 		SetRecursiveProxyIndices_R( pBaseTable, pNode, iCurProxyIndex );
@@ -346,7 +346,7 @@ void CalcPathLengths_R( CSendNode *pNode, CUtlVector<int> &pathLengths, int curP
 	pathLengths[pNode->GetRecursiveProxyIndex()] = curPathLength;
 	totalPathLengths += curPathLength;
 	
-	for ( int i=0; i < pNode->GetNumChildren(); i++ )
+	for ( intp i=0; i < pNode->GetNumChildren(); i++ )
 	{
 		CalcPathLengths_R( pNode->GetChild( i ), pathLengths, curPathLength+1, totalPathLengths );
 	}
@@ -378,7 +378,7 @@ void FillPathEntries_R( CSendTablePrecalc *pPrecalc, CSendNode *pNode, CSendNode
 		outProxyPath.m_nEntries = 0;
 	}
 
-	for ( int i=0; i < pNode->GetNumChildren(); i++ )
+	for ( intp i=0; i < pNode->GetNumChildren(); i++ )
 	{
 		FillPathEntries_R( pPrecalc, pNode->GetChild( i ), pNode, iCurEntry );
 	}
@@ -546,8 +546,8 @@ void DataTable_Warning( PRINTF_FORMAT_STRING const char *pInMessage, ... )
 	char msg[4096];
 	va_list marker;
 	
-	va_start(marker, pInMessage);
-	V_sprintf_safe( msg, pInMessage, marker);
+	va_start(marker, pInMessage); //-V2019 //-V2018
+	V_vsprintf_safe( msg, pInMessage, marker);
 	va_end(marker);
 
 	Warning( "DataTable warning: %s", msg );

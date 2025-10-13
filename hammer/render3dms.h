@@ -16,6 +16,7 @@
 #include "mapclass.h"
 #include "lpreview_thread.h"
 #include "shaderapi/ishaderapi.h"
+#include "windows/dpi_wnd_behavior.h"
 
 //
 // Size of the buffer used for picking. See glSelectBuffer for documention on
@@ -247,9 +248,10 @@ protected:
 
 	float m_fFrameRate;					// Framerate in frames per second, calculated once per second.
 	int m_nFramesThisSample;			// Number of frames rendered in the current sample period.
-	DWORD m_dwTimeLastSample;			// Time when the framerate was last calculated.
 
-	DWORD m_dwTimeLastFrame;			// The time when the previous frame was rendered.
+	ULONGLONG m_dwTimeLastSample;		// Time when the framerate was last calculated.
+	ULONGLONG m_dwTimeLastFrame;		// The time when the previous frame was rendered.
+
 	float m_fTimeElapsed;				// Milliseconds elapsed since the last frame was rendered.
 
 	// context for the last bitmap we sent to lighting preview for ray tracing. we do not send if

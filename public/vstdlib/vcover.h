@@ -17,14 +17,9 @@
 class CVCoverage
 {
 public:
-	CVCoverage() :
-	  m_bActive( false ),
-	  m_depth( 0 ),
-	  m_token( 1 )
-	{
-	}
+	CVCoverage() = default;
 
-	bool IsActive() const
+	[[nodiscard]] bool IsActive() const
 	{
 		return m_bActive;
 	}
@@ -52,7 +47,7 @@ public:
 		m_locations.RemoveAll();
 	}
 
-	bool ShouldCover( unsigned token ) const
+	[[nodiscard]] bool ShouldCover( unsigned token ) const
 	{
 		return ( m_bActive && m_depth > 0 && token != m_token );
 	}
@@ -99,9 +94,9 @@ private:
 		}
 	};
 
-	bool m_bActive;
-	intp m_depth;
-	unsigned m_token;
+	bool m_bActive{ false };
+	intp m_depth{ 0 };
+	unsigned m_token{ 1 };
 
 	CUtlRBTree< Location_t, unsigned short, CLocationLess > m_locations;
 };

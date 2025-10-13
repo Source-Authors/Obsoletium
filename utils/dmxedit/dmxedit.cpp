@@ -3712,7 +3712,7 @@ void CDmxEdit::Error( const tchar *pMsgFormat, ... )
 	va_list args;
 	va_start( args, pMsgFormat );
 	tchar pTempBuffer[5020];
-	assert( _tcslen( pMsgFormat ) < sizeof( pTempBuffer) ); // check that we won't artificially truncate the string
+	Assert( _tcslen( pMsgFormat ) < sizeof( pTempBuffer) ); // check that we won't artificially truncate the string
 	_vsntprintf( pTempBuffer, sizeof( pTempBuffer ) - 1, pMsgFormat, args );
 	pTempBuffer[ std::size(pTempBuffer) - 1 ] = 0;
 	// dimhotepus: Error to stderr.

@@ -28,7 +28,7 @@ public:
 	void GetOutputAttributes( CUtlVector< CDmAttribute * > &attrs ) override;
 
 protected:
-	CDmaVar< bool > *m_keys;
+	CDmaVar< bool > *m_keys{nullptr};
 
 	bool GetKeyStatus( uint ki );
 };

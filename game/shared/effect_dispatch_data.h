@@ -108,6 +108,8 @@ public:
 		m_bControlPoint1 = false;
 		m_ControlPoint1.m_eParticleAttachment = PATTACH_ABSORIGIN;
 		m_ControlPoint1.m_vecOffset.Init();
+
+		m_iEffectName = -1;
 	}
 
 	int GetEffectNameIndex() { return m_iEffectName; }

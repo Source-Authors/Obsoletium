@@ -84,8 +84,8 @@ bool CDispPaintMgr::PostPaint( bool bAutoSew )
 		return false;
 
 	// Update the modified displacements.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -121,8 +121,8 @@ bool CDispPaintMgr::DoPaint( SpatialPaintData_t &spatialData )
 	}
 
 	// For each displacement surface is the selection list attempt to paint on it.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -164,7 +164,7 @@ bool CDispPaintMgr::DoPaint( SpatialPaintData_t &spatialData )
 //-----------------------------------------------------------------------------
 void CDispPaintMgr::NudgeAdd( CMapDisp *pDisp, int iVert )
 {
-	int iNudge = m_aNudgeData.AddToTail();
+	intp iNudge = m_aNudgeData.AddToTail();
 	m_aNudgeData[iNudge].m_hDisp = pDisp->GetEditHandle();
 	m_aNudgeData[iNudge].m_iVert = iVert;
 }
@@ -177,8 +177,8 @@ void CDispPaintMgr::DoNudgeAdd( SpatialPaintData_t &spatialData )
 	Vector vPaintPos, vVert;
 	float flDistance2;
 
-	int nNudgeCount = m_aNudgeData.Count();
-	for ( int iNudge = 0; iNudge < nNudgeCount; iNudge++ )
+	intp nNudgeCount = m_aNudgeData.Count();
+	for ( intp iNudge = 0; iNudge < nNudgeCount; iNudge++ )
 	{
 		DispVertPair_t *pPairData = &m_aNudgeData[iNudge];
 
@@ -371,8 +371,8 @@ bool CDispPaintMgr::DoPaintSmoothOneOverExp( const SpatialPaintData_t &spatialDa
 	// Calculate the plane dist.
 	float flPaintDist = spatialData.m_vPaintAxis.Dot( vNewCenter );
 
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )

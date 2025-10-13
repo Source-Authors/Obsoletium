@@ -9,11 +9,9 @@
 
 #ifndef UTLALLOCATION_H
 #define UTLALLOCATION_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-#include "tier1/utlmemory.h"
+#include "utlmemory.h"
+#include "strtools.h"
 
 class CUtlAllocation
 {
@@ -22,18 +20,18 @@ public:
 	// constructor, destructor
 	CUtlAllocation()			
 	{ 
-		m_pMemory = NULL;
+		m_pMemory = nullptr;
 	}
 
 	CUtlAllocation( const void *pMemory, int cub )			
 	{ 
-		m_pMemory = NULL;
+		m_pMemory = nullptr;
 		Copy( pMemory, cub );
 	}
 
 	CUtlAllocation( CUtlAllocation const &src )
 	{ 
-		m_pMemory = NULL;
+		m_pMemory = nullptr;
 		Copy( src );
 	}
 
@@ -57,7 +55,7 @@ public:
 
 	void Copy( const void *pMemory, int cub )
 	{
-		if ( cub == 0 || pMemory == NULL )
+		if ( cub == 0 || pMemory == nullptr )
 		{
 			Purge();
 			return;
@@ -74,22 +72,22 @@ public:
 	// Gets the base address
 	uint8* Base()
 	{ 
-		if ( m_pMemory == NULL ) 
-			return NULL; 
+		if ( m_pMemory == nullptr ) 
+			return nullptr; 
 		return m_pMemory->rgub; 
 	}
 
-	const uint8* Base() const
+	[[nodiscard]] const uint8* Base() const
 	{ 
-		if ( m_pMemory == NULL ) 
-			return NULL; 
+		if ( m_pMemory == nullptr ) 
+			return nullptr; 
 		return m_pMemory->rgub; 
 	}
 
 	// Size
-	int Count() const
+	[[nodiscard]] int Count() const
 	{ 
-		if ( m_pMemory == NULL ) 
+		if ( m_pMemory == nullptr ) 
 			return 0; 
 		return m_pMemory->cub; 
 	}
@@ -99,7 +97,7 @@ public:
 	{ 
 		if ( m_pMemory )
 			free(m_pMemory); 
-		m_pMemory = NULL; 
+		m_pMemory = nullptr; 
 	}
 
 	void Copy( const CUtlAllocation &alloc )

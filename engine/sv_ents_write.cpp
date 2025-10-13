@@ -324,7 +324,7 @@ static inline void SV_WritePropsFromPackedEntity(
 	if ( !u.m_bCullProps && hltv )
 	{
 		// this is a HLTV relay proxy, cache delta bits
-		int nBits = u.m_pBuf->GetNumBitsWritten() - bufStart.GetNumBitsWritten();
+		intp nBits = u.m_pBuf->GetNumBitsWritten() - bufStart.GetNumBitsWritten();
 		hltv->m_DeltaCache.AddDeltaBits( pTo->m_nEntityIndex, u.m_pFromSnapshot->m_nTickCount, nBits, &bufStart );
 	}
 }
@@ -509,12 +509,12 @@ static inline void SV_DetermineUpdateType( CEntityWriteInfo &u )
 		// Write a header.
 		SV_WriteDeltaHeader( u, u.m_nNewEntity, FHDR_ZERO );
 #if defined( DEBUG_NETWORKING )
-		int startBit = u.m_pBuf->GetNumBitsWritten();
+		intp startBit = u.m_pBuf->GetNumBitsWritten();
 #endif
 		SV_WritePropsFromPackedEntity( u, checkProps, nCheckProps );
 #if defined( DEBUG_NETWORKING )
 		int endBit = u.m_pBuf->GetNumBitsWritten();
-		TRACE_PACKET( ( "    Delta Bits (%d) = %d (%d bytes)\n", u.m_nNewEntity, (endBit - startBit), ( (endBit - startBit) + 7 ) / 8 ) );
+		TRACE_PACKET( ( "    Delta Bits (%zd) = %zd (%zd bytes)\n", u.m_nNewEntity, (endBit - startBit), ( (endBit - startBit) + 7 ) / 8 ) );
 #endif
 		// If the numbers are the same, then the entity was in the old and new packet.
 		// Just delta compress the differences.
@@ -596,7 +596,7 @@ static inline void SV_WriteEnterPVS( CEntityWriteInfo &u )
 	else
 	{
 		// Since the ent is in the fullpack, then it must have either a static or an instance baseline.
-		int nFromBytes;
+		intp nFromBytes;
 		if ( !u.m_pServer->GetClassBaseline( pClass, &pFromData, &nFromBytes ) )
 		{
 			Error( "SV_WriteEnterPVS: missing instance baseline for '%s'.", pClass->m_pNetworkName );
@@ -747,7 +747,7 @@ static inline int SV_WriteDeletions( CEntityWriteInfo &u )
 
 		// Looks like it should be gone
 		bool bNeedsExplicitDelete = SV_NeedsExplicitDestroy( i, pFromSnapShot, pToSnapShot );
-		if ( !bNeedsExplicitDelete && u.m_pTo )
+		if ( !bNeedsExplicitDelete )
 		{
 			bNeedsExplicitDelete = ( pToSnapShot->m_iExplicitDeleteSlots.Find(i) != pToSnapShot->m_iExplicitDeleteSlots.InvalidIndex() );
 			// We used to do more stuff here as a sanity check, but I don't think it was necessary since the only thing that would unset the bould would be a "recreate" in the same slot which is
@@ -856,7 +856,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 	// Save room for number of headers to parse, too
 	u.m_pBuf->WriteUBitLong ( 0, MAX_EDICT_BITS+DELTASIZE_BITS+1 );	
 		
-	int startbit = u.m_pBuf->GetNumBitsWritten();
+	intp startbit = u.m_pBuf->GetNumBitsWritten();
 
 	bool bIsTracing = client->IsTracing();
 	if ( bIsTracing )
@@ -876,7 +876,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 		{
 			u.m_pNewPack = (u.m_nNewEntity != ENTITY_SENTINEL) ? framesnapshotmanager->GetPackedEntity( u.m_pToSnapshot, u.m_nNewEntity ) : NULL;
 			u.m_pOldPack = (u.m_nOldEntity != ENTITY_SENTINEL) ? framesnapshotmanager->GetPackedEntity( u.m_pFromSnapshot, u.m_nOldEntity ) : NULL;
-			int nEntityStartBit = pBuf.GetNumBitsWritten();
+			intp nEntityStartBit = pBuf.GetNumBitsWritten();
 
 			// Figure out how we want to write this entity.
 			SV_DetermineUpdateType( u  );
@@ -924,7 +924,7 @@ void CBaseServer::WriteDeltaEntities( CBaseClient *client, CClientFrame *to, CCl
 	}
 
 	// get number of written bits
-	int length = u.m_pBuf->GetNumBitsWritten() - startbit;
+	intp length = u.m_pBuf->GetNumBitsWritten() - startbit;
 
 	// go back to header and fill in correct length now
 	savepos.WriteUBitLong( u.m_nHeaderCount, MAX_EDICT_BITS );

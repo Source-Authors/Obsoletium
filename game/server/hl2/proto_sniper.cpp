@@ -2599,7 +2599,7 @@ Vector CProtoSniper::LeadTarget( CBaseEntity *pTarget )
 //---------------------------------------------------------
 CBaseEntity *CProtoSniper::PickDeadPlayerTarget()
 {
-	const int iSearchSize = 32;
+	constexpr int iSearchSize = 32;
 	CBaseEntity *pTarget = AI_GetSinglePlayer();
 	CBaseEntity *pEntities[ iSearchSize ];
 

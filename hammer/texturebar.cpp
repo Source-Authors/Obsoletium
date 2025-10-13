@@ -129,13 +129,13 @@ void CTextureBar::NotifyGraphicsChanged()
 	m_TextureGroupList.ResetContent();
 	m_TextureGroupList.AddString("All Textures");
 
-	int nCount = g_Textures.GroupsGetCount();
+	intp nCount = g_Textures.GroupsGetCount();
 	if (nCount > 1)
 	{
 		//
 		// Skip first group ("All Textures").
 		//
-		for (int i = 1; i < nCount; i++)
+		for (intp i = 1; i < nCount; i++)
 		{
 			CTextureGroup *pGroup = g_Textures.GroupsGet(i);
 			if (pGroup->GetTextureFormat() == g_pGameConfig->GetTextureFormat())

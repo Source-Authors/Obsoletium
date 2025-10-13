@@ -87,6 +87,7 @@
 #include "ihudlcd.h"
 #include "toolframework_client.h"
 #include "hltvcamera.h"
+#include "vscript/ivscript.h"
 #if defined( REPLAY_ENABLED )
 #include "replay/replaycamera.h"
 #include "replay/replay_ragdoll.h"
@@ -152,18 +153,6 @@
 
 extern vgui::IInputInternal *g_InputInternal;
 
-//=============================================================================
-// HPE_BEGIN
-// [dwenger] Necessary for stats display
-//=============================================================================
-
-#include "achievements_and_stats_interface.h"
-
-//=============================================================================
-// HPE_END
-//=============================================================================
-
-
 #ifdef PORTAL
 #include "PortalRender.h"
 #endif
@@ -207,6 +196,7 @@ IXboxSystem *xboxsystem = NULL;	// Xbox 360 only
 IMatchmaking *matchmaking = NULL;
 IUploadGameStats *gamestatsuploader = NULL;
 IClientReplayContext *g_pClientReplayContext = NULL;
+IScriptManager *scriptmanager = NULL;
 #if defined( REPLAY_ENABLED )
 IReplayManager *g_pReplayManager = NULL;
 IReplayMovieManager *g_pReplayMovieManager = NULL;
@@ -219,17 +209,6 @@ IReplaySystem *g_pReplay = NULL;
 #endif
 
 IHaptics* haptics = NULL;// NVNT haptics system interface singleton
-
-//=============================================================================
-// HPE_BEGIN
-// [dwenger] Necessary for stats display
-//=============================================================================
-
-AchievementsAndStatsInterface* g_pAchievementsAndStatsInterface = NULL;
-
-//=============================================================================
-// HPE_END
-//=============================================================================
 
 IGameSystem *SoundEmitterSystem();
 IGameSystem *ToolFrameworkClientSystem();
@@ -336,6 +315,8 @@ static ConVar s_cl_class("cl_class", "default", FCVAR_USERINFO|FCVAR_ARCHIVE, "D
 static ConVar s_cl_load_hl1_content("cl_load_hl1_content", "0", FCVAR_ARCHIVE, "Mount the content from Half-Life: Source if possible");
 #endif
 
+// dimhotepus: TF2 backport.
+ConVar r_lightmap_bicubic_set( "r_lightmap_bicubic_set", "0", FCVAR_ARCHIVE | FCVAR_HIDDEN, "Hack to get this convar to be re-set on first launch." );
 
 // Physics system
 bool g_bLevelInitialized;
@@ -391,35 +372,18 @@ public:
 
     void CreateAchievementsPanel( vgui::Panel* pParent )
     {
-        if (g_pAchievementsAndStatsInterface)
-        {
-            g_pAchievementsAndStatsInterface->CreatePanel( pParent );
-        }
     }
 
     void DisplayAchievementPanel()
     {
-        if (g_pAchievementsAndStatsInterface)
-        {
-            g_pAchievementsAndStatsInterface->DisplayPanel();
-        }
     }
 
     void ShutdownAchievementPanel()
     {
-        if (g_pAchievementsAndStatsInterface)
-        {
-            g_pAchievementsAndStatsInterface->ReleasePanel();
-        }
     }
 
 	int GetAchievementsPanelMinWidth( void ) const
 	{
-        if ( g_pAchievementsAndStatsInterface )
-        {
-            return g_pAchievementsAndStatsInterface->GetAchievementsPanelMinWidth();
-        }
-
 		return 0;
 	}
 
@@ -865,6 +829,8 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 #ifdef SIXENSE
 	g_pSixenseInput = new SixenseInput;
+	// dimhotepus: Initialize six sense.
+	g_pSixenseInput->Init();
 #endif
 
 	// Hook up global variables
@@ -951,6 +917,12 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	InitFbx();
 #endif
 
+	if ( !CommandLine()->CheckParm( "-noscripting") )
+	{
+		if ( (scriptmanager = (IScriptManager *)appSystemFactory( VSCRIPT_INTERFACE_VERSION, NULL )) == NULL )
+			return false;
+	}
+
 	// it's ok if this is NULL. That just means the sourcevr.dll wasn't found
 	if ( CommandLine()->CheckParm( "-vr" ) )
 		g_pSourceVR = (ISourceVirtualReality *)appSystemFactory(SOURCE_VIRTUAL_REALITY_INTERFACE_VERSION, NULL);
@@ -1015,7 +987,7 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 	IGameSystem::Add( PerfVisualBenchmark() );
 	IGameSystem::Add( MumbleSystem() );
 	
-	#if defined( TF_CLIENT_DLL )
+#if defined( TF_CLIENT_DLL )
 	IGameSystem::Add( CustomTextureToolCacheGameSystem() );
 	IGameSystem::Add( TFSharedContentManager() );
 	#endif
@@ -1082,12 +1054,9 @@ int CHLClient::Init( CreateInterfaceFn appSystemFactory, CreateInterfaceFn physi
 
 	C_BaseAnimating::InitBoneSetupThreadPool();
 
-#if defined( WIN32 ) && !defined( _X360 )
-	// NVNT connect haptics sytem
+#ifdef WIN32
+	// NVNT connect haptics system. It hooks messages automatically.
 	ConnectHaptics(appSystemFactory);
-#endif
-#ifndef _X360
-	HookHapticMessages(); // Always hook the messages
 #endif
 
 	return true;
@@ -1157,6 +1126,17 @@ void CHLClient::PostInit()
 		}
 	}
 #endif
+	
+	// dimhotepus: TF2 backport.
+	if ( !r_lightmap_bicubic_set.GetBool() && materials )
+	{
+		MaterialAdapterInfo_t info{};
+		materials->GetDisplayAdapterInfo( materials->GetCurrentAdapter(), info );
+
+		ConVarRef r_lightmap_bicubic( "r_lightmap_bicubic" );
+		r_lightmap_bicubic.SetValue( info.m_nMaxDXSupportLevel >= 95 || ( info.m_nMaxDXSupportLevel >= 90 && IsLinux() ) );
+		r_lightmap_bicubic_set.SetValue( true );
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1164,68 +1144,132 @@ void CHLClient::PostInit()
 //-----------------------------------------------------------------------------
 void CHLClient::Shutdown( void )
 {
-    if (g_pAchievementsAndStatsInterface)
-    {
-        g_pAchievementsAndStatsInterface->ReleasePanel();
-    }
+	UncacheAllMaterials();
+	vgui::BuildGroup::ClearResFileCache();
 
-#ifdef SIXENSE
-	g_pSixenseInput->Shutdown();
-	delete g_pSixenseInput;
-	g_pSixenseInput = NULL;
+	// dimhotepus: Shutdown in reverse order to Init.
+#ifdef WIN32
+	// NVNT Disconnect haptics system.
+	// It unhooks messages autmoatically.
+	DisconnectHaptics();
 #endif
 
 	C_BaseAnimating::ShutdownBoneSetupThreadPool();
-	ClientWorldFactoryShutdown();
 
+	ClientWorldFactoryShutdown();
+	
 	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetViewEffectsRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetPhysSaveRestoreBlockHandler() );
 	g_pGameSaveRestoreBlockSet->RemoveBlockHandler( GetEntitySaveRestoreBlockHandler() );
 
+	PhysicsDLLShutdown();
+
+	GetClientVoiceMgr()->Shutdown();
 	ClientVoiceMgr_Shutdown();
+
+	// Unregister user messages..
+	CUserMessageRegister::UnregisterAll();
+
+	TermSmokeFogOverlay();
+
+	VGui_Shutdown();
+
+	input->Shutdown_All();
+
+	C_BaseTempEntity::ClearDynamicTempEnts();
+
+	vieweffects->Shutdown();
+	view->Shutdown();
+
+	view = nullptr;
+
+	g_pClientMode->Disable();
+
+	IGameSystem::ShutdownAllSystems();
+
+	g_pClientMode->Shutdown();
+	
+	gHUD.Shutdown();
+	
+	g_pClientMode->VGui_Shutdown();
+
+	modemanager->Shutdown( );
+
+	IGameSystem::RemoveAll();
+
+	VGui_Shutdown();
+
+	g_pParticleSystemMgr->UncacheAllParticleSystems();
+	
+	ParticleMgr()->Term();
 
 	Initializer::FreeAllObjects();
 
-	g_pClientMode->Disable();
-	g_pClientMode->Shutdown();
+	g_pcv_ThreadMode = nullptr;
 
-	input->Shutdown_All();
-	C_BaseTempEntity::ClearDynamicTempEnts();
-	TermSmokeFogOverlay();
-	view->Shutdown();
-	g_pParticleSystemMgr->UncacheAllParticleSystems();
-	UncacheAllMaterials();
+	ConVar_Unregister();
 
-	IGameSystem::ShutdownAllSystems();
+	materials_stub = nullptr;
+
+	soundemitterbase->Disconnect();
 	
-	gHUD.Shutdown();
-	VGui_Shutdown();
-	
-	ParticleMgr()->Term();
-	
-	vgui::BuildGroup::ClearResFileCache();
+	g_pSourceVR = nullptr;
+	scriptmanager = nullptr;
+
+#ifdef WORKSHOP_IMPORT_ENABLED
+	ShutdownFbx();
+	ShutdownDataModel();
+	DisconnectDataModel();
+#endif
+
+	engine = nullptr;
+	modelrender = nullptr;
+	effects = nullptr;
+	enginetrace = nullptr;
+	render = nullptr;
+	debugoverlay = nullptr;
+	datacache = nullptr;
+	mdlcache = nullptr;
+	modelinfo = nullptr;
+	enginevgui = nullptr;
+	networkstringtable = nullptr;
+	partition = nullptr;
+	shadowmgr = nullptr;
+	staticpropmgr = nullptr;
+	enginesound = nullptr;
+	filesystem = nullptr;
+	random = nullptr;
+	gameuifuncs = nullptr;
+	gameeventmanager = nullptr;
+	soundemitterbase = nullptr;
+	inputsystem = nullptr;
+	scenefilecache = nullptr;
+	xboxsystem = nullptr;
+	matchmaking = nullptr;
+
+#ifndef _XBOX
+	gamestatsuploader = nullptr;
+#endif
+
+#if defined( REPLAY_ENABLED )
+	g_pEngineReplay = nullptr;
+	g_pEngineClientReplay = nullptr;
+#endif
 
 #ifndef NO_STEAM
 	ClientSteamContext().Shutdown();
 #endif
 
-#ifdef WORKSHOP_IMPORT_ENABLED
-	ShutdownDataModel();
-	DisconnectDataModel();
-	ShutdownFbx();
-#endif
-	
-	// This call disconnects the VGui libraries which we rely on later in the shutdown path, so don't do it
-//	DisconnectTier3Libraries( );
-	DisconnectTier2Libraries( );
-	ConVar_Unregister();
-	DisconnectTier1Libraries( );
+	DisconnectTier3Libraries();
+	DisconnectTier2Libraries();
+	DisconnectTier1Libraries();
 
-	gameeventmanager = NULL;
+	gpGlobals = nullptr;
 
-#if defined( WIN32 ) && !defined( _X360 )
-	// NVNT Disconnect haptics system
-	DisconnectHaptics();
+#ifdef SIXENSE
+	g_pSixenseInput->Shutdown();
+	delete g_pSixenseInput;
+	g_pSixenseInput = NULL;
 #endif
 }
 
@@ -1920,9 +1964,7 @@ void CHLClient::PrecacheMaterial( const char *pMaterialName )
 {
 	Assert( pMaterialName );
 
-	intp nLen = Q_strlen( pMaterialName );
-	char *pTempBuf = (char*)stackalloc( nLen + 1 );
-	memcpy( pTempBuf, pMaterialName, nLen + 1 );
+	V_strdup_stack( pMaterialName, pTempBuf );
 	char *pFound = Q_strstr( pTempBuf, ".vmt\0" );
 	if ( pFound )
 	{

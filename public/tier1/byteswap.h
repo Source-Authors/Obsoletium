@@ -6,11 +6,9 @@
 //=============================================================================
 #ifndef BYTESWAP_H
 #define BYTESWAP_H
-#if defined(_WIN32)
-#pragma once
-#endif
 
 #include "datamap.h"	// Needed for typedescription_t.  Note datamap.h is tier1 as well.
+#include "tier0/basetypes.h"
 #include "tier0/dbg.h"
 
 #ifdef _MSC_VER
@@ -64,19 +62,6 @@
 #include <byteswap.h>
 
 #endif
-
-enum class endian
-{
-#if defined(_MSC_VER) && !defined(__clang__)
-	little = 0,
-	big    = 1,
-	native = little
-#else
-	little = __ORDER_LITTLE_ENDIAN__,
-	big    = __ORDER_BIG_ENDIAN__,
-	native = __BYTE_ORDER__
-#endif
-};
 
 #ifdef CByteswap
 #undef CByteswap

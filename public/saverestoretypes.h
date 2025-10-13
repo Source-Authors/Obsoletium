@@ -102,7 +102,8 @@ struct levellist_t
 
 struct EHandlePlaceholder_t // Engine does some of the game writing (alas, probably shouldn't), but can't see ehandle.h
 {
-	unsigned long i;
+	// dimhotepus: unsigned long -> uint32. TF2 backport.
+	uint32 i;
 };
 
 //-------------------------------------
@@ -515,7 +516,7 @@ inline const char *CSaveRestoreSegment::StringFromSymbol( int token )
 #include <x86intrin.h>
 #endif
 
-// dimhotepus: clang now support _rotr
+// dimhotepus: clang now support _rotr, _rotr64
 //#ifdef COMPILER_CLANG
 //static __inline__ unsigned int __attribute__((__always_inline__, __nodebug__))
 //_rotr(unsigned int _Value, int _Shift) {
@@ -530,8 +531,17 @@ inline unsigned int CSaveRestoreSegment::HashString( const char *pszToken )
 	COMPILE_TIME_ASSERT( sizeof( unsigned int ) == 4 );
 	unsigned int	hash = 0;
 
+	// dimhotepus: x86-64 hashing support.
 	while ( *pszToken )
-		hash = _rotr( hash, 4 ) ^ *pszToken++;
+#ifndef PLATFORM_64BITS
+		if constexpr (sizeof(uintp) == 4)
+			hash = _rotr( hash, 4 ) ^ *pszToken++;
+#else
+		if constexpr (sizeof(uintp) == 8)
+			hash = _rotr64( hash, 4 ) ^ *pszToken++;
+#endif
+		else
+			static_assert(sizeof(uintp) == 4 || sizeof(uintp) == 8, "Unknown uintp size.");
 
 	return hash;
 }

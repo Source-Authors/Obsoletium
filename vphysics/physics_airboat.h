@@ -245,7 +245,6 @@ protected:
 	IVP_FLOAT						m_flThrust;
 
 	bool							m_bAirborne;		// Whether we are airborne or not.
-	IVP_FLOAT						m_flAirTime;		// How long we've been airborne (if we are).
 	bool							m_bWeakJump;		// Set when we become airborne while going slow.
 
 	// Pitch and roll stabilizers.

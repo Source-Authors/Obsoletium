@@ -165,7 +165,7 @@ bool Flashlight_UseLegacyVersion( void )
 	if ( g_bCacheLegacyFlashlightStatus )
 	{
 		char modDir[MAX_PATH];
-		if ( UTIL_GetModDir( modDir, sizeof(modDir) ) == false )
+		if ( UTIL_GetModDir( modDir ) == false )
 			return false;
 
 		g_bUseLegacyFlashlight = ( !Q_strcmp( modDir, "hl2" ) ||
@@ -2945,7 +2945,7 @@ void CHL2_Player::UpdateWeaponPosture( void )
 		VPROF( "CHL2_Player::UpdateWeaponPosture-CheckLower" );
 		Vector vecAim = BaseClass::GetAutoaimVector( AUTOAIM_SCALE_DIRECT_ONLY );
 
-		const float CHECK_FRIENDLY_RANGE = 50 * 12;
+		constexpr float CHECK_FRIENDLY_RANGE = 50 * 12;
 		trace_t	tr;
 		UTIL_TraceLine( EyePosition(), EyePosition() + vecAim * CHECK_FRIENDLY_RANGE, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
 

@@ -664,8 +664,8 @@ void DrawSplineSegs( int noise_divisions, float *prgNoise,
 	float			div, length, fraction, factor, vLast, vStep, brightness;
 	float			scaledColor[3];
 
-	model_t *beamsprite = ( model_t *)beammodel;
-	model_t *halosprite = ( model_t *)halomodel;
+	const model_t *beamsprite = ( const model_t *)beammodel;
+	const model_t *halosprite = ( const model_t *)halomodel;
 
 	CEngineSprite *pBeamSprite = Draw_SetSpriteTexture( beamsprite, frame, rendermode );
 	if ( !pBeamSprite )

@@ -91,7 +91,7 @@ static BOOL FindKeyValue(CMapEntity *pEntity, MDkeyvalue *pKV)
 //-----------------------------------------------------------------------------
 int CompareEntityNames(const char *szName1, const char *szName2)
 {
-	int nCompareLen = -1;
+	intp nCompareLen = -1;
 
 	const char *pszWildcard1 = strchr(szName1, '*');
 	if (pszWildcard1)
@@ -584,13 +584,11 @@ void CMapEntity::CalcBounds(BOOL bFullUpdate)
 //-----------------------------------------------------------------------------
 // Purpose: Debugging hook.
 //-----------------------------------------------------------------------------
-#pragma warning (disable:4189)
 void CMapEntity::Debug(void)
 {
 	int i = m_KeyValues.GetFirst();
-	MDkeyvalue &KeyValue = m_KeyValues.GetKeyValue(i);
+	[[maybe_unused]] MDkeyvalue &KeyValue = m_KeyValues.GetKeyValue(i);
 }
-#pragma warning (default:4189)
 
 
 //-----------------------------------------------------------------------------
@@ -891,8 +889,8 @@ void CMapEntity::ReplaceTargetname(const char *szOldName, const char *szNewName)
 	//
 	// Replace any connections that target the old name.
 	//
-	int nConnCount = Connections_GetCount();
-	for (int i = 0; i < nConnCount; i++)
+	intp nConnCount = Connections_GetCount();
+	for (intp i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConn = Connections_Get(i);
 		if (!CompareEntityNames( pConn->GetTargetName(), szOldName ))
@@ -1085,7 +1083,7 @@ void CMapEntity::EnsureUniqueNodeID(CMapWorld *pWorld)
 //-----------------------------------------------------------------------------
 void CMapEntity::PostloadWorld(CMapWorld *pWorld)
 {
-	int nIndex;
+	intp nIndex;
 
 	//
 	// Set our origin from our "origin" key and discard the key.
@@ -1602,7 +1600,7 @@ CMapEntity *CMapEntity::FindChildByKeyValue( LPCSTR key, LPCSTR value, bool *bIs
 		return(NULL);
 	}
 
-	int index;
+	intp index;
 	LPCSTR val = CEditGameClass::GetKeyValue(key, &index);
 
 	if ( val && value && !stricmp(value, val) )
@@ -2018,7 +2016,7 @@ void CMapEntity::Render2D(CRender2D *pRender)
 
 			CMapObjectList FoundEntitiesTarget;
 			FoundEntitiesTarget.RemoveAll();
-			pWorld->EnumChildren((ENUMMAPCHILDRENPROC)FindKeyValue, (DWORD)&kv, MAPCLASS_TYPE(CMapEntity));
+			pWorld->EnumChildren(&FindKeyValue, &kv);
 
 			Vector vCenter1,vCenter2;
 			GetBoundsCenter( vCenter1 );

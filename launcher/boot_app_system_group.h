@@ -23,8 +23,6 @@ class BootAppSystemGroup : public CSteamAppSystemGroup {
   BootAppSystemGroup(ICommandLine *command_line,
                      const char (&base_directory)[MAX_PATH], bool is_text_mode)
       : command_line_(command_line),
-        engine_api_(nullptr),
-        hammer_(nullptr),
         is_edit_mode_(command_line->CheckParm("-edit")),
         is_text_mode_(is_text_mode) {
     V_strcpy_safe(base_dir_, base_directory);
@@ -45,10 +43,10 @@ class BootAppSystemGroup : public CSteamAppSystemGroup {
   const char *DetermineDefaultMod();
   const char *DetermineDefaultGame();
 
-  char base_dir_[_MAX_PATH];
+  char base_dir_[MAX_PATH];
   ICommandLine *command_line_;
-  IEngineAPI *engine_api_;
-  IHammer *hammer_;
+  IEngineAPI *engine_api_{nullptr};
+  IHammer *hammer_{nullptr};
   std::unique_ptr<IResourceListing> resource_listing_;
   const bool is_edit_mode_;
   const bool is_text_mode_;

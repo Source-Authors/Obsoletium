@@ -2,7 +2,7 @@
 //
 //{{NO_DEPENDENCIES}}
 // Microsoft Developer Studio generated include file.
-// Used by SteamDebugHelper.rc
+// Used by sptconvert.rc
 //
 
 #define SRC_PRODUCT_FILE_DESCRIPTION_STRING "SpeedTree *.spt to Valve *.smd Converter"

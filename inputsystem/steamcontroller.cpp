@@ -283,7 +283,7 @@ void CInputSystem::PollSteamControllers( void )
 				SDigitalMenuAction& action = g_DigitalMenuActions[i];
 
 				// and for each controller
-				for ( uint64 j = 0; j < m_unNumConnected; ++j )
+				for ( uint32 j = 0; j < m_unNumConnected; ++j )
 				{
 
 					// Get the action's current state

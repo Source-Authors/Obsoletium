@@ -125,7 +125,7 @@ public:
 	int		Write( IN_BYTECAP(nLength) const void* pBuffer, int nLength );
 	int		Seek( int64 nOffset, int nWhence );
 	int		Tell();
-	int		Size();
+	unsigned		Size();
 
 	int64 AbsoluteBaseOffset();
 	bool	EndOfFile();
@@ -175,7 +175,7 @@ public:
 	int		Read( void* pBuffer, int nDestSize, int nLength );
 	int		Seek( int64 nOffset, int nWhence );
 	int		Tell() { return m_nPosition; }
-	int		Size() { return (int) m_nLength; }
+	unsigned	Size() { return (unsigned) m_nLength; }
 
 	CMemoryFileBacking *m_pBacking;
 	int m_nPosition;

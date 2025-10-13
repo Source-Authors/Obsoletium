@@ -16,8 +16,8 @@ struct DrawWater_params_t
 	half3 vTangentEyeVect;
 	float4 waterFogColor;
 #if BASETEXTURE
-	HALF4 lightmapTexCoord1And2;
-	HALF4 lightmapTexCoord3;
+	float4 lightmapTexCoord1And2;
+	float4 lightmapTexCoord3;
 #endif
 	float4 vProjPos;
 	float4 pixelFogParams;
@@ -90,7 +90,7 @@ void DrawWater( in DrawWater_params_t i,
 	vReflectTexCoord = vDependentTexCoords.xy;
 	vRefractTexCoord = vDependentTexCoords.wz;
 
-	HALF4 vReflectColor = tex2D( ReflectSampler, vReflectTexCoord );
+	float4 vReflectColor = tex2D( ReflectSampler, vReflectTexCoord );
 #if BLURRY_REFRACT
 	// Sample reflection and refraction
 	float2 ddx1=float2(0.005,0);
@@ -153,7 +153,7 @@ void DrawWater( in DrawWater_params_t i,
 #	endif
 #else
 	vReflectColor *= i.vReflectTint;
-	HALF4 vRefractColor = tex2D( RefractSampler, vRefractTexCoord );
+	float4 vRefractColor = tex2D( RefractSampler, vRefractTexCoord );
 	// get the depth value from the refracted sample to be used for fog.
 #	if ABOVEWATER
 	// Don't mess with this in the underwater case since we don't really have
@@ -166,8 +166,8 @@ void DrawWater( in DrawWater_params_t i,
 	vEyeVect = normalize( i.vTangentEyeVect );
 
 	// Fresnel term
-	HALF fNdotV = saturate( dot( vEyeVect, vNormal ) );
-	HALF fFresnel = pow( 1.0 - fNdotV, 5 );
+	float fNdotV = saturate( dot( vEyeVect, vNormal ) );
+	float fFresnel = pow( 1.0 - fNdotV, 5 );
 
 #if !BASETEXTURE
 	// fFresnel == 1.0f means full reflection
@@ -185,16 +185,16 @@ void DrawWater( in DrawWater_params_t i,
 
 #if BASETEXTURE
 	float4 baseSample = tex2D( BaseTextureSampler, i.vBumpTexCoord.xy );
-	HALF2 bumpCoord1;
-	HALF2 bumpCoord2;
-	HALF2 bumpCoord3;
+	float2 bumpCoord1;
+	float2 bumpCoord2;
+	float2 bumpCoord3;
 	ComputeBumpedLightmapCoordinates( i.lightmapTexCoord1And2, i.lightmapTexCoord3.xy,
 		bumpCoord1, bumpCoord2, bumpCoord3 );
 
-	HALF4 lightmapSample1 = tex2D( LightmapSampler, bumpCoord1 );
-	HALF3 lightmapColor1 = lightmapSample1.rgb;
-	HALF3 lightmapColor2 = tex2D( LightmapSampler, bumpCoord2 );
-	HALF3 lightmapColor3 = tex2D( LightmapSampler, bumpCoord3 );
+	float4 lightmapSample1 = tex2D( LightmapSampler, bumpCoord1 );
+	float3 lightmapColor1 = lightmapSample1.rgb;
+	float3 lightmapColor2 = tex2D( LightmapSampler, bumpCoord2 );
+	float3 lightmapColor3 = tex2D( LightmapSampler, bumpCoord3 );
 
 	float3 dp;
 	dp.x = saturate( dot( vNormal, bumpBasis[0] ) );
@@ -207,7 +207,7 @@ void DrawWater( in DrawWater_params_t i,
 		dp.z * lightmapColor3;
 	float sum = dot( dp, float3( 1.0f, 1.0f, 1.0f ) );
 	diffuseLighting *= LIGHT_MAP_SCALE / sum;
-	HALF3 diffuseComponent = baseSample.rgb * diffuseLighting;
+	float3 diffuseComponent = baseSample.rgb * diffuseLighting;
 #endif
 
 	if( bReflect && bRefract )

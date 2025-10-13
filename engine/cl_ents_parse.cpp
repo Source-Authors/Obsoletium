@@ -271,7 +271,7 @@ void CL_FlushEntityPacket( CClientFrame *packet, char const *errorString, ... )
 	va_list marker;
 
 	// Spit out an error.
-	va_start(marker, errorString);
+	va_start(marker, errorString); //-V2019 //-V2018
 	V_vsprintf_safe(str, errorString, marker);
 	va_end(marker);
 	
@@ -349,7 +349,7 @@ void CL_CopyNewEntity(
 
 	// Get either the static or instance baseline.
 	const void *pFromData;
-	int nFromBits;
+	intp nFromBits;
 
 	PackedEntity *baseline = u.m_bAsDelta ? cl.GetEntityBaseline( u.m_nBaseline, u.m_nNewEntity ) : NULL;
 	if ( baseline && baseline->m_pClientClass == pClass )

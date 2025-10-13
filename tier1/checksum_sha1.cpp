@@ -24,6 +24,7 @@
 #if !defined(_MINIMUM_BUILD_)
 #include "tier1/checksum_sha1.h"
 #include <cstring>
+#include "posix_file_stream.h"
 #else
 //
 //	This path is build in the CEG/DRM projects where we require that no CRT references are made !
@@ -34,7 +35,9 @@
 
 #include "tier1/strtools.h"
 
-#define MAX_FILE_READ_BUFFER 8000
+enum {
+  MAX_FILE_READ_BUFFER = 8000
+};
 
 // Rotate x bits to the left
 #ifndef ROL32
@@ -140,7 +143,8 @@ void CSHA1::Transform(unsigned long state[5], unsigned char buffer[64])
 	state[4] += e;
 
 	// Wipe variables
-	a = b = c = d = e = 0;
+	// dimhotepus: Compiler drops it anyway.
+	// a = b = c = d = e = 0;
 }
 
 // Use this function to hash in binary data and strings
@@ -177,36 +181,36 @@ void CSHA1::Update(unsigned char *data, unsigned int len)
 // Hash in file contents
 bool CSHA1::HashFile(char *szFileName)
 {
-	unsigned long ulFileSize = 0, ulRest = 0, ulBlocks = 0;
-	unsigned long i = 0;
 	unsigned char uData[MAX_FILE_READ_BUFFER];
-	FILE *fIn = NULL;
 
-	if(szFileName == NULL) return(false);
+	// dimhotepus: Safe file hashing.
+	if(!szFileName) return false;
 
-	if((fIn = fopen(szFileName, "rb")) == NULL) return(false);
+	auto [fIn, errc] = se::posix::posix_file_stream_factory::open(szFileName, "rb");
+	if(errc) return false;
 
-	fseek(fIn, 0, SEEK_END);
-	ulFileSize = ftell(fIn);
-	fseek(fIn, 0, SEEK_SET);
+	int64_t ulFileSize;
+	std::tie(ulFileSize, errc) = fIn.size();
+	if(errc || ulFileSize > std::numeric_limits<unsigned>::max()) return false;
 
-	ulRest = ulFileSize % MAX_FILE_READ_BUFFER;
-	ulBlocks = ulFileSize / MAX_FILE_READ_BUFFER;
+	const size_t ulRest = static_cast<size_t>(ulFileSize % std::size(uData));
+	const uint64_t ulBlocks = ulFileSize / std::size(uData);
 
-	for(i = 0; i < ulBlocks; i++)
+	for(uint64_t i = 0; i < ulBlocks; i++)
 	{
-		fread(uData, 1, MAX_FILE_READ_BUFFER, fIn);
-		Update(uData, MAX_FILE_READ_BUFFER);
+		std::tie(std::ignore, errc) = fIn.read(uData);
+		if(errc) return false;
+
+		Update(uData, std::size(uData));
 	}
 
 	if(ulRest != 0)
 	{
-		fread(uData, 1, ulRest, fIn);
+		std::tie(std::ignore, errc) = fIn.read(uData, ulRest);
+		if(errc) return false;
+
 		Update(uData, ulRest);
 	}
-
-	fclose(fIn);
-	fIn = NULL;
 
 	return(true);
 }
@@ -242,7 +246,6 @@ void CSHA1::Final()
 	}
 
 	// Wipe variables for security reasons
-	i = 0;
 	memset(m_buffer, 0, sizeof(m_buffer) );
 	memset(m_state, 0, sizeof(m_state) );
 	// dimhotepus: Ensure compiler do not remove trailing memset.
@@ -259,7 +262,7 @@ void CSHA1::ReportHash(char *szReport, std::ptrdiff_t nReportSize, unsigned char
 	unsigned char i = 0;
 	char szTemp[12];
 
-	if(szReport == NULL) return;
+	if(szReport == nullptr) return;
 
 	if(uReportType == REPORT_HEX)
 	{

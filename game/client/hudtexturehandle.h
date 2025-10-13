@@ -17,7 +17,7 @@ class CHudTextureHandle
 public:
 	CHudTextureHandle()
 	{
-		m_pValue = NULL;
+		m_pValue = nullptr;
 	}
 
 	// Assign a value to the handle.

@@ -27,6 +27,7 @@ CClientSteamContext::CClientSteamContext()
 {
 	m_bActive = false;
 	m_bLoggedOn = false;
+	m_nUniverse = k_EUniverseInvalid;
 	m_nAppID = 0;
 }
 

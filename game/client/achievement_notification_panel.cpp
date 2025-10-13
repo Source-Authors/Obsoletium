@@ -137,7 +137,7 @@ void CAchievementNotificationPanel::FireGameEvent( IGameEvent * event )
 			const wchar_t *pchFmt = g_pVGuiLocalize->Find( "#GameUI_Achievement_Progress_Fmt" );
 			if ( !pchFmt || !pchFmt[0] )
 				return;
-			Q_wcsncpy( szFmt, pchFmt, sizeof( szFmt ) );
+			V_wcscpy_safe( szFmt, pchFmt );
 
 			g_pVGuiLocalize->ConstructString_safe( szText, szFmt, 3, szLocalizedName, szNumFound, szNumTotal );
 			AddNotification( pchName, g_pVGuiLocalize->Find( "#GameUI_Achievement_Progress" ), szText );

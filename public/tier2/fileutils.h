@@ -4,13 +4,8 @@
 //
 //===========================================================================//
 
-
 #ifndef FILEUTILS_H
 #define FILEUTILS_H
-
-#if defined( _WIN32 )
-#pragma once
-#endif
 
 #include "tier0/platform.h"
 #include "tier2/tier2.h"
@@ -83,7 +78,7 @@ bool GenerateFullPath( const char *pFileName, char const *pPathID, OUT_Z_ARRAY c
 #define UOC_NOT_CREATED	0
 #define UOC_CREATED		1
 using CreateCallback_t = bool (*)( const char *pSourceName, const char *pTargetName, const char *pPathID, void *pExtraData );
-int UpdateOrCreate( const char *pSourceName, char *pTargetName, int targetLen, const char *pPathID, CreateCallback_t pfnCreate, bool bForce = false, void *pExtraData = NULL );
+int UpdateOrCreate( const char *pSourceName, char *pTargetName, int targetLen, const char *pPathID, CreateCallback_t pfnCreate, bool bForce = false, void *pExtraData = nullptr );
 
 char *CreateX360Filename( const char *pSourceName, char *pTargetName, int targetLen );
 
@@ -110,7 +105,7 @@ public:
 		Close();
 	}
 
-	FileHandle_t Handle() const
+	[[nodiscard]] FileHandle_t Handle() const
 	{
 		return m_FileHandle;
 	}
@@ -168,14 +163,14 @@ public:
 		Write(&n1, sizeof( n1 ) );
 	}
 
-	int GetInt( void )
+	[[nodiscard]] int GetInt()
 	{
 		int ret;
 		MustRead( &ret, sizeof( ret ));
 		return LittleDWord( ret );
 	}
 
-	float GetFloat( void )
+	[[nodiscard]] float GetFloat()
 	{
 		float ret;
 		MustRead( &ret, sizeof( ret ));
@@ -188,7 +183,7 @@ public:
 		Write( &f, sizeof( f ) );
 	}
 
-	bool IsOk( void )
+	[[nodiscard]] bool IsOk()
 	{
 		return ( m_FileHandle != FILESYSTEM_INVALID_HANDLE) &&
 			( g_pFullFileSystem->IsOk( m_FileHandle ) );
@@ -199,12 +194,12 @@ public:
 		g_pFullFileSystem->Seek( m_FileHandle, pos, nSeekType );
 	}
 
-	unsigned int Tell()
+	[[nodiscard]] unsigned int Tell()
 	{
 		return g_pFullFileSystem->Tell( m_FileHandle );
 	}
 
-	unsigned int Size( void )
+	[[nodiscard]] unsigned int Size()
 	{
 		Assert( IsOk() );
 		return g_pFullFileSystem->Size( m_FileHandle );

@@ -16,8 +16,8 @@ static MessageBuffer mb;
 #define	HALFBIT
 
 extern char		source[MAX_PATH];
-extern char		vismatfile[_MAX_PATH];
-extern char		incrementfile[_MAX_PATH];
+extern char		vismatfile[MAX_PATH];
+extern char		incrementfile[MAX_PATH];
 extern qboolean	incremental;
 
 /*
@@ -467,11 +467,13 @@ BuildVisMatrix
 */
 void BuildVisMatrix (void)
 {
+#ifdef MPI
 	if ( g_bUseMPI )
 	{
 		RunMPIBuildVisLeafs();
 	}
 	else 
+#endif
 	{
 		RunThreadsOn (dvis->numclusters, true, BuildVisLeafs);
 	}

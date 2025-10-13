@@ -12,7 +12,7 @@ $Configuration
 	$Compiler
 	{
 		$PreprocessorDefinitions			"$BASE;DMECONTROLS_LIB"
-		$PrecompiledHeaderFile				"Debug/dme_controls.pch"
+		$PrecompiledHeaderFile				"$(IntDir)/dme_controls.pch"
 	}
 }
 

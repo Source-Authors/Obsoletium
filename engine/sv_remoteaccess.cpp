@@ -682,7 +682,7 @@ void CServerRemoteAccess::SetValue(const char *variable, const char *value)
 //-----------------------------------------------------------------------------
 void CServerRemoteAccess::ExecCommand(const char *cmdString)
 {
-	Cbuf_AddText((char *)cmdString);
+	Cbuf_AddText(cmdString);
 	Cbuf_AddText("\n");
 	Cbuf_Execute();
 }

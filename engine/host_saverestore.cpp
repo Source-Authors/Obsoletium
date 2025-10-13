@@ -2076,10 +2076,7 @@ int CSaveRestore::SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) ch
 	delete[] pTokenList;
 	delete[] pSaveData;
 	
-	if ( name[0] && comment[0] )
-		return 1;
-	
-	return 0;
+	return name[0] && comment[0] ? 1 : 0;
 }
 
 //-----------------------------------------------------------------------------

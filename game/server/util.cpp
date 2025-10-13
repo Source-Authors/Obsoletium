@@ -168,11 +168,6 @@ IServerNetworkable *CEntityFactoryDictionary::Create( const char *pClassName )
 	IEntityFactory *pFactory = FindFactory( pClassName );
 	if ( !pFactory )
 	{
-#ifdef STAGING_ONLY
-		static ConVarRef tf_bot_use_items( "tf_bot_use_items" );
-		if ( tf_bot_use_items.IsValid() && tf_bot_use_items.GetInt() )
-			return NULL;
-#endif
 		Warning("Attempted to create unknown entity type %s!\n", pClassName );
 		return NULL;
 	}
@@ -808,7 +803,7 @@ inline void TransmitShakeEvent( CBasePlayer *pPlayer, float localAmplitude, floa
 //									for all players within the radius
 //			bAirShake - if this is false, then it will only shake players standing on the ground.
 //-----------------------------------------------------------------------------
-const float MAX_SHAKE_AMPLITUDE = 16.0f;
+constexpr inline float MAX_SHAKE_AMPLITUDE = 16.0f;
 void UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, float duration, float radius, ShakeCommand_t eCommand, bool bAirShake )
 {
 	int			i;
@@ -1445,12 +1440,12 @@ void UTIL_AxisStringToPointPoint( Vector &start, Vector &end, const char *pStrin
 	{
 		if ( i == 0 )
 		{
-			UTIL_StringToVector( start.Base(), pVec );
+			UTIL_StringToVector( start, pVec );
 			i++;
 		}
 		else
 		{
-			UTIL_StringToVector( end.Base(), pVec );
+			UTIL_StringToVector( end, pVec );
 		}
 		pVec = strtok( NULL, "," );
 	}

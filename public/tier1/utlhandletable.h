@@ -7,20 +7,15 @@
 #ifndef UTLHANDLETABLE_H
 #define	UTLHANDLETABLE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
-#include "tier1/utlvector.h"
-#include "tier1/utlqueue.h"
+#include "utlvector.h"
+#include "utlqueue.h"
 
 
 //-----------------------------------------------------------------------------
 // Handles are 32 bits. Invalid handles are all 1s
 //-----------------------------------------------------------------------------
-typedef unsigned int UtlHandle_t;
-#define UTLHANDLE_INVALID ((UtlHandle_t)~0)
+using UtlHandle_t = unsigned int;
+constexpr inline UtlHandle_t UTLHANDLE_INVALID{(UtlHandle_t)~0};
 
 
 //-----------------------------------------------------------------------------
@@ -45,13 +40,13 @@ public:
 	T *GetHandle( UtlHandle_t h, bool checkValidity ) const;
 
 	// Is a handle valid?
-	bool IsHandleValid( UtlHandle_t h ) const;
+	[[nodiscard]] bool IsHandleValid( UtlHandle_t h ) const;
 
 	// Iterate over handles; they may not be valid
-	int GetValidHandleCount() const;
-	int GetHandleCount() const;
-	UtlHandle_t GetHandleFromIndex( int i ) const;
-	int GetIndexFromHandle( UtlHandle_t h ) const;
+	[[nodiscard]] int GetValidHandleCount() const;
+	[[nodiscard]] int GetHandleCount() const;
+	[[nodiscard]] UtlHandle_t GetHandleFromIndex( int i ) const;
+	[[nodiscard]] int GetIndexFromHandle( UtlHandle_t h ) const;
 
 	void MarkHandleInvalid( UtlHandle_t h );
 	void MarkHandleValid( UtlHandle_t h );
@@ -401,7 +396,7 @@ public:
 	const T* Get() const;
 
 	// Is the handle valid?
-	bool IsValid() const;
+	[[nodiscard]] bool IsValid() const;
 
 	// Casting
 	operator T*();

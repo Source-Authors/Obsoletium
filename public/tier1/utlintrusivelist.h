@@ -9,10 +9,6 @@
 #ifndef UTILINTRUSIVELIST_H
 #define UTILINTRUSIVELIST_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/basetypes.h"
 #include "utlmemory.h"
 #include "tier0/dbg.h"
@@ -680,18 +676,18 @@ template<class T> class CUtlIntrusiveList
 public:
 	T *m_pHead;
 
-	FORCEINLINE T *Head( void ) const
+	FORCEINLINE T *Head( ) const
 	{
 		return m_pHead;
 	}
 	
-	FORCEINLINE CUtlIntrusiveList(void)
+	FORCEINLINE CUtlIntrusiveList()
 	{
 		m_pHead = NULL;
 	}
 
 
-	FORCEINLINE void RemoveAll( void )
+	FORCEINLINE void RemoveAll( )
 	{
 		// empty list. doesn't touch nodes at all
 		m_pHead = NULL;
@@ -713,7 +709,7 @@ public:
 
 	// this will kill a list if the list is of objects which automatically
 	// remove themselves from the list when delete is called
-	void KillList( void )
+	void KillList( )
 	{
 		while(m_pHead)
 		{
@@ -737,7 +733,7 @@ public:
 	// this will kill all elements in a list if
 	// the elements are of a type which does NOT remove itself from
 	// the list when the destructor is called.
-	void Purge( void )
+	void Purge( )
 	{
 		while (m_pHead)
 		{
@@ -747,7 +743,7 @@ public:
 		}
 	}
 
-	int Count( void ) const
+	[[nodiscard]] int Count( ) const
 	{
 		return IntrusiveList::ListLength( m_pHead );
 	}
@@ -758,7 +754,7 @@ public:
 
 	}
 
-	T *RemoveHead( void )
+	T *RemoveHead( )
 	{
 		if ( m_pHead )
 		{
@@ -790,7 +786,7 @@ public:
 		IntrusiveList::RemoveFromDList( CUtlIntrusiveList<T>::m_pHead, which );
 	}
 
-	T *RemoveHead( void )
+	T *RemoveHead( )
 	{
 		if ( CUtlIntrusiveList<T>::m_pHead )
 		{
@@ -817,7 +813,7 @@ public:
 
 	T *m_pTailPtr;
 
-	FORCEINLINE CUtlIntrusiveDListWithTailPtr( void ) : CUtlIntrusiveDList<T>()
+	FORCEINLINE CUtlIntrusiveDListWithTailPtr( ) : CUtlIntrusiveDList<T>()
 	{
 		m_pTailPtr = NULL;
 	}
@@ -836,19 +832,19 @@ public:
 		IntrusiveList::RemoveFromDListWithTailPtr( CUtlIntrusiveList<T>::m_pHead, pWhich, m_pTailPtr );
 	}
 
-	void Purge( void )
+	void Purge( )
 	{
 		CUtlIntrusiveList<T>::Purge();
 		m_pTailPtr = NULL;
 	}
 
-	void Kill( void ) //-V524
+	void Kill( ) //-V524
 	{
 		CUtlIntrusiveList<T>::Purge();
 		m_pTailPtr = NULL;
 	}
 
-	T *RemoveHead( void )
+	T *RemoveHead( )
 	{
 		if ( CUtlIntrusiveDList<T>::m_pHead )
 		{

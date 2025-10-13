@@ -12,6 +12,7 @@
 #endif
 
 #include "tier1/utldict.h"
+#include "tier1/utlhash.h"
 #include "vstdlib/random.h"
 #include "soundflags.h"
 #include "mathlib/compressed_vector.h"
@@ -180,7 +181,7 @@ struct CSoundParametersInternal
 	const SoundFile *GetConvertedNames() const				{ return ( m_nConvertedNames == 1 ) ? (SoundFile *)&m_pConvertedNames : m_pConvertedNames; }
 
 private:
-	void operator=( const CSoundParametersInternal& src ); // disallow implicit copies
+	CSoundParametersInternal& operator=( const CSoundParametersInternal& src ) = delete; // disallow implicit copies
 	CSoundParametersInternal( const CSoundParametersInternal& src );
 
 	void		AddToTail( SoundFile **pDest, uint16 *pDestCount, const SoundFile &source );
@@ -219,11 +220,11 @@ public:
 	virtual bool			ModInit() = 0;
 	virtual void			ModShutdown() = 0;
 
-	virtual int				GetSoundIndex( const char *pName ) const = 0;
-	virtual bool			IsValidIndex( int index ) = 0;
-	virtual int				GetSoundCount( void ) = 0;
+	virtual UtlHashHandle_t		GetSoundIndex( const char *pName ) const = 0;
+	virtual bool			IsValidIndex( UtlHashHandle_t index ) = 0;
+	virtual intp			GetSoundCount( void ) = 0;
 
-	virtual const char		*GetSoundName( intp index ) = 0;
+	virtual const char		*GetSoundName( UtlHashHandle_t index ) = 0;
 	virtual bool			GetParametersForSound( const char *soundname, CSoundParameters& params, gender_t gender, bool isbeingemitted = false ) = 0;
 
 	virtual const char		*GetWaveName( CUtlSymbol& sym ) = 0;
@@ -233,14 +234,14 @@ public:
 	virtual const char		*GetWavFileForSound( const char *soundname, char const *actormodel ) = 0;
 	virtual const char		*GetWavFileForSound( const char *soundname, gender_t gender ) = 0;
 	virtual int				CheckForMissingWavFiles( bool verbose ) = 0;
-	virtual const char		*GetSourceFileForSound( int index ) const = 0;
+	virtual const char		*GetSourceFileForSound( intp index ) const = 0;
 
 	// Iteration methods
-	virtual int				First() const = 0;
-	virtual int				Next( int i ) const = 0;
-	virtual int				InvalidIndex() const = 0;
+	virtual UtlHashHandle_t			First() const = 0;
+	virtual UtlHashHandle_t			Next( UtlHashHandle_t i ) const = 0;
+	virtual UtlHashHandle_t			InvalidIndex() const = 0;
 
-	virtual CSoundParametersInternal *InternalGetParametersForSound( int index ) = 0;
+	virtual CSoundParametersInternal *InternalGetParametersForSound( UtlHashHandle_t index ) = 0;
 
 	// The host application is responsible for dealing with dirty sound scripts, etc.
 	virtual bool			AddSound( const char *soundname, const char *scriptfile, const CSoundParametersInternal& params ) = 0;
@@ -251,10 +252,10 @@ public:
 	virtual void			UpdateSoundParameters( const char *soundname, const CSoundParametersInternal& params ) = 0;
 
 	virtual int				GetNumSoundScripts() const = 0;
-	virtual char const		*GetSoundScriptName( int index ) const = 0;
-	virtual bool			IsSoundScriptDirty( int index ) const = 0;
+	virtual char const		*GetSoundScriptName( intp index ) const = 0;
+	virtual bool			IsSoundScriptDirty( intp index ) const = 0;
 	virtual int				FindSoundScript( const char *name ) const = 0;
-	virtual void			SaveChangesToSoundScript( int scriptindex ) = 0;
+	virtual void			SaveChangesToSoundScript( intp scriptindex ) = 0;
 
 	virtual void			ExpandSoundNameMacros( CSoundParametersInternal& params, char const *wavename ) = 0;
 	virtual gender_t		GetActorGender( char const *actormodel ) = 0;

@@ -46,7 +46,7 @@ public:
 	virtual void	Draw( double frametime );
 	virtual bool	IsActive( void );
 	virtual void	Destroy( void );
-	virtual	void	Update( double frametime );
+	virtual	void	Update( float frametime );
 
 protected:
 

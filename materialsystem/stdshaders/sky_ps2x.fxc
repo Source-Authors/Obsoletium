@@ -10,7 +10,7 @@
 #endif
 
 sampler BaseTextureSampler	: register( s0 );
-HALF4 InputScale			: register( c0 );
+float4 InputScale			: register( c0 );
 
 struct PS_INPUT
 {
@@ -19,7 +19,7 @@ struct PS_INPUT
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	HALF4 color = tex2D( BaseTextureSampler, i.baseTexCoord.xy );
+	float4 color = tex2D( BaseTextureSampler, i.baseTexCoord.xy );
 	color.rgb *= InputScale.rgb;
 	
 	// This is never fogged.

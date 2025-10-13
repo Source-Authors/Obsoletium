@@ -127,9 +127,10 @@ void CLocalNetworkBackdoor::EndEntityStateUpdate()
 	// Handle entities removed.
 	for ( i=0; i < nDWords; i++ )
 	{
-		unsigned long prevEntsAlive = m_PrevEntsAlive.GetDWord( i );
-		unsigned long entsAlive = m_EntsAlive.GetDWord( i );
-		unsigned long toDelete = (prevEntsAlive ^ entsAlive) & prevEntsAlive;
+		// dimhotepus: unsigned long -> uint32
+		uint32 prevEntsAlive = m_PrevEntsAlive.GetDWord( i );
+		uint32 entsAlive = m_EntsAlive.GetDWord( i );
+		uint32 toDelete = (prevEntsAlive ^ entsAlive) & prevEntsAlive;
 
 		if ( toDelete )
 		{
@@ -221,7 +222,7 @@ void CLocalNetworkBackdoor::EntityDormant( int iEnt, int iSerialNum )
 }
 
 
-void CLocalNetworkBackdoor::AddToPendingDormantEntityList( unsigned short iEdict )
+void CLocalNetworkBackdoor::AddToPendingDormantEntityList( int iEdict )
 {
 	edict_t *e = &sv.edicts[iEdict];
 	if ( !( e->m_fStateFlags & FL_EDICT_PENDING_DORMANT_CHECK ) )

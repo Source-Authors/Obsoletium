@@ -6,13 +6,10 @@
 
 #ifndef RESOURCEMANAGER_H
 #define RESOURCEMANAGER_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "tier0/threadtools.h"
-#include "tier1/utlmultilist.h"
-#include "tier1/utlvector.h"
+#include "utlmultilist.h"
+#include "utlvector.h"
 
 FORWARD_DECLARE_HANDLE( memhandle_t );
 
@@ -85,9 +82,9 @@ protected:
 	virtual					~CDataManagerBase();
 	
 	
-	inline size_t			MemTotal_Inline() const { return m_targetMemorySize; }
-	inline size_t			MemAvailable_Inline() const { return m_targetMemorySize - m_memUsed; }
-	inline size_t			MemUsed_Inline() const { return m_memUsed; }
+	[[nodiscard]] inline size_t			MemTotal_Inline() const { return m_targetMemorySize; }
+	[[nodiscard]] inline size_t			MemAvailable_Inline() const { return m_targetMemorySize - m_memUsed; }
+	[[nodiscard]] inline size_t			MemUsed_Inline() const { return m_memUsed; }
 
 // Implemented by derived class:
 	virtual void			DestroyResourceStorage( void * ) = 0;
@@ -106,7 +103,7 @@ protected:
 		{
 			lockCount = 0;
 			serial = 1;
-			pStore = 0;
+			pStore = nullptr;
 		}
 
 		unsigned short lockCount;
@@ -130,13 +127,13 @@ protected:
 template< class STORAGE_TYPE, class CREATE_PARAMS, class LOCK_TYPE = STORAGE_TYPE *, class MUTEX_TYPE = CThreadNullMutex>
 class CDataManager : public CDataManagerBase
 {
-	typedef CDataManagerBase BaseClass;
+	using BaseClass = CDataManagerBase;
 public:
 
 	CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>( size_t size = std::numeric_limits<size_t>::max() ) : BaseClass(size) {}
 	
 
-	~CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>()
+	~CDataManager<STORAGE_TYPE, CREATE_PARAMS, LOCK_TYPE, MUTEX_TYPE>() override
 	{
 		// NOTE: This must be called in all implementations of CDataManager
 		FreeAllLists();
@@ -253,7 +250,7 @@ inline unsigned short CDataManagerBase::FromHandle( memhandle_t handle )
 {
 	Assert((uintp)handle <= std::numeric_limits<unsigned>::max() || handle == INVALID_MEMHANDLE);
 
-	unsigned int fullWord = (unsigned int)(uintp)handle; //-V221
+	auto fullWord = (unsigned int)(uintp)handle; //-V221
 	unsigned short serial = fullWord>>16;
 	unsigned short index = fullWord & 0xFFFF;
 

@@ -738,10 +738,10 @@ bool CEngineClient::GetPlayerInfo( int ent_num, player_info_t *pinfo )
 		return false;
 	}
 
-	int cubPlayerInfo;
-	player_info_t *pi = (player_info_t*) cl.m_pUserInfoTable->GetStringUserData( ent_num, &cubPlayerInfo );
+	intp cubPlayerInfo;
+	const auto *pi = (const player_info_t*) cl.m_pUserInfoTable->GetStringUserData( ent_num, &cubPlayerInfo );
 
-	if ( !pi || cubPlayerInfo < static_cast<int>(sizeof( player_info_t )) )
+	if ( !pi || cubPlayerInfo < static_cast<intp>(sizeof( player_info_t )) )
 	{
 		Q_memset( pinfo, 0, sizeof( player_info_t ) );
 		return false;
@@ -902,7 +902,7 @@ void CEngineClient::Con_NPrintf( int pos, const char *fmt, ... )
 {
 	va_list		argptr;
 	char		text[4096];
-	va_start (argptr, fmt);
+	va_start (argptr, fmt); //-V2019 //-V2018
 	V_vsprintf_safe(text, fmt, argptr);
 	va_end (argptr);
 
@@ -913,7 +913,7 @@ void CEngineClient::Con_NXPrintf( const struct con_nprint_s *info, const char *f
 {
 	va_list		argptr;
 	char		text[4096];
-	va_start (argptr, fmt);
+	va_start (argptr, fmt); //-V2019 //-V2018
 	V_vsprintf_safe(text, fmt, argptr);
 	va_end (argptr);
 
@@ -1136,7 +1136,7 @@ int	CEngineClient::GetPlayerForUserID(int userID)
 	int nMaxClients = Min( cl.m_nMaxClients, cl.m_pUserInfoTable->GetNumStrings() );
 	for ( int i = 0; i < nMaxClients; i++ )
 	{
-		player_info_t *pi = (player_info_t*) cl.m_pUserInfoTable->GetStringUserData( i, NULL );
+		const auto *pi = (const player_info_t*) cl.m_pUserInfoTable->GetStringUserData( i, NULL );
 
 		if ( !pi )
 			continue;
@@ -1912,13 +1912,9 @@ void ClientDLL_Init( void )
 			toolframework->ClientInit( g_ClientFactory );
 		}
 
-		// Don't want TF2 running less than DX 8
 		if ( g_pMaterialSystemHardwareConfig && g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 80 )
 		{
-			if ( ( Q_stricmp( COM_GetModDirectory(), "tf" ) == 0 ) || ( Q_stricmp( COM_GetModDirectory(), "ep2" ) == 0 ) || ( Q_stricmp( COM_GetModDirectory(), "portal" ) == 0 ) || ( Q_stricmp( COM_GetModDirectory(), "tf_beta" ) == 0 ) )
-			{
-				Sys_Error( "Your graphics hardware must support at least pixel shader version 1.1 to run this game!" );
-			}
+			Sys_Error( "Your GPU must support at least pixel shader version 1.1 to run this game!" );
 		}
 	}
 

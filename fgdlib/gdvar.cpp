@@ -52,6 +52,11 @@ static constexpr TypeMap_t TypeMap[] =
 	{ ivVecLine,			"vecline",				STRING },
 	{ ivPointEntityClass,	"pointentityclass",		STRING },
 	{ ivNodeDest,			"node_dest",			INTEGER },
+	// dimhotepus: CS:GO backport.
+	{ ivBoolean,			"boolean",				STRING },
+	// dimhotepus: TF2 backport.
+	{ ivScript,				"script",				STRING },
+	{ ivScriptList,			"scriptlist",			STRING },
 	{ ivInstanceFile,		"instance_file",		STRING },
 	{ ivAngleNegativePitch,	"angle_negative_pitch",	STRING },
 	{ ivInstanceVariable,	"instance_variable",	STRING },
@@ -231,7 +236,8 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		return FALSE;
 	}
 
-	// check for "reportable" marker
+	// check for "reportable" marker.
+	// NOTE: This has been deprecated in favor of the "report" keyword below.
 	trtoken_t ttype = tr.NextToken(szToken);
 	if (ttype == OPERATOR)
 	{
@@ -279,6 +285,21 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		// dimhotepus: Skip readonly token.
 		(void)tr.NextToken(szToken);
 		m_bReadOnly = true;
+
+		//
+		// Look ahead at the next token.
+		//
+		ttype = tr.PeekTokenType(szToken);
+	}
+
+	//
+	// Check for the "report" specifier.
+	//
+	// dimhotepus: TF2 backport.
+	if ((ttype == IDENT) && IsToken(szToken, "report"))
+	{
+		(void)tr.NextToken(szToken);
+		m_bReportable = true;
 
 		//
 		// Look ahead at the next token.
@@ -420,6 +441,44 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 			GDError(tr, "no %s specified", m_eType == ivFlags ? "flags" : "choices");
 			return(FALSE);
 		}
+		
+		// dimhotepus: TF2 backport.
+		// For boolean values, we construct it as if it were a choices dialog
+		if ( m_eType == ivBoolean )
+		{
+			m_eType = ivChoices;
+
+			GDIVITEM ivi;
+			BitwiseClear( ivi );
+			
+			// Yes
+			V_strcpy_safe( ivi.szValue, "1" );
+			V_strcpy_safe( ivi.szCaption, "Yes" );
+			m_Items.AddToTail(ivi);
+			
+			// No
+			V_strcpy_safe( ivi.szValue, "0" );
+			V_strcpy_safe( ivi.szCaption, "No" );
+			m_Items.AddToTail(ivi);
+
+			// Clean up string usages!
+			if ( stricmp( m_szDefault, "no" ) == 0 )
+			{
+				V_strcpy_safe( m_szDefault, "0" );
+			}
+			else if ( stricmp( m_szDefault, "yes" ) == 0 )
+			{
+				V_strcpy_safe( m_szDefault, "1" );
+			}
+			
+			// Sanity check it!
+			if ( strcmp( m_szDefault, "0" ) && strcmp( m_szDefault, "1" ) )
+			{
+				GDError(tr, "boolean type specified with nonsensical default value: %s", m_szDefault );
+				return(FALSE);
+			}
+		}
+
 		return(TRUE);
 	}
 
@@ -492,7 +551,7 @@ BOOL GDinputvariable::InitFromTokens(TokenReader& tr)
 		}
 		
 		// Set the default value.
-		unsigned long nDefault = 0;
+		unsigned nDefault = 0;
 		for (const auto &i : m_Items)
 		{
 			if (i.bDefault)

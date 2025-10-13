@@ -243,7 +243,7 @@ void CMoveHelperClient::Con_NPrintf( int idx, char const* pFormat, ...)
 	va_list marker;
 	char msg[8192];
 
-	va_start(marker, pFormat);
+	va_start(marker, pFormat); //-V2018 //-V2019
 	V_vsprintf_safe(msg, pFormat, marker);
 	va_end(marker);
 	

@@ -890,7 +890,7 @@ bool CBaseServer::GetPlayerInfo( int nClientIndex, player_info_t *pinfo )
 		return false;
 	}
 
-	player_info_t *pi = (player_info_t*) GetUserInfoTable()->GetStringUserData( nClientIndex, NULL );
+	const auto *pi = (const player_info_t*) GetUserInfoTable()->GetStringUserData( nClientIndex, NULL );
 
 	if ( !pi )
 	{
@@ -1328,7 +1328,7 @@ const char *CBaseServer::CompressPackedEntity(ServerClass *pServerClass, const c
 	bf_write writeBuf( "CompressPackedEntity", s_packedData, sizeof( s_packedData ) );
 
 	const void *pBaselineData = NULL;
-	int nBaselineBits = 0;
+	intp nBaselineBits = 0;
 
 	Assert( pServerClass != NULL );
 		
@@ -1367,7 +1367,7 @@ const char* CBaseServer::UncompressPackedEntity(PackedEntity *pPackedEntity, int
 	// not in cache, so uncompress it
 
 	const void *pBaseline;
-	int nBaselineBytes = 0;
+	intp nBaselineBytes = 0;
 
 	GetClassBaseline( pPackedEntity->m_pServerClass, &pBaseline, &nBaselineBytes );
 
@@ -1723,7 +1723,7 @@ INetworkStringTable *CBaseServer::GetUserInfoTable( void )
 	return m_pUserInfoTable;
 }
 
-bool CBaseServer::GetClassBaseline( ServerClass *pClass, void const **pData, int *pDatalen )
+bool CBaseServer::GetClassBaseline( ServerClass *pClass, void const **pData, intp *pDatalen )
 {
 	if ( sv_instancebaselines.GetInt() )
 	{
@@ -2136,7 +2136,7 @@ void CBaseServer::BroadcastPrintf (const char *fmt, ...)
 	va_list		argptr;
 	char		string[1024];
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe (string, fmt, argptr);
 	va_end (argptr);
 
@@ -2267,7 +2267,7 @@ void CBaseServer::WriteTempEntities( CBaseClient *client, CFrameSnapshot *pCurre
 	// Build list of events sorted by send table classID (makes the delta work better in cases with a lot of the same message type )
 	while ( pSnapshot && ((int)sorted.Count() < ev_max) )
 	{
-		for( int i = 0; i < pSnapshot->m_nTempEntities; ++i )
+		for( intp i = 0; i < pSnapshot->m_nTempEntities; ++i )
 		{
 			CEventInfo *event = pSnapshot->m_pTempEntities[ i ];
 

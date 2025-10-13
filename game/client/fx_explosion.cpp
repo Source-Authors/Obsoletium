@@ -129,6 +129,8 @@ C_BaseExplosionEffect	C_BaseExplosionEffect::m_instance;
 
 C_BaseExplosionEffect::C_BaseExplosionEffect( void ) : m_Material_Smoke( NULL ), m_Material_FireCloud( NULL )
 {
+	m_flForce = 0;
+	m_fFlags = 0;
 	m_Material_Embers[0] = NULL;
 	m_Material_Embers[1] = NULL;
 }

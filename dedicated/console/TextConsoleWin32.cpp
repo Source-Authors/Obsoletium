@@ -25,8 +25,8 @@ namespace se::dedicated {
 
 CTextConsoleWin32::CTextConsoleWin32() {
   m_szConsoleText[0] = '\0';
-  hinput = NULL;
-  houtput = NULL;
+  hinput = nullptr;
+  houtput = nullptr;
   Attrib = 0;
   statusline[0] = '\0';
 }
@@ -85,17 +85,17 @@ char *CTextConsoleWin32::GetLine(int index, char *buf, size_t buflen) {
 
     if (!GetNumberOfConsoleInputEvents(hinput, &numevents)) {
       Error("CTextConsoleWin32::GetLine: !GetNumberOfConsoleInputEvents");
-      return NULL;
+      return nullptr;
     }
 
     if (numevents <= 0) break;
 
     if (!ReadConsoleInput(hinput, recs, std::size(recs), &numread)) {
       Error("CTextConsoleWin32::GetLine: !ReadConsoleInput");
-      return NULL;
+      return nullptr;
     }
 
-    if (numread == 0) return NULL;
+    if (numread == 0) return nullptr;
 
     for (unsigned long i = 0; i < numread; i++) {
       INPUT_RECORD *pRec = &recs[i];
@@ -145,7 +145,7 @@ char *CTextConsoleWin32::GetLine(int index, char *buf, size_t buflen) {
     }
   }
 
-  return NULL;
+  return nullptr;
 }
 
 void CTextConsoleWin32::Print(const char *pszMsg) {
@@ -245,7 +245,7 @@ void CTextConsoleWin32::SetTitle(const char *pszTitle) {
 
 void CTextConsoleWin32::SetColor(WORD attrib) { Attrib = attrib; }
 
-intp CTextConsoleWin32::ReceiveNewline(void) {
+intp CTextConsoleWin32::ReceiveNewline() {
   intp nLen = 0;
 
   PrintRaw("\n");

@@ -55,8 +55,8 @@ enum
 // Internal maximums for sizes. Don't use directly, use IMaterialSystem::GetMaxToRender()
 enum
 {
-	INDEX_BUFFER_SIZE  = 32768,
-	DYNAMIC_VERTEX_BUFFER_MEMORY = ( 1024 + 512 ) * 1024,
+	INDEX_BUFFER_SIZE  = 65535,
+	DYNAMIC_VERTEX_BUFFER_MEMORY = ( 1024 + 1024 * 2 ) * 1024,
 	DYNAMIC_VERTEX_BUFFER_MEMORY_SMALL = 384 * 1024, // Only allocate this much during map transitions
 };
 
@@ -3108,6 +3108,7 @@ inline void CMeshBuilder::ComputeNumVertsAndIndices( int *pMaxVertices, int *pMa
 	}
 
 	// FIXME: need to get this from meshdx8.cpp, or move it to somewhere common
+	// TODO(dimhotepus): Bump to 65535? See VERTEX_BUFFER_SIZE
 	Assert( *pMaxVertices <= 32768 );
 	Assert( *pMaxIndices <= 32768 );
 }

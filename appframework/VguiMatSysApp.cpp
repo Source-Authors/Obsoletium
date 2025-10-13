@@ -273,7 +273,7 @@ bool CVguiMatSysApp::SetVideoMode( )
 {
 	MaterialSystem_Config_t config;
 	config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, !CommandLine()->CheckParm( "-fullscreen" ) );
-	config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, !!CommandLine()->CheckParm( "-noborder" ) );
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, !!CommandLine()->CheckParm( "-noborder" ) );
 
 	if ( CommandLine()->CheckParm( "-resizing" ) )
 	{

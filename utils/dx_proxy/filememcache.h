@@ -10,6 +10,8 @@
 #include <unordered_map>
 #include <string_view>
 
+#include "tier0/threadtools.h"
+
 namespace se::dx_proxy {
 
 class CachedFileData final {
@@ -23,13 +25,17 @@ class CachedFileData final {
   unsigned GetDataLen() const;
 
   unsigned AddRef() {
-    return m_numRefs.fetch_add(1, std::memory_order::memory_order_relaxed) + 1;
+    return m_ref_count.fetch_add(1, std::memory_order::memory_order_relaxed) +
+           1;
   }
   unsigned Release() {
-    return m_numRefs.fetch_sub(1, std::memory_order::memory_order_relaxed) - 1;
+    unsigned counter{
+        m_ref_count.fetch_sub(1, std::memory_order::memory_order_relaxed) - 1};
+    if (counter == 0) {
+      this->~CachedFileData();
+    }
+    return counter;
   }
-
-  bool IsValid() const;
 
  protected:  // Constructed by FileCache
   ~CachedFileData();
@@ -37,13 +43,18 @@ class CachedFileData final {
   static CachedFileData *Create(const char *file_name);
 
  private:
-  char m_chFilename[256 - 8];
-  std::atomic_uint m_numRefs;
-  unsigned m_numDataBytes;
+  char m_file_name[256 - 8];
+  std::atomic_uint m_ref_count;
 
+  unsigned m_data_count;
   unsigned char m_data[1];  // file data spans further
 
-  CachedFileData() : m_numDataBytes{0} { m_chFilename[0] = '\0'; }
+  CachedFileData(const char *file_path, unsigned data_count)
+      : m_data_count{data_count} {
+    strcpy_s(m_file_name, file_path);
+
+    AddRef();
+  }
 };
 
 class FileCache final {
@@ -52,6 +63,7 @@ class FileCache final {
   ~FileCache() { Clear(); }
 
   CachedFileData *Get(const char *file_name);
+  void Close(const void *data_ptr);
   void Clear();
 
  private:
@@ -60,22 +72,22 @@ class FileCache final {
 
     // Hasher.
     [[nodiscard]] inline size_t operator()(const char *s) const noexcept {
-      if (!s) return 0;
-
-      return hash(std::string_view{s, strlen(s)});
+      return hash(std::string_view{s});
     }
 
     // Comparer.
     [[nodiscard]] inline bool operator()(const char *s1,
                                          const char *s2) const noexcept {
-      return _stricmp(s1, s2) < 0;
+      return _stricmp(s1, s2) == 0;
     }
   };
 
-  using Mapping = std::unordered_map<const char *, CachedFileData *,
-                                     HasherAndComparer, HasherAndComparer>;
+  using FileName2DataMap =
+      std::unordered_map<const char *, CachedFileData *, HasherAndComparer,
+                         HasherAndComparer>;
 
-  Mapping m_map;
+  FileName2DataMap m_file_name_2_data_map;
+  CThreadMutex m_mutex;
 };
 
 }  // namespace se::dx_proxy

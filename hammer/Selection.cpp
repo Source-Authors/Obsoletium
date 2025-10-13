@@ -313,8 +313,8 @@ void CSelection::SetMode(SelectMode_t eNewSelectMode)
 		for (int i = 0; i < nSelCount; i++)
 		{
 			CMapClass *pObject = m_SelectionList[i];
-			AddLeavesToListCallback(pObject, &NewList);
-			pObject->EnumChildren((ENUMMAPCHILDRENPROC)AddLeavesToListCallback, (DWORD_PTR)&NewList);
+			AddAllLeavesToListCallback(pObject, &NewList);
+			pObject->EnumChildren(&AddAllLeavesToListCallback, &NewList);
 		}
 
 		SelectObject(NULL, scClear|scSaveChanges);
@@ -602,7 +602,7 @@ void CSelection::SelectObjectList( const CMapObjectList *pList, int cmd )
 
 	if ( pList != NULL )
 	{
-		for (int pos=0;pos<pList->Count();pos++)
+		for (intp pos=0;pos<pList->Count();pos++)
 		{
 			CMapClass *pObject = pList->Element(pos);
 			CMapClass *pSelObject = pObject->PrepareSelection( m_eSelectMode );

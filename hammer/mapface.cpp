@@ -57,7 +57,6 @@ BOOL CheckFace(Vector *Points, int nPoints, Vector *normal, float dist, CCheckFa
 LPCTSTR GetDefaultTextureName();
 
 
-#pragma warning(disable:4244)
 
 
 //
@@ -1680,7 +1679,7 @@ void CMapFace::ComputeColor( CRender3D* pRender, bool bRenderAsSelected,
 		}
 
 	default:
-		assert(0);
+		Assert(0);
 		break;
 	}
 }

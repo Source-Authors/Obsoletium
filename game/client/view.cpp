@@ -51,7 +51,7 @@
 #include "replay/ienginereplay.h"
 #endif
 
-#if defined( HL2_CLIENT_DLL ) || defined( CSTRIKE_DLL )
+#if defined( HL2_CLIENT_DLL ) || defined( CSTRIKE_DLL ) || defined( TF_CLIENT_DLL )
 #define USE_MONITORS
 #endif
 
@@ -65,29 +65,21 @@
 		  
 void ToolFramework_AdjustEngineViewport( int& x, int& y, int& width, int& height );
 bool ToolFramework_SetupEngineView( Vector &origin, QAngle &angles, float &fov );
-bool ToolFramework_SetupEngineMicrophone( Vector &origin, QAngle &angles );
-
 
 extern ConVar default_fov;
 extern bool g_bRenderingScreenshot;
 
-#if !defined( _X360 )
 #define SAVEGAME_SCREENSHOT_WIDTH	180
 #define SAVEGAME_SCREENSHOT_HEIGHT	100
-#else
-#define SAVEGAME_SCREENSHOT_WIDTH	128
-#define SAVEGAME_SCREENSHOT_HEIGHT	128
-#endif
 
-#ifndef _XBOX
 extern ConVar sensitivity;
-#endif
 
 ConVar zoom_sensitivity_ratio( "zoom_sensitivity_ratio", "1.0", FCVAR_ARCHIVE, "Additional mouse sensitivity scale factor applied when FOV is zoomed in." );
 
 CViewRender g_DefaultViewRender;
 IViewRender *view = NULL;	// set in cldll_client_init.cpp if no mod creates their own
 
+// dimhotepus: Make debug only.
 #if _DEBUG
 bool g_bRenderingCameraView = false;
 #endif
@@ -344,14 +336,6 @@ void CViewRender::LevelInit( void )
 
 	// Init all IScreenSpaceEffects
 	g_pScreenSpaceEffects->InitScreenSpaceEffects( );
-}
-
-//-----------------------------------------------------------------------------
-// Purpose: Called once per level change
-//-----------------------------------------------------------------------------
-void CViewRender::LevelShutdown( void )
-{
-	g_pScreenSpaceEffects->ShutdownScreenSpaceEffects( );
 }
 
 //-----------------------------------------------------------------------------
@@ -944,7 +928,7 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 	free( pPaddedImage );
 
 	// async write to disk (this will take ownership of the memory)
-	char szPathedFileName[_MAX_PATH];
+	char szPathedFileName[MAX_PATH];
 	Q_snprintf( szPathedFileName, sizeof(szPathedFileName), "//MOD/%s", pFilename );
 
 	filesystem->AsyncWrite( szPathedFileName, buffer.Base(), buffer.TellPut(), true );
@@ -1079,49 +1063,6 @@ void CViewRender::Render( vrect_t *rect )
 	{
 		CViewSetup &viewEye = GetView( eEye );
 
-		#if 0 && defined( CSTRIKE_DLL )
-			const bool bPlayingBackReplay = g_pEngineClientReplay && g_pEngineClientReplay->IsPlayingReplayDemo();
-			if ( pPlayer && !bPlayingBackReplay )
-			{
-				C_BasePlayer *pViewTarget = pPlayer;
-
-				if ( pPlayer->IsObserver() && pPlayer->GetObserverMode() == OBS_MODE_IN_EYE )
-				{
-					pViewTarget = dynamic_cast<C_BasePlayer*>( pPlayer->GetObserverTarget() );
-				}
-
-				if ( pViewTarget )
-				{
-					float targetFOV = (float)pViewTarget->m_iFOV;
-
-					if ( targetFOV == 0 )
-					{
-						// FOV of 0 means use the default FOV
-						targetFOV = g_pGameRules->DefaultFOV();
-					}
-
-					float deltaFOV = view.fov - m_flLastFOV;
-					float FOVDirection = targetFOV - pViewTarget->m_iFOVStart;
-
-					// Clamp FOV changes to stop FOV oscillation
-					if ( ( deltaFOV < 0.0f && FOVDirection > 0.0f ) ||
-						( deltaFOV > 0.0f && FOVDirection < 0.0f ) )
-					{
-						view.fov = m_flLastFOV;
-					}
-
-					// Catch case where FOV overshoots its target FOV
-					if ( ( view.fov < targetFOV && FOVDirection <= 0.0f ) ||
-						( view.fov > targetFOV && FOVDirection >= 0.0f ) )
-					{
-						view.fov = targetFOV;
-					}
-
-					m_flLastFOV = view.fov;
-				}
-			}
-		#endif
-
 	    static ConVarRef sv_restrict_aspect_ratio_fov( "sv_restrict_aspect_ratio_fov" );
 	    float aspectRatio = engine->GetScreenAspectRatio() * 0.75f;	 // / (4/3)
 	    float limitedAspectRatio = aspectRatio;
@@ -1208,7 +1149,7 @@ void CViewRender::Render( vrect_t *rect )
 		    materials->GetDisplayAdapterInfo( materials->GetCurrentAdapter(), adapterInfo );
 
 		    // On Posix, on ATI, we always clear color if we're antialiasing
-		    if ( adapterInfo.m_VendorID == 0x1002 )
+		    if ( adapterInfo.m_VendorID == VENDORID_ATI )
 		    {
 			    if ( g_pMaterialSystem->GetCurrentConfigForVideoCard().m_nAASamples > 0 )
 			    {

@@ -26,7 +26,7 @@ struct VS_OUTPUT
 	float2 texCoord2				: TEXCOORD2;
 	float2 texCoord3				: TEXCOORD3;
 	float2 texCoord4				: TEXCOORD4;
-	HALF4 worldPos_projPosZ		    : TEXCOORD5;
+	float4 worldPos_projPosZ		: TEXCOORD5;
 	float4 shadowColor				: COLOR0;
 	float4 fogFactorW				: COLOR1;
 };

@@ -246,7 +246,7 @@ KeyValues *COptionsSubKeyboard::GetItemForBinding( const char *binding )
 	static HKeySymbol bindingSymbol = KeyValuesSystem()->GetSymbolForString("Binding");
 
 	// Loop through all items
-	for (int i = 0; i < m_pKeyBindList->GetItemCount(); i++)
+	for (intp i = 0; i < m_pKeyBindList->GetItemCount(); i++)
 	{
 		KeyValues *item = m_pKeyBindList->GetItemData(m_pKeyBindList->GetItemIDFromRow(i));
 		if ( !item )
@@ -283,7 +283,7 @@ void COptionsSubKeyboard::AddBinding( KeyValues *item, const char *keyname )
 	// Loop through all the key bindings and set all entries that have
 	// the same binding. This allows us to have multiple entries pointing 
 	// to the same binding.
-	for (int i = 0; i < m_pKeyBindList->GetItemCount(); i++)
+	for (intp i = 0; i < m_pKeyBindList->GetItemCount(); i++)
 	{
 		KeyValues *curitem = m_pKeyBindList->GetItemData(m_pKeyBindList->GetItemIDFromRow(i));
 		if ( !curitem )
@@ -305,7 +305,7 @@ void COptionsSubKeyboard::AddBinding( KeyValues *item, const char *keyname )
 //-----------------------------------------------------------------------------
 void COptionsSubKeyboard::ClearBindItems( void )
 {
-	for (int i = 0; i < m_pKeyBindList->GetItemCount(); i++)
+	for (intp i = 0; i < m_pKeyBindList->GetItemCount(); i++)
 	{
 		KeyValues *item = m_pKeyBindList->GetItemData(m_pKeyBindList->GetItemIDFromRow(i));
 		if ( !item )
@@ -329,15 +329,11 @@ void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const cha
 	if ( !key || !key[ 0 ] )
 		return;
 
-	intp len = Q_strlen( key );
-	char *pszKey = new char[len + 1];
-
+	char *pszKey = V_strdup( key );
 	if ( !pszKey )
 		return;
 
-	Q_memcpy( pszKey, key, len+1 );
-
-	for (int i = 0; i < m_pKeyBindList->GetItemCount(); i++)
+	for (intp i = 0; i < m_pKeyBindList->GetItemCount(); i++)
 	{
 		KeyValues *item = m_pKeyBindList->GetItemData(m_pKeyBindList->GetItemIDFromRow(i));
 		if ( !item )
@@ -518,7 +514,7 @@ void COptionsSubKeyboard::ApplyAllBindings( void )
 	// free binding memory
     DeleteSavedBindings();
 
-	for (int i = 0; i < m_pKeyBindList->GetItemCount(); i++)
+	for (intp i = 0; i < m_pKeyBindList->GetItemCount(); i++)
 	{
 		KeyValues *item = m_pKeyBindList->GetItemData(m_pKeyBindList->GetItemIDFromRow(i));
 		if ( !item )

@@ -175,13 +175,10 @@ void CWordTag::SetWord( const char *word )
 {
 	delete[] m_pszWord;
 	m_pszWord = NULL;
-	if ( !word || !word[ 0 ] )
+	if ( Q_isempty( word ) )
 		return;
 
-	size_t len = strlen( word ) + 1;
-	m_pszWord = new char[ len ];
-	Assert( m_pszWord );
-	Q_strncpy( m_pszWord, word, len );
+	m_pszWord = V_strdup( word );
 }
 
 //-----------------------------------------------------------------------------
@@ -550,7 +547,8 @@ void CSentence::ParseEmphasis( CUtlBuffer& buf )
 	}
 }
 
-// This is obsolete, so it doesn't do anything with the data which is parsed.
+// This is obsolete, so it doesn't do anything with the data which is parsed, but is needed to advance the correct
+// amount in the stream.
 void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 {
 	char token[ 4096 ];
@@ -583,10 +581,10 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 			char cc_stream[ 4096 ];
 			int cc_length;
 
-			memset( cc_stream, 0, sizeof( cc_stream ) );
+			BitwiseClear( cc_stream );
 
 			buf.GetString( token );
-			Q_strncpy( cc_type, token, sizeof( cc_type ) );
+			V_strcpy_safe( cc_type, token );
 
 			bool unicode = false;
 			if ( !stricmp( cc_type, "unicode" ) )
@@ -600,7 +598,14 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 
 			buf.GetString( token );
 			cc_length = atoi( token );
-			Assert( cc_length >= 0 && cc_length < ssize( cc_stream ) );
+			// dimhotepus: Ensure no out of buffer access. TF2 backport.
+			if ( cc_length < 0 || cc_length >= ssize( cc_stream ) )
+			{
+				Warning( "Invalid CloseCaption data - segment length %d is out of bounds\n", cc_length );
+				AssertMsg( false, "Invalid CloseCaption data" );
+				break;
+			}
+
 			// Skip space
 			(void)buf.GetChar();
 			buf.Get( cc_stream, cc_length );
@@ -1345,16 +1350,19 @@ void CSentence::SetTextFromWords( void )
 #if PHONEME_EDITOR
 	char fulltext[ 1024 ];
 	fulltext[ 0 ] = '\0';
-	for ( intp i = 0 ; i < m_Words.Count(); i++ )
+
+	intp i = 0;
+	for ( auto *word : m_Words )
 	{
-		CWordTag *word = m_Words[ i ];
+		V_strcat_safe( fulltext, word->GetWord() );
 
-		Q_strncat( fulltext, word->GetWord(), sizeof( fulltext ), COPY_ALL_CHARACTERS );
-
-		if ( i != m_Words.Count() )
+		// dimhptepus: Correctly append " " between words, but not after last one.
+		if ( i != m_Words.Count() - 1 )
 		{
-			Q_strncat( fulltext, " ", sizeof( fulltext ), COPY_ALL_CHARACTERS );
+			V_strcat_safe( fulltext, " " );
 		}
+
+		++i;
 	}
 
 	SetText( fulltext );
@@ -1593,7 +1601,7 @@ intp CSentence::CountWords( char const *str )
 
 	intp c = 1;
 	
-	unsigned char *p = (unsigned char *)str;
+	const unsigned char *p = (const unsigned char *)str;
 	while ( *p )
 	{
 		if ( *p <= 32 )
@@ -1656,7 +1664,7 @@ void CSentence::CreateEventWordDistribution( char const *pszText, float flSenten
 	Reset();
 
 	char word[ 256 ];
-	unsigned char const *in = (unsigned char *)pszText;
+	const unsigned char *in = (const unsigned char *)pszText;
 	char *out = word;
 	
 	while ( *in )

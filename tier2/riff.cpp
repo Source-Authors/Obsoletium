@@ -54,7 +54,7 @@ InFileRIFF::InFileRIFF( const char *pFileName, IFileReadBinary &io ) : m_io(io)
 //-----------------------------------------------------------------------------
 // Purpose: Close the file
 //-----------------------------------------------------------------------------
-InFileRIFF::~InFileRIFF( void )
+InFileRIFF::~InFileRIFF( )
 {
 	m_io.close( m_file );
 }
@@ -64,7 +64,7 @@ InFileRIFF::~InFileRIFF( void )
 // Purpose: read a 4-byte int out of the stream
 // Output : int = read value, default is zero
 //-----------------------------------------------------------------------------
-int InFileRIFF::ReadInt( void )
+int InFileRIFF::ReadInt( )
 {
 	int tmp = 0;
 	m_io.read( &tmp, sizeof(int), m_file );
@@ -91,7 +91,7 @@ int InFileRIFF::ReadData( void *pOutput, int dataSize )
 // Purpose: Gets the file position
 // Output : int (bytes from start of file)
 //-----------------------------------------------------------------------------
-int InFileRIFF::PositionGet( void )
+int InFileRIFF::PositionGet( )
 {
 	return m_io.tell( m_file );
 }
@@ -132,7 +132,7 @@ OutFileRIFF::OutFileRIFF( const char *pFileName, IFileWriteBinary &io ) : m_io( 
 	WriteInt( RIFF_WAVE );
 }
 
-OutFileRIFF::~OutFileRIFF( void )
+OutFileRIFF::~OutFileRIFF( )
 {
 	if ( !IsValid() )
 		return;
@@ -173,7 +173,7 @@ bool OutFileRIFF::WriteData( void *pOutput, int dataSize )
 	return true;
 }
 
-int OutFileRIFF::PositionGet( void )
+int OutFileRIFF::PositionGet( )
 {
 	if ( !IsValid() )
 		return 0;
@@ -227,7 +227,7 @@ IterateRIFF::IterateRIFF( IterateRIFF &parent )
 //			This object will iterate over the sub-chunks of this chunk.
 //			This makes for easy hierarchical parsing
 //-----------------------------------------------------------------------------
-void IterateRIFF::ChunkSetup( void )
+void IterateRIFF::ChunkSetup( )
 {
 	m_chunkPosition = m_riff.PositionGet();
 
@@ -238,7 +238,7 @@ void IterateRIFF::ChunkSetup( void )
 //-----------------------------------------------------------------------------
 // Purpose: clear chunk setup, ChunkAvailable will return false
 //-----------------------------------------------------------------------------
-void IterateRIFF::ChunkClear( void )
+void IterateRIFF::ChunkClear( )
 {
 	m_chunkSize = -1;
 }
@@ -246,7 +246,7 @@ void IterateRIFF::ChunkClear( void )
 //-----------------------------------------------------------------------------
 // Purpose: If there are chunks left to read beyond this one, return true
 //-----------------------------------------------------------------------------
-bool IterateRIFF::ChunkAvailable( void )
+bool IterateRIFF::ChunkAvailable( )
 {
 	if ( m_chunkSize != -1 && m_chunkSize < 0x10000000 )
 		return true;
@@ -258,7 +258,7 @@ bool IterateRIFF::ChunkAvailable( void )
 //-----------------------------------------------------------------------------
 // Purpose: Go to the next chunk in the file, return true if there is one.
 //-----------------------------------------------------------------------------
-bool IterateRIFF::ChunkNext( void )
+bool IterateRIFF::ChunkNext( )
 {
 	if ( !ChunkAvailable() )
 		return false;
@@ -286,7 +286,7 @@ bool IterateRIFF::ChunkNext( void )
 // Purpose: get the chunk FOURCC as an int
 // Output : unsigned int
 //-----------------------------------------------------------------------------
-unsigned int IterateRIFF::ChunkName( void )
+unsigned int IterateRIFF::ChunkName( )
 {
 	return m_chunkName;
 }
@@ -296,7 +296,7 @@ unsigned int IterateRIFF::ChunkName( void )
 // Purpose: get the size of this chunk
 // Output : unsigned int
 //-----------------------------------------------------------------------------
-unsigned int IterateRIFF::ChunkSize( void )
+unsigned int IterateRIFF::ChunkSize( )
 {
 	return m_chunkSize;
 }
@@ -328,7 +328,7 @@ int IterateRIFF::ChunkReadPartial( void *pOutput, int dataSize )
 // Purpose: Read a 4-byte int
 // Output : int - read int
 //-----------------------------------------------------------------------------
-int IterateRIFF::ChunkReadInt( void )
+int IterateRIFF::ChunkReadInt( )
 {
 	return m_riff.ReadInt();
 }
@@ -388,7 +388,7 @@ void IterateOutputRIFF::ChunkWriteData( void *pOutput, int size )
 	m_riff.WriteData( pOutput, size );
 }
 
-void IterateOutputRIFF::ChunkFinish( void )
+void IterateOutputRIFF::ChunkFinish( )
 {
 	Assert( m_chunkStart != -1 );
 
@@ -422,7 +422,7 @@ void IterateOutputRIFF::ChunkSetPosition( int position )
 	m_riff.PositionSet( position );
 }
 
-unsigned int IterateOutputRIFF::ChunkGetPosition( void )
+unsigned int IterateOutputRIFF::ChunkGetPosition( )
 {
 	return m_riff.PositionGet();
 }

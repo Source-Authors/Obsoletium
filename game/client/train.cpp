@@ -54,6 +54,8 @@ DECLARE_HUD_MESSAGE( CHudTrain, Train )
 CHudTrain::CHudTrain( const char *pElementName ) :
 	CHudElement( pElementName ), BaseClass( NULL, "HudTrain" )
 {
+	m_iPos = 0;
+
 	vgui::Panel *pParent = g_pClientMode->GetViewport();
 	SetParent( pParent );
 	

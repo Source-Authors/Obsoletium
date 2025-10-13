@@ -91,7 +91,7 @@ protected:
 	// Rescan assets
 	void RescanAssets();
 
-	const char	*GetModPath( int nModIndex );
+	const char	*GetModPath( intp nModIndex );
 
 	MESSAGE_FUNC_PARAMS( OnTextChanged, "TextChanged", kv );
 	MESSAGE_FUNC_PARAMS( OnItemSelected, "ItemSelected", kv );
@@ -101,19 +101,19 @@ protected:
 protected:
 	struct AssetInfo_t
 	{
-		int m_nAssetIndex;
-		int m_nItemId;
+		intp m_nAssetIndex;
+		intp m_nItemId;
 	};
 
 	void BuildAssetNameList();
 	void RefreshAssetList( );
-	int GetSelectedAssetModIndex( );
+	intp GetSelectedAssetModIndex( );
 
 	// Is a particular asset visible?
-	bool IsAssetVisible( int nAssetIndex );
+	bool IsAssetVisible( intp nAssetIndex );
 
 	// Recursively add all files matching the wildcard under this directory
-	void AddAssetToList( int nAssetIndex );
+	void AddAssetToList( intp nAssetIndex );
 
 	// Update column headers
 	void UpdateAssetColumnHeader( );
@@ -140,7 +140,7 @@ protected:
 	bool m_bBuiltAssetList : 1;
 	bool m_bFirstAssetScan : 1;
 	bool m_bFinishedAssetListScan : 1;
-	int m_nCurrentModFilter;
+	intp m_nCurrentModFilter;
 	int m_nMatchingAssets;
 	bool m_bSubDirCheck;
 

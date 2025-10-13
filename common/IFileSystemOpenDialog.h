@@ -24,7 +24,7 @@ public:
 
 	// Use these to configure the dialog.
 	virtual void AddFileMask( const char *pMask ) = 0;
-	virtual void SetInitialDir( const char *pDir, const char *pPathID = NULL ) = 0;
+	virtual void SetInitialDir( const char *pDir, const char *pPathID = nullptr ) = 0;
 	virtual void SetFilterMdlAndJpgFiles( bool bFilter ) = 0;
 	virtual void GetFilename( OUT_Z_CAP(outLen) char *pOut, intp outLen ) const = 0;	// Get the filename they choose.
 	template<intp outSize>
@@ -39,6 +39,14 @@ public:
 
 	// This uses the standard windows file open dialog.
 	virtual bool DoModal_WindowsDialog() = 0;
+	
+	// dimhotepus: CS:GO backport below.
+
+	// Mark the dialog as allowing us to multi-select
+	virtual void AllowMultiSelect( bool bAllow ) = 0;
+
+	// Request the length of the buffer sufficient enough to hold the entire filename result
+	[[nodiscard]] virtual intp GetFilenameBufferSize() const = 0;
 };
 
 

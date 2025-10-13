@@ -214,7 +214,7 @@ inline int CSave::DataEmpty( const char *pdata, int size )
 		return 1;
 	}
 
-	return ( *((int *)pdata) == 0 );
+	return ( *((const int *)pdata) == 0 );
 }
 
 //-----------------------------------------------------------------------------
@@ -299,7 +299,7 @@ void CSave::Log( const char *pName, fieldtype_t fieldType, void *value, int coun
 		case FIELD_STRING:
 			{
 				string_t *pValue = ( string_t* )( value );
-				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "%s", ( char* )STRING( *pValue ) );
+				Q_snprintf( szTempBuf, sizeof( szTempBuf ), "%s", ( const char* )STRING( *pValue ) );
 				Q_strncat( szBuf, szTempBuf, sizeof( szTempBuf ), COPY_ALL_CHARACTERS );
 				break;					
 			}
@@ -423,7 +423,7 @@ void CSave::WriteData( const char *pdata , int size )
 
 void CSave::WriteString( const char *pstring )
 {
-	BufferData( pstring, strlen(pstring) + 1 );
+	BufferData( pstring, V_strlen(pstring) + 1 );
 }
 
 //-------------------------------------
@@ -433,7 +433,7 @@ void CSave::WriteString( const string_t *stringId, int count )
 	for ( int i = 0; i < count; i++ )
 	{
 		const char *pString = STRING(stringId[i]);
-		BufferData( pString, strlen(pString)+1 );
+		BufferData( pString, V_strlen(pString)+1 );
 	}
 }
 
@@ -504,7 +504,7 @@ void CSave::WriteFloat( const char *pname, const float *data, int count )
 
 void CSave::WriteString( const char *pname, const char *pdata )
 {
-	BufferField( pname, strlen(pdata) + 1, pdata );
+	BufferField( pname, V_strlen(pdata) + 1, pdata );
 }
 
 //-------------------------------------
@@ -647,7 +647,7 @@ bool CSave::ShouldSaveField( const void *pData, typedescription_t *pField )
 			}
 
 			int nFieldCount = pField->fieldSize;
-			char *pTestData = (char *)( ( !(pField->flags & FTYPEDESC_PTR) ) ? pData : *((void **)pData) );
+			const char *pTestData = (char *)( ( !(pField->flags & FTYPEDESC_PTR) ) ? pData : *((const void **)pData) );
 			while ( --nFieldCount >= 0 )
 			{
 				typedescription_t *pTestField = pField->td->dataDesc;
@@ -686,7 +686,7 @@ bool CSave::ShouldSaveField( const void *pData, typedescription_t *pField )
 				Assert( 0 );
 			}
 
-			int *pEHandle = (int *)pData;
+			const int *pEHandle = (const int *)pData;
 			for ( int i = 0; i < pField->fieldSize; ++i, ++pEHandle )
 			{
 				if ( (*pEHandle) != -1 )
@@ -852,7 +852,7 @@ int CSave::WriteFields( const char *pname, const void *pBaseData, datamap_t *pRo
 		count++;
 	}
 
-	int iCurPos = m_pData->GetCurPos();
+	intp iCurPos = m_pData->GetCurPos();
 	int iRewind = iCurPos - iHeaderPos;
 	m_pData->Rewind( iRewind );
 	WriteInt( pname, &count, 1 );
@@ -947,7 +947,7 @@ void CSave::WriteHeader( const char *pname, int size )
 
 //-------------------------------------
 
-void CSave::BufferData( const char *pdata, int size )
+void CSave::BufferData( const char *pdata, intp size )
 {
 	if ( !m_pData )
 		return;
@@ -1152,7 +1152,7 @@ void CSave::WriteFunction( datamap_t *pRootMap, const char *pname, inputfunc_t *
 		functionName = "BADFUNCTIONPOINTER";
 	}
 
-	BufferField( pname, strlen(functionName) + 1, functionName );
+	BufferField( pname, V_strlen(functionName) + 1, functionName );
 }
 
 //-------------------------------------
@@ -1215,7 +1215,7 @@ void CSave::WriteEHandle( const char *pname, const EHANDLE *pEHandle, int count 
 	int entityArray[MAX_ENTITYARRAY];
 	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
 	{
-		entityArray[i] = EntityIndex( (CBaseEntity *)(const_cast<EHANDLE *>(pEHandle)[i]) );
+		entityArray[i] = EntityIndex( static_cast<const CBaseEntity *>(pEHandle[i]) );
 	}
 	WriteInt( pname, entityArray, count );
 }
@@ -1228,7 +1228,7 @@ void CSave::WriteEHandle( const EHANDLE *pEHandle, int count )
 	int entityArray[MAX_ENTITYARRAY];
 	for ( int i = 0; i < count && i < MAX_ENTITYARRAY; i++ )
 	{
-		entityArray[i] = EntityIndex( (CBaseEntity *)(const_cast<EHANDLE *>(pEHandle)[i]) );
+		entityArray[i] = EntityIndex( static_cast<const CBaseEntity *>(pEHandle[i]) );
 	}
 	WriteInt( entityArray, count );
 }
@@ -2760,7 +2760,7 @@ void SaveEntityOnTable( CBaseEntity *pEntity, CSaveRestoreData *pSaveData, int &
 
 	pEntInfo->modelname = pEntity->GetModelName();
 	pEntInfo->restoreentityindex = -1;
-	pEntInfo->saveentityindex = pEntity ? pEntity->entindex() : -1;
+	pEntInfo->saveentityindex = pEntity->entindex();
 	pEntInfo->hEnt = pEntity;
 	pEntInfo->flags = 0;
 	pEntInfo->location = 0;

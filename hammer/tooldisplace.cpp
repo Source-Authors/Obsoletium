@@ -220,8 +220,8 @@ bool CToolDisplace::OnLMouseDown3D( CMapView3D *pView, UINT nFlags, const Vector
 		// Paint using the correct mode.
 		if ( m_bSpatial )
 		{
-			int nDispCount = pDispMgr->SelectCount();
-			for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+			intp nDispCount = pDispMgr->SelectCount();
+			for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 			{
 				CMapDisp *pDispSelect = pDispMgr->GetFromSelect( iDisp );
 				if ( pDispSelect )
@@ -341,8 +341,8 @@ bool CToolDisplace::OnRMouseDown3D( CMapView3D *pView, UINT nFlags, const Vector
 		// apply the current displacement tool
 		if ( m_bSpatial )
 		{
-			int nDispCount = pDispMgr->SelectCount();
-			for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+			intp nDispCount = pDispMgr->SelectCount();
+			for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 			{
 				CMapDisp *pDispSelect = pDispMgr->GetFromSelect( iDisp );
 				if ( pDispSelect )
@@ -528,8 +528,8 @@ void CToolDisplace::Nudge_Activate( CMapView3D *pView, EditDispHandle_t dispHand
 	// Setup paint (nudge) using the correct mode.
 	if ( m_bSpatial )
 	{
-		int nDispCount = pDispMgr->SelectCount();
-		for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+		intp nDispCount = pDispMgr->SelectCount();
+		for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 		{
 			CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 			if ( pDisp )
@@ -1053,7 +1053,7 @@ EditDispHandle_t CToolDisplace::GetHitPos( CMapView3D *pView, const Vector2D &vP
 	pView->GetCamera()->BuildRay( vPoint, rayStart, rayEnd );
 
 	// generate selected displacement list
-	int dispCount = GetSelectedDisps();
+	intp dispCount = GetSelectedDisps();
 	if( dispCount == 0 )
 		return NULL;
 
@@ -1063,7 +1063,7 @@ EditDispHandle_t CToolDisplace::GetHitPos( CMapView3D *pView, const Vector2D &vP
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-int CToolDisplace::GetSelectedDisps( void )
+intp CToolDisplace::GetSelectedDisps( void )
 {
 	//
 	// get a valid displacement manager
@@ -1118,8 +1118,8 @@ EditDispHandle_t CToolDisplace::CollideWithSelectedDisps( const Vector &rayStart
 	if( !pDispMgr )
 		return NULL;
 
-	int dispCount = pDispMgr->SelectCount();
-	for( int i = 0; i < dispCount; i++ )
+	intp dispCount = pDispMgr->SelectCount();
+	for( intp i = 0; i < dispCount; i++ )
 	{
 		// get the current displacement
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( i );

@@ -101,7 +101,7 @@ public:
 	CReplayEntityData		*m_pReplayEntityData; // is NULL if not in replay mode or array of m_pValidEntities entries
 
 	CEventInfo				**m_pTempEntities; // temp entities
-	int						m_nTempEntities;
+	intp					m_nTempEntities;
 
 	CUtlVector<int>			m_iExplicitDeleteSlots;
 

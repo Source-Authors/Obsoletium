@@ -13,8 +13,8 @@ extern "C"
 {
 	if (s1 == s2) return 0;
 
-	uint8 const *pS1 = ( uint8 const * ) s1;
-	uint8 const *pS2 = ( uint8 const * ) s2;
+	auto const *pS1 = ( uint8 const * ) s1;
+	auto const *pS2 = ( uint8 const * ) s2;
 	for(;;)
 	{
 		{

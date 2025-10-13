@@ -65,12 +65,7 @@ CGameSavePanel::CGameSavePanel( CSaveGameBrowserDialog *parent, SaveGameDescript
 	}
 
 	// Setup our basic settings
-	KeyValues *pKeys = NULL;
-	if ( GameUI().IsConsoleUI() )
-	{
-		pKeys = BasePanel()->GetConsoleControlSettings()->FindKey( "SaveGamePanel.res" );
-	}
-	LoadControlSettings( "Resource/SaveGamePanel.res", NULL, pKeys );
+	LoadControlSettings( "Resource/SaveGamePanel.res", NULL, nullptr );
 
 	int px, py;
 	m_pLevelPicBorder->GetPos( px, py );
@@ -202,13 +197,7 @@ CSaveGameBrowserDialog::CSaveGameBrowserDialog( vgui::Panel *parent )
 	m_pFooter = new CFooterPanel( parent, "SaveGameFooter" );
 
 	// Load our res files from the keyvalue we're holding
-	KeyValues *pKeys = NULL;
-	if ( GameUI().IsConsoleUI() )
-	{
-		pKeys = BasePanel()->GetConsoleControlSettings()->FindKey( "SaveGameDialog.res" );
-	}
-	
-	LoadControlSettings( "Resource/SaveGameDialog.res", NULL, pKeys );
+	LoadControlSettings( "Resource/SaveGameDialog.res", NULL, nullptr );
 }
 
 //-----------------------------------------------------------------------------
@@ -473,7 +462,7 @@ void CSaveGameBrowserDialog::UpdateMenuComponents( EScrollDirection dir )
 //-----------------------------------------------------------------------------
 // Purpose: sets a chapter as selected
 //-----------------------------------------------------------------------------
-void CSaveGameBrowserDialog::SetSelectedSaveIndex( int index )
+void CSaveGameBrowserDialog::SetSelectedSaveIndex( intp index )
 {
 	m_iSelectedSave = index;
 
@@ -482,7 +471,7 @@ void CSaveGameBrowserDialog::SetSelectedSaveIndex( int index )
 		return;
 
 	// Setup panels to the left of the selected panel
-	int currIdx = index;
+	intp currIdx = index;
 	for ( int i = SLOT_CENTER; i >= 0 && currIdx >= 0; --i )
 	{
 		m_PanelIndex[i] = currIdx;
@@ -879,7 +868,7 @@ bool CSaveGameBrowserDialog::IsValidPanel( const intp idx )
 //-----------------------------------------------------------------------------
 // Purpose: Sets up a panel's properties before it is displayed
 //-----------------------------------------------------------------------------
-void CSaveGameBrowserDialog::InitPanelIndexForDisplay( const int idx )
+void CSaveGameBrowserDialog::InitPanelIndexForDisplay( const intp idx )
 {
 	CGameSavePanel *panel = m_SavePanels[ m_PanelIndex[idx] ];
 	if ( panel )
@@ -908,29 +897,9 @@ void CSaveGameBrowserDialog::SetFastScroll( bool fast )
 //-----------------------------------------------------------------------------
 void CSaveGameBrowserDialog::ContinueScrolling( void )
 {
-	if ( !GameUI().IsConsoleUI() )
+	if ( m_PanelIndex[SLOT_CENTER-1] % 3 )
 	{
-		if ( m_PanelIndex[SLOT_CENTER-1] % 3 )
-		{
-			ScrollSelectionPanels( m_ScrollDirection );
-		}
-		return;
-	}
-
-	if ( m_ButtonPressed == m_ScrollDirection )
-	{
-		SetFastScroll( true );
 		ScrollSelectionPanels( m_ScrollDirection );
-	}
-	else if ( m_ButtonPressed != SCROLL_NONE )
-	{
-		// The other direction has been pressed - start a slow scroll
-		SetFastScroll( false );
-		ScrollSelectionPanels( (EScrollDirection)m_ButtonPressed );
-	}
-	else
-	{
-		SetFastScroll( false );
 	}
 }
 
@@ -1187,7 +1156,7 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 
 	save->iSize = g_pFullFileSystem->Size( fh );
 
-	int readok = SaveReadNameAndComment( fh, szMapName, sizeof(szMapName), szComment, sizeof(szComment) );
+	int readok = SaveReadNameAndComment( fh, szMapName, szComment );
 	g_pFullFileSystem->Close(fh);
 
 	if ( !readok )
@@ -1312,14 +1281,14 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 	CUtlVector<SaveGameDescription_t> saveGames;
 
 	// Get the search path
-	char szDirectory[_MAX_PATH];
+	char szDirectory[MAX_PATH];
 	Q_snprintf( szDirectory, sizeof( szDirectory ), "%s/*", SAVE_DIR );
 
 	Q_DefaultExtension( szDirectory, ".sav", sizeof( szDirectory ) );
 	Q_FixSlashes( szDirectory );
 
 	// iterate the saved files
-	FileFindHandle_t handle;
+	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( szDirectory, MOD_DIR, &handle );
 	while (pFileName)
 	{
@@ -1329,7 +1298,7 @@ void CSaveGameBrowserDialog::ScanSavedGames( bool bIgnoreAutosave )
 			continue;
 		}
 
-		char szFileName[_MAX_PATH];
+		char szFileName[MAX_PATH];
 		Q_snprintf(szFileName, sizeof( szFileName ), "%s/%s", SAVE_DIR, pFileName);
 
 		Q_FixSlashes( szFileName );

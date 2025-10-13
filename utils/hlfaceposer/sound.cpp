@@ -546,7 +546,7 @@ void CAudioWaveOutput::RemoveMixerChannelReferences( CAudioMixer *mixer )
 void CAudioWaveOutput::AddToReferencedList( CAudioMixer *mixer, CAudioBuffer *buffer )
 {
 	// Already in list
-	for ( int i = 0; i < buffer->m_Referenced.Size(); i++ )
+	for ( intp i = 0; i < buffer->m_Referenced.Count(); i++ )
 	{
 		if ( buffer->m_Referenced[ i ].mixer == mixer )
 		{
@@ -555,7 +555,7 @@ void CAudioWaveOutput::AddToReferencedList( CAudioMixer *mixer, CAudioBuffer *bu
 	}
 
 	// Just remove it
-	int idx = buffer->m_Referenced.AddToTail();
+	intp idx = buffer->m_Referenced.AddToTail();
 
 	CAudioMixerState *state = &buffer->m_Referenced[ idx ];
 	state->mixer = mixer;
@@ -565,7 +565,7 @@ void CAudioWaveOutput::AddToReferencedList( CAudioMixer *mixer, CAudioBuffer *bu
 
 void CAudioWaveOutput::RemoveFromReferencedList( CAudioMixer *mixer, CAudioBuffer *buffer )
 {
-	for ( int i = 0; i < buffer->m_Referenced.Size(); i++ )
+	for ( intp i = 0; i < buffer->m_Referenced.Count(); i++ )
 	{
 		if ( buffer->m_Referenced[ i ].mixer == mixer )
 		{
@@ -577,7 +577,7 @@ void CAudioWaveOutput::RemoveFromReferencedList( CAudioMixer *mixer, CAudioBuffe
 
 bool CAudioWaveOutput::IsSoundInReferencedList( CAudioMixer *mixer, CAudioBuffer *buffer )
 {
-	for ( int i = 0; i < buffer->m_Referenced.Size(); i++ )
+	for ( intp i = 0; i < buffer->m_Referenced.Count(); i++ )
 	{
 		if ( buffer->m_Referenced[ i ].mixer == mixer )
 		{
@@ -728,7 +728,7 @@ void CAudioWaveOutput::Update( float time )
 
 				StudioModel *model = NULL;
 
-				int modelindex = pSource->GetModelIndex();
+				intp modelindex = pSource->GetModelIndex();
 				if ( modelindex >= 0 )
 				{
 					model = models->GetStudioModel( modelindex );
@@ -928,7 +928,7 @@ void CAudioWaveOutput::FreeChannel( int channelIndex )
 	if ( m_sourceList[channelIndex] )
 	{
 		StudioModel *model = NULL;
-		int modelindex = m_sourceList[channelIndex]->GetModelIndex();
+		intp modelindex = m_sourceList[channelIndex]->GetModelIndex();
 		if ( modelindex >= 0)
 		{
 			model = models->GetStudioModel( modelindex );
@@ -983,15 +983,17 @@ void CAudioWaveOutput::OpenDevice( void )
 		{
 			m_buffers[i].hdr = new WAVEHDR;
 			m_buffers[i].hdr->lpData = new char[ bufferSize ];
-			long align = (long)m_buffers[i].hdr->lpData;
+			intp align = (intp)m_buffers[i].hdr->lpData;
 			if ( align & 3 )
 			{
-				m_buffers[i].hdr->lpData = (char *) ( (align+3) &~3 );
+				m_buffers[i].hdr->lpData = AlignValue( m_buffers[i].hdr->lpData, 4 );
 			}
 			m_buffers[i].hdr->dwBufferLength = bufferSize - (align&3);
 			m_buffers[i].hdr->dwFlags = 0;
 
-			if ( waveOutPrepareHeader( m_deviceHandle, m_buffers[i].hdr, sizeof(*m_buffers[i].hdr) ) != MMSYSERR_NOERROR )
+			errorCode = waveOutPrepareHeader( m_deviceHandle, m_buffers[i].hdr, sizeof(*m_buffers[i].hdr) );
+			// dimhotepus: Check wave prepared, too, or error.
+			if ( errorCode != MMSYSERR_NOERROR || !(m_buffers[i].hdr->dwFlags & WHDR_PREPARED) )
 			{
 				ClearDevice();
 				return;
@@ -1335,7 +1337,7 @@ void CFacePoserSound::AddViseme( float intensity, StudioModel *model, int phonem
 	if ( !hdr )
 		return;
 
-	for ( i = 0; i < NUM_PHONEME_CLASSES; i++ )
+	for ( int i = 0; i < NUM_PHONEME_CLASSES; i++ )
 	{
 		Emphasized_Phoneme *info = &g_PhonemeClasses[ i ];
 		
@@ -1398,8 +1400,8 @@ void CFacePoserSound::AddViseme( float intensity, StudioModel *model, int phonem
 void CFacePoserSound::SetupWeights( void )
 {
 	StudioModel *model;
-	int c = models->Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = models->Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		model = models->GetStudioModel( i );
 		if ( !model )
@@ -1446,13 +1448,13 @@ void CFacePoserSound::SetupWeights( void )
 
 			if ( t > 0.0f )
 			{
-				for ( int w = 0 ; w < sentence->m_Words.Size(); w++ )
+				for ( intp w = 0 ; w < sentence->m_Words.Count(); w++ )
 				{
 					CWordTag *word = sentence->m_Words[ w ];
 					if ( !word )
 						continue;
 
-					for ( int k = 0; k < word->m_Phonemes.Size(); k++)
+					for ( intp k = 0; k < word->m_Phonemes.Count(); k++)
 					{
 						CPhonemeTag *phoneme = word->m_Phonemes[ k ];
 						if ( !phoneme )
@@ -1465,11 +1467,11 @@ void CFacePoserSound::SetupWeights( void )
 						{
 							CPhonemeTag *next = NULL;
 							// try next phoneme, or first phoneme of next word
-							if (k < word->m_Phonemes.Size()-1)
+							if (k < word->m_Phonemes.Count()-1)
 							{
 								next = word->m_Phonemes[ k+1 ];
 							}
-							else if ( w < sentence->m_Words.Size() - 1  && sentence->m_Words[ w+1 ]->m_Phonemes.Size() )
+							else if ( w < sentence->m_Words.Count() - 1  && sentence->m_Words[ w+1 ]->m_Phonemes.Count() )
 							{
 								next = sentence->m_Words[ w+1 ]->m_Phonemes[ 0 ];
 							}
@@ -1555,8 +1557,8 @@ void CFacePoserSound::Flush( void )
 
 void CFacePoserSound::StopAll( void )
 {
-	int c = models->Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = models->Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		StudioModel *model = models->GetStudioModel( i );
 		if ( model )
@@ -1785,8 +1787,8 @@ CAudioMixer *CFacePoserSound::FindMixer( CAudioSource *source )
 
 void CFacePoserSound::EnsureNoModelReferences( CAudioSource *source )
 {
-	int c = models->Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = models->Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		StudioModel *model = models->GetStudioModel( i );
 		if ( model->m_mouth.IsSourceReferenced( source ) )

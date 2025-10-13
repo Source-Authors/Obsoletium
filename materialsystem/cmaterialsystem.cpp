@@ -28,9 +28,6 @@
 // NOTE: This must be the last file included!!!
 #include "tier0/memdbgon.h"
 
-// this is hooked into the engines convar
-ConVar mat_debugalttab( "mat_debugalttab", "0", FCVAR_CHEAT );
-
 ConVar mat_forcemanagedtextureintohardware( "mat_forcemanagedtextureintohardware", "1", FCVAR_HIDDEN | FCVAR_ALLOWED_IN_COMPETITIVE );
 
 ConVar mat_supportflashlight( "mat_supportflashlight", "-1", FCVAR_HIDDEN, "0 - do not support flashlight (don't load flashlight shader combos), 1 - flashlight is supported" );
@@ -631,7 +628,7 @@ InitReturnVal_t CMaterialSystem::Init()
 	// version of hammer initializing the material system. We need to know this so that we set
 	// up the editor materials properly. If we don't do this, we never allocate the white lightmap,
 	// for example. We can remove this when we update the SDK!!
-	char szExeName[_MAX_PATH];
+	char szExeName[MAX_PATH];
     if ( ::GetModuleFileName( GetModuleHandle( NULL ), szExeName, sizeof( szExeName ) ) )
     {
 		char szRight[20];
@@ -1000,32 +997,39 @@ unsigned	 CMaterialSystem::GetModeCount( unsigned adapter ) const
 //-----------------------------------------------------------------------------
 static void ConvertModeStruct( ShaderDeviceInfo_t *pMode, const MaterialSystem_Config_t &config ) 
 {
-	pMode->m_DisplayMode.m_nWidth = config.m_VideoMode.m_Width;					
+	pMode->m_DisplayMode.m_nWidth = config.m_VideoMode.m_Width;
 	pMode->m_DisplayMode.m_nHeight = config.m_VideoMode.m_Height;
-	pMode->m_DisplayMode.m_Format = config.m_VideoMode.m_Format;			
-	pMode->m_DisplayMode.m_nRefreshRateNumerator = config.m_VideoMode.m_RefreshRate;	
-	pMode->m_DisplayMode.m_nRefreshRateDenominator = config.m_VideoMode.m_RefreshRate ? 1 : 0;	
-	pMode->m_nBackBufferCount = 1;
+	pMode->m_DisplayMode.m_Format = config.m_VideoMode.m_Format;
+	pMode->m_DisplayMode.m_nRefreshRateNumerator = config.m_VideoMode.m_RefreshRate;
+	pMode->m_DisplayMode.m_nRefreshRateDenominator = config.m_VideoMode.m_RefreshRate ? 1 : 0;
+	pMode->m_nBackBufferCount = !config.UsingMultipleWindows() && !config.UsingPartialPresentation()
+		// dimhotepus: Use modern D3DSWAPEFFECT_FLIPEX swap effect which requires 2+ back buffers.
+		? 2
+		// dimhotepus: Use old D3DSWAPEFFECT_COPY (UsingMultipleWindows) or D3DSWAPEFFECT_DISCARD (UsingPartialPresentation).
+		// dimhotepus: Such swap effects can work only with 1 back buffer.
+		: 1;
+	// dimhotepus: Note modern FLIP* swap modes do not support MSAA directly.
 	pMode->m_nAASamples = config.m_nAASamples;
 	pMode->m_nAAQuality = config.m_nAAQuality;
 	pMode->m_nDXLevel = MAX( ABSOLUTE_MINIMUM_DXLEVEL, config.dxSupportLevel );
 	pMode->m_nWindowedSizeLimitWidth = (int)config.m_WindowedSizeLimitWidth;	
 	pMode->m_nWindowedSizeLimitHeight = (int)config.m_WindowedSizeLimitHeight;
 
-	pMode->m_bWindowed = config.Windowed() || config.Borderless();
+	pMode->m_bWindowed = config.Windowed() || config.NoWindowBorder();
 	pMode->m_bResizing = config.Resizing();
 	pMode->m_bUseStencil = config.Stencil();
 	pMode->m_bLimitWindowedSize = config.LimitWindowedSize();
 	pMode->m_bWaitForVSync = config.WaitForVSync();
 	pMode->m_bScaleToOutputResolution = config.ScaleToOutputResolution();
 	pMode->m_bUsingMultipleWindows = config.UsingMultipleWindows();
+	pMode->m_bUsingPartialPresentation = config.UsingPartialPresentation();
 }
 
 static void ConvertModeStruct( MaterialVideoMode_t *pMode, const ShaderDisplayMode_t &info ) 
 {
-	pMode->m_Width = info.m_nWidth;					
+	pMode->m_Width = info.m_nWidth;
 	pMode->m_Height = info.m_nHeight;
-	pMode->m_Format = info.m_Format;			
+	pMode->m_Format = info.m_Format;
 	pMode->m_RefreshRate = info.m_nRefreshRateDenominator ? ( info.m_nRefreshRateNumerator / info.m_nRefreshRateDenominator ) : 0;
 }
 
@@ -1074,10 +1078,6 @@ void CMaterialSystem::ForceSingleThreaded()
 		{
 			Assert( context.IsInitialized() );
 			context.EndQueue(true);
-		}
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning("Forcing queued mode off!\n");
 		}
 
 		// NOTE: Must happen after EndQueue or proxies get bound again, which is bad.
@@ -1145,13 +1145,10 @@ bool CMaterialSystem::SetMode( void* hwnd, const MaterialSystem_Config_t &config
 	// Copy over that state which isn't stored currently in convars
 	g_config.m_VideoMode = config.m_VideoMode;
 	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, config.Windowed() );
-	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, config.Borderless() );
+	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, config.NoWindowBorder() );
 	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_STENCIL, config.Stencil() );
 	g_config.SetFlag( MATSYS_VIDCFG_FLAGS_VR_MODE, config.VRMode() );
 	WriteConfigIntoConVars( config );
-
-	extern void SetupDirtyDiskReportFunc(); 
-	SetupDirtyDiskReportFunc();
 
 	return true;
 }
@@ -1215,11 +1212,6 @@ void CMaterialSystem::RemoveRestoreFunc( MaterialBufferRestoreFunc_t func )
 //-----------------------------------------------------------------------------
 void CMaterialSystem::ReleaseShaderObjects()
 {
-	if( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMaterialSystem::ReleaseShaderObjects\n" );
-	}
-
 	m_HardwareRenderContext.OnReleaseShaderObjects();
 
 	g_pOcclusionQueryMgr->FreeOcclusionQueryObjects();
@@ -1249,10 +1241,6 @@ void CMaterialSystem::RestoreShaderObjects( CreateInterfaceFn shaderFactory, int
 	}
 
 
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMaterialSystem::RestoreShaderObjects\n" );
-	}
 	// Shader API sets this to the max value the card supports when it resets
 	// the state, so restore this value.
 	g_pShaderAPI->SetAnisotropicLevel( GetCurrentConfigForVideoCard().m_nForceAnisotropicLevel );
@@ -1474,6 +1462,8 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 	// Get the desktop resolution and aspect ratio
 	ShaderDisplayMode_t displayMode;
 	g_pShaderDeviceMgr->GetCurrentModeInfo( &displayMode, 0 );
+	// dimhotepus: Honor image format.
+	ImageFormat imageFormat = displayMode.m_Format;
 	int nCurrentScreenAspect = GetScreenAspectMode( displayMode.m_nWidth, displayMode.m_nHeight );
 
 	// Let's see what the device supports and pick the most appropriate mode
@@ -1509,11 +1499,15 @@ void CMaterialSystem::GenerateConfigFromConfigKeyValues( MaterialSystem_Config_t
 	{
 		pConfig->m_VideoMode.m_Width = nBestWidth;
 		pConfig->m_VideoMode.m_Height = nBestHeight;
+		// dimhotepus: Honor mode image format.
+		pConfig->m_VideoMode.m_Format = imageFormat;
 	}
 	else // Fall back to 4:3 mode from the cfg file.  This should never happen
 	{
 		pConfig->m_VideoMode.m_Width = nRecommendedWidth;
 		pConfig->m_VideoMode.m_Height = nRecommendedHeight;
+		// dimhotepus: Honor mode image format.
+		pConfig->m_VideoMode.m_Format = imageFormat;
 	}
 
 #endif // LINUX
@@ -1649,6 +1643,11 @@ void CMaterialSystem::ReadConfigFromConVars( MaterialSystem_Config_t *pConfig )
 	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_DISABLE_PHONG, !mat_phong.GetBool() );
 	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_ENABLE_PARALLAX_MAPPING, mat_parallaxmap.GetBool() );
 	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE, mat_reducefillrate.GetBool() );
+
+	// dimhotepus: TF2 backport. Do not spam with missed r_lightmap_bicubic when use old branch stdshader_dx9.dll.
+	ConVarRef r_lightmap_bicubic( "r_lightmap_bicubic", true );
+	pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_LIGHTMAP_BICUBIC, r_lightmap_bicubic.IsValid() ? r_lightmap_bicubic.GetBool() : false );
+
 	pConfig->m_nForceAnisotropicLevel = max( mat_forceaniso.GetInt(), 1 );
 	pConfig->dxSupportLevel = MAX( ABSOLUTE_MINIMUM_DXLEVEL, mat_dxlevel.GetInt() );
 	pConfig->skipMipLevels = mat_picmip.GetInt();
@@ -1710,6 +1709,14 @@ void CMaterialSystem::ReadConfigFromConVars( MaterialSystem_Config_t *pConfig )
 		pConfig->m_bMotionBlur = false;
 		pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_ENABLE_HDR, false );
 	}
+	
+	// dimhotepus: TF2 backport.
+	// Disable bicubic filtering if no support.
+	if ( pConfig->dxSupportLevel < 95 && ( pConfig->dxSupportLevel < 90 || !IsLinux() ) )
+	{
+		r_lightmap_bicubic.SetValue( 0 );
+		pConfig->SetFlag( MATSYS_VIDCFG_FLAGS_LIGHTMAP_BICUBIC, false );
+	}
 
 	// VR mode adapter will generally be -1 if VR mode is not disabled
 	pConfig->m_nVRModeAdapter = static_cast<unsigned>( mat_vrmode_adapter.GetInt() );
@@ -1750,8 +1757,6 @@ static const char *pConvarsAllowedInDXSupport[]={
 	"mat_depthbias_decal",
 	"mat_depthbias_normal",
 	"mat_disable_ps_patch",
-	// dimhotepus: Added Windows Aero Extensions support.
-	"mat_disable_d3d9ex",
 	"mat_forceaniso",
 	"mat_forcehardwaresync",
 	"mat_forcemanagedtextureintohardware",
@@ -1888,6 +1893,11 @@ void CMaterialSystem::WriteConfigIntoConVars( const MaterialSystem_Config_t &con
 	mat_phong.SetValue( config.UsePhong() );
 	mat_parallaxmap.SetValue( config.UseParallaxMapping() );
 	mat_reducefillrate.SetValue( config.ReduceFillrate() );
+	
+	// dimhotepus: TF2 backport.
+	ConVarRef r_lightmap_bicubic( "r_lightmap_bicubic" );
+	r_lightmap_bicubic.SetValue( config.LightmapBicubic() );
+
 	mat_forceaniso.SetValue( config.m_nForceAnisotropicLevel );
 	mat_dxlevel.SetValue( MAX( ABSOLUTE_MINIMUM_DXLEVEL, config.dxSupportLevel ) );
 	mat_picmip.SetValue( config.skipMipLevels );
@@ -1959,20 +1969,15 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	bool bMonitorGammaChanged = false;
 	bool bVideoModeChange = false;
 	bool bResetTextureFilter = false;
-	bool bForceAltTab = false;
 
 	// internal config settings
-#ifndef _X360
 	MaterialSystem_Config_Internal_t config_internal;
 	config_internal.r_waterforceexpensive = r_waterforceexpensive.GetInt();
-#endif
 
 	if ( !g_pShaderDevice->IsUsingGraphics() )
 	{
 		g_config = config;
-#ifndef _X360
 		g_config_internal = config_internal;
-#endif
 
 		// Shouldn't call this more than once.
 		ColorSpace::SetGamma( 2.2f, 2.2f, OVERBRIGHT, g_config.bAllowCheats, false );
@@ -1989,11 +1994,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle dx emulation level
 	if ( config.dxSupportLevel != g_config.dxSupportLevel )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: Setting dxSupportLevelChanged, bResetAnisotropy, and bReloadMaterials because new dxlevel = %d and old dxlevel = %d\n",
-				( int )config.dxSupportLevel, g_config.dxSupportLevel );
-		}
 		dxSupportLevelChanged = true;
 		bResetAnisotropy = true;
 
@@ -2010,25 +2010,12 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 
 	if ( config.HDREnabled() != g_config.HDREnabled() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: Setting forceUpdate, bReloadMaterials, and bForceAltTab because new hdr level = %d and old hdr level = %d\n",
-				( int )config.HDREnabled(), g_config.HDREnabled() );
-		}
-
 		forceUpdate = true;
 		bReloadMaterials = true;
-		bForceAltTab = true;
 	}
 
 	if ( config.ShadowDepthTexture() != g_config.ShadowDepthTexture() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: Setting forceUpdate, bReloadMaterials and recomputeSnapshots (ShadowDepthTexture changed: %d -> %d)\n",
-				g_config.ShadowDepthTexture() ? 1 : 0, config.ShadowDepthTexture() ? 1 : 0 );
-		}
-
 		forceUpdate = true;
 		bReloadMaterials = true;
 		recomputeSnapshots = true;
@@ -2047,10 +2034,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 
 	if ( forceUpdate )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: forceUpdate is true, therefore setting recomputeSnapshots, bRedownloadLightmaps, bRedownloadTextures, bResetAnisotropy, and bSetStandardVertexShaderConstants\n" );
-		}
 		GetLightmaps()->EnableLightmapFiltering( config.bFilterLightmaps );
 		recomputeSnapshots = true;
 		bRedownloadLightmaps = true;
@@ -2062,10 +2045,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle bump mapping
 	if ( config.UseBumpmapping() != g_config.UseBumpmapping() || config.UsePhong() != g_config.UsePhong() )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: forceUpdate is true, therefore setting recomputeSnapshots, bRedownloadLightmaps, bRedownloadTextures, bResetAnisotropy, and bSetStandardVertexShaderConstants\n" );
-		}
 		recomputeSnapshots = true;
 		bReloadMaterials = true;
 		bResetAnisotropy = true;
@@ -2074,11 +2053,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle specularity
 	if ( config.UseSpecular() != g_config.UseSpecular() )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new usespecular=%d, old usespecular=%d, setting recomputeSnapshots, bReloadMaterials, and bResetAnisotropy\n", 
-				( int )config.UseSpecular(), ( int )g_config.UseSpecular() );
-		}
 		recomputeSnapshots = true;
 		bReloadMaterials = true;
 		bResetAnisotropy = true;
@@ -2087,33 +2061,18 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle parallax mapping
 	if ( config.UseParallaxMapping() != g_config.UseParallaxMapping() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new UseParallaxMapping=%d, old UseParallaxMapping=%d, setting bReloadMaterials\n",
-				( int )config.UseParallaxMapping(), ( int )g_config.UseParallaxMapping() );
-		}
 		bReloadMaterials = true;
 	}
 	
 	// Reload materials if we want reduced fillrate
 	if ( config.ReduceFillrate() != g_config.ReduceFillrate() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new ReduceFillrate=%d, old ReduceFillrate=%d, setting bReloadMaterials\n",
-				( int )config.ReduceFillrate(), ( int )g_config.ReduceFillrate() );
-		}
 		bReloadMaterials = true;
 	}
 
 	// toggle reverse depth
 	if ( config.bReverseDepth != g_config.bReverseDepth )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new ReduceFillrate=%d, old ReduceFillrate=%d, setting bReloadMaterials\n",
-				( int )config.ReduceFillrate(), ( int )g_config.ReduceFillrate() );
-		}
 		recomputeSnapshots = true;
 		bResetAnisotropy = true;
 	}
@@ -2121,11 +2080,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle no transparency
 	if ( config.bNoTransparency != g_config.bNoTransparency )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new bNoTransparency=%d, old bNoTransparency=%d, setting recomputeSnapshots and bResetAnisotropy\n",
-				( int )config.bNoTransparency, ( int )g_config.bNoTransparency );
-		}
 		recomputeSnapshots = true;
 		bResetAnisotropy = true;
 	}
@@ -2133,45 +2087,23 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	// toggle lightmap filtering
 	if ( config.bFilterLightmaps != g_config.bFilterLightmaps )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new bFilterLightmaps=%d, old bFilterLightmaps=%d, setting EnableLightmapFiltering\n",
-				( int )config.bFilterLightmaps, ( int )g_config.bFilterLightmaps );
-		}
 		GetLightmaps()->EnableLightmapFiltering( config.bFilterLightmaps );
 	}
 	
 	// toggle software lighting
 	if ( config.bSoftwareLighting != g_config.bSoftwareLighting )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new bSoftwareLighting=%d, old bSoftwareLighting=%d, setting bReloadMaterials\n",
-				( int )config.bFilterLightmaps, ( int )g_config.bFilterLightmaps );
-		}
 		bReloadMaterials = true;
 	}
 
-#ifndef _X360
 	if ( config_internal.r_waterforceexpensive != g_config_internal.r_waterforceexpensive )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new r_waterforceexpensive=%d, old r_waterforceexpensive=%d, setting bReloadMaterials\n",
-				( int )config_internal.r_waterforceexpensive, ( int )g_config_internal.r_waterforceexpensive );
-		}
 		bReloadMaterials = true;
 	}
-#endif
 
 	// generic things that cause us to redownload lightmaps
 	if ( config.bAllowCheats != g_config.bAllowCheats )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new bAllowCheats=%d, old bAllowCheats=%d, setting bRedownloadLightmaps\n",
-				( int )config.bAllowCheats, ( int )g_config.bAllowCheats );
-		}
 		bRedownloadLightmaps = true;
 	}
 
@@ -2184,10 +2116,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		config.bShowLowResImage != g_config.bShowLowResImage 
 		)
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: setting bRedownloadTextures, recomputeSnapshots, and bResetAnisotropy\n" );
-		}
 		bRedownloadTextures = true;
 		recomputeSnapshots = true;
 		bResetAnisotropy = true;
@@ -2195,21 +2123,11 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 
 	if ( config.ForceTrilinear() != g_config.ForceTrilinear() )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new forcetrilinear: %d, old forcetrilinear: %d, setting bResetTextureFilter\n",
-				( int )config.ForceTrilinear(), ( int )g_config.ForceTrilinear() );
-		}
 		bResetTextureFilter = true;
 	}
 
 	if ( config.m_nForceAnisotropicLevel != g_config.m_nForceAnisotropicLevel )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new m_nForceAnisotropicLevel: %d, old m_nForceAnisotropicLevel: %d, setting bResetAnisotropy and bResetTextureFilter\n",
-				( int )config.ForceTrilinear(), ( int )g_config.ForceTrilinear() );
-		}
 		bResetAnisotropy = true;
 		bResetTextureFilter = true;
 	}
@@ -2218,11 +2136,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		config.m_fGammaTVRangeMax != g_config.m_fGammaTVRangeMax ||	config.m_fGammaTVExponent != g_config.m_fGammaTVExponent ||
 		config.m_bGammaTVEnabled != g_config.m_bGammaTVEnabled )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: new monitorgamma: %f, old monitorgamma: %f, setting bMonitorGammaChanged\n",
-				config.m_fMonitorGamma, g_config.m_fMonitorGamma );
-		}
 		bMonitorGammaChanged = true;
 	}
 
@@ -2232,40 +2145,26 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		config.m_nAASamples != g_config.m_nAASamples ||
 		config.m_nAAQuality != g_config.m_nAAQuality ||
 		config.Windowed() != g_config.Windowed() ||
-		config.Borderless() != g_config.Borderless() ||
+		config.NoWindowBorder() != g_config.NoWindowBorder() ||
 		config.Stencil() != g_config.Stencil() )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: video mode changed for one of various reasons\n" );
-		}
 		bVideoModeChange = true;
 	}
 
 	// toggle wait for vsync
 	// In GL, we just check this and it's just a function call--no need for device shenanigans.
 #if !defined( DX_TO_GL_ABSTRACTION )
-	if ( (!config.Windowed() && !config.Borderless()) && (config.WaitForVSync() != g_config.WaitForVSync()) )
+	if ( (!config.Windowed() && !config.NoWindowBorder()) && (config.WaitForVSync() != g_config.WaitForVSync()) )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: video mode changed due to toggle of wait for vsync\n" );
-		}
 		bVideoModeChange = true;
 	}
 #endif
 
 	g_config = config;
-#ifndef _X360
 	g_config_internal = config_internal;
-#endif
 
 	if ( dxSupportLevelChanged )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: dx support level changed, clearing snapshots\n" );
-		}
 		// All snapshots have basically become invalid;
 		g_pShaderAPI->ClearSnapshots();
 	}
@@ -2273,40 +2172,26 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	if ( bRedownloadTextures || bRedownloadLightmaps )
 	{
 		// Get rid of this?
-		ColorSpace::SetGamma( 2.2f, 2.2f, OVERBRIGHT, g_config.bAllowCheats, false );
+		ColorSpace::SetGamma( GAMMA, TEXGAMMA, OVERBRIGHT, g_config.bAllowCheats, false );
 	}
 
-	// 360 does not support various configuration changes and cannot reload materials
-	if ( !IsX360() )
+	if ( bResetAnisotropy || recomputeSnapshots || bRedownloadLightmaps ||
+		// dimhotepus: Ensure single-threaded material system on dx level change.
+		bRedownloadTextures || dxSupportLevelChanged || bVideoModeChange ||
+		bSetStandardVertexShaderConstants || bResetTextureFilter )
 	{
-		if ( bResetAnisotropy || recomputeSnapshots || bRedownloadLightmaps ||
-			bRedownloadTextures || bResetAnisotropy || bVideoModeChange ||
-			bSetStandardVertexShaderConstants || bResetTextureFilter )
-		{
-			Unlock( hLock );
-			ForceSingleThreaded();
-			hLock = Lock();
-		}
+		Unlock( hLock );
+		ForceSingleThreaded();
+		hLock = Lock();
 	}
-	if ( bReloadMaterials && !IsX360() )
+
+	if ( bReloadMaterials )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: ReloadMaterials\n" );
-		}
 		ReloadMaterials();
 	}
 
-	// 360 does not support various configuration changes and cannot reload textures
-	// 360 has no reason to reload textures, it's unnecessary and massively expensive
-	// 360 does not use this path as an init affect to get its textures into memory
-	if ( bRedownloadTextures && !IsX360() )
+	if ( bRedownloadTextures )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: redownloading textures\n" );
-		}
-
 		if ( g_pShaderAPI->CanDownloadTextures() )
 		{
 			TextureManager()->RestoreRenderTargets();
@@ -2315,57 +2200,33 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 	}
 	else if ( bResetTextureFilter )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: ResetTextureFilteringState\n" );
-		}
 		TextureManager()->ResetTextureFilteringState();
 	}
 
 	// Recompute all state snapshots
 	if ( recomputeSnapshots )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: RecomputeAllStateSnapshots\n" );
-		}
 		RecomputeAllStateSnapshots();
 	}
 
 	if ( bResetAnisotropy )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: SetAnisotropicLevel\n" );
-		}
 		g_pShaderAPI->SetAnisotropicLevel( config.m_nForceAnisotropicLevel );
 	}
 
 	if ( bSetStandardVertexShaderConstants )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: SetStandardVertexShaderConstants\n" );
-		}
 		g_pShaderAPI->SetStandardVertexShaderConstants( OVERBRIGHT );
 	}
 
 	if ( bMonitorGammaChanged )
 	{
-		if( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: SetHardwareGammaRamp\n" );
-		}
 		g_pShaderDevice->SetHardwareGammaRamp( config.m_fMonitorGamma, config.m_fGammaTVRangeMin, config.m_fGammaTVRangeMax, 
 			config.m_fGammaTVExponent, config.m_bGammaTVEnabled );
 	}
 
 	if ( bVideoModeChange )
 	{
-		if ( mat_debugalttab.GetBool() )
-		{
-			Warning( "mat_debugalttab: ChangeVideoMode\n" );
-		}
 		ShaderDeviceInfo_t info;
 		ConvertModeStruct( &info, config );
 		g_pShaderAPI->ChangeVideoMode( info );
@@ -2375,13 +2236,6 @@ bool CMaterialSystem::OverrideConfig( const MaterialSystem_Config_t &_config, bo
 		uint height = info.m_DisplayMode.m_nHeight;
 		g_pLauncherMgr->RenderedSize( width, height, true ); // true = set
 #endif
-	}
-
-	if ( bForceAltTab )
-	{
-		// Simulate an Alt-Tab
-//		g_pShaderAPI->ReleaseResources();
-//		g_pShaderAPI->ReacquireResources();
 	}
 
 	Unlock( hLock );
@@ -2414,20 +2268,12 @@ bool CMaterialSystem::UpdateConfig( bool forceUpdate )
 
 void CMaterialSystem::ReleaseResources()
 {
-	if( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMaterialSystem::ReleaseResources\n" );
-	}
 	g_pShaderAPI->FlushBufferedPrimitives();
 	g_pShaderDevice->ReleaseResources();
 }
 
 void CMaterialSystem::ReacquireResources()
 {
-	if( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: CMaterialSystem::ReacquireResources\n" );
-	}
 	g_pShaderDevice->ReacquireResources();
 }
 
@@ -2856,7 +2702,8 @@ void CMaterialSystem::ResetTempHWMemory( bool bExitingLevel )
 //-----------------------------------------------------------------------------
 void CMaterialSystem::CacheUsedMaterials( )
 {
-	g_pShaderAPI->EvictManagedResources();
+	// dimhotepus: Call mateiralsystem EvictManagedResources which calls shaders
+	EvictManagedResources();
 	size_t count = 0;
 	for (MaterialHandle_t i = FirstMaterial(); i != InvalidMaterial(); i = NextMaterial(i) )
 	{
@@ -3179,10 +3026,8 @@ void CMaterialSystem::AllocateStandardTextures()
 		g_pShaderAPI->TexMinFilter( SHADER_TEXFILTERMODE_LINEAR );
 		g_pShaderAPI->TexMagFilter( SHADER_TEXFILTERMODE_LINEAR );
 		
-		//360 gets depth out of the red channel (which doubles as depth in D24S8) and may be 0/1 depending on REVERSE_DEPTH_ON_X360
 		//PC gets depth out of the alpha channel
-		texel[0] = texel[1] = texel[2] = ReverseDepthOnX360() ? 0 : 255;
-		texel[3] = 255;
+		texel[0] = texel[1] = texel[2] = texel[3] = 255;
 
 		g_pShaderAPI->TexImage2D( 0, 0, IMAGE_FORMAT_RGBA8888, 0, 1, 1, IMAGE_FORMAT_RGBA8888, false, texel );
 	}
@@ -3491,10 +3336,6 @@ void CMaterialSystem::EndFrame( void )
 			Assert( nextThreadMode == MATERIAL_SINGLE_THREADED );
 			bRelease = true;
 			nextThreadMode = MATERIAL_SINGLE_THREADED;
-			if( mat_debugalttab.GetBool() )
-			{
-				Warning("Handling alt-tab in queued mode!\n");
-			}
 		}
 	}
 
@@ -3589,9 +3430,9 @@ void CMaterialSystem::EndFrame( void )
 
 	if ( m_ThreadMode == MATERIAL_SINGLE_THREADED )
 	{
-		for ( int i = 0; i < m_threadEvents.Count(); i++ )
+		for ( auto ev : m_threadEvents )
 		{
-			g_pShaderDevice->HandleThreadEvent(m_threadEvents[i]);
+			g_pShaderDevice->HandleThreadEvent(ev);
 		}
 		m_threadEvents.RemoveAll();
 	}
@@ -4205,7 +4046,7 @@ public:
 		m_ImageData.EnsureCapacity( srcBufferSize );
 		Q_memcpy( m_ImageData.Base(), srcBits, srcBufferSize );
 	}
-	virtual ~CTextureBitsRegenerator() {}
+	~CTextureBitsRegenerator() {}
 
 	void RegenerateTextureBits( ITexture *pTexture, IVTFTexture *pVTFTexture, Rect_t *pRect ) override
 	{
@@ -4712,7 +4553,7 @@ void CMaterialSystem::ScanDirForReplacements( const char *pszPathName )
 
 	V_sprintf_safe( szBaseName, "%s/*", pszPathName );
 
-	FileFindHandle_t FindHandle;
+	FileFindHandle_t FindHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFindFileName = g_pFullFileSystem->FindFirst( szBaseName, &FindHandle );
 	
 	char szNextBaseName[ MAX_PATH ];

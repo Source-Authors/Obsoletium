@@ -39,11 +39,6 @@ bool s_bMathlibInitialized = false;
 void Sys_Error (char *error, ...);
 #endif
 
-const Vector vec3_origin(0,0,0);
-const QAngle vec3_angle(0,0,0);
-const Vector vec3_invalid( FLT_MAX, FLT_MAX, FLT_MAX );
-const int nanmask = 255<<23;
-
 // dimhotepus: Unsafe.
 //qboolean VectorsEqual( const float *v1, const float *v2 )
 //{
@@ -442,28 +437,15 @@ void XM_CALLCONV MatrixSetColumn( const Vector &in, int column, matrix3x4_t& out
 
 void XM_CALLCONV MatrixScaleBy ( const float flScale, matrix3x4_t &out )
 {
-	out[0][0] *= flScale;
-	out[1][0] *= flScale;
-	out[2][0] *= flScale;
-	out[0][1] *= flScale;
-	out[1][1] *= flScale;
-	out[2][1] *= flScale;
-	out[0][2] *= flScale;
-	out[1][2] *= flScale;
-	out[2][2] *= flScale;
+	DirectX::XMMATRIX m = DirectX::XMLoadFloat3x4( out.XmMBase() );
+	DirectX::XMStoreFloat3x4( out.XmMBase(), m *= flScale ); 
 }
 
 void XM_CALLCONV MatrixScaleByZero ( matrix3x4_t &out )
 {
-	out[0][0] = 0.0f;
-	out[1][0] = 0.0f;
-	out[2][0] = 0.0f;
-	out[0][1] = 0.0f;
-	out[1][1] = 0.0f;
-	out[2][1] = 0.0f;
-	out[0][2] = 0.0f;
-	out[1][2] = 0.0f;
-	out[2][2] = 0.0f;
+	DirectX::XMStoreFloat4( out.XmBase(), DirectX::g_XMZero );
+	DirectX::XMStoreFloat4( out.XmBase() + 1, DirectX::g_XMZero );
+	DirectX::XMStoreFloat4( out.XmBase() + 2, DirectX::g_XMZero );
 }
 
 
@@ -569,7 +551,7 @@ void VectorAngles( const float *forward, float *angles )
 R_ConcatRotations
 ================
 */
-void ConcatRotations (const float in1[3][3], const float in2[3][3], float out[3][3])
+void XM_CALLCONV ConcatRotations (const float in1[3][3], const float in2[3][3], float out[3][3])
 {
 	Assert( in1 != out );
 	Assert( in2 != out );
@@ -593,20 +575,20 @@ void ConcatRotations (const float in1[3][3], const float in2[3][3], float out[3]
 				in1[2][2] * in2[2][2];
 }
 
-void ConcatTransforms_Aligned( const matrix3x4_t &m0, const matrix3x4_t &m1, matrix3x4_t &out )
+void XM_CALLCONV ConcatTransforms_Aligned( const matrix3x4_t &m0, const matrix3x4_t &m1, matrix3x4_t &out )
 {
-	Assert( (((size_t)&m0) % 16) == 0 );
-	Assert( (((size_t)&m1) % 16) == 0 );
-	Assert( (((size_t)&out) % 16) == 0 );
+	Assert( (((uintp)&m0) % 16) == 0 );
+	Assert( (((uintp)&m1) % 16) == 0 );
+	Assert( (((uintp)&out) % 16) == 0 );
 
 	fltx4 lastMask = *(fltx4 *)(&g_SIMD_ComponentMask[3]);
-	fltx4 rowA0 = DirectX::XMLoadFloat4( m0.XmBase() );
-	fltx4 rowA1 = DirectX::XMLoadFloat4( m0.XmBase() + 1 );
-	fltx4 rowA2 = DirectX::XMLoadFloat4( m0.XmBase() + 2 );
+	fltx4 rowA0 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m0.XmBase()) );
+	fltx4 rowA1 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m0.XmBase()) + 1 );
+	fltx4 rowA2 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m0.XmBase()) + 2 );
 
-	fltx4 rowB0 = DirectX::XMLoadFloat4( m1.XmBase() );
-	fltx4 rowB1 = DirectX::XMLoadFloat4( m1.XmBase() + 1 );
-	fltx4 rowB2 = DirectX::XMLoadFloat4( m1.XmBase() + 2 );
+	fltx4 rowB0 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m1.XmBase()) );
+	fltx4 rowB1 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m1.XmBase()) + 1 );
+	fltx4 rowB2 = DirectX::XMLoadFloat4A( reinterpret_cast<const DirectX::XMFLOAT4A *>(m1.XmBase()) + 2 );
 
 	// now we have the rows of m0 and the columns of m1
 	// first output row
@@ -641,9 +623,9 @@ void ConcatTransforms_Aligned( const matrix3x4_t &m0, const matrix3x4_t &m1, mat
 	out1 = AddSIMD(out1, A1);
 	out2 = AddSIMD(out2, A2);
 
-	DirectX::XMStoreFloat4(out.XmBase(), out0);
-	DirectX::XMStoreFloat4(out.XmBase() + 1, out1 );
-	DirectX::XMStoreFloat4(out.XmBase() + 2, out2 );
+	DirectX::XMStoreFloat4A(reinterpret_cast<DirectX::XMFLOAT4A *>(out.XmBase()), out0);
+	DirectX::XMStoreFloat4A(reinterpret_cast<DirectX::XMFLOAT4A *>(out.XmBase()) + 1, out1 );
+	DirectX::XMStoreFloat4A(reinterpret_cast<DirectX::XMFLOAT4A *>(out.XmBase()) + 2, out2 );
 }
 
 /*
@@ -3380,25 +3362,25 @@ void XM_CALLCONV MathLib_Init( float gamma, float texGamma, float brightness, in
 	BuildGammaTable( gamma, texGamma, brightness, overbright );
 }
 
-bool XM_CALLCONV MathLib_3DNowEnabled( void )
+bool XM_CALLCONV MathLib_3DNowEnabled( )
 {
 	Assert( s_bMathlibInitialized );
 	return s_b3DNowEnabled;
 }
 
-bool XM_CALLCONV MathLib_MMXEnabled( void )
+bool XM_CALLCONV MathLib_MMXEnabled( )
 {
 	Assert( s_bMathlibInitialized );
 	return s_bMMXEnabled;
 }
 
-bool XM_CALLCONV MathLib_SSEEnabled( void )
+bool XM_CALLCONV MathLib_SSEEnabled( )
 {
 	Assert( s_bMathlibInitialized );
 	return s_bSSEEnabled;
 }
 
-bool XM_CALLCONV MathLib_SSE2Enabled( void )
+bool XM_CALLCONV MathLib_SSE2Enabled( )
 {
 	Assert( s_bMathlibInitialized );
 	return s_bSSE2Enabled;
@@ -3643,8 +3625,8 @@ int XM_CALLCONV PolyFromPlane( Vector *outVerts, const Vector& normal, float dis
 
 int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVerts, const Vector& normal, float dist, float fOnPlaneEpsilon )
 {
-	vec_t	 *dists = stackallocT( vec_t, vertCount * 4 ); //4x vertcount should cover all cases
-	SideType *sides = stackallocT( SideType, vertCount * 4 );
+	auto	*dists = stackallocT( vec_t, vertCount * 4 ); //4x vertcount should cover all cases
+	auto	*sides = stackallocT( SideType, vertCount * 4 );
 	int		counts[3];
 	vec_t	dot;
 	int		i, j;
@@ -3733,8 +3715,8 @@ int XM_CALLCONV ClipPolyToPlane( Vector *inVerts, int vertCount, Vector *outVert
 
 int XM_CALLCONV ClipPolyToPlane_Precise( double *inVerts, int vertCount, double *outVerts, const double *normal, double dist, double fOnPlaneEpsilon )
 {
-	double	 *dists = stackallocT( double, vertCount * 4 ); //4x vertcount should cover all cases
-	SideType *sides = stackallocT( SideType, vertCount * 4 );
+	auto	*dists = stackallocT( double, vertCount * 4 ); //4x vertcount should cover all cases
+	auto	*sides = stackallocT( SideType, vertCount * 4 );
 	int		counts[3];
 	double	dot;
 	int		i, j;

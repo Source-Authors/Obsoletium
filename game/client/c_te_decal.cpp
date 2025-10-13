@@ -173,5 +173,5 @@ void TE_Decal( IRecipientFilter& filter, float delay, KeyValues *pKeyValues )
 	int nHitbox = pKeyValues->GetInt( "hitbox" );
 	const char *pDecalName = pKeyValues->GetString( "decalname" );
 
-	TE_Decal( filter, 0.0f, &vecOrigin, &vecStart, 0, nHitbox, effects->Draw_DecalIndexFromName( (char*)pDecalName ) );
+	TE_Decal( filter, 0.0f, &vecOrigin, &vecStart, 0, nHitbox, effects->Draw_DecalIndexFromName( pDecalName ) );
 }

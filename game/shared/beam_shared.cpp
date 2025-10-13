@@ -331,6 +331,9 @@ CBeam::CBeam( void )
 	m_nMinDXLevel = 0;
 	m_flHDRColorScale = 1.0f; // default value.
 
+	m_flFireTime = -1;
+	m_flDamage = 0;
+
 #if !defined( CLIENT_DLL )
 	m_nDissolveType = -1;
 #else

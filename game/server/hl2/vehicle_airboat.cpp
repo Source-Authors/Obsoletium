@@ -1835,7 +1835,7 @@ void CPropAirboat::CreateDangerSounds( void )
 
 	GetVectors( &vecDir, &vecRight, NULL );
 
-	const float soundDuration = 0.25;
+	constexpr float soundDuration = 0.25;
 	float speed = m_VehiclePhysics.GetHLSpeed();
 
 	// Make danger sounds ahead of the vehicle

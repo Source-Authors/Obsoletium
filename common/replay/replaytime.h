@@ -45,7 +45,7 @@ public:
 	static const wchar_t *GetLocalizedYear( vgui::ILocalize *pLocalize, int nYear );
 	static const wchar_t *GetLocalizedTime( vgui::ILocalize *pLocalize, int nHour, int nMin, int nSec );
 	static const wchar_t *GetLocalizedDate( vgui::ILocalize *pLocalize, int nDay, int nMonth, int nYear,
-		int *pHour = NULL, int *pMin = NULL, int *pSec = NULL, bool bForceFullFormat = false );	// bForceFullFormat true will keep from returning "today" or "yesterday"
+		int *pHour = nullptr, int *pMin = nullptr, int *pSec = nullptr, bool bForceFullFormat = false );	// bForceFullFormat true will keep from returning "today" or "yesterday"
 	static const wchar_t *GetLocalizedDate( vgui::ILocalize *pLocalize, const CReplayTime &t, bool bForceFullFormat = false );
 
 	int				m_fDate;		// Representation of a date (bitfield)

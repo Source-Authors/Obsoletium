@@ -4,29 +4,31 @@
 // currently isn't supported by the OSX compiler. Sadness.
 //
 //=============================================================================
-#pragma once
+#ifndef SE_PUBLIC_TIER0_TYPE_TRAITS_H_
+#define SE_PUBLIC_TIER0_TYPE_TRAITS_H_
 
-template <class T>
+template <typename T>
 struct V_remove_const
 {
-	typedef T type;
+	using type = T;
 };
 
-template <class T>
+template <typename T>
 struct V_remove_const<const T>
 {
-	typedef T type;
+	using type = T;
 };
 
-template <class T>
+template <typename T>
 struct V_remove_const<const T[]>
 {
-	typedef T type;
+	using type = T;
 };
 
-template <class T, unsigned int N>
+template <typename T, unsigned int N>
 struct V_remove_const<const T[N]>
 {
-	typedef T type;
+	using type = T;
 };
 
+#endif  // !SE_PUBLIC_TIER0_TYPE_TRAITS_H_

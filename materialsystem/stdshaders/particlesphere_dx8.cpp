@@ -8,7 +8,7 @@
 
 #include "BaseVSShader.h"
 
-#include "ParticleSphere_vs11.inc"
+#include "particlesphere_vs11.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -82,15 +82,15 @@ BEGIN_VS_SHADER_FLAGS( ParticleSphere_DX8, "Help for BumpmappedEnvMap", SHADER_N
 			// it is equal to 1).
 			const float *f = params[LIGHT_COLOR]->GetVecValue();
 			// dimhotepus: ASAN catch, expect 4 component vector in SetVertexShaderConstant.
-			Vector4D vLightColor( f[0], f[1], f[2], f[3] );
-			float flScale = max( vLightColor.x, max( vLightColor.y, max( vLightColor.z, vLightColor.w ) ) );
+			Vector4D vLightColor( f[0], f[1], f[2], 0.f );
+			float flScale = max( vLightColor.x, max( vLightColor.y, vLightColor.z ) );
 			if ( flScale < 0.01f )
 				flScale = 0.01f;
-			float vScaleVec[4] = { flScale, flScale, flScale, flScale };
+			Vector4D vScaleVec = { flScale, flScale, flScale, 0.f };
 			vLightColor /= flScale;
 
 			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_1, vLightColor.Base() );
-			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_2, vScaleVec );
+			pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_2, vScaleVec.Base() );
 
 			// Compute the vertex shader index.
 			particlesphere_vs11_Dynamic_Index vshIndex;

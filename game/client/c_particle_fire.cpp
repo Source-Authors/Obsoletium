@@ -154,8 +154,9 @@ END_RECV_TABLE()
 // ------------------------------------------------------------------------- //
 C_ParticleFire::C_ParticleFire()
 {
-	m_pParticleMgr = NULL;
+	m_pParticleMgr = nullptr;
 	m_MaterialHandle = INVALID_MATERIAL_HANDLE;
+	m_nEmitters = 0;
 }
 
 

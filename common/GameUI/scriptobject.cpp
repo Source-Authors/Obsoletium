@@ -8,9 +8,9 @@
 // CScriptObject and CDescription class definitions
 // 
 #include "scriptobject.h"
-#include <time.h>
-#include <stdio.h>
-#include <stdlib.h>
+#include <ctime>
+#include <cstdio>
+#include <cstdlib>
 #include <vgui_controls/Label.h>
 #include "filesystem.h"
 #include "tier1/convar.h"
@@ -32,7 +32,7 @@ void StripFloatTrailingZeros(char *str)
 		return;
 
 	// start at the end and scan back to the period
-	char *end = 0;
+	char *end = nullptr;
 	for ( end = str + V_strlen(str) - 1; end > period; --end )
 	{
 		if (*end == '0')
@@ -69,11 +69,11 @@ mpcontrol_t::mpcontrol_t( Panel *parent, char const *panelName )
 : Panel( parent, panelName )
 {
 	type = O_BADTYPE;
-	pControl = NULL;
-	pPrompt = NULL;
-	pScrObj = NULL;
+	pControl = nullptr;
+	pPrompt = nullptr;
+	pScrObj = nullptr;
 
-	next = NULL;
+	next = nullptr;
 
 	SetPaintBackgroundEnabled( false );
 }
@@ -103,24 +103,24 @@ void mpcontrol_t::OnSizeChanged( int wide, int tall )
 
 CScriptListItem::CScriptListItem()
 {
-	pNext = NULL;
+	pNext = nullptr;
 	memset( szItemText, 0, 128 ); 
 	memset( szValue, 0, 256 );
 }
 
 CScriptListItem::CScriptListItem( char const *strItem, char const *strValue )
 {
-	pNext = NULL;
-	Q_strncpy( szItemText, strItem, sizeof( szItemText ) );
-	Q_strncpy( szValue   , strValue, sizeof( szValue ) );
+	pNext = nullptr;
+	V_strcpy_safe( szItemText, strItem );
+	V_strcpy_safe( szValue   , strValue );
 }
 
-CScriptObject::CScriptObject( void )
+CScriptObject::CScriptObject( )
 {
 	type = O_BOOL;
 	bSetInfo = false;  // Prepend "Setinfo" to keyvalue pair in config?
-	pNext = NULL;
-	pListItems = NULL;
+	pNext = nullptr;
+	pListItems = nullptr;
 	tooltip[0] = '\0';
 }
 
@@ -129,7 +129,7 @@ CScriptObject::~CScriptObject()
 	RemoveAndDeleteAllItems();
 }
 
-void CScriptObject::RemoveAndDeleteAllItems( void )
+void CScriptObject::RemoveAndDeleteAllItems( )
 {
 	CScriptListItem *p, *n;
 
@@ -140,7 +140,7 @@ void CScriptObject::RemoveAndDeleteAllItems( void )
 		delete p;
 		p = n;
 	}
-	pListItems = NULL;
+	pListItems = nullptr;
 }
 
 void CScriptObject::SetCurValue( char const *strValue )
@@ -163,7 +163,7 @@ void CScriptObject::AddItem( CScriptListItem *pItem )
 	if ( !p )
 	{
 		pListItems = pItem;
-		pItem->pNext = NULL;
+		pItem->pNext = nullptr;
 		return;
 	}
 
@@ -172,7 +172,7 @@ void CScriptObject::AddItem( CScriptListItem *pItem )
 		if ( !p->pNext )
 		{
 			p->pNext = pItem;
-			pItem->pNext = NULL;
+			pItem->pNext = nullptr;
 			return;
 		}
 		p = p->pNext;
@@ -403,7 +403,7 @@ void CScriptObject::WriteToFile( FileHandle_t fp )
 	}
 }
 
-void CScriptObject::WriteToConfig( void )
+void CScriptObject::WriteToConfig( )
 {
 	if ( type == O_OBSOLETE || type == O_CATEGORY )
 		return;
@@ -641,7 +641,7 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 		break;
 	case O_LIST:
 		// Parse items until we get the }
-		while ( 1 )
+		while ( true )
 		{
 			// Parse the next {
 			*pBuffer = engine->ParseFile( *pBuffer, token, sizeof( token ) );
@@ -743,9 +743,9 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 }
 
 /////////////////////////
-CDescription::CDescription( void )
+CDescription::CDescription( )
 {
-	pObjList = NULL;
+	pObjList = nullptr;
 }
 
 CDescription::~CDescription()
@@ -756,13 +756,13 @@ CDescription::~CDescription()
 	while ( p )
 	{
 		n = p->pNext;
-		p->pNext = NULL;
+		p->pNext = nullptr;
 		p->MarkForDeletion();
 		//delete p;
 		p = n;
 	}
 
-	pObjList = NULL;
+	pObjList = nullptr;
 	
 	if ( m_pszHintText )
 		free( m_pszHintText );
@@ -773,7 +773,7 @@ CDescription::~CDescription()
 CScriptObject * CDescription::FindObject( const char *pszObjectName )
 {
 	if ( !pszObjectName )
-		return NULL;
+		return nullptr;
 
 	CScriptObject *p;
 	p = pObjList;
@@ -783,7 +783,7 @@ CScriptObject * CDescription::FindObject( const char *pszObjectName )
 			return p;
 		p = p->pNext;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CDescription::AddObject( CScriptObject *pObj )
@@ -793,7 +793,7 @@ void CDescription::AddObject( CScriptObject *pObj )
 	if ( !p )
 	{
 		pObjList = pObj;
-		pObj->pNext = NULL;
+		pObj->pNext = nullptr;
 		return;
 	}
 
@@ -802,7 +802,7 @@ void CDescription::AddObject( CScriptObject *pObj )
 		if ( !p->pNext )
 		{
 			p->pNext = pObj;
-			pObj->pNext = NULL;
+			pObj->pNext = nullptr;
 			return;
 		}
 		p = p->pNext;
@@ -881,7 +881,7 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 	const char *pStart;
 	CScriptObject *pObj;
 	// Now read in the objects and link them in
-	while ( 1 )
+	while ( true )
 	{
 		pStart = *pBuffer;
 
@@ -979,7 +979,7 @@ void CDescription::WriteToFile( FileHandle_t fp )
 	}
 }
 
-void CDescription::WriteToConfig( void )
+void CDescription::WriteToConfig()
 {
 	CScriptObject *pObj;
 
@@ -1073,7 +1073,7 @@ void CDescription::setHint( const char *pszHint )
 //-----------------------------------------------------------------------------
 // Purpose: Constructor, load/save client settings object
 //-----------------------------------------------------------------------------
-CInfoDescription::CInfoDescription( void )
+CInfoDescription::CInfoDescription()
 	: CDescription(  )
 {
 	setHint( "// NOTE:  THIS FILE IS AUTOMATICALLY REGENERATED, \r\n\

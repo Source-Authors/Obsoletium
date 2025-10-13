@@ -190,7 +190,7 @@ return;
 #define MAX_FPS 250.0f
 #define MIN_TIMESTEP ( 1.0f / MAX_FPS )
 
-double realtime = 0.0f;
+double realtime = 0.0;
 
 void MatSysWindow::Frame( void )
 {
@@ -553,10 +553,10 @@ void MatSysWindow::draw ()
 	pRenderContext->Rotate( -90,  1, 0, 0 );	    // put Z going up
 	pRenderContext->Rotate( -90,  0, 0, 1 );
 
-	int modelcount = modellist.Count();
-	int countover2 = modelcount / 2;
+	intp modelcount = modellist.Count();
+	intp countover2 = modelcount / 2;
 	int ydelta = g_pControlPanel->GetModelGap();
-	int yoffset = -countover2 * ydelta;
+	intp yoffset = -countover2 * ydelta;
 	for ( i = 0 ; i < modelcount; i++ )
 	{
 		modellist[ i ]->IncrementFramecounter( );

@@ -611,7 +611,7 @@ bool CMapSideList::ReplaceSolidFaces(CMapSolid *pOrigSolid, CMapSolid *pNewSolid
 	{
 		CMapFace *pFace = pOrigSolid->GetFace(i);
 
-		int nIndex = m_Faces.FindFaceID(pFace->GetFaceID());
+		intp nIndex = m_Faces.FindFaceID(pFace->GetFaceID());
 		if (nIndex != -1)
 		{
 			//

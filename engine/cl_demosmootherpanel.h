@@ -11,12 +11,6 @@
 #pragma once
 #endif
 
-//========= Copyright © 1996-2002, Valve LLC, All rights reserved. ============
-//
-// Purpose: 
-//
-// $NoKeywords: $
-//=============================================================================
 #include <vgui_controls/Frame.h>
 
 namespace vgui

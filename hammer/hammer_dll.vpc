@@ -33,7 +33,7 @@ $Configuration	"Debug"
 {
 	$Compiler
 	{
-		$PrecompiledHeaderFile				"Hammer___Win32_Debug/hammer.pch"
+		$PrecompiledHeaderFile				"$(IntDir)/hammer.pch"
 	}
 }
 
@@ -41,7 +41,7 @@ $Configuration	"Release"
 {
 	$Compiler
 	{
-		$PrecompiledHeaderFile				"Hammer___Win32_Release/hammer.pch"
+		$PrecompiledHeaderFile				"$(IntDir)/hammer.pch"
 	}
 }
 
@@ -115,6 +115,14 @@ $Project "hammer_dll"
 		$File	"Axes2.h"
 		$File	"$SRCDIR\common\windows\base_dlg.h"
 		$File	"$SRCDIR\common\windows\base_dlg.cpp"
+		$File	"$SRCDIR\common\windows\base_mdi_child_wnd.h"
+		$File	"$SRCDIR\common\windows\base_mdi_child_wnd.cpp"
+		$File	"$SRCDIR\common\windows\base_property_sheet.h"
+		$File	"$SRCDIR\common\windows\base_property_sheet.cpp"
+		$File	"$SRCDIR\common\windows\base_status_bar.h"
+		$File	"$SRCDIR\common\windows\base_status_bar.cpp"
+		$File	"$SRCDIR\common\windows\base_tool_bar.h"
+		$File	"$SRCDIR\common\windows\base_tool_bar.cpp"
 		$File	"$SRCDIR\common\windows\base_wnd.h"
 		$File	"$SRCDIR\common\windows\base_wnd.cpp"
 		$File	"$SRCDIR\common\windows\bitmap_scale.h"

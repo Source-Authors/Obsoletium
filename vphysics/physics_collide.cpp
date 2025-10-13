@@ -41,7 +41,7 @@ struct bboxcache_t
 	CPhysCollideCompactSurface	*pCollide;
 };
 
-class CPhysicsCollision : public IPhysicsCollision
+class CPhysicsCollision final : public IPhysicsCollision
 {
 public:
 	CPhysicsCollision()
@@ -154,11 +154,11 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CPhysicsCollision, IPhysicsCollision, VPHYSIC
 //-----------------------------------------------------------------------------
 // Abstract compact_surface vs. compact_mopp
 //-----------------------------------------------------------------------------
-#define IVP_COMPACT_SURFACE_ID			MAKEID('I','V','P','S')
-#define IVP_COMPACT_SURFACE_ID_SWAPPED	MAKEID('S','P','V','I')
-#define IVP_COMPACT_MOPP_ID				MAKEID('M','O','P','P')
-#define VPHYSICS_COLLISION_ID			MAKEID('V','P','H','Y')
-#define VPHYSICS_COLLISION_VERSION		0x0100
+constexpr inline int IVP_COMPACT_SURFACE_ID = MAKEID('I', 'V', 'P', 'S');
+constexpr inline int IVP_COMPACT_SURFACE_ID_SWAPPED	= MAKEID('S', 'P', 'V', 'I');
+constexpr inline int IVP_COMPACT_MOPP_ID = MAKEID('M', 'O', 'P', 'P');
+constexpr inline int VPHYSICS_COLLISION_ID = MAKEID('V', 'P', 'H', 'Y');
+constexpr inline int VPHYSICS_COLLISION_VERSION = 0x0100;
 // You can disable all of the havok Mopp collision model building by undefining this symbol
 #define ENABLE_IVP_MOPP	0
 
@@ -207,7 +207,7 @@ BEGIN_BYTESWAP_DATADESC_( compactsurfaceheader_t, physcollideheader_t )
 END_BYTESWAP_DATADESC()
 
 #if ENABLE_IVP_MOPP
-struct moppheader_t : public physcollideheader_t
+struct moppheader_t final : public physcollideheader_t
 {
 	int moppSize;
 	void Mopp( const IVP_Compact_Mopp *pMopp )
@@ -219,7 +219,7 @@ struct moppheader_t : public physcollideheader_t
 #endif
 
 #if ENABLE_IVP_MOPP
-class CPhysCollideMopp : public CPhysCollide
+class CPhysCollideMopp final : public CPhysCollide
 {
 public:
 	CPhysCollideMopp( const moppheader_t *pHeader );
@@ -244,7 +244,7 @@ private:
 };
 #endif
 
-class CPhysCollideCompactSurface : public CPhysCollide
+class CPhysCollideCompactSurface final : public CPhysCollide
 {
 public:
 	~CPhysCollideCompactSurface();
@@ -784,7 +784,8 @@ struct PolyhedronMesh_Triangle
 {
 	struct
 	{
-		int iPointIndices[2];
+		// dimhotepus: int -> unsigned.
+		unsigned iPointIndices[2];
 	} Edges[3];
 };
 
@@ -794,11 +795,13 @@ struct PolyhedronMesh_Triangle
 CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConvex, bool bUseTempPolyhedron )
 {
 	IVP_Compact_Ledge *pLedge = (IVP_Compact_Ledge *)pConvex;
-	int iTriangles = pLedge->get_n_triangles();
+	// dimhotepus: int -> short.
+	const short iTriangles{pLedge->get_n_triangles()};
 
 	PolyhedronMesh_Triangle *pTriangles = stackallocT( PolyhedronMesh_Triangle, iTriangles );
 	
-	int iHighestPointIndex = 0;
+	// dimhotepus: int -> unsigned.
+	unsigned iHighestPointIndex = 0;
 	const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle();
 	for( int i = 0; i < iTriangles; ++i )
 	{
@@ -830,7 +833,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 
 	int iInsertIndex = 0;
 
-	for( int i = 0; i != iHighestPointIndex; ++i )
+	for( unsigned i = 0; i != iHighestPointIndex; ++i )
 	{
 		if( pPointRemapping[i] )
 		{
@@ -863,8 +866,8 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	{
 		for( int j = 0; j != 3; ++j )
 		{
-			const int *pIndices = pTriangles[i].Edges[j].iPointIndices;
-			int iLow = ((pIndices[0] > pIndices[1])?1:(0));
+			const unsigned *pIndices = pTriangles[i].Edges[j].iPointIndices;
+			byte iLow = pIndices[0] > pIndices[1] ? 1 : 0;
 			++iLinkCount; //this will technically make the link count double the actual number
 			bLinks[(pIndices[iLow] * iNumPoints) + pIndices[1-iLow]] = true;
 		}
@@ -881,7 +884,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	//copy/convert vertices
 	const IVP_Compact_Poly_Point *pLedgePoints = pLedge->get_point_array();
 	Vector *pWriteVertices = pReturn->pVertices;
-	for( int i = 0; i != iHighestPointIndex; ++i )
+	for( unsigned i = 0; i != iHighestPointIndex; ++i )
 	{
 		if( pPointRemapping[i] != -1 )
 			ConvertPositionToHL( pLedgePoints[i], pWriteVertices[pPointRemapping[i]] );
@@ -904,7 +907,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	}
 
 	
-	int *pStartIndices = (int *)stackalloc( iNumPoints * sizeof( int ) ); //for quicker lookup of which edges to use in polygons
+	int *pStartIndices = stackallocT( int, iNumPoints ); //for quicker lookup of which edges to use in polygons
 
 	pStartIndices[0] = 0; //the lowest index point drives links, so if the first point isn't the first link, then something is extremely messed up
 	Assert( pReturn->pLines[0].iPointIndices[0] == 0 );
@@ -929,23 +932,20 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 		pReturn->pPolygons[i].iFirstIndex = iInsertIndex;
 		pReturn->pPolygons[i].iIndexCount = 3;
 
-		Vector *p1, *p2, *p3;
-		p1 = &pReturn->pVertices[pTriangles[i].Edges[0].iPointIndices[0]];
-		p2 = &pReturn->pVertices[pTriangles[i].Edges[1].iPointIndices[0]];
-		p3 = &pReturn->pVertices[pTriangles[i].Edges[2].iPointIndices[0]];
+		const Vector &p1 = pReturn->pVertices[pTriangles[i].Edges[0].iPointIndices[0]];
+		const Vector &p2 = pReturn->pVertices[pTriangles[i].Edges[1].iPointIndices[0]];
+		const Vector &p3 = pReturn->pVertices[pTriangles[i].Edges[2].iPointIndices[0]];
 
-		Vector v1to2, v1to3;
-
-		v1to2 = *p2 - *p1;
-		v1to3 = *p3 - *p1;
+		Vector v1to2 = p2 - p1;
+		Vector v1to3 = p3 - p1;
 
 		pReturn->pPolygons[i].polyNormal = v1to3.Cross( v1to2 );
 		pReturn->pPolygons[i].polyNormal.NormalizeInPlace();
 
 		for( int j = 0; j != 3; ++j, ++iInsertIndex )
 		{
-			const int *pIndices = pTriangles[i].Edges[j].iPointIndices;
-			int iLow = (pIndices[0] > pIndices[1])?1:0;
+			const unsigned *pIndices = pTriangles[i].Edges[j].iPointIndices;
+			byte iLow = (pIndices[0] > pIndices[1]) ? 1 : 0;
 			int iLineIndex;
 			for( iLineIndex = pStartIndices[pIndices[iLow]]; iLineIndex != iLinkCount; ++iLineIndex )
 			{
@@ -1064,30 +1064,24 @@ static void LedgeInsidePoint( IVP_Compact_Ledge *pLedge, Vector& out )
 //			p3 - 
 // Output : float (volume in units^3)
 //-----------------------------------------------------------------------------
-static float TetrahedronVolume( const Vector &p0, const Vector &p1, const Vector &p2, const Vector &p3 )
+[[nodiscard]] static float TetrahedronVolume( const Vector &p0, const Vector &p1, const Vector &p2, const Vector &p3 )
 {
-	Vector a, b, c, cross;
-	float volume = 1.0f / 6.0f;
+	const Vector a = p1 - p0;
+	const Vector b = p2 - p0;
+	const Vector c = p3 - p0;
+	const Vector cross = b.Cross( c );
 
-	a = p1 - p0;
-	b = p2 - p0;
-	c = p3 - p0;
-	cross = CrossProduct( b, c );
-
-	volume *= DotProduct( a, cross );
-	if ( volume < 0 )
-		return -volume;
-	return volume;
+	const float volume = 1.0f / 6.0f * DotProduct( a, cross );
+	return volume < 0 ? -volume : volume;
 }
 
 
-static float TriangleArea( const Vector &p0, const Vector &p1, const Vector &p2 )
+[[nodiscard]] static float TriangleArea( const Vector &p0, const Vector &p1, const Vector &p2 )
 {
-	Vector e0 = p1 - p0;
-	Vector e1 = p2 - p0;
-	Vector cross;
+	const Vector e0 = p1 - p0;
+	const Vector e1 = p2 - p0;
+	const Vector cross = e0.Cross( e1 );
 
-	CrossProduct( e0, e1, cross );
 	return 0.5f * cross.Length();
 }
 
@@ -1257,11 +1251,11 @@ void CPhysicsCollision::InitBBoxCache()
 	IVP_Compact_Poly_Point *pPoints = reinterpret_cast<IVP_Compact_Ledge *>(pConvex)->get_point_array();
 	for ( int i = 0; i < 8; i++ )
 	{
-		int nearest = -1;
+		byte nearest = std::numeric_limits<byte>::max();
 		float minDist = 0.1f;
 		Vector tmp;
 		ConvertPositionToHL( pPoints[i], tmp );
-		for ( int j = 0; j < 8; j++ )
+		for ( byte j = 0; j < 8; j++ )
 		{
 			float dist = (boxVerts[j] - tmp).Length();
 			if ( dist < minDist )
@@ -1645,7 +1639,7 @@ void CPhysicsCollision::VCollideLoad( vcollide_t *pOutput, int solidCount, const
 
 		if (size > currentSize || !tmpbuf)
 		{
-				delete[] tmpbuf;
+			delete[] tmpbuf; //-V575
 			tmpbuf = new char[size];
 			currentSize = size;
 		}

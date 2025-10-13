@@ -7,13 +7,13 @@
 
 #include "toolutils/vgui_tools.h"
 #include "ienginevgui.h"
-#include <vgui/ISurface.h>
-#include <vgui/IVGui.h>
-#include <vgui/IInput.h>
+#include "vgui/ISurface.h"
+#include "vgui/IVGui.h"
+#include "vgui/IInput.h"
 #include "tier0/vprof.h"
-#include <vgui_controls/Panel.h>
-#include <KeyValues.h>
-#include <dme_controls/dmeControls.h>
+#include "tier1/KeyValues.h"
+#include "vgui_controls/Panel.h"
+#include "dme_controls/dmeControls.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

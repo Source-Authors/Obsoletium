@@ -126,8 +126,8 @@ const float4 g_vPyroParms1		: register( c0 );
 
 #endif
 
-const HALF3 g_EyePos						: register( c10 );
-const HALF4 g_FogParams						: register( c11 );
+const float3 g_EyePos						: register( c10 );
+const float4 g_FogParams					: register( c11 );
 const float4 g_vGeneralPyroParms1			: register( c12 );
 	#define g_fWriteDepthToAlpha	g_vGeneralPyroParms1.x
 	#define g_flTime				g_vGeneralPyroParms1.y
@@ -428,7 +428,8 @@ float4 main( PS_INPUT i ) : COLOR
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	float	flVignetteAmount = tex2D( VignetteSampler, i.vBaseTexCoord.xy );
+	// dimhotepus: Fix float4 -> float truncation warning.
+	float	flVignetteAmount = tex2D( VignetteSampler, i.vBaseTexCoord.xy ).x;
 	float4	vVignetteTile = tex2D( VignetteTileSampler, i.vBaseTexCoord.xy * 50.0f );
 
 #if HEATHAZE == 1

@@ -20,10 +20,10 @@
 //-----------------------------------------------------------------------------
 class CProcessUtils final : public CTier1AppSystem< IProcessUtils >
 {
-	typedef CTier1AppSystem< IProcessUtils > BaseClass;
+	using BaseClass = CTier1AppSystem<IProcessUtils>;
 
 public:
-	CProcessUtils() : BaseClass( false ), m_hCurrentProcess{PROCESS_HANDLE_INVALID}, m_bInitialized{false} {}
+	CProcessUtils() : BaseClass( false ) {}
 
 	// Inherited from IAppSystem
 	InitReturnVal_t Init() override;
@@ -82,8 +82,8 @@ private:
 	intp GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf, intp nBufLen );
 
 	CUtlFixedLinkedList< ProcessInfo_t >	m_Processes;
-	ProcessHandle_t m_hCurrentProcess;
-	bool m_bInitialized;
+	ProcessHandle_t m_hCurrentProcess{PROCESS_HANDLE_INVALID};
+	bool m_bInitialized{false};
 };
 
 
@@ -134,7 +134,7 @@ ProcessHandle_t CProcessUtils::CreateProcess( ProcessInfo_t &info, bool bConnect
 	}
 
 	PROCESS_INFORMATION pi;
-	if ( ::CreateProcess( NULL, info.m_CommandLine.GetForModify(), NULL, NULL, TRUE, DETACHED_PROCESS, NULL, NULL, &si, &pi ) )
+	if ( ::CreateProcess( nullptr, info.m_CommandLine.GetForModify(), nullptr, nullptr, TRUE, DETACHED_PROCESS, nullptr, nullptr, &si, &pi ) )
 	{
 		info.m_hProcess = pi.hProcess;
 		info.m_hThread = pi.hThread;
@@ -181,7 +181,7 @@ ProcessHandle_t CProcessUtils::StartProcess( const char *pCommandLine, bool bCon
     // Set the bInheritHandle flag so pipe handles are inherited.
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES); 
     saAttr.bInheritHandle = TRUE; 
-    saAttr.lpSecurityDescriptor = NULL; 
+    saAttr.lpSecurityDescriptor = nullptr; 
  
     // Create a pipe for the child's STDOUT. 
     if ( CreatePipe( &info.m_hChildStdoutRd, &info.m_hChildStdoutWr, &saAttr, 0 ) )
@@ -326,7 +326,7 @@ intp CProcessUtils::GetActualProcessOutputSize( ProcessHandle_t hProcess )
 		return 0;
 
 	DWORD dwCount = 0;
-	if ( !PeekNamedPipe( info.m_hChildStdoutRd, NULL, NULL, NULL, &dwCount, NULL ) )
+	if ( !PeekNamedPipe( info.m_hChildStdoutRd, nullptr, NULL, nullptr, &dwCount, nullptr ) )
 	{
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"
@@ -349,8 +349,8 @@ intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf
 	DWORD dwRead = 0;
 
 	// FIXME: Is there a way of making pipes be text mode so we don't get /n/rs back?
-	char *pTempBuf = (char*)_alloca( nBufLen );
-	if ( !PeekNamedPipe( info.m_hChildStdoutRd, NULL, NULL, NULL, &dwCount, NULL ) )
+	char *pTempBuf = stackallocT( char, nBufLen );
+	if ( !PeekNamedPipe( info.m_hChildStdoutRd, nullptr, NULL, nullptr, &dwCount, nullptr ) )
 	{
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"
@@ -360,7 +360,7 @@ intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf
 	}
 
 	dwCount = min( dwCount, (DWORD)nBufLen - 1 );
-	if ( !ReadFile( info.m_hChildStdoutRd, pTempBuf, dwCount, &dwRead, NULL) )
+	if ( !ReadFile( info.m_hChildStdoutRd, pTempBuf, dwCount, &dwRead, nullptr) )
 	{
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"

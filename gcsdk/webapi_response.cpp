@@ -1,4 +1,4 @@
-//========= Copyright 1996-2010, Valve LLC, All rights reserved. ============
+//========= Copyright Valve Corporation, All rights reserved. ============
 //
 // Purpose: Implementation for CWebAPIResponse objects
 //
@@ -2212,7 +2212,7 @@ CWebAPIValues *CWebAPIValues::ParseJSON( CUtlBuffer &inputBuffer )
 	// if the first character is the start of a string,
 	// wrap the whole thing in an object so we can parse it.
 	// We'll unwrap it at the end
-	char cFirst = *(char *)inputBuffer.PeekGet();
+	char cFirst = *(const char *)inputBuffer.PeekGet();
 	bool bWrapContent =  cFirst == '\"';
 
 	JSON_config config;

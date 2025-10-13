@@ -34,35 +34,7 @@
 #include "studiobyteswap.h"
 #include "filesystem/IQueuedLoader.h"
 
-// XXX remove this later. (henryg)
-#if 0 && defined(_DEBUG) && defined(_WIN32) && !defined(_X360)
-typedef struct LARGE_INTEGER { unsigned long long QuadPart; } LARGE_INTEGER;
-extern "C" void __stdcall OutputDebugStringA( const char *lpOutputString );
-extern "C" long __stdcall QueryPerformanceCounter( LARGE_INTEGER *lpPerformanceCount );
-extern "C" long __stdcall QueryPerformanceFrequency( LARGE_INTEGER *lpPerformanceCount );
-namespace {
-	class CDebugMicroTimer
-	{
-	public:
-		CDebugMicroTimer(const char* n) : name(n) { QueryPerformanceCounter(&start); }
-		~CDebugMicroTimer() {
-			LARGE_INTEGER end;
-			char outbuf[128];
-			QueryPerformanceCounter(&end);
-			if (!freq) QueryPerformanceFrequency((LARGE_INTEGER*)&freq);
-			V_snprintf(outbuf, 128, "%s %6d us\n", name, (int)((end.QuadPart - start.QuadPart) * 1000000 / freq));
-			OutputDebugStringA(outbuf);
-		}
-		LARGE_INTEGER start;
-		const char* name;
-		static long long freq;
-	};
-	long long CDebugMicroTimer::freq = 0;
-}
-#define DEBUG_SCOPE_TIMER(name) CDebugMicroTimer dbgLocalTimer(#name)
-#else
 #define DEBUG_SCOPE_TIMER(name) (void)0
-#endif
 
 #ifdef _RETAIL
 #define NO_LOG_MDLCACHE 1
@@ -121,7 +93,7 @@ struct studiodata_t
 	// array of cache handles to demand loaded virtual model data
 	int					m_nAnimBlockCount;
 	DataCacheHandle_t	*m_pAnimBlock;
-	unsigned long long 	*m_iFakeAnimBlockStall;
+	uint64 				*m_iFakeAnimBlockStall;
 
 	// vertex data is usually compressed to save memory (model decal code only needs some data)
 	DataCacheHandle_t	m_VertexCache;
@@ -890,8 +862,15 @@ MDLHandle_t CMDLCache::FindMDL( const char *pMDLRelativePath )
 	// can't trust provided path
 	// ensure provided path correctly resolves (Dictionary is case-insensitive)
 	char szFixedName[MAX_PATH];
-	V_strncpy( szFixedName, pMDLRelativePath, sizeof( szFixedName ) );
+	V_strcpy_safe( szFixedName, pMDLRelativePath );
 	V_RemoveDotSlashes( szFixedName, '/' );
+
+	// dimhotepus: Oh, some custom packs have model names like models/humans/male_postures.mdl\r\n :(
+	intp i{V_strlen(szFixedName)};
+	while (--i >= 0 && (szFixedName[i] == '\r' || szFixedName[i] == '\n'))
+	{
+		szFixedName[i] = '\0';
+	}
 
 	MDLHandle_t handle = m_MDLDict.Find( szFixedName );
 	if ( handle == m_MDLDict.InvalidIndex() )
@@ -1121,8 +1100,8 @@ void CMDLCache::AllocateAnimBlocks( studiodata_t *pStudioData, int nCount )
 	pStudioData->m_pAnimBlock = new DataCacheHandle_t[pStudioData->m_nAnimBlockCount];
 	memset( pStudioData->m_pAnimBlock, 0, sizeof(DataCacheHandle_t) * pStudioData->m_nAnimBlockCount );
 
-	pStudioData->m_iFakeAnimBlockStall = new unsigned long long [pStudioData->m_nAnimBlockCount];
-	memset( pStudioData->m_iFakeAnimBlockStall, 0, sizeof( unsigned long long ) * pStudioData->m_nAnimBlockCount );
+	pStudioData->m_iFakeAnimBlockStall = new uint64 [pStudioData->m_nAnimBlockCount];
+	memset( pStudioData->m_iFakeAnimBlockStall, 0, sizeof( uint64 ) * pStudioData->m_nAnimBlockCount );
 }
 
 void CMDLCache::FreeAnimBlocks( MDLHandle_t handle )
@@ -1253,7 +1232,7 @@ unsigned char *CMDLCache::GetAnimBlock( MDLHandle_t handle, intp nBlock )
 	if (mod_load_fakestall.GetInt())
 	{
 		// dimhotepus: ms -> mcs to not overflow in 49.7 days.
-		unsigned long long t = Plat_USTime();
+		uint64 t = Plat_USTime();
 		if (pStudioData->m_iFakeAnimBlockStall[nBlock] == 0 || pStudioData->m_iFakeAnimBlockStall[nBlock] > t)
 		{
 			pStudioData->m_iFakeAnimBlockStall[nBlock] = t;
@@ -1922,10 +1901,10 @@ bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlB
 	VPROF( "CMDLCache::ReadMDLFile" );
 
 	char pFileName[ MAX_PATH ];
-	Q_strncpy( pFileName, pMDLFileName, sizeof( pFileName ) );
-	Q_FixSlashes( pFileName );
+	V_strcpy_safe( pFileName, pMDLFileName );
+	V_FixSlashes( pFileName );
 #ifdef _LINUX
-	Q_strlower( pFileName );
+	V_strlower( pFileName );
 #endif
 
 	MdlCacheMsg( "MDLCache: Load studiohdr '%s'.\n", pFileName );
@@ -1936,6 +1915,13 @@ bool CMDLCache::ReadMDLFile( MDLHandle_t handle, const char *pMDLFileName, CUtlB
 	if ( !bOk )
 	{
 		DevWarning( "Unable to load model '%s'!\n", pMDLFileName );
+		return false;
+	}
+
+	// dimhotepus: Empty models like hl2/models/weapons/v_hands.mdl should not read past the buffer above. 
+	if ( buf.Size() == 0 )
+	{
+		DevWarning( "Model '%s' is empty and not loaded!\n", pMDLFileName );
 		return false;
 	}
 
@@ -2474,7 +2460,7 @@ bool CMDLCache::VerifyHeaders( studiohdr_t *pStudioHdr )
 		return false;
 	}
 
-	vertexFileHeader_t *pVertexHdr = (vertexFileHeader_t*)vvdHeader.PeekGet();
+	const vertexFileHeader_t *pVertexHdr = (const vertexFileHeader_t*)vvdHeader.PeekGet();
 
 	// check
 	if (( pVertexHdr->id != MODEL_VERTEX_FILE_ID ) ||
@@ -2498,7 +2484,7 @@ bool CMDLCache::VerifyHeaders( studiohdr_t *pStudioHdr )
 	}
 
 	// check
-	OptimizedModel::FileHeader_t *pVtxHdr = (OptimizedModel::FileHeader_t*)vtxHeader.PeekGet();
+	const OptimizedModel::FileHeader_t *pVtxHdr = (const OptimizedModel::FileHeader_t*)vtxHeader.PeekGet();
 	if (( pVtxHdr->version != OPTIMIZED_MODEL_FILE_VERSION ) ||
 		( pVtxHdr->checkSum != pStudioHdr->checksum ))
 	{
@@ -3254,7 +3240,7 @@ void CMDLCache::FreeData( MDLCacheDataType_t type, void *pData )
 {
 	if ( type != MDLCACHE_ANIMBLOCK )
 	{
-		_aligned_free( (void *)pData );
+		_aligned_free( pData );
 	}
 	else
 	{

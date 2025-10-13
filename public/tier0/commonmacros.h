@@ -3,19 +3,36 @@
 // This should contain ONLY general purpose macros that are
 // appropriate for use in engine/launcher/all tools.
 
-#ifndef TIER0_COMMONMACROS_H_
-#define TIER0_COMMONMACROS_H_
+#ifndef SE_PUBLIC_TIER0_COMMONMACROS_H_
+#define SE_PUBLIC_TIER0_COMMONMACROS_H_
 
 #include <cassert>  // assert
 #include <cstddef>  // memcmp, std::ptrdiff_t
 #include <cstring>  // strlen
 #include <utility>  // to_underlying
 
-#if defined(__x86_64__) || defined(_WIN64)
+// dimhotepus: Backport from TF2. Detect the architecture we are running on
+#if defined(__aarch64__) || defined(_M_ARM64)
+#define PLATFORM_ARM 1
+// dimhotepus: ARM64 detection.
+#define PLATFORM_ARM_64 1
+#elif defined(__arm__) || defined(_M_ARM)
+#define PLATFORM_ARM 1
+// dimhotepus: ARM detection.
+#define PLATFORM_ARM_32 1
+#elif defined(_M_X64) || defined(__x86_64__)
+#define PLATFORM_INTEL
+#define PLATFORM_X86 64
+
 /**
  * @brief Defined when x86-64 CPU architecture used.
  */
 #define PLATFORM_64BITS 1
+#elif defined(_M_IX86) || defined(__i386__)
+#define PLATFORM_INTEL
+#define PLATFORM_X86 32
+#else
+#error "Please define your processor architecture."
 #endif
 
 #if defined(__GCC__) || defined(__GNUC__)
@@ -23,6 +40,13 @@
  * @brief Defined when GCC compiler used.
  */
 #define COMPILER_GCC 1
+
+// dimhotepus: Require GCC 8+ for C++17 support.
+// Only Clang 8 has full C++17 support.
+// See https://gcc.gnu.org/projects/cxx-status.html#cxx17
+#if __GNUC__ < 8
+#error "Please install GCC 8+ to support C++ 17"
+#endif
 #endif
 
 #ifdef __clang__
@@ -30,14 +54,62 @@
  * @brief Defined when clang compiler used.
  */
 #define COMPILER_CLANG 1
+
+// dimhotepus: Require Clang 8+ for C++17 support.
+// Only Clang 8 has full C++17 support.
+// See https://clang.llvm.org/cxx_status.html#cxx17
+#if __clang_major__ < 8
+#error "Please install Clang 8+ to support C++ 17"
+#endif
 #endif
 
-#if defined(_MSC_VER) && !defined(COMPILER_MSVC)
+#if defined(_MSC_VER)
+#if !defined(COMPILER_MSVC)
 /**
  * @brief Defined when MSVC compiler used.
  */
 #define COMPILER_MSVC 1
 #endif
+
+// dimhotepus: Require Visual Studio 2022 version 17.2+ for C++17 support.
+// See https://en.cppreference.com/w/cpp/compiler_support/17.html
+// See
+// https://learn.microsoft.com/en-us/cpp/overview/visual-cpp-language-conformance?view=msvc-170
+#if _MSC_VER < 1932
+#error "Please install Visual Studio 2022 version 17.2+ to support C++ 17"
+#endif
+#endif
+
+#ifdef _MSC_VER
+#define NO_VTABLE __declspec( novtable )
+#else
+#define NO_VTABLE
+#endif
+
+// This can be used to declare an abstract (interface only) class.
+// Classes marked abstract should not be instantiated.  If they are, and access violation will occur.
+//
+// Example of use:
+//
+// abstract_class CFoo
+// {
+//      ...
+// }
+//
+// MSDN __declspec(novtable) documentation: https://docs.microsoft.com/en-us/cpp/cpp/novtable
+//
+// This form of __declspec can be applied to any class declaration, but should only be applied to
+// pure interface classes, that is, classes that will never be instantiated on their own.  The
+// __declspec stops the compiler from generating code to initialize the vfptr in the constructor(s)
+// and destructor of the class.  In many cases, this removes the only references to the vtable that
+// are associated with the class and, thus, the linker will remove it.  Using this form of
+// __declspec can result in a significant reduction in code size.
+//
+// If you attempt to instantiate a class marked with novtable and then access a class member, you
+// will receive an access violation(AV).
+//
+// dimhotepus: Enable for PC to reduce code size.
+#define abstract_class class NO_VTABLE
 
 /**
  * @brief Makes a signed 4-byte "packed ID" int out of 4 characters.
@@ -159,7 +231,7 @@ constexpr inline bool IsPowerOfTwo(T value) noexcept {
 // C++20 ssize
 using std::ssize;
 #else
-#include <type_traits> 
+#include <type_traits>
 
 template <class C>
 constexpr auto ssize(const C& c) noexcept(noexcept(c.size()))
@@ -407,7 +479,7 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
  */
 #define SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
 
- /*
+/*
  * @brief Do nothing.
  */
 #define SRC_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING()
@@ -428,4 +500,4 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
 #define SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
 #endif
 
-#endif  // TIER0_COMMONMACROS_H_
+#endif  // !SE_PUBLIC_TIER0_COMMONMACROS_H_

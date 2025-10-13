@@ -139,7 +139,7 @@ void CFXLine::Destroy( void )
 // Purpose: 
 // Input  : frametime - 
 //-----------------------------------------------------------------------------
-void CFXLine::Update( double frametime )
+void CFXLine::Update( float frametime )
 {
 	m_FXData.m_flLifeTime += frametime;
 

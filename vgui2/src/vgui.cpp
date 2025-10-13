@@ -1074,9 +1074,9 @@ void CVGui::DPrintf2(const char* format,...)
 
 void vgui::vgui_strcpy(char* dst,int dstLen,const char* src)
 {
-	Assert(dst!=null);
+	Assert(dst);
 	Assert(dstLen>=0);
-	Assert(src!=null);
+	Assert(src);
 
 	intp srcLen=V_strlen(src)+1;
 	if(srcLen>dstLen)

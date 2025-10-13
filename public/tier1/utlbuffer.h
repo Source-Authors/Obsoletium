@@ -10,12 +10,8 @@
 #ifndef UTLBUFFER_H
 #define UTLBUFFER_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "tier1/utlmemory.h"
-#include "tier1/byteswap.h"
+#include "utlmemory.h"
+#include "byteswap.h"
 
 #include <cstdarg>
 
@@ -44,7 +40,7 @@ public:
 	};
 
 	CUtlCharConversion( char nEscapeChar, const char *pDelimiter, intp nCount, ConversionArray_t *pArray );
-	virtual ~CUtlCharConversion() {}
+	virtual ~CUtlCharConversion() = default;
 
 	[[nodiscard]] char GetEscapeChar() const;
 	[[nodiscard]] const char *GetDelimiter() const;
@@ -180,17 +176,19 @@ public:
 	//		read for strings until a null character is reached.
 	// Text mode: it'll parse the file, turning text #s into real numbers.
 	//		GetString will read a string until a space is reached
-	[[nodiscard]] char			GetChar( );
-	[[nodiscard]] unsigned char	GetUnsignedChar( );
-	[[nodiscard]] short			GetShort( );
+	[[nodiscard]] char				GetChar( );
+	[[nodiscard]] unsigned char		GetUnsignedChar( );
+	[[nodiscard]] short				GetShort( );
 	[[nodiscard]] unsigned short	GetUnsignedShort( );
 	[[nodiscard]] int				GetInt( );
-	[[nodiscard]] int64			GetInt64( );
+	[[nodiscard]] int64				GetInt64( );
 	[[nodiscard]] int				GetIntHex( );
-	[[nodiscard]] unsigned int	GetUnsignedInt( );
+	[[nodiscard]] unsigned int		GetUnsignedInt( );
 	[[nodiscard]] uint64			GetUint64( );
-	[[nodiscard]] float			GetFloat( );
+	[[nodiscard]] float				GetFloat( );
 	[[nodiscard]] double			GetDouble( );
+	// dimhotepus: CS:GO backport.
+	[[nodiscard]] void *			GetPtr();
 	template <size_t maxLenInChars> void GetString( OUT_Z_ARRAY char( &pString )[maxLenInChars] )
 	{
 		GetStringInternal( pString, maxLenInChars );
@@ -311,6 +309,8 @@ public:
 	void			PutFloat( float f );
 	void			PutDouble( double d );
 	void			PutString( const char* pString );
+	// dimhotepus: CS:GO backport.
+	void			PutPtr( void * ); // Writes the pointer, not the pointed to
 	void			Put( const void* pMem, intp size );
 	template<typename T> 
 	std::enable_if_t<!std::is_pointer_v<T>> Put( const T &pMem )
@@ -692,7 +692,7 @@ inline void CUtlBuffer::GetTypeBin< float >( float &dest )
 {
 	if ( CheckGet( sizeof( float ) ) )
 	{
-		uintptr_t pData = (uintptr_t)PeekGet();
+		auto pData = (uintptr_t)PeekGet();
 		// aligned read
 		dest = *(float *)pData;
 
@@ -799,6 +799,18 @@ inline double CUtlBuffer::GetDouble( )
 	return d;
 }
 
+// dimhotepus: CS:GO backport.
+inline void *CUtlBuffer::GetPtr( )
+{
+	void *p;
+	// LEGACY WARNING: in text mode, PutPtr writes 32 bit pointers in hex, while GetPtr reads 32 or 64 bit pointers in decimal
+#if !defined(X64BITS) && !defined(PLATFORM_64BITS)
+	p = ( void* )(intp)GetUnsignedInt();
+#else
+	p = ( void* )(intp)GetInt64();
+#endif
+	return p;
+}
 
 //-----------------------------------------------------------------------------
 // Where am I writing?
@@ -1021,6 +1033,19 @@ inline void CUtlBuffer::PutDouble( double d )
 	PutType( d, "%f" );
 }
 
+// dimhotepus: CS:GO backport.
+inline void CUtlBuffer::PutPtr( void *p )
+{
+	// LEGACY WARNING: in text mode, PutPtr writes 32 bit pointers in hex, while GetPtr reads 32 or 64 bit pointers in decimal
+	if (!IsText())
+	{
+		PutTypeBin( p );
+	}
+	else
+	{
+		Printf( "0x%p", p );
+	}
+}
 
 //-----------------------------------------------------------------------------
 // Am I a text buffer?

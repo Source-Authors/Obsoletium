@@ -47,6 +47,9 @@ public:
 	// Save / Restore
 	virtual void	Save( ISave *pSave ) = 0;
 	virtual void	Restore( IRestore *pRestore, bool ) = 0;
+
+	// dimhotepus: Cleanup support.
+	virtual void	Shutdown() = 0;
 };
 
 extern IViewEffects *vieweffects;

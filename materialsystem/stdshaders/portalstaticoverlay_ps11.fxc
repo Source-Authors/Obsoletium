@@ -6,7 +6,7 @@
 
 #include "common_ps_fxc.h"
 
-const HALF3 g_StaticAmount	: register( c0 ); //x is static, y is 1.0 - static
+const float3 g_StaticAmount	: register( c0 ); //x is static, y is 1.0 - static
 
 #if( HASSTATICTEXTURE )
 	sampler StaticTextureSampler	: register( s0 );
@@ -42,9 +42,9 @@ struct PS_INPUT
 
 
 
-HALF4 main( PS_INPUT i ) : COLOR
+float4 main( PS_INPUT i ) : COLOR
 {
-	HALF4 result;
+	float4 result;
 	
 #	if( HASSTATICTEXTURE )
 		result.rgb = tex2D( StaticTextureSampler, i.vStaticTexCoord ).rgb;

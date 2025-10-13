@@ -42,7 +42,7 @@ bool WriteBonusMapSavedData( KeyValues *data )
 
 	data->RecursiveSaveToFile( buf, 0 );
 
-	char	szFilename[_MAX_PATH];
+	char	szFilename[MAX_PATH];
 	V_sprintf_safe( szFilename, "%s/bonus_maps_data.bmd", SAVE_DIR );
 
 	bool bWriteSuccess = g_pFullFileSystem->WriteFile( szFilename, MOD_DIR, buf );
@@ -272,7 +272,7 @@ void GetChallengeMedals( ChallengeDescription_t *pChallengeDescription, int &iBe
 
 CBonusMapsDatabase *BonusMapsDatabase( void )
 {
-		static CBonusMapsDatabase StaticBonusMapsDatabase;
+	static CBonusMapsDatabase StaticBonusMapsDatabase;
 	return &StaticBonusMapsDatabase;
 }
 
@@ -323,7 +323,7 @@ bool CBonusMapsDatabase::ReadBonusMapSaveData( void )
 		return false;
 	}
 
-	char	szFilename[_MAX_PATH];
+	char	szFilename[MAX_PATH];
 	V_sprintf_safe( szFilename, "%s/bonus_maps_data.bmd", SAVE_DIR );
 
 	// dimhotepus: Support bonus maps in mods.
@@ -411,7 +411,7 @@ void CBonusMapsDatabase::ScanBonusMaps( void )
 	m_fCurrentCompletion = 0.0f;
 
 	// populate list box with all bonus maps in the current path
-	char szDirectory[_MAX_PATH];
+	char szDirectory[MAX_PATH];
 
 	if ( Q_strcmp( m_szCurrentPath, "." ) == 0 )
 	{
@@ -454,7 +454,7 @@ void CBonusMapsDatabase::RefreshMapData( void )
 	m_iCompletableLevels = 0;
 	m_fCurrentCompletion = 0.0f;
 
-	for ( int iMap = 0; iMap < m_BonusMaps.Count(); ++iMap )
+	for ( intp iMap = 0; iMap < m_BonusMaps.Count(); ++iMap )
 	{
 		BonusMapDescription_t *pMap = &m_BonusMaps[ iMap ];
 
@@ -477,7 +477,7 @@ void CBonusMapsDatabase::RefreshMapData( void )
 	}
 }
 
-int CBonusMapsDatabase::BonusCount( void )
+intp CBonusMapsDatabase::BonusCount( void )
 {
 	if ( m_BonusMaps.Count() == 0 )
 		ScanBonusMaps();
@@ -529,7 +529,7 @@ bool CBonusMapsDatabase::BonusesUnlocked( void )
 	if ( m_iX360BonusesUnlocked == 0 )
 	{
 		// Hasn't been recorded as unlocked yet
-		for ( int iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
+		for ( intp iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
 		{
 			BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
 			if ( Q_strcmp( pMap->szMapName, "#Bonus_Map_AdvancedChambers" ) == 0 && !pMap->bLocked )
@@ -619,7 +619,7 @@ float CBonusMapsDatabase::GetCompletionPercentage( void )
 
 int CBonusMapsDatabase::NumAdvancedComplete( void )
 {
-	char szCurrentPath[_MAX_PATH];
+	char szCurrentPath[MAX_PATH];
 	V_strcpy_safe( szCurrentPath, m_szCurrentPath );
 	int iDirDepth = m_iDirDepth;
 
@@ -630,7 +630,7 @@ int CBonusMapsDatabase::NumAdvancedComplete( void )
 	int iNumComplete = 0;
 
 	// Look through all the bonus maps
-	for ( int iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
+	for ( intp iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
 	{
 		BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
 
@@ -651,7 +651,7 @@ int CBonusMapsDatabase::NumAdvancedComplete( void )
 
 void CBonusMapsDatabase::NumMedals( int piNumMedals[ 3 ] )
 {
-	char szCurrentPath[_MAX_PATH];
+	char szCurrentPath[MAX_PATH];
 	V_strcpy_safe( szCurrentPath, m_szCurrentPath );
 	int iDirDepth = m_iDirDepth;
 
@@ -663,7 +663,7 @@ void CBonusMapsDatabase::NumMedals( int piNumMedals[ 3 ] )
 		piNumMedals[ i ] = 0;
 
 	// Look through all the bonus maps
-	for ( int iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
+	for ( intp iBonusMap = 0; iBonusMap < BonusMapsDatabase()->BonusCount(); ++iBonusMap )
 	{
 		BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( iBonusMap );
 
@@ -692,7 +692,7 @@ void CBonusMapsDatabase::NumMedals( int piNumMedals[ 3 ] )
 
 void CBonusMapsDatabase::AddBonus( const char *pCurrentPath, const char *pDirFileName, bool bIsFolder )
 {
-	char szFileName[_MAX_PATH];
+	char szFileName[MAX_PATH];
 	V_sprintf_safe( szFileName, "%s%s", pCurrentPath, pDirFileName );
 
 	// Only load bonus maps from the current mod's maps dir
@@ -704,10 +704,10 @@ void CBonusMapsDatabase::AddBonus( const char *pCurrentPath, const char *pDirFil
 
 void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool bOutOfRoot )
 {
-	char szDirectory[_MAX_PATH];
+	char szDirectory[MAX_PATH];
 	V_sprintf_safe( szDirectory, "%s*", pCurrentPath );
 
-	FileFindHandle_t dirHandle;
+	FileFindHandle_t dirHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pDirFileName = g_pFullFileSystem->FindFirst( szDirectory, &dirHandle );
 
 	while (pDirFileName)
@@ -727,7 +727,7 @@ void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool b
 			AddBonus( pCurrentPath, pDirFileName, true );
 		else
 		{
-			char szFileName[_MAX_PATH];
+			char szFileName[MAX_PATH];
 			V_sprintf_safe( szFileName, "%s%s", pCurrentPath, pDirFileName );
 			AddBonus( "", szFileName, true );
 		}
@@ -740,10 +740,10 @@ void CBonusMapsDatabase::BuildSubdirectoryList( const char *pCurrentPath, bool b
 
 void CBonusMapsDatabase::BuildBonusMapsList( const char *pCurrentPath, bool bOutOfRoot )
 {
-	char szDirectory[_MAX_PATH];
+	char szDirectory[MAX_PATH];
 	V_sprintf_safe( szDirectory, "%s*.bns", pCurrentPath );
 
-	FileFindHandle_t mapHandle;
+	FileFindHandle_t mapHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pMapFileName = g_pFullFileSystem->FindFirst( szDirectory, &mapHandle );
 
 	while ( pMapFileName && !Q_isempty(pMapFileName) )
@@ -759,7 +759,7 @@ void CBonusMapsDatabase::BuildBonusMapsList( const char *pCurrentPath, bool bOut
 			AddBonus( pCurrentPath, pMapFileName, false );
 		else
 		{
-			char szFileName[_MAX_PATH];
+			char szFileName[MAX_PATH];
 			V_sprintf_safe( szFileName, "%s%s", pCurrentPath, pMapFileName );
 			AddBonus( "", szFileName, false );
 		}
@@ -778,7 +778,7 @@ void CBonusMapsDatabase::ParseBonusMapData( char const *pszFileName, char const 
 	if ( !pszFileName || !pszShortName )
 		return;
 
-	char szMapInfo[_MAX_PATH];
+	char szMapInfo[MAX_PATH];
 
 	// if it's a directory, there's no optional info
 	if ( bIsFolder )

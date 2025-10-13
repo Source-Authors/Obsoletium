@@ -266,7 +266,7 @@ public:
 		va_list argptr;
 		char szText[4096];
 
-		va_start ( argptr, pFormat );
+		va_start ( argptr, pFormat ); //-V2019 //-V2018
 		V_vsprintf_safe( szText, pFormat, argptr );
 		va_end ( argptr );
 

@@ -15,7 +15,7 @@ namespace se::dedicated {
  */
 abstract_class ISystem {
  public:
-  virtual ~ISystem() {}
+  virtual ~ISystem() = default;
 
   /**
    * @brief Load modules for group.

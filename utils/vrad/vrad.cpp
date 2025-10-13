@@ -21,6 +21,8 @@
 #include "byteswap.h"
 #include "bspflags.h"
 
+#include "scoped_app_locale.h"
+
 #include "winlite.h"
 
 #define ALLOWDEBUGOPTIONS (0 || _DEBUG)
@@ -81,8 +83,8 @@ char		global_lights[MAX_PATH] = "";
 char		designer_lights[MAX_PATH] = "";
 char		level_lights[MAX_PATH] = "";
 
-char		vismatfile[_MAX_PATH] = "";
-char		incrementfile[_MAX_PATH] = "";
+char		vismatfile[MAX_PATH] = "";
+char		incrementfile[MAX_PATH] = "";
 
 IIncremental *g_pIncremental = 0;
 std::atomic_bool	g_bInterrupt = false;	// Used with background lighting in WC. Tells VRAD
@@ -90,6 +92,7 @@ std::atomic_bool	g_bInterrupt = false;	// Used with background lighting in WC. T
 float g_SunAngularExtent=0.0;
 
 float g_flSkySampleScale = 1.0;
+float g_flStaticPropSampleScale = 4.0f;
 
 bool g_bLargeDispSampleRadius = false;
 
@@ -104,7 +107,9 @@ qboolean	do_extra = true;
 bool		debug_extra = false;
 qboolean	do_fast = false;
 qboolean	do_centersamples = false;
-int			extrapasses = 4;
+// dimhotepus: Original VRAD has 4 supersampling passes count.
+// Increased to 6 to make lightmaps less sharp in some areas.
+int			extrapasses = 6;
 float		smoothing_threshold = 0.7071067; // cos(45.0*(M_PI/180)) 
 // Cosine of smoothing angle(in radians)
 float		coring = 1.0;	// Light threshold to force to blackness(minimizes lightmaps)
@@ -117,11 +122,15 @@ unsigned	num_degenerate_faces;
 qboolean	g_bLowPriority = false;
 qboolean	g_bLogHashData = false;
 bool		g_bNoDetailLighting = false;
+// dimhotepus: Original VRAD has 30 non-point sun light samples count which is not enough for large surfaces.
+int			g_sunSamplesAreaLight = 1024;
 double		g_flStartTime;
 bool		g_bStaticPropLighting = false;
 bool        g_bStaticPropPolys = false;
 bool        g_bTextureShadows = false;
 bool        g_bDisablePropSelfShadowing = false;
+// dimhotepus: Use CS:GO mode by default instead of SteamPipe one. 
+IndirectPropLightingMode g_nIndirectPropLightingMode = IndirectPropLightingMode::CsGo;
 
 
 CUtlVector<byte> g_FacesVisibleToLights;
@@ -276,7 +285,7 @@ void ReadLightFile (char *filename)
 				{
 					if ( strcmp( texlights[j].filename, filename ) == 0 )
 					{
-						Warning( "\aDuplication of '%s' in file '%s'!\n",
+						Warning( "Duplication of '%s' in file '%s'!\n",
 							 texlights[j].name, texlights[j].filename );
 					}
 					else if ( texlights[j].value != value )
@@ -1854,21 +1863,22 @@ void BuildFacesVisibleToLights( bool bAllVisible )
 	aggregate.SetSize( (dvis->numclusters/8) + 1 );
 	memset( aggregate.Base(), 0, aggregate.Count() );
 
-	int nDWords = aggregate.Count() / 4;
-	int nBytes = aggregate.Count() - nDWords*4;
+	intp nDWords = aggregate.Count() / sizeof(uintp);
+	intp nBytes = aggregate.Count() - nDWords*sizeof(uintp);
 
 	for( directlight_t *dl = activelights; dl != NULL; dl = dl->next )
 	{
 		byte *pIn  = dl->pvs;
 		byte *pOut = aggregate.Base();
-		for( int iDWord=0; iDWord < nDWords; iDWord++ )
+		for( intp iDWord=0; iDWord < nDWords; iDWord++ )
 		{
-			*((unsigned long*)pOut) |= *((unsigned long*)pIn);
-			pIn  += 4;
-			pOut += 4;
+			// dimhotepus: Use uintp instead of unsigned long to scale on x86-64.
+			*((uintp*)pOut) |= *((uintp*)pIn);
+			pIn  += sizeof(uintp);
+			pOut += sizeof(uintp);
 		}
 
-		for( int iByte=0; iByte < nBytes; iByte++ )
+		for( intp iByte=0; iByte < nBytes; iByte++ )
 		{
 			*pOut |= *pIn;
 			++pOut;
@@ -2022,11 +2032,13 @@ bool RadWorld_Go()
 	}
 
 	// build initial facelights
+#ifdef MPI
 	if (g_bUseMPI) 
 	{
 		RunMPIBuildFacelights();
 	}
 	else 
+#endif
 	{
 		RunThreadsOnIndividual (numfaces, true, BuildFacelights);
 	}
@@ -2080,13 +2092,19 @@ bool RadWorld_Go()
 		StaticDispMgr()->InsertPatchSampleDataIntoHashTable();
 		StaticDispMgr()->EndTimer();
 
+#ifdef MPI
 		// blend bounced light into direct light and save
 		VMPI_SetCurrentStage( "FinalLightFace" );
 		if ( !g_bUseMPI || g_bMPIMaster )
+#endif
+		{
 			RunThreadsOnIndividual (numfaces, true, FinalLightFace);
-		
+		}
+
 		// Distribute the lighting data to workers.
+#ifdef MPI
 		VMPI_DistributeLightData();
+#endif
 			
 		Msg("FinalLightFace Done\n"); fflush(stdout);
 	}
@@ -2144,7 +2162,9 @@ void VRAD_LoadBSP( char const *pFilename )
 	// so we prepend qdir here.
 	V_strcpy_safe( source, ExpandPath( source ) );
 
+#ifdef MPI
 	if ( !g_bUseMPI )
+#endif
 	{
 		// Setup the logfile.
 		char logFile[MAX_FILEPATH];
@@ -2182,10 +2202,13 @@ void VRAD_LoadBSP( char const *pFilename )
 	Q_DefaultExtension(source, ".bsp");
 
 	Msg( "Loading %s.\n", source );
+#ifdef MPI
 	VMPI_SetCurrentStage( "LoadBSPFile" );
+#endif
 	LoadBSPFile (source);
 
 	// Add this bsp to our search path so embedded resources can be found
+#ifdef MPI
 	if ( g_bUseMPI && g_bMPIMaster )
 	{
 		// MPI Master, MPI workers don't need to do anything
@@ -2193,6 +2216,7 @@ void VRAD_LoadBSP( char const *pFilename )
 		g_pOriginalPassThruFileSystem->AddSearchPath(source, "MOD", PATH_ADD_TO_HEAD);
 	}
 	else if ( !g_bUseMPI )
+#endif
 	{
 		// Non-MPI
 		g_pFullFileSystem->AddSearchPath(source, "GAME", PATH_ADD_TO_HEAD);
@@ -2324,7 +2348,9 @@ void VRAD_Finish()
 	}
 
 	Msg( "Writing %s\n", source );
+#ifdef MPI
 	VMPI_SetCurrentStage( "WriteBSPFile" );
+#endif
 	WriteBSPFile(source);
 
 	if ( g_bDumpPatches )
@@ -2340,6 +2366,8 @@ void VRAD_Finish()
 
 	CloseDispLuxels();
 
+	// dimhotepus: Shutdown static displacements manage, too.
+	StaticDispMgr()->Shutdown();
 	StaticPropMgr()->Shutdown();
 
 	double end = Plat_FloatTime();
@@ -2398,12 +2426,36 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			Msg( "--no-self-shadow-props: true\n");
 			g_bDisablePropSelfShadowing = true;
 		}
+		// dimhotepus: Allow to specify indirect static props lighting mode.
+		else if ( !Q_stricmp( argv[i], "-StaticPropIndirectMode" ) )
+		{
+			if ( ++i < argc )
+			{
+				int lightingMode = atoi( argv[i] );
+				if ( lightingMode < to_underlying(IndirectPropLightingMode::LowestValue) ||
+					 lightingMode > to_underlying(IndirectPropLightingMode::MaxValue) )
+				{
+					Error( "Expected a value in range [%d...%d] after '-StaticPropIndirectMode', got %d.\n",
+						to_underlying(IndirectPropLightingMode::LowestValue),
+						to_underlying(IndirectPropLightingMode::MaxValue),
+						lightingMode );
+					return -1;
+				}
+				g_nIndirectPropLightingMode = static_cast<IndirectPropLightingMode>( lightingMode );
+				Msg( "--static-props-indirect-mode: %d\n", lightingMode );
+			}
+			else
+			{
+				Error( "Expected a value after '-StaticPropIndirectMode'.\n" );
+				return -1;
+			}
+		}
 		else if ( !Q_stricmp( argv[i], "-textureshadows" ) )
 		{
 			Msg( "--texture-shadows: true\n");
 			g_bTextureShadows = true;
 		}
-		else if ( !strcmp(argv[i], "-dump") )
+		else if ( !strcmp( argv[i], "-dump" ) )
 		{
 			Msg( "--dump-patches: true\n");
 			g_bDumpPatches = true;
@@ -2438,7 +2490,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			Msg( "--dump-prop-maps: true\n");
 			g_bDumpPropLightmaps = true;
 		}
-		else if (!Q_stricmp(argv[i],"-bounce"))
+		else if (!Q_stricmp(argv[i], "-bounce"))
 		{
 			if ( ++i < argc )
 			{
@@ -2522,7 +2574,8 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 		else if (!Q_stricmp(argv[i],"-final"))
 		{
 			Msg( "--final: true\n" );
-			g_flSkySampleScale = 16.0;
+			g_flSkySampleScale = 16.0f;
+			g_flStaticPropSampleScale = 16.0f;
 		}
 		else if (!Q_stricmp(argv[i],"-extrasky"))
 		{
@@ -2535,6 +2588,38 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			else
 			{
 				Error("Expected a scale factor after '-extrasky'.\n" );
+				return -1;
+			}
+		}
+		else if ( !Q_stricmp( argv[i], "-StaticPropSampleScale" ) )
+		{
+			if ( ++i < argc && *argv[i] )
+			{
+				g_flStaticPropSampleScale = strtof( argv[i], nullptr );
+				Msg( "--static-prop-sample-scale: %f\n", g_flStaticPropSampleScale );
+			}
+			else
+			{
+				Error( "Expected a float scale factor after '-StaticPropSampleScale'.\n" );
+				return -1;
+			}
+		}
+		else if (!Q_stricmp(argv[i], "-extrapasses"))
+		{
+			if (++i < argc)
+			{
+				int extrapassesParam = atoi(argv[i]);
+				if (extrapassesParam < 0)
+				{
+					Error("Expected non-negative supersampling passes count value after '-extrapasses'\n");
+					return 1;
+				}
+				extrapasses = extrapassesParam;
+				Msg( "--extra-supersampling-passes: %d\n", extrapasses );
+			}
+			else
+			{
+				Error("Expected a supersampling passes count value after '-extrapasses'\n");
 				return -1;
 			}
 		}
@@ -2611,6 +2696,26 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			else
 			{
 				Error("Expected an angular extent value (0..180) after '-softsun'.\n" );
+				return -1;
+			}
+		}
+		// dimhotepus: Allow to configure non-point sun light samples count.
+		else if (!Q_stricmp(argv[i], "-sunSamplesAreaLight"))
+		{
+			if (++i < argc)
+			{
+				int sunSamplesAreaLight = atoi(argv[i]);
+				if (sunSamplesAreaLight < 0)
+				{
+					Error("Expected non-negative samples count value after '-sunSamplesAreaLight'\n");
+					return -1;
+				}
+				g_sunSamplesAreaLight = sunSamplesAreaLight;
+				Msg("--sun-samples-area-light: %d\n", g_sunSamplesAreaLight);
+			}
+			else
+			{
+				Error("Expected a samples count value after '-sunSamplesAreaLight'\n");
 				return -1;
 			}
 		}
@@ -2808,6 +2913,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			}
 		}
 #endif
+#ifdef MPI
 		// NOTE: the -mpi checks must come last here because they allow the previous argument 
 		// to be -mpi as well. If it game before something else like -game, then if the previous
 		// argument was -mpi and the current argument was something valid like -game, it would skip it.
@@ -2822,6 +2928,7 @@ static int ParseCommandLine( int argc, char **argv, bool *onlydetail )
 			if ( i == argc - 1 && V_stricmp( argv[i], "-mpi_ListParams" ) != 0 )
 				break;
 		}
+#endif
 		else if ( mapArg == -1 )
 		{
 			mapArg = i;
@@ -2857,67 +2964,75 @@ void PrintUsage( int argc, char **argv )
 		"\n"
 		"Common options:\n"
 		"\n"
-		"  -v (or -verbose): Turn on verbose output (also shows more command\n"
-		"  -bounce #       : Set max number of bounces (default: 100).\n"
-		"  -fast           : Quick and dirty lighting.\n"
-		"  -fastambient    : Per-leaf ambient sampling is lower quality to save compute time.\n"
-		"  -final          : High quality processing. equivalent to -extrasky 16.\n"
-		"  -extrasky n     : trace N times as many rays for indirect light and sky ambient.\n"
-		"  -low            : Run as an idle-priority process.\n"
-		"  -mpi            : Use VMPI to distribute computations.\n"
-		"  -rederror       : Show errors in red.\n"
+		"  -v (or -verbose)        : Turn on verbose output (also shows more command).\n"
+		"  -bounce #               : Set max number of bounces (default: 100).\n"
+		"  -fast                   : Quick and dirty lighting.\n"
+		"  -fastambient            : Per-leaf ambient sampling is lower quality to save compute time.\n"
+		"  -final                  : High quality processing. equivalent to -extrasky 16.\n"
+		"  -extrasky n             : Trace N times as many rays for indirect light and sky ambient.\n"
+		"  -low                    : Run as an idle-priority process.\n"
+#ifdef MPI
+		"  -mpi                    : Use VMPI to distribute computations.\n"
+#endif
+		"  -rederror               : Show errors in red.\n"
 		"\n"
-		"  -vproject <directory> : Override the VPROJECT environment variable.\n"
-		"  -game <directory>     : Same as -vproject.\n"
+		"  -vproject <directory>   : Override the VPROJECT environment variable.\n"
+		"  -game <directory>       : Same as -vproject.\n"
 		"\n"
 		"Other options:\n"
-		"  -novconfig      : Don't bring up graphical UI on vproject errors.\n"
-		"  -dump           : Write debugging .txt files.\n"
-		"  -dumpnormals    : Write normals to debug files.\n"
-		"  -dumptrace      : Write ray-tracing environment to debug files.\n"
-		"  -threads        : Control the number of threads vbsp uses (defaults to the #\n"
-		"                    or processors on your machine).\n"
-		"  -lights <file>  : Load a lights file in addition to lights.rad and the\n"
-		"                    level lights file.\n"
-		"  -noextra        : Disable supersampling.\n"
-		"  -debugextra     : Places debugging data in lightmaps to visualize\n"
-		"                    supersampling.\n"
-		"  -smooth #       : Set the threshold for smoothing groups, in degrees\n"
-		"                    (default 45).\n"
-		"  -dlightmap      : Force direct lighting into different lightmap than\n"
-		"                    radiosity.\n"
-		"  -stoponexit	   : Wait for a keypress on exit.\n"
-		"  -mpi_pw <pw>    : Use a password to choose a specific set of VMPI workers.\n"
-		"  -nodetaillight  : Don't light detail props.\n"
-		"  -centersamples  : Move sample centers.\n"
-		"  -luxeldensity # : Rescale all luxels by the specified amount (default: 1.0).\n"
-		"                    The number specified must be less than 1.0 or it will be\n"
-		"                    ignored.\n"
-		"  -loghash        : Log the sample hash table to samplehash.txt.\n"
-		"  -onlydetail     : Only light detail props and per-leaf lighting.\n"
-		"  -maxdispsamplesize #: Set max displacement sample size (default: 512).\n"
-		"  -softsun <n>    : Treat the sun as an area light source of size <n> degrees."
-		"                    Produces soft shadows.\n"
-		"                    Recommended values are between 0 and 5. Default is 0.\n"
-		"  -FullMinidumps  : Write large minidumps on crash.\n"
-		"  -chop           : Smallest number of luxel widths for a bounce patch, used on edges\n"
-		"  -maxchop		   : Coarsest allowed number of luxel widths for a patch, used in face interiors\n"
+		"  -novconfig              : Don't bring up graphical UI on vproject errors.\n"
+		"  -dump                   : Write debugging .txt files.\n"
+		"  -dumpnormals            : Write normals to debug files.\n"
+		"  -dumptrace              : Write ray-tracing environment to debug files.\n"
+		"  -threads                : Control the number of threads vbsp uses (defaults to the #\n"
+		"                            or processors on your machine).\n"
+		"  -lights <file>          : Load a lights file in addition to lights.rad and the\n"
+		"                            level lights file.\n"
+		"  -noextra                : Disable supersampling.\n"
+		"  -debugextra             : Places debugging data in lightmaps to visualize\n"
+		"                            supersampling.\n"
+		"  -extrapasses #          : How many extra passes supersampling passes to do (default 6), differences above this value are minimal.\n"
+		"  -smooth #               : Set the threshold for smoothing groups, in degrees\n"
+		"                            (default 45).\n"
+		"  -dlightmap              : Force direct lighting into different lightmap than\n"
+		"                            radiosity.\n"
+		"  -stoponexit	           : Wait for a keypress on exit.\n"
+#ifdef MPI
+		"  -mpi_pw <pw>            : Use a password to choose a specific set of VMPI workers.\n"
+#endif
+		"  -nodetaillight          : Don't light detail props.\n"
+		"  -centersamples          : Move sample centers.\n"
+		"  -luxeldensity #         : Rescale all luxels by the specified amount (default: 1.0).\n"
+		"                            The number specified must be less than 1.0 or it will be\n"
+		"                            ignored.\n"
+		"  -loghash                : Log the sample hash table to samplehash.txt.\n"
+		"  -onlydetail             : Only light detail props and per-leaf lighting.\n"
+		"  -maxdispsamplesize #    : Set max displacement sample size (default: 512).\n"
+		"  -softsun <n>            : Treat the sun as an area light source of size <n> degrees."
+		"                            Produces soft shadows.\n"
+		"                            Recommended values are between 0 and 5 (default: 0).\n"
+		"  -sunSamplesAreaLight #  : Set max number of samples from the light_enviroment (default: 1024).\n"
+		"  -FullMinidumps          : Write large minidumps on crash.\n"
+		"  -chop                   : Smallest number of luxel widths for a bounce patch, used on edges.\n"
+		"  -maxchop                : Coarsest allowed number of luxel widths for a patch, used in face interiors.\n"
 		"\n"
-		"  -LargeDispSampleRadius: This can be used if there are splotches of bounced light\n"
-		"                          on terrain. The compile will take longer, but it will gather\n"
-		"                          light across a wider area.\n"
-        "  -StaticPropLighting   : generate backed static prop vertex lighting\n"
-        "  -StaticPropPolys   : Perform shadow tests of static props at polygon precision\n"
-        "  -OnlyStaticProps   : Only perform direct static prop lighting (vrad debug option)\n"
-		"  -StaticPropNormals : when lighting static props, just show their normal vector\n"
-		"  -textureshadows : Allows texture alpha channels to block light - rays intersecting alpha surfaces will sample the texture\n"
-		"  -noskyboxrecurse : Turn off recursion into 3d skybox (skybox shadows on world)\n"
-		"  -nossprops      : Globally disable self-shadowing on static props\n"
+		"  -LargeDispSampleRadius  : This can be used if there are splotches of bounced light\n"
+		"                            on terrain. The compile will take longer, but it will gather\n"
+		"                            light across a wider area.\n"
+        "  -StaticPropLighting     : Generate baked static prop vertex lighting.\n"
+        "  -StaticPropPolys        : Perform shadow tests of static props at polygon precision.\n"
+        "  -StaticPropIndirectMode : Override prop indirect lighting algorithm (0 - Balanced [CS:GO], 1 - Dark [SteamPipe], 2 - Bright [Orangebox]).\n"
+        "  -StaticPropSampleScale  : Override prop indirect lighting sample scale factor (default 4).\n"
+		"  -OnlyStaticProps        : Only perform direct static prop lighting (vrad debug option).\n"
+		"  -StaticPropNormals      : When lighting static props, just show their normal vector.\n"
+		"  -textureshadows         : Allows texture alpha channels to block light - rays intersecting alpha surfaces will sample the texture.\n"
+		"  -noskyboxrecurse        : Turn off recursion into 3d skybox (skybox shadows on world).\n"
+		"  -nossprops              : Globally disable self-shadowing on static props.\n"
 		"\n"
 #if 1 // Disabled for the initial SDK release with VMPI so we can get feedback from selected users.
 		);
 #else
-		"  -mpi_ListParams : Show a list of VMPI parameters.\n"
+		"  -mpi_ListParams        : Show a list of VMPI parameters.\n"
 		"\n"
 		);
 
@@ -2982,7 +3097,9 @@ int RunVRAD( int argc, char **argv )
 
 	VRAD_Finish();
 
+#ifdef MPI
 	VMPI_SetCurrentStage( "master done" );
+#endif
 
 	CmdLib_Cleanup();
 	SpewDeactivate();
@@ -2996,15 +3113,33 @@ int VRAD_Main(int argc, char **argv)
 
 	VRAD_Init();
 
-	// This must come first.
-	VRAD_SetupMPI( argc, argv );
+	// dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+	// 
+	// Printf/sscanf functions expect en_US UTF8 localization.
+	//
+	// Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+	// supports using a UTF-8 code page.
+	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
 
+	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+		Warning("setlocale('%s') failed, current locale is '%s'.\n",
+			kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+	}
+
+	// This must come first.
+#ifdef MPI
+	VRAD_SetupMPI( argc, argv );
+#endif
+
+#ifdef MPI
 	if ( g_bUseMPI && !g_bMPIMaster )
 	{
 		const se::utils::common::ScopedMinidumpHandler minidump{VMPI_ExceptionFilter};
 		return RunVRAD( argc, argv );
 	}
-	
+#endif
+
 	const se::utils::common::ScopedDefaultMinidumpHandler minidump;
 	return RunVRAD( argc, argv );
 }

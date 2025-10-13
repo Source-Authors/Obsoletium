@@ -12,9 +12,12 @@
 #include "ivp_compact_ledge.hxx"
 #include "ivp_compact_ledge_solver.hxx"
 #include "ivp_compact_surface.hxx"
-#include "tier0/vprof.h"
+
 #include "mathlib/ssemath.h"
+
+#include "tier0/vprof.h"
 #include "tier0/tslist.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -129,7 +132,8 @@ static unsigned short GetPackedIndex( const IVP_Compact_Ledge *pLedge, const IVP
 	const IVP_Compact_Poly_Point *RESTRICT pPoints = pLedge->get_point_array();
 	const IVP_Compact_Triangle *RESTRICT pTri = pLedge->get_first_triangle();
 	const IVP_Compact_Edge *RESTRICT pEdge = pTri->get_edge( 0 );
-	int best = pEdge->get_start_point_index();
+	// dimhotepus: int -> unsigned short.
+	unsigned short best{pEdge->get_start_point_index()};
 	IVP_DOUBLE bestDot = pPoints[best].dot_product( &dir );
 	int triCount = pLedge->get_n_triangles();
 	const IVP_Compact_Triangle *RESTRICT pBestTri = pTri;
@@ -140,11 +144,13 @@ static unsigned short GetPackedIndex( const IVP_Compact_Ledge *pLedge, const IVP
 	{
 		// get the index to the end vert of this edge (start vert on next edge)
 		pEdge = pEdge->get_prev();
-		int stopVert = pEdge->get_start_point_index();
+		// dimhotepus: int -> unsigned short.
+		const unsigned short stopVert{pEdge->get_start_point_index()};
 
 		// loop through the verts that can be reached along edges from this vert
 		// stop if you get back to the one you're starting on.
-		int vert = stopVert;
+		// dimhotepus: int -> unsigned short.
+		unsigned short vert{stopVert};
 		do
 		{
 			IVP_DOUBLE dot = pPoints[vert].dot_product( &dir );
@@ -192,7 +198,8 @@ void InitLeafmap( IVP_Compact_Ledge *pLedge, leafmap_t *pLeafmapOut )
 		// for small numbers of verts it's much faster to simply do dot products with all verts
 		// since the best case for hillclimbing is to touch the start vert plus all neighbors (avg_valence+1 dots)
 		// in t
-		int triCount = pLedge->get_n_triangles();
+		// dimhotepus: int -> unsigned short.
+		const short triCount = pLedge->get_n_triangles();
 		// this is a guess that anything with more than brute_force * 4 tris will have at least brute_force verts
 		if ( triCount <= BRUTE_FORCE_VERT_COUNT*4 )
 		{
@@ -224,8 +231,9 @@ void InitLeafmap( IVP_Compact_Ledge *pLedge, leafmap_t *pLeafmapOut )
 			// because the vert range is polluted
 			if ( vertCount < BRUTE_FORCE_VERT_COUNT )
 			{
-				char hasVert[BRUTE_FORCE_VERT_COUNT];
-				memset(hasVert, 0, sizeof(hasVert[0])*vertCount);
+				// dimhotepus: cahr -> bool.
+				bool hasVert[BRUTE_FORCE_VERT_COUNT];
+				BitwiseClear(hasVert);
 				for ( int i = 0; i < triCount; i++ )
 				{
 					const IVP_Compact_Triangle *pTri = pLedge->get_first_triangle() + i;
@@ -240,7 +248,7 @@ void InitLeafmap( IVP_Compact_Ledge *pLedge, leafmap_t *pLeafmapOut )
 				// now find the vertex spans and encode them
 				byte spans[BRUTE_FORCE_VERT_COUNT];
 				byte spanIndex = 0;
-				char has = hasVert[0];
+				bool has = hasVert[0];
 				Assert(has);
 				byte count = 1;
 				for ( int i = 1; i < vertCount && spanIndex < BRUTE_FORCE_VERT_COUNT; i++ )
@@ -730,7 +738,8 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 		unsigned short startPoint = m_pLeafmap->startVert[0];
 		unsigned short pointCount = m_pLeafmap->vertCount;
 		IVP_DOUBLE bestDot = pPoints[startPoint].dot_product(&mapdir);
-		int best = startPoint;
+		// dimhotepus: int -> unsigned short.
+		unsigned short best{startPoint};
 		for ( unsigned short i = 1; i < pointCount; i++ )
 		{
 			IVP_DOUBLE dot = pPoints[startPoint+i].dot_product(&mapdir);
@@ -758,7 +767,8 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 		GetStartVert( m_pLeafmap, mapdir, triIndex, edgeIndex );
 		const IVP_Compact_Triangle *RESTRICT pTri = m_pLedge->get_first_triangle() + triIndex;
 		const IVP_Compact_Edge *RESTRICT pEdge = pTri->get_edge( edgeIndex );
-		int best = pEdge->get_start_point_index();
+		// dimhotepus: int -> unsigned short.
+		unsigned short best{pEdge->get_start_point_index()};
 		IVP_DOUBLE bestDot = pPoints[best].dot_product( &mapdir );
 		m_pVisitHash->VisitVert(best);
 
@@ -770,11 +780,13 @@ unsigned short CTraceIVP::SupportMap( const Vector &dir, Vector *pOut ) const
 		{
 			// get the index to the end vert of this edge (start vert on next edge)
 			pEdge = pEdge->get_prev();
-			int stopVert = pEdge->get_start_point_index();
+			// dimhotepus: int -> unsigned short.
+			const unsigned short stopVert{pEdge->get_start_point_index()};
 
 			// loop through the verts that can be reached along edges from this vert
 			// stop if you get back to the one you're starting on.
-			int vert = stopVert;
+			// dimhotepus: int -> unsigned short.
+			unsigned short vert{stopVert};
 			do
 			{
 				if ( !m_pVisitHash->WasVisited(vert) )

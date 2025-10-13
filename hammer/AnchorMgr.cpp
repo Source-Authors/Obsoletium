@@ -92,55 +92,51 @@ void CAnchorMgr::Init( HWND hParentWnd, CAnchorDef *pAnchors, int nAnchors )
 	m_OriginalParentSize[1] = rcParent.bottom - rcParent.top;
 
 	// Get all the subitem positions.	
-	for ( int i=0; i < m_Anchors.Count(); i++ )
+	for ( auto &anchor : m_Anchors )
 	{
-		CAnchorDef *pAnchor = &m_Anchors[i];
-
-		if ( pAnchor->m_hInputWnd )
-			pAnchor->m_hWnd = pAnchor->m_hInputWnd;
+		if ( anchor.m_hInputWnd )
+			anchor.m_hWnd = anchor.m_hInputWnd;
 		else	
-			pAnchor->m_hWnd = GetDlgItem( m_hParentWnd, pAnchor->m_DlgItemID );
+			anchor.m_hWnd = GetDlgItem( m_hParentWnd, anchor.m_DlgItemID );
 			
-		if ( !pAnchor->m_hWnd )
+		if ( !anchor.m_hWnd )
 			continue;
 
-		GetWindowRect( pAnchor->m_hWnd, &rcItem );
+		GetWindowRect( anchor.m_hWnd, &rcItem );
 		POINT ptTopLeft;
 		ptTopLeft.x = rcItem.left;
 		ptTopLeft.y = rcItem.top;
 		ScreenToClient( m_hParentWnd, &ptTopLeft );
 		
-		pAnchor->m_OriginalPos[0] = ptTopLeft.x;
-		pAnchor->m_OriginalPos[1] = ptTopLeft.y;
-		pAnchor->m_OriginalPos[2] = ptTopLeft.x + (rcItem.right - rcItem.left);
-		pAnchor->m_OriginalPos[3] = ptTopLeft.y + (rcItem.bottom - rcItem.top);
+		anchor.m_OriginalPos[0] = ptTopLeft.x;
+		anchor.m_OriginalPos[1] = ptTopLeft.y;
+		anchor.m_OriginalPos[2] = ptTopLeft.x + (rcItem.right - rcItem.left);
+		anchor.m_OriginalPos[3] = ptTopLeft.y + (rcItem.bottom - rcItem.top);
 	}
 }
 
 void CAnchorMgr::OnSize()
 {
 	// Get the new size.
-	int width, height;
 	RECT rcParent;
 	GetWindowRect( m_hParentWnd, &rcParent );
-	width = rcParent.right - rcParent.left;
-	height = rcParent.bottom - rcParent.top;
+	int width = rcParent.right - rcParent.left;
+	int height = rcParent.bottom - rcParent.top;
 	
 	// Move each item.
-	for ( int i=0; i < m_Anchors.Count(); i++ )
+	for ( auto &anchor : m_Anchors )
 	{
-		CAnchorDef *pAnchor = &m_Anchors[i];
-		if ( !pAnchor->m_hWnd )
+		if ( !anchor.m_hWnd )
 			continue;
 	
 		RECT rcNew;
-		rcNew.left   = ProcessAnchorHorz( pAnchor->m_OriginalPos[0], m_OriginalParentSize, pAnchor->m_AnchorLeft, width, height );
-		rcNew.right  = ProcessAnchorHorz( pAnchor->m_OriginalPos[2], m_OriginalParentSize, pAnchor->m_AnchorRight, width, height );
-		rcNew.top    = ProcessAnchorVert( pAnchor->m_OriginalPos[1], m_OriginalParentSize, pAnchor->m_AnchorTop, width, height );
-		rcNew.bottom = ProcessAnchorVert( pAnchor->m_OriginalPos[3], m_OriginalParentSize, pAnchor->m_AnchorBottom, width, height );
+		rcNew.left   = ProcessAnchorHorz( anchor.m_OriginalPos[0], m_OriginalParentSize, anchor.m_AnchorLeft, width, height );
+		rcNew.right  = ProcessAnchorHorz( anchor.m_OriginalPos[2], m_OriginalParentSize, anchor.m_AnchorRight, width, height );
+		rcNew.top    = ProcessAnchorVert( anchor.m_OriginalPos[1], m_OriginalParentSize, anchor.m_AnchorTop, width, height );
+		rcNew.bottom = ProcessAnchorVert( anchor.m_OriginalPos[3], m_OriginalParentSize, anchor.m_AnchorBottom, width, height );
 	
-		SetWindowPos( pAnchor->m_hWnd, NULL, rcNew.left, rcNew.top, rcNew.right-rcNew.left, rcNew.bottom-rcNew.top, SWP_NOZORDER );
-		InvalidateRect( pAnchor->m_hWnd, NULL, false );
+		SetWindowPos( anchor.m_hWnd, NULL, rcNew.left, rcNew.top, rcNew.right-rcNew.left, rcNew.bottom-rcNew.top, SWP_NOZORDER );
+		InvalidateRect( anchor.m_hWnd, NULL, false );
 	}
 }
 

@@ -130,7 +130,8 @@ END_RECV_TABLE()
 // Constructor 
 //-----------------------------------------------------------------------------
 C_LightGlow::C_LightGlow() :
-m_nHorizontalSize( 0 ), m_nVerticalSize( 0 ), m_nMinDist( 0 ), m_nMaxDist( 0 )
+	m_nHorizontalSize( 0 ), m_nVerticalSize( 0 ), m_nMinDist( 0 ), m_nMaxDist( 0 ), m_nOuterMaxDist( 0 ),
+	m_spawnflags( 0 ), m_flGlowProxySize( 0 )
 {
 	m_Glow.m_bDirectional = false;
 	m_Glow.m_bInSky = false;

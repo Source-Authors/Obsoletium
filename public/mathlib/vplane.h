@@ -10,11 +10,7 @@
 #ifndef VPLANE_H
 #define VPLANE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "mathlib/vector.h"
+#include "vector.h"
 
 // Used to represent sides of things like planes.
 enum SideType : int
@@ -96,12 +92,7 @@ inline vec_t VPlane::DistTo(const Vector &vVec) const
 	return vVec.Dot(m_Normal) - m_Dist;
 }
 
-inline VPlane& VPlane::operator=(const VPlane &thePlane)
-{
-	m_Normal = thePlane.m_Normal;
-	m_Dist = thePlane.m_Dist;
-	return *this;
-}
+inline VPlane& VPlane::operator=(const VPlane &thePlane) = default;
 
 inline VPlane::VPlane(const VPlane &thePlane)
 	: m_Normal{thePlane.m_Normal}, m_Dist{thePlane.m_Dist}
@@ -112,7 +103,7 @@ inline VPlane::VPlane(const VPlane &thePlane)
 
 inline VPlane VPlane::Flip()
 {
-	return VPlane(-m_Normal, -m_Dist);
+	return VPlane{-m_Normal, -m_Dist};
 }
 
 inline Vector VPlane::GetPointOnPlane() const

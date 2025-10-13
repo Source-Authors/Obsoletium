@@ -23,7 +23,7 @@ class INetChannel;
 class INetworkMessageFactory;
 class bf_read;
 class bf_write;
-typedef struct netadr_s netadr_t;
+using netadr_t = struct netadr_s;
 class CNetPacket;
 
 
@@ -40,7 +40,7 @@ enum
 //-----------------------------------------------------------------------------
 // This interface encompasses a one-way communication path between two
 //-----------------------------------------------------------------------------
-typedef int ConnectionHandle_t;
+using ConnectionHandle_t = int;
 
 enum ConnectionStatus_t
 {
@@ -57,8 +57,7 @@ enum ConnectionStatus_t
 abstract_class INetChannel
 {
 public:
-//	virtual INetworkMessageHandler *GetMsgHandler( void ) const = 0;
-	virtual const netadr_t	&GetRemoteAddress( void ) const = 0;
+	[[nodiscard]] virtual const netadr_t	&GetRemoteAddress() const = 0;
 
 	// send a net message
 	// NOTE: There are special connect/disconnect messages?
@@ -141,12 +140,12 @@ public:
 	virtual void DisconnectClientFromServer( INetChannel* pChan ) = 0;
 
 	// Event queue
-	virtual NetworkEvent_t *FirstNetworkEvent( ) = 0;
-	virtual NetworkEvent_t *NextNetworkEvent( ) = 0;
+	virtual NetworkEvent_t *FirstNetworkEvent() = 0;
+	virtual NetworkEvent_t *NextNetworkEvent() = 0;
 
 	// Returns the local host name
-	virtual const char* GetLocalHostName( void ) const = 0;
-	virtual const char* GetLocalAddress( void ) const = 0;
+	[[nodiscard]] virtual const char* GetLocalHostName() const = 0;
+	[[nodiscard]] virtual const char* GetLocalAddress() const = 0;
 
 	/*
 	// NOTE: Server methods

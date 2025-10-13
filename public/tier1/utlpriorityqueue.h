@@ -7,11 +7,8 @@
 
 #ifndef UTLPRIORITYQUEUE_H
 #define UTLPRIORITYQUEUE_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-#include "tier1/utlvector.h"
+#include "utlvector.h"
 
 // T is the type stored in the queue, it must include the priority
 // The head of the list contains the element with GREATEST priority
@@ -23,9 +20,9 @@ public:
 	// Less func typedef
 	// Returns true if the first parameter is "less priority" than the second
 	// Items that are "less priority" sort toward the tail of the queue
-	typedef bool (*LessFunc_t)( T const&, T const& );
+	using LessFunc_t = bool (*)(const T &, const T &);
 
-	typedef T ElemType_t;
+	using ElemType_t = T;
 
 	// constructor: lessfunc is required, but may be set after the constructor with
 	// SetLessFunc
@@ -47,7 +44,7 @@ public:
 	void		SetLessFunc( LessFunc_t func );
 
 	// Returns the count of elements in the queue
-	inline intp	Count() const { return m_heap.Count(); }
+	[[nodiscard]] inline intp	Count() const { return m_heap.Count(); }
 	
 	// doesn't deallocate memory
 	void		RemoveAll() { m_heap.RemoveAll(); }

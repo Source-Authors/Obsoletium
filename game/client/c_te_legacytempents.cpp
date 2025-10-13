@@ -1640,7 +1640,7 @@ void CTempEnts::Sprite_Smoke( C_LocalTempEntity *pTemp, float scale )
 //			angles - 
 //			type - 
 //-----------------------------------------------------------------------------
-void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAngle &gunAngles, int type )
+void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAngle &gunAngles, int type, int count )
 {
 	if ( cl_ejectbrass.GetBool() == false )
 		return;
@@ -1650,46 +1650,50 @@ void CTempEnts::EjectBrass( const Vector &pos1, const QAngle &angles, const QAng
 	if ( pModel == NULL )
 		return;
 
-	C_LocalTempEntity	*pTemp = TempEntAlloc( pos1, pModel );
-
-	if ( pTemp == NULL )
-		return;
-
-	//Keep track of shell type
-	if ( type == 2 )
+	for (int i = 0; i < count; ++i)
 	{
-		pTemp->hitSound = BOUNCE_SHOTSHELL;
+		C_LocalTempEntity	*pTemp = TempEntAlloc( pos1, pModel );
+
+		if ( pTemp == NULL )
+			return;
+
+		//Keep track of shell type
+		if ( type == 2 )
+		{
+			pTemp->hitSound = BOUNCE_SHOTSHELL;
+		}
+		else
+		{
+			pTemp->hitSound = BOUNCE_SHELL;
+		}
+
+		pTemp->m_nBody	= 0;
+
+		pTemp->flags |= ( FTENT_COLLIDEWORLD | FTENT_FADEOUT | FTENT_GRAVITY | FTENT_ROTATE );
+
+		pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat(-1024,1024);
+		pTemp->m_vecTempEntAngVelocity[1] = random->RandomFloat(-1024,1024);
+		pTemp->m_vecTempEntAngVelocity[2] = random->RandomFloat(-1024,1024);
+
+		//Face forward
+		pTemp->SetAbsAngles( gunAngles );
+
+		pTemp->SetRenderMode( kRenderNormal );
+		pTemp->tempent_renderamt = 255;		// Set this for fadeout
+
+		Vector	dir;
+
+		AngleVectors( angles, &dir );
+
+		dir *= random->RandomFloat( 150.0f, 200.0f );
+
+		pTemp->SetVelocity( Vector(dir[0] + random->RandomFloat(-64,64),
+							dir[1] + random->RandomFloat(-64,64),
+							dir[2] + random->RandomFloat(  0,64) ) );
+
+		// dimhotepus: Original brasses died too fast (0..1s). Extend to 10..15 seconds for realism.
+		pTemp->die = gpGlobals->curtime + 1.0f + random->RandomFloat( 10.0f, 15.0f );	// Add an extra 10-15 secs of life	
 	}
-	else
-	{
-		pTemp->hitSound = BOUNCE_SHELL;
-	}
-
-	pTemp->m_nBody	= 0;
-
-	pTemp->flags |= ( FTENT_COLLIDEWORLD | FTENT_FADEOUT | FTENT_GRAVITY | FTENT_ROTATE );
-
-	pTemp->m_vecTempEntAngVelocity[0] = random->RandomFloat(-1024,1024);
-	pTemp->m_vecTempEntAngVelocity[1] = random->RandomFloat(-1024,1024);
-	pTemp->m_vecTempEntAngVelocity[2] = random->RandomFloat(-1024,1024);
-
-	//Face forward
-	pTemp->SetAbsAngles( gunAngles );
-
-	pTemp->SetRenderMode( kRenderNormal );
-	pTemp->tempent_renderamt = 255;		// Set this for fadeout
-
-	Vector	dir;
-
-	AngleVectors( angles, &dir );
-
-	dir *= random->RandomFloat( 150.0f, 200.0f );
-
-	pTemp->SetVelocity( Vector(dir[0] + random->RandomFloat(-64,64),
-						dir[1] + random->RandomFloat(-64,64),
-						dir[2] + random->RandomFloat(  0,64) ) );
-
-	pTemp->die = gpGlobals->curtime + 1.0f + random->RandomFloat( 0.0f, 1.0f );	// Add an extra 0-1 secs of life	
 }
 
 //-----------------------------------------------------------------------------
@@ -1741,6 +1745,7 @@ void CTempEnts::MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachm
 		break;
 
 	case MUZZLEFLASH_SMG1:
+	case MUZZLEFLASH_SMG2:
 		if ( firstPerson )
 		{
 			MuzzleFlash_SMG1_Player( hEntity, attachmentIndex );
@@ -1780,7 +1785,8 @@ void CTempEnts::MuzzleFlash( int type, ClientEntityHandle_t hEntity, int attachm
 	case MUZZLEFLASH_RPG:
 		if ( firstPerson )
 		{
-			// MuzzleFlash_RPG_Player( hEntity, attachmentIndex );
+			// dimhotepus: Add muzzle flash for RPG. 
+			MuzzleFlash_RPG_Player( hEntity, attachmentIndex );
 		}
 		else
 		{
@@ -1854,6 +1860,8 @@ void CTempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int type,
 		}
 		break;
 
+	// dimhotepus: AR2 and combine are same weapon.
+    case MUZZLEFLASH_AR2:
 	case MUZZLEFLASH_COMBINE:
 		if ( firstPerson )
 		{
@@ -1864,6 +1872,18 @@ void CTempEnts::MuzzleFlash( const Vector& pos1, const QAngle& angles, int type,
 		{
 			//FIXME: These should go away
 			MuzzleFlash_Combine_NPC( hEntity, 1 );
+		}
+		break;
+	
+	// dimhotepus: Add muzzle flash support for RPG (Player and NPC).
+	case MUZZLEFLASH_RPG:
+		if ( firstPerson )
+		{
+			MuzzleFlash_RPG_Player( hEntity, 1 );
+		}
+		else
+		{
+			MuzzleFlash_RPG_NPC( hEntity, 1 );
 		}
 		break;
 	
@@ -2135,7 +2155,6 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 	const char	*soundname = NULL;
 	float fvol;
 	bool isshellcasing = false;
-	int zvel;
 
 	switch ( pTemp->hitSound )
 	{
@@ -2214,7 +2233,8 @@ void CTempEnts::PlaySound ( C_LocalTempEntity *pTemp, float damp )
 #endif
 	}
 
-	zvel = abs( pTemp->GetVelocity()[2] );
+	// dimhtepus: Make velocity float.
+	float zvel = abs( pTemp->GetVelocity()[2] );
 		
 	// only play one out of every n
 
@@ -3222,8 +3242,69 @@ void CTempEnts::MuzzleFlash_Pistol_NPC( ClientEntityHandle_t hEntity, int attach
 	FX_MuzzleEffectAttached( 0.5f, hEntity, attachmentIndex, NULL, true );
 }
 
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+// dimhotepus: Derived from MuzzleFlash_RPG_NPC.
+void CTempEnts::MuzzleFlash_RPG_Player( ClientEntityHandle_t hEntity, int attachmentIndex )
+{
+	VPROF_BUDGET( "MuzzleFlash_RPG_Player", VPROF_BUDGETGROUP_PARTICLE_RENDERING );
+	CSmartPtr<CLocalSpaceEmitter> pSimple = CLocalSpaceEmitter::Create( "MuzzleFlash_RPG_Player", hEntity, attachmentIndex, FLE_VIEWMODEL );
+	pSimple->SetDrawBeforeViewModel( true );
 
+	CacheMuzzleFlashes();
 
+	constexpr float scale = 1.5f;
+
+	// Lock our bounding box
+	pSimple->GetBinding().SetBBox( -( Vector( 16, 16, 16 ) * scale ), ( Vector( 16, 16, 16 ) * scale ) );
+	
+	SimpleParticle *pParticle;
+	Vector			forward(1,0,0), offset;
+
+	float flScale = random->RandomFloat( scale-0.25f, scale+0.25f );
+
+	if ( flScale < 0.5f )
+	{
+		flScale = 0.5f;
+	}
+	else if ( flScale > 8.0f )
+	{
+		flScale = 8.0f;
+	}
+
+	//
+	// Flash
+	//
+
+	int i;
+	for ( i = 1; i < 9; i++ )
+	{
+		offset = (forward * (i*2.0f*scale));
+
+		pParticle = (SimpleParticle *) pSimple->AddParticle( sizeof( SimpleParticle ), g_Mat_SMG_Muzzleflash[random->RandomInt(0,3)], offset );
+			
+		if ( pParticle == NULL )
+			return;
+
+		pParticle->m_flLifetime		= 0.0f;
+		pParticle->m_flDieTime		= 0.1f;
+
+		pParticle->m_vecVelocity.Init();
+
+		pParticle->m_uchColor[0]	= 255;
+		pParticle->m_uchColor[1]	= 255;
+		pParticle->m_uchColor[2]	= 255;
+
+		pParticle->m_uchStartAlpha	= 255;
+		pParticle->m_uchEndAlpha	= 128;
+
+		pParticle->m_uchStartSize	= (random->RandomFloat( 6.0f, 9.0f ) * (12-(i))/9) * flScale;
+		pParticle->m_uchEndSize		= pParticle->m_uchStartSize;
+		pParticle->m_flRoll			= random->RandomFloat( 0.0f, 360.0f );
+		pParticle->m_flRollDelta	= 0.0f;
+	}
+}
 
 //==================================================
 // Purpose: 
@@ -3241,19 +3322,15 @@ void CTempEnts::MuzzleFlash_RPG_NPC( ClientEntityHandle_t hEntity, int attachmen
 
 void CTempEnts::RocketFlare( const Vector& pos )
 {
-	C_LocalTempEntity	*pTemp;
-	const model_t		*model;
-	int					nframeCount;
-
-	model = (model_t *)engine->LoadModel( "sprites/animglow01.vmt" );
+	const model_t *model = engine->LoadModel( "sprites/animglow01.vmt" );
 	if ( !model )
 	{
 		return;
 	}
 
-	nframeCount = modelinfo->GetModelFrameCount( model );
+	int nframeCount = modelinfo->GetModelFrameCount( model );
 
-	pTemp = TempEntAlloc( pos, model );
+	C_LocalTempEntity *pTemp = TempEntAlloc(pos, model);
 	if ( !pTemp )
 		return;
 

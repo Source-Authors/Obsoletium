@@ -46,6 +46,8 @@
 
 extern float dispchop; // "-dispchop" tightest number of luxel widths for a patch, used on edges
 extern float g_MaxDispPatchRadius;
+// dimhotepus: Make non-point sun light samples count configurable.
+extern int g_sunSamplesAreaLight;
 
 //-----------------------------------------------------------------------------
 // forward declarations
@@ -276,12 +278,30 @@ extern IIncremental *g_pIncremental;	// null if not doing incremental lighting
 extern bool			g_bDumpPropLightmaps;
 
 extern float g_flSkySampleScale;								// extra sampling factor for indirect light
+extern float g_flStaticPropSampleScale;							// extra sampling factor for indirect light (for static props)
 
 extern bool g_bLargeDispSampleRadius;
 extern bool g_bStaticPropPolys;
 extern bool g_bTextureShadows;
 extern bool g_bShowStaticPropNormals;
 extern bool g_bDisablePropSelfShadowing;
+
+enum class IndirectPropLightingMode
+{
+	LowestValue = 0,
+
+	// Uses dot, best results.
+	CsGo = LowestValue,
+	// SteamPipe Half-Life 2 / Team Fortress 2 lighting.
+	// Uses inverse square law causing lights to be too dark.
+	SteamPipe = 1,
+	// Orange box. Just reflectivity, too bright.
+	OrangeBox = 2,
+
+	MaxValue = OrangeBox
+};
+
+extern IndirectPropLightingMode g_nIndirectPropLightingMode;
 
 extern CUtlVector<char const *> g_NonShadowCastingMaterialStrings;
 extern void ForceTextureShadowsOnModel( const char *pModelName );

@@ -168,7 +168,7 @@ CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 	DEFINE_INVALID_STRING_INDEX;
 
 	if (!pString)
-		return CUtlSymbol();
+		return {};
 	
 	// Store a special context used to help with insertion
 	m_pUserSearchString = pString;
@@ -181,7 +181,7 @@ CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 	m_pUserSearchString = nullptr;
 #endif
 
-	return CUtlSymbol( idx );
+	return { idx };
 }
 
 
@@ -208,7 +208,7 @@ intp CUtlSymbolTable::FindPoolWithSpace( intp len )	const
 CUtlSymbol CUtlSymbolTable::AddString( const char* pString )
 {
 	if (!pString) 
-		return CUtlSymbol( UTL_INVAL_SYMBOL );
+		return { UTL_INVAL_SYMBOL };
 
 	CUtlSymbol id = Find( pString );
 	
@@ -223,7 +223,7 @@ CUtlSymbol CUtlSymbolTable::AddString( const char* pString )
 	{
 		// Add a new pool.
 		intp newPoolSize = max( len, MIN_STRING_POOL_SIZE );
-		StringPool_t *pPool = (StringPool_t*)malloc( sizeof( StringPool_t ) + newPoolSize - 1 );
+		auto *pPool = (StringPool_t*)malloc( sizeof( StringPool_t ) + newPoolSize - 1 );
 		pPool->m_TotalLen = newPoolSize;
 		pPool->m_SpaceUsed = 0;
 		iPool = m_StringPools.AddToTail( pPool );
@@ -245,7 +245,7 @@ CUtlSymbol CUtlSymbolTable::AddString( const char* pString )
 	index.m_iOffset = iStringOffset;
 
 	UtlSymId_t idx = m_Lookup.Insert( index );
-	return CUtlSymbol( idx );
+	return { idx };
 }
 
 

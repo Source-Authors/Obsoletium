@@ -5,16 +5,16 @@
 // FIFO from
 // http://jim.afim-asso.org/jim2002/articles/L17_Fober.pdf
 
-#ifndef TIER0_TSLIST_H_
-#define TIER0_TSLIST_H_
+#ifndef SE_PUBLIC_TIER0_TSLIST_H_
+#define SE_PUBLIC_TIER0_TSLIST_H_
 
 #include <atomic>
 #include <type_traits>
 
-#include "tier0/dbg.h"
-#include "tier0/threadtools.h"
-#include "tier0/memalloc.h"
-#include "tier0/memdbgoff.h"
+#include "dbg.h"
+#include "threadtools.h"
+#include "memalloc.h"
+#include "memdbgoff.h"
 
 
 #if defined( PLATFORM_64BITS )
@@ -167,13 +167,15 @@ class TSLIST_HEAD_ALIGN CTSListBase : public CAlignedNewDelete<TSLIST_HEAD_ALIGN
 };
 
 // Lock free simple stack.
-template <typename T, typename = std::enable_if_t<std::is_base_of_v<TSLNodeBase_t, T>>>
+template <typename T>
 class TSLIST_HEAD_ALIGN CTSSimpleList : public CTSListBase
 {
+	using tls_node_concept = std::enable_if_t<std::is_base_of_v<TSLNodeBase_t, T>>;
+
 public:
 	void Push( T *pNode )
 	{
-		Assert( sizeof(T) >= sizeof(TSLNodeBase_t) );
+		static_assert( sizeof(T) >= sizeof(TSLNodeBase_t) );
 		CTSListBase::Push( pNode );
 	}
 
@@ -755,4 +757,4 @@ private:
 	void FreeNode(Node_t *pNode) { m_FreeNodes.Push(pNode); }
 };
 
-#endif  // TIER0_TSLIST_H_
+#endif  // !SE_PUBLIC_TIER0_TSLIST_H_

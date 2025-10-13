@@ -317,7 +317,7 @@ void CToolOverlay::HandlesReset( void )
 {
 	// Go through selection list and reset overlay handles.
 	const CMapObjectList *pSelection = m_pDocument->GetSelection()->GetList();
-	for( int iSelection = 0; iSelection < pSelection->Count(); ++iSelection )
+	for( intp iSelection = 0; iSelection < pSelection->Count(); ++iSelection )
 	{
 		CMapClass *pMapClass = pSelection->Element( iSelection );
 		if ( pMapClass && pMapClass->IsMapClass( MAPCLASS_TYPE( CMapEntity ) ) )
@@ -346,7 +346,7 @@ bool CToolOverlay::HandleSelection( CMapView *pView, const Vector2D &vPoint )
 	// Go through selection list and test all overlay's handles and set the
 	// "hit" overlay current.
 	const CMapObjectList *pSelection = m_pDocument->GetSelection()->GetList();
-	for ( int iSelection = 0; iSelection < pSelection->Count(); ++iSelection )
+	for ( intp iSelection = 0; iSelection < pSelection->Count(); ++iSelection )
 	{
 		CMapClass *pMapClass = pSelection->Element( iSelection );
 		if ( pMapClass && pMapClass->IsMapClass( MAPCLASS_TYPE( CMapEntity ) ) )

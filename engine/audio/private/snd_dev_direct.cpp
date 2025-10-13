@@ -1941,6 +1941,8 @@ static void TransferSamplesToSurroundBuffer( int outputCount, surround_transfer_
 	// no center channel, 4 channel surround
 	else if ( transfer.channelCount == 4 )
 	{
+		Assert(transfer.snd_rp);
+
 		for (int i=0, j=0; i<outputCount ; i++, j+=2)
 		{
 			transfer.pOutput[0] = AdjustSampleVolume(transfer.snd_p[j], volumeFactor);		// FL
@@ -1954,6 +1956,8 @@ static void TransferSamplesToSurroundBuffer( int outputCount, surround_transfer_
 	else
 	{
 		Assert(transfer.snd_cp);
+		Assert(transfer.snd_rp);
+
 		// 6 channel / 5.1
 		for (int i=0, j=0 ; i<outputCount ; i++, j+=2)
 		{

@@ -349,7 +349,7 @@ void CSoundBrowser::OnRefreshSounds()
 {
 	// Set the title to "refreshing sounds..."
 	CString oldTitle, newTitle;
-	newTitle.LoadString( IDS_REFRESHING_SOUNDS );
+	VERIFY( newTitle.LoadString( IDS_REFRESHING_SOUNDS ) );
 	GetWindowText( oldTitle );
 	SetWindowText( newTitle );
 	

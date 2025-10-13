@@ -1,7 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_P5P6PERFORMANCECOUNTERS_H_
-#define TIER0_P5P6PERFORMANCECOUNTERS_H_
+#ifndef SE_PUBLIC_TIER0_P5P6PERFORMANCECOUNTERS_H_
+#define SE_PUBLIC_TIER0_P5P6PERFORMANCECOUNTERS_H_
+
+#include "basetypes.h"
 
 // defined for < Pentium 4
 
@@ -217,4 +219,4 @@
 #define K8_FAMILY           6	
 #define EXTENDED_FAMILY   15  // AMD 64 and AMD Opteron
 
-#endif  // TIER0_P5P6PERFORMANCECOUNTERS_H_
+#endif  // !SE_PUBLIC_TIER0_P5P6PERFORMANCECOUNTERS_H_

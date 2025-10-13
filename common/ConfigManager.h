@@ -55,50 +55,56 @@ public:
 		LOADSTATUS_ERROR,		// File was not loaded and was unable to perform the above fail-safe procedures
 	};
 
-			CGameConfigManager( void );
-			CGameConfigManager( const char *fileName );
+	CGameConfigManager();
+	~CGameConfigManager();
 
-			~CGameConfigManager( void );
-
-	bool	LoadConfigs( const char *baseDir = NULL );
-	bool	SaveConfigs( const char *baseDir = NULL );
-	bool	ResetConfigs( const char *baseDir = NULL );
+	bool	LoadConfigs( const char *baseDir = nullptr );
+	bool	SaveConfigs( const char *baseDir = nullptr );
+	bool	ResetConfigs( const char *baseDir = nullptr );
 	
-	int		GetNumConfigs( void );
-
-	KeyValues	*GetGameBlock( void );
+	KeyValues	*GetGameBlock( );
 	KeyValues	*GetGameSubBlock( const char *keyName );
 	bool		GetDefaultGameBlock( KeyValues *pIn );
 
-	bool	IsLoaded( void ) const { return m_pData != NULL; }
+	[[nodiscard]] bool	IsLoaded() const { return m_pData != nullptr; }
 
-	bool	WasConvertedOnLoad( void ) const { return m_LoadStatus == LOADSTATUS_CONVERTED; }
-	bool	WasCreatedOnLoad( void ) const { return m_LoadStatus == LOADSTATUS_CREATED; }
+	[[nodiscard]] bool	WasConvertedOnLoad() const { return m_LoadStatus == LOADSTATUS_CONVERTED; }
+	[[nodiscard]] bool	WasCreatedOnLoad() const { return m_LoadStatus == LOADSTATUS_CREATED; }
 	
 	bool	AddDefaultConfig( const defaultConfigInfo_t &info, KeyValues *out, const char *rootDirectory, const char *gameExeDir );
 
 	void	SetBaseDirectory( const char *pDirectory );
 
-	void	GetRootGameDirectory( char *out, size_t outLen, const char *rootDir );
+	void	GetRootGameDirectory( OUT_Z_CAP(outLen) char *out, intp outLen, const char *rootDir );
+	template<intp outLen>
+	void	GetRootGameDirectory( OUT_Z_ARRAY char (&out)[outLen], const char *rootDir )
+	{
+		GetRootGameDirectory( out, outLen, rootDir );
+	}
 
-	const char *GetRootDirectory( void );
+	const char *GetRootDirectory();
 	void	SetSDKEpoch( eSDKEpochs epoch ) { m_eSDKEpoch = epoch; };
 
 private:
 
-	void	GetRootContentDirectory( char *out, size_t outLen, const char *rootDir );
+	void	GetRootContentDirectory( OUT_Z_CAP(outLen) char *out, intp outLen, const char *rootDir );
+	template<intp outLen>
+	void	GetRootContentDirectory( OUT_Z_ARRAY char (&out)[outLen], const char *rootDir )
+	{
+		GetRootContentDirectory( out, outLen, rootDir );
+	}
 
-	const char *GetBaseDirectory( void );
-	const char *GetIniFilePath( void );
+	[[nodiscard]] const char *GetBaseDirectory( );
+	[[nodiscard]] const char *GetIniFilePath( );
 
 	bool	LoadConfigsInternal( const char *baseDir, bool bRecursiveCall );
-	void	UpdateConfigsInternal( void );
-	void	VersionConfig( void );
-	bool	IsConfigCurrent( void );
+	void	UpdateConfigsInternal( );
+	void	VersionConfig( );
+	[[nodiscard]] bool	IsConfigCurrent( );
 
-	bool	ConvertGameConfigsINI( void );
-	bool	CreateAllDefaultConfigs( void );
-	bool	IsAppSubscribed( int nAppID );
+	bool	ConvertGameConfigsINI( );
+	bool	CreateAllDefaultConfigs( );
+	[[nodiscard]] bool	IsAppSubscribed( int nAppID ) const;
 
 	loadStatus_t	m_LoadStatus;	// Holds various state about what occured while loading
 	KeyValues		*m_pData;		// Data as read from configuration file

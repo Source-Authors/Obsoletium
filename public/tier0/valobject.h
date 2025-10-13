@@ -4,8 +4,8 @@
 // in to CValidator.  Whenever a new object reports in (via CValidator::Push),
 // we create a new CValObject to aggregate stats for it.
 
-#ifndef TIER0_VALOBJECT_H_
-#define TIER0_VALOBJECT_H_
+#ifndef SE_PUBLIC_TIER0_VALOBJECT_H_
+#define SE_PUBLIC_TIER0_VALOBJECT_H_
 
 #ifdef DBGFLAG_VALIDATE
 class CValObject
@@ -62,4 +62,4 @@ private:
 #endif  // DBGFLAG_VALIDATE
 
 
-#endif  // TIER0_VALOBJECT_H_
+#endif  // !SE_PUBLIC_TIER0_VALOBJECT_H_

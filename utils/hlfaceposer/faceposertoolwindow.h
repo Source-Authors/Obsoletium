@@ -55,8 +55,8 @@ public:
 
 	virtual void	OnModelChanged();
 
-	static int GetToolCount( void );
-	static IFacePoserToolWindow *GetTool( int index );
+	static intp GetToolCount( void );
+	static IFacePoserToolWindow *GetTool( intp index );
 
 	static IFacePoserToolWindow *GetActiveTool( void );
 	static void SetActiveTool( IFacePoserToolWindow *tool );

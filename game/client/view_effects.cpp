@@ -111,6 +111,9 @@ public:
 	virtual void	Save( ISave *pSave );
 	virtual void	Restore( IRestore *pRestore, bool fCreatePlayers );
 
+	// dimhotepus: Cleanup support.
+	virtual void	Shutdown();
+
 private:
 
 	void ClearAllShakes();
@@ -184,6 +187,16 @@ void CViewEffects::Init( void )
 {
 	HOOK_MESSAGE( Shake );
 	HOOK_MESSAGE( Fade );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+// dimhotepus: Cleanup support.
+void CViewEffects::Shutdown()
+{
+	UNHOOK_MESSAGE( Fade );
+	UNHOOK_MESSAGE( Shake );
 }
 
 //-----------------------------------------------------------------------------

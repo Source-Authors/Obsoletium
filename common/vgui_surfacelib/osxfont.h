@@ -64,7 +64,7 @@ public:
 
 	// gets the name of this font
 	const char *GetName() { return m_szName.String(); }
-	const char *GetFamilyName() { return NULL; }
+	const char *GetFamilyName() { return nullptr; }
 
 	// gets the weight of the font
 	virtual int GetWeight() { return m_iWeight; }

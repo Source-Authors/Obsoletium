@@ -602,7 +602,7 @@ bool CLocalizedStringTable::AddAllLanguageFiles( const char *baseFileName )
 	char szSearchPath[MAX_PATH];
 	Q_snprintf( szSearchPath, sizeof(szSearchPath), "%s*.txt", baseFileName );
 
-	FileFindHandle_t hFind = NULL;
+	FileFindHandle_t hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *file = g_pFullFileSystem->FindFirst( szSearchPath, &hFind );
 	while ( file )
 	{

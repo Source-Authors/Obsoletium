@@ -3,15 +3,15 @@
 // Purpose:	All of our code is completely Unicode.  Instead of char, you should
 // use wchar, uint8, or char8, as explained below.
 
-#ifndef TIER0_WCHARTYPES_H_
-#define TIER0_WCHARTYPES_H_
+#ifndef SE_PUBLIC_TIER0_WCHARTYPES_H_
+#define SE_PUBLIC_TIER0_WCHARTYPES_H_
 
 #ifdef _INC_TCHAR
 #error "Must include tier0 type headers before tchar.h"
 #endif
 
 // Temporarily turn off Valve defines
-#include "tier0/valve_off.h"
+#include "valve_off.h"
 
 #if !defined(_WCHAR_T_DEFINED) && !defined(GNUC)
 typedef unsigned short wchar_t;
@@ -22,18 +22,18 @@ typedef unsigned short wchar_t;
 // char8 is equivalent to char, and should be used when you really need a char
 // (for example, when calling an external function that's declared to take
 // chars).
-typedef char char8;
+using char8 = char;
 
 // uint8
 // uint8 is equivalent to byte (but is preferred over byte for clarity).  Use this
 // whenever you mean a byte (for example, one byte of a network packet).
-typedef unsigned char uint8;
-typedef unsigned char byte;
+using uint8 = unsigned char;
+using byte = unsigned char;
 
 // wchar
 // wchar is a single character of text (currently 16 bits, as all of our text is
 // Unicode).  Use this whenever you mean a piece of text (for example, in a string).
-typedef wchar_t wchar;
+using wchar = wchar_t;
 //typedef char wchar;
 
 // __WFILE__
@@ -74,15 +74,15 @@ typedef wchar tchar;
 #define __TFILE__ __WFILE__
 #define TCHAR_IS_WCHAR
 #else
-typedef char tchar;
+using tchar = char;
 #define tstring std::string
 #define __TFILE__ __FILE__
 #define TCHAR_IS_CHAR
 #endif
 
 #if defined( WIN32 )
-typedef wchar_t uchar16;
-typedef unsigned int uchar32;
+using uchar16 = wchar_t;
+using uchar32 = unsigned int;
 #else
 typedef unsigned short uchar16;
 typedef wchar_t uchar32;
@@ -93,7 +93,7 @@ typedef wchar_t uchar32;
 #endif
 
 // Turn valve defines back on
-#include "tier0/valve_on.h"
+#include "valve_on.h"
 
 
-#endif  // TIER0_WCHARTYPES_H_
+#endif  // !SE_PUBLIC_TIER0_WCHARTYPES_H_

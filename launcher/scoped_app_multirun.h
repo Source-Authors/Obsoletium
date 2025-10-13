@@ -16,6 +16,9 @@ extern "C" {
 __declspec(dllimport) _Ret_maybenull_ HANDLE __stdcall CreateMutexW(
     _In_opt_ LPSECURITY_ATTRIBUTES lpMutexAttributes, _In_ BOOL bInitialOwner,
     _In_opt_ const wchar_t *lpName);
+
+__declspec(dllimport) BOOL __stdcall ReleaseMutex(_In_ HANDLE hMutex);
+
 __declspec(dllimport) BOOL __stdcall CloseHandle(
     _In_ _Post_ptr_invalid_ HANDLE hObject);
 
@@ -154,7 +157,7 @@ class ScopedAppMultiRun {
   ScopedAppMultiRun &operator=(const ScopedAppMultiRun &) = delete;
   ScopedAppMultiRun &operator=(ScopedAppMultiRun &&) = delete;
 
-  bool is_single_run() const noexcept {
+  [[nodiscard]] bool is_single_run() const noexcept {
 #if defined(WIN32)
     return !!mutex_;
 #else

@@ -33,7 +33,7 @@
 class CExpressionCalculator
 {
 public:
-	explicit CExpressionCalculator( const char *expr = NULL ) : m_expr( expr ) {}
+	explicit CExpressionCalculator( const char *expr = NULL ) : m_expr( expr ), m_bIsBuildingArgumentList( false ) {}
 	void SetExpression( const char *expr ) 
 	{
 		m_expr = expr;

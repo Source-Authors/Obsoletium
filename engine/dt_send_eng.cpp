@@ -112,7 +112,7 @@ public:
 		// Remember where the game code pointed us for this datatable's data so 
 		m_pProxies[ pNode->GetRecursiveProxyIndex() ] = pStructBase;
 
-		for ( int iChild=0; iChild < pNode->GetNumChildren(); iChild++ )
+		for ( intp iChild=0; iChild < pNode->GetNumChildren(); iChild++ )
 		{
 			CSendNode *pCurChild = pNode->GetChild( iChild );
 			
@@ -288,8 +288,8 @@ static inline void ShowEncodeDeltaWatchInfo(
 	ConDMsg( "+ %s %s, %s, index %i, bits %i, value %s\n", pTable->GetName(), pProp->GetName(), type, index, bits, value );
 }
 
-
-static FORCEINLINE void SendTable_EncodeProp( CEncodeInfo * pInfo, unsigned long iProp )
+// dimhotepus: unsigned long -> int.
+static FORCEINLINE void SendTable_EncodeProp( CEncodeInfo * pInfo, int iProp )
 {
 	// Call their proxy to get the property's value.
 	DVariant var;
@@ -318,8 +318,8 @@ static FORCEINLINE void SendTable_EncodeProp( CEncodeInfo * pInfo, unsigned long
 		); 
 }
 
-
-static bool SendTable_IsPropZero( CEncodeInfo *pInfo, unsigned long iProp )
+// dimhotepus: unsigned long -> int.
+static bool SendTable_IsPropZero( CEncodeInfo *pInfo, int iProp )
 {
 	const SendProp *pProp = pInfo->GetCurProp();
 

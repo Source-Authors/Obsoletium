@@ -616,7 +616,7 @@ void CMapReslistGenerator::OnModelPrecached(const char *relativePathFileName)
 	if (strstr(relativePathFileName, ".vmt"))
 	{
 		// it's a materials file, make sure that it starts in the materials directory, and we get the .vtf
-		char file[_MAX_PATH];
+		char file[MAX_PATH];
 
 		if (!Q_strnicmp(relativePathFileName, "materials", ssize("materials") - 1))
 		{
@@ -655,7 +655,7 @@ void CMapReslistGenerator::OnSoundPrecached(const char *relativePathFileName)
 	}
 
 	// prepend the sound/ directory if necessary
-	char file[_MAX_PATH];
+	char file[MAX_PATH];
 	if (!Q_strnicmp(relativePathFileName, "sound", ssize("sound") - 1))
 	{
 		V_strcpy_safe(file, relativePathFileName);
@@ -685,7 +685,7 @@ void CMapReslistGenerator::OnResourcePrecached(const char *relativePathFileName)
 	if (relativePathFileName[0] == '*')
 		return;
 
-	char fullPath[_MAX_PATH];
+	char fullPath[MAX_PATH];
 	if (g_pFileSystem->GetLocalPath_safe(relativePathFileName, fullPath))
 	{
 		OnResourcePrecachedFullPath(fullPath);
@@ -714,7 +714,7 @@ void CMapReslistGenerator::OnResourcePrecachedFullPath(const char *fullPathFileN
 	if (strstr(fixed, ".mdl"))
 	{
 		// it's a model, get it's other files as well
-		char file[_MAX_PATH];
+		char file[MAX_PATH];
 		Q_strncpy(file, fixed, sizeof(file) - 10);
 		char *ext = strstr(file, ".mdl");
 
@@ -771,7 +771,7 @@ void CMapReslistGenerator::WriteMapLog()
 	}
 
 	// write the sorted map log, allows for easier diffs between revisions
-	char path[_MAX_PATH];
+	char path[MAX_PATH];
 	Q_snprintf( path, sizeof( path ), "%s\\%s.lst", m_sResListDir.String(), m_szLevelName );
 	FileHandle_t fh = g_pFileSystem->Open( path, "wt", "DEFAULT_WRITE_PATH" );
 	for ( int i = m_MapLog.FirstInorder(); i != m_MapLog.InvalidIndex(); i = m_MapLog.NextInorder( i ) )
@@ -913,7 +913,7 @@ void CMapReslistGenerator::TrackDeletions( const char *fullPathFileName )
 {
 	Assert( m_bTrackingDeletions );
 
-	char test[ _MAX_PATH ];
+	char test[ MAX_PATH ];
 	Q_strncpy( test, fullPathFileName, sizeof( test ) );
 	Q_FixSlashes( test );
 	Q_strlower( test );
@@ -935,7 +935,7 @@ void CMapReslistGenerator::TrackDeletions( const char *fullPathFileName )
 	if (strstr(test, ".mdl"))
 	{
 		// it's a model, get it's other files as well
-		char file[_MAX_PATH];
+		char file[MAX_PATH];
 		Q_strncpy(file, test, sizeof(file) - 10);
 		char *ext = strstr(file, ".mdl");
 

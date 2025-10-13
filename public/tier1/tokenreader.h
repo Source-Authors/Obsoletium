@@ -7,9 +7,6 @@
 
 #ifndef TOKENREADER_H
 #define TOKENREADER_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include <fstream>
 
@@ -68,12 +65,13 @@ public:
 		return PeekTokenType(pszStore, size);
 	}
 
-	inline int GetErrorCount(void) const;
-
-private:
+	[[nodiscard]] inline int GetErrorCount() const;
+	
 	// compiler can't generate an assignment operator since descended from std::ifstream
 	inline TokenReader(TokenReader const &) = delete;
 	inline int operator=(TokenReader const &) = delete;
+
+private:
 
 	trtoken_t GetString(char *pszStore, intp nSize);
 	bool SkipWhiteSpace();
@@ -91,7 +89,7 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Returns the total number of parsing errors since this file was opened.
 //-----------------------------------------------------------------------------
-int TokenReader::GetErrorCount(void) const
+int TokenReader::GetErrorCount() const
 {
 	return(m_nErrorCount);
 }

@@ -46,9 +46,9 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
                                const char *message) {
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    Q_snprintf(out, std::size(out), "[%s] %s", group, message);
+    Q_snprintf(out, std::size(out), "[%.3f][%s] %s", Plat_FloatTime(), group, message);
   } else {
-    Q_snprintf(out, std::size(out), "%s", message);
+    Q_snprintf(out, std::size(out), "[%.3f] %s", Plat_FloatTime(), message);
   }
 
   return out;
@@ -65,7 +65,7 @@ void DebugWarn(PRINTF_FORMAT_STRING const char *format, ...) {
   tmp[0] = '\0';
 
   va_list argptr;
-  va_start(argptr, format);
+  va_start(argptr, format); //-V2019 //-V2018
   V_vsprintf_safe(tmp, format, argptr);
   va_end(argptr);
 

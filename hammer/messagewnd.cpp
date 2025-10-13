@@ -14,12 +14,12 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-IMPLEMENT_DYNCREATE(CMessageWnd, CMDIChildWnd)
+IMPLEMENT_DYNCREATE(CMessageWnd, CBaseMDIChildWnd)
 
 const int iMsgPtSize = 10;
 
 
-BEGIN_MESSAGE_MAP(CMessageWnd, CMDIChildWnd)
+BEGIN_MESSAGE_MAP(CMessageWnd, CBaseMDIChildWnd)
 	//{{AFX_MSG_MAP(CMessageWnd)
 	ON_WM_PAINT()
 	ON_WM_HSCROLL()
@@ -76,7 +76,7 @@ void CMessageWnd::CreateMessageWindow( CMDIFrameWnd *pwndParent, CRect &rect )
 		if ( ( mws.type == mwError ) || ( mws.type == mwWarning ) )
 		{
 			bErrors = true;
-		}		
+		}
 	}
 	
 	if ( bErrors )
@@ -111,7 +111,7 @@ void CMessageWnd::AddMsg(MWMSGTYPE type, TCHAR* msg)
 	mws.MsgLen = V_strlen(msg);
 	mws.type = type;
 	Assert(mws.MsgLen < ssize(mws.szMsg));
-	_tcscpy(mws.szMsg, msg);
+	_tcscpy_s(mws.szMsg, msg);
 
 	// Add the message, growing the array as necessary
 	MsgArray.SetAtGrow(iAddAt, mws);
@@ -190,11 +190,8 @@ void CMessageWnd::CalculateScrollSize()
 	if ( m_hWnd == NULL )
 		return;
 
-	int iHorz;
-	int iVert;
-
-	iVert = iNumMsgs * (iMsgPtSize + 2);
-	iHorz = 0;
+	int iVert = iNumMsgs * m_dpi_behavior.ScaleOnY( iMsgPtSize + 2 );
+	int iHorz = 0;
 	for(int i = 0; i < iNumMsgs; i++)
 	{
 		int iTmp = MsgArray[i].MsgLen * iCharWidth;
@@ -247,7 +244,7 @@ void CMessageWnd::OnPaint()
 
 	// paint messages
 	MWMSGSTRUCT mws;
-	CRect r(0, 0, 1, iMsgPtSize+2);
+	CRect r(0, 0, m_dpi_behavior.ScaleOnX( 1 ), m_dpi_behavior.ScaleOnY( iMsgPtSize+2 ));
 
 	dc.SetWindowOrg(GetScrollPos(SB_HORZ), GetScrollPos(SB_VERT));
 
@@ -277,7 +274,7 @@ void CMessageWnd::OnPaint()
 		dc.TextOut(r.left, r.top, mws.szMsg, mws.MsgLen);
 
 		// move rect down
-		r.OffsetRect(0, iMsgPtSize + 2);
+		r.OffsetRect(0, m_dpi_behavior.ScaleOnY( iMsgPtSize + 2 ));
 	}
 }
 

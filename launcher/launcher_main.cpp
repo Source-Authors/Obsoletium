@@ -44,8 +44,6 @@
 #include <gnu/libc-version.h>
 #endif
 
-#include "tier0/tslist.h"
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -60,20 +58,20 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
                                const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 
-  out_group = out_group && out_group[0] ? out_group : group;
+  out_group = !Q_isempty( out_group ) ? out_group : group;
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    Q_snprintf(out, std::size(out), "[%s] %s", out_group, message);
+    Q_snprintf(out, std::size(out), "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
   } else {
-    Q_snprintf(out, std::size(out), "%s", message);
+    Q_snprintf(out, std::size(out), "[%.3f] %s", Plat_FloatTime(), message);
   }
 
   return out;
 }
 
 // Spew function!
-SpewRetval_t LauncherDefaultSpewFunc(SpewType_t spew_type, const char *raw) {
+SpewRetval_t DefaultSpew(SpewType_t spew_type, const char *raw) {
   char message[4096];
 
   Plat_DebugString(PrefixMessageGroup(message, "launcher", raw));
@@ -366,7 +364,7 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
 #endif
 
   // Hook the debug output stuff.
-  SpewOutputFunc(LauncherDefaultSpewFunc);
+  const ScopedSpewOutputFunc scoped_spew_output(DefaultSpew);
 
   // Dump compiler / libs / app versions.
 #ifdef WIN32
@@ -555,8 +553,6 @@ DLL_EXPORT int LauncherMain(int argc, char **argv)
                           InitTextMode()};
 
   rc = RunApp(command_line, base_directory, is_text_mode);
-
-  SpewOutputFunc(nullptr);
 
   return rc;
 }

@@ -9,11 +9,7 @@
 #ifndef SPHERICAL_GEOMETRY_H
 #define SPHERICAL_GEOMETRY_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "mathlib/vector.h"
+#include "vector.h"
 
 // see https://mathworld.wolfram.com/SphericalTrigonometry.html
 

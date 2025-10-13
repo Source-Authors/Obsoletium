@@ -88,6 +88,7 @@ C_TEParticleSystem::C_TEParticleSystem()
 CTEParticleRenderer::CTEParticleRenderer( const char *pDebugName ) :
 	CParticleEffect( pDebugName )
 {
+	m_nActiveParticles = 0;
 	m_ParticleSize = 1.5f;
 	m_MaterialHandle = INVALID_MATERIAL_HANDLE;
 }

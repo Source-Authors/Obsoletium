@@ -138,12 +138,21 @@ CDpiWindowBehavior::CDpiWindowBehavior(bool applyDpiOnCreate)
       m_previous_dpi_y{USER_DEFAULT_SCREEN_DPI},
       m_current_dpi_x{USER_DEFAULT_SCREEN_DPI},
       m_current_dpi_y{USER_DEFAULT_SCREEN_DPI},
-      m_apply_dpi_on_create{applyDpiOnCreate} {}
+      m_apply_dpi_on_create{applyDpiOnCreate}
+#ifdef _DEBUG
+      ,
+      m_is_destroyed{false}
+#endif
+{
+}
 
 BOOL CDpiWindowBehavior::OnCreateWindow(HWND window) {
   Assert(window);
 
   m_window_handle = window;
+#ifdef _DEBUG
+  m_is_destroyed = false;
+#endif
   // Windows docs say DPI is same for X and Y.
   m_previous_dpi_x = m_previous_dpi_y =
       std::exchange(m_current_dpi_x, ::GetDpiForWindow(window));
@@ -153,18 +162,22 @@ BOOL CDpiWindowBehavior::OnCreateWindow(HWND window) {
 }
 
 void CDpiWindowBehavior::OnDestroyWindow() {
+  Assert(!m_is_destroyed);
   Assert(m_window_handle);
 
   DeleteWindowFont(m_window_handle);
   m_window_handle = nullptr;
+#ifdef _DEBUG
+  m_is_destroyed = true;
+#endif
 }
 
 [[nodiscard]] int CDpiWindowBehavior::ScaleOnX(int value) const {
-  return ::MulDiv(value, m_current_dpi_x, m_previous_dpi_x);
+  return ScaleByDpi(m_previous_dpi_x, value, m_current_dpi_x);
 }
 
 [[nodiscard]] int CDpiWindowBehavior::ScaleOnY(int value) const {
-  return ::MulDiv(value, m_current_dpi_y, m_previous_dpi_y);
+  return ScaleByDpi(m_previous_dpi_x, value, m_current_dpi_x);
 }
 
 LRESULT CDpiWindowBehavior::OnWindowDpiChanged(WPARAM wParam, LPARAM lParam) {
@@ -198,8 +211,9 @@ BOOL CDpiWindowBehavior::ApplyDpiToWindow(bool recompute_window_size) {
     const BOOL window_has_menu{::GetMenu(m_window_handle) ? TRUE : FALSE};
 
     rc = ::AdjustWindowRectExForDpi(
-        &rc_window, GetWindowLong(m_window_handle, GWL_STYLE), window_has_menu, //-V303
-        GetWindowLong(m_window_handle, GWL_EXSTYLE), m_current_dpi_y); //-V303
+        &rc_window, GetWindowLong(m_window_handle, GWL_STYLE),
+        window_has_menu,                                                //-V303
+        GetWindowLong(m_window_handle, GWL_EXSTYLE), m_current_dpi_y);  //-V303
     Assert(rc);
 
     if (rc) {
@@ -217,6 +231,11 @@ BOOL CDpiWindowBehavior::ApplyDpiToWindow(bool recompute_window_size) {
   }
 
   return rc;
+}
+
+int CDpiWindowBehavior::ScaleByDpi(unsigned oldDpi, int value,
+                                   unsigned newDpi) {
+  return ::MulDiv(value, newDpi, oldDpi);
 }
 
 }  // namespace se::windows::ui

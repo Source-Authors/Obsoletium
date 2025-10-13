@@ -13,11 +13,8 @@
 #include <cstdio>
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
-#include "tier1/strtools.h"
+#include "strtools.h"
 
-#if defined( _WIN32 )
-#pragma once
-#endif
 #if defined(POSIX)
 #pragma GCC visibility push(hidden)
 #endif
@@ -274,10 +271,10 @@ void CFmtStrN< SIZE_BUF, QUIET_TRUNCATION >::AppendFormatV( const char *pchForma
 
 #define FMTSTR_STD_LEN 256
 
-typedef CFmtStrN<FMTSTR_STD_LEN> CFmtStr;
-typedef CFmtStrQuietTruncationN<FMTSTR_STD_LEN> CFmtStrQuietTruncation;
-typedef CFmtStrN<1024> CFmtStr1024;
-typedef CFmtStrN<8192> CFmtStrMax;
+using CFmtStr = CFmtStrN<256>;
+using CFmtStrQuietTruncation = CFmtStrQuietTruncationN<256>;
+using CFmtStr1024 = CFmtStrN<1024>;
+using CFmtStrMax = CFmtStrN<8192>;
 
 
 //-----------------------------------------------------------------------------

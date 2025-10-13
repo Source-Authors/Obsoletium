@@ -26,6 +26,7 @@
 #include "filesystem.h"
 #include "../common/tools_minidump.h"
 #include "posix_file_stream.h"
+#include "scoped_app_locale.h"
 
 #include "tier0/memdbgon.h"
 
@@ -59,6 +60,20 @@ int main(int argc, char **argv) {
       scoped_default_minidumps;
 
   const ScopedSpewOutputFunc scoped_spew_output{VTF2TGAOutputFunc};
+
+  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+  //
+  // Printf/sscanf functions expect en_US UTF8 localization.
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
 
   CommandLine()->CreateCmdLine(argc, argv);
   MathLib_Init(2.2f, 2.2f, 0.0f, 1, false, false, false, false);
@@ -101,7 +116,6 @@ int main(int argc, char **argv) {
   if (errc) {
     Error("Unable to open '%s' for reading: %s.\n", actual_vtf_file_name,
           errc.message().c_str());
-    exit(errc.value());
   }
 
   int64 size;
@@ -109,7 +123,6 @@ int main(int argc, char **argv) {
   if (errc || size > std::numeric_limits<intp>::max()) {
     Error("Unable to get size of '%s': %s.\n", actual_vtf_file_name,
           errc.message().c_str());
-    exit(errc.value());
   }
 
   intp correct_size = static_cast<intp>(size);
@@ -123,7 +136,6 @@ int main(int argc, char **argv) {
   if (errc) {
     Error("Unable to read '%s': %s.\n", actual_vtf_file_name,
           errc.message().c_str());
-    exit(errc.value());
   }
 
   vtf_buffer.SeekPut(CUtlBuffer::SEEK_HEAD, bytes_read);
@@ -131,12 +143,10 @@ int main(int argc, char **argv) {
   IVTFTexture *pTex = CreateVTFTexture();
   if (!pTex) {
     Error("Error allocating .VTF for file '%s'.\n", actual_vtf_file_name);
-    exit(ENOMEM);
   }
 
   if (!pTex->Unserialize(vtf_buffer)) {
     Error("Error deserializing .VTF file '%s'.\n", actual_vtf_file_name);
-    exit(-1);
   }
 
   Msg("vtf width: %d\n", pTex->Width());
@@ -222,7 +232,7 @@ int main(int argc, char **argv) {
           }
 
           if (src_frame_count > 1) {
-            char pTemp[4];
+            char pTemp[4];  //-V112
             V_sprintf_safe(pTemp, "%03d", frame_no);
             V_strcat(temp_name.get(), pTemp, tga_name_size + 13);
           }
@@ -269,13 +279,12 @@ int main(int argc, char **argv) {
           std::unique_ptr<unsigned char[]> dst_data =
               std::make_unique<unsigned char[]>(ImageLoader::GetMemRequired(
                   mip_width, mip_height, 1, dst_format, false));
-          if (!ImageLoader::ConvertImageFormat(src_data, src_format, //-V1051
+          if (!ImageLoader::ConvertImageFormat(src_data, src_format,  //-V1051
                                                dst_data.get(), dst_format,
                                                mip_width, mip_height, 0, 0)) {
             Error("Error converting '%s' from '%s' to '%s'.\n",
                   actual_vtf_file_name, ImageLoader::GetName(src_format),
                   ImageLoader::GetName(dst_format));
-            exit(-1);
           }
 
           if (dst_format != IMAGE_FORMAT_RGB323232F) {
@@ -292,7 +301,6 @@ int main(int argc, char **argv) {
                 Error("Error converting '%s' from '%s' to '%s'.\n",
                       actual_vtf_file_name, ImageLoader::GetName(dst_format),
                       ImageLoader::GetName(IMAGE_FORMAT_RGBA8888));
-                exit(-1);
               }
 
               dst_format = IMAGE_FORMAT_RGBA8888;
@@ -309,7 +317,6 @@ int main(int argc, char **argv) {
                 Error("Error converting '%s' from '%s' to '%s'.\n",
                       actual_vtf_file_name, ImageLoader::GetName(dst_format),
                       ImageLoader::GetName(IMAGE_FORMAT_RGB888));
-                exit(-1);
               }
 
               dst_format = IMAGE_FORMAT_RGB888;

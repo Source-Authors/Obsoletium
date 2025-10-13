@@ -170,7 +170,14 @@ C_PropAirboat::C_PropAirboat()
 {
 	m_vecEyeSpeed.Init();
 	m_flViewAngleDeltaTime = 0.0f;
+
+	m_bHeadlightIsOn = false;
+	m_nAmmoCount = 0;
 	m_pHeadlight = NULL;
+
+	m_nExactWaterLevel = 0;
+
+	BitwiseClear(m_vecSteps);
 
 	m_ViewSmoothingData.flPitchCurveZero = r_AirboatPitchCurveZero.GetFloat();
 	m_ViewSmoothingData.flPitchCurveLinear = r_AirboatPitchCurveLinear.GetFloat();
@@ -185,6 +192,8 @@ C_PropAirboat::C_PropAirboat()
 
 	m_nFirstStep = 0;
 	m_nStepCount = 0;
+	m_flUpdateTime = 0.0f;
+
 	m_SplashTime.Init( 60 );
 }
 

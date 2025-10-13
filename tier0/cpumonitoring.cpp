@@ -104,7 +104,7 @@ unsigned __stdcall MeasureThread( void* vThreadNum )
 		s_frequencies[ threadNum ] = frequency;
 
 		// Tell the heartbeat thread that one thread has completed.
-		ReleaseSemaphore( g_workCompleteSemaphore, 1, NULL );
+		ReleaseSemaphore( g_workCompleteSemaphore, 1, nullptr );
 	}
 
 	// This will never be hit.
@@ -114,14 +114,15 @@ unsigned __stdcall MeasureThread( void* vThreadNum )
 /*
 Note that this structure definition was accidentally omitted from WinNT.h. This error will be corrected in the future. In the meantime, to compile your application, include the structure definition contained in this topic in your source code.
 */
-typedef struct _PROCESSOR_POWER_INFORMATION {
+using PROCESSOR_POWER_INFORMATION = struct _PROCESSOR_POWER_INFORMATION {
   ULONG Number;
   ULONG MaxMhz;
   ULONG CurrentMhz;
   ULONG MhzLimit;
   ULONG MaxIdleState;
   ULONG CurrentIdleState;
-} PROCESSOR_POWER_INFORMATION, *PPROCESSOR_POWER_INFORMATION;
+};
+using PPROCESSOR_POWER_INFORMATION = PROCESSOR_POWER_INFORMATION*;
 
 // Master control thread to periodically wake the measurement threads.
 unsigned __stdcall HeartbeatThread( void* )
@@ -146,7 +147,7 @@ unsigned __stdcall HeartbeatThread( void* )
 			// First ask Windows what the processor speed is -- this *might* reflect
 			// some types of thermal throttling, but doesn't seem to.
 			PROCESSOR_POWER_INFORMATION processorInfo[ nMaxCPUs ] = {};
-			LONG rc = CallNtPowerInformation( ProcessorInformation, NULL, 0, &processorInfo, sizeof(processorInfo[0]) * g_numCPUs );
+			LONG rc = CallNtPowerInformation( ProcessorInformation, nullptr, 0, &processorInfo, sizeof(processorInfo[0]) * g_numCPUs );
 
 			ULONG MinCurrentMHz = rc == 0 ? processorInfo[ 0 ].CurrentMhz : 0;
 			ULONG MaxCurrentMHz = rc == 0 ? processorInfo[ 0 ].CurrentMhz : 0;
@@ -159,7 +160,7 @@ unsigned __stdcall HeartbeatThread( void* )
 			// This will wake up all of the worker threads. It is possible that some of the
 			// threads will take a long time to wake up in which case the same thread might
 			// wake up multiple times but this should be harmless.
-			ReleaseSemaphore( g_releaseSemaphore, g_numCPUs, NULL );
+			ReleaseSemaphore( g_releaseSemaphore, g_numCPUs, nullptr );
 
 			// Wait until all of the measurement threads should have run.
 			// This is just to avoid having the heartbeat thread fighting for cycles
@@ -222,7 +223,7 @@ PLATFORM_INTERFACE CPUFrequencyResults GetCPUFrequencyResults( bool fGetDisabled
 	}
 
 	// Return zero initialized struct.
-	return CPUFrequencyResults();
+	return {};
 }
 
 PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
@@ -239,10 +240,10 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 	{
 		s_initialized = true;
 
-		g_releaseSemaphore = CreateSemaphore( NULL, 0, 1000, NULL );
+		g_releaseSemaphore = CreateSemaphore( nullptr, 0, 1000, nullptr );
 		if ( !g_releaseSemaphore )
 			return;
-		g_workCompleteSemaphore = CreateSemaphore( NULL, 0, 1000, NULL );
+		g_workCompleteSemaphore = CreateSemaphore( nullptr, 0, 1000, nullptr );
 		if ( !g_workCompleteSemaphore )
 			return;
 
@@ -257,7 +258,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		// ensure that they will run promptly on a specific CPU.
 		for ( int i = 0; i < g_numCPUs; ++i )
 		{
-			HANDLE thread = (HANDLE)_beginthreadex( NULL, 0x10000, MeasureThread, (void*)static_cast<intp>(i), 0, NULL );
+			auto thread = (HANDLE)_beginthreadex( nullptr, 0x10000, MeasureThread, (void*)static_cast<intp>(i), 0, nullptr );
 			if (thread)
 			{
 				SetThreadAffinityMask( thread, static_cast<size_t>(1u) << i );
@@ -266,7 +267,7 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		}
 
 		// Create the thread which tells the measurement threads to wake up periodically
-		_beginthreadex( NULL, 0x10000, HeartbeatThread, NULL, 0, NULL );
+		_beginthreadex( nullptr, 0x10000, HeartbeatThread, nullptr, 0, nullptr );
 	}
 
 	AUTO_LOCK( s_lock );

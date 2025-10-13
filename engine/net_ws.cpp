@@ -1571,7 +1571,8 @@ void NET_ProcessPending( void )
 		bf_read		header( headerBuf, sizeof(headerBuf) );
 
 		int cmd = header.ReadByte();
-		unsigned long challengeNr = header.ReadLong();
+		// dimhotepus: unsigned long -> uint32
+		uint32 challengeNr = header.ReadLong();
 		bool bOK = false;	
 
 		if ( cmd == STREAM_CMD_ACKN )
@@ -1812,7 +1813,7 @@ int NET_SendTo( bool verbose, SOCKET s, const char FAR * buf, int len, const str
 	
 	// If it's 0.0.0.0:0, then it's a fake player + sv_stressbots and we've plumbed everything all 
 	// the way through here, where we finally bail out.
-	sockaddr_in *pInternetAddr = (sockaddr_in*)to;
+	const sockaddr_in *pInternetAddr = (const sockaddr_in*)to;
 #ifdef _WIN32
 	if ( pInternetAddr->sin_addr.S_un.S_addr == 0
 #else
@@ -2171,7 +2172,7 @@ int NET_SendPacket ( INetChannel *chan, intp sock,  const netadr_t &to, const un
 	struct sockaddr	addr;
 	socket_handle	net_socket;
 
-	if ( net_showudp.GetInt() && (*(unsigned int*)data == CONNECTIONLESS_HEADER) )
+	if ( net_showudp.GetInt() && (*(const unsigned int*)data == CONNECTIONLESS_HEADER) )
 	{
 		Assert( !bUseCompression );
 		Msg("UDP -> %s: sz=%i OOB '%c'\n", to.ToString(), length, data[4] );
@@ -2347,7 +2348,7 @@ void NET_OutOfBandPrintf(intp sock, const netadr_t &adr, PRINTF_FORMAT_STRING co
 	
 	*(unsigned int*)string = CONNECTIONLESS_HEADER;
 
-	va_start (argptr, format);
+	va_start (argptr, format); //-V2019 //-V2018
 	V_vsnprintf (string+4, sizeof( string ) - 4, format,argptr);
 	va_end (argptr);
 

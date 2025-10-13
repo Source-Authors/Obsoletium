@@ -14,21 +14,17 @@
 #ifndef MEMPOOL_H
 #define MEMPOOL_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/memalloc.h"
 #include "tier0/tslist.h"
 #include "tier0/platform.h"
-#include "tier1/utlvector.h"
-#include "tier1/utlrbtree.h"
+#include "utlvector.h"
+#include "utlrbtree.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Optimized pool memory allocator
 //-----------------------------------------------------------------------------
 
-typedef void (*MemoryPoolReportFunc_t)( PRINTF_FORMAT_STRING char const* pMsg, ... );
+using MemoryPoolReportFunc_t = void (*)(const char *, ...);
 
 // Ways a memory pool can grow when it needs to make a new blob:
 enum MemoryPoolGrowType_t

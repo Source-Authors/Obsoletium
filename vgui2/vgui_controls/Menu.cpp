@@ -130,7 +130,7 @@ void Menu::DeleteAllItems()
 //-----------------------------------------------------------------------------
 // Purpose: Add a menu item to the menu.
 //-----------------------------------------------------------------------------
-intp Menu::AddMenuItem( MenuItem *panel )
+int Menu::AddMenuItem( MenuItem *panel )
 {
 	panel->SetParent( this );
 	MEM_ALLOC_CREDIT();
@@ -189,7 +189,7 @@ void Menu::DeleteItem( int itemID )
 //			*userData - any user data associated with this menu item
 // Output:  itemID - ID of this item
 //-----------------------------------------------------------------------------
-intp Menu::AddMenuItemCharCommand(MenuItem *item, const char *command, Panel *target, const KeyValues *userData)
+int Menu::AddMenuItemCharCommand(MenuItem *item, const char *command, Panel *target, const KeyValues *userData)
 {
 	item->SetCommand(command);
 	item->AddActionSignalTarget( target );
@@ -207,7 +207,7 @@ intp Menu::AddMenuItemCharCommand(MenuItem *item, const char *command, Panel *ta
 //							ptr to the menu that opens on selecting the item
 // Output:  itemID - ID of this item
 //-----------------------------------------------------------------------------
-intp Menu::AddMenuItemKeyValuesCommand( MenuItem *item, KeyValues *message, Panel *target, const KeyValues *userData  )
+int Menu::AddMenuItemKeyValuesCommand( MenuItem *item, KeyValues *message, Panel *target, const KeyValues *userData  )
 {
 	item->SetCommand(message);
 	item->AddActionSignalTarget(target);
@@ -223,13 +223,13 @@ intp Menu::AddMenuItemKeyValuesCommand( MenuItem *item, KeyValues *message, Pane
 //			*target - Target panel of the command
 // Output:  itemID - ID of this item
 //-----------------------------------------------------------------------------
-intp Menu::AddMenuItem( const char *itemName, const char *itemText, const char *command, Panel *target, const KeyValues *userData  )
+int Menu::AddMenuItem( const char *itemName, const char *itemText, const char *command, Panel *target, const KeyValues *userData  )
 {
 	MenuItem *item = new MenuItem(this, itemName, itemText );
 	return AddMenuItemCharCommand(item, command, target, userData);
 }
 
-intp Menu::AddMenuItem( const char *itemName, const wchar_t *wszItemText, const char *command, Panel *target, const KeyValues *userData  )
+int Menu::AddMenuItem( const char *itemName, const wchar_t *wszItemText, const char *command, Panel *target, const KeyValues *userData  )
 {
 	MenuItem *item = new MenuItem(this, itemName, wszItemText );
 	return AddMenuItemCharCommand(item, command, target, userData);
@@ -243,7 +243,7 @@ intp Menu::AddMenuItem( const char *itemName, const wchar_t *wszItemText, const 
 //			*target - Target panel of the command
 // Output:  itemID - ID of this item
 //-----------------------------------------------------------------------------
-intp Menu::AddMenuItem( const char *itemText, const char *command, Panel *target, const KeyValues *userData  )
+int Menu::AddMenuItem( const char *itemText, const char *command, Panel *target, const KeyValues *userData  )
 {
 	return AddMenuItem(itemText, itemText, command, target, userData ) ;
 }
@@ -257,13 +257,13 @@ intp Menu::AddMenuItem( const char *itemText, const char *command, Panel *target
 //          *cascadeMenu - if the menu item opens a cascading menu, this is a 
 //							ptr to the menu that opens on selecting the item
 //-----------------------------------------------------------------------------
-intp Menu::AddMenuItem( const char *itemName, const char *itemText, KeyValues *message, Panel *target, const KeyValues *userData  )
+int Menu::AddMenuItem( const char *itemName, const char *itemText, KeyValues *message, Panel *target, const KeyValues *userData  )
 {
 	MenuItem *item = new MenuItem(this, itemName, itemText );
 	return AddMenuItemKeyValuesCommand(item, message, target, userData);
 }
 
-intp Menu::AddMenuItem( const char *itemName, const wchar_t *wszItemText, KeyValues *message, Panel *target, const KeyValues *userData  )
+int Menu::AddMenuItem( const char *itemName, const wchar_t *wszItemText, KeyValues *message, Panel *target, const KeyValues *userData  )
 {
 	MenuItem *item = new MenuItem(this, itemName, wszItemText );
 	return AddMenuItemKeyValuesCommand(item, message, target, userData);
@@ -278,7 +278,7 @@ intp Menu::AddMenuItem( const char *itemName, const wchar_t *wszItemText, KeyVal
 //          *cascadeMenu - if the menu item opens a cascading menu, this is a 
 //							ptr to the menu that opens on selecting the item
 //-----------------------------------------------------------------------------
-intp Menu::AddMenuItem( const char *itemText, KeyValues *message, Panel *target, const KeyValues *userData  )
+int Menu::AddMenuItem( const char *itemText, KeyValues *message, Panel *target, const KeyValues *userData  )
 {
 	return AddMenuItem(itemText, itemText, message, target, userData );
 }
@@ -292,7 +292,7 @@ intp Menu::AddMenuItem( const char *itemText, KeyValues *message, Panel *target,
 //          *cascadeMenu - if the menu item opens a cascading menu, this is a 
 //							ptr to the menu that opens on selecting the item
 //-----------------------------------------------------------------------------
-intp Menu::AddMenuItem( const char *itemText, Panel *target , const KeyValues *userData )
+int Menu::AddMenuItem( const char *itemText, Panel *target , const KeyValues *userData )
 {
 	return AddMenuItem(itemText, itemText, target, userData );
 }
@@ -523,8 +523,8 @@ void Menu::SetContentAlignment( Label::Alignment alignment )
 		m_Alignment = alignment;
 
 		// Change the alignment of existing menu items
-		intp nCount = m_MenuItems.Count();
-		for ( intp i = 0; i < nCount; ++i )
+		int nCount = m_MenuItems.Count();
+		for ( int i = 0; i < nCount; ++i )
 		{
 			m_MenuItems[i]->SetContentAlignment( alignment );
 		}
@@ -556,7 +556,7 @@ int  Menu::GetMenuItemHeight() const
 	return m_iMenuItemHeight;
 }
 
-int Menu::CountVisibleItems()
+intp Menu::CountVisibleItems()
 {
 	intp count = 0;
 	intp c = m_SortedItems.Count();
@@ -756,7 +756,7 @@ void Menu::PerformLayout()
 
 	bool bNeedScrollbar = fullHeightWouldRequire >= workTall; 
 
-	int maxVisibleItems = CountVisibleItems();
+	intp maxVisibleItems = CountVisibleItems();
 
 	if ( m_iNumVisibleLines > 0 && 
 		 maxVisibleItems > m_iNumVisibleLines )
@@ -2568,7 +2568,7 @@ void Menu::AddSeparator()
 	m_SeparatorPanels.AddToTail( new MenuSeparator( this, "MenuSeparator" ) );
 }
 
-void Menu::AddSeparatorAfterItem( intp itemID )
+void Menu::AddSeparatorAfterItem( int itemID )
 {
 	Assert( m_MenuItems.IsValidIndex( itemID ) );
 	m_Separators.AddToTail( itemID );

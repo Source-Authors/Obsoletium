@@ -354,9 +354,22 @@ void		UTIL_BloodDecalTrace( trace_t *pTrace, int bloodColor );
 void		UTIL_DecalTrace( trace_t *pTrace, char const *decalName );
 bool		UTIL_IsSpaceEmpty( CBaseEntity *pMainEnt, const Vector &vMin, const Vector &vMax );
 
-void		UTIL_StringToVector( float *pVector, const char *pString );
-void		UTIL_StringToIntArray( int *pVector, int count, const char *pString );
-void		UTIL_StringToFloatArray( float *pVector, int count, const char *pString );
+// dimhotepus: Unsafe, use overload below.
+// void		UTIL_StringToVector( float *pVector, const char *pString );
+void		UTIL_StringToVector( Vector &vector, const char *pString );
+void		UTIL_StringToVector( QAngle &angles, const char *pString );
+void		UTIL_StringToIntArray( int *pVector, intp count, const char *pString );
+template<intp count>
+void		UTIL_StringToIntArray( int (&pVector)[count], const char *pString )
+{
+	UTIL_StringToIntArray( pVector, count, pString );
+}
+void		UTIL_StringToFloatArray( float *pVector, intp count, const char *pString );
+template<intp count>
+void		UTIL_StringToFloatArray( float (&pVector)[count], const char *pString )
+{
+	UTIL_StringToFloatArray( pVector, count, pString );
+}
 void		UTIL_StringToColor32( color32 *color, const char *pString );
 
 CBasePlayer *UTIL_PlayerByIndex( int entindex );

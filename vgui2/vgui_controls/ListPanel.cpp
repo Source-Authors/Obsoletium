@@ -242,7 +242,7 @@ static bool s_bSortAscendingSecondary = true;
 //-----------------------------------------------------------------------------
 // Purpose: Basic sort function, for use in qsort
 //-----------------------------------------------------------------------------
-static bool __cdecl AscendingSortFunc(const int itemID1, const int itemID2)
+static bool __cdecl AscendingSortFunc(const intp itemID1, const intp itemID2)
 {
 	// convert the item index into the ListPanelItem pointers
 	vgui::ListPanelItem *p1 = s_pCurrentSortingListPanel->GetItemData(itemID1);
@@ -726,12 +726,12 @@ void ListPanel::SetColumnHeaderTooltip(int column, const char *tooltipText)
 	tooltip->SetTooltipDelay(0);
 }
 
-int ListPanel::GetNumColumnHeaders() const
+intp ListPanel::GetNumColumnHeaders() const
 {
 	return m_CurrentColumns.Count();
 }
 
-bool ListPanel::GetColumnHeaderText( int index, char *pOut, int maxLen )
+bool ListPanel::GetColumnHeaderText( intp index, OUT_Z_CAP(maxLen) char *pOut, int maxLen )
 {
 	if ( index < m_CurrentColumns.Count() )
 	{
@@ -844,7 +844,7 @@ int ListPanel::FindColumn(const char *columnName)
 //			data->GetName() is used to uniquely identify an item
 //			data sub items are matched against column header name to be used in the table
 //-----------------------------------------------------------------------------
-int ListPanel::AddItem( const KeyValues *item, uintp userData, bool bScrollToItem, bool bSortOnAdd)
+intp ListPanel::AddItem( const KeyValues *item, uintp userData, bool bScrollToItem, bool bSortOnAdd)
 {
 	FastSortListPanelItem *newitem = new FastSortListPanelItem;
 	newitem->kv = item->MakeCopy();
@@ -880,7 +880,7 @@ int ListPanel::AddItem( const KeyValues *item, uintp userData, bool bScrollToIte
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void ListPanel::SetUserData( int itemID, uintp userData )
+void ListPanel::SetUserData( intp itemID, uintp userData )
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return;
@@ -891,7 +891,7 @@ void ListPanel::SetUserData( int itemID, uintp userData )
 //-----------------------------------------------------------------------------
 // Purpose: Finds the first itemID with a matching userData
 //-----------------------------------------------------------------------------
-int ListPanel::GetItemIDFromUserData( uintp userData )
+intp ListPanel::GetItemIDFromUserData( uintp userData )
 {
 	FOR_EACH_LL( m_DataItems, itemID )
 	{
@@ -905,7 +905,7 @@ int ListPanel::GetItemIDFromUserData( uintp userData )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	ListPanel::GetItemCount( void )
+intp ListPanel::GetItemCount( void )
 {
 	return m_VisibleItems.Count();
 }
@@ -913,7 +913,7 @@ int	ListPanel::GetItemCount( void )
 //-----------------------------------------------------------------------------
 // Purpose: gets the item ID of an item by name (data->GetName())
 //-----------------------------------------------------------------------------
-int ListPanel::GetItem(const char *itemName)
+intp ListPanel::GetItem(const char *itemName)
 {
 	FOR_EACH_LL( m_DataItems, i )
 	{
@@ -930,7 +930,7 @@ int ListPanel::GetItem(const char *itemName)
 //-----------------------------------------------------------------------------
 // Purpose: returns pointer to data the itemID holds
 //-----------------------------------------------------------------------------
-KeyValues *ListPanel::GetItem(int itemID)
+KeyValues *ListPanel::GetItem(intp itemID)
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return NULL;
@@ -941,7 +941,7 @@ KeyValues *ListPanel::GetItem(int itemID)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int ListPanel::GetItemCurrentRow(int itemID)
+intp ListPanel::GetItemCurrentRow(intp itemID)
 {
 	return m_VisibleItems.Find(itemID);
 }
@@ -950,7 +950,7 @@ int ListPanel::GetItemCurrentRow(int itemID)
 //-----------------------------------------------------------------------------
 // Attaches drag data to a particular item 
 //-----------------------------------------------------------------------------
-void ListPanel::SetItemDragData( int itemID, const KeyValues *data )
+void ListPanel::SetItemDragData( intp itemID, const KeyValues *data )
 {
 	ListPanelItem *pItem = m_DataItems[ itemID ];
 	if ( pItem->m_pDragData )
@@ -966,13 +966,13 @@ void ListPanel::SetItemDragData( int itemID, const KeyValues *data )
 //-----------------------------------------------------------------------------
 void ListPanel::OnCreateDragData( KeyValues *msg )
 {
-	int nCount = GetSelectedItemsCount();
+	intp nCount = GetSelectedItemsCount();
 	if ( nCount == 0 )
 		return;
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		int nItemID = GetSelectedItem( i );
+		intp nItemID = GetSelectedItem( i );
 
 		KeyValues *pDragData = m_DataItems[ nItemID ]->m_pDragData;
 		if ( pDragData )
@@ -983,7 +983,7 @@ void ListPanel::OnCreateDragData( KeyValues *msg )
 	}
 
 	// Add the keys of the last item directly into the root also
-	int nLastItemID = GetSelectedItem( nCount - 1 );
+	intp nLastItemID = GetSelectedItem( nCount - 1 );
 	KeyValues *pLastItemDrag = m_DataItems[ nLastItemID ]->m_pDragData;
 	if ( pLastItemDrag )
 	{
@@ -995,7 +995,7 @@ void ListPanel::OnCreateDragData( KeyValues *msg )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int ListPanel::GetItemIDFromRow(int currentRow)
+intp ListPanel::GetItemIDFromRow(intp currentRow)
 {
 	if (!m_VisibleItems.IsValidIndex(currentRow))
 		return -1;
@@ -1004,13 +1004,13 @@ int ListPanel::GetItemIDFromRow(int currentRow)
 }
 
 
-int ListPanel::FirstItem() const
+intp ListPanel::FirstItem() const
 {
 	return m_DataItems.Head();
 }
 
 
-int ListPanel::NextItem( int iItem ) const
+intp ListPanel::NextItem( intp iItem ) const
 {
 	return m_DataItems.Next( iItem );
 }
@@ -1019,7 +1019,7 @@ int ListPanel::NextItem( int iItem ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int ListPanel::InvalidItemID() const
+intp ListPanel::InvalidItemID() const
 {
 	return m_DataItems.InvalidIndex();
 }
@@ -1027,7 +1027,7 @@ int ListPanel::InvalidItemID() const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool ListPanel::IsValidItemID(int itemID)
+bool ListPanel::IsValidItemID(intp itemID)
 {
 	return m_DataItems.IsValidIndex(itemID);
 }
@@ -1035,7 +1035,7 @@ bool ListPanel::IsValidItemID(int itemID)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-ListPanelItem *ListPanel::GetItemData( int itemID )
+ListPanelItem *ListPanel::GetItemData( intp itemID )
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return NULL;
@@ -1046,7 +1046,7 @@ ListPanelItem *ListPanel::GetItemData( int itemID )
 //-----------------------------------------------------------------------------
 // Purpose: returns user data for itemID
 //-----------------------------------------------------------------------------
-uintp ListPanel::GetItemUserData(int itemID)
+uintp ListPanel::GetItemUserData(intp itemID)
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return 0;
@@ -1059,7 +1059,7 @@ uintp ListPanel::GetItemUserData(int itemID)
 // Purpose: updates the view with any changes to the data
 // Input  : itemID - index to update
 //-----------------------------------------------------------------------------
-void ListPanel::ApplyItemChanges(int itemID)
+void ListPanel::ApplyItemChanges(intp itemID)
 {
 	// reindex the item and then redraw
 	IndexItem(itemID);
@@ -1069,7 +1069,7 @@ void ListPanel::ApplyItemChanges(int itemID)
 //-----------------------------------------------------------------------------
 // Purpose: Adds the item into the column indexes
 //-----------------------------------------------------------------------------
-void ListPanel::IndexItem(int itemID)
+void ListPanel::IndexItem(intp itemID)
 {
 	FastSortListPanelItem *newitem = (FastSortListPanelItem*) m_DataItems[itemID];
 
@@ -1157,29 +1157,14 @@ void ListPanel::CleanupItem( FastSortListPanelItem *data )
 //-----------------------------------------------------------------------------
 // Purpose: Removes an item at the specified item
 //-----------------------------------------------------------------------------
-void ListPanel::RemoveItem(int itemID)
+void ListPanel::RemoveItem(intp itemID)
 {
-#ifdef _X360
-	bool renavigate = false;
-	if(HasFocus())
-	{
-		for(int i = 0; i < GetSelectedItemsCount(); ++i)
-		{
-			if(itemID == GetSelectedItem(i))
-			{
-				renavigate = true;
-				break;
-			}
-		}
-	}
-#endif
-
 	FastSortListPanelItem *data = (FastSortListPanelItem*) m_DataItems[itemID];
 	if (!data)
 		return;
 
 	// remove from column sorted indexes
-	int i;
+	intp i;
 	for ( i = 0; i < m_ColumnsHistory.Count(); i++ )
 	{
 		if ( m_ColumnsHistory[i] == m_ColumnsData.InvalidIndex())
@@ -1200,13 +1185,6 @@ void ListPanel::RemoveItem(int itemID)
 	m_DataItems.Remove(itemID);
 	CleanupItem( data );
 	InvalidateLayout();
-
-#ifdef _X360
-	if(renavigate)
-	{
-		NavigateTo();
-	}
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1215,7 +1193,7 @@ void ListPanel::RemoveItem(int itemID)
 void ListPanel::RemoveAll()
 {
 	// remove all sort indexes
-	for (int i = 0; i < m_ColumnsHistory.Count(); i++)
+	for (intp i = 0; i < m_ColumnsHistory.Count(); i++)
 	{
 		m_ColumnsData[m_ColumnsHistory[i]].m_SortedTree.RemoveAll();
 	}
@@ -1264,7 +1242,7 @@ void ListPanel::ResetScrollBar()
 //-----------------------------------------------------------------------------
 // Purpose: returns the count of selected rows
 //-----------------------------------------------------------------------------
-int ListPanel::GetSelectedItemsCount()
+intp ListPanel::GetSelectedItemsCount()
 {
 	return m_SelectedItems.Count();
 }
@@ -1274,7 +1252,7 @@ int ListPanel::GetSelectedItemsCount()
 // Input  : selectionIndex - valid in range [0, GetNumSelectedRows)
 // Output : int - itemID
 //-----------------------------------------------------------------------------
-int ListPanel::GetSelectedItem(int selectionIndex)
+intp ListPanel::GetSelectedItem(intp selectionIndex)
 {
 	if ( m_SelectedItems.IsValidIndex(selectionIndex))
 		return m_SelectedItems[selectionIndex];
@@ -1285,7 +1263,7 @@ int ListPanel::GetSelectedItem(int selectionIndex)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int ListPanel::GetSelectedColumn()
+intp ListPanel::GetSelectedColumn()
 {
 	return m_iSelectedColumn;
 }
@@ -1296,7 +1274,7 @@ int ListPanel::GetSelectedColumn()
 //-----------------------------------------------------------------------------
 void ListPanel::ClearSelectedItems()
 {
-	int nPrevCount = m_SelectedItems.Count();
+	intp nPrevCount = m_SelectedItems.Count();
 	m_SelectedItems.RemoveAll();
 	if ( nPrevCount > 0 )
 	{
@@ -1308,7 +1286,7 @@ void ListPanel::ClearSelectedItems()
 
 
 //-----------------------------------------------------------------------------
-bool ListPanel::IsItemSelected( int itemID )
+bool ListPanel::IsItemSelected( intp itemID )
 {
 	return m_DataItems.IsValidIndex( itemID ) && m_SelectedItems.HasElement( itemID );
 }
@@ -1317,7 +1295,7 @@ bool ListPanel::IsItemSelected( int itemID )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void ListPanel::AddSelectedItem( int itemID )
+void ListPanel::AddSelectedItem( intp itemID )
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return;
@@ -1334,7 +1312,7 @@ void ListPanel::AddSelectedItem( int itemID )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void ListPanel::SetSingleSelectedItem( int itemID )
+void ListPanel::SetSingleSelectedItem( intp itemID )
 {
 	ClearSelectedItems();
 	AddSelectedItem(itemID);
@@ -1344,7 +1322,7 @@ void ListPanel::SetSingleSelectedItem( int itemID )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void ListPanel::SetSelectedCell(int itemID, int col)
+void ListPanel::SetSelectedCell(intp itemID, intp col)
 {
 	if ( !m_bCanSelectIndividualCells )
 	{
@@ -1367,7 +1345,7 @@ void ListPanel::SetSelectedCell(int itemID, int col)
 //-----------------------------------------------------------------------------
 // Purpose: returns the data held by a specific cell
 //-----------------------------------------------------------------------------
-void ListPanel::GetCellText(int itemID, int col, OUT_Z_BYTECAP(bufferSizeInBytes) wchar_t *wbuffer, int bufferSizeInBytes)
+void ListPanel::GetCellText(intp itemID, intp col, OUT_Z_BYTECAP(bufferSizeInBytes) wchar_t *wbuffer, int bufferSizeInBytes)
 {
 	if ( !wbuffer || !bufferSizeInBytes )
 		return;
@@ -1418,7 +1396,7 @@ void ListPanel::GetCellText(int itemID, int col, OUT_Z_BYTECAP(bufferSizeInBytes
 //-----------------------------------------------------------------------------
 // Purpose: returns the data held by a specific cell
 //-----------------------------------------------------------------------------
-IImage *ListPanel::GetCellImage(int itemID, int col) //, ImagePanel *&buffer)
+IImage *ListPanel::GetCellImage(intp itemID, intp col) //, ImagePanel *&buffer)
 {
 //	if ( !buffer )
 //		return;
@@ -1460,7 +1438,7 @@ IImage *ListPanel::GetCellImage(int itemID, int col) //, ImagePanel *&buffer)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the panel to use to render a cell
 //-----------------------------------------------------------------------------
-Panel *ListPanel::GetCellRenderer(int itemID, int col)
+Panel *ListPanel::GetCellRenderer(intp itemID, intp col)
 {
 	Assert( m_pTextImage );
 	Assert( m_pImagePanel );
@@ -1652,7 +1630,7 @@ void ListPanel::PerformLayout()
 	
 	// location of the last column resizer
 	int oldSizeX = 0, oldSizeY = 0;
-	int lastColumnIndex = nColumns-1;
+	intp lastColumnIndex = nColumns-1;
 	for (intp i = nColumns-1; i >= 0; --i)
 	{
 		if (!m_ColumnsData[m_CurrentColumns[i]].m_bHidden)
@@ -1855,7 +1833,7 @@ void ListPanel::PerformLayout()
 		m_iTableStartY = m_iHeaderHeight + 1;
 
 		intp nTotalRows = m_VisibleItems.Count();
-		int nRowsPerPage = GetRowsPerPage();
+		intp nRowsPerPage = static_cast<intp>(GetRowsPerPage());
 
 		// find the first visible item to display
 		int nStartItem = 0;
@@ -1872,7 +1850,7 @@ void ListPanel::PerformLayout()
 			if (!m_VisibleItems.IsValidIndex(i))
 				continue;
 
-			int itemID = m_VisibleItems[i];
+			intp itemID = m_VisibleItems[i];
 			
 			// iterate the columns
 			for (intp j = 0; j < m_CurrentColumns.Count(); j++)
@@ -1935,7 +1913,7 @@ void ListPanel::Paint()
 	m_iTableStartY = m_iHeaderHeight + 1;
 
 	intp nTotalRows = m_VisibleItems.Count();
-	int nRowsPerPage = GetRowsPerPage();
+	intp nRowsPerPage = static_cast<intp>(GetRowsPerPage());
 
 	// find the first visible item to display
 	int nStartItem = 0;
@@ -1960,7 +1938,7 @@ void ListPanel::Paint()
 		if (!m_VisibleItems.IsValidIndex(i))
 			continue;
 
-		int itemID = m_VisibleItems[i];
+		intp itemID = m_VisibleItems[i];
 		
 		// iterate the columns
 		for (intp j = 0; j < m_CurrentColumns.Count(); j++)
@@ -2053,7 +2031,7 @@ void ListPanel::PaintBackground()
 //-----------------------------------------------------------------------------
 // Handles multiselect 
 //-----------------------------------------------------------------------------
-void ListPanel::HandleMultiSelection( int itemID, int row, int column )
+void ListPanel::HandleMultiSelection( intp itemID, int row, int column )
 {
 	// deal with 'multiple' row selection
 
@@ -2082,7 +2060,7 @@ void ListPanel::HandleMultiSelection( int itemID, int row, int column )
 	for (intp i = startRow; i <= endRow; i++)
 	{
 		// get the item indexes for these rows
-		int selectedItemID = m_VisibleItems[i];
+		intp selectedItemID = m_VisibleItems[i];
 		if ( !m_SelectedItems.HasElement(selectedItemID) )
 		{
 			AddSelectedItem( selectedItemID );
@@ -2094,7 +2072,7 @@ void ListPanel::HandleMultiSelection( int itemID, int row, int column )
 //-----------------------------------------------------------------------------
 // Handles multiselect 
 //-----------------------------------------------------------------------------
-void ListPanel::HandleAddSelection( int itemID, int row, int column )
+void ListPanel::HandleAddSelection( intp itemID, int row, int column )
 {
 	// dealing with row selection
 	if ( m_SelectedItems.HasElement( itemID ) )
@@ -2124,7 +2102,7 @@ void ListPanel::UpdateSelection( MouseCode code, int x, int y, int row, int colu
 		return;
 	}
 
-	int itemID = m_VisibleItems[ row ];
+	intp itemID = m_VisibleItems[ row ];
 
 	// if we've right-clicked on a selection, don't change the selection
 	if ( code == MOUSE_RIGHT && m_SelectedItems.HasElement( itemID ) )
@@ -2275,14 +2253,14 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 
 	// calculate info for adjusting scrolling
 	int nStartItem = GetStartItem();
-	int nRowsPerPage = (int)GetRowsPerPage();
+	intp nRowsPerPage = (intp)GetRowsPerPage();
 
 	intp nSelectedRow = 0;
 	if ( m_DataItems.IsValidIndex( m_LastItemSelected ) )
 	{
 		nSelectedRow = m_VisibleItems.Find( m_LastItemSelected );
 	}
- 	int nSelectedColumn = m_iSelectedColumn;
+ 	intp nSelectedColumn = m_iSelectedColumn;
 
 	switch (code)
 	{
@@ -2387,7 +2365,7 @@ void ListPanel::OnKeyCodePressed(KeyCode code)
 	// make sure newly selected item is a valid range
 	nSelectedRow = clamp(nSelectedRow, (intp)0, nTotalRows - 1);
 
-	int row = m_VisibleItems[ nSelectedRow ];
+	intp row = m_VisibleItems[ nSelectedRow ];
 
 	// This will select the cell if in single select mode, or the row in multiselect mode
 	if ( ( row != m_LastItemSelected ) || ( nSelectedColumn != m_iSelectedColumn ) || ( m_SelectedItems.Count() > 1 ) )
@@ -2584,8 +2562,8 @@ void ListPanel::SortList( void )
 
 	// check if the last selected item is on the screen - if so, we should try to maintain it on screen 
 	int startItem = GetStartItem();
-	int rowsperpage = (int) GetRowsPerPage();
-	int screenPosition = -1;
+	intp rowsperpage = (intp) GetRowsPerPage();
+	intp screenPosition = -1;
 	if ( m_LastItemSelected != -1 && m_SelectedItems.Count() > 0 )
 	{
 		intp selectedItemRow = m_VisibleItems.Find(m_LastItemSelected);
@@ -2787,7 +2765,7 @@ void ListPanel::OnSetSortColumn(int column)
 //-----------------------------------------------------------------------------
 // Purpose: sets whether the item is visible or not
 //-----------------------------------------------------------------------------
-void ListPanel::SetItemVisible(int itemID, bool state)
+void ListPanel::SetItemVisible(intp itemID, bool state)
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return;
@@ -2824,7 +2802,7 @@ void ListPanel::SetItemVisible(int itemID, bool state)
 //-----------------------------------------------------------------------------
 // Is the item visible?
 //-----------------------------------------------------------------------------
-bool ListPanel::IsItemVisible( int itemID )
+bool ListPanel::IsItemVisible( intp itemID )
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return false;
@@ -2837,7 +2815,7 @@ bool ListPanel::IsItemVisible( int itemID )
 //-----------------------------------------------------------------------------
 // Purpose: sets whether the item is disabled or not (effects item color)
 //-----------------------------------------------------------------------------
-void ListPanel::SetItemDisabled(int itemID, bool state)
+void ListPanel::SetItemDisabled(intp itemID, bool state)
 {
 	if ( !m_DataItems.IsValidIndex(itemID) )
 		return;
@@ -2860,7 +2838,7 @@ float ListPanel::GetRowsPerPage()
 int ListPanel::GetStartItem()
 {
 	// if rowsperpage < total number of rows
-	if ( GetRowsPerPage() < (float) m_VisibleItems.Count() )
+	if ( (intp)GetRowsPerPage() < m_VisibleItems.Count() )
 	{
 		return m_vbar->GetValue();
 	}
@@ -2956,13 +2934,13 @@ void ListPanel::ResizeColumnToContents(int column)
 	col.m_pHeader->GetContentSize( minRequiredWidth, tall );
 
 	// iterate every item
-	for (int i = 0; i < m_VisibleItems.Count(); i++)
+	for (intp i = 0; i < m_VisibleItems.Count(); i++)
 	{
 		if (!m_VisibleItems.IsValidIndex(i))
 			continue;
 
 		// get the cell
-		int itemID = m_VisibleItems[i];
+		intp itemID = m_VisibleItems[i];
 
 		// get the text
 		wchar_t tempText[ 256 ];

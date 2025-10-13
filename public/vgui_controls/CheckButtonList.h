@@ -34,17 +34,17 @@ public:
 	void RemoveAll();
 
 	// number of items in list that are checked
-	int GetCheckedItemCount();
+	intp GetCheckedItemCount() const;
 
 	// item iteration
-	bool IsItemIDValid(int itemID);
-	int GetHighestItemID();
-	int GetItemCount();
+	bool IsItemIDValid(intp itemID) const;
+	intp GetHighestItemID() const;
+	intp GetItemCount() const;
 
 	// item info
-	KeyValues *GetItemData(int itemID);
-	bool IsItemChecked(int itemID);
-	void SetItemCheckable(int itemID, bool state);
+	KeyValues *GetItemData(intp itemID);
+	bool IsItemChecked(intp itemID);
+	void SetItemCheckable(intp itemID, bool state);
 
 	/* MESSAGES SENT
 		"CheckButtonChecked" - sent when one of the check buttons state has changed

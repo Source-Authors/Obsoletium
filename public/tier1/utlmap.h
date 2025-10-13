@@ -9,10 +9,6 @@
 #ifndef UTLMAP_H
 #define UTLMAP_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/dbg.h"
 #include "utlrbtree.h"
 
@@ -48,13 +44,13 @@ template <typename K, typename T, typename I = unsigned short>
 class CUtlMap : public base_utlmap_t
 {
 public:
-	typedef K KeyType_t;
-	typedef T ElemType_t;
-	typedef I IndexType_t;
+	using KeyType_t = K;
+	using ElemType_t = T;
+	using IndexType_t = I;
 
 	// Less func typedef
 	// Returns true if the first parameter is "less" than the second
-	typedef bool (*LessFunc_t)( const KeyType_t &, const KeyType_t & );
+	using LessFunc_t = bool (*)(const KeyType_t &, const KeyType_t &);
 	
 	// constructor, destructor
 	// Left at growSize = 0, the memory will first allocate 1 element and double in size
@@ -91,7 +87,7 @@ public:
 	bool  IsValidIndex( IndexType_t i ) const				{ return m_Tree.IsValidIndex( i ); }
 	
 	// Checks if the map as a whole is valid
-	bool  IsValid() const									{ return m_Tree.IsValid(); }
+	[[nodiscard]] bool  IsValid() const									{ return m_Tree.IsValid(); }
 	
 	// Invalid index
 	static constexpr IndexType_t InvalidIndex()				{ return CTree::InvalidIndex(); }
@@ -207,7 +203,7 @@ public:
 		LessFunc_t m_LessFunc;
 	};
 
-	typedef CUtlRBTree<Node_t, I, CKeyLess> CTree;
+	using CTree = CUtlRBTree<Node_t, I, CKeyLess>;
 
 	CTree *AccessTree()	{ return &m_Tree; }
 

@@ -6,12 +6,9 @@
 
 #ifndef COMPRESSED_LIGHT_CUBE_H
 #define COMPRESSED_LIGHT_CUBE_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-
-#include "mathlib/mathlib.h"
+#include "datamap.h"
+#include "mathlib.h"
 
 
 struct CompressedLightCube

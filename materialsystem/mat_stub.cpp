@@ -1734,7 +1734,7 @@ public:
 	{
 	}
 
-	virtual int GetNumActiveDeformations() const
+	virtual intp GetNumActiveDeformations() const
 	{
 		return 0;
 	}
@@ -2335,6 +2335,17 @@ public:
 	virtual bool HasShaderAPI() const override
 	{
 		return true;
+	}
+	
+	// dimhotepus: TF2 backport.
+	void FogRadial( bool bRadial ) override
+	{
+	}
+	
+	// dimhotepus: TF2 backport.
+	bool GetFogRadial() override
+	{
+		return false;
 	}
 };
 

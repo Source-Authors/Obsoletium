@@ -147,11 +147,18 @@ C_SteamJet::C_SteamJet()
 	m_Rate = 26;
 	m_JetLength = 80;
 	m_bEmit = true;
+	m_nType = STEAM_NORMAL;
 	m_bFaceLeft = false;
+
+	m_spawnflags = 0;
+	m_flRollSpeed = 0.0f;
+
 	m_ParticleEffect.SetAlwaysSimulate( false ); // Don't simulate outside the PVS or frustum.
 
-	m_vLastRampUpdatePos.Init( 1e24, 1e24, 1e24 );
-	m_vLastRampUpdateAngles.Init( 1e24, 1e24, 1e24 );
+	m_vLastRampUpdatePos.Init( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
+	m_vLastRampUpdateAngles.Init( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
+
+	m_Lifetime = 0.0f;
 }
 
 
@@ -406,8 +413,8 @@ void C_SteamJet::RenderParticles( CParticleRenderIterator *pIterator )
 		vRampColor[0] = MIN( 1.0f, vRampColor[0] );
 		vRampColor[1] = MIN( 1.0f, vRampColor[1] );
 		vRampColor[2] = MIN( 1.0f, vRampColor[2] );
-
-		float sinLifetime = sin(pParticle->m_Lifetime * 3.14159f / pParticle->m_DieTime);
+		// dimhotepus: Use M_PI_F.
+		float sinLifetime = sinf(pParticle->m_Lifetime * M_PI_F / pParticle->m_DieTime);
 
 		if ( m_nType == STEAM_HEATWAVE )
 		{

@@ -153,8 +153,8 @@ CBaseTool *CToolManager::GetActiveTool()
 //-----------------------------------------------------------------------------
 CBaseTool *CToolManager::GetToolForID(ToolID_t eToolID)
 {
-	int nToolCount = GetToolCount();
-	for (int i = 0; i < nToolCount; i++)
+	intp nToolCount = GetToolCount();
+	for (intp i = 0; i < nToolCount; i++)
 	{
 		CBaseTool *pTool = GetTool(i);
 		if (pTool->GetToolID() == eToolID)
@@ -203,7 +203,7 @@ void CToolManager::PushTool(ToolID_t eToolID)
 //-----------------------------------------------------------------------------
 void CToolManager::PopTool()
 {
-	int nCount = m_ToolIDStack.Count();
+	intp nCount = m_ToolIDStack.Count();
 	if (nCount > 0)
 	{
 		ToolID_t eNewTool = m_ToolIDStack.Element(0);
@@ -284,7 +284,7 @@ ChunkFileResult_t CToolManager::LoadCallback(CChunkFile *pFile, CBaseTool *pTool
 
 void CToolManager::AddToolHandlers( CChunkHandlerMap *pHandlersMap )
 {
-	for (int i=0;i<m_Tools.Count(); i++)
+	for (intp i=0;i<m_Tools.Count(); i++)
 	{
 		if ( m_Tools[i]->GetVMFChunkName() != NULL  )
 		{

@@ -4065,7 +4065,7 @@ void CChoreoEvent::SaveToBuffer( CUtlBuffer& buf, [[maybe_unused]] CChoreoScene 
 
 	intp numRelativeTags = GetNumRelativeTags();
 	Assert( numRelativeTags <= 255 );
-	buf.PutUnsignedChar( numRelativeTags );
+	buf.PutUnsignedChar( static_cast<unsigned char>(numRelativeTags) );
 
 	for ( intp t = 0; t < numRelativeTags; t++ )
 	{
@@ -4321,7 +4321,7 @@ void CChoreoEvent::SaveFlexAnimationsToBuffer( CUtlBuffer& buf, IChoreoStringPoo
 {
 	intp numFlexAnimationTracks = GetNumFlexAnimationTracks();
 	Assert( numFlexAnimationTracks <= 255 );
-	buf.PutUnsignedChar( numFlexAnimationTracks );
+	buf.PutUnsignedChar( static_cast<unsigned char>(numFlexAnimationTracks) );
 
 	for ( intp i = 0; i < numFlexAnimationTracks; i++ )
 	{

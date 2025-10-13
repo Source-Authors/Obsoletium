@@ -6,10 +6,8 @@
 
 #ifndef CONVAR_SERVERBOUNDED_H
 #define CONVAR_SERVERBOUNDED_H
-#ifdef _WIN32
-#pragma once
-#endif
 
+#include "convar.h"
 
 // This class is used to virtualize a ConVar's value, so the client can restrict its 
 // value while connected to a server. When using this across modules, it's important
@@ -36,14 +34,14 @@ public:
 		: ConVar( pName, pDefaultValue, flags, pHelpString, bMin, fMin, bMax, fMax ) {}
 
 	// You must implement GetFloat.
-	virtual float GetFloat() const = 0;
+	[[nodiscard]] virtual float GetFloat() const = 0;
 	
 	// You can optionally implement these.
-	virtual int  GetInt() const		{ return (int)GetFloat(); }
-	virtual bool GetBool() const	{  return ( GetInt() != 0 ); }
+	[[nodiscard]] virtual int  GetInt() const		{ return (int)GetFloat(); }
+	[[nodiscard]] virtual bool GetBool() const	{  return ( GetInt() != 0 ); }
 
 	// Use this to get the underlying cvar's value.
-	float GetBaseFloatValue() const
+	[[nodiscard]] float GetBaseFloatValue() const
 	{
 		return ConVar::GetFloat();
 	}

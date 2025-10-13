@@ -8,14 +8,12 @@
 
 #define MATSYS_INTERNAL
 
-#include <math.h>
 #include "cmatrendercontext.h"
 #include "tier2/renderutils.h"
 #include "cmaterialsystem.h"
 #include "occlusionquerymgr.h"
 #include "texturemanager.h"
 #include "IHardwareConfigInternal.h"
-#include "ctype.h"
 
 #include "tier1/fmtstr.h"
 #include "togl/rendermechanism.h"
@@ -45,10 +43,6 @@
 #define ForceSync() ((void)(0))
 #endif
 
-#ifdef _X360
-static bool s_bDirtyDisk = false;
-#endif
-
 
 void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001f )
 {
@@ -59,41 +53,6 @@ void ValidateMatrices( const VMatrix &m1, const VMatrix &m2, float eps = .001f )
 	{
 		AssertFloatEquals( m1.Base()[i], m2.Base()[i], eps );
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-// The dirty disk error report function (NOTE: Could be called from any thread!)
-//-----------------------------------------------------------------------------
-#ifdef _X360
-unsigned ThreadedDirtyDiskErrorDisplay( void *pParam )
-{
-	XShowDirtyDiscErrorUI( XBX_GetPrimaryUserId() );
-}
-#endif
-
-
-void SpinPresent()
-{
-	while ( true )
-	{
-		g_pShaderAPI->ClearColor3ub( 0, 0, 0 );
-		g_pShaderAPI->ClearBuffers( true, true, true, -1, -1 );
-		g_pShaderDevice->Present();
-	}
-}
-
-void ReportDirtyDisk()
-{
-}
-
-
-//-----------------------------------------------------------------------------
-// Install dirty disk error reporting function (call after SetMode)
-//-----------------------------------------------------------------------------
-void SetupDirtyDiskReportFunc()
-{
-	g_pFullFileSystem->InstallDirtyDiskReportFunc( ReportDirtyDisk );
 }
 
 
@@ -171,12 +130,6 @@ InitReturnVal_t CMatRenderContextBase::Init( )
 		nSize = nCommitSize = 1024;
 #endif
 
-		const char *gamedir = CommandLine()->ParmValue("-game", CommandLine()->ParmValue( "-defaultgamedir", "hl2" ) );
-		if ( gamedir && !Q_stricmp( "garrysmod", gamedir ) )
-		{
-			nSize = 4400 * 1024;
-		}
-
 		// dimhotepus: Check initialization succeeded.
 		if ( !sm_RenderData[0].Init( nSize, nCommitSize, 0, 32 ) )
 		{
@@ -228,21 +181,6 @@ void CMatRenderContextBase::MarkRenderDataUnused( bool bFrameBegin )
 		sm_nRenderLockCount = 0;
 	}
 
-
-	// JAY: DO NOT MERGE FROM TF2 - L4D HAS CHANGED THE UNDERLYING INTERFACE IN A WAY THAT DOESN'T REQUIRE THIS
-#if 0
-	// Switch stacks
-	if ( bFrameBegin )
-	{
-		sm_nRenderStack = 1 - sm_nRenderStack;
-	}
-
-	// Clear the new stack
-#ifdef _DEBUG
-	memset( sm_RenderData[sm_nRenderStack].GetBase(), 0xFF, RenderDataSizeUsed() );
-#endif
-	sm_RenderData[ sm_nRenderStack ].FreeAll( false );
-#else
 	// Just for TF2, don't free the stack until the end of frame.  TF2 Allocates render data and holds it over the lock
 	// period because we haven't revised the studiorender interface yet to change patterns.
 	// Switch stacks
@@ -255,9 +193,6 @@ void CMatRenderContextBase::MarkRenderDataUnused( bool bFrameBegin )
 #endif
 		sm_RenderData[ sm_nRenderStack ].FreeAll( false );
 	}
-#endif
-
-
 }
 
 intp CMatRenderContextBase::RenderDataSizeUsed() const
@@ -300,15 +235,13 @@ float	CMatRenderContextBase::Knob( char *knobname, float *setvalue )
 
 void CMatRenderContextBase::InitializeFrom( CMatRenderContextBase *pInitialState )
 {
-	int i;
-
 	m_pCurrentMaterial = pInitialState->m_pCurrentMaterial;
 	m_pCurrentProxyData = pInitialState->m_pCurrentProxyData;
 	m_lightmapPageID = pInitialState->m_lightmapPageID;
 	m_pUserDefinedLightmap = pInitialState->m_pUserDefinedLightmap;
 	m_pLocalCubemapTexture = pInitialState->m_pLocalCubemapTexture;
 
-	memcpy( m_pCurrentFrameBufferCopyTexture, pInitialState->m_pCurrentFrameBufferCopyTexture, MAX_FB_TEXTURES * sizeof(ITexture *) );
+	BitwiseCopy(pInitialState->m_pCurrentFrameBufferCopyTexture, m_pCurrentFrameBufferCopyTexture);
 
 	m_bEnableClipping = pInitialState->m_bEnableClipping;
 
@@ -320,13 +253,13 @@ void CMatRenderContextBase::InitializeFrom( CMatRenderContextBase *pInitialState
 	m_RenderTargetStack.Clear();
 	m_RenderTargetStack.EnsureCapacity( pInitialState->m_RenderTargetStack.Count() );
 
-	for ( i = 0; i < pInitialState->m_RenderTargetStack.Count(); i++ )
+	for ( auto &rt : pInitialState->m_RenderTargetStack )
 	{
-		m_RenderTargetStack.Push( pInitialState->m_RenderTargetStack[i] );
+		m_RenderTargetStack.Push( rt );
 	}
 
 	m_MatrixMode = pInitialState->m_MatrixMode;
-	for ( i = 0; i < NUM_MATRIX_MODES; i++ )
+	for ( intp i = 0; i < NUM_MATRIX_MODES; i++ )
 	{
 		m_MatrixStacks[i].CopyFrom( pInitialState->m_MatrixStacks[i] );
 	}
@@ -804,11 +737,7 @@ void CMatRenderContextBase::PushRenderTargetAndViewport( )
 void CMatRenderContextBase::PushRenderTargetAndViewport( ITexture *pTexture )
 {
 	// Just blindly push the data on the stack with flags indicating full bounds
-#if !defined( _X360 )
 	RenderTargetStackElement_t element = { {pTexture, NULL, NULL, NULL}, 0, 0, -1, -1 };
-#else
-	RenderTargetStackElement_t element = { {pTexture}, 0, 0, -1, -1 };
-#endif
 	m_RenderTargetStack.Push( element );
 	CommitRenderTargetAndViewport();
 }
@@ -834,11 +763,7 @@ void CMatRenderContextBase::PushRenderTargetAndViewport( ITexture *pTexture, int
 void CMatRenderContextBase::PushRenderTargetAndViewport( ITexture *pTexture, ITexture *pDepthTexture, int nViewX, int nViewY, int nViewW, int nViewH )
 {
 	// Just blindly push the data on the stack
-#if !defined( _X360 )
 	RenderTargetStackElement_t element = { {pTexture, NULL, NULL, NULL}, pDepthTexture, nViewX, nViewY, nViewW, nViewH };
-#else
-	RenderTargetStackElement_t element = { {pTexture}, pDepthTexture, nViewX, nViewY, nViewW, nViewH };
-#endif
 	m_RenderTargetStack.Push( element );
 	CommitRenderTargetAndViewport();
 }
@@ -1064,6 +989,7 @@ CMatRenderContext::CMatRenderContext()
 	m_flNormalizedX = 0.0F;
 	m_flNormalizedY = 0.0F;
 	m_flNormalizedSize = 0.0F;
+	m_bFogRadial = false;
 }
 
 InitReturnVal_t CMatRenderContext::Init( CMaterialSystem *pMaterialSystem )
@@ -1552,13 +1478,6 @@ void CMatRenderContext::SwapBuffers()
 	g_pMorphMgr->AdvanceFrame();
 	g_pOcclusionQueryMgr->AdvanceFrame();
 	g_pShaderDevice->Present();
-
-#ifdef _X360
-	if ( s_bDirtyDisk )
-	{
-		SpinPresent();
-	}
-#endif
 }
 
 
@@ -1909,22 +1828,6 @@ void CMatRenderContext::SetNonInteractiveTempFullscreenBuffer( ITexture *pTextur
 void CMatRenderContext::RefreshFrontBufferNonInteractive()
 {
 	g_pShaderDevice->RefreshFrontBufferNonInteractive();
-#ifdef _X360
-	if ( s_bDirtyDisk )
-	{
-		if ( m_NonInteractiveMode == MATERIAL_NON_INTERACTIVE_MODE_NONE )
-		{
-			SpinPresent();
-		}
-		else
-		{
-			while ( true )
-			{
-				g_pShaderDevice->RefreshFrontBufferNonInteractive();
-			}
-		}
-	}
-#endif
 }
 
 void CMatRenderContext::EnableNonInteractiveMode( MaterialNonInteractiveMode_t mode )
@@ -2254,84 +2157,7 @@ void CMatRenderContext::CopyRenderTargetToTextureEx( ITexture *pTexture, int nRe
 	GetMaterialSystem()->Flush( false );
 	ITextureInternal *pTextureInternal = (ITextureInternal *)pTexture;
 
-	if ( IsPC() || !IsX360() )
-	{
-		pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
-	}
-	else
-	{
-		// X360 only does 1:1 resolves. So we can do full resolves to textures of size 
-		// equal or greater than the viewport trivially. Downsizing is nasty.
-		Rect_t srcRect;
-		if ( !pSrcRect )
-		{
-			// build out source rect
-			pSrcRect = &srcRect;
-			int x, y, w, h;
-			GetViewport( x, y, w, h );
-
-			pSrcRect->x = 0;
-			pSrcRect->y = 0;
-			pSrcRect->width = w;
-			pSrcRect->height = h;
-		}
-
-		Rect_t dstRect;
-		if ( !pDstRect )
-		{
-			// build out target rect
-			pDstRect = &dstRect;
-
-			pDstRect->x = 0;
-			pDstRect->y = 0;
-			pDstRect->width = pTexture->GetActualWidth();
-			pDstRect->height = pTexture->GetActualHeight();
-		}
-
-		if ( pSrcRect->width == pDstRect->width && pSrcRect->height == pDstRect->height )
-		{
-			// 1:1 mapping, no stretching needed, use direct path
-			pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
-			return;
-		}
-
-		if( (pDstRect->x == 0) && (pDstRect->y == 0) && 
-			(pDstRect->width == pTexture->GetActualWidth()) && (pDstRect->height == pTexture->GetActualHeight()) &&
-			(pDstRect->width >= pSrcRect->width) && (pDstRect->height >= pSrcRect->height) )
-		{
-			// Resolve takes up the whole texture, and the texture is large enough to hold the resolve.
-			// This is turned into a 1:1 resolve within shaderapi by making D3D think the texture is smaller from now on. (Until it resolves from a bigger source)
-			pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
-			return;
-		}
-
-		// currently assuming disparate copies are only for FB blits
-		// ensure active render target is actually the back buffer
-		Assert( m_RenderTargetStack.Top().m_pRenderTargets[0] == NULL );
-
-		// nasty sequence:
-		// resolve FB surface to matching clone DDR texture
-		// gpu draw from clone DDR FB texture to disparate RT target surface
-		// resolve to its matching DDR clone texture
-		ITextureInternal *pFullFrameFB = (ITextureInternal*)GetMaterialSystem()->FindTexture( "_rt_FullFrameFB", TEXTURE_GROUP_RENDER_TARGET );
-		pFullFrameFB->CopyFrameBufferToMe( nRenderTargetID, NULL, NULL );
-
-		// target texture must be a render target
-		PushRenderTargetAndViewport( pTexture );
-
-		// blit FB source to render target
-		DrawScreenSpaceRectangle(
-			GetMaterialSystem()->GetRenderTargetBlitMaterial(),
-			pDstRect->x, pDstRect->y, pDstRect->width, pDstRect->height,
-			pSrcRect->x, pSrcRect->y, pSrcRect->x+pSrcRect->width-1, pSrcRect->y+pSrcRect->height-1, 
-			pFullFrameFB->GetActualWidth(), pFullFrameFB->GetActualHeight() );
-
-		// resolve render target to texture
-		((ITextureInternal *)pTexture)->CopyFrameBufferToMe( 0, NULL, NULL );
-
-		// restore render target and viewport
-		PopRenderTargetAndViewport();
-	}
+	pTextureInternal->CopyFrameBufferToMe( nRenderTargetID, pSrcRect, pDstRect );
 }
 
 void CMatRenderContext::CopyRenderTargetToTexture( ITexture *pTexture )
@@ -2351,14 +2177,7 @@ void CMatRenderContext::CopyTextureToRenderTargetEx( int nRenderTargetID, ITextu
 	GetMaterialSystem()->Flush( false );
 	ITextureInternal *pTextureInternal = (ITextureInternal *)pTexture;
 
-	if ( IsPC() || !IsX360() )
-	{
-		pTextureInternal->CopyMeToFrameBuffer( nRenderTargetID, pSrcRect, pDstRect );
-	}
-	else
-	{
-		Assert( 0 );
-	}
+	pTextureInternal->CopyMeToFrameBuffer( nRenderTargetID, pSrcRect, pDstRect );
 }
 
 
@@ -3016,6 +2835,18 @@ void CMatRenderContext::AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, co
 	}
 
 	TextureManager()->AsyncCreateTextureFromRenderTarget( pSrcRt, pDstName, dstFmt, bGenMips, nAdditionalCreationFlags, pRecipient, pExtraArgs );
+}
+
+// dimhotepus: TF2 backport.
+void CMatRenderContext::FogRadial( bool bRadial )
+{
+	m_bFogRadial = bRadial;
+}
+
+// dimhotepus: TF2 backport.
+bool CMatRenderContext::GetFogRadial()
+{
+	return m_bFogRadial;
 }
 
 void CMatRenderContext::AsyncMap( ITextureInternal* pTexToMap, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs )

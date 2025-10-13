@@ -106,6 +106,7 @@ void UpdateDirtySpatialPartitionEntities()
 CDirtySpatialPartitionEntityList::CDirtySpatialPartitionEntityList( char const *name ) : CAutoGameSystem( name )
 {
 	m_DirtyEntities.Purge();
+	m_partitionWriteId = std::numeric_limits<ThreadId_t>::max();
 	m_readLockCount = 0;
 }
 

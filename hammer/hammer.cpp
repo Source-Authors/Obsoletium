@@ -44,6 +44,7 @@
 #include "tier0/dbg.h"
 #include "tier0/minidump.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
+#include "materialsystem/materialsystem_config.h"
 #include "istudiorender.h"
 #include "filesystem.h"
 #include "engine_launcher_api.h"
@@ -356,7 +357,7 @@ class CHammerCmdLine : public CCommandLineInfo
 			m_bConfigDir = false;
 		}
 
-		void ParseParam(LPCTSTR lpszParam, BOOL bFlag, BOOL bLast)
+		void ParseParam(LPCTSTR lpszParam, BOOL bFlag, BOOL bLast) override
 		{
 			if ((!m_bGame) && (bFlag && !stricmp(lpszParam, "game")))
 			{
@@ -467,9 +468,17 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 	if ( !g_pMDLCache || !g_pFileSystem || !g_pFullFileSystem || !materials || !g_pMaterialSystemHardwareConfig || !g_pStudioRender )
 		return false;
 
+#if defined ( _WIN32 )
+	// dimhotepus: Crash on crashes in timer.
+	// Ensure that we crash when we do something naughty in a callback
+	// such as a window proc. Otherwise on a 64-bit OS the crashes will be
+	// silently swallowed.
+	EnableCrashingOnCrashes();
+#endif
+
 	// ensure we're in the same directory as the .EXE
-	GetModuleFileName(NULL, m_szAppDir, MAX_PATH);
-	char *p = strrchr(m_szAppDir, '\\');
+	Plat_GetModuleFilename(m_szAppDir, MAX_PATH);
+	char *p = strrchr(m_szAppDir, CORRECT_PATH_SEPARATOR);
 	if(p)
 	{
 		// chop off \hammer.exe
@@ -478,7 +487,12 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 
 	if ( IsRunningInEngine() )
 	{
-		strcat( m_szAppDir, "\\bin" );
+#ifdef PLATFORM_64BITS
+		// dimhotepus: x86-64 support.
+		V_strcat_safe( m_szAppDir, CORRECT_PATH_SEPARATOR_S "bin" CORRECT_PATH_SEPARATOR_S "x64" );
+#else
+		V_strcat_safe( m_szAppDir, CORRECT_PATH_SEPARATOR_S "bin" );
+#endif
 	}
 	
 	// Create the message window object for capturing errors and warnings.
@@ -500,9 +514,6 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 #endif
 
 	// Load the options
-	// NOTE: Have to do this now, because we need it before Inits() are called 
-	// NOTE: SetRegistryKey will cause hammer to look into the registry for its values
-	SetRegistryKey("Valve");
 	Options.Init();
 	return true;
 }
@@ -510,20 +521,21 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 
 void CHammer::Disconnect()
 {
-	g_pStudioRender = NULL;
-	g_pFileSystem = NULL;
-	g_pEngineAPI = NULL;
-	g_pMDLCache = NULL;
+	g_Factory = nullptr;
+	g_pMDLCache = nullptr;
+	g_pEngineAPI = nullptr;
+	g_pStudioRender = nullptr;
+	g_pFileSystem = nullptr;
 	BaseClass::Disconnect();
 }
 
 void *CHammer::QueryInterface( const char *pInterfaceName )
 {
 	// We also implement the IMatSystemSurface interface
-	if (!Q_strncmp(	pInterfaceName, INTERFACEVERSION_HAMMER, Q_strlen(INTERFACEVERSION_HAMMER) + 1))
-		return (IHammer*)this;
+	if (!Q_strncmp(	pInterfaceName, INTERFACEVERSION_HAMMER, std::size(INTERFACEVERSION_HAMMER)))
+		return static_cast<IHammer*>(this);
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -535,19 +547,28 @@ bool CHammer::HammerPreTranslateMessage(MSG * pMsg)
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	// Copy this into the current message, needed for MFC
-#if _MSC_VER >= 1300
 	_AFX_THREAD_STATE* pState = AfxGetThreadState();
 	pState->m_msgCur = *pMsg;
-#else
-	m_msgCur = *pMsg;
-#endif
 
 	return (/*pMsg->message == WM_KICKIDLE ||*/ PreTranslateMessage(pMsg) != FALSE);
 }
 
+//-----------------------------------------------------------------------------
+// Return true if the message just dispatched should cause OnIdle to run.
+//
+// Return false for messages which do not usually affect the state of the user
+// interface and happen very often.
+//-----------------------------------------------------------------------------
 bool CHammer::HammerIsIdleMessage(MSG * pMsg)
 {
 	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
+	// dimhotepus: Skip WM_TIMER idle processing to allow tools to work faster. CS:GO
+	// We generate lots of WM_TIMER messages and shouldn't call OnIdle because of them.
+	// This fixes tool tips not popping up when a map is open.
+	if ( pMsg->message == WM_TIMER )
+		return false;
+
 	return IsIdleMessage(pMsg) != FALSE;
 }
 
@@ -573,46 +594,11 @@ static void EnsureTrailingBackslash(char *psz, ptrdiff_t size)
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Tweaks our data members to enable us to import old Hammer settings
-//			from the registry.
-//-----------------------------------------------------------------------------
-static const char *s_pszOldAppName = NULL;
-void CHammer::BeginImportWCSettings(void)
-{
-	s_pszOldAppName = m_pszAppName;
-	m_pszAppName = "Worldcraft";
-	SetRegistryKey("Valve");
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Tweaks our data members to enable us to import old Valve Hammer Editor
-//			settings from the registry.
-//-----------------------------------------------------------------------------
-void CHammer::BeginImportVHESettings(void)
-{
-	s_pszOldAppName = m_pszAppName;
-	m_pszAppName = "Valve Hammer Editor";
-	SetRegistryKey("Valve");
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Restores our tweaked data members to their original state.
-//-----------------------------------------------------------------------------
-void CHammer::EndImportSettings(void)
-{
-	m_pszAppName = s_pszOldAppName;
-	SetRegistryKey("Valve");
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Retrieves various important directories.
 // Input  : dir - Enumerated directory to retrieve.
 //			p - Pointer to buffer that receives the full path to the directory.
 //-----------------------------------------------------------------------------
-void CHammer::GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, ptrdiff_t size) const
+void CHammer::GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, intp size) const
 {
 	// dimhotepus: Always zero-terminate
 	if (size > 0)
@@ -673,14 +659,14 @@ void CHammer::GetDirectory(DirIndex_t dir, OUT_Z_CAP(size) char *p, ptrdiff_t si
 		{
 			V_strncpy(p, g_pGameConfig->m_szModDir, size);
 			EnsureTrailingBackslash(p, size);
-			V_strcat(p, "materials\\", MAX_PATH);
+			V_strcat(p, "materials\\", size);
 			break;
 		}
 
 		case DIR_AUTOSAVE:
 		{			
             V_strncpy( p, m_szAutosaveDir, size );
-			EnsureTrailingBackslash(p, size);			
+			EnsureTrailingBackslash(p, size);
 			break;
 		}
 	}
@@ -771,6 +757,7 @@ void CHammer::OpenURL(UINT nID, HWND hwnd)
 {
 	CString str;
 	const BOOL rc{str.LoadString(nID)};
+	VERIFY(rc);
 	// dimhotepus: Open URL only if found.
 	if (rc)
 	{
@@ -914,6 +901,17 @@ void UpdatePrefabs_Shutdown()
 //-----------------------------------------------------------------------------
 BOOL CHammer::InitInstance()
 {
+	// dimhotepus: Use Hammer.ini instead of registry to not clash with original Hammer.
+	char szProgram[MAX_PATH], szIniPath[MAX_PATH];
+	APP()->GetDirectory(DIR_PROGRAM, szProgram);
+	V_MakeAbsolutePath( szIniPath, "Hammer.ini", szProgram );
+
+	// dimhotepus: m_pszProfileName allocated and freed internally by MFC so can't use our allocator for it.
+#include "tier0/memdbgoff.h"
+	free((void *)m_pszProfileName);
+	m_pszProfileName = strdup(szIniPath);
+#include "tier0/memdbgon.h"
+
 	return TRUE;
 }
 
@@ -1105,14 +1103,6 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	// other init:
 	randomize();
 
-	/*
-#ifdef _AFXDLL
-	Enable3dControls();			// Call this when using MFC in a shared DLL
-#else
-	Enable3dControlsStatic();	// Call this when linking to MFC statically
-#endif
-	*/
-
 	LoadStdProfileSettings();  // Load standard INI file options (including MRU)
 
 	// Register the application's document templates.  Document templates
@@ -1173,6 +1163,13 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	g_pGameConfig->ParseGameInfo();
 
 	materials->ModInit();
+	// dimhotepus: Set MATSYS_VIDCFG_FLAGS_USING_MULTIPLE_WINDOWS to use D3DSWAPEFFECT_COPY instead of D3DSWAPEFFECT_FLIPEX
+	// dimhotepus: We can't use D3DSWAPEFFECT_FLIPEX because Hammer mix DirectX and GDI :(.
+	const auto &config = materials->GetCurrentConfigForVideoCard();
+	auto configCopy = config;
+	// dimhotepus: Hammer uses screen splitting and multiple windows, so use special mode for it.
+	configCopy.SetFlag(MATSYS_VIDCFG_FLAGS_USING_MULTIPLE_WINDOWS, 1);
+	materials->OverrideConfig(configCopy, false);
 
 	//
 	// Initialize the texture manager and load all textures.
@@ -1198,7 +1195,7 @@ InitReturnVal_t CHammer::HammerInternalInit()
 	LoadFileSystemDialogModule();
 
 	// Load detail object descriptions.
-	char	szGameDir[_MAX_PATH];
+	char	szGameDir[MAX_PATH];
 	APP()->GetDirectory(DIR_MOD, szGameDir);
 	DetailObjects::LoadEmitDetailObjectDictionary( szGameDir );
 	
@@ -1224,13 +1221,16 @@ InitReturnVal_t CHammer::HammerInternalInit()
 		}
 	}
 
+	// dimhotepus: Hide splash before we can start to load broken save.
+	CSplashWnd::HideSplashScreen();
+
 	if ( Options.general.bClosedCorrectly == FALSE )
 	{
 		CString strLastGoodSave = APP()->GetProfileString("General", "Last Good Save", "");
 		if ( strLastGoodSave.GetLength() != 0 )
 		{
 			char msg[1024];
-			V_sprintf_safe( msg, "Hammer did not shut down correctly the last time it was used.\n\nWould you like to load the last saved file?\n(%s)", strLastGoodSave.GetString() );
+			V_sprintf_safe( msg, "Hammer did not shut down correctly the last time it was used.\n\nWould you like to load the last saved file:\n\n%s?", strLastGoodSave.GetString() );
 			if ( AfxMessageBox( msg, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 			{
 				LoadLastGoodSave();
@@ -1241,8 +1241,6 @@ InitReturnVal_t CHammer::HammerInternalInit()
 #ifdef VPROF_HAMMER
 	g_VProfCurrentProfile.Start();
 #endif
-	
-	CSplashWnd::HideSplashScreen();
 
 	// create the lighting preview thread
 	g_LPreviewThread = CreateSimpleThread( LightingPreviewThreadFN, 0 );
@@ -1284,9 +1282,16 @@ int CHammer::InternalMainLoop()
 	{
 		RunFrame();
 
+		// Do idle processing at most once per frame, incrementing the counter until we get an
+		// idle message. The counter is used as a general indication of how idle the application is,
+		// so critical idle processing is done for lower values of lIdleCount, and less important
+		// stuff is done as lIdleCount increases.
+		//
+		// When there's no more idle work to do, OnIdle returns false and we stop doing idle
+		// processing until another idle message is processed by the message loop.
 		if ( bIdle && !HammerOnIdle(lIdleCount++) )
 		{
-			bIdle = false;
+			bIdle = false; // done with idle work for now
 		}
 
 		//

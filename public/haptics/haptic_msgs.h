@@ -19,7 +19,9 @@ void RegisterHapticMessages(void);
 // Client
 //-----------------------------------------------------------------------------
 #ifdef CLIENT_DLL
-	void HookHapticMessages(void);
+	void HookHapticMessages();
+	// dimhotepus: Cleanup support.
+	void UnhookHapticMessages();
 
 	void __MsgFunc_SPHapWeapEvent( bf_read &HapticMsg );
 	void __MsgFunc_HapDmg( bf_read &HapticMsg );

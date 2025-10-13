@@ -7,15 +7,14 @@
 
 #ifndef UTLQUEUE_H
 #define UTLQUEUE_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "utlmemory.h"
 
 //#define TEST_UTLQUEUE
 
-enum QueueIter_t : intp { QUEUE_ITERATOR_INVALID = std::numeric_limits<intp>::max() };
+// dimhotepus: Do not use enum as assingning invalid values is UB.
+using QueueIter_t = intp;
+constexpr inline QueueIter_t QUEUE_ITERATOR_INVALID = std::numeric_limits<intp>::max();
 
 // T is the type stored in the queue
 template< class T, class M = CUtlMemory< T > > 
@@ -41,23 +40,26 @@ public:
 
 	// Add a new item to the end of the queue
 	void	Insert( T const &element );
+	
+	// Add a new item to the end of the queue
+	void	Insert( T &&element );
 
 	// checks if an element of this value already exists on the stack, returns true if it does
 	bool		Check( T const element ) const;
 
 	// iterators may be invalidated by Insert()
-	QueueIter_t First() const;
-	QueueIter_t Next( QueueIter_t it ) const;
-	QueueIter_t Last() const;
-	QueueIter_t Previous( QueueIter_t it ) const;
-	bool IsValid( QueueIter_t it ) const;
+	[[nodiscard]] QueueIter_t First() const;
+	[[nodiscard]] QueueIter_t Next( QueueIter_t it ) const;
+	[[nodiscard]] QueueIter_t Last() const;
+	[[nodiscard]] QueueIter_t Previous( QueueIter_t it ) const;
+	[[nodiscard]] bool IsValid( QueueIter_t it ) const;
 	T const& Element( QueueIter_t it ) const;
 
 	// Returns the count of elements in the queue
-	intp			Count() const;
+	[[nodiscard]] intp		Count() const;
 
 	// Return whether the queue is empty or not, faster than Count().
-	bool		IsEmpty() const;
+	[[nodiscard]] bool		IsEmpty() const;
 
 	// doesn't deallocate memory
 	void		RemoveAll();
@@ -66,8 +68,8 @@ public:
 	void		Purge();
 
 protected:
-	QueueIter_t Next_Unchecked( QueueIter_t it ) const;
-	QueueIter_t Previous_Unchecked( QueueIter_t it ) const;
+	[[nodiscard]] QueueIter_t Next_Unchecked( QueueIter_t it ) const;
+	[[nodiscard]] QueueIter_t Previous_Unchecked( QueueIter_t it ) const;
 
 	M					m_memory;
 
@@ -87,7 +89,7 @@ protected:
 template< class T, size_t MAX_SIZE >
 class CUtlQueueFixed : public CUtlQueue< T, CUtlMemoryFixed<T, MAX_SIZE > >
 {
-	typedef CUtlQueue< T, CUtlMemoryFixed<T, MAX_SIZE > > BaseClass;
+	using BaseClass = CUtlQueue<T, CUtlMemoryFixed<T, MAX_SIZE>>;
 public:
 
 	// constructor, destructor
@@ -127,7 +129,7 @@ inline bool CUtlQueue<T, M>::RemoveAtHead( T &removedElement )
 
 	QueueIter_t it = m_head;
 	removedElement = m_memory[ it ];
-	Destruct( &m_memory[ it ] );
+	Destruct( std::addressof( m_memory[ it ] ) );
 	if ( m_head == m_tail )
 	{
 		m_head = m_tail = QUEUE_ITERATOR_INVALID;
@@ -158,7 +160,7 @@ inline bool CUtlQueue<T, M>::RemoveAtTail( T &removedElement )
 	}
 
 	removedElement = m_memory[ m_tail ];
-	Destruct( &m_memory[ m_tail ] );
+	Destruct( std::addressof( m_memory[ m_tail ] ) );
 	if ( m_head == m_tail )
 	{
 		m_head = m_tail = QUEUE_ITERATOR_INVALID;
@@ -231,7 +233,45 @@ void CUtlQueue<T, M>::Insert( T const &element )
 		m_tail = nextTail;
 	}
 
-	CopyConstruct( &m_memory[ m_tail ], element );
+	CopyConstruct( std::addressof( m_memory[ m_tail ] ), element );
+}
+
+template <class T, class M>
+void CUtlQueue<T, M>::Insert( T&& element )
+{
+	if ( m_tail == QUEUE_ITERATOR_INVALID )
+	{
+		// empty
+		m_memory.EnsureCapacity( 1 );
+		m_head = m_tail = QueueIter_t( 0 );
+	}
+	else
+	{
+		// non-empty
+		QueueIter_t nextTail = Next_Unchecked( m_tail );
+		if ( nextTail == m_head ) // if non-empty, and growing by 1 appears to make the queue of length 1, then we were already full before the Insert
+		{
+			intp nOldAllocCount = m_memory.NumAllocated();
+			m_memory.Grow();
+			intp nNewAllocCount = m_memory.NumAllocated();
+			intp nGrowAmount = nNewAllocCount - nOldAllocCount;
+
+			nextTail = Next_Unchecked( m_tail ); // if nextTail was 0, then it now should be nOldAllocCount
+
+			if ( m_head != QueueIter_t( 0 ) )
+			{
+				// if the queue wraps around the end of m_memory, move the part at the end of memory to the new end of memory
+				Q_memmove( &m_memory[ m_head + nGrowAmount ], &m_memory[ m_head ], ( nOldAllocCount - m_head ) * sizeof( T ) );
+#ifdef _DEBUG
+				Q_memset( &m_memory[ m_head ], 0xdd, nGrowAmount * sizeof( T ) );
+#endif
+				m_head = QueueIter_t( m_head + nGrowAmount );
+			}
+		}
+		m_tail = nextTail;
+	}
+
+	MoveConstruct( std::addressof( m_memory[ m_tail ] ), std::move( element ) );
 }
 
 template <class T, class M>

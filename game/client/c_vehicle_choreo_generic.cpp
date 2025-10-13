@@ -126,6 +126,9 @@ C_PropVehicleChoreoGeneric::C_PropVehicleChoreoGeneric( void )
 	m_ViewSmoothingData.flPitchCurveLinear = PITCH_CURVE_LINEAR;
 	m_ViewSmoothingData.flRollCurveZero = ROLL_CURVE_ZERO;
 	m_ViewSmoothingData.flRollCurveLinear = ROLL_CURVE_LINEAR;
+
+	m_bEnterAnimOn = false;
+	m_bExitAnimOn = false;
 	m_flFOV = 0;
 }
 

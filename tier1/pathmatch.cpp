@@ -230,20 +230,6 @@ inline __attribute__ ((always_inline)) static uint32_t utf8codepoint(const char 
 	return UNICODE_BOGUS_CHAR_VALUE;
 }
 
-typedef struct CaseFoldMapping
-{
-	uint32_t from;
-	uint32_t to0;
-	uint32_t to1;
-	uint32_t to2;
-} CaseFoldMapping;
-
-typedef struct CaseFoldHashBucket
-{
-	const uint8_t count;
-	const CaseFoldMapping *list;
-} CaseFoldHashBucket;
-
 #include "pathmatch_casefolding.h"
 
 inline __attribute__ ((always_inline)) static void locate_case_fold_mapping(const uint32_t from, uint32_t *to)

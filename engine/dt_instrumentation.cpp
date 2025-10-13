@@ -201,7 +201,7 @@ void DTI_HookRecvDecoder( CRecvDecoder *pDecoder )
 		}
 		else
 		{
-			char *parentArrayPropName = const_cast< char * >(const_cast< SendProp * >(pSendProp)->GetParentArrayPropName());
+			const char *parentArrayPropName = const_cast< SendProp * >(pSendProp)->GetParentArrayPropName();
 			if ( parentArrayPropName )
 			{
 				char temp[256];

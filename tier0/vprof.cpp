@@ -64,7 +64,7 @@ CVProfNode *CVProfNode::GetSubNode( const tchar *pszName, int detailLevel, const
 	}
 
 	// We didn't find it, so add it
-	CVProfNode * node = new CVProfNode( pszName, detailLevel, this, pBudgetGroupName, budgetFlags );
+	auto * node = new CVProfNode( pszName, detailLevel, this, pBudgetGroupName, budgetFlags );
 	node->m_pSibling = m_pChild;
 	m_pChild = node;
 	return node;
@@ -382,7 +382,7 @@ void CVProfile::SumTimes( CVProfNode *pNode, int budgetGroupID )
 	}
 		
 	if ( bSetStartNode )
-		g_pStartNode = NULL;
+		g_pStartNode = nullptr;
 }
 
 //-------------------------------------
@@ -391,7 +391,7 @@ CVProfNode *CVProfile::FindNode( CVProfNode *pStartNode, const tchar *pszNode )
 {
 	if ( _tcscmp( pStartNode->GetName(), pszNode ) != 0 )
 	{
-		CVProfNode *pFoundNode = NULL;
+		CVProfNode *pFoundNode = nullptr;
 		if ( pStartNode->GetSibling() )
 		{
 			pFoundNode = FindNode( pStartNode->GetSibling(), pszNode );
@@ -411,14 +411,14 @@ void CVProfile::SumTimes( const tchar *pszStartNode, int budgetGroupID )
 {
 	if ( GetRoot()->GetChild() )
 	{
-		if ( pszStartNode == NULL )
+		if ( pszStartNode == nullptr )
 			g_pStartNode = GetRoot();
 		else
-			g_pStartNode = NULL;
+			g_pStartNode = nullptr;
 
 		g_pszSumNode = pszStartNode;
 		SumTimes( GetRoot(), budgetGroupID );
-		g_pStartNode = NULL;
+		g_pStartNode = nullptr;
 	}
 
 }
@@ -476,7 +476,7 @@ void CVProfile::DumpNodes( CVProfNode *pNode, int indent, bool bAverageAndCountO
 
 	if ( !fIsRoot )
 	{
-		map<CVProfNode *, double>::iterator iterTimeLessChildren = g_TimesLessChildren.find( pNode );
+		auto iterTimeLessChildren = g_TimesLessChildren.find( pNode );
 		
 		indent = Max( indent, 0 );
 		indent = Min( indent, (int)ssize( s_indentText ) - 1 );
@@ -550,7 +550,7 @@ static void DumpSorted( CVProfile::StreamOut_t outputStream, const tchar *pszHea
 
 void CVProfile::SetOutputStream( StreamOut_t outputStream )
 {
-	if ( outputStream != NULL )
+	if ( outputStream != nullptr )
 		m_pOutputStream = outputStream;
 	else
 		m_pOutputStream = Msg;
@@ -580,7 +580,7 @@ void CVProfile::OutputReport( int type, const tchar *pszStartNode, int budgetGro
 			m_pOutputStream( _T("\n") );
 		}
 
-		if ( pszStartNode == NULL )
+		if ( pszStartNode == nullptr )
 		{
 			pszStartNode = GetRoot()->GetName();
 		}
@@ -591,8 +591,8 @@ void CVProfile::OutputReport( int type, const tchar *pszStartNode, int budgetGro
 		if ( type & VPRT_HIERARCHY )
 		{
 			m_pOutputStream( _T("-- Hierarchical Call Graph --\n"));
-			if ( pszStartNode == NULL )
-				g_pStartNode = NULL;
+			if ( pszStartNode == nullptr )
+				g_pStartNode = nullptr;
 			else
 				g_pStartNode = FindNode( GetRoot(), pszStartNode );
 
@@ -603,8 +603,8 @@ void CVProfile::OutputReport( int type, const tchar *pszStartNode, int budgetGro
 		if ( type & VPRT_HIERARCHY_TIME_PER_FRAME_AND_COUNT_ONLY )
 		{
 			m_pOutputStream( _T("-- Hierarchical Call Graph --\n"));
-			if ( pszStartNode == NULL )
-				g_pStartNode = NULL;
+			if ( pszStartNode == nullptr )
+				g_pStartNode = nullptr;
 			else
 				g_pStartNode = FindNode( GetRoot(), pszStartNode );
 
@@ -669,7 +669,7 @@ CVProfile::CVProfile()
 	m_enabled( 0 ),
 	m_fAtRoot( true ),
 	m_pCurNode( nullptr ),
-	m_Root( _T("Root"), 0, NULL, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, 0 ),
+	m_Root( _T("Root"), 0, nullptr, VPROF_BUDGETGROUP_OTHER_UNACCOUNTED, 0 ),
  	m_nFrames( 0 ),
  	m_ProfileDetailLevel( 0 ),
  	m_pausedEnabledDepth( 0 ),
@@ -753,7 +753,7 @@ void CVProfile::FreeNodes_R( CVProfNode *pNode )
 	
 	if ( pNode == GetRoot() )
 	{
-		pNode->m_pChild = NULL;
+		pNode->m_pChild = nullptr;
 	}
 	else
 	{
@@ -830,14 +830,14 @@ int CVProfile::FindBudgetGroupName( const tchar *pBudgetGroupName )
 int CVProfile::AddBudgetGroupName( const tchar *pBudgetGroupName, int budgetFlags )
 {
 	MEM_ALLOC_CREDIT();
-	tchar *pNewString = new tchar[ _tcslen( pBudgetGroupName ) + 1 ];
+	auto *pNewString = new tchar[ _tcslen( pBudgetGroupName ) + 1 ];
 	_tcscpy( pNewString, pBudgetGroupName );
 	if( m_nBudgetGroupNames + 1 > m_nBudgetGroupNamesAllocated )
 	{
 		m_nBudgetGroupNamesAllocated *= 2;
 		m_nBudgetGroupNamesAllocated = max( m_nBudgetGroupNames + 6, m_nBudgetGroupNamesAllocated );
 		
-		CBudgetGroup *pNew = new CBudgetGroup[ m_nBudgetGroupNamesAllocated ];
+		auto *pNew = new CBudgetGroup[ m_nBudgetGroupNamesAllocated ];
 		for ( int i=0; i < m_nBudgetGroupNames; i++ )
 			pNew[i] = m_pBudgetGroups[i];
 		
@@ -875,12 +875,12 @@ int CVProfile::BudgetGroupNameToBudgetGroupID( const tchar *pBudgetGroupName )
 	return BudgetGroupNameToBudgetGroupID( pBudgetGroupName, BUDGETFLAG_OTHER );
 }
 
-int CVProfile::GetNumBudgetGroups( void )
+int CVProfile::GetNumBudgetGroups( )
 {
 	return m_nBudgetGroupNames;
 }
 
-void CVProfile::RegisterNumBudgetGroupsChangedCallBack( void (*pCallBack)(void) )
+void CVProfile::RegisterNumBudgetGroupsChangedCallBack( void (*pCallBack)() )
 {
 	m_pNumBudgetGroupsChangedCallBack = pCallBack;
 }
@@ -916,7 +916,7 @@ uintp *CVProfile::FindOrCreateCounter( const tchar *pName, CounterGroup_t eCount
 
 	// NOTE: These get freed in ~CVProfile.
 	MEM_ALLOC_CREDIT();
-	tchar *pNewName = new tchar[_tcslen( pName ) + 1];
+	auto *pNewName = new tchar[_tcslen( pName ) + 1];
 	_tcscpy( pNewName, pName );
 	m_Counters[m_NumCounters] = 0;
 	m_CounterGroups[m_NumCounters] = static_cast<char>(to_underlying(eCounterGroup));

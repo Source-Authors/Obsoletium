@@ -5,6 +5,8 @@
 // $NoKeywords: $
 //===========================================================================//
 
+#include "GameUI_Interface.h"
+
 #ifdef WIN32
 #if !defined( _X360 )
 #include "winlite.h"
@@ -24,11 +26,13 @@
 #ifdef SendMessage
 #undef SendMessage
 #endif
-																
+
+#ifdef MessageBox
+#undef MessageBox
+#endif
+
 #include "filesystem.h"
-#include "GameUI_Interface.h"
 #include "Sys_Utils.h"
-#include "string.h"
 #include "tier0/icommandline.h"
 
 // interface to engine
@@ -134,6 +138,8 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CGameUI, IGameUI, GAMEUI_INTERFACE_VERSION, g_
 CGameUI::CGameUI()
 {
 	g_pGameUI = this;
+	m_GameFactory = nullptr;
+	m_bPlayGameStartupSound = false;
 	m_bTryingToLoadFriends = false;
 	m_iFriendsLoadPauseFrames = 0;
 	m_iGameIP = 0;
@@ -141,7 +147,7 @@ CGameUI::CGameUI()
 	m_iGameQueryPort = 0;
 	m_bActivatedUI = false;
 	m_szPreviousStatusText[0] = 0;
-	m_bIsConsoleUI = false;
+	m_szPlatformDir[0] = 0;
 	m_bHasSavedThisMenuSession = false;
 	m_bOpenProgressOnStart = false;
 }
@@ -172,9 +178,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 #ifndef NO_STEAM
 	steamapicontext->Init();
 #endif
-
-	ConVarRef var( "gameui_xbox" );
-	m_bIsConsoleUI = var.IsValid() && var.GetBool();
 
 	vgui::VGui_InitInterfacesList( "gameui", &factory, 1 );
 	vgui::VGui_InitMatSysInterfacesList( "gameui", &factory, 1 );
@@ -263,17 +266,7 @@ void CGameUI::BonusMapUnlock( const char *pchFileName, const char *pchMapName )
 			CBasePanel *pBasePanel = BasePanel();
 			if ( pBasePanel )
 			{
-				if ( GameUI().IsConsoleUI() )
-				{
-					if ( Q_stricmp( pchFileName, "scripts/advanced_chambers" ) == 0 )
-					{
-						pBasePanel->SetMenuItemBlinkingState( "OpenNewGameDialog", true );
-					}
-				}
-				else
-				{
-					pBasePanel->SetMenuItemBlinkingState( "OpenBonusMapsDialog", true );
-				}
+				pBasePanel->SetMenuItemBlinkingState( "OpenBonusMapsDialog", true );
 			}
 
 			BonusMapsDatabase()->SetBlink( true );
@@ -404,7 +397,7 @@ void CGameUI::PlayGameStartupSound()
 	if ( CommandLine()->FindParm( "-nostartupsound" ) )
 		return;
 
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 
 	CUtlVector<char *> fileNames;
 	char path[ 512 ];
@@ -1145,7 +1138,7 @@ bool CGameUI::IsInReplay()
 //-----------------------------------------------------------------------------
 bool CGameUI::IsConsoleUI()
 {
-	return m_bIsConsoleUI;
+	return false;
 }
 
 //-----------------------------------------------------------------------------

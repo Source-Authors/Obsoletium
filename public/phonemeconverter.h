@@ -12,7 +12,8 @@
 #endif
 
 const char *ConvertPhoneme( int code );
-int TextToPhoneme( const char *text );
+// dimhotepus: int -> unsigned short.
+unsigned short TextToPhoneme( const char *text );
 float WeightForPhonemeCode( int code );
 float WeightForPhoneme( char *text );
 

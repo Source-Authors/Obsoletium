@@ -276,6 +276,8 @@ IMPLEMENT_SERVERCLASS_ST_NOBASE( CBaseEntity, DT_BaseEntity )
 	SendPropInt		(SENDINFO(m_clrRender),	32, SPROP_UNSIGNED),
 	SendPropInt		(SENDINFO(m_iTeamNum),		TEAMNUM_NUM_BITS, 0),
 	SendPropInt		(SENDINFO(m_CollisionGroup), 5, SPROP_UNSIGNED),
+	// dimhotepus: Breaking change. Send gravity to fix prediction errors.
+	SendPropFloat	(SENDINFO(m_flGravity)),
 	SendPropFloat	(SENDINFO(m_flElasticity), 0, SPROP_COORD),
 	SendPropFloat	(SENDINFO(m_flShadowCastDistance), 12, SPROP_UNSIGNED ),
 	SendPropEHandle (SENDINFO(m_hOwnerEntity)),
@@ -3044,6 +3046,7 @@ static FORCEINLINE bool NamesMatchGood( const char *pszQuery, string_t nameToMat
 	return false;
 }
 
+#ifdef _DEBUG
 static bool NamesMatchBad( const char *pszQuery, string_t nameToMatch )
 {
 	if ( nameToMatch == NULL_STRING )
@@ -3079,6 +3082,7 @@ static bool NamesMatchBad( const char *pszQuery, string_t nameToMatch )
 
 	return false;
 }
+#endif
 
 static FORCEINLINE bool NamesMatch( const char *pszQuery, string_t nameToMatch )
 {
@@ -5204,7 +5208,8 @@ void CC_Ent_SetName( const CCommand& args )
 {
 	CBaseEntity *pEntity = NULL;
 
-	if ( args.ArgC() < 1 )
+	// dimhotepus: Should be at least 1 argument.
+	if ( args.ArgC() < 2 )
 	{
 		CBasePlayer *pPlayer = ToBasePlayer( UTIL_GetCommandClient() );
 		if (!pPlayer)
@@ -5225,13 +5230,21 @@ void CC_Ent_SetName( const CCommand& args )
 			CBaseEntity *ent = NULL;
 			while ( (ent = gEntList.NextEnt(ent)) != NULL )
 			{
-				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[1], STRING(ent->GetEntityName())))	|| 
-					  (ent->m_iClassname != NULL_STRING	&& FStrEq(args[1], STRING(ent->m_iClassname))) ||
-					  (ent->GetClassname()!=NULL && FStrEq(args[1], ent->GetClassname())))
+				// dimhotepus: Honor second arg for entity name
+				if (  (ent->GetEntityName() != NULL_STRING	&& FStrEq(args[2], STRING(ent->GetEntityName())))	|| 
+					  (ent->m_iClassname != NULL_STRING	&& FStrEq(args[2], STRING(ent->m_iClassname))) ||
+					  (ent->GetClassname()!=NULL && FStrEq(args[2], ent->GetClassname())))
 				{
 					pEntity = ent;
 					break;
 				}
+			}
+
+			if ( !pEntity )
+			{
+				// dimhotepus: Notify if we don't set the name.
+				Warning( "No such entity with name %s found to set new name for.\n", args[2] );
+				return;
 			}
 		}
 

@@ -108,14 +108,11 @@ void InitViewerSettings ( const char *subkey )
 
 bool RegReadVector( HKEY hKey, const char *szSubKey, Vector& value )
 {
-	LONG lResult;           // Registry function result code
 	char szBuff[128];       // Temp. buffer
 	DWORD dwType;           // Type of key
-	DWORD dwSize;           // Size of element data
+	DWORD dwSize = sizeof( szBuff );
 
-	dwSize = sizeof( szBuff );
-
-	lResult = RegQueryValueEx(
+	LONG lResult = RegQueryValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
@@ -146,14 +143,12 @@ bool RegReadQAngle( HKEY hKey, const char *szSubKey, QAngle& value )
 
 bool RegReadColor( HKEY hKey, const char *szSubKey, float value[4] )
 {
-	LONG lResult;           // Registry function result code
 	char szBuff[128];       // Temp. buffer
 	DWORD dwType;           // Type of key
-	DWORD dwSize;           // Size of element data
 
-	dwSize = sizeof( szBuff );
+	DWORD dwSize = sizeof( szBuff );
 
-	lResult = RegQueryValueEx(
+	LONG lResult = RegQueryValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
@@ -173,14 +168,12 @@ bool RegReadColor( HKEY hKey, const char *szSubKey, float value[4] )
 
 bool RegWriteVector( HKEY hKey, const char *szSubKey, Vector& value )
 {
-	LONG lResult;           // Registry function result code
 	char szBuff[128];       // Temp. buffer
-	DWORD dwSize;           // Size of element data
 
 	V_sprintf_safe( szBuff, "(%f %f %f)", value[0], value[1], value[2] );
-	dwSize = strlen( szBuff );
+	DWORD dwSize = strlen( szBuff );
 
-	lResult = RegSetValueEx(
+	LONG lResult = RegSetValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
@@ -204,14 +197,12 @@ bool RegWriteQAngle( HKEY hKey, const char *szSubKey, QAngle& value )
 
 bool RegWriteColor( HKEY hKey, const char *szSubKey, float value[4] )
 {
-	LONG lResult;           // Registry function result code
 	char szBuff[128];       // Temp. buffer
 	V_sprintf_safe( szBuff, "(%f %f %f %f)", value[0], value[1], value[2], value[3] );
 
-	sprintf( szBuff, "(%f %f %f %f)", value[0], value[1], value[2], value[3] );
-	dwSize = strlen( szBuff );
+	DWORD dwSize = strlen( szBuff );
 
-	lResult = RegSetValueEx(
+	LONG lResult = RegSetValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
@@ -227,15 +218,12 @@ bool RegWriteColor( HKEY hKey, const char *szSubKey, float value[4] )
 
 bool RegReadBool( HKEY hKey, const char *szSubKey, bool *value )
 {
-	LONG lResult;           // Registry function result code
 	DWORD dwType;           // Type of key
-	DWORD dwSize;           // Size of element data
-
 	DWORD dwTemp;
 
-	dwSize = sizeof( dwTemp );
+	DWORD dwSize = sizeof( dwTemp );
 
-	lResult = RegQueryValueEx(
+	LONG lResult = RegQueryValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
@@ -256,13 +244,10 @@ bool RegReadBool( HKEY hKey, const char *szSubKey, bool *value )
 
 bool RegReadInt( HKEY hKey, const char *szSubKey, int *value )
 {
-	LONG lResult;           // Registry function result code
 	DWORD dwType;           // Type of key
-	DWORD dwSize;           // Size of element data
+	DWORD dwSize = sizeof( DWORD );
 
-	dwSize = sizeof( DWORD );
-
-	lResult = RegQueryValueEx(
+	LONG lResult = RegQueryValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
@@ -282,12 +267,9 @@ bool RegReadInt( HKEY hKey, const char *szSubKey, int *value )
 
 bool RegWriteInt( HKEY hKey, const char *szSubKey, int value )
 {
-	LONG lResult;           // Registry function result code
-	DWORD dwSize;           // Size of element data
+	DWORD dwSize = sizeof( DWORD );
 
-	dwSize = sizeof( DWORD );
-
-	lResult = RegSetValueEx(
+	LONG lResult = RegSetValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
@@ -306,14 +288,12 @@ bool RegWriteInt( HKEY hKey, const char *szSubKey, int value )
 
 bool RegReadFloat( HKEY hKey, const char *szSubKey, float *value )
 {
-	LONG lResult;           // Registry function result code
 	char szBuff[128];       // Temp. buffer
-	DWORD dwType;           // Type of key
-	DWORD dwSize;           // Size of element data
 
-	dwSize = sizeof( szBuff );
+	DWORD dwType;
+	DWORD dwSize = sizeof( szBuff );
 
-	lResult = RegQueryValueEx(
+	LONG lResult = RegQueryValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
@@ -324,7 +304,8 @@ bool RegReadFloat( HKEY hKey, const char *szSubKey, float *value )
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 
-	*value = atof( szBuff );
+	// dimhotepus: atof -> strtof.
+	*value = strtof( szBuff, nullptr );
 
 	return true;
 }
@@ -332,14 +313,12 @@ bool RegReadFloat( HKEY hKey, const char *szSubKey, float *value )
 
 bool RegWriteFloat( HKEY hKey, const char *szSubKey, float value )
 {
-	LONG lResult;           // Registry function result code
 	char szBuff[128];       // Temp. buffer
-	DWORD dwSize;           // Size of element data
 
 	V_sprintf_safe( szBuff, "%f", value );
-	dwSize = strlen( szBuff );
+	DWORD dwSize = strlen( szBuff );
 
-	lResult = RegSetValueEx(
+	LONG lResult = RegSetValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
@@ -357,20 +336,16 @@ bool RegWriteFloat( HKEY hKey, const char *szSubKey, float value )
 
 bool RegReadString( HKEY hKey, const char *szSubKey, char *string, int size )
 {
-	LONG lResult;           // Registry function result code
 	DWORD dwType;           // Type of key
-	DWORD dwSize;           // Size of element data
+	DWORD dwSize = size;
 
-	dwSize = size;
-
-	lResult = RegQueryValueEx(
+	LONG lResult = RegQueryValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
 		&dwType,    // type buffer
 		(LPBYTE)string,    // data buffer
 		&dwSize );  // size of data buffer
-
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 
@@ -381,21 +356,17 @@ bool RegReadString( HKEY hKey, const char *szSubKey, char *string, int size )
 }
 
 
-bool RegWriteString( HKEY hKey, const char *szSubKey, char *string )
+bool RegWriteString( HKEY hKey, const char *szSubKey, const char *string )
 {
-	LONG lResult;           // Registry function result code
-	DWORD dwSize;           // Size of element data
+	DWORD dwSize = strlen( string );
 
-	dwSize = strlen( string );
-
-	lResult = RegSetValueEx(
+	LONG lResult = RegSetValueEx(
 		hKey,		// handle to key
 		szSubKey,	// value name
 		0,			// reserved
 		REG_SZ,		// type buffer
 		(LPBYTE)string,    // data buffer
 		dwSize );  // size of data buffer
-
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 
@@ -461,13 +432,10 @@ LONG RegViewerRootKey( PHKEY phKey, LPDWORD lpdwDisposition )
 
 bool LoadViewerSettingsInt( char const *keyname, int *value )
 {
-	LONG lResult;           // Registry function result code
 	DWORD dwDisposition;    // Type of key opening event
-
 	HKEY hModelKey;
 
-	lResult = RegViewerSettingsKey( "hlfaceposer", &hModelKey, &dwDisposition);
-	
+	LONG lResult = RegViewerSettingsKey( "hlfaceposer", &hModelKey, &dwDisposition);
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 
@@ -484,11 +452,10 @@ bool LoadViewerSettingsInt( char const *keyname, int *value )
 
 bool SaveViewerSettingsInt ( const char *keyname, int value )
 {
-	LONG lResult;           // Registry function result code
 	DWORD dwDisposition;    // Type of key opening event
-
 	HKEY hModelKey;
-	lResult = RegViewerSettingsKey( "hlfaceposer", &hModelKey, &dwDisposition);
+
+	LONG lResult = RegViewerSettingsKey( "hlfaceposer", &hModelKey, &dwDisposition);
 
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
@@ -499,16 +466,13 @@ bool SaveViewerSettingsInt ( const char *keyname, int value )
 
 bool LoadViewerSettings (const char *filename, StudioModel *pModel )
 {
-	LONG lResult;           // Registry function result code
 	DWORD dwDisposition;    // Type of key opening event
-
 	HKEY hModelKey;
 
 	if (filename == NULL || pModel == NULL)
 		return false;
 
-	lResult = RegViewerSettingsKey( filename, &hModelKey, &dwDisposition);
-	
+	LONG lResult = RegViewerSettingsKey( filename, &hModelKey, &dwDisposition);
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 
@@ -595,12 +559,10 @@ bool LoadViewerSettings (const char *filename, StudioModel *pModel )
 
 bool LoadViewerRootSettings( void )
 {
-	LONG lResult;           // Registry function result code
 	DWORD dwDisposition;    // Type of key opening event
-
 	HKEY hRootKey;
-	lResult = RegViewerRootKey( &hRootKey, &dwDisposition);
 
+	LONG lResult = RegViewerRootKey( &hRootKey, &dwDisposition);
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 
@@ -618,15 +580,13 @@ bool LoadViewerRootSettings( void )
 
 bool SaveViewerSettings (const char *filename, StudioModel *pModel )
 {
-	LONG lResult;           // Registry function result code
-	DWORD dwDisposition;    // Type of key opening event
-
 	if (filename == NULL || pModel == NULL)
 		return false;
 
+	DWORD dwDisposition;    // Type of key opening event
 	HKEY hModelKey;
-	lResult = RegViewerSettingsKey( filename, &hModelKey, &dwDisposition);
 
+	LONG lResult = RegViewerSettingsKey( filename, &hModelKey, &dwDisposition);
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 
@@ -678,12 +638,10 @@ bool SaveViewerSettings (const char *filename, StudioModel *pModel )
 
 bool SaveViewerRootSettings( void )
 {
-	LONG lResult;           // Registry function result code
 	DWORD dwDisposition;    // Type of key opening event
-
 	HKEY hRootKey;
-	lResult = RegViewerRootKey( &hRootKey, &dwDisposition);
 
+	LONG lResult = RegViewerRootKey( &hRootKey, &dwDisposition);
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 

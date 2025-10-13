@@ -8,7 +8,7 @@
 #include "tier1/KeyValues.h"
 
 CBasePropertiesContainer::CBasePropertiesContainer( vgui::Panel *parent, IDmNotify *pNotify, CDmeEditorTypeDictionary *pDict /*=NULL*/ )
-	: BaseClass( parent, pNotify, NULL, true, pDict )
+	: BaseClass( parent, pNotify, nullptr, true, pDict )
 {
 	SetDropEnabled( true );
 }

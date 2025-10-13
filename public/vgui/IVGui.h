@@ -22,17 +22,16 @@ class KeyValues;
 namespace vgui
 {
 
+// dimhotepus: x64 port. unsigned long -> uint32.
 // safe handle to a panel - can be converted to and from a VPANEL
-typedef unsigned long HPanel;
-typedef int HContext;
+using HPanel = uint32;
+using HContext = int;
 
-enum
+// dimhotepus: Make of HContext type.
+enum : HContext
 {
 	DEFAULT_VGUI_CONTEXT = ((vgui::HContext)~0)
 };
-
-// safe handle to a panel - can be converted to and from a VPANEL
-typedef unsigned long HPanel;
 
 //-----------------------------------------------------------------------------
 // Purpose: Interface to core vgui components

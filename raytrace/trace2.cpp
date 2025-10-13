@@ -3,6 +3,10 @@
 #include "raytrace.h"
 #include <mathlib/halton.h>
 
+// NOTE: This has to be the last file included!
+#include "tier0/memdbgon.h"
+
+
 #define IGAMMA (1.0f/2.2f)
 
 #define MAGIC_NUMBER (1<<23)

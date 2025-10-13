@@ -918,7 +918,7 @@ void CrosshairImagePanelAdvanced::UpdateCrosshair()
 void CrosshairImagePanelAdvanced::InitAdvCrosshairStyleList()
 {
 	// Find out images
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	char directory[ 512 ];
 
 	ConVarRef cl_crosshair_file( "cl_crosshair_file", true );
@@ -1344,7 +1344,7 @@ void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 void COptionsSubMultiplayer::InitLogoList( CLabeledCommandComboBox *cb )
 {
 	// Find out images
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	char directory[ 512 ];
 
 	ConVarRef cl_logofile( "cl_logofile", true );
@@ -1449,7 +1449,7 @@ void FindVMTFilesInFolder( const char *pFolder, const char *pFolderName, CLabele
 	char directory[ 512 ];
 	Q_snprintf( directory, sizeof( directory ), "%s/*.*", pFolder );
 
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 
 	const char *fn = g_pFullFileSystem->FindFirst( directory, &fh );
 	const char *modelfile = cl_modelfile.GetString();

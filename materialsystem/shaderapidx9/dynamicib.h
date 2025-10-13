@@ -23,6 +23,8 @@
 #include "tier1/utlqueue.h"
 #include "tier0/memdbgon.h"
 
+#include "windows/com_error_category.h"
+
 // Helper function to unbind an index buffer
 void Unbind( IDirect3DIndexBuffer9 *pIndexBuffer );
 
@@ -31,7 +33,7 @@ void Unbind( IDirect3DIndexBuffer9 *pIndexBuffer );
 class CIndexBuffer
 {
 public:
-	CIndexBuffer( IDirect3DDevice9 *pD3D, int count, bool bSoftwareVertexProcessing, bool dynamic = false );
+	CIndexBuffer( IDirect3DDevice9Ex *pD3D, int count, bool bSoftwareVertexProcessing, bool dynamic = false );
 
 	int AddRef() { return ++m_nReferenceCount; }
 	int Release() 
@@ -56,7 +58,7 @@ public:
 	// lock, unlock
 	unsigned short *Lock( bool bReadOnly, int numIndices, int &startIndex, int startPosition = -1 );	
 	void Unlock( int numIndices );
-	void HandleLateCreation( );
+	void HandleLateCreation( IDirect3DDevice9Ex *pD3D );
 
 	// Index position
 	int IndexPosition() const { return m_Position; }
@@ -126,14 +128,19 @@ public:
 	inline int AllocationCount() const;
 
 private:
-	void Create( IDirect3DDevice9 *pD3D );
+	void Create( IDirect3DDevice9Ex *pD3D );
 	inline void ReallyUnlock( [[maybe_unused]] int unlockBytes )
 	{
 #if DX_TO_GL_ABSTRACTION
 		// Knowing how much data was actually written is critical for performance under OpenGL.
 		m_pIB->UnlockActualSize( unlockBytes );
 #else
-		m_pIB->Unlock();
+		const HRESULT hr = m_pIB->Unlock();
+		if (FAILED(hr))
+		{
+			Warning( __FUNCTION__ ": IDirect3DIndexBuffer9::Unlock() failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 #endif
 	}
 
@@ -143,7 +150,7 @@ private:
 		LOCKFLAGS_APPEND = D3DLOCK_NOSYSLOCK | D3DLOCK_NOOVERWRITE
 	};
 
-	LPDIRECT3DINDEXBUFFER m_pIB;
+	se::win::com::com_ptr<IDirect3DIndexBuffer9> m_pIB;
 
 	int			m_IndexCount;
 	int			m_Position;
@@ -186,9 +193,8 @@ private:
 
 // constructor, destructor
 
-inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9 *pD3D, int count, 
+inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9Ex *pD3D, int count, 
 	bool bSoftwareVertexProcessing, bool dynamic ) :
-		m_pIB(0), 
 		m_Position(0), 
 		m_bLocked(false),
 		m_bFlush(true), 
@@ -251,15 +257,15 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9 *pD3D, int count,
 }
 
 
-void CIndexBuffer::Create( IDirect3DDevice9 *pD3D )
+void CIndexBuffer::Create( IDirect3DDevice9Ex *pD3D )
 {
 	D3DINDEXBUFFER_DESC desc;
-	memset( &desc, 0x00, sizeof( desc ) );
+	BitwiseClear( desc );
+
 	desc.Format = D3DFMT_INDEX16;
-	desc.Size = sizeof(unsigned short) * m_IndexCount;
 	desc.Type = D3DRTYPE_INDEXBUFFER;
-	desc.Pool = D3DPOOL_DEFAULT;
 	desc.Usage = D3DUSAGE_WRITEONLY;
+
 	if ( m_bDynamic )
 	{
 		desc.Usage |= D3DUSAGE_DYNAMIC;
@@ -268,6 +274,9 @@ void CIndexBuffer::Create( IDirect3DDevice9 *pD3D )
 	{
 		desc.Usage |= D3DUSAGE_SOFTWAREPROCESSING;
 	}
+	
+	desc.Pool = D3DPOOL_DEFAULT;
+	desc.Size = sizeof(unsigned short) * m_IndexCount;
 
 	RECORD_COMMAND( DX8_CREATE_INDEX_BUFFER, 6 );
 	RECORD_INT( m_UID );
@@ -277,30 +286,53 @@ void CIndexBuffer::Create( IDirect3DDevice9 *pD3D )
 	RECORD_INT( desc.Pool );
 	RECORD_INT( m_bDynamic );
 
-	HRESULT hr = pD3D->CreateIndexBuffer( 
+	HRESULT hr = pD3D->CreateIndexBuffer(
 		m_IndexCount * IndexSize(),
 		desc.Usage,
 		desc.Format,
 		desc.Pool, 
 		&m_pIB, 
-		NULL );
-	if ( hr != D3D_OK )
+		nullptr );
+	if ( FAILED( hr ) )
 	{
-		Warning( "CreateIndexBuffer failed!\n" );
-	}
+		Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateIndexBuffer(length = %u, usage = 0x%x, format = 0x%x, pool = 0x%x) failed w/e %s. Retrying...\n",
+			m_IndexCount * IndexSize(),
+			desc.Usage,
+			desc.Format,
+			desc.Pool,
+			se::win::com::com_error_category().message(hr).c_str() );
+		
+		if ( hr == D3DERR_OUTOFVIDEOMEMORY || hr == E_OUTOFMEMORY )
+		{
+			// Don't have the memory for this.  Try flushing all managed resources out of vid mem and try again.
+			// FIXME: need to record this
+			hr = pD3D->EvictManagedResources();
+			if ( FAILED( hr ) )
+			{
+				Warning( __FUNCTION__ ": IDirect3DDevice9Ex::EvictManagedResources() failed w/e %s.\n",
+					se::win::com::com_error_category().message(hr).c_str() );
+			}
 
-	if ( ( hr == D3DERR_OUTOFVIDEOMEMORY ) || ( hr == E_OUTOFMEMORY ) )
-	{
-		// Don't have the memory for this.  Try flushing all managed resources
-		// out of vid mem and try again.
-		// FIXME: need to record this
-		pD3D->EvictManagedResources();
-		hr = pD3D->CreateIndexBuffer( m_IndexCount * IndexSize(),
-			desc.Usage, desc.Format, desc.Pool, &m_pIB, NULL );
+			hr = pD3D->CreateIndexBuffer(
+				m_IndexCount * IndexSize(),
+				desc.Usage,
+				desc.Format,
+				desc.Pool,
+				&m_pIB,
+				nullptr );
+			if ( FAILED( hr ) )
+			{
+				Warning( __FUNCTION__ ": IDirect3DDevice9Ex::CreateIndexBuffer(length = %u, usage = 0x%x, format = 0x%x, pool = 0x%x) failed w/e %s. Skipping.\n",
+					m_IndexCount * IndexSize(),
+					desc.Usage,
+					desc.Format,
+					desc.Pool,
+					se::win::com::com_error_category().message(hr).c_str() );
+			}
+		}
 	}
-
+	
 	Assert( m_pIB );
-	Assert( hr == D3D_OK );
 
 #ifdef MEASURE_DRIVER_ALLOCATIONS
 	int nMemUsed = 1024;
@@ -310,11 +342,19 @@ void CIndexBuffer::Create( IDirect3DDevice9 *pD3D )
 #endif
 
 #if defined( _DEBUG )
-	if ( IsPC() && m_pIB && !m_pSysmemBuffer )
+	if ( m_pIB && !m_pSysmemBuffer )
 	{
-		D3DINDEXBUFFER_DESC aDesc;
-		m_pIB->GetDesc( &aDesc );
-		Assert( memcmp( &aDesc, &desc, sizeof( desc ) ) == 0 );
+		D3DINDEXBUFFER_DESC actual_desc;
+		hr = m_pIB->GetDesc( &actual_desc );
+		if ( SUCCEEDED( hr ) )
+		{
+			Assert( memcmp( &actual_desc, &desc, sizeof( desc ) ) == 0 );
+		}
+		else
+		{
+			Warning( __FUNCTION__ ": IDirect3DIndexBuffer9::GetDesc() failed w/e %s.\n",
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 	}
 #endif
 }
@@ -360,7 +400,7 @@ inline CIndexBuffer::~CIndexBuffer()
 		RECORD_COMMAND( DX8_DESTROY_INDEX_BUFFER, 1 );
 		RECORD_INT( m_UID );
 
-		m_pIB->Release();
+		m_pIB.Release();
 	}
 
 #ifdef VPROF_ENABLED
@@ -488,21 +528,19 @@ inline unsigned short* CIndexBuffer::Lock( bool bReadOnly, int numIndices, int& 
 	}
 	else 
 	{
-		hr = m_pIB->Lock( position * IndexSize(), numIndices * IndexSize(), 
-						   reinterpret_cast< void** >( &pLockedData ), dwFlags );
-	}
-
-	switch ( hr )
-	{
-		case D3DERR_INVALIDCALL:
-			Msg( "D3DERR_INVALIDCALL - Index Buffer Lock Failed in %s on line %d(offset %d, size %d, flags 0x%x)\n", V_UnqualifiedFileName(__FILE__), __LINE__, position * IndexSize(), numIndices * IndexSize(), dwFlags );
-			break;
-		case D3DERR_DRIVERINTERNALERROR:
-			Msg( "D3DERR_DRIVERINTERNALERROR - Index Buffer Lock Failed in %s on line %d (offset %d, size %d, flags 0x%x)\n", V_UnqualifiedFileName(__FILE__), __LINE__, position * IndexSize(), numIndices * IndexSize(), dwFlags );
-			break;
-		case D3DERR_OUTOFVIDEOMEMORY:
-			Msg( "D3DERR_OUTOFVIDEOMEMORY - Index Buffer Lock Failed in %s on line %d (offset %d, size %d, flags 0x%x)\n", V_UnqualifiedFileName(__FILE__), __LINE__, position * IndexSize(), numIndices * IndexSize(), dwFlags );
-			break;
+		hr = m_pIB->Lock(
+			position * IndexSize(),
+			numIndices * IndexSize(), 
+			reinterpret_cast< void** >( &pLockedData ),
+			dwFlags );
+		if (FAILED(hr))
+		{
+			Warning( __FUNCTION__ ": IDirect3DIndexBuffer9::Lock(offset = 0x%x, size = 0x%x, flags = 0x%x) failed w/e %s.\n",
+				position * IndexSize(),
+				numIndices * IndexSize(),
+				dwFlags,
+				se::win::com::com_error_category().message(hr).c_str() );
+		}
 	}
 
 	Assert( pLockedData != NULL );
@@ -557,7 +595,7 @@ inline void CIndexBuffer::Unlock( int numIndices )
 }
 
 
-inline void CIndexBuffer::HandleLateCreation( )
+inline void CIndexBuffer::HandleLateCreation( IDirect3DDevice9Ex *pD3D )
 {
 	if ( !m_pSysmemBuffer )
 	{
@@ -567,7 +605,7 @@ inline void CIndexBuffer::HandleLateCreation( )
 	if( !m_pIB )
 	{
 		bool bPrior = g_VBAllocTracker->TrackMeshAllocations( "HandleLateCreation" );
-		Create( Dx9Device() );
+		Create( pD3D );
 		if ( !bPrior )
 		{
 			g_VBAllocTracker->TrackMeshAllocations( NULL );
@@ -584,10 +622,19 @@ inline void CIndexBuffer::HandleLateCreation( )
 	m_bLateCreateShouldDiscard = false;
 	
 	// Don't use the Lock function, it does a bunch of stuff we don't want.
-	[[maybe_unused]] HRESULT hr = m_pIB->Lock( m_nSysmemBufferStartBytes, 
-	                         dataToWriteBytes,
-				             &pWritePtr,
-				             dwFlags);
+	HRESULT hr = m_pIB->Lock(
+		m_nSysmemBufferStartBytes,
+		dataToWriteBytes,
+		&pWritePtr,
+		dwFlags);
+	if (FAILED(hr))
+	{
+		Warning( __FUNCTION__ ": IDirect3DIndexBuffer9::Lock(offset = 0x%x, size = 0x%x, flags = 0x%x) failed w/e %s.\n",
+			m_nSysmemBufferStartBytes,
+			dataToWriteBytes,
+			dwFlags,
+			se::win::com::com_error_category().message(hr).c_str() );
+	}
 
 	// If this fails we're about to crash. Consider skipping the update and leaving 
 	// m_pSysmemBuffer around to try again later. (For example in case of device loss)

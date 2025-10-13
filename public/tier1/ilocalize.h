@@ -9,12 +9,8 @@
 #ifndef TIER1_ILOCALIZE_H
 #define TIER1_ILOCALIZE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "appframework/IAppSystem.h"
-#include "tier1/KeyValues.h"
+#include "KeyValues.h"
 
 // unicode character type
 // for more unicode manipulation functions #include <wchar.h>
@@ -25,7 +21,7 @@ typedef unsigned short wchar_t;
 
 
 // direct references to localized strings
-typedef unsigned long StringIndex_t;
+using StringIndex_t = unsigned long;
 constexpr inline unsigned long INVALID_LOCALIZE_STRING_INDEX = (StringIndex_t) -1;
 
 //-----------------------------------------------------------------------------
@@ -199,7 +195,7 @@ private:
 
 #else
 
-	typedef wchar_t locchar_t;
+	using locchar_t = wchar_t;
 
 	#define loc_snprintf	V_snwprintf
 	#define loc_sprintf_safe V_swprintf_safe

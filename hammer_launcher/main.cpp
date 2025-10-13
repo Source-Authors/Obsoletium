@@ -86,12 +86,12 @@ SpewRetval_t HammerSpewFunc(SpewType_t type, char const *raw) {
   if (type == SPEW_ASSERT) return SPEW_DEBUGGER;
 
   if (type == SPEW_WARNING) {
-    MessageBoxA(nullptr, message, "Hammer - Warning", MB_OK | MB_ICONWARNING);
+    MessageBox(nullptr, message, "Hammer - Warning", MB_OK | MB_ICONWARNING);
     return SPEW_CONTINUE;
   }
 
   if (type == SPEW_ERROR) {
-    MessageBoxA(nullptr, message, "Hammer - Error", MB_OK | MB_ICONSTOP);
+    MessageBox(nullptr, message, "Hammer - Error", MB_OK | MB_ICONSTOP);
     return SPEW_ABORT;
   }
 
@@ -211,7 +211,6 @@ bool HammerAppSystemGroup::Create() {
       {"datacache" DLL_EXT_STRING, DATACACHE_INTERFACE_VERSION},
       {"datacache" DLL_EXT_STRING, MDLCACHE_INTERFACE_VERSION},
       {"datacache" DLL_EXT_STRING, STUDIO_DATA_CACHE_INTERFACE_VERSION},
-      {"engine" DLL_EXT_STRING, VENGINE_LAUNCHER_API_VERSION},
       {"vguimatsurface" DLL_EXT_STRING, VGUI_SURFACE_INTERFACE_VERSION},
       {"vgui2" DLL_EXT_STRING, VGUI_IVGUI_INTERFACE_VERSION},
       {"hammer_dll" DLL_EXT_STRING, INTERFACEVERSION_HAMMER},
@@ -265,7 +264,7 @@ bool HammerAppSystemGroup::PreInit() {
   search_paths_init.m_pDirectoryName = hammer_->GetDefaultModFullPath();
 
   if (FileSystem_LoadSearchPaths(search_paths_init) != FS_OK) {
-    Error("Unable to load search paths!\n");
+    Error("File system unable to load search paths!\n\nPlease check GameConfig.txt is present and valid.\n");
   }
 
   // Required to run through the editor

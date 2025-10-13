@@ -389,7 +389,7 @@ CDmElement *CDmObjSerializer::ReadOBJ(
 		char findPath[ MAX_PATH ];
 		V_ComposeFileName( path, findGlob, findPath );
 
-		FileFindHandle_t hFind;
+		FileFindHandle_t hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 
 		char deltaFile[ MAX_PATH ];
 		char deltaPath[ MAX_PATH ];

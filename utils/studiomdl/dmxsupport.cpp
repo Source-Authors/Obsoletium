@@ -461,9 +461,9 @@ static void ParseFaceData( CDmeVertexData *pVertexData, int material, int v1, in
 	p = pVertexData->GetPositionIndex(v3); n = pVertexData->GetNormalIndex(v3); t = pVertexData->GetTexCoordIndex(v3);
 	f.c = ( p >= 0 ) ? vi + p : 0; f.nc = ( n >= 0 ) ? ni + n : 0; f.tc = ( t >= 0 ) ? ti + t : 0;
 
-	Assert( f.a <= (unsigned long)g_numverts && f.b <= (unsigned long)g_numverts && f.c <= (unsigned long)g_numverts );
-	Assert( f.na <= (unsigned long)g_numnormals && f.nb <= (unsigned long)g_numnormals && f.nc <= (unsigned long)g_numnormals );
-	Assert( f.ta <= (unsigned long)g_numtexcoords && f.tb <= (unsigned long)g_numtexcoords && f.tc <= (unsigned long)g_numtexcoords );
+	Assert( f.a <= (uint)g_numverts && f.b <= (uint)g_numverts && f.c <= (uint)g_numverts );
+	Assert( f.na <= (uint)g_numnormals && f.nb <= (uint)g_numnormals && f.nc <= (uint)g_numnormals );
+	Assert( f.ta <= (uint)g_numtexcoords && f.tb <= (uint)g_numtexcoords && f.tc <= (uint)g_numtexcoords );
 
 	Assert( g_numfaces < MAXSTUDIOTRIANGLES-1 );
 	if ( g_numfaces >= MAXSTUDIOTRIANGLES-1 )

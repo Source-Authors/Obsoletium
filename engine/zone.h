@@ -44,7 +44,7 @@ class CHunkMemory
 public:
 	// constructor, destructor
 	CHunkMemory( intp nGrowSize = 0, intp nInitSize = 0 )	{ m_pMemory = NULL; m_nAllocated = 0; if ( nInitSize ) Grow( nInitSize ); }
-	CHunkMemory( T* pMemory, intp numElements )				{ Assert( 0 ); }
+	CHunkMemory( T* pMemory, intp numElements )				= delete;
 
 	// Can we use this index?
 	bool IsIdxValid( intp i ) const							{ return (i >= 0) && (i < m_nAllocated); }

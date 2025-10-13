@@ -145,9 +145,11 @@ private:
 
 	void		DrawRenderList( IBrushSurface* pBrushSurface);
 	void		DrawRenderListHighlights( IBrushSurface* pBrushSurface );
-	int			FindRenderPanel(int nWidth, int nHeight, WinSide_t nSide);
+	// dimhotepus: int -> unsigned short.
+	unsigned short		FindRenderPanel(int nWidth, int nHeight, WinSide_t nSide);
 	void		AddToRenderList(int nWidth, int nHeight, WinSide_t nSide, WinEdge_t nEdgeType, int forceStyle);
-	int			FindFirstRenderTexture(WinEdge_t nEdgeType, int nStyle);
+	// dimhotepus: int -> unsigned short.
+	unsigned short		FindFirstRenderTexture(WinEdge_t nEdgeType, int nStyle);
 
 	inline void SetStyleType( int w, int h, int type )
 	{
@@ -288,7 +290,7 @@ void C_BreakableSurface::FindCrackedMaterial()
 	m_pCrackedMaterial = 0;
 
 	// First time we've seen it, get the material on the brush model
-	int materialCount = modelinfo->GetModelMaterialCount( const_cast<model_t*>(GetModel()) );
+	int materialCount = modelinfo->GetModelMaterialCount( GetModel() );
 	if( materialCount != 1 )
 	{
 		Warning( "Encountered func_breakablesurf that has a material applied to more than one surface!\n" );
@@ -298,7 +300,7 @@ void C_BreakableSurface::FindCrackedMaterial()
 
 	// Get at the first material; even if there are more than one.
 	IMaterial* pMaterial;
-	modelinfo->GetModelMaterials( const_cast<model_t*>(GetModel()), 1, &pMaterial );
+	modelinfo->GetModelMaterials( GetModel(), 1, &pMaterial );
 
 	// The material should point to a cracked version of itself
 	bool foundVar;
@@ -809,9 +811,9 @@ void C_BreakableSurface::UpdateEdgeType(int nWidth, int nHeight, int forceStyle 
 // Input   :
 // Output  :
 //--------------------------------------------------------------------------------
-int C_BreakableSurface::FindRenderPanel(int nWidth, int nHeight, WinSide_t nWinSide)
+unsigned short C_BreakableSurface::FindRenderPanel(int nWidth, int nHeight, WinSide_t nWinSide)
 {
-	for( unsigned short i = m_RenderList.Head(); i != m_RenderList.InvalidIndex(); i = m_RenderList.Next(i) )
+	for( auto i = m_RenderList.Head(); i != m_RenderList.InvalidIndex(); i = m_RenderList.Next(i) )
 	{
 		if (m_RenderList[i].m_nSide			== nWinSide	&&
 			m_RenderList[i].m_nWidth		== nWidth		&&
@@ -828,9 +830,9 @@ int C_BreakableSurface::FindRenderPanel(int nWidth, int nHeight, WinSide_t nWinS
 // Input   :
 // Output  :
 //----------------------------------------------------------------------------------
-int C_BreakableSurface::FindFirstRenderTexture(WinEdge_t nEdgeType, int nStyle)
+unsigned short C_BreakableSurface::FindFirstRenderTexture(WinEdge_t nEdgeType, int nStyle)
 {
-	for( unsigned short i = m_RenderList.Head(); i != m_RenderList.InvalidIndex(); i = m_RenderList.Next(i) )
+	for( auto i = m_RenderList.Head(); i != m_RenderList.InvalidIndex(); i = m_RenderList.Next(i) )
 	{
 		if (m_RenderList[i].m_nStyle		== nStyle		&&
 			m_RenderList[i].m_nEdgeType		== nEdgeType	)
@@ -850,7 +852,7 @@ void C_BreakableSurface::AddToRenderList(int nWidth, int nHeight, WinSide_t nSid
 {
 	// -----------------------------------------------------
 	// Try to find old panel
-	int nOldPanelIndex = FindRenderPanel(nWidth,nHeight,nSide);
+	unsigned short nOldPanelIndex = FindRenderPanel(nWidth,nHeight,nSide);
 
 	// -----------------------------------------------------
 	// If I have an old panel, get it's style and remove it

@@ -24,10 +24,10 @@ int CBaseAutoCompleteFileList::AutoCompletionFunc( char const *partial, char com
 {
 	char const *cmdname = m_pszCommandName;
 
-	char *substring = (char *)partial;
+	const char *substring = partial;
 	if ( Q_strstr( partial, cmdname ) )
 	{
-		substring = (char *)partial + strlen( cmdname ) + 1;
+		substring = partial + strlen( cmdname ) + 1;
 	}
 
 	// Search the directory structure.

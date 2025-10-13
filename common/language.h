@@ -41,6 +41,8 @@ enum ELanguage
 	k_Lang_Bulgarian,
 	k_Lang_Greek,
 	k_Lang_Ukrainian,
+	// dimhotepus: TF2 backport.
+	k_Lang_Latam_Spanish,
 	k_Lang_MAX
 };
 

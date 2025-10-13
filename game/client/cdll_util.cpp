@@ -56,7 +56,7 @@ char *VarArgs( const char *format, ... )
 	va_list		argptr;
 	static char		string[1024];
 	
-	va_start (argptr, format);
+	va_start (argptr, format); //-V2018 //-V2019
 	V_vsprintf_safe (string, format, argptr);
 	va_end (argptr);
 
@@ -410,7 +410,7 @@ void UTIL_ImpactTrace( trace_t *pTrace, int iDamageType, const char *pCustomImpa
 //-----------------------------------------------------------------------------
 int UTIL_PrecacheDecal( const char *name, bool preload )
 {
-	return effects->Draw_DecalIndexFromName( (char*)name );
+	return effects->Draw_DecalIndexFromName( name );
 }
 
 extern short g_sModelIndexSmoke;
@@ -1198,8 +1198,8 @@ void UTIL_IncrementMapKey( const char *pszCustomKey )
 	if ( !pszCustomKey )
 		return;
 
-	char szFilename[ _MAX_PATH ];
-	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, _MAX_PATH ) )
+	char szFilename[ MAX_PATH ];
+	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, MAX_PATH ) )
 		return;
 
 	int iCount = 1;
@@ -1245,8 +1245,8 @@ int UTIL_GetMapKeyCount( const char *pszCustomKey )
 	if ( !pszCustomKey )
 		return 0;
 
-	char szFilename[ _MAX_PATH ];
-	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, _MAX_PATH ) )
+	char szFilename[ MAX_PATH ];
+	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, MAX_PATH ) )
 		return 0;
 
 	int iCount = 0;
@@ -1283,8 +1283,8 @@ int UTIL_GetMapKeyCount( const char *pszCustomKey )
 
 bool UTIL_HasLoadedAnyMap()
 {
-	char szFilename[ _MAX_PATH ];
-	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, _MAX_PATH ) )
+	char szFilename[ MAX_PATH ];
+	if ( !UTIL_GetMapLoadCountFileName( MAP_KEY_FILE, szFilename, MAX_PATH ) )
 		return false;
 
 	return g_pFullFileSystem->FileExists( szFilename, "MOD" );

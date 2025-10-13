@@ -17,25 +17,25 @@ bool Check3DNowTechnology(void) { return false; }
 
 #elif defined( _WIN32 ) && !defined( _X360 )
 
-bool CheckMMXTechnology(void)
+bool CheckMMXTechnology()
 {
 	auto *info = GetCPUInformation();
 	return info->m_bMMX;
 }
 
-bool CheckSSETechnology(void)
+bool CheckSSETechnology()
 {
 	auto *info = GetCPUInformation();
 	return info->m_bSSE;
 }
 
-bool CheckSSE2Technology(void)
+bool CheckSSE2Technology()
 {
 	auto *info = GetCPUInformation();
 	return info->m_bSSE2;
 }
 
-bool Check3DNowTechnology(void)
+bool Check3DNowTechnology()
 {
 	auto *info = GetCPUInformation();
 	return info->m_b3DNow;

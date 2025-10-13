@@ -639,6 +639,13 @@ CBasePlayer::CBasePlayer( )
 	m_flMovementTimeForUserCmdProcessingRemaining = 0.0f;
 
 	m_flLastObjectiveTime = -1.f;
+
+	// dimhotepus: Do not break think functions when server attempts to run frame-based
+	// think functions on a player before they have received a command.
+	//
+	// It was breaking due to m_nTickBase was 0 and think functions were skipped in such
+	// case.
+	SetTimeBase( gpGlobals->curtime );
 }
 
 CBasePlayer::~CBasePlayer( )
@@ -848,6 +855,9 @@ void CBasePlayer::DeathSound( const CTakeDamageInfo &info )
 
 int CBasePlayer::TakeHealth( float flHealth, int bitsDamageType )
 {
+	// dimhotepus: Disallow to heal dead players.
+	if (!IsAlive()) return 0;
+
 	// clear out any damage types we healed.
 	// UNDONE: generic health should not heal any
 	// UNDONE: time-based damage

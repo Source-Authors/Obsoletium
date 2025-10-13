@@ -321,7 +321,7 @@ void CPlayerAnimState::ComputePoseParam_BodyPitch( CStudioHdr *pStudioHdr )
 	{
 		flPitch -= 360.0f;
 	}
-	flPitch = clamp( flPitch, -90, 90 );
+	flPitch = clamp( flPitch, -90.f, 90.f );
 
 	QAngle absangles = GetOuter()->GetAbsAngles();
 	absangles.x = 0.0f;

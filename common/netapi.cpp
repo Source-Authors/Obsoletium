@@ -9,7 +9,7 @@
 
 #ifdef _WIN32
 #include "winsock.h"
-typedef int socklen_t;
+using socklen_t = int;
 #elif POSIX
 #include <sys/types.h>
 #include <sys/socket.h>
@@ -32,17 +32,17 @@ typedef int socklen_t;
 class CNetAPI : public INetAPI
 {
 public:
-	virtual void		NetAdrToSockAddr( netadr_t *a, struct sockaddr *s );
-	virtual void		SockAddrToNetAdr( struct sockaddr *s, netadr_t *a );
+	void		NetAdrToSockAddr( netadr_t *a, struct sockaddr *s ) override;
+	void		SockAddrToNetAdr( struct sockaddr *s, netadr_t *a ) override;
 
-	virtual char		*AdrToString( netadr_t *a );
-	virtual bool		StringToAdr( const char *s, netadr_t *a );
+	char		*AdrToString( netadr_t *a ) override;
+	bool		StringToAdr( const char *s, netadr_t *a ) override;
 
-	virtual void		GetSocketAddress( socket_handle socket, netadr_t *a );
+	void		GetSocketAddress( socket_handle socket, netadr_t *a ) override;
 
-	virtual bool		CompareAdr( netadr_t *a, netadr_t *b );
+	bool		CompareAdr( netadr_t *a, netadr_t *b ) override;
 
-	virtual void	GetLocalIP(netadr_t *a);
+	void	GetLocalIP(netadr_t *a) override;
 };
 
 // Expose interface

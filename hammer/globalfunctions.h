@@ -37,7 +37,8 @@ void NotifyDuplicates(const CMapObjectList *pList);
 
 bool IsWorldObject(CMapAtom *pObject);
 
-BOOL AddLeavesToListCallback(CMapClass *pObject, CMapObjectList *pList);
+BOOL AddAllLeavesToListCallback(CMapClass *pObject, CMapObjectList *pList);
+BOOL AddSolidLeavesToListCallback(CMapSolid *pObject, CMapObjectList *pList);
 
 void WriteDebug(char *pszStr);
 LPCTSTR GetDefaultTextureName();
@@ -49,12 +50,6 @@ int mychdir(LPCTSTR pszDir);
 // Message window interface.
 //
 class CMessageWnd;
-
-enum MWMSGTYPE
-{	mwStatus,
-	mwError,
-	mwWarning
-};
 
 extern CMessageWnd *g_pwndMessage;
 

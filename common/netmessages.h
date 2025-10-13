@@ -68,21 +68,21 @@ class IClientMessageHandler;
 class CNetMessage : public INetMessage
 {
 public:
-	CNetMessage() : m_NetChannel{nullptr}, m_bReliable{true} {}
+	CNetMessage()  = default;
 
-	virtual ~CNetMessage() {};
+	~CNetMessage() override = default;
 
-	int		GetGroup() const override { return INetChannelInfo::GENERIC; }
-	INetChannel		*GetNetChannel() const override { return m_NetChannel; }
+	[[nodiscard]] int		GetGroup() const override { return INetChannelInfo::GENERIC; }
+	[[nodiscard]] INetChannel		*GetNetChannel() const override { return m_NetChannel; }
 		
 	void	SetReliable(bool state) override {m_bReliable = state;};
-	bool	IsReliable() const override { return m_bReliable; };
+	[[nodiscard]] bool	IsReliable() const override { return m_bReliable; };
 	void    SetNetChannel(INetChannel * netchan) override { m_NetChannel = netchan; }
 
 protected:
 	// dimhotepus: Reorder message to reduce size.
-	INetChannel			*m_NetChannel;	// netchannel this message is from/for
-	bool				m_bReliable;	// true if message should be send reliable
+	INetChannel			*m_NetChannel{nullptr};	// netchannel this message is from/for
+	bool				m_bReliable{true};	// true if message should be send reliable
 };
 
 
@@ -95,7 +95,7 @@ class NET_SetConVar : public CNetMessage
 {
 	DECLARE_NET_MESSAGE( SetConVar );
 
-	int	GetGroup() const override { return INetChannelInfo::STRINGCMD; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::STRINGCMD; }
 
 	NET_SetConVar() : m_pMessageHandler{nullptr} {}
 	NET_SetConVar(const char *name, const char *value) : NET_SetConVar{}
@@ -108,11 +108,11 @@ class NET_SetConVar : public CNetMessage
 
 public:	
 	
-	typedef struct cvar_s
+	using cvar_t = struct cvar_s
 	{
 		char	name[MAX_OSPATH];
 		char	value[MAX_OSPATH];
-	} cvar_t;
+	};
 
 	CUtlVector<cvar_t> m_ConVars;
 };
@@ -121,7 +121,7 @@ class NET_StringCmd : public CNetMessage
 {
 	DECLARE_NET_MESSAGE( StringCmd );
 
-	int	GetGroup() const override { return INetChannelInfo::STRINGCMD; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::STRINGCMD; }
 
 	NET_StringCmd() : NET_StringCmd{nullptr} {};
 	explicit NET_StringCmd(const char *cmd)
@@ -172,7 +172,7 @@ class NET_SignonState : public CNetMessage
 {
 	DECLARE_NET_MESSAGE( SignonState );
 
-	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
 	NET_SignonState() : NET_SignonState{ -1, -1 } {}
 	NET_SignonState( int state, int spawncount )
@@ -214,21 +214,19 @@ class CLC_Move : public CNetMessage
 {
 	DECLARE_CLC_MESSAGE( Move );
 
-	int	GetGroup() const override { return INetChannelInfo::MOVE; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::MOVE; }
 
 	CLC_Move()
-		: m_pMessageHandler{nullptr},
-		m_nBackupCommands{-1},
-		m_nNewCommands{-1},
-		m_nLength{-1}
+		: m_pMessageHandler{nullptr}
+		
 	{
 		m_bReliable = false;
 	}
 
 public:
-	int				m_nBackupCommands;
-	int				m_nNewCommands;
-	int				m_nLength;
+	int				m_nBackupCommands{-1};
+	int				m_nNewCommands{-1};
+	int				m_nLength{-1};
 	bf_read			m_DataIn;
 	bf_write		m_DataOut;
 };
@@ -237,18 +235,18 @@ class CLC_VoiceData : public CNetMessage
 {
 	DECLARE_CLC_MESSAGE( VoiceData );
 
-	int	GetGroup() const override { return INetChannelInfo::VOICE; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::VOICE; }
 
 	CLC_VoiceData()
 		: m_pMessageHandler{nullptr},
-		m_nLength{-1},
+		
 		m_xuid{std::numeric_limits<uint64>::max()}
 	{
 		m_bReliable = false;
 	}
 
 public:
-	int				m_nLength;
+	int				m_nLength{-1};
 	bf_read			m_DataIn;
 	bf_write		m_DataOut;
 	uint64			m_xuid;
@@ -265,7 +263,7 @@ class CLC_BaselineAck : public CNetMessage
 		m_nBaselineNr{baseline}
 	{}
 
-	int	GetGroup() const override { return INetChannelInfo::ENTITIES; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::ENTITIES; }
 
 public:
 	int		m_nBaselineTick;	// sequence number of baseline
@@ -276,7 +274,7 @@ class CLC_ListenEvents : public CNetMessage
 {
 	DECLARE_CLC_MESSAGE( ListenEvents );
 
-	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
 public:
 	CBitVec<MAX_EVENT_NUMBER> m_EventArray;
@@ -346,16 +344,16 @@ public:
 class Base_CmdKeyValues : public CNetMessage
 {
 protected:
-	explicit Base_CmdKeyValues( KeyValues *pKeyValues = NULL ); // takes ownership
-	~Base_CmdKeyValues();
+	explicit Base_CmdKeyValues( KeyValues *pKeyValues = nullptr ); // takes ownership
+	~Base_CmdKeyValues() override;
 
 public:
-	KeyValues * GetKeyValues() const { return m_pKeyValues; }
+	[[nodiscard]] KeyValues * GetKeyValues() const { return m_pKeyValues; }
 
 public:
 	bool ReadFromBuffer( bf_read &buffer ) override;
 	bool WriteToBuffer( bf_write &buffer ) override;
-	const char * ToString() const override;
+	[[nodiscard]] const char * ToString() const override;
 
 protected:
 	KeyValues *m_pKeyValues;
@@ -367,7 +365,7 @@ public:
 	DECLARE_CLC_MESSAGE( CmdKeyValues );
 
 public:
-	explicit CLC_CmdKeyValues( KeyValues *pKeyValues = NULL );	// takes ownership
+	explicit CLC_CmdKeyValues( KeyValues *pKeyValues = nullptr );	// takes ownership
 };
 
 class SVC_CmdKeyValues : public Base_CmdKeyValues
@@ -376,7 +374,7 @@ public:
 	DECLARE_SVC_MESSAGE( CmdKeyValues );
 
 public:
-	explicit SVC_CmdKeyValues( KeyValues *pKeyValues = NULL );	// takes ownership
+	explicit SVC_CmdKeyValues( KeyValues *pKeyValues = nullptr );	// takes ownership
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////
@@ -410,7 +408,7 @@ class SVC_ServerInfo : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( ServerInfo );
 
-	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
 public:	// member vars are public for faster handling
 	int			m_nProtocol;	// protocol version
@@ -443,7 +441,7 @@ class SVC_SendTable : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( SendTable );
 
-	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 		
 public:
 	bool			m_bNeedsDecoder;
@@ -456,7 +454,7 @@ class SVC_ClassInfo : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( ClassInfo );
 
-	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
 	SVC_ClassInfo() : SVC_ClassInfo{false, -1} {};
 	SVC_ClassInfo( bool createFromSendTables, int numClasses ) 
@@ -466,12 +464,12 @@ class SVC_ClassInfo : public CNetMessage
 
 public:
 		
-	typedef struct class_s
+	using class_t = struct class_s
 	{
 		int		classID;
 		char	datatablename[256];
 		char	classname[256];
-	} class_t;
+	};
 
 	bool					m_bCreateOnClient;	// if true, client creates own SendTables & classinfos from game.dll
 	CUtlVector<class_t>		m_Classes;			
@@ -515,7 +513,7 @@ class SVC_CreateStringTable : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( CreateStringTable );
 
-	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
 public:
 
@@ -543,7 +541,7 @@ class SVC_UpdateStringTable : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( UpdateStringTable );
 
-	int	GetGroup() const override { return INetChannelInfo::STRINGTABLE; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::STRINGTABLE; }
 
 public:
 	int				m_nTableID;	// table to be updated
@@ -567,7 +565,7 @@ class SVC_VoiceInit : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( VoiceInit );
 
-	int	GetGroup() const override { return INetChannelInfo::SIGNON; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SIGNON; }
 
 	SVC_VoiceInit()
 		: m_pMessageHandler{nullptr},
@@ -609,34 +607,30 @@ class SVC_VoiceData : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( VoiceData );
 
-	int	GetGroup() const override { return INetChannelInfo::VOICE; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::VOICE; }
 
 	SVC_VoiceData()
 		: m_pMessageHandler{nullptr},
-		m_nFromClient{-1},
-		m_bProximity{false},
-		m_nLength{-1},
-		m_xuid{std::numeric_limits<uint64>::max()},
-		m_DataOut{nullptr}
+		m_xuid{std::numeric_limits<uint64>::max()}
 	{
 		m_bReliable = false;
 	}
 
 public:	
-	int				m_nFromClient;	// client who has spoken
-	bool			m_bProximity;
-	int				m_nLength;		// data length in bits
+	int				m_nFromClient{-1};	// client who has spoken
+	bool			m_bProximity{false};
+	int				m_nLength{-1};		// data length in bits
 	uint64			m_xuid;			// X360 player ID
 
 	bf_read			m_DataIn;
-	void			*m_DataOut;
+	void			*m_DataOut{nullptr};
 };
 
 class SVC_Sounds : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( Sounds );
 
-	int	GetGroup() const override { return INetChannelInfo::SOUNDS; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SOUNDS; }
 
 public:	
 
@@ -651,7 +645,7 @@ class SVC_Prefetch : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( Prefetch );
 
-	int	GetGroup() const override { return INetChannelInfo::SOUNDS; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::SOUNDS; }
 
 	enum
 	{
@@ -728,7 +722,7 @@ class SVC_GameEvent : public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( GameEvent );
 
-	int	GetGroup() const override { return INetChannelInfo::EVENTS; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::EVENTS; }
 	
 public:
 	int			m_nLength;	// data length in bits
@@ -741,18 +735,16 @@ class SVC_UserMessage: public CNetMessage
 	DECLARE_SVC_MESSAGE( UserMessage );
 
 	SVC_UserMessage()
-		: m_pMessageHandler{nullptr},
-		m_nMsgType{-1},
-		m_nLength{-1}
+		: m_pMessageHandler{nullptr}
 	{
 		m_bReliable = false;
 	}
 
-	int	GetGroup() const override { return INetChannelInfo::USERMESSAGES; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::USERMESSAGES; }
 	
 public:
-	int			m_nMsgType;
-	int			m_nLength;	// data length in bits
+	int			m_nMsgType{-1};
+	int			m_nLength{-1};	// data length in bits
 	bf_read		m_DataIn;
 	bf_write	m_DataOut;
 };
@@ -762,20 +754,17 @@ class SVC_EntityMessage : public CNetMessage
 	DECLARE_SVC_MESSAGE( EntityMessage );
 
 	SVC_EntityMessage()
-		: m_pMessageHandler{nullptr},
-		m_nEntityIndex{-1},
-		m_nClassID{-1},
-		m_nLength{-1}
+		: m_pMessageHandler{nullptr}
 	{
 		m_bReliable = false;
 	}
 
-	int	GetGroup() const override { return INetChannelInfo::ENTMESSAGES	; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::ENTMESSAGES	; }
 
 public:
-	int			m_nEntityIndex;
-	int			m_nClassID;
-	int			m_nLength;	// data length in bits
+	int			m_nEntityIndex{-1};
+	int			m_nClassID{-1};
+	int			m_nLength{-1};	// data length in bits
 	bf_read		m_DataIn;
 	bf_write	m_DataOut;
 };
@@ -799,7 +788,7 @@ class SVC_PacketEntities: public CNetMessage
 {
 	DECLARE_SVC_MESSAGE( PacketEntities );
 	
-	int	GetGroup() const override { return INetChannelInfo::ENTITIES; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::ENTITIES; }
 	
 public:
 
@@ -819,17 +808,15 @@ class SVC_TempEntities: public CNetMessage
 	DECLARE_SVC_MESSAGE( TempEntities );
 
 	SVC_TempEntities()
-		: m_pMessageHandler{nullptr},
-		m_nNumEntries{-1},
-		m_nLength{-1}
+		: m_pMessageHandler{nullptr}
 	{
 		m_bReliable = false;
 	}
 
-	int	GetGroup() const override { return INetChannelInfo::EVENTS; }
+	[[nodiscard]] int	GetGroup() const override { return INetChannelInfo::EVENTS; }
 
-	int			m_nNumEntries;
-	int			m_nLength;
+	int			m_nNumEntries{-1};
+	int			m_nLength{-1};
 	bf_read		m_DataIn;
 	bf_write	m_DataOut;
 };
@@ -843,11 +830,11 @@ public:
 	{
 		m_bReliable = true;
 		m_Type = DIALOG_MENU;
-		m_MenuKeyValues = NULL;
+		m_MenuKeyValues = nullptr;
 		m_iLength = 0;
 	}
 	SVC_Menu( DIALOG_TYPE type, KeyValues *data ); 
-	~SVC_Menu();
+	~SVC_Menu() override;
 
 	KeyValues	*m_MenuKeyValues;
 	DIALOG_TYPE m_Type;
@@ -885,7 +872,7 @@ public:
 	uint64	m_xuids[MAX_PLAYERS_PER_CLIENT];
 	byte	m_cVoiceState[MAX_PLAYERS_PER_CLIENT];
 	bool	m_bInvited;
-	char	m_cPlayers;
+	byte	m_cPlayers;
 	char	m_iControllers[MAX_PLAYERS_PER_CLIENT];
 	char	m_iTeam[MAX_PLAYERS_PER_CLIENT];
 	char	m_szGamertags[MAX_PLAYERS_PER_CLIENT][MAX_PLAYER_NAME_LENGTH];

@@ -30,8 +30,8 @@
 
 #define NUM_NPC_DEBUG_OVERLAYS	  50
 
-const float MAX_LOCAL_NAV_DIST_GROUND[2] = { (50*12), (25*12) };
-const float MAX_LOCAL_NAV_DIST_FLY[2] = { (750*12), (750*12) };
+constexpr inline float MAX_LOCAL_NAV_DIST_GROUND[2] = { (50*12), (25*12) };
+constexpr inline float MAX_LOCAL_NAV_DIST_FLY[2] = { (750*12), (750*12) };
 
 //-----------------------------------------------------------------------------
 // CAI_Pathfinder
@@ -1202,8 +1202,8 @@ inline int ClosestPointToPosition( const Vector &vecPosition, Vector *vecPoints,
 //-----------------------------------------------------------------------------
 inline int ShortestDirectionThroughPoints( const Vector &vecStart, int nStartPoint, int nEndPoint, Vector *vecPoints, int nNumPoints )
 {
-	const int nClockwise = 1;
-	const int nCounterClockwise = -1;
+	constexpr int nClockwise = 1;
+	constexpr int nCounterClockwise = -1;
 
 	// Find the quickest direction around the object
 	int nCurPoint = nStartPoint;

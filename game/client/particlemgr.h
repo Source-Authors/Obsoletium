@@ -147,7 +147,8 @@ class CParticleMgr;
 class CNewParticleEffect;
 class CParticleCollection;
 
-#define INVALID_MATERIAL_HANDLE	NULL
+// dimhotepus: Use nullptr_t.
+constexpr inline std::nullptr_t INVALID_MATERIAL_HANDLE{nullptr};
 
 
 // Various stats, disabled
@@ -624,7 +625,8 @@ public:
 	virtual			~CParticleMgr();
 
 	// Call at init time to preallocate the bucket of particles.
-	bool			Init(unsigned long nPreallocatedParticles, IMaterialSystem *pMaterial);
+	// dimhotepus: unsigned long -> unsigned. x86-64.
+	bool			Init(unsigned nPreallocatedParticles, IMaterialSystem *pMaterial);
 
 	// Shutdown - free everything.
 	void			Term();

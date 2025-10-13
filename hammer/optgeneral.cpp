@@ -10,7 +10,6 @@
 #include "Options.h"
 
 
-#pragma warning(disable:4244)
 
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -65,7 +64,8 @@ void PASCAL DDV_UndoLevels(CDataExchange *pDX, int value)
 
 void PASCAL DDV_MaxCameras(CDataExchange *pDX, int value)
 {
-	if (value < 1 || value > 100)
+	// dimhotepus: Correctly check for max (was 100).
+	if (value < 1 || value > 1000)
 	{
 		AfxMessageBox("Max cameras must be between 1 and 1000.", MB_ICONEXCLAMATION | MB_OK);
 		pDX->Fail();

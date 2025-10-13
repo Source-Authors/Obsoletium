@@ -127,7 +127,7 @@ private:
 
 void CreateCrossbowBolt( const Vector &vecOrigin, const Vector &vecDirection )
 {
-	model_t *pModel = (model_t *)engine->LoadModel( "models/crossbow_bolt.mdl" );
+	const model_t *pModel = engine->LoadModel( "models/crossbow_bolt.mdl" );
 
 	QAngle vAngles;
 

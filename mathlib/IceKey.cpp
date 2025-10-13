@@ -130,7 +130,7 @@ ice_perm32 (
  */
 
 static void
-ice_sboxes_init (void)
+ice_sboxes_init ()
 {
 	int	i;
 

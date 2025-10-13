@@ -9,7 +9,7 @@
 #if defined( STEAM ) || defined( HL1 )
 #include "stdafx.h"
 #else
-#include <stdio.h>
+#include <cstdio>
 #include "dbg.h"
 #define INCLUDED_STEAM2_USERID_STRUCTS	
 #include "steamcommon.h"
@@ -39,14 +39,14 @@ static const char *DecimalToUint64( const char *pchStr, uint64 unLimit,
         if ( unNext < unVal )
         {
             // 64-bit overflow.
-            return NULL;
+            return nullptr;
         }
 
         unVal = unNext + (uint64)( *pchStr - '0' );
         if ( unVal > unLimit )
         {
             // Limit overflow.
-            return NULL;
+            return nullptr;
         }
 
         pchStr++;
@@ -54,7 +54,7 @@ static const char *DecimalToUint64( const char *pchStr, uint64 unLimit,
     if ( pchStr == pchStart )
     {
         // No number at all.
-        return NULL;
+        return nullptr;
     }
 
     *punVal = unVal;

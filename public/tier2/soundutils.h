@@ -7,10 +7,6 @@
 #ifndef SOUNDUTILS_H
 #define SOUNDUTILS_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 #include "tier2/riff.h"
 
 

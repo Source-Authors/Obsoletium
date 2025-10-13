@@ -28,6 +28,8 @@ protected:
 
 	//{{AFX_MSG(CMDIClientWnd)
 	afx_msg BOOL OnEraseBkgnd(CDC *pDC);
+	// dimhotepus: Easy new map UX. CS:GO
+	afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()

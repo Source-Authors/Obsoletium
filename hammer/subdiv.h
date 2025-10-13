@@ -205,8 +205,8 @@ inline int CSubdivMesh::GetPointCount( void )
 //-----------------------------------------------------------------------------
 inline void CSubdivMesh::GetPoint( int index, Vector& point )
 {
-	assert( index >= 0 );
-	assert( index < m_PointCount );
+	Assert( index >= 0 );
+	Assert( index < m_PointCount );
 
 	point = m_pPoints[index].m_Point;
 }
@@ -216,8 +216,8 @@ inline void CSubdivMesh::GetPoint( int index, Vector& point )
 //-----------------------------------------------------------------------------
 inline void CSubdivMesh::GetNormal( int index, Vector& normal )
 {
-	assert( index >= 0 );
-	assert( index < m_PointCount );
+	Assert( index >= 0 );
+	Assert( index < m_PointCount );
 
 	normal = m_pPoints[index].m_Normal;
 }
@@ -235,8 +235,8 @@ inline int CSubdivMesh::GetEdgeCount( void )
 //-----------------------------------------------------------------------------
 inline void CSubdivMesh::GetEdge( int index, CSubdivEdge *edge )
 {
-	assert( index >= 0 );
-	assert( index < m_EdgeCount );
+	Assert( index >= 0 );
+	Assert( index < m_EdgeCount );
 
 	edge->Copy( &m_pEdges[index] );
 }

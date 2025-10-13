@@ -79,7 +79,7 @@ private:
 		int						m_LightmapPageID;
 	};
 
-	friend bool FindDrawCommand( CUtlVector<CDrawCommand*> &drawCommands, int lmPageID, int &index );
+	friend bool FindDrawCommand( CUtlVector<CDrawCommand*> &drawCommands, int lmPageID, intp &index );
 
 	class CMaterialBuf
 	{

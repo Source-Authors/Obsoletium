@@ -213,7 +213,7 @@ public:
 #ifdef PLATFORM_64BITS
 			return Mix64HashFunctor()( (uintp)( p->fnHandle ) );
 #else
-			return Mix32HashFunctor()( (uint32)( p->fnHandle ) );
+			return Mix32HashFunctor()( (uint32)( p->fnHandle ) ); //-V205
 #endif
 		}
 		uint operator()( FileNameHandle_t fn ) const
@@ -221,7 +221,7 @@ public:
 #ifdef PLATFORM_64BITS
 			return Mix64HashFunctor()( (uintp) fn );
 #else
-			return Mix32HashFunctor()( (uint32) fn );
+			return Mix32HashFunctor()( (uint32) fn ); //-V205
 #endif
 		}
 	};
@@ -437,7 +437,7 @@ void CModelInfo::GetModelRenderBounds( const model_t *model, Vector& mins, Vecto
 	{
 	case mod_studio:
 		{
-			studiohdr_t *pStudioHdr = ( studiohdr_t * )modelloader->GetExtraData( (model_t*)model );
+			const studiohdr_t *pStudioHdr = ( const studiohdr_t * )modelloader->GetExtraData( (model_t*)model );
 			Assert( pStudioHdr );
 
 			// NOTE: We're not looking at the sequence box here, although we could
@@ -1110,7 +1110,7 @@ void CModelInfoClient::OnDynamicModelsStringTableChange( int nStringIndex, const
 	model_t* pModel = LookupDynamicModel( NETDYNAMIC_TO_MODEL( nStringIndex ) );
 
 	// Notify model loader that the server-side state may have changed
-	bool bServerLoaded = pData ? ( *(char*)pData != 0 ) : ( g_ClientGlobalVariables.network_protocol <= PROTOCOL_VERSION_20 );
+	bool bServerLoaded = pData ? ( *(const char*)pData != 0 ) : ( g_ClientGlobalVariables.network_protocol <= PROTOCOL_VERSION_20 );
 	modelloader->Client_OnServerModelStateChanged( pModel, bServerLoaded );
 }
 

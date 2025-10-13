@@ -38,7 +38,9 @@ private:
 	void SetDrawType( DrawType_t drawType );
 	virtual void ActivateView( bool bActivate );
  	bool UpdateRenderObjects();
-	void DrawCullingCircleHelper2D( CRender2D *pRender );
+
+	// dimhotepus: Remove radius culling.
+	// void DrawCullingCircleHelper2D( CRender2D *pRender );
 
 	void RenderInstanceMapClass_r( CMapClass *pObject );
 

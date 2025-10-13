@@ -385,7 +385,8 @@ HScheme  CSchemeManager::LoadSchemeFromFileEx( VPANEL sizingPanel, const char *f
 		return 0;
 	}
 	
-	ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
+	// dimhotepus: Do not do costly O(n) lookup every time.
+	static ConVarRef cl_hud_minmode( "cl_hud_minmode", true );
 	if ( cl_hud_minmode.IsValid() && cl_hud_minmode.GetBool() )
 	{
 		data->ProcessResolutionKeys( "_minmode" );
@@ -793,10 +794,32 @@ void CScheme::ReloadFontGlyphs()
 	KeyValues *fonts = m_pData->FindKey("Fonts", true);
 	FOR_EACH_DICT_FAST( m_FontAliases, i )
 	{
-		KeyValues *kv = fonts->FindKey( m_FontAliases[i]._trueFontName.String(), true );
+		const char *trueFontName = m_FontAliases[i]._trueFontName.String();
+		KeyValues *kv = fonts->FindKey( trueFontName, true );
+
+		// dimhotepus: Half-Life 2 20th Anniversary Update. Some fonts are without inner subkeys.
+		//
+		//"MenuLargeUnscaled"
+		//{
+		//	"name"		"Verdana"
+		//	...
+		//}
+		KeyValues *sub = kv->GetFirstSubKey();
+		bool hasInnerSubkey = sub && sub->GetDataType() == KeyValues::types_t::TYPE_NONE;
+		KeyValues *fontdata = hasInnerSubkey ? sub : kv;
+		// dimhotepus: Half-Life 2 20th Anniversary Update. Some fonts are empty on PC.
+		//
+		//GameUIButtons
+		//{
+		//	"1"	[$X360]
+		//	{
+		//		...
+		//	}
+		//}
+		fontdata = fontdata->GetFirstSubKey() ? fontdata : nullptr;
 	
 		// walk through creating adding the first matching glyph set to the font
-		for (KeyValues *fontdata = kv->GetFirstSubKey(); fontdata != NULL; fontdata = fontdata->GetNextKey())
+		for ( ; fontdata != nullptr; fontdata = fontdata->GetNextKey())
 		{
 			// skip over fonts not meant for this resolution
 			int fontYResMin = 0, fontYResMax = 0;
@@ -833,10 +856,12 @@ void CScheme::ReloadFontGlyphs()
 			{
 				flags |= ISurface::FONTFLAG_ANTIALIAS;
 			}
+			// dimhotepus: Add ClearType support.
 			if (fontdata->GetInt( "cleartype" ) && g_pSurface->SupportsFeature(ISurface::CLEARTYPE_FONTS))
 			{
 				flags |= ISurface::FONTFLAG_CLEARTYPE;
 			}
+			// dimhotepus: Add ClearType natural support.
 			if (fontdata->GetInt( "cleartype_natural" ) && g_pSurface->SupportsFeature(ISurface::CLEARTYPE_FONTS))
 			{
 				flags |= ISurface::FONTFLAG_CLEARTYPE_NATURAL;

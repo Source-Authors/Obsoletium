@@ -43,7 +43,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#pragma warning(disable:4244 4305)
 
 
 typedef struct
@@ -85,6 +84,9 @@ IMPLEMENT_DYNCREATE(CMapView3D, CView)
 
 BEGIN_MESSAGE_MAP(CMapView3D, CView)
 	//{{AFX_MSG_MAP(CMapView3D)
+	ON_WM_CREATE()
+	ON_WM_DESTROY()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	ON_WM_KILLFOCUS()
 	ON_WM_TIMER()
 	ON_WM_KEYDOWN()
@@ -181,6 +183,30 @@ BOOL CMapView3D::PreCreateWindow(CREATESTRUCT& cs)
 	cs.lpszClass = className;
 
 	return CView::PreCreateWindow(cs);
+}
+
+
+int CMapView3D::OnCreate(LPCREATESTRUCT lpCreateStruct)
+{
+	const int rc{__super::OnCreate(lpCreateStruct)};
+	if (!rc) {
+		m_dpiWindowBehavior.OnCreateWindow(m_hWnd);
+	}
+	return rc;
+}
+
+
+void CMapView3D::OnDestroy()
+{
+	m_dpiWindowBehavior.OnDestroyWindow();
+	
+	__super::OnDestroy();
+}
+
+
+LRESULT CMapView3D::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	return m_dpiWindowBehavior.OnWindowDpiChanged(wParam, lParam);
 }
 
 
@@ -379,7 +405,7 @@ void CMapView3D::Dump(CDumpContext& dc) const
 // Purpose: 
 // Input  : nIDEvent - 
 //-----------------------------------------------------------------------------
-void CMapView3D::OnTimer(UINT nIDEvent) 
+void CMapView3D::OnTimer(uintp nIDEvent) 
 {
 	static bool s_bPicking = false; // picking mutex
 
@@ -935,12 +961,13 @@ void CMapView3D::OnInitialUpdate(void)
 	// Set up the frustum. We set the vertical FOV to zero because the renderer
 	// only uses the horizontal FOV.
 	//
-	if ( Options.general.bRadiusCulling )
-	{
-		// Hack!  Don't use frustum culling when doing radial distance culling (slam the distance to 10K)
-		m_pCamera->SetPerspective( Options.view3d.fFOV, CAMERA_FRONT_PLANE_DISTANCE, 10000);
-	}
-	else
+	// dimhotepus: Remove radius culling.
+	// if ( Options.general.bRadiusCulling )
+	// {
+	// 	// Hack!  Don't use frustum culling when doing radial distance culling (slam the distance to 10K)
+	// 	m_pCamera->SetPerspective( Options.view3d.fFOV, CAMERA_FRONT_PLANE_DISTANCE, 10000);
+	// }
+	// else
 	{
 		m_pCamera->SetPerspective( Options.view3d.fFOV, CAMERA_FRONT_PLANE_DISTANCE, Options.view3d.iBackPlane);
 	}
@@ -1109,7 +1136,7 @@ bool CMapView3D::ShouldRender()
 		// don't animate ray traced displays
 		if ( Options.view3d.bAnimateModels )
 		{
-			DWORD dwTimeElapsed = timeGetTime() - m_dwTimeLastRender;
+			ULONGLONG dwTimeElapsed = GetTickCount64() - m_dwTimeLastRender;
 			
 			if ( (dwTimeElapsed/1000.0f) > 1.0f/20.0f)
 			{
@@ -1347,10 +1374,10 @@ void CMapView3D::ProcessInput(void)
 {
 	if (m_dwTimeLastInputSample == 0)
 	{
-		m_dwTimeLastInputSample = timeGetTime();
+		m_dwTimeLastInputSample = GetTickCount64();
 	}
 
-	DWORD dwTimeNow = timeGetTime();
+	ULONGLONG dwTimeNow = GetTickCount64();
 
 	float fElapsedTime = (float)(dwTimeNow - m_dwTimeLastInputSample) / 1000.0f;
 
@@ -1370,10 +1397,11 @@ void CMapView3D::ProcessInput(void)
 
 	ProcessMouse();
 
-	if ( Options.general.bRadiusCulling )
-	{
-		ProcessCulling();
-	}
+	// dimhotepus: Remove radius culling.
+	// if ( Options.general.bRadiusCulling )
+	// {
+	//	ProcessCulling();
+	// }
 }
 
 
@@ -1528,17 +1556,18 @@ void CMapView3D::ProcessKeys(float fElapsedTime)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CMapView3D::ProcessCulling( void )
-{
-	if ( m_bCameraPosChanged || m_bClippingChanged )
-	{
-		CMapDoc *pDoc = GetMapDoc();
-		pDoc->UpdateVisibilityAll();
-
-		m_bClippingChanged = false;
-		m_bCameraPosChanged = false;
-	}
-}
+// dimhotepus: Remove radius culling.
+// void CMapView3D::ProcessCulling( void )
+// {
+// 	if ( m_bCameraPosChanged || m_bClippingChanged )
+// 	{
+// 		CMapDoc *pDoc = GetMapDoc();
+// 		pDoc->UpdateVisibilityAll();
+// 
+// 		m_bClippingChanged = false;
+// 		m_bCameraPosChanged = false;
+// 	}
+// }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -1914,8 +1943,9 @@ void CMapView3D::Render(void)
 	if (m_pwndTitle != NULL)
 	{
 		m_pwndTitle->BringWindowToTop();
-		m_pwndTitle->Invalidate();
-		m_pwndTitle->UpdateWindow();
+		// dimhotepus: Title windows for views should not fliker.
+		//m_pwndTitle->Invalidate();
+		//m_pwndTitle->UpdateWindow();
 	}
 }
 

@@ -318,7 +318,7 @@ IPhysicsObject *PhysModelCreate( CBaseEntity *pEntity, int modelIndex, const Vec
 			return NULL;
 	}
 
-	int surfaceProp = -1;
+	intp surfaceProp = -1;
 	if ( pSolid->surfaceprop[0] )
 	{
 		surfaceProp = physprops->GetSurfaceIndex( pSolid->surfaceprop );
@@ -376,7 +376,7 @@ IPhysicsObject *PhysModelCreateUnmoveable( CBaseEntity *pEntity, int modelIndex,
 	// collisions are off by default
 	solid.params.enableCollisions = true;
 	//solid.params.mass = 1.0;
-	int surfaceProp = -1;
+	intp surfaceProp = -1;
 	if ( solid.surfaceprop[0] )
 	{
 		surfaceProp = physprops->GetSurfaceIndex( solid.surfaceprop );
@@ -459,7 +459,7 @@ IPhysicsObject *PhysSphereCreate( CBaseEntity *pEntity, float radius, const Vect
 	if ( !physenv )
 		return NULL;
 
-	int surfaceProp = -1;
+	intp surfaceProp = -1;
 	if ( solid.surfaceprop[0] )
 	{
 		surfaceProp = physprops->GetSurfaceIndex( solid.surfaceprop );
@@ -506,7 +506,7 @@ void PhysDestroyObject( IPhysicsObject *pObject, CBaseEntity *pEntity )
 	}
 }
 
-void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pProps, IFileSystem *pFileSystem )
+static void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pProps, IFileSystem *pFileSystem )
 {
 	// Load file into memory
 	FileHandle_t file = pFileSystem->Open( pFileName, "rb", "GAME" );
@@ -517,11 +517,7 @@ void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pProps, IF
 
 		// read the file
 		int nBufSize = len+1;
-		if ( IsXbox() )
-		{
-			nBufSize = AlignValue( nBufSize , 512 );
-		}
-		char *buffer = (char *)stackalloc( nBufSize );
+		char *buffer = stackallocT( char, nBufSize );
 		pFileSystem->ReadEx( buffer, nBufSize, len, file );
 		pFileSystem->Close( file );
 		buffer[len] = 0;
@@ -530,7 +526,8 @@ void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pProps, IF
 	}
 	else
 	{
-		Error( "Unable to load surface prop file '%s' (referenced by manifest file '%s')\n", pFileName, SURFACEPROP_MANIFEST_FILE );
+		Error( "Unable to load surface prop file '%s' (referenced by manifest file '%s')\n",
+			pFileName, SURFACEPROP_MANIFEST_FILE );
 	}
 }
 
@@ -591,7 +588,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 	if ( !physenv )
 		return NULL;
 
-	int surfaceData = physprops->GetSurfaceIndex( "default" );
+	intp surfaceData = physprops->GetSurfaceIndex( "default" );
 
 	objectparams_t params = defaultParams;
 	params.pGameData = static_cast<void *>(pWorld);

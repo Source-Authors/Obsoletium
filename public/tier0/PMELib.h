@@ -1,18 +1,18 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_PMELIB_H_
-#define TIER0_PMELIB_H_
+#ifndef SE_PUBLIC_TIER0_PMELIB_H_
+#define SE_PUBLIC_TIER0_PMELIB_H_
 
-#include "tier0/platform.h"
+#include "platform.h"
 
 constexpr inline char VERSION[]{"1.0.2"};
 
 // uncomment this list to add some runtime checks
 //#define PME_DEBUG   
 
-#include "tier0/valve_off.h"
+#include "valve_off.h"
 #include <string>
-#include "tier0/valve_on.h"
+#include "valve_on.h"
 
 // RDTSC Instruction macro
 #define RDTSC(var) (var = __rdtsc())
@@ -28,7 +28,7 @@ constexpr inline char VERSION[]{"1.0.2"};
 #define EVENT_TYPE(mode) EventType##mode
 #define EVENT_MASK(mode) EventMask##mode
 
-#include "tier0/ia32detect.h"
+#include "ia32detect.h"
 
 enum ProcessPriority
 {
@@ -81,7 +81,7 @@ protected:
 
     PME()
     {
-        hFile = NULL;
+        hFile = nullptr;
         bDriverOpen = FALSE;
         m_CPUClockSpeed = 0;
         Init(); 
@@ -96,8 +96,8 @@ public:
         Close();
     }
 
-    double GetCPUClockSpeedSlow( void );
-    double GetCPUClockSpeedFast( void );
+    double GetCPUClockSpeedSlow( );
+    double GetCPUClockSpeedFast( );
 
     long SelectP5P6PerformanceEvent( uint32 dw_event, uint32 dw_counter, bool b_user, bool b_kernel );
 
@@ -112,12 +112,12 @@ public:
     //---------------------------------------------------------------------------
     // Return the family of the processor
     //---------------------------------------------------------------------------
-    CPUVendor GetVendor() const
+    [[nodiscard]] CPUVendor GetVendor() const
     {
         return vendor;
     }
 
-    int GetProcessorFamily() const
+    [[nodiscard]] int GetProcessorFamily() const
     {
         return version.Family;
     }
@@ -128,9 +128,9 @@ public:
 
 };
 
-#include "tier0/P5P6PerformanceCounters.h"    
-#include "tier0/P4PerformanceCounters.h"    
-#include "tier0/K8PerformanceCounters.h"    
+#include "P5P6PerformanceCounters.h"    
+#include "P4PerformanceCounters.h"    
+#include "K8PerformanceCounters.h"    
 
 enum PerfErrors
 {
@@ -146,4 +146,4 @@ enum PerfErrors
     E_ILLEGAL_OPERATION		= -10,
 };
 
-#endif  // TIER0_PMELIB_H_
+#endif  // !SE_PUBLIC_TIER0_PMELIB_H_

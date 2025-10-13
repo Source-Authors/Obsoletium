@@ -30,7 +30,7 @@
 #include "fmtstr.h"
 #include "vcollide_parse.h"
 
-int FindPhysprop( const char *pPropname );
+intp FindPhysprop( const char *pPropname );
 
 bool LoadPhysicsProperties( void );
 extern int FindBoneIndex( CStudioHdr *pstudiohdr, const char *pName );
@@ -356,12 +356,12 @@ void CStudioPhysics::ParseKeydata( void )
 }
 
 
-int FindPhysprop( const char *pPropname )
+intp FindPhysprop( const char *pPropname )
 {
 	if ( physprop )
 	{
-		int count = physprop->SurfacePropCount();
-		for ( int i = 0; i < count; i++ )
+		intp count = physprop->SurfacePropCount();
+		for ( intp i = 0; i < count; i++ )
 		{
 			if ( !strcmpi( pPropname, physprop->GetPropName(i) ) )
 				return i;
@@ -378,20 +378,20 @@ public:
 	CTextBuffer( void ) {}
 	~CTextBuffer( void ) {}
 
-	inline int GetSize( void ) { return m_buffer.Size(); }
+	inline intp GetSize( void ) { return m_buffer.Count(); }
 	inline char *GetData( void ) { return m_buffer.Base(); }
 	
 	void WriteText( const char *pText )
 	{
-		int len = strlen( pText );
+		intp len = V_strlen( pText );
 		CopyData( pText, len );
 	}
 
 	void Terminate( void ) { CopyData( "\0", 1 ); }
 
-	void CopyData( const char *pData, int len )
+	void CopyData( const char *pData, intp len )
 	{
-		int offset = m_buffer.AddMultipleToTail( len );
+		intp offset = m_buffer.AddMultipleToTail( len );
 		memcpy( m_buffer.Base() + offset, pData, len );
 	}
 

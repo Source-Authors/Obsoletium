@@ -12,11 +12,6 @@
 #include "vphysics/constraints.h"
 #include "isaverestore.h"
 
-// HACKHACK: Mathlib defines this too!
-#undef clamp
-#undef max
-#undef min
-
 // new havana constraint class
 #include "hk_physics/physics.h"
 #include "hk_physics/constraint/constraint.h"
@@ -59,7 +54,7 @@ extern void qh_srand( int seed);
 #include "tier0/memdbgon.h"
 
 
-const float UNBREAKABLE_BREAK_LIMIT = 1e12f;
+constexpr inline float UNBREAKABLE_BREAK_LIMIT = 1e12f;
 
 hk_Vector3 TransformHLWorldToHavanaLocal( const Vector &hlWorld, IVP_Real_Object *pObject )
 {
@@ -184,7 +179,7 @@ END_DATADESC()
 // the constraints are restored and added to the groups
 static CUtlVector<CPhysicsConstraintGroup *> g_ConstraintGroupActivateList;
 
-class CPhysicsConstraintGroup: public IPhysicsConstraintGroup 
+class CPhysicsConstraintGroup final : public IPhysicsConstraintGroup 
 {
 public:
 	hk_Local_Constraint_System *GetLCS() { return m_pLCS; }
@@ -452,7 +447,7 @@ struct vphysics_save_constraint_t
 
 // UNDONE: May need to change interface to specify limits before construction
 // UNDONE: Refactor constraints to contain a separate object for the various constraint types?
-class CPhysicsConstraint: public IPhysicsConstraint, public IVP_Listener_Object
+class CPhysicsConstraint final : public IPhysicsConstraint, public IVP_Listener_Object
 {
 public:
 	CPhysicsConstraint( CPhysicsObject *pReferenceObject, CPhysicsObject *pAttachedObject );

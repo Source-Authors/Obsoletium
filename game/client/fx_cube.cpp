@@ -21,6 +21,7 @@ public:
 							m_pMaterial = pMaterial;
 							if(m_pMaterial)
 								m_pMaterial->IncrementReferenceCount();
+							m_Life = 0;
 						}
 
 	virtual				~FX_Cube()

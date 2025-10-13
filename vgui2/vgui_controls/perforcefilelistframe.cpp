@@ -215,12 +215,12 @@ void COperationFileListFrame::DoModal( KeyValues *pContextKeyValues, const char 
 //-----------------------------------------------------------------------------
 // Retrieves the number of files, the file names, and operations
 //-----------------------------------------------------------------------------
-int COperationFileListFrame::GetOperationCount()
+intp COperationFileListFrame::GetOperationCount()
 {
 	return m_pFileBrowser->GetItemCount();
 }
 
-const char *COperationFileListFrame::GetFileName( int i )
+const char *COperationFileListFrame::GetFileName( intp i )
 {
 	int nItemId = m_pFileBrowser->GetItemIDFromRow( i );
 	KeyValues *pKeyValues = m_pFileBrowser->GetItem( nItemId );
@@ -262,7 +262,7 @@ void COperationFileListFrame::OnCommand( const char *pCommand )
 	{
 		if ( m_pDescription )
 		{
-			int nLen = m_pDescription->GetTextLength() + 1;
+			intp nLen = m_pDescription->GetTextLength() + 1;
 			m_pText = new char[ nLen ];
 			m_pDescription->GetText( m_pText, nLen );
 		}
@@ -509,9 +509,9 @@ bool CPerforceFileListFrame::PerformOperation( )
 	if ( !p4 )
 		return false;
 
-	int nFileCount = GetOperationCount();
+	intp nFileCount = GetOperationCount();
 	const char **ppFileNames = (const char**)_alloca( nFileCount * sizeof(char*) );
-	for ( int i = 0; i < nFileCount; ++i )
+	for ( intp i = 0; i < nFileCount; ++i )
 	{
 		ppFileNames[i] = GetFileName( i );
 	}

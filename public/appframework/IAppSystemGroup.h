@@ -106,7 +106,7 @@ public:
 public:
 	// constructor
 	CAppSystemGroup( CAppSystemGroup *pParentAppSystem = nullptr );
-	virtual ~CAppSystemGroup() {}
+	virtual ~CAppSystemGroup() = default;
 
 	// Runs the app system group.
 	// First, modules are loaded, next they are connected, followed by initialization
@@ -120,7 +120,7 @@ public:
 	virtual void Shutdown();
 
 	// Returns the stage at which the app system group ran into an error
-	AppSystemGroupStage_t GetErrorStage() const;
+	[[nodiscard]] AppSystemGroupStage_t GetErrorStage() const;
 
 protected:
 	// These methods are meant to be called by derived classes of CAppSystemGroup
@@ -214,7 +214,7 @@ protected:
 	bool SetupSearchPaths( const char *pStartingDir, bool bOnlyUseStartingDir, bool bIsTool );
 
 	// Returns the game info path. Only works if you've called SetupSearchPaths first
-	const char *GetGameInfoPath() const;
+	[[nodiscard]] const char *GetGameInfoPath() const;
 
 private:
 	CSysModule *LoadModuleDLL( const char *pDLLName ) override;

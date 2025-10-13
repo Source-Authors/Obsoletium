@@ -23,7 +23,7 @@
 // modified to take (and use) a context object, ala Microsoft's qsort_s
 // "extension" to the stdlib
 
-#include <stddef.h>                     /* for size_t definition  */
+#include <cstddef>                     /* for size_t definition  */
 
 /*
 **  swap nbytes between a and b
@@ -41,7 +41,9 @@ static void swap_bytes(char *a, char *b, size_t nbytes)
 
 #define  COMP(ctx, a, b)  ((*comp)((void *)ctx, (void *)(a), (void *)(b)))
 
-#define  T           7    /* subfiles of T or fewer elements will */
+enum {
+  T = 7    /* subfiles of T or fewer elements will */
+};
                           /* be sorted by a simple insertion sort */
                           /* Note!  T must be at least 3          */
 

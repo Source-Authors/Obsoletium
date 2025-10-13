@@ -32,7 +32,6 @@ class DedicatedAppSystemGroup : public DEDICATED_BASECLASS {
                           bool is_console_mode)
       : system_{system},
         command_line_{command_line},
-        api_{nullptr},
         is_console_mode_{is_console_mode} {}
 
   bool Create() override;
@@ -63,7 +62,7 @@ class DedicatedAppSystemGroup : public DEDICATED_BASECLASS {
  private:
   ISystem *system_;
   ICommandLine *command_line_;
-  IDedicatedServerAPI *api_;
+  IDedicatedServerAPI *api_{nullptr};
   const bool is_console_mode_;
 };
 

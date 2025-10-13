@@ -4,17 +4,17 @@
 //
 //===========================================================================//
 
+#include "soundemittersystembase.h"
 
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
+#include "tier1/utldict.h"
+#include "tier1/utlbuffer.h"
+#include "tier1/checksum_crc.h"
 #include "filesystem.h"
-#include "utldict.h"
 #include "interval.h"
 #include "engine/IEngineSound.h"
-#include "soundemittersystembase.h"
-#include "utlbuffer.h"
 #include "soundchars.h"
 #include "vstdlib/random.h"
-#include "checksum_crc.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
 #include "ifilelist.h"
 
@@ -24,7 +24,7 @@
 #define MANIFEST_FILE				"scripts/game_sounds_manifest.txt"
 #define GAME_SOUNDS_HEADER_BLOCK	"scripts/game_sounds_header.txt"
 
-static IFileSystem* filesystem = 0;
+static IFileSystem* filesystem = nullptr;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -39,7 +39,7 @@ CSoundEmitterSystemBase::CSoundEmitterSystemBase() :
 // Purpose: 
 // Output : int	
 //-----------------------------------------------------------------------------
-int	 CSoundEmitterSystemBase::First() const
+UtlHashHandle_t CSoundEmitterSystemBase::First() const
 {
 	return m_Sounds.FirstHandle();
 }
@@ -49,7 +49,7 @@ int	 CSoundEmitterSystemBase::First() const
 // Input  : i - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CSoundEmitterSystemBase::Next( int i ) const
+UtlHashHandle_t CSoundEmitterSystemBase::Next( UtlHashHandle_t i ) const
 {
 	return m_Sounds.NextHandle(i);
 }
@@ -57,7 +57,7 @@ int CSoundEmitterSystemBase::Next( int i ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int	CSoundEmitterSystemBase::InvalidIndex() const
+UtlHashHandle_t	CSoundEmitterSystemBase::InvalidIndex() const
 {
 	return m_Sounds.InvalidHandle();
 }
@@ -172,13 +172,6 @@ static void AccumulateFileNameAndTimestampIntoChecksum( CRC32_t *crc, char const
 //-----------------------------------------------------------------------------
 bool CSoundEmitterSystemBase::InternalModInit()
 {
-	/*
-	if ( m_SoundKeyValues.Count() > 0 )
-	{
-		Shutdown();
-	}
-	*/
-
 	LoadGlobalActors();
 
 	m_uManifestPlusScriptChecksum = 0u;
@@ -230,7 +223,7 @@ bool CSoundEmitterSystemBase::InternalModInit()
 
 // Only print total once, on server
 #if !defined( CLIENT_DLL ) && !defined( FACEPOSER )
-	DevMsg( 1, "CSoundEmitterSystem:  Registered %i sounds\n", m_Sounds.Count() );
+	DevMsg( 1, "CSoundEmitterSystem:  Registered %zd sounds\n", m_Sounds.Count() );
 #endif
 
 	return true;
@@ -259,19 +252,18 @@ bool CSoundEmitterSystemBase::ModInit()
 //-----------------------------------------------------------------------------
 void CSoundEmitterSystemBase::InternalModShutdown()
 {
-	int i;
 	m_SoundKeyValues.RemoveAll();
 
-	for ( UtlHashHandle_t nIndex = m_Sounds.FirstHandle(); nIndex != m_Sounds.InvalidHandle(); nIndex = m_Sounds.NextHandle( nIndex ) )
+	for ( auto nIndex = m_Sounds.FirstHandle(); nIndex != m_Sounds.InvalidHandle(); nIndex = m_Sounds.NextHandle( nIndex ) )
 	{
 		delete m_Sounds[ nIndex ];
 	}
 
 	m_Sounds.Purge();
 
-	for ( i = 0; i < m_SavedOverrides.Count() ; ++i )
+	for ( auto *override : m_SavedOverrides )
 	{
-		delete m_SavedOverrides[ i ];
+		delete override;
 	}
 	m_SavedOverrides.Purge();
 	m_Waves.RemoveAll();
@@ -294,16 +286,16 @@ void CSoundEmitterSystemBase::ModShutdown()
 // Purpose: 
 // Input  : *pName - 
 //-----------------------------------------------------------------------------
-int	CSoundEmitterSystemBase::GetSoundIndex( const char *pName ) const
+UtlHashHandle_t	CSoundEmitterSystemBase::GetSoundIndex( const char *pName ) const
 {
 	if ( !pName )
-		return -1;
+		return std::numeric_limits<UtlHashHandle_t>::max();
 
 	CSoundEntry search;
 	search.m_Name = pName;
 	UtlHashHandle_t idx = m_Sounds.Find( pName );
 	if ( idx == m_Sounds.InvalidHandle() )
-		return -1;
+		return std::numeric_limits<UtlHashHandle_t>::max();
 
 	return idx;
 }
@@ -313,7 +305,7 @@ int	CSoundEmitterSystemBase::GetSoundIndex( const char *pName ) const
 // Input  : index - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSoundEmitterSystemBase::IsValidIndex( int index )
+bool CSoundEmitterSystemBase::IsValidIndex( UtlHashHandle_t index )
 {
 	return m_Sounds.IsValidHandle( index );
 }
@@ -323,7 +315,7 @@ bool CSoundEmitterSystemBase::IsValidIndex( int index )
 // Input  : index - 
 // Output : char const
 //-----------------------------------------------------------------------------
-const char *CSoundEmitterSystemBase::GetSoundName( intp index )
+const char *CSoundEmitterSystemBase::GetSoundName( UtlHashHandle_t index )
 {
 	if ( !IsValidIndex( index ) )
 		return "";
@@ -335,7 +327,7 @@ const char *CSoundEmitterSystemBase::GetSoundName( intp index )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CSoundEmitterSystemBase::GetSoundCount( void )
+intp CSoundEmitterSystemBase::GetSoundCount( void )
 {
 	return m_Sounds.Count();
 }
@@ -428,7 +420,7 @@ bool CSoundEmitterSystemBase::GetParametersForSound( const char *soundname, CSou
 	{
 		static CUtlSymbolTable soundWarnings;
 		char key[ 256 ];
-		Q_snprintf( key, sizeof( key ), "%s:%s", soundname, params.soundname );
+		V_sprintf_safe( key, "%s:%s", soundname, params.soundname );
 		if ( UTL_INVAL_SYMBOL == soundWarnings.Find( key ) )
 		{
 			soundWarnings.AddString( key );
@@ -441,7 +433,7 @@ bool CSoundEmitterSystemBase::GetParametersForSound( const char *soundname, CSou
 	return GetParametersForSoundEx( soundname, index, params, gender, isbeingemitted );
 }
 
-CSoundParametersInternal *CSoundEmitterSystemBase::InternalGetParametersForSound( int index )
+CSoundParametersInternal *CSoundEmitterSystemBase::InternalGetParametersForSound( UtlHashHandle_t index )
 {
 	if ( !m_Sounds.IsValidHandle( index ) )
 	{
@@ -452,14 +444,15 @@ CSoundParametersInternal *CSoundEmitterSystemBase::InternalGetParametersForSound
 	return &m_Sounds[ index ]->m_SoundParams;
 }
 
-static void SplitName( char const *input, int splitchar, int splitlen, char *before, int beforelen, char *after, int afterlen )
+template<intp beforelen, intp afterlen>
+static void SplitName( char const *input, intp splitchar, intp splitlen, char (&before)[beforelen], char (&after)[afterlen] )
 {
 	char const *in = input;
 	char *out = before;
 
-	int c = 0;
-	int l = 0;
-	int maxl = beforelen;
+	intp c = 0;
+	intp l = 0;
+	intp maxl = beforelen;
 	while ( *in )
 	{
 		if ( c == splitchar )
@@ -518,28 +511,27 @@ void CSoundEmitterSystemBase::AddSoundName( CSoundParametersInternal& params, ch
 void CSoundEmitterSystemBase::ExpandSoundNameMacros( CSoundParametersInternal& params, char const *wavename )
 {
 	char const *p = Q_stristr( wavename, SOUNDGENDER_MACRO );
-
 	if ( !p )
 	{
 		AddSoundName( params, wavename, GENDER_NONE );
 		return;
 	}
 
-	int offset = p - wavename;
+	intp offset = p - wavename;
 	Assert( offset >= 0 );
 	int duration = SOUNDGENDER_MACRO_LENGTH;
 
 	// Create a "male" and "female" version of the sound
 	char before[ 256 ], after[ 256 ];
-	Q_memset( before, 0, sizeof( before ) );
-	Q_memset( after, 0, sizeof( after ) );
+	BitwiseClear( before );
+	BitwiseClear( after );
 
-	SplitName( wavename, offset, duration, before, sizeof( before ), after, sizeof( after ) );
+	SplitName( wavename, offset, duration, before, after );
 
 	char temp[ 256 ];
-	Q_snprintf( temp, sizeof( temp ), "%s%s%s", before, "male", after );
+	V_sprintf_safe( temp, "%s%s%s", before, "male", after );
 	AddSoundName( params, temp, GENDER_MALE );
-	Q_snprintf( temp, sizeof( temp ), "%s%s%s", before, "female", after );
+	V_sprintf_safe( temp, "%s%s%s", before, "female", after );
 	AddSoundName( params, temp, GENDER_FEMALE );
 
 	// Add the conversion entry with the gender tags still in it
@@ -567,16 +559,16 @@ void CSoundEmitterSystemBase::GenderExpandString( gender_t gender, char const *i
 		return;
 	}
 
-	int offset = p - in;
+	intp offset = p - in;
 	Assert( offset >= 0 );
 	int duration = SOUNDGENDER_MACRO_LENGTH;
 
 	// Create a "male" and "female" version of the sound
 	char before[ 256 ], after[ 256 ];
-	Q_memset( before, 0, sizeof( before ) );
-	Q_memset( after, 0, sizeof( after ) );
+	BitwiseClear( before );
+	BitwiseClear( after );
 
-	SplitName( in, offset, duration, before, sizeof( before ), after, sizeof( after ) );
+	SplitName( in, offset, duration, before, after );
 
 	switch ( gender )
 	{
@@ -791,7 +783,7 @@ const char *CSoundEmitterSystemBase::GetWavFileForSound( const char *soundname, 
 	}
 
 	static char outsound[ 512 ];
-	Q_strncpy( outsound, params.soundname, sizeof( outsound ) );
+	V_strcpy_safe( outsound, params.soundname );
 	return outsound;
 }
 
@@ -971,11 +963,10 @@ int CSoundEmitterSystemBase::CheckForMissingWavFiles( bool verbose )
 {
 	int missing = 0;
 
-	int c = GetSoundCount();
-	int i;
+	intp c = GetSoundCount();
 	char testfile[ 512 ];
 
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		CSoundParametersInternal *internal = InternalGetParametersForSound( i );
 		if ( !internal )
@@ -998,7 +989,7 @@ int CSoundEmitterSystemBase::CheckForMissingWavFiles( bool verbose )
 			// Skip ! sentence stuff
 			if ( name[0] == CHAR_SENTENCE )
 				continue;
-			Q_snprintf( testfile, sizeof( testfile ), "sound/%s", PSkipSoundChars( name ) );
+			V_sprintf_safe( testfile, "sound/%s", PSkipSoundChars( name ) );
 			if ( filesystem->FileExists( testfile ) )
 				continue;
 
@@ -1075,9 +1066,9 @@ int CSoundEmitterSystemBase::TranslateChannel( const char *name )
 	return TextToChannel( name );
 }
 
-const char *CSoundEmitterSystemBase::GetSourceFileForSound( int index ) const
+const char *CSoundEmitterSystemBase::GetSourceFileForSound( intp index ) const
 {
-	if ( index < 0 || index >= (int)m_Sounds.Count() )
+	if ( index < 0 || index >= m_Sounds.Count() )
 	{
 		Assert( 0 );
 		return "";
@@ -1106,14 +1097,12 @@ const char *CSoundEmitterSystemBase::GetWaveName( CUtlSymbol& sym )
 
 int	CSoundEmitterSystemBase::FindSoundScript( const char *name ) const
 {
-	int i, c;
-
 	FileNameHandle_t hFilename = filesystem->FindFileName( name );
 	if ( hFilename )
 	{
 		// First, make sure it's known
-		c = m_SoundKeyValues.Count();
-		for ( i = 0; i < c ; i++ )
+		intp c = m_SoundKeyValues.Count();
+		for ( intp i = 0; i < c ; i++ )
 		{
 			if ( m_SoundKeyValues[ i ].hFilename == hFilename )
 			{
@@ -1127,7 +1116,7 @@ int	CSoundEmitterSystemBase::FindSoundScript( const char *name ) const
 
 bool CSoundEmitterSystemBase::AddSound( const char *soundname, const char *scriptfile, const CSoundParametersInternal& params )
 {
-	int idx = GetSoundIndex( soundname );
+	UtlHashHandle_t idx = GetSoundIndex( soundname );
 
 
 	int i = FindSoundScript( scriptfile );
@@ -1169,7 +1158,7 @@ bool CSoundEmitterSystemBase::AddSound( const char *soundname, const char *scrip
 
 void CSoundEmitterSystemBase::RemoveSound( const char *soundname )
 {
-	int idx = GetSoundIndex( soundname );
+	UtlHashHandle_t idx = GetSoundIndex( soundname );
 	if ( !IsValidIndex( idx ) )
 	{
 		Warning( "Can't remove %s, no such sound!\n", soundname );
@@ -1191,7 +1180,7 @@ void CSoundEmitterSystemBase::RemoveSound( const char *soundname )
 
 void CSoundEmitterSystemBase::MoveSound( const char *soundname, const char *newscript )
 {
-	int idx = GetSoundIndex( soundname );
+	UtlHashHandle_t idx = GetSoundIndex( soundname );
 	if ( !IsValidIndex( idx ) )
 	{
 		Warning( "Can't move '%s', no such sound!\n", soundname );
@@ -1232,7 +1221,7 @@ int CSoundEmitterSystemBase::GetNumSoundScripts() const
 	return m_SoundKeyValues.Count();
 }
 
-const char *CSoundEmitterSystemBase::GetSoundScriptName( int index ) const
+const char *CSoundEmitterSystemBase::GetSoundScriptName( intp index ) const
 {
 	if ( index < 0 || index >= m_SoundKeyValues.Count() )
 		return NULL;
@@ -1245,7 +1234,7 @@ const char *CSoundEmitterSystemBase::GetSoundScriptName( int index ) const
 	return "";
 }
 
-bool CSoundEmitterSystemBase::IsSoundScriptDirty( int index ) const
+bool CSoundEmitterSystemBase::IsSoundScriptDirty( intp index ) const
 {
 	if ( index < 0 || index >= m_SoundKeyValues.Count() )
 		return false;
@@ -1253,12 +1242,12 @@ bool CSoundEmitterSystemBase::IsSoundScriptDirty( int index ) const
 	return m_SoundKeyValues[ index ].dirty;
 }
 
-void CSoundEmitterSystemBase::SaveChangesToSoundScript( int scriptindex )
+void CSoundEmitterSystemBase::SaveChangesToSoundScript( intp scriptindex )
 {
 	const char *outfile = GetSoundScriptName( scriptindex );
 	if ( !outfile )
 	{
-		Msg( "CSoundEmitterSystemBase::SaveChangesToSoundScript:  No script file for index %i\n", scriptindex );
+		Msg( "CSoundEmitterSystemBase::SaveChangesToSoundScript:  No script file for index %zd\n", scriptindex );
 		return;
 	}
 
@@ -1304,8 +1293,8 @@ void CSoundEmitterSystemBase::SaveChangesToSoundScript( int scriptindex )
 	}
 
 
-	int c = GetSoundCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = GetSoundCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( Q_stricmp( outfile, GetSourceFileForSound( i ) ) )
 			continue;
@@ -1423,14 +1412,14 @@ void CSoundEmitterSystemBase::RenameSound( const char *soundname, const char *ne
 		return;
 	}
 
-	int oldindex = GetSoundIndex( soundname );
+	UtlHashHandle_t oldindex = GetSoundIndex( soundname );
 	if ( !IsValidIndex( oldindex ) )
 	{
 		Msg( "Can't rename %s, no such sound\n", soundname );
 		return;
 	}
 
-	int check = GetSoundIndex( newname );
+	UtlHashHandle_t check = GetSoundIndex( newname );
 	if ( IsValidIndex( check ) )
 	{
 		Msg( "Can't rename %s to %s, new name already in list\n", soundname, newname );
@@ -1453,7 +1442,7 @@ void CSoundEmitterSystemBase::RenameSound( const char *soundname, const char *ne
 
 void CSoundEmitterSystemBase::UpdateSoundParameters( const char *soundname, const CSoundParametersInternal& params )
 {
-	int idx = GetSoundIndex( soundname );
+	UtlHashHandle_t idx = GetSoundIndex( soundname );
 	if ( !IsValidIndex( idx ) )
 	{
 		Msg( "Can't UpdateSoundParameters %s, no such sound\n", soundname );
@@ -1476,7 +1465,7 @@ void CSoundEmitterSystemBase::UpdateSoundParameters( const char *soundname, cons
 
 bool CSoundEmitterSystemBase::IsUsingGenderToken( char const *soundname )
 {
-	int soundindex = GetSoundIndex( soundname );
+	UtlHashHandle_t soundindex = GetSoundIndex( soundname );
 	if ( soundindex < 0 )
 		return false;
 
@@ -1501,7 +1490,7 @@ bool CSoundEmitterSystemBase::GetParametersForSoundEx( const char *soundname, HS
 			return false;
 	}
 
-	CSoundParametersInternal *internal = InternalGetParametersForSound( (int)handle );
+	CSoundParametersInternal *internal = InternalGetParametersForSound( handle );
 	if ( !internal )
 	{
 		Assert( 0 );
@@ -1522,7 +1511,7 @@ bool CSoundEmitterSystemBase::GetParametersForSoundEx( const char *soundname, HS
 
 	if ( bestIndex >= 0 )
 	{
-		Q_strncpy( params.soundname, GetWaveName( internal->GetSoundNames()[ bestIndex ].symbol), sizeof( params.soundname ) );
+		V_strcpy_safe( params.soundname, GetWaveName( internal->GetSoundNames()[ bestIndex ].symbol) );
 
 		// If we are actually emitting the sound, mark it as not available...
 		if ( isbeingemitted )
@@ -1543,13 +1532,13 @@ bool CSoundEmitterSystemBase::GetParametersForSoundEx( const char *soundname, HS
 		params.soundname[ 0 ] != CHAR_SENTENCE )
 	{
 		char testfile[ 256 ];
-		Q_snprintf( testfile, sizeof( testfile ), "sound/%s", PSkipSoundChars( params.soundname ) );
+		V_sprintf_safe( testfile, "sound/%s", PSkipSoundChars( params.soundname ) );
 		if ( !filesystem->FileExists( testfile ) )
 		{
 			// Prevent repetitive spew...
 			static CUtlSymbolTable soundWarnings;
 			char key[ 256 ];
-			Q_snprintf( key, sizeof( key ), "%s:%s", soundname, params.soundname );
+			V_sprintf_safe( key, "%s:%s", soundname, params.soundname );
 			if ( UTL_INVAL_SYMBOL == soundWarnings.Find( key ) )
 			{
 				soundWarnings.AddString( key );
@@ -1574,7 +1563,7 @@ soundlevel_t CSoundEmitterSystemBase::LookupSoundLevelByHandle( char const *soun
 			return SNDLVL_NORM;
 	}
 
-	CSoundParametersInternal *internal = InternalGetParametersForSound( (int)handle );
+	CSoundParametersInternal *internal = InternalGetParametersForSound( handle );
 	if ( !internal )
 	{
 		return SNDLVL_NORM;
@@ -1600,9 +1589,9 @@ void CSoundEmitterSystemBase::AddSoundOverrides( char const *scriptfile, bool bP
 // Called by either client or server in LevelShutdown to clear out custom overrides
 void CSoundEmitterSystemBase::ClearSoundOverrides()
 {
-	ptrdiff_t removed = 0;
+	intp removed = 0;
 
-	for ( UtlHashHandle_t i = m_Sounds.FirstHandle(); i != m_Sounds.InvalidHandle(); )
+	for ( auto i = m_Sounds.FirstHandle(); i != m_Sounds.InvalidHandle(); )
 	{
 		CSoundEntry *entry = m_Sounds[ i ];
 		if ( entry->IsOverride() )
@@ -1624,9 +1613,8 @@ void CSoundEmitterSystemBase::ClearSoundOverrides()
 	}
 
 	// Now restore the original entries into the main dictionary.
-	for ( intp i = 0; i < m_SavedOverrides.Count(); ++i )
+	for ( auto *entry : m_SavedOverrides )
 	{
-		CSoundEntry *entry = m_SavedOverrides[ i ];
 		m_Sounds.Insert( entry );
 	}
 

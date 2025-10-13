@@ -314,7 +314,7 @@ void GLMDisplayDB::PopulateRenderers( void )
 
 
 
-void    GLMDisplayDB::PopulateFakeAdapters( uint realRendererIndex )            // fake adapters = one real adapter times however many displays are on it
+void    GLMDisplayDB::PopulateFakeAdapters( unsigned realRendererIndex )            // fake adapters = one real adapter times however many displays are on it
 {
         SDLAPP_FUNC;
 

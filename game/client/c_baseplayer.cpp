@@ -188,6 +188,7 @@ BEGIN_RECV_TABLE_NOBASE( CPlayerLocalData, DT_Local )
 	// 3d skybox fog data
 	RecvPropInt( RECVINFO( m_skybox3d.fog.enable ) ),
 	RecvPropInt( RECVINFO( m_skybox3d.fog.blend ) ),
+	RecvPropInt( RECVINFO( m_skybox3d.fog.radial ) ),
 	RecvPropVector( RECVINFO( m_skybox3d.fog.dirPrimary ) ),
 	RecvPropInt( RECVINFO( m_skybox3d.fog.colorPrimary ) ),
 	RecvPropInt( RECVINFO( m_skybox3d.fog.colorSecondary ) ),
@@ -1382,7 +1383,7 @@ void C_BasePlayer::CreateWaterEffects( void )
 		pParticle->m_vecVelocity = RandomVector( -2.0f, 2.0f );
 
 		//FIXME: We should tint these based on the water's fog value!
-		int color = random->RandomInt( 32, 128 );
+		byte color = static_cast<byte>(random->RandomInt( 32, 128 ));
 		pParticle->m_uchColor[0] = color;
 		pParticle->m_uchColor[1] = color;
 		pParticle->m_uchColor[2] = color;

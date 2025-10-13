@@ -79,6 +79,7 @@ CBasePlayerAnimState::CBasePlayerAnimState()
 	m_iCurrent8WayIdleSequence = -1;
 	m_iCurrent8WayCrouchIdleSequence = -1;
 
+	BitwiseClear( m_AnimConfig );
 	m_pOuter = NULL;
 	m_eCurrentMainSequenceActivity = ACT_IDLE;
 	m_flLastAnimationStateClearTime = 0.0f;
@@ -212,7 +213,7 @@ void CBasePlayerAnimState::ClearAnimationLayers()
 		return;
 
 	m_pOuter->SetNumAnimOverlays( AIMSEQUENCE_LAYER+NUM_AIMSEQUENCE_LAYERS );
-	for ( int i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
+	for ( intp i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
 	{
 		m_pOuter->GetAnimOverlay( i )->SetOrder( CBaseAnimatingOverlay::MAX_OVERLAYS );
 #ifndef CLIENT_DLL
@@ -462,7 +463,7 @@ int CBasePlayerAnimState::CalcSequenceIndex( PRINTF_FORMAT_STRING const char *pB
 {
 	char szFullName[512];
 	va_list marker;
-	va_start( marker, pBaseName );
+	va_start( marker, pBaseName ); //-V2018 //-V2019
 	V_vsprintf_safe( szFullName, pBaseName, marker );
 	va_end( marker );
 	int iSequence = GetOuter()->LookupSequence( szFullName );
@@ -939,7 +940,7 @@ void CBasePlayerAnimState::AnimStateLog( PRINTF_FORMAT_STRING const char *pMsg, 
 	// Format the string.
 	char str[4096];
 	va_list marker;
-	va_start( marker, pMsg );
+	va_start( marker, pMsg ); //-V2018 //-V2019
 	V_vsprintf_safe( str, pMsg, marker );
 	va_end( marker );
 
@@ -969,7 +970,7 @@ void CBasePlayerAnimState::AnimStatePrintf( int iLine, PRINTF_FORMAT_STRING cons
 	// Format the string.
 	char str[4096];
 	va_list marker;
-	va_start( marker, pMsg );
+	va_start( marker, pMsg ); //-V2018 //-V2019
 	V_vsprintf_safe( str, pMsg, marker );
 	va_end( marker );
 
@@ -1005,7 +1006,7 @@ void CBasePlayerAnimState::DebugShowAnimState( int iStartLine )
 			(float)pLayer->m_flWeight );
 	}
 
-	for ( int i=0; i < m_pOuter->GetNumAnimOverlays()-1; i++ )
+	for ( intp i=0; i < m_pOuter->GetNumAnimOverlays()-1; i++ )
 	{
 		CAnimationLayer *pLayer = m_pOuter->GetAnimOverlay( AIMSEQUENCE_LAYER + i );
 #ifdef CLIENT_DLL

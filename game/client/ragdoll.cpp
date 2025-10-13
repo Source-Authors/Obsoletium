@@ -27,9 +27,15 @@ CRagdoll::CRagdoll()
 {
 	m_ragdoll.listCount = 0;
 	m_vecLastOrigin.Init();
-	m_flLastOriginChangeTime = - 1.0f;
 	
+	m_mins.Init(-1, -1, -1);
+	m_maxs.Init(-1, -1, -1);
+	m_origin.Init(-1, -1, -1);
+	m_radius = -1;
+	m_allAsleep = false;
 	m_lastUpdate = -FLT_MAX;
+	m_flLastOriginChangeTime = -1.0f;
+	m_flBoneCacheTime = -FLT_MAX;
 }
 
 #define DEFINE_RAGDOLL_ELEMENT( i ) \
@@ -171,6 +177,37 @@ void CRagdoll::RagdollBone( C_BaseEntity *ent, mstudiobone_t *pbones, int boneCo
 		{
 			boneSimulated[m_ragdoll.boneIndex[i]] = true;
 		}
+	}
+}
+
+void CRagdoll::AcquireOrCopyBoneCache( CUtlVector<matrix3x4_t> &bonesToWorld )
+{
+	// acquire cache if not setup
+	if ( m_BoneCache.Count() != bonesToWorld.Count() )
+	{
+		// bonesToWorld -> m_BoneCache
+		m_BoneCache.CopyArray( bonesToWorld.Base(), bonesToWorld.Count() );
+		m_flBoneCacheTime = gpGlobals->curtime;
+	}
+	// copy cache out if called again in same frame
+	else if ( gpGlobals->curtime == m_flBoneCacheTime )
+	{
+		Assert( m_BoneCache.Count() == bonesToWorld.Count() );
+		// m_BoneCache -> bonesToWorld 
+        BitwiseCopy( m_BoneCache.Base(), bonesToWorld.Base(), bonesToWorld.Count() );
+	}
+	// copy out our cache and acquire the old one
+	else
+	{
+        Assert( m_BoneCache.Count() == bonesToWorld.Count() );
+		
+		const size_t uBoneDataSize = bonesToWorld.Count() * sizeof(matrix3x4_t);
+		matrix3x4_t* pTempBoneData = stackallocT( matrix3x4_t, bonesToWorld.Count() );
+		// swap(bonesToWorld, m_BoneCache)
+		BitwiseCopy( bonesToWorld.Base(), pTempBoneData, uBoneDataSize );
+		BitwiseCopy( m_BoneCache.Base(), bonesToWorld.Base(), uBoneDataSize );
+		BitwiseCopy( pTempBoneData, m_BoneCache.Base(), uBoneDataSize );
+		m_flBoneCacheTime = gpGlobals->curtime;
 	}
 }
 

@@ -11,10 +11,6 @@
 #ifndef UTLARRAY_H
 #define UTLARRAY_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "vstdlib/random.h"
@@ -42,9 +38,9 @@ template< class T, size_t MAX_SIZE >
 class CUtlArray : public base_array_t
 {
 public:
-	typedef T ElemType_t;
-	typedef T* iterator;
-	typedef const T* const_iterator;
+	using ElemType_t = T;
+	using iterator = T *;
+	using const_iterator = const T *;
 
 	CUtlArray();
 	CUtlArray( T* pMemory, size_t count );
@@ -72,11 +68,11 @@ public:
 	const T* Base() const;
 
 	// Returns the number of elements in the array, NumAllocated() is included for consistency with UtlVector
-	int Count() const;
-	int NumAllocated() const;
+	[[nodiscard]] int Count() const;
+	[[nodiscard]] int NumAllocated() const;
 
 	// Is element index valid?
-	bool IsValidIndex( int i ) const;
+	[[nodiscard]] bool IsValidIndex( int i ) const;
 	static int InvalidIndex();
 
 	void CopyArray( const T *pArray, size_t count );

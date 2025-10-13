@@ -2360,7 +2360,7 @@ void CTriggerPush::Touch( CBaseEntity *pOther )
 //-----------------------------------------------------------------------------
 // Teleport trigger
 //-----------------------------------------------------------------------------
-const int SF_TELEPORT_PRESERVE_ANGLES = 0x20;	// Preserve angles even when a local landmark is not specified
+constexpr inline int SF_TELEPORT_PRESERVE_ANGLES = 0x20;	// Preserve angles even when a local landmark is not specified
 
 class CTriggerTeleport : public CBaseTrigger
 {
@@ -4239,8 +4239,8 @@ int CTriggerImpact::DrawDebugTextOverlays(void)
 // Purpose: Disables auto movement on players that touch it
 //-----------------------------------------------------------------------------
 
-const int SF_TRIGGER_MOVE_AUTODISABLE				= 0x80;		// disable auto movement
-const int SF_TRIGGER_AUTO_DUCK						= 0x800;	// Duck automatically
+constexpr inline int SF_TRIGGER_MOVE_AUTODISABLE				= 0x80;		// disable auto movement
+constexpr inline int SF_TRIGGER_AUTO_DUCK						= 0x800;	// Duck automatically
 
 class CTriggerPlayerMovement : public CBaseTrigger
 {

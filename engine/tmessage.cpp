@@ -584,13 +584,13 @@ void TextMessageInit( void )
 
 void TextMessage_DemoMessage( const char *pszMessage, float fFadeInTime, float fFadeOutTime, float fHoldTime )
 {
-	if ( !pszMessage || !pszMessage[0] )
+	if ( Q_isempty( pszMessage ) )
 		return;
 	
 	// Restore
 	tm_demomessage = orig_demo_message;
 
-	Q_strncpy( gDemoMessageBuffer, (char *)pszMessage, sizeof( gDemoMessageBuffer ) );
+	V_strcpy_safe( gDemoMessageBuffer, pszMessage );
 	tm_demomessage.fadein   = fFadeInTime;
 	tm_demomessage.fadeout  = fFadeOutTime;
 	tm_demomessage.holdtime = fHoldTime;

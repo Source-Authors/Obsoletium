@@ -33,7 +33,7 @@ static char g_rgchMinidumpComment[8192];
 //			pExceptionInfo				- call stack.
 //			minidumpType				- type of minidump to write.
 //			ptchMinidumpFileNameBuffer	- if not-nullptr points to a writable tchar buffer
-//										  of length at least _MAX_PATH to contain the name
+//										  of length at least MAX_PATH to contain the name
 //										  of the written minidump file on return.
 //-----------------------------------------------------------------------------
 bool WriteMiniDumpUsingExceptionInfo( 
@@ -57,7 +57,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 
 	bool bReturnValue = false;
 
-	MINIDUMPWRITEDUMP pfnMiniDumpWrite =
+	auto pfnMiniDumpWrite =
 		reinterpret_cast<MINIDUMPWRITEDUMP>( ::GetProcAddress( hDbgHelpDll, V_STRINGIFY(MiniDumpWriteDump) ) );
 	if ( pfnMiniDumpWrite )
 	{
@@ -181,7 +181,7 @@ bool WriteMiniDumpUsingExceptionInfo(
 		// mark any failed minidump writes by renaming them
 		if ( !bMinidumpResult )
 		{
-			tchar rgchFailedFileName[_MAX_PATH];
+			tchar rgchFailedFileName[MAX_PATH];
 			_sntprintf( rgchFailedFileName, sizeof(rgchFailedFileName) / sizeof(tchar), "(failed)%s", rgchFileName );
 			// Ensure null-termination.
 			rgchFailedFileName[ std::size(rgchFailedFileName) - 1 ] = '\0';
@@ -349,7 +349,7 @@ struct CatchAndWriteContext_t
 		ErrorIfNot( m_pfn, ( "CatchAndWriteContext_t::Set w/o a function pointer!" ) )
 	}
 
-	int							Invoke() const
+	[[nodiscard]] int							Invoke() const
 	{
 		switch ( m_eType )
 		{
@@ -562,23 +562,7 @@ https://stackoverflow.com/questions/11376795/why-cant-64-bit-windows-unwind-user
 */
 void EnableCrashingOnCrashes()
 {
-	typedef BOOL (WINAPI *tGetProcessUserModeExceptionPolicy)(LPDWORD lpFlags);
-	typedef BOOL (WINAPI *tSetProcessUserModeExceptionPolicy)(DWORD dwFlags);
-	#define PROCESS_CALLBACK_FILTER_ENABLED     0x1
-
-	HMODULE kernel32 = LoadLibraryExA("kernel32.dll", nullptr, LOAD_LIBRARY_SEARCH_SYSTEM32);
-	if ( !kernel32 ) return;
-
-	auto pGetProcessUserModeExceptionPolicy = (tGetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "GetProcessUserModeExceptionPolicy");
-	auto pSetProcessUserModeExceptionPolicy = (tSetProcessUserModeExceptionPolicy)GetProcAddress(kernel32, "SetProcessUserModeExceptionPolicy");
-	if (pGetProcessUserModeExceptionPolicy && pSetProcessUserModeExceptionPolicy)
-	{
-		DWORD dwFlags;
-		if (pGetProcessUserModeExceptionPolicy(&dwFlags))
-		{
-			pSetProcessUserModeExceptionPolicy(dwFlags & ~PROCESS_CALLBACK_FILTER_ENABLED); // turn off bit 1
-		}
-	}
+	// dimhotepus: Since Windows 7 crashes are propagated in x86-64.
 
 	// If set to FALSE, Windows will not enclose its calls to TimerProc with an exception handler.
 	// A setting of FALSE is recommended. Otherwise, the application could behave unpredictably,

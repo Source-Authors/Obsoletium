@@ -1463,7 +1463,7 @@ void CTexture::MakePartiallyResident()
 	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
 
 	ResidencyType_t oldCurrentResidence = m_residenceCurrent;
-	ResidencyType_t oldTargetResidence = m_residenceTarget;
+	[[maybe_unused]] ResidencyType_t oldTargetResidence = m_residenceTarget;
 
 	m_residenceCurrent = m_residenceTarget = RESIDENT_PARTIAL;
 
@@ -1511,7 +1511,7 @@ bool CTexture::MakeFullyResident()
 	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
 
 	ResidencyType_t oldCurrentResidence = m_residenceCurrent;
-	ResidencyType_t oldTargetResidence = m_residenceTarget;
+	[[maybe_unused]] ResidencyType_t oldTargetResidence = m_residenceTarget;
 
 	if ( oldCurrentResidence == RESIDENT_FULL )
 	{
@@ -2397,11 +2397,12 @@ bool CTexture::AsyncReadTextureFromFile( IVTFTexture* pVTFTexture, unsigned int 
 		return false;
 	}
 
-	if ( V_strstr( GetName(), "c_sniperrifle_scope" ) )
-	{
-		int i = 0;
-		i = 3;
-	}
+	// dimhotepus: Drop debug code.
+	// if ( V_strstr( GetName(), "c_sniperrifle_scope" ) )
+	// {
+	// 	int i = 0;
+	// 	i = 3;
+	// }
 
 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, tmDynamicString( TELEMETRY_LEVEL0, pCacheFileName ) );
@@ -4122,11 +4123,12 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 	// NOTE! NOTE! NOTE! or by the streaming texture code!
 	Assert( ppOutVtfTexture != NULL && *ppOutVtfTexture != NULL );
 
-	if ( V_strstr( pName, "c_rocketlauncher/c_rocketlauncher" ) )
-	{
-		int i = 0;
-		i = 3;
-	}
+	// dimhotepus: Drop debug code.
+	//if ( V_strstr( pName, "c_rocketlauncher/c_rocketlauncher" ) )
+	//{
+	//	int i = 0;
+	//	i = 3;
+	//}
 
 	CUtlBuffer buf;
 

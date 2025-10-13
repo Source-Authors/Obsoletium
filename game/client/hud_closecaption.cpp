@@ -109,11 +109,13 @@ private:
 	bool			m_bBold;
 	bool			m_bItalic;
 	wchar_t			*m_pszStream;
-	vgui::HFont			m_hFont;
+	vgui::HFont		m_hFont;
 	Color			m_Color;
 };
 
 CCloseCaptionWorkUnit::CCloseCaptionWorkUnit() :
+	m_nX(0),
+	m_nY(0),
 	m_nWidth(0),
 	m_nHeight(0),
 	m_flFadeStartTime(0),
@@ -199,7 +201,7 @@ void CCloseCaptionWorkUnit::SetStream( const wchar_t *stream )
 	m_pszStream = NULL;
 
 	Assert( V_wcslen( stream ) < 4096 );
-	m_pszStream = V_wcsdup( m_pszStream );
+	m_pszStream = V_wcsdup( stream );
 }
 
 const wchar_t *CCloseCaptionWorkUnit::GetStream() const
@@ -1962,7 +1964,8 @@ public:
 	CAsyncCaption() : 
 		m_flDuration( 0.0f ),
 		m_bIsStream( false ),
-		m_bFromPlayer( false )
+		m_bFromPlayer( false ),
+		m_bDirect( false )
 	{
 	}
 
@@ -2220,7 +2223,7 @@ private:
 		void		SetStream( const wchar_t *in )
 		{
 			delete[] stream;
-			stream = 0;
+			stream = nullptr;
 			if ( !in )
 				return;
 
@@ -2639,11 +2642,11 @@ static int EmitCaptionCompletion( const char *partial, char commands[ COMMAND_CO
 		return current;
 
 	const char *cmdname = "cc_emit";
-	char *substring = NULL;
+	const char *substring = NULL;
 	intp substringLen = 0;
 	if ( Q_strstr( partial, cmdname ) && strlen(partial) > strlen(cmdname) + 1 )
 	{
-		substring = (char *)partial + strlen( cmdname ) + 1;
+		substring = partial + strlen( cmdname ) + 1;
 		substringLen = V_strlen(substring);
 	}
 	
@@ -2858,7 +2861,7 @@ void CHudCloseCaption::FindSound( char const *pchANSI )
 				Msg( "found '%s' in %s\n", streamANSI, fn );
 
 				// Now find the sounds that will hash to this
-				for ( int k = soundemitterbase->First(); k != soundemitterbase->InvalidIndex(); k = soundemitterbase->Next( k ) )
+				for ( auto k = soundemitterbase->First(); k != soundemitterbase->InvalidIndex(); k = soundemitterbase->Next( k ) )
 				{
 					char const *pchSoundName = soundemitterbase->GetSoundName( k );
 

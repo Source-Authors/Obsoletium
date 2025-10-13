@@ -1,4 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+﻿//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -97,8 +97,8 @@ ISoundSystem *g_pSoundSystem;
 CreateInterfaceFn g_Factory;
 
 // Filesystem dialog module wrappers.
-CSysModule *g_pFSDialogModule = 0;
-CreateInterfaceFn g_FSDialogFactory = 0;
+CSysModule *g_pFSDialogModule = nullptr;
+CreateInterfaceFnT<IFileSystemOpenDialog> g_FSDialogFactory = nullptr;
 
 
 class CHlmvIpcServer : public CValveIpcServerUtl
@@ -114,7 +114,7 @@ public:
 	void PopCommand();
 
 protected:
-	virtual BOOL ExecuteCommand( CUtlBuffer &cmd, CUtlBuffer &res );
+	BOOL ExecuteCommand( CUtlBuffer &cmd, CUtlBuffer &res ) override;
 
 protected:
 	CThreadFastMutex m_mtx;
@@ -134,7 +134,7 @@ void LoadFileSystemDialogModule()
 	g_pFSDialogModule = Sys_LoadModule( "filesystemopendialog" DLL_EXT_STRING );
 	if ( g_pFSDialogModule )
 	{
-		g_FSDialogFactory = Sys_GetFactory( g_pFSDialogModule );
+		g_FSDialogFactory = Sys_GetFactory<IFileSystemOpenDialog>( g_pFSDialogModule );
 	}
 
 	if ( !g_pFSDialogModule || !g_FSDialogFactory )
@@ -239,7 +239,6 @@ AccelTableEntry_t accelTable[] =					{{VK_F1, IDC_FLUSH_SHADERS,		mx::ACCEL_VIRT
 													{'T', IDC_ACCEL_TANGENTS,		mx::ACCEL_CONTROL | mx::ACCEL_VIRTKEY},
 													{'s', IDC_ACCEL_SHADOW,			mx::ACCEL_CONTROL | mx::ACCEL_VIRTKEY},
 													{'S', IDC_ACCEL_SHADOW,			mx::ACCEL_CONTROL | mx::ACCEL_VIRTKEY}};
-#define NUM_ACCELERATORS ARRAYSIZE( accelTable )
 
 
 MDLViewer::MDLViewer ()
@@ -345,7 +344,8 @@ MDLViewer::MDLViewer ()
 
 	menuView->addSeparator ();
 	menuView->add ("Show Activities", IDC_VIEW_ACTIVITIES);
-	menuView->add ("Show hidden", IDC_VIEW_HIDDEN );
+	// dimhotepus: hidden -> Hidden.
+	menuView->add ("Show Hidden", IDC_VIEW_HIDDEN );
 
 #ifdef WIN32
 	menuHelp->add ("Goto Homepage...", IDC_HELP_GOTOHOMEPAGE);
@@ -355,9 +355,6 @@ MDLViewer::MDLViewer ()
 
 
 	d_MatSysWindow = new MatSysWindow (this, 0, 0, 100, 100, "", mxWindow::Normal);
-#ifdef WIN32
-	// SetWindowLong ((HWND) d_MatSysWindow->getHandle (), GWL_EXSTYLE, WS_EX_CLIENTEDGE);
-#endif
 
 	d_cpl = new ControlPanel (this);
 	d_cpl->setMatSysWindow (d_MatSysWindow);
@@ -368,17 +365,25 @@ MDLViewer::MDLViewer ()
 	loadRecentFiles ();
 	initRecentFiles ();
 
-	LoadViewerRootSettings( );
-
-	// FIXME: where do I actually find the domain size of the viewport, especially for multi-monitor
-	// try to catch weird initialization error
-	if (g_viewerSettings.xpos < -16384)
-		g_viewerSettings.xpos = 20;
-	if (g_viewerSettings.ypos < -16384)
-		g_viewerSettings.ypos = 20;
-	g_viewerSettings.ypos  = max( 0, g_viewerSettings.ypos );
-	g_viewerSettings.width = max( 640, g_viewerSettings.width );
-	g_viewerSettings.height = max( 700, g_viewerSettings.height );
+	if ( !LoadViewerRootSettings( ) )
+	{
+		// dimhotepus: Center window when no settings.
+		
+		const int displayWidth = mx::getDisplayWidth();
+		const int displayHeight = mx::getDisplayHeight();
+		
+		g_viewerSettings.width  = max( 1024, displayWidth / 2 );
+		g_viewerSettings.height = max( 768, displayHeight / 2 );
+		g_viewerSettings.xpos   = max( ( displayWidth - g_viewerSettings.width ) / 2, 0 );
+		g_viewerSettings.ypos   = max( ( displayHeight - g_viewerSettings.height ) / 2, 0 );
+	}
+	else
+	{
+		g_viewerSettings.xpos  = max( 0, g_viewerSettings.xpos );
+		g_viewerSettings.ypos  = max( 0, g_viewerSettings.ypos );
+		g_viewerSettings.width = max( 1024, g_viewerSettings.width );
+		g_viewerSettings.height = max( 768, g_viewerSettings.height );
+	}
 
 	setBounds( g_viewerSettings.xpos, g_viewerSettings.ypos, g_viewerSettings.width, g_viewerSettings.height );
 	setVisible (true);
@@ -387,11 +392,11 @@ MDLViewer::MDLViewer ()
 	CUtlVector< mx::Accel_t > accelerators;
 	mx::Accel_t accel;
 
-	for (int i=0; i < NUM_ACCELERATORS; i++)
+	for (auto &t : accelTable)
 	{
-		accel.flags	  = accelTable[i].flags ;
-		accel.key	  = accelTable[i].key;
-		accel.command = accelTable[i].command;
+		accel.flags	  = t.flags;
+		accel.key	  = t.key;
+		accel.command = t.command;
 		accelerators.AddToTail( accel );
 	}
 
@@ -593,7 +598,7 @@ const char* MDLViewer::SteamGetOpenFilename()
 	{
 		char str[512];
 		V_sprintf_safe( str, "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
-		MessageBox( NULL, str, "Error", MB_OK );
+		MessageBox( NULL, str, "HLMV - Create Interface Error", MB_OK | MB_ICONERROR );
 		return NULL;
 	}
 	pDlg->Init( g_Factory, NULL );
@@ -1109,7 +1114,7 @@ MDLViewer::handleEvent (mxEvent *event)
 
 
 
-void TranslateMayaToHLMVCoordinates( const Vector &vMayaPos, const QAngle &vMayaRot, Vector &vHLMVPos, QAngle &vHLMVAngles )
+static void TranslateMayaToHLMVCoordinates( const Vector &vMayaPos, const QAngle &vMayaRot, Vector &vHLMVPos, QAngle &vHLMVAngles )
 {
 	vHLMVPos.Init( vMayaPos.z, vMayaPos.x, vMayaPos.y );
 
@@ -1328,6 +1333,10 @@ void MDLViewer::SendLightRotToLinkedHlmv()
 SpewRetval_t HLMVSpewFunc( SpewType_t spewType, char const *pMsg )
 {
 	g_bInError = true;
+
+	// dimhotepus: Dump debug output.
+	Plat_DebugString(pMsg);
+
 	switch (spewType)
 	{
 	case SPEW_ERROR:
@@ -1336,7 +1345,6 @@ SpewRetval_t HLMVSpewFunc( SpewType_t spewType, char const *pMsg )
 		return SPEW_ABORT;
 
 	default:
-		OutputDebugString(pMsg);
 		g_bInError = false;
 #ifdef _DEBUG
 		return spewType == SPEW_ASSERT ? SPEW_DEBUGGER : SPEW_CONTINUE;
@@ -1479,14 +1487,11 @@ bool CHLModelViewerApp::PreInit( )
 	}
 
 	g_pMaterialSystem->SetAdapter( nAdapter, nAdapterFlags );
-
-	g_bOldFileDialogs = true;
-	if ( CommandLine()->FindParm( "-NoSteamdDialog" ) )
-		g_bOldFileDialogs = false;
+	g_bOldFileDialogs = !CommandLine()->FindParm( "-NoSteamdDialog" );
 	
 	LoadFileSystemDialogModule();
 
-	return true; 
+	return true;
 }
 
 void CHLModelViewerApp::PostShutdown()

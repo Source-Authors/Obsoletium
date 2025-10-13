@@ -72,6 +72,7 @@ void CreateTools()
 CCommEditTool::CCommEditTool()
 {
 	m_bInNodeDropMode = false;
+	m_bDroppingCommentaryNodes = false;
 	m_pMenuBar = NULL;
 	m_pDoc = NULL;
 }
@@ -1032,9 +1033,6 @@ void CCommEditTool::AttachAllEngineEntities()
 
 	for ( EntitySearchResult sr = clienttools->FirstEntity(); sr != NULL; sr = clienttools->NextEntity( sr ) )
 	{
-		if ( !sr )
-			continue;
-
 		HTOOLHANDLE handle = clienttools->AttachToEntity( sr );
 
 		const char *pClassName = clienttools->GetClassname( handle );

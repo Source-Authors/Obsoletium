@@ -71,6 +71,7 @@ C_Flare::C_Flare() : CSimpleEmitter( "C_Flare" )
 	m_pParticle[0]	= NULL;
 	m_pParticle[1]	= NULL;
 	m_flTimeBurnOut	= 0.0f;
+	m_flScale		= 0.0f;
 
 	m_bLight		= true;
 	m_bSmoke		= true;

@@ -211,7 +211,7 @@ void CMapLightCone::BuildCone(void)
 		//
 		// Build the new face list using the new parameters.
 		//
-		float fStepSize = 360.0 / 15.0;
+		constexpr float fStepSize = 360.0 / 15.0;
 		for (int nZone = 0; nZone < NUM_LIGHTCONE_ZONES - 1; nZone++)
 		{
 			float fSin0 = 0;
@@ -225,8 +225,8 @@ void CMapLightCone::BuildCone(void)
 
 			for (int fAngle = fStepSize; fAngle <= 361; fAngle += fStepSize)
 			{
-				float fSin1 = sin(DEG2RAD(fAngle));
-				float fCos1 = cos(DEG2RAD(fAngle));
+				float fSin1, fCos1;
+				DirectX::XMScalarSinCos(&fSin1, &fCos1, DEG2RAD(fAngle * 1.f));
 
 				Vector Points[4];
 
@@ -309,8 +309,10 @@ void CMapLightCone::BuildCone(void)
 		// cosine falloff ^ exponent
 
 		// draw as lobe
-		float fFocusDist1 = cos(DEG2RAD(fPitch)) * fIllumination * fZoneDist[1];
-		float fFocusRadius1 = sin(DEG2RAD(fPitch)) * fIllumination * fZoneDist[1];
+		float fFocusSin, fFocusCos;
+		DirectX::XMScalarSinCos(&fFocusSin, &fFocusCos, DEG2RAD(fPitch));
+		float fFocusDist1 = fFocusCos * fIllumination * fZoneDist[1];
+		float fFocusRadius1 = fFocusSin * fIllumination * fZoneDist[1];
 
 		// draw as disk
 		// float fFocusDist1 = fZoneDist[1];
@@ -318,8 +320,8 @@ void CMapLightCone::BuildCone(void)
 
 		for (int fAngle = fStepSize; fAngle <= 361; fAngle += fStepSize)
 		{
-			float fSin1 = sin(DEG2RAD(fAngle));
-			float fCos1 = cos(DEG2RAD(fAngle));
+			float fSin1, fCos1;
+			DirectX::XMScalarSinCos(&fSin1, &fCos1, DEG2RAD(fAngle * 1.f));
 
 			Vector Points[4];
 

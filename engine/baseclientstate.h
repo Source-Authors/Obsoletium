@@ -149,7 +149,7 @@ public:
 	void SetEntityBaseline(int iBaseline, ClientClass *pClientClass, int index, char *packedData, int length);
 	void CopyEntityBaseline( int iFrom, int iTo );
 	void FreeEntityBaselines();
-	bool GetClassBaseline( int iClass, void const **pData, int *pDatalen );
+	bool GetClassBaseline( int iClass, void const **pData, intp *pDatalen );
 	ClientClass *GetClientClass( int i );
 
 	void ForceFullUpdate( void );

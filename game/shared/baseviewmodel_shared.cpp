@@ -53,6 +53,9 @@ CBaseViewModel::CBaseViewModel()
 	m_nViewModelIndex	= 0;
 
 	m_nAnimationParity	= 0;
+
+	m_flTimeWeaponIdle	= -1;
+	m_Activity			= ACT_INVALID;
 }
 
 //-----------------------------------------------------------------------------

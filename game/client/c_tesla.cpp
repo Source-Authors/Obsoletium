@@ -26,18 +26,20 @@ void C_Tesla::ReceiveMessage( int classID, bf_read &msg )
 {
 	CTeslaInfo teslaInfo;
 
+	// See CTesla::DoSpark
+
 	msg.ReadBitVec3Coord( teslaInfo.m_vPos );
 	teslaInfo.m_vAngles.Init();
 
 	teslaInfo.m_nEntIndex = msg.ReadShort();
 	teslaInfo.m_flRadius = msg.ReadFloat();
 
-	teslaInfo.m_vColor.x = ((unsigned char)msg.ReadChar()) / 255.0f;
-	teslaInfo.m_vColor.y = ((unsigned char)msg.ReadChar()) / 255.0f;
-	teslaInfo.m_vColor.z = ((unsigned char)msg.ReadChar()) / 255.0f;
+	teslaInfo.m_vColor.x = msg.ReadByte() / 255.0f;
+	teslaInfo.m_vColor.y = msg.ReadByte() / 255.0f;
+	teslaInfo.m_vColor.z = msg.ReadByte() / 255.0f;
 	
-	float flAlpha = 0;
-	flAlpha = ((unsigned char)msg.ReadChar()) / 255.0f;
+	// dimhotepus: Alpha is send but not used.
+	[[maybe_unused]] float flAlpha = msg.ReadByte() / 255.0f;
 
 	teslaInfo.m_nBeams = msg.ReadChar();
 	

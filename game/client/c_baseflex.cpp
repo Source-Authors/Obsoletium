@@ -755,7 +755,7 @@ void C_BaseFlex::AddViseme( Emphasized_Phoneme *classes, float emphasis_intensit
 
 		flexweight_t *pWeights = NULL;
 
-		int truecount = pSetting->psetting( (byte *)actual_flexsetting_header, 0, &pWeights );
+		int truecount = pSetting->psetting( (const byte *)actual_flexsetting_header, 0, &pWeights );
 		if ( pWeights )
 		{
 			for ( int i = 0; i < truecount; i++)
@@ -1359,12 +1359,13 @@ int C_BaseFlex::AddGlobalFlexController( const char *szName )
 	if ( g_numflexcontrollers < MAXSTUDIOFLEXCTRL * 4 )
 	{
 		g_flexcontroller[g_numflexcontrollers++] = strdup( szName );
+		return i;
 	}
-	else
-	{
-		// FIXME: missing runtime error condition
-	}
-	return i;
+
+	// dimhotepus: Handle out of capacity error.
+	AssertMsg( g_numflexcontrollers < MAXSTUDIOFLEXCTRL * 4, "Flex controllers out of max capacity %d", MAXSTUDIOFLEXCTRL * 4 );
+	Warning( "Flex controllers out of max capacity %d", MAXSTUDIOFLEXCTRL * 4 );
+	return -1;
 }
 
 char const *C_BaseFlex::GetGlobalFlexControllerName( int idx )
@@ -1822,7 +1823,7 @@ int C_BaseFlex::FlexControllerLocalToGlobal( const flexsettinghdr_t *pSettinghdr
 {
 	FS_LocalToGlobal_t entry( pSettinghdr );
 
-	int idx = m_LocalToGlobal.Find( entry );
+	auto idx = m_LocalToGlobal.Find( entry );
 	if ( idx == m_LocalToGlobal.InvalidIndex() )
 	{
 		// This should never happen!!!
@@ -1875,7 +1876,7 @@ void C_BaseFlex::AddFlexSetting( const char *expr, float scale,
 	}
 
 	flexweight_t *pWeights = NULL;
-	int truecount = pSetting->psetting( (byte *)pSettinghdr, 0, &pWeights );
+	int truecount = pSetting->psetting( (const byte *)pSettinghdr, 0, &pWeights );
 	if ( !pWeights )
 		return;
 
@@ -1991,7 +1992,7 @@ void C_BaseFlex::AddFlexAnimation( CSceneEventInfo *info )
 			}
 			else
 			{
-				track->SetFlexControllerIndex( MAX( FindFlexController( (char *)track->GetFlexControllerName() ), LocalFlexController_t(0)), 0 );
+				track->SetFlexControllerIndex( MAX( FindFlexController( track->GetFlexControllerName() ), LocalFlexController_t(0)), 0 );
 			}
 		}
 

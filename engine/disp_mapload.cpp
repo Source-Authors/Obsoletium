@@ -190,7 +190,8 @@ VertexFormat_t ComputeDisplacementStaticMeshVertexFormat( const IMaterial * pMat
 	VertexFormat_t vertexFormat = pMaterial->GetVertexFormat();
 
 	// FIXME: set VERTEX_FORMAT_COMPRESSED if there are no artifacts and if it saves enough memory (use 'mem_dumpvballocs')
-	vertexFormat &= ~VERTEX_FORMAT_COMPRESSED;
+	// dimhotepus: Ensure higher bits are not lost.
+	vertexFormat &= ~static_cast<decltype(vertexFormat)>(VERTEX_FORMAT_COMPRESSED);
 	// FIXME: check for and strip unused vertex elements (TANGENT_S/T?)
 
 	return vertexFormat;
@@ -775,7 +776,7 @@ CDispInfo::CDispInfo()
 
 	m_pPowerInfo = NULL;
 
-	m_ViewerSphereCenter.Init( 1e24, 1e24, 1e24 );
+	m_ViewerSphereCenter.Init( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
 	
 	m_bInUse = false;
 
@@ -976,7 +977,7 @@ int FindNeighborCornerVert( CCoreDispInfo *pDisp, const Vector &vecPoint )
 	CDispUtilsHelper *pDispHelper = pDisp;
 
 	int iClosest = 0;
-	float flClosest = 1e24;
+	float flClosest = std::numeric_limits<vec_t>::max();
 	for ( int iCorner = 0; iCorner < 4; ++iCorner )
 	{
 

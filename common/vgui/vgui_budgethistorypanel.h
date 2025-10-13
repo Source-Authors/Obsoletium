@@ -16,11 +16,11 @@ class CBaseBudgetPanel;
 
 class CBudgetHistoryPanel : public vgui::Panel
 {
-	typedef vgui::Panel BaseClass;
+	using BaseClass = vgui::Panel;
 
 public:
 	CBudgetHistoryPanel( CBaseBudgetPanel *pParent, const char *pPanelName );
-	virtual ~CBudgetHistoryPanel();
+	~CBudgetHistoryPanel() override;
 	void SetData( double *pData, intp numCategories, int numItems, int offsetIntoData );
 	void SetRange( float fMin, float fMax );
 

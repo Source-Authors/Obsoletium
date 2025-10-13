@@ -1028,4 +1028,4 @@ message CWorkshop_SetItemPaymentRules_Response
 {
 }
 
-// Don�t remove this line at the end of the file due a bug in the Mac OS X protobuf compiler
+// Don't remove this line at the end of the file due a bug in the Mac OS X protobuf compiler

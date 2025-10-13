@@ -106,8 +106,8 @@ public:
 	virtual void	OnDoneScanningSaveGames( void ) {}
 	virtual void	RefreshSaveGames( void );
 	
-	unsigned int	GetNumPanels( void ) { return m_SavePanels.Count(); }
-	bool			HasActivePanels( void ) { return ( m_SavePanels.Count() != 0 ); }
+	intp			GetNumPanels( void ) const { return m_SavePanels.Count(); }
+	bool			HasActivePanels( void ) const { return ( m_SavePanels.Count() != 0 ); }
 	CGameSavePanel	*GetActivePanel( void );
 	int				GetActivePanelIndex( void ) { return m_iSelectedSave; }
 	CFooterPanel	*GetFooterPanel( void ) { return m_pFooter; }
@@ -116,7 +116,7 @@ public:
 
 	uint			GetStorageSpaceUsed( void ) { return m_nUsedStorageSpace; }
 
-	void			SetSelectedSaveIndex( int index );
+	void			SetSelectedSaveIndex( intp index );
 	void			SetSelectedSave( const char *chapter );
 	void			AddPanel( CGameSavePanel *pPanel ) { m_SavePanels.AddToHead( pPanel ); }
 	
@@ -165,7 +165,7 @@ private:
 	void	AnimateSelectionPanels( void );
 	void	ShiftPanelIndices( int offset );
 	bool	IsValidPanel( const intp idx );
-	void	InitPanelIndexForDisplay( const int idx );
+	void	InitPanelIndexForDisplay( const intp idx );
 	void	UpdateMenuComponents( EScrollDirection dir );
 	void	ScanSavedGames( bool bIgnoreAutosave );
 	void	LayoutPanels( void );

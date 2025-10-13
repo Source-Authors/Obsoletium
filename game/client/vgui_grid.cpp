@@ -33,6 +33,8 @@ CGrid::CGridEntry::CGridEntry()
 {
 	m_pPanel = NULL;
 	m_bUnderline = false;
+	BitwiseClear(m_UnderlineColor);
+	m_iUnderlineOffset = 0;
 }
 
 CGrid::CGridEntry::~CGridEntry() = default;

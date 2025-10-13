@@ -102,8 +102,8 @@ inline CVertIndex CDispInfo::IndexToVert( int index ) const
 
 void CDispInfo::UpdateBoundingBox()
 {
-	m_BBoxMin.Init( 1e24, 1e24, 1e24 );
-	m_BBoxMax.Init( -1e24, -1e24, -1e24 );
+	m_BBoxMin.Init( std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max(), std::numeric_limits<vec_t>::max() );
+	m_BBoxMax.Init( std::numeric_limits<vec_t>::min(), std::numeric_limits<vec_t>::min(), std::numeric_limits<vec_t>::min() );
 
 	for( int i=0; i < NumVerts(); i++ )
 	{

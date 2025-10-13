@@ -17,7 +17,6 @@
 #include "physics_vehicle.h"
 #include "physics_controller_raycast_vehicle.h"
 #include "physics_airboat.h"
-#include "ivp_car_system.hxx"
 #include "ivp_listener_object.hxx"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -200,7 +199,7 @@ BEGIN_SIMPLE_DATADESC( vehicleparams_t )
 END_DATADESC()
 
 
-bool IsVehicleWheel( IVP_Real_Object *pivp )
+[[nodiscard]] static bool IsVehicleWheel( IVP_Real_Object *pivp )
 {
 	CPhysicsObject *pObject = static_cast<CPhysicsObject *>(pivp->client_data);
 
@@ -211,7 +210,7 @@ bool IsVehicleWheel( IVP_Real_Object *pivp )
 	return (pObject->CallbackFlags() & CALLBACK_IS_VEHICLE_WHEEL) ? true : false;
 }
 
-inline bool IsMoveable( IVP_Real_Object *pObject )
+[[nodiscard]] static inline bool IsMoveable( IVP_Real_Object *pObject )
 {
 	IVP_Core *pCore = pObject->get_core();
 	if ( pCore->pinned || pCore->physical_unmoveable )
@@ -219,9 +218,9 @@ inline bool IsMoveable( IVP_Real_Object *pObject )
 	return true;
 }
 
-inline bool IVPFloatPointIsZero( const IVP_U_Float_Point &test )
+[[nodiscard]] static inline bool IVPFloatPointIsZero( const IVP_U_Float_Point &test )
 {
-	const float eps = 1e-4f;
+	constexpr float eps = 1e-4f;
 	return test.quad_length() < eps ? true : false;
 }
 
@@ -260,7 +259,7 @@ bool ShouldOverrideWheelContactFriction( float *pFrictionOut, IVP_Real_Object *p
 }
 
 
-class CVehicleController : public IPhysicsVehicleController, public IVP_Listener_Object
+class CVehicleController final : public IPhysicsVehicleController, public IVP_Listener_Object
 {
 public:
 	CVehicleController( );
@@ -561,10 +560,10 @@ IVP_Real_Object *CVehicleController::CreateWheel( int wheelIndex, vehicle_axlepa
 	params.volume = (4.0f / 3) * M_PI_F * r3;
 
 	CPhysicsObject *pWheel = (CPhysicsObject *)m_pEnv->CreateSphereObject( radius, axle.wheels.materialIndex, wheelPositionHL, bodyAngles, &params, false );
-    pWheel->Wake();
+	pWheel->Wake();
 
 	// UNDONE: only mask off some of these flags?
-	unsigned int flags = pWheel->CallbackFlags();
+	unsigned short flags{pWheel->CallbackFlags()};
 	flags = 0;
 	pWheel->SetCallbackFlags( flags );
 	// copy the body's game flags
@@ -1019,7 +1018,7 @@ void CVehicleController::UpdateEngineTurboFinish( void )
 	{
 		if ( m_currentState.boostDelay > 0 )
 		{
-			m_currentState.boostTimeLeft = 100 - 100 * ( m_currentState.boostDelay / ( m_vehicleData.engine.boostDuration +  m_vehicleData.engine.boostDelay ) );
+			m_currentState.boostTimeLeft = static_cast<int>(100 - 100 * ( m_currentState.boostDelay / ( m_vehicleData.engine.boostDuration + m_vehicleData.engine.boostDelay ) ) );
 		}
 		else
 		{

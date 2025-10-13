@@ -20,17 +20,17 @@ class CBaseReplaySerializeable : public IReplaySerializeable
 public:
 	CBaseReplaySerializeable();
 
-	virtual void			SetHandle( ReplayHandle_t h );
-	virtual ReplayHandle_t	GetHandle() const;
-	virtual bool			Read( KeyValues *pIn );
-	virtual void			Write( KeyValues *pOut );
-	virtual const char		*GetFilename() const;
-	virtual const char		*GetFullFilename() const;
-	virtual const char		*GetDebugName() const;
-	virtual void			SetLocked( bool bLocked );
-	virtual bool			IsLocked() const;
-	virtual void			OnDelete();
-	virtual void			OnUnload();
+	void			SetHandle( ReplayHandle_t h ) override;
+	[[nodiscard]] ReplayHandle_t	GetHandle() const override;
+	bool			Read( KeyValues *pIn ) override;
+	void			Write( KeyValues *pOut ) override;
+	[[nodiscard]] const char		*GetFilename() const override;
+	[[nodiscard]] const char		*GetFullFilename() const override;
+	[[nodiscard]] const char		*GetDebugName() const override;
+	void			SetLocked( bool bLocked ) override;
+	[[nodiscard]] bool			IsLocked() const override;
+	void			OnDelete() override;
+	void			OnUnload() override;
 	virtual void			OnAddedToDirtyList();
 
 private:

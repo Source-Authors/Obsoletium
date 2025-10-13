@@ -30,8 +30,8 @@ public:
 
 	char const	*GetSentenceText();
 
-	int			GetPhonemeCount();
-	int			GetWordCount();
+	intp		GetPhonemeCount();
+	intp		GetWordCount();
 
 	bool		IsAsyncLoading() const { return m_bAsyncLoading; }
 	void		SetAsyncLoading( bool async ) { m_bAsyncLoading = async; }

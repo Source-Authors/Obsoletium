@@ -667,7 +667,8 @@ public:
 	virtual void DebugCheckContacts(void) = 0;
 };
 
-enum callbackflags
+// dimhotepus: int -> unsigned short.
+enum callbackflags : unsigned short
 {
 	CALLBACK_GLOBAL_COLLISION	= 0x0001,
 	CALLBACK_GLOBAL_FRICTION	= 0x0002,

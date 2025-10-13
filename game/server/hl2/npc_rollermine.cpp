@@ -2545,7 +2545,7 @@ void CNPC_RollerMine::Explode( void )
 	SetNextThink( gpGlobals->curtime );
 }
 
-const float MAX_ROLLING_SPEED = 720;
+constexpr inline float MAX_ROLLING_SPEED = 720;
 
 //-----------------------------------------------------------------------------
 // Purpose: 

@@ -53,7 +53,7 @@ protected:
 private:
 	// Defines widgets to edit this bad boy
 	CDmeHandle< CDmeEditorTypeDictionary > m_hTypeDictionary;
-	bool m_bSkipNextResolve;
+	bool m_bSkipNextResolve{false};
 };
 
 

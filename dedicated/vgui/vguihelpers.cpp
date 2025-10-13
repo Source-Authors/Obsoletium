@@ -69,7 +69,7 @@ int StartVGUI(CreateInterfaceFn dedicatedFactory) {
   vgui::surface()->SetEmbeddedPanel(g_pMainPanel->GetVPanel());
 
   // load the scheme
-  vgui::scheme()->LoadSchemeFromFile("Resource/SourceScheme.res", NULL);
+  vgui::scheme()->LoadSchemeFromFile("Resource/SourceScheme.res", nullptr);
 
   // localization
   g_pVGuiLocalize->AddFile("Resource/platform_%language%.txt");
@@ -99,10 +99,10 @@ int StartVGUI(CreateInterfaceFn dedicatedFactory) {
     CreateInterfaceFn adminFactory = Sys_GetFactory(g_hAdminServerModule);
 
     g_pAdminServer =
-        (IAdminServer *)adminFactory(ADMINSERVER_INTERFACE_VERSION, NULL);
+        (IAdminServer *)adminFactory(ADMINSERVER_INTERFACE_VERSION, nullptr);
     Assert(g_pAdminServer);
     g_pAdminVGuiModule =
-        (IVGuiModule *)adminFactory("VGuiModuleAdminServer001", NULL);
+        (IVGuiModule *)adminFactory("VGuiModuleAdminServer001", nullptr);
     Assert(g_pAdminVGuiModule);
 
     if (!g_pAdminServer || !g_pAdminVGuiModule) {

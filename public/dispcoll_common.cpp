@@ -1421,6 +1421,7 @@ CDispCollTree::CDispCollTree()
 	m_hCache = INVALID_MEMHANDLE;
 #endif
 
+	BitwiseClear(m_Helper);
 	m_nSize = 0;
 }
 
@@ -1499,7 +1500,8 @@ static int g_nTrees;
 CDispCollTree *DispCollTrees_Alloc( int count )
 {
 #ifdef ENGINE_DLL
-	CDispCollTree *pTrees = Hunk_Alloc<CDispCollTree>( count, false );
+	// dimhotepus: Hunk_Alloc -> Hunk_AllocName (TF2 backport).
+	CDispCollTree *pTrees = Hunk_AllocName<CDispCollTree>( count, "DispCollTrees_Alloc", false );
 	if( !pTrees )
 		return NULL;
 

@@ -1004,9 +1004,8 @@ void CAttributeSlider::DrawCircularTick( const Color& clr, float flValue, int nC
 		flAngle = flFraction * 180.0f;
 	}
 
-	float flRadians = DEG2RAD( flAngle );
-	float ca = cos( flRadians );
-	float sa = sin( flRadians );
+	float sa, ca;
+	DirectX::XMScalarSinCos( &sa, &ca, DEG2RAD( flAngle ) );
 
 	int nEndX = nCenterX + flRadius * sa;
 	int nEndY = nCenterY - flRadius * ca;
@@ -1216,10 +1215,8 @@ void CAttributeSlider::PaintCircularControl( float flValue, const Rect_t& rect )
 		ang += step;
 		//ang = min( ang, clamp );
 
-		float flRadians = DEG2RAD( ang );
-
-		float ca = cos( flRadians );
-		float sa = sin( flRadians );
+		float sa, ca;
+		DirectX::XMScalarSinCos( &sa, &ca, DEG2RAD( ang ) );
 
 		meshBuilder.Position3fv( centerVert.Base() );
 		meshBuilder.Color4ub( clr.r(), clr.g(), clr.b(), clr.a() );

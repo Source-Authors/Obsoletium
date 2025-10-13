@@ -1092,7 +1092,7 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 		if( flDist >= PROP_EXPLOSION_IGNITE_RADIUS )
 		{
 			// I'm far from the blast. Ignite and burn for several seconds.
-			const float MAX_BLAST_DIST = 256.0f;
+			constexpr float MAX_BLAST_DIST = 256.0f;
 
 			// Just clamp distance.
 			if( flDist > MAX_BLAST_DIST )
@@ -1100,7 +1100,7 @@ int CBreakableProp::OnTakeDamage( const CTakeDamageInfo &inputInfo )
 
 			float flFactor;
 			flFactor = flDist / MAX_BLAST_DIST;
-			const float MAX_BURN_TIME = 5.0f;
+			constexpr float MAX_BURN_TIME = 5.0f;
 			flBurnTime = MAX( 0.5f, MAX_BURN_TIME * flFactor );
 			flBurnTime += random->RandomFloat( 0, 0.5f );
 		}
@@ -2740,6 +2740,13 @@ void CPhysicsProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t r
 		}
 	}
 
+	// dimhotepus: If we catch explosive launched by cannon it should not explode when we stay it on ground.
+	if ( pPhysicsObject && ( pPhysicsObject->GetGameFlags() & FVPHYSICS_WAS_THROWN ) )
+	{
+		PhysClearGameFlags( pPhysicsObject, FVPHYSICS_WAS_THROWN );
+	}
+	m_bFirstCollisionAfterLaunch = false;
+
 	m_OnPhysGunPickup.FireOutput( pPhysGunUser, this );
 
 	if( reason == PICKED_UP_BY_CANNON )
@@ -2821,7 +2828,7 @@ bool CPhysicsProp::GetPropDataAngles( const char *pKeyName, QAngle &vecAngles )
 			char const *pszBase = pkvPropData->GetString( pKeyName );
 			if ( pszBase && pszBase[0] )
 			{
-				UTIL_StringToVector( vecAngles.Base(), pszBase );
+				UTIL_StringToVector( vecAngles, pszBase );
 				return true;
 			}
 		}
@@ -3450,7 +3457,7 @@ int PropBreakablePrecacheAll( string_t modelName )
 bool PropBreakableCapEdictsOnCreateAll(int modelindex, IPhysicsObject *pPhysics, const breakablepropparams_t &params, CBaseEntity *pEntity, int iPrecomputedBreakableCount = -1 )
 {
 	// @Note (toml 10-07-03): this is stop-gap to prevent this function from crashing the engine
-	const int BREATHING_ROOM = 64;
+	constexpr int BREATHING_ROOM = 64;
 
 	CUtlVector<breakmodel_t> list;
 	BreakModelList( list, modelindex, params.defBurstScale, params.defCollisionGroup );

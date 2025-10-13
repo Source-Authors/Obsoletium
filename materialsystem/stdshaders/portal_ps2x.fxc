@@ -47,7 +47,7 @@ struct PS_INPUT
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	HALF4 result;	
+	float4 result;	
 	result.rgb = tex2D(PortalSampler, i.vPortalTexCoord.xy / i.vPortalTexCoord.z ).rgb;
 		
 	//mix in static	

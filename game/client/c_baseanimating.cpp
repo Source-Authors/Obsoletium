@@ -68,7 +68,7 @@ static ConVar cl_SetupAllBones( "cl_SetupAllBones", "0" );
 ConVar r_sequence_debug( "r_sequence_debug", "" );
 
 // If an NPC is moving faster than this, he should play the running footstep sound
-const float RUN_SPEED_ESTIMATE_SQR = 150.0f * 150.0f;
+constexpr inline float RUN_SPEED_ESTIMATE_SQR = 150.0f * 150.0f;
 
 // Removed macro used by shared code stuff
 #if defined( CBaseAnimating )
@@ -516,7 +516,8 @@ void C_ClientRagdoll::HandleAnimatedFriction( void )
 	}
 }
 
-ConVar g_ragdoll_fadespeed( "g_ragdoll_fadespeed", "600" );
+// dimhotepus: 10x times slower ragdolls fade speed for realism.
+ConVar g_ragdoll_fadespeed( "g_ragdoll_fadespeed", "6000" );
 ConVar g_ragdoll_lvfadespeed( "g_ragdoll_lvfadespeed", "100" );
 
 void C_ClientRagdoll::OnPVSStatusChanged( bool bInPVS )
@@ -653,9 +654,11 @@ void C_ClientRagdoll::Release( void )
 //-----------------------------------------------------------------------------
 // Incremented each frame in InvalidateModelBones. Models compare this value to what it
 // was last time they setup their bones to determine if they need to re-setup their bones.
-static unsigned long	g_iModelBoneCounter = 0;
+// dimhotepus: unsigned long -> uint64.
+static uint64 g_iModelBoneCounter = 0;
 CUtlVector<C_BaseAnimating *> g_PreviousBoneSetups;
-static unsigned long	g_iPreviousBoneCounter = (unsigned)-1;
+// dimhotepus: unsigned long -> uint64.
+static uint64 g_iPreviousBoneCounter = std::numeric_limits<uint64>::max();
 
 class C_BaseAnimatingGameSystem : public CAutoGameSystem
 {
@@ -697,7 +700,7 @@ C_BaseAnimating::C_BaseAnimating() :
 
 	AddBaseAnimatingInterpolatedVars();
 
-	m_iMostRecentModelBoneCounter = 0xFFFFFFFF;
+	m_iMostRecentModelBoneCounter = std::numeric_limits<uint64>::max();
 	m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter - 1;
 	m_flLastBoneSetupTime = -FLT_MAX;
 
@@ -756,7 +759,7 @@ C_BaseAnimating::C_BaseAnimating() :
 //-----------------------------------------------------------------------------
 C_BaseAnimating::~C_BaseAnimating()
 {
-	int i = g_PreviousBoneSetups.Find( this );
+	intp i = g_PreviousBoneSetups.Find( this );
 	if ( i != -1 )
 		g_PreviousBoneSetups.FastRemove( i );
 
@@ -1127,8 +1130,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 
 	m_iv_flPoseParameter.SetMaxCount( hdr->GetNumPoseParameters() );
 	
-	int i;
-	for ( i = 0; i < hdr->GetNumPoseParameters() ; i++ )
+	for ( intp i = 0; i < hdr->GetNumPoseParameters() ; i++ )
 	{
 		const mstudioposeparamdesc_t &Pose = hdr->pPoseParameter( i );
 		m_iv_flPoseParameter.SetLooping( Pose.loop != 0.0f, i );
@@ -1145,7 +1147,7 @@ CStudioHdr *C_BaseAnimating::OnNewModel()
 
 	m_iv_flEncodedController.SetMaxCount( boneControllerCount );
 
-	for ( i = 0; i < boneControllerCount ; i++ )
+	for ( int i = 0; i < boneControllerCount ; i++ )
 	{
 		bool loop = (hdr->pBonecontroller( i )->type & (STUDIO_XR | STUDIO_YR | STUDIO_ZR)) != 0;
 		m_iv_flEncodedController.SetLooping( loop, i );
@@ -1605,7 +1607,26 @@ void C_BaseAnimating::BuildTransformations( CStudioHdr *hdr, Vector *pos, Quater
 		}
 	}
 	
-	
+	// dimhotepus: Fix jittery model rendering when spectating a ragdoll.
+	if ( m_pRagdoll )
+	{
+		C_BasePlayer *pPlayer = C_BasePlayer::GetLocalPlayer();
+		if ( pPlayer )
+		{
+			// When the local player is spectating a ragdoll, they are copying the root physics bone
+			// Afterwards, physics simulation of ragdolls happens and updates the bones
+			// ... But after that, the ragdoll is drawn with the NEW bones
+			// which leads to the camera and rendering being out of sync with each other and causing visible jittering
+			// The workaround for this problem is to render the ragdoll with the last frame's bone data
+			C_BaseEntity* pObserverTarget = pPlayer->GetObserverTarget();
+			if ( pObserverTarget 
+				&& pObserverTarget->IsPlayer() 
+				&& static_cast< C_BasePlayer* >( pObserverTarget )->GetRepresentativeRagdoll() == m_pRagdoll )
+			{
+				m_pRagdoll->AcquireOrCopyBoneCache( m_CachedBoneData );
+}
+		}
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -1821,7 +1842,8 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 	if ( !boneSetup.GetStudioHdr() )
 		return;
 
-	if ( prediction->InPrediction() )
+	// dimhotepus: Allow death pose animations to run when entity is ragdolled.
+	if ( prediction->InPrediction() || IsAboutToRagdoll() )
 	{
 		m_nPrevNewSequenceParity = m_nNewSequenceParity;
 		return;
@@ -1847,7 +1869,7 @@ void C_BaseAnimating::MaintainSequenceTransitions( IBoneSetup &boneSetup, float 
 
 
 	// process previous sequences
-	for (int i = m_SequenceTransitioner.m_animationQueue.Count() - 2; i >= 0; i--)
+	for (intp i = m_SequenceTransitioner.m_animationQueue.Count() - 2; i >= 0; i--)
 	{
 		C_AnimationLayer *blend = &m_SequenceTransitioner.m_animationQueue[i];
 
@@ -2312,7 +2334,9 @@ CBoneCache *C_BaseAnimating::GetBoneCache( CStudioHdr *pStudioHdr )
 	CBoneCache *pcache = Studio_GetBoneCache( m_hitboxBoneCacheHandle );
 	if ( pcache )
 	{
-		if ( pcache->IsValid( gpGlobals->curtime, 0.0 ) )
+		// dimhotepus: Use default 0.1 jitter as server does and ensure (as server does) bone cache
+		// is not from future (due to prediction).
+		if ( pcache->IsValid( gpGlobals->curtime ) && pcache->m_timeValid <= gpGlobals->curtime )
 		{
 			// in memory and still valid, use it!
 			return pcache;
@@ -2398,11 +2422,11 @@ void C_BaseAnimating::UpdateIKLocks( float currentTime )
 	if (!m_pIk) 
 		return;
 
-	int targetCount = m_pIk->m_target.Count();
+	intp targetCount = m_pIk->m_target.Count();
 	if ( targetCount == 0 )
 		return;
 
-	for (int i = 0; i < targetCount; i++)
+	for (intp i = 0; i < targetCount; i++)
 	{
 		CIKTarget *pTarget = &m_pIk->m_target[i];
 
@@ -2429,7 +2453,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	if (!m_pIk) 
 		return;
 
-	int targetCount = m_pIk->m_target.Count();
+	intp targetCount = m_pIk->m_target.Count();
 	if ( targetCount == 0 )
 		return;
 
@@ -2451,7 +2475,7 @@ void C_BaseAnimating::CalculateIKLocks( float currentTime )
 	float minHeight = FLT_MAX;
 	float maxHeight = -FLT_MAX;
 
-	for (int i = 0; i < targetCount; i++)
+	for (intp i = 0; i < targetCount; i++)
 	{
 		trace_t trace;
 		CIKTarget *pTarget = &m_pIk->m_target[i];
@@ -2695,12 +2719,12 @@ void C_BaseAnimating::ControlMouth( CStudioHdr *pstudiohdr )
 
 	if ( index_ != -1 )
 	{
-		float value = GetMouth()->mouthopen / 64.0;
+		float value = GetMouth()->mouthopen / 64.0f;
 
 		float raw = value;
 
-		if ( value > 1.0 )  
-			 value = 1.0;
+		if ( value > 1.0f )  
+			 value = 1.0f;
 
 		float start, end;
 		GetPoseParameterRange( index_, start, end );
@@ -2765,7 +2789,7 @@ void C_BaseAnimating::ThreadedBoneSetup()
 	g_bDoThreadedBoneSetup = cl_threaded_bone_setup.GetBool();
 	if ( g_bDoThreadedBoneSetup )
 	{
-		int nCount = g_PreviousBoneSetups.Count();
+		intp nCount = g_PreviousBoneSetups.Count();
 		if ( nCount > 1 )
 		{
 			g_bInThreadedBoneSetup = true;
@@ -2879,7 +2903,7 @@ bool C_BaseAnimating::SetupBones( matrix3x4_t *pBoneToWorldOut, int nMaxBones, i
 #endif
 	}
 
-	int nBoneCount = m_CachedBoneData.Count();
+	intp nBoneCount = m_CachedBoneData.Count();
 	if ( g_bDoThreadedBoneSetup && !g_bInThreadedBoneSetup && ( nBoneCount >= 16 ) && !GetMoveParent() && m_iMostRecentBoneSetupRequest != g_iPreviousBoneCounter )
 	{
 		m_iMostRecentBoneSetupRequest = g_iPreviousBoneCounter;
@@ -3113,7 +3137,7 @@ void C_BaseAnimating::PopBoneAccess( char const *tagPop )
 
 	// Validate that pop matches the push
 	Assert( ( g_BoneAcessBase.tag == tagPop ) || ( g_BoneAcessBase.tag && g_BoneAcessBase.tag != ( char const * ) 1 && tagPop && tagPop != ( char const * ) 1 && !strcmp( g_BoneAcessBase.tag, tagPop ) ) );
-	int lastIndex = g_BoneAccessStack.Count() - 1;
+	intp lastIndex = g_BoneAccessStack.Count() - 1;
 	if ( lastIndex < 0 )
 	{
 		AssertMsg( false, "C_BaseAnimating::PopBoneAccess:  Stack is empty!!!" );
@@ -3519,7 +3543,7 @@ void C_BaseAnimating::ProcessMuzzleFlashEvent()
 			// Make an elight
 			dlight_t *el = effects->CL_AllocElight( LIGHT_INDEX_MUZZLEFLASH + index );
 			el->origin = vAttachment;
-			el->radius = random->RandomInt( 32, 64 ); 
+			el->radius = random->RandomFloat( 32, 64 ); 
 			el->decay = el->radius / 0.05f;
 			el->die = gpGlobals->curtime + 0.05f;
 			el->color.r = 255;
@@ -3570,7 +3594,7 @@ void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
 		return;
 
 	// If we don't have any sequences, don't do anything
-	int nStudioNumSeq = pStudioHdr->GetNumSeq();
+	intp nStudioNumSeq = pStudioHdr->GetNumSeq();
 	if ( nStudioNumSeq < 1 )
 	{
 		Warning( "%s[%d]: no sequences?\n", GetDebugName(), entindex() );
@@ -3582,7 +3606,7 @@ void C_BaseAnimating::DoAnimationEvents( CStudioHdr *pStudioHdr )
 	if ( nSeqNum >= nStudioNumSeq )
 	{
 		// This can happen e.g. while reloading Heavy's shotgun, switch to the minigun.
-		Warning( "%s[%d]: Playing sequence %d but there's only %d in total?\n", GetDebugName(), entindex(), nSeqNum, nStudioNumSeq );
+		Warning( "%s[%d]: Playing sequence %d but there's only %zd in total?\n", GetDebugName(), entindex(), nSeqNum, nStudioNumSeq );
 		return;
 	}
 
@@ -3728,7 +3752,7 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 {
 	const char	*p = options;
 	char		token[128];
-	int			weaponType = 0;
+	int			weaponType = MUZZLEFLASH_AR2;
 
 	// Get the first parameter
 	p = nexttoken( token, p, ' ' );
@@ -3744,6 +3768,11 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 		else if ( Q_stricmp( token, "SMG1" ) == 0 )
 		{
 			weaponType = MUZZLEFLASH_SMG1;
+		}
+		// dimhotepus: Handle SMG2 muzzle flashes.
+		else if ( Q_stricmp( token, "SMG2" ) == 0 )
+		{
+			weaponType = MUZZLEFLASH_SMG2;
 		}
 		else if ( Q_stricmp( token, "PISTOL" ) == 0 )
 		{
@@ -3764,13 +3793,15 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 		else
 		{
 			//NOTENOTE: This means you specified an invalid muzzleflash type, check your spelling?
-			Assert( 0 );
+			Warning( "Unknown muzzle flash weapon type %s on %s.\nPlease check spelling.\n", token, GetModelName() );
+			AssertMsg( false, "Unknown muzzle flash weapon type %s on %s.\nPlease check spelling.", token, GetModelName() );
 		}
 	}
 	else
 	{
 		//NOTENOTE: This means that there wasn't a proper parameter passed into the animevent
-		Assert( 0 );
+		Warning( "Missed muzzle flash weapon type %s.\n", token );
+		AssertMsg( false, "Missed muzzle flash weapon type %s.", token );
 		return false;
 	}
 
@@ -3787,15 +3818,29 @@ bool C_BaseAnimating::DispatchMuzzleEffect( const char *options, bool isFirstPer
 		// Found an invalid attachment
 		if ( attachmentIndex <= 0 )
 		{
+			// dimhotepus: Combine have MUZZLE attachment not present on model.
+			// Try to attach them to left hand instead.
+			if ( Q_stricmp( token, "MUZZLE" ) == 0 )
+			{
+				Warning( "Missed %s attachment on %s, fall back to anim_attachment_LH.\n", token, GetModelName() );
+
+				attachmentIndex = LookupAttachment( "anim_attachment_LH" );
+			}
+
+			if (attachmentIndex <= 0)
+			{
 			//NOTENOTE: This means that the attachment you're trying to use is invalid
-			Assert( 0 );
+				Warning( "Missed %s attachment on %s.\n", token, GetModelName() );
+				AssertMsg( false, "Missed %s attachment on %s.\n", token, GetModelName() );
 			return false;
 		}
+	}
 	}
 	else
 	{
 		//NOTENOTE: This means that there wasn't a proper parameter passed into the animevent
-		Assert( 0 );
+		Warning( "Missed muzzle flash attachment parameter on %s.\n", GetModelName() );
+		AssertMsg( false, "Missed muzzle flash attachment parameter on %s.\n", GetModelName() );
 		return false;
 	}
 
@@ -3813,19 +3858,10 @@ void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolum
 	Vector traceStart;
 	QAngle angles;
 
-	int attachment;
-
 	//!!!PERF - These string lookups here aren't the swiftest, but
 	// this doesn't get called very frequently unless a lot of NPCs
 	// are using this code.
-	if( bLeftFoot )
-	{
-		attachment = pEnt->LookupAttachment( "LeftFoot" );
-	}
-	else
-	{
-		attachment = pEnt->LookupAttachment( "RightFoot" );
-	}
+	int attachment = pEnt->LookupAttachment( bLeftFoot ? "LeftFoot" : "RightFoot" );
 
 	if( attachment == -1 )
 	{
@@ -3842,14 +3878,7 @@ void MaterialFootstepSound( C_BaseAnimating *pEnt, bool bLeftFoot, float flVolum
 		if( psurf )
 		{
 			EmitSound_t params;
-			if( bLeftFoot )
-			{
-				params.m_pSoundName = physprops->GetString(psurf->sounds.stepleft);
-			}
-			else
-			{
-				params.m_pSoundName = physprops->GetString(psurf->sounds.stepright);
-			}
+			params.m_pSoundName = physprops->GetString(bLeftFoot ? psurf->sounds.stepleft : psurf->sounds.stepright);
 
 			CPASAttenuationFilter filter( pEnt, params.m_pSoundName );
 
@@ -4078,7 +4107,16 @@ void C_BaseAnimating::FireEvent( const Vector& origin, const QAngle& angles, int
 				
 				if( GetAttachment( 2, attachOrigin, attachAngles ) )
 				{
-					tempents->EjectBrass( attachOrigin, attachAngles, GetAbsAngles(), atoi( options ) );
+					int brassType = atoi( options );
+					int brassCount = 1;
+
+					// dimhotepus: Some weapons enhance options by brasses count, so two digits.
+					if ( const char *space = V_strstr(options, " ") )
+					{
+						brassCount = atoi( space + 1 );
+					}
+
+					tempents->EjectBrass( attachOrigin, attachAngles, GetAbsAngles(), brassType, brassCount );
 				}
 			}
 		}
@@ -4353,9 +4391,10 @@ void C_BaseAnimating::FireObsoleteEvent( const Vector& origin, const QAngle& ang
 			if ( iAttachment != -1 && m_Attachments.Count() > iAttachment )
 			{
 				GetAttachment( iAttachment+1, attachOrigin, attachAngles );
-				int entId = render->GetViewEntity();
-				ClientEntityHandle_t hEntity = ClientEntityList().EntIndexToHandle( entId );
-				tempents->MuzzleFlash( attachOrigin, attachAngles, atoi( options ), hEntity, bFirstPerson );
+				// int entId = render->GetViewEntity();
+				// ClientEntityHandle_t hEntity = ClientEntityList().EntIndexToHandle( entId );
+				// dimhotepus: Use current entity for muzzle attachment, not view one.
+				tempents->MuzzleFlash( attachOrigin, attachAngles, atoi( options ), GetRefEHandle(), /*hEntity,*/ bFirstPerson );
 			}
 		}
 		break;
@@ -6276,7 +6315,7 @@ void DevMsgRT( char const* pMsg, ... )
 	if (gpGlobals->frametime != 0.0f)
 	{
 		va_list argptr;
-		va_start( argptr, pMsg );
+		va_start( argptr, pMsg ); //-V2018 //-V2019
 		// 
 		{
 			static char	string[1024];
@@ -6426,7 +6465,7 @@ void C_BaseAnimating::GetToolRecordingState( KeyValues *msg )
 
 	// Force the animation to drive bones
 	CStudioHdr *hdr = GetModelPtr();
-	matrix3x4_t *pBones = (matrix3x4_t*)_alloca( ( hdr ? hdr->numbones() : 1 ) * sizeof(matrix3x4_t) );
+	matrix3x4_t *pBones = stackallocT( matrix3x4_t, hdr ? hdr->numbones() : 1 );
 	if ( hdr )
 	{
 		SetupBones( pBones, hdr->numbones(), BONE_USED_BY_ANYTHING, gpGlobals->curtime );

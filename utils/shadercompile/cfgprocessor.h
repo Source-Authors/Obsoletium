@@ -35,10 +35,9 @@ class CUtlInplaceBuffer;
 
 namespace se::shader_compile::shader_combo_processor {
 
-// Working with configuration
-void ReadConfiguration(FILE *fInputStream);
-void ReadConfiguration(CUtlInplaceBuffer *fInputStream);
-
+/**
+ * @brief Config entry info.
+ */
 struct CfgEntryInfo {
   char const *m_szName;  // Name of the shader, e.g. "shader_ps20b"
   // Name of the src file, e.g. "shader_psxx.fxc"
@@ -51,7 +50,8 @@ struct CfgEntryInfo {
   uint64_t m_iCommandEnd;       // End command, e.g. 1024
 };
 
-void DescribeConfiguration(std::unique_ptr<CfgEntryInfo[]> &rarrEntries);
+// Working with configuration
+std::unique_ptr<CfgEntryInfo[]> ReadConfiguration(CUtlInplaceBuffer *in);
 
 // Working with combos
 using ComboHandle = struct {
@@ -60,12 +60,13 @@ using ComboHandle = struct {
 ComboHandle Combo_GetCombo(uint64_t command_no);
 ComboHandle Combo_GetNext(uint64_t &command_no, ComboHandle &rhCombo,
                           uint64_t iCommandEnd);
-void Combo_FormatCommand(ComboHandle combo, OUT_Z_CAP(buffer_size) char *buffer, intp buffer_size);
+void Combo_FormatCommand(ComboHandle combo, OUT_Z_CAP(buffer_size) char *buffer,
+                         intp buffer_size);
 
-template<intp bufferSize>
-void Combo_FormatCommand(ComboHandle combo, OUT_Z_ARRAY char (&buffer)[bufferSize])
-{
-    Combo_FormatCommand(combo, buffer, bufferSize);
+template <intp bufferSize>
+void Combo_FormatCommand(ComboHandle combo,
+                         OUT_Z_ARRAY char (&buffer)[bufferSize]) {
+  Combo_FormatCommand(combo, buffer, bufferSize);
 }
 
 uint64_t Combo_GetCommandNum(ComboHandle combo);

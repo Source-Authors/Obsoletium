@@ -116,7 +116,7 @@ void CEditGameConfigs::OnRemove()
 	// Check to see if this is the last configuation and prompt for the user to make a decision
 	if ( Options.configs.nConfigs <= 1 )
 	{
-		if ( AfxMessageBox( "At least one configuration must be present!\n"
+		if ( AfxMessageBox( "At least one configuration must be present!\n\n"
 							"Would you like to reset to the default configurations?", MB_YESNO | MB_ICONQUESTION ) == IDNO )
 		{
 			return;

@@ -11,7 +11,7 @@
 #include "sound.h"
 // dimhotepus: For SOUND_DMA_SPEED
 #include "snd_device.h"
-#include <inetchannel.h>
+#include "inetchannel.h"
 #include "checksum_engine.h"
 #include "con_nprint.h"
 #include "r_local.h"
@@ -42,7 +42,6 @@
 #include "decal.h"
 #include "sv_rcon.h"
 #include "cl_rcon.h"
-#include "vgui_baseui_interface.h"
 #include "snd_audio_source.h"
 #include "iregistry.h"
 #include "sys.h"
@@ -66,9 +65,7 @@
 #include "cl_steamauth.h"
 #include "sv_steamauth.h"
 #include "engine/ivmodelinfo.h"
-#ifdef _X360
-#include "xbox/xbox_launch.h"
-#endif
+
 #if defined( REPLAY_ENABLED )
 #include "replay_internal.h"
 #endif
@@ -278,13 +275,13 @@ ConCommand whitelist( "whitelist", whitelist_f );
 
 const CPrecacheUserData* CL_GetPrecacheUserData( INetworkStringTable *table, int index )
 {
-	int testLength;
-	const CPrecacheUserData *data = ( CPrecacheUserData * )table->GetStringUserData( index, &testLength );
+	intp testLength;
+	const CPrecacheUserData *data = ( const CPrecacheUserData * )table->GetStringUserData( index, &testLength );
 	if ( data )
 	{
 		ErrorIfNot( 
 			testLength == sizeof( *data ),
-			("CL_GetPrecacheUserData(%d,%d) - length (%d) invalid.", table->GetTableId(), index, testLength)
+			("CL_GetPrecacheUserData(%d,%d) - length (%zd) invalid.", table->GetTableId(), index, testLength)
 		);
 
 	}
@@ -853,7 +850,7 @@ CPureServerWhitelist* CL_LoadWhitelist( INetworkStringTable *pTable, const char 
 	if ( iString == INVALID_STRING_INDEX )
 		return NULL;
 
-	int dataLen; 
+	intp dataLen; 
 	const void *pData = pTable->GetStringUserData( iString, &dataLen );
 	if ( pData )
 	{
@@ -907,7 +904,7 @@ int CL_GetServerQueryPort()
 	if ( iString == INVALID_STRING_INDEX )
 		return 0;
 		
-	int dataLen; 
+	intp dataLen; 
 	const void *pData = cl.m_pServerStartupTable->GetStringUserData( iString, &dataLen );
 	if ( pData && dataLen == sizeof( int ) )
 		return *((const int*)pData);
@@ -2196,7 +2193,8 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 
 	// If TF2 and PC we don't want to load the background map.
 	bool bIsTF2 = false;
-	if ( ( Q_stricmp( COM_GetModDirectory(), "tf" ) == 0 ) || ( Q_stricmp( COM_GetModDirectory(), "tf_beta" ) == 0 ) )
+	if ( ( Q_stricmp( COM_GetModDirectory(), "tf" ) == 0 ) ||
+		 ( Q_stricmp( COM_GetModDirectory(), "tf_beta" ) == 0 ) )
 	{
 		bIsTF2 = true;
 	}
@@ -2206,15 +2204,6 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 
 	if ( args.ArgC() == 2 )
 	{
-		// presence of args identifies an end-of-game situation
-		if ( IsX360() )
-		{
-			// 360 needs to get UI in the correct state to transition to the Background level
-			// from the credits.
-			EngineVGui()->OnCreditsFinished();
-			return true;
-		}
-
 		if ( !Q_stricmp( args[1], "force" ) )
 		{
 			// Adrian: Have to do this so the menu shows up if we ever call this while in a level.
@@ -2263,12 +2252,6 @@ bool CL_ShouldLoadBackgroundLevel( const CCommand &args )
 		CommandLine()->CheckParm("+load") ||
 		CommandLine()->CheckParm("-makereslists"))
 		return false;
-
-#ifdef _X360
-	// check if we are accepting an invite
-	if ( XboxLaunch()->GetLaunchFlags() & LF_INVITERESTART )
-		return false;
-#endif
 
 	// nothing else is going on, so load the startup level
 
@@ -2378,11 +2361,11 @@ void CL_CheckToDisplayStartupMenus( const CCommand &args )
 {
 	if ( CL_ShouldLoadBackgroundLevel( args ) )
 	{
-		char szBackgroundName[_MAX_PATH];
+		char szBackgroundName[MAX_PATH];
 		CL_GetBackgroundLevelName( szBackgroundName, sizeof(szBackgroundName), true );
 
-		char cmd[_MAX_PATH];
-		Q_snprintf( cmd, sizeof(cmd), "map_background %s\n", szBackgroundName );
+		char cmd[MAX_PATH];
+		V_sprintf_safe( cmd, "map_background %s\n", szBackgroundName );
 		Cbuf_AddText( cmd );
 	}
 }
@@ -2398,18 +2381,13 @@ void DisplaySystemVersion( char *osversion, int maxlen );
 
 void CL_SetPagedPoolInfo()
 {
-	if ( IsX360() )
-		return;
-#if !defined( _X360 ) && !defined(NO_STEAM) && !defined(SWDS)
+#if !defined(NO_STEAM) && !defined(SWDS)
 	Plat_GetPagedPoolInfo( &g_pagedpoolinfo );
 #endif
 }
 
 void CL_SetSteamCrashComment()
 {
-	if ( IsX360() )
-		return;
-
 	char map[ 80 ];
 	char videoinfo[ 2048 ];
 	char misc[ 256 ];
@@ -2437,13 +2415,13 @@ void CL_SetSteamCrashComment()
 
 	// Make a string out of the high part and low parts of driver version
 	char szDXDriverVersion[ 64 ];
-	Q_snprintf( szDXDriverVersion, sizeof( szDXDriverVersion ), "%u.%u.%u.%u", 
+	V_sprintf_safe( szDXDriverVersion, "%u.%u.%u.%u", 
 		( info.m_nDriverVersionHigh>>16 ), 
 		( info.m_nDriverVersionHigh & 0xffffU ), 
 		( info.m_nDriverVersionLow>>16 ), 
 		( info.m_nDriverVersionLow & 0xffffU ) );
 
-	Q_snprintf( driverinfo, sizeof(driverinfo), "Driver Name:  %s\nDriver Version: %s\nVendorId / DeviceId:  0x%x / 0x%x\nSubSystem / Rev:  0x%x / 0x%x\nDXLevel:  %s [%d]\nVid:  %i x %i",
+	V_sprintf_safe( driverinfo, "Driver Name:  %s\nDriver Version: %s\nVendorId / DeviceId:  0x%x / 0x%x\nSubSystem / Rev:  0x%x / 0x%x\nDXLevel:  %s [%d]\nVid:  %i x %i",
 		info.m_pDriverName,
 		szDXDriverVersion,
 		info.m_VendorID,
@@ -2460,40 +2438,31 @@ void CL_SetSteamCrashComment()
 	ConVarRef mat_aaquality( "mat_aaquality" );
 	ConVarRef r_shadowrendertotexture( "r_shadowrendertotexture" );
 	ConVarRef r_flashlightdepthtexture( "r_flashlightdepthtexture" );
-#ifndef _X360
 	ConVarRef r_waterforceexpensive( "r_waterforceexpensive" );
-#endif
-		ConVarRef r_waterforcereflectentities( "r_waterforcereflectentities" );
-		ConVarRef mat_vsync( "mat_vsync" );
-		ConVarRef r_rootlod( "r_rootlod" );
-		ConVarRef mat_reducefillrate( "mat_reducefillrate" );
-		ConVarRef mat_motion_blur_enabled( "mat_motion_blur_enabled" );
-		ConVarRef mat_queue_mode( "mat_queue_mode" );
+	ConVarRef r_waterforcereflectentities( "r_waterforcereflectentities" );
+	ConVarRef mat_vsync( "mat_vsync" );
+	ConVarRef r_rootlod( "r_rootlod" );
+	ConVarRef mat_reducefillrate( "mat_reducefillrate" );
+	// dimhotepus: Dump r_lightmap_bicubic state.
+	ConVarRef r_lightmap_bicubic( "r_lightmap_bicubic" );
+	ConVarRef mat_motion_blur_enabled( "mat_motion_blur_enabled" );
+	ConVarRef mat_queue_mode( "mat_queue_mode" );
 
-#ifdef _X360
-	Q_snprintf( videoinfo, sizeof(videoinfo), "picmip: %i forceansio: %i trilinear: %i antialias: %i vsync: %i rootlod: %i reducefillrate: %i\n"\
-		"shadowrendertotexture: %i r_flashlightdepthtexture %i waterforcereflectentities: %i mat_motion_blur_enabled: %i",
-										mat_picmip.GetInt(), mat_forceaniso.GetInt(), mat_trilinear.GetInt(), mat_antialias.GetInt(), mat_aaquality.GetInt(),
-										mat_vsync.GetInt(), r_rootlod.GetInt(), mat_reducefillrate.GetInt(), 
-										r_shadowrendertotexture.GetInt(), r_flashlightdepthtexture.GetInt(),
-										r_waterforcereflectentities.GetInt(),
-										mat_motion_blur_enabled.GetInt() );
-#else
-		Q_snprintf( videoinfo, sizeof(videoinfo), "picmip: %i forceansio: %i trilinear: %i antialias: %i vsync: %i rootlod: %i reducefillrate: %i\n"\
-			"shadowrendertotexture: %i r_flashlightdepthtexture %i waterforceexpensive: %i waterforcereflectentities: %i mat_motion_blur_enabled: %i mat_queue_mode %i",
-											mat_picmip.GetInt(), mat_forceaniso.GetInt(), mat_trilinear.GetInt(), mat_antialias.GetInt(), 
-											mat_vsync.GetInt(), r_rootlod.GetInt(), mat_reducefillrate.GetInt(), 
-											r_shadowrendertotexture.GetInt(), r_flashlightdepthtexture.GetInt(),
-											r_waterforceexpensive.GetInt(), r_waterforcereflectentities.GetInt(),
-											mat_motion_blur_enabled.GetInt(), mat_queue_mode.GetInt() );
-#endif
+	V_sprintf_safe( videoinfo, "picmip: %i forceansio: %i trilinear: %i antialias: %i vsync: %i rootlod: %i reducefillrate: %i\n"\
+		"shadowrendertotexture: %i r_flashlightdepthtexture %i waterforceexpensive: %i waterforcereflectentities: %i r_lightmap_bicubic: %i mat_motion_blur_enabled: %i mat_queue_mode %i",
+			mat_picmip.GetInt(), mat_forceaniso.GetInt(), mat_trilinear.GetInt(), mat_antialias.GetInt(), 
+			mat_vsync.GetInt(), r_rootlod.GetInt(), mat_reducefillrate.GetInt(), 
+			r_shadowrendertotexture.GetInt(), r_flashlightdepthtexture.GetInt(),
+			r_waterforceexpensive.GetInt(), r_waterforcereflectentities.GetInt(),
+			r_lightmap_bicubic.GetInt(),
+			mat_motion_blur_enabled.GetInt(), mat_queue_mode.GetInt() );
 	int latency = 0;
 	if ( cl.m_NetChannel )
 	{
 		latency = (int)( 1000.0f * cl.m_NetChannel->GetAvgLatency( FLOW_OUTGOING ) );
 	}
 
-	Q_snprintf( misc, sizeof( misc ), "skill:%i rate %i update %i cmd %i latency %i msec", 
+	V_sprintf_safe( misc, "skill:%i rate %i update %i cmd %i latency %i msec", 
 		skill.GetInt(),
 		cl_rate->GetInt(),
 		(int)cl_updaterate->GetFloat(),
@@ -2509,7 +2478,7 @@ void CL_SetSteamCrashComment()
 
 		CL_SetPagedPoolInfo();
 
-		Q_snprintf( g_minidumpinfo, sizeof(g_minidumpinfo),
+		V_sprintf_safe( g_minidumpinfo,
 				"Map: %s\n"\
 				"Game: %s\n"\
 				"Build: %i\n"\
@@ -2522,7 +2491,7 @@ void CL_SetSteamCrashComment()
 				map, com_gamedir, build_number(), misc, pNetChannel, CommandLine()->GetCmdLine(), driverinfo, videoinfo, osversion );
 
 		char full[ 4096 ];
-		Q_snprintf( full, sizeof( full ), "%sPP PAGES: used: %d, free %d\n", g_minidumpinfo, (int)g_pagedpoolinfo.numPagesUsed, (int)g_pagedpoolinfo.numPagesFree );
+		V_sprintf_safe( full, "%sPP PAGES: used: %d, free %d\n", g_minidumpinfo, (int)g_pagedpoolinfo.numPagesUsed, (int)g_pagedpoolinfo.numPagesFree );
 
 #ifndef NO_STEAM
 	SteamAPI_SetMiniDumpComment( full );
@@ -2846,7 +2815,7 @@ void Callback_UserInfoChanged( void *object, INetworkStringTable *stringTable, i
 
 	// stringnumber == player slot
 
-	player_info_t *player = (player_info_t*)newData;
+	const auto *player = (const player_info_t*)newData;
 
 	if ( !player )
 		return; // player left the game
@@ -2930,7 +2899,7 @@ void CL_InstallAndInvokeClientStringTableCallbacks()
 
 		for ( int j = 0; j < pTable->GetNumStrings(); ++j )
 		{
-			int userDataSize;
+			intp userDataSize;
 			const void *pUserData = pTable->GetStringUserData( j, &userDataSize );
 			(*pNewFunction)( NULL, pTable, j, pTable->GetString( j ), pUserData );
 		}

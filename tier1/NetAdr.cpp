@@ -16,7 +16,7 @@
 
 #if defined(_WIN32)
 #include <winsock.h>
-typedef int socklen_t;
+using socklen_t = int;
 #elif defined(POSIX)
 #include <netinet/in.h> // ntohs()
 #include <netdb.h>		// gethostbyname()
@@ -111,13 +111,13 @@ const char * netadr_t::ToString( bool onlyBase ) const
 	int useSlot = ( slot++ ) % 4;
 
 	// Render into it
-	ToString( s[useSlot], sizeof(s[0]), onlyBase );
+	ToString_safe( s[useSlot], onlyBase );
 
 	// Pray the caller uses it before it gets clobbered
 	return s[useSlot];
 }
 
-void netadr_t::ToString( char *pchBuffer, size_t unBufferSize, bool onlyBase ) const
+void netadr_t::ToString( OUT_Z_CAP(unBufferSize) char *pchBuffer, size_t unBufferSize, bool onlyBase ) const
 {
 	if (type == NA_LOOPBACK)
 	{

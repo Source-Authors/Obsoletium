@@ -1,11 +1,11 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_DBG_H_
-#define TIER0_DBG_H_
+#ifndef SE_PUBLIC_TIER0_DBG_H_
+#define SE_PUBLIC_TIER0_DBG_H_
 
-#include "tier0/basetypes.h"
-#include "tier0/dbgflag.h"
-#include "tier0/platform.h"
+#include "basetypes.h"
+#include "dbgflag.h"
+#include "platform.h"
 
 #include <cstdio>
 #include <cstdarg>
@@ -167,7 +167,7 @@ enum SpewRetval_t
 };
 
 /* type of externally defined function used to display debug spew */
-typedef SpewRetval_t (*SpewOutputFunc_t)( SpewType_t spewType, const tchar *pMsg );
+using SpewOutputFunc_t = SpewRetval_t (*)(SpewType_t, const tchar *);
 
 /* Used to redirect spew output */
 DBG_INTERFACE void SpewOutputFunc(SpewOutputFunc_t func);
@@ -233,7 +233,7 @@ DBG_INTERFACE bool AreAllAssertsDisabled();
 DBG_INTERFACE void SetAllAssertsDisabled( bool bAssertsEnabled );
 
 // Provides a callback that is called on asserts regardless of spew levels
-typedef void (*AssertFailedNotifyFunc_t)( const char *pchFile, int nLine, const char *pchMessage );
+using AssertFailedNotifyFunc_t = void (*)(const char *, int, const char *);
 DBG_INTERFACE void SetAssertFailedNotifyFunc( AssertFailedNotifyFunc_t func );
 // dimhotepus: Add ^ which returns old assert failed notify.
 DBG_INTERFACE AssertFailedNotifyFunc_t SetAssertFailedNotifyFunc2( AssertFailedNotifyFunc_t func );
@@ -664,7 +664,7 @@ private:
 // Purpose: Inline string formatter
 //
 
-#include "tier0/valve_off.h"
+#include "valve_off.h"
 class CDbgFmtMsg
 {
 public:
@@ -687,7 +687,7 @@ public:
 private:
 	tchar m_szBuf[256];
 };
-#include "tier0/valve_on.h"
+#include "valve_on.h"
 
 //-----------------------------------------------------------------------------
 //
@@ -836,7 +836,9 @@ private:
 #define Log_Warning( ignore, ... )	::Msg( __VA_ARGS__ ); ::Log( __VA_ARGS__ );
 #define Log_Msg( ignore, ... )		::Warning( __VA_ARGS__ ); ::Log( __VA_ARGS__ );
 #define Log_Error( ignore, ... )		::Error( __VA_ARGS__ );
+// dimhotepus: TF2 backport.
+#define DECLARE_LOGGING_CHANNEL(...);
 #define DEFINE_LOGGING_CHANNEL_NO_TAGS( ... );
 #define Plat_FatalError( ... ) do { Log_Error( LOG_GENERAL, __VA_ARGS__ ); Plat_ExitProcess( EXIT_FAILURE ); } while( 0 )
 
-#endif  // TIER0_DBG_H_
+#endif  // !SE_PUBLIC_TIER0_DBG_H_

@@ -987,7 +987,6 @@ float CMapDisp::CollideWithTriangles( const Vector& RayStart, const Vector& RayE
 	ray.m_Delta = RayEnd - RayStart;
 	ray.m_IsRay = true;
 
-	Vector vNormal;
 	float minFraction = 1.0f;
 	for( int ndxTri = 0; ndxTri < triCount; ndxTri++ )
 	{
@@ -1985,7 +1984,7 @@ void CMapDisp::CalcColor( CRender3D *pRender, bool bIsSelected,
 		}
 		default:
 		{
-			assert( 0 );
+			Assert( 0 );
 			break;
 		}
 	}
@@ -2522,8 +2521,8 @@ void CMapDisp::UpdateNeighborsOfDispsIntersectingBox( const Vector &bbMin, const
 	Vector bbPaddedMin = bbMin - Vector( flPadding, flPadding, flPadding );
 	Vector bbPaddedMax = bbMax + Vector( flPadding, flPadding, flPadding );
 
-	int count = pDispMgr->WorldCount();
-	for ( int i=0; i < count; i++ )
+	intp count = pDispMgr->WorldCount();
+	for ( intp i=0; i < count; i++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromWorld( i );
 		
@@ -3083,7 +3082,7 @@ ChunkFileResult_t CMapDisp::LoadDispTriangleTagsKeyCallback(const char *szKey, c
 
 		while ( pszNext != NULL ) 
 		{
-			nTriTag = ( unsigned int )atoi( pszNext );
+			nTriTag = ( unsigned short )strtoull( pszNext, nullptr, 10 );
 			pDisp->m_CoreDispInfo.SetTriTagValue( iTri, nTriTag );
 			pszNext = strtok( NULL, " " );
 			iTri++;

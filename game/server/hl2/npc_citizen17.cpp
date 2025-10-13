@@ -47,7 +47,7 @@
 extern ConVar sk_healthkit;
 extern ConVar sk_healthvial;
 
-const int MAX_PLAYER_SQUAD = 4;
+constexpr inline int MAX_PLAYER_SQUAD = 4;
 
 ConVar	sk_citizen_health				( "sk_citizen_health",					"0");
 ConVar	sk_citizen_heal_player			( "sk_citizen_heal_player",				"25");
@@ -101,15 +101,15 @@ enum SquadSlot_T
 	SQUAD_SLOT_CITIZEN_RPG2,
 };
 
-const float HEAL_MOVE_RANGE = 30*12;
-const float HEAL_TARGET_RANGE = 120; // 10 feet
+constexpr inline float HEAL_MOVE_RANGE = 30*12;
+constexpr inline float HEAL_TARGET_RANGE = 120; // 10 feet
 #ifdef HL2_EPISODIC
-const float HEAL_TOSS_TARGET_RANGE = 480; // 40 feet when we are throwing medkits 
-const float HEAL_TARGET_RANGE_Z = 72; // a second check that Gordon isn't too far above us -- 6 feet
+constexpr inline float HEAL_TOSS_TARGET_RANGE = 480; // 40 feet when we are throwing medkits 
+constexpr inline float HEAL_TARGET_RANGE_Z = 72; // a second check that Gordon isn't too far above us -- 6 feet
 #endif
 
 // player must be at least this distance away from an enemy before we fire an RPG at him
-const float RPG_SAFE_DISTANCE = CMissile::EXPLOSION_RADIUS + 64.0;
+constexpr inline float RPG_SAFE_DISTANCE = CMissile::EXPLOSION_RADIUS + 64.0;
 
 // Animation events
 int AE_CITIZEN_GET_PACKAGE;
@@ -1027,7 +1027,7 @@ void CNPC_Citizen::PrescheduleThink()
 		float gMin = 128;
 		float bMin = 0;
 
-		const float TIME_FADE = 1.0;
+		constexpr float TIME_FADE = 1.0;
 		float timeInSquad = gpGlobals->curtime - m_flTimeJoinedPlayerSquad;
 		timeInSquad = MIN( TIME_FADE, MAX( timeInSquad, 0 ) );
 

@@ -1842,12 +1842,12 @@ void CBaseGamesPage::OnRefreshServer( int serverID )
 		return;
 
 	// walk the list of selected servers refreshing them
-	for (int i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
+	for (intp i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
 	{
-		intp serverID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
+		intp selectedServerID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
 
 		// refresh this server
-		steamapicontext->SteamMatchmakingServers()->RefreshServer( m_hRequest, serverID );
+		steamapicontext->SteamMatchmakingServers()->RefreshServer( m_hRequest, selectedServerID );
 	}
 
 	SetRefreshing(IsRefreshing());

@@ -5,17 +5,15 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#ifndef VPROF_TELEMETRY_H
-#define VPROF_TELEMETRY_H
+#ifndef SE_PUBLIC_TIER0_VPROF_TELEMETRY_H_
+#define SE_PUBLIC_TIER0_VPROF_TELEMETRY_H_
+
+#include "basetypes.h"
+#include "platform.h"
 
 #if !defined( MAKE_VPC )
 
 #define RAD_TELEMETRY_DISABLED
-
-#if !defined( RAD_TELEMETRY_DISABLED ) && ( defined( IS_WINDOWS_PC ) || defined( _LINUX ) )
-// Rad Telemetry profiling is enabled on Win32 and Win64.
-#define RAD_TELEMETRY_ENABLED
-#endif
 
 #endif // !MAKE_VPC
 
@@ -35,7 +33,7 @@ class CTelemetryLock
 {
 public:
 	CTelemetryLock(void *, const char *) {}
-	~CTelemetryLock() {}
+	~CTelemetryLock() = default;
 	void Locked() {}
 	void Unlocked() {}
 };
@@ -44,7 +42,7 @@ class CTelemetrySpikeDetector
 {
 public:
 	CTelemetrySpikeDetector( const char *, [[maybe_unused]] uint32 threshold = 50 ) {}
-	~CTelemetrySpikeDetector() { }
+	~CTelemetrySpikeDetector() = default;
 };
 
 #define TM_ZONE_DEFAULT( context ) 
@@ -168,4 +166,4 @@ private:
 
 #endif // RAD_TELEMETRY_ENABLED
 
-#endif // VPROF_TELEMETRY_H
+#endif // !SE_PUBLIC_TIER0_VPROF_TELEMETRY_H_

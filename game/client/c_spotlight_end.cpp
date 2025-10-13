@@ -53,6 +53,7 @@ private:
 C_SpotlightEnd::C_SpotlightEnd(void) : /*m_pModelLight(0), */m_pDynamicLight(0)
 {
 	m_flLightScale	= 100;
+	m_Radius = -1;
 }
 
 //------------------------------------------------------------------------------

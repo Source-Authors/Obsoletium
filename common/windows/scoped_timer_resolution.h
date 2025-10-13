@@ -10,7 +10,7 @@
 
 #include "tier0/dbg.h"
 
-typedef _Return_type_success_(return == 0) unsigned MMRESULT;
+using MMRESULT = unsigned int;
 
 extern "C" {
 

@@ -8,11 +8,7 @@
 #ifndef TIER2DM_H
 #define TIER2DM_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
-#include "tier2/tier2.h"
+#include "tier2.h"
 
 //-----------------------------------------------------------------------------
 // Set up methods related to datamodel interfaces
@@ -28,7 +24,7 @@ void DisconnectDataModel();
 template< class IInterface, int ConVarFlag = 0 > 
 class CTier2DmAppSystem : public CTier2AppSystem< IInterface, ConVarFlag >
 {
-	typedef CTier2AppSystem< IInterface, ConVarFlag > BaseClass;
+	using BaseClass = CTier2AppSystem<IInterface, ConVarFlag>;
 
 public:
 	CTier2DmAppSystem( bool bIsPrimaryAppSystem = true ) : BaseClass( bIsPrimaryAppSystem )

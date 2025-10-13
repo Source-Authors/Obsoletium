@@ -183,7 +183,7 @@ public:
 	void	SetKeyTime( intp nKeyIndex, DmeTime_t keyTime );
 
 	// Scale + bias key times
-	void ScaleBiasKeyTimes( double flScale, DmeTime_t nBias );
+	void ScaleBiasKeyTimes( float flScale, DmeTime_t nBias );
 
 	// Removes a single key	by index
 	virtual void RemoveKey( intp nKeyIndex, intp nNumKeysToRemove = 1 ) = 0;
@@ -222,9 +222,9 @@ protected:
 
 	void OnUsingCurveTypesChanged();
 
-	CDmeLog *m_pOwnerLog;
+	CDmeLog *m_pOwnerLog{nullptr};
 
-	mutable intp m_lastKey;
+	mutable intp m_lastKey{0};
 	CDmaArray< int > m_times;
 	CDmaArray< int > m_CurveTypes;
 };
@@ -332,7 +332,7 @@ public:
 	virtual void ClearKeys() = 0;
 
 	// Scale + bias key times
-	void ScaleBiasKeyTimes( double flScale, DmeTime_t nBias );
+	void ScaleBiasKeyTimes( float flScale, DmeTime_t nBias );
 
 	virtual float GetValueThreshold() const = 0;
 	virtual void SetValueThreshold( float thresh ) = 0;
@@ -647,7 +647,7 @@ protected:
 protected:
 	// this really only makes sense for some of our subclasses, basically those which have float data
 	// anything else's threshhold is almost certainly 0, and that class just ignores m_threshold
-	float m_threshold;
+	float m_threshold{0.0f};
 
 	CDmaVar< bool >	m_UseDefaultValue;
 	CDmaVar< T >	m_DefaultValue;

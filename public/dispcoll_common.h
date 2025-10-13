@@ -187,7 +187,7 @@ public:
 	inline bool CheckFlags( int nFlags )							{ return ( ( nFlags & GetFlags() ) != 0 ) ? true : false; }
 
 	inline int GetWidth( void )										{ return ( ( 1 << m_nPower ) + 1 ); }
-	inline int GetHeight( void )									{ return ( ( 1 << m_nPower ) + 1 ); }
+	inline int GetHeight( void )									{ return ( ( 1 << m_nPower ) + 1 ); } //-V524
 	inline int GetSize( void )										{ return ( ( 1 << m_nPower ) + 1 ) * ( ( 1 << m_nPower ) + 1 ); }
 	inline int GetTriSize( void )									{ return ( ( 1 << m_nPower ) * ( 1 << m_nPower ) * 2 ); }
 

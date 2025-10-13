@@ -1133,7 +1133,7 @@ void CBaseVSShader::DrawWorldBumpedDiffuseLighting( int bumpmapVar, int bumpFram
 			s_pShaderShadow->SetPixelShader( "LightmappedGeneric_SSBumpmappedLightmap" );
 		else
 			s_pShaderShadow->SetPixelShader( "LightmappedGeneric_BumpmappedLightmap" );
-
+			
 		FogToFogColor();
 	}
 	else
@@ -2204,6 +2204,7 @@ void CBaseVSShader::InitUnlitGeneric_DX8(
 // Take 0..1 seed and map to (u, v) coordinate to be used in shadow filter jittering...
 void CBaseVSShader::HashShadow2DJitter( const float fJitterSeed, float *fU, float* fV )
 {
+	// dimhotepus: Compile-time eval for nTexResx2.
 	constexpr int nTexRes = 32;
 	constexpr int nTexResx2 = nTexRes * nTexRes;
 	int nSeed = fmod (fJitterSeed, 1.0f) * nTexResx2;

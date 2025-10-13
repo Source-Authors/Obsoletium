@@ -1043,9 +1043,9 @@ float CAI_BaseNPC::CalcReasonableFacing( bool bIgnoreOriginalFacing )
 			return flReasonableYaw;
 
 		// Otherwise, scan out back and forth until something better is found
-		const float SLICES = 8.0f;
-		const float SIZE_SLICE = 360.0 / SLICES;
-		const int SEARCH_MAX = (int)SLICES / 2;
+		constexpr float SLICES = 8.0f;
+		constexpr float SIZE_SLICE = 360.0 / SLICES;
+		constexpr int SEARCH_MAX = (int)SLICES / 2;
 
 		float zEye = GetAbsOrigin().z + m_vDefaultEyeOffset.z; // always use standing eye so as to not screw with crouch cover
 
@@ -1085,7 +1085,7 @@ float CAI_BaseNPC::GetReasonableFacingDist( void )
 {
 	if ( GetTask() && GetTask()->iTask == TASK_FACE_ENEMY )
 	{
-		const float dist = 3.5*12;
+		constexpr float dist = 3.5*12;
 		if ( GetEnemy() )
 		{
 			float distEnemy = ( GetEnemy()->GetAbsOrigin().AsVector2D() - GetAbsOrigin().AsVector2D() ).Length() - 1.0f; 
@@ -1628,7 +1628,7 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 			}
 			else
 			{
-				const float NPC_TRIVIAL_TURN = 15;	// (Degrees). Turns this small or smaller, don't bother with a transition.
+				constexpr float NPC_TRIVIAL_TURN = 15;	// (Degrees). Turns this small or smaller, don't bother with a transition.
 
 				GetMotor()->SetIdealYawToTarget( GetNavigator()->GetCurWaypointPos());
 
@@ -2265,8 +2265,8 @@ void CAI_BaseNPC::StartTask( const Task_t *pTask )
 		{
 			// Finds the nearest node within the leniency distances,
 			// whether the node can see the target or not.
-			const float XY_LENIENCY = 64.0;
-			const float Z_LENIENCY	= 72.0;
+			constexpr float XY_LENIENCY = 64.0;
+			constexpr float Z_LENIENCY	= 72.0;
 
 			if (m_hTargetEnt == NULL)
 			{

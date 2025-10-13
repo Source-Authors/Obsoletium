@@ -446,19 +446,19 @@ void CMatSystemSurface::Shutdown( void )
 	m_Titles.Purge();
 	m_PaintStateStack.Purge();
 
-#if defined( WIN32 ) && !defined( _X360 )
-	for (intp i = 0; i < m_CustomFontFileNames.Count(); i++)
+#if defined(WIN32)
+	for ( auto &f : m_CustomFontFileNames )
  	{
 		// dvs: Keep removing the font until we get an error back. After consulting with Microsoft, it appears
 		// that RemoveFontResourceEx must sometimes be called multiple times to work. Doing this insures that
 		// when we load the font next time we get the real font instead of Ariel.
 		int nRetries = 0;
-		while ( RemoveFontResourceExA( m_CustomFontFileNames[i].String(), FR_PRIVATE, NULL ) && ( nRetries < 10 ) )
+		while ( RemoveFontResourceExA( f.String(), FR_PRIVATE, NULL ) && ( nRetries < 10 ) )
 		{
 			nRetries++;
 		}
 		// dimhotepus: Less noisy font removal traces
-		Msg( "Removed font resource %s on attempt %d.\n", m_CustomFontFileNames[i].String(), nRetries );
+		Msg( "Removed font resource %s on attempt %d.\n", f.String(), nRetries );
  	}
 #endif
 
@@ -500,8 +500,6 @@ bool CMatSystemSurface::SupportsFeature(SurfaceFeature_e feature)
 		return true;
 
 	case ISurface::OUTLINE_FONTS:
-		if ( IsX360() )
-			return false;
 		return true;
 
 	case ISurface::ESCAPE_KEY:
@@ -1400,9 +1398,10 @@ void CMatSystemSurface::DrawOutlinedCircle(int x, int y, int radius, int segment
 	for ( int i = 1; i <= segments; ++i )
 	{
 		float flRadians = i * invDelta;
-		float ca = cosf( flRadians );
-		float sa = sinf( flRadians );
-					 
+
+		float sa, ca;
+		DirectX::XMScalarSinCos( &sa, &ca, flRadians );
+
 		// Rotate it around the circle
 		vertex[1].m_Position.x = m_nTranslateX + x + (radius * ca);
 		vertex[1].m_Position.y = m_nTranslateY + y + (radius * sa);

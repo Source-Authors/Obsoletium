@@ -85,7 +85,7 @@ public:
 	int m_iEntNum;
 
 	// Currently processed text
-	int m_iCurrentText;
+	intp m_iCurrentText;
 
 	// Info Text Flags
 	enum InfoTextFlags
@@ -145,7 +145,7 @@ void ModelPoseDebugInfo::AddInfoText( InfoText *x, ModelPoseDebugInfo *pOld )
 	{
 		// Search for the same activity/label in the other model pose debug info
 		ModelPoseDebugInfo &o = *pOld;
-		int k = o.m_iCurrentText;
+		intp k = o.m_iCurrentText;
 		if ( x )
 		{
 			for ( ; k < o.m_arrTxt.Count(); ++ k )
@@ -167,7 +167,7 @@ void ModelPoseDebugInfo::AddInfoText( InfoText *x, ModelPoseDebugInfo *pOld )
 		}
 
 		// Range of finished activities
-		int iFinishedRange[2] = { o.m_iCurrentText, k };
+		intp iFinishedRange[2] = { o.m_iCurrentText, k };
 
 		// Check whether this is a new message
 		if ( k == o.m_arrTxt.Count() )
@@ -193,7 +193,7 @@ void ModelPoseDebugInfo::AddInfoText( InfoText *x, ModelPoseDebugInfo *pOld )
 		}
 
 		// Everything before finished
-		for ( int iFinished = iFinishedRange[0]; iFinished < iFinishedRange[1]; ++ iFinished )
+		for ( intp iFinished = iFinishedRange[0]; iFinished < iFinishedRange[1]; ++ iFinished )
 		{
 			InfoText &txtFinished = o.m_arrTxt[ iFinished ];
 
@@ -220,7 +220,7 @@ void ModelPoseDebugInfo::AddInfoText( InfoText *x, ModelPoseDebugInfo *pOld )
 
 ModelPoseDebugInfo::InfoText * ModelPoseDebugInfo::LookupInfoText( InfoText *x )
 {
-	int k = m_iCurrentText;
+	intp k = m_iCurrentText;
 	if ( x )
 	{
 		for ( ; k < m_arrTxt.Count(); ++ k )
@@ -249,7 +249,7 @@ void ModelPoseDebugInfo::PrintPendingInfoText( int &rnPosPrint )
 	float const flFadeOutTime = ui_posedebug_fade_out_time.GetFloat();
 
 	// Now print all the accumulated spew
-	for ( int k = m_iCurrentText; k < m_arrTxt.Count(); ++ k )
+	for ( intp k = m_iCurrentText; k < m_arrTxt.Count(); ++ k )
 	{
 		InfoText &prntxt = m_arrTxt[k];
 
@@ -519,7 +519,7 @@ void CPoseDebuggerImpl::AccumulatePose( const CStudioHdr *pStudioHdr, CIKContext
 	if ( !txt.m_chActivity[0] )
 	{
 		// Try to find the last seen activity and re-use it
-		for ( int iLast = mpi.m_arrTxt.Count(); iLast --> 0; )
+		for ( intp iLast = mpi.m_arrTxt.Count(); iLast --> 0; )
 		{
 			ModelPoseDebugInfo::InfoText &lastSeenTxt = mpi.m_arrTxt[iLast];
 			if ( lastSeenTxt.m_uiFlags & ModelPoseDebugInfo::F_SEEN_THIS_FRAME &&

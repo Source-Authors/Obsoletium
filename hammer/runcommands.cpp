@@ -200,9 +200,11 @@ static void RemoveQuotes(IN_Z_CAP(bufferSize) char *pBuf, intp bufferSize)
 	if (pBuf[0] == '"')
 		V_memmove(pBuf, pBuf + 1, bufferSize - 1);
 
-	const size_t end = strlen(pBuf) - 1;
+	const intp end = bufferSize - 2;
 
-	if (pBuf[end] == '"')
+	if (end <= 0)
+		pBuf[0] = '\0';
+	else if (pBuf[end] == '"')
 		pBuf[end] = '\0';
 }
 
@@ -218,7 +220,32 @@ LPCTSTR GetErrorString()
 
 CProcessWnd procWnd;
 
-bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
+template<intp nameSize, intp extensionSize>
+void SplitFileNameFromPath(char* szDocLongPath,
+	char (&name)[nameSize],
+	char (&extension)[extensionSize])
+{
+	char *p = strrchr(szDocLongPath, '.');
+	if(p && strrchr(szDocLongPath, '\\') < p && strrchr(szDocLongPath, '/') < p)
+	{
+		// got the extension
+		V_strcpy_safe(extension, p+1);
+		p[0] = '\0';
+	}
+
+	p = strrchr(szDocLongPath, '\\');
+	if(!p)
+		p = strrchr(szDocLongPath, '/');
+
+	if(p)
+	{
+		// got the filepart
+		V_strcpy_safe(name, p+1);
+		p[0] = '\0';
+	}
+}
+
+bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 {
 	s_bRunsCommands = true;
 
@@ -230,7 +257,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 			std::generic_category().message(errno).c_str() );
 	}
 
-	procWnd.GetReady(pszOrigDocName);
+	procWnd.GetReady(pszOrigDocName, parent);
 
 	// cut up document name into file and extension components.
 	//  create two sets of buffers - one set with the long filename
@@ -243,48 +270,15 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 	char szDocShortPath[MAX_PATH] = {0}, szDocShortName[MAX_PATH] = {0}, 
 		szDocShortExt[MAX_PATH] = {0};
 
-	GetFullPathName(pszOrigDocName, MAX_PATH, szDocLongPath, NULL);
-	GetShortPathName(pszOrigDocName, szDocShortPath, MAX_PATH);
+	GetFullPathName(pszOrigDocName, std::size(szDocLongPath), szDocLongPath, nullptr);
+	GetShortPathName(pszOrigDocName, szDocShortPath, std::size(szDocShortPath));
 
 	// split them up
-	char *p = strrchr(szDocLongPath, '.');
-	if(p && strrchr(szDocLongPath, '\\') < p && strrchr(szDocLongPath, '/') < p)
-	{
-		// got the extension
-		V_strcpy_safe(szDocLongExt, p+1);
-		p[0] = 0;
-	}
+	SplitFileNameFromPath(szDocLongPath, szDocLongName, szDocLongExt);
+	SplitFileNameFromPath(szDocShortPath, szDocShortName, szDocShortExt);
 
-	p = strrchr(szDocLongPath, '\\');
-	if(!p)
-		p = strrchr(szDocLongPath, '/');
-	if(p)
-	{
-		// got the filepart
-		V_strcpy_safe(szDocLongName, p+1);
-		p[0] = 0;
-	}
-
-	// split the short part up
-	p = strrchr(szDocShortPath, '.');
-	if(p && strrchr(szDocShortPath, '\\') < p && strrchr(szDocShortPath, '/') < p)
-	{
-		// got the extension
-		V_strcpy_safe(szDocShortExt, p+1);
-		p[0] = 0;
-	}
-
-	p = strrchr(szDocShortPath, '\\');
-	if(!p)
-		p = strrchr(szDocShortPath, '/');
-	if(p)
-	{
-		// got the filepart
-		V_strcpy_safe(szDocShortName, p+1);
-		p[0] = 0;
-	}
-	
 	char *ppParms[32];
+	BitwiseClear(ppParms);
 	INT_PTR iSize = Commands.GetSize(), i = 0;
 	while(iSize--)
 	{
@@ -299,7 +293,8 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 		pszDocName = szDocLongName;
 		pszDocPath = szDocLongPath;
 		
-		static char szNewParms[MAX_PATH*5], szNewRun[MAX_PATH*5];
+		// dimhotepus: x5 -> x4
+		static char szNewParms[MAX_PATH*4], szNewRun[MAX_PATH*4];
 		szNewParms[0] = szNewRun[0] = '\0';
 
 		// HACK: force the spawnv call for launching the game
@@ -321,7 +316,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 		// create a parameter list (not always required)
 		if(!cmd.bUseProcessWnd || cmd.iSpecialCmd)
 		{
-			p = szNewParms;
+			char *p = szNewParms;
 			ppParms[0] = szNewRun;
 			int iArg = 1;
 			BOOL bDone = FALSE;
@@ -333,7 +328,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 					if(p[0] == ' ')
 					{
 						// found a space-separator
-						p[0] = 0;
+						p[0] = '\0';
 
 						p++;
 
@@ -353,7 +348,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 							if(p[0] == '\"')
 							{
 								// found the end
-								if(p[1] == 0)
+								if(p[1] == '\0')
 									bDone = TRUE;
 								p[1] = 0;	// kick its ass
 								p += 2;
@@ -385,11 +380,12 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 
 				if(cmd.iSpecialCmd == CCCopyFile && iArg == 3)
 				{
-					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
-					RemoveQuotes(ppParms[2], ssize(ppParms) - 2);
+					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
+					RemoveQuotes(ppParms[2], V_strlen(ppParms[2]));
 					
+					// dimhotepus: stricmp -> V_stricmp for performance.
 					// don't copy if we're already there
-					if (stricmp(ppParms[1], ppParms[2]) != 0 && 
+					if (V_stricmp(ppParms[1], ppParms[2]) != 0 && 
 							(!CopyFile(ppParms[1], ppParms[2], FALSE)))
 					{
 						bError = TRUE;
@@ -398,7 +394,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				}
 				else if(cmd.iSpecialCmd == CCDelFile && iArg == 2)
 				{
-					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
+					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
 					if(!DeleteFile(ppParms[1]))
 					{
 						bError = TRUE;
@@ -407,8 +403,8 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				}
 				else if(cmd.iSpecialCmd == CCRenameFile && iArg == 3)
 				{
-					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
-					RemoveQuotes(ppParms[2], ssize(ppParms) - 2);
+					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
+					RemoveQuotes(ppParms[2], V_strlen(ppParms[2]));
 					if(rename(ppParms[1], ppParms[2]))
 					{
 						bError = TRUE;
@@ -417,7 +413,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				}
 				else if(cmd.iSpecialCmd == CCChangeDir && iArg == 2)
 				{
-					RemoveQuotes(ppParms[1], ssize(ppParms) - 1);
+					RemoveQuotes(ppParms[1], V_strlen(ppParms[1]));
 					if(mychdir(ppParms[1]) == -1)
 					{
 						bError = TRUE;
@@ -442,7 +438,9 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				// This is necessary for Steam to find the correct Steam DLL (it
 				// uses the current working directory to search).
 				char szDir[MAX_PATH];
-				Q_strncpy(szDir, szNewRun, sizeof(szDir));
+				V_strcpy_safe(szDir, szNewRun);
+				// dimhotepus: Strip quotes around dir.
+				RemoveQuotes(szDir, V_strlen(szDir));
 				V_StripFilename(szDir);
 
 				mychdir(szDir);
@@ -450,8 +448,16 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName)
 				// YWB Force asynchronous operation so that engine doesn't hang on
 				//  exit???  Seems to work.
 				// spawnv doesn't like quotes
-				RemoveQuotes(szNewRun, ssize(szNewRun));
-				_spawnv(/*cmd.bNoWait ?*/ _P_NOWAIT /*: P_WAIT*/, szNewRun, ppParms);
+				RemoveQuotes(szNewRun, V_strlen(szNewRun));
+				intptr_t rc = _spawnv(/*cmd.bNoWait ?*/ _P_NOWAIT /*: P_WAIT*/, szNewRun, ppParms);
+				if (rc == -1)
+				{
+					const int err = errno;
+					CString str;
+					str.Format("The command failed:\r\n  \"%s\"\r\n", std::generic_category().message(err).c_str());
+					procWnd.Append(str);
+					procWnd.SetForegroundWindow();
+				}
 			}
 		}
 		else

@@ -99,7 +99,7 @@ void CPlayerListDialog::Activate()
 //-----------------------------------------------------------------------------
 void CPlayerListDialog::RefreshPlayerProperties()
 {
-	for (int i = 0; i <= m_pPlayerList->GetItemCount(); i++)
+	for (intp i = 0; i <= m_pPlayerList->GetItemCount(); i++)
 	{
 		KeyValues *data = m_pPlayerList->GetItem(i);
 		if (!data)

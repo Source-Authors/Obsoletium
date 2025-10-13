@@ -76,15 +76,15 @@ private:
 	BOOL Shutdown();
 
 private:
-	HANDLE m_hMutex;
-	HANDLE m_hMemorySegment;
-	char *m_pMemory;
+	HANDLE m_hMutex{ nullptr };
+	HANDLE m_hMemorySegment{ nullptr };
+	char *m_pMemory{ nullptr };
 
 private:
 	class Iterator
 	{
 	public:
-		explicit Iterator( char *m_pMemory = NULL )
+		explicit Iterator( char *m_pMemory = nullptr )
 		{
 			m_szServerName = m_pMemory ? m_pMemory : "";
 			if ( *m_szServerName )
@@ -98,17 +98,17 @@ private:
 		}
 
 	public:
-		BOOL IsValid() const
+		[[nodiscard]] BOOL IsValid() const
 		{
 			return m_szServerName && *m_szServerName &&
 				memcmp( &m_uuid, &GUID_NULL, sizeof( UUID ) );
 		}
 		
-		Iterator Next() const
+		[[nodiscard]] Iterator Next() const
 		{
 			return IsValid() ?
 				Iterator( m_szServerName + strlen( m_szServerName ) + 1 + sizeof( UUID ) ) :
-				Iterator( NULL );
+				Iterator( nullptr );
 		}
 
 	public:
@@ -146,7 +146,7 @@ public:
 public:
 	BOOL Start();
 	BOOL Stop();
-	BOOL IsRunning() const { return m_hThread && m_bRunning; }
+	[[nodiscard]] BOOL IsRunning() const { return m_hThread && m_bRunning; }
 
 public:
 	BOOL EnsureRegisteredAndRunning()
@@ -271,12 +271,7 @@ public:
 //////////////////////////////////////////////////////////////////////////
 
 
-VALVE_IPC_IMPL CValveIpcMgr::CValveIpcMgr() :
-	m_hMutex( NULL ),
-	m_hMemorySegment( NULL ),
-	m_pMemory( NULL )
-{
-}
+VALVE_IPC_IMPL CValveIpcMgr::CValveIpcMgr() = default;
 
 VALVE_IPC_IMPL CValveIpcMgr::~CValveIpcMgr()
 {
@@ -288,7 +283,7 @@ VALVE_IPC_IMPL BOOL CValveIpcMgr::Init( DWORD dwTimeout )
 	if ( m_pMemory )
 		return TRUE;
 
-	m_hMutex = ::CreateMutex( NULL, FALSE, VALVE_IPC_MGR_NAME "_MTX_" VALVE_IPC_PROTOCOL_VER  );
+	m_hMutex = ::CreateMutex( nullptr, FALSE, VALVE_IPC_MGR_NAME "_MTX_" VALVE_IPC_PROTOCOL_VER  );
 	DWORD dwWaitResult = m_hMutex ? ::WaitForSingleObject( m_hMutex, dwTimeout ) : WAIT_FAILED;
 
 	if ( dwWaitResult == WAIT_OBJECT_0 ||
@@ -296,7 +291,7 @@ VALVE_IPC_IMPL BOOL CValveIpcMgr::Init( DWORD dwTimeout )
 	{
 		// We own the mgr segment
 
-		m_hMemorySegment = ::CreateFileMapping( INVALID_HANDLE_VALUE, NULL, PAGE_READWRITE, 0, VALVE_IPC_MGR_MEMORY,
+		m_hMemorySegment = ::CreateFileMapping( INVALID_HANDLE_VALUE, nullptr, PAGE_READWRITE, 0, VALVE_IPC_MGR_MEMORY,
 			VALVE_IPC_MGR_NAME "_MEM_" VALVE_IPC_PROTOCOL_VER );
 
 		if ( m_hMemorySegment )
@@ -316,7 +311,7 @@ VALVE_IPC_IMPL BOOL CValveIpcMgr::Init( DWORD dwTimeout )
 	{
 		::ReleaseMutex( m_hMutex );
 		::CloseHandle( m_hMutex );
-		m_hMutex = NULL;
+		m_hMutex = nullptr;
 	}
 	
 	// Otherwise shutdown due to an init error
@@ -329,20 +324,20 @@ VALVE_IPC_IMPL BOOL CValveIpcMgr::Shutdown()
 	if ( m_pMemory )
 	{
 		::UnmapViewOfFile( m_pMemory );
-		m_pMemory = NULL;
+		m_pMemory = nullptr;
 	}
 
 	if ( m_hMemorySegment )
 	{
 		::CloseHandle( m_hMemorySegment );
-		m_hMemorySegment = NULL;
+		m_hMemorySegment = nullptr;
 	}
 
 	if ( m_hMutex )
 	{
 		::ReleaseMutex( m_hMutex );
 		::CloseHandle( m_hMutex );
-		m_hMutex = NULL;
+		m_hMutex = nullptr;
 	}
 
 	return TRUE;
@@ -460,9 +455,9 @@ VALVE_IPC_IMPL BOOL CValveIpcMgr::UnregisterServer( RPC_CSTR szServerUID )
 VALVE_IPC_IMPL HANDLE CValveIpcMgr::DuplicateMemorySegmentHandle()
 {
 	if ( !m_hMemorySegment )
-		return NULL;
+		return nullptr;
 
-	HANDLE hDup = NULL;
+	HANDLE hDup = nullptr;
 	::DuplicateHandle( GetCurrentProcess(), m_hMemorySegment,
 		GetCurrentProcess(), &hDup, DUPLICATE_SAME_ACCESS,
 		FALSE, DUPLICATE_SAME_ACCESS );
@@ -486,17 +481,17 @@ VALVE_IPC_IMPL CValveIpcServer::CValveIpcServer( char const *szServerName )
 	strcpy( m_szServerName, szServerName ? szServerName : "" );
 
 	// Init remaining
-	m_szServerUID = NULL;
-	m_hMemorySegment = NULL;
-	m_hServerAlive = NULL;
-	m_hServerPipe = NULL;
-	m_hPipeEvent = NULL;
-	m_hThread = NULL;
+	m_szServerUID = nullptr;
+	m_hMemorySegment = nullptr;
+	m_hServerAlive = nullptr;
+	m_hServerPipe = nullptr;
+	m_hPipeEvent = nullptr;
+	m_hThread = nullptr;
 	m_bRunning = FALSE;
 	
-	m_pBufferRead = NULL;
+	m_pBufferRead = nullptr;
 	m_cbBufferRead = 0;
-	m_pBufferWrite = NULL;
+	m_pBufferWrite = nullptr;
 	m_cbBufferWrite = 0;
 }
 
@@ -507,7 +502,7 @@ VALVE_IPC_IMPL CValveIpcServer::~CValveIpcServer()
 	if ( m_szServerName )
 	{
 		delete [] m_szServerName;
-		m_szServerName = NULL;
+		m_szServerName = nullptr;
 	}
 }
 
@@ -530,7 +525,7 @@ VALVE_IPC_IMPL BOOL CValveIpcServer::Register()
 	// create the "server alive" object
 	char chAliveName[ MAX_PATH ];
 	sprintf( chAliveName, "%s" "_ALIVE_" VALVE_IPC_PROTOCOL_VER, m_szServerUID );
-	m_hServerAlive = ::CreateMutex( NULL, FALSE, chAliveName );
+	m_hServerAlive = ::CreateMutex( nullptr, FALSE, chAliveName );
 	if ( !m_hServerAlive )
 	{
 		Unregister();
@@ -538,7 +533,7 @@ VALVE_IPC_IMPL BOOL CValveIpcServer::Register()
 	}
 
 	// Create the server pipe event
-	m_hPipeEvent = ::CreateEvent( NULL, TRUE, FALSE, NULL );
+	m_hPipeEvent = ::CreateEvent( nullptr, TRUE, FALSE, nullptr );
 	if ( !m_hPipeEvent )
 	{
 		Unregister();
@@ -555,7 +550,7 @@ VALVE_IPC_IMPL BOOL CValveIpcServer::Register()
 		1,
 		VALVE_IPC_CS_BUFFER, VALVE_IPC_CS_BUFFER,
 		VALVE_IPC_CS_TIMEOUT,
-		NULL
+		nullptr
 		);
 	if ( !m_hServerPipe )
 	{
@@ -598,40 +593,40 @@ VALVE_IPC_IMPL BOOL CValveIpcServer::Unregister()
 
 	m_cbBufferRead = 0;
 	delete [] m_pBufferRead;
-	m_pBufferRead = NULL;
+	m_pBufferRead = nullptr;
 
 	m_cbBufferWrite = 0;
 	delete [] m_pBufferWrite;
-	m_pBufferWrite = NULL;
+	m_pBufferWrite = nullptr;
 
 	if ( m_hServerPipe )
 	{
 		::CloseHandle( m_hServerPipe );
-		m_hServerPipe = NULL;
+		m_hServerPipe = nullptr;
 	}
 
 	if ( m_hPipeEvent )
 	{
 		::CloseHandle( m_hPipeEvent );
-		m_hPipeEvent = NULL;
+		m_hPipeEvent = nullptr;
 	}
 
 	if ( m_hServerAlive )
 	{
 		::CloseHandle( m_hServerAlive );
-		m_hServerAlive = NULL;
+		m_hServerAlive = nullptr;
 	}
 
 	if ( m_hMemorySegment )
 	{
 		::CloseHandle( m_hMemorySegment );
-		m_hMemorySegment = NULL;
+		m_hMemorySegment = nullptr;
 	}
 
 	if ( m_szServerUID )
 	{
 		RpcStringFree( &m_szServerUID );
-		m_szServerUID = NULL;
+		m_szServerUID = nullptr;
 	}
 
 	return TRUE;
@@ -786,7 +781,7 @@ VALVE_IPC_IMPL BOOL CValveIpcServer::Start()
 	if ( m_hThread )
 		return FALSE;
 
-	m_hThread = ::CreateThread( NULL, 0, RunDelegate, this, CREATE_SUSPENDED, NULL );
+	m_hThread = ::CreateThread( nullptr, 0, RunDelegate, this, CREATE_SUSPENDED, nullptr );
 	if ( !m_hThread )
 		return FALSE;
 
@@ -805,7 +800,7 @@ VALVE_IPC_IMPL BOOL CValveIpcServer::Stop()
 	::WaitForSingleObject( m_hThread, INFINITE );
 
 	::CloseHandle( m_hThread );
-	m_hThread = NULL;
+	m_hThread = nullptr;
 
 	return TRUE;
 }
@@ -826,8 +821,8 @@ VALVE_IPC_IMPL CValveIpcClient::CValveIpcClient( char const *szServerName )
 	strcpy( m_szServerName, szServerName ? szServerName : "" );
 
 	// Init remaining
-	m_szServerUID = NULL;
-	m_hClientPipe = NULL;
+	m_szServerUID = nullptr;
+	m_hClientPipe = nullptr;
 }
 
 VALVE_IPC_IMPL CValveIpcClient::~CValveIpcClient()
@@ -837,7 +832,7 @@ VALVE_IPC_IMPL CValveIpcClient::~CValveIpcClient()
 	if ( m_szServerName )
 	{
 		delete [] m_szServerName;
-		m_szServerName = NULL;
+		m_szServerName = nullptr;
 	}
 }
 
@@ -868,7 +863,7 @@ VALVE_IPC_IMPL BOOL CValveIpcClient::Connect()
 	else
 	{
 		::CloseHandle( hServerAlive );
-		hServerAlive = NULL;
+		hServerAlive = nullptr;
 	}
 
 	// Connect the server pipe
@@ -878,10 +873,10 @@ VALVE_IPC_IMPL BOOL CValveIpcClient::Connect()
 		chPipeName,
 		GENERIC_READ | GENERIC_WRITE,
 		0,
-		NULL,
+		nullptr,
 		OPEN_EXISTING,
 		FILE_FLAG_WRITE_THROUGH,
-		NULL
+		nullptr
 		);
 	if ( !m_hClientPipe )
 	{
@@ -890,7 +885,7 @@ VALVE_IPC_IMPL BOOL CValveIpcClient::Connect()
 	}
 	
 	DWORD dwPipeMode = PIPE_READMODE_MESSAGE;
-	SetNamedPipeHandleState( m_hClientPipe, &dwPipeMode, NULL, NULL );
+	SetNamedPipeHandleState( m_hClientPipe, &dwPipeMode, nullptr, nullptr );
 
 	return TRUE;
 }
@@ -903,13 +898,13 @@ VALVE_IPC_IMPL BOOL CValveIpcClient::Disconnect()
 	if ( m_hClientPipe )
 	{
 		::CloseHandle( m_hClientPipe );
-		m_hClientPipe = NULL;
+		m_hClientPipe = nullptr;
 	}
 
 	if ( m_szServerUID )
 	{
 		RpcStringFree( &m_szServerUID );
-		m_szServerUID = NULL;
+		m_szServerUID = nullptr;
 	}
 
 	return TRUE;
@@ -924,7 +919,7 @@ VALVE_IPC_IMPL BOOL CValveIpcClient::ExecuteCommand( LPVOID bufIn, DWORD numInBy
 		bufIn, numInBytes,
 		bufOut, numOutBytes,
 		&numOutBytes,
-		NULL );
+		nullptr );
 	if ( !bTransact &&
 		 GetLastError() == ERROR_MORE_DATA )
 	{

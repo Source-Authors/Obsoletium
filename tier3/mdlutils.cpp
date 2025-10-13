@@ -95,7 +95,7 @@ CMDL::CMDL()
 	m_vecViewTarget.Init( 0, 0, 0 );
 	m_bWorldSpaceViewTarget = false;
 	memset( m_pFlexControls, 0, sizeof(m_pFlexControls) );
-	m_pProxyData = NULL;
+	m_pProxyData = nullptr;
 }
 
 CMDL::~CMDL()
@@ -115,7 +115,7 @@ void CMDL::SetMDL( MDLHandle_t h )
 
 		if ( pHdr )
 		{
-			for ( LocalFlexController_t i = LocalFlexController_t(0); i < pHdr->numflexcontrollers; ++i )
+			for ( auto i = LocalFlexController_t(0); i < pHdr->numflexcontrollers; ++i )
 			{
 				if ( pHdr->pFlexcontroller( i )->localToGlobal == -1 )
 				{
@@ -168,7 +168,7 @@ void CMDL::UnreferenceMDL()
 studiohdr_t *CMDL::GetStudioHdr()
 {
 	if ( !g_pMDLCache )
-		return NULL;
+		return nullptr;
 	return g_pMDLCache->GetStudioHdr( m_MDLHandle );
 }
 
@@ -197,7 +197,7 @@ void CMDL::Draw( const matrix3x4_t& rootToWorld, const matrix3x4_t *pBoneToWorld
 	info.m_Body = m_nBody;
 	info.m_HitboxSet = 0;
 	info.m_pClientEntity = m_pProxyData;
-	info.m_pColorMeshes = NULL;
+	info.m_pColorMeshes = nullptr;
 	info.m_bStaticLighting = false;
 	info.m_Lod = m_nLOD;
 
@@ -216,7 +216,7 @@ void CMDL::Draw( const matrix3x4_t& rootToWorld, const matrix3x4_t *pBoneToWorld
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
 	// Set default flex values
-	float *pFlexWeights = NULL;
+	float *pFlexWeights = nullptr;
 	const int nFlexDescCount = info.m_pStudioHdr->numflexdesc;
 	if ( nFlexDescCount )
 	{
@@ -229,8 +229,8 @@ void CMDL::Draw( const matrix3x4_t& rootToWorld, const matrix3x4_t *pBoneToWorld
 
 	Vector vecModelOrigin;
 	MatrixGetColumn( rootToWorld, 3, vecModelOrigin );
-	g_pStudioRender->DrawModel( NULL, info, const_cast<matrix3x4_t*>( pBoneToWorld ), 
-		pFlexWeights, NULL, vecModelOrigin, STUDIORENDER_DRAW_ENTIRE_MODEL );
+	g_pStudioRender->DrawModel( nullptr, info, const_cast<matrix3x4_t*>( pBoneToWorld ), 
+		pFlexWeights, nullptr, vecModelOrigin, STUDIORENDER_DRAW_ENTIRE_MODEL );
 }
 
 void CMDL::Draw( const matrix3x4_t &rootToWorld )
@@ -294,9 +294,9 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 	Vector		pos[MAXSTUDIOBONES];
 	Quaternion	q[MAXSTUDIOBONES];
 
-	IBoneSetup boneSetup( &studioHdr, BONE_USED_BY_ANYTHING_AT_LOD( m_nLOD ), pPoseParameter, NULL );
+	IBoneSetup boneSetup( &studioHdr, BONE_USED_BY_ANYTHING_AT_LOD( m_nLOD ), pPoseParameter, nullptr );
 	boneSetup.InitPose( pos, q );
-	boneSetup.AccumulatePose( pos, q, m_nSequence, flCycle, 1.0f, m_flTime, NULL );
+	boneSetup.AccumulatePose( pos, q, m_nSequence, flCycle, 1.0f, m_flTime, nullptr );
 
 	// Accumulate the additional layers if specified.
 	if ( pSequenceLayers )
@@ -334,7 +334,7 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 					flLayerCycle -= (int)(flLayerCycle);
 				}
 
-				boneSetup.AccumulatePose( pos, q, nSeqIndex, flLayerCycle, flWeight, m_flTime, NULL );
+				boneSetup.AccumulatePose( pos, q, nSeqIndex, flLayerCycle, flWeight, m_flTime, nullptr );
 			}
 		}
 	}
@@ -422,7 +422,7 @@ void CMDL::SetupBonesWithBoneMerge( const CStudioHdr *pMergeHdr, matrix3x4_t *pM
 
 	IBoneSetup boneSetup( pMergeHdr,  BONE_USED_BY_ANYTHING_AT_LOD( m_nLOD ), pPoseParameter );
 	boneSetup.InitPose( pos, q );
-	boneSetup.AccumulatePose( pos, q, m_nSequence, flCycle, 1.0f, m_flTime, NULL );
+	boneSetup.AccumulatePose( pos, q, m_nSequence, flCycle, 1.0f, m_flTime, nullptr );
 
 	// Get the merge bone list.
 	mstudiobone_t *pMergeBones = pMergeHdr->pBone( 0 );

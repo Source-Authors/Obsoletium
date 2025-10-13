@@ -285,12 +285,7 @@ $total_start_time = SampleTime();
 $vPos				= "v0";
 $vBoneWeights			= "v1";
 $vBoneIndices			= "v2";
-$vNormal			= "v3";
-if( $g_x360 )
-{
-	$vPosFlex		= "v4";
-	$vNormalFlex		= "v13";
-}
+$vNormal				= "v3";
 $vColor				= "v5";
 $vSpecular			= "v6";
 $vTexCoord0			= "v7";
@@ -568,10 +563,6 @@ while( 1 )
 	{
 		$g_SourceDir = shift;
 	}
-	elsif( $filename =~ m/-x360/i )
-	{
-		$g_x360 = 1;
-	}
 	else
 	{
 		last;
@@ -600,15 +591,7 @@ if( !defined $shaderVersion )
 close FILE;
 
 
-if( $g_x360 )
-{
-	$vshtmp = "vshtmp9_360_tmp";
-}
-else
-{
-	$vshtmp = "vshtmp9_tmp";
-}
-
+$vshtmp = "vshtmp9_tmp";
 if( !stat $vshtmp )
 {
 	mkdir $vshtmp, 0777 || die $!;
@@ -659,8 +642,7 @@ foreach $_ ( @input )
 		if (/\[(.*)\]/)
 		{
 			$platforms=$1;
-			next if ( ($g_x360) && (!($platforms=~/XBOX/i)) );
-			next if ( (!$g_x360) && (!($platforms=~/PC/i)) );
+			next if ( !($platforms=~/PC/i) );
 		}
 		push @staticDefineNames, $name;
 		push @staticDefineMin, $min;
@@ -675,8 +657,7 @@ foreach $_ ( @input )
 		if (/\[(.*)\]/)
 		{
 			$platforms=$1;
-			next if ( ($g_x360) && (!($platforms=~/XBOX/i)) );
-			next if ( (!$g_x360) && (!($platforms=~/PC/i)) );
+			next if ( !($platforms=~/PC/i) );
 		}
 #		print "\"$name\" \"$min..$max\"\n";
 		push @dynamicDefineNames, $name;
@@ -846,11 +827,6 @@ for( $i = 0; $i < $numCombos; $i++ )
 
 	# Have to make another pass through after we know which v registers are used. . yuck.
 	$g_usesPos				= &UsesRegister( $vPos, $strippedStr );
-	if( $g_x360 )
-	{
-		$g_usesPosFlex		= &UsesRegister( $vPosFlex, $strippedStr );
-		$g_usesNormalFlex	= &UsesRegister( $vNormalFlex, $strippedStr );
-	}
 	$g_usesBoneWeights		= &UsesRegister( $vBoneWeights, $strippedStr );
 	$g_usesBoneIndices		= &UsesRegister( $vBoneIndices, $strippedStr );
 	$g_usesNormal			= &UsesRegister( $vNormal, $strippedStr );
@@ -915,14 +891,7 @@ for( $i = 0; $i < $numCombos; $i++ )
 	{
 		# assemble the vertex shader
 		unlink "shader$i.o";
-		if( $g_x360 )
-		{
-			$vsa = "..\\..\\x360xdk\\bin\\win32\\vsa";
-		}
-		else
-		{
-			$vsa = "..\\..\\dx9sdk\\utilities\\vsa";
-		}
+		$vsa = "..\\..\\dx9sdk\\utilities\\vsa";
 		$vsadebug = "$vsa /nologo /Foshader$i.o $outfilename";
 		$vsanodebug = "$vsa /nologo /Foshader$i.o $outfilename";
 
@@ -994,15 +963,7 @@ $finalheadername = "$vshtmp\\" . $filename_base . ".inc";
 
 &MakeDirHier( "shaders/vsh" );
 
-my $vcsName = "";
-if( $g_x360 )
-{
-	$vcsName = $filename_base . ".360.vcs";
-}
-else
-{
-	$vcsName = $filename_base . ".vcs";
-}
+my $vcsName = $filename_base . ".vcs";
 open COMPILEDSHADER, ">shaders/vsh/$vcsName" || die;
 binmode( COMPILEDSHADER );
 
@@ -1013,12 +974,6 @@ binmode( COMPILEDSHADER );
 # Pack arguments
 my $sInt = "i";
 my $uInt = "I";
-if ( $g_x360 )
-{
-	# Change arguments to "big endian long"
-	$sInt = "N";
-	$uInt = "N";
-}
 
 my $undecoratedinput = join "", &ReadInputFileWithoutLineInfo( $filename );
 #print STDERR "undecoratedinput: $undecoratedinput\n";

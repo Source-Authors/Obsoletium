@@ -98,17 +98,17 @@ public:
 
 	// WHERE IS YOUR GOD NOW
 	template< typename T >
-		using Public_Message_t = typename std::enable_if< bPublicMutable && std::is_same< T, Message_t >::value, Message_t & >::type;
+		using Public_Message_t = typename std::enable_if_t< bPublicMutable && std::is_same_v< T, Message_t >, Message_t & >;
 	template< typename T >
-		using Protected_Message_t = typename std::enable_if< !bPublicMutable && std::is_same< T, Message_t >::value, Message_t & >::type;
+		using Protected_Message_t = typename std::enable_if_t< !bPublicMutable && std::is_same_v< T, Message_t >, Message_t & >;
 
 	template< typename T = Message_t >
 		Public_Message_t<T> Obj() { return m_msgObject; }
 
 	const Message_t & Obj() const { return m_msgObject; }
 
-	typedef Message_t SchObjectType_t;
-	const static int k_nTypeID = nTypeID;
+	using SchObjectType_t = Message_t;
+	static constexpr inline int k_nTypeID = nTypeID;
 
 protected:
 	template< typename T = Message_t >
@@ -149,9 +149,9 @@ public:
 	Message_t & Obj() { return *m_pMsgObject; }
 	const Message_t & Obj() const { return *m_pMsgObject; }
 
-	typedef Message_t SchObjectType_t;
+	using SchObjectType_t = Message_t ;
 public:
-	const static int k_nTypeID = nTypeID;
+	static constexpr inline int k_nTypeID = nTypeID;
 
 protected:
 	::google::protobuf::Message *GetPObject() { return m_pMsgObject; }

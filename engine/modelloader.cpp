@@ -339,7 +339,7 @@ private:
 		model_t *modelpointer;
 	};
 
-	CUtlMap< FileNameHandle_t, ModelEntry_t >	m_Models;
+	CUtlMap< FileNameHandle_t, ModelEntry_t, int >	m_Models;
 
 	CUtlMemoryPool			m_ModelPool;
 
@@ -854,14 +854,6 @@ void EnableHDR( bool bEnable )
 		return;
 
 	g_pMaterialSystemHardwareConfig->SetHDREnabled( bEnable );
-
-	if ( IsX360() )
-	{
-		// cannot do what the pc does and ditch resources, we're loading!
-		// can safely do the state update only, knowing that the state change won't affect 360 resources
-		((MaterialSystem_Config_t *)g_pMaterialSystemConfig)->SetFlag( MATSYS_VIDCFG_FLAGS_ENABLE_HDR, bEnable );
-		return;
-	}
 
 	ShutdownWellKnownRenderTargets();
 	InitWellKnownRenderTargets();
@@ -1445,8 +1437,10 @@ static void CalcSurfaceExtents ( CMapLoadHelper& lh, SurfaceHandle_t surfID )
 	mtexinfo_t	*tex;
 	int		bmins[2], bmaxs[2];
 
-	textureMins[0] = textureMins[1] = 999999;
-	textureMaxs[0] = textureMaxs[1] = -99999;
+	// dimhotepus: 999999 -> max
+	textureMins[0] = textureMins[1] = std::numeric_limits<float>::max();
+	// dimhotepus: -99999 -> min
+	textureMaxs[0] = textureMaxs[1] = std::numeric_limits<float>::min();
 
 	worldbrushdata_t *pBrushData = lh.GetMap();
 	tex = MSurf_TexInfo( surfID, pBrushData );
@@ -3209,7 +3203,7 @@ model_t *CModelLoader::GetModelForIndex( int i )
 {
 	Assert( m_Models.IsValidIndex( i ) );
 
-	if ( i < 0 || (size_t)i >= m_Models.Count() )
+	if ( i < 0 || i >= m_Models.Count() )
 	{
 		return NULL;
 	}
@@ -3973,7 +3967,7 @@ int Mod_GetModelMaterials( model_t* pModel, int count, IMaterial** ppMaterials )
 	case mod_studio:
 		if ( pModel->ppMaterials )
 		{
-			int nMaterials = ((intptr_t*)(pModel->ppMaterials))[-1];
+			intp nMaterials = ((intptr_t*)(pModel->ppMaterials))[-1];
 			found = MIN( count, nMaterials );
 			memcpy( ppMaterials, pModel->ppMaterials, found * sizeof( IMaterial* ) );
 		}
@@ -5668,7 +5662,7 @@ bool CModelLoader::CancelDynamicModelLoad( CDynamicModelInfo *dyn, model_t *mod 
 
 void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
 {
-	const unsigned long long now = Plat_USTime() / 1000;
+	const uint64 now = Plat_USTime() / 1000;
 	const uint delay = bIgnoreTime ? 0 : (int)( clamp( mod_dynamicunloadtime.GetFloat(), 1.f, 600.f ) * 1000 );
 
 	UpdateDynamicModelLoadQueue();
@@ -5687,7 +5681,7 @@ void CModelLoader::InternalUpdateDynamicModels( bool bIgnoreTime )
 
 		// UNLOAD THIS MODEL if zero refcount and not currently loading, and either timed out or never loaded
 		if ( dyn.m_iRefCount <= 0 && !(dyn.m_nLoadFlags & CDynamicModelInfo::LOADING) &&
-			 ( ( now - ((unsigned long long)dyn.m_uLastTouchedMS_Div256 << 8) ) >= delay || !( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) ) )
+			 ( ( now - ((uint64)dyn.m_uLastTouchedMS_Div256 << 8) ) >= delay || !( dyn.m_nLoadFlags & CDynamicModelInfo::CLIENTREADY ) ) )
 		{
 			// Remove from load queue
 			if ( dyn.m_nLoadFlags & CDynamicModelInfo::QUEUED )
@@ -5969,8 +5963,8 @@ void CModelLoader::DebugPrintDynamicModels()
 	{
 		for ( int i = 0; i < sv.GetDynamicModelsTable()->GetNumStrings(); ++i )
 		{
-			int dummy = 0;
-			char* data = (char*) sv.GetDynamicModelsTable()->GetStringUserData( i, &dummy );
+			intp dummy = 0;
+			const char* data = (const char*) sv.GetDynamicModelsTable()->GetStringUserData( i, &dummy );
 			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
 			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', sv.GetDynamicModelsTable()->GetString(i) );
 		}
@@ -5982,8 +5976,8 @@ void CModelLoader::DebugPrintDynamicModels()
 	{
 		for ( int i = 0; i < cl.m_pDynamicModelsTable->GetNumStrings(); ++i )
 		{
-			int dummy = 0;
-			char* data = (char*) cl.m_pDynamicModelsTable->GetStringUserData( i, &dummy );
+			intp dummy = 0;
+			const char* data = (const char*) cl.m_pDynamicModelsTable->GetStringUserData( i, &dummy );
 			bool bLoadedOnServer = !(data && dummy && data[0] == 0);
 			Msg( "%3i: %c %s\n", i, bLoadedOnServer ? '*' : ' ', cl.m_pDynamicModelsTable->GetString(i) );
 		}

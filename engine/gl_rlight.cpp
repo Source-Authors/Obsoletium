@@ -81,7 +81,7 @@ void R_AnimateLight (void)
 
 	for (int j=0 ; j<MAX_LIGHTSTYLES ; j++)
 	{
-		int length;
+		intp length;
 		const char * lightstyle = (const char*) table->GetStringUserData( j, &length );
 		length--;
 		

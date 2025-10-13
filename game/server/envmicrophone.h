@@ -13,13 +13,13 @@
 class CBaseFilter;
 
 
-const int SF_MICROPHONE_SOUND_COMBAT			= 0x01;
-const int SF_MICROPHONE_SOUND_WORLD				= 0x02;
-const int SF_MICROPHONE_SOUND_PLAYER			= 0x04;
-const int SF_MICROPHONE_SOUND_BULLET_IMPACT		= 0x08;
-const int SF_MICROPHONE_SWALLOW_ROUTED_SOUNDS	= 0x10;
-const int SF_MICROPHONE_SOUND_EXPLOSION			= 0x20;
-const int SF_MICROPHONE_IGNORE_NONATTENUATED	= 0x40;
+constexpr inline int SF_MICROPHONE_SOUND_COMBAT				= 0x01;
+constexpr inline int SF_MICROPHONE_SOUND_WORLD				= 0x02;
+constexpr inline int SF_MICROPHONE_SOUND_PLAYER				= 0x04;
+constexpr inline int SF_MICROPHONE_SOUND_BULLET_IMPACT		= 0x08;
+constexpr inline int SF_MICROPHONE_SWALLOW_ROUTED_SOUNDS	= 0x10;
+constexpr inline int SF_MICROPHONE_SOUND_EXPLOSION			= 0x20;
+constexpr inline int SF_MICROPHONE_IGNORE_NONATTENUATED		= 0x40;
 
 
 // Return codes from SoundPlayed

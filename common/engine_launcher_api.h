@@ -70,7 +70,7 @@ public:
 	virtual void PostConsoleCommand( const char *pConsoleCommand ) = 0;
 
 	// Are we running the simulation?
-	virtual bool IsRunningSimulation( ) const = 0;
+	[[nodiscard]] virtual bool IsRunningSimulation( ) const = 0;
 
 	// Start/stop running the simulation
 	virtual void ActivateSimulation( bool bActive ) = 0;

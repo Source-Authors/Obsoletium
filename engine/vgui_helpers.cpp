@@ -40,14 +40,14 @@ void CConVarCheckButton::SetSelected( bool state )
 
 void IncrementalUpdateTree_R( 
 	vgui::TreeView *pTree, 
-	int iCurTreeNode,
+	intp iCurTreeNode,
 	KeyValues *pValues,
 	bool &bChanges,
 	UpdateItemStateFn fn )
 {
 	// Add new items.
-	int iCurChild = 0;
-	int nChildren = pTree->GetNumChildren( iCurTreeNode );
+	intp iCurChild = 0;
+	intp nChildren = pTree->GetNumChildren( iCurTreeNode );
 	KeyValues *pSub = pValues->GetFirstSubKey();
 
 	while ( iCurChild < nChildren || pSub )
@@ -61,7 +61,7 @@ void IncrementalUpdateTree_R(
 				if ( iCurChild < nChildren )
 				{
 					// Compare the items here.
-					int iChildItemId = pTree->GetChild( iCurTreeNode, iCurChild );
+					intp iChildItemId = pTree->GetChild( iCurTreeNode, iCurChild );
 					
 					if ( fn( pTree, iChildItemId, pSub ) )
 						bChanges = true;
@@ -72,7 +72,7 @@ void IncrementalUpdateTree_R(
 				{
 					// This means that the KeyValues has an extra node..
 					bChanges = true;
-					int iChildItemId = pTree->AddItem( pSub, iCurTreeNode );
+					intp iChildItemId = pTree->AddItem( pSub, iCurTreeNode );
 					
 					if ( fn( pTree, iChildItemId, pSub ) )
 						bChanges = true;
@@ -88,7 +88,7 @@ void IncrementalUpdateTree_R(
 		else
 		{
 			// This means that the tree view has extra ones at the end. Get rid of them.
-			int iChildItemId = pTree->GetChild( iCurTreeNode, iCurChild );
+			intp iChildItemId = pTree->GetChild( iCurTreeNode, iCurChild );
 			--nChildren;
 			bChanges = true;
 
@@ -105,7 +105,7 @@ bool IncrementalUpdateTree(
 	vgui::TreeView *pTree, 
 	KeyValues *pValues,
 	UpdateItemStateFn fn,
-	int iRoot )
+	intp iRoot )
 {
 	if ( iRoot == -1 )
 	{
@@ -130,26 +130,26 @@ void CopyListPanelToClipboard( vgui::ListPanel *pListPanel )
 	CUtlVector<char> textBuf;
 
 	// Write the headers.
-	int nColumns = pListPanel->GetNumColumnHeaders();
-	for ( int i=0; i < nColumns; i++ )
+	intp nColumns = pListPanel->GetNumColumnHeaders();
+	for ( intp i=0; i < nColumns; i++ )
 	{
 		if ( i != 0 )
 			textBuf.AddToTail( '\t' );
 		
 		char tempText[512];
-		if ( !pListPanel->GetColumnHeaderText( i, tempText, sizeof( tempText ) ) )
-			Error( "GetColumHeaderText( %d ) failed", i );
+		if ( !pListPanel->GetColumnHeaderText( i, tempText ) )
+			Error( "GetColumHeaderText( %zd ) failed", i );
 		
-		textBuf.AddMultipleToTail( strlen( tempText ), tempText );
+		textBuf.AddMultipleToTail( V_strlen( tempText ), tempText );
 	}
 	textBuf.AddToTail( '\n' );
 
 	// Now write the rows.
-	int iCur = pListPanel->FirstItem();
+	intp iCur = pListPanel->FirstItem();
 	while ( iCur != pListPanel->InvalidItemID() )
 	{
 		// Write the columns for this row.
-		for ( int i=0; i < nColumns; i++ )
+		for ( intp i=0; i < nColumns; i++ )
 		{
 			if ( i != 0 )
 				textBuf.AddToTail( '\t' );
@@ -160,7 +160,7 @@ void CopyListPanelToClipboard( vgui::ListPanel *pListPanel )
 			pListPanel->GetCellText( iCur, i, tempTextWC );
 			g_pVGuiLocalize->ConvertUnicodeToANSI( tempTextWC, tempText );
 
-			textBuf.AddMultipleToTail( strlen( tempText ), tempText );
+			textBuf.AddMultipleToTail( V_strlen( tempText ), tempText );
 		}
 		textBuf.AddToTail( '\n' );
 

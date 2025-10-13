@@ -161,7 +161,7 @@ private:
 //-----------------------------------------------------------------------------
 void RecvProxy_StunActive( const CRecvProxyData *pData, void *pStruct, void *pOut )
 {
-	bool state = *((bool *)&pData->m_Value.m_Int);
+	bool state = *((const bool *)&pData->m_Value.m_Int);
 
 	C_WeaponStunStick *pWeapon = (C_WeaponStunStick *) pStruct;
 

@@ -167,7 +167,7 @@ void CCreateMultiplayerGameServerPage::LoadMaps( const char *pszPathID )
 {
 	KeyValues *hiddenMaps = ModInfo().GetHiddenMaps();
 	
-	FileFindHandle_t findHandle = NULL;
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	char mapname[256];
 	bool firstTime = true;
 	const char *pszFilename = g_pFullFileSystem->FindFirstEx( "maps/*.bsp", pszPathID, &findHandle );

@@ -209,7 +209,7 @@ public:
 		SONG_FROM_PLAYLIST
 	};
 
-	void					SelectedSongs( SongListSource_t from, CUtlVector< int >& songIndexList );
+	void					SelectedSongs( SongListSource_t from, CUtlVector< intp >& songIndexList );
 
 	void					EnableAutoAdvance( bool state );
 

@@ -6,13 +6,10 @@
 //=============================================================================//
 #ifndef CHECKSUM_CRC_H
 #define CHECKSUM_CRC_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "tier0/platform.h"
 
-typedef unsigned int CRC32_t;
+using CRC32_t = unsigned int;
 
 void CRC32_Init( CRC32_t *pulCRC );
 void CRC32_ProcessBuffer( CRC32_t *pulCRC, IN_BYTECAP(nBuffer) const void *p, intp nBuffer );

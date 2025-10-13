@@ -141,7 +141,8 @@ void TE_GlowSprite( IRecipientFilter& filter, float delay, KeyValues *pKeyValues
 	int nModelIndex = pModelName[0] ? modelinfo->GetModelIndex( pModelName ) : 0;
 	float flDuration = pKeyValues->GetFloat( "duration" );
 	float flSize = pKeyValues->GetFloat( "size" );
-	int nBrightness = pKeyValues->GetFloat( "brightness" );
+	// dimhotepus: brightness is int, read as int
+	int nBrightness = pKeyValues->GetInt( "brightness" );
 
 	TE_GlowSprite( filter, delay, &vecOrigin, nModelIndex, flDuration, flSize, nBrightness );
 }

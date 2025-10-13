@@ -26,10 +26,10 @@
 
 #define WM_INITIALUPDATE 0x0364  // (params unused) - sent to children
 
-IMPLEMENT_DYNCREATE(CChildFrame, CMDIChildWnd)
+IMPLEMENT_DYNCREATE(CChildFrame, CBaseMDIChildWnd)
 
 
-BEGIN_MESSAGE_MAP(CChildFrame, CMDIChildWnd)
+BEGIN_MESSAGE_MAP(CChildFrame, CBaseMDIChildWnd)
 	//{{AFX_MSG_MAP(CChildFrame)
 	ON_WM_SETFOCUS()
 	ON_WM_SIZE()
@@ -97,19 +97,6 @@ CChildFrame::~CChildFrame(void)
 		m_wndSplitter->DestroyWindow();
 		delete m_wndSplitter;
 	}
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : cs - 
-// Output : Returns TRUE on success, FALSE on failure.
-//-----------------------------------------------------------------------------
-BOOL CChildFrame::PreCreateWindow(CREATESTRUCT& cs)
-{
-	//cs.style |= WS_MAXIMIZE;
-
-	return(__super::PreCreateWindow(cs));
 }
 
 
@@ -192,13 +179,13 @@ void CChildFrame::SetSplitterMode(BOOL bSplitter)
 		m_wndSplitter = new CMySplitterWnd;
 		if(!m_wndSplitter->CreateStatic(this, 2, 2))
 		{
-			TRACE0("Failed to create split bar ");
+			TRACE0("Failed to create 2x2 split bar.");
 			return;    // failed to create
 		}
 
 		CRect r;
 		GetClientRect(r);
-		CSize sizeView(r.Width()/2 - 3, r.Height()/2 - 3);
+		CSize sizeView(r.Width()/2 - m_dpi_behavior.ScaleOnX(3), r.Height()/2 - m_dpi_behavior.ScaleOnY(3));
 
 		CCreateContext context;
 		context.m_pNewViewClass = NULL;
@@ -566,16 +553,22 @@ BOOL CChildFrame::OnCreateClient(LPCREATESTRUCT lpcs, CCreateContext *pContext)
 		{
 			delete m_wndSplitter;
 			m_wndSplitter = NULL;
-			TRACE0("Failed to create split bar ");
+			TRACE0("Failed to create 2x2 split bar");
 			return(FALSE);
 		}
 		
 		//
 		// Calculate the size of each view within the splitter,
 		//
+		// Our DPI behavior is not initialized yet, so fallback to parent one.
+		const int scaled = se::windows::ui::CDpiWindowBehavior::ScaleByDpi
+		(
+			USER_DEFAULT_SCREEN_DPI, 3, ::GetDpiForWindow(lpcs->hwndParent)
+		);
+
 		CRect r;
 		GetClientRect(r);
-		CSize sizeView((r.Width() / 2) - 3, (r.Height() / 2) - 3);
+		CSize sizeView(r.Width()/2 - scaled, r.Height()/2 - scaled);
 
 		//
 		// Create the 4 views as they were when the user last closed the app.
@@ -674,7 +667,7 @@ void CChildFrame::CenterViews(void)
 
 	CRect r;
 	GetClientRect(r);
-	CSize sizeView(r.Width()/2 - 3, r.Height()/2 - 3);
+	CSize sizeView(r.Width()/2 - m_dpi_behavior.ScaleOnX(3), r.Height()/2 - m_dpi_behavior.ScaleOnY(3));
 
 	sizeView.cy = max(0L, sizeView.cy);
 	sizeView.cx = max(0L, sizeView.cx);

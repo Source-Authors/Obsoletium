@@ -9,10 +9,6 @@
 #ifndef VECTOR_H
 #define VECTOR_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <DirectXMath.h>
 
 #include <cstdlib>  // rand
@@ -21,8 +17,8 @@
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
 
-#include "mathlib/vector2d.h"
-#include "mathlib/math_pfns.h"
+#include "vector2d.h"
+#include "math_pfns.h"
 
 // Uncomment this to add extra Asserts to check for NANs, uninitialized vecs, etc.
 //#define VECTOR_PARANOIA	1
@@ -74,6 +70,8 @@ public:
 #endif
 	Vector(vec_t X, vec_t Y, vec_t Z);
 	explicit Vector(vec_t XYZ); ///< broadcast initialize
+	// dimhotepus: Dummy unsafe ctor, do not use directly!
+	constexpr Vector(vec_t X, vec_t Y, vec_t Z, vec_t) : x{X}, y{Y}, z{Z} {}
 
 	// Initialization
 	void Init(vec_t ix=0.0f, vec_t iy=0.0f, vec_t iz=0.0f);
@@ -540,7 +538,7 @@ void XM_CALLCONV VectorLerp(const Vector& src1, const Vector& src2, vec_t t, Vec
 
 [[nodiscard]] FORCEINLINE Vector XM_CALLCONV ReplicateToVector( float x )
 {
-	return Vector( x, x, x );
+	return { x, x, x };
 }
 
 // check if a point is in the field of a view of an object. supports up to 180 degree fov.
@@ -1474,7 +1472,7 @@ inline vec_t DotProductAbs( const Vector &v0, const float *v1 ) = delete;
 }
 
 
-inline vec_t Vector::Length(void) const
+inline vec_t Vector::Length() const
 {
 	CHECK_VALID(*this);
 	return VectorLength( *this );
@@ -1596,7 +1594,7 @@ inline Vector Vector::Max(const Vector &vOther) const
 // arithmetic operations
 //-----------------------------------------------------------------------------
 
-inline Vector Vector::operator-(void) const
+inline Vector Vector::operator-() const
 { 
 	DirectX::XMVECTOR result = DirectX::XMVectorNegate
 	(
@@ -1670,12 +1668,12 @@ inline Vector Vector::Cross(const Vector& vOther) const
 // 2D
 //-----------------------------------------------------------------------------
 
-inline vec_t Vector::Length2D(void) const
+inline vec_t Vector::Length2D() const
 { 
 	return FastSqrt(x*x + y*y); 
 }
 
-inline vec_t Vector::Length2DSqr(void) const
+inline vec_t Vector::Length2DSqr() const
 { 
 	return (x*x + y*y); 
 }
@@ -1745,7 +1743,7 @@ inline bool operator!=( const Vector&, float const* ) = delete;
 // AngularImpulse
 //-----------------------------------------------------------------------------
 // AngularImpulse are exponetial maps (an axis scaled by a "twist" angle in degrees)
-typedef Vector AngularImpulse;
+using AngularImpulse = Vector;
 
 #ifndef VECTOR_NO_SLOW_OPERATIONS
 
@@ -1780,8 +1778,11 @@ public:
 #else
 	Quaternion() = default;
 #endif
-	inline Quaternion(vec_t ix, vec_t iy, vec_t iz, vec_t iw) : x(ix), y(iy), z(iz), w(iw) { }
-	inline Quaternion(RadianEuler const &angle);	// evil auto type promotion!!!
+	// dimhotepus: Add validation.
+	Quaternion(vec_t ix, vec_t iy, vec_t iz, vec_t iw) : x(ix), y(iy), z(iz), w(iw) { CHECK_VALID(*this); }
+	Quaternion(RadianEuler const &angle);	// evil auto type promotion!!!
+	// dimhotepus: Dummy unsafe ctor, do not use directly!
+	constexpr Quaternion(vec_t ix, vec_t iy, vec_t iz, vec_t iw, vec_t) : x(ix), y(iy), z(iz), w(iw) {}
 
 	inline void XM_CALLCONV Init(vec_t ix=0.0f, vec_t iy=0.0f, vec_t iz=0.0f, vec_t iw=0.0f)	{ x = ix; y = iy; z = iz; w = iw; }
 
@@ -1945,7 +1946,7 @@ public:
 
 	// Conversion to qangle
 	[[nodiscard]] QAngle XM_CALLCONV ToQAngle() const;
-	bool XM_CALLCONV IsValid() const;
+	[[nodiscard]] bool XM_CALLCONV IsValid() const;
 	void Invalidate();
 
 	// array access...
@@ -2076,6 +2077,8 @@ public:
 #endif
 	QAngle(vec_t X, vec_t Y, vec_t Z);
 //	QAngle(RadianEuler const &angles);	// evil auto type promotion!!!
+	// dimhotepus: Dummy unsafe ctor, do not use directly!
+	constexpr QAngle(vec_t X, vec_t Y, vec_t Z, vec_t) : x{X}, y{Y}, z{Z} {}
 
 	// Allow pass-by-value
 	[[nodiscard]] XM_CALLCONV operator QAngleByValue &()
@@ -2161,7 +2164,7 @@ class QAngleByValue : public QAngle
 {
 public:
 	// Construction/destruction:
-	QAngleByValue(void) : QAngle() {} 
+	QAngleByValue() : QAngle() {} 
 	QAngleByValue(vec_t X, vec_t Y, vec_t Z) : QAngle( X, Y, Z ) {}
 	QAngleByValue(const QAngleByValue& vOther) = default;
 };
@@ -2638,16 +2641,20 @@ inline void _SSE_RSqrtInline( float a, float* out ) = delete;
 //}
 #endif
 
-FORCEINLINE float XM_CALLCONV VectorNormalize( DirectX::XMVECTOR& val )
+FORCEINLINE DirectX::XMVECTOR XM_CALLCONV VectorNormalize( DirectX::XMVECTOR& val )
 {
 	DirectX::XMVECTOR len = DirectX::XMVector3Length( val );
-	float slen = DirectX::XMVectorGetX( len ); //-V2002
+
 	// Prevent division on zero.
-	DirectX::XMVECTOR den = DirectX::XMVectorReplicate( 1.f / ( slen + FLT_EPSILON ) ); //-V2002
+	DirectX::XMVECTOR den = DirectX::XMVectorDivide
+	(
+		DirectX::g_XMOne,
+		DirectX::XMVectorAdd( len, DirectX::g_XMEpsilon )
+	);
 
 	val = DirectX::XMVectorMultiply( val, den );
 	
-	return slen;
+	return len;
 }
 
 FORCEINLINE float XM_CALLCONV VectorNormalize( Vector& vec )
@@ -2655,11 +2662,11 @@ FORCEINLINE float XM_CALLCONV VectorNormalize( Vector& vec )
 	CHECK_VALID(vec);
 
 	DirectX::XMVECTOR val = DirectX::XMLoadFloat3( vec.XmBase() );
-	float slen = VectorNormalize( val );
+	DirectX::XMVECTOR len = VectorNormalize( val );
 
 	DirectX::XMStoreFloat3( vec.XmBase(), val );
 
-	return slen;
+	return DirectX::XMVectorGetX( len );
 }
 
 [[nodiscard]] FORCEINLINE float XM_CALLCONV VectorNormalize( DirectX::XMFLOAT4 *v )
@@ -2672,11 +2679,11 @@ FORCEINLINE float XM_CALLCONV VectorNormalize( Vector& vec )
 		DirectX::XMLoadFloat4( v ),
 		0.0f
 	);
-	float slen = VectorNormalize( val );
+	DirectX::XMVECTOR len = VectorNormalize( val );
 
 	DirectX::XMStoreFloat4( v, val );
 	
-	return slen;
+	return DirectX::XMVectorGetX( len );
 }
 
 // FIXME: Obsolete version of VectorNormalize, once we remove all the friggin float*s

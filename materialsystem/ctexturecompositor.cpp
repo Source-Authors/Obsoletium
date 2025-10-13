@@ -1328,7 +1328,7 @@ private:
 		bool bGenMipmaps = !( _comp->GetCreateFlags() & TEX_COMPOSITE_CREATE_FLAGS_NO_MIPMAPS );
 
 		// We want to do this once only.
-		char buffer[_MAX_PATH];
+		char buffer[MAX_PATH];
 		_comp->GetTextureName( buffer, ssize( buffer ) );
 
 		int nCreateFlags = TEXTUREFLAGS_IMMEDIATE_CLEANUP 
@@ -1477,7 +1477,7 @@ void CTextureCompositor::Update()
 			// One time, go ahead and dump out the texture if we're supposed to right here, at completion time.
 			if ( ( r_texcomp_dump.GetInt() == 3 || r_texcomp_dump.GetInt() == 4 ) && m_ResolveStatus != ECRS_Complete )
 			{
-				char filename[_MAX_PATH];
+				char filename[MAX_PATH];
 				V_sprintf_safe( filename, "%s.tga", m_CompositeName.Get() );
 				m_pRootStage->GetResult().m_pTexture->SaveToFile( filename );
 			}
@@ -1518,7 +1518,7 @@ void CTextureCompositor::ScheduleResolve( )
 	#if WITH_TEX_COMPOSITE_CACHE
 		if ( ( GetCreateFlags() & TEX_COMPOSITE_CREATE_FLAGS_FORCE ) == 0)
 		{
-			char buffer[ _MAX_PATH ];
+			char buffer[ MAX_PATH ];
 			GetTextureName( buffer, ssize( buffer ) );
 
 			// I think there's a race condition here, add a flag to FindTexture that says only if loaded, and bumps ref?

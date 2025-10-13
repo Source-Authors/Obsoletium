@@ -1675,6 +1675,8 @@ CSnowFallManager::CSnowFallManager( void )
 	m_vecMin.Init( FLT_MAX, FLT_MAX, FLT_MAX );
 	m_vecMax.Init( FLT_MIN, FLT_MIN, FLT_MIN );
 	m_nActiveSnowCount = 0;
+	BitwiseClear(m_aActiveSnow);
+	m_bRayParticles = false;
 	m_aSnow.Purge();
 }
 

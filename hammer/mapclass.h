@@ -97,7 +97,16 @@ typedef _W64 unsigned long ULONG_PTR, *PULONG_PTR;
 typedef ULONG_PTR DWORD_PTR;
 
 typedef const char * MAPCLASSTYPE;
-typedef BOOL (*ENUMMAPCHILDRENPROC)(CMapClass *, DWORD_PTR dwParam);
+
+template<typename TMapClass>
+using MapClassConcept = std::enable_if_t<
+	(std::is_same_v<CMapClass, TMapClass> ||
+	 std::is_base_of_v<CMapClass, TMapClass>)
+, TMapClass>;
+
+template<typename TMapClass, typename... TArgs>
+using EnumMapChildrenFunction = BOOL (*)(TMapClass *, TArgs... args);
+
 typedef CUtlVector<CMapClass*> CMapObjectList;
 
 
@@ -169,6 +178,7 @@ private:
 	int m_RefCount;	// This object goes away when all smart pointers to it go away.
 };
 
+#define MAPCLASS_TYPE(class_name) (class_name::__Type)
 
 class CMapClass : public CMapPoint
 {
@@ -222,7 +232,7 @@ public:
 	virtual void RemoveChild(CMapClass *pChild, bool bUpdateBounds = true);
 	virtual void UpdateChild(CMapClass *pChild);
 
-	inline int GetChildCount(void) { return( m_Children.Count()); }
+	inline intp GetChildCount(void) { return( m_Children.Count()); }
 	inline const CMapObjectList *GetChildren() { return &m_Children; }
 		
 	CMapClass *GetFirstDescendent(EnumChildrenPos_t &pos);
@@ -337,9 +347,83 @@ public:
 	static CMapWorld *GetWorldObject(CMapAtom *pStart);
     
 	virtual const char* GetDescription() const { return ""; }
+	
+	//-----------------------------------------------------------------------------
+	// Purpose: Calls an enumerating function for each of our children that are of
+	//			of a given type, recursively enumerating their children also.
+	// Input  : f - Enumeration callback function. Called once per child.
+	//			args - User data to pass into the enumerating callback.
+	// Output : Returns FALSE if the enumeration was terminated early, TRUE if it completed.
+	//-----------------------------------------------------------------------------
+	template<typename TMapClass, typename... TArgs>
+	BOOL EnumChildren(EnumMapChildrenFunction<TMapClass, TArgs...>&& f, TArgs... args)
+	{
+		using map_class_concept = MapClassConcept<TMapClass>;
 
-	BOOL EnumChildren(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam = 0, MAPCLASSTYPE Type = NULL);
-	BOOL EnumChildrenRecurseGroupsOnly(ENUMMAPCHILDRENPROC pfn, DWORD_PTR dwParam, MAPCLASSTYPE Type = NULL);
+		MAPCLASSTYPE type = nullptr;
+		if constexpr (!std::is_same_v<CMapClass, std::decay_t<TMapClass>>)
+			type = MAPCLASS_TYPE(TMapClass);
+
+		FOR_EACH_OBJ( m_Children, pos )
+		{
+			CMapClass *pChild = m_Children.Element(pos);
+			if (!type || pChild->IsMapClass(type))
+			{
+				if(!std::forward<EnumMapChildrenFunction<TMapClass, TArgs...>>(f)(static_cast<TMapClass *>(pChild), std::forward<TArgs>(args)...))
+				{
+					return FALSE;
+				}
+			}
+
+			// enum this child's children
+			if (!pChild->EnumChildren(std::forward<EnumMapChildrenFunction<TMapClass, TArgs...>>(f), std::forward<TArgs>(args)...))
+			{
+				return FALSE;
+			}
+		}
+
+		return TRUE;
+	}
+
+	//-----------------------------------------------------------------------------
+	// Purpose: Enumerates a this object's children, only recursing into groups.
+	//			Children of entities will not be enumerated.
+	// Input  : f - Enumeration callback function. Called once per child.
+	//			args - User data to pass into the enumerating callback.
+	// Output : Returns FALSE if the enumeration was terminated early, TRUE if it completed.
+	//-----------------------------------------------------------------------------
+	template<typename TMapClass, typename... TArgs>
+	BOOL EnumChildrenRecurseGroupsOnly(EnumMapChildrenFunction<TMapClass, TArgs...>&& f, TArgs... args)
+	{
+		using map_class_concept = MapClassConcept<TMapClass>;
+
+		MAPCLASSTYPE type = nullptr;
+		if constexpr (!std::is_same_v<CMapClass, std::decay_t<TMapClass>>)
+			type = MAPCLASS_TYPE(TMapClass);
+
+		FOR_EACH_OBJ( m_Children, pos )
+		{
+			CMapClass *pChild = m_Children.Element(pos);
+
+			if (!type || pChild->IsMapClass(type))
+			{
+				if(!std::forward<EnumMapChildrenFunction<TMapClass, TArgs...>>(f)(static_cast<TMapClass *>(pChild), std::forward<TArgs>(args)...))
+				{
+					return FALSE;
+				}
+			}
+
+			if (pChild->IsGroup())
+			{
+				if (!pChild->EnumChildrenRecurseGroupsOnly(std::forward<EnumMapChildrenFunction<TMapClass, TArgs...>>(f), std::forward<TArgs>(args)...))
+				{
+					return FALSE;
+				}
+			}
+		}
+
+		return TRUE;
+	}
 	BOOL IsChildOf(CMapAtom *pObject);
 
 	virtual bool ShouldAppearInLightingPreview(void)
@@ -491,10 +575,6 @@ public:
 
 	static CMapClass * CreateObject(MAPCLASSTYPE Type);
 };
-
-
-#define MAPCLASS_TYPE(class_name) \
-	(class_name::__Type)
 
 
 #define IMPLEMENT_MAPCLASS(class_name) \

@@ -49,11 +49,7 @@ public:
 		if ( lhs.m_nPackFileNumber > rhs.m_nPackFileNumber )
 			return false;
 
-		if ( lhs.m_nFileFraction < rhs.m_nFileFraction )
-			return true;
-		if ( lhs.m_nFileFraction > rhs.m_nFileFraction )
-			return false;
-		return false;
+		return lhs.m_nFileFraction < rhs.m_nFileFraction;
 	}
 };
 
@@ -70,7 +66,7 @@ public:
 	struct CFileHeaderFixedData *m_pHeaderData;
 	uint8 *m_pDirFileNamePtr;								// pointer to basename in dir block
 
-	FORCEINLINE operator bool( void ) const
+	FORCEINLINE operator bool() const
 	{
 		return ( m_nFileNumber != -1 );
 	}
@@ -106,7 +102,7 @@ public:
 		return m_nCurrentFileOffset;
 	}
 
-	int Tell( void ) const
+	int Tell() const
 	{
 		return m_nCurrentFileOffset;
 	}
@@ -117,9 +113,9 @@ public:
 		return *pCRC;
 	}
 
-	FORCEINLINE void GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut );
+	FORCEINLINE void GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut );
 
-	template<int outSize>
+	template<intp outSize>
 	FORCEINLINE void GetPackFileName( OUT_Z_ARRAY char (&pchFileNameOut)[outSize] )
 	{
 		GetPackFileName( pchFileNameOut, outSize );
@@ -223,13 +219,8 @@ struct CachedVPKRead_t
 			return true;
 		if ( lhs.m_nPackFileNumber > rhs.m_nPackFileNumber )
 			return false;
-		if ( lhs.m_nFileFraction < rhs.m_nFileFraction )
-			return true;
-		if ( lhs.m_nFileFraction > rhs.m_nFileFraction )
-			return false;
-		return false;
+		return lhs.m_nFileFraction < rhs.m_nFileFraction;
 	}
-
 };
 
 
@@ -356,14 +347,14 @@ public:
 	bool FindFileHashFraction( int nPackFileNumber, int nFileFraction, ChunkHashFraction_t &chunkFileHashFraction );
 	void GetPackFileLoadErrorSummary( CUtlString &sErrors );
 
-	void GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut ) const;
-	template<int outSize>
+	void GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut ) const;
+	template<intp outSize>
 	void GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_ARRAY char (&pchFileNameOut)[outSize] ) const
 	{
 		return GetPackFileName( handle, pchFileNameOut, outSize );
 	}
-	void GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const;
-	template<int outSize>
+	void GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut, intp nFileNumber ) const;
+	template<intp outSize>
 	void GetDataFileName( OUT_Z_ARRAY char (&pchFileNameOut)[outSize], intp nFileNumber ) const
 	{
 		return GetDataFileName( pchFileNameOut, outSize, nFileNumber );
@@ -478,7 +469,7 @@ FORCEINLINE int CPackedStoreFileHandle::Read( void *pOutData, int nNumBytes )
 	return m_pOwner->ReadData( *this, pOutData, nNumBytes );
 }
 
-FORCEINLINE void CPackedStoreFileHandle::GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut )
+FORCEINLINE void CPackedStoreFileHandle::GetPackFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut )
 {
 	m_pOwner->GetPackFileName( *this, pchFileNameOut, cchFileNameOut );
 }

@@ -35,11 +35,11 @@ public:
 	// Load a set of animations by name.
 	// baseName - The name of the animations without their frame number or file extension, (e.g. c1.tga becomes just c.)
 	// framecount: number of frames in the animation
-	virtual void LoadAnimation(const char *baseName, int frameCount);
+	virtual void LoadAnimation(const char *baseName, intp frameCount);
 
 	virtual void StartAnimation();
 	virtual void StopAnimation();
-	virtual void ResetAnimation(int frame = 0);
+	virtual void ResetAnimation(intp frame = 0);
 
 protected:
 	void OnTick() override;
@@ -51,7 +51,7 @@ protected:
 	const char *GetDescription() override;
 
 private:
-	int m_iCurrentImage;
+	intp m_iCurrentImage;
 	int m_iNextFrameTime;
 	int m_iFrameTimeMillis;
 	CUtlVector<IImage *> m_Frames;

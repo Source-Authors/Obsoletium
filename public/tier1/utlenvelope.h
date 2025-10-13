@@ -5,15 +5,11 @@
 //
 //=============================================================================
 
-#include "tier1/utlstring.h"
-#include "tier0/basetypes.h"
-
 #ifndef UTLENVELOPE_H
 #define UTLENVELOPE_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
+#include "tier0/basetypes.h"
+#include "utlstring.h"
 
 //-----------------------------------------------------------------------------
 
@@ -78,11 +74,7 @@ public:
 		m_string = from.m_string;
 	}
 
-	CUtlEnvelope<const char *> &operator=( const CUtlEnvelope<const char *> &from )
-	{
-		m_string = from.m_string;
-		return *this;
-	}
+	CUtlEnvelope<const char *> &operator=( const CUtlEnvelope<const char *> &from ) = default;
 
 	[[nodiscard]] operator char *()
 	{

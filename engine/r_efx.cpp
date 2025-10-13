@@ -28,7 +28,7 @@ extern	CClientState	cl;
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CVEfx::Draw_DecalIndexFromName( char *name )
+int CVEfx::Draw_DecalIndexFromName( const char *name )
 {
 	bool found = false;
 	return ::Draw_DecalIndexFromName( name, &found );

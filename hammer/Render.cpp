@@ -43,7 +43,7 @@ CRender::CRender(void)
 	vgui::IScheme * pScheme = vgui::scheme()->GetIScheme( vgui::scheme()->GetDefaultScheme() );
 	if ( pScheme )
 	{	
-		m_DefaultFont = pScheme->GetFont( "Default" );
+		m_DefaultFont = pScheme->GetFont( "Default", true );
 	}
 	else
 	{
@@ -53,7 +53,7 @@ CRender::CRender(void)
 		if ( !s_bOnce )
 		{
 			s_bOnce = true;
-			MessageBox( NULL, "Failed to load the default scheme file. The map views may be missing some visual elements.", "Hammer - Error", MB_OK | MB_ICONEXCLAMATION );
+			MessageBox( NULL, "Failed to load the default scheme file.\n\nThe map views may be missing some visual elements.", "Hammer - Scheme Load Error", MB_OK | MB_ICONEXCLAMATION );
 		}
 	}
 	
@@ -395,10 +395,9 @@ void CRender::SetInstanceRendering( InstanceRenderingState_t State )
 void CRender::DrawText( const char *text, int x, int y, int nFlags )
 {
 	wchar_t unicode[ 128 ];
+	V_strtowcs( text, -1, unicode );
 
-	mbstowcs( unicode, text, ARRAYSIZE(unicode) );
-
-	int len = min( (ptrdiff_t)127, Q_strlen( text ) );
+	int len = min( (ptrdiff_t)127, V_strlen( text ) );
 
 	Assert( m_DefaultFont != vgui::INVALID_FONT );
 	bool bJustifyText = nFlags & ( TEXT_JUSTIFY_LEFT | TEXT_JUSTIFY_TOP | TEXT_JUSTIFY_HORZ_CENTER | TEXT_JUSTIFY_VERT_CENTER );
@@ -542,8 +541,9 @@ void CRender::StartRenderFrame()
 
 	pCamera->GetViewMatrix( m_CurrentMatrix );
 
+	const int maxNumLights = MaterialSystemHardwareConfig()->MaxNumLights();
 	// Disable all the lights..
-	for( int i = 0; i < MaterialSystemHardwareConfig()->MaxNumLights(); ++i)
+	for( int i = 0; i < maxNumLights; ++i)
 	{
 		LightDesc_t desc;
 		desc.m_Type = MATERIAL_LIGHT_DISABLE;
@@ -1376,7 +1376,7 @@ bool CRender::GetRequiredMaterial( const char *pName, IMaterial* &pMaterial )
 	{
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "Missing material '%s'. Go to Tools | Options | Game Configurations and verify that your game directory is correct.", pName );
-		MessageBox( NULL, str, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
+		MessageBox( NULL, str, "Hammer - Missed Material Error", MB_OK | MB_ICONERROR );
 		return false;
 	}
 }

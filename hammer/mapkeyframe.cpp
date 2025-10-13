@@ -93,9 +93,9 @@ void CMapKeyFrame::CalcBounds(BOOL bFullUpdate)
 		m_CullBox.UpdateBounds(vNextOrigin);
 
 		// Expand the bbox by the points on our line.
-		for ( int i=0; i < MAX_LINE_POINTS; i++ )
+		for ( const auto &lp : m_LinePoints )
 		{
-			m_CullBox.UpdateBounds(m_LinePoints[i]);
+			m_CullBox.UpdateBounds(lp);
 		}
 	}
 

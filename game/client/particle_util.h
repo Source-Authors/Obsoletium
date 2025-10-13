@@ -175,25 +175,25 @@ inline void RenderParticle_Color255SizeNormal(
 	pBuilder->Position3f( pos.x-size, pos.y-size, pos.z );
 	pBuilder->Color4ubv( ubColor );
 	pBuilder->TexCoord2f( 0, pDraw->m_pSubTexture->m_tCoordMins[0], pDraw->m_pSubTexture->m_tCoordMaxs[1] );
-	pBuilder->Normal3fv( (float*)&vNormal );
+	pBuilder->Normal3fv( vNormal.Base() );
 	pBuilder->AdvanceVertex();
 
 	pBuilder->Position3f( pos.x-size, pos.y+size, pos.z );
 	pBuilder->Color4ubv( ubColor );
 	pBuilder->TexCoord2f( 0, pDraw->m_pSubTexture->m_tCoordMins[0], pDraw->m_pSubTexture->m_tCoordMins[1] );
-	pBuilder->Normal3fv( (float*)&vNormal );
+	pBuilder->Normal3fv( vNormal.Base() );
  	pBuilder->AdvanceVertex();
 
 	pBuilder->Position3f( pos.x+size, pos.y+size, pos.z );
 	pBuilder->Color4ubv( ubColor );
 	pBuilder->TexCoord2f( 0, pDraw->m_pSubTexture->m_tCoordMaxs[0], pDraw->m_pSubTexture->m_tCoordMins[1] );
-	pBuilder->Normal3fv( (float*)&vNormal );
+	pBuilder->Normal3fv( vNormal.Base() );
  	pBuilder->AdvanceVertex();
 
 	pBuilder->Position3f( pos.x+size, pos.y-size, pos.z );
 	pBuilder->Color4ubv( ubColor );
 	pBuilder->TexCoord2f( 0, pDraw->m_pSubTexture->m_tCoordMaxs[0], pDraw->m_pSubTexture->m_tCoordMaxs[1] );
-	pBuilder->Normal3fv( (float*)&vNormal );
+	pBuilder->Normal3fv( vNormal.Base() );
  	pBuilder->AdvanceVertex();
 }
 
@@ -224,32 +224,32 @@ inline void RenderParticle_Color255SizeNormalAngle(
 	ubColor[2] = (unsigned char)RoundFloatToInt( color.z );
 	ubColor[3] = (unsigned char)RoundFloatToInt( alpha );
 
-	float ca = (float)cos(angle);
-	float sa = (float)sin(angle);
+	float ca = cos(angle);
+	float sa = sin(angle);
 
 	// Add the 4 corner vertices.
 	pBuilder->Position3f( pos.x + (-ca + sa) * size, pos.y + (-sa - ca) * size, pos.z );
 	pBuilder->Color4ubv( ubColor );
 	pBuilder->TexCoord2f( 0, pDraw->m_pSubTexture->m_tCoordMins[0], pDraw->m_pSubTexture->m_tCoordMaxs[1] );
-	pBuilder->Normal3fv( (float*)&vNormal );
+	pBuilder->Normal3fv( vNormal.Base() );
 	pBuilder->AdvanceVertex();
 
 	pBuilder->Position3f( pos.x + (-ca - sa) * size, pos.y + (-sa + ca) * size, pos.z );
 	pBuilder->Color4ubv( ubColor );
 	pBuilder->TexCoord2f( 0, pDraw->m_pSubTexture->m_tCoordMins[0], pDraw->m_pSubTexture->m_tCoordMins[1] );
-	pBuilder->Normal3fv( (float*)&vNormal );
+	pBuilder->Normal3fv( vNormal.Base() );
  	pBuilder->AdvanceVertex();
 
 	pBuilder->Position3f( pos.x + (ca - sa)  * size, pos.y + (sa + ca)  * size, pos.z );
 	pBuilder->Color4ubv( ubColor );
 	pBuilder->TexCoord2f( 0, pDraw->m_pSubTexture->m_tCoordMaxs[0], pDraw->m_pSubTexture->m_tCoordMins[1] );
-	pBuilder->Normal3fv( (float*)&vNormal );
+	pBuilder->Normal3fv( vNormal.Base() );
  	pBuilder->AdvanceVertex();
 
 	pBuilder->Position3f( pos.x + (ca + sa)  * size, pos.y + (sa - ca)  * size, pos.z );
 	pBuilder->Color4ubv( ubColor );
 	pBuilder->TexCoord2f( 0, pDraw->m_pSubTexture->m_tCoordMaxs[0], pDraw->m_pSubTexture->m_tCoordMaxs[1] );
-	pBuilder->Normal3fv( (float*)&vNormal );
+	pBuilder->Normal3fv( vNormal.Base() );
  	pBuilder->AdvanceVertex();
 }
 

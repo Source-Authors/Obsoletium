@@ -19,16 +19,15 @@
 //   mess up the function signature, you'll get a valid pointer and a crash
 //   if you call it as a function.
 
-#ifndef DYNFUNCTION_H
-#define DYNFUNCTION_H
-#pragma once
+#ifndef SE_PUBLIC_TIER0_DYNFUNCTION_H_
+#define SE_PUBLIC_TIER0_DYNFUNCTION_H_
 
-#include "tier0/platform.h"
+#include "platform.h"
 
 // The heavy lifting isn't template-specific, so we move it out of the header.
 DLL_EXPORT void *VoidFnPtrLookup_Tier0(const char *libname, const char *fn, void *fallback);
 
-template < class FunctionType >
+template <typename FunctionType >
 class CDynamicFunction
 {
 public:
@@ -132,5 +131,5 @@ public:
 	}
 };
 
-#endif  // DYNFUNCTION_H
+#endif  // !SE_PUBLIC_TIER0_DYNFUNCTION_H_
 

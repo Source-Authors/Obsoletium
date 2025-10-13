@@ -25,6 +25,7 @@
 #include "ChunkFile.h"
 #include "GlobalFunctions.h"
 #include "ToolDisplace.h"
+#include "fgdlib/gamedata.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -349,8 +350,8 @@ bool CDispMapImageFilterManager::PreApply( CDispMapImageFilter *pFilter,
 		return false;
 
 	// Get the displacements in the selection set.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -373,8 +374,8 @@ bool CDispMapImageFilterManager::PostApply( bool bSew )
 		return false;
 
 	// Get the displacements in the selection set.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp )
@@ -462,8 +463,8 @@ bool CDispMapImageFilterManager::IsNeighborInSelectionSet( CMapDisp *pNeighborDi
 		return false;
 
 	// Get the displacements in the selection set.
-	int nDispCount = pDispMgr->SelectCount();
-	for ( int iDisp = 0; iDisp < nDispCount; iDisp++ )
+	intp nDispCount = pDispMgr->SelectCount();
+	for ( intp iDisp = 0; iDisp < nDispCount; iDisp++ )
 	{
 		CMapDisp *pDisp = pDispMgr->GetFromSelect( iDisp );
 		if ( pDisp == pNeighborDisp )

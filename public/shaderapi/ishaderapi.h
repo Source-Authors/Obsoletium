@@ -134,12 +134,12 @@ enum ShaderAPIOcclusionQueryResult_t
 //-----------------------------------------------------------------------------
 // This is what the material system gets to see.
 //-----------------------------------------------------------------------------
-#define SHADERAPI_INTERFACE_VERSION		"ShaderApi030"
+#define SHADERAPI_INTERFACE_VERSION		"ShaderApi031"
 abstract_class IShaderAPI : public IShaderDynamicAPI
 {
 public:
 	//
-	// NOTE: These methods have been ported to DX10
+	// NOTE: These methods have been ported to DX11
 	//
 
 	// Viewport methods
@@ -160,7 +160,7 @@ public:
 	virtual void SetRasterState( const ShaderRasterState_t& state ) = 0;
 
 	//
-	// NOTE: These methods have not yet been ported to DX10
+	// NOTE: These methods have not yet been ported to DX11
 	//
 
 	// Sets the mode...
@@ -608,6 +608,10 @@ public:
 	
 	virtual void CopyTextureToTexture( ShaderAPITextureHandle_t srcTex, ShaderAPITextureHandle_t dstTex ) = 0;
 	
+	// Methods related to binding shaders
+	virtual void BindHullShader(HullShaderHandle_t hPixelShader) = 0;
+	virtual void BindDomainShader(DomainShaderHandle_t hPixelShader) = 0;
+	virtual void BindComputeShader(ComputeShaderHandle_t hPixelShader) = 0;
 };
 
 

@@ -18,6 +18,9 @@
 #include <thread>
 #include <vector>
 
+#include "windows/com_error_category.h"
+#include "tier0/dbg.h"
+
 #include "tier0/memdbgon.h"
 
 namespace {
@@ -101,7 +104,7 @@ class ScopedAcceptSocket {
   template <int max_size>
   [[nodiscard]] std::error_code Send(uint32_t (&buffer)[max_size], int size,
                                      int flags, int &send_bytes) noexcept {
-    assert(size <= max_size);
+    Assert(size <= max_size);
     if (size > max_size) {
       return std::error_code{EINVAL, std::generic_category()};
     }
@@ -135,7 +138,7 @@ class ScopedListenSocket {
       : s_{socket(info->ai_family, info->ai_socktype, info->ai_protocol)},
         rc_{s_ != INVALID_SOCKET ? std::error_code{}
                                  : GetSystemError(WSAGetLastError())} {
-    assert(info);
+    Assert(info);
 
     if (!rc_) {
       // Setup the TCP listening socket
@@ -189,7 +192,7 @@ class ScopedAddressInfo {
  public:
   ScopedAddressInfo(const char *port, int family, int socket_type,
                     IPPROTO proto, int flags) noexcept {
-    assert(port);
+    Assert(port);
 
     addrinfo hints = {};
     hints.ai_family = family;
@@ -222,7 +225,7 @@ class ScopedSetIsServerExitFlag {
  public:
   explicit ScopedSetIsServerExitFlag(std::atomic_bool &is_server_exit) noexcept
       : is_server_exit_{is_server_exit} {
-    assert(is_server_exit == false);
+    Assert(is_server_exit == false);
   }
   ~ScopedSetIsServerExitFlag() noexcept { is_server_exit_ = true; }
 
@@ -233,29 +236,9 @@ class ScopedSetIsServerExitFlag {
   std::atomic_bool &is_server_exit_;
 };
 
-class ComErrorCategory : public std::error_category {
- public:
-  ComErrorCategory() noexcept = default;
-
-  [[nodiscard]] const char *name() const noexcept override { return "com"; }
-
-  [[nodiscard]] std::string message(int error_value) const override {
-    const _com_error com_error{static_cast<HRESULT>(error_value)};
-    return std::string{com_error.ErrorMessage()};
-  }
-
-  ComErrorCategory(ComErrorCategory &) = delete;
-  ComErrorCategory &operator=(ComErrorCategory &) = delete;
-};
-
-[[nodiscard]] inline ComErrorCategory &com_error_category() {
-  static ComErrorCategory com_error_category;
-  return com_error_category;
-}
-
 [[nodiscard]] inline std::error_code get_com_error_code(
     const HRESULT result) noexcept {
-  return std::error_code{result, com_error_category()};
+  return std::error_code{result, se::win::com::com_error_category()};
 }
 
 class ScopedThreadName {
@@ -308,7 +291,7 @@ class ScopedThreadName {
 
 [[nodiscard]] std::error_code GetMultibyteAsWide(const char *mb,
                                                  std::wstring &result) {
-  assert(mb);
+  Assert(mb);
 
   const size_t required_size{mbstowcs(nullptr, mb, 0)};
   result.resize(required_size + 1);
@@ -377,6 +360,10 @@ template <int buffer_size>
     int received_bytes{-1};
 
     rc = scoped_accept_socket.Receive(receive_buffer, 0, received_bytes);
+
+    // We do a strtok later, so always null-terminate.
+    receive_buffer[min(received_bytes, buffer_size - 1)] = '\0';
+
     if (rc && (is_blocking || rc.value() != WSAEWOULDBLOCK)) {
       return -1;
     }
@@ -492,6 +479,12 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
 
     if (received_bytes > 0) {
       const char *shader_file_name{strtok(args.receive_buffer, "\n")};
+      if (!shader_file_name) {
+        fprintf(stderr,
+                "Received unexpected data instead of shader file name.\n");
+        continue;
+      }
+
       char full_file_name[MAX_PATH];
 
       // If we took in a path on the commandline, we concatenate the incoming
@@ -504,10 +497,21 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
       }
 
       const char *shader_model{strtok(nullptr, "\n")};
+      if (!shader_model) {
+        fprintf(stderr, "Received unexpected data instead of shader model.\n");
+        continue;
+      }
+
       int send_buffer_size = 0;
 
       {
         char *num_macroses_ptr{strtok(nullptr, "\n")};
+        if (!num_macroses_ptr) {
+          fprintf(stderr,
+                  "Received unexpected data instead of macroses count.\n");
+          continue;
+        }
+
         unsigned long num_macroses{strtoul(num_macroses_ptr, nullptr, 10)};
 
         // Read macros from the command file
@@ -519,7 +523,21 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
         for (unsigned long i = 1; i < num_macroses; i++) {
           // Allocate and populate strings
           const char *name{strtok(nullptr, "\n")};
+          if (!name) {
+            fprintf(stderr,
+                    "Received unexpected data instead of macros #%lu name.\n",
+                    i);
+            continue;
+          }
+
           const char *definition{strtok(nullptr, "\n")};
+          if (!definition) {
+            fprintf(stderr,
+                    "Received unexpected data instead of macros #%lu %s "
+                    "definition.\n",
+                    i, name);
+            continue;
+          }
 
           macros.emplace_back(D3D_SHADER_MACRO{name, definition});
         }
@@ -569,21 +587,31 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
             wide_shader_file_name.data(), macros.data(), nullptr, "main",
             shader_model, flags1, 0, &shader, &errors)};
         if (FAILED(hr)) {
-          args.send_buffer[0] = '\0';
+          // Send 0 on error.
+          args.send_buffer[0] = 0;
 
-          fprintf(stderr, "%s compilation error 0x%.8lx!\n", shader_file_name,
-                  hr);
+          fprintf(stderr, "%s compilation error 0x%.8lx: %s!\n",
+                  shader_file_name, hr,
+                  se::win::com::com_error_category().message(hr).c_str());
 
           if (errors) {
             // Null-terminated string
+            const size_t buffer_size{
+                min(errors->GetBufferSize(),
+                    static_cast<ULONG_PTR>((std::size(args.send_buffer) - 1) *
+                                           sizeof(args.send_buffer[0])))};
+
             memcpy(args.send_buffer + 1, errors->GetBufferPointer(),
-                   errors->GetBufferSize());
+                   buffer_size);
+
+            byte *buffer = reinterpret_cast<byte *>(&args.send_buffer[0] + 1);
+            buffer[buffer_size - 1] = '\0';
+
             fprintf(stderr, "%s\n",
                     reinterpret_cast<const char *>(args.send_buffer + 1));
 
             // account for uint32_t at front of the buffer
-            send_buffer_size =
-                static_cast<int>(errors->GetBufferSize() + sizeof(uint32_t));
+            send_buffer_size = static_cast<int>(buffer_size + sizeof(uint32_t));
           } else {
             reinterpret_cast<uint8_t *>(args.send_buffer + 1)[0] = '?';
             reinterpret_cast<uint8_t *>(args.send_buffer + 1)[1] = '\0';
@@ -593,13 +621,37 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
           }
         } else {
           // Success!
-          args.send_buffer[0] = static_cast<uint32_t>(shader->GetBufferSize());
+          size_t expected_buffer_size{shader->GetBufferSize()};
+          const size_t actual_buffer_size{static_cast<ULONG_PTR>(
+              (std::size(args.send_buffer) - 1) * sizeof(args.send_buffer[0]))};
+
+          if (expected_buffer_size > actual_buffer_size) {
+            expected_buffer_size = actual_buffer_size;
+
+            // Not enough room for shader.
+            memcpy(args.send_buffer + 1,
+                   "err: Compiled shader doesn't fit response buffer.\n",
+                   expected_buffer_size);
+
+            byte *buffer = reinterpret_cast<byte *>(&args.send_buffer[0] + 1);
+            buffer[expected_buffer_size - 1] = '\0';
+
+            fprintf(stderr,
+                    "Shader size %zu is too large to be saved in response "
+                    "buffer size %zu bytes.\n",
+                    expected_buffer_size, actual_buffer_size);
+            continue;
+          }
+
+          // Send size on success.
+          args.send_buffer[0] = static_cast<uint32_t>(expected_buffer_size);
+          // Send compiled shader.
           memcpy(args.send_buffer + 1, shader->GetBufferPointer(),
-                 shader->GetBufferSize());
+                 expected_buffer_size);
 
           // account for uint32_t at front of the buffer
           send_buffer_size =
-              static_cast<int>(shader->GetBufferSize() + sizeof(uint32_t));
+              static_cast<int>(expected_buffer_size + sizeof(uint32_t));
 
           printf("%s compiled successfullly.\n", shader_file_name);
 
@@ -619,7 +671,7 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
                 D3D_DISASM_ENABLE_INSTRUCTION_NUMBERING, "", &disassembly);
             if (FAILED(hr)) {
               fprintf(stderr, "Disassembly error 0x%.8lx: %s\n", hr,
-                      _com_error{hr}.ErrorMessage());
+                      se::win::com::com_error_category().message(hr).c_str());
             } else {
               printf(
                   "Disassembled shader:\n%s\n",

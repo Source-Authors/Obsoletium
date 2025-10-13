@@ -32,7 +32,7 @@ bool GetVConfigRegistrySetting( const char *pName, char *pReturn, unsigned long 
 	
 	// Get the value
 	DWORD dwSize = size;
-	if ( RegQueryValueEx( hregkey, pName, NULL, NULL,(LPBYTE) pReturn, &dwSize ) != ERROR_SUCCESS )
+	if ( RegQueryValueEx( hregkey, pName, nullptr, nullptr,(LPBYTE) pReturn, &dwSize ) != ERROR_SUCCESS )
 	{
 		// dimhotepus: Do not leak the key. 
 		RegCloseKey( hregkey );
@@ -47,7 +47,7 @@ bool GetVConfigRegistrySetting( const char *pName, char *pReturn, unsigned long 
 //-----------------------------------------------------------------------------
 // Purpose: Sends a global system message to alert programs to a changed environment variable
 //-----------------------------------------------------------------------------
-static void NotifyVConfigRegistrySettingChanged( void )
+static void NotifyVConfigRegistrySettingChanged( )
 {
 	DWORD_PTR dwReturnValue = 0;
 	
@@ -71,12 +71,12 @@ void SetVConfigRegistrySetting( const char *pName, const char *pValue, bool bNot
 		HKEY_CURRENT_USER,		// base key
 		VPROJECT_REG_KEY,		// subkey
 		0,						// reserved
-		0,						// lpClass
+		nullptr,				// lpClass
 		0,						// options
 		(REGSAM)KEY_ALL_ACCESS,	// access desired
-		NULL,					// security attributes
+		nullptr,				// security attributes
 		&hregkey,				// result
-		NULL					// tells if it created the key or not (which we don't care)
+		nullptr					// tells if it created the key or not (which we don't care)
 		) != ERROR_SUCCESS )
 	{
 		return;
@@ -111,12 +111,12 @@ bool RemoveObsoleteVConfigRegistrySetting( const char *pValueName, char *pOldVal
 		return false;
 
 	// Return the old state if they've requested it
-	if ( pOldValue != NULL )
+	if ( pOldValue != nullptr )
 	{
 		DWORD dwSize = size;
 
 		// Get the value
-		if ( RegQueryValueEx( hregkey, pValueName, NULL, NULL, (LPBYTE) pOldValue, &dwSize ) != ERROR_SUCCESS )
+		if ( RegQueryValueEx( hregkey, pValueName, nullptr, nullptr, (LPBYTE) pOldValue, &dwSize ) != ERROR_SUCCESS )
 		{
 			// dimhotepus: Do not leak the key. 
 			RegCloseKey( hregkey );

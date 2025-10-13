@@ -85,6 +85,8 @@ END_RECV_TABLE()
 C_EnvParticleScript::C_EnvParticleScript()
 {
 	m_flMaxParticleSize = 0.0f;
+	m_nOldSequence = -1;
+	m_flSequenceScale = -1;
 	m_bSimulate = true;
 }
 

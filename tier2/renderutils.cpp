@@ -34,7 +34,7 @@ void InitializeStandardMaterials()
 
 	s_bMaterialsInitialized = true;
 
-	KeyValues *pVMTKeyValues = new KeyValues( "wireframe" );
+	auto *pVMTKeyValues = new KeyValues( "wireframe" );
 	pVMTKeyValues->SetInt( "$vertexcolor", 1 );
 	s_pWireframe = g_pMaterialSystem->CreateMaterial( "__utilWireframe", pVMTKeyValues );
 
@@ -64,16 +64,16 @@ void ShutdownStandardMaterials()
 	s_bMaterialsInitialized = false;
 
 	s_pWireframe->DecrementReferenceCount();
-	s_pWireframe = NULL;
+	s_pWireframe = nullptr;
 
 	s_pWireframeIgnoreZ->DecrementReferenceCount();
-	s_pWireframeIgnoreZ = NULL;
+	s_pWireframeIgnoreZ = nullptr;
 
 	s_pVertexColor->DecrementReferenceCount();
-	s_pVertexColor = NULL;
+	s_pVertexColor = nullptr;
 
 	s_pVertexColorIgnoreZ->DecrementReferenceCount();
-	s_pVertexColorIgnoreZ = NULL;
+	s_pVertexColorIgnoreZ = nullptr;
 }
 
 
@@ -113,11 +113,17 @@ void RenderWireframeSphere( const Vector &vCenter, float flRadius, int nTheta, i
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
 
-			float sinPhi = sinf(phi);
+			DirectX::XMVECTOR angles = DirectX::XMVectorSet( theta, phi, 0, 0 );
 
-			meshBuilder.Position3f( vCenter.x + ( flRadius * sinPhi * cosf(theta) ),
-				vCenter.y + ( flRadius * sinPhi * sinf(theta) ), 
-				vCenter.z + ( flRadius * cosf(phi) ) );
+			DirectX::XMVECTOR sin, cos;
+			DirectX::XMVectorSinCos( &sin, &cos, angles );
+
+			float sinTheta = DirectX::XMVectorGetX( sin ), cosTheta = DirectX::XMVectorGetX( cos );
+			float sinPhi = DirectX::XMVectorGetY( sin ), cosPhi = DirectX::XMVectorGetY( cos );
+
+			meshBuilder.Position3f( vCenter.x + ( flRadius * sinPhi * cosTheta ),
+				vCenter.y + ( flRadius * sinPhi * sinTheta ), 
+				vCenter.z + ( flRadius * cosPhi ) );
 			meshBuilder.Color4ub( chRed, chGreen, chBlue, chAlpha );
 			meshBuilder.AdvanceVertex();
 		}
@@ -188,10 +194,18 @@ void RenderSphere( const Vector &vCenter, float flRadius, int nTheta, int nPhi, 
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
 
+			DirectX::XMVECTOR angles = DirectX::XMVectorSet( theta, phi, 0, 0 );
+
+			DirectX::XMVECTOR sin, cos;
+			DirectX::XMVectorSinCos( &sin, &cos, angles );
+
+			float sinTheta = DirectX::XMVectorGetX( sin ), cosTheta = DirectX::XMVectorGetX( cos );
+			float sinPhi = DirectX::XMVectorGetY( sin ), cosPhi = DirectX::XMVectorGetY( cos );
+
 			Vector vecPos;
-			vecPos.x = flRadius * sinf(phi) * cosf(theta);
-			vecPos.y = flRadius * sinf(phi) * sinf(theta); 
-			vecPos.z = flRadius * cosf(phi);
+			vecPos.x = flRadius * sinPhi * cosTheta;
+			vecPos.y = flRadius * sinPhi * sinTheta;
+			vecPos.z = flRadius * cosPhi;
 
 			Vector vecNormal = vecPos;
 			VectorNormalize(vecNormal);
@@ -309,11 +323,9 @@ void RenderWireframeBox( const Vector &vOrigin, const QAngle& angles, const Vect
 	meshBuilder.Begin( pMesh, MATERIAL_LINES, 24 );
 
 	// Draw the box
-	for ( int i = 0; i < 6; i++ )
+	for (auto pFaceIndex : s_pBoxFaceIndices)
 	{
-		int *pFaceIndex = s_pBoxFaceIndices[i];
-
-		for ( int j = 0; j < 4; ++j )
+			for ( int j = 0; j < 4; ++j )
 		{
 			meshBuilder.Position3fv( p[pFaceIndex[j]].Base() );
 			meshBuilder.Color4ub( chRed, chGreen, chBlue, chAlpha );
@@ -733,7 +745,7 @@ void RenderQuad( IMaterial *pMaterial, float x, float y, float w, float h,
 	float z, float s0, float t0, float s1, float t1, const Color& clr )
 {
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
-	IMesh *pMesh = pRenderContext->GetDynamicMesh( true, NULL, NULL, pMaterial );
+	IMesh *pMesh = pRenderContext->GetDynamicMesh( true, nullptr, nullptr, pMaterial );
 
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );

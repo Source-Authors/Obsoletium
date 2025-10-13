@@ -87,7 +87,7 @@ public:
 	virtual bool ReadFileToBuffer( const char *pSourceName, CUtlBuffer &buffer, bool bText = false, bool bNoOpenFailureWarning = false ) = 0;
 	virtual bool WriteBufferToFile( const char *pTargetName, CUtlBuffer &buffer, DiskWriteMode_t writeMode ) = 0;
 	virtual intp FindFiles( char* pFileMask, bool bRecurse, CUtlVector<fileList_t> &fileList ) = 0;
-	virtual char *MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize ) = 0;
+	[[deprecated]] virtual char *MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize ) = 0;
 	virtual void DeleteTemporaryFiles( const char *pFileMask ) = 0;
 	virtual int CompareFileTime( const char *pFilenameA, const char *pFilenameB ) = 0;
 	virtual bool DoesFileExist( const char *pFilename ) = 0;

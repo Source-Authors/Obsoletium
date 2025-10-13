@@ -154,6 +154,14 @@ bool PhysicsDLLInit( CreateInterfaceFn physicsFactory )
 	return true;
 }
 
+// dimhotepus: Add shutdown method to cleanup.
+void PhysicsDLLShutdown()
+{
+	physcollision = nullptr;
+	physprops = nullptr;
+	physics = nullptr;
+}
+
 void PhysicsLevelInit( void )
 {
 	physenv = physics->CreateEnvironment();

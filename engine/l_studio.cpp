@@ -1133,7 +1133,7 @@ void CModelRender::SuppressEngineLighting( bool bSuppress )
 //-----------------------------------------------------------------------------
 bool CModelRender::GetItemName( DataCacheClientID_t clientId, const void *pItem, OUT_Z_CAP(nMaxLen) char *pDest, size_t nMaxLen )
 {
-	CColorMeshData *pColorMeshData = (CColorMeshData *)pItem;
+	const CColorMeshData *pColorMeshData = (const CColorMeshData *)pItem;
 	g_pFileSystem->String( pColorMeshData->m_fnHandle, pDest, nMaxLen );
 	return true;
 }
@@ -1835,7 +1835,7 @@ matrix3x4_t* CModelRender::SetupModelState( IClientRenderable *pRenderable )
 	if ( !pModel )
 		return NULL;
 
-	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( const_cast<model_t*>(pModel) );
+	studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pModel );
 	if ( pStudioHdr->numbodyparts == 0 )
 		return NULL;
 
@@ -1950,13 +1950,6 @@ void AddModelDebugOverlay( const DrawModelInfo_t& info, const DrawModelResults_t
 void ClearSaveModelDebugOverlays( void )
 {
 	s_SavedModelInfo.RemoveAll();
-}
-
-int SavedModelInfo_Compare_f( const void *l, const void *r )
-{
-	ModelDebugOverlayData_t *left = ( ModelDebugOverlayData_t * )l;
-	ModelDebugOverlayData_t *right = ( ModelDebugOverlayData_t * )r;
-	return left->m_ModelResults.m_RenderTime.GetDuration().GetSeconds() < right->m_ModelResults.m_RenderTime.GetDuration().GetSeconds();
 }
 
 static ConVar r_drawmodelstatsoverlaymin( "r_drawmodelstatsoverlaymin", "0.1", FCVAR_ARCHIVE, "time in milliseconds that a model must take to render before showing an overlay in r_drawmodelstatsoverlay 2" );
@@ -2702,12 +2695,13 @@ struct robject_t
 	ColorMeshInfo_t		*pColorMeshes;
 	ITexture			*pEnvCubeMap;
 	Vector				*pLightingOrigin;
-	short				modelIndex;
+	// dimhotepus: short -> intp
+	intp				modelIndex;
 	short				lod;
 	ModelInstanceHandle_t instance;
 	short				skin;
-	short				lightIndex;
-	short				pad0;
+	// dimhotepus: short -> intp
+	intp				lightIndex;
 };
 
 struct rmodel_t
@@ -2735,16 +2729,22 @@ public:
 				return lhs.skin < rhs.skin;
 			return lhs.lod < rhs.lod;
 		}
-		if ( pModels[lhs.modelIndex].maxArea == pModels[rhs.modelIndex].maxArea )
+
+		float lmax = pModels[lhs.modelIndex].maxArea,
+			  rmax = pModels[rhs.modelIndex].maxArea;
+
+		if ( lmax == rmax )
 			return lhs.modelIndex < rhs.modelIndex;
-		return pModels[lhs.modelIndex].maxArea > pModels[rhs.modelIndex].maxArea;
+		return lmax > rmax;
 	}
 };
 
 struct rdecalmodel_t
 {
-	short			objectIndex;
-	short			lightIndex;
+	// dimhotepus: short -> intp
+	intp			objectIndex;
+	// dimhotepus: short -> intp
+	intp			lightIndex;
 };
 /*
 // ----------------------------------------
@@ -2800,8 +2800,8 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	constexpr int MAX_OBJECTS = 1024;
 	CUtlSortVector<robject_t, CRobjectLess> objectList( (intp)0, MAX_OBJECTS);
 	CUtlVectorFixedGrowable<rmodel_t, 256> modelList;
-	CUtlVectorFixedGrowable<short,256> lightObjects;
-	CUtlVectorFixedGrowable<short,64> shadowObjects;
+	CUtlVectorFixedGrowable<intp,256> lightObjects;
+	CUtlVectorFixedGrowable<intp,64> shadowObjects;
 	CUtlVectorFixedGrowable<rdecalmodel_t,64> decalObjects;
 	CUtlVectorFixedGrowable<LightingState_t,256> lightStates;
 	bool bForceCubemap = r_showenvcubemap.GetBool();
@@ -2882,7 +2882,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	else
 	{
 		// force the lod of each object
-		for ( int i = 0; i < objectList.Count(); i++ )
+		for ( intp i = 0; i < objectList.Count(); i++ )
 		{
 			const rmodel_t &model = modelList[objectList[i].modelIndex];
 			objectList[i].lod = clamp(forcedLodSetting, model.pStudioHWData->m_RootLOD, model.lodCount-1);
@@ -2898,7 +2898,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	// now build out the lighting states
 	if ( !bShadowDepth )
 	{
-		for ( int i = 0; i < objectList.Count(); i++ )
+		for ( intp i = 0; i < objectList.Count(); i++ )
 		{
 			robject_t &obj = objectList[i];
 			rmodel_t &model = modelList[obj.modelIndex];
@@ -3071,7 +3071,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	info.m_Decals = STUDIORENDER_DECAL_INVALID;
 	info.m_Body = 0;
 	info.m_HitboxSet = 0;
-	for ( int i = 0; i < objectList.Count(); i++ )
+	for ( intp i = 0; i < objectList.Count(); i++ )
 	{
 		robject_t &obj = objectList[i];
 		if ( obj.lightIndex >= 0 )
@@ -3095,36 +3095,33 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 	int				nLocalLightCount = 0;
 	LightDesc_t		localLightDescs[4];
 	drawFlags = STUDIORENDER_DRAW_ENTIRE_MODEL | STUDIORENDER_DRAW_STATIC_LIGHTING;
-	if ( lightObjects.Count() )
+	for ( intp i = 0; i < lightObjects.Count(); i++ )
 	{
-		for ( int i = 0; i < lightObjects.Count(); i++ )
+		robject_t &obj = objectList[lightObjects[i]];
+		rmodel_t &model = modelList[obj.modelIndex];
+
+		if ( obj.pEnvCubeMap )
 		{
-			robject_t &obj = objectList[lightObjects[i]];
-			rmodel_t &model = modelList[obj.modelIndex];
-
-			if ( obj.pEnvCubeMap )
-			{
-				pRenderContext->BindLocalCubemap( obj.pEnvCubeMap );
-			}
-
-			LightingState_t *pState = &lightStates[obj.lightIndex];
-			g_pStudioRender->SetAmbientLightColors( pState->r_boxcolor );
-			pRenderContext->SetLightingOrigin( *obj.pLightingOrigin );
-			R_SetNonAmbientLightingState( pState->numlights, pState->locallight, &nLocalLightCount, localLightDescs, true );
-			info.m_pStudioHdr = model.pStudioHdr;
-			info.m_pHardwareData = model.pStudioHWData;
-			info.m_Skin = obj.skin;
-			info.m_pClientEntity = static_cast<void*>(obj.pRenderable);
-			info.m_Lod = obj.lod;
-			info.m_pColorMeshes = obj.pColorMeshes;
-			g_pStudioRender->DrawModelStaticProp( info, *obj.pMatrix, drawFlags );
+			pRenderContext->BindLocalCubemap( obj.pEnvCubeMap );
 		}
+
+		LightingState_t *pState = &lightStates[obj.lightIndex];
+		g_pStudioRender->SetAmbientLightColors( pState->r_boxcolor );
+		pRenderContext->SetLightingOrigin( *obj.pLightingOrigin );
+		R_SetNonAmbientLightingState( pState->numlights, pState->locallight, &nLocalLightCount, localLightDescs, true );
+		info.m_pStudioHdr = model.pStudioHdr;
+		info.m_pHardwareData = model.pStudioHWData;
+		info.m_Skin = obj.skin;
+		info.m_pClientEntity = static_cast<void*>(obj.pRenderable);
+		info.m_Lod = obj.lod;
+		info.m_pColorMeshes = obj.pColorMeshes;
+		g_pStudioRender->DrawModelStaticProp( info, *obj.pMatrix, drawFlags );
 	}
 
 	if ( !IsX360() && ( r_flashlight_version2.GetInt() == 0 ) && shadowObjects.Count() )
 	{
 		drawFlags = STUDIORENDER_DRAW_ENTIRE_MODEL;
-		for ( int i = 0; i < shadowObjects.Count(); i++ )
+		for ( intp i = 0; i < shadowObjects.Count(); i++ )
 		{
 			// draw just the shadows!
 			robject_t &obj = objectList[shadowObjects[i]];
@@ -3142,7 +3139,7 @@ int CModelRender::DrawStaticPropArrayFast( StaticPropRenderInfo_t *pProps, int c
 		g_pStudioRender->ClearAllShadows();
 	}
 
-	for ( int i = 0; i < decalObjects.Count(); i++ )
+	for ( intp i = 0; i < decalObjects.Count(); i++ )
 	{
 		// draw just the decals!
 		robject_t &obj = objectList[decalObjects[i].objectIndex];
@@ -3682,19 +3679,16 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 {
 	// get our preserved data
 	Assert( pContext );
-	staticPropAsyncContext_t *pStaticPropContext = (staticPropAsyncContext_t *)pContext;
+	auto *pStaticPropContext = (staticPropAsyncContext_t *)pContext;
 
-	HardwareVerts::FileHeader_t *pVhvHdr;
 	byte *pOriginalData = NULL;
-	int numLightingComponents = 1;
 
+	auto *pVhvHdr = (HardwareVerts::FileHeader_t *)pData;
 	if ( asyncStatus != FSASYNC_OK )
 	{
 		// any i/o error
 		goto cleanUp;
 	}
-
-	pVhvHdr = (HardwareVerts::FileHeader_t *)pData;
 
 	int startMesh;
 	for ( startMesh=0; startMesh<pVhvHdr->m_nMeshes; startMesh++ )
@@ -3707,8 +3701,7 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 		}
 	}
 
-	int meshID;
-	for ( meshID = startMesh; meshID<pVhvHdr->m_nMeshes; meshID++ )
+	for ( int meshID = startMesh; meshID<pVhvHdr->m_nMeshes; meshID++ )
 	{
 		int numVertexes = pVhvHdr->pMesh( meshID )->m_nVertexes;
 		if ( numVertexes != pStaticPropContext->m_pColorMeshData->m_pMeshInfos[meshID-startMesh].m_nNumVerts )
@@ -3720,22 +3713,14 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 		int nID = meshID-startMesh;
 
 		unsigned char *pIn = (unsigned char *) pVhvHdr->pVertexBase( meshID );
-		unsigned char *pOut = NULL;
 			
 		CMeshBuilder meshBuilder;
 		meshBuilder.Begin( pStaticPropContext->m_pColorMeshData->m_pMeshInfos[ nID ].m_pMesh, MATERIAL_HETEROGENOUS, numVertexes, 0 );
-		if ( numLightingComponents > 1 )
-		{
-			pOut = reinterpret_cast< unsigned char * >( const_cast< float * >( meshBuilder.Normal() ) );
-		}
-		else
-		{
-			pOut = meshBuilder.Specular();
-		}
+		unsigned char *pOut = meshBuilder.Specular();
 
 #ifdef DX_TO_GL_ABSTRACTION
 		// OPENGL_SWAP_COLORS
-		for ( int i=0; i < (numVertexes * numLightingComponents ); i++ )
+		for ( int i=0; i < numVertexes; i++ )
 		{
 			unsigned char red = *pIn++;
 			unsigned char green = *pIn++;
@@ -3746,7 +3731,7 @@ void CModelRender::StaticPropColorMeshCallback( void *pContext, const void *pDat
 			*pOut++ = *pIn++; // Alpha goes straight across
 		}
 #else
-		V_memcpy( pOut, pIn, numVertexes * 4 * numLightingComponents );
+		V_memcpy( pOut, pIn, numVertexes * 4 );
 #endif
 		meshBuilder.End();
 	}
@@ -3977,13 +3962,13 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 		// purposely not deterministic to catch bugs with excessive re-baking (i.e. disco)
 		Vector fRandomColor;
 		int nColor = RandomInt(1,6);
-		fRandomColor.x = (nColor>>2) & 1;
-		fRandomColor.y = (nColor>>1) & 1;
-		fRandomColor.z = nColor & 1;
+		fRandomColor.x = static_cast<vec_t>((nColor>>2) & 1);
+		fRandomColor.y = static_cast<vec_t>((nColor>>1) & 1);
+		fRandomColor.z = static_cast<vec_t>(nColor & 1);
 		VectorNormalize( fRandomColor );
-		debugColor[0] = fRandomColor[0] * 255.0f;
-		debugColor[1] = fRandomColor[1] * 255.0f;
-		debugColor[2] = fRandomColor[2] * 255.0f;
+		debugColor[0] = static_cast<byte>(fRandomColor[0] * 255.0f);
+		debugColor[1] = static_cast<byte>(fRandomColor[1] * 255.0f);
+		debugColor[2] = static_cast<byte>(fRandomColor[2] * 255.0f);
 		bDebugColor = true;
 	}
 
@@ -4001,7 +3986,7 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 		{
 			// prop was compiled for static prop lighting, but out of sync
 			// bad disk data for model, show as red
-			debugColor[0] = 255.0f;
+			debugColor[0] = 255;
 			debugColor[1] = 0;
 			debugColor[2] = 0;
 		}
@@ -4009,15 +3994,15 @@ bool CModelRender::UpdateStaticPropColorData( IHandleEntity *pProp, ModelInstanc
 		{
 			// valid disk data, show as green
 			debugColor[0] = 0;
-			debugColor[1] = 255.0f;
+			debugColor[1] = 255;
 			debugColor[2] = 0;
 		}
 		else
 		{
 			// no disk based data, using runtime method, show as yellow
 			// identifies a prop that wasn't compiled for static prop lighting
-			debugColor[0] = 255.0f;
-			debugColor[1] = 255.0f;
+			debugColor[0] = 255;
+			debugColor[1] = 255;
 			debugColor[2] = 0;
 		}
 		bDebugColor = true;

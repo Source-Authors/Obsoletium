@@ -67,7 +67,7 @@ if ERRORLEVEL 1 (
 REM Build libjpeg-turbo.
 MKDIR thirdparty\libjpeg-turbo\out
 PUSHD thirdparty\libjpeg-turbo\out
-cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DWITH_CDJPEG=OFF -DWITH_TURBOJPEG=OFF ..
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DENABLE_SHARED=OFF -DENABLE_STATIC=ON -DWITH_TOOLS=OFF -DWITH_TURBOJPEG=OFF ..
 if ERRORLEVEL 1 (
   ECHO cmake generation for thirdparty\libjpeg-turbo failed.
   EXIT /B 1
@@ -229,6 +229,26 @@ if ERRORLEVEL 1 (
 POPD
 
 
+REM Build shadercompile2.
+MKDIR thirdparty\shadercompile\out
+PUSHD thirdparty\shadercompile\out
+cmake -G %CMAKE_MSVC_GEN_NAME% -A x64 ..
+if ERRORLEVEL 1 (
+  ECHO cmake generation for thirdparty\shadercompile failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Release
+if ERRORLEVEL 1 (
+  ECHO cmake --build Release for thirdparty\shadercompile failed.
+  EXIT /B 1
+)
+POPD
+COPY /Y thirdparty\shadercompile\out\Release\D3DX9_43.dll devtools\bin\D3DX9_43.dll
+COPY /Y thirdparty\shadercompile\out\Release\D3DCompiler_43.dll devtools\bin\D3DCompiler_43.dll
+COPY /Y thirdparty\shadercompile\out\Release\ShaderCompile.exe devtools\bin\ShaderCompile2.exe
+
+
 REM Build snappy.
 MKDIR thirdparty\snappy\out
 PUSHD thirdparty\snappy\out
@@ -266,6 +286,29 @@ if ERRORLEVEL 1 (
 )
 
 
+REM Build squirrel.
+MKDIR thirdparty\squirrel\out
+PUSHD thirdparty\squirrel\out
+cmake -G %CMAKE_MSVC_GEN_NAME% -A %CMAKE_MSVC_ARCH_NAME% -DBUILD_SHARED_LIBS=ON -DDISABLE_STATIC=ON -DLONG_OUTPUT_NAMES=ON -DSQ_DISABLE_INTERPRETER=ON ..
+if ERRORLEVEL 1 (
+  ECHO cmake generation for thirdparty\squirrel failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Debug
+if ERRORLEVEL 1 (
+  ECHO cmake --build Debug for thirdparty\squirrel failed.
+  EXIT /B 1
+)
+
+cmake --build . --config Release
+if ERRORLEVEL 1 (
+  ECHO cmake --build Release for thirdparty\squirrel failed.
+  EXIT /B 1
+)
+POPD
+
+
 REM Build zip-utils.
 MKDIR thirdparty\zip-utils\out
 PUSHD thirdparty\zip-utils\out
@@ -284,17 +327,6 @@ if ERRORLEVEL 1 (
 cmake --build . --config Release
 if ERRORLEVEL 1 (
   ECHO cmake --build Release for thirdparty\zip-utils failed.
-  EXIT /B 1
-)
-POPD
-
-
-REM Generate version info, etc.
-MKDIR out
-PUSHD out
-cmake ..\CMakeLists.txt
-if ERRORLEVEL 1 (
-  ECHO cmake version generation failed.
   EXIT /B 1
 )
 POPD

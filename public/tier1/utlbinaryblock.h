@@ -1,4 +1,4 @@
-//====== Copyright ?1996-2004, Valve Corporation, All rights reserved. =======
+//====== Copyright Valve Corporation, All rights reserved. =======
 //
 // Purpose: 
 //
@@ -6,12 +6,9 @@
 
 #ifndef UTLBINARYBLOCK_H
 #define UTLBINARYBLOCK_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-#include "tier1/utlmemory.h"
-#include "tier1/strtools.h"
+#include "utlmemory.h"
+#include "strtools.h"
 #include <climits>
 
 //-----------------------------------------------------------------------------

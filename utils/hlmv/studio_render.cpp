@@ -76,15 +76,16 @@ mstudioanimdesc_t &StudioModel::GetAnimDesc( int anim )
 //-----------------------------------------------------------------------------
 float GetAutoPlayTime( void )
 {
-	static int g_prevTicks;
-	static float g_time;
+	// dimhotepus: float -> double.
+	static double g_prevTicks;
+	static double g_time;
 
-	int ticks = GetTickCount();
+	double ticks = Plat_FloatTime();
 	// limit delta so that float time doesn't overflow
 	if (g_prevTicks == 0)
 		g_prevTicks = ticks;
 
-	g_time += ( (ticks - g_prevTicks) / 1000.0f ) * g_viewerSettings.speedScale;
+	g_time += ( ticks - g_prevTicks ) * g_viewerSettings.speedScale;
 	g_prevTicks = ticks;
 
 	return g_time;
@@ -96,16 +97,17 @@ float GetAutoPlayTime( void )
 //-----------------------------------------------------------------------------
 float GetRealtimeTime( void )
 {
+	// dimhotepus: float -> double.
 	// renamed static's so debugger doesn't get confused and show the wrong one
-	static int g_prevTicksRT;
-	static float g_timeRT;
+	static double g_prevTicksRT;
+	static double g_timeRT;
 
-	int ticks = GetTickCount();
+	double ticks = Plat_FloatTime();
 	// limit delta so that float time doesn't overflow
 	if (g_prevTicksRT == 0)
 		g_prevTicksRT = ticks;
 
-	g_timeRT += ( (ticks - g_prevTicksRT) / 1000.0f );
+	g_timeRT += ticks - g_prevTicksRT;
 	g_prevTicksRT = ticks;
 
 	return g_timeRT;
@@ -587,7 +589,7 @@ void StudioModel::SetUpBones( bool mergeBones )
 		{
 			// already calculated
 		}
-		else if (CalcProceduralBone( pStudioHdr, i, CBoneAccessor( m_pBoneToWorld ) ))
+		else if (CBoneAccessor accessor( m_pBoneToWorld ); CalcProceduralBone( pStudioHdr, i, accessor ))
 		{
 			continue;
 		}
@@ -2250,7 +2252,7 @@ float StudioModel::GetLodMetric( void )
 }
 
 
-const char *StudioModel::GetKeyValueText( int iSequence )
+const char *StudioModel::GetKeyValueText( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	return Studio_GetKeyValueText( pStudioHdr, iSequence );

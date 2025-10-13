@@ -54,7 +54,7 @@
 	#define STEAM_FSS_API STEAM_API
 #endif
 
-#include <limits.h>
+#include <climits>
 #include "steamcommon.h"
 
 /******************************************************************************

@@ -95,6 +95,7 @@ EmitSound_t::EmitSound_t( const CSoundParameters &src )
 	m_bWarnOnMissingCloseCaption = false;
 	m_bWarnOnDirectWaveReference = false;
 	m_nSpeakerEntity = -1;
+	m_hSoundScriptHandle = -1;
 }
 
 void Hack_FixEscapeChars( char *str )
@@ -193,7 +194,7 @@ public:
 		filesystem->CreateDirHierarchy("reslists", "DEFAULT_WRITE_PATH");
 
 		// open the new level reslist
-		char path[_MAX_PATH];
+		char path[MAX_PATH];
 		Q_snprintf(path, sizeof(path), "reslists\\%s.snd", gpGlobals->mapname.ToCStr() );
 		m_hPrecacheLogFile = filesystem->Open(path, "wt", "GAME");
 	}
@@ -248,7 +249,7 @@ public:
 
 		va_list	argptr;
 		char string[256];
-		va_start (argptr, fmt);
+		va_start (argptr, fmt); //-V2019 //-V2018
 		V_vsprintf_safe( string, fmt, argptr );
 		va_end (argptr);
 
@@ -314,7 +315,7 @@ public:
 #endif
 
 #if !defined( CLIENT_DLL )
-		for ( int i=soundemitterbase->First(); i != soundemitterbase->InvalidIndex(); i=soundemitterbase->Next( i ) )
+		for ( auto i=soundemitterbase->First(); i != soundemitterbase->InvalidIndex(); i=soundemitterbase->Next( i ) )
 		{
 			CSoundParametersInternal *pParams = soundemitterbase->InternalGetParametersForSound( i );
 			if ( pParams->ShouldPreload() )
@@ -372,7 +373,7 @@ public:
 		}
 	}
 
-	void InternalPrefetchWaves( int soundIndex )
+	void InternalPrefetchWaves( UtlHashHandle_t soundIndex )
 	{
 		CSoundParametersInternal *internal = soundemitterbase->InternalGetParametersForSound( soundIndex );
 		if ( !internal )
@@ -395,7 +396,7 @@ public:
 
 	HSOUNDSCRIPTHANDLE PrecacheScriptSound( const char *soundname )
 	{
-		int soundIndex = soundemitterbase->GetSoundIndex( soundname );
+		UtlHashHandle_t soundIndex = soundemitterbase->GetSoundIndex( soundname );
 		if ( !soundemitterbase->IsValidIndex( soundIndex ) )
 		{
 			if ( Q_stristr( soundname, ".wav" ) || Q_strstr( soundname, ".mp3" ) )
@@ -433,7 +434,7 @@ public:
 
 	void PrefetchScriptSound( const char *soundname )
 	{
-		int soundIndex = soundemitterbase->GetSoundIndex( soundname );
+		UtlHashHandle_t soundIndex = soundemitterbase->GetSoundIndex( soundname );
 		if ( !soundemitterbase->IsValidIndex( soundIndex ) )
 		{
 			if ( Q_stristr( soundname, ".wav" ) || Q_strstr( soundname, ".mp3" ) )
@@ -880,9 +881,7 @@ public:
 		if ( handle == SOUNDEMITTER_INVALID_HANDLE )
 			return;
 
-		CSoundParametersInternal *params;
-
-		params = soundemitterbase->InternalGetParametersForSound( (int)handle );
+		CSoundParametersInternal *params = soundemitterbase->InternalGetParametersForSound( handle );
 		if ( !params )
 		{
 			return;
@@ -1052,8 +1051,8 @@ CON_COMMAND_F( sv_findsoundname, "Find sound names which reference the specified
 	if ( args.ArgC() != 2 )
 		return;
 
-	int c = soundemitterbase->GetSoundCount();
-	int i;
+	intp c = soundemitterbase->GetSoundCount();
+	intp i;
 
 	char const *search = args[ 1 ];
 	if ( !search )
@@ -1124,22 +1123,22 @@ static int GamesoundCompletion( const char *partial, char commands[ COMMAND_COMP
 	int current = 0;
 
 	const char *cmdname = "playgamesound";
-	char *substring = NULL;
+	const char *substring = NULL;
 	intp substringLen = 0;
 	if ( Q_strstr( partial, cmdname ) && strlen(partial) > strlen(cmdname) + 1 )
 	{
-		substring = (char *)partial + strlen( cmdname ) + 1;
+		substring = partial + strlen( cmdname ) + 1;
 		substringLen = strlen(substring);
 	}
 	
-	for ( int i = soundemitterbase->GetSoundCount()-1; i >= 0 && current < COMMAND_COMPLETION_MAXITEMS; i-- )
+	for ( intp i = soundemitterbase->GetSoundCount()-1; i >= 0 && current < COMMAND_COMPLETION_MAXITEMS; i-- )
 	{
 		const char *pSoundName = soundemitterbase->GetSoundName( i );
 		if ( pSoundName )
 		{
 			if ( !substring || !Q_strncasecmp( pSoundName, substring, substringLen ) )
 			{
-				Q_snprintf( commands[ current ], sizeof( commands[ current ] ), "%s %s", cmdname, pSoundName );
+				V_sprintf_safe( commands[ current ], "%s %s", cmdname, pSoundName );
 				current++;
 			}
 		}
@@ -1170,7 +1169,7 @@ void CBaseEntity::EmitSound( const char *soundname, float soundtime /*= 0.0f*/, 
 	params.m_pflSoundDuration = duration;
 	params.m_bWarnOnDirectWaveReference = true;
 
-	// dimhotepus: See https://github.com/ValveSoftware/source-sdk-2013/pull/936
+	// dimhotepus: Fix client-side only sounds playback
 	int iEntIndex = entindex();
 #if defined( CLIENT_DLL )
 	if ( iEntIndex == -1 )
@@ -1200,7 +1199,7 @@ void CBaseEntity::EmitSound( const char *soundname, HSOUNDSCRIPTHANDLE& handle, 
 	params.m_pflSoundDuration = duration;
 	params.m_bWarnOnDirectWaveReference = true;
 
-	// dimhotepus: See https://github.com/ValveSoftware/source-sdk-2013/pull/936
+	// dimhotepus: Fix client-side only sounds playback
 	int iEntIndex = entindex();
 #if defined( CLIENT_DLL )
 	if ( iEntIndex == -1 )

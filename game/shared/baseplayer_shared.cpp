@@ -266,14 +266,17 @@ void CBasePlayer::ItemPostFrame()
 		return;
 	}
 
-    if ( gpGlobals->curtime < m_flNextAttack )
+	if ( gpGlobals->curtime < m_flNextAttack )
 	{
 		if ( GetActiveWeapon() )
 		{
 			GetActiveWeapon()->ItemBusyFrame();
 		}
 	}
-	else
+
+	// dimhotepus: replace if/else with if/if as ItemBusyFrame() can do m_flNextAttack = gpGlobals->curtime
+	// and we must fire immediately instead of waiting for next tick. 
+	if ( gpGlobals->curtime >= m_flNextAttack )
 	{
 		if ( GetActiveWeapon() && (!IsInAVehicle() || UsingStandardWeaponsInVehicle()) )
 		{
@@ -919,10 +922,9 @@ void CBasePlayer::RemoveFromPlayerSimulationList( CBaseEntity *other )
 
 void CBasePlayer::SimulatePlayerSimulatedEntities( void )
 {
-	int c = m_SimulatedByThisPlayer.Count();
-	int i;
+	intp c = m_SimulatedByThisPlayer.Count();
 
-	for ( i = c - 1; i >= 0; i-- )
+	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		CHandle< CBaseEntity > h;
 		
@@ -950,7 +952,7 @@ void CBasePlayer::SimulatePlayerSimulatedEntities( void )
 	// Loop through all entities again, checking their untouch if flagged to do so
 	c = m_SimulatedByThisPlayer.Count();
 
-	for ( i = c - 1; i >= 0; i-- )
+	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		CHandle< CBaseEntity > h;
 		
@@ -2067,6 +2069,7 @@ bool fogparams_t::operator !=( const fogparams_t& other ) const
 {
 	if ( this->enable != other.enable ||
 		this->blend != other.blend ||
+		this->radial != other.radial ||
 		!VectorsAreEqual(this->dirPrimary, other.dirPrimary, 0.01f ) || 
 		this->colorPrimary.Get() != other.colorPrimary.Get() ||
 		this->colorSecondary.Get() != other.colorSecondary.Get() ||

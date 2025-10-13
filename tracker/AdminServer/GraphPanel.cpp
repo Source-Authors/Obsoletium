@@ -693,10 +693,13 @@ void CGraphPanel::OnTextChanged(Panel *panel, const char *text)
 		}
 		else if (strstr(text, "Players"))
 		{
-			m_pGraphs->GetPlayerLimits(maxVal, minVal);
-			V_sprintf_safe(maxText,"%0.2f", maxVal);
-			V_sprintf_safe(midText,"%0.2f", (maxVal - minVal) / 2);
-			V_sprintf_safe(minText,"%0.2f", minVal);
+			// dimhotepus: Use int for players limits as players are natural.
+			int iMaxVal, iMinVal;
+			m_pGraphs->GetPlayerLimits(iMaxVal, iMinVal);
+
+			V_sprintf_safe(maxText,"%d", iMaxVal);
+			V_sprintf_safe(midText,"%d", (iMaxVal - iMinVal) / 2);
+			V_sprintf_safe(minText,"%d", iMinVal);
 
 			SetAxisLabels(m_pGraphs->GetPlayersColor(), maxText, midText, minText);
 		}
@@ -708,8 +711,7 @@ void CGraphPanel::OnTextChanged(Panel *panel, const char *text)
 //-----------------------------------------------------------------------------
 void CGraphPanel::SetAxisLabels(Color c, const char *max, const char *mid, const char *min)
 {
-	Label *lab;
-	lab= GetLabel("AxisMax");
+	Label *lab = GetLabel("AxisMax");
 	if(lab)
 	{
 		lab->SetFgColor(c);

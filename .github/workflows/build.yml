@@ -29,6 +29,7 @@ jobs:
     - name: 'Checkout Half-Life 2 repo & submodules'
       uses: actions/checkout@v4
       with:
+        fetch-depth: 0
         submodules: recursive
 
     - name: 'Setup & build'
@@ -50,6 +51,7 @@ jobs:
     - name: 'Checkout Half-Life 2: Loast Coast repo & submodules'
       uses: actions/checkout@v4
       with:
+        fetch-depth: 0
         submodules: recursive
 
     - name: 'Setup & build'
@@ -71,6 +73,7 @@ jobs:
     - name: 'Checkout Half-Life 2: Episode 1 & 2 repo & submodules'
       uses: actions/checkout@v4
       with:
+        fetch-depth: 0
         submodules: recursive
 
     - name: 'Setup & build'
@@ -92,6 +95,7 @@ jobs:
     - name: 'Checkout Half-Life 2: Deathmatch repo & submodules'
       uses: actions/checkout@v4
       with:
+        fetch-depth: 0
         submodules: recursive
 
     - name: 'Setup & build'
@@ -113,6 +117,7 @@ jobs:
     - name: 'Checkout Portal repo & submodules'
       uses: actions/checkout@v4
       with:
+        fetch-depth: 0
         submodules: recursive
 
     - name: 'Setup & build'

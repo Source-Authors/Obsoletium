@@ -14,18 +14,18 @@
 #include "common_ps_fxc.h"
 #include "shader_constant_register_map.h"
 
-const HALF4 g_DiffuseModulation	: register( c1 );
+const float4 g_DiffuseModulation	: register( c1 );
 #if !FLASHLIGHT
 		// we don't use these with HDR.
-		const HALF3 g_EnvmapContrast		: register( c2 );
-		const HALF3 g_EnvmapSaturation		: register( c3 );
+		const float3 g_EnvmapContrast		: register( c2 );
+		const float3 g_EnvmapSaturation		: register( c3 );
 #endif
 
 const float4 g_FogParams				: register( PSREG_FOG_PARAMS );
 const float4 g_EyePos_SpecExponent		: register( PSREG_EYEPOS_SPEC_EXPONENT );
 
 const float4 g_FlashlightAttenuationFactors	    : register( c22 );
-const HALF3 g_FlashlightPos						: register( c23 );
+const float3 g_FlashlightPos					: register( c23 );
 const float4x4 g_FlashlightWorldToTexture		: register( c24 ); // through c27
 
 sampler BaseTextureSampler	   : register( s0 );
@@ -34,8 +34,8 @@ sampler BaseTextureSampler2	   : register( s1 );
 struct PS_INPUT
 {
     float4 projPos					: POSITION;			// Projection-space position	
-	HALF2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
-	HALF2 baseTexCoord2				: TEXCOORD1;		// Base texture coordinate
+	float2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
+	float2 baseTexCoord2			: TEXCOORD1;		// Base texture coordinate
 	float4 worldPos_projPosZ		: TEXCOORD7;		// Necessary for water fog dest alpha
 	float4 fogFactorW				: COLOR1;
 	
@@ -64,9 +64,9 @@ float4 main( PS_INPUT i ) : COLOR
 	return FinalOutput( ret, 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_NONE );
 # endif
 #else
-	HALF4 baseColor = tex2D( BaseTextureSampler, i.baseTexCoord.xy );
-	HALF4 baseColor2 = tex2D( BaseTextureSampler2, i.baseTexCoord2.xy );
-	HALF4 result = baseColor * baseColor2 * g_DiffuseModulation;
+	float4 baseColor = tex2D( BaseTextureSampler, i.baseTexCoord.xy );
+	float4 baseColor2 = tex2D( BaseTextureSampler2, i.baseTexCoord2.xy );
+	float4 result = baseColor * baseColor2 * g_DiffuseModulation;
 	float alpha = 1.0f;
 	
 	float fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos_SpecExponent.z, i.worldPos_projPosZ.z, i.worldPos_projPosZ.w );

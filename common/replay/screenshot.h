@@ -24,7 +24,7 @@
 class CReplayScreenshot : public CBaseReplaySerializeable
 {
 public:
-	inline CReplayScreenshot( int nWidth = 0, int nHeight = 0, const char *pBaseFilename = NULL )
+	inline CReplayScreenshot( int nWidth = 0, int nHeight = 0, const char *pBaseFilename = nullptr )
 	:	m_nWidth( nWidth ), m_nHeight( nHeight )
 	{
 		if ( pBaseFilename )
@@ -33,10 +33,10 @@ public:
 		}
 	}
 
-	virtual bool		Read( KeyValues *pIn );
-	virtual void		Write( KeyValues *pOut );
-	virtual const char	*GetSubKeyTitle() const;
-	virtual const char	*GetPath() const;
+	bool		Read( KeyValues *pIn ) override;
+	void		Write( KeyValues *pOut ) override;
+	[[nodiscard]] const char	*GetSubKeyTitle() const override;
+	[[nodiscard]] const char	*GetPath() const override;
 
 	int		m_nWidth;				// Screenshot width (does not include power-of-2 padding)
 	int		m_nHeight;				// Screenshot height (does not include power-of-2 padding)

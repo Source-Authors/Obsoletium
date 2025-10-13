@@ -8,7 +8,8 @@
 
 #ifndef UTLCOMMON_H
 #define UTLCOMMON_H
-#pragma once
+
+#include "strtools.h"
 
 //-----------------------------------------------------------------------------
 // Henry Goffin (henryg) was here. Questions? Bugs? Go slap him around a bit.
@@ -24,10 +25,10 @@ struct undefined_t;
 
 // CTypeSelect<sel,A,B>::type is a typedef of A if sel is nonzero, else B
 template <int sel, typename A, typename B>
-struct CTypeSelect { typedef A type; };
+struct CTypeSelect { using type = A; };
 
 template <typename A, typename B>
-struct CTypeSelect<0, A, B> { typedef B type; };
+struct CTypeSelect<0, A, B> { using type = B; };
 
 // CTypeEquals<A, B>::value is nonzero if A and B are the same type
 template <typename A, typename B, bool bIgnoreConstVolatile = false, bool bIgnoreReference = false>
@@ -53,7 +54,7 @@ template <typename K, typename V>
 class CUtlKeyValuePair
 {
 public:
-	typedef V ValueReturn_t;
+	using ValueReturn_t = V;
 	K m_key;
 	V m_value;
 
@@ -73,7 +74,7 @@ template <typename K>
 class CUtlKeyValuePair<K, empty_t>
 {
 public:
-	typedef const K ValueReturn_t;
+	using ValueReturn_t = const K;
 	K m_key;
 
 	constexpr CUtlKeyValuePair() = default;
@@ -131,7 +132,7 @@ struct PointerEqualFunctor { [[nodiscard]] bool operator()( const void *a, const
 #if defined( PLATFORM_64BITS )
 struct PointerHashFunctor { [[nodiscard]] unsigned int operator()( const void* s ) const { return Mix64HashFunctor()( ( uintp ) s ); } };
 #else
-struct PointerHashFunctor { [[nodiscard]] unsigned int operator()( const void* s ) const { return Mix32HashFunctor()( ( uintp ) s ); } };
+struct PointerHashFunctor { [[nodiscard]] unsigned int operator()( const void* s ) const { return Mix32HashFunctor()( ( uint32 ) s ); } }; //-V221
 #endif
 
 
@@ -206,10 +207,10 @@ struct HasClassAltArgumentType
 };
 
 template < typename T, bool = HasClassAltArgumentType< T >::value >
-struct GetClassAltArgumentType { typedef typename T::AltArgumentType_t Result_t; };
+struct GetClassAltArgumentType { using Result_t = typename T::AltArgumentType_t; };
 
 template < typename T >
-struct GetClassAltArgumentType< T, false > { typedef undefined_t Result_t; };
+struct GetClassAltArgumentType< T, false > { using Result_t = undefined_t; };
 
 // Unwrap references; reference types don't have member typedefs.
 template < typename T >
@@ -220,8 +221,8 @@ template < typename ArgT, typename AltT = typename GetClassAltArgumentType<ArgT>
 struct ArgumentTypeInfoImpl
 {
 	enum { has_alt = 1 };
-	typedef ArgT Arg_t;
-	typedef AltT Alt_t;
+	using Arg_t = ArgT;
+	using Alt_t = AltT;
 };
 
 // Handle cases where AltArgumentType_t is typedef'd to undefined_t
@@ -229,8 +230,8 @@ template < typename ArgT >
 struct ArgumentTypeInfoImpl< ArgT, undefined_t >
 {
 	enum { has_alt = 0 };
-	typedef ArgT Arg_t;
-	typedef undefined_t Alt_t;
+	using Arg_t = ArgT;
+	using Alt_t = undefined_t;
 };
 
 // Handle cases where AltArgumentType_t is typedef'd to the primary type
@@ -238,8 +239,8 @@ template < typename ArgT >
 struct ArgumentTypeInfoImpl< ArgT, ArgT >
 {
 	enum { has_alt = 0 };
-	typedef ArgT Arg_t;
-	typedef undefined_t Alt_t;
+	using Arg_t = ArgT;
+	using Alt_t = undefined_t;
 };
 
 

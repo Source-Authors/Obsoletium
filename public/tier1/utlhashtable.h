@@ -55,18 +55,17 @@
 
 #ifndef UTLHASHTABLE_H
 #define UTLHASHTABLE_H
-#pragma once
 
-#include "tier1/utlcommon.h"
-#include "tier1/utlmemory.h"
+#include "utlcommon.h"
+#include "utlmemory.h"
+#include "utllinkedlist.h"
 #include "mathlib/mathlib.h"
-#include "tier1/utllinkedlist.h"
 
 //-----------------------------------------------------------------------------
 // Henry Goffin (henryg) was here. Questions? Bugs? Go slap him around a bit.
 //-----------------------------------------------------------------------------
 
-typedef uintp UtlHashHandle_t;
+using UtlHashHandle_t = uintp;
 
 #define FOR_EACH_HASHTABLE( table, iter ) \
 	for ( UtlHashHandle_t iter = (table).FirstHandle(); iter != (table).InvalidHandle(); iter = (table).NextHandle( iter ) )
@@ -77,7 +76,7 @@ template < typename KeyT, typename ValueT = empty_t >
 class CUtlHashtableEntry
 {
 public:
-	typedef CUtlKeyValuePair< KeyT, ValueT > KVPair;
+	using KVPair = CUtlKeyValuePair<KeyT, ValueT>;
 
 	enum
 	{
@@ -86,15 +85,7 @@ public:
 //		INT32_STORAGE = ( sizeof( KVPair ) >= 2 && sizeof( KVPair ) <= 4 )
 //#endif
 	};
-	typedef typename CTypeSelect<
-		INT16_STORAGE,
-		int16,
-//#ifdef PLATFORM_64BITS
-//		typename CTypeSelect< INT32_STORAGE, int32, int64 >::type
-//#else
-		int32
-//#endif
-	>::type storage_t;
+	using storage_t = typename CTypeSelect<INT16_STORAGE, int16, int32>::type;
 
 	enum
 	{
@@ -125,7 +116,7 @@ public:
 	storage_t flags_and_hash;
 	storage_t data[ ( sizeof(KVPair) + sizeof(storage_t) - 1 ) / sizeof(storage_t) ];
 
-	bool IsValid() const { return flags_and_hash >= 0; }
+	[[nodiscard]] bool IsValid() const { return flags_and_hash >= 0; }
 	void MarkInvalid() { constexpr auto flag = FLAG_FREE; flags_and_hash = (storage_t)flag; }
 	const KVPair *Raw() const { return reinterpret_cast< const KVPair * >( &data[0] ); }
 	const KVPair *operator->() const { Assert( IsValid() ); return reinterpret_cast< const KVPair * >( &data[0] ); }
@@ -133,7 +124,7 @@ public:
 	KVPair *operator->() { Assert( IsValid() ); return reinterpret_cast< KVPair * >( &data[0] ); }
 
 	// Returns the ideal index of the data in this slot, or all bits set if invalid
-	size_t FORCEINLINE IdealIndex( size_t slotmask ) const
+	[[nodiscard]] size_t FORCEINLINE IdealIndex( size_t slotmask ) const
 	{
 //#ifdef PLATFORM_64BITS
 //		return IdealIndex( flags_and_hash, slotmask ) | ( (int64)flags_and_hash >> 63 );
@@ -147,8 +138,8 @@ public:
 	// sometimes have trouble removing the constant branch, which is dumb... but whatever.
 	// 16-bit hashes are simply too narrow for large hashtables; more mask bits than hash bits!
 	// So we duplicate the hash bits. (Note: h *= MASK_HASH+2 is the same as h += h<<HASH_BITS)
-	typedef typename CTypeSelect< INT16_STORAGE, int16, undefined_t >::type uint32_if16BitStorage;
-	typedef typename CTypeSelect< INT16_STORAGE, undefined_t, int32 >::type uint32_if32BitStorage;
+	using uint32_if16BitStorage = typename CTypeSelect<INT16_STORAGE, int16, undefined_t>::type;
+	using uint32_if32BitStorage = typename CTypeSelect<INT16_STORAGE, undefined_t, int32>::type;
 	//typedef typename CTypeSelect< INT32_STORAGE, undefined_t, int64 >::type uint32_if64BitStorage;
 	static FORCEINLINE uint32 IdealIndex( uint32_if16BitStorage h, size_t m )
 	{
@@ -176,14 +167,14 @@ template <typename KeyT, typename ValueT = empty_t, typename KeyHashT = DefaultH
 class CUtlHashtable
 {
 public:
-	typedef UtlHashHandle_t handle_t;
+	using handle_t = UtlHashHandle_t;
 
 protected:
-	typedef CUtlKeyValuePair<KeyT, ValueT> KVPair;
-	typedef typename ArgumentTypeInfo<KeyT>::Arg_t KeyArg_t;
-	typedef typename ArgumentTypeInfo<ValueT>::Arg_t ValueArg_t;
-	typedef typename ArgumentTypeInfo<AlternateKeyT>::Arg_t KeyAlt_t;
-	typedef CUtlHashtableEntry< KeyT, ValueT > entry_t;
+	using KVPair = CUtlKeyValuePair<KeyT, ValueT>;
+	using KeyArg_t = typename ArgumentTypeInfo<KeyT>::Arg_t;
+	using ValueArg_t = typename ArgumentTypeInfo<ValueT>::Arg_t;
+	using KeyAlt_t = typename ArgumentTypeInfo<AlternateKeyT>::Arg_t;
+	using entry_t = CUtlHashtableEntry<KeyT, ValueT>;
 
 	enum { FLAG_FREE = entry_t::FLAG_FREE };
 	enum { FLAG_LAST = entry_t::FLAG_LAST };
@@ -246,15 +237,15 @@ public:
 	KeyIsEqualT const &GetEqualRef() const { return m_eq; }
 
 	// Handle validation
-	bool IsValidHandle( handle_t idx ) const { return (unsigned)idx < (unsigned)m_table.Count() && m_table[idx].IsValid(); }
+	[[nodiscard]] bool IsValidHandle( handle_t idx ) const { return (unsigned)idx < (unsigned)m_table.Count() && m_table[idx].IsValid(); }
 	static handle_t InvalidHandle() { return (handle_t) -1; }
 
 	// Iteration functions
-	handle_t FirstHandle() const { return NextHandle( (handle_t) -1 ); }
-	handle_t NextHandle( handle_t start ) const;
+	[[nodiscard]] handle_t FirstHandle() const { return NextHandle( (handle_t) -1 ); }
+	[[nodiscard]] handle_t NextHandle( handle_t start ) const;
 
 	// Returns the number of unique keys in the table
-	int Count() const { return m_nUsed; }
+	[[nodiscard]] intp Count() const { return m_nUsed; }
 
 
 	// Key lookup, returns InvalidHandle() if not found
@@ -270,12 +261,12 @@ public:
 	
 	// Key insertion or lookup, always returns a valid handle
 	handle_t Insert( KeyArg_t k ) { return DoInsert<KeyArg_t>( k, m_hash(k) ); }
-	handle_t Insert( KeyArg_t k, ValueArg_t v, bool *pDidInsert = NULL ) { return DoInsert<KeyArg_t>( k, v, m_hash(k), pDidInsert ); }
-	handle_t Insert( KeyArg_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = NULL ) { Assert( hash == m_hash(k) ); return DoInsert<KeyArg_t>( k, v, hash, pDidInsert ); }
+	handle_t Insert( KeyArg_t k, ValueArg_t v, bool *pDidInsert = nullptr ) { return DoInsert<KeyArg_t>( k, v, m_hash(k), pDidInsert ); }
+	handle_t Insert( KeyArg_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = nullptr ) { Assert( hash == m_hash(k) ); return DoInsert<KeyArg_t>( k, v, hash, pDidInsert ); }
 	// Alternate-type key insertion or lookup, always returns a valid handle
 	handle_t Insert( KeyAlt_t k ) { return DoInsert<KeyAlt_t>( k, m_hash(k) ); }
-	handle_t Insert( KeyAlt_t k, ValueArg_t v, bool *pDidInsert = NULL ) { return DoInsert<KeyAlt_t>( k, v, m_hash(k), pDidInsert ); }
-	handle_t Insert( KeyAlt_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = NULL ) { Assert( hash == m_hash(k) ); return DoInsert<KeyAlt_t>( k, v, hash, pDidInsert ); }
+	handle_t Insert( KeyAlt_t k, ValueArg_t v, bool *pDidInsert = nullptr ) { return DoInsert<KeyAlt_t>( k, v, m_hash(k), pDidInsert ); }
+	handle_t Insert( KeyAlt_t k, ValueArg_t v, unsigned int hash, bool *pDidInsert = nullptr ) { Assert( hash == m_hash(k) ); return DoInsert<KeyAlt_t>( k, v, hash, pDidInsert ); }
 
 	// Key removal, returns false if not found
 	bool Remove( KeyArg_t k ) { return DoRemove<KeyArg_t>( k, m_hash(k) ) >= 0; }
@@ -304,7 +295,7 @@ public:
 	void Compact( bool bMinimal ) { DoRealloc( bMinimal ? m_nUsed : ( m_nUsed * 4 / 3 ) ); }
 
 	// Access functions. Note: if ValueT is empty_t, all functions return const keys.
-	typedef typename KVPair::ValueReturn_t Element_t;
+	using Element_t = typename KVPair::ValueReturn_t;
 	KeyT const &Key( handle_t idx ) const { return m_table[idx]->m_key; }
 	Element_t const &Element( handle_t idx ) const { return m_table[idx]->GetValue(); }
 	Element_t &Element(handle_t idx) { return m_table[idx]->GetValue(); }
@@ -317,10 +308,10 @@ public:
 	Element_t const &Get( KeyArg_t k, Element_t const &defaultValue ) const { handle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 	Element_t const &Get( KeyAlt_t k, Element_t const &defaultValue ) const { handle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 
-	Element_t const *GetPtr( KeyArg_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t const *GetPtr( KeyAlt_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t *GetPtr( KeyArg_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t *GetPtr( KeyAlt_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
+	Element_t const *GetPtr( KeyArg_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t const *GetPtr( KeyAlt_t k ) const { handle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t *GetPtr( KeyArg_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t *GetPtr( KeyAlt_t k ) { handle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
 
 	// Swap memory and contents with another identical hashtable
 	// (NOTE: if using function pointers or functors with state,
@@ -329,12 +320,12 @@ public:
 
     // GetMemoryUsage returns all memory held by this class
     // and its held classes.  It does not include sizeof(*this).
-    size_t GetMemoryUsage() const
+    [[nodiscard]] size_t GetMemoryUsage() const
     {
         return m_table.AllocSize();
     }
 
-	size_t GetReserveCount( )const
+	[[nodiscard]] size_t GetReserveCount( )const
 	{
 		return m_table.Count();
 	}
@@ -345,7 +336,6 @@ public:
 	void DbgCheckIntegrity() const;
 #endif
 
-private:
 	CUtlHashtable(const CUtlHashtable& copyConstructorIsNotImplemented) = delete;
 };
 
@@ -830,21 +820,21 @@ template <typename KeyT, typename ValueT = empty_t, typename KeyHashT = DefaultH
 class CUtlStableHashtable
 {
 public:
-	typedef typename ArgumentTypeInfo<KeyT>::Arg_t KeyArg_t;
-	typedef typename ArgumentTypeInfo<ValueT>::Arg_t ValueArg_t;
-	typedef typename ArgumentTypeInfo<AlternateKeyT>::Arg_t KeyAlt_t;
-	typedef typename CTypeSelect< sizeof( IndexStorageT ) == 2, uint16, uint32 >::type IndexStorage_t;
+	using KeyArg_t = typename ArgumentTypeInfo<KeyT>::Arg_t;
+	using ValueArg_t = typename ArgumentTypeInfo<ValueT>::Arg_t;
+	using KeyAlt_t = typename ArgumentTypeInfo<AlternateKeyT>::Arg_t;
+	using IndexStorage_t = typename CTypeSelect<sizeof(IndexStorageT) == 2, uint16, uint32>::type;
 
 protected:
 	COMPILE_TIME_ASSERT( sizeof( IndexStorage_t ) == sizeof( IndexStorageT ) );
 
-	typedef CUtlKeyValuePair< KeyT, ValueT > KVPair;
+	using KVPair = CUtlKeyValuePair<KeyT, ValueT>;
 	struct HashProxy;
 	struct EqualProxy;
 	struct IndirectIndex;
 
-	typedef CUtlHashtable< IndirectIndex, empty_t, HashProxy, EqualProxy, AlternateKeyT > Hashtable_t;
-	typedef CUtlLinkedList< KVPair, IndexStorage_t > LinkedList_t;
+	using Hashtable_t = CUtlHashtable<IndirectIndex, empty_t, HashProxy, EqualProxy, AlternateKeyT>;
+	using LinkedList_t = CUtlLinkedList<KVPair, IndexStorage_t>;
 
 	template <typename KeyArgumentT> bool DoRemove( KeyArgumentT k );
 	template <typename KeyArgumentT> UtlHashHandle_t DoFind( KeyArgumentT k ) const;
@@ -869,9 +859,9 @@ public:
 
 	void RemoveAll() { m_table.RemoveAll(); m_data.RemoveAll(); }
 	void Purge() { m_table.Purge(); m_data.Purge(); }
-	int Count() const { return m_table.Count(); }
+	[[nodiscard]] intp Count() const { return m_table.Count(); }
 
-	typedef typename KVPair::ValueReturn_t Element_t;
+	using Element_t = typename KVPair::ValueReturn_t;
 	KeyT const &Key( UtlHashHandle_t idx ) const { return m_data[idx].m_key; }
 	Element_t const &Element( UtlHashHandle_t idx ) const { return m_data[idx].GetValue(); }
 	Element_t &Element( UtlHashHandle_t idx ) { return m_data[idx].GetValue(); }
@@ -884,15 +874,15 @@ public:
 	Element_t const &Get( KeyArg_t k, Element_t const &defaultValue ) const { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 	Element_t const &Get( KeyAlt_t k, Element_t const &defaultValue ) const { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return Element( h ); return defaultValue; }
 
-	Element_t const *GetPtr( KeyArg_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t const *GetPtr( KeyAlt_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t *GetPtr( KeyArg_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
-	Element_t *GetPtr( KeyAlt_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return &Element( h ); return NULL; }
+	Element_t const *GetPtr( KeyArg_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t const *GetPtr( KeyAlt_t k ) const { UtlHashHandle_t h = Find(k); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t *GetPtr( KeyArg_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
+	Element_t *GetPtr( KeyAlt_t k ) { UtlHashHandle_t h = Find( k ); if ( h != InvalidHandle() ) return std::addressof( Element( h ) ); return NULL; }
 
-	UtlHashHandle_t FirstHandle() const { return ExtendInvalidHandle( m_data.Head() ); }
-	UtlHashHandle_t NextHandle( UtlHashHandle_t h ) const { return ExtendInvalidHandle( m_data.Next( h ) ); }
-	bool IsValidHandle( UtlHashHandle_t h ) const { return m_data.IsValidIndex( h ); }
-	UtlHashHandle_t InvalidHandle() const { return (UtlHashHandle_t)-1; }
+	[[nodiscard]] UtlHashHandle_t FirstHandle() const { return ExtendInvalidHandle( m_data.Head() ); }
+	[[nodiscard]] UtlHashHandle_t NextHandle( UtlHashHandle_t h ) const { return ExtendInvalidHandle( m_data.Next( h ) ); }
+	[[nodiscard]] bool IsValidHandle( UtlHashHandle_t h ) const { return m_data.IsValidIndex( h ); }
+	[[nodiscard]] UtlHashHandle_t InvalidHandle() const { return (UtlHashHandle_t)-1; }
 
 	UtlHashHandle_t RemoveAndAdvance( UtlHashHandle_t h )
 	{
@@ -939,8 +929,8 @@ protected:
 		KeyHashT m_hash;
 		unsigned int operator()( IndirectIndex idx ) const
 		{
-			const ptrdiff_t tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetHashRef()) - 1024;
-			const ptrdiff_t owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
+			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetHashRef()) - 1024;
+			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_hash( pOwner->m_data[ idx.m_index ].m_key );
 		}
@@ -957,15 +947,15 @@ protected:
 		}
 		unsigned int operator()( IndirectIndex lhs, KeyArg_t rhs ) const
 		{
-			const ptrdiff_t tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
-			const ptrdiff_t owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
+			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
+			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_eq( pOwner->m_data[ lhs.m_index ].m_key, rhs );
 		}
 		unsigned int operator()( IndirectIndex lhs, KeyAlt_t rhs ) const
 		{
-			const ptrdiff_t tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
-			const ptrdiff_t owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
+			const intp tableoffset = (uintptr_t)(&((Hashtable_t*)1024)->GetEqualRef()) - 1024;
+			const intp owneroffset = offsetof(CUtlStableHashtable, m_table) + tableoffset;
 			CUtlStableHashtable* pOwner = (CUtlStableHashtable*)((uintptr_t)this - owneroffset);
 			return m_eq( pOwner->m_data[ lhs.m_index ].m_key, rhs );
 		}

@@ -80,7 +80,7 @@ public:
 	void	Draw( double frametime ) override;
 	bool	IsActive( void ) override;
 	void	Destroy( void ) override;
-	virtual	void	Update( double frametime );
+	virtual	void	Update( float frametime );
 
 	FXQuadData_t	m_FXData;
 };

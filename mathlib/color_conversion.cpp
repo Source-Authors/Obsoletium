@@ -4,10 +4,11 @@
 //
 //=====================================================================================//
 
-#include <float.h>	// Needed for FLT_EPSILON
+#include <cfloat>	// Needed for FLT_EPSILON
+#include <cmath>
+
 #include <memory.h>
 
-#include <cmath>
 
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
@@ -479,9 +480,12 @@ void XM_CALLCONV VectorToColorRGBExp32( const Vector& vin, ColorRGBExp32 &c )
 	const float b = vin.z * scalar;
 
 	// Above 255 would be right out.
-	AssertMsg( r <= 255.0f && g <= 255.0f && b <= 255.0f,
-		"(R = %.2f, G = %.2f, B = %.2f): component > 255.",
-		r, g, b );
+	AssertMsg( r <= 255.0f,
+		"(R %.2f, G %.2f, B %.2f): R > 255.", r, g, b );
+	AssertMsg( g <= 255.0f,
+		"(R %.2f, G %.2f, B %.2f): G > 255.", r, g, b );
+	AssertMsg( b <= 255.0f,
+		"(R %.2f, G %.2f, B %.2f): B > 255.", r, g, b );
 
 	c.r = static_cast<byte>( static_cast<int>(r) );
 	c.g = static_cast<byte>( static_cast<int>(g) );

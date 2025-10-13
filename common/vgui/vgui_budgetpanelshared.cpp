@@ -45,7 +45,7 @@ double CBudgetPanelShared::g_fFrameTimeLessBudget = 0;
 double CBudgetPanelShared::g_fFrameRate = 0;
 
 static CFastTimer g_TimerLessBudget;
-static CBudgetPanelShared *g_pBudgetPanelShared = NULL;
+static CBudgetPanelShared *g_pBudgetPanelShared = nullptr;
 extern IVProfExport *g_pVProfExport;
 
 
@@ -84,7 +84,7 @@ CBudgetPanelShared::CBudgetPanelShared( vgui::Panel *pParent, const char *pEleme
 CBudgetPanelShared::~CBudgetPanelShared()
 {
 	Assert( g_pBudgetPanelShared == this );
-	g_pBudgetPanelShared = NULL;
+	g_pBudgetPanelShared = nullptr;
 }
 
 

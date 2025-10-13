@@ -325,7 +325,7 @@ public:
 };
 
 static CUtlRBTree<VisibilityCacheEntry_t, unsigned short, CVisibilityCacheEntryLess> g_VisibilityCache;
-const float VIS_CACHE_ENTRY_LIFE = ( !IsXbox() ) ? .090 : .500;
+constexpr inline float VIS_CACHE_ENTRY_LIFE = ( !IsXbox() ) ? .090 : .500;
 
 bool CBaseCombatCharacter::FVisible( CBaseEntity *pEntity, int traceMask, CBaseEntity **ppBlocker )
 {
@@ -3546,7 +3546,7 @@ bool CBaseCombatCharacter::HasEverBeenInjured( int team /*= TEAM_ANY */ ) const
 //-----------------------------------------------------------------------------
 float CBaseCombatCharacter::GetTimeSinceLastInjury( int team /*= TEAM_ANY */ ) const
 {
-	const float never = 999999999999.9f;
+	constexpr float never = 999999999999.9f;
 
 	if ( team == TEAM_ANY )
 	{

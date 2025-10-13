@@ -14,7 +14,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define	MAX_ALIAS_NAME	32
+enum {
+  MAX_ALIAS_NAME =	32
+};
 
 struct cmdalias_t
 {
@@ -72,7 +74,7 @@ void CCommandBuffer::LimitArgumentBufferSize( intp nSize )
 bool CCommandBuffer::ParseArgV0( CUtlBuffer &buf, char *pArgV0, intp nMaxLen, const char **pArgS )
 {
 	pArgV0[0] = 0;
-	*pArgS = NULL;
+	*pArgS = nullptr;
 
 	if ( !buf.IsValid() )
 		return false;
@@ -82,7 +84,7 @@ bool CCommandBuffer::ParseArgV0( CUtlBuffer &buf, char *pArgV0, intp nMaxLen, co
 		return false;
 
 	intp nArgSLen = buf.TellMaxPut() - buf.TellGet();
-	*pArgS = (nArgSLen > 0) ? (const char*)buf.PeekGet() : NULL;
+	*pArgS = (nArgSLen > 0) ? (const char*)buf.PeekGet() : nullptr;
 	return true;
 }
 

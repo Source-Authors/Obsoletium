@@ -151,7 +151,8 @@ void ParseFaceData( s_source_t *psource, int material, s_face_t *pFace )
 				token = strtok( &g_szLine[ctr], " " );
 				ctr += strlen( token ) + 1;
 			
-				weights[k] = atof(token);
+				// dimhotepus: atof -> strtof
+				weights[k] = strtof(token, nullptr);
 			}
 			// printf("%d ", iCount );
 

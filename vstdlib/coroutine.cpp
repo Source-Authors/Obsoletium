@@ -30,7 +30,7 @@
 #include "tier0/minidump.h"
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlvector.h"
-#include <setjmp.h>
+#include <csetjmp>
 
 // for debugging
 //#define CHECK_STACK_CORRUPTION
@@ -253,14 +253,14 @@ public:
 
 	CCoroutine()
 	{
-		m_pSavedStack = NULL;
-		m_pStackHigh = m_pStackLow = NULL;
+		m_pSavedStack = nullptr;
+		m_pStackHigh = m_pStackLow = nullptr;
 		m_cubSavedStack = 0;
-		m_pFunc = NULL;
-		m_pvParam = NULL;
+		m_pFunc = nullptr;
+		m_pvParam = nullptr;
 		m_pchName = "(none)";
 		m_iJumpCode = 0;
-		m_pchDebugMsg = NULL;
+		m_pchDebugMsg = nullptr;
 #ifdef COROUTINE_TRACE
 		m_hCoroutine = -1;
 #endif
@@ -269,7 +269,7 @@ public:
 		m_nAlignmentBytes = CalcAlignOffset( m_rgubRegisters );
 #endif	
 #if defined( VPROF_ENABLED )
-		m_pVProfNodeScope = NULL;
+		m_pVProfNodeScope = nullptr;
 #endif
 	}
 
@@ -333,7 +333,7 @@ public:
 			// use an existing coroutine pointer that is already on the stack from the previous function (does so on the PS3), and will be overwritten
 			// when we memcpy below. Any allocations here should be ok, as the caller should have advanced the stack past the stack area where the
 			// new stack will be copied
-			CCoroutine *pThis = (CCoroutine*)stackalloc( sizeof( CCoroutine* ) );
+			auto *pThis = (CCoroutine*)stackalloc( sizeof( CCoroutine* ) );
 			pThis = this;
 			
 			RW_MEMORY_BARRIER;
@@ -354,12 +354,12 @@ public:
 #if !defined( _PS3 ) || !defined( _DEBUG )
 			FreePv( pThis->m_pSavedStack );
 #endif
-			pThis->m_pSavedStack = NULL;
+			pThis->m_pSavedStack = nullptr;
 
 			// If we were the "main thread", reset our stack pos to zero
-			if ( NULL == pThis->m_pFunc )
+			if ( nullptr == pThis->m_pFunc )
 			{
-				pThis->m_pStackLow = pThis->m_pStackHigh = 0;
+				pThis->m_pStackLow = pThis->m_pStackHigh = nullptr;
 			}
 
 			// resume accounting against the vprof node we were in when we yielded
@@ -417,7 +417,7 @@ public:
 			pCurNode = g_VProfCurrentProfile.GetCurrentNode();
 		}
 
-		m_pVProfNodeScope = NULL;
+		m_pVProfNodeScope = nullptr;
 #endif
 
 		RW_MEMORY_BARRIER;
@@ -504,9 +504,9 @@ public:
 
 		m_ListCoroutines[hCoroutine].m_pFunc = pFunc;
 		m_ListCoroutines[hCoroutine].m_pvParam = pvParam;
-		m_ListCoroutines[hCoroutine].m_pSavedStack = NULL;
+		m_ListCoroutines[hCoroutine].m_pSavedStack = nullptr;
 		m_ListCoroutines[hCoroutine].m_cubSavedStack = 0;
-		m_ListCoroutines[hCoroutine].m_pStackHigh = m_ListCoroutines[hCoroutine].m_pStackLow = NULL;
+		m_ListCoroutines[hCoroutine].m_pStackHigh = m_ListCoroutines[hCoroutine].m_pStackLow = nullptr;
 		m_ListCoroutines[hCoroutine].m_pchName = "(no name set)";
 #ifdef COROUTINE_TRACE
 		m_ListCoroutines[hCoroutine].m_hCoroutine = hCoroutine;
@@ -607,7 +607,7 @@ void Coroutine_ReleaseThreadMemory()
 {
 	AUTO_LOCK( g_ThreadMutexCoroutineMgr );
 
-	if ( g_ThreadLocalCoroutineMgr != NULL )
+	if ( g_ThreadLocalCoroutineMgr != nullptr )
 	{
 		intp iCoroutineMgr = g_VecPCoroutineMgr.Find( g_ThreadLocalCoroutineMgr );
 		delete g_VecPCoroutineMgr[iCoroutineMgr];
@@ -688,7 +688,7 @@ bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg
 				// save the main stack from where the coroutine stack wishes to start
 				// if the previous coroutine already had a stack save point, just save
 				// the whole thing.
-				if ( NULL == coroutinePrev.m_pStackHigh )
+				if ( nullptr == coroutinePrev.m_pStackHigh )
 				{
 					coroutinePrev.m_pStackHigh = coroutine.m_pStackHigh;
 				}
@@ -717,15 +717,15 @@ bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg
 
 			// This needs to go right here - after we've maybe padded the stack (so that iJumpCode does not
 			// get stepped on) and before the RestoreStack() call (because that might step on pchDebugMsg!).
-			if ( pchDebugMsg == NULL )
+			if ( pchDebugMsg == nullptr )
 			{					
 				coroutine.m_iJumpCode = k_iSetJmpContinue;
-				coroutine.m_pchDebugMsg = NULL;
+				coroutine.m_pchDebugMsg = nullptr;
 			}
 			else if ( pchDebugMsg == k_pchDebugMsg_GenericBreak )
 			{
 				coroutine.m_iJumpCode = k_iSetJmpDbgBreak;
-				coroutine.m_pchDebugMsg = NULL;
+				coroutine.m_pchDebugMsg = nullptr;
 			}
 			else
 			{
@@ -781,7 +781,7 @@ bool Internal_Coroutine_Continue( HCoroutine hCoroutine, const char *pchDebugMsg
 //-----------------------------------------------------------------------------
 bool Coroutine_Continue( HCoroutine hCoroutine, const char *pchName )
 {
-	return Internal_Coroutine_Continue( hCoroutine, NULL, pchName );
+	return Internal_Coroutine_Continue( hCoroutine, nullptr, pchName );
 }
 
 
@@ -850,7 +850,7 @@ void Coroutine_Cancel( HCoroutine hCoroutine )
 //-----------------------------------------------------------------------------
 void Coroutine_DebugBreak( HCoroutine hCoroutine )
 {
-	Internal_Coroutine_Continue( hCoroutine, k_pchDebugMsg_GenericBreak, NULL );
+	Internal_Coroutine_Continue( hCoroutine, k_pchDebugMsg_GenericBreak, nullptr );
 }
 
 //-----------------------------------------------------------------------------
@@ -860,7 +860,7 @@ void Coroutine_DebugBreak( HCoroutine hCoroutine )
 void Coroutine_DebugAssert( HCoroutine hCoroutine, const char *pchMsg )
 {
 	Assert( pchMsg );
-	Internal_Coroutine_Continue( hCoroutine, pchMsg, NULL );
+	Internal_Coroutine_Continue( hCoroutine, pchMsg, nullptr );
 }
 
 //-----------------------------------------------------------------------------
@@ -934,7 +934,7 @@ void Coroutine_YieldToMain()
 		}
 
 		// Clear message, regardless
-		coroutine.m_pchDebugMsg = NULL;
+		coroutine.m_pchDebugMsg = nullptr;
 
 		// save our stack - all the way to the top, err bottom err, the end of it ( where esp is )
 		coroutine.SaveStack();
@@ -1008,9 +1008,9 @@ void CoroutineTestFunc( void *pvRelaunch )
 		// test launching coroutines inside of coroutines
 		HCoroutine hCoroutine = Coroutine_Create( &CoroutineTestFunc, (void *)(size_t)-1 );
 		// first pass the coroutines should all still be running
-		DbgVerify( Coroutine_Continue( hCoroutine, NULL ) );
+		DbgVerify( Coroutine_Continue( hCoroutine, nullptr ) );
 		// second pass the coroutines should all be finished
-		DbgVerifyNot( Coroutine_Continue( hCoroutine, NULL ) );
+		DbgVerifyNot( Coroutine_Continue( hCoroutine, nullptr ) );
 	}
 }
 
@@ -1036,9 +1036,9 @@ void CoroutineTestL1( void *pvecCoroutineL2 )
 	// launch a set of coroutines
 	for ( i = 0; i < 20; i++ )
 	{
-		HCoroutine hCoroutine = Coroutine_Create( &CoroutineTestL2, NULL );
+		HCoroutine hCoroutine = Coroutine_Create( &CoroutineTestL2, nullptr );
 		vecCoroutineL2.AddToTail( hCoroutine );
-		Coroutine_Continue( hCoroutine, NULL );
+		Coroutine_Continue( hCoroutine, nullptr );
 
 		// now yield back to main occasionally
 		if ( i % 2 == 1 )
@@ -1056,60 +1056,60 @@ void CoroutineTestL1( void *pvecCoroutineL2 )
 bool Coroutine_Test()
 {
 	// basic calling of a  coroutine
-	HCoroutine hCoroutine = Coroutine_Create( &CoroutineTestFunc, NULL );
-	Coroutine_Continue( hCoroutine, NULL );
-	Coroutine_Continue( hCoroutine, NULL );
+	HCoroutine hCoroutine = Coroutine_Create( &CoroutineTestFunc, nullptr );
+	Coroutine_Continue( hCoroutine, nullptr );
+	Coroutine_Continue( hCoroutine, nullptr );
 
 	// now test 
 	CUtlVector<HCoroutine> vecCoroutineL2;
 	hCoroutine = Coroutine_Create( &CoroutineTestL1, &vecCoroutineL2 );
-	Coroutine_Continue( hCoroutine, NULL );
+	Coroutine_Continue( hCoroutine, nullptr );
 
 	// run the sub-coroutines until they're all done
 	while ( vecCoroutineL2.Count() )
 	{
-		if ( hCoroutine && !Coroutine_Continue( hCoroutine, NULL ) )
+		if ( hCoroutine && !Coroutine_Continue( hCoroutine, nullptr ) )
 			hCoroutine = NULL;
 
 		FOR_EACH_VEC_BACK( vecCoroutineL2, i )
 		{
-			if ( !Coroutine_Continue( vecCoroutineL2[i], NULL ) )
+			if ( !Coroutine_Continue( vecCoroutineL2[i], nullptr ) )
 				vecCoroutineL2.Remove( i );
 		}
 	}
 
 
 	// new one
-	hCoroutine = Coroutine_Create( &CoroutineTestFunc, NULL );
+	hCoroutine = Coroutine_Create( &CoroutineTestFunc, nullptr );
 	// it has yielded, now continue it's call
 	{
 		// pop our stack up so it collides with the coroutine stack position
-		Coroutine_Continue( hCoroutine, NULL );
+		Coroutine_Continue( hCoroutine, nullptr );
 		volatile byte *pvAlloca = (byte*)stackalloc( k_cubCoroutineStackGapSmall );
 		pvAlloca[ k_cubCoroutineStackGapSmall-1 ] = 0xF;
 		
-		Coroutine_Continue( hCoroutine, NULL );
+		Coroutine_Continue( hCoroutine, nullptr );
 	}
 
 	// now do a whole bunch of them
 	constexpr int k_nSimultaneousCoroutines = 10 * 1000;
 	CUtlVector<HCoroutine> coroutines;
-	Assert( coroutines.Base() == NULL );
+	Assert( coroutines.Base() == nullptr );
 	for (int i = 0; i < k_nSimultaneousCoroutines; i++)
 	{
-		coroutines.AddToTail( Coroutine_Create( &CoroutineTestFunc, NULL ) );
+		coroutines.AddToTail( Coroutine_Create( &CoroutineTestFunc, nullptr ) );
 	}
 
 	for ( auto h : coroutines )
 	{
 		// first pass the coroutines should all still be running
-		DbgVerify( Coroutine_Continue( h, NULL ) );
+		DbgVerify( Coroutine_Continue( h, nullptr ) );
 	}
 
 	for ( auto h : coroutines )
 	{
 		// second pass the coroutines should all be finished
-		DbgVerifyNot( Coroutine_Continue( h, NULL ) );
+		DbgVerifyNot( Coroutine_Continue( h, nullptr ) );
 	}
 
 	return true;

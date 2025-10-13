@@ -21,8 +21,8 @@
 
 //-----------------------------------------------------------------------------
 
-const float PLANE_SOLVER_THINK_FREQUENCY[2] = { 0.0f, 0.2f };
-const float MAX_PROBE_DIST[2] = { (10.0f*12.0f), (8.0f*12.0f) };
+constexpr inline float PLANE_SOLVER_THINK_FREQUENCY[2] = { 0.0f, 0.2f };
+constexpr inline float MAX_PROBE_DIST[2] = { (10.0f*12.0f), (8.0f*12.0f) };
 
 //#define PROFILE_PLANESOLVER 1
 

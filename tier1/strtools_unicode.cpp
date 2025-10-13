@@ -105,7 +105,7 @@ int Q_UChar32ToUTF16( uchar32 uVal, OUT_Z_CAP(2) uchar16 *pUTF16Out )
 // as a single character, as if they were a correctly-encoded 4-byte UTF-8 sequence.
 int Q_UTF8ToUChar32( IN_Z const char *pUTF8_, uchar32 &uValueOut, bool &bErrorOut )
 {
-	const uint8 *pUTF8 = (const uint8 *)pUTF8_;
+	const auto *pUTF8 = (const uint8 *)pUTF8_;
 
 	int nBytes = 1;
 	uint32 uValue = pUTF8[0];

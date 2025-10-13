@@ -7,16 +7,16 @@
 // Most of the VCR mode functionality is accomplished through hooks
 // called at various points in the engine.
 
-#ifndef TIER0_VCRMODE_H_
-#define TIER0_VCRMODE_H_
+#ifndef SE_PUBLIC_TIER0_VCRMODE_H_
+#define SE_PUBLIC_TIER0_VCRMODE_H_
 
 #ifdef _WIN32
 #include <process.h>
 #endif
 
-#include "tier0/platform.h"
-#include "tier0/vcr_shared.h"
-#include "tier0/dbg.h"
+#include "platform.h"
+#include "vcr_shared.h"
+#include "dbg.h"
 
 #ifdef _WIN32
 using socket_handle = uintp;
@@ -64,6 +64,12 @@ enum VCRMode_t
 	VCR_Playback
 };
 
+// dimhotepus: Backport from TF2. Was unsigned long.
+//#ifdef PLATFORM_64BITS
+//using VCRThreadId_t = uint64;
+//#else
+using VCRThreadId_t = uint32;
+//#endif
 
 //-----------------------------------------------------------------------------
 // Functions.
@@ -84,7 +90,7 @@ public:
 	virtual void		Read( void *pDest, int size ) = 0;
 };
 
-typedef struct VCR_s
+using VCR_t = struct VCR_s
 {
 	// Start VCR record or play.
 	int			(*Start)( tchar const *pFilename, bool bRecord, IVCRHelpers *pHelpers );
@@ -187,7 +193,7 @@ typedef struct VCR_s
 		void *lpStartAddress,
 		void *lpParameter,
 		unsigned long dwCreationFlags,
-		unsigned long *lpThreadID );
+		VCRThreadId_t *lpThreadID );
 	
 	unsigned long (*Hook_WaitForSingleObject)(
 		void *handle,
@@ -205,7 +211,7 @@ typedef struct VCR_s
 
 	unsigned long (*Hook_WaitForMultipleObjects)( uint32 nHandles, const void **pHandles, int bWaitAll, uint32 timeout );
 
-} VCR_t;
+};
 
 #ifndef NO_VCR
 
@@ -296,4 +302,4 @@ PLATFORM_INTERFACE VCR_t *g_pVCR;
 #define VCRHook_Time							Time
 #endif
 
-#endif  // TIER0_VCRMODE_H_
+#endif  // !SE_PUBLIC_TIER0_VCRMODE_H_

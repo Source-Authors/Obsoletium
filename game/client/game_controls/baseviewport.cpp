@@ -77,7 +77,8 @@ void hud_autoreloadscript_callback( IConVar *var, const char *pOldValue, float f
 
 static ConVar cl_leveloverviewmarker( "cl_leveloverviewmarker", "0", FCVAR_CHEAT );
 
-CON_COMMAND( showpanel, "Shows a viewport panel <name>" )
+// dimhotepus: Make cheat convar as user can show panels with stats which give advantage in multiplayer.
+CON_COMMAND_F( showpanel, "Shows a viewport panel <name>", FCVAR_CHEAT )
 {
 	if ( !gViewPortInterface )
 		return;
@@ -88,7 +89,8 @@ CON_COMMAND( showpanel, "Shows a viewport panel <name>" )
 	 gViewPortInterface->ShowPanel( args[ 1 ], true );
 }
 
-CON_COMMAND( hidepanel, "Hides a viewport panel <name>" )
+// dimhotepus: Make cheat convar as user can show panels with stats which give advantage in multiplayer.
+CON_COMMAND_F( hidepanel, "Hides a viewport panel <name>", FCVAR_CHEAT )
 {
 	if ( !gViewPortInterface )
 		return;
@@ -110,7 +112,7 @@ bool Helper_LoadFile( IBaseFileSystem *pFileSystem, const char *pFilename, CUtlV
 		return false;
 	}
 
-	unsigned long len = pFileSystem->Size( hFile );
+	unsigned len = pFileSystem->Size( hFile );
 	buf.SetSize( len );
 	pFileSystem->Read( buf.Base(), buf.Count(), hFile );
 	pFileSystem->Close( hFile );

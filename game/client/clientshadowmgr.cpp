@@ -1284,7 +1284,8 @@ bool CClientShadowMgr::Init()
 	SetShadowBlobbyCutoffArea( 0.005 );
 
 	bool bTools = CommandLine()->CheckParm( "-tools" ) != NULL;
-	m_nMaxDepthTextureShadows = bTools ? 4 : 1;	// Just one shadow depth texture in games, more in tools
+	// dimhotepus: Increase shadow depth textures count in game 1 -> 2.
+	m_nMaxDepthTextureShadows = bTools ? 4 : 2;	// Just two shadow depth texture in games, more in tools
 
 	bool bLowEnd = ( g_pMaterialSystemHardwareConfig->GetDXSupportLevel() < 80 );
 
@@ -2718,17 +2719,14 @@ void CClientShadowMgr::ComputeHierarchicalBounds( IClientRenderable *pRenderable
 
 	// We could use a good solution for this in the regular PC build, since
 	// it causes lots of extra bone setups for entities you can't see.
-	if ( IsPC() )
-	{
-		IClientRenderable *pChild = pRenderable->FirstShadowChild();
+	IClientRenderable *pChild = pRenderable->FirstShadowChild();
 
-		// Don't recurse down the tree when we hit a blobby shadow
-		if ( pChild && shadowType != SHADOWS_SIMPLE )
-		{
-			matrix3x4_t matWorldToBBox;
-			MatrixInvert( pRenderable->RenderableToWorldTransform(), matWorldToBBox );
-			AddChildBounds( matWorldToBBox, pRenderable, vecMins, vecMaxs );
-		}
+	// Don't recurse down the tree when we hit a blobby shadow
+	if ( pChild && shadowType != SHADOWS_SIMPLE )
+	{
+		matrix3x4_t matWorldToBBox;
+		MatrixInvert( pRenderable->RenderableToWorldTransform(), matWorldToBBox );
+		AddChildBounds( matWorldToBBox, pRenderable, vecMins, vecMaxs );
 	}
 }
 
@@ -3877,7 +3875,7 @@ void CClientShadowMgr::SetViewFlashlightState( int nActiveFlashlightCount, Clien
 	// NOTE: On the 360, we render the entire scene with the flashlight state
 	// set and don't render flashlights additively in the shadow mgr at a far later time
 	// because the CPU costs are prohibitive
-	if ( !IsX360() && !r_flashlight_version2.GetInt() )
+	if ( !r_flashlight_version2.GetInt() )
 		return;
 
 	Assert( nActiveFlashlightCount<= 1 ); 

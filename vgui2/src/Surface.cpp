@@ -493,29 +493,29 @@ static void staticNotifyIconProc(HWND hwnd, WPARAM wparam, LPARAM lparam);
 //-----------------------------------------------------------------------------
 // Purpose: Handles drag and drop
 //-----------------------------------------------------------------------------
-class CSurfaceDragDropTarget : public IDropTarget
+class CSurfaceDragDropTarget final : public IDropTarget
 {
 public:
-	CSurfaceDragDropTarget()
+	CSurfaceDragDropTarget() : _hr{OleInitialize(nullptr)}
 	{
 		_refCount = 0;
-		_dragData = NULL;
+		_dragData = nullptr;
 
-		HRESULT hr = OleInitialize(NULL);
-		if (FAILED(hr)) Warning("OleInitialize failed w/e %ld", hr);
+		if (FAILED(_hr)) Warning("OleInitialize failed w/e 0x%x", _hr);
 	}
 	~CSurfaceDragDropTarget()
 	{
-		OleUninitialize();
+		if (SUCCEEDED(_hr))	OleUninitialize();
 	}
 
 private:
 	CInterlockedUInt _refCount;
 	KeyValues *_dragData;
+	HRESULT _hr;
 
-    virtual HRESULT STDMETHODCALLTYPE QueryInterface( 
+    HRESULT STDMETHODCALLTYPE QueryInterface( 
         /* [in] */ REFIID riid,
-        /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject)
+        /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject) override
 	{
 		if (riid == IID_IDropTarget)
 		{
@@ -536,7 +536,7 @@ private:
 		return --_refCount;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE DragEnter(IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect)
+	HRESULT STDMETHODCALLTYPE DragEnter(IDataObject *pDataObject, DWORD grfKeyState, POINTL pt, DWORD *pdwEffect) override
 	{
 		if (_dragData)
 		{
@@ -546,7 +546,7 @@ private:
 		return DragOver(grfKeyState, pt, pdwEffect);
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE DragOver(DWORD, POINTL, DWORD *pdwEffect)
+	HRESULT STDMETHODCALLTYPE DragOver(DWORD, POINTL, DWORD *pdwEffect) override
 	{
 		*pdwEffect = DROPEFFECT_NONE;
 
@@ -567,12 +567,12 @@ private:
 		return S_OK;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE DragLeave()
+	HRESULT STDMETHODCALLTYPE DragLeave() override
 	{
 		return S_OK;
 	}
 
-	virtual HRESULT STDMETHODCALLTYPE Drop(IDataObject *, DWORD, POINTL, DWORD * pdwEffect)
+	HRESULT STDMETHODCALLTYPE Drop(IDataObject *, DWORD, POINTL, DWORD * pdwEffect) override
 	{
 		*pdwEffect = DROPEFFECT_NONE;
 
@@ -599,7 +599,7 @@ private:
 	}
 
 	// internal methods
-	virtual KeyValues *calculateData(IDataObject *pDataObject)
+	KeyValues *calculateData(IDataObject *pDataObject)
 	{
 		KeyValues *dragData = NULL;
 
@@ -611,13 +611,13 @@ private:
 			DVASPECT_CONTENT,
 			-1,
 			TYMED_HGLOBAL
-    		};
+    	};
 		STGMEDIUM storage;
 
 		if (pDataObject->GetData(&format, &storage) == S_OK)
 		{
 			// we got some data
-			if (storage.tymed == TYMED_HGLOBAL)
+			if (storage.tymed & TYMED_HGLOBAL)
 			{
 				const char *buf = (const char *)GlobalLock(storage.hGlobal);
 				if (buf)
@@ -633,7 +633,7 @@ private:
 		{
 			// try getting a file
 			format.cfFormat = CF_HDROP;
-			if (pDataObject->GetData(&format, &storage) == S_OK && storage.tymed == TYMED_HGLOBAL)
+			if (pDataObject->GetData(&format, &storage) == S_OK && storage.tymed & TYMED_HGLOBAL)
 			{
 				dragData = new KeyValues("DragDrop", "type", "files");
 				KeyValues *fileList = dragData->FindKey("list", true);
@@ -658,8 +658,6 @@ private:
 		return dragData;
 	}
 };
-
-static CSurfaceDragDropTarget staticDragDropTarget;
 
 bool CWin32Surface::TextureLessFunc(const Texture &lhs, const Texture &rhs)
 {
@@ -1067,12 +1065,12 @@ void CWin32Surface::PushMakeCurrent(VPANEL panel, bool useInsets)
 	if ( _currentContextPanel == panel )
 	{
 		// this panel has it's own window, so use screen space
-		::SetViewportOrgEx(PLAT(_currentContextPanel)->hdc,0+inset[0],0+inset[1],null);
+		::SetViewportOrgEx(PLAT(_currentContextPanel)->hdc,0+inset[0],0+inset[1],nullptr);
 	}
 	else
 	{
 		// child window, so set win32 up so all subsequent drawing calls are done in local space
-		::SetViewportOrgEx(PLAT(_currentContextPanel)->hdc,(absPanel[0]+inset[0])-absThis[0],(absPanel[1]+inset[1])-absThis[1],null);
+		::SetViewportOrgEx(PLAT(_currentContextPanel)->hdc,(absPanel[0]+inset[0])-absThis[0],(absPanel[1]+inset[1])-absThis[1],nullptr);
 	}
 
 	// setup clipping
@@ -1296,7 +1294,7 @@ void CWin32Surface::DrawSetColor(Color col)
 
 void CWin32Surface::DrawSetTextPos(int x, int y)
 {
-	MoveToEx(PLAT(_currentContextPanel)->hdc,x,y,null);	
+	MoveToEx(PLAT(_currentContextPanel)->hdc,x,y,nullptr);	
 	m_TextPos[0] = x;
 	m_TextPos[1] = y;
 }
@@ -1722,12 +1720,12 @@ void CWin32Surface::DrawSetTextureFile(int id, const char *filename, int, bool f
 //-----------------------------------------------------------------------------
 void CWin32Surface::DrawTexturedRect(int x0,int y0,int x1,int y1)
 {
-	if (m_pCurrentTexture == null)
+	if (m_pCurrentTexture == nullptr)
 	{
 		return;
 	}
 
-	if (PLAT(_currentContextPanel)->textureDC == null)
+	if (PLAT(_currentContextPanel)->textureDC == nullptr)
 	{
 		return;
 	}
@@ -2461,7 +2459,7 @@ void CWin32Surface::CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIc
 	plat->clipRgn = CreateRectRgn(0,0,64,64);
 	plat->hdc = CreateCompatibleDC(NULL);
 	plat->hwndDC = NULL;
-	plat->bitmap = null;
+	plat->bitmap = nullptr;
 	plat->bitmapSize[0] = 0;
 	plat->bitmapSize[1] = 0;
 	plat->isFullscreen = false;
@@ -2481,7 +2479,9 @@ void CWin32Surface::CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIc
 
 	// create the context
 	RecreateContext(panel);
-
+	
+	// dimhotepus: Moved here as dtor calls OleUninitialize which is prohibited on DLL unload.
+	static CSurfaceDragDropTarget staticDragDropTarget;
 	::RegisterDragDrop(plat->hwnd, &staticDragDropTarget);
 
 	// add the panel to the popup list
@@ -2599,7 +2599,7 @@ bool CWin32Surface::RecreateContext(VPANEL panel)
 			|| (wide < (plat->bitmapSize[0] - 200)) 
 			|| (tall < (plat->bitmapSize[1] - 200)))
 		{
-			if (plat->bitmap != null)
+			if (plat->bitmap != nullptr)
 			{
 				::DeleteObject(plat->bitmap);
 			}
@@ -2725,7 +2725,7 @@ void CWin32Surface::ApplyChanges()
 		// if they are not the same, then adjust the win32 window so it is
 		if ((x != sx) || (y != sy) || (wide != swide) || (tall != stall))
 		{
-			::SetWindowPos(Plat->hwnd, null, x, y, wide, tall, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
+			::SetWindowPos(Plat->hwnd, nullptr, x, y, wide, tall, SWP_NOZORDER | SWP_NOACTIVATE | SWP_NOCOPYBITS);
 			if ( sx > 0 || sy > 0 ) // only message for moves that are on the screen
 			{
 				g_pIVgui->PostMessage(panel, new KeyValues("Move"), NULL ); 
@@ -3570,20 +3570,20 @@ void CWin32Surface::initStaticData()
 {
 	//load up all default cursors, this gets called everytime a Surface is created, but
 	//who cares
-	staticDefaultCursor[dc_none]     =null;
-	staticDefaultCursor[dc_arrow]    =(HICON)LoadCursor(null,(LPCTSTR)OCR_NORMAL);
-	staticDefaultCursor[dc_ibeam]    =(HICON)LoadCursor(null,(LPCTSTR)OCR_IBEAM);
-	staticDefaultCursor[dc_hourglass]=(HICON)LoadCursor(null,(LPCTSTR)OCR_WAIT);
-	staticDefaultCursor[dc_waitarrow]=(HICON)LoadCursor(null,(LPCTSTR)OCR_APPSTARTING);
-	staticDefaultCursor[dc_crosshair]=(HICON)LoadCursor(null,(LPCTSTR)OCR_CROSS);
-	staticDefaultCursor[dc_up]       =(HICON)LoadCursor(null,(LPCTSTR)OCR_UP);
-	staticDefaultCursor[dc_sizenwse] =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZENWSE);
-	staticDefaultCursor[dc_sizenesw] =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZENESW);
-	staticDefaultCursor[dc_sizewe]   =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZEWE);
-	staticDefaultCursor[dc_sizens]   =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZENS);
-	staticDefaultCursor[dc_sizeall]  =(HICON)LoadCursor(null,(LPCTSTR)OCR_SIZEALL);
-	staticDefaultCursor[dc_no]       =(HICON)LoadCursor(null,(LPCTSTR)OCR_NO);
-	staticDefaultCursor[dc_hand]     =(HICON)LoadCursor(null,(LPCTSTR)32649);
+	staticDefaultCursor[dc_none]     =nullptr;
+	staticDefaultCursor[dc_arrow]    =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_NORMAL);
+	staticDefaultCursor[dc_ibeam]    =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_IBEAM);
+	staticDefaultCursor[dc_hourglass]=(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_WAIT);
+	staticDefaultCursor[dc_waitarrow]=(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_APPSTARTING);
+	staticDefaultCursor[dc_crosshair]=(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_CROSS);
+	staticDefaultCursor[dc_up]       =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_UP);
+	staticDefaultCursor[dc_sizenwse] =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZENWSE);
+	staticDefaultCursor[dc_sizenesw] =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZENESW);
+	staticDefaultCursor[dc_sizewe]   =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZEWE);
+	staticDefaultCursor[dc_sizens]   =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZENS);
+	staticDefaultCursor[dc_sizeall]  =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_SIZEALL);
+	staticDefaultCursor[dc_no]       =(HICON)LoadCursor(nullptr,(LPCTSTR)OCR_NO);
+	staticDefaultCursor[dc_hand]     =(HICON)LoadCursor(nullptr,(LPCTSTR)32649);
 
 	// make and register a very simple Window Class
 	memset( &staticWndclass,0,sizeof(staticWndclass) );

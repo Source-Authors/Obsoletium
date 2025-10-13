@@ -318,6 +318,19 @@ public:
 
 	virtual const char *GetDisplayDeviceName() OVERRIDE { return ""; }
 
+	// Shader creation, destruction
+	virtual HullShaderHandle_t CreateHullShader(
+		IShaderBuffer *pShaderBuffer) { return HULL_SHADER_HANDLE_INVALID; }
+	virtual void DestroyHullShader(HullShaderHandle_t hShader) {}
+	virtual DomainShaderHandle_t CreateDomainShader(
+		IShaderBuffer* pShaderBuffer) {
+		return DOMAIN_SHADER_HANDLE_INVALID;
+	}
+	virtual void DestroyDomainShader(DomainShaderHandle_t hShader) {}
+	virtual ComputeShaderHandle_t CreateComputeShader(
+		IShaderBuffer *pShaderBuffer) { return COMPUTE_SHADER_HANDLE_INVALID; }
+	virtual void DestroyComputeShader(ComputeShaderHandle_t hShader) {}
+
 private:
 	CEmptyMesh m_Mesh;
 	CEmptyMesh m_DynamicMesh;
@@ -576,6 +589,7 @@ public:
 	virtual void GetSceneFogColor( unsigned char *rgb );
 	virtual MaterialFogMode_t GetSceneFogMode( );
 	virtual int GetPixelFogCombo( );
+	virtual int GetPixelFogCombo1( bool bRadial );
 
 	void SetHeightClipZ( float z ); 
 	void SetHeightClipMode( enum MaterialHeightClipMode_t heightClipMode ); 
@@ -1178,7 +1192,7 @@ public:
 	{
 	}
 
-	int GetNumActiveDeformations( ) const
+	intp GetNumActiveDeformations( ) const
 	{
 		return 0;
 	}
@@ -1226,6 +1240,10 @@ public:
 	void PrintfVA( char *fmt, va_list vargs ) {}
 	void Printf( const char *fmt, ... ) {}
 	float Knob( char *knobname, float *setvalue = NULL ) { return 0.0f; };
+
+	virtual void BindHullShader(HullShaderHandle_t hPixelShader) {}
+	virtual void BindDomainShader(DomainShaderHandle_t hPixelShader) {}
+	virtual void BindComputeShader(ComputeShaderHandle_t hPixelShader) {}
 
 private:
 	enum
@@ -2548,6 +2566,11 @@ MaterialFogMode_t CShaderAPIEmpty::GetSceneFogMode( )
 }
 
 int CShaderAPIEmpty::GetPixelFogCombo( )
+{
+	return 0;
+}
+
+int CShaderAPIEmpty::GetPixelFogCombo1( bool bRadial )
 {
 	return 0;
 }

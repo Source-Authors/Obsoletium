@@ -83,7 +83,7 @@ private:
 	bool UpdateScreenSize();
 	
 	bool LoadScriptFile(const char *fileName);
-	bool ParseScriptFile(char *pMem, int length);
+	bool ParseScriptFile(char *pMem, intp length);
 
 	void UpdatePostedMessages(bool bRunToCompletion);
 	void UpdateActiveAnimations(bool bRunToCompletion);

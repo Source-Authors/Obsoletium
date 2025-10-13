@@ -1284,7 +1284,7 @@ bool CNetChan::SendSubChannelData( bf_write &buf )
 		{
 			// send from file
 			Assert( data->file != FILESYSTEM_INVALID_HANDLE );
-			char * tmpbuf = (char*)_alloca( length ); // alloc on stack
+			char * tmpbuf = stackallocT( char, length ); // alloc on stack
 			g_pFileSystem->Seek( data->file, offset, FILESYSTEM_SEEK_HEAD );
 			g_pFileSystem->Read( tmpbuf, length, data->file );
 			buf.WriteBytes( tmpbuf, length );

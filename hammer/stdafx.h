@@ -67,9 +67,6 @@
 
 #include "tier0/platform.h"
 
-// Some VS header files provoke this warning
-#pragma warning(disable : 4201) // warning C4201: nonstandard extension used : nameless struct/union
-
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 

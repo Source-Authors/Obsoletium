@@ -7,6 +7,9 @@
 #ifndef _3DNOW_H
 #define _3DNOW_H
 
+#include "tier0/platform.h"
+#include "vector.h"
+
 float _3DNow_Sqrt(float x);
 float _3DNow_RSqrt(float x);
 float FASTCALL _3DNow_VectorNormalize (Vector& vec);

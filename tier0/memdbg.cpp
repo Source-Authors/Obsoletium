@@ -434,13 +434,13 @@ class CNoRecurseAllocator
 {
 public:
 	// type definitions
-	typedef T        value_type;
-	typedef T*       pointer;
-	typedef const T* const_pointer;
-	typedef T&       reference;
-	typedef const T& const_reference;
-	typedef std::size_t    size_type;
-	typedef std::ptrdiff_t difference_type;
+	using value_type = T;
+	using pointer = T *;
+	using const_pointer = const T *;
+	using reference = T &;
+	using const_reference = const T &;
+	using size_type = std::size_t;
+	using difference_type = std::ptrdiff_t;
 
 	CNoRecurseAllocator() = default;
 	CNoRecurseAllocator(const CNoRecurseAllocator&) {}
@@ -448,15 +448,15 @@ public:
 	~CNoRecurseAllocator() = default;
 
 	// rebind allocator to type U
-	template <class U > struct rebind { typedef CNoRecurseAllocator<U> other; };
+	template <class U > struct rebind { using other = CNoRecurseAllocator<U>; };
 
 	// return address of values
 	pointer address (reference value) const { return &value; }
 
-	const_pointer address (const_reference value) const { return &value;}
-	size_type max_size() const { return INT_MAX; }
+	[[nodiscard]] const_pointer address (const_reference value) const { return &value;}
+	[[nodiscard]] size_type max_size() const { return INT_MAX; }
 
-	pointer allocate(size_type num, const void* = 0)  { return (pointer)DebugAlloc(num * sizeof(T)); }
+	pointer allocate(size_type num, const void* = nullptr)  { return (pointer)DebugAlloc(num * sizeof(T)); }
 	void deallocate (pointer p, size_type num) { DebugFree(p); }
 	void construct(pointer p, const T& value) {	new((void*)p)T(value); }
 	void destroy (pointer p) { p->~T(); }
@@ -512,7 +512,7 @@ public:
 	int CrtSetReportMode( int nReportType, int nReportMode ) override;
 	int CrtIsValidHeapPointer( const void *pMem ) override;
 	int CrtIsValidPointer( const void *pMem, unsigned int size, int access ) override;
-	int CrtCheckMemory( void ) override;
+	int CrtCheckMemory( ) override;
 	int CrtSetDbgFlag( int nNewFlag ) override;
 	void CrtMemCheckpoint( _CrtMemState *pState ) override;
 
@@ -657,11 +657,11 @@ private:
 
 	// Maps file name to info
 	// dimhotepus: Speed up debug allocation tracking.
-	typedef std::unordered_map<MemInfoKey_t, MemInfo_t, MemInfoKeyHasher, std::equal_to<MemInfoKey_t>, CNoRecurseAllocator<std::pair<const MemInfoKey_t, MemInfo_t>>> StatMap_t;
-	typedef std::unordered_set<const char*, std::hash<const char*>, std::equal_to<const char*>, CNoRecurseAllocator<const char*>> Filenames_t;
+	using StatMap_t = std::unordered_map<MemInfoKey_t, MemInfo_t, MemInfoKeyHasher, std::equal_to<>, CNoRecurseAllocator<std::pair<const MemInfoKey_t, MemInfo_t>>>;
+	using Filenames_t = std::unordered_set<const char *, std::hash<const char *>, std::equal_to<const char *>, CNoRecurseAllocator<const char *>>;
 
 	// Heap reporting method
-	typedef void (*HeapReportFunc_t)( char const *pFormat, ... );
+	using HeapReportFunc_t = void (*)(const char *, ...);
 
 private:
 	// Returns the actual debug info
@@ -694,18 +694,18 @@ private:
 	void GlobalMemoryStatus( size_t *pUsedMemory, size_t *pFreeMemory ) override;
 
 private:
-	StatMap_t *m_pStatMap;
+	StatMap_t *m_pStatMap{nullptr};
 	MemInfo_t m_GlobalInfo;
 	CFastTimer m_Timer;
 	bool		m_bInitialized;
-	Filenames_t *m_pFilenames;
+	Filenames_t *m_pFilenames{nullptr};
 
 	HeapReportFunc_t m_OutputFunc;
 
 	static size_t s_pCountSizes[NUM_BYTE_COUNT_BUCKETS];
 	static const char *s_pCountHeader[NUM_BYTE_COUNT_BUCKETS];
 
-	size_t				m_sMemoryAllocFailed;
+	size_t				m_sMemoryAllocFailed{0};
 };
 
 static constexpr inline char g_pszUnknown[]{"unknown"};
@@ -774,7 +774,7 @@ static void DefaultHeapReportFunc( char const *pFormat, ... )
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
-CDbgMemAlloc::CDbgMemAlloc() : m_pStatMap{nullptr}, m_pFilenames{nullptr}, m_sMemoryAllocFailed{0}
+CDbgMemAlloc::CDbgMemAlloc()  
 {
 	// Make sure that we return 64-bit addresses in 64-bit builds.
 	ReserveBottomMemory();
@@ -811,7 +811,7 @@ void CDbgMemAlloc::Initialize()
 		// a bug-finding point of view. Do this always on Windows since the heap is
 		// used by video drivers and other in-proc components.
 #if defined(PLATFORM_WINDOWS_PC)
-		HeapSetInformation( NULL, HeapEnableTerminationOnCorruption, NULL, 0 );
+		HeapSetInformation( nullptr, HeapEnableTerminationOnCorruption, nullptr, 0 );
 #endif
 	}
 }
@@ -905,7 +905,7 @@ void CDbgMemAlloc::Free( void *pMem )
 
 void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t )
 {
-	return NULL;
+	return nullptr;
 }
 
 void SetupDebugInfoStack(DbgInfoStack_t *&stack, int &stack_depth)
@@ -919,7 +919,7 @@ void SetupDebugInfoStack(DbgInfoStack_t *&stack, int &stack_depth)
 //-----------------------------------------------------------------------------
 void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -935,7 +935,7 @@ void CDbgMemAlloc::PushAllocDbgInfo( const char *pFileName, int nLine )
 
 void CDbgMemAlloc::PopAllocDbgInfo()
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -955,24 +955,24 @@ uint32 CDbgMemAlloc::GetDebugInfoSize()
 
 void CDbgMemAlloc::SaveDebugInfo( void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
 
-	int32 *pnStackDepth = (int32*) pvDebugInfo;
+	auto *pnStackDepth = (int32*) pvDebugInfo;
 	*pnStackDepth = g_nDbgInfoStackDepth;
 	memcpy( pnStackDepth+1, &g_DbgInfoStack[0], sizeof( DbgInfoStack_t ) * DBG_INFO_STACK_DEPTH );
 }
 
 void CDbgMemAlloc::RestoreDebugInfo( const void *pvDebugInfo )
 {
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
 
-	const int32 *pnStackDepth = (const int32*) pvDebugInfo;
+	const auto *pnStackDepth = (const int32*) pvDebugInfo;
 	g_nDbgInfoStackDepth = *pnStackDepth;
 	memcpy( &g_DbgInfoStack[0], pnStackDepth+1, sizeof( DbgInfoStack_t ) * DBG_INFO_STACK_DEPTH );
 
@@ -980,13 +980,13 @@ void CDbgMemAlloc::RestoreDebugInfo( const void *pvDebugInfo )
 
 void CDbgMemAlloc::InitDebugInfo( void *pvDebugInfo, const char *pchRootFileName, int nLine )
 {
-	int32 *pnStackDepth = (int32*) pvDebugInfo;
+	auto *pnStackDepth = (int32*) pvDebugInfo;
 
 	if( pchRootFileName )
 	{
 		*pnStackDepth = 0;
 
-		DbgInfoStack_t *pStackRoot = (DbgInfoStack_t *)(pnStackDepth + 1);
+		auto *pStackRoot = (DbgInfoStack_t *)(pnStackDepth + 1);
 		pStackRoot->m_pFileName = FindOrCreateFilename( pchRootFileName );
 		pStackRoot->m_nLine = nLine;
 	}
@@ -1007,7 +1007,7 @@ void CDbgMemAlloc::GetActualDbgInfo( const char *&pFileName, int &nLine )
 	return;
 #endif
 
-	if ( g_DbgInfoStack == NULL )
+	if ( g_DbgInfoStack == nullptr )
 	{
 		SetupDebugInfoStack( g_DbgInfoStack, g_nDbgInfoStackDepth );
 	}
@@ -1252,7 +1252,7 @@ void *CDbgMemAlloc::Realloc( void *pMem, size_t nSize, const char *pFileName, in
 	if ( !m_bInitialized )
 		return InternalRealloc( pMem, nSize, pFileName, nLine );
 
-	if ( pMem != 0 )
+	if ( pMem != nullptr )
 	{
 		RegisterDeallocation( GetAllocatonFileName( pMem ), GetAllocatonLineNumber( pMem ), InternalLogicalSize( pMem ), InternalMSize( pMem ), 0 );
 	}
@@ -1308,7 +1308,7 @@ void  CDbgMemAlloc::Free( void *pMem, const char * /*pFileName*/, int )
 
 void *CDbgMemAlloc::Expand_NoLongerSupported( void *, size_t, const char *, int )
 {
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1367,7 +1367,7 @@ int CDbgMemAlloc::CrtIsValidPointer( const void *pMem, unsigned int size, int ac
 
 #define DBGMEM_CHECKMEMORY 1
 
-int CDbgMemAlloc::CrtCheckMemory( void )
+int CDbgMemAlloc::CrtCheckMemory( )
 {
 #if !defined( DBGMEM_CHECKMEMORY ) || defined( POSIX )
 	return 1;

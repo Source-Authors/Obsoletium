@@ -1,4 +1,4 @@
-//========= Copyright (c), Valve LLC, All rights reserved. ============
+//========= Copyright Valve Corporation, All rights reserved. ============
 //
 // Purpose:
 //
@@ -82,7 +82,7 @@ void EmitBaseMessageV( const CGCEmitGroup& Group, SpewType_t spewType, int iCons
 void CGCEmitGroup::Internal_AssertError( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2019 //-V2018
 	AssertErrorV( pchMsg, args );
 	va_end( args );
 }
@@ -98,7 +98,7 @@ void CGCEmitGroup::AssertErrorV( const char *pchMsg, va_list vaArgs ) const
 void CGCEmitGroup::Internal_Error( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2018 //-V2019
 	ErrorV( pchMsg, args );
 	va_end( args );
 }
@@ -114,7 +114,7 @@ void CGCEmitGroup::ErrorV( const char *pchMsg, va_list vaArgs ) const
 void CGCEmitGroup::Internal_Warning( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2018 //-V2019
 	WarningV( pchMsg, args );
 	va_end( args );
 }
@@ -130,7 +130,7 @@ void CGCEmitGroup::WarningV( const char *pchMsg, va_list vaArgs ) const
 void CGCEmitGroup::Internal_Msg( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2018 //-V2019
 	MsgV( pchMsg, args );
 	va_end( args );
 }
@@ -146,7 +146,7 @@ void CGCEmitGroup::MsgV( const char *pchMsg, va_list vaArgs ) const
 void CGCEmitGroup::Internal_Verbose( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2018 //-V2019
 	VerboseV( pchMsg, args );
 	va_end( args );
 }
@@ -163,7 +163,7 @@ void CGCEmitGroup::VerboseV( const char *pchMsg, va_list vaArgs ) const
 void CGCEmitGroup::Internal_BoldMsg( PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2018 //-V2019
 	BoldMsgV( pchMsg, args );
 	va_end( args );
 }
@@ -183,7 +183,7 @@ void CGCEmitGroup::BoldMsgV( const char *pchMsg, va_list vaArgs ) const
 void CGCEmitGroup::Internal_Emit( EMsgLevel eLvl, PRINTF_FORMAT_STRING const char *pchMsg, ... ) const
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2019 //-V2018
 	EmitV( eLvl, pchMsg, args );
 	va_end( args );
 }
@@ -211,7 +211,7 @@ void CGCEmitGroup::EmitV( EMsgLevel eLvl, PRINTF_FORMAT_STRING const char *pchMs
 void EGInternal_EmitInfo( const CGCEmitGroup& Group, int iLevel, int iLevelLog, PRINTF_FORMAT_STRING const char *pchMsg, ... )
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2018 //-V2019
 	EmitBaseMessageV( Group, SPEW_MESSAGE, iLevel, iLevelLog, pchMsg, args );
 	va_end( args );
 }
@@ -224,7 +224,7 @@ void EmitInfoV( const CGCEmitGroup& Group, int iLevel, int iLevelLog, const char
 void EmitWarning( const CGCEmitGroup& Group, int iLevel, PRINTF_FORMAT_STRING const char *pchMsg, ... )
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2018 //-V2019
 	EmitBaseMessageV( Group, SPEW_WARNING, iLevel, iLevel, pchMsg, args );
 	va_end( args );
 }
@@ -232,7 +232,7 @@ void EmitWarning( const CGCEmitGroup& Group, int iLevel, PRINTF_FORMAT_STRING co
 void EmitError( const CGCEmitGroup& Group, PRINTF_FORMAT_STRING const char *pchMsg, ... )
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2019 //-V2018
 	EmitBaseMessageV( Group, SPEW_ERROR, 1, 1, pchMsg, args );
 	va_end( args );
 }
@@ -241,7 +241,7 @@ void EmitError( const CGCEmitGroup& Group, PRINTF_FORMAT_STRING const char *pchM
 void EmitAssertError( const CGCEmitGroup& Group, PRINTF_FORMAT_STRING const char *pchMsg, ... )
 {
 	va_list args;
-	va_start( args, pchMsg );
+	va_start( args, pchMsg ); //-V2019 //-V2018
 	EmitBaseMessageV( Group, SPEW_ASSERT, 1, 1, pchMsg, args );
 	va_end( args );
 }

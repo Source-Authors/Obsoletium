@@ -27,6 +27,8 @@ public:
 
 	// This is called at startup to register all the user messages.
 	static void RegisterAll();
+	// dimhotepus: Pair with unregister all to cleanup.
+	static void UnregisterAll();
 
 
 private:

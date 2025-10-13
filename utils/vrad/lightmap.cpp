@@ -1049,17 +1049,39 @@ int LightForKey (entity_t *ent, char *key, Vector& intensity )
 	return LightForString( pLight, intensity );
 }
 
+// dimhotepus: Dispatch vec_t type.
+using vector_type_t = std::conditional_t<
+	std::is_same_v<float, vec_t>,
+	float,
+	std::conditional_t<
+		std::is_same_v<double, vec_t>,
+		double,
+		void
+	>
+>;
+
+static constexpr const char* GetLight8FormatSpecifier() {
+	if constexpr (std::is_same_v<float, vector_type_t>)
+		return "%f %f %f %f %f %f %f %f";
+
+	if constexpr (std::is_same_v<double, vector_type_t>)
+		return "%lf %lf %lf %lf %lf %lf %lf %lf";
+
+	return "";
+};
+
 int LightForString( const char *pLight, Vector& intensity )
 {
-	double r, g, b, scaler;
-	int argCnt;
+	vector_type_t r, g, b, scaler;
 
 	VectorFill( intensity, 0 );
 
 	// scanf into doubles, then assign, so it is vec_t size independent
 	r = g = b = scaler = 0;
-	double r_hdr,g_hdr,b_hdr,scaler_hdr;
-	argCnt = sscanf ( pLight, "%lf %lf %lf %lf %lf %lf %lf %lf", 
+	// dimhotepus: Strongly-typed light types.
+	constexpr auto format = GetLight8FormatSpecifier();
+	vector_type_t r_hdr,g_hdr,b_hdr,scaler_hdr;
+	int argCnt = sscanf ( pLight, format, 
 					  &r, &g, &b, &scaler, &r_hdr,&g_hdr,&b_hdr,&scaler_hdr );
 
 	if (argCnt==8) 											// 2 4-tuples
@@ -1656,9 +1678,6 @@ void ExportDirectLightsToWorldLights()
 
 #define CONSTANT_DOT (.7/2)
 
-#define NSAMPLES_SUN_AREA_LIGHT 30							// number of samples to take for an
-                                                            // non-point sun light
-
 // Helper function - gathers light from sun (emit_skylight)
 void GatherSampleSkyLightSSE( SSE_sampleLightOutput_t &out, directlight_t *dl, int facenum, 
 							 FourVectors const& pos, FourVectors *pNormals, int normalCount, int iThread,
@@ -1683,7 +1702,8 @@ void GatherSampleSkyLightSSE( SSE_sampleLightOutput_t &out, directlight_t *dl, i
 	int nsamples = 1;
 	if ( g_SunAngularExtent > 0.0f )
 	{
-		nsamples = NSAMPLES_SUN_AREA_LIGHT;
+		// dimhotepus: Configurable number of samples to take for an non-point sun light.
+		nsamples = g_sunSamplesAreaLight; 
 		if ( do_fast || force_fast )
 			nsamples /= 4;
 	}
@@ -1696,7 +1716,7 @@ void GatherSampleSkyLightSSE( SSE_sampleLightOutput_t &out, directlight_t *dl, i
 	for ( int d = 0; d < nsamples; d++ )
 	{
 		// determine visibility of skylight
-		// serach back to see if we can hit a sky brush
+		// search back to see if we can hit a sky brush
 		Vector delta;
 		VectorScale( dl->light.normal, -MAX_TRACE_LENGTH, delta );
 		if ( d )
@@ -2855,24 +2875,24 @@ static void BuildSupersampleFaceLights( lightinfo_t& l, SSE_SampleInfo_t& info, 
 
 	// This is used to make sure we don't supersample a light sample more than once
 	int processedSampleSize = info.m_LightmapSize * sizeof(bool);
-	bool* pHasProcessedSample = (bool*)stackalloc( processedSampleSize );
+	bool* pHasProcessedSample = stackallocT( bool, processedSampleSize );
 	memset( pHasProcessedSample, 0, processedSampleSize );
 
 	// This is used to compute a simple gradient computation of the light samples
 	// We're going to store the maximum intensity of all bumped samples at each sample location
-	float* pGradient = (float*)stackalloc( info.m_pFaceLight->numsamples * sizeof(float) );
-	float* pSampleIntensity = (float*)stackalloc( info.m_NormalCount * info.m_LightmapSize * sizeof(float) );
+	float* pGradient = stackallocT( float, info.m_pFaceLight->numsamples );
+	float* pSampleIntensity = stackallocT( float, info.m_NormalCount * info.m_LightmapSize );
 
 	// Compute the maximum intensity of all lighting associated with this lightstyle
 	// for all bumped lighting
 	LightingValue_t **ppLightSamples = info.m_pFaceLight->light[lightstyleIndex];
 	ComputeSampleIntensities( info, ppLightSamples, pSampleIntensity );
 
-	Vector *pVisualizePass = NULL;
+	Vector *pVisualizePass = nullptr;
 	if (debug_extra)
 	{
-		int visualizationSize = info.m_pFaceLight->numsamples * sizeof(Vector);
-		pVisualizePass = (Vector*)stackalloc( visualizationSize );
+		pVisualizePass = stackallocT( Vector, info.m_pFaceLight->numsamples );
+		const int visualizationSize = info.m_pFaceLight->numsamples * sizeof(Vector);
 		memset( pVisualizePass, 0, visualizationSize ); 
 	}
 
@@ -2900,7 +2920,7 @@ static void BuildSupersampleFaceLights( lightinfo_t& l, SSE_SampleInfo_t& info, 
 				continue;
 
 			// Don't supersample if the lighting is pretty uniform near the sample
-			if (pGradient[i] < 0.0625)
+			if (pGradient[i] < 0.0625f)
 				continue;
 
 			// Joy! We're supersampling now, and we therefore must do another pass
@@ -2927,12 +2947,15 @@ static void BuildSupersampleFaceLights( lightinfo_t& l, SSE_SampleInfo_t& info, 
 			// In this case, just use what we already have
 			if ( ambientSupersampleCount > 0 && directSupersampleCount > 0 )
 			{
+				const float directSupersampleInverse = 1.0f / directSupersampleCount;
+				const float ambientSupersampleInverse = 1.0f / ambientSupersampleCount;
+
 				// Add the ambient + directional terms together, stick it back into the lightmap
 				for (int n = 0; n < info.m_NormalCount; ++n)
 				{
 					ppLightSamples[n][i].Zero();
-					ppLightSamples[n][i].AddWeighted( pDirectLight[n],1.0f / directSupersampleCount );
-					ppLightSamples[n][i].AddWeighted( pAmbientLight[n], 1.0f / ambientSupersampleCount );
+					ppLightSamples[n][i].AddWeighted( pDirectLight[n], directSupersampleInverse );
+					ppLightSamples[n][i].AddWeighted( pAmbientLight[n], ambientSupersampleInverse );
 				}
 
 				// Recompute the luxel intensity based on the supersampling
@@ -3152,7 +3175,9 @@ void BuildFacelights (int iThread, int facenum)
 		}
 	}
 
+#ifdef MPI
 	if (!g_bUseMPI) 
+#endif
 	{
 		//
 		// This is done on the master node when MPI is used
@@ -3173,13 +3198,9 @@ void BuildFacelights (int iThread, int facenum)
 
 void BuildPatchLights( int facenum )
 {
-	int i, k;
-
-	CPatch		*patch;
+	int k;
 
 	dface_t	*f = &g_pFaces[facenum];
-	facelight_t	*fl = &facelight[facenum];
-
 	for( k = 0; k < MAXLIGHTMAPS; k++ )
 	{
 		if (f->styles[k] == 0)
@@ -3188,8 +3209,9 @@ void BuildPatchLights( int facenum )
 
 	if (k >= MAXLIGHTMAPS)
 		return;
-
-	for (i = 0; i < fl->numsamples; i++)
+	
+	facelight_t	*fl = &facelight[facenum];
+	for (int i = 0; i < fl->numsamples; i++)
 	{
 		AddSampleToPatch( &fl->sample[i], fl->light[k][0][i], facenum);
 	}
@@ -3200,10 +3222,10 @@ void BuildPatchLights( int facenum )
 
 	// push up sampled light to parents (children always exist first in the list)
 	CPatch *pNextPatch;
-	for( patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
+	for( CPatch	*patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
 	{
 		// next patch
-		pNextPatch = NULL;
+		pNextPatch = nullptr;
 		if( patch->ndxNext != g_Patches.InvalidIndex() )
 		{
 			pNextPatch = &g_Patches.Element( patch->ndxNext );
@@ -3211,7 +3233,6 @@ void BuildPatchLights( int facenum )
 
 		// skip patches without parents
 		if( patch->parent == g_Patches.InvalidIndex() )
-//		if (patch->parent == -1)
 			continue;
 
 		CPatch *parent = &g_Patches.Element( patch->parent );
@@ -3223,10 +3244,10 @@ void BuildPatchLights( int facenum )
 	// average up the direct light on each patch for radiosity
 	if (numbounce > 0)
 	{
-		for( patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
+		for( CPatch	*patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
 		{
 			// next patch
-			pNextPatch = NULL;
+			pNextPatch = nullptr;
 			if( patch->ndxNext != g_Patches.InvalidIndex() )
 			{
 				pNextPatch = &g_Patches.Element( patch->ndxNext );
@@ -3234,9 +3255,8 @@ void BuildPatchLights( int facenum )
 
 			if (patch->samplearea)
 			{ 
-				float scale;
 				Vector v;
-				scale = 1.0f / patch->samplearea;
+				float scale = 1.0f / patch->samplearea;
 
 				VectorScale( patch->samplelight, scale, v );
 				VectorAdd( patch->totallight.light[0], v, patch->totallight.light[0] );
@@ -3246,10 +3266,10 @@ void BuildPatchLights( int facenum )
 	}
 
 	// pull totallight from children (children always exist first in the list)
-	for( patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
+	for( CPatch	*patch = &g_Patches.Element( g_FacePatches.Element( facenum ) ); patch; patch = pNextPatch )
 	{
 		// next patch
-		pNextPatch = NULL;
+		pNextPatch = nullptr;
 		if( patch->ndxNext != g_Patches.InvalidIndex() )
 		{
 			pNextPatch = &g_Patches.Element( patch->ndxNext );
@@ -3257,15 +3277,11 @@ void BuildPatchLights( int facenum )
 
 		if ( patch->child1 != g_Patches.InvalidIndex() )
 		{
-			float s1, s2;
-			CPatch *child1;
-			CPatch *child2;
+			CPatch *child1 = &g_Patches.Element( patch->child1 );
+			CPatch *child2 = &g_Patches.Element( patch->child2 );
 
-			child1 = &g_Patches.Element( patch->child1 );
-			child2 = &g_Patches.Element( patch->child2 );
-
-			s1 = child1->area / (child1->area + child2->area);
-			s2 = child2->area / (child1->area + child2->area);
+			const float s1 = child1->area / (child1->area + child2->area);
+			const float s2 = child2->area / (child1->area + child2->area);
 
 			VectorScale( child1->totallight.light[0], s1, patch->totallight.light[0] );
 			VectorMA( patch->totallight.light[0], s2, child2->totallight.light[0], patch->totallight.light[0] );
@@ -3274,30 +3290,44 @@ void BuildPatchLights( int facenum )
 		}
 	}
 
-	bool needsBumpmap = false;
-	if( texinfo[f->texinfo].flags & SURF_BUMPLIGHT )
-	{
-		needsBumpmap = true;
-	}
+	const bool needsBumpmap = ( texinfo[f->texinfo].flags & SURF_BUMPLIGHT ) ? true : false;
 
 	// add an ambient term if desired
 	if (ambient[0] || ambient[1] || ambient[2])
 	{
-		for( int j=0; j < MAXLIGHTMAPS && f->styles[j] != 255; j++ )
+		if( needsBumpmap )
 		{
-			if ( f->styles[j] == 0 )
+			for( int j=0; j < MAXLIGHTMAPS && f->styles[j] != 255; j++ )
 			{
-				for (i = 0; i < fl->numsamples; i++)
+				if ( f->styles[j] == 0 )
 				{
-					fl->light[j][0][i].m_vecLighting += ambient;
-					if( needsBumpmap )
+					for (int i = 0; i < fl->numsamples; i++)
 					{
-						fl->light[j][1][i].m_vecLighting += ambient;
-						fl->light[j][2][i].m_vecLighting += ambient;
-						fl->light[j][3][i].m_vecLighting += ambient;
+						auto &light = fl->light[j];
+
+						light[0][i].m_vecLighting += ambient;
+						light[1][i].m_vecLighting += ambient;
+						light[2][i].m_vecLighting += ambient;
+						light[3][i].m_vecLighting += ambient;
 					}
+					break;
 				}
-				break;
+			}
+		}
+		else
+		{
+			for( int j=0; j < MAXLIGHTMAPS && f->styles[j] != 255; j++ )
+			{
+				if ( f->styles[j] == 0 )
+				{
+					for (int i = 0; i < fl->numsamples; i++)
+					{
+						auto &light = fl->light[j];
+
+						light[0][i].m_vecLighting += ambient;
+					}
+					break;
+				}
 			}
 		}
 	}

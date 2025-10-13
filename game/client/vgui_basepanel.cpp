@@ -46,6 +46,7 @@ CBasePanel::CBasePanel( vgui::Panel *pParent, const char *panelName, int x, int 
 	m_bTiled = false;
 	m_nTextureSize[ 0 ] = 0;
 	m_nTextureSize[ 1 ] = 0;
+	m_bReflectMouse = false;
 }
 
 //-----------------------------------------------------------------------------

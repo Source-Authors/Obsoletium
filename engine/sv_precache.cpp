@@ -579,10 +579,10 @@ void CGameServer::DumpPrecacheStats( INetworkStringTable *table )
 		char const *name = table->GetString( i );
 		CPrecacheItem *slot = &items[ i ];
 		
-		int testLength;
+		intp testLength;
 		const CPrecacheUserData *p = ( const CPrecacheUserData * )table->GetStringUserData( i, &testLength );
 		ErrorIfNot( testLength == sizeof( *p ),
-			("CGameServer::DumpPrecacheStats: invalid CPrecacheUserData length (%d)", testLength)
+			("CGameServer::DumpPrecacheStats: invalid CPrecacheUserData length (%zd)", testLength)
 		);
 
 		if ( !name || !slot || !p )

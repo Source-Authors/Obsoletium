@@ -1333,7 +1333,7 @@ void CModelPresetGroupManager::LoadModelPresets( const char *pModelName, PresetG
 
 	CDisableUndoScopeGuard sg;
 
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( pPresetNameBuf, "GAME", &fh );
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( fh ) )
 	{

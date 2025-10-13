@@ -1,9 +1,12 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_IA32DETECT_H_
-#define TIER0_IA32DETECT_H_
+#ifndef SE_PUBLIC_TIER0_IA32DETECT_H_
+#define SE_PUBLIC_TIER0_IA32DETECT_H_
 
-#include "tier0/wchartypes.h"
+#include <string>
+
+#include "basetypes.h"
+#include "wchartypes.h"
 
 #ifdef _MSC_VER
 #include <intrin.h>
@@ -33,7 +36,7 @@ inline void cpuid(unsigned int regs[4], unsigned int function)
 
 
  */
-typedef	unsigned			bit;
+using bit = unsigned int;
 
 enum CPUVendor
 {
@@ -141,10 +144,10 @@ public:
 		memset(&misc, 0, sizeof(misc));
 		memset(&feature, 0, sizeof(feature));
 
-		cache = 0;
+		cache = nullptr;
 		uint32 m = init0();
 
-		uint32 *d = new uint32[m * 4];
+		auto *d = new uint32[m * 4];
 
 		for (uint32 i = 1; i <= m; i++)
 		{
@@ -181,7 +184,7 @@ public:
         }
 	}
 
-	tstring version_text () const
+	[[nodiscard]] tstring version_text () const
 	{
 		tchar b[128];
 
@@ -193,7 +196,7 @@ public:
 
 protected:
 
-	const tchar * type_text () const
+	[[nodiscard]] const tchar * type_text () const
 	{
 		static const tchar *text[] =
 		{
@@ -206,7 +209,7 @@ protected:
 		return text[version.Type];
 	}
 
-	tstring brand_text () const
+	[[nodiscard]] tstring brand_text () const
 	{
 		static const tchar *text[] =
 		{
@@ -238,7 +241,7 @@ private:
 	uint32 init0 ()
 	{
 		uint32 data[4 + 1];
-		tchar * s1 = (tchar *) &data[1];
+		auto * s1 = (tchar *) &data[1];
 		cpuid(data, 0);
 		data[4] = 0;
 		// Returns something like this:
@@ -275,8 +278,8 @@ private:
 		uint32 d[4];
 		bool c[256];
 
-		for (int ci1 = 0; ci1 < 256; ci1++)
-			c[ci1] = false;
+		for (bool & ci1 : c)
+			ci1 = false;
 
 		for (int i = 0; i < count; i++)
 		{
@@ -293,8 +296,8 @@ private:
 
 		int m = 0;
 
-		for (int ci2 = 0; ci2 < 256; ci2++)
-			if (c[ci2])
+		for (bool ci2 : c)
+			if (ci2)
 				m++;
 
 		cache = new byte[m];
@@ -320,7 +323,7 @@ private:
 
 		if ((m & 0x80000000) != 0)
 		{
-			uint32 *d = new uint32[(m - 0x80000000) * 4];
+			auto *d = new uint32[(m - 0x80000000) * 4];
 
 			for (uint32 i = 0x80000001; i <= m; i++)
 			{
@@ -338,4 +341,4 @@ private:
 	}
 };
 
-#endif  // TIER0_IA32DETECT_H_
+#endif  // !SE_PUBLIC_TIER0_IA32DETECT_H_

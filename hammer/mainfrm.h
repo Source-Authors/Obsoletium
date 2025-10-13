@@ -19,6 +19,10 @@
 #include "materialdlg.h"
 #include "ManifestDialog.h"
 
+#include "windows/base_status_bar.h"
+#include "windows/base_tool_bar.h"
+#include "windows/dpi_wnd_behavior.h"
+
 class CChildFrame;
 class CObjectProperties;
 class CTextureBrowser;
@@ -89,6 +93,8 @@ public:
 	CLightingPreviewResultsWindow *m_pLightingPreviewOutputWindow;
 	bool					m_bLightingPreviewOutputWindowShowing;
 
+	se::windows::ui::CDpiWindowBehavior m_dpiBehavior;
+
 	//CMapAnimationDlg m_AnimationDlg;
 
 	// Overrides
@@ -112,7 +118,7 @@ protected:
 	afx_msg void OnClose();
 	afx_msg void OnDestroy();
 	afx_msg void OnPaint();
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg void OnTimer(uintp nIDEvent);
 	afx_msg void OnToolsOptions();
 	afx_msg void OnViewShowconnections();
 	afx_msg void OnToolsPrefabfactory();
@@ -149,6 +155,7 @@ protected:
 	afx_msg BOOL OnChangeTool(UINT nID);
 	afx_msg void OnInitMenu( CMenu *pMenu );
 	afx_msg void OnHDR( void );
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
 	//}}AFX_MSG
 
 	DECLARE_MESSAGE_MAP()
@@ -172,11 +179,11 @@ private:
 
 	BOOL					m_bUndoActive;
 
-	CStatusBar				m_wndStatusBar;
-	CToolBar				m_wndMapToolBar;
-	CToolBar				m_wndUndoRedoToolBar;
-	CToolBar				m_wndMapEditToolBar;
-	CToolBar				m_wndMapOps;
+	CBaseStatusBar			m_wndStatusBar;
+	CBaseToolBar			m_wndMapToolBar;
+	CBaseToolBar			m_wndUndoRedoToolBar;
+	CBaseToolBar			m_wndMapEditToolBar;
+	CBaseToolBar			m_wndMapOps;
 
 	CSelectModeDlgBar		m_SelectModeDlg;
 
@@ -184,7 +191,6 @@ private:
 
 	bool					m_bMinimized;
 	bool					m_bShellSessionActive;		// Whether a client has initiated a remote shell editing session.
-	CBitmap					m_bmMapEditTools256;
 
 	enum
 	{

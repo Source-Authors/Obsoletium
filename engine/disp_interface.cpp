@@ -1400,7 +1400,7 @@ static void DispInfo_DrawDebugInformation( SurfaceHandle_t *pList, int listCount
 //-----------------------------------------------------------------------------
 // Renders all displacements in sorted order 
 //-----------------------------------------------------------------------------
-void DispInfo_RenderList( int nSortGroup, SurfaceHandle_t *pList, int listCount, bool bOrtho, unsigned long flags, ERenderDepthMode DepthMode )
+void DispInfo_RenderList( int nSortGroup, SurfaceHandle_t *pList, int listCount, bool bOrtho, unsigned flags, ERenderDepthMode DepthMode )
 {
 #ifndef SWDS
 	if( !r_DrawDisp.GetInt() || !listCount )

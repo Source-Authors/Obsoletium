@@ -179,7 +179,7 @@ bool CSlideshowDisplay::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		Assert( GetMoveParent() == NULL );
 		QAngle angles;
-		UTIL_StringToVector( angles.Base(), szValue );
+		UTIL_StringToVector( angles, szValue );
 
 		// Because the vgui screen basis is strange (z is front, y is up, x is right)
 		// we need to rotate the typical basis before applying it
@@ -451,7 +451,7 @@ void CSlideshowDisplay::RestoreControlPanels( void )
 
 void CSlideshowDisplay::BuildSlideShowImagesList( void )
 {
-	FileFindHandle_t matHandle;
+	FileFindHandle_t matHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	char szDirectory[_MAX_PATH];
 	char szMatFileName[_MAX_PATH] = {'\0'};
 

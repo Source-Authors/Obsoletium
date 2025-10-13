@@ -16,8 +16,8 @@ sampler cBTextureSampler	: register( s2 );
 
 struct PS_INPUT
 {
-	HALF2 baseTexCoord					: TEXCOORD0;
-	HALF4 worldPos_projPosZ				: TEXCOORD1;
+	float2 baseTexCoord					: TEXCOORD0;
+	float4 worldPos_projPosZ			: TEXCOORD1;
 	float4 fogFactorW					: COLOR1;
 };
 
@@ -68,14 +68,14 @@ float4 main( PS_INPUT i ) : COLOR
 	cB = tex2D( cBTextureSampler, i.baseTexCoord.xy );
 //	half a = tex2D( ATextureSampler, i.baseTexCoord.xy );
 	
-	HALF4 c;
+	float4 c;
 	c = float4( y, cR, cB, 1.0f );
 
 	float4 tor = float4( 1.164123535f,  1.595794678f,  0.0f,         -0.87065506f );
 	float4 tog = float4( 1.164123535f, -0.813476563f, -0.391448975f,  0.529705048f );
 	float4 tob = float4( 1.164123535f,  0.0f,          2.017822266f, -1.081668854f );
 
-	HALF4 rgba;
+	float4 rgba;
 	
 	rgba.r = dot( c, tor );
 	rgba.g = dot( c, tog );

@@ -66,7 +66,7 @@ void PrintSamples(Sample const *s, int nsamples, int ndims);
 
 [[nodiscard]] inline Sample *NthSample(Sample *s, int i, int nd)
 {
-	uint8 *r = (uint8 *) s;
+	auto *r = (uint8 *) s;
 	r += i * (sizeof(*s) + (nd - 1));
 	return (Sample *) r;
 }

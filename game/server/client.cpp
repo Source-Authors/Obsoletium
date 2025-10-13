@@ -135,9 +135,41 @@ char * CheckChatText( CBasePlayer *pPlayer, char *text )
 		p[length] = 0;
 	}
 
+	// dimhotepus: Prevent sending blank text and eating color codes.
+	V_StripTrailingWhitespace( p );
+
+	// dimhotepus: Start enchancements from TF2:
+
+	// Josh:
+	// Cheaters can send us whatever data they want through this channel
+	// Let's validate they aren't trying to clear the chat.
+	// If we detect any of these blacklisted characters (which players cannot type anyway.)
+	// Let's just end the string here.
+	static const char s_blacklist[] = {
+	//	CLRF   LF    ESC
+		'\r',  '\n', '\x1b'
+	};
+	intp oldLength = length;
+	for (intp i = 0; i < length && oldLength == length; i++) {
+		for (char black : s_blacklist) {
+			if (p[i] == black) {
+				p[i] = '\0';
+				length = i;
+			}
+		}
+	}
+
+	// Josh:
+	// If the whole string was garbage characters
+	// Let's just not print anything.
+	if ( !*p )
+		return NULL;
+
+	// dimhotepus: End enchancements from TF2:
+
 	// cut off after 127 chars
 	if ( length > 127 )
-		text[127] = 0;
+		text[127] = '\0';
 
 	GameRules()->CheckChatText( pPlayer, p );
 
@@ -177,7 +209,6 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 			// say with a blank message, nothing to do
 			return;
 		}
-		p = szTemp;
 	}
 	else  // Raw text, need to prepend argv[0]
 	{
@@ -190,8 +221,9 @@ void Host_Say( edict_t *pEdict, const CCommand &args, bool teamonly )
 			// Just a one word command, use the first word...sigh
 			V_sprintf_safe( szTemp, "%s", pcmd );
 		}
-		p = szTemp;
 	}
+
+	p = szTemp;
 
 	CBasePlayer *pPlayer = NULL;
 	if ( pEdict )

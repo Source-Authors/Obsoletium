@@ -14,12 +14,12 @@
 #include "tier0/memdbgon.h"
 
 
-PME* PME::_singleton = 0;
+PME* PME::_singleton = nullptr;
 
 // Single interface.
 PME* PME::Instance()
 {
-   if (_singleton == 0)
+   if (_singleton == nullptr)
    {
       _singleton = new PME;
    }      
@@ -29,7 +29,7 @@ PME* PME::Instance()
 //---------------------------------------------------------------------------
 // Open the device driver and detect the processor
 //---------------------------------------------------------------------------
-HRESULT PME::Init( void )
+HRESULT PME::Init( )
 {
     if ( bDriverOpen )
         return E_DRIVER_ALREADY_OPEN;
@@ -44,13 +44,13 @@ HRESULT PME::Init( void )
     }
 
     hFile = CreateFile(						// WINDOWS NT
-            "\\\\.\\GDPERF",
+            R"(\\.\GDPERF)",
             GENERIC_READ,
             0,
-            NULL,
+            nullptr,
             OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
-            NULL);
+            nullptr);
 
     if (hFile == INVALID_HANDLE_VALUE )
         return E_CANT_OPEN_DRIVER;
@@ -87,7 +87,7 @@ HRESULT PME::Init( void )
 //---------------------------------------------------------------------------
 // Close the device driver
 //---------------------------------------------------------------------------
-HRESULT PME::Close(void)
+HRESULT PME::Close()
 {
 	if (bDriverOpen == false)				// driver is not going
 		return E_DRIVER_NOT_OPEN;
@@ -98,7 +98,7 @@ HRESULT PME::Close(void)
 	{
         BOOL result = CloseHandle(hFile);
 
-        hFile = NULL;
+        hFile = nullptr;
 		return result ? S_OK : HRESULT_FROM_WIN32( GetLastError() );
 	}  
     else
@@ -227,7 +227,7 @@ HRESULT PME::ReadMSR(uint32 dw_reg, int64 * pi64_value)
 		pi64_value,					// Output Buffer from driver.
 		sizeof(int64),			// Length of output buffer in bytes.
 		&dw_ret_len,				// Bytes placed in output buffer.
-		NULL						// NULL means wait till op. completes
+		nullptr						// NULL means wait till op. completes
 	);
 
 	HRESULT hr = result ? S_OK : HRESULT_FROM_WIN32( GetLastError() );
@@ -253,7 +253,7 @@ HRESULT PME::ReadMSR(uint32 dw_reg, uint64 * pi64_value)
 		pi64_value,					// Output Buffer from driver.
 		sizeof(uint64),			    // Length of output buffer in bytes.
 		&dw_ret_len,				// Bytes placed in output buffer.
-		NULL						// NULL means wait till op. completes
+		nullptr						// NULL means wait till op. completes
 	);
 
 	HRESULT hr = result ? S_OK : HRESULT_FROM_WIN32( GetLastError() );
@@ -283,10 +283,10 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const int64 & i64_value)
 		(DWORD) IOCTL_WRITE_MSR,	// IO Control code for Read
 		dw_buffer,					// Input Buffer to driver.
 		12,							// Length of Input buffer
-		NULL,						// Buffer from driver, None for WRMSR
+		nullptr,						// Buffer from driver, None for WRMSR
 		0,							// Length of output buffer in bytes.
 		&dw_ret_len,			// Bytes placed in DataBuffer.
-		NULL					  	// NULL means wait till op. completes.
+		nullptr					  	// NULL means wait till op. completes.
 	);
 
 	HRESULT hr = result ? S_OK : HRESULT_FROM_WIN32( GetLastError() );
@@ -315,10 +315,10 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const uint64 & i64_value)
 		(DWORD) IOCTL_WRITE_MSR,	// IO Control code for Read
 		dw_buffer,					// Input Buffer to driver.
 		12,							// Length of Input buffer
-		NULL,						// Buffer from driver, None for WRMSR
+		nullptr,						// Buffer from driver, None for WRMSR
 		0,							// Length of output buffer in bytes.
 		&dw_ret_len,			// Bytes placed in DataBuffer.
-		NULL					  	// NULL means wait till op. completes.
+		nullptr					  	// NULL means wait till op. completes.
 	);
 
     //E_POINTER
@@ -352,15 +352,15 @@ HRESULT PME::WriteMSR(uint32 dw_reg, const uint64 & i64_value)
 
 extern int64 QueryCurrentCpuFrequency();
 
-double PME::GetCPUClockSpeedFast(void)
+double PME::GetCPUClockSpeedFast()
 {
-	return QueryCurrentCpuFrequency();
+	return static_cast<double>( QueryCurrentCpuFrequency() );
 }
 
 
 
 // takes 1 second
-double PME::GetCPUClockSpeedSlow(void)
+double PME::GetCPUClockSpeedSlow()
 {
 
     if (m_CPUClockSpeed != 0)

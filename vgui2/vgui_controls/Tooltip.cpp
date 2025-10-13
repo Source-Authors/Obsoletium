@@ -122,6 +122,11 @@ bool BaseTooltip::ShouldLayout( void )
 	if ( !_isDirty )
 		return false;
 
+	// dimhotepus: TF2 backport.
+	Panel* pMouseOverPanel = ipanel()->GetPanel( input()->GetMouseOver(), GetControlsModuleName() );
+	if ( pMouseOverPanel && pMouseOverPanel->GetTooltip() != this )
+		return false;
+
 	return true;
 }
 
@@ -324,6 +329,15 @@ void TextTooltip::ShowTooltip(Panel *currentPanel)
 		_isDirty = _isDirty || ( pCurrentParent != currentPanel );
 		s_TooltipWindow->SetText( m_Text.Base() );
 		s_TooltipWindow->SetParent(currentPanel);
+		
+		// dimhotepus: TF2 backport.
+		// Apply proportional scaling to the tooltip if the parent has scaling enabled.
+		//	This requires us to re-apply the font to see the changes.
+		if ( IScheme* pScheme = scheme()->GetIScheme( s_TooltipWindow->GetScheme() ) )
+		{
+			s_TooltipWindow->SetProportional( currentPanel && currentPanel->IsProportional() );
+			s_TooltipWindow->SetFont( pScheme->GetFont( "DefaultSmall", s_TooltipWindow->IsProportional() ) );
+		}
 	}
 	BaseTooltip::ShowTooltip( currentPanel );
 }

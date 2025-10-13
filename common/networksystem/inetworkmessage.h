@@ -48,19 +48,19 @@ public:
 	virtual	bool	ReadFromBuffer( bf_read &buffer ) = 0; // returns true if parsing was OK
 	virtual	bool	WriteToBuffer( bf_write &buffer ) = 0;	// returns true if writing was OK
 		
-	virtual bool	IsReliable( void ) const = 0;  // true, if message needs reliable handling
+	[[nodiscard]] virtual bool	IsReliable() const = 0;  // true, if message needs reliable handling
 	
-	virtual int				GetGroup( void ) const = 0;	// returns net message group of this message
-	virtual int				GetType( void ) const = 0;	// returns module specific header tag eg svc_serverinfo
-	virtual const char		*GetGroupName( void ) const = 0;	// returns network message group name
-	virtual const char		*GetName( void ) const = 0;	// returns network message name, eg "svc_serverinfo"
-	virtual INetChannel		*GetNetChannel( void ) const = 0;
-	virtual const char		*ToString( void ) const = 0; // returns a human readable string about message content
+	[[nodiscard]] virtual int				GetGroup() const = 0;	// returns net message group of this message
+	[[nodiscard]] virtual int				GetType() const = 0;	// returns module specific header tag eg svc_serverinfo
+	[[nodiscard]] virtual const char		*GetGroupName() const = 0;	// returns network message group name
+	[[nodiscard]] virtual const char		*GetName() const = 0;	// returns network message name, eg "svc_serverinfo"
+	[[nodiscard]] virtual INetChannel		*GetNetChannel() const = 0;
+	[[nodiscard]] virtual const char		*ToString() const = 0; // returns a human readable string about message content
 
 	virtual void Release() = 0;
 
 protected:
-	virtual	~INetworkMessage() {};
+	virtual	~INetworkMessage() = default;
 };
 
 
@@ -87,27 +87,27 @@ public:
 	CNetworkMessage() 
 	{	
 		m_bReliable = true;
-		m_pNetChannel = NULL; 
+		m_pNetChannel = nullptr; 
 	}
 
-	virtual void Release()
+	void Release() override
 	{
 		delete this;
 	}
 
-	virtual ~CNetworkMessage() {};
+	~CNetworkMessage() override = default;
 
-	virtual void SetReliable( bool state ) 
+	void SetReliable( bool state ) override 
 	{ 
 		m_bReliable = state;
 	}
 
-	virtual bool IsReliable() const 
+	[[nodiscard]] bool IsReliable() const override 
 	{ 
 		return m_bReliable;
 	}
 
-	virtual void SetNetChannel(INetChannel * netchan)
+	void SetNetChannel(INetChannel * netchan) override
 	{ 
 		m_pNetChannel = netchan; 
 	}
@@ -119,7 +119,7 @@ public:
 		return false; 
 	}	
 
-	INetChannel	*GetNetChannel() const
+	[[nodiscard]] INetChannel	*GetNetChannel() const override
 	{ 
 		return m_pNetChannel; 
 	}

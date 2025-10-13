@@ -395,17 +395,25 @@ enum
 	MATERIAL_ADAPTER_NAME_LENGTH = 512
 };
 
+// dimhotepus: Make enum and move to imaterialsystem.
+// Vendor IDs sometimes needed for vendor-specific code
+enum VendorId : unsigned {
+	VENDORID_ATI = 0x1002,
+	VENDORID_NVIDIA = 0x10DE,
+	VENDORID_INTEL = 0x8086
+};
+
 struct MaterialAdapterInfo_t
 {
 	char m_pDriverName[MATERIAL_ADAPTER_NAME_LENGTH];
-	unsigned int m_VendorID;
-	unsigned int m_DeviceID;
-	unsigned int m_SubSysID;
-	unsigned int m_Revision;
+	VendorId m_VendorID;
+	unsigned m_DeviceID;
+	unsigned m_SubSysID;
+	unsigned m_Revision;
 	int m_nDXSupportLevel;			// This is the *preferred* dx support level
 	int m_nMaxDXSupportLevel;
-	unsigned int m_nDriverVersionHigh;
-	unsigned int m_nDriverVersionLow;
+	unsigned m_nDriverVersionHigh;
+	unsigned m_nDriverVersionLow;
 };
 
 
@@ -988,24 +996,6 @@ public:
 	virtual void				ClearBuffers( bool bClearColor, bool bClearDepth, bool bClearStencil = false ) = 0;
 
 	// -----------------------------------------------------------
-	// X360 specifics
-	// -----------------------------------------------------------
-
-#if defined( _X360 )
-	virtual void				ListUsedMaterials( void ) = 0;
-	virtual HXUIFONT			OpenTrueTypeFont( const char *pFontname, int tall, int style ) = 0;
-	virtual void				CloseTrueTypeFont( HXUIFONT hFont ) = 0;
-	virtual bool				GetTrueTypeFontMetrics( HXUIFONT hFont, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] ) = 0;
-	// Render a sequence of characters and extract the data into a buffer
-	// For each character, provide the width+height of the font texture subrect,
-	// an offset to apply when rendering the glyph, and an offset into a buffer to receive the RGBA data
-	virtual bool				GetTrueTypeGlyphs( HXUIFONT hFont, int numChars, wchar_t *pWch, int *pOffsetX, int *pOffsetY, int *pWidth, int *pHeight, unsigned char *pRGBA, int *pRGBAOffset ) = 0;
-	virtual void				PersistDisplay() = 0;
-	virtual void				*GetD3DDevice() = 0;
-	virtual bool				OwnGPUResources( bool bEnable ) = 0;
-#endif
-
-	// -----------------------------------------------------------
 	// Access the render contexts
 	// -----------------------------------------------------------
 	virtual IMatRenderContext *	GetRenderContext() = 0;
@@ -1500,7 +1490,7 @@ public:
 
 	virtual void				PushDeformation( DeformationBase_t const *Deformation ) = 0;
 	virtual void				PopDeformation( ) = 0;
-	virtual int					GetNumActiveDeformations() const = 0;
+	virtual intp				GetNumActiveDeformations() const = 0;
 
 	virtual bool				GetMorphAccumulatorTexCoord( Vector2D *pTexCoord, IMorph *pMorph, int nVertex ) = 0;
 
@@ -1571,6 +1561,9 @@ public:
 	// The texture will be created using the destination format, and will optionally have mipmaps generated.
 	// In case of error, the provided callback function will be called with the error texture.
 	virtual void AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) = 0;
+	
+	virtual void FogRadial( bool bRadial ) = 0;
+	virtual bool GetFogRadial() = 0;
 };
 
 template< class E > inline E* IMatRenderContext::LockRenderDataTyped( intp nCount, const E* pSrcData )

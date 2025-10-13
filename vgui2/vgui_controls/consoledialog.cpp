@@ -130,6 +130,12 @@ CHistoryItem::CHistoryItem( const CHistoryItem& src )
 	SetText( src.GetText(), src.GetExtra() );
 }
 
+CHistoryItem& CHistoryItem::operator=(const CHistoryItem& src)
+{
+	SetText( src.GetText(), src.GetExtra() );
+	return *this;
+}
+
 CHistoryItem::~CHistoryItem( void )
 {
 	delete[] m_text;

@@ -3,7 +3,7 @@
 #include ".\\HFXConfig.h"
  
 class IHapticEffect; 
-typedef IHapticEffect IHFXEffect; 
+using IHFXEffect = IHapticEffect; 
 #ifdef HFX_64BIT
 #define HFX_NULL_HANDLE ((IHFXEffect*)(unsigned long)0x000000000000001) 
 #else
@@ -11,8 +11,8 @@ typedef IHapticEffect IHFXEffect;
 #endif
 static IHFXEffect *hfxNoHandle=HFX_NULL_HANDLE; 
  
-typedef unsigned __int32 HFXParamID; 
-typedef unsigned __int32 HFXEffectID; 
+using HFXParamID = unsigned int; 
+using HFXEffectID = unsigned int; 
  
 // if a invalid char is added it will show up as '`'
 // if a '?' it will be the same as a '_'
@@ -141,7 +141,7 @@ enum HFXParamType
 	HFXPARAM_BOOL_ARRAY		= 'B', 
 }; 
  
-typedef unsigned char HFXPARAM; 
+using HFXPARAM = unsigned char; 
  
 enum HFXArray
 {
@@ -149,8 +149,8 @@ enum HFXArray
 	HFXARRAY_COPY=1,//
 	HFXARRAY_INDEX=2, 
 }; 
-typedef unsigned char HFXARRAY; 
-typedef void *HFXVarValue; 
+using HFXARRAY = unsigned char; 
+using HFXVarValue = void *; 
 struct HFX_PURE_INTERFACE IHapticEffectParamGroup
 {
  
@@ -422,7 +422,7 @@ struct HFX_PURE_INTERFACE IHapticEffectParamGroup
  
 	HFX_INLINE bool SetVarDoubleArrayByFloatArray(const HFXParamID name, unsigned int size, const float *value, bool allowMake=false) 
 	{
-		double *__d_ = new double[size]; 
+		auto *__d_ = new double[size]; 
 		for(unsigned int i=0;i!=size;i++) 
 			__d_[i]=(double)value[i]; 
 		bool retval; 
@@ -489,7 +489,7 @@ struct HFX_PURE_INTERFACE IHapticEffectParamGroup
  
 	HFX_INLINE bool GetVarDoubleArrayByFloatArray(const HFXParamID name, unsigned int size, float *&value) const
 	{
-		double *__d_ = new double[size]; 
+		auto *__d_ = new double[size]; 
 		for(unsigned int i=0;i!=size;i++) 
 			__d_[i]=(double)value[i]; 
 		bool retval; 
@@ -530,37 +530,37 @@ struct HFX_PURE_INTERFACE IHapticEffectParamGroup
 	virtual bool GetVar(HFXParamID id, const char *value, HFXParamType t,
 		HFXARRAY gettype=HFXARRAY_NOTARRAY, unsigned int indexORcount=0 )const = 0;
 */
-	virtual class IStack *GetDefaultStack() const=0; 
+	[[nodiscard]] virtual class IStack *GetDefaultStack() const=0; 
 	virtual void SetDefaultStack(class IStack *stack)=0; 
  
 	virtual bool Copy(IHapticEffectParamGroup *&group) const=0; 
  
-	virtual HFXEffectID StandardEffectID() const=0; 
+	[[nodiscard]] virtual HFXEffectID StandardEffectID() const=0; 
 	virtual void ChangeStandardEffectID(const HFXEffectID type)=0; 
 	// creation
-	virtual bool CreateStandardEffect( IHFXEffect *&pHandle, class IStack *createOnStack=0,  const char *customName=0 )=0; 
+	virtual bool CreateStandardEffect( IHFXEffect *&pHandle, class IStack *createOnStack=nullptr,  const char *customName=nullptr )=0; 
 	HFX_INLINE bool CreateStandardEffect( IStack *createOnStack ) 
 	{
-		return CreateStandardEffect(hfxNoHandle, createOnStack, 0); 
+		return CreateStandardEffect(hfxNoHandle, createOnStack, nullptr); 
 	}
 	template<typename T> 
-	HFX_INLINE bool CreateStandardEffect( T *&pHandle, class IStack *createOnStack=0, const char *customName=0) 
+	HFX_INLINE bool CreateStandardEffect( T *&pHandle, class IStack *createOnStack=nullptr, const char *customName=nullptr) 
 	{
 		return CreateStandardEffect((IHFXEffect *&)pHandle, createOnStack, customName); 
 	}
-	HFX_INLINE HFXParamType GetVarTypeByName(const char *param, unsigned int *arraysize=0) const{ return GetVarType(HFX_PARAM_ENCODE_STRING(param), arraysize); }
-	virtual HFXParamType GetVarType(const HFXParamID param, unsigned int *arraysize=0) const=0; 
+	HFX_INLINE HFXParamType GetVarTypeByName(const char *param, unsigned int *arraysize=nullptr) const{ return GetVarType(HFX_PARAM_ENCODE_STRING(param), arraysize); }
+	virtual HFXParamType GetVarType(const HFXParamID param, unsigned int *arraysize=nullptr) const=0; 
  
 }; 
-typedef IHapticEffectParamGroup IHFXParamGroup; 
+using IHFXParamGroup = IHapticEffectParamGroup; 
  
 #define HFX_PARAMETER_INIT(classname, type, name, defaultvalue) \
 	const char * const classname::ID_##type##name##_String = #name; \
 	const HFXParamID classname::ID_##type##name = HFX_PARAM_ENCODE_STRING(classname::ID_##type##name##_String); \
 	const type classname::ID_##type##name##_Default = defaultvalue;  
  
-typedef void (*HFXPGCreate_t)(IHFXParamGroup*&ptr); 
-typedef void (*HFXPGDestroy_t)(IHFXParamGroup*&ptr); 
+using HFXPGCreate_t = void (*)(IHFXParamGroup *&); 
+using HFXPGDestroy_t = void (*)(IHFXParamGroup *&); 
  
 template<typename T> 
 void HFXDefaultAllocateParameterGroup(IHFXParamGroup *&ptr){ptr = new T;}; 

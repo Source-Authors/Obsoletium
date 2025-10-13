@@ -44,7 +44,8 @@ protected:
 private:
 	void UpdateMapCycleValue();
 
-	float m_flUpdateTime;
+	// dimhotepus: float -> double.
+	double m_flUpdateTime;
 	int m_iPlayerCount, m_iMaxPlayers;
 	// dimhotepus: float -> double
 	double m_flLastUptimeReceiveTime;

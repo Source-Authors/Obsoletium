@@ -7,7 +7,6 @@
 
 #ifndef _LZSS_H
 #define _LZSS_H
-#pragma once
 
 #include "tier0/platform.h"
 

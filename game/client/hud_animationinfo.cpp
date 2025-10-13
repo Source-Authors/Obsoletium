@@ -75,7 +75,8 @@ CHudAnimationInfo::CHudAnimationInfo( const char *pElementName )
 
 	SetActive( true );
 
-	m_pWatch = NULL;
+	m_LabelFont = m_ItemFont = INVALID_FONT;
+	m_pWatch = nullptr;
 
 	// Make sure we render on top of other hud elements since we are debugging info for them.
 	SetZPos( 100 );

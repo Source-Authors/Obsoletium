@@ -72,19 +72,9 @@ int g_nBitmapGenerationCounter = 1;
 //			pHit2 - Second hit to compare.
 // Output : Sorts by increasing depth value. Returns -1, 0, or 1 per qsort spec.
 //-----------------------------------------------------------------------------
-static int _CompareHits(const void *pHit1, const void *pHit2)
+static int _CompareHits(const HitInfo_t &pHit1, const HitInfo_t &pHit2)
 {
-	if (((HitInfo_t *)pHit1)->nDepth < ((HitInfo_t *)pHit2)->nDepth)
-	{
-		return(-1);
-	}
-
-	if (((HitInfo_t *)pHit1)->nDepth > ((HitInfo_t *)pHit2)->nDepth)
-	{
-		return(1);
-	}
-
-	return(0);
+	return pHit1.nDepth < pHit2.nDepth;
 }
 
 
@@ -96,19 +86,9 @@ static int _CompareHits(const void *pHit1, const void *pHit2)
 //			pHit2 - Second hit to compare.
 // Output : Sorts by decreasing depth value. Returns -1, 0, or 1 per qsort spec.
 //-----------------------------------------------------------------------------
-static int _CompareHitsReverse(const void *pHit1, const void *pHit2)
+static int _CompareHitsReverse(const HitInfo_t &pHit1, const HitInfo_t &pHit2)
 {
-	if (((HitInfo_t *)pHit1)->nDepth > ((HitInfo_t *)pHit2)->nDepth)
-	{
-		return(-1);
-	}
-
-	if (((HitInfo_t *)pHit1)->nDepth < ((HitInfo_t *)pHit2)->nDepth)
-	{
-		return(1);
-	}
-
-	return(0);
+	return pHit1.nDepth > pHit2.nDepth;
 }
 
 static bool TranslucentObjectsLessFunc( TranslucentObjects_t const&a, TranslucentObjects_t const&b )
@@ -132,7 +112,7 @@ static bool GetRequiredMaterial( const char *pName, IMaterial* &pMaterial )
 	{
 		char str[512];
 		V_sprintf_safe( str, "Missing material '%s'. Go to Tools | Options | Game Configurations and verify that your game directory is correct.", pName );
-		MessageBox( NULL, str, "Hammer - Fatal Error", MB_OK | MB_ICONERROR );
+		MessageBox( NULL, str, "Hammer - Missed Material Error", MB_OK | MB_ICONERROR );
 		return false;
 	}
 }
@@ -453,7 +433,7 @@ bool CRender3D::SetView( CMapView *pView )
 	if ((m_WinData.hDC = GetDCEx(m_WinData.hWnd, NULL, DCX_CACHE | DCX_CLIPSIBLINGS)) == NULL)
 	{
 		ChangeDisplaySettings(NULL, 0);
-		MessageBox(NULL, "GetDC on main window failed", "Hammer - Fatal Error", MB_OK | MB_ICONERROR);
+		MessageBox(NULL, "GetDC on main window failed.", "Hammer - Graphics Context Acquire Error", MB_OK | MB_ICONERROR);
 		return(false);
 	}
 
@@ -660,12 +640,12 @@ void CRender3D::StartRenderFrame(void)
 	//
 	// Determine the elapsed time since the last frame was rendered.
 	//
-	DWORD dwTimeNow = timeGetTime();
+	ULONGLONG dwTimeNow = GetTickCount64();
 	if (m_dwTimeLastFrame == 0)
 	{
 		m_dwTimeLastFrame = dwTimeNow;
 	}
-	DWORD dwTimeElapsed = dwTimeNow - m_dwTimeLastFrame;
+	ULONGLONG dwTimeElapsed = dwTimeNow - m_dwTimeLastFrame;
 	m_fTimeElapsed = (float)dwTimeElapsed / 1000.0;
 	m_dwTimeLastFrame = dwTimeNow;
 
@@ -1168,14 +1148,8 @@ void CRender3D::EndRenderFrame(void)
 		//
 		if (m_Pick.nNumHits > 1)
 		{
-			if (!m_RenderState.bReverseSelection)
-			{
-				qsort(m_Pick.Hits, m_Pick.nNumHits, sizeof(m_Pick.Hits[0]), _CompareHits);
-			}
-			else
-			{
-				qsort(m_Pick.Hits, m_Pick.nNumHits, sizeof(m_Pick.Hits[0]), _CompareHitsReverse);
-			}
+			std::sort(m_Pick.Hits, m_Pick.Hits + m_Pick.nNumHits,
+				!m_RenderState.bReverseSelection ? _CompareHits : _CompareHitsReverse);
 		}
 
 		//
@@ -1233,10 +1207,11 @@ void CRender3D::EndRenderFrame(void)
 			if (m_pView->m_bUpdateView && (m_eCurrentRenderMode == RENDER_MODE_LIGHT_PREVIEW_RAYTRACED))
 			{
 
-				static bool did_dump=false;
-				static float Last_SendTime=0;
+				// dimhotepus: Disable dumping of images to files for performance.
+				static bool did_dump=true;
+				static double Last_SendTime=0;
 				// now, lets create floatbms with the deferred rendering data, so we can pass it to the lpreview thread
-				float newtime=Plat_FloatTime();
+				double newtime=Plat_FloatTime();
 				if (( n_gbufs_queued < 1 ) && ( newtime-Last_SendTime > 1.0) )
 				{
 					SendShadowTriangles();
@@ -1252,23 +1227,28 @@ void CRender3D::EndRenderFrame(void)
 						m_nLastLPreviewHeight = height;
 						m_nLastLPreviewWidth = width;
 
-
 						g_nBitmapGenerationCounter++;
 
 						Last_SendTime = newtime;
 
 						delete g_pLPreviewOutputBitmap;
 						g_pLPreviewOutputBitmap = NULL;
-						static char const *rts_to_transmit[]={"_rt_albedo","_rt_normal","_rt_position",
+
+						constexpr char const *rts_to_transmit[]={"_rt_albedo","_rt_normal","_rt_position",
 															  "_rt_flags" };
+
 						MessageToLPreview Msg(LPREVIEW_MSG_G_BUFFERS);
-						for(int i=0; i < NELEMS( rts_to_transmit ); i++)
+						static_assert(std::size(rts_to_transmit) == std::size(Msg.m_pDefferedRenderingBMs));
+						for(size_t i=0; i < std::size( rts_to_transmit ); i++)
 						{
 							SetRenderTargetNamed(0,rts_to_transmit[i]);
-							FloatBitMap_t *fbm = new FloatBitMap_t( nTargetWidth, nTargetHeight );
+
+							auto *fbm = new FloatBitMap_t( nTargetWidth, nTargetHeight );
 							Msg.m_pDefferedRenderingBMs[i]=fbm;
-							pRenderContext->ReadPixels(0, 0, nTargetWidth, nTargetHeight, (uint8 *) &(fbm->Pixel(0,0,0)),
-												  IMAGE_FORMAT_RGBA32323232F);
+
+							pRenderContext->ReadPixels(0, 0, nTargetWidth, nTargetHeight,
+								(uint8 *) &(fbm->Pixel(0,0,0)), IMAGE_FORMAT_RGBA32323232F);
+
 							if ( (i==0) && (! did_dump) )
 							{
 								fbm->WriteTGAFile("albedo.tga");
@@ -1320,18 +1300,11 @@ void CRender3D::EndRenderFrame(void)
 				Vector eye_pnt;
 				pCamera->GetViewPoint(eye_pnt);
 				// now, add lights in priority order
-				for( int i = 0; i < lightList.Count(); i++ )
+				for( auto &l : lightList )
 				{
-					LightDesc_t *pLight = &lightList[i];
-					if (
-						( pLight->m_Type == MATERIAL_LIGHT_SPOT ) ||
-						( pLight->m_Type == MATERIAL_LIGHT_POINT ) )
+					if ( l.m_Type == MATERIAL_LIGHT_SPOT || l.m_Type == MATERIAL_LIGHT_POINT )
 					{
-						Vector lpnt;
-						CLightPreview_Light tmplight;
-						tmplight.m_Light = *pLight;
-						tmplight.m_flDistanceToEye = pLight->m_Position.DistTo( eye_pnt );
-						light_queue.Insert(tmplight);
+						light_queue.Insert(CLightPreview_Light{l, l.m_Position.DistTo( eye_pnt )});
 					}
 				}
 				if ( light_queue.Count() == 0 )
@@ -1341,10 +1314,10 @@ void CRender3D::EndRenderFrame(void)
 					tmplight.m_Light.m_Type = MATERIAL_LIGHT_POINT;
 					tmplight.m_Light.m_Color = Vector( 10, 10, 10 );
 					tmplight.m_Light.m_Position = Vector( 0, 0, 30000 );
-					tmplight.m_Light.m_Range = 1.0e20;
-					tmplight.m_Light.m_Attenuation0 = 1.0;
-					tmplight.m_Light.m_Attenuation1 = 0.0;
-					tmplight.m_Light.m_Attenuation2 = 0.0;
+					tmplight.m_Light.m_Range = 1.0e20f;
+					tmplight.m_Light.m_Attenuation0 = 1.0f;
+					tmplight.m_Light.m_Attenuation1 = 0.0f;
+					tmplight.m_Light.m_Attenuation2 = 0.0f;
 					tmplight.m_flDistanceToEye = 1;
 					light_queue.Insert(tmplight);
 				}
@@ -1375,8 +1348,8 @@ void CRender3D::EndRenderFrame(void)
 				pRenderContext->SetRenderTarget(dest_rt_other);
 				pRenderContext->ClearColor3ub(0,0,0);
 				pRenderContext->ClearBuffers( true, true );
-				int nlights=min(MAX_PREVIEW_LIGHTS,light_queue.Count());
-				for(int i=0;i<nlights;i++)
+				intp nlights=min((intp)MAX_PREVIEW_LIGHTS,light_queue.Count());
+				for(intp i=0;i<nlights;i++)
 				{
 					IMaterial *src_mat=add_0_to_1;
 					LightDesc_t light = light_queue.ElementAtHead().m_Light;
@@ -1396,8 +1369,8 @@ void CRender3D::EndRenderFrame(void)
 					if ( light.m_Type == MATERIAL_LIGHT_POINT )
 					{
 						// model point as a spot with infinite inner radius
-						SetNamedMaterialVar(src_mat, "$C0_W", 0.5 );
-						SetNamedMaterialVar(src_mat, "$C1_W", 1.0e10 );
+						SetNamedMaterialVar(src_mat, "$C0_W", 0.5f );
+						SetNamedMaterialVar(src_mat, "$C1_W", 1.0e10f );
 					}
 					else
 					{
@@ -1478,8 +1451,8 @@ void CRender3D::EndRenderFrame(void)
 			//
 			if (m_dwTimeLastSample != 0)
 			{
-				DWORD dwTimeNow = timeGetTime();
-				DWORD dwTimeElapsed = dwTimeNow - m_dwTimeLastSample;
+				ULONGLONG dwTimeNow = GetTickCount64();
+				ULONGLONG dwTimeElapsed = dwTimeNow - m_dwTimeLastSample;
 				if ((dwTimeElapsed > 1000) && (m_nFramesThisSample > 0))
 				{
 					float fTimeElapsed = (float)dwTimeElapsed / 1000.0;
@@ -1490,7 +1463,7 @@ void CRender3D::EndRenderFrame(void)
 			}
 			else
 			{
-				m_dwTimeLastSample = timeGetTime();
+				m_dwTimeLastSample = GetTickCount64();
 			}
 		
 			m_nFramesThisSample++;
@@ -1502,7 +1475,13 @@ void CRender3D::EndRenderFrame(void)
 			Vector ViewPoint;
 			GetCamera()->GetViewPoint(ViewPoint);
 			int nLen = V_sprintf_safe(szText, "FPS %3.2f @ Pos [%.2f %.2f %.2f]", m_fFrameRate, ViewPoint[0], ViewPoint[1], ViewPoint[2]);
-			TextOut(m_WinData.hDC, 2, 18, szText, nLen);
+			
+			unsigned dpi = GetDpiForWindow(m_WinData.hWnd);
+			TextOut(m_WinData.hDC,
+				se::windows::ui::CDpiWindowBehavior::ScaleByDpi( USER_DEFAULT_SCREEN_DPI, 2, dpi ),
+				se::windows::ui::CDpiWindowBehavior::ScaleByDpi( USER_DEFAULT_SCREEN_DPI, 18, dpi ),
+				szText,
+				nLen);
 		}
 	}
 }
@@ -1909,9 +1888,12 @@ void CRender3D::RenderBox(const Vector &Mins, const Vector &Maxs,
 			//
 			// If we are rendering using one of the lit modes, calculate lighting.
 			// 
-			unsigned char color[3];
+			// dimhotepus: 3 -> 4 to prevent out-of-buffer read.
+			unsigned char color[4];
+			// dimhotepus: Alpha is required.
+			color[3] = 0;
 
-			assert( (eRenderModeThisPass != RENDER_MODE_TEXTURED) &&
+			Assert( (eRenderModeThisPass != RENDER_MODE_TEXTURED) &&
 					(eRenderModeThisPass != RENDER_MODE_TEXTURED_SHADED) && 
 					(eRenderModeThisPass != RENDER_MODE_LIGHT_PREVIEW2) && 
 					(eRenderModeThisPass != RENDER_MODE_LIGHT_PREVIEW_RAYTRACED) && 
@@ -2008,8 +1990,11 @@ void CRender3D::RenderCone( Vector const &vBasePt, Vector const &vTipPt, float f
 	//
 	for( int i = 0; i < nSlices; i++ )
 	{
-		pPts[i].x = fRadius * cos( ( sliceAngle * -i ) );
-		pPts[i].y = fRadius * sin( ( sliceAngle * -i ) );
+		float sin, cos;
+		DirectX::XMScalarSinCos(&sin, &cos, sliceAngle * -i);
+
+		pPts[i].x = fRadius * cos;
+		pPts[i].y = fRadius * sin;
 		pPts[i].z = 0.0f;
 	}
 
@@ -2082,7 +2067,7 @@ void CRender3D::RenderCone( Vector const &vBasePt, Vector const &vTipPt, float f
 	// set to a flat shaded render mode
 	PushRenderMode( RENDER_MODE_FLAT );
 
-	for ( int i = 0; i < m_Faces.Count(); i++ )
+	for ( intp i = 0; i < m_Faces.Count(); i++ )
 	{
 		CMapFace *pFace = m_Faces.Element( i );
 		if( !pFace )
@@ -2145,10 +2130,18 @@ void CRender3D::RenderSphere(Vector const &vCenter, float flRadius, int nTheta, 
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
 
+			DirectX::XMVECTOR angles = DirectX::XMVectorSet( theta, phi, 0, 0 );
+
+			DirectX::XMVECTOR sin, cos;
+			DirectX::XMVectorSinCos( &sin, &cos, angles );
+
+			float sinTheta = DirectX::XMVectorGetX( sin ), cosTheta = DirectX::XMVectorGetX( cos );
+			float sinPhi = DirectX::XMVectorGetY( sin ), cosPhi = DirectX::XMVectorGetY( cos );
+
 			Vector vecPos;
-			vecPos.x = flRadius * sin(phi) * cos(theta);
-			vecPos.y = flRadius * sin(phi) * sin(theta); 
-			vecPos.z = flRadius * cos(phi);
+			vecPos.x = flRadius * sinPhi * cosTheta;
+			vecPos.y = flRadius * sinPhi * sinTheta;
+			vecPos.z = flRadius * cosPhi;
 
 			Vector vecNormal = vecPos;
 			VectorNormalize(vecNormal);
@@ -2233,9 +2226,18 @@ void CRender3D::RenderWireframeSphere(Vector const &vCenter, float flRadius, int
 			float v = i / ( float )( nPhi - 1 );
 			float theta = 2.0f * M_PI_F * u;
 			float phi = M_PI_F * v;
-			meshBuilder3D.Position3f( vCenter.x + ( flRadius * sin(phi) * cos(theta) ),
-				                    vCenter.y + ( flRadius * sin(phi) * sin(theta) ), 
-									vCenter.z + ( flRadius * cos(phi) ) );
+			
+			DirectX::XMVECTOR angles = DirectX::XMVectorSet( theta, phi, 0, 0 );
+
+			DirectX::XMVECTOR sin, cos;
+			DirectX::XMVectorSinCos( &sin, &cos, angles );
+
+			float sinTheta = DirectX::XMVectorGetX( sin ), cosTheta = DirectX::XMVectorGetX( cos );
+			float sinPhi = DirectX::XMVectorGetY( sin ), cosPhi = DirectX::XMVectorGetY( cos );
+
+			meshBuilder3D.Position3f( vCenter.x + ( flRadius * sinPhi * cosTheta ),
+				                    vCenter.y + ( flRadius * sinPhi * sinTheta ), 
+									vCenter.z + ( flRadius * cosPhi ) );
 			meshBuilder3D.Color3ub( chRed, chGreen, chBlue );
 			meshBuilder3D.AdvanceVertex();
 		}
@@ -2636,10 +2638,10 @@ void CRender3D::RenderNode(CCullTreeNode *pNode, bool bForce )
 	// Render all child nodes first.
 	//
 	CCullTreeNode *pChild;
-	int nChildren = pNode->GetChildCount();
+	intp nChildren = pNode->GetChildCount();
 	if (nChildren != 0)
 	{
-		for (int nChild = 0; nChild < nChildren; nChild++)
+		for (intp nChild = 0; nChild < nChildren; nChild++)
 		{
 			pChild = pNode->GetCullTreeChild(nChild);
 			Assert(pChild != NULL);
@@ -2680,8 +2682,8 @@ void CRender3D::RenderNode(CCullTreeNode *pNode, bool bForce )
 		// Now render the contents of this node.
 		//
 		CMapClass *pObject;
-		int nObjects = pNode->GetObjectCount();
-		for (int nObject = 0; nObject < nObjects; nObject++)
+		intp nObjects = pNode->GetObjectCount();
+		for (intp nObject = 0; nObject < nObjects; nObject++)
 		{
 			pObject = pNode->GetCullTreeObject(nObject);
 			Assert(pObject != NULL);
@@ -2881,7 +2883,7 @@ void CRender3D::RenderEnable(RenderState_t eRenderState, bool bEnable)
 
 		case RENDER_POLYGON_OFFSET_LINE:
 		{
-			assert(0);
+			Assert(0);
 			/* FIXME:
 			   Think we'll need to have two versions of the wireframe material
 			   one which ztests with offset + culling, the other which doesn't

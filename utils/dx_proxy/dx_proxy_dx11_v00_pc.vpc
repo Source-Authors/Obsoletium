@@ -1,0 +1,13 @@
+//
+// dx_proxy_dx11_v00_pc.vpc
+//
+// Base script for generating dx_proxy.dll for specific
+// version of Microsoft DirectX SDK:
+//
+
+$Macro SRCDIR		"..\.."
+$Macro OUTBINDIR	"$SRCDIR\dx11sdk\utilities\dx11"
+$Macro DX_SDK_VER	"DX11_V00_PC"
+
+$Include "dx_proxy_base.vpc"
+

@@ -31,9 +31,6 @@
 // DYNAMIC: "LIGHTING_PREVIEW"          "0..0"	[XBOX]
 // DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"	[ps20b]
 // DYNAMIC: "FLASHLIGHTSHADOWS"			"0..1"	[ps30]
-// DYNAMIC: "STATIC_LIGHT_LIGHTMAP"	    "0..1"  [ps20b] [ps30]
-// DYNAMIC: "STATIC_LIGHT_LIGHTMAP"	    "0..0"  [ps20]
-// DYNAMIC: "DEBUG_LUXELS"				"0..1"	[ps20b] [ps30]
 
 // detail blend mode 6 = ps20b only
 // SKIP: $DETAIL_BLEND_MODE == 6				[ps20]
@@ -74,9 +71,6 @@
 
 // SKIP: $CUBEMAP_SPHERE_LEGACY && ($CUBEMAP == 0)
 
-// Debugging luxels only makes sense if we have lightmaps on this geometry.
-// SKIP: ($STATIC_LIGHT_LIGHTMAP == 0) && ($DEBUG_LUXELS == 1)
-
 #include "common_flashlight_fxc.h"
 #include "common_vertexlitgeneric_dx9.h"
  
@@ -98,7 +92,7 @@ const float4 g_FogParams						: register( c21 );
 #define g_SelfIllumMaskControl		g_EnvmapSaturation_SelfIllumMask.w
 
 const float4 g_FlashlightAttenuationFactors	    : register( c22 );
-const HALF3 g_FlashlightPos						: register( c23 );
+const float3 g_FlashlightPos					: register( c23 );
 const float4x4 g_FlashlightWorldToTexture		: register( c24 ); // through c27
 
 
@@ -111,19 +105,18 @@ sampler FlashlightSampler		: register( s7 );
 sampler ShadowDepthSampler		: register( s8 );	// Flashlight shadow depth map sampler
 sampler DepthSampler			: register( s10 );	//depth buffer sampler for depth blending
 sampler SelfIllumMaskSampler	: register( s11 );	// selfillummask
-sampler LightMapSampler			: register( s12 );
 
 struct PS_INPUT
 {
 #if SEAMLESS_BASE
-	HALF3 baseTexCoord				: TEXCOORD0;	// Base texture coordinate
+	float3 baseTexCoord				: TEXCOORD0;	// Base texture coordinate
 #else
-	HALF2 baseTexCoord				: TEXCOORD0;	// Base texture coordinate
+	float2 baseTexCoord				: TEXCOORD0;	// Base texture coordinate
 #endif
 #if SEAMLESS_DETAIL
-	HALF3 detailTexCoord			: TEXCOORD1;	// Seamless texture coordinate
+	float3 detailTexCoord			: TEXCOORD1;	// Seamless texture coordinate
 #else
-	HALF2 detailTexCoord			: TEXCOORD1;	// Detail texture coordinate
+	float2 detailTexCoord			: TEXCOORD1;	// Detail texture coordinate
 #endif
 	float4 color					: TEXCOORD2;	// Vertex color (from lighting or unlit)
 	float3 worldVertToEyeVector		: TEXCOORD3;	// Necessary for reflection
@@ -174,10 +167,6 @@ const float4 g_OutlineParams : register( c9 );
 const float3 g_DetailTint : register( c10 );
 #endif
 
-#if DEBUG_LUXELS
-const float4 g_LuxelScale : register( c11 );
-#endif
-
 
 // Calculate unified fog
 float CalcPixelFogFactorConst( float fPixelFogType, const float4 fogParams, const float flEyePosZ, const float flWorldPosZ, const float flProjPosZ )
@@ -222,7 +211,9 @@ float4 FinalOutputConst( const float4 vShaderColor, float pixelFogFactor, float 
 
 
 #if LIGHTING_PREVIEW == 2
-LPREVIEW_PS_OUT main( PS_INPUT i ) : COLOR
+// dimhotepus: Drop COLOR semantics as we have a struct, not COLOR to return
+// dimhotepus: Fixes warning X3576: semantics in type overridden by variable/function or enclosing type
+LPREVIEW_PS_OUT main( PS_INPUT i )
 #else
 float4 main( PS_INPUT i ) : COLOR
 #endif
@@ -238,7 +229,7 @@ float4 main( PS_INPUT i ) : COLOR
 	bool bFlashlight = FLASHLIGHT ? true : false;
 	bool bBlendTintByBaseAlpha = BLENDTINTBYBASEALPHA ? true : false;
 
-	HALF4 baseColor = HALF4( 1.0f, 1.0f, 1.0f, 1.0f );
+	float4 baseColor = float4( 1.0f, 1.0f, 1.0f, 1.0f );
 #if SEAMLESS_BASE
 	baseColor =
 		i.SeamlessWeights.x * tex2D( BaseTextureSampler, i.baseTexCoord.yz )+
@@ -342,23 +333,13 @@ float4 main( PS_INPUT i ) : COLOR
 	}
 
 	float3 diffuseLighting = float3( 1.0f, 1.0f, 1.0f );
-	if( bDiffuseLighting || bVertexColor )
+	if( bDiffuseLighting || bVertexColor && !( bVertexColor && bDiffuseLighting ) )
 	{
 		diffuseLighting = i.color.rgb;
 	}
-
-#if STATIC_LIGHT_LIGHTMAP
-	// This matches the behavior of vertex lighting, which multiplies by cOverbright (which is not accessible here)
-	// And converts from Gamma space to Linear space before being used.
-	float2 lightmapTexCoords = i.baseTexCoord.xy;
-	#if DEBUG_LUXELS
-		lightmapTexCoords.xy *= g_LuxelScale.xy;
-	#endif
-	float3 f3LightmapColor = GammaToLinear( 2.0f * tex2D( LightMapSampler, lightmapTexCoords ).rgb );
-	diffuseLighting = f3LightmapColor;
-#endif
-
-	float3 albedo = baseColor;
+	
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	float3 albedo = baseColor.rgb;
 
 	if (bBlendTintByBaseAlpha)
 	{
@@ -425,20 +406,21 @@ float4 main( PS_INPUT i ) : COLOR
 		TextureCombinePostLighting( diffuseComponent, detailColor, DETAIL_BLEND_MODE, g_DetailBlendFactor );
 #endif
 
-	HALF3 specularLighting = HALF3( 0.0f, 0.0f, 0.0f );
+	float3 specularLighting = float3( 0.0f, 0.0f, 0.0f );
 
 #if !FLASHLIGHT || defined ( _X360 )
 	#if SELFILLUM_ENVMAPMASK_ALPHA
 		// range of alpha:
 	    // 0 - 0.125 = lerp(diffuse,selfillum,alpha*8)
 	    // 0.125-1.0 = selfillum*(1+alpha-0.125)*8 (over bright glows)
-		HALF3 selfIllumComponent = g_SelfIllumTint * albedo;
+		float3 selfIllumComponent = g_SelfIllumTint * albedo;
 		half Adj_Alpha=8*envmapMaskTexel.a;
 		diffuseComponent=( max( 0, 1-Adj_Alpha ) * diffuseComponent) + Adj_Alpha * selfIllumComponent;
 	#else
 		if ( bSelfIllum )
 		{
-			float3 vSelfIllumMask = tex2D( SelfIllumMaskSampler, i.baseTexCoord.xy );
+			// dimhotepus: Fix float4 -> float3 downcast warnings.
+			float3 vSelfIllumMask = tex2D( SelfIllumMaskSampler, i.baseTexCoord.xy ).xyz;
 			vSelfIllumMask = lerp( baseColor.aaa, vSelfIllumMask, g_SelfIllumMaskControl );
 			diffuseComponent = lerp( diffuseComponent, g_SelfIllumTint * albedo, vSelfIllumMask );
 		}
@@ -447,24 +429,27 @@ float4 main( PS_INPUT i ) : COLOR
 	if( bCubemap )
 	{
 #if CUBEMAP_SPHERE_LEGACY
-		HALF3 reflectVect = normalize(CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz ));
-
-		specularLighting = 0.5 * tex2D( EnvmapSampler, float2(reflectVect.x, reflectVect.y) ) * g_DiffuseModulation.rgb * diffuseLighting;
+		float3 reflectVect = normalize(CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz ));
+		
+		// dimhotepus: Fix float4 -> float3 downcast warnings.
+		specularLighting = 0.5 * tex2D( EnvmapSampler, float2(reflectVect.x, reflectVect.y) ).xyz * g_DiffuseModulation.rgb * diffuseLighting;
 #else
-		HALF3 reflectVect = CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz );
+		float3 reflectVect = CalcReflectionVectorUnnormalized( i.worldSpaceNormal, i.worldVertToEyeVector.xyz );
 
-		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect );
+		// dimhotepus: Fix float4 -> float3 downcast warnings.
+		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect ).xyz;
 		specularLighting *= specularFactor;
 		specularLighting *= g_EnvmapTint_TintReplaceFactor.rgb;
-		HALF3 specularLightingSquared = specularLighting * specularLighting;
-		specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast_ShadowTweaks );
-		HALF3 greyScale = dot( specularLighting, HALF3( 0.299f, 0.587f, 0.114f ) );
+		float3 specularLightingSquared = specularLighting * specularLighting;
+		// dimhotepus: Fix float4 -> float3 downcast warnings.
+		specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast_ShadowTweaks.xyz );
+		float3 greyScale = dot( specularLighting, float3( 0.299f, 0.587f, 0.114f ) );
 		specularLighting = lerp( greyScale, specularLighting, g_EnvmapSaturation );
 #endif
 	}
 #endif
 
-	HALF3 result = diffuseComponent + specularLighting;
+	float3 result = diffuseComponent + specularLighting;
 
 #if LIGHTING_PREVIEW
 # if LIGHTING_PREVIEW == 1

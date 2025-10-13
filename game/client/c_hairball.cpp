@@ -123,6 +123,7 @@ C_Hairball::C_Hairball()
 {
 	m_nHairs = 100;
 	m_nNodesPerHair = 3;
+	m_flSitStillTime = -1;
 	
 	float flHairLength = 20;
 	m_flSpringDist = flHairLength / (m_nNodesPerHair - 1);

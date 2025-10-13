@@ -68,11 +68,11 @@ private:
 	CDmaString m_TargetName;
 	CDmaVar<bool> m_bIsPlaceholder;
 
-	bool m_bInfoTarget;
-	bool m_bIsDirty;
+	bool m_bInfoTarget{false};
+	bool m_bIsDirty{false};
 
 	// The entity it's connected to in the engine
-	HTOOLHANDLE	m_hEngineEntity;
+	HTOOLHANDLE	m_hEngineEntity{HTOOLHANDLE_INVALID};
 
 	CMaterialReference m_SelectedInfoTarget;
 	CMaterialReference m_InfoTargetSprite;

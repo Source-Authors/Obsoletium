@@ -344,7 +344,7 @@ void SceneRampTool::redraw()
 
 		OffsetRect( &rcText, 0, 12 );
 
-		int current, total;
+		intp current, total;
 
 		g_pChoreoView->GetUndoLevels( current, total );
 		if ( total > 0 )
@@ -432,7 +432,7 @@ void SceneRampTool::ShowContextMenu( mxEvent *event, bool include_track_menus )
 	// Construct main menu
 	mxPopupMenu *pop = new mxPopupMenu();
 
-	int current, total;
+	intp current, total;
 	g_pChoreoView->GetUndoLevels( current, total );
 	if ( total > 0 )
 	{
@@ -479,7 +479,7 @@ void SceneRampTool::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
 
-	for ( int i = 0; i < m_FocusRects.Size(); i++ )
+	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
 		RECT rc = m_FocusRects[ i ].m_rcFocus;
 
@@ -576,7 +576,7 @@ void SceneRampTool::OnMouseMove( mxEvent *event )
 	{
 		DrawFocusRect();
 
-		for ( int i = 0; i < m_FocusRects.Size(); i++ )
+		for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 		{
 			CFocusRect *f = &m_FocusRects[ i ];
 			f->m_rcFocus = f->m_rcOrig;
@@ -1311,8 +1311,8 @@ void SceneRampTool::DrawTimingTags( CChoreoWidgetDrawHelper& drawHelper, RECT& r
 
 	// Loop through all events in scene
 
-	int c = scene->GetNumEvents();
-	int i;
+	intp c = scene->GetNumEvents();
+	intp i;
 	for ( i = 0; i < c; i++ )
 	{
 		CChoreoEvent *e = scene->GetEvent( i );
@@ -1728,7 +1728,7 @@ void SceneRampTool::DrawSamples( CChoreoWidgetDrawHelper& drawHelper, RECT &rcSa
 	if ( !s )
 		return;
 
-	int rampCount = s->GetSceneRampCount();
+	intp rampCount = s->GetSceneRampCount();
 	if ( !rampCount )
 		return;
 
@@ -1776,7 +1776,7 @@ void SceneRampTool::DrawSamples( CChoreoWidgetDrawHelper& drawHelper, RECT &rcSa
 
 	}
 
-	for ( int sample = 0; sample < rampCount; sample++ )
+	for ( intp sample = 0; sample < rampCount; sample++ )
 	{
 		CExpressionSample *start = s->GetSceneRamp( sample );
 
@@ -1854,8 +1854,8 @@ void SceneRampTool::DrawAutoHighlight( mxEvent *event )
 
 	// Fixme, could look at 1st derivative and do more sampling at high rate of change?
 	// or near actual sample points!
-	int sampleCount = s->GetSceneRampCount();
-	for ( int sample = 0; sample < sampleCount; sample++ )
+	intp sampleCount = s->GetSceneRampCount();
+	for ( intp sample = 0; sample < sampleCount; sample++ )
 	{
 		CExpressionSample *start = s->GetSceneRamp( sample );
 
@@ -1894,7 +1894,7 @@ void SceneRampTool::DrawAutoHighlight( mxEvent *event )
 }
 
 
-int SceneRampTool::NumSamples()
+intp SceneRampTool::NumSamples()
 {
 	CChoreoScene *s = GetSafeScene();
 	if ( !s )
@@ -1903,7 +1903,7 @@ int SceneRampTool::NumSamples()
 	return s->GetSceneRampCount();
 }
 
-CExpressionSample *SceneRampTool::GetSample( int idx )
+CExpressionSample *SceneRampTool::GetSample( intp idx )
 {
 	CChoreoScene *s = GetSafeScene();
 	if ( !s )
@@ -2075,12 +2075,12 @@ void SceneRampTool::MoveSelectedSamples( float dfdx, float dfdy )
 	if ( !s )
 		return;
 
-	int c = s->GetSceneRampCount();
+	intp c = s->GetSceneRampCount();
 
 	float duration = s->FindStopTime();
 	//dfdx *= duration;
 
-	for ( int i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		CExpressionSample *sample = s->GetSceneRamp( i );
 		if ( !sample || !sample->selected )
@@ -2102,8 +2102,6 @@ void SceneRampTool::MoveSelectedSamples( float dfdx, float dfdy )
 //-----------------------------------------------------------------------------
 void SceneRampTool::DeselectAll( void )
 {
-	int i;
-
 	int selecteditems = CountSelected();
 	if ( !selecteditems )
 		return;
@@ -2113,7 +2111,7 @@ void SceneRampTool::DeselectAll( void )
 	if ( !s )
 		return;
 
-	for ( i = s->GetSceneRampCount() - 1; i >= 0 ; i-- )
+	for ( intp i = s->GetSceneRampCount() - 1; i >= 0 ; i-- )
 	{
 		CExpressionSample *sample = s->GetSceneRamp( i );
 		sample->selected = false;
@@ -2124,14 +2122,12 @@ void SceneRampTool::DeselectAll( void )
 
 void SceneRampTool::SelectAll( void )
 {
-	int i;
-
 	CChoreoScene *s = GetSafeScene();
 	Assert( s );
 	if ( !s )
 		return;
 
-	for ( i = s->GetSceneRampCount() - 1; i >= 0 ; i-- )
+	for ( intp i = s->GetSceneRampCount() - 1; i >= 0 ; i-- )
 	{
 		CExpressionSample *sample = s->GetSceneRamp( i );
 		sample->selected = true;
@@ -2142,8 +2138,6 @@ void SceneRampTool::SelectAll( void )
 
 void SceneRampTool::Delete( void )
 {
-	int i;
-
 	CChoreoScene *s = GetSafeScene();
 	if ( !s )
 		return;
@@ -2154,7 +2148,7 @@ void SceneRampTool::Delete( void )
 
 	PreDataChanged( "Delete scene ramp points" );
 
-	for ( i = s->GetSceneRampCount() - 1; i >= 0 ; i-- )
+	for ( intp i = s->GetSceneRampCount() - 1; i >= 0 ; i-- )
 	{
 		CExpressionSample *sample = s->GetSceneRamp( i );
 		if ( !sample->selected )

@@ -35,8 +35,8 @@
 // Statically constructed list of ConCommandBases, 
 // used for registering them with the ICVar interface
 //-----------------------------------------------------------------------------
-ConCommandBase			*ConCommandBase::s_pConCommandBases = NULL;
-IConCommandBaseAccessor	*ConCommandBase::s_pAccessor = NULL;
+ConCommandBase			*ConCommandBase::s_pConCommandBases = nullptr;
+IConCommandBaseAccessor	*ConCommandBase::s_pAccessor = nullptr;
 static int s_nCVarFlag = 0;
 static int s_nDLLIdentifier = -1;	// A unique identifier indicating which DLL this convar came from
 static bool s_bRegistered = false;
@@ -80,7 +80,7 @@ void ConVar_Register( int nCVarFlag, IConCommandBaseAccessor *pAccessor )
 	}
 
 	g_pCVar->ProcessQueuedMaterialThreadConVarSets();
-	ConCommandBase::s_pConCommandBases = NULL;
+	ConCommandBase::s_pConCommandBases = nullptr;
 }
 
 void ConVar_Unregister( )
@@ -98,14 +98,14 @@ void ConVar_Unregister( )
 //-----------------------------------------------------------------------------
 // Purpose: Default constructor
 //-----------------------------------------------------------------------------
-ConCommandBase::ConCommandBase( void )
+ConCommandBase::ConCommandBase( )
 {
 	m_bRegistered   = false;
-	m_pszName       = NULL;
-	m_pszHelpString = NULL;
+	m_pszName       = nullptr;
+	m_pszHelpString = nullptr;
 
 	m_nFlags = 0;
-	m_pNext  = NULL;
+	m_pNext  = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -122,15 +122,13 @@ ConCommandBase::ConCommandBase( const char *pName, const char *pHelpString /*=0*
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-ConCommandBase::~ConCommandBase( void )
-{
-}
+ConCommandBase::~ConCommandBase( ) = default;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool ConCommandBase::IsCommand( void ) const
+bool ConCommandBase::IsCommand( ) const
 { 
 //	Assert( 0 ); This can't assert. . causes a recursive assert in Sys_Printf, etc.
 	return true;
@@ -176,7 +174,7 @@ void ConCommandBase::CreateBase( const char *pName, const char *pHelpString /*= 
 	else
 	{
 		// It's unregistered
-		m_pNext = NULL;
+		m_pNext = nullptr;
 	}
 
 	// If s_pAccessor is already set (this ConVar is not a global variable),
@@ -212,7 +210,7 @@ void ConCommandBase::Shutdown()
 // Purpose: Return name of the command/var
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *ConCommandBase::GetName( void ) const
+const char *ConCommandBase::GetName( ) const
 {
 	return m_pszName;
 }
@@ -246,12 +244,12 @@ void ConCommandBase::AddFlags( int flags )
 // Purpose: 
 // Output : const ConCommandBase
 //-----------------------------------------------------------------------------
-const ConCommandBase *ConCommandBase::GetNext( void ) const
+const ConCommandBase *ConCommandBase::GetNext( ) const
 {
 	return m_pNext;
 }
 
-ConCommandBase *ConCommandBase::GetNext( void )
+ConCommandBase *ConCommandBase::GetNext( )
 {
 	return m_pNext;
 }
@@ -281,7 +279,7 @@ char *ConCommandBase::CopyString( const char *from )
 // Purpose: 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *ConCommandBase::GetHelpText( void ) const
+const char *ConCommandBase::GetHelpText( ) const
 {
 	return m_pszHelpString;
 }
@@ -290,7 +288,7 @@ const char *ConCommandBase::GetHelpText( void ) const
 // Purpose: Has this cvar been registered
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool ConCommandBase::IsRegistered( void ) const
+bool ConCommandBase::IsRegistered( ) const
 {
 	return m_bRegistered;
 }
@@ -350,7 +348,7 @@ CCommand::CCommand( int nArgC, const char **ppArgV )
 		}
 		pBuf += nLen+1;
 
-		bool bContainsSpace = strchr( ppArgV[i], ' ' ) != NULL;
+		bool bContainsSpace = strchr( ppArgV[i], ' ' ) != nullptr;
 		if ( bContainsSpace )
 		{
 			*pSBuf++ = '\"';
@@ -471,7 +469,7 @@ const char* CCommand::FindArg( const char *pName ) const
 		if ( !Q_stricmp( Arg(i), pName ) )
 			return (i+1) < nArgC ? Arg( i+1 ) : "";
 	}
-	return 0;
+	return nullptr;
 }
 
 int CCommand::FindArgInt( const char *pName, int nDefaultVal ) const
@@ -508,7 +506,7 @@ ConCommand::ConCommand( const char *pName, FnCommandCallbackVoid_t callback, con
 	m_bUsingNewCommandCallback = false;
 	m_bUsingCommandCallbackInterface = false;
 	m_fnCompletionCallback = completionFunc ? completionFunc : DefaultCompletionFunc;
-	m_bHasCompletionCallback = completionFunc != 0 ? true : false;
+	m_bHasCompletionCallback = completionFunc != nullptr ? true : false;
 
 	// Setup the rest
 	BaseClass::CreateBase( pName, pHelpString, flags );
@@ -520,7 +518,7 @@ ConCommand::ConCommand( const char *pName, FnCommandCallback_t callback, const c
 	m_fnCommandCallback = callback;
 	m_bUsingNewCommandCallback = true;
 	m_fnCompletionCallback = completionFunc ? completionFunc : DefaultCompletionFunc;
-	m_bHasCompletionCallback = completionFunc != 0 ? true : false;
+	m_bHasCompletionCallback = completionFunc != nullptr ? true : false;
 	m_bUsingCommandCallbackInterface = false;
 
 	// Setup the rest
@@ -533,7 +531,7 @@ ConCommand::ConCommand( const char *pName, ICommandCallback *pCallback, const ch
 	m_pCommandCallback = pCallback;
 	m_bUsingNewCommandCallback = false;
 	m_pCommandCompletionCallback = pCompletionCallback;
-	m_bHasCompletionCallback = ( pCompletionCallback != 0 );
+	m_bHasCompletionCallback = ( pCompletionCallback != nullptr );
 	m_bUsingCommandCallbackInterface = true;
 
 	// Setup the rest
@@ -543,7 +541,7 @@ ConCommand::ConCommand( const char *pName, ICommandCallback *pCallback, const ch
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
-ConCommand::~ConCommand( void )
+ConCommand::~ConCommand( )
 {
 }
 
@@ -551,7 +549,7 @@ ConCommand::~ConCommand( void )
 //-----------------------------------------------------------------------------
 // Purpose: Returns true if this is a command 
 //-----------------------------------------------------------------------------
-bool ConCommand::IsCommand( void ) const
+bool ConCommand::IsCommand( ) const
 { 
 	return true;
 }
@@ -622,7 +620,7 @@ int	ConCommand::AutoCompleteSuggest( const char *partial, CUtlVector< CUtlString
 //-----------------------------------------------------------------------------
 // Returns true if the console command can autocomplete 
 //-----------------------------------------------------------------------------
-bool ConCommand::CanAutoComplete( void )
+bool ConCommand::CanAutoComplete( )
 {
 	return m_bHasCompletionCallback;
 }
@@ -672,13 +670,10 @@ ConVar::ConVar( const char *pName, const char *pDefaultValue, int flags, const c
 //-----------------------------------------------------------------------------
 // Destructor
 //-----------------------------------------------------------------------------
-ConVar::~ConVar( void )
+ConVar::~ConVar( )
 {
-	if ( m_pszString )
-	{
-		delete[] m_pszString;
-		m_pszString = NULL;
-	}
+	delete[] m_pszString;
+	m_pszString = nullptr;
 }
 
 
@@ -702,7 +697,7 @@ bool ConVar::IsFlagSet( int flag ) const
 	return ( flag & m_pParent->m_nFlags ) ? true : false;
 }
 
-const char *ConVar::GetHelpText( void ) const
+const char *ConVar::GetHelpText( ) const
 {
 	return m_pParent->m_pszHelpString;
 }
@@ -716,12 +711,12 @@ void ConVar::AddFlags( int flags )
 #endif
 }
 
-bool ConVar::IsRegistered( void ) const
+bool ConVar::IsRegistered( ) const
 {
 	return m_pParent->m_bRegistered;
 }
 
-const char *ConVar::GetName( void ) const
+const char *ConVar::GetName( ) const
 {
 	return m_pParent->m_pszName;
 }
@@ -730,7 +725,7 @@ const char *ConVar::GetName( void ) const
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool ConVar::IsCommand( void ) const
+bool ConVar::IsCommand( ) const
 { 
 	return false;
 }
@@ -944,7 +939,7 @@ void ConVar::InternalSetIntValue( int nValue )
 
 	Assert( m_pParent == this ); // Only valid for root convars.
 
-	float fValue = (float)nValue;
+	auto fValue = (float)nValue;
 	if ( ClampValue( fValue ) )
 	{
 		nValue = ( int )( fValue );
@@ -1044,7 +1039,7 @@ void ConVar::SetValue( int value )
 //-----------------------------------------------------------------------------
 // Purpose: Reset to default value
 //-----------------------------------------------------------------------------
-void ConVar::Revert( void )
+void ConVar::Revert( )
 {
 	// Force default value again
 	ConVar *var = m_pParent;
@@ -1136,7 +1131,7 @@ bool ConVar::SetCompetitiveMode( [[maybe_unused]] bool bCompetitive )
 // Purpose: 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *ConVar::GetDefault( void ) const
+const char *ConVar::GetDefault( ) const
 {
 	return m_pParent->m_pszDefaultValue;
 }
@@ -1159,8 +1154,8 @@ public:
 	void SetValue( const char * ) override {}
 	void SetValue( float ) override {}
 	void SetValue( int ) override {}
-	const char *GetName( void ) const override { return ""; }
-	bool IsFlagSet( int ) const override { return false; }
+	[[nodiscard]] const char *GetName( ) const override { return ""; }
+	[[nodiscard]] bool IsFlagSet( int ) const override { return false; }
 };
 
 static CEmptyConVar s_EmptyConVar;
@@ -1298,13 +1293,13 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 
 	if ( !pVar->IsCommand() )
 	{
-		ConVar *var = ( ConVar * )pVar;
-		const ConVar_ServerBounded *pBounded = dynamic_cast<const ConVar_ServerBounded*>( var );
+		auto *var = ( ConVar * )pVar;
+		const auto *pBounded = dynamic_cast<const ConVar_ServerBounded*>( var );
 
 		bMin = var->GetMin( fMin );
 		bMax = var->GetMax( fMax );
 
-		const char *value = NULL;
+		const char *value = nullptr;
 		char tempVal[ 32 ];
 
 		if ( pBounded || var->IsFlagSet( FCVAR_NEVER_AS_STRING ) )
@@ -1332,7 +1327,7 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 
 		if ( value )
 		{
-			ConColorMsg( clr, "\"%s\" = \"%s\"", var->GetName(), value );
+			ConColorMsg( clr, R"("%s" = "%s")", var->GetName(), value );
 
 			if ( stricmp( value, var->GetDefault() ) != 0 )
 			{
@@ -1362,7 +1357,7 @@ void ConVar_PrintDescription( const ConCommandBase *pVar )
 	}
 	else
 	{
-		ConCommand *var = ( ConCommand * )pVar;
+		auto *var = ( ConCommand * )pVar;
 
 		ConColorMsg( clr, "\"%s\"\n", var->GetName() );
 	}

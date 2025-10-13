@@ -4,7 +4,6 @@
 
 #include "d3dxfxc.h"
 
-#include "shadercompile.h"
 #include "cmdsink.h"
 
 #include "dx_proxy/dx_proxy.h"
@@ -222,10 +221,8 @@ ExecuteCommand(const char *in_command) {
 
   // Convert shader model to lowercase.
   char out_shader_model[16] = {};
-  if (in_shader_model) {
-    V_strcpy_safe(out_shader_model, in_shader_model);
-  }
-  Q_strlower(out_shader_model);
+  if (in_shader_model) V_strcpy_safe(out_shader_model, in_shader_model);
+  V_strlower(out_shader_model);
 
   // Determine the file name (at the end of the command line before
   // redirection).
@@ -249,9 +246,7 @@ ExecuteCommand(const char *in_command) {
 
 std::unique_ptr<se::shader_compile::command_sink::IResponse> TryExecuteCommand(
     const char *command) {
-  static int dummy{(Msg("[shadercompile] Using new faster Vitaliy's "
-                        "implementation.\n"),
-                    1)};
+  static int dummy{(Msg("Using new faster Vitaliy's implementation.\n"), 1)};
 
   const bool ok{!strncmp(command,
                          se::shader_compile::fxc_intercept::kFxcCommand,

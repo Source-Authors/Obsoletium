@@ -32,6 +32,7 @@
 #include "vphysics_interface.h"
 #include "icvar.h"
 #include "filesystem/IQueuedLoader.h"
+#include "vscript/ivscript.h"
 
 #include "scoped_app_locale.h"
 
@@ -42,7 +43,7 @@ namespace se::dedicated {
 // Loose implementation for operating system specific layer.
 class UnixSystem : public ISystem {
  public:
-  virtual ~UnixSystem();
+  ~UnixSystem() override;
 
   IDedicatedServerAPI *LoadModules(DedicatedAppSystemGroup *group) override;
 
@@ -59,7 +60,7 @@ class UnixSystem : public ISystem {
   void Printf(PRINTF_FORMAT_STRING const char *fmt, ...) override;
 };
 
-UnixSystem::~UnixSystem() {}
+UnixSystem::~UnixSystem() = default;
 
 void UnixSystem::ErrorMessage(int level, const char *msg) {
   Error("%s\n", msg);
@@ -110,10 +111,11 @@ IDedicatedServerAPI *UnixSystem::LoadModules(
       {"datacache" DLL_EXT_STRING, STUDIO_DATA_CACHE_INTERFACE_VERSION},
       {"dedicated" DLL_EXT_STRING, QUEUEDLOADER_INTERFACE_VERSION},
       {"engine" DLL_EXT_STRING, VENGINE_HLDS_API_VERSION},
+      {"vscript" DLL_EXT_STRING, VSCRIPT_INTERFACE_VERSION},
       {"", ""}  // Required to terminate the list
   };
 
-  if (!pAppSystemGroup->AddSystems(appSystems)) return false;
+  if (!pAppSystemGroup->AddSystems(appSystems)) return nullptr;
 
   auto *api = pAppSystemGroup->FindSystem<IDedicatedServerAPI>(
       VENGINE_HLDS_API_VERSION);

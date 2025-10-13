@@ -34,7 +34,7 @@ int DebugDrawModel( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 
 	CMeshBuilder meshBuilder;
 
-	int batchID;
+	intp batchID;
 	for( batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
@@ -44,7 +44,7 @@ int DebugDrawModel( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 		meshBuilder.Begin( pBuildMesh, MATERIAL_TRIANGLES, materialBatch.m_Verts.Count(), 
 			materialBatch.m_TriListIndices.Count() );
 
-		int vertID;
+		intp vertID;
 		// Send the vertices down to the hardware.
 		for( vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
 		{
@@ -75,7 +75,7 @@ int DebugDrawModel( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 			meshBuilder.AdvanceVertex();
 		}
 
-		int i;
+		intp i;
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
 		for( i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
@@ -105,7 +105,7 @@ int DebugDrawModelNormals( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 	pRenderContext->PushMatrix();
 	pRenderContext->LoadIdentity();
 
-	int batchID;
+	intp batchID;
 	for( batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
@@ -115,7 +115,7 @@ int DebugDrawModelNormals( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 		IMesh *pBuildMesh = pRenderContext->GetDynamicMesh();
 		meshBuilder.Begin( pBuildMesh, MATERIAL_LINES, materialBatch.m_Verts.Count() );
 
-		int vertID;
+		intp vertID;
 		// Send the vertices down to the hardware.
 		for( vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
 		{
@@ -169,7 +169,7 @@ int DebugDrawModelTangentS( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 	pRenderContext->PushMatrix();
 	pRenderContext->LoadIdentity();
 
-	int batchID;
+	intp batchID;
 	for( batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
@@ -179,7 +179,7 @@ int DebugDrawModelTangentS( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 		IMesh *pBuildMesh = pRenderContext->GetDynamicMesh();
 		meshBuilder.Begin( pBuildMesh, MATERIAL_LINES, materialBatch.m_Verts.Count() );
 
-		int vertID;
+		intp vertID;
 		// Send the vertices down to the hardware.
 		for( vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
 		{
@@ -237,7 +237,7 @@ int DebugDrawModelTangentT( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 	pRenderContext->PushMatrix();
 	pRenderContext->LoadIdentity();
 
-	int batchID;
+	intp batchID;
 	for( batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
@@ -247,7 +247,7 @@ int DebugDrawModelTangentT( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 		IMesh *pBuildMesh = pRenderContext->GetDynamicMesh();
 		meshBuilder.Begin( pBuildMesh, MATERIAL_LINES, materialBatch.m_Verts.Count() );
 
-		int vertID;
+		intp vertID;
 		// Send the vertices down to the hardware.
 		for( vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
 		{
@@ -309,7 +309,7 @@ int DebugDrawModelBadVerts( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 
 	CMeshBuilder meshBuilder;
 
-	int batchID;
+	intp batchID;
 	for( batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
@@ -319,7 +319,7 @@ int DebugDrawModelBadVerts( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 		meshBuilder.Begin( pBuildMesh, MATERIAL_TRIANGLES, materialBatch.m_Verts.Count(), 
 			materialBatch.m_TriListIndices.Count() );
 
-		int vertID;
+		intp vertID;
 		// Send the vertices down to the hardware.
 		for( vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
 		{
@@ -377,7 +377,7 @@ int DebugDrawModelBadVerts( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 			meshBuilder.AdvanceVertex();
 		}
 
-		int i;
+		intp i;
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
 		for( i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
@@ -409,7 +409,7 @@ int DebugDrawModelWireframe( IStudioRender *pStudioRender, DrawModelInfo_t& info
 
 	CMeshBuilder meshBuilder;
 
-	int batchID;
+	intp batchID;
 	for( batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
@@ -419,7 +419,7 @@ int DebugDrawModelWireframe( IStudioRender *pStudioRender, DrawModelInfo_t& info
 		meshBuilder.Begin( pBuildMesh, MATERIAL_TRIANGLES, materialBatch.m_Verts.Count(), 
 			materialBatch.m_TriListIndices.Count() );
 
-		int vertID;
+		intp vertID;
 		// Send the vertices down to the hardware.
 		for( vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
 		{
@@ -451,7 +451,7 @@ int DebugDrawModelWireframe( IStudioRender *pStudioRender, DrawModelInfo_t& info
 			meshBuilder.AdvanceVertex();
 		}
 
-		int i;
+		intp i;
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
 		for( i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
@@ -483,7 +483,7 @@ int DebugDrawModelBoneWeights( IStudioRender *pStudioRender, DrawModelInfo_t& in
 
 	CMeshBuilder meshBuilder;
 
-	int batchID;
+	intp batchID;
 	for( batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
@@ -493,7 +493,7 @@ int DebugDrawModelBoneWeights( IStudioRender *pStudioRender, DrawModelInfo_t& in
 		meshBuilder.Begin( pBuildMesh, MATERIAL_TRIANGLES, materialBatch.m_Verts.Count(), 
 			materialBatch.m_TriListIndices.Count() );
 
-		int vertID;
+		intp vertID;
 		// Send the vertices down to the hardware.
 		for( vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
 		{
@@ -559,7 +559,7 @@ int DebugDrawModelBoneWeights( IStudioRender *pStudioRender, DrawModelInfo_t& in
 			meshBuilder.AdvanceVertex();
 		}
 
-		int i;
+		intp i;
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
 		for( i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
@@ -583,8 +583,8 @@ int DebugDrawModelTexCoord( IStudioRender *pStudioRender, const char *pMaterialN
 
 	pStudioRender->GetTriangles( info, pBoneToWorld, tris );
 
-	CUtlVector<int> batchList;
-	for( int batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
+	CUtlVector<intp> batchList;
+	for( intp batchID = 0; batchID < tris.m_MaterialBatches.Count(); batchID++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchID];
 		if ( !materialBatch.m_Verts.Count() || V_stricmp(materialBatch.m_pMaterial->GetName(), pMaterialName) )
@@ -664,7 +664,7 @@ int DebugDrawModelTexCoord( IStudioRender *pStudioRender, const char *pMaterialN
 
 	// now draw coverage - show which UV space is used more than once
 #if 0 
-	for( int i = 0; i < batchList.Count(); i++ )
+	for( intp i = 0; i < batchList.Count(); i++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchList[i]];
 		//pRenderContext->Bind( g_materialWireframeVertexColorNoCull );
@@ -673,7 +673,7 @@ int DebugDrawModelTexCoord( IStudioRender *pStudioRender, const char *pMaterialN
 		meshBuilder.Begin( pBuildMesh, MATERIAL_TRIANGLES, materialBatch.m_Verts.Count(), 
 			materialBatch.m_TriListIndices.Count() );
 
-		int vertID;
+		intp vertID;
 		// Send the vertices down to the hardware.
 		for( vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
 		{
@@ -695,7 +695,7 @@ int DebugDrawModelTexCoord( IStudioRender *pStudioRender, const char *pMaterialN
 			meshBuilder.AdvanceVertex();
 		}
 
-		int i;
+		intp i;
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
 		for( i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
@@ -709,7 +709,7 @@ int DebugDrawModelTexCoord( IStudioRender *pStudioRender, const char *pMaterialN
 
 	const color32 batchColor = {0,255,255,0};
 	// now draw all batches with the matching material in wireframe over the render of the base texture
-	for( int i = 0; i < batchList.Count(); i++ )
+	for( intp i = 0; i < batchList.Count(); i++ )
 	{
 		GetTriangles_MaterialBatch_t &materialBatch = tris.m_MaterialBatches[batchList[i]];
 
@@ -719,7 +719,7 @@ int DebugDrawModelTexCoord( IStudioRender *pStudioRender, const char *pMaterialN
 			materialBatch.m_TriListIndices.Count() );
 
 		// Send the vertices down to the hardware.
-		for( int vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
+		for( intp vertID = 0; vertID < materialBatch.m_Verts.Count(); vertID++ )
 		{
 			GetTriangles_Vertex_t &vert = materialBatch.m_Verts[vertID];
 			const Vector &normal = vert.m_Normal;
@@ -741,7 +741,7 @@ int DebugDrawModelTexCoord( IStudioRender *pStudioRender, const char *pMaterialN
 
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
-		for( int j = 0; j < materialBatch.m_TriListIndices.Count(); j++ )
+		for( intp j = 0; j < materialBatch.m_TriListIndices.Count(); j++ )
 		{
 			meshBuilder.FastIndex( materialBatch.m_TriListIndices[j] );
 		}

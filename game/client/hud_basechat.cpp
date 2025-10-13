@@ -22,7 +22,6 @@
 #include "c_playerresource.h"
 #include "ihudlcd.h"
 #include "vgui/IInput.h"
-#include "vgui/ILocalize.h"
 #include "multiplay_gamerules.h"
 #include "voice_status.h"
 
@@ -205,11 +204,13 @@ wchar_t* ReadChatTextString( bf_read &msg, OUT_Z_BYTECAP(outSizeInBytes) wchar_t
 CBaseHudChatLine::CBaseHudChatLine( vgui::Panel *parent, const char *panelName ) : 
 	vgui::RichText( parent, panelName )
 {
-	m_hFont = m_hFontMarlett = 0;
-	m_flExpireTime = 0.0f;
-	m_flStartTime = 0.0f;
+	m_hFont = m_hFontMarlett = vgui::INVALID_FONT;
+	m_flExpireTime	= 0.0f;
+	m_iNameStart	= 0;
+	m_flStartTime	= 0.0f;
+	m_nCount		= 0;
 	m_iNameLength	= 0;
-	m_text = NULL;
+	m_text			= nullptr;
 
 	SetPaintBackgroundEnabled( true );
 	
@@ -783,7 +784,8 @@ void CBaseHudChat::MsgFunc_SayText( bf_read &msg )
 	CLocalPlayerFilter filter;
 	C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
 
-	Msg( "%s", szString );
+	// dimhotepus: Color console echo.
+	// Msg( "%s", szString );
 }
 
 int CBaseHudChat::GetFilterForString( const char *pString )
@@ -836,7 +838,8 @@ void CBaseHudChat::MsgFunc_SayText2( bf_read &msg )
 		// print raw chat text
 		ChatPrintf( client, iFilter, "%s", ansiString );
 
-		Msg( "%s\n", RemoveColorMarkup(ansiString) );
+		// dimhotepus: Color console echo.
+		// Msg( "%s\n", RemoveColorMarkup(ansiString) );
 
 		CLocalPlayerFilter filter;
 		C_BaseEntity::EmitSound( filter, SOUND_FROM_LOCAL_PLAYER, "HudChat.Message" );
@@ -923,7 +926,8 @@ void CBaseHudChat::MsgFunc_TextMsg( bf_read &msg )
 			Q_strncat( szString, "\n", sizeof(szString), 1 );
 		}
 		Printf( CHAT_FILTER_NONE, "%s", ConvertCRtoNL( szString ) );
-		Msg( "%s", ConvertCRtoNL( szString ) );
+		// dimhotepus: Color console echo.
+		// Msg( "%s", ConvertCRtoNL( szString ) );
 		break;
 
 	case HUD_PRINTCONSOLE:
@@ -1119,7 +1123,7 @@ void CBaseHudChat::Printf( int iFilter, PRINTF_FORMAT_STRING const char *fmt, ..
 	va_list marker;
 	char msg[4096];
 
-	va_start(marker, fmt);
+	va_start(marker, fmt); //-V2018 //-V2019
 	V_vsprintf_safe(msg, fmt, marker);
 	va_end(marker);
 
@@ -1523,6 +1527,9 @@ void CBaseHudChatLine::Colorize( int alpha )
 			InsertColorChange( color );
 			InsertString( wText );
 
+			// dimhotepus: Color console echo.
+			ConColorMsg( color, "%ls", wText );
+
 			if ( pChat && pChat->GetChatHistory() )
 			{	
 				pChat->GetChatHistory()->InsertColorChange( color );
@@ -1537,6 +1544,9 @@ void CBaseHudChatLine::Colorize( int alpha )
 
 		}
 	}
+
+	// dimhotepus: Color console echo.
+	Msg( "\n" );
 
 	InvalidateLayout( true );
 }
@@ -1674,7 +1684,7 @@ void CBaseHudChat::ChatPrintf( int iPlayerIndex, int iFilter, PRINTF_FORMAT_STRI
 	va_list marker;
 	char msg[4096];
 
-	va_start(marker, fmt);
+	va_start(marker, fmt); //-V2018 //-V2019
 	V_vsprintf_safe(msg, fmt, marker);
 	va_end(marker);
 

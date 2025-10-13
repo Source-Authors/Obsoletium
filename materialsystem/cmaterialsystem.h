@@ -555,21 +555,6 @@ public:
 	DELEGATE_TO_OBJECT_0C( int,				MaxHWMorphBatchCount, g_pMorphMgr );
 	DELEGATE_TO_OBJECT_1V(					GetCurrentColorCorrection, ShaderColorCorrectionInfo_t*, g_pColorCorrectionSystem );
 
-#if defined( _X360 )
-	void									ListUsedMaterials();
-	HXUIFONT								OpenTrueTypeFont( const char *pFontname, int tall, int style );
-	void									CloseTrueTypeFont( HXUIFONT hFont );
-	bool									GetTrueTypeFontMetrics( HXUIFONT hFont, XUIFontMetrics *pFontMetrics, XUICharMetrics charMetrics[256] );
-	// Render a sequence of characters and extract the data into a buffer
-	// For each character, provide the width+height of the font texture subrect,
-	// an offset to apply when rendering the glyph, and an offset into a buffer to receive the RGBA data
-	bool									GetTrueTypeGlyphs( HXUIFONT hFont, int numChars, wchar_t *pWch, int *pOffsetX, int *pOffsetY, int *pWidth, int *pHeight, unsigned char *pRGBA, int *pOffset );
-	void									ReadBackBuffer( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned char *pData, ImageFormat dstFormat, int nDstStride );
-	void									PersistDisplay();
-	void									*GetD3DDevice();
-	bool									OwnGPUResources( bool bEnable );
-#endif
-
 	MaterialLock_t							Lock();
 	void									Unlock( MaterialLock_t );
 	CMatCallQueue *							GetRenderCallQueue();

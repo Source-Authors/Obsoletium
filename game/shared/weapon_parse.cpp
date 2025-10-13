@@ -328,6 +328,7 @@ FileWeaponInfo_t::FileWeaponInfo_t()
 	iconAutoaim = 0;
 	iconZoomedCrosshair = 0;
 	iconZoomedAutoaim = 0;
+	iconSmall = 0;
 	bShowUsageHint = false;
 	m_bAllowFlipping = true;
 	m_bBuiltRightHanded = true;

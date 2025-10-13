@@ -505,18 +505,26 @@ MatSysWindow::handleEvent (mxEvent *event)
 				g_MDLViewer->Refresh();
 				break;
 			}
-		case 32:
+		case VK_SPACE:
 			{
 				int iSeq = g_pStudioModel->GetSequence ();
 				if (iSeq == g_pStudioModel->SetSequence (iSeq + 1))
 				{
-					g_pStudioModel->SetSequence (0);
+					g_pStudioModel->SetSequence ((intp)0);
 				}
 			}
 			break;
 		}
 	}
 	break;
+	// dimhotepus: CS:GO
+	case mxEvent::DropFile:
+	{
+		V_strlower( event->szChars );
+		// TODO(dimhotepus): Continue CS:GO backport.
+		// g_ControlPanel->AddQCRecordPath( event->szChars );
+		break;
+	}
 
 	} // switch (event->event)
 

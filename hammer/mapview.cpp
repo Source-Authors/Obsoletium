@@ -25,7 +25,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244 4305)
 
 
 //-----------------------------------------------------------------------------
@@ -75,11 +74,11 @@ void CMapView::ActivateView(bool bActivate)
 //-----------------------------------------------------------------------------
 bool CMapView::ShouldRender()
 {
-	DWORD dwTimeNow = timeGetTime();
+	ULONGLONG dwTimeNow = GetTickCount64();
 
 	if (m_dwTimeLastRender != 0)
 	{
-		DWORD dwTimeElapsed = dwTimeNow - m_dwTimeLastRender;
+		ULONGLONG dwTimeElapsed = dwTimeNow - m_dwTimeLastRender;
 	
 		if ( dwTimeElapsed <= 0 )
 			return false;

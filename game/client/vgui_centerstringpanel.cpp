@@ -72,7 +72,7 @@ CCenterStringLabel::CCenterStringLabel( vgui::VPANEL parent ) :
 	SetParent( parent );
 	ComputeSize();
 	SetVisible( false );
-	SetCursor( null );
+	SetCursor( 0 );
 	SetKeyBoardInputEnabled( false );
 	SetMouseInputEnabled( false );
 	SetContentAlignment( vgui::Label::a_center );

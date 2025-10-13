@@ -92,7 +92,7 @@ public:
 //-----------------------------------------------------------------------------
 // Installs a callback to call right before a spatial partition query occurs
 //-----------------------------------------------------------------------------
-class IPartitionQueryCallback
+abstract_class IPartitionQueryCallback
 {
 public:
 	virtual void OnPreQuery_V1() = 0;

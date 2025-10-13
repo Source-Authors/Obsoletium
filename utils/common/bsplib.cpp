@@ -171,7 +171,7 @@ BEGIN_BYTESWAP_DATADESC( ddispinfo_t )
 	DEFINE_FIELD( m_iLightmapSamplePositionStart, FIELD_INTEGER ),
 	DEFINE_EMBEDDED_ARRAY( m_EdgeNeighbors, 4 ),
 	DEFINE_EMBEDDED_ARRAY( m_CornerNeighbors, 4 ),
-	DEFINE_ARRAY( m_AllowedVerts, FIELD_INTEGER, ddispinfo_t::ALLOWEDVERTS_SIZE ),	// unsigned long
+	DEFINE_ARRAY( m_AllowedVerts, FIELD_INTEGER, ddispinfo_t::ALLOWEDVERTS_SIZE ),	// uint32
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( CDispNeighbor )
@@ -868,7 +868,7 @@ void AddDirToPak( IZip *pak, const char *pDirPath, const char *pPakPrefix )
 	V_snprintf( szEnumerateDir, sizeof( szEnumerateDir ), "%s/*.*", pDirPath );
 	V_FixSlashes( szEnumerateDir );
 
-	FileFindHandle_t handle;
+	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *szFindResult = g_pFullFileSystem->FindFirst( szEnumerateDir, &handle );
 	do
 	{
@@ -1401,7 +1401,7 @@ static void UnserializeOcclusionLumpV2( CUtlBuffer &buf )
 	{
 		if ( g_bSwapOnLoad )
 		{
-			g_Swap.SwapBufferToTargetEndian( (int*)buf.PeekGet(), (int*)buf.PeekGet(), nCount );
+			g_Swap.SwapBufferToTargetEndian( (int*)buf.PeekGet(), (const int*)buf.PeekGet(), nCount );
 		}
 		g_OccluderVertexIndices.SetCount( nCount );
 		buf.Get( g_OccluderVertexIndices.Base(), nCount * sizeof(g_OccluderVertexIndices[0]) );
@@ -2286,6 +2286,12 @@ bool LoadBSPFile( const char *filename )
 	CopyLump( header, FIELD_CHARACTER, LUMP_TEXDATA_STRING_DATA, g_TexDataStringData );
 	CopyLump( header, FIELD_INTEGER, LUMP_TEXDATA_STRING_TABLE, g_TexDataStringTable );
 
+	// It's assumed by other code that the data lump is filled with C strings. We need to make sure that 
+	// the buffer as a whole ends with a '\0'.
+	// dimhotepus: TF2 backport.
+	if ( g_TexDataStringData.Count() > 0 && g_TexDataStringData.Tail() != '\0' )
+		Error( "BSP file %s is corrupted", filename );
+	
 	g_nOverlayCount = CopyLump(header, LUMP_OVERLAYS, g_Overlays);
 	g_nWaterOverlayCount = CopyLump( header, LUMP_WATEROVERLAYS, g_WaterOverlays );
 	CopyLump( header, LUMP_OVERLAY_FADES, g_OverlayFades );
@@ -2830,7 +2836,7 @@ bool WriteLumpToFile( dheader_t *header, char *filename, int lump )
 	return true;
 }
 
-void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer, size_t nBufLen )
+void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer, intp nBufLen )
 {
 	char lumppre[MAX_PATH];	
 	if ( !GenerateNextLumpFileName( filename, lumppre, MAX_PATH ) )
@@ -2864,14 +2870,16 @@ void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer,
 
 
 //============================================================================
-#define ENTRIES(a)		ssize(a)
-#define ENTRYSIZE(a)	(sizeof(*(a)))
+template<typename T, std::size_t size>
+constexpr inline std::size_t ENTRYSIZE(T (&array)[size]) noexcept {
+  return sizeof(array[0]);
+}
 
-int ArrayUsage( const char *szItem, int items, int maxitems, int itemsize )
+static intp ArrayUsage( const char *szItem, intp items, std::size_t maxitems, std::size_t itemsize )
 {
 	float	percentage = maxitems ? items * 100.0f / maxitems : 0.0f;
 
-    Msg("%-17.17s %8i/%-8i %8i/%-8i (%4.1f%%) ", 
+    Msg("%-17.17s %8zd/%-8zu %8zu/%-8zu (%4.1f%%) ", 
 		   szItem, items, maxitems, items * itemsize, maxitems * itemsize, percentage );
 	if ( percentage > 80.0 )
 		Msg( "VERY FULL!\n" );
@@ -2884,10 +2892,10 @@ int ArrayUsage( const char *szItem, int items, int maxitems, int itemsize )
 	return items * itemsize;
 }
 
-int GlobUsage( const char *szItem, int itemstorage, int maxstorage )
+static intp GlobUsage( const char *szItem, intp itemstorage, std::size_t maxstorage )
 {
 	float	percentage = maxstorage ? itemstorage * 100.0f / maxstorage : 0.0f;
-    Msg("%-17.17s     [variable]    %8i/%-8i (%4.1f%%) ", 
+    Msg("%-17.17s     [variable]    %8zd/%-8zu (%4.1f%%) ", 
 		   szItem, itemstorage, maxstorage, percentage );
 	if ( percentage > 80.0 )
 		Msg( "VERY FULL!\n" );
@@ -2918,52 +2926,52 @@ void PrintBSPFileSizes (void)
 	Msg( "%-17s %16s %16s %9s \n", "Object names", "Objects/Maxobjs", "Memory / Maxmem", "Fullness" );
 	Msg( "%-17s %16s %16s %9s \n",  "------------", "---------------", "---------------", "--------" );
 
-	totalmemory += ArrayUsage( "models",		nummodels,		ssize(dmodels),		ENTRYSIZE(dmodels) );
-	totalmemory += ArrayUsage( "brushes",		numbrushes,		ssize(dbrushes),		ENTRYSIZE(dbrushes) );
-	totalmemory += ArrayUsage( "brushsides",	numbrushsides,	ssize(dbrushsides),	ENTRYSIZE(dbrushsides) );
-	totalmemory += ArrayUsage( "planes",		numplanes,		ssize(dplanes),		ENTRYSIZE(dplanes) );
-	totalmemory += ArrayUsage( "vertexes",		numvertexes,	ssize(dvertexes),		ENTRYSIZE(dvertexes) );
-	totalmemory += ArrayUsage( "nodes",			numnodes,		ssize(dnodes),		ENTRYSIZE(dnodes) );
-	totalmemory += ArrayUsage( "texinfos",		texinfo.Count(),MAX_MAP_TEXINFO,		sizeof(texinfo_t) );
-	totalmemory += ArrayUsage( "texdata",		numtexdata,		ssize(dtexdata),		ENTRYSIZE(dtexdata) );
+	totalmemory += ArrayUsage( "models",					nummodels,								std::size(dmodels),				ENTRYSIZE(dmodels) );
+	totalmemory += ArrayUsage( "brushes",					numbrushes,								std::size(dbrushes),			ENTRYSIZE(dbrushes) );
+	totalmemory += ArrayUsage( "brushsides",				numbrushsides,							std::size(dbrushsides),			ENTRYSIZE(dbrushsides) );
+	totalmemory += ArrayUsage( "planes",					numplanes,								std::size(dplanes),				ENTRYSIZE(dplanes) );
+	totalmemory += ArrayUsage( "vertexes",					numvertexes,							std::size(dvertexes),			ENTRYSIZE(dvertexes) );
+	totalmemory += ArrayUsage( "nodes",						numnodes,								std::size(dnodes),				ENTRYSIZE(dnodes) );
+	totalmemory += ArrayUsage( "texinfos",					texinfo.Count(),						MAX_MAP_TEXINFO,				sizeof(texinfo_t) );
+	totalmemory += ArrayUsage( "texdata",					numtexdata,								std::size(dtexdata),			ENTRYSIZE(dtexdata) );
     
-	totalmemory += ArrayUsage( "dispinfos",     g_dispinfo.Count(),			0,			sizeof( ddispinfo_t ) );
-    totalmemory += ArrayUsage( "disp_verts",	g_DispVerts.Count(),		0,			sizeof( g_DispVerts[0] ) );
-    totalmemory += ArrayUsage( "disp_tris",		g_DispTris.Count(),			0,			sizeof( g_DispTris[0] ) );
-    totalmemory += ArrayUsage( "disp_lmsamples",g_DispLightmapSamplePositions.Count(),0,sizeof( g_DispLightmapSamplePositions[0] ) );
+	totalmemory += ArrayUsage( "dispinfos",					g_dispinfo.Count(),						0,								sizeof( ddispinfo_t ) );
+    totalmemory += ArrayUsage( "disp_verts",				g_DispVerts.Count(),					0,								sizeof( g_DispVerts[0] ) );
+    totalmemory += ArrayUsage( "disp_tris",					g_DispTris.Count(),						0,								sizeof( g_DispTris[0] ) );
+    totalmemory += ArrayUsage( "disp_lmsamples",			g_DispLightmapSamplePositions.Count(),	0,								sizeof( g_DispLightmapSamplePositions[0] ) );
 	
-	totalmemory += ArrayUsage( "faces",			numfaces,		ssize(dfaces),		ENTRYSIZE(dfaces) );
-	totalmemory += ArrayUsage( "hdr faces",     numfaces_hdr,	ssize(dfaces_hdr),	ENTRYSIZE(dfaces_hdr) );
-    totalmemory += ArrayUsage( "origfaces",     numorigfaces,   ssize(dorigfaces),    ENTRYSIZE(dorigfaces) );    // original faces
-	totalmemory += ArrayUsage( "leaves",		numleafs,		ssize(dleafs),		ENTRYSIZE(dleafs) );
-	totalmemory += ArrayUsage( "leaffaces",		numleaffaces,	ssize(dleaffaces),	ENTRYSIZE(dleaffaces) );
-	totalmemory += ArrayUsage( "leafbrushes",	numleafbrushes,	ssize(dleafbrushes),	ENTRYSIZE(dleafbrushes) );
-	totalmemory += ArrayUsage( "areas",	numareas,	ssize(dareas),	ENTRYSIZE(dareas) );
-	totalmemory += ArrayUsage( "surfedges",		numsurfedges,	ssize(dsurfedges),	ENTRYSIZE(dsurfedges) );
-	totalmemory += ArrayUsage( "edges",			numedges,		ssize(dedges),		ENTRYSIZE(dedges) );
-	totalmemory += ArrayUsage( "LDR worldlights",	numworldlightsLDR,	ssize(dworldlightsLDR),	ENTRYSIZE(dworldlightsLDR) );
-	totalmemory += ArrayUsage( "HDR worldlights",	numworldlightsHDR,	ssize(dworldlightsHDR),	ENTRYSIZE(dworldlightsHDR) );
+	totalmemory += ArrayUsage( "faces",						numfaces,								std::size(dfaces),				ENTRYSIZE(dfaces) );
+	totalmemory += ArrayUsage( "hdr faces",					numfaces_hdr,							std::size(dfaces_hdr),			ENTRYSIZE(dfaces_hdr) );
+    totalmemory += ArrayUsage( "origfaces",					numorigfaces,							std::size(dorigfaces),			ENTRYSIZE(dorigfaces) );    // original faces
+	totalmemory += ArrayUsage( "leaves",					numleafs,								std::size(dleafs),				ENTRYSIZE(dleafs) );
+	totalmemory += ArrayUsage( "leaffaces",					numleaffaces,							std::size(dleaffaces),			ENTRYSIZE(dleaffaces) );
+	totalmemory += ArrayUsage( "leafbrushes",				numleafbrushes,							std::size(dleafbrushes),		ENTRYSIZE(dleafbrushes) );
+	totalmemory += ArrayUsage( "areas",						numareas,								std::size(dareas),				ENTRYSIZE(dareas) );
+	totalmemory += ArrayUsage( "surfedges",					numsurfedges,							std::size(dsurfedges),			ENTRYSIZE(dsurfedges) );
+	totalmemory += ArrayUsage( "edges",						numedges,								std::size(dedges),				ENTRYSIZE(dedges) );
+	totalmemory += ArrayUsage( "LDR worldlights",			numworldlightsLDR,						std::size(dworldlightsLDR),		ENTRYSIZE(dworldlightsLDR) );
+	totalmemory += ArrayUsage( "HDR worldlights",			numworldlightsHDR,						std::size(dworldlightsHDR),		ENTRYSIZE(dworldlightsHDR) );
 
-	totalmemory += ArrayUsage( "leafwaterdata",	numleafwaterdata,ssize(dleafwaterdata),	ENTRYSIZE(dleafwaterdata) );
-	totalmemory += ArrayUsage( "waterstrips",	g_numprimitives,ssize(g_primitives),	ENTRYSIZE(g_primitives) );
-	totalmemory += ArrayUsage( "waterverts",	g_numprimverts,	ssize(g_primverts),	ENTRYSIZE(g_primverts) );
-	totalmemory += ArrayUsage( "waterindices",	g_numprimindices,ssize(g_primindices),ENTRYSIZE(g_primindices) );
-	totalmemory += ArrayUsage( "cubemapsamples", g_nCubemapSamples,ssize(g_CubemapSamples),ENTRYSIZE(g_CubemapSamples) );
-	totalmemory += ArrayUsage( "overlays",      g_nOverlayCount, ssize(g_Overlays),   ENTRYSIZE(g_Overlays) );
+	totalmemory += ArrayUsage( "leafwaterdata",				numleafwaterdata,						std::size(dleafwaterdata),		ENTRYSIZE(dleafwaterdata) );
+	totalmemory += ArrayUsage( "waterstrips",				g_numprimitives,						std::size(g_primitives),		ENTRYSIZE(g_primitives) );
+	totalmemory += ArrayUsage( "waterverts",				g_numprimverts,							std::size(g_primverts),			ENTRYSIZE(g_primverts) );
+	totalmemory += ArrayUsage( "waterindices",				g_numprimindices,						std::size(g_primindices),		ENTRYSIZE(g_primindices) );
+	totalmemory += ArrayUsage( "cubemapsamples",			g_nCubemapSamples,						std::size(g_CubemapSamples),	ENTRYSIZE(g_CubemapSamples) );
+	totalmemory += ArrayUsage( "overlays",					g_nOverlayCount,						std::size(g_Overlays),			ENTRYSIZE(g_Overlays) );
 	
-	totalmemory += GlobUsage( "LDR lightdata",		dlightdataLDR.Count(),	0 );
-	totalmemory += GlobUsage( "HDR lightdata",	dlightdataHDR.Count(),	0 );
-	totalmemory += GlobUsage( "visdata",		visdatasize,	sizeof(dvisdata) );
-	totalmemory += GlobUsage( "entdata",		dentdata.Count(), 384*1024 );	// goal is <384K
+	totalmemory += GlobUsage( "LDR lightdata",				dlightdataLDR.Count(),					0 );
+	totalmemory += GlobUsage( "HDR lightdata",				dlightdataHDR.Count(),					0 );
+	totalmemory += GlobUsage( "visdata",					visdatasize,							sizeof(dvisdata) );
+	totalmemory += GlobUsage( "entdata",					dentdata.Count(),						384*1024 );	// goal is <384K
 
-	totalmemory += ArrayUsage( "LDR ambient table", g_LeafAmbientIndexLDR.Count(), MAX_MAP_LEAFS, sizeof( g_LeafAmbientIndexLDR[0] ) );
-	totalmemory += ArrayUsage( "HDR ambient table", g_LeafAmbientIndexHDR.Count(), MAX_MAP_LEAFS, sizeof( g_LeafAmbientIndexHDR[0] ) );
-	totalmemory += ArrayUsage( "LDR leaf ambient lighting", g_LeafAmbientLightingLDR.Count(), MAX_MAP_LEAFS, sizeof( g_LeafAmbientLightingLDR[0] ) );
-	totalmemory += ArrayUsage( "HDR leaf ambient lighting", g_LeafAmbientLightingHDR.Count(), MAX_MAP_LEAFS, sizeof( g_LeafAmbientLightingHDR[0] ) );
+	totalmemory += ArrayUsage( "LDR ambient table",			g_LeafAmbientIndexLDR.Count(),			MAX_MAP_LEAFS,					sizeof( g_LeafAmbientIndexLDR[0] ) );
+	totalmemory += ArrayUsage( "HDR ambient table",			g_LeafAmbientIndexHDR.Count(),			MAX_MAP_LEAFS,					sizeof( g_LeafAmbientIndexHDR[0] ) );
+	totalmemory += ArrayUsage( "LDR leaf ambient lighting", g_LeafAmbientLightingLDR.Count(),		MAX_MAP_LEAFS,					sizeof( g_LeafAmbientLightingLDR[0] ) );
+	totalmemory += ArrayUsage( "HDR leaf ambient lighting", g_LeafAmbientLightingHDR.Count(),		MAX_MAP_LEAFS,					sizeof( g_LeafAmbientLightingHDR[0] ) );
 
-	totalmemory += ArrayUsage( "occluders",     g_OccluderData.Count(),	0, sizeof( g_OccluderData[0] ) );
-    totalmemory += ArrayUsage( "occluder polygons",	g_OccluderPolyData.Count(),	0, sizeof( g_OccluderPolyData[0] ) );
-    totalmemory += ArrayUsage( "occluder vert ind",g_OccluderVertexIndices.Count(),0, sizeof( g_OccluderVertexIndices[0] ) );
+	totalmemory += ArrayUsage( "occluders",					g_OccluderData.Count(),					0,								sizeof( g_OccluderData[0] ) );
+    totalmemory += ArrayUsage( "occluder polygons",			g_OccluderPolyData.Count(),				0,								sizeof( g_OccluderPolyData[0] ) );
+    totalmemory += ArrayUsage( "occluder vert ind",			g_OccluderVertexIndices.Count(),		0,								sizeof( g_OccluderVertexIndices[0] ) );
 
 	GameLumpHandle_t h = g_GameLumps.GetGameLumpHandle( GAMELUMP_DETAIL_PROPS );
 	if (h != g_GameLumps.InvalidGameLump())
@@ -3121,7 +3129,8 @@ Generates the dentdata string from all the entities
 void UnparseEntities (void)
 {
 	epair_t	*ep;
-	char	line[2048];
+	// dimhotepus: +16 is from TF2 backport.
+	char	line[2048 + 16];
 	int		i;
 	char	key[1020], value[1020];
 
@@ -5081,8 +5090,8 @@ static thread_local dheader_t *s_sort_header;
 // compare function for qsort below
 static int LumpOffsetCompare( const void *pElem1, const void *pElem2 )
 {
-	int lump1 = *(byte *)pElem1;
-	int lump2 = *(byte *)pElem2;
+	const int lump1 = *(const byte *)pElem1;
+	const int lump2 = *(const byte *)pElem2;
 
 	if ( lump1 != lump2 )
 	{

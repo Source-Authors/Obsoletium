@@ -201,7 +201,8 @@ float4 main( PS_INPUT i ) : COLOR
 
 	float specularFactor = 1.0f;
 	float4 normalTexel = tex2D( BumpmapSampler, i.baseTexCoord2_tangentSpaceVertToEyeVectorXY.xy );
-	float3 tangentSpaceNormal = normalTexel * 2.0f - 1.0f;
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	float3 tangentSpaceNormal = normalTexel.xyz * 2.0f - 1.0f;
 
 	if ( bNormalMapAlphaEnvmapMask )
 		specularFactor = normalTexel.a;
@@ -211,7 +212,8 @@ float4 main( PS_INPUT i ) : COLOR
 	float3 worldSpaceNormal = float3( 0.0f, 0.0f, 1.0f );
 	if ( bDiffuseLighting || bFlashlight || bCubemap || bSelfIllumFresnel )
 	{
-		worldSpaceNormal = Vec3TangentToWorld( tangentSpaceNormal, i.vWorldNormal, i.vWorldTangent, vWorldBinormal );
+		// dimhotepus: Fix float4 -> float3 downcast warnings.
+		worldSpaceNormal = Vec3TangentToWorld( tangentSpaceNormal, i.vWorldNormal, i.vWorldTangent.xyz, vWorldBinormal );
 #if ( defined(SHADER_MODEL_PS_2_B) || defined(SHADER_MODEL_PS_3_0) )
 		worldSpaceNormal = normalize( worldSpaceNormal );
 #else
@@ -227,7 +229,8 @@ float4 main( PS_INPUT i ) : COLOR
 				false, 1.0f, bDoDiffuseWarp, DiffuseWarpSampler );
 	}
 
-	float3 albedo = baseColor;
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	float3 albedo = baseColor.rgb;
 	if (bBlendTintByBaseAlpha)
 	{
 		float3 tintedColor = albedo * g_DiffuseModulation.rgb;
@@ -314,11 +317,13 @@ float4 main( PS_INPUT i ) : COLOR
 	{
 		float3 reflectVect = CalcReflectionVectorUnnormalized( worldSpaceNormal, i.worldVertToEyeVectorXYZ_tangentSpaceVertToEyeVectorZ.xyz );
 
-		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect );
+		// dimhotepus: Fix float4 -> float3 downcast warnings.
+		specularLighting = ENV_MAP_SCALE * texCUBE( EnvmapSampler, reflectVect ).xyz;
 		specularLighting *= specularFactor;
 		specularLighting *= g_EnvmapTint_TintReplaceFactor.rgb;
 		float3 specularLightingSquared = specularLighting * specularLighting;
-		specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast_ShadowTweaks );
+		// dimhotepus: Fix float4 -> float3 downcast warnings.
+		specularLighting = lerp( specularLighting, specularLightingSquared, g_EnvmapContrast_ShadowTweaks.xyz );
 		float3 greyScale = dot( specularLighting, float3( 0.299f, 0.587f, 0.114f ) );
 		specularLighting = lerp( greyScale, specularLighting, g_EnvmapSaturation );
 	}

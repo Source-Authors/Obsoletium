@@ -17,16 +17,16 @@ $Configuration
 {
 	$Compiler
 	{
-		$AdditionalIncludeDirectories		"$BASE,..\common;..\vmpi;$SRCDIR\dx9sdk\include"
+		$AdditionalIncludeDirectories		"$BASE;..\;..\common;$SRCDIR\dx9sdk\include"
 		$AdditionalIncludeDirectories		"$BASE;$ZLIBSRCDIR;$ZLIBSRC2DIR;$ZLIBOUTDIR"
 		
-		$PreprocessorDefinitions			"$BASE;SHADERCOMPILE_EXPORTS;MPI"
+		$PreprocessorDefinitions			"$BASE;SHADERCOMPILE_EXPORTS"
 		$EnableC++Exceptions				"Yes (/EHsc)"
 	}
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE comsuppw.lib ws2_32.lib user32.lib gdi32.lib"
+		$AdditionalDependencies				"$BASE comsuppw.lib"
 	}
 }
 
@@ -35,31 +35,31 @@ $Project "shader-compiler-core"
 	$Folder	"Source Files"
 	{
 		$File	"..\common\cmdlib.cpp"
-		$File	"..\common\threads.cpp"
-		$File	"..\common\vmpi_tools_shared.cpp"
 		$File	"..\common\tools_minidump.cpp"
+		$File	"..\common\filesystem_tools.cpp"
 		$File	"..\common\pacifier.cpp"
+		$File	"..\vmpi\messbuf.cpp"
+		$File	"$SRCDIR\public\filesystem_init.cpp"
 		$File	"$SRCDIR\public\filesystem_helpers.cpp"
 		$File	"cmdsink.cpp"
 		$File	"d3dxfxc.cpp"
 		$File	"shadercompile.cpp"
-		$File	"subprocess.cpp"
 		$File	"cfgprocessor.cpp"
 	}
 
 	$Folder	"Header Files"
 	{
 		$File	"..\common\cmdlib.h"
-		$File	"..\common\threads.h"
-		$File	"..\common\vmpi_tools_shared.h"
 		$File	"..\common\tools_minidump.h"
+		$File	"..\common\filesystem_tools.h"
 		$File	"..\common\pacifier.h"
+		$File	"..\vmpi\messbuf.h"
+		$File	"$SRCDIR\public\filesystem_init.h"
+		$File	"$SRCDIR\public\filesystem_helpers.h"
 		$File	"$SRCDIR\public\ishadercompiledll.h"
 		$File	"cmdsink.h"
 		$File	"d3dxfxc.h"
-		$File	"shadercompile.h"
 		$File	"cfgprocessor.h"
-		$File	"subprocess.h"
 		$File	"utlnodehash.h"
 		$File	"resource.h"
 	}
@@ -67,7 +67,6 @@ $Project "shader-compiler-core"
 	$Folder	"Link Libraries"
 	{
 		$Lib tier2
-		$Lib vmpi
 		$Lib $LIBCOMMON\lzma
 		$Libexternal "$ZLIBOUTDIR/zlibstatic"
 	}

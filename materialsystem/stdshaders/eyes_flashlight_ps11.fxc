@@ -5,5 +5,7 @@
 //=============================================================================
 
 #define HDRTYPE HDR_TYPE_NONE
+// dimhotepus: Add missed PIXELFOGTYPE
+#define PIXELFOGTYPE PIXEL_FOG_TYPE_RANGE
 
 #include "eyes_flashlight_inc.fxc"

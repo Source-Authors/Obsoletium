@@ -391,7 +391,7 @@ bool CGenericPersistentManager< T >::Load()
 			{
 				// Peek in directory and load files based on what's there
 				CFmtStr fmtPath( "%s*.%s", GetIndexPath(), GENERIC_FILE_EXTENSION );
-				FileFindHandle_t hFind;
+				FileFindHandle_t hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 				const char *pFilename = g_pFullFileSystem->FindFirst( fmtPath.Access(), &hFind );
 				while ( pFilename )
 				{

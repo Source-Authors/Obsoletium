@@ -662,9 +662,6 @@ struct ComboEmission {
   std::string m_sSuffix;
 } g_comboEmission;
 
-size_t const g_lenTmpBuffer = 1 * 1024 * 1024;  // 1Mb buffer for tmp storage
-char g_chTmpBuffer[g_lenTmpBuffer];
-
 void ComboGenerator::RunAllCombos(CComplexExpression const &skipExpr) {
   // Combo numbers
   uint64_t const nTotalCombos = NumCombos();
@@ -762,7 +759,7 @@ class CfgEntry {
 QuickStrUnique s_uniqueSections, s_strPool;
 std::multiset<CfgEntry> s_setEntries;
 
-class ComboHandleImpl : public IEvaluationContext {
+class ComboHandleImpl final : public IEvaluationContext {
  public:
   uint64_t m_iTotalCommand;
   uint64_t m_iComboNumber;
@@ -888,7 +885,8 @@ bool ComboHandleImpl::NextNotSkipped(uint64_t iTotalCommand) {
   }
 }
 
-void ComboHandleImpl::FormatCommand(OUT_Z_CAP(buffer_size) char *pchBuffer, intp bufferSize) {
+void ComboHandleImpl::FormatCommand(OUT_Z_CAP(bufferSize) char *pchBuffer,
+                                    intp bufferSize) {
   // Get the pointers
   int *const pnValues = m_arrVarSlots.ArrayBaseForEdit();
   int *const pnValuesEnd = pnValues + m_arrVarSlots.Size();
@@ -925,61 +923,59 @@ struct CAutoDestroyEntries {
   }
 } s_autoDestroyEntries;
 
-FILE *&GetInputStream(FILE *) {
-  static FILE *s_fInput = stdin;
-  return s_fInput;
-}
-
 CUtlInplaceBuffer *&GetInputStream(CUtlInplaceBuffer *) {
-  static CUtlInplaceBuffer *s_fInput = nullptr;
-  return s_fInput;
+  static CUtlInplaceBuffer *in = nullptr;
+  return in;
 }
 
-char *GetLinePtr_Private() {
-  if (CUtlInplaceBuffer *pUtlBuffer =
-          GetInputStream((CUtlInplaceBuffer *)nullptr))
-    return pUtlBuffer->InplaceGetLinePtr();
-
-  if (FILE *fInput = GetInputStream((FILE *)nullptr))
-    return fgets(g_chTmpBuffer, g_lenTmpBuffer, fInput);
+char *GetLinePtr_Private(CUtlInplaceBuffer *in) {
+  if (auto *buffer = in) {
+    return buffer->InplaceGetLinePtr();
+  }
 
   return nullptr;
 }
 
-bool LineEquals(char const *sz1, char const *sz2, int nLen) {
-  return 0 == strncmp(sz1, sz2, nLen);
+template <intp size>
+bool LineEquals(char const *l1, const char (&l2)[size]) {
+  return 0 == V_strncmp(l1, l2, size - 1);
 }
 
-char *NextLine() {
-  if (char *szLine = GetLinePtr_Private()) {
+char *NextLine(CUtlInplaceBuffer *in) {
+  if (char *szLine = GetLinePtr_Private(in)) {
     // Trim trailing whitespace as well
-    size_t len = (size_t)strlen(szLine);
+    size_t len = strlen(szLine);
+
     while (len-- > 0 && V_isspace(szLine[len])) {
-      szLine[len] = 0;
+      szLine[len] = '\0';
     }
+
     return szLine;
   }
 
-  return NULL;
+  return nullptr;
 }
 
-char *WaitFor(char const *szWaitString, int nMatchLength) {
-  while (char *pchResult = NextLine()) {
-    if (LineEquals(pchResult, szWaitString, nMatchLength)) return pchResult;
+template <intp size>
+const char *WaitFor(const char (&wait)[size], CUtlInplaceBuffer *in) {
+  while (const char *line = NextLine(in)) {
+    if (LineEquals(line, wait)) {
+      return line;
+    }
   }
 
   return nullptr;
 }
 
-bool ProcessSection(CfgEntry &cfge) {
+bool ProcessSection(CfgEntry &cfge, CUtlInplaceBuffer *in) {
   bool bStaticDefines;
 
   // Read the next line for the section src file
-  if (char *szLine = NextLine()) {
+  if (const char *szLine = NextLine(in)) {
     cfge.m_szShaderSrc = s_strPool.AddLookup(szLine);
   }
 
-  if (char *szLine = WaitFor("#DEFINES-", 9)) {
+  if (const char *szLine = WaitFor("#DEFINES-", in)) {
     bStaticDefines = (szLine[9] == 'S');
   } else
     return false;
@@ -989,11 +985,11 @@ bool ProcessSection(CfgEntry &cfge) {
   CComplexExpression &exprSkip = *(cfge.m_pExpr = new CComplexExpression(&cg));
 
   // #DEFINES:
-  while (char *szLine = NextLine()) {
-    if (LineEquals(szLine, "#SKIP", 5)) break;
+  while (char *szLine = NextLine(in)) {
+    if (LineEquals(szLine, "#SKIP")) break;
 
     // static defines
-    if (LineEquals(szLine, "#DEFINES-", 9)) {
+    if (LineEquals(szLine, "#DEFINES-")) {
       bStaticDefines = (szLine[9] == 'S');
       continue;
     }
@@ -1027,18 +1023,18 @@ bool ProcessSection(CfgEntry &cfge) {
   }
 
   // #SKIP:
-  if (char *szLine = NextLine()) {
+  if (const char *szLine = NextLine(in)) {
     exprSkip.Parse(szLine);
   } else
     return false;
 
   // #COMMAND:
-  if (!WaitFor("#COMMAND", 8)) return false;
-  if (char *szLine = NextLine()) cfge.m_sPrefix = szLine;
-  if (char *szLine = NextLine()) cfge.m_sSuffix = szLine;
+  if (!WaitFor("#COMMAND", in)) return false;
+  if (const char *szLine = NextLine(in)) cfge.m_sPrefix = szLine;
+  if (const char *szLine = NextLine(in)) cfge.m_sSuffix = szLine;
 
   // #END
-  if (!WaitFor("#END", 4)) return false;
+  if (!WaitFor("#END", in)) return false;
 
   return true;
 }
@@ -1091,16 +1087,16 @@ void RunSection(CfgEntry const &cfge) {
   g_comboEmission.m_sSuffix = "";
 }
 
-void ProcessConfiguration() {
+void ProcessConfiguration(CUtlInplaceBuffer *in) {
   static bool s_bProcessOnce = false;
 
-  while (char *szLine = WaitFor("#BEGIN", 6)) {
+  while (const char *szLine = WaitFor("#BEGIN", in)) {
     if (' ' == szLine[6] && !s_uniqueSections.Add(szLine + 7)) continue;
 
     CfgEntry cfge;
     cfge.m_szName = s_uniqueSections.Lookup(szLine + 7);
 
-    ProcessSection(cfge);
+    ProcessSection(cfge, in);
     s_setEntries.insert(cfge);
   }
 
@@ -1155,20 +1151,9 @@ ComboHandle AsHandle(CPCHI_t *pImpl) {
   return reinterpret_cast<ComboHandle>(pImpl);
 }
 
-void ReadConfiguration(FILE *fInputStream) {
-  CAutoPushPop<FILE *> pushInputStream(internal::GetInputStream(fInputStream),
-                                       fInputStream);
-  internal::ProcessConfiguration();
-}
-
-void ReadConfiguration(CUtlInplaceBuffer *fInputStream) {
-  CAutoPushPop<CUtlInplaceBuffer *> pushInputStream(
-      internal::GetInputStream(fInputStream), fInputStream);
-  internal::ProcessConfiguration();
-}
-
-void DescribeConfiguration(std::unique_ptr<CfgEntryInfo[]> &rarrEntries) {
-  rarrEntries.reset(new CfgEntryInfo[internal::s_setEntries.size() + 1]);
+static std::unique_ptr<CfgEntryInfo[]> DescribeConfiguration() {
+  auto rarrEntries =
+      std::make_unique<CfgEntryInfo[]>(internal::s_setEntries.size() + 1);
 
   CfgEntryInfo *pInfo = rarrEntries.get();
   uint64_t nCurrentCommand = 0;
@@ -1196,6 +1181,16 @@ void DescribeConfiguration(std::unique_ptr<CfgEntryInfo[]> &rarrEntries) {
   memset(pInfo, 0, sizeof(CfgEntryInfo));
   pInfo->m_iCommandStart = nCurrentCommand;
   pInfo->m_iCommandEnd = nCurrentCommand;
+
+  return rarrEntries;
+}
+
+std::unique_ptr<CfgEntryInfo[]> ReadConfiguration(CUtlInplaceBuffer *in) {
+  CAutoPushPop<CUtlInplaceBuffer *> stream{internal::GetInputStream(in), in};
+
+  internal::ProcessConfiguration(in);
+
+  return DescribeConfiguration();
 }
 
 ComboHandle Combo_GetCombo(uint64_t iCommandNumber) {
@@ -1283,7 +1278,8 @@ ComboHandle Combo_GetNext(uint64_t &riCommandNumber, ComboHandle &rhCombo,
   }
 }
 
-void Combo_FormatCommand(ComboHandle hCombo, OUT_Z_CAP(buffer_size) char *pchBuffer,
+void Combo_FormatCommand(ComboHandle hCombo,
+                         OUT_Z_CAP(buffer_size) char *pchBuffer,
                          intp buffer_size) {
   CPCHI_t *impl = FromHandle(hCombo);
 
@@ -1293,13 +1289,13 @@ void Combo_FormatCommand(ComboHandle hCombo, OUT_Z_CAP(buffer_size) char *pchBuf
 uint64_t Combo_GetCommandNum(ComboHandle hCombo) {
   if (CPCHI_t *impl = FromHandle(hCombo)) return impl->m_iTotalCommand;
 
-  return ~uint64_t(0);
+  return ~0ULL;
 }
 
 uint64_t Combo_GetComboNum(ComboHandle hCombo) {
   if (CPCHI_t *impl = FromHandle(hCombo)) return impl->m_iComboNumber;
 
-  return ~uint64_t(0);
+  return ~0ULL;
 }
 
 CfgEntryInfo const *Combo_GetEntryInfo(ComboHandle hCombo) {

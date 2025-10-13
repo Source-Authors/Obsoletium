@@ -11,8 +11,10 @@
 #define UTLSTACK_H
 
 #include <cstring>
-#include "utlmemory.h"
+
 #include "tier0/dbg.h"
+
+#include "utlmemory.h"
 
 
 //-----------------------------------------------------------------------------
@@ -44,21 +46,32 @@ public:
 	T* Base();
 	T const* Base() const;
 
+	// STL compatible member functions. These allow easier use of std::sort
+	// and they are forward compatible with the C++ 11 range-based for loops.
+	T* begin()					{ return Base(); }
+	const T* begin() const		{ return Base(); }
+
+	T* end()					{ return Base() + Count(); }
+	const T* end() const		{ return Base() + Count(); }
+
 	// Looks at the stack top
 	T& Top();
 	T const& Top() const;
 
 	// Size
-	intp Count() const;
+	[[nodiscard]] intp Count() const;
 
 	// Is element index valid?
-	bool IsIdxValid( intp i ) const;
+	[[nodiscard]] bool IsIdxValid( intp i ) const;
 
 	// Adds an element, uses default constructor
 	intp Push();
 
 	// Adds an element, uses copy constructor
 	intp Push( T const& src );
+
+	// Adds an element, uses move constructor
+	intp Push( T&& src );
 
 	// Pops the stack
 	void Pop();
@@ -255,7 +268,7 @@ template< class T, class M >
 intp CUtlStack<T,M>::Push()
 {
 	GrowStack();
-	Construct( &Element(m_Size-1) );
+	Construct( std::addressof( Element(m_Size-1) ) );
 	return m_Size - 1;
 }
 
@@ -267,7 +280,19 @@ template< class T, class M >
 intp CUtlStack<T,M>::Push( T const& src )
 {
 	GrowStack();
-	CopyConstruct( &Element(m_Size-1), src );
+	CopyConstruct( std::addressof( Element(m_Size-1) ), src );
+	return m_Size - 1;
+}
+
+//-----------------------------------------------------------------------------
+// Adds an element, uses copy constructor
+//-----------------------------------------------------------------------------
+
+template< class T, class M >
+intp CUtlStack<T,M>::Push( T&& src )
+{
+	GrowStack();
+	MoveConstruct( std::addressof( Element(m_Size-1) ), std::move( src ) );
 	return m_Size - 1;
 }
 
@@ -280,7 +305,7 @@ template< class T, class M >
 void CUtlStack<T,M>::Pop()
 {
 	Assert( m_Size > 0 );
-	Destruct( &Element(m_Size-1) );
+	Destruct( std::addressof( Element(m_Size-1) ) );
 	--m_Size;
 }
 
@@ -297,7 +322,7 @@ void CUtlStack<T,M>::PopMultiple( intp num )
 {
 	Assert( m_Size >= num );
 	for ( intp i = 0; i < num; ++i )
-		Destruct( &Element( m_Size - i - 1 ) );
+		Destruct( std::addressof( Element( m_Size - i - 1 ) ) );
 	m_Size -= num;
 }
 
@@ -310,7 +335,7 @@ template< class T, class M >
 void CUtlStack<T,M>::Clear()
 {
 	for (intp i = m_Size; --i >= 0; )
-		Destruct(&Element(i));
+		Destruct( std::addressof( Element(i) ) );
 
 	m_Size = 0;
 }

@@ -143,7 +143,7 @@ bool CToolPickFace::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 				for (int nFace = 0; nFace < nFaceCount; nFace++)
 				{
 					CMapFace *pFace = pSolid->GetFace(nFace);
-					int nIndex = FindFace(pFace);
+					intp nIndex = FindFace(pFace);
 					if ((nIndex == -1) || (m_Faces[nIndex].eState != FaceState_Select))
 					{
 						bAllSelected = false;
@@ -257,7 +257,7 @@ void CToolPickFace::SetEyedropperCursor(void)
 //-----------------------------------------------------------------------------
 void CToolPickFace::CycleSelectFace(CMapFace *pFace)
 {
-	int nIndex = FindFace(pFace);
+	intp nIndex = FindFace(pFace);
 	if (nIndex != -1)
 	{
 		//
@@ -305,7 +305,7 @@ void CToolPickFace::SetSelectedFaces(CMapFaceList &FaceListFull, CMapFaceList &F
 {
 	m_Faces.RemoveAll();
 
-	for (int i = 0; i < FaceListFull.Count(); i++)
+	for (intp i = 0; i < FaceListFull.Count(); i++)
 	{
 		CMapFace *pFace = FaceListFull.Element(i);
 
@@ -313,7 +313,7 @@ void CToolPickFace::SetSelectedFaces(CMapFaceList &FaceListFull, CMapFaceList &F
 		pFace->SetSelectionState(SELECT_NORMAL);
 	}
 
-	for (int i = 0; i < FaceListPartial.Count(); i++)
+	for (intp i = 0; i < FaceListPartial.Count(); i++)
 	{
 		CMapFace *pFace = FaceListPartial.Element(i);
 
@@ -327,9 +327,9 @@ void CToolPickFace::SetSelectedFaces(CMapFaceList &FaceListFull, CMapFaceList &F
 // Purpose: 
 // Input  : pFace - 
 //-----------------------------------------------------------------------------
-int CToolPickFace::FindFace(CMapFace *pFace)
+intp CToolPickFace::FindFace(CMapFace *pFace)
 {
-	for (int i = 0; i < m_Faces.Count(); i++)
+	for (intp i = 0; i < m_Faces.Count(); i++)
 	{
 		if (m_Faces[i].pFace == pFace)
 		{
@@ -346,7 +346,7 @@ int CToolPickFace::FindFace(CMapFace *pFace)
 //-----------------------------------------------------------------------------
 void CToolPickFace::DeselectAll(void)
 {
-	for (int i = 0; i < m_Faces.Count(); i++)
+	for (intp i = 0; i < m_Faces.Count(); i++)
 	{
 		m_Faces[i].pFace->SetSelectionState(SELECT_NONE);
 	}
@@ -363,7 +363,7 @@ void CToolPickFace::DeselectAll(void)
 //-----------------------------------------------------------------------------
 void CToolPickFace::SelectFace(CMapFace *pFace)
 {
-	int nIndex = FindFace(pFace);
+	intp nIndex = FindFace(pFace);
 	if (nIndex != -1)
 	{
 		//
@@ -388,7 +388,7 @@ void CToolPickFace::SelectFace(CMapFace *pFace)
 //-----------------------------------------------------------------------------
 void CToolPickFace::DeselectFace(CMapFace *pFace)
 {
-	int nIndex = FindFace(pFace);
+	intp nIndex = FindFace(pFace);
 	if (nIndex != -1)
 	{
 		DeselectFace(nIndex);
@@ -400,7 +400,7 @@ void CToolPickFace::DeselectFace(CMapFace *pFace)
 // Purpose: Removes the face at the given index from the selection set.
 // Input  : nIndex - Index of the face in the selection list.
 //-----------------------------------------------------------------------------
-void CToolPickFace::DeselectFace(int nIndex)
+void CToolPickFace::DeselectFace(intp nIndex)
 {
 	Assert(m_Faces.IsValidIndex(nIndex));
 

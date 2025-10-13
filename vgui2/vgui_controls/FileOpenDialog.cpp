@@ -292,8 +292,7 @@ int FileCompletionEdit::GetItemIDFromRow(int row)
 
 int FileCompletionEdit::GetRowFromItemID(int itemID)
 {
-	int i;
-	for (i=0;i<GetItemCount();i++)
+	for (int i=0;i<GetItemCount();i++)
 	{
 		if (m_pDropDown->GetMenuID(i) == itemID)
 			return i;
@@ -1147,7 +1146,7 @@ void FileOpenDialog::PopulateFileList()
 	// clear the current list
 	m_pFileList->DeleteAllItems();
 	
-	FileFindHandle_t findHandle;
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	char pszFileModified[64];
 
 	// get the current directory
@@ -1623,9 +1622,8 @@ void FileOpenDialog::PopulateFileNameCompletion()
 	}
 
 	// what files use current string as a prefix?
-	int nCount = m_pFileList->GetItemCount();
-	int i;
-	for ( i = 0 ; i < nCount ; i++ )
+	intp nCount = m_pFileList->GetItemCount();
+	for ( intp i = 0 ; i < nCount ; i++ )
 	{
 		KeyValues *kv = m_pFileList->GetItem(m_pFileList->GetItemIDFromRow(i));
 		const wchar_t *wszString = kv->GetWString("text");

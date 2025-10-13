@@ -12,14 +12,10 @@
 #ifndef CONVAR_H
 #define CONVAR_H
 
-#if _WIN32
-#pragma once
-#endif
-
 #include "tier0/dbg.h"
-#include "tier1/iconvar.h"
-#include "tier1/utlvector.h"
-#include "tier1/utlstring.h"
+#include "iconvar.h"
+#include "utlvector.h"
+#include "utlstring.h"
 #include "icvar.h"
 
 #ifdef _WIN32
@@ -57,8 +53,8 @@ public:
 //-----------------------------------------------------------------------------
 // Called when a ConCommand needs to execute
 //-----------------------------------------------------------------------------
-typedef void ( *FnCommandCallbackVoid_t )( void );
-typedef void ( *FnCommandCallback_t )( const CCommand &command );
+using FnCommandCallbackVoid_t = void (*)();
+using FnCommandCallback_t = void (*)(const CCommand &);
 
 #define COMMAND_COMPLETION_MAXITEMS		64
 #define COMMAND_COMPLETION_ITEM_LENGTH	64
@@ -66,7 +62,7 @@ typedef void ( *FnCommandCallback_t )( const CCommand &command );
 //-----------------------------------------------------------------------------
 // Returns 0 to COMMAND_COMPLETION_MAXITEMS worth of completion strings
 //-----------------------------------------------------------------------------
-typedef int  ( *FnCommandCompletionCallback )( const char *partial, char commands[ COMMAND_COMPLETION_MAXITEMS ][ COMMAND_COMPLETION_ITEM_LENGTH ] );
+using FnCommandCompletionCallback = int (*)(const char *, char (*)[64]);
 
 
 //-----------------------------------------------------------------------------
@@ -99,13 +95,13 @@ class ConCommandBase
 	friend class CDefaultCvar;
 
 public:
-								ConCommandBase( void );
+								ConCommandBase( );
 								ConCommandBase( const char *pName, const char *pHelpString = nullptr, 
 									int flags = 0 );
 
-	virtual						~ConCommandBase( void );
+	virtual						~ConCommandBase( );
 
-	[[nodiscard]] virtual	bool				IsCommand( void ) const;
+	[[nodiscard]] virtual	bool				IsCommand( ) const;
 
 	// Check flag
 	[[nodiscard]] virtual bool				IsFlagSet( int flag ) const;
@@ -113,16 +109,16 @@ public:
 	virtual void				AddFlags( int flags );
 
 	// Return name of cvar
-	[[nodiscard]] virtual const char			*GetName( void ) const;
+	[[nodiscard]] virtual const char			*GetName( ) const;
 
 	// Return help text for cvar
-	[[nodiscard]] virtual const char			*GetHelpText( void ) const;
+	[[nodiscard]] virtual const char			*GetHelpText( ) const;
 
 	// Deal with next pointer
-	[[nodiscard]] const ConCommandBase		*GetNext( void ) const;
-	[[nodiscard]] ConCommandBase				*GetNext( void );
+	[[nodiscard]] const ConCommandBase		*GetNext( ) const;
+	[[nodiscard]] ConCommandBase				*GetNext( );
 	
-	[[nodiscard]] virtual bool IsRegistered(void) const;
+	[[nodiscard]] virtual bool IsRegistered() const;
 
 	// Returns the DLL identifier
 	[[nodiscard]] virtual CVarDLLIdentifier_t	GetDLLIdentifier() const;
@@ -254,7 +250,7 @@ class ConCommand : public ConCommandBase
 friend class CCvar;
 
 public:
-	typedef ConCommandBase BaseClass;
+	using BaseClass = ConCommandBase;
 
 	ConCommand( const char *pName, FnCommandCallbackVoid_t callback, 
 		const char *pHelpString = nullptr, int flags = 0, FnCommandCompletionCallback completionFunc = nullptr );
@@ -263,13 +259,13 @@ public:
 	ConCommand( const char *pName, ICommandCallback *pCallback, 
 		const char *pHelpString = nullptr, int flags = 0, ICommandCompletionCallback *pCommandCompletionCallback = nullptr );
 
-	virtual ~ConCommand( void );
+	~ConCommand( ) override;
 
-	[[nodiscard]] bool IsCommand( void ) const override;
+	[[nodiscard]] bool IsCommand( ) const override;
 
 	virtual int AutoCompleteSuggest( const char *partial, CUtlVector< CUtlString > &commands );
 
-	[[nodiscard]] virtual bool CanAutoComplete( void );
+	[[nodiscard]] virtual bool CanAutoComplete( );
 
 	// Invoke the function
 	virtual void Dispatch( const CCommand &command );
@@ -312,7 +308,7 @@ friend class CCvar;
 friend class ConVarRef;
 
 public:
-	typedef ConCommandBase BaseClass;
+	using BaseClass = ConCommandBase;
 
 	ConVar( const char *pName, const char *pDefaultValue, int flags = 0);
 
@@ -332,23 +328,23 @@ public:
 
 
 
-	virtual						~ConVar( void );
+	~ConVar( ) override;
 
 	[[nodiscard]] bool				IsFlagSet( int flag ) const override;
-	[[nodiscard]] const char*		GetHelpText( void ) const override;
-	[[nodiscard]] bool				IsRegistered( void ) const override;
-	[[nodiscard]] const char		*GetName( void ) const override;
+	[[nodiscard]] const char*		GetHelpText( ) const override;
+	[[nodiscard]] bool				IsRegistered( ) const override;
+	[[nodiscard]] const char		*GetName( ) const override;
 	void				AddFlags( int flags ) override;
-	[[nodiscard]] bool				IsCommand( void ) const override;
+	[[nodiscard]] bool				IsCommand( ) const override;
 
 	// Install a change callback (there shouldn't already be one....)
 	void InstallChangeCallback( FnChangeCallback_t callback );
 
 	// Retrieve value
-	[[nodiscard]] FORCEINLINE_CVAR float			GetFloat( void ) const;
-	[[nodiscard]] FORCEINLINE_CVAR int			GetInt( void ) const;
+	[[nodiscard]] FORCEINLINE_CVAR float			GetFloat( ) const;
+	[[nodiscard]] FORCEINLINE_CVAR int			GetInt( ) const;
 	[[nodiscard]] FORCEINLINE_CVAR bool			GetBool() const {  return !!GetInt(); }
-	[[nodiscard]] FORCEINLINE_CVAR char const	   *GetString( void ) const;
+	[[nodiscard]] FORCEINLINE_CVAR char const	   *GetString( ) const;
 
 	// Any function that allocates/frees memory needs to be virtual or else you'll have crashes
 	//  from alloc/free across dll/exe boundaries.
@@ -359,12 +355,12 @@ public:
 	void				SetValue( int value ) override;
 		
 	// Reset to default value
-	void						Revert( void );
+	void						Revert( );
 
 	// True if it has a min/max setting
 	[[nodiscard]] bool						GetMin( float& minVal ) const;
 	[[nodiscard]] bool						GetMax( float& maxVal ) const;
-	[[nodiscard]] const char					*GetDefault( void ) const;
+	[[nodiscard]] const char					*GetDefault( ) const;
 	void						SetDefault( const char *pszDefault );
 
 	// True if it has a min/max competitive setting
@@ -437,7 +433,7 @@ private:
 // Purpose: Return ConVar value as a float
 // Output : float
 //-----------------------------------------------------------------------------
-FORCEINLINE_CVAR float ConVar::GetFloat( void ) const
+FORCEINLINE_CVAR float ConVar::GetFloat( ) const
 {
 	return m_pParent->m_fValue;
 }
@@ -446,7 +442,7 @@ FORCEINLINE_CVAR float ConVar::GetFloat( void ) const
 // Purpose: Return ConVar value as an int
 // Output : int
 //-----------------------------------------------------------------------------
-FORCEINLINE_CVAR int ConVar::GetInt( void ) const 
+FORCEINLINE_CVAR int ConVar::GetInt( ) const 
 {
 	return m_pParent->m_nValue;
 }
@@ -456,7 +452,7 @@ FORCEINLINE_CVAR int ConVar::GetInt( void ) const
 // Purpose: Return ConVar value as a string, return "" for bogus string pointer, etc.
 // Output : const char *
 //-----------------------------------------------------------------------------
-FORCEINLINE_CVAR const char *ConVar::GetString( void ) const 
+FORCEINLINE_CVAR const char *ConVar::GetString( ) const 
 {
 	if ( m_nFlags & FCVAR_NEVER_AS_STRING )
 		return "FCVAR_NEVER_AS_STRING";
@@ -491,15 +487,15 @@ public:
 	ConVarRef( IConVar *pConVar );
 
 	void Init( const char *pName, bool bIgnoreMissing );
-	bool IsValid() const;
-	bool IsFlagSet( int nFlags ) const;
+	[[nodiscard]] bool IsValid() const;
+	[[nodiscard]] bool IsFlagSet( int nFlags ) const;
 	IConVar *GetLinkedConVar();
 
 	// Get/Set value
-	float GetFloat( void ) const;
-	int GetInt( void ) const;
-	bool GetBool() const { return !!GetInt(); }
-	const char *GetString( void ) const;
+	[[nodiscard]] float GetFloat( ) const;
+	[[nodiscard]] int GetInt( ) const;
+	[[nodiscard]] bool GetBool() const { return !!GetInt(); }
+	[[nodiscard]] const char *GetString( ) const;
 	// True if it has a min/max setting
 	bool GetMin( float& minVal ) const;
 	bool GetMax( float& maxVal ) const;
@@ -509,9 +505,9 @@ public:
 	void SetValue( int nValue );
 	void SetValue( bool bValue );
 
-	const char *GetName() const;
+	[[nodiscard]] const char *GetName() const;
 
-	const char *GetDefault() const;
+	[[nodiscard]] const char *GetDefault() const;
 
 private:
 	// High-speed method to read convar data
@@ -542,7 +538,7 @@ FORCEINLINE_CVAR const char *ConVarRef::GetName() const
 //-----------------------------------------------------------------------------
 // Purpose: Return ConVar value as a float
 //-----------------------------------------------------------------------------
-FORCEINLINE_CVAR float ConVarRef::GetFloat( void ) const
+FORCEINLINE_CVAR float ConVarRef::GetFloat( ) const
 {
 	return m_pConVarState->m_fValue;
 }
@@ -550,7 +546,7 @@ FORCEINLINE_CVAR float ConVarRef::GetFloat( void ) const
 //-----------------------------------------------------------------------------
 // Purpose: Return ConVar value as an int
 //-----------------------------------------------------------------------------
-FORCEINLINE_CVAR int ConVarRef::GetInt( void ) const 
+FORCEINLINE_CVAR int ConVarRef::GetInt( ) const 
 {
 	return m_pConVarState->m_nValue;
 }
@@ -558,7 +554,7 @@ FORCEINLINE_CVAR int ConVarRef::GetInt( void ) const
 //-----------------------------------------------------------------------------
 // Purpose: Return ConVar value as a string, return "" for bogus string pointer, etc.
 //-----------------------------------------------------------------------------
-FORCEINLINE_CVAR const char *ConVarRef::GetString( void ) const 
+FORCEINLINE_CVAR const char *ConVarRef::GetString( ) const 
 {
 	Assert( !IsFlagSet( FCVAR_NEVER_AS_STRING ) );
 	return m_pConVarState->m_pszString;
@@ -620,9 +616,9 @@ void ConVar_PrintDescription( const ConCommandBase *pVar );
 template< class T >
 class CConCommandMemberAccessor : public ConCommand, public ICommandCallback, public ICommandCompletionCallback
 {
-	typedef ConCommand BaseClass;
-	typedef void ( T::*FnMemberCommandCallback_t )( const CCommand &command );
-	typedef int  ( T::*FnMemberCommandCompletionCallback_t )( const char *pPartial, CUtlVector< CUtlString > &commands );
+	using BaseClass = ConCommand;
+	using FnMemberCommandCallback_t = void (T::*)(const CCommand &);
+	using FnMemberCommandCompletionCallback_t = int (T::*)(const char *, CUtlVector<CUtlString> &);
 
 public:
 	CConCommandMemberAccessor( T* pOwner, const char *pName, FnMemberCommandCallback_t callback, const char *pHelpString = nullptr,
@@ -634,7 +630,7 @@ public:
 		m_CompletionFunc = completionFunc;
 	}
 
-	~CConCommandMemberAccessor()
+	~CConCommandMemberAccessor() override
 	{
 		Shutdown();
 	}

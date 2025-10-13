@@ -884,11 +884,11 @@ void CCvarUtilities::CvarList( const CCommand &args )
 		var = sorted[ i ];
 		if ( var->IsCommand() )
 		{
-			PrintCommand( (ConCommand *)var, bLogging, f );
+			PrintCommand( (const ConCommand *)var, bLogging, f );
 		}
 		else
 		{
-			PrintCvar( (ConVar *)var, bLogging, f );
+			PrintCvar( (const ConVar *)var, bLogging, f );
 		}
 	}
 
@@ -979,10 +979,10 @@ void CCvarUtilities::CvarDifferences( const CCommand &args )
 		if ( var->IsFlagSet(FCVAR_DEVELOPMENTONLY) || var->IsFlagSet(FCVAR_HIDDEN) )
 			continue;
 
-		if ( !Q_stricmp( ((ConVar *)var)->GetDefault(), ((ConVar *)var)->GetString() ) )
+		if ( !Q_stricmp( ((const ConVar *)var)->GetDefault(), ((const ConVar *)var)->GetString() ) )
 			continue;
 
-		ConVar_PrintDescription( (ConVar *)var );	
+		ConVar_PrintDescription( (const ConVar *)var );	
 	}
 }
 

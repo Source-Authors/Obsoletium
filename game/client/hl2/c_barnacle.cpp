@@ -89,7 +89,7 @@ private:
 	CBarnaclePhysicsDelegate	m_PhysicsDelegate;
 
 private:
-	C_NPC_Barnacle( const C_NPC_Barnacle & ); // not defined, not accessible
+	C_NPC_Barnacle( const C_NPC_Barnacle & ) = delete; // not defined, not accessible
 };
 
 static void RecvProxy_VecTip( const CRecvProxyData *pData, void *pStruct, void *pOut )
@@ -109,6 +109,7 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 C_NPC_Barnacle::C_NPC_Barnacle( void )
 {
+	m_flAltitude = -1;
 	m_PhysicsDelegate.m_pBarnacle = this;
 }
 

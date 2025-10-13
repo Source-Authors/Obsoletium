@@ -7,39 +7,39 @@
 //=============================================================================//
 #include "cbase.h"
 #include "tier1/interface.h"
+#include "tier1/tier1.h"
 #include "vphysics/object_hash.h"
 #include "vphysics/collision_set.h"
-#include "tier1/tier1.h"
 #include "ivu_vhash.hxx"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 // simple 32x32 bit array
-class CPhysicsCollisionSet : public IPhysicsCollisionSet
+class CPhysicsCollisionSet final : public IPhysicsCollisionSet
 {
 public:
-	virtual ~CPhysicsCollisionSet() {}
+	virtual ~CPhysicsCollisionSet() = default;
 	CPhysicsCollisionSet()
 	{
-		memset( m_bits, 0, sizeof(m_bits) );
+		BitwiseClear( m_bits );
 	}
 	void EnableCollisions( int index0, int index1 ) override
 	{
-		Assert(index0<32&&index1<32);
+		Assert(index0<ssize(m_bits)&&index1<ssize(m_bits));
 		m_bits[index0] |= 1<<index1;
 		m_bits[index1] |= 1<<index0;
 	}
 	void DisableCollisions( int index0, int index1 ) override
 	{
-		Assert(index0<32&&index1<32);
+		Assert(index0<ssize(m_bits)&&index1<ssize(m_bits));
 		m_bits[index0] &= ~(1<<index1);
 		m_bits[index1] &= ~(1<<index0);
 	}
 
 	bool ShouldCollide( int index0, int index1 ) override
 	{
-		Assert(index0<32&&index1<32);
+		Assert(index0<ssize(m_bits)&&index1<ssize(m_bits));
 		return (m_bits[index0] & (1<<index1)) ? true : false;
 	}
 private:
@@ -50,10 +50,10 @@ private:
 //-----------------------------------------------------------------------------
 // Main physics interface
 //-----------------------------------------------------------------------------
-class CPhysicsInterface : public CTier1AppSystem<IPhysics>
+class CPhysicsInterface final : public CTier1AppSystem<IPhysics>
 {
 public:
-	CPhysicsInterface() : m_pCollisionSetHash(NULL) {}
+	CPhysicsInterface() : m_pCollisionSetHash(nullptr) {}
 	void *QueryInterface( const char *pInterfaceName ) override;
 	IPhysicsEnvironment *CreateEnvironment( void ) override;
 	void DestroyEnvironment( IPhysicsEnvironment *pEnvironment ) override;
@@ -109,7 +109,7 @@ void CPhysicsInterface::DestroyEnvironment( IPhysicsEnvironment *pEnvironment )
 IPhysicsEnvironment	*CPhysicsInterface::GetActiveEnvironmentByIndex( int index )
 {
 	if ( index < 0 || index >= m_envList.Count() )
-		return NULL;
+		return nullptr;
 
 	return m_envList[index];
 }
@@ -123,6 +123,7 @@ void CPhysicsInterface::DestroyObjectPairHash( IPhysicsObjectPairHash *pHash )
 {
 	delete pHash;
 }
+
 // holds a cache of these by id.
 // NOTE: This is stuffed into vphysics.dll as a sneaky way of sharing the memory between
 // client and server in single player.  So you can't have different client/server rules.
@@ -135,7 +136,7 @@ IPhysicsCollisionSet *CPhysicsInterface::FindOrCreateCollisionSet( unsigned int 
 	Assert( id != 0 );
 	Assert( maxElementCount <= 32 );
 	if ( maxElementCount > 32 )
-		return NULL;
+		return nullptr;
 
 	IPhysicsCollisionSet *pSet = FindCollisionSet( id );
 	if ( pSet )
@@ -159,12 +160,12 @@ IPhysicsCollisionSet *CPhysicsInterface::FindCollisionSet( unsigned int id )
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 void CPhysicsInterface::DestroyAllCollisionSets()
 {
 	m_collisionSets.Purge();
 	delete m_pCollisionSetHash;
-	m_pCollisionSetHash = NULL;
+	m_pCollisionSetHash = nullptr;
 }

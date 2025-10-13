@@ -44,6 +44,8 @@
 
 #define FOGTYPE_RANGE				0
 #define FOGTYPE_HEIGHT				1
+// dimhotepus: TF2 backport.
+#define FOGTYPE_RANGE_RADIAL		2
 
 #define COMPILE_ERROR ( 1/0; )
 
@@ -93,6 +95,10 @@ const float4 cFogParams					: register(c16);
 #define cFogEndOverFogRange cFogParams.x
 #define cFogOne cFogParams.y
 #define cFogMaxDensity cFogParams.z
+// dimhotepus: TF2 backport.
+// Radial fog max density in fractional portion.
+// Height fog max density stored in integer portion and is multiplied by 1e10
+#define cRadialFogMaxDensity cFogParams.z
 #define cOOFogRange cFogParams.w
 
 const float4x4 cViewModel				: register(c17);
@@ -414,7 +420,8 @@ bool ApplyMorph( sampler2D morphSampler, const float3 vMorphTargetTextureDim, co
 	vPosition	+= vPosDelta.xyz;
 #else
 	float4 t = float4( vMorphTexCoord.x, vMorphTexCoord.y, 0.0f, 0.0f );
-	float3 vPosDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vPosDelta = tex2Dlod( morphSampler, t ).xyz;
 	vPosition	+= vPosDelta.xyz * vMorphTexCoord.z;
 #endif // DECAL
 
@@ -438,9 +445,11 @@ bool ApplyMorph( sampler2D morphSampler, const float3 vMorphTargetTextureDim, co
 	vNormal		+= vNormalDelta.xyz;
 #else
 	float4 t = float4( vMorphTexCoord.x, vMorphTexCoord.y, 0.0f, 0.0f );
-	float3 vPosDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vPosDelta = tex2Dlod( morphSampler, t ).xyz;
 	t.x += 1.0f / vMorphTargetTextureDim.x;
-	float3 vNormalDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vNormalDelta = tex2Dlod( morphSampler, t ).xyz;
 	vPosition	+= vPosDelta.xyz * vMorphTexCoord.z;
 	vNormal		+= vNormalDelta.xyz * vMorphTexCoord.z;
 #endif // DECAL
@@ -466,9 +475,11 @@ bool ApplyMorph( sampler2D morphSampler, const float3 vMorphTargetTextureDim, co
 	vTangent	+= vNormalDelta.xyz;
 #else
 	float4 t = float4( vMorphTexCoord.x, vMorphTexCoord.y, 0.0f, 0.0f );
-	float3 vPosDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vPosDelta = tex2Dlod( morphSampler, t ).xyz;
 	t.x += 1.0f / vMorphTargetTextureDim.x;
-	float3 vNormalDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vNormalDelta = tex2Dlod( morphSampler, t ).xyz;
 	vPosition	+= vPosDelta.xyz * vMorphTexCoord.z;
 	vNormal		+= vNormalDelta.xyz * vMorphTexCoord.z;
 	vTangent	+= vNormalDelta.xyz * vMorphTexCoord.z;
@@ -499,7 +510,8 @@ bool ApplyMorph( sampler2D morphSampler, const float3 vMorphTargetTextureDim, co
 	float4 t = float4( vMorphTexCoord.x, vMorphTexCoord.y, 0.0f, 0.0f );
 	float4 vPosDelta = tex2Dlod( morphSampler, t );
 	t.x += 1.0f / vMorphTargetTextureDim.x;
-	float3 vNormalDelta = tex2Dlod( morphSampler, t );
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vNormalDelta = tex2Dlod( morphSampler, t ).xyz;
 
 	vPosition	+= vPosDelta.xyz * vMorphTexCoord.z;
 	vNormal		+= vNormalDelta.xyz * vMorphTexCoord.z;
@@ -551,14 +563,14 @@ float WaterFog( const float3 worldPos, const float3 projPos )
 
 float CalcFog( const float3 worldPos, const float3 projPos, const int fogType )
 {
-#if defined( _X360 )
-	// 360 only does pixel fog
-	return 1.0f;
-#endif
-
 	if( fogType == FOGTYPE_RANGE )
 	{
 		return RangeFog( projPos );
+	}
+	// dimhotepus: TF2 backport.
+	else if ( fogType == FOGTYPE_RANGE_RADIAL )
+	{
+		return CalcRadialFog_FixedFunction( worldPos, cEyePos, cRadialFogMaxDensity, cFogEndOverFogRange, cOOFogRange );
 	}
 	else
 	{
@@ -573,11 +585,6 @@ float CalcFog( const float3 worldPos, const float3 projPos, const int fogType )
 
 float CalcFog( const float3 worldPos, const float3 projPos, const bool bWaterFog )
 {
-#if defined( _X360 )
-	// 360 only does pixel fog
-	return 1.0f;
-#endif
-
 	float flFog;
 	if( !bWaterFog )
 	{
@@ -618,16 +625,10 @@ void SkinPosition( bool bSkinning, const float4 modelPos,
                    const float4 boneWeights, float4 fBoneIndices,
 				   out float3 worldPos )
 {
-#if !defined( _X360 )
-	int3 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
-#else
-	int3 boneIndices = fBoneIndices;
-#endif
+	// dimhotepus: int3 -> int4 to fix warnings.
+	int4 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
 
 	// Needed for invariance issues caused by multipass rendering
-#if defined( _X360 )
-	[isolate] 
-#endif
 	{ 
 		if ( !bSkinning )
 		{
@@ -653,16 +654,8 @@ void SkinPositionAndNormal( bool bSkinning, const float4 modelPos, const float3 
 						    out float3 worldPos, out float3 worldNormal )
 {
 	// Needed for invariance issues caused by multipass rendering
-#if defined( _X360 )
-	[isolate] 
-#endif
-	{ 
-
-#if !defined( _X360 )
-		int3 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
-#else
-		int3 boneIndices = fBoneIndices;
-#endif
+	{
+		int4 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
 
 		if ( !bSkinning )
 		{
@@ -696,16 +689,10 @@ void SkinPositionNormalAndTangentSpace(
 						    out float3 worldPos, out float3 worldNormal, 
 							out float3 worldTangentS, out float3 worldTangentT )
 {
-#if !defined( _X360 )
-	int3 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
-#else
-	int3 boneIndices = fBoneIndices;
-#endif
+	// dimhotepus: int3 -> int4 to fix warnings.
+	int4 boneIndices = D3DCOLORtoUBYTE4( fBoneIndices );
 
 	// Needed for invariance issues caused by multipass rendering
-#if defined( _X360 )
-	[isolate] 
-#endif
 	{ 
 		if ( !bSkinning )
 		{
@@ -753,8 +740,9 @@ float VertexAttenInternal( const float3 worldPos, int lightNum )
 {
 	float result = 0.0f;
 
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
 	// Get light direction
-	float3 lightDir = cLightInfo[lightNum].pos - worldPos;
+	float3 lightDir = cLightInfo[lightNum].pos.xyz - worldPos;
 
 	// Get light distance squared.
 	float lightDistSquared = dot( lightDir, lightDir );
@@ -765,20 +753,8 @@ float VertexAttenInternal( const float3 worldPos, int lightNum )
 	// Normalize light direction
 	lightDir *= ooLightDist;
 
-	float3 vDist;
-#	if defined( _X360 )
-	{
-		//X360 dynamic compile hits an internal compiler error using dst(), this is the breakdown of how dst() works from the 360 docs.
-		vDist.x = 1;
-		vDist.y = lightDistSquared * ooLightDist;
-		vDist.z = lightDistSquared;
-		//flDist.w = ooLightDist;
-	}
-#	else
-	{
-		vDist = dst( lightDistSquared, ooLightDist );
-	}
-#	endif
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	float3 vDist = dst( lightDistSquared, ooLightDist ).xyz;
 
 	float flDistanceAtten = 1.0f / dot( cLightInfo[lightNum].atten.xyz, vDist );
 
@@ -801,10 +777,16 @@ float VertexAttenInternal( const float3 worldPos, int lightNum )
 float CosineTermInternal( const float3 worldPos, const float3 worldNormal, int lightNum, bool bHalfLambert )
 {
 	// Calculate light direction assuming this is a point or spot
-	float3 lightDir = normalize( cLightInfo[lightNum].pos - worldPos );
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	float3 lightDir = normalize( cLightInfo[lightNum].pos.xyz - worldPos );
+
+	// dimhotepus: fix float4 -> float3 downcast warnings.
+	float4 dirInv = -cLightInfo[lightNum].dir;
+	float4 color = cLightInfo[lightNum].color;
 
 	// Select the above direction or the one in the structure, based upon light type
-	lightDir = lerp( lightDir, -cLightInfo[lightNum].dir, cLightInfo[lightNum].color.w );
+	// dimhotepus: fix float4 -> float3 downcast warnings.
+	lightDir = lerp( lightDir, dirInv.xyz, color.www );
 
 	// compute N dot L
 	float NDotL = dot( worldNormal, lightDir );
@@ -844,7 +826,8 @@ float GetVertexAttenForLight( const float3 worldPos, int lightNum, bool bUseStat
 
 float3 DoLightInternal( const float3 worldPos, const float3 worldNormal, int lightNum, bool bHalfLambert )
 {
-	return cLightInfo[lightNum].color *
+	// dimhotepus: Fix float4 -> float3 downcast warnings.
+	return cLightInfo[lightNum].color.xyz *
 		CosineTermInternal( worldPos, worldNormal, lightNum, bHalfLambert ) *
 		VertexAttenInternal( worldPos, lightNum );
 }
@@ -858,11 +841,7 @@ float3 DoLighting( const float3 worldPos, const float3 worldNormal,
 	if( bStaticLight )			// Static light
 	{
 		float3 col = staticLightingColor * cOverbright;
-#if defined ( _X360 )
-		linearColor += col * col;
-#else
 		linearColor += GammaToLinear( col );
-#endif
 	}
 
 	if( bDynamicLight )			// Dynamic light

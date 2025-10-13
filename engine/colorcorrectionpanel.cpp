@@ -4365,9 +4365,9 @@ public:
 	void OnMousePressed( MouseCode code ) override;
 	void OnMouseDoublePressed( MouseCode code ) override;
 
-	void AddSelectedItem( int itemID ) override;
+	void AddSelectedItem( intp itemID ) override;
 	void ClearSelectedItems( ) override;
-	void RemoveItem( int itemID ) override;
+	void RemoveItem( intp itemID ) override;
 
 	void SortList( ) override;
 	void SetSortColumn( int column ) override;
@@ -4389,7 +4389,7 @@ COperationListPanel::~COperationListPanel( )
 {
 }
 
-void COperationListPanel::AddSelectedItem( int itemID )
+void COperationListPanel::AddSelectedItem( intp itemID )
 {
 	BaseClass::AddSelectedItem( itemID );
 
@@ -4403,7 +4403,7 @@ void COperationListPanel::ClearSelectedItems( )
 	PostActionSignal( new KeyValues( "Command", "Command", "SelectedItemChanged" ) );
 }
 
-void COperationListPanel::RemoveItem( int itemID )
+void COperationListPanel::RemoveItem( intp itemID )
 {
 	BaseClass::RemoveItem( itemID );
 
@@ -4420,7 +4420,7 @@ void COperationListPanel::SetSortColumn( int column )
 	if( column==0 )
 	{
 		bool bAllEnabled = true;
-		for( int i=0;i<GetItemCount();i++ )
+		for( intp i=0;i<GetItemCount();i++ )
 		{
 			IColorOperation *pOp = (IColorOperation *)GetItemUserData( i );
 
@@ -4431,7 +4431,7 @@ void COperationListPanel::SetSortColumn( int column )
 			}
 		}
 
-		for( int i=0;i<GetItemCount();i++ )
+		for( intp i=0;i<GetItemCount();i++ )
 		{
 			KeyValues *kv = GetItem( i );
 			kv->SetInt( "image", (!bAllEnabled)?1:0 );
@@ -4678,13 +4678,13 @@ void CColorOperationListPanel::OnSliderMoved( KeyValues *data )
 	vgui::Panel *pPanel = reinterpret_cast<vgui::Panel *>( const_cast<KeyValues*>(data)->GetPtr("panel") );
 	if ( pPanel == m_pBlendFactorSlider )
 	{
-		int nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
+		intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 		if( nSelectedItem>=0 && nSelectedItem<m_pOperationListPanel->GetItemCount() )
 		{
 			IColorOperation *pOp = (IColorOperation *)m_pOperationListPanel->GetItemUserData( nSelectedItem );
-            pOp->SetBlendFactor( m_pBlendFactorSlider->GetValue() / 255.0f );
+			pOp->SetBlendFactor( m_pBlendFactorSlider->GetValue() / 255.0f );
 
-			for( int i=0;i<m_OpPanelList.Count();i++ )
+			for( intp i=0;i<m_OpPanelList.Count();i++ )
 			{
 				if( m_OpPanelList[i]->GetOperation()==pOp )
 				{
@@ -4744,7 +4744,7 @@ void CColorOperationListPanel::OnCommand( const char *command )
 	{
 		if( m_pOperationListPanel->GetSelectedItemsCount()!=0 )
 		{
-			int nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
+			intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 
 			IColorOperation *pOp = m_OperationList.GetOperation( nSelectedItem );
 			m_OperationList.DeleteOperation( nSelectedItem );
@@ -4768,7 +4768,7 @@ void CColorOperationListPanel::OnCommand( const char *command )
 	}
 	else if( !Q_stricmp( command, "BringForward" ) )
 	{
-		int nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
+		intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 		if( nSelectedItem!=0 )
 		{
 			m_OperationList.BringForward( nSelectedItem );
@@ -4782,7 +4782,7 @@ void CColorOperationListPanel::OnCommand( const char *command )
 	}
 	else if( !Q_stricmp( command, "PushBack" ) )
 	{
-		int nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
+		intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 		if( nSelectedItem<m_OperationList.GetNumOperations()-1 )
 		{
 			m_OperationList.PushBack( nSelectedItem );
@@ -4837,7 +4837,7 @@ void CColorOperationListPanel::OnCommand( const char *command )
 	}
 	else if( !Q_stricmp( command, "CloneOperation" ) )
 	{
-		int nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
+		intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 
 		IColorOperation *pOp = m_OperationList.GetOperation( nSelectedItem );
 		IColorOperation *pCloneOp = pOp->Clone();
@@ -4864,7 +4864,7 @@ void CColorOperationListPanel::OnThink( )
 
 void CColorOperationListPanel::ResetSlider( )
 {
-	int nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
+	intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 	if( nSelectedItem>=0 && nSelectedItem<m_pOperationListPanel->GetItemCount() )
 	{
 		IColorOperation *pOp = (IColorOperation *)m_pOperationListPanel->GetItemUserData( nSelectedItem );
@@ -4932,7 +4932,7 @@ void CColorOperationListPanel::OnKeyCodeTyped( KeyCode code )
 {
 	if( code==KEY_ENTER )
 	{
-		int nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
+		intp nSelectedItem = m_pOperationListPanel->GetSelectedItem( 0 );
 		IColorOperation *pSelectedOp = m_OperationList.GetOperation( nSelectedItem );
 		
 		LaunchOperationPanel( pSelectedOp );

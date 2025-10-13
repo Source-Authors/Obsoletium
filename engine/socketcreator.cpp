@@ -116,7 +116,7 @@ bool CSocketCreator::ConfigureSocket( socket_handle sock )
 {
 	// disable NAGLE (rcon cmds are small in size)
 	int nodelay = 1;
-	int ret = setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (char*)&nodelay, sizeof(nodelay));
+	int ret = setsockopt(sock, IPPROTO_TCP, TCP_NODELAY, (const char*)&nodelay, sizeof(nodelay));
 	if ( ret == -1 )
 	{
 		Warning( "Socket setsockopt(TCP_NODELAY): %s.\n", NET_ErrorString( WSAGetLastError() ) );
@@ -124,15 +124,15 @@ bool CSocketCreator::ConfigureSocket( socket_handle sock )
 	}
 
 	nodelay = 1;
-	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&nodelay, sizeof(nodelay));
+	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&nodelay, sizeof(nodelay));
 	if ( ret == -1 )
 	{
 		Warning( "Socket setsockopt(SO_REUSEADDR): %s.\n", NET_ErrorString( WSAGetLastError() ) );
 		// continue.
 	}
 
-	int opt = 1;
-	ret = ioctlsocket( sock, FIONBIO, (unsigned long*)&opt ); // non-blocking
+	unsigned long opt = 1;
+	ret = ioctlsocket( sock, FIONBIO, &opt ); // non-blocking
 	if ( ret == -1 )
 	{
 		Warning( "Socket ioctlsocket(FIONBIO) failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
@@ -212,8 +212,8 @@ intp CSocketCreator::ConnectSocket( const netadr_t &netAdr, bool bSingleSocket )
 		return -1;
 	}
 
-	int opt = 1;
-	int ret = ioctlsocket( hSocket, FIONBIO, (unsigned long*)&opt ); // non-blocking
+	unsigned long opt = 1;
+	int ret = ioctlsocket( hSocket, FIONBIO, &opt ); // non-blocking
 	if ( ret == -1 )
 	{
 		Warning( "Socket ioctl(FIONBIO) failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );

@@ -8,10 +8,6 @@
 #ifndef TIER2_H
 #define TIER2_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 #include "tier1/tier1.h"
 
 
@@ -62,8 +58,8 @@ void DisconnectTier2Libraries();
 //-----------------------------------------------------------------------------
 // Call this to get the file system set up to stdio for utilities, etc:
 //-----------------------------------------------------------------------------
-void InitDefaultFileSystem(void);
-void ShutdownDefaultFileSystem(void);
+void InitDefaultFileSystem();
+void ShutdownDefaultFileSystem();
 
 // dimhotepus: Add RAII wrapper over InitDefaultFileSystem.
 class ScopedDefaultFileSystem
@@ -118,7 +114,7 @@ public:
 template< class IInterface, int ConVarFlag = 0 > 
 class CTier2AppSystem : public CTier1AppSystem< IInterface, ConVarFlag >
 {
-	typedef CTier1AppSystem< IInterface, ConVarFlag > BaseClass;
+	using BaseClass = CTier1AppSystem<IInterface, ConVarFlag>;
 
 public:
 	CTier2AppSystem( bool bIsPrimaryAppSystem = true ) : BaseClass( bIsPrimaryAppSystem )

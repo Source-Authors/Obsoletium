@@ -241,11 +241,7 @@ void VGui_Shutdown()
 	loadingdisc->Destroy();
 	internalCenterPrint->Destroy();
 
-	if ( g_pClientMode )
-	{
-		g_pClientMode->VGui_Shutdown();
-	}
-
+	// dimhotepus: Move g_pClientMode->VGui_Shutdown(); upper.
 	// Make sure anything "marked for deletion"
 	//  actually gets deleted before this dll goes away
 	vgui::ivgui()->RunFrame();

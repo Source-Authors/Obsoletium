@@ -168,11 +168,11 @@ void R_LoadSkys( void )
 	static ConVarRef skyname( "sv_skyname" );
 	if ( skyname.IsValid() )
 	{
-		Q_strncpy( requestedsky, skyname.GetString(), sizeof( requestedsky ) );
+		V_strcpy_safe( requestedsky, skyname.GetString() );
 	}
 	else
 	{
-		ConDMsg( "Unable to find skyname ConVar!!!\n" );
+		ConDMsg( "Unable to find sv_skyname ConVar!!!\n" );
 		return;
 	}
 

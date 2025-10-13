@@ -102,9 +102,10 @@ void DrawVolumeClouds( CBaseVSShader *pShader, IMaterialVar** params, IShaderDyn
 		vPackedVsConst1[0] = flTime * flRotateSpeed * 1.0f;
 		vPackedVsConst1[1] = flTime * flRotateSpeed * 2.0f;
 		vPackedVsConst1[2] = flTime * flRotateSpeed * 4.0f;
-		vPackedVsConst1[0] -= (float)( (int)( vPackedVsConst1[0] / ( 2.0f * 3.14159f ) ) ) * 2.0f * 3.14159f;
-		vPackedVsConst1[1] -= (float)( (int)( vPackedVsConst1[1] / ( 2.0f * 3.14159f ) ) ) * 2.0f * 3.14159f;
-		vPackedVsConst1[2] -= (float)( (int)( vPackedVsConst1[2] / ( 2.0f * 3.14159f ) ) ) * 2.0f * 3.14159f;
+		// dimhotepus: Use M_PI_F instead of hardcoded const
+		vPackedVsConst1[0] -= (float)( (int)( vPackedVsConst1[0] / ( 2.0f * M_PI_F ) ) ) * 2.0f * M_PI_F;
+		vPackedVsConst1[1] -= (float)( (int)( vPackedVsConst1[1] / ( 2.0f * M_PI_F ) ) ) * 2.0f * M_PI_F;
+		vPackedVsConst1[2] -= (float)( (int)( vPackedVsConst1[2] / ( 2.0f * M_PI_F ) ) ) * 2.0f * M_PI_F;
 		pShaderAPI->SetVertexShaderConstant( VERTEX_SHADER_SHADER_SPECIFIC_CONST_0, vPackedVsConst1, 1 );
 
 		// Set Pixel Shader Combos

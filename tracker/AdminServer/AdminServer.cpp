@@ -32,7 +32,7 @@ IVProfExport *g_pVProfExport = NULL;
 CAdminServer::CAdminServer()
 {
 	// fill in the 0-based element of the manage servers list
-	OpenedManageDialog_t empty = { 0, NULL };
+	OpenedManageDialog_t empty = { vgui::INVALID_PANEL, NULL };
 	m_OpenedManageDialog.AddToTail(empty);
 	m_hParent=0;
 }

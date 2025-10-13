@@ -67,6 +67,8 @@ CPrediction::CPrediction( void )
 #if !defined( NO_ENTITY_PREDICTION )
 	m_bInPrediction = false;
 	m_bFirstTimePredicted = false;
+	m_bOldCLPredictValue = false;
+	m_bEnginePaused = false;
 
 	m_nIncomingPacketNumber = 0;
 	m_flIdealPitch = 0.0f;
@@ -136,7 +138,7 @@ void CPrediction::CheckError( int commands_acknowledged )
 		return;
 
 	Vector predicted_origin;
-	memcpy( &predicted_origin, (Vector *)( (byte *)slot + td->fieldOffset[ PC_DATA_PACKED ] ), sizeof( Vector ) );
+	memcpy( &predicted_origin, (const Vector *)( (const byte *)slot + td->fieldOffset[ PC_DATA_PACKED ] ), sizeof( Vector ) );
 	
 	// Compare what the server returned with what we had predicted it to be
 	VectorSubtract ( predicted_origin, origin, delta );

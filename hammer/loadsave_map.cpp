@@ -911,7 +911,7 @@ int CEditGameClass::SerializeMAP(std::fstream& file, BOOL fIsStoring)
 
 				if (pVar != NULL)
 				{
-					int iIndex;
+					intp iIndex;
 					MDkeyvalue *pKey;
 					LPCTSTR p = m_KeyValues.GetValue(pVar->GetName(), &iIndex);
 
@@ -982,8 +982,8 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 			// copy all texfiles into value
 			tmpkv.szValue[0] = 0;
 			BOOL bFirst = TRUE;
-			int nGraphicsFiles = g_Textures.FilesGetCount();
-			for (int i = 0; i < nGraphicsFiles; i++)
+			intp nGraphicsFiles = g_Textures.FilesGetCount();
+			for (intp i = 0; i < nGraphicsFiles; i++)
 			{
 				char szFile[MAX_PATH];
 				GRAPHICSFILESTRUCT gf;
@@ -1085,7 +1085,7 @@ int CMapWorld::SerializeMAP(std::fstream &file, BOOL fIsStoring, BoundBox *pInte
 		
 		CString caption;
 		[[maybe_unused]] const BOOL rc{caption.LoadString(IDS_LOADINGFILE)};
-		Assert(rc > 0);
+		VERIFY(rc);
 
 		pProgDlg->SetWindowText(caption);
 

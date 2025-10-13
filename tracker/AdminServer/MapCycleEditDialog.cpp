@@ -236,7 +236,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 		// write out the data
 		CUtlBuffer msg((intp)0, (intp)1024, CUtlBuffer::TEXT_BUFFER);
 
-		for (int i = 0; i < m_pMapCycleList->GetItemCount(); i++)
+		for (intp i = 0; i < m_pMapCycleList->GetItemCount(); i++)
 		{
 			int itemID = m_pMapCycleList->GetItemIDFromRow(i);
 			KeyValues *kv = m_pMapCycleList->GetItem(itemID);

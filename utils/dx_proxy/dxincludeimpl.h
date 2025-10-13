@@ -16,12 +16,12 @@ class D3DIncludeImpl : public ID3DInclude {
   STDMETHOD(Open)
   (THIS_ D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData,
    LPCVOID *ppData, UINT *pBytes) override {
+    if (!pFileName || !ppData || !pBytes) return E_POINTER;
+
     CachedFileData *data = file_cache_.Get(pFileName);
-    if (data && data->IsValid()) {
+    if (data) {
       *ppData = data->GetDataPtr();
       *pBytes = data->GetDataLen();
-
-      data->AddRef();
 
       return S_OK;
     }
@@ -32,9 +32,10 @@ class D3DIncludeImpl : public ID3DInclude {
   STDMETHOD(Close)(THIS_ LPCVOID pData) override {
     if (!pData) return E_POINTER;
 
-    if (CachedFileData *data = CachedFileData::GetByDataPtr(pData)) {
-      data->Release();
-    }
+    // If we close files here, we lost cached file data.
+    // I/O is slow, so better to consume more RAM and store all include files for next compilation.
+    // Cache will be purged in destructor, so file data never leaks.
+    // file_cache_.Close(pData);
 
     return S_OK;
   }

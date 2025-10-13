@@ -19,7 +19,7 @@
 LPCTSTR GetErrorString();
 
 
-CProcessWnd::CProcessWnd() : pEditBuf{nullptr}, uBufLen{0}, pFont{nullptr}
+CProcessWnd::CProcessWnd() : pEditBuf{nullptr}, uBufLen{0}
 {
 	Font.CreatePointFont(100, "Courier New");
 }
@@ -35,6 +35,8 @@ BEGIN_MESSAGE_MAP(CProcessWnd, CBaseWnd)
 	ON_BN_CLICKED(IDC_PROCESSWND_COPYALL, OnCopyAll)
 	ON_WM_TIMER()
 	ON_WM_CREATE()
+	ON_WM_DESTROY()
+	ON_MESSAGE(WM_DPICHANGED, OnDpiChanged)
 	ON_WM_SIZE()
 	//}}AFX_MSG_MAP
 END_MESSAGE_MAP()
@@ -222,20 +224,38 @@ int CProcessWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 	CRect rctEdit;
 	rctEdit = rctClient;
-	rctEdit.bottom = rctClient.bottom - 20;
+	rctEdit.bottom = rctClient.bottom - m_dpi_behavior.ScaleOnY(20);
 
 	Edit.Create(WS_CHILD | WS_BORDER | WS_VISIBLE | WS_VSCROLL | WS_HSCROLL | ES_MULTILINE | ES_AUTOVSCROLL | ES_WANTRETURN, rctClient, this, IDC_PROCESSWND_EDIT);
 	Edit.SetReadOnly(TRUE);
 	Edit.SetFont(&Font);
+	m_edit_dpi_behavior.OnCreateWindow(Edit.GetSafeHwnd());
 
 	CRect rctButton;
 	rctButton = rctClient;
-	rctButton.top = rctClient.bottom - 20;
+	rctButton.top = rctClient.bottom - m_dpi_behavior.ScaleOnY(20);
 
 	m_btnCopyAll.Create("Copy to Clipboard", WS_CHILD | WS_VISIBLE, rctButton, this, IDC_PROCESSWND_COPYALL);
 	m_btnCopyAll.SetButtonStyle(BS_PUSHBUTTON);
+	m_copy_all_dpi_behavior.OnCreateWindow(m_btnCopyAll.GetSafeHwnd());
 	
 	return 0;
+}
+
+void CProcessWnd::OnDestroy()
+{
+	m_copy_all_dpi_behavior.OnDestroyWindow();
+	m_edit_dpi_behavior.OnDestroyWindow();
+
+	__super::OnDestroy();
+}
+
+LRESULT CProcessWnd::OnDpiChanged(WPARAM wParam, LPARAM lParam)
+{
+	m_edit_dpi_behavior.OnWindowDpiChanged(wParam, lParam);
+	m_copy_all_dpi_behavior.OnWindowDpiChanged(wParam, lParam);
+
+	return __super::OnDpiChanged(wParam, lParam);
 }
 
 void CProcessWnd::OnSize(UINT nType, int cx, int cy) 
@@ -248,12 +268,12 @@ void CProcessWnd::OnSize(UINT nType, int cx, int cy)
 
 	CRect rctEdit;
 	rctEdit = rctClient;
-	rctEdit.bottom = rctClient.bottom - 20;
+	rctEdit.bottom = rctClient.bottom - m_dpi_behavior.ScaleOnY(20);
 	Edit.MoveWindow(rctEdit);
 
 	CRect rctButton;
 	rctButton = rctClient;
-	rctButton.top = rctClient.bottom - 20;
+	rctButton.top = rctClient.bottom - m_dpi_behavior.ScaleOnY(20);
 	m_btnCopyAll.MoveWindow(rctButton);
 }
 
@@ -262,7 +282,7 @@ void CProcessWnd::OnSize(UINT nType, int cx, int cy)
 // Purpose: Prepare the process window for display. If it has not been created
 //			yet, register the class and create it.
 //-----------------------------------------------------------------------------
-void CProcessWnd::GetReady(LPCTSTR pszDocName)
+void CProcessWnd::GetReady(LPCTSTR pszDocName, CWnd *parent)
 {
 	if (!IsWindow(m_hWnd))
 	{
@@ -270,7 +290,15 @@ void CProcessWnd::GetReady(LPCTSTR pszDocName)
 		CString title;
 		// dimhotepus: Add compiling map name to title.
 		title.Format("Compile - [%s]", pszDocName);
-		CreateEx(0, strClass, title.GetString(), WS_OVERLAPPEDWINDOW, 50, 50, 600, 400, AfxGetMainWnd()->GetSafeHwnd(), nullptr);
+
+		unsigned newDpi = ::GetDpiForWindow(parent->GetSafeHwnd());
+
+		CreateEx(0, strClass, title.GetString(), WS_OVERLAPPEDWINDOW,
+			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 44, newDpi),
+			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 68, newDpi),
+			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 800, newDpi),
+			se::windows::ui::CDpiWindowBehavior::ScaleByDpi(USER_DEFAULT_SCREEN_DPI, 600, newDpi),
+			AfxGetMainWnd()->GetSafeHwnd(), nullptr);
 	}
 
 	ShowWindow(SW_SHOW);

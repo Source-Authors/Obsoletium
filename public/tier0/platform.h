@@ -1,14 +1,14 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_PLATFORM_H_
-#define TIER0_PLATFORM_H_
+#ifndef SE_PUBLIC_TIER0_PLATFORM_H_
+#define SE_PUBLIC_TIER0_PLATFORM_H_
 
 #define __STDC_LIMIT_MACROS
 #include <cstdint>
 
-#include "tier0/wchartypes.h"
-#include "tier0/basetypes.h"
-#include "tier0/valve_off.h"
+#include "wchartypes.h"
+#include "basetypes.h"
+#include "valve_off.h"
 
 #ifndef PLAT_COMPILE_TIME_ASSERT
 #define PLAT_COMPILE_TIME_ASSERT( pred )	static_assert(pred);
@@ -35,7 +35,7 @@
 #include <x86intrin.h>  // __rdtsc, __rdtscp
 #endif
 
-#include "tier0/valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
+#include "valve_minmax_on.h"	// GCC 4.2.2 headers screw up our min/max defs.
 
 #ifdef _RETAIL
 #define IsRetail() true
@@ -64,16 +64,16 @@
 		#define IsPC() true
 		#define IsConsole() false
 		#define IsX360() false
-		#define IsPS3() false
+		//#define IsPS3() false
 		#define IS_WINDOWS_PC
 		#define PLATFORM_WINDOWS_PC 1 // Windows PC
 		#ifdef _WIN64
-			#define IsPlatformWindowsPC64() true
-			#define IsPlatformWindowsPC32() false
+			//#define IsPlatformWindowsPC64() true
+			//#define IsPlatformWindowsPC32() false
 			#define PLATFORM_WINDOWS_PC64 1
 		#else
-			#define IsPlatformWindowsPC64() false
-			#define IsPlatformWindowsPC32() true
+			//#define IsPlatformWindowsPC64() false
+			//#define IsPlatformWindowsPC32() true
 			#define PLATFORM_WINDOWS_PC32 1
 		#endif
 	// Adding IsPlatformOpenGL() to help fix a bunch of code that was using IsPosix() to infer if the DX->GL translation layer was being used.
@@ -87,7 +87,7 @@
 	#define IsWindows() false
 	#define IsConsole() false
 	#define IsX360() false
-	#define IsPS3() false
+	//#define IsPS3() false
 	#if defined( LINUX )
 		#define IsLinux() true
 	#else
@@ -136,23 +136,13 @@ using HWND = void *;
 // RTime32
 // We use this 32 bit time representing real world time.
 // It offers 1 second resolution beginning on January 1, 1970 (Unix time)
-typedef uint32 RTime32;
+using RTime32 = uint32;
 
-typedef float				float32;
-typedef double				float64;
+using float32 = float;
+using float64 = double;
 
 // for when we don't care about how many bits we use
-typedef unsigned int		uint;
-
-#ifdef _MSC_VER
-// Ensure that everybody has the right compiler version installed. The version
-// number can be obtained by looking at the compiler output when you type 'cl'
-// dimhotepus: Require MSVC 2019 16.10/11 for C++17 support.
-// See https://docs.microsoft.com/en-us/cpp/preprocessor/predefined-macros
-#if _MSC_VER < 1929
-#error "Please install VS 2019 version 16.10, 16.11+"
-#endif
-#endif
+using uint = unsigned int;
 
 // This can be used to ensure the size of pointers to members when declaring
 // a pointer type for a class that has only been forward declared
@@ -164,41 +154,9 @@ typedef unsigned int		uint;
 #define MULTIPLE_INHERITANCE
 #endif
 
-#ifdef _MSC_VER
-#define NO_VTABLE __declspec( novtable )
-#else
-#define NO_VTABLE
-#endif
-
 // This indicates that a function never returns, which helps with
 // generating accurate compiler warnings
 #define NORETURN				[[noreturn]]
-
-// This can be used to declare an abstract (interface only) class.
-// Classes marked abstract should not be instantiated.  If they are, and access violation will occur.
-//
-// Example of use:
-//
-// abstract_class CFoo
-// {
-//      ...
-// }
-//
-// MSDN __declspec(novtable) documentation: https://docs.microsoft.com/en-us/cpp/cpp/novtable
-//
-// This form of __declspec can be applied to any class declaration, but should only be applied to
-// pure interface classes, that is, classes that will never be instantiated on their own.  The
-// __declspec stops the compiler from generating code to initialize the vfptr in the constructor(s)
-// and destructor of the class.  In many cases, this removes the only references to the vtable that
-// are associated with the class and, thus, the linker will remove it.  Using this form of
-// __declspec can result in a significant reduction in code size.
-//
-// If you attempt to instantiate a class marked with novtable and then access a class member, you
-// will receive an access violation(AV).
-//
-// dimhotepus: Enable for PC to reduce code size.
-#define abstract_class class NO_VTABLE
-
 
 // MSVC CRT uses 0x7fff while gcc uses MAX_INT, leading to mismatches between platforms
 // As a result, we pick the least common denominator here.  This should be used anywhere
@@ -220,7 +178,7 @@ typedef unsigned int DWORD;
 #endif
 typedef unsigned short WORD;
 typedef void * HINSTANCE;
-#define _MAX_PATH PATH_MAX
+#define MAX_PATH PATH_MAX
 #define __cdecl
 #define __stdcall
 #define __declspec
@@ -267,18 +225,10 @@ typedef void * HINSTANCE;
 #endif
 #define	DebuggerBreakIfDebugging() if ( !Plat_IsInDebugSession() ) ; else DebuggerBreak()
 
-#ifdef STAGING_ONLY
-#define	DebuggerBreakIfDebugging_StagingOnly() if ( !Plat_IsInDebugSession() ) ; else DebuggerBreak()
-#else
 #define	DebuggerBreakIfDebugging_StagingOnly()
-#endif
 
 // Allows you to specify code that should only execute if we are in a staging build. Otherwise the code noops.
-#ifdef STAGING_ONLY
-#define STAGING_ONLY_EXEC( _exec ) do { _exec; } while (0)
-#else
 #define STAGING_ONLY_EXEC( _exec ) do { } while (0)
-#endif
 
 // C functions for external declarations that call the appropriate C++ methods
 #ifndef EXPORT
@@ -361,7 +311,8 @@ constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) n
 // Stack-based allocation related helpers
 //-----------------------------------------------------------------------------
 #if defined( GNUC )
-	#define stackalloc( _size )		alloca( AlignValue( _size, 16 ) )
+	// dimhotepus: Align at 16 bytes boundary for performance and SIMD.
+	#define stackalloc( _size )		AlignValue( alloca( AlignValue( _size, 16 ) ), 16 )
 #ifdef _LINUX
 	#define mallocsize( _p )	( malloc_usable_size( _p ) )
 #elif defined(OSX)
@@ -370,7 +321,8 @@ constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) n
 #error "Please define your platform"
 #endif
 #elif defined ( _WIN32 )
-	#define stackalloc( _size )		_alloca( AlignValue( _size, 16 ) )
+	// dimhotepus: Align at 16 bytes boundary for performance and SIMD. 
+	#define stackalloc( _size )		AlignValue( _alloca( AlignValue( _size, 16 ) ), 16 )
 	#define mallocsize( _p )		( _msize( _p ) )
 #endif
 
@@ -467,9 +419,17 @@ constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) n
 	#define  FORCEINLINE_TEMPLATE		__forceinline
 #else
 	#define FORCEINLINE inline __attribute__((always_inline))
-	// GCC 3.4.1 has a bug in supporting forced inline of templated functions
-	// this macro lets us not force inlining in that case
-	#define  FORCEINLINE_TEMPLATE		__forceinline
+	// dimhotepus: TF2 backport. Drop workaround for old GCC.
+	#define FORCEINLINE_TEMPLATE		FORCEINLINE
+#endif
+
+// dimhotepus: TF2 backport.
+#if ( defined(__SANITIZE_ADDRESS__) && __SANITIZE_ADDRESS__ )
+	#define NO_ASAN __attribute__((no_sanitize("address")))
+	#define NO_ASAN_FORCEINLINE NO_ASAN inline
+#else
+	#define NO_ASAN
+	#define NO_ASAN_FORCEINLINE FORCEINLINE
 #endif
 
 // Force a function call site -not- to inlined. (useful for profiling)
@@ -800,40 +760,182 @@ inline std::enable_if_t<std::is_scalar_v<T> && sizeof(T) == 8 && alignof(T) == a
 
 #else
 
-// @Note (toml 05-02-02): this technique expects the compiler to
-// optimize the expression and eliminate the other path. On any new
-// platform/compiler this should be tested.
-inline short BigShort( short val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? WordSwap( val )  : val; } //-V206
-inline uint16 BigWord( uint16 val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? WordSwap( val )  : val; } //-V206
-inline long BigLong( long val )			{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? DWordSwap( val ) : val; } //-V206
-inline uint32 BigDWord( uint32 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? DWordSwap( val ) : val; } //-V206
-inline short LittleShort( short val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : WordSwap( val ); } //-V206
-inline uint16 LittleWord( uint16 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : WordSwap( val ); } //-V206
-inline long LittleLong( long val )		{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : DWordSwap( val ); } //-V206
-inline uint32 LittleDWord( uint32 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : DWordSwap( val ); } //-V206
-inline uint64 LittleQWord( uint64 val )	{ int test = 1; return ( *reinterpret_cast<char *>(&test) == 1 ) ? val : QWordSwap( val ); } //-V206
-inline short SwapShort( short val )					{ return WordSwap( val ); }
+template <bool isLittleEndian = endian::native == endian::little>
+inline int16 BigShort( int16 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return WordSwap( val );
+	}
+
+	return val;
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint16 BigWord( uint16 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return WordSwap( val );
+	}
+
+	return val;
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline long BigLong( long val )
+{
+	if constexpr (isLittleEndian)
+	{
+		// dimhotepus: Honor size ex for LP64.
+		if constexpr (sizeof(val) <= 4)
+			return DWordSwap( val );
+		else
+			return QWordSwap( val );
+	}
+
+	return val;
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint32 BigDWord( uint32 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return DWordSwap( val );
+	}
+
+	return val;
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline int16 LittleShort( int16 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	return WordSwap( val );
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint16 LittleWord( uint16 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	return WordSwap( val );
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline long LittleLong( long val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	// dimhotepus: Honor size ex for LP64.
+	if constexpr (sizeof(val) <= 4)
+		return DWordSwap( val );
+	else
+		return QWordSwap( val );
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint32 LittleDWord( uint32 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	return DWordSwap(val);
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline uint64 LittleQWord( uint64 val )
+{
+	if constexpr (isLittleEndian)
+	{
+		return val;
+	}
+
+	return QWordSwap( val ); 
+}
+inline int16 SwapShort( int16 val )					{ return WordSwap( val ); }
 inline uint16 SwapWord( uint16 val )				{ return WordSwap( val ); }
 inline long SwapLong( long val )					{ return DWordSwap( val ); }
 inline uint32 SwapDWord( uint32 val )				{ return DWordSwap( val ); }
 
 // Pass floats by pointer for swapping to avoid truncation in the fpu
-inline void BigFloat( float *pOut, const float *pIn )		{ int test = 1; ( *reinterpret_cast<char *>(&test) == 1 ) ? SafeSwapFloat( pOut, pIn ) : ( *pOut = *pIn ); } //-V206
-inline void LittleFloat( float *pOut, const float *pIn )	{ int test = 1; ( *reinterpret_cast<char *>(&test) == 1 ) ? ( *pOut = *pIn ) : SafeSwapFloat( pOut, pIn ); } //-V206
+template <bool isLittleEndian = endian::native == endian::little>
+inline void BigFloat( float *pOut, const float *pIn )
+{
+	if constexpr (isLittleEndian)
+	{
+		SafeSwapFloat( pOut, pIn );
+	}
+	else
+	{
+		*pOut = *pIn;
+	}
+}
+template <bool isLittleEndian = endian::native == endian::little>
+inline void LittleFloat( float *pOut, const float *pIn )
+{
+	if constexpr (isLittleEndian)
+	{
+		*pOut = *pIn;
+	}
+	else
+	{
+		SafeSwapFloat( pOut, pIn );
+	}
+}
 inline void SwapFloat( float *pOut, const float *pIn )		{ SafeSwapFloat( pOut, pIn ); }
 
 #endif
 
 FORCEINLINE unsigned int LoadLittleDWord( const unsigned int *base, size_t dwordIndex )
-	{
-		return LittleDWord( base[dwordIndex] );
-	}
+{
+	return LittleDWord( base[dwordIndex] );
+}
 
 FORCEINLINE void StoreLittleDWord( unsigned int *base, size_t dwordIndex, unsigned int dword )
-	{
-		base[dwordIndex] = LittleDWord(dword);
-	}
+{
+	base[dwordIndex] = LittleDWord(dword);
+}
 
+//-----------------------------------------------------------------------------
+// Portability casting
+//-----------------------------------------------------------------------------
+// dimhotepus: TF2 & CS:GO backport.
+template <typename Tdst, typename Tsrc>
+[[nodiscard]] inline
+#ifndef DEBUG
+    constexpr
+#endif
+    Tdst
+    size_cast(Tsrc val) noexcept {
+  static_assert(
+      sizeof(Tdst) <= sizeof(uint64) && sizeof(Tsrc) <= sizeof(uint64),
+      "Okay in my defense there weren't any types larger than 64-bits when "
+      "this code was written.");
+
+#ifdef DEBUG
+  if constexpr (sizeof(Tdst) < sizeof(Tsrc)) {
+    Tdst cmpValDst = (Tdst)val;
+
+    // If this fails, the source value didn't actually fit in the destination
+    // value--you'll need to change the return type's size to match the source
+    // type in the calling code.
+    if (val != (Tsrc)cmpValDst) {
+      // Can't use assert here, and if this happens when running on a machine
+      // internally we should crash in preference to missing the problem ( so
+      // not DebuggerBreakIfDebugging() ).
+      DebuggerBreak();
+    }
+  }
+#endif
+
+  return (Tdst)val;
+}
 
 //-----------------------------------------------------------------------------
 // DLL export for platform utilities
@@ -882,7 +984,7 @@ PLATFORM_INTERFACE void				Plat_ExitProcessWithError( int nCode, bool bGenerateM
 //sets the callback that will be triggered by Plat_ExitProcessWithError. NULL is valid. The return value true indicates that
 //the exit has been handled and no further processing should be performed. False will cause a minidump to be generated, and the process
 //to be terminated
-typedef bool (*ExitProcessWithErrorCBFn)( int nCode );
+using ExitProcessWithErrorCBFn = bool (*)(int);
 PLATFORM_INTERFACE void				Plat_SetExitProcessWithErrorCB( ExitProcessWithErrorCBFn pfnCB );
 
 PLATFORM_INTERFACE struct tm *		Plat_gmtime( const time_t *timep, struct tm *result );
@@ -892,8 +994,13 @@ PLATFORM_INTERFACE struct tm *		Plat_localtime( const time_t *timep, struct tm *
 #if defined( _WIN32 )
 	extern "C" unsigned __int64 __rdtsc();
 	extern "C" unsigned __int64 __rdtscp(unsigned *aux);
-	#pragma intrinsic(__rdtsc)
+
+// dimhotepus: Clang does not have __rdtscp intrinsic for now.
+#if defined(_MSC_VER) && !defined(__clang__) 
 	#pragma intrinsic(__rdtscp)
+#endif  // _MSC_VER) && !defined(__clang__) 
+
+	#pragma intrinsic(__rdtsc)
 #endif
 
 FORCEINLINE uint64_t Plat_Rdtsc()
@@ -988,10 +1095,18 @@ BitwiseCopy(const T* src, T* dest, size_t size) noexcept
   std::memcpy(dest, src, sizeof(T) * size);
 }
 
+// Type-safe copying for trivial types.
+template<typename T, size_t size>
+std::enable_if_t<std::is_trivially_copyable_v<T>>
+BitwiseCopy(const T (&src)[size], T (&dest)[size]) noexcept
+{
+  std::memcpy(dest, src, sizeof(T) * size);
+}
+
 // Type-safe copying for non-trivial types.
 template<typename T>
 std::enable_if_t<!std::is_trivially_copyable_v<T>>
-constexpr BitwiseCopy(const T* src, T* dest, size_t size) noexcept
+constexpr BitwiseCopy(const T* src, T* dest, size_t size = 1) noexcept
 {
   std::copy_n(src, size, dest);
 }
@@ -1228,7 +1343,7 @@ PLATFORM_INTERFACE bool Is64BitOS();
 #define WM_XMP_PLAYBACKBEHAVIORCHANGED		(WM_USER + 122)
 #define WM_XMP_PLAYBACKCONTROLLERCHANGED	(WM_USER + 123)
 
-inline const char *GetPlatformExt( void )
+inline const char *GetPlatformExt( )
 {
 	return IsX360() ? ".360" : "";
 }
@@ -1252,7 +1367,7 @@ inline const char *GetPlatformExt( void )
 //-----------------------------------------------------------------------------
 // Include additional dependant header components.
 //-----------------------------------------------------------------------------
-#include "tier0/fasttimer.h"
+#include "fasttimer.h"
 
 //-----------------------------------------------------------------------------
 // Methods to invoke the constructor, copy constructor, and destructor
@@ -1260,42 +1375,49 @@ inline const char *GetPlatformExt( void )
 template <class T>
 inline T* Construct( T* pMemory )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T); //-V572
 }
 
 template <class T, typename ARG1>
 inline T* Construct( T* pMemory, ARG1 a1 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1 )); //-V572
 }
 
 template <class T, typename ARG1, typename ARG2>
 inline T* Construct( T* pMemory, ARG1 a1, ARG2 a2 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1, a2 )); //-V572
 }
 
 template <class T, typename ARG1, typename ARG2, typename ARG3>
 inline T* Construct( T* pMemory, ARG1 a1, ARG2 a2, ARG3 a3 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1, a2, a3 )); //-V572
 }
 
 template <class T, typename ARG1, typename ARG2, typename ARG3, typename ARG4>
 inline T* Construct( T* pMemory, ARG1 a1, ARG2 a2, ARG3 a3, ARG4 a4 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1, a2, a3, a4 )); //-V572
 }
 
 template <class T, typename ARG1, typename ARG2, typename ARG3, typename ARG4, typename ARG5>
 inline T* Construct( T* pMemory, ARG1 a1, ARG2 a2, ARG3 a3, ARG4 a4, ARG5 a5 )
 {
+	HINT( pMemory != nullptr );
 	return reinterpret_cast<T*>(::new( pMemory ) T( a1, a2, a3, a4, a5 )); //-V572
 }
 
 template <typename T, typename... Args>
 inline void Construct( T *memory, Args &&... args )
 {
+	HINT( pMemory != nullptr );
 	::new (memory) T{std::forward<Args>(args)...};
 }
 
@@ -1320,12 +1442,36 @@ template <class T, class P1, class P2, class P3 >
 template <class T>
 inline T* CopyConstruct( T* pMemory, T const& src )
 {
-	return reinterpret_cast<T*>(::new( pMemory ) T(src)); //-V572
+	HINT( pMemory != nullptr );
+	return ::new( pMemory ) T{src};
+}
+
+template <class T>
+inline void CopyConstruct( T* pMemory, T&& src )
+{
+	HINT( pMemory != nullptr );
+  ::new (pMemory) T{std::forward<T>(src)};
+}
+
+template <class T, typename... Args>
+inline void CopyConstruct( T* pMemory, Args&&... src )
+{
+	HINT( pMemory != nullptr );
+	::new( pMemory ) T{std::forward<Args...>( src )...};
+}
+
+template <class T>
+inline T* MoveConstruct( T* pMemory, T&& src )
+{
+	HINT( pMemory != nullptr );
+	return ::new( pMemory ) T{std::forward<T>( src )};
 }
 
 template <class T>
 inline void Destruct( T* pMemory )
 {
+	HINT( pMemory != nullptr );
+
 	pMemory->~T();
 
 #ifdef _DEBUG
@@ -1498,7 +1644,7 @@ PLATFORM_INTERFACE void Plat_SetWatchdogHandlerFunction( Plat_WatchDogHandlerFun
 
 //-----------------------------------------------------------------------------
 
-#include "tier0/valve_on.h"
+#include "valve_on.h"
 
 #if defined(TIER0_DLL_EXPORT)
 extern "C" int V_tier0_stricmp(const char *s1, const char *s2 );
@@ -1509,4 +1655,4 @@ extern "C" int V_tier0_stricmp(const char *s1, const char *s2 );
 #endif
 
 
-#endif  // TIER0_PLATFORM_H_
+#endif  // !SE_PUBLIC_TIER0_PLATFORM_H_

@@ -84,6 +84,10 @@ CHUDAutoAim::CHUDAutoAim( const char *pElementName ) :
 	SetParent( pParent );
 	SetHiddenBits( HIDEHUD_CROSSHAIR );
 
+	m_alpha = 0.0f;
+	m_scale = 0.0f;
+	m_alphaFixed = 0.0f;
+
 	m_textureID_ActiveReticle = -1;
 	m_textureID_FixedReticle = -1;
 }

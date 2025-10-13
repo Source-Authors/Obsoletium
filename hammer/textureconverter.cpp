@@ -100,14 +100,14 @@ void CTextureConverter::ConvertWorldTextures( CMapWorld * pWorld )
 void CTextureConverter::ConvertSolids( CMapWorld * pWorld )
 {
 	// Count total map solids so we know how many we have to do (for progress meter).
-	pWorld->EnumChildren( ENUMMAPCHILDRENPROC( CountMapSolids ), 0, MAPCLASS_TYPE( CMapSolid ) );
+	pWorld->EnumChildren( &CTextureConverter::CountMapSolids );
 
 	m_pProgDlg->SetRange( 0, m_nSolidCount );
 	m_pProgDlg->SetStep( 2 );
 	m_pProgDlg->SetWindowText( "Converting solids..." );
 
 	// Cycle through the solids again and convert as necessary.
-	pWorld->EnumChildren( ENUMMAPCHILDRENPROC( CheckSolidTextures ), 0, MAPCLASS_TYPE( CMapSolid ) );
+	pWorld->EnumChildren( &CTextureConverter::CheckSolidTextures );
 }
 
 
@@ -116,11 +116,11 @@ void CTextureConverter::ConvertSolids( CMapWorld * pWorld )
 // Input  : 
 // Output : Always return true to continue enumerating.
 //-----------------------------------------------------------------------------
-bool CTextureConverter::CountMapSolids( CMapSolid *, DWORD )
+BOOL CTextureConverter::CountMapSolids( CMapSolid * )
 {
 	m_nSolidCount++;
 
-	return true;	// return true to continue enumerating
+	return TRUE;	// return true to continue enumerating
 }
 
 
@@ -129,7 +129,7 @@ bool CTextureConverter::CountMapSolids( CMapSolid *, DWORD )
 // Input  : pSolid - map solid to be checked.
 // Output : Always return true to continue enumerating.
 //-----------------------------------------------------------------------------
-bool CTextureConverter::CheckSolidTextures( CMapSolid * pSolid, DWORD )
+BOOL CTextureConverter::CheckSolidTextures( CMapSolid * pSolid )
 {
 	m_nCurrentSolid++;
 
@@ -143,7 +143,7 @@ bool CTextureConverter::CheckSolidTextures( CMapSolid * pSolid, DWORD )
 		CheckFaceTexture( pSolid->GetFace( nFaceCount ) );
 	}
 
-	return true;	// return true to continue enumerating
+	return TRUE;	// return true to continue enumerating
 }
 
 
@@ -256,14 +256,14 @@ void CTextureConverter::ConvertFaceTexture( CMapFace * pFace )
 void CTextureConverter::ConvertDecals( CMapWorld * pWorld )
 {
 	// Count total map decals so we know how many we have to do (for progress meter).
-	pWorld->EnumChildren( ENUMMAPCHILDRENPROC( CountMapDecals ), 0, MAPCLASS_TYPE( CMapEntity ) );
+	pWorld->EnumChildren( &CTextureConverter::CountMapDecals );
 
 	m_pProgDlg->SetRange( 0, m_nDecalCount );
 	m_pProgDlg->SetStep( 3 );
 	m_pProgDlg->SetWindowText( "Converting decals..." );
 
 	// Cycle through the solids again and convert as necessary.
-	pWorld->EnumChildren( ENUMMAPCHILDRENPROC( CheckDecalTextures ), 0, MAPCLASS_TYPE( CMapEntity ) );
+	pWorld->EnumChildren( &CTextureConverter::CheckDecalTextures );
 }
 
 
@@ -272,12 +272,12 @@ void CTextureConverter::ConvertDecals( CMapWorld * pWorld )
 // Input  : 
 // Output : Always return true to continue enumerating.
 //-----------------------------------------------------------------------------
-bool CTextureConverter::CountMapDecals( CMapEntity * pEnt, DWORD )
+BOOL CTextureConverter::CountMapDecals( CMapEntity * pEnt )
 {
 	if ( !strcmp( pEnt->GetClassName(), "infodecal" ) )
 		m_nDecalCount++;
 
-	return true;	// return true to continue enumerating
+	return TRUE;	// return true to continue enumerating
 }
 
 
@@ -287,10 +287,10 @@ bool CTextureConverter::CountMapDecals( CMapEntity * pEnt, DWORD )
 // Input  : pEnt - map decal to be checked.
 // Output : Always return true to continue enumerating.
 //-----------------------------------------------------------------------------
-bool CTextureConverter::CheckDecalTextures( CMapEntity * pEnt, DWORD )
+BOOL CTextureConverter::CheckDecalTextures( CMapEntity * pEnt )
 {
 	if ( strcmp( pEnt->GetClassName(), "infodecal" ) != 0 )
-		return true;	// not a decal, return true to continue enumerating
+		return TRUE;	// not a decal, return true to continue enumerating
 
 	m_nCurrentDecal++;
 
@@ -305,7 +305,7 @@ bool CTextureConverter::CheckDecalTextures( CMapEntity * pEnt, DWORD )
 		ConvertDecalTexture( pEnt );
 	}
 
-	return true;	// return true to continue enumerating
+	return TRUE;	// return true to continue enumerating
 }
 
 

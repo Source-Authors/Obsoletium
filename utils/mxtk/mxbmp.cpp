@@ -34,6 +34,8 @@ mxBmpRead (const char *filename)
 	int cbPalBytes;
 	int biTrueWidth;
 	mxImage *image = 0;
+	// dimhotepus: CS:GO
+	bool success = false;
 
 	// File exists?
 	if ((pfile = fopen (filename, "rb")) == 0)
@@ -84,7 +86,6 @@ mxBmpRead (const char *filename)
 
 	if (!image->create (bmih.biWidth, bmih.biHeight, 8))
 	{
-		delete image;
 		goto GetOut;
 	}
 
@@ -146,9 +147,18 @@ mxBmpRead (const char *filename)
 	pb += biTrueWidth;
 	free (pb);
 
+	success = true;
+
 GetOut:
 	if (pfile) 
 		fclose (pfile);
+
+	// dimhotepus: CS:GO
+	if ( !success )
+	{
+		delete image;
+		image = 0;
+	}
 
 	return image;
 }

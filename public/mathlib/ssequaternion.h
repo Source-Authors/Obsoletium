@@ -6,12 +6,7 @@
 #ifndef SSEQUATMATH_H
 #define SSEQUATMATH_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
-#include "mathlib/ssemath.h"
+#include "ssemath.h"
 
 // If you compile assuming the presence of SSE2, the MSVC will abandon
 // the traditional x87 FPU operations altogether and make everything use

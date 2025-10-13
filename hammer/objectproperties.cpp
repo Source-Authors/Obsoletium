@@ -53,10 +53,10 @@ enum LayoutType_t
 
 
 
-IMPLEMENT_DYNAMIC(CObjectProperties, CPropertySheet)
+IMPLEMENT_DYNAMIC(CObjectProperties, CBasePropertySheet)
 
 
-BEGIN_MESSAGE_MAP(CObjectProperties, CPropertySheet)
+BEGIN_MESSAGE_MAP(CObjectProperties, CBasePropertySheet)
 	//{{AFX_MSG_MAP(CObjectProperties)
 	ON_WM_KILLFOCUS()
 	ON_WM_ACTIVATE()
@@ -86,7 +86,7 @@ static editCEditGameClass e_CEditGameClass;
 // Purpose: Constructor.
 //-----------------------------------------------------------------------------
 CObjectProperties::CObjectProperties(void) :
-	CPropertySheet()
+	CBasePropertySheet()
 {
 	m_bDummy = false;
 	m_pDummy = NULL;
@@ -108,7 +108,7 @@ CObjectProperties::CObjectProperties(void) :
 //			iSelectPage - 
 //-----------------------------------------------------------------------------
 CObjectProperties::CObjectProperties(UINT nIDCaption, CWnd* pParentWnd, UINT iSelectPage)
-	:CPropertySheet(nIDCaption, pParentWnd, iSelectPage)
+    : CBasePropertySheet(nIDCaption, pParentWnd, iSelectPage)
 {
 	m_bDummy = false;
 	m_pDummy = NULL;
@@ -128,7 +128,7 @@ CObjectProperties::CObjectProperties(UINT nIDCaption, CWnd* pParentWnd, UINT iSe
 //			iSelectPage - 
 //-----------------------------------------------------------------------------
 CObjectProperties::CObjectProperties(LPCTSTR pszCaption, CWnd* pParentWnd, UINT iSelectPage)
-	:CPropertySheet(pszCaption, pParentWnd, iSelectPage)
+	: CBasePropertySheet(pszCaption, pParentWnd, iSelectPage)
 {
 	m_bDummy = false;
 	m_pDummy = NULL;
@@ -439,20 +439,6 @@ void CObjectProperties::CreateButtons(void)
 {
 	//VPROF_BUDGET( "CObjectProperties::CreateButtons", "Object Properties" );
 
-#if 0
-	// Get the screen location of the hidden apply button(ID_APPLY_NOW)
-	rect	rcButton;
-	pApplyButton->GetWindowRect( &rcButton );
-
-	// Grab, enable and rename the OK button to be Apply 
-	// (Because <enter> only accelerates IDOK)
-	// and we dont want "OK" (apply+close) functionality
-	CButton	*pOKButton = reinterpret_cast<CButton *>(GetDlgItem(IDOK)); 
-	pOKButton->SetWindowTextA("Apply");
-	pOKButton->EnableWindow();
-	pOKButton->ShowWindow(SW_SHOWNA);
-	pOKButton->MoveWindow(&rcButton);
-#else
 	// Grab, enable and DONT show the OK button
 	// (Because <enter> only accelerates IDOK)
 	// and we dont want "OK" (apply+close) functionality
@@ -465,7 +451,7 @@ void CObjectProperties::CreateButtons(void)
 	pApplyButton->SetButtonStyle( pApplyButton->GetButtonStyle() | BS_DEFPUSHBUTTON );
 	pApplyButton->EnableWindow();
 	pApplyButton->ShowWindow(SW_SHOWNA);
-#endif
+
 	// Grab and enable & show the hidden Cancel button too
 	CButton *pCancelButton = reinterpret_cast<CButton *>(GetDlgItem(IDCANCEL));
 	pCancelButton->EnableWindow();
@@ -483,18 +469,18 @@ void CObjectProperties::CreateButtons(void)
 	// Create buttons to display connection status icons
 	CRect rect;
 	GetWindowRect(&rect);
-	rect.InflateRect(0, 0, 0, 32);
+	rect.InflateRect(0, 0, 0, m_dpi_behavior.ScaleOnY(32));
 	MoveWindow(&rect, FALSE);
 	GetClientRect(&rect);
 
 	m_pInputButton = new CButton;
-	m_pInputButton->Create(_T("My button"), WS_CHILD|WS_VISIBLE|BS_ICON|BS_FLAT, CRect(6,rect.bottom - 34,38,rect.bottom - 2), this, IDI_INPUT);
+	m_pInputButton->Create(_T("My button"), WS_CHILD|WS_VISIBLE|BS_ICON|BS_FLAT, CRect(m_dpi_behavior.ScaleOnX(6),rect.bottom - m_dpi_behavior.ScaleOnY(34),m_dpi_behavior.ScaleOnX(38),rect.bottom - m_dpi_behavior.ScaleOnY(2)), this, IDI_INPUT);
 
 	m_pOutputButton = new CButton;
-	m_pOutputButton->Create(_T("My button"), WS_CHILD|WS_VISIBLE|BS_ICON|BS_FLAT, CRect(40,rect.bottom - 34,72,rect.bottom - 2), this, IDI_OUTPUT);
+	m_pOutputButton->Create(_T("My button"), WS_CHILD|WS_VISIBLE|BS_ICON|BS_FLAT, CRect(m_dpi_behavior.ScaleOnX(40),rect.bottom - m_dpi_behavior.ScaleOnY(34),m_dpi_behavior.ScaleOnX(72),rect.bottom - m_dpi_behavior.ScaleOnY(2)), this, IDI_OUTPUT);
 
 	m_pInstanceButton = new CButton;
-	m_pInstanceButton->Create( _T( "Edit Instance" ), WS_CHILD|WS_VISIBLE|BS_TEXT, CRect( 6, rect.bottom - 28, 140, rect.bottom - 4 ), this, IDD_EDIT_INSTANCE );
+	m_pInstanceButton->Create( _T( "Edit Instance" ), WS_CHILD|WS_VISIBLE|BS_TEXT, CRect(m_dpi_behavior.ScaleOnX(6),rect.bottom - m_dpi_behavior.ScaleOnY(28),m_dpi_behavior.ScaleOnX(140),rect.bottom - m_dpi_behavior.ScaleOnY(4)), this, IDD_EDIT_INSTANCE);
 }
 
 

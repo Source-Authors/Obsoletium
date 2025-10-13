@@ -314,7 +314,7 @@ public:
 		if ((pCollide->GetSolidFlags() & FSOLID_VOLUME_CONTENTS) == 0)
 			return false;
 
-		model_t* pModel = (model_t*)pCollide->GetCollisionModel();
+		const model_t* pModel = pCollide->GetCollisionModel();
 		if ( pModel && pModel->type == mod_brush )
 		{
 			Assert( pCollide->GetCollisionModelIndex() < MAX_MODELS && pCollide->GetCollisionModelIndex() >= 0 );
@@ -355,7 +355,7 @@ private:
 		if(modelindex >= MAX_MODELS || modelindex < 0)
 			return -1;
 
-		model_t *pModel = (model_t*)pCollide->GetCollisionModel();
+		const model_t *pModel = pCollide->GetCollisionModel();
 		if(!pModel)
 			return -1;
 
@@ -880,7 +880,7 @@ bool CEngineTrace::ClipRayToVPhysics( const Ray_t &ray, unsigned int fMask, ICol
 			int nModelIndex = pEntity->GetCollisionModelIndex();
 
 			// BUGBUG: This only works when the vcollide in question is the first solid in the model
-			vcollide_t *pCollide = CM_VCollideForModel( nModelIndex, (model_t*)pModel );
+			vcollide_t *pCollide = CM_VCollideForModel( nModelIndex, pModel );
 
 			if ( pCollide && pCollide->solidCount )
 			{
@@ -1192,6 +1192,7 @@ public:
 	CEntityListAlongRay() 
 	{
 		m_nCount = 0;
+		BitwiseClear(m_EntityHandles);
 	}
 
 	void Reset()

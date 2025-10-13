@@ -20,22 +20,22 @@ class CSceneTokenProcessor final : public ISceneTokenProcessor
 public:
 	CSceneTokenProcessor();
 
-	const char	*CurrentToken( void ) override;
+	const char	*CurrentToken( ) override;
 	bool		GetToken( bool crossline ) override;
-	bool		TokenAvailable( void ) override;
+	bool		TokenAvailable( ) override;
 	void		Error( PRINTF_FORMAT_STRING const char *fmt, ... ) override;
 	void		SetBuffer( char *buffer );
 private:
 
 	const char *ParseNextToken (const char *data);
 
-	const char	*m_pBuffer;
+	const char	*m_pBuffer{nullptr};
 	char		m_szToken[ 1024 ];
 
 	characterset_t	m_BreakSetIncludingColons;
 };
 
-CSceneTokenProcessor::CSceneTokenProcessor() : m_pBuffer()
+CSceneTokenProcessor::CSceneTokenProcessor()  
 {
 	m_szToken[0] = '\0';
 	CharacterSetBuild( &m_BreakSetIncludingColons, "{}()':" );
@@ -45,7 +45,7 @@ CSceneTokenProcessor::CSceneTokenProcessor() : m_pBuffer()
 // Purpose: 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *CSceneTokenProcessor::CurrentToken( void )
+const char *CSceneTokenProcessor::CurrentToken( )
 {
 	return m_szToken;
 }
@@ -62,14 +62,14 @@ const char *CSceneTokenProcessor::ParseNextToken (const char *data)
 	m_szToken[0] = 0;
 	
 	if (!data)
-		return NULL;
+		return nullptr;
 		
 // skip whitespace
 skipwhite:
 	while ( (c = *data) <= ' ')
 	{
 		if (c == 0)
-			return NULL;                    // end of file;
+			return nullptr;                    // end of file;
 		data++;
 	}
 	
@@ -86,7 +86,7 @@ skipwhite:
 	if (c == '\"')
 	{
 		data++;
-		while (1)
+		while (true)
 		{
 			c = *data++;
 			if (c=='\"' || !c)
@@ -141,7 +141,7 @@ bool CSceneTokenProcessor::GetToken( [[maybe_unused]] bool crossline )
 // Purpose: 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool CSceneTokenProcessor::TokenAvailable( void )
+bool CSceneTokenProcessor::TokenAvailable( )
 {
 	const char *search_p = m_pBuffer;
 

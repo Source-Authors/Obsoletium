@@ -6,11 +6,6 @@
 //
 //=============================================================================
 
-#if defined(_WIN32)
-#undef _WIN32_WINNT
-#define _WIN32_WINNT 0x0502		// ReadDirectoryChangesW
-#endif
-
 #if defined(OSX)
 #include <CoreServices/CoreServices.h>
 #include <sys/types.h>
@@ -68,7 +63,7 @@
 #include "tier1/fileio.h"
 #include "tier1/utlbuffer.h"
 #include "tier1/strtools.h"
-#include <errno.h>
+#include <cerrno>
 
 #if defined( WIN32_FILEIO )
 #include "winlite.h"
@@ -93,7 +88,7 @@ CPathString::CPathString( const char *pchUTF8Path )
 {
 	// Need to first turn into an absolute path, so \\?\ pre-pended paths will be ok
 	m_pchUTF8Path = new char[ MAX_UNICODE_PATH_IN_UTF8 ];
-	m_pwchWideCharPathPrepended = NULL;
+	m_pwchWideCharPathPrepended = nullptr;
 
 	// First, convert to absolute path, which also does Q_FixSlashes for us.
 	Q_MakeAbsolutePath( m_pchUTF8Path, MAX_UNICODE_PATH * 4, pchUTF8Path );
@@ -111,13 +106,13 @@ CPathString::~CPathString()
 	if ( m_pwchWideCharPathPrepended )
 	{
 		delete[] m_pwchWideCharPathPrepended;
-		m_pwchWideCharPathPrepended = NULL;
+		m_pwchWideCharPathPrepended = nullptr;
 	}
 
 	if ( m_pchUTF8Path )
 	{
 		delete[] m_pchUTF8Path;
-		m_pchUTF8Path = NULL;
+		m_pchUTF8Path = nullptr;
 	}
 }
 
@@ -195,9 +190,9 @@ static const int k_cubDirWatchBufferSize = 8 * 1024;
 //-----------------------------------------------------------------------------
 CDirWatcher::CDirWatcher()
 {
-	m_hFile = NULL;
-	m_pOverlapped = NULL;
-	m_pFileInfo = NULL;
+	m_hFile = nullptr;
+	m_pOverlapped = nullptr;
+	m_pFileInfo = nullptr;
 #ifdef OSX
 	m_WatcherStream = 0;
 #endif
@@ -213,8 +208,8 @@ CDirWatcher::~CDirWatcher()
 	if ( m_pOverlapped )
 	{
 		// mark the overlapped structure as gone
-		DirWatcherOverlapped *pDirWatcherOverlapped = (DirWatcherOverlapped *)m_pOverlapped;
-		pDirWatcherOverlapped->m_pDirWatcher = NULL;
+		auto *pDirWatcherOverlapped = (DirWatcherOverlapped *)m_pOverlapped;
+		pDirWatcherOverlapped->m_pDirWatcher = nullptr;
 	}
 
 	if ( m_hFile )
@@ -255,7 +250,7 @@ class CDirWatcherFriend
 public:
 	static void WINAPI DirWatchCallback( DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, OVERLAPPED *pOverlapped )
 	{
-		DirWatcherOverlapped *pDirWatcherOverlapped = (DirWatcherOverlapped *)pOverlapped;
+		auto *pDirWatcherOverlapped = (DirWatcherOverlapped *)pOverlapped;
 
 		// see if we've been cancelled
 		if ( !pDirWatcherOverlapped->m_pDirWatcher )
@@ -264,12 +259,12 @@ public:
 		// parse and pass back
 		if ( dwNumberOfBytesTransfered > sizeof(FILE_NOTIFY_INFORMATION) )
 		{
-			FILE_NOTIFY_INFORMATION *pFileNotifyInformation = (FILE_NOTIFY_INFORMATION *)pDirWatcherOverlapped->m_pDirWatcher->m_pFileInfo;
+			auto *pFileNotifyInformation = (FILE_NOTIFY_INFORMATION *)pDirWatcherOverlapped->m_pDirWatcher->m_pFileInfo;
 			do 
 			{
 				// null terminate the string and turn it to UTF-8
 				int cNumWChars = pFileNotifyInformation->FileNameLength / sizeof(wchar_t);
-				wchar_t *pwchT = new wchar_t[cNumWChars + 1];
+				auto *pwchT = new wchar_t[cNumWChars + 1];
 				memcpy( pwchT, pFileNotifyInformation->FileName, pFileNotifyInformation->FileNameLength );
 				pwchT[cNumWChars] = 0;
 				CStrAutoEncode strAutoEncode( pwchT );
@@ -282,7 +277,7 @@ public:
 
 				// move to the next file
 				pFileNotifyInformation = (FILE_NOTIFY_INFORMATION *)(((byte*)pFileNotifyInformation) + pFileNotifyInformation->NextEntryOffset);
-			} while ( 1 );
+			} while ( true );
 		}
 
 
@@ -377,7 +372,7 @@ void CDirWatcher::SetDirToWatch( const char *pchDir )
 	CPathString strPath( pchDir );
 #ifdef WIN32
 	// open the directory
-	m_hFile = ::CreateFileW( strPath.GetWCharPathPrePended(), FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, NULL, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_BACKUP_SEMANTICS, NULL );
+	m_hFile = ::CreateFileW( strPath.GetWCharPathPrePended(), FILE_LIST_DIRECTORY, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING, FILE_FLAG_OVERLAPPED | FILE_FLAG_BACKUP_SEMANTICS, nullptr );
 
 	// create our buffers
 	m_pFileInfo = malloc( k_cubDirWatchBufferSize );
@@ -433,7 +428,7 @@ void CDirWatcher::SetDirToWatch( const char *pchDir )
 void CDirWatcher::PostDirWatch()
 {
 	memset( m_pOverlapped, 0, sizeof(DirWatcherOverlapped) );
-	DirWatcherOverlapped *pDirWatcherOverlapped = (DirWatcherOverlapped *)m_pOverlapped;
+	auto *pDirWatcherOverlapped = (DirWatcherOverlapped *)m_pOverlapped;
 	pDirWatcherOverlapped->m_pDirWatcher = this;
 
 	DWORD dwBytes;

@@ -338,7 +338,8 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	
 	if ( FStrEq( szKeyName, "renderamt" ) )
 	{
-		SetRenderColorA( atoi( szValue ) );
+		// dimhotepus: atoi -> strtoull.
+		SetRenderColorA( static_cast<byte>(strtoul( szValue, nullptr, 10 )) );
 		return true;
 	}
 
@@ -355,7 +356,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	if ( FStrEq( szKeyName, "mins" ))
 	{
 		Vector mins;
-		UTIL_StringToVector( mins.Base(), szValue );
+		UTIL_StringToVector( mins, szValue );
 		CollisionProp()->SetCollisionBounds( mins, CollisionProp()->OBBMaxs() );
 		return true;
 	}
@@ -363,7 +364,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	if ( FStrEq( szKeyName, "maxs" ))
 	{
 		Vector maxs;
-		UTIL_StringToVector( maxs.Base(), szValue );
+		UTIL_StringToVector( maxs, szValue );
 		CollisionProp()->SetCollisionBounds( CollisionProp()->OBBMins(), maxs );
 		return true;
 	}
@@ -396,15 +397,15 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 		float y = strtof( szValue, nullptr );
 		if (y >= 0)
 		{
-			Q_snprintf( szBuf,sizeof(szBuf), "%f %f %f", GetLocalAngles()[0], y, GetLocalAngles()[2] );
+			V_sprintf_safe( szBuf, "%f %f %f", GetLocalAngles()[0], y, GetLocalAngles()[2] );
 		}
 		else if ((int)y == -1)
 		{
-			Q_strncpy( szBuf, "-90 0 0", sizeof(szBuf) );
+			V_strcpy_safe( szBuf, "-90 0 0" );
 		}
 		else
 		{
-			Q_strncpy( szBuf, "90 0 0", sizeof(szBuf) );
+			V_strcpy_safe( szBuf, "90 0 0" );
 		}
 
 		// Do this so inherited classes looking for 'angles' don't have to bother with 'angle'
@@ -416,7 +417,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	if( FStrEq( szKeyName, "angles" ) )
 	{
 		QAngle angles;
-		UTIL_StringToVector( angles.Base(), szValue );
+		UTIL_StringToVector( angles, szValue );
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalAngles from within a KeyValues method.. use SetAbsAngles instead!
@@ -428,7 +429,7 @@ bool CBaseEntity::KeyValue( const char *szKeyName, const char *szValue )
 	if( FStrEq( szKeyName, "origin" ) )
 	{
 		Vector vecOrigin;
-		UTIL_StringToVector( vecOrigin.Base(), szValue );
+		UTIL_StringToVector( vecOrigin, szValue );
 
 		// If you're hitting this assert, it's probably because you're
 		// calling SetLocalOrigin from within a KeyValues method.. use SetAbsOrigin instead!
@@ -532,7 +533,7 @@ bool CBaseEntity::GetKeyValue( const char *szKeyName, char *szValue, int iMaxLen
 	if ( FStrEq( szKeyName, "renderamt" ) )
 	{
 		color32 tmp = GetRenderColor();
-		Q_snprintf( szValue, iMaxLen, "%d", tmp.a );
+		Q_snprintf( szValue, iMaxLen, "%hhu", tmp.a );
 		return true;
 	}
 

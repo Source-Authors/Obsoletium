@@ -115,7 +115,8 @@ CParticleSubTexture::CParticleSubTexture()
 CEffectMaterial::CEffectMaterial()
 {
 	m_Particles.m_pNext = m_Particles.m_pPrev = &m_Particles;
-	m_pGroup = NULL;
+	m_pHashedNext = nullptr;
+	m_pGroup = nullptr;
 }
 
 
@@ -1040,6 +1041,8 @@ CEffectMaterial* CParticleEffectBinding::GetEffectMaterial( CParticleSubTexture 
 //-----------------------------------------------------------------------------
 CParticleMgr::CParticleMgr()
 {
+	m_bStatsRunning = false;
+	m_nStatsFramesSinceLastAlert = 0;
 	m_nToolParticleEffectId = 0;
 	m_bUpdatingEffects = false;
 	m_bRenderParticleEffects = true;
@@ -1067,7 +1070,7 @@ CParticleMgr::~CParticleMgr()
 //-----------------------------------------------------------------------------
 // Initialization and shutdown
 //-----------------------------------------------------------------------------
-bool CParticleMgr::Init(unsigned long count, IMaterialSystem *pMaterials)
+bool CParticleMgr::Init(unsigned count, IMaterialSystem *pMaterials)
 {
 	Term();
 
@@ -1494,7 +1497,7 @@ void EndSimulateParticles( void )
 	double flETime = Plat_FloatTime() - g_flStartSimTime;
 	if ( g_bMeasureParticlePerformance )
 	{
-		g_nNumUSSpentSimulatingParticles += 1.0e6 * flETime;
+		g_nNumUSSpentSimulatingParticles += static_cast<int64_t>(1.0e6 * flETime);
 	}
 	g_pParticleSystemMgr->CommitProfileInformation( flETime > .001 * r_particle_sim_spike_threshold_ms.GetInt() );
 }

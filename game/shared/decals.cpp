@@ -173,12 +173,10 @@ bool CDecalEmitterSystem::Init()
 void CDecalEmitterSystem::LevelInitPreEntity()
 {
 	// Precache all entries
-	int c = m_AllDecals.Count();
-	for ( int i = 0 ; i < c; i++ )
+	for ( auto &e : m_AllDecals )
 	{
-		DecalListEntry& e = m_AllDecals[ i ];
 #if defined( CLIENT_DLL )
-		e.precache_index = effects->Draw_DecalIndexFromName( (char *)m_DecalFileNames.String( e.name ) );
+		e.precache_index = effects->Draw_DecalIndexFromName( m_DecalFileNames.String( e.name ) );
 #else
 		e.precache_index = engine->PrecacheDecal( m_DecalFileNames.String( e.name ) );
 #endif

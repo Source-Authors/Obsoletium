@@ -459,7 +459,7 @@ void CHudMenu::ShowMenu_KeyValueItems( KeyValues *pKV )
 //-----------------------------------------------------------------------------
 void CHudMenu::MsgFunc_ShowMenu( bf_read &msg)
 {
-	m_bitsValidSlots = (short)msg.ReadWord();
+	m_bitsValidSlots = msg.ReadWord();
 	char DisplayTime = msg.ReadChar();
 	int NeedMore = msg.ReadByte();
 

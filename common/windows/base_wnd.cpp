@@ -35,3 +35,9 @@ void CBaseWnd::OnDestroy() {
 LRESULT CBaseWnd::OnDpiChanged(WPARAM wParam, LPARAM lParam) {
   return m_dpi_behavior.OnWindowDpiChanged(wParam, lParam);
 }
+
+void CBaseWnd::CalcWindowRect(LPRECT lpClientRect, UINT nAdjustType) {
+  DWORD dwExStyle = GetExStyle();
+  if (nAdjustType == 0) dwExStyle &= ~WS_EX_CLIENTEDGE;
+  ::AdjustWindowRectExForDpi(lpClientRect, GetStyle(), FALSE, dwExStyle, m_dpi_behavior.GetCurrentDpiX());
+}

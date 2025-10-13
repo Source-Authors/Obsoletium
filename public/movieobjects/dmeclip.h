@@ -489,8 +489,8 @@ private:
 
 	CDmaVar< float >						m_Volume;
 
-	IVideoMaterial						   *m_pCachedVersion;	
-	bool m_bReloadCachedVersion;
+	IVideoMaterial						   *m_pCachedVersion{nullptr};
+	bool m_bReloadCachedVersion{false};
 	CMaterialReference m_FadeMaterial;
 };
 

@@ -169,9 +169,9 @@ void	CheckGLError( int line )
 
 void *VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, void *fallback)
 {
-	void *retval = NULL;
+	void *retval = nullptr;
 	if ((!okay) && (!bRequired))  // always look up if required (so we get a complete list of crucial missing symbols).
-		return NULL;
+		return nullptr;
 
 	// The SDL path would work on all these platforms, if we were using SDL there, too...
 #if defined( USE_SDL )
@@ -190,7 +190,7 @@ void *VoidFnPtrLookup_GlMgr(const char *fn, bool &okay, const bool bRequired, vo
 	// Note that a non-NULL response doesn't mean it's safe to call the function!
 	//  You always have to check that the extension is supported;
 	//  an implementation MAY return NULL in this case, but it doesn't have to (and doesn't, with the DRI drivers).
-	okay = (okay && (retval != NULL));
+	okay = (okay && (retval != nullptr));
 	if (bRequired && !okay)
 	{
 		// We can't continue execution, because one or more GL function pointers will be NULL.
@@ -593,7 +593,7 @@ void *CSDLMgr::QueryInterface( const char *pInterfaceName )
 	SDLAPP_FUNC;
 	if ( !Q_stricmp( pInterfaceName, SDLMGR_INTERFACE_VERSION ) )
 		return this;
-	return NULL;
+	return nullptr;
 }
 
 void CSDLMgr::Shutdown()
@@ -1448,7 +1448,7 @@ void CSDLMgr::handleKeyInput( const SDL_Event &event )
 	if ( CommandLine()->FindParm( "-nonqwerty" ) )
 	{
 		const char* keyname = SDL_GetKeyName( event.key.keysym.sym );
-		if ( keyname != NULL && V_strlen( keyname ) == 1) {
+		if ( keyname != nullptr && V_strlen( keyname ) == 1) {
 			const char c = *keyname;
 			if ( c >= 'A' && c <= 'Z' )
 			{

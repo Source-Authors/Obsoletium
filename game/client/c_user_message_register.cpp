@@ -10,7 +10,7 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-CUserMessageRegister *CUserMessageRegister::s_pHead = NULL;
+CUserMessageRegister *CUserMessageRegister::s_pHead = nullptr;
 
 
 CUserMessageRegister::CUserMessageRegister( const char *pMessageName, pfnUserMsgHook pHookFn )
@@ -26,11 +26,18 @@ CUserMessageRegister::CUserMessageRegister( const char *pMessageName, pfnUserMsg
 
 void CUserMessageRegister::RegisterAll()
 {
-	for ( CUserMessageRegister *pCur=s_pHead; pCur; pCur=pCur->m_pNext )
+	for ( auto *pCur=s_pHead; pCur; pCur=pCur->m_pNext )
 	{
 		usermessages->HookMessage( pCur->m_pMessageName, pCur->m_pHookFn );
 	}
 }
 
 
-
+// dimhotepus: Pair with unregister all to cleanup.
+void CUserMessageRegister::UnregisterAll()
+{
+	for ( auto *pCur=s_pHead; pCur; pCur=pCur->m_pNext )
+	{
+		usermessages->UnhookMessage( pCur->m_pMessageName, pCur->m_pHookFn );
+	}
+}

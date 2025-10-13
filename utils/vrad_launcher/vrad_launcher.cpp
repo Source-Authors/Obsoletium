@@ -15,6 +15,8 @@
 
 #include "ivraddll.h"
 
+#include "scoped_app_locale.h"
+
 #include "tier0/memdbgon.h"
 
 namespace {
@@ -57,6 +59,20 @@ template <intp size>
 }  // namespace
 
 int main(int argc, char *argv[]) {
+  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+  //
+  // Printf/sscanf functions expect en_US UTF8 localization.
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
+
   // Need command line first.
   CommandLine()->CreateCmdLine(argc, argv);
 

@@ -157,7 +157,7 @@ void MD5Update(MD5Context_t *ctx, IN_BYTECAP(len) const void *buf, unsigned int 
 
     /* Handle any leading odd-sized chunks */
 
-    const unsigned char *in = static_cast<const unsigned char*>(buf);
+    const auto *in = static_cast<const unsigned char*>(buf);
 
     if (t)
 	{

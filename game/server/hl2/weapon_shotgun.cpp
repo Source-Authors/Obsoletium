@@ -526,7 +526,8 @@ void CWeaponShotgun::SecondaryAttack( void )
 	Vector vecAiming = pPlayer->GetAutoaimVector( AUTOAIM_SCALE_DEFAULT );	
 
 	// Fire the bullets
-	pPlayer->FireBullets( 12, vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 0, -1, -1, 0, NULL, false, false );
+	// dimhotepus: Fire twice as much bullets when double shot.
+	pPlayer->FireBullets( sk_plr_num_shotgun_pellets.GetInt() * 2, vecSrc, vecAiming, GetBulletSpread(), MAX_TRACE_LENGTH, m_iPrimaryAmmoType, 0, -1, -1, 0, NULL, false, false );
 	pPlayer->ViewPunch( QAngle(random->RandomFloat( -5, 5 ),0,0) );
 
 	pPlayer->SetMuzzleFlashTime( gpGlobals->curtime + 1.0f );

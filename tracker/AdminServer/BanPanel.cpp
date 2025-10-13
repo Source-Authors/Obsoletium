@@ -129,10 +129,10 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 
 		// scan through response for all items
 		int item = 0;
-		float banTime = 0.0f;
+		double banTime = 0.0f;
 		char id[64] = { 0 };
 		// dimhotepus: Ensure id does not overflow.
-		while (3 == sscanf(response, "%i %63s : %f min\n", &item, id, &banTime))
+		while (3 == sscanf(response, "%i %63s : %lf min\n", &item, id, &banTime))
 		{
 			id[std::size(id) - 1] = '\0';
 
@@ -151,7 +151,7 @@ void CBanPanel::OnServerDataResponse(const char *value, const char *response)
 			}
 			ban->SetString("id", id);
 
-			if (banTime > 0.0f)
+			if (banTime > 0.0)
 			{
 				ban->SetFloat("time", banTime);
 			}

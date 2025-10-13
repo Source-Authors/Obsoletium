@@ -24,10 +24,10 @@ abstract_class IReplaySystem : public IAppSystem
 {
 public:
 	// IAppSystem:
-	virtual bool		Connect( CreateInterfaceFn fnFactory ) = 0;
-	virtual void		Disconnect() = 0;
-	virtual InitReturnVal_t Init() = 0;
-	virtual void		Shutdown() = 0;
+	bool		Connect( CreateInterfaceFn fnFactory ) override = 0;
+	void		Disconnect() override = 0;
+	InitReturnVal_t Init() override = 0;
+	void		Shutdown() override = 0;
 
 	// To be called client- & server-side
 	virtual void		Think() = 0;

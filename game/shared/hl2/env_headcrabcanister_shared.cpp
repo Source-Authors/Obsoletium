@@ -97,6 +97,8 @@ END_NETWORK_TABLE()
 //-----------------------------------------------------------------------------
 CEnvHeadcrabCanisterShared::CEnvHeadcrabCanisterShared()
 {
+	m_flLaunchHeight = -1.0f;
+
 	m_vecStartPosition.Init();
 	m_vecDirection.Init();
 	m_flFlightSpeed = 0.0f;

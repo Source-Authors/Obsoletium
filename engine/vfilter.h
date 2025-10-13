@@ -10,15 +10,19 @@ struct ipfilter_t
 {
 	unsigned	mask;
 	unsigned	compare;
-	float       banEndTime; // 0 for permanent ban
-	float       banTime;
+	// dimhotepus: float -> double for better precision.
+	double       banEndTime; // 0 for permanent ban
+	// dimhotepus: float -> double for better precision.
+	double       banTime;
 };
 
 struct userfilter_t
 {
 	USERID_t userid;
-	float	banEndTime;
-	float	banTime;
+	// dimhotepus: float -> double for better precision.
+	double	banEndTime;
+	// dimhotepus: float -> double for better precision.
+	double	banTime;
 };
 
 constexpr inline intp MAX_IPFILTERS{32768};

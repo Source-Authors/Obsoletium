@@ -12,6 +12,8 @@ class CBaseWnd : public CWnd {
 
  public:
   CBaseWnd();
+  
+  void CalcWindowRect(LPRECT lpClientRect, UINT nAdjustType = adjustBorder) override;
 
  protected:
   afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);

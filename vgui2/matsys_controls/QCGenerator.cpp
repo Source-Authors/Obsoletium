@@ -142,8 +142,8 @@ void QCInfo::SyncFromControls()
 
 	LODs.RemoveAll();
 	pTargetField = pQCGenerator->FindChildByName( "LODList" );
-	int numLOD = ((ListPanel *)pTargetField)->GetItemCount();
-	for ( int i = 0; i < numLOD; i++ )
+	intp numLOD = ((ListPanel *)pTargetField)->GetItemCount();
+	for ( intp i = 0; i < numLOD; i++ )
 	{
 		KeyValues *key = ((ListPanel *)pTargetField)->GetItem( i );
 		LODInfo newLOD;
@@ -234,9 +234,7 @@ void CBrowseButton::SetCharVar( char **pVar, const char *pszNewText )
 
 	if ( pszNewText )
 	{
-		intp len = Q_strlen( pszNewText ) + 1;
-		*pVar = new char[ len ];
-		Q_strncpy( *pVar, pszNewText, len );
+		*pVar = V_strdup( pszNewText );
 	}
 }
 
@@ -286,6 +284,10 @@ static const char *ParseKeyvalue( const char *pBuffer, char (&key)[size], char (
 //-----------------------------------------------------------------------------
 CQCGenerator::CQCGenerator( vgui::Panel *pParent, const char *pszPath, const char *pszScene ) : BaseClass( pParent, "QCGenerator" )
 {	
+	m_szTargetField[0] = 0;
+	m_nSelectedSequence = 0;
+	m_nSelectedColumn = 0;
+
 	m_QCInfo_t.Init( this );
 
 	SetMinimumSize(846, 770);
@@ -461,7 +463,7 @@ void CQCGenerator::BrowseFile( KeyValues *data )
 
 void CQCGenerator::OnFileSelected( KeyValues *data ) 
 {
-	if ( m_szTargetField[0] )
+	if ( !Q_isempty( m_szTargetField ) )
 	{
 		vgui::Panel *pTargetField = FindChildByName( m_szTargetField );
 		((TextEntry *)pTargetField)->SetText( data->GetString( "fullpath" ) );
@@ -471,7 +473,7 @@ void CQCGenerator::OnFileSelected( KeyValues *data )
 
 void CQCGenerator::OnDirectorySelected( KeyValues *data ) 
 {
-	if ( m_szTargetField[0] )
+	if ( !Q_isempty( m_szTargetField ) )
 	{
 		vgui::Panel *pTargetField = FindChildByName( m_szTargetField );
 		((TextEntry *)pTargetField)->SetText( data->GetString( "dir" ) );
@@ -626,7 +628,7 @@ void CQCGenerator::InitializeSMDPaths( const char *pszPath, const char *pszScene
 
 	g_pFullFileSystem->AddSearchPath( pszPath, "SMD_DIR" );
 
-	FileFindHandle_t pFileHandle = 0;	
+	FileFindHandle_t pFileHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *filename = g_pFullFileSystem->FindFirst( "*.smd", &pFileHandle );	
 
 	bool bFoundReference = false;

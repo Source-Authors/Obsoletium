@@ -101,8 +101,8 @@ void CEditGameClass::Connections_RemoveAll()
 	//
 	// Remove all our connections from their targets' upstream lists.
 	//	
-	int nConnectionsCount = m_Connections.Count();
-	for (int nConnection = 0; nConnection < nConnectionsCount; nConnection++)
+	intp nConnectionsCount = m_Connections.Count();
+	for (intp nConnection = 0; nConnection < nConnectionsCount; nConnection++)
 	{
 		CEntityConnection *pConnection = m_Connections.Element( nConnection );
 
@@ -130,14 +130,14 @@ void CEditGameClass::Connections_RemoveAll()
 //-----------------------------------------------------------------------------
 void CEditGameClass::Connections_FixBad(bool bRelink)
 {
-	int nConnectionsCount = m_Connections.Count();
-	for (int nConnections = 0; nConnections < nConnectionsCount; nConnections++)
+	intp nConnectionsCount = m_Connections.Count();
+	for (intp nConnections = 0; nConnections < nConnectionsCount; nConnections++)
 	{
 		CEntityConnection *pConnection = m_Connections.Element(nConnections);
 		CMapEntityList *pTargetEntities = pConnection->GetTargetEntityList();
-		int nEntityCount = pTargetEntities->Count();
+		intp nEntityCount = pTargetEntities->Count();
 
-		for ( int nEntities = 0; nEntities < nEntityCount; nEntities++ )
+		for ( intp nEntities = 0; nEntities < nEntityCount; nEntities++ )
 		{
 			CMapEntity *pEntity = pTargetEntities->Element(nEntities);
 			pEntity->Upstream_Remove( pConnection );
@@ -177,7 +177,7 @@ void CEditGameClass::Upstream_Add(CEntityConnection *pConnection)
 //-----------------------------------------------------------------------------
 bool CEditGameClass::Upstream_Remove(CEntityConnection *pConnection)
 {
-	int nIndex = m_Upstream.Find(pConnection);
+	intp nIndex = m_Upstream.Find(pConnection);
 	if (nIndex != -1)
 	{
 		m_Upstream.Remove(nIndex);
@@ -198,8 +198,8 @@ void CEditGameClass::Upstream_RemoveAll(void)
 	//
 	// Remove all our connections from their targets' upstream lists.
 	//	
-	int nUpstreamCount = m_Upstream.Count();
-	for (int nConnection = 0; nConnection < nUpstreamCount; nConnection++)
+	intp nUpstreamCount = m_Upstream.Count();
+	for (intp nConnection = 0; nConnection < nUpstreamCount; nConnection++)
 	{
 		CEntityConnection *pConnection = m_Upstream.Element( nConnection );
 
@@ -233,8 +233,8 @@ void CEditGameClass::Upstream_FixBad()
 		}
 #endif
 
-	int nUpstreamCount = m_Upstream.Count();
-	for (int nUpstream = 0; nUpstream < nUpstreamCount; nUpstream++)
+	intp nUpstreamCount = m_Upstream.Count();
+	for (intp nUpstream = 0; nUpstream < nUpstreamCount; nUpstream++)
 	{
 		CEntityConnection *pUpstream = m_Upstream.Element(nUpstream);
 	    pUpstream->LinkTargetEntities();
@@ -283,8 +283,8 @@ CEditGameClass *CEditGameClass::CopyFrom(CEditGameClass *pFrom)
 	// Copy all the connections objects
 	//
 	Connections_RemoveAll();
-	int nConnCount = pFrom->Connections_GetCount();
-	for (int i = 0; i < nConnCount; i++)
+	intp nConnCount = pFrom->Connections_GetCount();
+	for (intp i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConn = pFrom->Connections_Get(i);
 		CEntityConnection *pNewConn = new CEntityConnection( *pConn );
@@ -311,15 +311,15 @@ void CEditGameClass::GetDefaultKeys( void )
 		//
 		// For each variable from the base class...
 		//
-		int nVariableCount = m_pClass->GetVariableCount();
-		for ( int i = 0; i < nVariableCount; i++ )
+		intp nVariableCount = m_pClass->GetVariableCount();
+		for ( intp i = 0; i < nVariableCount; i++ )
 		{
 			GDinputvariable *pVar = m_pClass->GetVariableAt(i);
 			Assert(pVar != NULL);
 
 			if (pVar != NULL)
 			{
-				int iIndex;
+				intp iIndex;
 				LPCTSTR p = m_KeyValues.GetValue(pVar->GetName(), &iIndex);
 
 				//
@@ -400,7 +400,7 @@ void CEditGameClass::ImportAngle(int nAngle)
 void CEditGameClass::SetAngles(const QAngle &vecAngles)
 {
 	char szAngles[80];	
-	sprintf(szAngles, "%g %g %g", (double)vecAngles[PITCH], (double)vecAngles[YAW], (double)vecAngles[ROLL]);
+	V_sprintf_safe(szAngles, "%g %g %g", (double)vecAngles[PITCH], (double)vecAngles[YAW], (double)vecAngles[ROLL]);
 	SetKeyValue("angles", szAngles);
 }
 
@@ -478,7 +478,7 @@ ChunkFileResult_t CEditGameClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInf
 
 			if (pVar != NULL)
 			{
-				int iIndex;
+				intp iIndex;
 				LPCTSTR p = m_KeyValues.GetValue(pVar->GetName(), &iIndex);
 
 				//
@@ -514,8 +514,8 @@ ChunkFileResult_t CEditGameClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInf
 		eResult = pFile->BeginChunk("connections");
 		if (eResult == ChunkFile_Ok)
 		{
-			int nConnCount = Connections_GetCount();
-			for (int i = 0; i < nConnCount; i++)
+			intp nConnCount = Connections_GetCount();
+			for (intp i = 0; i < nConnCount; i++)
 			{
 				CEntityConnection *pConnection = Connections_Get(i);
 				if (pConnection != NULL)

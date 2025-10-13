@@ -29,7 +29,8 @@ enum ConsistencyType
 struct ExactFileUserData
 {
 	unsigned char consistencyType;
-	unsigned long crc;
+	// dimhotepus: unsigned long -> CRC32_t. x86-64.
+	CRC32_t crc;
 };
 
 struct ModelBoundsUserData

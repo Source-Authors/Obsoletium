@@ -10,8 +10,9 @@
 #pragma once
 #endif
 
+[[nodiscard]] const char *DT_ArrayElementNameForIdx( size_t i );
 
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 
 typedef void (*EnsureCapacityFn)( void *pVoid, intp offsetToUtlVector, intp len );

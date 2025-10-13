@@ -1,9 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_ICOMMANDLINE_H_
-#define TIER0_ICOMMANDLINE_H_
+#ifndef SE_PUBLIC_TIER0_ICOMMANDLINE_H_
+#define SE_PUBLIC_TIER0_ICOMMANDLINE_H_
 
-#include "tier0/platform.h"
+#include "platform.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Interface to engine command line
@@ -13,7 +13,7 @@ abstract_class ICommandLine
 public:
 	virtual void		CreateCmdLine( const char *commandline ) = 0;
 	virtual void		CreateCmdLine( int argc, char **argv ) = 0;
-	virtual const char	*GetCmdLine( void ) const = 0;
+	[[nodiscard]] virtual const char	*GetCmdLine( ) const = 0;
 
 	// Check whether a particular parameter exists
 	virtual	const char	*CheckParm( const char *psz, const char **ppszValue = nullptr ) const = 0;
@@ -28,9 +28,9 @@ public:
 	virtual float		ParmValue( const char *psz, float flDefaultVal ) const = 0;
 
 	// Gets at particular parameters
-	virtual int			ParmCount() const = 0;
+	[[nodiscard]] virtual int			ParmCount() const = 0;
 	virtual int			FindParm( const char *psz ) const = 0;	// Returns 0 if not found.
-	virtual const char* GetParm( int nIndex ) const = 0;
+	[[nodiscard]] virtual const char* GetParm( int nIndex ) const = 0;
 	
 	// copies the string passwed
 	virtual void SetParm( int nIndex, char const *pNewParm ) = 0;
@@ -49,5 +49,5 @@ PLATFORM_INTERFACE ICommandLine *CommandLine_Tier0();
 #define CommandLine CommandLine_Tier0
 #endif
 
-#endif  // TIER0_ICOMMANDLINE_H_
+#endif  // !SE_PUBLIC_TIER0_ICOMMANDLINE_H_
 

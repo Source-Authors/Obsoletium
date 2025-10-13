@@ -80,7 +80,7 @@ private:
 
 	char const	*GetSearchString();
 
-	bool		LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName, int nDirectoryNameLen );
+	bool		LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName, intp nDirectoryNameLen );
 	bool		InitDirectoryRecursive( CUtlDict< CWaveFile *, int >& soundlist, char const* pDirectoryName );
 
 	void		OnWaveProperties();

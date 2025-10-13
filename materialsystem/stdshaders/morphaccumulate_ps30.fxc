@@ -24,7 +24,7 @@ sampler MorphWeights	: register( s2 );
 
 const float4 vMorphScale : register( c0 );
 
-HALF4 main( PS_INPUT i ) : COLOR
+float4 main( PS_INPUT i ) : COLOR
 {
 #if CONSTANTBASEDMORPH
 	float4 vMorphWeights = i.vMorphWeights;

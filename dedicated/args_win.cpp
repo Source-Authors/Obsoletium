@@ -16,7 +16,7 @@ namespace {
 struct WideArgs {
   // Construct wide args from command line. |command_line| Command line.
   explicit WideArgs(_In_z_ const wchar_t *command_line) noexcept
-      : argv{::CommandLineToArgvW(command_line, &argc)} {}
+      : argv{::CommandLineToArgvW(command_line, &argc)} {} //-V670
 
   ~WideArgs() noexcept {
     [[maybe_unused]] const bool is_succeeded{::LocalFree(argv) == nullptr};

@@ -64,8 +64,10 @@ private:
 	class CMergedBone
 	{
 	public:
-		unsigned short m_iMyBone;
-		unsigned short m_iParentBone;
+		// dimhotepus: unsigned short -> int.
+		int m_iMyBone;
+		// dimhotepus: unsigned short -> int.
+		int m_iParentBone;
 	};
 
 	CUtlVector<CMergedBone> m_MergedBones;

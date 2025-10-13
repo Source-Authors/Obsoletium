@@ -76,7 +76,7 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	// Sort the group by alpha
 	float alpha = pGroupKeyValues->GetFloat( "alpha", 1.0f );
 	
-	int iGroup = s_DetailObjectDict[detailId].m_Groups.Count();
+	intp iGroup = s_DetailObjectDict[detailId].m_Groups.Count();
 	while ( --iGroup >= 0 )
 	{
 		if (alpha > s_DetailObjectDict[detailId].m_Groups[iGroup].m_Alpha)
@@ -208,9 +208,9 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 	// renormalize the amount if the total > 1
 	if (totalAmount > 1.0f)
 	{
-		for (int i = 0; i < group.m_Models.Count(); ++i)
+		for (auto &m : group.m_Models)
 		{
-			group.m_Models[i].m_Amount /= totalAmount;
+			m.m_Amount /= totalAmount;
 		}
 	}
 }
@@ -228,7 +228,7 @@ void DetailObjects::ParseDetailObjectFile( KeyValues& keyValues )
 		if (!pIter->GetFirstSubKey())
 			continue;
 
-		int i = s_DetailObjectDict.AddToTail( );
+		intp i = s_DetailObjectDict.AddToTail( );
 		s_DetailObjectDict[i].m_Name = pIter->GetName() ;
 		s_DetailObjectDict[i].m_Density = pIter->GetFloat( "density", 0.0f );
 
@@ -290,10 +290,10 @@ void DetailObjects::LoadEmitDetailObjectDictionary( const char* pGameDir )
 //-----------------------------------------------------------------------------
 // Selects a detail group
 //-----------------------------------------------------------------------------
-int DetailObjects::SelectGroup( const DetailObject_t& detail, float alpha )
+intp DetailObjects::SelectGroup( const DetailObject_t& detail, float alpha )
 {
 	// Find the two groups whose alpha we're between...
-	int start, end;
+	intp start, end;
 	for ( start = 0; start < detail.m_Groups.Count() - 1; ++start )
 	{
 		if (alpha < detail.m_Groups[start+1].m_Alpha)
@@ -328,13 +328,13 @@ int DetailObjects::SelectGroup( const DetailObject_t& detail, float alpha )
 //-----------------------------------------------------------------------------
 // Selects a detail object
 //-----------------------------------------------------------------------------
-int DetailObjects::SelectDetail( DetailObjectGroup_t const& group )
+intp DetailObjects::SelectDetail( DetailObjectGroup_t const& group )
 {
 	// Pick a number, any number...
 	float flR = rand() / (float)VALVE_RAND_MAX;
 
 	// Look through the list of models + pick the one associated with this number
-	for ( int i = 0; i < group.m_Models.Count(); ++i )
+	for ( intp i = 0; i < group.m_Models.Count(); ++i )
 	{
 		if ( flR <= group.m_Models[i].m_Amount)
 			return i;
@@ -366,7 +366,7 @@ void DetailObjects::AddDetailSpriteToFace( const Vector &vecOrigin, const QAngle
 	CSpriteModel	*pSpriteModel = new CSpriteModel;
 	m_DetailSprites.AddToTail(pSpriteModel);
 
-	const char	szSpriteName[_MAX_PATH] = "detail/detailsprites";
+	const char	szSpriteName[MAX_PATH] = "detail/detailsprites";
 
 	pSpriteModel->LoadSprite( szSpriteName );
 
@@ -522,17 +522,17 @@ void DetailObjects::EmitDetailObjectsOnFace( CMapFace *pMapFace, DetailObject_t&
 				// Triangle is out of bounds, flip the coordinates so they are in the near half of the parallelogram
 				u = 1.0f - u;
 				v = 1.0f - v;
-				assert( u + v <= 1.0f );
+				Assert( u + v <= 1.0f );
 			}
 
 			// Compute alpha - assumed to be 1.0 across entire face for non-displacement map faces, since there is no alpha channel
 			float alpha = 1.0f;
 
 			// Select a group based on the alpha value
-			int group = SelectGroup( detail, alpha );
+			intp group = SelectGroup( detail, alpha );
 
 			// Now that we've got a group, choose a detail
-			int model = SelectDetail( detail.m_Groups[group] );
+			intp model = SelectDetail( detail.m_Groups[group] );
 			if (model < 0)
 				continue;
 
@@ -580,7 +580,7 @@ float DetailObjects::ComputeDisplacementFaceArea( CMapFace *pMapFace )
 void DetailObjects::EmitDetailObjectsOnDisplacementFace( CMapFace *pMapFace, 
 						DetailObject_t& detail )
 {
-	assert(pMapFace->GetPointCount() == 4);
+	Assert(pMapFace->GetPointCount() == 4);
 
 	// We're going to pick a bunch of random points, and then probabilistically
 	// decide whether or not to plant a detail object there.
@@ -609,10 +609,10 @@ void DetailObjects::EmitDetailObjectsOnDisplacementFace( CMapFace *pMapFace,
 		alpha /= 255.0f;
 
 		// Select a group based on the alpha value
-		int group = SelectGroup( detail, alpha );
+		intp group = SelectGroup( detail, alpha );
 
 		// Now that we've got a group, choose a detail
-		int model = SelectDetail( detail.m_Groups[group] );
+		intp model = SelectDetail( detail.m_Groups[group] );
 		if (model < 0)
 			continue;
 
@@ -738,11 +738,11 @@ void	DetailObjects::Render3D(CRender3D *pRender)
 	float fDetailDistance = Options.view3d.nDetailDistance;
 	Vector viewPoint; pRender->GetCamera()->GetViewPoint( viewPoint );
 
-	int models = m_DetailModels.Count();
+	intp models = m_DetailModels.Count();
 	if ( models )
 	{
 		pRender->PushRenderMode( RENDER_MODE_DEFAULT );
-		for ( int i = 0; i < models; i++ )
+		for ( intp i = 0; i < models; i++ )
 		{
 			StudioModel	*pModel = m_DetailModels[i];
 			pModel->GetOrigin(Mins);
@@ -759,12 +759,12 @@ void	DetailObjects::Render3D(CRender3D *pRender)
 
 	}
 
-	int sprites = m_DetailSprites.Count();
+	intp sprites = m_DetailSprites.Count();
 	if ( sprites )
 	{
 		unsigned char	color[3] = { 255, 255, 255 };
 		pRender->PushRenderMode( RENDER_MODE_DEFAULT );
-		for ( int i = 0; i < sprites; i++ )
+		for ( intp i = 0; i < sprites; i++ )
 		{
 			CSpriteModel	*pSprite = m_DetailSprites[i];
 			pSprite->GetOrigin(Mins);

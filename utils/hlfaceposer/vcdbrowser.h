@@ -61,8 +61,8 @@ public:
 
 	void		JumpToItem( const FileNameHandle_t& vcd );
 
-	int			GetVCDCount() const;
-	FileNameHandle_t GetVCD( int index );
+	intp		GetVCDCount() const;
+	FileNameHandle_t GetVCD( intp index );
 
 	void		OnSearch();
 	void		OnCancelSearch();
@@ -84,7 +84,7 @@ private:
 
 	char const	*GetSearchString();
 
-	bool		LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CNameLessFunc >& soundlist, char const* pDirectoryName, int nDirectoryNameLen );
+	bool		LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CNameLessFunc >& soundlist, char const* pDirectoryName, intp nDirectoryNameLen );
 	bool		InitDirectoryRecursive( CUtlSortVector< FileNameHandle_t, CNameLessFunc >& soundlist, char const* pDirectoryName );
 
 	void		PopulateTree( char const *subdirectory );

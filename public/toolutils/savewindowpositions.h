@@ -6,9 +6,8 @@
 
 #ifndef SAVEWINDOWPOSITIONS_H
 #define SAVEWINDOWPOSITIONS_H
-#ifdef _WIN32
-#pragma once
-#endif
+
+#include "tier0/commonmacros.h"
 
 namespace vgui
 {
@@ -23,7 +22,8 @@ class CMovieView;
 //-----------------------------------------------------------------------------
 // Purpose: This will save the bounds and the visibility state of UI elements registered during startup
 //-----------------------------------------------------------------------------
-class IWindowPositionMgr
+// dimhotepus: Make abstract.
+abstract_class IWindowPositionMgr
 {
 public:
 	virtual void	SavePositions( char const *filename, char const *key ) = 0;

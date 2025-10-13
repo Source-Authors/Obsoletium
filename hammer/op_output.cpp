@@ -42,7 +42,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning( disable : 4355 )
 
 
 #define ICON_CONN_BAD		0
@@ -410,8 +409,8 @@ void COP_Output::AddEntityConnections(CMapEntity *pEntity, bool bFirst)
 	//
 	// The first entity simply adds its connections to the list.
 	//
-	int nConnCount = pEntity->Connections_GetCount();
-	for (int i = 0; i < nConnCount; i++)
+	intp nConnCount = pEntity->Connections_GetCount();
+	for (intp i = 0; i < nConnCount; i++)
 	{
 		CEntityConnection *pConnection = pEntity->Connections_Get(i);
 		if (pConnection != NULL)
@@ -950,7 +949,7 @@ void COP_Output::OnMark(void)
 		}
 		else
 		{
-			MessageBox("No entities were found with that targetname.", "No entities found", MB_ICONINFORMATION | MB_OK);
+			MessageBox("No entities were found with that targetname.", "Hammer - No Entities Found", MB_ICONINFORMATION | MB_OK);
 			return;
 		}
 	}

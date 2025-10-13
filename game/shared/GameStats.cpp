@@ -144,8 +144,11 @@ CBaseGameStats_Driver::CBaseGameStats_Driver( void ) :
 	m_bStationary( false ),
 	m_flLastMovementTime( 0.0f ),
 	m_bGamePaused( false ),
-	m_pGamestatsData( NULL )
+	m_flPauseStartTime( -1 ),
+	m_pGamestatsData( nullptr )
 {
+	BitwiseClear(m_StatsBuffer);
+
 	m_szLoadedUserID[0] = 0;
 	m_tLastUpload = 0;
 	m_LastUserCmd.Reset();
@@ -177,7 +180,7 @@ void CBaseGameStats::StatsLog( char const *fmt, ... )
 
 	char buf[ 2048 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2018 //-V2019
 	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
@@ -189,7 +192,7 @@ void CBaseGameStats::StatsLog( char const *fmt, ... )
 	struct tm *newtime = localtime( &aclock );
 
 	char timeString[ 128 ];
-	Q_strncpy( timeString, asctime( newtime ), sizeof( timeString ) );
+	V_strcpy_safe( timeString, asctime( newtime ) );
 	// Get rid of the \n.
 	char *pEnd = strchr( timeString, '\n' );
 	if ( pEnd )
@@ -1261,7 +1264,8 @@ void CBaseGameStats_Driver::ResetData()
 	pKV->SetInt( "Height", dest_height );
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 	pKV->SetInt( "Windowed", config.Windowed() == true );
-	pKV->SetInt( "Borderless", config.Borderless() == true );
+	// dimhotepus: Add no window border flag.
+	pKV->SetInt( "NoWindowBorder", config.NoWindowBorder() == true );
 	pKV->SetInt( "MaxDxLevel", g_pMaterialSystemHardwareConfig->GetMaxDXSupportLevel() );
 
 	engine->SetGamestatsData( m_pGamestatsData );

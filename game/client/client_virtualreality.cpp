@@ -245,6 +245,14 @@ void CalcFovFromProjection ( float *pFov, const VMatrix &proj )
 // --------------------------------------------------------------------
 CClientVirtualReality::CClientVirtualReality()
 {
+	m_fHudHorizontalFov = -1;
+	m_fHudHalfWidth = -1;
+	m_fHudHalfHeight = -1;
+
+	m_nNonVRWidth = -1;
+	m_nNonVRHeight = -1;
+	m_bNonVRWindowed = false;
+
 	m_PlayerTorsoOrigin.Init();
 	m_PlayerTorsoAngle.Init();
 	m_WorldFromWeapon.Identity();
@@ -686,7 +694,7 @@ bool CClientVirtualReality::OverrideStereoView( CViewSetup *pViewMiddle, CViewSe
 	// Figure out the HUD vectors and frustum.
 
 	// The aspect ratio of the HMD may be something bizarre (e.g. Rift is 640x800), and the pixels may not be square, so don't use that!
-	static const float fAspectRatio = 4.f/3.f;
+	static constexpr float fAspectRatio = 4.f/3.f;
 	float fHFOV = m_fHudHorizontalFov;
 	float fVFOV = m_fHudHorizontalFov / fAspectRatio;
 

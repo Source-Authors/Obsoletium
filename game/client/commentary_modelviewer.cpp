@@ -28,6 +28,9 @@ CCommentaryModelViewer::CCommentaryModelViewer(IViewPort *pViewPort) : Frame(NUL
 {
 	m_pViewPort = pViewPort;
 	m_pModelPanel = NULL;
+	m_bTranslating = false;
+	m_flYawSpeed = 0;
+	m_flZoomSpeed = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -113,7 +116,7 @@ void CCommentaryModelViewer::OnCommand( const char *command )
 {
 	if ( Q_stricmp( command, "vguicancel" ) )
 	{
-		engine->ClientCmd( const_cast<char *>( command ) );
+		engine->ClientCmd( command );
 	}
 
 	Close();

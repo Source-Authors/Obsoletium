@@ -117,7 +117,7 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadI
 	ThreadId_t idIgnored;
 	if ( !pID )
 		pID = &idIgnored;
-	HANDLE h = VCRHook_CreateThread(NULL, stackSize, reinterpret_cast<void*>(ThreadProcConvert), new ThreadProcInfo_t( pfnThread, pParam ), CREATE_SUSPENDED, pID);
+	HANDLE h = VCRHook_CreateThread(nullptr, stackSize, reinterpret_cast<void*>(ThreadProcConvert), new ThreadProcInfo_t( pfnThread, pParam ), CREATE_SUSPENDED, pID);
 	if ( h != INVALID_HANDLE_VALUE )
 	{
 		Plat_ApplyHardwareDataBreakpointsToNewThread( *pID );
@@ -150,7 +150,7 @@ ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, ThreadI
 
 ThreadHandle_t CreateSimpleThread( ThreadFunc_t pfnThread, void *pParam, unsigned stackSize )
 {
-	return CreateSimpleThread( pfnThread, pParam, NULL, stackSize );
+	return CreateSimpleThread( pfnThread, pParam, nullptr, stackSize );
 }
 
 PLATFORM_INTERFACE void ThreadDetach( [[maybe_unused]] ThreadHandle_t hThread )
@@ -417,7 +417,7 @@ void ThreadSetDebugName( ThreadId_t id, const char *pszName )
 		{
 			const size_t wcharsNeeded = mbstowcs( nullptr, pszName, INT_MAX );
 			const size_t descriptionSize = (wcharsNeeded + 1) * sizeof(wchar_t);
-			wchar_t *description = static_cast<wchar_t*>( stackalloc( descriptionSize ) );
+			auto *description = static_cast<wchar_t*>( stackalloc( descriptionSize ) );
 
 			[[maybe_unused]] const size_t wcharsConverted = mbstowcs( description, pszName, descriptionSize );
 			Assert( wcharsNeeded == wcharsConverted );
@@ -473,7 +473,7 @@ int ThreadWaitForObjects( int nEvents, const HANDLE *pHandles, bool bWaitAll, un
 //-----------------------------------------------------------------------------
 // Used to thread LoadLibrary on the 360
 //-----------------------------------------------------------------------------
-static ThreadedLoadLibraryFunc_t s_ThreadedLoadLibraryFunc = 0;
+static ThreadedLoadLibraryFunc_t s_ThreadedLoadLibraryFunc = nullptr;
 PLATFORM_INTERFACE void SetThreadedLoadLibraryFunc( ThreadedLoadLibraryFunc_t func )
 {
 	s_ThreadedLoadLibraryFunc = func;
@@ -491,7 +491,7 @@ PLATFORM_INTERFACE ThreadedLoadLibraryFunc_t GetThreadedLoadLibraryFunc()
 
 CThreadSyncObject::CThreadSyncObject()
 #ifdef _WIN32
-  : m_hSyncObject( NULL ), m_bCreatedHandle(false)
+  : m_hSyncObject( nullptr ), m_bCreatedHandle(false)
 #elif defined(POSIX)
   : m_bInitalized( false )
 #endif
@@ -614,7 +614,7 @@ bool CThreadSyncObject::Wait( uint32 dwTimeout )
 CThreadEvent::CThreadEvent( bool bManualReset )
 {
 #ifdef _WIN32
-    m_hSyncObject = CreateEvent( NULL, bManualReset, FALSE, NULL );
+    m_hSyncObject = CreateEvent( nullptr, bManualReset, FALSE, nullptr );
 	m_bCreatedHandle = true;
     AssertMsg1(m_hSyncObject, "Failed to create event: %s",
 		std::system_category().message(::GetLastError()).c_str() );
@@ -715,14 +715,14 @@ CThreadSemaphore::CThreadSemaphore( long initialValue, long maxValue )
 		AssertMsg( maxValue > 0, "Invalid max value for semaphore" );
 		AssertMsg( initialValue >= 0 && initialValue <= maxValue, "Invalid initial value for semaphore" );
 
-		m_hSyncObject = CreateSemaphore( NULL, initialValue, maxValue, NULL );
+		m_hSyncObject = CreateSemaphore( nullptr, initialValue, maxValue, nullptr );
 
 		AssertMsg1(m_hSyncObject, "Failed to create semaphore: %s",
 			std::system_category().message(::GetLastError()).c_str() );
 	}
 	else
 	{
-		m_hSyncObject = NULL;
+		m_hSyncObject = nullptr;
 	}
 }
 
@@ -742,7 +742,7 @@ bool CThreadSemaphore::Release( long releaseCount, long *pPreviousCount )
 
 CThreadFullMutex::CThreadFullMutex( bool bEstablishInitialOwnership, const char *pszName )
 {
-   m_hSyncObject = CreateMutex( NULL, bEstablishInitialOwnership, pszName );
+   m_hSyncObject = CreateMutex( nullptr, bEstablishInitialOwnership, pszName );
 
    AssertMsg1( m_hSyncObject, "Failed to create mutex: %s",
 	   std::system_category().message(::GetLastError()).c_str() );
@@ -799,7 +799,7 @@ void * CThreadLocalBase::Get() const
 	if ( m_index != TLS_OUT_OF_INDEXES )
 		return TlsGetValue( m_index );
 	AssertMsg( 0, "Bad thread local" );
-	return NULL;
+	return nullptr;
 #elif defined(POSIX)
 	void *value = pthread_getspecific( m_index );
 	return value;
@@ -955,9 +955,9 @@ bool ThreadInterlockedAssignIf128( volatile int128 *pDest, const int128 &value, 
 {
 	Assert( ( (size_t)pDest % 16 ) == 0 );
 
-	volatile int64 *pDest64 = ( volatile int64 * )pDest;
-	int64 *pValue64 = ( int64 * )&value;
-	int64 *pComperand64 = ( int64 * )&comperand;
+	volatile auto *pDest64 = ( volatile int64 * )pDest;
+	auto *pValue64 = ( int64 * )&value;
+	auto *pComperand64 = ( int64 * )&comperand;
 
 	// Description:
 	//  The CMPXCHG16B instruction compares the 128-bit value in the RDX:RAX and RCX:RBX registers
@@ -1293,7 +1293,9 @@ bool CThreadMutex::TryLock()
 //
 //-----------------------------------------------------------------------------
 
-#define THREAD_SPIN (8*1024)
+enum {
+  THREAD_SPIN = (8*1024)
+};
 
 void CThreadFastMutex::Lock( const ThreadId_t threadId, unsigned nSpinSleepTime ) 
 {
@@ -1432,9 +1434,7 @@ void CThreadRWLock::UnlockWrite()
 
 void CThreadSpinRWLock::SpinLockForWrite( const ThreadId_t threadId )
 {
-	int i;
-
-	for ( i = 1000; i != 0; --i )
+	for ( int i = 1000; i != 0; --i )
 	{
 		if ( TryLockForWrite( threadId ) )
 		{
@@ -1443,7 +1443,7 @@ void CThreadSpinRWLock::SpinLockForWrite( const ThreadId_t threadId )
 		ThreadPause();
 	}
 
-	for ( i = 20000; i != 0; --i )
+	for ( int i = 20000; i != 0; --i )
 	{
 		if ( TryLockForWrite( threadId ) )
 		{
@@ -1468,55 +1468,44 @@ void CThreadSpinRWLock::SpinLockForWrite( const ThreadId_t threadId )
 
 void CThreadSpinRWLock::LockForRead()
 {
-	int i;
-
-	// In order to grab a read lock, the number of readers must not change and no thread can own the write lock
-	LockInfo_t oldValue{0, m_lockInfo.load().m_nReaders};
-	LockInfo_t newValue{0, oldValue.m_nReaders + 1};
-
-	if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
-		return;
-
-	ThreadPause();
-	oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
-	newValue.m_nReaders = oldValue.m_nReaders + 1;
-
-	for ( i = 1000; i != 0; --i )
+	for ( int i = 1000; i != 0; --i )
 	{
-		if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
+		if ( TryLockForRead() )
+		{
 			return;
+		}
 		ThreadPause();
-		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
-		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 
-	for ( i = 20000; i != 0; --i )
+	for ( int i = 20000; i != 0; --i )
 	{
-		if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
+		if ( TryLockForRead() )
+		{
 			return;
+		}
+
 		ThreadPause();
 		ThreadSleep( 0 );
-		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
-		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 
 	for ( ;; ) // coded as for instead of while to make easy to breakpoint success
 	{
-		if( m_nWriters == 0 && AssignIf( newValue, oldValue ) )
+		if ( TryLockForRead() )
+		{
 			return;
+		}
+
 		ThreadPause();
 		ThreadSleep( 1 );
-		oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
-		newValue.m_nReaders = oldValue.m_nReaders + 1;
 	}
 }
 
 void CThreadSpinRWLock::UnlockRead()
 {
-	int i;
+	const auto lockInfo = m_lockInfo.load();
+	Assert( lockInfo.m_nReaders > 0 && lockInfo.m_writerId == 0 );
 
-	Assert( m_lockInfo.load().m_nReaders > 0 && m_lockInfo.load().m_writerId == 0 );
-	LockInfo_t oldValue{0UL, m_lockInfo.load().m_nReaders};
+	LockInfo_t oldValue{0UL, lockInfo.m_nReaders};
 	LockInfo_t newValue{0UL, oldValue.m_nReaders - 1};
 	
 	if( AssignIf( newValue, oldValue ) )
@@ -1525,7 +1514,7 @@ void CThreadSpinRWLock::UnlockRead()
 	oldValue.m_nReaders = m_lockInfo.load().m_nReaders;
 	newValue.m_nReaders = oldValue.m_nReaders - 1;
 
-	for ( i = 500; i != 0; --i )
+	for ( int i = 500; i != 0; --i )
 	{
 		if( AssignIf( newValue, oldValue ) )
 			return;
@@ -1534,7 +1523,7 @@ void CThreadSpinRWLock::UnlockRead()
 		newValue.m_nReaders = oldValue.m_nReaders - 1;
 	}
 
-	for ( i = 20000; i != 0; --i )
+	for ( int i = 20000; i != 0; --i )
 	{
 		if( AssignIf( newValue, oldValue ) )
 			return;
@@ -1557,9 +1546,12 @@ void CThreadSpinRWLock::UnlockRead()
 
 void CThreadSpinRWLock::UnlockWrite()
 {
-	Assert( m_lockInfo.load().m_writerId == ThreadGetCurrentId() && m_lockInfo.load().m_nReaders == 0 );
-	alignas(int64) static const LockInfo_t newValue = { 0, 0 };
-	m_lockInfo.exchange(newValue);
+	const auto lockInfo = m_lockInfo.load();
+
+	Assert( lockInfo.m_writerId == ThreadGetCurrentId() );
+	Assert( lockInfo.m_nReaders == 0 );
+
+	m_lockInfo.exchange(LockInfo_t{0, 0});
 	--m_nWriters;
 }
 
@@ -1578,7 +1570,7 @@ static thread_local CThread *g_pCurThread;
 CThread::CThread()
 :	
 #ifdef _WIN32
-	m_hThread( NULL ),
+	m_hThread( nullptr ),
 #endif
 	m_threadId( 0 ),
 	m_result( 0 ),
@@ -1670,7 +1662,7 @@ bool CThread::Start( unsigned nBytesStack )
 
 #ifdef _WIN32
 	HANDLE       hThread;
-	m_hThread = hThread = (HANDLE)VCRHook_CreateThread( NULL,
+	m_hThread = hThread = (HANDLE)VCRHook_CreateThread( nullptr,
 														nBytesStack,
 														reinterpret_cast<void*>(GetThreadProc()),
 														new ThreadInit_t(init),
@@ -1710,7 +1702,7 @@ bool CThread::Start( unsigned nBytesStack )
 		Msg( "Thread failed to initialize\n" );
 #ifdef _WIN32
 		CloseHandle( m_hThread );
-		m_hThread = NULL;
+		m_hThread = nullptr;
 		m_threadId = 0;
 #elif defined(POSIX)
 		m_threadId = 0;
@@ -1723,7 +1715,7 @@ bool CThread::Start( unsigned nBytesStack )
 		Msg( "Thread failed to initialize\n" );
 #ifdef _WIN32
 		CloseHandle( m_hThread );
-		m_hThread = NULL;
+		m_hThread = nullptr;
 		m_threadId = 0;
 #elif defined(POSIX)
 		m_threadId = 0;
@@ -1829,11 +1821,11 @@ void CThread::Stop(int exitCode)
 		if ( !( m_flags & SUPPORT_STOP_PROTOCOL ) )
 		{
 			OnExit();
-			g_pCurThread = NULL;
+			g_pCurThread = nullptr;
 
 #ifdef _WIN32
 			CloseHandle( m_hThread );
-			m_hThread = NULL;
+			m_hThread = nullptr;
 #endif
 			Cleanup();
 		}
@@ -1955,7 +1947,7 @@ bool CThread::Terminate(int exitCode)
 	if (!TerminateThread(m_hThread, exitCode))
 		return false;
 	CloseHandle( m_hThread );
-	m_hThread = NULL;
+	m_hThread = nullptr;
 	Cleanup();
 #elif defined(POSIX)
 	pthread_kill( m_threadId, SIGKILL );
@@ -2063,18 +2055,12 @@ CThread::ThreadProc_t CThread::GetThreadProc()
 unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 {
 	// dimhotepus: std::auto_ptr -> std::unique_ptr
-  std::unique_ptr<ThreadInit_t> pInit((ThreadInit_t *)pv);
-  
-#ifdef _X360
-        // Make sure all threads are consistent w.r.t floating-point math
-	SetupFPUControlWord();
-#endif
-	
+	std::unique_ptr<ThreadInit_t> pInit((ThreadInit_t *)pv);
+ 
 	CThread *pThread = pInit->pThread;
 	g_pCurThread = pThread;
 	
 	pThread->m_pStackBase = AlignValue(&pThread, 4096);
-	
 	pThread->m_result = -1;
 	
 	bool bInitSuccess = true;
@@ -2114,7 +2100,7 @@ unsigned __stdcall CThread::ThreadProc(LPVOID pv)
 	}
 	
 	pThread->OnExit();
-	g_pCurThread = NULL;
+	g_pCurThread = nullptr;
 	pThread->Cleanup();
 	
 	return pThread->m_result;
@@ -2128,7 +2114,7 @@ CWorkerThread::CWorkerThread()
 :	m_EventSend(true),                 // must be manual-reset for PeekCall()
 	m_EventComplete(true),             // must be manual-reset to handle multiple wait with thread properly
 	m_Param(0),
-	m_pParamFunctor(NULL),
+	m_pParamFunctor(nullptr),
 	m_ReturnVal(0)
 {
 }
@@ -2137,7 +2123,7 @@ CWorkerThread::CWorkerThread()
 
 int CWorkerThread::CallWorker(unsigned dw, unsigned timeout, bool fBoostWorkerPriorityToMaster, CFunctor *pParamFunctor)
 {
-	return Call(dw, timeout, fBoostWorkerPriorityToMaster, NULL, pParamFunctor);
+	return Call(dw, timeout, fBoostWorkerPriorityToMaster, nullptr, pParamFunctor);
 }
 
 //---------------------------------------------------------
@@ -2223,7 +2209,7 @@ int CWorkerThread::Call(unsigned dwParam, unsigned timeout, bool fBoostPriority,
 //---------------------------------------------------------
 int CWorkerThread::WaitForReply( unsigned timeout )
 {
-	return WaitForReply( timeout, NULL );
+	return WaitForReply( timeout, nullptr );
 }
 
 int CWorkerThread::WaitForReply( unsigned timeout, WaitFunc_t pfnWait )

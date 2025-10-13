@@ -59,7 +59,7 @@ public:
 
 	virtual void OnCommand( const char *command )
 	{
-		Cbuf_AddText( va( "%s\n", (char *)command ) );
+		Cbuf_AddText( va( "%s\n", command ) );
 	}
 
 	virtual void OnTick( void )
@@ -114,7 +114,8 @@ public:
 		SetCommand( "increment" );
 		AddActionSignalTarget( this );
 
-		m_flPreviousValue = -9999.0f;
+		// dimhotepus: -9999.0f -> min.
+		m_flPreviousValue = std::numeric_limits<decltype(m_flPreviousValue)>::min();
 
 		OnTick();
 	}

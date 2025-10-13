@@ -40,7 +40,7 @@ public:
 	virtual int Read( void* pBuffer, int nDestSize, int nBytes ) = 0;
 	virtual int Seek( int nOffset, int nWhence )                 = 0;
 	virtual int Tell()                                           = 0;
-	virtual int Size()											 = 0;
+	virtual unsigned Size()                                      = 0;
 
 	virtual void   SetBufferSize( int nBytes ) = 0;
 	virtual int    GetSectorSize()             = 0;
@@ -57,7 +57,7 @@ public:
 	int Seek( int nOffset, int nWhence )                 override;
 
 	int Tell() override { return m_nFilePointer; };
-	int Size() override { return m_nLength; };
+	unsigned Size() override { return m_nLength; };
 
 	void   SetBufferSize( int nBytes ) override;
 	int    GetSectorSize()             override;
@@ -82,7 +82,7 @@ public:
 	int Seek( int nOffset, int nWhence )                 override;
 
 	int Tell() override;
-	int Size() override;
+	unsigned Size() override;
 
 private:
 	// Ensure there are bytes in the read buffer, assuming we're not at the end of the underlying data

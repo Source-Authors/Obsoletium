@@ -128,7 +128,7 @@ public:
 		ElementType_t& e = m_Elements[ idx ];
 		Assert( e.dataIndex != m_Data.InvalidIndex() );
 
-		CUtlBuffer buf( 0, 0, 0 );
+		CUtlBuffer buf( (intp)0, (intp)0, 0 );
 
 		T *dest = m_Data[ e.dataIndex ];
 		Assert( dest );

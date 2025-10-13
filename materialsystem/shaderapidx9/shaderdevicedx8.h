@@ -18,20 +18,20 @@
 #include "shaderapidx8_global.h"
 #include "tier1/utlvector.h"
 
+#ifdef _WIN32
+#include "com_ptr.h"
+#endif
 
 
-//-----------------------------------------------------------------------------
 // Describes which D3DDEVTYPE to use
-//-----------------------------------------------------------------------------
 #ifndef USE_REFERENCE_RASTERIZER
-#define DX8_DEVTYPE	D3DDEVTYPE_HAL
+constexpr inline D3DDEVTYPE DX8_DEVTYPE{D3DDEVTYPE_HAL};
 #else
-#define DX8_DEVTYPE	D3DDEVTYPE_REF
+constexpr inline D3DDEVTYPE DX8_DEVTYPE{D3DDEVTYPE_REF};
 #endif
     
 
 // PC:    By default, PIX profiling is explicitly disallowed using the D3DPERF_SetOptions(1) API on PC
-// X360:  PIX_INSTRUMENTATION will only generate PIX events in RELEASE builds on 360
 // Uncomment to use PIX instrumentation:
 #if PIX_ENABLE
 #define	PIX_INSTRUMENTATION
@@ -49,29 +49,29 @@ typedef void (WINAPI *D3DPERF_SetOptions_FuncPtr)( DWORD dwOptions );
 //-----------------------------------------------------------------------------
 // The Base implementation of the shader device
 //-----------------------------------------------------------------------------
-class CShaderDeviceMgrDx8 : public CShaderDeviceMgrBase
+class CShaderDeviceMgrDx8 final : public CShaderDeviceMgrBase
 {
 	typedef CShaderDeviceMgrBase BaseClass;
 
 public:
 	// constructor, destructor
 	CShaderDeviceMgrDx8();
-	virtual ~CShaderDeviceMgrDx8();
+	~CShaderDeviceMgrDx8();
 
 	// Methods of IAppSystem
-	virtual bool Connect( CreateInterfaceFn factory );
-	virtual void Disconnect();
-	virtual InitReturnVal_t Init();
-	virtual void Shutdown();
+	bool Connect( CreateInterfaceFn factory ) override;
+	void Disconnect() override;
+	InitReturnVal_t Init() override;
+	void Shutdown() override;
 
 	// Methods of IShaderDevice
-	virtual unsigned	 GetAdapterCount() const;
-	virtual void GetAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const;
-	virtual unsigned	 GetModeCount( unsigned nAdapter ) const;
-	virtual void GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter, unsigned mode ) const;
-	virtual void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const;
-	virtual bool SetAdapter( unsigned nAdapter, int nFlags );
-	virtual CreateInterfaceFn SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode );
+	unsigned	 GetAdapterCount() const override;
+	void GetAdapterInfo( unsigned adapter, MaterialAdapterInfo_t& info ) const override;
+	unsigned	 GetModeCount( unsigned nAdapter ) const override;
+	void GetModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter, unsigned mode ) const override;
+	void GetCurrentModeInfo( ShaderDisplayMode_t* pInfo, unsigned nAdapter ) const override;
+	bool SetAdapter( unsigned nAdapter, int nFlags ) override;
+	CreateInterfaceFn SetMode( void *hWnd, unsigned nAdapter, const ShaderDeviceInfo_t& mode ) override;
 
 	// Determines hardware caps from D3D
 	bool ComputeCapsFromD3D( HardwareCaps_t *pCaps, unsigned nAdapter );
@@ -83,14 +83,12 @@ public:
 	bool ValidateMode( unsigned nAdapter, const ShaderDeviceInfo_t &info ) const;
 
 	// Returns the amount of video memory in bytes for a particular adapter
-	virtual size_t GetVidMemBytes( unsigned nAdapter ) const;
+	size_t GetVidMemBytes( unsigned nAdapter ) const override;
 
-#if !defined( _X360 )
-	FORCEINLINE IDirect3D9 *D3D() const
+	FORCEINLINE IDirect3D9Ex *D3D() const
 	{ 
-		return m_pD3D; 
+		return m_pD3D;
 	}
-#endif
 
 #if defined( PIX_INSTRUMENTATION ) && defined ( DX_TO_GL_ABSTRACTION ) && defined( _WIN32 )
 	HMODULE m_hD3D9;
@@ -106,7 +104,7 @@ protected:
 
 private:
 	// Initialize adapter information
-	void InitAdapterInfo();
+	bool InitGpuInfo();
 
 	// Code to detect support for texture border mode (not a simple caps check)
 	void CheckBorderColorSupport( HardwareCaps_t *pCaps, unsigned nAdapter );
@@ -121,12 +119,15 @@ private:
 	void ComputeDXSupportLevel( HardwareCaps_t &caps );
 
 	// Used to enumerate adapters, attach to windows
-#if !defined( _X360 )
-	IDirect3D9 *m_pD3D;
-#endif
+	se::win::com::com_ptr<IDirect3D9Ex> m_pD3D;
 
 	bool m_bObeyDxCommandlineOverride : 1;
 	bool m_bAdapterInfoIntialized : 1;
+
+	// D3D format used to enum adapters.
+	static constexpr inline D3DFORMAT m_AdapterImageFormat = D3DFMT_X8R8G8B8;
+	// D3D adapter scanline ordering used to enum adapters.
+	static constexpr inline D3DSCANLINEORDERING m_AdapterEnumScanlineOrdering = D3DSCANLINEORDERING_UNKNOWN;
 };
 
 extern CShaderDeviceMgrDx8* g_pShaderDeviceMgrDx8;
@@ -135,22 +136,10 @@ extern CShaderDeviceMgrDx8* g_pShaderDeviceMgrDx8;
 //-----------------------------------------------------------------------------
 // IDirect3D accessor
 //-----------------------------------------------------------------------------
-#if defined( _X360 )
-
-extern IDirect3D9 *m_pD3D;
-inline IDirect3D9* D3D()  
-{
-	return m_pD3D;
-}
-
-#else
-
-inline IDirect3D9* D3D()  
+inline IDirect3D9Ex* D3D()  
 {
 	return g_pShaderDeviceMgrDx8->D3D();
 }
-
-#endif
 
 #define NUM_FRAME_SYNC_QUERIES 2
 #define NUM_FRAME_SYNC_FRAMES_LATENCY 0
@@ -211,10 +200,7 @@ public:
 	// This handles any events queued because they were called outside of the owning thread
 	void HandleThreadEvent( uint32 threadEvent ) override;
 
-	// FIXME: Make private
-	// Which device are we using?
-	UINT		m_DisplayAdapter;
-	D3DDEVTYPE	m_DeviceType;
+	IDirect3DDevice9Ex* D3D9Device() { return m_d3d9_device_ex; }
 
 protected:
 	enum DeviceState_t
@@ -222,27 +208,13 @@ protected:
 		DEVICE_STATE_OK = 0,
 		DEVICE_STATE_OTHER_APP_INIT,
 		DEVICE_STATE_LOST_DEVICE,
+		// dimhotepus: Handle D3DERR_DEVICEHUNG.
+		DEVICE_STATE_HUNG_DEVICE,
+		// dimhotepus: Handle D3DERR_OUTOFVIDEOMEMORY.
+		DEVICE_STATE_OUT_OF_GPU_MEMORY,
+		// dimhotepus: Handle S_PRESENT_MODE_CHANGED.
+		DEVICE_STATE_DISPLAY_MODE_CHANGED,
 		DEVICE_STATE_NEEDS_RESET,
-	};
-
-	struct NonInteractiveRefreshState_t
-	{
-		IDirect3DVertexShader9 *m_pVertexShader;
-		IDirect3DPixelShader9 *m_pPixelShader;
-		IDirect3DPixelShader9 *m_pPixelShaderStartup;
-		IDirect3DPixelShader9 *m_pPixelShaderStartupPass2;
-		IDirect3DVertexDeclaration9 *m_pVertexDecl;
-		ShaderNonInteractiveInfo_t m_Info;
-		MaterialNonInteractiveMode_t m_Mode;
-		double m_flLastPacifierTime;
-		int m_nPacifierFrame;
-
-		double m_flStartTime;
-		double m_flLastPresentTime;
-		double m_flPeakDt;
-		double m_flTotalDt;
-		int m_nSamples;
-		int m_nCountAbove66;
 	};
 
 protected:
@@ -250,7 +222,7 @@ protected:
 	bool CreateD3DDevice( void* pHWnd, unsigned nAdapter, const ShaderDeviceInfo_t &info );
 
 	// Actually creates the D3D Device once the present parameters are set up
-	IDirect3DDevice9* InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags );
+	se::win::com::com_ptr<IDirect3DDevice9Ex> InvokeCreateDevice( void* hWnd, unsigned nAdapter, DWORD deviceCreationFlags );
 
 	// Checks for CreateQuery support
 	void DetectQuerySupport( IDirect3DDevice9* pD3DDevice );
@@ -261,20 +233,47 @@ protected:
 	// Computes the supersample flags
 	D3DMULTISAMPLE_TYPE ComputeMultisampleType( int nSampleCount );
 
+	// Computes display mode from presentation parameters.
+	[[nodiscard]] static D3DDISPLAYMODEEX GetFullScreenDisplayModeFromPresentParameters(const D3DPRESENT_PARAMETERS &paramters);
+
 	// Is the device active?
 	bool IsActive() const;
 
 	// Try to reset the device, returned true if it succeeded
-	bool TryDeviceReset();
+	bool TryDeviceReset( DeviceState_t deviceState );
 
 	// Queue up the fact that the device was lost
 	void MarkDeviceLost();
 
-	// Deals with lost devices
-	void CheckDeviceLost( bool bOtherAppInitializing );
+	// Queue up the fact that the device was hung
+	void MarkDeviceHung();
+	
+	// Queue up the fact that the device was out of GPU memory.
+	void MarkDeviceOutOfGpuMemory();
+
+	// Queue up the fact that the display mode changed and device need to adjust.
+	void MarkDeviceDisplayModeChange();
+
+	// Deals with lost or hung or out of GPU memory devices or desktop mode changes.
+	void CheckDeviceState( bool bOtherAppInitializing );
+
+	// Describe device state.
+	[[maybe_unused]] static const char *GetDeviceStateDescription( DeviceState_t state ); 
 
 	// Changes the window size
 	bool ResizeWindow( const ShaderDeviceInfo_t &info );
+
+	// Invoke display mode change callbacks.
+	void NotifyDisplayModeChange();
+	
+	// Handle presentation area occlusion.
+	bool IsPresentOccluded();
+	void MarkPresentOccluded();
+	// Handle desktop display mode change (ex. resolution or DPI change).
+	void HandlePresentModeChange();
+
+	void BeginPresent();
+	void EndPresent();
 
 	// Deals with the frame synching object
 	void AllocFrameSyncObjects( void );
@@ -292,11 +291,6 @@ protected:
 	virtual bool OnAdapterSet() = 0;
 	virtual void ResetRenderState( bool bFullReset = true ) = 0;
 
-	// For measuring if we meed TCR 022 on the XBox (refreshing often enough)
-	void UpdatePresentStats();
-
-	bool InNonInteractiveMode() const;
-
 	void ReacquireResourcesInternal( bool bResetState = false, bool bForceReacquire = false, char const *pszForceReason = NULL );
 
 #ifdef DX_TO_GL_ABSTRACTION
@@ -305,8 +299,13 @@ public:
 protected:
 #endif
 
+	se::win::com::com_ptr<IDirect3DDevice9Ex> m_d3d9_device_ex;
+
+	UINT				  m_DisplayAdapter;
+	D3DDEVTYPE			  m_DeviceType;
+
 	D3DPRESENT_PARAMETERS m_PresentParameters;
-	ImageFormat			m_AdapterFormat;
+	ImageFormat			  m_AdapterFormat;
 
 	// Mode info
 	int					m_DeviceSupportsCreateQuery;
@@ -315,7 +314,16 @@ protected:
 	DeviceState_t		m_DeviceState;
 
 	bool				m_bOtherAppInitializing : 1;
+	// D3DERR_DEVICELOST support handling support.
 	bool				m_bQueuedDeviceLost : 1;
+	// dimhotepus: Add D3DERR_DEVICEHUNG handling support.
+	bool				m_bQueuedDeviceHung : 1;
+	// dimhotepus: Add D3DERR_OUTOFVIDEOMEMORY handling support. Similar to D3DERR_DEVICEHUNG + try to free GPU memory.
+	bool				m_bQueuedDeviceOutOfGpuMemory: 1;
+	// dimhotepus: Add S_PRESENT_MODE_CHANGED handling support.
+	bool				m_bQueuedDeviceDisplayModeChange: 1;
+	// dimhotepus: Add S_PRESENT_OCCLUDED handling support.
+	bool				m_bRenderingOccluded : 1;
 	bool				m_IsResizing : 1;
 	bool				m_bPendingVideoModeChange : 1;
 	bool				m_bUsingStencil : 1;
@@ -325,49 +333,55 @@ protected:
 	int					m_iStencilBufferBits;
 
 	// Frame sync objects
-	IDirect3DQuery9		*m_pFrameSyncQueryObject[NUM_FRAME_SYNC_QUERIES];
+	se::win::com::com_ptr<IDirect3DQuery9> m_pFrameSyncQueryObject[NUM_FRAME_SYNC_QUERIES];
 	bool				m_bQueryIssued[NUM_FRAME_SYNC_QUERIES];
 	int					m_currentSyncQuery;
-	IDirect3DTexture9	*m_pFrameSyncTexture;
+	se::win::com::com_ptr<IDirect3DTexture9> m_pFrameSyncTexture;
 
 	CUtlString			m_sDisplayDeviceName;
 
-	// Used for x360 only
-	NonInteractiveRefreshState_t m_NonInteractiveRefresh;
-	CThreadFastMutex m_nonInteractiveModeMutex;
 	friend class CShaderDeviceMgrDx8;
 
-	int	m_numReleaseResourcesRefCount;		// This is holding the number of ReleaseResources calls queued up,
-											// for every ReleaseResources call there should be a matching call to
-											// ReacquireResources, only the last top-level ReacquireResources will
-											// have effect. Nested ReleaseResources calls are bugs.
+	// This is holding the number of ReleaseResources calls queued up,
+	// for every ReleaseResources call there should be a matching call to
+	// ReacquireResources, only the last top-level ReacquireResources will
+	// have effect. Nested ReleaseResources calls are bugs.
+	int	m_numReleaseResourcesRefCount;
+
+#ifdef DEBUG
+	// dimhotepus: Some DirectX API calls require to be performed on the same
+	// thread as device created.
+	ThreadId_t m_createDeviceThreadId;
+#endif
 };
 
 
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
-extern IDirect3DDevice9 *g_pD3DDevice;
-FORCEINLINE IDirect3DDevice9 *Dx9Device()
-{
-	return g_pD3DDevice;
-}
-
 extern CShaderDeviceDx8* g_pShaderDeviceDx8;
-
+FORCEINLINE IDirect3DDevice9Ex* Dx9Device()
+{
+	return g_pShaderDeviceDx8->D3D9Device();
+}
 
 //-----------------------------------------------------------------------------
 // Inline methods
 //-----------------------------------------------------------------------------
 FORCEINLINE bool CShaderDeviceDx8::IsActive() const
 {
-	return ( g_pD3DDevice != NULL );
+	return Dx9Device() != nullptr;
 }
 
 // used to determine if we're deactivated
 FORCEINLINE bool CShaderDeviceDx8::IsDeactivated() const 
 { 
-	return ( IsPC() && ( ( m_DeviceState != DEVICE_STATE_OK ) || m_bQueuedDeviceLost || m_numReleaseResourcesRefCount ) ); 
+	return m_DeviceState != DEVICE_STATE_OK ||
+		m_bQueuedDeviceLost ||
+		m_bQueuedDeviceHung ||
+		m_bQueuedDeviceOutOfGpuMemory ||
+		m_bRenderingOccluded ||
+		m_numReleaseResourcesRefCount;
 }
 
 

@@ -14,7 +14,11 @@
 
 // Macros to hook function calls into the HUD object
 #define HOOK_MESSAGE(x) usermessages->HookMessage(#x, __MsgFunc_##x );
+// dimhotepus: Unhook support for cleanup.
+#define UNHOOK_MESSAGE(x) usermessages->UnhookMessage(#x, __MsgFunc_##x );
 #define HOOK_HUD_MESSAGE(y, x) usermessages->HookMessage(#x, __MsgFunc_##y##_##x );
+// dimhotepus: Unhook support for cleanup.
+#define UNHOOK_HUD_MESSAGE(y, x) usermessages->UnhookMessage(#x, __MsgFunc_##y##_##x );
 // Message declaration for non-CHudElement classes
 #define DECLARE_MESSAGE(y, x) void __MsgFunc_##y##_##x(bf_read &msg) \
 	{											\

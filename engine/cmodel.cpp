@@ -2247,7 +2247,7 @@ void CM_DecompressVis( CCollisionBSPData *pBSPData, int cluster, int visType, by
 // Purpose: Decompress the RLE bitstring for PVS or PAS of one cluster
 // Input  : *dest - buffer to store the decompressed data
 //			cluster - index of cluster of interest
-//			visType - DVIS_PAS or DVIS_PAS
+//			visType - DVIS_PAS or DVIS_PVS
 // Output : byte * - pointer to the filled buffer
 //-----------------------------------------------------------------------------
 const byte *CM_Vis( byte *dest, int destlen, int cluster, int visType )
@@ -2255,9 +2255,9 @@ const byte *CM_Vis( byte *dest, int destlen, int cluster, int visType )
 	// get the current collision bsp -- there is only one!
 	CCollisionBSPData *pBSPData = GetCollisionBSPData();
 
-	if ( !dest || visType > 2 || visType < 0 )
+	if ( !dest || visType > DVIS_PAS || visType < DVIS_PVS )
 	{
-		Sys_Error( "CM_Vis: error");
+		Sys_Error( "CM_Vis: Vis type %d is unknown", visType );
 		return NULL;
 	}
 
@@ -2648,7 +2648,7 @@ int CFastPointLeafNum::GetLeaf( const Vector &vPos )
 		m_vCachedPos = vPos;
 
 		CCollisionBSPData *pBSPData = GetCollisionBSPData();
-		m_flDistToExitLeafSqr = 1e24;
+		m_flDistToExitLeafSqr = std::numeric_limits<decltype(m_flDistToExitLeafSqr)>::max();
 		m_iCachedLeaf = CM_PointLeafnumMinDistSqr_r( pBSPData, vPos, 0, m_flDistToExitLeafSqr );
 	}
 

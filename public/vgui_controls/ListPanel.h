@@ -99,8 +99,13 @@ public:
 	virtual void SetColumnTextAlignment( int column, int align );
 
 	// Get information about the column headers.
-	virtual int GetNumColumnHeaders() const;
-	virtual bool GetColumnHeaderText( int index, char *pOut, int maxLen );
+	virtual intp GetNumColumnHeaders() const;
+	virtual bool GetColumnHeaderText( intp index, OUT_Z_CAP(maxLen) char *pOut, int maxLen );
+	template<int size>
+	bool GetColumnHeaderText( intp index, OUT_Z_ARRAY char (&out)[size] )
+	{
+		return GetColumnHeaderText( index, out, size );
+	}
 
 	virtual void SetSortFunc(int column, SortFunc *func);
 	virtual void SetSortColumn(int column);
@@ -115,45 +120,45 @@ public:
 	// DATA HANDLING
 	// data->GetName() is used to uniquely identify an item
 	// data sub items are matched against column header name to be used in the table
-	virtual int AddItem(const KeyValues *data, uintp userData, bool bScrollToItem, bool bSortOnAdd); // Takes a copy of the data for use in the table. Returns the index the item is at.
-	void SetItemDragData( int itemID, const KeyValues *data ); // Makes a copy of the keyvalues to store in the table. Used when dragging from the table. Only used if the caller enables drag support
-	virtual int	GetItemCount( void );			// returns the number of VISIBLE items
-	virtual int GetItem(const char *itemName);	// gets the row index of an item by name (data->GetName())
-	virtual KeyValues *GetItem(int itemID); // returns pointer to data the row holds
-	virtual int GetItemCurrentRow(int itemID);		// returns -1 if invalid index or item not visible
-	virtual int GetItemIDFromRow(int currentRow);			// returns -1 if invalid row
-	virtual uintp GetItemUserData(int itemID);
-	virtual ListPanelItem *GetItemData(int itemID);
-	virtual void SetUserData( int itemID, uintp userData );
-	virtual int GetItemIDFromUserData( uintp userData );
-	virtual void ApplyItemChanges(int itemID); // applies any changes to the data, performed by modifying the return of GetItem() above
-	virtual void RemoveItem(int itemID); // removes an item from the table (changing the indices of all following items)
+	virtual intp AddItem(const KeyValues *data, uintp userData, bool bScrollToItem, bool bSortOnAdd); // Takes a copy of the data for use in the table. Returns the index the item is at.
+	void SetItemDragData( intp itemID, const KeyValues *data ); // Makes a copy of the keyvalues to store in the table. Used when dragging from the table. Only used if the caller enables drag support
+	virtual intp GetItemCount( void );			// returns the number of VISIBLE items
+	virtual intp GetItem(const char *itemName);	// gets the row index of an item by name (data->GetName())
+	virtual KeyValues *GetItem(intp itemID); // returns pointer to data the row holds
+	virtual intp GetItemCurrentRow(intp itemID);		// returns -1 if invalid index or item not visible
+	virtual intp GetItemIDFromRow(intp currentRow);			// returns -1 if invalid row
+	virtual uintp GetItemUserData(intp itemID);
+	virtual ListPanelItem *GetItemData(intp itemID);
+	virtual void SetUserData( intp itemID, uintp userData );
+	virtual intp GetItemIDFromUserData( uintp userData );
+	virtual void ApplyItemChanges(intp itemID); // applies any changes to the data, performed by modifying the return of GetItem() above
+	virtual void RemoveItem(intp itemID); // removes an item from the table (changing the indices of all following items)
 	virtual void RereadAllItems(); // updates the view with the new data
 
 	virtual void RemoveAll();		// clears and deletes all the memory used by the data items
 	virtual void DeleteAllItems();	// obselete, use RemoveAll();
 
-	virtual void GetCellText(int itemID, int column, OUT_Z_BYTECAP(bufferSizeInBytes) wchar_t *buffer, int bufferSizeInBytes); // returns the data held by a specific cell
+	virtual void GetCellText(intp itemID, intp column, OUT_Z_BYTECAP(bufferSizeInBytes) wchar_t *buffer, int bufferSizeInBytes); // returns the data held by a specific cell
 	template<intp bufferSize>
-	void GetCellText(int itemID, int column, OUT_Z_ARRAY wchar_t (&buffer)[bufferSize]) // returns the data held by a specific cell
+	void GetCellText(intp itemID, intp column, OUT_Z_ARRAY wchar_t (&buffer)[bufferSize]) // returns the data held by a specific cell
 	{
 		GetCellText( itemID, column, buffer, static_cast<int>(sizeof(wchar_t)) * bufferSize );
 	}
-	virtual IImage *GetCellImage(int itemID, int column); //, ImagePanel *&buffer); // returns the image held by a specific cell
+	virtual IImage *GetCellImage(intp itemID, intp column); //, ImagePanel *&buffer); // returns the image held by a specific cell
 
 	// Use these until they return InvalidItemID to iterate all the items.
-	virtual int FirstItem() const;
-	virtual int NextItem( int iItem ) const;
+	virtual intp FirstItem() const;
+	virtual intp NextItem( intp iItem ) const;
 
-	virtual int InvalidItemID() const;
-	virtual bool IsValidItemID(int itemID);
+	virtual intp InvalidItemID() const;
+	virtual bool IsValidItemID(intp itemID);
 
 	// sets whether the dataitem is visible or not
 	// it is removed from the row list when it becomes invisible, but stays in the indexes
 	// this is much faster than a normal remove
-	virtual void SetItemVisible(int itemID, bool state);
-	virtual void SetItemDisabled(int itemID, bool state );
-	bool IsItemVisible( int itemID );
+	virtual void SetItemVisible(intp itemID, bool state);
+	virtual void SetItemDisabled(intp itemID, bool state );
+	bool IsItemVisible( intp itemID );
 
 	virtual void SetFont(HFont font);
 
@@ -163,24 +168,24 @@ public:
 	// SELECTION
 	
 	// returns the count of selected items
-	virtual int GetSelectedItemsCount();
+	virtual intp GetSelectedItemsCount();
 
 	// returns the selected item by selection index, valid in range [0, GetNumSelectedRows)
-	virtual int GetSelectedItem(int selectionIndex);
+	virtual intp GetSelectedItem(intp selectionIndex);
 
 	// sets no item as selected
 	virtual void ClearSelectedItems();
 
-	virtual bool IsItemSelected( int itemID );
+	virtual bool IsItemSelected( intp itemID );
 
 	// adds a item to the select list
-	virtual void AddSelectedItem( int itemID );
+	virtual void AddSelectedItem( intp itemID );
 
 	// sets this single item as the only selected item
-	virtual void SetSingleSelectedItem( int itemID );
+	virtual void SetSingleSelectedItem( intp itemID );
 
 	// returns the selected column, -1 for particular column selected
-	virtual int GetSelectedColumn();
+	virtual intp GetSelectedColumn();
 
 	// whether or not to select specific cells (off by default)
 	virtual void SetSelectIndividualCells(bool state);
@@ -190,7 +195,7 @@ public:
 	bool IsMultiselectEnabled() const;
 
 	// sets a single cell - all other previous rows are cleared
-	virtual void SetSelectedCell(int row, int column);
+	virtual void SetSelectedCell(intp row, intp column);
 
 	virtual bool GetCellAtPos(int x, int y, int &row, int &column);	// returns true if any found, row and column are filled out. x, y are in screen space
 	virtual bool GetCellBounds( int row, int column, int& x, int& y, int& wide, int& tall );
@@ -219,9 +224,6 @@ public:
 
 	MESSAGE_FUNC_INT( ResizeColumnToContents, "ResizeColumnToContents", column );
 
-#ifdef _X360
-	virtual void NavigateTo();
-#endif
 	/// Version number for file format of user config.  This defaults to 1,
 	/// and if you rearrange columns you can increment it to cause any old
 	/// user configs (which will be screwed up) to be discarded.
@@ -229,7 +231,7 @@ public:
 
 protected:
 	// PAINTING
-	virtual Panel *GetCellRenderer(int row, int column);
+	virtual Panel *GetCellRenderer(intp row, intp column);
 
 	// overrides
 	void OnMouseWheeled(int delta) override;
@@ -240,11 +242,7 @@ protected:
 	void ApplySchemeSettings(IScheme *pScheme) override;
 	void OnMousePressed( MouseCode code ) override;
 	void OnMouseDoublePressed( MouseCode code ) override;
-#ifdef _X360
-	void OnKeyCodePressed(KeyCode code) override;
-#else
 	void OnKeyCodePressed( KeyCode code ) override;
-#endif
 	MESSAGE_FUNC( OnSliderMoved, "ScrollBarSliderMoved" );
 	MESSAGE_FUNC_INT_INT( OnColumnResized, "ColumnResized", column, delta );
 	MESSAGE_FUNC_INT( OnSetSortColumn, "SetSortColumn", column );
@@ -272,16 +270,16 @@ private:
 	void CleanupItem( FastSortListPanelItem *data );
 
 	// adds the item into the column indexes
-	void IndexItem(int itemID);
+	void IndexItem(intp itemID);
 
 	// Purpose: 
 	void UpdateSelection( vgui::MouseCode code, int x, int y, int row, int column );
 
 	// Handles multiselect 
-	void HandleMultiSelection( int itemID, int row, int column );
+	void HandleMultiSelection( intp itemID, int row, int column );
 
 	// Handles addselect 
-	void HandleAddSelection( int itemID, int row, int column );
+	void HandleAddSelection( intp itemID, int row, int column );
 
 	// pre-sorted columns
 	struct IndexItem_t
@@ -318,8 +316,8 @@ private:
 	int				    m_iColumnDraggerMoved; // which column dragger was moved->which header to resize
 	int					m_lastBarWidth;
 
-	CUtlLinkedList<FastSortListPanelItem*, int>		m_DataItems;
-	CUtlVector<int>									m_VisibleItems;
+	CUtlLinkedList<FastSortListPanelItem*, intp>	m_DataItems;
+	CUtlVector<intp>								m_VisibleItems;
 
 	// set to true if the table needs to be sorted before it's drawn next
 	int 				m_iSortColumn;
@@ -334,7 +332,7 @@ private:
 	ScrollBar			*m_hbar;
 	ScrollBar			*m_vbar;
 
-	int				m_iSelectedColumn;
+	intp			m_iSelectedColumn;
 
 	bool 			m_bNeedsSort : 1;
 	bool 			m_bSortAscending : 1;
@@ -349,8 +347,8 @@ private:
 	int 			m_iRowHeight;
 	
 	// selection data
-	CUtlVector<int> 	m_SelectedItems;		// array of selected rows
-	int					m_LastItemSelected;	// remember the last row selected for future shift clicks
+	CUtlVector<intp> 	m_SelectedItems;		// array of selected rows
+	intp				m_LastItemSelected;		// remember the last row selected for future shift clicks
 
 	int 		m_iTableStartX;
 	int	 		m_iTableStartY;

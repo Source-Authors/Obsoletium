@@ -31,6 +31,7 @@ public:
 				{
 					m_pNetworkName = pNetworkName;
 					m_pTable = pTable;
+					m_pNext = NULL;
 					m_InstanceBaselineIndex = INVALID_STRING_INDEX;
 					// g_pServerClassHead is sorted alphabetically, so find the correct place to insert
 					if ( !g_pServerClassHead )

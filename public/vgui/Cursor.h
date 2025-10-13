@@ -12,6 +12,7 @@
 #pragma once
 #endif
 
+#include "tier0/basetypes.h"
 #include <vgui/VGUI.h>
 
 namespace vgui
@@ -40,7 +41,8 @@ enum CursorCode
 	dc_alwaysvisible_pop,
 };
 
-typedef unsigned long HCursor;
+// dimhotepus: unsigned long -> uint32. x86-64
+using HCursor = uint32;
 
 }
 

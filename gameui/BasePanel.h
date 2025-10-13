@@ -15,15 +15,12 @@
 #include "vgui_controls/PHandle.h"
 #include "vgui_controls/MenuItem.h"
 #include "vgui_controls/MessageDialog.h"
-#include "KeyValues.h"
-#include "utlvector.h"
+#include "tier1/KeyValues.h"
+#include "tier1/utlvector.h"
 #include "tier1/CommandBuffer.h"
 
 #include "ixboxsystem.h"
-
-#if !defined( _X360 )
 #include "xbox/xboxstubs.h"
-#endif
 
 enum
 {
@@ -148,7 +145,6 @@ public:
 	CGameMenuItem(vgui::Menu *parent, const char *name);
 
 	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
-	void PaintBackground( void ) override;
 	void SetRightAlignedText( bool state );
 
 private:
@@ -178,7 +174,9 @@ public:
 	class CAsyncJobContext
 	{
 	public:
-		CAsyncJobContext( float flLeastExecuteTime = 0.0f ) : m_hThreadHandle( NULL ), m_flLeastExecuteTime( flLeastExecuteTime ) {}
+		// dimhotepus: float -> double.
+		explicit CAsyncJobContext( double flLeastExecuteTime = 0.0 )
+			: m_hThreadHandle( NULL ), m_flLeastExecuteTime( flLeastExecuteTime ) {}
 		virtual ~CAsyncJobContext() {}
 
 		virtual void ExecuteAsync() = 0;		// Executed on the secondary thread
@@ -186,7 +184,8 @@ public:
 
 	public:
 		CInterlockedPtr<void> m_hThreadHandle;		// Handle to an async job thread waiting for
-		float m_flLeastExecuteTime;				// Least amount of time this job should keep executing
+		// dimhotepus: float -> double.
+		double m_flLeastExecuteTime;				// Least amount of time this job should keep executing
 	};
 
 	CAsyncJobContext *m_pAsyncJob;
@@ -214,12 +213,9 @@ public:
 	void OnOpenNewGameDialog( const char *chapter = NULL );
 	void OnOpenBonusMapsDialog();
 	void OnOpenLoadGameDialog();
-	void OnOpenLoadGameDialog_Xbox();
 	void OnOpenSaveGameDialog();
-	void OnOpenSaveGameDialog_Xbox();
 	void OnOpenServerBrowser();
 	void OnOpenFriendsDialog();
-	void OnOpenDemoDialog();
 	void OnOpenCreateMultiplayerGameDialog();
 	void OnOpenQuitConfirmationDialog();
 	void OnOpenDisconnectConfirmationDialog();
@@ -227,7 +223,6 @@ public:
 	void OnOpenPlayerListDialog();
 	void OnOpenBenchmarkDialog();
 	void OnOpenOptionsDialog();
-	void OnOpenOptionsDialog_Xbox();
 	void OnOpenLoadCommentaryDialog();
 	void OpenLoadSingleplayerCommentaryDialog();
 	void OnOpenAchievementsDialog();
@@ -243,8 +238,6 @@ public:
     //=============================================================================
     // HPE_END
     //=============================================================================
-
-	void OnOpenControllerDialog();
 
 	// Xbox 360
 	CMatchmakingBasePanel* GetMatchmakingBasePanel();
@@ -272,16 +265,10 @@ public:
 
 	void OnSizeChanged( int newWide, int newTall ) override;
 
-	void ArmFirstMenuItem( void );
-
 	void OnGameUIHidden();
 
 	void CloseBaseDialogs( void );
 	bool IsWaitingForConsoleUI( void ) { return m_bWaitingForStorageDeviceHandle || m_bWaitingForUserSignIn || m_bXUIVisible; }
-
-#if defined( _X360 )
-	CON_COMMAND_MEMBER_F( CBasePanel, "gameui_reload_resources", Reload_Resources, "Reload the Xbox 360 UI res files", 0 );
-#endif
 
 	int  GetMenuAlpha( void );
 
@@ -330,8 +317,6 @@ private:
 	void UpdateGameMenus();
 	CGameMenu *RecursiveLoadGameMenu(KeyValues *datafile);
 
-	void StartExitingProcess();
-
 	bool IsPromptableCommand( const char *command );
 	bool CommandRequiresSignIn( const char *command );
 	bool CommandRequiresStorageDevice( const char *command );
@@ -369,13 +354,9 @@ private:
 	vgui::DHANDLE<vgui::Frame> m_hNewGameDialog;
 	vgui::DHANDLE<vgui::Frame> m_hBonusMapsDialog;
 	vgui::DHANDLE<vgui::Frame> m_hLoadGameDialog;
-	vgui::DHANDLE<vgui::Frame> m_hLoadGameDialog_Xbox;
 	vgui::DHANDLE<vgui::Frame> m_hSaveGameDialog;
-	vgui::DHANDLE<vgui::Frame> m_hSaveGameDialog_Xbox;
 	vgui::DHANDLE<vgui::PropertyDialog> m_hOptionsDialog;
-	vgui::DHANDLE<vgui::Frame> m_hOptionsDialog_Xbox;
 	vgui::DHANDLE<vgui::Frame> m_hCreateMultiplayerGameDialog;
-	//vgui::DHANDLE<vgui::Frame> m_hDemoPlayerDialog;
 	vgui::DHANDLE<vgui::Frame> m_hChangeGameDialog;
 	vgui::DHANDLE<vgui::Frame> m_hPlayerListDialog;
 	vgui::DHANDLE<vgui::Frame> m_hBenchmarkDialog;
@@ -384,7 +365,6 @@ private:
 
 	// Xbox 360
 	vgui::DHANDLE<vgui::Frame> m_hMatchmakingBasePanel;
-	vgui::DHANDLE<vgui::Frame> m_hControllerDialog;
 
 	EBackgroundState m_eBackgroundState;
 
@@ -396,18 +376,13 @@ private:
 
 	void						DrawBackgroundImage();
 	int							m_iBackgroundImageID;
-	int							m_iRenderTargetImageID;
 	int							m_iLoadingImageID;
-	int							m_iProductImageID;
 	bool						m_bLevelLoading;
 	bool						m_bEverActivated;
-	bool						m_bCopyFrameBuffer;
-	bool						m_bUseRenderTargetImage;
 	int							m_ExitingFrameCount;
 	bool						m_bXUIVisible;
 	bool						m_bUseMatchmaking;
 	bool						m_bRestartFromInvite;
-	bool						m_bRestartSameGame;
 	
 	// Used for internal state dealing with blades
 	bool						m_bUserRefusedSignIn;
@@ -431,9 +406,6 @@ private:
 	bool m_bRenderingBackgroundTransition;
 	float m_flTransitionStartTime;
 	float m_flTransitionEndTime;
-
-	// Used for rich presence updates on xbox360
-	bool m_bSinglePlayer;
 
 	// background fill transition
 	bool m_bHaveDarkenedBackground;

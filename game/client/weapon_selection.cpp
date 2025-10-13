@@ -74,6 +74,9 @@ CBaseHudWeaponSelection *GetHudWeaponSelection()
 //-----------------------------------------------------------------------------
 CBaseHudWeaponSelection::CBaseHudWeaponSelection( const char *pElementName ) : CHudElement( pElementName )
 {
+	m_flSelectionTime = -1;
+	m_bSelectionVisible = false;
+
 	s_pInstance = this;
 	
 	SetHiddenBits( HIDEHUD_WEAPONSELECTION | HIDEHUD_NEEDSUIT | HIDEHUD_PLAYERDEAD | HIDEHUD_INVEHICLE );

@@ -5,7 +5,7 @@
 //=============================================================================//
 #if !defined(_STATIC_LINKED) || defined(_SHARED_LIB)
 
-#include "stdlib.h"
+#include <cstdlib>
 #include "vstdlib/random.h"
 
 // memdbgon must be the last include file in a .cpp file!!!

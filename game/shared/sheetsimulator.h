@@ -185,8 +185,9 @@ class CIterativeSheetSimulator : public CSheetSimulator
 {
 public:
 	CIterativeSheetSimulator( TraceLineFunc_t traceline, TraceHullFunc_t traceHull );
-
-	void BeginSimulation( float dt, int steps, int substeps, int collisionCount );
+	
+	// dimhotepus: steps, collisionCount (int) -> char.
+	void BeginSimulation( float dt, char steps, int substeps, char collisionCount );
 
 	// Returns true if it just did a simulation step
 	bool Think( );
@@ -201,7 +202,8 @@ private:
 	void DetectCollisions( void );
 
 	float	m_TimeStep;
-	float	m_SubSteps;
+	// dimhotepus: float -> int
+	int		m_SubSteps;
 	char	m_TotalSteps;
 	char	m_SimulationSteps;
 	char	m_CollisionCount;

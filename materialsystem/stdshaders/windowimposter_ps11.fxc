@@ -14,9 +14,9 @@ struct PS_INPUT
 	float4 vertexColor				: COLOR;
 };
 
-HALF4 main( PS_INPUT i ) : COLOR
+float4 main( PS_INPUT i ) : COLOR
 {
-	HALF4 color;
+	float4 color;
 	color.xyz = texCUBE( EnvmapSampler, i.eyeToVertVector );
 	color.a = 1.0f;
 	color *= i.vertexColor;

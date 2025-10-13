@@ -37,9 +37,7 @@ class CCryptoOutBuffer
 {
 public:
 
-	CCryptoOutBuffer() : m_pubData{nullptr}, m_cubData{0}
-	{
-	}
+	CCryptoOutBuffer() = default;
 
 	~CCryptoOutBuffer()
 	{
@@ -78,8 +76,8 @@ public:
 	[[nodiscard]] size_t CubData() const { return m_cubData; }
 
 private:
-	uint8 *m_pubData;
-	size_t m_cubData;
+	uint8 *m_pubData{nullptr};
+	size_t m_cubData{0};
 };
 
 class CCrypto

@@ -73,8 +73,6 @@ void RestoreMaterialSystemObjects( int nChangeFlags );
 extern ConVar mat_colorcorrection;
 extern ConVar sv_allow_color_correction;
 
-ConVar mat_debugalttab( "mat_debugalttab", "0", FCVAR_CHEAT );
-
 // Static pointers to renderable textures
 static CTextureReference g_PowerOfTwoFBTexture;
 static CTextureReference g_WaterReflectionTexture;
@@ -191,7 +189,7 @@ ConVar mat_hdr_level( "mat_hdr_level", "2", FCVAR_ARCHIVE,
 MaterialSystem_SortInfo_t *materialSortInfoArray = 0;
 static bool s_bConfigLightingChanged = false;
 
-extern unsigned long GetRam();
+extern unsigned GetRam();
 
 
 //-----------------------------------------------------------------------------
@@ -390,7 +388,7 @@ static void ReadMaterialSystemConfigFromRegistry( MaterialSystem_Config_t &confi
 	ReadVideoConfigInt( "ScreenWidth", &config.m_VideoMode.m_Width );
 	ReadVideoConfigInt( "ScreenHeight", &config.m_VideoMode.m_Height );
 	config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, ReadVideoConfigInt( "ScreenWindowed", 0 ) != 0 );
-	config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, ReadVideoConfigInt( "ScreenNoBorder", 0 ) != 0 );
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, ReadVideoConfigInt( "ScreenNoBorder", 0 ) != 0 );
 #if defined( USE_SDL ) && !defined( SWDS )
 	// Read the ScreenDisplayIndex and set sdl_displayindex if it's there.
 	static ConVarRef conVar( "sdl_displayindex" );
@@ -519,7 +517,7 @@ static void WriteMaterialSystemConfigToRegistry( const MaterialSystem_Config_t &
 	WriteVideoConfigInt( "ScreenWidth", config.m_VideoMode.m_Width );
 	WriteVideoConfigInt( "ScreenHeight", config.m_VideoMode.m_Height );
 	WriteVideoConfigInt( "ScreenWindowed", config.Windowed() );
-	WriteVideoConfigInt( "ScreenNoBorder", config.Borderless() );
+	WriteVideoConfigInt( "ScreenNoBorder", config.NoWindowBorder() );
 	WriteVideoConfigInt( "ScreenMSAA", config.m_nAASamples );
 	WriteVideoConfigInt( "ScreenMSAAQuality", config.m_nAAQuality );
 	WriteVideoConfigInt( "MotionBlur", config.m_bMotionBlur ? 1 : 0 );
@@ -576,7 +574,7 @@ static void OverrideMaterialSystemConfigFromCommandLine( MaterialSystem_Config_t
 	// Check window is borderless
 	if ( CommandLine()->FindParm( "-noborder" ) )
 	{
-		config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, true );
+		config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, true );
 	}
 
 	// Get width and height
@@ -834,7 +832,8 @@ void GetMaterialSystemConfigForBenchmarkUpload(KeyValues *dataToUpload)
 	dataToUpload->SetInt( "ShadowDepthTexture", g_pMaterialSystemConfig->ShadowDepthTexture() );
 	dataToUpload->SetInt( "MotionBlur", g_pMaterialSystemConfig->MotionBlur() );
 	dataToUpload->SetInt( "Windowed", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_WINDOWED) ? 1 : 0 );
-	dataToUpload->SetInt( "Borderless", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_BORDERLESS) ? 1 : 0 );
+	// dimhotepus: Send no window border flags, too.
+	dataToUpload->SetInt( "NoWindowBorder", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER) ? 1 : 0 );
 	dataToUpload->SetInt( "Trilinear", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_FORCE_TRILINEAR) ? 1 : 0 );
 	dataToUpload->SetInt( "ForceHWSync", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_FORCE_HWSYNC) ? 1 : 0 );
 	dataToUpload->SetInt( "NoWaitForVSync", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_NO_WAIT_FOR_VSYNC) ? 1 : 0 );
@@ -843,6 +842,7 @@ void GetMaterialSystemConfigForBenchmarkUpload(KeyValues *dataToUpload)
 	dataToUpload->SetInt( "EnableParallaxMapping", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_ENABLE_PARALLAX_MAPPING) ? 1 : 0 );
 	dataToUpload->SetInt( "ZPrefill", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_USE_Z_PREFILL) ? 1 : 0 );
 	dataToUpload->SetInt( "ReduceFillRate", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE) ? 1 : 0 );
+	dataToUpload->SetInt( "UsingPartialPresentation", (g_pMaterialSystemConfig->m_Flags & MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION) ? 1 : 0 );
 	dataToUpload->SetInt( "RenderToTextureShadows", r_shadowrendertotexture.GetInt() ? 1 : 0 );
 	dataToUpload->SetInt( "FlashlightDepthTexture", r_flashlightdepthtexture.GetInt() ? 1 : 0 );
 	dataToUpload->SetInt( "RealtimeWaterReflection", r_waterforceexpensive.GetInt() ? 1 : 0 );
@@ -865,13 +865,15 @@ void PrintMaterialSystemConfig( const MaterialSystem_Config_t &config )
 	Warning( "dxSupportLevel: %d\n", config.dxSupportLevel );
 	Warning( "monitorGamma: %f\n", config.m_fMonitorGamma );
 	Warning( "MATSYS_VIDCFG_FLAGS_WINDOWED: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_WINDOWED ) ? "true" : "false" );
-	Warning( "MATSYS_VIDCFG_FLAGS_BORDERLESS: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_BORDERLESS ) ? "true" : "false" );
+	// dimhotepus: Print no window border flag, too.
+	Warning( "MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_FORCE_TRILINEAR: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_FORCE_TRILINEAR ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_FORCE_HWSYNC: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_FORCE_HWSYNC ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_DISABLE_SPECULAR: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_DISABLE_SPECULAR ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_ENABLE_PARALLAX_MAPPING: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_ENABLE_PARALLAX_MAPPING ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_USE_Z_PREFILL: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_USE_Z_PREFILL ) ? "true" : "false" );
 	Warning( "MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_REDUCE_FILLRATE ) ? "true" : "false" );
+	Warning( "MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION: %s\n", ( config.m_Flags & MATSYS_VIDCFG_FLAGS_USING_PARTIAL_PRESENTATION ) ? "true" : "false" );
 	Warning( "r_shadowrendertotexture: %s\n", r_shadowrendertotexture.GetInt() ? "true" : "false" );
 	Warning( "motionblur: %s\n", config.m_bMotionBlur ? "true" : "false" );
 	Warning( "shadowdepthtexture: %s\n", config.m_bShadowDepthTexture ? "true" : "false" );
@@ -1112,11 +1114,6 @@ static ITexture *CreateResolvedFullFrameDepthTexture( void )
 void InitWellKnownRenderTargets( void )
 {
 #if !defined( SWDS )
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: InitWellKnownRenderTargets\n" );
-	}
-
 	// Begin block in which all render targets should be allocated
 	materials->BeginRenderTargetAllocation();
 
@@ -1200,11 +1197,6 @@ void InitWellKnownRenderTargets( void )
 void ShutdownWellKnownRenderTargets( void )
 {
 #if !defined( SWDS )
-	if ( mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: ShutdownWellKnownRenderTargets\n" );
-	}
-
 	g_PowerOfTwoFBTexture.Shutdown();
 	g_BuildCubemaps16BitTexture.Shutdown();
 		
@@ -1259,11 +1251,6 @@ CON_COMMAND( mat_reset_rendertargets, "Resets all the render targets" )
 //-----------------------------------------------------------------------------
 static void InitDebugMaterials( void )
 {
-	if ( IsPC() && mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: InitDebugMaterials\n" );
-	}
-
 	g_materialEmpty = GL_LoadMaterial( "debug/debugempty", TEXTURE_GROUP_OTHER );
 #ifndef SWDS
 	g_materialWireframe = GL_LoadMaterial( "debug/debugwireframe", TEXTURE_GROUP_OTHER );
@@ -1366,11 +1353,6 @@ static void InitDebugMaterials( void )
 //-----------------------------------------------------------------------------
 static void ShutdownDebugMaterials( void )
 {
-	if ( IsPC() && mat_debugalttab.GetBool() )
-	{
-		Warning( "mat_debugalttab: ShutdownDebugMaterials\n" );
-	}
-
 	GL_UnloadMaterial( g_materialEmpty );
 #ifndef SWDS
 	GL_UnloadMaterial( g_pMaterialLightSprite );

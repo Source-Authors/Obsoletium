@@ -19,11 +19,11 @@ $Configuration
 
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE Psapi.lib"
+		$AdditionalDependencies				"$BASE psapi.lib shell32.lib user32.lib"
 	}
 }
 
-$Project "Vcdblock"
+$Project "vcdblock"
 {
 	$Folder	"Source Files"
 	{

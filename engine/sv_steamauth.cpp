@@ -79,7 +79,7 @@ static void MsgAndLog( const char *fmt, ... )
 static void WarningAndLog( const char *fmt, ... )
 {
 	va_list ap;
-	va_start(ap, fmt);
+	va_start(ap, fmt); //-V2019 //-V2018
 	V_vsprintf_safe( s_szTempMsgBuf, fmt, ap );
 
 	// Does Log always print to the console?

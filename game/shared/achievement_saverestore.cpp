@@ -44,10 +44,10 @@ public:
 		pAchievementMgr->SaveGlobalStateIfDirty( pSave->IsAsync() );
 
 		pSave->StartBlock( "Achievements" );
-		int iTotalAchievements = pAchievementMgr->GetAchievementCount();
+		intp iTotalAchievements = pAchievementMgr->GetAchievementCount();
 		short nSaveCount = 0;
 		// count how many achievements should be saved. 
-		for ( int i = 0; i < iTotalAchievements; i++ )
+		for ( intp i = 0; i < iTotalAchievements; i++ )
 		{
 			IAchievement *pAchievement = pAchievementMgr->GetAchievementByIndex( i );
 			if ( pAchievement->ShouldSaveWithGame() )
@@ -58,7 +58,7 @@ public:
 		// Write # of saved achievements
 		pSave->WriteShort( &nSaveCount );
 		// Write out each achievement
-		for ( int i = 0; i < iTotalAchievements; i++ )
+		for ( intp i = 0; i < iTotalAchievements; i++ )
 		{
 			IAchievement *pAchievement = pAchievementMgr->GetAchievementByIndex( i );
 			if ( pAchievement->ShouldSaveWithGame() )

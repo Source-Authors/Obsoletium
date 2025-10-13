@@ -2,14 +2,14 @@
 //
 // Purpose: Real-Time Hierarchical Profiling
 
-#ifndef TIER0_VPROF_H_
-#define TIER0_VPROF_H_
+#ifndef SE_PUBLIC_TIER0_VPROF_H_
+#define SE_PUBLIC_TIER0_VPROF_H_
 
-#include "tier0/dbg.h"
-#include "tier0/fasttimer.h"
-#include "tier0/l2cache.h"
-#include "tier0/threadtools.h"
-#include "tier0/vprof_telemetry.h"
+#include "dbg.h"
+#include "fasttimer.h"
+#include "l2cache.h"
+#include "threadtools.h"
+#include "vprof_telemetry.h"
 
 // VProf is enabled by default in all configurations.
 #define VPROF_ENABLED
@@ -263,9 +263,9 @@ public:
 	void EnterScope();
 	bool ExitScope();
 
-	const tchar *GetName() const;
+	[[nodiscard]] const tchar *GetName() const;
 
-	int GetBudgetGroupID() const
+	[[nodiscard]] int GetBudgetGroupID() const
 	{
 		return m_BudgetGroupID;
 	}
@@ -276,13 +276,13 @@ public:
 		m_BudgetGroupID = id;
 	}
 
-	int	GetCurCalls() const;
-	double GetCurTime() const;
-	int GetPrevCalls() const;
-	double GetPrevTime() const;
-	int	GetTotalCalls() const;
-	double GetTotalTime() const;
-	double GetPeakTime() const;
+	[[nodiscard]] int	GetCurCalls() const;
+	[[nodiscard]] double GetCurTime() const;
+	[[nodiscard]] int GetPrevCalls() const;
+	[[nodiscard]] double GetPrevTime() const;
+	[[nodiscard]] int	GetTotalCalls() const;
+	[[nodiscard]] double GetTotalTime() const;
+	[[nodiscard]] double GetPeakTime() const;
 
 	double GetCurTimeLessChildren();
 	double GetPrevTimeLessChildren();
@@ -300,7 +300,7 @@ public:
 	
 	// dimhotepus: Use intp instead of int for user data.
 	void SetClientData( intp iClientData )	{ m_iClientData = iClientData; }
-	intp GetClientData() const				{ return m_iClientData; }
+	[[nodiscard]] intp GetClientData() const				{ return m_iClientData; }
 
 #ifdef DBGFLAG_VALIDATE
 	void Validate( CValidator &validator, tchar *pchName );		// Validate our internal structures
@@ -315,7 +315,7 @@ private:
 		m_iUniqueNodeID = id;
 	}
 
-	int GetUniqueNodeID() const
+	[[nodiscard]] int GetUniqueNodeID() const
 	{
 		return m_iUniqueNodeID;
 	}
@@ -345,9 +345,9 @@ private:
 	CL2Cache	m_L2Cache;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
 
-	int			m_nRecursions;
+	int			m_nRecursions{ 0 };
 	
-	unsigned	m_nCurFrameCalls;
+	unsigned	m_nCurFrameCalls{ 0 };
 	
 	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
 	// DLL export looks safe.
@@ -355,7 +355,7 @@ private:
 	CCycleCount	m_CurFrameTime;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
 	
-	unsigned	m_nPrevFrameCalls;
+	unsigned	m_nPrevFrameCalls{ 0 };
 	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
 	// DLL export looks safe.
 	MSVC_DISABLE_WARNING(4251)
@@ -372,12 +372,12 @@ private:
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
 
 	CVProfNode *m_pParent;
-	CVProfNode *m_pChild;
-	CVProfNode *m_pSibling;
+	CVProfNode *m_pChild{ nullptr };
+	CVProfNode *m_pSibling{ nullptr };
 
 	int m_BudgetGroupID;
 
-	intp m_iClientData;
+	intp m_iClientData{ -1 };
 	int m_iUniqueNodeID;
 };
 
@@ -429,8 +429,8 @@ public:
 	void Stop();
 
 	void SetTargetThreadId( ThreadId_t id ) { m_TargetThreadId = id; }
-	ThreadId_t GetTargetThreadId() const { return m_TargetThreadId; }
-	bool InTargetThread() const { return ( m_TargetThreadId == ThreadGetCurrentId() ); }
+	[[nodiscard]] ThreadId_t GetTargetThreadId() const { return m_TargetThreadId; }
+	[[nodiscard]] bool InTargetThread() const { return ( m_TargetThreadId == ThreadGetCurrentId() ); }
 
 	void EnterScope( const tchar *pszName, int detailLevel, const tchar *pBudgetGroupName, bool bAssertAccounted );
 	void EnterScope( const tchar *pszName, int detailLevel, const tchar *pBudgetGroupName, bool bAssertAccounted, int budgetFlags );
@@ -443,10 +443,10 @@ public:
 	void Resume();
 	void Reset();
 	
-	bool IsEnabled() const;
-	int GetDetailLevel() const;
+	[[nodiscard]] bool IsEnabled() const;
+	[[nodiscard]] int GetDetailLevel() const;
 
-	bool AtRoot() const;
+	[[nodiscard]] bool AtRoot() const;
 
 	//
 	// Queries
@@ -460,37 +460,37 @@ public:
 		m_nVTuneGroupID = BudgetGroupNameToBudgetGroupID( pGroupName );
 		m_bVTuneGroupEnabled = true;
 	}
-	void DisableVTuneGroup( void )
+	void DisableVTuneGroup( )
 	{
 		m_bVTuneGroupEnabled = false;
 	}
 	
 	inline void PushGroup( int nGroupID );
-	inline void PopGroup( void );
+	inline void PopGroup( );
 #endif
 	
-	int NumFramesSampled() const { return m_nFrames; }
-	double GetPeakFrameTime() const;
-	double GetTotalTimeSampled() const;
-	double GetTimeLastFrame() const;
+	[[nodiscard]] int NumFramesSampled() const { return m_nFrames; }
+	[[nodiscard]] double GetPeakFrameTime() const;
+	[[nodiscard]] double GetTotalTimeSampled() const;
+	[[nodiscard]] double GetTimeLastFrame() const;
 	
 	CVProfNode *GetRoot();
 	CVProfNode *FindNode( CVProfNode *pStartNode, const tchar *pszNode );
 	CVProfNode *GetCurrentNode();
 
-	typedef void ( __cdecl *StreamOut_t )( const char* pszFormat, ... );
+	using StreamOut_t = void (*)(const char *, ...);
 	// Set the output function used for all vprof reports. Call this with NULL
 	// to set it to the default output function.
 	void SetOutputStream( StreamOut_t outputStream );
-	void OutputReport( int type = VPRT_FULL, const tchar *pszStartNode = NULL, int budgetGroupID = -1 );
+	void OutputReport( int type = VPRT_FULL, const tchar *pszStartNode = nullptr, int budgetGroupID = -1 );
 
 	const tchar *GetBudgetGroupName( int budgetGroupID );
-	int GetBudgetGroupFlags( int budgetGroupID ) const;	// Returns a combination of BUDGETFLAG_ defines.
-	int GetNumBudgetGroups( void );
+	[[nodiscard]] int GetBudgetGroupFlags( int budgetGroupID ) const;	// Returns a combination of BUDGETFLAG_ defines.
+	int GetNumBudgetGroups( );
 	void GetBudgetGroupColor( int budgetGroupID, int &r, int &g, int &b, int &a );
 	int BudgetGroupNameToBudgetGroupID( const tchar *pBudgetGroupName );
 	int BudgetGroupNameToBudgetGroupID( const tchar *pBudgetGroupName, int budgetFlagsToORIn );
-	void RegisterNumBudgetGroupsChangedCallBack( void (*pCallBack)(void) );
+	void RegisterNumBudgetGroupsChangedCallBack( void (*pCallBack)() );
 
 	int BudgetGroupNameToBudgetGroupIDNoCreate( const tchar *pBudgetGroupName ) { return FindBudgetGroupName( pBudgetGroupName ); }
 
@@ -501,20 +501,20 @@ public:
 	uintp *FindOrCreateCounter( const tchar *pName, CounterGroup_t eCounterGroup=COUNTER_GROUP_DEFAULT  );
 	void ResetCounters( CounterGroup_t eCounterGroup );
 	
-	int GetNumCounters( void ) const;
+	[[nodiscard]] int GetNumCounters( ) const;
 	
-	const tchar *GetCounterName( int index ) const;
+	[[nodiscard]] const tchar *GetCounterName( int index ) const;
 	// dimhotepus: intp -> uintp to handle mods with enchanced textures on x86.
-	uintp GetCounterValue( int index ) const;
+	[[nodiscard]] uintp GetCounterValue( int index ) const;
 	// dimhotepus: intp -> uintp to handle mods with enchanced textures on x86.
 	const tchar *GetCounterNameAndValue( int index, uintp &val ) const;
-	CounterGroup_t GetCounterGroup( int index ) const;
+	[[nodiscard]] CounterGroup_t GetCounterGroup( int index ) const;
 
 	// Performance monitoring events.
 	void PMEInitialized( bool bInit )		{ m_bPMEInit = bInit; }
 	void PMEEnable( bool bEnable )			{ m_bPMEEnabled = bEnable; }
 
-	bool UsePME() const { return ( m_bPMEInit && m_bPMEEnabled ); }
+	[[nodiscard]] bool UsePME() const { return ( m_bPMEInit && m_bPMEEnabled ); }
 
 #ifdef DBGFLAG_VALIDATE
 	void Validate( CValidator &validator, tchar *pchName );		// Validate our internal structures
@@ -525,11 +525,11 @@ protected:
 	void FreeNodes_R( CVProfNode *pNode );
 
 #ifdef VPROF_VTUNE_GROUP
-	bool VTuneGroupEnabled() const
+	[[nodiscard]] bool VTuneGroupEnabled() const
 	{ 
 		return m_bVTuneGroupEnabled;
 	}
-	int VTuneGroupID() const
+	[[nodiscard]] int VTuneGroupID() const
 	{ 
 		return m_nVTuneGroupID;
 	}
@@ -681,13 +681,9 @@ private:
 inline CVProfNode::CVProfNode( const tchar * pszName, int detailLevel, CVProfNode *pParent, const tchar *pBudgetGroupName, int budgetFlags )
  :	m_pszName( pszName ),
 	m_detailLevel( detailLevel ),
-	m_nRecursions( 0 ),
-	m_nCurFrameCalls( 0 ),
-	m_nPrevFrameCalls( 0 ),
-	m_pParent( pParent ),
-	m_pChild( NULL ),
-	m_pSibling( NULL ),
-	m_iClientData( -1 )
+	
+	m_pParent( pParent )
+	
 {
 	m_iUniqueNodeID = s_iCurrentUniqueNodeID++;
 
@@ -876,7 +872,7 @@ inline void CVProfNode::ClearPrevTime()
 }
 
 //-----------------------------------------------------------------------------
-inline int CVProfNode::GetL2CacheMisses( void )
+inline int CVProfNode::GetL2CacheMisses( )
 { 
 	return m_L2Cache.GetL2CacheMisses(); 
 }
@@ -1159,4 +1155,4 @@ private:
 #endif
 
 
-#endif  // TIER0_VPROF_H_
+#endif  // !SE_PUBLIC_TIER0_VPROF_H_

@@ -94,7 +94,7 @@ void COM_ExplainDisconnection( bool bPrint, PRINTF_FORMAT_STRING const char *fmt
 {
 	va_list		argptr;
 
-	va_start (argptr, fmt);
+	va_start (argptr, fmt); //-V2019 //-V2018
 	V_vsprintf_safe(gszDisconnectReason, fmt, argptr);
 	va_end (argptr);
 
@@ -334,7 +334,7 @@ char *va( PRINTF_FORMAT_STRING const char *format, ... )
 {
 	char* outbuf = tmpstr512();
 	va_list argptr;
-	va_start (argptr, format);
+	va_start (argptr, format); //-V2019 //-V2018
 	V_vsnprintf( outbuf, 512, format, argptr );
 	va_end (argptr);
 	return outbuf;
@@ -415,7 +415,7 @@ int COM_FindFile( const char *filename, FileHandle_t *file )
 //-----------------------------------------------------------------------------
 int COM_OpenFile(IN_Z const char *filename, FileHandle_t *file )
 {
-	return COM_FindFile( (char *)filename, file );
+	return COM_FindFile( filename, file );
 }
 
 /*
@@ -931,10 +931,18 @@ const char *COM_DXLevelToString( int dxlevel )
 			return !bHalfPrecision
 				? "10.0 [sm4] (full-precision)"
 				: "10.0 [sm4] (half-precision)";
-		case 114:
+		case 110:
 			return !bHalfPrecision
-				? "11.4 [sm5] (full-precision)"
-				: "11.4 [sm5] (half-precision)";
+				? "11.0 [sm5] (full-precision)"
+				: "11.0 [sm5] (half-precision)";
+		case 111:
+			return !bHalfPrecision
+				? "11.1 [sm5] (full-precision)"
+				: "11.1 [sm5] (half-precision)";
+		case 120:
+			return !bHalfPrecision
+				? "12.0 [sm6] (full-precision)"
+				: "12.0 [sm6] (half-precision)";
 		default:
 			return "UNKNOWN";
 		}
@@ -971,10 +979,18 @@ const char *COM_DXLevelToString( int dxlevel )
 			return !bHalfPrecision
 				? "gamemode - 10.0 [sm4] (full-precision)"
 				: "gamemode - 10.0 [sm4] (half-precision)";
-		case 114:
+		case 110:
 			return !bHalfPrecision
-				? "gamemode - 11.4 [sm5] (full-precision)"
-				: "gamemode - 11.4 [sm5] (half-precision)";
+				? "gamemode - 11.0 [sm5] (full-precision)"
+				: "gamemode - 11.0 [sm5] (half-precision)";
+		case 111:
+			return !bHalfPrecision
+				? "gamemode - 11.1 [sm5] (full-precision)"
+				: "gamemode - 11.1 [sm5] (half-precision)";
+		case 120:
+			return !bHalfPrecision
+				? "gamemode - 12.0 [sm6] (full-precision)"
+				: "gamemode - 12.0 [sm6] (half-precision)";
 		default:
 			return "gamemode";
 		}
@@ -1040,7 +1056,7 @@ void COM_Log( const char *pszFile, PRINTF_FORMAT_STRING const char *fmt, ...) FM
 	va_list		argptr;
 	char		string[8192];
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe(string, fmt, argptr);
 	va_end (argptr);
 

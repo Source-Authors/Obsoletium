@@ -159,9 +159,9 @@ bool StudioModel::LoadModel( const char *pModelName )
 	if (m_pModelName != pModelName)
 	{
 		// Copy over the model name; we'll need it later...
-			delete[] m_pModelName;
+		delete[] m_pModelName;
 		m_pModelName = V_strdup( pModelName );
-		}
+	}
 
 	m_MDLHandle = g_pMDLCache->FindMDL( pModelName );
 
@@ -264,7 +264,7 @@ bool StudioModel::PostLoadModel( const char *modelname )
 	if (pStudioHdr == NULL)
 		return false;
 
-	SetSequence (0);
+	SetSequence ((intp)0);
 	SetController (0, 0.0f);
 	SetController (1, 0.0f);
 	SetController (2, 0.0f);
@@ -314,12 +314,12 @@ bool StudioModel::HasModel()
 ////////////////////////////////////////////////////////////////////////
 
 
-int StudioModel::GetSequence( )
+intp StudioModel::GetSequence( ) const
 {
 	return m_sequence;
 }
 
-int StudioModel::SetSequence( int iSequence )
+intp StudioModel::SetSequence( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -339,7 +339,7 @@ int StudioModel::SetSequence( int iSequence )
 	return m_sequence;
 }
 
-const char* StudioModel::GetSequenceName( int iSequence )
+const char* StudioModel::GetSequenceName( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -382,7 +382,7 @@ int	StudioModel::GetNewAnimationLayer( int iPriority )
 	return m_iActiveLayers++;
 }
 
-int StudioModel::SetOverlaySequence( int iLayer, int iSequence, float flWeight )
+int StudioModel::SetOverlaySequence( int iLayer, intp iSequence, float flWeight )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -486,7 +486,7 @@ int StudioModel::LookupActivity( const char *szActivity )
 	return -1;
 }
 
-int StudioModel::SetSequence( const char *szSequence )
+intp StudioModel::SetSequence( const char *szSequence )
 {
 	return SetSequence( LookupSequence( szSequence ) );
 }
@@ -657,7 +657,7 @@ void StudioModel::ExtractBbox( Vector &mins, Vector &maxs )
 
 
 
-void StudioModel::GetSequenceInfo( int iSequence, float *pflFrameRate, float *pflGroundSpeed )
+void StudioModel::GetSequenceInfo( intp iSequence, float *pflFrameRate, float *pflGroundSpeed )
 {
 	float t = GetDuration( iSequence );
 
@@ -677,7 +677,7 @@ void StudioModel::GetSequenceInfo( float *pflFrameRate, float *pflGroundSpeed )
 	GetSequenceInfo( m_sequence, pflFrameRate, pflGroundSpeed );
 }
 
-float StudioModel::GetFPS( int iSequence )
+float StudioModel::GetFPS( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -691,7 +691,7 @@ float StudioModel::GetFPS( void )
 	return GetFPS( m_sequence );
 }
 
-float StudioModel::GetDuration( int iSequence )
+float StudioModel::GetDuration( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -701,7 +701,7 @@ float StudioModel::GetDuration( int iSequence )
 }
 
 
-int StudioModel::GetNumFrames( int iSequence )
+int StudioModel::GetNumFrames( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr || iSequence < 0 || iSequence >= pStudioHdr->GetNumSeq() )
@@ -731,7 +731,7 @@ static int GetSequenceFlags( CStudioHdr *pstudiohdr, int sequence )
 // Input  : iSequence - 
 // Output : Returns true on success, false on failure.
 //-----------------------------------------------------------------------------
-bool StudioModel::GetSequenceLoops( int iSequence )
+bool StudioModel::GetSequenceLoops( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -793,7 +793,7 @@ void StudioModel::GetMovement( float prevcycle[5], Vector &vecPos, QAngle &vecAn
 }
 
 
-void StudioModel::GetMovement( int iSequence, float prevCycle, float nextCycle, Vector &vecPos, QAngle &vecAngles )
+void StudioModel::GetMovement( intp iSequence, float prevCycle, float nextCycle, Vector &vecPos, QAngle &vecAngles )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
@@ -870,7 +870,7 @@ bool StudioModel::IsHidden( int iSequence )
 
 
 
-void StudioModel::GetSeqAnims( int iSequence, mstudioanimdesc_t *panim[4], float *weight )
+void StudioModel::GetSeqAnims( intp iSequence, mstudioanimdesc_t *panim[4], float *weight )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if (!pStudioHdr)

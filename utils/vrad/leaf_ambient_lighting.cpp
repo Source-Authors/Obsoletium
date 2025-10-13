@@ -439,7 +439,7 @@ float AABBDistance( const Vector &mins0, const Vector &maxs0, const Vector &mins
 class CLeafList : public ISpatialLeafEnumerator
 {
 public:
-	virtual bool EnumerateLeaf( int leaf, intp context )
+	bool EnumerateLeaf( int leaf, intp context ) override
 	{
 		m_list.AddToTail(leaf);
 		return true;
@@ -553,13 +553,14 @@ static void ThreadComputeLeafAmbient( int iThread, void *pUserData )
 		ComputeAmbientForLeaf(iThread, leafID, list);
 		// copy to the output array
 		g_LeafAmbientSamples[leafID].SetCount( list.Count() );
-		for ( int i = 0; i < list.Count(); i++ )
+		for ( intp i = 0; i < list.Count(); i++ )
 		{
 			g_LeafAmbientSamples[leafID].Element(i) = list.Element(i);
 		}
 	}
 }
 
+#ifdef MPI
 void VMPI_ProcessLeafAmbient( int iThread, uint64 iLeaf, MessageBuffer *pBuf )
 {
 	CUtlVector<ambientsample_t> list;
@@ -591,7 +592,7 @@ void VMPI_ReceiveLeafAmbientResults( uint64 leafID, MessageBuffer *pBuf, int iWo
 		pBuf->read(g_LeafAmbientSamples[leafID].Base(), nSamples * sizeof(ambientsample_t) );
 	}
 }
-
+#endif
 
 void ComputePerLeafAmbientLighting()
 {
@@ -618,6 +619,7 @@ void ComputePerLeafAmbientLighting()
 
 	g_LeafAmbientSamples.SetCount(numleafs);
 
+#ifdef MPI
 	if ( g_bUseMPI )
 	{
 		// Distribute the work among the workers.
@@ -625,6 +627,7 @@ void ComputePerLeafAmbientLighting()
 		DistributeWork( numleafs, VMPI_DISTRIBUTEWORK_PACKETID, VMPI_ProcessLeafAmbient, VMPI_ReceiveLeafAmbientResults );
 	}
 	else
+#endif
 	{
 		RunThreadsOn(numleafs, true, ThreadComputeLeafAmbient);
 	}

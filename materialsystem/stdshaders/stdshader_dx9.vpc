@@ -6,33 +6,12 @@
 
 $Macro SRCDIR		"..\.."
 $Macro OUTBINDIR	"$SRCDIR\..\game\bin"
-$Macro OUTBUILDDIR	"$SRCDIR\..\out"
 
-$MacroRequired				"PLATSUBDIR"
-$MacroRequiredAllowEmpty	"GAMENAME"
-$MacroRequiredAllowEmpty	"INTERMEDIATESUBDIR"
-$MacroRequiredAllowEmpty	"_UNITYSUBDIR"
-$Macro						"_SUBDIRSUFFIX"		"$INTERMEDIATESUBDIR$GAMENAME$PLATSUBDIR$_UNITYSUBDIR"
+// shader_dll_verify.cpp defines a function called _ftol3. This means that we can't
+// link with the bug-fixed ftol3.obj. It also means we can't convert float-to-unsigned.
+$Conditional DISABLE_FTOL3_OVERRIDE "1" [!$SOURCESDK]
 
 $Include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
-
-$Configuration	"Debug"
-{
-	$General
-	{
-		$OutputDirectory		"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
-		$IntermediateDirectory	"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
-	}
-}
-
-$Configuration	"Release"
-{
-	$General
-	{
-		$OutputDirectory		"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
-		$IntermediateDirectory	"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
-	}
-}
 
 // Common Configuration
 $Configuration
@@ -47,7 +26,6 @@ $Configuration
 	$Linker
 	{
 		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WINDOWS]
-		$SystemLibraries                                                        "iconv" [$OSXALL]
 	}
 }
 
@@ -121,6 +99,7 @@ $Project "stdshader_dx9"
 		$File	"pyro_vision.cpp"
 		$File	"refract.cpp"
 		$File	"refract_dx9_helper.cpp"
+		$File	"rendertargetblit_x360.cpp"					[$X360]	
 		$File	"sample4x4.cpp"
 		$File	"sample4x4_blend.cpp"
 		$File	"screenspace_general.cpp"
@@ -161,7 +140,7 @@ $Project "stdshader_dx9"
 		$File	"writez_dx9.cpp"
 		$File	"writestencil_dx9.cpp"
 
-		$Folder	"Remove me when VAC2 is out" [$WINDOWS]
+		$Folder	"Remove me when VAC2 is out" [$WINDOWS && !$SOURCESDK]
 		{
 			$File	"$SRCDIR\tier1\checksum_crc.cpp"
 			$File	"$SRCDIR\tier1\checksum_md5.cpp"
@@ -193,19 +172,15 @@ $Project "stdshader_dx9"
 
 	$Folder "Link Libraries" 
 	{
-		$Lib	mathlib
-		$Lib	shaderlib
-	}
+        $Lib	mathlib
+        $Lib	shaderlib
+		$Lib	tier2
+    }
 
-	$File	"$SRCDIR\devtools\bin\vsh_prep.pl"
-	$File	"$SRCDIR\devtools\bin\psh_prep.pl"
-	$File	"$SRCDIR\devtools\bin\fxc_prep.pl"
-	$File	"$SRCDIR\devtools\bin\updateshaders.pl"
-	$File	"$SRCDIR\devtools\bin\copyshaders.pl"
-	$File	"$SRCDIR\devtools\bin\valve_perl_helpers.pl"
-	$File	"$SRCDIR\devtools\bin\checkshaderchecksums.pl"
-	$File	"buildallshaders.bat"
-	$File	"buildshaders.bat"
+	$File	"buildstdshaders_V1.bat"
+	$File	"buildstdshaders_V2.bat"
+	$File	"buildshaders_V1.bat"
+	$File	"buildshaders_V2.bat"
 
 	$Shaders	"stdshader_dx9_20b.txt"
 	$Shaders	"stdshader_dx9_30.txt"

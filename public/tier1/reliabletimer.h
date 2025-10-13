@@ -8,10 +8,9 @@
 #define RELIABLETIMER_H
 
 #include "tier0/dbg.h"
-//#include "constants.h"
 #include "tier0/fasttimer.h"
-#include "tier1/tier1.h"
-#include "tier1/strtools.h"
+#include "tier1.h"
+#include "strtools.h"
 
 #define DbgAssert Assert
 #define kMILLION (1000000)

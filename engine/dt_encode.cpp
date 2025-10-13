@@ -39,7 +39,8 @@ void EncodeFloat( const SendProp *pProp, float fVal, bf_write *pOut, int objectI
 	}
 	else // standard clamped-range float
 	{
-		unsigned long ulVal;
+		// dimhotepus: unsigned long -> uint32.
+		uint32 ulVal;
 		int nBits = pProp->m_nBits;
 		if ( flags & SPROP_NOSCALE )
 		{
@@ -109,7 +110,8 @@ static float DecodeFloat(SendProp const *pProp, bf_read *pIn)
 	}
 	else // standard clamped-range float
 	{
-		unsigned long dwInterp = pIn->ReadUBitLong(pProp->m_nBits);
+		// dimhotepus: unsigned long -> uint32.
+		uint32 dwInterp = pIn->ReadUBitLong(pProp->m_nBits);
 		float fVal = (float)dwInterp / ((1 << pProp->m_nBits) - 1);
 		fVal = pProp->m_fLowValue + (pProp->m_fHighValue - pProp->m_fLowValue) * fVal;
 		return fVal;
@@ -298,7 +300,8 @@ void Int_Decode( DecodeInfo *pInfo )
 
 		if( bits != 32 && (flags & SPROP_UNSIGNED) == 0 )
 		{
-			unsigned long highbit = 1ul << (pProp->m_nBits - 1);
+			// dimhotepus: unsigned long -> uint32.
+			uint32 highbit = 1u << (pProp->m_nBits - 1);
 			if ( pInfo->m_Value.m_Int & highbit )
 			{
 				pInfo->m_Value.m_Int -= highbit; // strip high bit...
@@ -912,7 +915,7 @@ void Array_Encode( const unsigned char *pStruct, DVariant *pVar, const SendProp 
 	// Write the number of elements.
 	pOut->WriteUBitLong( nElements, pProp->GetNumArrayLengthBits() );
 
-	unsigned char *pCurStructOffset = (unsigned char*)pStruct + pArrayProp->GetOffset();
+	const unsigned char *pCurStructOffset = (const unsigned char*)pStruct + pArrayProp->GetOffset();
 	for ( int iElement=0; iElement < nElements; iElement++ )
 	{
 		DVariant var;

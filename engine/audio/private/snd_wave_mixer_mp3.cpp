@@ -19,6 +19,7 @@ extern IVAudio *vaudio;
 
 CAudioMixerWaveMP3::CAudioMixerWaveMP3( IWaveData *data ) : CAudioMixerWave( data ) 
 {
+	BitwiseClear(m_samples);
 	m_sampleCount = 0;
 	m_samplePosition = 0;
 	m_offset = 0;

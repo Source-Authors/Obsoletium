@@ -231,7 +231,11 @@ void ScratchPad_DrawLitCone(
 	for ( int i=0; i < nSegments; i++ )
 	{
 		float flAngle = (float)(i+1) * M_PI_F * 2.0F / nSegments;
-		Vector vOffset = vRight * cosf( flAngle ) + vUp * sinf( flAngle );
+		float flSin, flCos;
+
+		DirectX::XMScalarSinCos(&flSin, &flCos, flAngle);
+
+		Vector vOffset = vRight * flCos + vUp * flSin;
 		Vector vCurBottom = vBaseCenter + vOffset;
 
 		const Vector &v1 = vTip;
@@ -298,7 +302,11 @@ void ScratchPad_DrawLitCylinder(
 	for ( int i=0; i < nSegments; i++ )
 	{
 		float flAngle = (float)(i+1) * M_PI_F * 2.0F / nSegments;
-		Vector vOffset = vRight * cosf( flAngle ) + vUp * sinf( flAngle );
+		float flSin, flCos;
+
+		DirectX::XMScalarSinCos(&flSin, &flCos, flAngle);
+
+		Vector vOffset = vRight * flCos + vUp * flSin;
 		Vector vCurTop = v1 + vOffset;
 		Vector vCurBottom = v2 + vOffset;
 
@@ -383,25 +391,30 @@ void ScratchPad_DrawSphere(
 {
 	CUtlVector<Vector> prevPoints;
 	prevPoints.SetSize( nSubDivs );
+
+	Assert( nSubDivs > 1 );
+
+	// dimhotepus: Cache coefficient and ensure no zero division.
+	const float coefficient = 1.0f / (max(nSubDivs, 2) - 1);
 	
 	// For each vertical slice.. (the top and bottom ones are just a single point).
 	for ( int iSlice=0; iSlice < nSubDivs; iSlice++ )
 	{
-		float flHalfSliceAngle = M_PI_F * (float)iSlice / (nSubDivs - 1);
-
 		if ( iSlice == 0 )
 		{
 			prevPoints[0] = vCenter + Vector( 0, 0, flRadius );
-			for ( int z=1; z < prevPoints.Count(); z++ )
+			for ( intp z=1; z < prevPoints.Count(); z++ )
 				prevPoints[z] = prevPoints[0];
 		}
 		else
 		{
+			// dimhotepus: Compute only when needed.
+			const float flHalfSliceAngle = M_PI_F * (float)iSlice * coefficient;
 			const float sinHalfSliceAngle = sinf( flHalfSliceAngle );
 
 			for ( int iSubPt=0; iSubPt < nSubDivs; iSubPt++ )
 			{
-				float flHalfAngle = M_PI_F * (float)iSubPt / (nSubDivs - 1);
+				float flHalfAngle = M_PI_F * (float)iSubPt * coefficient;
 				float flAngle = flHalfAngle * 2;
 				
 				Vector pt;
@@ -411,8 +424,11 @@ void ScratchPad_DrawSphere(
 				}
 				else
 				{
-					pt.x = cosf( flAngle ) * sinHalfSliceAngle;
-					pt.y = sinf( flAngle ) * sinHalfSliceAngle;
+					float flSin, flCos;
+					DirectX::XMScalarSinCos(&flSin, &flCos, flAngle);
+
+					pt.x = flCos * sinHalfSliceAngle;
+					pt.y = flSin * sinHalfSliceAngle;
 					pt.z = cosf( flHalfSliceAngle );
 					
 					pt *= flRadius;

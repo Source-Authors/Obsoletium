@@ -8,7 +8,7 @@
 #ifndef COMPRESSED_3D_UNITVEC_H
 #define COMPRESSED_3D_UNITVEC_H
 
-#include "mathlib/vector.h"
+#include "vector.h"
 
 #define UNITVEC_DECLARE_STATICS \
    float cUnitVector::mUVAdjustment[0x2000]; \
@@ -151,10 +151,10 @@ public:
          }
 
          // convert to 3D vectors
-         float x = (float)xbits;
-         float y = (float)ybits;
-         float z = (float)( 126 - xbits - ybits );
-		
+         auto x = (float)xbits;
+         auto y = (float)ybits;
+         auto z = (float)( 126 - xbits - ybits );
+
          // calculate the amount of normalization required
          mUVAdjustment[idx] = 1.0f / sqrtf( y*y + z*z + x*x );
          Assert( std::isfinite( mUVAdjustment[idx]));

@@ -420,6 +420,10 @@ public:
 
 	virtual bool IsManualMapChangeOkay( const char ** ){ return true; }
 
+#ifdef GAME_DLL
+	virtual bool IsOfficialMap() { return false; }
+#endif
+
 #ifndef CLIENT_DLL
 private:
 	float m_flNextVerboseLogOutput;

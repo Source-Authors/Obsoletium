@@ -36,7 +36,7 @@ void AddElementsRecursively_R( CDmElement *pElement, ElementChoiceList_t &list, 
 
 	if ( pElement->IsA( pElementType ) )
 	{
-		int nIndex = list.AddToTail( );
+		auto nIndex = list.AddToTail( );
 		ElementChoice_t &entry = list[nIndex];
 		entry.m_pValue = pElement;
 		entry.m_pChoiceString = GetChoiceString( pElement );
@@ -54,8 +54,8 @@ void AddElementsRecursively_R( CDmElement *pElement, ElementChoiceList_t &list, 
 		else if ( attrType == AT_ELEMENT_ARRAY )
 		{
 			const CDmrElementArray<CDmElement> children( pElement, attributeName );
-			uint n = children.Count();
-			for ( uint i = 0; i < n; ++i )
+			intp n = children.Count();
+			for ( intp i = 0; i < n; ++i )
 			{
 				CDmElement *pChild = children[ i ];
 				AddElementsRecursively_R( pChild, list, dict, pElementType );
@@ -80,7 +80,7 @@ void AddElementsRecursively_R( CDmElement *pElement, DmeHandleVec_t &list, Eleme
 
 	if ( pElement->IsA( pElementType ) )
 	{
-		int nIndex = list.AddToTail( );
+		auto nIndex = list.AddToTail( );
 		list[nIndex] = pElement;
 	}
 
@@ -96,8 +96,8 @@ void AddElementsRecursively_R( CDmElement *pElement, DmeHandleVec_t &list, Eleme
 		else if ( attrType == AT_ELEMENT_ARRAY )
 		{
 			const CDmrElementArray<CDmElement> children( pElement, attributeName );
-			uint n = children.Count();
-			for ( uint i = 0; i < n; ++i )
+			intp n = children.Count();
+			for ( intp i = 0; i < n; ++i )
 			{
 				CDmElement *pChild = children[ i ];
 				AddElementsRecursively_R( pChild, list, dict, pElementType );

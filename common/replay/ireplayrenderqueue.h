@@ -22,9 +22,9 @@ public:
 	virtual void	Remove( ReplayHandle_t hReplay, int iPerformance ) = 0;
 	virtual void	Clear() = 0;
 
-	virtual int		GetCount() const = 0;
+	[[nodiscard]] virtual int		GetCount() const = 0;
 	virtual bool	GetEntryData( int iIndex, ReplayHandle_t *pHandleOut, int *pPerformanceOut ) const = 0;
-	virtual bool	IsInQueue( ReplayHandle_t hReplay, int iPerformance ) const = 0;
+	[[nodiscard]] virtual bool	IsInQueue( ReplayHandle_t hReplay, int iPerformance ) const = 0;
 };
 
 //----------------------------------------------------------------------------------------

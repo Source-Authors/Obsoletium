@@ -998,9 +998,8 @@ float CDmeVertexDeltaData::GenerateWeightDelta( CDmeVertexData *pBindState )
 
 	RemoveAllVertexData( nFieldIndex );
 
-	const float maxDeflection( static_cast< double >( ComputeMaxDeflection() ) );
-
-	if ( maxDeflection == 0.0 )
+	const float maxDeflection( ComputeMaxDeflection() );
+	if ( maxDeflection == 0.0f )
 		return maxDeflection;
 
 	const CUtlVector<Vector> &pos( GetPositionData() );

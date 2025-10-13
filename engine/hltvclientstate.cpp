@@ -94,7 +94,7 @@ void CHLTVClientState::CopyNewEntity(
 
 	// Get either the static or instance baseline.
 	const void *pFromData = NULL;
-	int nFromBits = 0;
+	intp nFromBits = 0;
 	int nFromTick = 0;	// MOTODO get tick when baseline last changed
 
 	PackedEntity *baseline = u.m_bAsDelta ? GetEntityBaseline( u.m_nBaseline, ent ) : NULL;

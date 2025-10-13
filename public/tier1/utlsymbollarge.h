@@ -9,14 +9,11 @@
 #ifndef UTLSYMBOLLARGE_H
 #define UTLSYMBOLLARGE_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/threadtools.h"
-#include "tier1/utltshash.h"
-#include "tier1/stringpool.h"
 #include "tier0/vprof.h"
+
+#include "utltshash.h"
+#include "stringpool.h"
 
 //-----------------------------------------------------------------------------
 // CUtlSymbolTableLarge:
@@ -28,7 +25,7 @@
 //     to the string data, the hash precedes it in memory and is used to speed up searching, etc.
 //-----------------------------------------------------------------------------
 
-typedef intp UtlSymLargeId_t;
+using UtlSymLargeId_t = intp;
 
 constexpr inline UtlSymLargeId_t UTL_INVAL_SYMBOL_LARGE{(UtlSymLargeId_t)~0};
 
@@ -100,11 +97,11 @@ public:
 		return u.m_Id != UTL_INVAL_SYMBOL_LARGE;
 	}
 
-private:
 	// Disallowed
 	CUtlSymbolLarge( const char* pStr ) = delete;       // they need to go through the table to assign the ptr
 	bool operator==( const char* pStr ) const = delete; // disallow since we don't know if the table this is from was case sensitive or not... maybe we don't care
 
+private:
 	union
 	{
 		UtlSymLargeId_t m_Id;
@@ -114,7 +111,7 @@ private:
 
 #define MIN_STRING_POOL_SIZE	2048
 
-typedef uint32 LargeSymbolTableHashDecoration_t; 
+using LargeSymbolTableHashDecoration_t = uint32; 
 
 inline LargeSymbolTableHashDecoration_t CUtlSymbolLarge_Hash( bool CASEINSENSITIVE, const char *pString, intp len )
 {
@@ -178,7 +175,7 @@ template< bool CASEINSENSITIVE >
 class CNonThreadsafeTree : public CUtlRBTree<CUtlSymbolTableLargeBaseTreeEntry_t *, intp, CTreeEntryLess< CNonThreadsafeTree< CASEINSENSITIVE >, CASEINSENSITIVE > >
 {
 public:
-	typedef CUtlRBTree<CUtlSymbolTableLargeBaseTreeEntry_t *, intp, CTreeEntryLess< CNonThreadsafeTree, CASEINSENSITIVE > > CNonThreadsafeTreeType;
+	using CNonThreadsafeTreeType = CUtlRBTree<CUtlSymbolTableLargeBaseTreeEntry_t *, intp, CTreeEntryLess<CNonThreadsafeTree, CASEINSENSITIVE>>;
 
 	CNonThreadsafeTree() : 
 		CNonThreadsafeTreeType( 0, 16 ) 
@@ -253,7 +250,7 @@ template < bool CASEINSENSITIVE >
 class CThreadsafeTree : public CUtlTSHash< CUtlSymbolTableLargeBaseTreeEntry_t *, 2048, CUtlSymbolTableLargeBaseTreeEntry_t *, CCThreadsafeTreeHashMethod< 2048, CUtlSymbolTableLargeBaseTreeEntry_t *, CASEINSENSITIVE > >
 {
 public:
-	typedef CUtlTSHash< CUtlSymbolTableLargeBaseTreeEntry_t *, 2048, CUtlSymbolTableLargeBaseTreeEntry_t *, CCThreadsafeTreeHashMethod< 2048, CUtlSymbolTableLargeBaseTreeEntry_t *, CASEINSENSITIVE > > CThreadsafeTreeType;
+	using CThreadsafeTreeType = CUtlTSHash<CUtlSymbolTableLargeBaseTreeEntry_t *, 2048, CUtlSymbolTableLargeBaseTreeEntry_t *, CCThreadsafeTreeHashMethod<2048, CUtlSymbolTableLargeBaseTreeEntry_t *, CASEINSENSITIVE>>;
 
 	CThreadsafeTree() : CThreadsafeTreeType( 32 ) 
 	{
@@ -306,7 +303,7 @@ public:
 	// Remove all symbols in the table.
 	void  RemoveAll();
 
-	[[nodiscard]] intp GetNumStrings( void ) const
+	[[nodiscard]] intp GetNumStrings( ) const
 	{
 		return m_Lookup.Count();
 	}
@@ -483,12 +480,12 @@ inline void CUtlSymbolTableLargeBase<TreeType, CASEINSENSITIVE, POOL_SIZE>::Remo
 }
 
 // Case-sensitive
-typedef CUtlSymbolTableLargeBase< CNonThreadsafeTree< false >, false > CUtlSymbolTableLarge;
+using CUtlSymbolTableLarge = CUtlSymbolTableLargeBase<CNonThreadsafeTree<false>, false>;
 // Case-insensitive
-typedef CUtlSymbolTableLargeBase< CNonThreadsafeTree< true >, true > CUtlSymbolTableLarge_CI;
+using CUtlSymbolTableLarge_CI = CUtlSymbolTableLargeBase<CNonThreadsafeTree<true>, true>;
 // Multi-threaded case-sensitive
-typedef CUtlSymbolTableLargeBase< CThreadsafeTree< false >, false > CUtlSymbolTableLargeMT;
+using CUtlSymbolTableLargeMT = CUtlSymbolTableLargeBase<CThreadsafeTree<false>, false>;
 // Multi-threaded case-insensitive
-typedef CUtlSymbolTableLargeBase< CThreadsafeTree< true >, true > CUtlSymbolTableLargeMT_CI;
+using CUtlSymbolTableLargeMT_CI = CUtlSymbolTableLargeBase<CThreadsafeTree<true>, true>;
 
 #endif // UTLSYMBOLLARGE_H

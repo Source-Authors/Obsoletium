@@ -352,7 +352,7 @@ public:
 	void CommentPrintf( const char *fmt, ... )
 	{
 		va_list args;
-		va_start( args, fmt );
+		va_start( args, fmt ); //-V2019 //-V2018
 		
 		size_t len = strlen( m_errorText );
 		V_vsnprintf( m_errorText + len, sizeof( m_errorText ) - len, fmt, args );
@@ -559,7 +559,7 @@ public:
 				if ( var->IsCommand() )
 					continue;
 
-				ConVar *pCvar = ( ConVar * )var;
+				const ConVar *pCvar = ( const ConVar * )var;
 				if ( pCvar->IsFlagSet( FCVAR_SERVER_CANNOT_QUERY | FCVAR_PROTECTED ) )
 					continue;
 
@@ -1694,16 +1694,17 @@ bool CEngineAPI::ModInit( const char *pModName, const char *pGameDir )
 	// FIXME: Deal with initial window width + height better
 	int width = g_pMaterialSystemConfig->m_VideoMode.m_Width;
 	int height = g_pMaterialSystemConfig->m_VideoMode.m_Height;
+	int refreshRate = g_pMaterialSystemConfig->m_VideoMode.m_RefreshRate;
 
 	bool bWindowed = g_pMaterialSystemConfig->Windowed() ||
 		// at init time we never want to start up full screen
 		g_pMaterialSystemConfig->m_nVRModeAdapter != UINT_MAX;
-	bool bBorderless = g_pMaterialSystemConfig->Borderless() ||
+	bool bBorderless = g_pMaterialSystemConfig->NoWindowBorder() ||
 		// at init time we never want to start up full screen
 		g_pMaterialSystemConfig->m_nVRModeAdapter != UINT_MAX;
 
 	return videomode &&
-		   videomode->CreateGameWindow( width, height, bWindowed, bBorderless );
+		   videomode->CreateGameWindow( width, height, refreshRate, bWindowed, bBorderless );
 }
 
 void CEngineAPI::ModShutdown()

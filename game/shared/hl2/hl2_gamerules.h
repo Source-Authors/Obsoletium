@@ -76,6 +76,11 @@ private:
 	virtual float			GetAmmoDamage( CBaseEntity *pAttacker, CBaseEntity *pVictim, int nAmmoType );
 
 	virtual bool			ShouldBurningPropsEmitLight();
+
+#ifdef GAME_DLL
+	bool					IsOfficialMap() override;
+#endif
+
 public:
 
 	bool AllowDamage( CBaseEntity *pVictim, const CTakeDamageInfo &info );

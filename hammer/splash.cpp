@@ -6,6 +6,7 @@
 
 #include "stdafx.h"
 #include "Splash.h"
+#include "windows/bitmap_scale.h"
 
 #include "resource.h"
 
@@ -273,11 +274,16 @@ BOOL CSplashWnd::PreTranslateAppMessage(MSG* pMsg)
 		return FALSE;
 
 	// If we get a keyboard or mouse message, hide the splash screen.
-	if (pMsg->message == WM_KEYDOWN ||
+	// dimhotepus: React on WM_INPUT, too.
+	if (pMsg->message == WM_INPUT ||
+	    pMsg->message == WM_KEYDOWN ||
 	    pMsg->message == WM_SYSKEYDOWN ||
 	    pMsg->message == WM_LBUTTONDOWN ||
 	    pMsg->message == WM_RBUTTONDOWN ||
 	    pMsg->message == WM_MBUTTONDOWN ||
+		// dimhotepus: Honor X button and mouse wheel.
+	    pMsg->message == WM_XBUTTONDOWN ||
+	    pMsg->message == WM_MOUSEHWHEEL ||
 	    pMsg->message == WM_NCLBUTTONDOWN ||
 	    pMsg->message == WM_NCRBUTTONDOWN ||
 	    pMsg->message == WM_NCMBUTTONDOWN)
@@ -300,7 +306,22 @@ BOOL CSplashWnd::Create(CWnd* pParentWnd /*= NULL*/)
 	if (!m_bitmap.LoadBitmap(IDB_SPLASH))
 		return FALSE;
 
+	const unsigned dpi = ::GetDpiForWindow(pParentWnd->GetSafeHwnd());
+
 	BITMAP bm;
+    m_bitmap.GetBitmap(&bm);
+
+	HBITMAP scaledBitmap = se::windows::ui::ScaleBitmapForDpi(
+		static_cast<HBITMAP>(m_bitmap.GetSafeHandle()),
+		USER_DEFAULT_SCREEN_DPI,
+		USER_DEFAULT_SCREEN_DPI,
+		dpi,
+		dpi);
+
+	// destroy old.
+	m_bitmap.DeleteObject();
+	// attach makes owner, no need to delete.
+	m_bitmap.Attach(scaledBitmap);
 	m_bitmap.GetBitmap(&bm);
 
 	return CreateEx(0,

@@ -75,7 +75,7 @@ void CServerReplayContext::CleanTmpDir()
 
 	Log( "Cleaning files from temp dir, \"%s\" ...", SV_GetTmpDir() );
 
-	FileFindHandle_t hFind;
+	FileFindHandle_t hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 	CFmtStr fmtPath( "%s*", SV_GetTmpDir() );
 	const char *pFilename = g_pFullFileSystem->FindFirst( fmtPath.Access(), &hFind );
 	while ( pFilename )

@@ -21,6 +21,8 @@
 #include "bspflags.h"
 #include "worldvertextransitionfixup.h"
 
+#include "scoped_app_locale.h"
+
 extern float		g_maxLightmapDimension;
 
 char		source[512];
@@ -893,6 +895,29 @@ void PrintCommandLine( int argc, char **argv )
 
 int RunVBSP( int argc, char **argv )
 {
+	InstallSpewFunction();
+	SpewActivate( "developer", 1 );
+
+#ifdef PLATFORM_64BITS
+	Msg( "Valve Software - vbsp [64 bit] (%s)\n", __DATE__ );
+#else
+	Msg( "Valve Software - vbsp (%s)\n", __DATE__ );
+#endif
+
+	// dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+	//
+	// Printf/sscanf functions expect en_US UTF8 localization.
+	//
+	// Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+	// supports using a UTF-8 code page.
+	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+		Warning("setlocale('%s') failed, current locale is '%s'.\n",
+			kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+	}
+
 	CommandLine()->CreateCmdLine( argc, argv );
 	const ScopedFileSystem scopedFileSystem( argv[ argc - 1 ] );
 
@@ -907,21 +932,12 @@ int RunVBSP( int argc, char **argv )
 
 	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
 
-	InstallSpewFunction();
-	SpewActivate( "developer", 1 );
-
 	// Maintaining legacy behavior here to avoid breaking tools:
 	// regardless of the extension we are passed, we strip it to get the
 	// "source" name, and append extensions as desired...
 	char mapFile[MAX_FILEPATH];
 	V_strcpy_safe( mapFile, source );
 	V_strcat_safe( mapFile, ".bsp" );
-
-#ifdef PLATFORM_64BITS
-	Msg( "Valve Software - vbsp [64 bit] (%s)\n", __DATE__ );
-#else
-	Msg( "Valve Software - vbsp (%s)\n", __DATE__ );
-#endif
 
 	int i;
 	for (i = 1; i < argc; i++)

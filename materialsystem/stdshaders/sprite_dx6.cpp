@@ -231,6 +231,7 @@ BEGIN_SHADER( Sprite_DX6,
 			}
 			DYNAMIC_STATE
 			{
+				// dimhotepus: Correctly set alpha.
 				SetColorState( COLOR, true );
 				BindTexture( SHADER_SAMPLER0, BASETEXTURE, FRAME );
 			}

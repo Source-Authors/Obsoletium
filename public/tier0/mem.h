@@ -2,12 +2,12 @@
 //
 // Memory allocation!
 
-#ifndef TIER0_MEM_H_
-#define TIER0_MEM_H_
+#ifndef SE_PUBLIC_TIER0_MEM_H_
+#define SE_PUBLIC_TIER0_MEM_H_
 
 #include <cstddef>
 
-#include "tier0/platform.h"
+#include "platform.h"
 
 #if !defined(STATIC_TIER0) && !defined(_STATIC_LINKED)
 
@@ -38,4 +38,4 @@ MEM_INTERFACE void ZeroMemory( void *mem, size_t length );
 #endif
 
 
-#endif  // TIER0_MEM_H_
+#endif  // !SE_PUBLIC_TIER0_MEM_H_

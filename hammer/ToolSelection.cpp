@@ -134,8 +134,8 @@ GDinputvariable *Selection3D::ChooseEyedropperVar(CMapView *pView, CUtlVector<GD
 	//
 	CMenu menu;
 	menu.CreatePopupMenu();
-	int nVarCount = VarList.Count();
-	for (int nVar = 0; nVar < nVarCount; nVar++)
+	intp nVarCount = VarList.Count();
+	for (intp nVar = 0; nVar < nVarCount; nVar++)
 	{
 		GDinputvariable *pVar = VarList.Element(nVar);
 		menu.AppendMenu(MF_STRING, nVar + 1, pVar->GetLongName());
@@ -277,7 +277,7 @@ void Selection3D::TransformSelection(void)
 {
 	// Transform the selected objects.
 	const CMapObjectList *pSelList = m_pSelection->GetList();
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		CMapClass *pobj = pSelList->Element(i);
 		pobj->Transform( GetTransformMatrix() );
@@ -294,7 +294,7 @@ void Selection3D::TransformLogicalSelection( const Vector2D &vecTranslation )
 {
 	// Transform the selected objects.
 	const CMapObjectList *pSelList = m_pSelection->GetList();
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		CMapClass *pObj = pSelList->Element(i);
 		Vector2D vecNewPosition;
@@ -315,7 +315,7 @@ void Selection3D::TransformLogicalSelection( const Vector2D &vecTranslation )
 //			pSel - 
 // Output : Returns TRUE to keep enumerating.
 //-----------------------------------------------------------------------------
-static BOOL DrawObject(CMapClass *pobj, CRender *pRender)
+static BOOL DrawObject2D(CMapClass *pobj, CRender2D *pRender)
 {
 	if ( !pobj->IsVisible() )
 		return true;
@@ -323,15 +323,30 @@ static BOOL DrawObject(CMapClass *pobj, CRender *pRender)
 	// switch selection mode so transformed object is drawn normal
 	pobj->SetSelectionState( SELECT_NONE );
 
-	CRender2D *pRender2D = dynamic_cast<CRender2D*>(pRender);
+	pobj->Render2D(pRender);
 
-	if ( pRender2D )
-		pobj->Render2D(pRender2D);
+	pobj->SetSelectionState( SELECT_MODIFY );
 
-	CRender3D *pRender3D = dynamic_cast<CRender3D*>(pRender);
+	return TRUE;
+}
 
-	if ( pRender3D )
-		pobj->Render3D(pRender3D);
+
+//-----------------------------------------------------------------------------
+// Purpose: Draws objects when they are selected. Odd, how this code is stuck
+//			in this obscure place, away from all the other 2D rendering code.
+// Input  : pobj - Object to draw.
+//			pSel - 
+// Output : Returns TRUE to keep enumerating.
+//-----------------------------------------------------------------------------
+static BOOL DrawObject3D(CMapClass *pobj, CRender3D *pRender)
+{
+	if ( !pobj->IsVisible() )
+		return true;
+
+	// switch selection mode so transformed object is drawn normal
+	pobj->SetSelectionState( SELECT_NONE );
+
+	pobj->Render3D(pRender);
 
 	pobj->SetSelectionState( SELECT_MODIFY );
 
@@ -379,12 +394,12 @@ void Selection3D::RenderTool2D(CRender2D *pRender)
 		pRender->BeginLocalTransfrom( matrix );
 
 		const CMapObjectList *pSelList = m_pSelection->GetList();
-		for (int i = 0; i < pSelList->Count(); i++)
+		for (intp i = 0; i < pSelList->Count(); i++)
 		{
 			CMapClass *pobj = pSelList->Element(i);
 			
-			DrawObject(pobj, pRender);
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObject, (DWORD_PTR)pRender);
+			DrawObject2D(pobj, pRender);
+			pobj->EnumChildren(&DrawObject2D, pRender);
 		}
 
 		pRender->EndLocalTransfrom();
@@ -416,12 +431,12 @@ void Selection3D::RenderToolLogical( CRender2D *pRender )
 		pRender->BeginLocalTransfrom( matrix );
 
 		const CMapObjectList *pSelList = m_pSelection->GetList();
-		for (int i = 0; i < pSelList->Count(); i++)
+		for (intp i = 0; i < pSelList->Count(); i++)
 		{
 			CMapClass *pobj = pSelList->Element(i);
 			
 			DrawObjectLogical(pobj, pRender);
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObjectLogical, (DWORD_PTR)pRender);
+			pobj->EnumChildren(&DrawObjectLogical, pRender);
 		}
 
 		pRender->EndLocalTransfrom();
@@ -486,12 +501,12 @@ void Selection3D::RenderTool3D(CRender3D *pRender)
 		pRender->BeginLocalTransfrom( matrix );
 
 		
-		for (int i = 0; i < pSelList->Count(); i++)
+		for (intp i = 0; i < pSelList->Count(); i++)
 		{
 			CMapClass *pobj = pSelList->Element(i);
 
-			DrawObject(pobj, pRender);
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)DrawObject, (DWORD_PTR)pRender);
+			DrawObject3D(pobj, pRender);
+			pobj->EnumChildren(&DrawObject3D, pRender);
 		}
 
 		pRender->EndLocalTransfrom();
@@ -514,7 +529,7 @@ CBaseTool *Selection3D::GetToolObject( CMapView2D *pView, const Vector2D &vPoint
 {
 
 	const CMapObjectList *pSelList = m_pSelection->GetList();
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		CMapClass *pObject = pSelList->Element(i);
 
@@ -543,7 +558,7 @@ CBaseTool *Selection3D::GetToolObject( CMapView2D *pView, const Vector2D &vPoint
 CBaseTool *Selection3D::GetToolObjectLogical( CMapViewLogical *pView, const Vector2D &vPoint, bool bAttach )
 {
 	const CMapObjectList *pSelList = m_pSelection->GetList();
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		CMapClass *pObject = pSelList->Element(i);
 
@@ -1634,7 +1649,7 @@ void Selection3D::EyedropperPick(CMapView *pView, CMapClass *pObject)
 
 	const CMapObjectList *pSelList = m_pSelection->GetList();
 
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		pObject = pSelList->Element(i);
 		pEntity = dynamic_cast <CMapEntity *> (pObject);
@@ -1658,7 +1673,7 @@ void Selection3D::EyedropperPick(CMapView *pView, CMapClass *pObject)
 	//
 	// Prompt for what keyvalue in the selected entities we are filling out.
 	//
-	int nCount = VarList.Count();
+	intp nCount = VarList.Count();
 	if (nCount <= 0)
 	{
 		//
@@ -1687,7 +1702,7 @@ void Selection3D::EyedropperPick(CMapView *pView, CMapClass *pObject)
 	//
 	// Apply the key to all selected entities with the chosen keyvalue.
 	//
-	for (int i = 0; i < pSelList->Count(); i++)
+	for (intp i = 0; i < pSelList->Count(); i++)
 	{
 		pObject = pSelList->Element(i);
 	

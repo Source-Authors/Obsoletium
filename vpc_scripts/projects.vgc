@@ -53,11 +53,6 @@ $Project "bspzip"
 	"utils\bspzip\bspzip.vpc" [$WINDOWS]
 }
 
-$Project "bugreporter"
-{
-	"utils\bugreporter\bugreporter.vpc" [$WINDOWS]
-}
-
 $Project "bugreporter_public"
 {
 	"utils\bugreporter_public\bugreporter_public.vpc" [$WINDOWS||$POSIX]
@@ -66,11 +61,6 @@ $Project "bugreporter_public"
 $Project "bugreporter_text"
 {
 	"utils\bugreporter_text\bugreporter_text.vpc" [$WINDOWS]
-}
-
-$Project "bugreporter_filequeue"
-{
-	"utils\bugreporter_filequeue\bugreporter_filequeue.vpc" [$WINDOWS||$POSIX]
 }
 
 // dimhotepus: Thirdparty.
@@ -205,11 +195,6 @@ $Project "dumpmatsyshelp"
 
 $Include "utils\dx_proxy\dx_proxy_all.vgc"
 
-$Project "dxsupportclean"
-{
-	"utils\dxsupportclean\dxsupportclean.vpc" [$WINDOWS]
-}
-
 $Project "elementviewer"
 {
 	"utils\elementviewer\elementviewer.vpc" [$WINDOWS]
@@ -255,9 +240,14 @@ $Project "filesystem_steam"
         "filesystem\filesystem_steam.vpc" [$WINDOWS||$POSIX]
 }
 
-$Project "finddbgdll"
+$Project "vfont"
 {
-	"utils\finddbgdll\finddbgdll.vpc" [$WINDOWS]
+	"utils/vfont/vfont.vpc" [$WINDOWS]
+}
+
+$Project "vfont_decompiler"
+{
+	"utils/vfont/vfont_decompiler.vpc" [$WINDOWS]
 }
 
 $Project "floatbm"
@@ -273,11 +263,6 @@ $Project "foundry"
 $Project "gameevents"
 {
 	"tools\gameevents\gameevents.vpc" [$WINDOWS]
-}
-
-$Project "gamestats_reader"
-{
-	"utils\gamestats_reader\gamestats_reader.vpc" [$WINDOWS]
 }
 
 $Project "gameUI"
@@ -323,11 +308,6 @@ $Project "gcsdk_gc"
 $Project "genrandomvectors"
 {
 	"utils\genrandomvectors\genrandomvectors.vpc" [$WINDOWS]
-}
-
-$Project "getbugs"
-{
-	"utils\getbugs\getbugs.vpc" [$WINDOWS]
 }
 
 $Project "glview"
@@ -560,11 +540,6 @@ $Project "mdlinfo"
 	"utils\mdlinfo\mdlinfo.vpc" [$WINDOWS]
 }
 
-$Project "mdmpRipper"
-{
-	"utils\mdmpRipper\mdmpRipper.vpc" [$WINDOWS]
-}
-
 $Project "mkentitypatch"
 {
 	"utils\mkentitypatch\mkentitypatch.vpc" [$WINDOWS]
@@ -696,11 +671,6 @@ $Project "printbones"
 	"utils\printbones\printbones.vpc" [$WINDOWS]
 }
 
-$Project "processgamestats"
-{
-	"devtools\processgamestats\processgamestats.vpc" [$WINDOWS]
-}
-
 $Project "psdinfo"
 {
 	"utils\psdinfo\psdinfo.vpc" [$WINDOWS]
@@ -749,11 +719,6 @@ $Project "rpt"
 $Project "rt_test"
 {
 	"unittests\rt_test\rt_test.vpc" [$WINDOWS]
-}
-
-$Project "runme"
-{
-	"utils\runme\runme.vpc" [$WINDOWS]
 }
 
 $Project "sampletool"
@@ -836,9 +801,9 @@ $Project "togl"
 	"togl/togl.vpc" [$GL]
 }
 
-$Project "shaderapidx10"
+$Project "shaderapidx11"
 {
-	"materialsystem\shaderapidx9\shaderapidx10.vpc" [$WINDOWS]
+	"materialsystem\shader_api_dx11\shaderapidx11.vpc" [$WINDOWS]
 }
 
 $Project "shaderapiempty"
@@ -986,11 +951,6 @@ $Project "SteamBackup"
 	"SteamBackup\SteamBackup.vpc" [$WINDOWS]
 }
 
-$Project "SteamDebugHelper"
-{
-	"utils\SteamDebugHelper\SteamDebugHelper.vpc" [$WINDOWS]
-}
-
 $Project "SteamUI"
 {
 	"SteamUI\SteamUI.vpc" [$WINDOWS]
@@ -1005,16 +965,6 @@ $Project "studiorender"
 {
 	"studiorender\studiorender.vpc" [$WINDOWS||$POSIX]
 }
-
-$Project "SymbolStoreUpdate"
-{
-	"utils\SymbolStoreUpdate\SymbolStoreUpdate.vpc" [$WINDOWS]
-}
-
-//$Project "test"
-//{
-//	"shell\uninstall\uninstalltester\test.vpc" [$WINDOWS]
-//}
 
 $Project "test_binaries"
 {
@@ -1154,11 +1104,6 @@ $Project "valvemaya_maya2012"
 $Project "valvemaya_maya2013"
 {
 	"sdktools\maya\valvemaya\valvemaya_maya2013.vpc" [$WINDOWS]
-}
-
-$Project "valvepython_python2.5"
-{
-	"sdktools\python\valvePython\valvePython_python2.5.vpc" [$WINDOWS]
 }
 
 $Project "vaudio_miles"
@@ -1321,22 +1266,6 @@ $Project "voice_tweak"
 	"utils\voice_tweak\voice_tweak.vpc" [$WINDOWS]
 }
 
-$Project "vp_python2.5"
-{
-	"sdktools\python\vp\vp_python2.5.vpc" [$WINDOWS]
-}
-
-$Project "vp4"
-{
-	"utils\vp4\vp4.vpc" [$WINDOWS]
-}
-
-$Project "vpccrccheck"
-{
-	"utils/vpccrccheck/vpccrccheck.vpc"   [$WINDOWS]
-}
-
-
 $Project "vphysics"
 {
 	"vphysics\vphysics.vpc"  [$WINDOWS||$POSIX]
@@ -1362,9 +1291,10 @@ $Project "vrad_launcher"
 	"utils\vrad_launcher\vrad_launcher.vpc" [$WINDOWS]
 }
 
-$Project "vs_python2.5"
+$Project "vscript"
 {
-	"sdktools\python\vs\vs_python2.5.vpc" [$WINDOWS]
+	"vscript/vscript.vpc"		[($WINDOWS || $POSIX) && !$SOB]
+	"vscript/vscript_sob.vpc"	[($WINDOWS) && $SOB]
 }
 
 $Project "vsblendeditor_maya2009"
@@ -1395,11 +1325,6 @@ $Project "vsdmxio_maya2012"
 $Project "vsdmxio_maya2013"
 {
 	"sdktools\maya\vsdmxio\vsdmxio_maya2013.vpc" [$WINDOWS]
-}
-
-$Project "vslib_python2.5"
-{
-	"sdktools\python\vs\vslib_python2.5.vpc" [$WINDOWS]
 }
 
 $Project "vsmaster_maya2009"
@@ -1615,11 +1540,6 @@ $Project "WaitAndRestart"
 $Project "xwad"
 {
 	"utils\xwad\xwad.vpc" [$WINDOWS]
-}
-
-$Project "ZipAlign"
-{
-	"utils\zipalign\ZipAlign.vpc" [$WINDOWS]
 }
 
 $Project "socketlib"

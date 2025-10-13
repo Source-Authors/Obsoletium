@@ -43,13 +43,13 @@
 #include "common_flashlight_fxc.h"
 #include "common_ps_fxc.h"
 
-const HALF4 g_SelfIllumTint						: register( c7 );
-static const HALF g_OverbrightFactor = 2.0f;
+const float4 g_SelfIllumTint						: register( c7 );
+static const float g_OverbrightFactor = 2.0f;
 
-const HALF3 g_EyePos							: register( c10 );
-const HALF4 g_FogParams							: register( c11 );
+const float3 g_EyePos							: register( c10 );
+const float4 g_FogParams						: register( c11 );
 
-const HALF3 g_FlashlightPos						: register( c15 );
+const float3 g_FlashlightPos					: register( c15 );
 // flashlightfixme: Move this math into the vertex shader.
 const float4x4 g_FlashlightWorldToTexture		: register( c16 );
 
@@ -64,15 +64,15 @@ sampler NormalizeSampler			: register( s6 );
 
 struct PS_INPUT
 {
-	HALF2 baseTexCoord				: TEXCOORD0;
-	HALF4 detailOrBumpTexCoord		: TEXCOORD1;	
-	HALF4 lightmapTexCoord1And2		: TEXCOORD2;	// CENTROID: TEXCOORD2	
-	HALF2 lightmapTexCoord3			: TEXCOORD3;	// CENTROID: TEXCOORD3
-	HALF4 worldPos_projPosZ			: TEXCOORD4;
-	HALF3x3 tangentSpaceTranspose	: TEXCOORD5;
+	float2 baseTexCoord				: TEXCOORD0;
+	float4 detailOrBumpTexCoord		: TEXCOORD1;	
+	float4 lightmapTexCoord1And2	: TEXCOORD2;	// CENTROID: TEXCOORD2	
+	float2 lightmapTexCoord3		: TEXCOORD3;	// CENTROID: TEXCOORD3
+	float4 worldPos_projPosZ		: TEXCOORD4;
+	float3x3 tangentSpaceTranspose	: TEXCOORD5;
 	//		tangentSpaceTranspose	: TEXCOORD6;
 	//		tangentSpaceTranspose	: TEXCOORD7;
-	HALF4 vertexColor				: COLOR;
+	float4 vertexColor				: COLOR;
 };
 
 
@@ -86,18 +86,18 @@ float4 main( PS_INPUT i ) : COLOR
 	bool bDetailAlphaMaskBaseTexture = DETAIL_ALPHA_MASK_BASE_TEXTURE ? true : false;
 	bool bFlashlight = FLASHLIGHT ? true : false;
 
-	HALF3 lightmapColor1 = HALF3( 1.0f, 1.0f, 1.0f );
-	HALF3 lightmapColor2 = HALF3( 1.0f, 1.0f, 1.0f );
-	HALF3 lightmapColor3 = HALF3( 1.0f, 1.0f, 1.0f );
+	float3 lightmapColor1 = float3( 1.0f, 1.0f, 1.0f );
+	float3 lightmapColor2 = float3( 1.0f, 1.0f, 1.0f );
+	float3 lightmapColor3 = float3( 1.0f, 1.0f, 1.0f );
 	if( bBumpmap && bDiffuseBumpmap )
 	{
-		HALF2 bumpCoord1;
-		HALF2 bumpCoord2;
-		HALF2 bumpCoord3;
+		float2 bumpCoord1;
+		float2 bumpCoord2;
+		float2 bumpCoord3;
 		ComputeBumpedLightmapCoordinates( i.lightmapTexCoord1And2, i.lightmapTexCoord3.xy,
 			bumpCoord1, bumpCoord2, bumpCoord3 );
 		
-		HALF4 lightmapSample1 = tex2D( LightmapSampler, bumpCoord1 );
+		float4 lightmapSample1 = tex2D( LightmapSampler, bumpCoord1 );
 		lightmapColor1 = lightmapSample1.rgb;
 		lightmapColor2 = tex2D( LightmapSampler, bumpCoord2 );
 		lightmapColor3 = tex2D( LightmapSampler, bumpCoord3 );
@@ -106,19 +106,19 @@ float4 main( PS_INPUT i ) : COLOR
 	{
 		if( !bFlashlight )
 		{
-			HALF2 bumpCoord1 = ComputeLightmapCoordinates( i.lightmapTexCoord1And2, i.lightmapTexCoord3.xy );
-			HALF4 lightmapSample1 = tex2D( LightmapSampler, bumpCoord1 );
+			float2 bumpCoord1 = ComputeLightmapCoordinates( i.lightmapTexCoord1And2, i.lightmapTexCoord3.xy );
+			float4 lightmapSample1 = tex2D( LightmapSampler, bumpCoord1 );
 			lightmapColor1 = lightmapSample1.rgb;
 		}
 	}
 
-	HALF4 detailColor = HALF4( 1.0f, 1.0f, 1.0f, 1.0f );
+	float4 detailColor = float4( 1.0f, 1.0f, 1.0f, 1.0f );
 	if( bDetailTexture )
 	{
 		detailColor = tex2D( DetailSampler, i.detailOrBumpTexCoord.xy );
 	}
 
-	HALF4 baseColor = HALF4( 1.0f, 1.0f, 1.0f, 1.0f );
+	float4 baseColor = float4( 1.0f, 1.0f, 1.0f, 1.0f );
 	baseColor = tex2D( BaseTextureSampler, i.baseTexCoord );
 	if ( bDetailAlphaMaskBaseTexture )
 	{
@@ -131,16 +131,16 @@ float4 main( PS_INPUT i ) : COLOR
 		baseColor.rgb = lerp( baseColor, detailColor, detailColor.a );
 	}
 	
-	HALF3 normal = HALF3( 0.0f, 0.0f, 1.0f );
+	float3 normal = float3( 0.0f, 0.0f, 1.0f );
 	if( bBumpmap )
 	{
-		HALF3 normalTexel;
+		float3 normalTexel;
 		normalTexel = tex2D( BumpmapSampler, i.detailOrBumpTexCoord.xy );
 		normal = 2.0 * normalTexel - 1.0;
 	}
 
-	HALF3 albedo = HALF3( 1.0f, 1.0f, 1.0f );
-	HALF alpha = 1.0f;
+	float3 albedo = float3( 1.0f, 1.0f, 1.0f );
+	float alpha = 1.0f;
 	albedo *= baseColor;
 	if( !bSelfIllum )
 	{
@@ -151,11 +151,11 @@ float4 main( PS_INPUT i ) : COLOR
 	albedo *= i.vertexColor;
 	alpha *= i.vertexColor.a; // not sure about this one
 
-	HALF3 diffuseLighting;
+	float3 diffuseLighting;
 	if( bFlashlight )
 	{
 		float3 worldSpaceNormal;
-		// Make the unbumped version not so fucking stupid and not need tangentSpaceTranspose you knob.
+		// Make the unbumped version not need tangentSpaceTranspose
 		worldSpaceNormal = mul( normal, i.tangentSpaceTranspose );
 
 		int nShadowSampleLevel = 0;
@@ -195,16 +195,16 @@ float4 main( PS_INPUT i ) : COLOR
 		diffuseLighting *= g_OverbrightFactor;
 	}
 
-	HALF3 diffuseComponent = albedo * diffuseLighting;
+	float3 diffuseComponent = albedo * diffuseLighting;
 
 	if( bSelfIllum )
 	{
-		HALF3 selfIllumComponent = g_SelfIllumTint * albedo;
+		float3 selfIllumComponent = g_SelfIllumTint * albedo;
 		diffuseComponent = lerp( diffuseComponent, selfIllumComponent, baseColor.a );
 	}
 
-	HALF3 specularLighting = HALF3( 0.0f, 0.0f, 0.0f );
-	HALF3 result = diffuseComponent + specularLighting;
+	float3 specularLighting = float3( 0.0f, 0.0f, 0.0f );
+	float3 result = diffuseComponent + specularLighting;
 
 	float fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos.z, i.worldPos_projPosZ.z, i.worldPos_projPosZ.w );
 

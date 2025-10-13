@@ -90,7 +90,7 @@ static CurveNameMap_t g_CurveNameMap[] =
 };
 
 // Turn enum into string and vice versa
-int Interpolator_CurveTypeForName( const char *name )
+unsigned short Interpolator_CurveTypeForName( const char *name )
 {
 	char sz[ 128 ];
 	V_strcpy_safe( sz, name );
@@ -98,7 +98,7 @@ int Interpolator_CurveTypeForName( const char *name )
 	unsigned char leftcurve = 0;
 	unsigned char rightcurve = 0;
 
-	intp skip = ssize( "curve_" ) - 1;
+	constexpr intp skip = ssize( "curve_" ) - 1;
 
 	if ( !Q_strnicmp( sz, "curve_", skip ) )
 	{

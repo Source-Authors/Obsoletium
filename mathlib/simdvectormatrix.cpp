@@ -27,7 +27,7 @@ void CSIMDVectorMatrix::CreateFromRGBA_FloatImageData(int srcwidth, int srcheigh
 	for(int y=0;y<srcheight;y++)
 	{
 		float const *data_in=srcdata;
-		float *data_out=reinterpret_cast<float *>( p_write_ptr );
+		auto *data_out=reinterpret_cast<float *>( p_write_ptr );
 		// copy full input blocks
 		for(int x=0;x<n_vectors_per_source_line;x++)
 		{

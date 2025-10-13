@@ -36,38 +36,27 @@ vphysics_units_t g_PhysicsUnits =
 
 void ConvertBoxToIVP( const Vector &mins, const Vector &maxs, Vector &outmins, Vector &outmaxs )
 {
-	float tmpZ;
-
-	tmpZ = mins.y;
+	const float tmpZ = mins.y;
 	outmins.y = -HL2IVP(mins.z); //-V537
 	outmins.z = HL2IVP(tmpZ);
 	outmins.x = HL2IVP(mins.x);
-	tmpZ = maxs.y;
+
+	const float tmpZZ = maxs.y;
 	outmaxs.y = -HL2IVP(maxs.z); //-V537
-	outmaxs.z = HL2IVP(tmpZ);
+	outmaxs.z = HL2IVP(tmpZZ);
 	outmaxs.x = HL2IVP(maxs.x);
 
-	tmpZ = outmaxs.y;
+	const float tmpZZZ = outmaxs.y;
 	outmaxs.y = outmins.y;
-	outmins.y = tmpZ;
+	outmins.y = tmpZZZ;
 }
 
 
 void ConvertMatrixToIVP( const matrix3x4_t& matrix, IVP_U_Matrix &out )
 {
-	Vector forward, left, up;
-
-	forward.x = matrix[0][0];
-	forward.y = matrix[1][0];
-	forward.z = matrix[2][0];
-
-	left.x = matrix[0][1];
-	left.y = matrix[1][1];
-	left.z = matrix[2][1];
-
-	up.x = matrix[0][2];
-	up.y = matrix[1][2];
-	up.z = matrix[2][2];
+	Vector forward{matrix[0][0], matrix[1][0], matrix[2][0]};
+	Vector left{matrix[0][1], matrix[1][1], matrix[2][1]};
+	Vector up{matrix[0][2], matrix[1][2], matrix[2][2]};
 
 	up = -up;
 
@@ -296,7 +285,6 @@ void TransformLocalToIVP( const IVP_U_Point &pointIn, IVP_U_Point &pointOut, IVP
 	}
 #else
 	const IVP_U_Matrix *pMatrix = GetTmpObjectMatrix( pObject );
-
 	if ( translate )
 	{
 		pMatrix->inline_vmult4( &pointIn, &pointOut );
@@ -326,7 +314,6 @@ void TransformLocalToIVP( const IVP_U_Float_Point &pointIn, IVP_U_Point &pointOu
 #else
 	const IVP_U_Matrix *pMatrix = GetTmpObjectMatrix( pObject );
 	IVP_U_Float_Point out;
-
 	if ( translate )
 	{
 		pMatrix->inline_vmult4( &pointIn, &out );
@@ -346,7 +333,7 @@ void TransformLocalToIVP( const IVP_U_Float_Point &pointIn, IVP_U_Float_Point &p
 	pointOut.set( &tmpOut );
 }
 
-static char axisMap[] = {0,2,1,3};
+static constexpr inline char axisMap[] = {0,2,1,3};
 
 int ConvertCoordinateAxisToIVP( int axisIndex )
 {

@@ -33,7 +33,6 @@ public:
 
 private:
 	int m_iTextureID;
-	int m_iImageWidth, m_iImageHeight;
 	bool m_bHasValidTexture, m_bLoadedTexture;
 	char m_szTGAName[256];
 };

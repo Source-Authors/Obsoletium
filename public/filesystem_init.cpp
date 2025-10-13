@@ -390,9 +390,9 @@ static bool FileSystem_GetBaseDir( char (&baseDir)[max_size] )
 	return false;
 }
 
-static bool LaunchVConfig()
+template<size_t size>
+static bool LaunchVConfig(OUT_Z_ARRAY char (&vconfigExe)[size])
 {
-	char vconfigExe[MAX_PATH];
 	if ( !FileSystem_GetExecutableDir( vconfigExe ) )
 		return false;
 
@@ -429,9 +429,10 @@ static FSReturnCode_t SetupFileSystemError( bool bRunVConfig, FSReturnCode_t ret
 		 g_FileSystemErrorMode.load(std::memory_order::memory_order_relaxed) == FS_ERRORMODE_VCONFIG &&
 		 !CommandLine()->FindParm( CMDLINEOPTION_NOVCONFIG ) && !GetVProjectCmdLineValue() )
 	{
-		if ( !LaunchVConfig() )
+		char vconfigExe[MAX_PATH];
+		if ( !LaunchVConfig( vconfigExe ) )
 		{
-			Warning( "Unable to launch VConfig.\n" );
+			Warning( "Unable to launch VConfig executable from '%s' to configure file system paths.\n", vconfigExe );
 			return FS_UNABLE_TO_INIT;
 		}
 	}
@@ -461,20 +462,20 @@ static FSReturnCode_t LoadGameInfoFile(
 	pMainFile = ReadKeyValuesFile( gameinfoFilename );
 	if ( !pMainFile )
 	{
-		return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, "%s is missing.", gameinfoFilename );
+		return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, "Game info file '%s' is missing.", gameinfoFilename );
 	}
 
 	auto *pFileSystemInfo = pMainFile->FindKey( "FileSystem" );
 	if ( !pFileSystemInfo )
 	{
-		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "%s is not a valid format.", gameinfoFilename );
+		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "Game info file '%s' is not a valid format.", gameinfoFilename );
 	}
 
 	// Now read in all the search paths.
 	pSearchPaths = pFileSystemInfo->FindKey( "SearchPaths" );
 	if ( !pSearchPaths )
 	{
-		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "%s is not a valid format.", gameinfoFilename );
+		return SetupFileSystemError( true, FS_INVALID_GAMEINFO_FILE, "Game info file '%s' is not a valid format.", gameinfoFilename );
 	}
 
 	return FS_OK;
@@ -638,7 +639,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		}
 		else
 		{
-			FileFindHandle_t findHandle = 0;
+			FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 			const char *pszFoundShortName = initInfo.m_pFileSystem->FindFirst( szAbsSearchPath, &findHandle );
 			if ( pszFoundShortName )
 			{
@@ -960,7 +961,8 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutD
 ShowError:
 	return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, 
 		"Unable to find %s. Solutions:\n\n"
-		"1. Read http://www.valve-erc.com/srcsdk/faq.html#NoGameDir\n"
+		// dimhotepus: Change URL on from TF2 backport.
+		"1. Read https://developer.valvesoftware.com/wiki/Gameinfo.txt\n"
 		"2. Run vconfig to specify which game you're working on.\n"
 		"3. Add -game <path> on the command line where <path> is the directory that %s is in.\n",
 		GAMEINFO_FILENAME, GAMEINFO_FILENAME );
@@ -1098,14 +1100,14 @@ FSReturnCode_t FileSystem_LoadFileSystemModule( CFSLoadModuleInfo &fsInfo )
 		&fsInfo.m_pModule,
 		&fsInfo.m_pFileSystem ) )
 	{
-		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Can't load %s.", fsInfo.m_pFileSystemDLLName );
+		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "Can't load filesystem binary '%s'.", fsInfo.m_pFileSystemDLLName );
 	}
 
 	if ( !fsInfo.m_pFileSystem->Connect( fsInfo.m_ConnectFactory ) )
-		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "%s IFileSystem::Connect failed.", fsInfo.m_pFileSystemDLLName );
+		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "'%s' IFileSystem::Connect failed.", fsInfo.m_pFileSystemDLLName );
 
 	if ( fsInfo.m_pFileSystem->Init() != INIT_OK )
-		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "%s IFileSystem::Init failed.", fsInfo.m_pFileSystemDLLName );
+		return SetupFileSystemError( false, FS_UNABLE_TO_INIT, "'%s' IFileSystem::Init failed.", fsInfo.m_pFileSystemDLLName );
 
 	return FS_OK;
 }

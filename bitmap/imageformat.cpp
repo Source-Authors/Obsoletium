@@ -7,6 +7,7 @@
 #if defined( _WIN32 ) && !defined( DX_TO_GL_ABSTRACTION )
 #include "winlite.h"
 #include <d3d9types.h>
+#include <dxgiformat.h>
 #endif
 
 #include "bitmap/imageformat.h"
@@ -144,7 +145,7 @@ intp GetMemRequired( int width, int height, int depth, ImageFormat imageFormat, 
 
 	// Mipmap version
 	intp memSize = 0;
-	while ( 1 )
+	while ( true )
 	{
 		memSize += GetMemRequired( width, height, depth, imageFormat, false );
 		if ( width == 1 && height == 1 && depth == 1 )
@@ -230,7 +231,7 @@ int GetNumMipMapLevels( int width, int height, int depth )
 		return 0;
 
 	int numMipLevels = 1;
-	while( 1 )
+	while( true )
 	{
 		if( width == 1 && height == 1 && depth == 1 )
 			break;
@@ -284,32 +285,34 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 		return IMAGE_FORMAT_BGRA5551;
 	case D3DFMT_A4R4G4B4:
 		return IMAGE_FORMAT_BGRA4444;
+	case D3DFMT_A8:
+		return IMAGE_FORMAT_A8;
+	case D3DFMT_A8B8G8R8:
+		return IMAGE_FORMAT_RGBA8888;
+	case D3DFMT_A16B16G16R16:
+		return IMAGE_FORMAT_RGBA16161616;
 	case D3DFMT_L8:
 		return IMAGE_FORMAT_I8;
 	case D3DFMT_A8L8:
 		return IMAGE_FORMAT_IA88;
-	case D3DFMT_A8:
-		return IMAGE_FORMAT_A8;
+	case D3DFMT_V8U8:
+		return IMAGE_FORMAT_UV88;
+	case D3DFMT_X8L8V8U8:
+		return IMAGE_FORMAT_UVLX8888;
+	case D3DFMT_Q8W8V8U8:
+		return IMAGE_FORMAT_UVWQ8888;
+	case D3DFMT_A16B16G16R16F:
+		return IMAGE_FORMAT_RGBA16161616F;
+	case D3DFMT_R32F:
+		return IMAGE_FORMAT_R32F;
+	case D3DFMT_A32B32G32R32F:
+		return IMAGE_FORMAT_RGBA32323232F;
 	case D3DFMT_DXT1:
 		return IMAGE_FORMAT_DXT1;
 	case D3DFMT_DXT3:
 		return IMAGE_FORMAT_DXT3;
 	case D3DFMT_DXT5:
 		return IMAGE_FORMAT_DXT5;
-	case D3DFMT_V8U8:
-		return IMAGE_FORMAT_UV88;
-	case D3DFMT_Q8W8V8U8:
-		return IMAGE_FORMAT_UVWQ8888;
-	case D3DFMT_X8L8V8U8:
-		return IMAGE_FORMAT_UVLX8888;
-	case D3DFMT_A16B16G16R16F:
-		return IMAGE_FORMAT_RGBA16161616F;
-	case D3DFMT_A16B16G16R16:
-		return IMAGE_FORMAT_RGBA16161616;
-	case D3DFMT_R32F:
-		return IMAGE_FORMAT_R32F;
-	case D3DFMT_A32B32G32R32F:
-		return IMAGE_FORMAT_RGBA32323232F;
 	
 	SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
 	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
@@ -326,10 +329,10 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 		return IMAGE_FORMAT_NV_NULL;
 	MSVC_END_WARNING_OVERRIDE_SCOPE()
 	SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
-	case D3DFMT_D16:
-		return IMAGE_FORMAT_NV_DST16;
 	case D3DFMT_D24S8:
 		return IMAGE_FORMAT_NV_DST24;
+	case D3DFMT_D16:
+		return IMAGE_FORMAT_NV_DST16;
 	SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
 	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
 	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
@@ -355,31 +358,123 @@ ImageFormat D3DFormatToImageFormat( D3DFORMAT format )
 	}
 }
 
+// https://learn.microsoft.com/en-us/previous-versions//ff471324(v=vs.85)?redirectedfrom=MSDN
+ImageFormat DxgiFormatToImageFormat( DXGI_FORMAT format )
+{
+	switch ( format )
+	{
+	//case D3DFMT_R8G8B8:
+	//	return IMAGE_FORMAT_BGR888;
+	case DXGI_FORMAT_R32G32B32A32_FLOAT:
+		return IMAGE_FORMAT_RGBA32323232F;
+	case DXGI_FORMAT_R16G16B16A16_FLOAT:
+		return IMAGE_FORMAT_RGBA16161616F;
+	case DXGI_FORMAT_R16G16B16A16_UNORM:
+		return IMAGE_FORMAT_RGBA16161616;
+	case DXGI_FORMAT_R8G8B8A8_UNORM:
+		return IMAGE_FORMAT_RGBA8888;
+	case DXGI_FORMAT_R8G8B8A8_SNORM:
+		return IMAGE_FORMAT_UVWQ8888;
+	case DXGI_FORMAT_R32_FLOAT:
+		return IMAGE_FORMAT_R32F;
+	case DXGI_FORMAT_R8G8_SNORM:
+		return IMAGE_FORMAT_UV88;
+	case DXGI_FORMAT_D16_UNORM:
+		return IMAGE_FORMAT_NV_DST16;
+	// Use .r swizzle in the pixel shader to duplicate red
+	// to other components to get Direct3D 9 behavior.
+	case DXGI_FORMAT_R8_UNORM:
+		return IMAGE_FORMAT_I8;
+	case DXGI_FORMAT_A8_UNORM:
+		return IMAGE_FORMAT_A8;
+	case DXGI_FORMAT_BC1_UNORM:
+		return IMAGE_FORMAT_DXT1;
+	case DXGI_FORMAT_BC2_UNORM:
+		return IMAGE_FORMAT_DXT3;
+	case DXGI_FORMAT_BC3_UNORM:
+		return IMAGE_FORMAT_DXT5;
+	// Requires DXGI 1.2 or later. DXGI 1.2 types are only
+	// supported on systems with Direct3D 11.1 or later.
+	case DXGI_FORMAT_B5G6R5_UNORM:
+		return IMAGE_FORMAT_BGR565;
+	// Requires DXGI 1.2 or later. DXGI 1.2 types are only
+	// supported on systems with Direct3D 11.1 or later.
+	case DXGI_FORMAT_B5G5R5A1_UNORM:
+		return IMAGE_FORMAT_BGRA5551;
+	case DXGI_FORMAT_B8G8R8A8_UNORM:
+		return IMAGE_FORMAT_BGRA8888;
+	case DXGI_FORMAT_B8G8R8X8_UNORM:
+		return IMAGE_FORMAT_BGRX8888;
+	//case D3DFMT_X1R5G5B5:
+	//	return IMAGE_FORMAT_BGRX5551;
+	// Requires DXGI 1.2 or later. DXGI 1.2 types are only
+	// supported on systems with Direct3D 11.1 or later.
+	case DXGI_FORMAT_B4G4R4A4_UNORM:
+		return IMAGE_FORMAT_BGRA4444;
+	//case D3DFMT_A8L8:
+	//	return IMAGE_FORMAT_IA88;
+	//case D3DFMT_X8L8V8U8:
+	//	return IMAGE_FORMAT_UVLX8888;
+	
+	SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// dimhotepus: D3DFORMAT expected to contain vendor-specific.
+	SRC_GCC_DISABLE_SWITCH_WARNING()
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// dimhotepus: DXGI_FORMAT expected to contain vendor-specific.
+	MSVC_DISABLE_WARNING(4063)
+	// DST and FOURCC formats mapped back to ImageFormat (for vendor-dependent shadow depth textures)
+	case (DXGI_FORMAT)(MAKEFOURCC('R','A','W','Z')):
+		return IMAGE_FORMAT_NV_RAWZ;
+	case (DXGI_FORMAT)(MAKEFOURCC('I','N','T','Z')):
+		return IMAGE_FORMAT_NV_INTZ;
+	case (DXGI_FORMAT)(MAKEFOURCC('N','U','L','L')):
+		return IMAGE_FORMAT_NV_NULL;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
+	SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
+	//case D3DFMT_D24S8:
+	//	return IMAGE_FORMAT_NV_DST24;
+	SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+	// dimhotepus: DXGI_FORMAT expected to contain vendor-specific.
+	SRC_GCC_DISABLE_SWITCH_WARNING()
+	// dimhotepus: DXGI_FORMAT expected to contain vendor-specific.
+	MSVC_DISABLE_WARNING(4063)
+	case (DXGI_FORMAT)(MAKEFOURCC('D','F','1','6')):
+		return IMAGE_FORMAT_ATI_DST16;
+	case (DXGI_FORMAT)(MAKEFOURCC('D','F','2','4')):
+		return IMAGE_FORMAT_ATI_DST24;
+
+	// ATIxN FOURCC formats mapped back to ImageFormat
+	case (DXGI_FORMAT)(MAKEFOURCC('A','T','I','1')):
+		return IMAGE_FORMAT_ATI1N;
+	case (DXGI_FORMAT)(MAKEFOURCC('A','T','I','2')):
+		return IMAGE_FORMAT_ATI2N;
+	MSVC_END_WARNING_OVERRIDE_SCOPE()
+	SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
+
+	default:
+		AssertMsg( false, "Unknown DXGI_FORMAT 0x%x.", format );
+		return IMAGE_FORMAT_UNKNOWN;
+	}
+}
+
 D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 {
 	// This doesn't care whether it's supported or not
 	switch ( format )
 	{
+	case IMAGE_FORMAT_RGBA8888:
+		return D3DFMT_A8B8G8R8;
 	case IMAGE_FORMAT_BGR888:
 		return D3DFMT_R8G8B8;
-	case IMAGE_FORMAT_BGRA8888:
-		return D3DFMT_A8R8G8B8;
-	case IMAGE_FORMAT_BGRX8888:
-		return D3DFMT_X8R8G8B8;
-	case IMAGE_FORMAT_BGR565:
-		return D3DFMT_R5G6B5;
-	case IMAGE_FORMAT_BGRX5551:
-		return D3DFMT_X1R5G5B5;
-	case IMAGE_FORMAT_BGRA5551:
-		return D3DFMT_A1R5G5B5;
-	case IMAGE_FORMAT_BGRA4444:
-		return D3DFMT_A4R4G4B4;
 	case IMAGE_FORMAT_I8:
 		return D3DFMT_L8;
 	case IMAGE_FORMAT_IA88:
 		return D3DFMT_A8L8;
 	case IMAGE_FORMAT_A8:
 		return D3DFMT_A8;
+	case IMAGE_FORMAT_BGRA8888:
+		return D3DFMT_A8R8G8B8;
 	case IMAGE_FORMAT_DXT1:
 	case IMAGE_FORMAT_DXT1_ONEBITALPHA:
 		return D3DFMT_DXT1;
@@ -387,42 +482,53 @@ D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 		return D3DFMT_DXT3;
 	case IMAGE_FORMAT_DXT5:
 		return D3DFMT_DXT5; //-V1037
+	case IMAGE_FORMAT_BGRX8888:
+		return D3DFMT_X8R8G8B8;
+	case IMAGE_FORMAT_BGR565:
+		return D3DFMT_R5G6B5;
+	case IMAGE_FORMAT_BGRX5551:
+		return D3DFMT_X1R5G5B5;
+	case IMAGE_FORMAT_BGRA4444:
+		return D3DFMT_A4R4G4B4;
+	case IMAGE_FORMAT_BGRA5551:
+		return D3DFMT_A1R5G5B5;
 	case IMAGE_FORMAT_UV88:
 		return D3DFMT_V8U8;
 	case IMAGE_FORMAT_UVWQ8888:
 		return D3DFMT_Q8W8V8U8;
-	case IMAGE_FORMAT_UVLX8888:
-		return D3DFMT_X8L8V8U8;
 	case IMAGE_FORMAT_RGBA16161616F:
 		return D3DFMT_A16B16G16R16F;
 	case IMAGE_FORMAT_RGBA16161616:
 		return D3DFMT_A16B16G16R16;
+	case IMAGE_FORMAT_UVLX8888:
+		return D3DFMT_X8L8V8U8;
 	case IMAGE_FORMAT_R32F:
 		return D3DFMT_R32F;
 	case IMAGE_FORMAT_RGBA32323232F:
 		return D3DFMT_A32B32G32R32F;
 
-	// ImageFormat mapped to vendor-dependent FOURCC formats (for shadow depth textures)
-	case IMAGE_FORMAT_NV_RAWZ:
-		return (D3DFORMAT)(MAKEFOURCC('R','A','W','Z'));
-	case IMAGE_FORMAT_NV_INTZ:
-		return (D3DFORMAT)(MAKEFOURCC('I','N','T','Z'));
-	case IMAGE_FORMAT_NV_NULL:
-		return (D3DFORMAT)(MAKEFOURCC('N','U','L','L'));
 	case IMAGE_FORMAT_NV_DST16:
 		return D3DFMT_D16;
 	case IMAGE_FORMAT_NV_DST24:
 		return D3DFMT_D24S8;
+
+	// ImageFormat mapped to vendor-dependent FOURCC formats (for shadow depth textures)
+	case IMAGE_FORMAT_NV_INTZ:
+		return (D3DFORMAT)(MAKEFOURCC('I','N','T','Z'));
+	case IMAGE_FORMAT_NV_RAWZ:
+		return (D3DFORMAT)(MAKEFOURCC('R','A','W','Z'));
 	case IMAGE_FORMAT_ATI_DST16:
 		return (D3DFORMAT)(MAKEFOURCC('D','F','1','6'));
 	case IMAGE_FORMAT_ATI_DST24:
 		return (D3DFORMAT)(MAKEFOURCC('D','F','2','4'));
-
+	case IMAGE_FORMAT_NV_NULL:
+		return (D3DFORMAT)(MAKEFOURCC('N','U','L','L'));
+	
 	// ImageFormats mapped to ATIxN FOURCC
-	case IMAGE_FORMAT_ATI1N:
-		return (D3DFORMAT)(MAKEFOURCC('A','T','I','1'));
 	case IMAGE_FORMAT_ATI2N:
 		return (D3DFORMAT)(MAKEFOURCC('A','T','I','2'));
+	case IMAGE_FORMAT_ATI1N:
+		return (D3DFORMAT)(MAKEFOURCC('A','T','I','1'));
 
 	case IMAGE_FORMAT_DXT1_RUNTIME:
 		return D3DFMT_DXT1;
@@ -432,6 +538,97 @@ D3DFORMAT ImageFormatToD3DFormat( ImageFormat format )
 	default:
 		AssertMsg( false, "Unknown ImageFormat 0x%x.", format );
 		return D3DFMT_UNKNOWN;
+	}
+}
+
+// https://learn.microsoft.com/en-us/previous-versions//ff471324(v=vs.85)?redirectedfrom=MSDN
+DXGI_FORMAT ImageFormatToDxgiFormat( ImageFormat format )
+{
+	// This doesn't care whether it's supported or not
+	switch ( format )
+	{
+	//case IMAGE_FORMAT_BGR888:
+	//	return D3DFMT_R8G8B8;
+	case IMAGE_FORMAT_RGBA8888:
+		return DXGI_FORMAT_R8G8B8A8_UNORM;
+	//case IMAGE_FORMAT_BGRX5551:
+	//	return D3DFMT_X1R5G5B5;
+	// Use .r swizzle in the pixel shader to duplicate red
+	// to other components to get Direct3D 9 behavior.
+	case IMAGE_FORMAT_I8:
+		return DXGI_FORMAT_R8_UNORM;
+	//case IMAGE_FORMAT_IA88:
+	//	return D3DFMT_A8L8;
+	case IMAGE_FORMAT_A8:
+		return DXGI_FORMAT_A8_UNORM;
+	case IMAGE_FORMAT_BGRA8888:
+		return DXGI_FORMAT_B8G8R8A8_UNORM;
+	case IMAGE_FORMAT_DXT1:
+	case IMAGE_FORMAT_DXT1_ONEBITALPHA:
+		return DXGI_FORMAT_BC1_UNORM;
+	case IMAGE_FORMAT_DXT3:
+		return DXGI_FORMAT_BC2_UNORM;
+	case IMAGE_FORMAT_DXT5:
+		return DXGI_FORMAT_BC3_UNORM; //-V1037
+	case IMAGE_FORMAT_BGRX8888:
+		return DXGI_FORMAT_B8G8R8X8_UNORM;
+	// Requires DXGI 1.2 or later. DXGI 1.2 types are only
+	// supported on systems with Direct3D 11.1 or later.
+	case IMAGE_FORMAT_BGR565:
+		return DXGI_FORMAT_B5G6R5_UNORM;
+	// Requires DXGI 1.2 or later. DXGI 1.2 types are only
+	// supported on systems with Direct3D 11.1 or later.
+	case IMAGE_FORMAT_BGRA4444:
+		return DXGI_FORMAT_B4G4R4A4_UNORM;
+	// Requires DXGI 1.2 or later. DXGI 1.2 types are only
+	// supported on systems with Direct3D 11.1 or later.
+	case IMAGE_FORMAT_BGRA5551:
+		return DXGI_FORMAT_B5G5R5A1_UNORM;
+	case IMAGE_FORMAT_UV88:
+		return DXGI_FORMAT_R8G8_SNORM;
+	case IMAGE_FORMAT_UVWQ8888:
+		return DXGI_FORMAT_R8G8B8A8_SNORM;
+	//case IMAGE_FORMAT_UVLX8888:
+	//	return D3DFMT_X8L8V8U8;
+	case IMAGE_FORMAT_RGBA16161616F:
+		return DXGI_FORMAT_R16G16B16A16_FLOAT;
+	case IMAGE_FORMAT_RGBA16161616:
+		return DXGI_FORMAT_R16G16B16A16_UNORM;
+	case IMAGE_FORMAT_R32F:
+		return DXGI_FORMAT_R32_FLOAT;
+	case IMAGE_FORMAT_RGBA32323232F:
+		return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+	// ImageFormat mapped to vendor-dependent FOURCC formats (for shadow depth textures)
+	case IMAGE_FORMAT_NV_DST16:
+		return DXGI_FORMAT_D16_UNORM;
+	case IMAGE_FORMAT_NV_INTZ:
+		return (DXGI_FORMAT)(MAKEFOURCC('I','N','T','Z'));
+	case IMAGE_FORMAT_NV_RAWZ:
+		return (DXGI_FORMAT)(MAKEFOURCC('R','A','W','Z'));
+	//case IMAGE_FORMAT_NV_DST24:
+	//	return D3DFMT_D24S8;
+	case IMAGE_FORMAT_ATI_DST16:
+		return (DXGI_FORMAT)(MAKEFOURCC('D','F','1','6'));
+	case IMAGE_FORMAT_ATI_DST24:
+		return (DXGI_FORMAT)(MAKEFOURCC('D','F','2','4'));
+	case IMAGE_FORMAT_NV_NULL:
+		return (DXGI_FORMAT)(MAKEFOURCC('N','U','L','L'));
+
+	// ImageFormats mapped to ATIxN FOURCC
+	case IMAGE_FORMAT_ATI2N:
+		return (DXGI_FORMAT)(MAKEFOURCC('A','T','I','2'));
+	case IMAGE_FORMAT_ATI1N:
+		return (DXGI_FORMAT)(MAKEFOURCC('A','T','I','1'));
+
+	case IMAGE_FORMAT_DXT1_RUNTIME:
+		return DXGI_FORMAT_BC1_UNORM;
+	case IMAGE_FORMAT_DXT5_RUNTIME:
+		return DXGI_FORMAT_BC3_UNORM;
+
+	default:
+		AssertMsg( false, "Unknown ImageFormat 0x%x.", format );
+		return DXGI_FORMAT_UNKNOWN;
 	}
 }
 

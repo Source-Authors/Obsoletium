@@ -72,8 +72,8 @@ public:
 	virtual void SetCheckButtonCheckable(bool state);
 	virtual bool IsCheckButtonCheckable() const { return m_bCheckButtonCheckable; }
 
-	Color GetDisabledFgColor() { return _disabledFgColor; }
-	Color GetDisabledBgColor() { return _disabledBgColor; }
+	Color GetDisabledFgColor() const { return _disabledFgColor; }
+	Color GetDisabledBgColor() const { return _disabledBgColor; }
 
 	CheckImage *GetCheckImage() { return _checkBoxImage; }
 

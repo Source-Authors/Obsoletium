@@ -61,7 +61,7 @@ public:
 	void SetSaveGameInfo( SaveGameDescription_t &save )
 	{
 		// set the bitmap to display
-		char tga[_MAX_PATH];
+		char tga[MAX_PATH];
 		V_strcpy_safe( tga, save.szFileName );
 		char *ext = strstr( tga, ".sav" );
 		if ( ext )
@@ -203,15 +203,15 @@ intp CBaseSaveGameDialog::GetSelectedItemSaveIndex()
 void CBaseSaveGameDialog::ScanSavedGames()
 {
 	// populate list box with all saved games on record:
-	char	szDirectory[_MAX_PATH];
-	Q_snprintf( szDirectory, sizeof( szDirectory ), "%s/*.sav", SAVE_DIR );
+	char	szDirectory[MAX_PATH];
+	V_sprintf_safe( szDirectory, "%s/*.sav", SAVE_DIR );
 
 	// clear the current list
 	m_pGameList->DeleteAllItems();
 	m_SaveGames.RemoveAll();
 	
 	// iterate the saved files
-	FileFindHandle_t handle;
+	FileFindHandle_t handle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( szDirectory, MOD_DIR, &handle );
 	while (pFileName)
 	{
@@ -221,8 +221,8 @@ void CBaseSaveGameDialog::ScanSavedGames()
 			continue;
 		}
 
-		char szFileName[_MAX_PATH];
-		Q_snprintf(szFileName, sizeof( szFileName ), "%s/%s", SAVE_DIR, pFileName);
+		char szFileName[MAX_PATH];
+		V_sprintf_safe(szFileName, "%s/%s", SAVE_DIR, pFileName);
 
 		// Only load save games from the current mod's save dir
 		if( !g_pFullFileSystem->FileExists( szFileName, MOD_DIR ) )
@@ -297,7 +297,7 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 	if (fh == FILESYSTEM_INVALID_HANDLE)
 		return false;
 
-	int readok = SaveReadNameAndComment( fh, szMapName, ssize(szMapName), szComment, ssize(szComment) );
+	int readok = SaveReadNameAndComment( fh, szMapName, szComment );
 	g_pFullFileSystem->Close(fh);
 
 	if ( !readok )
@@ -308,7 +308,7 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 	V_strcpy_safe( save.szMapName, szMapName );
 
 	// Elapsed time is the last 6 characters in comment. (mmm:ss)
-	intp i = strlen( szComment );
+	intp i = V_strlen( szComment );
 	V_strcpy_safe( szElapsedTime, "??" );
 	if (i >= 6)
 	{
@@ -506,10 +506,10 @@ bool CBaseSaveGameDialog::SaveGameSortFunc( const SaveGameDescription_t &s1, con
 		return true;
 
 	// timestamps are equal, so just sort by filename
-	return strcmp(s1.szFileName, s2.szFileName) == -1;
+	return strcmp(s1.szFileName, s2.szFileName) < 0;
 }
 
-int SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) char *name, int nameSize, OUT_Z_CAP(commentSize) char *comment, int commentSize )
+int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int nameSize, OUT_Z_CAP(commentSize) char *comment, int commentSize )
 {
 	int i, tag, size, tokenSize, tokenCount;
 	char *pSaveData, *pFieldName, **pTokenList;
@@ -628,14 +628,14 @@ int SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) char *name, int 
 //-----------------------------------------------------------------------------
 void CBaseSaveGameDialog::DeleteSaveGame( const char *fileName )
 {
-	if ( !fileName || !fileName[0] )
+	if ( Q_isempty( fileName ) )
 		return;
 
 	// delete the save game file
 	g_pFullFileSystem->RemoveFile( fileName, "MOD" );
 
 	// delete the associated tga
-	char tga[_MAX_PATH];
+	char tga[MAX_PATH];
 	V_strcpy_safe( tga, fileName );
 	char *ext = strstr( tga, ".sav" );
 	if ( ext )

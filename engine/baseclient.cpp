@@ -127,7 +127,7 @@ void CBaseClient::ClientPrintf (PRINTF_FORMAT_STRING const char *fmt, ...)
 	va_list		argptr;
 	char		string[1024];
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe (string, fmt,argptr);
 	va_end (argptr);
 
@@ -616,7 +616,7 @@ void CBaseClient::Disconnect( PRINTF_FORMAT_STRING const char *fmt, ... )
 	// clear user info 
 	m_Server->UserInfoChanged( m_nClientSlot );
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
 	va_end (argptr);
 
@@ -680,8 +680,8 @@ bool CBaseClient::SendServerInfo( void )
 		char devtext[ 2048 ];
 		int curplayers = m_Server->GetNumClients();
 
-		Q_snprintf( devtext, sizeof( devtext ), 
-			"\n%s\nMap: %s\nPlayers: %i / %i\nBuild: %d\nServer Number: %i\n\n",
+		V_sprintf_safe( devtext, 
+			"\n%s\nMap: %s\nPlayers: %i / %i\nBuild: %d\nServer Number: %i\n",
 			serverGameDLL->GetGameDescription(),
 			m_Server->GetMapName(),
 			curplayers, m_Server->GetMaxClients(),
@@ -700,12 +700,6 @@ bool CBaseClient::SendServerInfo( void )
 	m_Server->FillServerInfo( serverinfo ); // fill rest of info message
 	
 	serverinfo.WriteToBuffer( msg );
-
-	if ( IsX360() && serverinfo.m_nMaxClients > 1 )
-	{
-		Msg( "Telling clients to connect" );
-		g_pMatchmaking->TellClientsToConnect();
-	}
 
 	// send first tick
 	m_nSignonTick = m_Server->m_nTickCount;
@@ -1108,7 +1102,7 @@ void CBaseClient::TraceNetworkData( bf_write &msg, char const *fmt, ... )
 	VPROF_BUDGET( "CBaseClient::TraceNetworkData", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	char buf[ 64 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
@@ -1126,7 +1120,7 @@ void CBaseClient::TraceNetworkMsg( int nBits, char const *fmt, ... )
 	VPROF_BUDGET( "CBaseClient::TraceNetworkMsg", VPROF_BUDGETGROUP_OTHER_NETWORKING );
 	char buf[ 64 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 

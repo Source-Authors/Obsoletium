@@ -6,7 +6,7 @@
 
 #include "BaseVSShader.h"
 
-#include "Teeth.inc"
+#include "teeth.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

@@ -9,7 +9,8 @@
 
 #include "tier0/basetypes.h"
 #include "tier0/dbg.h"
-#include "mathlib/vector.h"
+
+#include "vector.h"
 
 
 // The following code is the c-ification of Ken Perlin's new noise algorithm

@@ -67,16 +67,16 @@ public:
 	virtual bool		SaveAsync() = 0;
 	virtual bool		SaveAsAsync( const wchar *pTitle ) = 0;
 
-	virtual bool		IsSaving() const = 0;
+	[[nodiscard]] virtual bool		IsSaving() const = 0;
 
 	virtual void		SaveThink() = 0;
 
-	virtual bool		GetLastSaveStatus() const = 0;
+	[[nodiscard]] virtual bool		GetLastSaveStatus() const = 0;
 
-	virtual bool		IsRecording() const = 0;
-	virtual bool		IsPlaying() const = 0;
+	[[nodiscard]] virtual bool		IsRecording() const = 0;
+	[[nodiscard]] virtual bool		IsPlaying() const = 0;
 
-	virtual bool		IsDirty() const = 0;
+	[[nodiscard]] virtual bool		IsDirty() const = 0;
 	virtual void		NotifyDirty() = 0;
 
 	virtual CReplayPerformance	*GetPerformance() = 0;
@@ -89,7 +89,7 @@ public:
 
 	virtual void		OnSignonStateFull() = 0;
 
-	virtual float		GetPlaybackTimeScale() const = 0;
+	[[nodiscard]] virtual float		GetPlaybackTimeScale() const = 0;
 
 	//
 	// Recorder-specific:

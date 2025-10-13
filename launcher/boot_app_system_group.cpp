@@ -18,6 +18,7 @@
 #include "vgui/IVGui.h"
 #include "vgui/VGUI.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include "vscript/ivscript.h"
 #include "vstdlib/iprocessutils.h"
 
 #include "tier1/tier1.h"
@@ -33,9 +34,6 @@ namespace {
 
 constexpr inline char kDefaultHalfLife2GameDirectory[]{"hl2"};
 
-// The dirty disk error report function
-void ReportDirtyDiskNoMaterialSystem() {}
-
 }  // namespace
 
 namespace se::launcher {
@@ -46,10 +44,8 @@ std::unique_ptr<FileLogger> BootAppSystemGroup::file_logger_ = nullptr;
 bool BootAppSystemGroup::Create() {
   double start_time{Plat_FloatTime()};
 
-  IFileSystem *file_system =
+  auto *file_system =
       FindSystem<IFileSystem>(FILESYSTEM_INTERFACE_VERSION);
-  file_system->InstallDirtyDiskReportFunc(ReportDirtyDiskNoMaterialSystem);
-
   resource_listing_ = CreateResourceListing(command_line_, file_system);
 
   AppSystemInfo_t app_systems[] = {
@@ -63,6 +59,8 @@ bool BootAppSystemGroup::Create() {
       {"studiorender" DLL_EXT_STRING, STUDIO_RENDER_INTERFACE_VERSION},
       {"vphysics" DLL_EXT_STRING, VPHYSICS_INTERFACE_VERSION},
       {"video_services" DLL_EXT_STRING, VIDEO_SERVICES_INTERFACE_VERSION},
+
+      {"vscript" DLL_EXT_STRING, VSCRIPT_INTERFACE_VERSION},
 
       // NOTE: This has to occur before vgui2.dll so it replaces vgui2's surface
       // implementation

@@ -482,22 +482,22 @@ void CShaderShadowDX8::DepthFunc( ShaderDepthFunc_t depthFunc )
 		zFunc = D3DCMP_NEVER;
 		break;
 	case SHADER_DEPTHFUNC_NEARER:
-		zFunc = (ShaderUtil()->GetConfig().bReverseDepth ^ ReverseDepthOnX360()) ? D3DCMP_GREATER : D3DCMP_LESS;
+		zFunc = ShaderUtil()->GetConfig().bReverseDepth ? D3DCMP_GREATER : D3DCMP_LESS;
 		break;
 	case SHADER_DEPTHFUNC_EQUAL:
 		zFunc = D3DCMP_EQUAL;
 		break;
 	case SHADER_DEPTHFUNC_NEAREROREQUAL:
-		zFunc = (ShaderUtil()->GetConfig().bReverseDepth ^ ReverseDepthOnX360()) ? D3DCMP_GREATEREQUAL : D3DCMP_LESSEQUAL;
+		zFunc = ShaderUtil()->GetConfig().bReverseDepth ? D3DCMP_GREATEREQUAL : D3DCMP_LESSEQUAL;
 		break;
 	case SHADER_DEPTHFUNC_FARTHER:
-		zFunc = (ShaderUtil()->GetConfig().bReverseDepth ^ ReverseDepthOnX360()) ? D3DCMP_LESS : D3DCMP_GREATER;
+		zFunc = ShaderUtil()->GetConfig().bReverseDepth ? D3DCMP_LESS : D3DCMP_GREATER;
 		break;
 	case SHADER_DEPTHFUNC_NOTEQUAL:
 		zFunc = D3DCMP_NOTEQUAL;
 		break;
 	case SHADER_DEPTHFUNC_FARTHEROREQUAL:
-		zFunc = (ShaderUtil()->GetConfig().bReverseDepth ^ ReverseDepthOnX360()) ? D3DCMP_LESSEQUAL : D3DCMP_GREATEREQUAL;
+		zFunc = ShaderUtil()->GetConfig().bReverseDepth ? D3DCMP_LESSEQUAL : D3DCMP_GREATEREQUAL;
 		break;
 	case SHADER_DEPTHFUNC_ALWAYS:
 		zFunc = D3DCMP_ALWAYS;

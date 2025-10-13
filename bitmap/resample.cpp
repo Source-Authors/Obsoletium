@@ -5,10 +5,6 @@
 //=============================================================================//
 
 // dimhotepus: Exclude nvtc as proprietary.
-#ifndef NO_NVTC
-#include "nvtc.h"
-#endif
-
 #include <algorithm>
 #include <cmath>
 #include <cstring>
@@ -20,6 +16,10 @@
 #include "tier0/dbg.h"
 #include "mathlib/mathlib.h"
 #include "tier1/utlmemory.h"
+
+#ifndef NO_NVTC
+#include "nvtc.h"
+#endif
 
 // Should be last include
 #include "tier0/memdbgon.h"
@@ -218,7 +218,7 @@ enum KernelType_t
 	KERNEL_ALPHATEST,
 };
 
-typedef void (*ApplyKernelFunc_t)( const KernelInfo_t &kernel, const ResampleInfo_t &info, int wratio, int hratio, int dratio, float* gammaToLinear, float *pAlphaResult );
+using ApplyKernelFunc_t = void (*)(const KernelInfo_t &, const ResampleInfo_t &, int, int, int, float *, float *);
 
 //-----------------------------------------------------------------------------
 // Apply Kernel to an image
@@ -394,7 +394,7 @@ public:
 		int nInitialY = (hratio >> 1) - ((hratio * kernel.m_nDiameter) >> 1);
 		int nInitialX = (wratio >> 1) - ((wratio * kernel.m_nDiameter) >> 1);
 
-		float flAlphaThreshhold = (info.m_flAlphaHiFreqThreshhold >= 0 ) ? 255.0f * info.m_flAlphaHiFreqThreshhold : 255.0f * 0.4f;
+		float flAlphaThreshhold = (info.m_flAlphaHiFreqThreshhold >= 0.0f) ? 255.0f * info.m_flAlphaHiFreqThreshhold : 255.0f * 0.4f;
 
 		float flInvFactor = (dratio == 0) ? 1.0f / (hratio * wratio) : 1.0f / (hratio * wratio * dratio);
 
@@ -452,7 +452,7 @@ public:
 		int nInitialY = (hratio >> 1) - ((hratio * kernel.m_nDiameter) >> 1);
 		int nInitialX = (wratio >> 1) - ((wratio * kernel.m_nDiameter) >> 1);
 
-		float flAlphaThreshhold = (info.m_flAlphaThreshhold >= 0 ) ? 255.0f * info.m_flAlphaThreshhold : 255.0f * 0.4f;
+		float flAlphaThreshhold = (info.m_flAlphaThreshhold >= 0.0f) ? 255.0f * info.m_flAlphaThreshhold : 255.0f * 0.4f;
 		for ( int k = 0; k < info.m_nDestDepth; ++k )
 		{
 			int startZ = dratio * k + nInitialZ;
@@ -503,12 +503,12 @@ public:
 	}
 };
 
-typedef CKernelWrapper< KERNEL_DEFAULT, false >		ApplyKernelDefault_t;
-typedef CKernelWrapper< KERNEL_NORMALMAP, false >	ApplyKernelNormalmap_t;
-typedef CKernelWrapper< KERNEL_ALPHATEST, false >	ApplyKernelAlphatest_t;
-typedef CKernelWrapper< KERNEL_DEFAULT, true >		ApplyKernelDefaultNice_t;
-typedef CKernelWrapper< KERNEL_NORMALMAP, true >	ApplyKernelNormalmapNice_t;
-typedef CKernelWrapper< KERNEL_ALPHATEST, true >	ApplyKernelAlphatestNice_t;
+using ApplyKernelDefault_t = CKernelWrapper<KERNEL_DEFAULT, false>;
+using ApplyKernelNormalmap_t = CKernelWrapper<KERNEL_NORMALMAP, false>;
+using ApplyKernelAlphatest_t = CKernelWrapper<KERNEL_ALPHATEST, false>;
+using ApplyKernelDefaultNice_t = CKernelWrapper<KERNEL_DEFAULT, true>;
+using ApplyKernelNormalmapNice_t = CKernelWrapper<KERNEL_NORMALMAP, true>;
+using ApplyKernelAlphatestNice_t = CKernelWrapper<KERNEL_ALPHATEST, true>;
 
 static ApplyKernelFunc_t g_KernelFunc[] =
 {
@@ -563,10 +563,10 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 	
 	KernelInfo_t kernel = {};
 
-	float* pTempMemory = 0;
-	float* pTempInvMemory = 0;
-	static float* kernelCache[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	static float* pInvKernelCache[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	float* pTempMemory = nullptr;
+	float* pTempInvMemory = nullptr;
+	static float* kernelCache[10] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
+	static float* pInvKernelCache[10] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	float pKernelMem, pInvKernelMem;
 	if ( info.m_nFlags & RESAMPLE_NICE_FILTER )
 	{
@@ -690,8 +690,8 @@ bool ResampleRGBA16161616( const ResampleInfo_t& info )
 	int nSampleWidth = info.m_nSrcWidth / info.m_nDestWidth;
 	int nSampleHeight = info.m_nSrcHeight / info.m_nDestHeight;
 
-	unsigned short *pSrc = ( unsigned short * )info.m_pSrc;
-	unsigned short *pDst = ( unsigned short * )info.m_pDest;
+	auto *pSrc = ( unsigned short * )info.m_pSrc;
+	auto *pDst = ( unsigned short * )info.m_pDest;
 	int x, y;
 	for( y = 0; y < info.m_nDestHeight; y++ )
 	{
@@ -741,7 +741,7 @@ bool ResampleRGB323232F( const ResampleInfo_t& info )
 	const int nSampleHeight = info.m_nSrcHeight / info.m_nDestHeight;
 
 	const float *pSrc = ( float * )info.m_pSrc;
-	float *pDst = ( float * )info.m_pDest;
+	auto *pDst = ( float * )info.m_pDest;
 
 	for( int y = 0; y < info.m_nDestHeight; y++ )
 	{

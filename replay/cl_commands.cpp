@@ -218,10 +218,10 @@ CON_COMMAND_F( replay_printclientreplays, "Prints out all client replay info", F
 		Msg( "  # screenshots: %zd\n", nScreenshotCount );
 		Msg( "  session handle: %i\n", (int)pReplay->m_hSession );
 
-		for ( intp i = 0; i < nScreenshotCount; ++i )
+		for ( intp j = 0; j < nScreenshotCount; ++j )
 		{
-			const CReplayScreenshot *pScreenshot = pReplay->GetScreenshot( i );
-			Msg( "    screenshot %zd:\n", i );
+			const CReplayScreenshot *pScreenshot = pReplay->GetScreenshot( j );
+			Msg( "    screenshot %zd:\n", j );
 			Msg( "      dimensions: w=%i, h=%i\n", pScreenshot->m_nWidth, pScreenshot->m_nHeight );
 			Msg( "      base filename: %s\n", pScreenshot->m_szBaseFilename );
 		}
@@ -229,11 +229,11 @@ CON_COMMAND_F( replay_printclientreplays, "Prints out all client replay info", F
 		intp nPerfCount = pReplay->GetPerformanceCount();
 		Msg( "\n" );
 		Msg( "# performances: %zd\n", nPerfCount );
-		for ( intp i = 0; i < nPerfCount; ++i )
+		for ( intp k = 0; k < nPerfCount; ++k )
 		{
-			const CReplayPerformance *pCurPerformance = pReplay->GetPerformance( i );
+			const CReplayPerformance *pCurPerformance = pReplay->GetPerformance( k );
 			g_pVGuiLocalize->ConvertUnicodeToANSI( pCurPerformance->m_wszTitle, szTitle );
-			Msg( "    performance %zd:\n", i );
+			Msg( "    performance %zd:\n", k );
 			Msg( "      title: %s\n", szTitle );
 			Msg( "      ticks: in=%i  out=%i\n", pCurPerformance->m_nTickIn, pCurPerformance->m_nTickOut );
 			Msg( "      filename: %s\n", pCurPerformance->m_szBaseFilename );

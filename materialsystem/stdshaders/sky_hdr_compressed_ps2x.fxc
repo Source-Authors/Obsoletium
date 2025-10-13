@@ -19,9 +19,9 @@ struct PS_INPUT
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	HALF3 color0 = 0.25*tex2D( ExposureTextureSampler0, i.baseTexCoord );
-	HALF3 color1 = 2.0*tex2D( ExposureTextureSampler1, i.baseTexCoord );
-	HALF3 color2 = 16.0*tex2D( ExposureTextureSampler2, i.baseTexCoord );
+	float3 color0 = 0.25*tex2D( ExposureTextureSampler0, i.baseTexCoord );
+	float3 color1 = 2.0*tex2D( ExposureTextureSampler1, i.baseTexCoord );
+	float3 color2 = 16.0*tex2D( ExposureTextureSampler2, i.baseTexCoord );
 
 	// This is never fogged.
 //	return FinalOutput( float4( max(max(color0,color1),color2), 1.0f ), 0, PIXEL_FOG_TYPE_NONE, TONEMAP_SCALE_LINEAR, WRITE_DEPTH_TO_DESTALPHA, 1e20 ); //when writing depth to dest alpha, write a value guaranteed to saturate

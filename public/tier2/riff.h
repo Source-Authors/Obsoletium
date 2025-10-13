@@ -13,7 +13,6 @@
 
 #ifndef RIFF_H
 #define RIFF_H
-#pragma once
 
 #include "tier0/basetypes.h"
 #include "tier0/commonmacros.h"
@@ -42,7 +41,7 @@ class InFileRIFF
 {
 public:
 	InFileRIFF( const char *pFileName, IFileReadBinary &io );
-	~InFileRIFF( void );
+	~InFileRIFF( );
 
 	[[nodiscard]] unsigned int RIFFName() const { return m_riffName; }
 	[[nodiscard]] unsigned int RIFFSize() const { return m_riffSize; }
@@ -52,9 +51,9 @@ public:
 	[[nodiscard]] int		PositionGet();
 	void	PositionSet( int position );
 	[[nodiscard]] bool	IsValid() const { return m_file != 0; }
-
-private:
+	
 	const InFileRIFF & operator=( const InFileRIFF & ) = delete;
+private:
 
 	IFileReadBinary		&m_io;
 	intp				m_file;
@@ -81,12 +80,12 @@ public:
 	int				ChunkReadPartial( void *pOutput, int dataSize );
 	[[nodiscard]] int				ChunkReadInt();
 	[[nodiscard]] int				ChunkFilePosition() const { return m_chunkPosition; }
-
-private:
+	
 	const IterateRIFF & operator=( const IterateRIFF & ) = delete;
+private:
 
-	void	ChunkSetup( void );
-	void	ChunkClear( void );
+	void	ChunkSetup( );
+	void	ChunkClear( );
 
 	InFileRIFF			&m_riff;
 	int					m_start;
@@ -113,7 +112,7 @@ class OutFileRIFF
 {
 public:
 	OutFileRIFF( const char *pFileName, IFileWriteBinary &io );
-	~OutFileRIFF( void );
+	~OutFileRIFF( );
 
 	bool	WriteInt( int number );
 	bool 	WriteData( void *pOutput, int dataSize );
@@ -122,9 +121,9 @@ public:
 	[[nodiscard]] bool	IsValid() const { return m_file != 0; }
 	
 	void    HasLISETData( int position );
-
-private:
+	
 	const OutFileRIFF & operator=( const OutFileRIFF & ) = delete;
+private:
 
 	IFileWriteBinary	&m_io;
 	intp				m_file;
@@ -149,7 +148,7 @@ public:
 	IterateOutputRIFF( IterateOutputRIFF &parent );
 
 	void			ChunkStart( unsigned int chunkname );
-	void			ChunkFinish( void );
+	void			ChunkFinish( );
 
 	void			ChunkWrite( unsigned int chunkname, void *pOutput, int size );
 	void			ChunkWriteInt( int number );
@@ -164,10 +163,8 @@ public:
 
 	void			SetLISETData( int position );
 
-private:
-
 	const IterateOutputRIFF & operator=( const IterateOutputRIFF & ) = delete;
-
+private:
 	OutFileRIFF			&m_riff;
 	int					m_start;
 	int					m_size;

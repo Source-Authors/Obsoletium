@@ -16,7 +16,6 @@
 #include <tier0/memdbgon.h>
 
 CInterlockedInt n_gbufs_queued;
-CInterlockedInt n_result_bms_queued;
 
 // the current lighting preview output, if we have one
 Bitmap_t *g_pLPreviewOutputBitmap;
@@ -47,34 +46,37 @@ public:
 	float m_fDistanceToEye;
 	int m_nMostRecentNonZeroContributionTimeStamp;
 
-	CIncrementalLightInfo( void )
+	CIncrementalLightInfo()
 	{
+		m_pNext = nullptr;
+		m_pLight = nullptr;
 		m_nObjectID = -1;
-		m_pNext = NULL;
 		m_eIncrState = INCR_STATE_NEW;
 		m_fTotalContribution = 0.;
 		m_PartialResultsStage = 0;
+		m_nBitmapGenerationCounter = -1;
+		m_fDistanceToEye = 0.0f;
 		m_nMostRecentNonZeroContributionTimeStamp = 0;
 	}
 
 
-	void DiscardResults( void )
+	void DiscardResults()
 	{
 		m_CalculatedContribution.SetSize(0,0);
 		if ( m_eIncrState != INCR_STATE_NEW )
 			m_eIncrState = INCR_STATE_NO_RESULTS;
 	}
 
-	void ClearIncremental( void )
+	void ClearIncremental()
 	{
 		m_eIncrState = INCR_STATE_NEW;
 		// free calculated lighting matrix
 		DiscardResults();
 	}
 
-	bool HasWorkToDo( void ) const
+	bool HasWorkToDo() const
 	{
-		return ( m_eIncrState != INCR_STATE_HAVE_FULL_RESULTS );
+		return m_eIncrState != INCR_STATE_HAVE_FULL_RESULTS;
 	}
 
 	
@@ -103,7 +105,8 @@ public:
 	Vector m_LastEyePosition;
 
 	bool m_bResultChangedSinceLastSend;
-	float m_fLastSendTime;
+	// dimhotepus: float -> double.
+	double m_fLastSendTime;
 
 	int m_LineMask[N_INCREMENTAL_STEPS];
 	int m_ClosestLineOffset[N_INCREMENTAL_STEPS][N_INCREMENTAL_STEPS];
@@ -114,7 +117,7 @@ public:
 	Vector m_MinViewCoords;
 	Vector m_MaxViewCoords;
 	
-	CLightingPreviewThread(void)
+	CLightingPreviewThread()
 	{
 		m_nBitmapGenerationCounter = -1;
 		m_pLightList = NULL;
@@ -127,12 +130,11 @@ public:
 		InitIncrementalInformation();
 	}
 	
-	void InitIncrementalInformation( void );
+	void InitIncrementalInformation();
 
-	~CLightingPreviewThread( void )
+	~CLightingPreviewThread()
 	{
-		if ( m_pLightList )
-			delete m_pLightList;
+		delete m_pLightList;
 		while ( m_pIncrementalLightInfoList )
 		{
 			CIncrementalLightInfo *n=m_pIncrementalLightInfoList->m_pNext;
@@ -142,13 +144,13 @@ public:
 	}
 
 	// check if the master has new work for us to do, meaning we should abort rendering
-	bool ShouldAbort( void )
+	bool ShouldAbort() const
 	{
 		return g_HammerToLPreviewMsgQueue.MessageWaiting();
 	}
 
 	// main loop
-	void Run(void);
+	void Run();
 
 	// handle new g-buffers from master
 	void HandleGBuffersMessage( MessageToLPreview &msg_in );
@@ -160,7 +162,7 @@ public:
 	void SendVectorMatrixAsRendering( CSIMDVectorMatrix const &src );
 
 	// calculate m_MinViewCoords, m_MaxViewCoords - the bounding box of the rendered pixels+the eye
-	void CalculateSceneBounds( void );
+	void CalculateSceneBounds();
 
 	// inner lighting loop. meant to be multithreaded on dual-core (or more)
 	void CalculateForLightTask( int nLineMask, int nLineMatch,
@@ -171,11 +173,11 @@ public:
 	void CalculateForLight( CLightingPreviewLightDescription &l );
 
 	// send our current output back
-	void SendResult( void );
+	void SendResult();
 
-	void UpdateIncrementalForNewLightList( void );
+	void UpdateIncrementalForNewLightList();
 
-	void DiscardResults( void )
+	void DiscardResults()
 	{
 		// invalidate all per light result data
 		for( CIncrementalLightInfo *i=m_pIncrementalLightInfoList; i; i=i->m_pNext)
@@ -187,9 +189,8 @@ public:
 		m_nContributionCounter++;
 		// update distances to lights
 		if ( m_pLightList )
-			for(int i=0;i<m_pLightList->Count();i++)
+			for(auto &l : *m_pLightList)
 			{
-				CLightingPreviewLightDescription &l=(*m_pLightList)[i];
 				CIncrementalLightInfo *l_info=l.m_pIncrementalInfo;
 				if ( l.m_Type == MATERIAL_LIGHT_DIRECTIONAL )
 					l_info->m_fDistanceToEye = 0;			// high priority
@@ -197,19 +198,19 @@ public:
 					l_info->m_fDistanceToEye = m_LastEyePosition.DistTo( l.m_Position );
 			}
 		m_bResultChangedSinceLastSend = true;
-		m_fLastSendTime = Plat_FloatTime()-9;				// force send
+		m_fLastSendTime = Plat_FloatTime()-9.0;				// force send
 	}
 	
 	// handle a message. returns true if the thread shuold exit
-	bool HandleAMessage( void );
+	bool HandleAMessage();
 
 	// returns whether or not there is useful work to do
-	bool AnyUsefulWorkToDo( void );
+	bool AnyUsefulWorkToDo();
 
 	// do some work, like a rendering for one light
-	void DoWork(void);
+	void DoWork();
 
-	Vector EstimatedUnshotAmbient( void )
+	Vector EstimatedUnshotAmbient()
 	{
 //		return Vector( 1,1,1 );
 		float sum_weights=0.0001;
@@ -342,7 +343,7 @@ bool CIncrementalLightInfo::IsLowerPriorityThan( CLightingPreviewThread *pLPV,
 	return false;
 }
 
-void CLightingPreviewThread::InitIncrementalInformation( void )
+void CLightingPreviewThread::InitIncrementalInformation()
 {
 	int calculated_bit_mask=0;
 	for(int i=0;i<N_INCREMENTAL_STEPS;i++)
@@ -410,7 +411,7 @@ void CLightingPreviewThread::HandleGeomMessage( MessageToLPreview &msg_in )
 }
 
 
-void CLightingPreviewThread::CalculateSceneBounds( void )
+void CLightingPreviewThread::CalculateSceneBounds()
 {
 	FourVectors minbound, maxbound;
 	minbound.DuplicateVector( m_LastEyePosition );
@@ -440,7 +441,7 @@ void CLightingPreviewThread::CalculateSceneBounds( void )
 }
 
 
-void CLightingPreviewThread::UpdateIncrementalForNewLightList( void )
+void CLightingPreviewThread::UpdateIncrementalForNewLightList()
 {
 	for( int iLight=0; iLight<m_pLightList->Count(); iLight++)
 	{
@@ -470,7 +471,7 @@ void CLightingPreviewThread::UpdateIncrementalForNewLightList( void )
 }
 
 
-void CLightingPreviewThread::Run(void)
+void CLightingPreviewThread::Run()
 {
 	bool should_quit = false;
 	while(! should_quit )
@@ -483,7 +484,7 @@ void CLightingPreviewThread::Run(void)
 			DoWork();
 		if ( m_bResultChangedSinceLastSend )
 		{
-			float newtime=Plat_FloatTime();
+			double newtime=Plat_FloatTime();
 			if ( (newtime-m_fLastSendTime > 10.0) || ( ! AnyUsefulWorkToDo() ) )
 			{
 				SendResult();
@@ -495,7 +496,7 @@ void CLightingPreviewThread::Run(void)
 	}
 }
 
-bool CLightingPreviewThread::HandleAMessage( void )
+bool CLightingPreviewThread::HandleAMessage()
 {
 	MessageToLPreview msg_in;
 	g_HammerToLPreviewMsgQueue.WaitMessage( &msg_in );
@@ -528,13 +529,12 @@ bool CLightingPreviewThread::HandleAMessage( void )
 	return false;
 }
 
-bool CLightingPreviewThread::AnyUsefulWorkToDo( void )
+bool CLightingPreviewThread::AnyUsefulWorkToDo()
 {
 	if (  m_pLightList ) 
 	{
-		for(int i=0;i<m_pLightList->Count();i++)
+		for(const auto &l : *m_pLightList)
 		{
-			CLightingPreviewLightDescription &l=(*m_pLightList)[i];
 			CIncrementalLightInfo *l_info=l.m_pIncrementalInfo;
 			if ( l_info->HasWorkToDo() )
 				return true;
@@ -543,15 +543,14 @@ bool CLightingPreviewThread::AnyUsefulWorkToDo( void )
 	return false;
 }
 
-void CLightingPreviewThread::DoWork( void )
+void CLightingPreviewThread::DoWork()
 {
 	if (  m_pLightList ) 
 	{
 		CLightingPreviewLightDescription *best_l=NULL;
 		CIncrementalLightInfo *best_l_info=NULL;
-		for(int i=0;i<m_pLightList->Count();i++)
+		for(auto &l : *m_pLightList)
 		{
-			CLightingPreviewLightDescription &l=(*m_pLightList)[i];
 			CIncrementalLightInfo *l_info=l.m_pIncrementalInfo;
 			if ( l_info->HasWorkToDo() )
 			{
@@ -589,8 +588,8 @@ void CLightingPreviewThread::HandleGBuffersMessage( MessageToLPreview &msg_in )
 		msg_in.m_pDefferedRenderingBMs[2]->RGBAData);
 
 	m_LastEyePosition = msg_in.m_EyePosition;
-	for( int i = 0;i < ARRAYSIZE( msg_in.m_pDefferedRenderingBMs ); i++ )
-		delete msg_in.m_pDefferedRenderingBMs[i];
+	for( auto *bm : msg_in.m_pDefferedRenderingBMs )
+		delete bm;
 	n_gbufs_queued--;
 	m_nBitmapGenerationCounter = msg_in.m_nBitmapGenerationCounter;
 	CalculateSceneBounds();
@@ -598,14 +597,13 @@ void CLightingPreviewThread::HandleGBuffersMessage( MessageToLPreview &msg_in )
 }
 
 
-void CLightingPreviewThread::SendResult( void )
+void CLightingPreviewThread::SendResult()
 {
 	m_ResultImage = m_Albedos;
  	m_ResultImage *= EstimatedUnshotAmbient();
-	for( int i = 0 ; i < m_pLightList->Count(); i ++ )
+	for( const auto &l : *m_pLightList )
 	{
-		CLightingPreviewLightDescription & l = ( *m_pLightList )[i];
-		CIncrementalLightInfo * l_info = l.m_pIncrementalInfo;
+		CIncrementalLightInfo *l_info = l.m_pIncrementalInfo;
 		if ( ( l_info->m_fTotalContribution > 0.0 ) &&
 			 ( l_info->m_eIncrState >= INCR_STATE_PARTIAL_RESULTS ) )
 		{
@@ -617,7 +615,7 @@ void CLightingPreviewThread::SendResult( void )
 				int src_y = ( y & ~( N_INCREMENTAL_STEPS - 1 ))
 					+ m_ClosestLineOffset[l_info->m_PartialResultsStage][yo];
 				FourVectors const * cptr = &( src.CompoundElement( 0, src_y ));
-				FourVectors * dest =& ( m_ResultImage.CompoundElement( 0, y ));
+				FourVectors * dest = &( m_ResultImage.CompoundElement( 0, y ));
 				FourVectors const *pAlbedo =&( m_Albedos.CompoundElement( 0, y ));
 				for( int x = 0;x < m_ResultImage.m_nPaddedWidth;x ++ )
 				{
@@ -764,18 +762,18 @@ void CLightingPreviewThread::SendVectorMatrixAsRendering( CSIMDVectorMatrix cons
 {
 	Bitmap_t *ret_bm=new Bitmap_t;
 	ret_bm->Init( src.m_nWidth, src.m_nHeight, IMAGE_FORMAT_RGBA8888 );
+	constexpr float scale = 1 / 2.2f;
 	// lets copy into the output bitmap
 	for(int y=0;y<src.m_nHeight;y++)
 		for(int x=0;x<src.m_nWidth;x++)
 		{
 			Vector color=src.Element( x, y );
-			*(ret_bm->GetPixel( x, y )+0)= (uint8) min(255, (int)(255.0*pow(color.z,(float) (1/2.2))));
-			*(ret_bm->GetPixel( x, y )+1)= (uint8) min(255, (int)(255.0*pow(color.y,(float) (1/2.2))));
-			*(ret_bm->GetPixel( x, y )+2)= (uint8) min(255, (int)(255.0*pow(color.x,(float) (1/2.2))));
+			*(ret_bm->GetPixel( x, y )+0)= (uint8) min(255, (int)(255.0*pow(color.z,scale)));
+			*(ret_bm->GetPixel( x, y )+1)= (uint8) min(255, (int)(255.0*pow(color.y,scale)));
+			*(ret_bm->GetPixel( x, y )+2)= (uint8) min(255, (int)(255.0*pow(color.x,scale)));
 			*(ret_bm->GetPixel( x, y )+3)=0;
 		}
 	MessageFromLPreview ret_msg( LPREVIEW_MSG_DISPLAY_RESULT );
-//	n_result_bms_queued++;
 	ret_msg.m_pBitmapToDisplay = ret_bm;
 	ret_msg.m_nBitmapGenerationCounter = m_nBitmapGenerationCounter;
 	g_LPreviewToHammerMsgQueue.QueueMessage( ret_msg );
@@ -789,18 +787,21 @@ unsigned LightingPreviewThreadFN( void *thread_start_arg )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("LightingPreview");
-	ThreadSetPriority( -2 );								// low
+
+	CLightingPreviewThread LPreviewObject;
+	ThreadSetPriority( THREAD_PRIORITY_BELOW_NORMAL );	// dimhotepus: lowest -> below normal.
 	LPreviewObject.Run();
 	return 0;
 }
 
 
-void HandleLightingPreview( void )
+void HandleLightingPreview()
 {
-	if ( GetMainWnd()->m_pLightingPreviewOutputWindow && !GetMainWnd()->m_bLightingPreviewOutputWindowShowing )
+	if ( auto *&window = GetMainWnd()->m_pLightingPreviewOutputWindow;
+		window && !GetMainWnd()->m_bLightingPreviewOutputWindowShowing )
 	{
-		delete GetMainWnd()->m_pLightingPreviewOutputWindow;
-		GetMainWnd()->m_pLightingPreviewOutputWindow = NULL;
+		delete window;
+		window = nullptr;
 	}
 
 	// called during main loop
@@ -808,18 +809,15 @@ void HandleLightingPreview( void )
 	{
 		MessageFromLPreview msg;
 		g_LPreviewToHammerMsgQueue.WaitMessage( &msg );
+
 		switch( msg.m_MsgType )
 		{
 			case LPREVIEW_MSG_DISPLAY_RESULT:
 			{
-				n_result_bms_queued--;
-				if (g_pLPreviewOutputBitmap)
-					delete g_pLPreviewOutputBitmap;
-				g_pLPreviewOutputBitmap = NULL;
-//				if ( msg.m_nBitmapGenerationCounter == g_nBitmapGenerationCounter )
-			{
+				delete g_pLPreviewOutputBitmap;
 				g_pLPreviewOutputBitmap = msg.m_pBitmapToDisplay;
-				if ( g_pLPreviewOutputBitmap && (g_pLPreviewOutputBitmap->Width() > 10) )
+
+				if ( g_pLPreviewOutputBitmap && g_pLPreviewOutputBitmap->Width() > 10 )
 				{
 					SignalUpdate( EVTYPE_BITMAP_RECEIVED_FROM_LPREVIEW );
 
@@ -831,33 +829,33 @@ void HandleLightingPreview( void )
 
 						GetMainWnd()->m_bLightingPreviewOutputWindowShowing = true;
 					}
-					if (! w->IsWindowVisible() )
+
+					if ( !w->IsWindowVisible() )
 						w->ShowWindow( SW_SHOW );
+
 					RECT existing_rect;
 					w->GetClientRect( &existing_rect );
-					if (
-						(existing_rect.right != g_pLPreviewOutputBitmap->Width()-1) ||
-						(existing_rect.bottom != g_pLPreviewOutputBitmap->Height()-1) )
+
+					const int bitmapWidth = g_pLPreviewOutputBitmap->Width()-1;
+					const int bitmapHeight = g_pLPreviewOutputBitmap->Height()-1;
+
+					if ( existing_rect.right != bitmapWidth || existing_rect.bottom != bitmapHeight )
 					{
-						CRect myRect;
-						myRect.top=0; 
-						myRect.left=0;
-						myRect.right=g_pLPreviewOutputBitmap->Width()-1;
-						myRect.bottom=g_pLPreviewOutputBitmap->Height()-1;
+						CRect myRect{0, 0, bitmapWidth, bitmapHeight};
+
 						w->CalcWindowRect(&myRect);
 						w->SetWindowPos(
 							NULL,0,0,
-							myRect.Width(), myRect.Height(),
+							myRect.Width(),
+							myRect.Height(),
 							SWP_NOMOVE | SWP_NOZORDER );
 					}
 					
 					w->Invalidate( false );
 					w->UpdateWindow();
 				}
-			}
-// 				else
-// 					delete msg.m_pBitmapToDisplay;			// its old
-			break;
+
+				break;
 			}
 		}
 	}

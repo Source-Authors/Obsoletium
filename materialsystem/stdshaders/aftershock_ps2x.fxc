@@ -77,8 +77,9 @@ float4 main( PS_INPUT i ) : COLOR
 	vBumpTexel1 = tex2D( g_tBumpSampler, i.vUv1.xy + ( vBumpTexel1.xy*0.03 ) );
 
 	// Combine bump layers into tangetn normal
-	float3 vTangentNormal = ( vBumpTexel0 * 2.0f ) - 1.0f;
-	vTangentNormal.xyz += ( vBumpTexel1 * 2.0f - 1.0f ) * 0.5f; // * 0.5f;
+	// dimhotepus: Fix float4 -> float3 truncation warnings
+	float3 vTangentNormal = ( vBumpTexel0 * 2.0f ).xyz - 1.0f;
+	vTangentNormal.xyz += ( vBumpTexel1.xyz * 2.0f - 1.0f ) * 0.5f; // * 0.5f;
 
 	// Transform into world space
 	float3 vWorldNormal = Vec3TangentToWorld( vTangentNormal.xyz, i.vWorldNormal, i.vWorldTangent, i.vWorldBinormal );

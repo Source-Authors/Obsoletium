@@ -484,6 +484,12 @@ public:
 #endif
 	}
 
+	// dimhotepus: Special method to allow change options by weapon class.
+	virtual bool	OnFireEventEx( [[maybe_unused]] C_BaseViewModel *pViewModel, [[maybe_unused]] const Vector& origin, [[maybe_unused]] const QAngle& angles, [[maybe_unused]] int event, [[maybe_unused]] const char *&options ) 
+	{
+		return false;
+	}
+
 	// Should this object cast shadows?
 	ShadowType_t	ShadowCastType() override;
 	void			SetDormant( bool bDormant ) override;

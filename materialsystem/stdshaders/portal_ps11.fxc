@@ -15,7 +15,7 @@
 
 
 
-const HALF3 g_StaticAmount	: register( c0 ); //x is static, y is 1.0 - static
+const float3 g_StaticAmount	: register( c0 ); //x is static, y is 1.0 - static
 
 sampler PrimarySampler		: register( s0 );
 #if( TEXTURESTAGES == 3 )
@@ -48,9 +48,9 @@ struct PS_INPUT
 
 
 
-HALF4 main( PS_INPUT i ) : COLOR
+float4 main( PS_INPUT i ) : COLOR
 {
-	HALF4 result;
+	float4 result;
 	
 #	if( TEXTURESTAGES == 3 ) //we can do everything in one pass
 	{

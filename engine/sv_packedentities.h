@@ -26,7 +26,7 @@ void SV_WriteSendTables( ServerClass *pClasses, bf_write &pBuf );
 void SV_WriteClassInfos( ServerClass *pClasses, bf_write &pBuf );
 
 void SV_ComputeClassInfosCRC( CRC32_t* crc );
-void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const void *pData, int nBytes );
+void SV_EnsureInstanceBaseline( ServerClass *pServerClass, int iEdict, const void *pData, intp nBytes );
 
 void SV_EnableChangeFrames( bool state );
 

@@ -1299,7 +1299,7 @@ private:
 		CUtlMemory< unsigned char > srcBufferAllMips;
 		const intp srcFinestMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, false );
 		const intp srcAllMemRequired = ImageLoader::GetMemRequired( w, h, 1, srcFmt, pJob->m_bGenMips );
-		const intp srcPitch = ImageLoader::GetMemRequired( w, 1, 1, srcFmt, false );
+		[[maybe_unused]] const intp srcPitch = ImageLoader::GetMemRequired( w, 1, 1, srcFmt, false );
 
 		const ImageFormat dstFmt = pJob->m_dstFmt;
 		CUtlMemory< unsigned char > dstBufferAllMips;
@@ -2817,7 +2817,7 @@ void CTextureManager::FindFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 {
 	Assert( pOutFilesToLoad != NULL );
 
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	pFilename = g_pFullFileSystem->FindFirstEx( pFilename, cTextureCachePathDir, &fh );
 
 	while ( pFilename != NULL )
@@ -2826,14 +2826,14 @@ void CTextureManager::FindFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 		{
 			if ( pFilename[0] != '.' ) 
 			{
-				char childFilename[_MAX_PATH];
+				char childFilename[MAX_PATH];
 				V_sprintf_safe( childFilename, "%s/*.*", pFilename );
 				FindFilesToLoad( pOutFilesToLoad, childFilename );
 			}
 		}
 		else
 		{
-			char filenameNoExtension[_MAX_PATH];
+			char filenameNoExtension[MAX_PATH];
 			V_StripExtension( pFilename, filenameNoExtension );
 			// Add the file to the list, which we will later traverse in order to ensure we're hitting these in the expected order for the VPK. 
 			( *pOutFilesToLoad ).Insert( CUtlString( filenameNoExtension ), 0 );
@@ -2859,7 +2859,7 @@ void CTextureManager::ReadFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 	if ( !g_pFullFileSystem->ReadToBuffer( fh, fileContents ) )
 		goto cleanup;
 
-	char buffer[_MAX_PATH + 1];
+	char buffer[MAX_PATH + 1];
 	while ( 1 ) 
 	{
 		fileContents.GetLine( buffer );

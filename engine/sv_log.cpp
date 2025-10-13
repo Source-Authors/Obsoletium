@@ -368,9 +368,7 @@ bool CLog::DelLogAddress(netadr_t addr)
 
 void CLog::ListLogAddress( void )
 {
-	netadr_t *pElement;
-	const char *pszAdr;
-	int count = m_LogAddresses.Count();
+	intp count = m_LogAddresses.Count();
 
 	if ( count <= 0 )
 	{
@@ -380,19 +378,16 @@ void CLog::ListLogAddress( void )
 	{
 		if ( count == 1 )
 		{
-			ConMsg( "logaddress_list: %i entry\n", count );
+			ConMsg( "logaddress_list: %zi entry\n", count );
 		}
 		else
 		{
-			ConMsg( "logaddress_list: %i entries\n", count );
+			ConMsg( "logaddress_list: %zi entries\n", count );
 		}
 
-		for ( int i = 0 ; i < count ; ++i )
+		for ( auto &address : m_LogAddresses )
 		{
-			pElement = &m_LogAddresses.Element(i);
-			pszAdr = pElement->ToString();
-			
-			ConMsg( "%s\n", pszAdr );
+			ConMsg( "%s\n", address.ToString() );
 		}
 	}
 }
@@ -440,7 +435,7 @@ void CLog::PrintServerVars( void )
 		if ( !( var->IsFlagSet( FCVAR_NOTIFY ) ) )
 			continue;
 
-		Printf( "\"%s\" = \"%s\"\n", var->GetName(), ((ConVar*)var)->GetString() );
+		Printf( "\"%s\" = \"%s\"\n", var->GetName(), ((const ConVar*)var)->GetString() );
 	}
 
 	Printf( "server cvars end\n" );
@@ -468,7 +463,7 @@ void CLog::Printf( const char *fmt, ... )
 		return;
 	}
 
-	va_start ( argptr, fmt );
+	va_start ( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe ( string, fmt, argptr );
 	va_end   ( argptr );
 

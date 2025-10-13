@@ -1459,29 +1459,27 @@ int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_
 {
 	AUTO_LOCK( m_SearchPathsMutex );
 
-	if ( maxLenInChars )
-	{
-		pDest[0] = 0;
-	}
-
 	// Build up result into string object
-	CUtlString sResult;
+	// dimhotepus: Use std::string and reserve capacity. 
+	std::string sResult;
+	sResult.reserve(maxLenInChars);
+
 	CSearchPathsIterator iter( this, pathID, bGetPackFiles ? FILTER_NONE : FILTER_CULLPACK );
 	for ( CSearchPath *pSearchPath = iter.GetFirst(); pSearchPath != nullptr; pSearchPath = iter.GetNext() )
 	{
-		if ( !sResult.IsEmpty() )
+		if ( !sResult.empty() )
 			sResult += ";";
 		if ( pSearchPath->GetPackFile() )
 		{
 			sResult += pSearchPath->GetPackFile()->m_ZipName.String();
 			sResult += CORRECT_PATH_SEPARATOR_S;
 		}
-		#ifdef SUPPORT_PACKED_STORE
+#ifdef SUPPORT_PACKED_STORE
 		else if ( pSearchPath->GetPackedStore() )
 		{
 			sResult += pSearchPath->GetPackedStore()->FullPathName();
 		}
-		#endif
+#endif
 		else
 		{
 			sResult += pSearchPath->GetPathString();
@@ -1491,11 +1489,11 @@ int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_
 	// Copy into user's buffer, possibly truncating
 	if ( maxLenInChars )
 	{
-		V_strncpy( pDest, sResult.String(), maxLenInChars );
+		V_strncpy( pDest, sResult.c_str(), maxLenInChars );
 	}
 
 	// Return 1 extra for the nullptr terminator
-	return sResult.Length()+1;
+	return sResult.size()+1;
 }
 
 
@@ -3840,13 +3838,13 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
 			}
 
 #ifdef SUPPORT_PACKED_STORE
-				if ( pSearchPath->GetPackedStore() )
-				{
-					Assert( pFindData->m_dirMatchesFromVPKOrPak.Count() == 0 );
-					Assert( pFindData->m_fileMatchesFromVPKOrPak.Count() == 0 );
-					pSearchPath->GetPackedStore()->GetFileAndDirLists( pWildCard, pFindData->m_dirMatchesFromVPKOrPak, pFindData->m_fileMatchesFromVPKOrPak, true );
-					bIsVPKOrPak = true;
-				}
+			if ( pSearchPath->GetPackedStore() )
+			{
+				Assert( pFindData->m_dirMatchesFromVPKOrPak.Count() == 0 );
+				Assert( pFindData->m_fileMatchesFromVPKOrPak.Count() == 0 );
+				pSearchPath->GetPackedStore()->GetFileAndDirLists( pWildCard, pFindData->m_dirMatchesFromVPKOrPak, pFindData->m_fileMatchesFromVPKOrPak, true );
+				bIsVPKOrPak = true;
+			}
 #endif
 
 			if ( bIsVPKOrPak )
@@ -3889,7 +3887,8 @@ const char *CBaseFileSystem::FindFirstHelper( const char *pWildCardT, const char
 	// Handle failure here
 	pFindData = 0;
 	m_FindData.Remove(hTmpHandle);
-	*pHandle = -1;
+	// dimhotepus: FileFindHandle_t: int -> unsigned short
+	*pHandle = std::numeric_limits<FileFindHandle_t>::max();
 
 	return nullptr;
 }
@@ -4100,7 +4099,6 @@ bool CBaseFileSystem::FixUpPath( const char *pFileName, char *pFixedUpFileName, 
 	//
 	V_strncpy( pFixedUpFileName, pFileName, sizeFixedUpFileName );
 	V_FixSlashes( pFixedUpFileName, CORRECT_PATH_SEPARATOR );
-//	V_RemoveDotSlashes( pFixedUpFileName, CORRECT_PATH_SEPARATOR, true );
 	V_FixDoubleSlashes( pFixedUpFileName );
 
 	if ( !V_IsAbsolutePath( pFixedUpFileName ) )
@@ -4375,7 +4373,7 @@ bool CBaseFileSystem::GetCaseCorrectFullPath_Ptr( const char *pFullPath, OUT_Z_C
 	strSearchPath += "*";
 
 	CUtlString strFoundCaseCorrectName;
-	FileFindHandle_t findHandle;
+	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pszCaseCorrectName = FindFirst( strSearchPath.Get(), &findHandle );
 	while ( pszCaseCorrectName )
 	{
@@ -5350,11 +5348,11 @@ int CFileHandle::Tell()
 	return -1;
 }
 
-int CFileHandle::Size()
+unsigned CFileHandle::Size()
 {
 	Assert( IsValid() );
 
-	int nReturnedSize = -1;
+	unsigned nReturnedSize = std::numeric_limits<unsigned>::max();
 
 #if defined( SUPPORT_PACKED_STORE )
 	if ( m_VPKHandle )
@@ -5365,7 +5363,7 @@ int CFileHandle::Size()
 
 	if ( m_pFile  )
 	{
-		nReturnedSize = m_nLength; 
+		nReturnedSize = m_nLength;
 	}
 	else if ( m_pPackFileHandle )
 	{

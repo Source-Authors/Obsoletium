@@ -58,21 +58,22 @@ struct ShaderDeviceInfo_t
 
 	int m_nVersion;
 	ShaderDisplayMode_t m_DisplayMode;
-	int m_nBackBufferCount;				// valid values are 1 or 2 [2 results in triple buffering]
-	int m_nAASamples;					// Number of AA samples to use
-	int m_nAAQuality;					// AA quality level
-	int m_nDXLevel;						// 0 means use recommended DX level for this adapter
-	int m_nWindowedSizeLimitWidth;		// Used if m_bLimitWindowedSize is set, defines max bounds for the back buffer
+	int m_nBackBufferCount;					// valid value is 2+ [2 results in triple buffering]
+	int m_nAASamples;						// Number of AA samples to use. Ignored for modern FLIP_* modes.
+	int m_nAAQuality;						// AA quality level. Ignored for modern FLIP_* modes.
+	int m_nDXLevel;							// 0 means use recommended DX level for this adapter
+	int m_nWindowedSizeLimitWidth;			// Used if m_bLimitWindowedSize is set, defines max bounds for the back buffer
 	int m_nWindowedSizeLimitHeight;
 
 	bool m_bWindowed : 1;
-	bool m_bResizing : 1;				// Only is meaningful when using windowed mode; means the window can be resized.
+	bool m_bResizing : 1;					// Only is meaningful when using windowed mode; means the window can be resized.
 	bool m_bUseStencil : 1;
-	bool m_bLimitWindowedSize : 1;		// In windowed mode, should we prevent the back buffer from getting too large?
-	bool m_bWaitForVSync : 1;			// Would we not present until vsync?
-	bool m_bScaleToOutputResolution : 1;			// 360 ONLY: sets up hardware scaling
-	bool m_bProgressive : 1;			// 360 ONLY: interlaced or progressive
-	bool m_bUsingMultipleWindows : 1; 	// Forces D3DPresent to use _COPY instead
+	bool m_bLimitWindowedSize : 1;			// In windowed mode, should we prevent the back buffer from getting too large?
+	bool m_bWaitForVSync : 1;				// Would we not present until vsync?
+	bool m_bScaleToOutputResolution : 1;	// 360 ONLY: sets up hardware scaling
+	bool m_bProgressive : 1;				// 360 ONLY: interlaced or progressive
+	bool m_bUsingMultipleWindows : 1; 		// Forces D3DPresent to use D3DSWAPEFFECT_COPY instead
+	bool m_bUsingPartialPresentation : 1;	// Forces D3DPresent to use D3DSWAPEFFECT_DISCARD instead
 };
 
 
@@ -116,10 +117,16 @@ inline bool IsDynamicBufferType( ShaderBufferType_t type )
 DECLARE_POINTER_HANDLE( VertexShaderHandle_t );
 DECLARE_POINTER_HANDLE( GeometryShaderHandle_t );
 DECLARE_POINTER_HANDLE( PixelShaderHandle_t );
+DECLARE_POINTER_HANDLE( HullShaderHandle_t );
+DECLARE_POINTER_HANDLE( DomainShaderHandle_t );
+DECLARE_POINTER_HANDLE( ComputeShaderHandle_t );
 
 #define VERTEX_SHADER_HANDLE_INVALID	( (VertexShaderHandle_t)0 )
 #define GEOMETRY_SHADER_HANDLE_INVALID	( (GeometryShaderHandle_t)0 )
 #define PIXEL_SHADER_HANDLE_INVALID		( (PixelShaderHandle_t)0 )
+#define HULL_SHADER_HANDLE_INVALID		( (HullShaderHandle_t)0 )
+#define DOMAIN_SHADER_HANDLE_INVALID	( (DomainShaderHandle_t)0 )
+#define COMPUTE_SHADER_HANDLE_INVALID	( (ComputeShaderHandle_t)0 )
 
 
 //-----------------------------------------------------------------------------
@@ -128,11 +135,13 @@ DECLARE_POINTER_HANDLE( PixelShaderHandle_t );
 abstract_class IShaderBuffer
 {
 public:
+	// dimhotepus: Drop Release and use virtual destructor instead.
+	virtual ~IShaderBuffer() = 0;
 	virtual size_t GetSize() const = 0;
 	virtual const void* GetBits() const = 0;
-	virtual void Release() = 0;
 };
 
+inline IShaderBuffer::~IShaderBuffer() {}
 
 //-----------------------------------------------------------------------------
 // Mode chance callback
@@ -183,7 +192,7 @@ public:
 //-----------------------------------------------------------------------------
 // Methods related to control of the device
 //-----------------------------------------------------------------------------
-#define SHADER_DEVICE_INTERFACE_VERSION			"ShaderDevice001"
+#define SHADER_DEVICE_INTERFACE_VERSION			"ShaderDevice002"
 abstract_class IShaderDevice
 {
 public:
@@ -272,32 +281,34 @@ public:
 	virtual void DoStartupShaderPreloading( void ) = 0;
 #endif
 	virtual const char *GetDisplayDeviceName() = 0;
-
+	
+	// Shader creation, destruction
+	virtual HullShaderHandle_t CreateHullShader( IShaderBuffer* pShaderBuffer ) = 0;
+	virtual void DestroyHullShader( HullShaderHandle_t hShader ) = 0;
+	virtual DomainShaderHandle_t CreateDomainShader( IShaderBuffer* pShaderBuffer ) = 0;
+	virtual void DestroyDomainShader( DomainShaderHandle_t hShader ) = 0;
+	virtual ComputeShaderHandle_t CreateComputeShader( IShaderBuffer* pShaderBuffer ) = 0;
+	virtual void DestroyComputeShader( ComputeShaderHandle_t hShader ) = 0;
 };
 
 
 //-----------------------------------------------------------------------------
 // Helper wrapper for IShaderBuffer for reading precompiled shader files
-// NOTE: This is meant to be instanced on the stack; so don't call Release!
+// NOTE: This is meant to be instanced on the stack.
 //-----------------------------------------------------------------------------
-class CUtlShaderBuffer : public IShaderBuffer
+class CUtlShaderBuffer final : public IShaderBuffer
 {
 public:
 	CUtlShaderBuffer( CUtlBuffer &buf ) : m_pBuf( &buf ) {}
 
-	virtual size_t GetSize() const
+	size_t GetSize() const override
 	{
 		return m_pBuf->TellMaxPut();
 	}
 
-	virtual const void* GetBits() const
+	const void* GetBits() const override
 	{
 		return m_pBuf->Base();
-	}
-
-	virtual void Release()
-	{
-		Assert( 0 );
 	}
 
 private:
@@ -329,7 +340,7 @@ inline VertexShaderHandle_t IShaderDevice::CreateVertexShader( const char *pProg
 	if ( pShaderBuffer )
 	{
 		hVertexShader = CreateVertexShader( pShaderBuffer );
-		pShaderBuffer->Release();
+		delete pShaderBuffer;
 	}
 	return hVertexShader;
 }
@@ -355,7 +366,7 @@ inline GeometryShaderHandle_t IShaderDevice::CreateGeometryShader( const char *p
 	if ( pShaderBuffer )
 	{
 		hGeometryShader = CreateGeometryShader( pShaderBuffer );
-		pShaderBuffer->Release();
+		delete pShaderBuffer;
 	}
 	return hGeometryShader;
 }
@@ -381,7 +392,7 @@ inline PixelShaderHandle_t IShaderDevice::CreatePixelShader( const char *pProgra
 	if ( pShaderBuffer )
 	{
 		hPixelShader = CreatePixelShader( pShaderBuffer );
-		pShaderBuffer->Release();
+		delete pShaderBuffer;
 	}
 	return hPixelShader;
 }

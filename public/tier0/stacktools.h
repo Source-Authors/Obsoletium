@@ -5,14 +5,10 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#ifndef TIER0_STACKTOOLS_H
-#define TIER0_STACKTOOLS_H
+#ifndef SE_PUBLIC_TIER0_STACKTOOLS_H
+#define SE_PUBLIC_TIER0_STACKTOOLS_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "tier0/platform.h"
+#include "platform.h"
 
 #if (defined( PLATFORM_WINDOWS ) || defined( PLATFORM_X360 )) && !defined( STEAM ) && !defined( _CERT ) && defined( TCHAR_IS_CHAR ) //designed for windows/x360, not built/tested with wide characters, not intended for release builds (but probably wouldn't damage anything)
 #	define ENABLE_RUNTIME_STACK_TRANSLATION //uncomment to enable runtime stack translation tools. All of which use on-demand loading of necessary dll's and pdb's
@@ -101,7 +97,7 @@ class PLATFORM_CLASS CStackTop_CopyParentStack : public CStackTop_Base
 {
 public:
 	CStackTop_CopyParentStack( void * const * pParentStackTrace, intp iParentStackTraceLength );
-	~CStackTop_CopyParentStack( void );
+	~CStackTop_CopyParentStack( );
 };
 
 //just references the parent stack. Assuming that you'll keep that memory around as long as you're keeping this Stack Top marker.
@@ -109,8 +105,8 @@ class PLATFORM_CLASS CStackTop_ReferenceParentStack : public CStackTop_Base
 {
 public:
 	CStackTop_ReferenceParentStack( void * const * pParentStackTrace = nullptr, intp iParentStackTraceLength = 0 );
-	~CStackTop_ReferenceParentStack( void );
-	void ReleaseParentStackReferences( void ); //in case you need to delete the parent stack trace before this class goes out of scope
+	~CStackTop_ReferenceParentStack( );
+	void ReleaseParentStackReferences( ); //in case you need to delete the parent stack trace before this class goes out of scope
 };
 
 
@@ -154,4 +150,4 @@ struct FullStackInfo_t
 };
 #pragma pack(pop)
 
-#endif //#ifndef TIER0_STACKTOOLS_H
+#endif // !SE_PUBLIC_TIER0_STACKTOOLS_H

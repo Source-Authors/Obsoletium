@@ -9,10 +9,6 @@
 
 #include <atomic>
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 template <typename T>
 inline void SafeAssign(T** ppInoutDst, T* pInoutSrc )
 {
@@ -97,8 +93,11 @@ private:
 
 // Do a an inline AddRef then return the pointer, useful when returning an
 // object from a function.
-#define RetAddRef( p ) ( (p)->AddRef(), (p) )
-#define InlineAddRef( p ) ( (p)->AddRef(), (p) )
+template<typename T>
+inline T* RetAddRef( T *p ) { p->AddRef(); return p; }
+
+template<typename T>
+inline T* InlineAddRef( T *p ) { p->AddRef(); return p; }
 
 
 // A class to both hold a pointer to an object and its reference.  Base exists
@@ -289,15 +288,15 @@ private:
 };
 
 
-typedef CRefCountServiceBase<true, CRefST>	CRefCountServiceST;
-typedef CRefCountServiceBase<false, CRefST>	CRefCountServiceNoDeleteST;
+using CRefCountServiceST = CRefCountServiceBase<true, CRefST>;
+using CRefCountServiceNoDeleteST = CRefCountServiceBase<false, CRefST>;
 
-typedef CRefCountServiceBase<true, CRefMT>	CRefCountServiceMT;
-typedef CRefCountServiceBase<false, CRefMT> CRefCountServiceNoDeleteMT;
+using CRefCountServiceMT = CRefCountServiceBase<true, CRefMT>;
+using CRefCountServiceNoDeleteMT = CRefCountServiceBase<false, CRefMT>;
 
 // Default to threadsafe
-typedef CRefCountServiceNoDeleteMT			CRefCountServiceNoDelete;
-typedef CRefCountServiceMT					CRefCountService;
+using CRefCountServiceNoDelete = CRefCountServiceNoDeleteMT;
+using CRefCountService = CRefCountServiceMT;
 
 //-----------------------------------------------------------------------------
 // Purpose:	Base classes to implement reference counting

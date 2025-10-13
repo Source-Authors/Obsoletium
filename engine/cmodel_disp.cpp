@@ -124,7 +124,7 @@ public:
 			}
 		}
 	}
-	int GetDispListCount() { return m_dispList.Count(); }
+	intp GetDispListCount() const { return m_dispList.Count(); }
 	void WriteLeafList( unsigned short *pLeafList )
 	{
 		// clear current count if any
@@ -134,9 +134,8 @@ public:
 			pLeaf->dispCount = 0;
 		}
 		// compute new count per leaf
-		for ( int i = 0; i < m_dispList.Count(); i++ )
+		for ( auto leafIndex : m_dispList )
 		{
-			int leafIndex = m_dispList[i];
 			cleaf_t *pLeaf = &m_pBSPData->map_leafs[leafIndex];
 			pLeaf->dispCount++;
 		}
@@ -151,14 +150,14 @@ public:
 		}
 		// now iterate the references in disp order adding to each leaf's (now compact) list
 		// for each displacement with leaves
-		for ( int i = 0; i < m_leafCount.Count(); i++ )
+		for ( intp i = 0; i < m_leafCount.Count(); i++ )
 		{
 			// for each leaf in this disp's list
-			int count = m_leafCount[i];
-			for ( int j = 0; j < count; j++ )
+			auto count = m_leafCount[i];
+			for ( decltype(count) j = 0; j < count; j++ )
 			{
-				int listIndex = m_firstIndex[i] + j;					// index to per-disp list
-				int leafIndex = m_dispList[listIndex];					// this reference is for one leaf
+				intp listIndex = m_firstIndex[i] + j;					// index to per-disp list
+				auto leafIndex = m_dispList[listIndex];					// this reference is for one leaf
 				cleaf_t *pLeaf = &m_pBSPData->map_leafs[leafIndex];
 				int outListIndex = pLeaf->dispListStart + pLeaf->dispCount;	// output position for this leaf
 				pLeafList[outListIndex] = i;							// write the reference there
@@ -173,7 +172,7 @@ private:
 	// this is a list of all of the leaf indices for each displacement
 	CUtlVector<unsigned short> m_dispList;
 	// this is the first entry into dispList for each displacement
-	CUtlVector<int> m_firstIndex;
+	CUtlVector<intp> m_firstIndex;
 	// this is the # of leaf entries for each displacement
 	CUtlVector<unsigned short> m_leafCount;
 };
@@ -199,7 +198,7 @@ void CM_DispTreeLeafnum( CCollisionBSPData *pBSPData )
 	{
 		leafBuilder.BuildLeafListForDisplacement( i );
 	}
-	int count = leafBuilder.GetDispListCount();
+	intp count = leafBuilder.GetDispListCount();
 	pBSPData->map_dispList.Attach( count, Hunk_Alloc<unsigned short>( count, false ) );
 	leafBuilder.WriteLeafList( pBSPData->map_dispList.Base() );
 }
@@ -216,48 +215,93 @@ void DispCollTrees_FreeLeafList( CCollisionBSPData *pBSPData )
 }
 
 // Virtual collision models for terrain
-class CVirtualTerrain : public IVirtualMeshEvent
+class CVirtualTerrain final : public IVirtualMeshEvent
 {
 public:
 	CVirtualTerrain()
 	{
-		m_pDispHullData =  NULL;
+		m_pDispHullData = nullptr;
 	}
+
 	// Fill out the meshlist for this terrain patch
-	virtual void GetVirtualMesh( void *userData, virtualmeshlist_t *pList )
+	void GetVirtualMesh( void *userData, virtualmeshlist_t *pList ) override
 	{
-		intp index = (intp)userData;
-		Assert(index >= 0 && index < g_DispCollTreeCount );
-		g_pDispCollTrees[index].GetVirtualMeshList( pList );
-		pList->pHull = NULL;
-		if ( m_pDispHullData )
+		const intp index = (intp)userData;
+
+		if ( index >= 0 && index < g_DispCollTreeCount )
 		{
-			if ( m_dispHullOffset[index] >= 0 )
+			g_pDispCollTrees[index].GetVirtualMeshList( pList );
+			pList->pHull = nullptr;
+
+			if ( m_pDispHullData && m_dispHullOffset[index] >= 0 )
 			{
 				pList->pHull = m_pDispHullData + m_dispHullOffset[index];
 			}
 		}
+		else
+		{
+			// dimhotepus: Verify index is in range.
+			AssertMsg( false, "(%zd) Out of bounds (%zd) virtual mesh query.\n",
+				index, g_DispCollTreeCount );
+			Warning( "(%zd) Out of bounds (%zd) virtual mesh query.\n",
+				index, g_DispCollTreeCount );
+
+			pList->pHull = nullptr;
+		}
 	}
 	// returns the bounds for the terrain patch
-	virtual void GetWorldspaceBounds( void *userData, Vector *pMins, Vector *pMaxs )
+	void GetWorldspaceBounds( void *userData, Vector *pMins, Vector *pMaxs ) override
 	{
-		intp index = (intp)userData;
-		*pMins = g_pDispBounds[index].mins;
-		*pMaxs = g_pDispBounds[index].maxs;
+		const intp index = (intp)userData;
+
+		if ( index >= 0 && index < g_DispCollTreeCount )
+		{
+			*pMins = g_pDispBounds[index].mins;
+			*pMaxs = g_pDispBounds[index].maxs;
+		}
+		else
+		{
+			// dimhotepus: Verify index is in range.
+			AssertMsg( false, "(%zd) Out of bounds (%zd) worldspace bounds query.\n",
+				index, g_DispCollTreeCount );
+			Warning( "(%zd) Out of bounds (%zd) worldspace bounds query.\n",
+				index, g_DispCollTreeCount );
+
+			*pMins = vec3_invalid;
+			*pMaxs = vec3_invalid;
+		}
 	}
+
 	// Query against the AABB tree to find the list of triangles for this patch in a sphere
-	virtual void GetTrianglesInSphere( void *userData, const Vector &center, float radius, virtualmeshtrianglelist_t *pList )
+	void GetTrianglesInSphere( void *userData, const Vector &center, float radius, virtualmeshtrianglelist_t *pList ) override
 	{
-		intp index = (intp)userData;
-		pList->triangleCount = g_pDispCollTrees[index].AABBTree_GetTrisInSphere( center, radius, pList->triangleIndices, ARRAYSIZE(pList->triangleIndices) );
+		const intp index = (intp)userData;
+
+		if ( index >= 0 && index < g_DispCollTreeCount )
+		{
+			pList->triangleCount = g_pDispCollTrees[index]
+				.AABBTree_GetTrisInSphere( center, radius, pList->triangleIndices, std::size(pList->triangleIndices) );
+		}
+		else
+		{
+			// dimhotepus: Verify index is in range.
+			AssertMsg( false, "(%zd) Out of bounds (%zd) triangles in sphere query.\n",
+				index, g_DispCollTreeCount );
+			Warning( "(%zd) Out of bounds (%zd) triangles in sphere query.\n",
+				index, g_DispCollTreeCount );
+
+			pList->triangleCount = -1;
+		}
 	}
+
 	void LevelInit( dphysdisp_t *pLump, int lumpSize )
 	{
 		if ( !pLump )
 		{
-			m_pDispHullData = NULL;
+			m_pDispHullData = nullptr;
 			return;
 		}
+
 		int totalHullData = 0;
 		m_dispHullOffset.SetCount(g_DispCollTreeCount);
 		Assert(pLump->numDisplacements==g_DispCollTreeCount);
@@ -265,7 +309,7 @@ public:
 		unsigned short *pDataSize = (unsigned short *)(pLump+1);
 		for ( int i = 0; i < pLump->numDisplacements; i++ )
 		{
-			if ( pDataSize[i] == (unsigned short)-1 )
+			if ( pDataSize[i] == std::numeric_limits<unsigned short>::max() )
 			{
 				m_dispHullOffset[i] = -1;
 				continue;
@@ -277,15 +321,16 @@ public:
 		byte *pData = (byte *)(pDataSize + pLump->numDisplacements);
 		memcpy( m_pDispHullData, pData, totalHullData );
 #if _DEBUG
-		int offset = pData - ((byte *)pLump);
+		intp offset = pData - ((byte *)pLump);
 		Assert( offset + totalHullData == lumpSize );
 #endif
 	}
+
 	void LevelShutdown()
 	{
 		m_dispHullOffset.Purge();
 		delete[] m_pDispHullData;
-		m_pDispHullData = NULL;
+		m_pDispHullData = nullptr;
 	}
 
 private:
@@ -338,7 +383,7 @@ void CM_CreateDispPhysCollide( dphysdisp_t *pDispLump, int dispLumpSize )
 void CM_DestroyDispPhysCollide()
 {
 	g_VirtualTerrain.LevelShutdown();
-	for ( int i = g_TerrainList.Count()-1; i>=0; --i )
+	for ( intp i = g_TerrainList.Count()-1; i>=0; --i )
 	{
 		physcollision->DestroyCollide( g_TerrainList[i] );
 	}

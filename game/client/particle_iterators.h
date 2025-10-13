@@ -121,13 +121,21 @@ private:
 
 inline CParticleRenderIterator::CParticleRenderIterator()
 {
-	m_pCur = NULL;
+	m_pEffectBinding = nullptr;
+	m_pMaterial = nullptr;
+	m_pParticleDraw = nullptr;
+	m_pMeshBuilder = nullptr;
+	m_pMesh = nullptr;
+
+	m_MinZ = std::numeric_limits<decltype(m_MinZ)>::max();
+	m_MaxZ = std::numeric_limits<decltype(m_MaxZ)>::min();
+	BitwiseClear(m_zCoords);
+	m_nZCoords = 0;
+
+	m_pCur = nullptr;
 	m_bGotFirst = false;
 	m_flPrevZ = 0;
 	m_nParticlesInCurrentBatch = 0;
-	m_MinZ = 1e24;
-	m_MaxZ = -1e24;
-	m_nZCoords = 0;
 }
 
 inline const Particle* CParticleRenderIterator::GetFirst()

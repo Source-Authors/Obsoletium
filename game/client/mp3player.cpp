@@ -186,11 +186,11 @@ public:
 				kv->SetString( "Album", album );
 			}
 		}
-		kv->SetInt( "SongIndex", songIndex );
+		kv->SetUint64( "SongIndex", songIndex );
 		m_pList->AddItem( kv, 0, false, false );
 	}
 
-	void GetSelectedSongs( CUtlVector< int >&list )
+	void GetSelectedSongs( CUtlVector< intp >&list )
 	{
 		list.RemoveAll();
 
@@ -208,7 +208,7 @@ public:
 			{
 				continue;
 			}
-			int song = kv->GetInt( "SongIndex", -1 );
+			intp song = (intp)kv->GetUint64( "SongIndex", std::numeric_limits<uint64>::max() );
 			if ( song == -1 )
 			{
 				continue;
@@ -223,7 +223,7 @@ public:
 
 	MESSAGE_FUNC( OnItemSelected, "ItemSelected" )
 	{
-		CUtlVector< int > songList;
+		CUtlVector< intp > songList;
 		GetSelectedSongs( songList );
 		m_pPlayer->SelectedSongs( CMP3Player::SONG_FROM_FILELIST, songList );
 	}
@@ -264,7 +264,7 @@ void CMP3FileListPage::OnCommand( char const *cmd )
 			KeyValues *kv = m_pList->GetItem( itemId );
 			if ( kv )
 			{
-				int songIndex = kv->GetInt( "SongIndex" );
+				intp songIndex = (intp)kv->GetUint64( "SongIndex" );
 				m_pPlayer->AddToPlayList( songIndex, false );
 			}
 		}
@@ -335,7 +335,7 @@ public:
 				kv->SetString( "Album", album );
 			}
 		}
-		kv->SetInt( "SongIndex", songIndex );
+		kv->SetUint64( "SongIndex", songIndex );
 		m_pList->AddItem( kv, 0, false, false );
 	}
 
@@ -347,14 +347,14 @@ public:
 		{
 			int itemId = m_pList->GetSelectedItem( 0 );
 			KeyValues *kv = m_pList->GetItem( itemId );
-			if ( kv && ( kv->GetInt( "SongIndex", -1 ) == songIndex ) )
+			if ( kv && ( (intp)kv->GetUint64( "SongIndex", std::numeric_limits<uint64>::max() ) == songIndex ) )
 			{
 				m_pList->RemoveItem( itemId );
 			}
 		}
 	}
 
-	void GetSelectedSongs( CUtlVector< int >&list )
+	void GetSelectedSongs( CUtlVector< intp >&list )
 	{
 		list.RemoveAll();
 
@@ -371,7 +371,7 @@ public:
 			{
 				continue;
 			}
-			int song = kv->GetInt( "SongIndex", -1 );
+			intp song = (intp)kv->GetUint64( "SongIndex", std::numeric_limits<uint64>::max() );
 			if ( song == -1 )
 			{
 				continue;
@@ -387,7 +387,7 @@ public:
 
 	MESSAGE_FUNC( OnItemSelected, "ItemSelected" )
 	{
-		CUtlVector< int > songList;
+		CUtlVector< intp > songList;
 		GetSelectedSongs( songList );
 		m_pPlayer->SelectedSongs( CMP3Player::SONG_FROM_PLAYLIST, songList );
 	}
@@ -440,7 +440,7 @@ void CMP3PlayListPage::OnCommand( char const *cmd )
 			KeyValues *kv = m_pList->GetItem( itemId );
 			if ( kv )
 			{
-				int songIndex = kv->GetInt( "SongIndex" );
+				intp songIndex = (intp)kv->GetUint64( "SongIndex" );
 				m_pPlayer->RemoveFromPlayList( songIndex );
 			}
 		}
@@ -548,12 +548,12 @@ class CMP3TreeControl : public TreeView
 public:
 	CMP3TreeControl( CMP3Player *player, char const *panelName );
 
-	int GetSelectedSongIndex();
+	intp GetSelectedSongIndex();
 
 	MESSAGE_FUNC( OnTreeViewItemSelected, "TreeViewItemSelected" )
 	{
-		CUtlVector< int > songList;
-		int idx = GetSelectedSongIndex();
+		CUtlVector< intp > songList;
+		intp idx = GetSelectedSongIndex();
 		if ( idx != -1 )
 		{
 			songList.AddToTail( idx );
@@ -583,7 +583,7 @@ CMP3TreeControl::CMP3TreeControl( CMP3Player *player, char const *panelName ) :
 	AddActionSignalTarget( this );
 }
 
-int CMP3TreeControl::GetSelectedSongIndex()
+intp CMP3TreeControl::GetSelectedSongIndex()
 {
 	CUtlVector< KeyValues * > kv;
 	GetSelectedItemData( kv );
@@ -591,7 +591,7 @@ int CMP3TreeControl::GetSelectedSongIndex()
 	{
 		return -1;
 	}
-	return kv[ 0 ]->GetInt( "SongIndex", -1 );
+	return (intp)kv[ 0 ]->GetUint64( "SongIndex", std::numeric_limits<uint64>::max() );
 }
 
 void CMP3TreeControl::OpenContextMenu()
@@ -617,7 +617,7 @@ void CMP3TreeControl::OnCommand( char const *cmd )
 	if ( !Q_stricmp( cmd, "addsong" ) )
 	{
 		// Get selected item
-		int songIndex = GetSelectedSongIndex();
+		intp songIndex = GetSelectedSongIndex();
 		if ( songIndex >= 0 )
 		{
 			m_pPlayer->AddToPlayList( songIndex, false );
@@ -625,7 +625,7 @@ void CMP3TreeControl::OnCommand( char const *cmd )
 	}
 	else if ( !Q_stricmp( cmd, "playsong" ) )
 	{
-		int songIndex = GetSelectedSongIndex();
+		intp songIndex = GetSelectedSongIndex();
 		if ( songIndex >= 0 )
 		{
 			m_pPlayer->AddToPlayList( songIndex, true );
@@ -783,7 +783,7 @@ void CMP3Player::DeleteSoundDirectories()
 
 void CMP3Player::RemoveTempSounds()
 {
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 
 	char path[ 512 ];
 	Q_strncpy( path, "sound/_mp3/*.mp3", sizeof( path ) );
@@ -1086,7 +1086,7 @@ void CMP3Player::RecursiveFindMP3Files( SoundDirectory_t *root, char const *curr
 
 	Q_FixSlashes( path );
 	
-	FileFindHandle_t fh;
+	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	char const *fn = g_pFullFileSystem->FindFirstEx( path, pathID, &fh );
 	if ( fn )
 	{
@@ -1229,7 +1229,7 @@ void CMP3Player::RecursiveAddToTree( MP3Dir_t *current, intp parentIndex )
 		KeyValuesAD kv( "TVI" );
 
 		kv->SetString( "Text", song->shortname.String() );
-		kv->SetInt( "SongIndex", current->m_FilesInDirectory[ i ] );
+		kv->SetUint64( "SongIndex", current->m_FilesInDirectory[ i ] );
 
 		intp index = m_pTree->AddItem( kv, parentIndex );
 		m_pTree->SetItemFgColor( index, TREE_TEXT_COLOR );
@@ -1441,7 +1441,7 @@ float CMP3Player::GetMP3Duration( char const *songname )
 	return enginesound->GetSoundDuration( songname );
 }
 
-void CMP3Player::SelectedSongs( SongListSource_t from, CUtlVector< int >& songIndexList )
+void CMP3Player::SelectedSongs( SongListSource_t from, CUtlVector< intp >& songIndexList )
 {
 	m_SelectedSongs.RemoveAll();
 	m_SelectionFrom = from;
@@ -1905,7 +1905,7 @@ static void bpr( int level, CUtlBuffer& buf, PRINTF_FORMAT_STRING char const *fm
 {
 	char txt[ 4096 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2018 //-V2019
 	V_vsprintf_safe( txt, fmt, argptr );
 	va_end( argptr );
 
@@ -1979,10 +1979,7 @@ void CMP3Player::SaveDbDirectory( int level, CUtlBuffer& buf, SoundDirectory_t *
 	bpr( level + 1, buf, "fullpath \"%s\"\n", sd->m_pTree->m_FullDirPath.String() );
 
 	CUtlVector< intp > files;
-	if ( sd->m_pTree )
-	{
-		FlattenDirectoryFileList_R( sd->m_pTree, files );
-	}
+	FlattenDirectoryFileList_R( sd->m_pTree, files );
 
 	intp c = files.Count();
 	if ( c > 0 )

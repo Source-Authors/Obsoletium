@@ -4,20 +4,20 @@
 // as much as possible contain portability problems.  Here avoiding including
 // windows.h.
 
-#ifndef TIER0_THREADTOOLS_H_
-#define TIER0_THREADTOOLS_H_
+#ifndef SE_PUBLIC_TIER0_THREADTOOLS_H_
+#define SE_PUBLIC_TIER0_THREADTOOLS_H_
 
-#include "tier0/type_traits.h"
+#include "type_traits.h"
 
 #include <DirectXMath.h>
 #include <atomic>
 #include <climits>
 
-#include "tier0/platform.h"
-#include "tier0/memalloc.h"
-#include "tier0/dbg.h"
-#include "tier0/vcrmode.h"
-#include "tier0/vprof_telemetry.h"
+#include "platform.h"
+#include "memalloc.h"
+#include "dbg.h"
+#include "vcrmode.h"
+#include "vprof_telemetry.h"
 
 #ifdef PLATFORM_WINDOWS_PC
 #include <intrin.h>
@@ -90,7 +90,14 @@ constexpr unsigned TT_INFINITE = 0xffffffff; //-V112
 
 #endif // NO_THREAD_LOCAL
 
-using ThreadId_t = unsigned long;
+// dimhotepus: Backport from TF2. Was unsigned long.
+//#ifdef PLATFORM_64BITS
+//using ThreadId_t = uint64;
+//#else
+using ThreadId_t = uint32;
+//#endif
+
+constexpr inline ThreadId_t INVALID_THREAD_ID{~ThreadId_t(0)};
 
 //-----------------------------------------------------------------------------
 //
@@ -171,7 +178,7 @@ PLATFORM_INTERFACE bool ThreadJoin( ThreadHandle_t, unsigned timeout = TT_INFINI
 PLATFORM_INTERFACE void ThreadDetach( ThreadHandle_t );
 
 PLATFORM_INTERFACE void ThreadSetDebugName( ThreadId_t id, const char *pszName );
-inline void ThreadSetDebugName( const char *pszName ) { ThreadSetDebugName( static_cast<ThreadId_t>(-1), pszName ); }
+inline void ThreadSetDebugName( const char *pszName ) { ThreadSetDebugName( INVALID_THREAD_ID, pszName ); }
 
 PLATFORM_INTERFACE void ThreadSetAffinity( ThreadHandle_t hThread, intp nAffinityMask );
 
@@ -303,7 +310,7 @@ PLATFORM_INTERFACE bool ThreadInterlockedAssignPointerIf( void * volatile *, voi
 
 #if defined( PLATFORM_64BITS )
 #if defined (_WIN32) && defined( _XM_SSE_INTRINSICS_ )
-typedef __m128i int128;
+using int128 = __m128i;
 inline int128 int128_zero()	{ return _mm_setzero_si128(); }
 #else
 typedef __int128_t int128;
@@ -408,7 +415,7 @@ public:
 	CThreadLocalBase();
 	~CThreadLocalBase();
 
-	void * Get() const;
+	[[nodiscard]] void * Get() const;
 	void   Set(void *);
 
 private:
@@ -592,8 +599,8 @@ private:
 	std::atomic<T> m_value;
 };
 
-typedef CInterlockedIntT<int> CInterlockedInt;
-typedef CInterlockedIntT<unsigned> CInterlockedUInt;
+using CInterlockedInt = CInterlockedIntT<int>;
+using CInterlockedUInt = CInterlockedIntT<unsigned int>;
 
 //-----------------------------------------------------------------------------
 
@@ -694,13 +701,13 @@ public:
 	void Unlock() const		{ (const_cast<CThreadMutex *>(this))->Unlock(); }
 
 	bool TryLock();
-	bool TryLock() const	{ return (const_cast<CThreadMutex *>(this))->TryLock(); }
+	[[nodiscard]] bool TryLock() const	{ return (const_cast<CThreadMutex *>(this))->TryLock(); }
 
 	//------------------------------------------------------
 	// Use this to make deadlocks easier to track by asserting
 	// when it is expected that the current thread owns the mutex
 	//------------------------------------------------------
-	bool AssertOwnedByCurrentThread() const;
+	[[nodiscard]] bool AssertOwnedByCurrentThread() const;
 
 	//------------------------------------------------------
 	// Enable tracing to track deadlock problems
@@ -751,8 +758,7 @@ class CThreadFastMutex
 {
 public:
 	CThreadFastMutex()
-	  :	m_ownerID( 0 ),
-	  	m_depth( 0 )
+	  :	m_ownerID( 0 )
 	{
 	}
 
@@ -850,7 +856,7 @@ public:
 	int	GetDepth() const				{ return m_depth; }
 private:
 	CInterlockedUInt m_ownerID;
-	int				m_depth;
+	int				m_depth{ 0 };
 };
 
 // dimhotepus: Fix aligned alloc.
@@ -905,7 +911,7 @@ public:
 	void Unlock() const		{ if ( *pCondition ) BaseClass::Unlock(); }
 
 	bool TryLock()			{ if ( *pCondition ) return BaseClass::TryLock(); else return true; }
-	bool TryLock() const 	{ if ( *pCondition ) return BaseClass::TryLock(); else return true; }
+	[[nodiscard]] bool TryLock() const 	{ if ( *pCondition ) return BaseClass::TryLock(); else return true; }
 	bool AssertOwnedByCurrentThread() { if ( *pCondition ) return BaseClass::AssertOwnedByCurrentThread(); else return true; }
 	void SetTrace( bool b ) { if ( *pCondition ) BaseClass::SetTrace( b ); }
 };
@@ -919,7 +925,7 @@ class CThreadTerminalMutex : public BaseClass
 {
 public:
 	bool TryLock()			{ if ( !BaseClass::TryLock() ) { DebuggerBreak(); return false; } return true; }
-	bool TryLock() const 	{ if ( !BaseClass::TryLock() ) { DebuggerBreak(); return false; } return true; }
+	[[nodiscard]] bool TryLock() const 	{ if ( !BaseClass::TryLock() ) { DebuggerBreak(); return false; } return true; }
 	void Lock()				{ if ( !TryLock() ) BaseClass::Lock(); }
 	void Lock() const 		{ if ( !TryLock() ) BaseClass::Lock(); }
 
@@ -990,7 +996,7 @@ private:
 	CAutoLockT<MUTEX_TYPE> &operator=( CAutoLockT<MUTEX_TYPE> && ) = delete;
 };
 
-typedef CAutoLockT<CThreadMutex> CAutoLock;
+using CAutoLock = CAutoLockT<CThreadMutex>;
 
 template < typename MUTEX_TYPE >
 inline CAutoLockT<MUTEX_TYPE> make_auto_lock( MUTEX_TYPE& lock, const char* pMutexname, const char* pFilename, int nLineNum, uint64 nMinReportDurationUs = 1 )
@@ -1035,7 +1041,7 @@ public:
 	//-----------------------------------------------------
 #ifdef _WIN32
 	operator HANDLE() { return GetHandle(); }
-	HANDLE GetHandle() const { return m_hSyncObject; }
+	[[nodiscard]] HANDLE GetHandle() const { return m_hSyncObject; }
 #endif
 	//-----------------------------------------------------
 	// Wait for a signal from the object
@@ -1220,9 +1226,9 @@ private:
 	CThreadEvent m_CanWrite;
 	CThreadEvent m_CanRead;
 
-	int m_nWriters;
-	int m_nActiveReaders;
-	int m_nPendingReaders;
+	int m_nWriters{ 0 };
+	int m_nActiveReaders{ 0 };
+	int m_nPendingReaders{ 0 };
 };
 
 //-----------------------------------------------------------------------------
@@ -1394,7 +1400,7 @@ protected:
 	bool WaitForCreateComplete( CThreadEvent *pEvent );
 
 	// "Virtual static" facility
-	typedef unsigned (__stdcall *ThreadProc_t)( void * );
+	using ThreadProc_t = unsigned int (__stdcall *)(void *);
 	virtual ThreadProc_t GetThreadProc();
 	virtual bool IsThreadRunning();
 
@@ -1532,7 +1538,7 @@ protected:
 #ifndef _WIN32
 #define __stdcall
 #endif
-	typedef uint32 (__stdcall *WaitFunc_t)( int nEvents, CThreadEvent * const *pEvents, int bWaitAll, uint32 timeout );
+	using WaitFunc_t = uint32 (__stdcall *)(int, CThreadEvent *const *, int, uint32);
 	
 	int Call( unsigned, unsigned timeout, bool fBoost, WaitFunc_t = nullptr, CFunctor *pParamFunctor = nullptr );
 	int WaitForReply( unsigned timeout, WaitFunc_t );
@@ -1569,13 +1575,13 @@ template<class T> class CMessageQueue
 	MsgNode *Tail;
 
 public:
-	CMessageQueue( void )
+	CMessageQueue( )
 	{
 		Head = Tail = nullptr;
 	}
 
 	// check for a message. not 100% reliable - someone could grab the message first
-	bool MessageWaiting( void ) 
+	bool MessageWaiting( ) 
 	{
 		return ( Head != nullptr );
 	}
@@ -1634,8 +1640,8 @@ public:
 //-----------------------------------------------------------------------------
 
 #ifdef _WIN32
-typedef struct _RTL_CRITICAL_SECTION RTL_CRITICAL_SECTION;
-typedef RTL_CRITICAL_SECTION CRITICAL_SECTION;
+using RTL_CRITICAL_SECTION = struct _RTL_CRITICAL_SECTION;
+using CRITICAL_SECTION = RTL_CRITICAL_SECTION;
 
 #ifndef _X360
 extern "C"
@@ -1766,10 +1772,7 @@ inline void CThreadMutex::SetTrace(bool fTrace)
 //-----------------------------------------------------------------------------
 
 inline CThreadRWLock::CThreadRWLock()
-:	m_CanRead( true ),
-	m_nWriters( 0 ),
-	m_nActiveReaders( 0 ),
-	m_nPendingReaders( 0 )
+:	m_CanRead( true )
 {
 }
 
@@ -1809,8 +1812,7 @@ inline bool CThreadSpinRWLock::AssignIf( const LockInfo_t &newValue, LockInfo_t 
 
 inline bool CThreadSpinRWLock::TryLockForWrite( const ThreadId_t threadId )
 {
-	auto lockInfo = m_lockInfo.load();
-
+	const auto lockInfo = m_lockInfo.load();
 	// In order to grab a write lock, there can be no readers and no owners of the write lock
 	if ( lockInfo.m_nReaders > 0 || ( lockInfo.m_writerId && lockInfo.m_writerId != threadId ) )
 	{
@@ -1927,4 +1929,4 @@ private:
 
 //-----------------------------------------------------------------------------
 
-#endif  // TIER0_THREADTOOLS_H_
+#endif  // !SE_PUBLIC_TIER0_THREADTOOLS_H_

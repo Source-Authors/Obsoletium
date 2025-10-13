@@ -286,7 +286,7 @@ public:
 				// add the configuration in the combo
 				char szDXLevelName[64];
 				GetNameForDXLevel( dxl, szDXLevelName, sizeof(szDXLevelName) );
-				m_pDXLevel->AddItem( szDXLevelName, new KeyValues("dxlevel", "dxlevel", dxl) );
+				m_pDXLevel->AddItem( szDXLevelName, KeyValuesAD( new KeyValues("dxlevel", "dxlevel", dxl) ) );
 			}
 		}
 
@@ -541,23 +541,6 @@ public:
 			box->SetCancelCommand(new KeyValues("ResetDXLevelCombo"));
 			box->DoModal();
 		}
-
-		if ( panel == m_pD3D9Ex )
-		{
-			// Windows Aero extensions changed.
-			if ( !m_bDisplayedWindowsAeroChangeMessage && m_pD3D9Ex->IsEnabled() )
-			{
-				ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
-				Assert( mat_disable_d3d9ex.IsValid() );
-				if ( mat_disable_d3d9ex.GetInt() != 1 - m_pD3D9Ex->GetActiveItem() )
-				{
-					m_bDisplayedWindowsAeroChangeMessage = true;
-					MessageBox *box = new MessageBox( "#GameUI_D3D9Ex", "#GameUI_D3D9ExRelaunchMsg", this );
-					box->MoveToFront();
-					box->DoModal();
-				}
-			}
-		}
 	}
 
 	MESSAGE_FUNC( OnGameUIHidden, "GameUIHidden" )	// called when the GameUI is hidden
@@ -584,14 +567,6 @@ public:
 			ConVarRef mat_hdr_level("mat_hdr_level");
 			Assert( mat_hdr_level.IsValid() );
 			m_pHDR->ActivateItem( clamp( mat_hdr_level.GetInt(), 0, 2 ) );
-		}
-
-		// Reset Windows Aero extensions too
-		if ( m_pD3D9Ex->IsEnabled() )
-		{
-			ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
-			Assert( mat_disable_d3d9ex.IsValid() );
-			m_pD3D9Ex->ActivateItem( mat_disable_d3d9ex.GetInt() ? 0 : 1 );
 		}
 	}
 
@@ -643,10 +618,8 @@ public:
 		int nDXLevel = pKeyValues->GetInt( "ConVar.mat_dxlevel", 0 );
 		int nColorCorrection = pKeyValues->GetInt( "ConVar.mat_colorcorrection", 0 );
 		int nMotionBlur = pKeyValues->GetInt( "ConVar.mat_motion_blur_enabled", 0 );
-		// dimhotepus: mat_supports_d3d9ex not present in original Valve config. Need direct access.s
-		ConVarRef mat_supports_d3d9ex( "mat_supports_d3d9ex" );
-		Assert( mat_supports_d3d9ex.IsValid() );
-		int nSupportD3d9ex = mat_supports_d3d9ex.GetInt();
+		// dimhotepus: All systems since Windows 7 support Direct3D9 Ex.
+		constexpr int nSupportD3d9ex = 1;
 		// It doesn't make sense to retrieve this convar from dxsupport, because we'll then have materialsystem setting this config at loadtime. (Also, it only has very minimal support for CPU related configuration.)
 		//int nMulticore = pKeyValues->GetInt( "ConVar.mat_queue_mode", 0 );
 		int nMulticore = GetCPUInformation()->m_nPhysicalProcessors >= 2;
@@ -854,14 +827,6 @@ public:
 
 		ApplyChangesToConVar( "mat_motion_blur_enabled", m_pMotionBlur->GetActiveItem() );
 
-		if ( m_pD3D9Ex->IsEnabled() )
-		{
-			ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
-			Assert( mat_disable_d3d9ex.IsValid() );
-			// Inverse, disabled means not enabled.
-			mat_disable_d3d9ex.SetValue(1 - m_pD3D9Ex->GetActiveItem());
-		}
-		
 		m_pFOVSlider->ApplyChanges();
 	}
 
@@ -885,7 +850,6 @@ public:
 		ConVarRef mat_hdr_level( "mat_hdr_level" );
 		ConVarRef mat_colorcorrection( "mat_colorcorrection" );
 		ConVarRef mat_motion_blur_enabled( "mat_motion_blur_enabled" );
-		ConVarRef mat_disable_d3d9ex( "mat_disable_d3d9ex" );
 		ConVarRef r_shadowrendertotexture( "r_shadowrendertotexture" );
 
 		ResetDXLevelCombo();
@@ -908,9 +872,9 @@ public:
 		}
 
 		m_pShaderDetail->ActivateItem( mat_reducefillrate.GetBool() ? 0 : 1 );
-		m_pHDR->ActivateItem(clamp(mat_hdr_level.GetInt(), 0, 2));
-		// Inversed, disabled means not enabled.
-		m_pD3D9Ex->ActivateItem( mat_disable_d3d9ex.GetInt() ? 0 : 1 );
+		m_pHDR->ActivateItem(clamp( mat_hdr_level.GetInt(), 0, 2) );
+		// dimhotepus: Always enabled since Windows 7
+		m_pD3D9Ex->ActivateItem( 1 );
 
 		switch (mat_forceaniso.GetInt())
 		{
@@ -1646,7 +1610,7 @@ void COptionsSubVideo::OnResetData()
 #if defined( USE_SDL ) && defined( DX_TO_GL_ABSTRACTION )
 	int ItemIndex;
 
-	if ( config.Borderless() )
+	if ( config.NoWindowBorder() )
 	{
 		// Last before one item in the combobox is window borderless.
 		ItemIndex = ( m_pWindowed->GetItemCount() - 1 );
@@ -1670,7 +1634,7 @@ void COptionsSubVideo::OnResetData()
 
     m_pWindowed->ActivateItem( ItemIndex );
 #else
-	if (config.Borderless())
+	if (config.NoWindowBorder())
 	{
 		m_pWindowed->ActivateItem( 2 );
 	}
@@ -1685,7 +1649,7 @@ void COptionsSubVideo::OnResetData()
 #endif
 
 	// reset gamma control
-	m_pGammaButton->SetEnabled( !config.Windowed() && !config.Borderless() );
+	m_pGammaButton->SetEnabled( !config.Windowed() && !config.NoWindowBorder() );
 
 	m_pHDContent->SetSelected( BUseHDContent() );
 
@@ -1817,7 +1781,7 @@ void COptionsSubVideo::OnApplyChanges()
 	if ( config.m_VideoMode.m_Width != width
 		|| config.m_VideoMode.m_Height != height
 		|| config.Windowed() != windowed
-		|| config.Borderless() != borderless )
+		|| config.NoWindowBorder() != borderless )
 	{
 		bConfigChanged = true;
 	}
@@ -1889,7 +1853,7 @@ void COptionsSubVideo::PerformLayout()
 	if ( m_pGammaButton )
 	{
 		const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
-		m_pGammaButton->SetEnabled( !config.Windowed() && !config.Borderless() );
+		m_pGammaButton->SetEnabled( !config.Windowed() && !config.NoWindowBorder() );
 	}
 }
 

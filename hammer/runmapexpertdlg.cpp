@@ -631,7 +631,7 @@ void CRunMapExpertDlg::OnSelchangeConfigurations()
 
 	// add the commands from this sequence into the command listbox ..
 	CCommandArray &Commands = pSeq->m_Commands;
-	for(int i = 0; i < Commands.GetSize(); i++)
+	for(intp i = 0; i < Commands.GetSize(); i++)
 	{
 		PCCOMMAND pCommand = new CCOMMAND(Commands[i]);
 		AddCommand(i, pCommand);

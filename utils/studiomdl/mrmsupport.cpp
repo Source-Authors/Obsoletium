@@ -517,8 +517,8 @@ static void BuildUniqueVertexList( s_source_t *pSource, const int *pDesiredToVLi
 // sort new vertices by materials, last used
 //-----------------------------------------------------------------------------
 static bool vlistCompare( const int elem1, const int elem2 ) {
-	RESTRICT v_unify_t *u1 = &v_listdata[elem1];
-	RESTRICT v_unify_t *u2 = &v_listdata[elem2];
+	v_unify_t * RESTRICT u1 = &v_listdata[elem1];
+	v_unify_t * RESTRICT u2 = &v_listdata[elem2];
 
 	// sort by material
 	if (u1->m < u2->m)
@@ -653,8 +653,8 @@ static void BuildFaceList( s_source_t *pSource, int *pVListToDesired, int *pDesi
 //-----------------------------------------------------------------------------
 static void RemapVertexAnimations( s_source_t *pSource, int *pVListToDesired )
 {
-	int nAnimationCount = pSource->m_Animations.Count();
-	for ( int i = 0; i < nAnimationCount; ++i )
+	intp nAnimationCount = pSource->m_Animations.Count();
+	for ( intp i = 0; i < nAnimationCount; ++i )
 	{
 		s_sourceanim_t &anim = pSource->m_Animations[i];
 		if ( !anim.newStyleVertexAnimations )

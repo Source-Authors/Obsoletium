@@ -36,10 +36,10 @@ void CCustomAnim::LoadFromFile()
 	if ( !filesystem->String( m_Handle, fn, sizeof( fn ) ) )
 		return;
 
-	KeyValues *kv = new KeyValues( "CustomAnimation" );
+	KeyValuesAD kv( "CustomAnimation" );
 	if ( kv->LoadFromFile( filesystem, fn, "MOD" ) )
 	{
-		for ( KeyValues *sub = kv->GetFirstSubKey(); sub ; sub = sub->GetNextKey() )
+		for ( auto *sub = kv->GetFirstSubKey(); sub ; sub = sub->GetNextKey() )
 		{
 			CUtlSymbol anim;
 			anim = sub->GetString();
@@ -47,7 +47,6 @@ void CCustomAnim::LoadFromFile()
 			m_Animations.AddToTail( anim );
 		}
 	}
-	kv->deleteThis();
 }
 
 void CCustomAnim::SaveToFile()
@@ -206,7 +205,7 @@ AnimationBrowser::AnimationBrowser( mxWindow *parent, int id /*=0*/ )
 	m_pThumbnailDecreaseButton = new mxButton( this, 0, 0, 18, 18, "-", IDC_AB_THUMBNAIL_DECREASE );
 	m_nCurFilter = FILTER_NONE;
 
-	m_flDragTime = 0.0f;
+	m_flDragTime = 0.0;
 
 	OnFilter();
 }
@@ -250,7 +249,7 @@ void AnimationBrowser::Deselect( void )
 // Purpose: 
 // Input  : exp - 
 //-----------------------------------------------------------------------------
-void AnimationBrowser::Select( int sequence )
+void AnimationBrowser::Select( intp sequence )
 {
 	m_nCurCell = sequence;
 	redraw();
@@ -260,10 +259,9 @@ void AnimationBrowser::Select( int sequence )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int AnimationBrowser::ComputePixelsNeeded( void )
+intp AnimationBrowser::ComputePixelsNeeded( void )
 {
-	int seqcount = GetSequenceCount();
-
+	intp seqcount = GetSequenceCount();
 	if ( !seqcount )
 		return 100;
 
@@ -276,11 +274,11 @@ int AnimationBrowser::ComputePixelsNeeded( void )
 	// At least one
 	colsperrow = max( 1, colsperrow );
 
-	int rowsneeded = ( ( seqcount + colsperrow - 1 ) / colsperrow  );
+	intp rowsneeded = ( ( seqcount + colsperrow - 1 ) / colsperrow  );
 	return rowsneeded * ( m_nSnapshotHeight + m_nGap ) + m_nGap + TOP_GAP + GetCaptionHeight();
 }
 
-bool AnimationBrowser::ComputeRect( int cell, int& rcx, int& rcy, int& rcw, int& rch )
+bool AnimationBrowser::ComputeRect( intp cell, int& rcx, int& rcy, int& rcw, int& rch )
 {
 	// Remove scroll bar
 	int w = this->w2() - 16;
@@ -327,7 +325,7 @@ void AnimationBrowser::DrawSequenceFocusRect( CChoreoWidgetDrawHelper& helper, i
 	helper.DrawOutlinedRect( clr, PS_SOLID, 4, x, y, x + w, y + h );
 }
 
-void AnimationBrowser::DrawSequenceDescription( CChoreoWidgetDrawHelper& helper, int x, int y, int w, int h, int sequence, mstudioseqdesc_t &seqdesc )
+void AnimationBrowser::DrawSequenceDescription( CChoreoWidgetDrawHelper& helper, int x, int y, int w, int h, intp sequence, mstudioseqdesc_t &seqdesc )
 {
 	int textheight = 15;
 
@@ -367,7 +365,7 @@ bool AnimationBrowser::PaintBackground( void )
 	return false;
 }
 
-void AnimationBrowser::DrawThumbNail( int sequence, CChoreoWidgetDrawHelper& helper, int rcx, int rcy, int rcw, int rch )
+void AnimationBrowser::DrawThumbNail( intp sequence, CChoreoWidgetDrawHelper& helper, int rcx, int rcy, int rcw, int rch )
 {
 	HDC dc = helper.GrabDC();
 
@@ -399,7 +397,7 @@ void AnimationBrowser::redraw()
 
 	bool updateSelection = false;
 
-	int curcount = GetSequenceCount();
+	intp curcount = GetSequenceCount();
 	if ( curcount != m_nLastNumAnimations )
 	{
 		m_nTopOffset = 0;
@@ -426,8 +424,8 @@ void AnimationBrowser::redraw()
 
 	EnableStickySnapshotMode( );
 
-	int c = curcount;
-	for ( int i = 0; i < c; i++ )
+	intp c = curcount;
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( !ComputeRect( i, rcx, rcy, rcw, rch ) )
 		{
@@ -455,14 +453,14 @@ void AnimationBrowser::redraw()
 
 }
 
-int AnimationBrowser::GetCellUnderPosition( int x, int y )
+intp AnimationBrowser::GetCellUnderPosition( int x, int y )
 {
-	int count = GetSequenceCount();
+	intp count = GetSequenceCount();
 	if ( !count )
 		return -1;
 
 	int rcx, rcy, rcw, rch;
-	int c = 0;
+	intp c = 0;
 	while ( c < count )
 	{
 		if ( !ComputeRect( c, rcx, rcy, rcw, rch ) )
@@ -487,7 +485,7 @@ void AnimationBrowser::RepositionSlider( void )
 	int trueh = h2() - GetCaptionHeight();
 
 	int heightpixels = trueh / m_nGranularity;
-	int rangepixels = ComputePixelsNeeded() / m_nGranularity;
+	intp rangepixels = ComputePixelsNeeded() / m_nGranularity;
 
 	if ( rangepixels < heightpixels )
 	{
@@ -501,7 +499,7 @@ void AnimationBrowser::RepositionSlider( void )
 
 	slScrollbar->setBounds( w2() - 16, GetCaptionHeight() + TOP_GAP, 16, trueh - TOP_GAP );
 
-	m_nTopOffset = max( 0, m_nTopOffset );
+	m_nTopOffset = max( (intp)0, m_nTopOffset );
 	m_nTopOffset = min( rangepixels, m_nTopOffset );
 
 	slScrollbar->setRange( 0, rangepixels );
@@ -509,7 +507,7 @@ void AnimationBrowser::RepositionSlider( void )
 	slScrollbar->setPagesize( heightpixels );
 }
 
-void AnimationBrowser::SetClickedCell( int cell )
+void AnimationBrowser::SetClickedCell( intp cell )
 {
 	m_nClickedCell = cell;
 	Select( cell );
@@ -652,7 +650,7 @@ int AnimationBrowser::handleEvent (mxEvent *event)
 				break;
 			case IDC_AB_FILTERTAB:
 				{
-					int index = m_pFilterTab->getSelectedIndex();
+					intp index = m_pFilterTab->getSelectedIndex();
 					if ( index >= 0 )
 					{
 						m_nCurFilter = index;
@@ -714,7 +712,7 @@ int AnimationBrowser::handleEvent (mxEvent *event)
 				break;
 			case IDC_AB_CONTEXT_CREATEBITMAP:
 				{
-					int current_model = models->GetActiveModelIndex();
+					intp current_model = models->GetActiveModelIndex();
 
 					if ( m_nClickedCell >= 0 )
 					{
@@ -725,7 +723,7 @@ int AnimationBrowser::handleEvent (mxEvent *event)
 				break;
 			case IDC_AB_CONTEXT_CREATEALLBITMAPS:
 				{
-					int current_model = models->GetActiveModelIndex();
+					intp current_model = models->GetActiveModelIndex();
 					models->RecreateAllAnimationBitmaps( current_model );
 					redraw();
 				}
@@ -738,7 +736,7 @@ int AnimationBrowser::handleEvent (mxEvent *event)
 			if ( !( event->buttons & mxEvent::MouseRightButton ) )
 			{
 				// Figure out cell #
-				int cell = GetCellUnderPosition( event->x, event->y );
+				intp cell = GetCellUnderPosition( event->x, event->y );
 				if ( cell >= 0 && cell < GetSequenceCount() )
 				{
 					int cx, cy, cw, ch;
@@ -870,11 +868,11 @@ int AnimationBrowser::handleEvent (mxEvent *event)
 
 			if ( event->height < 0 )
 			{
-				m_nTopOffset = min( m_nTopOffset + 10, slScrollbar->getMaxValue() );
+				m_nTopOffset = min( m_nTopOffset + 10, (intp)slScrollbar->getMaxValue() );
 			}
 			else
 			{
-				m_nTopOffset = max( m_nTopOffset - 10, 0 );
+				m_nTopOffset = max( m_nTopOffset - 10, (intp)0 );
 			}
 			RepositionSlider();
 			redraw();
@@ -952,7 +950,7 @@ void AnimationBrowser::Think( float dt )
 	StudioModel *model = models->GetActiveStudioModel();
 	if ( model )
 	{
-		int iSequence = TranslateSequenceNumber( m_nClickedCell );
+		intp iSequence = TranslateSequenceNumber( m_nClickedCell );
 		float dur = model->GetDuration( iSequence );
 		if ( dur > 0.0f )
 		{
@@ -1046,11 +1044,11 @@ static bool IsTypeOfSequence( StudioModel *model, int sequence, char const *type
 	if ( !model->GetStudioHdr() )
 		return match;
 
-	KeyValues *seqKeyValues = new KeyValues("");
+	KeyValuesAD seqKeyValues("");
 	if ( seqKeyValues->LoadFromBuffer( model->GetFileName( ), model->GetKeyValueText( sequence ) ) )
 	{
 		// Do we have a build point section?
-		KeyValues *pkvAllFaceposer = seqKeyValues->FindKey("faceposer");
+		auto *pkvAllFaceposer = seqKeyValues->FindKey("faceposer");
 		if ( pkvAllFaceposer )
 		{
 			char const *t = pkvAllFaceposer->GetString( "type", "" );
@@ -1060,8 +1058,6 @@ static bool IsTypeOfSequence( StudioModel *model, int sequence, char const *type
 			}
 		}
 	}
-
-	seqKeyValues->deleteThis();
 
 	return match;
 }
@@ -1145,7 +1141,7 @@ void AnimationBrowser::OnFilter()
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int AnimationBrowser::GetSequenceCount()
+intp AnimationBrowser::GetSequenceCount()
 {
 	return m_Filtered.Count();
 }
@@ -1155,7 +1151,7 @@ int AnimationBrowser::GetSequenceCount()
 // Input  : index - 
 // Output : mstudioseqdesc_t
 //-----------------------------------------------------------------------------
-mstudioseqdesc_t *AnimationBrowser::GetSeqDesc( int index )
+mstudioseqdesc_t *AnimationBrowser::GetSeqDesc( intp index )
 {
 	CStudioHdr *hdr = models->GetActiveStudioModel()->GetStudioHdr();
 	if ( !hdr )
@@ -1169,7 +1165,7 @@ mstudioseqdesc_t *AnimationBrowser::GetSeqDesc( int index )
 	return &hdr->pSeqdesc( index );
 }
 
-int	 AnimationBrowser::TranslateSequenceNumber( int index )
+intp	 AnimationBrowser::TranslateSequenceNumber( intp index )
 {
 	if ( index < 0 || index >= m_Filtered.Count() )
 		return NULL;
@@ -1478,7 +1474,7 @@ void AnimationBrowser::RemoveAnimationFromCustomFile( int index, char const *ani
 	CUtlSymbol search;
 	search = animationName;
 	
-	int slot = anim->m_Animations.Find( search );
+	intp slot = anim->m_Animations.Find( search );
 	if ( slot != anim->m_Animations.InvalidIndex() )
 	{
 		anim->m_Animations.Remove( slot );

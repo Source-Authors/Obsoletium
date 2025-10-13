@@ -26,6 +26,7 @@
 #include "tier1/utlsymbol.h"
 
 #include "tools_minidump.h"
+#include "scoped_app_locale.h"
 
 #include "tier0/memdbgon.h"
 
@@ -530,7 +531,7 @@ int material_to_texture(int material) {
   return -1;
 }
 
-template<intp maxlen>
+template <intp maxlen>
 int lookup_texture(char (&texturename)[maxlen]) {
   int i;
 
@@ -955,7 +956,7 @@ static void FlipFacing(s_source_t *pSrc) {
       s_face_t &f = pSrc->face[pMesh->faceoffset + j];
 
       // dimhotepus: Original code used swap with unsigned short variable which
-      // causes leaks as f.b/f.c are unsigned long.
+      // causes leaks as f.b/f.c are uint32.
       std::swap(f.b, f.c);
     }
   }
@@ -1199,8 +1200,7 @@ void M_MatrixAngles(const M_matrix4x4_t &matrix, RadianEuler &angles,
   angles[0] = atan2f(sX, cX);
   angles[2] = atan2f(sZ, cZ);
 
-  sX = sinf(angles[0]);
-  cX = cosf(angles[0]);
+  DirectX::XMScalarSinCos(&sX, &cX, angles[0]);
 
   if (sX > cX)
     cY = matrix[1][2] / sX;
@@ -1265,21 +1265,25 @@ void M_MatrixCopy(const M_matrix4x4_t &in, M_matrix4x4_t &out) {
   memcpy(out.Base(), in.Base(), sizeof(float) * 4 * 4);
 }
 void M_RotateZMatrix(float radian, M_matrix4x4_t &resultMatrix) {
-  resultMatrix[0][0] = cosf(radian);
-  resultMatrix[0][1] = sin(radian);
+  float sa, ca;
+  DirectX::XMScalarSinCos(&sa, &ca, radian);
+
+  resultMatrix[0][0] = ca;
+  resultMatrix[0][1] = sa;
   resultMatrix[0][2] = 0.0;
-  resultMatrix[1][0] = -sin(radian);
-  resultMatrix[1][1] = cos(radian);
+  resultMatrix[1][0] = -sa;
+  resultMatrix[1][1] = ca;
   resultMatrix[1][2] = 0.0;
   resultMatrix[2][0] = 0.0;
   resultMatrix[2][1] = 0.0;
   resultMatrix[2][2] = 1.0;
 }
 
-// !!! THIS SHIT DOESN'T WORK!! WHY? HAS I EVER?
+// !!! THIS DOESN'T WORK!! WHY? HAS IT EVER?
 void M_AngleAboutAxis(Vector &axis, float radianAngle, M_matrix4x4_t &result) {
-  float c = cosf(radianAngle);
-  float s = sinf(radianAngle);
+  float s, c;
+  DirectX::XMScalarSinCos(&s, &c, radianAngle);
+
   float t = 1.0f - c;
   // axis.normalize();
 
@@ -1439,14 +1443,18 @@ void M_ConcatTransforms(const M_matrix4x4_t &in1, const M_matrix4x4_t &in2,
 void M_AngleMatrix(RadianEuler const &angles, const Vector &position,
                    M_matrix4x4_t &matrix) {
   // Assert( s_bMathlibInitialized );
-  float sx, sy, sz, cx, cy, cz;
+  DirectX::XMVECTOR vecAngles =
+      DirectX::XMVectorSet(angles[0], angles[1], angles[2], 0);
 
-  sx = sinf(angles[0]);
-  cx = cosf(angles[0]);
-  sy = sinf(angles[1]);
-  cy = cosf(angles[1]);
-  sz = sinf(angles[2]);
-  cz = cosf(angles[2]);
+  DirectX::XMVECTOR sin, cos;
+  DirectX::XMVectorSinCos(&sin, &cos, vecAngles);
+
+  float sx = DirectX::XMVectorGetX(sin);
+  float cx = DirectX::XMVectorGetX(cos);
+  float sy = DirectX::XMVectorGetY(sin);
+  float cy = DirectX::XMVectorGetY(cos);
+  float sz = DirectX::XMVectorGetZ(sin);
+  float cz = DirectX::XMVectorGetZ(cos);
 
   // SinCos( angles[0], &sx, &cx ); // 2
   // SinCos( angles[1], &sy, &cy ); // 1
@@ -2797,6 +2805,20 @@ int main(int argc, char **argv) {
   // Header
   PrintHeader();
 
+  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+  //
+  // Printf/sscanf functions expect en_US UTF8 localization.
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    fprintf(stderr, "setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
+
   // Init command line stuff
   CommandLine()->CreateCmdLine(argc, argv);
   InstallSpewFunction();
@@ -2888,7 +2910,7 @@ int main(int argc, char **argv) {
 
   // Verbose stuff
   if (!g_quiet) {
-    vprint(stdout, 0, "%s, %s, %s, path %s\n", qdir, gamedir, g_outfile);
+    vprint(stdout, 0, "%s, %s, %s\n", qdir, gamedir, g_outfile);
   }
 
   // ??

@@ -25,40 +25,20 @@ if ["%~2"]==["x86"] (
   EXIT /B 1
 )
 
-REM Build VPC.
-MKDIR external\vpc\out
-PUSHD external\vpc\out
-cmake -G Ninja ..
-if ERRORLEVEL 1 (
-  ECHO cmake generation for external\vpc failed.
-  EXIT /B 1
-)
-
-cmake --build . --config Release
-if ERRORLEVEL 1 (
-  ECHO cmake --build for external\vpc failed.
-  EXIT /B 1
-)
-
-COPY /V /Y vpc.exe /B ..\..\..\devtools\bin\vpc.exe /B
-if ERRORLEVEL 1 (
-  ECHO No vpc.exe to copy to devtools\bin\.
-  EXIT /B 1
-)
-
-COPY /V /Y vpc.pdb /B ..\..\..\devtools\bin\vpc.pdb /B
-if ERRORLEVEL 1 (
-  ECHO No vpc.pdb to copy to devtools\bin\.
-  EXIT /B 1
-)
-POPD
-
 
 SET "WIN_X64= "
 if ["%CMAKE_MSVC_ARCH_NAME%"]==["x64"] (
   SET "WIN_X64=/windows"
 
-  echo Add /windows arg to VPC as generating x64 solution. 
+  ECHO Add /windows arg to VPC as generating x64 solution.
+
+  ECHO Searching for ml64 in PATH...
+  WHERE ml64.exe
+
+  if ERRORLEVEL 1 (
+    ECHO Unable to find ml64 in PATH.
+    EXIT /B 1
+  )
 )
 
 

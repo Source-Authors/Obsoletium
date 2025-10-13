@@ -90,8 +90,8 @@ private:
 	template< class T > int ModifyKey( int nPoint, DmeTime_t initialTime, DmeTime_t time, int nComps, float flValue );
 
 	CDmeHandle<CDmeLog> m_hLog;
-	int m_LogFieldMask;
-	int m_nFieldIndex;
+	int m_LogFieldMask{0};
+	int m_nFieldIndex{0};
 	DmeTime_t m_minTime;
 	DmeTime_t m_maxTime;
 	float m_flMinVertical;

@@ -25,7 +25,7 @@ inline float V_round( float f )
 //-----------------------------------------------------------------------------
 
 // The epsilon used by the solver
-const float AIMS_EPS = 0.01;
+constexpr inline float AIMS_EPS = 0.01;
 
 
 //-----------------------------------------------------------------------------
@@ -101,8 +101,8 @@ bool CAI_MoveSolver::Solve( const AI_MoveSuggestion_t *pSuggestions, int nSugges
 	suggestions.AddVectorToTail( m_Regulations );
 
 	// Initialize the solver
-	const int NUM_SOLUTIONS	= 120;
-	const int SOLUTION_ANG	= 360 / NUM_SOLUTIONS;
+	constexpr int NUM_SOLUTIONS	= 120;
+	constexpr int SOLUTION_ANG	= 360 / NUM_SOLUTIONS;
 
 	COMPILE_TIME_ASSERT( ( 360 % NUM_SOLUTIONS ) == 0 );
 
@@ -145,8 +145,8 @@ bool CAI_MoveSolver::Solve( const AI_MoveSuggestion_t *pSuggestions, int nSugges
 
 		// Sweep from left to right, summing the bias. For positive suggestions,
 		// the bias is further weighted to favor the center of the arc.
-		const float positiveDegradePer180 = 0.05; // i.e., lose 5% of weight by the time hit 180 degrees off center
-		const float positiveDegrade       = ( positiveDegradePer180 / ( NUM_SOLUTIONS * 0.5 ) ); 
+		constexpr float positiveDegradePer180 = 0.05; // i.e., lose 5% of weight by the time hit 180 degrees off center
+		constexpr float positiveDegrade       = ( positiveDegradePer180 / ( NUM_SOLUTIONS * 0.5 ) ); 
 
 		for ( int i = 0; i < left + 1; ++i )
 		{
@@ -285,7 +285,7 @@ bool CAI_MoveSolver::HaveRegulationForObstacle( CBaseEntity *pEntity)
 CON_COMMAND(ai_test_move_solver, "Tests the AI move solver system")
 {
 #ifdef DEBUG
-	const float EPS = 0.001;
+	constexpr float EPS = 0.001;
 #endif
 	DevMsg( "Beginning move solver tests...\n" );
 

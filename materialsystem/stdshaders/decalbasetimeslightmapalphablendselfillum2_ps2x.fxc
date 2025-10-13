@@ -19,7 +19,7 @@ struct PS_INPUT
 
 float4 main( PS_INPUT i ) : COLOR
 {
-	HALF4 result = tex2D( BaseTextureSampler, i.vTexCoord0 );
+	float4 result = tex2D( BaseTextureSampler, i.vTexCoord0 );
 	
 	float fogFactor = CalcPixelFogFactor( PIXELFOGTYPE, g_FogParams, g_EyePos_SpecExponent.z, i.worldPos_projPosZ.z, i.worldPos_projPosZ.w );
 	return FinalOutput( result, fogFactor, PIXELFOGTYPE, TONEMAP_SCALE_LINEAR );

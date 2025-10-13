@@ -22,7 +22,7 @@ struct VS_OUTPUT
 #if !defined( _X360 )    
 	float  fog						: FOG;
 #endif
-	HALF2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
+	float2 baseTexCoord				: TEXCOORD0;		// Base texture coordinate
 	float4 color					: TEXCOORD2;		// Vertex color (from lighting or unlit)
 	
 	float4 worldPos_projPosZ		: TEXCOORD7;		// Necessary for pixel fog

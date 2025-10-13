@@ -2307,7 +2307,7 @@ void CMatchmaking::SetPreventFullServerStartup( bool bState, char const *fmt, ..
 {
 	char desc[ 256 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( desc, fmt, argptr );
 	va_end( argptr );
 

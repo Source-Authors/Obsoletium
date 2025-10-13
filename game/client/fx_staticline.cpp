@@ -160,7 +160,7 @@ void CFXStaticLine::Destroy( void )
 // Input:	frametime - the time, this frame
 //==================================================
 
-void CFXStaticLine::Update( double frametime )
+void CFXStaticLine::Update( float frametime )
 {
 	m_fLife -= frametime;
 }

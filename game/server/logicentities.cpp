@@ -131,8 +131,8 @@ void CLogicCompareInteger::InputCompareValues( inputdata_t &inputdata )
 //
 // Spawnflags and others constants.
 //
-const int SF_TIMER_UPDOWN = 1;
-const float LOGIC_TIMER_MIN_INTERVAL = 0.01;
+constexpr inline int SF_TIMER_UPDOWN = 1;
+constexpr inline float LOGIC_TIMER_MIN_INTERVAL = 0.01;
 
 
 class CTimerEntity : public CLogicalEntity
@@ -585,8 +585,8 @@ void CLogicLineToEntity::Think(void)
 //-----------------------------------------------------------------------------
 // Purpose: Remaps a given input range to an output range.
 //-----------------------------------------------------------------------------
-const int SF_MATH_REMAP_IGNORE_OUT_OF_RANGE = 1;
-const int SF_MATH_REMAP_CLAMP_OUTPUT_TO_RANGE = 2;
+constexpr inline int SF_MATH_REMAP_IGNORE_OUT_OF_RANGE = 1;
+constexpr inline int SF_MATH_REMAP_CLAMP_OUTPUT_TO_RANGE = 2;
 
 class CMathRemap : public CLogicalEntity
 {
@@ -717,7 +717,7 @@ void CMathRemap::InputValue( inputdata_t &inputdata )
 //-----------------------------------------------------------------------------
 // Purpose: Remaps a given input range to an output range.
 //-----------------------------------------------------------------------------
-const int SF_COLOR_BLEND_IGNORE_OUT_OF_RANGE = 1;
+constexpr inline int SF_COLOR_BLEND_IGNORE_OUT_OF_RANGE = 1;
 
 class CMathColorBlend : public CLogicalEntity
 {
@@ -849,7 +849,7 @@ static ConCommand global_set( "global_set", CC_Global_Set, "global_set <globalna
 // Purpose: Holds a global state that can be queried by other entities to change
 //			their behavior, such as "predistaster".
 //-----------------------------------------------------------------------------
-const int SF_GLOBAL_SET = 1;	// Set global state to initial state on spawn
+constexpr inline int SF_GLOBAL_SET = 1;	// Set global state to initial state on spawn
 
 class CEnvGlobal : public CLogicalEntity
 {
@@ -897,7 +897,9 @@ BEGIN_DATADESC( CEnvGlobal )
 	DEFINE_INPUTFUNC( FIELD_INTEGER, "AddToCounter",	InputAddToCounter ),
 	DEFINE_INPUTFUNC( FIELD_VOID, "GetCounter",	InputGetCounter ),
 	
-	DEFINE_OUTPUT( m_outCounter, "Counter" ),
+	// dimhotepus: Original output had name Counter which conflicted with
+	// counter keyvalue which was returned instead.
+	DEFINE_OUTPUT( m_outCounter, "OnCounter" ),
 
 END_DATADESC()
 
@@ -1102,7 +1104,7 @@ int CEnvGlobal::DrawDebugTextOverlays(void)
 //-----------------------------------------------------------------------------
 #define MS_MAX_TARGETS 32
 
-const int SF_MULTI_INIT	= 1;
+constexpr inline int SF_MULTI_INIT	= 1;
 
 class CMultiSource : public CLogicalEntity
 {
@@ -1201,7 +1203,8 @@ void CMultiSource::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_TYPE 
 			break;
 
 	// if we didn't find it, report error and leave
-	if (i > m_iTotal)
+	// dimhotepus: Exit when caller not found.
+	if (i >= m_iTotal)
 	{
 		Warning("MultiSrc: Used by non member %s.\n", pCaller->edict() ? pCaller->GetClassname() : "<logical entity>");
 		return;	

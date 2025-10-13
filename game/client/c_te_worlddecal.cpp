@@ -153,5 +153,5 @@ void TE_WorldDecal( IRecipientFilter& filter, float delay, KeyValues *pKeyValues
 	vecOrigin.z = pKeyValues->GetFloat( "originz" );
 	const char *pDecalName = pKeyValues->GetString( "decalname" );
 
-	TE_WorldDecal( filter, 0.0f, &vecOrigin, effects->Draw_DecalIndexFromName( (char*)pDecalName ) );
+	TE_WorldDecal( filter, 0.0f, &vecOrigin, effects->Draw_DecalIndexFromName( pDecalName ) );
 }

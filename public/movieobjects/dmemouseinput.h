@@ -34,8 +34,8 @@ public:
 protected:
 	void GetNormalizedCursorPos( float &flX, float &flY );
 
-	float m_xOrigin;
-	float m_yOrigin;
+	float m_xOrigin{0.0f};
+	float m_yOrigin{0.0f};
 
 	CDmaVar< float > m_x;
 	CDmaVar< float > m_y;

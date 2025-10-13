@@ -113,7 +113,23 @@ void WriteDebug(char *pszStr)
 //			pList - List to put the children in.
 // Output : Returns TRUE to continue enumerating when called from EnumChildren.
 //-----------------------------------------------------------------------------
-BOOL AddLeavesToListCallback(CMapClass *pObject, CMapObjectList *pList)
+BOOL AddAllLeavesToListCallback(CMapClass *pObject, CMapObjectList *pList)
+{
+	if (pObject->GetChildCount() == 0)
+	{
+		pList->AddToTail(pObject);
+	}
+
+	return(TRUE);
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Adds the given object to the list if it is a leaf object (no children).
+// Input  : pObject - Object to add to the list.
+//			pList - List to put the children in.
+// Output : Returns TRUE to continue enumerating when called from EnumChildren.
+//-----------------------------------------------------------------------------
+BOOL AddSolidLeavesToListCallback(CMapSolid *pObject, CMapObjectList *pList)
 {
 	if (pObject->GetChildCount() == 0)
 	{

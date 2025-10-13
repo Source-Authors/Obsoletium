@@ -7,10 +7,6 @@
 #ifndef CHECKSUM_MD5_H
 #define CHECKSUM_MD5_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/platform.h"
 
 #include <memory.h>

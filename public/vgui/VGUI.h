@@ -16,15 +16,8 @@
 
 #include "tier0/platform.h"
 
-#define null 0L
-
-#ifndef NULL
-#ifdef __cplusplus
-#define NULL    0
-#else
-#define NULL    nullptr
-#endif
-#endif
+// dimhotepus: Drop pesky null define
+// #define null 0L
 
 using uchar = unsigned char;
 using ushort = unsigned short;
@@ -53,10 +46,13 @@ using VPANEL = uintp;
 
 // dimhotepus: x64 port. unsigned long -> uintp.
 using HScheme = uintp;
+// dimhotepus: x64 port. unsigned long -> uint32.
 // Both -1 and 0 are used for invalid textures. Be careful.
-using HTexture = unsigned long;
-using HCursor = unsigned long;
-using HPanel = unsigned long;
+using HTexture = uint32;
+// dimhotepus: x64 port. unsigned long -> uint32.
+using HCursor = uint32;
+// dimhotepus: x64 port. unsigned long -> uint32.
+using HPanel = uint32;
 
 constexpr inline HPanel INVALID_PANEL{std::numeric_limits<HPanel>::max()};
 

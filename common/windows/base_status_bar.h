@@ -20,7 +20,7 @@ class CBaseStatusBar : public CStatusBar {
   afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
   DECLARE_MESSAGE_MAP()
 
-  int GetHeight() const;
+  [[nodiscard]] int GetHeight() const;
   void ScaleHeight(int initialHeight);
 
  private:

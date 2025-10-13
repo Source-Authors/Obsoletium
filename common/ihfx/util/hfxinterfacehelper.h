@@ -1,5 +1,5 @@
 
-typedef int (*NovintHFX_ExposeInterfaceFn)(void **ppInterface, void *hwnd, const char *cmd, unsigned int versionMaj, unsigned int versionMin, void *pMouseEnableFN, unsigned int TargetDevices);
+using NovintHFX_ExposeInterfaceFn = int (*)(void **, void *, const char *, unsigned int, unsigned int, void *, unsigned int);
 inline const char *HFX_GetVersionMajorString(){
 	return HFX_VERSION_MAJOR_SZ;
 }
@@ -16,7 +16,7 @@ inline const char *HFX_DYNAMIC_LIBRARY_NAME(const unsigned int tries = 0){
 	switch(tries)
 	{
 	default:
-		return 0;
+		return nullptr;
 	break;
 
 #ifdef HFX_DLL_CUSTOM_NAME

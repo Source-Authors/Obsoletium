@@ -8,8 +8,8 @@
 
 #include "BaseVSShader.h"
 
-#include "VertexLitGeneric_vs11.inc"
-#include "VertexLitGeneric_SelfIllumOnly.inc"
+#include "vertexlitgeneric_vs11.inc"
+#include "vertexlitgeneric_selfillumonly.inc"
 #include "emissive_scroll_blended_pass_helper.h"
 #include "flesh_interior_blended_pass_helper.h"
 #include "cloak_blended_pass_helper.h"

@@ -13,11 +13,11 @@ $Configuration
 {
 	$Linker
 	{
-		$AdditionalDependencies				"$BASE psapi.lib"
+		$AdditionalDependencies				"$BASE psapi.lib shell32.lib user32.lib"
 	}
 }
 
-$Project "Actbusy"
+$Project "actbusy"
 {
 	$Folder	"Source Files"
 	{

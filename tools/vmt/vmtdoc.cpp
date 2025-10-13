@@ -246,9 +246,9 @@ void CVMTDoc::CopyParamsFromVMT( CDmElement *pVMT )
 				int r, g, b;
 				Vector v = pSrc->GetValue<Vector>( );
 				v *= 255.0f;
-				r = clamp( v[0], 0, 255 );
-				g = clamp( v[1], 0, 255 );
-				b = clamp( v[2], 0, 255 );
+				r = clamp( v[0], 0.f, 255.f );
+				g = clamp( v[1], 0.f, 255.f );
+				b = clamp( v[2], 0.f, 255.f );
 				c.SetColor( r, g, b, 255 );
 				pDst->SetValue( c );
 			}
@@ -839,9 +839,9 @@ bool CVMTDoc::SetColorParamValue( CDmAttribute *pAttribute, const char *pValue )
 	if ( count == 3 )
 	{
 		vec *= 255.0f;
-		r = clamp( vec[0], 0, 255 );
-		g = clamp( vec[1], 0, 255 );
-		b = clamp( vec[2], 0, 255 );
+		r = clamp( vec[0], 0.f, 255.f );
+		g = clamp( vec[1], 0.f, 255.f );
+		b = clamp( vec[2], 0.f, 255.f );
 		c.SetColor( r, g, b, 255 );
 		pAttribute->SetValue( c );
 		return true;
@@ -1049,12 +1049,13 @@ void CVMTDoc::UpdatePreviewMaterial()
 	g_pDataModel->Serialize( vmtBuf, "vmt", "vmt", m_hRoot );
 
 	// Now use the text format to create a keyvalues
-	KeyValues *pVMTKeyValues = new KeyValues( "ShaderName" );
-	pVMTKeyValues->LoadFromBuffer( "VMT Preview", vmtBuf, g_pFileSystem, "GAME" );
-
-	// Finally, hook the keyvalues into the material.
-	m_pPreviewMaterial->SetShaderAndParams( pVMTKeyValues );
-	pVMTKeyValues->deleteThis();
+	KeyValuesAD pVMTKeyValues( "ShaderName" );
+	// dimhotepus: Set shader and params only if they are loaded successfully.
+	if ( pVMTKeyValues->LoadFromBuffer( "VMT Preview", vmtBuf, g_pFileSystem, "GAME" ) )
+	{
+		// Finally, hook the keyvalues into the material.
+		m_pPreviewMaterial->SetShaderAndParams( pVMTKeyValues );
+	}
 }
 
 	

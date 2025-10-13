@@ -184,7 +184,7 @@ bool CGameClient::ProcessMove(CLC_Move *msg)
 //		m_Client->m_NetChan->incoming_sequence,
 //		m_Client->m_NetChan->incoming_sequence & SV_UPDATE_MASK );
 	
-	int startbit = msg->m_DataIn.GetNumBitsRead();
+	intp startbit = msg->m_DataIn.GetNumBitsRead();
 
 	serverGameClients->ProcessUsercmds
 	( 
@@ -204,7 +204,7 @@ bool CGameClient::ProcessMove(CLC_Move *msg)
 		return false;
 	}
 
-	int endbit = msg->m_DataIn.GetNumBitsRead();
+	intp endbit = msg->m_DataIn.GetNumBitsRead();
 
 	if ( msg->m_nLength != (endbit-startbit) )
 	{
@@ -218,7 +218,7 @@ bool CGameClient::ProcessMove(CLC_Move *msg)
 bool CGameClient::ProcessVoiceData( CLC_VoiceData *msg )
 {
 	char voiceDataBuffer[4096];
-	int bitsRead = msg->m_DataIn.ReadBitsClamped( voiceDataBuffer, msg->m_nLength );
+	intp bitsRead = msg->m_DataIn.ReadBitsClamped( voiceDataBuffer, msg->m_nLength );
 
 	SV_BroadcastVoiceData( this, Bits2Bytes(bitsRead), voiceDataBuffer, msg->m_xuid );
 
@@ -433,7 +433,7 @@ void CGameClient::SetupPackInfo( CFrameSnapshot *pSnapshot )
 	if ( sv_maxreplay.GetFloat() > 0 )
 	{
 		// if the server has replay features enabled, allow a way bigger frame buffer
-		nMaxFrames = max ( (float)nMaxFrames, sv_maxreplay.GetFloat() / m_Server->GetTickInterval() );
+		nMaxFrames = (int)max ( (float)nMaxFrames, sv_maxreplay.GetFloat() / m_Server->GetTickInterval() );
 	}
 		
 	if ( nMaxFrames < AddClientFrame( m_pCurrentFrame ) )
@@ -692,7 +692,7 @@ void CGameClient::Disconnect( const char *fmt, ... )
 	if ( m_nSignonState == SIGNONSTATE_NONE )
 		return;	// no recursion
 
-	va_start (argptr,fmt);
+	va_start (argptr,fmt); //-V2019 //-V2018
 	V_vsprintf_safe (reason, fmt,argptr);
 	va_end (argptr);
 
@@ -819,10 +819,10 @@ void CGameClient::WriteGameSounds( bf_write &buf )
 
 int	CGameClient::FillSoundsMessage(SVC_Sounds &msg)
 {
-	int i, count = m_Sounds.Count();
+	intp count = m_Sounds.Count();
 
 	// send max 64 sound in multiplayer per snapshot, 255 in SP
-	int max = m_Server->IsMultiplayer() ? 32 : 255;
+	intp max = m_Server->IsMultiplayer() ? 32 : 255;
 
 	// Discard events if we have too many to signal with 8 bits
 	if ( count > max )
@@ -841,7 +841,7 @@ int	CGameClient::FillSoundsMessage(SVC_Sounds &msg)
 
 	Assert( msg.m_DataOut.GetNumBitsLeft() > 0 );
 
-	for ( i = 0 ; i < count; i++ )
+	for ( intp i = 0 ; i < count; i++ )
 	{
 		SoundInfo_t &sound = m_Sounds[ i ];
 		sound.WriteDelta( pDeltaSound, msg.m_DataOut );
@@ -849,11 +849,11 @@ int	CGameClient::FillSoundsMessage(SVC_Sounds &msg)
 	}
 
 	// remove added events from list
-	int remove = m_Sounds.Count() - ( count + max );
+	intp remove = m_Sounds.Count() - ( count + max );
 
 	if ( remove > 0 )
 	{
-		DevMsg("Warning! Dropped %i unreliable sounds for client %s.\n" , remove, m_Name );
+		DevMsg("Warning! Dropped %zi unreliable sounds for client %s.\n" , remove, m_Name );
 		count+= remove;
 	}
 	

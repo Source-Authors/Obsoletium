@@ -1079,7 +1079,7 @@ void CNPC_Manhack::MaintainGroundHeight( void )
 	if ( zSpeed > 32.0f )
 		return;
 
-	const float minGroundHeight = 52.0f;
+	constexpr float minGroundHeight = 52.0f;
 
 	trace_t	tr;
 	AI_TraceHull(	GetAbsOrigin(), 
@@ -1139,7 +1139,7 @@ bool CNPC_Manhack::OverrideMove( float flInterval )
 	else if (GetNavigator()->IsGoalActive())
 	{
 		bool bReducible = GetNavigator()->GetPath()->GetCurWaypoint()->IsReducible();
-		const float strictTolerance = 64.0;
+		constexpr float strictTolerance = 64.0;
 		//NDebugOverlay::Line( GetAbsOrigin(), GetAbsOrigin() + Vector(0, 0, 10 ), 255, 0, 0, true, 0.1);
   		if ( ProgressFlyPath( flInterval, GetEnemy(), MoveCollisionMask(), bReducible, strictTolerance ) == AINPP_COMPLETE )
 			return true;

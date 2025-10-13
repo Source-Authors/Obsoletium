@@ -55,7 +55,7 @@ void CProgressDlg::ReEnableParent()
 BOOL CProgressDlg::Create(CWnd *pParent)
 {
     // Get the true parent of the dialog
-    m_pParentWnd = CWnd::GetSafeOwner(pParent);
+    m_pParentWnd = __super::GetSafeOwner(pParent);
 
     // m_bParentDisabled is used to re-enable the parent window
     // when the dialog is destroyed. So we don't want to set
@@ -95,11 +95,11 @@ void CProgressDlg::OnCancel()
     m_bCancel=TRUE;
 }
 
-void CProgressDlg::SetRange(short nLower,short nUpper)
+void CProgressDlg::SetRange(int nLower,int nUpper)
 {
     m_nLower = nLower;
     m_nUpper = nUpper;
-    m_Progress.SetRange(nLower,nUpper);
+    m_Progress.SetRange32(nLower,nUpper);
 }
   
 int CProgressDlg::SetPos(int nPos)
@@ -169,30 +169,32 @@ BOOL CProgressDlg::CheckCancelButton()
 
 void CProgressDlg::UpdatePercent(int nNewPos)
 {
-    CWnd *pWndPercent = GetDlgItem(CG_IDC_PROGDLG_PERCENT);
-    
-    short nDivisor = m_nUpper - m_nLower;
-    Assert(nDivisor>0);  // m_nLower should be smaller than m_nUpper
-
-    int nDividend = (nNewPos - m_nLower);
-    Assert(nDividend>=0);   // Current position should be greater than m_nLower
-
-    int nPercent = nDividend * 100 / nDivisor;
-
-    // Since the Progress Control wraps, we will wrap the percentage
-    // along with it. However, don't reset 100% back to 0%
-    if (nPercent != 100)
-      nPercent %= 100;
-
-    // Display the percentage
-    CString strBuf;
-    strBuf.Format(_T("%hd%c"),nPercent,_T('%'));
-
-	CString strCur; // get current percentage
-    pWndPercent->GetWindowText(strCur);
-
-	if (strCur != strBuf)
-		pWndPercent->SetWindowText(strBuf);
+    // dimhotepus: Drop percent showing as looks too bad
+    // (window is not transparent and we can't make it one as created by control).
+    // CWnd *pWndPercent = GetDlgItem(CG_IDC_PROGDLG_PERCENT);
+    // 
+    // int nDivisor = m_nUpper - m_nLower;
+    // Assert(nDivisor>0);  // m_nLower should be smaller than m_nUpper
+    // 
+    // int nDividend = (nNewPos - m_nLower);
+    // Assert(nDividend>=0);   // Current position should be greater than m_nLower
+    // 
+    // int nPercent = nDividend * 100 / nDivisor;
+    // 
+    // // Since the Progress Control wraps, we will wrap the percentage
+    // // along with it. However, don't reset 100% back to 0%
+    // if (nPercent != 100)
+    //   nPercent %= 100;
+    // 
+    // // Display the percentage
+    // CString strBuf;
+    // strBuf.Format(_T("%hd%c"),nPercent,_T('%'));
+    // 
+	// CString strCur; // get current percentage
+    // pWndPercent->GetWindowText(strCur);
+    // 
+	// if (strCur != strBuf)
+	// 	pWndPercent->SetWindowText(strBuf);
 }
     
 /////////////////////////////////////////////////////////////////////////////
@@ -201,7 +203,7 @@ void CProgressDlg::UpdatePercent(int nNewPos)
 BOOL CProgressDlg::OnInitDialog() 
 {
     __super::OnInitDialog();
-    m_Progress.SetRange(m_nLower,m_nUpper);
+    m_Progress.SetRange32(m_nLower,m_nUpper);
     m_Progress.SetStep(m_nStep);
     m_Progress.SetPos(m_nLower);
 

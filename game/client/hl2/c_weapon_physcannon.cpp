@@ -53,6 +53,8 @@ END_RECV_TABLE()
 //-----------------------------------------------------------------------------
 C_WeaponPhysCannon::C_WeaponPhysCannon( void )
 {
+	m_bIsCurrentlyUpgrading = false;
+	m_flTimeForceView = false;
 	m_bWasUpgraded = false;
 	m_flTimeIgnoreForceView = -1;
 }

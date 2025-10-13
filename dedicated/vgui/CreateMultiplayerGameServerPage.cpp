@@ -103,10 +103,10 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
   // dimhotepus: Ensure no UB on uninitialized mod read.
   memset(m_szMod, 0x0, sizeof(m_szMod));
 
-  m_MainPanel =
-      parent;  // as we are a popup frame we need to store this seperately
-  m_pSavedData = NULL;
-  m_pGameInfo = NULL;
+  // as we are a popup frame we need to store this seperately
+  m_MainPanel = parent;
+  m_pSavedData = nullptr;
+  m_pGameInfo = nullptr;
 
   SetMinimumSize(310, 350);
   SetSize(310, 350);
@@ -120,8 +120,8 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
   m_pMapList->SetEditable(false);
 
   m_pNetworkCombo = new ComboBox(this, "NetworkCombo", 10, false);
-  int defaultItem = m_pNetworkCombo->AddItem("#Internet", NULL);
-  int lanItem = m_pNetworkCombo->AddItem("#LAN", NULL);
+  int defaultItem = m_pNetworkCombo->AddItem("#Internet", nullptr);
+  int lanItem = m_pNetworkCombo->AddItem("#LAN", nullptr);
   if (CommandLine()->CheckParm("-steam") && IsSteamInOfflineMode()) {
     defaultItem = lanItem;
   }
@@ -131,7 +131,7 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
   char num[3];
   for (int i = 1; i <= MAX_PLAYERS; i++) {
     V_sprintf_safe(num, "%i", i);
-    m_pNumPlayers->AddItem(num, NULL);
+    m_pNumPlayers->AddItem(num, nullptr);
   }
   m_pNumPlayers->ActivateItemByRow(23);  // 24 players by default
 
@@ -159,7 +159,7 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
 
   // get default port from commandline if possible
   m_iPort = 27015;
-  const char *portVal = NULL;
+  const char *portVal = nullptr;
   if (CommandLine()->CheckParm("-port", &portVal) && portVal &&
       atoi(portVal) > 0) {
     m_iPort = atoi(portVal);
@@ -180,8 +180,8 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
   SetVisible(true);
 
   if (CommandLine()->CheckParm("-steam") && IsSteamInOfflineMode()) {
-    MessageBox *box = new vgui::MessageBox("#Start_Server_Offline_Title",
-                                           "#Start_Server_Offline_Warning");
+    auto *box = new vgui::MessageBox("#Start_Server_Offline_Title",
+                                     "#Start_Server_Offline_Warning");
     box->DoModal();
   }
 }
@@ -193,11 +193,11 @@ CCreateMultiplayerGameServerPage::~CCreateMultiplayerGameServerPage() {
   SaveConfig();
   if (m_pSavedData) {
     m_pSavedData->deleteThis();
-    m_pSavedData = NULL;
+    m_pSavedData = nullptr;
   }
   if (m_pGameInfo) {
     m_pGameInfo->deleteThis();
-    m_pGameInfo = NULL;
+    m_pGameInfo = nullptr;
   }
 }
 
@@ -357,8 +357,8 @@ void CCreateMultiplayerGameServerPage::OnCommand(const char *cmd) {
 
     //	V_strcpy_safe(m_szPassword, GetControlString("RCONPasswordEdit", ""));
     if (strlen(m_szPassword) < 3 || BadRconChars(m_szPassword)) {
-      MessageBox *dlg = new MessageBox("#Start_Server_RCON_Error_Title",
-                                       "#Start_Server_RCON_Error");
+      auto *dlg = new MessageBox("#Start_Server_RCON_Error_Title",
+                                 "#Start_Server_RCON_Error");
       dlg->DoModal();
     } else {
       V_sprintf_safe(
@@ -489,10 +489,11 @@ void CCreateMultiplayerGameServerPage::LoadMODList() {
 
     KeyValuesAD gamesFile(pSteamGamesFilename);
 
-    if (gamesFile->LoadFromFile(g_pFullFileSystem, pSteamGamesFilename, NULL)) {
-      for (KeyValues *kv = gamesFile->GetFirstSubKey(); kv != NULL;
+    if (gamesFile->LoadFromFile(g_pFullFileSystem, pSteamGamesFilename,
+                                nullptr)) {
+      for (KeyValues *kv = gamesFile->GetFirstSubKey(); kv != nullptr;
            kv = kv->GetNextKey()) {
-        const char *pGameDir = kv->GetString("gamedir", NULL);
+        const char *pGameDir = kv->GetString("gamedir", nullptr);
         if (!pGameDir)
           Error("Mod %s in %s missing 'gamedir'.", kv->GetName(),
                 pSteamGamesFilename);
@@ -509,7 +510,7 @@ void CCreateMultiplayerGameServerPage::LoadMODList() {
   // Also, check in SourceMods.
   char sourceModsDir[MAX_PATH];
   if (system()->GetRegistryString(
-          "HKEY_CURRENT_USER\\Software\\Valve\\Steam\\SourceModInstallPath",
+          R"(HKEY_CURRENT_USER\Software\Valve\Steam\SourceModInstallPath)",
           sourceModsDir, sizeof(sourceModsDir)))
     LoadModListInDirectory(sourceModsDir);
 
@@ -523,7 +524,7 @@ void CCreateMultiplayerGameServerPage::LoadModListInDirectory(
   Q_AppendSlash(searchString, sizeof(searchString));
   Q_strncat(searchString, "*.*", sizeof(searchString), COPY_ALL_CHARACTERS);
 
-  FileFindHandle_t findHandle = NULL;
+  FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
   const char *filename =
       g_pFullFileSystem->FindFirst(searchString, &findHandle);
   while (filename) {
@@ -597,7 +598,7 @@ void CCreateMultiplayerGameServerPage::AddMod(const char *pGameDirName,
     if (IsEp1EraAppID(iSteamAppId)) return;
 #endif
 
-    const char *gameName = pGameInfo->GetString("game", NULL);
+    const char *gameName = pGameInfo->GetString("game", nullptr);
     if (!gameName) Error("%s missing 'game' key.", pGameInfoFilename);
 
     // add to drop-down combo and mod list
@@ -615,18 +616,15 @@ void CCreateMultiplayerGameServerPage::AddMod(const char *pGameDirName,
 int CCreateMultiplayerGameServerPage::LoadMaps(const char *pszMod) {
   // iterate the filesystem getting the list of all the files
   // UNDONE: steam wants this done in a special way, need to support that
-  FileFindHandle_t findHandle = NULL;
   char szSearch[256];
   V_sprintf_safe(szSearch, "%s/maps/*.bsp", pszMod);
 
   int iMapsFound = 0;
 
+  FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
   const char *pszFilename = g_pFullFileSystem->FindFirst(szSearch, &findHandle);
-
-  KeyValues *hiddenMaps = NULL;
-  if (m_pGameInfo) {
-    hiddenMaps = m_pGameInfo->FindKey("hidden_maps");
-  }
+  KeyValues *hiddenMaps =
+      m_pGameInfo ? m_pGameInfo->FindKey("hidden_maps") : nullptr;
 
   while (pszFilename) {
     // remove the text 'maps/' and '.bsp' from the file name to get the map name
@@ -660,7 +658,7 @@ int CCreateMultiplayerGameServerPage::LoadMaps(const char *pszMod) {
     iMapsFound++;
 
     // add to the map list
-    m_pMapList->AddItem(mapname, NULL);
+    m_pMapList->AddItem(mapname, nullptr);
 
     // get the next file
   nextFile:
@@ -692,9 +690,10 @@ void CCreateMultiplayerGameServerPage::LoadMapList() {
 
   if (CommandLine()->CheckParm("-steam")) {
     KeyValues *userData = m_pGameCombo->GetActiveItemUserData();
-    if (userData && userData->GetString("DedicatedServerStartMap", NULL)) {
+    if (userData && userData->GetString("DedicatedServerStartMap", nullptr)) {
       // set only
-      m_pMapList->AddItem(userData->GetString("DedicatedServerStartMap"), NULL);
+      m_pMapList->AddItem(userData->GetString("DedicatedServerStartMap"),
+                          nullptr);
       m_pMapList->ActivateItemByRow(0);
       m_pMapList->SetEnabled(false);
       return;
@@ -768,7 +767,7 @@ void CCreateMultiplayerGameServerPage::OnTextChanged(Panel *panel) {
     KeyValues *gameData = m_pGameCombo->GetActiveItemUserData();
     if (!gameData) Error("Missing gameData for active item.");
 
-    const char *pGameDir = gameData->GetString("gamedir", NULL);
+    const char *pGameDir = gameData->GetString("gamedir", nullptr);
     if (!pGameDir) Error("Game %s missing 'gamedir' key.", m_szGameName);
 
     V_strcpy_safe(m_szMod, pGameDir);
@@ -780,9 +779,8 @@ void CCreateMultiplayerGameServerPage::OnTextChanged(Panel *panel) {
     char liblist[1024];
     V_sprintf_safe(liblist, "%s\\gameinfo.txt", m_szMod);
     m_pGameInfo = new KeyValues("GameInfo");
-    if ( !m_pGameInfo->LoadFromFile(g_pFullFileSystem, liblist) )
-    {
-        Warning( "Unable to load game info from '%s'.\n", liblist );
+    if (!m_pGameInfo->LoadFromFile(g_pFullFileSystem, liblist)) {
+      Warning("Unable to load game info from '%s'.\n", liblist);
     }
 
     // redo the hostname with the new game name

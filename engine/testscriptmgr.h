@@ -26,7 +26,8 @@ public:
 	int				m_nCount;			// How many times we've hit the loop.
 	double			m_flStartTime;		// What time the loop started at.
 	char			m_Name[64];
-	unsigned long	m_iNextCommandPos;	// Position in the file of the next command.
+	// dimhotepus: unsigned long -> unsigned. x86-64.
+	unsigned		m_iNextCommandPos;	// Position in the file of the next command.
 	int				m_ListIndex;		// Index into CTestScriptMgr::m_Loops.
 };
 

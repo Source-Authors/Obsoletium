@@ -73,7 +73,9 @@ namespace {
     if (bytes_read > 0) {
       size -= bytes_read;
 
-      MD5Update(&ctx, chunk, bytes_read);
+      Assert(bytes_read <= std::size(chunk));
+
+      MD5Update(&ctx, chunk, static_cast<unsigned>(bytes_read));
     }
 
     // We are at the end of file, break loop and return.

@@ -1,4 +1,4 @@
-//========= Copyright Valve Corporation, All rights reserved. ============//
+ï»¿//========= Copyright Valve Corporation, All rights reserved. ============//
 //
 // Purpose: 
 //
@@ -308,7 +308,7 @@ const char *ExpandPath(const char *path)
 // is $include in scriptlib, if this function returns 0, $include will
 // behave the way it did before this change
 //-----------------------------------------------------------------------------
-int CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, const char *pszPath )
+intp CmdLib_ExpandWithBasePaths( CUtlVector< CUtlString > &expandedPathList, const char *pszPath )
 {
 	return 0;
 }
@@ -487,15 +487,11 @@ public:
 	CFlatButton( mxWindow *parent, int id )
 		: mxButton( parent, 0, 0, 0, 0, "", id )
 	{
-		HWND wnd = (HWND)getHandle();
-		DWORD exstyle = GetWindowLong( wnd, GWL_EXSTYLE );
-		exstyle |= WS_EX_CLIENTEDGE;
-		SetWindowLong( wnd, GWL_EXSTYLE, exstyle );
-
-		DWORD style = GetWindowLong( wnd, GWL_STYLE );
-		style &= ~WS_BORDER;
-		SetWindowLong( wnd, GWL_STYLE, style );
-
+		// dimhotepus: Use single API to set window styles.
+		FacePoser_AddWindowExStyle(this, WS_EX_CLIENTEDGE);
+		
+		// dimhotepus: Use single API to set window styles.
+		FacePoser_RemoveWindowStyle(this, WS_BORDER);
 	}
 };
 
@@ -674,7 +670,7 @@ public:
 
 		char const *current = "";
 		char const *filename = "";
-		int idx = getSelectedIndex();
+		intp idx = getSelectedIndex();
 		if ( idx >= 0 )
 		{
 			current = models->GetModelName( idx );
@@ -702,9 +698,9 @@ public:
 			if ( scene )
 			{
 				// See if there is already an actor with this model associated
-				int c = scene->GetNumActors();
+				intp c = scene->GetNumActors();
 				bool hasassoc = false;
-				for ( int i = 0; i < c; i++ )
+				for ( intp i = 0; i < c; i++ )
 				{
 					CChoreoActor *a = scene->GetActor( i );
 					Assert( a );
@@ -772,8 +768,8 @@ public:
 				case IDC_MODELTAB_HIDEALL:
 					{
 						bool show = ( event->action == IDC_MODELTAB_SHOWALL ) ? true : false;
-						int c = models->Count();
-						for ( int i = 0; i < c ; i++ )
+						intp c = models->Count();
+						for ( intp i = 0; i < c ; i++ )
 						{
 							models->ShowModelIn3DView( i, show );
 						}
@@ -797,7 +793,7 @@ public:
 					break;
 				case IDC_MODELTAB_CLOSE:
 					{
-						int idx = getSelectedIndex();
+						intp idx = getSelectedIndex();
 						if ( idx >= 0 )
 						{
 							models->FreeModel( idx );
@@ -816,7 +812,7 @@ public:
 					break;
 				case IDC_MODELTAB_TOGGLE3DVIEW:
 					{
-						int idx = getSelectedIndex();
+						intp idx = getSelectedIndex();
 						if ( idx >= 0 )
 						{
 							bool visible = models->IsModelShownIn3DView( idx );
@@ -826,7 +822,7 @@ public:
 					break;
 				case IDC_MODELTAB_ASSOCIATEACTOR:
 					{
-						int idx = getSelectedIndex();
+						intp idx = getSelectedIndex();
 						if ( idx >= 0 )
 						{
 							char const *modelname = models->GetModelFileName( idx );
@@ -847,9 +843,9 @@ public:
 								params.m_nSelected = -1;
 								int oldsel = -1;
 
-								int c = scene->GetNumActors();
+								intp c = scene->GetNumActors();
 								ChoiceText text;
-								for ( int i = 0; i < c; i++ )
+								for ( intp i = 0; i < c; i++ )
 								{
 									CChoreoActor *a = scene->GetActor( i );
 									Assert( a );
@@ -891,7 +887,7 @@ public:
 
 	void HandleModelSelect( void )
 	{
-		int idx = getSelectedIndex();
+		intp idx = getSelectedIndex();
 		if ( idx < 0 )
 			return;
 
@@ -903,8 +899,8 @@ public:
 	{
 		removeAll();
 		
-		int c = models->Count();
-		int i;
+		intp c = models->Count();
+		intp i;
 		for ( i = 0; i < c ; i++ )
 		{
 			char const *name = models->GetModelName( i );
@@ -1019,8 +1015,8 @@ public:
 
 	void	Init( void )
 	{
-		int c = IFacePoserToolWindow::GetToolCount();
-		int i;
+		intp c = IFacePoserToolWindow::GetToolCount();
+		intp i;
 		for ( i = 0; i < c ; i++ )
 		{
 			IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
@@ -1040,7 +1036,7 @@ public:
 		bool doubleclicked = false;
 
 		double curtime = realtime;
-		int clickedItem = getSelectedIndex();
+		intp clickedItem = getSelectedIndex();
 
 		if ( clickedItem == m_nLastSelected )
 		{
@@ -1078,8 +1074,8 @@ private:
 
 	IFacePoserToolWindow *GetSelectedTool()
 	{
-		int idx = getSelectedIndex();
-		int c = IFacePoserToolWindow::GetToolCount();
+		intp idx = getSelectedIndex();
+		intp c = IFacePoserToolWindow::GetToolCount();
 	
 		if ( idx < 0 || idx >= c )
 			return NULL;
@@ -1089,7 +1085,7 @@ private:
 	}
 
 	// HACKY double click handler
-	int		m_nLastSelected;
+	intp	m_nLastSelected;
 	double	m_flLastSelectedTime;
 };
 
@@ -1184,10 +1180,10 @@ void MDLViewer::SavePosition( void )
 MDLViewer::MDLViewer () : 
 	mxWindow (0, 0, 0, 0, 0, g_appTitle, mxWindow::Normal),
 	menuCloseCaptionLanguages(0),
-	m_bOldSoundScriptsDirty( -1 ),
+	m_bOldSoundScriptsDirty( true ),
 	m_bVCDSaved( false )
 {
-	int i;
+	intp i;
 
 	g_MDLViewer = this;
 
@@ -1391,11 +1387,11 @@ MDLViewer::MDLViewer () :
 
 	Con_Printf( "Add Tool Windows\n" );
 
-	int c = IFacePoserToolWindow::GetToolCount();
+	intp c = IFacePoserToolWindow::GetToolCount();
 	for ( i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
-		menuWindow->add( tool->GetToolName(), IDC_WINDOW_FIRSTTOOL + i );
+		menuWindow->add( tool->GetToolName(), static_cast<int>(IDC_WINDOW_FIRSTTOOL + i) );
 	}
 
 	menuWindow->addSeparator();
@@ -1432,8 +1428,8 @@ MDLViewer::MDLViewer () :
 //-----------------------------------------------------------------------------
 void MDLViewer::UpdateWindowMenu( void )
 {
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c ; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c ; i++ )
 	{
 		IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
 		menuWindow->setChecked( static_cast<int>(IDC_WINDOW_FIRSTTOOL + i), tool->GetMxWindow()->isVisible() );
@@ -1495,7 +1491,7 @@ void MDLViewer::InitGridSettings( void )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int MDLViewer::GetActiveModelTab( void )
+intp MDLViewer::GetActiveModelTab( void )
 {
 	return modeltab->getSelectedIndex();
 }
@@ -1627,38 +1623,6 @@ void MDLViewer::LoadModelFile( const char *pszFile )
 	g_pControlPanel->CenterOnFace();
 }
 
-//-----------------------------------------------------------------------------
-// Purpose: 
-// Input  : *wnd - 
-//			x - 
-//			y - 
-// Output : static bool
-//-----------------------------------------------------------------------------
-static bool WindowContainsPoint( mxWindow *wnd, int x, int y )
-{
-	POINT pt;
-	pt.x = (short)x;
-	pt.y = (short)y;
-
-	HWND window = (HWND)wnd->getHandle();
-	if ( !window )
-		return false;
-
-	ScreenToClient( window, &pt );
-
-	if ( pt.x < 0 )
-		return false;
-	if ( pt.y < 0 )
-		return false;
-	if ( pt.x > wnd->w() )
-		return false;
-	if ( pt.y > wnd->h() )
-		return false;
-
-	return true;
-}
-
-
 void MDLViewer::LoadModel_Steam()
 {
 	if ( !g_FSDialogFactory )
@@ -1670,7 +1634,7 @@ void MDLViewer::LoadModel_Steam()
 	{
 		char str[512];
 		Q_snprintf( str, sizeof( str ), "Can't create %s interface.", FILESYSTEMOPENDIALOG_VERSION );
-		::MessageBox( NULL, str, "Error", MB_OK );
+		::MessageBox( NULL, str, "HLFacePoser - Interface Create Error", MB_OK | MB_ICONERROR );
 		return;
 	}
 	pDlg->Init( g_Factory, NULL );
@@ -1909,8 +1873,9 @@ int MDLViewer::handleEvent (mxEvent *event)
 #endif
 				
 			case IDC_HELP_ABOUT:
+				// dimhotepus: Adjust about text.
 				mxMessageBox (this,
-					"v1.0  Copyright © 1996-2007, Valve Corporation. All rights reserved.\r\nBuild Date: " __DATE__ "",
+					"Valve Face Poser v" SRC_PRODUCT_FILE_VERSION_INFO_STRING " (c0 1996-2025, Valve Corp. All rights reserved.\r\nBuild Date: " __DATE__ "",
 					"Valve Face Poser", 
 					MX_MB_OK | MX_MB_INFORMATION);
 				break;
@@ -2129,8 +2094,8 @@ void MDLViewer::SaveWindowPositions( void )
 	// Save the model viewer position
 	SavePosition();
 
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		IFacePoserToolWindow *w = IFacePoserToolWindow::GetTool( i );
 		w->SavePosition();
@@ -2148,8 +2113,8 @@ void MDLViewer::LoadWindowPositions( void )
 	g_viewerSettings.width = w;
 	g_viewerSettings.height = h;
 
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		IFacePoserToolWindow *w = IFacePoserToolWindow::GetTool( i );
 		w->LoadPosition();
@@ -2187,8 +2152,8 @@ void MDLViewer::Think( float dt )
 
 static int CountVisibleTools( void )
 {
-	int i;
-	int c = IFacePoserToolWindow::GetToolCount();
+	intp i;
+	intp c = IFacePoserToolWindow::GetToolCount();
 	int viscount = 0;
 
 	for ( i = 0; i < c; i++ )
@@ -2206,8 +2171,8 @@ static int CountVisibleTools( void )
 
 void MDLViewer::OnCascade()
 {
-	int i;
-	int c = IFacePoserToolWindow::GetToolCount();
+	intp i;
+	intp c = IFacePoserToolWindow::GetToolCount();
 	int viscount = CountVisibleTools();
 
 	int x = 0, y = 0;
@@ -2262,8 +2227,8 @@ void MDLViewer::OnTileVertically()
 
 void MDLViewer::OnHideAll()
 {
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
 		mxWindow *w = tool->GetMxWindow();
@@ -2276,8 +2241,8 @@ void MDLViewer::OnHideAll()
 
 void MDLViewer::OnShowAll()
 {
-	int c = IFacePoserToolWindow::GetToolCount();
-	for ( int i = 0; i < c; i++ )
+	intp c = IFacePoserToolWindow::GetToolCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		IFacePoserToolWindow *tool = IFacePoserToolWindow::GetTool( i );
 		mxWindow *w = tool->GetMxWindow();
@@ -2290,7 +2255,7 @@ void MDLViewer::OnShowAll()
 
 void MDLViewer::DoTile( int x, int y )
 {
-	int c = IFacePoserToolWindow::GetToolCount();
+	intp c = IFacePoserToolWindow::GetToolCount();
 
 	if ( x < 1 )
 		x = 1;
@@ -2375,7 +2340,7 @@ void MDLViewer::OnRebuildScenesImage()
 	m_bVCDSaved = false;
 }
 
-void MDLViewer::UpdateStatus( char const *pchSceneName, bool bQuiet, int nIndex, int nCount )
+void MDLViewer::UpdateStatus( char const *pchSceneName, bool bQuiet, intp nIndex, intp nCount )
 {
 	g_pProgressDialog->UpdateText( pchSceneName );
 	g_pProgressDialog->Update( (float)nIndex / (float)nCount );
@@ -2388,6 +2353,9 @@ void MDLViewer::OnVCDSaved()
 
 SpewRetval_t HLFacePoserSpewFunc( SpewType_t spewType, char const *pMsg )
 {
+	// dimhotepus: Dump to debug output.
+	Plat_DebugString(pMsg);
+
 	g_bInError = true;
 
 	switch (spewType)

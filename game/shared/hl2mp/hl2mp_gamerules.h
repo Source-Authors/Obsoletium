@@ -135,6 +135,9 @@ public:
 	const char *GetChatFormat( bool bTeamOnly, CBasePlayer *pPlayer );
 
 #endif
+
+	bool IsOfficialMap( void );
+
 	virtual void ClientDisconnected( edict_t *pClient );
 
 	bool CheckGameOver( void );

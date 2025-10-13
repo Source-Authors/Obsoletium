@@ -138,9 +138,12 @@ struct portalfile_t
 struct UpdateVisibilityData_t
 {
 	CMapDoc *pDoc;
-	bool bRadiusCullingEnabled;
-	Vector vecRadiusCullCenter;
-	float flRadiusCullDistSq;
+	// dimhotepus: Remove radius culling.
+	// bool bRadiusCullingEnabled;
+	// dimhotepus: Remove radius culling.
+	// Vector vecRadiusCullCenter;
+	// dimhotepus: Remove radius culling.
+	// float flRadiusCullDistSq;
 };
 
 
@@ -388,7 +391,8 @@ class CMapDoc : public CDocument
 	        void NotifyDependents(CMapClass *pObject, Notify_Dependent_t eNotifyType);
 
 		// Radius culling
-		bool IsCulledBy3DCameraDistance( CMapClass *pObject, UpdateVisibilityData_t *pData );
+		// dimhotepus: Remove radius culling.
+		// bool IsCulledBy3DCameraDistance( CMapClass *pObject, UpdateVisibilityData_t *pData );
 
 		//
 		// Morph tool.
@@ -550,7 +554,7 @@ class CMapDoc : public CDocument
 		bool m_bHasInitialUpdate;
 		bool m_bLoading; // Set to true while we are being loaded from VMF.
 
-		static BOOL GetBrushNumberCallback(CMapClass *pObject, void *pFindInfo);
+		static BOOL GetBrushNumberCallback(CMapSolid *pObject, class CFindBrushInfo* pFindInfo);
 
 		//
 		// Serialization.
@@ -576,8 +580,7 @@ class CMapDoc : public CDocument
 		//
 		// Search functions.
 		//
-		static BOOL FindEntityCallback(CMapClass *pObject, FindEntity_t *pFindInfo);
-		static BOOL FindGroupCallback(CMapGroup *pGroup, FindGroup_t *pFindInfo);
+		static BOOL FindEntityCallback(CMapEntity *pEntity, FindEntity_t *pFindInfo);
 
 		void AssignToVisGroups(void);
 		void AssignToGroups(void);

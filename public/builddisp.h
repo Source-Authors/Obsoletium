@@ -702,7 +702,7 @@ struct CoreDispTri_t
 	unsigned short	m_uiTags;							// walkable, buildable, etc.
 };
 
-class CCoreDispInfo : public CDispUtilsHelper
+class CCoreDispInfo final : public CDispUtilsHelper
 {
 public:
 
@@ -752,10 +752,10 @@ public:
 // CDispUtilsHelper implementation.
 public:
 
-	virtual CDispNeighbor*			GetEdgeNeighbor( int index );
-	virtual CDispCornerNeighbors*	GetCornerNeighbors( int index );
-	virtual const CPowerInfo* 		GetPowerInfo() const;
-	virtual CDispUtilsHelper*		GetDispUtilsByIndex( int index );
+	CDispNeighbor*			GetEdgeNeighbor( int index );
+	CDispCornerNeighbors*	GetCornerNeighbors( int index );
+	const CPowerInfo* 		GetPowerInfo() const;
+	CDispUtilsHelper*		GetDispUtilsByIndex( int index );
 
 
 public:
@@ -765,7 +765,7 @@ public:
 	// Creation/Destruction
 	//
 	CCoreDispInfo();
-	virtual ~CCoreDispInfo();
+	~CCoreDispInfo();
 
 	void InitSurf( int parentIndex, Vector points[4], Vector normals[4],
 		           Vector2D texCoords[4], Vector2D lightCoords[4][4], int contents, int flags,
@@ -799,7 +799,7 @@ public:
 	inline int GetSize( void ) const;
 
 	// Use this disp as a CDispUtils.
-	void SetDispUtilsHelperInfo( CCoreDispInfo **ppListBase, int listSize );
+	void SetDispUtilsHelperInfo( CCoreDispInfo **ppListBase, intp listSize );
 
 	void SetNeighborData( const CDispNeighbor edgeNeighbors[4], const CDispCornerNeighbors cornerNeighbors[4] ) { GetSurface()->SetNeighborData( edgeNeighbors, cornerNeighbors ); }
 
@@ -942,7 +942,7 @@ private:
 
 	// The list that this disp is in (used for CDispUtils::IHelper implementation).
 	CCoreDispInfo		**m_ppListBase;
-	int					m_ListSize;
+	intp					m_ListSize;
 
 	CBitVec<MAX_DISPVERTS>	m_AllowedVerts;		// Built in VBSP. Defines which verts are allowed to exist based on what the neighbors are.
 

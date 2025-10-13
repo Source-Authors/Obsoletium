@@ -9,7 +9,7 @@
 #include "BaseVSShader.h"
 #include "convar.h"
 
-#include "WorldVertexTransition.inc"
+#include "worldvertextransition.inc"
 #include "worldvertextransition_vs14.inc"
 #include "worldvertextransition_seamless.inc"
 #include "lightmappedgeneric_vs11.inc"

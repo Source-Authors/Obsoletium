@@ -1707,7 +1707,7 @@ void CFuncTrackTrain::Blocked( CBaseEntity *pOther )
 			int ticksBlocked = gpGlobals->tickcount - m_lastBlockTick;
 			float dist = 0.0f;
 			// wait at least 10 ticks and make sure the train isn't actually moving before really blocking
-			const int MIN_BLOCKED_TICKS = 10;
+			constexpr int MIN_BLOCKED_TICKS = 10;
 			if ( ticksBlocked > MIN_BLOCKED_TICKS )
 			{
 				dist = (GetAbsOrigin() - m_lastBlockPos).Length();

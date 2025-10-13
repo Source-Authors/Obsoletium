@@ -27,8 +27,8 @@ struct VS_OUTPUT
 	float4 vProjPos					: TEXCOORD4;
 	float  screenCoord				: TEXCOORD5;
 #if BASETEXTURE
-	HALF4 lightmapTexCoord1And2		: TEXCOORD6;
-	HALF4 lightmapTexCoord3			: TEXCOORD7;
+	float4 lightmapTexCoord1And2	: TEXCOORD6;
+	float4 lightmapTexCoord3		: TEXCOORD7;
 #endif
 	float4 fogFactorW				: COLOR1;
 };

@@ -276,7 +276,7 @@ Update
 ==================================================
 */
 
-void CFXDiscreetLine::Update( double frametime )
+void CFXDiscreetLine::Update( float frametime )
 {
 	m_fStartTime += frametime;
 	m_fLife -= frametime;

@@ -86,7 +86,7 @@ bool CVGuiScreen::KeyValue( const char *szKeyName, const char *szValue )
 	{
 		Assert( GetMoveParent() == NULL );
 		QAngle angles;
-		UTIL_StringToVector( angles.Base(), szValue );
+		UTIL_StringToVector( angles, szValue );
 
 		// Because the vgui screen basis is strange (z is front, y is up, x is right)
 		// we need to rotate the typical basis before applying it

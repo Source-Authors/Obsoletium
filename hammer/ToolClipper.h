@@ -94,7 +94,7 @@ inline CMapSolid *CClipGroup::GetClipSolid( int side )
 
 class Clipper3D : public Tool3D
 {
-    friend BOOL AddToClipList( CMapClass *mp, DWORD_PTR ctx );
+    friend BOOL AddToClipList( CMapSolid *pSolid, Clipper3D *pClipper );
 
 public:
 

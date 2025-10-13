@@ -23,6 +23,8 @@
 #include "byteswap.h"
 #include "bspflags.h"
 
+#include "scoped_app_locale.h"
+
 #include "winlite.h"
 
 int			g_numportals;
@@ -41,9 +43,9 @@ byte		*vismap, *vismap_p, *vismap_end;	// past visfile
 int			originalvismapsize;
 
 int			leafbytes;				// (portalclusters+63)>>3
-int			leaflongs;
+int			leafarchwords;
 
-int			portalbytes, portallongs;
+int			portalbytes, portalarchwords;
 
 bool		fastvis;
 bool		nosort;
@@ -173,7 +175,7 @@ Merges the portal visibility for a leaf
 */
 void ClusterMerge (int clusternum)
 {
-	alignas(long) byte portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
+	alignas(intp) byte portalvector[MAX_PORTALS/4];      // 4 because portal bytes is * 2
 	byte		uncompressed[MAX_MAP_LEAFS/8];
 	int			numvis;
 	int			pnum;
@@ -188,8 +190,8 @@ void ClusterMerge (int clusternum)
 	{
 		if (p->status != stat_done)
 			Error ("portal not done %zd 0x%p 0x%p\n", i, p, portals);
-		for (int j=0 ; j<portallongs ; j++)
-			((long *)portalvector)[j] |= ((long *)p->portalvis)[j];
+		for (int j=0 ; j<portalarchwords ; j++)
+			((intp *)portalvector)[j] |= ((intp *)p->portalvis)[j];
 		pnum = p - portals;
 		SetBit( portalvector, pnum );
 
@@ -278,11 +280,12 @@ void CalcPortalVis (void)
 		return;
 	}
 
-
+#ifdef MPI
     if (g_bUseMPI) 
 	{
  		RunMPIPortalFlow();
 	}
+#endif
 	else 
 	{
 		RunThreadsOnIndividual (g_numportals*2, true, PortalFlow);
@@ -308,10 +311,12 @@ void CalcVis (void)
 {
 	int		i;
 
+#ifdef MPI
 	if (g_bUseMPI) 
 	{
 		RunMPIBasePortalVis();
 	}
+#endif
 	else 
 	{
 	    RunThreadsOnIndividual (g_numportals*2, true, BasePortalVis);
@@ -406,6 +411,7 @@ void LoadPortals (char *name)
 	FILE *f;
 
 	// Open the portal file.
+#ifdef MPI
 	if ( g_bUseMPI )
 	{
 		// If we're using MPI, copy off the file to a temporary first. This will download the file
@@ -435,14 +441,15 @@ void LoadPortals (char *name)
 		f = fopen( tempFile, "wt" );
 		if (f)
 		{
-		fwrite( data.Base(), 1, data.Count(), f );
-		fclose( f );
+			fwrite( data.Base(), 1, data.Count(), f );
+			fclose( f );
 
-		// Open the temp file up.
-		f = fopen( tempFile, "rSTD" ); // read only, sequential, temporary, delete on close
-	}
+			// Open the temp file up.
+			f = fopen( tempFile, "rSTD" ); // read only, sequential, temporary, delete on close
+		}
 	}
 	else
+#endif
 	{
 		f = fopen( name, "r" );
 	}
@@ -469,10 +476,16 @@ void LoadPortals (char *name)
 
 	// these counts should take advantage of 64 bit systems automatically
 	leafbytes = ((portalclusters+63)&~63)>>3;
-	leaflongs = leafbytes/sizeof(long);
+	// dimhotepus: long -> intp.
+	leafarchwords = leafbytes / sizeof(intp);
+	AssertMsg(leafbytes % sizeof(intp) == 0,
+		"Can't use CPU arch dependent type to copy leafs.");
 	
 	portalbytes = ((g_numportals*2+63)&~63)>>3;
-	portallongs = portalbytes/sizeof(long);
+	// dimhotepus: long -> intp.
+	portalarchwords = portalbytes / sizeof(intp);
+	AssertMsg(portalbytes % sizeof(intp) == 0,
+		"Can't use CPU arch dependent type to copy portals.");
 
 	// each file portal is split into two memory portals
 	portals = (portal_t*)calloc(2*g_numportals, sizeof(portal_t));
@@ -566,10 +579,10 @@ by ORing together all the PVS visible from a leaf
 */
 void CalcPAS (void)
 {
-	alignas(long) byte	uncompressed[MAX_MAP_LEAFS/8];
+	alignas(intp) byte	uncompressed[MAX_MAP_LEAFS/8];
 	byte	compressed[MAX_MAP_LEAFS/8];
 	
-	long *dest, *src;
+	intp *dest, *src;
 
 	Msg ("Building PAS...\n");
 
@@ -583,7 +596,7 @@ void CalcPAS (void)
 		memcpy (uncompressed, scan, leafbytes);
 
 		// dimhotepus: Add size check to catch usage issues.
-		Assert(leaflongs * static_cast<intp>(sizeof(long)) <= ssize(uncompressed));
+		Assert(leafarchwords * static_cast<intp>(sizeof(intp)) <= ssize(uncompressed));
 		for (int j=0 ; j<leafbytes ; j++)
 		{
 			int bitbyte = scan[j];
@@ -600,11 +613,11 @@ void CalcPAS (void)
 				if (index >= portalclusters)
 					Error ("Bad bit %d (>= %d) in PVS", index, portalclusters);	// pad bits should be 0
 
-				src = (long *)(uncompressedvis + index*leafbytes);
-				dest = (long *)uncompressed;
+				src = (intp *)(uncompressedvis + index*leafbytes);
+				dest = (intp *)uncompressed;
 
-				for (int l=0 ; l<leaflongs ; l++)
-					((long *)uncompressed)[l] |= src[l];
+				for (int l=0 ; l<leafarchwords ; l++)
+					((intp *)uncompressed)[l] |= src[l];
 			}
 		}
 		for (int j=0 ; j<portalclusters ; j++)
@@ -620,7 +633,7 @@ void CalcPAS (void)
 	//
 		int j = CompressVis (uncompressed, compressed);
 
-		dest = (long *)vismap_p;
+		dest = (intp *)vismap_p;
 		vismap_p += j;
 		
 		if (vismap_p > vismap_end)
@@ -998,6 +1011,7 @@ int ParseCommandLine( int argc, char **argv )
 		// NOTE: the -mpi checks must come last here because they allow the previous argument 
 		// to be -mpi as well. If it game before something else like -game, then if the previous
 		// argument was -mpi and the current argument was something valid like -game, it would skip it.
+#ifdef MPI
 		else if ( !Q_strncasecmp( argv[i], "-mpi", 4 ) || !Q_strncasecmp( argv[i-1], "-mpi", 4 ) )
 		{
 			if ( stricmp( argv[i], "-mpi" ) == 0 )
@@ -1009,6 +1023,7 @@ int ParseCommandLine( int argc, char **argv )
 			if ( i == argc - 1 )
 				break;
 		}
+#endif
 		else if (argv[i][0] == '-')
 		{
 			Warning("Unknown option \"%s\".\n\n", argv[i]);
@@ -1045,7 +1060,9 @@ void PrintUsage( int argc, char **argv )
 		"\n"
 		"  -v (or -verbose): Turn on verbose output (also shows more command\n"
 		"  -fast           : Only do first quick pass on vis calculations.\n"
+#ifdef MPI
 		"  -mpi            : Use VMPI to distribute computations.\n"
+#endif
 		"  -low            : Run as an idle-priority process.\n"
 		"                    env_fog_controller specifies one.\n"
 		"\n"
@@ -1055,7 +1072,9 @@ void PrintUsage( int argc, char **argv )
 		"Other options:\n"
 		"  -novconfig      : Don't bring up graphical UI on vproject errors.\n"
 		"  -radius_override: Force a vis radius, regardless of whether an\n"
+#ifdef MPI
 		"  -mpi_pw <pw>    : Use a password to choose a specific set of VMPI workers.\n"
+#endif
 		"  -threads        : Control the number of threads vbsp uses (defaults to the #\n"
 		"                    or processors on your machine).\n"
 		"  -nosort         : Don't sort portals (sorting is an optimization).\n"
@@ -1138,8 +1157,9 @@ int RunVVis( int argc, char **argv )
 
 	double start = Plat_FloatTime();
 
-
+#ifdef MPI
 	if (!g_bUseMPI)
+#endif
 	{
 		// Setup the logfile.
 		char logFile[MAX_FILEPATH];
@@ -1218,12 +1238,12 @@ int RunVVis( int argc, char **argv )
 		{
 			Error("Invalid cluster trace: %d to %d, valid range is 0 to %d\n", g_TraceClusterStart, g_TraceClusterStop, portalclusters-1 );
 		}
-
+#ifdef MPI
 		if ( g_bUseMPI )
 		{
 			Warning("Can't compile trace in MPI mode\n");
 		}
-
+#endif
 		CalcVisTrace ();
 		WritePortalTrace(source);
 	}
@@ -1245,21 +1265,39 @@ int RunVVis( int argc, char **argv )
 int main (int argc, char **argv)
 {
 	CommandLine()->CreateCmdLine( argc, argv );
+	
+	InstallSpewFunction();
+	SpewActivate( "developer", 1 );
+	
+	// dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+	//
+	// Printf/sscanf functions expect en_US UTF8 localization.
+	//
+	// Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+	// supports using a UTF-8 code page.
+	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+		Warning("setlocale('%s') failed, current locale is '%s'.\n",
+				kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+	}
 
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );
 
-	InstallSpewFunction();
-	SpewActivate( "developer", 1 );
 
+#ifdef MPI
 	VVIS_SetupMPI( argc, argv );
+#endif
 
 	// Install an exception handler.
+#ifdef MPI
 	if ( g_bUseMPI && !g_bMPIMaster )
 	{
 		const se::utils::common::ScopedMinidumpHandler minidump{VMPI_ExceptionFilter};
 		return RunVVis( argc, argv );
 	}
-
+#endif
 	const se::utils::common::ScopedDefaultMinidumpHandler minidump;
 	return RunVVis( argc, argv );
 }

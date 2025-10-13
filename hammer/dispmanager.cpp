@@ -145,8 +145,8 @@ public: // functions
 	virtual ~CWorldEditDispMgr();
 
 	// world list functionals
-	int WorldCount( void );
-	CMapDisp *GetFromWorld( int iWorldList );
+	intp WorldCount( void );
+	CMapDisp *GetFromWorld( intp iWorldList );
 	CMapDisp *GetFromWorld( EditDispHandle_t handle );
 
 	void AddToWorld( EditDispHandle_t handle );	
@@ -155,7 +155,7 @@ public: // functions
 	void FindWorldNeighbors( EditDispHandle_t handle );
 
 	// selection list functions
-	int SelectCount( void );
+	intp SelectCount( void );
 	void SelectClear( void );
 	CMapDisp *GetFromSelect( int iSelectList );
 
@@ -241,7 +241,7 @@ CWorldEditDispMgr::~CWorldEditDispMgr()
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-int CWorldEditDispMgr::WorldCount( void )
+intp CWorldEditDispMgr::WorldCount( void )
 {
 	return m_WorldList.Count();
 }
@@ -250,7 +250,7 @@ int CWorldEditDispMgr::WorldCount( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CMapDisp *CWorldEditDispMgr::GetFromWorld( int iWorldList )
+CMapDisp *CWorldEditDispMgr::GetFromWorld( intp iWorldList )
 {
 	// no assert because the .Element( ) takes care of that!
 	EditDispHandle_t handle = m_WorldList.Element( iWorldList );
@@ -321,8 +321,8 @@ void CWorldEditDispMgr::FindWorldNeighbors( EditDispHandle_t handle )
 	//
 	// compare against all of the displacements in the world
 	//
-	int count = WorldCount();
-	for( int ndx = 0; ndx < count; ndx++ )
+	intp count = WorldCount();
+	for( intp ndx = 0; ndx < count; ndx++ )
 	{
 		// get the potential neighbor surface
 		CMapDisp *pNeighborDisp = GetFromWorld( ndx );
@@ -469,7 +469,7 @@ int CWorldEditDispMgr::GetEdgeIndex( int *edge )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-int CWorldEditDispMgr::SelectCount( void )
+intp CWorldEditDispMgr::SelectCount( void )
 {
 	return m_SelectList.Count();
 }
@@ -487,7 +487,7 @@ void CWorldEditDispMgr::SelectClear( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CMapDisp *CWorldEditDispMgr::GetFromSelect( int iSelectList )
+CMapDisp *CWorldEditDispMgr::GetFromSelect( intp iSelectList )
 {
 	// no assert because the .Element( ) takes care of that!
 	EditDispHandle_t handle = m_SelectList.Element( iSelectList );
@@ -546,8 +546,8 @@ void CWorldEditDispMgr::CatmullClarkSubdivide( void )
 	//
 	PreUndo( "Subdivision" );
 
-	int selectCount = m_SelectList.Count();
-	for( int ndxSelect = 0; ndxSelect < selectCount; ndxSelect++ )
+	intp selectCount = m_SelectList.Count();
+	for( intp ndxSelect = 0; ndxSelect < selectCount; ndxSelect++ )
 	{
 		// get the current displacement surface
 		CMapDisp *pDisp = GetFromSelect( ndxSelect );

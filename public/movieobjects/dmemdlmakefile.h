@@ -90,7 +90,7 @@ private:
 	const char *GetOutputDirectoryID() override { return "makefilegamedir:.."; }
 
 	CDmeHandle< CDmeMDL > m_hMDL;
-	bool m_bFlushMDL;
+	bool m_bFlushMDL{false};
 };
 
 

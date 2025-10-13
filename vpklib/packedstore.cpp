@@ -338,6 +338,10 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, intp fnam
 			uint32 nSizeOfHeader = dirFile.Tell();
 			int nSize = dirHeader.m_nDirectorySize;
 			m_nDirectoryDataSize = dirHeader.m_nDirectorySize;
+			// dimhotepus: CS:GO backport.
+			// Flush out the existing allocation so that we allocate exactly the right size.
+			// This saves about 3 MB of address space currently (5.1 MB was rounded up to 8 MB).
+			m_DirectoryData.Purge();
 			m_DirectoryData.SetCount( nSize );
 			dirFile.MustRead( DirectoryData(), nSize );
 			// now, if we are opening for write, read the entire contents of the embedded data chunk in the dir into ram
@@ -430,7 +434,7 @@ CPackedStore::CPackedStore( char const *pFileBasename, char *pszFName, intp fnam
 }
 
 
-void CPackedStore::GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut, intp nFileNumber ) const
+void CPackedStore::GetDataFileName( OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut, intp nFileNumber ) const
 {
 	if ( nFileNumber == VPKFILENUMBER_EMBEDDED_IN_DIR_FILE )
 	{
@@ -632,7 +636,10 @@ void CPackedStore::Write( void )
 
 	// Do we plan on signing this thing and writing a signature?
 	m_Signature.Purge();
-	uint32 nExpectedSignatureSize = 0;
+    // dimhotepus: Wrap into VPK_ENABLE_SIGNING. CS:GO backport.
+	#ifdef VPK_ENABLE_SIGNING
+		uint32 nExpectedSignatureSize = 0;
+	#endif
 	if ( m_SignaturePrivateKey.Count() > 0 && m_SignaturePublicKey.Count() > 0 )
 	{
 		#ifdef VPK_ENABLE_SIGNING
@@ -936,7 +943,7 @@ int CPackedStoreReadCache::FindBufferToUse()
 	int idxLRU = 0;
 	auto idxToRemove = m_treeCachedVPKRead.InvalidIndex();
 	// dimhotepus: uint -> ullong as former overflows in 49.7 days.
-	auto uTimeLowest = std::numeric_limits<unsigned long long>::max();
+	auto uTimeLowest = std::numeric_limits<uint64>::max();
 	// find the oldest item, reuse its buffer
 	for ( int i = 0; i < m_cItemsInCache; i++ )
 	{
@@ -1419,7 +1426,7 @@ bool CPackedStore::FindFileHashFraction( int nPackFileNumber, int nFileFraction,
 	return true;
 }
 
-void CPackedStore::GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, int cchFileNameOut ) const
+void CPackedStore::GetPackFileName( CPackedStoreFileHandle &handle, OUT_Z_CAP(cchFileNameOut) char *pchFileNameOut, intp cchFileNameOut ) const
 {
 	GetDataFileName( pchFileNameOut, cchFileNameOut, handle.m_nFileNumber );
 }

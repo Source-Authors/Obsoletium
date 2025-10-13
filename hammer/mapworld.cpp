@@ -27,7 +27,6 @@
 #include <tier0/memdbgon.h>
 
 
-#pragma warning(disable:4244)
 
 
 class CCullTreeNode;
@@ -246,9 +245,8 @@ void CMapWorld::AddObjectToWorld(CMapClass *pObject, CMapClass *pParent)
 //			and groups. These lists are then serialized in SaveVMF.
 // Input  : pSaveLists - Receives lists of objects.
 //-----------------------------------------------------------------------------
-BOOL CMapWorld::BuildSaveListsCallback(CMapClass *pObject, DWORD_PTR ctx)
+BOOL CMapWorld::BuildSaveListsCallback(CMapClass *pObject, SaveLists_t *pSaveLists)
 {
-	auto *pSaveLists = reinterpret_cast<SaveLists_t *>(ctx);
 	CMapEntity *pEntity = dynamic_cast<CMapEntity *>(pObject);
 	if (pEntity != NULL)
 	{
@@ -590,8 +588,8 @@ void CMapWorld::UpdateChild(CMapClass *pChild)
 void CMapWorld::GetUsedTextures(CUsedTextureList &List)
 {
 	List.RemoveAll();
-	EnumChildren((ENUMMAPCHILDRENPROC)AddUsedTextures, (DWORD_PTR)&List, MAPCLASS_TYPE(CMapSolid));
-	EnumChildren((ENUMMAPCHILDRENPROC)AddOverlayTextures, (DWORD_PTR)&List, MAPCLASS_TYPE(CMapOverlay));
+	EnumChildren(&AddUsedTextures, &List);
+	EnumChildren(&AddOverlayTextures, &List);
 }
 
 
@@ -607,10 +605,10 @@ void CMapWorld::CullTree_FreeNode(CCullTreeNode *pNode)
 		return;
 	}
 
-	int nChildCount = pNode->GetChildCount();
+	intp nChildCount = pNode->GetChildCount();
 	if (nChildCount != 0)
 	{
-		for (int nChild = 0; nChild < nChildCount; nChild++)
+		for (intp nChild = 0; nChild < nChildCount; nChild++)
 		{
 			CCullTreeNode *pChild = pNode->GetCullTreeChild(nChild);
 			CullTree_FreeNode(pChild);
@@ -719,8 +717,8 @@ void CMapWorld::CullTree_SplitNode(CCullTreeNode *pNode)
 			// Check all objects in this node against the child's bounding box, adding the
 			// objects that intersect to the child's object list.
 			//
-			int nObjectCount = pNode->GetObjectCount();
-			for (int nObject = 0; nObject < nObjectCount; nObject++)
+			intp nObjectCount = pNode->GetObjectCount();
+			for (intp nObject = 0; nObject < nObjectCount; nObject++)
 			{
 				CMapClass *pObject = pNode->GetCullTreeObject(nObject);
 				Assert(pObject != NULL);
@@ -743,7 +741,7 @@ void CMapWorld::CullTree_SplitNode(CCullTreeNode *pNode)
 		//
 		// Recurse into all children with at least two objects, splitting them.
 		//
-		int nChildCount = pNode->GetChildCount();
+		intp nChildCount = pNode->GetChildCount();
 		for (nChild = 0; nChild < nChildCount; nChild++)
 		{
 			CCullTreeNode *pChild = pNode->GetCullTreeChild(nChild);
@@ -762,15 +760,15 @@ void CMapWorld::CullTree_SplitNode(CCullTreeNode *pNode)
 //-----------------------------------------------------------------------------
 void CMapWorld::CullTree_DumpNode(CCullTreeNode *pNode, int nDepth)
 {
-	int nChildCount = pNode->GetChildCount();
+	intp nChildCount = pNode->GetChildCount();
 	char szText[100];
 
 	if (nChildCount == 0)
 	{
 		// Leaf
 		OutputDebugString("LEAF:\n");
-		int nObjectCount = pNode->GetObjectCount();
-		for (int nObject = 0; nObject < nObjectCount; nObject++)
+		intp nObjectCount = pNode->GetObjectCount();
+		for (intp nObject = 0; nObject < nObjectCount; nObject++)
 		{
 			CMapClass *pMapClass = pNode->GetCullTreeObject(nObject);
 			V_sprintf_safe(szText, "%*c %p %s\n", nDepth, ' ', pMapClass, pMapClass->GetType());
@@ -863,7 +861,7 @@ void CMapWorld::PostloadWorld(void)
 	//
 	// Set the class name from our "classname" key and discard the key.
 	//
-	int nIndex;
+	intp nIndex;
 	const char *pszValue = pszValue = m_KeyValues.GetValue("classname", &nIndex);
 	if (pszValue != NULL)
 	{
@@ -1047,7 +1045,7 @@ ChunkFileResult_t CMapWorld::SaveSolids(CChunkFile *pFile, CSaveInfo *pSaveInfo,
 	PresaveWorld();
 
 	SaveLists_t SaveLists;
-	EnumChildrenRecurseGroupsOnly(BuildSaveListsCallback, (DWORD_PTR)&SaveLists);
+	EnumChildrenRecurseGroupsOnly(&BuildSaveListsCallback, &SaveLists);
 
 	return SaveObjectListVMF(pFile, pSaveInfo, &SaveLists.Solids, saveFlags);
 }
@@ -1067,7 +1065,7 @@ ChunkFileResult_t CMapWorld::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo, in
 	// Sort the world objects into lists for saving into different chunks.
 	//
 	SaveLists_t SaveLists;
-	EnumChildrenRecurseGroupsOnly(BuildSaveListsCallback, (DWORD_PTR)&SaveLists);
+	EnumChildrenRecurseGroupsOnly(&BuildSaveListsCallback, &SaveLists);
 
 	//
 	// Begin the world chunk.
@@ -1694,7 +1692,7 @@ void CMapWorld::PostloadVisGroups()
 	if ( bFoundOrphans == true )
 	{
 		pDoc->VisGroups_CreateNamedVisGroup( orphans, "_orphaned hidden", true, false );
-		GetMainWnd()->MessageBox( "Orphaned objects were found and placed into the \"_orphaned hidden\" visgroup.", "Orphaned Objects Found", MB_OK | MB_ICONEXCLAMATION);
+		GetMainWnd()->MessageBox( "Orphaned objects were found and placed into the \"_orphaned hidden\" visgroup.", "Hammer - Orphaned Objects Found Warning", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	// Link up all the connections to the entities
@@ -1710,8 +1708,8 @@ void CMapWorld::PostloadVisGroups()
 			int foo = 0;
 		}
 #endif
-		int nConnections = pEntity->Connections_GetCount();
-		for ( int pos2 = 0; pos2 < nConnections; pos2++ )
+		intp nConnections = pEntity->Connections_GetCount();
+		for ( intp pos2 = 0; pos2 < nConnections; pos2++ )
 		{
 			CEntityConnection	*pEntityConnection = pEntity->Connections_Get(pos2);
 

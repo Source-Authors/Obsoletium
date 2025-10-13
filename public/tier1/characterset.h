@@ -6,10 +6,6 @@
 #ifndef CHARACTERSET_H
 #define CHARACTERSET_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <climits>
 
 struct characterset_t

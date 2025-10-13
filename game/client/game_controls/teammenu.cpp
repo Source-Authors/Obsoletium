@@ -210,10 +210,10 @@ void CTeamMenu::LoadMapPage( const char *mapName )
 	if( bFoundHTML || g_pFullFileSystem->FileExists( mapRES ) )
 	{
 		// it's a local HTML file
-		char localURL[ _MAX_PATH + 7 ];
+		char localURL[ MAX_PATH + 7 ];
 		V_strcpy_safe( localURL, "file://" );
 
-		char pPathData[ _MAX_PATH ];
+		char pPathData[ MAX_PATH ];
 		g_pFullFileSystem->GetLocalPath_safe( mapRES, pPathData );
 		V_strcat_safe( localURL, pPathData );
 

@@ -101,11 +101,10 @@
 #elif defined(LINUX)
 #define BUG_REPOSITORY_URL "\\\\fileserver\\bugs"
 #else
-//#error "Please define your platform"
+#error "Please define your platform"
 #endif
 #define REPOSITORY_VALIDATION_FILE "info.txt"
 
-#define BUG_REPORTER_DLLNAME "bugreporter_filequeue" 
 #define BUG_REPORTER_PUBLIC_DLLNAME "bugreporter_public" 
 
 #if defined( _DEBUG )
@@ -126,7 +125,7 @@ static ConVar bugreporter_uploadasync( "bugreporter_uploadasync", "0", FCVAR_ARC
 
 using namespace vgui;
 
-unsigned long GetRam()
+unsigned GetRam()
 {
 	MemoryInformation info;
 	if (GetMemoryInformation(&info))
@@ -135,15 +134,6 @@ unsigned long GetRam()
 	}
 
 	return 0;
-}
-
-const char *GetInternalBugReporterDLL( void )
-{
-	char const *pBugReportedDLL = NULL;
-	if ( CommandLine()->CheckParm("-bugreporterdll", &pBugReportedDLL ) )
-		return pBugReportedDLL;
-
-	return BUG_REPORTER_DLLNAME;
 }
 
 void DisplaySystemVersion( char *osversion, int maxlen )
@@ -411,7 +401,7 @@ class CBugUIPanel : public vgui::Frame
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CBugUIPanel, vgui::Frame );
 
 public:
-	CBugUIPanel( bool bIsPublic, vgui::Panel *parent );
+	CBugUIPanel( vgui::Panel *parent );
 	~CBugUIPanel();
 
 	void	OnTick() override;
@@ -594,14 +584,14 @@ protected:
 //-----------------------------------------------------------------------------
 // Purpose: Basic help dialog
 //-----------------------------------------------------------------------------
-CBugUIPanel::CBugUIPanel( bool bIsPublic, vgui::Panel *parent ) : 
+// dimhotepus: Always use public bug reporter.
+CBugUIPanel::CBugUIPanel( vgui::Panel *parent ) : 
 	BaseClass( parent, "BugUIPanel"),
 	m_bAddVMF( false ),
-	m_bIsPublic( bIsPublic )
+	// dimhotepus: Always use public bug reporter.
+	m_bIsPublic( true )
 {
-	m_sDllName = m_bIsPublic ? 
-		BUG_REPORTER_PUBLIC_DLLNAME : 
-		GetInternalBugReporterDLL();
+	m_sDllName = BUG_REPORTER_PUBLIC_DLLNAME;
 
 	m_hZip = (HZIP)0;
 
@@ -1119,33 +1109,31 @@ void CBugUIPanel::OnChooseArea(vgui::Panel *panel)
 	if (panel != m_pGameArea)
 		return;
 
-	if (!Q_strcmp(BUG_REPORTER_DLLNAME, GetInternalBugReporterDLL()))
-	{
-		int area_index = m_pGameArea->GetActiveItem();
-		int c = m_pBugReporter->GetLevelCount(area_index);
-		int item = -1;
-		const char *currentLevel = cl.IsActive() ? cl.m_szLevelBaseName : "console";
+	// dimhotepus: Drop internal bug reporter as we are fully public.
+	int area_index = m_pGameArea->GetActiveItem();
+	int c = m_pBugReporter->GetLevelCount(area_index);
+	int item = -1;
+	const char *currentLevel = cl.IsActive() ? cl.m_szLevelBaseName : "console";
 
-		m_pMapNumber->DeleteAllItems();
+	m_pMapNumber->DeleteAllItems();
 		
-		for ( int i = 0; i < c; i++ )
+	for ( int i = 0; i < c; i++ )
+	{
+		const char *level = m_pBugReporter->GetLevel(area_index, i );
+		int id = m_pMapNumber->AddItem( level, NULL );
+		if (!Q_strcmp(currentLevel, level))
 		{
-			const char *level = m_pBugReporter->GetLevel(area_index, i );
-			int id = m_pMapNumber->AddItem( level, NULL );
-			if (!Q_strcmp(currentLevel, level))
-			{
-				item = id;
-			}
+			item = id;
 		}
+	}
 
-		if (item >= 0)
-		{
-			m_pMapNumber->ActivateItem( item );
-		}
-		else
-		{
-			m_pMapNumber->ActivateItemByRow(0);
-		}
+	if (item >= 0)
+	{
+		m_pMapNumber->ActivateItem( item );
+	}
+	else
+	{
+		m_pMapNumber->ActivateItemByRow(0);
 	}
 }
 
@@ -1934,7 +1922,7 @@ void CBugUIPanel::OnSubmit()
 		char gd[ 256 ];
 		Q_FileBase( com_gamedir, gd );
 		buginfo.Printf( "GameDirectory:  %s\n", gd );
-		buginfo.Printf( "Ram:  %lu\n", GetRam() );
+		buginfo.Printf( "Ram:  %u\n", GetRam() );
 		buginfo.Printf( "CPU:  %i\n", (int)fFrequency );
 		buginfo.Printf( "Processor Vendor:  %s\n", pi.m_szProcessorID );
 		buginfo.Printf( "Processor Name:  %s\n", pi.m_szProcessorBrand );
@@ -2800,11 +2788,8 @@ CON_COMMAND( _bugreporter_restart, "Restarts bug reporter " DLL_EXT_STRING )
 
 	IEngineBugReporter::BR_TYPE type = IEngineBugReporter::BR_PUBLIC;
 
-	if ( !Q_stricmp( args.Arg( 1 ), "internal" ) )
-	{
-		type = IEngineBugReporter::BR_INTERNAL;
-	}
-	else if ( !Q_stricmp( args.Arg( 1 ), "autoselect" ) )
+	// dimhotepus: Drop internal bug reporter.
+	if ( !Q_stricmp( args.Arg( 1 ), "autoselect" ) )
 	{
 		type = IEngineBugReporter::BR_AUTOSELECT;
 	}
@@ -2831,53 +2816,8 @@ void CEngineBugReporter::InstallBugReportingUI( vgui::Panel *parent, IEngineBugR
 	if ( g_pBugUI )
 		return;
 
-	bool bIsPublic = true;
-	
-	char fn[ 512 ];
-
-	Q_snprintf( fn, sizeof( fn ), "%s%s", GetInternalBugReporterDLL(), DLL_EXT_STRING );
-
-	bool bCanUseInternal = g_pFileSystem->FileExists( fn, "EXECUTABLE_PATH" );
-
-	switch ( type )
-	{
-	case IEngineBugReporter::BR_PUBLIC:
-		// Nothing
-		break;
-	default:
-	case IEngineBugReporter::BR_AUTOSELECT:
-		{
-			// check
-			bIsPublic = IsExternalBuild();
-			if ( bCanUseInternal )
-			{
-				// if command line param specifies internal, use that
-				if ( CommandLine()->FindParm( "-internalbuild" ) )
-				{
-					bIsPublic = false;
-				}
-#if !defined( _X360 )
-				// otherwise, if Steam is running and connected to beta, autoselect the internal bug db
-				else if ( k_EUniverseBeta == GetSteamUniverse() )
-				{
-					bIsPublic = false;
-				}
-#endif
-			}
-		}
-		break;
-
-	case IEngineBugReporter::BR_INTERNAL:
-		{
-			if ( bCanUseInternal )
-			{
-				bIsPublic = false;
-			}
-		}
-		break;
-	}
-
-	g_pBugUI = new CBugUIPanel( bIsPublic, parent );
+	// dimhotepus: Always public bug reporter.
+	g_pBugUI = new CBugUIPanel( parent );
 	Assert( g_pBugUI );
 
 	m_ParentPanel = parent;

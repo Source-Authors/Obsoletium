@@ -34,6 +34,8 @@
 #include "console/conproc.h"
 #include "console/textconsole.h"
 
+#include "vscript/ivscript.h"
+
 #include "scoped_app_locale.h"
 
 namespace se::dedicated {
@@ -45,9 +47,8 @@ class WindowsSystem : public ISystem {
  public:
   explicit WindowsSystem(ICommandLine *command_line, bool is_console_mode)
       : command_line_{command_line},
-        api_{nullptr},
         is_console_mode_{is_console_mode} {}
-  virtual ~WindowsSystem() = default;
+  ~WindowsSystem() override = default;
 
   IDedicatedServerAPI *LoadModules(
       DedicatedAppSystemGroup *app_system_group) override;
@@ -66,7 +67,7 @@ class WindowsSystem : public ISystem {
 
  private:
   ICommandLine *command_line_;
-  IDedicatedServerAPI *api_;
+  IDedicatedServerAPI *api_{nullptr};
   const bool is_console_mode_;
 };
 
@@ -170,6 +171,7 @@ IDedicatedServerAPI *WindowsSystem::LoadModules(
       {"vgui2" DLL_EXT_STRING, VGUI_IVGUI_INTERFACE_VERSION},
       {"engine" DLL_EXT_STRING, VENGINE_HLDS_API_VERSION},
       {"dedicated" DLL_EXT_STRING, QUEUEDLOADER_INTERFACE_VERSION},
+      {"vscript" DLL_EXT_STRING, VSCRIPT_INTERFACE_VERSION},
       {"", ""}  // Required to terminate the list
   };
 

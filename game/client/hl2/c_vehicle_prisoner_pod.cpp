@@ -123,6 +123,8 @@ C_PropVehiclePrisonerPod::C_PropVehiclePrisonerPod( void )
 	m_ViewSmoothingData.flRollCurveLinear = ROLL_CURVE_LINEAR;
 	m_ViewSmoothingData.flFOV = POD_VIEW_FOV;
 
+	m_bEnterAnimOn = m_bExitAnimOn = false;
+	m_vecEyeExitEndpoint = vec3_origin;
 	m_flFOV = 0;
 }
 

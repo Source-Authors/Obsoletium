@@ -23,6 +23,8 @@ class CEntityInfo
 public:
 
 	CEntityInfo() {
+		m_pFrom = nullptr;
+		m_pTo = nullptr;
 		m_nOldEntity = -1;
 		m_nNewEntity = -1;
 		m_nHeaderBase = -1;
@@ -87,7 +89,9 @@ class CEntityReadInfo : public CEntityInfo
 public:
 
 	CEntityReadInfo() 
-	{	m_nPostDataUpdateCalls = 0;
+	{	
+		m_pBuf = nullptr;
+		m_nPostDataUpdateCalls = 0;
 		m_nLocalPlayerBits = 0;
 		m_nOtherPlayerBits = 0;
 		m_UpdateType = PreserveEnt;

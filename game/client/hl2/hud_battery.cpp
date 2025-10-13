@@ -55,6 +55,8 @@ DECLARE_HUD_MESSAGE( CHudBattery, Battery );
 //-----------------------------------------------------------------------------
 CHudBattery::CHudBattery( const char *pElementName ) : BaseClass(NULL, "HudSuit"), CHudElement( pElementName )
 {
+	m_iBat = INIT_BAT;
+	m_iNewBat = 0;
 	SetHiddenBits( HIDEHUD_HEALTH | HIDEHUD_NEEDSUIT );
 }
 

@@ -34,7 +34,7 @@ public:
 	virtual void Resolve();
 
 private:
-	IMaterial *m_pMTL;
+	IMaterial *m_pMTL{nullptr};
 	CDmaString m_mtlName;
 };
 

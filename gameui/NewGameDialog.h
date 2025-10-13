@@ -16,7 +16,6 @@
 #include "utlvector.h"
 
 class CGameChapterPanel;
-class CSkillSelectionDialog;
 
 // Slot indices in new game menu
 #define INVALID_INDEX	-1
@@ -82,8 +81,7 @@ public:
 	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	void	OnCommand( const char *command ) override;
 	void	OnClose( void ) override;
-	void	PaintBackground() override;
-	void			SetSelectedChapterIndex( int index );
+	void			SetSelectedChapterIndex( intp index );
 	void			SetSelectedChapter( const char *chapter );
 	void			UpdatePanelLockedStatus( int iUnlockedChapter, int i, CGameChapterPanel *pChapterPanel );
 
@@ -103,11 +101,9 @@ public:
 	EScrollDirection	m_ScrollDirection;
 
 private:
-	int m_iSelectedChapter;
+	intp m_iSelectedChapter;
 
 	CUtlVector<CGameChapterPanel *> m_ChapterPanels;
-
-	vgui::DHANDLE<CSkillSelectionDialog> m_hSkillSelectionDialog;
 
 	vgui::Button		*m_pPlayButton;
 	vgui::Button		*m_pNextButton;
@@ -116,7 +112,6 @@ private:
 	vgui::Label			*m_pChapterTitleLabels[2];
 	vgui::Label			*m_pBonusSelection;
 	vgui::ImagePanel	*m_pBonusSelectionBorder;
-	CFooterPanel		*m_pFooter;
 	bool				m_bCommentaryMode;
 	vgui::Label			*m_pCommentaryLabel;
 
@@ -129,23 +124,19 @@ private:
 	void	ContinueScrolling( void );
 	void	AnimateSelectionPanels( void );
 	void	ShiftPanelIndices( int offset );
-	bool	IsValidPanel( const int idx );
-	void	InitPanelIndexForDisplay( const int idx );
+	bool	IsValidPanel( const intp idx );
+	void	InitPanelIndexForDisplay( const intp idx );
 	void	UpdateMenuComponents( EScrollDirection dir );
 	void	UpdateBonusSelection( void );
 
 	int		m_PanelXPos[ NUM_SLOTS ];
 	int		m_PanelYPos[ NUM_SLOTS ];
 	float	m_PanelAlpha[ NUM_SLOTS ];
-	int		m_PanelIndex[ NUM_SLOTS ];
+	intp	m_PanelIndex[ NUM_SLOTS ];
 	float	m_ScrollSpeed;
-	int		m_ButtonPressed;
 	int		m_ScrollCt;
 	bool	m_bScrolling;
-	char	m_ActiveTitleIdx;
-	bool	m_bMapStarting;
 	int		m_iBonusSelection;
-	bool	m_bScrollToFirstBonusMap;
 	
 	struct BonusMapDescription_t	*m_pBonusMapDescription;
 

@@ -854,7 +854,7 @@ void CNPC_Barnacle::PullEnemyTorwardsMouth( bool bAdjustEnemyOrigin )
 #if 0
 		// this is an example of one somewhat crude attempt to realign objects so that they are directly underneath
 		// the barnacle. It introduces unacceptable oscillation.
-		const float MAX_CENTERING_VELOCITY = 24.0f;
+		constexpr float MAX_CENTERING_VELOCITY = 24.0f;
 		float distToMove = MAX_CENTERING_VELOCITY * dt;
 		Vector2D vToCenter = GetAbsOrigin().AsVector2D() - GetEnemy()->GetAbsOrigin().AsVector2D();
 		float distFromCenter = vToCenter.NormalizeInPlace();

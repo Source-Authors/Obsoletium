@@ -7,21 +7,15 @@
 #include "cbase.h"
 #include "physics_airboat.h"
 #include "cmodel.h"
-#include <ivp_ray_solver.hxx>
+#include "ivp_ray_solver.hxx"
 
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#ifdef _X360 
-	#define AIRBOAT_STEERING_RATE_MIN			0.000225f
-	#define AIRBOAT_STEERING_RATE_MAX			(10.0f * AIRBOAT_STEERING_RATE_MIN)
-	#define AIRBOAT_STEERING_INTERVAL			1.5f
-#else
-	#define AIRBOAT_STEERING_RATE_MIN			0.00045f
-	#define AIRBOAT_STEERING_RATE_MAX			(5.0f * AIRBOAT_STEERING_RATE_MIN)
-	#define AIRBOAT_STEERING_INTERVAL			0.5f
-#endif //_X360
+#define AIRBOAT_STEERING_RATE_MIN			0.00045f
+#define AIRBOAT_STEERING_RATE_MAX			(5.0f * AIRBOAT_STEERING_RATE_MIN)
+#define AIRBOAT_STEERING_INTERVAL			0.5f
 
 #define AIRBOAT_ROT_DRAG					0.00004f
 #define AIRBOAT_ROT_DAMPING					0.001f
@@ -125,13 +119,12 @@ CPhysics_Airboat::CPhysics_Airboat( IVP_Environment *pEnv, const IVP_Template_Ca
 	InitAirboat( pCarSystem );
 	m_pGameTrace = pGameTrace;
 
-    m_SteeringAngle = 0;
+	m_SteeringAngle = 0;
 	m_bSteeringReversed = false;
 
 	m_flThrust = 0;
 
 	m_bAirborne = false;
-	m_flAirTime = 0;
 	m_bWeakJump = false;
 
 	m_flPitchErrorPrev = 0;
@@ -144,7 +137,7 @@ CPhysics_Airboat::CPhysics_Airboat( IVP_Environment *pEnv, const IVP_Template_Ca
 //-----------------------------------------------------------------------------
 CPhysics_Airboat::~CPhysics_Airboat()
 {
-    m_pAirboatBody->get_environment()->get_controller_manager()->remove_controller_from_environment( this, IVP_TRUE );
+	m_pAirboatBody->get_environment()->get_controller_manager()->remove_controller_from_environment( this, IVP_TRUE );
 }
 
 
@@ -200,8 +193,8 @@ float CPhysics_Airboat::ComputeFrontPontoonWaveNoise( int nPontoonIndex, float f
 	IVP_FLOAT flNoiseScale = RemapValClamped( 1.0f - flSpeedRatio, 0, 1, AIRBOAT_WATER_NOISE_MIN, AIRBOAT_WATER_NOISE_MAX );
 
 	// Apply a phase shift between left and right pontoons to simulate waves passing under the boat.
-	IVP_FLOAT flPhaseShift = 0;
-	if ( flSpeedRatio < 0.3 )
+	IVP_FLOAT flPhaseShift = 0.0f;
+	if ( flSpeedRatio < 0.3f )
 	{
 		// BUG: this allows a discontinuity in the waveform - use two superimposed sine waves instead?
 		flPhaseShift = nPontoonIndex * AIRBOAT_WATER_PHASE_MAX;
@@ -523,7 +516,6 @@ void CPhysics_Airboat::UpdateAirborneState( IVP_Raycast_Airboat_Impact *pImpacts
 		if (!m_bAirborne)
 		{
 			m_bAirborne = true;
-			m_flAirTime = 0;
 
 			IVP_FLOAT flSpeed = ( IVP_FLOAT )m_pCore->speed.real_length();
 			if (flSpeed < 11.0f)
@@ -535,10 +527,6 @@ void CPhysics_Airboat::UpdateAirborneState( IVP_Raycast_Airboat_Impact *pImpacts
 			{
 				//Msg("Strong JUMP at %f\n", flSpeed);
 			}
-		}
-		else
-		{
-			m_flAirTime += pEventSim->delta_time;
 		}
 	}
 	else
@@ -586,7 +574,7 @@ bool CPhysics_Airboat::PostRaycasts( IVP_Ray_Solver_Template *pRaySolverTemplate
 
 			// Get the inverse portion of the surface normal in the direction of the ray cast (shock - used in the shock simulation code for the sign
 			// and percentage of force applied to the shock).
-			pImpact->inv_normal_dot_dir = 1.1f / ( IVP_Inline_Math::fabsd( pImpact->raycast_dir_ws.dot_product( &pImpact->vecImpactNormalWS ) ) + 0.1f );
+			pImpact->inv_normal_dot_dir = 1.1f / ( IVP_Inline_Math::fabsd( pImpact->raycast_dir_ws.dot_product( &pImpact->vecImpactNormalWS ) ) + 0.1 );
 
 			// Set the wheel friction - ground friction (if any) + wheel friction.
 			pImpact->friction_value = pImpact->flFriction * pPontoonPoint->friction_of_wheel;

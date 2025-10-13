@@ -30,11 +30,11 @@ public:
 
 	virtual void			Think() = 0;
 
-	virtual bool			IsInitialized() const = 0;
+	[[nodiscard]] virtual bool			IsInitialized() const = 0;
 	
-	virtual const char		*GetRelativeBaseDir() const = 0;	// Returns path to wherever the index .dmx lives relative to the game path, e.g. "replay\client\"
-	virtual const char		*GetBaseDir() const = 0;	// Returns full directory to wherever the index .dmx lives, e.g. c:\program files (x86)\steam\steamapps\<username>\team fortress 2\tf\replays\<client|server>\ -- NOTE: includes trailing slash
-	virtual const char		*GetReplaySubDir() const = 0;	// Returns "client" or "server"
+	[[nodiscard]] virtual const char		*GetRelativeBaseDir() const = 0;	// Returns path to wherever the index .dmx lives relative to the game path, e.g. "replay\client\"
+	[[nodiscard]] virtual const char		*GetBaseDir() const = 0;	// Returns full directory to wherever the index .dmx lives, e.g. c:\program files (x86)\steam\steamapps\<username>\team fortress 2\tf\replays\<client|server>\ -- NOTE: includes trailing slash
+	[[nodiscard]] virtual const char		*GetReplaySubDir() const = 0;	// Returns "client" or "server"
 
 	virtual IReplayErrorSystem	*GetErrorSystem() = 0;
 	virtual IRecordingSessionManager		*GetRecordingSessionManager() = 0;

@@ -219,7 +219,7 @@ void CFish::FlockTo( CFish *other, float amount )
 		return;
 
 	// if they are close and we are moving together, avoid them
-	const float avoidRange = 25.0f;
+	constexpr float avoidRange = 25.0f;
 	if (other && range < avoidRange)
 	{
 		// compute their relative velocity to us
@@ -227,7 +227,7 @@ void CFish::FlockTo( CFish *other, float amount )
 
 		if (DotProduct( to, relVel ) < 0.0f)
 		{
-			const float avoidPower = 5.0f;
+			constexpr float avoidPower = 5.0f;
 
 			// their comin' right at us! - avoid
 			if (DotProduct( m_perp, to ) > 0.0f)
@@ -256,7 +256,7 @@ void CFish::FlockTo( CFish *other, float amount )
 
 	float power = 1.0f - (range / maxRange);
 
-	const float flockInfluence = 0.7f; // 0.3f;	// 0.3
+	constexpr float flockInfluence = 0.7f; // 0.3f;	// 0.3
 	m_angleChange += amount * flockInfluence * power * side * turn;
 }
 
@@ -269,7 +269,7 @@ void CFish::FlockTo( CFish *other, float amount )
  */
 float CFish::Avoid( void )
 {
-	const float avoidPower = 100.0f; // 50.0f; // 25.0f;
+	constexpr float avoidPower = 100.0f; // 50.0f; // 25.0f;
 
 	// 
 	// Stay within pool bounds.
@@ -277,7 +277,7 @@ float CFish::Avoid( void )
 	// right at the max range.
 	//
 	Vector toCenter = m_pool->GetAbsOrigin() - GetAbsOrigin();
-	const float avoidZone = 20.0f;
+	constexpr float avoidZone = 20.0f;
 	if (toCenter.IsLengthGreaterThan( m_pool->GetMaxRange() - avoidZone ))
 	{
 		// turn away from edge
@@ -291,7 +291,7 @@ float CFish::Avoid( void )
 	}
 
 	trace_t result;
-	const float sideOffset = 0.2f;
+	constexpr float sideOffset = 0.2f;
 
 	float rightDanger = 0.0f;
 	float leftDanger = 0.0f;
@@ -357,7 +357,7 @@ void CFish::Panic( void )
 void CFish::Update( float deltaT )
 {
 	Vector deltaPos = GetAbsOrigin() - m_poolOrigin;
-	const float safetyMargin = 5.0f;
+	constexpr float safetyMargin = 5.0f;
 
 	// pass relative position to the client
 	// clamp them here to cover the rare cases where a fish's high velocity skirts the range limit
@@ -382,7 +382,7 @@ void CFish::Update( float deltaT )
 			// decay movement speed to zero
 			Vector vel = GetAbsVelocity();
 
-			const float drag = 1.0f;
+			constexpr float drag = 1.0f;
 			vel -= drag * vel * deltaT;
 
 			SetAbsVelocity( vel );
@@ -463,13 +463,13 @@ void CFish::Update( float deltaT )
 	//
 	// Update speed
 	//
-	const float rate = 2.0f;
+	constexpr float rate = 2.0f;
 	m_speed += rate * (m_desiredSpeed - m_speed) * deltaT;
 
 	// decay desired speed if done moving
 	if (m_moveTimer.IsElapsed())
 	{
-		const float decayRate = 1.0f;
+		constexpr float decayRate = 1.0f;
 		m_desiredSpeed -= decayRate * deltaT;
 		if (m_desiredSpeed < 0.0f)
 		{
@@ -638,8 +638,8 @@ void CFishPool::FireGameEvent( IGameEvent *event )
 	CBasePlayer *player = UTIL_PlayerByUserId( event->GetInt( "userid" ) );
 	
 	// the fish panic
-	const float loudRange = 500.0f;
-	const float quietRange = 75.0f;
+	constexpr float loudRange = 500.0f;
+	constexpr float quietRange = 75.0f;
 
 	float range = (Q_strcmp( "player_footstep", event->GetName() )) ? loudRange : quietRange;
 

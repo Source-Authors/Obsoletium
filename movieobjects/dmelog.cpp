@@ -989,7 +989,7 @@ DmeTime_t CDmeLogLayer::GetKeyTime( intp nKeyIndex ) const
 //-----------------------------------------------------------------------------
 // Scale + bias key times
 //-----------------------------------------------------------------------------
-void CDmeLogLayer::ScaleBiasKeyTimes( double flScale, DmeTime_t nBias )
+void CDmeLogLayer::ScaleBiasKeyTimes( float flScale, DmeTime_t nBias )
 {
 	// Don't waste time on the identity transform
 	if ( ( nBias == DMETIME_ZERO ) && ( fabs( flScale - 1.0 ) < 1e-5 ) )
@@ -3000,7 +3000,7 @@ intp CDmeLog::GetKeyCount() const
 //-----------------------------------------------------------------------------
 // Scale + bias key times
 //-----------------------------------------------------------------------------
-void CDmeLog::ScaleBiasKeyTimes( double flScale, DmeTime_t nBias )
+void CDmeLog::ScaleBiasKeyTimes( float flScale, DmeTime_t nBias )
 {
 	// Don't waste time on the identity transform
 	if ( ( nBias == DMETIME_ZERO ) && ( fabs( flScale - 1.0 ) < 1e-5 ) )
@@ -3992,7 +3992,7 @@ void CLogFalloffBlend< float >::InsertClampTransitionPoints( CDmeTypedLogLayer<f
 {
 	bool bLastLess, bLastGreater, bCurrLess, bCurrGreater;
 	DmeTime_t tCrossing, tDuration;
-	double flOODv;
+	float flOODv;
 
 	// First time through? cache last values.
 	if ( clampHelper.m_tLastTime == DMETIME_MINTIME )
@@ -4006,7 +4006,7 @@ void CLogFalloffBlend< float >::InsertClampTransitionPoints( CDmeTypedLogLayer<f
 		goto cacheLastValues;
 
 	// NOTE: The check above means val != m_LastUnclampedValue
-	flOODv = 1.0 / ( val - clampHelper.m_LastUnclampedValue );
+	flOODv = 1.0f / ( val - clampHelper.m_LastUnclampedValue );
 	tDuration = t - clampHelper.m_tLastTime;
 
 	// NOTE: Clamp semantics here favor keeping the non-clamped value
@@ -4016,7 +4016,7 @@ void CLogFalloffBlend< float >::InsertClampTransitionPoints( CDmeTypedLogLayer<f
 	if ( bLastLess && !bCurrLess )
 	{
 		// Insert at min crossing
-		double flFactor = ( m_MinValue - clampHelper.m_LastUnclampedValue ) * flOODv;
+		float flFactor = ( m_MinValue - clampHelper.m_LastUnclampedValue ) * flOODv;
 		tCrossing = clampHelper.m_tLastTime + tDuration * flFactor;
 		tCrossing.Clamp( clampHelper.m_tLastTime, t - DMETIME_MINDELTA );
 		pWriteLayer->InsertKey( tCrossing, m_MinValue, m_nCurveType );
@@ -4028,7 +4028,7 @@ void CLogFalloffBlend< float >::InsertClampTransitionPoints( CDmeTypedLogLayer<f
 	else if ( bLastGreater && !bCurrGreater )
 	{
 		// Insert at max crossing
-		double flFactor = ( m_MaxValue - clampHelper.m_LastUnclampedValue ) * flOODv;
+		float flFactor = ( m_MaxValue - clampHelper.m_LastUnclampedValue ) * flOODv;
 		tCrossing = clampHelper.m_tLastTime + tDuration * flFactor;
 		tCrossing.Clamp( clampHelper.m_tLastTime, t - DMETIME_MINDELTA );
 		pWriteLayer->InsertKey( tCrossing, m_MaxValue, m_nCurveType );
@@ -4043,7 +4043,7 @@ void CLogFalloffBlend< float >::InsertClampTransitionPoints( CDmeTypedLogLayer<f
 	{
 		// Insert at min crossing
 		// NOTE: Clamp semantics here favor keeping the non-clamped value
-		double flFactor = ( m_MinValue - clampHelper.m_LastUnclampedValue ) * flOODv;
+		float flFactor = ( m_MinValue - clampHelper.m_LastUnclampedValue ) * flOODv;
 		tCrossing = clampHelper.m_tLastTime + tDuration * flFactor;
 		tCrossing.Clamp( clampHelper.m_tLastTime + DMETIME_MINDELTA, t );
 		pWriteLayer->InsertKey( tCrossing, m_MinValue, m_nCurveType );
@@ -4055,7 +4055,7 @@ void CLogFalloffBlend< float >::InsertClampTransitionPoints( CDmeTypedLogLayer<f
 	else if ( !bLastGreater && bCurrGreater )
 	{
 		// Insert at max crossing
-		double flFactor = ( m_MaxValue - clampHelper.m_LastUnclampedValue ) * flOODv;
+		float flFactor = ( m_MaxValue - clampHelper.m_LastUnclampedValue ) * flOODv;
 		tCrossing = clampHelper.m_tLastTime + tDuration * flFactor;
 		tCrossing.Clamp( clampHelper.m_tLastTime + DMETIME_MINDELTA, t );
 		pWriteLayer->InsertKey( tCrossing, m_MaxValue, m_nCurveType );

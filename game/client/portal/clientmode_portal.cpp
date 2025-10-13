@@ -131,6 +131,9 @@ public:
 	virtual void	CreateMove( float flInputSampleTime, CUserCmd *cmd );
 	virtual void	LevelInit( const char *newmap );
 	virtual void	LevelShutdown( void );
+
+	// dimhotepus: Cleanup support.
+	virtual void	Shutdown( void );
 };
 
 CHLModeManager::CHLModeManager( void )
@@ -145,6 +148,12 @@ void CHLModeManager::Init( void )
 {
 	g_pClientMode = GetClientModeNormal();
 	PanelMetaClassMgr()->LoadMetaClassDefinitionFile( SCREEN_FILE );
+}
+
+// dimhotepus: Cleanup support.
+void CHLModeManager::Shutdown( void )
+{
+	g_pClientMode = nullptr;
 }
 
 void CHLModeManager::SwitchMode( bool commander, bool force )

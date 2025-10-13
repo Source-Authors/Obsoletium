@@ -15,19 +15,11 @@
 #include <time.h>
 #endif
 
-#ifndef _XBOX
-#undef min
-#undef max
 #include <set>
-#endif
 
 #ifdef _WIN32
 #pragma once
 #endif
-
-// the include <set> monkey's with the MAX() define, unbreak it
-#undef MINMAX_H
-#include "minmax.h"
 
 #include "ai_playerally.h"
 

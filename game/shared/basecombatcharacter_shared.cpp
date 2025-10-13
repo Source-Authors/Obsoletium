@@ -345,13 +345,16 @@ VisCacheResult_t CCombatCharVisCache::HasVisibility( int iCache ) const
 	
 	m_nTestCount++;
 
-	bool bReverse = ( iCache < 0 );
+	const bool bReverse = iCache < 0;
 	if ( bReverse )
 	{
-		iCache = - iCache - 1;
+		iCache = -iCache - 1;
 	}
 
-	const VisCacheEntry_t &entry = m_VisCache[iCache];
+	// dimhotepus: Catch out-of-range in DEBUG.
+	Assert(iCache >= 0 && iCache <= std::numeric_limits<unsigned short>::max());
+
+	const VisCacheEntry_t &entry = m_VisCache[static_cast<unsigned short>(iCache)];
 	if ( gpGlobals->curtime - entry.m_flTime > VIS_CACHE_ENTRY_LIFE )
 		return VISCACHE_UNKNOWN;
 
@@ -366,13 +369,16 @@ void CCombatCharVisCache::RegisterVisibility( int iCache, bool bEntity1CanSeeEnt
 	if ( iCache == VIS_CACHE_INVALID )
 		return;
 
-	bool bReverse = ( iCache < 0 );
+	bool bReverse = iCache < 0;
 	if ( bReverse )
 	{
-		iCache = - iCache - 1;
+		iCache = -iCache - 1;
 	}
+	
+	// dimhotepus: Catch out-of-range in DEBUG.
+	Assert(iCache >= 0 && iCache <= std::numeric_limits<unsigned short>::max());
 
-	VisCacheEntry_t &entry = m_VisCache[iCache];
+	VisCacheEntry_t &entry = m_VisCache[static_cast<unsigned short>(iCache)];
 	entry.m_flTime = gpGlobals->curtime;
 	if ( !bReverse )
 	{

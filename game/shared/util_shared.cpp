@@ -915,15 +915,16 @@ bool UTIL_IsSpaceEmpty( CBaseEntity *pMainEnt, const Vector &vMin, const Vector 
 	return bClear;
 }
 
-void UTIL_StringToFloatArray( float *pVector, int count, const char *pString )
+void UTIL_StringToFloatArray( float *pVector, intp count, const char *pString )
 {
 	char *pstr, *pfront, tempString[128];
-	int	j;
 
-	Q_strncpy( tempString, pString, sizeof(tempString) );
+	V_strcpy_safe( tempString, pString );
 	pstr = pfront = tempString;
 
-	for ( j = 0; j < count; j++ )			// lifted from pr_edict.c
+	intp j = 0;
+
+	for ( ; j < count; j++ )			// lifted from pr_edict.c
 	{
 		pVector[j] = strtof( pfront, nullptr );
 
@@ -941,26 +942,33 @@ void UTIL_StringToFloatArray( float *pVector, int count, const char *pString )
 		pstr++;
 		pfront = pstr;
 	}
+
 	for ( j++; j < count; j++ )
 	{
 		pVector[j] = 0;
 	}
 }
 
-void UTIL_StringToVector( float *pVector, const char *pString )
+void UTIL_StringToVector( Vector &vector, const char *pString )
 {
-	UTIL_StringToFloatArray( pVector, 3, pString );
+	UTIL_StringToFloatArray( vector.Base(), 3, pString );
 }
 
-void UTIL_StringToIntArray( int *pVector, int count, const char *pString )
+void UTIL_StringToVector( QAngle &angles, const char *pString )
+{
+	UTIL_StringToFloatArray( angles.Base(), 3, pString );
+}
+
+void UTIL_StringToIntArray( int *pVector, intp count, const char *pString )
 {
 	char *pstr, *pfront, tempString[128];
-	int	j;
 
-	Q_strncpy( tempString, pString, sizeof(tempString) );
+	V_strcpy_safe( tempString, pString );
 	pstr = pfront = tempString;
 
-	for ( j = 0; j < count; j++ )			// lifted from pr_edict.c
+	intp j = 0;
+
+	for ( ; j < count; j++ )			// lifted from pr_edict.c
 	{
 		pVector[j] = atoi( pfront );
 
@@ -981,7 +989,7 @@ void UTIL_StringToIntArray( int *pVector, int count, const char *pString )
 void UTIL_StringToColor32( color32 *color, const char *pString )
 {
 	int tmp[4];
-	UTIL_StringToIntArray( tmp, 4, pString );
+	UTIL_StringToIntArray( tmp, pString );
 	color->r = static_cast<byte>(tmp[0]);
 	color->g = static_cast<byte>(tmp[1]);
 	color->b = static_cast<byte>(tmp[2]);
@@ -1347,7 +1355,7 @@ const char *UTIL_GetRandomSoundFromEntry( const char* pszEntryName )
 
 	if ( pszEntryName )
 	{
-		int soundIndex = soundemitterbase->GetSoundIndex( pszEntryName );
+		UtlHashHandle_t soundIndex = soundemitterbase->GetSoundIndex( pszEntryName );
 		CSoundParametersInternal *internal = ( soundIndex != -1 ) ? soundemitterbase->InternalGetParametersForSound( soundIndex ) : NULL;
 		// See if we need to pick a random one
 		if ( internal )

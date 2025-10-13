@@ -116,7 +116,7 @@ CFrameSnapshot* CFrameSnapshotManager::TakeTickSnapshot( int tickcount )
 
 	CFrameSnapshot *snap = CreateEmptySnapshot( tickcount, sv.num_edicts );
 	
-	int maxclients = sv.GetClientCount();
+	intp maxclients = sv.GetClientCount();
 
 	CFrameSnapshotEntry *entry = snap->m_pEntities - 1;
 	edict_t *edict= sv.edicts - 1;
@@ -459,7 +459,7 @@ CFrameSnapshot::~CFrameSnapshot()
 	if ( m_pTempEntities )
 	{
 		Assert( m_nTempEntities>0 );
-		for (int i = 0; i < m_nTempEntities; i++ )
+		for (intp i = 0; i < m_nTempEntities; i++ )
 		{
 			delete m_pTempEntities[i];
 		}

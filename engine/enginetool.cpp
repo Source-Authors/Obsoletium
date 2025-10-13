@@ -548,7 +548,7 @@ void CEngineTool::Con_NPrintf( int pos, const char *fmt, ... )
 {
 	char buf[ 1024 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 
@@ -559,7 +559,7 @@ void CEngineTool::Con_NXPrintf( const struct con_nprint_s *info, const char *fmt
 {
 	char buf[ 1024 ];
 	va_list argptr;
-	va_start( argptr, fmt );
+	va_start( argptr, fmt ); //-V2019 //-V2018
 	V_vsprintf_safe( buf, fmt, argptr );
 	va_end( argptr );
 

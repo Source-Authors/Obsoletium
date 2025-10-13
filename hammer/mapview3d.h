@@ -15,6 +15,7 @@
 #include "MapView.h"
 #include "Render3D.h"
 #include "camera.h"
+#include "windows/dpi_wnd_behavior.h"
 
 namespace vgui
 {
@@ -135,7 +136,8 @@ private:
 	float GetKeyScale(unsigned int uKeyState);
 
 	// Radius culling
-	void ProcessCulling( void );
+	// dimhotepus: Remove radius culling.
+	// void ProcessCulling( void );
 
 	enum
 	{
@@ -147,8 +149,8 @@ private:
 	bool m_bRotating;
 	CPoint m_ptLastMouseMovement;	// Last position used for tracking the mouse for camera control.
 
-	DWORD m_dwTimeLastSample;		// Used for calculating rendering framerate.
-	DWORD m_dwTimeLastInputSample;	// Used for framerate-independent input processing.
+	ULONGLONG m_dwTimeLastSample;		// Used for calculating rendering framerate.
+	ULONGLONG m_dwTimeLastInputSample;	// Used for framerate-independent input processing.
 
 	float m_fForwardSpeed;			// Current forward speed, in world units per second.
 	float m_fStrafeSpeed;			// Current side-to-side speed, in world units per second.
@@ -173,9 +175,14 @@ private:
 	bool m_bCameraPosChanged;
 	bool m_bClippingChanged;
 
+	se::windows::ui::CDpiWindowBehavior m_dpiWindowBehavior;
+
 	//{{AFX_MSG(CMapView3D)
 protected:
-	afx_msg void OnTimer(UINT nIDEvent);
+	afx_msg int OnCreate(LPCREATESTRUCT lpCreateStruct);
+	afx_msg void OnDestroy();
+	afx_msg LRESULT OnDpiChanged(WPARAM wParam, LPARAM lParam);
+	afx_msg void OnTimer(uintp nIDEvent);
 	afx_msg void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnSize(UINT nType, int cx, int cy);

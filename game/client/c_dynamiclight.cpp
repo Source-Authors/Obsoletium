@@ -210,9 +210,9 @@ void C_DynamicLight::ClientThink(void)
 			m_pSpotlightEnd->flags = DLIGHT_NO_MODEL_ILLUMINATION | (m_Flags & DLIGHT_DISPLACEMENT_MASK);
 			m_pSpotlightEnd->radius		= m_SpotRadius; // * falloff;
 			m_pSpotlightEnd->die		= gpGlobals->curtime + 1e6f;
-			m_pSpotlightEnd->color.r	= m_clrRender->r * falloff;
-			m_pSpotlightEnd->color.g	= m_clrRender->g * falloff;
-			m_pSpotlightEnd->color.b	= m_clrRender->b * falloff;
+			m_pSpotlightEnd->color.r	= static_cast<byte>(m_clrRender->r * falloff);
+			m_pSpotlightEnd->color.g	= static_cast<byte>(m_clrRender->g * falloff);
+			m_pSpotlightEnd->color.b	= static_cast<byte>(m_clrRender->b * falloff);
 			m_pSpotlightEnd->color.exponent	= m_Exponent;
 
 			// For bumped lighting

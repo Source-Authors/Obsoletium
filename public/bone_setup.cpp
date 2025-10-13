@@ -1676,7 +1676,7 @@ void ScaleBones(
 //-----------------------------------------------------------------------------
 // Purpose: resolve a global pose parameter to the specific setting for this sequence
 //-----------------------------------------------------------------------------
-void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, int iSequence, int iLocalIndex, float &flSetting, int &index )
+void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, intp iSequence, int iLocalIndex, float &flSetting, int &index )
 {
 	if (!pStudioHdr)
 	{
@@ -3034,7 +3034,7 @@ bool Studio_IKAnimationError( const CStudioHdr *pStudioHdr, const mstudioikrule_
 //			return true if the rule is within bounds.
 //-----------------------------------------------------------------------------
 
-bool Studio_IKSequenceError( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, int iSequence, float flCycle, int iRule, const float poseParameter[], mstudioanimdesc_t *panim[4], float weight[4], ikcontextikrule_t &ikRule )
+bool Studio_IKSequenceError( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, float flCycle, int iRule, const float poseParameter[], mstudioanimdesc_t *panim[4], float weight[4], ikcontextikrule_t &ikRule )
 {
 	int i;
 
@@ -4389,7 +4389,7 @@ void CIKContext::SolveAllLocks(
 
 void CIKContext::SolveLock(
 	const mstudioiklock_t *plock,
-	int i,
+	intp i,
 	Vector pos[], 
 	Quaternion q[],
 	matrix3x4_t boneToWorld[], 
@@ -5056,7 +5056,7 @@ float Studio_GetController( const CStudioHdr *pStudioHdr, int iController, float
 
 void Studio_CalcDefaultPoseParameters( const CStudioHdr *pStudioHdr, float flPoseParameter[24], int nCount )
 {
-	int nPoseCount = pStudioHdr->GetNumPoseParameters();
+	intp nPoseCount = pStudioHdr->GetNumPoseParameters();
 	int nNumParams = MIN( nCount, MAXSTUDIOPOSEPARAM );
 
 	for ( int i = 0; i < nNumParams; ++i )
@@ -5261,7 +5261,6 @@ bool SweepBoxToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, CStudioHd
 		if ( ( fBoneContents & fContentsMask ) == 0 )
 			continue;
 		
-		//FIXME: Won't work with scaling!
 		trace_t obbTrace;
 		if ( IntersectRayWithOBB( clippedRay, *hitboxbones[pbox->bone], pbox->bbmin, pbox->bbmax, 0.0f, &obbTrace ) )
 		{
@@ -5719,7 +5718,7 @@ float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist )
 //			returns false if sequence is not a movement sequence
 //-----------------------------------------------------------------------------
 
-bool Studio_SeqMovement( const CStudioHdr *pStudioHdr, int iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector &deltaPos, QAngle &deltaAngles )
+bool Studio_SeqMovement( const CStudioHdr *pStudioHdr, intp iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector &deltaPos, QAngle &deltaAngles )
 {
 	mstudioanimdesc_t *panim[4];
 	float	weight[4];
@@ -5766,7 +5765,7 @@ bool Studio_SeqMovement( const CStudioHdr *pStudioHdr, int iSequence, float flCy
 //			returns false if sequence is not a movement sequence
 //-----------------------------------------------------------------------------
 
-bool Studio_SeqVelocity( const CStudioHdr *pStudioHdr, int iSequence, float flCycle, const float poseParameter[], Vector &vecVelocity )
+bool Studio_SeqVelocity( const CStudioHdr *pStudioHdr, intp iSequence, float flCycle, const float poseParameter[], Vector &vecVelocity )
 {
 	mstudioanimdesc_t *panim[4];
 	float	weight[4];
@@ -5798,7 +5797,7 @@ bool Studio_SeqVelocity( const CStudioHdr *pStudioHdr, int iSequence, float flCy
 // Purpose: finds how much of an sequence to play to move given linear distance
 //-----------------------------------------------------------------------------
 
-float Studio_FindSeqDistance( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], float flDist )
+float Studio_FindSeqDistance( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[], float flDist )
 {
 	mstudioanimdesc_t *panim[4];
 	float	weight[4];
@@ -5852,7 +5851,7 @@ int Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAtta
 		CUtlVector<int> matchingAttachments;
 
 		// Extract the bone index from the name
-		for (int i = 0; i < pStudioHdr->GetNumAttachments(); i++)
+		for (intp i = 0; i < pStudioHdr->GetNumAttachments(); i++)
 		{
 			if ( strstr( ((CStudioHdr *)pStudioHdr)->pAttachment(i).pszName(), pAttachmentName ) ) 
 			{
@@ -5929,7 +5928,7 @@ const char *Studio_GetKeyValueText( const CStudioHdr *pStudioHdr, intp iSequence
 	return NULL;
 }
 
-bool Studio_PrefetchSequence( const CStudioHdr *pStudioHdr, int iSequence )
+bool Studio_PrefetchSequence( const CStudioHdr *pStudioHdr, intp iSequence )
 {
 	bool pendingload = false;
 	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );

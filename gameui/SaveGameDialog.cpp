@@ -91,12 +91,12 @@ void CSaveGameDialog::OnCommand( const char *command )
 
 			// save to a new name
 			char saveName[128];
-			FindSaveSlot( saveName, sizeof(saveName) );
-			if ( saveName[ 0 ] )
+			FindSaveSlot( saveName );
+			if ( !Q_isempty( saveName ) )
 			{
 				// Load the game, return to top and switch to engine
 				char sz[ 256 ];
-				Q_snprintf(sz, sizeof( sz ), "save %s\n", saveName );
+				V_sprintf_safe(sz, "save %s\n", saveName );
 
 				engine->ClientCmd_Unrestricted( sz );
 
@@ -160,5 +160,5 @@ void CSaveGameDialog::FindSaveSlot( OUT_Z_CAP(bufsize) char *buffer, intp bufsiz
 		g_pFullFileSystem->Close(fp);
 	}
 
-	Assert(!("Could not generate new save game file"));
+	Warning("Could not generate new save game file. Last checked save file '%s' already exist.\n", szFileName);
 }

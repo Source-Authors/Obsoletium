@@ -18,8 +18,10 @@
 #ifndef HALTON_H
 #define HALTON_H
 
-#include <tier0/platform.h>
-#include <mathlib/vector.h>
+#include "tier0/platform.h"
+#include "vector.h"
+
+#include <DirectXMath.h>
 
 class HaltonSequenceGenerator_t
 {
@@ -32,7 +34,7 @@ public:
 
 	[[nodiscard]] float GetElement(int element);
 
-	[[nodiscard]] inline float NextValue(void)
+	[[nodiscard]] inline float NextValue()
 	{
 		return GetElement(seed++);
 	}
@@ -45,23 +47,24 @@ class DirectionalSampler_t									//< pseudo-random sphere sampling
 	HaltonSequenceGenerator_t zdot;
 	HaltonSequenceGenerator_t vrot;
 public:
-	DirectionalSampler_t(void)
+	DirectionalSampler_t()
 		: zdot(2),vrot(3)
 	{
 	}
 
-	[[nodiscard]] Vector NextValue(void)
+	[[nodiscard]] Vector NextValue()
 	{
 		float zvalue=zdot.NextValue();
 		zvalue=2*zvalue-1.0f;								// map from 0..1 to -1..1
 		float phi=acosf(zvalue);
 		// now, generate a random rotation angle for x/y
 		float theta=2.0f*M_PI_F*vrot.NextValue();
-		float sin_p=sinf(phi);
-		return Vector(cosf(theta)*sin_p,
-					  sinf(theta)*sin_p,
-					  zvalue);
 
+		float sinTheta, cosTheta;
+		DirectX::XMScalarSinCos(&sinTheta, &cosTheta, theta);
+
+		const float sinPhi = sinf(phi);
+		return {cosTheta * sinPhi, sinTheta * sinPhi, zvalue};
 	}
 };
 

@@ -1212,7 +1212,7 @@ struct boundingvolume_t
 };
 
 
-void CreateCollide( CPhysCollisionModel *pBase, CPhysConvex **pElements, int elementCount, const boundingvolume_t &bv )
+void CreateCollide( CPhysCollisionModel *pBase, CPhysConvex **pElements, intp elementCount, const boundingvolume_t &bv )
 {
 	if ( !pBase )
 		return;
@@ -2191,8 +2191,8 @@ void LoadSurfacePropsAll()
 	if ( physprops->SurfacePropCount() )
 		return;
 
-	const char *SURFACEPROP_MANIFEST_FILE = "scripts/surfaceproperties_manifest.txt";
-	KeyValues *manifest = new KeyValues( SURFACEPROP_MANIFEST_FILE );
+	constexpr char SURFACEPROP_MANIFEST_FILE[]{"scripts/surfaceproperties_manifest.txt"};
+	KeyValuesAD manifest( SURFACEPROP_MANIFEST_FILE );
 	if ( manifest->LoadFromFile( g_pFileSystem, SURFACEPROP_MANIFEST_FILE, "GAME" ) )
 	{
 		for ( KeyValues *sub = manifest->GetFirstSubKey(); sub != NULL; sub = sub->GetNextKey() )
@@ -2205,8 +2205,6 @@ void LoadSurfacePropsAll()
 			}
 		}
 	}
-
-	manifest->deleteThis();
 }
 
 //-----------------------------------------------------------------------------
@@ -2518,8 +2516,8 @@ void CollisionModel_Write( long checkSum )
 		char filename[MAX_PATH];
 
 		V_strcpy_safe( filename, gamedir );
-		V_strcat_safe( filename, "models/" );	
-		V_strcat_safe( filename, outname );	
+		V_strcat_safe( filename, "models/" );
+		V_strcat_safe( filename, outname );
 
 		float volume = TotalVolume( pPhys );
 		if ( volume <= 0 )
@@ -2665,8 +2663,10 @@ void CollisionModel_Write( long checkSum )
 			if ( g_JointedModel.m_bHasAnimatedFriction == true )
 			{
 				fprintf( fp, "animatedfriction {\n" );
-				KeyWriteFloat( fp, "animfrictionmin", g_JointedModel.m_iMinAnimatedFriction );
-				KeyWriteFloat( fp, "animfrictionmax", g_JointedModel.m_iMaxAnimatedFriction );
+				// dimhotepus: Write int as int.
+				KeyWriteInt( fp, "animfrictionmin", g_JointedModel.m_iMinAnimatedFriction );
+				// dimhotepus: Write int as int.
+				KeyWriteInt( fp, "animfrictionmax", g_JointedModel.m_iMaxAnimatedFriction );
 				KeyWriteFloat( fp, "animfrictiontimein", g_JointedModel.m_flFrictionTimeIn );
 				KeyWriteFloat( fp, "animfrictiontimeout", g_JointedModel.m_flFrictionTimeOut );
 				KeyWriteFloat( fp, "animfrictiontimehold", g_JointedModel.m_flFrictionTimeHold );

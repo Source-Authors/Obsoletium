@@ -114,9 +114,10 @@ public:
 	CModelPanelModelInfo()
 		: m_mapBodygroupValues( DefLessFunc( int ) )
 	{
-		m_pszModelName = NULL;
-		m_pszModelName_HWM = NULL;
+		m_pszModelName = nullptr;
+		m_pszModelName_HWM = nullptr;
 		m_nSkin = -1;
+		m_pszVCD = nullptr;
 		m_vecAbsAngles.Init();
 		m_vecOriginOffset.Init();
 		m_vecFramedOriginOffset.Init();

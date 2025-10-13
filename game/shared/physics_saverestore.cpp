@@ -135,6 +135,8 @@ public:
 		SetDefLessFunc( m_PhysObjectModels );
 		SetDefLessFunc( m_PhysObjectCustomModels );
 		SetDefLessFunc( m_PhysCollideBBoxModels );
+		m_fDoLoad = false;
+		BitwiseClear(m_blockHeader);
 	}
 
 	const char *GetBlockName()

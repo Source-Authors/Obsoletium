@@ -91,7 +91,8 @@ private:
 		void GetInLimits(float &max, float &min) { min=minIn; max=maxIn; }
 		void GetOutLimits(float &max, float &min) { min=minOut; max=maxOut; }
 		void GetPingLimits(float &max, float &min) { min=minPing; max=maxPing; }
-		void GetPlayerLimits(float &max, float &min) { min=minPlayers; max=maxPlayers; }
+		// dimhotepus: float -> int to match class members.
+		void GetPlayerLimits(int &max, int &min) { min=minPlayers; max=maxPlayers; }
 
 		virtual void Paint();	
 

@@ -346,7 +346,7 @@ public:
 	{
 	}
 
-	virtual int GetNumActiveDeformations() const
+	virtual intp GetNumActiveDeformations() const
 	{
 		return 0;
 	}
@@ -836,6 +836,17 @@ public:
 #endif
 
 	void									TextureManagerUpdate( void ) { }
+
+	// dimhotepus: TF2 backport.
+	void FogRadial( bool bRadial ) override
+	{
+	}
+	
+	// dimhotepus: TF2 backport.
+	bool GetFogRadial() override
+	{
+		return false;
+	}
 
 	int m_WidthBackBuffer, m_HeightBackBuffer;
 };

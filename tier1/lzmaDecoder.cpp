@@ -40,7 +40,7 @@ ConVar lzma_persistent_buffer( "lzma_persistent_buffer", LZMA_DEFAULT_PERSISTENT
                                "at the expensive of keeping extra memory around when it is not in-use." );
 
 // Allocator to pass to LZMA functions
-static void *g_pStaticLZMABuf = NULL;
+static void *g_pStaticLZMABuf = nullptr;
 static size_t g_unStaticLZMABufSize = 0;
 static uint32 g_unStaticLZMABufRef = 0;
 static void *SzAlloc( [[maybe_unused]] ISzAllocPtr p, size_t size) {
@@ -68,14 +68,14 @@ static void SzFree( [[maybe_unused]] ISzAllocPtr p, void *address) {
 	// Don't touch static buffer on other threads.
 	if ( ThreadInMainThread() )
 	{
-		if ( address != NULL && g_unStaticLZMABufRef && address == g_pStaticLZMABuf )
+		if ( address != nullptr && g_unStaticLZMABufRef && address == g_pStaticLZMABuf )
 		{
 			g_unStaticLZMABufRef--;
 			// If the convar was turned off, free the buffer
 			if ( g_pStaticLZMABuf && g_unStaticLZMABufRef == 0 && !lzma_persistent_buffer.GetBool() )
 			{
 				free( g_pStaticLZMABuf );
-				g_pStaticLZMABuf = NULL;
+				g_pStaticLZMABuf = nullptr;
 				g_unStaticLZMABufSize = 0;
 			}
 			return;
@@ -169,7 +169,7 @@ size_t CLZMA::Uncompress( void *pInput, OUT_BYTECAP(outSize) void *pOutput, size
 }
 
 CLZMAStream::CLZMAStream()
-	: m_pDecoderState( NULL ),
+	: m_pDecoderState( nullptr ),
 	  m_nActualSize( 0 ),
 	  m_nActualBytesRead ( 0 ),
 	  m_nCompressedSize( 0 ),
@@ -189,13 +189,13 @@ void CLZMAStream::FreeDecoderState()
 	{
 		LzmaDec_Free( m_pDecoderState, &g_Alloc );
 		delete m_pDecoderState;
-		m_pDecoderState = NULL;
+		m_pDecoderState = nullptr;
 	}
 }
 
 bool CLZMAStream::CreateDecoderState( const unsigned char *pProperties )
 {
-	CLzmaDec *pDecoderState = new CLzmaDec();
+	auto *pDecoderState = new CLzmaDec();
 
 	LzmaDec_Construct( pDecoderState );
 	if ( LzmaDec_Allocate( pDecoderState, pProperties, LZMA_PROPS_SIZE, &g_Alloc) != SZ_OK )

@@ -16,7 +16,9 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
-#define KEYVALUES_TOKEN_SIZE	1024
+enum {
+  KEYVALUES_TOKEN_SIZE =	1024
+};
 
 // writes KeyValue as binary data to buffer
 bool KVPacker::WriteAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
@@ -30,7 +32,7 @@ bool KVPacker::WriteAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 	// Write subkeys:
 
 	// loop through all our peers
-	for ( KeyValues *dat = pNode; dat != NULL; dat = dat->GetNextKey() )
+	for ( KeyValues *dat = pNode; dat != nullptr; dat = dat->GetNextKey() )
 	{
 		// write type
 		switch ( dat->GetDataType() )
@@ -180,7 +182,7 @@ bool KVPacker::ReadAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 
 	char		token[KEYVALUES_TOKEN_SIZE];
 	KeyValues	*dat = pNode;
-	EPackType		ePackType = (EPackType)buffer.GetUnsignedChar();
+	auto		ePackType = (EPackType)buffer.GetUnsignedChar();
 
 	// loop through all our peers
 	while ( true )
@@ -197,7 +199,7 @@ bool KVPacker::ReadAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 		{
 		case PACKTYPE_NONE:
 			{
-				KeyValues *pNewNode = new KeyValues("");
+				auto *pNewNode = new KeyValues("");
 				dat->AddSubKey( pNewNode );
 				if( !ReadAsBinary( pNewNode, buffer ) )
 					return false;
@@ -217,7 +219,7 @@ bool KVPacker::ReadAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 				{
 					if ( nLength > 0 )
 					{
-						wchar_t *pTemp = (wchar_t *)malloc( sizeof( wchar_t ) * (1 + nLength) );
+						auto *pTemp = (wchar_t *)malloc( sizeof( wchar_t ) * (1 + nLength) );
 
 						for ( int k = 0; k < nLength; ++k )
 						{
@@ -225,12 +227,12 @@ bool KVPacker::ReadAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 						}
 
 						pTemp[nLength] = 0;
-						dat->SetWString( NULL, pTemp );
+						dat->SetWString( nullptr, pTemp );
 
 						free( pTemp );
 					}
 					else
-						dat->SetWString( NULL, L"" );
+						dat->SetWString( nullptr, L"" );
 
 				}
 				break;
@@ -238,19 +240,19 @@ bool KVPacker::ReadAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 
 		case PACKTYPE_INT:
 			{
-				dat->SetInt( NULL, buffer.GetInt() );
+				dat->SetInt( nullptr, buffer.GetInt() );
 				break;
 			}
 
 		case PACKTYPE_UINT64:
 			{
-				dat->SetUint64( NULL, (uint64)buffer.GetInt64() );
+				dat->SetUint64( nullptr, (uint64)buffer.GetInt64() );
 				break;
 			}
 
 		case PACKTYPE_FLOAT:
 			{
-				dat->SetFloat( NULL, buffer.GetFloat() );
+				dat->SetFloat( nullptr, buffer.GetFloat() );
 				break;
 			}
 		case PACKTYPE_COLOR:
@@ -260,13 +262,13 @@ bool KVPacker::ReadAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 					buffer.GetUnsignedChar(),
 					buffer.GetUnsignedChar(),
 					buffer.GetUnsignedChar() );
-				dat->SetColor( NULL, color );
+				dat->SetColor( nullptr, color );
 				break;
 			}
 		case PACKTYPE_PTR:
 			{
 #ifdef PLATFORM_64BITS
-				dat->SetPtr( NULL, (void*)buffer.GetUint64() );
+				dat->SetPtr( nullptr, (void*)buffer.GetUint64() );
 #else
 				dat->SetPtr( NULL, (void*)buffer.GetUnsignedInt() );
 #endif
@@ -286,7 +288,7 @@ bool KVPacker::ReadAsBinary( KeyValues *pNode, CUtlBuffer &buffer )
 			break;
 
 		// new peer follows
-		KeyValues *pNewPeer = new KeyValues("");
+		auto *pNewPeer = new KeyValues("");
 		dat->SetNextKey( pNewPeer );
 		dat = pNewPeer;
 	}

@@ -47,6 +47,8 @@
 #include "tier1/checksum_crc.h"
 #include <system_error>
 
+#include "scoped_app_locale.h"
+
 #define FF_TRYAGAIN 1
 #define FF_DONTPROCESS 2
 
@@ -1167,7 +1169,11 @@ static bool LoadFaceFromPSD( IVTFTexture *pTexture, CUtlBuffer &psdBuffer, int z
 			resInfo.m_nFlags |= ImageLoader::RESAMPLE_NICE_FILTER;
 		}
 
-		ResampleRGBA8888( resInfo );
+		if ( !ResampleRGBA8888( resInfo ) )
+		{
+			VTexWarning( "%s: resample to RGBA8888 failed.\n", info.m_SrcName );
+			return false;
+		}
 
 		if ( info.m_bAlphaToDistance )
 		{
@@ -1316,7 +1322,12 @@ static bool LoadFaceFromTGA( IVTFTexture *pTexture, CUtlBuffer &tgaBuffer, int z
 			resInfo.m_nFlags |= ImageLoader::RESAMPLE_NICE_FILTER;
 		}
 
-		ResampleRGBA8888( resInfo );
+		// dimhotepus: Warn if resample fails.
+		if ( !ResampleRGBA8888( resInfo ) )
+		{
+			VTexWarning( "Unable to resample texture of size %zd bytes to RGBA8888.\n", pTexture->FileSize() );
+			return false;
+		}
 
 		if ( info.m_bAlphaToDistance )
 		{
@@ -1775,11 +1786,9 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 				  bool isCubeMap, VTexConfigInfo_t &info )
 {
 	// force clamps/clampt for cube maps
-	if( isCubeMap )
+	if ( isCubeMap )
 	{
-		info.m_nFlags |= TEXTUREFLAGS_ENVMAP;
-		info.m_nFlags |= TEXTUREFLAGS_CLAMPS;
-		info.m_nFlags |= TEXTUREFLAGS_CLAMPT;
+		info.m_nFlags |= TEXTUREFLAGS_ENVMAP | TEXTUREFLAGS_CLAMPS | TEXTUREFLAGS_CLAMPT;
 	}
 
 	// Create the texture we're gonna store out
@@ -1789,7 +1798,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 	char fullNameTemp[512];
 	if ( info.m_bSkyBox )
 	{
-		Q_strncpy( fullNameTemp, pFullNameWithoutExtension, sizeof( fullNameTemp ) );
+		V_strcpy_safe( fullNameTemp, pFullNameWithoutExtension );
 		pFullNameWithoutExtension = fullNameTemp;
 		PreprocessSkyBox( fullNameTemp, &iSkyboxFace );
 	}
@@ -1817,13 +1826,13 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 	V_sprintf_safe( dstFileName, "%s/%s%s.vtf", pOutputDir, pBaseName, ( ( Mode::eModePFM == g_eMode ) && isCubeMap ) ? ".hdr" : "" );
 
 	// Now if we are only validating the CRC
-	if( CommandLine()->FindParm( "-crcvalidate" ) )
+	if ( CommandLine()->FindParm( "-crcvalidate" ) )
 	{
 		CUtlBuffer bufFile;
 		bool bLoad = LoadFile( dstFileName, bufFile, false, NULL );
 		if ( !bLoad )
 		{
-			fprintf( stderr, "LOAD ERROR: %s\n", dstFileName );
+			fprintf( stderr, "Unable to load '%s'.\n", dstFileName );
 			return false;
 		}
 
@@ -1831,7 +1840,7 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 		bLoad = spExistingVtf->Unserialize( bufFile );
 		if ( !bLoad )
 		{
-			fprintf( stderr, "UNSERIALIZE ERROR: %s\n", dstFileName );
+			fprintf( stderr, "Unable to deserialize '%s'.\n", dstFileName );
 			return false;
 		}
 
@@ -1839,23 +1848,22 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 		const void *pCrcData = spExistingVtf->GetResourceData( VTexConfigInfo_t::VTF_INPUTSRC_CRC, &numDataBytes );
 		if ( !pCrcData || numDataBytes != sizeof( CRC32_t ) )
 		{
-			fprintf( stderr, "OLD TEXTURE FORMAT: %s\n", dstFileName );
+			fprintf( stderr, "Old texture format '%s'.\n", dstFileName );
 			return false;
 		}
 
 		CRC32_t crcFile = * reinterpret_cast< CRC32_t const * >( pCrcData );
 		if ( crcFile != crcWritten )
 		{
-			fprintf( stderr, "CRC MISMATCH: %s\n", dstFileName );
+			fprintf( stderr, "CRC32 mismatch '%s'.\n", dstFileName );
 			return false;
 		}
 
-		fprintf( stderr, "OK: %s\n", dstFileName );
 		return true;
 	}
 
 	// Now if we are not forcing the CRC
-	if( !CommandLine()->FindParm( "-crcforce" ) )
+	if ( !CommandLine()->FindParm( "-crcforce" ) )
 	{
 		CUtlBuffer bufFile;
 		if ( LoadFile( dstFileName, bufFile, false, NULL ) )
@@ -1871,10 +1879,9 @@ static bool ProcessFiles( const char *pFullNameWithoutExtension,
 					if ( crcFile == crcWritten )
 					{
 						if( !g_Quiet )
-							printf( "SUCCESS: %s is up-to-date\n", dstFileName );
+							printf( "SUCCESS: '%s' is up-to-date.\n", dstFileName );
 
-						if( !CommandLine()->FindParm( "-crcforce" ) )
-							return true;
+						return true;
 					}
 				}
 			}
@@ -2395,7 +2402,7 @@ static int Find_Files( WIN32_FIND_DATA &wfd, HANDLE &hResult, const char *basedi
 		if ( access( filename, 0 ) != -1 )
 			return FF_TRYAGAIN;
 
-		char texturename[ _MAX_PATH ] = {0};
+		char texturename[ MAX_PATH ] = {0};
 		char *p = ( char * )basedir;
 
 		// Skip over the base path to get a material system relative path
@@ -2431,8 +2438,8 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 			// Convert to full path
 			if ( !getcwd( outputDir, sizeof( outputDir ) ) )
 			{
-				Warning("Unable to get current directory: %s.\n",
-					std::generic_category().message(errno).c_str());
+				VTexWarning( "Unable to get current directory: %s.\n",
+					std::generic_category().message(errno).c_str() );
 				return false;
 			}
 
@@ -2742,6 +2749,20 @@ int CVTex::VTex( int argc, char **argv )
 #else
 	Msg("Valve Software - vtex (%s)\n", __DATE__);
 #endif
+
+	// dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+	//
+	// Printf/sscanf functions expect en_US UTF8 localization.
+	//
+	// Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+	// supports using a UTF-8 code page.
+	constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+	const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+	if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+		Warning("setlocale('%s') failed, current locale is '%s'.\n",
+			kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+	}
 
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 1, false, false, false, false );
 

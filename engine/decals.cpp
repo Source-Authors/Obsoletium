@@ -68,7 +68,7 @@ IMaterial *Draw_DecalMaterial( int index )
 }
 
 #ifndef SWDS
-void Draw_DecalSetName( int decal, char *name )
+void Draw_DecalSetName( int decal, const char *name )
 {
 	while ( decal >= g_DecalLookup.Count() )
 	{
@@ -83,9 +83,7 @@ void Draw_DecalSetName( int decal, char *name )
 	{
 		DecalEntry entry;
 #ifdef _DEBUG
-		intp len = V_strlen(name) + 1;
-		entry.m_pDebugName = new char[len];
-		memcpy( entry.m_pDebugName, name, len );
+		entry.m_pDebugName = V_strdup( name );
 #endif
 		entry.material = GL_LoadMaterial( name, TEXTURE_GROUP_DECAL );
 		entry.index = decal;
@@ -105,7 +103,7 @@ void Draw_DecalSetName( int decal, char *name )
 // called from cl_parse.cpp
 // find the server side decal id given it's name.
 // used for save/restore
-int Draw_DecalIndexFromName( char *name, bool *found )
+int Draw_DecalIndexFromName( const char *name, bool *found )
 {
 	Assert( found );
 

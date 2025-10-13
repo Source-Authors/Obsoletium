@@ -1,7 +1,13 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_EVENTMODES_H_
-#define TIER0_EVENTMODES_H_
+#ifndef SE_PUBLIC_TIER0_EVENTMODES_H_
+#define SE_PUBLIC_TIER0_EVENTMODES_H_
+
+#define EVENT_TYPE(mode) EventType##mode
+#define EVENT_MASK(mode) EventMask##mode
+
+#include "P4PerformanceCounters.h"
+#include "wchartypes.h"
 
 /*
  
@@ -1776,4 +1782,4 @@ public:
 
 };
 
-#endif  // TIER0_EVENTMODES_H_
+#endif  // !SE_PUBLIC_TIER0_EVENTMODES_H_

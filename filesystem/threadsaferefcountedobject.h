@@ -18,7 +18,7 @@ template< class T >
 class CThreadSafeRefCountedObject
 {
 public:
-  CThreadSafeRefCountedObject(T initVal) : m_RefCount{ 0 }
+	explicit CThreadSafeRefCountedObject(T initVal) : m_RefCount{ 0 }
 	{
 		m_pObject = initVal;
 	}
@@ -75,9 +75,9 @@ public:
 		m_pObject = newValue;
 	}
 
-private:	
+private:
 	std::atomic_int32_t	m_RefCount;
-	T						m_pObject;
+	T					m_pObject;
 };
 
 

@@ -143,8 +143,8 @@ bool EdgeCompare( Vector *pEdgePts1, Vector *pEdgePts2, int &edgeType1, int &edg
 					continue;
 
 				// sanity check
-				assert( overlapCount >= 0 );
-				assert( overlapCount < 2 );
+				Assert( overlapCount >= 0 );
+				Assert( overlapCount < 2 );
 
 				ndxEdge1[overlapCount] = ndx1;
 				ndxEdge2[overlapCount] = ndx2;
@@ -2106,7 +2106,7 @@ bool PrePlanarizeDependentVerts( void )
 		CMapDisp *pDisp = EditDispMgr()->GetDisp( pFace->GetDisp() );
 		Assert( pDisp );
 
-		int iDisp = m_aCoreDispInfos.AddToTail();
+		intp iDisp = m_aCoreDispInfos.AddToTail();
 		pDisp->GetCoreDispInfo()->SetListIndex( iDisp );
 		m_aCoreDispInfos[iDisp] = pDisp->GetCoreDispInfo();
 	}
@@ -2154,7 +2154,7 @@ bool FindEnclosingTri( const Vector2D &vert, CUtlVector<Vector2D> &vertCoords,
 	                   CUtlVector<unsigned short> &indices, int *pStartVert,
 					   float bcCoords[3] )
 {
-	for ( int i = 0; i < indices.Count(); i += 3 )
+	for ( intp i = 0; i < indices.Count(); i += 3 )
 	{
 		GetBarycentricCoords2D( vertCoords[indices[i+0]],
 			                    vertCoords[indices[i+1]],
@@ -2189,7 +2189,7 @@ void SnapDependentVertsToSurface( CCoreDispInfo *pCoreDisp )
 	CUtlVector<bool> vertsTouched;
 	vertsTouched.SetSize( pCoreDisp->GetSize() );
 	memset( vertsTouched.Base(), 0, sizeof( bool ) * vertsTouched.Count() );
-	for ( int iVert = 0; iVert < indices.Count(); ++iVert )
+	for ( intp iVert = 0; iVert < indices.Count(); ++iVert )
 	{
 		vertsTouched[indices[iVert]] = true;
 	}

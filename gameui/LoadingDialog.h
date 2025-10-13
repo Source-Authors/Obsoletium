@@ -43,7 +43,6 @@ protected:
 	void OnClose() override;
 	void OnKeyCodeTyped(vgui::KeyCode code) override;
 	void OnKeyCodePressed(vgui::KeyCode code) override;
-	void PaintBackground( void ) override;
 	
 private:
 	void SetupControlSettings( bool bForceShowProgressText );
@@ -59,11 +58,12 @@ private:
 
 	bool	m_bShowingSecondaryProgress;
 	float	m_flSecondaryProgress;
-	float	m_flLastSecondaryProgressUpdateTime;
-	float	m_flSecondaryProgressStartTime;
+	// dimhotepus: float -> double.
+	double	m_flLastSecondaryProgressUpdateTime;
+	// dimhotepus: float -> double.
+	double	m_flSecondaryProgressStartTime;
 	bool	m_bShowingVACInfo;
 	bool	m_bCenter;
-	bool	m_bConsoleStyle;
 	float	m_flProgressFraction;	
 
 	CPanelAnimationVar( int, m_iAdditionalIndentX, "AdditionalIndentX", "0" );

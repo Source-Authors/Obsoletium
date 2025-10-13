@@ -552,9 +552,9 @@ int CNPC_BaseZombie::MeleeAttack1Conditions ( float flDot, float flDist )
 
 				if( pObject )
 				{
-					float flDist = pObject->WorldSpaceCenter().DistTo( WorldSpaceCenter() );
+					float flDistCenter = pObject->WorldSpaceCenter().DistTo( WorldSpaceCenter() );
 
-					if( flDist <= GetClawAttackRange() )
+					if( flDistCenter <= GetClawAttackRange() )
 						return COND_CAN_MELEE_ATTACK1;
 				}
 			}

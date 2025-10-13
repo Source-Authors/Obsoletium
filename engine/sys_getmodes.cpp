@@ -91,7 +91,7 @@ public:
     void        DrawNullBackground( void *hdc, int w, int h ) override;
     void        InvalidateWindow() override;
     void        DrawStartupGraphic() override;
-    bool        CreateGameWindow( int nWidth, int nHeight, bool bWindowed, bool bBorderless ) override;
+    bool        CreateGameWindow( int nWidth, int nHeight, int refreshRate, bool bWindowed, bool bBorderless ) override;
     int         GetModeWidth( void ) const override;
     int         GetModeHeight( void ) const override;
 	int			GetModeStereoWidth() const override;
@@ -545,7 +545,7 @@ void CVideoMode_Common::ResetCurrentModeForNewResolution( int nWidth, int nHeigh
 //-----------------------------------------------------------------------------
 // Creates the game window, plays the startup movie
 //-----------------------------------------------------------------------------
-bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowed, bool bBorderless )
+bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, int refreshRate, bool bWindowed, bool bBorderless )
 {
     COM_TimestampedLog( "CVideoMode_Common::Init  CreateGameWindow" );
 
@@ -581,6 +581,8 @@ bool CVideoMode_Common::CreateGameWindow( int nWidth, int nHeight, bool bWindowe
         // and reading the command-line. Would be nice for just one place where this is done.
         RequestedWindowVideoMode().width = nWidth;
         RequestedWindowVideoMode().height = nHeight;
+        // dimhotepus: Honor refresh rate for requested mode.
+        RequestedWindowVideoMode().refreshRate = refreshRate;
     }
     
     if ( !InEditMode() )
@@ -652,7 +654,7 @@ IVTFTexture *CVideoMode_Common::LoadVTF( CUtlBuffer &temp, const char *szFileNam
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::ComputeStartupGraphicName( char *pBuf, int nBufLen )
 {
-    char szBackgroundName[_MAX_PATH];
+    char szBackgroundName[MAX_PATH];
     CL_GetBackgroundLevelName( szBackgroundName, sizeof(szBackgroundName), false );
 
     float aspectRatio = (float)GetModeStereoWidth() / GetModeStereoHeight();
@@ -745,11 +747,11 @@ void CVideoMode_Common::SetupStartupGraphic()
 {
     COM_TimestampedLog( "CVideoMode_Common::Init  SetupStartupGraphic" );
 
-    char szBackgroundName[_MAX_PATH];
+    char szBackgroundName[MAX_PATH];
     CL_GetBackgroundLevelName( szBackgroundName, sizeof(szBackgroundName), false );
 
     // get the image to load
-    char material[_MAX_PATH];
+    char material[MAX_PATH];
     CUtlBuffer buf;
 
     float aspectRatio = (float)GetModeWidth() / GetModeHeight();
@@ -1021,64 +1023,6 @@ void CVideoMode_Common::DrawNullBackground( void *hHDC, int w, int h )
 
 }
 
-#ifndef _WIN32
-
-typedef unsigned char BYTE;
-typedef unsigned short WORD;
-typedef signed long LONG;
-typedef unsigned long ULONG;
-
-typedef char * LPSTR;
-
-typedef struct tagBITMAPINFOHEADER{
-    DWORD      biSize;
-    LONG       biWidth;
-    LONG       biHeight;
-    WORD       biPlanes;
-    WORD       biBitCount;
-    DWORD      biCompression;
-    DWORD      biSizeImage;
-    LONG       biXPelsPerMeter;
-    LONG       biYPelsPerMeter;
-    DWORD      biClrUsed;
-    DWORD      biClrImportant;
-} BITMAPINFOHEADER;
-
-typedef struct tagBITMAPFILEHEADER {
-    WORD    bfType;
-    DWORD   bfSize;
-    WORD    bfReserved1;
-    WORD    bfReserved2;
-    DWORD   bfOffBits;
-} BITMAPFILEHEADER;
-
-typedef struct tagRGBQUAD {
-    BYTE    rgbBlue;
-    BYTE    rgbGreen;
-    BYTE    rgbRed;
-    BYTE    rgbReserved;
-} RGBQUAD;
-
-/* constants for the biCompression field */
-#define BI_RGB        0L
-#define BI_RLE8       1L
-#define BI_RLE4       2L
-#define BI_BITFIELDS  3L
-
-#if 0
-typedef struct _GUID
-{
-    unsigned long Data1;
-    unsigned short Data2;
-    unsigned short Data3;
-    unsigned char Data4[8];
-} GUID;
-
-#endif
-typedef GUID UUID;
-
-#endif //WIN32
-
 //-----------------------------------------------------------------------------
 // Purpose: This is called in response to a WM_MOVE message
 //-----------------------------------------------------------------------------
@@ -1175,8 +1119,9 @@ void CVideoMode_Common::AdjustWindow( int nWidth, int nHeight, int nBPP, bool bW
 
 	SetWindowLong( (HWND)game->GetMainWindow(), GWL_STYLE, style ); //-V303 //-V2002
 
-	// Compute rect needed for that size client area based on window style
-	AdjustWindowRectEx( &WindowRect, style, FALSE, exStyle );
+    // Compute rect needed for that size client area based on window style
+	// dimhotepus: Honor DPI.
+	AdjustWindowRectExForDpi( &WindowRect, style, FALSE, exStyle, ::GetDpiForWindow((HWND)game->GetMainWindow()) );
 
 	// Prepare to set window pos, which is required when toggling between topmost and not window flags
 	HWND hWndAfter = NULL;
@@ -2013,15 +1958,15 @@ bool CVideoMode_MaterialSystem::Init( )
         bool bAlreadyInList = false;
         for ( int j = 0; j < m_nNumModes; j++ )
         {
-            if ( info.m_Width == m_rgModeList[ j ].width && info.m_Height == m_rgModeList[ j ].height )
+            auto &mode = m_rgModeList[j];
+            if ( info.m_Width == mode.width && info.m_Height == mode.height )
             {
-
 				// in VR mode we want the highest refresh rate, without regard for the desktop refresh rate
 				if ( UseVR() || ShouldForceVRActive() )
 				{
-					if ( info.m_RefreshRate > m_rgModeList[j].refreshRate )
+					if ( info.m_RefreshRate > mode.refreshRate )
 					{
-						m_rgModeList[j].refreshRate = info.m_RefreshRate;
+						mode.refreshRate = info.m_RefreshRate;
 					}
 				}
 				else
@@ -2029,9 +1974,11 @@ bool CVideoMode_MaterialSystem::Init( )
 					// choose the highest refresh rate available for each mode up to the desktop rate
 
 					// if the new mode is valid and current is invalid or not as high, choose the new one
-					if ( info.m_RefreshRate <= nDesktopRefresh && (m_rgModeList[j].refreshRate > nDesktopRefresh || m_rgModeList[j].refreshRate < info.m_RefreshRate) )
+					if ( info.m_RefreshRate <= nDesktopRefresh &&
+                        (mode.refreshRate > nDesktopRefresh ||
+                         mode.refreshRate < info.m_RefreshRate) )
 					{
-						m_rgModeList[j].refreshRate = info.m_RefreshRate;
+						mode.refreshRate = info.m_RefreshRate;
 					}
 				}
 
@@ -2102,7 +2049,7 @@ bool CVideoMode_MaterialSystem::SetMode( int nWidth, int nHeight, bool bWindowed
 #endif
 
     config.SetFlag( MATSYS_VIDCFG_FLAGS_WINDOWED, bWindowed );
-	config.SetFlag( MATSYS_VIDCFG_FLAGS_BORDERLESS, bBorderless );
+	config.SetFlag( MATSYS_VIDCFG_FLAGS_NO_WINDOW_BORDER, bBorderless );
 
     // FIXME: This is trash. We have to do *different* things depending on how we're setting the mode!
     if ( !m_bSetModeOnce )
@@ -2139,7 +2086,7 @@ void CVideoMode_MaterialSystem::AdjustForModeChange( void )
     int nNewWidth = g_pMaterialSystemConfig->m_VideoMode.m_Width;
     int nNewHeight = g_pMaterialSystemConfig->m_VideoMode.m_Height;
     bool bWindowed = g_pMaterialSystemConfig->Windowed();
-    bool bBorderless = g_pMaterialSystemConfig->Borderless();
+    bool bBorderless = g_pMaterialSystemConfig->NoWindowBorder();
 
     // reset the window size
     CMatRenderContextPtr pRenderContext( materials );

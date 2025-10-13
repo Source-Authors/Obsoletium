@@ -11,6 +11,7 @@
 #endif
 
 #include <afxwin.h>
+#include "windows/base_mdi_child_wnd.h"
 
 enum DrawType_t;
 
@@ -27,7 +28,7 @@ public:
 };
 
 
-class CChildFrame : public CMDIChildWnd
+class CChildFrame : public CBaseMDIChildWnd
 {
 	DECLARE_DYNCREATE(CChildFrame)
 		
@@ -46,12 +47,6 @@ class CChildFrame : public CMDIChildWnd
 	BOOL bUsingSplitter;
 	BOOL m_bReady;
 	BOOL m_bNeedsCentered;
-
-	// ClassWizard generated virtual function overrides
-	//{{AFX_VIRTUAL(CChildFrame)
-public:
-	BOOL PreCreateWindow(CREATESTRUCT& cs);
-	//}}AFX_VIRTUAL
 
 public:
 
@@ -96,7 +91,7 @@ protected:
 
 	DECLARE_MESSAGE_MAP()
 
-		CMySplitterWnd *m_wndSplitter;
+	CMySplitterWnd *m_wndSplitter;
 };
 
 

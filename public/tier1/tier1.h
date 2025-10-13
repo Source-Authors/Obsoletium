@@ -8,12 +8,8 @@
 #ifndef TIER1_H
 #define TIER1_H
 
-#if defined( _WIN32 )
-#pragma once
-#endif
-
 #include "appframework/IAppSystem.h"
-#include "tier1/convar.h"
+#include "convar.h"
 
 
 //-----------------------------------------------------------------------------
@@ -50,7 +46,7 @@ void DisconnectTier1Libraries();
 template< class IInterface, int ConVarFlag = 0 > 
 class CTier1AppSystem : public CTier0AppSystem< IInterface >
 {
-	typedef CTier0AppSystem< IInterface > BaseClass;
+	using BaseClass = CTier0AppSystem<IInterface>;
 
 public:
 	CTier1AppSystem( bool bIsPrimaryAppSystem = true ) : BaseClass(	bIsPrimaryAppSystem )

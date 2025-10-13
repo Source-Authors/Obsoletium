@@ -11,17 +11,14 @@
 #ifndef UTLSOACONTAINER_H
 #define UTLSOACONTAINER_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 #include "tier0/platform.h"
 #include "tier0/dbg.h"
 #include "tier0/threadtools.h"
-#include "tier1/utlmemory.h"
-#include "tier1/utlblockmemory.h"
+
 #include "mathlib/ssemath.h"
+
+#include "utlmemory.h"
+#include "utlblockmemory.h"
 
 
 // strided pointers. gives you a class that acts like a pointer, but the ++ and += operators do the
@@ -39,23 +36,23 @@ public:
 		m_nStride = nByteStride / sizeof( T );
 	}
 
-	FORCEINLINE CStridedPtr<T>( void ) = default;
-	T *operator->(void) const
+	FORCEINLINE CStridedPtr<T>( ) = default;
+	T *operator->() const
 	{
 		return m_pData;
 	}
 	
-	T & operator*(void) const
+	T & operator*() const
 	{
 		return *m_pData;
 	}
 	
-	FORCEINLINE operator T *(void)
+	FORCEINLINE operator T *()
 	{
 		return m_pData;
 	}
 
-	FORCEINLINE CStridedPtr<T> & operator++(void)
+	FORCEINLINE CStridedPtr<T> & operator++()
 	{
 		m_pData += m_nStride;
 		return *this;
@@ -81,24 +78,24 @@ public:
 		m_nStride = nByteStride / sizeof( T );
 	}
 
-	FORCEINLINE CStridedConstPtr<T>( void ) = default;
+	FORCEINLINE CStridedConstPtr<T>( ) = default;
 
-	const T *operator->(void) const
+	const T *operator->() const
 	{
 		return m_pData;
 	}
 
-	const T & operator*(void) const
+	const T & operator*() const
 	{
 		return *m_pData;
 	}
 
-	FORCEINLINE operator const T *(void) const
+	FORCEINLINE operator const T *() const
 	{
 		return m_pData;
 	}
 
-	FORCEINLINE CStridedConstPtr<T> &operator++(void)
+	FORCEINLINE CStridedConstPtr<T> &operator++()
 	{
 		m_pData += m_nStride;
 		return *this;
@@ -146,27 +143,27 @@ protected:
 
 	uint32 m_nFieldPresentMask;
 
-	FORCEINLINE void Init( void )
+	FORCEINLINE void Init( )
 	{
 		for (auto& t : m_nDataType)
 		{
 			t = ATTRDATATYPE_NONE;
 		}
-		m_pDataMemory = 0;
+		m_pDataMemory = nullptr;
 		m_nColumns = m_nPaddedColumns = m_nRows = m_nSlices = 0;
 		m_nFieldPresentMask = 0;
 	}
 public:
 
 
-	CSOAContainer( void )									// an empoty one with no attributes
+	CSOAContainer( )									// an empoty one with no attributes
 	{
 		Init();
 	}
 
-	void Purge( void );										// set back to un-initted state, freeing memory
+	void Purge( );										// set back to un-initted state, freeing memory
 
-	~CSOAContainer( void );
+	~CSOAContainer( );
 
 	// easy constructor for 2d using varargs. call like
 	// #define ATTR_RED 0
@@ -177,7 +174,7 @@ public:
 
 	CSOAContainer( int nCols, int nRows, ... );
 
-	size_t ElementSize( void ) const;					// total bytes per element. not super fast.
+	[[nodiscard]] size_t ElementSize( ) const;					// total bytes per element. not super fast.
 
 	// set the data type for an attribute. If you set the data type, but tell it not to allocate,
 	// the data type will be set but writes will assert, and reads will give you back zeros.
@@ -192,16 +189,16 @@ public:
 			m_nFieldPresentMask &= ~( 1 << nAttrIdx );
 	}
 
-	FORCEINLINE int NumRows( void ) const
+	[[nodiscard]] FORCEINLINE int NumRows( ) const
 	{
 		return m_nRows;
 	}
 
-	FORCEINLINE int NumCols( void ) const
+	[[nodiscard]] FORCEINLINE int NumCols( ) const
 	{
 		return m_nColumns;
 	}
-	FORCEINLINE int NumSlices( void ) const
+	[[nodiscard]] FORCEINLINE int NumSlices( ) const
 	{
 		return m_nSlices;
 	}
@@ -216,17 +213,17 @@ public:
 	
 
 	// # of groups of 4 elements per row
-	FORCEINLINE int NumQuadsPerRow( void ) const
+	[[nodiscard]] FORCEINLINE int NumQuadsPerRow( ) const
 	{
 		return m_nNumQuadsPerRow;
 	}
 
-	FORCEINLINE int Count( void ) const						// for 1d data
+	[[nodiscard]] FORCEINLINE int Count( ) const						// for 1d data
 	{
 		return NumCols();
 	}
 
-	FORCEINLINE int NumElements( void ) const
+	[[nodiscard]] FORCEINLINE int NumElements( ) const
 	{
 		return NumCols() * NumRows() * NumSlices();
 	}
@@ -234,12 +231,12 @@ public:
 
 	// how much to step to go from the end of one row to the start of the next one. Basically, how
 	// many bytes to add at the end of a row when iterating over the whole 2d array with ++
-	FORCEINLINE size_t RowToRowStep( [[maybe_unused]] int nAttrIdx ) const
+	[[nodiscard]] FORCEINLINE size_t RowToRowStep( [[maybe_unused]] int nAttrIdx ) const
 	{
 		return 0;
 	}
 	
-	FORCEINLINE void *RowPtr( int nAttributeIdx, int nRowNumber, int nSliceNumber = 0 ) const
+	[[nodiscard]] FORCEINLINE void *RowPtr( int nAttributeIdx, int nRowNumber, int nSliceNumber = 0 ) const
 	{
 		Assert( nRowNumber < m_nRows );
 		Assert( nAttributeIdx < MAX_SOA_FIELDS );
@@ -250,7 +247,7 @@ public:
 			+ nSliceNumber * m_nSliceStrideInBytes[nAttributeIdx];
 	}
 
-	FORCEINLINE void const *ConstRowPtr( int nAttributeIdx, int nRowNumber, int nSliceNumber = 0 ) const
+	[[nodiscard]] FORCEINLINE void const *ConstRowPtr( int nAttributeIdx, int nRowNumber, int nSliceNumber = 0 ) const
 	{
 		Assert( nRowNumber < m_nRows );
 		Assert( nAttributeIdx < MAX_SOA_FIELDS );
@@ -277,7 +274,7 @@ public:
 			);
 	}
 		
-	FORCEINLINE size_t ItemByteStride( int nAttributeIdx ) const
+	[[nodiscard]] FORCEINLINE size_t ItemByteStride( int nAttributeIdx ) const
 	{
 		Assert( nAttributeIdx < MAX_SOA_FIELDS );
 		Assert( m_nDataType[nAttributeIdx] != ATTRDATATYPE_NONE );

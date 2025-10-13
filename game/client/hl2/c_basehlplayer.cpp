@@ -61,11 +61,16 @@ C_BaseHLPlayer::C_BaseHLPlayer()
 	AddVar( &m_Local.m_vecPunchAngle, &m_Local.m_iv_vecPunchAngle, LATCH_SIMULATION_VAR );
 	AddVar( &m_Local.m_vecPunchAngleVel, &m_Local.m_iv_vecPunchAngleVel, LATCH_SIMULATION_VAR );
 
+	m_hClosestNPC		= nullptr;
+	m_flSpeedModTime	= 0.0f;
+	m_fIsSprinting		= false;
 	m_flZoomStart		= 0.0f;
 	m_flZoomEnd			= 0.0f;
 	m_flZoomRate		= 0.0f;
 	m_flZoomStartTime	= 0.0f;
+	m_bPlayUseDenySound	= false;
 	m_flSpeedMod		= cl_forwardspeed.GetFloat();
+	m_flExitSpeedMod	= 0.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -560,32 +565,6 @@ void C_BaseHLPlayer::PerformClientSideNPCSpeedModifiers( float flFrameTime, CUse
 				float flDot = DotProduct( los, facingDir );
 				if ( flDot > 0.8 )
 				{
-					/*
-					// Velocity check (abort if the target isn't moving)
-					Vector vecTargetVelocity;
-					pNPC->EstimateAbsVelocity( vecTargetVelocity );
-					float flSpeed = VectorNormalize(vecTargetVelocity);
-					Vector vecMyVelocity = GetAbsVelocity();
-					VectorNormalize(vecMyVelocity);
-					if ( flSpeed > 1.0 )
-					{
-						// Velocity roughly parallel?
-						if ( DotProduct(vecTargetVelocity,vecMyVelocity) > 0.4  )
-						{
-							bShouldModSpeed = true;
-						}
-					} 
-					else
-					{
-						// NPC's not moving, slow down if we're moving at him
-						//Msg("Dot: %.2f\n", DotProduct( los, vecMyVelocity ) );
-						if ( DotProduct( los, vecMyVelocity ) > 0.8 )
-						{
-							bShouldModSpeed = true;
-						} 
-					}
-					*/
-
 					bShouldModSpeed = true;
 				}
 			}
@@ -608,14 +587,8 @@ void C_BaseHLPlayer::PerformClientSideNPCSpeedModifiers( float flFrameTime, CUse
 		}
 	}
 
-	if ( pCmd->forwardmove > 0.0f )
-	{
-		pCmd->forwardmove = clamp( pCmd->forwardmove, -m_flSpeedMod, m_flSpeedMod );
-	}
-	else
-	{
-		pCmd->forwardmove = clamp( pCmd->forwardmove, -m_flSpeedMod, m_flSpeedMod );
-	}
+	// dimhotepus: Simplify clamp.
+	pCmd->forwardmove = clamp( pCmd->forwardmove, -m_flSpeedMod, m_flSpeedMod );
 	pCmd->sidemove = clamp( pCmd->sidemove, -m_flSpeedMod, m_flSpeedMod );
    
 	//Msg( "fwd %f right %f\n", pCmd->forwardmove, pCmd->sidemove );

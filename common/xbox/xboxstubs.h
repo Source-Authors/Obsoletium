@@ -7,10 +7,6 @@
 #if !defined( XBOXSTUBS_H ) && !defined( _X360 )
 #define XBOXSTUBS_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/platform.h"
 
 //  Content creation/open flags
@@ -43,7 +39,7 @@
 #define XBOX_MINBORDERSAFE			0
 #define XBOX_MAXBORDERSAFE			0
 
-typedef enum
+using xKey_t = enum
 {
 	XK_NULL,
 	XK_BUTTON_UP,
@@ -71,7 +67,7 @@ typedef enum
 	XK_STICK2_LEFT,
 	XK_STICK2_RIGHT,
 	XK_MAX_KEYS,
-} xKey_t;
+};
 
 //typedef enum
 //{
@@ -83,12 +79,12 @@ typedef enum
 //	XVRB_ALL,
 //} xverbose_e;
 
-typedef unsigned char BYTE; //-V677
-typedef unsigned short WORD; //-V677
+using BYTE = unsigned char; //-V677
+using WORD = unsigned short; //-V677
 #ifndef POSIX
-typedef unsigned long DWORD; //-V677
-typedef void* HANDLE; //-V677
-typedef unsigned __int64 ULONGLONG; //-V677
+using DWORD = unsigned long; //-V677
+using HANDLE = void *; //-V677
+using ULONGLONG = unsigned long long; //-V677
 #endif
 
 #ifdef POSIX
@@ -103,25 +99,26 @@ typedef DWORD COLORREF;
 // 	BYTE        abOnline[20];                   // Online identification
 // } XNADDR;
 
-typedef int XNADDR;
-typedef uint64 XUID;
+using XNADDR = int;
+using XUID = uint64;
 
-typedef struct {
+using XNKID = struct {
 	BYTE        ab[8];                          // xbox to xbox key identifier
-} XNKID;
+};
 
-typedef struct {
+using XNKEY = struct {
 	BYTE        ab[16];                         // xbox to xbox key exchange key
-} XNKEY;
+};
 
-typedef struct _XSESSION_INFO
+using XSESSION_INFO = struct _XSESSION_INFO
 {
 	XNKID sessionID;                // 8 bytes
 	XNADDR hostAddress;             // 36 bytes
 	XNKEY keyExchangeKey;           // 16 bytes
-} XSESSION_INFO, *PXSESSION_INFO;
+};
+using PXSESSION_INFO = XSESSION_INFO*;
 
-typedef struct _XUSER_DATA
+using XUSER_DATA = struct _XUSER_DATA
 {
 	BYTE                                type;
 
@@ -142,21 +139,24 @@ typedef struct _XUSER_DATA
 			char *                       pbData;
 		} binary;
 	};
-} XUSER_DATA, *PXUSER_DATA;
+};
+using PXUSER_DATA = XUSER_DATA*;
 
-typedef struct _XUSER_PROPERTY
+using XUSER_PROPERTY = struct _XUSER_PROPERTY
 {
 	DWORD                               dwPropertyId;
 	XUSER_DATA                          value;
-} XUSER_PROPERTY, *PXUSER_PROPERTY;
+};
+using PXUSER_PROPERTY = XUSER_PROPERTY*;
 
-typedef struct _XUSER_CONTEXT
+using XUSER_CONTEXT = struct _XUSER_CONTEXT
 {
 	DWORD                               dwContextId;
 	DWORD                               dwValue;
-} XUSER_CONTEXT, *PXUSER_CONTEXT;
+};
+using PXUSER_CONTEXT = XUSER_CONTEXT*;
 
-typedef struct _XSESSION_SEARCHRESULT
+using XSESSION_SEARCHRESULT = struct _XSESSION_SEARCHRESULT
 {
 	XSESSION_INFO   info;
 	DWORD           dwOpenPublicSlots;
@@ -167,30 +167,33 @@ typedef struct _XSESSION_SEARCHRESULT
 	DWORD           cContexts;
 	PXUSER_PROPERTY pProperties;
 	PXUSER_CONTEXT  pContexts;
-} XSESSION_SEARCHRESULT, *PXSESSION_SEARCHRESULT;
+};
+using PXSESSION_SEARCHRESULT = XSESSION_SEARCHRESULT*;
 
-typedef struct _XSESSION_SEARCHRESULT_HEADER
+using XSESSION_SEARCHRESULT_HEADER = struct _XSESSION_SEARCHRESULT_HEADER
 {
 	DWORD dwSearchResults;
 	XSESSION_SEARCHRESULT *pResults;
-} XSESSION_SEARCHRESULT_HEADER, *PXSESSION_SEARCHRESULT_HEADER;
+};
+using PXSESSION_SEARCHRESULT_HEADER = XSESSION_SEARCHRESULT_HEADER*;
 
-typedef struct _XSESSION_REGISTRANT
+using XSESSION_REGISTRANT = struct _XSESSION_REGISTRANT
 {
 	uint64 qwMachineID;
 	DWORD bTrustworthiness;
 	DWORD bNumUsers;
 	XUID *rgUsers;
 
-} XSESSION_REGISTRANT;
+};
 
-typedef struct _XSESSION_REGISTRATION_RESULTS
+using XSESSION_REGISTRATION_RESULTS = struct _XSESSION_REGISTRATION_RESULTS
 {
 	DWORD wNumRegistrants;
 	XSESSION_REGISTRANT *rgRegistrants;
-} XSESSION_REGISTRATION_RESULTS, *PXSESSION_REGISTRATION_RESULTS;
+};
+using PXSESSION_REGISTRATION_RESULTS = XSESSION_REGISTRATION_RESULTS*;
 
-typedef struct {
+using XNQOSINFO = struct {
 	BYTE        bFlags;                         
 	BYTE        bReserved;                    
 	WORD        cProbesXmit;                   
@@ -201,13 +204,13 @@ typedef struct {
 	WORD        wRttMedInMsecs;                
 	DWORD       dwUpBitsPerSec;                
 	DWORD       dwDnBitsPerSec;                
-} XNQOSINFO;
+};
 
-typedef struct {
+using XNQOS = struct {
 	uint        cxnqos;                        
 	uint        cxnqosPending;                 
 	XNQOSINFO   axnqosinfo[1];                 
-} XNQOS;
+};
 
 #define XSESSION_CREATE_HOST				0
 #define XUSER_DATA_TYPE_INT32				0

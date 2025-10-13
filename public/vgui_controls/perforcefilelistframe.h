@@ -63,11 +63,11 @@ public:
 	void SetOperationColumnHeaderText( const char *pText );
 
 	// Shows the panel
-	void DoModal( KeyValues *pContextKeyValues = NULL, const char *pMessage = NULL );
+	void DoModal( KeyValues *pContextKeyValues = NULL, const char *pMessage = NULL ); //-V762
 
 	// Retrieves the number of files, the file names, and operations
-	int GetOperationCount();
-	const char *GetFileName( int i );
+	intp GetOperationCount();
+	const char *GetFileName( intp i );
 	const char *GetOperation( int i );
 
 	// Retreives the description (only if it was shown)
@@ -119,7 +119,7 @@ public:
 	void AddFile( const char *pFullPath );
 	void AddFile( const char *pRelativePath, const char *pPathId );
 
-	void DoModal( KeyValues *pContextKeys = NULL, const char *pMessage = NULL );
+	void DoModal( KeyValues *pContextKeys = NULL, const char *pMessage = NULL ); //-V762
 
 private:
 	bool PerformOperation() override;

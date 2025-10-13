@@ -52,7 +52,7 @@ inline AIMoveResult_t DbgResult( AIMoveResult_t result ) { return result; } // i
 // Movement related constants and base types
 //-----------------------------------------------------------------------------
 #ifdef PHYSICS_NPC_SHADOW_DISCREPENCY
-const float AI_EPS_CASTS = 0.3;  // The amount physics and hull cast can disagree
+constexpr inline float AI_EPS_CASTS = 0.3;  // The amount physics and hull cast can disagree
 #endif
 
 

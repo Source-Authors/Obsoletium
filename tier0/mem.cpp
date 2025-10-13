@@ -19,7 +19,7 @@
 
 // dimhotepus: Memory allocation should be multithreaded.
 static CThreadMutex s_allocMutex;
-static uint8 *s_pBuf = NULL;
+static uint8 *s_pBuf = nullptr;
 static size_t s_pBufStackDepth[32];
 static int s_nBufDepth = -1;
 static size_t s_nBufCurSize = 0;

@@ -376,8 +376,8 @@ void CDmeSourceDCCFilePanel::OnDCCObjectNameChanged()
 //-----------------------------------------------------------------------------
 static int IntCompare( const void *pSrc1, const void *pSrc2 )
 {
-	int i1 = *(int*)pSrc1;
-	int i2 = *(int*)pSrc2;
+	int i1 = *(const int*)pSrc1;
+	int i2 = *(const int*)pSrc2;
 	return i1 - i2;
 }
 

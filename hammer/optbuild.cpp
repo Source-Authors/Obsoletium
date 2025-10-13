@@ -34,10 +34,10 @@ enum
 
 
 void EditorUtil_ConvertPath(CString &str, bool bSave);
-void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, OUT_Z_CAP(destSize) char *szDest, intp destSize, bool bSave);
+void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, INOUT_Z_CAP(destSize) char *szDest, intp destSize, bool bSave);
 
 template<intp destSize>
-inline void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, OUT_Z_ARRAY char (&szDest)[destSize], bool bSave)
+inline void EditorUtil_TransferPath(CDialog *pDlg, int nIDC, INOUT_Z_ARRAY char (&szDest)[destSize], bool bSave)
 {
 	EditorUtil_TransferPath( pDlg, nIDC, szDest, destSize, bSave );
 }

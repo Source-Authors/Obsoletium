@@ -8,9 +8,9 @@
 
 
 #include "BaseVSShader.h"
-#include "ShatteredGlass.inc"
-#include "ShatteredGlass_EnvMap.inc"
-#include "ShatteredGlass_EnvMapSphere.inc"
+#include "shatteredglass.inc"
+#include "shatteredglass_envmap.inc"
+#include "shatteredglass_envmapsphere.inc"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

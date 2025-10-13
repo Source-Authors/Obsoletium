@@ -1038,7 +1038,7 @@ inline const CDmaObjectId& CDmaObjectId::operator=( const CDmaObjectId& src )
 	return *this;
 }
 
-inline const DmObjectId_t& CDmaObjectId::Set( const DmObjectId_t &src )
+inline const DmObjectId_t& CDmaObjectId::Set( const DmObjectId_t &src ) //-V524
 {
 	m_pAttribute->SetValue( src );
 	return Value();

@@ -42,10 +42,10 @@ typedef struct
 typedef CArray<CCOMMAND, CCOMMAND&> CCommandArray;
 
 // run a list of commands:
-bool RunCommands(CCommandArray& Commands, LPCTSTR pszDocName);
-void FixGameVars(char *pszSrc, OUT_Z_CAP(dstSize) char *pszDst, intp dstSize, BOOL bUseQuotes = TRUE);
+bool RunCommands(CCommandArray& Commands, LPCTSTR pszDocName, CWnd *parent);
+void FixGameVars(char *pszSrc, OUT_Z_CAP(dstSize) char *pszDst, intp dstSize, BOOL bUseQuotes /*= TRUE*/);
 template<intp dstSize>
-void FixGameVars(char* pszSrc, OUT_Z_ARRAY char (&pszDst)[dstSize], BOOL bUseQuotes = TRUE)
+void FixGameVars(char* pszSrc, OUT_Z_ARRAY char (&pszDst)[dstSize], BOOL bUseQuotes)
 {
 	FixGameVars(pszSrc, pszDst, dstSize, bUseQuotes);
 }

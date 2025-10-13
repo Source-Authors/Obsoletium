@@ -44,7 +44,7 @@ extern IPhysicsObjectEvent * const g_pObjectEventHandler;
 // HACKHACK: We treat anything >= 500kg as a special "large mass" that does more impact damage
 // and has special recovery on crushing/killing other objects
 // also causes screen shakes on impact with static/world objects
-const float VPHYSICS_LARGE_OBJECT_MASS = 500.0f;
+constexpr inline float VPHYSICS_LARGE_OBJECT_MASS = 500.0f;
 
 struct gamevcollisionevent_t : public vcollisionevent_t
 {

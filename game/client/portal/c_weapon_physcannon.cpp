@@ -262,7 +262,7 @@ int C_WeaponPhysCannon::DrawModel( int flags )
 				yDir = yvec;
 				float yScale = VectorNormalize( yDir ) * 0.75f;
 
-				int numParticles = clamp( 4.0f * fadePerc, 1, 3 );
+				int numParticles = clamp( 4.0f * fadePerc, 1.f, 3.f );
 
 				for ( int j = 0; j < numParticles; j++ )
 				{

@@ -75,22 +75,22 @@ public:
 	virtual void GetSelectedItemData( CUtlVector< KeyValues * >& list );
 
 	// set colors for individual elments
-	virtual void SetItemFgColor(int itemIndex, const Color& color);
-	virtual void SetItemBgColor(int itemIndex, const Color& color);
-	virtual void SetItemSelectionTextColor( int itemIndex, const Color& clr );
-	virtual void SetItemSelectionBgColor( int itemIndex, const Color& clr );
-	virtual void SetItemSelectionUnfocusedBgColor( int itemIndex, const Color& clr );
+	virtual void SetItemFgColor(intp itemIndex, const Color& color);
+	virtual void SetItemBgColor(intp itemIndex, const Color& color);
+	virtual void SetItemSelectionTextColor( intp itemIndex, const Color& clr );
+	virtual void SetItemSelectionBgColor( intp itemIndex, const Color& clr );
+	virtual void SetItemSelectionUnfocusedBgColor( intp itemIndex, const Color& clr );
 
 	// returns true if the itemID is valid for use
-	virtual bool IsItemIDValid(int itemIndex);
+	virtual bool IsItemIDValid(intp itemIndex);
 
 	// item iterators
 	// iterate from [0..GetHighestItemID()], 
 	// and check each with IsItemIDValid() before using
 	virtual intp GetHighestItemID();
 
-    virtual void ExpandItem(int itemIndex, bool bExpand);
-	virtual bool IsItemExpanded( int itemIndex );
+    virtual void ExpandItem(intp itemIndex, bool bExpand);
+	virtual bool IsItemExpanded(intp itemIndex);
 
     virtual void MakeItemVisible(intp itemIndex);
 	
@@ -99,10 +99,10 @@ public:
 
 	virtual HFont GetFont();
 
-	virtual void GenerateDragDataForItem( int itemIndex, KeyValues *msg );
+	virtual void GenerateDragDataForItem( intp itemIndex, KeyValues *msg );
 	virtual void SetDragEnabledItems( bool state );
 
-	virtual void OnLabelChanged( int itemIndex, char const *oldString, char const *newString );
+	virtual void OnLabelChanged( intp itemIndex, char const *oldString, char const *newString );
 	virtual bool IsLabelEditingAllowed() const;
 	virtual bool IsLabelBeingEdited() const;
 	virtual void SetAllowLabelEditing( bool state );
@@ -121,13 +121,13 @@ public:
 	// By default, the tree view expands nodes on left-click. This enables/disables that feature
 	void EnableExpandTreeOnLeftClick( bool bEnable );
 
-	virtual void SetLabelEditingAllowed( int itemIndex, bool state );
-	virtual void StartEditingLabel( int itemIndex );
+	virtual void SetLabelEditingAllowed( intp itemIndex, bool state );
+	virtual void StartEditingLabel( intp itemIndex );
 
-	virtual bool IsItemDroppable( int itemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual void OnItemDropped( int itemIndex, CUtlVector< KeyValues * >& msglist );
-	virtual bool GetItemDropContextMenu( int itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist );
-	virtual HCursor GetItemDropCursor( int itemIndex, CUtlVector< KeyValues * >& msglist );
+	virtual bool IsItemDroppable( intp itemIndex, CUtlVector< KeyValues * >& msglist );
+	virtual void OnItemDropped( intp itemIndex, CUtlVector< KeyValues * >& msglist );
+	virtual bool GetItemDropContextMenu( intp itemIndex, Menu *menu, CUtlVector< KeyValues * >& msglist );
+	virtual HCursor GetItemDropCursor( intp itemIndex, CUtlVector< KeyValues * >& msglist );
 
 	virtual intp		GetPrevChildItemIndex( intp itemIndex );
 	virtual intp		GetNextChildItemIndex( intp itemIndex );
@@ -146,10 +146,10 @@ public:
 protected:
 	// functions to override
 	// called when a node, marked as "Expand", needs to generate it's child nodes when expanded
-	virtual void GenerateChildrenOfNode(int) {}
+	virtual void GenerateChildrenOfNode(intp) {}
 
 	// override to open a custom context menu on a node being selected and right-clicked
-	virtual void GenerateContextMenu( int, int, int ) {}
+	virtual void GenerateContextMenu( intp, int, int ) {}
 
 	// overrides
 	void OnMouseWheeled(int delta) override;
@@ -170,7 +170,7 @@ private:
 	void CleanUpImageList( );
 
 	// to be accessed by TreeNodes
-    IImage* GetImage(int index);        
+    IImage* GetImage(intp index);        
 
 	// bools
 	bool m_bAllowLabelEditing : 1;

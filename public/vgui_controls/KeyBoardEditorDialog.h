@@ -63,7 +63,12 @@ protected:
 	void			ApplyMappings();
 
 protected:
-	void					AnsiText( char const *token, char *out, size_t buflen );
+	void					AnsiText( char const *token, OUT_Z_CAP(size) char *out, int size );
+	template<int size>
+	void					AnsiText( char const* token, OUT_Z_ARRAY char(&out)[size] )
+	{
+		AnsiText( token, out, size );
+	}
 
 	Panel			*m_pPanel;
 	KeyBindingContextHandle_t m_Handle;

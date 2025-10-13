@@ -101,7 +101,7 @@ struct MapError
 {
 	CMapClass *pObjects[3];
 	MapErrorType Type;
-	DWORD dwExtra;
+	DWORD_PTR dwExtra;
 	FIXCODE Fix;
 };
 
@@ -503,10 +503,10 @@ void CMapCheckDlg::OnSelchangeErrors()
 
 	// Figure out which error string we're using.
 	int iErrorStr = (int)pError->Type;
-	iErrorStr = clamp( iErrorStr, 0, ARRAYSIZE( g_MapErrorStrings ) - 1 );
+	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
 	Assert( iErrorStr == (int)pError->Type );
 	
-	str.LoadString(g_MapErrorStrings[iErrorStr].m_DescriptionResourceID);
+	VERIFY(str.LoadString(g_MapErrorStrings[iErrorStr].m_DescriptionResourceID));
 	m_Description.SetWindowText(str);
 
 	m_Go.EnableWindow(pError->pObjects[0] != NULL);
@@ -587,10 +587,10 @@ static void AddErrorToListBox(CListBox *pList, MapError *pError)
 
 	// Figure out which error string we're using.
 	int iErrorStr = (int)pError->Type;
-	iErrorStr = clamp( iErrorStr, 0, ARRAYSIZE( g_MapErrorStrings ) - 1 );
+	iErrorStr = clamp( iErrorStr, 0, static_cast<int>( ARRAYSIZE( g_MapErrorStrings ) - 1 ) );
 	Assert( iErrorStr == (int)pError->Type );
 	
-	str.LoadString(g_MapErrorStrings[iErrorStr].m_StrResourceID);
+	VERIFY(str.LoadString(g_MapErrorStrings[iErrorStr].m_StrResourceID));
 
 	if (str.Find('%') != -1)
 	{
@@ -620,7 +620,7 @@ static void AddErrorToListBox(CListBox *pList, MapError *pError)
 //			dwExtra - 
 //			... - 
 //-----------------------------------------------------------------------------
-static void AddError(CListBox *pList, MapErrorType Type, DWORD dwExtra, ...)
+static void AddError(CListBox *pList, MapErrorType Type, DWORD_PTR dwExtra, ...)
 {
 	MapError *pError = new MapError;
 	memset(pError, 0, sizeof(MapError));
@@ -671,7 +671,7 @@ static void AddError(CListBox *pList, MapErrorType Type, DWORD dwExtra, ...)
 		case ErrorKillInputRaceCondition:
 		{
 			pError->pObjects[0] = va_arg(vl, CMapClass *);
-			pError->dwExtra = (DWORD)va_arg(vl, CEntityConnection *);
+			pError->dwExtra = (DWORD_PTR)va_arg(vl, CEntityConnection *);
 			break;
 		}
 	}
@@ -719,7 +719,7 @@ static void AddError(CListBox *pList, MapErrorType Type, DWORD dwExtra, ...)
 //			DWORD - 
 // Output : 
 //-----------------------------------------------------------------------------
-static BOOL FindPlayer(CMapEntity *pObject, DWORD)
+static BOOL FindPlayer(CMapEntity *pObject)
 {
 	if ( !IsCheckVisible( pObject ) )
 		return TRUE;
@@ -740,7 +740,7 @@ static BOOL FindPlayer(CMapEntity *pObject, DWORD)
 static void CheckRequirements(CListBox *pList, CMapWorld *pWorld)
 {
 	// ensure there's a player start .. 
-	if (pWorld->EnumChildren((ENUMMAPCHILDRENPROC)FindPlayer, 0, MAPCLASS_TYPE(CMapEntity)))
+	if (pWorld->EnumChildren(&FindPlayer))
 	{
 		// if rvl is !0, it was not stopped prematurely.. which means there is 
 		// NO player start.
@@ -788,7 +788,7 @@ static BOOL _CheckMixedFaces(CMapSolid *pSolid, CListBox *pList)
 
 static void CheckMixedFaces(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckMixedFaces, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckMixedFaces, pList);
 }
 
 
@@ -839,7 +839,7 @@ static void CheckDuplicateNodeIDs(CListBox *pList, CMapWorld *pWorld)
 		{
 			if (FindDuplicateNodeID(pEntity, pWorld))
 			{
-				AddError(pList, ErrorDuplicateNodeIDs, (DWORD)pWorld, pEntity);
+				AddError(pList, ErrorDuplicateNodeIDs, (DWORD_PTR)pWorld, pEntity);
 			}
 		}
 		
@@ -906,7 +906,7 @@ static BOOL _CheckDuplicatePlanes(CMapSolid *pSolid, CListBox *pList)
 
 static void CheckDuplicatePlanes(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckDuplicatePlanes, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckDuplicatePlanes, pList);
 }
 
 
@@ -960,12 +960,12 @@ static void CheckDuplicateFaceIDs(CListBox *pList, CMapWorld *pWorld)
 	Lists.All.SetGrowSize(128);
 	Lists.Duplicates.SetGrowSize(128);
 
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckDuplicateFaceIDs, (DWORD)&Lists, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckDuplicateFaceIDs, &Lists);
 
 	for (int i = 0; i < Lists.Duplicates.Count(); i++)
 	{
 		CMapFace *pFace = Lists.Duplicates.Element(i);
-		AddError(pList, ErrorDuplicateFaceIDs, (DWORD)pFace, (CMapSolid *)pFace->GetParent());
+		AddError(pList, ErrorDuplicateFaceIDs, (DWORD_PTR)pFace, (CMapSolid *)pFace->GetParent());
 	}
 }
 
@@ -996,7 +996,7 @@ static void CheckValidTarget(CMapEntity *pEntity, const char *pFieldName, const 
 	if (!bFound)
 	{
 		// No dice, flag it as an error.
-		AddError(pList, ErrorMissingTarget, (DWORD)pFieldName, pEntity);
+		AddError(pList, ErrorMissingTarget, (DWORD_PTR)pFieldName, pEntity);
 	}
 }
 
@@ -1040,7 +1040,7 @@ static BOOL _CheckMissingTargets(CMapEntity *pEntity, CListBox *pList)
 
 static void CheckMissingTargets(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckMissingTargets, (DWORD)pList, MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(&_CheckMissingTargets, pList);
 }
 
 
@@ -1082,7 +1082,7 @@ static BOOL _CheckSolidIntegrity(CMapSolid *pSolid, CListBox *pList)
 
 static void CheckSolidIntegrity(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckSolidIntegrity, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckSolidIntegrity, pList);
 }
 
 
@@ -1121,7 +1121,7 @@ static void CheckSolidContents(CListBox *pList, CMapWorld *pWorld)
 {
 	if (CMapDoc::GetActiveMapDoc() && CMapDoc::GetActiveMapDoc()->GetGame() && CMapDoc::GetActiveMapDoc()->GetGame()->mapformat == mfQuake2)
 	{
-		pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckSolidContents, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+		pWorld->EnumChildren(&_CheckSolidContents, pList);
 	}
 }
 
@@ -1146,7 +1146,7 @@ static BOOL _CheckInvalidTextures(CMapSolid *pSolid, CListBox *pList)
 		IEditorTexture *pTex = pFace->GetTexture();
 		if (pTex->IsDummy())
 		{
-			AddError(pList, ErrorInvalidTexture, (DWORD)pFace->texture.texture, pSolid);
+			AddError(pList, ErrorInvalidTexture, (DWORD_PTR)pFace->texture.texture, pSolid);
 			return TRUE;
 		}
 
@@ -1163,7 +1163,7 @@ static BOOL _CheckInvalidTextures(CMapSolid *pSolid, CListBox *pList)
 
 static void CheckInvalidTextures(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckInvalidTextures, (DWORD)pList, MAPCLASS_TYPE(CMapSolid));
+	pWorld->EnumChildren(&_CheckInvalidTextures, pList);
 }
 
 
@@ -1189,7 +1189,7 @@ static BOOL _CheckUnusedKeyvalues(CMapEntity *pEntity, CListBox *pList)
 	{
 		if (pClass->VarForName(pEntity->GetKey(i)) == NULL)
 		{
-			AddError(pList, ErrorUnusedKeyvalues, (DWORD)pEntity->GetKey(i), pEntity);
+			AddError(pList, ErrorUnusedKeyvalues, (DWORD_PTR)pEntity->GetKey(i), pEntity);
 			return(TRUE);
 		}
 	}
@@ -1200,7 +1200,7 @@ static BOOL _CheckUnusedKeyvalues(CMapEntity *pEntity, CListBox *pList)
 
 static void CheckUnusedKeyvalues(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckUnusedKeyvalues, (DWORD)pList, MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(&_CheckUnusedKeyvalues, pList);
 }
 
 
@@ -1217,7 +1217,7 @@ static BOOL _CheckEmptyEntities(CMapEntity *pEntity, CListBox *pList)
 
 	if(!pEntity->IsPlaceholder() && !pEntity->GetChildCount())
 	{
-		AddError(pList, ErrorEmptyEntity, (DWORD)pEntity->GetClassName(), pEntity);
+		AddError(pList, ErrorEmptyEntity, (DWORD_PTR)pEntity->GetClassName(), pEntity);
 	}
 	
 	return(TRUE);
@@ -1226,7 +1226,7 @@ static BOOL _CheckEmptyEntities(CMapEntity *pEntity, CListBox *pList)
 
 static void CheckEmptyEntities(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckEmptyEntities, (DWORD)pList, MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(&_CheckEmptyEntities, pList);
 }
 
 
@@ -1243,13 +1243,13 @@ static BOOL _CheckBadConnections(CMapEntity *pEntity, CListBox *pList)
 
 	if (CEntityConnection::ValidateOutputConnections(pEntity, (Options.general.bCheckVisibleMapErrors == TRUE)) == CONNECTION_BAD)
 	{
-		AddError(pList, ErrorBadConnections, (DWORD)pEntity->GetClassName(), pEntity);
+		AddError(pList, ErrorBadConnections, (DWORD_PTR)pEntity->GetClassName(), pEntity);
 	}
 
 	// TODO: Check for a "Kill" input with the same output, target, and delay as another input. This
 	//		 creates a race condition in the game where the order of arrival is not guaranteed
-	//int nConnCount = pEntity->Connections_GetCount();
-	//for (int i = 0; i < nConnCount; i++)
+	//intp nConnCount = pEntity->Connections_GetCount();
+	//for (intp i = 0; i < nConnCount; i++)
 	//{
 	//	CEntityConnection *pConn = pEntity->Connections_Get(i);
 	//	if (!stricmp(pConn->GetInputName(), "kill"))
@@ -1263,7 +1263,7 @@ static BOOL _CheckBadConnections(CMapEntity *pEntity, CListBox *pList)
 
 static void CheckBadConnections(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildren((ENUMMAPCHILDRENPROC)_CheckBadConnections, (DWORD)pList, MAPCLASS_TYPE(CMapEntity));
+	pWorld->EnumChildren(&_CheckBadConnections, pList);
 }
 
 
@@ -1356,7 +1356,7 @@ static BOOL _CheckVisGroups(CMapClass *pObject, CListBox *pList)
 
 static void CheckVisGroups(CListBox *pList, CMapWorld *pWorld)
 {
-	pWorld->EnumChildrenRecurseGroupsOnly((ENUMMAPCHILDRENPROC)_CheckVisGroups, (DWORD)pList);
+	pWorld->EnumChildrenRecurseGroupsOnly(&_CheckVisGroups, pList);
 }
 
 //-----------------------------------------------------------------------------
@@ -1391,7 +1391,7 @@ static BOOL _CheckOverlayFaceList( CMapEntity *pEntity, CListBox *pList )
 //-----------------------------------------------------------------------------
 static void CheckOverlayFaceList( CListBox *pList, CMapWorld *pWorld )
 {
-	pWorld->EnumChildren( ( ENUMMAPCHILDRENPROC )_CheckOverlayFaceList, ( DWORD )pList, MAPCLASS_TYPE( CMapEntity ));
+	pWorld->EnumChildren(&_CheckOverlayFaceList, pList);
 }
 
 //
@@ -1589,7 +1589,7 @@ static void FixKillInputRaceCondition(MapError *pError)
 
 	// Delay the Kill command so that it arrives after the other command,
 	// solving the race condition.
-	pConn->SetDelay(pConn->GetDelay() + 0.01);
+	pConn->SetDelay(pConn->GetDelay() + 0.01f);
 }
 
 //-----------------------------------------------------------------------------

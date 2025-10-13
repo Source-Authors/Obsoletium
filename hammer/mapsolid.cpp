@@ -586,16 +586,14 @@ CMapClass *CMapSolid::CopyFrom(CMapClass *pobj, bool bUpdateDependencies)
 // Purpose: Walks the faces of a solid for debugging.
 //-----------------------------------------------------------------------------
 #ifdef _DEBUG
-#pragma warning (disable:4189)
 void CMapSolid::DebugSolid(void)
 {
 	int nFaceCount = Faces.GetCount();
 	for (int nFace = 0; nFace < nFaceCount; nFace++)
 	{
-		CMapFace *pFace = GetFace(nFace);
+		[[maybe_unused]] CMapFace *pFace = GetFace(nFace);
 	}
 }
-#pragma warning (default:4189)
 #endif // _DEBUG
 
 

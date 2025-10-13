@@ -6,6 +6,7 @@
 
 #include "bitmap/float_bm.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <utility>
@@ -56,7 +57,7 @@ void FloatBitMap_t::CompressTo8Bits(float overbright) const
 		for(int x=0;x<Width;x++)
 		{
 			// determine maximum component
-			float maxc=max(max(Pixel(x,y,0),Pixel(x,y,1)),Pixel(x,y,2));
+			float maxc=max({Pixel(x,y,0),Pixel(x,y,1),Pixel(x,y,2)});
 			if (maxc==0)
 			{
 				for(int c=0;c<4;c++)

@@ -35,6 +35,8 @@ C_PhysicsProp::C_PhysicsProp( void )
 	m_pPhysicsObject = NULL;
 	m_takedamage = DAMAGE_YES;
 
+	// dimhotepus: Initialize to not awake by default.
+	m_bAwake = false;
 	// default true so static lighting will get recomputed when we go to sleep
 	m_bAwakeLastTime = true;
 }

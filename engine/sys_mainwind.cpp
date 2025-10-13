@@ -157,7 +157,7 @@ public:
 	void			SetMainWindow( SDL_Window* window );
 #else
 #ifdef WIN32
-	LRESULT				WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
+	LRESULT			WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam );
 #endif
 	void			SetMainWindow( HWND window );
 #endif
@@ -813,8 +813,10 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 								display_state == MONITOR_DISPLAY_STATE::PowerMonitorOff
 								? "Off"
 								: display_state == MONITOR_DISPLAY_STATE::PowerMonitorOn
-								? "On"
-								: "Dimmed");
+									? "On"
+									: display_state == MONITOR_DISPLAY_STATE::PowerMonitorDim
+										? "Dimmed"
+										: "Unknown");
 
 							// TODO: Stop rendering when display is off.
 						}
@@ -888,12 +890,23 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		break;
 
 	case WM_SIZE:
-		if ( wParam != SIZE_MINIMIZED )
+		if ( wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED )
 		{
+			RECT rcClient;
+			::GetClientRect( hWnd, &rcClient );
+			if ( rcClient.top == 0 && rcClient.bottom == 0 )
+			{
+				// Rapidly clicking the task bar to minimize and restore a window
+				// can cause a WM_SIZE message with SIZE_RESTORED when
+				// the window has actually become minimized due to rapid change
+				// so just ignore this message
+				break;
+			}
+
 			// Update restored client rect
-			::GetClientRect( hWnd, &m_rcLastRestoredClientRect );
+			m_rcLastRestoredClientRect = rcClient;
 		}
-		else
+		else if ( wParam == SIZE_MINIMIZED )
 		{
 			// Fix the window rect to have same client area as it used to have
 			// before it got minimized
@@ -903,10 +916,22 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			rcWindow.right = rcWindow.left + m_rcLastRestoredClientRect.right;
 			rcWindow.bottom = rcWindow.top + m_rcLastRestoredClientRect.bottom;
 
-			::AdjustWindowRectEx( &rcWindow, ::GetWindowLong( hWnd, GWL_STYLE ), FALSE, ::GetWindowLong( hWnd, GWL_EXSTYLE ) ); //-V303 //-V2002
+			const DWORD windowStyle = ::GetWindowLong( hWnd, GWL_STYLE );
+			const DWORD windowExStyle = ::GetWindowLong( hWnd, GWL_EXSTYLE );
+			// dimhotepus: Honor DPI.
+			::AdjustWindowRectExForDpi( &rcWindow, windowStyle, FALSE, windowExStyle, ::GetDpiForWindow( hWnd ) ); //-V303 //-V2002
 			::MoveWindow( hWnd, rcWindow.left, rcWindow.top,
 				rcWindow.right - rcWindow.left, rcWindow.bottom - rcWindow.top, FALSE );
 		}
+		break;
+
+	// dimhotepus: Handy when we will add window resize.
+	case WM_GETMINMAXINFO:
+	{
+		auto minmaxInfo = reinterpret_cast<MINMAXINFO*>(lParam);
+		minmaxInfo->ptMinTrackSize.x = BASE_WIDTH;
+		minmaxInfo->ptMinTrackSize.y = BASE_HEIGHT;
+	}
 		break;
 
 	case WM_SYSCHAR:
@@ -1018,7 +1043,7 @@ bool CGame::CreateGameWindow( void )
 	else
 	{
 		// dimhotepus: Match steam_legacy branch behavior.
-		V_strcat_safe( utf8_window_name, " - Direct3D 9" );
+		V_strcat_safe( utf8_window_name, " - Direct3D 9Ex" );
 	}
 
 #if PIX_ENABLE || defined( PIX_INSTRUMENTATION )
@@ -1217,8 +1242,8 @@ void CGame::AttachToWindow()
 		std::make_unique<source::engine::win::ScopedPowerSettingNotificationsRegistrator>(m_hWindow, GUID_SESSION_DISPLAY_STATUS));
 
 #if !defined( USE_SDL )
-	m_ChainedWindowProc = (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC );
-	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)HLEngineWindowProc );
+	m_ChainedWindowProc = (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC ); //-V204
+	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)HLEngineWindowProc ); //-V221
 #endif
 #endif // WIN32
 
@@ -1273,8 +1298,8 @@ void CGame::DetachFromWindow()
 	}
 
 #if defined( WIN32 ) && !defined( USE_SDL )
-	Assert( (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC ) == HLEngineWindowProc );
-	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)m_ChainedWindowProc );
+	Assert( (WNDPROC)GetWindowLongPtrW( m_hWindow, GWLP_WNDPROC ) == HLEngineWindowProc ); //-V204
+	SetWindowLongPtrW( m_hWindow, GWLP_WNDPROC, (LONG_PTR)m_ChainedWindowProc ); //-V221
 #endif
 }
 

@@ -245,10 +245,10 @@ void C_EntityDissolve::BuildTeslaEffect( mstudiobbox_t *pHitBox, const matrix3x4
 				pParticle->m_vecVelocity = vec3_origin;
 				Vector color( 1,1,1 );
 				float  colorRamp = RandomFloat( 0.75f, 1.25f );
-				pParticle->m_uchColor[0]	= MIN( 1.0f, color[0] * colorRamp ) * 255.0f;
-				pParticle->m_uchColor[1]	= MIN( 1.0f, color[1] * colorRamp ) * 255.0f;
-				pParticle->m_uchColor[2]	= MIN( 1.0f, color[2] * colorRamp ) * 255.0f;
-				pParticle->m_uchStartSize	= RandomInt( 6,13 );
+				pParticle->m_uchColor[0]	= static_cast<byte>(MIN( 1.0f, color[0] * colorRamp ) * 255.0f);
+				pParticle->m_uchColor[1]	= static_cast<byte>(MIN( 1.0f, color[1] * colorRamp ) * 255.0f);
+				pParticle->m_uchColor[2]	= static_cast<byte>(MIN( 1.0f, color[2] * colorRamp ) * 255.0f);
+				pParticle->m_uchStartSize	= static_cast<byte>(RandomInt( 6,13 ));
 				pParticle->m_uchEndSize		= pParticle->m_uchStartSize - 2;
 				pParticle->m_uchStartAlpha	= 255;
 				pParticle->m_uchEndAlpha	= 10;

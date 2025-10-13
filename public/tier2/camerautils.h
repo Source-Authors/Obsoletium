@@ -7,11 +7,7 @@
 #ifndef CAMERAUTILS_H
 #define CAMERAUTILS_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "tier2/tier2.h"
+#include "tier2.h"
 #include "Color.h"
 
 //-----------------------------------------------------------------------------

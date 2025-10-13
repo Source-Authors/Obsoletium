@@ -77,7 +77,7 @@ public:
 	int						sndavg;			
 
 public:
-							CMouthInfo( void ) { m_nVoiceSources = 0; m_needsEnvelope = 0; }
+							CMouthInfo( void ) { mouthopen = 0; sndcount = 0; sndavg = 0; m_nVoiceSources = 0; m_needsEnvelope = 0; }
 	virtual					~CMouthInfo( void ) { ClearVoiceSources(); }
 
 	int						GetNumVoiceSources( void );

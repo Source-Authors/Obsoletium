@@ -10,10 +10,6 @@
 #ifndef UTLFIXEDMEMORY_H
 #define UTLFIXEDMEMORY_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier0/dbg.h"
 #include "tier0/platform.h"
 
@@ -114,15 +110,15 @@ public:
 	const T& Element( intp i ) const;
 
 	// Can we use this index?
-	bool IsIdxValid( intp i ) const;
+	[[nodiscard]] bool IsIdxValid( intp i ) const;
 
 	// Specify the invalid ('null') index that we'll only return on failure
 	static constexpr intp INVALID_INDEX = 0; // For use with COMPILE_TIME_ASSERT
 	static constexpr intp InvalidIndex() { return INVALID_INDEX; }
 
 	// Size
-	intp NumAllocated() const;
-	intp Count() const { return NumAllocated(); }
+	[[nodiscard]] intp NumAllocated() const;
+	[[nodiscard]] intp Count() const { return NumAllocated(); }
 
 	// Grows memory by max(num,growsize), and returns the allocation index/ptr
 	void Grow( intp num = 1 );

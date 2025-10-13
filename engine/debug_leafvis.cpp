@@ -476,16 +476,16 @@ static Vector CubeSide( const Vector &pos, float size, int vert )
 static void CubeFace( CMeshBuilder &meshBuilder, const Vector org, int v0, int v1, int v2, int v3, float size, const color32 &color )
 {
 	meshBuilder.Position3fv( CubeSide(org,size,v0).Base() );
-	meshBuilder.Color4ubv( (byte *)&color );
+	meshBuilder.Color4ubv( (const byte *)&color );
 	meshBuilder.AdvanceVertex();
 	meshBuilder.Position3fv( CubeSide(org,size,v1).Base() );
-	meshBuilder.Color4ubv( (byte *)&color );
+	meshBuilder.Color4ubv( (const byte *)&color );
 	meshBuilder.AdvanceVertex();
 	meshBuilder.Position3fv( CubeSide(org,size,v2).Base() );
-	meshBuilder.Color4ubv( (byte *)&color );
+	meshBuilder.Color4ubv( (const byte *)&color );
 	meshBuilder.AdvanceVertex();
 	meshBuilder.Position3fv( CubeSide(org,size,v3).Base() );
-	meshBuilder.Color4ubv( (byte *)&color );
+	meshBuilder.Color4ubv( (const byte *)&color );
 	meshBuilder.AdvanceVertex();
 }
 

@@ -11,15 +11,15 @@
 // To use this class, your list node class must have a Key() function defined
 // which returns an integer type.  May add this class to main utl tier when i'm
 // happy with it.
-template <typename T, int HASHSIZE = 7907, typename K = int>
+template <typename T, unsigned HASHSIZE = 7907, typename K = intp>
 class CUtlNodeHash {
  public:
   CUtlIntrusiveDList<T> m_HashChains[HASHSIZE];
 
   CUtlNodeHash() { m_nNumNodes = 0; }
 
-  T *FindByKey(K key, int *found_chain = nullptr) {
-    unsigned int chain = (unsigned int)key;
+  T *FindByKey(K key, uintp *found_chain = nullptr) const {
+    uintp chain = (uintp)key;
 
     chain %= HASHSIZE;
 
@@ -32,7 +32,7 @@ class CUtlNodeHash {
   }
 
   void Add(T *pNode) {
-    unsigned int nChain = (unsigned int)pNode->Key();
+    uintp nChain = (uintp)pNode->Key();
 
     nChain %= HASHSIZE;
 
@@ -44,15 +44,15 @@ class CUtlNodeHash {
     m_nNumNodes = 0;
 
     // delete all nodes
-    for (int i = 0; i < HASHSIZE; i++) {
+    for (unsigned i = 0; i < HASHSIZE; i++) {
       m_HashChains[i].Purge();
     }
   }
 
-  int Count() const { return m_nNumNodes; }
+  intp Count() const { return m_nNumNodes; }
 
   void DeleteByKey(K nMatchKey) {
-    int chain;
+    uintp chain;
     T *value = FindByKey(nMatchKey, &chain);
 
     if (value) {
@@ -66,7 +66,7 @@ class CUtlNodeHash {
   ~CUtlNodeHash() { Purge(); }
 
  private:
-  int m_nNumNodes;
+  intp m_nNumNodes;
 };
 
 #endif  // !SRC_UTILS_SHADERCOMPILE_UTLNODEHASH_H_

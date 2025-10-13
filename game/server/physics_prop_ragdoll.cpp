@@ -34,10 +34,10 @@ const char *GetMassEquivalent(float flMass);
 //-----------------------------------------------------------------------------
 // ThinkContext
 //-----------------------------------------------------------------------------
-const char *s_pFadeOutContext = "RagdollFadeOutContext";
-const char *s_pDebrisContext = "DebrisContext";
+constexpr inline char s_pFadeOutContext[] = "RagdollFadeOutContext";
+constexpr inline char s_pDebrisContext[] = "DebrisContext";
 
-const float ATTACHED_DAMPING_SCALE = 50.0f;
+constexpr inline float ATTACHED_DAMPING_SCALE = 50.0f;
 
 //-----------------------------------------------------------------------------
 // Spawnflags
@@ -347,6 +347,10 @@ void CRagdollProp::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 //-----------------------------------------------------------------------------
 void CRagdollProp::OnPhysGunPickup( CBasePlayer *pPhysGunUser, PhysGunPickup_t reason )
 {
+	// dimhotepus: Clear thrown flags as we catched the ragdoll.
+	PhysClearGameFlags( VPhysicsGetObject(), FVPHYSICS_WAS_THROWN );
+	m_bFirstCollisionAfterLaunch = false;
+
 	m_hPhysicsAttacker = pPhysGunUser;
 	m_flLastPhysicsInfluenceTime = gpGlobals->curtime;
 
@@ -471,19 +475,19 @@ void CRagdollProp::VPhysicsCollision( int index, gamevcollisionevent_t *pEvent )
 {
 	BaseClass::VPhysicsCollision( index, pEvent );
 
-	CBaseEntity *pHitEntity = pEvent->pEntities[!index];
-	if ( pHitEntity == this )
+	CBaseEntity *pHitEntity1 = pEvent->pEntities[!index];
+	if ( pHitEntity1 == this )
 		return;
 
 	// Don't take physics damage from whoever's holding him with the physcannon.
 	if ( VPhysicsGetObject() && (VPhysicsGetObject()->GetGameFlags() & FVPHYSICS_PLAYER_HELD) )
 	{
-		if ( pHitEntity && (pHitEntity == HasPhysicsAttacker( FLT_MAX )) )
+		if ( pHitEntity1 && (pHitEntity1 == HasPhysicsAttacker( FLT_MAX )) )
 			return;
 	}
 
 	// Don't bother taking damage from the physics attacker
-	if ( pHitEntity && HasPhysicsAttacker( 0.5f ) == pHitEntity )
+	if ( pHitEntity1 && HasPhysicsAttacker( 0.5f ) == pHitEntity1 )
 		return;
 
 	if( m_bFirstCollisionAfterLaunch )
@@ -589,8 +593,6 @@ void CRagdollProp::HandleFirstCollisionInteractions( int index, gamevcollisionev
 
 	if( HasPhysgunInteraction( "onfirstimpact", "paintsplat" ) )
 	{
-		IPhysicsObject *pObj = VPhysicsGetObject();
- 
 		Vector vecPos;
 		pObj->GetPosition( &vecPos, NULL );
  
@@ -616,10 +618,10 @@ void CRagdollProp::HandleFirstCollisionInteractions( int index, gamevcollisionev
 	bool bAlienBloodSplat = HasPhysgunInteraction( "onfirstimpact", "alienbloodsplat" );
 	if( bAlienBloodSplat || HasPhysgunInteraction( "onfirstimpact", "bloodsplat" ) )
 	{
-		IPhysicsObject *pObj = VPhysicsGetObject();
+		IPhysicsObject *phys = VPhysicsGetObject();
  
 		Vector vecPos;
-		pObj->GetPosition( &vecPos, NULL );
+		phys->GetPosition( &vecPos, NULL );
  
 		trace_t tr;
 		UTIL_TraceLine( vecPos, vecPos + pEvent->preVelocity[0] * 1.5, MASK_SHOT, this, COLLISION_GROUP_NONE, &tr );
@@ -721,7 +723,7 @@ void CRagdollProp::InitRagdoll( const Vector &forceVector, int forceBone, const 
 			{
 				QAngle angles;
 				Assert( objectIndex >= 0 && objectIndex < RAGDOLL_MAX_ELEMENTS );
-				UTIL_StringToVector( angles.Base(), szToken );
+				UTIL_StringToVector( angles, szToken );
 				int boneIndex = m_ragdoll.boneIndex[objectIndex];
 				AngleMatrix( angles, pBoneToWorld[boneIndex] );
 				const ragdollelement_t &element = m_ragdoll.list[objectIndex];
@@ -863,7 +865,16 @@ void CRagdollProp::SetupBones( matrix3x4_t *pBoneToWorld, int boneMask )
 
 		matrix3x4_t matBoneLocal;
 		AngleMatrix( pbones[i].rot, pbones[i].pos, matBoneLocal );
-		ConcatTransforms( pBoneToWorld[pbones[i].parent], matBoneLocal, pBoneToWorld[i]);
+
+		if ( pbones[i].parent != -1 )
+		{
+			ConcatTransforms( pBoneToWorld[pbones[i].parent], matBoneLocal, pBoneToWorld[i] );
+		} 
+		else 
+		{
+			// dimhotepus: Well, some mods create ragdolls without parent bones, so fallback to ragdoll ones.
+			ConcatTransforms( EntityToWorldTransform(), matBoneLocal, pBoneToWorld[i] );
+		}
 	}
 }
 
@@ -1465,7 +1476,7 @@ void CRagdollPropAttached::Detach()
 	RemoveSolidFlags( FSOLID_NOT_SOLID );
 	physenv->DestroyConstraint( m_pAttachConstraint );
 	m_pAttachConstraint = NULL;
-	const float dampingScale = 1.0f / ATTACHED_DAMPING_SCALE;
+	constexpr float dampingScale = 1.0f / ATTACHED_DAMPING_SCALE;
 	for ( int i = 0; i < m_ragdoll.listCount; i++ )
 	{
 		float damping, rotdamping;

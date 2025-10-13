@@ -75,10 +75,12 @@
 #define tmSPUUpdateTime(...)
 #define tmSPUFlushImage(...)
 
-#define NTELEMETRY 1
+enum {
+    NTELEMETRY = 1
+};
 
 #define TM_CONTEXT_LITE(val) ((char*)(val))
 #define TM_CONTEXT_FULL(val) ((char*)(val))
 
-typedef char *HTELEMETRY;
+using HTELEMETRY = char *;
 

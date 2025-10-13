@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //=============================================================================//
 #include "cbase.h"
-#include "tier0/threadtools.h"
 #include "physics_constraint.h"
 #include "physics_spring.h"
 #include "physics_fluid.h"
@@ -13,7 +12,6 @@
 #include "physics_motioncontroller.h"
 #include "physics_vehicle.h"
 #include "physics_virtualmesh.h"
-#include "tier1/utlmultilist.h"
 #include "vphysics/constraints.h"
 #include "vphysics/vehicles.h"
 #include "vphysics/object_hash.h"
@@ -36,6 +34,9 @@
 #include "ivp_phantom.hxx"
 #include "ivp_range_manager.hxx"
 #include "ivp_clustering_visualizer.hxx"
+
+#include "tier0/threadtools.h"
+#include "tier1/utlmultilist.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -74,10 +75,10 @@ struct IDeleteQueueItem
 IDeleteQueueItem::~IDeleteQueueItem() = default;
 
 template <typename T>
-class CDeleteProxy : public IDeleteQueueItem
+class CDeleteProxy final : public IDeleteQueueItem
 {
 public:
-	CDeleteProxy(T *pItem) : m_pItem(pItem) {}
+	explicit CDeleteProxy(T *pItem) : m_pItem(pItem) {}
 	void Delete() override { delete m_pItem; }
 private:
 	T *m_pItem;
@@ -110,7 +111,7 @@ private:
 	CUtlVector< IDeleteQueueItem * >	m_list;
 };
 
-class CPhysicsCollisionData : public IPhysicsCollisionData
+class CPhysicsCollisionData final : public IPhysicsCollisionData
 {
 public:
 	CPhysicsCollisionData( IVP_Contact_Situation *contact ) : m_pContact(contact) {}
@@ -122,7 +123,7 @@ public:
 	const IVP_Contact_Situation *m_pContact;
 };
 
-class CPhysicsFrictionData : public IPhysicsCollisionData
+class CPhysicsFrictionData final : public IPhysicsCollisionData
 {
 public:
 	CPhysicsFrictionData( IVP_Synapse_Friction *synapse, float sign )
@@ -186,12 +187,12 @@ private:
 //-----------------------------------------------------------------------------
 // Purpose: Routes object event callbacks to game code
 //-----------------------------------------------------------------------------
-class CSleepObjects : public IVP_Listener_Object
+class CSleepObjects final : public IVP_Listener_Object
 {
 public:
 	CSleepObjects( void ) : IVP_Listener_Object() 
 	{
-		m_pCallback = NULL;
+		m_pCallback = nullptr;
 		m_lastScrapeTime = 0.0f;
 	}
 
@@ -421,7 +422,7 @@ private:
 	IPhysicsObjectEvent				*m_pCallback;
 };
 
-class CEmptyCollisionListener : public IPhysicsCollisionEvent
+class CEmptyCollisionListener final : public IPhysicsCollisionEvent
 {
 public:
 	void PreCollision( vcollisionevent_t * ) override {}
@@ -448,7 +449,7 @@ CEmptyCollisionListener g_EmptyCollisionListener;
 //-----------------------------------------------------------------------------
 // Purpose: Routes collision event callbacks to game code
 //-----------------------------------------------------------------------------
-class CPhysicsListenerCollision : public IVP_Listener_Collision, public IVP_Listener_Phantom
+class CPhysicsListenerCollision final : public IVP_Listener_Collision, public IVP_Listener_Phantom
 {
 public:
 	CPhysicsListenerCollision();
@@ -469,8 +470,8 @@ public:
 		if ( !pObject1 || !pObject2 )
 			return;
 
-		unsigned int flags1 = pObject1->CallbackFlags();
-		unsigned int flags2 = pObject2->CallbackFlags();
+		unsigned short flags1{pObject1->CallbackFlags()};
+		unsigned short flags2{pObject2->CallbackFlags()};
 
 		m_event.isCollision = (flags1 & flags2 & CALLBACK_GLOBAL_COLLISION) ? true : false;
 		
@@ -554,9 +555,9 @@ public:
 		if ( !pObject1 || !pObject2 )
 			return;
 
-		unsigned int flags1 = pObject1->CallbackFlags();
-		unsigned int flags2 = pObject2->CallbackFlags();
-		unsigned int allflags = flags1|flags2;
+		unsigned short flags1{pObject1->CallbackFlags()};
+		unsigned short flags2{pObject2->CallbackFlags()};
+		unsigned short allflags{static_cast<unsigned short>(flags1 | flags2)};
 
 		if ( !pObject1->IsStatic() || !pObject2->IsStatic() )
 		{
@@ -593,10 +594,10 @@ public:
 		if ( !pObject1 || !pObject2 )
 			return;
 
-		unsigned int flags1 = pObject1->CallbackFlags();
-		unsigned int flags2 = pObject2->CallbackFlags();
+		unsigned short flags1{pObject1->CallbackFlags()};
+		unsigned short flags2{pObject2->CallbackFlags()};
 
-		unsigned int allflags = flags1|flags2;
+		unsigned short allflags{static_cast<unsigned short>(flags1 | flags2)};
 
 		bool calltouch = ( allflags & CALLBACK_GLOBAL_TOUCH ) ? true : false;
 		if ( !calltouch )
@@ -795,7 +796,7 @@ void CPhysicsListenerCollision::event_friction_pair_deleted( IVP_Friction_Core_P
 
 #if defined(IVP_ENABLE_VISUALIZER)
 
-class CCollisionVisualizer : public IVP_Clustering_Visualizer_Shortrange_Callback, public IVP_Clustering_Visualizer_Longrange_Callback
+class CCollisionVisualizer final : public IVP_Clustering_Visualizer_Shortrange_Callback, public IVP_Clustering_Visualizer_Longrange_Callback
 {
 	IVPhysicsDebugOverlay			*m_pDebug;
 public:
@@ -841,7 +842,7 @@ public:
 };
 #endif
 
-class CCollisionSolver : public IVP_Collision_Filter, public IVP_Anomaly_Manager
+class CCollisionSolver final : public IVP_Collision_Filter, public IVP_Anomaly_Manager
 {
 public:
 	CCollisionSolver( void ) : IVP_Anomaly_Manager(IVP_FALSE) { m_pSolver = NULL; }
@@ -993,16 +994,14 @@ public:
 
 
 
-class CPhysicsListenerConstraint : public IVP_Listener_Constraint
+class CPhysicsListenerConstraint final : public IVP_Listener_Constraint
 {
 public:
 	CPhysicsListenerConstraint()
 	{
-		m_pCallback = NULL;
+		m_pCallback = nullptr;
 	}
-	virtual ~CPhysicsListenerConstraint()
-	{
-	}
+	virtual ~CPhysicsListenerConstraint() = default;
 
 	void SetHandler( IPhysicsConstraintEvent *pHandler )
 	{
@@ -1037,7 +1036,7 @@ private:
 
 #define AIR_DENSITY	2
 
-class CDragController : public IVP_Controller_Independent
+class CDragController final : public IVP_Controller_Independent
 {
 public:
 
@@ -1093,7 +1092,7 @@ private:
 //
 // Default implementation of the debug overlay interface so that we never return NULL from GetDebugOverlay.
 //
-class CVPhysicsDebugOverlay : public IVPhysicsDebugOverlay
+class CVPhysicsDebugOverlay final : public IVPhysicsDebugOverlay
 {
 public:
 	void AddEntityTextOverlay(int, int, float, int, int, int, int, const char *, ...) override {}
@@ -1999,7 +1998,7 @@ IPhysicsEnvironment *CreatePhysicsEnvironment( void )
 // This wraps IVP_Collision_Filter_Exclusive_Pair since we're reusing it
 // as a general void * pair hash and it's API implies that has something
 // to do with collision detection
-class CVoidPairHash : private IVP_Collision_Filter_Exclusive_Pair
+class CVoidPairHash final : private IVP_Collision_Filter_Exclusive_Pair
 {
 public:
 	void AddPair( void *pObject0, void *pObject1 )
@@ -2022,7 +2021,7 @@ public:
 };
 
 
-class CObjectPairHash : public IPhysicsObjectPairHash
+class CObjectPairHash final : public IPhysicsObjectPairHash
 {
 public:
 	CObjectPairHash() 
@@ -2036,7 +2035,7 @@ public:
 	}
 
 	// converts the void * stored in the hash to a list in the multilist
-	unsigned short HashToListIndex( void *pHash )
+	unsigned short HashToListIndex( void *pHash ) const
 	{
 		if ( !pHash )
 			return m_objectList.InvalidIndex();

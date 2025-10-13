@@ -60,11 +60,6 @@ while( 1 )
 	{
 		$ps2a = 1;
 	}
-	elsif( $fxc_filename =~ m/-x360/i )
-	{
-		# enable x360
-		$g_x360 = 1;
-	}
 	elsif( $fxc_filename =~ m/-novcs/i )
 	{
 		$g_produceCompiledVcs = 0;
@@ -720,15 +715,7 @@ sub CreateCFuncToCreateCompileCommandLine
 
 #print "--------\n";
 
-if ( $g_x360 )
-{
-	$fxctmp = "fxctmp9_360_tmp";
-}
-else
-{
-	$fxctmp = "fxctmp9_tmp";
-}
-
+$fxctmp = "fxctmp9_tmp";
 if( !stat $fxctmp )
 {
 	mkdir $fxctmp, 0777 || die $!;
@@ -741,8 +728,7 @@ if( !stat $fxctmp )
 # READ THE TOP OF THE FILE TO FIND SHADER COMBOS
 foreach $line ( @fxc )
 {
-	$line="" if ($g_x360 && ($line=~/\[PC\]/));										# line marked as [PC] when building for x360
-	$line="" if (($g_x360 == 0)  && ($line=~/\[XBOX\]/));							# line marked as [XBOX] when building for pc
+	$line="" if ($line=~/\[XBOX\]/);							# line marked as [XBOX] when building for pc
 	
 	if ( $fxc_basename =~ m/_ps(\d+\w?)$/i )
 	{
@@ -887,11 +873,6 @@ if( $g_produceCompiledVcs && !$dynamic_compile )
 	if( $nvidia )
 	{
 		print FOUT "/DNV3X=1 "; # enable NV3X codepath
-	}
-	if ( $g_x360 )
-	{
-		print FOUT "/D_X360=1 "; # shaders can identify X360 centric code
-		# print FOUT "/Xbe:2- "; # use the less-broken old back end
 	}
 	if( $debug )
 	{

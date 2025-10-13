@@ -88,7 +88,7 @@ private:
 	CDmaVar<bool> m_bIsPlaceholder;
 
 	// The entity it's connected to in the engine
-	HTOOLHANDLE	m_hEngineEntity;
+	HTOOLHANDLE	m_hEngineEntity{HTOOLHANDLE_INVALID};
 
 	CMaterialReference m_Wireframe;
 
@@ -96,13 +96,13 @@ private:
 	CMaterialReference m_InfoTargetSprite;
 
 	// pretty sure this entity is edited
-	bool m_bIsDirty;
+	bool m_bIsDirty{false};
 
 	// entity needs to be deleted
 	CDmaVar<bool> m_bIsDeleted;
 
 	// FIXME: This is a hack for info targets
-	bool m_bInfoTarget;
+	bool m_bInfoTarget{false};
 
 	// Used to store the next unique entity id;
 	static int s_nNextEntityId;

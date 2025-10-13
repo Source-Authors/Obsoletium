@@ -28,7 +28,7 @@ abstract_class IVEfx
 {
 public:
 	// Retrieve decal texture index from decal by name
-	virtual	int				Draw_DecalIndexFromName	( char *name ) = 0;
+	virtual	int				Draw_DecalIndexFromName	( const char *name ) = 0;
 
 	// Apply decal
 	virtual	void			DecalShoot				( int textureIndex, int entity, 

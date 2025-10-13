@@ -55,6 +55,7 @@ BEGIN_DATADESC( CSkyCamera )
 	DEFINE_KEYFIELD( m_skyboxData.fog.start,			FIELD_FLOAT, "fogstart" ),
 	DEFINE_KEYFIELD( m_skyboxData.fog.end,				FIELD_FLOAT, "fogend" ),
 	DEFINE_KEYFIELD( m_skyboxData.fog.maxdensity,		FIELD_FLOAT, "fogmaxdensity" ),
+	DEFINE_KEYFIELD( m_skyboxData.fog.radial,			FIELD_BOOLEAN, "fogradial" ),
 
 END_DATADESC()
 
@@ -92,6 +93,7 @@ CSkyCamera::CSkyCamera()
 {
 	g_SkyList.Insert( this );
 	m_skyboxData.fog.maxdensity = 1.0f;
+	m_skyboxData.fog.radial = false;
 }
 
 CSkyCamera::~CSkyCamera()
@@ -128,11 +130,11 @@ void CSkyCamera::Activate( )
 	// the maps look the same as before the bug fix without having to download new maps,
 	// I have to cheat here and slam the primary and secondary colors to be the average of 
 	// the primary and secondary colors.
-	/*if ( m_skyboxData.fog.blend )
+	if ( m_skyboxData.fog.blend )
 	{
-		for ( const auto *map : s_pBogusFogMaps )
+		for ( const auto* bogusMap : s_pBogusFogMaps)
 		{
-			if ( !Q_stricmp( map, STRING(gpGlobals->mapname) ) )
+			if ( !Q_stricmp( bogusMap, STRING(gpGlobals->mapname) ) )
 			{
 				m_skyboxData.fog.colorPrimary.SetR( ( m_skyboxData.fog.colorPrimary.GetR() + m_skyboxData.fog.colorSecondary.GetR() ) * 0.5f );
 				m_skyboxData.fog.colorPrimary.SetG( ( m_skyboxData.fog.colorPrimary.GetG() + m_skyboxData.fog.colorSecondary.GetG() ) * 0.5f );
@@ -141,6 +143,12 @@ void CSkyCamera::Activate( )
 				m_skyboxData.fog.colorSecondary = m_skyboxData.fog.colorPrimary;
 			}
 		}
-	}*/
+	}
 #endif
+
+	// matches the behavior of fog controller
+	if ( GameRules()->IsOfficialMap() )
+	{
+		m_skyboxData.fog.radial = true;
+	}
 }

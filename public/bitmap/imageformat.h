@@ -7,10 +7,6 @@
 #ifndef IMAGEFORMAT_H
 #define IMAGEFORMAT_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include <cstdio>
 #include "tier0/basetypes.h"
 
@@ -22,6 +18,7 @@ enum NormalDecodeMode_t
 // Forward declaration
 #ifdef _WIN32
 using D3DFORMAT = enum _D3DFORMAT;
+enum DXGI_FORMAT;
 #endif
 
 //-----------------------------------------------------------------------------
@@ -368,7 +365,9 @@ namespace ImageLoader
 	// whether it's supported or not
 	//-----------------------------------------------------------------------------
 	[[nodiscard]] ImageFormat D3DFormatToImageFormat( D3DFORMAT format );
+	[[nodiscard]] ImageFormat DxgiFormatToImageFormat( DXGI_FORMAT format );
 	[[nodiscard]] D3DFORMAT ImageFormatToD3DFormat( ImageFormat format );
+	[[nodiscard]] DXGI_FORMAT ImageFormatToDxgiFormat( ImageFormat format );
 
 	// Flags for ResampleRGBA8888
 	enum
@@ -384,11 +383,7 @@ namespace ImageLoader
 	struct ResampleInfo_t
 	{
 		ResampleInfo_t()
-			: m_pSrc(nullptr), m_pDest(nullptr),
-			m_nSrcWidth(-1), m_nSrcHeight(-1), m_nSrcDepth(1),
-			m_nDestWidth(-1), m_nDestHeight(-1), m_nDestDepth(1),
-			m_flSrcGamma(0.0F), m_flDestGamma(0.0F),
-			m_flAlphaThreshhold(0.4f), m_flAlphaHiFreqThreshhold(0.4f), m_nFlags(0)
+			 
 		{
 			m_flColorScale[0] = 1.0f;
 			m_flColorScale[1] = 1.0f;
@@ -401,27 +396,27 @@ namespace ImageLoader
 			m_flColorGoal[3] = 0.0f;
 		}
 
-		unsigned char *m_pSrc;
-		unsigned char *m_pDest;
+		unsigned char *m_pSrc{nullptr};
+		unsigned char *m_pDest{nullptr};
 
-		int m_nSrcWidth;
-		int m_nSrcHeight;
-		int m_nSrcDepth;
+		int m_nSrcWidth{-1};
+		int m_nSrcHeight{-1};
+		int m_nSrcDepth{1};
 		
-		int m_nDestWidth;
-		int m_nDestHeight;
-		int m_nDestDepth;
+		int m_nDestWidth{-1};
+		int m_nDestHeight{-1};
+		int m_nDestDepth{1};
 		
-		float m_flSrcGamma;
-		float m_flDestGamma;
+		float m_flSrcGamma{0.0F};
+		float m_flDestGamma{0.0F};
 		
 		float m_flColorScale[4];	// Color scale factors RGBA
 		float m_flColorGoal[4];		// Color goal values RGBA		DestColor = ColorGoal + scale * (SrcColor - ColorGoal)
 		
-		float m_flAlphaThreshhold;
-		float m_flAlphaHiFreqThreshhold;
+		float m_flAlphaThreshhold{0.4f};
+		float m_flAlphaHiFreqThreshhold{0.4f};
 		
-		int m_nFlags;
+		int m_nFlags{0};
 	};
 
 	[[nodiscard]] bool ResampleRGBA8888( const ResampleInfo_t &info );

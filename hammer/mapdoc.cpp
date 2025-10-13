@@ -287,8 +287,9 @@ BEGIN_MESSAGE_MAP(CMapDoc, CDocument)
 	ON_UPDATE_COMMAND_UI(ID_VIEW_QUICKHIDEUNSELECTED, OnUpdateEditSelection)
 	ON_COMMAND( ID_VIEW_QUICKUNHIDE, OnQuickHide_Unhide )
 	ON_UPDATE_COMMAND_UI(ID_VIEW_QUICKUNHIDE, OnQuickHide_UpdateUnHide)
-	ON_COMMAND( ID_TOGGLE_RADIUSCULLING, OnRadiusCulling )
-	ON_UPDATE_COMMAND_UI(ID_TOGGLE_RADIUSCULLING, OnUpdateRadiusCulling )	
+	// dimhotepus: Remove radius culling.
+	// ON_COMMAND( ID_TOGGLE_RADIUSCULLING, OnRadiusCulling )
+	// ON_UPDATE_COMMAND_UI(ID_TOGGLE_RADIUSCULLING, OnUpdateRadiusCulling )	
 	ON_COMMAND( ID_VIEW_QUICKHIDEVISGROUP, OnQuickHide_CreateVisGroupFromHidden )
 	ON_UPDATE_COMMAND_UI(ID_VIEW_QUICKHIDEVISGROUP, OnQuickHide_UpdateCreateVisGroupFromHidden)
 	END_MESSAGE_MAP()
@@ -579,8 +580,8 @@ void CMapDoc::RemoveEmptyGroups(void)
  	CUtlVector<CMapGroup *> GroupList;
 	m_pWorld->GetGroupList(GroupList);
 
-	int nGroupCount = GroupList.Count();
-	for (int i = nGroupCount - 1; i >= 0; i--)
+	intp nGroupCount = GroupList.Count();
+	for (intp i = nGroupCount - 1; i >= 0; i--)
 	{
 		CMapGroup *pGroup = GroupList.Element(i);
 
@@ -1052,10 +1053,8 @@ void CMapDoc::EndShellSession(void)
 // Output : Returns FALSE if this is the object that we are looking for, TRUE
 //			to continue iterating.
 //-----------------------------------------------------------------------------
-BOOL CMapDoc::FindEntityCallback(CMapClass *pObject, FindEntity_t *pFindInfo)
+BOOL CMapDoc::FindEntityCallback(CMapEntity *pEntity, FindEntity_t *pFindInfo)
 {
-	CMapEntity *pEntity = dynamic_cast<CMapEntity *>(pObject);
-
 	if (pEntity != NULL)
 	{
 		Vector Pos;
@@ -1106,7 +1105,7 @@ CMapEntity *CMapDoc::FindEntity(const char *pszClassName, float x, float y, floa
 		FindInfo.Pos[1] = V_rint(y);
 		FindInfo.Pos[2] = V_rint(z);
 
-		m_pWorld->EnumChildren((ENUMMAPCHILDRENPROC)FindEntityCallback, (DWORD)&FindInfo, MAPCLASS_TYPE(CMapEntity));
+		m_pWorld->EnumChildren(&CMapDoc::FindEntityCallback, &FindInfo);
 
 		if (FindInfo.pEntityFound != NULL)
 		{
@@ -1302,9 +1301,8 @@ public:
 };
 
 
-BOOL CMapDoc::GetBrushNumberCallback(CMapClass *pObject, void *pFindInfoVoid)
+BOOL CMapDoc::GetBrushNumberCallback(CMapSolid *pObject, CFindBrushInfo *pFindInfo)
 {
-	CFindBrushInfo *pFindInfo = (CFindBrushInfo*)pFindInfoVoid;
 	if ( pObject->IsVisible() )
 	{
 		if ( pObject == pFindInfo->m_pBrush )
@@ -1348,8 +1346,7 @@ void CMapDoc::OnMapShowSelectedBrushNumber()
 	}
 
 	// Enumerate the visible brushes..
-	m_pWorld->EnumChildrenRecurseGroupsOnly(
-		(ENUMMAPCHILDRENPROC)&CMapDoc::GetBrushNumberCallback, (DWORD)&info, MAPCLASS_TYPE(CMapSolid));
+	m_pWorld->EnumChildrenRecurseGroupsOnly(&CMapDoc::GetBrushNumberCallback, &info);
 
 	CString str;
 	if ( info.m_bFound )
@@ -1482,7 +1479,7 @@ bool CMapDoc::LoadVMF( const char *pszFileName, int LoadFlags )
 
 	// Set the progress dialog title
 	CString caption;
-	caption.LoadString(IDS_LOADINGFILE);
+	VERIFY(caption.LoadString(IDS_LOADINGFILE));
 	pProgDlg->SetWindowText(caption);
 
 	g_nFileFormatVersion = 0;
@@ -1560,7 +1557,7 @@ bool CMapDoc::LoadVMF( const char *pszFileName, int LoadFlags )
 	}
 	else
 	{
-		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Error loading file", MB_OK | MB_ICONEXCLAMATION);
+		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - VMF Load Error", MB_OK | MB_ICONEXCLAMATION);
 	}
 
 	if ( bLocked )
@@ -1745,8 +1742,8 @@ void CMapDoc::Postload(const char *pszFileName)
 	{
 		char szError[ 1024 ];
 
-		V_sprintf_safe( szError, "For your information, %d solid(s) were not loaded due to errors in the file.\nWould you like to Re-Save your map with the invalid solids removed?", CMapSolid::GetBadSolidCount() );
-		if ( GetMainWnd()->MessageBox(szError, "Warning", MB_YESNO | MB_ICONQUESTION) == IDYES )
+		V_sprintf_safe( szError, "For your information, %d solid(s) were not loaded due to errors in the file.\n\nWould you like to Re-Save your map with the invalid solids removed?", CMapSolid::GetBadSolidCount() );
+		if ( GetMainWnd()->MessageBox(szError, "Hammer - Resave Without Solids Warning", MB_YESNO | MB_ICONQUESTION) == IDYES )
 		{
 			OnFileSave();
 		}
@@ -1806,8 +1803,8 @@ void CMapDoc::Postload(const char *pszFileName)
 	IWorldEditDispMgr *pDispMgr = GetActiveWorldEditDispManager();
 	if( pDispMgr )
 	{
-		int count = pDispMgr->WorldCount();
-		for( int ndx = 0; ndx < count; ndx++ )
+		intp count = pDispMgr->WorldCount();
+		for( intp ndx = 0; ndx < count; ndx++ )
 		{
 			CMapDisp *pDisp = pDispMgr->GetFromWorld( ndx );
 			if( pDisp )
@@ -2092,11 +2089,9 @@ void CMapDoc::CollapseInstances( bool bOnlySelected )
 // Output : Result - returns the $variable if it exists
 //			returns the string index after the variable if one is found, otherwise -1 if not found
 //-----------------------------------------------------------------------------
-int FindInstanceParm( char *Text, ptrdiff_t StartPos, CString &Result )
+intp FindInstanceParm( const char *Text, intp StartPos, CString &Result )
 {
-	char	*found;
-
-	found = strchr( Text + StartPos, '$' );
+	const char *found = strchr( Text + StartPos, '$' );
 	if ( found == NULL )
 	{
 		return -1;
@@ -2132,14 +2127,14 @@ void CMapDoc::PopulateInstanceParms_r( CMapEntity *pEntity, const CMapObjectList
 
 		if ( pInstanceEntity && pInstanceEntity != pEntity )
 		{
-			for ( int i = pInstanceEntity->GetFirstKeyValue(); i != pInstanceEntity->GetInvalidKeyValue(); i = pInstanceEntity->GetNextKeyValue( i ) )
+			for ( auto i = pInstanceEntity->GetFirstKeyValue(); i != pInstanceEntity->GetInvalidKeyValue(); i = pInstanceEntity->GetNextKeyValue( i ) )
 			{
 				LPCTSTR	pValue = pInstanceEntity->GetKeyValue( i );
 
-				int			StartPos = 0;
+				intp		StartPos = 0;
 				CString		Result;
 
-				while( ( StartPos = FindInstanceParm( (char * )pValue, StartPos, Result ) ) != -1 )
+				while( ( StartPos = FindInstanceParm( pValue, StartPos, Result ) ) != -1 )
 				{
 					if ( ParmList.Find( Result ) == -1 )
 					{
@@ -2148,17 +2143,17 @@ void CMapDoc::PopulateInstanceParms_r( CMapEntity *pEntity, const CMapObjectList
 				}
 			}
 
-			int nCount = pInstanceEntity->Connections_GetCount();
-			for ( int j = 0; j < nCount; ++j )
+			intp nCount = pInstanceEntity->Connections_GetCount();
+			for ( intp j = 0; j < nCount; ++j )
 			{
 				CEntityConnection *pConn = pInstanceEntity->Connections_Get( j );
 
 				const char *pValue = pConn->GetTargetName();
 
-				int			StartPos = 0;
+				intp		StartPos = 0;
 				CString		Result;
 
-				while( ( StartPos = FindInstanceParm( (char * )pValue, StartPos, Result ) ) != -1 )
+				while( ( StartPos = FindInstanceParm( pValue, StartPos, Result ) ) != -1 )
 				{
 					if ( ParmList.Find( Result ) == -1 )
 					{
@@ -3006,10 +3001,10 @@ static bool IsInVisGroupRecursive(CMapClass *pObject, CVisGroup *pGroup)
 		return true;
 	}
 
-	int nChildCount = pGroup->GetChildCount();
+	intp nChildCount = pGroup->GetChildCount();
 	if (nChildCount > 0)
 	{
-		for (int i = 0; i < nChildCount; i++)
+		for (intp i = 0; i < nChildCount; i++)
 		{
 			CVisGroup *pChild = pGroup->GetChild(i);
 			if (IsInVisGroupRecursive(pObject, pChild))
@@ -3231,7 +3226,7 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	{
 		if (!CopyFile(lpszPathName, szFile, FALSE))
 		{
-			char szError[_MAX_PATH];
+			char szError[MAX_PATH];
 			V_sprintf_safe(szError, "Hammer was unable to backup the existing file \"%s\".\nThe error is '%s'.\n\n"
 				"Please verify that the there is storage space and that the path still exists.",
 				std::system_category().message(::GetLastError()).c_str(), lpszPathName);
@@ -3278,7 +3273,7 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 	std::fstream file(lpszPathName, std::ios::out | std::ios::binary);
 	if (!file.is_open())
 	{
-		char szError[_MAX_PATH];
+		char szError[MAX_PATH];
 		V_sprintf_safe(szError, "Hammer was unable to open the file \"%s\" for writing.\n\n"
 			"Please verify that the file is writable and that the path exists.", lpszPathName);
 		AfxMessageBox(szError, MB_ICONERROR);
@@ -3433,7 +3428,7 @@ void CMapDoc::UpdateAllViews(int nFlags, UpdateBox *ub )
 //-----------------------------------------------------------------------------
 // Purpose: used during iteration, tells an map entity to 
 //-----------------------------------------------------------------------------
-static BOOL _UpdateAnimation( CMapClass *mapClass, float animTime )
+static BOOL _UpdateAnimation( CMapAnimator *mapClass, float animTime )
 {
 	mapClass->UpdateAnimation( animTime );
 	return TRUE;
@@ -3459,15 +3454,10 @@ void CMapDoc::UpdateAnimation( void )
 	}
 
 	// get current animation time from animation toolbar
-	union {
-		float fl;
-		DWORD dw;
-	} animTime;
-	
-	animTime.fl = GetAnimationTime();
+	float animTime = GetAnimationTime();
 
 	// iterate through all CMapEntity object and update their animation frame matrix
-	m_pWorld->EnumChildren( ENUMMAPCHILDRENPROC(_UpdateAnimation), animTime.dw, MAPCLASS_TYPE(CMapAnimator) );
+	m_pWorld->EnumChildren(&_UpdateAnimation, animTime);
 
 }
 
@@ -3492,7 +3482,7 @@ void CMapDoc::SetAnimationTime( float time )
 //-----------------------------------------------------------------------------
 void CMapDoc::UpdateCurrentTime( void )
 {
-	m_flCurrentTime = (float)timeGetTime() / 1000;
+	m_flCurrentTime = (float)((double)GetTickCount64() / 1000);
 }
 
 
@@ -3647,7 +3637,7 @@ void CMapDoc::SelectRegion( BoundBox *pBox, bool bInsideOnly, bool ResetSelectio
 		SelectObject(NULL, scSaveChanges);
 	}
 
-	m_pWorld->EnumChildren((ENUMMAPCHILDRENPROC)SelectInBox, (DWORD)&info);
+	m_pWorld->EnumChildren(&SelectInBox, &info);
 }
 
 
@@ -3665,7 +3655,7 @@ void CMapDoc::SelectLogicalRegion( const Vector2D &vecMins, const Vector2D &vecM
 
 	SelectObject(NULL, scSaveChanges);
 
-	m_pWorld->EnumChildren((ENUMMAPCHILDRENPROC)SelectInLogicalBox, (DWORD)&info);
+	m_pWorld->EnumChildren(&SelectInLogicalBox, &info);
 }
 
 bool CMapDoc::SelectObject(CMapClass *pObj, int cmd)
@@ -3765,16 +3755,16 @@ void CMapDoc::BuildCascadingSelectionList( CMapClass *pObj, CUtlRBTree< CMapClas
 	if ( !pClass )
 		return;
 
-	int nCount = pClass->Connections_GetCount();
-	for ( int j = 0; j < nCount; ++j )
+	intp nCount = pClass->Connections_GetCount();
+	for ( intp j = 0; j < nCount; ++j )
 	{
 		CEntityConnection *pConn = pClass->Connections_Get( j );
 
 		CMapEntityList entityList;
 		FindEntitiesByName( entityList, pConn->GetTargetName(), true );
 		
-		int nOutputCount = entityList.Count();
-		for ( int k = 0; k < nOutputCount; ++k )
+		intp nOutputCount = entityList.Count();
+		for ( intp k = 0; k < nOutputCount; ++k )
 		{
 			CMapEntity *pEntity = entityList.Element(k);
 			if ( pEntity == pObj )
@@ -4118,7 +4108,7 @@ void CMapDoc::OnEditApplytexture(void)
 			((CMapSolid*)pobj)->SetTexture(GetDefaultTextureName());
 		}
 
-		pobj->EnumChildren((ENUMMAPCHILDRENPROC)ApplyTextureToSolid, (DWORD)GetDefaultTextureName(), MAPCLASS_TYPE(CMapSolid));
+		pobj->EnumChildren(&ApplyTextureToSolid, GetDefaultTextureName());
 	}
 
 	SetModifiedFlag();
@@ -4131,7 +4121,7 @@ void CMapDoc::OnEditApplytexture(void)
 //			pList - List to add the object to.
 // Output : Returns TRUE to continue iterating.
 //-----------------------------------------------------------------------------
-static BOOL CopyObjectsToList(CMapClass *pObject, CMapObjectList *pList)
+static BOOL CopyObjectsToList(CMapSolid *pObject, CMapObjectList *pList)
 {
 	pList->AddToTail(pObject);
 	return(TRUE);
@@ -4172,14 +4162,14 @@ void CMapDoc::OnEditToEntity(void)
 		//
 		else if (pObject->IsGroup())
 		{
-			pObject->EnumChildren(ENUMMAPCHILDRENPROC(CopyObjectsToList), DWORD(&newobjects), MAPCLASS_TYPE(CMapSolid));
+			pObject->EnumChildren(&CopyObjectsToList, &newobjects);
 		}
 		//
 		// If the object is an entity, add any solid children of the entity to our list.
 		//
 		else if (pObject->IsMapClass(MAPCLASS_TYPE(CMapEntity)))
 		{
-			pObject->EnumChildren(ENUMMAPCHILDRENPROC(CopyObjectsToList), DWORD(&newobjects), MAPCLASS_TYPE(CMapSolid));
+			pObject->EnumChildren(&CopyObjectsToList, &newobjects);
 
 			//
 			// See if there is more than one solid entity selected. If so, we'll need to prompt the user
@@ -5204,7 +5194,7 @@ void CMapDoc::OnToolsGroup(void)
 		CMapClass *pobj = pSelList->Element(i);
 		if ((pobj->GetParent() != NULL) && (!IsWorldObject(pobj->GetParent())))
 		{
-			if (GetMainWnd()->MessageBox("Some selected objects are part of an entity or belong to a group. Grouping them now will remove them from the entity or group! Continue?", "Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
+			if (GetMainWnd()->MessageBox("Some selected objects are part of an entity or belong to a group.\nGrouping them now will remove them from the entity or group!\n\nContinue?", "Hammer - Remove From Group Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
 			{
 				return;
 			}
@@ -5486,7 +5476,7 @@ void CMapDoc::OnFileSaveAs(void)
 		if (access(str, 0) != -1)
 		{
 			// The file exists.
-			char szConfirm[_MAX_PATH];
+			char szConfirm[MAX_PATH];
 
 			if (access(str, 2) == -1)
 			{
@@ -5672,7 +5662,7 @@ void CMapDoc::OnFileExport(void)
 
 		if (strFile.CompareNoCase(dlg.GetPathName()) == 0)
 		{
-			if (GetMainWnd()->MessageBox("You are about to export over your current work file. Some data loss will occur if you have any objects hidden. Continue?", "Export Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
+			if (GetMainWnd()->MessageBox("You are about to export over your current work file.\nSome data loss will occur if you have any objects hidden.\n\nContinue?", "Hammer - Export Overwrite File Warning", MB_YESNO | MB_ICONEXCLAMATION) != IDYES)
 			{
 				return;
 			}
@@ -5878,7 +5868,7 @@ void CMapDoc::OnFileRunmap(void)
 			else if (dlgExpert.m_pActiveSequence) // clicked ok
 			{
 				// run the commands in the active sequence
-				RunCommands(dlgExpert.m_pActiveSequence->m_Commands, strFile);
+				RunCommands(dlgExpert.m_pActiveSequence->m_Commands, strFile, AfxGetApp()->GetMainWnd());
 				return;
 			}
 			else
@@ -5942,7 +5932,8 @@ void CMapDoc::OnFileRunmap(void)
 	if ((dlg.m_iLight) && (m_pGame->szLIGHT[0] != '\0'))
 	{
 		V_strcpy_safe(cmd.szRun, "$light_exe");
-		V_sprintf_safe(cmd.szParms, "%s -game $gamedir %s$path\\$file", dlg.m_bHDRLight ? "-both" : "", dlg.m_iLight == 2 ? "-noextra " : "" );
+		// dimhotepus: As we have fixed -LargeDispSampleRadius applciation for VRAD, set it by default as it work before.
+		V_sprintf_safe(cmd.szParms, "%s -game $gamedir -LargeDispSampleRadius %s$path\\$file", dlg.m_bHDRLight ? "-both" : "", dlg.m_iLight == 2 ? "-noextra " : "" );
 		cmds.Add(cmd);
 	}
 
@@ -5969,7 +5960,7 @@ void CMapDoc::OnFileRunmap(void)
 		cmds.Add(cmd);
 	}
 
-	RunCommands(cmds, GetPathName());
+	RunCommands(cmds, GetPathName(), AfxGetApp()->GetMainWnd());
 }
 
 
@@ -6211,7 +6202,7 @@ void CMapDoc::UpdateForApplicator(BOOL bApplicator)
 				Solids.AddToTail(pSolid);
 			}
 
-			pObject->EnumChildren((ENUMMAPCHILDRENPROC)AddLeavesToListCallback, (DWORD)&Solids, MAPCLASS_TYPE(CMapSolid));
+			pObject->EnumChildren(&AddSolidLeavesToListCallback, &Solids);
 		}
 
 		//
@@ -7326,8 +7317,8 @@ void CMapDoc::AddConnectedNodes( CMapClass *pObject, CUtlRBTree< CMapClass*, uns
 				if ( pClass )
 				{
 					// Iterate through each of the upstream connections
-					int nCount = pClass->Upstream_GetCount();
-					for ( int i = 0; i < nCount; ++i )
+					intp nCount = pClass->Upstream_GetCount();
+					for ( intp i = 0; i < nCount; ++i )
 					{
 						CEntityConnection *pConn = pClass->Upstream_Get( i );
 
@@ -7346,7 +7337,7 @@ void CMapDoc::AddConnectedNodes( CMapClass *pObject, CUtlRBTree< CMapClass*, uns
 
 					// Iterate through each of the downstream connections
 					nCount = pClass->Connections_GetCount();
-					for ( int i = 0; i < nCount; ++i )
+					for ( intp i = 0; i < nCount; ++i )
 					{
 						CEntityConnection *pConn = pClass->Connections_Get( i );
 
@@ -7468,7 +7459,7 @@ BOOL CMapDoc::OnViewHideObjects(UINT nID)
 //-----------------------------------------------------------------------------
 bool CMapDoc::GetChildrenToHide(CMapClass *pObject, bool bSelected, CMapObjectList &List)
 {
-	int nAddedCount = 0;
+	intp nAddedCount = 0;
 
 	const CMapObjectList *pChildren = pObject->GetChildren();
 	FOR_EACH_OBJ( *pChildren, pos )
@@ -7666,7 +7657,7 @@ void CMapDoc::OnViewShowconnections(void)
 //-----------------------------------------------------------------------------
 void CMapDoc::OnMapEntityGallery(void)
 {
-	if (GetMainWnd()->MessageBox("This will place one of every possible point entity in the current map! Performing this operation in an empty map is recommended. Continue?", "Create Entity Gallery", MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
+	if (GetMainWnd()->MessageBox("This will place one of every possible point entity in the current map!\nPerforming this operation in an empty map is recommended.\n\nContinue?", "Hammer - Create Entity Gallery", MB_ICONEXCLAMATION | MB_YESNO) == IDYES)
 	{
 		int x = -1024;
 		int y = -1024;
@@ -8114,7 +8105,7 @@ void CMapDoc::ReplaceTextures(LPCTSTR pszFind, LPCTSTR pszReplace, BOOL bEveryth
 			SelectObject(NULL, scClear);
 		}
 
-		m_pWorld->EnumChildren((ENUMMAPCHILDRENPROC)ReplaceTexFunc, (DWORD)&info, MAPCLASS_TYPE(CMapSolid));
+		m_pWorld->EnumChildren(&ReplaceTexFunc, &info);
 	}
 	else
 	{
@@ -8144,7 +8135,7 @@ void CMapDoc::ReplaceTextures(LPCTSTR pszFind, LPCTSTR pszReplace, BOOL bEveryth
 			{
 				ReplaceTexFunc((CMapSolid *)pobj, &info);
 			}
-			pobj->EnumChildren((ENUMMAPCHILDRENPROC)ReplaceTexFunc, (DWORD)&info, MAPCLASS_TYPE(CMapSolid));
+			pobj->EnumChildren(&ReplaceTexFunc, &info);
 		}
 	}
 
@@ -8175,18 +8166,14 @@ void CMapDoc::ReplaceTextures(LPCTSTR pszFind, LPCTSTR pszReplace, BOOL bEveryth
 //			pInfo - Pointer to the structure with info about how to do the find/replace.
 // Output : 
 //-----------------------------------------------------------------------------
-static BOOL BatchReplaceTextureCallback( CMapClass *pObject, BatchReplaceTextures_t *pInfo )
+static BOOL BatchReplaceTextureCallback( CMapSolid *solid, BatchReplaceTextures_t *pInfo )
 { 
-	CMapSolid *solid;
-	int numFaces, i;
-	CMapFace *face;
 	char szCurrentTexture[MAX_PATH];
 
-	solid = ( CMapSolid * )pObject;
-	numFaces = solid->GetFaceCount();
-	for( i = 0; i < numFaces; i++ )
+	const int numFaces = solid->GetFaceCount();
+	for( int i = 0; i < numFaces; i++ )
 	{
-		face = solid->GetFace( i );
+		CMapFace *face = solid->GetFace( i );
 		face->GetTextureName( szCurrentTexture );
 		if( stricmp( szCurrentTexture, pInfo->szFindTexName ) == 0 )
 		{
@@ -8270,7 +8257,7 @@ void CMapDoc::BatchReplaceTextures( FileHandle_t fp )
 		}
 
 		// Search and replace all key textures with val.
-		m_pWorld->EnumChildren( ( ENUMMAPCHILDRENPROC )BatchReplaceTextureCallback, ( DWORD )&Info, MAPCLASS_TYPE( CMapSolid ) ); 
+		m_pWorld->EnumChildren(&BatchReplaceTextureCallback, &Info); 
 next_line:;
 	}
 }
@@ -9014,7 +9001,7 @@ void CMapDoc::OnFileExporttodxf(void)
 	info.pWorld = m_pWorld;
 	info.fp = fp;
 
-	m_pWorld->EnumChildren(ENUMMAPCHILDRENPROC(SaveDXF), DWORD(&info), MAPCLASS_TYPE(CMapSolid));
+	m_pWorld->EnumChildren(&SaveDXF, &info);
 
 	EndWaitCursor();
 
@@ -9518,8 +9505,8 @@ void CMapDoc::AddToAutoVisGroup( CMapClass *pObject, const char *pAutoVisGroup )
 
 	// Find the desired visgroup
 	CVisGroup *pFoundVisGroup = NULL;
-	int nVisGroupCount = pRootVisGroup->GetChildCount();
-	for ( int i = 0; i < nVisGroupCount; ++i )
+	intp nVisGroupCount = pRootVisGroup->GetChildCount();
+	for ( intp i = 0; i < nVisGroupCount; ++i )
 	{
 		CVisGroup *pVisGroup = pRootVisGroup->GetChild(i);
 		if ( !Q_stricmp( pAutoVisGroup, pVisGroup->GetName() ) )
@@ -9557,8 +9544,8 @@ void CMapDoc::AddChildGroupToAutoVisGroup( CMapClass *pObject, const char *pAuto
 
 	// Find the desired visgroup
 	CVisGroup *pFoundVisGroup = NULL;
-	int nVisGroupCount = pRootVisGroup->GetChildCount();
-	for ( int i = 0; i < nVisGroupCount; ++i )
+	intp nVisGroupCount = pRootVisGroup->GetChildCount();
+	for ( intp i = 0; i < nVisGroupCount; ++i )
 	{
 		CVisGroup *pVisGroup = pRootVisGroup->GetChild(i);
 		if ( !Q_stricmp( pAutoVisGroup, pVisGroup->GetName() ) )//&& pVisGroup->IsAutoVisGroup() )
@@ -9957,7 +9944,7 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 
 	if (eResult != ChunkFile_Ok)
 	{
-		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Error Saving File", MB_OK | MB_ICONERROR);
+		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Saving File Error", MB_OK | MB_ICONERROR);
 	}
 	else
 	{
@@ -10135,24 +10122,25 @@ void CMapDoc::SetUndoActive(bool bActive)
 }
 
 
-bool CMapDoc::IsCulledBy3DCameraDistance( CMapClass *pObject, UpdateVisibilityData_t *pData )
-{
-	if ( pObject->IsWorld() || pObject->IsGroup() )
-		return false;
-
-	if ( pObject->IsSelected() )
-		return false;
-
-	Vector objectPos;
-	pObject->GetOrigin( objectPos );
-
-	float flDistance = ( pData->vecRadiusCullCenter - objectPos ).LengthSqr();	
-
-	if ( flDistance >= pData->flRadiusCullDistSq )
-		return true;
-
-	return false;
-}
+// dimhotepus: Remove radius culling.
+// bool CMapDoc::IsCulledBy3DCameraDistance( CMapClass *pObject, UpdateVisibilityData_t *pData )
+// {
+// 	if ( pObject->IsWorld() || pObject->IsGroup() )
+// 		return false;
+// 
+// 	if ( pObject->IsSelected() )
+// 		return false;
+// 
+// 	Vector objectPos;
+// 	pObject->GetOrigin( objectPos );
+// 
+// 	float flDistance = ( pData->vecRadiusCullCenter - objectPos ).LengthSqr();	
+// 
+// 	if ( flDistance >= pData->flRadiusCullDistSq )
+// 		return true;
+// 
+// 	return false;
+// }
 
 
 //-----------------------------------------------------------------------------
@@ -10180,13 +10168,14 @@ bool CMapDoc::ShouldObjectBeVisible(CMapClass *pObject, UpdateVisibilityData_t *
 		return false;
 	}
 
-	if ( pData->bRadiusCullingEnabled )
-	{
-		if ( IsCulledBy3DCameraDistance( pObject, pData ) )
-		{
-			return false;
-		}
-	}
+	// dimhotepus: Remove radius culling.
+	// if ( pData->bRadiusCullingEnabled )
+	// {
+	// 	if ( IsCulledBy3DCameraDistance( pObject, pData ) )
+	// 	{
+	// 		return false;
+	// 	}
+	// }
 
 	//
 	// If hide entities is enabled and the object is an entity, hide the object.
@@ -10308,7 +10297,7 @@ BOOL CMapDoc::UpdateVisibilityCallback(CMapClass *pObject, UpdateVisibilityData_
 		//
 		if ( ( dynamic_cast< CMapEntity * >( pObject ) ) != NULL || ( dynamic_cast< CMapWorld * >( pObject ) ) != NULL )
 		{
-			pObject->EnumChildren((ENUMMAPCHILDRENPROC)UpdateVisibilityCallback, (DWORD)pData);
+			pObject->EnumChildren(&UpdateVisibilityCallback, pData);
 		}
 	}
 
@@ -10321,32 +10310,33 @@ void CMapDoc::InitUpdateVisibilityData( UpdateVisibilityData_t &data )
 	memset( &data, 0, sizeof( data ) );
 
 	data.pDoc = this;
-	data.bRadiusCullingEnabled = ( Options.general.bRadiusCulling == TRUE );
+	// dimhotepus: Remove radius culling.
+	// data.bRadiusCullingEnabled = ( Options.general.bRadiusCulling == TRUE );
 
-	if ( data.bRadiusCullingEnabled )
-	{
-		POSITION viewpos = GetFirstViewPosition();
-		while ( viewpos )
-		{
-			CMapView3D *pView = dynamic_cast<CMapView3D*>( GetNextView( viewpos ) );
-			if ( pView )
-			{
-				CCamera *pCamera = pView->GetCamera();
-				if ( pCamera )
-				{
-					pCamera->GetViewPoint( data.vecRadiusCullCenter );
-
-					data.flRadiusCullDistSq = pCamera->GetFarClip();
-					data.flRadiusCullDistSq *= data.flRadiusCullDistSq;
-
-					return;
-				}
-			}
-		}
-
-		// Can't use radius culling without a 3D view.
-		data.bRadiusCullingEnabled = false;
-	}
+	//if ( data.bRadiusCullingEnabled )
+	//{
+	//	POSITION viewpos = GetFirstViewPosition();
+	//	while ( viewpos )
+	//	{
+	//		CMapView3D *pView = dynamic_cast<CMapView3D*>( GetNextView( viewpos ) );
+	//		if ( pView )
+	//		{
+	//			CCamera *pCamera = pView->GetCamera();
+	//			if ( pCamera )
+	//			{
+	//				pCamera->GetViewPoint( data.vecRadiusCullCenter );
+	//
+	//				data.flRadiusCullDistSq = pCamera->GetFarClip();
+	//				data.flRadiusCullDistSq *= data.flRadiusCullDistSq;
+	//
+	//				return;
+	//			}
+	//		}
+	//	}
+	// 
+	//  // Can't use radius culling without a 3D view.
+	//  data.bRadiusCullingEnabled = false;
+	// }
 };
 
 
@@ -10363,7 +10353,7 @@ void CMapDoc::UpdateVisibility(CMapClass *pObject)
 	UpdateVisibilityCallback(pObject, &data);
 	if (pObject->IsGroup())
 	{
-		pObject->EnumChildrenRecurseGroupsOnly((ENUMMAPCHILDRENPROC)UpdateVisibilityCallback, (DWORD)&data);
+		pObject->EnumChildrenRecurseGroupsOnly(&UpdateVisibilityCallback, &data);
 	}
 }
 
@@ -10380,7 +10370,7 @@ void CMapDoc::UpdateVisibilityAll(void)
 	// Two stage recursion: first we recurse groups only, then from the callback we recurse
 	// solid children of entities.
 	//
-	m_pWorld->EnumChildrenRecurseGroupsOnly((ENUMMAPCHILDRENPROC)UpdateVisibilityCallback, (DWORD)&data);
+	m_pWorld->EnumChildrenRecurseGroupsOnly(&UpdateVisibilityCallback, &data);
 	m_pSelection->RemoveInvisibles();
 
 	CMainFrame *pwndMain = GetMainWnd();
@@ -10726,7 +10716,7 @@ void CMapDoc::VisGroups_DoRemoveOrCombine(CVisGroup *pFrom, CVisGroup *pTo)
 		//
 		// Move child visgroups into pTo.
 		//
-		for (int i = 0; i < pFrom->GetChildCount(); i++)
+		for (intp i = 0; i < pFrom->GetChildCount(); i++)
 		{
 			CVisGroup *pChild = pFrom->GetChild(i);
 			pTo->AddChild(pChild);
@@ -11992,13 +11982,12 @@ void CMapDoc::QuickHide_HideObjects( void )
 	// Now check any parents
 	if ( m_QuickHideGroupedParents.Count() > 0 )
 	{
-		int nHiddenChildCount = 0;
+		intp nHiddenChildCount = 0;
 
-		for ( int index = 0; index < m_QuickHideGroupedParents.Count(); index++ )
+		for ( auto *pParent : m_QuickHideGroupedParents )
 		{
 			EnumChildrenPos_t posParent;
-			CMapClass *pParent = m_QuickHideGroupedParents[ index ];
-			int nChildCount = pParent->GetChildCount();
+			intp nChildCount = pParent->GetChildCount();
 
 			if ( pParent )
 			{
@@ -12169,23 +12158,24 @@ void CMapDoc::OnQuickHide_Unhide( void )
 	QuickHide_Unhide();
 }
 
+// dimhotepus: Remove radius culling.
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CMapDoc::OnRadiusCulling( void )
-{
-	Options.general.bRadiusCulling = !Options.general.bRadiusCulling;
-	UpdateVisibilityAll();
-}
+//void CMapDoc::OnRadiusCulling( void )
+//{
+//	Options.general.bRadiusCulling = !Options.general.bRadiusCulling;
+//	UpdateVisibilityAll();
+//}
 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-void CMapDoc::OnUpdateRadiusCulling( CCmdUI *pCmdUI )
-{
-	pCmdUI->SetCheck( Options.general.bRadiusCulling ? 1 : 0 );
-	pCmdUI->Enable(!GetMainWnd()->IsShellSessionActive());
-}
+//void CMapDoc::OnUpdateRadiusCulling( CCmdUI *pCmdUI )
+//{
+//	pCmdUI->SetCheck( Options.general.bRadiusCulling ? 1 : 0 );
+//	pCmdUI->Enable(!GetMainWnd()->IsShellSessionActive());
+//}
 
 
 #include <tier0/memdbgoff.h>

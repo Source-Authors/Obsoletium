@@ -267,7 +267,22 @@ int COptionsConfigs::LoadGameConfigs()
 		return 0;
 
 	// Install the message handler for error messages.
-	GDSetMessageFunc(Msg);
+	GDSetMessageFunc([](MWMSGTYPE level, PRINTF_FORMAT_STRING const char* fmt, ...) {
+		va_list args;
+		va_start( args, fmt );
+		char buf[2048];
+		V_vsprintf_safe( buf, fmt, args );
+		va_end( args );
+
+		if ( level == MWMSGTYPE::mwStatus )
+			Msg( buf );
+		else if ( level == MWMSGTYPE::mwWarning )
+			Warning( buf );
+		else if ( level == MWMSGTYPE::mwError )
+			Error( buf );
+		else
+			Warning( buf );
+	});
 
 	// Load from the blocks
 	nConfigsRead = LoadGameConfigsBlock( pGame );
@@ -358,139 +373,15 @@ COptions::COptions(void)
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Looks for the Valve Hammer Editor registry settings and returns whether
-//			they were found.
-//-----------------------------------------------------------------------------
-static bool HammerSettingsFound(void)
-{
-	bool bFound = false;
-	HKEY hkeySoftware;
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_READ | KEY_WRITE, &hkeySoftware) == ERROR_SUCCESS)
-	{
-		HKEY hkeyValve;
-		if (RegOpenKeyEx(hkeySoftware, "Valve", 0, KEY_READ | KEY_WRITE, &hkeyValve) == ERROR_SUCCESS)
-		{
-			HKEY hkeyHammer;
-			if (RegOpenKeyEx(hkeyValve, "Hammer", 0, KEY_READ | KEY_WRITE, &hkeyHammer) == ERROR_SUCCESS)
-			{
-				HKEY hkeyConfigured;
-				if (RegOpenKeyEx(hkeyHammer, "Configured", 0, KEY_READ | KEY_WRITE, &hkeyConfigured) == ERROR_SUCCESS)
-				{
-					bFound = true;
-					RegCloseKey(hkeyConfigured);
-				}
-				RegCloseKey(hkeyHammer);
-			}
-			RegCloseKey(hkeyValve);
-		}
-		RegCloseKey(hkeySoftware);
-	}
-
-	return bFound;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Looks for the Valve Hammer Editor registry settings and returns whether
-//			they were found.
-//-----------------------------------------------------------------------------
-static bool ValveHammerEditorSettingsFound(void)
-{
-	bool bFound = false;
-	HKEY hkeySoftware;
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_READ | KEY_WRITE, &hkeySoftware) == ERROR_SUCCESS)
-	{
-		HKEY hkeyValve;
-		if (RegOpenKeyEx(hkeySoftware, "Valve", 0, KEY_READ | KEY_WRITE, &hkeyValve) == ERROR_SUCCESS)
-		{
-			HKEY hkeyHammer;
-			if (RegOpenKeyEx(hkeyValve, "Valve Hammer Editor", 0, KEY_READ | KEY_WRITE, &hkeyHammer) == ERROR_SUCCESS)
-			{
-				HKEY hkeyConfigured;
-				if (RegOpenKeyEx(hkeyHammer, "Configured", 0, KEY_READ | KEY_WRITE, &hkeyConfigured) == ERROR_SUCCESS)
-				{
-					bFound = true;
-					RegCloseKey(hkeyConfigured);
-				}
-				RegCloseKey(hkeyHammer);
-			}
-			RegCloseKey(hkeyValve);
-		}
-		RegCloseKey(hkeySoftware);
-	}
-
-	return bFound;
-}
-
-
-//-----------------------------------------------------------------------------
-// Purpose: Looks for the Worldcraft registry settings and returns whether they
-//			were found.
-//-----------------------------------------------------------------------------
-static bool WorldcraftSettingsFound(void)
-{
-	bool bFound = false;
-	HKEY hkeySoftware;
-	if (RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_READ | KEY_WRITE, &hkeySoftware) == ERROR_SUCCESS)
-	{
-		HKEY hkeyValve;
-		if (RegOpenKeyEx(hkeySoftware, "Valve", 0, KEY_READ | KEY_WRITE, &hkeyValve) == ERROR_SUCCESS)
-		{
-			HKEY hkeyWorldcraft;
-			if (RegOpenKeyEx(hkeyValve, "Worldcraft", 0, KEY_READ | KEY_WRITE, &hkeyWorldcraft) == ERROR_SUCCESS)
-			{
-				bFound = true;
-				RegCloseKey(hkeyWorldcraft);
-			}
-			RegCloseKey(hkeyValve);
-		}
-		RegCloseKey(hkeySoftware);
-	}
-
-	return bFound;
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
 bool COptions::Init(void)
 {
-	//
-	// If the we have no registry settings and the "Valve Hammer Editor" registry tree exists,
-	// import settings from there. If that isn't found, try "Worldcraft".
-	//
-	bool bWCSettingsFound = false;
-	bool bVHESettingsFound = false;
-
-	if (!HammerSettingsFound())
-	{
-		bVHESettingsFound = ValveHammerEditorSettingsFound();
-		if (!bVHESettingsFound)
-		{
-			bWCSettingsFound = WorldcraftSettingsFound();
-		}
-	}
-
-	if (bVHESettingsFound)
-	{
-		APP()->BeginImportVHESettings();
-	}
-	else if (bWCSettingsFound)
-	{
-		APP()->BeginImportWCSettings();
-	}
-
 	SetDefaults();
 	
 	if (!Read())
 	{
 		return false;
-	}
-
-	if (bVHESettingsFound || bWCSettingsFound)
-	{
-		APP()->EndImportSettings();
 	}
 
 	//
@@ -655,7 +546,8 @@ bool COptions::Read(void)
 	general.bClosedCorrectly = APP()->GetProfileInt(pszGeneral, "Closed Correctly", TRUE);
 	general.bUseVGUIModelBrowser = APP()->GetProfileInt(pszGeneral, "VGUI Model Browser", TRUE);	
 	general.bShowHiddenTargetsAsBroken = APP()->GetProfileInt(pszGeneral, "Show Hidden Targets As Broken", TRUE);	
-	general.bRadiusCulling = APP()->GetProfileInt(pszGeneral, "Use Radius Culling", FALSE);
+	// dimhotepus: Remove radius culling.
+	// general.bRadiusCulling = APP()->GetProfileInt(pszGeneral, "Use Radius Culling", FALSE);
 
 	char szDefaultAutosavePath[MAX_PATH];
 	V_strcpy_safe( szDefaultAutosavePath, APP()->GetProfileString( pszGeneral, "Directory", "C:" ) );
@@ -703,7 +595,7 @@ bool COptions::Read(void)
 	view3d.nTimeToMaxSpeed = APP()->GetProfileInt(pszView3D, "TimeToMaxSpeed", 500);
 	view3d.bFilterTextures = APP()->GetProfileInt(pszView3D, "FilterTextures", TRUE);
 	view3d.bReverseSelection = APP()->GetProfileInt(pszView3D, "ReverseSelection", FALSE);
-	view3d.fFOV = 90;
+	view3d.fFOV = 110;
 	view3d.fLightConeLength = 10;
 		
 	ReadColorSettings();
@@ -736,8 +628,8 @@ bool COptions::Read(void)
 bool COptions::RunConfigurationDialog()
 {
 	CString strText;
-	strText.LoadString(IDS_NO_CONFIGS_AVAILABLE);
-	if (MessageBox(NULL, strText, "First Time Setup", MB_ICONQUESTION | MB_YESNO) == IDYES)
+	VERIFY(strText.LoadString(IDS_NO_CONFIGS_AVAILABLE));
+	if (MessageBox(NULL, strText, "Hammer - First Time Setup", MB_ICONQUESTION | MB_YESNO) == IDYES)
 	{
 		APP()->OpenURL(ID_HELP_FIRST_TIME_SETUP, GetMainWnd()->GetSafeHwnd());
 	}
@@ -753,7 +645,7 @@ bool COptions::RunConfigurationDialog()
 
 		if (configs.nConfigs == 0)
 		{
-			MessageBox(NULL, "You must create at least one game configuration before using Hammer.", "First Time Setup", MB_ICONEXCLAMATION | MB_OK);
+			MessageBox(NULL, "You must create at least one game configuration before using Hammer.", "Hammer - First Time Setup", MB_ICONEXCLAMATION | MB_OK);
 		}
 
 	} while (configs.nConfigs == 0);
@@ -888,7 +780,8 @@ void COptions::Write( BOOL fOverwrite, BOOL fSaveConfigs )
 	APP()->SetDirectory( DIR_AUTOSAVE, general.szAutosaveDir );
 	APP()->WriteProfileInt(pszGeneral, "VGUI Model Browser", general.bUseVGUIModelBrowser );
 	APP()->WriteProfileInt(pszGeneral, "Show Hidden Targets As Broken", general.bShowHiddenTargetsAsBroken);
-	APP()->WriteProfileInt(pszGeneral, "Use Radius Culling", general.bRadiusCulling);
+	// dimhotepus: Remove radius culling.
+	// APP()->WriteProfileInt(pszGeneral, "Use Radius Culling", general.bRadiusCulling);
 
 
 	

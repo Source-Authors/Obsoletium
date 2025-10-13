@@ -1931,10 +1931,10 @@ bool CNPC_Antlion::AllowedToBePushed( void )
 //-----------------------------------------------------------------------------
 bool CNPC_Antlion::IsJumpLegal( const Vector &startPos, const Vector &apex, const Vector &endPos ) const
 {
-	const float MAX_JUMP_RISE		= 512;
-	const float MAX_JUMP_DROP		= 512;
-	const float MAX_JUMP_DISTANCE	= 1024;
-	const float MIN_JUMP_DISTANCE   = 128;
+	constexpr float MAX_JUMP_RISE		= 512;
+	constexpr float MAX_JUMP_DROP		= 512;
+	constexpr float MAX_JUMP_DISTANCE	= 1024;
+	constexpr float MIN_JUMP_DISTANCE   = 128;
 
 	if ( CAntlionRepellant::IsPositionRepellantFree( endPos ) == false )
 		 return false;
@@ -3313,7 +3313,7 @@ bool CNPC_Antlion::CheckLanding( void )
 	Vector	testPos;
 
 	//Amount of time to predict forward
-	const float	timeStep = 0.1f;
+	constexpr float	timeStep = 0.1f;
 
 	//Roughly looks one second into the future
 	testPos = GetAbsOrigin() + ( GetAbsVelocity() * timeStep );

@@ -138,7 +138,7 @@ RET_MAY_BE_NULL char *_V_strrchr (const char*, int, IN_Z const char *s, char c)
     s += len;
     while (len--)
 	if (*--s == c) return (char *)s;
-    return 0;
+    return nullptr;
 }
 
 int _V_strcmp (const char*, int, IN_Z const char *s1, IN_Z const char *s2)
@@ -190,7 +190,7 @@ wchar_t *_V_wcslower (const char*, int, INOUT_Z wchar_t *start)
 
 char *V_strupr( INOUT_Z char *start )
 {
-	unsigned char *str = (unsigned char*)start;
+	auto *str = (unsigned char*)start;
 	while( *str )
 	{
 		if ( (unsigned char)(*str - 'a') <= ('z' - 'a') )
@@ -204,7 +204,7 @@ char *V_strupr( INOUT_Z char *start )
 
 char *V_strlower( INOUT_Z char *start )
 {
-	unsigned char *str = (unsigned char*)start;
+	auto *str = (unsigned char*)start;
 	while( *str )
 	{
 		if ( (unsigned char)(*str - 'A') <= ('Z' - 'A') )
@@ -221,7 +221,7 @@ char *V_strnlwr( INOUT_Z_CAP(count) char *s, size_t count )
 	// Assert( count >= 0 ); tautology since size_t is unsigned
 	AssertValidStringPtr( s, count );
 
-	unsigned char *it = reinterpret_cast<unsigned char *>(s);
+	auto *it = reinterpret_cast<unsigned char *>(s);
 	char* pRet = s;
 	if ( !s || !count )
 		return s;
@@ -249,8 +249,8 @@ int V_stricmp( IN_Z const char *str1, IN_Z const char *str2 )
 	{
 		return 0;
 	}
-	const unsigned char *s1 = (const unsigned char*)str1;
-	const unsigned char *s2 = (const unsigned char*)str2;
+	const auto *s1 = (const unsigned char*)str1;
+	const auto *s2 = (const unsigned char*)str2;
 	for ( ; *s1; ++s1, ++s2 )
 	{
 		if ( *s1 != *s2 )
@@ -274,8 +274,8 @@ int V_stricmp( IN_Z const char *str1, IN_Z const char *str2 )
 
 int V_strnicmp( IN_Z const char *str1, IN_Z const char *str2, intp n )
 {
-	const unsigned char *s1 = (const unsigned char*)str1;
-	const unsigned char *s2 = (const unsigned char*)str2;
+	const auto *s1 = (const unsigned char*)str1;
+	const auto *s2 = (const unsigned char*)str2;
 	for ( ; n > 0 && *s1; --n, ++s1, ++s2 )
 	{
 		if ( *s1 != *s2 )
@@ -328,7 +328,7 @@ RET_MAY_BE_NULL const char *StringAfterPrefix( IN_Z const char *str, IN_Z const 
 			return str;
 	}
 	while ( FastToLower( *str++ ) == FastToLower( *prefix++ ) );
-	return NULL;
+	return nullptr;
 }
 
 RET_MAY_BE_NULL const char *StringAfterPrefixCaseSensitive( IN_Z const char *str, IN_Z const char *prefix )
@@ -341,7 +341,7 @@ RET_MAY_BE_NULL const char *StringAfterPrefixCaseSensitive( IN_Z const char *str
 			return str;
 	}
 	while ( *str++ == *prefix++ );
-	return NULL;
+	return nullptr;
 }
 
 
@@ -377,7 +377,7 @@ int64 V_atoi64( IN_Z const char *str )
 	if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X') )
 	{
 		str += 2;
-		while (1)
+		while (true)
 		{
 			c = *str++;
 			if (c >= '0' && c <= '9')
@@ -402,7 +402,7 @@ int64 V_atoi64( IN_Z const char *str )
 //
 // assume decimal
 //
-	while (1)
+	while (true)
 	{
 		c = *str++;
 		if (c <'0' || c > '9')
@@ -430,7 +430,7 @@ uint64 V_atoui64( IN_Z const char *str )
 	if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X') )
 	{
 		str += 2;
-		while (1)
+		while (true)
 		{
 			c = *str++;
 			if (c >= '0' && c <= '9')
@@ -455,7 +455,7 @@ uint64 V_atoui64( IN_Z const char *str )
 	//
 	// assume decimal
 	//
-	while (1)
+	while (true)
 	{
 		c = *str++;
 		if (c <'0' || c > '9')
@@ -502,7 +502,7 @@ float V_atof (IN_Z const char *str)
 	if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X') )
 	{
 		str += 2;
-		while (1)
+		while (true)
 		{
 			c = *str++;
 			if (c >= '0' && c <= '9')
@@ -531,7 +531,7 @@ float V_atof (IN_Z const char *str)
 	decimal = -1;
 	total = 0;
 	int exponent = 0;
-	while (1)
+	while (true)
 	{
 		c = *str++;
 		if (c == '.')
@@ -611,7 +611,7 @@ RET_MAY_BE_NULL char const* V_stristr( IN_Z char const* pStr, IN_Z char const* p
 	AssertValidStringPtr(pSearch);
 
 	if (!pStr || !pSearch) 
-		return 0;
+		return nullptr;
 
 	char const* pLetter = pStr;
 
@@ -628,7 +628,7 @@ RET_MAY_BE_NULL char const* V_stristr( IN_Z char const* pStr, IN_Z char const* p
 			{
 				// We've run off the end; don't bother.
 				if (*pMatch == 0)
-					return 0;
+					return nullptr;
 
 				if (FastToLower((unsigned char)*pMatch) != FastToLower((unsigned char)*pTest))
 					break;
@@ -645,7 +645,7 @@ RET_MAY_BE_NULL char const* V_stristr( IN_Z char const* pStr, IN_Z char const* p
 		++pLetter;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 RET_MAY_BE_NULL char* V_stristr( IN_Z char* pStr, IN_Z char const* pSearch )
@@ -666,7 +666,7 @@ RET_MAY_BE_NULL char const* V_strnistr( IN_Z char const* pStr, IN_Z char const* 
 	AssertValidStringPtr(pSearch);
 
 	if (!pStr || !pSearch) 
-		return 0;
+		return nullptr;
 
 	char const* pLetter = pStr;
 
@@ -674,7 +674,7 @@ RET_MAY_BE_NULL char const* V_strnistr( IN_Z char const* pStr, IN_Z char const* 
 	while (*pLetter != 0)
 	{
 		if ( n <= 0 )
-			return 0;
+			return nullptr;
 
 		// Skip over non-matches
 		if (FastToLower(*pLetter) == FastToLower(*pSearch))
@@ -687,11 +687,11 @@ RET_MAY_BE_NULL char const* V_strnistr( IN_Z char const* pStr, IN_Z char const* 
 			while (*pTest != 0)
 			{
 				if ( n1 <= 0 )
-					return 0;
+					return nullptr;
 
 				// We've run off the end; don't bother.
 				if (*pMatch == 0)
-					return 0;
+					return nullptr;
 
 				if (FastToLower(*pMatch) != FastToLower(*pTest))
 					break;
@@ -710,7 +710,7 @@ RET_MAY_BE_NULL char const* V_strnistr( IN_Z char const* pStr, IN_Z char const* 
 		--n;
 	}
 
-	return 0;
+	return nullptr;
 }
 
 RET_MAY_BE_NULL const char* V_strnchr( IN_Z const char* pStr, char c, intp n )
@@ -725,7 +725,7 @@ RET_MAY_BE_NULL const char* V_strnchr( IN_Z const char* pStr, char c, intp n )
 			return pLetter;
 		++pLetter;
 	}
-	return NULL;
+	return nullptr;
 }
 
 void V_strncpy( OUT_Z_CAP(maxLenInChars) char *pDest, IN_Z char const *pSrc, intp maxLenInChars )
@@ -947,7 +947,9 @@ wchar_t *V_wcsncat( INOUT_Z_CAP(cchDest) wchar_t *pDest, IN_Z const wchar_t *pSr
 //			false - 
 // Output : char
 //-----------------------------------------------------------------------------
-#define NUM_PRETIFYMEM_BUFFERS 8
+enum {
+  NUM_PRETIFYMEM_BUFFERS = 8
+};
 char *V_pretifymem( double value, int digitsafterdecimal /*= 2*/, bool usebinaryonek /*= false*/ )
 {
 	static char output[ NUM_PRETIFYMEM_BUFFERS ][ 32 ];
@@ -1056,7 +1058,9 @@ char *V_pretifymem( double value, int digitsafterdecimal /*= 2*/, bool usebinary
 // Input  : value -		Value to convert
 // Output : Pointer to a static buffer containing the output
 //-----------------------------------------------------------------------------
-#define NUM_PRETIFYNUM_BUFFERS 8 // Must be a power of two
+enum {
+  NUM_PRETIFYNUM_BUFFERS = 8 // Must be a power of two
+};
 char *V_pretifynum( int64 inputValue )
 {
 	static char output[ NUM_PRETIFYNUM_BUFFERS ][ 32 ];
@@ -1224,7 +1228,7 @@ bool Q_RemoveAllEvilCharacters( INOUT_Z char *pch )
 	// convert to unicode
 	size_t cch = strlen( pch );
 	size_t cubDest = (cch + 1 ) * sizeof( wchar_t );
-	wchar_t *pwch = stackallocT( wchar_t, cubDest );
+	auto *pwch = stackallocT( wchar_t, cubDest );
 	size_t cwch = Q_UTF8ToWString( pch, pwch, cubDest ) / sizeof( wchar_t );
 
 	bool bStrippedWhitespace = false;
@@ -1271,7 +1275,7 @@ bool Q_StripPrecedingAndTrailingWhitespaceW( INOUT_Z wchar_t *pwch )
 
 	// duplicate on stack
 	intp cubDest = ( cch + 1 ) * static_cast<intp>(sizeof( wchar_t ));
-	wchar_t *pwchT = stackallocT( wchar_t, cubDest );
+	auto *pwchT = stackallocT( wchar_t, cubDest );
 	V_wcsncpy( pwchT, pwch, cubDest );
 
 	bool bStrippedWhitespace = false;
@@ -1298,7 +1302,7 @@ bool Q_AggressiveStripPrecedingAndTrailingWhitespaceW( INOUT_Z wchar_t *pwch )
 	// duplicate on stack
 	size_t cch = wcslen( pwch );
 	size_t cubDest = ( cch + 1 ) * sizeof( wchar_t );
-	wchar_t *pwchT = stackallocT( wchar_t, cubDest );
+	auto *pwchT = stackallocT( wchar_t, cubDest );
 	Q_wcsncpy( pwchT, pwch, cubDest );
 
 	bool bStrippedWhitespace = false;
@@ -1327,7 +1331,7 @@ bool Q_StripPrecedingAndTrailingWhitespace( INOUT_Z char *pch )
 
 	// convert to unicode
 	intp cubDest = (cch + 1 ) * static_cast<intp>(sizeof( wchar_t ));
-	wchar_t *pwch = stackallocT( wchar_t, cubDest );
+	auto *pwch = stackallocT( wchar_t, cubDest );
 	intp cwch = Q_UTF8ToWString( pch, pwch, cubDest ) / sizeof( wchar_t );
 
 	bool bStrippedWhitespace = false;
@@ -1350,7 +1354,7 @@ bool Q_AggressiveStripPrecedingAndTrailingWhitespace( INOUT_Z char *pch )
 	// convert to unicode
 	size_t cch = strlen( pch );
 	size_t cubDest = (cch + 1 ) * sizeof( wchar_t );
-	wchar_t *pwch = stackallocT( wchar_t, cubDest );
+	auto *pwch = stackallocT( wchar_t, cubDest );
 	size_t cwch = Q_UTF8ToUnicode( pch, pwch, cubDest ) / sizeof( wchar_t );
 
 	bool bStrippedWhitespace = false;
@@ -1409,7 +1413,7 @@ intp _V_UnicodeToUCS2( const wchar_t *pUnicode, intp cubSrcInBytes, OUT_Z_BYTECA
 	// Figure out which buffer is smaller and convert from bytes to character
 	// counts.
 	intp cchResult = min( cubSrcInBytes/(intp)sizeof(wchar_t), cubDestSizeInBytes/(intp)sizeof(wchar_t) );
-	wchar_t *pDest = (wchar_t*)pUCS2;
+	auto *pDest = (wchar_t*)pUCS2;
 	wcsncpy( pDest, pUnicode, cchResult );
 	// Make sure we NULL-terminate.
 	pDest[ cchResult - 1 ] = L'\0';
@@ -1447,7 +1451,7 @@ int _V_UCS2ToUTF8( const ucs2 *pUCS2, OUT_Z_BYTECAP(cubDestSizeInBytes) char *pU
 	pUTF8[0] = '\0';
 #ifdef _WIN32
 	// under win32 wchar_t == ucs2, sigh
-	int cchResult = WideCharToMultiByte( CP_UTF8, 0, pUCS2, -1, pUTF8, cubDestSizeInBytes, NULL, NULL );
+	int cchResult = WideCharToMultiByte( CP_UTF8, 0, pUCS2, -1, pUTF8, cubDestSizeInBytes, nullptr, nullptr );
 #elif defined(POSIX)
 	iconv_t conv_t = iconv_open( "UTF-8", "UCS-2LE" );
 	size_t cchResult = -1;
@@ -2067,7 +2071,7 @@ void V_ExtractFileExtension( IN_Z const char *path, OUT_Z_CAP(destSize) char *de
 	if (destSize)
 		*dest = NULL;
 	const char * extension = V_GetFileExtension( path );
-	if ( NULL != extension )
+	if ( nullptr != extension )
 		V_strncpy( dest, extension, destSize );
 }
 
@@ -2094,7 +2098,7 @@ RET_MAY_BE_NULL const char * V_GetFileExtension( IN_Z const char * path )
 	// check to see if the '.' is part of a pathname
 	if (src == path || PATHSEPARATOR( *src ) )
 	{		
-		return NULL;  // no extension
+		return nullptr;  // no extension
 	}
 
 	return src;
@@ -2259,8 +2263,8 @@ bool V_MakeRelativePath( IN_Z const char *pFullPath, IN_Z const char *pDirectory
 	const char *pDir = pDirectory;
 
 	// Strip out common parts of the path
-	const char *pLastCommonPath = NULL;
-	const char *pLastCommonDir = NULL;
+	const char *pLastCommonPath = nullptr;
+	const char *pLastCommonDir = nullptr;
 	while ( *pPath && ( FastToLower( *pPath ) == FastToLower( *pDir ) || 
 						( PATHSEPARATOR( *pPath ) && ( PATHSEPARATOR( *pDir ) || (*pDir == 0) ) ) ) )
 	{
@@ -2429,7 +2433,8 @@ bool V_MakeRelativePath( IN_Z const char *pFullPath, IN_Z const char *pDirectory
 //-----------------------------------------------------------------------------
 bool V_IsAbsolutePath( IN_Z const char *pStr )
 {
-	bool bIsAbsolute = ( pStr[0] && pStr[1] == ':' ) || pStr[0] == '/' || pStr[0] == '\\';
+	char first = pStr[0];
+	bool bIsAbsolute = ( first && pStr[1] == ':' ) || first == '/' || first == '\\';
 	return bIsAbsolute;
 }
 
@@ -2491,7 +2496,7 @@ bool V_StrSubst(
 	char *pOutPos = pOut;
 	pOutPos[0] = 0;
 
-	while ( 1 )
+	while ( true )
 	{
 		intp nRemainingOut = outLen - (pOutPos - pOut);
 
@@ -2546,10 +2551,10 @@ void V_SplitString2( IN_Z const char *pString, const char **pSeparators, intp nS
 {
 	outStrings.Purge();
 	const char *pCurPos = pString;
-	while ( 1 )
+	while ( true )
 	{
 		intp iFirstSeparator = -1;
-		const char *pFirstSeparator = 0;
+		const char *pFirstSeparator = nullptr;
 		for ( intp i=0; i < nSeparators; i++ )
 		{
 			const char *pTest = V_stristr( pCurPos, pSeparators[i] );
@@ -2726,7 +2731,7 @@ void V_strtowcs( IN_Z_CAP(nInSize) const char *pString, int nInSize, OUT_Z_BYTEC
 void V_wcstostr( IN_Z_CAP(nInSize) const wchar_t *pWString, int nInSize, OUT_Z_CAP(nOutSizeInBytes) char *pString, int nOutSizeInBytes )
 {
 #ifdef _WIN32
-	int result = WideCharToMultiByte( CP_UTF8, 0, pWString, nInSize, pString, nOutSizeInBytes, NULL, NULL );
+	int result = WideCharToMultiByte( CP_UTF8, 0, pWString, nInSize, pString, nOutSizeInBytes, nullptr, nullptr );
 	// If the string completely fails to fit then MultiByteToWideChar will return 0.
 	// If the string exactly fits but with no room for a null-terminator then MultiByteToWideChar
 	// will happily fill the buffer and omit the null-terminator, returning nOutSizeInChars.
@@ -3094,18 +3099,18 @@ bool BGetLocalFormattedDateAndTime( time_t timeVal, char *pchDate, int cubDate, 
 
 		WCHAR rgwch[ MAX_PATH ];
 
-		if ( pchDate != NULL )
+		if ( pchDate != nullptr )
 		{
 			pchDate[ 0 ] = 0;
-			if ( !GetDateFormatW( LOCALE_USER_DEFAULT, DATE_LONGDATE, &st, NULL, rgwch, MAX_PATH ) )
+			if ( !GetDateFormatW( LOCALE_USER_DEFAULT, DATE_LONGDATE, &st, nullptr, rgwch, MAX_PATH ) )
 				return false;
 			Q_strncpy( pchDate, CStrAutoEncode( rgwch ).ToString(), cubDate );
 		}
 
-		if ( pchTime != NULL )
+		if ( pchTime != nullptr )
 		{
 			pchTime[ 0 ] = 0;
-			if ( !GetTimeFormatW( LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, NULL, rgwch, MAX_PATH ) )
+			if ( !GetTimeFormatW( LOCALE_USER_DEFAULT, TIME_NOSECONDS, &st, nullptr, rgwch, MAX_PATH ) )
 				return false;
 			Q_strncpy( pchTime, CStrAutoEncode( rgwch ).ToString(), cubTime );
 		}
@@ -3120,11 +3125,11 @@ bool BGetLocalFormattedDateAndTime( time_t timeVal, char *pchDate, int cubDate, 
 // And a couple of helpers so people don't have to remember the order of the parameters in the above function
 bool BGetLocalFormattedDate( time_t timeVal, char *pchDate, int cubDate )
 {
-	return BGetLocalFormattedDateAndTime( timeVal, pchDate, cubDate, NULL, 0 );
+	return BGetLocalFormattedDateAndTime( timeVal, pchDate, cubDate, nullptr, 0 );
 }
 bool BGetLocalFormattedTime( time_t timeVal, char *pchTime, int cubTime )
 {
-	return BGetLocalFormattedDateAndTime( timeVal, NULL, 0, pchTime, cubTime );
+	return BGetLocalFormattedDateAndTime( timeVal, nullptr, 0, pchTime, cubTime );
 }
 
 // Prints out a memory dump where stuff that's ascii is human readable, etc.
@@ -3140,7 +3145,7 @@ void V_LogMultiline( bool input, char const *label, const char *data, size_t len
 		V_memset(hex_line, ' ', sizeof(hex_line));
 		size_t line_len = MIN(len, LINE_SIZE);
 		for (size_t i=0; i<line_len; ++i) {
-			unsigned char ch = static_cast<unsigned char>(data[i]);
+			auto ch = static_cast<unsigned char>(data[i]);
 			asc_line[i] = ( V_isprint(ch) && !V_iscntrl(ch) ) ? data[i] : '.';
 			hex_line[i*2 + i/4] = HEX[ch >> 4];
 			hex_line[i*2 + i/4 + 1] = HEX[ch & 0xf];
@@ -3175,18 +3180,18 @@ inline int V_iswspace( int c ) { return ( c <= 0xFFFF ) ? iswspace( (wint_t)c ) 
 //			sep - Character to use as separator. UNDONE: allow multiple separator chars
 // Output : Returns a pointer to the next token to be parsed.
 //-----------------------------------------------------------------------------
-RET_MAY_BE_NULL const char *nexttoken(OUT_Z_CAP(nMaxTokenLen) char *token, size_t nMaxTokenLen, IN_Z const char *str, char sep)
+RET_MAY_BE_NULL const char *nexttoken(OUT_Z_CAP(nMaxTokenLen) char *token, size_t nMaxTokenLen, IN_OPT_Z const char *str, char sep)
 {
 	if (nMaxTokenLen < 1)
 	{
 		Assert(nMaxTokenLen > 0);
-		return NULL;
+		return nullptr;
 	}
 
-	if ((str == NULL) || (*str == '\0'))
+	if ((str == nullptr) || (*str == '\0'))
 	{
 		*token = '\0';
-		return NULL;
+		return nullptr;
 	}
 
 	char *pTokenLast = token + nMaxTokenLen - 1;
@@ -3226,26 +3231,26 @@ intp V_StrTrim( IN_Z char *pStr )
 	}
 
 	// copy everything else
-	char *pLastWhiteBlock = NULL;
+	char *pLastWhiteBlock = nullptr;
 	char *pStart = pDest;
 	while ( *pSource != 0 )
 	{
 		*pDest = *pSource++;
 		if ( V_isspace( *pDest ) )
 		{
-			if ( pLastWhiteBlock == NULL )
+			if ( pLastWhiteBlock == nullptr )
 				pLastWhiteBlock = pDest;
 		}
 		else
 		{
-			pLastWhiteBlock = NULL;
+			pLastWhiteBlock = nullptr;
 		}
 		pDest++;
 	}
 	*pDest = 0;
 
 	// did we end in a whitespace block?
-	if ( pLastWhiteBlock != NULL )
+	if ( pLastWhiteBlock != nullptr )
 	{
 		// yep; shorten the string
 		pDest = pLastWhiteBlock;
@@ -3291,13 +3296,13 @@ constexpr static HtmlEntity_t g_BasicHTMLEntities[] = {
 		{ '<', "&lt;", 4 },
 		{ '>', "&gt;", 4 },
 		{ '&', "&amp;", 5 },
-		{ 0, NULL, 0 } // sentinel for end of array
+		{ 0, nullptr, 0 } // sentinel for end of array
 };
 
 constexpr static HtmlEntity_t g_WhitespaceEntities[] = {
 		{ ' ', "&nbsp;", 6 },
 		{ '\n', "<br>", 4 },
-		{ 0, NULL, 0 } // sentinel for end of array
+		{ 0, nullptr, 0 } // sentinel for end of array
 };
 
 
@@ -3416,14 +3421,20 @@ const Tier1FullHTMLEntity_t g_Tier1_FullHTMLEntities[] =
 	{ L'\u00FD', "&yacute;", 8 },
 	{ L'\u00FE', "&thorn;", 7 },
 	{ L'\u00FF', "&yuml;", 6 },
-	{ 0, NULL, 0 } // sentinel for end of array
+	{ 0, nullptr, 0 } // sentinel for end of array
 };
 
 
 
 bool V_BasicHtmlEntityEncode( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDestSize, IN_Z_CAP(nInSize) char const *pIn, const intp nInSize, bool bPreserveWhitespace /*= false*/ )
 {
-	Assert( nDestSize == 0 || pDest != NULL );
+	// dimhotepus: Ensure no out of bounds access to 
+	if ( nDestSize <= 0 || pDest == nullptr )
+	{
+		Assert( nDestSize <= 0 || pDest == nullptr );
+		return false;
+	}
+
 	intp iOutput = 0;
 	for ( intp iInput = 0; iInput < nInSize; ++iInput )
 	{
@@ -3482,7 +3493,13 @@ bool V_BasicHtmlEntityEncode( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDe
 
 bool V_HtmlEntityDecodeToUTF8( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDestSize, IN_Z_CAP(nInSize) char const *pIn, const intp nInSize )
 {
-	Assert( nDestSize == 0 || pDest != NULL );
+	// dimhotepus: Ensure no out of bounds access to 
+	if ( nDestSize <= 0 || pDest == nullptr )
+	{
+		Assert( nDestSize <= 0 || pDest == nullptr );
+		return false;
+	}
+
 	intp iOutput = 0;
 	char rgchReplacement[8];
 	for ( intp iInput = 0; iInput < nInSize && iOutput < nDestSize; ++iInput )
@@ -3509,7 +3526,7 @@ bool V_HtmlEntityDecodeToUTF8( OUT_Z_CAP( nDestSize ) char *pDest, const intp nD
 						iOffset = 3;
 					}
 
-					wrgchReplacement[ 0 ] = (uchar32)V_strtoi64( pIn + iInput + iOffset, NULL, iBase );
+					wrgchReplacement[ 0 ] = (uchar32)V_strtoi64( pIn + iInput + iOffset, nullptr, iBase );
 					if ( !Q_UTF32ToUTF8( wrgchReplacement, rgchReplacement, sizeof( rgchReplacement ) ) )
 					{
 						rgchReplacement[ 0 ] = 0;
@@ -3601,7 +3618,13 @@ static const char * const g_pszSimpleBBCodeReplacements[] = {
 // Converts BBCode tags to HTML tags
 bool V_BBCodeToHTML( OUT_Z_CAP( nDestSize ) char *pDest, const intp nDestSize, IN_Z_CAP(nInSize) char const *pIn, const intp nInSize )
 {
-	Assert( nDestSize == 0 || pDest != NULL );
+	// dimhotepus: Ensure no out of bounds access to 
+	if ( nDestSize <= 0 || pDest == nullptr )
+	{
+		Assert( nDestSize <= 0 || pDest == nullptr );
+		return false;
+	}
+
 	intp iOutput = 0;
 
 	for ( intp iInput = 0; iInput < nInSize && iOutput < nDestSize && pIn[ iInput ]; ++iInput )
@@ -3861,7 +3884,7 @@ bool V_IsValidDomainNameCharacter( IN_Z const char *pch, IN_OPT intp *pAdvanceBy
 	// We allow unicode in Domain Names without the an encoding unless it corresponds to 
 	// a whitespace or control sequence or something we think is an underscore looking thing.
 	// If this character is the start of a UTF-8 sequence, try decoding it.
-	unsigned char ch = (unsigned char)*pch;
+	auto ch = (unsigned char)*pch;
 	if ( ( ch & 0xC0 ) == 0xC0 )
 	{
 		uchar32 rgch32Buf;
@@ -3919,7 +3942,7 @@ bool V_IsValidURLCharacter( IN_Z const char *pch, IN_OPT intp *pAdvanceBytes )
 
 	// We allow unicode in URLs unless it corresponds to a whitespace or control sequence.
 	// If this character is the start of a UTF-8 sequence, try decoding it.
-	unsigned char ch = (unsigned char)*pch;
+	auto ch = (unsigned char)*pch;
 	if ( ( ch & 0xC0 ) == 0xC0 )
 	{
 		uchar32 rgch32Buf;
@@ -3979,7 +4002,7 @@ bool V_ExtractDomainFromURL( IN_Z const char *pchURL, OUT_Z_CAP( cchDomain ) cha
 	constexpr char k_pchSteamOpenUrlExt[] = "steam://openurl_external/";
 
 	const char *pchOpenUrlSuffix = StringAfterPrefix( pchURL, k_pchSteamOpenUrl );
-	if ( pchOpenUrlSuffix == NULL )
+	if ( pchOpenUrlSuffix == nullptr )
 		pchOpenUrlSuffix = StringAfterPrefix( pchURL, k_pchSteamOpenUrlExt );
 
 	if ( pchOpenUrlSuffix )

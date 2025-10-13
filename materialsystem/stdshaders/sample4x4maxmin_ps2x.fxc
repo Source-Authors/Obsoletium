@@ -2,7 +2,7 @@
 // STATIC: "CONVERT_TO_SRGB" "0..0"	[= 0] [XBOX]
 
 #define HDRTYPE HDR_TYPE_NONE
-#include "common_ps_Fxc.h"
+#include "common_ps_fxc.h"
 
 
 sampler TexSampler	: register( s0 );

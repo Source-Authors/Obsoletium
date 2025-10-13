@@ -879,7 +879,17 @@ CAudioSource *S_LoadSound( CSfxTable *pSfx, channel_t *ch )
 		{
 			if ( bUserVox )
 			{
-				pSfx->pSource = Voice_SetupAudioSource( ch->soundsource, ch->entchannel );
+				// dimhotepus: Check channel exists.
+				if ( ch )
+				{
+					pSfx->pSource = Voice_SetupAudioSource( ch->soundsource, ch->entchannel );
+				}
+				else
+				{
+					AssertMsg( ch, "Missed channel to load user VOX %s.", pSfx->getname() );
+
+					Warning( "Missed channel to load user VOX %s.", pSfx->getname() );
+				}
 			}
 			else
 			{
@@ -3582,7 +3592,7 @@ bool DAS_UpdateRoomSize( das_room_t *proom )
 			// ignore horizontal sky hits for distance calculations
 			surfdata.dist = 1.0;
 		else
-			surfdata.dist = surfdata.dist; // debug
+			surfdata.dist = surfdata.dist; // debug //-V570
 	}
 
 	// get length of trace if it hit world

@@ -22,6 +22,7 @@
 #include "cmdlib.h"
 
 #include "posix_file_stream.h"
+#include "scoped_app_locale.h"
 
 #include "tier0/memdbgon.h"
 
@@ -283,13 +284,27 @@ int main(int argc, char **argv) {
   const se::utils::common::ScopedDefaultMinidumpHandler
       scoped_default_minidumps;
 
-  const ScopedCommandLineProgram scoped_command_line_program(argc, argv);
-
 #ifdef PLATFORM_64BITS
   Msg("\nValve Software - vbspinfo [64 bit] (%s)\n", __DATE__);
 #else
   Msg("\nValve Software - vbspinfo (%s)\n", __DATE__);
 #endif
+
+  // dimhotepus: Apply en_US UTF8 locale for printf/scanf.
+  //
+  // Printf/sscanf functions expect en_US UTF8 localization.
+  //
+  // Starting in Windows 10 version 1803 (10.0.17134.0), the Universal C Runtime
+  // supports using a UTF-8 code page.
+  constexpr char kEnUsUtf8Locale[]{"en_US.UTF-8"};
+
+  const se::ScopedAppLocale scoped_app_locale{kEnUsUtf8Locale};
+  if (V_stricmp(se::ScopedAppLocale::GetCurrentLocale(), kEnUsUtf8Locale)) {
+    Warning("setlocale('%s') failed, current locale is '%s'.\n",
+            kEnUsUtf8Locale, se::ScopedAppLocale::GetCurrentLocale());
+  }
+
+  const ScopedCommandLineProgram scoped_command_line_program(argc, argv);
 
   char source[1024];
 

@@ -385,7 +385,8 @@ private:
 CPlayerLogoProxy::CPlayerLogoProxy()
 : m_Logos( 0, 0, LogoLessFunc )
 {
-	m_pDefaultTexture = NULL;
+	m_pBaseTextureVar = nullptr;
+	m_pDefaultTexture = nullptr;
 }
 
 #define DEFAULT_DECAL_NAME "decals/YBlood1"

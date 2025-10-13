@@ -23,21 +23,23 @@ void StartPacifier(char const *pPrefix) {
 }
 
 void UpdatePacifier(float flPercent) {
-  int iCur = (int)(flPercent * 40.0f);
-  iCur = std::clamp(iCur, g_LastPacifierDrawn, 40);
+  constexpr int forty = 40;
 
-  if (iCur != g_LastPacifierDrawn && !g_bPacifierSuppressed) {
-    for (int i = g_LastPacifierDrawn + 1; i <= iCur; i++) {
-      if (!(i % 4)) {
-        Msg("%d", i / 4);
+  const int it = std::clamp(static_cast<int>(flPercent * forty),
+                            g_LastPacifierDrawn, forty);
+
+  if (it != g_LastPacifierDrawn && !g_bPacifierSuppressed) {
+    for (int i = g_LastPacifierDrawn + 1; i <= it; i++) {
+      const auto dv = div(i, 4);
+
+      if (dv.rem == 0) {
+        Msg("%d", dv.quot);
       } else {
-        if (i != 40) {
-          Msg(".");
-        }
+        if (i != forty) Msg(".");
       }
     }
 
-    g_LastPacifierDrawn = iCur;
+    g_LastPacifierDrawn = it;
   }
 }
 

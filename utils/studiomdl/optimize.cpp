@@ -76,7 +76,7 @@ struct TotalMeshStats_t
 	int m_TotalVerts;
 	int m_TotalIndices;
 	int m_TotalBoneStateChanges;
-	int m_TotalMaterialReplacements;
+	intp m_TotalMaterialReplacements;
 };
 
 struct Triangle_t
@@ -108,8 +108,9 @@ struct Strip_t
 	// these are the verts and indices that are used while building.
 	// (there may be verts in here that aren't use in the stripGroup.)
 	CUtlVector<Vertex_t> verts;
-	int numIndices;
-	unsigned short *pIndices;
+	intp numIndices;
+	// dimhotepus: unsgined short -> size_t.
+	size_t *pIndices;
 
 	unsigned int flags;
 
@@ -132,7 +133,8 @@ struct Strip_t
 
 typedef CUtlVector<Vertex_t>	VertexList_t;
 typedef CUtlVector<Triangle_t>	TriangleList_t;
-typedef CUtlVector<unsigned short>	VertexIndexList_t;
+// dimhotepus: unsigned short -> unsigned int.
+typedef CUtlVector<unsigned>	VertexIndexList_t;
 typedef CUtlVector<Strip_t>		StripList_t;
 typedef CUtlVector<bool>		TriangleProcessedList_t;
 
@@ -142,26 +144,24 @@ typedef CUtlVector<bool>		TriangleProcessedList_t;
 class CStringTable
 {
 public:
-	int StringTableOffset( const char *string )
+	intp StringTableOffset( const char *string ) const
 	{
-		int i;
-		int size = 0;
-		for( i = 0; i < m_Strings.Size(); i++ )
+		intp size = 0;
+		for( auto &s : m_Strings )
 		{
-			if( stricmp( m_Strings[i].Base(), string ) == 0 )
+			if( stricmp( s.Base(), string ) == 0 )
 			{
 				return size;
 			}
-			size += m_Strings[i].Size();
+			size += s.Count();
 		}
 		return -1;
 	}
-	bool StringPresent( const char *string )
+	bool StringPresent( const char *string ) const
 	{
-		int i;
-		for( i = 0; i < m_Strings.Size(); i++ )
+		for( auto &s : m_Strings )
 		{
-			if( stricmp( m_Strings[i].Base(), string ) == 0 )
+			if( stricmp( s.Base(), string ) == 0 )
 			{
 				return true;
 			}
@@ -175,37 +175,36 @@ public:
 			return;
 		}
 		CUtlVector<char> &s = m_Strings[m_Strings.AddToTail()];
-		int size = strlen( newString ) + 1;
+		intp size = strlen( newString ) + 1;
 		s.AddMultipleToTail( size );
-		strcpy( s.Base(), newString );
+		V_strncpy( s.Base(), newString, s.Count() );
 	}
 	void Purge()
 	{
 		m_Strings.Purge();
 	}
-	int CalcSize( void )
+	intp CalcSize( void ) const
 	{
-		int size = 0;
-		int i;
-		for( i = 0; i < m_Strings.Size(); i++ )
+		intp size = 0;
+		for( auto &s : m_Strings )
 		{
-			size += m_Strings[i].Size();
+			size += s.Count();
 		}
 		return size;
 	}
 	void WriteToMem( char *pDst )
 	{
-		int size = 0;
-		int i;
-		for( i = 0; i < m_Strings.Size(); i++ )
+		intp size = 0;
+		for( auto &s : m_Strings )
 		{
 #ifdef _DEBUG
-			int j = Q_strlen( m_Strings[i].Base() ) + 1;
-			int k = m_Strings[i].Size();
+			intp j = Q_strlen( s.Base() ) + 1;
+			intp k = s.Count();
 			Assert( j == k );
 #endif
-			memcpy( pDst + size, m_Strings[i].Base(), m_Strings[i].Size() );
-			size += m_Strings[i].Size();
+
+			memcpy( pDst + size, s.Base(), s.Count() );
+			size += s.Count();
 		}
 	}
 private:
@@ -323,7 +322,7 @@ private:
 
 	// Actually does the stripification
 	void Stripify( VertexIndexList_t const& sourceIndices, bool isHWSkinned,
-					int* pNumIndices, unsigned short** ppIndices );
+					intp* pNumIndices, size_t** ppIndices );
 
 	// Makes sure our vertices are using the correct bones
 	void SanityCheckVertBones( VertexIndexList_t const& list, VertexList_t const& vertices );
@@ -379,8 +378,8 @@ private:
 	void WriteMesh( int meshID, Mesh_t *pMesh, int stripGroupID );
 	void WriteStripGroup( int stripGroupID, StripGroup_t *pStripGroup,
 						  int vertID, int indexID, int stripID );
-	int WriteVerts( int vertID, StripGroup_t *pStripGroup );
-	int WriteIndices( int indexID, StripGroup_t *pStripGroup );
+	intp WriteVerts( int vertID, StripGroup_t *pStripGroup );
+	intp WriteIndices( int indexID, StripGroup_t *pStripGroup );
 	void WriteStrip( int stripID, Strip_t *pStrip, int indexID, int vertID, int boneID );
 	void WriteBoneStateChange( int boneID, BoneStateChange_t *boneStateChange );
 	
@@ -405,11 +404,11 @@ private:
 	void CheckVert( Vertex_t *pVert, int maxBonesPerTri, int maxBonesPerVert );
 	void CheckAllVerts( int maxBonesPerTri, int maxBonesPerVert );
 	void SortBonesWithinVertex( bool flexed, Vertex_t *vert, mstudiomodel_t *pStudioModel, mstudiomesh_t *pStudioMesh, int *globalToHardwareBoneIndex, int *hardwareToGlobalBoneIndex, int maxBonesPerTri, int maxBonesPerVert );
-	int GetTotalVertsForMesh( Mesh_t *pMesh );
-	int GetTotalIndicesForMesh( Mesh_t *pMesh );
-	int GetTotalStripsForMesh( Mesh_t *pMesh );
-	int GetTotalStripGroupsForMesh( Mesh_t *pMesh );
-	int GetTotalBoneStateChangesForMesh( Mesh_t *pMesh );
+	intp GetTotalVertsForMesh( Mesh_t *pMesh );
+	intp GetTotalIndicesForMesh( Mesh_t *pMesh );
+	intp GetTotalStripsForMesh( Mesh_t *pMesh );
+	intp GetTotalStripGroupsForMesh( Mesh_t *pMesh );
+	intp GetTotalBoneStateChangesForMesh( Mesh_t *pMesh );
 	bool MeshNeedsRemoval( studiohdr_t *pHdr, mstudiomesh_t *pStudioMesh,
 												   LodScriptData_t& scriptLOD );
 
@@ -538,11 +537,10 @@ void COptimizedModel::SanityCheckAgainstStudioHDR( studiohdr_t *phdr )
 
 static Triangle_t *GetNextUntouched( TriangleList_t& triangles )
 {
-	int i;
-	for( i = 0; i < triangles.Size(); i++ )
+	for( auto &t : triangles )
 	{
-		if( !triangles[i].touched )
-			return &triangles[i];
+		if( !t.touched )
+			return &t;
 	}
 	return 0;
 }
@@ -575,21 +573,20 @@ Triangle_t* COptimizedModel::GetNextUntouchedWithoutBoneStateChange( TriangleLis
 	Triangle_t *bestTriangle = 0;
 	int bestNumNewBones = MAX_NUM_BONES_PER_TRI + 1;
 	
-	int i;
-	for( i = 0; i < triangles.Size(); i++ )
+	for( auto &t : triangles )
 	{
 		// We haven't processed this one, so let's try it
-		if( !triangles[i].touched )
+		if( !t.touched )
 		{
 			// How many bones are not represented in the current state?
-			int numNewBones = ComputeNewBonesNeeded( triangles[i] );
+			int numNewBones = ComputeNewBonesNeeded( t );
 
 			// if this triangle fit and if it's the best so far, save it.
 			if ( (numNewBones <= m_HardwareMatrixState.FreeMatrixCount()) && 
 				 (numNewBones < bestNumNewBones ) )
 			{
 				bestNumNewBones = numNewBones;
-				bestTriangle = &triangles[i];
+				bestTriangle = &t;
 
 				// Can't get any better than this!
 				if (bestNumNewBones == 0)
@@ -610,20 +607,19 @@ Triangle_t *COptimizedModel::GetNextUntouchedWithLeastBoneStateChanges( Triangle
 {
 	Triangle_t *bestTriangle = 0;
 	int bestNumNewBones = MAX_NUM_BONES_PER_TRI + 1;
-	int i;
 	
 	// For this one, just find the triangle that needs the least number
 	// of new bones. That way, we'll not have to change too many states
-	for( i = 0; i < triangles.Size(); i++ )
+	for( auto &t : triangles )
 	{
-		if( !triangles[i].touched )
+		if( !t.touched )
 		{
-			int numNewBones = ComputeNewBonesNeeded( triangles[i] );
+			int numNewBones = ComputeNewBonesNeeded( t );
 
 			if( numNewBones < bestNumNewBones )
 			{
 				bestNumNewBones = numNewBones;
-				bestTriangle = &triangles[i];
+				bestTriangle = &t;
 			}
 		}
 	}
@@ -675,8 +671,7 @@ bool COptimizedModel::AllocateHardwareBonesForTriangle( Triangle_t *tri )
 Triangle_t *COptimizedModel::GetNextTriangle( TriangleList_t& tris, bool allowNewStrip )
 {
 	// First try to get a triangle that doesn't involve changing matrix state
-	Triangle_t *tri;
-	tri = GetNextUntouchedWithoutBoneStateChange( tris );
+	Triangle_t *tri = GetNextUntouchedWithoutBoneStateChange( tris );
 
 	// If that didn't work, pick the triangle that changes the state the least
 	if( !tri && allowNewStrip )
@@ -697,16 +692,15 @@ void COptimizedModel::SanityCheckVertBones( VertexIndexList_t const& list, Verte
 {
 #ifdef _DEBUG
 	Vertex_t const *pVert;
-	int i;
-	for( i = 0; i < list.Size(); i++ )
+	for( auto &l : list )
 	{
-		pVert = &vertices[list[i]];
+		pVert = &vertices[l];
 		if( !g_staticprop )
 		{
 			Assert( pVert->numBones != 0 );
 		}
-		int j;
-		for( j = 0; j < pVert->numBones; j++ )
+
+		for( int j = 0; j < pVert->numBones; j++ )
 		{
 			if( pVert->boneID[j] == -1 )
 			{
@@ -726,9 +720,9 @@ void COptimizedModel::SanityCheckVertBones( VertexIndexList_t const& list, Verte
 // Make sure all vertices we've added up to now use bones in the matrix list
 //-----------------------------------------------------------------------------
 void COptimizedModel::Stripify( VertexIndexList_t const& sourceIndices, bool isHWSkinned,
-							    int* pNumIndices, unsigned short** ppIndices ) 
+							    intp* pNumIndices, size_t** ppIndices ) 
 {
-	if( sourceIndices.Size() == 0 )
+	if ( sourceIndices.Count() == 0 )
 	{
 		*ppIndices = 0;
 		*pNumIndices = 0;
@@ -739,31 +733,39 @@ void COptimizedModel::Stripify( VertexIndexList_t const& sourceIndices, bool isH
 	if ( g_bBuildPreview || isHWSkinned == false )
 	{
 		*pNumIndices = sourceIndices.Count();
-		*ppIndices = new unsigned short[*pNumIndices];
-		memcpy( *ppIndices, sourceIndices.Base(), (*pNumIndices) * sizeof(unsigned short) );
+		*ppIndices = new size_t[*pNumIndices];
+
+		// dimhotepus: Downcast unsigned int -> size_t?
+		intp j = 0;
+		for (auto si : sourceIndices)
+		{
+			*ppIndices[j++] = si;
+		}
+
 		return;
 	}
 
 /*
 	printf( "Stripify\n" );
-	int i;
-	for( i = 0; i < sourceIndices.Size(); i++ )
+	for( intp i = 0; i < sourceIndices.Count(); i++ )
 	{
 		printf( "stripindex: %d\n", sourceIndices[i] );
 	}
 */
 
 #ifdef NVTRISTRIP
-	PrimitiveGroup *primGroups;
-	unsigned short numPrimGroups;
+	nv::tristrip::PrimitiveGroup *primGroups;
+	size_t numPrimGroups;
 
 	// Be sure to call delete[] on the returned primGroups to avoid leaking mem
-	GenerateStrips( &sourceIndices[0], sourceIndices.Size(),
+	nv::tristrip::GenerateStrips( &sourceIndices[0], sourceIndices.Count(),
 		&primGroups, &numPrimGroups );
 	Assert( numPrimGroups == 1 );
+
 	*pNumIndices = primGroups->numIndices;
-	*ppIndices = new unsigned short[*pNumIndices];
-	memcpy( *ppIndices, primGroups->indices, sizeof( unsigned short ) * *pNumIndices );
+	*ppIndices = new size_t[*pNumIndices];
+
+	memcpy( *ppIndices, primGroups->indices, sizeof( size_t ) * *pNumIndices );
 	delete [] primGroups;
 #endif
 }
@@ -789,9 +791,9 @@ void COptimizedModel::BuildStripsRecursive( VertexIndexList_t& indices,
 	// then add the vertices of all the neighboring triangles.
 	triangle->touched = true;
 
-	indices.AddToTail( ( unsigned short )triangle->vertID[0] );
-	indices.AddToTail( ( unsigned short )triangle->vertID[1] );
-	indices.AddToTail( ( unsigned short )triangle->vertID[2] );
+	indices.AddToTail( ( unsigned int )triangle->vertID[0] );
+	indices.AddToTail( ( unsigned int )triangle->vertID[1] );
+	indices.AddToTail( ( unsigned int )triangle->vertID[2] );
 
 	// Try to add our neighbors
 	if( triangle->neighborTriID[0] != -1 )
@@ -820,7 +822,7 @@ void COptimizedModel::BuildHWSkinnedStrips( TriangleList_t& triangles,
 
 	// Empty out the list of triangles to be stripified.
 	VertexIndexList_t trianglesToStrip;
-	trianglesToStrip.EnsureCapacity( triangles.Size() * 3 );
+	trianglesToStrip.EnsureCapacity( triangles.Count() * 3 );
 
 	// pick any old unused triangle to start with.
 	Triangle_t *pSeedTri = GetNextUntouched( triangles );
@@ -844,7 +846,7 @@ void COptimizedModel::BuildHWSkinnedStrips( TriangleList_t& triangles,
 			continue;
 
 		// Save the results of the generated strip.
-		int stripIdx = pStripGroup->strips.AddToTail( );
+		intp stripIdx = pStripGroup->strips.AddToTail( );
 		Strip_t& newStrip = pStripGroup->strips[stripIdx];
 
 		// Compute the strip flags
@@ -864,10 +866,9 @@ void COptimizedModel::BuildHWSkinnedStrips( TriangleList_t& triangles,
 		Stripify( trianglesToStrip, true, &newStrip.numIndices, &newStrip.pIndices );
 
 		// hack - should just build directly into newStrip.verts instead of using a global.
-		int i;
-		for( i = 0; i < vertices.Size(); i++ )
+		for( auto &v : vertices )
 		{
-			newStrip.verts.AddToTail( vertices[i] );
+			newStrip.verts.AddToTail( v );
 		}
 
 		// Compute the number of bones in this strip
@@ -875,7 +876,7 @@ void COptimizedModel::BuildHWSkinnedStrips( TriangleList_t& triangles,
 		Assert( newStrip.numBoneStateChanges <= maxBonesPerStrip );
 
 		// Save off the bones used for this strip.
-		for( i = 0; i < m_HardwareMatrixState.AllocatedMatrixCount(); i++ )
+		for( int i = 0; i < m_HardwareMatrixState.AllocatedMatrixCount(); i++ )
 		{
 			newStrip.boneStateChanges[i].hardwareID = i;
 			newStrip.boneStateChanges[i].newBoneID = m_HardwareMatrixState.GetNthBoneGlobalID( i );
@@ -897,7 +898,7 @@ void COptimizedModel::BuildSWSkinnedStrips( TriangleList_t& triangles,
 	VertexList_t const& vertices, StripGroup_t *pStripGroup )
 {
 	// Save the results of the generated strip.
-	int stripIdx = pStripGroup->strips.AddToTail( );
+	intp stripIdx = pStripGroup->strips.AddToTail( );
 	Strip_t& newStrip = pStripGroup->strips[stripIdx];
 
 	// Set the strip flags
@@ -908,12 +909,12 @@ void COptimizedModel::BuildSWSkinnedStrips( TriangleList_t& triangles,
 	newStrip.flags |= STRIP_IS_TRISTRIP;
 #endif
 
-	int nTriangleCount = triangles.Count();
+	intp nTriangleCount = triangles.Count();
 
 	VertexIndexList_t indices;
 	indices.EnsureCapacity( nTriangleCount * 3 );
 
-	for( int i = 0; i < nTriangleCount; i++ )
+	for( intp i = 0; i < nTriangleCount; i++ )
 	{
 		Triangle_t* triangle = &triangles[i];
 		triangle->touched = true;
@@ -925,7 +926,7 @@ void COptimizedModel::BuildSWSkinnedStrips( TriangleList_t& triangles,
 	Stripify( indices, false, &newStrip.numIndices, &newStrip.pIndices );
 
 	// hack - should just build directly into newStrip.verts instead of using a global.
-	for( int i = 0; i < vertices.Size(); i++ )
+	for( intp i = 0; i < vertices.Count(); i++ )
 	{
 		newStrip.verts.AddToTail( vertices[i] );
 	}
@@ -1166,10 +1167,10 @@ int COptimizedModel::CountMaxVertBones( int count, Vertex_t *pVertex ) const
 // Adds a vertex to the list of vertices to be added to the strip group
 //-----------------------------------------------------------------------------
 
-static int FindOrCreateVertex( VertexList_t& list, Vertex_t const& vert )
+static intp FindOrCreateVertex( VertexList_t& list, Vertex_t const& vert )
 {
-	int i;
-	for( i = 0; i < list.Size(); i++ )
+	intp i;
+	for( i = 0; i < list.Count(); i++ )
 	{
 		if (list[i].origMeshVertID == vert.origMeshVertID)
 		{
@@ -1285,8 +1286,8 @@ void COptimizedModel::BuildNeighborInfo( TriangleList_t& list, int nMaxVertexId 
 	memset( vertexToEdges.Base(), 0, nMaxVertexId * sizeof(int) );
 
 	int pEdgeVertIds[2];
-	int nTriCount = list.Count();
-	for ( int i = 0; i < nTriCount; ++i )
+	intp nTriCount = list.Count();
+	for ( intp i = 0; i < nTriCount; ++i )
 	{
 		Triangle_t &tri = list[i];
 
@@ -1324,7 +1325,7 @@ void COptimizedModel::ProcessStripGroup( StripGroup_t *pStripGroup, bool isHWSki
 	// We could precompute those flags just once (instead of doing it 4 times)
 
 	// Add each face to the stripgroup, if it's appropriate
-	for( int n=0; n < srcFaces.Size(); ++n )
+	for( intp n=0; n < srcFaces.Count(); ++n )
 	{
 		// Don't bother processing a triangle that's already been done
 		if (trianglesProcessed[n])
@@ -1369,7 +1370,7 @@ void COptimizedModel::ProcessStripGroup( StripGroup_t *pStripGroup, bool isHWSki
 		}
 
 		// Add a new triangle to our list of triangles
-		int triIndex = stripGroupSourceTriangles.AddToTail( );
+		intp triIndex = stripGroupSourceTriangles.AddToTail( );
 
 		Triangle_t& newTri = stripGroupSourceTriangles[triIndex];
 		newTri.vertID[0] = FindOrCreateVertex( stripGroupVertices, stripGroupVert[0] );
@@ -1384,7 +1385,7 @@ void COptimizedModel::ProcessStripGroup( StripGroup_t *pStripGroup, bool isHWSki
 	}
 	
 	// No mesh? bye bye
-	if (stripGroupSourceTriangles.Size() == 0)
+	if (stripGroupSourceTriangles.Count() == 0)
 		return;
 
 	// Figure out neighboring triangles
@@ -1397,7 +1398,7 @@ void COptimizedModel::ProcessStripGroup( StripGroup_t *pStripGroup, bool isHWSki
 
 		// Check to see if any strips were produced that are too small
 		// If so, remove them, and let the software pass take care of them.
-		//if (stripGroupSourceTriangles.Size() < m_MinimumGroupSize
+		//if (stripGroupSourceTriangles.Count() < m_MinimumGroupSize
 		//	trianglesProcessed[n] = false;
 	}
 	else
@@ -1450,33 +1451,30 @@ int COptimizedModel::CountUniqueBonesInStrip( StripGroup_t *pStripGroup, Strip_t
 
 void COptimizedModel::PostProcessStripGroup( mstudiomodel_t *pStudioModel, mstudiomesh_t *pStudioMesh, StripGroup_t *pStripGroup )
 {
-	int i;
-	
 	// We're gonna compile all of the vertices in the current strip into
 	// the current strip group's vertex list
-	for( i = 0; i < pStripGroup->strips.Size(); i++ )
+	for( intp i = 0; i < pStripGroup->strips.Count(); i++ )
 	{
 		// create sorted strip verts and indices in the stripgroup
 		Strip_t *pStrip = &pStripGroup->strips[i];
-		int vertOffset = pStripGroup->verts.Size();
+		intp vertOffset = pStripGroup->verts.Count();
 		pStrip->stripGroupVertexOffset = vertOffset;
-		pStrip->stripGroupIndexOffset = pStripGroup->indices.Size();
+		pStrip->stripGroupIndexOffset = pStripGroup->indices.Count();
 
 		// make sure we have enough memory allocated
-		pStripGroup->indices.EnsureCapacity( pStripGroup->indices.Size() + pStrip->numIndices );
+		pStripGroup->indices.EnsureCapacity( pStripGroup->indices.Count() + pStrip->numIndices );
 
 		// Try to find each of the strip's vertices in the strip group
 		int maxNumBones = 0;
 		int j;
 		for( j = 0; j < pStrip->numIndices; j++ )
 		{
-			int newIndex = -1;
+			intp newIndex = -1;
 			int index = pStrip->pIndices[j];
 			Vertex_t *pVert = &pStrip->verts[index];
 
 			// Does this vertex exist in the strip group?
-			int k;
-			for( k = vertOffset; k < pStripGroup->verts.Size(); k++ )
+			for( intp k = vertOffset; k < pStripGroup->verts.Count(); k++ )
 			{
 				if( pVert->origMeshVertID == pStripGroup->verts[k].origMeshVertID )
 				{
@@ -1494,9 +1492,8 @@ void COptimizedModel::PostProcessStripGroup( mstudiomodel_t *pStudioModel, mstud
 
 #ifdef _DEBUG
 			//	float GetOrigVertBoneWeightValue( mstudiomodel_t *pStudioModel, mstudiomesh_t *pStudioMesh, Vertex_t *pVert, int boneID );
-			int i;
-			float *pWeight = ( float * )_alloca( sizeof( float ) * pVert->numBones );
-			for( i = 0; i < pVert->numBones; i++ )
+			float *pWeight = stackallocT( float, pVert->numBones );
+			for( int i = 0; i < pVert->numBones; i++ )
 			{
 				pWeight[i] = GetOrigVertBoneWeightValue( pStudioModel, pStudioMesh, pVert, i );
 			}
@@ -1506,8 +1503,8 @@ void COptimizedModel::PostProcessStripGroup( mstudiomodel_t *pStudioModel, mstud
 			if (pVert->numBones > maxNumBones)
 				maxNumBones = pVert->numBones;
 		}
-		pStrip->numStripGroupIndices = pStripGroup->indices.Size() - pStrip->stripGroupIndexOffset;
-		pStrip->numStripGroupVerts = pStripGroup->verts.Size() - pStrip->stripGroupVertexOffset;
+		pStrip->numStripGroupIndices = pStripGroup->indices.Count() - pStrip->stripGroupIndexOffset;
+		pStrip->numStripGroupVerts = pStripGroup->verts.Count() - pStrip->stripGroupVertexOffset;
 
 		// The number of bones in a strip is the max number of 
 		// bones in a vertex in this strip for vertex shaders, and it's the
@@ -1582,8 +1579,8 @@ void COptimizedModel::ProcessMesh( Mesh_t *pMesh, studiohdr_t *pStudioHeader,
 	// because we're gonna add all unprocessed faces to the software
 	// lists if for some reason they don't get added to the hardware lists
 	TriangleProcessedList_t	trianglesProcessed;
-	trianglesProcessed.AddMultipleToTail( srcFaces.Size() ); 
-	memset( trianglesProcessed.Base(), 0, trianglesProcessed.Size() );
+	trianglesProcessed.AddMultipleToTail( srcFaces.Count() ); 
+	memset( trianglesProcessed.Base(), 0, trianglesProcessed.Count() );
 	
 	// there are up to 4 stripgroups per mesh
 	// Note that we're gonna do the HW skinned versions first
@@ -1608,7 +1605,7 @@ void COptimizedModel::ProcessMesh( Mesh_t *pMesh, studiohdr_t *pStudioHeader,
 				realMaxBonesPerStrip = m_MaxBonesPerStrip;
 			}
 
-			int newStripGroupIndex = pMesh->stripGroups.AddToTail( );
+			intp newStripGroupIndex = pMesh->stripGroups.AddToTail( );
 			StripGroup_t& newStripGroup = pMesh->stripGroups[newStripGroupIndex];
 			ProcessStripGroup( &newStripGroup, 
 				isHWSkinned ? true : false, 
@@ -1619,7 +1616,7 @@ void COptimizedModel::ProcessMesh( Mesh_t *pMesh, studiohdr_t *pStudioHeader,
 			PostProcessStripGroup( pStudioModel, pStudioMesh, &newStripGroup );
 
 			// Clear out the strip group if there wasn't anything in it
-			if( !newStripGroup.indices.Size() )
+			if( !newStripGroup.indices.Count() )
 				pMesh->stripGroups.FastRemove( newStripGroupIndex );
 		}
 	}
@@ -1635,13 +1632,13 @@ void COptimizedModel::SetupMeshProcessing( studiohdr_t *pHdr, int vertexCacheSiz
 {
 #ifdef NVTRISTRIP
 	// tell nvtristrip all of it's params
-	SetCacheSize( vertexCacheSize );
-	SetStitchStrips( true );
-	SetMinStripSize( 0 );
+	nv::tristrip::SetCacheSize( vertexCacheSize );
+	nv::tristrip::SetStitchStrips( true );
+	nv::tristrip::SetMinStripSize( 0 );
 #	ifdef EMIT_TRILISTS
-	SetListsOnly( true );
+	nv::tristrip::SetListsOnly( true );
 #	else
-	SetListsOnly( false );
+	nv::tristrip::SetListsOnly( false );
 #	endif
 #endif // NVTRISTRIP
 	
@@ -1678,56 +1675,51 @@ void COptimizedModel::SetupMeshProcessing( studiohdr_t *pHdr, int vertexCacheSiz
 // Process the entire model, return stats...
 //-----------------------------------------------------------------------------
 
-int COptimizedModel::GetTotalVertsForMesh( Mesh_t *pMesh )
+intp COptimizedModel::GetTotalVertsForMesh( Mesh_t *pMesh )
 {
-	int numVerts = 0;
-	int i;
-	for( i = 0; i < pMesh->stripGroups.Size(); i++ )
+	intp numVerts = 0;
+	for( intp i = 0; i < pMesh->stripGroups.Count(); i++ )
 	{
 		StripGroup_t *pStripGroup = &pMesh->stripGroups[i];
-		numVerts += pStripGroup->verts.Size();
+		numVerts += pStripGroup->verts.Count();
 	}
 	return numVerts;
 }
 
-int COptimizedModel::GetTotalIndicesForMesh( Mesh_t *pMesh )
+intp COptimizedModel::GetTotalIndicesForMesh( Mesh_t *pMesh )
 {
-	int numIndices = 0;
-	int i;
-	for( i = 0; i < pMesh->stripGroups.Size(); i++ )
+	intp numIndices = 0;
+	for( intp i = 0; i < pMesh->stripGroups.Count(); i++ )
 	{
 		StripGroup_t *pStripGroup = &pMesh->stripGroups[i];
-		numIndices += pStripGroup->indices.Size();
+		numIndices += pStripGroup->indices.Count();
 	}
 	return numIndices;
 }
 
-int COptimizedModel::GetTotalStripsForMesh( Mesh_t *pMesh )
+intp COptimizedModel::GetTotalStripsForMesh( Mesh_t *pMesh )
 {
-	int numStrips = 0;
-	int i;
-	for( i = 0; i < pMesh->stripGroups.Size(); i++ )
+	intp numStrips = 0;
+	for( intp i = 0; i < pMesh->stripGroups.Count(); i++ )
 	{
 		StripGroup_t *pStripGroup = &pMesh->stripGroups[i];
-		numStrips += pStripGroup->strips.Size();
+		numStrips += pStripGroup->strips.Count();
 	}
 	return numStrips;
 }
 
-int COptimizedModel::GetTotalStripGroupsForMesh( Mesh_t *pMesh )
+intp COptimizedModel::GetTotalStripGroupsForMesh( Mesh_t *pMesh )
 {
-	return pMesh->stripGroups.Size();
+	return pMesh->stripGroups.Count();
 }
 
-int COptimizedModel::GetTotalBoneStateChangesForMesh( Mesh_t *pMesh )
+intp COptimizedModel::GetTotalBoneStateChangesForMesh( Mesh_t *pMesh )
 {
-	int numBoneStateChanges = 0;
-	int i;
-	for( i = 0; i < pMesh->stripGroups.Size(); i++ )
+	intp numBoneStateChanges = 0;
+	for( intp i = 0; i < pMesh->stripGroups.Count(); i++ )
 	{
 		StripGroup_t *pStripGroup = &pMesh->stripGroups[i];
-		int j;
-		for( j = 0; j < pStripGroup->strips.Size(); j++ )
+		for( intp j = 0; j < pStripGroup->strips.Count(); j++ )
 		{
 			Strip_t *pStrip = &pStripGroup->strips[j];
 			numBoneStateChanges += pStrip->numBoneStateChanges;
@@ -1737,45 +1729,6 @@ int COptimizedModel::GetTotalBoneStateChangesForMesh( Mesh_t *pMesh )
 }
 
 
-
-/*
-static void WriteDebugFile( const char *fileName, const char *outFileName, float red, float grn, float blu )
-{
-	char *tmpName = ( char * )_alloca( strlen( fileName ) + 1 );
-	strcpy( tmpName, fileName );
-	
-	s_source_t *pSrc = Load_Source( tmpName, "SMD" );
-	Assert( pSrc );
-
-	int i, j;
-
-	FILE *fp;
-	fp = fopen( outFileName, "w" );
-	Assert( fp );
-	
-	for( i = 0; i < pSrc->nummeshes; i++ )
-	{
-		s_mesh_t *pMesh = &pSrc->mesh[i];
-		for( j = 0; j < pMesh->numfaces; j++ )
-		{
-			s_face_t *pFace = &pSrc->face[pMesh->faceoffset + j];
-			Vector &a = pSrc->vertex[pMesh->vertexoffset + pFace->a];
-			Vector &b = pSrc->vertex[pMesh->vertexoffset + pFace->b];
-			Vector &c = pSrc->vertex[pMesh->vertexoffset + pFace->c];
-			fprintf( fp, "3\n" );
-			fprintf( fp, "%f %f %f %f %f %f\n", ( float )( a[0] ), ( float )( a[1] ), ( float )( a[2] ), 
-				( float )red, ( float )grn, ( float )blu );
-			fprintf( fp, "%f %f %f %f %f %f\n", ( float )( b[0] ), ( float )( b[1] ), ( float )( b[2] ), 
-				( float )red, ( float )grn, ( float )blu );
-			fprintf( fp, "%f %f %f %f %f %f\n", ( float )( c[0] ), ( float )( c[1] ), ( float )( c[2] ), 
-				( float )red, ( float )grn, ( float )blu );
-		}
-
-	}
-	fclose( fp );
-}
-*/
-
 void COptimizedModel::SourceMeshToTriangleList( s_model_t *pSrcModel, s_mesh_t *pSrcMesh, 
 										  CUtlVector<mstudioiface_t> &meshTriangleList )
 {
@@ -1784,7 +1737,7 @@ void COptimizedModel::SourceMeshToTriangleList( s_model_t *pSrcModel, s_mesh_t *
 	for ( i = 0; i < pSrcMesh->numfaces; i++ )
 	{
 		const s_face_t &pFace = pFaces[i];
-		int j = meshTriangleList.AddToTail();
+		intp j = meshTriangleList.AddToTail();
 		mstudioiface_t &newTriangle = meshTriangleList[j];
 		newTriangle.a = pFace.a;
 		newTriangle.b = pFace.b;
@@ -1969,7 +1922,7 @@ void COptimizedModel::CreateLODTriangleList( s_model_t *pSrcModel, int nLodID, s
 	// build the lod's faces so indexes map to remapped vertexes
 	for ( i = 0; i < pSrcMesh->numfaces; i++ )
 	{
-		int index = meshTriangleList.AddToTail();
+		intp index = meshTriangleList.AddToTail();
 		mstudioiface_t& newFace = meshTriangleList[index];
 		const s_face_t &srcFace = pSrc->face[pSrcMesh->faceoffset + i];
 		newFace.a = indexMapping[srcFace.a];
@@ -2014,8 +1967,7 @@ bool COptimizedModel::MeshNeedsRemoval( studiohdr_t *pHdr, mstudiomesh_t *pStudi
 	short *pskinref	= pHdr->pSkinref( 0 );
 	ptexture = pHdr->pTexture( pskinref[ pStudioMesh->material ] );
 	const char *meshName = ptexture->material->GetName();
-	int i;
-	for( i = 0; i < scriptLOD.meshRemovals.Size(); i++ )
+	for( intp i = 0; i < scriptLOD.meshRemovals.Count(); i++ )
 	{
 		const char *meshRemovalName = scriptLOD.meshRemovals[i].GetSrcName();
 		if ( ComparePath( meshName, meshRemovalName ) )
@@ -2036,23 +1988,23 @@ void COptimizedModel::ProcessModel( studiohdr_t *pHdr, s_bodypart_t *pSrcBodyPar
 	memset( &stats, 0, sizeof(stats) );
 	m_Models.RemoveAll();
 
-	int bodyPartID, modelID, meshID, lodID;
+	int bodyPartID, modelID, meshID;
 	for ( bodyPartID = 0; bodyPartID < pHdr->numbodyparts; bodyPartID++, stats.m_TotalBodyParts++ )
 	{
 		mstudiobodyparts_t *pBodyPart = pHdr->pBodypart( bodyPartID );
 		s_bodypart_t *pSrcBodyPart = &pSrcBodyParts[bodyPartID];
 		for ( modelID = 0; modelID < pBodyPart->nummodels; modelID++, stats.m_TotalModels++ )
 		{
-			int i = m_Models.AddToTail();
+			intp i = m_Models.AddToTail();
 			Model_t& newModel = m_Models[i];
 			mstudiomodel_t *pStudioModel = pBodyPart->pModel( modelID );
 			s_model_t *pSrcModel = pSrcBodyPart->pmodel[modelID];
-			for ( lodID = 0; lodID < g_ScriptLODs.Count(); lodID++, stats.m_TotalModelLODs++ )
+			for ( intp lodID = 0; lodID < g_ScriptLODs.Count(); lodID++, stats.m_TotalModelLODs++ )
 			{
 				LodScriptData_t& scriptLOD = g_ScriptLODs[lodID];
 				s_source_t *pLODSource = pSrcModel->m_LodSources[lodID];
 
-				int i = newModel.modelLODs.AddToTail();
+				intp i = newModel.modelLODs.AddToTail();
 				Assert( i == lodID );
 				ModelLOD_t& newLOD = newModel.modelLODs[i];
 				newLOD.switchPoint = scriptLOD.switchValue;
@@ -2076,7 +2028,7 @@ void COptimizedModel::ProcessModel( studiohdr_t *pHdr, s_bodypart_t *pSrcBodyPar
 					mstudiomesh_t *pStudioMesh = pStudioModel->pMesh( meshID );
 					s_mesh_t *pSrcMesh = &pSrcModel->source->mesh[pSrcModel->source->meshindex[meshID]];
 
-					int i = newLOD.meshes.AddToTail();
+					intp i = newLOD.meshes.AddToTail();
 					Assert( i == meshID );
 					Mesh_t& newMesh = newLOD.meshes[i];
 					
@@ -2240,7 +2192,7 @@ void COptimizedModel::WriteHeader( int vertCacheSize, int maxBonesPerVert,
 	fileHeader.numBodyParts = numBodyParts;
 	fileHeader.bodyPartOffset = sizeof( FileHeader_t );
 	fileHeader.checkSum = checkSum;
-	fileHeader.numLODs = g_ScriptLODs.Size();
+	fileHeader.numLODs = g_ScriptLODs.Count();
 	fileHeader.materialReplacementListOffset = m_MaterialReplacementsListOffset;
 	m_FileBuffer->WriteAt( 0, &fileHeader, sizeof( FileHeader_t ), "header" );
 #ifdef _DEBUG
@@ -2267,7 +2219,7 @@ void COptimizedModel::WriteBodyPart( int bodyPartID, mstudiobodyparts_t *pBodyPa
 void COptimizedModel::WriteModel( int modelID, mstudiomodel_t *pModel, int lodID )
 {
 	ModelHeader_t model;
-	model.numLODs = IsChar( g_ScriptLODs.Size() );
+	model.numLODs = IsChar( g_ScriptLODs.Count() );
 	int modelFileOffset = m_ModelsOffset + modelID * sizeof( ModelHeader_t );
 	int lodFileOffset = m_ModelLODsOffset + lodID * sizeof( ModelLODHeader_t );
 	model.lodOffset = lodFileOffset - modelFileOffset;
@@ -2284,7 +2236,7 @@ void COptimizedModel::WriteModelLOD( int lodID, ModelLOD_t *pLOD, int meshID )
 	int lodFileOffset = m_ModelLODsOffset + lodID * sizeof( ModelLODHeader_t );
 	int meshFileOffset = m_MeshesOffset + meshID * sizeof( MeshHeader_t );
 	lod.meshOffset = meshFileOffset - lodFileOffset;
-	lod.numMeshes = pLOD->meshes.Size();
+	lod.numMeshes = pLOD->meshes.Count();
 	lod.switchPoint = pLOD->switchPoint;
 	m_FileBuffer->WriteAt( lodFileOffset, &lod, sizeof( ModelLODHeader_t ), "modellod" );
 #ifdef _DEBUG
@@ -2296,7 +2248,7 @@ void COptimizedModel::WriteModelLOD( int lodID, ModelLOD_t *pLOD, int meshID )
 void COptimizedModel::WriteMesh( int meshID, Mesh_t *pMesh, int stripGroupID )
 {
 	MeshHeader_t mesh;
-	mesh.numStripGroups = IsChar( pMesh->stripGroups.Size() );
+	mesh.numStripGroups = IsChar( pMesh->stripGroups.Count() );
 	int meshFileOffset = m_MeshesOffset + meshID * sizeof( MeshHeader_t );
 	int stripGroupFileOffset = m_StripGroupsOffset + stripGroupID * sizeof( StripGroupHeader_t );
 	mesh.stripGroupHeaderOffset = stripGroupFileOffset - meshFileOffset;
@@ -2312,9 +2264,9 @@ void COptimizedModel::WriteStripGroup( int stripGroupID, StripGroup_t *pStripGro
 									   int vertID, int indexID, int stripID )
 {
 	StripGroupHeader_t stripGroup;
-	stripGroup.numVerts = pStripGroup->verts.Size();
-	stripGroup.numIndices = pStripGroup->indices.Size();
-	stripGroup.numStrips = pStripGroup->strips.Size();
+	stripGroup.numVerts = pStripGroup->verts.Count();
+	stripGroup.numIndices = pStripGroup->indices.Count();
+	stripGroup.numStrips = pStripGroup->strips.Count();
 	stripGroup.flags = IsByte( pStripGroup->flags );
 	int stripGroupFileOffset = m_StripGroupsOffset + stripGroupID * sizeof( StripGroupHeader_t );
 	int vertsFileOffset = m_VertsOffset + vertID * sizeof( Vertex_t );
@@ -2332,10 +2284,10 @@ void COptimizedModel::WriteStripGroup( int stripGroupID, StripGroup_t *pStripGro
 #endif
 }
 
-int COptimizedModel::WriteVerts( int vertID, StripGroup_t *pStripGroup )
+intp COptimizedModel::WriteVerts( int vertID, StripGroup_t *pStripGroup )
 {
 	int vertFileOffset = m_VertsOffset + vertID * sizeof( Vertex_t );
-	int numVerts = pStripGroup->verts.Size();
+	intp numVerts = pStripGroup->verts.Count();
 	m_FileBuffer->WriteAt( vertFileOffset, &pStripGroup->verts[0], sizeof( Vertex_t ) * numVerts, "verts" );
 #ifdef _DEBUG
 //	Vertex_t *debug = ( Vertex_t * )m_FileBuffer->GetPointer( vertFileOffset );
@@ -2343,10 +2295,10 @@ int COptimizedModel::WriteVerts( int vertID, StripGroup_t *pStripGroup )
 	return numVerts;
 }
 
-int COptimizedModel::WriteIndices( int indexID, StripGroup_t *pStripGroup )
+intp COptimizedModel::WriteIndices( int indexID, StripGroup_t *pStripGroup )
 {
 	int indexFileOffset = m_IndicesOffset + indexID * sizeof( unsigned short );
-	int numIndices = pStripGroup->indices.Size();
+	intp numIndices = pStripGroup->indices.Count();
 	m_FileBuffer->WriteAt( indexFileOffset, &pStripGroup->indices[0], sizeof( unsigned short ) * numIndices, "indices" );
 #ifdef _DEBUG
 //	unsigned short *debug = ( unsigned short * )m_FileBuffer->GetPointer( indexFileOffset );
@@ -2445,12 +2397,11 @@ void COptimizedModel::WriteStringTable( int stringTableOffset )
 void COptimizedModel::WriteMaterialReplacements( int materialReplacementsOffset )
 {
 	int offset = materialReplacementsOffset;
- 	int i, j;
-	int numLODs = g_ScriptLODs.Size();
-	for( i = 0; i < numLODs; i++ )
+	intp numLODs = g_ScriptLODs.Count();
+	for( intp i = 0; i < numLODs; i++ )
 	{
 		LodScriptData_t &scriptLOD = g_ScriptLODs[i];
-		for( j = 0; j < scriptLOD.materialReplacements.Size(); j++ )
+		for( intp j = 0; j < scriptLOD.materialReplacements.Count(); j++ )
 		{
 			CLodScriptReplacement_t &materialReplacement = scriptLOD.materialReplacements[j];
 			MaterialReplacementHeader_t tmpHeader;
@@ -2467,13 +2418,12 @@ void COptimizedModel::WriteMaterialReplacementLists( int materialReplacementsOff
 {
 	int replacementOffset = materialReplacementsOffset;
 	int offset = materialReplacementListOffset;
-	int i;
-	int numLODs = g_ScriptLODs.Size();
-	for( i = 0; i < numLODs; i++ )
+	intp numLODs = g_ScriptLODs.Count();
+	for( intp i = 0; i < numLODs; i++ )
 	{
 		LodScriptData_t &scriptLOD = g_ScriptLODs[i];
 		MaterialReplacementListHeader_t tmpHeader;
-		tmpHeader.numReplacements = IsChar( scriptLOD.materialReplacements.Size() );
+		tmpHeader.numReplacements = IsChar( scriptLOD.materialReplacements.Count() );
 		tmpHeader.replacementOffset = IsInt24( replacementOffset - offset );
 		m_FileBuffer->WriteAt( offset, &tmpHeader, sizeof( tmpHeader ), "material replacement headers" );
 		MaterialReplacementListHeader_t *pDebugList = 
@@ -2587,21 +2537,21 @@ void COptimizedModel::WriteVTXFile( studiohdr_t *pHdr, const char *pFileName,
 		{
 			mstudiomodel_t *pStudioModel = pBodyPart->pModel( modelID );
 			Model_t *pModel = &m_Models[curModel + deltaModel];
-			for( int lodID = 0; lodID < g_ScriptLODs.Count(); lodID++ )
+			for( intp lodID = 0; lodID < g_ScriptLODs.Count(); lodID++ )
 			{
 //				printf( "lod: %d\n", lodID );
 				ModelLOD_t *pLOD = &pModel->modelLODs[lodID];
 				for( int meshID = 0; meshID < pStudioModel->nummeshes; meshID++ )
 				{
 					Mesh_t *pMesh = &pLOD->meshes[meshID];
-					for( int stripGroupID = 0; stripGroupID < pMesh->stripGroups.Count(); stripGroupID++ )
+					for( intp stripGroupID = 0; stripGroupID < pMesh->stripGroups.Count(); stripGroupID++ )
 					{
 						StripGroup_t *pStripGroup = &pMesh->stripGroups[stripGroupID];
 						deltaVert += WriteVerts( curVert + deltaVert, pStripGroup );
 						deltaIndex += WriteIndices( curIndex + deltaIndex, pStripGroup );
 
-						int nStripCount = pStripGroup->strips.Count();
-						for( int stripID = 0; stripID < nStripCount; stripID++ )
+						intp nStripCount = pStripGroup->strips.Count();
+						for( intp stripID = 0; stripID < nStripCount; stripID++ )
 						{
 							Strip_t *pStrip = &pStripGroup->strips[stripID];
 							for( int boneStateChangeID = 0; boneStateChangeID < pStrip->numBoneStateChanges; boneStateChangeID++ )
@@ -2822,13 +2772,12 @@ void COptimizedModel::PrintVerts( studiohdr_t *phdr, int lod )
 
 static int CalcNumMaterialReplacements()
 {
- 	int i;
-	int numReplacements = 0;
-	int numLODs = g_ScriptLODs.Size();
-	for( i = 0; i < numLODs; i++ )
+	intp numReplacements = 0;
+	intp numLODs = g_ScriptLODs.Count();
+	for( intp i = 0; i < numLODs; i++ )
 	{
 		LodScriptData_t &scriptLOD = g_ScriptLODs[i];
-		numReplacements += scriptLOD.materialReplacements.Size();
+		numReplacements += scriptLOD.materialReplacements.Count();
 	}
 	return numReplacements;
 }
@@ -2930,17 +2879,6 @@ void COptimizedModel::PrintVert( Vertex_t *v, mstudiomodel_t *pStudioModel, mstu
 		printf( "\tboneID[%d]: %d weight: %f (%s)\n", i, ( int )v->boneID[i], boneWeight, 
 		         g_bonetable[v->boneID[i]].name );
 	}
-}
-
-
-static float RandomFloat( float min, float max )
-{
-	float ret;
-
-	ret = ( ( float )rand() ) / ( float )VALVE_RAND_MAX;
-	ret *= max - min;
-	ret += min;
-	return ret;
 }
 
 Vector& COptimizedModel::GetOrigVertPosition( mstudiomodel_t *pStudioModel, mstudiomesh_t *pStudioMesh, Vertex_t *pVert )
@@ -3879,12 +3817,11 @@ void COptimizedModel::RemoveRedundantBoneStateChanges( void )
 
 static void AddMaterialReplacementsToStringTable( void )
 {
- 	int i, j;
-	int numLODs = g_ScriptLODs.Size();
-	for( i = 0; i < numLODs; i++ )
+	intp numLODs = g_ScriptLODs.Count();
+	for( intp i = 0; i < numLODs; i++ )
 	{
 		LodScriptData_t &scriptLOD = g_ScriptLODs[i];
-		for( j = 0; j < scriptLOD.materialReplacements.Size(); j++ )
+		for( intp j = 0; j < scriptLOD.materialReplacements.Count(); j++ )
 		{
 			CLodScriptReplacement_t &materialReplacement = scriptLOD.materialReplacements[j];
 			s_StringTable.AddString( materialReplacement.GetDstName() );
@@ -3897,16 +3834,13 @@ static void AddMaterialReplacementsToStringTable( void )
 void ValidateLODReplacements( studiohdr_t *pHdr )
 {
 	bool failed = false;
-	int lodID;
-	for( lodID = 0; lodID < g_ScriptLODs.Size(); lodID++ )
+	for( intp lodID = 0; lodID < g_ScriptLODs.Count(); lodID++ )
 	{
 		LodScriptData_t& scriptLOD = g_ScriptLODs[lodID];
-		int j;
-		for( j = 0; j < scriptLOD.meshRemovals.Count(); j++ )
+		for( intp j = 0; j < scriptLOD.meshRemovals.Count(); j++ )
 		{
 			const char *pName1 = scriptLOD.meshRemovals[j].GetSrcName();
-			int i;
-			for( i = 0; i < pHdr->numtextures; i++ )
+			for( int i = 0; i < pHdr->numtextures; i++ )
 			{
 				const char *pName2 = pHdr->pTexture( i )->material->GetName();
 				if( ComparePath( pName1, pName2 ) )
@@ -3925,8 +3859,7 @@ got_one:
 	if( failed )
 	{
 		MdlWarning( "possible materials in model:\n" );
-		int i;
-		for( i = 0; i < pHdr->numtextures; i++ )
+		for( int i = 0; i < pHdr->numtextures; i++ )
 		{
 			MdlWarning( "\t\"%s\"\n", pHdr->pTexture( i )->material->GetName() );
 		}
@@ -3954,7 +3887,7 @@ void WriteOptimizedFiles( studiohdr_t *phdr, s_bodypart_t *pSrcBodyParts )
 //		V_strcat_safe( filename, g_pPlatformName );
 //		V_strcat_safe( filename, "/" );	
 //	}
-	V_strcat_safe( filename, "models/" );	
+	V_strcat_safe( filename, "models/" );
 	V_strcat_safe( filename, outname );
 	Q_StripExtension( filename, filename );
 

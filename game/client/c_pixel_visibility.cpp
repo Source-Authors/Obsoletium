@@ -175,6 +175,9 @@ public:
 	bool IsActive();
 	CPixelVisSet()
 	{
+		proxySize = 0;
+		proxyAspect = 0;
+		fadeTimeInv = 0;
 		frameIssued = 0;
 		serial = 0;
 		queryList = 0xFFFF;
@@ -341,7 +344,7 @@ float CPixelVisibilityQuery::GetFractionVisible( float fadeTimeInv )
 
 			if ( r_pixelvisibility_spew.GetBool() && CurrentViewID() == 0 ) 
 			{
-				DevMsg( 1, "Pixels visible: %d (qh:%zd) Pixels possible: %d (qh:%zd) (frame:%d)\n", pixels, (intp)m_queryHandle, pixelsPossible, (intp)m_queryHandleCount, gpGlobals->framecount );
+				DevMsg( 1, "Pixels visible: %d (qh:%p) Pixels possible: %d (qh:%zd) (frame:%d)\n", pixels, m_queryHandle, pixelsPossible, (intp)m_queryHandleCount, gpGlobals->framecount );
 			}
 
 			if ( pixels < 0 || pixelsPossible < 0 )
@@ -372,7 +375,7 @@ float CPixelVisibilityQuery::GetFractionVisible( float fadeTimeInv )
 
 			if ( r_pixelvisibility_spew.GetBool() && CurrentViewID() == 0 ) 
 			{
-				DevMsg( 1, "Pixels visible: %d (qh:%zd) (frame:%d)\n", pixels, (intp)m_queryHandle, gpGlobals->framecount );
+				DevMsg( 1, "Pixels visible: %d (qh:%p) (frame:%d)\n", pixels, m_queryHandle, gpGlobals->framecount );
 			}
 
 			if ( pixels < 0 )
@@ -411,7 +414,7 @@ void CPixelVisibilityQuery::IssueQuery( IMatRenderContext *pRenderContext, float
 
 		if ( r_pixelvisibility_spew.GetBool() && CurrentViewID() == 0 ) 
 		{
-			DevMsg( 1, "Draw Proxy: qh:%zd org:<%d,%d,%d> (frame:%d)\n", (intp)m_queryHandle, (int)m_origin[0], (int)m_origin[1], (int)m_origin[2], gpGlobals->framecount );
+			DevMsg( 1, "Draw Proxy: qh:%p org:<%d,%d,%d> (frame:%d)\n", m_queryHandle, (int)m_origin[0], (int)m_origin[1], (int)m_origin[2], gpGlobals->framecount );
 		}
 
 		m_clipFraction = PixelVisibility_DrawProxy( pRenderContext, m_queryHandle, m_origin, proxySize, proxyAspect, pMaterial, sizeIsScreenSpace );

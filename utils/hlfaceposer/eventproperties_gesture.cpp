@@ -99,7 +99,7 @@ static CEventPropertiesGestureDialog g_EventPropertiesGestureDialog;
 
 bool CEventPropertiesGestureDialog::CheckSequenceType( StudioModel *model, int iSequence, char *szType )
 {
-	KeyValues *seqKeyValues = new KeyValues("");
+	KeyValuesAD seqKeyValues("");
 	bool isType = false;
 	if ( seqKeyValues->LoadFromBuffer( model->GetFileName( ), model->GetKeyValueText( iSequence ) ) )
 	{
@@ -115,8 +115,6 @@ bool CEventPropertiesGestureDialog::CheckSequenceType( StudioModel *model, int i
 			}
 		}
 	}
-
-	seqKeyValues->deleteThis();
 
 	return isType;
 }

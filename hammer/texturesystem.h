@@ -54,7 +54,7 @@ public:
 	void AddTexture(IEditorTexture *pTexture);
 	void Sort(void);
 
-	IEditorTexture *GetTexture(int nIndex);
+	IEditorTexture *GetTexture(intp nIndex);
 	IEditorTexture* GetTexture( char const* pName );
 
 	// Fast find texture..
@@ -71,7 +71,7 @@ protected:
 	CUtlDict<intp,intp> m_TextureNameMap;	// Maps the texture name to an index into m_Textures (the key is IEditorTexture::GetName).
 
 	// Used to lazily load the textures in the group
-	int	m_nTextureToLoad;
+	intp	m_nTextureToLoad;
 };
 
 
@@ -140,16 +140,16 @@ public:
 	//
 	// Exposes a list of all texture (WAD) files.
 	//
-	inline int FilesGetCount(void) const;
-	inline void FilesGetInfo(GRAPHICSFILESTRUCT *pFileInfo, int nIndex) const;
-	bool FindGraphicsFile(GRAPHICSFILESTRUCT *pFileInfo, DWORD id, int *piIndex = NULL);
+	inline intp FilesGetCount(void) const;
+	inline void FilesGetInfo(GRAPHICSFILESTRUCT *pFileInfo, intp nIndex) const;
+	bool FindGraphicsFile(GRAPHICSFILESTRUCT *pFileInfo, DWORD id, intp *piIndex = NULL);
 
 	//
 	// Exposes a list of texture groups (sets of textures of a given format).
 	//
 	void SetActiveGroup(const char *pcszName);
-	inline int GroupsGetCount() const;
-	inline CTextureGroup *GroupsGet(int nIndex) const;
+	inline intp GroupsGetCount() const;
+	inline CTextureGroup *GroupsGet(intp nIndex) const;
 
 	//
 	// Exposes a list of active textures based on the currently active texture group.
@@ -164,8 +164,8 @@ public:
 	// Exposes a list of Most Recently Used textures.
 	//
 	void AddMRU(IEditorTexture *pTex);
-	inline int MRUGetCount() const;
-	inline IEditorTexture *MRUGet(int nIndex) const;
+	inline intp MRUGetCount() const;
+	inline IEditorTexture *MRUGet(intp nIndex) const;
 
 	//
 	// Exposes a list of all unique keywords found in the master texture list.
@@ -276,7 +276,7 @@ protected:
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CTextureSystem::FilesGetCount(void) const
+intp CTextureSystem::FilesGetCount(void) const
 {
 	return(m_GraphicsFiles.Count());
 }
@@ -287,7 +287,7 @@ int CTextureSystem::FilesGetCount(void) const
 // Input  : pFileInfo - 
 //			nIndex - 
 //-----------------------------------------------------------------------------
-void CTextureSystem::FilesGetInfo(GRAPHICSFILESTRUCT *pFileInfo, int nIndex) const
+void CTextureSystem::FilesGetInfo(GRAPHICSFILESTRUCT *pFileInfo, intp nIndex) const
 {
 	if (pFileInfo != NULL)
 	{
@@ -325,7 +325,7 @@ IEditorTexture *CTextureSystem::GetActiveTexture(int nIndex) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CTextureSystem::GroupsGetCount() const
+intp CTextureSystem::GroupsGetCount() const
 {
 	if (!m_pActiveContext)
 		return 0;
@@ -337,7 +337,7 @@ int CTextureSystem::GroupsGetCount() const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CTextureGroup *CTextureSystem::GroupsGet(int nIndex) const
+CTextureGroup *CTextureSystem::GroupsGet(intp nIndex) const
 {
 	if (!m_pActiveContext)
 		return NULL;
@@ -349,7 +349,7 @@ CTextureGroup *CTextureSystem::GroupsGet(int nIndex) const
 //-----------------------------------------------------------------------------
 // Purpose: Initiates an iteration of the MRU list.
 //-----------------------------------------------------------------------------
-int CTextureSystem::MRUGetCount() const
+intp CTextureSystem::MRUGetCount() const
 {
 	if (!m_pActiveContext)
 		return NULL;
@@ -364,7 +364,7 @@ int CTextureSystem::MRUGetCount() const
 //			eDesiredFormat - Texture format to return.
 // Output : Pointer to the texture.
 //-----------------------------------------------------------------------------
-IEditorTexture *CTextureSystem::MRUGet(int nIndex) const
+IEditorTexture *CTextureSystem::MRUGet(intp nIndex) const
 {
 	if (!m_pActiveContext)
 		return NULL;

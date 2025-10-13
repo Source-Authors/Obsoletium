@@ -345,7 +345,7 @@ void CAI_Relationship::ChangeRelationships( int disposition, int iReverting, CBa
 		return;
 	}
 
-	const int MAX_HANDLED = 512;
+	constexpr int MAX_HANDLED = 512;
 	CUtlVectorFixed<CBaseCombatCharacter *, MAX_HANDLED> subjectList;
 	CUtlVectorFixed<CBaseCombatCharacter *, MAX_HANDLED> targetList;
 

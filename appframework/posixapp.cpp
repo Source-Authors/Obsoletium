@@ -59,7 +59,7 @@ int AppMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 {
 	Assert( pAppSystemGroup );
 
-	s_HInstance = NULL;
+	s_HInstance = nullptr;
 	CommandLine()->CreateCmdLine( argc, argv );
 
 	return pAppSystemGroup->Run( );
@@ -80,7 +80,7 @@ int AppMain( int argc, char **argv, CAppSystemGroup *pAppSystemGroup )
 CSteamApplication::CSteamApplication( CSteamAppSystemGroup *pAppSystemGroup )
 {
 	m_pChildAppSystemGroup = pAppSystemGroup;
-	m_pFileSystem = NULL;
+	m_pFileSystem = nullptr;
 }
 
 
@@ -116,7 +116,7 @@ bool CSteamApplication::Create( )
 //-----------------------------------------------------------------------------
 void CSteamApplication::Destroy()
 {
-	m_pFileSystem = NULL;
+	m_pFileSystem = nullptr;
 }
 
 

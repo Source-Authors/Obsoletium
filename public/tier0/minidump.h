@@ -1,9 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef TIER0_MINIDUMP_H_
-#define TIER0_MINIDUMP_H_
+#ifndef SE_PUBLIC_TIER0_MINIDUMP_H_
+#define SE_PUBLIC_TIER0_MINIDUMP_H_
 
-#include "tier0/platform.h"
+#include "platform.h"
 
 // Set prefix to use for minidump files.  If you don't set one, it is defaulted for you,
 // using the current module name
@@ -15,16 +15,16 @@ PLATFORM_INTERFACE void SetMinidumpComment( const char *pszComment );
 // writes out a minidump of the current stack trace with a unique filename
 PLATFORM_INTERFACE void WriteMiniDump( const char *pszFilenameSuffix = nullptr );
 
-typedef void (*FnWMain)( int , tchar *[] );
-typedef void (*FnVoidPtrFn)( void * );
+using FnWMain = void (*)(int, tchar **);
+using FnVoidPtrFn = void (*)(void *);
 
 #if defined(_WIN32) && !defined(_X360)
 
 // calls the passed in function pointer and catches any exceptions/crashes thrown by it, and writes a minidump
 // use from wmain() to protect the whole program
-typedef void (*FnWMain)( int , tchar *[] );
-typedef int (*FnWMainIntRet)( int , tchar *[] );
-typedef void (*FnVoidPtrFn)( void * );
+using FnWMain = void (*)(int, tchar **);
+using FnWMainIntRet = int (*)(int, tchar **);
+using FnVoidPtrFn = void (*)(void *);
 
 enum ECatchAndWriteMinidumpAction
 {
@@ -48,7 +48,7 @@ struct _EXCEPTION_POINTERS;
 // Returns the previously-set function.
 // The function is called internally by WriteMiniDump() and CatchAndWriteMiniDump()
 // The default is the built-in function that uses DbgHlp.dll's MiniDumpWriteDump function
-typedef void (*FnMiniDump)( unsigned int uStructuredExceptionCode, _EXCEPTION_POINTERS * pExceptionInfo, const char *pszFilenameSuffix );
+using FnMiniDump = void (*)(unsigned int, _EXCEPTION_POINTERS *, const char *);
 PLATFORM_INTERFACE FnMiniDump SetMiniDumpFunction( FnMiniDump pfn );
 
 // Use this to write a minidump explicitly.
@@ -56,7 +56,7 @@ PLATFORM_INTERFACE FnMiniDump SetMiniDumpFunction( FnMiniDump pfn );
 // so they can show their own dialog.
 //
 // ptchMinidumpFileNameBuffer if not-NULL should be a writable tchar buffer of length at
-// least _MAX_PATH and on return will contain the name of the minidump file written.
+// least MAX_PATH and on return will contain the name of the minidump file written.
 // If ptchMinidumpFileNameBuffer is NULL the name of the minidump file written will not
 // be available after the function returns.
 //
@@ -93,5 +93,5 @@ PLATFORM_INTERFACE void MinidumpUserStreamInfoAppend( const char *pFormat, ... )
 //  Empty strings ("\0") can be returned if comment hasn't been set
 PLATFORM_INTERFACE const char *MinidumpUserStreamInfoGet( intp Index );
 
-#endif  // TIER0_MINIDUMP_H_
+#endif  // !SE_PUBLIC_TIER0_MINIDUMP_H_
 

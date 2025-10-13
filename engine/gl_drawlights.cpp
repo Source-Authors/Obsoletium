@@ -184,14 +184,19 @@ static void DrawPointLight( const Vector &vecOrigin, float flLightRadius )
 	float flPhi = 0;
 	for ( i = 0; i <= POINT_PHI_GRID; ++i )
 	{
-		float flSinPhi = sinf(DEG2RAD(flPhi));
-		float flCosPhi = cosf(DEG2RAD(flPhi));
+		float flSinPhi, flCosPhi;
+		DirectX::XMScalarSinCos(&flSinPhi, &flCosPhi, DEG2RAD(flPhi));
+
 		float flTheta = 0;
 		for ( int j = 0; j < POINT_THETA_GRID; ++j )
 		{
 			pt = vecOrigin;
-			pt.x += flLightRadius * cosf(DEG2RAD(flTheta)) * flSinPhi;
-			pt.y += flLightRadius * sinf(DEG2RAD(flTheta)) * flSinPhi;
+
+			float flSinTheta, flCosTheta;
+			DirectX::XMScalarSinCos(&flSinTheta, &flCosTheta, DEG2RAD(flTheta));
+
+			pt.x += flLightRadius * flCosTheta * flSinPhi;
+			pt.y += flLightRadius * flSinTheta * flSinPhi;
 			pt.z += flLightRadius * flCosPhi;
 
 			meshBuilder.Position3fv( pt.Base() );
@@ -283,8 +288,9 @@ void DrawSpotLight( dworldlight_t *pLight )
 		float flTempAngle = 0;
 		for ( int j = 0; j < SPOT_RADIAL_GRID; ++j )
 		{
-			float flSin = sin( DEG2RAD( flTempAngle ) );
-			float flCos = cos( DEG2RAD( flTempAngle ) );
+			float flSin, flCos;
+			DirectX::XMScalarSinCos(&flSin, &flCos, DEG2RAD(flTempAngle));
+
 			VectorMA( vecCenter, flRadius * flCos, xaxis, pt );
 			VectorMA( pt, flRadius * flSin, yaxis, pt );
 

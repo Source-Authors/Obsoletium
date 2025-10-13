@@ -1,9 +1,9 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#include "tier0/valobject.h"
+#ifndef SE_PUBLIC_TIER0_VALIDATOR_H_
+#define SE_PUBLIC_TIER0_VALIDATOR_H_
 
-#ifndef TIER0_VALIDATOR_H_
-#define TIER0_VALIDATOR_H_
+#include "valobject.h"
 
 #ifdef DBGFLAG_VALIDATE
 
@@ -58,4 +58,4 @@ private:
 #endif  // DBGFLAG_VALIDATE
 
 
-#endif  // TIER0_VALIDATOR_H_
+#endif  // !SE_PUBLIC_TIER0_VALIDATOR_H_

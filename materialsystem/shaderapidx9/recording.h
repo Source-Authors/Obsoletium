@@ -10,6 +10,10 @@
 #define RECORDING_H
 #pragma once
 
+#include <type_traits>
+
+#include "tier0/basetypes.h"
+
 //-----------------------------------------------------------------------------
 // Use this to put us into a 'recording' mode
 //-----------------------------------------------------------------------------
@@ -46,7 +50,7 @@
 // Recording state, if you change this, change the table in playback/playback.cpp
 //-----------------------------------------------------------------------------
 
-enum RecordingCommands_t
+enum RecordingCommands_t : unsigned char
 {
 	DX8_CREATE_DEVICE = 0,
 	DX8_DESTROY_DEVICE,
@@ -112,7 +116,7 @@ enum RecordingCommands_t
 	DX8_DESTROY_DEPTH_TEXTURE,
 	DX8_SET_RENDER_TARGET,
 
-	DX8_TEST_COOPERATIVE_LEVEL,
+	DX8_CHECK_DEVICE_STATE,
 	
 	DX8_SET_VERTEX_BUFFER_FORMAT, // isn't actually a dx8 command. . let's playback know what format a buffer is for listing info
 	
@@ -134,22 +138,31 @@ enum RecordingCommands_t
 
 #ifdef RECORDING
 
-void RecordCommand( RecordingCommands_t cmd, int numargs );
-void RecordArgument( void const* pMemory, int size );
+void RecordCommand( RecordingCommands_t cmd, unsigned char numargs );
+void RecordArgument( const void *pMemory, intp size );
 void FinishRecording( void );
 
-inline void RecordInt( int i )
+template<typename TIntegral>
+inline std::enable_if_t<std::is_integral_v<TIntegral>> RecordInt( TIntegral i )
 {
-	RecordArgument( &i, sizeof(int) );
+	RecordArgument( &i, sizeof(i) );
 }
 
-inline void RecordFloat( float f )
+template<typename TPointer>
+inline std::enable_if_t<std::is_pointer_v<TPointer>> RecordPtr( TPointer p )
 {
-	RecordArgument( &f, sizeof(float) );
+	RecordArgument( p, sizeof(p) );
+}
+
+template<typename TFloat>
+inline std::enable_if_t<std::is_floating_point_v<TFloat>> RecordFloat( TFloat f )
+{
+	RecordArgument( &f, sizeof(f) );
 }
 
 #	define RECORD_COMMAND( _cmd, _numargs )		RecordCommand( _cmd, _numargs )
 #	define RECORD_INT( _int )					RecordInt( _int )
+#	define RECORD_PTR( _ptr )					RecordPtr( _int )
 #	define RECORD_FLOAT( _float )				RecordFloat( _float )
 #	define RECORD_STRING( _string )				RecordArgument( _string, strlen(_string) + 1 )
 #	define RECORD_STRUCT( _struct, _size )		RecordArgument( _struct, _size )
@@ -185,6 +198,7 @@ inline void RecordFloat( float f )
 
 #	define RECORD_COMMAND( _cmd, _numargs )		0
 #	define RECORD_INT( _int )					0
+#	define RECORD_PTR( _ptr )					0
 #	define RECORD_FLOAT( _float )				0
 #	define RECORD_STRING( _string )				0
 #	define RECORD_STRUCT( _struct, _size )		0

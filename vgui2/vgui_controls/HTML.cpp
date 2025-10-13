@@ -381,8 +381,8 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 		if ( baseDir )
 		{
 			// get the app we need to run
-			char htmlLocation[_MAX_PATH];
-			char fileLocation[_MAX_PATH];
+			char htmlLocation[MAX_PATH];
+			char fileLocation[MAX_PATH];
 
 			if ( ! g_pFullFileSystem->FileExists( baseDir ) ) 
 			{

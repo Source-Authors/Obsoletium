@@ -414,12 +414,9 @@ void CGameConfig::CopyFrom(CGameConfig *pConfig)
 //			pGD - 
 // Output : Returns TRUE to keep enumerating.
 //-----------------------------------------------------------------------------
-static BOOL UpdateClassPointer(CMapClass *mp, DWORD_PTR ctx)
+static BOOL UpdateClassPointer(CMapEntity *pEntity, const GameData *gd)
 {
-	auto *pEntity = reinterpret_cast<CMapEntity *>(mp);
-	auto *pGDIn = reinterpret_cast<GameData *>(ctx);
-
-	GDclass *pClass = pGDIn->ClassForName(pEntity->GetClassName());
+	GDclass *pClass = gd->ClassForName(pEntity->GetClassName());
 	pEntity->SetClass(pClass);
 	return(TRUE);
 }
@@ -472,7 +469,7 @@ void CGameConfig::LoadGDFiles(void)
 		{
 			CMapWorld *pWorld = pDoc->GetMapWorld();
 			pWorld->SetClass(GD.ClassForName(pWorld->GetClassName()));
-			pWorld->EnumChildren(UpdateClassPointer, (DWORD_PTR)&GD, MAPCLASS_TYPE(CMapEntity));
+			pWorld->EnumChildren(&UpdateClassPointer, const_cast<const GameData*>(&GD));
 		}
 	}
 }

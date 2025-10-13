@@ -56,7 +56,7 @@ const char * CStringPool::Find( const char *pszValue )
 	if ( m_Strings.IsValidIndex(i) )
 		return m_Strings[i];
 
-	return NULL;
+	return nullptr;
 }
 
 const char * CStringPool::Allocate( const char *pszValue )
@@ -104,7 +104,7 @@ CCountedStringPool::CCountedStringPool()
 
 	m_FreeListStart = INVALID_ELEMENT;
 	m_Elements.AddToTail();
-	m_Elements[0].pString = NULL;
+	m_Elements[0].pString = nullptr;
 	m_Elements[0].nReferenceCount = 0;
 	m_Elements[0].nNextElement = INVALID_ELEMENT;
 }
@@ -132,7 +132,7 @@ void CCountedStringPool::FreeAll()
 		if( m_Elements[i].pString )
 		{
 			delete [] m_Elements[i].pString;
-			m_Elements[i].pString = NULL;
+			m_Elements[i].pString = nullptr;
 			m_Elements[i].nReferenceCount = 0;
 			m_Elements[i].nNextElement = INVALID_ELEMENT;
 		}
@@ -141,7 +141,7 @@ void CCountedStringPool::FreeAll()
 	// Remove all but the invalid element:
 	m_Elements.RemoveAll();
 	m_Elements.AddToTail();
-	m_Elements[0].pString = NULL;
+	m_Elements[0].pString = nullptr;
 	m_Elements[0].nReferenceCount = 0;
 	m_Elements[0].nNextElement = INVALID_ELEMENT;
 }
@@ -149,7 +149,7 @@ void CCountedStringPool::FreeAll()
 
 unsigned short CCountedStringPool::FindStringHandle( const char* pIntrinsic )
 {
-	if( pIntrinsic == NULL )
+	if( pIntrinsic == nullptr )
 		return INVALID_ELEMENT;
 
 	unsigned short nHashBucketIndex = (HashStringCaseless(pIntrinsic ) %HASH_TABLE_SIZE);
@@ -173,8 +173,8 @@ unsigned short CCountedStringPool::FindStringHandle( const char* pIntrinsic )
 
 char* CCountedStringPool::FindString( const char* pIntrinsic )
 {
-	if( pIntrinsic == NULL )
-		return NULL;
+	if( pIntrinsic == nullptr )
+		return nullptr;
 
 	// Yes, this will be NULL on failure.
 	return m_Elements[FindStringHandle(pIntrinsic)].pString;
@@ -182,7 +182,7 @@ char* CCountedStringPool::FindString( const char* pIntrinsic )
 
 unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic )
 {
-	if( pIntrinsic == NULL )
+	if( pIntrinsic == nullptr )
 		return INVALID_ELEMENT;
 
 	unsigned short nHashBucketIndex = (HashStringCaseless( pIntrinsic ) % HASH_TABLE_SIZE);
@@ -233,7 +233,7 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 char* CCountedStringPool::ReferenceString( const char* pIntrinsic )
 {
 	if(!pIntrinsic)
-		return NULL;
+		return nullptr;
 
 	return m_Elements[ReferenceStringHandle( pIntrinsic)].pString; 
 }
@@ -273,7 +273,7 @@ void CCountedStringPool::DereferenceString( const char* pIntrinsic )
 				}
 
 				delete [] m_Elements[nCurrentBucket].pString;
-				m_Elements[nCurrentBucket].pString = NULL;
+				m_Elements[nCurrentBucket].pString = nullptr;
 				m_Elements[nCurrentBucket].nReferenceCount = 0;
 
 				m_Elements[nCurrentBucket].nNextElement = m_FreeListStart;
@@ -298,7 +298,7 @@ void CCountedStringPool::SpewStrings()
 	{
 		char* string = m_Elements[i].pString;
 
-		Msg("String %d: ref:%d %s", i, m_Elements[i].nReferenceCount, string == NULL? "EMPTY - ok for slot zero only!" : string);
+		Msg("String %d: ref:%d %s", i, m_Elements[i].nReferenceCount, string == nullptr? "EMPTY - ok for slot zero only!" : string);
 	}
 
 	Msg("\n%zd total counted strings.", m_Elements.Count());
@@ -314,10 +314,10 @@ CON_COMMAND( test_stringpool, "Tests the class CStringPool" )
 	Assert(pool.Allocate("test") && pool.Count() == 1);
 	Assert(pool.Allocate("test2") && pool.Count() == 2);
 
-	Assert( pool.Find("test2") != NULL );
-	Assert( pool.Find("TEST") != NULL );
-	Assert( pool.Find("Test2") != NULL );
-	Assert( pool.Find("test") != NULL );
+	Assert( pool.Find("test2") != nullptr );
+	Assert( pool.Find("TEST") != nullptr );
+	Assert( pool.Find("Test2") != nullptr );
+	Assert( pool.Find("test") != nullptr );
 
 	pool.FreeAll();
 	Assert(pool.Count() == 0);

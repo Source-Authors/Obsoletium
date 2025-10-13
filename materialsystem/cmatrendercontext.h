@@ -537,6 +537,11 @@ public:
 	DELEGATE_TO_OBJECT_0V(					EndFrame, g_pShaderAPI );
 
 	virtual void							AsyncCreateTextureFromRenderTarget( ITexture* pSrcRt, const char* pDstName, ImageFormat dstFmt, bool bGenMips, int nAdditionalCreationFlags, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs );
+	
+	// dimhotepus: TF2 backport.
+	virtual void							FogRadial( bool bRadial );
+	// dimhotepus: TF2 backport.
+	virtual bool							GetFogRadial();
 
 	virtual void							AsyncMap( ITextureInternal* pTexToMap, IAsyncTextureOperationReceiver* pRecipient, void* pExtraArgs ) override;
 	virtual void							AsyncUnmap( ITextureInternal* pTexToUnmap ) override;
@@ -551,7 +556,7 @@ public:
 
 	DELEGATE_TO_OBJECT_1V(                  PushDeformation, const DeformationBase_t *, g_pShaderAPI );
 	DELEGATE_TO_OBJECT_0V(                  PopDeformation, g_pShaderAPI );
-	DELEGATE_TO_OBJECT_0C( int,             GetNumActiveDeformations, g_pShaderAPI );
+	DELEGATE_TO_OBJECT_0C( intp,            GetNumActiveDeformations, g_pShaderAPI );
 
 	// Color correction related methods..
 	DELEGATE_TO_OBJECT_1V(					EnableColorCorrection, bool, g_pColorCorrectionSystem );
@@ -628,6 +633,7 @@ protected:
 	float m_flNormalizedX;
 	float m_flNormalizedY;
 	float m_flNormalizedSize;
+	bool m_bFogRadial;
 };
 
 

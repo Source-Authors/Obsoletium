@@ -70,7 +70,7 @@ public:
 		// Hackily calculate a length for the spline. Subdivide & measure.
 		flSplineLength = 0;
 		Vector vecPrev = splinePoints[1];
-		const int iDivs = 10;
+		constexpr int iDivs = 10;
 		for ( int i = 1; i <= iDivs; i++ )
 		{
 			Vector vecCurr;

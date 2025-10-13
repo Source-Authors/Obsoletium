@@ -38,8 +38,8 @@ void CAttributeShaderPickerPanel::ShowPickerDialog()
 {
 	CPickerFrame *pShaderPickerDialog = new CPickerFrame( this, "Select Shader", "Shader", "shaderName" );
 
-	int nCount = vgui::MaterialSystem()->ShaderCount();
-	IShader** ppShaderList = (IShader**)_alloca( nCount * sizeof(IShader) );
+	intp nCount = vgui::MaterialSystem()->ShaderCount();
+	IShader** ppShaderList = stackallocT( IShader*, nCount );
 	vgui::MaterialSystem()->GetShaders( 0, nCount, ppShaderList );
 	PickerList_t shaderList( 0, nCount );
 	for ( int i = 0; i < nCount; ++i )

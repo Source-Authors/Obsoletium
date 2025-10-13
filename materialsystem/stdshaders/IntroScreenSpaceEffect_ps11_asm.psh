@@ -2,7 +2,7 @@
 
 ps.1.1
 
-//HALF Grey( HALF3 input )
+//float Grey( float3 input )
 //{
 //	return dot( ( float3 )( 1.0f / 3.0f ), input );
 //}

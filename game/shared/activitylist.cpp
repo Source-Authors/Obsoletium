@@ -2372,30 +2372,34 @@ void ActivityList_RegisterSharedActivities( void )
 // HACKHACK: Keep backwards compatibility on broken activities temporarily
 #define ACTIVITY_FILE_TAG 0x80800000
 
-class CActivityDataOps : public CDefSaveRestoreOps
+class CActivityDataOps final : public CDefSaveRestoreOps
 {
 public:
 	// save data type interface
-	virtual void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) 
+	void Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave ) override
 	{
-		int activityIndex = *((int *)fieldInfo.pField);
+		const int activityIndex = *((int *)fieldInfo.pField);
 		const char *pActivityName = ActivityList_NameForIndex( activityIndex );
 		if ( !pActivityName )
 		{
 			AssertOnce( activityIndex == -1 ); // FIXME: whatever activity this was, it's now being saved out as ACT_RESET
 			pActivityName = ActivityList_NameForIndex( 0 );
 		}
-		int len = V_strlen(pActivityName) + 1;
+
+		const intp len = V_strlen(pActivityName) + 1;
+		Assert(len <= std::numeric_limits<int>::max());
+
+		int len_safe = static_cast<int>(len);
 		
 		// Use the high 16-bits of this int to signify this file format
 		// this makes this backwards compatible.
 		// UNDONE: Remove after playtest save files are no longer needed
-		len |= ACTIVITY_FILE_TAG;
-		pSave->WriteInt( &len );
+		len_safe |= ACTIVITY_FILE_TAG;
+		pSave->WriteInt( &len_safe );
 		pSave->WriteString( pActivityName );
 	}
 
-	virtual void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) 
+	void Restore( const SaveRestoreFieldInfo_t &fieldInfo, IRestore *pRestore ) override
 	{
 		char nameBuf[1024];
 
@@ -2417,13 +2421,13 @@ public:
 		}
 	}
 
-	virtual bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) 
+	bool IsEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{ 
 		int *pActivityIndex = (int *)fieldInfo.pField;
 		return (*pActivityIndex == 0);
 	}
 
-	virtual void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) 
+	void MakeEmpty( const SaveRestoreFieldInfo_t &fieldInfo ) override
 	{
 		int *pActivityIndex = (int *)fieldInfo.pField;
 		*pActivityIndex = 0;

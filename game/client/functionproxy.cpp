@@ -98,7 +98,7 @@ float CFloatInput::GetFloat() const
 //
 //-----------------------------------------------------------------------------
 
-CResultProxy::CResultProxy() : m_pResult(0)
+CResultProxy::CResultProxy() : m_pResult(0), m_ResultVecComp(0)
 {
 }
 

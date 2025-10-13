@@ -180,7 +180,7 @@ void CFXQuad::Destroy( void )
 // Purpose: 
 // Input  : frametime - 
 //-----------------------------------------------------------------------------
-void CFXQuad::Update( double frametime )
+void CFXQuad::Update( float frametime )
 {
 	m_FXData.m_flLifeTime += frametime;
 }
