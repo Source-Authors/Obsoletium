@@ -870,6 +870,13 @@ void BuildGroup::PanelRemoved(Panel *panel)
 //-----------------------------------------------------------------------------
 void BuildGroup::LoadControlSettings(const char *controlResourceName, const char *pathID, KeyValues *pPreloadedKeyValues, KeyValues *pConditions)
 {
+	// dimhotepus: TF2 backport.
+	if ( Q_isempty( controlResourceName ) )
+	{
+		Warning( "LoadControlSettings failed! Invalid resource filename!\n" );
+		return;
+	}
+
 	// make sure the file is registered
 	RegisterControlSettingsFile(controlResourceName, pathID);
 
