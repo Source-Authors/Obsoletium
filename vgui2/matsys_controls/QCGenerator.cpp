@@ -463,7 +463,7 @@ void CQCGenerator::BrowseFile( KeyValues *data )
 
 void CQCGenerator::OnFileSelected( KeyValues *data ) 
 {
-	if ( m_szTargetField[0] )
+	if ( !Q_isempty( m_szTargetField ) )
 	{
 		vgui::Panel *pTargetField = FindChildByName( m_szTargetField );
 		((TextEntry *)pTargetField)->SetText( data->GetString( "fullpath" ) );
@@ -473,7 +473,7 @@ void CQCGenerator::OnFileSelected( KeyValues *data )
 
 void CQCGenerator::OnDirectorySelected( KeyValues *data ) 
 {
-	if ( m_szTargetField[0] )
+	if ( !Q_isempty( m_szTargetField ) )
 	{
 		vgui::Panel *pTargetField = FindChildByName( m_szTargetField );
 		((TextEntry *)pTargetField)->SetText( data->GetString( "dir" ) );
