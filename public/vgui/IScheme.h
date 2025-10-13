@@ -22,7 +22,8 @@ namespace vgui
 {
 
 typedef uintp HScheme;
-typedef unsigned long HTexture;
+// dimhotepus: unsigned long -> uint32. x86-64
+typedef uint32 HTexture;
 
 class IBorder;
 class IImage;

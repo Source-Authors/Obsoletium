@@ -46,10 +46,13 @@ using VPANEL = uintp;
 
 // dimhotepus: x64 port. unsigned long -> uintp.
 using HScheme = uintp;
+// dimhotepus: x64 port. unsigned long -> uint32.
 // Both -1 and 0 are used for invalid textures. Be careful.
-using HTexture = unsigned long;
-using HCursor = unsigned long;
-using HPanel = unsigned long;
+using HTexture = uint32;
+// dimhotepus: x64 port. unsigned long -> uint32.
+using HCursor = uint32;
+// dimhotepus: x64 port. unsigned long -> uint32.
+using HPanel = uint32;
 
 constexpr inline HPanel INVALID_PANEL{std::numeric_limits<HPanel>::max()};
 

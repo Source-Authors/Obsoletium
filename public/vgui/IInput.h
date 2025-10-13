@@ -12,8 +12,10 @@
 #pragma once
 #endif
 
-#include <vgui/VGUI.h>
+#include "tier0/basetypes.h"
 #include "tier1/interface.h"
+
+#include <vgui/VGUI.h>
 #include "vgui/MouseCode.h"
 #include "vgui/KeyCode.h"
 
@@ -21,7 +23,8 @@ namespace vgui
 {
 
 class Cursor;
-typedef unsigned long HCursor;
+// dimhotepus: unsigned long -> uint32. x86-64
+using HCursor = uint32;
 
 #define VGUI_GCS_COMPREADSTR                 0x0001
 #define VGUI_GCS_COMPREADATTR                0x0002

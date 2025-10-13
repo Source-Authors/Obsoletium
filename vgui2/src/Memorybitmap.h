@@ -19,7 +19,8 @@
 namespace vgui
 {
 
-typedef unsigned long HTexture;
+// dimhotepus: unsigned long -> uint32. x86-64
+using HTexture = uint32;
 
 //-----------------------------------------------------------------------------
 // Purpose: Holds a single image created from a chunk of memory, internal to vgui only

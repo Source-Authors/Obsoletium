@@ -13,7 +13,9 @@
 #endif
 
 #include <vgui/VGUI.h>
-#include <vgui/IHTML.h> // CreateHTML, PaintHTML 
+#include <vgui/IHTML.h> // CreateHTML, PaintHTML
+
+#include "tier0/basetypes.h"
 #include "tier1/interface.h"
 #include "bitmap/imageformat.h"
 
@@ -41,8 +43,11 @@ class Image;
 class Point;
 
 // handles
-typedef unsigned long HCursor;
-typedef unsigned long HTexture;
+// dimhotepus: unsigned long -> uint32. x86-64
+using HCursor = uint32;
+// dimhotepus: unsigned long -> uint32. x86-64
+using HTexture = uint32;
+
 // dimhotepus: x86-64 port. unsigned long -> uintp
 typedef uintp HFont;
 
@@ -52,7 +57,7 @@ typedef uintp HFont;
 
 struct Vertex_t
 {
-  Vertex_t() = default;
+	Vertex_t() = default;
 	Vertex_t( const Vector2D &pos, const Vector2D &coord = Vector2D( 0, 0 ) )
 		: m_Position{ pos }, m_TexCoord{ coord }
 	{
