@@ -212,8 +212,8 @@ intp CSocketCreator::ConnectSocket( const netadr_t &netAdr, bool bSingleSocket )
 		return -1;
 	}
 
-	int opt = 1;
-	int ret = ioctlsocket( hSocket, FIONBIO, (unsigned long*)&opt ); // non-blocking
+	unsigned long opt = 1;
+	int ret = ioctlsocket( hSocket, FIONBIO, &opt ); // non-blocking
 	if ( ret == -1 )
 	{
 		Warning( "Socket ioctl(FIONBIO) failed: %s.\n", NET_ErrorString( WSAGetLastError() ) );
