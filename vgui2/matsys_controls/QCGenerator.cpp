@@ -142,8 +142,8 @@ void QCInfo::SyncFromControls()
 
 	LODs.RemoveAll();
 	pTargetField = pQCGenerator->FindChildByName( "LODList" );
-	int numLOD = ((ListPanel *)pTargetField)->GetItemCount();
-	for ( int i = 0; i < numLOD; i++ )
+	intp numLOD = ((ListPanel *)pTargetField)->GetItemCount();
+	for ( intp i = 0; i < numLOD; i++ )
 	{
 		KeyValues *key = ((ListPanel *)pTargetField)->GetItem( i );
 		LODInfo newLOD;
