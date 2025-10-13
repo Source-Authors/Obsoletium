@@ -674,8 +674,9 @@ bool CAssetCache::ContinueSearchForAssets( AssetList_t hList, float flDuration )
 	double flStartTime = Plat_FloatTime();
 	while ( list.m_DirectoriesToCheck.Count() )
 	{
-		const char *pFilePath = list.m_DirectoriesToCheck[ list.m_DirectoriesToCheck.Head() ].m_DirName;
-		DirHandle_t hCurrentDir = list.m_DirectoriesToCheck[ list.m_DirectoriesToCheck.Head() ].m_hDirHandle;
+		const auto &it = list.m_DirectoriesToCheck[ list.m_DirectoriesToCheck.Head() ];
+		const char *pFilePath = it.m_DirName;
+		const DirHandle_t hCurrentDir = it.m_hDirHandle;
 
 		const char *pStartingFile;
 		if ( list.m_hFind == FILESYSTEM_INVALID_FIND_HANDLE )
