@@ -699,9 +699,10 @@ public:
 //-----------------------------------------------------------------------------
 // Computes draw flags for the engine to build its world surface lists
 //-----------------------------------------------------------------------------
-static inline unsigned long BuildEngineDrawWorldListFlags( unsigned nDrawFlags )
+// dimhotepus: unsigned long -> unsigned. x86-64.
+[[nodiscard]] static inline unsigned BuildEngineDrawWorldListFlags( unsigned nDrawFlags )
 {
-	unsigned long nEngineFlags = 0;
+	unsigned nEngineFlags = 0;
 
 	if ( nDrawFlags & DF_DRAWSKYBOX )
 	{
@@ -3629,7 +3630,7 @@ void CRendering3dView::DrawWorld( float waterZAdjust )
 		return;
 	}
 
-	unsigned long engineFlags = BuildEngineDrawWorldListFlags( m_DrawFlags );
+	const unsigned engineFlags = BuildEngineDrawWorldListFlags( m_DrawFlags );
 
 	render->DrawWorldLists( m_pWorldRenderList, engineFlags, waterZAdjust );
 }
@@ -4523,7 +4524,7 @@ void CRendering3dView::DrawTranslucentRenderables( bool bInSkybox, bool bShadowD
 // 	bool bDrawAboveWater = (nFlags & DF_RENDER_ABOVEWATER) != 0;
 // 	bool bDrawWater = (nFlags & DF_RENDER_WATER) != 0;
 // 	bool bClipSkybox = (nFlags & DF_CLIP_SKYBOX ) != 0;
-	unsigned long nEngineDrawFlags = BuildEngineDrawWorldListFlags( m_DrawFlags & ~DF_DRAWSKYBOX );
+	const unsigned nEngineDrawFlags = BuildEngineDrawWorldListFlags( m_DrawFlags & ~DF_DRAWSKYBOX );
 
 	DetailObjectSystem()->BeginTranslucentDetailRendering();
 

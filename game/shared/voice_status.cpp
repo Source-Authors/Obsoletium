@@ -399,11 +399,13 @@ void CVoiceStatus::UpdateServerState(bool bForce)
 	Q_strncpy(str,"vban",sizeof(str));
 	bool bChange = false;
 
-	for(unsigned long dw=0; dw < VOICE_MAX_PLAYERS_DW; dw++)
+	// dimhotepus: unsigned long -> unsigned. x86-64.
+	for(unsigned dw=0; dw < VOICE_MAX_PLAYERS_DW; dw++)
 	{	
-		unsigned long serverBanMask = 0;
-		unsigned long banMask = 0;
-		for(unsigned long i=0; i < 32; i++)
+		// dimhotepus: unsigned long -> unsigned. x86-64.
+		unsigned serverBanMask = 0;
+		unsigned banMask = 0;
+		for(unsigned i=0; i < 32; i++)
 		{
 			int playerIndex = ( dw * 32 + i );
 			if ( playerIndex >= MAX_PLAYERS )
@@ -462,8 +464,10 @@ void CVoiceStatus::HandleVoiceMaskMsg(bf_read &msg)
 	unsigned int dw;
 	for(dw=0; dw < VOICE_MAX_PLAYERS_DW; dw++)
 	{
-		m_AudiblePlayers.SetDWord(dw, (unsigned long)msg.ReadLong());
-		m_ServerBannedPlayers.SetDWord(dw, (unsigned long)msg.ReadLong());
+		// dimhotepus: unsigned long -> unsigned. x86-64.
+		m_AudiblePlayers.SetDWord(dw, msg.ReadULong());
+		// dimhotepus: unsigned long -> unsigned. x86-64.
+		m_ServerBannedPlayers.SetDWord(dw, msg.ReadULong());
 
 		if( voice_clientdebug.GetInt())
 		{

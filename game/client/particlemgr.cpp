@@ -1070,7 +1070,7 @@ CParticleMgr::~CParticleMgr()
 //-----------------------------------------------------------------------------
 // Initialization and shutdown
 //-----------------------------------------------------------------------------
-bool CParticleMgr::Init(unsigned long count, IMaterialSystem *pMaterials)
+bool CParticleMgr::Init(unsigned count, IMaterialSystem *pMaterials)
 {
 	Term();
 

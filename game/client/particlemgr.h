@@ -625,7 +625,8 @@ public:
 	virtual			~CParticleMgr();
 
 	// Call at init time to preallocate the bucket of particles.
-	bool			Init(unsigned long nPreallocatedParticles, IMaterialSystem *pMaterial);
+	// dimhotepus: unsigned long -> unsigned. x86-64.
+	bool			Init(unsigned nPreallocatedParticles, IMaterialSystem *pMaterial);
 
 	// Shutdown - free everything.
 	void			Term();
