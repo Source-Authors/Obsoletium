@@ -2075,10 +2075,13 @@ struct studiohdr2_t
 	inline mstudioboneflexdriver_t *pBoneFlexDriver( int i ) const { Assert( i >= 0 && i < m_nBoneFlexDriverCount ); return (mstudioboneflexdriver_t *)(((byte *)this) + m_nBoneFlexDriverIndex) + i; }
 
 #ifdef PLATFORM_64BITS
-	void* pVertexBase;
-	void* pIndexBase;
+	mutable serializedstudioptr_t< void	> virtualModel;
+	mutable serializedstudioptr_t< void	> animblockModel;
 
-	int reserved[52];
+	serializedstudioptr_t< void> pVertexBase;
+	serializedstudioptr_t< void> pIndexBase;
+
+	int reserved[56 - 4 * sizeof( serializedstudioptr_t< void > ) / sizeof( int ) ];
 #else
 	int reserved[56];
 #endif
@@ -2284,7 +2287,11 @@ struct studiohdr_t
 	const studiohdr_t	*FindModel( void **cache, char const *modelname ) const;
 
 	// implementation specific back pointer to virtual data
-	void*				virtualModel;
+#ifdef PLATFORM_64BITS
+	int					unused_virtualModel;
+#else
+	mutable void*		virtualModel;
+#endif
 	virtualmodel_t		*GetVirtualModel( void ) const;
 
 	// for demand loaded animation blocks
