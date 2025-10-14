@@ -1189,7 +1189,7 @@ void R_CheckForLightingConfigChanges()
 	{
 		ClearMaterialConfigLightingChanged();
 		ConMsg( "Redownloading all lightmaps\n" );
-		BuildGammaTable( 2.2f, 2.2f, 0.0f, OVERBRIGHT );
+		BuildGammaTable( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT );
 		R_RedownloadAllLightmaps();
 		StaticPropMgr()->RecomputeStaticLighting();
 	}
