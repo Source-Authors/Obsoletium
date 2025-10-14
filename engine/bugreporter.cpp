@@ -93,17 +93,18 @@
 #define DENY_SOUND		"common/bugreporter_failed"
 #define SUCCEED_SOUND	"common/bugreporter_succeeded"
 
+// dimhotepus: Drop as only public repo used.
 // Fixme, move these to buguiddata.res script file?
-#ifdef WIN32
-#define BUG_REPOSITORY_URL "\\\\fileserver\\bugs"
-#elif defined(OSX)
-#define BUG_REPOSITORY_URL "/Volumes/bugs"
-#elif defined(LINUX)
-#define BUG_REPOSITORY_URL "\\\\fileserver\\bugs"
-#else
-#error "Please define your platform"
-#endif
-#define REPOSITORY_VALIDATION_FILE "info.txt"
+// #ifdef WIN32
+// #define BUG_REPOSITORY_URL "\\\\fileserver\\bugs"
+// #elif defined(OSX)
+// #define BUG_REPOSITORY_URL "/Volumes/bugs"
+// #elif defined(LINUX)
+// #define BUG_REPOSITORY_URL "\\\\fileserver\\bugs"
+// #else
+// #error "Please define your platform"
+// #endif
+// #define REPOSITORY_VALIDATION_FILE "info.txt"
 
 #define BUG_REPORTER_PUBLIC_DLLNAME "bugreporter_public" 
 
@@ -544,15 +545,16 @@ protected:
 		char	fixedname[ 256 ];
 	};
 
-	bool						UploadBugSubmission( 
-									char const *levelname,
-									int			bugId,
-
-									char const *savefile, 
-									char const *screenshot,
-									char const *bsp,
-									char const *vmf,
-									CUtlVector< includedfile >& includedfiles );
+	// dimhotepus: Drop as only public repo used.
+	//bool						UploadBugSubmission( 
+	//								char const *levelname,
+	//								int			bugId,
+	//
+	//								char const *savefile, 
+	//								char const *screenshot,
+	//								char const *bsp,
+	//								char const *vmf,
+	//								CUtlVector< includedfile >& includedfiles );
 	bool						UploadFile( char const *local, char const *remote, bool bDeleteLocal = false );
 
 	void						DenySound();
@@ -839,12 +841,13 @@ bool CBugUIPanel::Init()
 
 		m_bQueryingSteamForCSER = true;
 	}
-	else
-	{
-		m_pEmail->SetVisible( false );
-		m_pSubmitterLabel->SetVisible( true );
-
-	}
+	// dimhotepus: Drop as only public repo used.
+	//else
+	//{
+	//	m_pEmail->SetVisible( false );
+	//	m_pSubmitterLabel->SetVisible( true );
+	//
+	//}
 
 	Q_snprintf( m_szVMFContentDirFullpath, sizeof( m_szVMFContentDirFullpath ), "%s/maps", com_gamedir );
 	Q_strlower( m_szVMFContentDirFullpath );
@@ -996,10 +999,11 @@ void CBugUIPanel::GetDataFileBase( char const *suffix, char *buf, int bufsize )
 	{
 		Q_snprintf( buf, bufsize, "%i_%02i_%02i", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday );
 	}
-	else
-	{
-		Q_snprintf( buf, bufsize, "%i_%02i_%02i_%s", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, who );
-	}
+	// dimhotepus: Drop as only public repo used.
+	//else
+	//{
+	//	Q_snprintf( buf, bufsize, "%i_%02i_%02i_%s", t.tm_year + 1900, t.tm_mon + 1, t.tm_mday, who );
+	//}
 }
 
 //-----------------------------------------------------------------------------
@@ -1008,24 +1012,28 @@ void CBugUIPanel::GetDataFileBase( char const *suffix, char *buf, int bufsize )
 //-----------------------------------------------------------------------------
 const char *CBugUIPanel::GetRepositoryURL( void )
 {
-	const char *pURL = m_pBugReporter->GetRepositoryURL();
-	if ( pURL )
-		return pURL;
-
-	return BUG_REPOSITORY_URL;
+	// dimhotepus: Drop as only public repo used.
+	// const char *pURL = m_pBugReporter->GetRepositoryURL();
+	// if ( pURL )
+	// 	return pURL;
+	// 
+	// return BUG_REPOSITORY_URL;
+	return "";
 }
 
 const char *CBugUIPanel::GetSubmissionURL( int bugid )
 {
-	const char *pURL = m_pBugReporter->GetSubmissionURL();
-	if ( pURL )
-		return pURL;
-	
-	static char url[512];
-
-	Q_snprintf(url, sizeof(url), "%s/%i", GetRepositoryURL(), bugid);
-
-	return url;
+	// dimhotepus: Drop as only public repo used.
+	// const char *pURL = m_pBugReporter->GetSubmissionURL();
+	// if ( pURL )
+	// 	return pURL;
+	// 
+	// static char url[512];
+	// 
+	// Q_snprintf(url, sizeof(url), "%s/%i", GetRepositoryURL(), bugid);
+	// 
+	// return url;
+	return "";
 }
 
 
@@ -1051,13 +1059,8 @@ void CBugUIPanel::OnTakeSnapshot()
 
 	SetVisible( false );
 
-	// Internal reports at 100% quality .jpg
-	int quality = 100;
-
-	if ( m_pBugReporter && m_pBugReporter->IsPublicUI() )
-	{
-		quality = 40;
-	}
+	// dimhotepus: all reports at 100% quality .jpg
+	constexpr int quality = 100;
 
 	Cbuf_AddText( va( "jpeg \"%s\" %i\n", m_szScreenShotName, quality ) );
 }
@@ -1074,10 +1077,11 @@ void CBugUIPanel::OnSaveGame()
 		// External users send us a "minisave" file which doesn't contain data from other previously encoudntered/connected levels
 		Cbuf_AddText( va( "minisave %s\n", m_szSaveGameName ) );
 	}
-	else
-	{
-		Cbuf_AddText( va( "save %s notmostrecent copymap\n", m_szSaveGameName ) );
-	}
+	// dimhotepus: Drop as only public repo used.
+	// else
+	// {
+	// 	Cbuf_AddText( va( "save %s notmostrecent copymap\n", m_szSaveGameName ) );
+	// }
 
 	m_pSaveGameURL->SetText( m_szSaveGameName );
 }
@@ -1090,30 +1094,31 @@ void CBugUIPanel::OnSaveBSP()
 
 void CBugUIPanel::OnSaveVMF()
 {
-	if ( m_pBugReporter && m_pBugReporter->IsPublicUI() )
-		return;
-
-	char level[ 256 ];
-	m_pLevelName->GetText( level );
-
-	// See if .vmf exists in assumed location
-	char localfile[ 512 ];
-	Q_snprintf( localfile, sizeof( localfile ), "%s/%s.vmf", m_szVMFContentDirFullpath, level );
-	if ( !g_pFileSystem->FileExists( localfile, NULL ) )
-	{
-		if ( !m_hDirectorySelectDialog.Get() )
-		{
-			m_hDirectorySelectDialog = new DirectorySelectDialog( this, "Choose .vmf folder" );
-		}
-
-		m_bAddVMF = true;
-		m_hDirectorySelectDialog->SetStartDirectory( m_szVMFContentDirFullpath );
-		m_hDirectorySelectDialog->DoModal();
-		return;
-	}
-
-	GetDataFileBase( GetSubmitter(), m_szVMFName, sizeof( m_szVMFName ) );
-	m_pVMFURL->SetText( m_szVMFName );
+	// dimhotepus: Drop as only public repo used.
+	// if ( m_pBugReporter && m_pBugReporter->IsPublicUI() )
+	// 	return;
+	// 
+	// char level[ 256 ];
+	// m_pLevelName->GetText( level );
+	// 
+	// // See if .vmf exists in assumed location
+	// char localfile[ 512 ];
+	// Q_snprintf( localfile, sizeof( localfile ), "%s/%s.vmf", m_szVMFContentDirFullpath, level );
+	// if ( !g_pFileSystem->FileExists( localfile, NULL ) )
+	// {
+	// 	if ( !m_hDirectorySelectDialog.Get() )
+	// 	{
+	// 		m_hDirectorySelectDialog = new DirectorySelectDialog( this, "Choose .vmf folder" );
+	// 	}
+	// 
+	// 	m_bAddVMF = true;
+	// 	m_hDirectorySelectDialog->SetStartDirectory( m_szVMFContentDirFullpath );
+	// 	m_hDirectorySelectDialog->DoModal();
+	// 	return;
+	// }
+	// 
+	// GetDataFileBase( GetSubmitter(), m_szVMFName, sizeof( m_szVMFName ) );
+	// m_pVMFURL->SetText( m_szVMFName );
 }
 
 void CBugUIPanel::OnChooseVMFFolder()
@@ -1184,83 +1189,85 @@ void CBugUIPanel::OnDirectorySelected( char const *dir )
 
 void CBugUIPanel::OnFileSelected( char const *fullpath )
 {
-	bool baseDirFile = false;
-
-	if ( m_pBugReporter && m_pBugReporter->IsPublicUI() )
-		return;
-
-	if ( !fullpath || !fullpath[ 0 ] )
-		return;
-
-	char relativepath[ 512 ];
-	if ( !g_pFileSystem->FullPathToRelativePath_safe( fullpath, relativepath ) )
-	{
-		if ( Q_stristr( fullpath, com_basedir ) )
-		{
-			V_sprintf_safe( relativepath, "..%s", fullpath + strlen(com_basedir) );	
-			baseDirFile = true;
-		}
-		else
-		{
-			Msg("Only files beneath the base game directory can be included\n" );
-			return;
-		}
-	}
-
-	char ext[ 10 ];
-	V_ExtractFileExtension( relativepath, ext );
-
-	if ( m_hFileOpenDialog != 0 )
-	{
-		m_hFileOpenDialog->MarkForDeletion();
-	}
-
-	includedfile inc;
-	V_strcpy_safe( inc.name, relativepath );
-	
-	if ( baseDirFile )
-	{
-		V_sprintf_safe( inc.fixedname, "%s", inc.name+3 ); // strip the "..\"
-	}
-	else
-	{
-		V_sprintf_safe( inc.fixedname, "%s", inc.name );
-	}
-	V_FixSlashes( inc.fixedname );
-
-	m_IncludedFiles.AddToTail( inc );
-
-	char concat[ 8192 ];
-	concat[ 0 ] = 0;
-	for ( int i = 0 ; i < m_IncludedFiles.Count(); ++i )
-	{
-		V_strcat_safe( concat, m_IncludedFiles[ i ].name );
-		V_strcat_safe( concat, "\n" );
-	}
-	m_pIncludedFiles->SetText( concat );
+	// dimhotepus: Drop as only public repo used.
+	// bool baseDirFile = false;
+	// 
+	// if ( m_pBugReporter && m_pBugReporter->IsPublicUI() )
+	// 	return;
+	// 
+	// if ( !fullpath || !fullpath[ 0 ] )
+	// 	return;
+	// 
+	// char relativepath[ 512 ];
+	// if ( !g_pFileSystem->FullPathToRelativePath_safe( fullpath, relativepath ) )
+	// {
+	// 	if ( Q_stristr( fullpath, com_basedir ) )
+	// 	{
+	// 		V_sprintf_safe( relativepath, "..%s", fullpath + strlen(com_basedir) );	
+	// 		baseDirFile = true;
+	// 	}
+	// 	else
+	// 	{
+	// 		Msg("Only files beneath the base game directory can be included\n" );
+	// 		return;
+	// 	}
+	// }
+	// 
+	// char ext[ 10 ];
+	// V_ExtractFileExtension( relativepath, ext );
+	// 
+	// if ( m_hFileOpenDialog != 0 )
+	// {
+	// 	m_hFileOpenDialog->MarkForDeletion();
+	// }
+	// 
+	// includedfile inc;
+	// V_strcpy_safe( inc.name, relativepath );
+	// 
+	// if ( baseDirFile )
+	// {
+	// 	V_sprintf_safe( inc.fixedname, "%s", inc.name+3 ); // strip the "..\"
+	// }
+	// else
+	// {
+	// 	V_sprintf_safe( inc.fixedname, "%s", inc.name );
+	// }
+	// V_FixSlashes( inc.fixedname );
+	// 
+	// m_IncludedFiles.AddToTail( inc );
+	// 
+	// char concat[ 8192 ];
+	// concat[ 0 ] = 0;
+	// for ( int i = 0 ; i < m_IncludedFiles.Count(); ++i )
+	// {
+	// 	V_strcat_safe( concat, m_IncludedFiles[ i ].name );
+	// 	V_strcat_safe( concat, "\n" );
+	// }
+	// m_pIncludedFiles->SetText( concat );
 }
 
 void CBugUIPanel::OnIncludeFile()
 {
-	if ( m_pBugReporter && m_pBugReporter->IsPublicUI() )
-		return;
+	//if ( m_pBugReporter && m_pBugReporter->IsPublicUI() )
+	//	return;
 
-	if ( !m_hFileOpenDialog.Get() )
-	{
-		m_hFileOpenDialog = new FileOpenDialog( this, "Choose file to include", true );
-		if ( m_hFileOpenDialog != 0 )
-		{
-			m_hFileOpenDialog->AddFilter("*.*", "All Files (*.*)", true);
-		}
-	}
-	if ( m_hFileOpenDialog )
-	{
-		char startPath[ MAX_PATH ];
-		V_strcpy_safe( startPath, com_gamedir );
-		V_FixSlashes( startPath );
-		m_hFileOpenDialog->SetStartDirectory( startPath );
-		m_hFileOpenDialog->DoModal( false );
-	}
+	// dimhotepus: Drop as only public repo used.
+	//if ( !m_hFileOpenDialog.Get() )
+	//{
+	//	m_hFileOpenDialog = new FileOpenDialog( this, "Choose file to include", true );
+	//	if ( m_hFileOpenDialog != 0 )
+	//	{
+	//		m_hFileOpenDialog->AddFilter("*.*", "All Files (*.*)", true);
+	//	}
+	//}
+	//if ( m_hFileOpenDialog )
+	//{
+	//	char startPath[ MAX_PATH ];
+	//	V_strcpy_safe( startPath, com_gamedir );
+	//	V_FixSlashes( startPath );
+	//	m_hFileOpenDialog->SetStartDirectory( startPath );
+	//	m_hFileOpenDialog->DoModal( false );
+	//}
 
 	//GetDataFileBase( GetSubmitter(), m_szVMFName, sizeof( m_szVMFName ) );
 }
@@ -1445,7 +1452,8 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 	if ( !m_pBugReporter )
 		return false;
 
-	bool isPublic = m_pBugReporter->IsPublicUI();
+	// dimhotepus: Drop as only public repo used.
+	// bool isPublic = m_pBugReporter->IsPublicUI();
 
 	char title[ 256 ];
 	char desc[ 4096 ];
@@ -1464,8 +1472,9 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 		return false;
 	}
 
+	// dimhotepus: Drop as only public repo used.
 	// Only require description in public UI
-	if ( isPublic )
+	// if ( isPublic )
 	{
 		m_pDescription->GetText( desc );
 		if ( !desc[ 0 ] )
@@ -1478,65 +1487,71 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 		}
 	}
 	
+	// dimhotepus: Drop as only public repo used.
+	// if ( !isPublic && m_pSeverity->GetActiveItem() < 0 )
+	// {
+	// 	if ( verbose ) 
+	// 	{
+	// 		Warning( "Severity not set!\n" );
+	// 	}
+	// 	return false;
+	// }
 
-	if ( !isPublic && m_pSeverity->GetActiveItem() < 0 )
-	{
-		if ( verbose ) 
-		{
-			Warning( "Severity not set!\n" );
-		}
-		return false;
-	}
-
-	if ( !isPublic && m_pAssignTo->GetActiveItem() < 0 )
-	{
-		if ( verbose ) 
-		{
-			Warning( "Owner not set!\n" );
-		}
-		return false;
-	}
+	// dimhotepus: Drop as only public repo used.
+	// if ( !isPublic && m_pAssignTo->GetActiveItem() < 0 )
+	// {
+	// 	if ( verbose ) 
+	// 	{
+	// 		Warning( "Owner not set!\n" );
+	// 	}
+	// 	return false;
+	// }
 
 	char owner[ 256 ];
 	Q_strncpy( owner, m_pBugReporter->GetDisplayName( m_pAssignTo->GetActiveItem() ), sizeof( owner ) );
-	if ( !isPublic && !Q_stricmp( owner, "<<Unassigned>>" ) )
-	{
-		if ( verbose ) 
-		{
-			Warning( "Owner not set!\n" );
-		}
-		return false;
-	}
+	// dimhotepus: Drop as only public repo used.
+	// if ( !isPublic && !Q_stricmp( owner, "<<Unassigned>>" ) )
+	// {
+	// 	if ( verbose ) 
+	// 	{
+	// 		Warning( "Owner not set!\n" );
+	// 	}
+	// 	return false;
+	// }
 
-	if ( !isPublic && m_pPriority->GetActiveItem() < 0 )
-	{
-		if ( verbose ) 
-		{
-			Warning( "Priority not set!\n" );
-		}
-		return false;
-	}
+	// dimhotepus: Drop as only public repo used.
+	// if ( !isPublic && m_pPriority->GetActiveItem() < 0 )
+	// {
+	// 	if ( verbose ) 
+	// 	{
+	// 		Warning( "Priority not set!\n" );
+	// 	}
+	// 	return false;
+	// }
 
-	if ( !isPublic && m_pReportType->GetActiveItem() < 0 )
-	{
-		if ( verbose ) 
-		{
-			Warning( "Report Type not set!\n" );
-		}
-		return false;
-	}
+	// dimhotepus: Drop as only public repo used.
+	// if ( !isPublic && m_pReportType->GetActiveItem() < 0 )
+	// {
+	// 	if ( verbose ) 
+	// 	{
+	// 		Warning( "Report Type not set!\n" );
+	// 	}
+	// 	return false;
+	// }
 
-	if ( !isPublic && m_pGameArea->GetActiveItem() < 0 )
-	{
-		if ( verbose ) 
-		{
-			Warning( "Area not set!\n" );
-		}
-		return false;
-	}
+	// dimhotepus: Drop as only public repo used.
+	// if ( !isPublic && m_pGameArea->GetActiveItem() < 0 )
+	// {
+	// 	if ( verbose ) 
+	// 	{
+	// 		Warning( "Area not set!\n" );
+	// 	}
+	// 	return false;
+	// }
 
+	// dimhotepus: Drop as only public repo used.
 	// Public must have a selection and it can't be the "<<Choose One>>"
-	if ( isPublic && m_pReportType->GetActiveItem() <= 0 )
+	if ( /* isPublic && */ m_pReportType->GetActiveItem() <= 0 )
 	{
 		if ( verbose )
 		{
@@ -1545,7 +1560,8 @@ bool CBugUIPanel::IsValidSubmission( bool verbose )
 		return false;
 	}
 
-	if ( isPublic )
+	// dimhotepus: Drop as only public repo used.
+	// if ( isPublic )
 	{
 		char email[ 80 ];
 		m_pEmail->GetText( email );
@@ -1619,7 +1635,8 @@ void CBugUIPanel::OnSubmit()
 		return;
 	}
 
-	bool isPublic = m_pBugReporter->IsPublicUI();
+	// dimhotepus: Drop as only public repo used.
+	// bool isPublic = m_pBugReporter->IsPublicUI();
 
 	char title[ 80 ];
 	char desc[ 4096 ];
@@ -1747,16 +1764,17 @@ void CBugUIPanel::OnSubmit()
 		char misc2[ 256 ];
 
 		// dimhotepus: long -> time_t
-		time_t mapfiletime = g_pFileSystem->GetFileTime( modelloader->GetName( host_state.worldmodel ), "GAME" );
-		if ( !isPublic && mapfiletime != 0L )
-		{
-			char filetimebuf[ 64 ];
-			g_pFileSystem->FileTimeToString( filetimebuf, mapfiletime );
-
-			V_sprintf_safe( misc2, "Map version:  %i\nFile timestamp:  %s", g_ServerGlobalVariables.mapversion, filetimebuf );
-			V_strcat_safe( misc, misc2 );
-		}
-		else
+		// time_t mapfiletime = g_pFileSystem->GetFileTime( modelloader->GetName( host_state.worldmodel ), "GAME" );
+		// dimhotepus: Drop as only public repo used.
+		// if ( !isPublic && mapfiletime != 0L )
+		// {
+		// 	char filetimebuf[ 64 ];
+		// 	g_pFileSystem->FileTimeToString( filetimebuf, mapfiletime );
+		// 
+		// 	V_sprintf_safe( misc2, "Map version:  %i\nFile timestamp:  %s", g_ServerGlobalVariables.mapversion, filetimebuf );
+		// 	V_strcat_safe( misc, misc2 );
+		// }
+		// else
 		{
 			V_sprintf_safe( misc2, "Map version:  %i\n", g_ServerGlobalVariables.mapversion );
 			V_strcat_safe( misc, misc2 );
@@ -1781,25 +1799,27 @@ void CBugUIPanel::OnSubmit()
 
 	Msg( "%s", misc );
 
-	if ( !isPublic )
-	{
-		m_pSeverity->GetText( severity );
-		Msg( "severity %s\n", severity );
+	// dimhotepus: Drop as only public repo used.
+	// if ( !isPublic )
+	// {
+	// 	m_pSeverity->GetText( severity );
+	// 	Msg( "severity %s\n", severity );
+	// 
+	// 	m_pGameArea->GetText( area );
+	// 	Msg( "area %s\n", area );
+	// 
+	// 	m_pMapNumber->GetText( mapnumber );
+	// 	Msg( "map number %s\n", mapnumber);
+	// 
+	// 	m_pPriority->GetText( priority );
+	// 	Msg( "priority %s\n", priority );
+	// 
+	// 	m_pAssignTo->GetText( assignedto );
+	// 	Msg( "owner %s\n", assignedto );
+	// }
 
-		m_pGameArea->GetText( area );
-		Msg( "area %s\n", area );
-
-		m_pMapNumber->GetText( mapnumber );
-		Msg( "map number %s\n", mapnumber);
-
-		m_pPriority->GetText( priority );
-		Msg( "priority %s\n", priority );
-
-		m_pAssignTo->GetText( assignedto );
-		Msg( "owner %s\n", assignedto );
-	}
-
-	if ( isPublic )
+	// dimhotepus: Drop as only public repo used.
+	// if ( isPublic )
 	{
 		m_pEmail->GetText( email );
 		if ( !Q_isempty( email ) )
@@ -1816,21 +1836,22 @@ void CBugUIPanel::OnSubmit()
 		m_pSubmitterLabel->GetText( submitter );
 		m_pBugReporter->SetSubmitter( submitter );
 	}
-	else
-	{
-		m_pBugReporter->SetOwner( m_pBugReporter->GetUserNameForDisplayName( assignedto ) );
-
-		if ( m_bUseNameForSubmitter )
-		{
-			char submitter[ 80 ];
-			m_pSubmitter->GetText( submitter );
-			m_pBugReporter->SetSubmitter( submitter );
-		}
-		else
-		{
-			m_pBugReporter->SetSubmitter( NULL );
-		}
-	}
+	// dimhotepus: Drop as only public repo used.
+	// else
+	// {
+	// 	m_pBugReporter->SetOwner( m_pBugReporter->GetUserNameForDisplayName( assignedto ) );
+	// 
+	// 	if ( m_bUseNameForSubmitter )
+	// 	{
+	// 		char submitter[ 80 ];
+	// 		m_pSubmitter->GetText( submitter );
+	// 		m_pBugReporter->SetSubmitter( submitter );
+	// 	}
+	// 	else
+	// 	{
+	// 		m_pBugReporter->SetSubmitter( NULL );
+	// 	}
+	// }
 
 	m_pReportType->GetText( reporttype );
 	Msg( "report type %s\n", reporttype );
@@ -1864,26 +1885,27 @@ void CBugUIPanel::OnSubmit()
 		Msg( "no screenshot\n" );
 	}
 
-	if ( !isPublic )
-	{
-		if ( m_szBSPName[ 0 ] )
-		{
-			Msg( "bsp file maps/%s.bsp\n", m_szBSPName );
-		}
-
-		if ( m_szVMFName[ 0 ] )
-		{
-			Msg( "vmf file maps/%s.vmf\n", m_szVMFName );
-		}
-
-		if ( m_IncludedFiles.Count() > 0 )
-		{
-			for ( int i = 0; i < m_IncludedFiles.Count(); ++i )
-			{
-				Msg( "Include:  %s\n", m_IncludedFiles[ i ].name );
-			}
-		}
-	}
+	// dimhotepus: Drop as only public repo used.
+	// if ( !isPublic )
+	// {
+	// 	if ( m_szBSPName[ 0 ] )
+	// 	{
+	// 		Msg( "bsp file maps/%s.bsp\n", m_szBSPName );
+	// 	}
+	// 
+	// 	if ( m_szVMFName[ 0 ] )
+	// 	{
+	// 		Msg( "vmf file maps/%s.vmf\n", m_szVMFName );
+	// 	}
+	// 
+	// 	if ( m_IncludedFiles.Count() > 0 )
+	// 	{
+	// 		for ( int i = 0; i < m_IncludedFiles.Count(); ++i )
+	// 		{
+	// 			Msg( "Include:  %s\n", m_IncludedFiles[ i ].name );
+	// 		}
+	// 	}
+	// }
 
 
 	m_pBugReporter->SetTitle( title );
@@ -2033,52 +2055,53 @@ void CBugUIPanel::OnSubmit()
 		uint64 un64SteamID = m_SteamID.ConvertToUint64();
 		m_pBugReporter->SetSteamUserID( &un64SteamID, sizeof( un64SteamID ) );
 	}
-	else
-	{
-		// Notify other players that we've submitted a bug
-		if ( cl.IsActive() && cl.m_nMaxClients > 1 )
-		{
-			char buf[256];
-			Q_snprintf( buf, sizeof(buf), "say \"Bug Submitted: \'%s\'\"", title );
-			Cbuf_AddText( buf );
-		}
-
-		if ( m_szSaveGameName[ 0 ] )
-		{
-			Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s.sav", GetRepositoryURL(), m_szSaveGameName );
-			Q_FixSlashes( fn );
-			m_pBugReporter->SetSaveGame( fn );
-		}
-		if ( m_szScreenShotName[ 0 ] )
-		{
-			Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s.jpg", GetRepositoryURL(), m_szScreenShotName );
-			Q_FixSlashes( fn );
-			m_pBugReporter->SetScreenShot( fn );
-		}
-		if ( m_szBSPName[ 0 ] )
-		{
-			Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s.bsp", GetRepositoryURL(), m_szBSPName );
-			Q_FixSlashes( fn );
-			m_pBugReporter->SetBSPName( fn );
-		}
-		if ( m_szVMFName[ 0 ] )
-		{
-			Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s.vmf", GetRepositoryURL(), m_szVMFName );
-			Q_FixSlashes( fn );
-			m_pBugReporter->SetVMFName( fn );
-		}
-
-
-		if ( m_IncludedFiles.Count() > 0 )
-		{
-			for ( int i = 0; i < m_IncludedFiles.Count(); ++i )
-			{
-				Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s", GetRepositoryURL(), m_IncludedFiles[ i ].fixedname );
-				Q_FixSlashes( fn );
-				m_pBugReporter->AddIncludedFile( fn );
-			}
-		}
-	}
+	// dimhotepus: Drop as only public repo used.
+	// else
+	// {
+	// 	// Notify other players that we've submitted a bug
+	// 	if ( cl.IsActive() && cl.m_nMaxClients > 1 )
+	// 	{
+	// 		char buf[256];
+	// 		Q_snprintf( buf, sizeof(buf), "say \"Bug Submitted: \'%s\'\"", title );
+	// 		Cbuf_AddText( buf );
+	// 	}
+	// 
+	// 	if ( m_szSaveGameName[ 0 ] )
+	// 	{
+	// 		Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s.sav", GetRepositoryURL(), m_szSaveGameName );
+	// 		Q_FixSlashes( fn );
+	// 		m_pBugReporter->SetSaveGame( fn );
+	// 	}
+	// 	if ( m_szScreenShotName[ 0 ] )
+	// 	{
+	// 		Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s.jpg", GetRepositoryURL(), m_szScreenShotName );
+	// 		Q_FixSlashes( fn );
+	// 		m_pBugReporter->SetScreenShot( fn );
+	// 	}
+	// 	if ( m_szBSPName[ 0 ] )
+	// 	{
+	// 		Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s.bsp", GetRepositoryURL(), m_szBSPName );
+	// 		Q_FixSlashes( fn );
+	// 		m_pBugReporter->SetBSPName( fn );
+	// 	}
+	// 	if ( m_szVMFName[ 0 ] )
+	// 	{
+	// 		Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s.vmf", GetRepositoryURL(), m_szVMFName );
+	// 		Q_FixSlashes( fn );
+	// 		m_pBugReporter->SetVMFName( fn );
+	// 	}
+	// 
+	// 
+	// 	if ( m_IncludedFiles.Count() > 0 )
+	// 	{
+	// 		for ( int i = 0; i < m_IncludedFiles.Count(); ++i )
+	// 		{
+	// 			Q_snprintf( fn, sizeof( fn ), "%s/BugId/%s", GetRepositoryURL(), m_IncludedFiles[ i ].fixedname );
+	// 			Q_FixSlashes( fn );
+	// 			m_pBugReporter->AddIncludedFile( fn );
+	// 		}
+	// 	}
+	// }
 
 	Q_strncpy( m_szLevel, level, sizeof( m_szLevel ) );
 
@@ -2089,10 +2112,11 @@ void CBugUIPanel::OnSubmit()
 		vgui::input()->SetAppModalSurface(m_pProgressDialog->GetVPanel());
 		m_flPauseTime = (float)system()->GetFrameTime() + PUBLIC_BUGREPORT_WAIT_TIME;
 	}
-	else
-	{
-		OnFinishBugReport();
-	}
+	// dimhotepus: Drop as only public repo used.
+	// else
+	// {
+	// 	OnFinishBugReport();
+	// }
 }
 
 bool CBugUIPanel::OnFinishBugReport()
@@ -2103,14 +2127,15 @@ bool CBugUIPanel::OnFinishBugReport()
 	if ( success )
 	{
 		// The public UI handles uploading on it's own...
-		if ( !m_pBugReporter->IsPublicUI() )
-		{
-			if ( !UploadBugSubmission( m_szLevel, bugId, m_szSaveGameName, m_szScreenShotName, m_szBSPName, m_szVMFName, m_IncludedFiles ) )
-			{
-				Warning( "Unable to upload saved game and screenshot to bug repository!\n" );
-				success = false;
-			}
-		}
+		// dimhotepus: Drop as only public repo used.
+		// if ( !m_pBugReporter->IsPublicUI() )
+		// {
+		// 	if ( !UploadBugSubmission( m_szLevel, bugId, m_szSaveGameName, m_szScreenShotName, m_szBSPName, m_szVMFName, m_IncludedFiles ) )
+		// 	{
+		// 		Warning( "Unable to upload saved game and screenshot to bug repository!\n" );
+		// 		success = false;
+		// 	}
+		// }
 	}
 	else
 	{
@@ -2129,10 +2154,11 @@ bool CBugUIPanel::OnFinishBugReport()
 		WipeData();
 		SuccessSound( bugId );
 
-		if ( !m_pBugReporter->IsPublicUI() )
-		{
-			Close();
-		}
+		// dimhotepus: Drop as only public repo used.
+		// if ( !m_pBugReporter->IsPublicUI() )
+		// {
+		// 	Close();
+		// }
 	}
 
 	return success;
@@ -2276,104 +2302,105 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 
 CCallQueue g_UploadQueue;
 
-bool CBugUIPanel::UploadBugSubmission( char const *levelname, int bugId, char const *savefile, char const *screenshot, char const *bsp, char const *vmf,
-	CUtlVector< includedfile >& files )
-{
-	bool bret = true;
-	bool bAsync = bugreporter_uploadasync.GetBool();
-
-	char localfile[ 512 ];
-	char remotefile[ 512 ];
-
-	if ( savefile && savefile[ 0 ] )
-	{
-#ifdef PLATFORM_64BITS
-		Q_snprintf( localfile, sizeof( localfile ), "%s/save/x64/%s.sav", com_gamedir, savefile );
-#else
-		Q_snprintf( localfile, sizeof( localfile ), "%s/save/%s.sav", com_gamedir, savefile );
-#endif
-		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.sav", GetSubmissionURL(bugId), savefile );
-		Q_FixSlashes( localfile );
-		Q_FixSlashes( remotefile );
-
-		g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-	}
-
-	if ( screenshot && screenshot[ 0 ] )
-	{
-		Q_snprintf( localfile, sizeof( localfile ), "%s/screenshots/%s.jpg", com_gamedir, screenshot );
-		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.jpg", GetSubmissionURL(bugId), screenshot );
-		Q_FixSlashes( localfile );
-		Q_FixSlashes( remotefile );
-		
-		g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-	}
-
-	if ( bsp && bsp[ 0 ] )
-	{
-		Q_snprintf( localfile, sizeof( localfile ), "maps/%s.bsp", levelname );
-		char *pszMapPath;
-		FileHandle_t hBsp = g_pFileSystem->OpenEx( localfile, "rb", 0, 0, &pszMapPath );
-		if ( !hBsp )
-		{
-			Q_snprintf( localfile, sizeof( localfile ), "%s/maps/%s.bsp", com_gamedir, levelname );
-		}
-		else
-		{
-			V_strncpy( localfile, pszMapPath, sizeof( localfile ) );
-			delete pszMapPath;
-			g_pFileSystem->Close( hBsp );
-		}
-		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.bsp", GetSubmissionURL(bugId), bsp );
-		Q_FixSlashes( localfile );
-		Q_FixSlashes( remotefile );
-		
-		g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-	}
-
-	if ( vmf && vmf[ 0 ] )
-	{
-		Q_snprintf( localfile, sizeof( localfile ), "%s/%s.vmf", m_szVMFContentDirFullpath, levelname );
-		if ( g_pFileSystem->FileExists( localfile, NULL ) )
-		{
-			Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.vmf", GetSubmissionURL(bugId), vmf );
-			Q_FixSlashes( localfile );
-			Q_FixSlashes( remotefile );
-		
-			g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-		}
-		else
-		{
-			Msg( "Unable to locate .vmf file %s\n", localfile );
-		}
-	}
-
-	if ( files.Count() > 0 )
-	{
-		bAsync = false;
-		intp c = files.Count();
-		for ( intp i = 0 ; i < c; ++i )
-		{
-			Q_snprintf( localfile, sizeof( localfile ), "%s/%s", com_gamedir, files[ i ].name );
-			Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s", GetSubmissionURL(bugId), files[ i ].fixedname );
-			Q_FixSlashes( localfile );
-			Q_FixSlashes( remotefile );
-			
-			g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-		}
-	}
-
-	if ( !bAsync )
-	{
-		g_UploadQueue.CallQueued();
-	}
-	else
-	{
-		ThreadExecuteSolo( "BugUpload", &g_UploadQueue, &CCallQueue::CallQueued );
-	}
-
-	return bret;
-}
+// dimhotepus: Drop as only public repo used.
+// bool CBugUIPanel::UploadBugSubmission( char const *levelname, int bugId, char const *savefile, char const *screenshot, char const *bsp, char const *vmf,
+// 	CUtlVector< includedfile >& files )
+// {
+// 	bool bret = true;
+// 	bool bAsync = bugreporter_uploadasync.GetBool();
+// 
+// 	char localfile[ 512 ];
+// 	char remotefile[ 512 ];
+// 
+// 	if ( savefile && savefile[ 0 ] )
+// 	{
+// #ifdef PLATFORM_64BITS
+// 		Q_snprintf( localfile, sizeof( localfile ), "%s/save/x64/%s.sav", com_gamedir, savefile );
+// #else
+// 		Q_snprintf( localfile, sizeof( localfile ), "%s/save/%s.sav", com_gamedir, savefile );
+// #endif
+// 		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.sav", GetSubmissionURL(bugId), savefile );
+// 		Q_FixSlashes( localfile );
+// 		Q_FixSlashes( remotefile );
+// 
+// 		g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
+// 	}
+// 
+// 	if ( screenshot && screenshot[ 0 ] )
+// 	{
+// 		Q_snprintf( localfile, sizeof( localfile ), "%s/screenshots/%s.jpg", com_gamedir, screenshot );
+// 		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.jpg", GetSubmissionURL(bugId), screenshot );
+// 		Q_FixSlashes( localfile );
+// 		Q_FixSlashes( remotefile );
+// 		
+// 		g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
+// 	}
+// 
+// 	if ( bsp && bsp[ 0 ] )
+// 	{
+// 		Q_snprintf( localfile, sizeof( localfile ), "maps/%s.bsp", levelname );
+// 		char *pszMapPath;
+// 		FileHandle_t hBsp = g_pFileSystem->OpenEx( localfile, "rb", 0, 0, &pszMapPath );
+// 		if ( !hBsp )
+// 		{
+// 			Q_snprintf( localfile, sizeof( localfile ), "%s/maps/%s.bsp", com_gamedir, levelname );
+// 		}
+// 		else
+// 		{
+// 			V_strncpy( localfile, pszMapPath, sizeof( localfile ) );
+// 			delete pszMapPath;
+// 			g_pFileSystem->Close( hBsp );
+// 		}
+// 		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.bsp", GetSubmissionURL(bugId), bsp );
+// 		Q_FixSlashes( localfile );
+// 		Q_FixSlashes( remotefile );
+// 		
+// 		g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
+// 	}
+// 
+// 	if ( vmf && vmf[ 0 ] )
+// 	{
+// 		Q_snprintf( localfile, sizeof( localfile ), "%s/%s.vmf", m_szVMFContentDirFullpath, levelname );
+// 		if ( g_pFileSystem->FileExists( localfile, NULL ) )
+// 		{
+// 			Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.vmf", GetSubmissionURL(bugId), vmf );
+// 			Q_FixSlashes( localfile );
+// 			Q_FixSlashes( remotefile );
+// 		
+// 			g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
+// 		}
+// 		else
+// 		{
+// 			Msg( "Unable to locate .vmf file %s\n", localfile );
+// 		}
+// 	}
+// 
+// 	if ( files.Count() > 0 )
+// 	{
+// 		bAsync = false;
+// 		intp c = files.Count();
+// 		for ( intp i = 0 ; i < c; ++i )
+// 		{
+// 			Q_snprintf( localfile, sizeof( localfile ), "%s/%s", com_gamedir, files[ i ].name );
+// 			Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s", GetSubmissionURL(bugId), files[ i ].fixedname );
+// 			Q_FixSlashes( localfile );
+// 			Q_FixSlashes( remotefile );
+// 			
+// 			g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
+// 		}
+// 	}
+// 
+// 	if ( !bAsync )
+// 	{
+// 		g_UploadQueue.CallQueued();
+// 	}
+// 	else
+// 	{
+// 		ThreadExecuteSolo( "BugUpload", &g_UploadQueue, &CCallQueue::CallQueued );
+// 	}
+// 
+// 	return bret;
+// }
 
 void CBugUIPanel::Close()
 {
@@ -2402,11 +2429,12 @@ void CBugUIPanel::OnCommand( char const *command )
 		
 		//Adrian: We always want the BSP you used when saving the game.
 		//But only if you're not the public bug reporter!
-		if ( bugreporter_includebsp.GetBool() &&
-			 m_pBugReporter->IsPublicUI() == false ) 
-		{
-			OnSaveBSP();
-		}
+		// dimhotepus: Drop as only public repo used.
+		// if ( bugreporter_includebsp.GetBool() &&
+		// 	 m_pBugReporter->IsPublicUI() == false ) 
+		// {
+		// 	OnSaveBSP();
+		// }
 	}
 	else if ( !Q_strcasecmp( command, "savebsp" ) )
 	{
@@ -2460,49 +2488,50 @@ void CBugUIPanel::DetermineSubmitterName()
 		m_bCanSeeRepository = true;
 		m_bCanSubmit = true;
 	}
-	else
-	{
-		Color clr( 100, 200, 255, 255 );
-
-		const char *pUserName = m_pBugReporter->GetUserName();
-		const char *pUserDisplayName = m_pBugReporter->GetUserName_Display();
-
-		if ( pUserName && pUserName[0] && pUserDisplayName && pUserDisplayName[0] )
-		{
-			ConColorMsg( clr, "Username '%s' -- '%s'\n", pUserName, pUserDisplayName );
-		}
-		else if ( cl.IsActive() )
-		{
-			m_bUseNameForSubmitter = true;
-			pUserDisplayName = cl_name.GetString();
-			ConColorMsg( clr, "Using '%s' as bug submission name.\n", pUserDisplayName );
-		}
-		else
-		{
-			ConColorMsg( clr, "Failed to determine bug submission name.\n" );
-		}
-
-		// See if we can see the bug repository right now
-		char fn[ 512 ];
-		Q_snprintf( fn, sizeof( fn ), "%s/%s", GetRepositoryURL(), REPOSITORY_VALIDATION_FILE );
-		Q_FixSlashes( fn );
-
-		FILE *fp = fopen( fn, "rb" );
-		if ( fp )
-		{
-			ConColorMsg( clr, "Bug Repository '%s'\n", GetRepositoryURL() );
-			fclose( fp );
-
-			m_bCanSeeRepository = true;
-		}
-		else
-		{
-			Warning( "Unable to see '%s', check permissions and network connectivity\n", fn );
-			m_bCanSubmit = false;
-		}
-
-		m_pSubmitter->SetText( pUserDisplayName );
-	}
+	// dimhotepus: Drop as only public repo used.
+	// else
+	// {
+	// 	Color clr( 100, 200, 255, 255 );
+	// 
+	// 	const char *pUserName = m_pBugReporter->GetUserName();
+	// 	const char *pUserDisplayName = m_pBugReporter->GetUserName_Display();
+	// 
+	// 	if ( pUserName && pUserName[0] && pUserDisplayName && pUserDisplayName[0] )
+	// 	{
+	// 		ConColorMsg( clr, "Username '%s' -- '%s'\n", pUserName, pUserDisplayName );
+	// 	}
+	// 	else if ( cl.IsActive() )
+	// 	{
+	// 		m_bUseNameForSubmitter = true;
+	// 		pUserDisplayName = cl_name.GetString();
+	// 		ConColorMsg( clr, "Using '%s' as bug submission name.\n", pUserDisplayName );
+	// 	}
+	// 	else
+	// 	{
+	// 		ConColorMsg( clr, "Failed to determine bug submission name.\n" );
+	// 	}
+	// 
+	// 	// See if we can see the bug repository right now
+	// 	char fn[ 512 ];
+	// 	Q_snprintf( fn, sizeof( fn ), "%s/%s", GetRepositoryURL(), REPOSITORY_VALIDATION_FILE );
+	// 	Q_FixSlashes( fn );
+	// 
+	// 	FILE *fp = fopen( fn, "rb" );
+	// 	if ( fp )
+	// 	{
+	// 		ConColorMsg( clr, "Bug Repository '%s'\n", GetRepositoryURL() );
+	// 		fclose( fp );
+	// 
+	// 		m_bCanSeeRepository = true;
+	// 	}
+	// 	else
+	// 	{
+	// 		Warning( "Unable to see '%s', check permissions and network connectivity\n", fn );
+	// 		m_bCanSubmit = false;
+	// 	}
+	// 
+	// 	m_pSubmitter->SetText( pUserDisplayName );
+	// }
 }
 
 void CBugUIPanel::PopulateControls()
@@ -2588,10 +2617,11 @@ void CBugUIPanel::SuccessSound( int bugId )
 	{
 		ConColorMsg( clr, "Bug submission succeeded\n" );
 	}
-	else
-	{
-		ConColorMsg( clr, "Bug submission succeeded for bug (%i)\n", bugId );
-	}
+	// dimhotepus: Drop as only public repo used.
+	// else
+	// {
+	// 	ConColorMsg( clr, "Bug submission succeeded for bug (%i)\n", bugId );
+	// }
 	Cbuf_AddText( va( "play %s\n", SUCCEED_SOUND ) );
 }
 
