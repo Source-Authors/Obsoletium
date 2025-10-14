@@ -292,7 +292,8 @@ private:
 //-----------------------------------------------------------------------------
 CBugReportUploadProgressDialog::CBugReportUploadProgressDialog(Panel *parent, const char *name, const char *title, const char *message) : Frame(parent, name)
 {
-	SetSize(300, 160);
+	// dimhotepus: Scale support.
+	SetSize(QuickPropScale( 300 ), QuickPropScale( 160 ));
 	SetSizeable(false);
 	MoveToFront();
 	SetTitle(title, true);
@@ -357,7 +358,8 @@ private:
 //-----------------------------------------------------------------------------
 CBugReportFinishedDialog::CBugReportFinishedDialog(Panel *parent, const char *name, const char *title, const char *message) : Frame(parent, name)
 {
-	SetSize(300, 160);
+	// dimhotepus: Scale support.
+	SetSize(QuickPropScale( 300 ), QuickPropScale( 160 ));
 	SetSizeable(false);
 	MoveToFront();
 	SetTitle(title, true);
@@ -426,8 +428,27 @@ public:
 	bool			Init();
 	void			Shutdown();
 
-	void	OnKeyCodePressed( KeyCode code ) override;
+	void ApplySchemeSettings( IScheme *pScheme ) override
+	{
+		BaseClass::ApplySchemeSettings( pScheme );
 
+		// dimhotepus: Hack, adjust build label/version to fit the dialog.
+		auto *buildLabel = FindControl<vgui::Label>( "Label6" );
+		if ( buildLabel )
+		{
+			const int shift = QuickPropScale( 10 );
+			int x, y, wide, tall;
+
+			buildLabel->GetPos( x, y );
+			x -= shift;
+			buildLabel->SetPos( x, y );
+
+			m_pBuildNumber->GetBounds( x, y, wide, tall );
+			x -= shift;
+			wide += shift;
+			m_pBuildNumber->SetBounds( x, y, wide, tall );
+		}
+	}
 	void			ParseDefaultParams( void );
 	void			ParseCommands( const CCommand &args );
 
