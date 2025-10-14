@@ -219,13 +219,6 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 void CGameUI::PostInit()
 {
-	if ( IsX360() )
-	{
-		enginesound->PrecacheSound( "UI/buttonrollover.wav", true, true );
-		enginesound->PrecacheSound( "UI/buttonclick.wav", true, true );
-		enginesound->PrecacheSound( "UI/buttonclickrelease.wav", true, true );
-		enginesound->PrecacheSound( "player/suit_denydevice.wav", true, true );
-	}
 }
 
 //-----------------------------------------------------------------------------
@@ -385,9 +378,6 @@ int __stdcall SendShutdownMsgFunc(WHANDLE hwnd, int lparam)
 //-----------------------------------------------------------------------------
 void CGameUI::PlayGameStartupSound()
 {
-	if ( IsX360() )
-		return;
-
 	if ( CommandLine()->FindParm( "-nostartupsound" ) )
 		return;
 
@@ -781,12 +771,6 @@ void CGameUI::OnGameUIHidden()
 //-----------------------------------------------------------------------------
 void CGameUI::RunFrame()
 {
-	if ( IsX360() && m_bOpenProgressOnStart )
-	{
-		StartProgressBar();
-		m_bOpenProgressOnStart = false;
-	}
-
 	// resize the background panel to the screen size
 	int wide, tall;
 	vgui::surface()->GetScreenSize(wide, tall);
