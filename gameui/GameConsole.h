@@ -40,7 +40,8 @@ public:
 	// activates the console after a delay
 	void ActivateDelayed(float time);
 
-	void SetParent( uintp parent );
+	// dimhotepus: Use strict type.
+	void SetParent( vgui::VPANEL parent );
 
 	static void OnCmdCondump();
 private:

@@ -144,13 +144,13 @@ void CGameConsole::ActivateDelayed(float time)
 #endif
 }
 
-void CGameConsole::SetParent( uintp parent )
+void CGameConsole::SetParent( vgui::VPANEL parent )
 {	
 #ifndef _XBOX
 	if (!m_bInitialized)
 		return;
 
-	m_pConsole->SetParent( static_cast<vgui::VPANEL>( parent ));
+	m_pConsole->SetParent( parent );
 #endif
 }
 

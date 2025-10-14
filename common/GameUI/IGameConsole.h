@@ -12,6 +12,14 @@
 
 #include "tier1/interface.h"
 
+namespace vgui
+{
+
+// handle to an internal vgui panel
+// this is the only handle to a panel that is valid across dll boundaries
+using VPANEL = uintp;
+
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: interface to game/dev console
@@ -33,7 +41,8 @@ public:
 	// return true if the console has focus
 	virtual bool IsConsoleVisible() = 0;
 
-	virtual void SetParent( uintp parent ) = 0;
+	// dimhotepus: Use strict type.
+	virtual void SetParent( vgui::VPANEL parent ) = 0;
 };
 
 #define GAMECONSOLE_INTERFACE_VERSION "GameConsole004"
