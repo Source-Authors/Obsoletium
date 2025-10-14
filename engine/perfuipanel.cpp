@@ -49,7 +49,7 @@ extern ConVar mat_wireframe;
 extern ConVar sv_cheats;
 
 // If you add a tool, add it to the string list and instance the panel in the constructor below
-enum PerformanceTool_t
+enum class PerformanceTool_t
 {
 	PERF_TOOL_NONE = 0,
 	PERF_TOOL_PROP_FADES,
@@ -61,7 +61,7 @@ enum PerformanceTool_t
 	DEFAULT_PERF_TOOL = PERF_TOOL_NONE,
 };
 
-static const char *s_pPerfToolNames[PERF_TOOL_COUNT] = 
+static constexpr char *s_pPerfToolNames[to_underlying(PerformanceTool_t::PERF_TOOL_COUNT)] = 
 {
 	"No Tool Active",
 	"Prop Fade Distance Tool",
@@ -469,7 +469,7 @@ private:
 	void	OnPerfToolSelected();
 
 	PerformanceTool_t m_nPerfTool;
-	CPerfUIChildPanel *m_pToolPanel[PERF_TOOL_COUNT];
+	CPerfUIChildPanel *m_pToolPanel[to_underlying(PerformanceTool_t::PERF_TOOL_COUNT)];
 	CPerfUIChildPanel *m_pCurrentToolPanel;
 };
 
@@ -501,17 +501,17 @@ CPerfUIPanel::CPerfUIPanel( vgui::Panel *parent ) : BaseClass( parent, "PerfUIPa
 	SetBounds( x, y, w, h );
 
 	// Create the child tool panels
-	m_pToolPanel[PERF_TOOL_NONE] = new CPerfUIChildPanel( this, "PerfNone" );
-	m_pToolPanel[PERF_TOOL_PROP_FADES] = new CPropFadeUIPanel( this );
-	m_pToolPanel[PERF_TOOL_AREA_PORTALS] = new CAreaPortalsUIPanel( this );
-	m_pToolPanel[PERF_TOOL_OCCLUSION] = new COcclusionUIPanel( this );
+	m_pToolPanel[to_underlying(PerformanceTool_t::PERF_TOOL_NONE)] = new CPerfUIChildPanel( this, "PerfNone" );
+	m_pToolPanel[to_underlying(PerformanceTool_t::PERF_TOOL_PROP_FADES)] = new CPropFadeUIPanel( this );
+	m_pToolPanel[to_underlying(PerformanceTool_t::PERF_TOOL_AREA_PORTALS)] = new CAreaPortalsUIPanel( this );
+	m_pToolPanel[to_underlying(PerformanceTool_t::PERF_TOOL_OCCLUSION)] = new COcclusionUIPanel( this );
 
 	for ( int i = 0; i < PERF_TOOL_COUNT; ++i )
 	{
 		m_pToolPanel[i]->SetBounds( 0, 75, w, h - 75 );
 	}
 
-	m_nPerfTool = PERF_TOOL_COUNT;
+	m_nPerfTool = PerformanceTool_t::PERF_TOOL_COUNT;
 	m_pCurrentToolPanel = NULL;
 	PopulateControls();
 }
@@ -583,8 +583,8 @@ void CPerfUIPanel::OnTextChanged( KeyValues *data )
 
 void CPerfUIPanel::OnPerfToolSelected()
 {
-	int tool = m_pPerformanceTool->GetActiveItem();
-	if ( tool == m_nPerfTool )
+	const int tool = m_pPerformanceTool->GetActiveItem();
+	if ( tool == to_underlying(m_nPerfTool) )
 		return;
 
 	if ( m_pCurrentToolPanel )
@@ -592,7 +592,7 @@ void CPerfUIPanel::OnPerfToolSelected()
 		m_pCurrentToolPanel->Deactivate();
 		m_pCurrentToolPanel->SetVisible( false );
 	}
-	m_nPerfTool = (PerformanceTool_t)tool;
+	m_nPerfTool = static_cast<PerformanceTool_t>(tool);
 	m_pCurrentToolPanel = m_pToolPanel[tool];
 	m_pCurrentToolPanel->SetVisible( true );
 	m_pCurrentToolPanel->Activate();
