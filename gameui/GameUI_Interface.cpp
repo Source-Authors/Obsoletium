@@ -646,32 +646,45 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 //-----------------------------------------------------------------------------
 void CGameUI::Shutdown()
 {
+	// dimhotepus: Shutdown in reverse to creation order.
+
 	// notify all the modules of Shutdown
 	g_VModuleLoader.ShutdownPlatformModules();
 
 	// unload the modules them from memory
 	g_VModuleLoader.UnloadPlatformModules();
-
-	ModInfo().FreeModInfo();
 	
+	if (g_hWaitMutex)
+	{
+		Sys_ReleaseMutex(g_hWaitMutex);
+	}
 	// release platform mutex
 	// close the mutex
 	if (g_hMutex)
 	{
 		Sys_ReleaseMutex(g_hMutex);
 	}
-	if (g_hWaitMutex)
-	{
-		Sys_ReleaseMutex(g_hWaitMutex);
-	}
 	
 	BonusMapsDatabase()->WriteSaveData();
 
+	g_pSourceVR = nullptr;
+	
+	g_pEngineClientReplay = nullptr;
+	xboxsystem  = nullptr;
+	matchmaking = nullptr;
+	gameuifuncs = nullptr;
+	enginesurfacefuncs = nullptr;
+	enginevguifuncs = nullptr;
+
+	ModInfo().FreeModInfo();
+	
 	steamapicontext->Clear();
 	
+	engine = nullptr;
+	enginesound = nullptr;
 
-	ConVar_Unregister();
 	DisconnectTier3Libraries();
+	ConVar_Unregister();
 	DisconnectTier2Libraries();
 	DisconnectTier1Libraries();
 }
