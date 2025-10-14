@@ -37,7 +37,7 @@ public:
 private:
 	class COptionsSubAudio *m_pOptionsSubAudio;
 	class COptionsSubVideo *m_pOptionsSubVideo;
-	vgui::PropertyPage *m_pOptionsSubMultiplayer;
+	vgui::PropertyPage *m_pOptionsSubMultiplayer{nullptr};
 };
 
 
