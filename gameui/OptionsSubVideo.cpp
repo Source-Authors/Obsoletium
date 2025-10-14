@@ -146,7 +146,9 @@ public:
 	{
 		// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
 		SetTitle("#GameUI_AdjustGamma_Title", true);
-		SetSize( 400, 260 );
+		// dimhotepus: Scale UI.
+		SetProportional(ipanel()->GetPanel(hParent, GetModuleName())->IsProportional());
+		SetSize(QuickPropScale(400), QuickPropScale(260));
 		SetDeleteSelfOnClose( true );
 
 		m_pGammaSlider = new CCvarSlider( this, "Gamma", "#GameUI_Gamma", 1.6f, 2.6f, "mat_monitorgamma" );
@@ -1996,7 +1998,9 @@ public:
       // parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
 
       SetTitle("#GameUI_ThirdPartyVideo_Title", true);
-      SetSize( 500, 200 );
+	  // dimhotepus: Scale UI.
+      SetProportional(ipanel()->GetPanel(hParent, GetModuleName())->IsProportional());
+	  SetSize(QuickPropScale(500), QuickPropScale(200));
       LoadControlSettings( "resource/OptionsSubVideoThirdPartyDlg.res" );
       MoveToCenterOfScreen();
       SetSizeable( false );

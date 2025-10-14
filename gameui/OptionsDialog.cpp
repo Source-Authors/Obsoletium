@@ -45,7 +45,13 @@ using namespace vgui;
 COptionsDialog::COptionsDialog(vgui::Panel *parent) : PropertyDialog(parent, "OptionsDialog")
 {
 	SetDeleteSelfOnClose(true);
-	SetBounds(0, 0, 512, 406);
+	// dimhotepus: Scale UI.
+	SetBounds
+	(
+		0, 0,
+		QuickPropScale( 512 ),
+		QuickPropScale( 406 )
+	);
 	SetSizeable( false );
 
 	SetTitle("#GameUI_Options", true);
@@ -98,7 +104,8 @@ COptionsDialog::COptionsDialog(vgui::Panel *parent) : PropertyDialog(parent, "Op
 //	Msg("COptionsDialog::COptionsDialog(): %.3fms\n", (float)(s5 - s4) * 1000.0f);
 
 	SetApplyButtonVisible(true);
-	GetPropertySheet()->SetTabWidth(84);
+	// dimhotepus: Scale UI.
+	GetPropertySheet()->SetTabWidth( QuickPropScale( 84 ) );
 }
 
 //-----------------------------------------------------------------------------

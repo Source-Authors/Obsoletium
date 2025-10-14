@@ -393,7 +393,9 @@ public:
       // parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
 
       SetTitle("#GameUI_ThirdPartyAudio_Title", true);
-      SetSize( 500, 200 );
+      // dimhotepus: Scale UI.
+	  SetProportional(ipanel()->GetPanel(hParent, GetModuleName())->IsProportional());
+	  SetSize(QuickPropScale( 500 ), QuickPropScale( 200 ));
       LoadControlSettings( "resource/OptionsSubAudioThirdPartyDlg.res" );
       MoveToCenterOfScreen();
       SetSizeable( false );

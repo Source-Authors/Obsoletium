@@ -747,7 +747,9 @@ public:
 		// parent is ignored, since we want look like we're steal focus from the parent (we'll become modal below)
 
 		SetTitle("#GameUI_KeyboardAdvanced_Title", true);
-		SetSize( 280, 140 );
+		// dimhotepus: Scale UI.
+		SetProportional(ipanel()->GetPanel(hParent, GetModuleName())->IsProportional());
+		SetSize(QuickPropScale(280), QuickPropScale(140));
 		LoadControlSettings( "resource/OptionsSubKeyboardAdvancedDlg.res" );
 		MoveToCenterOfScreen();
 		SetSizeable( false );
