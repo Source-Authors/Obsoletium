@@ -2856,9 +2856,9 @@ CON_COMMAND_F( bug, "Show/hide the bug reporting UI.", FCVAR_DONTRECORD )
 	if ( bWasVisible )
 	{
 		// hide
-		g_pBugUI->Close();		
+		g_pBugUI->Close();
 	}
-			
+
 	// make sure the gameUI is open so the bugreporter is visible
 	EngineVGui()->ActivateGameUI();
 
@@ -2879,7 +2879,7 @@ int CBugUIPanel::GetArea()
 	intp iNewTitleLength = 80;
 
 	if ( host_state.worldmodel )
-	{		
+	{
 		CL_SetupMapName( modelloader->GetName( host_state.worldmodel ), mapname, sizeof( mapname ) );
 		iNewTitleLength = (80 - (V_strlen( mapname )+2)); 		
 	}
@@ -2904,9 +2904,9 @@ int CBugUIPanel::GetArea()
 		else if ( pszAreaDir && !pszAreaPrefix )
 		{
 			pszAreaDir++;
-			iDirLength = Q_strlen( szAreaMap ) - (pszAreaDir - szAreaMap);			
+			iDirLength = Q_strlen( szAreaMap ) - (pszAreaDir - szAreaMap);
 		}
-		else 
+		else
 		{
 			return 0;
 		}
@@ -2929,7 +2929,7 @@ int CBugUIPanel::GetArea()
 			{
 				return i+1;
 			}
-		}		
+		}
 	}
 	return 0;
 }
