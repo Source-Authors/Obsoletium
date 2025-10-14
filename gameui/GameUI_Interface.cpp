@@ -77,13 +77,7 @@
 #include "tier3/tier3.h"
 #include "tier0/vcrmode.h"
 #include "matsys_controls/matsyscontrols.h"
-#include "steam/steam_api.h"
 
-#if defined( _X360 )
-#include "xbox/xbox_win32stubs.h"
-#endif
-
-#include "tier0/dbg.h"
 #include "engine/IEngineSound.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
