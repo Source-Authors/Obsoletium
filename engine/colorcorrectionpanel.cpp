@@ -247,34 +247,6 @@ static void VectorToColor24( const Vector &inVector, color24 &outColor )
 
 
 //-----------------------------------------------------------------------------
-// Convert HSV to RGB
-//-----------------------------------------------------------------------------
-float HueToRGB( float v1, float v2, float vH )
-{
-	float fResult = v1;
-
-	vH = vH / 360.0f;
-
-	vH = fmodf (vH + 1.0f, 1.0f);
-
-	if ( ( vH * 6.0f ) < 1.0f )
-	{
-		fResult = ( v1 + ( v2 - v1 ) * 6.0f * vH );
-	}
-	else if ( ( vH * 2.0f ) < 1.0f )
-	{
-		fResult = ( v2 );
-	}
-	else if ( ( vH * 3.0f ) < 2.0f )
-	{
-		fResult = ( v1 + ( v2 - v1 ) * ( ( 2.0f / 3.0f ) - vH ) * 6.0f );
-	}
-
-	return fResult;
-}
-
-
-//-----------------------------------------------------------------------------
 // Computes the point on the spline whose x value == flInColor
 //-----------------------------------------------------------------------------
 static void ComputeSplinePoint( float flInColor, Vector *pControlPoints[4], Vector &vecOut )
