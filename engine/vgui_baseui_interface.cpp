@@ -817,22 +817,25 @@ void CEngineVGui::CreateVProfPanels( vgui::Panel *pParent )
 void CEngineVGui::DestroyVProfPanels( )
 {
 #ifdef VPROF_ENABLED
-	if ( m_pVProfPanel )
+	// dimhotepus: Destroy in reverse to creation order.
+	if ( m_pTextureBudgetPanel )
 	{
-		delete m_pVProfPanel;
-		m_pVProfPanel = NULL;
+		delete m_pTextureBudgetPanel;
+		m_pTextureBudgetPanel = NULL;
 	}
+
+	DestroyVProfGraphPanel();
+
 	if ( m_pBudgetPanel )
 	{
 		delete m_pBudgetPanel;
 		m_pBudgetPanel = NULL;
 	}
-	DestroyVProfGraphPanel();
 
-	if ( m_pTextureBudgetPanel )
+	if ( m_pVProfPanel )
 	{
-		delete m_pTextureBudgetPanel;
-		m_pTextureBudgetPanel = NULL;
+		delete m_pVProfPanel;
+		m_pVProfPanel = NULL;
 	}
 #endif
 }
