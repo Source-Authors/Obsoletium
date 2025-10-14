@@ -4,6 +4,7 @@
 //
 //=============================================================================//
 
+#include "bugreporter/bugreporter.h"
 
 #undef PROTECT_FILEIO_FUNCTIONS
 #ifndef _LINUX
@@ -13,6 +14,7 @@
 #include "winlite.h"
 #include <winsock2.h> // INADDR_ANY defn
 #include <direct.h>
+#undef GetUserName
 #elif defined(POSIX)
 #include <sys/stat.h>
 
@@ -29,15 +31,12 @@
 #error "Please define your platform"
 #endif
 
-#include <time.h>
-
 #include "client.h"
 #include <vgui_controls/Frame.h>
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
 #include <vgui/IInput.h>
 #include <vgui/IVGui.h>
-#include <KeyValues.h>
 #include <vgui_controls/BuildGroup.h>
 #include <vgui_controls/Tooltip.h>
 #include <vgui_controls/TextImage.h>
@@ -56,23 +55,25 @@
 #include "ivideomode.h"
 #include "cl_main.h"
 #include "gl_model_private.h"
-#include "tier2/tier2.h"
+
+#include "tier0/icommandline.h"
+#include "tier0/vcrmode.h"
+#include "tier0/platform.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/utldict.h"
 #include "tier1/utlstring.h"
 #include "tier1/callqueue.h"
+#include "tier1/KeyValues.h"
+#include "tier2/tier2.h"
 #include "vstdlib/jobthread.h"
+#include "vstdlib/random.h"
 
-#include "utlsymbol.h"
-#include "utldict.h"
 #include "filesystem.h"
 #include "filesystem_engine.h"
 #include "icliententitylist.h"
-#include "bugreporter/bugreporter.h"
 #include "icliententity.h"
-#include "tier0/vcrmode.h"
-#include "tier0/platform.h"
 #include "net.h"
 #include "host_phonehome.h"
-#include "tier0/icommandline.h"
 #include "stdstring.h"
 #include "sv_main.h"
 #include "server.h"
@@ -80,7 +81,6 @@
 #include "gl_matsysiface.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "FindSteamServers.h"
-#include "vstdlib/random.h"
 #ifndef SWDS
 #include "cl_steamauth.h"
 #endif
