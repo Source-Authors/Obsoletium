@@ -320,10 +320,9 @@ const char *COcclusionUIPanel::s_pOccVisualizeLabel[COcclusionUIPanel::VISUALIZE
 COcclusionUIPanel::COcclusionUIPanel( vgui::Panel *parent ) : BaseClass( parent, "AreaPortalUIPanel")
 {
 	m_pVisualization = new ComboBox(this, "VisualizeMode", VISUALIZE_TYPE_COUNT, false);
-	int i;
-	for ( i = 0; i < VISUALIZE_TYPE_COUNT; i++ )
+	for ( const auto *l : s_pOccVisualizeLabel )
 	{
-		m_pVisualization->AddItem( s_pOccVisualizeLabel[i], NULL );
+		m_pVisualization->AddItem( l, NULL );
 	}
 	m_pVisualization->AddActionSignalTarget( this );
 	m_pVisualization->ActivateItem( 0 );
@@ -493,10 +492,10 @@ CPerfUIPanel::CPerfUIPanel( vgui::Panel *parent ) : BaseClass( parent, "PerfUIPa
 	SetSizeable( false );
 	SetMoveable( true );
 
-	int w = 250;
-	int h = 400;
+	int w = QuickPropScale( 250 );
+	int h = QuickPropScale( 400 );
 
-	int x = videomode->GetModeStereoWidth() - w - 10;
+	int x = videomode->GetModeStereoWidth() - w - QuickPropScale( 10 );
 	int y = ( videomode->GetModeStereoHeight() - h ) / 2 + videomode->GetModeStereoHeight() * 0.2;
 	SetBounds( x, y, w, h );
 
@@ -506,9 +505,9 @@ CPerfUIPanel::CPerfUIPanel( vgui::Panel *parent ) : BaseClass( parent, "PerfUIPa
 	m_pToolPanel[to_underlying(PerformanceTool_t::PERF_TOOL_AREA_PORTALS)] = new CAreaPortalsUIPanel( this );
 	m_pToolPanel[to_underlying(PerformanceTool_t::PERF_TOOL_OCCLUSION)] = new COcclusionUIPanel( this );
 
-	for ( int i = 0; i < PERF_TOOL_COUNT; ++i )
+	for ( auto *p : m_pToolPanel )
 	{
-		m_pToolPanel[i]->SetBounds( 0, 75, w, h - 75 );
+		p->SetBounds( 0, QuickPropScale( 75 ), w, h - QuickPropScale( 75 ) );
 	}
 
 	m_nPerfTool = PerformanceTool_t::PERF_TOOL_COUNT;
@@ -544,10 +543,9 @@ void CPerfUIPanel::Shutdown()
 void CPerfUIPanel::PopulateControls()
 {
 	m_pPerformanceTool->DeleteAllItems();
-	int i;
-	for ( i = 0; i < PERF_TOOL_COUNT; i++ )
+	for ( auto *n : s_pPerfToolNames )
 	{
-		m_pPerformanceTool->AddItem( s_pPerfToolNames[i], NULL );
+		m_pPerformanceTool->AddItem( n, NULL );
 	}
 	m_pPerformanceTool->AddActionSignalTarget( this );
 	m_pPerformanceTool->ActivateItem( 0 );
