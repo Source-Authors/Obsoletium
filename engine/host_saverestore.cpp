@@ -1067,7 +1067,8 @@ bool CSaveRestore::LoadGame( const char *pName )
 
 		if ( !HaveExactMap( gameHeader.mapName ) )
 		{
-			Msg( "Map '%s' missing or invalid\n", gameHeader.mapName );
+			// dimhotepus: Msg -> Warning.
+			Warning( "Map '%s' missing or invalid\n", gameHeader.mapName );
 			validload = false;
 		}
 
