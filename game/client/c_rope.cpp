@@ -243,6 +243,9 @@ public:
 	void SetHolidayLightMode( bool bHoliday ) { m_bDrawHolidayLights = bHoliday; }
 	bool IsHolidayLightMode( void );
 	int GetHolidayLightStyle( void );
+
+	// dimhotepus: Cleanup rope cache.
+	void RemoveFromRenderCache( C_RopeKeyframe *pRope );
 	
 private:
 	struct RopeRenderData_t;
@@ -296,10 +299,10 @@ private:
 	int m_nHolidayLightsStyle;
 };
 
+static CRopeManager s_RopeManager;
 
 IRopeManager *RopeManager()
 {
-	static CRopeManager s_RopeManager;
 	return &s_RopeManager;
 }
 
@@ -405,6 +408,38 @@ void CRopeManager::AddToRenderCache( C_RopeKeyframe *pRope )
 
 	m_aRenderCache[iRenderCache].m_aCache[m_aRenderCache[iRenderCache].m_nCacheCount] = pRope;
 	++m_aRenderCache[iRenderCache].m_nCacheCount;
+}
+
+// dimhotepus: Cleanup rope cache.
+void CRopeManager::RemoveFromRenderCache( C_RopeKeyframe *pRope )
+{
+	if( !pRope->GetSolidMaterial() )
+	{
+		return;
+	}
+	
+	// Find the current rope list.
+	intp nRenderCacheCount = m_aRenderCache.Count();
+	for ( intp i = 0; i < nRenderCacheCount; ++i )
+	{
+		auto &d = m_aRenderCache[i];
+
+		if ( ( pRope->GetSolidMaterial() == d.m_pSolidMaterial ) &&
+			 ( pRope->GetBackMaterial() == d.m_pBackMaterial ) )
+		{
+			if ( d.m_pSolidMaterial )
+			{
+				d.m_pSolidMaterial->DecrementReferenceCount();
+			}
+			if ( d.m_pBackMaterial )
+			{
+				d.m_pBackMaterial->DecrementReferenceCount();
+			}
+			d.m_nCacheCount = 0;
+
+			m_aRenderCache.Remove(i);
+		}
+	}
 }
 
 void CRopeManager::DrawRenderCache_NonQueued( bool bShadowDepth, RopeRenderData_t *pRenderCache, int nRenderCacheCount, const Vector &vCurrentViewForward, const Vector &vCurrentViewOrigin, C_RopeKeyframe::BuildRopeQueuedData_t *pBuildRopeQueuedData )
@@ -1066,7 +1101,9 @@ C_RopeKeyframe::C_RopeKeyframe()
 
 C_RopeKeyframe::~C_RopeKeyframe()
 {
-	static_cast<CRopeManager *>(RopeManager())->RemoveRopeFromQueuedRenderCaches( this );	
+	// dimhotepus: Cleanup rope cache.
+	RopeManager()->RemoveFromRenderCache( this );
+	s_RopeManager.RemoveRopeFromQueuedRenderCaches( this );	
 	g_Ropes.FindAndRemove( this );
 
 	if ( m_pBackMaterial )

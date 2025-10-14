@@ -254,6 +254,8 @@ public:
 	virtual void				SetHolidayLightMode( bool bHoliday ) = 0;
 	virtual bool				IsHolidayLightMode( void ) = 0;
 	virtual int					GetHolidayLightStyle( void ) = 0;
+	// dimhotepus: Cleanup cache to not destruct twice.
+	virtual void				RemoveFromRenderCache( C_RopeKeyframe *pRope ) = 0;
 };
 
 IRopeManager *RopeManager();
