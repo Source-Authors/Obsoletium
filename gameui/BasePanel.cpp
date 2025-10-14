@@ -123,9 +123,6 @@ CGameMenuItem::CGameMenuItem(vgui::Menu *parent, const char *name)  : BaseClass(
 void CGameMenuItem::ApplySchemeSettings(IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
-	
-	// dimhotepus: Large screens friendly menu.
-	SetProportional(true);
 
 	// make fully transparent
 	SetFgColor(GetSchemeColor("MainMenu.TextColor", pScheme));
@@ -183,10 +180,8 @@ public:
 	{
 		BaseClass::ApplySchemeSettings(pScheme);
 		
-		// dimhotepus: Large screens friendly menu.
-		const int menuItemHeight = scheme()->GetProportionalScaledValueEx
-		(
-			GetScheme(),
+		// dimhotepus: Scale UI.
+		const int menuItemHeight = QuickPropScale(
 			atoi(pScheme->GetResourceString("MainMenu.MenuItemHeight"))
 		);
 
@@ -553,7 +548,10 @@ bool g_bIsCreatingNewGameMenuForPreFetching = false;
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
 CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
-{	
+{
+	// dimhotepus: Scale UI.
+	SetProportional(true);
+
 	g_pBasePanel = this;
 	m_bLevelLoading = false;
 	m_eBackgroundState = BACKGROUND_INITIAL;
