@@ -265,8 +265,7 @@ void CGameUI::BonusMapUnlock( const char *pchFileName, const char *pchMapName )
 
 void CGameUI::BonusMapComplete( const char *pchFileName, const char *pchMapName )
 {
-	if ( !pchFileName || pchFileName[ 0 ] == '\0' || 
-		 !pchMapName || pchMapName[ 0 ] == '\0' )
+	if ( Q_isempty( pchFileName ) || Q_isempty( pchMapName ) )
 	{
 		if ( !g_pBonusMapsDialog )
 			return;
@@ -289,9 +288,9 @@ void CGameUI::BonusMapComplete( const char *pchFileName, const char *pchMapName 
 
 void CGameUI::BonusMapChallengeUpdate( const char *pchFileName, const char *pchMapName, const char *pchChallengeName, int iBest )
 {
-	if ( !pchFileName || pchFileName[ 0 ] == '\0' || 
-		 !pchMapName || pchMapName[ 0 ] == '\0' || 
-		 !pchChallengeName || pchChallengeName[ 0 ] == '\0' )
+	if ( Q_isempty( pchFileName ) || 
+		 Q_isempty( pchMapName ) || 
+		 Q_isempty( pchChallengeName ) )
 	{
 		return;
 	}
@@ -1088,7 +1087,7 @@ bool CGameUI::IsInLevel()
 bool CGameUI::IsInBackgroundLevel()
 {
 	const char *levelName = engine->GetLevelName();
-	if (levelName && levelName[0] && engine->IsLevelMainMenuBackground())
+	if (!Q_isempty( levelName ) && engine->IsLevelMainMenuBackground())
 	{
 		return true;
 	}
