@@ -116,8 +116,8 @@ void CircularProgressBar::ApplySchemeSettings(IScheme *pScheme)
 //-----------------------------------------------------------------------------
 void CircularProgressBar::SetImage(const char *imageName, progress_textures_t iPos)
 {
-	const char pszDir[] = "vgui/";
-	intp len = Q_strlen(imageName) + 1;
+	constexpr char pszDir[] = "vgui/";
+	intp len = V_strlen(imageName) + 1;
 	len += ssize(pszDir) - 1;
 	
 	if ( m_pszImageName[iPos] && ( m_lenImageName[iPos] < len ) )
