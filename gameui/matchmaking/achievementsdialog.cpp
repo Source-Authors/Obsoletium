@@ -363,11 +363,12 @@ void CAchievementsDialog_XBox::OnClose()
 //-----------------------------------------------------------------------------
 CAchievementsDialog::CAchievementsDialog(vgui::Panel *parent) : BaseClass(parent, "AchievementsDialog")
 {
-	m_iFixedWidth = 512;
+	// dimhotepus: Scale UI.
+	m_iFixedWidth = QuickPropScale( 512 );
 
 	SetDeleteSelfOnClose(true);
-	SetBounds(0, 0, 512, 384);
-	SetMinimumSize( 256, 300 );
+	SetBounds(0, 0, m_iFixedWidth, QuickPropScale( 384 ) );
+	SetMinimumSize( QuickPropScale( 256 ), QuickPropScale( 300 ) );
 	SetSizeable( true );
 
 	m_nOldScrollItem = -1;
@@ -506,7 +507,8 @@ void CAchievementsDialog::CreateNewAchievementGroup( int iMinRange, int iMaxRang
 //----------------------------------------------------------
 void CAchievementsDialog::ApplySettings( KeyValues *pResourceData )
 {
-	m_iFixedWidth = pResourceData->GetInt( "wide", 512 );
+	// dimhotepus: Scale UI.
+	m_iFixedWidth = QuickPropScale( pResourceData->GetInt( "wide", 512 ) );
 
 	BaseClass::ApplySettings( pResourceData );
 }
