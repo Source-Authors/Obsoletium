@@ -94,8 +94,8 @@ CPrecisionSlider::CPrecisionSlider( Panel *parent, const char *panelName ) : Bas
 	m_pTextEntry->SetCatchEnterKey( true );
 	m_pTextEntry->AddActionSignalTarget( this );
 
-	m_nTextEntryWidth = 32;
-	m_nSpacing = 8;
+	m_nTextEntryWidth = QuickPropScale( 32 );
+	m_nSpacing = QuickPropScale( 8 );
 }
 
 //-----------------------------------------------------------------------------
@@ -117,7 +117,7 @@ void CPrecisionSlider::OnSizeChanged( int wide, int tall )
 	nEditWidth = m_nTextEntryWidth;
 
 	nSliderHeight = tall;
-	nEditHeight = tall - 12;
+	nEditHeight = tall - QuickPropScale( 12 );
 	nSliderWidth  = wide - (m_nSpacing + nEditWidth);
     
 	m_pTextEntry->SetBounds( nSliderWidth + m_nSpacing, 0, nEditWidth, nEditHeight );
@@ -134,9 +134,9 @@ void CPrecisionSlider::GetTrackRect( int &x, int &y, int &w, int &h )
 	GetPaintSize( wide, tall );
 
 	x = 0;
-	y = 8;
+	y = QuickPropScale( 8 );
 	w = wide - ( _nobSize + m_nTextEntryWidth + m_nSpacing );
-	h = 4;
+	h = QuickPropScale( 4 );
 }
 
 //-----------------------------------------------------------------------------
@@ -4223,8 +4223,9 @@ private:
 
 CLookupViewWindow::CLookupViewWindow( vgui::Panel *parent, ColorCorrectionHandle_t CCHandle ) : BaseClass( parent, "LookupViewWindow" )
 {
-	SetSize( 146, 298 );
-	SetPos( 32, 32 );
+	// dimhotepus: Scale support.
+	SetSize( QuickPropScale( 146 ), QuickPropScale( 298 ) );
+	SetPos( QuickPropScale( 32 ), QuickPropScale( 32 ) );
 
 	m_pLookupPanel = new CLookupViewPanel( this, CCHandle );
 
@@ -4625,8 +4626,8 @@ CColorOperationListPanel::CColorOperationListPanel( vgui::Panel *parent, ColorCo
 
 	m_pOperationListPanel = new COperationListPanel( this, "OperationList" );
 	m_pOperationListPanel->SetBuildModeEditable( true );
-	m_pOperationListPanel->AddColumnHeader( 0, "image", "", 24, ListPanel::COLUMN_IMAGE );
-	m_pOperationListPanel->AddColumnHeader( 1, "layer", "", 226, 0 );
+	m_pOperationListPanel->AddColumnHeader( 0, "image", "", QuickPropScale( 24 ), ListPanel::COLUMN_IMAGE );
+	m_pOperationListPanel->AddColumnHeader( 1, "layer", "", QuickPropScale( 226 ), 0 );
 	m_pOperationListPanel->SetSelectIndividualCells( false );
 	m_pOperationListPanel->SetEmptyListText( "" );
 	m_pOperationListPanel->SetDragEnabled( false );
@@ -4640,7 +4641,7 @@ CColorOperationListPanel::CColorOperationListPanel( vgui::Panel *parent, ColorCo
 
 	m_pLookupViewWindow = new CLookupViewWindow( this, CCHandle );
 	m_pLookupViewWindow->SetTitle( "Lookup View", true );
-	m_pLookupViewWindow->SetSize( 148, 298 );
+	m_pLookupViewWindow->SetSize( QuickPropScale( 148 ), QuickPropScale( 298 ) );
 	m_pLookupViewWindow->SetEnabled( true );
 	m_pLookupViewWindow->SetSizeable( false );
 	m_pLookupViewWindow->AddActionSignalTarget( this );
@@ -5009,7 +5010,7 @@ void CColorOperationListPanel::LaunchOperationPanel( IColorOperation *pOp )
 		int xPos = parentX - 250*static_cast<int>(panelOffset);
 
 		pOpPanel->SetPos(  xPos, parentY );
-		pOpPanel->SetSize( 250, BASE_HEIGHT );
+		pOpPanel->SetSize( QuickPropScale( 250 ), QuickPropScale( BASE_HEIGHT ) );
 		pOpPanel->SetTitle( pOp->GetName(), true );
 		pOpPanel->AddActionSignalTarget( this );
 		pOpPanel->SetSizeable( false );
@@ -5119,11 +5120,12 @@ CColorCorrectionUIPanel::CColorCorrectionUIPanel( vgui::Panel *parent ) : BaseCl
 	SetSizeable( false );
 	SetMoveable( true );
 
-	int w = 250;
-	int h = BASE_HEIGHT;
+	// dimhotepus: Scale support.
+	int w = QuickPropScale( 250 );
+	int h = min(videomode->GetModeStereoHeight(), QuickPropScale( BASE_HEIGHT ));
 
-	int x = videomode->GetModeStereoWidth() - w - 10;
-	int y = videomode->GetModeStereoHeight() - h - 10;
+	int x = videomode->GetModeStereoWidth() - w - QuickPropScale( 10 );
+	int y = max(videomode->GetModeStereoHeight() - h - QuickPropScale( 10 ), 0);
 	SetBounds( x, y, w, h );
 
 	m_pOperationListPanel->PopulateList( );
