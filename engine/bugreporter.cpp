@@ -294,7 +294,7 @@ private:
 CBugReportUploadProgressDialog::CBugReportUploadProgressDialog(Panel *parent, const char *name, const char *title, const char *message) : Frame(parent, name)
 {
 	// dimhotepus: Scale support.
-	SetProportional(true);
+	SetProportional(parent->IsProportional());
 	SetSize(QuickPropScale( 300 ), QuickPropScale( 160 ));
 	SetSizeable(false);
 	MoveToFront();
@@ -361,7 +361,7 @@ private:
 CBugReportFinishedDialog::CBugReportFinishedDialog(Panel *parent, const char *name, const char *title, const char *message) : Frame(parent, name)
 {
 	// dimhotepus: Scale support.
-	SetProportional(true);
+	SetProportional(parent->IsProportional());
 	SetSize(QuickPropScale( 300 ), QuickPropScale( 160 ));
 	SetSizeable(false);
 	MoveToFront();
