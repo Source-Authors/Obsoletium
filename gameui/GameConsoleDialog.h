@@ -28,6 +28,9 @@ class CGameConsoleDialog : public vgui::CConsoleDialog
 public:
 	CGameConsoleDialog();
 
+	// dimhotepus: Allow to set parent to apply proportional scaling.
+	void SetParent( vgui::VPANEL newParent ) override;
+
 private:
 	MESSAGE_FUNC( OnClosedByHittingTilde, "ClosedByHittingTilde" );
 	MESSAGE_FUNC_CHARPTR_OVERRIDE( OnCommandSubmitted, "CommandSubmitted", command );
