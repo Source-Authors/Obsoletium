@@ -107,11 +107,8 @@ void PropertyDialog::PerformLayout()
 {
 	BaseClass::PerformLayout();
 
-	int iBottom = m_iSheetInsetBottom;
-	if ( IsProportional() )
-	{
-		iBottom = scheme()->GetProportionalScaledValueEx( GetScheme(), iBottom );
-	}
+	// dimhotepus: Simplify scaling.
+	int iBottom = QuickPropScale( m_iSheetInsetBottom );
 
 	int x, y, wide, tall;
 	GetClientArea(x, y, wide, tall);
