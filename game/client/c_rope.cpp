@@ -418,7 +418,7 @@ void CRopeManager::RemoveFromRenderCache( C_RopeKeyframe *pRope )
 		return;
 	}
 	
-	// Find the current rope list.
+	// Find the current rope in list.
 	intp nRenderCacheCount = m_aRenderCache.Count();
 	for ( intp i = 0; i < nRenderCacheCount; ++i )
 	{
@@ -438,6 +438,8 @@ void CRopeManager::RemoveFromRenderCache( C_RopeKeyframe *pRope )
 			d.m_nCacheCount = 0;
 
 			m_aRenderCache.Remove(i);
+
+			break;
 		}
 	}
 }
