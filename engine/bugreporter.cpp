@@ -277,7 +277,7 @@ public:
 	CBugReportUploadProgressDialog(vgui::Panel *parent, const char *name, const char *title, const char *message);
 	~CBugReportUploadProgressDialog();
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	void SetProgress( float progress );
 
@@ -344,9 +344,9 @@ class CBugReportFinishedDialog : public vgui::Frame
 public:
 	CBugReportFinishedDialog(vgui::Panel *parent, const char *name, const char *title, const char *message);
 
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
-	virtual void OnCommand( const char *command );
+	void OnCommand( const char *command ) override;
 
 private:
 	typedef vgui::Frame BaseClass;
