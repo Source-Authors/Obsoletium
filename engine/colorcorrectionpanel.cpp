@@ -4173,7 +4173,7 @@ void CLookupViewPanel::RegenerateTextureBits( ITexture *pTexture, IVTFTexture *p
 	}
 }
 
-class CLookupViewWindow : public vgui::Frame
+class CLookupViewWindow final : public vgui::Frame
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CLookupViewWindow, vgui::Frame );
 
@@ -4236,7 +4236,7 @@ void CLookupViewWindow::UpdateColorCorrection()
 
 class CColorOperationListPanel;
 
-class CNewOperationDialog : public vgui::Frame
+class CNewOperationDialog final : public vgui::Frame
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CNewOperationDialog, vgui::Frame );
 
@@ -5012,7 +5012,7 @@ void CColorOperationListPanel::UpdateColorCorrection()
 // CColorCorrectionUIPanel begins here
 //
 //-----------------------------------------------------------------------------
-class CColorCorrectionUIPanel : public vgui::Frame
+class CColorCorrectionUIPanel final : public vgui::Frame
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CColorCorrectionUIPanel, vgui::Frame );
 
@@ -5025,22 +5025,21 @@ public:
 
 	void	Activate() override;
 
-	void			Init();
-	void			Shutdown();
+	void	Init();
+	void	Shutdown();
 
 	void	OnKeyCodeTyped(KeyCode code) override;
 
 	void	OnThink( ) override;
 
-	void			ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage );
+	void	ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char *pPreviewImage );
 
 	// Updates the color correction terms
-	void			UpdateColorCorrection( );
+	void	UpdateColorCorrection( );
 
-	void			SetFinalOperation( IColorOperation *pOp );
+	void	SetFinalOperation( IColorOperation *pOp );
 
-protected:
-
+private:
 	CColorOperationListPanel *m_pOperationListPanel;
 
 	IColorOperation	*m_pFinalOperation;
@@ -5054,8 +5053,6 @@ protected:
 	color24			m_pLookupCache[ 32*32*32 ];
 
 	bool			m_bForceReset;
-    
-private:
 };
 
 
@@ -5102,7 +5099,8 @@ CColorCorrectionUIPanel::CColorCorrectionUIPanel( vgui::Panel *parent ) : BaseCl
 
 	m_pOperationListPanel->PopulateList( );
 
-	Q_memset( m_pLookupCache, 0x00, sizeof(color24)*32*32*32 );
+	// dimhotepus: Use type-safe helper.
+	BitwiseClear( m_pLookupCache );
 	m_nCurrentRow = -1;
 	m_nRowStep = 4;
 
@@ -5267,16 +5265,16 @@ static CColorCorrectionUIPanel *g_pColorCorrectionUI = NULL;
 class CColorCorrectionTools : public IColorCorrectionTools
 {
 public:
-	virtual void		Init( void );
-	virtual void		Shutdown( void );
+	void		Init() override;
+	void		Shutdown() override;
 
-	virtual void		InstallColorCorrectionUI( vgui::Panel *parent );
-	virtual bool		ShouldPause() const;
+	void		InstallColorCorrectionUI( vgui::Panel *parent ) override;
+	bool		ShouldPause() const override;
 
-	virtual void		GrabPreColorCorrectedFrame( int x, int y, int width, int height );
-	virtual void		UpdateColorCorrection( );
+	void		GrabPreColorCorrectedFrame( int x, int y, int width, int height ) override;
+	void		UpdateColorCorrection( ) override;
 
-	virtual void		SetFinalOperation( IColorOperation *pOp );
+	void		SetFinalOperation( IColorOperation *pOp ) override;
 
 private:
 
@@ -5372,7 +5370,7 @@ void ShowHideColorCorrectionUI()
 
 static ConCommand colorcorrectionui( "colorcorrectionui", ShowHideColorCorrectionUI, "Show/hide the color correction tools UI.", FCVAR_CHEAT );
 
-void PrintColorCorrection()
+static void PrintColorCorrection()
 {
 	ConMsg( "Default weight : %0.5f\n", colorcorrection->GetLookupWeight(-1) );
 	ConMsg( "Weight 0       : %0.5f\n", colorcorrection->GetLookupWeight(0) );
