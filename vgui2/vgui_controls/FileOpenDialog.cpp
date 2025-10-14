@@ -1491,7 +1491,8 @@ void FileOpenDialog::OnOpen()
 	GetSelectedFileName( pFileName );
 
 	intp nLen = Q_strlen( pFileName );
-	bool bSpecifiedDirectory = ( pFileName[nLen-1] == '/' || pFileName[nLen-1] == '\\' ) && (!IsOSX() || ( !Q_stristr( pFileName, ".app" ) ) );
+	// dimhotepus: Fix buffer underflow. ASAN catch.
+	bool bSpecifiedDirectory = ( nLen > 0 && ( pFileName[nLen-1] == '/' || pFileName[nLen-1] == '\\' ) ) && (!IsOSX() || ( !Q_stristr( pFileName, ".app" ) ) );
 	V_StripTrailingSlash( pFileName );
 
 	if ( !stricmp(pFileName, "..") )
