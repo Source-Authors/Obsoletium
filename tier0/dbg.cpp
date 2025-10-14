@@ -67,7 +67,7 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
   if (length > 1 && message[length - 1] == '\n') {
     snprintf(out, std::size(out) - 1, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
   } else {
-    snprintf(out, std::size(out) - 1, "[%.3f] %s", Plat_FloatTime(), message);
+    snprintf(out, std::size(out) - 1, "%s", message);
   }
 
   out[std::size(out) - 1] = '\0';
