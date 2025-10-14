@@ -86,8 +86,6 @@
 
 using namespace vgui;
 
-#define MAIN_MENU_INDENT_X360 10
-
 ConVar vgui_message_dialog_modal( "vgui_message_dialog_modal", "1", FCVAR_ARCHIVE );
 
 extern vgui::DHANDLE<CLoadingDialog> g_hLoadingDialog;
