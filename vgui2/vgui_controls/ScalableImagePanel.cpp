@@ -225,12 +225,10 @@ void ScalableImagePanel::ApplySettings(KeyValues *inResourceData)
 	m_iCornerHeight = inResourceData->GetInt( "draw_corner_height" );
 	m_iCornerWidth = inResourceData->GetInt( "draw_corner_width" );
 
-	if ( IsProportional() )
-	{
-		// scale the x and y up to our screen co-ords
-		m_iCornerHeight = scheme()->GetProportionalScaledValueEx(GetScheme(), m_iCornerHeight);
-		m_iCornerWidth = scheme()->GetProportionalScaledValueEx(GetScheme(), m_iCornerWidth);
-	}
+	// dimhotepus: Simplify scaling.
+	// scale the x and y up to our screen co-ords
+	m_iCornerHeight = QuickPropScale( m_iCornerHeight );
+	m_iCornerWidth = QuickPropScale( m_iCornerWidth );
 
 	const char *imageName = inResourceData->GetString("image", "");
 	SetImage( imageName );
