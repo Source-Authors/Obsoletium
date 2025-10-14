@@ -591,7 +591,7 @@ void CEngineVGui::Init()
 	COM_TimestampedLog( "Load Scheme File" );
 
 	// load scheme
-	const char *pStr = "Resource/SourceScheme.res";
+	constexpr char pStr[]{"Resource/SourceScheme.res"};
 	if ( !vgui::scheme()->LoadSchemeFromFile( pStr, "Tracker" ))
 	{
 		Sys_Error( "Error loading file %s.\n", pStr );
