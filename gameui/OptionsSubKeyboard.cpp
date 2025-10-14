@@ -42,7 +42,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 COptionsSubKeyboard::COptionsSubKeyboard(vgui::Panel *parent) : PropertyPage(parent, NULL)
 {
-	memset( m_Bindings, 0, sizeof( m_Bindings ));
+	// dimhotepus: Type-safe clear.
+	BitwiseClear( m_Bindings );
 
 	// create the key bindings list
 	CreateKeyBindingList();
