@@ -1078,29 +1078,29 @@ void CNewGameDialog::StartGame( void )
 		ConVarRef sv_cheats( "sv_cheats" );
 		sv_cheats.SetValue( m_bCommentaryMode );
 
-			// If commentary is on, we go to the explanation dialog (but not for teaser trailers)
-			if ( m_bCommentaryMode && !m_ChapterPanels[m_iSelectedChapter]->IsTeaserChapter() )
+		// If commentary is on, we go to the explanation dialog (but not for teaser trailers)
+		if ( m_bCommentaryMode && !m_ChapterPanels[m_iSelectedChapter]->IsTeaserChapter() )
+		{
+			// Check our current state and disconnect us from any multiplayer server we're connected to.
+			// This fixes an exploit where players would click "start" on the commentary dialog to enable
+			// sv_cheats on the client (via the code above) and then hit <esc> to get out of the explanation dialog.
+			if ( GameUI().IsInMultiplayer() )
 			{
-				// Check our current state and disconnect us from any multiplayer server we're connected to.
-				// This fixes an exploit where players would click "start" on the commentary dialog to enable
-				// sv_cheats on the client (via the code above) and then hit <esc> to get out of the explanation dialog.
-				if ( GameUI().IsInMultiplayer() )
-				{
-					engine->ExecuteClientCmd( "disconnect" );
-				}
+				engine->ExecuteClientCmd( "disconnect" );
+			}
 
-				DHANDLE<CCommentaryExplanationDialog> hCommentaryExplanationDialog;
-				if ( !hCommentaryExplanationDialog.Get() )
-				{
-					hCommentaryExplanationDialog = new CCommentaryExplanationDialog( BasePanel(), mapcommand );
-				}
-				hCommentaryExplanationDialog->Activate();
-			}
-			else
+			DHANDLE<CCommentaryExplanationDialog> hCommentaryExplanationDialog;
+			if ( !hCommentaryExplanationDialog.Get() )
 			{
-				// start map
-				BasePanel()->FadeToBlackAndRunEngineCommand( mapcommand );
+				hCommentaryExplanationDialog = new CCommentaryExplanationDialog( BasePanel(), mapcommand );
 			}
+			hCommentaryExplanationDialog->Activate();
+		}
+		else
+		{
+			// start map
+			BasePanel()->FadeToBlackAndRunEngineCommand( mapcommand );
+		}
 
 		OnClose();
 	}
