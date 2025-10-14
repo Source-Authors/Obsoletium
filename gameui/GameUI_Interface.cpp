@@ -440,8 +440,7 @@ void CGameUI::PlayGameStartupSound()
 					V_sprintf_safe( temp, "ui/%s", fn );
 				}
 
-				char *found = new char[ strlen( temp ) + 1 ];
-				Q_strncpy( found, temp, strlen( temp ) + 1 );
+				char *found = V_strdup( temp );
 
 				Q_FixSlashes( found );
 				fileNames.AddToTail( found );
