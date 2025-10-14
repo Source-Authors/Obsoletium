@@ -551,18 +551,18 @@ static bool BindingLessFunc( KeyValues * const & lhs, KeyValues * const &rhs )
 	return ( Q_stricmp( p1->GetString( "Action" ), p2->GetString( "Action" ) ) < 0 ) ? true : false;
 }
 
-void CKeyBoardEditorPage::AnsiText( char const *token, char *out, int buflen )
+void CKeyBoardEditorPage::AnsiText( char const *token, OUT_Z_CAP(size) char *out, int size )
 {
 	out[ 0 ] = 0;
 
 	wchar_t *str = g_pVGuiLocalize->Find( token );
 	if ( !str )
 	{
-		Q_strncpy( out, token, buflen );
+		Q_strncpy( out, token, size );
 	}
 	else
 	{
-		g_pVGuiLocalize->ConvertUnicodeToANSI( str, out, buflen );
+		g_pVGuiLocalize->ConvertUnicodeToANSI( str, out, size );
 	}
 }
 
