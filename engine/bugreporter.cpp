@@ -617,7 +617,7 @@ CBugUIPanel::CBugUIPanel( vgui::Panel *parent ) :
 {
 	m_sDllName = BUG_REPORTER_PUBLIC_DLLNAME;
 
-	m_hZip = (HZIP)0;
+	m_hZip = nullptr;
 
 	m_hDirectorySelectDialog = NULL;
 	m_hFileOpenDialog = NULL;
