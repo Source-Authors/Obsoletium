@@ -88,10 +88,15 @@ int64 s_frequencies[ nMaxCPUs ];
 // Measurement thread, designed to be one per core.
 unsigned __stdcall MeasureThread( void* vThreadNum )
 {
-	// dimhotepus: Add thread name to aid debugging.
-	ThreadSetDebugName( "CPUBurnMonitor" );
+	const intp threadNum = reinterpret_cast<intp>(vThreadNum);
 
-	intp threadNum = reinterpret_cast<intp>(vThreadNum);
+	char threadName[16];
+	snprintf(threadName, ssize(threadName), "CPUBurnMon#%zi", threadNum);
+	threadName[ssize(threadName) - 1] = '\0';
+
+	// dimhotepus: Add thread name to aid debugging.
+	ThreadSetDebugName( threadName );
+
 
 	for ( ; ; )
 	{
