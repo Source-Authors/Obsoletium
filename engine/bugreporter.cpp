@@ -449,6 +449,9 @@ public:
 			m_pBuildNumber->SetBounds( x, y, wide, tall );
 		}
 	}
+
+	void			OnKeyCodePressed( KeyCode code ) override;
+
 	void			ParseDefaultParams( void );
 	void			ParseCommands( const CCommand &args );
 
@@ -2783,13 +2786,13 @@ static CBugUIPanel *g_pBugUI = NULL;
 class CEngineBugReporter : public IEngineBugReporter
 {
 public:
-	virtual void		Init( void );
-	virtual void		Shutdown( void );
+	void		Init() override;
+	void		Shutdown( void ) override;
 
-	virtual void		InstallBugReportingUI( vgui::Panel *parent, IEngineBugReporter::BR_TYPE type );
-	virtual bool		ShouldPause() const;
+	void		InstallBugReportingUI( vgui::Panel *parent, IEngineBugReporter::BR_TYPE type ) override;
+	bool		ShouldPause() const override;
 
-	virtual bool		IsVisible() const; //< true iff the bug panel is active and on screen right now
+	bool		IsVisible() const override; //< true iff the bug panel is active and on screen right now
 
 	void				Restart( IEngineBugReporter::BR_TYPE type );
 private:
