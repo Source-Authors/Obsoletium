@@ -399,7 +399,7 @@ void CGameUI::PlayGameStartupSound()
 			pszHoliday = GameClientExports()->GetHolidayString();
 			if ( pszHoliday && pszHoliday[0] )
 			{
-				Q_snprintf( path, sizeof( path ), "sound/ui/holiday/gamestartup_%s*.mp3", pszHoliday );
+				V_sprintf_safe( path, "sound/ui/holiday/gamestartup_%s*.mp3", pszHoliday );
 				Q_FixSlashes( path );
 
 				char const *fn = g_pFullFileSystem->FindFirstEx( path, "MOD", &fh );
@@ -416,7 +416,7 @@ void CGameUI::PlayGameStartupSound()
 	// only want to do this if we haven't found a holiday file
 	if ( !bHolidayFound )
 	{
-		Q_snprintf( path, sizeof( path ), "sound/ui/gamestartup*.mp3" );
+		V_sprintf_safe( path, "sound/ui/gamestartup*.mp3" );
 		Q_FixSlashes( path );
 	}
 
@@ -426,18 +426,18 @@ void CGameUI::PlayGameStartupSound()
 		do
 		{
 			char ext[ 10 ];
-			Q_ExtractFileExtension( fn, ext, sizeof( ext ) );
+			V_ExtractFileExtension( fn, ext );
 
 			if ( !Q_stricmp( ext, "mp3" ) )
 			{
 				char temp[ 512 ];
 				if ( bHolidayFound )
 				{
-					Q_snprintf( temp, sizeof( temp ), "ui/holiday/%s", fn );
+					V_sprintf_safe( temp, "ui/holiday/%s", fn );
 				}
 				else
 				{
-					Q_snprintf( temp, sizeof( temp ), "ui/%s", fn );
+					V_sprintf_safe( temp, "ui/%s", fn );
 				}
 
 				char *found = new char[ strlen( temp ) + 1 ];
@@ -490,7 +490,7 @@ void CGameUI::PlayGameStartupSound()
 #endif
 
 			char found[ 512 ];
-			Q_snprintf( found, sizeof( found ), "play *#%s", pSoundFile );
+			V_sprintf_safe( found, "play *#%s", pSoundFile );
 
 			engine->ClientCmd_Unrestricted( found );
 		}
@@ -512,8 +512,8 @@ void CGameUI::Start()
 	{
 		// setup config file directory
 		char szConfigDir[512];
-		Q_strncpy( szConfigDir, m_szPlatformDir, sizeof( szConfigDir ) );
-		Q_strncat( szConfigDir, "config", sizeof( szConfigDir ), COPY_ALL_CHARACTERS );
+		V_strcpy_safe( szConfigDir, m_szPlatformDir );
+		V_strcat_safe( szConfigDir, "config" );
 
 		Msg( "Steam config directory: %s\n", szConfigDir );
 
@@ -1030,7 +1030,7 @@ bool CGameUI::SetProgressBarStatusText(const char *statusText)
 		return false;
 
 	g_hLoadingDialog->SetStatusText(statusText);
-	Q_strncpy(m_szPreviousStatusText, statusText, sizeof(m_szPreviousStatusText));
+	V_strcpy_safe(m_szPreviousStatusText, statusText);
 	return true;
 }
 
