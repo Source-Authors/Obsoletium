@@ -216,9 +216,9 @@ void CPropFadeUIPanel::Activate()
 	modelinfoclient->GetLevelScreenFadeRange( &flMinArea, &flMaxArea );
 
 	char buf[256];
-	Q_snprintf( buf, 256, "%.2f", flMinArea );
+	V_sprintf_safe( buf, "%.2f", flMinArea );
 	m_pMinScreenArea->SetText( buf );
-	Q_snprintf( buf, 256, "%.2f", flMaxArea );
+	V_sprintf_safe( buf, "%.2f", flMaxArea );
 	m_pMaxScreenArea->SetText( buf );
 
 	OnVisualizationSelected();
@@ -346,9 +346,9 @@ void COcclusionUIPanel::Activate()
 	OnDeactivateOcclusion();
 
 	char buf[256];
-	Q_snprintf( buf, 256, "%.2f", r_occluderminarea.GetFloat() );
+	V_sprintf_safe( buf, "%.2f", r_occluderminarea.GetFloat() );
 	m_pMinOccluderArea->SetText( buf );
-	Q_snprintf( buf, 256, "%.2f", r_occludeemaxarea.GetFloat() );
+	V_sprintf_safe( buf, "%.2f", r_occludeemaxarea.GetFloat() );
 	m_pMaxOccludeeArea->SetText( buf );
 }
 
@@ -451,8 +451,8 @@ public:
 
 	void	Activate() override;
 
-	void			Init();
-	void			Shutdown();
+	void	Init();
+	void	Shutdown();
 
 	void	OnKeyCodeTyped(KeyCode code) override;
 
@@ -492,6 +492,7 @@ CPerfUIPanel::CPerfUIPanel( vgui::Panel *parent ) : BaseClass( parent, "PerfUIPa
 	SetSizeable( false );
 	SetMoveable( true );
 
+	// dimhotepus: Scaling support.
 	int w = QuickPropScale( 250 );
 	int h = QuickPropScale( 400 );
 
@@ -652,21 +653,21 @@ static CPerfUIPanel *g_pPerfUI = NULL;
 class CEnginePerfTools : public IEnginePerfTools
 {
 public:
-	virtual void		Init( void );
-	virtual void		Shutdown( void );
+	void		Init() override;
+	void		Shutdown() override;
 
-	virtual void		InstallPerformanceToolsUI( vgui::Panel *parent );
-	virtual bool		ShouldPause() const;
+	void		InstallPerformanceToolsUI( vgui::Panel *parent ) override;
+	bool		ShouldPause() const override;
 };
 
 static CEnginePerfTools g_PerfTools;
 IEnginePerfTools *perftools = &g_PerfTools;
 
-void CEnginePerfTools::Init( void )
+void CEnginePerfTools::Init()
 {
 }
 
-void CEnginePerfTools::Shutdown( void )
+void CEnginePerfTools::Shutdown()
 {
 	if ( g_pPerfUI )
 	{
@@ -688,7 +689,7 @@ bool CEnginePerfTools::ShouldPause() const
 	return false;
 }
 
-void ShowHidePerfUI()
+static void ShowHidePerfUI()
 {
 	if ( !g_pPerfUI )
 		return;
