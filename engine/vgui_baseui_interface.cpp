@@ -580,7 +580,7 @@ void CEngineVGui::Init()
 	char lang[ 64 ];
 	lang[0] = '\0';
 	engineClient->GetUILanguage( lang, sizeof( lang ) );
-	if ( lang[0] )
+	if ( !Q_isempty( lang ) )
 		vgui::system()->SetRegistryString( "HKEY_CURRENT_USER\\Software\\Valve\\Source\\Language", lang );
 
 	COM_TimestampedLog( "AttachToWindow" );
@@ -760,8 +760,7 @@ void CEngineVGui::Init()
 	// Each mod acn have its own language.txt in addition to the valve_%%langauge%%.txt file under defaultgamedir.
 	// load mod-specific localization file for kb_act.lst, user.scr, settings.scr, etc.
 	char szFileName[MAX_PATH];
-	Q_snprintf( szFileName, sizeof( szFileName ) - 1, "resource/%s_%%language%%.txt", GetCurrentMod() );
-	szFileName[ std::size( szFileName ) - 1 ] = '\0';
+	V_sprintf_safe( szFileName, "resource/%s_%%language%%.txt", GetCurrentMod() );
 	g_pVGuiLocalize->AddFile( szFileName );
 
 	// setup console
