@@ -43,12 +43,14 @@ bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *, int )
 	// keep a record of this module name
 	V_strcpy_safe(g_szControlsModuleName, moduleName);
 
+	// dimhotepus: Use locale set when app starts (en_US.UTF-8). TF2 backport.
 	// initialize our locale (must be done for every vgui dll/exe)
-	// "" makes it use the default locale, required to make iswprint() work correctly in different languages
-	setlocale(LC_CTYPE, "");
-	setlocale(LC_TIME, "");
-	setlocale(LC_COLLATE, "");
-	setlocale(LC_MONETARY, "");
+    // "" makes it use the default locale, required to make iswprint() work
+    // correctly in different languages
+    // setlocale(LC_CTYPE, "");
+    // setlocale(LC_TIME, "");
+    // setlocale(LC_COLLATE, "");
+    // setlocale(LC_MONETARY, "");
 
 	// NOTE: Vgui expects to use these interfaces which are defined in tier3.lib
 	if ( !g_pVGui || !g_pVGuiInput || !g_pVGuiPanel || 
