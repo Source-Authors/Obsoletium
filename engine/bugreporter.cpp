@@ -482,7 +482,7 @@ protected:
 	vgui::Label  *m_pLevelName;
 	vgui::Label  *m_pBuildNumber;
 
-	vgui::Label		*m_pSubmitter;
+	vgui::Label  *m_pSubmitter;
 
 	vgui::ComboBox *m_pAssignTo;
 	vgui::ComboBox *m_pSeverity;
@@ -500,8 +500,8 @@ protected:
 	vgui::TextEntry		*m_pEmail;
 	vgui::Label			*m_pSubmitterLabel;
 
-	IBugReporter				*m_pBugReporter;
-	CSysModule					*m_hBugReporter;
+	IBugReporter		*m_pBugReporter;
+	CSysModule			*m_hBugReporter;
 
 	MESSAGE_FUNC_CHARPTR( OnFileSelected, "FileSelected", fullpath );
 	MESSAGE_FUNC_CHARPTR( OnDirectorySelected, "DirectorySelected", dir );
