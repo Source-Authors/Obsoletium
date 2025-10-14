@@ -151,6 +151,13 @@ void CGameConsole::SetParent( vgui::VPANEL parent )
 		return;
 
 	m_pConsole->SetParent( parent );
+
+	// dimhotepus: Copy proportional from parent
+	if (vgui::ipanel()->IsProportional(parent))
+	{
+		m_pConsole->SetProportional(true);
+		m_pConsole->InvalidateLayout(true, true);
+	}
 #endif
 }
 

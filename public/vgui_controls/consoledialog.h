@@ -95,7 +95,8 @@ private:
 		const char *GetName() const;
 
 		bool			m_bIsCommand;
-		ConCommandBase	*m_pCommand;
+		// dimhotepus: Add const.
+		const ConCommandBase	*m_pCommand;
 		CHistoryItem	*m_pText;
 	};
 

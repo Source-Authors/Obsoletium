@@ -75,26 +75,6 @@ void CGameConsoleDialog::OnKeyCodeTyped(KeyCode code)
 
 
 //-----------------------------------------------------------------------------
-// Sets a parent and recompute proportional.
-//-----------------------------------------------------------------------------
-void CGameConsoleDialog::SetParent( VPANEL newParent )
-{
-	BaseClass::SetParent( newParent );
-
-	if ( newParent != 0 )
-	{
-		// dimhotepus: Need to scale. Ensure BaseUI parent panel is present.
-		vgui::Panel *panel = ipanel()->GetPanel( newParent, "BaseUI" );
-		AssertMsg( panel, "Game console dialog must have parent panel to scale properly." );
-		if ( panel )
-		{
-			SetProportional( panel->IsProportional() );
-		}
-	}
-}
-
-
-//-----------------------------------------------------------------------------
 // Submits a command
 //-----------------------------------------------------------------------------
 void CGameConsoleDialog::OnCommandSubmitted( const char *pCommand )

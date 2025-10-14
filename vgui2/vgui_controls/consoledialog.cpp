@@ -75,7 +75,7 @@ public:
 		SetDragEnabled( true );
 	}
 
-	virtual void OnKeyCodeTyped(KeyCode code)
+	void OnKeyCodeTyped(KeyCode code) override
 	{
 		if (code == KEY_TAB)
 		{
@@ -91,7 +91,7 @@ public:
 		}
 	}
 
-	virtual void OnKillFocus()
+	void OnKillFocus() override
 	{
 		if ( input()->GetFocus() != m_pCompletionList ) // if its not the completion window trying to steal our focus
 		{
@@ -285,7 +285,7 @@ const char *CConsolePanel::CompletionItem::GetCommand( void ) const
 
 
 //-----------------------------------------------------------------------------
-// Purpose: Constructor, destuctor
+// Purpose: Constructor, destructor
 //-----------------------------------------------------------------------------
 CConsolePanel::CConsolePanel( vgui::Panel *pParent, const char *pName, bool bStatusVersion ) : 
 	BaseClass( pParent, pName ), m_bStatusVersion( bStatusVersion )
@@ -294,7 +294,8 @@ CConsolePanel::CConsolePanel( vgui::Panel *pParent, const char *pName, bool bSta
 
 	if ( !m_bStatusVersion )
 	{
-		SetMinimumSize(100,100);
+		// dimhotepus: Scale UI.
+		SetMinimumSize(QuickPropScale( 100 ), QuickPropScale( 100));
 	}
 
 	// create controls
@@ -304,7 +305,8 @@ CConsolePanel::CConsolePanel( vgui::Panel *pParent, const char *pName, bool bSta
 	m_pHistory->SetVerticalScrollbar( !m_bStatusVersion );
 	if ( m_bStatusVersion )
 	{
-		m_pHistory->SetDrawOffsets( 3, 3 );
+		// dimhotepus: Scale UI.
+		m_pHistory->SetDrawOffsets( QuickPropScale( 3 ), QuickPropScale( 3 ) );
 	}
 	m_pHistory->GotoTextEnd();
 	
@@ -410,8 +412,7 @@ void CConsolePanel::DPrint( const char *msg )
 void CConsolePanel::ClearCompletionList()
 {
 	intp c = m_CompletionList.Count();
-	intp i;
-	for ( i = c - 1; i >= 0; i-- )
+	for ( intp i = c - 1; i >= 0; i-- )
 	{
 		delete m_CompletionList[ i ];
 	}
@@ -422,7 +423,7 @@ void CConsolePanel::ClearCompletionList()
 static ConCommand *FindAutoCompleteCommmandFromPartial( const char *partial )
 {
 	char command[ 256 ];
-	Q_strncpy( command, partial, sizeof( command ) );
+	V_strcpy_safe( command, partial );
 
 	char *space = Q_strstr( command, " " );
 	if ( space )
@@ -449,7 +450,7 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 	ClearCompletionList();
 
 	// we need the length of the text for the partial string compares
-	intp len = Q_strlen(text);
+	intp len = V_strlen(text);
 	if ( len < 1 )
 	{
 		// Fill the completion list with history instead
@@ -486,10 +487,10 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 		{
 			// match found, add to list
 			auto *item = new CompletionItem();
-			m_CompletionList.AddToTail( item );
 			item->m_bIsCommand = false;
 			item->m_pCommand = nullptr;
 			item->m_pText = new CHistoryItem( commands[ i ].String() );
+			m_CompletionList.AddToTail( item );
 		}
 	}
 
@@ -509,14 +510,14 @@ void CConsolePanel::RebuildCompletionList(const char *text)
 			{
 				// match found, add to list
 				auto *item = new CompletionItem();
+				item->m_pCommand = cmd;
 				m_CompletionList.AddToTail( item );
-				item->m_pCommand = (ConCommandBase *)cmd;
 				const char *tst = cmd->GetName();
 				if ( !cmd->IsCommand() )
 				{
 					item->m_bIsCommand = false;
-					auto *var = ( ConVar * )cmd;
-					auto *pBounded = dynamic_cast<ConVar_ServerBounded*>( var );
+					const auto *var = ( const ConVar * )cmd;
+					const auto *pBounded = dynamic_cast<const ConVar_ServerBounded*>( var );
 					if ( pBounded || var->IsFlagSet( FCVAR_NEVER_AS_STRING ) )
 					{
 						char strValue[512];
@@ -782,11 +783,7 @@ void CConsolePanel::OnKeyCodeTyped(KeyCode code)
 	{
 		if (code == KEY_TAB)
 		{
-			bool reverse = false;
-			if (input()->IsKeyDown(KEY_LSHIFT) || input()->IsKeyDown(KEY_RSHIFT))
-			{
-				reverse = true;
-			}
+			bool reverse = input()->IsKeyDown(KEY_LSHIFT) || input()->IsKeyDown(KEY_RSHIFT);
 
 			// attempt auto-completion
 			OnAutoComplete(reverse);
@@ -829,12 +826,13 @@ void CConsolePanel::PerformLayout()
 
 	if ( !m_bStatusVersion )
 	{
-		constexpr int inset = 8;
-		constexpr int entryHeight = 24;
-		constexpr int topHeight = 4;
-		constexpr int entryInset = 4;
-		constexpr int submitWide = 64;
-		constexpr int submitInset = 7; // x inset to pull the submit button away from the frame grab
+		// dimhotepus: Scale UI.
+		const int inset = QuickPropScale( 8 );
+		const int entryHeight = QuickPropScale( 24 );
+		const int topHeight = QuickPropScale( 4 );
+		const int entryInset = QuickPropScale( 4 );
+		const int submitWide = QuickPropScale( 64 );
+		const int submitInset = QuickPropScale( 7 ); // x inset to pull the submit button away from the frame grab
 
 		m_pHistory->SetPos(inset, inset + topHeight); 
 		m_pHistory->SetSize(wide - (inset * 2), tall - (entryInset * 2 + inset * 2 + topHeight + entryHeight));
@@ -849,12 +847,13 @@ void CConsolePanel::PerformLayout()
 	}
 	else
 	{
-		constexpr int inset = 2;
+		// dimhotepus: Scale UI.
+		const int inset = QuickPropScale( 2 );
 
 		int entryWidth = wide / 2;
-		if ( wide > 400 )
+		if ( wide > QuickPropScale( 400 ) )
 		{
-			entryWidth = 200;
+			entryWidth = QuickPropScale( 200 );
 		}
 
 		m_pEntry->SetBounds( inset, inset, entryWidth, tall - 2 * inset );
