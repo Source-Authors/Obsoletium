@@ -762,8 +762,19 @@ void Button::FireActionSignal()
 			&& !strnicmp(_actionMessage->GetString("command", ""), "url ", ssize("url ") - 1)
 			&& strstr(_actionMessage->GetString("command", ""), "://"))
 		{
-			// it's a command to launch a url, run it
-			system()->ShellExecute("open", _actionMessage->GetString("command", "      ") + 4);
+			// diomhotepus: Check URL schema. TF2 backport.
+			const char* pszURL = _actionMessage->GetString("command", "      ") + 4;
+			// XXX ShellExecuting random URLs is questionable at any point, but lets at least make sure it's an expected
+			//     protocol.
+			if ( Q_strncmp( pszURL, "http://", 7 ) != 0 && Q_strncmp( pszURL, "https://", 8 ) != 0 )
+			{
+				Warning( "Invalid URL in FireActionSignal '%s'\n", pszURL );
+			}
+			else
+			{
+				// it's a command to launch a url, run it
+				system()->ShellExecute("open", pszURL);
+			}
 		}
 		PostActionSignal(_actionMessage->MakeCopy());
 	}
