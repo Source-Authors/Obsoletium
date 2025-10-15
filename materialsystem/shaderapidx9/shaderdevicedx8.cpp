@@ -2511,13 +2511,15 @@ void CShaderDeviceDx8::ReleaseResources()
 	g_pShaderAPI->ReleaseShaderObjects();
 
 #ifdef _DEBUG
-	for( int i = 0; i < MeshMgr()->BufferCount(); i++ )
+	const int bufferCount = MeshMgr()->BufferCount();
+
+	for( int i = 0; i < bufferCount; i++ )
 	{
 	}
-#endif
 
 	// All meshes cleaned up?
-	Assert( MeshMgr()->BufferCount() == 0 );
+	AssertMsg( bufferCount == 0, "Mesh manager leaked %d buffers.", bufferCount );
+#endif
 
 	// Signal that our resources have been released so that we can try to reset the device
 	m_bResourcesReleased = true;
