@@ -40,7 +40,8 @@ public:
 	{
 		m_iSaveGameListItemID = saveGameListItemID;
 		m_pParent = parent;
-		m_pSaveGameImage = new CTGAImagePanel( this, "SaveGameImage" );
+		// dimhotepus: Scale UI.
+		m_pSaveGameImage = new CTGAImagePanel( this, "SaveGameImage", TGA_IMAGE_PANEL_WIDTH, TGA_IMAGE_PANEL_HEIGHT );
 		m_pAutoSaveImage = new ImagePanel( this, "AutoSaveImage" );
 		m_pSaveGameScreenshotBackground = new ImagePanel( this, "SaveGameScreenshotBackground" );
 		m_pChapterLabel = new Label( this, "ChapterLabel", "" );
