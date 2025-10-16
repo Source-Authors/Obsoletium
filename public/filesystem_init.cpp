@@ -595,7 +595,6 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	}
 
 	bool bLowViolence = initInfo.m_bLowViolence;
-	bool bFirstGamePath = true;
 	for ( auto *pCur=pSearchPaths->GetFirstValue(); pCur; pCur=pCur->GetNextValue() )
 	{
 		const char *pLocation = pCur->GetString();
@@ -732,39 +731,6 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 				const char *pPathID = vecPathIDs[ idxPathID ], *pFullPath = vecFullLocationPaths[ idxLocation ];
 
 				FileSystem_AddLoadedSearchPath( initInfo, pPathID, pFullPath, bLowViolence );
-				
-				if ( Q_stricmp("game", pPathID) == 0 )
-				{
-					const char *ext = Q_GetFileExtension( pFullPath );
-					// dimhotepus: Do not add stuff like .vpk/bin as nonsense.
-					if ( !ext || Q_strcmp( ext, "vpk" ))
-					{
-						char szGameBinPath[MAX_PATH];
-#ifdef PLATFORM_64BITS
-						V_sprintf_safe( szGameBinPath, "%s" CORRECT_PATH_SEPARATOR_S "bin" CORRECT_PATH_SEPARATOR_S "x64", pFullPath );
-#else
-						V_sprintf_safe( szGameBinPath, "%s" CORRECT_PATH_SEPARATOR_S "bin", pFullPath );
-#endif
-
-						// 1. For each "Game" search path, it adds a "GameBin" path, in <dir>\bin[\x64]
-						FileSystem_AddLoadedSearchPath( initInfo, "GAMEBIN", szGameBinPath, bLowViolence );
-					}
-					
-					// 2. For each "Game" search path, it adds another "Game" path in front of it with _<langage> at the end.
-					//    For example: c:\hl2\cstrike on a french machine would get a c:\hl2\cstrike_french path added to it.
-
-					// 3. For the first "Game" search path, it adds a search path called "MOD".
-					// dimhotepus: Not only for first, as ex. episode 1 depends on skill.cfg from hl2, so add hl2 as MOD too, but with lower priority.
-					FileSystem_AddLoadedSearchPath( initInfo, "MOD", pFullPath, bLowViolence );
-
-					if ( bFirstGamePath )
-					{
-						// 4. For the first "Game" search path, it adds a search path called "DEFAULT_WRITE_PATH".
-						FileSystem_AddLoadedSearchPath( initInfo, "DEFAULT_WRITE_PATH", pFullPath, bLowViolence );
-
-						bFirstGamePath = false;
-					}
-				}
 			}
 		}
 	}
