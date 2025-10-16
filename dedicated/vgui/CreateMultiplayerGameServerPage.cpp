@@ -180,8 +180,9 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
   SetVisible(true);
 
   if (CommandLine()->CheckParm("-steam") && IsSteamInOfflineMode()) {
+    // dimhotepus: Own message box to scale it.
     auto *box = new vgui::MessageBox("#Start_Server_Offline_Title",
-                                     "#Start_Server_Offline_Warning");
+                                     "#Start_Server_Offline_Warning", this);
     box->DoModal();
   }
 }
@@ -357,8 +358,9 @@ void CCreateMultiplayerGameServerPage::OnCommand(const char *cmd) {
 
     //	V_strcpy_safe(m_szPassword, GetControlString("RCONPasswordEdit", ""));
     if (strlen(m_szPassword) < 3 || BadRconChars(m_szPassword)) {
+      // dimhotepus: Own message box to scale it.
       auto *dlg = new MessageBox("#Start_Server_RCON_Error_Title",
-                                 "#Start_Server_RCON_Error");
+                                 "#Start_Server_RCON_Error", this);
       dlg->DoModal();
     } else {
       V_sprintf_safe(

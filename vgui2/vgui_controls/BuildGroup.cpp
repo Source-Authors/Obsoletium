@@ -1189,7 +1189,8 @@ bool BuildGroup::SaveControlSettings( void )
 		bSuccess = rDat->SaveToFile( g_pFullFileSystem, fullpath, NULL );
 		if (!bSuccess)
 		{
-			MessageBox *dlg = new MessageBox("BuildMode - Error saving file", "Error: Could not save changes.  File is most likely read only.");
+			// dimhotepus: Own message box to scale it.
+			MessageBox *dlg = new MessageBox("BuildMode - Error saving file", "Error: Could not save changes.  File is most likely read only.", m_pParentPanel);
 			dlg->DoModal();
 		}
 	}

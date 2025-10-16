@@ -122,7 +122,8 @@ void COptionsSubKeyboard::OnCommand( const char *command )
 	if ( !stricmp( command, "Defaults" )  )
 	{
 		// open a box asking if we want to restore defaults
-		QueryBox *box = new QueryBox("#GameUI_KeyboardSettings", "#GameUI_KeyboardSettingsText");
+		// dimhotepus: Own query box to scale it.
+		QueryBox *box = new QueryBox("#GameUI_KeyboardSettings", "#GameUI_KeyboardSettingsText", this );
 		box->AddActionSignalTarget(this);
 		box->SetOKCommand(new KeyValues("Command", "command", "DefaultsOK"));
 		box->DoModal();

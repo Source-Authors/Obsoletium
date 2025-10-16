@@ -248,7 +248,8 @@ void CPlayerPanel::OnKickButtonPressed()
 	QueryBox *box; 
 	if (m_pPlayerListPanel->GetSelectedItemsCount() > 1)
 	{
-		box = new QueryBox("#Kick_Multiple_Players_Title", "#Kick_Multiple_Players_Question");
+		// dimhotepus: Own query box to scale it.
+		box = new QueryBox("#Kick_Multiple_Players_Title", "#Kick_Multiple_Players_Question", this);
 	}
 	else
 	{
@@ -263,7 +264,8 @@ void CPlayerPanel::OnKickButtonPressed()
 
 		wchar_t msg[512];
 		g_pVGuiLocalize->ConstructString_safe( msg, g_pVGuiLocalize->Find("Kick_Single_Player_Question"), 1, playerName );
-		box = new QueryBox(g_pVGuiLocalize->Find("#Kick_Single_Player_Title"), msg);
+		// dimhotepus: Own query box to scale it.
+		box = new QueryBox(g_pVGuiLocalize->Find("#Kick_Single_Player_Title"), msg, this);
 	}
 	box->AddActionSignalTarget(this);
 	box->SetOKCommand(new KeyValues("KickSelectedPlayers"));

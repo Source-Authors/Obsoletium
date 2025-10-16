@@ -683,7 +683,8 @@ void CDialogGameInfo::ConnectToServer()
 			{
 			case IRunGameEngine::k_ERunResultModNotInstalled:
 				{
-				MessageBox *dlg = new MessageBox( "#ServerBrowser_GameInfoTitle", "#ServerBrowser_ModNotInstalled" );
+				// dimhotepus: Own message box to scale it.
+				MessageBox *dlg = new MessageBox( "#ServerBrowser_GameInfoTitle", "#ServerBrowser_ModNotInstalled", this );
 				dlg->DoModal();
 				SetVisible(false);
 				return;
@@ -691,7 +692,8 @@ void CDialogGameInfo::ConnectToServer()
 				break;
 			case IRunGameEngine::k_ERunResultAppNotFound:
 				{
-				MessageBox *dlg = new MessageBox( "#ServerBrowser_GameInfoTitle", "#ServerBrowser_AppNotFound" );
+				// dimhotepus: Own message box to scale it.
+				MessageBox *dlg = new MessageBox( "#ServerBrowser_GameInfoTitle", "#ServerBrowser_AppNotFound", this );
 				dlg->DoModal();
 				SetVisible(false);
 				return;
@@ -699,7 +701,8 @@ void CDialogGameInfo::ConnectToServer()
 				break;
 			case IRunGameEngine::k_ERunResultNotInitialized:
 				{
-				MessageBox *dlg = new MessageBox( "#ServerBrowser_GameInfoTitle", "#ServerBrowser_NotInitialized" );
+				// dimhotepus: Own message box to scale it.
+				MessageBox *dlg = new MessageBox( "#ServerBrowser_GameInfoTitle", "#ServerBrowser_NotInitialized", this );
 				dlg->DoModal();
 				SetVisible(false);
 				return;

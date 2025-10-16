@@ -80,7 +80,8 @@ void CLoadGameDialog::OnCommand( const char *command )
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
 		{
 			// confirm the deletion
-			QueryBox *box = new QueryBox( "#GameUI_ConfirmDeleteSaveGame_Title", "#GameUI_ConfirmDeleteSaveGame_Info" );
+			// dimhotepus: Own query box to scale it.
+			QueryBox *box = new QueryBox( "#GameUI_ConfirmDeleteSaveGame_Title", "#GameUI_ConfirmDeleteSaveGame_Info", this );
 			box->AddActionSignalTarget(this);
 			box->SetOKButtonText("#GameUI_ConfirmDeleteSaveGame_OK");
 			box->SetOKCommand(new KeyValues("Command", "command", "DeleteConfirmed"));

@@ -149,13 +149,15 @@ void CDialogAddBan::OnCommand(const char *command)
 
 		if(Q_isempty(idbuf))
 		{
-			MessageBox *dlg = new MessageBox("#Add_Ban_Error", "#Add_Ban_ID_Invalid");
+			// dimhotepus: Own message box to scale it.
+			MessageBox *dlg = new MessageBox("#Add_Ban_Error", "#Add_Ban_ID_Invalid", this);
 			dlg->DoModal();
 			bClose=false;
 		} 
 		else if(Q_isempty(buf) && !m_pPermBanRadio->IsSelected())
 		{
-			MessageBox *dlg = new MessageBox("#Add_Ban_Error", "#Add_Ban_Time_Empty");
+			// dimhotepus: Own message box to scale it.
+			MessageBox *dlg = new MessageBox("#Add_Ban_Error", "#Add_Ban_Time_Empty", this);
 			dlg->DoModal();
 			bClose=false;
 		}
@@ -178,7 +180,8 @@ void CDialogAddBan::OnCommand(const char *command)
 				}
 				if(time<0) 
 				{
-					MessageBox *dlg = new MessageBox("#Add_Ban_Error", "#Add_Ban_Time_Invalid");
+					// dimhotepus: Own message box to scale it.
+					MessageBox *dlg = new MessageBox("#Add_Ban_Error", "#Add_Ban_Time_Invalid", this);
 					dlg->DoModal();
 					bClose=false;
 				}

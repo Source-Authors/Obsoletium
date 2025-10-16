@@ -204,8 +204,9 @@ void CGamePanelInfo::OnCommand(const char *command)
 // Purpose: produces a dialog asking a player to enter a new ban
 //-----------------------------------------------------------------------------
 void CGamePanelInfo::OnStop()
-{	
-	QueryBox *box = new QueryBox("#Game_Stop_Server_Title", "#Game_Restart_Server");
+{
+	// dimhotepus: Own query box to scale it.
+	QueryBox *box = new QueryBox("#Game_Stop_Server_Title", "#Game_Restart_Server", this);
 	box->AddActionSignalTarget(this);
 	box->SetOKButtonText("#Game_Stop_Server");
 	box->SetOKCommand(new KeyValues("Command", "command", "stop2"));
@@ -290,7 +291,8 @@ void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 		// _snprintf -> strcpy + strcat
 		V_strncpy( fullmsg, msg, msgLen );
 		V_strncat( fullmsg, "\n\nDo you wish to shutdown now?\n", msgLen );
-		m_hOutOfDateQueryBox = new QueryBox("Server restart pending", fullmsg);
+		// dimhotepus: Own query box to scale it.
+		m_hOutOfDateQueryBox = new QueryBox("Server restart pending", fullmsg, this);
 		m_hOutOfDateQueryBox->AddActionSignalTarget(this);
 		m_hOutOfDateQueryBox->SetOKCommand(new KeyValues("RestartServer"));
 		m_hOutOfDateQueryBox->ShowWindow();
@@ -311,7 +313,8 @@ void CGamePanelInfo::OnMasterRequestRestart()
 	// open a dialog informing user that they need to restart the server
 	if (!m_hRestartQueryBox.Get())
 	{
-		m_hRestartQueryBox = new QueryBox("Server restart needed", "Your server is out of date, and will not be listed\non the master server until you restart.\n\nDo you wish to shutdown now?\n");
+		// dimhotepus: Own query box to scale it.
+		m_hRestartQueryBox = new QueryBox("Server restart needed", "Your server is out of date, and will not be listed\non the master server until you restart.\n\nDo you wish to shutdown now?\n", this);
 		m_hRestartQueryBox->AddActionSignalTarget(this);
 		m_hRestartQueryBox->SetOKCommand(new KeyValues("RestartServer"));
 		m_hRestartQueryBox->ShowWindow();

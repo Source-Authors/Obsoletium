@@ -523,7 +523,8 @@ void DirectorySelectDialog::OnCreateDirectory(const char *dir)
 		else
 		{
 			// print error message
-			MessageBox *box = new MessageBox("#vgui_CreateDirectoryFail_Title", "#vgui_CreateDirectoryFail_Info");
+			// dimhotepus: Own message box to scale it.
+			MessageBox *box = new MessageBox("#vgui_CreateDirectoryFail_Title", "#vgui_CreateDirectoryFail_Info", this);
 			box->DoModal(this);
 		}
 	}

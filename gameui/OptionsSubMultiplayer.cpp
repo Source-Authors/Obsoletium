@@ -1299,7 +1299,9 @@ void COptionsSubMultiplayer::ConversionError( ConversionErrorType nError )
 	if ( pErrorText )
 	{
 		// Create the dialog
-		vgui::MessageBox *pErrorDlg = new vgui::MessageBox("#GameUI_Spray_Import_Error_Title", pErrorText );	Assert( pErrorDlg );
+		// dimhotepus: Own message box to scale it.
+		vgui::MessageBox *pErrorDlg = new vgui::MessageBox("#GameUI_Spray_Import_Error_Title", pErrorText, this );
+		Assert( pErrorDlg );
 
 		// Display
 		if ( pErrorDlg )	// Check for a NULL just to be extra cautious...

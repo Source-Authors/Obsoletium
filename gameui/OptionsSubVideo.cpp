@@ -538,7 +538,8 @@ public:
 		if ( panel == m_pDXLevel && RequiresRestart() )
 		{
 			// notify the user that this will require a disconnect
-			QueryBox *box = new QueryBox("#GameUI_SettingRequiresDisconnect_Title", "#GameUI_SettingRequiresDisconnect_Info");
+			// dimhotepus: Own query box to scale it.
+			QueryBox *box = new QueryBox("#GameUI_SettingRequiresDisconnect_Title", "#GameUI_SettingRequiresDisconnect_Info", this);
 			box->AddActionSignalTarget( this );
 			box->SetCancelCommand(new KeyValues("ResetDXLevelCombo"));
 			box->DoModal();
@@ -970,7 +971,8 @@ public:
 			if ( RequiresRestart() )
 			{
 				// Bring up the confirmation dialog
-				QueryBox *box = new QueryBox("#GameUI_SettingRequiresDisconnect_Title", "#GameUI_SettingRequiresDisconnect_Info");
+				// dimhotepus: Own query box to scale it.
+				QueryBox *box = new QueryBox("#GameUI_SettingRequiresDisconnect_Title", "#GameUI_SettingRequiresDisconnect_Info", this);
 				box->AddActionSignalTarget( this );
 				box->SetOKCommand(new KeyValues("OK_Confirmed"));
 				box->SetCancelCommand(new KeyValues("ResetDXLevelCombo"));
@@ -1835,7 +1837,8 @@ void COptionsSubVideo::OnApplyChanges()
 		{
 			SetUseHDContent( m_pHDContent->IsSelected() );
 			// Bring up the confirmation dialog
-			MessageBox *box = new MessageBox("#GameUI_OptionsRestartRequired_Title", "#GameUI_HDRestartRequired_Info");
+			// dimhotepus: Own query box to scale it.
+			MessageBox *box = new MessageBox("#GameUI_OptionsRestartRequired_Title", "#GameUI_HDRestartRequired_Info", this);
 			box->DoModal();
 			box->MoveToFront();
 		}

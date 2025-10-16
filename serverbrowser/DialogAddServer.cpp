@@ -191,7 +191,8 @@ void CDialogAddServer::OnOK()
 	else
 	{
 		// could not parse the ip address, popup an error
-		MessageBox *dlg = new MessageBox("#ServerBrowser_AddServerErrorTitle", "#ServerBrowser_AddServerError");
+		// dimhotepus: Own message box to scale it.
+		MessageBox *dlg = new MessageBox("#ServerBrowser_AddServerErrorTitle", "#ServerBrowser_AddServerError", this);
 		dlg->DoModal();
 	}
 

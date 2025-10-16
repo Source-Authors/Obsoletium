@@ -73,7 +73,8 @@ void CSaveGameDialog::OnCommand( const char *command )
 			else
 			{
 				// open confirmation dialog
-				QueryBox *box = new QueryBox( "#GameUI_ConfirmOverwriteSaveGame_Title", "#GameUI_ConfirmOverwriteSaveGame_Info" );
+				// dimhotepus: Own query box to scale it.
+				QueryBox *box = new QueryBox( "#GameUI_ConfirmOverwriteSaveGame_Title", "#GameUI_ConfirmOverwriteSaveGame_Info", this );
 				box->AddActionSignalTarget(this);
 				box->SetOKButtonText("#GameUI_ConfirmOverwriteSaveGame_OK");
 				box->SetOKCommand(new KeyValues("Command", "command", "SaveOverwriteConfirmed"));

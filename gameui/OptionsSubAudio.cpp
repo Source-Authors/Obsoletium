@@ -343,7 +343,8 @@ void COptionsSubAudio::OnCommand( const char *command )
 		// ask them if they REALLY want to test the speakers if they're in a game already.
 		if (engine->IsConnected())
 		{
-			QueryBox *qb = new QueryBox("#GameUI_TestSpeakersWarning_Title", "#GameUI_TestSpeakersWarning_Info" );
+			// dimhotepus: Own query box to scale it.
+			QueryBox *qb = new QueryBox("#GameUI_TestSpeakersWarning_Title", "#GameUI_TestSpeakersWarning_Info", this );
 			if (qb != NULL)
 			{
 				qb->SetOKCommand(new KeyValues("RunTestSpeakers"));
