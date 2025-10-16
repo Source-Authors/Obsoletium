@@ -224,7 +224,7 @@ void CSessionOptionsDialog::SetupSession( void )
 		pProperty->SetInt( "type", prop.nType );
 		pProperty->SetString( "valuestring", prop.szValue );
 		pProperty->SetString( "valuetype", prop.szValueType );
-		// dimhotpeus: int -> uint64.
+		// dimhotepus: int -> uint64.
 		pProperty->SetUint64( "optionindex", pItem->GetActiveOptionIndex() );
 	}
 
@@ -342,7 +342,7 @@ void CSessionOptionsDialog::OverrideMenuItem( KeyValues *pItemKeys )
 			KeyValues *pKey = m_pDialogKeys->FindKey( pID );
 			if ( pKey )
 			{
-				// dimhotpeus: int -> uint64.
+				// dimhotepus: int -> uint64.
 				pItemKeys->SetUint64( "activeoption", pKey->GetUint64( "optionindex" ) );	
 			}
 		}
@@ -361,7 +361,7 @@ void CSessionOptionsDialog::OverrideMenuItem( KeyValues *pItemKeys )
 			const char *pID	= pItemKeys->GetString( "id", "NULL" );
 			if ( !Q_stricmp( pID, "PROPERTY_GAME_SIZE" ) )
 			{
-				// dimhotpeus: int -> uint64.
+				// dimhotepus: int -> uint64.
 				pItemKeys->SetUint64( "activeoption", GetMaxPlayersRecommendedOption() );
 			}
 		}
