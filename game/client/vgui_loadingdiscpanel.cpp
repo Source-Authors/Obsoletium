@@ -124,24 +124,24 @@ public:
 		m_nPrevTimeRemaining = -1;
 	}
 
-	void Create( vgui::VPANEL parent )
+	void Create( vgui::VPANEL parent ) override
 	{
 		// don't create now, only when it's needed
 		m_hParent = parent;
 	}
 
-	void Destroy( void )
+	void Destroy( void ) override
 	{
 		if ( loadingDiscPanel )
 		{
-			loadingDiscPanel->SetParent( (vgui::Panel *)NULL );
+			loadingDiscPanel->SetParent( nullptr );
 			loadingDiscPanel->MarkForDeletion();
 			loadingDiscPanel = NULL;
 		}
 
 		if ( m_pPauseDiscPanel )
 		{
-			m_pPauseDiscPanel->SetParent( (vgui::Panel *)NULL );
+			m_pPauseDiscPanel->SetParent( nullptr );
 			m_pPauseDiscPanel->MarkForDeletion();
 			m_pPauseDiscPanel = NULL;
 		}
@@ -149,7 +149,7 @@ public:
 		m_hParent = NULL;
 	}
 
-	void SetLoadingVisible( bool bVisible )
+	void SetLoadingVisible( bool bVisible ) override
 	{
 		// demand-create the dialog
 		if ( bVisible && !loadingDiscPanel )
@@ -164,7 +164,7 @@ public:
 	}
 
 
-	void SetPausedVisible( bool bVisible, float flExpireTime /*= -1.f */)
+	void SetPausedVisible( bool bVisible, float flExpireTime /*= -1.f */) override
 	{
 		if ( bVisible )
 		{
@@ -207,4 +207,4 @@ public:
 };
 
 static CLoadingDisc g_LoadingDisc;
-ILoadingDisc *loadingdisc = ( ILoadingDisc * )&g_LoadingDisc;
+ILoadingDisc *loadingdisc = &g_LoadingDisc;
