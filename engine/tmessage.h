@@ -9,10 +9,6 @@
 #define TMESSAGE_H
 #pragma once
 
-#ifdef __cplusplus
-extern "C" {
-#endif // __cplusplus
-
 #define DEMO_MESSAGE "__DEMOMESSAGE__"
 #define NETWORK_MESSAGE1 "__NETMESSAGE__1"
 #define NETWORK_MESSAGE2 "__NETMESSAGE__2"
@@ -39,9 +35,5 @@ void					TextMessageShutdown( void );
 
 void TextMessage_DemoMessage( const char *pszMessage, float fFadeInTime, float fFadeOutTime, float fHoldTime );
 void TextMessage_DemoMessageFull( const char *pszMessage, client_textmessage_t const *message );
-
-#ifdef __cplusplus
-}
-#endif // __cplusplus
 
 #endif		//TMESSAGE_H

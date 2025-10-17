@@ -74,8 +74,6 @@ constexpr inline float M_PI_F{3.14159265358979323846f};
 
 #include "valve_minmax_on.h"
 
-#ifdef __cplusplus
-
 // #define COMPILETIME_MAX and COMPILETIME_MIN for max/min in constant expressions
 template <typename T, typename Y>
 [[nodiscard]] constexpr inline auto COMPILETIME_MIN( const T& a, const Y& b )
@@ -133,8 +131,6 @@ template< typename T >
 {
 	return val1 > val2 ? val1 : val2;
 }
-
-#endif
 
 #ifndef FALSE
 #define FALSE 0
