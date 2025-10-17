@@ -78,7 +78,7 @@ static client_textmessage_t orig_demo_message = tm_demomessage;
 static void TextMessageParse( byte *pMemFile, int fileSize );
 
 // The string "pText" is assumed to have all whitespace from both ends cut out
-int IsComment( char *pText )
+[[nodiscard]] static int IsComment( char *pText )
 {
 	if ( pText )
 	{
@@ -97,7 +97,7 @@ int IsComment( char *pText )
 
 
 // The string "pText" is assumed to have all whitespace from both ends cut out
-int IsStartOfText( char *pText )
+[[nodiscard]] static int IsStartOfText( char *pText )
 {
 	if ( pText )
 	{
@@ -109,7 +109,7 @@ int IsStartOfText( char *pText )
 
 
 // The string "pText" is assumed to have all whitespace from both ends cut out
-int IsEndOfText( char *pText )
+[[nodiscard]] static int IsEndOfText( char *pText )
 {
 	if ( pText )
 	{
@@ -120,13 +120,13 @@ int IsEndOfText( char *pText )
 }
 
 
-int IsWhiteSpace( char space )
+[[nodiscard]] static int IsWhiteSpace( char space )
 {
 	return IN_CHARACTERSET( g_WhiteSpace, space );
 }
 
 
-const char *SkipSpace( const char *pText )
+[[nodiscard]] static const char *SkipSpace( const char *pText )
 {
 	if ( pText )
 	{
@@ -136,11 +136,11 @@ const char *SkipSpace( const char *pText )
 		return pText + pos;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
-const char *SkipText( const char *pText )
+[[nodiscard]] static const char *SkipText( const char *pText )
 {
 	if ( pText )
 	{
@@ -150,11 +150,11 @@ const char *SkipText( const char *pText )
 		return pText + pos;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
-int ParseFloats( const char *pText, float *pFloat, int count )
+[[nodiscard]] static int ParseFloats( const char *pText, float *pFloat, int count )
 {
 	const char *pTemp = pText;
 	int index = 0;
@@ -181,7 +181,7 @@ int ParseFloats( const char *pText, float *pFloat, int count )
 	return 0;
 }
 
-int ParseString( char const *pText, char *buf, size_t bufsize )
+[[nodiscard]] static int ParseString( char const *pText, char *buf, size_t bufsize )
 {
 	const char *pTemp = pText;
 
@@ -195,9 +195,9 @@ int ParseString( char const *pText, char *buf, size_t bufsize )
 		char const *pStart = pTemp;
 		pTemp = SkipText( pTemp );
 
-		intp len =  min( pTemp - pStart + 1, (intp)bufsize - 1 );
+		intp len = min( pTemp - pStart + 1, (intp)bufsize - 1 );
 		Q_strncpy( buf, pStart, len );
-		buf[ len ] = 0;
+		buf[ len ] = '\0';
 		return 1;
 	}
 
@@ -206,7 +206,7 @@ int ParseString( char const *pText, char *buf, size_t bufsize )
 
 
 // Trims all whitespace from the front and end of a string
-void TrimSpace( const char *source, char *dest )
+[[nodiscard]] static void TrimSpace( const char *source, char *dest )
 {
 	intp start, end, length;
 
@@ -229,11 +229,11 @@ void TrimSpace( const char *source, char *dest )
 		length = 0;
 
 	// Terminate the dest string
-	dest[ length ] = 0;
+	dest[ length ] = '\0';
 }
 
 
-int IsToken( const char *pText, const char *pTokenName )
+[[nodiscard]] static int IsToken( const char *pText, const char *pTokenName )
 {
 	if ( !pText || !pTokenName )
 		return 0;
@@ -246,7 +246,7 @@ int IsToken( const char *pText, const char *pTokenName )
 
 static char g_pchSkipName[ 64 ];
 
-int ParseDirective( const char *pText )
+[[nodiscard]] static int ParseDirective( const char *pText )
 {
 	if ( pText && pText[0] == '$' )
 	{
@@ -566,9 +566,7 @@ void TextMessageInit( void )
 		free( pMemFile );
 	}
 
-	int i;
-
-	for ( i = 0; i < MAX_NETMESSAGE; i++ )
+	for ( int i = 0; i < MAX_NETMESSAGE; i++ )
 	{
 		gNetworkTextMessage[ i ].pMessage = 
 			gNetworkTextMessageBuffer[ i ];
@@ -600,13 +598,13 @@ void TextMessage_DemoMessageFull( const char *pszMessage, client_textmessage_t c
 	if ( !message )
 		return;
 
-	if ( !pszMessage || !pszMessage[0] )
+	if ( Q_isempty( pszMessage ) )
 		return;
 
 	memcpy( &tm_demomessage, message, sizeof( tm_demomessage ) );
 	tm_demomessage.pMessage = orig_demo_message.pMessage;
 	tm_demomessage.pName = orig_demo_message.pName;
-	Q_strncpy( gDemoMessageBuffer, pszMessage, sizeof( gDemoMessageBuffer ) );
+	V_strcpy_safe( gDemoMessageBuffer, pszMessage );
 }
 
 
@@ -635,5 +633,5 @@ client_textmessage_t *TextMessageGet( const char *pName )
 			return &gMessageTable[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
