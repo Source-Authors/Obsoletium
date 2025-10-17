@@ -728,9 +728,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		{
 			FOR_EACH_VEC( vecPathIDs, idxPathID )
 			{
-				const char *pPathID = vecPathIDs[ idxPathID ], *pFullPath = vecFullLocationPaths[ idxLocation ];
-
-				FileSystem_AddLoadedSearchPath( initInfo, pPathID, pFullPath, bLowViolence );
+				FileSystem_AddLoadedSearchPath( initInfo, vecPathIDs[ idxPathID ], vecFullLocationPaths[ idxLocation ], bLowViolence );
 			}
 		}
 	}
