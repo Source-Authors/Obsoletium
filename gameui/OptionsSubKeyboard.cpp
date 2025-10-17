@@ -218,8 +218,9 @@ void COptionsSubKeyboard::ParseActionDescriptions( void )
 			{
 				// add header item
 				m_pKeyBindList->AddSection(++sectionIndex, szDescription);
-				m_pKeyBindList->AddColumnToSection(sectionIndex, "Action", szDescription, SectionedListPanel::COLUMN_BRIGHT, 286);
-				m_pKeyBindList->AddColumnToSection(sectionIndex, "Key", "#GameUI_KeyButton", SectionedListPanel::COLUMN_BRIGHT, 128);
+				// dimhotepus: Scale UI.
+				m_pKeyBindList->AddColumnToSection(sectionIndex, "Action", szDescription, SectionedListPanel::COLUMN_BRIGHT, QuickPropScale(286));
+				m_pKeyBindList->AddColumnToSection(sectionIndex, "Key", "#GameUI_KeyButton", SectionedListPanel::COLUMN_BRIGHT, QuickPropScale(128));
 			}
 			else
 			{
