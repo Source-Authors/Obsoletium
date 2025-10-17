@@ -5609,7 +5609,7 @@ Panel *PHandle::Set( HPanel hPanel )
 //-----------------------------------------------------------------------------
 // Purpose: Returns a handle to a valid panel, NULL if the panel has been deleted
 //-----------------------------------------------------------------------------
-VPANEL VPanelHandle::Get()
+VPANEL VPanelHandle::Get() const
 {
 	if (m_iPanelID != INVALID_PANEL)
 	{

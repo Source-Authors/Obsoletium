@@ -50,14 +50,17 @@ class VPanelHandle
 public:
 	VPanelHandle() : m_iPanelID(INVALID_PANEL) {}
 
-	VPANEL Get();
+	// dimhotepus: Add const.
+	VPANEL Get() const;
 	VPANEL Set( VPANEL pPanel );
 
-	operator VPANEL ()						{ return Get(); }
+	// dimhotepus: Add const.
+	operator VPANEL () const				{ return Get(); }
 	VPANEL operator = (VPANEL pPanel)		{ return Set(pPanel); }
 
-	bool operator == (VPANEL pPanel)		{ return (Get() == pPanel); }
-	operator bool ()						{ return Get() != 0; }
+	// dimhotepus: Add const.
+	bool operator == (VPANEL pPanel) const	{ return (Get() == pPanel); }
+	operator bool () const					{ return Get() != 0; }
 
 private:
 	HPanel m_iPanelID;
