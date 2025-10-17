@@ -52,7 +52,8 @@ public:
 		CMouseMessageForwardingPanel *panel = new CMouseMessageForwardingPanel(this, NULL);
 		panel->SetZPos(2);
 
-		SetSize( 200, 140 );
+		// dimhotepus: Scale UI.
+		SetSize( QuickPropScale( 200 ), QuickPropScale( 140 ) );
 
 		LoadControlSettings( "resource/SaveGamePanel.res" );
 

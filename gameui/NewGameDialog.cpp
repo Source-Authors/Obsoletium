@@ -291,7 +291,7 @@ const char *COM_GetModDirectory()
 CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : BaseClass(parent, "NewGameDialog")
 {
 	SetDeleteSelfOnClose(true);
-	SetBounds(0, 0, 372, 160);
+	SetBounds(0, 0, QuickPropScale( 372 ), QuickPropScale( 160 ));
 	SetSizeable( false );
 	m_iSelectedChapter = -1;
 
@@ -406,10 +406,10 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	}
 
 	// Layout panel positions relative to the dialog center.
-	int panelWidth = m_ChapterPanels[0]->GetWide() + 16;
+	int panelWidth = m_ChapterPanels[0]->GetWide() + QuickPropScale( 16 );
 	int dialogWidth = GetWide();
 	
-	m_PanelXPos[2] = ( dialogWidth - panelWidth ) / 2 + 8;
+	m_PanelXPos[2] = ( dialogWidth - panelWidth ) / 2 + QuickPropScale( 8 );
 	
 	if (m_ChapterPanels.Count() > 1)
 	{
@@ -433,8 +433,8 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 
 	int panelHeight;
 	m_ChapterPanels[0]->GetSize( panelWidth, panelHeight );
-	m_pCenterBg->SetWide( panelWidth + 16 );
-	m_pCenterBg->SetPos( m_PanelXPos[2] - 8, m_PanelYPos[2] - (m_pCenterBg->GetTall() - panelHeight) + 8 );
+	m_pCenterBg->SetWide( panelWidth + QuickPropScale( 16 ) );
+	m_pCenterBg->SetPos( m_PanelXPos[2] - QuickPropScale( 8 ), m_PanelYPos[2] - (m_pCenterBg->GetTall() - panelHeight) + QuickPropScale( 8 ) );
 	m_pCenterBg->SetBgColor( Color( 190, 115, 0, 255 ) );
 
 	// start the first item selected
@@ -480,7 +480,7 @@ void CNewGameDialog::ApplySettings( KeyValues *inResourceData )
 {
 	BaseClass::ApplySettings( inResourceData );
 
-	int ypos = inResourceData->GetInt( "chapterypos", 40 );
+	int ypos = QuickPropScale( inResourceData->GetInt( "chapterypos", 40 ) );
 	for ( auto &idx : m_PanelYPos )
 	{
 		idx = ypos;

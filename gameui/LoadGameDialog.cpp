@@ -29,8 +29,8 @@ using namespace vgui;
 CLoadGameDialog::CLoadGameDialog(vgui::Panel *parent) : BaseClass(parent, "LoadGameDialog")
 {
 	SetDeleteSelfOnClose(true);
-	SetBounds(0, 0, 512, 384);
-	SetMinimumSize( 256, 300 );
+	SetBounds(0, 0, QuickPropScale( 512 ), QuickPropScale( 384 ));
+	SetMinimumSize( QuickPropScale( 256 ), QuickPropScale( 300 ) );
 	SetSizeable( true );
 
 	SetTitle("#GameUI_LoadGame", true);
