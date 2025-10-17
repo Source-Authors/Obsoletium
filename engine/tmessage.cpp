@@ -233,12 +233,13 @@ static void TextMessageParse( byte *pMemFile, int fileSize );
 }
 
 
-[[nodiscard]] static int IsToken( const char *pText, const char *pTokenName )
+template<intp size>
+[[nodiscard]] static int IsToken( const char *pText, const char (&pTokenName)[size] )
 {
 	if ( !pText || !pTokenName )
 		return 0;
 
-	if ( !Q_strnicmp( pText+1, pTokenName, strlen(pTokenName) ) )
+	if ( !Q_strnicmp( pText+1, pTokenName, size - 1 ) )
 		return 1;
 	
 	return 0;
