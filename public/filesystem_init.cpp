@@ -842,7 +842,7 @@ FSReturnCode_t LocateGameInfoFile( const CFSSteamSetupInfo &fsInfo, char (&pOutD
 		bool bExists = DoesFileExistIn( fsInfo.m_pDirectoryName, GAMEINFO_FILENAME );
 		if ( !bExists )
 		{
-			return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, "Setup file '%s' doesn't exist in subdirectory '%s'.\nCheck your -game parameter or VCONFIG setting.", GAMEINFO_FILENAME, fsInfo.m_pDirectoryName );
+			return SetupFileSystemError( true, FS_MISSING_GAMEINFO_FILE, "Sorry, setup file '%s' doesn't exist in subdirectory '%s'.\n\nCheck your -game parameter or VCONFIG setting.", GAMEINFO_FILENAME, fsInfo.m_pDirectoryName );
 		}
 
 		V_strcpy_safe( pOutDir, fsInfo.m_pDirectoryName );
