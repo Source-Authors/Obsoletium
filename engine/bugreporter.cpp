@@ -294,7 +294,7 @@ private:
 CBugReportUploadProgressDialog::CBugReportUploadProgressDialog(Panel *parent, const char *name, const char *title, const char *message) : Frame(parent, name)
 {
 	// dimhotepus: Scale support.
-	SetProportional(parent ? parent->IsProportional() : true);
+	SetProportional(parent->IsProportional());
 	SetSize(QuickPropScale( 300 ), QuickPropScale( 160 ));
 	SetSizeable(false);
 	MoveToFront();
@@ -361,7 +361,7 @@ private:
 CBugReportFinishedDialog::CBugReportFinishedDialog(Panel *parent, const char *name, const char *title, const char *message) : Frame(parent, name)
 {
 	// dimhotepus: Scale support.
-	SetProportional(parent ? parent->IsProportional() : true);
+	SetProportional(parent->IsProportional());
 	SetSize(QuickPropScale( 300 ), QuickPropScale( 160 ));
 	SetSizeable(false);
 	MoveToFront();
@@ -960,7 +960,8 @@ void CBugUIPanel::OnTick()
 			// dimhotepus: Show success message only if bug uploaded.
 			if ( success && !m_hFinishedDialog.Get() )
 			{
-				m_hFinishedDialog = new CBugReportFinishedDialog(NULL, "FinishDialog", "#Steam_FinishedBug_WorkingTitle", "#Steam_FinishedBug_Text"  );
+				// dimhotepus: Add parent to scale UI.
+				m_hFinishedDialog = new CBugReportFinishedDialog(this, "FinishDialog", "#Steam_FinishedBug_WorkingTitle", "#Steam_FinishedBug_Text"  );
 				m_hFinishedDialog->Activate();
 				vgui::input()->SetAppModalSurface(m_hFinishedDialog->GetVPanel());
 			}
@@ -2109,7 +2110,8 @@ void CBugUIPanel::OnSubmit()
 
 	if ( m_pBugReporter->IsPublicUI() )
 	{
-		m_pProgressDialog = new CBugReportUploadProgressDialog(NULL, "ProgressDialog", "#Steam_SubmittingBug_WorkingTitle", "#Steam_SubmittingBug_WorkingText"  );
+		// dimhotepus: Add parent to scale UI.
+		m_pProgressDialog = new CBugReportUploadProgressDialog(this, "ProgressDialog", "#Steam_SubmittingBug_WorkingTitle", "#Steam_SubmittingBug_WorkingText"  );
 		m_pProgressDialog->Activate();
 		vgui::input()->SetAppModalSurface(m_pProgressDialog->GetVPanel());
 		m_flPauseTime = (float)system()->GetFrameTime() + PUBLIC_BUGREPORT_WAIT_TIME;
