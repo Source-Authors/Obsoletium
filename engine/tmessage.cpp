@@ -602,7 +602,7 @@ void TextMessage_DemoMessageFull( const char *pszMessage, client_textmessage_t c
 	if ( Q_isempty( pszMessage ) )
 		return;
 
-	memcpy( &tm_demomessage, message, sizeof( tm_demomessage ) );
+	BitwiseCopy( message, &tm_demomessage, sizeof( tm_demomessage ) );
 	tm_demomessage.pMessage = orig_demo_message.pMessage;
 	tm_demomessage.pName = orig_demo_message.pName;
 	V_strcpy_safe( gDemoMessageBuffer, pszMessage );
