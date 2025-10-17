@@ -4,24 +4,23 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <stdio.h>
-#include <memory.h>
+#include <cstdio>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 // Copied from sound.cpp in the DLL
-char *memfgets( unsigned char *pMemFile, int fileSize, int *pFilePos, char *pBuffer, int bufferSize )
+char *memfgets( IN_CAP(fileSize) unsigned char *pMemFile, intp fileSize, intp *pFilePos, OUT_Z_CAP(bufferSize) char *pBuffer, intp bufferSize )
 {
-	int filePos = *pFilePos;
-	int i, last, stop;
+	intp filePos = *pFilePos;
+	intp i, last, stop;
 
 	// Bullet-proofing
 	if ( !pMemFile || !pBuffer )
-		return NULL;
+		return nullptr;
 
 	if ( filePos >= fileSize )
-		return NULL;
+		return nullptr;
 
 	i = filePos;
 	last = fileSize;
@@ -45,13 +44,13 @@ char *memfgets( unsigned char *pMemFile, int fileSize, int *pFilePos, char *pBuf
 	if ( i != filePos )
 	{
 		// We read in size bytes
-		int size = i - filePos;
+		intp size = i - filePos;
 		// copy it out
 		memcpy( pBuffer, pMemFile + filePos, sizeof(unsigned char)*size );
 		
 		// If the buffer isn't full, terminate (this is always true)
 		if ( size < bufferSize )
-			pBuffer[size] = 0;
+			pBuffer[size] = '\0';
 
 		// Update file pointer
 		*pFilePos = i;
@@ -59,5 +58,5 @@ char *memfgets( unsigned char *pMemFile, int fileSize, int *pFilePos, char *pBuf
 	}
 
 	// No data read, bail
-	return NULL;
+	return nullptr;
 }

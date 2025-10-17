@@ -130,7 +130,7 @@ static void TextMessageParse( byte *pMemFile, int fileSize );
 {
 	if ( pText )
 	{
-		int pos = 0;
+		intp pos = 0;
 		while ( pText[pos] && IsWhiteSpace( pText[pos] ) )
 			pos++;
 		return pText + pos;
@@ -144,7 +144,7 @@ static void TextMessageParse( byte *pMemFile, int fileSize );
 {
 	if ( pText )
 	{
-		int pos = 0;
+		intp pos = 0;
 		while ( pText[pos] && !IsWhiteSpace( pText[pos] ) )
 			pos++;
 		return pText + pos;
@@ -157,7 +157,7 @@ static void TextMessageParse( byte *pMemFile, int fileSize );
 [[nodiscard]] static int ParseFloats( const char *pText, float *pFloat, int count )
 {
 	const char *pTemp = pText;
-	int index = 0;
+	intp index = 0;
 
 	while ( pTemp && count > 0 )
 	{
@@ -181,7 +181,7 @@ static void TextMessageParse( byte *pMemFile, int fileSize );
 	return 0;
 }
 
-[[nodiscard]] static int ParseString( char const *pText, char *buf, size_t bufsize )
+[[nodiscard]] static int ParseString( char const *pText, char *buf, intp bufsize )
 {
 	const char *pTemp = pText;
 
@@ -195,7 +195,7 @@ static void TextMessageParse( byte *pMemFile, int fileSize );
 		char const *pStart = pTemp;
 		pTemp = SkipText( pTemp );
 
-		intp len = min( pTemp - pStart + 1, (intp)bufsize - 1 );
+		intp len = min( pTemp - pStart + 1, bufsize - 1 );
 		Q_strncpy( buf, pStart, len );
 		buf[ len ] = '\0';
 		return 1;
@@ -338,7 +338,7 @@ static char g_pchSkipName[ 64 ];
 			{
 				if ( !g_pchSkipName[ 0 ] || !Q_stricmp( g_pchSkipName, "0" ) )
 				{
-					gMessageParms.pClearMessage = NULL;
+					gMessageParms.pClearMessage = nullptr;
 				}
 				else
 				{
@@ -361,29 +361,27 @@ static char g_pchSkipName[ 64 ];
 void TextMessageParse( byte *pMemFile, int fileSize )
 {
 	char		buf[512], trim[512];
-	char		*pCurrentText=0, *pNameHeap;
-	char		 currentName[512], nameHeap[ NAME_HEAP_SIZE ];
-	intp		lastNamePos;
+	char		*pCurrentText = 0, *pNameHeap;
+	char		currentName[512], nameHeap[ NAME_HEAP_SIZE ];
+	intp		lastNamePos = 0;
+
+	// dimhotepus: Ensure name is initialized.
+	currentName[0] = '\0';
 
 	int			mode = MSGFILE_NAME;	// Searching for a message name	
-	int			lineNumber, filePos, lastLinePos;
-	int			messageCount;
+	int			lineNumber = 0, lastLinePos = 0;
+	int			messageCount = 0;
 
 	client_textmessage_t	textMessages[ MAX_MESSAGES ];
 	
 	intp		i, nameHeapSize, textHeapSize, messageSize, nameOffset;
 
-	lastNamePos = 0;
-	lineNumber = 0;
-	filePos = 0;
-	lastLinePos = 0;
-	messageCount = 0;
-
+	intp filePos = 0;
 	bool bSpew = CommandLine()->FindParm( "-textmessagedebug" ) ? true : false;
 
 	CharacterSetBuild( &g_WhiteSpace, " \r\n\t" );
 
-	while( memfgets( pMemFile, fileSize, &filePos, buf, 512 ) != NULL )
+	while( memfgets( pMemFile, fileSize, &filePos, buf ) != NULL )
 	{
 		if(messageCount>=MAX_MESSAGES)
 		{
@@ -411,13 +409,13 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 				ConDMsg("Unexpected '}' found, line %d\n", lineNumber );
 				return;
 			}
-			Q_strncpy( currentName, trim, sizeof( currentName ) );
+			V_strcpy_safe( currentName, trim );
 			break;
 		
 		case MSGFILE_TEXT:
 			if ( IsEndOfText( trim ) )
 			{
-				intp length = V_strlen(currentName);
+				intp length = V_strlen( currentName );
 
 				// Save name on name heap
 				if ( lastNamePos + length > 8192 )
@@ -430,25 +428,25 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 				// Terminate text in-place in the memory file (it's temporary memory that will be deleted)
 				// If the string starts with #, it's a localization string and we don't
 				// want the \n (or \r) on the end or the Find() lookup will fail (so subtract 2)
-				if ( pCurrentText && pCurrentText[0] && pCurrentText[0] == '#' && lastLinePos > 1 && 
+				if ( !Q_isempty( pCurrentText ) && pCurrentText[0] == '#' && lastLinePos > 1 && 
 					( ( pMemFile[lastLinePos - 2] == '\n' ) || ( pMemFile[lastLinePos - 2] == '\r' ) ) )
 				{
-					pMemFile[ lastLinePos - 2 ] = 0;
+					pMemFile[ lastLinePos - 2 ] = '\0';
 				}
 				else
 				{
-					pMemFile[ lastLinePos - 1 ] = 0;
+					pMemFile[ lastLinePos - 1 ] = '\0';
 				}
 
 				// Save name/text on heap
 				textMessages[ messageCount ] = gMessageParms;
 				textMessages[ messageCount ].pName = nameHeap + lastNamePos;
-				lastNamePos += strlen(currentName) + 1;
+				lastNamePos += V_strlen(currentName) + 1;
 				if ( gMessageParms.pClearMessage )
 				{
-					Q_strncpy( nameHeap + lastNamePos, textMessages[ messageCount ].pClearMessage, Q_strlen( textMessages[ messageCount ].pClearMessage ) + 1 );
+					V_strncpy( nameHeap + lastNamePos, textMessages[ messageCount ].pClearMessage, V_strlen( textMessages[ messageCount ].pClearMessage ) + 1 );
 					textMessages[ messageCount ].pClearMessage = nameHeap + lastNamePos;
-					lastNamePos += Q_strlen( textMessages[ messageCount ].pClearMessage ) + 1;
+					lastNamePos += V_strlen( textMessages[ messageCount ].pClearMessage ) + 1;
 				}
 				textMessages[ messageCount ].pMessage = pCurrentText;
 
@@ -502,7 +500,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 		textHeapSize += V_strlen( textMessages[i].pMessage ) + 1;
 
 
-	messageSize = (messageCount * sizeof(client_textmessage_t));
+	messageSize = messageCount * sizeof(client_textmessage_t);
 
 	// Must malloc because we need to be able to clear it after initialization
 	gMessageTable = (client_textmessage_t *)malloc( textHeapSize + nameHeapSize + messageSize );
@@ -534,6 +532,7 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 	if ( (pCurrentText - (char *)gMessageTable) != (textHeapSize + nameHeapSize + messageSize) )
 		ConMsg("Overflow text message buffer!!!!!\n");
 #endif
+
 	gMessageTableCount = messageCount;
 }
 
@@ -543,23 +542,21 @@ void TextMessageShutdown( void )
 	if ( gMessageTable )
 	{
 		free( gMessageTable );
-		gMessageTable = NULL;
+		gMessageTable = nullptr;
 	}
 }
 
 void TextMessageInit( void )
 {
-	int fileSize;
-	byte *pMemFile;
-
 	// Clear out any old data that's sitting around.
 	if ( gMessageTable )
 	{
 		free( gMessageTable );
-		gMessageTable = NULL;
+		gMessageTable = nullptr;
 	}
-
-	pMemFile = COM_LoadFile( "scripts/titles.txt", 5, &fileSize );
+	
+	int fileSize;
+	byte *pMemFile = COM_LoadFile("scripts/titles.txt", 5, &fileSize);
 
 	if ( pMemFile )
 	{
@@ -617,21 +614,22 @@ client_textmessage_t *TextMessageGet( const char *pName )
 	// HACKHACK -- add 4 "channels" of network text
 	if (!Q_stricmp( pName, NETWORK_MESSAGE1 ))
 		return gNetworkTextMessage;
-	else if (!Q_stricmp( pName, NETWORK_MESSAGE2 ))
+	if (!Q_stricmp( pName, NETWORK_MESSAGE2 ))
 		return gNetworkTextMessage + 1;
-	else if (!Q_stricmp( pName, NETWORK_MESSAGE3 ))
+	if (!Q_stricmp( pName, NETWORK_MESSAGE3 ))
 		return gNetworkTextMessage + 2;
-	else if (!Q_stricmp( pName, NETWORK_MESSAGE4 ))
+	if (!Q_stricmp( pName, NETWORK_MESSAGE4 ))
 		return gNetworkTextMessage + 3;
-	else if (!Q_stricmp( pName, NETWORK_MESSAGE5 ))
+	if (!Q_stricmp( pName, NETWORK_MESSAGE5 ))
 		return gNetworkTextMessage + 4;
-	else if (!Q_stricmp( pName, NETWORK_MESSAGE6 ))
+	if (!Q_stricmp( pName, NETWORK_MESSAGE6 ))
 		return gNetworkTextMessage + 5;
 
 	for ( int i = 0; i < gMessageTableCount; i++ )
 	{
-		if ( !Q_stricmp( pName, gMessageTable[i].pName ) )
-			return &gMessageTable[i];
+		auto &message = gMessageTable[i];
+		if ( !Q_stricmp( pName, message.pName ) )
+			return &message;
 	}
 
 	return nullptr;
