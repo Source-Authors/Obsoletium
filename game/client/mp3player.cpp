@@ -734,9 +734,10 @@ CMP3Player::CMP3Player( VPANEL parent, char const *panelName ) :
 	m_pSongProgress = new CMP3SongProgress( this, "Progress" );
 	m_pSongProgress->AddActionSignalTarget( this );
 	
-	SetSize( 500, 562 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 500 ), QuickPropScale( 562 ) );
 
-	SetMinimumSize( 350, 400 );
+	SetMinimumSize( QuickPropScale( 350 ), QuickPropScale( 400 ) );
 
 	SetTitle( "#MP3PlayerTitle", true );
 
