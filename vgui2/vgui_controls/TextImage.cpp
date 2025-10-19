@@ -810,7 +810,8 @@ void TextImage::RecalculateEllipsesPosition()
 					float flWide = 0.0f, flabcA = 0.0f;
 					surface()->GetKernedCharWidth( font, *rwsz, chBefore, chAfter, flWide, flabcA );
 					int len = floor( flWide + 0.6 );
-					remainingLength += floor( flWide + 0.6 );
+					// dimhotepus: Use computed len.
+					remainingLength += len;
 #else
 					remainingLength += surface()->GetCharacterWidth(font, *rwsz);
 #endif
