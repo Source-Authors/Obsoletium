@@ -106,7 +106,7 @@ CDemoUIPanel::CDemoUIPanel( vgui::Panel *parent ) : vgui::Frame( parent, "DemoUI
 
 	m_ViewOrigin.Init();
 	m_ViewAngles.Init();
-	memset( m_nOldCursor, 0, sizeof( m_nOldCursor ) );
+	BitwiseClear( m_nOldCursor );
 	m_bInputActive = false;
 }
 
@@ -200,8 +200,8 @@ void CDemoUIPanel::OnTick()
 	m_pProgress->SetProgress( fProgress );
 	m_pProgressLabelFrame->SetText( va( "Tick: %i / %i", curtick, totalticks ) );
 
-	Q_strncpy( curtime, COM_FormatSeconds( host_state.interval_per_tick * curtick ), 32 );
-	Q_strncpy( totaltime, COM_FormatSeconds( host_state.interval_per_tick * totalticks ), 32 );
+	V_strcpy_safe( curtime, COM_FormatSeconds( host_state.interval_per_tick * curtick ) );
+	V_strcpy_safe( totaltime, COM_FormatSeconds( host_state.interval_per_tick * totalticks ) );
 	m_pProgressLabelTime->SetText( va( "Time: %s / %s", curtime, totaltime ) );
 
 	m_pFastForward->SetEnabled( demoplayer->IsPlayingBack() && !demoplayer->IsPlaybackPaused() );
@@ -225,7 +225,7 @@ void CDemoUIPanel::OnCommand(const char *command)
 		if ( !demoplayer->IsPlayingBack() )
 		{
 			char cmd[ 256 ];
-			Q_snprintf( cmd, sizeof( cmd ), "playdemo %s\n", demoaction->GetCurrentDemoFile() );
+			V_sprintf_safe( cmd, "playdemo %s\n", demoaction->GetCurrentDemoFile() );
 
 			Cbuf_AddText( cmd );
 		}
@@ -659,7 +659,7 @@ CDemoUIPanel2::CDemoUIPanel2( vgui::Panel *pParentBkgnd, vgui::Panel *pParentFgn
 	SetSizeable( false );
 	SetMoveable( true );
 
-	memset( m_nOldCursor, 0, sizeof( m_nOldCursor ) );
+	BitwiseClear( m_nOldCursor );
 	m_bInputActive = false;
 }
 
@@ -750,8 +750,8 @@ void CDemoUIPanel2::OnTick()
 	// Color in red when dragging back
 	m_pProgressLabelFrame->SetFgColor( ( m_pProgress->GetValue() < curtick ) ? Color( 255, 0, 0, 255 ) : m_pProgressLabelTime->GetFgColor() );
 
-	Q_strncpy( curtime, COM_FormatSeconds( host_state.interval_per_tick * curtick ), 32 );
-	Q_strncpy( totaltime, COM_FormatSeconds( host_state.interval_per_tick * totalticks ), 32 );
+	V_strcpy_safe( curtime, COM_FormatSeconds( host_state.interval_per_tick * curtick ) );
+	V_strcpy_safe( totaltime, COM_FormatSeconds( host_state.interval_per_tick * totalticks ) );
 	m_pProgressLabelTime->SetText( va( "Time: %s / %s", curtime, totaltime ) );
 
 	m_pFastForward->SetEnabled( demoplayer->IsPlayingBack() && !demoplayer->IsPlaybackPaused() );
@@ -856,7 +856,7 @@ void CDemoUIPanel2::OnLoad()
 	if ( m_hFileOpenDialog )
 	{
 		char startPath[ MAX_PATH ];
-		Q_strncpy( startPath, com_gamedir, sizeof( startPath ) );
+		V_strcpy_safe( startPath, com_gamedir );
 		Q_FixSlashes( startPath );
 		m_hFileOpenDialog->SetStartDirectory( startPath );
 		m_hFileOpenDialog->DoModal( false );
