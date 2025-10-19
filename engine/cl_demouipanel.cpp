@@ -989,7 +989,7 @@ void CDemoUIPanel2::MakePanelForeground( bool bPutToForeground )
 	}
 }
 
-void DemoUI2_f()
+static void DemoUI2_f()
 {
 	if ( !g_pDemoUI2 )
 		return;
@@ -1004,7 +1004,7 @@ void DemoUI2_f()
 	}
 }
 
-void DemoUI2_on()
+static void DemoUI2_on()
 {
 	if ( !g_pDemoUI2 )
 		return;
@@ -1012,7 +1012,7 @@ void DemoUI2_on()
 	g_pDemoUI2->MakePanelForeground( true );
 }
 
-void DemoUI2_off()
+static void DemoUI2_off()
 {
 	if ( !g_pDemoUI2 )
 		return;
