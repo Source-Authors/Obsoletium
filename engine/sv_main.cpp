@@ -247,7 +247,7 @@ ConVar  sv_restrict_aspect_ratio_fov( "sv_restrict_aspect_ratio_fov", "1", FCVAR
 									 "    2 = limit the effective FOV on both windowed mode and full-screen users\n",
 									 true, 0, true, 2);
 
-void OnTVEnablehanged( IConVar *pConVar, const char *pOldString, float flOldValue )
+static void OnTVEnableChanged( IConVar *pConVar, const char *pOldString, float flOldValue )
 {
 	ConVarRef var( pConVar );
 
@@ -268,7 +268,7 @@ void OnTVEnablehanged( IConVar *pConVar, const char *pOldString, float flOldValu
 	}
 }
 
-ConVar tv_enable( "tv_enable", "0", FCVAR_NOTIFY, "Activates SourceTV on server.", OnTVEnablehanged );
+ConVar tv_enable( "tv_enable", "0", FCVAR_NOTIFY, "Activates SourceTV on server.", OnTVEnableChanged );
 
 extern ConVar *sv_noclipduringpause;
 
