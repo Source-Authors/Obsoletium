@@ -100,8 +100,11 @@ CON_COMMAND( viewanim_save, "Save current animation to file" )
 		return;
 
 	if ( g_pTestAnimation )
-	{	
-		g_pTestAnimation->SaveAsAnimFile( args[1] );
+	{
+		// dimhotepus: TF2 backport. Fixup file name.
+		char szOutput[ MAX_PATH ];
+		V_FixupPathName( szOutput, args[1] );
+		g_pTestAnimation->SaveAsAnimFile( szOutput );
 	}
 	else
 	{
