@@ -329,7 +329,8 @@ CPluginHudMessage::CPluginHudMessage( vgui::VPANEL parent ) : vgui::Frame( NULL,
 	SetParent( parent );
 	SetVisible( false );
 	SetAlpha( 255 );
-	SetMinimumSize( 10 , 10 );
+	// dimhotepus: Scale UI.
+	SetMinimumSize( QuickPropScale( 10 ), QuickPropScale( 10 ) );
 
 	SetScheme( "ClientScheme" );
 	SetMoveable(false);
@@ -394,7 +395,8 @@ void CPluginHudMessage::OnSizeChanged( int newWide, int newTall )
 	BaseClass::OnSizeChanged( newWide, newTall );
 	int w, h;
 	GetSize( w, h );
-	m_Message->SetBounds( MESSAGE_X_INSET, 5, w - MESSAGE_X_INSET - 10, h - 10 );
+	// dimhotepus: Scale UI.
+	m_Message->SetBounds( QuickPropScale( MESSAGE_X_INSET ), QuickPropScale( 5 ), w - QuickPropScale( MESSAGE_X_INSET + 10 ), h - QuickPropScale( 10 ) );
 
 }
 
@@ -428,7 +430,8 @@ void CPluginHudMessage::Hide()
 void CPluginHudMessage::ShowMessage( const wchar_t *text, int time, Color clr, bool bHasExtraPanel )
 {
 	m_Message->SetVisible( true );
-	m_Message->SetBounds( MESSAGE_X_INSET, 5, m_iTargetW - MESSAGE_X_INSET - 10, m_iTargetH - 10 );
+	// dimhotepus: Scale UI.
+	m_Message->SetBounds( QuickPropScale( MESSAGE_X_INSET ), QuickPropScale( 5 ), m_iTargetW - QuickPropScale( MESSAGE_X_INSET + 10 ), m_iTargetH - QuickPropScale( 10 ) );
 	m_Message->SetText( text );
 	m_Message->SetFgColor( clr );
 	m_fgColor = clr;
@@ -446,7 +449,8 @@ void CPluginHudMessage::ShowMessage( const wchar_t *text, int time, Color clr, b
 	int textW, textH;
 	m_Message->GetContentSize( textW, textH );
 	
-	textW = min( textW + MESSAGE_X_INSET + 10, (int)MAX_TEXT_LEN_PIXELS ); 
+	// dimhotepus: Scale UI.
+	textW = min( textW + QuickPropScale( MESSAGE_X_INSET + 10 ), QuickPropScale( MAX_TEXT_LEN_PIXELS ) ); 
 	SetSize( textW, m_iTargetH ); // the "small" animation event changes our size
 }
 
