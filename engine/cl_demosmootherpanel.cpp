@@ -135,8 +135,9 @@ CFixEdgeButton::CFixEdgeButton(Panel *parent, const char *panelName, const char 
 //-----------------------------------------------------------------------------
 CDemoSmootherPanel::CDemoSmootherPanel( vgui::Panel *parent ) : Frame( parent, "DemoSmootherPanel")
 {
-	int w = 440;
-	int h = 300;
+	// dimhotepus: Scale UI.
+	const int w = QuickPropScale( 440 );
+	const int h = QuickPropScale( 300 );
 
 	SetSize( w, h );
 

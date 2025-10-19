@@ -77,8 +77,9 @@ CNewActionButton::CNewActionButton(Panel *parent, const char *panelName, const c
 //-----------------------------------------------------------------------------
 CDemoEditorPanel::CDemoEditorPanel( vgui::Panel *parent ) : Frame( parent, "DemoEditorPanel")
 {
-	int w = 440;
-	int h = 300;
+	// dimhotepus: Scale UI.
+	const int w = QuickPropScale( 440 );
+	const int h = QuickPropScale( 300 );
 
 	SetSize( w, h );
 
