@@ -5,23 +5,18 @@
 // $NoKeywords: $
 //=============================================================================//
 
-
-#ifdef _XBOX
-#include "xbox/xbox_platform.h"
-#include "xbox/xbox_win32stubs.h"
-#endif
-
-#if !defined( _X360 )
-#include "winlite.h"
-#endif
-#include <stdio.h>
-
 #include "ChangeGameDialog.h"
+
+#include <cstdio>
+
+#include "posix_file_stream.h"
+#include "winlite.h"
+
 #include "ModInfo.h"
 #include "EngineInterface.h"
 
-#include <vgui_controls/ListPanel.h>
-#include <KeyValues.h>
+#include "vgui_controls/ListPanel.h"
+#include "tier1/KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
