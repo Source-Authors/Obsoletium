@@ -871,6 +871,12 @@ short CClientLeafSystem::GetRenderableArea( ClientRenderHandle_t handle )
 void CClientLeafSystem::SetSubSystemDataInLeaf( int leaf, int nSubSystemIdx, CClientLeafSubSystemData *pData )
 {
 	Assert( nSubSystemIdx < N_CLSUBSYSTEMS );
+	// dimhotepus: Check leaf is in range. TF2 backport.
+	if ( !m_Leaf.IsValidIndex( leaf ) )
+	{
+		Assert( false );
+		return;
+	}
 	delete m_Leaf[leaf].m_pSubSystemData[nSubSystemIdx];
 	m_Leaf[leaf].m_pSubSystemData[nSubSystemIdx] = pData;
 }
@@ -878,6 +884,12 @@ void CClientLeafSystem::SetSubSystemDataInLeaf( int leaf, int nSubSystemIdx, CCl
 CClientLeafSubSystemData *CClientLeafSystem::GetSubSystemDataInLeaf( int leaf, int nSubSystemIdx )
 {
 	Assert( nSubSystemIdx < N_CLSUBSYSTEMS );
+	// dimhotepus: Check leaf is in range. TF2 backport.
+	if ( !m_Leaf.IsValidIndex( leaf ) )
+	{
+		Assert( false );
+		return NULL;
+	}
 	return m_Leaf[leaf].m_pSubSystemData[nSubSystemIdx];
 }
 
@@ -887,6 +899,12 @@ CClientLeafSubSystemData *CClientLeafSystem::GetSubSystemDataInLeaf( int leaf, i
 void CClientLeafSystem::SetDetailObjectsInLeaf( int leaf, int firstDetailObject,
 											    int detailObjectCount )
 {
+	// dimhotepus: Check leaf is in range. TF2 backport.
+	if ( !m_Leaf.IsValidIndex( leaf ) )
+	{
+		Assert( false );
+		return;
+	}
 	m_Leaf[leaf].m_FirstDetailProp = firstDetailObject;
 	m_Leaf[leaf].m_DetailPropCount = detailObjectCount;
 }
@@ -897,6 +915,12 @@ void CClientLeafSystem::SetDetailObjectsInLeaf( int leaf, int firstDetailObject,
 void CClientLeafSystem::GetDetailObjectsInLeaf( int leaf, int& firstDetailObject,
 											    int& detailObjectCount )
 {
+	// dimhotepus: Check leaf is in range. TF2 backport.
+	if ( !m_Leaf.IsValidIndex( leaf ) )
+	{
+		Assert( false );
+		return;
+	}
 	firstDetailObject = m_Leaf[leaf].m_FirstDetailProp;
 	detailObjectCount = m_Leaf[leaf].m_DetailPropCount;
 }
