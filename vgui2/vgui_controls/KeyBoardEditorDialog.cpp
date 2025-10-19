@@ -86,7 +86,8 @@ class CInlineEditPanel : public vgui::Panel
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CInlineEditPanel, vgui::Panel );
 
 public:
-	CInlineEditPanel() : vgui::Panel(NULL, "InlineEditPanel")
+	// dimhotepus: Add parent to support scaling.
+	CInlineEditPanel( vgui::Panel *parent ) : vgui::Panel(parent, "InlineEditPanel")
 	{
 	}
 
@@ -136,7 +137,7 @@ VControlsListPanel::VControlsListPanel( vgui::Panel *parent, const char *listNam
 	m_bCaptureMode	= false;
 	m_nClickRow		= 0;
 	m_hFont = INVALID_FONT;
-	m_pInlineEditPanel = new CInlineEditPanel();
+	m_pInlineEditPanel = new CInlineEditPanel( parent );
 	m_iMouseX = m_iMouseY = -1;
 }
 
@@ -145,7 +146,6 @@ VControlsListPanel::VControlsListPanel( vgui::Panel *parent, const char *listNam
 //-----------------------------------------------------------------------------
 VControlsListPanel::~VControlsListPanel()
 {
-	m_pInlineEditPanel->MarkForDeletion();
 }
 
 //-----------------------------------------------------------------------------

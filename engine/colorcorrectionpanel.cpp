@@ -4472,7 +4472,8 @@ void COperationListPanel::OnMouseDoublePressed( MouseCode code )
 					m_pNameEditPanel->SendNewLine( true );
 					m_pNameEditPanel->SetCatchEnterKey( true );
 					m_pNameEditPanel->AddActionSignalTarget( this );
-					m_pNameEditPanel->SetSize( 226, 24 );
+					// dimhotepus: Scale UI.
+					m_pNameEditPanel->SetSize( QuickPropScale( 226 ), QuickPropScale( 24 ) );
 					m_pNameEditPanel->SetBgColor( Color(255,255,255,255) );
 					EnterEditMode( row, column, m_pNameEditPanel );
 				}
