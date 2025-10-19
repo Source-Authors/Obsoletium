@@ -434,7 +434,7 @@ void CDemoActionTextMessageStart::FireAction( void )
 	GetTextMessage()->pVGuiSchemeFontName = GetFontName();
 
 	TextMessage_DemoMessageFull( GetMessageText(), GetTextMessage() );
-	CL_HudMessage( (const char *)DEMO_MESSAGE );
+	CL_HudMessage( DEMO_MESSAGE );
 	SetFinishedAction( true );
 }
 
