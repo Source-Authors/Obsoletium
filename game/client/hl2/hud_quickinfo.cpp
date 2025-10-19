@@ -106,6 +106,9 @@ void CHUDQuickInfo::ApplySchemeSettings( IScheme *scheme )
 
 	SetPaintBackgroundEnabled( false );
 	SetForceStereoRenderToFrameBuffer( true );
+
+	// dimhotepus: TF2 backport.
+	SetSize( ScreenWidth(), ScreenHeight() );
 }
 
 
