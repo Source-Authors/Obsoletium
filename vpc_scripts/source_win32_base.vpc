@@ -66,5 +66,10 @@ $Configuration
 
 		// dimhotepus: Drop warning suppression.
 		// $AdditionalOptions	"$BASE /Wv:18" //warning C4456: declaration of 'accFactorZ' hides previous local declaration suppression
+	
+		// dimhotepus: Correctly define __cplusplus. TF2 backport.
+		// Zc:__cplusplus makes the compiler use the real value for the __cplusplus macro
+		// normally, MSVC sets it to C++97, for VC6 compatibility. This is stupid. and C++97 doesn't even exist!
+		$AdditionalOptions	"$BASE /Zc:__cplusplus" [$AT_LEAST_VS2017]
 	}
 }
