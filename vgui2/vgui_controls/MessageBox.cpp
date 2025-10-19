@@ -42,7 +42,7 @@ MessageBox::MessageBox(const char *title, const char *text, Panel *parent) : Fra
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
 MessageBox::MessageBox(const wchar_t *wszTitle, const wchar_t *wszText, Panel *parent) : Frame(parent, NULL, false)
-{	
+{
 	SetTitle(wszTitle, true);
 	m_pMessageLabel = new Label(this, NULL, wszText);
 
@@ -144,8 +144,9 @@ void MessageBox::ApplySchemeSettings(IScheme *pScheme)
 	m_pMessageLabel->GetContentSize(wide, tall);
 	m_pMessageLabel->SetSize(wide, tall);
 
-	wide += 100;
-	tall += 100;
+	// dimhotepus: Scale UI.
+	wide += QuickPropScale( 100 );
+	tall += QuickPropScale( 100 );
 	SetSize(wide, tall);
 
 	if ( m_bShowMessageBoxOverCursor )
@@ -252,11 +253,13 @@ void MessageBox::PerformLayout()
 
 	int oldWide, oldTall;
 	m_pOkButton->GetSize(oldWide, oldTall);
-	
+
 	int btnWide, btnTall;
 	m_pOkButton->GetContentSize(btnWide, btnTall);
-	btnWide = max(oldWide, btnWide + 10);
-	btnTall = max(oldTall, btnTall + 10);
+
+	// dimhotepus: Scale UI.
+	btnWide = max(oldWide, btnWide + QuickPropScale( 10 ));
+	btnTall = max(oldTall, btnTall + QuickPropScale( 10 ));
 	m_pOkButton->SetSize(btnWide, btnTall);
 
 	int btnWide2 = 0, btnTall2 = 0;
@@ -270,21 +273,25 @@ void MessageBox::PerformLayout()
 		m_pCancelButton->SetSize(btnWide2, btnTall2);
 	}
 
-	boxWidth = max(boxWidth, m_pMessageLabel->GetWide() + 100);
-	boxWidth = max(boxWidth, (btnWide + btnWide2) * 2 + 30);
+	// dimhotepus: Scale UI.
+	boxWidth = max(boxWidth, m_pMessageLabel->GetWide() + QuickPropScale( 100 ));
+	boxWidth = max(boxWidth, (btnWide + btnWide2) * 2 + QuickPropScale( 30 ));
 	SetSize(boxWidth, boxTall);
 
 	GetSize(boxWidth, boxTall);
 
-	m_pMessageLabel->SetPos((wide/2)-(m_pMessageLabel->GetWide()/2) + x, y + 5 );
+	// dimhotepus: Scale UI.
+	m_pMessageLabel->SetPos((wide/2)-(m_pMessageLabel->GetWide()/2) + x, y + QuickPropScale( 5 ) );
 	if ( !m_pCancelButton->IsVisible() )
 	{
-		m_pOkButton->SetPos((wide/2)-(m_pOkButton->GetWide()/2) + x, tall - m_pOkButton->GetTall() - 15);
+		// dimhotepus: Scale UI.
+		m_pOkButton->SetPos((wide/2)-(m_pOkButton->GetWide()/2) + x, tall - m_pOkButton->GetTall() - QuickPropScale( 15 ));
 	}
 	else
 	{
-		m_pOkButton->SetPos((wide/4)-(m_pOkButton->GetWide()/2) + x, tall - m_pOkButton->GetTall() - 15);
-		m_pCancelButton->SetPos((3*wide/4)-(m_pOkButton->GetWide()/2) + x, tall - m_pOkButton->GetTall() - 15);
+		// dimhotepus: Scale UI.
+		m_pOkButton->SetPos((wide/4)-(m_pOkButton->GetWide()/2) + x, tall - m_pOkButton->GetTall() - QuickPropScale( 15 ));
+		m_pCancelButton->SetPos((3*wide/4)-(m_pOkButton->GetWide()/2) + x, tall - m_pOkButton->GetTall() - QuickPropScale( 15 ));
 	}
 
 	BaseClass::PerformLayout();
