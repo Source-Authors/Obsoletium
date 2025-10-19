@@ -541,7 +541,6 @@ void CAI_ScriptConditions::EvaluationThink()
 		}
 
 		bool      result = true;
-		const int nEvaluators = sizeof( gm_Evaluators ) / sizeof( gm_Evaluators[0] );
 
 		EvalArgs_t args =
 		{
@@ -550,7 +549,8 @@ void CAI_ScriptConditions::EvaluationThink()
 			m_hTarget.Get()
 		};
 
-		for ( int i = 0; i < nEvaluators; ++i )
+		// dimhotepus: Compile-time size.
+		for ( intp i = 0; i < ssize(gm_Evaluators); ++i )
 		{
 			if ( !(this->*gm_Evaluators[i].pfnEvaluator)( args ) )
 			{
