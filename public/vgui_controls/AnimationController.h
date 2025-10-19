@@ -76,8 +76,9 @@ public:
 	};
 
 	// runs the specific animation command (doesn't use script file at all)
-	void RunAnimationCommand(vgui::Panel *panel, const char *variable, float targetValue, float startDelaySeconds, float durationSeconds, Interpolators_e interpolator, float animParameter = 0 );
-	void RunAnimationCommand(vgui::Panel *panel, const char *variable, Color targetValue, float startDelaySeconds, float durationSeconds, Interpolators_e interpolator, float animParameter = 0 );
+	// dimhotepus: Add clear and can be cancelled flags from TF2.
+	void RunAnimationCommand(vgui::Panel *panel, const char *variable, float targetValue, float startDelaySeconds, float durationSeconds, Interpolators_e interpolator, float animParameter = 0, bool bClearValueQueue = true, bool bCanBeCancelled = true );
+	void RunAnimationCommand(vgui::Panel *panel, const char *variable, Color targetValue, float startDelaySeconds, float durationSeconds, Interpolators_e interpolator, float animParameter = 0, bool bClearValueQueue = true, bool bCanBeCancelled = true );
 
 private:
 	bool UpdateScreenSize();

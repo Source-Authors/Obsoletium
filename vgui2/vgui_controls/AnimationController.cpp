@@ -261,10 +261,7 @@ void AnimationController::SetupPosition( AnimCmdAnimate_t& cmd, float *output, c
 	pos = atoi(psz);
 
 	// scale the values
-	if (IsProportional())
-	{
-		pos = vgui::scheme()->GetProportionalScaledValueEx( GetScheme(), pos );
-	}
+	pos = QuickPropScale( pos );
 
 	// adjust the positions
 	if (r)
@@ -434,20 +431,14 @@ bool AnimationController::ParseScriptFile(char *pMem, intp length)
 				// fix up scale
 				if (cmdAnimate.variable == m_sSize)
 				{
-					if (IsProportional())
-					{
-						cmdAnimate.target.a = static_cast<float>( vgui::scheme()->GetProportionalScaledValueEx(GetScheme(), cmdAnimate.target.a) );
-						cmdAnimate.target.b = static_cast<float>( vgui::scheme()->GetProportionalScaledValueEx(GetScheme(), cmdAnimate.target.b) );
-					}
+					cmdAnimate.target.a = QuickPropScale( cmdAnimate.target.a );
+					cmdAnimate.target.b = QuickPropScale( cmdAnimate.target.b );
 				}
 				else if (cmdAnimate.variable == m_sWide ||
 					     cmdAnimate.variable == m_sTall )
 				{
-					if (IsProportional())
-					{
-						// Wide and tall both use.a
-						cmdAnimate.target.a = static_cast<float>( vgui::scheme()->GetProportionalScaledValueEx(GetScheme(), cmdAnimate.target.a) );
-					}
+					// Wide and tall both use.a
+					cmdAnimate.target.a = QuickPropScale( cmdAnimate.target.a );
 				}
 				
 				// interpolation function
@@ -1136,11 +1127,23 @@ void AnimationController::CancelAnimationsForPanel( Panel *pWithinParent )
 //-----------------------------------------------------------------------------
 // Purpose: Runs a custom command from code, not from a script file
 //-----------------------------------------------------------------------------
-void AnimationController::RunAnimationCommand(vgui::Panel *panel, const char *variable, float targetValue, float startDelaySeconds, float duration, Interpolators_e interpolator, float animParameter /* = 0 */ )
+void AnimationController::RunAnimationCommand(vgui::Panel *panel,
+											   const char *variable,
+											   float targetValue,
+											   float startDelaySeconds,
+											   float duration,
+											   Interpolators_e interpolator,
+											   float animParameter /* = 0 */,
+											   bool bClearValueQueue /* = true */,
+											   bool bCanBeCancelled /* = true */ )
 {
-	// clear any previous animations of this variable
 	UtlSymId_t var = g_ScriptSymbols.AddString(variable);
-	RemoveQueuedAnimationByType(panel, var, UTL_INVAL_SYMBOL);
+	// dimhotepus: Optional clear. TF2 backport.
+	if ( bClearValueQueue )
+	{
+		// clear any previous animations of this variable
+		RemoveQueuedAnimationByType(panel, var, UTL_INVAL_SYMBOL);
+	}
 
 	// build a new animation
 	AnimCmdAnimate_t animateCmd;
@@ -1154,17 +1157,30 @@ void AnimationController::RunAnimationCommand(vgui::Panel *panel, const char *va
 	animateCmd.duration = duration;
 
 	// start immediately
-	StartCmd_Animate(panel, 0, animateCmd, true);
+	// dimhotpeus: Optional cancel. TF2 backport.
+	StartCmd_Animate(panel, 0, animateCmd, bCanBeCancelled);
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: Runs a custom command from code, not from a script file
 //-----------------------------------------------------------------------------
-void AnimationController::RunAnimationCommand(vgui::Panel *panel, const char *variable, Color targetValue, float startDelaySeconds, float duration, Interpolators_e interpolator, float animParameter /* = 0 */ )
+void AnimationController::RunAnimationCommand(vgui::Panel *panel,
+											   const char *variable,
+											   Color targetValue,
+											   float startDelaySeconds,
+											   float duration,
+											   Interpolators_e interpolator,
+											   float animParameter /* = 0 */,
+											   bool bClearValueQueue /* = true */,
+											   bool bCanBeCancelled /* = true */ )
 {
-	// clear any previous animations of this variable
 	UtlSymId_t var = g_ScriptSymbols.AddString(variable);
-	RemoveQueuedAnimationByType(panel, var, UTL_INVAL_SYMBOL);
+	// dimhotepus: Optional clear. TF2 backport.
+	if ( bClearValueQueue )
+	{
+		// clear any previous animations of this variable
+		RemoveQueuedAnimationByType(panel, var, UTL_INVAL_SYMBOL);
+	}
 
 	// build a new animation
 	AnimCmdAnimate_t animateCmd;
@@ -1181,7 +1197,8 @@ void AnimationController::RunAnimationCommand(vgui::Panel *panel, const char *va
 	animateCmd.duration = duration;
 
 	// start immediately
-	StartCmd_Animate(panel, 0, animateCmd, true);
+	// dimhotepus: Optional cancel. TF2 backport.
+	StartCmd_Animate(panel, 0, animateCmd, bCanBeCancelled);
 }
 
 //-----------------------------------------------------------------------------
@@ -1313,6 +1330,11 @@ void AnimationController::StartCmd_Animate(UtlSymId_t seqName, AnimCmdAnimate_t 
 		}
 	}
 	if (!panel)
+		return;
+	
+	// dimhotepus: TF2 exploit fix backport.
+	// Block some panels (like HudScope). Unfortunately players are abusing animations with broad/null parents.
+	if ( !panel->CanAnimate() )
 		return;
 
 	StartCmd_Animate(panel, seqName, cmd, bCanBeCancelled);
