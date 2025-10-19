@@ -401,7 +401,13 @@ bool CAI_ScriptConditions::EvalPlayerInVehicle( const EvalArgs_t &args )
 		return false;
 
 	// Desired states must match
-	return ( !!args.pPlayer->IsInAVehicle() == m_fPlayerInVehicle );
+	// dimhotepus: Correctly eval player in vehicle. TF2 backport.
+	AssertMsg( ( !!args.pPlayer->IsInAVehicle() == m_fPlayerInVehicle ) == 
+			   ( args.pPlayer->IsInAVehicle() == ( m_fPlayerInVehicle == TRS_TRUE ) ),
+			   "Changed player in vehicle result from %s to %s.",
+			   !!args.pPlayer->IsInAVehicle() == m_fPlayerInVehicle ? "true" : "false",
+			    args.pPlayer->IsInAVehicle() == ( m_fPlayerInVehicle == TRS_TRUE ) ? "true" : "false" );
+	return args.pPlayer->IsInAVehicle() == ( m_fPlayerInVehicle == TRS_TRUE );
 }
 
 //-----------------------------------------------------------------------------
@@ -421,7 +427,14 @@ bool CAI_ScriptConditions::EvalActorInVehicle( const EvalArgs_t &args )
 		return false;
 
 	// Desired states must match
-	return ( !!pBCC->IsInAVehicle() == m_fActorInVehicle );
+	// dimhotepus: Correctly eval actor in vehicle. TF2 backport.
+	AssertMsg( ( !!pBCC->IsInAVehicle() == m_fActorInVehicle ) == 
+				( pBCC->IsInAVehicle() == ( m_fActorInVehicle == TRS_TRUE ) ),
+				"Changed actor '%s' in vehicle result from %s to %s.",
+				pBCC->GetDebugName(),
+				!!pBCC->IsInAVehicle() == m_fActorInVehicle ? "true" : "false",
+				 pBCC->IsInAVehicle() == ( m_fActorInVehicle == TRS_TRUE ) ? "true" : "false" );
+	return pBCC->IsInAVehicle() == ( m_fActorInVehicle == TRS_TRUE );
 }
 
 //-----------------------------------------------------------------------------
