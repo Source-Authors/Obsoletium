@@ -1813,10 +1813,19 @@ void CHL2_Player::SuitPower_Update( void )
 		{
 			if( SuitPower_IsDeviceActive(SuitDeviceSprint) )
 			{
-				if( !fabs(GetAbsVelocity().x) && !fabs(GetAbsVelocity().y) )
+				// dimhotepus: TF2 backport. If abs velocity is near 0 than assume it affects suit power.
+				if ( CloseEnough( fabs( GetAbsVelocity().x ), 0.0f ) && CloseEnough( fabs( GetAbsVelocity().y ), 0.0f ) )
 				{
-					// If player's not moving, don't drain sprint juice.
-					flPowerLoad -= SuitDeviceSprint.GetDeviceDrainRate();
+					// dimhotepus: TF2 backport. If suit device sprint near drain rate than use 0.
+					if ( CloseEnough( flPowerLoad, SuitDeviceSprint.GetDeviceDrainRate() ) )
+					{
+						flPowerLoad = 0.0f;
+					}
+					else
+					{
+						// If player's not moving, don't drain sprint juice.
+						flPowerLoad -= SuitDeviceSprint.GetDeviceDrainRate();
+					}
 				}
 			}
 		}
