@@ -399,9 +399,9 @@ void CAchievementsDialog::UpdateAchievementList()
 				achievements.Insert( pCur );
 			}
 
-			for ( int i=0; i<achievements.Count(); i++ )
+			for ( intp i=0; i<achievements.Count(); i++ )
 			{
-				CAchievementDialogItemPanel *achievementItemPanel = new CAchievementDialogItemPanel( m_pAchievementsList, "AchievementDialogItemPanel", i );
+				auto *achievementItemPanel = new CAchievementDialogItemPanel( m_pAchievementsList, "AchievementDialogItemPanel", i );
 				achievementItemPanel->SetAchievementInfo( achievements[i] );
 				m_pAchievementsList->AddItem( NULL, achievementItemPanel );
 			}
@@ -706,26 +706,28 @@ void CAchievementsDialog::OnCommand( const char *command )
 CAchievementDialogItemPanel::CAchievementDialogItemPanel( vgui::PanelListPanel *parent, const char* name, int iListItemID ) : BaseClass( parent, name )
 {
 	m_iListItemID = iListItemID;
+
+	m_pSourceAchievement = nullptr;
+	m_iSourceAchievementIndex = -1;
+
 	m_pParent = parent;
-	m_pSchemeSettings = NULL;
+
+	m_pAchievementNameLabel = m_pAchievementDescLabel = m_pPercentageText = nullptr;
+
+	m_pLockedIcon = m_pAchievementIcon = nullptr;
+
+	m_pPercentageBarBackground = m_pPercentageBar = nullptr;
+
+	m_pShowOnHUDCheck = nullptr;
+
+	m_pSchemeSettings = nullptr;
 
 	SetMouseInputEnabled( true );
 	parent->SetMouseInputEnabled( true );
-
-	//CMouseMessageForwardingPanel *panel = new CMouseMessageForwardingPanel(this, NULL);
-	//panel->SetZPos(2);
 }
 
 CAchievementDialogItemPanel::~CAchievementDialogItemPanel()
 {
-	/*
-	delete m_pAchievementIcon;
-	delete m_pAchievementNameLabel;
-	delete m_pAchievementDescLabel;
-	delete m_pPercentageBar;
-	delete m_pPercentageText;
-	delete m_pShowOnHUDCheck;
-	*/
 }
 
 //-----------------------------------------------------------------------------
