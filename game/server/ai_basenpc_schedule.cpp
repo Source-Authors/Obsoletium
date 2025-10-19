@@ -3278,7 +3278,7 @@ void CAI_BaseNPC::RunTask( const Task_t *pTask )
 						DbgNavMsg( this, "Jump landed\n" );
 						SetNavType( NAV_GROUND ); // this assumes that NAV_JUMP only happens with npcs that use NAV_GROUND as base movement
 					}
-					else if (GetSmoothedVelocity().Length() > 0.01) // use an EPSILON damnit!!
+					else if (GetSmoothedVelocity().Length() > 0.01) // use an EPSILON
 					{
 						// wait until you land
 						break;
