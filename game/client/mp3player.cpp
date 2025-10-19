@@ -136,9 +136,10 @@ public:
 	  m_pPlayer( player )
 	{
 		m_pList = new ListPanel( this, "FileList" );
-		m_pList->AddColumnHeader( 0, "File", "File", 200, ListPanel::COLUMN_RESIZEWITHWINDOW );
-		m_pList->AddColumnHeader( 1, "Artist", "Artist", 150, ListPanel::COLUMN_RESIZEWITHWINDOW );
-		m_pList->AddColumnHeader( 2, "Album", "Album", 150, ListPanel::COLUMN_RESIZEWITHWINDOW );
+		// dimhotepus: Scale UI.
+		m_pList->AddColumnHeader( 0, "File", "File", QuickPropScale( 200 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
+		m_pList->AddColumnHeader( 1, "Artist", "Artist", QuickPropScale( 150 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
+		m_pList->AddColumnHeader( 2, "Album", "Album", QuickPropScale( 150 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
 	}
 
 	void Reset()
@@ -285,9 +286,10 @@ public:
 	  m_pPlayer( player )
 	{
 		m_pList = new ListPanel( this, "PlayList" );
-		m_pList->AddColumnHeader( 0, "File", "File", 400, ListPanel::COLUMN_RESIZEWITHWINDOW );
-		m_pList->AddColumnHeader( 1, "Artist", "Artist", 150, ListPanel::COLUMN_RESIZEWITHWINDOW );
-		m_pList->AddColumnHeader( 2, "Album", "Album", 150, ListPanel::COLUMN_RESIZEWITHWINDOW );
+		// dimhotepus: Scale UI.
+		m_pList->AddColumnHeader( 0, "File", "File", QuickPropScale( 400 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
+		m_pList->AddColumnHeader( 1, "Artist", "Artist", QuickPropScale( 150 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
+		m_pList->AddColumnHeader( 2, "Album", "Album", QuickPropScale( 150 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
 	}
 
 	void Reset()
