@@ -81,7 +81,8 @@ public:
 		CMouseMessageForwardingPanel *panel = new CMouseMessageForwardingPanel(this, NULL);
 		panel->SetZPos(2);
 
-		SetSize( 200, 140 );
+		// dimhotepus: Scale UI.
+		SetSize( QuickPropScale( 200 ), QuickPropScale( 140 ) );
 
 		LoadControlSettings( "resource/CommentaryItem.res" );
 
@@ -168,8 +169,10 @@ private:
 CLoadCommentaryDialog::CLoadCommentaryDialog(vgui::Panel *parent) : BaseClass(parent, "LoadCommentaryDialog")
 {
 	SetDeleteSelfOnClose(true);
-	SetBounds(0, 0, 512, 384);
-	SetMinimumSize( 256, 300 );
+	// dimhotepus: Scale UI.
+	SetBounds(0, 0, QuickPropScale( 512 ), QuickPropScale( 384 ) );
+	// dimhotepus: Scale UI.
+	SetMinimumSize( QuickPropScale( 256 ), QuickPropScale( 300 ) );
 	SetSizeable( true );
 
 	SetTitle("#GameUI_LoadCommentary", true);
@@ -203,7 +206,7 @@ void CLoadCommentaryDialog::OnCommand( const char *command )
 			{
 				// Load the game, return to top and switch to engine
 				char sz[ 256 ];
-				Q_snprintf(sz, sizeof( sz ), "progress_enable\ncommentary 1\nmap %s\n", mapName );
+				V_sprintf_safe(sz, "progress_enable\ncommentary 1\nmap %s\n", mapName );
 
 				// Close this dialog
 				OnClose();
@@ -270,7 +273,7 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 {
 	// populate list box with all saved games on record:
 	char	szDirectory[MAX_PATH];
-	Q_snprintf( szDirectory, sizeof( szDirectory ), "maps/*commentary.txt" );
+	V_sprintf_safe( szDirectory, "maps/*commentary.txt" );
 
 	// clear the current list
 	m_pGameList->DeleteAllItems();
@@ -282,7 +285,7 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 	while (pFileName)
 	{
 		char szFileName[MAX_PATH];
-		Q_snprintf(szFileName, sizeof( szFileName ), "maps/%s", pFileName);
+		V_sprintf_safe(szFileName, "maps/%s", pFileName);
 
 		// Only load save games from the current mod's save dir
 		if( !g_pFullFileSystem->FileExists( szFileName, "MOD" ) )
@@ -291,7 +294,7 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 			continue;
 		}
 
-		ParseCommentaryFile( szFileName, pFileName );		
+		ParseCommentaryFile( szFileName, pFileName );
 
 		pFileName = g_pFullFileSystem->FindNext( handle );
 	}
@@ -329,7 +332,7 @@ void CLoadCommentaryDialog::ScanCommentaryFiles()
 void CLoadCommentaryDialog::AddCommentaryItemToList( int itemIndex )
 {
 	// create the new panel and add to the list
-	CCommentaryItemPanel *commentaryItemPanel = new CCommentaryItemPanel( m_pGameList, "CommentaryItemPanel", itemIndex );
+	auto *commentaryItemPanel = new CCommentaryItemPanel( m_pGameList, "CommentaryItemPanel", itemIndex );
 	commentaryItemPanel->SetCommentaryInfo( m_CommentaryItems[itemIndex] );
 	m_pGameList->AddItem( NULL, commentaryItemPanel );
 }
