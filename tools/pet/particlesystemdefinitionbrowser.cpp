@@ -50,7 +50,8 @@ CParticleSystemDefinitionBrowser::CParticleSystemDefinitionBrowser( CPetDoc *pDo
 	SetPaintBackgroundEnabled( true );
 
 	m_pParticleSystemsDefinitions = new vgui::ListPanel( this, "ParticleSystems" );
-	m_pParticleSystemsDefinitions->AddColumnHeader( 0, "name", "Name", 52, ListPanel::COLUMN_RESIZEWITHWINDOW );
+	// dimhotepus: Scale UI.
+	m_pParticleSystemsDefinitions->AddColumnHeader( 0, "name", "Name", QuickPropScale( 52 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
 	m_pParticleSystemsDefinitions->SetColumnSortable( 0, true );
 	m_pParticleSystemsDefinitions->SetEmptyListText( "No Particle System Definitions" );
  	m_pParticleSystemsDefinitions->AddActionSignalTarget( this );

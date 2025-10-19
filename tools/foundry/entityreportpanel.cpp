@@ -76,8 +76,9 @@ CEntityReportPanel::CEntityReportPanel( CFoundryDoc *pDoc, vgui::Panel* pParent,
 	SetPaintBackgroundEnabled( true );
 
 	m_pEntities = new vgui::ListPanel( this, "Entities" );
-	m_pEntities->AddColumnHeader( 0, "targetname", "Name", 52, ListPanel::COLUMN_RESIZEWITHWINDOW );
- 	m_pEntities->AddColumnHeader( 1, "classname", "Class Name", 52, ListPanel::COLUMN_RESIZEWITHWINDOW );
+	// dimhotepus: Scale UI.
+	m_pEntities->AddColumnHeader( 0, "targetname", "Name", QuickPropScale( 52 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
+ 	m_pEntities->AddColumnHeader( 1, "classname", "Class Name", QuickPropScale( 52 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
 	m_pEntities->SetColumnSortable( 0, true );
 	m_pEntities->SetColumnSortable( 1, true );
 	m_pEntities->SetEmptyListText( "No Entities" );
