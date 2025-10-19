@@ -62,14 +62,13 @@ void CChangeGameDialog::LoadModList()
 {
 	// look for third party games
 	char szSearchPath[MAX_PATH + 5];
-	Q_strncpy(szSearchPath, "*.*", sizeof( szSearchPath ) );
+	V_strcpy_safe(szSearchPath, "*.*" );
 
 	// use local filesystem since it has to look outside path system, and will never be used under steam
 	WIN32_FIND_DATA wfd;
-	HANDLE hResult;
-	memset(&wfd, 0, sizeof(WIN32_FIND_DATA));
+	BitwiseClear( wfd );
 	
-	hResult = FindFirstFile( szSearchPath, &wfd);
+	HANDLE hResult = FindFirstFile(szSearchPath, &wfd);
 	if (hResult != INVALID_HANDLE_VALUE)
 	{
 		BOOL bMoreFiles;
@@ -79,7 +78,7 @@ void CChangeGameDialog::LoadModList()
 			{
 				// Check for dlls\*.dll
 				char szDllDirectory[MAX_PATH + 16];
-				Q_snprintf(szDllDirectory, sizeof( szDllDirectory ), "%s\\gameinfo.txt", wfd.cFileName);
+				V_sprintf_safe(szDllDirectory, "%s\\gameinfo.txt", wfd.cFileName);
 
 				FILE *f = fopen(szDllDirectory, "rb");
 				if (f)
@@ -133,7 +132,7 @@ void CChangeGameDialog::OnCommand(const char *command)
 			{
 				// change the game dir and restart the engine
 				char szCmd[256];
-				Q_snprintf(szCmd, sizeof( szCmd ), "_setgamedir %s\n", kv->GetString("ModDir"));
+				V_sprintf_safe(szCmd, "_setgamedir %s\n", kv->GetString("ModDir"));
 				engine->ClientCmd_Unrestricted(szCmd);
 
 				// Force restart of entire engine
