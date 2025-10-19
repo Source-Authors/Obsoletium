@@ -17,6 +17,7 @@
 
 #include "vgui_controls/ListPanel.h"
 #include "tier1/KeyValues.h"
+#include "tier1/strtools.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -80,33 +81,38 @@ void CChangeGameDialog::LoadModList()
 				char szDllDirectory[MAX_PATH + 16];
 				V_sprintf_safe(szDllDirectory, "%s\\gameinfo.txt", wfd.cFileName);
 
-				FILE *f = fopen(szDllDirectory, "rb");
-				if (f)
+				// dimhotepus: Use posix streams.
+				auto [f, rc] = se::posix::posix_file_stream_factory::open(szDllDirectory, "rb");
+				if (!rc)
 				{
 					// find the description
-					fseek(f, 0, SEEK_END);
-					unsigned int size = ftell(f);
-					fseek(f, 0, SEEK_SET);
-					char *buf = (char *)malloc(size + 1);
-					if (fread(buf, 1, size, f) == size)
+					int64_t size;
+					std::tie(size, rc) = f.size();
+
+					if (!rc && size < std::numeric_limits<size_t>::max()) 
 					{
-						buf[size] = 0;
+						std::unique_ptr<char[]> buf = std::make_unique<char[]>(static_cast<size_t>(size) + 1);
+						size_t readSize;
+						std::tie(readSize, rc) = f.read(buf.get(), static_cast<size_t>(size) + 1);
 
-						CModInfo modInfo;
-						modInfo.LoadGameInfoFromBuffer(buf);
-
-						if (strcmp(modInfo.GetGameName(), ModInfo().GetGameName()))
+						if (!rc && size == readSize)
 						{
-							// Add the game directory.
-							strlwr(wfd.cFileName);
-							KeyValuesAD itemData("Mod");
-							itemData->SetString("ModName", modInfo.GetGameName());
-							itemData->SetString("ModDir", wfd.cFileName);
-							m_pModList->AddItem(itemData, 0, false, false);
+							CModInfo modInfo;
+							modInfo.LoadGameInfoFromBuffer(buf.get());
+
+							if (strcmp(modInfo.GetGameName(), ModInfo().GetGameName()))
+							{
+								// Add the game directory.
+								V_strlwr_safe(wfd.cFileName);
+
+								KeyValuesAD itemData("Mod");
+								itemData->SetString("ModName", modInfo.GetGameName());
+								itemData->SetString("ModDir", wfd.cFileName);
+
+								m_pModList->AddItem(itemData, 0, false, false);
+							}
 						}
 					}
-					free(buf);
-					fclose(f);
 				}
 			}
 			bMoreFiles = FindNextFile(hResult, &wfd);

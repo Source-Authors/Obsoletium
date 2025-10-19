@@ -421,7 +421,7 @@ template <intp cchDest> wchar_t *V_wcscat_safe( INOUT_Z_ARRAY wchar_t (&pDest)[c
 char *V_strnlwr( INOUT_Z_CAP(count) char *pBuf, size_t count);
 template <intp cchDest> char *V_strlwr_safe( INOUT_Z_ARRAY char (&pBuf)[cchDest] )
 { 
-	return _V_strnlwr( pBuf, cchDest ); 
+	return V_strnlwr( pBuf, cchDest ); 
 }
 
 // Unicode string conversion policies - what to do if an illegal sequence is encountered
