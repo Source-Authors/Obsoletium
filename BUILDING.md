@@ -117,6 +117,8 @@ Binaries at <https://github.com/Source-Authors/Obsoletium/releases> are produced
 
 To run the games you need to _own_ ones. Check Steam store pages for Half-Life 2, Half-Life 2 Episode 1/2 or Portal and buy them. **Note you need ```steam_legacy``` branch for Half-Life 2 and episodes, as [`20th Anniversary Update`](https://www.half-life.com/en/halflife2/20th) not supported *yet***.
 
+### Windows
+
 #### Windows Prerequisites
 
 * Git. Follow [`Git downloads`](https://git-scm.com/downloads).

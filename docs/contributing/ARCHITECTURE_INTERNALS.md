@@ -8,6 +8,7 @@ The **Obsoletium** repository on GitHub contains several top-level folders, each
 |-----------------------|-----------------------------------------------------------------------------------------------------|
 | **appframework**      | Source code for basic applications using the Obsoletium platform. |
 | **bitmap**            | Image format conversions, resampling and PSD, TGA files support. |
+| **build**             | App version resources and manifests. |
 | **choreoobjects**     | Choreo actors, channels, events and scenes. |
 | **common**            | Contains the source code for common things. Slowly being removed / moved. |
 | **datacache**         | Data caching functionality. |
@@ -19,7 +20,6 @@ The **Obsoletium** repository on GitHub contains several top-level folders, each
 | **dmxloader**         | *.dmx file loader. |
 | **docs**              | Holds documentation files that provide guidance on using and contributing to the project. This may include setup instructions, API references, and user guides. |
 | **dx9sdk**            | DirectX 9 SDK files which are not distributed by Windows SDK. |
-| **dx11sdk**           | DirectX 11 SDK binaries used for shader compiling. |
 | **dx11sdk**           | DirectX 11 SDK binaries used for shader compiling. |
 | **engine**            | Engine to run the game app. |
 | **external**          | External things needed for compilation. |
