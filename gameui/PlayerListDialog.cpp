@@ -32,14 +32,16 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CPlayerListDialog::CPlayerListDialog(vgui::Panel *parent) : BaseClass(parent, "PlayerListDialog")
 {
-	SetSize(320, 240);
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 320 ), QuickPropScale( 240 ) );
 	SetTitle("#GameUI_CurrentPlayers", true);
 
 	m_pMuteButton = new Button(this, "MuteButton", "");
 
 	m_pPlayerList = new ListPanel(this, "PlayerList");
-	m_pPlayerList->AddColumnHeader(0, "Name", "#GameUI_PlayerName", 180);
-	m_pPlayerList->AddColumnHeader(1, "Properties", "#GameUI_Properties", 80);
+	// dimhotepus: Scale UI.
+	m_pPlayerList->AddColumnHeader(0, "Name", "#GameUI_PlayerName", QuickPropScale( 180 ));
+	m_pPlayerList->AddColumnHeader(1, "Properties", "#GameUI_Properties", QuickPropScale( 80 ));
 
 	m_pPlayerList->SetEmptyListText("#GameUI_NoOtherPlayersInGame");
 
@@ -176,7 +178,7 @@ void CPlayerListDialog::ToggleMuteStateOfSelectedUser()
 	if (!GameClientExports())
 		return;
 
-	for ( int iSelectedItem = 0; iSelectedItem < m_pPlayerList->GetSelectedItemsCount(); iSelectedItem++ )
+	for ( intp iSelectedItem = 0; iSelectedItem < m_pPlayerList->GetSelectedItemsCount(); iSelectedItem++ )
 	{
 		KeyValues *data = m_pPlayerList->GetItem( m_pPlayerList->GetSelectedItem( iSelectedItem ) );
 		if (!data)
