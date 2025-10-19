@@ -362,8 +362,12 @@ bool CMoveHelperServer::PlayerFallingDamage( void )
 	float flFallDamage = g_pGameRules->FlPlayerFallDamage( m_pHostPlayer );	
 	if ( flFallDamage > 0 )
 	{
-		m_pHostPlayer->TakeDamage( CTakeDamageInfo( GetContainingEntity(INDEXENT(0)), GetContainingEntity(INDEXENT(0)), flFallDamage, DMG_FALL ) ); 
-		StartSound( m_pHostPlayer->GetAbsOrigin(), "Player.FallDamage" );
+		int iDamageTaken = m_pHostPlayer->TakeDamage( CTakeDamageInfo( GetContainingEntity(INDEXENT(0)), GetContainingEntity(INDEXENT(0)), flFallDamage, DMG_FALL ) ); 
+		// dimhotepus: Play fall damage only if damage is taken. TF2 backport.
+		if ( iDamageTaken )
+		{
+			StartSound( m_pHostPlayer->GetAbsOrigin(), "Player.FallDamage" );
+		}
 
         //=============================================================================
         // HPE_BEGIN:
