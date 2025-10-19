@@ -30,49 +30,6 @@ bool LoadAchievementIcon( vgui::ImagePanel* pIconPanel, IAchievement *pAchieveme
 // Updates a listed achievement item's progress bar. 
 void UpdateProgressBar( vgui::EditablePanel* pPanel, IAchievement *pAchievement, Color clrProgressBar );
 
-//-----------------------------------------------------------------------------
-// Purpose: Simple menu to choose a matchmaking session type
-//-----------------------------------------------------------------------------
-class CAchievementsDialog_XBox : public CBaseDialog
-{
-	DECLARE_CLASS_SIMPLE_OVERRIDE( CAchievementsDialog_XBox, CBaseDialog ); 
-
-public:
-	CAchievementsDialog_XBox(vgui::Panel *parent);
-	~CAchievementsDialog_XBox();
-
-	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
-	void	ApplySettings( KeyValues *pResourceData ) override;
-	void	PerformLayout() override;
-
-	void	OnKeyCodePressed( vgui::KeyCode code ) override;
-	void	HandleKeyRepeated( vgui::KeyCode code ) override;
-
-	void	OnClose() override;
-
-
-private:
-
-	vgui::Panel	*m_pProgressBg;
-
-	vgui::Panel *m_pProgressBar;
-	vgui::Label *m_pProgressPercent;
-	vgui::Label *m_pNumbering;
-	vgui::Label	*m_pUpArrow;
-	vgui::Label	*m_pDownArrow;
-
-	KeyValues*	m_pResourceData;
-
-	CFooterPanel *m_pFooter;
-
-	bool		m_bCenterOnScreen;
-	int			m_iNumItems;
-	int			m_nTotalAchievements;	// Total achievements for this title
-	int			m_nUnlocked;
-	int			m_iSelection;
-	int			m_iScroll;
-};
-
 
 //////////////////////////////////////////////////////////////////////////// 
 // PC version

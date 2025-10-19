@@ -874,9 +874,10 @@ void CMatchmakingBasePanel::OnOpenAchievementsDialog()
 	if ( !ValidateSigninAndStorage( false, "OpenAchievementsDialog" ) )
 		return;
 
+	// dimhotepus: Comment unused.
 	if ( !m_hAchievementsDialog.Get() )
 	{
-		m_hAchievementsDialog = new CAchievementsDialog_XBox( this );
+		// m_hAchievementsDialog = new CAchievementsDialog( this );
 	}
 	PushDialog( m_hAchievementsDialog );
 }
@@ -891,9 +892,10 @@ void CMatchmakingBasePanel::OnOpenCSAchievementsDialog()
     if ( !ValidateSigninAndStorage( false, "OpenCSAchievementsDialog" ) )
         return;
 
+	// dimhotepus: Comment unused.
     if ( !m_hAchievementsDialog.Get() )
     {
-        // $TODO(HPE):  m_hAchievementsDialog = new CAchievementsDialog_XBox( this );
+        // $TODO(HPE):  m_hAchievementsDialog = new CAchievementsDialog( this );
     }
     PushDialog( m_hAchievementsDialog );
 }
