@@ -2471,7 +2471,8 @@ void CClientShadowMgr::BuildRenderToTextureShadow( IClientRenderable* pRenderabl
 	Vector boxSize;
 	VectorSubtract( maxs, mins, boxSize );
 	
-	Vector yvec;
+	// dimhotepus: Default initialize. TF2 backport.
+	Vector yvec = vec3_origin;
 	float fProjMax = 0.0f;
 	for( int i = 0; i != 3; ++i )
 	{
@@ -3916,11 +3917,11 @@ void CClientShadowMgr::ComputeShadowDepthTextures( const CViewSetup &viewSetup )
 		if ( !bGotShadowDepthTexture )
 		{
 			// If we don't get one, that means we have too many this frame so bind no depth texture
-			static int bitchCount = 0;
-			if( bitchCount < 10 )
+			static int mapCount = 0;
+			if( mapCount < 10 )
 			{
 				Warning( "Too many shadow maps this frame!\n"  );
-				bitchCount++;
+				mapCount++;
 			}
 
 			Assert(0);
