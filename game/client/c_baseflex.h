@@ -16,7 +16,7 @@
 #include "c_baseanimatingoverlay.h"
 #include "sceneentity_shared.h"
 
-#include "utlvector.h"
+#include "tier1/utlvector.h"
 
 //-----------------------------------------------------------------------------
 // Purpose: Item in list of loaded scene files
@@ -50,18 +50,18 @@ enum
 struct FS_LocalToGlobal_t
 {
 	explicit FS_LocalToGlobal_t() :
-	m_Key( 0 ),
+		m_Key( 0 ),
 		m_nCount( 0 ),
 		m_Mapping( 0 )
 	{
 	}
 
 	explicit FS_LocalToGlobal_t( const flexsettinghdr_t *key ) :
-	m_Key( key ),
+		m_Key( key ),
 		m_nCount( 0 ),
 		m_Mapping( 0 )
 	{
-	}		
+	}
 
 	void SetCount( int count )
 	{
@@ -69,17 +69,28 @@ struct FS_LocalToGlobal_t
 		Assert( count > 0 );
 		m_nCount = count;
 		m_Mapping = new int[ m_nCount ];
-		Q_memset( m_Mapping, 0, m_nCount * sizeof( int ) );
+		// dimhotepus: Type-safe clear.
+		BitwiseClear( m_Mapping, m_nCount * sizeof( int ) );
 	}
 
 	FS_LocalToGlobal_t( const FS_LocalToGlobal_t& src )
 	{
 		m_Key = src.m_Key;
-		delete m_Mapping;
 		m_Mapping = new int[ src.m_nCount ];
-		Q_memcpy( m_Mapping, src.m_Mapping, src.m_nCount * sizeof( int ) );
+		// dimhotepus: Type-safe copy.
+		BitwiseCopy( src.m_Mapping, m_Mapping, src.m_nCount );
 
 		m_nCount = src.m_nCount;
+	}
+
+	// dimhotepus: Add missed assign operator to pair copy ctor.
+	FS_LocalToGlobal_t& operator=( FS_LocalToGlobal_t src )
+	{
+		std::swap( m_Key, src.m_Key );
+		std::swap( m_nCount, src.m_nCount );
+		std::swap( m_Mapping, src.m_Mapping );
+
+		return *this;
 	}
 
 	~FS_LocalToGlobal_t()
