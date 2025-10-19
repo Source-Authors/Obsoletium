@@ -3744,6 +3744,9 @@ void CNPC_AttackHelicopter::Event_Killed( const CTakeDamageInfo &info )
 			return;
 		}
 	}
+	
+	// dimhotepus: Chopper should notify it is killed. TF2 backport.
+	SendOnKilledGameEvent( info );
 
 	Chopper_BecomeChunks( this );
 	StopLoopingSounds();
