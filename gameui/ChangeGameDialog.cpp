@@ -28,13 +28,15 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CChangeGameDialog::CChangeGameDialog(vgui::Panel *parent) : Frame(parent, "ChangeGameDialog")
 {
-	SetSize(400, 340);
-	SetMinimumSize(400, 340);
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 400 ), QuickPropScale( 340 ) );
+	SetMinimumSize( QuickPropScale( 400 ), QuickPropScale( 340 ) );
 	SetTitle("#GameUI_ChangeGame", true);
 
 	m_pModList = new ListPanel(this, "ModList");
 	m_pModList->SetEmptyListText("#GameUI_NoOtherGamesAvailable");
-	m_pModList->AddColumnHeader(0, "ModName", "#GameUI_Game", 128);
+	// dimhotepus: Scale UI.
+	m_pModList->AddColumnHeader(0, "ModName", "#GameUI_Game", QuickPropScale( 128 ) );
 
 	LoadModList();
 	LoadControlSettings("Resource/ChangeGameDialog.res");
