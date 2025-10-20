@@ -48,8 +48,8 @@ template <size_t buffer_size>
     fprintf(stderr, "%s\n", entire_error_message);
     OutputDebugStringA(entire_error_message);
   } else {
-    // Note, uses delay load to allow
-    MessageBoxA(nullptr, entire_error_message, "Dedicated Server - Error",
+    // Note, uses delay load to allow run in no Win32 mode.
+    MessageBoxA(nullptr, entire_error_message, "SRCDS - Error",
                 MB_OK | MB_ICONERROR | MB_SETFOREGROUND);
   }
 
@@ -338,5 +338,5 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
       dedicated_main(instance, old_instance, cmd_line, window_flags);
 
   // Prevent tail call optimization and incorrect stack traces.
-  exit(rc); //-V2014
+  exit(rc);  //-V2014
 }
