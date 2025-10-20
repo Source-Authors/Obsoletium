@@ -85,7 +85,7 @@ void UnloadEntityDLLs( void );
 bool IsInErrorExit();
 
 // error message
-bool Sys_MessageBox(const char *title, const char *info, bool bShowOkAndCancel);
+bool Sys_MessageBox(const char *title, const char *info, bool bShowOkAndCancel, bool bError = false);
 
 bool ServerDLL_Load( bool bIsServerOnly );
 void ServerDLL_Unload();

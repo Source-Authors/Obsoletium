@@ -60,7 +60,7 @@ $Configuration	"Debug"
 	{
 		$AdditionalLibraryDirectories		"$BASE;$SNAPPYOUTDIRDEBUG;$MPAHEADERINFOOUTDIRDEBUG;$ZIPUTILSOUTDIRDEBUG"
 		
-		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib comsuppw.lib snappy.lib zip-utils.lib" [$WINDOWS]
+		$AdditionalDependencies			"$BASE Advapi32.lib dsound.lib dxguid.lib Gdi32.lib winmm.lib wsock32.lib ws2_32.lib wininet.lib vfw32.lib Rpcrt4.lib Shell32.lib User32.lib Comctl32.lib comsuppw.lib snappy.lib zip-utils.lib" [$WINDOWS]
 		$AdditionalDependencies			"$BASE mpaheaderinfo.lib" [$WINDOWS&&!$DEDICATED]
 		$SystemFrameworks				"Carbon;AppKit;OpenAL;CoreAudio;AudioToolbox;SystemConfiguration;Quicktime;AudioUnit" [$OSXALL]
 		$SystemLibraries				"iconv" [$OSXALL]

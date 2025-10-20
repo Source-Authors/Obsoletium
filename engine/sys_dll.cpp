@@ -4,6 +4,7 @@
 
 #if defined(_WIN32) && !defined(_X360)
 #include "winlite.h"
+#include <CommCtrl.h>
 #include <system_error>
 #endif
 #if defined(LINUX)
@@ -339,15 +340,33 @@ void Sys_Printf(const char *fmt, ...)
 }
 
 
-bool Sys_MessageBox(const char *title, const char *info, bool bShowOkAndCancel)
+bool Sys_MessageBox(const char *title, const char *info, bool bShowOkAndCancel, bool bError)
 {
 #ifdef _WIN32
 
-	if ( IDOK == ::MessageBoxA( nullptr, title, info, MB_ICONEXCLAMATION | ( bShowOkAndCancel ? MB_OKCANCEL : MB_OK ) ) )
+	wchar_t wideTitle[512];
+	Q_UTF8ToWString( title, wideTitle, ssize( wideTitle ) );
+
+	wchar_t wideInfo[512];
+	Q_UTF8ToWString( info, wideInfo, ssize( wideInfo ) );
+
+	// dimhotepus: Use modern looking dialog.
+	int nButtonPressed;
+	const HRESULT hr{ ::TaskDialog( nullptr,
+		nullptr,
+		wideTitle,
+		wideTitle,
+		wideInfo,
+		TDCBF_OK_BUTTON | ( bShowOkAndCancel ? TDCBF_CANCEL_BUTTON : TDCBF_OK_BUTTON ),
+		bError ? TD_ERROR_ICON : TD_WARNING_ICON,
+		&nButtonPressed ) };
+	if ( FAILED( hr ) )
 	{
-		return true;
+		// If nice dialog fail (ex. out of memory), then use message box as fallback.
+		return ::MessageBoxA( nullptr, title, info, MB_OK | MB_TOPMOST | MB_ICONERROR ) == IDOK;
 	}
-	return false;
+
+	return nButtonPressed == IDOK;
 
 #elif defined( USE_SDL )
 
@@ -420,11 +439,8 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 		!CommandLine()->FindParm( "-nomessagebox" ) &&
 		!CommandLine()->FindParm( "-nocrashdialog" ) )
 	{
-#ifdef _WIN32
-		::MessageBoxA( nullptr, text, "Engine - Error", MB_OK | MB_TOPMOST | MB_ICONERROR );
-#elif defined( USE_SDL )
-		Sys_MessageBox( "Engine Error", text, false );
-#endif
+		// dimhotepus: Use common message box.
+		Sys_MessageBox( "Source Engine - Error", text, false, true );
 	}
 
 	DebuggerBreakIfDebugging();
