@@ -12,7 +12,6 @@
 #if !defined(_X360) && defined(_WIN32)
 #include "winlite.h"
 #endif
-#include <stdio.h>
 #include "editor_sendcommand.h"
 #include "tier1/strtools.h"
 #include "mathlib/vector.h"
@@ -31,7 +30,7 @@ constexpr inline int MAX_COMMAND_BUFFER = 2048;
 EditorSendResult_t Editor_BeginSession(const char *pszMapName, int nMapVersion, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "session_begin %s %d", pszMapName, nMapVersion);
+	V_sprintf_safe(szCommand, "session_begin %s %d", pszMapName, nMapVersion);
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 
@@ -46,7 +45,7 @@ EditorSendResult_t Editor_BeginSession(const char *pszMapName, int nMapVersion, 
 EditorSendResult_t Editor_CheckVersion(const char *pszMapName, int nMapVersion, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "map_check_version %s %d", pszMapName, nMapVersion);
+	V_sprintf_safe(szCommand, "map_check_version %s %d", pszMapName, nMapVersion);
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 
@@ -61,7 +60,7 @@ EditorSendResult_t Editor_CheckVersion(const char *pszMapName, int nMapVersion, 
 EditorSendResult_t Editor_CreateEntity(const char *pszEntity, float x, float y,  float z, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "entity_create %s %g %g %g", pszEntity, x, y, z);
+	V_sprintf_safe(szCommand, "entity_create %s %g %g %g", pszEntity, x, y, z);
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 
@@ -77,7 +76,7 @@ EditorSendResult_t Editor_CreateEntity(const char *pszEntity, float x, float y, 
 EditorSendResult_t Editor_CreateNode(const char *pszNodeClass, int nID, float x, float y,  float z, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "node_create %s %d %g %g %g", pszNodeClass, nID, x, y, z);
+	V_sprintf_safe(szCommand, "node_create %s %d %g %g %g", pszNodeClass, nID, x, y, z);
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 
@@ -93,7 +92,7 @@ EditorSendResult_t Editor_CreateNode(const char *pszNodeClass, int nID, float x,
 EditorSendResult_t Editor_CreateNodeLink(int nStartID, int nEndID, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "nodelink_create %d %d", nStartID, nEndID);
+	V_sprintf_safe(szCommand, "nodelink_create %d %d", nStartID, nEndID);
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 
@@ -108,7 +107,7 @@ EditorSendResult_t Editor_CreateNodeLink(int nStartID, int nEndID, bool bShowUI)
 EditorSendResult_t Editor_DeleteEntity(const char *pszEntity, float x, float y, float z, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "entity_delete %s %g %g %g", pszEntity, x, y, z);
+	V_sprintf_safe(szCommand, "entity_delete %s %g %g %g", pszEntity, x, y, z);
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 
@@ -117,7 +116,7 @@ EditorSendResult_t Editor_DeleteEntity(const char *pszEntity, float x, float y, 
 EditorSendResult_t Editor_SetKeyValue(const char *pszEntity, float x, float y, float z, const char *pKey, const char *pValue, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "entity_set_keyvalue %s %f %f %f \"%s\" \"%s\"", pszEntity, x, y, z, pKey, pValue);
+	V_sprintf_safe(szCommand, "entity_set_keyvalue %s %f %f %f \"%s\" \"%s\"", pszEntity, x, y, z, pKey, pValue);
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 
@@ -126,7 +125,7 @@ EditorSendResult_t Editor_SetKeyValue(const char *pszEntity, float x, float y, f
 EditorSendResult_t Editor_RotateEntity(const char *pszEntity, float x, float y, float z, const QAngle &incrementalRotation, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "entity_rotate_incremental %s %f %f %f %f %f %f", pszEntity, x, y, z, incrementalRotation.x, incrementalRotation.y, incrementalRotation.z );
+	V_sprintf_safe(szCommand, "entity_rotate_incremental %s %f %f %f %f %f %f", pszEntity, x, y, z, incrementalRotation.x, incrementalRotation.y, incrementalRotation.z );
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 //-----------------------------------------------------------------------------
@@ -138,7 +137,7 @@ EditorSendResult_t Editor_RotateEntity(const char *pszEntity, float x, float y, 
 EditorSendResult_t Editor_DeleteNode(int nID, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "node_delete %d", nID);
+	V_sprintf_safe(szCommand, "node_delete %d", nID);
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 
@@ -153,7 +152,7 @@ EditorSendResult_t Editor_DeleteNode(int nID, bool bShowUI)
 EditorSendResult_t Editor_DeleteNodeLink(int nStartID, int nEndID, bool bShowUI)
 {
 	char szCommand[MAX_COMMAND_BUFFER];
-	Q_snprintf(szCommand,sizeof(szCommand), "nodelink_delete %d %d", nStartID, nEndID);
+	V_sprintf_safe(szCommand, "nodelink_delete %d %d", nStartID, nEndID);
 	return(Editor_SendCommand(szCommand, bShowUI));
 }
 
@@ -198,8 +197,8 @@ EditorSendResult_t Editor_SendCommand(const char *pszCommand, bool bShowUI)
 			if (bShowUI)
 			{
 				char szError[1024];
-				Q_snprintf(szError,sizeof(szError), "Hammer did not accept the command: \n\n\"%s\"\n\n Make sure the command is valid and that Hammer is still running properly.", pszCommand);
-				MessageBox(NULL, szError, "Hammer - Send Shell Command Error", MB_OK | MB_ICONERROR);
+				V_sprintf_safe(szError, "Hammer did not accept the command: \n\n\"%s\"\n\n Make sure the command is valid and that Hammer is still running properly.", pszCommand);
+				MessageBoxA(NULL, szError, "Hammer - Send Shell Command Error", MB_OK | MB_ICONERROR);
 			}
 		
 			return(Editor_BadCommand);
@@ -210,8 +209,8 @@ EditorSendResult_t Editor_SendCommand(const char *pszCommand, bool bShowUI)
 		if (bShowUI)
 		{
 			char szError[1024];
-			Q_snprintf(szError,sizeof(szError), "Could not contact Hammer to send the command: \n\n\"%s\"\n\n Hammer does not appear to be running.", pszCommand);
-			MessageBox(NULL, szError, "Hammer - Send Shell Command Error", MB_OK | MB_ICONERROR);
+			V_sprintf_safe(szError, "Could not contact Hammer to send the command: \n\n\"%s\"\n\n Hammer does not appear to be running.", pszCommand);
+			MessageBoxA(NULL, szError, "Hammer - Send Shell Command Error", MB_OK | MB_ICONERROR);
 		}
 
 		return(Editor_NotRunning);
