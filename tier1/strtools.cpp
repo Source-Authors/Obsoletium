@@ -231,7 +231,12 @@ char *V_strnlwr( INOUT_Z_CAP(count) char *s, size_t count )
 		if ( !*it )
 			return pRet; // reached end of string
 
-		*it = static_cast<unsigned char>(tolower( static_cast<unsigned char>(*it) ));
+		// dimhotepus: Use fast ASCII way to lowercase.
+		if ( (unsigned char)(*it - 'A') <= ('Z' - 'A') )
+			*it += 'a' - 'A';
+		else if ( (unsigned char)*it >= 0x80 ) // non-ascii, fall back to CRT
+			*it =static_cast<unsigned char>(tolower( static_cast<unsigned char>(*it) ));
+
 		++it;
 	}
 
