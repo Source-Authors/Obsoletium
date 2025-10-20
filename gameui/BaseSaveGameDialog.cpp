@@ -492,6 +492,11 @@ void CBaseSaveGameDialog::OnKeyCodePressed( vgui::KeyCode code )
 			return;
 		}
 	}
+	// dimhotepus: Support deletion of saves by delete button.
+	else if ( code == KEY_DELETE )
+	{
+		OnCommand( "Delete" );
+	}
 
 	BaseClass::OnKeyCodePressed( code );
 }
