@@ -644,7 +644,7 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 				}
 				else
 				{
-					printf( "Warning: invalid mipblend setting '%s'.\n", pKeyValue );
+					VTexWarning( "Warning: invalid mipblend setting '%s'.\n", pKeyValue );
 				}
 			}
 		}
@@ -2098,7 +2098,7 @@ static bool LoadConfigFile( const char *pFileBaseName, VTexConfigInfo_t &info, b
 		else
 		{
 			memcpy( pFileName + lenBaseName, ".tga", 4 );
-			printf("no config file for %s\n",pFileName);
+			VTexWarning("no config file for %s\n",pFileName);
 			bOK = true;
 		}
 	}
