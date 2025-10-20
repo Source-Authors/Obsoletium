@@ -24,23 +24,6 @@
 #include "tier0/memdbgon.h"
 
 
-// makes a copy of a string
-char *COPY_STRING( const char *pString )
-{
-	if ( pString == nullptr )
-		return nullptr;
-
-	size_t strLen = V_strlen( pString );
-
-	char *pNewStr = new char[ strLen+ 1 ];
-	if ( strLen > 0 )
-		V_memcpy( pNewStr, pString, strLen );
-
-	pNewStr[strLen] = nullchar;
-
-	return pNewStr;
-}
-
 // ===========================================================================
 // CBinkMaterialRGBTextureRegenerator - Inherited from ITextureRegenerator
 //	Copies and converts the buffer bits to texture bits
@@ -191,7 +174,7 @@ void CBinkMaterial::SetFileName( const char *theMovieFileName )
 
 	if ( theMovieFileName != nullptr )
 	{
-		m_pFileName = COPY_STRING( theMovieFileName );
+		m_pFileName = V_strdup( theMovieFileName );
 	}
 }
 
