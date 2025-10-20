@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
-#include <stdio.h>
+#include "URLButton.h"
 #include <utlsymbol.h>
 
 #include <vgui/IBorder.h>
@@ -18,7 +18,6 @@
 #include <vgui/KeyCode.h>
 #include <KeyValues.h>
 
-#include "URLButton.h"
 #include <vgui_controls/FocusNavGroup.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
