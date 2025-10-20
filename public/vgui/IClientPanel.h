@@ -86,6 +86,9 @@ public:
 	virtual const char *GetModuleName() = 0;
 
 	virtual void OnTick() = 0;
+
+	// dimhotepus: Child removal notification support. TF2 backport.
+	virtual void OnChildRemoved( Panel *child ) = 0;
 };
 
 } // namespace vgui

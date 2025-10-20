@@ -1414,6 +1414,7 @@ void Panel::SetParent(Panel *newParent)
 	Panel* pCurrentParent = GetParent();
 	if ( pCurrentParent )
 	{
+		pCurrentParent->OnChildRemoved( this );
 		pCurrentParent->m_dictChidlren.Remove( GetName() );
 	}
 
@@ -1472,6 +1473,13 @@ void Panel::OnChildAdded(VPANEL child)
 		auto idx = m_dictChidlren.Insert( pChild->GetName() );
 		m_dictChidlren[ idx ].Set( child );
 	}
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: 
+//-----------------------------------------------------------------------------
+void Panel::OnChildRemoved( Panel* pChild )
+{
 }
 
 //-----------------------------------------------------------------------------
