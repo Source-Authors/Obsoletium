@@ -4977,10 +4977,10 @@ void CColorOperationListPanel::LaunchOperationPanel( IColorOperation *pOp )
 		int parentX, parentY;
 		GetParent()->GetPos( parentX, parentY );
 
-		int maxPanels = parentX / 250;
+		int maxPanels = parentX / QuickPropScale( 250 );
 		intp panelOffset = (m_OpPanelList.Count()+1<maxPanels)?m_OpPanelList.Count()+1:maxPanels;
 
-		int xPos = parentX - 250*static_cast<int>(panelOffset);
+		int xPos = parentX - QuickPropScale( 250 )*static_cast<int>(panelOffset);
 
 		pOpPanel->SetPos(  xPos, parentY );
 		pOpPanel->SetSize( QuickPropScale( 250 ), QuickPropScale( BASE_HEIGHT ) );
