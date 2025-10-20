@@ -68,14 +68,6 @@
 
 #define COPYTOCLIPBOARD_CMDNAME "CopyToClipboard"
 
-#if defined( _X360 )
-CON_COMMAND( mat_get_textures, "VXConsole command" )
-{
-	g_pMaterialSystemDebugTextureInfo->EnableDebugTextureList( true );
-	g_pMaterialSystemDebugTextureInfo->EnableGetAllTextures( args.ArgC() >= 2 && ( Q_stricmp( args[1], "all" ) == 0 ) );
-}
-#endif
-
 static ConVar mat_texture_list( "mat_texture_list", "0", FCVAR_CHEAT, "For debugging, show a list of used textures per frame" );
 
 static enum TxListPanelRequest
