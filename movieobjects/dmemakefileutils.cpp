@@ -491,7 +491,8 @@ bool CDmeMakefileUtils::PerformCompilationStep( CDmeMDLMakefile *pMakeFile, Comp
 		return PerformCompilationStep( static_cast<CDmeMakefile*>( pMakeFile ), step );
 
 	char pBinDirectory[MAX_PATH];
-	GetModSubdirectory( "..\\bin", pBinDirectory );
+	// dimhotepus: x86-64 port.
+	GetModSubdirectory( ".." CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR, pBinDirectory );
 	Q_RemoveDotSlashes( pBinDirectory );
 
 	char pStudioMDLCmd[MAX_PATH];

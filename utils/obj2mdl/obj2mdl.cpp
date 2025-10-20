@@ -4,11 +4,11 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#include <stdio.h>
-#include <windows.h>
+#include <cstdio>
+#include "winlite.h"
 #include "tier0/dbg.h"
-#include "strtools.h"
-#include "utlvector.h"
+#include "tier1/strtools.h"
+#include "tier1/utlvector.h"
 
 bool verbose = false;
 
@@ -320,7 +320,8 @@ bool GetSDKBinDirectory( char *pcSDKBinDir, size_t nBuffSize )
 
 	if ( szEngineVersion[0] && szSDKPath[0] )
 	{
-		V_snprintf( pcSDKBinDir, nBuffSize, "%s\\bin\\%s\\bin", szSDKPath, szEngineVersion );
+		// dimhotepus: x86-64 support.
+		V_snprintf( pcSDKBinDir, nBuffSize, "%s\\" PLATFORM_BIN_DIR "\\%s\\" PLATFORM_BIN_DIR, szSDKPath, szEngineVersion );
 		return true;
 	}
 

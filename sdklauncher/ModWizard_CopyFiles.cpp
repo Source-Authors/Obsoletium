@@ -934,7 +934,8 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 		"..\\..\\game\\sdksample\\", replaceWith, 
 		"..\\..\\game\\hl2\\", replaceWith,
 		"..\\..\\game\\hl2mp\\", replaceWith,
-		"..\\game\\bin", "..\\bin"
+		// dimhotepus: x86-64 port.
+		"..\\game\\" PLATFORM_BIN_DIR, "..\\" PLATFORM_BIN_DIR
 	};
 
 	// No 'dx8' shaders in orange box, at least any time soon, just keeping it cleaned up.
@@ -1004,7 +1005,8 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 		"..\\..\\game\\sdksample\\", replaceWith, 
 		"..\\..\\game\\hl2\\", replaceWith,
 		"..\\..\\game\\hl2mp\\", replaceWith,
-		"..\\game\\bin", "..\\bin"
+		// dimhotepus: x86-64 port.
+		"..\\game\\" PLATFORM_BIN_DIR, "..\\" PLATFORM_BIN_DIR
 	};
 
 	// No 'dx8' shaders in orange box, at least any time soon, just keeping it cleaned up.
@@ -1072,7 +1074,8 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		"..\\..\\game\\sdksample\\", replaceWith, 
 		"..\\..\\game\\hl2\\", replaceWith,
 		"..\\..\\game\\hl2mp\\", replaceWith,
-		"..\\game\\bin", "..\\bin"
+		// dimhotepus: x86-64 port.
+		"..\\game\\" PLATFORM_BIN_DIR, "..\\" PLATFORM_BIN_DIR
 	};
 
 	if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx8-2003.vcproj" ) == 0 ||
@@ -1140,11 +1143,12 @@ bool CModWizardSubPanel_CopyFiles::HandleReplacements_GenericVCProj( CFileCopyIn
 {
 	if ( IsVCProjFile( pInfo->m_InFilename ) )
 	{	
-		// This code is for all the tools. Internally, Valve uses <base dir>\game\bin, and externally,
-		// they're using <game dir>\bin to store tools.
+		// This code is for all the tools. Internally, Valve uses <base dir>\game\bin{\x64}, and externally,
+		// they're using <game dir>\bin{\x64} to store tools.
 		const char *vcprojReplacements[] =
 		{
-			"..\\game\\bin", "..\\bin"
+			// dimhotepus: x86-64 port.
+			"..\\game\\" PLATFORM_BIN_DIR, "..\\" PLATFORM_BIN_DIR
 		};
 
 		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, vcprojReplacements, ARRAYSIZE( vcprojReplacements ), "%s", pInfo->m_OutFilename );

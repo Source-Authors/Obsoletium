@@ -500,11 +500,7 @@ char *CSaveRestore::GetSaveDir()
 	if ( szDirectory[0] ) return szDirectory;
 
 	// dimhotepus: Dropped / at the end to unify all places.
-#ifdef PLATFORM_64BITS
-	V_sprintf_safe(szDirectory, "save/x64", MOD_DIR);
-#else
-	V_sprintf_safe(szDirectory, "save", MOD_DIR);
-#endif
+	V_sprintf_safe(szDirectory, "save" PLATFORM_DIR, MOD_DIR);
 
 	return szDirectory;
 }

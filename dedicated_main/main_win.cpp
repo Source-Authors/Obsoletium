@@ -7,6 +7,8 @@
 
 #include <system_error>
 
+#include "tier0/platform.h"
+
 #include "scoped_dll.h"
 #include "winlite.h"
 
@@ -299,11 +301,7 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   char base_directory_path[MAX_PATH], dedicated_dll_path[MAX_PATH];
   // Assemble the full path to our "dedicated.dll".
   _snprintf_s(dedicated_dll_path, _TRUNCATE,
-#if !defined(_WIN64)
-              "%s\\bin\\dedicated.dll",
-#else
-              "%s\\bin\\x64\\dedicated.dll",
-#endif
+              "%s\\" PLATFORM_BIN_DIR "\\dedicated.dll",
               GetBaseDirectory(module_name, base_directory_path));
 
   char user_error[1024];

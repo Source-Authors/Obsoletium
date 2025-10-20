@@ -484,7 +484,8 @@ int CompileCaptionsApp::Main() {
   char binaries[MAX_PATH];
   V_strcpy_safe(binaries, gamedir);
   Q_StripTrailingSlash(binaries);
-  V_strcat_safe(binaries, "/../bin");
+  // dimhotepus: x86-64 support.
+  V_strcat_safe(binaries, CORRECT_PATH_SEPARATOR_S ".." CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR );
 
   char outfile[MAX_PATH];
   const char *lastCaption = worklist[worklist.Count() - 1].String();

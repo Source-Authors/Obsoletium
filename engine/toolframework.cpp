@@ -576,7 +576,7 @@ void CToolFrameworkInternal::LoadTools()
 {
 	m_bInToolMode = true;
 
-	// Load rootdir/bin/enginetools.txt
+	// Load rootdir/bin{/x64}/enginetools.txt
 	KeyValuesAD kv( "enginetools" );
 	Assert( kv );
 
@@ -591,7 +591,7 @@ void CToolFrameworkInternal::LoadTools()
 		{
 			if ( !Q_stricmp( tool->GetName(),  "library" ) )
 			{
-				// CHECK both bin/tools and gamedir/bin/tools
+				// CHECK both bin{/x64}/tools and gamedir/bin{/x64}/tools
 				LoadToolsFromLibrary( tool->GetString() );
 			}
 		}

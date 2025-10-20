@@ -460,7 +460,8 @@ struct AnalysisData
 char *directories_to_check[] =
 {
 	"",
-	"bin",
+	// dimhotepus: x86-64 support.
+	PLATFORM_BIN_DIR,
 	"maps",
 	"materials",
 	"models",

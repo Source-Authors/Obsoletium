@@ -487,12 +487,8 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 
 	if ( IsRunningInEngine() )
 	{
-#ifdef PLATFORM_64BITS
 		// dimhotepus: x86-64 support.
-		V_strcat_safe( m_szAppDir, CORRECT_PATH_SEPARATOR_S "bin" CORRECT_PATH_SEPARATOR_S "x64" );
-#else
-		V_strcat_safe( m_szAppDir, CORRECT_PATH_SEPARATOR_S "bin" );
-#endif
+		V_strcat_safe( m_szAppDir, CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR );
 	}
 	
 	// Create the message window object for capturing errors and warnings.

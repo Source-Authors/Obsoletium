@@ -651,7 +651,8 @@ int CCompileKeyValuesApp::Main()
 	char binaries[MAX_PATH];
 	Q_strncpy( binaries, gamedir, MAX_PATH );
 	Q_StripTrailingSlash( binaries );
-	Q_strncat( binaries, "/../bin", MAX_PATH, MAX_PATH );
+	// dimhotepus: x86-64 support.
+	Q_strncat( binaries, CORRECT_PATH_SEPARATOR_S ".." CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR, MAX_PATH, MAX_PATH );
 
 	char outfile[ 512 ];
 	Q_strncpy( outfile, worklist[ worklist.Count() - 1 ].String() , sizeof( outfile ) );

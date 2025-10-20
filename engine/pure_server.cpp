@@ -855,7 +855,8 @@ int CPureFileTracker::ListUserFiles( bool bListAll, const char *pchFilenameFind 
 		UserReportedFile_t &ufile = m_treeAllReportedFiles[file.m_idxFile];
 
 		bool bOutput = false;
-		if ( Q_stristr( ufile.m_filename.String(), "bin\\pak01" )!=NULL || Q_stristr( ufile.m_filename.String(), ".vpk" )!=NULL )
+		// dimhotepus: x86-64 support.
+		if ( Q_stristr( ufile.m_filename.String(), PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S "pak01" )!=NULL || Q_stristr( ufile.m_filename.String(), ".vpk" )!=NULL )
 			bOutput = true;
 		else
 		{

@@ -425,33 +425,32 @@ void CBaseFileSystem::Shutdown()
 			fprintf( m_pLogFile, "mkdir \"%%fs_target%%\"\n" );
 			fprintf( m_pLogFile, "copy \"%%binsrc%%\\hl2.exe\" \"%%fs_target%%\"\n" );
 			fprintf( m_pLogFile, "copy \"%%binsrc%%\\hl2.dat\" \"%%fs_target%%\"\n" );
-			fprintf( m_pLogFile, "mkdir \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\*.asi\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\materialsystem.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\shaderapidx9.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\filesystem_stdio.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\soundemittersystem.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\stdshader*.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\shader_nv*.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\launcher.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\engine.dll\" \"%%fs_target%%\\bin\"\n" );
+			fprintf( m_pLogFile, "mkdir \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\*.asi\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\materialsystem.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\shaderapidx9.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\filesystem_stdio.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\soundemittersystem.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\stdshader*.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\launcher.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\engine.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
 
 #ifdef _WIN64
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\mss64.dll\" \"%%fs_target%%\\bin\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\mss64.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
 #else
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\mss32.dll\" \"%%fs_target%%\\bin\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\mss32.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
 #endif
 
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\tier0.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\vgui2.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\vguimatsurface.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\voice_miles.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\vphysics.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\vstdlib.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\studiorender.dll\" \"%%fs_target%%\\bin\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\bin\\vaudio_miles.dll\" \"%%fs_target%%\\bin\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\tier0.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\vgui2.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\vguimatsurface.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\voice_miles.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\vphysics.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\vstdlib.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\studiorender.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\" PLATFORM_BIN_DIR "\\vaudio_miles.dll\" \"%%fs_target%%\\" PLATFORM_BIN_DIR "\"\n" );
 			fprintf( m_pLogFile, "copy \"%%binsrc%%\\hl2\\resource\\*.ttf\" \"%%fs_target%%\\hl2\\resource\"\n" );
-			fprintf( m_pLogFile, "copy \"%%binsrc%%\\hl2\\bin\\gameui.dll\" \"%%fs_target%%\\hl2\\bin\"\n" );
+			fprintf( m_pLogFile, "copy \"%%binsrc%%\\hl2\\" PLATFORM_BIN_DIR "\\gameui.dll\" \"%%fs_target%%\\hl2\\" PLATFORM_BIN_DIR "\"\n" );
 		}
 		fprintf( m_pLogFile, "goto done\n" );
 		fprintf( m_pLogFile, ":error\n" );

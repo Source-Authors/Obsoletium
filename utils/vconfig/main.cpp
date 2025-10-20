@@ -438,7 +438,8 @@ void SetXSIScriptSettings( )
 //-----------------------------------------------------------------------------
 // Points the XSI script to the appropriate place
 //-----------------------------------------------------------------------------
-#define VPROJECT_BIN_PATH "%vproject%\\..\\bin"
+// dimhotepus: x86-64 support.
+#define VPROJECT_BIN_PATH "%vproject%\\..\\" PLATFORM_BIN_DIR
 
 void SetPathSettings( )
 {
@@ -461,12 +462,13 @@ void SetPathSettings( )
 			pPath += nLen;
 			pFound = Q_stristr( pPath, VPROJECT_BIN_PATH );
 		}
-
-		Q_strncat( pPathBuf, ";%VPROJECT%\\..\\bin", sizeof(pPathBuf) );
+		// dimhotepus: x86-64 support.
+		Q_strncat( pPathBuf, ";%VPROJECT%\\..\\" PLATFORM_BIN_DIR, sizeof(pPathBuf) );
 	}
 	else
 	{
-		Q_strncpy( pPathBuf, "%VPROJECT%\\..\\bin", sizeof(pPathBuf) );
+		// dimhotepus: x86-64 support.
+		Q_strncpy( pPathBuf, "%VPROJECT%\\..\\" PLATFORM_BIN_DIR, sizeof(pPathBuf) );
 	}
 
 	SetVConfigRegistrySetting( "PATH", pPathBuf, false );
@@ -560,7 +562,7 @@ bool CVConfigApp::PreInit()
 
 	FileSystem_SetErrorMode( FS_ERRORMODE_AUTO );
 
-	// We only want to use the gameinfo.txt that is in the bin\vconfig directory.
+	// We only want to use the gameinfo.txt that is in the bin\{x64}\vconfig directory.
 	char dirName[MAX_PATH];
 	Q_strncpy( dirName, GetBaseDirectory(), sizeof( dirName ) );
 	Q_AppendSlash( dirName, sizeof( dirName ) );

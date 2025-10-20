@@ -282,11 +282,8 @@ CSysModule *Sys_LoadModule( const char *pModuleName, Sys_Flags flags /* = SYS_NO
 		}
 		else
 		{
-#ifdef PLATFORM_64BITS
-			Q_snprintf( szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/bin/x64/%s", szCwd, pModuleName );
-#else
-			Q_snprintf( szAbsoluteModuleName, sizeof(szAbsoluteModuleName), "%s/bin/%s", szCwd, pModuleName );
-#endif
+			// dimhotepus: x86-64 support.
+			V_sprintf_safe( szAbsoluteModuleName, "%s" CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S "%s", szCwd, pModuleName );
 		}
 		hDLL = Sys_LoadLibrary( szAbsoluteModuleName, flags );
 	}

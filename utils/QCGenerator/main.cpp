@@ -153,7 +153,7 @@ bool CQCGeneratorApp::PreInit()
 
 	FileSystem_SetErrorMode( FS_ERRORMODE_AUTO );
 
-	// We only want to use the gameinfo.txt that is in the bin\vconfig directory.
+	// We only want to use the gameinfo.txt that is in the bin{\x64\}vconfig directory.
 	char dirName[MAX_PATH];
 	Q_strncpy( dirName, GetBaseDirectory(), sizeof( dirName ) );
 	Q_AppendSlash( dirName, sizeof( dirName ) );

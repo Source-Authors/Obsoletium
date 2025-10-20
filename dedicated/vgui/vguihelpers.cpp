@@ -80,11 +80,7 @@ int StartVGUI(CreateInterfaceFn dedicatedFactory) {
   vgui::ivgui()->Start();
 
   // load the module
-#ifdef PLATFORM_64BITS
-  g_pFullFileSystem->GetLocalCopy("bin/x64/adminserver" DLL_EXT_STRING);
-#else
-  g_pFullFileSystem->GetLocalCopy("bin/adminserver" DLL_EXT_STRING);
-#endif
+  g_pFullFileSystem->GetLocalCopy(PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S "adminserver" DLL_EXT_STRING);
 
   g_hAdminServerModule = g_pFullFileSystem->LoadModule("adminserver");
   Assert(g_hAdminServerModule);

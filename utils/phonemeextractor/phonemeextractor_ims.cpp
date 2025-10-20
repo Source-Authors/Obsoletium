@@ -294,11 +294,8 @@ bool CPhonemeExtractorLipSinc::InitLipSinc( void )
 
 	if ( _stat64( szCheck, &buf ) != 0 )
 	{
-#ifdef PLATFORM_64BITS
-		V_sprintf_safe( coreDataDir, "%s\\bin\\x64\\lipsinc_data\\", szBaseDir );
-#else
-		V_sprintf_safe( coreDataDir, "%s\\bin\\lipsinc_data\\",	szBaseDir );
-#endif
+		// dimhotepus: x86-64 support.
+		V_sprintf_safe( coreDataDir, "%s\\" PLATFORM_BIN_DIR "\\lipsinc_data\\", szBaseDir );
 		V_FixSlashes( coreDataDir );
 		V_sprintf_safe( szCheck, "%sDtC6dal.dat", coreDataDir );
 

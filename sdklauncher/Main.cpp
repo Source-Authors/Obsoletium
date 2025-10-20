@@ -187,7 +187,8 @@ const char* GetSDKToolsBinDirectory( )
 		GetModuleFileName( (HMODULE)GetAppInstance(), path, sizeof( path ) );
 		Q_StripLastDir( path, sizeof( path ) );	// Get rid of the filename.
 		V_strncat( path, g_engineDir, sizeof( path ) );
-		V_strncat( path, "\\bin", sizeof( path ) );
+		// dimhotepus: x86-64 port.
+		V_strncat( path, CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR, sizeof( path ) );
 	}
 	return path;
 }
@@ -200,6 +201,10 @@ const char* GetSDKLauncherBaseDirectory()
 	{
 		Q_strncpy( basedir, GetSDKLauncherBinDirectory(), sizeof( basedir ) );
 		Q_StripLastDir( basedir, sizeof( basedir ) );	// Get rid of the bin directory.
+#ifdef PLATFORM_64BITS
+		// dimhotepus: x86-64 port.
+		Q_StripLastDir( basedir, sizeof( basedir ) );	// Get rid of the x64 directory.
+#endif
 		Q_StripTrailingSlash( basedir );
 	}
 	return basedir;
@@ -426,7 +431,8 @@ void UpdateConfigsStatus_Init( void )
 		Q_strncpy( szConfigDir, GetSDKLauncherBinDirectory(), sizeof( szConfigDir ) );
 		Q_strncat ( szConfigDir, "\\", MAX_PATH );
 		Q_strncat ( szConfigDir, g_engineDir, MAX_PATH );
-		Q_strncat ( szConfigDir, "\\bin", MAX_PATH );
+		// dimhotepus: x86-64 port.
+		Q_strncat ( szConfigDir, CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR, MAX_PATH );
 
 		g_dwChangeHandle = FindFirstChangeNotification( 
 			szConfigDir,													// directory to watch 
@@ -507,19 +513,22 @@ bool RunQuickLaunch()
 
 	if ( CommandLine()->FindParm( "-runhammer" ) )
 	{
-		Q_snprintf( cmdLine, sizeof( cmdLine ), "\"%s\\%s\\bin\\hammer.exe\"", GetSDKLauncherBinDirectory(), g_engineDir );
+		// dimhotepus: x86-64 port.
+		Q_snprintf( cmdLine, sizeof( cmdLine ), "\"%s\\%s\\" PLATFORM_BIN_DIR "\\hammer.exe\"", GetSDKLauncherBinDirectory(), g_engineDir );
 		QuickLaunchCommandLine( cmdLine );
 		return true;
 	}
 	else if ( CommandLine()->FindParm( "-runmodelviewer" ) )
 	{
-		Q_snprintf( cmdLine, sizeof( cmdLine ), "\"%s\\%s\\bin\\hlmv.exe\"", GetSDKLauncherBinDirectory(), g_engineDir );
+		// dimhotepus: x86-64 port.
+		Q_snprintf( cmdLine, sizeof( cmdLine ), "\"%s\\%s\\" PLATFORM_BIN_DIR "\\hlmv.exe\"", GetSDKLauncherBinDirectory(), g_engineDir );
 		QuickLaunchCommandLine( cmdLine );
 		return true;
 	}
 	else if ( CommandLine()->FindParm( "-runfaceposer" ) )
 	{
-		Q_snprintf( cmdLine, sizeof( cmdLine ), "\"%s\\%s\\bin\\hlfaceposer.exe\"", GetSDKLauncherBinDirectory(), g_engineDir );
+		// dimhotepus: x86-64 port.
+		Q_snprintf( cmdLine, sizeof( cmdLine ), "\"%s\\%s\\" PLATFORM_BIN_DIR "\\hlfaceposer.exe\"", GetSDKLauncherBinDirectory(), g_engineDir );
 		QuickLaunchCommandLine( cmdLine );
 		return true;
 	}

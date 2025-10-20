@@ -57,7 +57,7 @@ int g_iBoundPort = -1;
 bool g_bScreensaverMode = false;	// If this is true, then it'll act like the service is disabled while
 									// a screensaver isn't running.
 
-// If this is on, it runs the exes out of c:/hl2/bin instead of the network. If the exes are built in debug,
+// If this is on, it runs the exes out of c:/hl2/bin{/x64} instead of the network. If the exes are built in debug,
 // this makes it possible to catch nasty crashes.
 bool g_bSuperDebugMode = false;
 
@@ -1071,7 +1071,7 @@ void AdjustSuperDebugArgs( CUtlVector<char*> &args )
 	}
 	*pLastSlash = 0;
 	
-	// In superdebug mode, run it out of c:/hl2/bin.
+	// In superdebug mode, run it out of c:/hl2/bin{/x64}.
 	const char *pBase = args[0];
 	const char *pBaseCur = pBase;
 	while ( *pBaseCur )

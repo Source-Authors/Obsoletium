@@ -1910,11 +1910,7 @@ void CBugUIPanel::OnSubmit()
 	
 	if ( m_szSaveGameName[ 0 ] )
 	{
-#ifdef PLATFORM_64BITS
-		Msg( "save file save/x64/%s.sav\n", m_szSaveGameName );
-#else
-		Msg( "save file save/%s.sav\n", m_szSaveGameName );
-#endif
+		Msg( "save file save" PLATFORM_DIR CORRECT_PATH_SEPARATOR_S "%s.sav\n", m_szSaveGameName );
 	}
 	else
 	{
@@ -2054,11 +2050,7 @@ void CBugUIPanel::OnSubmit()
 		// Only attach .sav files in single player
 		if ( ( cl.m_nMaxClients == 1 ) && m_szSaveGameName[ 0 ] )
 		{
-#ifdef PLATFORM_64BITS
-			Q_snprintf( fn, sizeof( fn ), "save/x64/%s.sav", m_szSaveGameName );
-#else
-			Q_snprintf( fn, sizeof( fn ), "save/%s.sav", m_szSaveGameName );
-#endif
+			V_sprintf_safe( fn, "save" PLATFORM_DIR CORRECT_PATH_SEPARATOR_S "%s.sav", m_szSaveGameName );
 			Q_FixSlashes( fn );
 			attachedSave = AddFileToZip( fn );
 		}
@@ -2360,11 +2352,7 @@ CCallQueue g_UploadQueue;
 // 
 // 	if ( savefile && savefile[ 0 ] )
 // 	{
-// #ifdef PLATFORM_64BITS
-// 		Q_snprintf( localfile, sizeof( localfile ), "%s/save/x64/%s.sav", com_gamedir, savefile );
-// #else
-// 		Q_snprintf( localfile, sizeof( localfile ), "%s/save/%s.sav", com_gamedir, savefile );
-// #endif
+// 		Q_snprintf( localfile, sizeof( localfile ), "%s/save" PLATFORM_DIR CORRECT_PATH_SEPARATOR_S "%s.sav", com_gamedir, savefile );
 // 		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.sav", GetSubmissionURL(bugId), savefile );
 // 		Q_FixSlashes( localfile );
 // 		Q_FixSlashes( remotefile );

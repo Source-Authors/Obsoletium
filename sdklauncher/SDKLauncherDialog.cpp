@@ -402,7 +402,8 @@ void CSDKLauncherDialog::Launch( int hActiveListItem, bool bForce )
 			V_StrSubst( programNameTemp, "%enginedir%", g_engineDir , programName, sizeof( programName ) );
 			
 			V_strncpy( launchDirectory, GetSDKLauncherBaseDirectory(), sizeof( launchDirectory ) );
-			V_strncat( launchDirectory, "\\bin\\", sizeof( launchDirectory ) );
+			// dimhotepus: x86-64 port.
+			V_strncat( launchDirectory, CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S, sizeof( launchDirectory ) );
 			V_strncat( launchDirectory, g_engineDir, sizeof( launchDirectory ) );
 
 			// Check to see if we're running in tools mode
@@ -418,7 +419,8 @@ void CSDKLauncherDialog::Launch( int hActiveListItem, bool bForce )
 				// If we are running the engine tools then change our launch directory to the game directory
 				V_strncpy( launchDirectory, pModDir, sizeof( launchDirectory ) );
 				V_StripLastDir( launchDirectory, sizeof( launchDirectory ) );
-				V_strncat( launchDirectory, "bin", sizeof( launchDirectory ) );
+				// dimhotepus: x86-64 port.
+				V_strncat( launchDirectory, PLATFORM_BIN_DIR, sizeof( launchDirectory ) );
 			}
 
 			STARTUPINFO si;
@@ -753,7 +755,8 @@ void CSDKLauncherDialog::RefreshConfigs( void )
 	V_AppendSlash( szGameConfigDir, MAX_PATH );
 	V_strncat( szGameConfigDir, g_engineDir, MAX_PATH );
 	V_AppendSlash( szGameConfigDir, MAX_PATH );
-	V_strncat( szGameConfigDir, "bin", MAX_PATH );
+	// dimhotepus: x86-64 port.
+	V_strncat( szGameConfigDir, PLATFORM_BIN_DIR, MAX_PATH );
 
 	// Set directory in which GameConfig.txt is found
 	g_ConfigManager.SetBaseDirectory( szGameConfigDir );

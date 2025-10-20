@@ -713,9 +713,11 @@ int TextureCompile_Main( int argc, char* argv[] )
 
 		// DIE DIE KILL KILL AHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		char path[MAX_PATH];
-		sprintf( path, "%s%s\\bin\\server.dll", g_WorkerTempPath, g_pGameDir + 3 ); // hack hack
+		// dimhotepus: x86-64 support.
+		sprintf( path, "%s%s\\" PLATFORM_BIN_DIR "\\server.dll", g_WorkerTempPath, g_pGameDir + 3 ); // hack hack
 		TouchFile( path );
-		sprintf( path, "%s%s\\bin\\client.dll", g_WorkerTempPath, g_pGameDir + 3 );// hack hack
+		// dimhotepus: x86-64 support.
+		sprintf( path, "%s%s\\" PLATFORM_BIN_DIR "\\client.dll", g_WorkerTempPath, g_pGameDir + 3 );// hack hack
 		TouchFile( path );
 
 		Worker_GetLocalCopyOfBinaries();

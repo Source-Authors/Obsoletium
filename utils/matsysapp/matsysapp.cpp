@@ -613,7 +613,8 @@ bool MaterialSystemApp::InitMaterialSystem()
 	}
 	// BUGBUG: Can't figure out why this is broken.  EXECUTABLE_PATH should already be there
 	// but it isn't so the shader system is computing texture memory on each run...
-	g_pFullFileSystem->AddSearchPath( "U:\\main\\game\\bin", "EXECUTABLE_PATH", PATH_ADD_TO_TAIL );
+	// dimhotepus: x86-64 support.
+	g_pFullFileSystem->AddSearchPath( "U:\\main\\game\\" PLATFORM_BIN_DIR, "EXECUTABLE_PATH", PATH_ADD_TO_TAIL );
 
 	const char *pShaderDLL = FindParameterArg("-shaderdll");
 	char defaultShaderDLL[256];

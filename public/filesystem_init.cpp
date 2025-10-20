@@ -337,7 +337,8 @@ bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned ex
 		}
 		if ( pProject )
 		{
-			Q_snprintf( exedir, exeDirLen, "%s%c..%cbin", pProject, CORRECT_PATH_SEPARATOR, CORRECT_PATH_SEPARATOR );
+			// dimhotepus: x86-64 support.
+			Q_snprintf( exedir, exeDirLen, "%s%c..%c" PLATFORM_BIN_DIR, pProject, CORRECT_PATH_SEPARATOR, CORRECT_PATH_SEPARATOR );
 			return true;
 		}
 		return false;
@@ -352,22 +353,13 @@ bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned ex
 	// Return the bin directory as the executable dir if it's not in there
 	// because that's really where we're running from...
 	char ext[MAX_PATH];
-	V_StrRight( exedir, 4, ext );
-	if ( ext[0] != CORRECT_PATH_SEPARATOR ||
-#ifdef PLATFORM_64BITS
-		Q_stricmp( ext+1, "x64" ) != 0
-#else
-		Q_stricmp( ext+1, "bin" ) != 0
-#endif
-		)
+	// dimhotepus: x86-64 support. TF2 backport.
+	V_StrRight( exedir, ssize( PLATFORM_BIN_DIR ), ext);
+	if ( ext[0] != CORRECT_PATH_SEPARATOR || Q_stricmp( ext+1, PLATFORM_BIN_DIR ) != 0 )
 	{
 		Q_strncat( exedir, CORRECT_PATH_SEPARATOR_S, exeDirLen, COPY_ALL_CHARACTERS );
-		Q_strncat( exedir, "bin", exeDirLen, COPY_ALL_CHARACTERS );
-
-#ifdef PLATFORM_64BITS
-		Q_strncat( exedir, CORRECT_PATH_SEPARATOR_S "x64", exeDirLen, COPY_ALL_CHARACTERS );
-#endif
-
+		// dimhotepus: x86-64 support. TF2 backport.
+		Q_strncat( exedir, PLATFORM_BIN_DIR, exeDirLen, COPY_ALL_CHARACTERS );
 		Q_FixSlashes( exedir );
 	}
 	
@@ -375,17 +367,18 @@ bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned ex
 }
 
 template<size_t max_size>
-static bool FileSystem_GetBaseDir( char (&baseDir)[max_size] )
+static bool FileSystem_GetBaseDir( OUT_Z_ARRAY char (&baseDir)[max_size] )
 {
 	if ( FileSystem_GetExecutableDir( baseDir ) )
 	{
-#ifdef PLATFORM_64BITS
-		// dimhotepus: Need to strip x64, too.
 		V_StripFilename( baseDir );
-#endif
-		V_StripFilename( baseDir );
+		// dimhotepus: Need to strip PLATFORM_DIR, too.
+		if constexpr ( ssize( PLATFORM_DIR ) > 0 )
+			V_StripFilename( baseDir );
 		return true;
 	}
+
+	if ( max_size > 0 ) baseDir[max_size - 1] = '\0';
 	
 	return false;
 }
@@ -597,6 +590,8 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 	bool bLowViolence = initInfo.m_bLowViolence;
 	for ( auto *pCur=pSearchPaths->GetFirstValue(); pCur; pCur=pCur->GetNextValue() )
 	{
+		// dimhotepus: x86-64 support. TF2 backport.
+		const char *pszPathID = pCur->GetName();
 		const char *pLocation = pCur->GetString();
 		const char *pszBaseDir = baseDir;
 
@@ -616,6 +611,14 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 			// In the case of a game or a Steam-launched dedicated server, all the necessary prior engine content is mapped in with the Steam depots,
 			// so we can just use the path as-is.
 			pLocation += std::size( BASESOURCEPATHS_TOKEN ) - 1;
+		}
+
+		// dimhotepus: x86-64 support. TF2 backport.
+		char szBinLocation[MAX_PATH];
+		if ( Q_stricmp( pszPathID, "GAMEBIN" ) == 0 )
+		{
+			V_sprintf_safe( szBinLocation, "%s" PLATFORM_DIR, pLocation );
+			pLocation = szBinLocation;
 		}
 
 		CUtlStringList vecFullLocationPaths;
@@ -975,6 +978,14 @@ FSReturnCode_t FileSystem_SetBasePaths( IFileSystem *pFileSystem )
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetExecutableDir failed." );
 
 	pFileSystem->AddSearchPath( executablePath, "EXECUTABLE_PATH" );
+	// dimhotepus: x86-64 support.
+	if constexpr ( ssize( PLATFORM_DIR ) > 0 )
+	{
+		char baseBinFolder[MAX_PATH];
+		V_strcpy_safe( baseBinFolder, executablePath );
+		baseBinFolder[ V_strlen( baseBinFolder ) - ( ssize( PLATFORM_DIR ) - 1 ) ] = '\0';
+		pFileSystem->AddSearchPath( baseBinFolder, "EXECUTABLE_PATH" );
+	}
 
 	if ( !FileSystem_GetBaseDir( executablePath ) )
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetBaseDir failed." );

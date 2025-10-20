@@ -376,7 +376,7 @@ void SetupDependencyFilename(CDependencyInfo *pInfo,
 
   // If they're in patch mode, then the dependency files come out of a directory
   // they've passed in. Otherwise, the files come from the same exe dir we're in
-  // (like c:\valve\game\bin).
+  // (like c:\valve\game\bin{\x64}).
   if (pPatchDirectory) {
     V_strcpy_safe(pInfo->m_DependencyFilesDir, pPatchDirectory);
   } else {

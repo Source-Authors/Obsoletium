@@ -775,7 +775,7 @@ bool CItemUpload::GetVMod( CUtlString &sVMod )
 
 //-----------------------------------------------------------------------------
 // Guess where the SourceSDK root is based on executable directory...
-// If there's a /bin/orangebox/bin/ in the executable path we know 
+// If there's a /bin{/x64/}orangebox/bin{/x64}/ in the executable path we know 
 // the SourceSDK is above it, otherwise we don't know anything and false is
 // returned
 //
@@ -796,7 +796,8 @@ bool CItemUpload::GetSourceSDKFromExe( CUtlString &sSourceSDK, CUtlString &sSour
 
 	// Special hack for executables running out of the orange box SDK
 	sCurrentExecutableFileName.FixSlashes( '/' );
-	const char *pszBinOrangeBoxBin = V_strstr( sCurrentExecutableFileName.String(), "/bin/orangebox/bin/" );
+	// dimhotepus: x86-64 port.
+	const char *pszBinOrangeBoxBin = V_strstr( sCurrentExecutableFileName.String(), CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S "orangebox" CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S );
 	if ( pszBinOrangeBoxBin )
 	{
 		sSourceSDK.SetDirect( sCurrentExecutableFileName.String(), pszBinOrangeBoxBin - sCurrentExecutableFileName.String() );
@@ -833,7 +834,8 @@ bool CItemUpload::GetSourceSDKFromExe( CUtlString &sSourceSDK, CUtlString &sSour
 		V_FixSlashes( szSDKPath, '/' );
 
 		sSourceSDK = szSDKPath;
-		sSourceSDKBin.Format( "%s/bin/%s/bin", szSDKPath, szEngineVersion );
+		// dimhotepus: x86-64 port.
+		sSourceSDKBin.Format( "%s" CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S "%s" CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR, szSDKPath, szEngineVersion );
 		return true;
 	}
 
@@ -998,7 +1000,7 @@ bool CItemUpload::GetBinDirectory( CUtlString &sBinDir )
 		return true;
 	}
 
-	// Check for the game/bin directory
+	// Check for the game/bin{/x64}/ directory
 	CUtlString sVProject;
 	if ( GetVProjectDir( sVProject ) && !sVProject.IsEmpty() )
 	{
@@ -1008,7 +1010,8 @@ bool CItemUpload::GetBinDirectory( CUtlString &sBinDir )
 		{
 			sBinDir = sVProject;
 			sBinDir.SetLength( pszGame - sVProject.String() );
-			sBinDir += "/game/bin";
+			// dimhotepus: x86-64 port.
+			sBinDir += CORRECT_PATH_SEPARATOR_S "game" CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR;
 
 			if ( CheckToolPath( sBinDir ) )
 			{
@@ -1024,7 +1027,8 @@ bool CItemUpload::GetBinDirectory( CUtlString &sBinDir )
 			return false;
 
 		sBinDir = szBinDir;
-		sBinDir += "/bin";
+		// dimhotepus: x86-64 port.
+		sBinDir += CORRECT_PATH_SEPARATOR_S PLATFORM_BIN_DIR;
 
 		if ( CheckToolPath( sBinDir ) )
 		{

@@ -42,11 +42,7 @@ constexpr inline int DT_RIGHT = 3;
 #include "tier0/memdbgon.h"
 
 #define G15_RESOURCE_FILE "resource/g15.res"
-#ifdef PLATFORM_64BITS
-#define G15_MODULE_NAME "bin/x64/g15.dll"
-#else
-#define G15_MODULE_NAME "bin/g15.dll"
-#endif
+#define G15_MODULE_NAME PLATFORM_BIN_DIR CORRECT_PATH_SEPARATOR_S "g15" DLL_EXT_STRING
 
 #define SMALL_ITEM_HEIGHT	10
 #define G15_DEFAULT_MAX_CHAT_HISTORY 4

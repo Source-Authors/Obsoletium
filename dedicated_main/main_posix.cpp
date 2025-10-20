@@ -11,6 +11,7 @@
 #include <cerrno>
 
 #include "tier0/basetypes.h"
+#include "tier0/platform.h"
 #include "scoped_dll.h"
 
 namespace {
@@ -85,12 +86,7 @@ int main(int argc, char *argv[]) {
 
   char new_path_env[4096];
   snprintf(new_path_env, sizeof(new_path_env) - 1,
-#if !defined(PLATFORM_64BITS)
-           "LD_LIBRARY_PATH=%s/bin:%s",
-#else
-           "LD_LIBRARY_PATH=%s/bin/x64:%s",
-#endif
-           cwd, path_env);
+           "LD_LIBRARY_PATH=%s/" PLATFORM_BIN_DIR ":%s", cwd, path_env);
   if (putenv(new_path_env)) {
     const auto rc = errno;
     fprintf(stderr, "putenv (%s) failed: %s\n", new_path_env, strerror(rc));

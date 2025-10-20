@@ -154,7 +154,8 @@ bool GetCallerModule( char (&pDest)[size] )
 	if ( !bInit )
 	{
 		PSTR psUserSearchPath = NULL;
-		psUserSearchPath = "u:\\data\\game\\bin\\;u:\\data\\game\\episodic\\bin\\;u:\\data\\game\\hl2\\bin\\;\\\\perforce\\symbols";
+		// dimhotepus: x86-64 port.
+		psUserSearchPath = "u:\\data\\game\\" PLATFORM_BIN_DIR "\\;u:\\data\\game\\episodic\\" PLATFORM_BIN_DIR "\\;u:\\data\\game\\hl2\\" PLATFORM_BIN_DIR "\\;\\\\perforce\\symbols";
 		SymInitialize( GetCurrentProcess(), psUserSearchPath, true );
 		bInit = true;
 	}

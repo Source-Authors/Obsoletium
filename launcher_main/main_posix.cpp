@@ -8,6 +8,8 @@
 #include <cstring>
 
 #include "tier0/basetypes.h"
+#include "tier0/platform.h"
+
 #include "scoped_dll.h"
 
 namespace {
@@ -70,20 +72,7 @@ void WaitForDebuggerConnect(int argc, char *argv[], int time) {
 }  // namespace
 
 int main(int argc, char *argv[]) {
-  const char kLauncherPath[] =
-#ifdef PLATFORM_64BITS
-#ifdef OSX
-      "bin/osx64/launcher" DLL_EXT_STRING;
-#else
-      "bin/linux64/launcher" DLL_EXT_STRING;
-#endif
-#else
-#ifdef OSX
-      "bin/osx/launcher" DLL_EXT_STRING;
-#else
-      "bin/linux/launcher" DLL_EXT_STRING;
-#endif
-#endif
+  const char kLauncherPath[] = PLATFORM_BIN_DIR "/launcher" DLL_EXT_STRING;
   const source::ScopedDll launcher_dll {
      kLauncherPath, RTLD_NOW
   };

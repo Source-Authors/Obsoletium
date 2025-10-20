@@ -7,6 +7,8 @@
 
 #include <system_error>
 
+#include "tier0/platform.h"
+
 #include "scoped_dll.h"
 #include "scoped_process_error_mode.h"
 #include "winlite.h"
@@ -223,11 +225,7 @@ int Run(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   char base_directory_path[MAX_PATH], launcher_dll_path[MAX_PATH];
   // Assemble the full path to our "launcher.dll".
   _snprintf_s(launcher_dll_path, _TRUNCATE,
-#if !defined(_WIN64)
-              "%s\\bin\\launcher.dll",
-#else
-              "%s\\bin\\x64\\launcher.dll",
-#endif
+              "%s\\" PLATFORM_BIN_DIR "\\launcher.dll",
               GetBaseDirectory(module_name, base_directory_path));
 
   char user_error[1024];
@@ -269,5 +267,5 @@ int APIENTRY WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE old_instance,
   const auto rc = Run(instance, old_instance, cmd_line, window_flags);
 
   // Prevent tail call optimization and incorrect stack traces.
-  exit(rc); //-V2014
+  exit(rc);  //-V2014
 }
