@@ -36,7 +36,8 @@ constexpr time_t NEW_SAVE_GAME_TIMESTAMP = -1;
 CSaveGameDialog::CSaveGameDialog(vgui::Panel *parent) : BaseClass(parent, "SaveGameDialog")
 {
 	SetDeleteSelfOnClose(true);
-	SetBounds(0, 0, 512, 384);
+	// dimhotepus: Scale UI.
+	SetBounds(0, 0, QuickPropScale( 512 ), QuickPropScale( 384 ));
 	SetSizeable( true );
 
 	SetTitle("#GameUI_SaveGame", true);
