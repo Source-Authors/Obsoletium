@@ -53,7 +53,7 @@ bool Plat_VerifyHardwareKeyPrompt()
 #ifdef REQUIRE_HARDWARE_KEY
 	if ( !DK2DriverInstalled() )
 	{
-		if( IDCANCEL == MessageBox( NULL, "No drivers detected for the hardware key, please install them and re-run the application.\n", "No Driver Detected", MB_OKCANCEL ) )
+		if( IDCANCEL == MessageBoxA( nullptr, "No drivers detected for the hardware key, please install them and re-run the application.\n", "No Driver Detected", MB_OKCANCEL ) )
 		{
 			return false;
 		}
@@ -61,7 +61,7 @@ bool Plat_VerifyHardwareKeyPrompt()
 
 	while ( !Plat_VerifyHardwareKey() )
 	{
-		if ( IDCANCEL == MessageBox( NULL, "Please insert the hardware key and hit 'ok'.\n", "Insert Hardware Key", MB_OKCANCEL ) )
+		if ( IDCANCEL == MessageBoxA( nullptr, "Please insert the hardware key and hit 'ok'.\n", "Insert Hardware Key", MB_OKCANCEL ) )
 		{
 			return false;
 		}
