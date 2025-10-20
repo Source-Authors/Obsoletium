@@ -842,26 +842,6 @@ void PhysComputeSlideDirection( IPhysicsObject *pPhysics, const Vector &inputVel
 			if ( pOutputAngularVelocity )
 			{
 				angVel = normal * DotProduct( angVel, normal );
-#if 0
-				pSnapshot->GetContactPoint( point );
-				Vector point, dummy;
-				AngularImpulse angularClip, clip2;
-
-				pPhysics->CalculateVelocityOffset( normal, point, dummy, angularClip );
-				VectorNormalize( angularClip );
-				float proj = DotProduct( angVel, angularClip );
-				if ( proj > 0 )
-				{
-					angVel -= angularClip * proj;
-				}
-				CrossProduct( angularClip, normal, clip2 );
-				proj = DotProduct( angVel, clip2 );
-				if ( proj > 0 )
-				{
-					angVel -= clip2 * proj;
-				}
-				//NDebugOverlay::Line( point, point - normal * 20, 255, 0, 0, true, 0.1 );
-#endif
 			}
 
 			// Determine how far along plane to slide based on incoming direction.
