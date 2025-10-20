@@ -147,8 +147,8 @@ CParticleEffectBinding::CParticleEffectBinding()
 	m_LastMin = m_Min;
 	m_LastMax = m_Max;
 
-	// dimhotepus: Init to 0 as SetParticleCullRadius gets nan and behaves incorrectly.
-	m_flParticleCullRadius = 0.0f;
+	// dimhotepus: Init to 1.f as TF2 does. SetParticleCullRadius gets nan and behaves incorrectly.
+	m_flParticleCullRadius = -1.0f;
 	SetParticleCullRadius( 0.0f );
 	m_nActiveParticles = 0;
 
