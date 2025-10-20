@@ -37,8 +37,8 @@ using namespace vgui;
 CLoadingDialog::CLoadingDialog( vgui::Panel *parent ) : Frame(parent, "LoadingDialog")
 {
 	SetDeleteSelfOnClose(true);
-
-	SetSize( 416, 100 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 416 ), QuickPropScale( 100 ) );
     SetTitle( "#GameUI_Loading", true );
 
 	// center the loading dialog, unless we have another dialog to show in the background
@@ -71,9 +71,10 @@ CLoadingDialog::CLoadingDialog( vgui::Panel *parent ) : Frame(parent, "LoadingDi
 	SetSizeable( false );
 	SetMoveable( false );
 
-	m_pInfoLabel->SetBounds(20, 32, 392, 24);
-    m_pProgress->SetBounds(20, 64, 300, 24);
-    m_pCancelButton->SetBounds(330, 64, 72, 24);
+	// dimhotepus: Scale UI.
+	m_pInfoLabel->SetBounds( QuickPropScale( 20 ), QuickPropScale( 32 ), QuickPropScale( 392 ), QuickPropScale( 24 ));
+    m_pProgress->SetBounds(QuickPropScale( 20 ), QuickPropScale( 64 ), QuickPropScale( 300 ), QuickPropScale( 24 ));
+    m_pCancelButton->SetBounds(QuickPropScale( 330 ), QuickPropScale( 64 ), QuickPropScale( 72 ), QuickPropScale( 24));
     m_pProgress2->SetVisible(false);
 
 	SetupControlSettings( false );
@@ -235,11 +236,12 @@ void CLoadingDialog::DisplayGenericError(const char *failureReason, const char *
 	int x,y;
 	m_pInfoLabel->GetContentSize( wide, tall );
 	m_pInfoLabel->GetPos( x, y );
-	SetTall( tall + y + 50 );
+	// dimhotepus: Scale UI.
+	SetTall( tall + y + QuickPropScale( 50 ) );
 	 
 	int buttonX, buttonY;
 	m_pCancelButton->GetPos( buttonX, buttonY );
-	m_pCancelButton->SetPos( buttonX, tall + y + 6 );
+	m_pCancelButton->SetPos( buttonX, tall + y + QuickPropScale( 6 ) );
 
 	m_pCancelButton->RequestFocus();
 }
@@ -346,8 +348,9 @@ void CLoadingDialog::PerformLayout()
 		int wide,tall;
 		GetSize( wide, tall );
 
-		x = screenWide - ( wide + 10 ) - m_iAdditionalIndentX;
-		y = screenTall - ( tall + 10 ) - m_iAdditionalIndentY;
+		// dimhotepus: Scale UI.
+		x = screenWide - ( wide + QuickPropScale( 10 ) ) - m_iAdditionalIndentX;
+		y = screenTall - ( tall + QuickPropScale( 10 ) ) - m_iAdditionalIndentY;
 
 		SetPos( x, y );
 	}
