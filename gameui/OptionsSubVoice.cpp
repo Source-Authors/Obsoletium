@@ -322,8 +322,9 @@ void COptionsSubVoice::OnThink()
 			float val = m_pVoiceTweak->GetControlFloat( SpeakingVolume );
 			int nValue = static_cast<int>( val*32768.0f + 0.5f );
 
-			int width = (BAR_WIDTH * nValue) / 32768;
-			width = ((width + (BAR_INCREMENT-1)) / BAR_INCREMENT) * BAR_INCREMENT;  // round to nearest BAR_INCREMENT
+			int width = (QuickPropScale( BAR_WIDTH ) * nValue) / 32768;
+            int increment = QuickPropScale( BAR_INCREMENT );
+			width = ((width + (increment-1)) / increment) * increment;  // round to nearest BAR_INCREMENT
 
 			int wide, tall;
 			m_pMicMeter2->GetSize(wide, tall);

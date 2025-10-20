@@ -205,7 +205,8 @@ void CGameUI::Initialize( CreateInterfaceFn factory )
 
 	// setup base panel
 	staticPanel = new CBasePanel();
-	staticPanel->SetBounds(0, 0, 400, 300 );
+	// dimhotepus: Scale UI.
+	staticPanel->SetBounds(0, 0, vgui::scheme()->GetProportionalScaledValue(400), vgui::scheme()->GetProportionalScaledValue(300) );
 	staticPanel->SetPaintBorderEnabled( false );
 	staticPanel->SetPaintBackgroundEnabled( true );
 	staticPanel->SetPaintEnabled( false );

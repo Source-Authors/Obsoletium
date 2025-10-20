@@ -69,7 +69,8 @@ CGameSavePanel::CGameSavePanel( CSaveGameBrowserDialog *parent, SaveGameDescript
 
 	int px, py;
 	m_pLevelPicBorder->GetPos( px, py );
-	SetSize( m_pLevelPicBorder->GetWide(), py + m_pLevelPicBorder->GetTall() + ( m_pType->GetTall() + 16 ) );
+	// dimhotepus: Scale UI.
+	SetSize( m_pLevelPicBorder->GetWide(), py + m_pLevelPicBorder->GetTall() + ( m_pType->GetTall() + QuickPropScale( 16 ) ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -277,9 +278,10 @@ void CSaveGameBrowserDialog::LayoutPanels( void )
 		HideNoSaveGameUI();
 
 		// Layout panel positions relative to the dialog center.
-		int panelWidth = m_SavePanels[0]->GetWide() + 16;
+		// dimhotepus: Scale UI.
+		int panelWidth = m_SavePanels[0]->GetWide() + QuickPropScale( 16 );
 		int dialogWidth = GetWide();
-		m_PanelXPos[2] = ( dialogWidth - panelWidth ) / 2 + 8;
+		m_PanelXPos[2] = ( dialogWidth - panelWidth ) / 2 + QuickPropScale( 8 );
 		m_PanelXPos[1] = m_PanelXPos[2] - panelWidth;
 		m_PanelXPos[0] = m_PanelXPos[1];
 		m_PanelXPos[3] = m_PanelXPos[2] + panelWidth;
@@ -294,8 +296,9 @@ void CSaveGameBrowserDialog::LayoutPanels( void )
 		int panelHeight;
 		m_SavePanels[0]->GetSize( panelWidth, panelHeight );
 		m_pCenterBg->SetVisible( true );
-		m_pCenterBg->SetWide( panelWidth + 16 );
-		m_pCenterBg->SetPos( m_PanelXPos[2] - 8, m_PanelYPos[2] - (panelHeight - m_nCenterBgTallDefault) + 8 );
+		// dimhotepus: Scale UI.
+		m_pCenterBg->SetWide( panelWidth + QuickPropScale( 16 ) );
+		m_pCenterBg->SetPos( m_PanelXPos[2] - QuickPropScale( 8 ), m_PanelYPos[2] - (panelHeight - m_nCenterBgTallDefault) + QuickPropScale( 8 ) );
 		m_pCenterBg->SetBgColor( Color( 190, 115, 0, 255 ) );
 	}
 	else
@@ -353,7 +356,8 @@ void CSaveGameBrowserDialog::AnimateDialogStart( void )
 	CGameSavePanel *selectedPanel = GetActivePanel();
 	if ( selectedPanel && selectedPanel->IsAutoSaveType() )
 	{
-		m_pCenterBg->SetTall( m_nCenterBgTallDefault + 20 );
+		// dimhotepus: Scale UI.
+		m_pCenterBg->SetTall( m_nCenterBgTallDefault + QuickPropScale( 20 ) );
 	}
 	else
 	{
@@ -388,10 +392,12 @@ void CSaveGameBrowserDialog::ApplySettings( KeyValues *inResourceData )
 	int ypos = inResourceData->GetInt( "chapterypos", 20 );
 	for ( int i = 0; i < NUM_SLOTS; ++i )
 	{
-		m_PanelYPos[i] = ypos;
+		// dimhotepus: Scale UI.
+		m_PanelYPos[i] = QuickPropScale( ypos );
 	}
 
-	m_nCenterBgTallDefault = inResourceData->GetInt( "centerbgtall", 0 );
+	// dimhotepus: Scale UI.
+	m_nCenterBgTallDefault = QuickPropScale( inResourceData->GetInt( "centerbgtall", 0 ) );
 	m_pCenterBg->SetTall( m_nCenterBgTallDefault );
 
 	m_ScrollSpeedSlow = inResourceData->GetFloat( "scrollslow", 0.0f );
@@ -973,7 +979,8 @@ void CSaveGameBrowserDialog::FinishScroll( void )
 	CGameSavePanel *selectedPanel = GetActivePanel();
 	if ( selectedPanel && selectedPanel->IsAutoSaveType() )
 	{
-		m_pCenterBg->SetTall( m_nCenterBgTallDefault + 20 );
+		// dimhotepus: Scale UI.
+		m_pCenterBg->SetTall( m_nCenterBgTallDefault + QuickPropScale( 20 ) );
 	}
 	else
 	{

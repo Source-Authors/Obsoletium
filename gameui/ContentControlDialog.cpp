@@ -43,7 +43,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CContentControlDialog::CContentControlDialog(vgui::Panel *parent) : vgui::Frame(parent, "ContentControlDialog")
 {
-	SetBounds(0, 0, 372, 160);
+	// dimhotepus: Scale UI.
+	SetBounds(0, 0, QuickPropScale( 372 ), QuickPropScale( 160 ));
 	SetSizeable( false );
 
 	SetTitle( "#GameUI_ContentLock", true );

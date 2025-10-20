@@ -80,7 +80,8 @@ mpcontrol_t::mpcontrol_t( Panel *parent, char const *panelName )
 
 void mpcontrol_t::OnSizeChanged( int wide, int tall )
 {
-	int inset = 4;
+	// dimhotepus: Scale UI.
+	int inset = QuickPropScale( 4 );
 
 	if ( pPrompt )
 	{
@@ -88,9 +89,9 @@ void mpcontrol_t::OnSizeChanged( int wide, int tall )
 
 		if ( pControl )
 		{
-			pControl->SetBounds( w + 20, inset, w - 20, tall - 2 * inset );
+			pControl->SetBounds( w + QuickPropScale( 20 ), inset, w - QuickPropScale( 20 ), tall - 2 * inset );
 		}
-		pPrompt->SetBounds( 0, inset, w + 20, tall - 2 * inset  );
+		pPrompt->SetBounds( 0, inset, w + QuickPropScale( 20 ), tall - 2 * inset  );
 	}
 	else
 	{

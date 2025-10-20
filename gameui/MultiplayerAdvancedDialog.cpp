@@ -44,7 +44,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CMultiplayerAdvancedDialog::CMultiplayerAdvancedDialog(vgui::Panel *parent) : BaseClass(NULL, "MultiplayerAdvancedDialog")
 {
-	SetBounds(0, 0, 372, 160);
+	// dimhotepus: Scale UI.
+	SetBounds(0, 0, QuickPropScale( 372 ), QuickPropScale( 160 ));
 	SetSizeable( false );
 
 	SetTitle("#GameUI_MultiplayerAdvanced", true);
@@ -345,10 +346,12 @@ void CMultiplayerAdvancedDialog::CreateControls()
 		case O_STRING:
 		case O_NUMBER:
 		case O_LIST:
-			pCtrl->SetSize( 100, 28 );
+			// dimhotepus: Scale UI.
+			pCtrl->SetSize( QuickPropScale( 100 ), QuickPropScale( 28 ) );
 			break;
 		case O_SLIDER:
-			pCtrl->SetSize( 100, 40 );
+			// dimhotepus: Scale UI.
+			pCtrl->SetSize( QuickPropScale( 100 ), QuickPropScale( 40 ) );
 			break;
 		default:
 			break;

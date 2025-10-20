@@ -262,7 +262,8 @@ public:
 	COptionsSubVideoAdvancedDlg( vgui::Panel *parent ) : BaseClass( parent , "OptionsSubVideoAdvancedDlg" )
 	{
 		SetTitle("#GameUI_VideoAdvanced_Title", true);
-		SetSize( 260, 400 );
+		// dimhotepus: Scale UI.
+		SetSize( QuickPropScale( 260 ), QuickPropScale( 400 ) );
 
 		m_pDXLevel = new ComboBox(this, "dxlabel", 6, false );
 

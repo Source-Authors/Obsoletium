@@ -60,15 +60,16 @@ void CTextEntryBox::PerformLayout()
 	GetClientArea(x, y, wide, tall);
 	wide += x;
 	tall += y;
-
-	constexpr int borderW = 10;
+	// dimhotepus: Scale UI.
+	const int borderW = QuickPropScale( 10 );
 
 	int labelW, labelH;
 	int entryW, entryH;
 	m_pMessageLabel->GetSize( labelW, labelH );
-
-	entryW = max(120, wide - borderW - borderW - borderW - labelW);
-	entryH = max(24, labelH);
+	
+	// dimhotepus: Scale UI.
+	entryW = max(QuickPropScale( 120 ), wide - borderW - borderW - borderW - labelW);
+	entryH = max(QuickPropScale( 24 ), labelH);
 	m_pEntry->SetSize( entryW, entryH );
 
 	int boxWidth, boxTall;

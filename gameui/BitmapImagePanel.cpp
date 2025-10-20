@@ -20,7 +20,8 @@ CBitmapImagePanel::CBitmapImagePanel( Panel *parent, char const *panelName,
 	m_bUploaded = false;
 	m_nTextureId = -1;
 
-	SetBounds( 0, 0, 100, 100 );
+	// dimhotepus: Scale UI.	
+	SetBounds( 0, 0, QuickPropScale( 100 ), QuickPropScale( 100 ) );
 
 	if ( filename && filename[ 0 ] )
 	{

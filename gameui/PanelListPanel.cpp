@@ -58,7 +58,8 @@ void VScrollBarReversedButtons::ApplySchemeSettings( IScheme *pScheme )
 //-----------------------------------------------------------------------------
 CPanelListPanel::CPanelListPanel( vgui::Panel *parent, char const *panelName, bool inverseButtons ) : Panel( parent, panelName )
 {
-	SetBounds( 0, 0, 100, 100 );
+	// dimhotepus: Scale UI.
+	SetBounds( 0, 0, QuickPropScale( 100 ), QuickPropScale( 100 ) );
 	_sliderYOffset = 0;
 
 	if (inverseButtons)
@@ -69,12 +70,14 @@ CPanelListPanel::CPanelListPanel( vgui::Panel *parent, char const *panelName, bo
 	{
 		_vbar = new ScrollBar(this, "CPanelListPanelVScroll", true );
 	}
-	_vbar->SetBounds( 0, 0, 20, 20 );
+	// dimhotepus: Scale UI.
+	_vbar->SetBounds( 0, 0, QuickPropScale( 20 ), QuickPropScale( 20 ) );
 	_vbar->SetVisible(false);
 	_vbar->AddActionSignalTarget( this );
 
 	_embedded = new Panel( this, "PanelListEmbedded" );
-	_embedded->SetBounds( 0, 0, 20, 20 );
+	// dimhotepus: Scale UI.
+	_embedded->SetBounds( 0, 0, QuickPropScale( 20 ), QuickPropScale( 20 ) );
 	_embedded->SetPaintBackgroundEnabled( false );
 	_embedded->SetPaintBorderEnabled( false );
 }
@@ -111,7 +114,8 @@ int	CPanelListPanel::computeVPixelsNeeded( void )
 
 		pixels += h;
 	}
-	pixels+=5; // add a buffer after the last item
+	// dimhotepus: Scale UI.
+	pixels+=QuickPropScale( 5 ); // add a buffer after the last item
 
 	return pixels;
 
@@ -241,17 +245,21 @@ void CPanelListPanel::PerformLayout()
 	//!! need to make it recalculate scroll positions
 	_vbar->SetVisible(true);
 	_vbar->SetEnabled(false);
-	_vbar->SetRange( 0, vpixels - tall + 24);
+	// dimhotepus: Scale UI.
+	_vbar->SetRange( 0, vpixels - tall + QuickPropScale( 24 ));
 	_vbar->SetRangeWindow( 24 /*vpixels / 10*/ );
 	_vbar->SetButtonPressedScrollValue( 24 );
-	_vbar->SetPos(wide - 20, _sliderYOffset);
-	_vbar->SetSize(18, tall - 2 - _sliderYOffset);
+	// dimhotepus: Scale UI.
+	_vbar->SetPos(wide - QuickPropScale( 20 ), _sliderYOffset);
+	// dimhotepus: Scale UI.
+	_vbar->SetSize(QuickPropScale( 18 ), tall - QuickPropScale( 2 ) - _sliderYOffset);
 	_vbar->InvalidateLayout();
 
 	int top = _vbar->GetValue();
 
 	_embedded->SetPos( 0, -top );
-	_embedded->SetSize( wide-20, vpixels );
+	// dimhotepus: Scale UI.
+	_embedded->SetSize( wide- QuickPropScale( 20 ), vpixels );
 
 	// Now lay out the controls on the embedded panel
 	int y = 0;
@@ -263,7 +271,8 @@ void CPanelListPanel::PerformLayout()
 			continue;
 
 		h = item->panel->GetTall();
-		item->panel->SetBounds( 8, y, wide-36, h );
+		// dimhotepus: Scale UI.
+		item->panel->SetBounds( QuickPropScale( 8 ), y, wide-QuickPropScale( 36 ), h );
 	}
 }
 
