@@ -709,9 +709,9 @@ class CPhysicsGameTrace : public IPhysicsGameTrace
 {
 public:
 
-	void VehicleTraceRay( const Ray_t &ray, void *pVehicle, trace_t *pTrace );
-	void VehicleTraceRayWithWater( const Ray_t &ray, void *pVehicle, trace_t *pTrace );
-	bool VehiclePointInWater( const Vector &vecPoint );
+	void VehicleTraceRay( const Ray_t &ray, void *pVehicle, trace_t *pTrace ) override;
+	void VehicleTraceRayWithWater( const Ray_t &ray, void *pVehicle, trace_t *pTrace ) override;
+	bool VehiclePointInWater( const Vector &vecPoint ) override;
 };
 
 CPhysicsGameTrace g_PhysGameTrace;
