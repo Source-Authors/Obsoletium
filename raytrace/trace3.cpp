@@ -42,14 +42,14 @@ void RayTracingEnvironment::AddBSPFace(int id,dface_t const &face)
 // 		return;
 	if (tx)
 	{
-		printf("id %d flags=%x\n",id,tx->flags);
+		DevMsg("id %d flags=%x\n",id,tx->flags);
 	}
-	printf("side: ");
+	DevMsg("side: ");
 	for(int v=0;v<face.numedges;v++)
 	{
-		printf("(%f %f %f) ",XYZ(VertCoord(face,v)));
+		DevMsg("(%f %f %f) ",XYZ(VertCoord(face,v)));
 	}
-	printf("\n");
+	DevMsg("\n");
 	int ntris=face.numedges-2;
 	for(int tri=0;tri<ntris;tri++)
 	{

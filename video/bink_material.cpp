@@ -147,7 +147,7 @@ CBinkMaterial::~CBinkMaterial()
 
 void CBinkMaterial::Reset()
 {
-	printf("CBinkMaterial::Reset()\n");
+	DevMsg("CBinkMaterial::Reset()\n");
 
 	SetFileName( nullptr );
 
@@ -353,7 +353,7 @@ VideoResult_t CBinkMaterial::SoundDeviceCommand( VideoSoundDeviceOperation_t ope
 //-----------------------------------------------------------------------------
 bool CBinkMaterial::Init( const char *pMaterialName, const char *pFileName, VideoPlaybackFlags_t flags )
 {
-	printf("CBinkMaterial::Init\n");
+	DevMsg("CBinkMaterial::Init\n");
 
 	SetResult( VideoResult::BAD_INPUT_PARAMETERS );
 	AssertExitF( IS_NOT_EMPTY( pFileName ) );
@@ -501,7 +501,7 @@ bool CBinkMaterial::StartVideo()
 
 	m_NextInterestingTimeToPlay = Plat_FloatTime();
 
-	printf("Movie start time = %lf\n", Plat_FloatTime());
+	DevMsg("Movie start time = %lf\n", Plat_FloatTime());
 
 	// Transition to playing state
 	m_bMovieInitialized = false;
@@ -702,7 +702,7 @@ bool CBinkMaterial::SetTime( float flTime )
 //-----------------------------------------------------------------------------
 void CBinkMaterial::CreateProceduralTexture( const char *pTextureName )
 {
-	printf("CBinkMaterial::CreateProceduralTexture\n");
+	DevMsg("CBinkMaterial::CreateProceduralTexture\n");
 
 	AssertIncRange( m_VideoFrameWidth, cMinVideoFrameWidth, cMaxVideoFrameWidth );
 	AssertIncRange( m_VideoFrameHeight, cMinVideoFrameHeight, cMaxVideoFrameHeight );
@@ -793,7 +793,7 @@ void CBinkMaterial::OpenMovie( const char *theMovieFileName )
 	AssertExit( IS_NOT_EMPTY( theMovieFileName ) );
 
 	SetFileName( theMovieFileName );
-	printf("CBinkMaterial::OpenMovie( \"%s\" )\n", theMovieFileName);
+	DevMsg("CBinkMaterial::OpenMovie( \"%s\" )\n", theMovieFileName);
 
 	m_bMovieInitialized = true;
 }
