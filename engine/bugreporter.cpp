@@ -201,11 +201,22 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 		// Display version, service pack (if any), and build number.
 		
 		char build[256];
-		Q_snprintf (build, sizeof( build ), "%s (Build %lu) version %lu.%lu (super user: %s)",
+		Q_snprintf (build, sizeof( build ), "%s (Build %lu) version %lu.%lu (%s) (super user: %s)",
 			osvi.szCSDVersion,
 			osvi.dwBuildNumber & 0xFFFF,
 			osvi.dwMajorVersion,
 			osvi.dwMinorVersion,
+#ifdef PLATFORM_ARM_64
+			"AArch64",
+#elif defined(PLATFORM_ARM_32)
+			"ARM32",
+#elif defined(PLATFORM_64BITS)
+			"x86-64",
+#elif defined(PLATFORM_X86)
+			"x86",
+#else
+			"N/A",
+#endif
 			Plat_IsUserAnAdmin() ? "yes" : "no" );
 		Q_strncat ( osversion, build, maxlen, COPY_ALL_CHARACTERS );
 		break;
@@ -237,8 +248,23 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 				intp ccVersion = Q_strlen(pchVersion); // trim the \n
 				Q_strncpy ( osversion, pchVersion, ccVersion );
 				osversion[ ccVersion ] = 0;
-				Q_strncat ( osversion, " (super user: " );
-				Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)" );
+
+				Q_strncat ( osversion,
+#ifdef PLATFORM_ARM_64
+					"AArch64",
+#elif defined(PLATFORM_ARM_32)
+					"ARM32",
+#elif defined(PLATFORM_64BITS)
+					"x86-64",
+#elif defined(PLATFORM_X86)
+					"x86",
+#else
+					"N/A",
+#endif
+					maxlen
+				);
+				Q_strncat ( osversion, " (super user: ", maxlen );
+				Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)", maxlen );
 				break;
 			}
 		}
@@ -255,8 +281,24 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 	{
 		fgets( osversion, maxlen, fpKernelVer );
 		osversion[ maxlen - 1 ] = 0;
-		Q_strncat ( osversion, " (super user: " );
-		Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)" );
+
+		Q_strncat ( osversion,
+#ifdef PLATFORM_ARM_64
+			"AArch64",
+#elif defined(PLATFORM_ARM_32)
+			"ARM32",
+#elif defined(PLATFORM_64BITS)
+			"x86-64",
+#elif defined(PLATFORM_X86)
+			"x86",
+#else
+			"N/A",
+#endif
+			maxlen
+		);
+
+		Q_strncat ( osversion, " (super user: ", maxlen );
+		Q_strncat ( osversion, Plat_IsUserAnAdmin() ? "yes)" : "no)", maxlen );
 
 		char *szlf = Q_strrchr( osversion, '\n' );
 		if( szlf )
