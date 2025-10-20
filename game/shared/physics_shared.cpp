@@ -15,7 +15,7 @@
 #include "vphysics/object_hash.h"
 #include "vphysics/friction.h"
 #include "coordsize.h"
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "decals.h"
 #include "IEffects.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
@@ -124,7 +124,7 @@ IPhysicsObject *PhysModelCreateBox( CBaseEntity *pEntity, const Vector &mins, co
 			}
 		}
 	}
-	Q_strncpy( solid.surfaceprop, pSurfaceProps, sizeof( solid.surfaceprop ) );
+	V_strcpy_safe( solid.surfaceprop, pSurfaceProps );
 
 	CPhysCollide *pCollide = PhysCreateBbox( mins, maxs );
 	if ( !pCollide )
@@ -164,7 +164,7 @@ IPhysicsObject *PhysModelCreateOBB( CBaseEntity *pEntity, const Vector &mins, co
 			}
 		}
 	}
-	Q_strncpy( solid.surfaceprop, pSurfaceProps, sizeof( solid.surfaceprop ) );
+	V_strcpy_safe( solid.surfaceprop, pSurfaceProps );
 
 	CPhysCollide *pCollide = PhysCreateBbox( mins, maxs );
 	if ( !pCollide )
@@ -479,7 +479,7 @@ void PhysGetDefaultAABBSolid( solid_t &solid )
 	solid.params = g_PhysDefaultObjectParams;
 	solid.params.mass = 85.0f;
 	solid.params.inertia = 1e24f;
-	Q_strncpy( solid.surfaceprop, "default", sizeof( solid.surfaceprop ) );
+	V_strcpy_safe( solid.surfaceprop, "default" );
 }
 
 //-----------------------------------------------------------------------------
@@ -570,7 +570,7 @@ void PhysCreateVirtualTerrain( CBaseEntity *pWorld, const objectparams_t &defaul
 			solid.params = defaultParams;
 			solid.params.enableCollisions = true;
 			solid.params.pGameData = pWorld;
-			Q_snprintf(nameBuf, sizeof(nameBuf), "vdisp_%04d", i );
+			V_sprintf_safe(nameBuf, "vdisp_%04d", i );
 			solid.params.pName = nameBuf;
 			int surfaceData = physprops->GetSurfaceIndex( "default" );
 			// create this as part of the world
