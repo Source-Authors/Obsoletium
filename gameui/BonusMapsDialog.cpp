@@ -84,7 +84,8 @@ public:
 		CMouseMessageForwardingPanel *panel = new CMouseMessageForwardingPanel(this, NULL);
 		panel->SetZPos(2);
 
-		SetSize( 200, 140 );
+		// dimhotepus: Scale UI.
+		SetSize( QuickPropScale( 200 ), QuickPropScale( 140 ) );
 
 		LoadControlSettings( "resource/BonusMapPanel.res" );
 
@@ -103,7 +104,7 @@ public:
 			if ( map.szImageName[ 0 ] == '\0' )
 			{
 				// use associate bonus folder icon
-				Q_snprintf( szImageFileName, sizeof(szImageFileName), "%s/foldericon.tga", map.szFileName );
+				V_sprintf_safe( szImageFileName, "%s/foldericon.tga", map.szFileName );
 				bIsTGA = true;
 
 				// use default folder icon
@@ -145,14 +146,16 @@ public:
 		if ( bIsTGA )
 		{
 			m_pBonusMapTGAImage->SetTGANonMod( szImageFileName );
-			m_pBonusMapTGAImage->SetSize( 180, 100 );
+			// dimhotepus: Scale UI.
+			m_pBonusMapTGAImage->SetSize( QuickPropScale( 180 ), QuickPropScale( 100 ) );
 			m_pBonusMapTGAImage->SetVisible( true );
 			m_pBonusMapImage->SetVisible( false );
 		}
 		else
 		{
 			m_pBonusMapImage->SetImage( szImageFileName );
-			m_pBonusMapImage->SetSize( 180, 100 );
+			// dimhotepus: Scale UI.
+			m_pBonusMapImage->SetSize( QuickPropScale( 180 ), QuickPropScale( 100 ) );
 			m_pBonusMapImage->SetVisible( true );
 			m_pBonusMapTGAImage->SetVisible( false );
 		}
@@ -286,11 +289,11 @@ bool CBonusMapsDialog::ImportZippedBonusMaps( const char *pchZippedFileName )
 	// It's going to go in the maps folder
 	char szOutFilename[ 512 ];
 
-	Q_snprintf( szOutFilename, sizeof( szOutFilename ), "maps%s", pchShortFileName );
-	Q_StripExtension( szOutFilename, szOutFilename, sizeof( szOutFilename ) );
+	V_sprintf_safe( szOutFilename, "maps%s", pchShortFileName );
+	V_StripExtension( szOutFilename, szOutFilename );
 
 	// If there's already a folder by the same name we're going to tack a number onto the end
-	intp iOutFilenameLength = Q_strlen( szOutFilename );
+	intp iOutFilenameLength = V_strlen( szOutFilename );
 	intp iSameFolderCount = 1;
 
 	while ( g_pFullFileSystem->FileExists( szOutFilename, "MOD" ) )
@@ -303,7 +306,7 @@ bool CBonusMapsDialog::ImportZippedBonusMaps( const char *pchZippedFileName )
 		}
 
 		szOutFilename[ iOutFilenameLength ] = '\0';
-		Q_snprintf( szOutFilename, sizeof( szOutFilename ), "%s%02i", szOutFilename, iSameFolderCount );
+		V_sprintf_safe( szOutFilename, "%s%02i", szOutFilename, iSameFolderCount );
 	}
 
 	// Pull the files out of the zip
@@ -336,7 +339,7 @@ void CBonusMapsDialog::BuildMapsList( void )
 	SetControlVisible( "ImportBonusMaps", bIsRoot );
 
 	char szDisplayPath[MAX_PATH];
-	Q_snprintf( szDisplayPath, MAX_PATH, "%s/", BonusMapsDatabase()->GetPath() );
+	V_sprintf_safe( szDisplayPath, "%s/", BonusMapsDatabase()->GetPath() );
 
 	SetControlString( "FileName", szDisplayPath );
 	SetControlString( "CommentLabel", "" );
@@ -346,7 +349,7 @@ void CBonusMapsDialog::BuildMapsList( void )
 	// add to the list
 	for ( intp iMapIndex = 0; iMapIndex < iMapCount && iMapIndex < MAX_LISTED_BONUS_MAPS; ++iMapIndex )
 	{
-		CBonusMapPanel *bonusMapPanel = new CBonusMapPanel( m_pGameList, "BonusMapPanel", iMapIndex );
+		auto *bonusMapPanel = new CBonusMapPanel( m_pGameList, "BonusMapPanel", iMapIndex );
 		bonusMapPanel->SetBonusMapInfo( BonusMapsDatabase()->GetPath(), *(BonusMapsDatabase()->GetBonusData( iMapIndex )) );
 		m_pGameList->AddItem( NULL, bonusMapPanel );
 	}
@@ -354,7 +357,7 @@ void CBonusMapsDialog::BuildMapsList( void )
 	// display a message if there are no save games
 	if ( iMapCount <= 0 )
 	{
-		vgui::Label *pNoSavesLabel = SETUP_PANEL(new Label(m_pGameList, "NoBonusMapsLabel", "#GameUI_NoBonusMapsToDisplay"));
+		auto *pNoSavesLabel = SETUP_PANEL(new Label(m_pGameList, "NoBonusMapsLabel", "#GameUI_NoBonusMapsToDisplay"));
 		pNoSavesLabel->SetTextColorState(vgui::Label::CS_DULL);
 		m_pGameList->AddItem( NULL, pNoSavesLabel );
 		m_pGameList->SetNumColumns( 1 );
@@ -420,13 +423,13 @@ void CBonusMapsDialog::RefreshData( void )
 {
 	for ( int iMap = 0; iMap < m_pGameList->GetItemCount(); ++iMap )
 	{
-		CBonusMapPanel *pBonusMapPanel = (CBonusMapPanel *)m_pGameList->GetItemPanel( iMap );
+		auto *pBonusMapPanel = (CBonusMapPanel *)m_pGameList->GetItemPanel( iMap );
 
 		if ( pBonusMapPanel )
 			pBonusMapPanel->SetBonusMapInfo( BonusMapsDatabase()->GetPath(), *(BonusMapsDatabase()->GetBonusData( pBonusMapPanel->GetBonusMapListItemID() ) ) );
 	}
 
-	CBonusMapPanel *pSelectedBonusMapPanel = (CBonusMapPanel *)m_pGameList->GetSelectedPanel();
+	auto *pSelectedBonusMapPanel = (CBonusMapPanel *)m_pGameList->GetSelectedPanel();
 	if ( !pSelectedBonusMapPanel )
 		return;
 
@@ -528,12 +531,12 @@ void CBonusMapsDialog::RefreshMedalDisplay( BonusMapDescription_t *pMap )
 					GetChallengeMedals( pChallengeDescription, iBest, iEarnedMedal, iNext, iNextMedal );
 
 					if ( iChallengeNum < 10 )
-						Q_snprintf( szBuff, 256, "medals/medal_0%i_%s", iChallengeNum, g_pszMedalNames[ iEarnedMedal ] );
+						V_sprintf_safe( szBuff, "medals/medal_0%i_%s", iChallengeNum, g_pszMedalNames[ iEarnedMedal ] );
 					else
-						Q_snprintf( szBuff, 256, "medals/medal_%i_%s", iChallengeNum, g_pszMedalNames[ iEarnedMedal ] );
+						V_sprintf_safe( szBuff, "medals/medal_%i_%s", iChallengeNum, g_pszMedalNames[ iEarnedMedal ] );
 				}
 
-				CBitmapImagePanel *pBitmap = dynamic_cast<CBitmapImagePanel*>( GetChild( iFirstChildIndex + iChallengeNum ) );
+				auto *pBitmap = dynamic_cast<CBitmapImagePanel*>( GetChild( iFirstChildIndex + iChallengeNum ) );
 				pBitmap->SetVisible( true );
 				pBitmap->setTexture( szBuff );
 			}
@@ -544,7 +547,7 @@ void CBonusMapsDialog::RefreshMedalDisplay( BonusMapDescription_t *pMap )
 
 	ChallengeDescription_t *pChallengeDescription = NULL;
 
-	for ( int i = 0 ; i < pMap->m_pChallenges->Count(); ++i )
+	for ( intp i = 0 ; i < pMap->m_pChallenges->Count(); ++i )
 	{
 		int iType = ((*pMap->m_pChallenges)[ i ]).iType;
 
@@ -573,11 +576,11 @@ void CBonusMapsDialog::RefreshMedalDisplay( BonusMapDescription_t *pMap )
 	if ( iEarnedMedal > -1 )
 	{
 		if ( iChallenge < 10 )
-			Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
+			V_sprintf_safe( szBuff, "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
 		else
-			Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
+			V_sprintf_safe( szBuff, "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iEarnedMedal ] );
 
-		CBitmapImagePanel *pBitmap = dynamic_cast<CBitmapImagePanel*>( FindChildByName( "ChallengeEarnedMedal" ) );
+		auto *pBitmap = dynamic_cast<CBitmapImagePanel*>( FindChildByName( "ChallengeEarnedMedal" ) );
 		pBitmap->SetVisible( true );
 		pBitmap->setTexture( szBuff );
 	}
@@ -586,11 +589,11 @@ void CBonusMapsDialog::RefreshMedalDisplay( BonusMapDescription_t *pMap )
 	if ( iNextMedal > 0 )
 	{
 		if ( iChallenge < 10 )
-			Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
+			V_sprintf_safe( szBuff, "medals/medal_0%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
 		else
-			Q_snprintf( szBuff, sizeof( szBuff ), "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
+			V_sprintf_safe( szBuff, "medals/medal_%i_%s", iChallenge, g_pszMedalNames[ iNextMedal ] );
 
-		CBitmapImagePanel *pBitmap = dynamic_cast<CBitmapImagePanel*>( FindChildByName( "ChallengeNextMedal" ) );
+		auto *pBitmap = dynamic_cast<CBitmapImagePanel*>( FindChildByName( "ChallengeNextMedal" ) );
 		pBitmap->SetVisible( true );
 		pBitmap->setTexture( szBuff );
 	}
@@ -605,7 +608,7 @@ void CBonusMapsDialog::RefreshMedalDisplay( BonusMapDescription_t *pMap )
 	// Best label
 	if ( iBest != -1 )
 	{
-		Q_snprintf( szBuff, sizeof( szBuff ), "%i", iBest );
+		V_to_chars( szBuff, iBest );
 		g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2 );
 		g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( "#GameUI_BonusMapsBest" ), 1, szWideBuff2 );
 		g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
@@ -619,7 +622,7 @@ void CBonusMapsDialog::RefreshMedalDisplay( BonusMapDescription_t *pMap )
 	// Next label
 	if ( iNext != -1 )
 	{
-		Q_snprintf( szBuff, sizeof( szBuff ), "%i", iNext );
+		V_to_chars( szBuff, iNext );
 		g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2 );
 		g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( "#GameUI_BonusMapsGoal" ), 1, szWideBuff2 );
 		g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
@@ -638,9 +641,9 @@ void CBonusMapsDialog::RefreshCompletionPercentage( void )
 	{
 		char szBuff[ 256 ];
 		if ( fPercentage * 100.0f < 1.0f )
-			Q_snprintf( szBuff, 256, "%.2f%%", fPercentage * 100.0f );	// Show decimal places if less than 1%
+			V_sprintf_safe( szBuff, "%.2f%%", fPercentage * 100.0f );	// Show decimal places if less than 1%
 		else
-			Q_snprintf( szBuff, 256, "%.0f%%", fPercentage * 100.0f );
+			V_sprintf_safe( szBuff, "%.0f%%", fPercentage * 100.0f );
 
 		SetControlString( "PercentageText", szBuff );
 		SetControlVisible( "PercentageText", true );
@@ -695,7 +698,7 @@ void CBonusMapsDialog::OnCommand( const char *command )
 				return;			
 
 			const char *shortName = pBonusMap->szShortName;
-			if ( shortName && shortName[ 0 ] )
+			if ( !Q_isempty( shortName ) )
 			{
 				if ( pBonusMap->bIsFolder )
 				{
@@ -716,7 +719,7 @@ void CBonusMapsDialog::OnCommand( const char *command )
 
 					if ( iChallenge > 0 )
 					{
-						Q_snprintf( sz, sizeof( sz ), "sv_bonus_challenge %i\n", iChallenge );
+						V_sprintf_safe( sz, "sv_bonus_challenge %i\n", iChallenge );
 						engine->ClientCmd_Unrestricted( sz );
 
 						ChallengeDescription_t *pChallengeDescription = &((*pBonusMap->m_pChallenges)[ iChallenge - 1 ]);
@@ -728,7 +731,7 @@ void CBonusMapsDialog::OnCommand( const char *command )
 
 					if ( pBonusMap->szMapFileName[ 0 ] != '.' )
 					{
-						Q_snprintf( sz, sizeof( sz ), "map %s\n", pBonusMap->szMapFileName );
+						V_sprintf_safe( sz, "map %s\n", pBonusMap->szMapFileName );
 					}
 					else
 					{
@@ -742,7 +745,7 @@ void CBonusMapsDialog::OnCommand( const char *command )
 							{
 								++pchSubDir;
 								const char *pchMapFileName = pBonusMap->szMapFileName + 2;
-								Q_snprintf( sz, sizeof( sz ), "map %s/%s\n", pchSubDir, pchMapFileName );
+								V_sprintf_safe( sz, "map %s/%s\n", pchSubDir, pchMapFileName );
 							}
 						}
 					}
@@ -925,7 +928,7 @@ void CBonusMapsDialog::OnKeyCodePressed( vgui::KeyCode code )
 //-----------------------------------------------------------------------------
 void CBonusMapsDialog::OnPanelSelected()
 {
-	CBonusMapPanel *pSelectedBonusMapPanel = (CBonusMapPanel *)m_pGameList->GetSelectedPanel();
+	auto *pSelectedBonusMapPanel = (CBonusMapPanel *)m_pGameList->GetSelectedPanel();
 	if ( !pSelectedBonusMapPanel )
 		return;
 	
@@ -983,7 +986,7 @@ void CBonusMapsDialog::OnPanelSelected()
 
 void CBonusMapsDialog::OnControlModified()
 {
-	CBonusMapPanel *pSelectedBonusMapPanel = (CBonusMapPanel *)m_pGameList->GetSelectedPanel();
+	auto *pSelectedBonusMapPanel = (CBonusMapPanel *)m_pGameList->GetSelectedPanel();
 	if ( !pSelectedBonusMapPanel )
 		return;
 	BonusMapDescription_t *pMap = BonusMapsDatabase()->GetBonusData( pSelectedBonusMapPanel->GetBonusMapListItemID() );
