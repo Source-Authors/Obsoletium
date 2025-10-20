@@ -245,13 +245,14 @@ void URLButton::Paint(void)
 
 	int x, y;
 	int controlWidth, controlHeight, textWidth, textHeight;
-   GetSize(controlWidth, controlHeight);
-   GetContentSize(textWidth, textHeight);
-   x = textWidth;
-   y = controlHeight - 4;
-   
-   surface()->DrawSetColor(GetButtonFgColor());
-   surface()->DrawLine(0, y, x, y); 
+	GetSize(controlWidth, controlHeight);
+	GetContentSize(textWidth, textHeight);
+	x = textWidth;
+	// dimhotepus: Scale UI.
+	y = controlHeight - QuickPropScale( 4 );
+
+	surface()->DrawSetColor(GetButtonFgColor());
+	surface()->DrawLine(0, y, x, y); 
 }
 
 //-----------------------------------------------------------------------------
@@ -616,6 +617,7 @@ void URLButton::SizeToContents()
 {
 	int wide, tall;
 	GetContentSize(wide, tall);
-	SetSize(wide + Label::Content, tall + Label::Content);
+	// dimhotepus: Scale UI.
+	SetSize(wide + QuickPropScale( Label::Content ), tall + QuickPropScale( Label::Content ));
 }
 
