@@ -585,8 +585,12 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 	solid_t solid;
 	fluid_t fluid;
 
-	if ( !physenv )
+	// dimhotepus: Early exit on no world collide or solid count < 1.
+	if ( !physenv || !pWorldCollide || pWorldCollide->solidCount < 1 )
+	{
+		AssertMsg( false, "Missed essential env to create world." );
 		return NULL;
+	}
 
 	intp surfaceData = physprops->GetSurfaceIndex( "default" );
 
