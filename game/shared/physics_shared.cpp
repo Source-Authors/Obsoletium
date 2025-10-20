@@ -224,7 +224,7 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, int model
 	// collisions are off by default
 	solid.params.enableCollisions = true;
 
-	solid.params.pGameData = static_cast<void *>(pEntity);
+	solid.params.pGameData = pEntity;
 	solid.params.pName = STRING(pEntity->GetModelName());
 	return parsed;
 }
@@ -287,7 +287,7 @@ bool PhysModelParseSolidByIndex( solid_t &solid, CBaseEntity *pEntity, vcollide_
 	// collisions are off by default
 	solid.params.enableCollisions = true;
 
-	solid.params.pGameData = static_cast<void *>(pEntity);
+	solid.params.pGameData = pEntity;
 	solid.params.pName = STRING(pEntity->GetModelName());
 	return parsed;
 }
@@ -381,7 +381,7 @@ IPhysicsObject *PhysModelCreateUnmoveable( CBaseEntity *pEntity, int modelIndex,
 	{
 		surfaceProp = physprops->GetSurfaceIndex( solid.surfaceprop );
 	}
-	solid.params.pGameData = static_cast<void *>(pEntity);
+	solid.params.pGameData = pEntity;
 	solid.params.pName = STRING(pEntity->GetModelName());
 	IPhysicsObject *pObject = physenv->CreatePolyObjectStatic( pCollide->solids[0], surfaceProp, origin, angles, &solid.params );
 
@@ -428,7 +428,7 @@ IPhysicsObject *PhysModelCreateCustom( CBaseEntity *pEntity, const CPhysCollide 
 		pSolid = &tmpSolid;
 	}
 	int surfaceProp = physprops->GetSurfaceIndex( pSolid->surfaceprop );
-	pSolid->params.pGameData = static_cast<void *>(pEntity);
+	pSolid->params.pGameData = pEntity;
 	pSolid->params.pName = pName;
 	IPhysicsObject *pObject = NULL;
 	if ( isStatic )
@@ -465,7 +465,7 @@ IPhysicsObject *PhysSphereCreate( CBaseEntity *pEntity, float radius, const Vect
 		surfaceProp = physprops->GetSurfaceIndex( solid.surfaceprop );
 	}
 
-	solid.params.pGameData = static_cast<void *>(pEntity);
+	solid.params.pGameData = pEntity;
 	IPhysicsObject *pObject = physenv->CreateSphereObject( radius, surfaceProp, origin, vec3_angle, &solid.params, false );
 
 	return pObject;
@@ -569,7 +569,7 @@ void PhysCreateVirtualTerrain( CBaseEntity *pWorld, const objectparams_t &defaul
 			solid_t solid;
 			solid.params = defaultParams;
 			solid.params.enableCollisions = true;
-			solid.params.pGameData = static_cast<void *>(pWorld);
+			solid.params.pGameData = pWorld;
 			Q_snprintf(nameBuf, sizeof(nameBuf), "vdisp_%04d", i );
 			solid.params.pName = nameBuf;
 			int surfaceData = physprops->GetSurfaceIndex( "default" );
@@ -595,7 +595,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 	intp surfaceData = physprops->GetSurfaceIndex( "default" );
 
 	objectparams_t params = defaultParams;
-	params.pGameData = static_cast<void *>(pWorld);
+	params.pGameData = pWorld;
 	params.pName = "world";
 
 	IPhysicsObject *pWorldPhysics = physenv->CreatePolyObjectStatic( 
@@ -618,7 +618,7 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 			solid.params = defaultParams;
 			pParse->ParseSolid( &solid, &g_SolidSetup );
 			solid.params.enableCollisions = true;
-			solid.params.pGameData = static_cast<void *>(pWorld);
+			solid.params.pGameData = pWorld;
 			solid.params.pName = "world";
 			surfaceData = physprops->GetSurfaceIndex( "default" );
 
@@ -661,8 +661,8 @@ IPhysicsObject *PhysCreateWorld_Shared( CBaseEntity *pWorld, vcollide_t *pWorldC
 				solid.params = defaultParams;	// copy world's params
 				solid.params.enableCollisions = true;
 				solid.params.pName = "fluid";
-				solid.params.pGameData = static_cast<void *>(pWorld);
-				fluid.params.pGameData = static_cast<void *>(pWorld);
+				solid.params.pGameData = pWorld;
+				fluid.params.pGameData = pWorld;
 				surfaceData = physprops->GetSurfaceIndex( fluid.surfaceprop );
 				// create this as part of the world
 				IPhysicsObject *pWater = physenv->CreatePolyObjectStatic( pWorldCollide->solids[fluid.index], 
