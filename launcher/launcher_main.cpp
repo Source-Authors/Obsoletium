@@ -62,9 +62,9 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
-    Q_snprintf(out, std::size(out), "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
+    V_sprintf_safe(out, "[%.3f][%s] %s", Plat_FloatTime(), out_group, message);
   } else {
-    Q_snprintf(out, std::size(out), "%s", message);
+    V_sprintf_safe(out, "%s", message);
   }
 
   return out;
