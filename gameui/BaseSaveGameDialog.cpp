@@ -49,7 +49,7 @@ public:
 		m_pElapsedTimeLabel = new Label( this, "ElapsedTimeLabel", "" );
 		m_pFileTimeLabel = new Label( this, "FileTimeLabel", "" );
 
-		CMouseMessageForwardingPanel *panel = new CMouseMessageForwardingPanel(this, NULL);
+		auto *panel = new CMouseMessageForwardingPanel(this, NULL);
 		panel->SetZPos(2);
 
 		// dimhotepus: Scale UI.
