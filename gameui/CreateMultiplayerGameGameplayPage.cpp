@@ -49,7 +49,8 @@ public:
 //-----------------------------------------------------------------------------
 CCreateMultiplayerGameGameplayPage::CCreateMultiplayerGameGameplayPage(vgui::Panel *parent, const char *name) : PropertyPage(parent, name)
 {
-	SetSize( 10, 10 ); // Quiet "parent not sized yet" spew
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 10 ), QuickPropScale( 10 ) ); // Quiet "parent not sized yet" spew
 	m_pOptionsList = new CPanelListPanel(this, "GameOptions");
 
 	m_pDescription = new CServerDescription();
@@ -135,14 +136,12 @@ void CCreateMultiplayerGameGameplayPage::OnApplyChanges()
 	// Create the game.cfg file
 	if ( m_pDescription )
 	{
-		FileHandle_t fp;
-
 		// Add settings to config.cfg
 		m_pDescription->WriteToConfig();
 
 		// save out in the settings file
 		g_pFullFileSystem->CreateDirHierarchy( OPTIONS_DIR, "GAME" );
-		fp = g_pFullFileSystem->Open( OPTIONS_FILE, "wb", "GAME" );
+		FileHandle_t fp = g_pFullFileSystem->Open( OPTIONS_FILE, "wb", "GAME" );
 		if ( fp )
 		{
 			m_pDescription->WriteToScriptFile( fp );
@@ -239,7 +238,8 @@ void CCreateMultiplayerGameGameplayPage::LoadGameOptionsList()
 		}
 
 		pCtrl->pScrObj = pObj;
-		pCtrl->SetSize( 100, 28 );
+		// dimhotepus: Scale UI.
+		pCtrl->SetSize( QuickPropScale( 100 ), QuickPropScale( 28 ) );
 		//pCtrl->SetBorder( scheme()->GetBorder(1, "DepressedButtonBorder") );
 		m_pOptionsList->AddItem( pCtrl );
 

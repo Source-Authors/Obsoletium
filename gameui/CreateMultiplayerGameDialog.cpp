@@ -34,7 +34,8 @@ CCreateMultiplayerGameDialog::CCreateMultiplayerGameDialog(vgui::Panel *parent) 
 {
 	m_bBotsEnabled = false;
 	SetDeleteSelfOnClose(true);
-	SetSize(348, 460);
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 348 ), QuickPropScale( 460 ) );
 	
 	SetTitle("#GameUI_CreateServer", true);
 	SetOKButtonText("#GameUI_Start");
@@ -106,9 +107,9 @@ bool CCreateMultiplayerGameDialog::OnOK(bool applyOnly)
 
 	// get these values from m_pServerPage and store them temporarily
 	char szMapName[64], szHostName[64], szPassword[64];
-	strncpy(szMapName, m_pServerPage->GetMapName(), sizeof( szMapName ));
-	strncpy(szHostName, m_pGameplayPage->GetHostName(), sizeof( szHostName ));
-	strncpy(szPassword, m_pGameplayPage->GetPassword(), sizeof( szPassword ));
+	V_strcpy_safe(szMapName, m_pServerPage->GetMapName());
+	V_strcpy_safe(szHostName, m_pGameplayPage->GetHostName());
+	V_strcpy_safe(szPassword, m_pGameplayPage->GetPassword());
 
 	// save the config data
 	if (m_pSavedData)
@@ -130,7 +131,7 @@ bool CCreateMultiplayerGameDialog::OnOK(bool applyOnly)
 	char szMapCommand[1024];
 
 	// create the command to execute
-	Q_snprintf(szMapCommand, sizeof( szMapCommand ), "disconnect\nwait\nwait\nsv_lan 1\nsetmaster enable\nmaxplayers %i\nsv_password \"%s\"\nhostname \"%s\"\nprogress_enable\nmap %s\n",
+	V_sprintf_safe(szMapCommand, "disconnect\nwait\nwait\nsv_lan 1\nsetmaster enable\nmaxplayers %i\nsv_password \"%s\"\nhostname \"%s\"\nprogress_enable\nmap %s\n",
 		m_pGameplayPage->GetMaxPlayers(),
 		szPassword,
 		szHostName,
