@@ -486,9 +486,10 @@ void CControlPointPage::LayoutControlPointControls()
 		if ( !m_pControlPointName[i] )
 			continue;
 
-		int yVal = 8 + nFoundControlCount * 28;
-		m_pControlPointName[i]->SetBounds( 8, yVal, 48, 24 );
-		m_pControlPointValue[i]->SetBounds( 64, yVal, 160, 24 );
+		// dimhotepus: Scale UI,
+		int yVal = QuickPropScale( 8 ) + nFoundControlCount * QuickPropScale( 28 );
+		m_pControlPointName[i]->SetBounds( QuickPropScale( 8 ), yVal, QuickPropScale( 48 ), QuickPropScale( 24 ) );
+		m_pControlPointValue[i]->SetBounds( QuickPropScale( 64 ), yVal, QuickPropScale( 160 ), QuickPropScale( 24 ) );
 		++nFoundControlCount;
 	}
 }

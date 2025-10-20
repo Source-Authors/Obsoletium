@@ -543,7 +543,8 @@ void CElementTreeViewListControl::PerformLayout()
 				}
 
 				p->SetVisible( vis );
-				p->SetBounds( left + 4, top + offset, right - left, bottom - top );
+				// dimhotepus: Scale UI.
+				p->SetBounds( left + QuickPropScale( 4 ), top + offset, right - left, bottom - top );
 
 				p->InvalidateLayout();
 			}
@@ -890,28 +891,29 @@ void CPropertiesTreeToolbar::PerformLayout()
 	int w, h;
 	GetSize( w, h );
 
-	int buttonw = 75;
-	int buttonh =  h - 6;
+	// dimhotepus: Scale UI.
+	int buttonw = QuickPropScale( 75 );
+	int buttonh = h - QuickPropScale( 6 );
 
-	int x = 2;
+	int x = QuickPropScale( 2 );
 
-	m_pBack->SetBounds( x, 3, buttonw, buttonh );
+	m_pBack->SetBounds( x, QuickPropScale( 3 ), buttonw, buttonh );
 
-	x += buttonw + 2;
+	x += buttonw + QuickPropScale( 2 );
 
-	m_pFwd->SetBounds( x, 3, buttonw, buttonh );
+	m_pFwd->SetBounds( x, QuickPropScale( 3 ), buttonw, buttonh );
 
-	x += buttonw + 15;
+	x += buttonw + QuickPropScale( 15 );
 
-	m_pSearchLabel->SetBounds( x, 2, 50, buttonh );
+	m_pSearchLabel->SetBounds( x, QuickPropScale( 2 ), QuickPropScale( 50 ), buttonh );
 
-	x += 50 + 2;
+	x += QuickPropScale( 50 + 2 );
 
-	int textw = ( w - 2 ) - x;
+	int textw = ( w - QuickPropScale( 2 ) ) - x;
 
 	//textw -= 75;
 
-	m_pSearch->SetBounds( x, 2, textw, buttonh );
+	m_pSearch->SetBounds( x, QuickPropScale( 2 ), textw, buttonh );
 
 	//x += textw;
 
@@ -4397,7 +4399,8 @@ CElementPropertiesTree::CElementPropertiesTree( vgui::Panel *parent, IDmNotify *
 
 	SetSizeable( true );
 	SetCloseButtonVisible( false );
-	SetMinimumSize( 600, 200 );
+	// dimhotepus: Scale UI.
+	SetMinimumSize( QuickPropScale( 600 ), QuickPropScale( 200 ) );
 
 	m_pProperties = new CElementPropertiesTreeInternal( this, pNotify, pObject, false, pDict );
 

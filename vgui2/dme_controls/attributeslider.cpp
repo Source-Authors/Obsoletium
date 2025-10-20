@@ -859,7 +859,7 @@ float CAttributeSlider::GetPreview( AnimationControlType_t type ) const
 }
 
 // Estimates the value of the control given a local coordinate
-float CAttributeSlider::EstimateValueAtPos( int nLocalX, int nLocalY ) const
+float CAttributeSlider::EstimateValueAtPos( int nLocalX, int nLocalY )
 {
 	Rect_t rect;
 	GetControlRect( &rect, ANIM_CONTROL_VALUE );
@@ -892,10 +892,10 @@ void CAttributeSlider::PerformLayout()
 	}
 }
 
-void CAttributeSlider::GetControlRect( Rect_t *pRect, AnimationControlType_t type ) const
+void CAttributeSlider::GetControlRect( Rect_t *pRect, AnimationControlType_t type )
 {
 	int sw, sh;
-	const_cast<CAttributeSlider*>( this )->GetSize( sw, sh );
+	GetSize( sw, sh );
 
 	int cw, ch;
 	m_pCircleImage->GetSize( cw, ch );
@@ -903,21 +903,24 @@ void CAttributeSlider::GetControlRect( Rect_t *pRect, AnimationControlType_t typ
 	switch ( type )
 	{
 	case ANIM_CONTROL_VALUE:
-		pRect->x = 2 * SLIDER_PIXEL_SPACING + cw;
-		pRect->y = SLIDER_PIXEL_SPACING;
+		// dimhotepus: Scale UI.
+		pRect->x = 2 * QuickPropScale( SLIDER_PIXEL_SPACING ) + cw;
+		pRect->y = QuickPropScale( SLIDER_PIXEL_SPACING );
 		pRect->width = sw - pRect->x * 2;
-		pRect->height = max( 0, sh - SLIDER_PIXEL_SPACING * 2 );
+		pRect->height = max( 0, sh - QuickPropScale( SLIDER_PIXEL_SPACING ) * 2 );
 		break;
 /*
 	case ANIM_CONTROL_BALANCE:
-		pRect->x = SLIDER_PIXEL_SPACING;
+		// dimhotepus: Scale UI.
+		pRect->x = QuickPropScale( SLIDER_PIXEL_SPACING );
 		pRect->y = max( 0, sh - ch ) / 2;
 		pRect->width = cw;
 		pRect->height = min( ch, sh );
 		break;
 */
 	case ANIM_CONTROL_MULTILEVEL:
-		pRect->x = sw - SLIDER_PIXEL_SPACING - cw;
+		// dimhotepus: Scale UI.
+		pRect->x = sw - QuickPropScale( SLIDER_PIXEL_SPACING ) - cw;
 		pRect->y = max( 0, sh - ch ) / 2;
 		pRect->width = cw;
 		pRect->height = min( ch, sh );
@@ -1086,21 +1089,23 @@ void CAttributeSlider::DrawValueLabel( float flValue )
 	m_pValues[ 0 ]->SetText( sz );
 	m_pValues[ 0 ]->ResizeImageToContent();
 	m_pValues[ 0 ]->GetContentSize( cw, ch );
-	m_pValues[ 0 ]->SetPos( rect.x + 5, rect.y + ( rect.height - ch ) * 0.5f );
+	// dimhotepus: Scale UI.
+	m_pValues[ 0 ]->SetPos( rect.x + QuickPropScale( 5 ), rect.y + ( rect.height - ch ) / 2 );
 	m_pValues[ 0 ]->Paint();
 
 	Q_snprintf( sz, sizeof( sz ), "%.1f", flMaxVal );
 	m_pValues[ 2 ]->SetText( sz );
 	m_pValues[ 2 ]->ResizeImageToContent();
 	m_pValues[ 2 ]->GetContentSize( cw, ch );
-	m_pValues[ 2 ]->SetPos( rect.x + rect.width - cw - 5, rect.y + ( rect.height - ch ) * 0.5f );
+	// dimhotepus: Scale UI.
+	m_pValues[ 2 ]->SetPos( rect.x + rect.width - cw - QuickPropScale( 5 ), rect.y + ( rect.height - ch ) / 2 );
 	m_pValues[ 2 ]->Paint();
 
 	Q_snprintf( sz, sizeof( sz ), "%.3f", flValue );
 	m_pValues[ 1 ]->SetText( sz );
 	m_pValues[ 1 ]->ResizeImageToContent();
 	m_pValues[ 1 ]->GetContentSize( cw, ch );
-	m_pValues[ 1 ]->SetPos( rect.x + ( rect.width - cw ) * 0.5f, rect.y + ( rect.height - ch ) * 0.5f );
+	m_pValues[ 1 ]->SetPos( rect.x + ( rect.width - cw ) / 2, rect.y + ( rect.height - ch ) / 2 );
 	m_pValues[ 1 ]->Paint();
 }
 
@@ -1131,7 +1136,7 @@ void CAttributeSlider::DrawNameLabel()
 	Rect_t rect;
 	GetControlRect( &rect, ANIM_CONTROL_VALUE );
 
-	m_pName->SetPos( rect.x + ( rect.width - cw ) * 0.5f, rect.y + ( rect.height - ch ) * 0.5f );
+	m_pName->SetPos( rect.x + ( rect.width - cw ) / 2, rect.y + ( rect.height - ch ) / 2 );
 	m_pName->Paint();
 }
 

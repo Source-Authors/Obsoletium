@@ -88,9 +88,10 @@ public:
 	// Are we in text entry mode? If so, what control is having text entered?
 	bool IsInTextEntry() const;
 	AnimationControlType_t GetTextEntryControl() const;
-
+	
+	// dimhotepus: Drop const to scale UI.
 	// Estimates the value of the control given a local coordinate
-	float EstimateValueAtPos( int nLocalX, int nLocalY ) const;
+	float EstimateValueAtPos( int nLocalX, int nLocalY );
 
 	void		SetPreview( const AttributeValue_t &value, const AttributeValue_t &full, bool instantaneous, bool startfromcurrent );
 	float		GetPreview( AnimationControlType_t type ) const;
@@ -140,8 +141,9 @@ private:
 	};
 
 private:
+	// dimhotepus: Drop const to scale UI.
 	// Returns the location of a particular control
-	void GetControlRect( Rect_t *pRect, AnimationControlType_t type ) const;
+	void GetControlRect( Rect_t *pRect, AnimationControlType_t type );
 
 	// Given a mouse position in (x,y) in local coordinates, which animation control is it over?
 	AnimationControlType_t DetermineControl( int x, int y );

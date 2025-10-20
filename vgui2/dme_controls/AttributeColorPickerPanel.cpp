@@ -158,13 +158,15 @@ void CAttributeColorPickerPanel::PerformLayout()
 	int x, y, w, h;
 	m_pType->GetBounds( x, y, w, h );
 
-	int inset = 25;
+	// dimhotepus: Scale UI.
+	int inset = QuickPropScale( 25 );
 	m_pType->SetWide( w - inset );
 
 	x += w;
 	x -= inset;
 
-	h -= 2;
+	// dimhotepus: Scale UI.
+	h -= QuickPropScale( 2 );
 
 	m_pOpen->SetBounds( x, y, inset, h );
 }

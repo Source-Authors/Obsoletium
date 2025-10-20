@@ -46,7 +46,8 @@ CDmePicker::CDmePicker( vgui::Panel *pParent ) : BaseClass( pParent, "DmePicker"
 {
 	// FIXME: Make this an image browser
 	m_pDmeBrowser = new vgui::ListPanel( this, "DmeBrowser" );
-	m_pDmeBrowser->AddColumnHeader( 0, "dme", "Dme Elements", 52, 0 );
+	// dimhotepus: Scale UI.
+	m_pDmeBrowser->AddColumnHeader( 0, "dme", "Dme Elements", QuickPropScale( 52 ), 0 );
 	m_pDmeBrowser->SetSelectIndividualCells( true );
 	m_pDmeBrowser->SetEmptyListText( "No Dme Elements" );
 	m_pDmeBrowser->SetDragEnabled( true );

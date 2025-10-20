@@ -83,13 +83,6 @@ int ListPanelStringSortFunc( vgui::ListPanel *pPanel, const vgui::ListPanelItem 
 	return Q_stricmp( string1, string2 );
 }
 
-void AddColumn( CFileListManager *pFileManager, ColumnIndex_t ci )
-{
-	pFileManager->AddColumnHeader( ci, g_ColInfo[ ci ].columnName, g_ColInfo[ ci ].columnText, g_ColInfo[ ci ].startingWidth, g_ColInfo[ ci ].flags );
-	pFileManager->SetSortFunc( ci, g_ColInfo[ ci ].pfnSort );
-	pFileManager->SetColumnTextAlignment( ci, g_ColInfo[ ci ].alignment );
-}
-
 
 CFileListManager::CFileListManager( vgui::Panel *parent ) : BaseClass( parent, "FileListManager" )
 {
@@ -97,16 +90,17 @@ CFileListManager::CFileListManager( vgui::Panel *parent ) : BaseClass( parent, "
 	SetVisible( true );
 	m_bRefreshRequired = false;
 
-	SetSize( 800, 200 );
-	SetPos( 100, 100 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 800 ), QuickPropScale( 200 ) );
+	SetPos( QuickPropScale( 100 ), QuickPropScale( 100 ) );
 
-	AddColumn( this, CI_FILENAME );
-	AddColumn( this, CI_PATH );
-	AddColumn( this, CI_LOADED );
-	AddColumn( this, CI_NUMELEMENTS );
-	AddColumn( this, CI_CHANGED );
-	AddColumn( this, CI_INPERFORCE );
-	AddColumn( this, CI_OPENFOREDIT );
+	AddColumn( CI_FILENAME );
+	AddColumn( CI_PATH );
+	AddColumn( CI_LOADED );
+	AddColumn( CI_NUMELEMENTS );
+	AddColumn( CI_CHANGED );
+	AddColumn( CI_INPERFORCE );
+	AddColumn( CI_OPENFOREDIT );
 
 	SetSortColumn( 0 );
 
@@ -580,6 +574,14 @@ void CFileListManager::OnCommand( const char *cmd )
 	BaseClass::OnCommand( cmd );
 }
 
+void CFileListManager::AddColumn( int ci )
+{
+	// dimhotepus: Scale UI.
+	AddColumnHeader(ci, g_ColInfo[ci].columnName, g_ColInfo[ci].columnText, QuickPropScale( g_ColInfo[ci].startingWidth ), g_ColInfo[ci].flags);
+	SetSortFunc(ci, g_ColInfo[ci].pfnSort);
+	SetColumnTextAlignment(ci, g_ColInfo[ci].alignment);
+}
+
 
 //-----------------------------------------------------------------------------
 //
@@ -592,12 +594,14 @@ CFileManagerFrame::CFileManagerFrame( vgui::Panel *parent ) : BaseClass( parent,
 
 	SetSizeable( true );
 	SetCloseButtonVisible( false );
-	SetMinimumSize( 200, 200 );
+	// dimhotepus: Scale UI.
+	SetMinimumSize( QuickPropScale( 200 ), QuickPropScale( 200 ) );
 
 	SetVisible( true );
-
-	SetSize( 800, 200 );
-	SetPos( 100, 100 );
+	
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 800 ), QuickPropScale( 200 ) );
+	SetPos( QuickPropScale( 100 ), QuickPropScale( 100 ) );
 
 	m_pFileListManager = new CFileListManager( this );
 	Refresh();
@@ -622,6 +626,7 @@ void CFileManagerFrame::PerformLayout()
 
 	int iWidth, iHeight;
 	GetSize( iWidth, iHeight );
-	m_pFileListManager->SetPos( 0, GetCaptionHeight() );
-	m_pFileListManager->SetSize( iWidth, iHeight - GetCaptionHeight() );
+	// dimhotepus: Scale UI.
+	m_pFileListManager->SetPos( 0, QuickPropScale( GetCaptionHeight() ) );
+	m_pFileListManager->SetSize( iWidth, iHeight - QuickPropScale( GetCaptionHeight() ) );
 }

@@ -90,7 +90,8 @@ CDmeAnimationListPanel::CDmeAnimationListPanel( vgui::Panel *pParent, const char
 	BaseClass( pParent, pName )
 {
 	m_pAnimationList = new vgui::ListPanel( this, "AnimationList" );
-	m_pAnimationList->AddColumnHeader( 0, "name", "name", 100, 0 );
+	// dimhotepus: Scale UI.
+	m_pAnimationList->AddColumnHeader( 0, "name", "name", QuickPropScale( 100 ), 0 );
 	m_pAnimationList->AddActionSignalTarget( this );
 	m_pAnimationList->SetSortFunc( 0, AnimationNameSortFunc );
 	m_pAnimationList->SetSortColumn( 0 );

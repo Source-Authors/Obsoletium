@@ -48,7 +48,8 @@ CBaseAttributePanel::CBaseAttributePanel( vgui::Panel *parent, const AttributeWi
 	Q_strncpy( m_szAttributeName, info.m_pAttributeName, sizeof( m_szAttributeName ) );
 
 	m_pType = new Label( this, "AttributeType", "" );
-	SetColumnSize( m_pType, 100 );
+	// dimhotepus: Scale UI.
+	SetColumnSize( m_pType, QuickPropScale( 100 ) );
 
 	CDmAttribute *pAttribute = info.m_pElement->GetAttribute( info.m_pAttributeName );
 	m_AttributeType = pAttribute ? pAttribute->GetType() : AT_UNKNOWN;
@@ -264,7 +265,7 @@ int CBaseAttributePanel::GetSizeForColumn( Panel *panel )
 	int idx = m_ColumnSize.Find( search );
 	if ( idx == m_ColumnSize.InvalidIndex() )
 	{
-		return 100;
+		return QuickPropScale( 100 );
 	}
 	return m_ColumnSize[ idx ].width;
 }
@@ -312,9 +313,10 @@ void CBaseAttributePanel::PerformLayout()
 	int w, h;
 	GetSize( w, h );
 
-	int x = 1;
+	// dimhotepus: Scale UI.
+	int x = QuickPropScale( 1 );
 	int y = 0;
-	w-= 2;
+	w-= QuickPropScale( 2 );
 
 	for ( intp i = 0; i < c; ++i )
 	{

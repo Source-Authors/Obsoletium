@@ -72,7 +72,8 @@ CSoundPicker::CSoundPicker( vgui::Panel *pParent, int nFlags ) :
 	{
 		m_pGameSoundPage = new PropertyPage( m_pViewsSheet, "GameSoundPage" );
 		m_pGameSoundList = new ListPanel( m_pGameSoundPage, "GameSoundsList" );
- 		m_pGameSoundList->AddColumnHeader( 0, "GameSound", "Game Sound", 52, 0 );
+		// dimhotepus: Scale UI.
+ 		m_pGameSoundList->AddColumnHeader( 0, "GameSound", "Game Sound", QuickPropScale( 52 ), 0 );
 		m_pGameSoundList->AddActionSignalTarget( this );
 		m_pGameSoundList->SetSelectIndividualCells( true );
  		m_pGameSoundList->SetEmptyListText("No game sounds");

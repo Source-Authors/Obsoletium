@@ -120,8 +120,9 @@ CDmePresetRemapPanel::CDmePresetRemapPanel( vgui::Panel *pParent, const char *pT
 	SetDeleteSelfOnClose( true );
 
 	m_pPresetRemapList = new vgui::ListPanel( this, "PresetRemapList" );
-	m_pPresetRemapList->AddColumnHeader( 0, "dest", "Dest Preset", 100, 0 );
-	m_pPresetRemapList->AddColumnHeader( 1, "src", "Source Preset", 100, 0 );
+	// dimhotepus: Scale UI.
+	m_pPresetRemapList->AddColumnHeader( 0, "dest", "Dest Preset", QuickPropScale( 100 ), 0 );
+	m_pPresetRemapList->AddColumnHeader( 1, "src", "Source Preset", QuickPropScale( 100 ), 0 );
 	m_pPresetRemapList->SetSelectIndividualCells( false );
 	m_pPresetRemapList->SetMultiselectEnabled( true );
 	m_pPresetRemapList->SetEmptyListText( "No presets" );
@@ -464,10 +465,11 @@ CDmePresetGroupEditorPanel::CDmePresetGroupEditorPanel( vgui::Panel *pParent, co
 	vgui::Panel *pSplitterRightSide = m_pSplitter->GetChild( 1 );
 
 	m_pPresetGroupList = new CDmePresetGroupListPanel( pSplitterLeftSide, "PresetGroupList", this );
-	m_pPresetGroupList->AddColumnHeader( 0, "name", "Preset Group Name", 150, 0 );
-	m_pPresetGroupList->AddColumnHeader( 1, "visible", "Visible", 70, 0 );
-	m_pPresetGroupList->AddColumnHeader( 2, "shared", "Shared", 52, 0 );
-	m_pPresetGroupList->AddColumnHeader( 3, "readonly", "Read Only", 52, 0 );
+	// dimhotepus: Scale UI.
+	m_pPresetGroupList->AddColumnHeader( 0, "name", "Preset Group Name", QuickPropScale( 150 ), 0 );
+	m_pPresetGroupList->AddColumnHeader( 1, "visible", "Visible", QuickPropScale( 70 ), 0 );
+	m_pPresetGroupList->AddColumnHeader( 2, "shared", "Shared", QuickPropScale( 52 ), 0 );
+	m_pPresetGroupList->AddColumnHeader( 3, "readonly", "Read Only", QuickPropScale( 52 ), 0 );
 	m_pPresetGroupList->SetSelectIndividualCells( false );
 	m_pPresetGroupList->SetMultiselectEnabled( false );
 	m_pPresetGroupList->SetEmptyListText( "No preset groups" );
@@ -486,7 +488,8 @@ CDmePresetGroupEditorPanel::CDmePresetGroupEditorPanel( vgui::Panel *pParent, co
 	m_pPresetGroupList->SetIgnoreDoubleClick( true );
 
 	m_pPresetList = new CDmePresetListPanel( pSplitterRightSide, "PresetList", this );
-	m_pPresetList->AddColumnHeader( 0, "name", "Preset Name", 150, 0 );
+	// dimhotepus: Scale UI.
+	m_pPresetList->AddColumnHeader( 0, "name", "Preset Name", QuickPropScale( 150 ), 0 );
 	m_pPresetList->SetSelectIndividualCells( false );
 	m_pPresetList->SetEmptyListText( "No presets" );
 	m_pPresetList->AddActionSignalTarget( this );

@@ -368,8 +368,9 @@ CAssetBuilder::CAssetBuilder( vgui::Panel *pParent, const char *pPanelName ) :
 	m_pOututPreviewPanel->AddActionSignalTarget( this );
 
 	m_pSourcesList = new vgui::ListPanel( pSplitterLeftSide, "SourcesList" );
-	m_pSourcesList->AddColumnHeader( 0, "type", "type", 100, 0 );
-	m_pSourcesList->AddColumnHeader( 1, "file", "file", 52, 0 );
+	// dimhotepus: Scale UI.
+	m_pSourcesList->AddColumnHeader( 0, "type", "type", QuickPropScale( 100 ), 0 );
+	m_pSourcesList->AddColumnHeader( 1, "file", "file", QuickPropScale( 52 ), 0 );
 	m_pSourcesList->AddActionSignalTarget( this );
 	m_pSourcesList->SetSortFunc( 0, TypeSortFunc );
 	m_pSourcesList->SetSortFunc( 1, FileSortFunc );
@@ -379,8 +380,9 @@ CAssetBuilder::CAssetBuilder( vgui::Panel *pParent, const char *pPanelName ) :
 //	m_pSourcesList->SetDragEnabled( true );
 
 	m_pOutputList = new vgui::ListPanel( m_pOutputPage, "OutputList" );
-	m_pOutputList->AddColumnHeader( 0, "type", "type", 100, 0 );
-	m_pOutputList->AddColumnHeader( 1, "file", "file", 52, 0 );
+	// dimhotepus: Scale UI.
+	m_pOutputList->AddColumnHeader( 0, "type", "type", QuickPropScale( 100 ), 0 );
+	m_pOutputList->AddColumnHeader( 1, "file", "file", QuickPropScale( 52 ), 0 );
 	m_pOutputList->AddActionSignalTarget( this );
 	m_pOutputList->SetSortFunc( 0, TypeSortFunc );
 	m_pOutputList->SetSortFunc( 1, FileSortFunc );
@@ -459,8 +461,8 @@ void CAssetBuilder::BuildFileIDList( CDmeMakefile *pMakeFile, CUtlVector<DmFileI
 		fileIds.AddToTail( id );
 	}
 
-	int nSourceCount = pMakeFile->GetSourceCount();
-	for ( int i = 0; i < nSourceCount; ++i )
+	intp nSourceCount = pMakeFile->GetSourceCount();
+	for ( intp i = 0; i < nSourceCount; ++i )
 	{
 		CDmeSource *pSource = pMakeFile->GetSource(i);
 		BuildFileIDList( pSource->GetDependentMakefile(), fileIds );

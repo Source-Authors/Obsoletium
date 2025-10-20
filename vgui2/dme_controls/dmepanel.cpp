@@ -83,10 +83,12 @@ void CDmePanel::PerformLayout()
 	GetSize( w, h );
 	if ( m_pEditorNames->IsVisible() )
 	{
-		m_pEditorNames->SetBounds( 1, 1, w-2, 20 );
+		// dimhotepus: Scale UI.
+		m_pEditorNames->SetBounds( QuickPropScale( 1 ), QuickPropScale( 1 ), w - QuickPropScale( 2 ), QuickPropScale( 20 ) );
 		if ( m_pDmeEditorPanel )
 		{
-			m_pDmeEditorPanel->SetBounds( 0, 24, w, h-24 );
+			// dimhotepus: Scale UI.
+			m_pDmeEditorPanel->SetBounds( 0, QuickPropScale( 24 ), w, h - QuickPropScale( 24 ) );
 		}
 	}
 	else

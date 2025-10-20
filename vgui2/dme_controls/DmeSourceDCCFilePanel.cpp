@@ -48,7 +48,8 @@ CDmeSourceDCCFilePanel::CDmeSourceDCCFilePanel( vgui::Panel *pParent, const char
 	BaseClass( pParent, pPanelName )
 {	
 	m_pRootDCCObjects = new vgui::ListPanel( this, "DCCObjectList" );
-	m_pRootDCCObjects->AddColumnHeader( 0, "dccobject", "Maya/XSI Object Name", 100, 0 );
+	// dimhotepus: Scale UI.
+	m_pRootDCCObjects->AddColumnHeader( 0, "dccobject", "Maya/XSI Object Name", QuickPropScale( 100 ), 0 );
 	m_pRootDCCObjects->AddActionSignalTarget( this );
 	m_pRootDCCObjects->SetSortFunc( 0, DccObjectSortFunc );
 	m_pRootDCCObjects->SetSortColumn( 0 );

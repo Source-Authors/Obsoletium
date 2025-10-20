@@ -72,7 +72,8 @@ CParticleFunctionPickerFrame::CParticleFunctionPickerFrame( vgui::Panel *pParent
 	m_pContextKeyValues = NULL;
 
 	m_pFunctionList = new vgui::ListPanel( this, "ParticleFunctionList" );
-	m_pFunctionList->AddColumnHeader( 0, "name", "Particle Function Name", 52, 0 );
+	// dimhotepus: Scale UI.
+	m_pFunctionList->AddColumnHeader( 0, "name", "Particle Function Name", QuickPropScale( 52 ), 0 );
 	m_pFunctionList->SetSelectIndividualCells( false );
 	m_pFunctionList->SetMultiselectEnabled( false );
 	m_pFunctionList->SetEmptyListText( "No particle functions" );
@@ -271,7 +272,8 @@ CParticleChildrenPickerFrame::CParticleChildrenPickerFrame( vgui::Panel *pParent
 	m_pContextKeyValues = NULL;
 
 	m_pChildrenList = new vgui::ListPanel( this, "ParticleChildrenList" );
-	m_pChildrenList->AddColumnHeader( 0, "name", "Particle System Name", 52, 0 );
+	// dimhotepus: Scale UI.
+	m_pChildrenList->AddColumnHeader( 0, "name", "Particle System Name", QuickPropScale( 52 ), 0 );
 	m_pChildrenList->SetSelectIndividualCells( false );
 	m_pChildrenList->SetMultiselectEnabled( false );
 	m_pChildrenList->SetEmptyListText( "No particle systems" );
@@ -480,14 +482,16 @@ CParticleFunctionBrowser::CParticleFunctionBrowser( vgui::Panel *pParent, const 
 	m_pFunctionList = new vgui::ListPanel( this, "FunctionList" );
 	if ( m_FuncType != FUNCTION_CHILDREN )
 	{
-		m_pFunctionList->AddColumnHeader( 0, "name", "Function Name", 150, 0 );
-		m_pFunctionList->AddColumnHeader( 1, "type", "Function Type", 150, 0 );
+		// dimhotepus: Scale UI.
+		m_pFunctionList->AddColumnHeader( 0, "name", "Function Name", QuickPropScale( 150 ), 0 );
+		m_pFunctionList->AddColumnHeader( 1, "type", "Function Type", QuickPropScale( 150 ), 0 );
 		m_pFunctionList->SetEmptyListText( "No particle functions" );
 	}
 	else
 	{
-		m_pFunctionList->AddColumnHeader( 0, "name", "Label", 150, 0 );
-		m_pFunctionList->AddColumnHeader( 1, "type", "Child Name", 150, 0 );
+		// dimhotepus: Scale UI.
+		m_pFunctionList->AddColumnHeader( 0, "name", "Label", QuickPropScale( 150 ), 0 );
+		m_pFunctionList->AddColumnHeader( 1, "type", "Child Name", QuickPropScale( 150 ), 0 );
 		m_pFunctionList->SetEmptyListText( "No children" );
 	}
 	m_pFunctionList->SetSelectIndividualCells( false );
@@ -933,7 +937,9 @@ CParticleSystemPropertiesPanel::CParticleSystemPropertiesPanel( IParticleSystemP
 	m_pFunctionTypeCombo->AddActionSignalTarget( this );
 
 	m_pParticleFunctionProperties = new CDmeElementPanel( pSplitterRightSide, "FunctionProperties" );
-	m_pParticleFunctionProperties->SetAutoResize( vgui::Panel::PIN_TOPLEFT, vgui::Panel::AUTORESIZE_DOWNANDRIGHT, 6, 6, -6, -6 );
+	// dimhotepus: Scale UI.
+	m_pParticleFunctionProperties->SetAutoResize( vgui::Panel::PIN_TOPLEFT, vgui::Panel::AUTORESIZE_DOWNANDRIGHT,
+		QuickPropScale( 6 ), QuickPropScale( 6 ), QuickPropScale( -6 ), QuickPropScale( -6 ) );
 	m_pParticleFunctionProperties->AddActionSignalTarget( this );
 
 	for ( int i = 0; i < PARTICLE_FUNCTION_COUNT; ++i )

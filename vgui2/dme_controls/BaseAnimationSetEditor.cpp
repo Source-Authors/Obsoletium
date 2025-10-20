@@ -184,14 +184,16 @@ void CBaseAnimationSetEditor::ChangeLayout( EAnimSetLayout_t newLayout )
 	case LAYOUT_SPLIT:
 		{
 			m_Splitter = new Splitter( this, "AnimSetEditorMainSplitter", SPLITTER_MODE_VERTICAL, 1 );
+			// dimhotepus: Scale UI.
 			m_Splitter->SetAutoResize
 				( 
 				Panel::PIN_TOPLEFT, 
 				Panel::AUTORESIZE_DOWNANDRIGHT,
-				0, ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT,
+				0, QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT ),
 				0, 0
 				);
-			m_Splitter->SetBounds( 0, ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT, GetWide(), GetTall() - ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT );
+			m_Splitter->SetBounds( 0, QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT ),
+				GetWide(), GetTall() - QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT ) );
 			m_Splitter->SetSplitterColor( Color(32, 32, 32, 255) );
 
 			// m_Splitter->EnableBorders( false );
@@ -236,14 +238,17 @@ void CBaseAnimationSetEditor::ChangeLayout( EAnimSetLayout_t newLayout )
 		{
 			m_Splitter = new Splitter( this, "AnimSetEditorMainSplitter", SPLITTER_MODE_VERTICAL, 2 );
 			m_Splitter->SetSplitterColor( Color(32, 32, 32, 255) );
+			// dimhotepus: Scale UI.
 			m_Splitter->SetAutoResize
 				( 
 				Panel::PIN_TOPLEFT, 
 				Panel::AUTORESIZE_DOWNANDRIGHT,
-				0, ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT,
+				0, QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT ),
 				0, 0
 				);
-			m_Splitter->SetBounds( 0, ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT, GetWide(), GetTall() - ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT );
+			// dimhotepus: Scale UI.
+			m_Splitter->SetBounds( 0, QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT ),
+				GetWide(), GetTall() - QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT ) );
 
 			for ( i = 0; i < list.Count(); ++i )
 			{
@@ -265,15 +270,18 @@ void CBaseAnimationSetEditor::ChangeLayout( EAnimSetLayout_t newLayout )
 		{
 			m_Splitter = new Splitter( this, "AnimSetEditorMainSplitter", SPLITTER_MODE_HORIZONTAL, 2 );
 			m_Splitter->SetSplitterColor( Color(32, 32, 32, 255) );
+			// dimhotepus: Scale UI.
 			m_Splitter->SetAutoResize
 				( 
 				Panel::PIN_TOPLEFT, 
 				Panel::AUTORESIZE_DOWNANDRIGHT,
-				0, ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT,
+				0, QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT ),
 				0, 0
 				);
 
-			m_Splitter->SetBounds( 0, ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT, GetWide(), GetTall() - ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT );
+			// dimhotepus: Scale UI.
+			m_Splitter->SetBounds( 0, QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT ),
+				GetWide(), GetTall() - QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_HEIGHT ) );
 
 			for ( i = 0; i < list.Count(); ++i )
 			{
@@ -307,17 +315,20 @@ void CBaseAnimationSetEditor::PerformLayout()
 	int w, h;
 	GetSize( w, h );
 
-	int ypos = ANIMATION_SET_EDITOR_BUTTONTRAY_YPOS;
-
-	int xpos = w - 25;
-	m_pSelectionModeType->SetBounds( xpos, ypos, 20, 20 );
+	// dimhotepus: Scale UI.
+	int ypos = QuickPropScale( ANIMATION_SET_EDITOR_BUTTONTRAY_YPOS );
+	
+	// dimhotepus: Scale UI.
+	int xpos = w - QuickPropScale( 25 );
+	m_pSelectionModeType->SetBounds( xpos, ypos, QuickPropScale( 20 ), QuickPropScale( 20 ) );
 	for ( int i = NUM_AS_RECORDING_STATES - 1; i >= 0 ; --i  )
 	{
-		xpos -= 23;
-		m_pState[ i ]->SetBounds( xpos, ypos, 20, 20 );
+		xpos -= QuickPropScale( 23 );
+		m_pState[ i ]->SetBounds( xpos, ypos, QuickPropScale( 20 ), QuickPropScale( 20 ) );
 	}
-
-	m_pComboBox->SetBounds( 10, ypos, xpos - 10- 5, 20 );
+	
+	// dimhotepus: Scale UI.
+	m_pComboBox->SetBounds( QuickPropScale( 10 ), ypos, xpos - QuickPropScale( 10 + 5 ), QuickPropScale( 20 ) );
 }
 
 void CBaseAnimationSetEditor::OnChangeLayout( int value )

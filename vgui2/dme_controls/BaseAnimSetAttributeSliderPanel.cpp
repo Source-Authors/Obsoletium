@@ -219,7 +219,7 @@ void CPresetSideFilterSlider::PaintBackground()
 	int cw, ch;
 	m_pName->SetColor( _dragging ? m_TextColorFocus : m_TextColor );
 	m_pName->GetContentSize( cw, ch );
-	m_pName->SetPos( ( w - cw ) * 0.5f, ( h - ch ) * 0.5f );
+	m_pName->SetPos( ( w - cw ) / 2, ( h - ch ) / 2 );
 	m_pName->Paint();
 }
 
@@ -245,11 +245,12 @@ CBaseAnimSetAttributeSliderPanel::CBaseAnimSetAttributeSliderPanel( vgui::Panel 
 	m_pPresetSideFilter = new CPresetSideFilterSlider( this, "PresetSideFilter" );
 	m_Sliders = new PanelListPanel( this, "AttributeSliders" );
 	m_Sliders->SetFirstColumnWidth( 0 );
+	// dimhotepus: Scale UI.
 	m_Sliders->SetAutoResize
 		( 
 		Panel::PIN_TOPLEFT, 
 		Panel::AUTORESIZE_DOWNANDRIGHT,
-		0, ANIMATION_SET_EDITOR_ATTRIBUTESLIDERS_BUTTONTRAY_HEIGHT,
+		0, QuickPropScale( ANIMATION_SET_EDITOR_ATTRIBUTESLIDERS_BUTTONTRAY_HEIGHT ),
 		0, 0
 		);
 	m_Sliders->SetVerticalBufferPixels( 0 );
@@ -294,12 +295,14 @@ void CBaseAnimSetAttributeSliderPanel::PerformLayout()
 	int w, h;
 	GetSize( w, h );
 
-	int availH = ANIMATION_SET_EDITOR_ATTRIBUTESLIDERS_BUTTONTRAY_HEIGHT;
+	// dimhotepus: Scale UI.
+	int availH = QuickPropScale( ANIMATION_SET_EDITOR_ATTRIBUTESLIDERS_BUTTONTRAY_HEIGHT );
 				 	 
 	int btnSize = 9;
-	m_pLeftRightBoth[ 0 ]->SetBounds( 15, ( availH - btnSize ) / 2, btnSize, btnSize );
-	m_pLeftRightBoth[ 1 ]->SetBounds( w - 15, ( availH - btnSize ) / 2, btnSize, btnSize );
-	m_pPresetSideFilter->SetBounds( 23 + btnSize, 4, w - 38 - 2 * btnSize, availH - 8 );
+	m_pLeftRightBoth[ 0 ]->SetBounds( QuickPropScale( 15 ), ( availH - btnSize ) / 2, btnSize, btnSize );
+	m_pLeftRightBoth[ 1 ]->SetBounds( w - QuickPropScale( 15 ), ( availH - btnSize ) / 2, btnSize, btnSize );
+	m_pPresetSideFilter->SetBounds( QuickPropScale( 23 ) + btnSize, QuickPropScale( 4 ),
+		w - QuickPropScale( 38 ) - 2 * btnSize, availH - QuickPropScale( 8 ) );
 }
 
 
@@ -524,7 +527,8 @@ void CBaseAnimSetAttributeSliderPanel::ChangeAnimationSet( CDmeAnimationSet *new
 
 		slider->SetVisible( false );
 		slider->SetValue( ANIM_CONTROL_VALUE, control->GetValue< float >( "value" ) );
-		slider->SetSize( 100, 20 );
+		// dimhotepus: Scale UI.
+		slider->SetSize( QuickPropScale( 100 ), QuickPropScale( 20 ) );
 
 		bool bStereo = control->GetValue< bool >( "combo" );
 		slider->ActivateControl( ANIM_CONTROL_BALANCE, bStereo );

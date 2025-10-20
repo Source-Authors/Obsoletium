@@ -362,10 +362,11 @@ CDmeCombinationControlsPanel::CDmeCombinationControlsPanel( vgui::Panel *pParent
 	vgui::Panel *pSplitterRightSide = m_pSplitter->GetChild( 1 );
 
 	m_pControlList = new CDmeInputControlListPanel( pSplitterLeftSide, "ControlList", this );
-	m_pControlList->AddColumnHeader( 0, "name", "Control Name", 150, 0 );
-	m_pControlList->AddColumnHeader( 1, "stereo", "Stereo", 70, 0 );
-	m_pControlList->AddColumnHeader( 2, "eyelid", "Eyelid", 70, 0 );
-	m_pControlList->AddColumnHeader( 3, "default", "Default", 52, 0 );
+	// dimhotepus: Scale UI.
+	m_pControlList->AddColumnHeader( 0, "name", "Control Name", QuickPropScale( 150 ), 0 );
+	m_pControlList->AddColumnHeader( 1, "stereo", "Stereo", QuickPropScale( 70 ), 0 );
+	m_pControlList->AddColumnHeader( 2, "eyelid", "Eyelid", QuickPropScale( 70 ), 0 );
+	m_pControlList->AddColumnHeader( 3, "default", "Default", QuickPropScale( 52 ), 0 );
 	m_pControlList->SetSelectIndividualCells( false );
 	m_pControlList->SetMultiselectEnabled( true );
 	m_pControlList->SetEmptyListText( "No controls" );
@@ -383,10 +384,11 @@ CDmeCombinationControlsPanel::CDmeCombinationControlsPanel( vgui::Panel *pParent
 	m_pControlList->SetDropEnabled( true );
 
 	m_pRawControlList = new CDmeRawControlListPanel( pSplitterRightSide, "RawControlList", this );
-	m_pRawControlList->AddColumnHeader( 0, "name", "Raw Control Name", 150, 0 );
-	m_pRawControlList->AddColumnHeader( 1, "peak", "Peak", 52, 0 );
-	m_pRawControlList->AddColumnHeader( 2, "wrinkletype", "Wrinkle Type", 100, 0 );
-	m_pRawControlList->AddColumnHeader( 3, "wrinkle", "Wrinkle Amount", 100, 0 );
+	// dimhotepus: Scale UI.
+	m_pRawControlList->AddColumnHeader( 0, "name", "Raw Control Name", QuickPropScale( 150 ), 0 );
+	m_pRawControlList->AddColumnHeader( 1, "peak", "Peak", QuickPropScale( 52 ), 0 );
+	m_pRawControlList->AddColumnHeader( 2, "wrinkletype", "Wrinkle Type", QuickPropScale( 100 ), 0 );
+	m_pRawControlList->AddColumnHeader( 3, "wrinkle", "Wrinkle Amount", QuickPropScale( 100 ), 0 );
 	m_pRawControlList->SetSelectIndividualCells( false );
 	m_pRawControlList->SetEmptyListText( "No raw controls" );
 	m_pRawControlList->AddActionSignalTarget( this );
@@ -1416,7 +1418,8 @@ CRawControlPickerFrame::CRawControlPickerFrame( vgui::Panel *pParent, const char
 	m_pContextKeyValues = NULL;
 
 	m_pRawControlList = new vgui::ListPanel( this, "RawControlList" );
-	m_pRawControlList->AddColumnHeader( 0, "name", "Raw Control Name", 52, 0 );
+	// dimhotepus: Scale UI.
+	m_pRawControlList->AddColumnHeader( 0, "name", "Raw Control Name", QuickPropScale( 52 ), 0 );
 	m_pRawControlList->SetSelectIndividualCells( false );
 	m_pRawControlList->SetEmptyListText( "No raw controls" );
 	m_pRawControlList->AddActionSignalTarget( this );
@@ -1600,8 +1603,9 @@ CDmeCombinationDominationRulesPanel::CDmeCombinationDominationRulesPanel( vgui::
 	BaseClass( pParent, pName )
 {
 	m_pDominationRulesList = new vgui::ListPanel( this, "DominationRulesList" );
-	m_pDominationRulesList->AddColumnHeader( 0, "suppressed", "Suppress", 100, 0 );
-	m_pDominationRulesList->AddColumnHeader( 1, "dominator", "Dominate", 100, 0 );
+	// dimhotepus: Scale UI.
+	m_pDominationRulesList->AddColumnHeader( 0, "suppressed", "Suppress", QuickPropScale( 100 ), 0 );
+	m_pDominationRulesList->AddColumnHeader( 1, "dominator", "Dominate", QuickPropScale( 100 ), 0 );
 	m_pDominationRulesList->AddActionSignalTarget( this );
 	m_pDominationRulesList->SetSortFunc( 0, DominatorNameSortFunc );
 	m_pDominationRulesList->SetSortFunc( 1, DominatorNameSortFunc );

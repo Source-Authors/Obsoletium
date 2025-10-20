@@ -60,6 +60,10 @@ protected:
 	bool m_bRefreshRequired;
 
 	vgui::DHANDLE< vgui::Menu >	m_hContextMenu;
+
+private:
+	// dimhotepus: Scale UI.
+	void AddColumn( int ci );
 };
 
 

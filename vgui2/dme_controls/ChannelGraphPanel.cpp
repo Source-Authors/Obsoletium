@@ -334,12 +334,14 @@ CChannelGraphFrame::CChannelGraphFrame( Panel *parent, const char *pTitle )
 
 	SetSizeable( true );
 	SetCloseButtonVisible( true );
-	SetMinimumSize( 200, 100 );
+	// dimhotepus: Scale UI.
+	SetMinimumSize( QuickPropScale( 200 ), QuickPropScale( 100 ) );
 
 	SetVisible( true );
 
-	SetSize( 400, 200 );
-	SetPos( 100, 100 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 400 ), QuickPropScale( 200 ) );
+	SetPos( QuickPropScale( 100 ), QuickPropScale( 100 ) );
 
 	m_pChannelGraph = new CChannelGraphPanel( this, "ChannelGraph" );
 
@@ -361,9 +363,10 @@ void CChannelGraphFrame::PerformLayout()
 {
 	BaseClass::PerformLayout();
 
-	int border = 5;
+	// dimhotepus: Scale UI.
+	int border = QuickPropScale( 5 );
 	int iWidth, iHeight;
 	GetSize( iWidth, iHeight );
-	m_pChannelGraph->SetPos( border, GetCaptionHeight() + border );
-	m_pChannelGraph->SetSize( iWidth - 2 * border, iHeight - GetCaptionHeight() - 2 * border );
+	m_pChannelGraph->SetPos( border, QuickPropScale( GetCaptionHeight() ) + border );
+	m_pChannelGraph->SetSize( iWidth - 2 * border, iHeight - QuickPropScale( GetCaptionHeight() ) - 2 * border );
 }

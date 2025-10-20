@@ -798,18 +798,20 @@ void CPresetSlider::PerformLayout()
 	int w, h;
 	GetSize( w, h );
 
-	int btnSize = 9;
-	m_pEdgeButtons[ 0 ]->SetBounds( 3, ( h - btnSize ) / 2, btnSize, btnSize );
-	m_pEdgeButtons[ 1 ]->SetBounds( w - 12, ( h - btnSize ) / 2, btnSize, btnSize );
+	// dimhotepus: Scale UI.
+	int btnSize = QuickPropScale( 9 );
+	m_pEdgeButtons[ 0 ]->SetBounds( QuickPropScale( 3 ), ( h - btnSize ) / 2, btnSize, btnSize );
+	m_pEdgeButtons[ 1 ]->SetBounds( w - QuickPropScale( 12 ), ( h - btnSize ) / 2, btnSize, btnSize );
 }
 
 void CPresetSlider::GetTrackRect( int &x, int &y, int &w, int &h )
 {
+	// dimhotepus: Scale UI.
 	GetSize( w, h );
-	x = 15;
-	y = 2;
-	w -= 30;
-	h -= 4;
+	x = QuickPropScale( 15 );
+	y = QuickPropScale( 2 );
+	w -= QuickPropScale( 30 );
+	h -= QuickPropScale( 4 );
 }
 
 
@@ -990,24 +992,27 @@ CBaseAnimSetPresetFaderPanel::CBaseAnimSetPresetFaderPanel( vgui::Panel *parent,
 
 	m_pSliders = new CSliderListPanel( this, m_pWorkspace, "PresetSliders" );
 	m_pSliders->SetFirstColumnWidth( 0 );
+	// dimhotepus: Scale UI.
 	m_pSliders->SetAutoResize
 		( 
 		Panel::PIN_TOPLEFT, 
 		Panel::AUTORESIZE_DOWNANDRIGHT,
-		0, 24,
+		0, QuickPropScale( 24 ),
 		0, 0
 		);
-	m_pSliders->SetPos( 0, 24 );
+	// dimhotepuse: Scale UI.
+	m_pSliders->SetPos( 0, QuickPropScale( 24 ) );
 	m_pSliders->SetVerticalBufferPixels( 0 );
 
 	m_pFilter = new TextEntry( m_pWorkspace, "PresetFilter" );
 	m_pFilter->AddActionSignalTarget( this );
+	// dimhotepus: Scale UI.
 	m_pFilter->SetAutoResize
 		( 
 		Panel::PIN_TOPLEFT, 
 		Panel::AUTORESIZE_RIGHT,
-		2, 2,
-		2, 22
+		QuickPropScale( 2 ), QuickPropScale( 2 ),
+		QuickPropScale( 2 ), QuickPropScale( 22 )
 		);
 	m_pFilter->SetPos( 0, 0 );
 
@@ -1317,7 +1322,8 @@ void CBaseAnimSetPresetFaderPanel::PopulateList( bool bChanged )
 
 				CPresetSlider *pSlider = new CPresetSlider( this, pPreset->GetName(), pPreset );
 				pSlider->SetPos( 0 );
-				pSlider->SetSize( 100, 20 );
+				// dimhotepus: Scale UI.
+				pSlider->SetSize( QuickPropScale( 100 ), QuickPropScale( 20 ) );
 				pSlider->SetGradientColor( Color( 194, 120, 0, 255 ) );
 
 				pSlider->SetControlValues( );
@@ -1445,7 +1451,8 @@ void CBaseAnimSetPresetFaderPanel::AddNewPreset( CDmePreset *pPreset )
 	if ( pSlider )
 	{
 		pSlider->SetPos( 0 );
-		pSlider->SetSize( 100, 20 );
+		// dimhotepus: Scale UI.
+		pSlider->SetSize( QuickPropScale( 100 ), QuickPropScale( 20 ) );
 		pSlider->SetGradientColor( Color( 194, 120, 0, 255 ) );
 		pSlider->SetControlValues( );
 		m_pSliders->AddItem( NULL, pSlider );
