@@ -138,10 +138,14 @@ void SeedRandomNumberGenerator( bool random_invariant )
 	{
 		long iSeed;
 		g_pVCR->Hook_Time( &iSeed );
-		float flAppTime = Plat_FloatTime();
+		double flAppTime = Plat_FloatTime();
 		ThreadId_t threadId = ThreadGetCurrentId();
 
-		iSeed ^= (*((int *)&flAppTime));
+		long iRand;
+		// dimhotepus: Use memcpy as casts are UB.
+		memcpy( &iRand, &flAppTime, min( sizeof(iRand), sizeof(flAppTime) ) );
+
+		iSeed ^= iRand;
 		iSeed ^= threadId;
 
 		RandomSeed( iSeed );
