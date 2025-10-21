@@ -86,9 +86,9 @@ void CMatchmaking::Cleanup()
 	m_pGameServer = NULL;
 
 	Q_memset( m_Mutelist, 0, sizeof( m_Mutelist ) );
-	for ( int i = 0; i < MAX_PLAYERS_PER_CLIENT; ++i )
+	for ( auto &mb : m_MutedBy )
 	{
-		m_MutedBy[i].Purge();
+		mb.Purge();
 	}
 
 	m_Channels.RemoveAll();
@@ -320,12 +320,12 @@ bool CMatchmaking::ProcessVoiceData( CLC_VoiceData *pVoice )
 void CMatchmaking::CleanupMarkedChannels()
 {
 	// Clean up net channels that need to be deleted
-	for ( int i = 0; i < m_ChannelsToRemove.Count(); ++i )
+	for ( auto &c : m_ChannelsToRemove )
 	{
-		INetChannel *pNetChannel = FindChannel( m_ChannelsToRemove[i] );
+		INetChannel *pNetChannel = FindChannel( c );
 		if ( pNetChannel )
 		{
-			if ( !m_Channels.Remove( m_ChannelsToRemove[i] ) )
+			if ( !m_Channels.Remove( c ) )
 			{
 				Warning( "CleanupMarkedChannels: Failed to remove a channel!\n" );
 			}
@@ -357,11 +357,11 @@ CClientInfo *CMatchmaking::FindClient( netadr_t *adr )
 	}
 	else
 	{
-		for ( int i = 0; i < m_Remote.Count(); ++i )
+		for ( auto &r : m_Remote )
 		{
-			if ( ip == m_Remote[i]->m_adr.GetIPNetworkByteOrder() )
+			if ( ip == r->m_adr.GetIPNetworkByteOrder() )
 			{
-				pClient = m_Remote[i];
+				pClient = r;
 				break;
 			}
 		}
@@ -382,11 +382,11 @@ CClientInfo *CMatchmaking::FindClientByXUID( XUID xuid )
 	}
 	else
 	{
-		for ( int i = 0; i < m_Remote.Count(); ++i )
+		for ( auto &r : m_Remote )
 		{
-			if ( xuid == m_Remote[i]->m_xuids[0] )
+			if ( xuid == r->m_xuids[0] )
 			{
-				pClient = m_Remote[i];
+				pClient = r;
 				break;
 			}
 		}
@@ -567,9 +567,9 @@ void CMatchmaking::SendHeartbeat()
 
 	if ( m_Session.IsHost() )
 	{
-		for ( int i = 0; i < m_Remote.Count(); ++i )
+		for ( auto &r : m_Remote )
 		{
-			SendHeartbeat( m_Remote[i] );
+			SendHeartbeat( r );
 		}
 	}
 	else
@@ -604,9 +604,9 @@ uint64 CMatchmaking::PlayerIdToXuid( int playerId )
 	if ( engineClient->GetPlayerInfo( playerId, &info ) )
 	{
 		// find the client with a matching name
-		for ( int i = 0; i < m_Remote.Count(); ++i )
+		for ( auto &r : m_Remote )
 		{
-			ret = FindPlayerByName( m_Remote[i], info.name );
+			ret = FindPlayerByName( r, info.name );
 			if ( ret )
 			{
 				break;
@@ -1176,7 +1176,7 @@ void Con_PrintTalkers( const CCommand &args )
 
 void CMatchmaking::PrintVoiceStatus( void )
 {
-		}
+}
 
 static ConCommand voice_printtalkers( "voice_printtalkers", Con_PrintTalkers, "voice debug.", FCVAR_DONTRECORD );
 
@@ -1185,7 +1185,7 @@ static ConCommand voice_printtalkers( "voice_printtalkers", Con_PrintTalkers, "v
 //-----------------------------------------------------------------------------
 void CMatchmaking::GenerateMutelist( MM_Mutelist *pMsg )
 {
-			}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Handle the mutelist from another client
@@ -1761,7 +1761,7 @@ void CMatchmaking::SwitchToState( int newState )
 
 void CMatchmaking::UpdateVoiceStatus( void )
 {
-	}
+}
 
 //-----------------------------------------------------------------------------
 //	Update matchmaking and any active session 
@@ -1922,9 +1922,9 @@ void CMatchmaking::ShowSessionInfo()
 //-----------------------------------------------------------------------------
 void CMatchmaking::TestSendMessage()
 {
-	for ( int i = 0; i < m_Remote.Count(); ++i )
+	for ( auto &r : m_Remote )
 	{
-		AddRemoteChannel( &m_Remote[i]->m_adr );
+		AddRemoteChannel( &r->m_adr );
 	}
 	NET_StringCmd msg;
 	SendToRemoteClients( &msg );
