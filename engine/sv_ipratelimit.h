@@ -33,7 +33,8 @@ private:
 	struct iprate_s
 	{
 		ip_t ip;
-		long lastTime;
+		// dimhotepus: long -> double.
+		double lastTime;
 		int count;
 	};
 
