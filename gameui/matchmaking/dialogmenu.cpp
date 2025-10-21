@@ -542,50 +542,7 @@ CAchievementItem::CAchievementItem( CDialogMenu *pParent, const wchar_t *pName, 
 	// Title and description were returned as results of a system query,
 	// and are therefore already localized.
 	m_pTitle->SetText( pName );
-
-	if ( IsX360() )
-	{
-		wchar_t buf[120];
-
-		// Get the screen size
-		int wide, tall;
-		vgui::surface()->GetScreenSize(wide, tall);
-
-		unsigned int iWrapLen;
-
-		if ( tall <= BASE_HEIGHT )
-		{
-			iWrapLen = 50;
-		}
-		else
-		{
-			iWrapLen = 65;
-		}
-
-		// let's do some wrapping on this label
-		wcsncpy( buf, pDesc, sizeof(buf) / sizeof( wchar_t ) );
-
-		if ( wcslen(buf) > iWrapLen )
-		{
-			int iPos = iWrapLen;
-
-			while ( iPos > 0 && buf[iPos] != L' ' )
-			{
-				iPos--;
-			}
-
-			if ( iPos > 0 && buf[iPos] == L' ' )
-			{
-				buf[iPos] = L'\n';
-			}				
-		}
-
-		m_pDescription->SetText( buf );
-	}
-	else
-	{
 		m_pDescription->SetText( pDesc );
-	}
 
 	m_pSourceAchievement = pSourceAchievement;
 
