@@ -213,7 +213,7 @@ void CDemoFile::WriteConsoleCommand( const char *cmdstring, int tick )
 
 	WriteCmdHeader( dem_consolecmd, tick );
 
-	WriteRawData( cmdstring, len );
+	WriteRawData( cmdstring, static_cast<int>( len ) );
 }
 
 const char *CDemoFile::ReadConsoleCommand()
