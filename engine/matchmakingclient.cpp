@@ -53,9 +53,6 @@ void CMatchmaking::StartClient( bool bSystemLink )
 bool CMatchmaking::StartSystemLinkSearch()
 {
 	// Create an random identifier and reset the send timer
-#if defined( _X360 )
-	XNetRandom( (byte*)&m_Nonce, sizeof( m_Nonce ) );
-#endif
 	m_fSendTimer = GetTime();
 	m_nSendCount = 0;
 
@@ -208,31 +205,6 @@ void CMatchmaking::UpdateSearch()
 			{
 				// A list of matching sessions was found.
 				Msg( "Found %d matching games\n", m_pSearchResults->dwSearchResults );
-#if defined( _X360 )
-				for ( unsigned int i = 0; i < m_pSearchResults->dwSearchResults; ++i )
-				{
-					m_QoSxnaddr[i] = &(m_pSearchResults->pResults[i].info.hostAddress);
-					m_QoSxnkid[i] = &(m_pSearchResults->pResults[i].info.sessionID);
-					m_QoSxnkey[i] = &(m_pSearchResults->pResults[i].info.keyExchangeKey);
-				}
-
-				//
-				// Note: XNetQosLookup requires only 2 successful probes to be received from the host.
-				// This is much less than the recommended 8 probes because on a 10% data loss profile
-				// it is impossible to find the host when requiring 8 probes to be received.
-				XNetQosLookup(  m_pSearchResults->dwSearchResults, 
-								m_QoSxnaddr,
-								m_QoSxnkid, 
-								m_QoSxnkey, 
-								0,				// number of security gateways to probe
-								NULL,			// gateway ip addresses
-								NULL,			// gateway service ids
-								2,				// number of probes
-								0,				// upstream bandwith to use (0 = default)
-								0,				// flags - not supported
-								NULL,			// signal event
-								&m_pQoSResult );// results
-#endif
 				SwitchToState( MMSTATE_WAITING_QOS );
 			}
 			else
@@ -315,9 +287,6 @@ void CMatchmaking::CancelSearch()
 //-----------------------------------------------------------------------------
 void CMatchmaking::CancelQosLookup()
 {
-#if defined( _X360 )
-	XNetQosRelease( m_pQoSResult );
-#endif
 	SwitchToState( MMSTATE_INITIAL );
 }
 
@@ -430,139 +399,16 @@ void CMatchmaking::JoinInviteSession( XSESSION_INFO *pHostInfo )
 			return;
 		}
 
-#if defined( _X360 )
-		// Switch into validating invite mode and do it right away
-		m_InviteState = INVITE_VALIDATING;
-		// fall through
-
-	case INVITE_VALIDATING:
-		// Validate user storage information
-		Msg( "[JoinInviteSession:INVITE_VALIDATING] Validating user storage before accepting invite.\n" );
-
-		//
-		// Configure and validate waiting info in case user will have to pick storage device
-		//
-		m_InviteWaitingInfo.m_InviteStorageDeviceSelected = 0;
-		m_InviteWaitingInfo.m_UserIdx = XBX_GetPrimaryUserId();
-		if ( m_InviteWaitingInfo.m_UserIdx == INVALID_USER_ID )
-		{
-			Msg( "[JoinInviteSession:INVITE_VALIDATING] Invalid user id, aborting.\n" );
-			InviteCancel();
-			return;
-		}
-
-		m_InviteWaitingInfo.m_SignInState = XUserGetSigninState( m_InviteWaitingInfo.m_UserIdx );
-		if ( ( m_InviteWaitingInfo.m_SignInState != eXUserSigninState_SignedInToLive ) ||
-			 ( ERROR_SUCCESS != XUserGetSigninInfo( m_InviteWaitingInfo.m_UserIdx, 0, &m_InviteWaitingInfo.m_SignInInfo ) ) ||
-			 ! ( m_InviteWaitingInfo.m_SignInInfo.dwInfoFlags & XUSER_INFO_FLAG_LIVE_ENABLED ) )
-		{
-			Msg( "[JoinInviteSession:INVITE_VALIDATING] Failed to get sign in to LIVE info, aborting.\n" );
-			InviteCancel();
-			return;
-		}
-
-		if ( ( ERROR_SUCCESS != XUserCheckPrivilege( m_InviteWaitingInfo.m_UserIdx, XPRIVILEGE_MULTIPLAYER_SESSIONS, &m_InviteWaitingInfo.m_PrivilegeMultiplayer ) ) ||
-			 ( !m_InviteWaitingInfo.m_PrivilegeMultiplayer ) )
-		{
-			Msg( "[JoinInviteSession:INVITE_VALIDATING] Privilege denied, aborting.\n" );
-			InviteCancel();
-			return;
-		}
-
-		//
-		// Enqueue the call to track storage device once it gets selected
-		//
-		if ( m_InviteWaitingInfo.m_bAcceptingInvite ||
-			EngineVGui()->ValidateStorageDevice( &m_InviteWaitingInfo.m_InviteStorageDeviceSelected ) )
-		{
-			m_InviteWaitingInfo.m_bAcceptingInvite = 0;
-			Msg( "[JoinInviteSession:INVITE_VALIDATING] Storage %s, accepting.\n", m_InviteWaitingInfo.m_bAcceptingInvite ? "already queried" : "valid" );
-			m_InviteState = INVITE_ACCEPTING;
-			// fall through
-		}
-		else
-		{
-			// User doesn't have a device selected and has to pick one
-			Msg( "[JoinInviteSession:INVITE_VALIDATING] Awaiting storage.\n" );
-			m_InviteState = INVITE_AWAITING_STORAGE;
-			return;
-		}
-#else
 		// Accept the invite right away
 		m_InviteState = INVITE_ACCEPTING;
 		// fall through
-#endif
 
 	case INVITE_ACCEPTING:
 		// Everything will finish this frame
 		Msg( "[JoinInviteSession:INVITE_ACCEPTING] Accepting the invite.\n" );
 		break;
 
-#if defined( _X360 )
-	case INVITE_AWAITING_STORAGE:
-		// Wait for user to select storage, but keep an eye on user change or logout or etc
-		{
-			InviteWaitingInfo_t InviteCurrentInfo;
-
-			InviteCurrentInfo.m_UserIdx = XBX_GetPrimaryUserId();
-			if ( InviteCurrentInfo.m_UserIdx != m_InviteWaitingInfo.m_UserIdx )
-			{
-				Msg( "[JoinInviteSession:INVITE_AWAITING_STORAGE] User index changed, aborting.\n" );
-				InviteCancel();
-				return;
-			}
-
-			InviteCurrentInfo.m_SignInState = XUserGetSigninState( InviteCurrentInfo.m_UserIdx );
-			if ( ( InviteCurrentInfo.m_SignInState != m_InviteWaitingInfo.m_SignInState ) ||
-				( ERROR_SUCCESS != XUserGetSigninInfo( InviteCurrentInfo.m_UserIdx, 0, &InviteCurrentInfo.m_SignInInfo ) ) ||
-				! ( InviteCurrentInfo.m_SignInInfo.dwInfoFlags & XUSER_INFO_FLAG_LIVE_ENABLED ) ||
-				!IsEqualXUID( InviteCurrentInfo.m_SignInInfo.xuid, m_InviteWaitingInfo.m_SignInInfo.xuid ) )
-			{
-				Msg( "[JoinInviteSession:INVITE_AWAITING_STORAGE] User xuid changed, aborting.\n" );
-				InviteCancel();
-				return;
-			}
-
-			if ( ( ERROR_SUCCESS != XUserCheckPrivilege( InviteCurrentInfo.m_UserIdx, XPRIVILEGE_MULTIPLAYER_SESSIONS, &InviteCurrentInfo.m_PrivilegeMultiplayer ) ) ||
-				( !InviteCurrentInfo.m_PrivilegeMultiplayer ) )
-			{
-				Msg( "[JoinInviteSession:INVITE_AWAITING_STORAGE] Privilege denied, aborting.\n" );
-				InviteCancel();
-				return;
-			}
-
-			// Check if we should keep waiting
-			switch ( m_InviteWaitingInfo.m_InviteStorageDeviceSelected )
-			{
-			case 0:
-				// Keep waiting
-				return;
-
-			case 1:
-				// Device selected, proceed
-				Msg( "[JoinInviteSession:INVITE_AWAITING_STORAGE] Device selected.\n" );
-				break;
-			case 2:
-				Msg( "[JoinInviteSession:INVITE_AWAITING_STORAGE] Device rejected.\n" );
-				// User opts to run with no storage device, proceed
-				break;
-
 			default:
-				// Device selection weird error
-				InviteCancel();
-				return;
-			}
-		}
-
-		// Otherwise user has selected the storage device, try to accept the invite once again
-		Msg( "[JoinInviteSession:INVITE_AWAITING_STORAGE] Accepting.\n" );
-		m_InviteWaitingInfo.m_bAcceptingInvite = 1;
-		m_InviteState = INVITE_NONE;
-		JoinInviteSession( pHostInfo );
-		return;
-#endif
-
-	default:
 		Msg( "[JoinInviteSession:UnknownState=%d] Aborting.\n", m_InviteState );
 		InviteCancel();
 		return;
@@ -574,19 +420,6 @@ void CMatchmaking::JoinInviteSession( XSESSION_INFO *pHostInfo )
 
 	// Allow us to access private channels due to invite
 	m_Local.m_bInvited = true;
-
-#if defined( _X360 )
-	// "Spoof" certain information we don't yet know about the server, knowing that we'll modify it later once connected
-	m_Session.SetIsSystemLink( false );
-	m_Session.SetSessionInfo( pHostInfo );
-	m_Session.SetIsHost( false );
-	m_Session.SetContext( X_CONTEXT_GAME_TYPE, X_CONTEXT_GAME_TYPE_STANDARD, false );
-	m_Session.SetSessionFlags( XSESSION_CREATE_LIVE_MULTIPLAYER_STANDARD );
-	m_Session.SetSessionSlots( SLOTS_TOTALPUBLIC, 8 );
-	m_Session.SetSessionSlots( SLOTS_TOTALPRIVATE, 0 );
-	m_Session.SetSessionSlots( SLOTS_FILLEDPUBLIC, 0 );
-	m_Session.SetSessionSlots( SLOTS_FILLEDPRIVATE, 0 );
-#endif
 
 	// Create the session and kick off our UI
 	if ( !m_Session.CreateSession() )
@@ -611,41 +444,7 @@ void CMatchmaking::InviteCancel()
 //-----------------------------------------------------------------------------
 void CMatchmaking::JoinInviteSessionByID( XNKID nSessionID )
 {
-#ifdef _X360
-	DWORD dwResultSize = 0;
-	XSESSION_SEARCHRESULT_HEADER *pSearchResults = NULL;
-
-	// Call this once to find the proper buffer size
-	DWORD dwError = XSessionSearchByID( nSessionID, XBX_GetPrimaryUserId(), &dwResultSize, pSearchResults, NULL );
-	if ( dwError != ERROR_INSUFFICIENT_BUFFER )
-		return;
-
-	// Create a buffer big enough to hold the requested information
-	pSearchResults = (XSESSION_SEARCHRESULT_HEADER *) new byte[dwResultSize];
-	ZeroMemory( pSearchResults, dwResultSize );
-
-	// Now get the real results
-	dwError = XSessionSearchByID( nSessionID, XBX_GetPrimaryUserId(), &dwResultSize, pSearchResults, NULL );
-	if ( dwError != ERROR_SUCCESS )
-	{
-		delete[] pSearchResults;
-		return;
 	}
-
-	// If we found something, connect to it
-	if ( pSearchResults->dwSearchResults > 0 )
-	{
-		JoinInviteSession( &(pSearchResults->pResults[0].info) );
-	}
-	else
-	{
-		SessionNotification( SESSION_NOTIFY_CONNECT_NOTAVAILABLE );
-	}
-
-	// Done
-	delete[] pSearchResults;
-#endif // _X360
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Tell a session host we'd like to join the session
@@ -843,20 +642,6 @@ bool CMatchmaking::ConnectToHost()
 
 	XSESSION_INFO info;
 	m_Session.GetSessionInfo( &info );
-
-#if defined( _X360 )
-	// Resolve the host's IP address
-	XNADDR xaddr = info.hostAddress;
-	XNKID xid = info.sessionID;
-	IN_ADDR winaddr;
-	if ( XNetXnAddrToInAddr( &xaddr, &xid, &winaddr ) != 0 )
-	{
-		Warning( "Error resolving host IP\n" );
-		return false;
-	}
-	m_Host.m_adr.SetType( NA_IP );
-	m_Host.m_adr.SetIPAndPort( winaddr.S_un.S_addr, PORT_MATCHMAKING );
-#endif
 
 	// Initiate the network channel
 	AddRemoteChannel( &m_Host.m_adr );
