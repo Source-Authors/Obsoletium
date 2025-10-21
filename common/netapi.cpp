@@ -8,7 +8,7 @@
 #include "netapi.h"
 
 #ifdef _WIN32
-#include "winsock.h"
+#include <winsock.h>
 using socklen_t = int;
 #elif POSIX
 #include <sys/types.h>
