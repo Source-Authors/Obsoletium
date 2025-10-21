@@ -1515,8 +1515,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	// Might be writing a zip into a larger stream
 	uintp zipOffsetInStream = stream.Tell();
 
-	int i;
-	for ( i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
+	for ( auto i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
 		CZipEntry *e = &m_Files[i];
 		Assert( e );
@@ -1598,7 +1597,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	}
 
 	int realNumFiles = 0;
-	for ( i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
+	for ( auto i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
 		CZipEntry *e = &m_Files[i];
 		Assert( e );
