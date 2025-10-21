@@ -265,9 +265,7 @@ class CVRenderView : public IVRenderView, public ISpatialLeafEnumerator
 public:
 	void TouchLight( dlight_t *light )
 	{
-		int i;
-		
-		i = light - cl_dlights;
+		intp i = light - cl_dlights;
 		if (i >= 0 && i < MAX_DLIGHTS)
 		{
 			r_dlightchanged |= (1 << i);
