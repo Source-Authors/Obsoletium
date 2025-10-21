@@ -15,6 +15,8 @@
 #include "tier0/vprof.h"
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
+#include "unordered_map"
+#include "string"
 
 #ifdef _X360
 #include "xbox/xbox_console.h"
@@ -113,6 +115,7 @@ private:
 	CUtlVector< IConsoleDisplayFunc* >	m_DisplayFuncs;
 	int									m_nNextDLLIdentifier;
 	ConCommandBase						*m_pConCommandList;
+	std::unordered_map<std::string, ConCommandBase*> m_pCommandBaseNames;
 
 	// temporary console area so we can store prints before console display funs are installed
 	mutable CUtlBuffer					m_TempConsoleBuffer;
@@ -162,6 +165,39 @@ protected:
 private:
 	// Standard console commands -- DO NOT PLACE ANY HIGHER THAN HERE BECAUSE THESE MUST BE THE FIRST TO DESTRUCT
 	CON_COMMAND_MEMBER_F( CCvar, "find", Find, "Find concommands with the specified string in their name/help text.", 0 )
+
+	/*
+	 * BUG: The Source engine uses Q_stricmp -> V_stricmp which is case insensitive, so we need to account for that.
+	 */
+	inline void AddCommandBaseName( ConCommandBase* variable )
+	{
+		std::string strName = variable->GetName();
+		std::transform( strName.begin(), strName.end(), strName.begin(), ::tolower );
+
+		m_pCommandBaseNames.try_emplace( strName, variable );
+	}
+
+	inline void RemoveCommandBaseName( const ConCommandBase* variable )
+	{
+		std::string strName = variable->GetName();
+		std::transform( strName.begin(), strName.end(), strName.begin(), ::tolower );
+
+		auto it = m_pCommandBaseNames.find( strName );
+		if ( it != m_pCommandBaseNames.end() )
+			m_pCommandBaseNames.erase( it );
+	}
+
+	inline ConCommandBase* FindCommandBaseName( const char* name ) const
+	{
+		std::string strName = name;
+		std::transform( strName.begin(), strName.end(), strName.begin(), ::tolower );
+
+		auto it = m_pCommandBaseNames.find( strName );
+		if ( it != m_pCommandBaseNames.end() )
+			return it->second;
+
+		return nullptr;
+	}
 };
 
 void CCvar::CCVarIteratorInternal::SetFirst( ) RESTRICT
@@ -404,6 +440,8 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 	// link the variable in
 	variable->m_pNext = m_pConCommandList;
 	m_pConCommandList = variable;
+
+	AddCommandBaseName( variable );
 }
 
 void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
@@ -433,6 +471,7 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 			pPrev->m_pNext = pCommand->m_pNext;
 		}
 		pCommand->m_pNext = nullptr;
+		RemoveCommandBaseName( pCommandToRemove );
 		break;
 	}
 }
@@ -454,6 +493,8 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 			// Unlink
 			pCommand->m_bRegistered = false;
 			pCommand->m_pNext = nullptr;
+
+			RemoveCommandBaseName( pCommand );
 		}
 
 		pCommand = pNext;
@@ -468,24 +509,12 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 //-----------------------------------------------------------------------------
 const ConCommandBase *CCvar::FindCommandBase( const char *name ) const
 {
-	const ConCommandBase *cmd = GetCommands();
-	for ( ; cmd; cmd = cmd->GetNext() )
-	{
-		if ( !Q_stricmp( name, cmd->GetName() ) )
-			return cmd;
-	}
-	return nullptr;
+	return FindCommandBaseName( name );
 }
 
 ConCommandBase *CCvar::FindCommandBase( const char *name )
 {
-	ConCommandBase *cmd = GetCommands();
-	for ( ; cmd; cmd = cmd->GetNext() )
-	{
-		if ( !Q_stricmp( name, cmd->GetName() ) )
-			return cmd;
-	}
-	return nullptr;
+	return FindCommandBaseName( name );
 }
 
 
