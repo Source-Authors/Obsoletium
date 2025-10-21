@@ -263,7 +263,7 @@ class CUploadGameStats : public IUploadGameStats
 {
 public:
 
-	#define GAMESTATSUPLOADER_CONNECT_RETRY_TIME	1.0F
+	#define GAMESTATSUPLOADER_CONNECT_RETRY_TIME	1.0
 
 	CUploadGameStats() : m_flNextConnectAttempt(0), m_bConnected(false) {}
 
@@ -301,7 +301,7 @@ public:
 		if ( !pSteamUtils )
 			return;
 
-		float curTime = Sys_FloatTime();
+		double curTime = Sys_FloatTime();
 
 		if ( curTime < m_flNextConnectAttempt )
 			return;
@@ -503,7 +503,8 @@ public:
 	}
 private:
 	netadr_t	m_Adr;
-	float		m_flNextConnectAttempt;
+	// dimhotepus: float -> double.
+	double		m_flNextConnectAttempt;
 	bool		m_bConnected;
 };
 
