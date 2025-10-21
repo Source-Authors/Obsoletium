@@ -68,7 +68,8 @@ protected:
 	FILE *FS_fopen( const char *filename, const char *options, unsigned flags, int64 *size ) override;
 	void FS_setbufsize( FILE *fp, unsigned nBytes ) override;
 	void FS_fclose( FILE *fp ) override;
-	void FS_fseek( FILE *fp, int64 pos, int seekType ) override;
+	// dimhotepus: FS_fseek now returns offset.
+	int FS_fseek( FILE *fp, int64 pos, int seekType ) override;
 	long FS_ftell( FILE *fp ) override;
 	int FS_feof( FILE *fp ) override;
 	size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size, FILE *fp ) override;
@@ -105,7 +106,8 @@ public:
 	virtual ~CStdFilesystemFile() {}
 	virtual void FS_setbufsize( unsigned nBytes ) = 0;
 	virtual void FS_fclose() = 0;
-	virtual void FS_fseek( int64 pos, int seekType ) = 0;
+	// dimhotepus: FS_fseek now returns offset.
+	virtual int FS_fseek( int64 pos, int seekType ) = 0;
 	virtual long FS_ftell() = 0;
 	virtual int FS_feof() = 0;
 	virtual size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size ) = 0;
@@ -127,7 +129,8 @@ public:
 
 	void FS_setbufsize( unsigned nBytes ) override;
 	void FS_fclose() override;
-	void FS_fseek( int64 pos, int seekType ) override;
+	// dimhotepus: FS_fseek now returns offset.
+	int FS_fseek( int64 pos, int seekType ) override;
 	long FS_ftell() override;
 	int FS_feof() override;
 	size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size) override;
@@ -174,7 +177,8 @@ public:
 
 	void FS_setbufsize( unsigned nBytes ) override {}
 	void FS_fclose() override;
-	void FS_fseek( int64 pos, int seekType ) override;
+	// dimhotepus: FS_fseek now returns offset.
+	int FS_fseek( int64 pos, int seekType ) override;
 	long FS_ftell() override;
 	int FS_feof() override;
 	size_t FS_fread( OUT_BYTECAP(destSize) void *dest, size_t destSize, size_t size) override;
@@ -436,11 +440,12 @@ void CFileSystem_Stdio::FS_fclose( FILE *fp )
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
 //-----------------------------------------------------------------------------
-void CFileSystem_Stdio::FS_fseek( FILE *fp, int64 pos, int seekType )
+// dimhotepus: FS_fseek now returns offset.
+int CFileSystem_Stdio::FS_fseek( FILE *fp, int64 pos, int seekType )
 {
 	auto *pFile = reinterpret_cast<CStdFilesystemFile *>(fp);
 
-	pFile->FS_fseek( pos, seekType );
+	return pFile->FS_fseek( pos, seekType );
 }
 
 //-----------------------------------------------------------------------------
@@ -862,9 +867,17 @@ void CStdioFile::FS_fclose()
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
 //-----------------------------------------------------------------------------
-void CStdioFile::FS_fseek( int64 pos, int seekType )
+// dimhotepus: FS_fseek now returns offset.
+int CStdioFile::FS_fseek( int64 pos, int seekType )
 {
-	fseek( m_pFile, pos, seekType );
+	if ( fseek( m_pFile, pos, seekType ) == 0 )
+	{
+		// dimhotepus: Return new position.
+		return FS_ftell();
+	}
+
+	// dimhotepus: Return error flag.
+	return -1;
 }
 
 //-----------------------------------------------------------------------------
@@ -1180,21 +1193,29 @@ void CWin32ReadOnlyFile::FS_fclose()
 //-----------------------------------------------------------------------------
 // Purpose: low-level filesystem wrapper
 //-----------------------------------------------------------------------------
-void CWin32ReadOnlyFile::FS_fseek( int64 pos, int seekType )
+// dimhotepus: FS_fseek now returns offset.
+int CWin32ReadOnlyFile::FS_fseek( int64 pos, int seekType )
 {
 	switch ( seekType )
 	{
 	case SEEK_SET:
 		m_ReadPos = pos;
-		break;
+		// dimhotepus: Return read position.
+		return m_ReadPos;
 
 	case SEEK_CUR:
 		m_ReadPos += pos;
-		break;
+		// dimhotepus: Return read position.
+		return m_ReadPos;
 
 	case SEEK_END:
 		m_ReadPos = m_Size - pos;
-		break;
+		// dimhotepus: Return read position.
+		return m_ReadPos;
+
+	default:
+		// dimhotepus: Handle invalid parameter.
+		return -1;
 	}
 }
 

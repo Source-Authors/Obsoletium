@@ -118,7 +118,7 @@ public:
 	void	Flush();
 	void	SetBufferSize( int nBytes );
 
-	int		Read( void* pBuffer, int nLength );
+	int		Read( OUT_BYTECAP(nLength) void* pBuffer, int nLength );
 	int		Read( void* pBuffer, int nDestSize, int nLength );
 
 	int		Write( IN_BYTECAP(nLength) const void* pBuffer, int nLength );
@@ -697,7 +697,8 @@ protected:
 	virtual FILE *FS_fopen( const char *filename, const char *options, unsigned flags, int64 *size ) = 0;
 	virtual void FS_setbufsize( FILE *fp, unsigned nBytes ) = 0;
 	virtual void FS_fclose( FILE *fp ) = 0;
-	virtual void FS_fseek( FILE *fp, int64 pos, int seekType ) = 0;
+	// dimhotepus: FS_fseek now returns offset.
+	virtual int FS_fseek( FILE *fp, int64 pos, int seekType ) = 0;
 	virtual long FS_ftell( FILE *fp ) = 0;
 	virtual int FS_feof( FILE *fp ) = 0;
 	size_t FS_fread( OUT_BYTECAP(size) void *dest, size_t size, FILE *fp ) { return FS_fread( dest, (size_t)-1, size, fp ); }

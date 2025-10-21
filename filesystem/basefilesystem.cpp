@@ -864,12 +864,12 @@ bool CBaseFileSystem::AddPackFileFromPath( const char *pPath, const char *pakfil
 		return false;
 	}
 
-	// NOTE: Opening .bsp fiels inside of VPK files is not supported
+	// NOTE: Opening .bsp fields inside of VPK files is not supported
 
 	// Get the length of the pack file:
-	FS_fseek( ( FILE * )pf->m_hPackFileHandleFS, 0, FILESYSTEM_SEEK_TAIL );
-	int64 len = FS_ftell( ( FILE * )pf->m_hPackFileHandleFS );
-	FS_fseek( ( FILE * )pf->m_hPackFileHandleFS, 0, FILESYSTEM_SEEK_HEAD );
+	// dimhotepus: FS_fseek now returns offset.
+	int64 len = FS_fseek( pf->m_hPackFileHandleFS, 0, FILESYSTEM_SEEK_TAIL );
+	FS_fseek( pf->m_hPackFileHandleFS, 0, FILESYSTEM_SEEK_HEAD );
 
 	if ( !pf->Prepare( len ) )
 	{
@@ -5225,7 +5225,7 @@ void CFileHandle::SetBufferSize( int nBytes )
 	}
 }
 
-int CFileHandle::Read( void* pBuffer, int nLength )
+int CFileHandle::Read( OUT_BYTECAP(nLength) void* pBuffer, int nLength )
 {
 	Assert( IsValid() );
 	return Read( pBuffer, -1, nLength );
@@ -5300,9 +5300,8 @@ int CFileHandle::Seek( int64 nOffset, int nWhence )
 
 	if ( m_pFile )
 	{
-		m_fs->FS_fseek( m_pFile, nOffset, nWhence );
-		// TODO - FS_fseek should return the resultant offset
-		return 0;
+		// dimhotepus: Return seek offset like other paths do.
+		return m_fs->FS_fseek( m_pFile, nOffset, nWhence );
 	}
 
 	if ( m_pPackFileHandle )
