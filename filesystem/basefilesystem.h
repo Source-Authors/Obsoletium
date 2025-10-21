@@ -23,12 +23,10 @@
 #undef GetJob
 #undef AddJob
 
-#include "tier0/threadtools.h"
-#include <stdio.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <malloc.h>
-#include <string.h>
+
+#include "tier0/threadtools.h"
 #include "tier1/utldict.h"
 
 #elif defined(POSIX)
@@ -54,10 +52,10 @@
 #include "tier1/utllinkedlist.h"
 #include "tier1/utlstring.h"
 #include "tier1/UtlSortVector.h"
-#include "bspfile.h"
 #include "tier1/tier1.h"
 #include "tier1/strtools.h"
 #include "tier1/byteswap.h"
+#include "bspfile.h"
 #include "threadsaferefcountedobject.h"
 #include "filetracker.h"
 // #include "filesystem_init.h"
@@ -68,7 +66,7 @@
 
 #include "tier0/memdbgon.h"
 
-#ifdef	_WIN32
+#ifdef _WIN32
 #define PATHSEPARATOR(c) ((c) == '\\' || (c) == '/')
 #elif defined(POSIX)
 #define PATHSEPARATOR(c) ((c) == '/')
