@@ -244,7 +244,7 @@ void CMatchmaking::UpdateSearch()
 				SessionNotification( SESSION_NOTIFY_SEARCH_COMPLETED );
 
 				// Send the session info to gameui
-				for ( int i = 0; i < m_pSystemLinkResults.Count(); ++i )
+				for ( intp i = 0; i < m_pSystemLinkResults.Count(); ++i )
 				{
 					systemLinkInfo_s *pSearchInfo = (systemLinkInfo_s*)m_pSystemLinkResults[i];
 					XSESSION_SEARCHRESULT *pResult = &pSearchInfo->Result;
