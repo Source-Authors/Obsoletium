@@ -804,8 +804,10 @@ inline int16 BigShort( int16 val )
 	{
 		return WordSwap( val );
 	}
-
-	return val;
+	else
+	{
+		return val;
+	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
 inline uint16 BigWord( uint16 val )
@@ -814,8 +816,10 @@ inline uint16 BigWord( uint16 val )
 	{
 		return WordSwap( val );
 	}
-
-	return val;
+	else
+	{
+		return val;
+	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
 inline long BigLong( long val )
@@ -838,8 +842,10 @@ inline uint32 BigDWord( uint32 val )
 	{
 		return DWordSwap( val );
 	}
-
-	return val;
+	else
+	{
+		return val;
+	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
 inline int16 LittleShort( int16 val )
@@ -848,8 +854,10 @@ inline int16 LittleShort( int16 val )
 	{
 		return val;
 	}
-
-	return WordSwap( val );
+	else
+	{
+		return WordSwap( val );
+	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
 inline uint16 LittleWord( uint16 val )
@@ -858,19 +866,18 @@ inline uint16 LittleWord( uint16 val )
 	{
 		return val;
 	}
-
-	return WordSwap( val );
+	else
+	{
+		return WordSwap( val );
+	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
 inline long LittleLong( long val )
 {
 	if constexpr (isLittleEndian)
-	{
 		return val;
-	}
-
 	// dimhotepus: Honor size ex for LP64.
-	if constexpr (sizeof(val) <= 4)
+	else if constexpr (sizeof(val) <= 4)
 		return DWordSwap( val );
 	else
 		return QWordSwap( val );
@@ -882,8 +889,10 @@ inline uint32 LittleDWord( uint32 val )
 	{
 		return val;
 	}
-
-	return DWordSwap(val);
+	else
+	{
+		return DWordSwap(val);
+	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
 inline uint64 LittleQWord( uint64 val )
@@ -892,8 +901,10 @@ inline uint64 LittleQWord( uint64 val )
 	{
 		return val;
 	}
-
-	return QWordSwap( val ); 
+	else
+	{
+		return QWordSwap( val );
+	}
 }
 inline int16 SwapShort( int16 val )					{ return WordSwap( val ); }
 inline uint16 SwapWord( uint16 val )				{ return WordSwap( val ); }
