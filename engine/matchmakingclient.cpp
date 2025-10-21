@@ -298,7 +298,7 @@ void CMatchmaking::SelectSession( uint idx )
 	XSESSION_SEARCHRESULT *pResult = NULL;
 	if ( m_Session.IsSystemLink() )
 	{
-		systemLinkInfo_s* pInfo = (systemLinkInfo_s*)m_pSystemLinkResults[idx];
+		auto* pInfo = (systemLinkInfo_s*)m_pSystemLinkResults[idx];
 		pResult = &pInfo->Result;
 	}
 	else
