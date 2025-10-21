@@ -53,12 +53,13 @@ char const *CBuildFactoryHelper::GetClassName() const
 	return m_pClassName;
 }
 
-vgui::Panel *CBuildFactoryHelper::CreatePanel()
+// dimhotepus: Add parent to scale UI.
+vgui::Panel *CBuildFactoryHelper::CreatePanel( vgui::Panel *parent )
 {
 	if ( !m_CreateFunc )
 		return NULL;
 
-	return ( *m_CreateFunc )();
+	return ( *m_CreateFunc )( parent );
 }
 
 // private static meethod
@@ -76,13 +77,14 @@ bool CBuildFactoryHelper::HasFactory( char const *className )
 }
 
 // static method
-vgui::Panel *CBuildFactoryHelper::InstancePanel( char const *className )
+// dimhotepus: Add parent to scale UI.
+vgui::Panel *CBuildFactoryHelper::InstancePanel( char const *className, vgui::Panel *parent )
 {
 	CBuildFactoryHelper *p = m_sHelpers;
 	while ( p )
 	{
 		if ( !Q_stricmp( className, p->GetClassName() ) )
-			return p->CreatePanel();
+            return p->CreatePanel( parent );
 
 		p = p->GetNext();
 	}

@@ -21,9 +21,10 @@
 
 using namespace vgui;
 
-vgui::Panel *MessageBox_Factory()
+// dimhotepus: Add parent to scale UI.
+vgui::Panel *MessageBox_Factory( vgui::Panel* parent )
 {
-	return new MessageBox("MessageBox", "MessageBoxText");
+	return new MessageBox("MessageBox", "MessageBoxText", parent);
 }
 
 DECLARE_BUILD_FACTORY_CUSTOM( MessageBox, MessageBox_Factory );

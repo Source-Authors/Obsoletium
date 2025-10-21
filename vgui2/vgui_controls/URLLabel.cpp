@@ -21,9 +21,10 @@
 
 using namespace vgui;
 
-vgui::Panel *URLLabel_Factory()
+// dimhotepus: Add parent to scale UI.
+vgui::Panel *URLLabel_Factory( vgui::Panel* parent )
 {
-	return new URLLabel(NULL, NULL, "URLLabel", NULL);
+	return new URLLabel(parent, NULL, "URLLabel", NULL);
 }
 
 DECLARE_BUILD_FACTORY_CUSTOM( URLLabel, URLLabel_Factory );

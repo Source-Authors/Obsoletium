@@ -17,9 +17,10 @@
 
 using namespace vgui;
 
-vgui::Panel *CvarToggleCheckButton_Factory()
+// dimhotepus: Pass parent to scale UI.
+vgui::Panel *CvarToggleCheckButton_Factory( vgui::Panel* parent )
 {
-	return new CCvarToggleCheckButton( NULL, NULL, "CvarToggleCheckButton", NULL );
+	return new CCvarToggleCheckButton( parent, NULL, "CvarToggleCheckButton", NULL );
 }
 DECLARE_BUILD_FACTORY_CUSTOM( CCvarToggleCheckButton, CvarToggleCheckButton_Factory );
 

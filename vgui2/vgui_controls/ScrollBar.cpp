@@ -116,14 +116,16 @@ public:
 
 }
 
-vgui::Panel *ScrollBar_Vertical_Factory()
+// dimhotepus: Add parent to scale UI.
+vgui::Panel *ScrollBar_Vertical_Factory( vgui::Panel* parent )
 {
-	return new ScrollBar(NULL, NULL, true );
+	return new ScrollBar( parent, NULL, true );
 }
 
-vgui::Panel *ScrollBar_Horizontal_Factory()
+// dimhotepus: Add parent to scale UI.
+vgui::Panel *ScrollBar_Horizontal_Factory( vgui::Panel* parent )
 {
-	return new ScrollBar(NULL, NULL, false );
+	return new ScrollBar( parent, NULL, false );
 }
 
 DECLARE_BUILD_FACTORY_CUSTOM_ALIAS( ScrollBar, ScrollBar_Vertical, ScrollBar_Vertical_Factory );

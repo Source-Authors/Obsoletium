@@ -70,9 +70,10 @@ void ComboBoxButton::OnCursorExited()
 
 } // namespace vgui
 
-vgui::Panel *ComboBox_Factory()
+// dimhotepus: Add parent to scale UI.
+vgui::Panel *ComboBox_Factory( vgui::Panel* parent  )
 {
-	return new ComboBox( NULL, NULL, 5, true );
+	return new ComboBox( parent, NULL, 5, true );
 }
 DECLARE_BUILD_FACTORY_CUSTOM( ComboBox, ComboBox_Factory );
 

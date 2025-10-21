@@ -69,7 +69,8 @@ private:
 	MenuItem *_menuItem;
 };
 
-DECLARE_BUILD_FACTORY_DEFAULT_TEXT( MenuItem, MenuItem );
+// dimhotepus: Add parent to scale UI.
+DECLARE_BUILD_FACTORY_DEFAULT_TEXT_TYPED( MenuItem, Menu, MenuItem );
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor

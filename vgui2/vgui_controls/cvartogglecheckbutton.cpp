@@ -17,9 +17,10 @@
 
 using namespace vgui;
 
-static vgui::Panel *Create_CvarToggleCheckButton()
+// dimhotepus: Add parent to scale UI.
+static vgui::Panel *Create_CvarToggleCheckButton( vgui::Panel* parent )
 {
-	return new CvarToggleCheckButton< ConVarRef >( NULL, NULL );
+	return new CvarToggleCheckButton< ConVarRef >( parent, NULL );
 }
 
 DECLARE_BUILD_FACTORY_CUSTOM_ALIAS( CvarToggleCheckButton<ConVarRef>, CvarToggleCheckButton, Create_CvarToggleCheckButton );

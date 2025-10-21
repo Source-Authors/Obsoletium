@@ -386,7 +386,8 @@ struct PanelMap_t
 	vgui::PanelMap_t derivedClass::m_PanelMap = { derivedClass::m_MessageMap, ssize(derivedClass::m_MessageMap), #derivedClass, &baseClass::m_PanelMap, 0 }; \
 	vgui::PanelMap_t *derivedClass::GetPanelMap( void ) { return &m_PanelMap; }
 
-typedef vgui::Panel *( *PANELCREATEFUNC )( void );
+// dimhotepus: Pass parent to scale UI.
+typedef vgui::Panel *( *PANELCREATEFUNC )( vgui::Panel *parent );
 
 //-----------------------------------------------------------------------------
 // Purpose: Used by DECLARE_BUILD_FACTORY macro to create a linked list of
@@ -406,10 +407,12 @@ public:
 	CBuildFactoryHelper *GetNext( void );
 
 	char const	*GetClassName() const;
+	
+	// dimhotepus: Pass parent to scale UI.
+	vgui::Panel *CreatePanel( vgui::Panel *parent = nullptr );
 
-	vgui::Panel *CreatePanel();
-
-	static vgui::Panel *InstancePanel( char const *className );
+	// dimhotepus: Pass parent to scale UI.
+	static vgui::Panel *InstancePanel( char const *className, vgui::Panel *parent = nullptr );
 	static void GetFactoryNames( CUtlVector< char const * >& list );
 private:
 
@@ -428,18 +431,29 @@ private:
 // It creates a function which instances an object of the specified type
 // It them hooks that function up to the helper list so that the CHud objects can create
 //  the elements by name, with no header file dependency, etc.
+// dimhotepus: All panels by default have parent.
 #define DECLARE_BUILD_FACTORY( className )										\
-	static vgui::Panel *Create_##className( void )							\
+	static vgui::Panel *Create_##className( vgui::Panel *parent )							\
 		{																		\
-			return new className( NULL, NULL );									\
+			return new className( parent, NULL );									\
 		};																		\
 		static vgui::CBuildFactoryHelper g_##className##_Helper( #className, Create_##className );\
 	className *g_##className##LinkerHack = NULL;
 
+// dimhotepus: Pass parent to scale UI.
 #define DECLARE_BUILD_FACTORY_DEFAULT_TEXT( className, defaultText )			\
-	static vgui::Panel *Create_##className( void )							\
+	static vgui::Panel *Create_##className( vgui::Panel *parent )							\
 		{																		\
-			return new className( NULL, NULL, #defaultText );					\
+			return new className( parent, NULL, #defaultText );					\
+		};																		\
+	static vgui::CBuildFactoryHelper g_##className##_Helper( #className, Create_##className );\
+	className *g_##className##LinkerHack = NULL;
+
+// dimhotepus: Pass parent to scale UI. Add parent type to cast to.
+#define DECLARE_BUILD_FACTORY_DEFAULT_TEXT_TYPED( className, parentClassName, defaultText )			\
+	static vgui::Panel *Create_##className( vgui::Panel *parent )							\
+		{																		\
+			return new className( dynamic_cast<parentClassName *>( parent ), NULL, #defaultText );				\
 		};																		\
 	static vgui::CBuildFactoryHelper g_##className##_Helper( #className, Create_##className );\
 	className *g_##className##LinkerHack = NULL;

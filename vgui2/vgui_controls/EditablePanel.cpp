@@ -1054,7 +1054,8 @@ KeyValues *EditablePanel::GetDialogVariables()
 //-----------------------------------------------------------------------------
 Panel *EditablePanel::CreateControlByName(const char *controlName)
 {
-	Panel *fromFactory = CBuildFactoryHelper::InstancePanel( controlName );
+	// dimhotepus: Add parent to scale UI.
+	Panel *fromFactory = CBuildFactoryHelper::InstancePanel( controlName, this );
 	if ( fromFactory )
 	{
 		return fromFactory;
