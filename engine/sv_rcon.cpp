@@ -520,14 +520,13 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 		}
 	}
 
-	int i;
 	FailedRCon_t *failedRcon = NULL;
-	int nCount = m_failedRcons.Count();
-	for ( i=0; i < nCount; ++i )
+	intp nCount = m_failedRcons.Count();
+	for ( auto &rcon : m_failedRcons )
 	{
-		if ( adr.CompareAdr( m_failedRcons[i].adr, true ) )
+		if (adr.CompareAdr(rcon.adr, true))
 		{
-			failedRcon = &m_failedRcons[i];
+			failedRcon = &rcon;
 			break;
 		}
 	}
@@ -538,8 +537,8 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 		if ( nCount >= 32 )
 		{
 			// look for the one with the oldest failure
-			int indexToRemove = -1;
-			for ( i=0; i < nCount; ++i )
+			intp indexToRemove = -1;
+			for ( intp i=0; i < nCount; ++i )
 			{
 				if ( indexToRemove < 0 || m_failedRcons[i] < m_failedRcons[indexToRemove] )
 				{
@@ -591,9 +590,9 @@ bool CRConServer::HandleFailedRconAuth( const netadr_t & adr )
 
 	// check if the user should be banned based on recent failed attempts
 	int recentFailures = 0;
-	for ( i=failedRcon->badPasswordTimes.Count()-1; i>=0; --i )
+	for ( int j=failedRcon->badPasswordTimes.Count()-1; j>=0; --j )
 	{
-		if ( failedRcon->badPasswordTimes[i] + sv_rcon_minfailuretime.GetFloat() >= sv.GetTime() )
+		if ( failedRcon->badPasswordTimes[j] + sv_rcon_minfailuretime.GetFloat() >= sv.GetTime() )
 		{
 			++recentFailures;
 		}

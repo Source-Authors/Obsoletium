@@ -145,10 +145,9 @@ void CRConVProfExport::ResumeProfile()
 
 void CRConVProfExport::CleanupGroupData()
 {
-	int nCount = m_Info.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( auto &i : m_Info )
 	{
-		delete m_Info[i].m_pName;
+		delete i.m_pName;
 	}
 
 	m_Info.RemoveAll();

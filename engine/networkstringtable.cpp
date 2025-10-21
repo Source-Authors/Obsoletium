@@ -1360,10 +1360,10 @@ INetworkStringTable *CNetworkStringTableContainer::CreateStringTableEx( const ch
 //-----------------------------------------------------------------------------
 INetworkStringTable *CNetworkStringTableContainer::FindTable( const char *tableName ) const
 {
-	for ( int i = 0; i < m_Tables.Count(); i++ )
+	for ( auto *t : m_Tables )
 	{
-		if ( !Q_stricmp( tableName, m_Tables[ i ]->GetTableName() ) )
-			return m_Tables[i];
+		if ( !Q_stricmp( tableName, t->GetTableName() ) )
+			return t;
 	}
 
 	return NULL;
