@@ -125,7 +125,7 @@ void CMatchmaking::HandleSystemLinkReply( netpacket_t *pPacket )
 	m_pSystemLinkResults.AddToTail( pData );
 
 	Msg( "Found a matching game\n" );
-	DevMsg( "Result #%d: %d open public, %d open private\n", m_pSystemLinkResults.Count()-1, pResult->dwOpenPublicSlots, pResult->dwOpenPrivateSlots );
+	DevMsg( "Result #%zd: %lu open public, %lu open private\n", m_pSystemLinkResults.Count()-1, pResult->dwOpenPublicSlots, pResult->dwOpenPrivateSlots );
 }
 
 //-----------------------------------------------------------------------------
