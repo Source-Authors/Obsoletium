@@ -32,10 +32,12 @@
 #define DT_MAX_STRING_BITS			9
 #define DT_MAX_STRING_BUFFERSIZE	(1<<DT_MAX_STRING_BITS)	// Maximum length of a string that can be sent.
 
-#define STRINGBUFSIZE(className, varName)	sizeof( ((className*)0)->varName )
+// dimhotepus: size_t -> int.
+#define STRINGBUFSIZE(className, varName)	static_cast<int>( sizeof(((className*)0)->varName) )
 
 // Gets the size of a variable in a class.
-#define PROPSIZEOF(className, varName)		sizeof(((className*)0)->varName)
+// dimhotepus: size_t -> int.
+#define PROPSIZEOF(className, varName)		static_cast<int>( sizeof(((className*)0)->varName) )
 
 
 // SendProp::m_Flags.

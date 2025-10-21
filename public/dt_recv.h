@@ -286,13 +286,17 @@ inline bool RecvTable::IsInMainList() const
 // Normal offset of is invalid on non-array-types, this is dubious as hell. The rest of the codebase converted to the
 // legit offsetof from the C headers, so we'll use the old impl here to avoid exposing temptation to others
 // dimhotepus: TF2 backport. Add 0x1000000.
-#define _hacky_dtrecv_offsetof(s,m)	( (size_t)&(((s *)0x1000000)->m) - 0x1000000u )
+// dimhotepus: size_t -> int.
+#define _hacky_dtrecv_offsetof(s,m)	static_cast<int>( (size_t)&(((s *)0x1000000)->m) - 0x1000000u )
 
-#define RECVINFO(varName)						#varName, _hacky_dtrecv_offsetof(currentRecvDTClass, varName), sizeof(((currentRecvDTClass*)0)->varName)
-#define RECVINFO_NAME(varName, remoteVarName)	#remoteVarName, _hacky_dtrecv_offsetof(currentRecvDTClass, varName), sizeof(((currentRecvDTClass*)0)->varName)
+// dimhotepus: size_t -> int.
+#define RECVINFO(varName)						#varName, _hacky_dtrecv_offsetof(currentRecvDTClass, varName), static_cast<int>( sizeof(((currentRecvDTClass*)0)->varName) )
+// dimhotepus: size_t -> int.
+#define RECVINFO_NAME(varName, remoteVarName)	#remoteVarName, _hacky_dtrecv_offsetof(currentRecvDTClass, varName), static_cast<int>( sizeof(((currentRecvDTClass*)0)->varName) )
 #define RECVINFO_STRING(varName)				#varName, _hacky_dtrecv_offsetof(currentRecvDTClass, varName), STRINGBUFSIZE(currentRecvDTClass, varName)
 #define RECVINFO_BASECLASS(tableName)			RecvPropDataTable("this", 0, 0, &REFERENCE_RECV_TABLE(tableName))
-#define RECVINFO_ARRAY(varName)					#varName, _hacky_dtrecv_offsetof(currentRecvDTClass, varName), sizeof(((currentRecvDTClass*)0)->varName[0]), sizeof(((currentRecvDTClass*)0)->varName)/sizeof(((currentRecvDTClass*)0)->varName[0])
+// dimhotepus: size_t -> int.
+#define RECVINFO_ARRAY(varName)					#varName, _hacky_dtrecv_offsetof(currentRecvDTClass, varName), static_cast<int>( sizeof(((currentRecvDTClass*)0)->varName[0]) ), static_cast<int>( sizeof(((currentRecvDTClass*)0)->varName)/sizeof(((currentRecvDTClass*)0)->varName[0]) )
 
 // Just specify the name and offset. Used for strings and data tables.
 #define RECVINFO_NOSIZE(varName)				#varName, _hacky_dtrecv_offsetof(currentRecvDTClass, varName)
@@ -414,13 +418,13 @@ RecvProp InternalRecvPropArray(
 		arrayLengthProxy \
 		)
 
-
 // Use this and pass the array name and it will figure out the count and stride automatically.
+// dimhotepus: size_t -> int.
 #define RecvPropVariableLengthArray( arrayLengthProxy, varTemplate, arrayName )			\
 	varTemplate,										\
 	InternalRecvPropArray(								\
-		sizeof(((currentRecvDTClass*)0)->arrayName) / PROPSIZEOF(currentRecvDTClass, arrayName[0]), \
-		PROPSIZEOF(currentRecvDTClass, arrayName[0]),	\
+		static_cast<int>( sizeof(((currentRecvDTClass*)0)->arrayName) / PROPSIZEOF(currentRecvDTClass, arrayName[0]) ), \
+		static_cast<int>( PROPSIZEOF(currentRecvDTClass, arrayName[0]) ),	\
 		#arrayName,										\
 		arrayLengthProxy								\
 		)

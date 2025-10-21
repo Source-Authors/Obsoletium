@@ -579,7 +579,8 @@ inline void SendTable::SetHasPropsEncodedAgainstTickcount( bool bState )
 // Normal offset of is invalid on non-array-types, this is dubious as hell. The rest of the codebase converted to the
 // legit offsetof from the C headers, so we'll use the old impl here to avoid exposing temptation to others
 // dimhotepus: TF2 backport. Add 0x1000000.
-#define _hacky_dtsend_offsetof(s,m)	( (size_t)&(((s *)0x1000000)->m) - 0x1000000u )
+// dimhotepus: size_t -> int.
+#define _hacky_dtsend_offsetof(s,m)	static_cast<int>( (size_t)&(((s *)0x1000000)->m) - 0x1000000u )
 
 // These can simplify creating the variables.
 // Note: currentSendDTClass::MakeANetworkVar_##varName equates to currentSendDTClass. It's
@@ -781,11 +782,12 @@ SendProp InternalSendPropArray(
 		)
 
 
+// dimhotepus: size_t -> int.
 #define SendPropVariableLengthArray( arrayLengthSendProxy, varTemplate, arrayName )	\
 	varTemplate,										\
 	InternalSendPropArray(								\
-		sizeof(((currentSendDTClass*)0)->arrayName) / PROPSIZEOF(currentSendDTClass, arrayName[0]), \
-		PROPSIZEOF(currentSendDTClass, arrayName[0]),	\
+		static_cast<int>( sizeof(((currentSendDTClass*)0)->arrayName) / PROPSIZEOF(currentSendDTClass, arrayName[0]) ), \
+		static_cast<int>( PROPSIZEOF(currentSendDTClass, arrayName[0]) ),	\
 		#arrayName,										\
 		arrayLengthSendProxy							\
 		)
