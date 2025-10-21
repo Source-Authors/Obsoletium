@@ -5,6 +5,7 @@
 // $NoKeywords: $
 //=============================================================================//
 
+#include "ContentControlDialog.h"
 
 #include <stdio.h>
 #include <memory.h>
@@ -12,7 +13,6 @@
 #include "winlite.h"
 #endif
 
-#include "ContentControlDialog.h"
 #include "checksum_md5.h"
 #include "EngineInterface.h"
 
