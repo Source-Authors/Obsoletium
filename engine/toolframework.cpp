@@ -472,6 +472,21 @@ void CToolFrameworkInternal::ShutdownTools()
 //-----------------------------------------------------------------------------
 void CToolFrameworkInternal::LoadToolsFromLibrary( const char *dllname )
 {
+	char fixedDllName[ MAX_PATH ];
+	// dimhotepus: x86-64 support.
+	if ( ssize( PLATFORM_DIR ) > 0 && V_stristr( dllname, PLATFORM_DIR ) == nullptr )
+	{
+		if ( V_strncmp( dllname, "tools", ssize( "tools" ) - 1 ) == 0 ) 
+		{
+			V_strcpy_safe( fixedDllName, "tools" PLATFORM_DIR CORRECT_PATH_SEPARATOR_S );
+			V_strcat_safe( fixedDllName, dllname + ssize( "tools/" ) - 1 );
+
+			V_FixSlashes( fixedDllName );
+
+			dllname = fixedDllName;
+		}
+	}
+
 	CSysModule *module = Sys_LoadModule( dllname );
 	if ( !module )
 	{
