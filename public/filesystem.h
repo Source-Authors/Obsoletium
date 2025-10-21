@@ -1009,4 +1009,17 @@ inline unsigned IFileSystem::GetOptimalReadSize( FileHandle_t hFile, unsigned nL
 
 extern IFileSystem *g_pFullFileSystem;
 
+// dimhotepus: Define single API for path separators.
+#ifdef _WIN32
+[[nodiscard]] constexpr inline bool PATHSEPARATOR( char c )
+{
+	return c == '\\' || c == '/';
+}
+#elif defined(POSIX)
+[[nodiscard]] constexpr inline bool PATHSEPARATOR( char c )
+{
+	return c == '/';
+}
+#endif	//_WIN32
+
 #endif // FILESYSTEM_H

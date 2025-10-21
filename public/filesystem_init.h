@@ -20,12 +20,12 @@ constexpr inline char CMDLINEOPTION_NOVCONFIG[]{"-NoVConfig"};
 
 constexpr inline char GAMEDIR_TOKEN[]{"VProject"};
 
-
-#if defined( _WIN32 ) || defined( WIN32 )
-#define PATHSEPARATOR(c) ((c) == '\\' || (c) == '/')
-#else	//_WIN32
-#define PATHSEPARATOR(c) ((c) == '/')
-#endif	//_WIN32
+// dimhotepus: Moved to filesystem.h
+// #if defined( _WIN32 ) || defined( WIN32 )
+// #define PATHSEPARATOR(c) ((c) == '\\' || (c) == '/')
+// #else	//_WIN32
+// #define PATHSEPARATOR(c) ((c) == '/')
+// #endif	//_WIN32
 
 
 enum FSReturnCode_t

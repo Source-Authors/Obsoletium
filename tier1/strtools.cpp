@@ -1649,7 +1649,7 @@ void V_binarytohex( IN_BYTECAP(inputbytes) const byte *in, intp inputbytes, OUT_
 // now counting it as one even Posix since so many times our filepaths aren't actual
 // paths but rather text strings passed in from data files, treating \ as a pathseparator
 // covers the full range of cases
-bool PATHSEPARATOR( char c )
+[[nodiscard]] static constexpr inline bool PATHSEPARATOR( char c )
 {
 	return c == '\\' || c == '/';
 }

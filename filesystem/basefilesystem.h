@@ -66,11 +66,12 @@
 
 #include "tier0/memdbgon.h"
 
-#ifdef _WIN32
-#define PATHSEPARATOR(c) ((c) == '\\' || (c) == '/')
-#elif defined(POSIX)
-#define PATHSEPARATOR(c) ((c) == '/')
-#endif	//_WIN32
+// dimhotepus: Moved to filesystem.h
+// #ifdef _WIN32
+// #define PATHSEPARATOR(c) ((c) == '\\' || (c) == '/')
+// #elif defined(POSIX)
+// #define PATHSEPARATOR(c) ((c) == '/')
+// #endif	//_WIN32
 
 #define MAX_FILEPATH 512 
 
