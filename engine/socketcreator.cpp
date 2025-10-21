@@ -249,7 +249,7 @@ intp CSocketCreator::ConnectSocket( const netadr_t &netAdr, bool bSingleSocket )
 		tv.tv_sec = 1;
 		FD_ZERO( &writefds );
 		FD_SET( static_cast<uintp>( hSocket ), &writefds );
-		if ( select ( hSocket + 1, NULL, &writefds, NULL, &tv ) < 1 ) // block for at most 1 second
+		if ( select ( (intp)hSocket + 1, NULL, &writefds, NULL, &tv ) < 1 ) // block for at most 1 second
 		{
 			closesocket( hSocket );		// took too long to connect to, give up
 			return -1;
