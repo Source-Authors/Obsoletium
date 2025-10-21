@@ -593,7 +593,8 @@ private:
 	CUtlVector< FSMState_t >		m_States;
 	uint							m_uCurrentState;
 	struct sockaddr_in				m_HarvesterSockAddr;
-	uint							m_SocketTCP;
+	// dimhotepus: x86-64 support. uint -> socket_handle.
+	socket_handle					m_SocketTCP;
 	const TGameStatsParameters	&m_rCrashParameters; //lint !e1725
 	u32								m_ContextID;
 };
@@ -694,7 +695,7 @@ bool CWin32UploadGameStats::CreateTCPSocket( EGameStatsUploadStatus& status, CUt
 	UpdateProgress( m_rCrashParameters, "Creating game stats upload socket." );
 
 	m_SocketTCP = socket( AF_INET, SOCK_STREAM, IPPROTO_TCP );
-	if ( m_SocketTCP == (uint)SOCKET_ERROR )
+	if ( m_SocketTCP == SOCKET_ERROR )
 	{
 		UpdateProgress( m_rCrashParameters, "Socket creation failed." );
 
