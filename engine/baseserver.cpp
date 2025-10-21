@@ -758,7 +758,7 @@ bool CBaseServer::ProcessConnectionlessPacket(netpacket_t * packet)
 				else
 				{
 					msg.ReadString( cdkey );
-					ConnectClient( packet->from, protocol, challengeNr, clientChallenge, authProtocol, name, password, cdkey, strlen(cdkey) );
+					ConnectClient( packet->from, protocol, challengeNr, clientChallenge, authProtocol, name, password, cdkey, V_strlen(cdkey) );
 				}
 			}
 

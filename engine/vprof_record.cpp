@@ -162,7 +162,7 @@ public:
 				
 				Record_WriteToken( Token_AddNode );
 				g_pFileSystem->Write( &parentNodeID, sizeof( parentNodeID ), m_hFile );						// Parent node ID.
-				g_pFileSystem->Write( pToAdd->m_pszName, strlen( pToAdd->m_pszName ) + 1, m_hFile );	// Name of the new node.
+				g_pFileSystem->Write( pToAdd->m_pszName, V_strlen( pToAdd->m_pszName ) + 1, m_hFile );	// Name of the new node.
 				g_pFileSystem->Write( &budgetGroupID, sizeof( budgetGroupID ), m_hFile );
 				g_pFileSystem->Write( &nodeID, sizeof( nodeID ), m_hFile );
 
@@ -199,7 +199,7 @@ public:
 			const char *pName = pInProfile->GetBudgetGroupName( i );
 			int flags = pInProfile->GetBudgetGroupFlags( i );
 			Record_WriteToken( Token_AddBudgetGroup );
-			g_pFileSystem->Write( pName, strlen( pName ) + 1, m_hFile );
+			g_pFileSystem->Write( pName, V_strlen( pName ) + 1, m_hFile );
 			g_pFileSystem->Write( &flags, sizeof( flags ), m_hFile );
 
 			AddBudgetGroupName( pName, flags );

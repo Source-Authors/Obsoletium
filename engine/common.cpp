@@ -1040,7 +1040,7 @@ void COM_LogString( char const *pchFile, char const *pchString )
 	FileHandle_t fp = g_pFileSystem->Open( pfilename, "a+t");
 	if (fp)
 	{
-		g_pFileSystem->Write( pchString, strlen( pchString), fp );
+		g_pFileSystem->Write( pchString, V_strlen( pchString), fp );
 		g_pFileSystem->Close(fp);
 	}
 }

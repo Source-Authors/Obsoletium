@@ -25,13 +25,13 @@ ConVar vgui_nav_lock_default_button( "vgui_nav_lock_default_button", "0", FCVAR_
 //-----------------------------------------------------------------------------
 int DrawTextLen( vgui::HFont font, const wchar_t *text )
 {
-	int len = wcslen( text );
+	intp len = V_wcslen( text );
 
 	int x = 0;
 
 	vgui::surface()->DrawSetTextFont( font );
 
-	for ( int i = 0 ; i < len; i++ )
+	for ( intp i = 0 ; i < len; i++ )
 	{
 		int a, b, c;
 		vgui::surface()->GetCharABCwide( font, text[i], a, b, c );
@@ -63,7 +63,7 @@ int DrawTextLen( vgui::HFont font, const wchar_t *text )
 
 int DrawColoredText( vgui::HFont font, int x, int y, int r, int g, int b, int a, const wchar_t *text )
 {
-	int len = wcslen( text );
+	intp len = V_wcslen( text );
 	
 	if ( len <= 0 )
 		return x;
