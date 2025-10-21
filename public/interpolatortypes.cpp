@@ -120,7 +120,8 @@ unsigned short Interpolator_CurveTypeForName( const char *name )
 	return MAKE_CURVE_TYPE( leftcurve, rightcurve );
 }
 
-const char *Interpolator_NameForCurveType( int type, bool printname )
+// dimhotepus: int -> unsigned short.
+const char *Interpolator_NameForCurveType( unsigned short type, bool printname )
 {
 	static char outname[ 256 ];
 
@@ -143,7 +144,8 @@ const char *Interpolator_NameForCurveType( int type, bool printname )
 	return outname;
 }
 
-void Interpolator_CurveInterpolatorsForType( int type, int& inbound, int& outbound )
+// dimhotepus: int -> unsigned short.
+void Interpolator_CurveInterpolatorsForType( unsigned short type, int& inbound, int& outbound )
 {
 	inbound = GET_LEFT_CURVE( type );
 	outbound = GET_RIGHT_CURVE( type );

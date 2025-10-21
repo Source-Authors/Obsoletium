@@ -72,8 +72,10 @@ enum
 
 // Turn enum into string and vice versa
 unsigned short	Interpolator_CurveTypeForName( const char *name );
-const char	*Interpolator_NameForCurveType( int type, bool printname );
-void		Interpolator_CurveInterpolatorsForType( int type, int& inbound, int& outbound );
+// dimhotepus: int -> unsigned short.
+const char	*Interpolator_NameForCurveType( unsigned short type, bool printname );
+// dimhotepus: int -> unsigned short.
+void		Interpolator_CurveInterpolatorsForType( unsigned short type, int& inbound, int& outbound );
 int			Interpolator_CurveTypeForHotkey( int key );
 
 unsigned char	Interpolator_InterpolatorForName( char const *name );
