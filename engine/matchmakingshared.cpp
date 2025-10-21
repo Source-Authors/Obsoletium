@@ -18,12 +18,6 @@
 #include "server.h"
 #include "host.h"
 
-#if defined( _X360 )   
-#include "xbox/xbox_win32stubs.h"
-#include "audio/private/snd_dev_xaudio.h"
-#include "audio_pch.h"
-#endif
-
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
@@ -78,19 +72,6 @@ void CMatchmaking::Cleanup()
 
 	m_Host.Clear();
 
-#ifdef _X360
-	if ( Audio_GetXVoice() )
-	{
-		CClientInfo *pLocal = NULL;
-
-		if ( m_bCreatedLocalTalker )
-		{
-			pLocal = &m_Local;
-		}
-
-		Audio_GetXVoice()->RemoveAllTalkers( pLocal );
-	}
-#endif
 	m_bCreatedLocalTalker = false;
 	SetPreventFullServerStartup( false, "Cleanup\n" );
 
@@ -330,13 +311,6 @@ bool CMatchmaking::ProcessVoiceData( CLC_VoiceData *pVoice )
 		SendToRemoteClients( pVoice, true, pVoice->m_xuid );
 	}
 
-	// Playback the voice data locally through xaudio
-#if defined ( _X360 )
-	if ( pVoice->m_xuid != m_Local.m_xuids[0] )
-	{
-		Audio_GetXVoice()->PlayIncomingVoiceData( pVoice->m_xuid, (byte*)chReceived, dwLength );
-	}
-#endif
 	return true;
 }
 
@@ -719,17 +693,6 @@ void CMatchmaking::NetMessageToClientInfo( CClientInfo *pClient, const MM_Client
 	pClient->m_cPlayers = pInfo->m_cPlayers;
 	pClient->m_bInvited = pInfo->m_bInvited;
 
-#if defined( _X360 )
-	IN_ADDR winaddr;
-	XNKID xid = m_Session.GetSessionId();
-	if ( XNetXnAddrToInAddr( &pClient->m_xnaddr, &xid, &winaddr ) != 0 )
-	{
-		Warning( "Error resolving client IP\n" );
-	}
- 	pClient->m_adr.SetType( NA_IP );
- 	pClient->m_adr.SetIPAndPort( winaddr.S_un.S_addr, PORT_MATCHMAKING );
-#endif
-
 	Q_memcpy( pClient->m_xuids, pInfo->m_xuids, sizeof( pClient->m_xuids ) );
 	Q_memcpy( pClient->m_cVoiceState, pInfo->m_cVoiceState, sizeof( pClient->m_cVoiceState ) );
 	Q_memcpy( pClient->m_iTeam, pInfo->m_iTeam, sizeof( pClient->m_iTeam ) );
@@ -750,77 +713,6 @@ bool CMatchmaking::InitializeLocalClient( bool bIsHost )
 	Q_memset( &m_Local, 0, sizeof( m_Local ) );
 
 	m_Local.m_bInvited = bIsHost;
-
-#if defined( _X360 )
-	while( XNetGetTitleXnAddr( &m_Local.m_xnaddr ) == XNET_GET_XNADDR_PENDING )
-		;
-
-	// machine id
-	if ( 0 != XNetXnAddrToMachineId( &m_Local.m_xnaddr, &m_Local.m_id ) )
-	{
-		// User isn't signed in to live, use their xuid instead
-		XUserGetXUID( XBX_GetPrimaryUserId(), &m_Local.m_id );
-	}
-
-	m_Local.m_cPlayers = 0;
-
-	// Set up the players
-	for ( uint i = 0; i < MAX_PLAYERS_PER_CLIENT; ++i )
-	{
-		// We currently only allow one player per console
-		if ( i != XBX_GetPrimaryUserId() )
-		{
-			continue;
-		}
-
-		// xuid
-		uint ret = XUserGetXUID( i, &m_Local.m_xuids[m_Local.m_cPlayers] );
-		if ( ret == ERROR_NO_SUCH_USER )
-		{
-			continue;
-		}
-		else if ( ret != ERROR_SUCCESS )
-		{
-			return false;
-		}
-
-		// gamertag
-		ret = XUserGetName( XBX_GetPrimaryUserId(), m_Local.m_szGamertags[m_Local.m_cPlayers], MAX_PLAYER_NAME_LENGTH );
-		if ( ret != ERROR_SUCCESS )
-		{
-			return false;
-		}
-		m_Local.m_szGamertags[m_Local.m_cPlayers][MAX_PLAYER_NAME_LENGTH - 1] = '\0';
-
-		// Set the player's name in the game
-		char szNameCmd[MAX_PLAYER_NAME_LENGTH + 16];
-		Q_snprintf( szNameCmd, sizeof( szNameCmd ), "name %s", m_Local.m_szGamertags[m_Local.m_cPlayers] );
-		engineClient->ClientCmd( szNameCmd );
-
-		m_Local.m_iControllers[m_Local.m_cPlayers] = i;
-		m_Local.m_iTeam[m_Local.m_cPlayers] = -1;
-
-
-		m_Local.m_cVoiceState[m_Local.m_cPlayers] = 0;
-
-		// number of players on this console
-		++m_Local.m_cPlayers;
-	}
-
-	// Source can only support one player per console.
-	if( m_Local.m_cPlayers > 1 )
-	{
-		Warning( "Too many players on this console\n" );
-		return false;
-	}
-
-	// Set up the host data that gets sent back to searching clients
-	// By default, the first player is considered the host
-	Q_strncpy( m_HostData.hostName, m_Local.m_szGamertags[0], sizeof( m_HostData.hostName ) );
-	m_HostData.gameState = GAMESTATE_INLOBBY;
-	m_HostData.xuid = m_Local.m_xuids[ XBX_GetPrimaryUserId() ];
-
-#endif
 
 	m_bInitialized = true;
 	return true;
@@ -1213,16 +1105,6 @@ void CMatchmaking::AddPlayersToSession( CClientInfo *pClient )
 		m_Session.JoinRemote( pClient );
 	}
 
-#if defined ( _X360 )
-	if ( Audio_GetXVoice() )
-	{
-		Audio_GetXVoice()->AddPlayerToVoiceList( pClient, bIsLocal );
-		if ( bIsLocal )
-		{
-			m_bCreatedLocalTalker = true;
-		}
-	}
-#endif
 	UpdateMuteList();
 }
 
@@ -1246,12 +1128,6 @@ void CMatchmaking::RemovePlayersFromSession( CClientInfo *pClient )
 		m_Session.RemoveRemote( pClient );
 	}
 
-#if defined ( _X360 )
-	if ( Audio_GetXVoice() )
-	{
-		Audio_GetXVoice()->RemovePlayerFromVoiceList( pClient, bIsLocal );
-	}
-#endif
 	UpdateMuteList();
 }
 
@@ -1300,61 +1176,7 @@ void Con_PrintTalkers( const CCommand &args )
 
 void CMatchmaking::PrintVoiceStatus( void )
 {
-#ifdef _X360
-	int iRemoteClient = 0;
-	int numRemoteTalkers;
-	XUID remoteTalkers[MAX_PLAYERS];
-	Audio_GetXVoice()->GetRemoteTalkers( &numRemoteTalkers, remoteTalkers );
-
-	CClientInfo *pClient = &m_Local;
-
-	if ( m_Session.IsHost() == false )
-	{
-		pClient = &m_Host;
-	}
-
-
-	Msg( "Num Remote Talkers: %d\n", numRemoteTalkers );
-
-	bool bFound = false;
-
-	while ( pClient )
-	{
-		if ( pClient != &m_Local )
-		{
-			for ( int iRemote = 0; iRemote < numRemoteTalkers; iRemote++ )
-			{
-				if ( pClient->m_xuids[0] == remoteTalkers[iRemote] )
-				{
-					bFound = true;
-					break;
-				}
-			}
-
-			if ( bFound == true )
-			{
-				Msg( "Found a Talker: %s\n", pClient->m_szGamertags[0] );
-			}
-			else
-			{
-				Msg( "ALERT!!! %s not in Talker list\n", pClient->m_szGamertags[0] );
-			}
 		}
-
-		if ( iRemoteClient < m_Remote.Count() )
-		{
-			pClient = m_Remote[iRemoteClient];
-			iRemoteClient++;
-		}
-		else
-		{
-			pClient = NULL;
-		}
-	}
-
-#endif
-
-}
 
 static ConCommand voice_printtalkers( "voice_printtalkers", Con_PrintTalkers, "voice debug.", FCVAR_DONTRECORD );
 
@@ -1363,106 +1185,13 @@ static ConCommand voice_printtalkers( "voice_printtalkers", Con_PrintTalkers, "v
 //-----------------------------------------------------------------------------
 void CMatchmaking::GenerateMutelist( MM_Mutelist *pMsg )
 {
-#if defined( _X360 )
-	// Get our remote talker list
-	if ( !Audio_GetXVoice() )
-		return;
-
-	int numRemoteTalkers;
-	XUID remoteTalkers[MAX_PLAYERS];
-	Audio_GetXVoice()->GetRemoteTalkers( &numRemoteTalkers, remoteTalkers );
-
-	pMsg->m_cPlayers = 0;
-
-	// Loop through local players and update mutes
-	for ( int iLocal = 0; iLocal < m_Local.m_cPlayers; ++iLocal )
-	{	
-		pMsg->m_cMuted[iLocal] = 0;
-
-		pMsg->m_xuid[pMsg->m_cPlayers] = m_Local.m_xuids[iLocal];
-
-		for ( int iRemote = 0; iRemote < numRemoteTalkers; ++iRemote )
-		{
-			BOOL bIsMuted = false;
-
-			DWORD ret = XUserMuteListQuery( m_Local.m_iControllers[iLocal], remoteTalkers[iRemote], &bIsMuted );
-			if( ERROR_SUCCESS != ret )
-			{
-				Warning( "Warning: XUserMuteListQuery() returned 0x%08x for user %d\n", ret, iLocal );
 			}
-
-			if( bIsMuted )
-			{
-				pMsg->m_Muted[pMsg->m_cPlayers].AddToTail( remoteTalkers[iRemote ] );
-				++pMsg->m_cMuted[pMsg->m_cPlayers];
-			}
-			else
-			{
-				bIsMuted = m_MutedBy[iLocal].HasElement( remoteTalkers[iRemote] );
-			}
-
-			if( bIsMuted )
-			{
-				Audio_GetXVoice()->SetPlaybackPriority( remoteTalkers[iRemote], m_Local.m_iControllers[iLocal], XHV_PLAYBACK_PRIORITY_NEVER );
-			}
-			else
-			{
-				Audio_GetXVoice()->SetPlaybackPriority( remoteTalkers[iRemote], m_Local.m_iControllers[iLocal], XHV_PLAYBACK_PRIORITY_MAX );
-			}
-		}
-
-		pMsg->m_cRemoteTalkers[pMsg->m_cPlayers] = m_MutedBy[pMsg->m_cPlayers].Count();
-		++pMsg->m_cPlayers;
-	}
-#endif
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Handle the mutelist from another client
 //-----------------------------------------------------------------------------
 bool CMatchmaking::ProcessMutelist( MM_Mutelist *pMsg )
 {
-#if defined( _X360 )
-	// local players
-	for( int i = 0; i < m_Local.m_cPlayers; ++i )
-	{
-		// remote players
-		for( int j = 0; j < pMsg->m_cPlayers; ++j )
-		{
-			m_MutedBy[i].FindAndRemove( pMsg->m_xuid[j] );
-
-			// players muted by remote player
-			for( int k = 0; k < pMsg->m_cMuted[j]; ++k )
-			{
-				if( m_Local.m_xuids[i] == pMsg->m_Muted[j][k] )
-				{
-					m_MutedBy[i].AddToTail( pMsg->m_xuid[j] );
-				}
-			}
-
-			BOOL bIsMuted = m_MutedBy[i].HasElement( pMsg->m_xuid[j] );
-			if ( !bIsMuted )
-			{
-				XUserMuteListQuery( m_Local.m_iControllers[i], pMsg->m_xuid[j], &bIsMuted );
-			}
-			if( bIsMuted )
-			{
-				Audio_GetXVoice()->SetPlaybackPriority( pMsg->m_xuid[j], m_Local.m_iControllers[i], XHV_PLAYBACK_PRIORITY_NEVER );
-			}
-			else
-			{
-				Audio_GetXVoice()->SetPlaybackPriority( pMsg->m_xuid[j], m_Local.m_iControllers[i], XHV_PLAYBACK_PRIORITY_MAX );
-			}
-		}
-	}
-
-	if ( m_Session.IsHost() )
-	{
-		// Pass this along to everyone else
-		SendToRemoteClients( pMsg );
-	}
-
-#endif
 	return true;
 }
 
@@ -2032,75 +1761,7 @@ void CMatchmaking::SwitchToState( int newState )
 
 void CMatchmaking::UpdateVoiceStatus( void )
 {
-#if defined( _X360 )
-
-	if ( m_flVoiceBlinkTime > GetTime() )
-		return;
-
-	m_flVoiceBlinkTime = GetTime() + VOICE_ICON_BLINK_TIME;
-	CClientInfo *pClient = &m_Local;
-
-	bool bIsHost = m_Session.IsHost();
-	bool bShouldSendInfo = false;
-
-	if ( pClient )
-	{
-		for ( int i = 0; i < pClient->m_cPlayers; ++i )
-		{
-			if ( pClient->m_xuids[i] == 0 )
-				continue;
-
-			byte cOldVoiceState = pClient->m_cVoiceState[i];
-
-			if ( Audio_GetXVoice()->IsHeadsetPresent( pClient->m_iControllers[i] ) == false )
-			{
-				pClient->m_cVoiceState[i] = VOICE_STATUS_OFF;
-			}
-			else
-			{
-				if ( Audio_GetXVoice()->IsPlayerTalking( pClient->m_xuids[i], true ) )
-				{
-					pClient->m_cVoiceState[i] = VOICE_STATUS_TALKING;
-				}
-				else
-				{
-					pClient->m_cVoiceState[i] = VOICE_STATUS_IDLE;
-				}
-			}
-
-			if ( cOldVoiceState != pClient->m_cVoiceState[i] )
-			{
-				bShouldSendInfo = true;
-			}
-
-			if ( bShouldSendInfo == true )
-			{
-				EngineVGui()->UpdatePlayerInfo( pClient->m_xuids[i], pClient->m_szGamertags[i], pClient->m_iTeam[i], pClient->m_cVoiceState[i], GetPlayersNeeded(), bIsHost );
-			}
-		}
-
-
-		if ( bShouldSendInfo )
-		{
-			MM_ClientInfo info;
-			ClientInfoToNetMessage( &info, pClient );
-		
-			if ( bIsHost == true )
-			{
-				// Tell all the clients
-				ProcessClientInfo( &info );
-			}
-			else
-			{
-				// Tell all the clients
-				SendMessage( &info, &m_Host );
-			}
-		}
 	}
-
-#endif
-
-}
 
 //-----------------------------------------------------------------------------
 //	Update matchmaking and any active session 
@@ -2122,35 +1783,6 @@ void CMatchmaking::RunFrame()
 			NET_ProcessSocket( NS_SYSTEMLINK, this );
 		}
 	}
-
-#if defined( _X360 )
-	if ( Audio_GetXVoice() != NULL )
-	{
-		if ( !GameIsActive() )
-		{
-			if ( Audio_GetXVoice()->VoiceUpdateData() == true )
-			{
-				CLC_VoiceData voice;
-				Audio_GetXVoice()->GetVoiceData( &voice );
-
-				if ( m_Session.IsHost() )
-				{
-					// Send this message on to everyone else
-					SendToRemoteClients( &voice, true );
-				}
-				else
-				{
-					// Send to the host
-					SendMessage( &voice, &m_Host );
-				}
-
-				Audio_GetXVoice()->VoiceResetLocalData();
-			}
-
-			UpdateVoiceStatus();
-		}
-	}
-#endif
 
 	// Tell the session to run its update
 	m_Session.RunFrame();
