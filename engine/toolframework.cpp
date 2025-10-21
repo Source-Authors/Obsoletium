@@ -157,10 +157,8 @@ IToolFrameworkInternal *toolframework = &g_ToolFrameworkInternal;
 //-----------------------------------------------------------------------------
 void CToolFrameworkInternal::InvokeMethod( ToolSystemFunc_t f )
 {
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = 0; i < toolCount; ++i )
+	for ( auto *sys : m_ToolSystems )
 	{
-		IToolSystem *sys = m_ToolSystems[i];
 		(sys->*f)();
 	}
 }
@@ -171,10 +169,8 @@ void CToolFrameworkInternal::InvokeMethod( ToolSystemFunc_t f )
 //-----------------------------------------------------------------------------
 void CToolFrameworkInternal::InvokeMethodInt( ToolSystemFunc_Int_t f, int arg )
 {
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = 0; i < toolCount; ++i )
+	for ( auto *sys : m_ToolSystems )
 	{
-		IToolSystem *sys = m_ToolSystems[i];
 		(sys->*f)( arg );
 	}
 }
@@ -215,7 +211,7 @@ void *CToolFrameworkInternal::QueryInterface( const char *pInterfaceName )
 //-----------------------------------------------------------------------------
 static bool CToolFrameworkInternal_QuitHandler( void *pvUserData )
 {
-	CToolFrameworkInternal *tfm = reinterpret_cast< CToolFrameworkInternal * >( pvUserData );
+	auto *tfm = reinterpret_cast< CToolFrameworkInternal * >( pvUserData );
 	if ( tfm )
 	{
 		return tfm->CanQuit();
@@ -256,14 +252,11 @@ InitReturnVal_t CToolFrameworkInternal::Init()
 bool CToolFrameworkInternal::PostInit()
 {
 	bool bRetVal = true;
-
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = 0; i < toolCount; ++i )
+	
+	for ( auto *sys : m_ToolSystems )
 	{
-		IToolSystem *system = m_ToolSystems[ i ];
-
 		// FIXME: Should this really get access to a list if factories
-		bool success = system->Init( );
+		bool success = sys->Init( );
 		if ( !success )
 		{
 			bRetVal = false;
@@ -297,11 +290,9 @@ void CToolFrameworkInternal::Shutdown()
 //-----------------------------------------------------------------------------
 void CToolFrameworkInternal::Think( bool finalTick )
 {
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = 0; i < toolCount; ++i )
+	for ( auto *sys : m_ToolSystems )
 	{
-		IToolSystem *system = m_ToolSystems[ i ];
-		system->Think( finalTick );
+		sys->Think( finalTick );
 	}
 }
 
@@ -313,13 +304,11 @@ void CToolFrameworkInternal::Think( bool finalTick )
 bool CToolFrameworkInternal::ServerInit( CreateInterfaceFn serverFactory )
 {
 	bool retval = true;
-
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = 0; i < toolCount; ++i )
+	
+	for ( auto *sys : m_ToolSystems )
 	{
-		IToolSystem *system = m_ToolSystems[ i ];
 		// FIXME: Should this really get access to a list if factories
-		bool success = system->ServerInit( serverFactory );
+		bool success = sys->ServerInit( serverFactory );
 		if ( !success )
 		{
 			retval = false;
@@ -336,13 +325,11 @@ bool CToolFrameworkInternal::ServerInit( CreateInterfaceFn serverFactory )
 bool CToolFrameworkInternal::ClientInit( CreateInterfaceFn clientFactory )
 {
 	bool retval = true;
-
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = 0; i < toolCount; ++i )
+	
+	for ( auto *sys : m_ToolSystems )
 	{
-		IToolSystem *system = m_ToolSystems[ i ];
 		// FIXME: Should this really get access to a list if factories
-		bool success = system->ClientInit( clientFactory );
+		bool success = sys->ClientInit( clientFactory );
 		if ( !success )
 		{
 			retval = false;
@@ -358,8 +345,8 @@ bool CToolFrameworkInternal::ClientInit( CreateInterfaceFn clientFactory )
 void CToolFrameworkInternal::ServerShutdown()
 {
 	// Reverse order
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = toolCount - 1; i >= 0; --i )
+	intp toolCount = m_ToolSystems.Count();
+	for ( intp i = toolCount - 1; i >= 0; --i )
 	{
 		IToolSystem *system = m_ToolSystems[ i ];
 		system->ServerShutdown();
@@ -374,8 +361,8 @@ void CToolFrameworkInternal::ServerShutdown()
 void CToolFrameworkInternal::ClientShutdown()
 {
 	// Reverse order
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = toolCount - 1; i >= 0; --i )
+	intp toolCount = m_ToolSystems.Count();
+	for ( intp i = toolCount - 1; i >= 0; --i )
 	{
 		IToolSystem *system = m_ToolSystems[ i ];
 		system->ClientShutdown();
@@ -390,11 +377,9 @@ void CToolFrameworkInternal::ClientShutdown()
 //-----------------------------------------------------------------------------
 bool CToolFrameworkInternal::CanQuit()
 {
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = 0; i < toolCount; ++i )
+	for ( auto *sys : m_ToolSystems )
 	{
-		IToolSystem *system = m_ToolSystems[ i ];
-		bool canquit = system->CanQuit();
+		bool canquit = sys->CanQuit();
 		if ( !canquit )
 		{
 			return false;
@@ -410,7 +395,7 @@ bool CToolFrameworkInternal::CanQuit()
 void CToolFrameworkInternal::ShutdownModules()
 {
 	// Shutdown dictionaries
-	int i;
+	intp i;
 	for ( i = m_Modules.Count(); --i >= 0; )
 	{
 		Sys_UnloadModule( m_Modules[i] );
@@ -426,7 +411,7 @@ void CToolFrameworkInternal::ShutdownModules()
 void CToolFrameworkInternal::ShutdownToolDictionaries()
 {
 	// Shutdown dictionaries
-	int i;
+	intp i;
 	for ( i = m_Dictionaries.Count(); --i >= 0; )
 	{
 		m_Dictionaries[i]->Shutdown();
@@ -451,9 +436,8 @@ void CToolFrameworkInternal::ShutdownTools()
 	SwitchToTool( -1 );
 
 	// Reverse order
-	int i;
-	int toolCount = m_ToolSystems.Count();
-	for ( i = toolCount - 1; i >= 0; --i )
+	intp toolCount = m_ToolSystems.Count();
+	for ( intp i = toolCount - 1; i >= 0; --i )
 	{
 		IToolSystem *system = m_ToolSystems[ i ];
 		system->Shutdown();
@@ -783,13 +767,11 @@ void CToolFrameworkInternal::ServerPreSetupVisibilityAllTools()
 void CToolFrameworkInternal::PostToolMessage( HTOOLHANDLE hEntity, KeyValues *msg )
 {
 	// FIXME: Only message topmost tool?
-
-	int toolCount = m_ToolSystems.Count();
-	for ( int i = 0; i < toolCount; ++i )
+	
+	for ( auto *sys : m_ToolSystems )
 	{
-		IToolSystem *tool = m_ToolSystems[ i ];
-		Assert( tool );
-		tool->PostMessage( hEntity, msg );
+		Assert( sys );
+		sys->PostMessage( hEntity, msg );
 	}
 }
 
