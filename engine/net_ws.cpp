@@ -2033,7 +2033,7 @@ int NET_SendLong( INetChannel *chan, intp sock, socket_handle s, const char FAR 
 
 	CNetChan *netchan = dynamic_cast< CNetChan * >( chan );
 
-	short nSplitSizeMinusHeader = nMaxRoutableSize - sizeof( SPLITPACKET );
+	short nSplitSizeMinusHeader = nMaxRoutableSize - static_cast<int>( sizeof( SPLITPACKET ) );
 
 	int nSequenceNumber = -1;
 	if ( netchan )

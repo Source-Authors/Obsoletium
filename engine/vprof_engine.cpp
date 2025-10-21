@@ -1156,7 +1156,7 @@ void WriteRemoteVProfData()
 		s_VProfListeners[i].m_flLastSentVProfDataTime = flTime;
 
 		// Re-order send times to match send group order
-		int nSentSize = s_VProfListeners[i].m_SentGroups.Count() * sizeof(float);
+		int nSentSize = s_VProfListeners[i].m_SentGroups.Count() * static_cast<intp>(sizeof(float));
 		float *pSentTimes = (float*)stackalloc( nSentSize );
 		memset( pSentTimes, 0, nSentSize );
 		for ( int j = 0; j < nGroupCount; ++j )

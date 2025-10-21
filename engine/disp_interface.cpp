@@ -1293,7 +1293,7 @@ int DispInfo_ComputeIndex( HDISPINFOARRAY hArray, IDispInfo* pInfo )
 	if( !pArray )
 		return NULL;
 
-	int iElement = ((intp)pInfo - (intp)(pArray->m_pDispInfos)) / sizeof(CDispInfo);
+	int iElement = ((intp)pInfo - (intp)(pArray->m_pDispInfos)) / static_cast<intp>(sizeof(CDispInfo));
 
 	Assert( iElement >= 0 && iElement < pArray->m_nDispInfos );
 	return iElement;

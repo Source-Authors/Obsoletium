@@ -1399,7 +1399,7 @@ void CNetworkStringTableContainer::WriteBaselines( bf_write &buf )
 
 	SVC_CreateStringTable msg;
 
-	size_t msg_buffer_size = 2 * NET_MAX_PAYLOAD;
+	constexpr intp msg_buffer_size = 2 * NET_MAX_PAYLOAD;
 	char *msg_buffer = new char[ msg_buffer_size ];
 	if ( !msg_buffer )
 	{
@@ -1460,7 +1460,7 @@ void CNetworkStringTableContainer::WriteBaselines( bf_write &buf )
 		int after = buf.GetNumBytesWritten();
 		if ( sv_dumpstringtables.GetBool() )
 		{
-			DevMsg( "CNetworkStringTableContainer::WriteBaselines wrote %d bytes for table %s [space remaining %d bytes]\n", after - before, table->GetTableName(), buf.GetNumBytesLeft() );
+			DevMsg( "CNetworkStringTableContainer::WriteBaselines wrote %d bytes for table %s [space remaining %zd bytes]\n", after - before, table->GetTableName(), buf.GetNumBytesLeft() );
 		}
 	}
 

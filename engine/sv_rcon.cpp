@@ -245,7 +245,7 @@ void CRConServer::RunFrame()
 			}
 			memcpy( pBuf, &sendLen, sizeof(sendLen) ); // copy the size of the packet in
 			g_ServerRemoteAccess.ReadDataResponse( pData->listenerID, pBuf + sizeof(int), sendLen );
-			SendRCONResponse( i, pBuf, sendLen + sizeof(int) );
+			SendRCONResponse( i, pBuf, sendLen + static_cast<intp>(sizeof(int)) );
 			if ( bAllocate )
 			{
 				delete [] pBuf;
@@ -394,7 +394,7 @@ void CRConServer::FinishRedirect( const char *msg, const netadr_t &adr )
 		response.PutInt(SERVERDATA_RESPONSE_VALUE);
 		response.PutString(msg);
 		response.PutString("");
-		int size = response.TellPut() - sizeof(int); 
+		int size = response.TellPut() - static_cast<intp>(sizeof(int)); 
 		response.SeekPut( CUtlBuffer::SEEK_HEAD, 0 );
 		response.PutInt(size); // the size
 		response.SeekPut( CUtlBuffer::SEEK_CURRENT, size );
