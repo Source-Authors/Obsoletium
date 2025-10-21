@@ -9,10 +9,7 @@
 #pragma once
 #endif
 
-#ifdef _WIN32
-#include "winerror.h"
-#endif
-#include "utlmap.h"
+#include "tier1/utlmap.h"
 #include "inetmsghandler.h"
 #include "netmessages.h"
 #include "Session.h"
@@ -380,9 +377,6 @@ private:
 	struct InviteWaitingInfo_t
 	{
 		DWORD				m_UserIdx;
-#if defined( _X360 )
-		XUSER_SIGNIN_INFO	m_SignInInfo;
-#endif
 		DWORD				m_SignInState;
 		BOOL				m_PrivilegeMultiplayer;
 		int					m_InviteStorageDeviceSelected;

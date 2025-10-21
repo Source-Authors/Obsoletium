@@ -14,6 +14,10 @@
 #include "convar.h"
 #include "cmd.h"
 
+#ifdef _WIN32
+#include <winerror.h>
+#endif
+
 extern IVEngineClient *engineClient;
 
 // TODO: remove when UI sets all properties
