@@ -210,9 +210,9 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 			"AArch64",
 #elif defined(PLATFORM_ARM_32)
 			"ARM32",
-#elif defined(PLATFORM_64BITS)
+#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 64)
 			"x86-64",
-#elif defined(PLATFORM_X86)
+#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 32)
 			"x86",
 #else
 			"N/A",
@@ -287,9 +287,9 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 			"AArch64",
 #elif defined(PLATFORM_ARM_32)
 			"ARM32",
-#elif defined(PLATFORM_64BITS)
+#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 64)
 			"x86-64",
-#elif defined(PLATFORM_X86)
+#elif defined(PLATFORM_X86) && (PLATFORM_X86 == 32)
 			"x86",
 #else
 			"N/A",

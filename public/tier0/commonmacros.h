@@ -16,6 +16,8 @@
 #define PLATFORM_ARM 1
 // dimhotepus: ARM64 detection.
 #define PLATFORM_ARM_64 1
+// dimhotepus: Define when 64 bits are used.
+#define PLATFORM_64BITS 1
 #elif defined(__arm__) || defined(_M_ARM)
 #define PLATFORM_ARM 1
 // dimhotepus: ARM detection.
