@@ -1006,7 +1006,13 @@ FSReturnCode_t FileSystem_GetFileSystemDLLName( OUT_Z_CAP(nMaxLen) char *pFileSy
 	// is in this same directory with us.
 	char executablePath[MAX_PATH];
 	if ( !FileSystem_GetExecutableDir( executablePath )	)
+	{
+		// dimhotepus: Ensure zero-termination in success case.
+		if ( nMaxLen > 0 )
+			pFileSystemDLL[nMaxLen - 1] = '\0';
+
 		return SetupFileSystemError( false, FS_INVALID_PARAMETERS, "FileSystem_GetExecutableDir failed." );
+	}
 
 	// Use filesystem_steam if it exists?
 	struct stat statBuf;
