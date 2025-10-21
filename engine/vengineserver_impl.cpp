@@ -647,7 +647,7 @@ public:
 	{
 #if defined( _DEBUG ) && defined( WIN32 )
 		// set the memory to a known value
-		int size = _msize( pEntity );
+		size_t size = _msize( pEntity );
 		memset( pEntity, 0xDD, size );
 #endif
 		
