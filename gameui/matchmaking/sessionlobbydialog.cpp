@@ -193,8 +193,9 @@ void CSessionLobbyDialog::ApplySettings( KeyValues *pResourceData )
 {
 	BaseClass::ApplySettings( pResourceData );
 
-	m_nImageBorderWidth = pResourceData->GetInt( "imageborderwidth", 15 );
-	m_nTeamspacing = pResourceData->GetInt( "teamspacing", 0 );
+	// dimhotepus: Scale UI.
+	m_nImageBorderWidth = QuickPropScale( pResourceData->GetInt( "imageborderwidth", 15 ) );
+	m_nTeamspacing = QuickPropScale( pResourceData->GetInt( "teamspacing", 0 ) );
 	m_bHostLobby = pResourceData->GetInt( "hostlobby", 0 ) != 0;
 	m_bCenterOnScreen = pResourceData->GetInt( "center", 1 ) == 1;
 
