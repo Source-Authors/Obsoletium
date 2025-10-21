@@ -84,8 +84,8 @@ template <typename T>
 		return Hash12( &item );
 	if constexpr ( sizeof(item) == 16 )
 		return Hash16( &item );
-
-	return HashBlock( &item, sizeof(item) );
+	else
+		return HashBlock( &item, sizeof(item) );
 }
 
 template <> [[nodiscard]] inline unsigned HashItem<int>(const int &key )
