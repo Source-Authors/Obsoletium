@@ -408,7 +408,7 @@ void CMatchmaking::JoinInviteSession( XSESSION_INFO *pHostInfo )
 		Msg( "[JoinInviteSession:INVITE_ACCEPTING] Accepting the invite.\n" );
 		break;
 
-			default:
+	default:
 		Msg( "[JoinInviteSession:UnknownState=%d] Aborting.\n", m_InviteState );
 		InviteCancel();
 		return;
@@ -444,7 +444,7 @@ void CMatchmaking::InviteCancel()
 //-----------------------------------------------------------------------------
 void CMatchmaking::JoinInviteSessionByID( XNKID nSessionID )
 {
-	}
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: Tell a session host we'd like to join the session

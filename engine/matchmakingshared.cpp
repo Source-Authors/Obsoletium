@@ -2303,7 +2303,7 @@ bool CMatchmaking::PreventFullServerStartup()
 	return m_bPreventFullServerStartup;
 }
 
-void CMatchmaking::SetPreventFullServerStartup( bool bState, char const *fmt, ... )
+void CMatchmaking::SetPreventFullServerStartup( bool bState, PRINTF_FORMAT_STRING char const *fmt, ... )
 {
 	char desc[ 256 ];
 	va_list argptr;
