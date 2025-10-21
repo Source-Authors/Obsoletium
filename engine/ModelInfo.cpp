@@ -179,10 +179,10 @@ public:
 	virtual void GetBrushModelPlane( const model_t *model, int nIndex, cplane_t &plane, Vector *pOrigin ) const;
 
 protected:
-	static int CLIENTSIDE_TO_MODEL( int i ) { return i >= 0 ? (-2 - (i*2 + 1)) : -1; }
-	static int NETDYNAMIC_TO_MODEL( int i ) { return i >= 0 ? (-2 - (i*2)) : -1; }
-	static int MODEL_TO_CLIENTSIDE( int i ) { return ( i <= -2 && (i & 1) ) ? (-2 - i) >> 1 : -1; }
-	static int MODEL_TO_NETDYNAMIC( int i ) { return ( i <= -2 && !(i & 1) ) ? (-2 - i) >> 1 : -1; }
+	[[nodiscard]] static constexpr int CLIENTSIDE_TO_MODEL( int i ) { return i >= 0 ? (-2 - (i*2 + 1)) : -1; }
+	[[nodiscard]] static constexpr int NETDYNAMIC_TO_MODEL( int i ) { return i >= 0 ? (-2 - (i*2)) : -1; }
+	[[nodiscard]] static constexpr int MODEL_TO_CLIENTSIDE( int i ) { return ( i <= -2 && (i & 1) ) ? (-2 - i) >> 1 : -1; }
+	[[nodiscard]] static constexpr int MODEL_TO_NETDYNAMIC( int i ) { return ( i <= -2 && !(i & 1) ) ? (-2 - i) >> 1 : -1; }
 
 	model_t *LookupDynamicModel( int i );
 
