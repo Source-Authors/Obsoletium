@@ -430,7 +430,7 @@ private:
 	CUtlVector< FSMState_t >		m_States;
 	uint							m_uCurrentState{ eCreateTCPSocket };
 	struct sockaddr_in				m_HarvesterSockAddr;
-	uintp							m_SocketTCP{ 0 };
+	socket_handle					m_SocketTCP{ 0 };
 	const TBugReportParameters	&m_rBugReportParameters; //lint !e1725
 	u32								m_ContextID;
 };
