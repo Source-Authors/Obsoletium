@@ -24,22 +24,22 @@ void EngineTool_InstallQuitHandler( void *pvUserData, FnQuitHandler func );
 //-----------------------------------------------------------------------------
 // Purpose: -tools loads framework
 //-----------------------------------------------------------------------------
-class CToolFrameworkInternal : public IToolFrameworkInternal
+class CToolFrameworkInternal final : public IToolFrameworkInternal
 {
 public:
 	// Here's where the app systems get to learn about each other 
-	virtual bool	Connect( CreateInterfaceFn factory );
-	virtual void	Disconnect();
+	bool	Connect( CreateInterfaceFn factory ) override;
+	void	Disconnect() override;
 
 	// Here's where systems can access other interfaces implemented by this object
 	// Returns NULL if it doesn't implement the requested interface
-	virtual void	*QueryInterface( const char *pInterfaceName );
+	void	*QueryInterface( const char *pInterfaceName ) override;
 
 	// Init, shutdown
-	virtual InitReturnVal_t Init();
-	virtual void	Shutdown();
+	InitReturnVal_t Init() override;
+	void	Shutdown() override;
 
-	virtual bool	CanQuit();
+	bool	CanQuit() override;
 
 public:
 	// Level init, shutdown
@@ -1028,20 +1028,20 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR( CToolFrameworkInternal, IToolFrameworkInterna
 class CClientEngineTools final : public IClientEngineTools
 {
 public:
-	virtual void LevelInitPreEntityAllTools();
-	virtual void LevelInitPostEntityAllTools();
-	virtual void LevelShutdownPreEntityAllTools();
-	virtual void LevelShutdownPostEntityAllTools();
-	virtual void PreRenderAllTools();
-	virtual void PostRenderAllTools();
-	virtual void PostToolMessage( HTOOLHANDLE hEntity, KeyValues *msg );
-	virtual void AdjustEngineViewport( int& x, int& y, int& width, int& height );
-	virtual bool SetupEngineView( Vector &origin, QAngle &angles, float &fov );
-	virtual bool SetupAudioState( AudioState_t &audioState );
-	virtual void VGui_PreRenderAllTools( int paintMode );
-	virtual void VGui_PostRenderAllTools( int paintMode );
-	virtual bool IsThirdPersonCamera( );
-	virtual bool InToolMode();
+	void LevelInitPreEntityAllTools() override;
+	void LevelInitPostEntityAllTools() override;
+	void LevelShutdownPreEntityAllTools() override;
+	void LevelShutdownPostEntityAllTools() override;
+	void PreRenderAllTools() override;
+	void PostRenderAllTools() override;
+	void PostToolMessage( HTOOLHANDLE hEntity, KeyValues *msg ) override;
+	void AdjustEngineViewport( int& x, int& y, int& width, int& height ) override;
+	bool SetupEngineView( Vector &origin, QAngle &angles, float &fov ) override;
+	bool SetupAudioState( AudioState_t &audioState ) override;
+	void VGui_PreRenderAllTools( int paintMode ) override;
+	void VGui_PostRenderAllTools( int paintMode ) override;
+	bool IsThirdPersonCamera( ) override;
+	bool InToolMode() override;
 };
 
 EXPOSE_SINGLE_INTERFACE( CClientEngineTools, IClientEngineTools, VCLIENTENGINETOOLS_INTERFACE_VERSION );
@@ -1164,20 +1164,20 @@ bool CClientEngineTools::InToolMode()
 //-----------------------------------------------------------------------------
 // Purpose: Exposed to server.dll
 //-----------------------------------------------------------------------------
-class CServerEngineTools : public IServerEngineTools
+class CServerEngineTools final : public IServerEngineTools
 {
 public:
 	// Inherited from IServerEngineTools
-	virtual void LevelInitPreEntityAllTools();
-	virtual void LevelInitPostEntityAllTools();
-	virtual void LevelShutdownPreEntityAllTools();
-	virtual void LevelShutdownPostEntityAllTools();
-	virtual void FrameUpdatePreEntityThinkAllTools();
-	virtual void FrameUpdatePostEntityThinkAllTools();
-	virtual void PreClientUpdateAllTools();
-	virtual void PreSetupVisibilityAllTools();
-	virtual const char* GetEntityData( const char *pActualEntityData );
-	virtual bool InToolMode();
+	void LevelInitPreEntityAllTools() override;
+	void LevelInitPostEntityAllTools() override;
+	void LevelShutdownPreEntityAllTools() override;
+	void LevelShutdownPostEntityAllTools() override;
+	void FrameUpdatePreEntityThinkAllTools() override;
+	void FrameUpdatePostEntityThinkAllTools() override;
+	void PreClientUpdateAllTools() override;
+	void PreSetupVisibilityAllTools() override;
+	const char* GetEntityData( const char *pActualEntityData ) override;
+	bool InToolMode() override;
 };
 
 EXPOSE_SINGLE_INTERFACE( CServerEngineTools, IServerEngineTools, VSERVERENGINETOOLS_INTERFACE_VERSION );
