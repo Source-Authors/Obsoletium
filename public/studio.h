@@ -100,6 +100,38 @@ struct mstudiodata_t
 #define STUDIO_PROC_AIMATATTACH 4
 #define STUDIO_PROC_JIGGLE 5
 
+// If you want to embed a pointer into one of the structures that is serialized, use this class! It will ensure that the pointers consume the 
+// right amount of space and work correctly across 32 and 64 bit. It also makes sure that there is no surprise about how large the structure
+// is when placed in the middle of another structure, and supports Intel's desired behavior on 64-bit that pointers are always 8-byte aligned.
+#pragma pack( push, 4 )
+template < class T > 
+struct ALIGN4 serializedstudioptr_t
+{
+	T* m_pData;
+#ifndef PLATFORM_64BITS
+	int32 padding;
+#endif
+
+	serializedstudioptr_t() 
+	{ 
+		m_pData = nullptr; 
+		#if _DEBUG && !defined( PLATFORM_64BITS )
+			padding = 0; 
+		#endif
+	}
+
+	inline operator       T*()             { return m_pData; }
+	inline operator const T*() const       { return m_pData; }
+
+	inline       T* operator->( )          { return m_pData; }
+	inline const T* operator->( ) const    { return m_pData; }
+
+	inline T* operator=( T* ptr )          { return m_pData = ptr; }
+	
+} ALIGN4_POST;
+
+#pragma pack( pop )
+
 struct mstudioaxisinterpbone_t
 {
 	DECLARE_BYTESWAP_DATADESC();
@@ -2075,10 +2107,13 @@ struct studiohdr2_t
 	inline mstudioboneflexdriver_t *pBoneFlexDriver( int i ) const { Assert( i >= 0 && i < m_nBoneFlexDriverCount ); return (mstudioboneflexdriver_t *)(((byte *)this) + m_nBoneFlexDriverIndex) + i; }
 
 #ifdef PLATFORM_64BITS
-	void* pVertexBase;
-	void* pIndexBase;
+	mutable serializedstudioptr_t< void	> virtualModel;
+	mutable serializedstudioptr_t< void	> animblockModel;
 
-	int reserved[52];
+	serializedstudioptr_t< void> pVertexBase;
+	serializedstudioptr_t< void> pIndexBase;
+
+	int reserved[56 - 4 * sizeof( serializedstudioptr_t< void > ) / sizeof( int ) ];
 #else
 	int reserved[56];
 #endif
@@ -2284,7 +2319,11 @@ struct studiohdr_t
 	const studiohdr_t	*FindModel( void **cache, char const *modelname ) const;
 
 	// implementation specific back pointer to virtual data
-	int					virtualModel;
+#ifdef PLATFORM_64BITS
+	int					unused_virtualModel;
+#else
+	mutable void*		virtualModel;
+#endif
 	virtualmodel_t		*GetVirtualModel( void ) const;
 
 	// for demand loaded animation blocks
@@ -2355,6 +2394,15 @@ struct studiohdr_t
 
 	inline int			BoneFlexDriverCount() const { return studiohdr2index ? pStudioHdr2()->m_nBoneFlexDriverCount : 0; }
 	inline const mstudioboneflexdriver_t* BoneFlexDriver( int i ) const { Assert( i >= 0 && i < BoneFlexDriverCount() ); return studiohdr2index ? pStudioHdr2()->pBoneFlexDriver( i ) : nullptr; }
+
+#ifdef PLATFORM_64BITS
+	void* 				VirtualModel() const { return studiohdr2index ? (void *)( pStudioHdr2()->virtualModel ) : nullptr; }
+	void				SetVirtualModel( void* ptr ) { Assert( studiohdr2index ); if ( studiohdr2index ) { pStudioHdr2()->virtualModel = ptr; } }
+#else
+	void* 				VirtualModel() const { return virtualModel; }
+	void				SetVirtualModel( void* ptr ) { virtualModel = ptr; }
+#endif
+
 
 	// NOTE: No room to add stuff? Up the .mdl file format version 
 	// [and move all fields in studiohdr2_t into studiohdr_t and kill studiohdr2_t],
