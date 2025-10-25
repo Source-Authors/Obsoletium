@@ -3114,10 +3114,6 @@ void _Host_RunFrame (float time)
 			// set net_time once before running the server
 			NET_SetTime( Plat_FloatTime() );
 			pGameJob = new CFunctorJob( CreateFunctor( _Host_RunFrame_Server_Async, serverticks ) );
-			if ( IsX360() )
-			{
-				pGameJob->SetServiceThread( g_nServerThread );
-			}
 			g_pThreadPool->AddJob( pGameJob );
 #if LOG_FRAME_OUTPUT
 			if ( !cl.IsPaused() || !sv.IsPaused() )
