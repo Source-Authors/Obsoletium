@@ -774,7 +774,7 @@ void Host_Error ( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2
 
 #ifndef SWDS
 
-ButtonCode_t nInvalidKeyBindings[] =
+constexpr ButtonCode_t nInvalidKeyBindings[] =
 {
 	KEY_PAD_0,
 	KEY_PAD_1,
@@ -829,12 +829,12 @@ ButtonCode_t nInvalidKeyBindings[] =
 // bind those keys, based on a file called
 // newbindings.txt.
 //******************************************
-void SetupNewBindings()
+static void SetupNewBindings()
 {
 	char szBindCmd[ 256 ];
 
 	// Load the file
-	const char *pFilename = "scripts\\newbindings.txt";
+	constexpr char pFilename[]{ "scripts\\newbindings.txt" };
 	KeyValuesAD pNewBindingsData( pFilename );
 	if ( !pNewBindingsData->LoadFromFile( g_pFileSystem, pFilename ) )
 	{
@@ -861,7 +861,7 @@ void SetupNewBindings()
 			const char *pCurrentBindingForKey = ::Key_BindingForKey( g_pInputSystem->StringToButtonCode( pIdealKey ) );
 			if ( !pCurrentBindingForKey  || !V_stricmp( pOverrideIfCmd, pCurrentBindingForKey ) )
 			{
-				V_snprintf( szBindCmd, sizeof( szBindCmd ), "bind \"%s\" \"%s\"", pIdealKey, pBinding );
+				V_sprintf_safe( szBindCmd, "bind \"%s\" \"%s\"", pIdealKey, pBinding );
 				Cbuf_AddText( szBindCmd );
 				continue;
 			}
@@ -877,7 +877,7 @@ void SetupNewBindings()
 		if ( !pCurrentBindingForIdealKey )
 		{
 			// Yes - bind to the ideal key.
-			V_snprintf( szBindCmd, sizeof( szBindCmd ), "bind \"%s\" \"%s\"", pIdealKey, pBinding );
+			V_sprintf_safe( szBindCmd, "bind \"%s\" \"%s\"", pIdealKey, pBinding );
 			Cbuf_AddText( szBindCmd );
 			continue;
 		}
@@ -885,13 +885,13 @@ void SetupNewBindings()
 		// Ideal key already bound - find another key at random and bind it
 		bool bFound = false;
 		int nNumAttempts = 1;
-		for ( int nCurButton = (int)KEY_0; nCurButton <= (int)KEY_LAST; ++nCurButton, ++nNumAttempts )
+		for ( int nCurButton = to_underlying( ButtonCode_t::KEY_0 ); nCurButton <= to_underlying( ButtonCode_t::KEY_LAST ); ++nCurButton, ++nNumAttempts )
 		{
 			// Don't consider numpad, windows keys, etc
 			bool bFoundInvalidKey = false;
-			for ( size_t iKeyIndex = 0; iKeyIndex < std::size( nInvalidKeyBindings ); iKeyIndex++ )
+			for ( auto &invalid : nInvalidKeyBindings )
 			{
-				if ( nCurButton == (int)nInvalidKeyBindings[iKeyIndex] )
+				if ( nCurButton == to_underlying( invalid ) )
 				{
 					bFoundInvalidKey = true;
 					break;
@@ -902,11 +902,11 @@ void SetupNewBindings()
 				continue;
 
 			// Key available?
-			ButtonCode_t bcCurButton = (ButtonCode_t)nCurButton;
+			const auto bcCurButton = static_cast<ButtonCode_t>(nCurButton);
 			if ( !::Key_BindingForKey( bcCurButton ) )
 			{
 				// Yes - use it.
-				V_snprintf( szBindCmd, sizeof( szBindCmd ), "bind \"%s\" \"%s\"", g_pInputSystem->ButtonCodeToString( bcCurButton ), pBinding );
+				V_sprintf_safe( szBindCmd, "bind \"%s\" \"%s\"", g_pInputSystem->ButtonCodeToString( bcCurButton ), pBinding );
 				Cbuf_AddText( szBindCmd );
 				bFound = true;
 				break;
