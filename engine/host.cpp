@@ -175,7 +175,7 @@ BEGIN_BYTESWAP_DATADESC( player_info_s )
 END_BYTESWAP_DATADESC()
 
 //------------------------------------------
-enum
+enum class FrameSegment
 {
 	FRAME_SEGMENT_INPUT = 0,
 	FRAME_SEGMENT_CLIENT,
@@ -193,31 +193,33 @@ class CFrameTimer
 public:
 	void ResetDeltas();
 
-	CFrameTimer() : swaptime(0)
+	// dimhotepus: Make clear timer writes stats.
+	explicit CFrameTimer( CEngineStats &engineStats )
+		: m_engineStats{engineStats}, swaptime(0)
 	{
 		ResetDeltas();
 	}
 
 	void MarkFrame();
-	void StartFrameSegment( int i )
+	void StartFrameSegment( FrameSegment i )
 	{
-		starttime[i] = Sys_FloatTime();
+		starttime[to_underlying( i )] = Sys_FloatTime();
 	}
 
-	void EndFrameSegment( int i )
+	void EndFrameSegment( FrameSegment i )
 	{
-		double dt = Sys_FloatTime() - starttime[i];
-		deltas[ i ] += dt;
+		double dt = Sys_FloatTime() - starttime[to_underlying( i )];
+		deltas[to_underlying( i )] += dt;
 	}
-	void MarkSwapTime( )
+	void MarkSwapTime()
 	{
 		double newswaptime = Sys_FloatTime();
 		frametime = newswaptime - swaptime;
 		swaptime = newswaptime;
 
 		ComputeFrameVariability();
-		g_EngineStats.SetFrameTime( frametime );
-		g_EngineStats.SetFPSVariability( m_flFPSVariability );
+		m_engineStats.SetFrameTime( frametime );
+		m_engineStats.SetFPSVariability( m_flFPSVariability );
 
 		host_frametime_stddeviation = m_flFPSStdDeviationSeconds;
 	}
@@ -231,20 +233,45 @@ private:
 	friend void Host_Speeds();
 	void ComputeFrameVariability();
 
+	// dimhotepus: Make clear timer writes stats.
+	CEngineStats &m_engineStats;
+
 	double times[9];
 	double swaptime;
 	double frametime;
 	double m_flFPSVariability;
 	double m_flFPSStdDeviationSeconds;
-	double starttime[NUM_FRAME_SEGMENTS];
-	double deltas[NUM_FRAME_SEGMENTS];
+	double starttime[to_underlying( FrameSegment::NUM_FRAME_SEGMENTS )];
+	double deltas[to_underlying( FrameSegment::NUM_FRAME_SEGMENTS )];
 
 	double m_pFrameTimeHistory[FRAME_HISTORY_COUNT];
 	int m_nFrameTimeHistoryIndex;
 };
 
 
-static CFrameTimer g_HostTimes;
+static CFrameTimer g_HostTimes{ g_EngineStats };
+
+// dimhotepus: Simple RAII frame segment scope wrapper.
+class ScopedFrameSegment
+{
+public:
+	ScopedFrameSegment( CFrameTimer &timer, FrameSegment segment )
+		: m_timer{ timer }, m_segment{ segment }
+	{
+		timer.StartFrameSegment( segment );
+	}
+	~ScopedFrameSegment()
+	{
+		m_timer.EndFrameSegment( m_segment );
+	}
+
+	ScopedFrameSegment( const ScopedFrameSegment& ) = delete;
+	ScopedFrameSegment& operator=( const ScopedFrameSegment& ) = delete;
+
+ private:
+	CFrameTimer &m_timer;
+	const FrameSegment m_segment;
+};
 
 
 //------------------------------------------
@@ -1924,13 +1951,13 @@ void CFrameTimer::MarkFrame()
 
 	// ConDMsg("%f %f %f\n", time1, time2, time3 );
 
-	double fs_input = (deltas[FRAME_SEGMENT_INPUT])*1000.0;
-	double fs_client = (deltas[FRAME_SEGMENT_CLIENT])*1000.0;
-	double fs_server = (deltas[FRAME_SEGMENT_SERVER])*1000.0;
-	double fs_render = (deltas[FRAME_SEGMENT_RENDER])*1000.0;
-	double fs_sound = (deltas[FRAME_SEGMENT_SOUND])*1000.0;
-	double fs_cldll = (deltas[FRAME_SEGMENT_CLDLL])*1000.0;
-	double fs_exec = (deltas[FRAME_SEGMENT_CMD_EXECUTE])*1000.0;
+	double fs_input = (deltas[to_underlying( FrameSegment::FRAME_SEGMENT_INPUT )])*1000.0;
+	double fs_client = (deltas[to_underlying( FrameSegment::FRAME_SEGMENT_CLIENT )])*1000.0;
+	double fs_server = (deltas[to_underlying( FrameSegment::FRAME_SEGMENT_SERVER )])*1000.0;
+	double fs_render = (deltas[to_underlying( FrameSegment::FRAME_SEGMENT_RENDER )])*1000.0;
+	double fs_sound = (deltas[to_underlying( FrameSegment::FRAME_SEGMENT_SOUND )])*1000.0;
+	double fs_cldll = (deltas[to_underlying( FrameSegment::FRAME_SEGMENT_CLDLL )])*1000.0;
+	double fs_exec = (deltas[to_underlying( FrameSegment::FRAME_SEGMENT_CMD_EXECUTE )])*1000.0;
 
 	ResetDeltas();
 
@@ -2268,25 +2295,24 @@ void _Host_RunFrame_Input( float accumulated_extra_samples, bool bFinalTick )
 		}
 	}
 
-	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_INPUT );
+	{
+		const ScopedFrameSegment input_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_INPUT };
 
 #ifndef SWDS
 	// Client can process input
 	ClientDLL_ProcessInput( );
 
-	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CMD_EXECUTE );
+		{
+			const ScopedFrameSegment cmd_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_CMD_EXECUTE };
 
 	// process console commands
 	Cbuf_Execute ();
-
-	g_HostTimes.EndFrameSegment( FRAME_SEGMENT_CMD_EXECUTE );
+		}
 
 	// Send any current movement commands to server and flush reliable buffer even if not moving yet.
 	CL_Move( accumulated_extra_samples, bFinalTick );
-
 #endif
-
-	g_HostTimes.EndFrameSegment( FRAME_SEGMENT_INPUT );
+	}
 }
 
 void _Host_RunFrame_Server( bool finaltick )
@@ -2296,10 +2322,8 @@ void _Host_RunFrame_Server( bool finaltick )
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
 	// Run the Server frame ( read, run physics, respond )
-	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_SERVER );
+	const ScopedFrameSegment server_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_SERVER };
 	SV_Frame ( finaltick );
-	g_HostTimes.EndFrameSegment( FRAME_SEGMENT_SERVER );
-
 	// Look for connectionless rcon packets on dedicated servers
 	// SV_CheckRcom(); TODO 
 }
@@ -2324,7 +2348,8 @@ void _Host_RunFrame_Client( bool framefinished )
 	VPROF( "_Host_RunFrame_Client" );
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, framefinished );
 
-	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CLIENT );
+	{
+		const ScopedFrameSegment client_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_CLIENT };
 
 	// Get any current state update from server, etc.
 	CL_ReadPackets( framefinished );
@@ -2341,8 +2366,7 @@ void _Host_RunFrame_Client( bool framefinished )
 	cl.RunFrame();
 
 	Steam3Client().RunFrame();
-
-	g_HostTimes.EndFrameSegment( FRAME_SEGMENT_CLIENT );
+	}
 
 	// This takes 1 usec, so it's pretty cheap...
 	CL_SetPagedPoolInfo();
@@ -2401,8 +2425,9 @@ void _Host_RunFrame_Render()
 		mat_norendering.SetValue( 0 );
 	}
 
+	{
 	// update video if not running in background
-	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_RENDER );
+		const ScopedFrameSegment render_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_RENDER };
 
 	CL_LatchInterpolationAmount();
 
@@ -2416,8 +2441,7 @@ void _Host_RunFrame_Render()
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render - CL_DecayLights" );
 		CL_DecayLights ();
 	}
-
-	g_HostTimes.EndFrameSegment( FRAME_SEGMENT_RENDER );
+	}
 
 	saverestore->OnFrameRendered();
 
@@ -2535,14 +2559,11 @@ void CL_ApplyAddAngle()
 void _Host_RunFrame_Sound()
 {
 #ifndef SWDS
-
 	VPROF_BUDGET( "_Host_RunFrame_Sound", VPROF_BUDGETGROUP_OTHER_SOUND );
 
-	g_HostTimes.StartFrameSegment( FRAME_SEGMENT_SOUND );
+	const ScopedFrameSegment sound_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_SOUND };
 
 	Host_UpdateSounds();
-
-	g_HostTimes.EndFrameSegment( FRAME_SEGMENT_SOUND );
 #endif
 }
 
@@ -2776,7 +2797,8 @@ void _Host_RunFrame (float time)
 		VPROF( "_Host_RunFrame" );
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame" );
 
-		g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CMD_EXECUTE );
+		{
+			const ScopedFrameSegment cmd_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_CMD_EXECUTE };
 
 		// process console commands
 		Cbuf_Execute ();
@@ -2784,8 +2806,7 @@ void _Host_RunFrame (float time)
 		// initialize networking for dedicated server after commandline & autoexec.cfg have been parsed
 		if ( NET_IsDedicated() && !NET_IsMultiplayer() )
 			NET_SetMutiplayer( true );
-
-		g_HostTimes.EndFrameSegment( FRAME_SEGMENT_CMD_EXECUTE );
+		}
 
 		// Msg( "Running %i ticks (%f remainder) for frametime %f total %f tick %f delta %f\n", numticks, remainder, host_frametime, host_time );
 		g_ServerGlobalVariables.interpolation_amount = 0.0f;
@@ -3155,11 +3176,9 @@ void _Host_RunFrame (float time)
 			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame - ClientDLL_Update" );
 
 			// Client-side simulation
-			g_HostTimes.StartFrameSegment( FRAME_SEGMENT_CLDLL );
+			const ScopedFrameSegment cldll_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_CLDLL };
 
 			ClientDLL_Update();
-
-			g_HostTimes.EndFrameSegment( FRAME_SEGMENT_CLDLL );
 		}
 #endif
 		if ( pGameJob )
