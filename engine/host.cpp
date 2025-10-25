@@ -4,17 +4,16 @@
 //
 //===========================================================================//
 
+#include "host.h"
+
 #include "tier0/fasttimer.h"
-
-#ifdef _WIN32
-#include "tier0/memdbgon.h" // needed because in release builds crtdbg.h is handled specially if USE_MEM_DEBUG is defined
-#include "tier0/memdbgoff.h"
-#include <crtdbg.h>   // For getting at current heap size
-
-#include "winlite.h"
-#endif
-
+#include "tier0/etwprof.h"
+#include "tier0/vcrmode.h"
+#include "tier0/vprof.h"
+#include "tier0/icommandline.h"
 #include "tier1/fmtstr.h"
+#include "tier1/strtools.h"
+#include "tier2/tier2.h"
 #include "vstdlib/jobthread.h"
 
 #ifdef USE_SDL
@@ -37,7 +36,6 @@
 #include "ivideomode.h"
 #include "vprof_engine.h"
 #include "iengine.h"
-#include "tier2/tier2.h"
 #include "enginethreads.h"
 #include "steam/steam_api.h"
 #include "LoadScreenUpdate.h"
@@ -55,7 +53,6 @@
 #include "cl_pred.h"
 #include "console.h"
 #include "view.h"
-#include "host.h"
 #include "decal.h"
 #include "gl_matsysiface.h"
 #include "gl_shader.h"
@@ -66,8 +63,6 @@
 #endif
 #include "filesystem.h"
 #include "filesystem_engine.h"
-#include "tier0/etwprof.h"
-#include "tier0/vcrmode.h"
 #include "traceinit.h"
 #include "host_saverestore.h"
 #include "l_studio.h"
@@ -81,11 +76,8 @@
 #include "bitbuf_errorhandler.h"
 #include "soundflags.h"
 #include "enginestats.h"
-#include "tier1/strtools.h"
 #include "testscriptmgr.h"
 #include "tmessage.h"
-#include "tier0/vprof.h"
-#include "tier0/icommandline.h"
 #include "materialsystem/imaterialsystemhardwareconfig.h"
 #include "MapReslistGenerator.h"
 #include "DownloadListGenerator.h"
