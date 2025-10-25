@@ -50,7 +50,8 @@ int GetWeaponSoundFromString( const char *pszString );
 #define MAX_SHOOT_SOUNDS	16			// Maximum number of shoot sounds per shoot type
 
 #define MAX_WEAPON_STRING	80
-#define MAX_WEAPON_PREFIX	16
+// dimhotepus: Bump 16 -> 32 as "missile launcher" truncated to "missile launche"
+#define MAX_WEAPON_PREFIX	32
 #define MAX_WEAPON_AMMO_NAME		32
 
 #define WEAPON_PRINTNAME_MISSING "!!! Missing printname on weapon"
