@@ -579,9 +579,6 @@ ConVar vcr_verbose( "vcr_verbose", "0", 0, "Write extra information into .vcr fi
 // dimhotepus: NO_STEAM
 #ifndef NO_STEAM
 static bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const char *pszRemoteFileName, const char *pszLocalFileName )
-
-
-bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const char *pszRemoteFileName, const char *pszLocalFileName )
 {
 	bool bSuccess = false;
 
@@ -595,7 +592,7 @@ bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const char *
 		{
 
 			char filepath[ 512 ];
-			Q_strncpy( filepath, pszLocalFileName, sizeof( filepath ) );
+			V_strcpy_safe( filepath, pszLocalFileName );
 			V_StripFilename( filepath );
 			g_pFullFileSystem->CreateDirHierarchy( filepath, "MOD" );
 
@@ -620,6 +617,7 @@ bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const char *
 
 	return bSuccess;
 }
+#endif
 
 
 void CCommonHostState::SetWorldModel( model_t *pModel )
