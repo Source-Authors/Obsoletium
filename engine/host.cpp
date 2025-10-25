@@ -2244,7 +2244,7 @@ static void CheckSpecialCheatVars()
 	if ( !mat_picmip )
 		mat_picmip = g_pCVar->FindVar( "mat_picmip" );
 
-	// In multiplayer, don't allow them to set mat_picmip > 2.	
+	// In multiplayer, don't allow them to set mat_picmip > 2.
 	if ( mat_picmip )
 		CheckVarRange_Generic( mat_picmip, -1, 2 );
 	
@@ -2495,7 +2495,7 @@ static void Host_ShowIPCCallCount()
 	{
 		uint32 callCount = 0;
 
-	  // dimhotepus: NO_STEAM
+		// dimhotepus: NO_STEAM
 #ifndef NO_STEAM
 		ISteamClient *pSteamClient = SteamClient();
 		if ( pSteamClient )
@@ -3748,14 +3748,6 @@ void Host_Init( bool bDedicated )
 	pRenderContext->SetNonInteractivePacifierTexture( NULL, 0, 0, 0 );
 }
 
-//-----------------------------------------------------------------------------
-// Adds hints to the loader to keep resources that are in the transition volume,
-// as they may not be part of the next map's reslist.
-//-----------------------------------------------------------------------------
-void AddTransitionResources( CSaveRestoreData *pSaveData, const char *pLevelName, const char *pLandmarkName )
-{
-}
-
 bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *start )
 {
 	char			_startspot[MAX_QPATH];
@@ -3903,9 +3895,6 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 				return false;
 			}
 		}
-
-		// ensure resources in the transition volume stay
-		AddTransitionResources( pSaveData, szMapName, startspot );
 	}
 #endif
 	g_pServerPluginHandler->LevelShutdown();
