@@ -1382,7 +1382,7 @@ void Host_ShutdownServer( void )
 // Input  : time - 
 // Output : bool
 //-----------------------------------------------------------------------------
-void Host_AccumulateTime( float dt )
+static void Host_AccumulateTime( float dt )
 {
 	// Accumulate some time
 	realtime += dt;
@@ -1493,7 +1493,7 @@ float g_fFramesPerSecond = 0.0f;
 Host_PostFrameRate
 ==================
 */
-void Host_PostFrameRate( float frameTime )
+static void Host_PostFrameRate( float frameTime )
 {
 	frameTime = clamp( frameTime, 0.0001f, 1.0f );
 
@@ -1616,7 +1616,7 @@ char const * Host_CleanupConVarStringValue( char const *invalue )
 	return clean;
 }
 
-int Host_CountVariablesWithFlags( int flags, bool nonDefault )
+static int Host_CountVariablesWithFlags( int flags, bool nonDefault )
 {
 	int i = 0;
 	const ConCommandBase *var;
@@ -1765,7 +1765,7 @@ Host_UpdateScreen
 Refresh the screen
 =====================
 */
-void Host_UpdateScreen( void )
+static void Host_UpdateScreen( void )
 {
 #ifndef SWDS 
 
@@ -1789,7 +1789,7 @@ Host_UpdateSounds
 Update sound subsystem and cd audio
 ====================
 */
-void Host_UpdateSounds( void )
+static void Host_UpdateSounds( void )
 {
 #if !defined( SWDS )
 	// update audio
@@ -2048,7 +2048,7 @@ static double g_flLastPeriodicMemDump = -1.0f;
 // Purpose: 
 //-----------------------------------------------------------------------------
 static double g_TimeLastMemTest;
-void Host_CheckDumpMemoryStats( void )
+static void Host_CheckDumpMemoryStats()
 {
 	if ( mem_test_each_frame.GetBool() )
 	{
@@ -2125,7 +2125,7 @@ void Host_CheckDumpMemoryStats( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void _Host_SetGlobalTime()
+static void _Host_SetGlobalTime()
 {
 	// Server
 	g_ServerGlobalVariables.realtime			= realtime;
@@ -2150,7 +2150,7 @@ Runs all active servers
 ==================
 */
 
-void _Host_RunFrame_Input( float accumulated_extra_samples, bool bFinalTick )
+static void _Host_RunFrame_Input( float accumulated_extra_samples, bool bFinalTick )
 {
 	VPROF_BUDGET( "_Host_RunFrame_Input", _T("Input") );
 
@@ -2189,7 +2189,7 @@ void _Host_RunFrame_Input( float accumulated_extra_samples, bool bFinalTick )
 	}
 }
 
-void _Host_RunFrame_Server( bool finaltick )
+static void _Host_RunFrame_Server( bool finaltick )
 {
 	VPROF_BUDGET( "_Host_RunFrame_Server", VPROF_BUDGETGROUP_GAME );
 	VPROF_INCREMENT_COUNTER( "ticks", 1 );
@@ -2202,7 +2202,7 @@ void _Host_RunFrame_Server( bool finaltick )
 	// SV_CheckRcom(); TODO 
 }
 
-void _Host_RunFrame_Server_Async( int numticks )
+static void _Host_RunFrame_Server_Async( int numticks )
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s %d", __FUNCTION__, numticks );
 
@@ -2216,7 +2216,7 @@ void _Host_RunFrame_Server_Async( int numticks )
 }
 
 
-void _Host_RunFrame_Client( bool framefinished )
+static void _Host_RunFrame_Client( bool framefinished )
 {
 #ifndef SWDS
 	VPROF( "_Host_RunFrame_Client" );
@@ -2267,7 +2267,7 @@ bool CheckVarRange_Generic( ConVar *pVar, int minVal, int maxVal )
 }
 
 
-void CheckSpecialCheatVars()
+static void CheckSpecialCheatVars()
 {
 	static ConVar *mat_picmip = NULL;
 	if ( !mat_picmip )
@@ -2283,7 +2283,7 @@ void CheckSpecialCheatVars()
 }
 
 
-void _Host_RunFrame_Render()
+static void _Host_RunFrame_Render()
 {
 #ifndef SWDS
 	VPROF( "_Host_RunFrame_Render" );
@@ -2330,7 +2330,7 @@ void _Host_RunFrame_Render()
 #endif
 }
 
-void CL_FindInterpolatedAddAngle( float t, float& frac, AddAngle **prev, AddAngle **next )
+static void CL_FindInterpolatedAddAngle( float t, float& frac, AddAngle **prev, AddAngle **next )
 {
 	int c = cl.addangle.Count();
 
@@ -2372,7 +2372,7 @@ void CL_FindInterpolatedAddAngle( float t, float& frac, AddAngle **prev, AddAngl
 	}
 }
 
-void CL_DiscardOldAddAngleEntries( float t )
+static void CL_DiscardOldAddAngleEntries( float t )
 {
 	float killtime = t - host_state.interval_per_tick - 0.1f;
 
@@ -2394,7 +2394,7 @@ void CL_DiscardOldAddAngleEntries( float t )
 }
 
 #ifndef SWDS
-void CL_ApplyAddAngle()
+static void CL_ApplyAddAngle()
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
@@ -2430,7 +2430,7 @@ void CL_ApplyAddAngle()
 }
 #endif
 
-void _Host_RunFrame_Sound()
+static void _Host_RunFrame_Sound()
 {
 #ifndef SWDS
 	VPROF_BUDGET( "_Host_RunFrame_Sound", VPROF_BUDGETGROUP_OTHER_SOUND );
@@ -2501,7 +2501,7 @@ S_API int SteamGameServer_GetIPCCallCount();
 #else
 S_API int SteamGameServer_GetIPCCallCount() { return 0; }
 #endif
-void Host_ShowIPCCallCount()
+static void Host_ShowIPCCallCount()
 {
 	// If set to 0 then get out.
 	if ( host_ShowIPCCallCount.GetInt() == 0 )
@@ -2553,7 +2553,7 @@ void Host_ShowIPCCallCount()
 	}
 }
 
-void Host_SetClientInSimulation( bool bInSimulation )
+static void Host_SetClientInSimulation( bool bInSimulation )
 {
 #ifndef SWDS
 	// Tracker 77931:  If the game is paused, then lock the client clock at the previous tick boundary 
@@ -2574,7 +2574,7 @@ static ConVar host_Sleep( "host_sleep", "0", FCVAR_CHEAT, "Force the host to sle
 extern ConVar sv_alternateticks;
 #define LOG_FRAME_OUTPUT 0
 
-void _Host_RunFrame (float time)
+static void _Host_RunFrame (float time)
 {
 	MDLCACHE_COARSE_LOCK_(g_pMDLCache);
 	static double host_remainder = 0.0f;
@@ -3172,7 +3172,7 @@ void Host_RunFrame( float time )
 //-----------------------------------------------------------------------------
 // A more secure means of enforcing low violence.
 //-----------------------------------------------------------------------------
-bool IsLowViolence_Secure()
+static bool IsLowViolence_Secure()
 {
 #ifndef DEDICATED
 	if ( Steam3Client().SteamApps() )
@@ -3190,7 +3190,7 @@ bool IsLowViolence_Secure()
 // If "User Token 2" exists in HKEY_CURRENT_USER/Software/Valve/Half-Life/Settings
 // then we disable gore. Obviously not very secure.
 //-----------------------------------------------------------------------------
-bool IsLowViolence_Registry()
+static bool IsLowViolence_Registry()
 {
 	char szSubKey[128];
 	int nBufferLen;
@@ -3283,7 +3283,7 @@ void Host_CheckGore( void )
 }
 
 
-void Host_InitCpu()
+static void Host_InitCpu()
 {
 	Cbuf_AddText("star_cpu");
 
@@ -3296,22 +3296,22 @@ void Host_InitCpu()
 #endif
 }
 
-void Host_InitRam()
+static void Host_InitRam()
 {
 	Cbuf_AddText("star_memory");
 }
 
-void Host_InitGpu()
+static void Host_InitGpu()
 {
 	Cbuf_AddText("star_gpu");
 }
 
-void Host_InitAudio()
+static void Host_InitAudio()
 {
 	Cbuf_AddText("star_audio_render");
 }
 
-void Host_InitOperatingSystem()
+static void Host_InitOperatingSystem()
 {
 	Cbuf_AddText("star_os");
 }
@@ -3342,7 +3342,7 @@ int Host_GetServerCount( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void Host_PostInit()
+static void Host_PostInit()
 {
 	if ( serverGameDLL )
 	{
@@ -3365,13 +3365,13 @@ void Host_PostInit()
 #endif
 }
 
-void HLTV_Init()
+static void HLTV_Init()
 {
 	Assert ( hltv == NULL );
 	Assert ( hltvtest == NULL );
 }
 
-void HLTV_Shutdown()
+static void HLTV_Shutdown()
 {
 	if ( hltv )
 	{
@@ -3388,7 +3388,7 @@ void HLTV_Shutdown()
 }
 
 // Check with steam to see if the requested file (requires full path) is a valid, signed binary
-bool DLL_LOCAL Host_IsValidSignature( const char *pFilename, bool bAllowUnknown )
+static bool Host_IsValidSignature( const char *pFilename, bool bAllowUnknown )
 {
 #if defined( SWDS )
 	return true;
