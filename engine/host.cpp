@@ -1290,13 +1290,13 @@ void Host_ReadPreStartupConfiguration()
 
 	// read file into memory
 	int size = g_pFileSystem->Size(f);
-	char *configBuffer = new char[ size + 1 ];
-	g_pFileSystem->Read( configBuffer, size, f );
+	std::unique_ptr<char[]> configBuffer = std::make_unique<char[]>(size + 1);
+	g_pFileSystem->Read( configBuffer.get(), size, f );
 	configBuffer[size] = 0;
 	g_pFileSystem->Close( f );
 
 	// parse out file
-	static const char *s_PreStartupConfigConVars[] =
+	constexpr char *s_PreStartupConfigConVars[] =
 	{
 		"sv_unlockedchapters",		// needed to display the startup graphic while loading
 		"snd_legacy_surround",		// needed to init the sound system
@@ -1306,7 +1306,7 @@ void Host_ReadPreStartupConfiguration()
 	// loop through looking for all the cvars to apply
 	for ( const auto *configVar : s_PreStartupConfigConVars )
 	{
-		const char *search = Q_stristr(configBuffer, configVar);
+		const char *search = Q_stristr(configBuffer.get(), configVar);
 		if (search)
 		{
 			// read over the token
@@ -1323,9 +1323,6 @@ void Host_ReadPreStartupConfiguration()
 			}
 		}
 	}
-
-	// free
-	delete [] configBuffer;
 }
 
 void Host_RecomputeSpeed_f( void )
