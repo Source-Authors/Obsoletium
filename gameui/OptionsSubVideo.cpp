@@ -602,10 +602,11 @@ public:
 	{
 		// Pull in data from dxsupport.cfg database (includes fine-grained per-vendor/per-device config data)
 		KeyValuesAD pKeyValues( "config" );
-		materials->GetRecommendedConfigurationInfo( 0, pKeyValues );	
+		materials->GetRecommendedConfigurationInfo( 0, pKeyValues );
 
 		// Read individual values from keyvalues which came from dxsupport.cfg database
-		int nSkipLevels = pKeyValues->GetInt( "ConVar.mat_picmip", 0 );
+		// dimhotepus: Clamp to safe range [-1..2] to assign to [0..3] in textures quality combobox.
+		int nSkipLevels = clamp( pKeyValues->GetInt( "ConVar.mat_picmip", 0 ), -1, 2 );
 		int nAnisotropicLevel = pKeyValues->GetInt( "ConVar.mat_forceaniso", 1 );
 		int nForceTrilinear = pKeyValues->GetInt( "ConVar.mat_trilinear", 0 );
 		int nAASamples = pKeyValues->GetInt( "ConVar.mat_antialias", 0 );

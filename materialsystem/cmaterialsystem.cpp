@@ -1565,9 +1565,10 @@ static ConVar mat_reducefillrate(	"mat_reducefillrate", "0", FCVAR_ALLOWED_IN_CO
 
 #if defined( OSX ) && !defined( STAGING_ONLY ) && !defined( _DEBUG )
 // OSX users are currently running OOM. We limit them to texture quality high here, which avoids the problem while we come up with a real solution.
-static ConVar mat_picmip(			"mat_picmip", "1", FCVAR_ARCHIVE, "", true, 0, true, 4 );
+static ConVar mat_picmip(			"mat_picmip", "1", FCVAR_ARCHIVE, "", true, 0, true, 2 );
 #else
-static ConVar mat_picmip(			"mat_picmip", "0", FCVAR_ARCHIVE, "", true, -1, true, 4 );
+// dimhotepus: Allow -10 as it is the best allowed value ex for TF2 now. See https://developer.valvesoftware.com/wiki/Mat_picmip
+static ConVar mat_picmip(			"mat_picmip", "0", FCVAR_ARCHIVE, "", true, -10, true, 2 );
 #endif
 static ConVar mat_slopescaledepthbias_normal( "mat_slopescaledepthbias_normal", "0.0f", FCVAR_CHEAT );
 static ConVar mat_depthbias_normal( "mat_depthbias_normal", "0.0f", FCVAR_CHEAT | FCVAR_ALLOWED_IN_COMPETITIVE );

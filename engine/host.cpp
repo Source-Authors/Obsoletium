@@ -2246,7 +2246,11 @@ static void CheckSpecialCheatVars()
 
 	// In multiplayer, don't allow them to set mat_picmip > 2.
 	if ( mat_picmip )
-		CheckVarRange_Generic( mat_picmip, -1, 2 );
+	{
+		// dimhotepus: TF2 allows mat_picmip -10, do not see a reason to disallow for other games.
+		// See https://developer.valvesoftware.com/wiki/Mat_picmip
+		CheckVarRange_Generic( mat_picmip, -10, 2 );
+	}
 	
 	CheckVarRange_r_rootlod();
 	CheckVarRange_r_lod();
