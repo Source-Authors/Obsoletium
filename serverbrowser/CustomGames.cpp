@@ -357,8 +357,8 @@ void CCustomGames::RecalculateCommonTags( void )
 
 	aTagsInUse.Sort( SortTagsInUse );
 
-	int iTagsToAdd = min( aTagsInUse.Count(), (intp)NUM_COMMON_TAGS );
-	for ( int i = 0; i < iTagsToAdd; i++ )
+	intp iTagsToAdd = min( aTagsInUse.Count(), (intp)NUM_COMMON_TAGS );
+	for ( intp i = 0; i < iTagsToAdd; i++ )
 	{
 		const char *pszTag = aTagsInUse[i].pszTag;
 		m_pTagListMenu->AddMenuItem( pszTag, new KeyValues("AddTag", "tag", pszTag), this, KeyValuesAD( new KeyValues( "data", "tag", pszTag ) ) );
