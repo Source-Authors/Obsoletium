@@ -465,14 +465,15 @@ CCommonHostState host_state;
 
 //-----------------------------------------------------------------------------
 
-enum HostThreadMode
+enum class HostThreadMode
 {
 	HTM_DISABLED,
 	HTM_DEFAULT,
 	HTM_FORCED,
 };
 
-ConVar host_thread_mode( "host_thread_mode", ( IsX360() ) ? "1" : "0", 0, "Run the host in threaded mode, (0 == off, 1 == if multicore, 2 == force)" );
+// dimhotepus: Bound to allowed set.
+ConVar host_thread_mode( "host_thread_mode", ( IsX360() ) ? "1" : "0", 0, "Run the host in threaded mode, (0 == off, 1 == if multicore, 2 == force)", true, to_underlying( HostThreadMode::HTM_DISABLED ), true, to_underlying( HostThreadMode::HTM_FORCED ) );
 extern ConVar threadpool_affinity;
 void OnChangeThreadAffinity( IConVar *var, const char *pOldValue, float flOldValue )
 {
@@ -3246,9 +3247,15 @@ void Host_RunFrame( float time )
 	{
 		switch ( host_thread_mode.GetInt() )
 		{
-		case HTM_DISABLED:	g_bThreadedEngine = false;									break;
-		case HTM_DEFAULT:	g_bThreadedEngine = ( g_pThreadPool->NumThreads() > 0 );	break;
-		case HTM_FORCED:	g_bThreadedEngine = true;									break;
+		case to_underlying(HostThreadMode::HTM_DISABLED):
+			g_bThreadedEngine = false;
+			break;
+		case to_underlying(HostThreadMode::HTM_DEFAULT):
+			g_bThreadedEngine = ( g_pThreadPool->NumThreads() > 0 );
+			break;
+		case to_underlying(HostThreadMode::HTM_FORCED):
+			g_bThreadedEngine = true;
+			break;
 		}
 	}
 	else
