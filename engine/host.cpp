@@ -995,7 +995,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 	if ( sv.IsDedicated() )
 		return;
 
-	if ( IsPC() && Key_CountBindings() <= 1 )
+	if ( Key_CountBindings() <= 1 )
 	{
 		ConMsg( "skipping %s output, no keys bound\n", filename );
 		return;
@@ -1008,7 +1008,7 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 	char		szFileName[MAX_PATH];
 	CUtlBuffer	configBuff( (intp)0, 0, CUtlBuffer::TEXT_BUFFER);
 
-	Q_snprintf( szFileName, sizeof(szFileName), "cfg/%s", filename );
+	V_sprintf_safe( szFileName, "cfg/%s", filename );
 	g_pFileSystem->CreateDirHierarchy( "cfg", "MOD" );
 	if ( g_pFileSystem->FileExists( szFileName, "MOD" ) && !g_pFileSystem->IsFileWritable( szFileName, "MOD" ) )
 	{
@@ -1023,11 +1023,10 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 	cv->WriteVariables( configBuff, bAllVars );
 
 #if !defined( SWDS )
-		bool down;
-		if ( g_ClientDLL->IN_IsKeyDown( "in_jlook", down ) && down )
-		{
-			configBuff.Printf( "+jlook\n" );
-		}
+	if ( bool down = true; g_ClientDLL->IN_IsKeyDown( "in_jlook", down ) && down )
+	{
+		configBuff.Printf( "+jlook\n" );
+	}
 #endif // SWDS
 
 	if ( !configBuff.TellMaxPut() )
@@ -1121,13 +1120,14 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 		}
 #endif
 
-
 	// make a persistent copy that async will use and free
-	char *tempBlock = new char[configBuff.TellMaxPut()];
-	Q_memcpy( tempBlock, configBuff.Base(), configBuff.TellMaxPut() );
+	const intp blockSize = configBuff.TellMaxPut();
+
+	char *tempBlock = new char[blockSize];
+	Q_memcpy( tempBlock, configBuff.Base(), blockSize );
 
 	// async write the buffer, and then free it
-	g_pFileSystem->AsyncWrite( szFileName, tempBlock, configBuff.TellMaxPut(), true );
+	g_pFileSystem->AsyncWrite( szFileName, tempBlock, blockSize, true );
 
 	ConMsg( "Host_WriteConfiguration: Wrote %s\n", szFileName );
 }
