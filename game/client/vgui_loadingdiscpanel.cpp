@@ -116,8 +116,8 @@ private:
 public:
 	CLoadingDisc( void )
 	{
-		loadingDiscPanel = NULL;
-		m_pPauseDiscPanel = NULL;
+		loadingDiscPanel = nullptr;
+		m_pPauseDiscPanel = nullptr;
 		m_hParent = std::numeric_limits<vgui::VPANEL>::max();
 		m_nPrevTimeRemaining = -1;
 	}
@@ -134,14 +134,14 @@ public:
 		{
 			loadingDiscPanel->SetParent( nullptr );
 			loadingDiscPanel->MarkForDeletion();
-			loadingDiscPanel = NULL;
+			loadingDiscPanel = nullptr;
 		}
 
 		if ( m_pPauseDiscPanel )
 		{
 			m_pPauseDiscPanel->SetParent( nullptr );
 			m_pPauseDiscPanel->MarkForDeletion();
-			m_pPauseDiscPanel = NULL;
+			m_pPauseDiscPanel = nullptr;
 		}
 
 		m_hParent = NULL;
