@@ -227,7 +227,7 @@ public:
 private:
 	enum
 	{
-		FRAME_HISTORY_COUNT = 50		
+		FRAME_HISTORY_COUNT = 50
 	};
 
 	friend void Host_Speeds();
@@ -559,7 +559,7 @@ CON_COMMAND( host_timer_report, "Spew CPU timer jitter for the last 128 frames i
 	}
 }
 
-#ifdef REL_TO_STAGING_MERGE_TODO							 
+#ifdef REL_TO_STAGING_MERGE_TODO
 // Do this when merging the game DLLs so FCVAR_CHEAT can be set on them at the same time.
 ConVar  developer( "developer", "0", FCVAR_CHEAT, "Set developer message level");
 #else
@@ -2190,18 +2190,18 @@ void _Host_RunFrame_Input( float accumulated_extra_samples, bool bFinalTick )
 		const ScopedFrameSegment input_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_INPUT };
 
 #ifndef SWDS
-	// Client can process input
-	ClientDLL_ProcessInput( );
+		// Client can process input
+		ClientDLL_ProcessInput( );
 
 		{
 			const ScopedFrameSegment cmd_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_CMD_EXECUTE };
 
-	// process console commands
-	Cbuf_Execute ();
+			// process console commands
+			Cbuf_Execute ();
 		}
 
-	// Send any current movement commands to server and flush reliable buffer even if not moving yet.
-	CL_Move( accumulated_extra_samples, bFinalTick );
+		// Send any current movement commands to server and flush reliable buffer even if not moving yet.
+		CL_Move( accumulated_extra_samples, bFinalTick );
 #endif
 	}
 }
@@ -2242,21 +2242,21 @@ void _Host_RunFrame_Client( bool framefinished )
 	{
 		const ScopedFrameSegment client_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_CLIENT };
 
-	// Get any current state update from server, etc.
-	CL_ReadPackets( framefinished );
+		// Get any current state update from server, etc.
+		CL_ReadPackets( framefinished );
 
 #if defined( VOICE_OVER_IP )
-	// Send any enqueued voice data to the server
-	CL_ProcessVoiceData();
+		// Send any enqueued voice data to the server
+		CL_ProcessVoiceData();
 #endif // VOICE_OVER_IP
 
-	cl.CheckUpdatingSteamResources();
-	cl.CheckFileCRCsWithServer();
+		cl.CheckUpdatingSteamResources();
+		cl.CheckFileCRCsWithServer();
 
-	// Resend connection request if needed.
-	cl.RunFrame();
+		// Resend connection request if needed.
+		cl.RunFrame();
 
-	Steam3Client().RunFrame();
+		Steam3Client().RunFrame();
 	}
 
 	// This takes 1 usec, so it's pretty cheap...
@@ -2317,21 +2317,21 @@ void _Host_RunFrame_Render()
 	}
 
 	{
-	// update video if not running in background
+		// update video if not running in background
 		const ScopedFrameSegment render_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_RENDER };
 
-	CL_LatchInterpolationAmount();
+		CL_LatchInterpolationAmount();
 
-	{
-		VPROF( "_Host_RunFrame_Render - UpdateScreen" );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render - UpdateScreen" );
-		Host_UpdateScreen();
-	}
-	{
-		VPROF( "_Host_RunFrame_Render - CL_DecayLights" );
-		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render - CL_DecayLights" );
-		CL_DecayLights ();
-	}
+		{
+			VPROF( "_Host_RunFrame_Render - UpdateScreen" );
+			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render - UpdateScreen" );
+			Host_UpdateScreen();
+		}
+		{
+			VPROF( "_Host_RunFrame_Render - CL_DecayLights" );
+			tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "_Host_RunFrame_Render - CL_DecayLights" );
+			CL_DecayLights ();
+		}
 	}
 
 	saverestore->OnFrameRendered();
@@ -2691,12 +2691,12 @@ void _Host_RunFrame (float time)
 		{
 			const ScopedFrameSegment cmd_segment{ g_HostTimes, FrameSegment::FRAME_SEGMENT_CMD_EXECUTE };
 
-		// process console commands
-		Cbuf_Execute ();
+			// process console commands
+			Cbuf_Execute ();
 
-		// initialize networking for dedicated server after commandline & autoexec.cfg have been parsed
-		if ( NET_IsDedicated() && !NET_IsMultiplayer() )
-			NET_SetMutiplayer( true );
+			// initialize networking for dedicated server after commandline & autoexec.cfg have been parsed
+			if ( NET_IsDedicated() && !NET_IsMultiplayer() )
+				NET_SetMutiplayer( true );
 		}
 
 		// Msg( "Running %i ticks (%f remainder) for frametime %f total %f tick %f delta %f\n", numticks, remainder, host_frametime, host_time );
@@ -3902,7 +3902,7 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	// Add on time passed since the last time we kept track till this transition
 	// dimhotepus: int -> float
 	float fAdditionalSeconds = g_ServerGlobalVariables.curtime - saverestore->GetMostRecentElapsedTimeSet();
-	int iElapsedSeconds = saverestore->GetMostRecentElapsedSeconds() + floor( fAdditionalSeconds );
+	int iElapsedSeconds = saverestore->GetMostRecentElapsedSeconds() + (int)floor( fAdditionalSeconds );
 	int iElapsedMinutes = saverestore->GetMostRecentElapsedMinutes() + ( iElapsedSeconds / 60 );
 	saverestore->SetMostRecentElapsedMinutes( iElapsedMinutes );
 	saverestore->SetMostRecentElapsedSeconds( ( iElapsedSeconds % 60 ) );
