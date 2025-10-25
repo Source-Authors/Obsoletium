@@ -22,14 +22,14 @@ extern vgui::ILocalize *g_pVGuiLocalize;
 //-----------------------------------------------------------------------------
 // Purpose: Displays the loading plaque
 //-----------------------------------------------------------------------------
-class CLoadingDiscPanel : public vgui::EditablePanel
+class CLoadingDiscPanel final : public vgui::EditablePanel
 {
 	typedef vgui::EditablePanel BaseClass;
 public:
 	CLoadingDiscPanel( vgui::VPANEL parent );
 	~CLoadingDiscPanel();
 
-	virtual void ApplySchemeSettings( vgui::IScheme *pScheme )
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 
@@ -53,14 +53,14 @@ public:
 		SetPos( ( w - wide ) / 2, ( h - tall ) / 2 );
 	}
 
-	virtual void PaintBackground()
+	void PaintBackground() override
 	{
 		SetBgColor( Color(0, 0, 0, 128) );
 		SetPaintBackgroundType( 2 );
 		BaseClass::PaintBackground();
 	}
 
-	virtual void SetText( const char *text )
+	void SetText( const char *text )
 	{
 		m_pLoadingLabel->SetText( text );
 	}
@@ -106,7 +106,7 @@ CLoadingDiscPanel::~CLoadingDiscPanel()
 {
 }
 
-class CLoadingDisc : public ILoadingDisc
+class CLoadingDisc final : public ILoadingDisc
 {
 private:
 	CLoadingDiscPanel *loadingDiscPanel;
