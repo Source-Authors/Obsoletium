@@ -1729,10 +1729,6 @@ void CL_ProcessVoiceData()
 #endif
 
 
-
-
-
-
 /*
 =====================
 Host_UpdateScreen
@@ -2244,7 +2240,7 @@ bool CheckVarRange_Generic( ConVar *pVar, int minVal, int maxVal )
 
 static void CheckSpecialCheatVars()
 {
-	static ConVar *mat_picmip = NULL;
+	static ConVar *mat_picmip = nullptr;
 	if ( !mat_picmip )
 		mat_picmip = g_pCVar->FindVar( "mat_picmip" );
 
