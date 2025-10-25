@@ -1325,7 +1325,7 @@ void Host_ReadPreStartupConfiguration()
 	}
 }
 
-void Host_RecomputeSpeed_f( void )
+static void Host_RecomputeSpeed_f()
 {
 	ConMsg( "Recomputing clock speed...\n" );
 
@@ -1335,7 +1335,7 @@ void Host_RecomputeSpeed_f( void )
 
 static ConCommand recompute_speed( "recompute_speed", Host_RecomputeSpeed_f, "Recomputes clock speed (for debugging purposes).", FCVAR_CHEAT );
 
-void DTI_Flush_f()
+static void DTI_Flush_f()
 {
 	DTI_Flush();
 	ServerDTI_Flush();
