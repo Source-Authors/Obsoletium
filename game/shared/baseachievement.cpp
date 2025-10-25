@@ -604,7 +604,7 @@ void CBaseAchievement::ApplySettings( KeyValues *pNodeIn )
 	// if this achievement has components, set the component bits
 	if ( HasComponents() )
 	{
-		int64 iComponentBits = pNodeIn->GetUint64( "data" );
+		uint64 iComponentBits = pNodeIn->GetUint64( "data" );
 		SetComponentBits( iComponentBits );
 	}
 	SetShowOnHUD( !!pNodeIn->GetInt( "hud" ) );
