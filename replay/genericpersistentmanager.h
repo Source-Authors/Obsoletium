@@ -272,7 +272,7 @@ void CGenericPersistentManager< T >::Remove( ReplayHandle_t hObj )
 template< class T >
 void CGenericPersistentManager< T >::Remove( T *pObj )
 {
-	const int it = m_vecObjs.Find( pObj );
+	const auto it = m_vecObjs.Find( pObj );
 
 	if ( it != m_vecObjs.InvalidIndex() )
 	{
