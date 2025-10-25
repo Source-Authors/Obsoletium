@@ -576,9 +576,9 @@ ConVar	r_ForceRestore( "r_ForceRestore", "0", 0 );
 
 ConVar vcr_verbose( "vcr_verbose", "0", 0, "Write extra information into .vcr file." );
 
-#ifndef SWDS
-void CL_CheckToDisplayStartupMenus(); // in cl_main.cpp
-#endif
+// dimhotepus: NO_STEAM
+#ifndef NO_STEAM
+static bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const char *pszRemoteFileName, const char *pszLocalFileName )
 
 
 bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const char *pszRemoteFileName, const char *pszLocalFileName )
