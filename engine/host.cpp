@@ -3989,8 +3989,9 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 
 #if !defined( SWDS )
 	// Add on time passed since the last time we kept track till this transition
-	int iAdditionalSeconds = g_ServerGlobalVariables.curtime - saverestore->GetMostRecentElapsedTimeSet();
-	int iElapsedSeconds = saverestore->GetMostRecentElapsedSeconds() + iAdditionalSeconds;
+	// dimhotepus: int -> float
+	float fAdditionalSeconds = g_ServerGlobalVariables.curtime - saverestore->GetMostRecentElapsedTimeSet();
+	int iElapsedSeconds = saverestore->GetMostRecentElapsedSeconds() + floor( fAdditionalSeconds );
 	int iElapsedMinutes = saverestore->GetMostRecentElapsedMinutes() + ( iElapsedSeconds / 60 );
 	saverestore->SetMostRecentElapsedMinutes( iElapsedMinutes );
 	saverestore->SetMostRecentElapsedSeconds( ( iElapsedSeconds % 60 ) );
@@ -4013,7 +4014,8 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 		}
 
 		// Not going to load a save after the transition, so add this map's elapsed time to the total elapsed time
-		int totalSeconds = g_ServerGlobalVariables.curtime + saverestore->GetMostRecentElapsedSeconds();
+		// dimhotepus: int -> float
+		float totalSeconds = g_ServerGlobalVariables.curtime + saverestore->GetMostRecentElapsedSeconds();
 		saverestore->SetMostRecentElapsedMinutes( (int)( totalSeconds / 60.0f ) + saverestore->GetMostRecentElapsedMinutes() );
 		saverestore->SetMostRecentElapsedSeconds( (int)fmod( totalSeconds, 60.0f ) );
 	}
@@ -4099,7 +4101,8 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 
 #if !defined(SWDS)
 	// Offset stored elapsed time by the current elapsed time for this new map
-	int maptime = sv.GetTime();
+	// dimhotepus: int -> float
+	float maptime = sv.GetTime();
 	int minutes = (int)( maptime / 60.0f );
 	int seconds = (int)fmod( maptime, 60.0f );
 	saverestore->SetMostRecentElapsedMinutes( saverestore->GetMostRecentElapsedMinutes() - minutes );
