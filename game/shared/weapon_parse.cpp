@@ -344,13 +344,13 @@ void FileWeaponInfo_t::Parse( KeyValues *pKeyValuesData, const char *szWeaponNam
 	bParsedScript = true;
 
 	// Classname
-	Q_strncpy( szClassName, szWeaponName, MAX_WEAPON_STRING );
+	V_strcpy_safe( szClassName, szWeaponName );
 	// Printable name
-	Q_strncpy( szPrintName, pKeyValuesData->GetString( "printname", WEAPON_PRINTNAME_MISSING ), MAX_WEAPON_STRING );
+	V_strcpy_safe( szPrintName, pKeyValuesData->GetString( "printname", WEAPON_PRINTNAME_MISSING ) );
 	// View model & world model
-	Q_strncpy( szViewModel, pKeyValuesData->GetString( "viewmodel" ), MAX_WEAPON_STRING );
-	Q_strncpy( szWorldModel, pKeyValuesData->GetString( "playermodel" ), MAX_WEAPON_STRING );
-	Q_strncpy( szAnimationPrefix, pKeyValuesData->GetString( "anim_prefix" ), MAX_WEAPON_PREFIX );
+	V_strcpy_safe( szViewModel, pKeyValuesData->GetString( "viewmodel" ) );
+	V_strcpy_safe( szWorldModel, pKeyValuesData->GetString( "playermodel" ) );
+	V_strcpy_safe( szAnimationPrefix, pKeyValuesData->GetString( "anim_prefix" ) );
 	iSlot = pKeyValuesData->GetInt( "bucket", 0 );
 	iPosition = pKeyValuesData->GetInt( "bucket_position", 0 );
 	
@@ -429,16 +429,16 @@ void FileWeaponInfo_t::Parse( KeyValues *pKeyValuesData, const char *szWeaponNam
 	iAmmo2Type = GetAmmoDef()->Index( szAmmo2 );
 
 	// Now read the weapon sounds
-	memset( aShootSounds, 0, sizeof( aShootSounds ) );
+	BitwiseClear( aShootSounds );
 	KeyValues *pSoundData = pKeyValuesData->FindKey( "SoundData" );
 	if ( pSoundData )
 	{
 		for ( int i = EMPTY; i < NUM_SHOOT_SOUND_TYPES; i++ )
 		{
 			const char *soundname = pSoundData->GetString( pWeaponSoundCategories[i] );
-			if ( soundname && soundname[0] )
+			if ( !Q_isempty( soundname ) )
 			{
-				Q_strncpy( aShootSounds[i], soundname, MAX_WEAPON_STRING );
+				V_strcpy_safe( aShootSounds[i], soundname );
 			}
 		}
 	}
