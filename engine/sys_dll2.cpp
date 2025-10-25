@@ -918,6 +918,11 @@ class CEngineAPI : public CTier3AppSystem< IEngineAPI >
 	typedef CTier3AppSystem< IEngineAPI > BaseClass;
 
 public:
+	CEngineAPI()
+	{
+		BitwiseClear(m_StartupInfo);
+	}
+
 	bool Connect( CreateInterfaceFn factory ) override;
 	void Disconnect() override;
 	void *QueryInterface( const char *pInterfaceName ) override;
@@ -980,9 +985,9 @@ private:
 	void ActivateEditModeShaders( bool bActive );
 
 private:
-	void *m_hEditorHWnd;
-	bool m_bRunningSimulation;
-	bool m_bSupportsVR;
+	void *m_hEditorHWnd{nullptr};
+	bool m_bRunningSimulation{false};
+	bool m_bSupportsVR{false};
 	StartupInfo_t m_StartupInfo;
 };
 
