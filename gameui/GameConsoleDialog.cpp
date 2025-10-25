@@ -22,7 +22,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
-CGameConsoleDialog::CGameConsoleDialog() : BaseClass( NULL, "GameConsole", false )
+CGameConsoleDialog::CGameConsoleDialog( vgui::Panel *parent ) : BaseClass( parent, "GameConsole", false )
 {
 	AddActionSignalTarget( this );
 }

@@ -26,7 +26,8 @@ class CGameConsoleDialog : public vgui::CConsoleDialog
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CGameConsoleDialog, vgui::CConsoleDialog );
 
 public:
-	CGameConsoleDialog();
+	// dimhotepus: Console always has parent. Scale UI.
+	CGameConsoleDialog( vgui::Panel *parent );
 
 private:
 	MESSAGE_FUNC( OnClosedByHittingTilde, "ClosedByHittingTilde" );

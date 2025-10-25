@@ -54,25 +54,7 @@ CGameConsole::~CGameConsole()
 //-----------------------------------------------------------------------------
 void CGameConsole::Initialize()
 {
-#ifndef _XBOX
-	m_pConsole = vgui::SETUP_PANEL( new CGameConsoleDialog() ); // we add text before displaying this so set it up now!
-
-	// set the console to taking up most of the right-half of the screen
-	int swide, stall;
-	vgui::surface()->GetScreenSize(swide, stall);
-	// dimhotepus: Console should take more space as scaled it is too small.
-	int offsetx = vgui::scheme()->GetProportionalScaledValue(48);
-	int offsety = vgui::scheme()->GetProportionalScaledValue(64);
-
-	m_pConsole->SetBounds(
-		swide / 2 - offsetx,
-		offsety,
-		// dimhotepus: Console should take more space as scaled it is too small.
-		swide / 2 + offsetx - vgui::scheme()->GetProportionalScaledValue(8),
-		stall - (offsety * 2));
-
-	m_bInitialized = true;
-#endif
+	Initialize( 0, "" );
 }
 
 //-----------------------------------------------------------------------------
@@ -168,6 +150,32 @@ void CGameConsole::OnCmdCondump()
 {
 #ifndef _XBOX
 	g_GameConsole.m_pConsole->DumpConsoleTextToFile();
+#endif
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: sets up the console for use
+//-----------------------------------------------------------------------------
+void CGameConsole::Initialize( vgui::VPANEL parent, const char *panelModule )
+{
+#ifndef _XBOX
+	m_pConsole = vgui::SETUP_PANEL( new CGameConsoleDialog( vgui::ipanel()->GetPanel( parent, panelModule ) ) ); // we add text before displaying this so set it up now!
+
+	// set the console to taking up most of the right-half of the screen
+	int swide, stall;
+	vgui::surface()->GetScreenSize(swide, stall);
+	// dimhotepus: Console should take more space as scaled it is too small.
+	int offsetx = vgui::scheme()->GetProportionalScaledValue(48);
+	int offsety = vgui::scheme()->GetProportionalScaledValue(64);
+
+	m_pConsole->SetBounds(
+		swide / 2 - offsetx,
+		offsety,
+		// dimhotepus: Console should take more space as scaled it is too small.
+		swide / 2 + offsetx - vgui::scheme()->GetProportionalScaledValue(8),
+		stall - (offsety * 2));
+
+	m_bInitialized = true;
 #endif
 }
 

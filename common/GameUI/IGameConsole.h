@@ -43,8 +43,12 @@ public:
 
 	// dimhotepus: Use strict type.
 	virtual void SetParent( vgui::VPANEL parent ) = 0;
+
+	// dimhotepus: Initialize with parent to scale UI.
+	virtual void Initialize( vgui::VPANEL parent, const char *panelModule ) = 0;
 };
 
-#define GAMECONSOLE_INTERFACE_VERSION "GameConsole004"
+// dimhotepus: Bump version.
+#define GAMECONSOLE_INTERFACE_VERSION "GameConsole005"
 
 #endif // IGAMECONSOLE_H

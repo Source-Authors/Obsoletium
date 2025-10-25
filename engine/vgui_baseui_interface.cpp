@@ -416,6 +416,8 @@ private:
 
 	// used to start the progress from an arbitrary position
 	float					m_ProgressBias;
+	// dimhotepus: Add module name.
+	static constexpr char	m_UiModuleName[]{"BaseUI"};
 };
 
 
@@ -574,7 +576,7 @@ void CEngineVGui::Init()
 		Sys_Error( "Could not get IGameConsole interface %s from %s.\n", GAMECONSOLE_INTERFACE_VERSION, szDllName );
 	}
 
-	vgui::VGui_InitMatSysInterfacesList( "BaseUI", &g_AppSystemFactory, 1 );
+	vgui::VGui_InitMatSysInterfacesList( m_UiModuleName, &g_AppSystemFactory, 1 );
 
 	// Get our langauge string
 	char lang[ 64 ];
@@ -766,8 +768,9 @@ void CEngineVGui::Init()
 	// setup console
 	if ( staticGameConsole )
 	{
-		staticGameConsole->Initialize();
-		staticGameConsole->SetParent(staticGameUIPanel->GetVPanel());
+		// dimhotepus: Correctly scale console UI.
+		staticGameConsole->Initialize( staticGameUIPanel->GetVPanel(), m_UiModuleName );
+		// staticGameConsole->SetParent(staticGameUIPanel->GetVPanel());
 	}
 
 	// show the game UI

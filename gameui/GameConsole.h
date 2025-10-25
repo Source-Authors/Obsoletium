@@ -25,23 +25,26 @@ public:
 	~CGameConsole();
 
 	// sets up the console for use
-	void Initialize();
+	void Initialize() override;
 
 	// activates the console, makes it visible and brings it to the foreground
-	virtual void Activate();
+	void Activate() override;
 	// hides the console
-	virtual void Hide();
+	void Hide() override;
 	// clears the console
-	virtual void Clear();
+	void Clear() override;
 
 	// returns true if the console is currently in focus
-	virtual bool IsConsoleVisible();
+	bool IsConsoleVisible() override;
+
+	// dimhotepus: Use strict type.
+	void SetParent( vgui::VPANEL parent ) override;
+
+	// sets up the console for use
+	void Initialize( vgui::VPANEL parent, const char *panelModule ) override;
 
 	// activates the console after a delay
 	void ActivateDelayed(float time);
-
-	// dimhotepus: Use strict type.
-	void SetParent( vgui::VPANEL parent );
 
 	static void OnCmdCondump();
 private:
