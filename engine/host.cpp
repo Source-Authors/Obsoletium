@@ -744,7 +744,7 @@ void Host_Error ( PRINTF_FORMAT_STRING const char *error, ...) FMTFUNCTION( 1, 2
 
 #ifndef SWDS
 	// Reenable screen updates
-	SCR_EndLoadingPlaque ();		
+	SCR_EndLoadingPlaque ();
 #endif
 	ConMsg( "\nHost_Error: %s\n\n", string );
 
@@ -916,16 +916,15 @@ static void SetupNewBindings()
 // function is called to set the default key
 // bindings to match those defined in kb_def.lst
 //******************************************
-void UseDefaultBindings( void )
+static void UseDefaultBindings()
 {
-	FileHandle_t f;
 	char szFileName[ MAX_PATH ];
 	char token[ 1024 ];
 	char szKeyName[ 256 ];
 
 	// read kb_def file to get default key binds
-	Q_snprintf( szFileName, sizeof( szFileName ), "%skb_def.lst", SCRIPT_DIR );
-	f = g_pFileSystem->Open( szFileName, "r");
+	V_sprintf_safe( szFileName, "%skb_def.lst", SCRIPT_DIR );
+	FileHandle_t f = g_pFileSystem->Open( szFileName, "r");
 	if ( !f )
 	{
 		ConMsg( "Couldn't open kb_def.lst\n" );
@@ -934,17 +933,18 @@ void UseDefaultBindings( void )
 
 	// read file into memory
 	int size = g_pFileSystem->Size(f);
-	char *startbuf = new char[ size ];
-	g_pFileSystem->Read( startbuf, size, f );
+
+	std::unique_ptr<char[]> startbuf = std::make_unique<char[]>( size );
+	g_pFileSystem->Read( startbuf.get(), size, f );
 	g_pFileSystem->Close( f );
 
-	const char *buf = startbuf;
-	while ( 1 )
+	const char *buf = startbuf.get();
+	while ( true )
 	{
 		buf = COM_ParseFile( buf, token );
 		if ( Q_isempty( token ) )
 			break;
-		Q_strncpy ( szKeyName, token, sizeof( szKeyName ) );
+		V_strcpy_safe ( szKeyName, token );
 
 		buf = COM_ParseFile( buf, token );
 		if ( Q_isempty( token ) )  // Error
@@ -953,7 +953,6 @@ void UseDefaultBindings( void )
 		// finally, bind key
 		Key_SetBinding ( g_pInputSystem->StringToButtonCode( szKeyName ), token );
 	}
-	delete [] startbuf;		// cleanup on the way out
 }
 
 static bool g_bConfigCfgExecuted = false;
