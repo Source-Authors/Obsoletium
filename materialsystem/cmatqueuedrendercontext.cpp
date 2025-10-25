@@ -735,7 +735,6 @@ void CMatQueuedRenderContext::EndQueue( bool bCallQueued )
 	{
 		CallQueued();
 	}
-	int i;
 
 	if ( m_pCurrentMaterial )
 	{
@@ -752,21 +751,21 @@ void CMatQueuedRenderContext::EndQueue( bool bCallQueued )
 		m_pLocalCubemapTexture = NULL;
 	}
 
-	for ( i = 0; i < MAX_FB_TEXTURES; i++ )
+	for ( auto &t : m_pCurrentFrameBufferCopyTexture )
 	{
-		if ( m_pCurrentFrameBufferCopyTexture[i] )
+		if ( t )
 		{
-			m_pCurrentFrameBufferCopyTexture[i] = NULL;
+			t = nullptr;
 		}
 	}
 
-	for ( i = 0; i < m_RenderTargetStack.Count(); i++ )
+	for ( auto &t : m_RenderTargetStack )
 	{
-		for ( int j = 0; j < MAX_RENDER_TARGETS; j++ )
+		for ( auto &rt : t.m_pRenderTargets )
 		{
-			if ( m_RenderTargetStack[i].m_pRenderTargets[j] )
+			if ( rt )
 			{
-				m_RenderTargetStack[i].m_pRenderTargets[j] = NULL;
+				rt = nullptr;
 			}
 		}
 	}
