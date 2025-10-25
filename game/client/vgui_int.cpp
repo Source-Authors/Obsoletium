@@ -257,19 +257,15 @@ void VGui_PreRender()
 	VPROF( "VGui_PreRender" );
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-	// 360 does not use these plaques
-	if ( IsPC() )
-	{
-		loadingdisc->SetLoadingVisible( engine->IsDrawingLoadingImage() && !engine->IsPlayingDemo() );
-		
-		bool bShowPausedImage = !enginevgui->IsGameUIVisible() && cl_showpausedimage.GetBool() && engine->IsPaused() && !engine->IsTakingScreenshot() && !engine->IsPlayingDemo();
+	loadingdisc->SetLoadingVisible( engine->IsDrawingLoadingImage() && !engine->IsPlayingDemo() );
+
+	bool bShowPausedImage = !enginevgui->IsGameUIVisible() && cl_showpausedimage.GetBool() && engine->IsPaused() && !engine->IsTakingScreenshot() && !engine->IsPlayingDemo();
 #if !defined( TF_CLIENT_DLL )
-		loadingdisc->SetPausedVisible( bShowPausedImage, engine->GetPausedExpireTime()  );
+	loadingdisc->SetPausedVisible( bShowPausedImage, engine->GetPausedExpireTime()  );
 #else
-		bShowPausedImage &= ( TFGameRules() && !TFGameRules()->IsInTraining() );
-		loadingdisc->SetPausedVisible( bShowPausedImage, engine->GetPausedExpireTime() );
+	bShowPausedImage &= ( TFGameRules() && !TFGameRules()->IsInTraining() );
+	loadingdisc->SetPausedVisible( bShowPausedImage, engine->GetPausedExpireTime() );
 #endif
-	}
 }
 
 void VGui_PostRender()
