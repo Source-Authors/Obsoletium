@@ -1223,7 +1223,7 @@ void Host_ReadConfiguration()
 	Key_SetBinding( KEY_ESCAPE, "cancelselect" );
 
 	// Make sure that something is always bound to console
-	if (NULL == Key_NameForBinding("toggleconsole"))
+	if (!Key_NameForBinding("toggleconsole"))
 	{
 		// If nothing is bound to it then bind it to '
 		Key_SetBinding( KEY_BACKQUOTE, "toggleconsole" );
@@ -1236,8 +1236,7 @@ void Host_ReadConfiguration()
 	if ( saveconfig )
 	{
 		// An ugly hack, but we can probably save this safely
-		bool saveinit = host_initialized;
-		host_initialized = true;
+		const bool saveinit = std::exchange( host_initialized, true );
 		Host_WriteConfiguration();
 		host_initialized = saveinit;
 	}
