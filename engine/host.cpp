@@ -1271,7 +1271,7 @@ CON_COMMAND( host_writeconfig, "Store current settings to config.cfg (or specifi
 	}
 	else
 	{
-		Host_WriteConfiguration( NULL, true );
+		Host_WriteConfiguration( nullptr, true );
 	}
 }
 
