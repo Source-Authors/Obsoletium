@@ -1257,14 +1257,14 @@ CON_COMMAND( host_writeconfig, "Store current settings to config.cfg (or specifi
 		bool bWriteAll = ( args.ArgC() == 3 && V_stricmp( args[ 2 ], "full" ) == 0 );
 
 		char const *filename = args[ 1 ];
-		if ( !filename || !filename[ 0 ] )
+		if ( Q_isempty( filename ) )
 		{
 			return;
 		}
 
 		char outfile[ MAX_QPATH ];
 		// Strip path and extension from filename
-		Q_FileBase( filename, outfile );
+		V_FileBase( filename, outfile );
 		Host_WriteConfiguration( va( "%s.cfg", outfile ), bWriteAll );
 		if  ( !bWriteAll )
 			ConMsg( "Wrote partial config file \"%s\" out, to write full file use host_writeconfig \"%s\" full\n", outfile, outfile );
