@@ -17,7 +17,7 @@
 // The sound categories found in the weapon classname.txt files
 // This needs to match the WeaponSound_t enum in weapon_parse.h
 #if !defined(_STATIC_LINKED) || defined(CLIENT_DLL)
-const char *pWeaponSoundCategories[ NUM_SHOOT_SOUND_TYPES ] = 
+constexpr char *pWeaponSoundCategories[ NUM_SHOOT_SOUND_TYPES ] = 
 {
 	"empty",
 	"single_shot",
@@ -58,7 +58,7 @@ struct itemFlags_t
 	int m_iFlagValue;
 };
 #if !defined(_STATIC_LINKED) || defined(CLIENT_DLL)
-itemFlags_t g_ItemFlags[8] =
+constexpr itemFlags_t g_ItemFlags[8] =
 {
 	{ "ITEM_FLAG_SELECTONEMPTY",	ITEM_FLAG_SELECTONEMPTY },
 	{ "ITEM_FLAG_NOAUTORELOAD",		ITEM_FLAG_NOAUTORELOAD },
