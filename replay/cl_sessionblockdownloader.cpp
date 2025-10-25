@@ -270,7 +270,7 @@ void CSessionBlockDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, 
 				// Report error to OGS.
 				CL_GetErrorSystem()->OGS_ReportSessionBlockDownloadError(
 					pDownloader, pBlock, pDownloader->GetBytesDownloaded(), m_nMaxBlock, &bSizesDiffer,
-					&bHashFail, aLocalHash, ssize(aLocalHash)
+					&bHashFail, aLocalHash, static_cast<int>(ssize(aLocalHash))
 				);
 			}
 		}
