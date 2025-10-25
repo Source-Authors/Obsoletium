@@ -71,7 +71,8 @@ bool CMemoryStack::Init( size_t maxSize, size_t commitSize, size_t initialCommit
 
 	SYSTEM_INFO sysInfo;
 	GetNativeSystemInfo( &sysInfo );
-	Assert( !( sysInfo.dwPageSize & (sysInfo.dwPageSize-1)) );
+	// dimhotepus: Use convenient API instead of bits magic.
+	Assert( IsPowerOfTwo( sysInfo.dwPageSize ) );
 	pageSize = sysInfo.dwPageSize;
 
 	if ( m_commitSize == 0 )
