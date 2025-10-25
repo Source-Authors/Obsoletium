@@ -301,7 +301,7 @@ void Snd_Restart_f()
 		const char *pPreviousCodec = Voice_ConfiguredCodec();
 		if ( pPreviousCodec && *pPreviousCodec )
 		{
-			V_strncpy( szVoiceCodec, pPreviousCodec, sizeof( szVoiceCodec ) );
+			V_strcpy_safe( szVoiceCodec, pPreviousCodec );
 		}
 	}
 
@@ -311,11 +311,11 @@ void Snd_Restart_f()
 	S_Init();
 
 	// Restart voice if it was running
-	if ( szVoiceCodec[0] )
+	if ( !Q_isempty( szVoiceCodec ) )
 		Voice_Init( szVoiceCodec, nVoiceSampleRate );
 
 	// Do this or else it won't have anything in the cache.
-	if ( audiosourcecache && sv.GetMapName()[0] )
+	if ( audiosourcecache && !Q_isempty( sv.GetMapName() ) )
 	{
 		audiosourcecache->LevelInit( sv.GetMapName() );
 	}
