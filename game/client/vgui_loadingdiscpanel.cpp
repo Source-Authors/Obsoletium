@@ -33,9 +33,8 @@ public:
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
 
-		int w, h;
-		w = ScreenWidth();
-		h = ScreenHeight();
+		int w = ScreenWidth();
+		int h = ScreenHeight();
 
 		if ( w != m_ScreenSize[ 0 ] || 
 			 h != m_ScreenSize[ 1 ] )
@@ -75,9 +74,8 @@ private:
 //-----------------------------------------------------------------------------
 CLoadingDiscPanel::CLoadingDiscPanel( vgui::VPANEL parent ) : BaseClass( NULL, "CLoadingDiscPanel" )
 {
-	int w, h;
-	w = ScreenWidth();
-	h = ScreenHeight();
+	int w = ScreenWidth();
+	int h = ScreenHeight();
 
 	SetParent( parent );
 	SetProportional( true );
