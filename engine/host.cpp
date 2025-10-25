@@ -1717,25 +1717,6 @@ void CL_SendVoicePacket(bool bFinal)
 #endif
 }
 
-#if defined ( _X360 )
-
-
-void CL_ProcessXboxVoiceData()
-{
-	if ( Audio_GetXVoice() == NULL )
-		return;
-
-	if ( Audio_GetXVoice()->VoiceUpdateData() == true )
-	{
-		if ( cl.IsActive() )
-		{
-			Audio_GetXVoice()->VoiceSendData( cl.m_NetChannel );
-		}
-	}
-}
-
-#endif
-
 void CL_ProcessVoiceData()
 {
 	VPROF_BUDGET( "CL_ProcessVoiceData", VPROF_BUDGETGROUP_OTHER_NETWORKING );
@@ -1744,12 +1725,6 @@ void CL_ProcessVoiceData()
 	Voice_Idle(host_frametime);
 	CL_SendVoicePacket(false);
 #endif
-
-#if defined ( _X360 )
-
-	CL_ProcessXboxVoiceData();
-#endif
-
 }
 #endif
 
