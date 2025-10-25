@@ -197,14 +197,14 @@ KeyValues* ReadEncryptedKVFile( IFileSystem *pFilesystem, const char *szFilename
 	// Open the weapon data file, and abort if we can't
 	KeyValues *pKV = new KeyValues( "WeaponDatafile" );
 
-	Q_snprintf(szFullName,sizeof(szFullName), "%s.txt", szFilenameWithoutExtension);
+	V_sprintf_safe(szFullName, "%s.txt", szFilenameWithoutExtension);
 
 	if ( bForceReadEncryptedFile || !pKV->LoadFromFile( pFilesystem, szFullName, pSearchPath ) ) // try to load the normal .txt file first
 	{
 #ifndef _XBOX
 		if ( pICEKey )
 		{
-			Q_snprintf(szFullName,sizeof(szFullName), "%s.ctx", szFilenameWithoutExtension); // fall back to the .ctx file
+			V_sprintf_safe(szFullName, "%s.ctx", szFilenameWithoutExtension); // fall back to the .ctx file
 
 			FileHandle_t f = pFilesystem->Open( szFullName, "rb", pSearchPath );
 
@@ -269,7 +269,7 @@ bool ReadWeaponDataFromFileForSlot( IFileSystem* pFilesystem, const char *szWeap
 		return true;
 
 	char sz[128];
-	Q_snprintf( sz, sizeof( sz ), "scripts/%s", szWeaponName );
+	V_sprintf_safe( sz, "scripts/%s", szWeaponName );
 
 	KeyValuesAD pKV = KeyValuesAD{ReadEncryptedKVFile( pFilesystem, sz, pICEKey,
 #if defined( DOD_DLL )
