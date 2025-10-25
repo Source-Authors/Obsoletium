@@ -62,26 +62,21 @@ bool CMemoryStack::Init( size_t maxSize, size_t commitSize, size_t initialCommit
 	Assert( m_maxSize > 0 );
 
 #if defined(_WIN32)
-	if ( commitSize != 0 )
-	{
-		m_commitSize = commitSize;
-	}
-
-	unsigned pageSize;
-
 	SYSTEM_INFO sysInfo;
 	GetNativeSystemInfo( &sysInfo );
 	// dimhotepus: Use convenient API instead of bits magic.
 	Assert( IsPowerOfTwo( sysInfo.dwPageSize ) );
-	pageSize = sysInfo.dwPageSize;
 
-	if ( m_commitSize == 0 )
+	const DWORD pageSize = sysInfo.dwPageSize;
+
+	// dimhotepus: Simplify commit size initialization.
+	if ( commitSize == 0 )
 	{
 		m_commitSize = pageSize;
 	}
 	else
 	{
-		m_commitSize = AlignValue( m_commitSize, pageSize );
+		m_commitSize = AlignValue( commitSize, pageSize );
 	}
 
 	m_maxSize = AlignValue( m_maxSize, m_commitSize );
