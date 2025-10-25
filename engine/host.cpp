@@ -336,7 +336,6 @@ void Snd_Restart_f()
 static ConCommand snd_restart( "snd_restart", Snd_Restart_f, "Restart sound system." );
 
 // In other C files.
-void Shader_Shutdown( void );
 void R_Shutdown( void );
 
 bool g_bAbortServerSet = false;
@@ -458,8 +457,6 @@ ConVar telemetry_server( "telemetry_server", "localhost", 0, "Set Telemetry serv
 ConVar telemetry_demostart( "telemetry_demostart", "0", 0, "When playing demo, start telemetry on tick #", OnChangeTelemetryDemoStart );
 ConVar telemetry_demoend( "telemetry_demoend", "0", 0, "When playing demo, stop telemetry on tick #", OnChangeTelemetryDemoEnd );
 #endif
-
-extern bool gfBackground;
 
 static bool host_checkheap = false;
 
