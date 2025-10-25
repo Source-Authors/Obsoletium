@@ -357,13 +357,12 @@ void FileWeaponInfo_t::Parse( KeyValues *pKeyValuesData, const char *szWeaponNam
 	// Use the console (X360) buckets if hud_fastswitch is set to 2.
 #ifdef CLIENT_DLL
 	if ( hud_fastswitch.GetInt() == 2 )
-#else
-	if ( IsX360() )
-#endif
 	{
 		iSlot = pKeyValuesData->GetInt( "bucket_360", iSlot );
 		iPosition = pKeyValuesData->GetInt( "bucket_position_360", iPosition );
 	}
+#endif
+	
 	iMaxClip1 = pKeyValuesData->GetInt( "clip_size", WEAPON_NOCLIP );					// Max primary clips gun can hold (assume they don't use clips by default)
 	iMaxClip2 = pKeyValuesData->GetInt( "clip2_size", WEAPON_NOCLIP );					// Max secondary clips gun can hold (assume they don't use clips by default)
 	iDefaultClip1 = pKeyValuesData->GetInt( "default_clip", iMaxClip1 );		// amount of primary ammo placed in the primary clip when it's picked up
