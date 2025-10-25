@@ -1911,9 +1911,9 @@ Host_Speeds
 */
 void CFrameTimer::ResetDeltas()
 {
-	for ( int i = 0; i < NUM_FRAME_SEGMENTS; i++ )
+	for ( auto &d : deltas )
 	{
-		deltas[ i ] = 0.0f;
+		d = 0.0f;
 	}
 }
 
