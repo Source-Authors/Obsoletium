@@ -1395,8 +1395,12 @@ uint64 KeyValues::GetUint64( const char *keyName, uint64 defaultValue )
 			return _wtoi64(dat->m_wsValue);
 		case TYPE_FLOAT:
 			return (int)dat->m_flValue;
-		case TYPE_UINT64:
-			return *((uint64 *)dat->m_sValue);
+		case TYPE_UINT64: {
+			// dimhotepus: Use memcpy as type punning is UB.
+			uint64 value;
+			V_memcpy( &value, dat->m_sValue, sizeof(uint64) );
+			return value;
+		}
 		case TYPE_INT:
 		case TYPE_PTR:
 		default:
@@ -1457,8 +1461,12 @@ float KeyValues::GetFloat( const char *keyName, float defaultValue )
 			return dat->m_flValue;
 		case TYPE_INT:
 			return (float)dat->m_iValue;
-		case TYPE_UINT64:
-			return (float)(*((uint64 *)dat->m_sValue));
+		case TYPE_UINT64: {
+			// dimhotepus: Use memcpy as type punning is UB.
+			uint64 value;
+			V_memcpy( &value, dat->m_sValue, sizeof(uint64) );
+			return (float)value;
+		}
 		case TYPE_PTR:
 		default:
 			return 0.0f;
@@ -1493,9 +1501,14 @@ const char *KeyValues::GetString( const char *keyName, const char *defaultValue 
 			SetString( keyName, buf );
 			break;
 		case TYPE_UINT64:
-			V_to_chars( buf, *((uint64 *)(dat->m_sValue)) );
+		{
+			// dimhotepus: Use memcpy as type punning is UB.
+			uint64 value;
+			V_memcpy( &value, dat->m_sValue, sizeof(uint64) );
+			V_to_chars( buf, value );
 			SetString( keyName, buf );
 			break;
+		}
 
 		case TYPE_WSTRING:
 		{
@@ -1547,7 +1560,10 @@ const wchar_t *KeyValues::GetWString( const char *keyName, const wchar_t *defaul
 			break;
 		case TYPE_UINT64:
 			{
-				swprintf( wbuf, std::size(wbuf), L"%llu", *((uint64 *)(dat->m_sValue)) );
+				// dimhotepus: Use memcpy as type punning is UB.
+				uint64 value;
+				V_memcpy( &value, dat->m_sValue, sizeof(uint64) );
+				swprintf( wbuf, std::size(wbuf), L"%llu", value );
 				SetWString( keyName, wbuf );
 			}
 			break;
@@ -1775,7 +1791,8 @@ void KeyValues::SetUint64( const char *keyName, uint64 value )
 		dat->m_wsValue = nullptr;
 
 		dat->m_sValue = new char[sizeof(uint64)];
-		*((uint64 *)dat->m_sValue) = value;
+		// dimhotepus: Use memcpy as type punning is UB.
+		V_memcpy( dat->m_sValue, &value, sizeof(uint64) );
 		dat->m_iDataType = TYPE_UINT64;
 	}
 }
@@ -1919,7 +1936,7 @@ void KeyValues::CopyKeyValue( const KeyValues& src, size_t tmpBufferSizeB, char*
 	case TYPE_UINT64:
 		{
 			m_sValue = new char[sizeof(uint64)];
-			Q_memcpy( m_sValue, src.m_sValue, sizeof(uint64) );
+			V_memcpy( m_sValue, src.m_sValue, sizeof(uint64) );
 		}
 		break;
 	case TYPE_COLOR:
@@ -2034,7 +2051,7 @@ KeyValues *KeyValues::MakeCopy( ) const
 
 	case TYPE_UINT64:
 		newKeyValue->m_sValue = new char[sizeof(uint64)];
-		Q_memcpy( newKeyValue->m_sValue, m_sValue, sizeof(uint64) );
+		V_memcpy( newKeyValue->m_sValue, m_sValue, sizeof(uint64) );
 		break;
 
 		// dimhotepus: Do nothing.
@@ -2607,8 +2624,9 @@ void KeyValues::RecursiveLoadFromBuffer( char const *resourceName, CUtlBuffer &b
 			}
 			else if ( ( 18 == len ) && ( value[0] == '0' ) && ( value[1] == 'x' ) )
 			{
-				// an 18-byte value prefixed with "0x" (followed by 16 hex digits) is an int64 value
-				int64 retVal = 0;
+				// an 18-byte value prefixed with "0x" (followed by 16 hex digits) is an uint64 value
+				// dimhotepus: Load uint64, not int64.
+				uint64 retVal = 0;
 				for( int i=2; i < 2 + 16; i++ )
 				{
 					char digit = value[i];
@@ -2620,7 +2638,8 @@ void KeyValues::RecursiveLoadFromBuffer( char const *resourceName, CUtlBuffer &b
 					retVal = ( retVal * 16 ) + ( digit - '0' );
 				}
 				dat->m_sValue = new char[sizeof(uint64)];
-				*((uint64 *)dat->m_sValue) = retVal;
+				// dimhotepus: Use memcpy as type punning is UB.
+				V_memcpy( dat->m_sValue, &retVal, sizeof(uint64) );
 				dat->m_iDataType = TYPE_UINT64;
 			}
 			else if ( (pFEnd > pIEnd) && (pFEnd == pSEnd) )
@@ -2742,7 +2761,11 @@ bool KeyValues::WriteAsBinary( CUtlBuffer &buffer )
 
 		case TYPE_UINT64:
 			{
-				buffer.PutDouble( *((double *)dat->m_sValue) );
+				uint64 value;
+				// dimhotepus: Use memcpy as type punning is UB.
+				V_memcpy( &value, dat->m_sValue, sizeof(uint64) );
+				// dimhotepus: PutInt64 -> PutUint64.
+				buffer.PutUint64( value );
 				break;
 			}
 
@@ -2854,7 +2877,10 @@ bool KeyValues::ReadAsBinary( CUtlBuffer &buffer, int nStackDepth )
 		case TYPE_UINT64:
 			{
 				dat->m_sValue = new char[sizeof(uint64)];
-				*((uint64 *)dat->m_sValue) = buffer.GetInt64();
+				// dimhotepus: GetInt64 -> GetUint64()
+				const uint64 value{buffer.GetUint64()};
+				// dimhotepus: Use memcpy as type punning is UB.
+				V_memcpy( dat->m_sValue, &value, sizeof(uint64) );
 				break;
 			}
 
