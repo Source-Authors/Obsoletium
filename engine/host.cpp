@@ -528,7 +528,8 @@ ConVar	host_framerate( "host_framerate","0", 0, "Set to lock per-frame time elap
 ConVar	host_timescale( "host_timescale","1.0", FCVAR_REPLICATED, "Prescale the clock by this amount.", true, 0.0001f, true, 1.2f );
 ConVar	host_speeds( "host_speeds","0", 0, "Show general system running times." );		// set for running times
 
-ConVar	host_flush_threshold( "host_flush_threshold", "20", 0, "Memory threshold below which the host should flush caches between server instances" );
+// dimhotepus: X360 only, dropped.
+// ConVar	host_flush_threshold( "host_flush_threshold", "20", 0, "Memory threshold below which the host should flush caches between server instances" );
 
 void HostTimerSpinMsChangedCallback( IConVar *var, const char *pOldString, float flOldValue );
 ConVar host_timer_spin_ms( "host_timer_spin_ms", "0", FCVAR_NONE, "Use CPU busy-loop for improved timer precision (dedicated only)", HostTimerSpinMsChangedCallback );
@@ -655,112 +656,6 @@ bool Host_IsSinglePlayerGame( void )
 	{
 		return cl.m_nMaxClients == 1;
 	}
-}
-
-void CheckForFlushMemory( const char *pCurrentMapName, const char *pDestMapName )
-{
-	if ( host_flush_threshold.GetInt() == 0 )
-		return;
-
-#if defined(_X360)
-	// There are three cases in which we flush memory
-	//   Case 1: changing from one map to another
-	//          -> flush temp data caches
-	//   Case 2: loading any map (inc. A to A) and free memory is below host_flush_threshold MiB
-	//          -> flush everything
-	//   Case 3: loading a 'blacklisted' map (the known biggest memory users, or where texture sets change)
-	//          -> flush everything
-	static const char *mapBlackList[] = 
-	{
-		// --hl2--
-		"d1_canals_01",
-		"d1_canals_05",
-		"d1_eli_01",
-		"d1_town_01",
-		"d2_coast_01",
-		"d2_prison_01",
-		"d3_c17_01",
-		"d3_c17_05",
-		"d3_c17_09",
-		"d3_citadel_01",
-		"d3_breen_01",
-		// --ep1--
-		"ep1_c17_02",
-		"ep1_c17_02b",
-		"ep1_c17_05",
-		"ep1_c17_06",
-		// --ep2--
-		"ep2_outland_06a",
-		"ep2_outland_09",
-		"ep2_outland_11",
-		"ep2_outland_12",
-		"ep2_outland_12a",
-		// --tf--
-		"tc_hydro"
-	};
-
-	char szCurrentMapName[MAX_PATH];
-	char szDestMapName[MAX_PATH];
-	if ( pCurrentMapName )
-	{
-		V_FileBase( pCurrentMapName, szCurrentMapName );
-	}
-	else
-	{
-		szCurrentMapName[0] = '\0';
-	}
-	pCurrentMapName = szCurrentMapName;
-
-	if ( pDestMapName )
-	{
-		V_FileBase( pDestMapName, szDestMapName );
-	}
-	else
-	{
-		szDestMapName[0] = '\0';
-	}
-	pDestMapName = szDestMapName;
-
-	bool bIsMapChanging = pCurrentMapName[0] && V_stricmp( pCurrentMapName, pDestMapName );
-
-	bool bIsDestMapBlacklisted = false;
-	for ( int i = 0; i < ARRAYSIZE( mapBlackList ); i++ )
-	{
-		if ( pDestMapName && !V_stricmp( pDestMapName, mapBlackList[i] ) )
-		{
-			bIsDestMapBlacklisted = true;
-		}
-	}
-
-	DevMsg( "---CURRENT(%s), NEXT(%s)\n", (pCurrentMapName[0] ? pCurrentMapName : "----"), (pDestMapName[0] ? pDestMapName : "----") );
-	if ( bIsMapChanging )
-	{
-		DevMsg( "---CHANGING MAPS!\n" );
-	}
-	if ( bIsDestMapBlacklisted )
-	{
-		DevMsg( "---BLACKLISTED!\n" );
-	}
-
-	MEMORYSTATUS stat;
-	GlobalMemoryStatus( &stat );
-	if ( ( stat.dwAvailPhys < host_flush_threshold.GetInt() * 1024 * 1024 ) ||
-		 ( bIsDestMapBlacklisted && bIsMapChanging ) )
-	{
-		// Flush everything; ALL data is reloaded from scratch
-		SV_FlushMemoryOnNextServer();
-		g_pDataCache->Flush();
-		DevWarning( "---FULL FLUSH\n" );
-	}
-	else if ( bIsMapChanging )
-	{
-		// Flush temporary data (async anim, non-locked async audio)
-		g_pMDLCache->Flush( MDLCACHE_FLUSH_ANIMBLOCK );
-		wavedatacache->Flush();
-		DevWarning( "---PARTIAL FLUSH\n" );
-	}
-	DevMsg( "---- --- ----\n" );
-#endif
 }
 
 void Host_AbortServer()
@@ -4004,7 +3899,6 @@ bool Host_Changelevel( bool loadfromsavedgame, const char *mapname, const char *
 	}
 
 	Warning( "---- Host_Changelevel ----\n" );
-	CheckForFlushMemory( sv.GetMapName(), szMapName );
 
 #if !defined( SWDS )
 	// Add on time passed since the last time we kept track till this transition
@@ -4183,8 +4077,6 @@ bool Host_NewGame( char *mapName, bool loadGame, bool bBackgroundLevel, const ch
 
 	DevMsg( "---- Host_NewGame ----\n" );
 	host_map.SetValue( szMapName );
-
-	CheckForFlushMemory( previousMapName, szMapName );
 
 	if (MapReslistGenerator().IsEnabled())
 	{
