@@ -322,7 +322,7 @@ void Snd_Restart_f()
 
 	// Flush soundscapes so they don't stop. We don't insert text in the buffer here because 
 	// cl_soundscape_flush is normally cheat-protected.
-	ConCommand *pCommand = dynamic_cast< ConCommand* >( g_pCVar->FindCommand( "cl_soundscape_flush" ) );
+	auto *pCommand = dynamic_cast< ConCommand* >( g_pCVar->FindCommand( "cl_soundscape_flush" ) );
 	if ( pCommand )
 	{
 		char const *argv[ 1 ] = { "cl_soundscape_flush" };
