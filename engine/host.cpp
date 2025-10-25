@@ -367,7 +367,7 @@ CON_COMMAND( mem_compact, "" )
 
 CON_COMMAND( mem_eat, "" )
 {
-	MemAlloc_Alloc( 1024* 1024 );
+	MemAlloc_Alloc( static_cast<size_t>( 1024 ) * 1024 );
 }
 
 CON_COMMAND( mem_test, "" )
