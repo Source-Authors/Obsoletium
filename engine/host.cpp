@@ -1838,7 +1838,7 @@ void CFrameTimer::MarkFrame()
 		}
 
 		char sz[ 256 ];
-		Q_snprintf( sz, sizeof( sz ),
+		V_sprintf_safe( sz,
 			"%3i fps -- inp(%.2f) sv(%.2f) cl(%.2f) render(%.2f) snd(%.2f) cl_dll(%.2f) exec(%.2f) ents(%d) ticks(%d)",
 			(int)fps, 
 			fs_input, 
@@ -2060,7 +2060,7 @@ static void Host_CheckDumpMemoryStats()
 			}
 
 			char mapname[ 256 ];
-			Q_FileBase( pTest, mapname );
+			V_FileBase( pTest, mapname );
 #if defined( _MEMTEST )
 			MemAlloc_SetStatsExtraInfo( pTest, "" );
 #endif
@@ -2078,7 +2078,7 @@ static void Host_CheckDumpMemoryStats()
 		mem_dumpstats.SetValue( 0 ); // reset cvar, dump stats only once
 
 	_CrtMemState state;
-	Q_memset( &state, 0, sizeof( state ) );
+	BitwiseClear( state );
 	_CrtMemCheckpoint( &state );
 
 	size_t size = 0;
@@ -2089,11 +2089,11 @@ static void Host_CheckDumpMemoryStats()
 
 	Msg("MEMORY:  Run-time Heap\n------------------------------------\n");
 
-	Msg( "\tHigh water %s\n", Q_pretifymem( state.lHighWaterCount,4 ) );
-	Msg( "\tCurrent mem %s\n", Q_pretifymem( size,4 ) );
+	Msg( "\tHigh water %s\n", V_pretifymem( state.lHighWaterCount,4 ) );
+	Msg( "\tCurrent mem %s\n", V_pretifymem( size,4 ) );
 	Msg("------------------------------------\n");
 	intp hunk = Hunk_MallocSize();
-	Msg("\tAllocated outside hunk:  %s\n", Q_pretifymem( size - hunk ) );
+	Msg("\tAllocated outside hunk:  %s\n", V_pretifymem( size - hunk ) );
 #endif
 }
 
@@ -3175,10 +3175,10 @@ static bool IsLowViolence_Registry()
 	memset( szBuffer, 0, 128 );
 
 	char const *appname = "Source";
-	Q_snprintf(szSubKey, sizeof( szSubKey ), "Software\\Valve\\%s\\Settings", appname );
+	V_sprintf_safe(szSubKey, "Software\\Valve\\%s\\Settings", appname );
 
 	nBufferLen = 127;
-	Q_strncpy( szBuffer, "", sizeof( szBuffer ) );
+	V_strcpy_safe( szBuffer, "" );
 
 	Sys_GetRegKeyValue( szSubKey, "User Token 2", szBuffer,	nBufferLen, szBuffer );
 
@@ -3192,7 +3192,7 @@ static bool IsLowViolence_Registry()
 	}
 
 	char gamedir[MAX_OSPATH];
-	Q_FileBase( com_gamedir, gamedir );
+	V_FileBase( com_gamedir, gamedir );
 
 	// also check mod specific directories for LV changes
 	V_sprintf_safe(szSubKey, "Software\\Valve\\%s\\%s\\Settings", appname, gamedir );
