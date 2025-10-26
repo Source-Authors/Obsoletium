@@ -2469,8 +2469,9 @@ void CVTFTexture::GenerateMipmaps()
 //	{
 //		return;
 //	}
-
-	Assert( m_Format == IMAGE_FORMAT_RGBA8888 || m_Format == IMAGE_FORMAT_RGB323232F );
+// 
+	// dimhotepus: IMAGE_FORMAT_RGBA32323232F CS:GO backport
+	Assert( m_Format == IMAGE_FORMAT_RGBA8888 || m_Format == IMAGE_FORMAT_RGB323232F || m_Format == IMAGE_FORMAT_RGBA32323232F );
 
 	// FIXME: Should we be doing anything special for normalmaps other than a final normalization pass?
 	ImageLoader::ResampleInfo_t info;
@@ -2609,12 +2610,25 @@ void CVTFTexture::GenerateMipmaps()
 				info.m_pDest = pDstLevel;
 
 				ComputeMipLevelDimensions( nSrcMipLevel, &info.m_nSrcWidth, &info.m_nSrcHeight, &info.m_nSrcDepth );
-
-				[[maybe_unused]] const bool ok = m_Format == IMAGE_FORMAT_RGB323232F
-					? ImageLoader::ResampleRGB323232F( info )
-					: ImageLoader::ResampleRGBA8888( info );
-				AssertMsg(ok, "Unable to resample image of format 0x%x.", m_Format);
-				if (!ok) Warning("Unable to resample image of format 0x%x.", m_Format);
+				// dimhotepus: IMAGE_FORMAT_RGBA32323232F CS:GO backport
+				if( m_Format == IMAGE_FORMAT_RGBA32323232F )
+				{
+					const bool ok = ImageLoader::ResampleRGBA32323232F( info );
+					AssertMsg(ok, "Unable to resample image of format IMAGE_FORMAT_RGBA32323232F.");
+					if (!ok) Warning("Unable to resample image of format IMAGE_FORMAT_RGBA32323232F.");
+				}
+				else if( m_Format == IMAGE_FORMAT_RGB323232F )
+				{
+					const bool ok = ImageLoader::ResampleRGB323232F( info );
+					AssertMsg(ok, "Unable to resample image of format IMAGE_FORMAT_RGB323232F");
+					if (!ok) Warning("Unable to resample image of format IMAGE_FORMAT_RGB323232F.");
+				}
+				else
+				{
+					const bool ok = ImageLoader::ResampleRGBA8888( info );
+					AssertMsg(ok, "Unable to resample image of format IMAGE_FORMAT_RGBA8888.");
+					if (!ok) Warning("Unable to resample image of format IMAGE_FORMAT_RGBA8888.");
+				}
 				if ( Flags() & TEXTUREFLAGS_NORMAL )
 				{
 					ImageLoader::NormalizeNormalMapRGBA8888( pDstLevel, info.m_nDestWidth * info.m_nDestHeight * info.m_nDestDepth );
