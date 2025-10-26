@@ -934,9 +934,11 @@ static void UseDefaultBindings()
 	// read file into memory
 	int size = g_pFileSystem->Size(f);
 
-	std::unique_ptr<char[]> startbuf = std::make_unique<char[]>( size );
+	// dimhotepus: ASAN catch. Missed space for '\0'.
+	std::unique_ptr<char[]> startbuf = std::make_unique<char[]>( static_cast<intp>( size ) + 1 );
 	g_pFileSystem->Read( startbuf.get(), size, f );
 	g_pFileSystem->Close( f );
+	startbuf[ size ] = '\0';
 
 	const char *buf = startbuf.get();
 	while ( true )
