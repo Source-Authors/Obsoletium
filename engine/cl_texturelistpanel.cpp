@@ -682,14 +682,7 @@ struct ViewParamsLast
 	struct VarMap : public CUtlMap< UtlSymId_t, TxInfo >
 	{
 		VarMap() : CUtlMap< UtlSymId_t, TxInfo >( DefLessFunc( UtlSymId_t ) ) {}
-		VarMap( VarMap const &x ) { const_cast< VarMap & >( x ).Swap( *this ); m_matInfo = x.m_matInfo; } // Fast-swap data //-V2018
-
-		struct MatInfo
-		{
-// 			MatInfo() : ignorez( false ) {}
-// 			bool ignorez;
-			MatInfo() {}
-		} m_matInfo;
+		VarMap( VarMap const &x ) { const_cast< VarMap & >( x ).Swap( *this ); } // Fast-swap data //-V2018
 	};
 
 	CUtlMap< UtlSymId_t, VarMap > lstMaterials;
@@ -752,13 +745,6 @@ static void DisplaySelectedTextures()
 				IMaterialVar **arrVars = pMat->GetShaderParams();
 				for ( int idxParam = 0; idxParam < numParams; ++ idxParam )
 				{
-// 					if ( !stricmp( arrVars[ idxParam ]->GetName(), "$ignorez" ) )
-// 					{
-// 						vars.m_matInfo.ignorez = arrVars[ idxParam ]->GetIntValue() ? true : false;
-// 						arrVars[ idxParam ]->SetIntValue( 1 );
-// 						continue;
-// 					}
-
 					if ( !arrVars[ idxParam ]->IsTexture() )
 						continue;
 
@@ -793,12 +779,6 @@ static void DisplaySelectedTextures()
 			IMaterialVar **arrVars = pMat->GetShaderParams();
 			for ( int idxParam = 0; idxParam < numParams; ++ idxParam )
 			{
-// 				if ( bRemovedSelection && !stricmp( arrVars[ idxParam ]->GetName(), "$ignorez" ) )
-// 				{
-// 					arrVars[ idxParam ]->SetIntValue( vars.m_matInfo.ignorez ? 1 : 0 );
-// 					continue;
-// 				}
-
 				char const *szVarName = arrVars[ idxParam ]->GetName();
 				CUtlSymbol symVarName( szVarName );
 				MapIdx idxVarsTxInfo = vars.Find( symVarName );
