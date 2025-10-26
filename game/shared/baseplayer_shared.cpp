@@ -825,7 +825,7 @@ Vector CBasePlayer::Weapon_ShootPosition( )
 
 void CBasePlayer::SetAnimationExtension( const char *pExtension )
 {
-	Q_strncpy( m_szAnimExtension, pExtension, sizeof(m_szAnimExtension) );
+	V_strcpy_safe( m_szAnimExtension, pExtension );
 }
 
 
