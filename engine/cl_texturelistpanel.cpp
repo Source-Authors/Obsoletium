@@ -723,7 +723,7 @@ static void DisplaySelectedTextures()
 	// Find the empty texture
 	ITexture *txEmpty = materials->FindTexture( "debugempty", "", false );
 
-	typedef unsigned short MapIdx;
+	using MapIdx = unsigned short;
 
 	// Now walk over all the materials in the req list and push them to the params
 	for ( intp k = 0, kEnd = s_viewParamsReq.lstMaterials.Count(); k < kEnd; ++ k )
