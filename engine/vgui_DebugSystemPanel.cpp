@@ -220,7 +220,7 @@ public:
 	void Init( KeyValues *kv )
 	{
 		// LoadControlSettings( va( "resource\\%s.res", kv->GetName() ) );
-		for (KeyValues *control = kv->GetFirstSubKey(); control != NULL; control = control->GetNextKey())
+		for (KeyValues *control = kv->GetFirstSubKey(); control != nullptr; control = control->GetNextKey())
 		{
 			const char *t = control->GetString( "command", "" );
 			if ( !Q_isempty( t ) )
@@ -265,7 +265,7 @@ public:
 		KeyValuesAD kv( "DebugOptions" );
 		if ( kv->LoadFromFile(g_pFullFileSystem, "scripts/DebugOptions.txt") )
 		{
-			for (KeyValues *dat = kv->GetFirstSubKey(); dat != NULL; dat = dat->GetNextKey())
+			for (KeyValues *dat = kv->GetFirstSubKey(); dat != nullptr; dat = dat->GetNextKey())
 			{
 				if ( !Q_strcasecmp( dat->GetName(), "width" ) )
 				{
@@ -338,7 +338,6 @@ CDebugSystemPanel::CDebugSystemPanel( Panel *parent, const char *panelName )
 
 	m_pDebugMenu = new CDebugMenuButton( this, "Debug Menu", "Debug Menu" );
 	
-	int h = 24;
 	// Locate it at top left
 	m_pDebugMenu->SetPos( 0, 0 );
 	m_pDebugMenu->SetSize( 110, h );
