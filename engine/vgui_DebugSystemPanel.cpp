@@ -101,7 +101,7 @@ public:
 		CCommand args;
 		args.Tokenize( pCommand );
 
-		m_pVar = NULL;
+		m_pVar = nullptr;
 		if ( args.ArgC() >= 4 )
 		{
 			m_pVar = ( ConVar * )g_pCVar->FindVar( args[0] );
