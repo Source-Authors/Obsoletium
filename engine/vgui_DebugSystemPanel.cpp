@@ -183,10 +183,8 @@ public:
 		if ( !IsVisible() )
 			return;
 
-		int c = m_LayoutItems.Count();
-		for ( int i = 0; i < c; i++ )
+		for ( auto *p : m_LayoutItems )
 		{
-			vgui::Panel *p = m_LayoutItems[ i ];
 			p->OnTick();
 		}
 	}
@@ -206,9 +204,8 @@ public:
 		int tall = GetTall();
 
 		// LoadControlSettings( va( "resource\\%s.res", kv->GetName() ) );
-		for ( int i = 0; i < c; i++ )
+		for ( auto *p : m_LayoutItems )
 		{
-			vgui::Panel *p = m_LayoutItems[ i ];
 			p->SetBounds( x, y, w, h );
 
 			y += ( h + gap );
