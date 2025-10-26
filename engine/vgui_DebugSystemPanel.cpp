@@ -33,7 +33,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Purpose: A menu button that knows how to parse cvar/command menu data from gamedir\scripts\debugmenu.txt
 //-----------------------------------------------------------------------------
-class CDebugMenuButton : public MenuButton
+class CDebugMenuButton final : public MenuButton
 {
 	typedef MenuButton BaseClass;
 
@@ -46,9 +46,9 @@ private:
 	Menu	*m_pMenu;
 };
 
-class CDebugCommandButton : public vgui::Button
+class CDebugCommandButton final : public vgui::Button
 {
-typedef vgui::Button BaseClass;
+	typedef vgui::Button BaseClass;
 public:
 	CDebugCommandButton( vgui::Panel *parent, const char *panelName, const char *labelText, const char *command )
 		: BaseClass( parent, panelName, labelText )
@@ -57,19 +57,19 @@ public:
 		SetCommand( command );
 	}
 
-	virtual void OnCommand( const char *command )
+	void OnCommand( const char *command ) override
 	{
 		Cbuf_AddText( va( "%s\n", command ) );
 	}
 
-	virtual void OnTick( void )
+	void OnTick( void ) override
 	{
 	}
 };
 
-class CDebugCommandCheckbox : public vgui::CheckButton
+class CDebugCommandCheckbox final : public vgui::CheckButton
 {
-typedef vgui::CheckButton BaseClass;
+	typedef vgui::CheckButton BaseClass;
 public:
 	CDebugCommandCheckbox( vgui::Panel *parent, const char *panelName, const char *labelText, const char *command )
 		: BaseClass( parent, panelName, labelText )
@@ -79,7 +79,7 @@ public:
 		AddActionSignalTarget( this );
 	}
 
-	virtual void OnCommand( const char *command )
+	void OnCommand( const char *command ) override
 	{
 		if ( m_pVar )
 		{
@@ -91,9 +91,9 @@ private:
 	ConVar		*m_pVar;
 };
 
-class CDebugIncrementCVarButton : public vgui::Button
+class CDebugIncrementCVarButton final : public vgui::Button
 {
-typedef vgui::Button BaseClass;
+	typedef vgui::Button BaseClass;
 public:
 	CDebugIncrementCVarButton( vgui::Panel *pParent, const char *pPanelName, const char *pLabelText, const char *pCommand )
 		: BaseClass( pParent, pPanelName, pLabelText )
@@ -120,7 +120,7 @@ public:
 		OnTick();
 	}
 
-	virtual void OnCommand( const char *command )
+	void OnCommand( const char *command ) override
 	{
 		//
 		if ( !m_pVar )
@@ -139,7 +139,7 @@ public:
 		m_pVar->SetValue( curValue );
 	}
 
-	virtual void OnTick( void )
+	void OnTick() override
 	{
 		if ( !m_pVar )
 			return;
@@ -165,7 +165,7 @@ private:
 
 };
 
-class CDebugOptionsPage : public vgui::PropertyPage
+class CDebugOptionsPage final : public vgui::PropertyPage
 {
 	typedef vgui::PropertyPage BaseClass;
 public:
@@ -175,7 +175,7 @@ public:
 		vgui::ivgui()->AddTickSignal( GetVPanel(), 250 );
 	}
 
-	virtual void OnTick( void )
+	void OnTick() override
 	{
 		BaseClass::OnTick();
 
@@ -190,7 +190,7 @@ public:
 		}
 	}
 
-	virtual void PerformLayout( void )
+	void PerformLayout() override
 	{
 		BaseClass::PerformLayout();
 
@@ -332,7 +332,6 @@ CDebugMenuButton::CDebugMenuButton(Panel *parent, const char *panelName, const c
 CDebugSystemPanel::CDebugSystemPanel( Panel *parent, const char *panelName )
 	: BaseClass( parent, panelName )
 {
-
 	SetBounds( 0, 0, videomode->GetModeStereoWidth(), videomode->GetModeStereoHeight() );
 
 	// Show arrow cursor while in this mode
