@@ -72,13 +72,13 @@
 // dimhotepus: Restrict to 0...1 range as bool.
 static ConVar mat_texture_list( "mat_texture_list", "0", FCVAR_CHEAT, "For debugging, show a list of used textures per frame", true, 0, true, 1 );
 
-static enum TxListPanelRequest
+static enum class TxListPanelRequest
 {
 	TXR_NONE,
 	TXR_SHOW,
 	TXR_RUNNING,
 	TXR_HIDE
-} s_eTxListPanelRequest = TXR_NONE;
+} s_eTxListPanelRequest = TxListPanelRequest::TXR_NONE;
 
 IVTex* VTex_Load( CSysModule** pModule );
 void VTex_Unload( CSysModule *pModule );
@@ -2657,8 +2657,8 @@ bool CTextureListPanel::ShouldDraw( void )
 {
 	if ( mat_texture_list.GetInt() )
 		return true;
-	if ( s_eTxListPanelRequest == TXR_SHOW ||
-		 s_eTxListPanelRequest == TXR_RUNNING )
+	if ( s_eTxListPanelRequest == TxListPanelRequest::TXR_SHOW ||
+		 s_eTxListPanelRequest == TxListPanelRequest::TXR_RUNNING )
 		return true;
 	
 	return false;
@@ -3122,7 +3122,7 @@ void CTextureListPanel::Paint()
 		return;
 
 	CRenderTextureEditor *pRte = m_pViewPanel->GetRenderTxEditor();
-	if ( ( s_eTxListPanelRequest == TXR_RUNNING ) &&
+	if ( ( s_eTxListPanelRequest == TxListPanelRequest::TXR_RUNNING ) &&
 		 pRte->IsVisible() )
 	{
 		KeyValues *kv = NULL;
@@ -3156,24 +3156,24 @@ void CTextureListPanel::Paint()
 	// If we are fetching all textures, then stop loading material system:
 	if ( mat_texture_list_all.GetBool() )
 	{
-		if ( s_eTxListPanelRequest == TXR_RUNNING )
+		if ( s_eTxListPanelRequest == TxListPanelRequest::TXR_RUNNING )
 		{
 			mat_texture_list.SetValue( 0 );
-			s_eTxListPanelRequest = TXR_SHOW; // Keep displaying our panel
+			s_eTxListPanelRequest = TxListPanelRequest::TXR_SHOW; // Keep displaying our panel
 		}
 		else
 		{
-			s_eTxListPanelRequest = TXR_RUNNING;
+			s_eTxListPanelRequest = TxListPanelRequest::TXR_RUNNING;
 		}
 	}
 	else
 	{
-		if ( s_eTxListPanelRequest == TXR_SHOW )
+		if ( s_eTxListPanelRequest == TxListPanelRequest::TXR_SHOW )
 		{
 			// Either first show or turned off "all textures"
 			m_pListPanel->RemoveAll();
 			m_pViewPanel->InvalidateLayout();
-			s_eTxListPanelRequest = TXR_RUNNING;
+			s_eTxListPanelRequest = TxListPanelRequest::TXR_RUNNING;
 			return;
 		}
 	}
@@ -3348,7 +3348,7 @@ void mat_texture_list_on_f()
 	}
 
 	mat_texture_list.SetValue( 1 );
-	s_eTxListPanelRequest = TXR_SHOW;
+	s_eTxListPanelRequest = TxListPanelRequest::TXR_SHOW;
 
 	g_pTextureListPanel->OnTurnedOn();
 
@@ -3366,7 +3366,7 @@ void mat_texture_list_on_f()
 void mat_texture_list_off_f()
 {
 	mat_texture_list.SetValue( 0 );
-	s_eTxListPanelRequest = TXR_HIDE;
+	s_eTxListPanelRequest = TxListPanelRequest::TXR_HIDE;
 
 	if( g_cursorset )
 	{
