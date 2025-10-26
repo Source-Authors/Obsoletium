@@ -106,9 +106,10 @@ public:
 		{
 			m_pVar = ( ConVar * )g_pCVar->FindVar( args[0] );
 
-			m_flMinvalue = (float)atof( args[1] );
-			m_flMaxvalue = (float)atof( args[2] );
-			m_flIncrement = (float)atof( args[3] );
+			// dimhotepus: atof -> strtof
+			m_flMinvalue = strtof( args[1], nullptr );
+			m_flMaxvalue = strtof( args[2], nullptr );
+			m_flIncrement = strtof( args[3], nullptr );
 		}
 
 		SetCommand( "increment" );
