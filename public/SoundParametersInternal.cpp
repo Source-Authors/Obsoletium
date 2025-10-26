@@ -24,7 +24,6 @@ struct SoundChannels
 };
 
 // NOTE:  This will need to be updated if channel names are added/removed
-static SoundChannels g_pChannelNames[] =
 static constexpr SoundChannels g_pChannelNames[] =
 {
 	{ CHAN_AUTO, "CHAN_AUTO" },
@@ -207,9 +206,14 @@ int TextToChannel( const char *name )
 		return atoi( name );
 	}
 
+	// dimhotepus: Some mods like "The Citizen Returns" use "CHAN_BODY " instead of "CHAN_BODY"
+	// Apply a hotfix it here comparing only trimmed names.
+	V_strdup_stack( name, trimmedName );
+	V_StrTrim( trimmedName );
+
 	for ( const auto &channelName : g_pChannelNames )
 	{
-		if ( !Q_strcasecmp( name, channelName.name ) )
+		if ( !Q_strcasecmp( trimmedName, channelName.name ) )
 		{
 			return channelName.channel;
 		}
