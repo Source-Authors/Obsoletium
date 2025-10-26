@@ -74,7 +74,7 @@ public:
 	CDebugCommandCheckbox( vgui::Panel *parent, const char *panelName, const char *labelText, const char *command )
 		: BaseClass( parent, panelName, labelText )
 	{
-		m_pVar = ( ConVar * )g_pCVar->FindVar( command );
+		m_pVar = g_pCVar->FindVar( command );
 		SetCommand( command );
 		AddActionSignalTarget( this );
 	}
