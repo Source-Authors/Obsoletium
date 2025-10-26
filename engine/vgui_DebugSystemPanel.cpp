@@ -104,7 +104,7 @@ public:
 		m_pVar = nullptr;
 		if ( args.ArgC() >= 4 )
 		{
-			m_pVar = ( ConVar * )g_pCVar->FindVar( args[0] );
+			m_pVar = g_pCVar->FindVar( args[0] );
 
 			// dimhotepus: atof -> strtof
 			m_flMinvalue = strtof( args[1], nullptr );
