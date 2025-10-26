@@ -69,7 +69,8 @@
 
 #define COPYTOCLIPBOARD_CMDNAME "CopyToClipboard"
 
-static ConVar mat_texture_list( "mat_texture_list", "0", FCVAR_CHEAT, "For debugging, show a list of used textures per frame" );
+// dimhotepus: Restrict to 0...1 range as bool.
+static ConVar mat_texture_list( "mat_texture_list", "0", FCVAR_CHEAT, "For debugging, show a list of used textures per frame", true, 0, true, 1 );
 
 static enum TxListPanelRequest
 {
