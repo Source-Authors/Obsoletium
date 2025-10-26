@@ -83,7 +83,7 @@ public:
 	{
 		if ( m_pVar )
 		{
-			Cbuf_AddText( va( "%s %d\n", m_pVar->GetName(), !m_pVar->GetInt() ) );
+			Cbuf_AddText( va( "%s %d\n", m_pVar->GetName(), m_pVar->GetInt() ? 0 : 1 ) );
 		}
 	}
 
