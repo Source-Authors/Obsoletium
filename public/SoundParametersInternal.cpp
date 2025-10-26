@@ -173,9 +173,9 @@ soundlevel_t TextToSoundLevel( const char *key )
 			return entry.level;
 	}
 
-	if ( !Q_strnicmp( key, SNDLVL_PREFIX, Q_strlen( SNDLVL_PREFIX ) ) )
+	if ( !Q_strnicmp( key, SNDLVL_PREFIX, ssize( SNDLVL_PREFIX ) - 1 ) )
 	{
-		char const *val = key + Q_strlen( SNDLVL_PREFIX );
+		char const *val = key + ssize( SNDLVL_PREFIX ) - 1;
 		int sndlvl = atoi( val );
 		if ( sndlvl > 0 && sndlvl <= 180 )
 		{
