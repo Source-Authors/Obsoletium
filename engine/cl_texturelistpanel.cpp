@@ -567,7 +567,7 @@ namespace
 
 }; // end `anonymous` namespace
 
-bool CanAdjustTextureSize( char const *szTextureName, bool bMoveSizeUp )
+static bool CanAdjustTextureSize( char const *szTextureName, bool bMoveSizeUp )
 {
 	ITexture *pMatTexture = materials->FindTexture( szTextureName, "", false );
 	if ( !pMatTexture )
@@ -585,7 +585,7 @@ bool CanAdjustTextureSize( char const *szTextureName, bool bMoveSizeUp )
 	}
 }
 
-bool AdjustTextureSize( char const *szTextureName, bool bMoveSizeUp )
+static bool AdjustTextureSize( char const *szTextureName, bool bMoveSizeUp )
 {
 	ITexture *pMatTexture = materials->FindTexture( szTextureName, "", false );
 
@@ -614,7 +614,6 @@ CON_COMMAND_F( mat_texture_list_txlod, "Adjust LOD of the last viewed texture +1
 				return;
 			default:
 				break;
-				
 		}
 	}
 	Warning( "Usage: 'mat_texture_list_txlod +1' to inc lod | 'mat_texture_list_txlod -1' to dec lod\n" );
@@ -655,11 +654,11 @@ struct ViewParamsReq
 }
 s_viewParamsReq;
 
-void RequestSelectNone( void )
+static void RequestSelectNone( void )
 {
 	s_viewParamsReq.lstMaterials.RemoveAll();
 }
-void RequestSelected( int nCount, UtlSymId_t const *pNameIds )
+static void RequestSelected( int nCount, UtlSymId_t const *pNameIds )
 {
 	s_viewParamsReq.lstMaterials.AddMultipleToTail( nCount, pNameIds );
 }
@@ -702,7 +701,7 @@ s_viewParamsLast;
 //	Executed every frame to toggle the selected/unselected
 //	textures for a list of materials.
 //
-void DisplaySelectedTextures()
+static void DisplaySelectedTextures()
 {
 	// Nothing selected
 	if ( !s_viewParamsLast.lstMaterials.Count() &&
@@ -2860,7 +2859,7 @@ void KeepSpecialKeys( KeyValues *textureList, bool bServiceKeys )
 	}
 }
 
-void KeepKeysMatchingFilter( KeyValues *textureList, char const *szFilter )
+static void KeepKeysMatchingFilter( KeyValues *textureList, char const *szFilter )
 {
 	if ( !szFilter || !*szFilter )
 		return;
@@ -2887,7 +2886,7 @@ void KeepKeysMatchingFilter( KeyValues *textureList, char const *szFilter )
 	}
 }
 
-void KeepKeysMarkedNoMip( KeyValues *textureList )
+static void KeepKeysMarkedNoMip( KeyValues *textureList )
 {
 	KeyValues *pNext;
 	for ( KeyValues *pCur=textureList->GetFirstSubKey(); pCur; pCur=pNext )
