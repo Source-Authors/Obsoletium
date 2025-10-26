@@ -138,8 +138,8 @@ static const char *_VolumeToString( float volume )
 			return entry.name;
 	}
 
-	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%.3f", volume );
+	static char sz[ 16 ];
+	V_sprintf_safe( sz, "%.3f", volume );
 	return sz;
 }
 
@@ -151,8 +151,8 @@ static const char *_PitchToString( float pitch )
 			return entry.name;
 	}
 
-	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%.3f", pitch );
+	static char sz[ 16 ];
+	V_sprintf_safe( sz, "%.3f", pitch );
 	return sz;
 }
 
@@ -229,8 +229,8 @@ const char *SoundLevelToString( soundlevel_t level )
 			return entry.name;
 	}
 
-	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%i", (int)level );
+	static char sz[ 16 ];
+	V_to_chars(sz, (int)level);
 	return sz;
 }
 
@@ -255,8 +255,8 @@ const char *VolumeToString( float volume )
 			return entry.name;
 	}
 
-	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%.3f", volume );
+	static char sz[ 16 ];
+	V_sprintf_safe( sz, "%.3f", volume );
 	return sz;
 }
 
@@ -268,8 +268,8 @@ const char *PitchToString( float pitch )
 			return entry.name;
 	}
 
-	static char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "%.3f", pitch );
+	static char sz[ 16 ];
+	V_sprintf_safe( sz, "%.3f", pitch );
 	return sz;
 }
 
