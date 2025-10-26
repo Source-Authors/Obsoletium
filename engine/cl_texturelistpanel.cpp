@@ -3265,9 +3265,6 @@ void VGui_UpdateTextureListPanel()
 
 	MatViewOverride::DisplaySelectedTextures();
 
-	if ( IsX360() )
-		return;
-
 	g_pMaterialSystemDebugTextureInfo->EnableGetAllTextures( mat_texture_list_all.GetBool() );
 
 	g_pMaterialSystemDebugTextureInfo->EnableDebugTextureList( ( mat_texture_list.GetInt() <= 0 ) ? false : true );
