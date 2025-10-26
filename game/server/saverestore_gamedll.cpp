@@ -23,12 +23,9 @@
 //-----------------------------------------------------------------------------
 bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, const char *szKeyName, const char *szValue )
 {
-	int i;
-	typedescription_t 	*pField;
-
-	for ( i = 0; i < iNumFields; i++ )
+	for ( int i = 0; i < iNumFields; i++ )
 	{
-		pField = &pFields[i];
+		typedescription_t *pField = &pFields[i];
 
 		int fieldOffset = pField->fieldOffset[ TD_OFFSET_NORMAL ];
 
@@ -37,7 +34,7 @@ bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, c
 		{
 			for ( datamap_t *dmap = pField->td; dmap != NULL; dmap = dmap->baseMap )
 			{
-				void *pEmbeddedObject = (void*)((char*)pObject + fieldOffset);
+				void *pEmbeddedObject = (char*)pObject + fieldOffset;
 				if ( ParseKeyvalue( pEmbeddedObject, dmap->dataDesc, dmap->dataNumFields, szKeyName, szValue) )
 					return true;
 			}
@@ -140,8 +137,9 @@ bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, c
 			case FIELD_MODELINDEX:
 			case FIELD_MATERIALINDEX:
 			case FIELD_EDICT:
-				Warning( "Bad field in entity!!\n" );
-				Assert(0);
+				// dimhotepus: Add detailed info about bad field.
+				AssertMsg( false, "Bad %s field of type %d wit hvalue %s in entity!!\n", szKeyName, pField->fieldType, szValue );
+				Warning( "Bad %s field of type %d wit hvalue %s in entity!!\n", szKeyName, pField->fieldType, szValue );
 				break;
 			}
 		}
