@@ -225,21 +225,21 @@ public:
 			const char *t = control->GetString( "command", "" );
 			if ( !Q_isempty( t ) )
 			{
-				CDebugCommandButton *btn = new CDebugCommandButton( this, "CommandButton", control->GetName(), t );
+				auto *btn = new CDebugCommandButton( this, "CommandButton", control->GetName(), t );
 				m_LayoutItems.AddToTail( btn );
 				continue;
 			}
 			t = control->GetString( "togglecvar", "" );
 			if ( !Q_isempty( t ) )
 			{
-				CDebugCommandCheckbox *checkbox = new CDebugCommandCheckbox( this, "CommandCheck", control->GetName(), t );
+				auto *checkbox = new CDebugCommandCheckbox( this, "CommandCheck", control->GetName(), t );
 				m_LayoutItems.AddToTail( checkbox );
 				continue;
 			}
 			t = control->GetString( "incrementcvar", "" );
 			if ( !Q_isempty( t ) )
 			{
-				CDebugIncrementCVarButton *increment = new CDebugIncrementCVarButton( this, "IncrementCVar", control->GetName(), t );
+				auto *increment = new CDebugIncrementCVarButton( this, "IncrementCVar", control->GetName(), t );
 				m_LayoutItems.AddToTail( increment );
 				continue;
 			}
