@@ -138,8 +138,8 @@ bool ParseKeyvalue( void *pObject, typedescription_t *pFields, int iNumFields, c
 			case FIELD_MATERIALINDEX:
 			case FIELD_EDICT:
 				// dimhotepus: Add detailed info about bad field.
-				AssertMsg( false, "Bad %s field of type %d wit hvalue %s in entity!!\n", szKeyName, pField->fieldType, szValue );
-				Warning( "Bad %s field of type %d wit hvalue %s in entity!!\n", szKeyName, pField->fieldType, szValue );
+				AssertMsg( false, "Bad '%s' field of type %d with value '%s' in entity!!\n", szKeyName, pField->fieldType, szValue );
+				Warning( "Bad '%s' field of type %d with value '%s' in entity!!\n", szKeyName, pField->fieldType, szValue );
 				break;
 			}
 		}
