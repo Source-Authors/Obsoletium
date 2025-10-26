@@ -25,6 +25,7 @@ struct SoundChannels
 
 // NOTE:  This will need to be updated if channel names are added/removed
 static SoundChannels g_pChannelNames[] =
+static constexpr SoundChannels g_pChannelNames[] =
 {
 	{ CHAN_AUTO, "CHAN_AUTO" },
 	{ CHAN_WEAPON, "CHAN_WEAPON" },
@@ -42,7 +43,7 @@ struct VolumeLevel
 	const char *name;
 };
 
-static VolumeLevel g_pVolumeLevels[] = 
+static constexpr VolumeLevel g_pVolumeLevels[] = 
 {
 	{ VOL_NORM, "VOL_NORM" },
 };
@@ -53,7 +54,7 @@ struct PitchLookup
 	const char *name;
 };
 
-static PitchLookup g_pPitchLookup[] =
+static constexpr PitchLookup g_pPitchLookup[] =
 {
 	{ PITCH_NORM,	"PITCH_NORM" },
 	{ PITCH_LOW,	"PITCH_LOW" },
@@ -70,7 +71,7 @@ struct SoundLevelLookup
 };
 
 // NOTE:  Needs to reflect the soundlevel_t enum defined in soundflags.h
-static SoundLevelLookup g_pSoundLevels[] =
+static constexpr SoundLevelLookup g_pSoundLevels[] =
 {
 	{ SNDLVL_NONE, "SNDLVL_NONE" },
 	{ SNDLVL_20dB, "SNDLVL_20dB" },
