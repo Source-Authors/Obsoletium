@@ -3390,7 +3390,12 @@ void CBasePlayer::PhysicsSimulate( void )
 			pi->m_nNumCmds = commandsToRun;
 		}
 	}
-	else if ( GetTimeSinceLastUserCommand() > sv_player_usercommand_timeout.GetFloat() )
+	// dimhotepus: Need to check m_flLastUserCommandTime to fix https://github.com/Source-Authors/Obsoletium/issues/27
+	// RunNullCommand sets pl.fixangle = FIXANGLE_NONE which causes CGameClient::WriteViewAngleUpdate to not send SVC_FixAngle
+	// In turn missed SVC_FixAngle will not update CCLientState::viewangles and player will not get a correct view angles after save load.
+	// 
+	// So add m_flLastUserCommandTime check to ensure we are playing the game, not loading from save (when null command should be skipped).
+	else if ( m_flLastUserCommandTime && GetTimeSinceLastUserCommand() > sv_player_usercommand_timeout.GetFloat() )
 	{
 		// no usercommand from player after some threshold
 		// server should start RunNullCommand as if client sends an empty command so that Think and gamestate related things run properly

@@ -93,8 +93,6 @@ public:
 	void	ReceiveMessage( int classID, bf_read &msg ) override;
 
 	void	OnRestore() override;
-	// dimhotepus: Notify engine about new client angles for player.
-	virtual int		Restore( IRestore &restore ) override;
 
 	void	AddEntity( void ) override;
 

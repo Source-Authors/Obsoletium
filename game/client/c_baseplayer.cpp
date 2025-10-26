@@ -978,19 +978,6 @@ void C_BasePlayer::OnRestore()
 	}
 }
 
-int C_BasePlayer::Restore( IRestore &restore )
-{
-	int status = BaseClass::Restore( restore );
-	if ( !status )
-		return 0;
-	
-	// dimhotepus: Notify engine about new client angles for player.
-	QAngle restoredAngles = GetAbsAngles();
-	engine->SetViewAngles( restoredAngles );
-
-	return 1;
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Process incoming data
 //-----------------------------------------------------------------------------
