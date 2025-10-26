@@ -193,13 +193,13 @@ public:
 	{
 		BaseClass::PerformLayout();
 
-		int c = m_LayoutItems.Count();
-		int x = 5;
-		int y = 5;
+		// dimhotepus: Scale UI.
+		int x = QuickPropScale( 5 );
+		int y = QuickPropScale( 5 );
 
-		int w = 150;
-		int h = 18;
-		int gap = 2;
+		int w = QuickPropScale( 150 );
+		int h = QuickPropScale( 18 );
+		int gap = QuickPropScale( 2 );
 
 		int tall = GetTall();
 
@@ -212,7 +212,8 @@ public:
 			if ( y >= tall - h )
 			{
 				x += ( w + gap );
-				y = 5;
+				// dimhotepus: Scale UI.
+				y = QuickPropScale( 5 );
 			}
 		}
 	}
@@ -269,12 +270,14 @@ public:
 			{
 				if ( !Q_strcasecmp( dat->GetName(), "width" ) )
 				{
-					SetWide( dat->GetInt() );
+					// dimhotepus: Scale UI.
+					SetWide( QuickPropScale( dat->GetInt() ) );
 					continue;
 				}
 				else if ( !Q_strcasecmp( dat->GetName(), "height" ) )
 				{
-					SetTall( dat->GetInt() );
+					// dimhotepus: Scale UI.
+					SetTall( QuickPropScale( dat->GetInt() ) );
 					continue;
 				}
 
@@ -284,9 +287,9 @@ public:
 				AddPage( page, dat->GetName() );
 			}
 		}
-	
-		GetPropertySheet()->SetTabWidth(72);
-		SetPos( videomode->GetModeStereoWidth() - GetWide() - 10 , 10 );
+		// dimhotepus: Scale UI.
+		GetPropertySheet()->SetTabWidth(QuickPropScale( 72 ));
+		SetPos( videomode->GetModeStereoWidth() - GetWide() - QuickPropScale( 10 ), QuickPropScale( 10 ) );
 		SetVisible( true );
 
 		if ( g_pFullFileSystem->FileExists( "resource/DebugOptionsPanel.res" ) )
@@ -340,7 +343,8 @@ CDebugSystemPanel::CDebugSystemPanel( Panel *parent, const char *panelName )
 	
 	// Locate it at top left
 	m_pDebugMenu->SetPos( 0, 0 );
-	m_pDebugMenu->SetSize( 110, h );
+	// dimhotepus: Scale UI.
+	m_pDebugMenu->SetSize( QuickPropScale( 110 ), QuickPropScale( 24 ) );
 
 	m_hDebugOptions = new CDebugOptionsPanel( this, "DebugOptions" );
 }
