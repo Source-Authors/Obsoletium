@@ -870,7 +870,7 @@ void CVmtTextEntry::OpenVmtSelected()
 #ifdef IS_WINDOWS_PC
 static bool IsSpaceOrQuote( char val )
 {
-	return (isspace(val) || val == '\"');
+	return (V_isspace(val) || val == '\"');
 }
 
 static bool SetBufferValue( INOUT_Z_CAP(nTxtFileBufferSize) char *chTxtFileBuffer,
@@ -1302,7 +1302,7 @@ void CRenderTextureEditor::PerformLayout()
 	if ( m_pInfo )
 	{
 		char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
-		Q_snprintf( chResolveNameArg, sizeof( chResolveNameArg ) - 1, "materials/%s.vtf", m_pInfo->GetString( KEYNAME_NAME ) );
+		V_sprintf_safe( chResolveNameArg, "materials/%s.vtf", m_pInfo->GetString( KEYNAME_NAME ) );
 		char const *szResolvedName = g_pFileSystem->RelativePathToFullPath_safe( chResolveNameArg, "game", chResolveName );
 		if ( szResolvedName )
 		{
@@ -1678,7 +1678,7 @@ void CRenderTextureEditor::Paint()
 		return;
 
 	char const *szTextureFile = kv->GetString( KEYNAME_NAME );
-	Q_strncpy( s_chLastViewedTextureBuffer, szTextureFile, sizeof( s_chLastViewedTextureBuffer ) );
+	V_strcpy_safe( s_chLastViewedTextureBuffer, szTextureFile );
 	char const *szTextureGroup = kv->GetString( KEYNAME_TEXTURE_GROUP );
 
 	ITexture *pMatTexture = nullptr;
@@ -2796,16 +2796,7 @@ bool StripDirName( char *pFilename )
 	}
 }
 
-static inline void ToLowerInplace( char *chBuffer )
-{
-	for ( char *pch = chBuffer; *pch; ++ pch )
-	{
-		if ( V_isupper( *pch ) )
-			*pch = static_cast<char>(tolower( *pch ));
-	}
-}
-
-void KeepSpecialKeys( KeyValues *textureList, bool bServiceKeys )
+static void KeepSpecialKeys( KeyValues *textureList, bool bServiceKeys )
 {
 	KeyValues *pNext;
 
@@ -2846,8 +2837,8 @@ static void KeepKeysMatchingFilter( KeyValues *textureList, char const *szFilter
 
 	char chFilter[MAX_PATH] = {0}, chName[MAX_PATH] = {0};
 	
-	Q_strncpy( chFilter, szFilter, sizeof( chFilter ) - 1 );
-	ToLowerInplace( chFilter );
+	V_strcpy_safe( chFilter, szFilter );
+	V_strlwr_safe( chFilter );
 
 	KeyValues *pNext;
 	for ( KeyValues *pCur=textureList->GetFirstSubKey(); pCur; pCur=pNext )
@@ -2856,8 +2847,8 @@ static void KeepKeysMatchingFilter( KeyValues *textureList, char const *szFilter
 
 		char const *szName = pCur->GetString( KEYNAME_NAME );
 
-		Q_strncpy( chName, szName, sizeof( chName ) - 1 );
-		ToLowerInplace( chName );
+		V_strcpy_safe( chName, szName );
+		V_strlwr_safe( chName );
 		
 		if ( !strstr( chName, chFilter ) )
 		{
@@ -2896,7 +2887,7 @@ void CTextureListPanel::UpdateTotalUsageLabel()
 	if ( bool bCollapsed = m_pCollapse->IsSelected() )
 	{
 		char const *szTitle = "";
-		Q_snprintf( data, sizeof( data ), "%s[F %s KiB] / [T %s KiB] / [S %s KiB]", szTitle, kb1, kb2, kb3 );
+		V_sprintf_safe( data, "%s[F %s KiB] / [T %s KiB] / [S %s KiB]", szTitle, kb1, kb2, kb3 );
 	}
 	else
 	{
@@ -2904,7 +2895,7 @@ void CTextureListPanel::UpdateTotalUsageLabel()
 		char kbMip1[ 20 ], kbMip2[ 20 ];
 		FmtCommaNumber( kbMip1, (g_pMaterialSystemDebugTextureInfo->GetTextureMemoryUsed( IDebugTextureInfo::MEMORY_ESTIMATE_PICMIP_1 ) + 511) / 1024 );
 		FmtCommaNumber( kbMip2, (g_pMaterialSystemDebugTextureInfo->GetTextureMemoryUsed( IDebugTextureInfo::MEMORY_ESTIMATE_PICMIP_2 ) + 511) / 1024 );
-		Q_snprintf( data, sizeof( data ), "%s:  frame %s KiB  /  total %s KiB ( picmip1 = %s KiB, picmip2 = %s KiB )  /  shown %s KiB", szTitle, kb1, kb2, kbMip1, kbMip2, kb3 );
+		V_sprintf_safe( data, "%s:  frame %s KiB  /  total %s KiB ( picmip1 = %s KiB, picmip2 = %s KiB )  /  shown %s KiB", szTitle, kb1, kb2, kbMip1, kbMip2, kb3 );
 	}
 
 	wchar_t unicodeString[1024];
@@ -3301,7 +3292,7 @@ CON_COMMAND( mat_texture_save_fonts, "Save all font textures" )
 	{
 		char szTextureName[ MAX_PATH ];
 
-		Q_snprintf( szTextureName, ARRAYSIZE( szTextureName ), "__font_page_%d.tga", i );
+		V_sprintf_safe( szTextureName, "__font_page_%d.tga", i );
 
 		if( !materials->IsTextureLoaded( szTextureName ) )
 			break;
