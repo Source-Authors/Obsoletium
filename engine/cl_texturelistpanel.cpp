@@ -2452,8 +2452,8 @@ static int __cdecl KilobytesSortFunc( vgui::ListPanel *pPanel, const vgui::ListP
 class CSmartTextureKeyValues
 {
 private:
-	CSmartTextureKeyValues( CSmartTextureKeyValues const &x );
-	CSmartTextureKeyValues& operator = ( CSmartTextureKeyValues const &x );
+	CSmartTextureKeyValues( CSmartTextureKeyValues const &x ) = delete;
+	CSmartTextureKeyValues& operator = ( CSmartTextureKeyValues const &x ) = delete;
 
 public:
 	CSmartTextureKeyValues() : m_p( nullptr ) { if ( KeyValues *p = g_pMaterialSystemDebugTextureInfo->GetDebugTextureList() ) m_p = p->MakeCopy(); }
