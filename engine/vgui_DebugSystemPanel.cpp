@@ -278,7 +278,7 @@ public:
 					continue;
 				}
 
-				CDebugOptionsPage *page = new CDebugOptionsPage( this, dat->GetName() );
+				auto *page = new CDebugOptionsPage( this, dat->GetName() );
 				page->Init( dat );
 	
 				AddPage( page, dat->GetName() );
