@@ -149,7 +149,7 @@ public:
 			return;
 
 		char sz[ 512 ];
-		Q_snprintf( sz, sizeof( sz ), "%s %.2f", m_pVar->GetName(), m_pVar->GetFloat() );
+		V_sprintf_safe( sz, "%s %.2f", m_pVar->GetName(), m_pVar->GetFloat() );
 		SetText( sz );
 		SizeToContents();
 		m_flPreviousValue = m_pVar->GetFloat();
@@ -225,24 +225,22 @@ public:
 		// LoadControlSettings( va( "resource\\%s.res", kv->GetName() ) );
 		for (KeyValues *control = kv->GetFirstSubKey(); control != NULL; control = control->GetNextKey())
 		{
-			const char *t;
-			
-			t = control->GetString( "command", "" );
-			if ( t && t[0] )
+			const char *t = control->GetString( "command", "" );
+			if ( !Q_isempty( t ) )
 			{
 				CDebugCommandButton *btn = new CDebugCommandButton( this, "CommandButton", control->GetName(), t );
 				m_LayoutItems.AddToTail( btn );
 				continue;
 			}
 			t = control->GetString( "togglecvar", "" );
-			if ( t && t[0] )
+			if ( !Q_isempty( t ) )
 			{
 				CDebugCommandCheckbox *checkbox = new CDebugCommandCheckbox( this, "CommandCheck", control->GetName(), t );
 				m_LayoutItems.AddToTail( checkbox );
 				continue;
 			}
 			t = control->GetString( "incrementcvar", "" );
-			if ( t && t[0] )
+			if ( !Q_isempty( t ) )
 			{
 				CDebugIncrementCVarButton *increment = new CDebugIncrementCVarButton( this, "IncrementCVar", control->GetName(), t );
 				m_LayoutItems.AddToTail( increment );
