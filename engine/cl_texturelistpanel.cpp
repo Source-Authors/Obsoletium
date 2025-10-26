@@ -92,11 +92,14 @@ void mat_texture_list_off_f();
 ConCommand mat_texture_list_on( "+mat_texture_list", mat_texture_list_on_f );
 ConCommand mat_texture_list_off( "-mat_texture_list", mat_texture_list_off_f );
 
-ConVar mat_texture_list_all( "mat_texture_list_all", "0", FCVAR_NEVER_AS_STRING|FCVAR_CHEAT, "If this is nonzero, then the texture list panel will show all currently-loaded textures." );
+// dimhotepus: Restrict to 0...1 range as bool.
+ConVar mat_texture_list_all( "mat_texture_list_all", "0", FCVAR_NEVER_AS_STRING|FCVAR_CHEAT, "If this is nonzero, then the texture list panel will show all currently-loaded textures.", true, 0, true, 1 );
 
-ConVar mat_texture_list_view( "mat_texture_list_view", "1", FCVAR_NEVER_AS_STRING|FCVAR_CHEAT, "If this is nonzero, then the texture list panel will render thumbnails of currently-loaded textures." );
+// dimhotepus: Restrict to 0...1 range as bool.
+ConVar mat_texture_list_view( "mat_texture_list_view", "1", FCVAR_NEVER_AS_STRING|FCVAR_CHEAT, "If this is nonzero, then the texture list panel will render thumbnails of currently-loaded textures.", true, 0, true, 1 );
 
-ConVar mat_show_texture_memory_usage( "mat_show_texture_memory_usage", "0", FCVAR_NEVER_AS_STRING|FCVAR_CHEAT, "Display the texture memory usage on the HUD." );
+// dimhotepus: Restrict to 0...1 range as bool.
+ConVar mat_show_texture_memory_usage( "mat_show_texture_memory_usage", "0", FCVAR_NEVER_AS_STRING|FCVAR_CHEAT, "Display the texture memory usage on the HUD.", true, 0, true, 1 );
 
 
 static int g_warn_texkbytes = 1499;
@@ -3273,7 +3276,7 @@ void CTextureListPanel::Paint()
 
 void VGui_UpdateTextureListPanel()
 {
-	if ( mat_show_texture_memory_usage.GetInt() )
+	if ( mat_show_texture_memory_usage.GetBool() )
 	{
 		con_nprint_t info;
 		info.index = 4;
