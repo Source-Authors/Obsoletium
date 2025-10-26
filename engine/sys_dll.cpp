@@ -479,7 +479,7 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 
 			// We always get here because the above filter evaluates to EXCEPTION_EXECUTE_HANDLER
 		}
-#elif defined( OSX )
+#elif defined( POSIX )
 		// Doing this doesn't quite work the way we want because there is no "crashing" thread
 		// and we see "No thread was identified as the cause of the crash; No signature could be created because we do not know which thread crashed" on the back end
 		//SteamAPI_WriteMiniDump( 0, NULL, build_number() );
@@ -487,22 +487,8 @@ void Sys_Error_Internal( bool bMinidump, const char *error, va_list argsList )
 		fprintf( stderr, "\n ##### Sys_Error: %s", text );
 		fflush( stdout );
 
-		int *p = 0;
-#ifdef PLATFORM_64BITS
-		*p = 0xdeadbeefdeadbeef;
-#else
-		*p = 0xdeadbeef;
-#endif
-#elif defined( LINUX )
-		// Doing this doesn't quite work the way we want because there is no "crashing" thread
-		// and we see "No thread was identified as the cause of the crash; No signature could be created because we do not know which thread crashed" on the back end
-		//SteamAPI_WriteMiniDump( 0, NULL, build_number() );
-		int *p = 0;
-#ifdef PLATFORM_64BITS
-		*p = 0xdeadbeefdeadbeef;
-#else
-		*p = 0xdeadbeef;
-#endif
+		// dimhotepus: Fix UB on nullptr dereference.
+		raise( SIGTRAP );
 #else
 #warning "need minidump impl on sys_error"
 #endif
