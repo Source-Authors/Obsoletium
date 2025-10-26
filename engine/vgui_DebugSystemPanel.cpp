@@ -5,25 +5,25 @@
 // $NoKeywords: $
 //===========================================================================//
 #include "client_pch.h"
-#include "ivideomode.h"
 #include "vgui_DebugSystemPanel.h"
+#include "ivideomode.h"
+#include "tier1/CommandBuffer.h"
+#include "tier1/tier1.h"
 #include <vgui/ISurface.h>
+#include <vgui/Cursor.h>
+#include <vgui/IScheme.h>
+#include <vgui/IVGui.h>
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/MenuButton.h>
 #include <vgui_controls/Menu.h>
 #include <vgui_controls/MenuItem.h>
-#include <vgui/Cursor.h>
 #include <vgui_controls/TreeView.h>
 #include <vgui_controls/ImageList.h>
-#include <vgui/IScheme.h>
-#include <vgui/IVGui.h>
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/CheckButton.h>
 #include <vgui_controls/PropertyPage.h>
 #include <vgui_controls/PropertyDialog.h>
 #include <vgui_controls/PropertySheet.h>
-#include "tier1/CommandBuffer.h"
-#include "tier1/tier1.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
