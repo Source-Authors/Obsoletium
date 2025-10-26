@@ -124,11 +124,15 @@ CAudioSourceMP3::CAudioSourceMP3( CSfxTable *pSfx, CAudioSourceCachedInfo *info 
 	m_dataSize = info->DataSize();
 	m_dataStart = info->DataStart();
 
+	// dimhotepus : Add missed initialization of cache handle.
+	m_AudioCacheHandle.info = info;
 	m_nCachedDataSize = 0;
+
 	m_bIsPlayOnce = false;
 	m_bIsSentenceWord = false;
 	m_bCheckedForPendingSentence = false;
 
+	// dimhotepus: Fully-qualify method name as virtual calls from ctor call parent!
 	CAudioSourceMP3::CheckAudioSourceCache();
 }
 
@@ -242,7 +246,7 @@ void CAudioSourceMP3::GetCacheData( CAudioSourceCachedInfo *info )
 	info->SetDataStart( 0 );
 
 	intp file = g_pSndIO->open( m_pSfx->GetFileName() );
-	// dimhotepus: Diffrent imple signal errors in different ways
+	// dimhotepus: Different impl signal errors in different ways
 	if ( !file || file == -1 )
 	{
 		Warning( "Failed to find file for building soundcache [ %s ]\n", m_pSfx->GetFileName() );
@@ -304,7 +308,8 @@ void CAudioSourceMP3::CheckAudioSourceCache()
 	}
 
 	// This will "re-cache" this if it's not in this level's cache already
-	m_AudioCacheHandle.Get( GetType(), true, m_pSfx, &m_nCachedDataSize );
+	// dimhotepus: Oh, calling GetType() from ctor is not allowed, use static binding.
+	m_AudioCacheHandle.Get( CAudioSourceMP3::GetType(), true, m_pSfx, &m_nCachedDataSize );
 }
 
 //-----------------------------------------------------------------------------
