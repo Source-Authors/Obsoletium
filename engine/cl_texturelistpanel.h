@@ -10,6 +10,12 @@
 #pragma once
 #endif
 
+namespace vgui {
+
+class Panel;
+
+}
+
 
 void CL_CreateTextureListPanel( vgui::Panel *pPanel );
 

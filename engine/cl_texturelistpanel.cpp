@@ -5,53 +5,54 @@
 //=============================================================================//
 
 #include "client_pch.h"
-#include "ivideomode.h"
+
+#include "cl_texturelistpanel.h"
+
+#include "bitvec.h"
+#include "con_nprint.h"
+#include "client.h"
 #include "client_class.h"
+#include "gl_matsysiface.h"
 #include "icliententitylist.h"
+#include "igame.h"
+#include "ivideomode.h"
+#include "ivtex.h"
 #include "vgui_basepanel.h"
-#include <vgui_controls/Controls.h>
+#include "vgui_helpers.h"
+// dimhotepus: Exclude perforce
+// #include "p4lib/ip4.h"
+
 #include <vgui/ISurface.h>
 #include <vgui/IScheme.h>
 #include <vgui/IVGui.h>
+#include <vgui/ISystem.h>
+#include "vgui/ILocalize.h"
+
+#include <vgui_controls/Controls.h>
 #include <vgui_controls/Frame.h>
 #include <vgui_controls/TreeView.h>
 #include <vgui_controls/ListPanel.h>
 #include <vgui_controls/ListViewPanel.h>
 #include <vgui_controls/TreeViewListControl.h>
-#include <vgui/ISystem.h>
-#include "tier0/vprof.h"
-#include "KeyValues.h"
-#include "vgui_helpers.h"
-#include "utlsymbol.h"
-#include "tier1/UtlStringMap.h"
-#include "bitvec.h"
-#include "utldict.h"
-#include "vgui/ILocalize.h"
-#include "con_nprint.h"
-#include "gl_matsysiface.h"
 
-#include "VGuiMatSurface/IMatSystemSurface.h"
+#include "tier0/vprof.h"
+#include "tier1/KeyValues.h"
+#include "tier1/smartptr.h"
+#include "tier1/utlsymbol.h"
+#include "tier1/UtlStringMap.h"
+#include "tier1/utldict.h"
+#include "tier2/tier2.h"
+#include "tier2/fileutils.h"
+#include "tier2/p4helpers.h"
+
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialvar.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/idebugtextureinfo.h"
 #include "materialsystem/itexture.h"
+
+#include "VGuiMatSurface/IMatSystemSurface.h"
 #include "vtf/vtf.h"
-#include "tier2/tier2.h"
-#include "smartptr.h"
-
-#include "igame.h"
-
-#include "client.h"
-
-#include "tier2/p4helpers.h"
-// dimhotepus: Exclude perforce
-// #include "p4lib/ip4.h"
-#include "ivtex.h"
-#include "tier2/fileutils.h"
-
-// For character manipulations isupper/tolower
-#include <ctype.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
