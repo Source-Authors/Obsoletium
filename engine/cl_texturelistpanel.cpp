@@ -134,12 +134,12 @@ public:
 	virtual HFont GetFont();
 
 public:
-	enum HitTest_t
+	enum class HitTest_t
 	{
 		HT_NOTHING = 0,
 		HT_TILE
 	};
-	virtual int HitTest( int x, int y, int &iTile );
+	virtual HitTest_t HitTest( int x, int y, int &iTile );
 	virtual bool GetTileOrg( int iTile, int &x, int &y );
 
 protected: // Overrides for contents
@@ -203,28 +203,28 @@ HFont TileViewPanelEx::GetFont()
 	return m_hFont;
 }
 
-int TileViewPanelEx::HitTest( int x, int y, int &iTile )
+TileViewPanelEx::HitTest_t TileViewPanelEx::HitTest( int x, int y, int &iTile )
 {
 	iTile = -1;
 
 	if ( !ComputeLayoutInfo() )
-		return HT_NOTHING;
+		return HitTest_t::HT_NOTHING;
 
 	int hitCol = ( x / m_li_wideItem );
 	int hitRow = ( y / m_li_tallItem );
 
 	if ( hitCol >= m_li_colVisible )
-		return HT_NOTHING;
+		return HitTest_t::HT_NOTHING;
 	if ( hitRow > m_li_rowVisible )
-		return HT_NOTHING;
+		return HitTest_t::HT_NOTHING;
 
 	int hitTile = m_li_startTile + hitCol + hitRow * m_li_colVisible;
 	if ( hitTile >= m_li_endTile )
-		return HT_NOTHING;
+		return HitTest_t::HT_NOTHING;
 
 	// Hit tile
 	iTile = hitTile;
-	return HT_TILE;
+	return HitTest_t::HT_TILE;
 }
 
 bool TileViewPanelEx::GetTileOrg( int iTile, int &x, int &y )
@@ -2051,8 +2051,8 @@ void CRenderTexturesListViewPanel::OnMousePressed( vgui::MouseCode code )
 
 	// Hit test the click
 	int iTile, tileX, tileY;
-	int htResult = HitTest( x, y, iTile );
-	if ( HT_NOTHING == htResult )
+	HitTest_t htResult = HitTest( x, y, iTile );
+	if ( HitTest_t::HT_NOTHING == htResult )
 		return;
 	if ( !GetTileOrg( iTile, tileX, tileY ) )
 		return;
