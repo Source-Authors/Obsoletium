@@ -110,7 +110,7 @@ static bool g_cursorset = false;
 class CTextureListPanel;
 static CTextureListPanel *g_pTextureListPanel = nullptr;
 static bool g_bRecursiveRequestToShowTextureList = false;
-static int g_nSaveQueueState = INT_MIN;
+static int g_nSaveQueueState = std::numeric_limits<int>::min();
 
 
 //
