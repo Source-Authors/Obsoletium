@@ -11,6 +11,8 @@
 
 #if defined( _WIN32 )
 #include "winlite.h"
+
+#include <sdkddkver.h>
 #endif
 
 #ifdef _WIN32
@@ -295,7 +297,11 @@ _Check_return_
 size_t _msize_base
 (
 	_Pre_notnull_ void *pMem
-) noexcept
+)
+// dimhotepus: Since Windows 11 21H1 (22000) _msize_base has noexcept.
+#if defined(WDK_NTDDI_VERSION) && (WDK_NTDDI_VERSION >= NTDDI_WIN11_ZN)
+noexcept
+#endif
 {
 	return g_pMemAlloc->GetSize(pMem);
 }
