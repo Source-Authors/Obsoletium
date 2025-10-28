@@ -148,7 +148,7 @@ bool CBlacklistedServers::AddServersFromFile( const char *pszFilename, bool bRes
 	{
 		const char *pszName = pData->GetString( "name" );
 
-		uint32 ulDate = pData->GetInt( "date" );
+		uint64 ulDate = pData->GetUint64( "date" );
 		if ( bResetTimes )
 		{
 			time_t today;
