@@ -57,7 +57,8 @@
 #define BACKFACE_EPSILON	-0.01f
 
 #define BRUSHMODEL_DECAL_SORT_GROUP		MAX_MAT_SORT_GROUPS
-constexpr inline int MAX_VERTEX_FORMAT_CHANGES = 128;
+// dimhotepus: Some mods like "The Citizen Returns" use more than 128 vertexes.
+constexpr inline int MAX_VERTEX_FORMAT_CHANGES = 256;
 int g_MaxLeavesVisible = 512;
 
 //-----------------------------------------------------------------------------
@@ -898,7 +899,7 @@ void Shader_DrawChainsStatic( const CMSurfaceSortList &sortList, int nSortGroup,
 				{
 					if ( bWarn )
 					{
-						Warning( "Too many vertex format changes in frame, whole world not rendered\n" );
+						Warning( "Too many (>= %d) vertex format changes in frame, whole world not rendered\n", MAX_VERTEX_FORMAT_CHANGES - 1 );
 						bWarn = false;
 					}
 					continue;
@@ -958,9 +959,8 @@ void Shader_DrawChainsStatic( const CMSurfaceSortList &sortList, int nSortGroup,
 				if ( meshList[meshMap[i]].pMesh < meshList[meshMap[i-1]].pMesh )
 #endif
 				{
-					int tmp = meshMap[i-1];
-					meshMap[i-1] = meshMap[i];
-					meshMap[i] = tmp;
+					// dimhotepus: Use std::swap instead of manual algorithm.
+					std::swap( meshMap[i-1], meshMap[i] );
 					swapped = true;
 				}
 			}
