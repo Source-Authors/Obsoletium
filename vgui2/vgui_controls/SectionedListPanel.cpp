@@ -1239,9 +1239,8 @@ bool SectionedListPanel::AddColumnToSection(int sectionID, const char *columnNam
 	index = section.m_Columns.AddToTail();
 	column_t &column = section.m_Columns[index];
 
-	Q_strncpy(column.m_szColumnName, columnName, sizeof(column.m_szColumnName));
-	wcsncpy(column.m_szColumnText, columnText,  sizeof(column.m_szColumnText) / sizeof(wchar_t));
-	column.m_szColumnText[sizeof(column.m_szColumnText) / sizeof(wchar_t) - 1] = 0;
+	V_strcpy_safe(column.m_szColumnName, columnName);
+	V_wcscpy_safe(column.m_szColumnText, columnText);
 	column.m_iColumnFlags = columnFlags;
 	column.m_iWidth = width;
 	column.m_hFallbackFont = fallbackFont;
@@ -1270,8 +1269,7 @@ bool SectionedListPanel::ModifyColumn(int sectionID, const char *columnName, con
 	column_t &column = section.m_Columns[columnIndex];
 
 	// modify the text
-	wcsncpy(column.m_szColumnText, columnText, sizeof(column.m_szColumnText) / sizeof(wchar_t));
-	column.m_szColumnText[sizeof(column.m_szColumnText) / sizeof(wchar_t) - 1] = 0;
+	V_wcscpy_safe(column.m_szColumnText, columnText);
 	section.m_pHeader->InvalidateLayout();
 	return true;
 }
