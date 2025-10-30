@@ -805,7 +805,7 @@ void C_BaseEntity::Interp_SetupMappings( VarMapping_t *map )
 	{
 		IInterpolatedVar *watcher = e.watcher;
 		void *data = e.data;
-		int type = e.type;
+		auto type = e.type;
 
 		watcher->Setup( data, type );
 		watcher->SetInterpolationAmount( GetInterpolationAmount( watcher->GetType() ) ); 
