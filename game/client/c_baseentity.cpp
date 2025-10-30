@@ -1779,13 +1779,21 @@ void C_BaseEntity::SetMoveType( MoveType_t val, MoveCollide_t moveCollide /*= MO
 	}
 #endif
 
- 	m_MoveType = val;
+	static_assert(
+		std::numeric_limits<decltype(m_MoveType)>::min() <= MoveType_t::MOVETYPE_NONE &&
+		std::numeric_limits<decltype(m_MoveType)>::max() >= MoveType_t::MOVETYPE_LAST);
+
+ 	m_MoveType = static_cast<decltype(m_MoveType)>(val);
 	SetMoveCollide( moveCollide );
 }
 
 void C_BaseEntity::SetMoveCollide( MoveCollide_t val )
 {
-	m_MoveCollide = val;
+	static_assert(
+		std::numeric_limits<decltype(m_MoveCollide)>::min() <= MoveCollide_t::MOVECOLLIDE_DEFAULT &&
+		std::numeric_limits<decltype(m_MoveCollide)>::max() >= MoveCollide_t::MOVECOLLIDE_COUNT);
+
+	m_MoveCollide = static_cast<decltype(m_MoveCollide)>(val);
 }
 
 
