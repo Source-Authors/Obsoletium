@@ -532,11 +532,14 @@ void C_EntityDissolve::ClientThink( void )
 		}
 	}
 
+	// dimhotepus: Cache for performance.
+	const float fadeInPercentage = (1.0f - GetFadeInPercentage());
+
 	color32 color;
 
-	color.r = ( 1.0f - GetFadeInPercentage() ) * m_vEffectColor.x;
-	color.g = ( 1.0f - GetFadeInPercentage() ) * m_vEffectColor.y;
-	color.b = ( 1.0f - GetFadeInPercentage() ) * m_vEffectColor.z;
+	color.r = fadeInPercentage * m_vEffectColor.x;
+	color.g = fadeInPercentage * m_vEffectColor.y;
+	color.b = fadeInPercentage * m_vEffectColor.z;
 	color.a = GetModelFadeOutPercentage() * 255.0f;
 
 	// Setup the entity fade
