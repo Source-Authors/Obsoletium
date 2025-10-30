@@ -83,7 +83,7 @@ activitylist_t *ActivityList_AddActivityEntry( const char *pName, int iActivityI
 static activitylist_t *ListFromString( const char *pString )
 {
 	// just use the string registry to do this search/map
-	int stringID = g_ActivityStrings.GetStringID( pString );
+	intp stringID = g_ActivityStrings.GetStringID( pString );
 	if ( stringID < 0 )
 		return NULL;
 
