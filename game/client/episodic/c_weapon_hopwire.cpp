@@ -175,8 +175,6 @@ void C_HopwireExplosion::AddParticles( void )
 		vecDustColor.y = 0.3f;
 		vecDustColor.z = 0.25f;
 
-		Vector	color;
-
 		int	numRingSprites = 8;
 		float yaw;
 		Vector forward, vRight, vForward;
