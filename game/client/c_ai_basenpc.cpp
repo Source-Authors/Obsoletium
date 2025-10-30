@@ -131,9 +131,9 @@ void C_AI_BaseNPC::ClientThink( void )
 			Vector p2 = GetAbsOrigin() + vRight * vMaxs.x + vUp * vMins.z;
 			Vector p3 = GetAbsOrigin() + vUp * vMaxs.z;
 
-			int r = 0 * fFade;
-			int g = 255 * fFade;
-			int b = 0 * fFade;
+			const int r = static_cast<int>(0 * fFade);
+			const int g = static_cast<int>(255 * fFade);
+			const int b = static_cast<int>(0 * fFade);
 
 			if ( debugoverlay )
 			{

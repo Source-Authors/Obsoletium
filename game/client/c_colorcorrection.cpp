@@ -91,7 +91,7 @@ void C_ColorCorrection::OnDataChanged(DataUpdateType_t updateType)
 			Q_strncpy( filename, m_netLookupFilename, MAX_PATH );
 
 			m_CCHandle = g_pColorCorrectionMgr->AddColorCorrection( filename );
-			SetNextClientThink( ( m_CCHandle != INVALID_CLIENT_CCHANDLE ) ? CLIENT_THINK_ALWAYS : CLIENT_THINK_NEVER );
+			SetNextClientThink( ( m_CCHandle != INVALID_CLIENT_CCHANDLE ) ? static_cast<float>(CLIENT_THINK_ALWAYS) : CLIENT_THINK_NEVER );
 		}
 	}
 }
