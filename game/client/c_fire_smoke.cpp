@@ -393,7 +393,7 @@ void C_EntityFlame::Simulate( void )
 		dl->color.g = 174;
 		dl->color.b = 10;
 		dl->radius = random->RandomFloat(400,431);
-		dl->die = gpGlobals->curtime + 0.001;
+		dl->die = gpGlobals->curtime + 0.001f;
 	}
 
 #endif // HL2_EPISODIC 

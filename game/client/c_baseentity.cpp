@@ -5613,7 +5613,7 @@ void C_BaseEntity::DrawBBoxVisualizations( void )
 		Vector vecRenderMins, vecRenderMaxs;
 		GetRenderBounds( vecRenderMins, vecRenderMaxs );
 		debugoverlay->AddBoxOverlay( GetRenderOrigin(), vecRenderMins, vecRenderMaxs,
-			GetRenderAngles(), 255, 0, 255, 0, 0.01 );
+			GetRenderAngles(), 255, 0, 255, 0, 0.01f );
 	}
 }
 
