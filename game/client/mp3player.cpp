@@ -201,9 +201,9 @@ public:
 			return;
 		}
 
-		for ( int i = 0; i < selCount; ++i )
+		for ( intp i = 0; i < selCount; ++i )
 		{
-			int itemId = m_pList->GetSelectedItem( 0 );
+			intp itemId = m_pList->GetSelectedItem( i );
 			KeyValues *kv = m_pList->GetItem( itemId );
 			if ( !kv )
 			{
@@ -258,10 +258,10 @@ void CMP3FileListPage::OnCommand( char const *cmd )
 	if ( !Q_stricmp( cmd, "addsong" ) )
 	{
 		// Get selected item
-		int c = m_pList->GetSelectedItemsCount();
+		intp c = m_pList->GetSelectedItemsCount();
 		if ( c > 0 )
 		{
-			int itemId = m_pList->GetSelectedItem( 0 );
+			intp itemId = m_pList->GetSelectedItem( 0 );
 			KeyValues *kv = m_pList->GetItem( itemId );
 			if ( kv )
 			{
@@ -344,10 +344,10 @@ public:
 	void RemoveSong( intp songIndex )
 	{
 		// Get selected item
-		int c = m_pList->GetSelectedItemsCount();
+		intp c = m_pList->GetSelectedItemsCount();
 		if ( c > 0 )
 		{
-			int itemId = m_pList->GetSelectedItem( 0 );
+			intp itemId = m_pList->GetSelectedItem( 0 );
 			KeyValues *kv = m_pList->GetItem( itemId );
 			if ( kv && ( (intp)kv->GetUint64( "SongIndex", std::numeric_limits<uint64>::max() ) == songIndex ) )
 			{
@@ -360,14 +360,14 @@ public:
 	{
 		list.RemoveAll();
 
-		int selCount = m_pList->GetSelectedItemsCount();
+		intp selCount = m_pList->GetSelectedItemsCount();
 		if ( selCount <= 0 )
 		{
 			return;
 		}
-		for ( int i = 0; i < selCount; ++i )
+		for ( intp i = 0; i < selCount; ++i )
 		{
-			int itemId = m_pList->GetSelectedItem( 0 );
+			intp itemId = m_pList->GetSelectedItem( 0 );
 			KeyValues *kv = m_pList->GetItem( itemId );
 			if ( !kv )
 			{
@@ -396,7 +396,7 @@ public:
 
 	void OnItemPlaying( int listIndex )
 	{
-		int itemId = m_pList->GetItemIDFromRow( listIndex );
+		intp itemId = m_pList->GetItemIDFromRow( listIndex );
 		m_pList->ClearSelectedItems();
 		m_pList->SetSingleSelectedItem( itemId );
 	}
@@ -435,10 +435,10 @@ void CMP3PlayListPage::OnCommand( char const *cmd )
 	if ( !Q_stricmp( cmd, "removesong" ) )
 	{
 		// Get selected item
-		int c = m_pList->GetSelectedItemsCount();
+		intp c = m_pList->GetSelectedItemsCount();
 		if ( c > 0 )
 		{
-			int itemId = m_pList->GetSelectedItem( 0 );
+			intp itemId = m_pList->GetSelectedItem( 0 );
 			KeyValues *kv = m_pList->GetItem( itemId );
 			if ( kv )
 			{
