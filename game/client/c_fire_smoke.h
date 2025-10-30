@@ -31,7 +31,8 @@ private:
 
 			float fUpAmount = vToPos.z;
 
-			int iAlpha = 255;
+			// dimhotepus: int -> byte.
+			byte iAlpha = 255;
 
 			if ( fUpAmount < -0.75f )
 				iAlpha = 0;
@@ -65,7 +66,8 @@ class C_FireFromAboveSprite : public C_Sprite
 
 		float fUpAmount = vToPos.z;
 
-		int iAlpha = 0;
+		// dimhotepus: int -> byte.
+		byte iAlpha = 0;
 
 		if ( fUpAmount < -0.85f )
 			iAlpha = 255;
