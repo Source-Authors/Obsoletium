@@ -2751,8 +2751,8 @@ void C_BaseEntity::OnStoreLastNetworkedValue()
 		MoveToLastReceivedPosition( true );
 	}
 
-	int c = m_VarMap.m_Entries.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = m_VarMap.m_Entries.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		VarMapEntry_t *e = &m_VarMap.m_Entries[ i ];
 		IInterpolatedVar *watcher = e->watcher;
@@ -2786,8 +2786,8 @@ void C_BaseEntity::OnLatchInterpolatedVariables( int flags )
 
 	PREDICTION_TRACKVALUECHANGESCOPE_ENTITY( this, bUpdateLastNetworkedValue ? "latch+net" : "latch" );
 
-	int c = m_VarMap.m_Entries.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = m_VarMap.m_Entries.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		VarMapEntry_t *e = &m_VarMap.m_Entries[ i ];
 		IInterpolatedVar *watcher = e->watcher;
