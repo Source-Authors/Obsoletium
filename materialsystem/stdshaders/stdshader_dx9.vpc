@@ -27,6 +27,11 @@ $Configuration
 	{
 		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WINDOWS]
 	}
+
+	$Resources
+	{
+		$AdditionalIncludeDirectories		"$BASE;.\dx9"
+	}
 }
 
 $Project "stdshader_dx9"

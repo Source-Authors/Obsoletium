@@ -26,6 +26,11 @@ $Configuration
 	{
 		$AdditionalDependencies			"$BASE version.lib winmm.lib"
 	}
+
+	$Resources
+	{
+		$AdditionalIncludeDirectories		"$BASE;.\dx8"
+	}
 }
 
 

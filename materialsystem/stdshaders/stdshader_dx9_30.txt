@@ -18,7 +18,7 @@ emissive_scroll_blended_pass_vs20.fxc
 emissive_scroll_blended_pass_ps2x.fxc
 eye_refract_vs20.fxc
 eye_refract_ps2x.fxc
-Eyes_vs20.fxc
+eyes_vs20.fxc
 eyes_ps2x.fxc
 eyes_flashlight_vs20.fxc
 eyes_flashlight_ps2x.fxc

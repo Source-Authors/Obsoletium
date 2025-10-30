@@ -26,6 +26,11 @@ $Configuration
 	{
 		$AdditionalDependencies			"$BASE version.lib winmm.lib"	[$WINDOWS]
 	}
+
+	$Resources
+	{
+		$AdditionalIncludeDirectories		"$BASE;.\dbg"
+	}
 }
 
 $Project "stdshader_dbg"

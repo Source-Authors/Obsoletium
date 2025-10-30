@@ -25,6 +25,11 @@ $Configuration
 	{
 		$AdditionalDependencies			"$BASE odbc32.lib odbccp32.lib"
 	}
+	
+	$Resources
+	{
+		$AdditionalIncludeDirectories		"$BASE;.\dx6"
+	}
 }
 
 $Project "stdshader_dx6"
