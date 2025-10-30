@@ -179,19 +179,18 @@ void C_BaseAnimatingOverlay::GetRenderBounds( Vector& theMins, Vector& theMaxs )
 		if ( !pStudioHdr || !pStudioHdr->SequencesAvailable() )
 			return;
 
-		int nSequences = pStudioHdr->GetNumSeq();
+		intp nSequences = pStudioHdr->GetNumSeq();
 
-		int i;
-		for (i = 0; i < m_AnimOverlay.Count(); i++)
+		for ( auto &l : m_AnimOverlay )
 		{
-			if (m_AnimOverlay[i].m_flWeight > 0.0)
+			if ( l.m_flWeight > 0.0 )
 			{
-				if ( m_AnimOverlay[i].m_nSequence >= nSequences )
+				if ( l.m_nSequence >= nSequences )
 				{
 					continue;
 				}
 
-				mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( m_AnimOverlay[i].m_nSequence );
+				mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( l.m_nSequence );
 				VectorMin( seqdesc.bbmin, theMins, theMins );
 				VectorMax( seqdesc.bbmax, theMaxs, theMaxs );
 			}
@@ -291,41 +290,42 @@ void C_BaseAnimatingOverlay::CheckForLayerChanges( CStudioHdr *hdr, float curren
 void C_BaseAnimatingOverlay::AccumulateLayers( IBoneSetup &boneSetup, Vector pos[], Quaternion q[], float currentTime )
 {
 	BaseClass::AccumulateLayers( boneSetup, pos, q, currentTime );
-	int i;
 
 	// resort the layers
-	int layer[MAX_OVERLAYS];
-	for (i = 0; i < MAX_OVERLAYS; i++)
+	intp layer[MAX_OVERLAYS];
+	for (auto &l : layer)
 	{
-		layer[i] = MAX_OVERLAYS;
+		l = MAX_OVERLAYS;
 	}
-	for (i = 0; i < m_AnimOverlay.Count(); i++)
+	intp i = 0;
+	for (auto &l : m_AnimOverlay)
 	{
-		if (m_AnimOverlay[i].m_nOrder < MAX_OVERLAYS)
+		if (l.m_nOrder < MAX_OVERLAYS)
 		{
 			/*
 			Assert( layer[m_AnimOverlay[i].m_nOrder] == MAX_OVERLAYS );
 			layer[m_AnimOverlay[i].m_nOrder] = i;
 			*/
 			// hacky code until initialization of new layers is finished
-			if (layer[m_AnimOverlay[i].m_nOrder] != MAX_OVERLAYS)
+			if (layer[l.m_nOrder] != MAX_OVERLAYS)
 			{
-				m_AnimOverlay[i].m_nOrder = MAX_OVERLAYS;
+				l.m_nOrder = MAX_OVERLAYS;
 			}
 			else
 			{
-				layer[m_AnimOverlay[i].m_nOrder] = i;
+				layer[l.m_nOrder] = i;
 			}
 		}
+
+		++i;
 	}
 
 	CheckForLayerChanges( boneSetup.GetStudioHdr(), currentTime );
 
-	int nSequences = boneSetup.GetStudioHdr()->GetNumSeq();
+	intp nSequences = boneSetup.GetStudioHdr()->GetNumSeq();
 
 	// add in the overlay layers
-	int j;
-	for (j = 0; j < MAX_OVERLAYS; j++)
+	for (int j = 0; j < MAX_OVERLAYS; j++)
 	{
 		i = layer[ j ];
 		if (i < m_AnimOverlay.Count())
@@ -334,17 +334,6 @@ void C_BaseAnimatingOverlay::AccumulateLayers( IBoneSetup &boneSetup, Vector pos
 			{
 				continue;
 			}
-
-			/*
-			DevMsgRT( 1 , "%.3f  %.3f  %.3f\n", currentTime, fWeight, dadt );
-			debugoverlay->AddTextOverlay( GetAbsOrigin() + Vector( 0, 0, 64 ), -j - 1, 0, 
-				"%2d(%s) : %6.2f : %6.2f", 
-					m_AnimOverlay[i].m_nSequence,
-					hdr->pSeqdesc( m_AnimOverlay[i].m_nSequence )->pszLabel(),
-					m_AnimOverlay[i].m_flCycle, 
-					m_AnimOverlay[i].m_flWeight
-					);
-			*/
 
 			m_AnimOverlay[i].BlendWeight();
 
@@ -429,7 +418,7 @@ void C_BaseAnimatingOverlay::DoAnimationEvents( CStudioHdr *pStudioHdr )
 
 	MDLCACHE_CRITICAL_SECTION();
 
-	int nSequences = pStudioHdr->GetNumSeq();
+	intp nSequences = pStudioHdr->GetNumSeq();
 
 	BaseClass::DoAnimationEvents( pStudioHdr );
 
@@ -437,8 +426,7 @@ void C_BaseAnimatingOverlay::DoAnimationEvents( CStudioHdr *pStudioHdr )
 
 	CheckForLayerChanges( pStudioHdr, gpGlobals->curtime ); // !!!
 
-	int j;
-	for (j = 0; j < m_AnimOverlay.Count(); j++)
+	for (intp j = 0; j < m_AnimOverlay.Count(); j++)
 	{
 		if ( m_AnimOverlay[j].m_nSequence >= nSequences )
 		{
