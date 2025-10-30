@@ -1876,7 +1876,7 @@ void CBaseEntity::FireBullets( const FireBulletsInfo_t &info )
 			{
 				if ( tr.m_pEnt->IsPlayer() )
 				{
-					flActualDamage = iPlayerDamage;
+					flActualDamage = static_cast<float>(iPlayerDamage);
 				}
 #ifdef GAME_DLL
 				else if ( tr.m_pEnt->GetServerVehicle() )

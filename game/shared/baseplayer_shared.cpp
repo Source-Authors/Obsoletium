@@ -1971,7 +1971,7 @@ bool CBasePlayer::SetFOV( CBaseEntity *pRequester, int FOV, float zoomRate, int 
 	}
 	else
 	{
-		m_iFOVStart = GetFOV();
+		m_iFOVStart = static_cast<int>(GetFOV());
 	}
 
 	m_flFOVTime = gpGlobals->curtime;
