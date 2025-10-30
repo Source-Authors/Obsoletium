@@ -18,7 +18,7 @@ $Configuration
 	}
 }
 
-$Project "Client (DOD)"
+$Project "client (DOD)"
 {
 	$Folder	"Source Files"
 	{

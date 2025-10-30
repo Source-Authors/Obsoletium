@@ -23,7 +23,7 @@ $Configuration
 	}
 }
 
-$Project "Client (Portal)"
+$Project "client (Portal)"
 {
 	$Folder	"Source Files"
 	{

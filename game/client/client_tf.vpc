@@ -27,7 +27,7 @@ $Configuration
 	}
 }
 
-$Project "Client (TF)"
+$Project "client (TF)"
 {
 	$Folder "Source Files"
 	{

@@ -24,7 +24,7 @@ $Configuration
 	}
 }
 
-$Project "Server (Episodic)"
+$Project "server (Episodic)"
 {
 	$Folder	"Source Files"
 	{

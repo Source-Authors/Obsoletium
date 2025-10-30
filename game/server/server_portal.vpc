@@ -23,7 +23,7 @@ $Configuration
 	}
 }
 
-$Project "Server (Portal)"
+$Project "server (Portal)"
 {
 	$Folder	"Source Files"
 	{

@@ -23,7 +23,7 @@ $Configuration
 	}
 }
 
-$Project "Server (DoD)"
+$Project "server (DoD)"
 {
 	$Folder	"Source Files"
 	{

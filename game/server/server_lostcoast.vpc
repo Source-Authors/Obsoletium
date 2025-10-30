@@ -23,7 +23,7 @@ $Configuration
 	}
 }
 
-$Project "Server (LostCoast)"
+$Project "server (LostCoast)"
 {
 	$Folder	"Source Files"
 	{

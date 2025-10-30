@@ -18,7 +18,7 @@ $Configuration
 	}
 }
 
-$Project "Server (HL1MP)"
+$Project "server (HL1MP)"
 {
 	$Folder	"Source Files"
 	{
