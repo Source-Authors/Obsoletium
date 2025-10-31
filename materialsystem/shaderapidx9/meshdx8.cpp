@@ -64,8 +64,8 @@ static bool g_bDrawSelection = true;	// only used in DRAW_SELECTION
 #endif
 static unsigned short g_nScratchIndexBuffer[6]; // large enough for a fast quad; used when device is not active
 #ifdef _DEBUG
-int CVertexBuffer::s_BufferCount = 0;
-int CIndexBuffer::s_BufferCount = 0;
+std::atomic_int CVertexBuffer::s_BufferCount = 0;
+std::atomic_int CIndexBuffer::s_BufferCount = 0;
 #endif
 
 //-----------------------------------------------------------------------------

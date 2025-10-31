@@ -117,7 +117,7 @@ public:
 	static int BufferCount()
 	{
 #ifdef _DEBUG
-		return s_BufferCount;
+		return s_BufferCount.load(std::memory_order::memory_order_relaxed);
 #else
 		return 0;
 #endif
@@ -170,7 +170,7 @@ private:
 	CInterlockedInt	m_nReferenceCount;
 
 #ifdef _DEBUG
-	static int		s_BufferCount;
+	static std::atomic_int		s_BufferCount;
 #endif
 
 #ifdef RECORDING
@@ -228,7 +228,7 @@ inline CIndexBuffer::CIndexBuffer( IDirect3DDevice9Ex *pD3D, int count,
 #endif
 
 #ifdef _DEBUG
-	++s_BufferCount;
+	s_BufferCount.fetch_add(1, std::memory_order::memory_order_relaxed);
 #endif
 
 #ifdef CHECK_INDICES
@@ -365,7 +365,7 @@ inline CIndexBuffer::~CIndexBuffer()
 #ifdef _DEBUG
 	if ( !m_bExternalMemory )
 	{
-		--s_BufferCount;
+		s_BufferCount.fetch_sub(1, std::memory_order::memory_order_relaxed);
 	}
 #endif
 
