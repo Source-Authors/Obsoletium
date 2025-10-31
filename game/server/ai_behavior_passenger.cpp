@@ -1140,8 +1140,6 @@ bool CAI_PassengerBehavior::LocalIntervalMovement( float flInterval, bool &bMove
 
 		return false;
 	}
-
-	return false;
 }
 
 //-----------------------------------------------------------------------------
