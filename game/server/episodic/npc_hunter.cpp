@@ -4244,8 +4244,6 @@ Activity CNPC_Hunter::NPC_TranslateActivity( Activity baseAct )
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 {
-	Vector footPosition;
-	
 	if ( pEvent->event == AE_HUNTER_FOOTSTEP_LEFT )
 	{
 		LeftFootHit( pEvent->eventtime );
