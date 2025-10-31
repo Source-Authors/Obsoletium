@@ -263,7 +263,7 @@ void ReadUsercmd( bf_read *buf, CUserCmd *move, CUserCmd *from )
 
 	if ( buf->ReadOneBit() )
 	{
-		move->impulse = buf->ReadUBitLong( 8 );
+		move->impulse = static_cast<byte>(buf->ReadUBitLong( 8 ));
 	}
 
 
