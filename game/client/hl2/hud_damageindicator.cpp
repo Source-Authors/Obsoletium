@@ -199,7 +199,7 @@ void CHudDamageIndicator::DrawDamageIndicator(int side)
 		bHighDamage = true;
 	}
 
-	int r, g, b, a;
+	byte r, g, b, a;
 	if (side == 1)
 	{
 		if ( bHighDamage )
@@ -281,7 +281,7 @@ void CHudDamageIndicator::DrawFullscreenDamageIndicator()
 
 	CMeshBuilder meshBuilder;
 	meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );
-	int r = m_DmgFullscreenColor[0], g = m_DmgFullscreenColor[1], b = m_DmgFullscreenColor[2], a = m_DmgFullscreenColor[3];
+	byte r = m_DmgFullscreenColor[0], g = m_DmgFullscreenColor[1], b = m_DmgFullscreenColor[2], a = m_DmgFullscreenColor[3];
 
 	float wide = GetWide(), tall = GetTall();
 
