@@ -305,7 +305,7 @@ template<typename T>
 class CSimpleRingBuffer
 {
 public:
-	CSimpleRingBuffer( intp startSize = 4 )
+	CSimpleRingBuffer( unsigned short startSize = 4 )
 	{
 		m_pElements = 0;
 		m_maxElement = 0;
@@ -320,37 +320,35 @@ public:
 		m_pElements = NULL;
 	}
 
-	inline intp Count() const { return m_count; }
+	inline int Count() const { return m_count; }
 
-	intp Head() const { return (m_count>0) ? 0 : InvalidIndex(); }
+	int Head() const { return (m_count>0) ? 0 : InvalidIndex(); }
 
-	bool IsIdxValid( intp i ) const { return (i >= 0 && i < m_count) ? true : false; }
-	bool IsValidIndex(intp i) const { return IsIdxValid(i); }
-	static intp InvalidIndex() { return -1; }
+	bool IsIdxValid( int i ) const { return (i >= 0 && i < m_count) ? true : false; }
+	bool IsValidIndex(int i) const { return IsIdxValid(i); }
+	static int InvalidIndex() { return -1; }
 
-	T& operator[]( intp i ) 
+	T& operator[]( int i ) 
 	{ 
 		Assert( IsIdxValid(i) ); 
 		i += m_firstElement;
-		i = WrapRange(i);
-		return m_pElements[i];
+		return m_pElements[WrapRange(i)];
 	}
 
-	const T& operator[]( intp i ) const
+	const T& operator[]( int i ) const
 	{ 
 		Assert( IsIdxValid(i) ); 
 		i += m_firstElement;
-		i = WrapRange(i);
-		return m_pElements[i];
+		return m_pElements[WrapRange(i)];
 	}
 
-	void EnsureCapacity( intp capSize )
+	void EnsureCapacity( unsigned short capSize )
 	{
 		if ( capSize > m_maxElement )
 		{
-			intp newMax = m_maxElement + ((capSize+m_growSize-1)/m_growSize) * m_growSize;
+			unsigned short newMax = m_maxElement + ((capSize+m_growSize-1)/m_growSize) * m_growSize;
 			T *pNew = new T[newMax];
-			for ( intp i = 0; i < m_maxElement; i++ )
+			for ( unsigned short i = 0; i < m_maxElement; i++ )
 			{
 				// ------------
 				// If you wanted to make this a more generic container you'd probably want this code
@@ -367,24 +365,23 @@ public:
 		}
 	}
 
-	intp AddToHead()
+	int AddToHead()
 	{
 		EnsureCapacity( m_count + 1 );
-		intp i = m_firstElement + m_maxElement - 1;
+		int i = m_firstElement + m_maxElement - 1;
 		m_count++;
-		i = WrapRange(i);
-		m_firstElement = i;
+		m_firstElement = WrapRange(i);
 		return 0;
 	}
 
-	intp AddToHead( const T &elem )
+	int AddToHead( const T &elem )
 	{
 		AddToHead();
 		m_pElements[m_firstElement] = elem;
 		return 0;
 	}
 
-	intp AddToTail()
+	int AddToTail()
 	{
 		EnsureCapacity( m_count + 1 );
 		m_count++;
@@ -406,19 +403,19 @@ public:
 		}
 	}
 
-	void Truncate( intp newLength )
+	void Truncate( int newLength )
 	{
 		if ( newLength < m_count )
 		{
-			Assert(newLength>=0);
-			m_count = newLength;
+			Assert(newLength>=0 && newLength<=std::numeric_limits<decltype(m_count)>::max());
+			m_count = static_cast<decltype(m_count)>(newLength);
 		}
 	}
 
 private:
-	inline intp WrapRange( intp i ) const
+	inline unsigned short WrapRange( int i ) const
 	{
-		return ( i >= m_maxElement ) ? (i - m_maxElement) : i;
+		return static_cast<unsigned short>( ( i >= m_maxElement ) ? (i - m_maxElement) : i );
 	}
 
 	T *m_pElements;
@@ -489,7 +486,7 @@ public:
 	void SetHistoryValuesForItem( int item, Type& value );
 	void	SetLooping( bool looping, int iArrayIndex=0 );
 	
-	void SetMaxCount( int newmax );
+	void SetMaxCount( byte newmax );
 	int GetMaxCount() const;
 
 	// Get the time of the oldest entry.
@@ -699,7 +696,7 @@ template< typename Type, bool IS_ARRAY >
 inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::AddToHead( float changeTime, const Type* values, bool bFlushNewer )
 {
 	MEM_ALLOC_CREDIT_CLASS();
-	intp newslot;
+	int newslot;
 	
 	if ( bFlushNewer )
 	{
@@ -723,7 +720,7 @@ inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::AddToHead( float changeTi
 	else
 	{
 		newslot = m_VarHistory.AddToHead();
-		for ( intp i = 1; i < m_VarHistory.Count(); i++ )
+		for ( int i = 1; i < m_VarHistory.Count(); i++ )
 		{
 			if ( m_VarHistory[i].changetime <= changeTime )
 				break;
@@ -813,7 +810,7 @@ inline bool CInterpolatedVarArrayBase<Type, IS_ARRAY>::GetInterpolationInfo(
 	pInfo->frac = 0;
 	pInfo->oldest = pInfo->older = pInfo->newer = varHistory.InvalidIndex();
 	
-	for ( intp i = 0; i < varHistory.Count(); i++ )
+	for ( int i = 0; i < varHistory.Count(); i++ )
 	{
 		pInfo->older = i;
 		
@@ -1186,9 +1183,9 @@ inline void CInterpolatedVarArrayBase<Type, IS_ARRAY>::Copy( IInterpolatedVar *p
 	// Copy the entries.
 	m_VarHistory.RemoveAll();
 
-	for ( intp i = 0; i < pSrc->m_VarHistory.Count(); i++ )
+	for ( int i = 0; i < pSrc->m_VarHistory.Count(); i++ )
 	{
-		intp newslot = m_VarHistory.AddToTail();
+		int newslot = m_VarHistory.AddToTail();
 
 		CInterpolatedVarEntry *dest = &m_VarHistory[newslot];
 		CInterpolatedVarEntry *src	= &pSrc->m_VarHistory[i];
@@ -1276,12 +1273,12 @@ inline void	CInterpolatedVarArrayBase<Type, IS_ARRAY>::SetLooping( bool looping,
 }
 
 template< typename Type, bool IS_ARRAY >
-inline void	CInterpolatedVarArrayBase<Type, IS_ARRAY>::SetMaxCount( int newmax )
+inline void	CInterpolatedVarArrayBase<Type, IS_ARRAY>::SetMaxCount( byte newmax )
 {
 	bool changed = ( newmax != m_nMaxCount ) ? true : false;
 
 	// BUGBUG: Support 0 length properly?
-	newmax = MAX(1,newmax);
+	newmax = MAX(static_cast<byte>(1),newmax);
 
 	m_nMaxCount = newmax;
 	// Wipe everything any time this changes!!!
