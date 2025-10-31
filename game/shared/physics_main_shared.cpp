@@ -1961,8 +1961,8 @@ struct ThinkSync
 	{
 		thinktime = src.thinktime;
 		thinktick = src.thinktick;
-		int c = src.entities.Count();
-		for ( int i = 0; i < c; i++ )
+		intp c = src.entities.Count();
+		for ( intp i = 0; i < c; i++ )
 		{
 			entities.AddToTail( src.entities[ i ] );
 		}
@@ -2056,14 +2056,14 @@ private:
 			if ( !p )
 				continue;
 
-			int ecount = p->entities.Count();
+			intp ecount = p->entities.Count();
 			if ( !ecount )
 			{
 				continue;
 			}
 
-			Msg( "thinktime %f, %i entities\n", p->thinktime, ecount );
-			for ( int j =0; j < ecount; j++ )
+			Msg( "thinktime %f, %zi entities\n", p->thinktime, ecount );
+			for ( intp j =0; j < ecount; j++ )
 			{
 				EHANDLE h = p->entities[ j ];
 				int lastthinktick = 0;

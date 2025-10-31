@@ -427,7 +427,7 @@ IPhysicsObject *PhysModelCreateCustom( CBaseEntity *pEntity, const CPhysCollide 
 		PhysGetDefaultAABBSolid( tmpSolid );
 		pSolid = &tmpSolid;
 	}
-	int surfaceProp = physprops->GetSurfaceIndex( pSolid->surfaceprop );
+	intp surfaceProp = physprops->GetSurfaceIndex( pSolid->surfaceprop );
 	pSolid->params.pGameData = pEntity;
 	pSolid->params.pName = pName;
 	IPhysicsObject *pObject = NULL;
@@ -572,7 +572,7 @@ void PhysCreateVirtualTerrain( CBaseEntity *pWorld, const objectparams_t &defaul
 			solid.params.pGameData = pWorld;
 			V_sprintf_safe(nameBuf, "vdisp_%04d", i );
 			solid.params.pName = nameBuf;
-			int surfaceData = physprops->GetSurfaceIndex( "default" );
+			intp surfaceData = physprops->GetSurfaceIndex( "default" );
 			// create this as part of the world
 			IPhysicsObject *pObject = physenv->CreatePolyObjectStatic( pCollide, surfaceData, vec3_origin, vec3_angle, &solid.params );
 			pObject->SetCallbackFlags( pObject->GetCallbackFlags() | CALLBACK_NEVER_DELETED );

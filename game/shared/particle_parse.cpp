@@ -91,8 +91,8 @@ void ParseParticleEffects( bool bLoadSheets, bool bPrecache )
 	CUtlVector<CUtlString> files;
 	GetParticleManifest( files );
 
-	int nCount = files.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = files.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		g_pParticleSystemMgr->ReadParticleConfigFile( files[i], bPrecache, false );
 	}
@@ -213,7 +213,7 @@ void ParseParticleEffectsMap( const char *pMapName, bool bLoadSheets, IFileList 
 		return;
 	}
 
-	int nCount = files.Count();
+	intp nCount = files.Count();
 	if ( !nCount )
 	{
 		return;
@@ -221,7 +221,7 @@ void ParseParticleEffectsMap( const char *pMapName, bool bLoadSheets, IFileList 
 
 	g_pParticleSystemMgr->ShouldLoadSheets( bLoadSheets );
 
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		// If we've been given a list of particles to reload, only reload those.
 		if ( !pFilesToReload || (pFilesToReload && pFilesToReload->IsFileInList( files[i] )) )

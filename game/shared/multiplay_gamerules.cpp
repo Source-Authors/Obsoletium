@@ -1858,9 +1858,9 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		if ( iMenu < 0 || iMenu >= m_VoiceCommandMenus.Count() )
 			return false;
 
-		int iNumItems = m_VoiceCommandMenus.Element( iMenu ).Count();
+		intp iNumItems = m_VoiceCommandMenus.Element( iMenu ).Count();
 
-		for ( int i=0; i<iNumItems; i++ )
+		for ( intp i=0; i<iNumItems; i++ )
 		{
 			VoiceCommandMenuItem_t *pItem = &m_VoiceCommandMenus.Element( iMenu ).Element( i );
 

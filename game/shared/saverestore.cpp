@@ -821,7 +821,7 @@ bool CSave::WriteField( const char *pname, void *pData, datamap_t *pRootMap, typ
 int CSave::WriteFields( const char *pname, const void *pBaseData, datamap_t *pRootMap, typedescription_t *pFields, int fieldCount )
 {
 	typedescription_t *pTest;
-	int iHeaderPos = m_pData->GetCurPos();
+	intp iHeaderPos = m_pData->GetCurPos();
 	int count = -1;
 	WriteInt( pname, &count, 1 );
 
@@ -853,7 +853,7 @@ int CSave::WriteFields( const char *pname, const void *pBaseData, datamap_t *pRo
 	}
 
 	intp iCurPos = m_pData->GetCurPos();
-	int iRewind = iCurPos - iHeaderPos;
+	intp iRewind = iCurPos - iHeaderPos;
 	m_pData->Rewind( iRewind );
 	WriteInt( pname, &count, 1 );
 	iCurPos = m_pData->GetCurPos();
