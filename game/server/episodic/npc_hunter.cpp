@@ -5226,10 +5226,6 @@ Vector CNPC_Hunter::Weapon_ShootPosition( )
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType )
 {
-	Vector vecDir = tr.endpos - vecTracerSrc;
-
-	float flTracerDist = VectorNormalize(vecDir);
-
 	int nAttachment = LookupAttachment( "MiniGun" );
 
 	UTIL_Tracer( vecTracerSrc, tr.endpos, nAttachment, TRACER_FLAG_USEATTACHMENT, 5000, true, "HunterTracer" );
