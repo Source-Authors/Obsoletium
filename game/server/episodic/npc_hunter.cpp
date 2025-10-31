@@ -4245,7 +4245,6 @@ Activity CNPC_Hunter::NPC_TranslateActivity( Activity baseAct )
 void CNPC_Hunter::HandleAnimEvent( animevent_t *pEvent )
 {
 	Vector footPosition;
-	QAngle angles;
 	
 	if ( pEvent->event == AE_HUNTER_FOOTSTEP_LEFT )
 	{
@@ -5229,13 +5228,9 @@ Vector CNPC_Hunter::Weapon_ShootPosition( )
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::MakeTracer( const Vector &vecTracerSrc, const trace_t &tr, int iTracerType )
 {
-	float flTracerDist;
-	Vector vecDir;
-	Vector vecEndPos;
+	Vector vecDir = tr.endpos - vecTracerSrc;
 
-	vecDir = tr.endpos - vecTracerSrc;
-
-	flTracerDist = VectorNormalize( vecDir );
+	float flTracerDist = VectorNormalize(vecDir);
 
 	int nAttachment = LookupAttachment( "MiniGun" );
 
