@@ -195,7 +195,7 @@ void CHudSuitPower::Paint()
 	}
 	else
 	{
-		surface()->DrawPrintText(L"AUX POWER", ssize(L"AUX POWER") - 1);
+		surface()->DrawPrintText(L"AUX POWER", static_cast<int>(ssize(L"AUX POWER")) - 1);
 	}
 
 	if ( m_iActiveSuitDevices )
@@ -215,7 +215,7 @@ void CHudSuitPower::Paint()
 			}
 			else
 			{
-				surface()->DrawPrintText(L"OXYGEN", ssize(L"OXYGEN") - 1);
+				surface()->DrawPrintText(L"OXYGEN", static_cast<int>(ssize(L"OXYGEN")) - 1);
 			}
 			ypos += text2_gap;
 		}
@@ -232,7 +232,7 @@ void CHudSuitPower::Paint()
 			}
 			else
 			{
-				surface()->DrawPrintText(L"FLASHLIGHT", ssize(L"FLASHLIGHT") - 1);
+				surface()->DrawPrintText(L"FLASHLIGHT", static_cast<int>(ssize(L"FLASHLIGHT")) - 1);
 			}
 			ypos += text2_gap;
 		}
@@ -249,7 +249,7 @@ void CHudSuitPower::Paint()
 			}
 			else
 			{
-				surface()->DrawPrintText(L"SPRINT", ssize(L"SPRINT") - 1);
+				surface()->DrawPrintText(L"SPRINT", static_cast<int>(ssize(L"SPRINT")) - 1);
 			}
 			ypos += text2_gap;
 		}
