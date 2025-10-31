@@ -56,7 +56,7 @@ int g_iAlive = 1;
 static int s_ClearInputState = 0;
 
 // FIXME void V_Init( void );
-static int in_impulse = 0;
+static byte in_impulse = 0;
 static int in_cancel = 0;
 
 ConVar cl_anglespeedkey( "cl_anglespeedkey", "0.67", 0 );
@@ -523,7 +523,7 @@ void IN_Cancel( const CCommand &args )
 
 void IN_Impulse( const CCommand &args )
 {
-	in_impulse = atoi( args[1] );
+	in_impulse = static_cast<byte>( clamp( atoi( args[1] ), 0, (int)std::numeric_limits<byte>::max() ) );;
 }
 
 void IN_ScoreDown( const CCommand &args )
