@@ -591,8 +591,9 @@ float CAI_PassengerBehaviorZombie::GetEntryPointCost( const Vector &vecEntryPos 
 
 	// Scale our cost by how closely it matches our facing
 	float flDot = DotProduct( vecEntryDir, vecDir );
-	if ( flDot < 0.0f )
-		return FLT_MAX;
+	// dimhotepus: Dot product is never < 0.
+	// if (flDot < 0.0f)
+	//   return FLT_MAX;
 
 	flCost *= RemapValClamped( flDot, 1.0f, 0.0f, 1.0f, 2.0f );
 
