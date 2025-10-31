@@ -1070,6 +1070,7 @@ void CNPC_Advisor::RunTask( const Task_t *pTask )
 
 #endif
 
+#if NPC_ADVISOR_HAS_BEHAVIOR
 // helper function for testing whether or not an avisor is allowed to grab an object
 static bool AdvisorCanPickObject(CBasePlayer *pPlayer, CBaseEntity *pEnt)
 {
@@ -1095,7 +1096,7 @@ static bool AdvisorCanPickObject(CBasePlayer *pPlayer, CBaseEntity *pEnt)
 
 	return true;
 }
-
+#endif
 
 #if NPC_ADVISOR_HAS_BEHAVIOR
 //-----------------------------------------------------------------------------
