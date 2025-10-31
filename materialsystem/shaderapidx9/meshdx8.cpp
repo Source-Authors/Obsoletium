@@ -17,7 +17,7 @@
 #include "tier0/systeminformation.h"
 
 // fixme - stick this in a header file.
-#if defined( _DEBUG ) && !defined( _X360 )
+#if defined( _DEBUG )
 // define this if you want to range check all indices when drawing
 #define CHECK_INDICES
 #endif
@@ -2397,11 +2397,6 @@ inline D3DPRIMITIVETYPE ComputeMode( MaterialPrimitiveType_t type )
 {
 	switch(type)
 	{
-#ifdef _X360
-	case MATERIAL_INSTANCED_QUADS:
-		return D3DPT_QUADLIST;
-#endif
-
 	case MATERIAL_POINTS:
 		return D3DPT_POINTLIST;
 		
@@ -3165,11 +3160,7 @@ void CMeshDX8::SetVertexStreamState( int nVertOffsetInBytes )
 	}
 
 	// MESHFIXME: Make sure this jives between the mesh/ib/vb version.
-#ifdef _X360
-	if ( ( g_pLastVertex != m_pVertexBuffer ) || ( m_pVertexBuffer->IsDynamic() ) || ( g_nLastVertOffsetInBytes != nVertOffsetInBytes ) )
-#else
 	if ( ( g_pLastVertex != m_pVertexBuffer ) || ( g_nLastVertOffsetInBytes != nVertOffsetInBytes ) )
-#endif
 	{
 		Assert( m_pVertexBuffer );
 
@@ -5074,14 +5065,12 @@ void CMeshMgr::DestroyVertexBuffers()
 	RECORD_INT( 0 );
 	D3DSetStreamSource( 2, 0, 0, 0 );
 
-#ifndef _X360
 	RECORD_COMMAND( DX8_SET_STREAM_SOURCE, 4 );
 	RECORD_INT( -1 );
 	RECORD_INT( 3 );
 	RECORD_INT( 0 );
 	RECORD_INT( 0 );
 	D3DSetStreamSource( 3, 0, 0, 0 );
-#endif
 
 	for (int i = m_DynamicVertexBuffers.Count(); --i >= 0; )
 	{
