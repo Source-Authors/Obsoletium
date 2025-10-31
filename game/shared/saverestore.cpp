@@ -933,13 +933,14 @@ void CSave::BufferField( const char *pname, int size, const char *pdata )
 
 void CSave::WriteHeader( const char *pname, int size )
 {
-	short shortSize = size;
-	short hashvalue = m_pData->FindCreateSymbol( pname );
 	if ( size > SHRT_MAX || size < 0 )
 	{
 		Warning( "CSave::WriteHeader() size parameter exceeds 'short'!\n" );
 		Assert(0);
 	}
+
+	short shortSize = size;
+	short hashvalue = m_pData->FindCreateSymbol( pname );
 
 	BufferData( (const char *)&shortSize, sizeof(short) );
 	BufferData( (const char *)&hashvalue, sizeof(short) );
