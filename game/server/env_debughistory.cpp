@@ -103,10 +103,10 @@ void CDebugHistory::AddDebugHistoryLine( int iCategory, const char *szLine )
 
 	while ( iCharsToWrite )
 	{
-		int iCharsLeftBeforeLoop = sizeof(m_DebugLines[iCategory]) - (m_DebugLineEnd[iCategory] - m_DebugLines[iCategory]);
+		intp iCharsLeftBeforeLoop = sizeof(m_DebugLines[iCategory]) - (m_DebugLineEnd[iCategory] - m_DebugLines[iCategory]);
 
 		// Write into the buffer
-		int iWrote = MIN( iCharsToWrite, iCharsLeftBeforeLoop );
+		intp iWrote = MIN( iCharsToWrite, iCharsLeftBeforeLoop );
 		memcpy( m_DebugLineEnd[iCategory], pszRemaining, iWrote );	
 		m_DebugLineEnd[iCategory] += iWrote;
 		pszRemaining += iWrote;
