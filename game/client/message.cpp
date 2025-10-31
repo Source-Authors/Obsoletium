@@ -567,7 +567,7 @@ void CHudMessage::MessageDrawScan( client_textmessage_t *pMessage, float time )
 			m_parms.lineLength++;
 			if ( m_parms.lineLength > ssize(line)-1 )
 			{
-				m_parms.lineLength = ssize(line)-1;
+				m_parms.lineLength = static_cast<int>(ssize(line))-1;
 			}
 			pText++;
 		}

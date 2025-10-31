@@ -1104,7 +1104,7 @@ static void SetToneMapScale(IMatRenderContext *pRenderContext, float newvalue, f
 	{
 		float avg = 0.;
 		float sumweights = 0;
-		int sample_pt = ssize( s_MovingAverageToneMapScale ) / 2;
+		int sample_pt = static_cast<int>(ssize( s_MovingAverageToneMapScale )) / 2;
 		for( int i = 0;i < ssize( s_MovingAverageToneMapScale );i ++ )
 		{
 			float weight = abs( i - sample_pt ) * ( 1.0f / ( ssize( s_MovingAverageToneMapScale ) / 2 ));
