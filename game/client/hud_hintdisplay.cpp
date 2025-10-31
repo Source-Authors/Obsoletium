@@ -230,7 +230,7 @@ void CHudHintDisplay::PerformLayout()
 	// now lay out the sub-labels
 	for ( i=0; i<m_Labels.Count(); ++i )
 	{
-		int xOffset = (wide - m_Labels[i]->GetWide()) * 0.5;
+		int xOffset = (wide - m_Labels[i]->GetWide()) / 2;
 		m_Labels[i]->SetPos( xOffset, y + m_iTextY + i*fontTall );
 	}
 }
