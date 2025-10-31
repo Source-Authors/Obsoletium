@@ -113,9 +113,9 @@ void CInput::ApplySteamControllerCameraMove( QAngle& viewangles, CUserCmd *cmd, 
 	}		
 
 	// Finally, add mouse state to usercmd.
-	// NOTE:  Does rounding to int cause any issues?  ywb 1/17/04
-	cmd->mousedx = (int)vecPosition.x;
-	cmd->mousedy = (int)vecPosition.y;
+	// NOTE:  Does rounding to short cause any issues?  ywb 1/17/04
+	cmd->mousedx = (short)vecPosition.x;
+	cmd->mousedy = (short)vecPosition.y;
 }
 
 #define CONTROLLER_ACTION_FLAGS_NONE 0
