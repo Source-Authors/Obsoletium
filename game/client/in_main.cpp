@@ -1376,9 +1376,9 @@ bool CInput::WriteUsercmdDeltaToBuffer( bf_write *buf, int from, int to, bool is
 
 	if ( buf->IsOverflowed() )
 	{
-		int endbit = buf->GetNumBitsWritten();
+		intp endbit = buf->GetNumBitsWritten();
 
-		Msg( "WARNING! User command buffer overflow(%i %i), last cmd was %i bits long\n",
+		Msg( "WARNING! User command buffer overflow(%i %i), last cmd was %zi bits long\n",
 			from, to,  endbit - startbit );
 
 		return false;

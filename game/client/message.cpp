@@ -1024,8 +1024,8 @@ void CHudMessage::PaintCharacters()
 	int xpos = 0, ypos = 0;
 	vgui::surface()->DrawSetTextFont( m_hFont );
 
-	int messageCount = m_Messages.Count();
-	for ( int i = 0 ; i < messageCount; ++i )
+	intp messageCount = m_Messages.Count();
+	for ( intp i = 0 ; i < messageCount; ++i )
 	{
 		message_t *msg = &m_Messages[ i ];
 

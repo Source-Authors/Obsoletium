@@ -861,7 +861,7 @@ struct ragdoll_memory_list_t
 			return;
 		}
 
-		for ( int i = list.Count()-1; i >= 0; --i )
+		for ( intp i = list.Count()-1; i >= 0; --i )
 		{
 			if ( list[i].tickCount != gpGlobals->tickcount )
 			{
@@ -872,7 +872,7 @@ struct ragdoll_memory_list_t
 
 	bool IsInList( C_BaseEntity *pRagdoll )
 	{
-		for ( int i = list.Count()-1; i >= 0; --i )
+		for ( intp i = list.Count()-1; i >= 0; --i )
 		{
 			if ( list[i].ragdoll == pRagdoll )
 				return true;

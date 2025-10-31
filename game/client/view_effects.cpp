@@ -364,8 +364,8 @@ void CViewEffects::ApplyShake( Vector& origin, QAngle& angles, float factor )
 //-----------------------------------------------------------------------------
 void CViewEffects::ClearAllShakes()
 {
-	int nShakeCount = m_ShakeList.Count();
-	for ( int i = 0; i < nShakeCount; i++ )
+	intp nShakeCount = m_ShakeList.Count();
+	for ( intp i = 0; i < nShakeCount; i++ )
 	{
 		delete m_ShakeList.Element( i );
 	}
@@ -384,8 +384,8 @@ screenshake_t *CViewEffects::FindLongestShake()
 {
 	screenshake_t *pLongestShake = NULL;
 
-	int nShakeCount = m_ShakeList.Count();
-	for ( int i = 0; i < nShakeCount; i++ )
+	intp nShakeCount = m_ShakeList.Count();
+	for ( intp i = 0; i < nShakeCount; i++ )
 	{
 		screenshake_t *pShake = m_ShakeList.Element( i );
 		if ( pShake && ( !pLongestShake || ( pShake->duration > pLongestShake->duration ) ) )

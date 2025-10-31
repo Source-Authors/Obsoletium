@@ -271,8 +271,8 @@ void CHudMenu::ProcessText( void )
 	m_nMaxPixels = 0;
 	m_nHeight = 0;
 
-	int i = 0;
-	int startpos = i;
+	intp i = 0;
+	intp startpos = i;
 	int menuitem = 0;
 	while ( i < MAX_MENU_STRING  )
 	{
@@ -334,7 +334,7 @@ void CHudMenu::ProcessText( void )
 	}
 
 	// Now compute pixels needed
-	int c = m_Processed.Count();
+	intp c = m_Processed.Count();
 	for ( i = 0; i < c; i++ )
 	{
 		ProcessedLine *l = &m_Processed[ i ];

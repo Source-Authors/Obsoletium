@@ -195,7 +195,7 @@ public:
 	{
 		list.RemoveAll();
 
-		int selCount = m_pList->GetSelectedItemsCount();
+		intp selCount = m_pList->GetSelectedItemsCount();
 		if ( selCount <= 0 )
 		{
 			return;

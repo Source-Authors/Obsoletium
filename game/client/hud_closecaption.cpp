@@ -1206,8 +1206,8 @@ void CHudCloseCaption::OnTick( void )
 
 	float dt = gpGlobals->frametime;
 
-	int c = m_Items.Count();
-	int i;
+	intp c = m_Items.Count();
+	intp i;
 
 	if ( m_bVisibleDueToDirect )
 	{
@@ -1554,7 +1554,7 @@ void CHudCloseCaption::Process( const wchar_t *stream, float duration, const cha
 				continue;
 			}
 
-			int copychars = curpos - prevpos;
+			intp copychars = curpos - prevpos;
 			while ( --copychars >= 0 )
 			{
 				*out++ = *prevpos++;
@@ -1794,7 +1794,7 @@ void CHudCloseCaption::ComputeStreamWork( int available_width, CCloseCaptionItem
 			if ( most_recent_space && curpos >= most_recent_space + 1 )
 			{
 				// Roll back to previous space character if there is one...
-				int goback = curpos - most_recent_space - 1;
+				intp goback = curpos - most_recent_space - 1;
 				params.out -= ( goback + 1 );
 				params.width = most_recent_space_w;
 				
@@ -1971,8 +1971,8 @@ public:
 
 	~CAsyncCaption()
 	{
-		int c = m_Tokens.Count();
-		for ( int i = 0; i < c; ++i )
+		intp c = m_Tokens.Count();
+		for ( intp i = 0; i < c; ++i )
 		{
 			delete m_Tokens[ i ];
 		}
@@ -1982,8 +1982,8 @@ public:
 	void StartRequesting( CHudCloseCaption *hudCloseCaption, CUtlVector< AsyncCaption_t >& directories )
 	{
 		// Issue pending async requests for each token in string
-		int c = m_Tokens.Count();
-		for ( int i = 0; i < c; ++i )
+		intp c = m_Tokens.Count();
+		for ( intp i = 0; i < c; ++i )
 		{
 			caption_t *caption = m_Tokens[ i ];
 			Assert( !caption->stream );
@@ -1998,8 +1998,8 @@ public:
 
 	void OnDataArrived( CUtlVector< AsyncCaption_t >& directories, int nFileIndex, int nBlockNum, AsyncCaptionData_t *pData )
 	{
-		int c = m_Tokens.Count();
-		for ( int i = 0; i < c; ++i )
+		intp c = m_Tokens.Count();
+		for ( intp i = 0; i < c; ++i )
 		{
 			caption_t *caption = m_Tokens[ i ];
 			if ( caption->stream != NULL )
@@ -2024,8 +2024,8 @@ public:
 
 	void ProcessAsyncWork( CHudCloseCaption *hudCloseCaption, CUtlVector< AsyncCaption_t >& directories )
 	{
-		int c = m_Tokens.Count();
-		for ( int i = 0; i < c; ++i )
+		intp c = m_Tokens.Count();
+		for ( intp i = 0; i < c; ++i )
 		{
 			caption_t *caption = m_Tokens[ i ];
 			if ( caption->stream != NULL )
@@ -2097,7 +2097,7 @@ public:
 		intp dc = directories.Count();
 		int fileindex = RandomInt( 0, dc - 1 );
 
-		int c = directories[ fileindex ].m_CaptionDirectory.Count();
+		intp c = directories[ fileindex ].m_CaptionDirectory.Count();
 		int idx = RandomInt( 0, c - 1 );
 
 		caption_t *caption = new caption_t;

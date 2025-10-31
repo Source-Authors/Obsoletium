@@ -510,8 +510,8 @@ void CLCD::ShowItems_R( CLCDPage *page, unsigned int dwCurTime, CUtlVector< CLCD
 					int subPage = 0;
 					int spItems = 0;
 
-					int ecount = validIndices.Count();
-					for ( int e = 0; e < ecount; ++e )
+					intp ecount = validIndices.Count();
+					for ( intp e = 0; e < ecount; ++e )
 					{
 						// Now fixup any strings
 						int index = validIndices[ e ];
@@ -521,7 +521,7 @@ void CLCD::ShowItems_R( CLCDPage *page, unsigned int dwCurTime, CUtlVector< CLCD
 						V_to_chars( s2, index + 1 );
 						
 						// Now replace "playerindex" with the index as needed
-						for( int r = 0; r < ag->m_Definition.Count(); ++r )
+						for( intp r = 0; r < ag->m_Definition.Count(); ++r )
 						{
 							CLCDItem *newItem = NULL;
 
