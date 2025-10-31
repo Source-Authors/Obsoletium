@@ -109,7 +109,7 @@ void CHudHDRDemo::Paint()
 		{
 			iLength += vgui::surface()->GetCharacterWidth( hFont, *wch );
 		}
-		vgui::surface()->DrawSetTextPos( floor(wide * 0.25) - (iLength / 2), m_iLeftY );
+		vgui::surface()->DrawSetTextPos( wide / 4 - (iLength / 2), m_iLeftY );
 		vgui::surface()->DrawPrintText(tempString, V_wcslen(tempString));
 	}
 
@@ -122,7 +122,7 @@ void CHudHDRDemo::Paint()
 		{
 			iLength += vgui::surface()->GetCharacterWidth( hFont, *wch );
 		}
- 		vgui::surface()->DrawSetTextPos( ceil(wide * 0.75) - (iLength / 2), m_iRightY );
+ 		vgui::surface()->DrawSetTextPos( wide * 3 / 4 - (iLength / 2), m_iRightY );
 		vgui::surface()->DrawPrintText(tempString, V_wcslen(tempString));
 	}
 	
