@@ -2335,7 +2335,8 @@ int CTempEnts::AddVisibleTempEntity( C_LocalTempEntity *pEntity )
 
 		return 1;
 	}
-	return 0;
+	// dimhotepus: Comment unreachable code.
+	//return 0;
 }
 
 //-----------------------------------------------------------------------------
