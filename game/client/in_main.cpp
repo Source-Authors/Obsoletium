@@ -1338,7 +1338,7 @@ bool CInput::WriteUsercmdDeltaToBuffer( bf_write *buf, int from, int to, bool is
 
 	CUserCmd *f, *t;
 
-	int startbit = buf->GetNumBitsWritten();
+	intp startbit = buf->GetNumBitsWritten();
 
 	if ( from == -1 )
 	{
