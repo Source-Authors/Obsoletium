@@ -209,7 +209,7 @@ void CAvatarImage::UpdateFriendStatus( void )
 //-----------------------------------------------------------------------------
 void CAvatarImage::InitFromRGBA( int iAvatar, const byte *rgba, int width, int height )
 {
-	int iTexIndex = s_AvatarImageCache.Find( AvatarImagePair_t( m_SteamID, iAvatar ) );
+	auto iTexIndex = s_AvatarImageCache.Find( AvatarImagePair_t( m_SteamID, iAvatar ) );
 	if ( iTexIndex == s_AvatarImageCache.InvalidIndex() )
 	{
 		m_iTextureID = vgui::surface()->CreateNewTextureID( true );
