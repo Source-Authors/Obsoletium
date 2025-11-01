@@ -3854,11 +3854,13 @@ void CGameMovement::CategorizePosition( void )
 			// If our gamematerial has changed, tell any player surface triggers that are watching
 			IPhysicsSurfaceProps *surfphysprops = MoveHelper()->GetSurfaceProps();
 			surfacedata_t *pSurfaceProp = surfphysprops->GetSurfaceData( pm.surface.surfaceProps );
-			char cCurrGameMaterial = pSurfaceProp->game.material;
+			unsigned short cCurrGameMaterial = pSurfaceProp->game.material;
 			if ( !player->GetGroundEntity() )
 			{
 				cCurrGameMaterial = 0;
 			}
+
+			Assert(cCurrGameMaterial <= std::numeric_limits<decltype(player->m_chPreviousTextureType)>::max());
 
 			// Changed?
 			if ( player->m_chPreviousTextureType != cCurrGameMaterial )

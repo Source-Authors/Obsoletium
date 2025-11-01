@@ -1554,7 +1554,9 @@ void CBaseServerVehicle::ProcessMovement( CBasePlayer *pPlayer, CMoveData *pMove
 	// If our gamematerial has changed, tell any player surface triggers that are watching
 	IPhysicsSurfaceProps *pPhysprops = MoveHelper()->GetSurfaceProps();
 	const surfacedata_t *pSurfaceProp = pPhysprops->GetSurfaceData( tr.surface.surfaceProps );
-	char cCurrGameMaterial = pSurfaceProp->game.material;
+	unsigned short cCurrGameMaterial = pSurfaceProp->game.material;
+
+	Assert(cCurrGameMaterial <= std::numeric_limits<decltype(m_chPreviousTextureType)>::max());
 
 	// Changed?
 	if ( m_chPreviousTextureType != cCurrGameMaterial )
