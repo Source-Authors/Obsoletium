@@ -216,16 +216,16 @@ void UpdateQueryCache( void )
 	// parallel process all hash chains
 	QueryCacheUpdateRecord_t workList[N_WAYS_TO_SPLIT_CACHE_UPDATE];
 	int nCurEntry = 0;
-	for( int i =0 ; i < N_WAYS_TO_SPLIT_CACHE_UPDATE; i++ )
+	for( int i = 0; i < N_WAYS_TO_SPLIT_CACHE_UPDATE; i++ )
 	{
 		workList[i].m_nStartHashChain = nCurEntry;
 
 		if ( i != N_WAYS_TO_SPLIT_CACHE_UPDATE -1 )
-			workList[i].m_nNumHashChainsToUpdate = ssize( s_HashChains ) / N_WAYS_TO_SPLIT_CACHE_UPDATE;
+			workList[i].m_nNumHashChainsToUpdate = static_cast<int>( ssize( s_HashChains ) ) / N_WAYS_TO_SPLIT_CACHE_UPDATE;
 		else
-			workList[i].m_nNumHashChainsToUpdate = ssize( s_HashChains ) - nCurEntry;
+			workList[i].m_nNumHashChainsToUpdate = static_cast<int>( ssize( s_HashChains ) ) - nCurEntry;
 
-		nCurEntry += ssize( s_HashChains ) / N_WAYS_TO_SPLIT_CACHE_UPDATE;
+		nCurEntry += static_cast<int>( ssize( s_HashChains ) ) / N_WAYS_TO_SPLIT_CACHE_UPDATE;
 	}
 	ParallelProcess( "ProcessQueryCacheUpdate", workList, N_WAYS_TO_SPLIT_CACHE_UPDATE, ProcessQueryCacheUpdate, PreUpdateQueryCache, PostUpdateQueryCache, ( sv_disable_querycache.GetBool() ) ? 0 : INT_MAX );
 	// now, we need to take all of the obsolete cache entries each thread generated and add them to
