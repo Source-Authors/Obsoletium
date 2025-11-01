@@ -898,7 +898,7 @@ bool CFire::GetFireDimensions( Vector *pFireMins, Vector *pFireMaxs )
 	}
 
 	float scale = m_flHeatLevel / m_flMaxHeat;
-	float damageRadius = scale * m_flFireSize * FIRE_WIDTH / FIRE_HEIGHT * 0.5;	
+	float damageRadius = scale * m_flFireSize * FIRE_WIDTH / FIRE_HEIGHT * 0.5f;
 
 	damageRadius *= FIRE_SPREAD_DAMAGE_MULTIPLIER; //FIXME: Trying slightly larger radius for burning
 
@@ -1370,10 +1370,10 @@ void CEnvFireSensor::Think()
 	if ( !m_bEnabled )
 		return;
 
-	float time = m_targetTime * 0.25;
-	if ( time < 0.1 )
+	float time = m_targetTime * 0.25f;
+	if ( time < 0.1f )
 	{
-		time = 0.1;
+		time = 0.1f;
 	}
 	SetNextThink( gpGlobals->curtime + time );
 

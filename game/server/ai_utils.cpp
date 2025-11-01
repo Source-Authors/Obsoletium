@@ -299,7 +299,7 @@ float CAI_AccelDecay::Update( float flCurrent, float flTarget, float flInterval 
 			}
 		}
 
-		float newValue = flCurrent + (curVelocity + m_velocity) * 0.5 * flInterval;
+		float newValue = flCurrent + (curVelocity + m_velocity) * 0.5f * flInterval;
 		return newValue;
 	}
 

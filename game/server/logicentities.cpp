@@ -2392,7 +2392,7 @@ class CLogicActiveAutosave : public CLogicAutosave
 			}
 		}
 
-		float thinkInterval = ( m_flStartTime < 0 ) ? 1.0 : 0.5;
+		float thinkInterval = ( m_flStartTime < 0 ) ? 1.0f : 0.5f;
 		SetNextThink( gpGlobals->curtime + thinkInterval );
 	}
 

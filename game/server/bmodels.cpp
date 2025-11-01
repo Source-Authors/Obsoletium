@@ -975,7 +975,7 @@ void CFuncRotating::SpinUpMove( void )
 	// Calculate our new speed.
 	//
 	bool bSpinUpDone = false;
-	float flNewSpeed = fabs( m_flSpeed ) + 0.2 * m_flMaxSpeed * m_flFanFriction;
+	float flNewSpeed = fabs( m_flSpeed ) + 0.2f * m_flMaxSpeed * m_flFanFriction;
 	if ( fabs( flNewSpeed ) >=  fabs( m_flTargetSpeed ) )
 	{
 		// Reached our target speed.
@@ -1017,7 +1017,7 @@ bool CFuncRotating::SpinDown( float flTargetSpeed )
 	// Bleed off a little speed due to friction.
 	//
 	bool bSpinDownDone = false;
-	float flNewSpeed = fabs( m_flSpeed ) - 0.1 * m_flMaxSpeed * m_flFanFriction;
+	float flNewSpeed = fabs( m_flSpeed ) - 0.1f * m_flMaxSpeed * m_flFanFriction;
 	if ( flNewSpeed < 0 )
 	{
 		flNewSpeed = 0;

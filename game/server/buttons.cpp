@@ -1322,7 +1322,7 @@ void CMomentaryRotButton::Use( CBaseEntity *pActivator, CBaseEntity *pCaller, US
 		if ( OnUseLocked( pActivator ) && HasSpawnFlags( SF_BUTTON_JIGGLE_ON_USE_LOCKED ) )
 		{
 			// Jiggle two degrees.
-			float flDist = 2.0 / m_flMoveDistance;
+			float flDist = 2.0f / m_flMoveDistance;
 
 			// Must be first!
 			g_EventQueue.AddEvent( this, "_DisableUpdateTarget", 0, this, this );

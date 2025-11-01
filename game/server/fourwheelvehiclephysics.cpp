@@ -28,7 +28,7 @@
 #define DUST_SPEED			5		// speed at which dust starts
 #define REAR_AXLE			1		// indexes of axlex
 #define	FRONT_AXLE			0
-#define MAX_GUAGE_SPEED		100.0	// 100 mph is max speed shown on guage
+#define MAX_GUAGE_SPEED		100.0f	// 100 mph is max speed shown on guage
 
 #define BRAKE_MAX_VALUE				1.0f
 #define BRAKE_BACK_FORWARD_SCALAR	2.0f

@@ -851,7 +851,7 @@ AI_Waypoint_t *CAI_Pathfinder::BuildComplexRoute( Navigation_t navType, const Ve
 	AI_PROFILE_SCOPE( CAI_Pathfinder_BuildComplexRoute );
 	
 	float flTotalDist = ComputePathDistance( navType, vStart, vEnd );
-	if ( flTotalDist < 0.0625 )
+	if ( flTotalDist < 0.0625f )
 	{
 		return new AI_Waypoint_t( vEnd, flYaw, navType, endFlags, nodeID );
 	}

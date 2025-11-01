@@ -775,12 +775,12 @@ void CAI_PlayerAlly::PostSpeakDispatchResponse( AIConcept_t concept, AI_Response
 		// Set the input parameter to the random number we used to find the Question
 		variant_t value;
 		value.SetInt( m_iQARandomNumber );
-		g_EventQueue.AddEvent( GetSpeechTarget(), pszInput, value, duration + .2, this, this );
+		g_EventQueue.AddEvent( GetSpeechTarget(), pszInput, value, duration + .2f, this, this );
 
 		if ( GetSpeechTarget()->MyNPCPointer() )
 		{
-			AddLookTarget( GetSpeechTarget()->MyNPCPointer(), 1.0, duration + random->RandomFloat( 0.4, 1.2 ), 0.5 );
-			GetSpeechTarget()->MyNPCPointer()->AddLookTarget( this, 1.0, duration + random->RandomFloat( 0.4, 1 ), 0.7 );
+			AddLookTarget( GetSpeechTarget()->MyNPCPointer(), 1.0f, duration + random->RandomFloat( 0.4f, 1.2f ), 0.5f );
+			GetSpeechTarget()->MyNPCPointer()->AddLookTarget( this, 1.0f, duration + random->RandomFloat( 0.4f, 1 ), 0.7f );
 		}
 
 		// Don't let anyone else butt in.

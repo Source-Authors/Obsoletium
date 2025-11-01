@@ -135,10 +135,10 @@ Vector VecCheckToss( CBaseEntity *pEntity, ITraceFilter *pFilter, Vector vecSpot
 	float distance2 = (vecMidPoint.z - vecSpot2.z);
 
 	// How long will it take for the object to travel this distance
-	float time1 = sqrt( distance1 / (0.5 * flGravity) );
-	float time2 = sqrt( distance2 / (0.5 * flGravity) );
+	float time1 = sqrt( distance1 / (0.5f * flGravity) );
+	float time2 = sqrt( distance2 / (0.5f * flGravity) );
 
-	if (time1 < 0.1)
+	if (time1 < 0.1f)
 	{
 		// too close
 		return vec3_origin;

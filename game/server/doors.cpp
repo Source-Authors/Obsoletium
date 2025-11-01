@@ -107,7 +107,7 @@ END_SEND_TABLE()
 
 #define DOOR_SENTENCEWAIT	6
 #define DOOR_SOUNDWAIT		1
-#define BUTTON_SOUNDWAIT	0.5
+#define BUTTON_SOUNDWAIT	0.5f
 
 
 //-----------------------------------------------------------------------------

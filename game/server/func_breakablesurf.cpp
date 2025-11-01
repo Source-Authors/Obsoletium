@@ -980,7 +980,7 @@ void CBreakableSurface::BreakThink(void)
 	// ----------------------------------------------------
 	//  Set support and break inadequately supported panes
 	// ----------------------------------------------------
-	float flBreakValue = WINDOW_BREAK_SUPPORT*(m_nFragility/100.0);
+	float flBreakValue = WINDOW_BREAK_SUPPORT*(m_nFragility/100.0f);
 	for (w=0;w<m_nNumWide;w++)
 	{
 		for (int h=0;h<m_nNumHigh;h++)
