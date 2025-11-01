@@ -232,12 +232,10 @@ void CBaseFlex::RemoveChoreoScene( CChoreoScene *scene, bool canceled )
 
 int CBaseFlex::GetScenePriority( CChoreoScene *scene )
 {
-	int iPriority = 0;
-	int c = m_ActiveChoreoScenes.Count();
+	intp iPriority = 0;
 	// count number of channels in scenes older than current
-	for ( int i = 0; i < c; i++ )
+	for ( auto *pScene : m_ActiveChoreoScenes )
 	{
-		CChoreoScene *pScene = m_ActiveChoreoScenes[ i ];
 		if ( !pScene )
 		{
 			continue;
@@ -565,8 +563,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 		char szEndLoop[CEventAbsoluteTag::MAX_EVENTTAG_LENGTH] = { "end" };
 
 		// check in the tag indexes
-		KeyValues *pkvFaceposer;
-		for ( pkvFaceposer = pkvAllFaceposer->GetFirstSubKey(); pkvFaceposer; pkvFaceposer = pkvFaceposer->GetNextKey() )
+		for ( KeyValues *pkvFaceposer = pkvAllFaceposer->GetFirstSubKey(); pkvFaceposer; pkvFaceposer = pkvFaceposer->GetNextKey() )
 		{
 			if (!stricmp( pkvFaceposer->GetName(), "startloop" ))
 			{
@@ -578,8 +575,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 			}
 		}
 
-		CEventAbsoluteTag *ptag;
-		ptag = event->FindAbsoluteTag( CChoreoEvent::ORIGINAL, szStartLoop );
+		CEventAbsoluteTag *ptag = event->FindAbsoluteTag( CChoreoEvent::ORIGINAL, szStartLoop );
 		if (ptag)
 		{
 			ptag->SetLinear( true );
@@ -608,8 +604,7 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 			mstudioanimdesc_t &animdesc = pstudiohdr->pAnimdesc( pstudiohdr->iRelativeAnim( info->m_nSequence, seqdesc.anim(0,0) ) );
 
 			// check in the tag indexes
-			KeyValues *pkvFaceposer;
-			for ( pkvFaceposer = pkvAllFaceposer->GetFirstSubKey(); pkvFaceposer; pkvFaceposer = pkvFaceposer->GetNextKey() )
+			for ( KeyValues *pkvFaceposer = pkvAllFaceposer->GetFirstSubKey(); pkvFaceposer; pkvFaceposer = pkvFaceposer->GetNextKey() )
 			{
 				if (!stricmp( pkvFaceposer->GetName(), "tags" ))
 				{
