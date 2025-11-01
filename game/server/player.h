@@ -41,12 +41,13 @@ class CPlayerCmdInfo
 {
 public:
 	CPlayerCmdInfo() : 
-	  m_flTime( 0.0f ), m_nNumCmds( 0 ), m_nDroppedPackets( 0 )
+	  m_flTime( 0.0 ), m_nNumCmds( 0 ), m_nDroppedPackets( 0 )
 	{
 	}
 
 	// realtime of sample
-	float		m_flTime;
+	// dimhotepus: float -> double.
+	double		m_flTime;
 	// # of CUserCmds in this update
 	int			m_nNumCmds;
 	// # of dropped packets on the link
@@ -57,12 +58,13 @@ class CPlayerSimInfo
 {
 public:
 	CPlayerSimInfo() : 
-	  m_flTime( 0.0f ), m_nNumCmds( 0 ), m_nTicksCorrected( 0 ), m_flFinalSimulationTime( 0.0f ), m_flGameSimulationTime( 0.0f ), m_flServerFrameTime( 0.0f ), m_vecAbsOrigin( 0, 0, 0 )
+	  m_flTime( 0.0 ), m_nNumCmds( 0 ), m_nTicksCorrected( 0 ), m_flFinalSimulationTime( 0.0f ), m_flGameSimulationTime( 0.0f ), m_flServerFrameTime( 0.0f ), m_vecAbsOrigin( 0, 0, 0 )
 	{
 	}
 
 	// realtime of sample
-	float		m_flTime;
+	// dimhotepus: float -> double.
+	double		m_flTime;
 	// # of CUserCmds in this update
 	int			m_nNumCmds;
 	// If clock needed correction, # of ticks added/removed

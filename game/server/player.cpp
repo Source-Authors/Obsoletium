@@ -3592,7 +3592,7 @@ void CBasePlayer::DumpPerfToRecipient( CBasePlayer *pRecipient, int nMaxRecords 
 		}
 
 		char line[ 128 ];
-		int len = Q_snprintf( line, sizeof( line ), "%.3f %d %d %.3f %.3f vel %.2f\n",
+		int len = Q_snprintf( line, sizeof( line ), "%.3lf %d %d %.3f %.3f vel %.2f\n",
 			pi->m_flTime,
 			pi->m_nNumCmds,
 			pi->m_nTicksCorrected,
@@ -3602,7 +3602,7 @@ void CBasePlayer::DumpPerfToRecipient( CBasePlayer *pRecipient, int nMaxRecords 
 
 		if ( curpos + len > 200 )
 		{
-			ClientPrint( pRecipient, HUD_PRINTCONSOLE, (char const *)buf );
+			ClientPrint( pRecipient, HUD_PRINTCONSOLE, buf );
 			buf[ 0 ] = 0;
 			curpos = 0;
 		}
@@ -3631,14 +3631,14 @@ void CBasePlayer::DumpPerfToRecipient( CBasePlayer *pRecipient, int nMaxRecords 
 		const CPlayerCmdInfo *pi = &m_vecPlayerCmdInfo[ i ];
 
 		char line[ 128 ];
-		int len = Q_snprintf( line, sizeof( line ), "%.3f %d %d\n",
+		int len = Q_snprintf( line, sizeof( line ), "%.3lf %d %d\n",
 			pi->m_flTime,
 			pi->m_nNumCmds,
 			pi->m_nDroppedPackets );
 
 		if ( curpos + len > 200 )
 		{
-			ClientPrint( pRecipient, HUD_PRINTCONSOLE, (char const *)buf );
+			ClientPrint( pRecipient, HUD_PRINTCONSOLE, buf );
 			buf[ 0 ] = 0;
 			curpos = 0;
 		}
