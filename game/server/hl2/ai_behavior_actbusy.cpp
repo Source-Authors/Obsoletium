@@ -97,9 +97,9 @@ public:
 	bool ParseActBusyFromKV( busyanim_t *pAnim, KeyValues *pSection );
 
 	// Purpose: Returns the index of the busyanim data for the specified activity or sequence
-	int FindBusyAnim( Activity iActivity, const char *pSequence );
+	intp FindBusyAnim( Activity iActivity, const char *pSequence );
 
-	busyanim_t *GetBusyAnim( int iIndex ) { return &m_ActBusyAnims[iIndex]; }
+	busyanim_t *GetBusyAnim( intp iIndex ) { return &m_ActBusyAnims[iIndex]; }
 
 protected:
 	CUtlVector<busyanim_t>	m_ActBusyAnims;
@@ -212,10 +212,10 @@ bool CActBusyAnimData::ParseActBusyFromKV( busyanim_t *pAnim, KeyValues *pSectio
 //-----------------------------------------------------------------------------
 // Purpose: Returns the busyanim data for the specified activity
 //-----------------------------------------------------------------------------
-int CActBusyAnimData::FindBusyAnim( Activity iActivity, const char *pSequence )
+intp CActBusyAnimData::FindBusyAnim( Activity iActivity, const char *pSequence )
 {
-	int iCount = m_ActBusyAnims.Count();
-	for ( int i = 0; i < iCount; i++ )
+	intp iCount = m_ActBusyAnims.Count();
+	for ( intp i = 0; i < iCount; i++ )
 	{
 		busyanim_t *pBusyAnim = &m_ActBusyAnims[i];
 		Assert( pBusyAnim );
@@ -722,7 +722,7 @@ void CAI_ActBusyBehavior::OnFriendDamaged( CBaseCombatCharacter *pSquadmate, CBa
 //			You must set COND_ACTBUSY_AWARE_OF_ENEMY_IN_SAFE_ZONE to let
 //			the NPC know.
 //-----------------------------------------------------------------------------
-int CAI_ActBusyBehavior::CountEnemiesInSafeZone()
+intp CAI_ActBusyBehavior::CountEnemiesInSafeZone()
 {
 	if( !IsCombatActBusy() )
 	{
@@ -1192,7 +1192,7 @@ int CAI_ActBusyBehavior::SelectScheduleWhileNotBusy( int iBase )
 			// Ensure we've got a sequence for the node
 			const char *pSequenceOrActivity = STRING(pNode->HintActivityName());
 			Activity iNodeActivity;
-			int iBusyAnim;
+			intp iBusyAnim;
 
 			// See if the node specifies that we should teleport to it
 			const char *cSpace = strchr( pSequenceOrActivity, ' ' );
@@ -1599,7 +1599,7 @@ bool CAI_ActBusyBehavior::IsInSafeZone( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 // Purpose: Return true if this NPC has the anims required to use the specified actbusy hint
 //-----------------------------------------------------------------------------
-bool CAI_ActBusyBehavior::HasAnimForActBusy( int iActBusy, busyanimparts_t AnimPart )
+bool CAI_ActBusyBehavior::HasAnimForActBusy( intp iActBusy, busyanimparts_t AnimPart )
 {
 	if ( iActBusy == -1 )
 		return false;

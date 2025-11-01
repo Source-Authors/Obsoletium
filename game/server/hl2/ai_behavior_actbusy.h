@@ -148,7 +148,7 @@ public:
 	bool	IsCombatActBusy();
 	void 	CollectSafeZoneVolumes( CAI_ActBusyGoal *pActBusyGoal );
 	bool	IsInSafeZone( CBaseEntity *pEntity );
-	int		CountEnemiesInSafeZone();
+	intp	CountEnemiesInSafeZone();
 
 private:
 	virtual int		SelectSchedule( void );
@@ -158,7 +158,7 @@ private:
 	virtual void	StartTask( const Task_t *pTask );
 	virtual void	RunTask( const Task_t *pTask );
 	void			NotifyBusyEnding( void );
-	bool			HasAnimForActBusy( int iActBusy, busyanimparts_t AnimPart );
+	bool			HasAnimForActBusy( intp iActBusy, busyanimparts_t AnimPart );
 	bool			PlayAnimForActBusy( busyanimparts_t AnimPart );
 	void			PlaySoundForActBusy( busyanimparts_t AnimPart ); 
 
