@@ -536,9 +536,9 @@ void CBaseHelicopter::DoRotorPhysicsPush( const Vector &vecRotorOrigin, float fl
 
 	// Push entities that we've pushed before, and are still within range
 	// Walk backwards because they may be removed if they're now out of range
-	int iCount = m_hEntitiesPushedByWash.Count();
+	intp iCount = m_hEntitiesPushedByWash.Count();
 	bool bWasPushingObjects = (iCount > 0);
-	for ( int i = (iCount-1); i >= 0; i-- )
+	for ( intp i = (iCount-1); i >= 0; i-- )
 	{
 		if ( !DoWashPush( &(m_hEntitiesPushedByWash[i]), vecPhysicsOrigin ) )
 		{
