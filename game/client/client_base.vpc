@@ -27,25 +27,6 @@ $include "$SRCDIR\vpc_scripts\protobuf_builder.vpc"
 $Include "$SRCDIR\vpc_scripts\source_replay.vpc"	[$TF]
 $Include "$SRCDIR\game\protobuf_include.vpc"
 
-$Configuration	"Debug"
-{
-	$General
-	{
-		$OutputDirectory			"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
-		$IntermediateDirectory		"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
-	}
-}
-
-$Configuration	"Release"
-{
-	$General
-	{
-		// Windows generator doesn't sandbox these directories per configuration but others do :-/
-		$OutputDirectory			"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
-		$IntermediateDirectory		"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
-	}
-}
-
 $Configuration
 {
 	// dimhotepus: Commented as somehow override above.
