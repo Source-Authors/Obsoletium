@@ -789,14 +789,14 @@ void CBaseGameStats_Driver::Shutdown()
 
 void CBaseGameStats_Driver::UpdatePerfStats( void )
 {
-	float flCurTime = Plat_FloatTime();
+	double flCurTime = Plat_FloatTime();
 	if (
 		( m_flLastSampleTime == -1 ) || 
 		( flCurTime - m_flLastSampleTime >= STATS_RECORD_INTERVAL ) )
 	{
 		if ( ( m_flLastRealTime > 0 ) && ( flCurTime > m_flLastRealTime ) )
 		{
-			float flFrameRate = 1.0 / ( flCurTime - m_flLastRealTime );
+			float flFrameRate = 1.0f / static_cast<float>( flCurTime - m_flLastRealTime );
 			StatsBufferRecord_t &stat = m_StatsBuffer[m_nWriteIndex];
 			stat.m_flFrameRate = flFrameRate;
 #ifdef CLIENT_DLL

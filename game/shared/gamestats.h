@@ -390,8 +390,10 @@ public:
 	StatsBufferRecord_t m_StatsBuffer[STATS_WINDOW_SIZE];
 	bool m_bBufferFull;
 	int m_nWriteIndex;
-	float m_flLastRealTime;
-	float m_flLastSampleTime;
+	// dimhotepus: float -> double.
+	double m_flLastRealTime;
+	// dimhotepus: float -> double.
+	double m_flLastSampleTime;
 	float m_flTotalTimeInLevels;
 	int m_iNumLevels;
 	bool m_bDidVoiceChat;	// Did the player use voice chat at ALL this map?
