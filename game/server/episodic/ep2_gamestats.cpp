@@ -419,7 +419,8 @@ void CEP2GameStats::Event_SaveGame( void )
 	Q_strlower( name );
 	Q_FixSlashes( name );
 
-	unsigned int uFileTime = filesystem->GetFileTime( name, "GAME" );
+	// dimhotepus: unsigned int -> time_t.
+	time_t uFileTime = filesystem->GetFileTime( name, "GAME" );
 	// Latch off previous
 	map->m_SaveGameInfo.Latch( name, uFileTime );
 
@@ -462,7 +463,7 @@ void CEP2GameStats::Event_LoadGame( void )
 
 	char name[ 512 ];
 	Q_snprintf( name, sizeof( name ), "save/%s", pchSaveFile );
-	Q_DefaultExtension( name, IsX360() ? ".360.sav" : ".sav", sizeof( name ) );
+	Q_DefaultExtension( name, ".sav", sizeof( name ) );
 	Q_FixSlashes( name );
 	Q_strlower( name );
 
@@ -471,10 +472,18 @@ void CEP2GameStats::Event_LoadGame( void )
 	if ( pSaveGameInfo->m_nCurrentSaveFileTime == 0 || 
 		pSaveGameInfo->m_sCurrentSaveFile != name )
 	{
-		unsigned int uFileTime = filesystem->GetFileTime( name, "GAME" );
+		// dimhotepus: unsigned int -> time_t.
+		time_t uFileTime = filesystem->GetFileTime( name, "GAME" );
 
 		// Latch off previous
-		StatsLog( "Relatching save game file due to time or filename change (%s : %u)\n", name, uFileTime );
+		StatsLog( "Relatching save game file due to time or filename change (%s : "
+		// dimhotepus: Support 64 bit time_t.
+#ifndef _USE_32BIT_TIME_T			
+			"%lld"
+#else
+			"%d"
+#endif
+		")\n", name, uFileTime );
 		pSaveGameInfo->Latch( name, uFileTime );
 	}
 }

@@ -18,8 +18,10 @@ enum Ep2GameStatsVersions_t
 {
 	EP2_GAMESTATS_FILE_VERSION_01 = 001,
 	EP2_GAMESTATS_FILE_VERSION_02 = 002,
+	// dimhotepus: Version 003 has fixes for time_t becoming 64 bit.
+	EP2_GAMESTATS_FILE_VERSION_03 = 003,
 
-	EP2_GAMESTATS_CURRENT_VERSION = EP2_GAMESTATS_FILE_VERSION_02,
+	EP2_GAMESTATS_CURRENT_VERSION = EP2_GAMESTATS_FILE_VERSION_03,
 };
 
 enum Ep2GameStatsLumpIds_t
@@ -149,7 +151,16 @@ public:
 		{
 			CUtlBuffer buf;
 			buf.PutString( m_SaveGameInfo.m_sCurrentSaveFile.String() );
-			buf.PutInt( m_SaveGameInfo.m_nCurrentSaveFileTime );
+
+			if ( m_Header.m_iVersion >= EP2_GAMESTATS_FILE_VERSION_03 )
+			{
+				// dimhotepus: int -> int64 for time_t.
+				buf.PutInt64( m_SaveGameInfo.m_nCurrentSaveFileTime );
+			}
+			else
+			{
+				buf.PutInt( m_SaveGameInfo.m_nCurrentSaveFileTime );
+			}
 			buf.PutInt( m_SaveGameInfo.m_Records.Count() );
 			for ( int i = 0 ; i < m_SaveGameInfo.m_Records.Count(); ++i )
 			{
@@ -242,7 +253,16 @@ public:
 					char sz[ 512 ];
 					LoadBuffer.GetString( sz );
 					info->m_sCurrentSaveFile = sz;
-					info->m_nCurrentSaveFileTime = LoadBuffer.GetInt();
+
+					if ( pItem->m_Header.m_iVersion >= EP2_GAMESTATS_FILE_VERSION_03 )
+					{
+						// dimhotepus: int -> int64 for time_t.
+						info->m_nCurrentSaveFileTime = LoadBuffer.GetInt64();
+					}
+					else
+					{
+						info->m_nCurrentSaveFileTime = LoadBuffer.GetInt();
+					}
 					int c = LoadBuffer.GetInt();
 					for ( int i = 0 ; i < c; ++i )
 					{
@@ -417,7 +437,8 @@ public:
 		{
 		}
 
-		void Latch( char const *pchSaveName, unsigned int uFileTime )
+		// dimhotepus: unsigned int -> time_t.
+		void Latch( char const *pchSaveName, time_t uFileTime )
 		{
 			m_pCurrentRecord = &m_Records[ m_Records.AddToTail() ];
 			m_nCurrentSaveFileTime = uFileTime;
@@ -426,7 +447,8 @@ public:
 
 		CUtlVector< SaveGameInfoRecord2_t > m_Records;
 		SaveGameInfoRecord2_t				*m_pCurrentRecord;
-		unsigned int						m_nCurrentSaveFileTime;
+		// dimhotepus: unsigned int -> time_t.
+		time_t								m_nCurrentSaveFileTime;
 		CUtlString							m_sCurrentSaveFile;
 	};
 
