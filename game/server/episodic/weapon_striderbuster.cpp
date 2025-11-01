@@ -542,7 +542,7 @@ void CWeaponStriderBuster::CreateDestroyedEffect( void )
 	CEffectData	data;
 
 	int nNumSteps = 6;
-	float flRadStep = (2*M_PI) / nNumSteps;
+	float flRadStep = (2*M_PI_F) / nNumSteps;
 	for ( int i = 0; i < nNumSteps; i++ )
 	{
 		data.m_vOrigin = GetAbsOrigin() + RandomVector( -32.0f, 32.0f );
@@ -763,9 +763,9 @@ int CWeaponStriderBuster::OnTakeDamage( const CTakeDamageInfo &info )
 				float sinTime = sin( gpGlobals->curtime );
 				bool bSubtractX = ( bFirst ) ? ( sinTime < 0 ) : ( m_CarryAngles.x < 45 );
 
-				m_CarryAngles.x += ( 10.0 + 10.0 * fabsf( sinTime ) + random->RandomFloat( -2.5, 2.5 ) + random->RandomFloat( -2.5, 2.5 ) ) * ( ( bSubtractX ) ? -1.0 : 1.0 );
-				m_CarryAngles.y = 15 * ( sin( gpGlobals->curtime ) + cos( gpGlobals->curtime * 0.5 ) ) * .5  + random->RandomFloat( -15, 15 );
-				m_CarryAngles.z = 7.5 * ( sin( gpGlobals->curtime ) + sin( gpGlobals->curtime * 2.0 ) ) * .5 + random->RandomFloat( -7.5, 7.5 );
+				m_CarryAngles.x += ( 10.0f + 10.0f * fabsf( sinTime ) + random->RandomFloat( -2.5f, 2.5f ) + random->RandomFloat( -2.5f, 2.5f ) ) * ( ( bSubtractX ) ? -1.0f : 1.0f );
+				m_CarryAngles.y = 15 * ( sin( gpGlobals->curtime ) + cos( gpGlobals->curtime * 0.5f ) ) * .5f  + random->RandomFloat( -15, 15 );
+				m_CarryAngles.z = 7.5f * ( sin( gpGlobals->curtime ) + sin( gpGlobals->curtime * 2.0f ) ) * .5f + random->RandomFloat( -7.5f, 7.5f );
 			}
 
 			return 1;
@@ -920,7 +920,7 @@ void CWeaponStriderBuster::BusterFlyThink()
 	}
 
 	// seek?	
-	const float magradius = 38.0 * sk_striderbuster_magnet_multiplier.GetFloat(); // radius of strider hull times multiplier
+	const float magradius = 38.0f * sk_striderbuster_magnet_multiplier.GetFloat(); // radius of strider hull times multiplier
 	if (magradius > 0 &&
 		GetMoveType() == MOVETYPE_VPHYSICS &&
 		VPhysicsGetObject()

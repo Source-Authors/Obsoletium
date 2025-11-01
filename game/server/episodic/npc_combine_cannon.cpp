@@ -308,7 +308,7 @@ float CNPC_Combine_Cannon::GetWaitTimePercentage( float flTime, bool fLinear )
 	}
 	else
 	{
-		return (1 + sin( (M_PI * flTimeParameter) - (M_PI / 2) ) ) / 2;
+		return (1 + sin( (M_PI_F * flTimeParameter) - (M_PI_F / 2) ) ) / 2;
 	}
 }
 
@@ -451,7 +451,7 @@ void CNPC_Combine_Cannon::UpdateAncillaryBeams( float flConvergencePerc, const V
 
 		// Find the number of radians offset we are
 		flOffset = (float) i * flRotationOffset + DEG2RAD( 30.0f );
-		flOffset += (M_PI/8.0f) * sin( gpGlobals->curtime * 3.0f );
+		flOffset += (M_PI_F/8.0f) * sin( gpGlobals->curtime * 3.0f );
 		
 		// Construct a circle that's also offset by the line's length
 		vecOffset.x = cos( flOffset ) * flScale;
@@ -511,9 +511,9 @@ void CNPC_Combine_Cannon::PaintTarget( const Vector &vecTarget, float flPaintTim
 	}
 
 	// mult by P
-	vecCurrentDir.x += flNoiseScale * ( sin( 3 * M_PI * gpGlobals->curtime ) * 0.0006 );
-	vecCurrentDir.y += flNoiseScale * ( sin( 2 * M_PI * gpGlobals->curtime + 0.5 * M_PI ) * 0.0006 );
-	vecCurrentDir.z += flNoiseScale * ( sin( 1.5 * M_PI * gpGlobals->curtime + M_PI ) * 0.0006 );
+	vecCurrentDir.x += flNoiseScale * ( sin( 3 * M_PI_F * gpGlobals->curtime ) * 0.0006f );
+	vecCurrentDir.y += flNoiseScale * ( sin( 2 * M_PI_F * gpGlobals->curtime + 0.5f * M_PI_F ) * 0.0006f );
+	vecCurrentDir.z += flNoiseScale * ( sin( 1.5f * M_PI_F * gpGlobals->curtime + M_PI_F ) * 0.0006f );
 
 	// Find where our center is
 	trace_t tr;
@@ -1008,7 +1008,7 @@ void CNPC_Combine_Cannon::PrescheduleThink( void )
 	// Think faster if the beam is on, this gives the beam higher resolution.
 	if( m_pBeam )
 	{
-		SetNextThink( gpGlobals->curtime + 0.03 );
+		SetNextThink( gpGlobals->curtime + 0.03f );
 	}
 	else
 	{
