@@ -154,7 +154,7 @@ void CAI_BaseActor::Precache()
 	}
 }
 
-static char const *g_ServerSideFlexControllers[] = 
+static constexpr char const *g_ServerSideFlexControllers[] = 
 {
 	"body_rightleft",
 	//"body_updown",
