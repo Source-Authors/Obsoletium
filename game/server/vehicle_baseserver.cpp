@@ -739,7 +739,7 @@ void CBaseServerVehicle::ParseNPCPassengerSeat( KeyValues *pSetKeyValues, CPasse
 CPassengerRole *CBaseServerVehicle::FindOrCreatePassengerRole( string_t strName, int *nIndex )
 {
 	// Try to find an already created container of the same name
-	for ( int i = 0; i < m_PassengerRoles.Count(); i++ )
+	for ( intp i = 0; i < m_PassengerRoles.Count(); i++ )
 	{
 		// If we match, return it
 		if ( FStrEq( STRING( m_PassengerRoles[i].m_strName ), STRING( strName ) ) )
@@ -1212,8 +1212,8 @@ int CBaseServerVehicle::GetEntryAnimForPoint( const Vector &vecEyePoint )
 		if ( IsPointInBox( localEyePoint, pbox->bbmin, pbox->bbmax ) )
 		{
 			// Find the entry animation for this hitbox
-			int iCount = m_EntryAnimations.Count();
-			for ( int entry = 0; entry < iCount; entry++ )
+			intp iCount = m_EntryAnimations.Count();
+			for ( intp entry = 0; entry < iCount; entry++ )
 			{
 				if ( m_EntryAnimations[entry].iHitboxGroup == pbox->group )
 				{
@@ -1269,7 +1269,7 @@ int CBaseServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAll
 
 	int nRole = GetPassengerRole( pPlayer );
 
-	int nBestExitAnim = -1;
+	intp nBestExitAnim = -1;
 	bool bBestExitIsEscapePoint = true;
 	Vector vecViewDirection, vecViewOrigin, vecBestExitPoint( 0, 0, 0 );
 	vecViewOrigin = pPlayer->EyePosition();
@@ -1279,8 +1279,8 @@ int CBaseServerVehicle::GetExitAnimToUse( Vector &vecEyeExitEndpoint, bool &bAll
 
 	float flMaxCosAngleDelta = -2.0f;
 
-	int iCount = m_ExitAnimations.Count();
-	for ( int i = 0; i < iCount; i++ )
+	intp iCount = m_ExitAnimations.Count();
+	for ( intp i = 0; i < iCount; i++ )
 	{
 		if ( m_ExitAnimations[i].bUpright != bUpright )
 			continue;
@@ -1843,7 +1843,6 @@ static sound_states MapGearToMidState( vbs_sound_update_t &params, int gear )
 
 bool CBaseServerVehicle::PlayCrashSound( float speed )
 {
-	int i;
 	float delta = 0;
 	float absSpeed = fabs(speed);
 	float absLastSpeed = fabs(m_lastSpeed);
@@ -1865,9 +1864,8 @@ bool CBaseServerVehicle::PlayCrashSound( float speed )
 		}
 	}
 
-	for ( i = 0; i < m_vehicleSounds.crashSounds.Count(); i++ )
+	for ( const auto &crash : m_vehicleSounds.crashSounds )
 	{
-		const vehicle_crashsound_t &crash = m_vehicleSounds.crashSounds[i];
 		if ( !crash.gearLimit )
 			continue;
 
@@ -1881,7 +1879,7 @@ bool CBaseServerVehicle::PlayCrashSound( float speed )
 		}
 	}
 
-	for ( i = m_vehicleSounds.crashSounds.Count()-1; i >= 0; --i )
+	for ( intp i = m_vehicleSounds.crashSounds.Count()-1; i >= 0; --i )
 	{
 		const vehicle_crashsound_t &crash = m_vehicleSounds.crashSounds[i];
 		if ( delta > crash.flMinDeltaSpeed && absLastSpeed > crash.flMinSpeed )
@@ -2325,8 +2323,8 @@ void CBaseServerVehicle::StopSound( vehiclesound iSound )
 //-----------------------------------------------------------------------------
 void CBaseServerVehicle::RecalculateSoundGear( vbs_sound_update_t &params )
 {
-	int iNumGears = m_vehicleSounds.pGears.Count();
-	for ( int i = (iNumGears-1); i >= 0; i-- )
+	intp iNumGears = m_vehicleSounds.pGears.Count();
+	for ( intp i = (iNumGears-1); i >= 0; i-- )
 	{
 		if ( m_flSpeedPercentage > m_vehicleSounds.pGears[i].flMinSpeed )
 		{
