@@ -194,7 +194,7 @@ void CBaseGrenade::Explode( trace_t *pTrace, int bitsDamageType )
 	// intermittent bugs with env_microphones who are listening for explosions. They will 'randomly' not
 	// hear explosion sounds when the grenade is removed and the SoundEnt thinks (and removes the sound)
 	// before the env_microphone thinks and hears the sound.
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 #else
 	SetNextThink( gpGlobals->curtime );
 #endif//HL2_EPISODIC
