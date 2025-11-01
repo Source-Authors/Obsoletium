@@ -820,11 +820,12 @@ bool CAI_PassengerBehaviorCompanion::CanEnterVehicleImmediately( int *pResultSeq
 	float	flSeatDistSqr;
 	int		nNearestSequence = -1;
 	int		nSequence;
-	Vector	vecNearestPos;
-	QAngle	vecNearestAngles;
+	// dimhotepus: Initialize to invalid values to fix warning about uninitialized vars.
+	Vector	vecNearestPos = vec3_invalid;
+	QAngle	vecNearestAngles{FLT_MAX, FLT_MAX, FLT_MAX};
 
 	// Test each animation (sorted by priority) for the best match
-	for ( int i = 0; i < pEntryAnims->Count(); i++ )
+	for ( intp i = 0; i < pEntryAnims->Count(); i++ )
 	{
 		// Find the activity for this animation name
 		pTransition = &pEntryAnims->Element(i);
