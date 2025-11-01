@@ -3494,7 +3494,7 @@ bool CAI_Navigator::MarkCurWaypointFailedLink( void )
 		if ( bBlockAll )
 		{
 			CAI_Node *pDestNode = GetNetwork()->GetNode( endID );
-			for ( int i = 0; i < pDestNode->NumLinks(); i++ )
+			for ( intp i = 0; i < pDestNode->NumLinks(); i++ )
 			{
 				CAI_Link *pLink = pDestNode->GetLinkByIndex( i );
 				pLink->m_LinkInfo |= bits_LINK_STALE_SUGGESTED;

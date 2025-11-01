@@ -3978,8 +3978,8 @@ void CNPC_MetroPolice::AdministerJustice( void )
 
 		// Try and find a nearby cop to administer justice
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
-		int nAIs = g_AI_Manager.NumAIs();
-		for ( int i = 0; i < nAIs; i++ )
+		intp nAIs = g_AI_Manager.NumAIs();
+		for ( intp i = 0; i < nAIs; i++ )
 		{
 			if ( ppAIs[i] == this )
 				continue;

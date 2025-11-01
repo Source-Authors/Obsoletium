@@ -209,7 +209,7 @@ void CAI_AllySpeechManager::OnSpokeConcept( CAI_PlayerAlly *pPlayerAlly, AIConce
 		{
 			CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 			CAI_PlayerAlly *pTalker;
-			for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
+			for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 			{
 				pTalker = dynamic_cast<CAI_PlayerAlly *>(ppAIs[i]);
 
@@ -1308,11 +1308,10 @@ CBaseEntity *CAI_PlayerAlly::FindSpeechTarget( int flags )
 	float 			closestDistSq 	= FLT_MAX;
 	CBaseEntity *	pNearest 		= NULL;
 	float			distSq;
-	int				i;
 	
 	if ( flags & AIST_PLAYERS )
 	{
-		for ( i = 1; i <= gpGlobals->maxClients; i++ )
+		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
 			CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
 			if ( pPlayer )
@@ -1339,7 +1338,7 @@ CBaseEntity *CAI_PlayerAlly::FindSpeechTarget( int flags )
 	
 	if ( flags & AIST_NPCS )
 	{
-		for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+		for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			CAI_BaseNPC *pNPC = (g_AI_Manager.AccessAIs())[i];
 

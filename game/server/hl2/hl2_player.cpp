@@ -1616,7 +1616,6 @@ void CHL2_Player::CommanderExecute( CommanderCommand_t command )
 		return;
 	}
 
-	int i;
 	CUtlVector<CAI_BaseNPC *> Allies;
 	commandgoal_t goal;
 
@@ -1669,7 +1668,7 @@ void CHL2_Player::CommanderExecute( CommanderCommand_t command )
 	// If the trace hits an NPC, send all ally NPCs a "target" order. Always
 	// goes to targeted one first
 #ifdef DBGFLAG_ASSERT
-	int nAIs = g_AI_Manager.NumAIs();
+	intp nAIs = g_AI_Manager.NumAIs();
 #endif
 	CAI_BaseNPC * pTargetNpc = (goal.m_pGoalEntity) ? goal.m_pGoalEntity->MyNPCPointer() : NULL;
 	
@@ -1679,7 +1678,7 @@ void CHL2_Player::CommanderExecute( CommanderCommand_t command )
 		bHandled = !CommanderExecuteOne( pTargetNpc, goal, Allies.Base(), Allies.Count() );
 	}
 	
-	for ( i = 0; !bHandled && i < Allies.Count(); i++ )
+	for ( intp i = 0; !bHandled && i < Allies.Count(); i++ )
 	{
 		if ( Allies[i] != pTargetNpc && Allies[i]->IsPlayerAlly() )
 		{
@@ -2161,7 +2160,7 @@ void CHL2_Player::CheckFlashlight( void )
 	m_flNextFlashlightCheckTime = gpGlobals->curtime + FLASHLIGHT_NPC_CHECK_INTERVAL;
 
 	// Loop through NPCs looking for illuminated ones
-	for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
+	for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 	{
 		CAI_BaseNPC *pNPC = g_AI_Manager.AccessAIs()[i];
 
@@ -2285,7 +2284,7 @@ void CHL2_Player::NotifyFriendsOfDamage( CBaseEntity *pAttackerEntity )
 	if ( pAttacker )
 	{
 		const Vector &origin = GetAbsOrigin();
-		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
+		for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			constexpr float NEAR_Z = 12*12;
 			constexpr float NEAR_XY_SQ = Square( 50.0f*12 );
@@ -2471,7 +2470,7 @@ void CHL2_Player::Event_KilledOther( CBaseEntity *pVictim, const CTakeDamageInfo
 
 	CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 
-	for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
+	for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 	{
 		if ( ppAIs[i] && ppAIs[i]->IRelationType(this) == D_LI )
 		{

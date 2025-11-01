@@ -829,9 +829,9 @@ float CBounceBomb::FindNearestNPC()
 	SetNearestNPC( NULL );
 
 	CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
-	int nAIs = g_AI_Manager.NumAIs();
+	intp nAIs = g_AI_Manager.NumAIs();
 
-	for ( int i = 0; i < nAIs; i++ )
+	for ( intp i = 0; i < nAIs; i++ )
 	{
 		CAI_BaseNPC *pNPC = ppAIs[ i ];
 

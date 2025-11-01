@@ -132,9 +132,9 @@ void CAI_AllyManager::CountAllies( int *pTotal, int *pMedics )
 
 	const Vector &	vPlayerPos = UTIL_GetLocalPlayer()->GetAbsOrigin();
 	CAI_BaseNPC **	ppAIs 	= g_AI_Manager.AccessAIs();
-	int 			nAIs 	= g_AI_Manager.NumAIs();
+	intp 			nAIs 	= g_AI_Manager.NumAIs();
 
-	for ( int i = 0; i < nAIs; i++ )
+	for ( intp i = 0; i < nAIs; i++ )
 	{
 		if ( ppAIs[i]->IsAlive() && ppAIs[i]->IsPlayerAlly() )
 		{

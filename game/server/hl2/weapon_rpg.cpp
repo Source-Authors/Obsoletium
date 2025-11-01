@@ -1651,7 +1651,7 @@ void CWeaponRPG::PrimaryAttack( void )
 	if( hl2_episodic.GetBool() )
 	{
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
-		int nAIs = g_AI_Manager.NumAIs();
+		intp nAIs = g_AI_Manager.NumAIs();
 
 		string_t iszStriderClassname = AllocPooledString( "npc_strider" );
 

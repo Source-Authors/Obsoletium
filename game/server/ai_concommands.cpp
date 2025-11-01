@@ -855,7 +855,7 @@ CON_COMMAND( ai_clear_bad_links, "Clears bits set on nav links indicating link i
 	for ( int i = 0; i < g_pBigAINet->NumNodes(); i++ )
 	{
 		pNode = g_pBigAINet->GetNode( i );
-		for ( int j = 0; j < pNode->NumLinks(); j++ )
+		for ( intp j = 0; j < pNode->NumLinks(); j++ )
 		{
 			pNode->GetLinkByIndex( j )->m_LinkInfo &= ~bits_LINK_STALE_SUGGESTED;
 		}

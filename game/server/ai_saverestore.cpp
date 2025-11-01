@@ -61,9 +61,8 @@ public:
 		short nMemories = 0;
 		
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
-		int i;
 
-		for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+		for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			if ( ppAIs[i]->GetEnemies() )
 				nMemories++;
@@ -71,7 +70,7 @@ public:
 
 		pSave->WriteShort( &nMemories );
 		
-		for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+		for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			if ( ppAIs[i]->GetEnemies() )
 			{
@@ -106,9 +105,8 @@ public:
 	{
 		// Initialize the squads (as there's no spawn)
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
-		int i;
 
-		for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+		for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			ppAIs[i]->InitSquad();
 		}

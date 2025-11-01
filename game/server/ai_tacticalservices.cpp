@@ -294,7 +294,7 @@ int CAI_TacticalServices::FindBackAwayNode(const Vector &vecThreat )
 	float flCurDist = VectorNormalize( vecToThreat );
 
 	// Check my neighbors to find a node that's further away
-	for (int link = 0; link < GetNetwork()->GetNode(iMyNode)->NumLinks(); link++) 
+	for (intp link = 0; link < GetNetwork()->GetNode(iMyNode)->NumLinks(); link++) 
 	{
 		CAI_Link *nodeLink = GetNetwork()->GetNode(iMyNode)->GetLinkByIndex(link);
 
@@ -441,9 +441,9 @@ int CAI_TacticalServices::FindCoverNode(const Vector &vNearPos, const Vector &vT
 		// Add its children to the search list
 		// Go through each link
 		// UNDONE: Pass in a cost function to measure each link?
-		for ( int link = 0; link < GetNetwork()->GetNode(nodeIndex)->NumLinks(); link++ ) 
+		for ( intp link = 0; link < GetNetwork()->GetNode(nodeIndex)->NumLinks(); link++ ) 
 		{
-			int index = (link + nSearchRandomizer) % GetNetwork()->GetNode(nodeIndex)->NumLinks();
+			intp index = (link + nSearchRandomizer) % GetNetwork()->GetNode(nodeIndex)->NumLinks();
 			CAI_Link *nodeLink = GetNetwork()->GetNode(nodeIndex)->GetLinkByIndex(index);
 
 			if ( !m_pPathfinder->IsLinkUsable( nodeLink, iMyNode ) )
@@ -653,9 +653,9 @@ int CAI_TacticalServices::FindLosNode(const Vector &vThreatPos, const Vector &vT
 		}
 
 		// Go through each link and add connected nodes to the list
-		for (int link=0; link < GetNetwork()->GetNode(nodeIndex)->NumLinks();link++) 
+		for (intp link=0; link < GetNetwork()->GetNode(nodeIndex)->NumLinks();link++) 
 		{
-			int index = (link + nSearchRandomizer) % GetNetwork()->GetNode(nodeIndex)->NumLinks();
+			intp index = (link + nSearchRandomizer) % GetNetwork()->GetNode(nodeIndex)->NumLinks();
 			CAI_Link *nodeLink = GetNetwork()->GetNode(nodeIndex)->GetLinkByIndex(index);
 
 			if ( !m_pPathfinder->IsLinkUsable( nodeLink, iMyNode ) )

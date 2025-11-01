@@ -438,7 +438,7 @@ int CAI_Senses::LookForHighPriorityEntities( int iDistance )
     }
     else
     {
-    	for ( int i = m_SeenHighPriority.Count() - 1; i >= 0; --i )
+    	for ( intp i = m_SeenHighPriority.Count() - 1; i >= 0; --i )
     	{
     		if ( m_SeenHighPriority[i].Get() == NULL )
     			m_SeenHighPriority.FastRemove( i );    			
@@ -466,13 +466,13 @@ int CAI_Senses::LookForNPCs( int iDistance )
 
 		if ( efficiency < AIE_SUPER_EFFICIENT )
 		{
-			int i, nSeen = 0;
+			int nSeen = 0;
 
 			BeginGather();
 
 			CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 			
-			for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+			for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 			{
 				if ( ppAIs[i] != GetOuter() && ( ppAIs[i]->ShouldNotDistanceCull() || origin.DistToSqr(ppAIs[i]->GetAbsOrigin()) < distSq ) )
 				{
@@ -546,7 +546,7 @@ int CAI_Senses::LookForObjects( int iDistance )
 	}
     else
     {
-    	for ( int i = m_SeenMisc.Count() - 1; i >= 0; --i )
+    	for ( intp i = m_SeenMisc.Count() - 1; i >= 0; --i )
     	{
     		if ( m_SeenMisc[i].Get() == NULL )
     			m_SeenMisc.FastRemove( i );    			

@@ -287,7 +287,7 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 		buf.PutUnsignedShort( pNode->m_eNodeInfo );
 		buf.PutShort( pNode->GetZone() );
 
-		for (int link = 0; link < pNode->NumLinks(); link++)
+		for (intp link = 0; link < pNode->NumLinks(); link++)
 		{
 			// Only dump if link source
 			if (node == pNode->GetLinkByIndex(link)->m_iSrcID)
@@ -306,7 +306,7 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 	{
 		CAI_Node *pNode = m_pNetwork->GetNode(node);
 
-		for (int link = 0; link < pNode->NumLinks(); link++)
+		for (intp link = 0; link < pNode->NumLinks(); link++)
 		{
 			// Only dump if link source
 			CAI_Link *pLink = pNode->GetLinkByIndex(link);
@@ -420,9 +420,9 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 		filesystem->FPrintf ( file, "Connected     ");
 		m_pAInode[node]->m_pConnectedBS->SaveBitString(file);
 
-		filesystem->FPrintf ( file, "NumLinks      %4d\n",m_pAInode[node]->NumLinks());
+		filesystem->FPrintf ( file, "NumLinks      %4zd\n",m_pAInode[node]->NumLinks());
 
-		for (int link = 0; link < m_pAInode[node]->NumLinks(); link++)
+		for (intp link = 0; link < m_pAInode[node]->NumLinks(); link++)
 		{
 			// Only dump if link source
 			if (node == m_pAInode[node]->GetLinkByIndex(link)->m_iSrcID)
@@ -439,7 +439,7 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 
 	for (node = 0; node < m_iNumNodes; node++)
 	{
-		for (int link = 0; link < m_pAInode[node]->NumLinks(); link++)
+		for (intp link = 0; link < m_pAInode[node]->NumLinks(); link++)
 		{
 			// Only dump if link source
 			if (node == m_pAInode[node]->GetLinkByIndex(link)->m_iSrcID)
@@ -1280,7 +1280,7 @@ CAI_Link *CAI_NetworkEditTools::FindAILinkNearestFacing( const Vector &vOrigin, 
 				(!m_bAirEditMode && aiNet->GetNode(node)->GetType() == NODE_GROUND))
 			{
 				// Go through each link
-				for (int link=0; link < aiNet->GetNode(node)->NumLinks();link++) 
+				for (intp link=0; link < aiNet->GetNode(node)->NumLinks();link++) 
 				{
 					CAI_Link *nodeLink = aiNet->GetNode(node)->GetLinkByIndex(link);
 
@@ -1631,7 +1631,7 @@ void CAI_NetworkEditTools::DrawAINetworkOverlay(void)
 		{
 			for (int node=startDrawNode;node<endDrawNode;node++) 
 			{
-				for (int link=0;link<pAINode[node]->NumLinks();link++) 
+				for (intp link=0;link<pAINode[node]->NumLinks();link++) 
 				{
 					// Only draw link once
 					if (pAINode[node]->GetLinkByIndex(link)->DestNodeID(node) < node) 
@@ -1717,7 +1717,7 @@ void CAI_NetworkEditTools::DrawAINetworkOverlay(void)
 					}
 					else
 					{
-						for (int link=0;link<pAINode[node]->NumLinks();link++) {
+						for (intp link=0;link<pAINode[node]->NumLinks();link++) {
 
 							// Only draw link once
 							if (pAINode[node]->GetLinkByIndex(link)->DestNodeID(node) < node)
@@ -2016,7 +2016,7 @@ void CAI_NetworkBuilder::FloodFillZone( CAI_Node **ppNodes, CAI_Node *pNode, int
 {
 	pNode->SetZone( zone );
 
-	for (int link = 0; link < pNode->NumLinks(); link++) 
+	for (intp link = 0; link < pNode->NumLinks(); link++) 
 	{
 		CAI_Link *pLink = pNode->GetLinkByIndex(link);
 		CAI_Node *pLinkedNode = ( pLink->m_iDestID == pNode->GetId()) ? ppNodes[pLink->m_iSrcID] : ppNodes[pLink->m_iDestID];

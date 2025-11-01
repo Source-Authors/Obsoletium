@@ -732,10 +732,10 @@ int CAI_ActBusyBehavior::CountEnemiesInSafeZone()
 	// Grovel the AI list and count the enemies in the zone. By enemies, I mean
 	// anyone that I would fight if I saw. 
 	CAI_BaseNPC **	ppAIs 	= g_AI_Manager.AccessAIs();
-	int 			nAIs 	= g_AI_Manager.NumAIs();
-	int				count = 0;
+	intp 			nAIs 	= g_AI_Manager.NumAIs();
+	intp			count = 0;
 
-	for ( int i = 0; i < nAIs; i++ )
+	for ( intp i = 0; i < nAIs; i++ )
 	{
 		if( GetOuter()->IRelationType(ppAIs[i]) < D_LI )
 		{

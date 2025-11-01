@@ -694,13 +694,12 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 
 	CUtlVector<CBaseEntity *> candidates;
 	float fSearchDistSq = fSearchDist * fSearchDist;
-	int i;
 
 	// Inspect players unless told otherwise
 	if ( m_bNeverInspectPlayers == false )
 	{
 		// Players
-		for ( i = 1; i <= gpGlobals->maxClients; i++ )
+		for ( int i = 1; i <= gpGlobals->maxClients; i++ )
 		{
 			CBaseEntity *pPlayer = UTIL_PlayerByIndex( i );
 
@@ -717,7 +716,7 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 	// NPCs
 	CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 	
-	for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+	for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 	{
 		if ( ppAIs[i] != this && vSearchOrigin.DistToSqr(ppAIs[i]->GetAbsOrigin()) < fSearchDistSq )
 		{
@@ -725,7 +724,7 @@ CBaseEntity* CNPC_CScanner::BestInspectTarget(void)
 		}
 	}
 
-	for ( i = 0; i < candidates.Count(); i++ )
+	for ( intp i = 0; i < candidates.Count(); i++ )
 	{
 		pEntity = candidates[i];
 		Assert( pEntity != this && (pEntity->MyNPCPointer() || pEntity->IsPlayer() ) );
@@ -1953,11 +1952,11 @@ void CNPC_CScanner::BlindFlashTarget( CBaseEntity *pTarget )
 {
 	// Tell all the striders this person is here!
 	CAI_BaseNPC **	ppAIs 	= g_AI_Manager.AccessAIs();
-	int 			nAIs 	= g_AI_Manager.NumAIs();
+	intp 			nAIs 	= g_AI_Manager.NumAIs();
 	
 	if( IsStriderScout() )
 	{
-		for ( int i = 0; i < nAIs; i++ )
+		for ( intp i = 0; i < nAIs; i++ )
 		{
 			if( FClassnameIs( ppAIs[ i ], "npc_strider" ) )
 			{

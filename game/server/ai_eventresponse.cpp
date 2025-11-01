@@ -118,7 +118,7 @@ void CNPCEventResponseSystem::FrameUpdatePreEntityThink()
 
 				// Try and find the nearest NPC to the player
 				CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
-				for ( int j = 0; j < g_AI_Manager.NumAIs(); j++ )
+				for ( intp j = 0; j < g_AI_Manager.NumAIs(); j++ )
 				{
 					if ( ppAIs[j]->CanRespondToEvent( pResponse ))
 					{

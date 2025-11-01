@@ -567,7 +567,7 @@ void CNPC_Zombine::HandleAnimEvent( animevent_t *pEvent )
 				// Tell player allies nearby to regard me!
 				CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 				CAI_BaseNPC *pNPC;
-				for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
+				for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 				{
 					pNPC = ppAIs[i];
 

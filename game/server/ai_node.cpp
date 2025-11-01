@@ -33,7 +33,7 @@
 CAI_Link *CAI_Node::GetLink( int destNodeId )
 {
 	// Now make sure this node still has a link to the destID
-	for ( int link = 0; link < NumLinks(); link++ )
+	for ( intp link = 0; link < NumLinks(); link++ )
 	{
 		// If we find the link the dynamic link is valid
 		if ( m_Links[link]->DestNodeID(m_iID) == destNodeId )
@@ -59,7 +59,7 @@ void CAI_Node::AddLink(CAI_Link *newLink)
 	}
 
 #ifdef _DEBUG
-	for (int link=0;link<NumLinks();link++)
+	for (intp link=0;link<NumLinks();link++)
 	{
 		if (m_Links[link] == newLink)
 		{
@@ -83,7 +83,7 @@ void CAI_Node::AddLink(CAI_Link *newLink)
 //-----------------------------------------------------------------------------
 CAI_Link* CAI_Node::HasLink(int nNodeID)
 {
-	for (int link=0;link<NumLinks();link++)
+	for (intp link=0;link<NumLinks();link++)
 	{
 		// If node has link to myself, than add link to my list of links
 		if (m_Links[link]->DestNodeID(m_iID) == nNodeID)

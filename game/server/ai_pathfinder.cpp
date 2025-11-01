@@ -108,7 +108,7 @@ Navigation_t CAI_Pathfinder::ComputeWaypointType( CAI_Node **ppNodes, int parent
 	Navigation_t navType = NAV_NONE;
 
 	CAI_Node *pNode = ppNodes[parentID];
-	for (int link=0; link < pNode->NumLinks();link++) 
+	for (intp link=0; link < pNode->NumLinks();link++) 
 	{
 		if (pNode->GetLinkByIndex(link)->DestNodeID(parentID) == destID)
 		{
@@ -141,7 +141,7 @@ Navigation_t CAI_Pathfinder::ComputeWaypointType( CAI_Node **ppNodes, int parent
 	if ( navType == NAV_NONE )
 	{
 		pNode = ppNodes[destID];
-		for (int link=0; link < pNode->NumLinks();link++) 
+		for (intp link=0; link < pNode->NumLinks();link++) 
 		{
 			if (pNode->GetLinkByIndex(link)->DestNodeID(parentID) == destID)
 			{
@@ -333,7 +333,7 @@ AI_Waypoint_t *CAI_Pathfinder::FindBestPath(int startID, int endID)
 
 		// Check this if the node is immediately in the path after the startNode 
 		// that it isn't blocked
-		for (int link=0; link < pSmallestNode->NumLinks();link++) 
+		for (intp link=0; link < pSmallestNode->NumLinks();link++) 
 		{
 			CAI_Link *nodeLink = pSmallestNode->GetLinkByIndex(link);
 			
@@ -524,7 +524,7 @@ AI_Waypoint_t* CAI_Pathfinder::FindShortRandomPath(int startID, float minPathLen
 
 		// Now add in new neighbors, pick links in different order ever time
 		pAInode[neighborID]->ShuffleLinks();
-		for (int link=0; link < pAInode[neighborID]->NumLinks();link++) 
+		for (intp link=0; link < pAInode[neighborID]->NumLinks();link++) 
 		{
 			if ( numStaleNeighbors == ARRAYSIZE(pStaleNeighbor) )
 			{
@@ -1698,7 +1698,7 @@ public:
 		if ( !m_pPathfinder->m_bIgnoreStaleLinks )
 		{
 			int hull = m_pPathfinder->GetOuter()->GetHullType();
-			for ( int i = 0; i < pNode->NumLinks(); i++ )
+			for ( intp i = 0; i < pNode->NumLinks(); i++ )
 			{
 				CAI_Link *pLink = pNode->GetLinkByIndex( i );
 				if ( pLink->m_LinkInfo & ( bits_LINK_STALE_SUGGESTED | bits_LINK_OFF ) )

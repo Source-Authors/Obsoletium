@@ -454,8 +454,8 @@ void CFuncTank::NPC_FindController( void )
 
 	// Search through the AI list for the closest NPC with the func_tank behavior.
 	CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
-	int nAICount = g_AI_Manager.NumAIs();
-	for ( int iAI = 0; iAI < nAICount; ++iAI )
+	intp nAICount = g_AI_Manager.NumAIs();
+	for ( intp iAI = 0; iAI < nAICount; ++iAI )
 	{
 		CAI_BaseNPC *pNPC = ppAIs[iAI];
 		if ( !pNPC )

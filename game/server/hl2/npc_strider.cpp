@@ -2076,7 +2076,7 @@ void CNPC_Strider::InputSetCannonTarget( inputdata_t &inputdata )
 			
 		CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
 		CNPC_Strider *pStrider;
-		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
+		for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			if ( ppAIs[i] != this && ppAIs[i]->ClassMatches( GetClassname() ) )
 			{
@@ -4629,7 +4629,7 @@ bool CNPC_Strider::CNavigator::DoFindPathToPos()
 					Vector vNewEnd = vec3_invalid;
 					int segmentDestClosest = NO_NODE;
 
-					for (int link=0; link < pLastNode->NumLinks();link++) 
+					for (intp link=0; link < pLastNode->NumLinks();link++) 
 					{
 						CAI_Link *pLink = pLastNode->GetLinkByIndex(link);
 						if ( !( pLink->m_LinkInfo & bits_LINK_OFF ) && (pLink->m_iAcceptedMoveTypes[GetHullType()] & bits_CAP_MOVE_FLY) )

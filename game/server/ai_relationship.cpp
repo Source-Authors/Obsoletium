@@ -394,7 +394,7 @@ void CAI_Relationship::ChangeRelationships( int disposition, int iReverting, CBa
 	}
 
 	// Search NPCs
-	for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
+	for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 	{
 		if ( subjectList.Count() == MAX_HANDLED || targetList.Count() == MAX_HANDLED )
 		{

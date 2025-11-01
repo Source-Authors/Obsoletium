@@ -452,7 +452,7 @@ public:
 	CAI_Manager();
 	
 	CAI_BaseNPC **	AccessAIs();
-	int				NumAIs();
+	intp			NumAIs() const;
 	
 	void AddAI( CAI_BaseNPC *pAI );
 	void RemoveAI( CAI_BaseNPC *pAI );

@@ -6947,11 +6947,10 @@ void CAI_HunterEscortBehavior::DistributeFreeHunters()
 	g_TimeLastDistributeFreeHunters = gpGlobals->curtime;
 
 	CUtlVector<CNPC_Hunter *> freeHunters;
-	int i;
 	FindFreeHunters( &freeHunters );
 
 	CAI_BaseNPC **ppNPCs = g_AI_Manager.AccessAIs();
-	for ( i = 0; i < g_AI_Manager.NumAIs() && freeHunters.Count(); i++ )
+	for ( intp i = 0; i < g_AI_Manager.NumAIs() && freeHunters.Count(); i++ )
 	{
 		int nToAdd;
 		CNPC_Strider *pStrider = ( ppNPCs[i]->IsAlive() ) ? dynamic_cast<CNPC_Strider *>( ppNPCs[i] ) : NULL;
@@ -6970,7 +6969,7 @@ void CAI_HunterEscortBehavior::DistributeFreeHunters()
 		}
 	}
 
-	for ( i = 0; i < freeHunters.Count(); i++ )
+	for ( intp i = 0; i < freeHunters.Count(); i++ )
 	{
 		//DevMsg( "npc_hunter %d assigned to free_hunters_squad\n", freeHunters[i]->entindex() );
 		freeHunters[i]->m_EscortBehavior.SetFollowTarget( NULL );
@@ -6981,7 +6980,7 @@ void CAI_HunterEscortBehavior::DistributeFreeHunters()
 	CBaseEntity *pHunterMaker = gEntList.FindEntityByClassname( NULL, "npc_hunter_maker" ); // TODO: this picks the same one every time!
 	if ( pHunterMaker )
 	{
-		for ( i = 0; i < freeHunters.Count(); i++ )
+		for ( intp i = 0; i < freeHunters.Count(); i++ )
 		{
 			freeHunters[i]->m_EscortBehavior.SetFollowTarget( pHunterMaker );
 		}
@@ -7029,9 +7028,9 @@ bool Hunter_IsHunter(CBaseEntity *pEnt)
 void Hunter_StriderBusterLaunched( CBaseEntity *pBuster )
 {
 	CAI_BaseNPC **ppAIs = g_AI_Manager.AccessAIs();
-	int nAIs = g_AI_Manager.NumAIs();
+	intp nAIs = g_AI_Manager.NumAIs();
 
-	for ( int i = 0; i < nAIs; i++ )
+	for ( intp i = 0; i < nAIs; i++ )
 	{
 		CAI_BaseNPC *pNPC = ppAIs[ i ];
 		if ( pNPC && ( pNPC->Classify() == CLASS_COMBINE_HUNTER ) && pNPC->m_lifeState == LIFE_ALIVE )

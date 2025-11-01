@@ -639,9 +639,8 @@ void CNPC_Citizen::SelectModel()
 		{
 			// Count the heads
 			int headCounts[ssize(g_ppszRandomHeads)] = { 0 };
-			int i;
 
-			for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+			for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 			{
 				CNPC_Citizen *pCitizen = dynamic_cast<CNPC_Citizen *>(g_AI_Manager.AccessAIs()[i]);
 				if ( pCitizen && pCitizen != this && pCitizen->m_iHead >= 0 && pCitizen->m_iHead < static_cast<int>(ARRAYSIZE(g_ppszRandomHeads)) )
@@ -653,7 +652,7 @@ void CNPC_Citizen::SelectModel()
 			// Find all candidates
 			CUtlVectorFixed<HeadCandidate_t, ssize(g_ppszRandomHeads)> candidates;
 
-			for ( i = 0; i < static_cast<int>(ARRAYSIZE(g_ppszRandomHeads)); i++ )
+			for ( int i = 0; i < static_cast<int>(ssize(g_ppszRandomHeads)); i++ )
 			{
 				if ( !gender || g_ppszRandomHeads[i][0] == gender )
 				{
@@ -906,7 +905,7 @@ void CNPC_Citizen::GatherConditions()
 	if ( !SpokeConcept( TLK_JOINPLAYER ) && IsRunningScriptedSceneWithSpeech( this, true ) )
 	{
 		SetSpokeConcept( TLK_JOINPLAYER, NULL );
-		for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
+		for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			CAI_BaseNPC *pNpc = g_AI_Manager.AccessAIs()[i];
 			if ( pNpc != this && pNpc->GetClassname() == GetClassname() && pNpc->GetAbsOrigin().DistToSqr( GetAbsOrigin() ) < Square( 15*12 ) && FVisible( pNpc ) )
@@ -2447,7 +2446,7 @@ bool CNPC_Citizen::ShouldAutoSummon()
 		// Auto summon only if there are no readily apparent enemies
 		if ( bSetFollow && bTestEnemies )
 		{
-			for ( int i = 0; i < g_AI_Manager.NumAIs(); i++ )
+			for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 			{
 				CAI_BaseNPC *pNpc = g_AI_Manager.AccessAIs()[i];
 				float timeSinceCombatTolerance = player_squad_autosummon_time_after_combat.GetFloat();
@@ -2851,9 +2850,8 @@ void CNPC_Citizen::UpdatePlayerSquad()
 		CUtlVector<SquadCandidate_t> candidates;
 		const Vector &vPlayerPos = pPlayer->GetAbsOrigin();
 		bool bFoundNewGuy = false;
-		int i;
 
-		for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+		for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 		{
 			if ( ppAIs[i]->GetState() == NPC_STATE_DEAD )
 				continue;
@@ -2925,14 +2923,14 @@ void CNPC_Citizen::UpdatePlayerSquad()
 		if ( bFoundNewGuy )
 		{
 			// Look for second order guys
-			int initialCount = candidates.Count();
-			for ( i = 0; i < initialCount; i++ )
+			intp initialCount = candidates.Count();
+			for ( intp i = 0; i < initialCount; i++ )
 				candidates[i].pCitizen->AddSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE ); // Prevents double-add
-			for ( i = 0; i < initialCount; i++ )
+			for ( intp i = 0; i < initialCount; i++ )
 			{
 				if ( candidates[i].iSquadIndex == -1 )
 				{
-					for ( int j = 0; j < g_AI_Manager.NumAIs(); j++ )
+					for ( intp j = 0; j < g_AI_Manager.NumAIs(); j++ )
 					{
 						if ( ppAIs[j]->GetState() == NPC_STATE_DEAD )
 							continue;
@@ -2968,14 +2966,14 @@ void CNPC_Citizen::UpdatePlayerSquad()
 					}
 				}
 			}
-			for ( i = 0; i < candidates.Count(); i++ )
+			for ( intp i = 0; i < candidates.Count(); i++ )
 				candidates[i].pCitizen->RemoveSpawnFlags( SF_CITIZEN_NOT_COMMANDABLE );
 
 			if ( candidates.Count() > MAX_PLAYER_SQUAD )
 			{
 				candidates.Sort( PlayerSquadCandidateSortFunc );
 
-				for ( i = MAX_PLAYER_SQUAD; i < candidates.Count(); i++ )
+				for ( intp i = MAX_PLAYER_SQUAD; i < candidates.Count(); i++ )
 				{
 					if ( candidates[i].pCitizen->IsInPlayerSquad() )
 					{
@@ -2990,7 +2988,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 				float closestDistSq = FLT_MAX;
 				int nJoined = 0;
 
-				for ( i = 0; i < candidates.Count() && i < MAX_PLAYER_SQUAD; i++ )
+				for ( intp i = 0; i < candidates.Count() && i < MAX_PLAYER_SQUAD; i++ )
 				{
 					if ( !candidates[i].pCitizen->IsInPlayerSquad() )
 					{
@@ -3016,7 +3014,7 @@ void CNPC_Citizen::UpdatePlayerSquad()
 						pClosest->SpeakCommandResponse( TLK_STARTFOLLOW );
 					}
 
-					for ( i = 0; i < candidates.Count() && i < MAX_PLAYER_SQUAD; i++ )
+					for ( intp i = 0; i < candidates.Count() && i < MAX_PLAYER_SQUAD; i++ )
 					{
 						candidates[i].pCitizen->SetSpokeConcept( TLK_JOINPLAYER, NULL ); 
 					}
