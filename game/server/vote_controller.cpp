@@ -491,10 +491,10 @@ bool CVoteController::CreateVote( int iEntIndex, const char *pszTypeString, cons
 						for ( int iIndex = 0; iIndex < nNumVoteOptions; iIndex++ )
 						{
 							char szNumber[2];
-							Q_snprintf( szNumber, sizeof( szNumber ), "%i", iIndex + 1 );
+							V_to_chars( szNumber, iIndex + 1 );
 
 							char szOptionName[8] = "option";
-							Q_strncat( szOptionName, szNumber, sizeof( szOptionName ), COPY_ALL_CHARACTERS );
+							V_strcat_safe( szOptionName, szNumber );
 
 							event->SetString( szOptionName, m_VoteOptions[iIndex] );
 						}
