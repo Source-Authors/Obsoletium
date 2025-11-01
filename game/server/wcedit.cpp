@@ -349,7 +349,7 @@ void NWCEdit::DestroyAINode( CBasePlayer *pPlayer )
 			g_pAINetworkManager->GetEditOps()->m_pLastDeletedNode	= pAINode;
 
 			// Now go through at delete any dynamic links that were attached to this node
-			for (int link = 0; link < pAINode->NumLinks(); link++)
+			for (intp link = 0; link < pAINode->NumLinks(); link++)
 			{
 				int nSrcID = pAINode->GetLinkByIndex(link)->m_iSrcID;
 				int nDstID = pAINode->GetLinkByIndex(link)->m_iDestID;
