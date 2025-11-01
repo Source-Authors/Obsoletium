@@ -74,10 +74,9 @@ void CEnvPlayerSurfaceTrigger::SetPlayerSurface( CBasePlayer *pPlayer, char game
 		return;
 
 	// Loop through the surface triggers and tell them all about the change
-	int iCount = g_PlayerSurfaceTriggers.Count();
-	for ( int i = 0; i < iCount; i++ )
+	for ( auto &t : g_PlayerSurfaceTriggers )
 	{
-		g_PlayerSurfaceTriggers[i]->PlayerSurfaceChanged( pPlayer, gameMaterial );
+		t->PlayerSurfaceChanged( pPlayer, gameMaterial );
 	}
 }
 

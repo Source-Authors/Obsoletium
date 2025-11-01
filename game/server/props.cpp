@@ -6046,7 +6046,7 @@ bool UTIL_CreateScaledPhysObject( CBaseAnimating *pInstance, float flScale )
 	tmpSolid.params.volume = physcollision->CollideVolume( pNewCollide );
 
 	// Get our surface prop info
-	int surfaceProp = -1;
+	intp surfaceProp = -1;
 	if ( tmpSolid.surfaceprop[0] )
 	{
 		surfaceProp = physprops->GetSurfaceIndex( tmpSolid.surfaceprop );

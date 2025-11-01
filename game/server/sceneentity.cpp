@@ -4829,8 +4829,8 @@ void CSceneManager::Think()
 		return;
 
 	bool needCleanupPass = false;
-	int c = m_ActiveScenes.Count();
-	for ( int i = 0; i < c; i++ )
+	intp c = m_ActiveScenes.Count();
+	for ( intp i = 0; i < c; i++ )
 	{
 		CSceneEntity *scene = m_ActiveScenes[ i ].Get();
 		if ( !scene )
@@ -4852,7 +4852,7 @@ void CSceneManager::Think()
 	// Now delete any invalid ones
 	if ( needCleanupPass )
 	{
-		for ( int i = c - 1; i >= 0; i-- )
+		for ( intp i = c - 1; i >= 0; i-- )
 		{
 			CSceneEntity *scene = m_ActiveScenes[ i ].Get();
 			if ( scene )

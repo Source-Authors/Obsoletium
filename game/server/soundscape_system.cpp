@@ -211,7 +211,7 @@ void CSoundscapeSystem::LevelInitPostEntity()
 
 	// find the clusters visible from each soundscape
 	// add this soundscape to the list of soundscapes for that cluster, clip cluster bounds to radius
-	for ( int i = 0; i < m_soundscapeEntities.Count(); i++ )
+	for ( intp i = 0; i < m_soundscapeEntities.Count(); i++ )
 	{
 		Vector position = m_soundscapeEntities[i]->GetAbsOrigin();
 		float radius = m_soundscapeEntities[i]->m_flRadius;
@@ -248,7 +248,7 @@ void CSoundscapeSystem::LevelInitPostEntity()
 	// now add each soundscape index to the appropriate cluster's list
 	// The resulting list is precomputing all soundscapes that need to be checked for a player
 	// in each cluster.  This is used to accelerate the per-frame operations
-	for ( int i = 0; i < soundscapeIndexList.Count(); i++ )
+	for ( intp i = 0; i < soundscapeIndexList.Count(); i++ )
 	{
 		int cluster = clusterIndexList[i];
 		int outIndex = m_soundscapesInCluster[cluster].soundscapeCount + m_soundscapesInCluster[cluster].firstSoundscape;
@@ -286,7 +286,7 @@ void CSoundscapeSystem::RemoveSoundscapeEntity( CEnvSoundscape *pSoundscape )
 
 void CSoundscapeSystem::FrameUpdatePostEntityThink()
 {
-	int total = m_soundscapeEntities.Count();
+	intp total = m_soundscapeEntities.Count();
 	if ( total > 0 )
 	{
 		int traceCount = 0;

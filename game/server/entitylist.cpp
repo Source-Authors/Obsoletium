@@ -1093,9 +1093,9 @@ void CGlobalEntityList::OnAddEntity( IHandleEntity *pEnt, CBaseHandle handle )
 	// NOTE: Must be a CBaseEntity on server
 	Assert( pBaseEnt );
 	//DevMsg(2,"Created %s\n", pBaseEnt->GetClassname() );
-	for ( i = m_entityListeners.Count()-1; i >= 0; i-- )
+	for ( intp j = m_entityListeners.Count()-1; j >= 0; j-- )
 	{
-		m_entityListeners[i]->OnEntityCreated( pBaseEnt );
+		m_entityListeners[j]->OnEntityCreated( pBaseEnt );
 	}
 }
 

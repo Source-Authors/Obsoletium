@@ -539,7 +539,7 @@ float CalculateObjectStress( IPhysicsObject *pObject, CBaseEntity *pInputOwnerEn
 				pOtherOwner = pOtherEntity->GetOwnerEntity();
 			}
 
-			int outIndex = 0;
+			intp outIndex = 0;
 			if ( !pOther->IsMoveable() )
 			{
 				outIndex = 0;
@@ -568,7 +568,7 @@ float CalculateObjectStress( IPhysicsObject *pObject, CBaseEntity *pInputOwnerEn
 				// aggregate contacts over each object to avoid greater stress in multiple contact cases
 				// NOTE: Contacts should be in order, so this shouldn't ever search, but just in case
 				outIndex = pObjectList.Count();
-				for ( int i = pObjectList.Count()-1; i >= 2; --i )
+				for ( intp i = pObjectList.Count()-1; i >= 2; --i )
 				{
 					if ( pObjectList[i] == pOtherOwner )
 					{

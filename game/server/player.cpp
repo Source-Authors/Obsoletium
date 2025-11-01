@@ -3298,7 +3298,7 @@ void CBasePlayer::PhysicsSimulate( void )
 	// If we're running multiple ticks this frame, don't peel off all of the commands, spread them out over
 	// the server ticks.  Use blocks of two in alternate ticks
 	int commandLimit = CBaseEntity::IsSimulatingOnAlternateTicks() ? 2 : 1;
-	int commandsToRun = vecAvailCommands.Count();
+	intp commandsToRun = vecAvailCommands.Count();
 	if ( gpGlobals->simTicksThisFrame >= commandLimit && vecAvailCommands.Count() > commandLimit )
 	{
 		int commandsToRollOver = MIN( vecAvailCommands.Count(), ( gpGlobals->simTicksThisFrame - 1 ) );
