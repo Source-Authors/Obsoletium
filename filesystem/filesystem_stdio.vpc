@@ -17,24 +17,6 @@ $Macro						"_SUBDIRSUFFIX"		"$INTERMEDIATESUBDIR$GAMENAME$PLATSUBDIR$_UNITYSUBD
 $include "$SRCDIR\vpc_scripts\source_dll_base.vpc"
 $include "$SRCDIR\vpc_scripts\source_cryptlib_include.vpc"
 
-$Configuration	"Debug"
-{
-	$General
-	{
-		$OutputDirectory		"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME"     [$WINDOWS]
-		$IntermediateDirectory	"$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i"     [$WINDOWS]
-	}
-}
-
-$Configuration	"Release"
-{
-	$General
-	{
-		$OutputDirectory		"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME"     [$WINDOWS]
-		$IntermediateDirectory	"$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i"     [$WINDOWS]
-	}
-}
-
 $Configuration
 {
 	$Compiler
