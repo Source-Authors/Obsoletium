@@ -455,7 +455,7 @@ void CAPCController::StartRotSound( void )
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_STATIC;
-		ep.m_pSoundName = (char*)STRING(m_soundLoopRotate);
+		ep.m_pSoundName = STRING(m_soundLoopRotate);
 		ep.m_SoundLevel = SNDLVL_NORM;
 		ep.m_flVolume = 0.85;
 
@@ -468,7 +468,7 @@ void CAPCController::StartRotSound( void )
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_BODY;
-		ep.m_pSoundName = (char*)STRING(m_soundStartRotate);
+		ep.m_pSoundName = STRING(m_soundStartRotate);
 		ep.m_SoundLevel = SNDLVL_NORM;
 		ep.m_flVolume = 1.0f;
 
@@ -481,7 +481,7 @@ void CAPCController::StopRotSound( void )
 {
 	if ( m_soundLoopRotate != NULL_STRING )
 	{
-		StopSound( entindex(), CHAN_STATIC, (char*)STRING(m_soundLoopRotate) );
+		StopSound( entindex(), CHAN_STATIC, STRING(m_soundLoopRotate) );
 	}
 	if ( m_soundStopRotate != NULL_STRING )
 	{
@@ -489,7 +489,7 @@ void CAPCController::StopRotSound( void )
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_BODY;
-		ep.m_pSoundName = (char*)STRING(m_soundStopRotate);
+		ep.m_pSoundName = STRING(m_soundStopRotate);
 		ep.m_SoundLevel = SNDLVL_NORM;
 
 		EmitSound( filter, entindex(), ep );

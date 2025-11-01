@@ -1610,7 +1610,7 @@ bool CAI_ActBusyBehavior::HasAnimForActBusy( int iActBusy, busyanimparts_t AnimP
 
 	// Try and play the sequence first
 	if ( pBusyAnim->iszSequences[AnimPart] != NULL_STRING )
-		return (GetOuter()->LookupSequence( (char*)STRING(pBusyAnim->iszSequences[AnimPart]) ) != ACTIVITY_NOT_AVAILABLE);
+		return (GetOuter()->LookupSequence( STRING(pBusyAnim->iszSequences[AnimPart]) ) != ACTIVITY_NOT_AVAILABLE);
 
 	// Try and play the activity second
 	if ( pBusyAnim->iActivities[AnimPart] != ACT_INVALID )
@@ -1668,7 +1668,7 @@ bool CAI_ActBusyBehavior::PlayAnimForActBusy( busyanimparts_t AnimPart )
 	// Try and play the sequence first
 	if ( pBusyAnim->iszSequences[AnimPart] != NULL_STRING )
 	{
-		GetOuter()->SetSequenceByName( (char*)STRING(pBusyAnim->iszSequences[AnimPart]) );
+		GetOuter()->SetSequenceByName( STRING(pBusyAnim->iszSequences[AnimPart]) );
 		GetOuter()->SetIdealActivity( ACT_DO_NOT_DISTURB );
 		return true;
 	}

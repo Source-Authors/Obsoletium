@@ -2291,7 +2291,7 @@ void CFuncTank::StartRotSound( void )
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_STATIC;
-		ep.m_pSoundName = (char*)STRING(m_soundLoopRotate);
+		ep.m_pSoundName = STRING(m_soundLoopRotate);
 		ep.m_flVolume = 0.85;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -2304,7 +2304,7 @@ void CFuncTank::StartRotSound( void )
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_BODY;
-		ep.m_pSoundName = (char*)STRING(m_soundStartRotate);
+		ep.m_pSoundName = STRING(m_soundStartRotate);
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -2319,7 +2319,7 @@ void CFuncTank::StopRotSound( void )
 	{
 		if ( m_soundLoopRotate != NULL_STRING )
 		{
-			StopSound( entindex(), CHAN_STATIC, (char*)STRING(m_soundLoopRotate) );
+			StopSound( entindex(), CHAN_STATIC, STRING(m_soundLoopRotate) );
 		}
 		if ( m_soundStopRotate != NULL_STRING )
 		{
@@ -2327,7 +2327,7 @@ void CFuncTank::StopRotSound( void )
 
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_BODY;
-			ep.m_pSoundName = (char*)STRING(m_soundStopRotate);
+			ep.m_pSoundName = STRING(m_soundStopRotate);
 			ep.m_flVolume = 1.0f;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -2581,7 +2581,7 @@ void CFuncTankPulseLaser::Fire( int bulletCount, const Vector &barrelEnd, const 
 
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_WEAPON;
-			ep.m_pSoundName = (char*)STRING(m_sPulseFireSound);
+			ep.m_pSoundName = STRING(m_sPulseFireSound);
 			ep.m_flVolume = 1.0f;
 			ep.m_SoundLevel = SNDLVL_85dB;
 
@@ -3601,7 +3601,7 @@ void CMortarShell::Warn( void )
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_WEAPON;
-		ep.m_pSoundName = (char*)STRING(m_warnSound);
+		ep.m_pSoundName = STRING(m_warnSound);
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NONE;
 
@@ -3948,7 +3948,7 @@ void CFuncTankMortar::Fire( int bulletCount, const Vector &barrelEnd, const Vect
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_WEAPON;
-		ep.m_pSoundName = (char*)STRING(m_fireStartSound);
+		ep.m_pSoundName = STRING(m_fireStartSound);
 		ep.m_flVolume = 1.0f;
 		ep.m_SoundLevel = SNDLVL_NONE;
 
