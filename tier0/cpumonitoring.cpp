@@ -295,9 +295,8 @@ PLATFORM_INTERFACE CPUFrequencyResults GetCPUFrequencyResults(bool)
 	return results;
 }
 
-PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
+PLATFORM_INTERFACE void SetCPUMonitoringInterval( [[maybe_unused]] unsigned nDelayMilliseconds )
 {
-	NOTE_UNUSED( nDelayMilliseconds );
 }
 
 #endif

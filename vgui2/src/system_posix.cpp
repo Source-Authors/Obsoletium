@@ -311,9 +311,8 @@ void CSystem::ShellExecute(const char *command, const char *file)
 	}
 }
 
-void CSystem::ShellExecuteEx( const char *command, const char *file, const char *pParams )
+void CSystem::ShellExecuteEx( const char *command, const char *file, [[maybe_unused]] const char *pParams )
 {
-	NOTE_UNUSED( pParams );
 	ShellExecute( command, file );
 }
 

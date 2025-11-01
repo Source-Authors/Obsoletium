@@ -72,10 +72,8 @@ const char *GetKey( ColumnIndex_t ci )
 }
 
 template < int C >
-int ListPanelStringSortFunc( vgui::ListPanel *pPanel, const vgui::ListPanelItem &item1, const vgui::ListPanelItem &item2 )
+int ListPanelStringSortFunc( [[maybe_unused]] vgui::ListPanel *pPanel, const vgui::ListPanelItem &item1, const vgui::ListPanelItem &item2 )
 {
-	NOTE_UNUSED( pPanel );
-
 	const char *pKey = GetKey( ( ColumnIndex_t )C );
 	const char *string1 = item1.kv->GetString( pKey );
 	const char *string2 = item2.kv->GetString( pKey );

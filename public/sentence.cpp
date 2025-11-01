@@ -504,7 +504,7 @@ void CSentence::ParseWords( CUtlBuffer& buf )
 			end = strtof( token, nullptr );
 			buf.GetString( token );
 			// dimhotepus: atof -> strtof
-			float volume = strtof( token, nullptr );
+			[[maybe_unused]] float volume = strtof( token, nullptr );
 
 			CPhonemeTag *pt = new CPhonemeTag();
 			Assert( pt );

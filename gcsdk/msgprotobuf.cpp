@@ -449,8 +449,7 @@ uint8* CProtoBufMsgBase::AllocateMessageMemory( MsgType_t eMsgType, const CMsgPr
 	#endif
 
 	// Serialize extended pb header, we guarantee we didn't modify the message since the last call to ByteSize above, so use the cached sizes serialize
-	uint8 *pEnd = hdr.SerializeWithCachedSizesToArray( pubMsgBytes + sizeof( ProtoBufMsgHeader_t ) );
-	NOTE_UNUSED( pEnd );
+	[[maybe_unused]] uint8 *pEnd = hdr.SerializeWithCachedSizesToArray( pubMsgBytes + sizeof( ProtoBufMsgHeader_t ) );
 	Assert( pEnd == pubMsgBytes + sizeof( ProtoBufMsgHeader_t ) + cubExtHdrSize );
 
 	if( pCubTotalSizeOut )

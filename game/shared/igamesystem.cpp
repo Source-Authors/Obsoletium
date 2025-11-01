@@ -326,10 +326,8 @@ void IGameSystem::PreClientUpdateAllSystems()
 //-----------------------------------------------------------------------------
 // Invokes a method on all installed game systems in proper order
 //-----------------------------------------------------------------------------
-void InvokeMethod( GameSystemFunc_t f, char const *timed /*=0*/ )
+void InvokeMethod( GameSystemFunc_t f, [[maybe_unused]] char const *timed /*=0*/ )
 {
-	NOTE_UNUSED( timed );
-
 	for ( auto *sys : s_GameSystems )
 	{
 		MDLCACHE_CRITICAL_SECTION();
@@ -341,10 +339,8 @@ void InvokeMethod( GameSystemFunc_t f, char const *timed /*=0*/ )
 //-----------------------------------------------------------------------------
 // Invokes a method on all installed game systems in proper order
 //-----------------------------------------------------------------------------
-void InvokePerFrameMethod( PerFrameGameSystemFunc_t f, char const *timed /*=0*/ )
+void InvokePerFrameMethod( PerFrameGameSystemFunc_t f, [[maybe_unused]] char const *timed /*=0*/ )
 {
-	NOTE_UNUSED( timed );
-
 	for ( auto *sys : s_GameSystemsPerFrame )
 	{
 		MDLCACHE_CRITICAL_SECTION();

@@ -871,10 +871,8 @@ VPANEL CWin32Surface::GetEmbeddedPanel()
  void CWin32Surface::DrawTexturedSubRect( int, int, int, int, float, float, float, float )
  {
  }
- void CWin32Surface::DrawTexturedPolygon(int n, Vertex_t *pVertices, bool bClipVertices /*= true*/)
+ void CWin32Surface::DrawTexturedPolygon(int n, Vertex_t *pVertices, [[maybe_unused]] bool bClipVertices /*= true*/)
  {
-	NOTE_UNUSED( bClipVertices );
-
 	POINT *pt;
 	HDC hdc = PLAT(_currentContextPanel)->hdc;
 	

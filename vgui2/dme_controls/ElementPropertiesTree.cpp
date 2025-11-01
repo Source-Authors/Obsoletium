@@ -4203,8 +4203,7 @@ void CElementPropertiesTreeInternal::SetupWidgetInfo( AttributeWidgetInfo_t *pIn
 //-----------------------------------------------------------------------------
 void CElementPropertiesTreeInternal::InsertSingleAttribute( int parentNodeIndex, CDmElement *obj, CDmAttribute *pAttribute, intp nArrayIndex )
 {
-	const char *attributeName = pAttribute->GetName();
-	NOTE_UNUSED( attributeName );
+	[[maybe_unused]] const char *attributeName = pAttribute->GetName();
 
 	// Get information about the widget to create
 

@@ -1009,8 +1009,7 @@ void CInputSystem::UpdateMouseFocus(int x, int y)
 				continue;
 			}
 #if defined( _DEBUG )
-			char const *pchName = popup->GetName();
-			NOTE_UNUSED( pchName );
+			[[maybe_unused]] char const *pchName = popup->GetName();
 #endif
 			bool wantsMouse = panel->IsMouseInputEnabled() && IsChildOfModalSubTree( (VPANEL)panel );
 			if ( !wantsMouse )

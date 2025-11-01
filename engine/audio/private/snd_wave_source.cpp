@@ -1505,8 +1505,7 @@ CAudioSource *CreateWave( CSfxTable *pSfx, bool bStreaming )
 #if defined( _DEBUG )
 	// For some reason you can't usually do pSfx->getname() in the dev studio debugger, so for convenience we'll grab the name
 	// here in debug builds at least...
-	char const *pName = pSfx->getname();
-	NOTE_UNUSED( pName );
+	[[maybe_unused]] char const *pName = pSfx->getname();
 #endif
 
 	CAudioSourceWave *pWave = NULL;

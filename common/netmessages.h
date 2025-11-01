@@ -147,16 +147,13 @@ class NET_Tick : public CNetMessage
 	{ 
 	};
 
-	NET_Tick( int tick, float hostFrametime, float hostFrametime_stddeviation ) : m_pMessageHandler{nullptr}
+	NET_Tick( int tick, [[maybe_unused]] float hostFrametime, [[maybe_unused]] float hostFrametime_stddeviation ) : m_pMessageHandler{nullptr}
 	{ 
 		m_bReliable = false; 
 		m_nTick = tick; 
 #if PROTOCOL_VERSION > 10
 		m_flHostFrameTime			= hostFrametime;
 		m_flHostFrameTimeStdDeviation	= hostFrametime_stddeviation;
-#else
-		NOTE_UNUSED( hostFrametime );
-		NOTE_UNUSED( hostFrametime_stddeviation );
 #endif
 	};
 	
