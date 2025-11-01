@@ -227,7 +227,7 @@ public:
 
 private:
 	bool	m_bPanelDirty;
-	int		m_iDefaultAnimation;
+	intp	m_iDefaultAnimation;
 
 	bool	m_bAllowOffscreen;
 
