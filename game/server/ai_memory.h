@@ -18,7 +18,7 @@ DECLARE_POINTER_HANDLE(AIEnemiesIter_t);
 constexpr inline float AI_DEF_ENEMY_DISCARD_TIME = 60.0;
 
 const inline CBaseEntity* AI_UNKNOWN_ENEMY{((CBaseEntity *)nullptr)+1}; // use this to probe for unseen attackers
-#define AI_INVALID_TIME (FLT_MAX * -1.0)
+constexpr inline float AI_INVALID_TIME{FLT_MAX * -1.0f};
 
 //-----------------------------------------------------------------------------
 // AI_EnemyInfo_t
