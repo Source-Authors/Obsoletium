@@ -2414,7 +2414,7 @@ void CAI_ActBusyGoal::InputDeactivate( inputdata_t &inputdata )
 
 	BaseClass::InputDeactivate( inputdata );
 
-	for( int i = 0 ; i < NumActors() ; i++ )
+	for( intp i = 0 ; i < NumActors() ; i++ )
 	{
 		CAI_BaseNPC *pActor = GetActor( i );
 
@@ -2442,7 +2442,7 @@ void CAI_ActBusyGoal::InputSetBusySearchRange( inputdata_t &inputdata )
 {
 	m_flBusySearchRange = inputdata.value.Float();
 
-	for( int i = 0 ; i < NumActors() ; i++ )
+	for( intp i = 0 ; i < NumActors() ; i++ )
 	{
 		CAI_BaseNPC *pActor = GetActor( i );
 

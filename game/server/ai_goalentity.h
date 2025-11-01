@@ -56,8 +56,8 @@ public:
 
 	bool 			IsActive();
 	
-	int 			NumActors();
-	CAI_BaseNPC *	GetActor( int iActor = 0 );
+	intp 			NumActors();
+	CAI_BaseNPC *	GetActor( intp iActor = 0 );
 
 	void			SetGoalEntity( CBaseEntity *pGoalEntity );
 	CBaseEntity *	GetGoalEntity();
@@ -143,7 +143,7 @@ inline bool CAI_GoalEntity::IsActive()
 
 //-------------------------------------
 
-inline int CAI_GoalEntity::NumActors()
+inline intp CAI_GoalEntity::NumActors()
 {
 	UpdateActors();
 	return m_actors.Count();
@@ -151,7 +151,7 @@ inline int CAI_GoalEntity::NumActors()
 	
 //-------------------------------------
 
-inline CAI_BaseNPC *CAI_GoalEntity::GetActor( int iActor )
+inline CAI_BaseNPC *CAI_GoalEntity::GetActor( intp iActor )
 {
 	UpdateActors();
 	if (  m_actors.Count() > iActor )

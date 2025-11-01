@@ -1591,9 +1591,7 @@ void CAI_AssaultGoal::DisableGoal( CAI_BaseNPC *pAI )
 //-----------------------------------------------------------------------------
 void CAI_AssaultGoal::InputBeginAssault( inputdata_t &inputdata )
 {
-	int i;
-
-	for( i = 0 ; i < NumActors() ; i++ )
+	for( intp i = 0 ; i < NumActors() ; i++ )
 	{
 		CAI_BaseNPC *pActor = GetActor( i );
 
