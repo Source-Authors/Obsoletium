@@ -524,11 +524,10 @@ void CBaseTrigger::EndTouch(CBaseEntity *pOther)
 		// If there are no more entities touching this trigger, fire the lost all touches
 		// Loop through the touching entities backwards. Clean out old ones, and look for existing
 		bool bFoundOtherTouchee = false;
-		int iSize = m_hTouchingEntities.Count();
-		for ( int i = iSize-1; i >= 0; i-- )
+		intp iSize = m_hTouchingEntities.Count();
+		for ( intp i = iSize-1; i >= 0; i-- )
 		{
-			EHANDLE hOther;
-			hOther = m_hTouchingEntities[i];
+			EHANDLE hOther = m_hTouchingEntities[i];
 
 			if ( !hOther )
 			{
@@ -576,8 +575,8 @@ bool CBaseTrigger::IsTouching( const CBaseEntity *pOther ) const
 //-----------------------------------------------------------------------------
 CBaseEntity *CBaseTrigger::GetTouchedEntityOfType( const char *sClassName )
 {
-	int iCount = m_hTouchingEntities.Count();
-	for ( int i = 0; i < iCount; i++ )
+	intp iCount = m_hTouchingEntities.Count();
+	for ( intp i = 0; i < iCount; i++ )
 	{
 		CBaseEntity *pEntity = m_hTouchingEntities[i];
 		if ( FClassnameIs( pEntity, sClassName ) )
@@ -1594,11 +1593,10 @@ void CChangeLevel::NotifyEntitiesOutOfTransition()
 //------------------------------------------------------------------------------
 void CChangeLevel::WarnAboutActiveLead( void )
 {
-	int					i;
 	CAI_BaseNPC *		ai;
 	CAI_BehaviorBase *	behavior;
 
-	for ( i = 0; i < g_AI_Manager.NumAIs(); i++ )
+	for ( intp i = 0; i < g_AI_Manager.NumAIs(); i++ )
 	{
 		ai = g_AI_Manager.AccessAIs()[i];
 		behavior = ai->GetRunningBehavior();
@@ -1839,7 +1837,7 @@ static bool TestEntityTriggerIntersection_Accurate( CBaseEntity *pTrigger, CBase
 						collideList.AddToTail( element );
 					}
 				}
-				for ( int i = collideList.Count()-1; i >= 0; --i )
+				for ( intp i = collideList.Count()-1; i >= 0; --i )
 				{
 					const collidelist_t &element = collideList[i];
 					trace_t tr;
