@@ -520,7 +520,7 @@ bool CAI_BaseActor::ProcessSceneEvent( CSceneEventInfo *info, CChoreoScene *scen
 							if (m_syntheticLookQueue.Count() > 0)
 							{
 								float flDuration = (event->GetEndTime() - scene->GetTime());
-								int i = m_syntheticLookQueue.Count() - 1;
+								intp i = m_syntheticLookQueue.Count() - 1;
 								m_syntheticLookQueue[i].m_flEndTime = MIN( m_syntheticLookQueue[i].m_flEndTime, gpGlobals->curtime + flDuration );
 								m_syntheticLookQueue[i].m_flInterest = 0.1f;
 							}
@@ -1121,7 +1121,7 @@ bool CAI_BaseActor::HasActiveLookTargets( void )
 //-----------------------------------------------------------------------------
 void CAI_BaseActor::ClearLookTarget( CBaseEntity *pTarget )
 {
-	int iIndex = m_lookQueue.Find( pTarget );
+	intp iIndex = m_lookQueue.Find( pTarget );
 	if ( iIndex != m_lookQueue.InvalidIndex() )
 	{
 		m_lookQueue.Remove(iIndex);
@@ -1134,7 +1134,7 @@ void CAI_BaseActor::ClearLookTarget( CBaseEntity *pTarget )
 
 		// Figure out the new random look time
 		m_flNextRandomLookTime = gpGlobals->curtime + 1.0f;
-		for (int i = 0; i < m_randomLookQueue.Count(); i++)
+		for (intp i = 0; i < m_randomLookQueue.Count(); i++)
 		{
 			if ( m_randomLookQueue[i].m_flEndTime > m_flNextRandomLookTime )
 			{
@@ -1431,8 +1431,6 @@ void CAI_BaseActor::AddLookTarget( const Vector &vecPosition, float flImportance
 //-----------------------------------------------------------------------------
 void CAI_BaseActor::MaintainLookTargets( float flInterval )
 {
-	int i;
-
 	if ( m_iszExpressionScene != NULL_STRING && m_hExpressionSceneEnt == NULL )
 	{
 		InstancedScriptedScene( this, STRING(m_iszExpressionScene), &m_hExpressionSceneEnt, 0.0f, true );
@@ -1478,7 +1476,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 	// if there's real things to look at, turn off the random targets
 	if (m_lookQueue.Count() != 0 || m_syntheticLookQueue.Count() != 0)
 	{
-		for (i = 0; i < m_randomLookQueue.Count(); i++)
+		for (intp i = 0; i < m_randomLookQueue.Count(); i++)
 		{
 			if (gpGlobals->curtime < m_randomLookQueue[i].m_flEndTime - m_randomLookQueue[i].m_flRamp - 0.2f)
 			{
@@ -1511,15 +1509,15 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 
 	CUtlVector<CAI_InterestTarget_t *> active;
 	// clean up random look targets
-	for (i = 0; i < m_randomLookQueue.Count(); i++)
+	for (intp i = 0; i < m_randomLookQueue.Count(); i++)
 	{
 		active.AddToTail( &m_randomLookQueue[i] );
 	}
-	for (i = 0; i < m_lookQueue.Count(); i++)
+	for (intp i = 0; i < m_lookQueue.Count(); i++)
 	{
 		active.AddToTail( &m_lookQueue[i] );
 	}
-	for (i = 0; i < m_syntheticLookQueue.Count(); i++)
+	for (intp i = 0; i < m_syntheticLookQueue.Count(); i++)
 	{
 		active.AddToTail( &m_syntheticLookQueue[i] );
 	}
@@ -1527,7 +1525,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 	// figure out ideal head yaw
 	bool bValidHeadTarget = false;
 	bool bExpectedHeadTarget = false;
-	for (i = 0; i < active.Count();i++)
+	for (intp i = 0; i < active.Count();i++)
 	{
 		Vector dir;
 		float flDist = 100.0f;
@@ -1614,7 +1612,7 @@ void CAI_BaseActor::MaintainLookTargets( float flInterval )
 	bool bFoundTarget = false;
 	EHANDLE	hTarget = NULL;
 
-	for (i = active.Count() - 1; i >= 0; i--)
+	for (intp i = active.Count() - 1; i >= 0; i--)
 	{
 		if (active[i]->IsThis( this ))
 		{
