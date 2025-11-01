@@ -2921,9 +2921,9 @@ bool CNPC_PlayerCompanion::OverrideMove( float flInterval )
 			else if ( pEntity->m_iClassname == iszNPCTurretFloor )
 			{
 				UTIL_TraceLine( WorldSpaceCenter(), pEntity->WorldSpaceCenter(), MASK_BLOCKLOS, pEntity, COLLISION_GROUP_NONE, &tr );
-				if (tr.fraction == 1.0 && !tr.startsolid)
+				if (tr.fraction == 1.0f && !tr.startsolid)
 				{
-					float radius = 1.4 * pEntity->CollisionProp()->BoundingRadius2D(); 
+					float radius = 1.4f * pEntity->CollisionProp()->BoundingRadius2D(); 
 					GetLocalNavigator()->AddObstacle( pEntity->WorldSpaceCenter(), radius, AIMST_AVOID_OBJECT );
 				}
 			}

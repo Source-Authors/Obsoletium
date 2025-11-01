@@ -41,9 +41,9 @@ constexpr inline float FASTZOMBIE_SOUND_UPDATE_FREQ{0.5f};
 
 #define FASTZOMBIE_MAXLEAP_Z		128
 
-#define FASTZOMBIE_EXCITE_DIST 480.0
+#define FASTZOMBIE_EXCITE_DIST 480.0f
 
-#define FASTZOMBIE_BASE_FREQ 1.5
+#define FASTZOMBIE_BASE_FREQ 1.5f
 
 // If flying at an enemy, and this close or closer, start playing the maul animation!!
 #define FASTZOMBIE_MAUL_RANGE	300

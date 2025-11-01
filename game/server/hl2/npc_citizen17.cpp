@@ -3540,7 +3540,7 @@ bool CNPC_Citizen::ShouldHealTossTarget( CBaseEntity *pTarget, bool bActiveUse )
 				float timeFullHeal = m_flPlayerHealTime;
 				float timeRecharge = sk_citizen_heal_player_delay.GetFloat();
 				float maximumHealAmount = sk_citizen_heal_player.GetFloat();
-				float healAmt = ( maximumHealAmount * ( 1.0 - ( timeFullHeal - gpGlobals->curtime ) / timeRecharge ) );
+				float healAmt = ( maximumHealAmount * ( 1.0f - ( timeFullHeal - gpGlobals->curtime ) / timeRecharge ) );
 				if ( healAmt > pTarget->m_iMaxHealth - pTarget->m_iHealth )
 					healAmt = pTarget->m_iMaxHealth - pTarget->m_iHealth;
 				if ( healAmt < sk_citizen_heal_player_min_forced.GetFloat() )

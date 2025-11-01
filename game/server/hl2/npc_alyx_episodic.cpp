@@ -551,7 +551,7 @@ void CNPC_Alyx::ReadinessLevelChanged( int iPriorLevel )
 	//If Alyx is going from Relaxed to Agitated or Stimulated, let her raise her weapon before she's able to fire.
 	if ( iPriorLevel == AIRL_RELAXED && GetReadinessLevel() > iPriorLevel )
 	{
-		GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + 0.5 );
+		GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + 0.5f );
 	}
 
 	// FIXME: Are there certain animations that we DO want to interrupt?
@@ -651,7 +651,7 @@ void CNPC_Alyx::PrescheduleThink( void )
 
 				// Allow firing again, but prevent myself from firing until I'm done
 				GetShotRegulator()->EnableShooting();
-				GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + 1.0 );
+				GetShotRegulator()->FireNoEarlierThan( gpGlobals->curtime + 1.0f );
 				
 				m_bIsFlashlightBlind = false;
 				m_flDontBlindUntil = gpGlobals->curtime + RandomFloat( 1, 3 );
@@ -1741,9 +1741,9 @@ int CNPC_Alyx::SelectSchedule( void )
 			CBaseHLCombatWeapon *pWeapon = dynamic_cast<CBaseHLCombatWeapon *>(Weapon_FindUsable( WEAPON_SEARCH_DELTA ));
 			if ( pWeapon )
 			{
-				m_flNextWeaponSearchTime = gpGlobals->curtime + 10.0;
+				m_flNextWeaponSearchTime = gpGlobals->curtime + 10.0f;
 				// Now lock the weapon for several seconds while we go to pick it up.
-				pWeapon->Lock( 10.0, this );
+				pWeapon->Lock( 10.0f, this );
 				SetTarget( pWeapon );
 				return SCHED_ALYX_NEW_WEAPON;
 			}

@@ -1669,7 +1669,7 @@ void CNPC_Barnacle::BitePrey( void )
 		CollisionProp()->NormalizedToWorldSpace( Vector( 0.5f, 0.5f, 0.0f ), &vecBloodPos );
 		UTIL_BloodSpray( vecBloodPos, Vector(0,0,-1), GetEnemy()->BloodColor(), 8, FX_BLOODSPRAY_ALL );
 		
-		m_flDigestFinish = gpGlobals->curtime + 10.0;
+		m_flDigestFinish = gpGlobals->curtime + 10.0f;
 		return;
 	}
 
@@ -1684,7 +1684,7 @@ void CNPC_Barnacle::BitePrey( void )
 		m_flNextBloodTime = 0.0f;
 		SprayBlood();
 
-		m_flDigestFinish = gpGlobals->curtime + 10.0;
+		m_flDigestFinish = gpGlobals->curtime + 10.0f;
 		if (m_hRagdoll)
 		{
 			UTIL_Remove( m_hRagdoll );
