@@ -33,25 +33,6 @@ $Configuration
 	}
 }
 
-$Configuration  "Debug"
-{
-        $General
-        {
-                $OutputDirectory                        "$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
-                $IntermediateDirectory                  "$OUTBUILDDIR\debug\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
-        }
-}
-
-$Configuration  "Release"
-{
-        $General
-        {
-                $OutputDirectory                        "$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME" [$WINDOWS]
-                $IntermediateDirectory                  "$OUTBUILDDIR\release\$_SUBDIRSUFFIX\$PROJECTNAME\i" [$WINDOWS]
-        }
-}
-
-
 $Project "video_services"
 {
 	$Folder	"Source Files"
