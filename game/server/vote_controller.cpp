@@ -385,11 +385,10 @@ bool CVoteController::SetupVote( int iEntIndex )
 	filter.MakeReliable();
 	UserMessageBegin( filter, "VoteSetup" );
 	WRITE_BYTE( nIssueCount );
-	int nMsgSize = 0;
+	intp nMsgSize = 0;
 
-	for( int iIndex = 0; iIndex < m_potentialIssues.Count(); ++iIndex )
+	for( auto *pCurrentIssue : m_potentialIssues )
 	{
-		CBaseIssue *pCurrentIssue = m_potentialIssues[iIndex];
 		if ( pCurrentIssue )
 		{
 			// Don't send/display disabled issues when set
@@ -482,7 +481,7 @@ bool CVoteController::CreateVote( int iEntIndex, const char *pszTypeString, cons
 				// Now get our choices
 				m_VoteOptions.RemoveAll();
 				pCurrentIssue->GetVoteOptions( m_VoteOptions );
-				int nNumVoteOptions = m_VoteOptions.Count();
+				intp nNumVoteOptions = m_VoteOptions.Count();
 				if ( nNumVoteOptions >= 2 )
 				{
 					IGameEvent *event = gameeventmanager->CreateEvent( "vote_options" );
