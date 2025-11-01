@@ -1208,9 +1208,9 @@ static void SolveBlockingProps( CPropJeepEpisodic *pVehicleEntity, IPhysicsObjec
 	pVehiclePhysics->DestroyFrictionSnapshot( pSnapshot );
 	if ( solveList.Count() )
 	{
-		for ( int i = 0; i < solveList.Count(); i++ )
+		for ( auto *e : solveList )
 		{
-			EntityPhysics_CreateSolver( pVehicleEntity, solveList[i], true, 4.0f );
+			EntityPhysics_CreateSolver( pVehicleEntity, e, true, 4.0f );
 		}
 		pVehiclePhysics->RecheckContactPoints();
 	}
