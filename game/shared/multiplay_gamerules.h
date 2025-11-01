@@ -266,7 +266,8 @@ protected:
 	static int m_nMapCycleindex;
 	static CUtlVector<char*> m_MapList;
 
-	float m_flTimeLastMapChangeOrPlayerWasConnected;
+	// dimhotepus: float -> double.
+	double m_flTimeLastMapChangeOrPlayerWasConnected;
 
 #else
 	

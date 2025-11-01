@@ -409,10 +409,10 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	{
 		BaseClass::FrameUpdatePostEntityThink();
 
-		float flNow = Plat_FloatTime();
+		double flNow = Plat_FloatTime();
 
 		// Update time when client was last connected
-		if ( m_flTimeLastMapChangeOrPlayerWasConnected <= 0.0f )
+		if ( m_flTimeLastMapChangeOrPlayerWasConnected <= 0.0 )
 		{
 			m_flTimeLastMapChangeOrPlayerWasConnected = flNow;
 		}
@@ -1502,7 +1502,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 	void CMultiplayRules::ChangeLevelToMap( const char *pszMap )
 	{
 		g_fGameOver = true;
-		m_flTimeLastMapChangeOrPlayerWasConnected = 0.0f;
+		m_flTimeLastMapChangeOrPlayerWasConnected = 0.0;
 		Msg( "CHANGE LEVEL: %s\n", pszMap );
 		engine->ChangeLevel( pszMap, NULL );
 	}
