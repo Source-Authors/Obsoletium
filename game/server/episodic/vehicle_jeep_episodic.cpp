@@ -1248,7 +1248,7 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 			Vector normal;
 			pSnapshot->GetSurfaceNormal(normal);
 			normal *= force;
-			int index = npcList.Find(pNPC);
+			intp index = npcList.Find(pNPC);
 			if ( index < 0 )
 			{
 				vphysicsupdateai_t *pUpdate = NULL;
@@ -1292,7 +1292,7 @@ static void KillBlockingEnemyNPCs( CBasePlayer *pPlayer, CBaseEntity *pVehicleEn
 	// now iterate the list and check each cumulative force against the threshold
 	if ( npcList.Count() )
 	{
-		for ( int i = npcList.Count(); --i >= 0; )
+		for ( intp i = npcList.Count(); --i >= 0; )
 		{
 			Vector damageForce;
 			npcList[i]->VPhysicsGetObject()->GetVelocity( &damageForce, NULL );
