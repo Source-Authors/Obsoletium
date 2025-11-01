@@ -797,7 +797,7 @@ public:
 		CAI_BehaviorBase **ppBehaviors = AccessBehaviors();
 		
 		*ppBehavior = NULL;
-		for ( int i = 0; i < NumBehaviors(); i++ )
+		for ( intp i = 0; i < NumBehaviors(); i++ )
 		{
 			*ppBehavior = dynamic_cast<BEHAVIOR_TYPE *>(ppBehaviors[i]);
 			if ( *ppBehavior )
@@ -816,8 +816,8 @@ public:
 	virtual bool OnBehaviorChangeStatus( [[maybe_unused]]  CAI_BehaviorBase *pBehavior, [[maybe_unused]] bool fCanFinishSchedule ) { return false; }
 
 private:
-	virtual CAI_BehaviorBase **	AccessBehaviors() 	{ return NULL; }
-	virtual int					NumBehaviors()		{ return 0; }
+	virtual CAI_BehaviorBase **	AccessBehaviors() 	{ return nullptr; }
+	virtual intp				NumBehaviors()		{ return 0; }
 
 public:
 	//-----------------------------------------------------

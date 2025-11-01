@@ -139,8 +139,8 @@ public:
 	virtual int	Save( ISave &save );
 	virtual int	Restore( IRestore &restore );
 
-	static void SaveBehaviors(ISave &save, CAI_BehaviorBase *pCurrentBehavior, CAI_BehaviorBase **ppBehavior, int nBehaviors );
-	static int RestoreBehaviors(IRestore &restore, CAI_BehaviorBase **ppBehavior, int nBehaviors ); // returns index of "current" behavior, or -1
+	static void SaveBehaviors(ISave &save, CAI_BehaviorBase *pCurrentBehavior, CAI_BehaviorBase **ppBehavior, intp nBehaviors );
+	static intp RestoreBehaviors(IRestore &restore, CAI_BehaviorBase **ppBehavior, intp nBehaviors ); // returns index of "current" behavior, or -1
 
 protected:
 
@@ -515,7 +515,7 @@ private:
 	void			BackBridge_HandleAnimEvent( animevent_t *pEvent );
 
 	CAI_BehaviorBase **AccessBehaviors();
-	int				NumBehaviors();
+	intp			NumBehaviors() override;
 
 	CAI_BehaviorBase *			   m_pCurBehavior;
 	CUtlVector<CAI_BehaviorBase *> m_Behaviors;
@@ -1915,7 +1915,7 @@ inline CAI_BehaviorBase **CAI_BehaviorHost<BASE_NPC>::AccessBehaviors()
 //-------------------------------------
 
 template <class BASE_NPC>
-inline int CAI_BehaviorHost<BASE_NPC>::NumBehaviors()
+inline intp CAI_BehaviorHost<BASE_NPC>::NumBehaviors()
 {
 	return m_Behaviors.Count();
 }
@@ -1939,7 +1939,7 @@ inline int CAI_BehaviorHost<BASE_NPC>::Restore( IRestore &restore )
 	int result = BaseClass::Restore( restore );
 	if ( result )
 	{
-		int iCurrent = CAI_BehaviorBase::RestoreBehaviors( restore, AccessBehaviors(), NumBehaviors() );
+		intp iCurrent = CAI_BehaviorBase::RestoreBehaviors( restore, AccessBehaviors(), NumBehaviors() );
 		if ( iCurrent != -1 )
 			m_pCurBehavior = AccessBehaviors()[iCurrent];
 		else

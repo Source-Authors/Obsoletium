@@ -463,7 +463,7 @@ int	CAI_BehaviorBase::Restore( IRestore &restore )
 #define BEHAVIOR_SAVE_BLOCKNAME "AI_Behaviors"
 #define BEHAVIOR_SAVE_VERSION	2
 
-void CAI_BehaviorBase::SaveBehaviors(ISave &save, CAI_BehaviorBase *pCurrentBehavior, CAI_BehaviorBase **ppBehavior, int nBehaviors )		
+void CAI_BehaviorBase::SaveBehaviors(ISave &save, CAI_BehaviorBase *pCurrentBehavior, CAI_BehaviorBase **ppBehavior, intp nBehaviors )		
 { 
 	save.StartBlock( BEHAVIOR_SAVE_BLOCKNAME );
 	short temp = BEHAVIOR_SAVE_VERSION;
@@ -471,7 +471,7 @@ void CAI_BehaviorBase::SaveBehaviors(ISave &save, CAI_BehaviorBase *pCurrentBeha
 	temp = (short)nBehaviors;
 	save.WriteShort( &temp );
 
-	for ( int i = 0; i < nBehaviors; i++ )
+	for ( intp i = 0; i < nBehaviors; i++ )
 	{
 		if ( strcmp( ppBehavior[i]->GetDataDescMap()->dataClassName, CAI_BehaviorBase::m_DataMap.dataClassName ) != 0 )
 		{
@@ -489,9 +489,9 @@ void CAI_BehaviorBase::SaveBehaviors(ISave &save, CAI_BehaviorBase *pCurrentBeha
 
 //-------------------------------------
 
-int CAI_BehaviorBase::RestoreBehaviors(IRestore &restore, CAI_BehaviorBase **ppBehavior, int nBehaviors )	
+intp CAI_BehaviorBase::RestoreBehaviors(IRestore &restore, CAI_BehaviorBase **ppBehavior, intp nBehaviors )	
 { 
-	int iCurrent = -1;
+	intp iCurrent = -1;
 	char szBlockName[SIZE_BLOCK_NAME_BUF];
 	restore.StartBlock( szBlockName );
 	if ( strcmp( szBlockName, BEHAVIOR_SAVE_BLOCKNAME ) == 0 )
@@ -510,7 +510,7 @@ int CAI_BehaviorBase::RestoreBehaviors(IRestore &restore, CAI_BehaviorBase **ppB
 				bool bIsCurrent;
 				restore.ReadBool( &bIsCurrent );
 
-				for ( int j = 0; j < nBehaviors; j++ )
+				for ( intp j = 0; j < nBehaviors; j++ )
 				{
 					if ( strcmp( ppBehavior[j]->GetDataDescMap()->dataClassName, szClassNameCurrent ) == 0 )
 					{

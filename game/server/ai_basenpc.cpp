@@ -11244,7 +11244,7 @@ bool CAI_BaseNPC::KeyValue( const char *szKeyName, const char *szValue )
 		// Defer unhandled Keys to behaviors
 		CAI_BehaviorBase **ppBehaviors = AccessBehaviors();
 		
-		for ( int i = 0; i < NumBehaviors(); i++ )
+		for ( intp i = 0; i < NumBehaviors(); i++ )
 		{
 			if( ppBehaviors[ i ]->KeyValue( szKeyName, szValue ) )
 			{
