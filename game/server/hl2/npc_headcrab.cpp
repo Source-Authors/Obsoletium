@@ -1731,8 +1731,8 @@ int CBaseHeadcrab::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 		// Slow down burn damage so that headcrabs live longer while on fire.
 		info.ScaleDamage( 0.25 );
 
-#define HEADCRAB_SCORCH_RATE	5
-#define HEADCRAB_SCORCH_FLOOR	30
+		constexpr byte HEADCRAB_SCORCH_RATE{5};
+		constexpr byte HEADCRAB_SCORCH_FLOOR{30};
 
 		if( IsOnFire() )
 		{

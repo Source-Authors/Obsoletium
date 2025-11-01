@@ -292,7 +292,8 @@ public:
 	virtual void IgniteHitboxFireScale( float flHitboxFireScale );
 	virtual void Extinguish() { RemoveFlag( FL_ONFIRE ); }
 	bool IsOnFire() { return ( (GetFlags() & FL_ONFIRE) != 0 ); }
-	void Scorch( int rate, int floor );
+	// dimhotepus: int -> byte.
+	void Scorch( byte rate, byte floor );
 	void InputIgnite( inputdata_t &inputdata );
 	void InputIgniteLifetime( inputdata_t &inputdata );
 	void InputIgniteNumHitboxFires( inputdata_t &inputdata );

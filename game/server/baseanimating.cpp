@@ -3507,7 +3507,7 @@ bool CBaseAnimating::Dissolve( const char *pMaterialName, float flStartTime, boo
 //-----------------------------------------------------------------------------
 // Make a model look as though it's burning. 
 //-----------------------------------------------------------------------------
-void CBaseAnimating::Scorch( int rate, int floor )
+void CBaseAnimating::Scorch( byte rate, byte floor )
 {
 	color32 color = GetRenderColor();
 

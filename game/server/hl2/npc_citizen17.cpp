@@ -2258,8 +2258,8 @@ int CNPC_Citizen::OnTakeDamage_Alive( const CTakeDamageInfo &info )
 {
 	if( (info.GetDamageType() & DMG_BURN) && (info.GetDamageType() & DMG_DIRECT) )
 	{
-#define CITIZEN_SCORCH_RATE		6
-#define CITIZEN_SCORCH_FLOOR	75
+		constexpr byte CITIZEN_SCORCH_RATE{6};
+		constexpr byte CITIZEN_SCORCH_FLOOR{75};
 
 		Scorch( CITIZEN_SCORCH_RATE, CITIZEN_SCORCH_FLOOR );
 	}

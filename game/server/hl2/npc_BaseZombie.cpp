@@ -810,8 +810,6 @@ HeadcrabRelease_t CNPC_BaseZombie::ShouldReleaseHeadcrab( const CTakeDamageInfo 
 //			bitsDamageType - 
 // Output : int
 //-----------------------------------------------------------------------------
-#define ZOMBIE_SCORCH_RATE		8
-#define ZOMBIE_MIN_RENDERCOLOR	50
 int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 {
 	CTakeDamageInfo info = inputInfo;
@@ -826,6 +824,9 @@ int CNPC_BaseZombie::OnTakeDamage_Alive( const CTakeDamageInfo &inputInfo )
 			return 0;
 		}
 		
+		constexpr byte ZOMBIE_SCORCH_RATE{8};
+		constexpr byte ZOMBIE_MIN_RENDERCOLOR{50};
+
 		Scorch( ZOMBIE_SCORCH_RATE, ZOMBIE_MIN_RENDERCOLOR );
 	}
 
