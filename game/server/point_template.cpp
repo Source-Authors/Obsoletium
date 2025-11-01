@@ -281,7 +281,7 @@ void CPointTemplate::PerformPrecache()
 	for ( i = 0; i < iTemplates; i++ )
 	{
 		//CBaseEntity *pEntity = NULL;
-		char *pMapData;
+		const char *pMapData;
 		int iTemplateIndex = m_hTemplates[i].iTemplateIndex;
 
 		// Some templates have Entity I/O connecting the entities within the template.
@@ -298,7 +298,7 @@ void CPointTemplate::PerformPrecache()
 		else
 		{
 			// Use the unmodified mapdata
-			pMapData = (char*)STRING( Templates_FindByIndex( iTemplateIndex ) );
+			pMapData = STRING( Templates_FindByIndex( iTemplateIndex ) );
 		}
 
 		nStringSize = Templates_GetStringSize( iTemplateIndex );
@@ -334,7 +334,7 @@ bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecA
 	for ( i = 0; i < iTemplates; i++ )
 	{
 		CBaseEntity *pEntity = NULL;
-		char *pMapData;
+		const char *pMapData;
 		int iTemplateIndex = m_hTemplates[i].iTemplateIndex;
 
 		// Some templates have Entity I/O connecting the entities within the template.
@@ -349,7 +349,7 @@ bool CPointTemplate::CreateInstance( const Vector &vecOrigin, const QAngle &vecA
 		else
 		{
 			// Use the unmodified mapdata
-			pMapData = (char*)STRING( Templates_FindByIndex( iTemplateIndex ) );
+			pMapData = STRING( Templates_FindByIndex( iTemplateIndex ) );
 		}
 
 		// Create the entity from the mapdata

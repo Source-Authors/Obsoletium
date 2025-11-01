@@ -187,7 +187,7 @@ void CFuncMoveLinear::MoveTo(Vector vPosition, float flSpeed)
 		{
 			if (m_currentSound == m_soundStart)
 			{
-				StopSound(entindex(), CHAN_BODY, (char*)STRING(m_soundStop));
+				StopSound(entindex(), CHAN_BODY, STRING(m_soundStop));
 			}
 			else
 			{
@@ -196,7 +196,7 @@ void CFuncMoveLinear::MoveTo(Vector vPosition, float flSpeed)
 
 				EmitSound_t ep;
 				ep.m_nChannel = CHAN_BODY;
-				ep.m_pSoundName = (char*)STRING(m_soundStart);
+				ep.m_pSoundName = STRING(m_soundStart);
 				ep.m_flVolume = 1;
 				ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -224,7 +224,7 @@ void CFuncMoveLinear::StopMoveSound( void )
 {
 	if ( m_soundStart != NULL_STRING && ( m_currentSound == m_soundStart ) )
 	{
-		StopSound(entindex(), CHAN_BODY, (char*)STRING(m_soundStart) );
+		StopSound(entindex(), CHAN_BODY, STRING(m_soundStart) );
 	}
 
 	if ( m_soundStop != NULL_STRING && ( m_currentSound != m_soundStop ) )
@@ -234,7 +234,7 @@ void CFuncMoveLinear::StopMoveSound( void )
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_BODY;
-		ep.m_pSoundName = (char*)STRING(m_soundStop);
+		ep.m_pSoundName = STRING(m_soundStop);
 		ep.m_flVolume = 1;
 		ep.m_SoundLevel = SNDLVL_NORM;
 

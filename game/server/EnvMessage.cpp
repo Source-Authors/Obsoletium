@@ -120,7 +120,7 @@ void CMessage::InputShowMessage( inputdata_t &inputdata )
 		
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_BODY;
-		ep.m_pSoundName = (char*)STRING(m_sNoise);
+		ep.m_pSoundName = STRING(m_sNoise);
 		ep.m_flVolume = m_MessageVolume;
 		ep.m_SoundLevel = ATTN_TO_SNDLVL( m_Radius );
 

@@ -186,7 +186,7 @@ SendProp SendPropPredictableId(
 void SendProxy_StringT_To_String( const SendProp *pProp, const void *pStruct, const void *pVarData, DVariant *pOut, int iElement, int objectID )
 {
 	string_t &str = *((string_t*)pVarData);
-	pOut->m_pString = (char*)STRING( str );
+	pOut->m_pString = STRING( str );
 }
 
 

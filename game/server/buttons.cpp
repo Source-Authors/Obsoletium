@@ -248,7 +248,7 @@ void CBaseButton::Press( CBaseEntity *pActivator, BUTTON_CODE eCode )
 
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_VOICE;
-			ep.m_pSoundName = (char*)STRING(m_sNoise);
+			ep.m_pSoundName = STRING(m_sNoise);
 			ep.m_flVolume = 1;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -340,7 +340,7 @@ int CBaseButton::OnTakeDamage( const CTakeDamageInfo &info )
 
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_VOICE;
-			ep.m_pSoundName = (char*)STRING(m_sNoise);
+			ep.m_pSoundName = STRING(m_sNoise);
 			ep.m_flVolume = 1;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -548,7 +548,7 @@ void CBaseButton::ButtonUse( CBaseEntity *pActivator, CBaseEntity *pCaller, USE_
 
 				EmitSound_t ep;
 				ep.m_nChannel = CHAN_VOICE;
-				ep.m_pSoundName = (char*)STRING(m_sNoise);
+				ep.m_pSoundName = STRING(m_sNoise);
 				ep.m_flVolume = 1;
 				ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -631,7 +631,7 @@ void CBaseButton::ButtonTouch( CBaseEntity *pOther )
 
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_VOICE;
-			ep.m_pSoundName = (char*)STRING(m_sNoise);
+			ep.m_pSoundName = STRING(m_sNoise);
 			ep.m_flVolume = 1;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -662,7 +662,7 @@ void CBaseButton::ButtonActivate( void )
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_VOICE;
-		ep.m_pSoundName = (char*)STRING(m_sNoise);
+		ep.m_pSoundName = STRING(m_sNoise);
 		ep.m_flVolume = 1;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -1108,7 +1108,7 @@ void CMomentaryRotButton::PlaySound( void )
 
 	EmitSound_t ep;
 	ep.m_nChannel = CHAN_VOICE;
-	ep.m_pSoundName = (char*)STRING(m_sNoise);
+	ep.m_pSoundName = STRING(m_sNoise);
 	ep.m_flVolume = 1;
 	ep.m_SoundLevel = SNDLVL_NORM;
 

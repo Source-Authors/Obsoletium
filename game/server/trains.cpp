@@ -597,7 +597,7 @@ void CFuncPlat::Blocked( CBaseEntity *pOther )
 
 	if (m_sNoise != NULL_STRING)
 	{
-		StopSound(entindex(), CHAN_STATIC, (char*)STRING(m_sNoise));
+		StopSound(entindex(), CHAN_STATIC, STRING(m_sNoise));
 	}
 	
 	// Send the platform back where it came from

@@ -141,7 +141,7 @@ void PlayLockSounds(CBaseEntity *pEdict, locksound_t *pls, int flocked, int fbut
 
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_ITEM;
-			ep.m_pSoundName = (char*)STRING(pls->sLockedSound);
+			ep.m_pSoundName = STRING(pls->sLockedSound);
 			ep.m_flVolume = fvol;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -189,7 +189,7 @@ void PlayLockSounds(CBaseEntity *pEdict, locksound_t *pls, int flocked, int fbut
 
 			EmitSound_t ep;
 			ep.m_nChannel = CHAN_ITEM;
-			ep.m_pSoundName = (char*)STRING(pls->sUnlockedSound);
+			ep.m_pSoundName = STRING(pls->sUnlockedSound);
 			ep.m_flVolume = fvol;
 			ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -359,11 +359,11 @@ void CBaseDoor::MovingSoundThink( void )
 	ep.m_nChannel = CHAN_STATIC;
 	if ( m_NoiseMovingClosed == NULL_STRING || m_toggle_state == TS_GOING_DOWN || m_toggle_state == TS_AT_BOTTOM )
 	{
-		ep.m_pSoundName = (char*)STRING(m_NoiseMoving);
+		ep.m_pSoundName = STRING(m_NoiseMoving);
 	}
 	else
 	{
-		ep.m_pSoundName = (char*)STRING(m_NoiseMovingClosed);
+		ep.m_pSoundName = STRING(m_NoiseMovingClosed);
 	}
 	ep.m_flVolume = 1;
 	ep.m_SoundLevel = SNDLVL_NORM;
@@ -399,14 +399,14 @@ void CBaseDoor::StartMovingSound( void )
 void CBaseDoor::StopMovingSound(void)
 {
 	SetContextThink( NULL, gpGlobals->curtime, "MovingSound" );
-	char *pSoundName;
+	const char *pSoundName;
 	if ( m_NoiseMovingClosed == NULL_STRING || m_toggle_state == TS_GOING_UP || m_toggle_state == TS_AT_TOP )
 	{
-		pSoundName = (char*)STRING(m_NoiseMoving);
+		pSoundName = STRING(m_NoiseMoving);
 	}
 	else
 	{
-		pSoundName = (char*)STRING(m_NoiseMovingClosed);
+		pSoundName = STRING(m_NoiseMovingClosed);
 	}
 	StopSound( entindex(), CHAN_STATIC, pSoundName );
 }
@@ -555,7 +555,7 @@ void CBaseDoor::Precache( void )
 	}
 
 #ifdef HL1_DLL
-	if( m_ls.sLockedSound != NULL_STRING && strlen((char*)STRING(m_ls.sLockedSound)) < 4 )
+	if( m_ls.sLockedSound != NULL_STRING && strlen(STRING(m_ls.sLockedSound)) < 4 )
 	{
 		// Too short to be ANYTHING ".wav", so it must be an old index into a long-lost
 		// array of sound choices. slam it to a known "deny" sound. We lose the designer's
@@ -1020,7 +1020,7 @@ void CBaseDoor::DoorHitTop( void )
 
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_STATIC;
-		ep.m_pSoundName = (char*)STRING(m_NoiseArrived);
+		ep.m_pSoundName = STRING(m_NoiseArrived);
 		ep.m_flVolume = 1;
 		ep.m_SoundLevel = SNDLVL_NORM;
 
@@ -1104,9 +1104,9 @@ void CBaseDoor::DoorHitBottom( void )
 		EmitSound_t ep;
 		ep.m_nChannel = CHAN_STATIC;
 		if ( m_NoiseArrivedClosed == NULL_STRING )
-			ep.m_pSoundName = (char*)STRING(m_NoiseArrived);
+			ep.m_pSoundName = STRING(m_NoiseArrived);
 		else
-			ep.m_pSoundName = (char*)STRING(m_NoiseArrivedClosed);
+			ep.m_pSoundName = STRING(m_NoiseArrivedClosed);
 		ep.m_flVolume = 1;
 		ep.m_SoundLevel = SNDLVL_NORM;
 

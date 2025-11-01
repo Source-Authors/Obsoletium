@@ -84,7 +84,7 @@ END_DATADESC()
 void SendProxy_String_tToString( const SendProp *pProp, const void *pStruct, const void *pData, DVariant *pOut, int iElement, int objectID )
 {
 	string_t *pString = (string_t*)pData;
-	pOut->m_pString = (char*)STRING( *pString );
+	pOut->m_pString = STRING( *pString );
 }
 
 IMPLEMENT_SERVERCLASS_ST( CEnvScreenOverlay, DT_EnvScreenOverlay )
