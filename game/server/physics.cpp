@@ -1271,7 +1271,7 @@ static void CallbackHighlight( CBaseEntity *pEntity )
 static void CallbackReport( CBaseEntity *pEntity )
 {
 	const char *pName = STRING(pEntity->GetEntityName());
-	if ( !Q_strlen(pName) )
+	if ( Q_isempty(pName) )
 	{
 		pName = STRING(pEntity->GetModelName());
 	}
