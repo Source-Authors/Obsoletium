@@ -577,7 +577,7 @@ END_PREDICTION_DATA()
 void SpewInterpolatedVar( CInterpolatedVar< Vector > *pVar )
 {
 	Msg( "--------------------------------------------------\n" );
-	intp i = pVar->GetHead();
+	int i = pVar->GetHead();
 	Vector v0(0, 0, 0);
 	CApparentVelocity<Vector> apparent(v0);
 	float prevtime = 0.0f;
@@ -601,7 +601,7 @@ void SpewInterpolatedVar( CInterpolatedVar< Vector > *pVar, float flNow, float f
 	float target = flNow - flInterpAmount;
 
 	Msg( "--------------------------------------------------\n" );
-	intp i = pVar->GetHead();
+	int i = pVar->GetHead();
 	Vector v0(0, 0, 0);
 	CApparentVelocity<Vector> apparent(v0);
 	float newtime = 999999.0f;
@@ -631,7 +631,7 @@ void SpewInterpolatedVar( CInterpolatedVar< Vector > *pVar, float flNow, float f
 			else
 			{
 				bSpew = true;
-				intp savei = std::exchange(i, pVar->GetNext( i ));
+				int savei = std::exchange(i, pVar->GetNext( i ));
 				float oldtertime = 0.0f;
 				pVar->GetHistoryValue( i, oldtertime );
 
@@ -669,7 +669,7 @@ void SpewInterpolatedVar( CInterpolatedVar< Vector > *pVar, float flNow, float f
 void SpewInterpolatedVar( CInterpolatedVar< float > *pVar )
 {
 	Msg( "--------------------------------------------------\n" );
-	intp i = pVar->GetHead();
+	int i = pVar->GetHead();
 	CApparentVelocity<float> apparent(0.0f);
 	while ( 1 )
 	{
