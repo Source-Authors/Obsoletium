@@ -179,10 +179,8 @@ protected:
 
 private:
 	int GetLineHeight();
-	HFont GetDefaultFont();
 
 	const wchar_t *ResolveLocalizedTextAndVariables( char const *pchLookup, OUT_Z_BYTECAP(outbufsizeinbytes) wchar_t *outbuf, size_t outbufsizeinbytes );
-	void CheckRecalcLineBreaks();
 
 	void GotoWordRight();	// move cursor to start of next word
 	void GotoWordLeft();	// move cursor to start of prev word
