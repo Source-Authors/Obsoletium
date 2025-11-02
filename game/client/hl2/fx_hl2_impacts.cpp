@@ -106,7 +106,7 @@ void ImpactCallback( const CEffectData &data )
 	if ( Impact( vecOrigin, vecStart, iMaterial, iDamageType, iHitbox, pEntity, tr ) )
 	{
 		// Check for custom effects based on the Decal index
-		PerformCustomEffects( vecOrigin, tr, vecShotDir, iMaterial, 1.0 );
+		PerformCustomEffects( vecOrigin, tr, vecShotDir, iMaterial, 1 );
 	}
 
 	PlayImpactSound( pEntity, tr, vecOrigin, nSurfaceProp );
@@ -264,7 +264,7 @@ void ImpactHelicopterCallback( const CEffectData &data )
 		// Only do metal + computer custom effects
 		if ( (iMaterial == CHAR_TEX_METAL) || (iMaterial == CHAR_TEX_COMPUTER) )
 		{
-			PerformCustomEffects( vecOrigin, tr, vecShotDir, iMaterial, 1.0, FLAGS_CUSTIOM_EFFECTS_NOFLECKS );
+			PerformCustomEffects( vecOrigin, tr, vecShotDir, iMaterial, 1, FLAGS_CUSTIOM_EFFECTS_NOFLECKS );
 		}
 	}
 

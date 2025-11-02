@@ -440,7 +440,7 @@ void C_AR2Explosion::RenderParticles( CParticleRenderIterator *pIterator )
 			float lifetimePercent = ( pParticle->m_Lifetime - AR2_DUST_FADE_IN_TIME ) / pParticle->m_Dwell;
 
 			// FIXME: base color should be a dirty version of the material color
-			Vector color = g_AR2DustColor1 * (1.0 - lifetimePercent) + g_AR2DustColor2 * lifetimePercent;
+			Vector color = g_AR2DustColor1 * (1.0f - lifetimePercent) + g_AR2DustColor2 * lifetimePercent;
 			
 			Vector tPos;
 			TransformParticle(m_pParticleMgr->GetModelView(), pParticle->m_Pos, tPos);
