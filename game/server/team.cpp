@@ -198,13 +198,13 @@ CBaseEntity *CTeam::SpawnPlayer( CBasePlayer *pPlayer )
 		return NULL;
 
 	// Randomize the start spot
-	int iSpawn = m_iLastSpawn + random->RandomInt( 1,3 );
+	intp iSpawn = m_iLastSpawn + random->RandomInt( 1,3 );
 	if ( iSpawn >= m_aSpawnPoints.Count() )
 		iSpawn -= m_aSpawnPoints.Count();
-	int iStartingSpawn = iSpawn;
+	intp iStartingSpawn = iSpawn;
 
 	// Now loop through the spawnpoints and pick one
-	int loopCount = 0;
+	intp loopCount = 0;
 	do 
 	{
 		if ( iSpawn >= m_aSpawnPoints.Count() )
