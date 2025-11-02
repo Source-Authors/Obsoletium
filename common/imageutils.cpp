@@ -738,7 +738,8 @@ fail:
 	width = png_width;
 	height = png_height;
 
-    png_uint_32 rowbytes;
+	// dimhotepus: Use size_t for memsize type.
+    size_t rowbytes;
 
     /* expand palette images to RGB, low-bit-depth grayscale images to 8 bits,
      * transparency chunks to full alpha channel; strip 16-bit-per-sample
