@@ -252,7 +252,7 @@ void RichText::ApplySchemeSettings(IScheme *pScheme)
 	_selectionTextColor = GetSchemeColor("RichText.SelectedTextColor", GetFgColor(), pScheme);
 	_selectionColor = GetSchemeColor("RichText.SelectedBgColor", pScheme);
 
-	if ( Q_strlen( pScheme->GetResourceString( "RichText.InsetX" ) ) )
+	if ( !Q_isempty( pScheme->GetResourceString( "RichText.InsetX" ) ) )
 	{
 		SetDrawOffsets( atoi( pScheme->GetResourceString( "RichText.InsetX" ) ), atoi( pScheme->GetResourceString( "RichText.InsetY" ) ) );
 	}
