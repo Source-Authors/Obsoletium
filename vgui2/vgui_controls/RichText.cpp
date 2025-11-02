@@ -153,7 +153,8 @@ RichText::RichText(Panel *parent, const char *panelName) : BaseClass(parent, pan
 	_vertScrollBar = new ScrollBar(this, "ScrollBar", true);
 	_vertScrollBar->AddActionSignalTarget(this);
 	_recalcSavedRenderState = true;
-	_maxCharCount = (64 * 1024);
+	// dimhotepus: Up 65535 x2 to show more text.
+	_maxCharCount = (128 * 1024);
 	AddActionSignalTarget(this);
 	m_pInterior = new RichTextInterior( this, NULL );
 
