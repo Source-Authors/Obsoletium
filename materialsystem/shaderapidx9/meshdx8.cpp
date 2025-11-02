@@ -3353,9 +3353,12 @@ void CMeshDX8::CheckIndices( CPrimList *pPrim, int numPrimitives )
 				continue;
 			}
 
+			// dimhotepus: Dump into console only once.
+#ifdef _DEBUG
+			AssertMsg(false, "%s invalid index: %hu [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, upperShadowIndexBound - 1);
+#else
 			Warning("%s invalid index: %hu [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, upperShadowIndexBound - 1);
-
-			Assert( false );
+#endif
 		}
 	}
 }
