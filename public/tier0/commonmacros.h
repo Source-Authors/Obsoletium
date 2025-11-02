@@ -9,7 +9,7 @@
 #include <cassert>  // assert
 #include <cstddef>  // memcmp, std::ptrdiff_t
 #include <cstring>  // strlen
-#include <utility>  // to_underlying
+#include <utility>  // std::to_underlying, std::unreachable
 
 // dimhotepus: Backport from TF2. Detect the architecture we are running on
 #if defined(__aarch64__) || defined(_M_ARM64)
