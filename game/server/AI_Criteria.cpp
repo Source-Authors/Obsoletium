@@ -451,7 +451,7 @@ void AI_Response::SetContext( const char *context )
 //			*duration -
 // Output : static bool
 //-----------------------------------------------------------------------------
-const char *SplitContext( const char *raw, char *key, int keylen, char *value, int valuelen, float *duration )
+const char *SplitContext( const char *raw, char *key, intp keylen, char *value, intp valuelen, float *duration )
 {
 	char *colon1 = Q_strstr( raw, ":" );
 	if ( !colon1 )
@@ -461,7 +461,7 @@ const char *SplitContext( const char *raw, char *key, int keylen, char *value, i
 		return NULL;
 	}
 
-	int len = colon1 - raw;
+	intp len = colon1 - raw;
 	Q_strncpy( key, raw, MIN( len + 1, keylen ) );
 	key[ MIN( len, keylen - 1 ) ] = 0;
 

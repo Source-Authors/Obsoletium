@@ -15,7 +15,7 @@
 #include "interval.h"
 #include "mathlib/compressed_vector.h"
 
-extern const char *SplitContext( const char *raw, char *key, int keylen, char *value, int valuelen, float *duration );
+extern const char *SplitContext( const char *raw, char *key, intp keylen, char *value, intp valuelen, float *duration );
 
 
 class AI_CriteriaSet
