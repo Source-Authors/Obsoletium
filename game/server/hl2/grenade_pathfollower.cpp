@@ -22,7 +22,8 @@
 #define GRENADE_PF_TOLERANCE 300
 #define GRENADE_PF_MODEL	 "models/Weapons/w_missile.mdl"
 
-extern short	g_sModelIndexFireball;			// (in combatweapon.cpp) holds the index for the smoke cloud
+// dimhotepus: short -> int.
+extern int	g_sModelIndexFireball;			// (in combatweapon.cpp) holds the index for the smoke cloud
 
 ConVar    sk_dmg_pathfollower_grenade		( "sk_dmg_pathfollower_grenade","0");
 ConVar	  sk_pathfollower_grenade_radius	( "sk_pathfollower_grenade_radius","0");

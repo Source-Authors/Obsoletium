@@ -131,15 +131,17 @@ void C_World::RegisterSharedActivities( void )
 // -----------------------------------------
 //	Sprite Index info
 // -----------------------------------------
-short		g_sModelIndexLaser;			// holds the index for the laser beam
-const char	*g_pModelNameLaser = "sprites/laserbeam.vmt";
-short		g_sModelIndexLaserDot;		// holds the index for the laser beam dot
-short		g_sModelIndexFireball;		// holds the index for the fireball
-short		g_sModelIndexSmoke;			// holds the index for the smoke cloud
-short		g_sModelIndexWExplosion;	// holds the index for the underwater explosion
-short		g_sModelIndexBubbles;		// holds the index for the bubbles model
-short		g_sModelIndexBloodDrop;		// holds the sprite index for the initial blood
-short		g_sModelIndexBloodSpray;	// holds the sprite index for splattered blood
+// dimhotepus: short -> int.
+int			g_sModelIndexLaser;			// holds the index for the laser beam
+const char *g_pModelNameLaser = "sprites/laserbeam.vmt";
+// dimhotepus: short -> int.
+int			g_sModelIndexLaserDot;		// holds the index for the laser beam dot
+int			g_sModelIndexFireball;		// holds the index for the fireball
+int			g_sModelIndexSmoke;			// holds the index for the smoke cloud
+int			g_sModelIndexWExplosion;	// holds the index for the underwater explosion
+int			g_sModelIndexBubbles;		// holds the index for the bubbles model
+int			g_sModelIndexBloodDrop;		// holds the sprite index for the initial blood
+int			g_sModelIndexBloodSpray;	// holds the sprite index for splattered blood
 
 //-----------------------------------------------------------------------------
 // Purpose: Precache global weapon sounds

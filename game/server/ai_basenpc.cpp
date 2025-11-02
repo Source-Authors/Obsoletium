@@ -121,9 +121,10 @@ bool RagdollManager_SaveImportant( CAI_BaseNPC *pNPC );
 
 #define FINDNAMEDENTITY_MAX_ENTITIES	32		// max number of entities to be considered for random entity selection in FindNamedEntity
 
-extern bool			g_fDrawLines;
-extern short		g_sModelIndexLaser;		// holds the index for the laser beam
-extern short		g_sModelIndexLaserDot;	// holds the index for the laser beam dot
+extern bool g_fDrawLines;
+// dimhotepus: short -> int.
+extern int		g_sModelIndexLaser;		// holds the index for the laser beam
+extern int		g_sModelIndexLaserDot;	// holds the index for the laser beam dot
 
 // Debugging tools
 ConVar	ai_no_select_box( "ai_no_select_box", "0" );

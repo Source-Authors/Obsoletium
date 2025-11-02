@@ -413,7 +413,8 @@ int UTIL_PrecacheDecal( const char *name, bool preload )
 	return effects->Draw_DecalIndexFromName( name );
 }
 
-extern short g_sModelIndexSmoke;
+// dimhotepus: short -> int.
+extern int g_sModelIndexSmoke;
 
 void UTIL_Smoke( const Vector &origin, const float scale, const float framerate )
 {

@@ -50,7 +50,8 @@ constexpr inline float ROCKET_DELAY_TIME{1.5f};
 #define DEATH_VOLLEY_MIN_FIRE_TIME		0.333
 #define DEATH_VOLLEY_MAX_FIRE_TIME		0.166
 
-extern short g_sModelIndexFireball; // Echh...
+// dimhotepus: short -> int.
+extern int g_sModelIndexFireball; // Echh...
 
 
 ConVar sk_apc_health( "sk_apc_health", "750" );

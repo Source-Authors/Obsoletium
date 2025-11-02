@@ -14,7 +14,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern short g_sModelIndexFireball;
 #define SPRITE_FIREBALL		"sprites/zerogxplode.vmt"
 #define SPRITE_SMOKE		"sprites/steam1.vmt"
 

@@ -14,9 +14,10 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern short		g_sModelIndexSmoke;			// (in combatweapon.cpp) holds the index for the smoke cloud
-extern short		g_sModelIndexBloodDrop;		// (in combatweapon.cpp) holds the sprite index for the initial blood
-extern short		g_sModelIndexBloodSpray;	// (in combatweapon.cpp) holds the sprite index for splattered blood
+// dimhotepus: short -> int.
+extern int		g_sModelIndexSmoke;			// (in combatweapon.cpp) holds the index for the smoke cloud
+extern int		g_sModelIndexBloodDrop;		// (in combatweapon.cpp) holds the sprite index for the initial blood
+extern int		g_sModelIndexBloodSpray;	// (in combatweapon.cpp) holds the sprite index for splattered blood
 
 
 //-----------------------------------------------------------------------------

@@ -17,7 +17,8 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-extern short	g_sModelIndexSmoke;			// (in combatweapon.cpp) holds the index for the smoke cloud
+// dimhotepus: short -> int.
+extern int	g_sModelIndexSmoke;			// (in combatweapon.cpp) holds the index for the smoke cloud
 
 //-----------------------------------------------------------------------------
 // Purpose: Dispatches a beam between two entities

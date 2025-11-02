@@ -18,7 +18,8 @@
 
 #define FCYCLER_NOTSOLID		0x0001
 
-extern short		g_sModelIndexSmoke; // (in combatweapon.cpp) holds the index for the smoke cloud
+// dimhotepus: short -> int.
+extern int		g_sModelIndexSmoke; // (in combatweapon.cpp) holds the index for the smoke cloud
 
 BEGIN_DATADESC( CCycler )
 

@@ -26,7 +26,8 @@
 
 #define AR2_GRENADE_MAX_DANGER_RADIUS	300
 
-extern short	g_sModelIndexFireball;			// (in combatweapon.cpp) holds the index for the smoke cloud
+// dimhotepus: short -> int.
+extern int	g_sModelIndexFireball;			// (in combatweapon.cpp) holds the index for the smoke cloud
 
 // Moved to HL2_SharedGameRules because these are referenced by shared AmmoDef functions
 extern ConVar    sk_plr_dmg_smg1_grenade;

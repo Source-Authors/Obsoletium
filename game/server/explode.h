@@ -24,8 +24,9 @@
 #define SF_ENVEXPLOSION_SURFACEONLY	0x00002000 // don't damage the player if he's underwater.
 #define SF_ENVEXPLOSION_GENERIC_DAMAGE	0x00004000 // don't do BLAST damage
 
-extern short	g_sModelIndexFireball;
-extern short	g_sModelIndexSmoke;
+// dimhotepus: short -> int.
+extern int	g_sModelIndexFireball;
+extern int	g_sModelIndexSmoke;
 
 void ExplosionCreate( const Vector &center, const QAngle &angles, 
 	CBaseEntity *pOwner, int magnitude, int radius, bool doDamage, float flExplosionForce = 0.0f, bool bSurfaceOnly = false, bool bSilent = false, int iCustomDamageType = -1 );

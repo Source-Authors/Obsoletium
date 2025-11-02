@@ -56,7 +56,8 @@
 
 #define GUNSHIP_NUM_DAMAGE_OUTPUTS		4
 
-extern short		g_sModelIndexFireball;		// holds the index for the fireball
+// dimhotepus: short -> int.
+extern int		g_sModelIndexFireball;		// holds the index for the fireball
 
 int g_iGunshipEffectIndex = -1;
 
