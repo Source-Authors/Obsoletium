@@ -79,7 +79,7 @@ void CChangeGameDialog::LoadModList()
 			{
 				// Check for dlls\*.dll
 				char szDllDirectory[MAX_PATH + 16];
-				V_sprintf_safe(szDllDirectory, "%s\\gameinfo.txt", wfd.cFileName);
+				V_sprintf_safe(szDllDirectory, "%s" CORRECT_PATH_SEPARATOR_S "gameinfo.txt", wfd.cFileName);
 
 				// dimhotepus: Use posix streams.
 				auto [f, rc] = se::posix::posix_file_stream_factory::open(szDllDirectory, "rb");
