@@ -981,7 +981,7 @@ class CParallelProcessor
 public:
 	CParallelProcessor( const char *pszDescription )
 	{
-		m_pItems = m_pLimit = 0;
+		m_pItems = m_pLimit = nullptr;
 		m_szDescription = pszDescription;
 	}
 
