@@ -130,8 +130,8 @@ static const matrix3x4_t *ComputeSkinMatrix( int nBoneCount, const float *pJoint
 		return &result;
 	}
 
-	Assert(0);
-	return NULL;
+	// dimhotepus: Unreachable.
+	unreachable();
 }
 
 
