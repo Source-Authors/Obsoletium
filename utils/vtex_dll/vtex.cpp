@@ -2708,7 +2708,8 @@ public:
 
 public:
 	char const * const *m_pszInputFiles;
-	size_t m_numInputFiles;
+	// dimhotepus: size_t -> int.
+	int m_numInputFiles;
 } g_suggestGameDirHelper;
 
 bool CSuggestGameDirHelper::SuggestFn( CFSSteamSetupInfo const *pFsSteamSetupInfo, char *pchPathBuffer, int nBufferLength, bool *pbBubbleDirectories )
@@ -2724,7 +2725,7 @@ bool CSuggestGameDirHelper::MySuggestFn( CFSSteamSetupInfo const *pFsSteamSetupI
 	if ( pbBubbleDirectories )
 		*pbBubbleDirectories = true;
 
-	for ( size_t k = 0; k < m_numInputFiles; ++ k )
+	for ( int k = 0; k < m_numInputFiles; ++ k )
 	{
 		V_MakeAbsolutePath( pchPathBuffer, nBufferLength, m_pszInputFiles[ k ] );
 		return true;
