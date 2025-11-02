@@ -36,7 +36,7 @@ public:
 	static void FindOrAddScriptSound( CUtlVector< unsigned short >& sounds, char const *soundname );
 	static void BuildAnimationEventSoundList( CStudioHdr *hdr, CUtlVector< unsigned short >& sounds );
 private:
-	char const *GetSoundName( int index );
+	char const *GetSoundName( intp index );
 };
 #pragma pack()
 

@@ -3364,9 +3364,8 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
 	// Now spawn entities
 	CUtlVector<int> checkList;
 
-	int i;
 	int movedCount = 0;
-	for ( i = 0; i < pSaveData->NumEntities(); i++ )
+	for ( int i = 0; i < pSaveData->NumEntities(); i++ )
 	{
 		pEntInfo = pSaveData->GetEntityInfo( i );
 		pent = pEntInfo->hEnt;
@@ -3417,7 +3416,7 @@ int CreateEntityTransitionList( CSaveRestoreData *pSaveData, int levelMask )
 		}
 	}
 
-	for ( i = checkList.Count()-1; i >= 0; --i )
+	for ( intp i = checkList.Count()-1; i >= 0; --i )
 	{
 		pEntInfo = pSaveData->GetEntityInfo( checkList[i] );
 		pent = pEntInfo->hEnt;
