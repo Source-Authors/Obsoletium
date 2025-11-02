@@ -550,14 +550,14 @@ void CAI_ScriptConditions::EvaluationThink()
 		};
 
 		// dimhotepus: Compile-time size.
-		for ( intp i = 0; i < ssize(gm_Evaluators); ++i )
+		for ( intp j = 0; j < ssize(gm_Evaluators); ++j )
 		{
-			if ( !(this->*gm_Evaluators[i].pfnEvaluator)( args ) )
+			if ( !(this->*gm_Evaluators[j].pfnEvaluator)( args ) )
 			{
 				pConditionElement->GetTimer()->Reset();
 				result = false;
 
-				ScrCondDbgMsg( ( "%s failed on: %s\n", GetDebugName(), gm_Evaluators[ i ].pszName ) );
+				ScrCondDbgMsg( ( "%s failed on: %s\n", GetDebugName(), gm_Evaluators[ j ].pszName ) );
 
 				break;
 			}
