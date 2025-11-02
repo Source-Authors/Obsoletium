@@ -825,7 +825,7 @@ struct mstudioseqdesc_t
 
 	int					numiklocks;
 	int					iklockindex;
-	inline mstudioiklock_t *pIKLock( int i ) const { Assert( i >= 0 && i < numiklocks); return (mstudioiklock_t *)(((byte *)this) + iklockindex) + i; }
+	inline mstudioiklock_t *pIKLock( intp i ) const { Assert( i >= 0 && i < numiklocks); return (mstudioiklock_t *)(((byte *)this) + iklockindex) + i; }
 
 	// Key values
 	int					keyvalueindex;
