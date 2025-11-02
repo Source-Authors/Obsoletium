@@ -72,8 +72,7 @@ void CChangeGameDialog::LoadModList()
 	HANDLE hResult = FindFirstFile(szSearchPath, &wfd);
 	if (hResult != INVALID_HANDLE_VALUE)
 	{
-		BOOL bMoreFiles;
-		while (1)
+		while (true)
 		{
 			if ((wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (Q_strnicmp(wfd.cFileName, ".", 1)))
 			{
@@ -83,40 +82,36 @@ void CChangeGameDialog::LoadModList()
 
 				// dimhotepus: Use posix streams.
 				auto [f, rc] = se::posix::posix_file_stream_factory::open(szDllDirectory, "rb");
-				if (!rc)
+				if (rc) continue;
+
+				// find the description
+				int64_t size;
+				std::tie(size, rc) = f.size();
+
+				if (rc || static_cast<uint64_t>(size) >= std::numeric_limits<size_t>::max()) continue;
+
+				auto buf = std::make_unique<char[]>(static_cast<size_t>(size) + 1);
+				size_t readSize;
+				std::tie(readSize, rc) = f.read(buf.get(), static_cast<size_t>(size) + 1);
+
+				if (rc || static_cast<uint64_t>(size) != readSize) continue;
+
+				CModInfo modInfo;
+				modInfo.LoadGameInfoFromBuffer(buf.get());
+
+				if (strcmp(modInfo.GetGameName(), ModInfo().GetGameName()))
 				{
-					// find the description
-					int64_t size;
-					std::tie(size, rc) = f.size();
+					// Add the game directory.
+					V_strlwr_safe(wfd.cFileName);
 
-					if (!rc && size < std::numeric_limits<size_t>::max()) 
-					{
-						std::unique_ptr<char[]> buf = std::make_unique<char[]>(static_cast<size_t>(size) + 1);
-						size_t readSize;
-						std::tie(readSize, rc) = f.read(buf.get(), static_cast<size_t>(size) + 1);
+					KeyValuesAD itemData("Mod");
+					itemData->SetString("ModName", modInfo.GetGameName());
+					itemData->SetString("ModDir", wfd.cFileName);
 
-						if (!rc && size == readSize)
-						{
-							CModInfo modInfo;
-							modInfo.LoadGameInfoFromBuffer(buf.get());
-
-							if (strcmp(modInfo.GetGameName(), ModInfo().GetGameName()))
-							{
-								// Add the game directory.
-								V_strlwr_safe(wfd.cFileName);
-
-								KeyValuesAD itemData("Mod");
-								itemData->SetString("ModName", modInfo.GetGameName());
-								itemData->SetString("ModDir", wfd.cFileName);
-
-								m_pModList->AddItem(itemData, 0, false, false);
-							}
-						}
-					}
+					m_pModList->AddItem(itemData, 0, false, false);
 				}
 			}
-			bMoreFiles = FindNextFile(hResult, &wfd);
-			if (!bMoreFiles)
+			if (!FindNextFile(hResult, &wfd))
 				break;
 		}
 		
