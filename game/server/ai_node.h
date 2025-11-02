@@ -126,7 +126,7 @@ public:
 	CAI_Link*		HasLink(int nNodeID);				// Return link to nNodeID or NULL
 
 	void			ShuffleLinks();						// Called before GetShuffeledLinks to reorder 
-	CAI_Link*		GetShuffeledLink(int nNum);			// Used to get links in different order each time
+	CAI_Link*		GetShuffeledLink(intp nNum);		// Used to get links in different order each time
 
 	int 			GetId() const			{ return m_iID; }
 	

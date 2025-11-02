@@ -115,9 +115,9 @@ void CAI_Node::ShuffleLinks(void)
 // Input   :
 // Output  :
 //------------------------------------------------------------------------------
-CAI_Link* CAI_Node::GetShuffeledLink(int nNum)
+CAI_Link* CAI_Node::GetShuffeledLink(intp nNum)
 {
-	int nLinkID = m_iFirstShuffledLink + nNum;
+	intp nLinkID = m_iFirstShuffledLink + nNum;
 	if (nLinkID >= NumLinks())
 	{
 		nLinkID -= NumLinks();
