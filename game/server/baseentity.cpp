@@ -6457,11 +6457,10 @@ void CBaseEntity::AppendContextToCriteria( AI_CriteriaSet& set, const char *pref
 {
 	RemoveExpiredConcepts();
 
-	int c = GetContextCount();
-	int i;
+	intp c = GetContextCount();
 
 	char sz[ 128 ];
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		const char *name = GetContextName( i );
 		const char *value = GetContextValue( i );
@@ -6478,10 +6477,9 @@ void CBaseEntity::AppendContextToCriteria( AI_CriteriaSet& set, const char *pref
 //-----------------------------------------------------------------------------
 void CBaseEntity::RemoveExpiredConcepts( void )
 {
-	int c = GetContextCount();
-	int i;
+	intp c = GetContextCount();
 
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		if ( ContextExpired( i ) )
 		{
@@ -6497,7 +6495,7 @@ void CBaseEntity::RemoveExpiredConcepts( void )
 // Purpose: Get current context count
 // Output : int
 //-----------------------------------------------------------------------------
-int CBaseEntity::GetContextCount() const
+intp CBaseEntity::GetContextCount() const
 {
 	return m_ResponseContexts.Count();
 }
@@ -6507,7 +6505,7 @@ int CBaseEntity::GetContextCount() const
 // Input  : index - 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *CBaseEntity::GetContextName( int index ) const
+const char *CBaseEntity::GetContextName( intp index ) const
 {
 	if ( index < 0 || index >= m_ResponseContexts.Count() )
 	{
@@ -6523,7 +6521,7 @@ const char *CBaseEntity::GetContextName( int index ) const
 // Input  : index - 
 // Output : const char
 //-----------------------------------------------------------------------------
-const char *CBaseEntity::GetContextValue( int index ) const
+const char *CBaseEntity::GetContextValue( intp index ) const
 {
 	if ( index < 0 || index >= m_ResponseContexts.Count() )
 	{
@@ -6539,7 +6537,7 @@ const char *CBaseEntity::GetContextValue( int index ) const
 // Input  : index - 
 // Output : bool
 //-----------------------------------------------------------------------------
-bool CBaseEntity::ContextExpired( int index ) const
+bool CBaseEntity::ContextExpired( intp index ) const
 {
 	if ( index < 0 || index >= m_ResponseContexts.Count() )
 	{
@@ -6560,7 +6558,7 @@ bool CBaseEntity::ContextExpired( int index ) const
 // Input  : *name - 
 // Output : int
 //-----------------------------------------------------------------------------
-int CBaseEntity::FindContextByName( const char *name ) const
+intp CBaseEntity::FindContextByName( const char *name ) const
 {
 	intp c = m_ResponseContexts.Count();
 	for ( intp i = 0; i < c; i++ )
@@ -6638,7 +6636,7 @@ void CBaseEntity::AddContext( const char *contextName )
 			duration += gpGlobals->curtime;
 		}
 
-		int iIndex = FindContextByName( key );
+		intp iIndex = FindContextByName( key );
 		if ( iIndex != -1 )
 		{
 			// Set the existing context to the new value
@@ -6663,7 +6661,7 @@ void CBaseEntity::AddContext( const char *contextName )
 void CBaseEntity::InputRemoveContext( inputdata_t& inputdata )
 {
 	const char *contextName = inputdata.value.String();
-	int idx = FindContextByName( contextName );
+	intp idx = FindContextByName( contextName );
 	if ( idx == -1 )
 		return;
 

@@ -842,11 +842,11 @@ protected:
 #endif
 
 	void RemoveExpiredConcepts( void );
-	int	GetContextCount() const;						// Call RemoveExpiredConcepts to clean out expired concepts
-	const char *GetContextName( int index ) const;		// note: context may be expired
-	const char *GetContextValue( int index ) const; 	// note: context may be expired
-	bool ContextExpired( int index ) const;
-	int FindContextByName( const char *name ) const;
+	intp GetContextCount() const;						// Call RemoveExpiredConcepts to clean out expired concepts
+	const char *GetContextName( intp index ) const;		// note: context may be expired
+	const char *GetContextValue( intp index ) const; 	// note: context may be expired
+	bool ContextExpired( intp index ) const;
+	intp FindContextByName( const char *name ) const;
 public:
 	void	AddContext( const char *nameandvalue );
 
