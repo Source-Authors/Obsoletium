@@ -1396,14 +1396,14 @@ public:
 	{
 		if ( !pEntity || !pLink || IsWorldEntity(pEntity) || IsWorldEntity(pLink) )
 			return;
-		int listIndex = m_list.Find(pEntity);
+		auto listIndex = m_list.Find(pEntity);
 		if ( listIndex == m_list.InvalidIndex() )
 		{
 			intp entryIndex = m_entryList.AddToTail();
 			m_entryList[entryIndex].isConstraint = bIsConstraint;
 			listIndex = m_list.Insert( pEntity, entryIndex );
 		}
-		int entryIndex = m_list.Element(listIndex);
+		intp entryIndex = m_list.Element(listIndex);
 		CConstraintFloodEntry &entry = m_entryList.Element(entryIndex);
 		Assert( entry.isConstraint == bIsConstraint );
 		if ( entry.linkList.Find(pLink) < 0 )
@@ -1414,10 +1414,10 @@ public:
 
 	void BuildGraphFromEntity( CBaseEntity *pEntity, CUtlVector<CBaseEntity *> &constraintList )
 	{
-		int listIndex = m_list.Find(pEntity);
+		auto listIndex = m_list.Find(pEntity);
 		if ( listIndex != m_list.InvalidIndex() )
 		{
-			int entryIndex = m_list.Element(listIndex);
+			intp entryIndex = m_list.Element(listIndex);
 			CConstraintFloodEntry &entry = m_entryList.Element(entryIndex);
 			if ( !entry.isMarked )
 			{
@@ -1435,7 +1435,7 @@ public:
 			}
 		}
 	}
-	CUtlMap<CBaseEntity *, int>	m_list;
+	CUtlMap<CBaseEntity *, intp>	m_list;
 	CUtlVector<CConstraintFloodEntry> m_entryList;
 };
 
@@ -1668,7 +1668,7 @@ void PortalPhysFrame( float deltaTime ) //small wrapper for PhysFrame that simul
 // Advance physics by time (in seconds)
 void PhysFrame( float deltaTime )
 {
-	static int lastObjectCount = 0;
+	static intp lastObjectCount = 0;
 	entitem_t *pItem;
 
 	if ( !g_PhysicsHook.ShouldSimulate() )
@@ -2191,7 +2191,7 @@ void CCollisionEvent::UpdateDamageEvents( void )
 	m_damageInflictors.RemoveAll();
 }
 
-void CCollisionEvent::RestoreDamageInflictorState( int inflictorStateIndex, float velocityBlend )
+void CCollisionEvent::RestoreDamageInflictorState( intp inflictorStateIndex, float velocityBlend )
 {
 	inflictorstate_t &state = m_damageInflictors[inflictorStateIndex];
 	if ( state.restored )

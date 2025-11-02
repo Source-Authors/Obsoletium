@@ -133,7 +133,7 @@ private:
 	float DeltaTimeSinceLastFluid( CBaseEntity *pEntity );
 
 	void RestoreDamageInflictorState( IPhysicsObject *pInflictor );
-	void RestoreDamageInflictorState( int inflictorStateIndex, float velocityBlend );
+	void RestoreDamageInflictorState( intp inflictorStateIndex, float velocityBlend );
 	intp AddDamageInflictor( IPhysicsObject *pInflictorPhysics, float otherMass, const Vector &savedVel, const AngularImpulse &savedAngVel, bool addList );
 	intp FindDamageInflictor( IPhysicsObject *pInflictorPhysics );
 
