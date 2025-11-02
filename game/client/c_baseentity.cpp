@@ -5785,8 +5785,7 @@ int C_BaseEntity::RestoreData( const char *context, int slot, int type )
 	AddEFlags( savedEFlags );
 
 	// restore original model index and change via SetModelIndex
-	int newModelIndex = m_nModelIndex;
-	m_nModelIndex = oldModelIndex;
+	int newModelIndex = std::exchange(m_nModelIndex, oldModelIndex);
 	int overrideModelIndex = CalcOverrideModelIndex();
 	if( overrideModelIndex != -1 )
 		newModelIndex = overrideModelIndex;
