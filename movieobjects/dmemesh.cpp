@@ -2362,7 +2362,7 @@ bool CDmeMesh::GetControlDeltaIndices(
 			++pNext;
 		}
 
-		if ( Q_strlen( pCurr ) )
+		if ( !Q_isempty( pCurr ) )
 		{
 			const int controlDeltaIndex( FindDeltaStateIndex( pCurr ) );
 			if ( controlDeltaIndex >= 0 )
