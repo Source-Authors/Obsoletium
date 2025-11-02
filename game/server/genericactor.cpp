@@ -328,7 +328,7 @@ void CFlextalkActor::ProcessSceneEvents( void )
 				// Msg( "%s %.3f\n", predef_flexcontroller_names[i], predef_flexcontroller_values[j][i] );
 			}
 		}
-		else if (pszExpression && pszExpression[0] != '\0' && strcmp(pszExpression, "+") != 0)
+		else if (!Q_isempty( pszExpression ) && strcmp(pszExpression, "+") != 0)
 		{
 			char szExpression[128];
 			char szTemp[32];
