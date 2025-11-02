@@ -394,7 +394,7 @@ public:
 		m_pPlayer->SelectedSongs( CMP3Player::SONG_FROM_PLAYLIST, songList );
 	}
 
-	void OnItemPlaying( int listIndex )
+	void OnItemPlaying( intp listIndex )
 	{
 		intp itemId = m_pList->GetItemIDFromRow( listIndex );
 		m_pList->ClearSelectedItems();
@@ -515,7 +515,7 @@ public:
 		}
 	}
 
-	void OnPlayListItemPlaying( int listIndex )
+	void OnPlayListItemPlaying( intp listIndex )
 	{
 		if ( m_pPlayList )
 		{
