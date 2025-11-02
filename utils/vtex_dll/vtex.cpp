@@ -2704,7 +2704,7 @@ public:
 	bool MySuggestFn( CFSSteamSetupInfo const *pFsSteamSetupInfo, char *pchPathBuffer, int nBufferLength, bool *pbBubbleDirectories );
 
 public:
-	CSuggestGameDirHelper() : m_pszInputFiles( NULL ), m_numInputFiles( 0 ) {}
+	CSuggestGameDirHelper() : m_pszInputFiles( nullptr ), m_numInputFiles( 0 ) {}
 
 public:
 	char const * const *m_pszInputFiles;
