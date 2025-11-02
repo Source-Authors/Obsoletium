@@ -832,8 +832,10 @@ inline long BigLong( long val )
 		else
 			return QWordSwap( val );
 	}
-
-	return val;
+	else
+	{
+		return val;
+	}
 }
 template <bool isLittleEndian = endian::native == endian::little>
 inline uint32 BigDWord( uint32 val )
