@@ -1159,7 +1159,7 @@ private:
 
 		m_ItemProcessor.End();
 
-		--m_nActive;
+		m_nActive.fetch_sub(1, std::memory_order::memory_order_relaxed);
 	}
 	
 #ifdef PLATFORM_64BITS
