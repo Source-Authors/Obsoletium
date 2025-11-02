@@ -253,7 +253,7 @@ void CEP1IntroEffect::Render( int x, int y, int w, int h )
 	if ( g_pMaterialSystemHardwareConfig->UsesSRGBCorrectBlending() )
 	{
 		// For DX10 cards, alpha blending happens in linear space, so try to adjust by hacking alpha to 50%
-		overlaycolor[3] *= 0.7f;
+		overlaycolor[3] = overlaycolor[3] * 7 / 10;
 	}
 
 	// Disable overself if we're done fading out
@@ -265,8 +265,8 @@ void CEP1IntroEffect::Render( int x, int y, int w, int h )
 	}
 
 	// Calculate some wavey noise to jitter the view by
-	float vX = 2.0f * -fabs( cosf( gpGlobals->curtime ) * cosf( gpGlobals->curtime * 6.0 ) );
-	float vY = 2.0f * cosf( gpGlobals->curtime ) * cosf( gpGlobals->curtime * 5.0 );
+	float vX = 2.0f * -fabs( cosf( gpGlobals->curtime ) * cosf( gpGlobals->curtime * 6.0f ) );
+	float vY = 2.0f * cosf( gpGlobals->curtime ) * cosf( gpGlobals->curtime * 5.0f );
 
 	// Scale percentage
 	float flScalePerc = 0.02f + ( 0.01f * cosf( gpGlobals->curtime * 2.0f ) * cosf( gpGlobals->curtime * 0.5f ) );
@@ -422,8 +422,8 @@ void CEP2StunEffect::Render( int x, int y, int w, int h )
 	}
 
 	// Calculate some wavey noise to jitter the view by
-	float vX = 4.0f * cosf( gpGlobals->curtime ) * cosf( gpGlobals->curtime * 6.0 );
-	float vY = 2.0f * cosf( gpGlobals->curtime ) * cosf( gpGlobals->curtime * 5.0 );
+	float vX = 4.0f * cosf( gpGlobals->curtime ) * cosf( gpGlobals->curtime * 6.0f );
+	float vY = 2.0f * cosf( gpGlobals->curtime ) * cosf( gpGlobals->curtime * 5.0f );
 
 	float flBaseScale = 0.2f + 0.005f * sinf( gpGlobals->curtime * 4.0f );
 
