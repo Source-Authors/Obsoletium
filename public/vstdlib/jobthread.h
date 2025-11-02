@@ -1015,7 +1015,7 @@ public:
 
 		if ( nJobs > 1 )
 		{
-			CJob **jobs = (CJob **)stackalloc( nJobs * sizeof(CJob **) );
+			CJob **jobs = stackallocT( CJob*, nJobs );
 			intp i = nJobs;
 
 			while( i-- )
