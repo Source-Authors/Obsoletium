@@ -39,7 +39,7 @@ struct HudTextureFileRef
 	{
 		Q_strncpy( m_cszFileKey, cszFileKey, kcszFileKeyLength );
 		Q_strncpy( m_cszHudTexturePrefix, cszHudTexturePrefix, kcszHudTexturePrefix );
-		m_uiPrefixLength = Q_strlen( cszHudTexturePrefix );
+		m_uiPrefixLength = V_strlen( cszHudTexturePrefix );
 		m_fileKeySymbol = KeyValuesSystem()->GetSymbolForString( m_cszFileKey );
 		Assert( m_fileKeySymbol != INVALID_KEY_SYMBOL );
 	}
@@ -49,7 +49,8 @@ struct HudTextureFileRef
 
 	char m_cszFileKey[kcszFileKeyLength];
 	char m_cszHudTexturePrefix[kcszHudTexturePrefix];
-	unsigned int m_uiPrefixLength;
+	// dimhotepus: unsigned -> intp.
+	intp m_uiPrefixLength;
 	HKeySymbol m_fileKeySymbol;
 };
 
