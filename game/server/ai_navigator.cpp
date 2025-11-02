@@ -4142,7 +4142,7 @@ void CAI_Navigator::DrawDebugRouteOverlay(void)
 
 		if (waypoint->GetNext()) 
 		{
-			Vector RGB = GetRouteColor(waypoint->GetNext()->NavType(), waypoint->GetNext()->Flags());
+			RGB = GetRouteColor(waypoint->GetNext()->NavType(), waypoint->GetNext()->Flags());
 			NDebugOverlay::Line(waypoint->GetPos(), waypoint->GetNext()->GetPos(),RGB[0],RGB[1],RGB[2], true,0);
 		}
 		waypoint = waypoint->GetNext();
