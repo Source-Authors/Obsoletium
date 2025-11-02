@@ -1040,7 +1040,7 @@ void CBaseHudChat::OnTick( void )
 		m_pChatInput->GetBounds( iInputX, iInputY, iInputW, iInputH );
 		GetBounds( iChatX, iChatY, iChatW, iChatH );
 
-		m_pChatInput->SetBounds( iInputX, iChatH - (m_iFontHeight * 1.75), iInputW, m_iFontHeight );
+		m_pChatInput->SetBounds( iInputX, iChatH - (m_iFontHeight * 7 / 4), iInputW, m_iFontHeight );
 
 		//Resize the History Panel so it fits more lines depending on the screen resolution.
 		int iChatHistoryX, iChatHistoryY, iChatHistoryW, iChatHistoryH;
