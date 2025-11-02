@@ -57,7 +57,7 @@ public:
 	
 	void		Simulate( 
 		CNode *pNodes, 
-		int nNodes, 
+		intp nNodes, 
 		IHelper *pHelper, 
 		float dt,
 		float flDamp );

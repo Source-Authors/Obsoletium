@@ -29,7 +29,7 @@ void CSimplePhysics::Init( double flTimeStep )
 
 void CSimplePhysics::Simulate( 
 	CSimplePhysics::CNode *pNodes, 
-	int nNodes, 
+	intp nNodes, 
 	CSimplePhysics::IHelper *pHelper, 
 	float dt,
 	float flDamp )
@@ -41,7 +41,7 @@ void CSimplePhysics::Simulate(
 	for( int iTimeStep=0; iTimeStep < nTimeSteps; iTimeStep++ )
 	{
 		// Simulate everything..
-		for( int iNode=0; iNode < nNodes; iNode++ )
+		for( intp iNode=0; iNode < nNodes; iNode++ )
 		{
 			CSimplePhysics::CNode *pNode = &pNodes[iNode];
 
@@ -62,7 +62,7 @@ void CSimplePhysics::Simulate(
 
 	// Setup predicted positions.
 	double flInterpolant = (m_flPredictedTime - (GetCurTime() - m_flTimeStep)) / m_flTimeStep;
-	for( int iNode=0; iNode < nNodes; iNode++ )
+	for( intp iNode=0; iNode < nNodes; iNode++ )
 	{
 		CSimplePhysics::CNode *pNode = &pNodes[iNode];
 		VectorLerp( pNode->m_vPrevPos, pNode->m_vPos, flInterpolant, pNode->m_vPredicted );
