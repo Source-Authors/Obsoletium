@@ -1594,7 +1594,8 @@ void CHudCloseCaption::CreateFonts( void )
 	m_hFonts[CCFONT_ITALIC] = pScheme->GetFont( "CloseCaption_Italic", true );
 	m_hFonts[CCFONT_ITALICBOLD] = pScheme->GetFont( "CloseCaption_BoldItalic", true );
 
-	m_nLineHeight = MAX( 6, vgui::surface()->GetFontTall( m_hFonts[ CCFONT_NORMAL ] ) );
+	// dimhotepus: Scale UI.
+	m_nLineHeight = MAX( QuickPropScale( 6 ), vgui::surface()->GetFontTall( m_hFonts[ CCFONT_NORMAL ] ) );
 }
 
 struct WorkUnitParams
