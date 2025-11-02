@@ -295,7 +295,7 @@ protected:
 	virtual void		PlayUseDenySound();
 
 private:
-	bool				CommanderExecuteOne( CAI_BaseNPC *pNpc, const commandgoal_t &goal, CAI_BaseNPC **Allies, int numAllies );
+	bool				CommanderExecuteOne( CAI_BaseNPC *pNpc, const commandgoal_t &goal, CAI_BaseNPC **Allies, intp numAllies );
 
 	void				OnSquadMemberKilled( inputdata_t &data );
 

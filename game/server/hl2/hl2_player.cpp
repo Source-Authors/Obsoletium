@@ -1590,7 +1590,7 @@ void CHL2_Player::CommanderUpdate()
 // a suitable candidate. (like picking up a single weapon. We don't wish for
 // all allies to respond and try to pick up one weapon).
 //----------------------------------------------------------------------------- 
-bool CHL2_Player::CommanderExecuteOne( CAI_BaseNPC *pNpc, const commandgoal_t &goal, CAI_BaseNPC **Allies, int numAllies )
+bool CHL2_Player::CommanderExecuteOne( CAI_BaseNPC *pNpc, const commandgoal_t &goal, CAI_BaseNPC **Allies, intp numAllies )
 {
 	if ( goal.m_pGoalEntity )
 	{
