@@ -313,9 +313,11 @@ static SpewRetval_t _SpewMessage( SpewType_t spewType, const char *pGroupName, i
 	assert( len * sizeof(*pMsgFormat) < sizeof(pTempBuffer) ); /* use normal assert here; to avoid recursion. */
 
 	// Add \n for warning and assert
-	if ( spewType == SPEW_ASSERT )
+	// dimhotepus: Do not add \n twice if Assert already has one.
+	if ( spewType == SPEW_ASSERT && len > 0 && pTempBuffer[len - 1] != '\n' )
 	{
-		len += _stprintf( &pTempBuffer[len], _T("\n") ); 
+		// dimhotepus: Limit buffer size to ensure no overflow.
+		len += _sntprintf( &pTempBuffer[len], sizeof( pTempBuffer ) - 1, _T("\n") ); 
 	}
 	
 	assert( len < ssize(pTempBuffer) - 1 ); /* use normal assert here; to avoid recursion. */
