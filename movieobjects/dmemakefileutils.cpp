@@ -201,8 +201,8 @@ bool CDmeMakefileUtils::AddCompileDependencies( CDmeMakefile *pMakefile, bool bB
 		return true;
 
 	CUtlVector< CUtlString > outputs;
-	int nCount = pMakefile->GetSourceCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pMakefile->GetSourceCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeSource *pSource = pMakefile->GetSource( i );
 		if ( !pSource )
@@ -215,12 +215,11 @@ bool CDmeMakefileUtils::AddCompileDependencies( CDmeMakefile *pMakefile, bool bB
 		bool bShouldBuildFile = bBuildAllDependencies;
 
 		// Does the output files exist?
-		intp j = 0;
 		if ( !bBuildAllDependencies )
 		{
 			pDependentMakefile->GetOutputs( outputs );
 			intp nOutputCount = outputs.Count();
-			for ( j = 0; j < nOutputCount; ++j )
+			for ( intp j = 0; j < nOutputCount; ++j )
 			{
 				// If the file doesn't exist, we have to build it
 				if ( !g_pFullFileSystem->FileExists( outputs[j] ) )
