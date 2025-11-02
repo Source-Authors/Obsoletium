@@ -798,11 +798,11 @@ int UTIL_ComputeStringWidth( vgui::HFont& font, const wchar_t *str )
 // - replaces '#' at the start of the name with '*'
 //-----------------------------------------------------------------------------
 
-void UTIL_MakeSafeName( const char *oldName, char *newName, int newNameBufSize )
+void UTIL_MakeSafeName( const char *oldName, OUT_Z_CAP(newNameBufSize) char *newName, intp newNameBufSize )
 {
 	Assert( newNameBufSize >= static_cast<int>(sizeof(newName[0])) );
 
-	int newpos = 0;
+	intp newpos = 0;
 
 	for( const char *p=oldName; *p != 0 && newpos < newNameBufSize-1; p++ )
 	{
@@ -847,7 +847,7 @@ void UTIL_MakeSafeName( const char *oldName, char *newName, int newNameBufSize )
 const char * UTIL_SafeName( const char *oldName )
 {
 	static char safeName[ MAX_PLAYER_NAME_LENGTH * 2 + 1 ];
-	UTIL_MakeSafeName( oldName, safeName, sizeof( safeName ) );
+	UTIL_MakeSafeName( oldName, safeName );
 
 	return safeName;
 }
@@ -865,7 +865,7 @@ const char * UTIL_SafeName( const char *oldName )
 //			attempted for a Steam Controller binding in the given action set. If none if found, fallback
 //			is to the usual keyboard binding path.
 //-----------------------------------------------------------------------------
-void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BYTECAP(outbufsizebytes) wchar_t *outbuf, int outbufsizebytes, GameActionSet_t actionset )
+void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_BYTECAP(outbufsizebytes) wchar_t *outbuf, int outbufsizebytes, GameActionSet_t actionset )
 {
 	Assert( outbufsizebytes >= static_cast<int>(sizeof(outbuf[0])) );
 	// copy to a new buf if there are vars

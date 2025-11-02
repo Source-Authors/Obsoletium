@@ -148,7 +148,7 @@ bool CHudHintDisplay::SetHintText( wchar_t *text )
 
 		// replace any key references with bound keys
 		wchar_t buf[512];
-		UTIL_ReplaceKeyBindings( line, linelengthbytes, buf, sizeof( buf ) );
+		UTIL_ReplaceKeyBindings( line, linelengthbytes, buf );
 
 		// put it in a label
 		vgui::Label *label = vgui::SETUP_PANEL(new vgui::Label(this, NULL, buf));

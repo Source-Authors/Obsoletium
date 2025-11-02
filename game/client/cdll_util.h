@@ -71,9 +71,23 @@ void	UTIL_SetOrigin( C_BaseEntity *entity, const Vector &vecOrigin );
 void	UTIL_ScreenShake( const Vector &center, float amplitude, float frequency, float duration, float radius, ShakeCommand_t eCommand, bool bAirShake=false );
 byte	*UTIL_LoadFileForMe( const char *filename, int *pLength );
 void	UTIL_FreeFile( byte *buffer );
-void	UTIL_MakeSafeName( const char *oldName, OUT_Z_CAP(newNameBufSize) char *newName, int newNameBufSize );	///< Cleans up player names for putting in vgui controls (cleaned names can be up to original*2+1 in length)
+void	UTIL_MakeSafeName( const char *oldName, OUT_Z_CAP(newNameBufSize) char *newName, intp newNameBufSize );	///< Cleans up player names for putting in vgui controls (cleaned names can be up to original*2+1 in length)
+
+template<intp newSize>
+void	UTIL_MakeSafeName( const char *oldName, OUT_Z_ARRAY char (&newName)[newSize] )	///< Cleans up player names for putting in vgui controls (cleaned names can be up to original*2+1 in length)
+{
+	UTIL_MakeSafeName( oldName, newName, newSize );
+}
+
 const char *UTIL_SafeName( const char *oldName );	///< Wraps UTIL_MakeSafeName, and returns a static buffer
-void	UTIL_ReplaceKeyBindings( const wchar_t *inbuf, int inbufsizebytes, OUT_Z_BYTECAP(outbufsizebytes) wchar_t *outbuf, int outbufsizebytes, GameActionSet_t action_set = GAME_ACTION_SET_NONE );
+void	UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_BYTECAP(outbufsizebytes) wchar_t *outbuf, int outbufsizebytes, GameActionSet_t action_set = GAME_ACTION_SET_NONE );
+
+template<intp outSize>
+void	UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_ARRAY wchar_t (&outbuf)[outSize], GameActionSet_t action_set = GAME_ACTION_SET_NONE )
+{
+	UTIL_ReplaceKeyBindings( inbuf, inbufsizebytes, outbuf, outSize * sizeof(wchar_t), action_set );
+}
+
 
 // Fade out an entity based on distance fades
 unsigned char UTIL_ComputeEntityFade( C_BaseEntity *pEntity, float flMinDist, float flMaxDist, float flFadeScale );

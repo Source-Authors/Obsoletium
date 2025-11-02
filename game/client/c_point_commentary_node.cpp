@@ -461,7 +461,7 @@ void CHudCommentary::Paint()
 		wchar_t *pszText = g_pVGuiLocalize->Find( "#Commentary_PrimaryAttack" );
 		if ( pszText )
 		{
-			UTIL_ReplaceKeyBindings( pszText, 0, wzFinal, sizeof( wzFinal ) );
+			UTIL_ReplaceKeyBindings( pszText, 0, wzFinal );
 			vgui::surface()->DrawSetTextPos( m_iSpeakersX, iY );
 			vgui::surface()->DrawPrintText( wzFinal, V_wcslen(wzFinal) );
 		}
@@ -470,7 +470,7 @@ void CHudCommentary::Paint()
 		if ( pszText )
 		{
 			int w, h;
-			UTIL_ReplaceKeyBindings( pszText, 0, wzFinal, sizeof( wzFinal ) );
+			UTIL_ReplaceKeyBindings( pszText, 0, wzFinal );
 			vgui::surface()->GetTextSize( hFont, wzFinal, w, h );
 			vgui::surface()->DrawSetTextPos( m_iBarX + m_iBarWide - w, iY );
 			vgui::surface()->DrawPrintText( wzFinal, V_wcslen(wzFinal) );
