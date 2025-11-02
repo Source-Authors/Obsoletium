@@ -106,7 +106,7 @@ void UpdateDirtySpatialPartitionEntities()
 CDirtySpatialPartitionEntityList::CDirtySpatialPartitionEntityList( char const *name ) : CAutoGameSystem( name )
 {
 	m_DirtyEntities.Purge();
-	m_partitionWriteId = std::numeric_limits<ThreadId_t>::max();
+	m_partitionWriteId = INVALID_THREAD_ID;
 	m_readLockCount = 0;
 }
 
@@ -165,7 +165,7 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 	if ( !( listMask & validMask ) )
 		return;
 
-	if ( m_partitionWriteId != 0 && m_partitionWriteId == ThreadGetCurrentId() )
+	if ( m_partitionWriteId != INVALID_THREAD_ID && m_partitionWriteId == ThreadGetCurrentId() )
 		return;
 
 #ifdef CLIENT_DLL
@@ -225,7 +225,7 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 				m_DirtyEntities.PushItem( vecStillDirty[i] );
 			}
 		}
-		m_partitionWriteId = 0;
+		m_partitionWriteId = INVALID_THREAD_ID;
 		m_partitionMutex.UnlockWrite();
 	}
 	LockPartitionForRead();
@@ -244,7 +244,7 @@ void CDirtySpatialPartitionEntityList::OnPostQuery( SpatialPartitionListMask_t l
 		return;
 #endif
 
-	if ( m_partitionWriteId != 0 )
+	if ( m_partitionWriteId != INVALID_THREAD_ID )
 		return;
 
 	UnlockPartitionForRead();
