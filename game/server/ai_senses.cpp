@@ -266,7 +266,9 @@ CBaseEntity *CAI_Senses::GetFirstSeenEntity( AISightIter_t *pIter, seentype_t iS
 	pIterVal->SeenArray = (char)iSeenType;
 	int iFirstArray = ( iSeenType == SEEN_ALL ) ? 0 : iSeenType;
 
-	for ( int i = iFirstArray; i < static_cast<int>(ARRAYSIZE( m_SeenArrays )); i++ )
+	static_assert(std::numeric_limits<char>::max() >= ARRAYSIZE(m_SeenArrays));
+
+	for ( char i = iFirstArray; i < static_cast<char>(ssize( m_SeenArrays )); i++ )
 	{
 		if ( m_SeenArrays[i]->Count() != 0 )
 		{
@@ -288,7 +290,9 @@ CBaseEntity *CAI_Senses::GetNextSeenEntity( AISightIter_t *pIter ) const
 	{
 		AISightIterVal_t *pIterVal = (AISightIterVal_t *)pIter;
 		
-		for ( int i = pIterVal->array;  i < static_cast<int>(ARRAYSIZE( m_SeenArrays )); i++ )
+		static_assert(std::numeric_limits<char>::max() >= ARRAYSIZE(m_SeenArrays));
+
+		for ( char i = pIterVal->array;  i < static_cast<char>(ssize( m_SeenArrays )); i++ )
 		{
 			for ( int j = pIterVal->iNext; j < m_SeenArrays[i]->Count(); j++ )
 			{
@@ -397,9 +401,9 @@ bool CAI_Senses::LookThroughPortal( const CProp_Portal *pPortal, CBaseEntity *pS
 
 //-----------------------------------------------------------------------------
 
-int CAI_Senses::LookForHighPriorityEntities( int iDistance )
+intp CAI_Senses::LookForHighPriorityEntities( int iDistance )
 {
-	int nSeen = 0;
+	intp nSeen = 0;
 	if ( gpGlobals->curtime - m_TimeLastLookHighPriority > AI_HIGH_PRIORITY_SEARCH_TIME )
 	{
 		AI_PROFILE_SENSES(CAI_Senses_LookForHighPriorityEntities);
@@ -441,7 +445,7 @@ int CAI_Senses::LookForHighPriorityEntities( int iDistance )
     	for ( intp i = m_SeenHighPriority.Count() - 1; i >= 0; --i )
     	{
     		if ( m_SeenHighPriority[i].Get() == NULL )
-    			m_SeenHighPriority.FastRemove( i );    			
+    			m_SeenHighPriority.FastRemove( i );
     	}
     	nSeen = m_SeenHighPriority.Count();
     }
@@ -451,7 +455,7 @@ int CAI_Senses::LookForHighPriorityEntities( int iDistance )
 
 //-----------------------------------------------------------------------------
 
-int CAI_Senses::LookForNPCs( int iDistance )
+intp CAI_Senses::LookForNPCs( int iDistance )
 {
 	bool bRemoveStaleFromCache = false;
 	float distSq = ( iDistance * iDistance );
@@ -466,7 +470,7 @@ int CAI_Senses::LookForNPCs( int iDistance )
 
 		if ( efficiency < AIE_SUPER_EFFICIENT )
 		{
-			int nSeen = 0;
+			intp nSeen = 0;
 
 			BeginGather();
 
@@ -492,7 +496,7 @@ int CAI_Senses::LookForNPCs( int iDistance )
 		// Fall through
 	}
 
-    for ( int i = m_SeenNPCs.Count() - 1; i >= 0; --i )
+    for ( intp i = m_SeenNPCs.Count() - 1; i >= 0; --i )
     {
     	if ( m_SeenNPCs[i].Get() == NULL )
 		{
@@ -514,10 +518,10 @@ int CAI_Senses::LookForNPCs( int iDistance )
 
 //-----------------------------------------------------------------------------
 
-int CAI_Senses::LookForObjects( int iDistance )
+intp CAI_Senses::LookForObjects( int iDistance )
 {	
-	const int BOX_QUERY_MASK = FL_OBJECT;
-	int	nSeen = 0;
+	constexpr int BOX_QUERY_MASK = FL_OBJECT;
+	intp nSeen = 0;
 
 	if ( gpGlobals->curtime - m_TimeLastLookMisc > AI_MISC_SEARCH_TIME )
 	{
@@ -549,7 +553,7 @@ int CAI_Senses::LookForObjects( int iDistance )
     	for ( intp i = m_SeenMisc.Count() - 1; i >= 0; --i )
     	{
     		if ( m_SeenMisc[i].Get() == NULL )
-    			m_SeenMisc.FastRemove( i );    			
+    			m_SeenMisc.FastRemove( i );
     	}
     	nSeen = m_SeenMisc.Count();
     }

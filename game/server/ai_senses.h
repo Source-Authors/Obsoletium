@@ -115,9 +115,9 @@ private:
 	bool 			LookThroughPortal( const CProp_Portal *pPortal, CBaseEntity *pSightEnt );
 #endif
 
-	int 			LookForHighPriorityEntities( int iDistance );
-	int 			LookForNPCs( int iDistance );
-	int 			LookForObjects( int iDistance );
+	intp 			LookForHighPriorityEntities( int iDistance );
+	intp 			LookForNPCs( int iDistance );
+	intp 			LookForObjects( int iDistance );
 	
 	bool			SeeEntity( CBaseEntity *pEntity );
 	
