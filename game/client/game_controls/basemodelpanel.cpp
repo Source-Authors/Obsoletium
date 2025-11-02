@@ -643,7 +643,7 @@ void CModelPanel::Paint()
 	{
 		Vector vecMins, vecMaxs;
 		m_hModel->GetRenderBounds( vecMins, vecMaxs );
-		LightDesc_t spotLight( vec3_origin + Vector( 0, 0, 200 ), Vector( 1, 1, 1 ), m_hModel->GetAbsOrigin() + Vector( 0, 0, ( vecMaxs.z - vecMins.z ) * 0.75 ), 0.035, 0.873 );
+		LightDesc_t spotLight( vec3_origin + Vector( 0, 0, 200 ), Vector( 1, 1, 1 ), m_hModel->GetAbsOrigin() + Vector( 0, 0, ( vecMaxs.z - vecMins.z ) * 0.75f ), 0.035f, 0.873f );
 		g_pStudioRender->SetLocalLights( 1, &spotLight );
 	}
 
