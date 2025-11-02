@@ -50,7 +50,7 @@ public:
 		if ( !m_pInData )
 			return JOB_FAILED;
 
-		if ( !V_strlen( m_szFullFilename ) )
+		if ( Q_isempty( m_szFullFilename ) )
 			return JOB_FAILED;
 
 #ifdef _DEBUG

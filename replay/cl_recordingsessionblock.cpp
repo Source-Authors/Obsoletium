@@ -49,7 +49,7 @@ bool CClientRecordingSessionBlock::Read( KeyValues *pIn )
 
 	// Read relative path and construct full path - must have a filename
 	const char *pBlockFile = pIn->GetString( "filename" );
-	if ( !V_strlen( pBlockFile ) )
+	if ( Q_isempty( pBlockFile ) )
 	{
 		AssertMsg( 0, "No block filename!" );
 		return false;
