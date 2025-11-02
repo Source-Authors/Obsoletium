@@ -55,7 +55,8 @@ struct message_parms_t
 	int lineLength;
 	int length;
 	int r, g, b;
-	int text;
+	// dimhotepus: int -> wchar_t.
+	wchar_t text;
 	int fadeBlend;
 	float charTime;
 	float fadeTime;
