@@ -960,12 +960,11 @@ void CHudCloseCaption::Paint( void )
 	int avail_height = rcText.bottom - rcText.top - 2 * CC_INSET;
 
 	int totalheight = 0;
-	int i;
 	CUtlVector< VisibleStreamItem > visibleitems;
-	int c = m_Items.Count();
+	intp c = m_Items.Count();
 	int maxwidth = 0;
 
-	for  ( i = 0; i < c; i++ )
+	for  ( intp i = 0; i < c; i++ )
 	{
 		CCloseCaptionItem *item = m_Items[ i ];
 
@@ -1091,7 +1090,7 @@ void CHudCloseCaption::Paint( void )
 
 	// Now draw them
 	c = visibleitems.Count();
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		VisibleStreamItem *si = &visibleitems[ i ];
 

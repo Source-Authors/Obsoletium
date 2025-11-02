@@ -122,7 +122,7 @@ bool CHudHintDisplay::SetHintText( wchar_t *text )
 	}
 
 	// clear the existing text
-	for (int i = 0; i < m_Labels.Count(); i++)
+	for (intp i = 0; i < m_Labels.Count(); i++)
 	{
 		m_Labels[i]->MarkForDeletion();
 	}
@@ -134,7 +134,7 @@ bool CHudHintDisplay::SetHintText( wchar_t *text )
 	{
 		wchar_t *line = p;
 		wchar_t *end = wcschr( p, L'\n' );
-		int linelengthbytes = 0;
+		intp linelengthbytes = 0;
 		if ( end )
 		{
 			//*end = 0;	//eek
@@ -144,7 +144,7 @@ bool CHudHintDisplay::SetHintText( wchar_t *text )
 		else
 		{
 			p = NULL;
-		}		
+		}
 
 		// replace any key references with bound keys
 		wchar_t buf[512];
