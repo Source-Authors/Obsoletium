@@ -539,11 +539,13 @@ void SendProxy_FuncRotatingAngle( const SendProp *pProp, const void *pStruct, co
 	Assert( entity );
 
 	vec_t const *qa = (vec_t *)pData;
+
+#ifdef _DEBUG
 	vec_t const *ea = entity->GetLocalAngles().Base();
-	NOTE_UNUSED(ea);
 	// Assert its actually an index into m_angRotation if not this won't work
 
 	Assert( (uintp)qa >= (uintp)ea && (uintp)qa < (uintp)ea + sizeof( QAngle ));
+#endif
 
 #ifdef TF_DLL
 	if ( entity->HasSpawnFlags(SF_BRUSH_ROTATE_CLIENTSIDE) )
