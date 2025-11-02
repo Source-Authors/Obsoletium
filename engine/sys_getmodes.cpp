@@ -1438,7 +1438,9 @@ void GetCubemapOffset( CubeMapFaceIndex_t faceIndex, int &x, int &y, int &faceDi
         x = 2;
         y = 2;
         break;
-    NO_DEFAULT
+    default:
+        Assert(0);
+        unreachable();
     }
     x *= faceDim;
     y *= faceDim;

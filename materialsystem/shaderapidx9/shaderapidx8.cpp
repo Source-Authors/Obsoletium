@@ -5256,9 +5256,11 @@ void CShaderAPIDx8::UpdatePixelFogColorConstant( void )
 			}
 		}
 		break;
-
-		NO_DEFAULT;
-	};	
+		
+		default:
+			Assert(0);
+			unreachable();
+	};
 
 	fogColor[3] = 1.0f / m_DynamicState.m_DestAlphaDepthRange;
 
@@ -5311,7 +5313,9 @@ void CShaderAPIDx8::ApplyFogMode( ShaderFogMode_t fogMode, bool bSRGBWritesEnabl
 		case SHADER_FOGMODE_FOGCOLOR:
 			GetSceneFogColor( &r, &g, &b );		// Scene fog color
 			break;
-		NO_DEFAULT
+		default:
+			Assert(0);
+			unreachable();
 	}
 
 	bShouldGammaCorrect &= !bDisableFogGammaCorrection;

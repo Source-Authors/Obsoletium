@@ -824,8 +824,10 @@ public:
 
 			case MATERIAL_LIGHT_DISABLE:
 				return 0.f;
-
-			NO_DEFAULT;
+				
+			default:
+				Assert(0);
+				unreachable();
 		} 
 	}
 };
@@ -870,8 +872,10 @@ public:
 
 		case MATERIAL_LIGHT_DISABLE:
 			return 0.f;
-
-			NO_DEFAULT;
+			
+		default:
+			Assert(0);
+			unreachable();
 		} 
 	}
 };
@@ -884,7 +888,9 @@ inline float CStudioRender::R_WorldLightAngle( const LightDesc_t *wl, const Vect
 		case MATERIAL_LIGHT_POINT:			return CWorldLightAngleWrapper<MATERIAL_LIGHT_POINT>::WorldLightAngle( wl, lnormal, snormal, delta );
 		case MATERIAL_LIGHT_DIRECTIONAL:	return CWorldLightAngleWrapper<MATERIAL_LIGHT_DIRECTIONAL>::WorldLightAngle( wl, lnormal, snormal, delta );
 		case MATERIAL_LIGHT_SPOT:			return CWorldLightAngleWrapper<MATERIAL_LIGHT_SPOT>::WorldLightAngle( wl, lnormal, snormal, delta );
-		NO_DEFAULT;
+		default:
+			Assert(0);
+			unreachable();
 	}
 }
 

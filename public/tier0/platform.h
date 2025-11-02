@@ -488,11 +488,11 @@ constexpr inline std::enable_if_t<std::is_pointer_v<T>, R> POINTER_TO_INT(T p) n
 
 // Marks the codepath from here until the next branch entry point as unreachable,
 // and asserts if any attempt is made to execute it.
-#define UNREACHABLE() { Assert(0); HINT(0); }
+#define UNREACHABLE() { Assert(0); unreachable(); }
 
 // In cases where no default is present or appropriate, this causes MSVC to generate
 // as little code as possible, and throw an assertion in debug.
-#define NO_DEFAULT default: UNREACHABLE();
+#define NO_DEFAULT default: { Assert(0); unreachable(); }
 
 #if defined( LINUX ) && ((__GNUC__ * 100) + __GNUC_MINOR__) >= 406
   // based on some Jonathan Wakely macros on the net...

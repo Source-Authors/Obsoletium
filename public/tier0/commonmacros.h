@@ -260,7 +260,26 @@ template <typename T>
 to_underlying(T value) noexcept {
   return static_cast<std::underlying_type_t<T>>(value);
 }
+#endif  // !__cpp_lib_to_underlying
+
+#ifdef __cpp_lib_unreachable
+// C++23 to_underlying
+using std::unreachable;
+#else
+[[noreturn]]
+#ifdef COMPILER_MSVC
+__forceinline
+#else
+inline
 #endif
+    void unreachable() noexcept {
+#ifdef COMPILER_MSVC
+  __assume(false);
+#else
+  __builtin_unreachable();
+#endif
+}
+#endif  // !__cpp_lib_unreachable
 
 #ifndef REFERENCE
 #define REFERENCE(arg) ((void)arg)

@@ -35,7 +35,7 @@ namespace {
     case VoiceCodecQuality::Perfect:
       return 10;
     default:
-      UNREACHABLE();
+      unreachable();
   }
 }
 
