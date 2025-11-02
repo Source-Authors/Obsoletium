@@ -1738,7 +1738,7 @@ void CBreakableProp::Break( CBaseEntity *pBreaker, const CTakeDamageInfo &info )
 	{
 		CPASFilter filter( WorldSpaceCenter() );
 
-		Vector velocity; velocity.Init();
+		Vector velocity{vec3_origin};
 
 		if ( pPhysics )
 			pPhysics->GetVelocity( &velocity, NULL );
