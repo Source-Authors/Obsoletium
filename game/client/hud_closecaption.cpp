@@ -7,10 +7,10 @@
 
 
 #include "cbase.h"
-#include <ctype.h>
-#include "sentence.h"
 #include "hud_closecaption.h"
+#include "sentence.h"
 #include "tier1/strtools.h"
+#include "tier1/checksum_crc.h"
 #include <vgui_controls/Controls.h>
 #include <vgui/IVGui.h>
 #include <vgui/ISurface.h>
@@ -18,7 +18,6 @@
 #include <vgui/ILocalize.h>
 #include "iclientmode.h"
 #include "hud_macros.h"
-#include "checksum_crc.h"
 #include "filesystem.h"
 #include "datacache/idatacache.h"
 #include "SoundEmitterSystem/isoundemittersystembase.h"
