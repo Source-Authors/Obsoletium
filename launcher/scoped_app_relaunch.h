@@ -14,7 +14,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 
-#include <cstdio>
+#include "posix_file_stream.h"
 #endif
 
 namespace se::launcher {
@@ -46,24 +46,20 @@ class ScopedAppRelaunch {
       return;
     }
 
-    FILE *fp{fopen(kRelaunchFilePath, "r")};
-    if (fp) {
+    auto [fp, rc] =
+        se::posix::posix_file_stream_factory::open(kRelaunchFilePath, "r");
+    if (!rc) {
       char cmd[256];
-      int chars_count = fread(cmd, 1, sizeof(cmd), fp);
+      size_t read;
+      std::tie(read, rc) = fp.read(cmd);
 
-      fclose(fp);
-
-      if (chars_count > 0) {
-        if (chars_count > (sizeof(cmd) - 1)) {
-          chars_count = sizeof(cmd) - 1;
-        }
-        cmd[chars_count] = 0;
+      if (!rc && read > 0) {
         char open_line[MAX_PATH];
 
 #if defined(LINUX)
-        Q_snprintf(open_line, sizeof(open_line), "xdg-open \"%s\"", cmd);
+        V_sprintf_safe(open_line, "xdg-open \"%s\"", cmd);
 #else
-        Q_snprintf(open_line, sizeof(open_line), "open \"%s\"", cmd);
+        V_sprintf_safe(open_line, "open \"%s\"", cmd);
 #endif
 
         system(open_line);
