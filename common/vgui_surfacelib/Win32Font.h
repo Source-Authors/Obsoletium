@@ -105,6 +105,8 @@ protected:
 	unsigned int	m_bClearTypeNatural : 1;
 	unsigned int	m_bRotary : 1;
 	unsigned int	m_bAdditive : 1; //31
+	// dimhotepus: Speedup IsValid checks.
+	unsigned int	m_bHasName : 1; //32
 
 private:
 	// abc widths
