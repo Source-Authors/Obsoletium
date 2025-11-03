@@ -36,7 +36,8 @@ static CPUFrequencyResults s_results;
 static unsigned s_nDelayMs;
 // Has monitoring been enabled? If not measurements may still continue
 // if kDelayMillisecondsWhenDisabled is non-zero.
-static bool s_fEnabled = false;
+// dimhotepus: Make atomic to remove lock for performance.
+static std::atomic_bool s_fEnabled = false;
 
 // This is the delay between measurements when measurements are 'disabled'. If it
 // is zero then the measurements are truly disabled.
@@ -220,9 +221,10 @@ unsigned __stdcall HeartbeatThread( void* )
 
 PLATFORM_INTERFACE CPUFrequencyResults GetCPUFrequencyResults( bool fGetDisabledResults )
 {
-	AUTO_LOCK( s_lock );
-	if ( s_fEnabled || fGetDisabledResults )
+	// dimhotepus: Make atomic to remove lock for performance.
+	if ( s_fEnabled.load( std::memory_order::memory_order_acquire ) || fGetDisabledResults )
 	{
+		AUTO_LOCK( s_lock );
 		// Return actual results.
 		return s_results;
 	}
@@ -282,8 +284,9 @@ PLATFORM_INTERFACE void SetCPUMonitoringInterval( unsigned nDelayMilliseconds )
 		memset( &s_results, 0, sizeof(s_results) );
 	}
 	// Set the specified delay time or 5,000 if it is disabled.
-    s_nDelayMs = nDelayMilliseconds ? nDelayMilliseconds : kDelayMsWhenDisabled;
-	s_fEnabled = nDelayMilliseconds != 0;
+	s_nDelayMs = nDelayMilliseconds ? nDelayMilliseconds : kDelayMsWhenDisabled;
+	// dimhotepus: Make atomic to remove lock for performance.
+	s_fEnabled.store( nDelayMilliseconds != 0, std::memory_order::memory_order_release );
 }
 
 #else
