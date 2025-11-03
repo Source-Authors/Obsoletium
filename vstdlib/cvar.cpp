@@ -740,15 +740,18 @@ void CCvar::DisplayQueuedMessages( )
 		switch( nType )
 		{
 		case CONSOLE_COLOR_PRINT:
-			ConsoleColorPrintf( clr, pTemp );
+			// dimhotepus: Add missed %s as string can have format specifiers and is vulnerable.
+			ConsoleColorPrintf( clr, "%s", pTemp );
 			break;
 
 		case CONSOLE_PRINT:
-			ConsolePrintf( pTemp );
+			// dimhotepus: Add missed %s as string can have format specifiers and is vulnerable.
+			ConsolePrintf( "%s", pTemp );
 			break;
 
 		case CONSOLE_DPRINT:
-			ConsoleDPrintf( pTemp );
+			// dimhotepus: Add missed %s as string can have format specifiers and is vulnerable.
+			ConsoleDPrintf( "%s", pTemp );
 			break;
 		}
 	}
