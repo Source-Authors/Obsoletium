@@ -303,25 +303,3 @@ void CCountedStringPool::SpewStrings()
 
 	Msg("\n%zd total counted strings.", m_Elements.Count());
 }
-
-#ifdef _DEBUG
-CON_COMMAND( test_stringpool, "Tests the class CStringPool" )
-{
-	CStringPool pool;
-	Assert(pool.Count() == 0);
-
-	Assert(pool.Allocate("test") && pool.Count() == 1);
-	Assert(pool.Allocate("test") && pool.Count() == 1);
-	Assert(pool.Allocate("test2") && pool.Count() == 2);
-
-	Assert( pool.Find("test2") != nullptr );
-	Assert( pool.Find("TEST") != nullptr );
-	Assert( pool.Find("Test2") != nullptr );
-	Assert( pool.Find("test") != nullptr );
-
-	pool.FreeAll();
-	Assert(pool.Count() == 0);
-
-	Msg("Pass.");
-}
-#endif

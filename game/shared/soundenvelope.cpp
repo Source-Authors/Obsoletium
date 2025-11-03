@@ -307,7 +307,12 @@ private:
 
 int CSoundPatch::g_SoundPatchCount = 0;
 
+// dimhotepus: CS:GO backport. Split by client and server.
+#ifdef CLIENT_DLL
+CON_COMMAND( cl_report_soundpatch, "reports client-side sound patch count" )
+#else
 CON_COMMAND( report_soundpatch, "reports sound patch count" )
+#endif
 {
 #ifndef CLIENT_DLL
 	if ( !UTIL_IsCommandIssuedByServerAdmin() )

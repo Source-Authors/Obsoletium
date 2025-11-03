@@ -16,6 +16,9 @@
 #include "tier1/tier1.h"
 #include "tier1/utlbuffer.h"
 
+// dimhotepus: CS:GO backport.
+#include "concommandhash.h"
+
 #ifdef _X360
 #include "xbox/xbox_console.h"
 #endif
@@ -113,6 +116,8 @@ private:
 	CUtlVector< IConsoleDisplayFunc* >	m_DisplayFuncs;
 	int									m_nNextDLLIdentifier;
 	ConCommandBase						*m_pConCommandList;
+	// dimhotepus: CS:GO backport for high-speed command search.
+	CConCommandHash						m_CommandHash;
 
 	// temporary console area so we can store prints before console display funs are installed
 	mutable CUtlBuffer					m_TempConsoleBuffer;
@@ -124,8 +129,9 @@ protected:
 	public:
 		CCVarIteratorInternal( CCvar *outer ) 
 			: m_pOuter( outer )
-			//, m_pHash( &outer->m_CommandHash ), // remember my CCvar,
-			//m_hashIter( -1, -1 ) // and invalid iterator
+			// dimhotepus: CS:GO backport.
+			, m_pHash( &outer->m_CommandHash ), // remember my CCvar,
+			m_hashIter( -1, -1 ) // and invalid iterator
 			 
 		{}
 		void		SetFirst( ) RESTRICT override;
@@ -134,9 +140,10 @@ protected:
 		RESTRICT_FUNC ConCommandBase *Get( ) override;
 	protected:
 		CCvar * const m_pOuter;
-		//CConCommandHash * const m_pHash;
-		//CConCommandHash::CCommandHashIterator_t m_hashIter;
-		ConCommandBase *m_pCur{ nullptr };
+		// dimhotepus: CS:GO backport.
+		CConCommandHash * const m_pHash;
+		CConCommandHash::CCommandHashIterator_t m_hashIter;
+		// ConCommandBase *m_pCur{ nullptr };
 	};
 
 	ICVarIteratorInternal	*FactoryInternalIterator( ) override;
@@ -162,32 +169,40 @@ protected:
 private:
 	// Standard console commands -- DO NOT PLACE ANY HIGHER THAN HERE BECAUSE THESE MUST BE THE FIRST TO DESTRUCT
 	CON_COMMAND_MEMBER_F( CCvar, "find", Find, "Find concommands with the specified string in their name/help text.", 0 )
+	// dimhotepus: CS:GO backport.
+#ifdef _DEBUG
+	CON_COMMAND_MEMBER_F( CCvar, "ccvar_hash_report", HashReport, "report info on bucket distribution of internal hash.", 0 )
+#endif
 };
 
 void CCvar::CCVarIteratorInternal::SetFirst( ) RESTRICT
 {
-	//m_hashIter = m_pHash->First();
-	m_pCur = m_pOuter->GetCommands();
+	// dimhotepus: CS:GO backport.
+	m_hashIter = m_pHash->First();
+	//m_pCur = m_pOuter->GetCommands();
 }
 
 void CCvar::CCVarIteratorInternal::Next( ) RESTRICT
 {
-	//m_hashIter = m_pHash->Next( m_hashIter );
-	if ( m_pCur )
-		m_pCur = m_pCur->GetNext();
+	// dimhotepus: CS:GO backport.
+	m_hashIter = m_pHash->Next( m_hashIter );
+	//if ( m_pCur )
+	//	m_pCur = m_pCur->GetNext();
 }
 
 bool CCvar::CCVarIteratorInternal::IsValid( ) RESTRICT
 {
-	//return m_pHash->IsValidIterator( m_hashIter );
-	return m_pCur != nullptr;
+	// dimhotepus: CS:GO backport.
+	return m_pHash->IsValidIterator( m_hashIter );
+	// return m_pCur != nullptr;
 }
 
 RESTRICT_FUNC ConCommandBase *CCvar::CCVarIteratorInternal::Get( )
 {
 	Assert( IsValid( ) );
-	//return (*m_pHash)[m_hashIter];
-	return m_pCur;
+	// dimhotepus: CS:GO backport.
+	return (*m_pHash)[m_hashIter];
+	// return m_pCur;
 }
 
 ICvar::ICVarIteratorInternal *CCvar::FactoryInternalIterator( )
@@ -221,6 +236,8 @@ CCvar::CCvar() : m_TempConsoleBuffer( (intp)0, 1024 )
 
 	m_nNextDLLIdentifier = 0;
 	m_pConCommandList = nullptr;
+	// dimhotepus: CS:GO backport.
+	m_CommandHash.Init();
 
 	m_bMaterialSystemThreadSetAllowed = false;
 }
@@ -404,6 +421,11 @@ void CCvar::RegisterConCommand( ConCommandBase *variable )
 	// link the variable in
 	variable->m_pNext = m_pConCommandList;
 	m_pConCommandList = variable;
+	
+	// dimhotepus: CS:GO backport.
+	AssertMsg1(FindCommandBase(variable->GetName()) == nullptr, "Console command %s added twice!",
+		variable->GetName());
+	m_CommandHash.Insert(variable);
 }
 
 void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
@@ -433,6 +455,8 @@ void CCvar::UnregisterConCommand( ConCommandBase *pCommandToRemove )
 			pPrev->m_pNext = pCommand->m_pNext;
 		}
 		pCommand->m_pNext = nullptr;
+		// dimhotepus: CS:GO backport.
+		m_CommandHash.Remove(m_CommandHash.Find(pCommand));
 		break;
 	}
 }
@@ -441,6 +465,8 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 {
 	ConCommandBase *pNewList = nullptr;
 	ConCommandBase  *pCommand = m_pConCommandList;
+	// dimhotepus: CS:GO backport.
+	m_CommandHash.Purge( true );
 	while ( pCommand )
 	{
 		ConCommandBase  *pNext = pCommand->m_pNext;
@@ -448,6 +474,8 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 		{
 			pCommand->m_pNext = pNewList;
 			pNewList = pCommand;
+			// dimhotepus: CS:GO backport.
+			m_CommandHash.Insert( pCommand );
 		}
 		else
 		{
@@ -468,24 +496,20 @@ void CCvar::UnregisterConCommands( CVarDLLIdentifier_t id )
 //-----------------------------------------------------------------------------
 const ConCommandBase *CCvar::FindCommandBase( const char *name ) const
 {
-	const ConCommandBase *cmd = GetCommands();
-	for ( ; cmd; cmd = cmd->GetNext() )
-	{
-		if ( !Q_stricmp( name, cmd->GetName() ) )
-			return cmd;
-	}
-	return nullptr;
+	// dimhotepus: CS:GO backport.
+	VPROF_INCREMENT_COUNTER( "CCvar::FindCommandBase", 1 );
+	VPROF_BUDGET( "CCvar::FindCommandBase", VPROF_BUDGETGROUP_CVAR_FIND );
+	
+	return m_CommandHash.FindPtr( name );
 }
 
 ConCommandBase *CCvar::FindCommandBase( const char *name )
 {
-	ConCommandBase *cmd = GetCommands();
-	for ( ; cmd; cmd = cmd->GetNext() )
-	{
-		if ( !Q_stricmp( name, cmd->GetName() ) )
-			return cmd;
-	}
-	return nullptr;
+	// dimhotepus: CS:GO backport.
+	VPROF_INCREMENT_COUNTER( "CCvar::FindCommandBase", 1 );
+	VPROF_BUDGET( "CCvar::FindCommandBase", VPROF_BUDGETGROUP_CVAR_FIND );
+	
+	return m_CommandHash.FindPtr( name );
 }
 
 
@@ -594,8 +618,12 @@ void CCvar::CallGlobalChangeCallbacks( ConVar *var, const char *pOldString, floa
 //-----------------------------------------------------------------------------
 void CCvar::RevertFlaggedConVars( int nFlag )
 {
-	for (const ConCommandBase *var= GetCommands() ; var ; var=var->GetNext())
+	// dimhotepus: CS:GO backport.
+	for ( auto i = m_CommandHash.First() ;
+		  m_CommandHash.IsValidIterator( i ) ; 
+		  i = m_CommandHash.Next( i ) )
 	{
+		ConCommandBase *var = m_CommandHash[ i ];
 		if ( var->IsCommand() )
 			continue;
 
@@ -811,13 +839,18 @@ void CCvar::ConsoleDPrintf( PRINTF_FORMAT_STRING const char *pFormat, ... ) cons
 	}
 }
 
+// dimhotepus: CS:GO backport.
+static bool ConVarSortFunc( ConCommandBase * const &lhs, ConCommandBase * const &rhs )
+{
+	return CaselessStringLessThan( lhs->GetName(), rhs->GetName() );
+}
+
 //-----------------------------------------------------------------------------
 // Console commands
 //-----------------------------------------------------------------------------
 void CCvar::Find( const CCommand &args )
 {
 	const char *search;
-	const ConCommandBase *var;
 
 	if ( args.ArgC() != 2 )
 	{
@@ -827,19 +860,242 @@ void CCvar::Find( const CCommand &args )
 
 	// Get substring to find
 	search = args[1];
-				 
+
+	// dimhotepus: CS:GO backport. Sort commands.
+	CUtlRBTree< ConCommandBase *, int > sorted( 0, 0, ConVarSortFunc );
+
+	// dimhotepus: CS:GO backport.
 	// Loop through vars and print out findings
-	for ( var = GetCommands(); var; var=var->GetNext() )
+	for ( auto i = m_CommandHash.First() ;
+		m_CommandHash.IsValidIterator(i) ; 
+		i = m_CommandHash.Next(i) )
 	{
+		ConCommandBase *var = m_CommandHash[ i ];
 		if ( var->IsFlagSet(FCVAR_DEVELOPMENTONLY) || var->IsFlagSet(FCVAR_HIDDEN) )
 			continue;
 
-		if ( !Q_stristr( var->GetName(), search ) &&
-			!Q_stristr( var->GetHelpText(), search ) )
+		if ( !V_stristr( var->GetName(), search ) &&
+			!V_stristr( var->GetHelpText(), search ) )
 			continue;
 
-		ConVar_PrintDescription( var );	
-	}	
+		sorted.Insert( var );
+	}
+
+	// dimhotepus: CS:GO backport. Print sorted commands.
+	for ( auto i = sorted.FirstInorder(); i != sorted.InvalidIndex(); i = sorted.NextInorder( i ) )
+	{
+		ConVar_PrintDescription( sorted[ i ] );
+	}
 }
 
+#ifdef _DEBUG
+void CCvar::HashReport( const CCommand &args )
+{
+	m_CommandHash.Report();
+}
+#endif
+
+
+// dimhotepus: CS:GO backport.
+//-----------------------------------------------------------------------------
+// Console command hash data structure
+//-----------------------------------------------------------------------------
+CConCommandHash::CConCommandHash()
+{
+	Purge( true );
+}
+
+CConCommandHash::~CConCommandHash()
+{
+	Purge( false );
+}
+
+void CConCommandHash::Purge( bool bReinitialize )
+{
+	m_aBuckets.Purge();
+	m_aDataPool.Purge();
+	if ( bReinitialize )
+	{
+		Init();
+	}
+}
+
+// Initialize.
+void CConCommandHash::Init()
+{
+	// kNUM_BUCKETS must be a power of two.
+	static_assert( IsPowerOfTwo( to_underlying( kNUM_BUCKETS ) ) );
+
+	// Set the bucket size.
+	m_aBuckets.SetSize( kNUM_BUCKETS );
+	for ( intp iBucket = 0; iBucket < to_underlying( kNUM_BUCKETS ); ++iBucket )
+	{
+		m_aBuckets[iBucket] = m_aDataPool.InvalidIndex();
+	}
+
+	// Calculate the grow size.
+	constexpr intp nGrowSize = 4 * to_underlying( kNUM_BUCKETS );
+	m_aDataPool.SetGrowSize( nGrowSize );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Insert data into the hash table given its key (unsigned int), 
+//			WITH a check to see if the element already exists within the hash.
+//-----------------------------------------------------------------------------
+CConCommandHash::CCommandHashHandle_t CConCommandHash::Insert( ConCommandBase *cmd )
+{
+	// Check to see if that key already exists in the buckets (should be unique).
+	CCommandHashHandle_t hHash = Find( cmd );
+	if( hHash != InvalidHandle() )
+		return hHash;
+
+	return FastInsert( cmd );
+}
+//-----------------------------------------------------------------------------
+// Purpose: Insert data into the hash table given its key (unsigned int),
+//          WITHOUT a check to see if the element already exists within the hash.
+//-----------------------------------------------------------------------------
+CConCommandHash::CCommandHashHandle_t CConCommandHash::FastInsert( ConCommandBase *cmd )
+{
+	// Get a new element from the pool.
+	intp iHashData = m_aDataPool.Alloc( true );
+	HashEntry_t * RESTRICT pHashData = &m_aDataPool[iHashData];
+	if ( !pHashData )
+		return InvalidHandle();
+
+	HashKey_t key = Hash(cmd);
+
+	// Add data to new element.
+	pHashData->m_uiKey = key;
+	pHashData->m_Data = cmd;
+
+	// Link element.
+	intp iBucket = key & to_underlying( kBUCKETMASK ); // HashFuncs::Hash( uiKey, m_uiBucketMask );
+	m_aDataPool.LinkBefore( m_aBuckets[iBucket], iHashData );
+	m_aBuckets[iBucket] = iHashData;
+
+	return iHashData;
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Remove a given element from the hash.
+//-----------------------------------------------------------------------------
+void CConCommandHash::Remove( CCommandHashHandle_t hHash ) RESTRICT
+{
+	HashEntry_t * RESTRICT entry = &m_aDataPool[hHash];
+	HashKey_t iBucket = entry->m_uiKey & to_underlying( kBUCKETMASK );
+	if ( m_aBuckets[iBucket] == hHash )
+	{
+		// It is a bucket head.
+		m_aBuckets[iBucket] = m_aDataPool.Next( hHash );
+	}
+	else
+	{
+		// Not a bucket head.
+		m_aDataPool.Unlink( hHash );
+	}
+
+	// Remove the element.
+	m_aDataPool.Remove( hHash );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: Remove all elements from the hash
+//-----------------------------------------------------------------------------
+void CConCommandHash::RemoveAll()
+{
+	m_aBuckets.RemoveAll();
+	m_aDataPool.RemoveAll();
+}
+
+//-----------------------------------------------------------------------------
+// Find hash entry corresponding to a string name
+//-----------------------------------------------------------------------------
+CConCommandHash::CCommandHashHandle_t CConCommandHash::Find( const char *name, HashKey_t hashkey) const RESTRICT
+{
+	// hash the "key" - get the correct hash table "bucket"
+	intp iBucket = hashkey & to_underlying( kBUCKETMASK );
+
+	for ( auto iElement = m_aBuckets[iBucket]; iElement != m_aDataPool.InvalidIndex(); iElement = m_aDataPool.Next( iElement ) )
+	{
+		const HashEntry_t &element = m_aDataPool[iElement];
+		if ( element.m_uiKey == hashkey && // if hashes of strings match,
+			 Q_stricmp( name, element.m_Data->GetName() ) == 0) // then test the actual strings
+		{
+			return iElement;
+		}
+	}
+
+	// found nuffink
+	return InvalidHandle();
+}
+
+//-----------------------------------------------------------------------------
+// Find a command in the hash.
+//-----------------------------------------------------------------------------
+CConCommandHash::CCommandHashHandle_t CConCommandHash::Find( const ConCommandBase *cmd ) const RESTRICT
+{
+	// Set this #if to 1 if the assert at bottom starts whining --
+	// that indicates that a console command is being double-registered,
+	// or something similarly nonfatally bad. With this #if 1, we'll search
+	// by name instead of by pointer, which is more robust in the face
+	// of double registered commands, but obviously slower.
+#if 0 
+	return Find(cmd->GetName());
+#else
+	HashKey_t hashkey = Hash(cmd);
+	intp iBucket = hashkey & to_underlying( kBUCKETMASK );
+
+	// hunt through all entries in that bucket
+	for ( auto iElement = m_aBuckets[iBucket]; iElement != m_aDataPool.InvalidIndex(); iElement = m_aDataPool.Next( iElement ) )
+	{
+		const HashEntry_t &element = m_aDataPool[iElement];
+		if ( element.m_uiKey == hashkey && // if the hashes match... 
+			 element.m_Data  == cmd	) // and the pointers...
+		{
+			// in debug, test to make sure we don't have commands under the same name
+			// or something goofy like that
+			AssertMsg1( iElement == Find(cmd->GetName()),
+				"ConCommand %s had two entries in the hash!", cmd->GetName() );
+			
+			// return this element
+			return iElement;
+		}
+	}
+
+	// found nothing.
+#ifdef DBGFLAG_ASSERT // double check against search by name
+	CCommandHashHandle_t dbghand = Find(cmd->GetName());
+
+	AssertMsg1( InvalidHandle() == dbghand,
+		"ConCommand %s couldn't be found by pointer, but was found by name!", cmd->GetName() );
+#endif
+	return InvalidHandle();
+#endif
+}
+
+
+#ifdef _DEBUG
+// Dump a report to MSG
+void CConCommandHash::Report()
+{
+	Msg("Console command hash bucket load:\n");
+	intp total = 0;
+	for ( intp iBucket = 0 ; iBucket < to_underlying( kNUM_BUCKETS); ++iBucket )
+	{
+		intp count = 0;
+		CCommandHashHandle_t iElement = m_aBuckets[iBucket]; // get the head of the bucket
+		while ( iElement != m_aDataPool.InvalidIndex() )
+		{
+			++count;
+			iElement = m_aDataPool.Next( iElement );
+		}
+
+		Msg( "%zd: %zd\n", iBucket, count );
+		total += count;
+	}
+
+	Msg("\tAverage: %.1f\n", total / static_cast<float>(to_underlying(kNUM_BUCKETS)));
+}
+#endif
 

@@ -12,6 +12,8 @@
 #include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 #include "tier1/fmtstr.h"
+// dimhotepus: Moved from tier1 to not register twice.
+#include "tier1/stringpool.h"
 #include "tier1/strtools.h"
 #include "tier2/tier2.h"
 #include "vstdlib/jobthread.h"
@@ -4370,3 +4372,26 @@ bool Host_AllowQueuedMaterialSystem( bool bAllow )
 	return false;
 #endif
 }
+
+// dimhotepus: Moved from tier1 to not register twice.
+#ifdef _DEBUG
+CON_COMMAND( test_stringpool, "Tests the class CStringPool" )
+{
+	CStringPool pool;
+	Assert(pool.Count() == 0);
+
+	Assert(pool.Allocate("test") && pool.Count() == 1);
+	Assert(pool.Allocate("test") && pool.Count() == 1);
+	Assert(pool.Allocate("test2") && pool.Count() == 2);
+
+	Assert( pool.Find("test2") != nullptr );
+	Assert( pool.Find("TEST") != nullptr );
+	Assert( pool.Find("Test2") != nullptr );
+	Assert( pool.Find("test") != nullptr );
+
+	pool.FreeAll();
+	Assert(pool.Count() == 0);
+
+	Msg("Pass.");
+}
+#endif
