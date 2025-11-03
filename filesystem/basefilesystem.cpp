@@ -19,6 +19,8 @@
 #include "zip_utils.h"
 #include "packfile.h"
 
+#include "posix_file_stream.h"
+
 #ifndef DEDICATED
 #include "keyvaluescompiler.h"
 #endif
@@ -87,12 +89,12 @@ static void LogFileOpen( const char *vpk, const char *pFilename, const char *pAb
 		return;
 
 	// Open file for write or append
-	FILE *f = fopen( "opened_files.txt", mode );
-	Assert( f );
-	if ( f )
+	auto [f, rc] = se::posix::posix_file_stream_factory::open( "opened_files.txt", mode );
+	Assert( !rc );
+	if ( !rc )
 	{
-		fprintf( f, "%s, %s, %s\n", vpk, pFilename, pAbsPath );
-		fclose(f);
+		std::tie(std::ignore, rc) = f.print( "%s, %s, %s\n", vpk, pFilename, pAbsPath );
+		Assert( !rc );
 
 		// If this was the first time, switch from write to append for further writes
 		mode = "at";
