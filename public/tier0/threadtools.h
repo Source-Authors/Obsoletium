@@ -134,7 +134,13 @@ extern "C" unsigned long __declspec(dllimport) __stdcall GetCurrentThreadId();
 #define ThreadGetCurrentId GetCurrentThreadId
 #endif
 
-inline void ThreadPause()
+// dimhotepus: Force inline on MSVC to reduce function call cost.
+#ifdef COMPILER_MSVC
+__forceinline
+#else
+inline
+#endif
+void ThreadPause()
 {
 #if defined(_XM_SSE_INTRINSICS_)
 	// Intrinsic for __asm pause; from <intrin.h>
