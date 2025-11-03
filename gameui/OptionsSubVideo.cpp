@@ -28,6 +28,7 @@
 #include "ModInfo.h"
 #include "vgui_controls/Tooltip.h"
 #include "sourcevr/isourcevirtualreality.h"
+#include "posix_file_stream.h"
 
 #if defined( USE_SDL )
 #include "include/SDL3/SDL.h"
@@ -1548,14 +1549,13 @@ COptionsSubVideo::~COptionsSubVideo()
 }
 
 
-FILE *FOpenGameHDFile( const char *pchMode )
+[[nodiscard]] static se::posix::io_result<se::posix::posix_file_stream> FOpenGameHDFile( const char *pchMode )
 {
 	const char *pGameDir = engine->GetGameDirectory();
 	char szModSteamInfPath[ 1024 ];
 	V_ComposeFileName( pGameDir, "game_hd.txt", szModSteamInfPath );
 
-	FILE *fp = fopen( szModSteamInfPath, pchMode );
-	return fp;
+	return se::posix::posix_file_stream_factory::open( szModSteamInfPath, pchMode );
 }
 
 
@@ -1564,14 +1564,9 @@ FILE *FOpenGameHDFile( const char *pchMode )
 //-----------------------------------------------------------------------------
 bool COptionsSubVideo::BUseHDContent()
 {
-	FILE *fp = FOpenGameHDFile( "rb" );
-	if ( fp )
-	{
-		fclose(fp);
-		return true;
-	}
-	return false;
-
+	std::error_code rc;
+	std::tie(std::ignore, rc) = FOpenGameHDFile( "rb" );
+	return !rc;
 }
 
 
@@ -1582,11 +1577,10 @@ void COptionsSubVideo::SetUseHDContent( bool bUse )
 {
 	if ( bUse )
 	{
-		FILE *fp = FOpenGameHDFile( "wb+" );
-		if ( fp )
+		auto [fp, rc] = FOpenGameHDFile( "wb+" );
+		if ( !rc )
 		{
-			fprintf( fp, "If this file exists on disk HD content will be loaded.\n" );
-			fclose( fp );
+			std::tie(std::ignore, rc) = fp.print("If this file exists on disk HD content will be loaded.\n" );
 		}
 	}
 	else
