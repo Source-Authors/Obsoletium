@@ -146,6 +146,7 @@ const mstudioanim_t *mstudioanimdesc_t::pAnim( int *piFrame, float &flStall ) co
 	flStall = 0.0f;
 	if (panim == nullptr && section <= 0)
 	{
+		// dimhotepus: Can't make this double as it breaks file format.
 		zeroframestalltime = Plat_FloatTime();
 		flStall = 1.0f;
 	}
