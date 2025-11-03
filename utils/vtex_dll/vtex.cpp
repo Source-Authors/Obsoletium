@@ -2525,15 +2525,21 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 
 		DestroyVTFTexture( pVtf );
 
-		if ( FILE *fw = fopen( chFileNameConvert, "wb" ) )
+		auto [fw, rc] = se::posix::posix_file_stream_factory::open(chFileNameConvert, "wb");
+		if ( !rc )
 		{
-			fwrite( bufFile.Base(), 1, bufFile.TellPut(), fw );
-			fclose( fw );
+			const intp write = bufFile.TellPut();
+			size_t written;
+
+			std::tie(written, rc) = fw.write( bufFile.Base(), 1, write );
+			if ( rc || static_cast<size_t>( write ) != written )
+				VTexError( "Failed to write %zd bytes to '%s'. Written %zu bytes: %s!\n",
+					write, chFileNameConvert, written, rc.message().c_str() );
+			else
+				printf( "... succeeded.\n" );
 		}
 		else
-			VTexError( "Failed to open '%s' for writing!\n", chFileNameConvert );
-
-		printf( "... succeeded.\n" );
+			VTexError( "Failed to open '%s' for writing: %s!\n", chFileNameConvert, rc.message().c_str() );
 
 		return TRUE;
 	}
