@@ -359,13 +359,11 @@ int ClipPolygon( int iCount, vgui::Vertex_t *pVerts, int iTranslateX, int iTrans
 //-----------------------------------------------------------------------------
 // Purpose: Used for clipping, produces an interpolated texture coordinate
 //-----------------------------------------------------------------------------
-inline float InterpTCoord(float val, float mins, float maxs, float tMin, float tMax)
+[[nodiscard]] static constexpr inline float InterpTCoord(float val, float mins, float maxs, float tMin, float tMax)
 {
-	float flPercent;
-	if (mins != maxs)
-		flPercent = (float)(val - mins) / (maxs - mins);
-	else
-		flPercent = 0.5f;
+	float flPercent = (mins != maxs)
+		? (float)(val - mins) / (maxs - mins)
+		: 0.5f;
 	return tMin + (tMax - tMin) * flPercent;
 }
 
@@ -426,13 +424,15 @@ bool ClipRect( const vgui::Vertex_t &inUL, const vgui::Vertex_t &inLR,
 
 		if ( !g_bStretchTexture )
 		{
+			// dimhotepus: Group changes to same textcoord together for perf.
 			pOutUL->m_TexCoord.x = InterpTCoord(pOutUL->m_Position.x, 
 				inUL.m_Position.x, inLR.m_Position.x, inUL.m_TexCoord.x, inLR.m_TexCoord.x);
-			pOutLR->m_TexCoord.x = InterpTCoord(pOutLR->m_Position.x,  
-				inUL.m_Position.x, inLR.m_Position.x, inUL.m_TexCoord.x, inLR.m_TexCoord.x);
-
 			pOutUL->m_TexCoord.y = InterpTCoord(pOutUL->m_Position.y, 
 				inUL.m_Position.y, inLR.m_Position.y, inUL.m_TexCoord.y, inLR.m_TexCoord.y);
+			
+			// dimhotepus: Group changes to same textcoord together for perf.
+			pOutLR->m_TexCoord.x = InterpTCoord(pOutLR->m_Position.x,  
+				inUL.m_Position.x, inLR.m_Position.x, inUL.m_TexCoord.x, inLR.m_TexCoord.x);
 			pOutLR->m_TexCoord.y = InterpTCoord(pOutLR->m_Position.y,  
 				inUL.m_Position.y, inLR.m_Position.y, inUL.m_TexCoord.y, inLR.m_TexCoord.y);
 		}
