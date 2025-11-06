@@ -26,10 +26,11 @@
 #include <fcntl.h>
 #endif
 #define GetLastError() errno
-#elif defined( _X360 )
 #else
 #error "Please define your platform"
 #endif
+
+#include "posix_file_stream.h"
 
 #include "client.h"
 #include <vgui_controls/Frame.h>
@@ -228,18 +229,18 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 		break;
 	}
 #elif defined(OSX)
-	FILE *fpVersionInfo = popen( "/usr/bin/sw_vers", "r" );
-	const char *pszSearchString = "ProductVersion:\t";
-	const intp cchSearchString = Q_strlen( pszSearchString );
+	auto [fpVersionInfo, rc] = se::posix::posix_file_stream_factory::open( "/usr/bin/sw_vers", "r" );
+	constexpr char pszSearchString[]{"ProductVersion:\t"};
+	constexpr intp cchSearchString = ssize( pszSearchString ) - 1;
 	char rgchVersionLine[1024];
 		
-	if ( !fpVersionInfo )
+	if ( rc )
 		Q_strncpy ( osversion, "OSXU ", maxlen );
 	else
 	{
-		Q_strncpy ( osversion, "OSX10", maxlen );
+		Q_strncpy ( osversion, "OSX ", maxlen );
 
-		while ( fgets( rgchVersionLine, sizeof(rgchVersionLine), fpVersionInfo ) )
+		while ( !std::get<std::error_code>( fpVersionInfo.gets( rgchVersionLine ) ) )
 		{
 			if ( !Q_strnicmp( rgchVersionLine, pszSearchString, cchSearchString ) )
 			{
@@ -251,15 +252,15 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 
 				Q_strncat ( osversion,
 #ifdef PLATFORM_ARM_64
-					"AArch64",
+					" AArch64",
 #elif defined(PLATFORM_ARM_32)
-					"ARM32",
+					" ARM32",
 #elif defined(PLATFORM_64BITS)
-					"x86-64",
+					" x86-64",
 #elif defined(PLATFORM_X86)
-					"x86",
+					" x86",
 #else
-					"N/A",
+					" N/A",
 #endif
 					maxlen
 				);
@@ -268,31 +269,35 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 				break;
 			}
 		}
-		pclose( fpVersionInfo );
 	}
 #elif defined(LINUX)
-	FILE *fpKernelVer = fopen( "/proc/version_signature", "r" );
+	auto [fpKernelVer, rc] = se::posix::posix_file_stream_factory::open( "/proc/version_signature", "r" );
 
-	if ( !fpKernelVer )
+	if ( rc )
 	{
 		Q_strncat ( osversion, "Linux ", maxlen, COPY_ALL_CHARACTERS );
 	}
 	else
 	{
-		fgets( osversion, maxlen, fpKernelVer );
-		osversion[ maxlen - 1 ] = 0;
+		char rgchVersionLine[1024];
+		std::tie(std::ignore, rc) = fpKernelVer.gets( rgchVersionLine );
+
+		if ( !rc )
+		{
+			Q_strncat ( osversion, rgchVersionLine, maxlen, COPY_ALL_CHARACTERS );
+		}
 
 		Q_strncat ( osversion,
 #ifdef PLATFORM_ARM_64
-			"AArch64",
+			" AArch64",
 #elif defined(PLATFORM_ARM_32)
-			"ARM32",
+			" ARM32",
 #elif defined(PLATFORM_X86) && (PLATFORM_X86 == 64)
-			"x86-64",
+			" x86-64",
 #elif defined(PLATFORM_X86) && (PLATFORM_X86 == 32)
-			"x86",
+			" x86",
 #else
-			"N/A",
+			" N/A",
 #endif
 			maxlen
 		);
@@ -303,8 +308,6 @@ MSVC_END_WARNING_OVERRIDE_SCOPE()
 		char *szlf = Q_strrchr( osversion, '\n' );
 		if( szlf )
 			*szlf = '\0';
-
-		fclose( fpKernelVer );
 	}
 #endif
 }
@@ -2261,8 +2264,8 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 		return false;
 	}
 
-	int nLocalFileSize = g_pFileSystem->Size( hLocal );
-	if ( nLocalFileSize <= 0 )
+	unsigned nLocalFileSize = g_pFileSystem->Size( hLocal );
+	if ( nLocalFileSize == 0 )
 	{
 		Warning( "CBugUIPanel::UploadFile:  Local file has 0 size '%s'\n", local );
 		g_pFileSystem->Close( hLocal );
@@ -2284,40 +2287,41 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 	}
 	else
 	{
-
-		FILE *r = fopen( va( "%s", remote ), "wb" );
-		if ( !r )
+		auto [r, rc] = se::posix::posix_file_stream_factory::open( va( "%s", remote ), "wb" );
+		if ( rc )
 		{
-			Warning( "CBugUIPanel::UploadFile:  Unable to open remote path '%s'\n", remote );
+			Warning( "CBugUIPanel::UploadFile:  Unable to open remote path '%s': %s\n", remote, rc.message().c_str() );
 			g_pFileSystem->Close( hLocal );
 			return false;
 		}
 
-		int nCopyBufferSize = 2 * 1024 * 1024;
+		constexpr size_t nCopyBufferSize = 4 * 1024 * 1024;
 
-		byte *pCopyBuf = new byte[ nCopyBufferSize ];
+		auto pCopyBuf = std::make_unique<byte[]>( nCopyBufferSize );
 		Assert( pCopyBuf );
 		if ( !pCopyBuf )
 		{
-			Warning( "CBugUIPanel::UploadFile:  Unable to allocate copy buffer of %d bytes\n", nCopyBufferSize );
-			fclose( r );
+			Warning( "CBugUIPanel::UploadFile:  Unable to allocate copy buffer of %zu bytes\n", nCopyBufferSize );
 			g_pFileSystem->Close( hLocal );
 			return false;
 		}
 
-		int nRemainingBytes = nLocalFileSize;
+		unsigned nRemainingBytes = nLocalFileSize;
 		while ( nRemainingBytes > 0 )
 		{
-			int nBytesToCopy = MIN( nRemainingBytes, nCopyBufferSize );
-			g_pFileSystem->Read( pCopyBuf, nBytesToCopy, hLocal );
-			fwrite( pCopyBuf, nBytesToCopy, 1, r );
+			unsigned nBytesToCopy = MIN( nRemainingBytes, nCopyBufferSize );
+			g_pFileSystem->Read( pCopyBuf.get(), nBytesToCopy, hLocal );
+			std::tie(std::ignore, rc) = r.write( pCopyBuf.get(), 1, nBytesToCopy );
+			if ( rc )
+			{
+				Warning( "CBugUIPanel::UploadFile:  Unable to copy file: %s\n", rc.message().c_str() );
+				g_pFileSystem->Close( hLocal );
+				return false;
+			}
 			nRemainingBytes -= nBytesToCopy;
 		}
 
-		fclose( r );
 		g_pFileSystem->Close( hLocal );
-
-		delete[] pCopyBuf;
 
 		bResult = true;
 	}
