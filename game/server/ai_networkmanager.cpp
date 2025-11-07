@@ -945,12 +945,6 @@ bool CAI_NetworkManager::IsAIFileCurrent ( const char *szMapName )
 		return false;
 	}
 
-	if ( IsX360() && ( filesystem->GetDVDMode() == DVDMODE_STRICT ) )
-	{
-		// dvd build process validates and guarantees correctness, timestamps are allowed to be wrong
-		return true;
-	}
-	
 	{
 		const char *pGameDir = CommandLine()->ParmValue( "-game", "hl2" );		
 		char szLoweredGameDir[256];
