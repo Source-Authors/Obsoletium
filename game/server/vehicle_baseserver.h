@@ -223,7 +223,7 @@ protected:
 	int		NPC_GetAvailableSeat_Any( CBaseCombatCharacter *pPassenger, int nRoleID );
 	int		NPC_GetAvailableSeat_Nearest( CBaseCombatCharacter *pPassenger, int nRoleID );
 
-	CPassengerRole *FindOrCreatePassengerRole( string_t strName, int *nIndex = NULL );
+	CPassengerRole *FindOrCreatePassengerRole( string_t strName, intp *nIndex = NULL );
 
 	CUtlVector< CPassengerInfo >	m_PassengerInfo;
 	CUtlVector< CPassengerRole >	m_PassengerRoles;	// Not save/restored

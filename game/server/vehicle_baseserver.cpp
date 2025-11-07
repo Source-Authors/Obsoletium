@@ -736,7 +736,7 @@ void CBaseServerVehicle::ParseNPCPassengerSeat( KeyValues *pSetKeyValues, CPasse
 //		  : *nIndex - the index into the CUtlBuffer where this role resides
 // Output : CPassengerRole * - Role found or created
 //-----------------------------------------------------------------------------
-CPassengerRole *CBaseServerVehicle::FindOrCreatePassengerRole( string_t strName, int *nIndex )
+CPassengerRole *CBaseServerVehicle::FindOrCreatePassengerRole( string_t strName, intp *nIndex )
 {
 	// Try to find an already created container of the same name
 	for ( intp i = 0; i < m_PassengerRoles.Count(); i++ )
@@ -794,7 +794,7 @@ void CBaseServerVehicle::ParseNPCRoles( KeyValues *pkvPassengerList )
 		return;
 
 	// Parse all subkeys
-	int nRoleIndex;
+	intp nRoleIndex;
 	KeyValues *pkvPassengerKey = pkvPassengerList->GetFirstSubKey();
 	while ( pkvPassengerKey != NULL )
 	{
