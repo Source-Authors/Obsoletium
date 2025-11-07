@@ -304,26 +304,22 @@ static bool IsSourceModLoaded()
 			return true;
 	}
 #else
-	FILE *fh = fopen( "/proc/self/maps", "r" );
-
-	if ( fh )
+	auto [fh, rc] = se::posix::posix_file_stream_factory::open( "/proc/self/maps", "r" );
+	if ( !rc )
 	{
 		char buf[ 1024 ];
 		static const char *s_pFileNames[] = { "metamod.2.tf2.so", "sourcemod.2.tf2.so", "sdkhooks.ext.2.ep2v.so", "sdkhooks.ext.2.tf2.so" };
 
-		while ( fgets( buf, sizeof( buf ), fh ) )
+		while ( !std::get<std::error_code>( fh.gets( buf ) ) )
 		{
 			for ( auto *n : s_pFileNames )
 			{
 				if ( strstr( buf, n ) )
 				{
-					fclose( fh );
 					return true;
 				}
 			}
 		}
-
-		fclose( fh );
 	}
 #endif
 
