@@ -50,9 +50,9 @@ bool IsReplayServer( gameserveritem_t &server )
 		{
 			CUtlVector<char*> TagList;
 			V_SplitString( server.m_szGameTags, ",", TagList );
-			for ( int i = 0; i < TagList.Count(); i++ )
+			for ( const auto *tag : TagList )
 			{
-				if ( Q_stricmp( TagList[i], "replays" ) == 0 )
+				if ( Q_stricmp( tag, "replays" ) == 0 )
 				{
 					bReplay = true;
 				}
