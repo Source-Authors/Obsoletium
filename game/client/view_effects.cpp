@@ -579,9 +579,11 @@ void CViewEffects::FadeCalculate( void )
 	// Divide colors
 	if ( m_FadeList.Count() )
 	{
-		m_FadeColorRGBA[0] /= m_FadeList.Count();
-		m_FadeColorRGBA[1] /= m_FadeList.Count();
-		m_FadeColorRGBA[2] /= m_FadeList.Count();
+		Assert(std::numeric_limits<int>::max() >= m_FadeList.Count());
+
+		m_FadeColorRGBA[0] /= static_cast<int>( m_FadeList.Count() );
+		m_FadeColorRGBA[1] /= static_cast<int>( m_FadeList.Count() );
+		m_FadeColorRGBA[2] /= static_cast<int>( m_FadeList.Count() );
 	}
 }
 
