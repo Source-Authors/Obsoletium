@@ -37,7 +37,7 @@ struct serverdisplay_t
 		m_iServerID = -1;
 		m_bDoNotRefresh = true;
 	}
-	int			m_iListID;		// the VGUI2 list panel index for displaying this server
+	intp		m_iListID;		// the VGUI2 list panel index for displaying this server
 	int			m_iServerID;	// the matchmaking interface index for this server
 	bool		m_bDoNotRefresh; 
 	bool operator==( const serverdisplay_t &rhs ) const { return rhs.m_iServerID == m_iServerID; }

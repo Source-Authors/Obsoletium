@@ -408,7 +408,7 @@ void CBaseGamesPage::SelectQuickListServers( void )
 
 				if ( vecMapServers )
 				{
-					for ( int i =0; i < vecMapServers->Count(); i++ )
+					for ( intp i = 0; i < vecMapServers->Count(); i++ )
 					{
 						int iListID = vecMapServers->Element( i );
 
@@ -523,7 +523,7 @@ void CBaseGamesPage::PrepareQuickListMap( const char *pMapName, int iListID )
 		{
 			pPanelSort->RemoveAll();
 
-			for ( int i = 0; i < m_vecMapNamesFound.Count(); i++ )
+			for ( intp i = 0; i < m_vecMapNamesFound.Count(); i++ )
 			{
 				pPanelSort->AddToTail( m_vecMapNamesFound[i].iPanelIndex );
 			}
@@ -663,7 +663,7 @@ void CBaseGamesPage::CreateFilters()
 	KeyValuesAD pkv( new KeyValues("mod", "gamedir", "", "appid", NULL ) );
 	m_pGameFilter->AddItem("#ServerBrowser_All", pkv);
 
-	for (int i = 0; i < ModList().ModCount(); i++)
+	for (intp i = 0; i < ModList().ModCount(); i++)
 	{
 		pkv->SetString("gamedir", ModList().GetModDir(i));
 		pkv->SetUint64("appid", ModList().GetAppID(i).ToUint64() );
@@ -830,7 +830,7 @@ void CBaseGamesPage::ServerResponded( int iServer, gameserveritem_t *pServerItem
 		if ( iServerIP != m_mapServerIP.InvalidIndex() )
 		{
 			// if we already had this entry under another index remove the old entry
-			auto iServerMap = m_mapServers.Find( m_mapServerIP[ iServerIP ] );
+			iServerMap = m_mapServers.Find( m_mapServerIP[ iServerIP ] );
 			if ( iServerMap != m_mapServers.InvalidIndex() )
 			{
 				serverdisplay_t &server = m_mapServers[ iServerMap ];
@@ -1215,7 +1215,7 @@ void CBaseGamesPage::UpdateStatus()
 		wchar_t count[128];
 		wchar_t blacklistcount[128];
 
-		V_swprintf_safe( count, L"%d", m_pGameList->GetItemCount() );
+		V_swprintf_safe( count, L"%zd", m_pGameList->GetItemCount() );
 		V_swprintf_safe( blacklistcount, L"%d", m_iServersBlacklisted );
 		g_pVGuiLocalize->ConstructString_safe( header, g_pVGuiLocalize->Find( "#ServerBrowser_ServersCountWithBlacklist"), 2, count, blacklistcount );
 		m_pGameList->SetColumnHeaderText( k_nColumn_Name, header);
@@ -1761,9 +1761,9 @@ void CBaseGamesPage::OnAddToFavorites()
 		return;
 
 	// loop through all the selected favorites
-	for (int i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
+	for (intp i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
 	{
-		intp serverID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
+		int serverID = static_cast<int>(m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i)));
 
 		gameserveritem_t *pServer = steamapicontext->SteamMatchmakingServers()->GetServerDetails( m_hRequest, serverID );
 		if ( pServer )
@@ -1783,9 +1783,9 @@ void CBaseGamesPage::OnAddToBlacklist()
 		return;
 
 	// loop through all the selected favorites
-	for (int i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
+	for (intp i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
 	{
-		intp serverID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
+		int serverID = static_cast<int>(m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i)));
 
 		gameserveritem_t *pServer = steamapicontext->SteamMatchmakingServers()->GetServerDetails( m_hRequest, serverID );
 		if ( pServer )
@@ -1836,7 +1836,7 @@ void CBaseGamesPage::OnRefreshServer( int serverID )
 	// walk the list of selected servers refreshing them
 	for (intp i = 0; i < m_pGameList->GetSelectedItemsCount(); i++)
 	{
-		intp selectedServerID = m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i));
+		int selectedServerID = static_cast<int>(m_pGameList->GetItemUserData(m_pGameList->GetSelectedItem(i)));
 
 		// refresh this server
 		steamapicontext->SteamMatchmakingServers()->RefreshServer( m_hRequest, selectedServerID );
@@ -2022,7 +2022,7 @@ int CBaseGamesPage::GetSelectedServerID( KeyValues **pKV )
 
 			if ( pQuickPanel )
 			{
-				serverID = m_pGameList->GetItemUserData( pQuickPanel->GetListID() );
+				serverID = static_cast<int>( m_pGameList->GetItemUserData( pQuickPanel->GetListID() ) );
 				if ( pKV )
 				{
 					*pKV = m_pGameList->GetItem( pQuickPanel->GetListID() );
