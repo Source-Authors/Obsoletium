@@ -64,14 +64,6 @@ bool IsReplayServer( gameserveritem_t &server )
 	return bReplay;
 }
 
-//--------------------------------------------------------------------------------------------------------
-inline char *CloneString( const char *str )
-{
-	char *cloneStr = new char [ strlen(str)+1 ];
-	strcpy( cloneStr, str );
-	return cloneStr;
-}
-
 const char *COM_GetModDirectory()
 {
 	static char modDir[MAX_PATH] = {};
@@ -497,8 +489,8 @@ void CBaseGamesPage::PrepareQuickListMap( const char *pMapName, int iListID )
 		{
 			servermaps_t servermap;
 
-			servermap.pFriendlyName = CloneString( szFriendlyName );
-			servermap.pOriginalName = CloneString( szMapName );
+			servermap.pFriendlyName = V_strdup( szFriendlyName );
+			servermap.pOriginalName = V_strdup( szMapName );
 
 			char path[ 512 ];
 			Q_snprintf( path, sizeof( path ), "maps/%s.bsp", szMapName );

@@ -28,13 +28,6 @@ IEngineReplay *g_pEngineReplay = NULL;
 ConVar sb_firstopentime( "sb_firstopentime", "0", FCVAR_DEVELOPMENTONLY, "Indicates the time the server browser was first opened." );
 ConVar sb_numtimesopened( "sb_numtimesopened", "0", FCVAR_DEVELOPMENTONLY, "Indicates the number of times the server browser was opened this session." );
 
-// the original author of this code felt strdup was not acceptible.
-inline char *CloneString( const char *str )
-{
-	char *cloneStr = new char [ strlen(str)+1 ];
-	strcpy( cloneStr, str );
-	return cloneStr;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: Constructor
@@ -408,8 +401,8 @@ void LoadGameTypes( void )
 	{
 		gametypes_t gametype;
 
-		gametype.pPrefix = CloneString( pData->GetString( "prefix", "" ) );
-		gametype.pGametypeName = CloneString( pData->GetString( "name", "" ) );
+		gametype.pPrefix = V_strdup( pData->GetString( "prefix", "" ) );
+		gametype.pGametypeName = V_strdup( pData->GetString( "name", "" ) );
 		g_GameTypes.AddToTail( gametype );
 	}
 }
