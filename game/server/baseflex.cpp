@@ -617,14 +617,14 @@ bool CBaseFlex::HandleStartGestureSceneEvent( CSceneEventInfo *info, CChoreoScen
 						{
 							float percentage = (float)pkvTags->GetInt() / maxFrame;
 
-							CEventAbsoluteTag *ptag = event->FindAbsoluteTag( CChoreoEvent::ORIGINAL, pkvTags->GetName() );
-							if (ptag)
+							CEventAbsoluteTag *ptag2 = event->FindAbsoluteTag( CChoreoEvent::ORIGINAL, pkvTags->GetName() );
+							if (ptag2)
 							{
-								if (fabs(ptag->GetPercentage() - percentage) > 0.05)
+								if (fabs(ptag2->GetPercentage() - percentage) > 0.05f)
 								{
-									DevWarning("%s repositioned tag: %s : %.3f -> %.3f (%s:%s:%s)\n", scene->GetFilename(), pkvTags->GetName(), ptag->GetPercentage(), percentage, scene->GetFilename(), actor->GetName(), event->GetParameters() );
+									DevWarning("%s repositioned tag: %s : %.3f -> %.3f (%s:%s:%s)\n", scene->GetFilename(), pkvTags->GetName(), ptag2->GetPercentage(), percentage, scene->GetFilename(), actor->GetName(), event->GetParameters() );
 									// reposition tag
-									ptag->SetPercentage( percentage );
+									ptag2->SetPercentage( percentage );
 								}
 							}
 						}

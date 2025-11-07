@@ -794,10 +794,10 @@ void killvector_helper( const CCommand &args, bool bExplode )
 		// Find the matching netname.
 		for ( int iClient = 1; iClient <= gpGlobals->maxClients; iClient++ )
 		{
-			CBasePlayer *pPlayer = ToBasePlayer( UTIL_PlayerByIndex( iClient ) );
-			if ( pPlayer )
+			CBasePlayer *pClientPlayer = ToBasePlayer( UTIL_PlayerByIndex( iClient ) );
+			if ( pClientPlayer )
 			{
-				if ( Q_strstr( pPlayer->GetPlayerName(), args[1] ) )
+				if ( Q_strstr( pClientPlayer->GetPlayerName(), args[1] ) )
 				{
 					// Build world-space force vector.
 					Vector vecForce;
@@ -805,7 +805,7 @@ void killvector_helper( const CCommand &args, bool bExplode )
 					vecForce.y = strtof( args[3], nullptr );
 					vecForce.z = strtof( args[4], nullptr );
 
-					ClientKill( pPlayer->edict(), vecForce, bExplode );
+					ClientKill( pClientPlayer->edict(), vecForce, bExplode );
 				}
 			}
 		}
