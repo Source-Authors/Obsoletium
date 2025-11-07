@@ -2512,8 +2512,8 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 					}
 					else
 					{
-						Vector origin = GetLocalOrigin();
-						QAngle angles = GetLocalAngles();
+						origin = GetLocalOrigin();
+						angles = GetLocalAngles();
 
 						if ( checkmove )
 						{
