@@ -202,8 +202,10 @@ void CSoundscapeSystem::LevelInitPostEntity()
 		m_soundscapesInCluster[i].firstSoundscape = 0;
 	}
 	unsigned char myPVS[16 * 1024];
-	CUtlVector<short> clusterIndexList;
-	CUtlVector<short> soundscapeIndexList;
+	// dimhotepus: short -> int.
+	CUtlVector<int> clusterIndexList;
+	// dimhotepus: short -> intp.
+	CUtlVector<intp> soundscapeIndexList;
 
 	// find the clusters visible from each soundscape
 	// add this soundscape to the list of soundscapes for that cluster, clip cluster bounds to radius
@@ -234,7 +236,8 @@ void CSoundscapeSystem::LevelInitPostEntity()
 	m_soundscapeIndexList.SetCount(soundscapeIndexList.Count());
 
 	// now compute the starting index of each cluster
-	int firstSoundscape = 0;
+	// dimhotepus: int -> unsigned short.
+	unsigned short firstSoundscape = 0;
 	for ( int i = 0; i < clusterCount; i++ )
 	{
 		m_soundscapesInCluster[i].firstSoundscape = firstSoundscape;
@@ -319,8 +322,7 @@ void CSoundscapeSystem::FrameUpdatePostEntityThink()
 				CEnvSoundscape *pCurrent = (CEnvSoundscape *)( audio.ent.Get() );
 				if ( pCurrent )
 				{
-					int nEntIndex = pCurrent->m_soundscapeEntityId - 1;
-					NOTE_UNUSED( nEntIndex );
+					[[maybe_unused]] intp nEntIndex = pCurrent->m_soundscapeEntityId - 1;
 					Assert( m_soundscapeEntities[nEntIndex] == pCurrent );
 				}
 				ss_update_t update;

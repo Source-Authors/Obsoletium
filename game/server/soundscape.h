@@ -59,7 +59,7 @@ public:
 	float	m_flRadius;
 	string_t m_soundscapeName;
 	int		m_soundscapeIndex;
-	int		m_soundscapeEntityId;
+	intp	m_soundscapeEntityId;
 	string_t m_positionNames[NUM_AUDIO_LOCAL_SOUNDS];
 	
 	// If this is set, then this soundscape ignores all its parameters and uses
