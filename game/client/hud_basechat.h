@@ -101,18 +101,6 @@ wchar_t* ReadLocalizedString( bf_read &msg, OUT_Z_BYTECAP(outSizeInBytes) wchar_
 wchar_t* ReadChatTextString( bf_read &msg, OUT_Z_BYTECAP(outSizeInBytes) wchar_t *pOut, int outSizeInBytes );
 char* RemoveColorMarkup( char *str );
 
-//--------------------------------------------------------------------------------------------------------
-/**
- * Simple utility function to allocate memory and duplicate a wide string
- */
-inline wchar_t *CloneWString( const wchar_t *str )
-{
-	const int nLen = V_wcslen(str)+1;
-	wchar_t *cloneStr = new wchar_t [ nLen ];
-	const int nSize = nLen * sizeof( wchar_t );
-	V_wcsncpy( cloneStr, str, nSize );
-	return cloneStr;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: An output/display line of the chat interface

@@ -1361,7 +1361,7 @@ void CBaseHudChatLine::InsertAndColorizeText( wchar_t *buf, int clientIndex )
 	}
 	m_textRanges.RemoveAll();
 
-	m_text = CloneWString( buf );
+	m_text = V_wcsdup( buf );
 
 	CBaseHudChat *pChat = dynamic_cast<CBaseHudChat*>(GetParent() );
 
