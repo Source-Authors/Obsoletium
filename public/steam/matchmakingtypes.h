@@ -213,7 +213,8 @@ public:
 	int m_nBotPlayers;											///< Number of bots (i.e simulated players) on this server
 	bool m_bPassword;											///< true if this server needs a password to join
 	bool m_bSecure;												///< Is this server protected by VAC
-	uint32 m_ulTimeLastPlayed;									///< time (in unix time) when this server was last played on (for favorite/history servers)
+	// dimhotepus: uint32 -> time_t.
+	time_t m_ulTimeLastPlayed;									///< time (in unix time) when this server was last played on (for favorite/history servers)
 	int	m_nServerVersion;										///< server version as reported to Steam
 
 private:
@@ -235,7 +236,8 @@ inline gameserveritem_t::gameserveritem_t()
 {
 	m_szGameDir[0] = m_szMap[0] = m_szGameDescription[0] = m_szServerName[0] = 0;
 	m_bHadSuccessfulResponse = m_bDoNotRefresh = m_bPassword = m_bSecure = false;
-	m_nPing = m_nAppID = m_nPlayers = m_nMaxPlayers = m_nBotPlayers = m_ulTimeLastPlayed = m_nServerVersion = 0;
+	m_nPing = m_nAppID = m_nPlayers = m_nMaxPlayers = m_nBotPlayers = m_nServerVersion = 0;
+	m_ulTimeLastPlayed = 0;
 	m_szGameTags[0] = 0;
 }
 

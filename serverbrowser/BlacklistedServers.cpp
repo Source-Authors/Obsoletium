@@ -254,7 +254,7 @@ void CBlacklistedServers::UpdateBlacklistUI( blacklisted_server_t *blackServer )
 
 	// construct a time string for blacklisted time
 	struct tm *now;
-	now = localtime( (time_t*)&blackServer->m_ulTimeBlacklistedAt );
+	now = localtime( &blackServer->m_ulTimeBlacklistedAt );
 	if ( now ) 
 	{
 		char buf[64];

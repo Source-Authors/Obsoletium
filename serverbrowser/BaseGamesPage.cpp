@@ -933,7 +933,7 @@ void CBaseGamesPage::ServerResponded( int iServer, gameserveritem_t *pServerItem
 	{
 		// construct a time string for last played time
 		struct tm *now;
-		now = localtime( (time_t*)&pServerItem->m_ulTimeLastPlayed );
+		now = localtime( &pServerItem->m_ulTimeLastPlayed );
 
 		if ( now ) 
 		{
