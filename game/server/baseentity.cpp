@@ -2466,7 +2466,7 @@ void CBaseEntity::VPhysicsUpdatePusher( IPhysicsObject *pPhysics )
 		params.pBlockedEntity = NULL;
 		params.moveBackFraction = 0.0f;
 		params.movetime = movetime;
-		for ( int i = 0; i < list.Count(); i++ )
+		for ( intp i = 0; i < list.Count(); i++ )
 		{
 			if ( list[i]->IsSolid() )
 			{
