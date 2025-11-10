@@ -256,15 +256,7 @@ void CBaseGamesPage::PerformLayout()
 {
 	BaseClass::PerformLayout();
 	
-	if ( GetSelectedServerID() == -1 )
-	{
-		m_pConnect->SetEnabled(false);
-	}
-	else
-	{
-		m_pConnect->SetEnabled(true);
-	}
-
+	m_pConnect->SetEnabled(GetSelectedServerID() != -1);
 
 	if (SupportsItem(IGameList::GETNEWLIST))
 	{
