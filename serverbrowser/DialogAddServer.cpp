@@ -45,7 +45,7 @@ CDialogAddServer::CDialogAddServer(vgui::Panel *parent, IGameList *gameList) : F
 	{
 		nReplayWidth = 0;
 	}
-
+	
 	// dimhotepus: Scale UI.
 	m_pDiscoveredGames->AddColumnHeader(3, "Replay", "#ServerBrowser_Replay", nReplayWidth, ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
 	m_pDiscoveredGames->AddColumnHeader(4, "Name", "#ServerBrowser_Servers", QuickPropScale( 20 ), ListPanel::COLUMN_RESIZEWITHWINDOW | ListPanel::COLUMN_UNHIDABLE);
@@ -363,14 +363,7 @@ void CDialogAddServer::ApplySchemeSettings( IScheme *pScheme )
 void CDialogAddServer::OnItemSelected()
 {
 	int nSelectedItem = m_pDiscoveredGames->GetSelectedItem(0);
-	if( nSelectedItem != -1 ) 
-	{
-		m_pAddSelectedServerButton->SetEnabled( true );
-	}
-	else
-	{
-		m_pAddSelectedServerButton->SetEnabled( false );
-	}
+	m_pAddSelectedServerButton->SetEnabled( nSelectedItem != -1 );
 }
 
 //-----------------------------------------------------------------------------
