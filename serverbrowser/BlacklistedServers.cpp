@@ -211,7 +211,7 @@ void CBlacklistedServers::AddServer( gameserveritem_t &server )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-blacklisted_server_t *CBlacklistedServers::GetBlacklistedServer( intp iServerID )
+blacklisted_server_t *CBlacklistedServers::GetBlacklistedServer( unsigned iServerID )
 {
 	return m_blackList.GetServer( iServerID );
 }
@@ -239,7 +239,7 @@ void CBlacklistedServers::UpdateBlacklistUI( blacklisted_server_t *blackServer )
 		return;
 
 	KeyValues *kv;
-	int iItemId = m_pGameList->GetItemIDFromUserData( blackServer->m_nServerID );
+	intp iItemId = m_pGameList->GetItemIDFromUserData( blackServer->m_nServerID );
 	if ( m_pGameList->IsValidItemID( iItemId ) )
 	{
 		// we're updating an existing entry
@@ -255,8 +255,7 @@ void CBlacklistedServers::UpdateBlacklistUI( blacklisted_server_t *blackServer )
 	kv->SetString( "name", blackServer->m_szServerName );
 
 	// construct a time string for blacklisted time
-	struct tm *now;
-	now = localtime( &blackServer->m_ulTimeBlacklistedAt );
+	tm *now = localtime( &blackServer->m_ulTimeBlacklistedAt );
 	if ( now ) 
 	{
 		char buf[64];
@@ -320,12 +319,12 @@ void CBlacklistedServers::OnPageShow( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CBlacklistedServers::GetSelectedServerID( void )
+unsigned CBlacklistedServers::GetSelectedServerID( void )
 {
-	int serverID = -1;
+	unsigned serverID = std::numeric_limits<unsigned>::max();
 	if ( m_pGameList->GetSelectedItemsCount() )
 	{
-		serverID = m_pGameList->GetItemUserData( m_pGameList->GetSelectedItem(0) );
+		serverID = static_cast<unsigned>( m_pGameList->GetItemUserData( m_pGameList->GetSelectedItem(0) ) );
 	}
 
 	return serverID;
@@ -339,10 +338,10 @@ void CBlacklistedServers::OnOpenContextMenu(int itemID)
 	CServerContextMenu *menu = ServerBrowserDialog().GetContextMenu( m_pGameList );
 
 	// get the server
-	int serverID = GetSelectedServerID();
+	unsigned serverID = GetSelectedServerID();
 
-	menu->ShowMenu( this,(uint32)-1, false, false, false, false );
-	if ( serverID != -1 )
+	menu->ShowMenu( this, std::numeric_limits<unsigned>::max(), false, false, false, false );
+	if ( serverID != std::numeric_limits<unsigned>::max() )
 	{
 		menu->AddMenuItem("RemoveServer", "#ServerBrowser_RemoveServerFromBlacklist", new KeyValues("RemoveFromBlacklist"), this);
 	}
@@ -368,10 +367,10 @@ void CBlacklistedServers::OnAddServerByName()
 void CBlacklistedServers::OnRemoveFromBlacklist()
 {
 	// iterate the selection
-	for ( int iGame = (m_pGameList->GetSelectedItemsCount() - 1); iGame >= 0; iGame-- )
+	for ( intp iGame = (m_pGameList->GetSelectedItemsCount() - 1); iGame >= 0; iGame-- )
 	{
-		int itemID = m_pGameList->GetSelectedItem( iGame );
-		intp serverID = m_pGameList->GetItemData( itemID )->userData;
+		intp itemID = m_pGameList->GetSelectedItem( iGame );
+		unsigned serverID = static_cast<unsigned>( m_pGameList->GetItemData( itemID )->userData );
 
 		m_pGameList->RemoveItem( itemID );
 		m_blackList.RemoveServer( serverID );

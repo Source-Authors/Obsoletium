@@ -35,7 +35,7 @@ public:
 	void OnConnectToGame();
 	void OnDisconnectFromGame( void );
 
-	blacklisted_server_t *GetBlacklistedServer( intp iServerID );
+	blacklisted_server_t *GetBlacklistedServer( unsigned iServerID );
 	bool IsServerBlacklisted(gameserveritem_t &server); 
 
 private:
@@ -51,7 +51,7 @@ private:
 	void OnImportBlacklist( void );
 	void OnCommand(const char *command) override;
 	void UpdateBlacklistUI( blacklisted_server_t *blackServer );
-	int  GetSelectedServerID( void );
+	unsigned GetSelectedServerID();
 	bool AddServersFromFile( const char *pszFilename, bool bResetTimes );
 
 private:

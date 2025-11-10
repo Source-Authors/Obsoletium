@@ -328,7 +328,7 @@ void CCustomGames::RecalculateCommonTags( void )
 	intp iCount = m_pGameList->GetItemCount();
 	for ( intp i = 0; i < iCount; i++ )
 	{
-		uintp serverID = m_pGameList->GetItemUserData( i );
+		unsigned serverID = static_cast<unsigned>( m_pGameList->GetItemUserData( i ) );
 		gameserveritem_t *pServer = GetServer( serverID ); 
 		if ( pServer && pServer->m_szGameTags[0] )
 		{
@@ -411,7 +411,7 @@ void CCustomGames::AddTagToFilterList( const char *pszTag )
 
 	if ( txt[0] )
 	{
-		for ( int i = 0; i < TagList.Count(); i++ )
+		for ( intp i = 0; i < TagList.Count(); i++ )
 		{
 			// Already in the tag list?
 			if ( !Q_stricmp( TagList[i], pszTag ) )

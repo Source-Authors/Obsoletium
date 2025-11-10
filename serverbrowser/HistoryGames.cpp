@@ -121,7 +121,7 @@ void CHistoryGames::OnRemoveFromHistory()
 		return;
 
 	// iterate the selection
-	for ( int i = m_pGameList->GetSelectedItemsCount() - 1; i >= 0; i-- )
+	for ( intp i = m_pGameList->GetSelectedItemsCount() - 1; i >= 0; i-- )
 	{
 		int itemID = m_pGameList->GetSelectedItem( i );
 		intp serverID = m_pGameList->GetItemData(itemID)->userData;
