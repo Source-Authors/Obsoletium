@@ -5,17 +5,18 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <winlite.h>
+#include "winlite.h"
 #undef CreateDialog
 #ifdef WIN32
 #include <direct.h>
 #include <io.h>
 #endif
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <time.h>
+
+#include <cstdio>
+#include <cstdlib>
+#include <ctime>
 
 #include "vstdlib/pch_vstdlib.h"
 #include "tier0/memdbgoff.h"
