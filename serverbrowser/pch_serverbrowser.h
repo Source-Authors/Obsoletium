@@ -74,8 +74,6 @@
 extern bool GameSupportsReplay();
 extern bool IsReplayServer( gameserveritem_t &server );
 
-#pragma warning( disable: 4355 )  //  warning C4355: 'this' : used in base member initializer list
-
 #if defined( STEAM )
 #define IsSteam()	true
 #else
