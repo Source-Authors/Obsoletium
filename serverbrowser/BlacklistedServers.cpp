@@ -161,7 +161,7 @@ bool CBlacklistedServers::AddServersFromFile( const char *pszFilename, bool bRes
 
 		const char *pszNetAddr = pData->GetString( "addr" );
 
-		if ( pszNetAddr && pszNetAddr[0] && pszName && pszName[0] )
+		if ( !Q_isempty( pszNetAddr ) && !Q_isempty( pszName ) )
 		{
 			blacklisted_server_t *blackServer = m_blackList.AddServer( pszName, pszNetAddr, ulDate );
 
@@ -204,7 +204,7 @@ void CBlacklistedServers::AddServer( gameserveritem_t &server )
 	{
 		// send command to propagate to the client so the client can send it on to the GC
 		char command[ 256 ];
-		Q_snprintf( command, ssize( command ), "rbgc %s\n", blackServer->m_NetAdr.ToString() );
+		V_sprintf_safe( command, "rbgc %s\n", blackServer->m_NetAdr.ToString() );
 		g_pRunGameEngine->AddTextCommand( command );
 	}
 }
@@ -261,7 +261,7 @@ void CBlacklistedServers::UpdateBlacklistUI( blacklisted_server_t *blackServer )
 	{
 		char buf[64];
 		strftime(buf, sizeof(buf), "%a %d %b %I:%M%p", now);
-		Q_strlower(buf + strlen(buf) - 4);
+		V_strlower(buf + strlen(buf) - 4);
 		kv->SetString("BlacklistedAt", buf);
 	}
 

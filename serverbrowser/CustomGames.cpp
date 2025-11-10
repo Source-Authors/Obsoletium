@@ -237,7 +237,7 @@ bool CCustomGames::CheckWorkshopFilter( gameserveritem_t &server )
 	const char szWorkshopPrefix[] = "workshop/";
 	if ( workshopMode == eWorkshop_WorkshopOnly )
 	{
-		return V_strncasecmp( server.m_szMap, szWorkshopPrefix, sizeof( szWorkshopPrefix ) - 1 ) == 0;
+		return V_strncasecmp( server.m_szMap, szWorkshopPrefix, ssize( szWorkshopPrefix ) - 1 ) == 0;
 	}
 	else if ( workshopMode == eWorkshop_SubscribedOnly )
 	{
@@ -410,7 +410,7 @@ void CCustomGames::AddTagToFilterList( const char *pszTag )
 	CUtlVector<char*> TagList;
 	V_SplitString( txt, ",", TagList );
 
-	if ( txt[0] )
+	if ( !Q_isempty( txt ) )
 	{
 		for ( intp i = 0; i < TagList.Count(); i++ )
 		{
