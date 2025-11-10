@@ -37,10 +37,6 @@ bool GameSupportsReplay()
 	return g_pEngineReplay && g_pEngineReplay->IsSupportedModAndPlatform();
 }
 
-#ifdef STAGING_ONLY
-	ConVar sb_fake_app_id( "sb_fake_app_id", "0", 0, "If nonzero, then server browser requests will use this App ID instead" );
-#endif
-
 //--------------------------------------------------------------------------------------------------------
 bool IsReplayServer( gameserveritem_t &server )
 {
@@ -1241,10 +1237,6 @@ void CBaseGamesPage::UpdateFilterSettings()
 		m_iLimitToAppID = ServerBrowserDialog().GetActiveAppID();
 
 
-		#ifdef STAGING_ONLY
-		if ( sb_fake_app_id.GetInt() != 0 )
-			m_iLimitToAppID = CGameID( sb_fake_app_id.GetInt() );
-		#endif
 
 
 		RecalculateFilterString();
