@@ -64,7 +64,6 @@
 #include "LanGames.h"
 #include "FriendsGames.h"
 #include "HistoryGames.h"
-#include "SpectateGames.h"
 #include "CustomGames.h"
 #include "ServerBrowserDialog.h"
 #include "QuickListPanel.h"
