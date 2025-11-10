@@ -44,7 +44,7 @@ bool IsReplayServer( gameserveritem_t &server )
 
 	if ( GameSupportsReplay() )
 	{
-		if ( server.m_szGameTags[0] )
+		if ( !Q_isempty( server.m_szGameTags ) )
 		{
 			CUtlVector<char*> TagList;
 			V_SplitString( server.m_szGameTags, ",", TagList );
@@ -73,7 +73,7 @@ const char *COM_GetModDirectory()
 		{
 			V_StripLastDir( modDir );
 			intp dirlen = Q_strlen( modDir );
-			Q_strncpy( modDir, gamedir + dirlen, sizeof(modDir) - dirlen );
+			Q_strncpy( modDir, gamedir + dirlen, ssize(modDir) - dirlen );
 		}
 	}
 
@@ -465,12 +465,12 @@ int ServerMapnameSortFunc( const servermaps_t *p1,  const servermaps_t *p2 )
 void CBaseGamesPage::PrepareQuickListMap( const char *pMapName, int iListID )
 {
 	char szMapName[ 512 ];
-	Q_snprintf( szMapName, sizeof( szMapName ), "%s",  pMapName );
+	V_sprintf_safe( szMapName, "%s",  pMapName );
 
-	Q_strlower( szMapName );
+	V_strlower( szMapName );
 
 	char path[ 512 ];
-	Q_snprintf( path, sizeof( path ), "maps/%s.bsp", szMapName );
+	V_sprintf_safe( path, "maps/%s.bsp", szMapName );
 	
 	int iIndex = m_quicklistserverlist.Find( szMapName );
 
@@ -490,8 +490,8 @@ void CBaseGamesPage::PrepareQuickListMap( const char *pMapName, int iListID )
 			servermap.pFriendlyName = V_strdup( szFriendlyName );
 			servermap.pOriginalName = V_strdup( szMapName );
 
-			char path[ 512 ];
-			Q_snprintf( path, sizeof( path ), "maps/%s.bsp", szMapName );
+			char path[ MAX_PATH ];
+			V_sprintf_safe( path, "maps/%s.bsp", szMapName );
 
 			servermap.bOnDisk = g_pFullFileSystem->FileExists( path, "MOD" );
 
@@ -1512,7 +1512,7 @@ void CBaseGamesPage::RecalculateFilterString()
 //-----------------------------------------------------------------------------
 bool CBaseGamesPage::CheckPrimaryFilters( gameserveritem_t &server )
 {
-	if (m_szGameFilter[0] && ( server.m_szGameDir[0] || server.m_nPing ) && Q_stricmp(m_szGameFilter, server.m_szGameDir ) ) 
+	if ( !Q_isempty( m_szGameFilter ) && ( !Q_isempty( server.m_szGameDir ) || server.m_nPing ) && Q_stricmp(m_szGameFilter, server.m_szGameDir ) ) 
 	{
 		return false;
 	}
@@ -1594,7 +1594,7 @@ bool CBaseGamesPage::CheckSecondaryFilters( gameserveritem_t &server )
 	if ( m_pQuickList->IsVisible() == false )
 	{
 		// compare the first few characters of the filter name
-		intp count = Q_strlen( m_szMapFilter );
+		intp count = V_strlen( m_szMapFilter );
 		if ( count && Q_strnicmp( server.m_szMap, m_szMapFilter, count ) )
 		{
 			return false;
