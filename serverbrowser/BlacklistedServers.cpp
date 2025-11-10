@@ -18,8 +18,8 @@ ConVar sb_showblacklists( "sb_showblacklists", "0", FCVAR_NONE, "If set to 1, bl
 //-----------------------------------------------------------------------------
 static int __cdecl BlacklistedServerNameCompare(ListPanel *pPanel, const ListPanelItem &p1, const ListPanelItem &p2)
 {
-	blacklisted_server_t *pSvr1 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p1.userData );
-	blacklisted_server_t *pSvr2 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p2.userData );
+	const blacklisted_server_t *pSvr1 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( static_cast<unsigned>( p1.userData ) );
+	const blacklisted_server_t *pSvr2 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( static_cast<unsigned>( p2.userData ) );
 
 	if ( !pSvr1 && pSvr2 ) 
 		return -1;
@@ -36,8 +36,8 @@ static int __cdecl BlacklistedServerNameCompare(ListPanel *pPanel, const ListPan
 //-----------------------------------------------------------------------------
 static int __cdecl BlacklistedIPAddressCompare(ListPanel *pPanel, const ListPanelItem &p1, const ListPanelItem &p2)
 {
-	blacklisted_server_t *pSvr1 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p1.userData );
-	blacklisted_server_t *pSvr2 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p2.userData );
+	const blacklisted_server_t *pSvr1 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( static_cast<unsigned>( p1.userData ) );
+	const blacklisted_server_t *pSvr2 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( static_cast<unsigned>( p2.userData ) );
 
 	if ( !pSvr1 && pSvr2 ) 
 		return -1;
@@ -59,8 +59,8 @@ static int __cdecl BlacklistedIPAddressCompare(ListPanel *pPanel, const ListPane
 //-----------------------------------------------------------------------------
 static int __cdecl BlacklistedAtCompare(ListPanel *pPanel, const ListPanelItem &p1, const ListPanelItem &p2)
 {
-	blacklisted_server_t *pSvr1 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p1.userData );
-	blacklisted_server_t *pSvr2 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p2.userData );
+	const blacklisted_server_t *pSvr1 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( static_cast<unsigned>( p1.userData ) );
+	const blacklisted_server_t *pSvr2 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( static_cast<unsigned>( p2.userData ) );
 
 	if ( !pSvr1 && pSvr2 ) 
 		return -1;
@@ -292,7 +292,7 @@ void CBlacklistedServers::ApplySchemeSettings(vgui::IScheme *pScheme)
 	if ( g_pFullFileSystem->FileExists( pszFileName, "MOD" ) )
 	{
 		pPathID = "MOD";
-	}	
+	}
 	LoadControlSettings( pszFileName, pPathID );
 
 	vgui::HFont hFont = pScheme->GetFont( "ListSmall", IsProportional() );

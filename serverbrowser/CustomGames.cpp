@@ -234,7 +234,7 @@ bool CCustomGames::CheckTagFilter( gameserveritem_t &server )
 bool CCustomGames::CheckWorkshopFilter( gameserveritem_t &server )
 {
 	eWorkshopMode workshopMode = WorkshopMode();
-	const char szWorkshopPrefix[] = "workshop/";
+	constexpr char szWorkshopPrefix[] = "workshop/";
 	if ( workshopMode == eWorkshop_WorkshopOnly )
 	{
 		return V_strncasecmp( server.m_szMap, szWorkshopPrefix, ssize( szWorkshopPrefix ) - 1 ) == 0;
