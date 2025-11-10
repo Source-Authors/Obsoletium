@@ -132,7 +132,7 @@ CCustomGames::CCustomGames(vgui::Panel *parent) :
 //-----------------------------------------------------------------------------
 CCustomGames::~CCustomGames()
 {
-}		
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -423,10 +423,7 @@ void CCustomGames::AddTagToFilterList( const char *pszTag )
 		}
 	}
 
-	char *pszNewTag = new char[64];
-	Q_strncpy( pszNewTag, pszTag, 64 );
-	TagList.AddToHead( pszNewTag );
-
+	TagList.AddToHead( V_strdup( pszTag ) );
 	TagList.Sort( SortServerTags );
 
 	// Append it
