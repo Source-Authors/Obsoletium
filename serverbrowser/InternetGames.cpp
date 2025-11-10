@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "InternetGames.h"
+
 using namespace vgui;
 
 // How often to re-sort the server list

@@ -6,6 +6,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "VACBannedConnRefusedDialog.h"
+
 using namespace vgui;
 
 //-----------------------------------------------------------------------------

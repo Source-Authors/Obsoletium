@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "DialogAddServer.h"
+
 using namespace vgui;
 
 //-----------------------------------------------------------------------------

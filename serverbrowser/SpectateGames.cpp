@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "SpectateGames.h"
+
 
 CSpectateGames::CSpectateGames( vgui::Panel *parent )
 	: CInternetGames( parent, "SpectateGames", eSpectatorServer )

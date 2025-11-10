@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "DialogGameInfo.h"
+
 using namespace vgui;
 
 static constexpr inline long RETRY_TIME = 10000;		// refresh server every 10 seconds

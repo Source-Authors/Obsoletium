@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "BlacklistedServers.h"
+
 using namespace vgui;
 
 ConVar sb_showblacklists( "sb_showblacklists", "0", FCVAR_NONE, "If set to 1, blacklist rules will be printed to the console as they're applied." );

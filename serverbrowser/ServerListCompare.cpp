@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "ServerListCompare.h"
+
 bool IsReplayServer( gameserveritem_t &server );
 
 //-----------------------------------------------------------------------------

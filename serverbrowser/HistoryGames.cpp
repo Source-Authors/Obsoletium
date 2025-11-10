@@ -6,6 +6,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "HistoryGames.h"
+
 using namespace vgui;
 
 //-----------------------------------------------------------------------------

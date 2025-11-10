@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "DialogServerPassword.h"
+
 using namespace vgui;
 
 //-----------------------------------------------------------------------------

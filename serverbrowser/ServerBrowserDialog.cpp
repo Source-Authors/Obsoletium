@@ -17,6 +17,8 @@
 //=============================================================================
 #include "pch_serverbrowser.h"
 
+#include "ServerBrowserDialog.h"
+
 #include "qlimits.h"
 
 #if defined( _WIN32 ) && !defined( _X360 )

@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "BaseGamesPage.h"
+
 using namespace vgui;
 
 #define FILTER_ALLSERVERS			0

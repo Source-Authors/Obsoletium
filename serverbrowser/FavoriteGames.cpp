@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "FavoriteGames.h"
+
 using namespace vgui;
 
 //-----------------------------------------------------------------------------

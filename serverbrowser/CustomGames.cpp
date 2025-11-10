@@ -5,8 +5,11 @@
 //=============================================================================
 
 #include "pch_serverbrowser.h"
-#include <vgui_controls/HTML.h>
-#include <vgui_controls/MessageDialog.h>
+
+#include "CustomGames.h"
+
+#include "vgui_controls/HTML.h"
+#include "vgui_controls/MessageDialog.h"
 
 using namespace vgui;
 

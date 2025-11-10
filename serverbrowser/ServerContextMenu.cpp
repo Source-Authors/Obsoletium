@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "ServerContextMenu.h"
+
 using namespace vgui;
 
 //-----------------------------------------------------------------------------

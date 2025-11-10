@@ -6,6 +6,8 @@
 //=============================================================================
 #include "pch_serverbrowser.h"
 
+#include "QuickListPanel.h"
+
 using namespace vgui;
 
 

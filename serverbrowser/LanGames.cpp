@@ -7,6 +7,8 @@
 
 #include "pch_serverbrowser.h"
 
+#include "LanGames.h"
+
 using namespace vgui;
 
 constexpr inline float BROADCAST_LIST_TIMEOUT = 0.4f;
