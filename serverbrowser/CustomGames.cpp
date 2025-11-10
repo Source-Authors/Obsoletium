@@ -100,7 +100,8 @@ void TagInfoLabel::DoOpenCustomServerInfoURL( void )
 CCustomGames::CCustomGames(vgui::Panel *parent) : 
 	BaseClass(parent, "CustomGames", eInternetServer )
 {
-	m_pGameList->AddColumnHeader(10, "Tags", "#ServerBrowser_Tags", 200);
+	// dimhotepus: Scale UI.
+	m_pGameList->AddColumnHeader(10, "Tags", "#ServerBrowser_Tags", QuickPropScale( 200 ));
 	m_pGameList->SetSortFunc(10, TagsCompare);
 
 	if ( !IsSteamGameServerBrowsingEnabled() )

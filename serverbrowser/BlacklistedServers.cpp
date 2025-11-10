@@ -83,7 +83,8 @@ static int __cdecl BlacklistedAtCompare(ListPanel *pPanel, const ListPanelItem &
 CBlacklistedServers::CBlacklistedServers( vgui::Panel *parent ) : 
 	vgui::PropertyPage( parent, "BlacklistedGames" )
 {
-	SetSize( 624, 278 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 624 ), QuickPropScale( 278 ) );
 
 	m_pAddServer = new Button(this, "AddServerButton", "#ServerBrowser_AddServer");
 	m_pAddCurrentServer = new Button(this, "AddCurrentServerButton", "#ServerBrowser_AddCurrentServer");
@@ -91,9 +92,9 @@ CBlacklistedServers::CBlacklistedServers( vgui::Panel *parent ) :
 	m_pGameList->SetAllowUserModificationOfColumns(true);
 
 	// Add the column headers
-	m_pGameList->AddColumnHeader(0, "Name", "#ServerBrowser_BlacklistedServers", 50, ListPanel::COLUMN_RESIZEWITHWINDOW | ListPanel::COLUMN_UNHIDABLE);
-	m_pGameList->AddColumnHeader(1, "IPAddr", "#ServerBrowser_IPAddress", 64, ListPanel::COLUMN_HIDDEN);
-	m_pGameList->AddColumnHeader(2, "BlacklistedAt", "#ServerBrowser_BlacklistedDate", 100);
+	m_pGameList->AddColumnHeader(0, "Name", "#ServerBrowser_BlacklistedServers", QuickPropScale( 50 ), ListPanel::COLUMN_RESIZEWITHWINDOW | ListPanel::COLUMN_UNHIDABLE);
+	m_pGameList->AddColumnHeader(1, "IPAddr", "#ServerBrowser_IPAddress", QuickPropScale( 64 ), ListPanel::COLUMN_HIDDEN);
+	m_pGameList->AddColumnHeader(2, "BlacklistedAt", "#ServerBrowser_BlacklistedDate", QuickPropScale( 100 ));
 
 	//m_pGameList->SetColumnHeaderTooltip(0, "#ServerBrowser_PasswordColumn_Tooltip");
 

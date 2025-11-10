@@ -80,9 +80,9 @@ CServerBrowserDialog::CServerBrowserDialog(vgui::Panel *parent) : Frame(parent, 
 	m_pSpectateGames = new CSpectateGames(this);
 	m_pLanGames = new CLanGames(this);
 	m_pFriendsGames = new CFriendsGames(this);
-
-	SetMinimumSize( BASE_WIDTH, 384 );
-	SetSize( BASE_WIDTH, 384 );
+	// dimhotepus: Scale UI.
+	SetMinimumSize( QuickPropScale( BASE_WIDTH ), QuickPropScale( 384 ) );
+	SetSize( QuickPropScale( BASE_WIDTH ), QuickPropScale( 384 ) );
 
 	m_pGameList = m_pInternetGames;
 
@@ -90,7 +90,9 @@ CServerBrowserDialog::CServerBrowserDialog(vgui::Panel *parent) : Frame(parent, 
 
 	// property sheet
 	m_pTabPanel = new PropertySheet(this, "GameTabs");
-	m_pTabPanel->SetTabWidth(72);
+	
+	// dimhotepus: Scale UI.
+	m_pTabPanel->SetTabWidth(QuickPropScale( 72 ));
 	m_pTabPanel->AddPage(m_pInternetGames, "#ServerBrowser_InternetTab");
 	m_pTabPanel->AddPage(m_pFavorites, "#ServerBrowser_FavoritesTab");
 	m_pTabPanel->AddPage(m_pHistory, "#ServerBrowser_HistoryTab");

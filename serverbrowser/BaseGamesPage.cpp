@@ -114,7 +114,8 @@ CBaseGamesPage::CBaseGamesPage( vgui::Panel *parent, const char *name, EPageType
 	  m_hRequest( NULL ),
 	  m_pCustomResFilename( pCustomResFilename )
 {
-	SetSize( 624, 278 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 624 ), QuickPropScale( 278 ) );
 	m_szGameFilter[0] = 0;
 	m_szMapFilter[0]  = 0;
 	m_iMaxPlayerFilter = 0;
@@ -162,31 +163,32 @@ CBaseGamesPage::CBaseGamesPage( vgui::Panel *parent, const char *name, EPageType
 	m_pGameList->m_nUserConfigFileVersion = 2;
 
 	// Add the column headers
-	m_pGameList->AddColumnHeader( k_nColumn_Password, "Password", "#ServerBrowser_Password", 16, ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
-	m_pGameList->AddColumnHeader( k_nColumn_Secure, "Secure", "#ServerBrowser_Secure", 16, ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
+	m_pGameList->AddColumnHeader( k_nColumn_Password, "Password", "#ServerBrowser_Password", QuickPropScale( 16 ), ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
+	m_pGameList->AddColumnHeader( k_nColumn_Secure, "Secure", "#ServerBrowser_Secure", QuickPropScale( 16 ), ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
 
-	int nReplayWidth = 16;
+	// dimhotepus: Scale UI.
+	int nReplayWidth = QuickPropScale( 16 );
 	if ( !bRunningTF2 )
 	{
 		nReplayWidth = 0;
 	}
 
 	m_pGameList->AddColumnHeader( k_nColumn_Replay, "Replay", "#ServerBrowser_Replay", nReplayWidth, ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
-	m_pGameList->AddColumnHeader( k_nColumn_Name, "Name", "#ServerBrowser_Servers", 50, ListPanel::COLUMN_RESIZEWITHWINDOW | ListPanel::COLUMN_UNHIDABLE);
-	m_pGameList->AddColumnHeader( k_nColumn_IPAddr, "IPAddr", "#ServerBrowser_IPAddress", 64, ListPanel::COLUMN_HIDDEN);
-	m_pGameList->AddColumnHeader( k_nColumn_GameDesc, "GameDesc", "#ServerBrowser_Game", 112,
-		112,	// minwidth
-		300,	// maxwidth
+	m_pGameList->AddColumnHeader( k_nColumn_Name, "Name", "#ServerBrowser_Servers", QuickPropScale( 50 ), ListPanel::COLUMN_RESIZEWITHWINDOW | ListPanel::COLUMN_UNHIDABLE);
+	m_pGameList->AddColumnHeader( k_nColumn_IPAddr, "IPAddr", "#ServerBrowser_IPAddress", QuickPropScale( 64 ), ListPanel::COLUMN_HIDDEN);
+	m_pGameList->AddColumnHeader( k_nColumn_GameDesc, "GameDesc", "#ServerBrowser_Game", QuickPropScale( 112 ),
+		QuickPropScale( 112 ),	// minwidth
+		QuickPropScale( 300 ),	// maxwidth
 		0		// flags
 		);
-	m_pGameList->AddColumnHeader( k_nColumn_Players, "Players", "#ServerBrowser_Players", 55, ListPanel::COLUMN_FIXEDSIZE);
-	m_pGameList->AddColumnHeader( k_nColumn_Bots, "Bots", "#ServerBrowser_Bots", 40, ListPanel::COLUMN_FIXEDSIZE);
-	m_pGameList->AddColumnHeader( k_nColumn_Map, "Map", "#ServerBrowser_Map", 90, 
-		90,		// minwidth
-		300,	// maxwidth
+	m_pGameList->AddColumnHeader( k_nColumn_Players, "Players", "#ServerBrowser_Players", QuickPropScale( 55 ), ListPanel::COLUMN_FIXEDSIZE);
+	m_pGameList->AddColumnHeader( k_nColumn_Bots, "Bots", "#ServerBrowser_Bots", QuickPropScale( 40 ), ListPanel::COLUMN_FIXEDSIZE);
+	m_pGameList->AddColumnHeader( k_nColumn_Map, "Map", "#ServerBrowser_Map", QuickPropScale( 90 ), 
+		QuickPropScale( 90 ),		// minwidth
+		QuickPropScale( 300 ),	// maxwidth
 		0		// flags
 		);
-	m_pGameList->AddColumnHeader( k_nColumn_Ping, "Ping", "#ServerBrowser_Latency", 55, ListPanel::COLUMN_FIXEDSIZE);
+	m_pGameList->AddColumnHeader( k_nColumn_Ping, "Ping", "#ServerBrowser_Latency", QuickPropScale( 55 ), ListPanel::COLUMN_FIXEDSIZE);
 
 	m_pGameList->SetColumnHeaderTooltip( k_nColumn_Password, "#ServerBrowser_PasswordColumn_Tooltip");
 	m_pGameList->SetColumnHeaderTooltip( k_nColumn_Bots, "#ServerBrowser_BotColumn_Tooltip");
@@ -980,7 +982,8 @@ void CBaseGamesPage::UpdateFilterAndQuickListVisibility()
 	
 	int wide, tall;
 	GetSize( wide, tall );
-	SetSize( 624, 278 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 624 ), QuickPropScale( 278 ) );
 
 	UpdateDerivedLayouts();		
 	UpdateGameFilter();

@@ -17,7 +17,8 @@ CHistoryGames::CHistoryGames(vgui::Panel *parent) :
 	CBaseGamesPage(parent, "HistoryGames", eHistoryServer )
 {
 	m_bRefreshOnListReload = false;
-	m_pGameList->AddColumnHeader(10, "LastPlayed", "#ServerBrowser_LastPlayed", 100);
+	// dimhotepus: Scale UI.
+	m_pGameList->AddColumnHeader(10, "LastPlayed", "#ServerBrowser_LastPlayed", QuickPropScale( 100 ));
 	m_pGameList->SetSortFunc(10, LastPlayedCompare);
 	m_pGameList->SetSortColumn(10);
 

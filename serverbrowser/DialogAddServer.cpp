@@ -25,30 +25,35 @@ CDialogAddServer::CDialogAddServer(vgui::Panel *parent, IGameList *gameList) : F
 	SetSizeable( false );
 
 	m_pTabPanel = new PropertySheet(this, "GameTabs");
-	m_pTabPanel->SetTabWidth(72);
+	// dimhotepus: Scale UI.
+	m_pTabPanel->SetTabWidth(QuickPropScale( 72 ));
 
 	m_pDiscoveredGames = new ListPanel( this, "Servers" );
 
 	// Add the column headers
-	m_pDiscoveredGames->AddColumnHeader(0, "Password", "#ServerBrowser_Password", 16, ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
-	m_pDiscoveredGames->AddColumnHeader(1, "Bots", "#ServerBrowser_Bots", 16, ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE | ListPanel::COLUMN_HIDDEN);
-	m_pDiscoveredGames->AddColumnHeader(2, "Secure", "#ServerBrowser_Secure", 16, ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
+	
+	// dimhotepus: Scale UI.
+	m_pDiscoveredGames->AddColumnHeader(0, "Password", "#ServerBrowser_Password", QuickPropScale( 16 ), ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
+	m_pDiscoveredGames->AddColumnHeader(1, "Bots", "#ServerBrowser_Bots", QuickPropScale( 16 ), ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE | ListPanel::COLUMN_HIDDEN);
+	m_pDiscoveredGames->AddColumnHeader(2, "Secure", "#ServerBrowser_Secure", QuickPropScale( 16 ), ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
 
 	bool bGameSupportsReplay = GameSupportsReplay();
 
-	int nReplayWidth = 16;
+	// dimhotepus: Scale UI.
+	int nReplayWidth = QuickPropScale( 16 );
 	if ( !bGameSupportsReplay )
 	{
 		nReplayWidth = 0;
 	}
 
+	// dimhotepus: Scale UI.
 	m_pDiscoveredGames->AddColumnHeader(3, "Replay", "#ServerBrowser_Replay", nReplayWidth, ListPanel::COLUMN_FIXEDSIZE | ListPanel::COLUMN_IMAGE);
-	m_pDiscoveredGames->AddColumnHeader(4, "Name", "#ServerBrowser_Servers", 20, ListPanel::COLUMN_RESIZEWITHWINDOW | ListPanel::COLUMN_UNHIDABLE);
-	m_pDiscoveredGames->AddColumnHeader(5, "IPAddr", "#ServerBrowser_IPAddress", 60, ListPanel::COLUMN_HIDDEN);
-	m_pDiscoveredGames->AddColumnHeader(6, "GameDesc", "#ServerBrowser_Game", 150);
-	m_pDiscoveredGames->AddColumnHeader(7, "Players", "#ServerBrowser_Players", 60);
-	m_pDiscoveredGames->AddColumnHeader(8, "Map", "#ServerBrowser_Map", 80);
-	m_pDiscoveredGames->AddColumnHeader(9, "Ping", "#ServerBrowser_Latency", 60);
+	m_pDiscoveredGames->AddColumnHeader(4, "Name", "#ServerBrowser_Servers", QuickPropScale( 20 ), ListPanel::COLUMN_RESIZEWITHWINDOW | ListPanel::COLUMN_UNHIDABLE);
+	m_pDiscoveredGames->AddColumnHeader(5, "IPAddr", "#ServerBrowser_IPAddress", QuickPropScale( 60 ), ListPanel::COLUMN_HIDDEN);
+	m_pDiscoveredGames->AddColumnHeader(6, "GameDesc", "#ServerBrowser_Game", QuickPropScale( 150 ));
+	m_pDiscoveredGames->AddColumnHeader(7, "Players", "#ServerBrowser_Players", QuickPropScale( 60 ));
+	m_pDiscoveredGames->AddColumnHeader(8, "Map", "#ServerBrowser_Map", QuickPropScale( 80 ));
+	m_pDiscoveredGames->AddColumnHeader(9, "Ping", "#ServerBrowser_Latency", QuickPropScale( 60 ));
 
 	m_pDiscoveredGames->SetColumnHeaderTooltip(0, "#ServerBrowser_PasswordColumn_Tooltip");
 	m_pDiscoveredGames->SetColumnHeaderTooltip(1, "#ServerBrowser_BotColumn_Tooltip");
@@ -101,7 +106,8 @@ CDialogAddServer::CDialogAddServer(vgui::Panel *parent, IGameList *gameList) : F
 	// Initially, we aren't high enough to show the tab panel.
 	int x, y;
 	m_pTabPanel->GetPos( x, y );
-	m_OriginalHeight = m_pTabPanel->GetTall() + y + 50;
+	// dimhotepus: Scale UI.
+	m_OriginalHeight = m_pTabPanel->GetTall() + y + QuickPropScale( 50 );
 	SetTall( y );
 }
 
