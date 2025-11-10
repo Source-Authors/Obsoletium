@@ -12,7 +12,7 @@
 #endif
 
 #include "tier0/platform.h"
-#include "netadr.h"
+#include "tier1/netadr.h"
 #include "tier1/utlvector.h"
 
 constexpr inline char BLACKLIST_DEFAULT_SAVE_FILE[]{"cfg/server_blacklist.txt"};
@@ -21,7 +21,8 @@ class gameserveritem_t;
 
 struct blacklisted_server_t 
 {
-	int m_nServerID;
+	// dimhotepus: int -> unsigned.
+	unsigned m_nServerID;
 	char m_szServerName[64];
 	// dimhotepus: uint32 -> time_t
 	time_t m_ulTimeBlacklistedAt;
@@ -40,29 +41,33 @@ public:
 	void Reset();
 
 	blacklisted_server_t *AddServer( gameserveritem_t &server );
-	blacklisted_server_t *AddServer( const char *serverName, uint32 serverIP, int serverPort );
+	// dimhotepus: int port -> uint16 port.
+	blacklisted_server_t *AddServer( const char *serverName, uint32 serverIP, uint16 serverPort );
 	// dimhotepus: uint32 -> time_t
 	blacklisted_server_t *AddServer( const char *serverName, const char *netAddressString, time_t timestamp );
 
-	void RemoveServer( intp iServerID );		// remove server with matching 'server id' from list
+	void RemoveServer( unsigned iServerID );		// remove server with matching 'server id' from list
 
 	void SaveToFile( const char *filename );
 	int LoadServersFromFile( const char *pszFilename, bool bResetTimes );		// returns count of appended servers, zero for failure
 
-	blacklisted_server_t *GetServer( intp iServerID );		// return server with matching 'server id'
+	blacklisted_server_t *GetServer( unsigned iServerID );		// return server with matching 'server id'
 	[[nodiscard]] intp GetServerCount() const;
 
 	[[nodiscard]] const CUtlVector< blacklisted_server_t > &GetServerVector() const;
 
 	[[nodiscard]] bool IsServerBlacklisted( const gameserveritem_t &server ) const;
-	bool IsServerBlacklisted( uint32 serverIP, int serverPort, const char *serverName ) const;
+	// dimhotepus: int port -> uint16 port.
+	bool IsServerBlacklisted( uint32 serverIP, uint16 serverPort, const char *serverName ) const;
 
 	bool CanServerBeBlacklisted( gameserveritem_t &server ) const;
-	bool CanServerBeBlacklisted( uint32 serverIP, int serverPort, const char *serverName ) const;
+	// dimhotepus: int port -> uint16 port.
+	bool CanServerBeBlacklisted( uint32 serverIP, uint16 serverPort, const char *serverName ) const;
 
 private:
 	CUtlVector< blacklisted_server_t >	m_Blacklist;
-	int m_iNextServerID;		// for vgui use
+	// dimhotepus: int -> unsigned
+	unsigned m_iNextServerID;		// for vgui use
 };
 
 inline intp CBlacklistedServerManager::GetServerCount() const
