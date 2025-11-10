@@ -21,7 +21,7 @@
 
 #include "qlimits.h"
 
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 #define WIN32_LEAN_AND_MEAN
 #include <winsock.h>
 #endif
@@ -173,7 +173,7 @@ void CServerBrowserDialog::Initialize()
 //-----------------------------------------------------------------------------
 // Purpose: returns a server in the list
 //-----------------------------------------------------------------------------
-gameserveritem_t *CServerBrowserDialog::GetServer( uintp serverID )
+gameserveritem_t *CServerBrowserDialog::GetServer( unsigned serverID )
 {
 	if (m_pGameList)
 		return m_pGameList->GetServer( serverID );
