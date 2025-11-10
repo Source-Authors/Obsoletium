@@ -24,7 +24,7 @@ extern "C"
 //-----------------------------------------------------------------------------
 // Purpose: Comparison function used in query redblack tree
 //-----------------------------------------------------------------------------
-bool QueryLessFunc( const struct challenge_s &item1, const struct challenge_s &item2 )
+static bool QueryLessFunc( const struct challenge_s &item1, const struct challenge_s &item2 )
 {
 	// compare port then ip
 	if ( item1.addr.GetPort() < item2.addr.GetPort() )

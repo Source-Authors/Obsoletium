@@ -71,7 +71,7 @@ void TagInfoLabel::OnMousePressed(MouseCode code)
 		if ( GetURL() )
 		{
 			// Pop up the dialog with the url in it
-			CCustomServerInfoURLQuery *qb = new CCustomServerInfoURLQuery( "#ServerBrowser_CustomServerURLWarning", "#ServerBrowser_CustomServerURLOpen", this );
+			auto *qb = new CCustomServerInfoURLQuery( "#ServerBrowser_CustomServerURLWarning", "#ServerBrowser_CustomServerURLOpen", this );
 			if (qb != NULL)
 			{
 				qb->SetOKCommand( new KeyValues("DoOpenCustomServerInfoURL") );
@@ -309,7 +309,7 @@ struct tagentry_t
 	const char *pszTag;
 	int iCount;
 };
-int __cdecl SortTagsInUse( const tagentry_t *pTag1, const tagentry_t *pTag2 )
+static int __cdecl SortTagsInUse( const tagentry_t *pTag1, const tagentry_t *pTag2 )
 {
 	return (pTag1->iCount < pTag2->iCount);
 }
@@ -393,7 +393,7 @@ void CCustomGames::OnAddTag(KeyValues *params)
 }
 
 
-int SortServerTags( char* const *p1, char* const *p2 )
+static int SortServerTags( char* const *p1, char* const *p2 )
 {
 	return ( Q_strcmp( *p1, *p2 ) > 0 );
 }

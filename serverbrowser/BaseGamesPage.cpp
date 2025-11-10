@@ -356,7 +356,7 @@ struct serverqualitysort_t
 	int iMaxPlayerCount;
 };
 
-int ServerQualitySort( const serverqualitysort_t *pSQ1, const serverqualitysort_t *pSQ2 )
+static int ServerQualitySort( const serverqualitysort_t *pSQ1, const serverqualitysort_t *pSQ2 )
 {
 	int iMaxP = sb_mod_suggested_maxplayers.GetInt();
 	if ( iMaxP && pSQ1->iMaxPlayerCount != pSQ2->iMaxPlayerCount )
@@ -441,7 +441,7 @@ void CBaseGamesPage::SelectQuickListServers( void )
 	OnItemSelected();
 }
 
-int ServerMapnameSortFunc( const servermaps_t *p1,  const servermaps_t *p2 )
+static int ServerMapnameSortFunc( const servermaps_t *p1,  const servermaps_t *p2 )
 {
 	//If they're both on disc OR both missing then sort them alphabetically
 	if ( (p1->bOnDisk && p2->bOnDisk) || (!p1->bOnDisk && !p2->bOnDisk ) )
@@ -487,7 +487,7 @@ void CBaseGamesPage::PrepareQuickListMap( const char *pMapName, int iListID )
 
 			servermap.bOnDisk = g_pFullFileSystem->FileExists( path, "MOD" );
 
-			CQuickListPanel *pQuickListPanel = new CQuickListPanel( m_pQuickList, "QuickListPanel");
+			auto *pQuickListPanel = new CQuickListPanel( m_pQuickList, "QuickListPanel");
 
 			if ( pQuickListPanel ) 
 			{
@@ -2004,7 +2004,7 @@ int CBaseGamesPage::GetSelectedServerID( KeyValues **pKV )
 
 		if ( m_pQuickList->GetSelectedPanel() )
 		{
-			CQuickListPanel *pQuickPanel = dynamic_cast<CQuickListPanel*>( m_pQuickList->GetSelectedPanel() );
+			auto *pQuickPanel = dynamic_cast<CQuickListPanel*>( m_pQuickList->GetSelectedPanel() );
 
 			if ( pQuickPanel )
 			{

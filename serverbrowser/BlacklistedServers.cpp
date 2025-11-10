@@ -16,7 +16,7 @@ ConVar sb_showblacklists( "sb_showblacklists", "0", FCVAR_NONE, "If set to 1, bl
 //-----------------------------------------------------------------------------
 // Purpose: Server name comparison function
 //-----------------------------------------------------------------------------
-int __cdecl BlacklistedServerNameCompare(ListPanel *pPanel, const ListPanelItem &p1, const ListPanelItem &p2)
+static int __cdecl BlacklistedServerNameCompare(ListPanel *pPanel, const ListPanelItem &p1, const ListPanelItem &p2)
 {
 	blacklisted_server_t *pSvr1 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p1.userData );
 	blacklisted_server_t *pSvr2 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p2.userData );
@@ -34,7 +34,7 @@ int __cdecl BlacklistedServerNameCompare(ListPanel *pPanel, const ListPanelItem 
 //-----------------------------------------------------------------------------
 // Purpose: list column sort function
 //-----------------------------------------------------------------------------
-int __cdecl BlacklistedIPAddressCompare(ListPanel *pPanel, const ListPanelItem &p1, const ListPanelItem &p2)
+static int __cdecl BlacklistedIPAddressCompare(ListPanel *pPanel, const ListPanelItem &p1, const ListPanelItem &p2)
 {
 	blacklisted_server_t *pSvr1 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p1.userData );
 	blacklisted_server_t *pSvr2 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p2.userData );
@@ -57,7 +57,7 @@ int __cdecl BlacklistedIPAddressCompare(ListPanel *pPanel, const ListPanelItem &
 //-----------------------------------------------------------------------------
 // Purpose: Player number comparison function
 //-----------------------------------------------------------------------------
-int __cdecl BlacklistedAtCompare(ListPanel *pPanel, const ListPanelItem &p1, const ListPanelItem &p2)
+static int __cdecl BlacklistedAtCompare(ListPanel *pPanel, const ListPanelItem &p1, const ListPanelItem &p2)
 {
 	blacklisted_server_t *pSvr1 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p1.userData );
 	blacklisted_server_t *pSvr2 = ServerBrowserDialog().GetBlacklistPage()->GetBlacklistedServer( p2.userData );
@@ -146,7 +146,7 @@ bool CBlacklistedServers::AddServersFromFile( const char *pszFilename, bool bRes
 	if ( !pKV->LoadFromFile( g_pFullFileSystem, pszFilename, "GAME" ) )
 		return false;
 
-	for ( KeyValues *pData = pKV->GetFirstSubKey(); pData != NULL; pData = pData->GetNextKey() )
+	for ( auto *pData = pKV->GetFirstSubKey(); pData != NULL; pData = pData->GetNextKey() )
 	{
 		const char *pszName = pData->GetString( "name" );
 
