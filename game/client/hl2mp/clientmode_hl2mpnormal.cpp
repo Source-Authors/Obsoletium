@@ -21,6 +21,10 @@
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
+
+// dimhotepus: Fix spam in HL2:DM logs about fov_desired is not found.
+ConVar fov_desired( "fov_desired", "75", FCVAR_ARCHIVE | FCVAR_USERINFO, "Sets the base field-of-view.", true, 75.0, true, MAX_FOV );
+
 //-----------------------------------------------------------------------------
 // Globals
 //-----------------------------------------------------------------------------
