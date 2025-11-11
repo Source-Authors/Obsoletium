@@ -273,7 +273,7 @@ void CBaseGamesPage::PerformLayout()
 
 	if ( SupportsItem(IGameList::ADDSERVER) )
 	{
-// 		m_pFilterString->SetWide( 90 ); // shrink the filter label to fix the add current server button
+// 		m_pFilterString->SetWide( QuickScaleProp( 90 ) ); // shrink the filter label to fix the add current server button
 		m_pAddServer->SetVisible(true);
 	}
 	else
