@@ -540,16 +540,17 @@ bool CBaseGameStats::UploadStatsFileNOW( void )
 		return false;
 	}
 
-	double curtime = Plat_FloatTime();
-
-	CBGSDriver.m_tLastUpload = curtime;
+	// dimhotepus: Use 64 bit time_t.
+	time_t now;
+	time(&now);
+	CBGSDriver.m_tLastUpload = now;
 
 	// Update the registry
 #ifndef SWDS
-	IRegistry *reg = InstanceRegistry( "Steam" );
+	auto reg = InstanceRegistry( "Steam" );
 	Assert( reg );
-	reg->WriteInt( GetStatUploadRegistryKeyName(), CBGSDriver.m_tLastUpload );
-	ReleaseInstancedRegistry( reg );
+	// dimhotepus: Use 64 bit time_t.
+	reg->WriteInt64( GetStatUploadRegistryKeyName(), CBGSDriver.m_tLastUpload );
 #endif
 
 	CUtlBuffer buf;
@@ -713,10 +714,10 @@ bool CBaseGameStats_Driver::Init()
 	{
 		// FIXME: Load m_tLastUpload from registry and save it back out, too
 #ifndef SWDS
-		IRegistry *reg = InstanceRegistry( "Steam" );
+		auto reg = InstanceRegistry( "Steam" );
 		Assert( reg );
-		m_tLastUpload = reg->ReadInt( gamestats->GetStatUploadRegistryKeyName(), 0 );
-		ReleaseInstancedRegistry( reg );
+		// dimhotepus: Use 64 bit time_t.
+		m_tLastUpload = reg->ReadInt64( gamestats->GetStatUploadRegistryKeyName(), 0 );
 #endif
 		//load existing stats
 		gamestats->LoadFromFile();

@@ -14,7 +14,7 @@
 #include "tier0/dbg.h"
 #include "tier1/strtools.h"
 
-#if defined(WIN32) && !defined(_X360)
+#if defined(WIN32)
 #include "winlite.h"
 #endif
 
@@ -27,24 +27,30 @@
 class CRegistry : public IRegistry
 {
 public:
-							CRegistry( void );
-	virtual					~CRegistry( void );
+	CRegistry();
+	virtual	~CRegistry();
 
-	virtual bool			Init( const char *platformName );
-	virtual bool			DirectInit( const char *subDirectoryUnderValve );
-	virtual void			Shutdown( void );
+	bool			Init( const char *platformName ) override;
+	bool			DirectInit( const char *subDirectoryUnderValve );
+	void			Shutdown() override;
 	
-	virtual int				ReadInt( const char *key, int defaultValue = 0);
-	virtual void			WriteInt( const char *key, int value );
+	int				ReadInt( const char *key, int defaultValue = 0) override;
+	void			WriteInt( const char *key, int value ) override;
 
-	virtual const char		*ReadString( const char *key, const char *defaultValue = NULL );
-	virtual void			WriteString( const char *key, const char *value );
+	const char		*ReadString( const char *key, const char *defaultValue = nullptr ) override;
+	void			WriteString( const char *key, const char *value ) override;
 
 	// Read/write helper methods
-	virtual int				ReadInt( const char *pKeyBase, const char *pKey, int defaultValue = 0 );
-	virtual void			WriteInt( const char *pKeyBase, const char *key, int value );
-	virtual const char		*ReadString( const char *pKeyBase, const char *key, const char *defaultValue );
-	virtual void			WriteString( const char *pKeyBase, const char *key, const char *value );
+	int				ReadInt( const char *pKeyBase, const char *pKey, int defaultValue = 0 ) override;
+	void			WriteInt( const char *pKeyBase, const char *key, int value ) override;
+	const char		*ReadString( const char *pKeyBase, const char *key, const char *defaultValue ) override;
+	void			WriteString( const char *pKeyBase, const char *key, const char *value ) override;
+
+	// dimhotepus:
+
+	// Read/write 64 bit integers
+	int64			ReadInt64( const char *key, int64 defaultValue = 0 ) override;
+	void			WriteInt64( const char *key, int64 value ) override;
 
 private:
 	bool			m_bValid;
@@ -54,29 +60,16 @@ private:
 };
 
 // Creates it and calls Init
-IRegistry *InstanceRegistry( char const *subDirectoryUnderValve )
+std::unique_ptr<IRegistry, RegistryDeleter> InstanceRegistry( char const *subDirectoryUnderValve )
 {
-	CRegistry *instance = new CRegistry();
+	auto *instance = new CRegistry();
 	instance->DirectInit( subDirectoryUnderValve );
-	return instance;
-}
-
-// Calls Shutdown and deletes it
-void ReleaseInstancedRegistry( IRegistry *reg )
-{
-	if ( !reg )
-	{
-		AssertMsg( false, "ReleaseInstancedRegistry( reg == NULL )!" );
-		return;
-	}
-
-	reg->Shutdown();
-	delete reg;
+	return std::unique_ptr<IRegistry, RegistryDeleter>( instance );
 }
 
 // Expose to launcher
 static CRegistry g_Registry;
-IRegistry *registry = ( IRegistry * )&g_Registry;
+IRegistry *registry = &g_Registry;
 
 //-----------------------------------------------------------------------------
 // Read/write helper methods
@@ -122,7 +115,7 @@ void CRegistry::WriteString( const char *pKeyBase, const char *pKey, const char 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CRegistry::CRegistry( void )
+CRegistry::CRegistry()
 {
 	// Assume failure
 	m_bValid	= false;
@@ -132,7 +125,7 @@ CRegistry::CRegistry( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CRegistry::~CRegistry( void )
+CRegistry::~CRegistry()
 {
 }
 
@@ -144,9 +137,7 @@ CRegistry::~CRegistry( void )
 //-----------------------------------------------------------------------------
 int CRegistry::ReadInt( const char *key, int defaultValue /*= 0*/ )
 {
-	LONG lResult;           // Registry function result code
 	DWORD dwType;           // Type of key
-	DWORD dwSize;           // Size of element data
 
 	int value;
 
@@ -155,9 +146,9 @@ int CRegistry::ReadInt( const char *key, int defaultValue /*= 0*/ )
 		return defaultValue;
 	}
 
-	dwSize = sizeof( DWORD );
+	DWORD dwSize = sizeof( value );
 
-	lResult = VCRHook_RegQueryValueEx(
+	LONG lResult = VCRHook_RegQueryValueEx(
 		m_hKey,		// handle to key
 		key,	// value name
 		0,			// reserved
@@ -181,15 +172,12 @@ int CRegistry::ReadInt( const char *key, int defaultValue /*= 0*/ )
 //-----------------------------------------------------------------------------
 void CRegistry::WriteInt( const char *key, int value )
 {
-	// Size of element data
-	DWORD dwSize;           
-
 	if ( !m_bValid )
 	{
 		return;
 	}
 
-	dwSize = sizeof( DWORD );
+	constexpr DWORD dwSize = sizeof( value );
 
 	VCRHook_RegSetValueEx(
 		m_hKey,		// handle to key
@@ -208,7 +196,6 @@ void CRegistry::WriteInt( const char *key, int value )
 //-----------------------------------------------------------------------------
 const char *CRegistry::ReadString( const char *key, const char *defaultValue /* = NULL */ )
 {
-	LONG lResult;        
 	// Type of key
 	DWORD dwType;        
 	// Size of element data
@@ -223,7 +210,7 @@ const char *CRegistry::ReadString( const char *key, const char *defaultValue /* 
 		return defaultValue;
 	}
 
-	lResult = VCRHook_RegQueryValueEx(
+	LONG lResult = VCRHook_RegQueryValueEx(
 		m_hKey,		// handle to key
 		key,	// value name
 		0,			// reserved
@@ -251,14 +238,12 @@ const char *CRegistry::ReadString( const char *key, const char *defaultValue /* 
 //-----------------------------------------------------------------------------
 void CRegistry::WriteString( const char *key, const char *value )
 {
-	DWORD dwSize;           // Size of element data
-
 	if ( !m_bValid )
 	{
 		return;
 	}
 
-	dwSize = (DWORD)( strlen( value ) + 1 );
+	DWORD dwSize = (DWORD)(strlen(value) + 1);
 
 	VCRHook_RegSetValueEx(
 		m_hKey,		// handle to key
@@ -274,13 +259,12 @@ void CRegistry::WriteString( const char *key, const char *value )
 
 bool CRegistry::DirectInit( const char *subDirectoryUnderValve )
 {
-	LONG lResult;           // Registry function result code
 	ULONG dwDisposition;    // Type of key opening event
 
 	char szModelKey[ 1024 ];
-	sprintf_s( szModelKey, "Software\\Valve\\%s", subDirectoryUnderValve );
+	V_sprintf_safe( szModelKey, "Software\\Valve\\%s", subDirectoryUnderValve );
 
-	lResult = VCRHook_RegCreateKeyEx(
+	LONG lResult = VCRHook_RegCreateKeyEx(
 		HKEY_CURRENT_USER,	// handle of open key 
 		szModelKey,			// address of name of subkey to open 
 		0ul,					// DWORD ulOptions,	  // reserved 
@@ -308,14 +292,14 @@ bool CRegistry::DirectInit( const char *subDirectoryUnderValve )
 bool CRegistry::Init( const char *platformName )
 {
 	char subDir[ 512 ];
-	sprintf_s( subDir, "%s\\Settings", platformName );
+	V_sprintf_safe( subDir, "%s\\Settings", platformName );
 	return DirectInit( subDir );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CRegistry::Shutdown( void )
+void CRegistry::Shutdown()
 {
 	if ( !m_bValid )
 		return;
@@ -323,6 +307,54 @@ void CRegistry::Shutdown( void )
 	// Make invalid
 	m_bValid = false;
 	VCRHook_RegCloseKey( m_hKey );
+}
+
+int64 CRegistry::ReadInt64( const char* key, int64 defaultValue )
+{
+	DWORD dwType;           // Type of key
+
+	int64 value;
+
+	if ( !m_bValid )
+	{
+		return defaultValue;
+	}
+
+	DWORD dwSize = sizeof( value );
+
+	LONG lResult = VCRHook_RegQueryValueEx(
+		m_hKey,		// handle to key
+		key,	// value name
+		0,			// reserved
+		&dwType,    // type buffer
+		(LPBYTE)&value,    // data buffer
+		&dwSize );  // size of data buffer
+
+	if (lResult != ERROR_SUCCESS)  // Failure
+		return defaultValue;
+
+	if (dwType != REG_QWORD)
+		return defaultValue;
+
+	return value;
+}
+
+void CRegistry::WriteInt64( const char* key, int64 value )
+{
+	if ( !m_bValid )
+	{
+		return;
+	}
+
+	constexpr DWORD dwSize = sizeof( value );
+
+	VCRHook_RegSetValueEx(
+		m_hKey,		// handle to key
+		key,	// value name
+		0,			// reserved
+		REG_QWORD,		// type buffer
+		(LPBYTE)&value,    // data buffer
+		dwSize );  // size of data buffer
 }
 
 #else
@@ -335,7 +367,7 @@ void CRegistry::Shutdown( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CRegistry::CRegistry( void )
+CRegistry::CRegistry()
 {
 	// Assume failure
 	m_bValid	= false;
@@ -344,7 +376,7 @@ CRegistry::CRegistry( void )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-CRegistry::~CRegistry( void )
+CRegistry::~CRegistry()
 {
 }
 
@@ -365,6 +397,15 @@ int CRegistry::ReadInt( const char *key, int defaultValue /*= 0*/ )
 //			value - 
 //-----------------------------------------------------------------------------
 void CRegistry::WriteInt( const char *key, int value )
+{
+}
+
+int64 CRegistry::ReadInt64( const char* key, int64 defaultValue )
+{
+	return 0;
+}
+
+void CRegistry::WriteInt64( const char* key, int64 value )
 {
 }
 
@@ -402,14 +443,14 @@ bool CRegistry::DirectInit( const char *subDirectoryUnderValve )
 bool CRegistry::Init( const char *platformName )
 {
 	char subDir[ 512 ];
-	snprintf( subDir, sizeof(subDir), "%s\\Settings", platformName );
+	V_sprintf_safe( subDir, "%s\\Settings", platformName );
 	return DirectInit( subDir );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CRegistry::Shutdown( void )
+void CRegistry::Shutdown()
 {
 	if ( !m_bValid )
 		return;

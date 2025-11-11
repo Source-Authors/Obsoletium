@@ -350,13 +350,11 @@ public:
 #ifdef SWDS
 		return true;
 #else
-		IRegistry *temp = InstanceRegistry( "Steam" );
+		auto temp = InstanceRegistry( "Steam" );
 		Assert( temp );
 		// Check registry
 		int iDisable = temp->ReadInt( "DisableGameStats", 0 );
 		
-		ReleaseInstancedRegistry( temp );
-
 		if ( iDisable != 0 )
 		{
 			return false;
@@ -374,7 +372,7 @@ public:
 		Q_memset( buf, 0, bufsize );
 
 #ifndef SWDS
-		IRegistry *temp = InstanceRegistry( "Steam" );
+		auto temp = InstanceRegistry( "Steam" );
 		Assert( temp );
 		// Check registry
 		char const *uuid = temp->ReadString( "PseudoUUID", "" );
@@ -438,9 +436,7 @@ public:
 		{
 			Q_strncpy( buf, uuid, bufsize );
 		}
-
-	    ReleaseInstancedRegistry( temp );
-#endif		
+#endif
 
 		if ( ( buf[0] == 0 ) && sv.IsDedicated() )
 		{

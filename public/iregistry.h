@@ -4,13 +4,13 @@
 //
 // $NoKeywords: $
 //===========================================================================//
-#if !defined( UTIL_REGISTRY_H )
+#ifndef UTIL_REGISTRY_H
 #define UTIL_REGISTRY_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-#include "tier0/platform.h"
+#include "tier0/basetypes.h"
+#include "tier0/commonmacros.h"
+
+#include <memory>
 
 
 //-----------------------------------------------------------------------------
@@ -40,13 +40,22 @@ public:
 	virtual void			WriteInt( const char *pKeyBase, const char *key, int value ) = 0;
 	virtual const char		*ReadString( const char *pKeyBase, const char *key, const char *defaultValue ) = 0;
 	virtual void			WriteString( const char *pKeyBase, const char *key, const char *value ) = 0;
+
+	// dimhotepus: Extended APIs below.
+	
+	// Read/write 64 bit integers
+	virtual int64			ReadInt64( const char *key, int64 defaultValue = 0 ) = 0;
+	virtual void			WriteInt64( const char *key, int64 value ) = 0;
 };
 
 extern IRegistry *registry;
 
-// Creates it and calls Init
-IRegistry *InstanceRegistry( char const *subDirectoryUnderValve );
-// Calls Shutdown and deletes it
-void ReleaseInstancedRegistry( IRegistry *reg );
+struct RegistryDeleter
+{
+	void operator()(IRegistry *r) { r->Shutdown(); }
+};
 
-#endif // UTIL_REGISTRY_H
+// Creates it and calls Init
+std::unique_ptr<IRegistry, RegistryDeleter> InstanceRegistry( char const *subDirectoryUnderValve );
+
+#endif  // UTIL_REGISTRY_H
