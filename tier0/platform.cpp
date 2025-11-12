@@ -374,7 +374,7 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 	// dimhotepus: Since Windows 11 21H1 (22000)
 	// DWM has DWMWA_USE_IMMERSIVE_DARK_MODE & DWMWA_SYSTEMBACKDROP_TYPE.
 #if defined(WDK_NTDDI_VERSION) && (WDK_NTDDI_VERSION >= NTDDI_WIN11_ZN)
-	// Detect current app  window text is light or dark and apply Dark mode.
+	// Detect current app window text is light or dark and apply Dark mode.
 	const BOOL enableDarkMode{ShouldAppUseLightTheme() ? FALSE : TRUE};
 	HRESULT hr{::DwmSetWindowAttribute(static_cast<HWND>(window),
 		DWMWA_USE_IMMERSIVE_DARK_MODE, &enableDarkMode, sizeof(enableDarkMode))};
