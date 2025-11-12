@@ -735,9 +735,6 @@ void C_WeaponStunStick::DrawThirdPersonEffects( void )
 		// Update our effects
 		if ( gpGlobals->frametime != 0.0f && ( random->RandomInt( 0, 5 ) == 0 ) )
 		{
-			Vector	vecOrigin;
-			QAngle	vecAngles;
-
 			GetAttachment( 1, vecOrigin, vecAngles );
 
 			Vector	vForward;
