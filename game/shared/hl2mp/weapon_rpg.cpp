@@ -45,7 +45,8 @@
 const char *g_pLaserDotThink = "LaserThinkContext";
 
 static ConVar sk_apc_missile_damage("sk_apc_missile_damage", "15");
-#define APC_MISSILE_DAMAGE	sk_apc_missile_damage.GetFloat()
+// dimhotepus: GetFloat -> GetInt as magnitude is int.
+#define APC_MISSILE_DAMAGE	sk_apc_missile_damage.GetInt()
 
 #endif
 
