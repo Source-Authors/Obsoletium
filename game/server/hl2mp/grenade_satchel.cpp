@@ -192,7 +192,7 @@ void CSatchelCharge::BounceSound( void )
 {
 	if (gpGlobals->curtime > m_flNextBounceSoundTime)
 	{
-		m_flNextBounceSoundTime = gpGlobals->curtime + 0.1;
+		m_flNextBounceSoundTime = gpGlobals->curtime + 0.1f;
 	}
 }
 

@@ -73,10 +73,10 @@ void CTripmineGrenade::Spawn( void )
 	
 	UTIL_SetSize(this, Vector( -4, -4, -2), Vector(4, 4, 2));
 
-	m_flPowerUp = gpGlobals->curtime + 2.0;
+	m_flPowerUp = gpGlobals->curtime + 2.0f;
 	
 	SetThink( &CTripmineGrenade::PowerupThink );
-	SetNextThink( gpGlobals->curtime + 0.2 );
+	SetNextThink( gpGlobals->curtime + 0.2f );
 
 	m_takedamage		= DAMAGE_YES;
 
@@ -173,10 +173,10 @@ void CTripmineGrenade::MakeBeam( void )
 
 	Vector vecTmpEnd = GetLocalOrigin() + m_vecDir * 2048 * drawLength;
 
-	m_pBeam = CBeam::BeamCreate( g_pModelNameLaser, 0.35 );
+	m_pBeam = CBeam::BeamCreate( g_pModelNameLaser, 0.35f );
 	m_pBeam->PointEntInit( vecTmpEnd, this );
 	m_pBeam->SetColor( 255, 55, 52 );
-	m_pBeam->SetScrollRate( 25.6 );
+	m_pBeam->SetScrollRate( 25.6f );
 	m_pBeam->SetBrightness( 64 );
 	
 	int beamAttach = LookupAttachment("beam_attach");
@@ -255,7 +255,7 @@ void CTripmineGrenade::Event_Killed( const CTakeDamageInfo &info )
 	m_takedamage		= DAMAGE_NO;
 
 	SetThink( &CTripmineGrenade::DelayDeathThink );
-	SetNextThink( gpGlobals->curtime + 0.25 );
+	SetNextThink( gpGlobals->curtime + 0.25f );
 
 	EmitSound( "TripmineGrenade.StopSound" );
 }
@@ -266,7 +266,7 @@ void CTripmineGrenade::DelayDeathThink( void )
 	KillBeam();
 	trace_t tr;
 	UTIL_TraceLine ( GetAbsOrigin() + m_vecDir * 8, GetAbsOrigin() - m_vecDir * 64,  MASK_SOLID, this, COLLISION_GROUP_NONE, & tr);
-	UTIL_ScreenShake( GetAbsOrigin(), 25.0, 150.0, 1.0, 750, SHAKE_START );
+	UTIL_ScreenShake( GetAbsOrigin(), 25.0f, 150.0f, 1.0f, 750, SHAKE_START );
 
 	ExplosionCreate( GetAbsOrigin() + m_vecDir * 8, GetAbsAngles(), m_hOwner, GetDamage(), 200, 
 		SF_ENVEXPLOSION_NOSPARKS | SF_ENVEXPLOSION_NODLIGHTS | SF_ENVEXPLOSION_NOSMOKE, 0.0f, this);

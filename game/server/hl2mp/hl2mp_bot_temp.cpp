@@ -101,7 +101,7 @@ CBasePlayer *BotPutInServer( bool bFrozen, int iTeam )
 	BotNumber++;
 
 	g_BotData[pPlayer->entindex()-1].m_WantedTeam = iTeam;
-	g_BotData[pPlayer->entindex()-1].m_flJoinTeamTime = gpGlobals->curtime + 0.3;
+	g_BotData[pPlayer->entindex()-1].m_flJoinTeamTime = gpGlobals->curtime + 0.3f;
 
 	return pPlayer;
 }
@@ -234,10 +234,10 @@ void Bot_Think( CHL2MP_Player *pBot )
 		{
 			if ( pBot->m_iHealth == 100 )
 			{
-				forwardmove = 600 * ( botdata->backwards ? -1 : 1 );
+				forwardmove = botdata->backwards ? -600.f : 600.0f;
 				if ( botdata->sidemove != 0.0f )
 				{
-					forwardmove *= random->RandomFloat( 0.1, 1.0f );
+					forwardmove *= random->RandomFloat( 0.1f, 1.0f );
 				}
 			}
 			else
@@ -291,7 +291,7 @@ void Bot_Think( CHL2MP_Player *pBot )
 				else if ( angle.y < -180 )
 					angle.y += 360;
 
-				botdata->nextturntime = gpGlobals->curtime + 2.0;
+				botdata->nextturntime = gpGlobals->curtime + 2.0f;
 				botdata->lastturntoright = random->RandomInt( 0, 1 ) == 0 ? true : false;
 
 				botdata->forwardAngle = angle;
