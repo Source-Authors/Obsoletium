@@ -1267,6 +1267,13 @@ COptionsSubVideo::COptionsSubVideo(vgui::Panel *parent) : PropertyPage(parent, N
 
 	LoadControlSettings("Resource\\OptionsSubVideo.res");
 
+	{
+		// dimhotepus: HL2:DM missed HUD aspect ratio combobox. Hide it.
+		int x, y;
+		m_pHUDAspectRatio->GetPos(x, y);
+		m_pHUDAspectRatio->SetVisible( x != 0 && y != 0 );
+	}
+
 	// Moved down here so we can set the Drop down's
 	// menu state after the default (disabled) value is loaded
 	PrepareResolutionList();
