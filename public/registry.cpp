@@ -7,8 +7,6 @@
 
 #include "iregistry.h"
 
-#include <cstdio>
-
 #include "tier0/platform.h"
 #include "tier0/vcrmode.h"
 #include "tier0/dbg.h"
@@ -49,8 +47,8 @@ public:
 	// dimhotepus:
 
 	// Read/write 64 bit integers
-	int64			ReadInt64( const char *key, int64 defaultValue = 0 ) override;
-	void			WriteInt64( const char *key, int64 value ) override;
+	int64_t			ReadInt64( const char *key, int64_t defaultValue = 0 ) override;
+	void			WriteInt64( const char *key, int64_t value ) override;
 
 private:
 	bool			m_bValid;
@@ -309,11 +307,11 @@ void CRegistry::Shutdown()
 	VCRHook_RegCloseKey( m_hKey );
 }
 
-int64 CRegistry::ReadInt64( const char* key, int64 defaultValue )
+int64_t CRegistry::ReadInt64( const char* key, int64_t defaultValue )
 {
 	DWORD dwType;           // Type of key
 
-	int64 value;
+	int64_t value;
 
 	if ( !m_bValid )
 	{
@@ -339,7 +337,7 @@ int64 CRegistry::ReadInt64( const char* key, int64 defaultValue )
 	return value;
 }
 
-void CRegistry::WriteInt64( const char* key, int64 value )
+void CRegistry::WriteInt64( const char* key, int64_t value )
 {
 	if ( !m_bValid )
 	{
@@ -400,12 +398,12 @@ void CRegistry::WriteInt( const char *key, int value )
 {
 }
 
-int64 CRegistry::ReadInt64( const char* key, int64 defaultValue )
+int64_t CRegistry::ReadInt64( const char* key, int64_t defaultValue )
 {
 	return 0;
 }
 
-void CRegistry::WriteInt64( const char* key, int64 value )
+void CRegistry::WriteInt64( const char* key, int64_t value )
 {
 }
 

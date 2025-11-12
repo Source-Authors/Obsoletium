@@ -7,10 +7,10 @@
 #ifndef UTIL_REGISTRY_H
 #define UTIL_REGISTRY_H
 
-#include "tier0/basetypes.h"
-#include "tier0/commonmacros.h"
-
+#include <cstdint>
 #include <memory>
+
+#include "tier0/commonmacros.h"
 
 
 //-----------------------------------------------------------------------------
@@ -44,8 +44,8 @@ public:
 	// dimhotepus: Extended APIs below.
 	
 	// Read/write 64 bit integers
-	virtual int64			ReadInt64( const char *key, int64 defaultValue = 0 ) = 0;
-	virtual void			WriteInt64( const char *key, int64 value ) = 0;
+	virtual int64_t			ReadInt64( const char *key, int64_t defaultValue = 0 ) = 0;
+	virtual void			WriteInt64( const char *key, int64_t value ) = 0;
 };
 
 extern IRegistry *registry;
