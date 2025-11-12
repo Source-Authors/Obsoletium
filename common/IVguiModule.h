@@ -22,11 +22,11 @@ abstract_class IVGuiModule : public IBaseInterface
 public:
 	// called first to setup the module with the vgui
 	// returns true on success, false on failure
-	virtual bool Initialize(CreateInterfaceFn *vguiFactories, int factoryCount) = 0;
+	virtual bool Initialize(CreateInterfaceFn *vguiFactories, intp factoryCount) = 0;
 
 	// called after all the modules have been initialized
 	// modules should use this time to link to all the other module interfaces
-	virtual bool PostInitialize(CreateInterfaceFn *modules, int factoryCount) = 0;
+	virtual bool PostInitialize(CreateInterfaceFn *modules, intp factoryCount) = 0;
 
 	// called when the module is selected from the menu or otherwise activated
 	virtual bool Activate() = 0;

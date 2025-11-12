@@ -47,7 +47,7 @@ CAdminServer::~CAdminServer()
 //-----------------------------------------------------------------------------
 // Purpose: links to vgui and engine interfaces
 //-----------------------------------------------------------------------------
-bool CAdminServer::Initialize(CreateInterfaceFn *factorylist, int factoryCount)
+bool CAdminServer::Initialize(CreateInterfaceFn *factorylist, intp factoryCount)
 {
 	ConnectTier1Libraries( factorylist, factoryCount );
 	ConVar_Register();
@@ -55,7 +55,7 @@ bool CAdminServer::Initialize(CreateInterfaceFn *factorylist, int factoryCount)
 	ConnectTier3Libraries( factorylist, factoryCount );
 
 	// find our interfaces
-	for (int i = 0; i < factoryCount; i++)
+	for (intp i = 0; i < factoryCount; i++)
 	{
 		// if we're running locally we can get this direct interface to the game engine
 		if (!g_pGameServerData)
@@ -83,7 +83,7 @@ bool CAdminServer::Initialize(CreateInterfaceFn *factorylist, int factoryCount)
 //-----------------------------------------------------------------------------
 // Purpose: links to other modules interfaces (tracker)
 //-----------------------------------------------------------------------------
-bool CAdminServer::PostInitialize(CreateInterfaceFn *modules, int factoryCount)
+bool CAdminServer::PostInitialize(CreateInterfaceFn *modules, intp factoryCount)
 {
 	return true;
 }

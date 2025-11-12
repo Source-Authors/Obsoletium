@@ -28,8 +28,8 @@ public:
 	virtual ~CAdminServer();
 
 	// IVGui module implementation
-	bool Initialize(CreateInterfaceFn *factorylist, int numFactories) override;
-	bool PostInitialize(CreateInterfaceFn *modules, int factoryCount) override;
+	bool Initialize(CreateInterfaceFn *factorylist, intp numFactories) override;
+	bool PostInitialize(CreateInterfaceFn *modules, intp factoryCount) override;
 	vgui::VPANEL GetPanel() override;
 	bool Activate() override;
 	bool IsValid() override;

@@ -63,7 +63,7 @@ void CServerBrowser::CreateDialog()
 //-----------------------------------------------------------------------------
 // Purpose: links to vgui and engine interfaces
 //-----------------------------------------------------------------------------
-bool CServerBrowser::Initialize(CreateInterfaceFn *factorylist, int factoryCount)
+bool CServerBrowser::Initialize(CreateInterfaceFn *factorylist, intp factoryCount)
 {
 	ConnectTier1Libraries( factorylist, factoryCount );
 	ConVar_Register();
@@ -71,7 +71,7 @@ bool CServerBrowser::Initialize(CreateInterfaceFn *factorylist, int factoryCount
 	ConnectTier3Libraries( factorylist, factoryCount );
 	g_pRunGameEngine = NULL;
 
-	for ( int i = 0; i < factoryCount; ++i )
+	for ( intp i = 0; i < factoryCount; ++i )
 	{
 		if ( !g_pEngineReplay )
 		{
@@ -86,7 +86,7 @@ bool CServerBrowser::Initialize(CreateInterfaceFn *factorylist, int factoryCount
 	steamapicontext->Init();
 #endif
 
-	for (int i = 0; i < factoryCount; i++)
+	for (intp i = 0; i < factoryCount; i++)
 	{
 		if (!g_pRunGameEngine)
 		{
@@ -111,10 +111,10 @@ bool CServerBrowser::Initialize(CreateInterfaceFn *factorylist, int factoryCount
 //-----------------------------------------------------------------------------
 // Purpose: links to other modules interfaces (tracker)
 //-----------------------------------------------------------------------------
-bool CServerBrowser::PostInitialize(CreateInterfaceFn *modules, int factoryCount)
+bool CServerBrowser::PostInitialize(CreateInterfaceFn *modules, intp factoryCount)
 {
 	// find the interfaces we need
-	for (int i = 0; i < factoryCount; i++)
+	for (intp i = 0; i < factoryCount; i++)
 	{
 		if (!g_pRunGameEngine)
 		{
