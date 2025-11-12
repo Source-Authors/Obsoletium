@@ -557,8 +557,7 @@ Activity CPlayerAnimState::BodyYawTranslateActivity( Activity activity )
 		return mp_ik.GetBool() ? ACT_TURN : activity;
 	}
 
-	Assert( 0 );
-	return activity;
+	unreachable();
 }
 
 const QAngle& CPlayerAnimState::GetRenderAngles()

@@ -265,9 +265,9 @@ float CHL2MPRules::FlWeaponRespawnTime( CBaseCombatWeapon *pWeapon )
 	}
 
 	return sv_hl2mp_weapon_respawn_time.GetFloat();
-#endif
-
+#else
 	return 0;		// weapon respawns almost instantly
+#endif
 }
 
 
@@ -275,9 +275,9 @@ bool CHL2MPRules::IsIntermission( void )
 {
 #ifndef CLIENT_DLL
 	return m_flIntermissionEndTime > gpGlobals->curtime;
-#endif
-
+#else
 	return false;
+#endif
 }
 
 void CHL2MPRules::PlayerKilled( CBasePlayer *pVictim, const CTakeDamageInfo &info )
