@@ -164,7 +164,7 @@ static LRESULT CALLBACK MatSurfaceWindowProc( HWND hwnd, UINT uMsg, WPARAM wPara
 			for ( int i = 0; i < nKeyRepeat; ++i )
 			{
 				event.m_nType = IE_KeyCodeTyped;
-				event.m_nData = KeyCode_VirtualKeyToVGUI( wParam );
+				event.m_nData = KeyCode_VirtualKeyToVGUI( static_cast<int>( wParam ) );
 				g_pInputSystem->PostUserEvent( event );
 			}
 
