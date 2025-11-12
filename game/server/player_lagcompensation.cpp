@@ -341,9 +341,9 @@ void CLagCompensationManager::FrameUpdatePostEntityThink()
 		record.m_masterSequence = pPlayer->GetSequence();
 		record.m_masterCycle = pPlayer->GetCycle();
 
-		for( int i=0; i<MAXSTUDIOPOSEPARAM; i++ )
+		for( int j=0; j<MAXSTUDIOPOSEPARAM; j++ )
 		{
-			record.m_flPoseParameters[i] = pPlayer->GetPoseParameter(i);
+			record.m_flPoseParameters[j] = pPlayer->GetPoseParameter(j);
 		}
 	}
 
@@ -873,9 +873,9 @@ void CLagCompensationManager::FinishLagCompensation( CBasePlayer *player )
 				}
 			}
 
-			for( int i=0; i<MAXSTUDIOPOSEPARAM; i++ )
+			for( int j=0; j<MAXSTUDIOPOSEPARAM; j++ )
 			{
-				pPlayer->SetPoseParameter( i, restore->m_flPoseParameters[i] );
+				pPlayer->SetPoseParameter( j, restore->m_flPoseParameters[j] );
 			}
 		}
 
