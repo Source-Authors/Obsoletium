@@ -220,7 +220,7 @@ float AssignRangeMultiplier( int nBits, double range )
 	{
 		// Squeeze it down smaller and smaller until it's going to produce an integer
 		// in the valid range when given the highest value.
-		float multipliers[] = { 0.9999, 0.99, 0.9, 0.8, 0.7 };
+		float multipliers[] = { 0.9999f, 0.99f, 0.9f, 0.8f, 0.7f };
 		size_t i;
 		for ( i=0; i < std::size( multipliers ); i++ )
 		{
