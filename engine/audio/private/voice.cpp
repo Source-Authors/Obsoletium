@@ -18,11 +18,9 @@
 #include "ivoicerecord.h"
 #include "ivoicecodec.h"
 #include "filesystem.h"
+#include "traceinit.h"
 #include "../../filesystem_engine.h"
 #include "tier1/utlbuffer.h"
-#if defined( _X360 )
-#include "xauddefs.h"
-#endif
 
 // dimhotepus: NO_STEAM
 #ifndef NO_STEAM
@@ -719,7 +717,8 @@ bool Voice_Init( const char *pCodecName, int nSampleRate )
 
 	// XXX(JohnS): These don't do much in Steam codec mode, but code below uses their presence to mean 'voice fully
 	//             initialized' and other things assume they will succeed.
-	InitMixerControls();
+	// dimhotepus: Use trace init as we expect trace shutdown for one.
+	TRACEINIT( InitMixerControls(), ShutdownMixerControls() );
 
 	// Steam mode uses steam for raw input so this isn't meaningful and could have side-effects
 	if( voice_forcemicrecord.GetInt() && !bSteam )
@@ -1476,7 +1475,8 @@ int VoiceTweak_StartVoiceTweakMode()
 	Voice_RecordStart(NULL, NULL, NULL);
 	Voice_AssignChannel(TWEAKMODE_ENTITYINDEX, false );
 	g_bInTweakMode = true;
-	InitMixerControls();
+	// dimhotepus: Use trace init as we expect trace shutdown for one.
+	TRACEINIT( InitMixerControls(), ShutdownMixerControls() );
 
 	return 1;
 }

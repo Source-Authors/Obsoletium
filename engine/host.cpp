@@ -3558,9 +3558,6 @@ void Host_Init( bool bDedicated )
 	TRACEINIT( Filter_Init(), Filter_Shutdown() );
 
 #ifndef SWDS
-#ifndef _X360
-	TRACEINIT( InitMixerControls(), ShutdownMixerControls() );
-#endif
 
 	TRACEINIT( Key_Init(), Key_Shutdown() );
 #endif
