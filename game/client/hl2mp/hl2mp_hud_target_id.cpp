@@ -216,7 +216,7 @@ void CTargetID::Paint()
 			vgui::surface()->DrawSetTextFont( m_hFont );
 			vgui::surface()->DrawSetTextPos( xpos, ypos );
 			vgui::surface()->DrawSetTextColor( c );
-			vgui::surface()->DrawPrintText( sIDString, wcslen(sIDString) );
+			vgui::surface()->DrawPrintText( sIDString, V_wcslen(sIDString) );
 		}
 	}
 }
