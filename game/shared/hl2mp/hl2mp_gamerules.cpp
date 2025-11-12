@@ -502,11 +502,11 @@ bool GetObjectsOriginalParameters( CBaseEntity *pObject, Vector &vOriginalOrigin
 
 void CHL2MPRules::ManageObjectRelocation( void )
 {
-	int iTotal = m_hRespawnableItemsAndWeapons.Count();
+	intp iTotal = m_hRespawnableItemsAndWeapons.Count();
 
 	if ( iTotal > 0 )
 	{
-		for ( int i = 0; i < iTotal; i++ )
+		for ( intp i = 0; i < iTotal; i++ )
 		{
 			CBaseEntity *pObject = m_hRespawnableItemsAndWeapons[i].Get();
 			
