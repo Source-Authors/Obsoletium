@@ -191,19 +191,6 @@ static QAngle AlignAngles( const QAngle &angles, float cosineAlignAngle )
 }
 
 
-static void TraceCollideAgainstBBox( const CPhysCollide *pCollide, const Vector &start, const Vector &end, const QAngle &angles, const Vector &boxOrigin, const Vector &mins, const Vector &maxs, trace_t *ptr )
-{
-	physcollision->TraceBox( boxOrigin, boxOrigin + (start-end), mins, maxs, pCollide, start, angles, ptr );
-
-	if ( ptr->DidHit() )
-	{
-		ptr->endpos = start * (1-ptr->fraction) + end * ptr->fraction;
-		ptr->startpos = start;
-		ptr->plane.dist = -ptr->plane.dist;
-		ptr->plane.normal *= -1;
-	}
-}
-
 //-----------------------------------------------------------------------------
 // Purpose: Computes a local matrix for the player clamped to valid carry ranges
 //-----------------------------------------------------------------------------
@@ -222,6 +209,7 @@ static void TraceCollideAgainstBBox( const CPhysCollide *pCollide, const Vector 
 // player can reach down 2ft below his feet (otherwise he'll hold the object above the bottom)
 #define PLAYER_REACH_DOWN_DISTANCE	24
 
+#ifndef CLIENT_DLL
 static void ComputePlayerMatrix( CBasePlayer *pPlayer, matrix3x4_t &out )
 {
 	if ( !pPlayer )
@@ -251,6 +239,7 @@ static void ComputePlayerMatrix( CBasePlayer *pPlayer, matrix3x4_t &out )
 	angles.x = 0;
 	AngleMatrix( angles, origin, out );
 }
+#endif
 
 
 //-----------------------------------------------------------------------------
@@ -585,6 +574,7 @@ void CGrabController::AttachEntity( CBasePlayer *pPlayer, CBaseEntity *pEntity, 
 
 }
 
+#ifndef CLIENT_DLL
 static void ClampPhysicsVelocity( IPhysicsObject *pPhys, float linearLimit, float angularLimit )
 {
 	Vector vel;
@@ -598,6 +588,7 @@ static void ClampPhysicsVelocity( IPhysicsObject *pPhys, float linearLimit, floa
 	angVel *= angSpeed;
 	pPhys->AddVelocity( &vel, &angVel );
 }
+#endif
 
 void CGrabController::DetachEntity( bool bClearVelocity )
 {
