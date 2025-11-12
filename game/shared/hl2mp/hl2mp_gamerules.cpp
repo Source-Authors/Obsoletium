@@ -354,7 +354,7 @@ void CHL2MPRules::Think( void )
 	{		
 		CheckAllPlayersReady();
 		CheckRestartGame();
-		m_tmNextPeriodicThink = gpGlobals->curtime + 1.0;
+		m_tmNextPeriodicThink = gpGlobals->curtime + 1.0f;
 	}
 
 	if ( m_flRestartGameTime > 0.0f && m_flRestartGameTime <= gpGlobals->curtime )
@@ -938,11 +938,11 @@ bool CHL2MPRules::ClientCommand( CBaseEntity *pEdict, const CCommand &args )
 
 // shared ammo definition
 // JAY: Trying to make a more physical bullet response
-#define BULLET_MASS_GRAINS_TO_LB(grains)	(0.002285*(grains)/16.0f)
+#define BULLET_MASS_GRAINS_TO_LB(grains)	(0.002285f*(grains)/16.0f)
 #define BULLET_MASS_GRAINS_TO_KG(grains)	lbs2kg(BULLET_MASS_GRAINS_TO_LB(grains))
 
 // exaggerate all of the forces, but use real numbers to keep them consistent
-#define BULLET_IMPULSE_EXAGGERATION			3.5
+#define BULLET_IMPULSE_EXAGGERATION			3.5f
 // convert a velocity in ft/sec and a mass in grains to an impulse in kg in/s
 #define BULLET_IMPULSE(grains, ftpersec)	((ftpersec)*12*BULLET_MASS_GRAINS_TO_KG(grains)*BULLET_IMPULSE_EXAGGERATION)
 

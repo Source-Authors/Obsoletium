@@ -159,7 +159,7 @@ static void MatrixOrthogonalize( matrix3x4_t &matrix, int column )
 	MatrixSetColumn( columns[index2], index2, matrix );
 }
 
-#define SIGN(x) ( (x) < 0 ? -1 : 1 )
+[[nodiscard]] static constexpr inline float SIGN(float x) { return x < 0 ? -1.f : 1.f; }
 
 static QAngle AlignAngles( const QAngle &angles, float cosineAlignAngle )
 {
@@ -2164,7 +2164,7 @@ CWeaponPhysCannon::FindObjectResult_t CWeaponPhysCannon::FindObject( void )
 	float mass = PhysGetEntityMass( pEntity );
 	if ( mass < 50.0f )
 	{
-		pullDir *= (mass + 0.5) * (1/50.0f);
+		pullDir *= (mass + 0.5f) * (1/50.0f);
 	}
 
 	// Nudge it towards us
@@ -2178,7 +2178,7 @@ CBaseEntity *CWeaponPhysCannon::FindObjectInCone( const Vector &vecOrigin, const
 {
 	// Find the nearest physics-based item in a cone in front of me.
 	CBaseEntity *list[256];
-	float flNearestDist = TraceLength() + 1.0;
+	float flNearestDist = TraceLength() + 1.0f;
 	Vector mins = vecOrigin - Vector( flNearestDist, flNearestDist, flNearestDist );
 	Vector maxs = vecOrigin + Vector( flNearestDist, flNearestDist, flNearestDist );
 

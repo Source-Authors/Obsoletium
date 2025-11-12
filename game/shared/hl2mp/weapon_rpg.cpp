@@ -343,7 +343,7 @@ void CMissile::ShotDown( void )
 	SetThink( &CMissile::AugerThink );
 	SetNextThink( gpGlobals->curtime );
 	m_flAugerTime = gpGlobals->curtime + 1.5f;
-	m_flMarkDeadTime = gpGlobals->curtime + 0.75;
+	m_flMarkDeadTime = gpGlobals->curtime + 0.75f;
 
 	// Let the RPG start reloading immediately
 	if ( m_hOwner != NULL )
