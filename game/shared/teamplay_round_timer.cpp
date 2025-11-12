@@ -828,12 +828,12 @@ void CTeamRoundTimer::SetTimerThink( int nType )
 {
 	if ( nType == RT_THINK_SETUP )
 	{
-		SetContextThink( &CTeamRoundTimer::RoundTimerSetupThink, gpGlobals->curtime + 0.05, ROUND_TIMER_SETUP_THINK );
+		SetContextThink( &CTeamRoundTimer::RoundTimerSetupThink, gpGlobals->curtime + 0.05f, ROUND_TIMER_SETUP_THINK );
 		SetContextThink( NULL, 0, ROUND_TIMER_THINK );
 	}
 	else
 	{
-		SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05, ROUND_TIMER_THINK );
+		SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05f, ROUND_TIMER_THINK );
 		SetContextThink( NULL, 0, ROUND_TIMER_SETUP_THINK );
 	}
 }
@@ -855,7 +855,7 @@ void CTeamRoundTimer::RoundTimerSetupThink( void )
 
 	if ( IsDisabled() || m_bTimerPaused )
 	{
-		SetContextThink( &CTeamRoundTimer::RoundTimerSetupThink, gpGlobals->curtime + 0.05, ROUND_TIMER_SETUP_THINK );
+		SetContextThink( &CTeamRoundTimer::RoundTimerSetupThink, gpGlobals->curtime + 0.05f, ROUND_TIMER_SETUP_THINK );
 		return;
 	}
 
@@ -939,7 +939,7 @@ void CTeamRoundTimer::RoundTimerSetupThink( void )
 		m_bFire1SecRemain = false;
 	}
 
-	SetContextThink( &CTeamRoundTimer::RoundTimerSetupThink, gpGlobals->curtime + 0.05, ROUND_TIMER_SETUP_THINK );
+	SetContextThink( &CTeamRoundTimer::RoundTimerSetupThink, gpGlobals->curtime + 0.05f, ROUND_TIMER_SETUP_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -955,7 +955,7 @@ void CTeamRoundTimer::RoundTimerThink( void )
 
 	if ( IsDisabled() || m_bTimerPaused || IsInCommentaryMode() || gpGlobals->eLoadType == MapLoad_Background )
 	{
-		SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05, ROUND_TIMER_THINK );
+		SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05f, ROUND_TIMER_THINK );
 		return;
 	}
 
@@ -971,7 +971,7 @@ void CTeamRoundTimer::RoundTimerThink( void )
 			m_bPauseDueToWin = true;
 		}
 
-		SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05, ROUND_TIMER_THINK );
+		SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05f, ROUND_TIMER_THINK );
 		return;
 	}
 	else if ( m_bPauseDueToWin )
@@ -1022,7 +1022,7 @@ void CTeamRoundTimer::RoundTimerThink( void )
 #endif
 			}
 
-			SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05, ROUND_TIMER_THINK );
+			SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05f, ROUND_TIMER_THINK );
 			return;
 		}
 
@@ -1090,7 +1090,7 @@ void CTeamRoundTimer::RoundTimerThink( void )
 		m_bFire1SecRemain = false;
 	}
 
-	SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05, ROUND_TIMER_THINK );
+	SetContextThink( &CTeamRoundTimer::RoundTimerThink, gpGlobals->curtime + 0.05f, ROUND_TIMER_THINK );
 }
 
 //-----------------------------------------------------------------------------

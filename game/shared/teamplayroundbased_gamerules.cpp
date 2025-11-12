@@ -729,7 +729,7 @@ void CTeamplayRoundBasedRules::Think( void )
 		CheckRestartRound();
 		CheckWaitingForPlayers();
 
-		m_flNextPeriodicThink = gpGlobals->curtime + 1.0;
+		m_flNextPeriodicThink = gpGlobals->curtime + 1.0f;
 	}
 
 	// Watch dog for cheats ever being enabled during a level
@@ -1442,7 +1442,7 @@ void CTeamplayRoundBasedRules::State_Think_INIT( void )
 //-----------------------------------------------------------------------------
 void CTeamplayRoundBasedRules::State_Enter_PREGAME( void )
 {
-	m_flNextPeriodicThink = gpGlobals->curtime + 0.1;
+	m_flNextPeriodicThink = gpGlobals->curtime + 0.1f;
 }
 
 //-----------------------------------------------------------------------------
@@ -1504,7 +1504,7 @@ void CTeamplayRoundBasedRules::State_Enter_PREROUND( void )
 {
 	BalanceTeams( false );
 
-	m_flStartBalancingTeamsAt = gpGlobals->curtime + 60.0;
+	m_flStartBalancingTeamsAt = gpGlobals->curtime + 60.0f;
 
 	RoundRespawn();
 
