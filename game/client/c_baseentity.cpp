@@ -6349,7 +6349,7 @@ void C_BaseEntity::AddVar( void *data, IInterpolatedVar *watcher, byte type, boo
 {
 	// Only add it if it hasn't been added yet.
 	bool bAddIt = true;
-	for ( int i=0; i < m_VarMap.m_Entries.Count(); i++ )
+	for ( intp i=0; i < m_VarMap.m_Entries.Count(); i++ )
 	{
 		if ( m_VarMap.m_Entries[i].watcher == watcher )
 		{
@@ -6399,7 +6399,7 @@ void C_BaseEntity::AddVar( void *data, IInterpolatedVar *watcher, byte type, boo
 
 void C_BaseEntity::RemoveVar( void *data, bool bAssert )
 {
-	for ( int i=0; i < m_VarMap.m_Entries.Count(); i++ )
+	for ( intp i=0; i < m_VarMap.m_Entries.Count(); i++ )
 	{
 		if ( m_VarMap.m_Entries[i].data == data )
 		{
