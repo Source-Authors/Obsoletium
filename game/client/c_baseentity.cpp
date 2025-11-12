@@ -6344,8 +6344,8 @@ bool C_BaseEntity::ValidateEntityAttachedToPlayer( bool &bShouldRetry )
 }
 #endif // TF_CLIENT_DLL
 
-
-void C_BaseEntity::AddVar( void *data, IInterpolatedVar *watcher, int type, bool bSetup )
+// dimhotepus: int -> byte.
+void C_BaseEntity::AddVar( void *data, IInterpolatedVar *watcher, byte type, bool bSetup )
 {
 	// Only add it if it hasn't been added yet.
 	bool bAddIt = true;

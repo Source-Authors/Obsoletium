@@ -82,7 +82,8 @@ class VarMapEntry_t
 	
 
 public:
-	unsigned short		type;
+	// dimhotepus: unsigned short -> byte.
+	byte				type;
 	unsigned short		m_bNeedsToInterpolate;	// Set to false when this var doesn't
 												// need Interpolate() called on it anymore.
 	void				*data;
@@ -383,7 +384,8 @@ public:
 
 public:
 
-	void AddVar( void *data, IInterpolatedVar *watcher, int type, bool bSetup=false );
+	// dimhotepus: int -> byte.
+	void AddVar( void *data, IInterpolatedVar *watcher, byte type, bool bSetup=false );
 	void RemoveVar( void *data, bool bAssert=true );
 	VarMapping_t* GetVarMapping();
 
