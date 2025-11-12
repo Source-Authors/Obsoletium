@@ -578,7 +578,7 @@ static LRESULT WINAPI CallDefaultWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam
 }
 #endif
 
-#if defined( WIN32 ) && !defined( USE_SDL )
+#if defined(WIN32) && !defined(USE_SDL)
 
 [[nodiscard]] const char* GetAcLineStatusDescription(SystemPowerAcLineStatus status) noexcept {
   switch (status) {
@@ -988,6 +988,22 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 		}
 		break;
 
+	case WM_SETTINGCHANGE:
+	{
+		// dimhotepus: Handle Dark / Light mode change.
+		const wchar_t *area = reinterpret_cast<const wchar_t *>( lParam );
+		if ( area && V_wcscmp( area, L"ImmersiveColorSet" ) == 0 )
+		{
+			// dimhotepus: Reapply Dark or Light mode if any and Mica styles to window title bar.
+			Plat_ApplySystemTitleBarTheme( hWnd, SystemBackdropType::MainWindow );
+		}
+		else
+		{
+			lRet = CallWindowProc( m_ChainedWindowProc, hWnd, uMsg, wParam, lParam );
+		}
+	}
+		break;
+
 	case WM_IME_NOTIFY:
 		switch ( wParam )
 		{
@@ -1044,13 +1060,13 @@ bool CGame::CreateGameWindow( void )
 	if ( KeyValuesAD modinfo("ModInfo");
 		 modinfo->LoadFromFile(g_pFileSystem, "gameinfo.txt") )
 	{
-		V_strncpy( utf8_window_name, modinfo->GetString("game"), sizeof(utf8_window_name) );
+		V_strcpy_safe( utf8_window_name, modinfo->GetString("game") );
 	}
 
 	if (!utf8_window_name[0])
 	{
 		// dimhotepus: Not HALF-LIFE 2 when no info.
-		V_strncpy( utf8_window_name, "N/A", sizeof(utf8_window_name) );
+		V_strcpy_safe( utf8_window_name, "N/A" );
 	}
 
 	if ( IsOpenGL() )

@@ -329,6 +329,33 @@ bool Plat_IsUserAnAdmin() {
 #endif
 }
 
+[[nodiscard]] static bool ShouldAppUseLightTheme() {
+	HKEY personalizeKey;
+	// Light mode by default if not supported.
+	DWORD value = 1;
+	LSTATUS ok{::RegOpenKeyExW(HKEY_CURRENT_USER,
+		L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
+		0, KEY_READ, &personalizeKey)};
+	if (personalizeKey) {
+		DWORD valueType;
+		DWORD valueSize = sizeof(value);
+
+		ok = ::RegQueryValueExW(personalizeKey,
+			L"AppsUseLightTheme",
+			nullptr,
+			&valueType,
+			reinterpret_cast<byte*>(&value),
+			&valueSize);
+
+		::RegCloseKey(personalizeKey);
+
+		// Light mode by default if not supported.
+		value = ok == ERROR_SUCCESS && valueType == REG_DWORD ? value : 1;
+	}
+
+	return value > 0;
+}
+
 // dimhotepus: Apply system Mica materials to window.
 // See https://learn.microsoft.com/en-us/windows/apps/design/style/mica
 bool Plat_ApplySystemTitleBarTheme(void *window,
@@ -347,9 +374,10 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 	// dimhotepus: Since Windows 11 21H1 (22000)
 	// DWM has DWMWA_USE_IMMERSIVE_DARK_MODE & DWMWA_SYSTEMBACKDROP_TYPE.
 #if defined(WDK_NTDDI_VERSION) && (WDK_NTDDI_VERSION >= NTDDI_WIN11_ZN)
-	const BOOL value = TRUE;
+	// Detect current app  window text is light or dark and apply Dark mode.
+	const BOOL enableDarkMode{ShouldAppUseLightTheme() ? FALSE : TRUE};
 	HRESULT hr{::DwmSetWindowAttribute(static_cast<HWND>(window),
-		DWMWA_USE_IMMERSIVE_DARK_MODE, &value, sizeof(value))};
+		DWMWA_USE_IMMERSIVE_DARK_MODE, &enableDarkMode, sizeof(enableDarkMode))};
 	if (FAILED(hr)) {
 		const int windowTextSize =
 			GetWindowTextLengthA(static_cast<HWND>(window)) + 1;

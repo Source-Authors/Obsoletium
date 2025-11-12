@@ -340,6 +340,20 @@ static INT_PTR CALLBACK AssertDialogProc(
 				? TRUE : FALSE;
 		}
 
+		case WM_SETTINGCHANGE:
+		{
+			// dimhotepus: Handle Dark / Light mode change.
+			const char *area = reinterpret_cast<const char *>( lParam );
+			if ( area && strcmp( area, "ImmersiveColorSet" ) == 0 )
+			{
+				// dimhotepus: Reapply Dark or Light mode if any and Mica styles to window title bar.
+				Plat_ApplySystemTitleBarTheme( hDlg, SystemBackdropType::TransientWindow );
+				return TRUE;
+			}
+		}
+		break;
+
+
 		case WM_DESTROY:
 		{
 			g_dpi_window_behavior.OnDestroyWindow();
