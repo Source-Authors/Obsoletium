@@ -337,8 +337,7 @@ bool Plat_IsUserAnAdmin() {
 		L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
 		0, KEY_READ, &personalizeKey)};
 	if (personalizeKey) {
-		DWORD valueType;
-		DWORD valueSize = sizeof(value);
+		DWORD valueType, valueSize = sizeof(value);
 
 		ok = ::RegQueryValueExW(personalizeKey,
 			L"AppsUseLightTheme",
