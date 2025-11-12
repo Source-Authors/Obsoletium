@@ -507,8 +507,7 @@ CDialogGameInfo *CServerBrowserDialog::OpenGameInfoDialog( IGameList *gameList, 
 	if ( !pServer )
 		return NULL;
 
-	CDialogGameInfo *gameDialog = new CDialogGameInfo( NULL, pServer->m_NetAdr.GetIP(), pServer->m_NetAdr.GetQueryPort(), pServer->m_NetAdr.GetConnectionPort(), gameList->GetConnectCode() );
-	gameDialog->SetParent(GetVParent());
+	auto *gameDialog = new CDialogGameInfo( this, pServer->m_NetAdr.GetIP(), pServer->m_NetAdr.GetQueryPort(), pServer->m_NetAdr.GetConnectionPort(), gameList->GetConnectCode() );
 	gameDialog->AddActionSignalTarget(this);
 	gameDialog->Run( pServer->GetName() );
 	intp i = m_GameInfoDialogs.AddToTail();
@@ -521,9 +520,8 @@ CDialogGameInfo *CServerBrowserDialog::OpenGameInfoDialog( IGameList *gameList, 
 //-----------------------------------------------------------------------------
 CDialogGameInfo *CServerBrowserDialog::OpenGameInfoDialog( int serverIP, uint16 connPort, uint16 queryPort, const char *pszConnectCode )
 {
-	CDialogGameInfo *gameDialog = new CDialogGameInfo(NULL, serverIP, queryPort, connPort, pszConnectCode);
+	auto *gameDialog = new CDialogGameInfo(this, serverIP, queryPort, connPort, pszConnectCode);
 	gameDialog->AddActionSignalTarget(this);
-	gameDialog->SetParent(GetVParent());
 	gameDialog->Run("");
 	intp i = m_GameInfoDialogs.AddToTail();
 	m_GameInfoDialogs[i] = gameDialog;
