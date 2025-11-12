@@ -30,7 +30,7 @@ class CTeamControlPoint;
 
 #define TW_THINK		"CTeamTrainWatcherThink"
 #define TW_ALARM_THINK	"CTeamTrainWatcherAlarmThink"
-#define TW_ALARM_THINK_INTERVAL	8.0
+#define TW_ALARM_THINK_INTERVAL	8.0f
 
 // #define TWMASTER_THINK	"CTeamTrainWatcherMasterThink"
 

@@ -1035,7 +1035,7 @@ void CTeamTrainWatcher::WatcherActivate( void )
 
 	InternalSetSpeedForwardModifier( m_flSpeedForwardModifier );
 
-	SetContextThink( &CTeamTrainWatcher::WatcherThink, gpGlobals->curtime + 0.1, TW_THINK );
+	SetContextThink( &CTeamTrainWatcher::WatcherThink, gpGlobals->curtime + 0.1f, TW_THINK );
 }
 
 void CTeamTrainWatcher::StopCaptureAlarm( void )
@@ -1190,7 +1190,7 @@ void CTeamTrainWatcher::WatcherThink( void )
 				}
 			}
 
-			m_flNextSpeakForwardConceptTime = gpGlobals->curtime + 3.0;
+			m_flNextSpeakForwardConceptTime = gpGlobals->curtime + 3.0f;
 		}
 
 		// what percent progress are we at?
@@ -1418,7 +1418,7 @@ void CTeamTrainWatcher::WatcherThink( void )
 		}
 	}
 
-	SetContextThink( &CTeamTrainWatcher::WatcherThink, gpGlobals->curtime + 0.1, TW_THINK );
+	SetContextThink( &CTeamTrainWatcher::WatcherThink, gpGlobals->curtime + 0.1f, TW_THINK );
 }
 
 void CTeamTrainWatcher::WatcherAlarmThink( void )

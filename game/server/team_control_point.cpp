@@ -892,18 +892,18 @@ float CTeamControlPoint::GetTeamCapPercentage( int iTeam )
 	{
 		// No-one's capping this point.
 		if ( iTeam == m_iTeam )
-			return 1.0;
+			return 1.0f;
 
-		return 0.0;
+		return 0.0f;
 	}
 
 	float flCapPerc = ObjectiveResource()->GetCPCapPercentage( GetPointIndex() );
 	if ( iTeam == iCappingTeam )
-		return (1.0 - flCapPerc);
+		return (1.0f - flCapPerc);
 	if ( iTeam == m_iTeam )
 		return flCapPerc;
 
-	return 0.0;
+	return 0.0f;
 }
 
 //-----------------------------------------------------------------------------
@@ -1081,7 +1081,7 @@ void CTeamControlPoint::InputSetUnlockTime( inputdata_t &inputdata )
 		ObjectiveResource()->SetCPUnlockTime( GetPointIndex(), m_flUnlockTime );
 	}
 
-	SetContextThink( &CTeamControlPoint::UnlockThink, gpGlobals->curtime + 0.1, CONTROL_POINT_UNLOCK_THINK );
+	SetContextThink( &CTeamControlPoint::UnlockThink, gpGlobals->curtime + 0.1f, CONTROL_POINT_UNLOCK_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -1097,5 +1097,5 @@ void CTeamControlPoint::UnlockThink( void )
 		return;
 	}
 
-	SetContextThink( &CTeamControlPoint::UnlockThink, gpGlobals->curtime + 0.1, CONTROL_POINT_UNLOCK_THINK );
+	SetContextThink( &CTeamControlPoint::UnlockThink, gpGlobals->curtime + 0.1f, CONTROL_POINT_UNLOCK_THINK );
 }

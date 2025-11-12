@@ -620,7 +620,7 @@ void CTeamControlPointMaster::CPMThink( void )
 {
 	if ( m_bDisabled || !TeamplayGameRules()->PointsMayBeCaptured() )
 	{
-		SetContextThink( &CTeamControlPointMaster::CPMThink, gpGlobals->curtime + 0.2, CPM_THINK );
+		SetContextThink( &CTeamControlPointMaster::CPMThink, gpGlobals->curtime + 0.2f, CPM_THINK );
 		return;
 	}
 
@@ -629,7 +629,7 @@ void CTeamControlPointMaster::CPMThink( void )
 	CheckWinConditions();
 
 	// the next time we 'think'
-	SetContextThink( &CTeamControlPointMaster::CPMThink, gpGlobals->curtime + 0.2, CPM_THINK );
+	SetContextThink( &CTeamControlPointMaster::CPMThink, gpGlobals->curtime + 0.2f, CPM_THINK );
 }
 
 //-----------------------------------------------------------------------------
@@ -831,7 +831,7 @@ void CTeamControlPointMaster::InputRoundSpawn( inputdata_t &input )
 			}
 		}
 */
-		SetContextThink( &CTeamControlPointMaster::CPMThink, gpGlobals->curtime + 0.1, CPM_THINK );
+		SetContextThink( &CTeamControlPointMaster::CPMThink, gpGlobals->curtime + 0.1f, CPM_THINK );
 	}
 
 	// clear out the old rounds
