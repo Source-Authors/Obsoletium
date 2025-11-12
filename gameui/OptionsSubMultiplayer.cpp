@@ -1217,7 +1217,7 @@ void COptionsSubMultiplayer::OnCommand( const char *command )
 	{
 		if (m_hImportSprayDialog == NULL)
 		{
-			m_hImportSprayDialog = new FileOpenDialog(NULL, "#GameUI_ImportSprayImage", true);
+			m_hImportSprayDialog = new FileOpenDialog(this, "#GameUI_ImportSprayImage", true);
 #ifdef WIN32
 			m_hImportSprayDialog->AddFilter("*.tga,*.jpg,*.bmp,*.vtf", "#GameUI_All_Images", true);
 #else
