@@ -485,6 +485,12 @@ public:
 		m_pFOVSlider = static_cast<CCvarSlider *>(FindChildByName( "FOVSlider" ));
 		m_pFOVValueLabel = static_cast<vgui::Label *>(FindChildByName( "FOVValueLabel" ));
 
+		// dimhotepus: HL2:DM uses FOVLabel label for FOV, so fallback to one.
+		if ( !m_pFOVValueLabel )
+		{
+			m_pFOVValueLabel = static_cast<vgui::Label *>(FindChildByName( "FOVLabel" ));
+		}
+
 		UpdateFOVLabel();
 		
 		MarkDefaultSettingsAsRecommended();
