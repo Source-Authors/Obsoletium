@@ -418,7 +418,7 @@ void CServerBrowserDialog::AddServerToFavorites(gameserveritem_t &server)
 		{
 			// send command to propagate to the client so the client can send it on to the GC
 			char command[ 256 ];
-			Q_snprintf( command, ssize( command ), "rfgc %s\n", server.m_NetAdr.GetConnectionAddressString() );
+			V_sprintf_safe( command, "rfgc %s\n", server.m_NetAdr.GetConnectionAddressString() );
 			g_pRunGameEngine->AddTextCommand( command );
 		}
 	}
