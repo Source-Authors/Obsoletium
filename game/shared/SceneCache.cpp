@@ -96,7 +96,7 @@ void CSceneCache::PrecacheSceneEvent( CChoreoEvent *event, CUtlVector< unsigned 
 		char tok[ CChoreoEvent::MAX_CCTOKEN_STRING ];
 		if ( event->GetPlaybackCloseCaptionToken( tok, sizeof( tok ) ) )
 		{
-			UtlHashHandle_t idx = soundemitterbase->GetSoundIndex( tok );
+			idx = soundemitterbase->GetSoundIndex( tok );
 			if ( idx != std::numeric_limits<UtlHashHandle_t>::max() &&
 				 soundlist.Find( idx ) == soundlist.InvalidIndex() )
 			{

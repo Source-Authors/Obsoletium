@@ -367,7 +367,6 @@ void CWeapon_SLAM::TripmineAttach( void )
 		{
 
 #ifndef CLIENT_DLL
-			QAngle angles;
 			VectorAngles(tr.plane.normal, angles);
 
 			angles.x += 90;
