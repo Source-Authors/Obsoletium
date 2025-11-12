@@ -2927,9 +2927,9 @@ void CClientShadowMgr::PreRender()
 
 	// Transparent shadows must remain dirty, since they were not re-projected
 	intp nCount = m_TransparentShadows.Count();
-	for ( intp i = 0; i < nCount; ++i )
+	for ( intp j = 0; j < nCount; ++j )
 	{
-		m_DirtyShadows.Insert( m_TransparentShadows[i] );
+		m_DirtyShadows.Insert( m_TransparentShadows[j] );
 	}
 	m_TransparentShadows.RemoveAll();
 
