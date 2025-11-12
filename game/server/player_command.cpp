@@ -90,7 +90,8 @@ void CPlayerMove::FinishCommand( CBasePlayer *player )
 // Input  : *player - 
 //			frametime - 
 //-----------------------------------------------------------------------------
-void CPlayerMove::CheckMovingGround( CBasePlayer *player, double frametime )
+// dimhotepus: double -> float as float always passed as argument.
+void CPlayerMove::CheckMovingGround( CBasePlayer *player, float frametime )
 {
 	VPROF( "CPlayerMove::CheckMovingGround()" );
 

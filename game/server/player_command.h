@@ -46,7 +46,8 @@ protected:
 	void			FinishCommand( CBasePlayer *player );
 
 	// Helper to determine if the user is standing on ground
-	void			CheckMovingGround( CBasePlayer *player, double frametime );
+	// dimhotepus: double -> float as float always passed as argument.
+	void			CheckMovingGround( CBasePlayer *player, float frametime );
 
 	// Helpers to call pre and post think for player, and to call think if a think function is set
 	void			RunPreThink( CBasePlayer *player );
