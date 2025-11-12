@@ -1158,7 +1158,10 @@ bool CGame::CreateGameWindow( void )
 		Error( "Unable to create game window '%s': %s.\n", utf8_window_name, error.c_str() );
 		return false;
 	}
-	
+
+	// dimhotepus: Apply Dark mode if any and Mica styles to window title bar.
+	Plat_ApplySystemTitleBarTheme( hwnd, SystemBackdropType::MainWindow );
+
 	// NOTE: On some cards, CreateWindowExW slams the FPU control word
 	SetupFPUControlWord();
 

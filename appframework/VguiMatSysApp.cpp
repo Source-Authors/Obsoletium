@@ -126,6 +126,9 @@ void* CVguiMatSysApp::CreateAppWindow( char const *pTitle, bool bWindowed, int w
 		return nullptr;
 	}
 
+	// dimhotepus: Apply Dark mode if any and Mica styles to window title bar.
+	Plat_ApplySystemTitleBarTheme( hWnd, SystemBackdropType::MainWindow );
+
 	const unsigned window_dpi{::GetDpiForWindow(hWnd)};
 	// Compute rect needed for DPI + that size client area based on window style
 	::AdjustWindowRectExForDpi(&windowRect, style, FALSE, 0, window_dpi);

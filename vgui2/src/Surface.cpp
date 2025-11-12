@@ -2454,6 +2454,9 @@ void CWin32Surface::CreatePopup(VPANEL panel, bool minimised, bool showTaskbarIc
 
 	plat->hwnd = CreateWindowEx(style_ex, "Surface", "", style, x, y, wide, tall, hwndParent, NULL, GetModuleHandle(NULL), NULL);
 
+	// dimhotepus: Apply Dark mode if any and Mica styles to window title bar.
+	Plat_ApplySystemTitleBarTheme( plat->hwnd, SystemBackdropType::TransientWindow );
+
 	plat->clipRgn = CreateRectRgn(0,0,64,64);
 	plat->hdc = CreateCompatibleDC(NULL);
 	plat->hwndDC = NULL;
@@ -3710,7 +3713,7 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 	if (msg == staticShutdownMsg)
 	{
 		// we're being notified that we have to Shutdown
-		g_pIVgui->ShutdownMessage(lparam);
+		g_pIVgui->ShutdownMessage(staticShutdownMsg);
 		return ::DefWindowProc(hwnd,msg,wparam,lparam);
 	}
 	

@@ -1353,6 +1353,21 @@ inline bool Plat_IsInDebugSession( bool bForceRecheck = false ) { return false; 
 // dimhotepus: Check user is admin or priviledged one.
 PLATFORM_INTERFACE bool Plat_IsUserAnAdmin();
 
+#ifdef _WIN32
+enum class SystemBackdropType
+{
+	Auto,        // [Default] Let DWM automatically decide the system-drawn backdrop for this window.
+	None,        // Do not draw any system backdrop.
+	MainWindow,  // Draw the backdrop material effect corresponding to a long-lived window.
+	TransientWindow,  // Draw the backdrop material effect corresponding to a transient window.
+	TabbedWindow,  // Draw the backdrop material effect corresponding to a window with a tabbed title bar.
+};
+
+// dimhotepus: Apply system Mica materials and Dark mode (if enabled) to window.
+// See https://learn.microsoft.com/en-us/windows/apps/design/style/mica
+PLATFORM_INTERFACE bool Plat_ApplySystemTitleBarTheme( void *window, SystemBackdropType backDropType );
+#endif
+
 //-----------------------------------------------------------------------------
 // Returns true if running on a 64 bit (windows) OS
 //-----------------------------------------------------------------------------

@@ -158,6 +158,9 @@ BOOL CDpiWindowBehavior::OnCreateWindow(HWND window) {
       std::exchange(m_current_dpi_x, ::GetDpiForWindow(window));
   m_current_dpi_y = m_current_dpi_x;
 
+  // dimhotepus: Apply Dark mode if any and Mica styles to window title bar.
+  Plat_ApplySystemTitleBarTheme(window, SystemBackdropType::TransientWindow);
+
   return ApplyDpiToWindow(m_apply_dpi_on_create);
 }
 
