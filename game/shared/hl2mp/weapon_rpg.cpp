@@ -1438,9 +1438,6 @@ void CWeaponRPG::PrimaryAttack( void )
 	if ( GetActivity() == ACT_VM_RELOAD )
 		return;
 
-	Vector vecOrigin;
-	Vector vecForward;
-
 	m_flNextPrimaryAttack = gpGlobals->curtime + 0.5f;
 
 	CBasePlayer *pOwner = ToBasePlayer( GetOwner() );
@@ -1990,7 +1987,6 @@ void CWeaponRPG::DrawEffects( void )
 
 	color32 color={255,255,255,255};
 	Vector	vecAttachment, vecDir;
-	QAngle	angles;
 
 	float scale = 8.0f + random->RandomFloat( -2.0f, 2.0f );
 
@@ -2221,7 +2217,6 @@ int CLaserDot::DrawModel( int flags )
 {
 	color32 color={255,255,255,255};
 	Vector	vecAttachment, vecDir;
-	QAngle	angles;
 
 	float	scale;
 	Vector	endPos;
