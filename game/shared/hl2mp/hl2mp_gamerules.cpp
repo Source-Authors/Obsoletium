@@ -1178,7 +1178,8 @@ void CHL2MPRules::CleanUpMap()
 		}
 
 	public:
-		int m_iIterator; // Iterator into g_MapEntityRefs.
+		// dimhotepus: int -> unsigned short.
+		unsigned short m_iIterator; // Iterator into g_MapEntityRefs.
 	};
 	CHL2MPMapEntityFilter filter;
 	filter.m_iIterator = g_MapEntityRefs.Head();
