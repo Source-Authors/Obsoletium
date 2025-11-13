@@ -794,10 +794,10 @@ void CServerBrowserDialog::OnKeyCodePressed( vgui::KeyCode code )
 			  nButtonCode == STEAMCONTROLLER_DPAD_DOWN ||
 			  nButtonCode == KEY_DOWN )
 	{
-		CBaseGamesPage *pGamesPage = dynamic_cast< CBaseGamesPage* >( m_pTabPanel->GetActivePage() );
+		auto *pGamesPage = dynamic_cast< CBaseGamesPage* >( m_pTabPanel->GetActivePage() );
 		if ( pGamesPage )
 		{
-			ListPanel *pListPanel = dynamic_cast< ListPanel * >( pGamesPage->GetActiveList() );
+			auto *pListPanel = dynamic_cast< ListPanel * >( pGamesPage->GetActiveList() );
 			if ( pListPanel )
 			{
 				if ( pListPanel->GetSelectedItem( 0 ) == -1 )
