@@ -4,8 +4,6 @@
 //
 //=============================================================================//
 
-#include <stdio.h>
-
 #include "VGuiSystemModuleLoader.h"
 #include "Sys_Utils.h"
 #include "IVguiModule.h"
@@ -15,7 +13,7 @@
 #include <vgui/ISystem.h>
 #include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
 
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/Panel.h>
@@ -37,7 +35,7 @@ extern CPlatformMainPanel *g_pMainPanel;
 
 bool bSteamCommunityFriendsVersion = false;
 
-#include <tier0/dbg.h>
+#include "tier0/dbg.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
