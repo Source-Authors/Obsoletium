@@ -36,8 +36,6 @@ public:
 
 	// CS Bots
 	void EnableBots( KeyValues *data );
-	int GetBotQuota( void );
-	bool GetBotsEnabled( void );
 
 protected:
 	void OnApplyChanges() override;
