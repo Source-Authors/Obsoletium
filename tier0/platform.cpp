@@ -370,7 +370,7 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 	
 	bool ok = true;
 	
-	// dimhotepus: Since Windows 11 21H1 (22000)
+	// dimhotepus: Since Windows 11 21H1 (22000) SDK
 	// DWM has DWMWA_USE_IMMERSIVE_DARK_MODE & DWMWA_SYSTEMBACKDROP_TYPE.
 #if defined(WDK_NTDDI_VERSION) && (WDK_NTDDI_VERSION >= NTDDI_WIN11_ZN)
 	// Detect current app window text is light or dark and apply Dark mode.
@@ -384,9 +384,8 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 		GetWindowTextA(static_cast<HWND>(window), windowText, windowTextSize);
 
 		Warning(
-			"Unable to apply user Color Mode preferences to window 0x%p (%s): "
-			"%s.\n",
-			windowText, window,
+			"Unable to apply user Color Mode preferences to window 0x%p (%s): %s\n",
+			window, windowText,
 			se::win::com::com_error_category().message(hr).c_str());
 
 		ok = false;
@@ -404,8 +403,8 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 		GetWindowTextA(static_cast<HWND>(window), windowText, windowTextSize);
 
 		Warning(
-			"Unable to apply backdrop material effect to window 0x%p (%s): %s.\n",
-			windowText, window,
+			"Unable to apply backdrop material effect to window 0x%p (%s): %s\n",
+			window, windowText,
 			se::win::com::com_error_category().message(hr).c_str());
 
 		ok = false;
