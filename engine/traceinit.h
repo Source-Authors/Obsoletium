@@ -4,28 +4,18 @@
 //
 // $NoKeywords: $
 //=============================================================================//
-#if !defined( TRACEINIT_H )
+#ifndef TRACEINIT_H
 #define TRACEINIT_H
 #ifdef _WIN32
 #pragma once
 #endif
 
 void TraceInit( const char *i, const char *s, int list );
-#ifdef _XBOX
-void TraceInitFinish( const char *i );
-#endif
 void TraceShutdown( const char *s, int list );
 
-#ifndef _XBOX
 #define TRACEINITNUM( initfunc, shutdownfunc, num )	\
 	TraceInit( #initfunc, #shutdownfunc, num );		\
 	initfunc;
-#else
-#define TRACEINITNUM( initfunc, shutdownfunc, num )	\
-	TraceInit( #initfunc, #shutdownfunc, num );		\
-	initfunc;										\
-	TraceInitFinish( #initfunc );
-#endif
 
 #define TRACESHUTDOWNNUM( shutdownfunc, num )	\
 	TraceShutdown( #shutdownfunc, num );		\
