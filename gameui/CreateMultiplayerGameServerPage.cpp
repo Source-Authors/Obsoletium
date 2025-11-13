@@ -207,7 +207,7 @@ void CCreateMultiplayerGameServerPage::LoadMaps( const char *pszPathID )
 		char *ext = Q_strstr( mapname, ".bsp" );
 		if ( ext )
 		{
-			continue;
+			*ext = '\0';
 		}
 
 		//!! hack: strip out single player HL maps
