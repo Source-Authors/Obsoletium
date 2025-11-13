@@ -65,7 +65,8 @@ PerforceFileExplorer::~PerforceFileExplorer()
 void PerforceFileExplorer::ApplySchemeSettings( IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
-	m_pFolderUpButton->AddImage( scheme()->GetImage( "resource/icon_folderup", false), -3 );
+	// dimhotepus: Scale UI.
+	m_pFolderUpButton->AddImage( scheme()->GetImage( "resource/icon_folderup", false, IsProportional()), -3 );
 }
 
 	

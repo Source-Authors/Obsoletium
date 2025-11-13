@@ -58,11 +58,11 @@ CMDLSequencePicker::CMDLSequencePicker( vgui::Panel *pParent ) : BaseClass(pPare
 
 	// file browser tree controls
 	m_pFileTree = new CGameFileTreeView( pSplitterLeftSide, "FileTree", "All .MDLs", "models", "mdl" );
-
+	// dimhotepus: Scale UI.
 	// build our list of images
-	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder", false ) );
-	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder_selected", false ) );
-	m_Images.AddImage( scheme()->GetImage( "resource/icon_file", false ) );
+	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder", false, IsProportional() ) );
+	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder_selected", false, IsProportional() ) );
+	m_Images.AddImage( scheme()->GetImage( "resource/icon_file", false, IsProportional() ) );
 	m_pFileTree->SetImageList( &m_Images, false );
   	m_pFileTree->AddActionSignalTarget( this );
 

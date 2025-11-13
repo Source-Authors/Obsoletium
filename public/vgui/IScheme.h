@@ -104,8 +104,8 @@ public:
 
 	// gets the proportional coordinates for doing screen-size independant panel layouts
 	// use these for font, image and panel size scaling (they all use the pixel height of the display for scaling)
-	virtual int GetProportionalScaledValue( int normalizedValue) = 0;
-	virtual int GetProportionalNormalizedValue(int scaledValue) = 0;
+	virtual int GetProportionalScaledValue( int normalizedValue ) = 0;
+	virtual int GetProportionalNormalizedValue( int scaledValue ) = 0;
 
 	// loads a scheme from a file
 	// first scheme loaded becomes the default scheme, and all subsequent loaded scheme are derivitives of that
@@ -125,11 +125,15 @@ public:
 	
 	// Returns true if image evicted, false otherwise
 	virtual bool DeleteImage( const char *pImageName ) = 0;
+
+	// dimhotepus: Scale UI.
+	// returns a pointer to an image
+	virtual IImage *GetImage(const char *imageName, bool hardwareFiltered, bool proportional) = 0;
 };
 
 } // namespace vgui
 
-constexpr inline char VGUI_SCHEME_INTERFACE_VERSION[]{"VGUI_Scheme011"};
+constexpr inline char VGUI_SCHEME_INTERFACE_VERSION[]{"VGUI_Scheme012"};
 
 // dimhotepus: TF2 backport.
 // misyl: Added this to scale much quicker and easier

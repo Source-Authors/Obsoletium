@@ -92,14 +92,15 @@ CBaseAnimationSetEditor::CBaseAnimationSetEditor( vgui::Panel *parent, const cha
 	m_pSelectionModeType->SetKeyBoardInputEnabled( false );
 
 	m_pComboBox = new ComboBox( this, "AnimationSets", 10, false );
-
-	//	m_Images.AddImage( scheme()->GetImage( "tools/ifm/icon_lock", false ) );
-	//	m_Images.AddImage( scheme()->GetImage( "tools/ifm/icon_eyedropper", false ) );
-	//	m_Images.AddImage( scheme()->GetImage( "tools/ifm/icon_selectionmodeactive", false ) );
-	m_Images.AddImage( scheme()->GetImage( "tools/ifm/icon_selectionmodeattached", false ) );
+	// dimhotepus: Scale UI.
+	//	m_Images.AddImage( scheme()->GetImage( "tools/ifm/icon_lock", false, IsProportional() ) );
+	//	m_Images.AddImage( scheme()->GetImage( "tools/ifm/icon_eyedropper", false, IsProportional() ) );
+	//	m_Images.AddImage( scheme()->GetImage( "tools/ifm/icon_selectionmodeactive", false, IsProportional() ) );
+	m_Images.AddImage( scheme()->GetImage( "tools/ifm/icon_selectionmodeattached", false, IsProportional() ) );
 	for ( i = 0; i < NUM_AS_RECORDING_STATES; ++i )
 	{
-		m_Images.AddImage( scheme()->GetImage( imagefiles[ i ], false ) );
+		// dimhotepus: Scale UI.
+		m_Images.AddImage( scheme()->GetImage( imagefiles[ i ], false, IsProportional() ) );
 	}
 
 	int w, h;

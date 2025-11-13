@@ -75,7 +75,8 @@ void AnimatingImagePanel::LoadAnimation(const char *baseName, intp frameCount)
 	{
 		char imageName[512];
 		V_sprintf_safe(imageName, "%s%zd", baseName, i);
-		AddImage(scheme()->GetImage(imageName, m_bFiltered));
+		// dimhotepus: Scale UI.
+		AddImage(scheme()->GetImage(imageName, m_bFiltered, IsProportional()));
 	}
 }
 

@@ -39,11 +39,11 @@ CGameFileTreeView::CGameFileTreeView( Panel *parent, const char *name, const cha
 	m_bUseExt = ( pExtension != NULL );
 	
 	m_RootFolderName = pRootFolderName;
-
+	// dimhotepus: Scale UI.
 	// build our list of images
-	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder", false ) );
-	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder_selected", false ) );
-	m_Images.AddImage( scheme()->GetImage( "resource/icon_file", false ) );
+	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder", false, IsProportional() ) );
+	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder_selected", false, IsProportional() ) );
+	m_Images.AddImage( scheme()->GetImage( "resource/icon_file", false, IsProportional() ) );
 	SetImageList( &m_Images, false );
 }
 

@@ -541,7 +541,8 @@ void CSpectatorGUI::SetLogoImage(const char *image)
 {
 	if ( m_pBannerImage )
 	{
-		m_pBannerImage->SetImage( scheme()->GetImage(image, false) );
+		// dimhotepus: Scale UI.
+		m_pBannerImage->SetImage( scheme()->GetImage(image, false, IsProportional()) );
 	}
 }
 

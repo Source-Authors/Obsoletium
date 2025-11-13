@@ -333,16 +333,18 @@ void CDialogAddServer::ApplySchemeSettings( IScheme *pScheme )
 	BaseClass::ApplySchemeSettings( pScheme );
 
 	ImageList *imageList = new ImageList(false);
-	imageList->AddImage(scheme()->GetImage("servers/icon_password", false));
-	imageList->AddImage(scheme()->GetImage("servers/icon_bots", false));
-	imageList->AddImage(scheme()->GetImage("servers/icon_robotron", false));
-	imageList->AddImage(scheme()->GetImage("servers/icon_secure_deny", false));
-	imageList->AddImage(scheme()->GetImage("servers/icon_replay", false));
+	// dimhotepus: Scale UI.
+	imageList->AddImage(scheme()->GetImage("servers/icon_password", false, IsProportional()));
+	imageList->AddImage(scheme()->GetImage("servers/icon_bots", false, IsProportional()));
+	imageList->AddImage(scheme()->GetImage("servers/icon_robotron", false, IsProportional()));
+	imageList->AddImage(scheme()->GetImage("servers/icon_secure_deny", false, IsProportional()));
+	imageList->AddImage(scheme()->GetImage("servers/icon_replay", false, IsProportional()));
 
-	intp passwordColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_password_column", false));
-	intp botColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_bots_column", false));
-	intp secureColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_robotron_column", false));
-	intp replayColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_replay_column", false));
+	// dimhotepus: Scale UI.
+	intp passwordColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_password_column", false, IsProportional()));
+	intp botColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_bots_column", false, IsProportional()));
+	intp secureColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_robotron_column", false, IsProportional()));
+	intp replayColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_replay_column", false, IsProportional()));
 
 	m_pDiscoveredGames->SetImageList(imageList, true);
 	vgui::HFont hFont = pScheme->GetFont( "ListSmall", IsProportional() );

@@ -369,7 +369,8 @@ CPluginHudMessage::~CPluginHudMessage()
 //-----------------------------------------------------------------------------
 void CPluginHudMessage::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
-	m_pExtraPanelIcon->SetImage( vgui::scheme()->GetImage( "plugin/message_waiting", true ) );
+	// dimhotepus: Scale UI.
+	m_pExtraPanelIcon->SetImage( vgui::scheme()->GetImage( "plugin/message_waiting", true, IsProportional() ) );
 	BaseClass::ApplySchemeSettings( pScheme );
 	SetBgColor( pScheme->GetColor( "Plugins.BgColor", pScheme->GetColor( "TransparentBlack", Color( 0, 0, 0, 192 ))) );
 	SetPaintBackgroundType( 2 );

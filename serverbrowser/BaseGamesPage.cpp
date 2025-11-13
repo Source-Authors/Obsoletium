@@ -328,15 +328,16 @@ void CBaseGamesPage::ApplySchemeSettings(IScheme *pScheme)
 	
 	// load the password icon
 	ImageList *imageList = new ImageList(false);
-	m_nImageIndexPassword = imageList->AddImage(scheme()->GetImage("servers/icon_password", false));
-	//imageList->AddImage(scheme()->GetImage("servers/icon_bots", false));
-	m_nImageIndexSecure = imageList->AddImage(scheme()->GetImage("servers/icon_robotron", false));
-	m_nImageIndexSecureVacBanned = imageList->AddImage(scheme()->GetImage("servers/icon_secure_deny", false));
-	m_nImageIndexReplay = imageList->AddImage(scheme()->GetImage("servers/icon_replay", false));
-	intp passwordColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_password_column", false));
-	//intp botColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_bots_column", false));
-	intp secureColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_robotron_column", false));
-	intp replayColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_replay_column", false));
+	// dimhotepus: Scale UI.
+	m_nImageIndexPassword = imageList->AddImage(scheme()->GetImage("servers/icon_password", false, IsProportional()));
+	//imageList->AddImage(scheme()->GetImage("servers/icon_bots", false, IsProportional()));
+	m_nImageIndexSecure = imageList->AddImage(scheme()->GetImage("servers/icon_robotron", false, IsProportional()));
+	m_nImageIndexSecureVacBanned = imageList->AddImage(scheme()->GetImage("servers/icon_secure_deny", false, IsProportional()));
+	m_nImageIndexReplay = imageList->AddImage(scheme()->GetImage("servers/icon_replay", false, IsProportional()));
+	intp passwordColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_password_column", false, IsProportional()));
+	//intp botColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_bots_column", false, IsProportional()));
+	intp secureColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_robotron_column", false, IsProportional()));
+	intp replayColumnImage = imageList->AddImage(scheme()->GetImage("servers/icon_replay_column", false, IsProportional()));
 
 	m_pGameList->SetImageList(imageList, true);
 	m_hFont = pScheme->GetFont( "ListSmall", IsProportional() );

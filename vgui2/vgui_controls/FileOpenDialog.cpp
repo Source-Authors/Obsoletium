@@ -673,15 +673,17 @@ FileOpenDialog::~FileOpenDialog()
 void FileOpenDialog::ApplySchemeSettings(IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
-	m_pFolderIcon->SetImage(scheme()->GetImage("resource/icon_folder", false));
-	m_pFolderUpButton->AddImage(scheme()->GetImage("resource/icon_folderup", false), -3);
-	m_pNewFolderButton->AddImage( scheme()->GetImage("resource/icon_newfolder", false), -3 );
-	m_pOpenInExplorerButton->AddImage( scheme()->GetImage("resource/icon_play_once", false), -3 );
+	// dimhotepus: Scale UI.
+	m_pFolderIcon->SetImage(scheme()->GetImage("resource/icon_folder", false, IsProportional()));
+	m_pFolderUpButton->AddImage(scheme()->GetImage("resource/icon_folderup", false, IsProportional()), -3);
+	m_pNewFolderButton->AddImage( scheme()->GetImage("resource/icon_newfolder", false, IsProportional()), -3 );
+	m_pOpenInExplorerButton->AddImage( scheme()->GetImage("resource/icon_play_once", false, IsProportional()), -3 );
 
 	ImageList *imageList = new ImageList(false);
-	imageList->AddImage(scheme()->GetImage("resource/icon_file", false));
-	imageList->AddImage(scheme()->GetImage("resource/icon_folder", false));
-	imageList->AddImage(scheme()->GetImage("resource/icon_folder_selected", false));
+	// dimhotepus: Scale UI.
+	imageList->AddImage(scheme()->GetImage("resource/icon_file", false, IsProportional()));
+	imageList->AddImage(scheme()->GetImage("resource/icon_folder", false, IsProportional()));
+	imageList->AddImage(scheme()->GetImage("resource/icon_folder_selected", false, IsProportional()));
 
 	m_pFileList->SetImageList(imageList, true);
 }

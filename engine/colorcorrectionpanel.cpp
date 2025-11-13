@@ -4609,7 +4609,8 @@ CColorOperationListPanel::CColorOperationListPanel( vgui::Panel *parent, ColorCo
 	m_pOperationListPanel->AddActionSignalTarget( this );
 
 	vgui::ImageList *pImageList = new vgui::ImageList( false );
-	pImageList->AddImage( scheme()->GetImage( "Resource/icon_hlicon1", false ) );
+	// dimhotepus: Scale UI.
+	pImageList->AddImage( scheme()->GetImage( "Resource/icon_hlicon1", false, IsProportional() ) );
 	m_pOperationListPanel->SetImageList( pImageList, true );
 
 	m_pLookupViewWindow = new CLookupViewWindow( this, CCHandle );

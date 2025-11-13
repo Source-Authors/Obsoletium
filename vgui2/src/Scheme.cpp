@@ -180,6 +180,9 @@ public:
 
 	virtual bool DeleteImage( const char *pImageName );
 
+	// dimhotepus: Scale UI.
+	IImage *GetImage( const char *imageName, bool hardwareFiltered, bool proportional ) override;
+
 	// gets the proportional coordinates for doing screen-size independant panel layouts
 	// use these for font, image and panel size scaling (they all use the pixel height of the display for scaling)
 	int GetProportionalScaledValueEx( CScheme *pScheme, int normalizedValue );
@@ -201,6 +204,8 @@ private:
 	struct CachedBitmapHandle_t
 	{
 		Bitmap *pBitmap;
+		// dimhotepus: Scale UI.
+		bool isProportional;
 	};
 	static bool BitmapHandleSearchFunc(const CachedBitmapHandle_t &, const CachedBitmapHandle_t &);
 	CUtlRBTree<CachedBitmapHandle_t, int> m_Bitmaps;
@@ -216,7 +221,9 @@ bool CSchemeManager::BitmapHandleSearchFunc(const CachedBitmapHandle_t &lhs, con
 	// a NULL bitmap indicates to use the search string instead
 	if (lhs.pBitmap && rhs.pBitmap)
 	{
-		return stricmp(lhs.pBitmap->GetName(), rhs.pBitmap->GetName()) > 0;
+		return stricmp(lhs.pBitmap->GetName(), rhs.pBitmap->GetName()) > 0 &&
+			// dimhotepus: Scale UI.
+			lhs.isProportional > rhs.isProportional;
 	}
 	else if (lhs.pBitmap)
 	{
@@ -1242,6 +1249,16 @@ const char *CScheme::GetResourceString(const char *stringName)
 //-----------------------------------------------------------------------------
 IImage *CSchemeManager::GetImage(const char *imageName, bool hardwareFiltered)
 {
+	// dimhotepus: Scale UI.
+	return GetImage( imageName, hardwareFiltered, false );
+}
+
+//-----------------------------------------------------------------------------
+// Purpose: returns a pointer to an image
+//-----------------------------------------------------------------------------
+// dimhotepus: Scale UI.
+IImage *CSchemeManager::GetImage(const char *imageName, bool hardwareFiltered, bool proportional)
+{
 	if ( !imageName || Q_isempty(imageName) ) // frame icons and the like are in the scheme file and may not be defined, so if this is null then fail silently
 	{
 		return NULL; 
@@ -1272,8 +1289,19 @@ IImage *CSchemeManager::GetImage(const char *imageName, bool hardwareFiltered)
 		return m_Bitmaps[i].pBitmap;
 	}
 
+	auto *bitmap = new Bitmap( szFileName, hardwareFiltered );
+	// dimhotepus: Scale UI.
+	if ( proportional )
+	{
+		int wide, tall;
+		bitmap->GetSize( wide, tall );
+		bitmap->SetSize(
+			GetProportionalScaledValue( wide ),
+			GetProportionalScaledValue( tall )
+		);
+	}
 	// couldn't find the image, try and load it
-	CachedBitmapHandle_t hBitmap = { new Bitmap( szFileName, hardwareFiltered ) };
+	CachedBitmapHandle_t hBitmap = { bitmap, proportional };
 	m_Bitmaps.Insert( hBitmap );
 	return hBitmap.pBitmap;
 }

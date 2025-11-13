@@ -159,8 +159,9 @@ void DirectorySelectDialog::PerformLayout()
 void DirectorySelectDialog::ApplySchemeSettings(IScheme *pScheme)
 {
 	ImageList *imageList = new ImageList(false);
-	imageList->AddImage(scheme()->GetImage("Resource/icon_folder", false));
-	imageList->AddImage(scheme()->GetImage("Resource/icon_folder_selected", false));
+	// dimhotepus: Scale UI.
+	imageList->AddImage(scheme()->GetImage("Resource/icon_folder", false, IsProportional()));
+	imageList->AddImage(scheme()->GetImage("Resource/icon_folder_selected", false, IsProportional()));
 	m_pDirTree->SetImageList(imageList, true);
 
 	BaseClass::ApplySchemeSettings(pScheme);

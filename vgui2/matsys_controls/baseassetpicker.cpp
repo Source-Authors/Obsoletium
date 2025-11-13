@@ -104,9 +104,9 @@ CAssetTreeView::CAssetTreeView( Panel *pParent, const char *pName, const char *p
 	m_RootFolderName = pRootFolderName;
 	m_RootDirectory = pRootDir;
 	AllocateRootNode();
-
+	// dimhotepus: Scale UI.
 	// build our list of images
-	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder", false ) );
+	m_Images.AddImage( scheme()->GetImage( "resource/icon_folder", false, IsProportional() ) );
 	SetImageList( &m_Images, false );
 
 	SETUP_PANEL( this );

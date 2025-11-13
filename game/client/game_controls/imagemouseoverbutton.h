@@ -98,12 +98,14 @@ void CImageMouseOverButton<T>::ApplySchemeSettings( vgui::IScheme *pScheme )
 
 	if ( m_pszActiveImageName && !Q_isempty( m_pszActiveImageName ) )
 	{
-		this->SetActiveImage( vgui::scheme()->GetImage( m_pszActiveImageName, m_bScaleImage ) );
+		// dimhotepus: Scale UI.
+		this->SetActiveImage( vgui::scheme()->GetImage( m_pszActiveImageName, m_bScaleImage, IsProportional() ) );
 	}
 
 	if ( m_pszInactiveImageName && !Q_isempty( m_pszInactiveImageName ) )
 	{
-		this->SetInactiveImage( vgui::scheme()->GetImage( m_pszInactiveImageName, m_bScaleImage ) );
+		// dimhotepus: Scale UI.
+		this->SetInactiveImage( vgui::scheme()->GetImage( m_pszInactiveImageName, m_bScaleImage, IsProportional() ) );
 	}
 
 	vgui::IBorder *pBorder = pScheme->GetBorder( "NoBorder" );
