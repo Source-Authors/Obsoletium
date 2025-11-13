@@ -85,7 +85,7 @@ bool CVGuiSystemModuleLoader::InitializeAllModules(CreateInterfaceFn *factorylis
 	}
 
 	// create a table of all the loaded modules
-	CreateInterfaceFn *moduleFactories = (CreateInterfaceFn *)_alloca(sizeof(CreateInterfaceFn) * m_Modules.Count());
+	CreateInterfaceFn *moduleFactories = stackallocT( CreateInterfaceFn, m_Modules.Count());
 	for ( intp i = 0; i < m_Modules.Count(); i++ )
 	{
 		moduleFactories[i] = Sys_GetFactory(m_Modules[i].module);
