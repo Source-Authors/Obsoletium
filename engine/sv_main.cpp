@@ -714,7 +714,8 @@ void SetupMaxPlayers( int iDesiredMaxPlayers )
 		sv.m_nMaxClientsLimit += 1;
 	}
 
-	newmaxplayers = clamp( newmaxplayers, minmaxplayers, sv.m_nMaxClientsLimit );
+	// dimhotepus: Do not use clamp here as minmaxplayers can be > sv.m_nMaxClientsLimit! (maxplayers 1 in HL2:DM)
+	newmaxplayers = min( max( newmaxplayers, minmaxplayers ), sv.m_nMaxClientsLimit );
 
 	if ( sv.GetMaxClients() < newmaxplayers || !tv_enable.GetBool() )
 		sv.SetMaxClients( newmaxplayers );
