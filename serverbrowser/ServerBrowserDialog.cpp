@@ -336,7 +336,7 @@ void CServerBrowserDialog::BlacklistsChanged()
 //-----------------------------------------------------------------------------
 // Purpose: Updates status test at bottom of window
 //-----------------------------------------------------------------------------
-void CServerBrowserDialog::UpdateStatusText(const char *fmt, ...)
+void CServerBrowserDialog::UpdateStatusText(PRINTF_FORMAT_STRING const char *fmt, ...)
 {
 	if ( !m_pStatusLabel )
 		return;
