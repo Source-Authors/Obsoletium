@@ -110,8 +110,8 @@ void CCreateMultiplayerGameServerPage::EnableBots( KeyValues *data )
 	const int difficulty = clamp( data->GetInt( "bot_difficulty", 0 ), 0, 3 );
 
 	char buttonName[64];
-	Q_snprintf( buttonName, sizeof( buttonName ), "SkillLevel%d", difficulty );
-	vgui::RadioButton *button = dynamic_cast< vgui::RadioButton * >(FindChildByName( buttonName ));
+	V_sprintf_safe( buttonName, "SkillLevel%d", difficulty );
+	auto *button = dynamic_cast< vgui::RadioButton * >(FindChildByName( buttonName ));
 	if ( button )
 	{
 		button->SetSelected( true );
@@ -141,8 +141,8 @@ void CCreateMultiplayerGameServerPage::OnApplyChanges()
 		for ( int i=0; i<4; ++i )
 		{
 			char buttonName[64];
-			Q_snprintf( buttonName, sizeof( buttonName ), "SkillLevel%d", i );
-			vgui::RadioButton *button = dynamic_cast< vgui::RadioButton * >(FindChildByName( buttonName ));
+			V_sprintf_safe( buttonName, "SkillLevel%d", i );
+			auto *button = dynamic_cast< vgui::RadioButton * >(FindChildByName( buttonName ));
 			if ( button )
 			{
 				if ( button->IsSelected() )
