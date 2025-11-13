@@ -53,6 +53,10 @@ COptionsSubVoice::COptionsSubVoice(vgui::Panel *parent) : PropertyPage(parent, N
 
 	LoadControlSettings("Resource\\OptionsSubVoice.res");
 
+    // dimhotepus: Scale UI.
+    m_pMicMeter->SetShouldScaleImage(true);
+    m_pMicMeter2->SetShouldScaleImage(true);
+
     m_bVoiceOn = false;
     m_pMicMeter2->SetVisible(false);
     // no voice tweak - then disable all buttons
@@ -320,9 +324,9 @@ void COptionsSubVoice::OnThink()
 		else
 		{
 			float val = m_pVoiceTweak->GetControlFloat( SpeakingVolume );
-			int nValue = static_cast<int>( val*32768.0f + 0.5f );
+			int nValue = static_cast<int>( val * 32768.0f + 0.5f );
 
-			int width = (QuickPropScale( BAR_WIDTH ) * nValue) / 32768;
+			int width = QuickPropScale( BAR_WIDTH ) * nValue / 32768;
             int increment = QuickPropScale( BAR_INCREMENT );
 			width = ((width + (increment-1)) / increment) * increment;  // round to nearest BAR_INCREMENT
 
