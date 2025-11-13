@@ -7,6 +7,8 @@
 #include "VGuiSystemModuleLoader.h"
 #include "Sys_Utils.h"
 #include "IVguiModule.h"
+// dimhotepus: Scale UI.
+#include "BasePanel.h"
 #include "ServerBrowser/IServerBrowser.h"
 
 #include <vgui/IPanel.h>
@@ -94,17 +96,18 @@ bool CVGuiSystemModuleLoader::InitializeAllModules(CreateInterfaceFn *factorylis
 	// give the modules a chance to link themselves together
 	for ( auto &m : m_Modules )
 	{
-		if (!m.moduleInterface->PostInitialize(moduleFactories, m_Modules.Count()))
+		// dimhotepus: Initialize with parent to immediately scale UI.
+#ifdef GAMEUI_EXPORTS
+		vgui::Panel *parent = BasePanel();
+#else
+		vgui::Panel *parent = g_pMainPanel;
+#endif
+
+		if (!m.moduleInterface->PostInitialize(moduleFactories, m_Modules.Count(), parent))
 		{
 			bSuccess = false;
 			Error("Platform Error: module failed to initialize\n");
 		}
-		
-#ifdef GAMEUI_EXPORTS
-		m.moduleInterface->SetParent(GetGameUIBasePanel());
-#else
-		m.moduleInterface->SetParent(g_pMainPanel->GetVPanel());
-#endif
 	}
 
 	m_bModulesInitialized = true;

@@ -36,6 +36,7 @@ ConVar sb_numtimesopened( "sb_numtimesopened", "0", FCVAR_DEVELOPMENTONLY, "Indi
 //-----------------------------------------------------------------------------
 CServerBrowser::CServerBrowser()
 {
+	m_bWorkshopEnabled = false;
 }
 
 
@@ -50,11 +51,11 @@ CServerBrowser::~CServerBrowser()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CServerBrowser::CreateDialog()
+void CServerBrowser::CreateDialog(vgui::Panel *parent)
 {
 	if (!m_hInternetDlg.Get())
 	{
-		m_hInternetDlg = new CServerBrowserDialog(NULL); // SetParent() call below fills this in
+		m_hInternetDlg = new CServerBrowserDialog(parent);
 		m_hInternetDlg->Initialize();
 	}
 }
@@ -113,6 +114,15 @@ bool CServerBrowser::Initialize(CreateInterfaceFn *factorylist, intp factoryCoun
 //-----------------------------------------------------------------------------
 bool CServerBrowser::PostInitialize(CreateInterfaceFn *modules, intp factoryCount)
 {
+	return PostInitialize( modules, factoryCount, nullptr );
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose: links to other modules interfaces (tracker)
+//-----------------------------------------------------------------------------
+bool CServerBrowser::PostInitialize(CreateInterfaceFn *modules, intp factoryCount, vgui::Panel *parent)
+{
 	// find the interfaces we need
 	for (intp i = 0; i < factoryCount; i++)
 	{
@@ -122,7 +132,7 @@ bool CServerBrowser::PostInitialize(CreateInterfaceFn *modules, intp factoryCoun
 		}
 	}
 
-	CreateDialog();
+	CreateDialog(parent);
 	m_hInternetDlg->SetVisible(false);
 
 	return g_pRunGameEngine;

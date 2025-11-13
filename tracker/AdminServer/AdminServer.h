@@ -38,6 +38,9 @@ public:
 	void Reactivate() override;
 	void SetParent(vgui::VPANEL parent) override;
 
+	// dimhotepus: Initialize with parent to immediately scale UI.
+bool PostInitialize(CreateInterfaceFn* modules, intp factoryCount, vgui::Panel* parent) override;
+
 	// IAdminServer implementation
 	// opens a manage server dialog for a local server
 	ManageServerUIHandle_t OpenManageServerDialog(const char *serverName, const char *gameDir) override;
@@ -60,6 +63,8 @@ private:
 	};
 	CUtlVector<OpenedManageDialog_t> m_OpenedManageDialog;
 	vgui::VPANEL m_hParent;
+	// dimhotepus: Initialize with parent to immediately scale UI.
+	vgui::Panel *m_pParent;
 };
 
 

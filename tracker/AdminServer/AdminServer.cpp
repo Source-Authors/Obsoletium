@@ -34,7 +34,8 @@ CAdminServer::CAdminServer()
 	// fill in the 0-based element of the manage servers list
 	OpenedManageDialog_t empty = { vgui::INVALID_PANEL, NULL };
 	m_OpenedManageDialog.AddToTail(empty);
-	m_hParent=0;
+	m_hParent = 0;
+	m_pParent = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -85,6 +86,13 @@ bool CAdminServer::Initialize(CreateInterfaceFn *factorylist, intp factoryCount)
 //-----------------------------------------------------------------------------
 bool CAdminServer::PostInitialize(CreateInterfaceFn *modules, intp factoryCount)
 {
+	return PostInitialize(modules, factoryCount, nullptr);
+}
+
+// dimhotepus: Initialize with parent to immediately scale UI.
+bool CAdminServer::PostInitialize(CreateInterfaceFn* modules, intp factoryCount, vgui::Panel* parent)
+{
+	m_pParent = parent;
 	return true;
 }
 
@@ -152,8 +160,12 @@ void CAdminServer::Reactivate()
 //-----------------------------------------------------------------------------
 ManageServerUIHandle_t CAdminServer::OpenManageServerDialog(const char *serverName, const char *gameDir)
 {
-	CGamePanelInfo *tmp = new CGamePanelInfo(NULL, serverName, gameDir);
-	tmp->SetParent(m_hParent);
+	// dimhotepus: Initialize with parent to immediately scale UI.
+	CGamePanelInfo *tmp = new CGamePanelInfo(m_pParent, serverName, gameDir);
+	if ( !m_pParent )
+	{
+		tmp->SetParent(m_hParent);
+	}
 
 	// add a new item into the list
 	intp i = m_OpenedManageDialog.AddToTail();

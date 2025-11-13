@@ -32,6 +32,9 @@ public:
 	void Deactivate() override;
 	void Reactivate() override;
 	void SetParent(vgui::VPANEL parent) override;
+	
+	// dimhotepus: Initialize with parent to immediately scale UI.
+	bool PostInitialize(CreateInterfaceFn *modules, intp factoryCount, vgui::Panel *parent) override;
 
 	// IServerBrowser implementation
 	// joins a specified game - game info dialog will only be opened if the server is fully or passworded
@@ -50,7 +53,8 @@ public:
 	virtual const char *GetMapFriendlyNameAndGameType( const char *pszMapName, char *szFriendlyMapName, int cchFriendlyName ) override;
 
 	// methods
-	virtual void CreateDialog();
+	// dimhotepus: Initialize with parent to immediately scale UI.
+	virtual void CreateDialog(vgui::Panel *parent);
 	virtual void Open();
 
 	// true if the user can't play a game

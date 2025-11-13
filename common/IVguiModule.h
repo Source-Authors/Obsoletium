@@ -14,6 +14,12 @@
 #include "tier1/interface.h"
 #include <vgui/VGUI.h>
 
+namespace vgui {
+
+class Panel;
+
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Standard interface to loading vgui modules
 //-----------------------------------------------------------------------------
@@ -49,6 +55,11 @@ public:
 	// sets the parent of the main module panel
 	virtual void SetParent(vgui::VPANEL parent) = 0;
 
+	// dimhotepus: Initialize with parent to immediately scale UI.
+	// called after all the modules have been initialized
+	// modules should use this time to link to all the other module interfaces
+	virtual bool PostInitialize(CreateInterfaceFn *modules, intp factoryCount, vgui::Panel *parent) = 0;
+
 	// messages sent through through the panel returned by GetPanel():
 	//
 	//  "ConnectedToGame"	"ip" "port" "gamedir"
@@ -58,7 +69,7 @@ public:
 	//  "LoadingFinished"	"type"	"name"
 };
 
-#define VGUIMODULE_INTERFACE_VERSION "VGuiModule002"
+#define VGUIMODULE_INTERFACE_VERSION "VGuiModule003"
 
 
 #endif // IVGUIMODULE_H
