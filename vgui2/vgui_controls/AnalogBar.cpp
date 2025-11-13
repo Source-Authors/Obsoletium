@@ -22,8 +22,9 @@ using namespace vgui;
 DECLARE_BUILD_FACTORY( AnalogBar );
 
 
-#define ANALOG_BAR_HOME_SIZE 4
-#define ANALOG_BAR_HOME_GAP 2
+// dimhotepus: Scale UI.
+#define ANALOG_BAR_HOME_SIZE QuickPropScale( 4 )
+#define ANALOG_BAR_HOME_GAP QuickPropScale( 2 )
 #define ANALOG_BAR_LESS_TALL ( ANALOG_BAR_HOME_SIZE + ANALOG_BAR_HOME_GAP )
 
 
@@ -34,7 +35,8 @@ AnalogBar::AnalogBar(Panel *parent, const char *panelName) : Panel(parent, panel
 {
 	_analogValue = 0.0f;
 	m_pszDialogVar = NULL;
-	SetSegmentInfo( 2, 6 );
+	// dimhotepus: Scale UI.
+	SetSegmentInfo( QuickPropScale( 2 ), QuickPropScale( 6 ) );
 	SetBarInset( 0 );
 	m_iAnalogValueDirection = PROGRESS_EAST;
 
