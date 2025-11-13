@@ -86,7 +86,7 @@ CServerBrowserDialog::CServerBrowserDialog(vgui::Panel *parent) : Frame(parent, 
 
 	m_pGameList = m_pInternetGames;
 
-	m_pContextMenu =  new CServerContextMenu(this);;
+	m_pContextMenu =  new CServerContextMenu(this);
 
 	// property sheet
 	m_pTabPanel = new PropertySheet(this, "GameTabs");
