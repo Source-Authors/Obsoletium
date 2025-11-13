@@ -107,9 +107,7 @@ void CCreateMultiplayerGameServerPage::EnableBots( KeyValues *data )
 	SetControlInt( "BotQuotaCombo", quota );
 	m_pEnableBotsCheck->SetSelected( (quota > 0) );
 
-	int difficulty = data->GetInt( "bot_difficulty", 0 );
-	difficulty = max( difficulty, 0 );
-	difficulty = min( 3, difficulty );
+	const int difficulty = clamp( data->GetInt( "bot_difficulty", 0 ), 0, 3 );
 
 	char buttonName[64];
 	Q_snprintf( buttonName, sizeof( buttonName ), "SkillLevel%d", difficulty );
