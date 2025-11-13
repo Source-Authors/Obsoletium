@@ -9,19 +9,19 @@
 
 using namespace vgui;
 
-#include <KeyValues.h>
 #include <vgui_controls/ComboBox.h>
 #include <vgui_controls/RadioButton.h>
 #include <vgui_controls/CheckButton.h>
 #include "filesystem.h"
 #include "tier1/convar.h"
+#include "tier1/KeyValues.h"
 #include "EngineInterface.h"
 #include "CvarToggleCheckButton.h"
 
 #include "ModInfo.h"
 
 // for SRC
-#include <vstdlib/random.h>
+#include "vstdlib/random.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
