@@ -127,8 +127,8 @@ void CToolFileMenuBar::PerformLayout()
 	int faredge = right - cw - QuickPropScale( 5 + 2 );
 	int nearedge = barx + QuickPropScale( 2 );
 
-	int mid = ( nearedge + faredge ) * 0.5f;
+	int mid = ( nearedge + faredge ) / 2;
 
 	m_pFileName->GetContentSize( cw, ch );
-	m_pFileName->SetBounds( mid - cw * 0.5f, 0, cw, h );
+	m_pFileName->SetBounds( mid - cw / 2, 0, cw, h );
 }
