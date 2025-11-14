@@ -392,14 +392,13 @@ intp CKeyValuesSystem::CaseInsensitiveHash(const char *string, intp iBounds)
 
 	for ( ; *string != 0; string++ )
 	{
-		hash = (hash << 1) + *string;
-
 		if (*string >= 'A' && *string <= 'Z')
 		{
-			// dimhotepus: Precompute diff.
-			constexpr intp diff = (int)'a' - (int)'A';
-
-			hash = hash - diff;
+			hash = (hash << 1) + (*string - 'A' + 'a');
+		}
+		else
+		{
+			hash = (hash << 1) + *string;
 		}
 	}
 	  
