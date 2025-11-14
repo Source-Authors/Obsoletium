@@ -71,10 +71,10 @@ void CToolEditMenuButton::OnShowMenu( vgui::Menu *menu )
 		if ( fmt )
 		{
 			wchar_t desc[ 256 ];
-			g_pVGuiLocalize->ConvertANSIToUnicode( g_pDataModel->GetUndoDesc(), desc, sizeof( desc ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( g_pDataModel->GetUndoDesc(), desc );
 
 			wchar_t buf[ 512 ];
-			g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), fmt, 1, desc );
+			g_pVGuiLocalize->ConstructString_safe( buf, fmt, 1, desc );
 
 			m_pMenu->UpdateMenuItem( id, buf, new KeyValues( "Command", "command", "OnUndo" ) );
 		}
@@ -98,10 +98,10 @@ void CToolEditMenuButton::OnShowMenu( vgui::Menu *menu )
 		if ( fmt )
 		{
 			wchar_t desc[ 256 ];
-			g_pVGuiLocalize->ConvertANSIToUnicode( g_pDataModel->GetRedoDesc(), desc, sizeof( desc ) );
+			g_pVGuiLocalize->ConvertANSIToUnicode( g_pDataModel->GetRedoDesc(), desc );
 
 			wchar_t buf[ 512 ];
-			g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), fmt, 1, desc );
+			g_pVGuiLocalize->ConstructString_safe( buf, fmt, 1, desc );
 
 			m_pMenu->UpdateMenuItem( id, buf, new KeyValues( "Command", "command", "OnRedo" ) );
 		}

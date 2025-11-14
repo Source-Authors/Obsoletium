@@ -48,10 +48,10 @@ CToolHelpMenuButton::CToolHelpMenuButton( char const *toolName, char const *help
 	if ( fmt )
 	{
 		wchar_t desc[ 256 ];
-		g_pVGuiLocalize->ConvertANSIToUnicode( toolName, desc, sizeof( desc ) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( toolName, desc );
 
 		wchar_t buf[ 512 ];
-		g_pVGuiLocalize->ConstructString( buf, sizeof( buf ), fmt, 1, desc );
+		g_pVGuiLocalize->ConstructString_safe( buf, fmt, 1, desc );
 
 		AddMenuItem( "help", buf, new KeyValues( "OnHelp" ), pActionTarget, NULL, helpBinding );
 	}

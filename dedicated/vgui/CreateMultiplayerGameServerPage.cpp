@@ -523,8 +523,8 @@ void CCreateMultiplayerGameServerPage::LoadModListInDirectory(
     const char *pDirectoryName) {
   char searchString[MAX_PATH * 2];
   V_strcpy_safe(searchString, pDirectoryName);
-  Q_AppendSlash(searchString, sizeof(searchString));
-  Q_strncat(searchString, "*.*", sizeof(searchString), COPY_ALL_CHARACTERS);
+  V_AppendSlash(searchString);
+  V_strcat_safe(searchString, "*.*");
 
   FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
   const char *filename =
@@ -540,9 +540,8 @@ void CCreateMultiplayerGameServerPage::LoadModListInDirectory(
         V_strcpy_safe(fullFilename, filename);
       } else {
         V_strcpy_safe(fullFilename, pDirectoryName);
-        Q_AppendSlash(fullFilename, sizeof(fullFilename));
-        Q_strncat(fullFilename, filename, sizeof(fullFilename),
-                  COPY_ALL_CHARACTERS);
+        V_AppendSlash(fullFilename);
+        V_strcat_safe(fullFilename, filename);
       }
 
       LoadPossibleMod(fullFilename);
@@ -556,8 +555,7 @@ void CCreateMultiplayerGameServerPage::LoadModListInDirectory(
 void CCreateMultiplayerGameServerPage::LoadPossibleMod(
     const char *pGameDirName) {
   char gameInfoFilename[1024];
-  Q_snprintf(gameInfoFilename, sizeof(gameInfoFilename) - 1, "%s\\gameinfo.txt",
-             pGameDirName);
+  V_sprintf_safe(gameInfoFilename, "%s\\gameinfo.txt", pGameDirName);
   if (!g_pFullFileSystem->FileExists(gameInfoFilename)) return;
 
   // don't want to add single player games to the list

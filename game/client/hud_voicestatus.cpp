@@ -379,7 +379,7 @@ void CHudVoiceStatus::Paint()
 						if ( formatStr )
 						{
 							wchar_t unicodeName[ 64 ];
-							g_pVGuiLocalize->ConvertANSIToUnicode( pName, unicodeName, sizeof( unicodeName ) );
+							g_pVGuiLocalize->ConvertANSIToUnicode( pName, unicodeName );
 
 							g_pVGuiLocalize->ConstructString_safe( szconverted,
 								formatStr, 2, unicodeName, unicodeLocation );
@@ -393,7 +393,7 @@ void CHudVoiceStatus::Paint()
 
 		if ( !usedLocation )
 		{
-			g_pVGuiLocalize->ConvertANSIToUnicode( pName, szconverted, sizeof(szconverted)  );
+			g_pVGuiLocalize->ConvertANSIToUnicode( pName, szconverted );
 		}
 
 		// Draw the item background

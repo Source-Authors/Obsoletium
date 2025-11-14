@@ -1696,9 +1696,9 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 		if ( pMaterialsSubDir[0] == '\\' || pMaterialsSubDir[0] == '/' )
 			pMaterialsSubDir = pMaterialsSubDir + 1;
 		V_strcat_safe(szOutDir, pMaterialsSubDir, sizeof(szOutDir) );
-		Q_StripTrailingSlash( szOutDir );
-		Q_AppendSlash( szOutDir, sizeof(szOutDir) );
-		Q_FixSlashes( szOutDir, CORRECT_PATH_SEPARATOR );
+		V_StripTrailingSlash( szOutDir );
+		V_AppendSlash( szOutDir );
+		V_FixSlashes( szOutDir, CORRECT_PATH_SEPARATOR );
 
 #ifdef ENGINE_DLL
 		Q_strncpy(finalPath, com_gamedir, sizeof(finalPath));

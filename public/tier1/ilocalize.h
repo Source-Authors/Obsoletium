@@ -362,7 +362,7 @@ public:
 
 		if ( loc_Format )
 		{
-			::ILocalize::ConstructString( m_loc_Buffer, sizeof( m_loc_Buffer ), loc_Format, 1, CLocalizedStringArg<T>( arg0 ).GetLocArg() );
+			::ILocalize::ConstructString_safe( m_loc_Buffer, loc_Format, 1, CLocalizedStringArg<T>( arg0 ).GetLocArg() );
 		}
 	}
 
@@ -376,7 +376,7 @@ public:
 
 		if ( loc_Format )
 		{
-			::ILocalize::ConstructString( m_loc_Buffer, sizeof( m_loc_Buffer ), loc_Format, 2, CLocalizedStringArg<T>( arg0 ).GetLocArg(), CLocalizedStringArg<U>( arg1 ).GetLocArg() );
+			::ILocalize::ConstructString_safe( m_loc_Buffer, loc_Format, 2, CLocalizedStringArg<T>( arg0 ).GetLocArg(), CLocalizedStringArg<U>( arg1 ).GetLocArg() );
 		}
 	}
 
@@ -391,8 +391,7 @@ public:
 
 		if ( loc_Format )
 		{
-			::ILocalize::ConstructString( m_loc_Buffer,
-										  sizeof( m_loc_Buffer ),
+			::ILocalize::ConstructString_safe( m_loc_Buffer,
 										  loc_Format,
 										  3,
 										  CLocalizedStringArg<T>( arg0 ).GetLocArg(),
@@ -413,8 +412,7 @@ public:
 
 		if ( loc_Format )
 		{
-			::ILocalize::ConstructString( m_loc_Buffer,
-										  sizeof( m_loc_Buffer ),
+			::ILocalize::ConstructString_safe( m_loc_Buffer,
 										  loc_Format,
 										  4, //-V112
 										  CLocalizedStringArg<T>( arg0 ).GetLocArg(),
@@ -437,8 +435,7 @@ public:
 
 		if ( loc_Format )
 		{
-			::ILocalize::ConstructString( m_loc_Buffer,
-				sizeof( m_loc_Buffer ),
+			::ILocalize::ConstructString_safe( m_loc_Buffer,
 				loc_Format,
 				5,
 				CLocalizedStringArg<T>( arg0 ).GetLocArg(),
@@ -463,8 +460,7 @@ public:
 
 		if ( loc_Format )
 		{
-			::ILocalize::ConstructString( m_loc_Buffer,
-										  sizeof( m_loc_Buffer ),
+			::ILocalize::ConstructString_safe( m_loc_Buffer,
 										  loc_Format,
 										  6,
 										  CLocalizedStringArg<T>( arg0 ).GetLocArg(),
@@ -491,8 +487,7 @@ public:
 
 		if ( loc_Format )
 		{
-			::ILocalize::ConstructString( m_loc_Buffer,
-				sizeof( m_loc_Buffer ),
+			::ILocalize::ConstructString_safe( m_loc_Buffer,
 				loc_Format,
 				7,
 				CLocalizedStringArg<T>( arg0 ).GetLocArg(),
@@ -511,7 +506,7 @@ public:
 
 		if ( loc_Format && pKeyValues )
 		{
-			::ILocalize::ConstructString( m_loc_Buffer, sizeof( m_loc_Buffer ), loc_Format, pKeyValues );
+			::ILocalize::ConstructString_safe( m_loc_Buffer, loc_Format, pKeyValues );
 		}
 	}
 

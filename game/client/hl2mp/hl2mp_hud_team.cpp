@@ -170,9 +170,9 @@ void CTeamPlayHud::OnThink()
 	if ( pTeam )
 	{
 		wchar_t TeamName[64];
-		g_pVGuiLocalize->ConvertANSIToUnicode( pTeam->Get_Name(), TeamName, sizeof(TeamName) );
+		g_pVGuiLocalize->ConvertANSIToUnicode( pTeam->Get_Name(), TeamName );
 		
-		g_pVGuiLocalize->ConstructString( string1, sizeof(string1), g_pVGuiLocalize->Find("#Team"), 1, TeamName );
+		g_pVGuiLocalize->ConstructString_safe( string1, g_pVGuiLocalize->Find("#Team"), 1, TeamName );
 		
 		m_pBackground->SetFgColor( GetFgColor() );
 		m_pWarmupLabel->SetFgColor(c);

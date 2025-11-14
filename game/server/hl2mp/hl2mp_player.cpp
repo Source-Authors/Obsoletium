@@ -1437,7 +1437,7 @@ CON_COMMAND( timeleft, "prints the time remaining in the match" )
 		char seconds[8];
 
 		Q_snprintf( minutes, sizeof(minutes), "%d", iMinutes );
-		Q_snprintf( seconds, sizeof(seconds), "%2.2d", iSeconds );
+		V_sprintf_safe( seconds, "%2.2d", iSeconds );
 
 		if ( pPlayer )
 		{

@@ -381,46 +381,46 @@ void CHL2MPClientScoreBoardDialog::UpdateTeamInfo()
 
 			if ( HL2MPRules()->IsTeamplay() == false )
 			{
-				_snwprintf( wNumPlayers, ARRAYSIZE(wNumPlayers), L"%i", iNumPlayersInGame );
+				_snwprintf( wNumPlayers, ssize(wNumPlayers), L"%i", iNumPlayersInGame );
 #ifdef WIN32
-				_snwprintf( name, ARRAYSIZE(name), L"%s", g_pVGuiLocalize->Find("#ScoreBoard_Deathmatch") );
+				_snwprintf( name, ssize(name), L"%s", g_pVGuiLocalize->Find("#ScoreBoard_Deathmatch") );
 #else
-				_snwprintf( name, ARRAYSIZE(name), L"%S", g_pVGuiLocalize->Find("#ScoreBoard_Deathmatch") );
+				_snwprintf( name, ssize(name), L"%S", g_pVGuiLocalize->Find("#ScoreBoard_Deathmatch") );
 #endif
 				
 				teamName = name;
 
 				if ( iNumPlayersInGame == 1)
 				{
-					g_pVGuiLocalize->ConstructString( string1, sizeof(string1), g_pVGuiLocalize->Find("#ScoreBoard_Player"), 2, teamName, wNumPlayers );
+					g_pVGuiLocalize->ConstructString_safe( string1, g_pVGuiLocalize->Find("#ScoreBoard_Player"), 2, teamName, wNumPlayers );
 				}
 				else
 				{
-					g_pVGuiLocalize->ConstructString( string1, sizeof(string1), g_pVGuiLocalize->Find("#ScoreBoard_Players"), 2, teamName, wNumPlayers );
+					g_pVGuiLocalize->ConstructString_safe( string1, g_pVGuiLocalize->Find("#ScoreBoard_Players"), 2, teamName, wNumPlayers );
 				}
 			}
 			else
 			{
-				_snwprintf(wNumPlayers, ARRAYSIZE(wNumPlayers), L"%i", team->Get_Number_Players());
+				_snwprintf( wNumPlayers, ssize(wNumPlayers), L"%i", team->Get_Number_Players() );
 
 				if (!teamName && team)
 				{
-					g_pVGuiLocalize->ConvertANSIToUnicode(team->Get_Name(), name, sizeof(name));
+					g_pVGuiLocalize->ConvertANSIToUnicode( team->Get_Name(), name );
 					teamName = name;
 				}
 
 				if (team->Get_Number_Players() == 1)
 				{
-					g_pVGuiLocalize->ConstructString( string1, sizeof(string1), g_pVGuiLocalize->Find("#ScoreBoard_Player"), 2, teamName, wNumPlayers );
+					g_pVGuiLocalize->ConstructString_safe( string1, g_pVGuiLocalize->Find("#ScoreBoard_Player"), 2, teamName, wNumPlayers );
 				}
 				else
 				{
-					g_pVGuiLocalize->ConstructString( string1, sizeof(string1), g_pVGuiLocalize->Find("#ScoreBoard_Players"), 2, teamName, wNumPlayers );
+					g_pVGuiLocalize->ConstructString_safe( string1, g_pVGuiLocalize->Find("#ScoreBoard_Players"), 2, teamName, wNumPlayers );
 				}
 
 				// update stats
 				wchar_t val[6];
-				V_snwprintf(val, ARRAYSIZE(val), L"%d", team->Get_Score());
+				V_snwprintf(val, ssize(val), L"%d", team->Get_Score());
 				m_pPlayerList->ModifyColumn(sectionID, "frags", val);
 				if (team->Get_Ping() < 1)
 				{
