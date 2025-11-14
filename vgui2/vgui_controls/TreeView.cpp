@@ -2209,7 +2209,8 @@ void TreeView::OnMouseWheeled(int delta)
 		return;
 	}
 	int val = m_pVertScrollBar->GetValue();
-	val -= (delta * 3);
+	// dimhotepus: Scale UI.
+	val -= (delta * QuickPropScale( 3 ));
 	m_pVertScrollBar->SetValue(val);
 }
 

@@ -186,7 +186,8 @@ void CPrecisionSlider::OnMouseWheeled( int delta )
 		int value = GetValue();
 
 		if( input()->IsKeyDown( KEY_LCONTROL ) || input()->IsKeyDown( KEY_RCONTROL ) )
-			SetValue( value + delta*4 );
+			// dimhotepus: Scale UI.
+			SetValue( value + delta * QuickPropScale( 4 ) );
 		else
 			SetValue( value + delta );
 	}

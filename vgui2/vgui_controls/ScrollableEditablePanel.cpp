@@ -82,7 +82,8 @@ void ScrollableEditablePanel::OnScrollBarSliderMoved()
 void ScrollableEditablePanel::OnMouseWheeled(int delta)
 {
 	int val = m_pScrollBar->GetValue();
-	val -= (delta * 50);
+	// dimhotepus: Scale UI.
+	val -= (delta * QuickPropScale( 50 ));
 	m_pScrollBar->SetValue( val );
 }
 

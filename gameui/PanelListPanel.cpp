@@ -228,7 +228,8 @@ void CPanelListPanel::DeleteAllItems()
 void CPanelListPanel::OnMouseWheeled(int delta)
 {
 	int val = _vbar->GetValue();
-	val -= (delta * 3 * 5);
+	// dimhotepus: Scale UI.
+	val -= (delta * QuickPropScale( 3 * 5 ));
 	_vbar->SetValue(val);
 }
 

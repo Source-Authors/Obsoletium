@@ -1838,7 +1838,8 @@ void RichText::OnMouseWheeled(int delta)
 //-----------------------------------------------------------------------------
 void RichText::MoveScrollBar(int delta)
 {
-	MoveScrollBarDirect( delta * 3 );
+	// dimhotepus: Scale UI.
+	MoveScrollBarDirect( delta * QuickPropScale( 3 ) );
 }
 
 //-----------------------------------------------------------------------------

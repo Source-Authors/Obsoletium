@@ -1600,7 +1600,8 @@ void SectionedListPanel::OnMouseWheeled(int delta)
 
 	// scroll the window based on the delta
 	int val = m_pScrollBar->GetValue();
-	val -= (delta * BUTTON_HEIGHT_DEFAULT * 3);
+	// dimhotepus: Scale UI.
+	val -= (delta * QuickPropScale( BUTTON_HEIGHT_DEFAULT ) * 3 );
 	m_pScrollBar->SetValue(val);
 }
 

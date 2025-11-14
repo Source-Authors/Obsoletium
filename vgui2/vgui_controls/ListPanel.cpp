@@ -2206,7 +2206,7 @@ void ListPanel::OnMouseWheeled(int delta)
 	}
 
 	int val = m_vbar->GetValue();
-	val -= (delta * 3);
+	val -= (delta * QuickPropScale( 3 ));
 	m_vbar->SetValue(val);
 }
 

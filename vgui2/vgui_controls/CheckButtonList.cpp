@@ -209,6 +209,7 @@ void CheckButtonList::OnScrollBarSliderMoved()
 void CheckButtonList::OnMouseWheeled(int delta)
 {
 	int val = m_pScrollBar->GetValue();
-	val -= (delta * 15);
+	// dimhotepus: Scale UI.
+	val -= (delta * QuickPropScale( 15 ));
 	m_pScrollBar->SetValue(val);
 }

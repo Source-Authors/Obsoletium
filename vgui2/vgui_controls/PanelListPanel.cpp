@@ -404,7 +404,8 @@ int PanelListPanel::GetNumColumns( void )
 void PanelListPanel::OnMouseWheeled(int delta)
 {
 	int val = m_vbar->GetValue();
-	val -= (delta * DEFAULT_HEIGHT);
+	// dimhotepus: Scale UI.
+	val -= (delta * QuickPropScale( DEFAULT_HEIGHT ));
 	m_vbar->SetValue(val);	
 }
 
