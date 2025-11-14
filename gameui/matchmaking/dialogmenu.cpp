@@ -1089,9 +1089,7 @@ void CDialogMenu::SortMenuItems()
 			bool bSwap = bSortDown ? diff > 0 : diff < 0;
 			if ( bSwap )
 			{
-				CMenuItem *pTemp = m_MenuItems[j+1];
-				m_MenuItems[j+1] = m_MenuItems[j];
-				m_MenuItems[j] = pTemp;
+				std::swap( m_MenuItems[j+1], m_MenuItems[j] );
 
 				m_pParent->SwapMenuItems( j, j+1 );
 			}
