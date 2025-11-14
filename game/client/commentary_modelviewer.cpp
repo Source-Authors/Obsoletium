@@ -169,10 +169,10 @@ void CCommentaryModelViewer::OnThink( void )
 //-----------------------------------------------------------------------------
 void CCommentaryModelViewer::HandleMovementInput( void )
 {
-	bool bLeftDown = input()->IsKeyDown(KEY_LEFT);
-	bool bRightDown = input()->IsKeyDown(KEY_RIGHT);
-	bool bForwardDown = input()->IsKeyDown(KEY_UP);
-	bool bBackDown = input()->IsKeyDown(KEY_DOWN);
+	bool bLeftDown = vgui::input()->IsKeyDown(KEY_LEFT);
+	bool bRightDown = vgui::input()->IsKeyDown(KEY_RIGHT);
+	bool bForwardDown = vgui::input()->IsKeyDown(KEY_UP);
+	bool bBackDown = vgui::input()->IsKeyDown(KEY_DOWN);
 
 	float flAccel = 0.05;
 

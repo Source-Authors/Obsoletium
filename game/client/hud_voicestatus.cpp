@@ -171,11 +171,11 @@ CHudVoiceStatus::CHudVoiceStatus( const char *pName ) :
 
 	m_clrIcon = Color(255,255,255,255);
 
-	m_iDeadImageID = surface()->DrawGetTextureId( "hud/leaderboard_dead" );
+	m_iDeadImageID = vgui::surface()->DrawGetTextureId( "hud/leaderboard_dead" );
 	if ( m_iDeadImageID == -1 ) // we didn't find it, so create a new one
 	{
-		m_iDeadImageID = surface()->CreateNewTextureID();
-		surface()->DrawSetTextureFile( m_iDeadImageID, "hud/leaderboard_dead", true, false );
+		m_iDeadImageID = vgui::surface()->CreateNewTextureID();
+		vgui::surface()->DrawSetTextureFile( m_iDeadImageID, "hud/leaderboard_dead", true, false );
 	}
 }
 
@@ -338,9 +338,9 @@ void CHudVoiceStatus::Paint()
 
 	if( length > 0 )
 	{
-		surface()->DrawSetTextFont( m_NameFont );
-		surface()->DrawSetTextColor( Color(255,255,255,255) );
-		iFontHeight = surface()->GetFontTall( m_NameFont );
+		vgui::surface()->DrawSetTextFont( m_NameFont );
+		vgui::surface()->DrawSetTextColor( Color(255,255,255,255) );
+		iFontHeight = vgui::surface()->GetFontTall( m_NameFont );
 	}
 
 	if ( !sv_alltalk )
@@ -352,8 +352,8 @@ void CHudVoiceStatus::Paint()
 		int playerId = m_SpeakingList[i].playerId;
 		bool bIsAlive = g_PR->IsAlive( playerId );
 
-		float oldAlphaMultiplier = surface()->DrawGetAlphaMultiplier();
-		surface()->DrawSetAlphaMultiplier(oldAlphaMultiplier * m_SpeakingList[i].fAlpha);
+		float oldAlphaMultiplier = vgui::surface()->DrawGetAlphaMultiplier();
+		vgui::surface()->DrawSetAlphaMultiplier(oldAlphaMultiplier * m_SpeakingList[i].fAlpha);
 
 		Color c = g_PR->GetTeamColor( g_PR ? g_PR->GetTeam(playerId) : TEAM_UNASSIGNED );
 
@@ -397,28 +397,28 @@ void CHudVoiceStatus::Paint()
 		}
 
 		// Draw the item background
-		surface()->DrawSetColor( c );
-		surface()->DrawFilledRect( 0, ypos, item_wide, ypos + item_tall );
+		vgui::surface()->DrawSetColor( c );
+		vgui::surface()->DrawFilledRect( 0, ypos, item_wide, ypos + item_tall );
 
 		if ( show_dead_icon && bIsAlive == false && m_iDeadImageID != -1 )
 		{
 			// draw background for dead icon
 			// surface()->DrawFilledRect(dead_icon_xpos, ypos, 0, ypos + dead_icon_tall);
 
-			Vertex_t vert[4];
+			vgui::Vertex_t vert[4];
 			float uv1 = 0.0f;
 			float uv2 = 1.0f;
 
 			// Draw the dead material
-			surface()->DrawSetTexture( m_iDeadImageID );
+			vgui::surface()->DrawSetTexture( m_iDeadImageID );
 
 			vert[0].Init( Vector2D( dead_icon_xpos, ypos + dead_icon_ypos ), Vector2D( uv1, uv1 ) );
 			vert[1].Init( Vector2D( dead_icon_xpos + dead_icon_wide, ypos + dead_icon_ypos ), Vector2D( uv2, uv1 ) );
 			vert[2].Init( Vector2D( dead_icon_xpos + dead_icon_wide, ypos + dead_icon_ypos + dead_icon_tall ), Vector2D( uv2, uv2 ) );
 			vert[3].Init( Vector2D( dead_icon_xpos, ypos + dead_icon_ypos + dead_icon_tall ), Vector2D( uv1, uv2 ) );
 
-			surface()->DrawSetColor(COLOR_WHITE);
-			surface()->DrawTexturedPolygon( 4, vert );
+			vgui::surface()->DrawSetColor(COLOR_WHITE);
+			vgui::surface()->DrawTexturedPolygon( 4, vert );
 		}
 
 		//=============================================================================
@@ -442,8 +442,8 @@ void CHudVoiceStatus::Paint()
 			m_pVoiceIcon->DrawSelf( voice_icon_xpos, ypos + voice_icon_ypos, voice_icon_wide, voice_icon_tall, m_clrIcon );
 
 		// Draw the player's name
-		surface()->DrawSetTextColor(COLOR_WHITE);
-		surface()->DrawSetTextPos( text_xpos, ypos + ( item_tall / 2 ) - ( iFontHeight / 2 ) );
+		vgui::surface()->DrawSetTextColor(COLOR_WHITE);
+		vgui::surface()->DrawSetTextPos( text_xpos, ypos + ( item_tall / 2 ) - ( iFontHeight / 2 ) );
 
 		int iTextSpace = item_wide - text_xpos;
 
@@ -453,7 +453,7 @@ void CHudVoiceStatus::Paint()
 		int iTextWidthCounter = 0;
 		for( intp j=0;j<iNameLength;j++ )
 		{
-			iTextWidthCounter += surface()->GetCharacterWidth( m_NameFont, pszconverted[j] );
+			iTextWidthCounter += vgui::surface()->GetCharacterWidth( m_NameFont, pszconverted[j] );
 
 			if( iTextWidthCounter > iTextSpace )
 			{	
@@ -467,11 +467,11 @@ void CHudVoiceStatus::Paint()
 			}
 		}
 
-		surface()->DrawPrintText( szconverted, V_wcslen(szconverted) );
+		vgui::surface()->DrawPrintText( szconverted, V_wcslen(szconverted) );
 			
 		ypos -= ( item_spacing + item_tall );
 
-		surface()->DrawSetAlphaMultiplier(oldAlphaMultiplier);
+		vgui::surface()->DrawSetAlphaMultiplier(oldAlphaMultiplier);
 	}
 }
 

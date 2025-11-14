@@ -47,7 +47,7 @@ CommandMenu::~CommandMenu()
 	ClearMenu();
 }
 
-void CommandMenu::OnMessage(const KeyValues *params, VPANEL fromPanel)
+void CommandMenu::OnMessage(const KeyValues *params, vgui::VPANEL fromPanel)
 {
 	char text[255];
 	bool bHandled = false;

@@ -13,8 +13,6 @@
 
 #include <vgui_controls/Panel.h>
 
-using namespace vgui;
-
 class CIconPanel : public vgui::Panel
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CIconPanel, vgui::Panel );
