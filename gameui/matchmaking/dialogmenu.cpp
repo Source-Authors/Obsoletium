@@ -297,10 +297,8 @@ void COptionsItem::PerformLayout()
 	int optionWide = max( m_nOptionsMinWide, GetWide() - m_nOptionsXPos - m_pRightArrow->GetWide() - m_nOptionsLeftMargin );
 	int optionTall = GetTall();
 
-	for ( int i = 0; i < m_OptionLabels.Count(); ++i )
+	for ( auto *pOption : m_OptionLabels )
 	{
-		vgui::Label *pOption = m_OptionLabels[i];
-
 		pOption->SetBounds( m_nOptionsXPos, 0, optionWide, optionTall );
 	}
 
@@ -354,16 +352,16 @@ void COptionsItem::SetFocus( const bool bActive )
 {
 	if ( bActive )
 	{
-		for ( int i = 0; i < m_OptionLabels.Count(); ++i )
+		for ( auto *l : m_OptionLabels )
 		{
-			m_OptionLabels[i]->SetBgColor( m_BgColorActive );
+			l->SetBgColor( m_BgColorActive );
 		}
 	}
 	else
 	{
-		for ( int i = 0; i < m_OptionLabels.Count(); ++i )
+		for ( auto *l : m_OptionLabels )
 		{
-			m_OptionLabels[i]->SetBgColor( m_BgColor );
+			l->SetBgColor( m_BgColor );
 		}
 	}
 }
