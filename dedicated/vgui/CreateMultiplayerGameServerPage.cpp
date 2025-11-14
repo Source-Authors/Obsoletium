@@ -108,15 +108,16 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
   m_pSavedData = nullptr;
   m_pGameInfo = nullptr;
 
-  SetMinimumSize(310, 350);
-  SetSize(310, 350);
+  // dimhotepus: Scale UI.
+  SetMinimumSize(QuickPropScale(310), QuickPropScale(350));
+  SetSize(QuickPropScale(310), QuickPropScale(350));
   SetSizeable(false);
 
   SetTitle("#Start_Server_Title", true);
 
   m_pMapList = new ComboBox(this, "MapList", 10, false);
-  m_pMapList->SetEnabled(
-      false);  // a mod needs to be chosen first to populate the map list
+  // a mod needs to be chosen first to populate the map list
+  m_pMapList->SetEnabled(false);
   m_pMapList->SetEditable(false);
 
   m_pNetworkCombo = new ComboBox(this, "NetworkCombo", 10, false);
