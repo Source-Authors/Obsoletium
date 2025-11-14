@@ -791,8 +791,7 @@ void CVProfPanel::OnCheckButtonChecked(Panel *panel)
 void CVProfPanel::ExpandAll( void )
 {
 	int count = m_pHierarchy->GetTree()->GetHighestItemID();
-	int i;
-	for( i = 0; i < count; i++ )
+	for( int i = 0; i < count; i++ )
 	{
 		if( m_pHierarchy->GetTree()->IsItemIDValid( i ) )
 		{
@@ -804,8 +803,7 @@ void CVProfPanel::ExpandAll( void )
 void CVProfPanel::CollapseAll( void )
 {
 	int count = m_pHierarchy->GetTree()->GetHighestItemID();
-	int i;
-	for( i = 1; i < count; i++ )
+	for( int i = 1; i < count; i++ )
 	{
 		if( m_pHierarchy->GetTree()->IsItemIDValid( i ) )
 		{
