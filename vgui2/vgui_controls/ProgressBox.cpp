@@ -34,7 +34,7 @@ ProgressBox::ProgressBox(const char *title, const char *text, const char *pszUnk
 	const wchar_t *ws = g_pVGuiLocalize->Find(title);
 	if (ws)
 	{
-		wcsncpy(m_wszTitleString, ws, sizeof(m_wszTitleString) / sizeof(wchar_t));
+		V_wcscpy_safe(m_wszTitleString, ws);
 	}
 	else
 	{
@@ -46,7 +46,7 @@ ProgressBox::ProgressBox(const char *title, const char *text, const char *pszUnk
 	ws = g_pVGuiLocalize->Find(text);
 	if (ws)
 	{
-		wcsncpy(m_wcsInfoString, ws, sizeof(m_wcsInfoString) / sizeof(wchar_t));
+		V_wcscpy_safe(m_wcsInfoString, ws);
 	}
 	else
 	{
@@ -56,7 +56,7 @@ ProgressBox::ProgressBox(const char *title, const char *text, const char *pszUnk
 	ws = g_pVGuiLocalize->Find(pszUnknownTimeString);
 	if (ws)
 	{
-		wcsncpy(m_wszUnknownTimeString, ws, sizeof(m_wszUnknownTimeString) / sizeof(wchar_t));
+		V_wcscpy_safe(m_wszUnknownTimeString, ws);
 	}
 	else
 	{
@@ -70,10 +70,10 @@ ProgressBox::ProgressBox(const char *title, const char *text, const char *pszUnk
 //-----------------------------------------------------------------------------
 ProgressBox::ProgressBox(const wchar_t *wszTitle, const wchar_t *wszText, const wchar_t *wszUnknownTimeString, Panel *parent) : Frame(parent, NULL, parent ? false : true)
 {
-	wcsncpy(m_wszTitleString, wszTitle, sizeof(m_wszTitleString) / sizeof(wchar_t));
+	V_wcscpy_safe(m_wszTitleString, wszTitle);
 	m_pMessageLabel = new Label(this, NULL, wszUnknownTimeString);
-	wcsncpy(m_wcsInfoString, wszText, sizeof(m_wcsInfoString) / sizeof(wchar_t));
-	wcsncpy(m_wszUnknownTimeString, wszUnknownTimeString, sizeof(m_wszUnknownTimeString) / sizeof(wchar_t));
+	V_wcscpy_safe(m_wcsInfoString, wszText);
+	V_wcscpy_safe(m_wszUnknownTimeString, wszUnknownTimeString);
 	Init();
 }
 
