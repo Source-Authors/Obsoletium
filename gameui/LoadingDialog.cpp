@@ -72,7 +72,7 @@ CLoadingDialog::CLoadingDialog( vgui::Panel *parent ) : Frame(parent, "LoadingDi
 	SetMoveable( false );
 
 	// dimhotepus: Scale UI.
-	m_pInfoLabel->SetBounds( QuickPropScale( 20 ), QuickPropScale( 32 ), QuickPropScale( 392 ), QuickPropScale( 24 ));
+	m_pInfoLabel->SetBounds(QuickPropScale( 20 ), QuickPropScale( 32 ), QuickPropScale( 392 ), QuickPropScale( 24 ));
     m_pProgress->SetBounds(QuickPropScale( 20 ), QuickPropScale( 64 ), QuickPropScale( 300 ), QuickPropScale( 24 ));
     m_pCancelButton->SetBounds(QuickPropScale( 330 ), QuickPropScale( 64 ), QuickPropScale( 72 ), QuickPropScale( 24));
     m_pProgress2->SetVisible(false);

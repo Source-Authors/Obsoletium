@@ -486,7 +486,8 @@ void CNewGameDialog::ApplySettings( KeyValues *inResourceData )
 		idx = ypos;
 	}
 
-	m_pCenterBg->SetTall( inResourceData->GetInt( "centerbgtall", 0 ) );
+	// dimhotepus: Scale UI,
+	m_pCenterBg->SetTall( QuickPropScale( inResourceData->GetInt( "centerbgtall", 0 ) ) );
 
 	g_ScrollSpeedSlow = inResourceData->GetFloat( "scrollslow", 0.0f );
 	g_ScrollSpeedFast = inResourceData->GetFloat( "scrollfast", 0.0f );

@@ -24,8 +24,9 @@ BaseClass(parent,panelName)
 	SlideValues->Near->AddActionSignalTarget(GetVPanel());
 	SlideValues->Left->AddActionSignalTarget(GetVPanel());
 	SlideValues->Right->AddActionSignalTarget(GetVPanel());
-	SetWide(64);
-	SetTall(64);
+	// dimhotepus: Scale UI.
+	SetWide(QuickPropScale(64));
+	SetTall(QuickPropScale(64));
 }
 
 void ControlBoxVisual::OnSlideEnter(KeyValues*data)
