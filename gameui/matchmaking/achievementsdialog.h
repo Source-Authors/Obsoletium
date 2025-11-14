@@ -42,7 +42,7 @@ public:
 	CAchievementsDialog( vgui::Panel *parent );
 	~CAchievementsDialog();
 
-	void ApplySchemeSettings( IScheme *pScheme ) override;
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	void ScrollToItem( int nDirection );
 	void OnKeyCodePressed( vgui::KeyCode code ) override;
 	virtual void UpdateAchievementDialogInfo( void );
@@ -103,8 +103,8 @@ public:
 
 	void SetAchievementInfo ( IAchievement* pAchievement );
 	IAchievement* GetAchievementInfo( void ) { return m_pSourceAchievement; }
-	void UpdateAchievementInfo( IScheme *pScheme );
-	void ApplySchemeSettings( IScheme *pScheme ) override;
+	void UpdateAchievementInfo( vgui::IScheme *pScheme );
+	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	void ToggleShowOnHUD( void );
 
 	MESSAGE_FUNC_PTR( OnCheckButtonChecked, "CheckButtonChecked", panel );

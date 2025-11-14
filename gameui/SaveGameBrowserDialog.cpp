@@ -24,6 +24,8 @@
 
 #include "SaveGameBrowserDialog.h"
 
+using namespace vgui;
+
 extern const char *COM_GetModDirectory( void );
 
 //-----------------------------------------------------------------------------

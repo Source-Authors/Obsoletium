@@ -23,8 +23,6 @@
 
 class CSaveGameBrowserDialog;
 
-using namespace vgui;
-
 //-----------------------------------------------------------------------------
 // Purpose: selectable item with screenshot for an individual chapter in the dialog
 //-----------------------------------------------------------------------------
@@ -37,7 +35,7 @@ public:
 					CGameSavePanel( CSaveGameBrowserDialog *parent, SaveGameDescription_t *pSaveDesc, bool bCommandPanel = false );
 					~CGameSavePanel( void );
 
-	void	ApplySchemeSettings( IScheme *pScheme ) override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	
 	bool IsAutoSaveType( void ) { return ( Q_stristr( m_SaveInfo.szType, "autosave" ) != 0 ); }
 
@@ -48,13 +46,13 @@ protected:
 
 	SaveGameDescription_t	m_SaveInfo;	// Stored internally for easy access
 
-	ImagePanel	*m_pLevelPicBorder;
-	ImagePanel	*m_pLevelPic;
-	ImagePanel	*m_pCommentaryIcon;
-	Label		*m_pChapterTitle;
-	Label		*m_pTime;
-	Label		*m_pElapsedTime;
-	Label		*m_pType;
+	vgui::ImagePanel	*m_pLevelPicBorder;
+	vgui::ImagePanel	*m_pLevelPic;
+	vgui::ImagePanel	*m_pCommentaryIcon;
+	vgui::Label		*m_pChapterTitle;
+	vgui::Label		*m_pTime;
+	vgui::Label		*m_pElapsedTime;
+	vgui::Label		*m_pType;
 
 	Color	m_TextColor;
 	Color	m_DisabledColor;
@@ -138,7 +136,7 @@ public:
 protected:
 
 	bool				m_bFilterAutosaves;
-	CKeyRepeatHandler	m_KeyRepeat;
+	vgui::CKeyRepeatHandler	m_KeyRepeat;
 
 	bool				ParseSaveData( char const *pszFileName, char const *pszShortName, SaveGameDescription_t *save );
 
