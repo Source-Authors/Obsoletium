@@ -175,7 +175,8 @@ void CMenuItem::OnClick()
 CCommandItem::CCommandItem( CDialogMenu *pParent, const char *pTitleLabel, const char *pDescLabel, const char *pCommand ) 
 	: BaseClass( pParent, pTitleLabel, pDescLabel )
 {
-	Q_strncpy( m_szCommand, pCommand, MAX_COMMAND_LEN );
+	m_bHasFocus = false;
+	V_strcpy_safe( m_szCommand, pCommand );
 }
 
 CCommandItem::~CCommandItem()
@@ -333,7 +334,7 @@ void COptionsItem::ApplySettings( KeyValues *pSettings )
 	m_nOptionsLeftMargin	= QuickPropScale( pSettings->GetInt( "optionsleftmargin", 0 ) );
 	m_nArrowGap				= QuickPropScale( pSettings->GetInt( "arrowgap", 0 ) );
 
-	Q_strncpy( m_szOptionsFont, pSettings->GetString( "optionsfont", "Default" ), sizeof( m_szOptionsFont ) );
+	V_strcpy_safe( m_szOptionsFont, pSettings->GetString( "optionsfont", "Default" ) );
 }
 
 void COptionsItem::ApplySchemeSettings( vgui::IScheme *pScheme )
