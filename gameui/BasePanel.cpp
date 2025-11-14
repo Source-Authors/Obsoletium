@@ -561,7 +561,8 @@ CBasePanel::CBasePanel() : Panel(NULL, "BaseGameUIPanel")
 	m_bRenderingBackgroundTransition = false;
 	m_bFadingInMenus = false;
 	m_bEverActivated = false;
-	m_iGameMenuInset = 24;
+	// dimhotepus: Scale UI.
+	m_iGameMenuInset = QuickPropScale( 24 );
 	m_bPlatformMenuInitialized = false;
 	m_bHaveDarkenedBackground = false;
 	m_bHaveDarkenedTitleText = true;
@@ -1246,8 +1247,8 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
 
-	m_iGameMenuInset = atoi(pScheme->GetResourceString("MainMenu.Inset"));
-	m_iGameMenuInset *= 2;
+	// dimhotepus: Scale UI.
+	m_iGameMenuInset = QuickPropScale( 2 * atoi(pScheme->GetResourceString("MainMenu.Inset")) );
 
 	IScheme *pClientScheme = vgui::scheme()->GetIScheme( vgui::scheme()->GetScheme( "ClientScheme" ) );
 	CUtlVector< Color > buttonColor;
@@ -2855,21 +2856,25 @@ CFooterPanel::CFooterPanel( Panel *parent, const char *panelName ) : BaseClass( 
 	m_pSizingLabel = new vgui::Label( this, "SizingLabel", "" );
 	m_pSizingLabel->SetVisible( false );
 
-	m_nButtonGap = 32;
-	m_nButtonGapDefault = 32;
-	m_ButtonPinRight = 100;
-	m_FooterTall = 80;
+	// dimhotepus: Scale UI.
+	m_nButtonGap = QuickPropScale( 32 );
+	m_nButtonGapDefault = QuickPropScale( 32 );
+	m_ButtonPinRight = QuickPropScale( 100 );
+	m_FooterTall = QuickPropScale( 80 );
 
 	int wide, tall;
 	surface()->GetScreenSize(wide, tall);
-
-	if ( tall <= BASE_HEIGHT )
+	// dimhotepus: Scale UI.
+	if ( tall <= QuickPropScale( BASE_HEIGHT ) )
 	{
-		m_FooterTall = 60;
+		
+		// dimhotepus: Scale UI.
+		m_FooterTall = QuickPropScale( 60 );
 	}
 
 	m_ButtonOffsetFromTop = 0;
-	m_ButtonSeparator = 4;
+	// dimhotepus: Scale UI.
+	m_ButtonSeparator = QuickPropScale( 4 );
 	m_TextAdjust = 0;
 
 	m_bPaintBackground = false;
@@ -2895,8 +2900,9 @@ void CFooterPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	m_hButtonFont = pScheme->GetFont( ( m_szButtonFont[0] != '\0' ) ? m_szButtonFont : "GameUIButtons" );
-	m_hTextFont = pScheme->GetFont( ( m_szTextFont[0] != '\0' ) ? m_szTextFont : "MenuLarge" );
+	// dimhotepus: Scale UI.
+	m_hButtonFont = pScheme->GetFont( ( m_szButtonFont[0] != '\0' ) ? m_szButtonFont : "GameUIButtons", IsProportional() );
+	m_hTextFont = pScheme->GetFont( ( m_szTextFont[0] != '\0' ) ? m_szTextFont : "MenuLarge", IsProportional() );
 
 	SetFgColor( pScheme->GetColor( m_szFGColor, Color( 255, 255, 255, 255 ) ) );
 	SetBgColor( pScheme->GetColor( m_szBGColor, Color( 0, 0, 0, 255 ) ) );
@@ -2913,14 +2919,15 @@ void CFooterPanel::ApplySettings( KeyValues *inResourceData )
 {
 	BaseClass::ApplySettings( inResourceData );
 
+	// dimhotepus: Scale UI.
 	// gap between hints
-	m_nButtonGap = inResourceData->GetInt( "buttongap", 32 );
+	m_nButtonGap = QuickPropScale( inResourceData->GetInt( "buttongap", 32 ) );
 	m_nButtonGapDefault = m_nButtonGap;
-	m_ButtonPinRight = inResourceData->GetInt( "button_pin_right", 100 );
-	m_FooterTall = inResourceData->GetInt( "tall", 80 );
-	m_ButtonOffsetFromTop = inResourceData->GetInt( "buttonoffsety", 0 );
-	m_ButtonSeparator = inResourceData->GetInt( "button_separator", 4 );
-	m_TextAdjust = inResourceData->GetInt( "textadjust", 0 );
+	m_ButtonPinRight = QuickPropScale( inResourceData->GetInt( "button_pin_right", 100 ) );
+	m_FooterTall = QuickPropScale( inResourceData->GetInt( "tall", 80 ) );
+	m_ButtonOffsetFromTop = QuickPropScale( inResourceData->GetInt( "buttonoffsety", 0 ) );
+	m_ButtonSeparator = QuickPropScale( inResourceData->GetInt( "button_separator", 4 ) );
+	m_TextAdjust = QuickPropScale( inResourceData->GetInt( "textadjust", 0 ) );
 
 	m_bCenterHorizontal = ( inResourceData->GetInt( "center", 0 ) == 1 );
 	m_bPaintBackground = ( inResourceData->GetInt( "paintbackground", 0 ) == 1 );
