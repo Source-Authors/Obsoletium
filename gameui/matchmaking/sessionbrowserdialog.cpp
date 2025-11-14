@@ -105,7 +105,7 @@ void CSessionBrowserDialog::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
 
-	for ( int i = 0; i < m_pScenarioInfos.Count(); ++i )
+	for ( intp i = 0; i < m_pScenarioInfos.Count(); ++i )
 	{
 		m_pScenarioInfos[i]->SetBgColor( pScheme->GetColor( "TanDark", Color( 0, 0, 0, 255 ) ) );
 	}

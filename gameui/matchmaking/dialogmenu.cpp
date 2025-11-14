@@ -639,7 +639,7 @@ CSectionedItem::~CSectionedItem()
 
 void CSectionedItem::ClearSections()
 {
-	for ( int i = 0; i < m_Sections.Count(); ++i )
+	for ( intp i = 0; i < m_Sections.Count(); ++i )
 	{
 		section_s &sec = m_Sections[i];
 		delete sec.pLabel;
@@ -651,7 +651,7 @@ void CSectionedItem::PerformLayout()
 	BaseClass::PerformLayout();
 
 	int tall = GetTall();
-	for ( int i = 0; i < m_Sections.Count(); ++i )
+	for ( intp i = 0; i < m_Sections.Count(); ++i )
 	{
 		vgui::Label *pLabel = m_Sections[i].pLabel;
 		if ( !m_bHeader )
@@ -693,7 +693,7 @@ void CSectionedItem::AddSection( const char *pText, int align )
 
 void CSectionedItem::SetActiveColumn( int col )
 {
-	for ( int i = 0; i < m_Sections.Count(); ++i )
+	for ( intp i = 0; i < m_Sections.Count(); ++i )
 	{
 		m_Sections[i].pLabel->SetPaintBackgroundEnabled( i == col );
 	}
@@ -837,7 +837,7 @@ void CDialogMenu::PerformLayout()
 		m_pHeader->PerformLayout();
 	}
 
-	for ( int i = 0; i < m_MenuItems.Count(); ++i )
+	for ( intp i = 0; i < m_MenuItems.Count(); ++i )
 	{
 		CMenuItem *pItem = m_MenuItems[i];
 
@@ -1039,11 +1039,11 @@ void CDialogMenu::ApplySchemeSettings( vgui::IScheme *pScheme )
 //--------------------------------------------------------------------------------------
 void CDialogMenu::SetFocus( int idx )
 {
-	int itemCt = (unsigned int)m_MenuItems.Count();
+	intp itemCt = m_MenuItems.Count();
 	if ( idx >= itemCt )
 		return;
 
-	for ( int i = 0; i < itemCt; ++i )
+	for ( intp i = 0; i < itemCt; ++i )
 	{
 		m_MenuItems[i]->SetFocus( i == idx );
 	}
