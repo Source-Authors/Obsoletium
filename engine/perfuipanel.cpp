@@ -497,7 +497,7 @@ CPerfUIPanel::CPerfUIPanel( vgui::Panel *parent ) : BaseClass( parent, "PerfUIPa
 	int h = QuickPropScale( 400 );
 
 	int x = videomode->GetModeStereoWidth() - w - QuickPropScale( 10 );
-	int y = ( videomode->GetModeStereoHeight() - h ) / 2 + videomode->GetModeStereoHeight() * 0.2;
+	int y = ( videomode->GetModeStereoHeight() - h ) / 2 + videomode->GetModeStereoHeight() * 2 / 10;
 	SetBounds( x, y, w, h );
 
 	// Create the child tool panels
