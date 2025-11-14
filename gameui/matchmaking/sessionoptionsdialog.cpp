@@ -149,7 +149,8 @@ void CSessionOptionsDialog::ApplySettings( KeyValues *pResourceData )
 			int nTall = pScenario->GetInt( "tall", -1 );
 			if ( nTall > 0 )
 			{
-				pScenarioInfo->SetTall( nTall );
+				// dimhotepus: Scale UI.
+				pScenarioInfo->SetTall( QuickPropScale( nTall ) );
 			}
 
 			m_pScenarioInfos.AddToTail( pScenarioInfo );

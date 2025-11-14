@@ -66,7 +66,8 @@ void CSessionBrowserDialog::ApplySettings( KeyValues *pResourceData )
 			int nTall = pScenario->GetInt( "tall", -1 );
 			if ( nTall > 0 )
 			{
-				pScenarioInfo->SetTall( nTall );
+				// dimhotepus: Scale UI.
+				pScenarioInfo->SetTall( QuickPropScale( nTall ) );
 			}
 
 			int nXPos = pScenario->GetInt( "xpos", -1 );
@@ -74,7 +75,8 @@ void CSessionBrowserDialog::ApplySettings( KeyValues *pResourceData )
 			{
 				int x, y;
 				pScenarioInfo->GetPos( x, y );
-				pScenarioInfo->SetPos( nXPos, y );
+				// dimhotepus: Scale UI.
+				pScenarioInfo->SetPos( QuickPropScale( nXPos ), y );
 			}
 
 			int nDescOneYpos = pScenario->GetInt( "descOneY", -1 );
@@ -82,7 +84,8 @@ void CSessionBrowserDialog::ApplySettings( KeyValues *pResourceData )
 			{
 				int x, y;
 				pScenarioInfo->m_pDescOne->GetPos( x, y );
-				pScenarioInfo->m_pDescOne->SetPos( x, nDescOneYpos );
+				// dimhotepus: Scale UI.
+				pScenarioInfo->m_pDescOne->SetPos( x, QuickPropScale( nDescOneYpos ) );
 			}
 
 			int nDescTwoYpos = pScenario->GetInt( "descTwoY", -1 );
@@ -90,7 +93,8 @@ void CSessionBrowserDialog::ApplySettings( KeyValues *pResourceData )
 			{
 				int x, y;
 				pScenarioInfo->m_pDescTwo->GetPos( x, y );
-				pScenarioInfo->m_pDescTwo->SetPos( x, nDescTwoYpos );
+				// dimhotepus: Scale UI.
+				pScenarioInfo->m_pDescTwo->SetPos( x, QuickPropScale( nDescTwoYpos ) );
 			}
 
 			m_pScenarioInfos.AddToTail( pScenarioInfo );

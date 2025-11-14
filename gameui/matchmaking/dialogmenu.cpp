@@ -66,8 +66,9 @@ void CMenuItem::ApplySettings( KeyValues *pSettings )
 {
 	BaseClass::ApplySettings( pSettings );
 
-	m_nBottomMargin = pSettings->GetInt( "bottommargin", 0 );
-	m_nRightMargin	= pSettings->GetInt( "rightmargin", 0 );
+	// dimhotepus: Scale UI.
+	m_nBottomMargin = QuickPropScale( pSettings->GetInt( "bottommargin", 0 ) );
+	m_nRightMargin	= QuickPropScale( pSettings->GetInt( "rightmargin", 0 ) );
 
 	int x, y;
 	m_pTitle->GetPos( x, y );
@@ -384,11 +385,11 @@ void COptionsItem::PerformLayout()
 void COptionsItem::ApplySettings( KeyValues *pSettings )
 {
 	BaseClass::ApplySettings( pSettings );
-
-	m_nOptionsXPos			= pSettings->GetInt( "optionsxpos", 0 );
-	m_nOptionsMinWide		= pSettings->GetInt( "optionsminwide", 0 );
-	m_nOptionsLeftMargin	= pSettings->GetInt( "optionsleftmargin", 0 );
-	m_nArrowGap				= pSettings->GetInt( "arrowgap", 0 );
+	// dimhotepus: Scale UI.
+	m_nOptionsXPos			= QuickPropScale( pSettings->GetInt( "optionsxpos", 0 ) );
+	m_nOptionsMinWide		= QuickPropScale( pSettings->GetInt( "optionsminwide", 0 ) );
+	m_nOptionsLeftMargin	= QuickPropScale( pSettings->GetInt( "optionsleftmargin", 0 ) );
+	m_nArrowGap				= QuickPropScale( pSettings->GetInt( "arrowgap", 0 ) );
 
 	Q_strncpy( m_szOptionsFont, pSettings->GetString( "optionsfont", "Default" ), sizeof( m_szOptionsFont ) );
 }
@@ -660,7 +661,8 @@ void CSectionedItem::PerformLayout()
 			pLabel->SetFgColor( m_pParent->GetColumnColor(i) );
 		}
 		pLabel->SetBounds( m_pParent->GetColumnXPos(i), 0, m_pParent->GetColumnWide(i), tall );
-		pLabel->SetTextInset( 10, m_bHeader ? 5 : m_pParent->GetColumnYPos(i) ); // only use ypos for the y-inset if we're not a header
+		// dimhotepus: Scale UI.
+		pLabel->SetTextInset( QuickPropScale( 10 ), m_bHeader ? QuickPropScale( 5 ) : m_pParent->GetColumnYPos(i) ); // only use ypos for the y-inset if we're not a header
 	}
 }
 
@@ -831,7 +833,8 @@ void CDialogMenu::PerformLayout()
 
 	if ( m_bHasHeader )
 	{
-		yPos = 40;
+		// dimhotepus: Scale UI.
+		yPos = QuickPropScale( 40 );
 		m_pHeader->SetPos( 0, 0 );
 		m_pHeader->SetWide( wide );
 		m_pHeader->PerformLayout();
@@ -871,8 +874,9 @@ void CDialogMenu::ApplySettings( KeyValues *pResourceData )
 {
 	BaseClass::ApplySettings( pResourceData );
 
-	m_nItemSpacing		 = pResourceData->GetInt( "itemspacing", 2 );
-	m_nMinWide			 = pResourceData->GetInt( "minwide", 0 );
+	// dimhotepus: Scale UI.
+	m_nItemSpacing		 = QuickPropScale( pResourceData->GetInt( "itemspacing", 2 ) );
+	m_nMinWide			 = QuickPropScale( pResourceData->GetInt( "minwide", 0 ) );
 	m_nActiveColumn		 = pResourceData->GetInt( "activecolumn", -1 );
 	m_nMaxVisibleItems	 = pResourceData->GetInt( "maxvisibleitems", 1000 ); // arbitrarily large
 	m_nMaxVisibleColumns = pResourceData->GetInt( "maxvisiblecolumns", 1000 ); // arbitrarily large
@@ -889,12 +893,14 @@ void CDialogMenu::ApplySettings( KeyValues *pResourceData )
 			{
 				columninfo_s col;
 				col.bSortDown	= true;
-				col.xpos		= pColumn->GetInt( "xpos", xPos );
-				col.ypos		= pColumn->GetInt( "ypos", 0 );
-				col.wide		= pColumn->GetInt( "wide", 0 );
+				// dimhotepus: Scale UI.
+				col.xpos		= QuickPropScale( pColumn->GetInt( "xpos", xPos ) );
+				col.ypos		= QuickPropScale( pColumn->GetInt( "ypos", 0 ) );
+				col.wide		= QuickPropScale( pColumn->GetInt( "wide", 0 ) );
 				col.align		= pColumn->GetInt( "align", 3 ); // west by default
 				col.bLocked		= pColumn->GetInt( "locked", 0 );
-				col.hFont		= m_pScheme->GetFont( pColumn->GetString( "font", "default" ) );
+				// dimhotepus: Scale UI.
+				col.hFont		= m_pScheme->GetFont( pColumn->GetString( "font", "default" ), IsProportional() );
 				col.color		= m_pScheme->GetColor( pColumn->GetString( "fgcolor" ), Color( 0, 0, 0, 255 ) );
 				
 				ppHeader[idx++] = pColumn->GetString( "header", "" );
@@ -915,7 +921,8 @@ void CDialogMenu::ApplySettings( KeyValues *pResourceData )
 		SETUP_PANEL( m_pHeader );
 
 		m_pHeader->SetPaintBackgroundEnabled( false );
-		vgui::HFont headerFont = m_pScheme->GetFont( pColumnData->GetString( "headerfont", "default" ) );
+		// dimhotepus: Scale UI.
+		vgui::HFont headerFont = m_pScheme->GetFont( pColumnData->GetString( "headerfont", "default" ), IsProportional() );
 		Color headerColor = m_pScheme->GetColor( pColumnData->GetString( "headerfgcolor" ), Color( 0, 0, 0, 255 ) );
 		for ( int i = 0; i < idx; ++i )
 		{
@@ -1347,7 +1354,8 @@ int	CDialogMenu::GetColumnXPos( int idx )
 		if ( trueIdx < m_iUnlocked )
 		{
 			// Put it offscreen
-			xpos = -100 - col.wide;
+			// dimhotepus: Scale UI.
+			xpos = QuickPropScale( -100 ) - col.wide;
 		}
 		else
 		{
