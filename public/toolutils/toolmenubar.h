@@ -15,8 +15,6 @@
 
 #include "vgui_controls/menubar.h"
 
-using namespace vgui;
-
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -45,8 +43,8 @@ public:
 	CBaseToolSystem *GetToolSystem();
 
 protected:
-	Label		*m_pInfo;
-	Label		*m_pToolName;
+	vgui::Label		*m_pInfo;
+	vgui::Label		*m_pToolName;
 	CBaseToolSystem *m_pToolSystem;
 };
 
@@ -64,7 +62,7 @@ public:
 	void SetFileName( const char *pFileName );
 
 private:
-	Label		*m_pFileName;
+	vgui::Label		*m_pFileName;
 };
 
 
