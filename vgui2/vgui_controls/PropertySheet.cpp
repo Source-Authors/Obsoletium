@@ -150,9 +150,7 @@ public:
 		if ( imageName )
 		{
 			m_pImage = new ImagePanel( this, text );
-			intp buflen = Q_strlen( imageName ) + 1;
-			m_pszImageName = new char[ buflen ];
-			Q_strncpy( m_pszImageName, imageName, buflen );
+			m_pszImageName = V_strdup( imageName );
 
 		}
 		SetMouseClickEnabled( MOUSE_RIGHT, true );
