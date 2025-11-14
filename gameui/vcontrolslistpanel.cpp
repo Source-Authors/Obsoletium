@@ -78,8 +78,12 @@ VControlsListPanel::VControlsListPanel( vgui::Panel *parent, const char *listNam
 {
 	m_bCaptureMode	= false;
 	m_nClickRow		= 0;
-	m_pInlineEditPanel = new CInlineEditPanel(parent);
 	m_hFont = INVALID_FONT;
+	m_pInlineEditPanel = new CInlineEditPanel(parent);
+	// dimhotepus: To scale UI inline edit got parent
+	// dimhotepus: Due to parent it is rendered in its bounds on start, which is not needed.
+	m_pInlineEditPanel->SetVisible(false);
+	m_iMouseX = m_iMouseY = 0;
 }
 
 //-----------------------------------------------------------------------------
