@@ -36,7 +36,7 @@ public:
 	{
 	}
 
-	virtual void Paint()
+	void Paint() override
 	{
 		int x = 0, y = 0, wide, tall;
 		GetSize(wide, tall);
@@ -46,7 +46,7 @@ public:
 		vgui::surface()->DrawFilledRect( x, y, x + wide, y + tall );
 	}
 
-	virtual void OnKeyCodeTyped(KeyCode code)
+	void OnKeyCodeTyped(KeyCode code) override
 	{
 		// forward up
 		if (GetParent())
@@ -55,13 +55,13 @@ public:
 		}
 	}
 
-	virtual void ApplySchemeSettings(IScheme *pScheme)
+	void ApplySchemeSettings(IScheme *pScheme) override
 	{
 		Panel::ApplySchemeSettings(pScheme);
 		SetBorder(pScheme->GetBorder("DepressedButtonBorder"));
 	}
 
-	void OnMousePressed(vgui::MouseCode code)
+	void OnMousePressed(vgui::MouseCode code) override
 	{
 		// forward up mouse pressed messages to be handled by the key options
 		if (GetParent())
