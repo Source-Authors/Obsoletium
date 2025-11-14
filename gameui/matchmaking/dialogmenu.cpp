@@ -1390,7 +1390,7 @@ int CDialogMenu::GetColumnAlignment( int idx )
 //-----------------------------------------------------------------------
 // Return the specified column font
 //-----------------------------------------------------------------------
-HFont CDialogMenu::GetColumnFont( int idx )
+vgui::HFont CDialogMenu::GetColumnFont( int idx )
 {
 	return m_Columns[idx].hFont;
 }
