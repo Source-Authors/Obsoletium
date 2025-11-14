@@ -456,7 +456,7 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 				}
 				else
 				{
-					Q_snprintf( sz, sizeof( sz ), "%i", ent->entindex() );
+					V_to_chars( sz, ent->entindex() );
 				}
 
 				np.index = i;
