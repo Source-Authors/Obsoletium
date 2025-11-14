@@ -225,7 +225,7 @@ private:
 	int m_iDragX;
 	int m_iDragY;
 	CDmeHandle< CDmeVMFEntity > m_hPreviewTarget;
-	CToolWindowFactory< ToolWindow > m_ToolWindowFactory;
+	CToolWindowFactory< vgui::ToolWindow > m_ToolWindowFactory;
 
 	// remembered player position
 	bool m_bRememberPlayerPosition;

@@ -15,8 +15,6 @@
 #include "materialsystem/MaterialSystemUtil.h"
 #include "datamodel/dmehandle.h"
 
-using namespace vgui;
-
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -35,7 +33,7 @@ class CSubRectImage;
 // we can be driven by the preset pane or by dragging on any individual control
 // we can also be driven by ctrl hovering over the preset pane or an individual control
 // if we move from control to control in the preset or here, we need to be able to decay into/out of the various individual sliders
-class CAttributeSlider : public EditablePanel 
+class CAttributeSlider : public vgui::EditablePanel 
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CAttributeSlider, EditablePanel );
 
@@ -43,15 +41,15 @@ class CAttributeSlider : public EditablePanel
 public:
 	void Paint() override;
 	void PaintBackground() override;
-	void ApplySchemeSettings( IScheme *scheme ) override;
+	void ApplySchemeSettings( vgui::IScheme *scheme ) override;
 	void PerformLayout() override;
 	void OnCursorMoved(int x, int y) override;
-	void OnMousePressed(MouseCode code) override;
-	void OnMouseDoublePressed(MouseCode code) override;
-	void OnMouseReleased(MouseCode code) override;
+	void OnMousePressed(vgui::MouseCode code) override;
+	void OnMouseDoublePressed(vgui::MouseCode code) override;
+	void OnMouseReleased(vgui::MouseCode code) override;
 	void OnCursorEntered() override;
 	void OnCursorExited() override;
-	void OnKeyCodeTyped( KeyCode code ) override;
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
 
 	// Other public methods
 public:
@@ -175,8 +173,8 @@ private:
 
 private:
 	CBaseAnimSetAttributeSliderPanel *m_pParent;
-	TextImage *m_pName;
-	TextImage *m_pValues[ 3 ];
+	vgui::TextImage *m_pName;
+	vgui::TextImage *m_pValues[ 3 ];
 	CSubRectImage *m_pCircleImage;	// The background for the balance + multilevel controls
 
 	// This is the control we're modifying

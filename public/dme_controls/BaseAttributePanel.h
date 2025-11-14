@@ -34,8 +34,6 @@ namespace vgui
 	class Label;
 }
 
-using namespace vgui;
-
 
 //-----------------------------------------------------------------------------
 // CBaseAttributePanel
@@ -49,8 +47,8 @@ public:
 
 	virtual void	PostConstructor();
 	void	PerformLayout() override;
-	virtual void	SetFont( HFont font );
-	void	ApplySchemeSettings( IScheme *pScheme ) override;
+	virtual void	SetFont( vgui::HFont font );
+	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 	void	OnCreateDragData( KeyValues *msg ) override;
 
 	void			SetDirty( bool dirty );
@@ -141,7 +139,7 @@ private:
 	MESSAGE_FUNC( OnRefresh, "Refresh" );
 
 protected:
-	Label *m_pType;
+	vgui::Label *m_pType;
 
 private:
 	CDmeHandle< CDmElement >				m_hObject;
@@ -154,7 +152,7 @@ private:
 	IDmNotify *m_pNotify;
 	int m_nFlags;
 	CUtlRBTree< colinfo_t, int > m_ColumnSize;
-	HFont m_hFont;
+	vgui::HFont m_hFont;
 };
 
 

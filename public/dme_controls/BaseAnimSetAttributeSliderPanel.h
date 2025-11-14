@@ -17,8 +17,6 @@
 #include "movieobjects/dmechannel.h"
 #include "dme_controls/BaseAnimSetPresetFaderPanel.h"
 
-using namespace vgui;
-
 
 //-----------------------------------------------------------------------------
 // Forward declarations

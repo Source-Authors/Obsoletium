@@ -33,7 +33,7 @@ CPetDoc::CPetDoc( IPetDocCallback *pCallback ) : m_pCallback( pCallback )
 	m_pFileName[0] = 0;
 	m_bDirty = false;
 	g_pDataModel->InstallNotificationCallback( this );
-	SetElementPropertiesChoices( this );
+	vgui::SetElementPropertiesChoices( this );
 }
 
 CPetDoc::~CPetDoc()
@@ -44,7 +44,7 @@ CPetDoc::~CPetDoc()
 		m_hRoot = NULL;
 	}
 	g_pDataModel->RemoveNotificationCallback( this );
-	SetElementPropertiesChoices( NULL );
+	vgui::SetElementPropertiesChoices( NULL );
 }
 
 

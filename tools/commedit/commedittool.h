@@ -223,7 +223,7 @@ private:
 	bool m_bDroppingCommentaryNodes;
 	CDmeHandle< CDmeCommentaryNodeEntity > m_hPreviewNode;
 	CDmeHandle< CDmeCommentaryNodeEntity > m_hPreviewTarget;
-	CToolWindowFactory< ToolWindow > m_ToolWindowFactory;
+	CToolWindowFactory< vgui::ToolWindow > m_ToolWindowFactory;
 };
 
 extern CCommEditTool *g_pCommEditTool;

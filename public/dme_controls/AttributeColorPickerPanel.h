@@ -41,7 +41,7 @@ public:
 	void	OnCommand( const char *cmd ) override;
 	void	PerformLayout() override;
 	void	Refresh() override;
-	void	ApplySchemeSettings(IScheme *pScheme) override;
+	void	ApplySchemeSettings(vgui::IScheme *pScheme) override;
 
 private:
 	MESSAGE_FUNC_PARAMS( OnPreview, "ColorPickerPreview", data );

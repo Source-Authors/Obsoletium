@@ -201,7 +201,7 @@ private:
 	CDmeHandle< CDmeParticleSystemDefinition > m_hCurrentParticleSystem;
 
 	// Separate undo context for the act busy tool
-	CToolWindowFactory< ToolWindow > m_ToolWindowFactory;
+	CToolWindowFactory< vgui::ToolWindow > m_ToolWindowFactory;
 };
 
 extern CPetTool *g_pPetTool;

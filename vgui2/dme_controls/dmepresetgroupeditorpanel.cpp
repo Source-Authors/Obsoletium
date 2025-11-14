@@ -70,7 +70,7 @@ public:
 	// Inherited from Frame
 	void OnCommand( const char *pCommand ) override;
 
-	void OnKeyCodeTyped( KeyCode code ) override;
+	void OnKeyCodeTyped( vgui::KeyCode code ) override;
 
 private:
 	MESSAGE_FUNC( OnTextChanged, "TextChanged" );
@@ -228,7 +228,7 @@ void CDmePresetRemapPanel::OnPresetPicked( KeyValues *pParams )
 //-----------------------------------------------------------------------------
 // Called when double-clicking on a list entry
 //-----------------------------------------------------------------------------
-void CDmePresetRemapPanel::OnKeyCodeTyped( KeyCode code )
+void CDmePresetRemapPanel::OnKeyCodeTyped( vgui::KeyCode code )
 {
 	if ( code == KEY_ENTER )
 	{
@@ -2033,13 +2033,13 @@ void CDmePresetGroupListPanel::OnDroppablePanelPaint( CUtlVector< KeyValues * >&
 
 	LocalToScreen( x, y );
 
-	surface()->DrawSetColor( GetDropFrameColor() );
+	vgui::surface()->DrawSetColor(GetDropFrameColor());
 
 	// Draw insertion point
-	surface()->DrawFilledRect( x,			y, x + w, y + 2 );
-	surface()->DrawFilledRect( x,	y + h - 2, x + w, y + h );
-	surface()->DrawFilledRect( x,			y, x + 2, y + h );
-	surface()->DrawFilledRect( x + w - 2,	y, x + w, y + h );
+	vgui::surface()->DrawFilledRect( x,			y, x + w, y + 2 );
+	vgui::surface()->DrawFilledRect( x,	y + h - 2, x + w, y + h );
+	vgui::surface()->DrawFilledRect( x,			y, x + 2, y + h );
+	vgui::surface()->DrawFilledRect( x + w - 2,	y, x + w, y + h );
 }
 
 
@@ -2171,13 +2171,13 @@ void CDmePresetListPanel::OnDroppablePanelPaint( CUtlVector< KeyValues * >& msgl
 	GetCellBounds( row, column, x, y, w, h );
 	LocalToScreen( x, y );
 
-	surface()->DrawSetColor( GetDropFrameColor() );
+	vgui::surface()->DrawSetColor(GetDropFrameColor());
 
 	// Draw insertion point
-	surface()->DrawFilledRect( x,			y, x + w, y + 2 );
-	surface()->DrawFilledRect( x,	y + h - 2, x + w, y + h );
-	surface()->DrawFilledRect( x,			y, x + 2, y + h );
-	surface()->DrawFilledRect( x + w - 2,	y, x + w, y + h );
+	vgui::surface()->DrawFilledRect( x,			y, x + w, y + 2 );
+	vgui::surface()->DrawFilledRect( x,	y + h - 2, x + w, y + h );
+	vgui::surface()->DrawFilledRect( x,			y, x + 2, y + h );
+	vgui::surface()->DrawFilledRect( x + w - 2,	y, x + w, y + h );
 }
 
 
