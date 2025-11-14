@@ -117,29 +117,6 @@ public:
 };
 
 //-----------------------------------------------------------------------
-// CBrowserItem
-//
-// Menu item used to display session search results, etc.
-//-----------------------------------------------------------------------
-class CBrowserItem : public CCommandItem
-{
-	DECLARE_CLASS_SIMPLE_OVERRIDE( CBrowserItem, CCommandItem ); 
-
-public:
-	CBrowserItem( CDialogMenu *pParent, const char *pHost, const char *pPlayers, const char *pScenario, const char *pPing );
-	virtual ~CBrowserItem();
-
-	void	PerformLayout() override;
-	void	ApplySettings( KeyValues *pSettings ) override;
-	void	ApplySchemeSettings( vgui::IScheme *pScheme ) override;
-	
-private:
-	vgui::Label	*m_pPlayers;
-	vgui::Label *m_pScenario;
-	vgui::Label *m_pPing;
-};
-
-//-----------------------------------------------------------------------
 // COptionsItem
 //
 // Menu item used to present a list of options for the player to select
@@ -249,7 +226,6 @@ public:
 	// Menu items
 	CCommandItem		*AddCommandItem( const char *pTitleLabel, const char *pDescLabel, const char *pCommand );
 	CPlayerItem			*AddPlayerItem( const char *pTitleLabel, int64 nId, byte bVoice, bool bReady );
-	CBrowserItem		*AddBrowserItem( const char *pHost, const char *pPlayers, const char *pScenario, const char *pPing );
 	COptionsItem		*AddOptionsItem( const char *pLabel );
 	CSectionedItem		*AddSectionedItem( const char **ppEntries, int ct );
 	CMenuItem			*AddItemInternal( CMenuItem *pItem );

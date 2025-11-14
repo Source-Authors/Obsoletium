@@ -262,62 +262,6 @@ void CPlayerItem::OnClick()
 }
 
 //-----------------------------------------------------------------------
-// CBrowserItem
-//
-// Menu item used to display session search results.
-//-----------------------------------------------------------------------
-CBrowserItem::CBrowserItem( CDialogMenu *pParent, const char *pHost, const char *pPlayers, const char *pScenario, const char *pPing ) 
-	: BaseClass( pParent, pHost, NULL, "SelectSession" )
-{
-	m_pPlayers = new vgui::Label( this, "players", pPlayers );
-	m_pScenario = new vgui::Label( this, "scenario", pScenario );
-	m_pPing = new vgui::Label( this, "ping", pPing );
-}
-
-CBrowserItem::~CBrowserItem()
-{
-	delete m_pPlayers;
-	delete m_pScenario;
-	delete m_pPing;
-}
-
-void CBrowserItem::PerformLayout()
-{
-	BaseClass::PerformLayout();
-
-	int x, y, wide, tall;
-	m_pPing->GetBounds( x, y, wide, tall );
-
-	m_pScenario->SizeToContents();
-	int sx, sy;
-	m_pScenario->GetPos( sx, sy );
-	m_pScenario->SetPos( x - m_pScenario->GetWide() - m_nRightMargin, sy );
-
-	SetSize( x + wide, GetTall() );
-}
-
-void CBrowserItem::ApplySettings( KeyValues *pSettings )
-{
-	BaseClass::ApplySettings( pSettings );
-}
-
-void CBrowserItem::ApplySchemeSettings( vgui::IScheme *pScheme )
-{
-	BaseClass::ApplySchemeSettings( pScheme );
-
-	Color fgcolor = pScheme->GetColor( "MatchmakingMenuItemDescriptionColor", Color( 64, 64, 64, 255 ) );
-	m_pPlayers->SetFgColor( fgcolor );
-	m_pScenario->SetFgColor( fgcolor );
-
-	m_pPing->SetContentAlignment( vgui::Label::a_center );
-
-	KeyValues *pKeys = BasePanel()->GetConsoleControlSettings()->FindKey( "BrowserItem.res" );
-	ApplySettings( pKeys );
-
-	SetFocus( false );
-}
-
-//-----------------------------------------------------------------------
 // COptionsItem
 //
 // Menu item used to present a list of options for the player to select
@@ -684,14 +628,6 @@ CMenuItem *CDialogMenu::AddItemInternal( CMenuItem *pItem )
 CCommandItem *CDialogMenu::AddCommandItem( const char *pTitleLabel, const char *pDescLabel, const char *pCommand )
 {
 	return (CCommandItem*)AddItemInternal( new CCommandItem( this, pTitleLabel, pDescLabel, pCommand ) );
-}
-
-CBrowserItem *CDialogMenu::AddBrowserItem( const char *pHost, const char *pPlayers, const char *pScenario, const char *pPing )
-{
-	// Results are added to the menu at runtime, so the layout needs to be updated after each addition.
-	CBrowserItem *pItem = (CBrowserItem*)AddItemInternal( new CBrowserItem( this, pHost, pPlayers, pScenario, pPing ) );
-	PerformLayout();
-	return pItem;
 }
 
 COptionsItem *CDialogMenu::AddOptionsItem( const char *pLabel )
