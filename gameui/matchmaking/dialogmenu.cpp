@@ -107,8 +107,8 @@ void CMenuItem::ApplySchemeSettings( vgui::IScheme *pScheme )
 		m_pDescription->SetFgColor( pScheme->GetColor( "MatchmakingMenuItemDescriptionColor", Color( 0, 0, 0, 255 ) ) );
 	}
 
-		KeyValues *pKeys = BasePanel()->GetConsoleControlSettings()->FindKey( "MenuItem.res" );
-		ApplySettings( pKeys );
+	KeyValues *pKeys = BasePanel()->GetConsoleControlSettings()->FindKey( "MenuItem.res" );
+	ApplySettings( pKeys );
 }
 
 //-----------------------------------------------------------------------
@@ -273,7 +273,10 @@ COptionsItem::COptionsItem( CDialogMenu *pParent, const char *pLabel )
 {
 	m_nActiveOption = m_Options.InvalidIndex();
 	m_nOptionsXPos = 0;
+	m_nOptionsMinWide = 0;
+	m_nOptionsLeftMargin = 0;
 	m_nMaxOptionWidth = 0;
+	m_nArrowGap = 0;
 
 	m_szOptionsFont[0] = '\0';
 	m_hOptionsFont = vgui::INVALID_FONT;
