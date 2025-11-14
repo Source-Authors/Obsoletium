@@ -17,7 +17,8 @@ using namespace vgui;
 CDialogServerPassword::CDialogServerPassword(vgui::Panel *parent) : Frame(parent, "DialogServerPassword")
 {
 	m_iServerID = -1;
-	SetSize(320, 240);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 320 ), QuickPropScale( 240 ));
 	SetDeleteSelfOnClose(true);
 	SetSizeable(false);
 
