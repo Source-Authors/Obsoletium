@@ -24,10 +24,10 @@
 #include "vgui_controls/Controls.h"
 #include "vgui_controls/PHandle.h"
 #include "vgui_controls/PanelAnimationVar.h"
+#include "vgui_controls/BuildGroup.h"
 #include "Color.h"
 #include "vstdlib/IKeyValuesSystem.h"
 #include "tier1/utlsymbol.h"
-#include "vgui_controls/BuildGroup.h"
 
 // undefine windows function macros that overlap 
 #ifdef PostMessage
