@@ -187,8 +187,8 @@ CProfileHierarchyPanel::ColumnPanels_t::ColumnPanels_t() :
 CProfileHierarchyPanel::ColumnPanels_t::ColumnPanels_t( const ColumnPanels_t& src )
 {
 	treeViewItem = src.treeViewItem;
-	int c = src.m_Columns.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = src.m_Columns.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		PanelEntry_t pe;
 		pe.dataname = src.m_Columns[ i ].dataname;
@@ -210,8 +210,8 @@ void CProfileHierarchyPanel::ColumnPanels_t::Refresh( KeyValues *kv )
 {
 	VPROF( "CProfileHierarchyPanel::ColumnPanels_t" );
 
-	int c = m_Columns.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = m_Columns.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		vgui::Label *label = m_Columns[ i ].label;
 		if ( !label )
@@ -277,8 +277,8 @@ void CProfileHierarchyPanel::SetItemColors( int id, const Color& fg, const Color
 		return;
 	}
 	ColumnPanels_t& info = m_Panels[ idx ];
-	int c = info.m_Columns.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = info.m_Columns.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
 		Label *label = info.m_Columns[ i ].label;
 		if ( !label )
@@ -299,7 +299,7 @@ void CProfileHierarchyPanel::SetItemColumnColors( int id, int col, const Color& 
 		return;
 	}
 	ColumnPanels_t& info = m_Panels[ idx ];
-	int c = info.m_Columns.Count();
+	intp c = info.m_Columns.Count();
 	if ( col < 0 || col >= c )
 		return;
 
@@ -426,8 +426,8 @@ void CProfileHierarchyPanel::HideAll()
 	for ( int i = m_Panels.FirstInorder(); i != m_Panels.InvalidIndex(); i = m_Panels.NextInorder( i ) )
 	{
 		ColumnPanels_t& info = m_Panels[ i ];
-		int c = info.m_Columns.Count();
-		for ( int j = 0 ; j < c; ++j )
+		intp c = info.m_Columns.Count();
+		for ( intp j = 0 ; j < c; ++j )
 		{
 			Label *panel = info.m_Columns[ j ].label;
 			if ( !panel )
@@ -446,8 +446,8 @@ void CProfileHierarchyPanel::RemoveAll()
 	for ( int i = m_Panels.FirstInorder(); i != m_Panels.InvalidIndex(); i = m_Panels.NextInorder( i ) )
 	{
 		ColumnPanels_t& info = m_Panels[ i ];
-		int c = info.m_Columns.Count();
-		for ( int j = 0 ; j < c; ++j )
+		intp c = info.m_Columns.Count();
+		for ( intp j = 0 ; j < c; ++j )
 		{
 			delete info.m_Columns[ j ].label;
 		}
