@@ -364,8 +364,8 @@ void NDebugOverlay::DrawTickMarkedLine(const Vector &startPos, const Vector &end
 		// Draw tick mark text
 		if (tickTextCnt == tickTextDist)
 		{
-			char text[25];
-			Q_snprintf(text,sizeof(text),"%i",i);
+			char text[16];
+			V_to_chars(text,i);
 			Vector textPos = tickLeft + Vector(0,0,8);
 			Line(tickLeft, tickRight, 255,255,255,noDepthTest,duration);
 			Text( textPos, text, true, 0 );

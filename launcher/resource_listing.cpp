@@ -406,7 +406,7 @@ bool ResourceListing::InitCommandFile(const char *pchGameDir,
   int i = 0;
   do {
     char sz[32];
-    Q_snprintf(sz, sizeof(sz), "%i", i);
+    V_to_chars(sz, i);
     KeyValues *subKey = kv->FindKey(sz, false);
     if (!subKey) break;
 

@@ -128,9 +128,9 @@ CCreateMultiplayerGameServerPage::CCreateMultiplayerGameServerPage(
   m_pNetworkCombo->ActivateItem(defaultItem);
 
   m_pNumPlayers = new ComboBox(this, "NumPlayers", 10, false);
-  char num[3];
+  char num[4];
   for (int i = 1; i <= MAX_PLAYERS; i++) {
-    V_sprintf_safe(num, "%i", i);
+    V_to_chars(num, i);
     m_pNumPlayers->AddItem(num, nullptr);
   }
   m_pNumPlayers->ActivateItemByRow(23);  // 24 players by default
@@ -317,7 +317,7 @@ bool CCreateMultiplayerGameServerPage::BadRconChars(const char *pass) {
 
 const char *ToString(int val) {
   static char text[256];
-  Q_snprintf(text, sizeof(text), "%i", val);
+  V_to_chars(text, val);
   return text;
 }
 

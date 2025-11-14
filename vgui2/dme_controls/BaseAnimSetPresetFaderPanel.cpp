@@ -1127,7 +1127,7 @@ void CBaseAnimSetPresetFaderPanel::OnSetCrossfadeSpeed()
 	}
 
 	char sz[32 ];
-	Q_snprintf( sz, sizeof( sz ), "%f", ifm_fader_timescale );
+	V_to_chars( sz, ifm_fader_timescale );
 	m_hInputDialog = new InputDialog( this, "Crossfade Speed", "Fader Crossfade Rate:", sz );
 	if ( m_hInputDialog.Get() )
 	{

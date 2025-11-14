@@ -576,7 +576,7 @@ void CSoundPickerFrame::OnCommand( const char *pCommand )
 				for ( int i = 0; i < nSoundCount; ++i )
 				{
 					char pBuf[32];
-					Q_snprintf( pBuf, sizeof(pBuf), "%d", i );
+					V_to_chars( pBuf, i );
 					pSoundName = pPicker->GetSelectedSoundName( i );
 
 					len = V_strlen( pSoundName );

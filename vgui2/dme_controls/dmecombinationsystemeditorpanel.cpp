@@ -1357,7 +1357,7 @@ void CDmeRawControlListPanel::OnMouseDoublePressed( vgui::MouseCode code )
 	m_bIsWrinkle = !Q_stricmp( pKeyValues->GetString( "wrinkletype" ), "Wrinkle" );
 
 	char buf[64];
-	Q_snprintf( buf, sizeof(buf), "%f", flWrinkleValue );
+	V_to_chars( buf, flWrinkleValue );
 	m_pWrinkleEdit->SetText( buf );
 
 	EnterEditMode( nEditingItem, 3, m_pWrinkleEdit );

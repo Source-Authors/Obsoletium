@@ -565,9 +565,9 @@ void CAttributeSlider::EnterTextEntryMode( AnimationControlType_t type, bool bRe
 		ValueBalanceToLeftRight( &flLeftValue, &flRightValue, flValue, flBalance );
 
 		char val[ 64 ];
-		V_snprintf( val, sizeof( val ), "%f", flLeftValue );
+		V_to_chars( val, flLeftValue );
 		m_pTextField->SetText( val );
-		V_snprintf( val, sizeof( val ), "%f", flRightValue );
+		V_to_chars( val, flRightValue );
 		m_pRightTextField->SetText( val );
 
 		m_pRightTextField->GotoTextEnd();
@@ -576,7 +576,7 @@ void CAttributeSlider::EnterTextEntryMode( AnimationControlType_t type, bool bRe
 	else
 	{
 		char val[ 64 ];
-		Q_snprintf( val, sizeof( val ), "%f", m_InitialTextEntryValue.m_pValue[ type ] );
+		V_to_chars( val, m_InitialTextEntryValue.m_pValue[ type ] );
 		m_pTextField->SetText( val );
 	}
 
@@ -699,7 +699,7 @@ void CAttributeSliderTextEntry::OnMouseWheeled( int delta )
 		val = clamp( val, 0.0f, 1.0f );
 	}
 
-	Q_snprintf( sz, sizeof( sz ), "%f", val );
+	V_to_chars( sz, val );
 
 	SetText( sz );
 	m_pSlider->SetValue( ANIM_CONTROL_VALUE, val );

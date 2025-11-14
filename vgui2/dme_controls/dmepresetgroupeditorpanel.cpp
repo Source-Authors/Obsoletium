@@ -1074,7 +1074,7 @@ bool CDmePresetGroupEditorPanel::OnWriteFileToDisk( const char *pFileName, const
 	for ( int i = 0; i < nCount; ++i )
 	{
 		char pBuf[32];
-		Q_snprintf( pBuf, sizeof(pBuf), "%d", i );
+		V_to_chars( pBuf, i );
 		CDmePreset *pPreset = GetElementKeyValue<CDmePreset>( pContextKeyValues, pBuf );
 		presets.AddToTail( pPreset );
 	}
@@ -1150,7 +1150,7 @@ void CDmePresetGroupEditorPanel::OnPresetPicked( KeyValues *pParams )
 	for ( int i = 0; i < nCount; ++i )
 	{
 		char pBuf[32];
-		Q_snprintf( pBuf, sizeof(pBuf), "%d", i );
+		V_to_chars( pBuf, i );
 		CDmePreset *pPreset = GetElementKeyValue<CDmePreset>( pParams, pBuf );
 		presets.AddToTail( pPreset );
 	}
@@ -1162,7 +1162,7 @@ void CDmePresetGroupEditorPanel::OnPresetPicked( KeyValues *pParams )
 		for ( int i = 0; i < nCount; ++i )
 		{
 			char pBuf[32];
-			Q_snprintf( pBuf, sizeof(pBuf), "%d", i );
+			V_to_chars( pBuf, i );
 			SetElementKeyValue( pContextKeyValues, pBuf, presets[i] );
 		}
 

@@ -172,7 +172,7 @@ bool CGenericClassBasedReplay::Read( KeyValues *pIn )
 		for ( int i = 0; i < REPLAY_GAMESTATS_MAX; ++i )
 		{
 			char szStatKey[ 16 ];
-			V_snprintf( szStatKey, sizeof( szStatKey ), "%i", i );
+			V_to_chars( szStatKey, i );
 			m_lifeStats.Set( i, pStats->GetInt( szStatKey ) );
 		}
 	}
@@ -247,7 +247,7 @@ void CGenericClassBasedReplay::Write( KeyValues *pOut )
 		if ( nCurStat )
 		{
 			char szStatKey[ 16 ];
-			V_snprintf( szStatKey, sizeof( szStatKey ), "%i", i );
+			V_to_chars( szStatKey, i );
 			pStats->SetInt( szStatKey, nCurStat );
 		}
 	}

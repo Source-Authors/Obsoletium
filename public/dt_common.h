@@ -140,7 +140,7 @@ public:
 					switch ( m_Type )
 					{
 						case DPT_Int : 
-							Q_snprintf( text, sizeof(text), "%i", m_Int );
+							V_to_chars( text, m_Int );
 							break;
 						case DPT_Float :
 							Q_snprintf( text, sizeof(text), "%.3f", m_Float );

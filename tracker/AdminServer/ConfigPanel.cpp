@@ -69,10 +69,10 @@ CConfigPanel::CConfigPanel(vgui::Panel *parent, bool autorefresh,bool savercon,i
 
 	char refreshText[20];
 
-	V_sprintf_safe(refreshText,"%i",refreshtime);
+	V_to_chars(refreshText,refreshtime);
 	m_pRefreshTextEntry->SetText(refreshText);
 	
-	V_sprintf_safe(refreshText,"%i",graphsrefreshtime);
+	V_to_chars(refreshText,graphsrefreshtime);
 	m_pGraphsRefreshTimeTextEntry->SetText(refreshText);
 
 	SetVisible(true);

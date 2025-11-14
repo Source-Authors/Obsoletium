@@ -1018,7 +1018,7 @@ void CNetGraphPanel::DrawLargePacketSizes( int x, int w, int graphtype, float wa
 			nTotalBytes > MAX( 300, warning_threshold ) )
 		{
 			char sz[ 32 ];
-			Q_snprintf( sz, sizeof( sz ), "%i", nTotalBytes );
+			V_to_chars( sz, nTotalBytes );
 
 			int len = g_pMatSystemSurface->DrawTextLen( m_hFont, "%s", sz );
 

@@ -1351,7 +1351,7 @@ void CBaseGamesPage::UpdateFilterSettings()
 	if ( ( regCode >= 0 ) && ( regCode < 255 ) )
 	{
 		char szRegCode[ 32 ];
-		Q_snprintf( szRegCode, sizeof(szRegCode), "%i", regCode );
+		V_to_chars( szRegCode, regCode );
 		m_vecServerFilters.AddToTail( MatchMakingKeyValuePair_t( "region", szRegCode ) );
 	}
 

@@ -130,7 +130,7 @@ void C_VoteController::ClientThink()
 				for ( int i = 0; i < MAX_VOTE_OPTIONS; i++ )
 				{	
 					char szOption[2];
-					Q_snprintf( szOption, sizeof( szOption ), "%i", i + 1 );
+					V_to_chars( szOption, i + 1 );
 
 					char szVoteOption[13] = "vote_option";
 					Q_strncat( szVoteOption, szOption, sizeof( szVoteOption ), COPY_ALL_CHARACTERS );

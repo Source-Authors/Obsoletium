@@ -1517,7 +1517,7 @@ const char *variant_t::ToString( void ) const
 
 	case FIELD_INTEGER:
 		{
-			Q_snprintf( szBuf, sizeof( szBuf ), "%i", iVal );
+			V_to_chars( szBuf, iVal );
 			return(szBuf);
 		}
 

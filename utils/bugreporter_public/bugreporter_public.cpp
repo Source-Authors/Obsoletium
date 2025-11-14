@@ -453,7 +453,7 @@ void CBugReporter::SubstituteBugId( int bugid, char *out, int outlen, CUtlBuffer
 			*dest++ = '\\';
 
 			char num[ 32 ];
-			Q_snprintf( num, sizeof( num ), "%i", bugid );
+			V_to_chars( num, bugid );
 			char *pnum = num;
 			while ( *pnum )
 			{

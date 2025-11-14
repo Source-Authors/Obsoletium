@@ -53,7 +53,7 @@ void CDmeVMFEntity::OnConstruction()
 	{
 		// Assign a unique ID to the name
 		char pNameString[128];
-		Q_snprintf( pNameString, sizeof(pNameString), "%d", GetNextEntityId() );
+		V_to_chars( pNameString, GetNextEntityId() );
 		m_Name = pNameString;
 	}
 

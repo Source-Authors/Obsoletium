@@ -112,7 +112,7 @@ void CReplayTime::Write( KeyValues *pOut )
 	char szDay[8];		// Convert day to wide
 	static wchar_t s_wDay[8];
 
-	V_sprintf_safe( szDay, "%i", nDay );
+	V_to_chars( szDay, nDay );
 	pLocalize->ConvertANSIToUnicode( szDay, s_wDay );
 
 	return s_wDay;
@@ -123,7 +123,7 @@ void CReplayTime::Write( KeyValues *pOut )
 	char szYear[8];		// Convert year to wide
 	static wchar_t s_wYear[8];
 
-	V_sprintf_safe( szYear, "%i", nYear );
+	V_to_chars( szYear, nYear );
 	pLocalize->ConvertANSIToUnicode( szYear, s_wYear );
 
 	return s_wYear;

@@ -188,7 +188,7 @@ void CGraphPanel::OnServerDataResponse(const char *value, const char *response)
 
 		// days:hours:minutes:seconds
 		char timeText[64];
-		V_sprintf_safe(timeText, "%i", (int)p.players);
+		V_to_chars(timeText, (int)p.players);
 		SetControlString("TotalUsersLabel", timeText);
 
 		// mark the vert combo has changed to force it to update graph ranges
@@ -697,9 +697,9 @@ void CGraphPanel::OnTextChanged(Panel *panel, const char *text)
 			int iMaxVal, iMinVal;
 			m_pGraphs->GetPlayerLimits(iMaxVal, iMinVal);
 
-			V_sprintf_safe(maxText,"%d", iMaxVal);
-			V_sprintf_safe(midText,"%d", (iMaxVal - iMinVal) / 2);
-			V_sprintf_safe(minText,"%d", iMinVal);
+			V_to_chars(maxText, iMaxVal);
+			V_to_chars(midText, (iMaxVal - iMinVal) / 2);
+			V_to_chars(minText, iMinVal);
 
 			SetAxisLabels(m_pGraphs->GetPlayersColor(), maxText, midText, minText);
 		}

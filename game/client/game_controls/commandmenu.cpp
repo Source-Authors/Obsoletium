@@ -262,7 +262,7 @@ bool CommandMenu::LoadFromKeyValues( KeyValues * params )
 	if ( !params )
 		return false;
 
-	V_sprintf_safe( m_CurrentTeam, "%i", GetLocalPlayerTeam() );
+	V_to_chars( m_CurrentTeam, GetLocalPlayerTeam() );
 
 	V_FileBase( engine->GetLevelName(), m_CurrentMap );
 	

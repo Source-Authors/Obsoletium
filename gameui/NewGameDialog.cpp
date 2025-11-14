@@ -668,7 +668,7 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		// Best label
 		if ( iBest != -1 )
 		{
-			V_sprintf_safe( szBuff, "%i", iBest );
+			V_to_chars( szBuff, iBest );
 			g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2 );
 			g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( "#GameUI_BonusMapsBest" ), 1, szWideBuff2 );
 			g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );
@@ -684,7 +684,7 @@ void CNewGameDialog::UpdateBonusSelection( void )
 		// Next label
 		if ( iNext != -1 )
 		{
-			V_sprintf_safe( szBuff, "%i", iNext );
+			V_to_chars( szBuff, iNext );
 			g_pVGuiLocalize->ConvertANSIToUnicode( szBuff, szWideBuff2 );
 			g_pVGuiLocalize->ConstructString_safe( szWideBuff, g_pVGuiLocalize->Find( "#GameUI_BonusMapsGoal" ), 1, szWideBuff2 );
 			g_pVGuiLocalize->ConvertUnicodeToANSI( szWideBuff, szBuff );

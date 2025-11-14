@@ -145,7 +145,7 @@ void CPresetPickerFrame::OnCommand( const char *pCommand )
 			for ( int i = 0; i < nSelectedItemCount; ++i )
 			{
 				char pBuf[32];
-				Q_snprintf( pBuf, sizeof(pBuf), "%d", i );
+				V_to_chars( pBuf, i );
 
 				int nItemID = m_pPresetList->GetSelectedItem( i );
 				KeyValues *pKeyValues = m_pPresetList->GetItem( nItemID );

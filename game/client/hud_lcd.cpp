@@ -1376,11 +1376,11 @@ void CLCD::LookupToken( char const *in, CUtlString& value )
 		Q_snprintf( sz, sizeof( sz ), "%s", *( ( const bool *)pInputData + iIndex ) ? "true" : "false" );
 		break;
 	case FIELD_INTEGER:
-		Q_snprintf( sz, sizeof( sz ), "%i", *( (const int *)pInputData + iIndex ));
+		V_to_chars( sz, *( (const int *)pInputData + iIndex ));
 		break;
 		
 	case FIELD_SHORT:
-		Q_snprintf( sz, sizeof( sz ), "%i", *( (const short *)pInputData + iIndex ) );
+		V_to_chars( sz, *( (const short *)pInputData + iIndex ) );
 		break;
 		
 	case FIELD_CHARACTER:
