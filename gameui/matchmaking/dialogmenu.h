@@ -191,42 +191,6 @@ private:
 };
 
 //-----------------------------------------------------------------------
-// CAchievementItem
-//
-// Menu item used to present an achievement - including image, title,
-// description, points and unlock date. Clicking the item opens another
-// dialog with additional information about the achievement.
-//-----------------------------------------------------------------------
-class CAchievementItem : public CMenuItem
-{
-	DECLARE_CLASS_SIMPLE_OVERRIDE( CAchievementItem, CMenuItem );
-
-public:
-	CAchievementItem( CDialogMenu *pParent, const wchar_t *pName, const wchar_t *pDesc, uint points, bool bUnlocked, IAchievement* pSourceAchievement );
-	virtual ~CAchievementItem();
-
-	void PerformLayout() override;
-	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
-
-private:
-	vgui::Label			*m_pPoints;
-	vgui::ImagePanel	*m_pLockedIcon;
-	vgui::ImagePanel	*m_pUnlockedIcon;
-	vgui::ImagePanel	*m_pImage;
-
-	vgui::ImagePanel	*m_pPercentageBarBackground;
-	vgui::ImagePanel	*m_pPercentageBar;
-	vgui::Label			*m_pPercentageText;
-
-	IAchievement		*m_pSourceAchievement;
-
-	Color				m_AchievedBGColor;
-	Color				m_UnachievedBGColor;
-
-	CPanelAnimationVar( Color, m_clrProgressBar, "ProgressBarColor", "140 140 140 255" );
-};
-
-//-----------------------------------------------------------------------
 // CSectionedItem
 //
 // Menu item used to display some number of data entries, which are arranged
@@ -288,7 +252,6 @@ public:
 	CBrowserItem		*AddBrowserItem( const char *pHost, const char *pPlayers, const char *pScenario, const char *pPing );
 	COptionsItem		*AddOptionsItem( const char *pLabel );
 	CSectionedItem		*AddSectionedItem( const char **ppEntries, int ct );
-	CAchievementItem	*AddAchievementItem( const wchar_t *pName, const wchar_t *pDesc, uint cred, bool bUnlocked, IAchievement* pSourceAchievement );
 	CMenuItem			*AddItemInternal( CMenuItem *pItem );
 
 	void				RemovePlayerItem( int idx );
