@@ -246,8 +246,6 @@ CBonusMapsDialog::CBonusMapsDialog(vgui::Panel *parent) : BaseClass(parent, "Bon
 	SetControlEnabled( "loadbonusmap", false );
 
 	SetDeleteSelfOnClose(true);
-	//SetBounds(0, 0, 512, 384);
-	//SetMinimumSize( 256, 300 );
 	SetSizeable( false );
 
 	SetTitle("#GameUI_BonusMaps", true);
