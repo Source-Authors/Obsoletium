@@ -419,7 +419,7 @@ bool CFontTextureCache::AllocatePageForChar(int charWide, int charTall, intp &pa
 		Page_t &newPage = m_PageList[pageIndex];
 		m_pCurrPage[nPageType] = pageIndex;
 
-		for (int i = 0; i < FONT_DRAW_TYPE_COUNT; ++i )
+		for (int i = 0; i < vgui::FontDrawType_t::FONT_DRAW_TYPE_COUNT; ++i )
 		{
 			newPage.textureID[i] = g_MatSystemSurface.CreateNewTextureID( true );
 		}

@@ -30,8 +30,6 @@
 #include "tier3/tier3.h"
 #include "qlimits.h"
 
-using namespace vgui;
-
 class IImage;
 
 extern class IMaterialSystem *g_pMaterialSystem;
@@ -45,7 +43,7 @@ public:
 	CMatEmbeddedPanel();
 	void OnThink() override;
 
-	VPANEL IsWithinTraverse(int x, int y, bool traversePopups) override;
+	vgui::VPANEL IsWithinTraverse(int x, int y, bool traversePopups) override;
 };
 
 //-----------------------------------------------------------------------------
@@ -97,7 +95,7 @@ public:
 	void DrawTexturedPolyLine( const vgui::Vertex_t *p, int n ) override;
 
 	void DrawFilledRect(int x0, int y0, int x1, int y1) override;
-	void DrawFilledRectArray( IntRect *pRects, int numRects ) override;
+	void DrawFilledRectArray( vgui::IntRect *pRects, int numRects ) override;
 	void DrawFilledRectFastFade( int x0, int y0, int x1, int y1, int fadeStartPt, int fadeEndPt, unsigned int alpha0, unsigned int alpha1, bool bHorizontal ) override;
 	void DrawFilledRectFade( int x0, int y0, int x1, int y1, unsigned int alpha0, unsigned int alpha1, bool bHorizontal ) override;
 	void DrawOutlinedRect(int x0, int y0, int x1, int y1) override;
@@ -124,9 +122,9 @@ public:
 
 	void DrawTexturedPolygon(int n, vgui::Vertex_t *pVertices, bool bClipVertices = true ) override;
 
-	void DrawPrintText(const wchar_t *text, int textLen, FontDrawType_t drawType = FONT_DRAW_DEFAULT)override;
-	void DrawUnicodeChar(wchar_t wch, FontDrawType_t drawType = FONT_DRAW_DEFAULT ) override;
-	void DrawUnicodeString( const wchar_t *pwString, FontDrawType_t drawType = FONT_DRAW_DEFAULT ) override;
+	void DrawPrintText(const wchar_t *text, int textLen, vgui::FontDrawType_t drawType = vgui::FontDrawType_t::FONT_DRAW_DEFAULT)override;
+	void DrawUnicodeChar(wchar_t wch, vgui::FontDrawType_t drawType = vgui::FontDrawType_t::FONT_DRAW_DEFAULT ) override;
+	void DrawUnicodeString( const wchar_t *pwString, vgui::FontDrawType_t drawType = vgui::FontDrawType_t::FONT_DRAW_DEFAULT ) override;
 	void DrawSetTextFont(vgui::HFont font) override;
 	void DrawFlushText() override;
 
@@ -139,7 +137,7 @@ public:
 	vgui::IHTML *CreateHTMLWindow(vgui::IHTMLEvents *events,vgui::VPANEL context) override;
 	void PaintHTMLWindow(vgui::IHTML *htmlwin) override;
 	void DeleteHTMLWindow(vgui::IHTML *htmlwin) override;
-	bool BHTMLWindowNeedsPaint(IHTML *htmlwin) override;
+	bool BHTMLWindowNeedsPaint(vgui::IHTML *htmlwin) override;
 
 	void GetScreenSize(int &wide, int &tall) override;
 	void SetAsTopMost(vgui::VPANEL panel, bool state) override;
@@ -154,7 +152,7 @@ public:
 	void SetAsToolBar(vgui::VPANEL panel, bool state) override;		// removes the window's task bar entry (for context menu's, etc.)
 
 	// windows stuff
-	void CreatePopup(VPANEL panel, bool minimized, bool showTaskbarIcon = true, bool disabled = false, bool mouseInput = true , bool kbInput = true) override;
+	void CreatePopup(vgui::VPANEL panel, bool minimized, bool showTaskbarIcon = true, bool disabled = false, bool mouseInput = true , bool kbInput = true) override;
 
 	void SwapBuffers(vgui::VPANEL panel) override;
 	void Invalidate(vgui::VPANEL panel) override;
@@ -176,21 +174,21 @@ public:
 	vgui::HFont CreateFont() override;
 	bool SetFontGlyphSet(vgui::HFont font, const char *windowsFontName, int tall, int weight, int blur, int scanlines, int flags, int nRangeMin = 0, int nRangeMax = 0) override;
 	bool SetBitmapFontGlyphSet(vgui::HFont font, const char *windowsFontName, float scalex, float scaley, int flags) override;
-	int GetFontTall(HFont font) override;
-	int GetFontTallRequested(HFont font) override;
-	int GetFontAscent(HFont font, wchar_t wch) override;
-	bool IsFontAdditive(HFont font)  override;
-	void GetCharABCwide(HFont font, wchar_t ch, int &a, int &b, int &c) override;
-	void GetTextSize(HFont font, const wchar_t *text, int &wide, int &tall) override;
+	int GetFontTall(vgui::HFont font) override;
+	int GetFontTallRequested(vgui::HFont font) override;
+	int GetFontAscent(vgui::HFont font, wchar_t wch) override;
+	bool IsFontAdditive(vgui::HFont font)  override;
+	void GetCharABCwide(vgui::HFont font, wchar_t ch, int &a, int &b, int &c) override;
+	void GetTextSize(vgui::HFont font, const wchar_t *text, int &wide, int &tall) override;
 	int GetCharacterWidth(vgui::HFont font, wchar_t ch) override;
 	bool AddCustomFontFile(const char *fontName, const char *fontFileName) override;
 	bool AddBitmapFontFile(const char *fontFileName) override;
 	void SetBitmapFontName( const char *pName, const char *pFontFilename ) override;
 	const char *GetBitmapFontName( const char *pName ) override;
-	void PrecacheFontCharacters(HFont font, const wchar_t *pCharacters) override;
+	void PrecacheFontCharacters(vgui::HFont font, const wchar_t *pCharacters) override;
 	void ClearTemporaryFontCache( void ) override;
-	const char *GetFontName( HFont font ) override;
-	const char *GetFontFamilyName( HFont font ) override;
+	const char *GetFontName( vgui::HFont font ) override;
+	const char *GetFontFamilyName( vgui::HFont font ) override;
 
 	// GameUI-only accessed functions
 	// uploads a part of a texture, used for font rendering
@@ -275,23 +273,23 @@ public:
 	void GetProportionalBase( int &width, int &height ) override { width = BASE_WIDTH; height = BASE_HEIGHT; }
 	bool HasCursorPosFunctions() override { return true; }
 
-	void SetModalPanel(VPANEL ) override;
-	VPANEL GetModalPanel() override;
+	void SetModalPanel(vgui::VPANEL) override;
+	vgui::VPANEL GetModalPanel() override;
 	void UnlockCursor() override;
 	void LockCursor() override;
 	void SetTranslateExtendedKeys(bool state) override;
-	VPANEL GetTopmostPopup() override;
+	vgui::VPANEL GetTopmostPopup() override;
 	void GetAbsoluteWindowBounds(int &x, int &y, int &wide, int &tall) override;
 	void CalculateMouseVisible() override;
 	bool NeedKBInput() override;
 	void SurfaceGetCursorPos(int &x, int &y) override;
 	void SurfaceSetCursorPos(int x, int y) override;
-	void MovePopupToBack(VPANEL panel) override;
+	void MovePopupToBack(vgui::VPANEL panel) override;
 
-	virtual bool IsInThink( VPANEL panel); 
+	virtual bool IsInThink( vgui::VPANEL panel); 
 
-	bool DrawGetUnicodeCharRenderInfo( wchar_t ch, CharRenderInfo& info ) override;
-	void DrawRenderCharFromInfo( const CharRenderInfo& info ) override;
+	bool DrawGetUnicodeCharRenderInfo( wchar_t ch, vgui::CharRenderInfo& info ) override;
+	void DrawRenderCharFromInfo( const vgui::CharRenderInfo& info ) override;
 
 	// global alpha setting functions
 	// affect all subsequent draw calls - shouldn't normally be used directly, only in Panel::PaintTraverse()
@@ -306,11 +304,11 @@ public:
 
 	vgui::HCursor CreateCursorFromFile( char const *curOrAniFile, char const *pPathID ) override;
 
-	void PaintTraverseEx(VPANEL panel, bool paintPopups = false ) override;
+	void PaintTraverseEx(vgui::VPANEL panel, bool paintPopups = false ) override;
 
 	float GetZPos() const override;
 
-	void SetPanelForInput( VPANEL vpanel ) override;
+	void SetPanelForInput( vgui::VPANEL vpanel ) override;
 
 	vgui::IImage *GetIconImageForFullPath( char const *pFullPath ) override;
 
@@ -325,7 +323,7 @@ public:
 
 	void OffsetAbsPos( int &x, int &y ) override;
 
-	void GetKernedCharWidth( HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &flabcA ) override;
+	void GetKernedCharWidth( vgui::HFont font, wchar_t ch, wchar_t chBefore, wchar_t chAfter, float &wide, float &flabcA ) override;
 	
 
 	const char *GetWebkitHTMLUserAgentString() override { return "Valve Client"; }
@@ -360,7 +358,7 @@ public:
 
 private:
 	//void DrawRenderCharInternal( const FontCharRenderInfo& info );
-	void DrawRenderCharInternal( const CharRenderInfo& info );
+	void DrawRenderCharInternal( const vgui::CharRenderInfo& info );
 
 private:
 	enum { BASE_HEIGHT = ::BASE_HEIGHT, BASE_WIDTH = ::BASE_WIDTH };
@@ -406,21 +404,21 @@ private:
 	int DrawColoredText( vgui::HFont font, int x, int y, int r, int g, int b, int a, const char *fmt, va_list argptr );
 	void SearchForWordBreak( vgui::HFont font, char *text, int& chars, int& pixels );
 
-	void InternalThinkTraverse(VPANEL panel);
-	void InternalSolveTraverse(VPANEL panel);
-	void InternalSchemeSettingsTraverse(VPANEL panel, bool forceApplySchemeSettings);
+	void InternalThinkTraverse(vgui::VPANEL panel);
+	void InternalSolveTraverse(vgui::VPANEL panel);
+	void InternalSchemeSettingsTraverse(vgui::VPANEL panel, bool forceApplySchemeSettings);
 
 	// handles mouse movement
 	void SetCursorPos(int x, int y);
 	void GetCursorPos(int &x, int &y);
 
-	void DrawTexturedLineInternal( const Vertex_t &a, const Vertex_t &b );
+	void DrawTexturedLineInternal( const vgui::Vertex_t &a, const vgui::Vertex_t &b );
 
 	// Gets texture coordinates for drawing the full screen buffer
 	void GetFullScreenTexCoords( int x, int y, int w, int h, float *pMinU, float *pMinV, float *pMaxU, float *pMaxV );
 
 	// Is a panel under the restricted panel?
-	bool IsPanelUnderRestrictedPanel( VPANEL panel );
+	bool IsPanelUnderRestrictedPanel( vgui::VPANEL panel );
 
 	// Point Translation for current panel
 	int				m_nTranslateX;
@@ -503,7 +501,7 @@ private:
 
 	int m_nLastInputPollCount;
 
-	VPANEL m_CurrentThinkPanel;
+	vgui::VPANEL m_CurrentThinkPanel;
 
 	// The attached HWND
 	void *m_HWnd;
