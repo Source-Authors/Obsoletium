@@ -546,7 +546,8 @@ void CSectionedItem::AddSection( const char *pText, int align )
 	sec.pLabel = new vgui::Label( this, "Section", pText );
 	SETUP_PANEL( sec.pLabel );
 	sec.pLabel->SetContentAlignment( (vgui::Label::Alignment)align );
-	sec.pLabel->SetTextInset( 10, 0 );
+	// dimhotepus: Scale UI.
+	sec.pLabel->SetTextInset( QuickPropScale( 10 ), 0 );
 	sec.pLabel->SetBgColor( Color( 209, 112, 52, 128 ) );
 	m_Sections.AddToTail( sec );
 }

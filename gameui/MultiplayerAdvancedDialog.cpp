@@ -334,7 +334,8 @@ void CMultiplayerAdvancedDialog::CreateControls()
 		{
 			pCtrl->pPrompt = new vgui::Label( pCtrl, "DescLabel", "" );
 			pCtrl->pPrompt->SetContentAlignment( vgui::Label::a_west );
-			pCtrl->pPrompt->SetTextInset( 5, 0 );
+			// dimhotepus: Scale UI.
+			pCtrl->pPrompt->SetTextInset( QuickPropScale( 5 ), 0 );
 			pCtrl->pPrompt->SetText( pObj->prompt );
 		}
 
