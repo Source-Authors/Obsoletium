@@ -157,7 +157,7 @@ public: // functions
 	// selection list functions
 	intp SelectCount( void );
 	void SelectClear( void );
-	CMapDisp *GetFromSelect( int iSelectList );
+	CMapDisp *GetFromSelect( intp iSelectList );
 
 	void AddToSelect( EditDispHandle_t handle );
 	void RemoveFromSelect( EditDispHandle_t handle );
