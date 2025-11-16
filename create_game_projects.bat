@@ -25,22 +25,12 @@ if ["%~2"]==["x86"] (
   EXIT /B 1
 )
 
-
 SET "WIN_X64= "
 if ["%CMAKE_MSVC_ARCH_NAME%"]==["x64"] (
   SET "WIN_X64=/windows"
 
   ECHO Add /windows arg to VPC as generating x64 solution.
-
-  ECHO Searching for ml64 in PATH...
-  WHERE ml64.exe
-
-  if ERRORLEVEL 1 (
-    ECHO Unable to find ml64 in PATH.
-    EXIT /B 1
-  )
 )
-
 
 REM Finally create solution.
 devtools\bin\vpc.exe /2022 %WIN_X64% /define:WORKSHOP_IMPORT_DISABLE /define:SIXENSE_DISABLE /define:NO_X360_XDK /define:RAD_TELEMETRY_DISABLED /define:DISABLE_ETW /define:NO_STEAM /define:NO_ATI_COMPRESS /define:NO_NVTC /define:LTCG /no_ceg /nofpo /%GAME_NAME% +game /mksln %SOLUTION_NAME%.sln /slnitems .slnitems
