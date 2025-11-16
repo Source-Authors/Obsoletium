@@ -5,9 +5,8 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
-
 #include "PlayerPanel.h"
+
 #include "PlayerContextMenu.h"
 #include "PlayerListCompare.h"
 #include "DialogAddBan.h"
@@ -17,11 +16,12 @@
 #include <vgui/ILocalize.h>
 #include <vgui/IVGui.h>
 #include <vgui/KeyCode.h>
-#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ListPanel.h>
 #include <vgui_controls/QueryBox.h>
+
+#include "tier1/KeyValues.h"
 
 using namespace vgui;
 

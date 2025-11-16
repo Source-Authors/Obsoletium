@@ -6,6 +6,7 @@
 //=============================================================================
 
 #include "AdminServer.h"
+
 #include "IRunGameEngine.h"
 #include "IGameServerData.h"
 #include "GamePanelInfo.h"
@@ -15,8 +16,9 @@
 #include <vgui/IPanel.h>
 #include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
-#include <tier1/KeyValues.h>
+
 #include "filesystem.h"
+#include "tier1/KeyValues.h"
 
 // expose the server browser interfaces
 CAdminServer g_AdminServerSingleton;

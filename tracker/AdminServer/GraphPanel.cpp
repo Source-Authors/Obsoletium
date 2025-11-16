@@ -5,8 +5,6 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
-
 #include "GraphPanel.h"
 
 #include <vgui/ISystem.h>
@@ -14,7 +12,6 @@
 #include <vgui/IVGui.h>
 #include <vgui/IScheme.h>
 #include <vgui/ILocalize.h>
-#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Label.h>
 #include <vgui_controls/TextEntry.h>
@@ -26,6 +23,8 @@
 #include <vgui_controls/PHandle.h>
 #include <vgui_controls/PropertySheet.h>
 #include <vgui_controls/CheckButton.h>
+
+#include "tier1/KeyValues.h"
 
 constexpr inline double STATS_UPDATE_RATE{5.0};
 

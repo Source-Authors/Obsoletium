@@ -6,11 +6,10 @@
 //=============================================================================
 
 #include "RemoteServer.h"
-#include <assert.h>
-#include <stdio.h>
 
 #include "tier1/utlbuffer.h"
 #include "IGameServerData.h"
+
 extern IGameServerData *g_pGameServerData;
 
 //-----------------------------------------------------------------------------

@@ -5,17 +5,17 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
 #include "DialogCvarChange.h"
 
 #include <vgui/IInput.h>
 #include <vgui/ISurface.h>
-#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/Panel.h>
 #include <vgui_controls/Label.h>
 #include <vgui_controls/TextEntry.h>
+
+#include "tier1/KeyValues.h"
 
 using namespace vgui;
 

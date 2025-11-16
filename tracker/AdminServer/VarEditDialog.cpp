@@ -6,16 +6,16 @@
 //=============================================================================
 
 #include "VarEditDialog.h"
-#include "RemoteServer.h"
 
-#include <stdio.h>
+#include "RemoteServer.h"
 
 #include <vgui/IInput.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ComboBox.h>
 #include <vgui_controls/TextEntry.h>
-#include <tier1/KeyValues.h>
+
+#include "tier1/KeyValues.h"
 
 using namespace vgui;
 

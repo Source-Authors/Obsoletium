@@ -6,12 +6,10 @@
 //=============================================================================
 
 #include "ConfigPanel.h"
-//#include "Info.h"
 
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
-#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Label.h>
 #include <vgui_controls/TextEntry.h>
@@ -21,7 +19,7 @@
 #include <vgui_controls/MessageBox.h>
 #include <vgui_controls/RadioButton.h>
 
-#include <stdio.h>
+#include "tier1/KeyValues.h"
 
 using namespace vgui;
 

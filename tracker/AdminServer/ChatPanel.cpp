@@ -9,14 +9,13 @@
 #include "RemoteServer.h"
 
 #include <vgui/IVGui.h>
-#include <tier1/KeyValues.h>
 
 #include <vgui_controls/TextEntry.h>
 #include <vgui_controls/RichText.h>
 #include <vgui_controls/Button.h>
 #include <vgui_controls/PHandle.h>
 
-#include <stdio.h>
+#include "tier1/KeyValues.h"
 
 using namespace vgui;
 

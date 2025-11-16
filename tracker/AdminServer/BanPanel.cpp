@@ -5,8 +5,6 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
-
 #include "BanPanel.h"
 #include "PlayerContextMenu.h"
 #include "DialogAddBan.h"

@@ -5,15 +5,12 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
-
 #include "RawLogPanel.h"
 
 #include <vgui/ISystem.h>
 #include <vgui/ISurface.h>
 #include <vgui/IVGui.h>
 #include <vgui/ILocalize.h>
-#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Label.h>
 #include <vgui_controls/TextEntry.h>
@@ -26,6 +23,8 @@
 #include <vgui_controls/PHandle.h>
 #include <vgui_controls/PropertySheet.h>
 #include "vgui_controls/ConsoleDialog.h"
+
+#include "tier1/KeyValues.h"
 
 using namespace vgui;
 

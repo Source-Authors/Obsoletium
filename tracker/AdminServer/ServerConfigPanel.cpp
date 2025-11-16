@@ -5,8 +5,6 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
-
 #include "ServerConfigPanel.h"
 
 #include <vgui/ISystem.h>

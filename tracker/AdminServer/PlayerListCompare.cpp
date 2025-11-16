@@ -5,11 +5,9 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <stdio.h>
-
-#include <tier1/KeyValues.h>
 #include <vgui_controls/ListPanel.h>	
 
+#include "tier1/KeyValues.h"
 
 int __cdecl PlayerNameCompare(const KeyValues *elem1, const KeyValues *elem2 )
 {

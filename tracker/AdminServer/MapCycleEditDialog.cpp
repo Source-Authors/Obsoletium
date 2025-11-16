@@ -8,13 +8,13 @@
 #include "MapCycleEditDialog.h"
 
 #include <vgui/KeyCode.h>
-#include <tier1/KeyValues.h>
 
 #include <vgui_controls/Button.h>
 #include <vgui_controls/ListPanel.h>
 
 #include "RemoteServer.h"
 #include "tier1/utlbuffer.h"
+#include "tier1/KeyValues.h"
 
 using namespace vgui;
 

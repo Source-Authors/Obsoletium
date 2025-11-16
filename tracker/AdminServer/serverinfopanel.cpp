@@ -6,12 +6,12 @@
 //=============================================================================
 
 #include "ServerInfoPanel.h"
+
 #include "MapCycleEditDialog.h"
 
-#include <vgui/ISystem.h>
+#include <cctype>
 
-#include <ctype.h>
-#include <stdio.h>
+#include <vgui/ISystem.h>
 
 using namespace vgui;
 
