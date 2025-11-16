@@ -37,7 +37,7 @@ extern ConVar  sv_packettrace;
 
 enum
 {
-	ENTITY_SENTINEL = 9999	// larger number than any real entity number
+	ENTITY_SENTINEL = INT_MAX	// larger number than any real entity number
 };
 
 #define	FLAG_IS_COMPRESSED	(1<<31)
