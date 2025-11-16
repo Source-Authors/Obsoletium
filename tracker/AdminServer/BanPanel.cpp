@@ -23,6 +23,7 @@
 #include <vgui_controls/FileOpenDialog.h>
 
 #include "filesystem.h"
+#include "posix_file_stream.h"
 
 #include "DialogCvarChange.h"
 #include "tokenline.h"
@@ -387,10 +388,12 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 	// this can take a while, put up a waiting cursor
 	surface()->SetCursor(dc_hourglass);
 
-	// we don't use filesystem() here becuase we want to let the user pick
+	// we don't use filesystem() here because we want to let the user pick
 	// a file from anywhere on their filesystem... so we use stdio
-	FILE *f = fopen(fullpath,"rb");
-	while (f && !feof(f) && fgets(line, ssize(line), f))
+	auto [f, rc] = se::posix::posix_file_stream_factory::open(fullpath, "rb");
+	if (!rc)
+	{
+		while (std::get<char *>(f.gets(line)))
 	{	
 		// parse each line of the config file adding the ban
 		tok.SetLine(line);
@@ -400,14 +403,15 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 			const char *id = tok.GetToken(2);
 			ChangeBanTimeByID(id, "0");
 		}
+		}
+	}
+	else
+	{
+		Warning("Unable to load bans from %s: %s.\n", fullpath, rc.message().c_str());
 	}
 
 	// change the cursor back to normal and shutdown file
 	surface()->SetCursor(dc_user);
-	if (f) 
-	{
-		fclose(f);
-	}
 }
 
 //-----------------------------------------------------------------------------
