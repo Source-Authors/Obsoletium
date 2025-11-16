@@ -26,6 +26,11 @@ static ConVar sv_filterban( "sv_filterban", "1", 0, "Set packet filtering by IP 
 
 CUtlVector< ipfilter_t > g_IPFilters;
 CUtlVector< userfilter_t > g_UserFilters;
+#if defined(WIN32) || defined(_WIN32)
+CThreadSpinRWLock g_IPFilterMutex;
+#else
+CThreadRWLock g_IPFilterMutex;
+#endif
 
 #define BANNED_IP_FILENAME "banned_ip.cfg"
 #define BANNED_USER_FILENAME "banned_user.cfg"
@@ -45,6 +50,7 @@ void Filter_SendBan( const netadr_t& adr )
 // Purpose: Checks an IP address to see if it is banned
 // Input  : *adr - 
 // Output : bool
+// RaphaelIT7: This function is fully threadsafe in case the network layer gets threaded
 //-----------------------------------------------------------------------------
 bool Filter_ShouldDiscard( const netadr_t& adr )
 {
@@ -56,6 +62,8 @@ bool Filter_ShouldDiscard( const netadr_t& adr )
 	const bool bNegativeFilter = sv_filterban.GetInt() == 1;
 
 	unsigned in = *(unsigned *)&adr.ip[0];
+
+	AUTO_LOCK_READ( g_IPFilterMutex );
 
 	// Handle timeouts 
 	for ( intp i = g_IPFilters.Count() - 1 ; i >= 0 ; i--)
@@ -175,6 +183,10 @@ static void Filter_Add_f( const CCommand& args )
 	if ( !Filter_ConvertString( args[2], &f ) )
 		return;
 
+	// RaphaelIT7: You cannot use it here as else you'd enter a deadlock
+	// AUTO_LOCK_WRITE( g_IPFilterMutex );
+	g_IPFilterMutex.LockForWrite();
+
 	intp i;
 	for (i=0 ; i<g_IPFilters.Count(); i++)
 	{
@@ -188,6 +200,7 @@ static void Filter_Add_f( const CCommand& args )
 		if (g_IPFilters.Count() == MAX_IPFILTERS)
 		{
 			ConMsg( "addip: IP filter list is full (max %zd).\n", MAX_IPFILTERS );
+			g_IPFilterMutex.UnlockWrite();
 			return;
 		}
 
@@ -198,6 +211,10 @@ static void Filter_Add_f( const CCommand& args )
 		// updating in-place, so don't kick people
 		bKick = false;
 	}
+
+	// RaphaelIT7: We have to unlock here as if bKick we might call Filter_ShouldDiscard
+	//          And since in there we lock for read, we have to ensure that we aren't already locking it!
+	g_IPFilterMutex.UnlockWrite();
 	
 	if (banTime < 0.01)
 	{
@@ -291,6 +308,11 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 		return;
 	}
 
+	// RaphaelIT7: I perfer to release it sooner so that when the gameevent is fired we are not locking it anymore
+	//       Just so that in the case that anything might do something filter related we avoid a deadlock
+	// AUTO_LOCK_WRITE( g_IPFilterMutex );
+	g_IPFilterMutex.LockForWrite();
+
 	// if no "." in the string we'll assume it's a slot number
 	if ( !V_strstr( args[1], "." ) )
 	{
@@ -298,6 +320,7 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 		if ( slot <= 0 || slot > g_IPFilters.Count() )
 		{
 			ConMsg( "removeip: Invalid slot %i\n", slot );
+			g_IPFilterMutex.UnlockWrite();
 			return;
 		}
 
@@ -306,6 +329,8 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 		memcpy( b, &g_IPFilters[--slot].compare, sizeof(b) );
 
 		g_IPFilters.Remove( slot );
+
+		g_IPFilterMutex.UnlockWrite(); // Not needed anymore
 		
 		char szIP[32];
 		V_sprintf_safe( szIP, "%i.%i.%i.%i", b[0], b[1], b[2], b[3] );
@@ -328,7 +353,10 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 
 	ipfilter_t	f;
 	if ( !Filter_ConvertString( args[1], &f ) )
+	{
+		g_IPFilterMutex.UnlockWrite();
 		return;
+	}
 
 	for ( intp i = 0 ; i < g_IPFilters.Count() ; i++ )
 	{
@@ -338,6 +366,7 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 			g_IPFilters.Remove(i);
 
 			ConMsg( "removeip: filter removed for %s\n", args[1] );
+			g_IPFilterMutex.UnlockWrite();
 
 			// send an event
 			IGameEvent *event = g_GameEventManager.CreateEvent( "server_removeban" );
@@ -355,6 +384,7 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 	}
 
 	ConMsg( "removeip: Couldn't find %s\n", args[1] );
+	g_IPFilterMutex.UnlockWrite();
 }
 
 
@@ -363,6 +393,7 @@ CON_COMMAND( removeip, "Remove an IP address from the ban list." )
 //-----------------------------------------------------------------------------
 CON_COMMAND( listip, "List IP addresses on the ban list." )
 {
+	AUTO_LOCK_READ( g_IPFilterMutex );
 	const intp count = g_IPFilters.Count();
 	if ( !count )
 	{
@@ -407,6 +438,8 @@ CON_COMMAND( writeip, "Save the ban list to " BANNED_IP_FILENAME "." )
 		return;
 	}
 	
+	AUTO_LOCK_READ( g_IPFilterMutex );
+
 	byte b[4];
 	for ( const auto &ipf : g_IPFilters )
 	{
