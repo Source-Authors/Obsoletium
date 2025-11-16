@@ -169,7 +169,6 @@ enum InternalTextureFlags
 	TEXTUREFLAGSINTERNAL_TEMPRENDERTARGET	= 0x00000080, // 360: should only allocate texture bits upon first resolve, destroy at level end
 };
 
-static int  GetThreadId();
 static bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile, unsigned int nFlags, TextureLODControlSettings_t* pInOutCachedFileLodSettings, int nDesiredDimensionLimit, unsigned short* pOutStreamedMips, const char* pName, const char* pCacheFileName, TexDimensions_t* pOptOutMappingDims = NULL, TexDimensions_t* pOptOutActualDims = NULL, TexDimensions_t* pOptOutAllocatedDims = NULL, unsigned int* pOptOutStripFlags = NULL );
 static int  ComputeActualMipCount( const TexDimensions_t& actualDims, unsigned int nFlags );
 static int  ComputeMipSkipCount( const char* pName, const TexDimensions_t& mappingDims, bool bIgnorePicmip, IVTFTexture *pOptVTFTexture, unsigned int nFlags, int nDesiredDimensionLimit, unsigned short* pOutStreamedMips, TextureLODControlSettings_t* pInOutCachedFileLodSettings, TexDimensions_t* pOptOutActualDims, TexDimensions_t* pOptOutAllocatedDims, unsigned int* pOptOutStripFlags  );
@@ -830,20 +829,17 @@ void CReferenceToHandleTexture::DeleteIfUnreferenced()
 //DEFINE_FIXEDSIZE_ALLOCATOR( CTexture, 1024, true );
 
 
-//-----------------------------------------------------------------------------
-// Static instance of VTF texture
-//-----------------------------------------------------------------------------
-#define MAX_RENDER_THREADS 4
 
 // For safety's sake, we allow any of the threads that intersect with rendering
 // to have their own state vars. In practice, we expect only the matqueue thread 
 // and the main thread to ever hit s_pVTFTexture. 
-static IVTFTexture *s_pVTFTexture[ MAX_RENDER_THREADS ] = { NULL };
+// RaphaelIT7: We use thread_local since other threads may end up in here too, we pray on no memory leaks though can always use std::unique_ptr or something like it if it becomes a problem
+static thread_local IVTFTexture *s_pVTFTexture = NULL;
 
 // We only expect that the main thread or the matqueue thread to actually touch 
 // these, but we still need a NULL and size of 0 for the other threads. 
-static void *s_pOptimalReadBuffer[ MAX_RENDER_THREADS ] = { NULL };
-static int s_nOptimalReadBufferSize[ MAX_RENDER_THREADS ] = { 0 };
+static thread_local void *s_pOptimalReadBuffer = NULL;
+static thread_local int s_nOptimalReadBufferSize = 0;
 
 //-----------------------------------------------------------------------------
 // Class factory methods
@@ -1123,22 +1119,16 @@ void CTexture::ReleaseMemory()
 
 IVTFTexture *CTexture::GetScratchVTFTexture( )
 {
-	[[maybe_unused]] const bool cbThreadInMatQueue = ( MaterialSystem()->GetRenderThreadId() == ThreadGetCurrentId() );
-	Assert( cbThreadInMatQueue || ThreadInMainThread() );
+	if ( !s_pVTFTexture )
+		s_pVTFTexture = CreateVTFTexture();
 
-	const int ti = GetThreadId();
-
-	if ( !s_pVTFTexture[ ti ] )
-		s_pVTFTexture[ ti ] = CreateVTFTexture();
-	return s_pVTFTexture[ ti ];
+	return s_pVTFTexture;
 }
 
 void CTexture::ReleaseScratchVTFTexture( IVTFTexture* tex )
 {
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-	[[maybe_unused]] const bool cbThreadInMatQueue = ( MaterialSystem()->GetRenderThreadId() == ThreadGetCurrentId() );
-	Assert( cbThreadInMatQueue || ThreadInMainThread() );
 	Assert( m_pStreamingVTF == NULL || ThreadInMainThread() );	// Can only manipulate m_pStreamingVTF to release safely in main thread.
 
 	if ( m_pStreamingVTF )
@@ -4084,31 +4074,6 @@ void CTextureStreamingJob::OnAsyncFindComplete( ITexture* pTex, void* pExtraArgs
 }
 
 // ------------------------------------------------------------------------------------------------
-int GetThreadId()
-{
-	TM_ZONE_DEFAULT( TELEMETRY_LEVEL0 );
-
-	// Turns the current thread into a 0-based index for use in accessing statics in this file.
-	int retVal = INT_MAX;
-	if ( ThreadInMainThread() )
-		retVal = 0;
-	else if ( MaterialSystem()->GetRenderThreadId() == ThreadGetCurrentId() )
-		retVal = 1;
-	else if ( TextureManager()->ThreadInAsyncLoadThread() )
-		retVal = 2;
-	else if ( TextureManager()->ThreadInAsyncReadThread() )
-		retVal = 3;
-	else
-	{
-		STAGING_ONLY_EXEC( AssertAlways( !"Unexpected thread in GetThreadId, need to debug this--crash is next. Tell McJohn." ) );
-		DebuggerBreakIfDebugging_StagingOnly();
-	}
-	
-	Assert( retVal < MAX_RENDER_THREADS );
-	return retVal;
-}
-
-// ------------------------------------------------------------------------------------------------
 bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile, unsigned int nFlags, 
 							   TextureLODControlSettings_t* pInOutCachedFileLodSettings, 
 							   int nDesiredDimensionLimit, unsigned short* pOutStreamedMips, 
@@ -4482,11 +4447,6 @@ int ComputeMipSkipCount( const char* pName, const TexDimensions_t& mappingDims, 
 //-----------------------------------------------------------------------------
 int GetOptimalReadBuffer( CUtlBuffer* pOutOptimalBuffer, FileHandle_t hFile, int nSize )
 {
-	// NOTE! NOTE! NOTE! If you are making changes to this function, be aware that it has threading
-	// NOTE! NOTE! NOTE! implications. It can be called synchronously by the Main thread, 
-	// NOTE! NOTE! NOTE! or by the streaming texture code!
-	Assert( GetThreadId() < MAX_RENDER_THREADS );
-
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s (%d bytes)", __FUNCTION__, nSize );
 	Assert( pOutOptimalBuffer != NULL );
 
@@ -4495,22 +4455,20 @@ int GetOptimalReadBuffer( CUtlBuffer* pOutOptimalBuffer, FileHandle_t hFile, int
 	nSize = max( nSize, minSize );
 	int nBytesOptimalRead = g_pFullFileSystem->GetOptimalReadSize( hFile, nSize );
 
-	const int ti = GetThreadId();
-
-	if ( nBytesOptimalRead > s_nOptimalReadBufferSize[ ti ] )
+	if ( nBytesOptimalRead > s_nOptimalReadBufferSize )
 	{
 		FreeOptimalReadBuffer( 0 );
 
-		s_nOptimalReadBufferSize[ ti ] = nBytesOptimalRead;
-		s_pOptimalReadBuffer[ ti ] = g_pFullFileSystem->AllocOptimalReadBuffer( hFile, nSize );
+		s_nOptimalReadBufferSize = nBytesOptimalRead;
+		s_pOptimalReadBuffer = g_pFullFileSystem->AllocOptimalReadBuffer( hFile, nSize );
 		if ( mat_spewalloc.GetBool() )
 		{
-			Msg( "Allocated optimal read buffer of %d bytes @ 0x%p for thread %d\n", s_nOptimalReadBufferSize[ ti ], s_pOptimalReadBuffer[ ti ], ti );
+			Msg( "Allocated optimal read buffer of %d bytes @ 0x%p for thread %d\n", s_nOptimalReadBufferSize, s_pOptimalReadBuffer, ThreadGetCurrentId() );
 		}
 	}
 
 	// set external buffer and reset to empty
-	( *pOutOptimalBuffer ).SetExternalBuffer( s_pOptimalReadBuffer[ ti ], s_nOptimalReadBufferSize[ ti ], 0 );
+	( *pOutOptimalBuffer ).SetExternalBuffer( s_pOptimalReadBuffer, s_nOptimalReadBufferSize, 0 );
 
 	// return the optimal read size
 	return nBytesOptimalRead;
@@ -4521,24 +4479,17 @@ int GetOptimalReadBuffer( CUtlBuffer* pOutOptimalBuffer, FileHandle_t hFile, int
 //-----------------------------------------------------------------------------
 void FreeOptimalReadBuffer( int nMaxSize )
 {
-	// NOTE! NOTE! NOTE! If you are making changes to this function, be aware that it has threading
-	// NOTE! NOTE! NOTE! implications. It can be called synchronously by the Main thread, 
-	// NOTE! NOTE! NOTE! or by the streaming texture code!
-	Assert( GetThreadId() < MAX_RENDER_THREADS );
-
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-	const int ti = GetThreadId();
-
-	if ( s_pOptimalReadBuffer[ ti ] && s_nOptimalReadBufferSize[ ti ] >= nMaxSize )
+	if ( s_pOptimalReadBuffer && s_nOptimalReadBufferSize >= nMaxSize )
 	{
 		if ( mat_spewalloc.GetBool() )
 		{
-			Msg( "Freeing optimal read buffer of %d bytes @ 0x%p for thread %d\n", s_nOptimalReadBufferSize[ ti ], s_pOptimalReadBuffer[ ti ], ti );
+			Msg( "Freeing optimal read buffer of %d bytes @ 0x%p for thread %d\n", s_nOptimalReadBufferSize, s_pOptimalReadBuffer, ThreadGetCurrentId() );
 		}
-		g_pFullFileSystem->FreeOptimalReadBuffer( s_pOptimalReadBuffer[ ti ] );
-		s_pOptimalReadBuffer[ ti ] = NULL;
-		s_nOptimalReadBufferSize[ ti ] = 0;
+		g_pFullFileSystem->FreeOptimalReadBuffer( s_pOptimalReadBuffer );
+		s_pOptimalReadBuffer = NULL;
+		s_nOptimalReadBufferSize = 0;
 	}
 }
 
