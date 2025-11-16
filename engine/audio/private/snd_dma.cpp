@@ -22,6 +22,7 @@
 #include "../../client.h"
 #include "../../cl_main.h"
 #include "tier1/utldict.h"
+#include "tier1/utlmapmt.h"
 #include "mempool.h"
 #include "../../enginetrace.h"			// for traceline
 #include "../../public/bspflags.h"		// for traceline
@@ -299,13 +300,13 @@ static	float	s_lastsoundtime = 0.0f;
 
 bool s_bOnLoadScreen = false;
 
-static CClassMemoryPool< CSfxTable > s_SoundPool( MAX_SFX );
+static CClassMemoryPoolMT< CSfxTable > s_SoundPool( MAX_SFX );
 struct SfxDictEntry
 {
 	CSfxTable *pSfx;
 };
 
-static CUtlMap< FileNameHandle_t, SfxDictEntry > s_Sounds( 0, 0, DefLessFunc( FileNameHandle_t ) );
+static CUtlMapMT< FileNameHandle_t, SfxDictEntry > s_Sounds( 0, 0, DefLessFunc( FileNameHandle_t ) );
 
 class CDummySfx : public CSfxTable
 {
@@ -578,7 +579,7 @@ public:
 	}
 	
 private:
-	CUtlSymbolTable	m_SoundNames;
+	CUtlSymbolTableMT	m_SoundNames;
 };
 static CResourcePreloadSound s_ResourcePreloadSound;
 
