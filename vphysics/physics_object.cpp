@@ -1454,6 +1454,12 @@ void CPhysicsObject::OutputDebugInfo() const
 	}
 }
 
+IPhysicsEnvironment *CPhysicsObject::GetEnvironment() const
+{
+	// Same as GetVPhysicsEnvironment but this function is exposed for the game dlls
+	return (CPhysicsEnvironment *) (m_pObject->get_environment()->client_data);
+}
+
 bool CPhysicsObject::IsAttachedToConstraint( bool bExternalOnly ) const
 {
 	if ( m_pObject )

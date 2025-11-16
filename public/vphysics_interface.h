@@ -863,8 +863,19 @@ public:
 	// dumps info about the object to Msg()
 	virtual void			OutputDebugInfo() const = 0;
 
+	// returns the buoyancy of the object.
+	// newly added by Valve in new builds since it was requested by Rubat to solve https://github.com/Facepunch/garrysmod-issues/issues/5696
+	virtual float			GetBuoyancyRatio( void ) const = 0;
+
+	// returns the environment this object belongs to
+	virtual IPhysicsEnvironment *GetEnvironment( void ) const = 0;
 };
 
+// Helper function - destroys the given object using the right environment
+static inline void DestroyPhysicsObject( IPhysicsObject* pObject )
+{
+	pObject->GetEnvironment()->DestroyObject( pObject );
+}
 
 abstract_class IPhysicsSpring
 {

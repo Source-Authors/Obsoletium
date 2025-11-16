@@ -500,10 +500,7 @@ void PhysDestroyObject( IPhysicsObject *pObject, CBaseEntity *pEntity )
 		g_EntityCollisionHash->RemoveAllPairsForObject( pEntity );
 	}
 
-	if ( physenv )
-	{
-		physenv->DestroyObject( pObject );
-	}
+	DestroyPhysicsObject( pObject );
 }
 
 static void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pProps, IFileSystem *pFileSystem )
