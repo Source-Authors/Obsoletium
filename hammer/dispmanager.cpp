@@ -487,7 +487,7 @@ void CWorldEditDispMgr::SelectClear( void )
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-CMapDisp *CWorldEditDispMgr::GetFromSelect( intp iSelectList )
+CMapDisp *CWorldEditDispMgr::GetFromSelect( int iSelectList )
 {
 	// no assert because the .Element( ) takes care of that!
 	EditDispHandle_t handle = m_SelectList.Element( iSelectList );
