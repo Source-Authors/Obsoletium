@@ -67,7 +67,7 @@ Studio models are position independent, so the cache manager can move them.
 ==============================================================================
 */
 
-#define STUDIO_VERSION		48
+#define STUDIO_VERSION		49
 
 #define MAXSTUDIOTRIANGLES	65536	// TODO: tune this
 #define MAXSTUDIOVERTS		65536	// TODO: tune this
@@ -612,14 +612,14 @@ struct mstudioanim_valueptr_t
 
 
 // per bone per animation DOF and weight pointers
-struct mstudioanim_t
+struct mstudio_rle_anim_t
 {
 	DECLARE_BYTESWAP_DATADESC();
 	byte				bone;
 	byte				flags;		// weighing options
 
 	// valid for animating data only
-	inline byte				*pData( void ) const { return (((byte *)this) + sizeof( struct mstudioanim_t )); }
+	inline byte				*pData( void ) const { return (((byte *)this) + sizeof( struct mstudio_rle_anim_t )); }
 	inline mstudioanim_valueptr_t	*pRotV( void ) const { return (mstudioanim_valueptr_t *)(pData()); }
 	inline mstudioanim_valueptr_t	*pPosV( void ) const { return (mstudioanim_valueptr_t *)(pData()) + ((flags & STUDIO_ANIM_ANIMROT) != 0); }
 
@@ -629,7 +629,32 @@ struct mstudioanim_t
 	inline Vector48			*pPos( void ) const { return (Vector48 *)(pData() + ((flags & STUDIO_ANIM_RAWROT) != 0) * sizeof( *pQuat48() ) + ((flags & STUDIO_ANIM_RAWROT2) != 0) * sizeof( *pQuat64() ) ); }
 
 	short				nextoffset;
-	inline mstudioanim_t	*pNext( void ) const { if (nextoffset != 0) return  (mstudioanim_t *)(((byte *)this) + nextoffset); else return nullptr; }
+	inline mstudio_rle_anim_t	*pNext( void ) const { if (nextoffset != 0) return  (mstudio_rle_anim_t *)(((byte *)this) + nextoffset); else return nullptr; }
+};
+
+#define STUDIO_FRAME_CONST_POS	0x01 // Vector48 in constants
+#define STUDIO_FRAME_CONST_ROT	0x02 // Quaternion48 in constants
+#define STUDIO_FRAME_ANIM_POS	0x04 // Vector48 in framedata
+#define STUDIO_FRAME_ANIM_ROT	0x08 // Quaternion48 in framedata
+#define STUDIO_FRAME_ANIM_POS2	0x10 // Vector in framedata
+#define STUDIO_FRAME_CONST_POS2	0x20 // Vector in constants
+#define STUDIO_FRAME_CONST_ROT2	0x40 // Quaternion48S in constants
+#define STUDIO_FRAME_ANIM_ROT2	0x80 // Quaternion48S in framedata
+
+struct mstudio_frame_anim_t
+{
+	DECLARE_BYTESWAP_DATADESC();
+
+	inline byte		*pBoneFlags( void ) const { return (((byte *)this) + sizeof( struct mstudio_frame_anim_t )); };
+	
+	int				constantsoffset;
+	inline byte		*pConstantData( void ) const { return (((byte *)this) + constantsoffset); };
+
+	int				frameoffset;
+	int 			framelength;
+	inline byte		*pFrameData( int iFrame  ) const { return (((byte *)this) + frameoffset + iFrame * framelength); };
+
+	int				unused[3];
 };
 
 struct mstudiomovement_t
@@ -689,9 +714,9 @@ struct mstudioanimdesc_t
 	int					animblock;
 	int					animindex;	 // non-zero when anim data isn't in sections
 
-	const mstudioanim_t *pAnimBlock( intp block, intp index ) const; // returns pointer to a specific anim block (local or external)
-	const mstudioanim_t *pAnim( int *piFrame, float &flStall ) const; // returns pointer to data and new frame index
-	const mstudioanim_t *pAnim( int *piFrame ) const; // returns pointer to data and new frame index
+	const mstudio_rle_anim_t *pAnimBlock( intp block, intp index ) const; // returns pointer to a specific anim block (local or external)
+	const mstudio_rle_anim_t *pAnim( int *piFrame, float &flStall ) const; // returns pointer to data and new frame index
+	const mstudio_rle_anim_t *pAnim( int *piFrame ) const; // returns pointer to data and new frame index
 	int					numikrules;
 	int					ikruleindex;	// non-zero when IK data is stored in the mdl
 	int					animblockikruleindex; // non-zero when IK data is stored in animblock file
@@ -3045,7 +3070,7 @@ inline const mstudioflexcontroller_t *mstudioflexcontrollerui_t::pController( in
 #define STUDIO_AUTOPLAY	0x0008		// temporary flag that forces the sequence to always play
 #define STUDIO_POST		0x0010		// 
 #define STUDIO_ALLZEROS	0x0020		// this animation/sequence has no real animation data
-//						0x0040
+#define STUDIO_FRAMEANIM 0x0040		// animation is encoded as by frame x bone instead of RLE bone x frame
 #define STUDIO_CYCLEPOSE 0x0080		// cycle index is taken from a pose parameter index
 #define STUDIO_REALTIME	0x0100		// cycle index is taken from a real-time clock, not the animations cycle index
 #define STUDIO_LOCAL	0x0200		// sequence has a local context sequence
@@ -3077,7 +3102,7 @@ inline const mstudioflexcontroller_t *mstudioflexcontrollerui_t::pController( in
 // If we only support the current version, this function should be empty.
 inline bool Studio_ConvertStudioHdrToNewVersion( studiohdr_t *pStudioHdr )
 {
-	COMPILE_TIME_ASSERT( STUDIO_VERSION == 48 ); //  put this to make sure this code is updated upon changing version.
+	COMPILE_TIME_ASSERT( STUDIO_VERSION == 49 ); //  put this to make sure this code is updated upon changing version.
 
 	int version = pStudioHdr->version;
 	if ( version == STUDIO_VERSION )
@@ -3118,7 +3143,7 @@ inline bool Studio_ConvertStudioHdrToNewVersion( studiohdr_t *pStudioHdr )
 			pAnim->zeroframeindex = 0;
 			pAnim->zeroframespan = 0;
 		}
-	} 
+	}
 	else if (version == 47)
 	{
 		for (int i = 0; i < pStudioHdr->numlocalanim; i++)
@@ -3132,6 +3157,19 @@ inline bool Studio_ConvertStudioHdrToNewVersion( studiohdr_t *pStudioHdr )
 			}
 		}
 	}
+	if (version < 49)
+	{
+		// remove any frameanim flag settings that might be stale
+		for (int i = 0; i < pStudioHdr->numlocalanim; i++)
+		{
+			mstudioanimdesc_t *pAnim = (mstudioanimdesc_t *)pStudioHdr->pLocalAnimdesc( i );
+			if (pAnim->flags & STUDIO_FRAMEANIM)
+			{
+				pAnim->flags &= ~STUDIO_FRAMEANIM;
+				bResult = false;
+			}
+		}
+	} 
 
 	// for now, just slam the version number since they're compatible
 	pStudioHdr->version = STUDIO_VERSION;

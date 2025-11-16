@@ -225,6 +225,100 @@ inline Quaternion48& Quaternion48::operator=(const Quaternion &vOther)
 	return *this; 
 }
 
+// 48 bit sorted Quaternion
+class Quaternion48S
+{
+public:
+	// Construction/destruction:
+	Quaternion48S(void); 
+	Quaternion48S(vec_t X, vec_t Y, vec_t Z);
+
+	// assignment
+	// Quaternion& operator=(const Quaternion48 &vOther);
+	Quaternion48S& operator=(const Quaternion &vOther);
+	operator Quaternion () const;
+//private:
+	// shift the quaternion so that the largest value is recreated by the sqrt()
+	// abcd maps modulo into quaternion xyzw starting at "offset"
+	// "offset" is split into two 1 bit fields so that the data packs into 6 bytes (3 shorts)
+	unsigned short a:15;		// first of the 3 consecutive smallest quaternion elements 
+	unsigned short offsetH:1;	// high bit of "offset"
+	unsigned short b:15;
+	unsigned short offsetL:1;	// low bit of "offset"
+	unsigned short c:15;
+	unsigned short dneg:1;		// sign of the largest quaternion element
+};
+
+#define SCALE48S 23168.0f		// needs to fit 2*sqrt(0.5) into 15 bits.
+#define SHIFT48S 16384			// half of 2^15 bits.
+
+inline Quaternion48S::operator Quaternion ()	const
+{
+#if defined(__SPU__)
+
+	fltx4 tmpV;
+	QuaternionAligned tmpQ;
+
+	tmpV = *this;
+	StoreAlignedSIMD( (float *)&tmpQ, tmpV );
+
+	return tmpQ;
+
+#else
+
+	Quaternion tmp;
+
+	COMPILE_TIME_ASSERT( sizeof( Quaternion48S ) == 6 );
+
+	float *ptmp = &tmp.x;
+	int ia = offsetL + offsetH * 2;
+	int ib = ( ia + 1 ) % 4;
+	int ic = ( ia + 2 ) % 4;
+	int id = ( ia + 3 ) % 4;
+	ptmp[ia] = ( (int)a - SHIFT48S ) * ( 1.0f / SCALE48S );
+	ptmp[ib] = ( (int)b - SHIFT48S ) * ( 1.0f / SCALE48S );
+	ptmp[ic] = ( (int)c - SHIFT48S ) * ( 1.0f / SCALE48S );
+	ptmp[id] = sqrt( 1.0f - ptmp[ia] * ptmp[ia] - ptmp[ib] * ptmp[ib] - ptmp[ic] * ptmp[ic] );
+	if (dneg)
+		ptmp[id] = -ptmp[id];
+
+	return tmp; 
+
+#endif
+}
+
+inline Quaternion48S& Quaternion48S::operator=(const Quaternion &vOther)	
+{
+	CHECK_VALID(vOther);
+
+	const float *ptmp = &vOther.x;
+
+	// find largest field, make sure that one is recreated by the sqrt to minimize error
+	int i = 0;
+	if ( fabs( ptmp[i] ) < fabs( ptmp[1] ) )
+	{
+		i = 1;
+	}
+	if ( fabs( ptmp[i] ) < fabs( ptmp[2] ) )
+	{
+		i = 2;
+	}
+	if ( fabs( ptmp[i] ) < fabs( ptmp[3] ) )
+	{
+		i = 3;
+	}
+
+	int offset = ( i + 1 ) % 4; // make "a" so that "d" is the largest element
+	offsetL = offset & 1;
+	offsetH = offset > 1;
+	a = clamp( (int)(ptmp[ offset ] * SCALE48S) + SHIFT48S, 0, (int)(SCALE48S * 2) );
+	b = clamp( (int)(ptmp[ ( offset + 1 ) % 4 ] * SCALE48S) + SHIFT48S, 0, (int)(SCALE48S * 2) );
+	c = clamp( (int)(ptmp[ ( offset + 2 ) % 4 ] * SCALE48S) + SHIFT48S, 0, (int)(SCALE48S * 2) );
+	dneg = ( ptmp[ ( offset + 3 ) % 4 ] < 0.0f );
+
+	return *this; 
+}
+
 // 32 bit Quaternion
 class Quaternion32
 {

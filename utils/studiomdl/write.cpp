@@ -937,13 +937,13 @@ void WriteAnimationData( s_animation_t *srcanim, mstudioanimdesc_t *destanimdesc
 			bUseExtData = true;
 		}
 
-		mstudioanim_t	*destanim = (mstudioanim_t *)pData;
+		mstudio_rle_anim_t	*destanim = (mstudio_rle_anim_t *)pData;
 		byte	*pStartSection = pData;
 		pData += sizeof( *destanim );
 
 		destanim->bone = 255;
 
-		mstudioanim_t	*prevanim = NULL;
+		mstudio_rle_anim_t	*prevanim = NULL;
 
 		// save animation value info
 		for (j = 0; j < g_numbones; j++)
@@ -1066,7 +1066,7 @@ void WriteAnimationData( s_animation_t *srcanim, mstudioanimdesc_t *destanimdesc
 
 			prevanim					= destanim;
 			destanim->nextoffset		= pData - (byte *)destanim;
-			destanim					= (mstudioanim_t *)pData;
+			destanim					= (mstudio_rle_anim_t *)pData;
 			pData						+= sizeof( *destanim );
 		}
 

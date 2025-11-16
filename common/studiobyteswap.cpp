@@ -778,14 +778,111 @@ intp ByteswapVTX( void *pDestBase, const void *pSrcBase, const intp fileSize )
 }
 
 //----------------------------------------------------------------------
+// Swap Frame Animation data (found inside .mdl and .ani)
+//----------------------------------------------------------------------
+
+void ByteswapFrameAnimData( studiohdr_t *&pHdrSrc, mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSrc, byte *&pDataDest )
+{
+	DECLARE_OBJECT_POINTERS( pFrame, pData, mstudio_frame_anim_t );
+
+	/** FRAME ANIMATION BLOCK **/
+	WriteObjects<mstudio_frame_anim_t>( &pDataDest, &pDataSrc );
+
+	/** FLAGS **/
+	byte *pBoneFlags = pDataSrc;
+	WriteBuffer<byte>( &pDataDest, &pDataSrc, pHdrSrc->numbones );
+
+	/** CONSTANTS **/
+	SET_INDEX_POINTERS( pData, pFrame, constantsoffset );
+	// printf("%s:\n", pAnimDesc->pszName() );
+	for (int j = 0; j < pHdrSrc->numbones; j++)
+	{
+		if (pBoneFlags[j] & STUDIO_FRAME_CONST_ROT )
+		{
+			// Quaternion q = *(Quaternion48 *)(pDataSrc);
+			// printf("  %7.4f %7.4f %7.4f %7.4f\n", q.x, q.y, q.z, q.w );
+			// Write the quaternion (bit fields contained in 3 unsigned shorts)
+			WriteBuffer<short>( &pDataDest, &pDataSrc, 3 );
+		}
+		else if (pBoneFlags[j] & STUDIO_FRAME_CONST_ROT2 )
+		{
+			// Quaternion q = *(Quaternion48S *)(pDataSrc);
+			// printf("  %7.4f %7.4f %7.4f %7.4f : ", q.x, q.y, q.z, q.w );
+			// Quaternion48S q2 = *(Quaternion48S *)(pDataSrc);
+			// printf("  %5d %5d %5d %1d %1d\n", q2.a, q2.b, q2.c, q2.dneg, q2.offsetH * 2 + q2.offsetL );
+			// Write the quaternion (bit fields contained in 3 unsigned shorts)
+			WriteBuffer<short>( &pDataDest, &pDataSrc, 3 );
+		}
+
+		if (pBoneFlags[j] & STUDIO_FRAME_CONST_POS )
+		{
+			// Write the vector (3 float16)
+			WriteBuffer<short>( &pDataDest, &pDataSrc, 3 );
+		}
+		else if (pBoneFlags[j] & STUDIO_FRAME_CONST_POS2 )
+		{
+			// Write the vector (3 float)
+			WriteBuffer<float>( &pDataDest, &pDataSrc, 3 );
+		}
+	}
+
+	/** FRAME ANIMATIONS **/
+	SET_INDEX_POINTERS( pData, pFrame, frameoffset );
+	int numFrames = pAnimDesc->numframes;
+	if ( pAnimDesc->sectionframes )
+	{
+		int iStartFrame =  MIN( section * pAnimDesc->sectionframes, pAnimDesc->numframes - 1 );
+		int iEndFrame = MIN( (section + 1) * pAnimDesc->sectionframes, pAnimDesc->numframes - 1 );
+
+		numFrames = iEndFrame - iStartFrame + 1;
+	}
+
+	for (int iFrame = 0; iFrame < numFrames; iFrame++)
+	{
+		for (int j = 0; j < pHdrSrc->numbones; j++)
+		{
+			if (pBoneFlags[j] & STUDIO_FRAME_ANIM_ROT )
+			{
+				// Quaternion q = *(Quaternion48 *)(pDataSrc);
+				// printf("  %7.4f %7.4f %7.4f %7.4f\n", q.x, q.y, q.z, q.w );
+				// Write the quaternion (bit fields contained in 3 unsigned shorts)
+				WriteBuffer<short>( &pDataDest, &pDataSrc, 3 );
+			}
+			else if (pBoneFlags[j] & STUDIO_FRAME_ANIM_ROT2 )
+			{
+				// Quaternion q = *(Quaternion48S *)(pDataSrc);
+				// printf("  %7.4f %7.4f %7.4f %7.4f\n", q.x, q.y, q.z, q.w );
+				// Write the quaternion (bit fields contained in 1 int64)
+				WriteBuffer<int64>( &pDataDest, &pDataSrc, 1 );
+			}
+
+			if (pBoneFlags[j] & STUDIO_FRAME_ANIM_POS )
+			{
+				// Write the vector (3 float16)
+				WriteBuffer<short>( &pDataDest, &pDataSrc, 3 );
+			}
+			else if (pBoneFlags[j] & STUDIO_FRAME_ANIM_POS2 )
+			{
+				// printf("%.1f %.1f %.1f\n", ((float *)pDataSrc)[0], ((float *)pDataSrc)[1], ((float *)pDataSrc)[2] );
+				// Write the vector (3 float)
+				WriteBuffer<float>( &pDataDest, &pDataSrc, 3 );
+			}
+		}
+	}
+
+	ALIGN4( pDataSrc );
+	ALIGN4( pDataDest );
+}
+
+//----------------------------------------------------------------------
 // Swap animation data
 // Fixes alignment errors
 //----------------------------------------------------------------------
 
-void ByteswapAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSrc, byte *&pDataDest )
+void ByteswapRLEAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSrc, byte *&pDataDest )
 {
 	/** ANIMATIONS **/
-	DECLARE_OBJECT_POINTERS( pAnimation, pData, mstudioanim_t )
+	DECLARE_OBJECT_POINTERS( pAnimation, pData, mstudio_rle_anim_t )
 	WriteObjects( pAnimationDest, pAnimationSrc );
 	if ( pAnimation->bone == 255 )
 	{
@@ -899,8 +996,8 @@ void ByteswapAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSr
 		if ( pAnimation->nextoffset )
 		{
 			// Set pointers to the next animation
-			pAnimationSrc = (mstudioanim_t*)( (byte*)pAnimationSrc + SrcNative( &pAnimation->nextoffset ) );
-			pAnimationDest = (mstudioanim_t*)( (byte*)pAnimationDest + SrcNative( &pAnimation->nextoffset ) );
+			pAnimationSrc = (mstudio_rle_anim_t*)( (byte*)pAnimationSrc + SrcNative( &pAnimation->nextoffset ) );
+			pAnimationDest = (mstudio_rle_anim_t*)( (byte*)pAnimationDest + SrcNative( &pAnimation->nextoffset ) );
 			pAnimation = pAnimationSrc;
 
 			// Swap the next animation
@@ -909,8 +1006,8 @@ void ByteswapAnimData( mstudioanimdesc_t *pAnimDesc, int section, byte *&pDataSr
 		else
 		{
 			pAnimation = nullptr;
-			pDataSrc += sizeof( mstudioanim_t );
-			pDataDest += sizeof( mstudioanim_t );
+			pDataSrc += sizeof( mstudio_rle_anim_t );
+			pDataDest += sizeof( mstudio_rle_anim_t );
 		}
 	}
 
@@ -1051,7 +1148,14 @@ intp ByteswapANIFile( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, 
 			byte *pDataSrc = pBlockBaseSrc + pAnimDesc->animindex;
 			byte *pDataDest = pBlockBaseDest + pAnimDesc->animindex;
 
-			ByteswapAnimData( pAnimDesc, 0, pDataSrc, pDataDest );
+			if ( pAnimDesc->flags & STUDIO_FRAMEANIM )
+			{
+				ByteswapFrameAnimData( pHdrSrc, pAnimDesc, 0, pDataSrc, pDataDest );
+			}
+			else
+			{
+				ByteswapRLEAnimData( pAnimDesc, 0, pDataSrc, pDataDest );
+			}
 		}
 		else
 		{
@@ -1077,7 +1181,14 @@ intp ByteswapANIFile( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, 
 					byte *pDataSrc = pBlockBaseSrc + index;
 					byte *pDataDest = pBlockBaseDest + index;
 
-					ByteswapAnimData( pAnimDesc, iSec, pDataSrc, pDataDest );
+					if ( pAnimDesc->flags & STUDIO_FRAMEANIM )
+					{
+						ByteswapFrameAnimData( pHdrSrc, pAnimDesc, i, pDataSrc, pDataDest );
+					}
+					else
+					{
+						ByteswapRLEAnimData( pAnimDesc, i, pDataSrc, pDataDest );
+					}
 				}
 			}
 		}
@@ -1394,7 +1505,14 @@ intp ByteswapMDLFile( void *pDestBase, void *pSrcBase, const intp fileSize )
 			if ( numsections == 0 )
 			{
 				SET_INDEX_POINTERS( pData, pAnimDesc, animindex )
-				ByteswapAnimData( pAnimDesc, 0, pDataSrc, pDataDest );
+				if ( pAnimDesc->flags & STUDIO_FRAMEANIM )
+				{
+					ByteswapFrameAnimData( pHdrSrc, pAnimDesc, 0, pDataSrc, pDataDest );
+				}
+				else
+				{
+					ByteswapRLEAnimData( pAnimDesc, 0, pDataSrc, pDataDest );
+				}
 			}
 			else
 			{
@@ -1408,7 +1526,14 @@ intp ByteswapMDLFile( void *pDestBase, void *pSrcBase, const intp fileSize )
 						byte *pDataSrcAnim = (byte *)pAnimDescSrc + index;
 						byte *pDataDestAnim = (byte *)pAnimDescDest + index;
 
-						ByteswapAnimData( pAnimDesc, i, pDataSrcAnim, pDataDestAnim );
+						if ( pAnimDesc->flags & STUDIO_FRAMEANIM )
+						{
+							ByteswapFrameAnimData( pHdrSrc, pAnimDesc, i, pDataSrc, pDataDest );
+						}
+						else
+						{
+							ByteswapRLEAnimData( pAnimDesc, i, pDataSrc, pDataDest );
+						}
 					}
 				}
 			}
@@ -2084,7 +2209,7 @@ void ProcessANIFields( void *pDataBase, datadescProcessFunc_t pfnProcessFunc )
 		byte *pBlockBase = (byte*)pSrcBase + pAnimBlock->datastart;
 
 		byte *pData = pBlockBase + pAnimDesc->animindex;
-		auto* pAnimation = (mstudioanim_t*)pData;
+		auto* pAnimation = (mstudio_rle_anim_t*)pData;
 		if ( pAnimation->bone == 255 )
 		{
 			// No animation data
@@ -2093,12 +2218,12 @@ void ProcessANIFields( void *pDataBase, datadescProcessFunc_t pfnProcessFunc )
 
 		while( pAnimation )
 		{		
-			ProcessFields( pAnimation, &mstudioanim_t::m_DataMap, pfnProcessFunc );
+			ProcessFields( pAnimation, &mstudio_rle_anim_t::m_DataMap, pfnProcessFunc );
 
 			if ( pAnimation->nextoffset )
 			{
 				pData = (byte*)pAnimation + SrcNative( &pAnimation->nextoffset );
-				pAnimation = (mstudioanim_t*)pData;
+				pAnimation = (mstudio_rle_anim_t*)pData;
 			}
 			else
 			{
@@ -2231,15 +2356,15 @@ void ProcessMDLFields( void *pDataBase, datadescProcessFunc_t pfnProcessFunc  )
 			ProcessFieldByName( pAnimDesc, &mstudioanimdesc_t::m_DataMap, "animindex", pfnProcessFunc );
 
 			pData = (byte*)pAnimDesc + SrcNative( &pAnimDesc->animindex );
-			auto* pAnimation = (mstudioanim_t*)pData;
+			auto* pAnimation = (mstudio_rle_anim_t*)pData;
 			while( pAnimation )
 			{		
-				ProcessFields( pAnimation, &mstudioanim_t::m_DataMap, pfnProcessFunc );
+				ProcessFields( pAnimation, &mstudio_rle_anim_t::m_DataMap, pfnProcessFunc );
 
 				if ( pAnimation->nextoffset )
 				{
 					pData = (byte*)pAnimation + SrcNative( &pAnimation->nextoffset );
-					pAnimation = (mstudioanim_t*)pData;
+					pAnimation = (mstudio_rle_anim_t*)pData;
 				}
 				else
 				{
@@ -2731,10 +2856,17 @@ BEGIN_BYTESWAP_DATADESC( mstudioanimdesc_t )
 	DEFINE_FIELD( zeroframestalltime, FIELD_FLOAT ),
 END_BYTESWAP_DATADESC()
 
-BEGIN_BYTESWAP_DATADESC( mstudioanim_t )
+BEGIN_BYTESWAP_DATADESC( mstudio_rle_anim_t )
 	DEFINE_FIELD( bone, FIELD_CHARACTER ),
 	DEFINE_FIELD( flags, FIELD_CHARACTER ),
 	DEFINE_INDEX( nextoffset, FIELD_SHORT ),
+END_BYTESWAP_DATADESC()
+
+BEGIN_BYTESWAP_DATADESC( mstudio_frame_anim_t )
+	DEFINE_FIELD( constantsoffset, FIELD_INTEGER ),
+	DEFINE_FIELD( frameoffset, FIELD_INTEGER ),
+	DEFINE_FIELD( framelength, FIELD_INTEGER ),
+	DEFINE_ARRAY( unused, FIELD_INTEGER, 3 ),
 END_BYTESWAP_DATADESC()
 
 BEGIN_BYTESWAP_DATADESC( mstudioikerror_t )

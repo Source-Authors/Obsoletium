@@ -40,7 +40,7 @@ mstudioanimdesc_t &studiohdr_t::pAnimdesc( intp i ) const
 // Purpose:
 //-----------------------------------------------------------------------------
 
-const mstudioanim_t *mstudioanimdesc_t::pAnimBlock( intp block, intp index ) const
+const mstudio_rle_anim_t *mstudioanimdesc_t::pAnimBlock( intp block, intp index ) const
 {
 	if (block == -1)
 	{
@@ -49,13 +49,13 @@ const mstudioanim_t *mstudioanimdesc_t::pAnimBlock( intp block, intp index ) con
 
 	if (block == 0)
 	{
-		return reinterpret_cast<const mstudioanim_t *>(reinterpret_cast<const byte *>(this) + index);
+		return reinterpret_cast<const mstudio_rle_anim_t *>(reinterpret_cast<const byte *>(this) + index);
 	}
 
 	const byte *pAnimBlock = pStudiohdr()->GetAnimBlock( block );
 	if ( pAnimBlock )
 	{
-		return reinterpret_cast<const mstudioanim_t *>(pAnimBlock + index);
+		return reinterpret_cast<const mstudio_rle_anim_t *>(pAnimBlock + index);
 	}
 
 	return nullptr;
@@ -66,15 +66,15 @@ const mstudioanim_t *mstudioanimdesc_t::pAnimBlock( intp block, intp index ) con
 //-----------------------------------------------------------------------------
 
 static ConVar mod_load_showstall( "mod_load_showstall", "0", 0, "1 - show hitches , 2 - show stalls" );
-const mstudioanim_t *mstudioanimdesc_t::pAnim( int *piFrame ) const
+const mstudio_rle_anim_t *mstudioanimdesc_t::pAnim( int *piFrame ) const
 {
 	float flStall;
 	return pAnim( piFrame, flStall );
 }
 
-const mstudioanim_t *mstudioanimdesc_t::pAnim( int *piFrame, float &flStall ) const
+const mstudio_rle_anim_t *mstudioanimdesc_t::pAnim( int *piFrame, float &flStall ) const
 {
-	const mstudioanim_t *panim = nullptr;
+	const mstudio_rle_anim_t *panim = nullptr;
 
 	int block = animblock;
 	int index = animindex;

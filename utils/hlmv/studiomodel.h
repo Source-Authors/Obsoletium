@@ -324,7 +324,7 @@ public:
 
 private:
 	mstudioanimdesc_t				&GetAnimDesc( int anim );
-	mstudioanim_t					*GetAnim( int anim );
+	mstudio_rle_anim_t					*GetAnim( int anim );
 
 	void							DrawPhysmesh( CPhysmesh *pMesh, int boneIndex, IMaterial *pMaterial, float *color );
 	void							DrawPhysConvex( CPhysmesh *pMesh, IMaterial *pMaterial );
