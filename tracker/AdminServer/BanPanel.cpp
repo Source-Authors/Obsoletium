@@ -227,7 +227,7 @@ void CBanPanel::AddBan()
 //-----------------------------------------------------------------------------
 void CBanPanel::RemoveBan()
 {
-	int itemID = m_pBanListPanel->GetSelectedItem(0);
+	intp itemID = m_pBanListPanel->GetSelectedItem(0);
 	if ( itemID == -1 )
 		return;
 
@@ -255,7 +255,7 @@ void CBanPanel::RemoveBan()
 //-----------------------------------------------------------------------------
 void CBanPanel::ChangeBan()
 {	
-	int itemID = m_pBanListPanel->GetSelectedItem(0);
+	intp itemID = m_pBanListPanel->GetSelectedItem(0);
 	if (itemID == -1)
 		return;
 
@@ -351,7 +351,7 @@ void CBanPanel::OnCvarChangeValue( KeyValues *kv )
 //-----------------------------------------------------------------------------
 void CBanPanel::OnItemSelected()
 {
-	int itemID = m_pBanListPanel->GetSelectedItem(0);
+	intp itemID = m_pBanListPanel->GetSelectedItem(0);
 	if (itemID == -1)
 	{
 		m_pRemoveButton->SetEnabled(false);
