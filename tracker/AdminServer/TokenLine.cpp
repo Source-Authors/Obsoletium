@@ -30,10 +30,10 @@ bool TokenLine::SetLine(const char * newLine)
 {
 	m_tokenNumber = 0;
 
-	if (!newLine || ( strlen(newLine) >= (MAX_LINE_CHARS-1) ) )
+	if (!newLine || ( V_strlen(newLine) >= (MAX_LINE_CHARS-1) ) )
 	{
-		memset( m_fullLine, 0, MAX_LINE_CHARS );
-		memset( m_tokenBuffer, 0, MAX_LINE_CHARS );
+		BitwiseClear( m_fullLine );
+		BitwiseClear( m_tokenBuffer );
 		return false;
 	}
 
@@ -59,11 +59,9 @@ bool TokenLine::SetLine(const char * newLine)
 				m_token[m_tokenNumber] = charPointer;
 				while (*charPointer && (*charPointer != '\"') )
 					charPointer++;
-
-			} 
+			}
 			else 
-			{
-				m_token[m_tokenNumber] = charPointer;
+			{				m_token[m_tokenNumber] = charPointer;
 				while (*charPointer && ((*charPointer > 32) && (*charPointer <= 126)))
 					charPointer++;
 			}
@@ -81,24 +79,23 @@ bool TokenLine::SetLine(const char * newLine)
 	return (m_tokenNumber != MAX_LINE_TOKENS);
 }
 
-char * TokenLine::GetLine()
+char * TokenLine::GetLine() 
 {
 	return m_fullLine;
 }
 
-char * TokenLine::GetToken(int i)
+char * TokenLine::GetToken(intp i) const
 {
 	if (i >= m_tokenNumber)
-		return NULL;
+		return nullptr;
 	return m_token[i];
-
 }
 
-// if the given parm is not present return NULL
+// if the given parm is not present return nullptr
 // otherwise return the address of the following token, or an empty string
-char* TokenLine::CheckToken(const char * parm)
+char* TokenLine::CheckToken(const char * parm) const
 {
-	for (int i = 0 ; i < m_tokenNumber; i ++)
+	for (intp i = 0 ; i < m_tokenNumber; i ++)
 	{
 		if (!m_token[i])
 			continue; 
@@ -113,13 +110,13 @@ char* TokenLine::CheckToken(const char * parm)
 			
 	}
 		
-	return NULL;
+	return nullptr;
 }
 
-int TokenLine::CountToken() const
+intp TokenLine::CountToken() const
 {
-	int c = 0;
-	for (int i = 0 ; i < m_tokenNumber; i ++)
+	intp c = 0;
+	for (intp i = 0 ; i < m_tokenNumber; i ++)
 	{
 		if (m_token[i])
 			c++;
@@ -127,10 +124,10 @@ int TokenLine::CountToken() const
 	return c;
 }
 
-char* TokenLine::GetRestOfLine(int i)
+char* TokenLine::GetRestOfLine(intp i)
 {
 	if (i >= m_tokenNumber)
-		return NULL;
+		return nullptr;
 	return m_fullLine + (m_token[i] - m_tokenBuffer);
 }
 
