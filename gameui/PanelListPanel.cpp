@@ -96,16 +96,13 @@ CPanelListPanel::~CPanelListPanel()
 //-----------------------------------------------------------------------------
 int	CPanelListPanel::computeVPixelsNeeded( void )
 {
-	int pixels =0;
-	DATAITEM *item;
-	Panel *panel;
-	for ( int i = 0; i < _dataItems.GetCount(); i++ )
+	int pixels = 0;
+	for ( auto *item : _dataItems )
 	{
-		item = _dataItems[ i ];
 		if ( !item )
 			continue;
 
-		panel = item->panel;
+		Panel *panel = item->panel;
 		if ( !panel )
 			continue;
 
@@ -115,7 +112,7 @@ int	CPanelListPanel::computeVPixelsNeeded( void )
 		pixels += h;
 	}
 	// dimhotepus: Scale UI.
-	pixels+=QuickPropScale( 5 ); // add a buffer after the last item
+	pixels += QuickPropScale( 5 ); // add a buffer after the last item
 
 	return pixels;
 
@@ -209,13 +206,13 @@ void CPanelListPanel::RemoveItem(int itemIndex)
 //-----------------------------------------------------------------------------
 void CPanelListPanel::DeleteAllItems()
 {
-	for (int i = 0; i < _dataItems.GetCount(); i++)
+	for (auto *item : _dataItems)
 	{
-		if ( _dataItems[i] )
+		if ( item )
 		{
-			delete _dataItems[i]->panel;
+			delete item->panel;
+			delete item;
 		}
-		delete _dataItems[i];
 	}
 	_dataItems.RemoveAll();
 
@@ -265,7 +262,7 @@ void CPanelListPanel::PerformLayout()
 	// Now lay out the controls on the embedded panel
 	int y = 0;
 	int h = 0;
-	for ( int i = 0; i < _dataItems.GetCount(); i++, y += h )
+	for ( intp i = 0; i < _dataItems.GetCount(); i++, y += h )
 	{
 		DATAITEM *item = _dataItems[ i ];
 		if ( !item || !item->panel )
