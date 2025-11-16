@@ -4681,6 +4681,9 @@ void CModelLoader::Sprite_UnloadModel( model_t *mod )
 //-----------------------------------------------------------------------------
 void CModelLoader::Studio_ReloadModels( CModelLoader::ReloadType_t reloadType )
 {
+	// RaphaelIT7: We need to flush the materialsystem queue thread as it may work with static prop data while were nuking that
+	g_pMaterialSystem->Unlock( g_pMaterialSystem->Lock() );
+
 #if !defined( SWDS )
 	if ( g_ClientDLL )
 		g_ClientDLL->InvalidateMdlCache();
