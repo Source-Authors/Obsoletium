@@ -248,8 +248,8 @@ void CPanelListPanel::PerformLayout()
 	_vbar->SetEnabled(false);
 	// dimhotepus: Scale UI.
 	_vbar->SetRange( 0, vpixels - tall + QuickPropScale( 24 ));
-	_vbar->SetRangeWindow( 24 /*vpixels / 10*/ );
-	_vbar->SetButtonPressedScrollValue( 24 );
+	_vbar->SetRangeWindow( QuickPropScale( 24 ) /*vpixels / 10*/ );
+	_vbar->SetButtonPressedScrollValue( QuickPropScale( 24 ) );
 	// dimhotepus: Scale UI.
 	_vbar->SetPos(wide - QuickPropScale( 20 ), _sliderYOffset);
 	// dimhotepus: Scale UI.
