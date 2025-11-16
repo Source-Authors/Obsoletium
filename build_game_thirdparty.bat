@@ -22,13 +22,13 @@ if ["%~1"]==["x86"] (
   EXIT /B 1
 )
 
-# This check previously was in create_game_projects.bat but we split a part of it into here since this way earlier in the build process
+REM This check previously was in create_game_projects.bat but we split a part of it into here since this way earlier in the build process
 if ["%CMAKE_MSVC_ARCH_NAME%"]==["x64"] (
   ECHO Searching for ml64 in PATH...
   WHERE ml64.exe
 
   if ERRORLEVEL 1 (
-  	# RaphaelIT7: Had it happen that this errored since I used the x86 one but there all things already compiled for 32x making a mess to clean up
+    REM RaphaelIT7: Had it happen that this errored since I used the x86 one but there all things already compiled for 32x making a mess to clean up
     ECHO Unable to find ml64 in PATH. Are you using the x64 Command Prompt?
     EXIT /B 1
   )
