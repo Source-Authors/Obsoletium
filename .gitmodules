@@ -10,12 +10,14 @@
 [submodule "thirdparty/zlib"]
 	path = thirdparty/zlib
 	url = git@github.com:Source-Authors/zlib.git
+	ignore = dirty
 [submodule "thirdparty/libpng"]
 	path = thirdparty/libpng
 	url = git@github.com:Source-Authors/libpng.git
 [submodule "thirdparty/libjpeg-turbo"]
 	path = thirdparty/libjpeg-turbo
 	url = git@github.com:Source-Authors/libjpeg-turbo.git
+	ignore = dirty
 [submodule "thirdparty/openvr"]
 	path = thirdparty/openvr
 	url = git@github.com:Source-Authors/openvr.git
@@ -23,6 +25,7 @@
 [submodule "thirdparty/protobuf"]
 	path = thirdparty/protobuf
 	url = git@github.com:Source-Authors/protobuf.git
+	ignore = dirty
 [submodule "thirdparty/bzip2"]
 	path = thirdparty/bzip2
 	url = git@github.com:Source-Authors/bzip2.git
@@ -65,9 +68,11 @@
 [submodule "thirdparty/lua"]
 	path = thirdparty/lua
 	url = git@github.com:Source-Authors/Lua.git
+	ignore = dirty
 [submodule "thirdparty/shadercompile"]
 	path = thirdparty/shadercompile
 	url = git@github.com:Source-Authors/ShaderCompile.git
 [submodule "thirdparty/squirrel"]
 	path = thirdparty/squirrel
 	url = git@github.com:Source-Authors/squirrel.git
+	ignore = dirty
