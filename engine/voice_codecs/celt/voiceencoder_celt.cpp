@@ -72,12 +72,7 @@ VoiceEncoder_Celt::VoiceEncoder_Celt() {
   memset(&preset_, 0, sizeof(preset_));
 }
 
-VoiceEncoder_Celt::~VoiceEncoder_Celt() {
-  TermStates();
-
-  Msg("Shut down CELT codec %u (bit stream version)\n",
-      CELT_GET_BITSTREAM_VERSION);
-}
+VoiceEncoder_Celt::~VoiceEncoder_Celt() { TermStates(); }
 
 bool VoiceEncoder_Celt::Init(VoiceCodecQuality quality, int &raw_frame_size,
                              int &encoded_frame_size) {
@@ -90,9 +85,6 @@ bool VoiceEncoder_Celt::Init(VoiceCodecQuality quality, int &raw_frame_size,
 
   preset_ = kCeltPresets[to_underlying(quality)];
   raw_frame_size = preset_.frame_size * BYTES_PER_SAMPLE;
-
-  Msg("Start up CELT codec %u  (bit stream version)\n",
-      CELT_GET_BITSTREAM_VERSION);
 
   int rc = 0;
 
