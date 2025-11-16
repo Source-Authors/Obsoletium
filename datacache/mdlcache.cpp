@@ -12,7 +12,7 @@
 #include "tier0/vprof.h"
 #include "tier0/icommandline.h"
 #include "tier1/utllinkedlist.h"
-#include "tier1/utlmap.h"
+#include "tier1/utlmapmt.h"
 #include "tier1/utldict.h"
 #include "tier1/convar.h"
 #include "tier1/mempool.h"
@@ -474,7 +474,7 @@ private:
 	int m_nModelCacheFrameLocks;
 	int m_nMeshCacheFrameLocks;
 
-	CUtlDict< studiodata_t*, MDLHandle_t > m_MDLDict;
+	CUtlDict< studiodata_t*, MDLHandle_t, CUtlMapMT > m_MDLDict;
 
 	IMDLCacheNotify *m_pCacheNotify;
 
