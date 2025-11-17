@@ -5,6 +5,7 @@
 //=============================================================================//
 
 #include "vgui_budgetpanelshared.h"
+
 #include "vgui/IVGui.h"
 #include "vgui/ILocalize.h"
 #include "vgui/ISurface.h"

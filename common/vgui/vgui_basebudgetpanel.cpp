@@ -5,6 +5,7 @@
 //=============================================================================//
 
 #include "vgui_basebudgetpanel.h"
+
 #include "vgui_controls/Label.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
