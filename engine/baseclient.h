@@ -276,8 +276,7 @@ public:
 	{
 		SNAPSHOT_SCRATCH_BUFFER_SIZE = 160000,
 	};
-
-	unsigned int		m_SnapshotScratchBuffer[ SNAPSHOT_SCRATCH_BUFFER_SIZE / 4 ];
+	static constexpr int g_nScratchBufferSize = SNAPSHOT_SCRATCH_BUFFER_SIZE / sizeof(unsigned int);
 
 private:
 	void				StartTrace( bf_write &msg );

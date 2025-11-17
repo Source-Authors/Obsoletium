@@ -28,6 +28,7 @@
 #include "iregistry.h"
 #include "sv_main.h"
 #include "hltvserver.h"
+#include <memory>
 
 #ifdef REPLAY_ENABLED
 #include "replay_internal.h"
@@ -1153,7 +1154,9 @@ void CBaseClient::SendSnapshot( CClientFrame *pFrame )
 
 	bool bFailedOnce = false;
 write_again:
-	bf_write msg( "CBaseClient::SendSnapshot", m_SnapshotScratchBuffer, sizeof( m_SnapshotScratchBuffer ) );
+	// RaphaelIT7: Were deep in networking and the stack can easily get close to an overflow
+	static thread_local std::unique_ptr<unsigned int> pSnapshotScratchBuffer(new unsigned int[g_nScratchBufferSize]);
+	bf_write msg( "CBaseClient::SendSnapshot", pSnapshotScratchBuffer.get(), g_nScratchBufferSize );
 
 	TRACE_PACKET( ( "SendSnapshot(%d)\n", pFrame->tick_count ) );
 
