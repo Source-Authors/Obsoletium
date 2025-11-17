@@ -16,7 +16,8 @@
 namespace vgui
 {
 	class EditablePanel;
-	typedef unsigned long HCursor;
+	// raphaelit7: unsigned long -> uint32. x86-64 - same as everywhere else
+	typedef uint32 HCursor;
 }
 
 class CVGuiWnd 

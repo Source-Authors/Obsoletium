@@ -316,8 +316,8 @@ void CalcVis (void)
 	{
 		RunMPIBasePortalVis();
 	}
-#endif
 	else 
+#endif
 	{
 	    RunThreadsOnIndividual (g_numportals*2, true, BasePortalVis);
 	}

@@ -980,6 +980,10 @@ public:
 		return false;
 	}
 
+	void AllowMultiSelect( bool bAllow ) override { (void)bAllow; };
+
+	intp GetFilenameBufferSize() const override { return MAX_PATH; };
+
 private:
 	CFileSystemOpenDlg *m_pDialog;
 	HWND m_hParentWnd;

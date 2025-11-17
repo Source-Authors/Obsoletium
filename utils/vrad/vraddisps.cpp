@@ -420,7 +420,7 @@ void CVRadDispMgr::DispBuilderInit( CCoreDispInfo *pBuilderDisp, dface_t *pFace,
 void CVRadDispMgr::UnserializeDisps() 
 {
 	// temporarily create the "builder" displacements
-	CUtlVector<CCoreDispInfo*> builderDisps( 0, g_dispinfo.Count() );
+	CUtlVector<CCoreDispInfo*> builderDisps( (intp)0, g_dispinfo.Count() );
 	for ( auto &info : g_dispinfo )
 	{
 		auto *pDisp = new CCoreDispInfo;
