@@ -600,6 +600,19 @@ void CEngineVGui::Init()
 		return;
 	}
 
+	// dimhotepus: Better SteamDeck support.
+	if ( IsSteamDeck() )
+	{
+		CCommand ccommand;
+		if ( CL_ShouldLoadBackgroundLevel( ccommand ) )
+		{
+			// Must be before the game ui base panel starts up
+			// This is a hint to avoid the menu pop due to the impending background map
+			// that the game ui is not aware of until 1 frame later.
+			staticGameUIFuncs->SetProgressOnStart();
+		}
+	}
+
 	COM_TimestampedLog( "vgui::ivgui()->Start()" );
 
 	// Start the App running
@@ -1195,6 +1208,13 @@ void CEngineVGui::OnLevelLoadingStarted()
 		{
 			pSyncReportConVar->SetValue( 0 );
 		}
+	}
+
+	// dimhotepus: Better SteamDeck support.
+	if ( IsSteamDeck() )
+	{
+		// TCR requirement, always!!!
+		m_bShowProgressDialog = true;
 	}
 	
 	// we've starting loading a level/connecting to a server
