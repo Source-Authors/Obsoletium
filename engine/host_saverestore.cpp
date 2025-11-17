@@ -741,7 +741,7 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 
 	// open the file to validate it exists, and to clear it
 	if ( bClearFile )
-	{		
+	{
 		FileHandle_t pSaveFile = g_pSaveRestoreFileSystem->Open( name, "wb", MOD_DIR );
 		if (!pSaveFile && g_pFileSystem->FileExists( name, MOD_DIR ) )
 		{

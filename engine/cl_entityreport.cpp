@@ -274,7 +274,7 @@ CEntityReportPanel::CEntityReportPanel( vgui::Panel *parent ) :
 	SetSize( videomode->GetModeStereoWidth(), videomode->GetModeStereoHeight() );
 	SetPos( 0, 0 );
 	SetVisible( true );
-	SetCursor( 0 );
+	SetCursor( vgui::dc_user );
 
 	m_hFont = vgui::INVALID_FONT;
 
