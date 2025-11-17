@@ -39,6 +39,7 @@ public:
 };
 
 #define MAX_TRAIL_LENGTH	30
+// dimhotepus: Scale UI.
 #define OVERVIEW_MAP_SIZE	1024	// an overview map is 1024x1024 pixels
 
 typedef bool ( *FnCustomMapOverviewObjectPaint )( int textureID, Vector pos, float scale, float angle, const char *text, Color *textColor, float status, Color *statusColor );

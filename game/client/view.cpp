@@ -46,6 +46,8 @@
 #include "sourcevr/isourcevirtualreality.h"
 #include "client_virtualreality.h"
 
+#include "mapoverview.h"
+
 #if defined( REPLAY_ENABLED )
 #include "replay/ireplaysystem.h"
 #include "replay/ienginereplay.h"
@@ -1003,7 +1005,8 @@ void CViewRender::SetUpOverView()
 	float aspect = (float)viewEye.width/(float)viewEye.height;
 
 	// dimhotepus: int -> float.
-	float size_y = 1024.0f * cl_leveloverview.GetFloat(); // scale factor, 1024 = OVERVIEW_MAP_SIZE
+	// dimhotepus: Use OVERVIEW_MAP_SIZE to scale UI.
+	float size_y = OVERVIEW_MAP_SIZE * cl_leveloverview.GetFloat(); // scale factor, 1024 = OVERVIEW_MAP_SIZE
 	float size_x = size_y * aspect;	// standard screen aspect 
 
 	viewEye.origin.x -= size_x / 2;

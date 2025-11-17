@@ -114,7 +114,8 @@ CMapOverview::CMapOverview( const char *pElementName ) : CHudElement( pElementNa
 {
 	SetParent( g_pClientMode->GetViewport()->GetVPanel() );
 
-	SetBounds( 0,0, 256, 256 );
+	// dimhotepus: Scale UI.
+	SetBounds( 0,0, QuickPropScale( 256 ), QuickPropScale( 256 ) );
 	SetBgColor( Color( 0,0,0,100 ) );
 	SetPaintBackgroundEnabled( true );
 	ShowPanel( false );
