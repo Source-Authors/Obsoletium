@@ -412,6 +412,30 @@ public:
 	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 };
 
+// dimhotepus: Simple RAII over wait cursor.
+class ScopedSurfaceWaitCursor
+{
+public:
+	explicit ScopedSurfaceWaitCursor(ISurface *surface, CursorCode restoreCursor = dc_user)
+		: surface_{surface}, restoreCursor_{restoreCursor}
+	{
+		surface->SetCursor(dc_hourglass);
+	}
+	~ScopedSurfaceWaitCursor()
+	{
+		surface_->SetCursor(restoreCursor_);
+	}
+
+	ScopedSurfaceWaitCursor(ScopedSurfaceWaitCursor&) = delete;
+	ScopedSurfaceWaitCursor(ScopedSurfaceWaitCursor&&) = delete;
+	ScopedSurfaceWaitCursor& operator=(ScopedSurfaceWaitCursor&) = delete;
+	ScopedSurfaceWaitCursor& operator=(ScopedSurfaceWaitCursor&&) = delete;
+
+private:
+	ISurface *surface_;
+	CursorCode restoreCursor_;
+};
+
 }
 
 constexpr inline char VGUI_SURFACE_INTERFACE_VERSION[]{"VGUI_Surface030"};

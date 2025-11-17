@@ -1314,8 +1314,8 @@ void COptionsSubMultiplayer::ConversionError( ConversionErrorType nError )
 void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 {
 #ifndef _XBOX
-	// this can take a while, put up a waiting cursor
-	surface()->SetCursor(dc_hourglass);
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor{vgui::surface()};
 
 	ConversionErrorType nErrorCode = ImgUtl_ConvertToVTFAndDumpVMT( fullpath, IsPosix() ? "/vgui/logos" : "\\vgui\\logos", 256, 256 );
 	if ( nErrorCode == CE_SUCCESS )
@@ -1334,9 +1334,6 @@ void COptionsSubMultiplayer::OnFileSelected(const char *fullpath)
 	{
 		ConversionError( nErrorCode );
 	}
-
-	// change the cursor back to normal
-	surface()->SetCursor(dc_user);
 #endif
 }
 
@@ -1544,6 +1541,9 @@ void COptionsSubMultiplayer::RemapLogo()
 
 	if( !logoname[ 0 ] )
 		return;
+	
+	// dimhotepus: This can take a while, put up a waiting cursor.
+    const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
 	// make sure there is a version with the proper shader
 	g_pFullFileSystem->CreateDirHierarchy( "materials/VGUI/logos/UI", "GAME" );

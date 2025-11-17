@@ -2384,6 +2384,9 @@ void RichText::ApplySettings(KeyValues *inResourceData)
 		const char *textfilename = inResourceData->GetString("textfile", NULL);
 		if ( textfilename )
 		{
+			// dimhotepus: This can take a while, put up a waiting cursor
+			const ScopedPanelWaitCursor scopedWaitCursor{this};
+
 			FileHandle_t f = g_pFullFileSystem->Open( textfilename, "rt" );
 			if (!f)
 			{

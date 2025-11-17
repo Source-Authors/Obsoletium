@@ -44,10 +44,15 @@ void CTGAPreviewPanel::SetTGA( const char *pFullPath )
 		return;
 	}
 
-	if ( !TGALoader::GetInfo( buf, &nWidth, &nHeight, &format, &flGamma ) )
 	{
-		Warning( "TGA file '%s' is broken or not in supported format.\n", pFullPath );
-		return;
+		// dimhotepus: This can take a while, put up a waiting cursor.
+		const ScopedPanelWaitCursor scopedWaitCursor{this};
+
+		if ( !TGALoader::GetInfo( buf, &nWidth, &nHeight, &format, &flGamma ) )
+		{
+			Warning( "TGA file '%s' is broken or not in supported format.\n", pFullPath );
+			return;
+		}
 	}
 
 	Shutdown();
@@ -55,14 +60,20 @@ void CTGAPreviewPanel::SetTGA( const char *pFullPath )
 	m_TGAName = pFullPath;
 
 	buf.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
-	if ( !TGALoader::Load( (unsigned char*)GetImageBuffer(), buf, 
-		  nWidth, nHeight, IMAGE_FORMAT_BGRA8888, flGamma, false ) )
+
 	{
-		Shutdown();
-	}
-	else
-	{
-		DownloadTexture();
+		// dimhotepus: This can take a while, put up a waiting cursor.
+		const ScopedPanelWaitCursor scopedWaitCursor{this};
+
+		if ( !TGALoader::Load( (unsigned char*)GetImageBuffer(), buf, 
+			  nWidth, nHeight, IMAGE_FORMAT_BGRA8888, flGamma, false ) )
+		{
+			Shutdown();
+		}
+		else
+		{
+			DownloadTexture();
+		}
 	}
 }
 

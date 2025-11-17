@@ -40,6 +40,8 @@
 #include "tier0/icommandline.h"
 #include "dmxloader/dmxelement.h"
 #include "dmxloader/dmxloader.h"
+#include "vgui/ISurface.h"
+#include "vgui_controls/Controls.h"
 #include "bitmap/float_bm.h"
 #include "tier2/tier2.h"
 #include "../utils/common/bsplib.h"
@@ -488,6 +490,9 @@ CON_COMMAND( lightprobe,
 		nTGASize = atoi( args[2] );
 	}
 
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor{vgui::surface()};
+
 	CSysModule *pModule;
 	IVTex *pIVTex = VTex_Load( &pModule );
 	if ( !pIVTex )
@@ -922,6 +927,9 @@ void R_BuildCubemapSamples( int numIterations )
 {
 	if ( IsX360() )
 		return;
+
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor{vgui::surface()};
 
 	// Make sure that the file is writable before building cubemaps.
 	Assert( g_pFileSystem->FileExists( cl.m_szLevelFileName, "GAME" ) );

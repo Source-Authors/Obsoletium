@@ -60,10 +60,14 @@ CMultiplayerAdvancedDialog::CMultiplayerAdvancedDialog(vgui::Panel *parent) : Ba
 
 	m_pList = NULL;
 
-	m_pDescription = new CInfoDescription();
-	m_pDescription->InitFromFile( DEFAULT_OPTIONS_FILE );
-	m_pDescription->InitFromFile( OPTIONS_FILE );
-	m_pDescription->TransferCurrentValues( NULL );
+	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+		const vgui::ScopedPanelWaitCursor scopedWaitCursor(this);
+		m_pDescription = new CInfoDescription();
+		m_pDescription->InitFromFile( DEFAULT_OPTIONS_FILE );
+		m_pDescription->InitFromFile( OPTIONS_FILE );
+		m_pDescription->TransferCurrentValues( NULL );
+	}
 
 	LoadControlSettings("Resource\\MultiplayerAdvancedDialog.res");
 	CreateControls();
@@ -418,6 +422,9 @@ void CMultiplayerAdvancedDialog::SaveValues()
 	// Create the game.cfg file
 	if ( m_pDescription )
 	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+    	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		FileHandle_t fp;
 
 		// Add settings to config.cfg

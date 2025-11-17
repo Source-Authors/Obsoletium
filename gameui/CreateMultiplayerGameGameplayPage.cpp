@@ -53,9 +53,15 @@ CCreateMultiplayerGameGameplayPage::CCreateMultiplayerGameGameplayPage(vgui::Pan
 	SetSize( QuickPropScale( 10 ), QuickPropScale( 10 ) ); // Quiet "parent not sized yet" spew
 	m_pOptionsList = new CPanelListPanel(this, "GameOptions");
 
-	m_pDescription = new CServerDescription();
-	m_pDescription->InitFromFile( DEFAULT_OPTIONS_FILE );
-	m_pDescription->InitFromFile( OPTIONS_FILE );
+	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+		const vgui::ScopedPanelWaitCursor scopedWaitCursor(this);
+
+		m_pDescription = new CServerDescription();
+		m_pDescription->InitFromFile( DEFAULT_OPTIONS_FILE );
+		m_pDescription->InitFromFile( OPTIONS_FILE );
+	}
+	
 	m_pList = NULL;
 
 	LoadControlSettings("Resource/CreateMultiplayerGameGameplayPage.res");
@@ -130,6 +136,9 @@ const char *CCreateMultiplayerGameGameplayPage::GetValue(const char *cvarName, c
 //-----------------------------------------------------------------------------
 void CCreateMultiplayerGameGameplayPage::OnApplyChanges()
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+    const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 	// Get the values from the controls
 	GatherCurrentValues();
 

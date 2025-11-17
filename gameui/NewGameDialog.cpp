@@ -325,6 +325,9 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 	int chapterIndex = 0;
 
 	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+    	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 		const char *fileName = g_pFullFileSystem->FindFirst( "cfg/chapter*.cfg", &findHandle );
 		while ( fileName && chapterIndex < MAX_CHAPTERS )

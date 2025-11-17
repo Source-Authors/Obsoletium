@@ -387,7 +387,7 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 	TokenLine tok;
 
 	// this can take a while, put up a waiting cursor
-	surface()->SetCursor(dc_hourglass);
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor(surface());
 
 	// we don't use filesystem() here because we want to let the user pick
 	// a file from anywhere on their filesystem... so we use stdio
@@ -410,9 +410,6 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 	{
 		Warning("Unable to load bans from %s: %s.\n", fullpath, rc.message().c_str());
 	}
-
-	// change the cursor back to normal and shutdown file
-	surface()->SetCursor(dc_user);
 }
 
 //-----------------------------------------------------------------------------

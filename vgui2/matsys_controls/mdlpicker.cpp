@@ -720,6 +720,9 @@ void CMDLPicker::WriteBackbackVMTFiles( const char *pAssetName )
 	Q_FixSlashes( pBaseTextureName );
 	
 	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+    	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		CP4AutoEditAddFile autop4( pVMTFilename );
 		FileHandle_t fileHandle = g_pFullFileSystem->Open( pVMTFilename, "w" );
 		if ( fileHandle )
@@ -745,6 +748,8 @@ void CMDLPicker::WriteBackbackVMTFiles( const char *pAssetName )
 	Q_FixSlashes( pBaseTextureName );
 
 	{
+		const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		CP4AutoEditAddFile autop4( pVMTFilename );
 		FileHandle_t fileHandle = g_pFullFileSystem->Open( pVMTFilename, "w" );
 		if ( fileHandle )
@@ -888,6 +893,9 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	V_SetExtension( pVTexOptionsFileName, ".txt" );
 
 	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+    	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		CP4AutoEditAddFile autop4( pVTexOptionsFileName );
 		FileHandle_t hVTexOptionsFile = g_pFullFileSystem->Open( pVTexOptionsFileName, "w" );
 		if ( hVTexOptionsFile )
@@ -926,7 +934,12 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	vTexArgv[ vTexArgc++ ] = pOutputPathGame;
 	vTexArgv[ vTexArgc++ ] = (char *)pLargeTGAName;
 
+	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+		const ScopedPanelWaitCursor scopedWaitCursor{this};
+
 	g_pVTex->VTex( MdlPickerFSFactory, pOutputPathGame, vTexArgc, vTexArgv );
+	}
 
 	// Generale small TGA name, by removing the "large" part
 	char pSmallTGAName[ MAX_PATH ];
@@ -942,6 +955,10 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	float gamma;
 	CUtlBuffer largeTGAFileData;
 	CUtlMemory<unsigned char> largeTGAImageData;
+
+	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+		const ScopedPanelWaitCursor scopedWaitCursor{this};
 
 	if ( !g_pFullFileSystem->ReadFile( pLargeTGAName, NULL, largeTGAFileData )
 		|| !TGALoader::GetInfo( largeTGAFileData, &nCheckWidth, &nCheckHeight, &largeFmt, &gamma )
@@ -959,6 +976,7 @@ void CMDLPicker::GenerateBackpackIcons( void )
 		Error( "Failed to reload image data %s", pLargeTGAName );
 		Assert( false );
 		return;
+	}
 	}
 
 	//
@@ -1003,6 +1021,9 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	V_SetExtension( pVTexOptionsFileName, ".txt" );
 
 	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+    	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		CP4AutoEditAddFile autop4( pVTexOptionsFileName );
 		FileHandle_t hVTexOptionsFile = g_pFullFileSystem->Open( pVTexOptionsFileName, "w" );
 		if ( hVTexOptionsFile )
@@ -1023,8 +1044,13 @@ void CMDLPicker::GenerateBackpackIcons( void )
 	vTexArgv[ vTexArgc++ ] = (char*)"-outdir";
 	vTexArgv[ vTexArgc++ ] = pOutputPathGame;
 	vTexArgv[ vTexArgc++ ] = (char *)pSmallTGAName;
-	g_pVTex->VTex( MdlPickerFSFactory, pOutputPathGame, vTexArgc, vTexArgv );
 
+	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+		const ScopedPanelWaitCursor scopedWaitCursor{this};
+
+	g_pVTex->VTex( MdlPickerFSFactory, pOutputPathGame, vTexArgc, vTexArgv );
+	}
 
 	// restore the preview panel to its original state
 	m_pMDLPreview->SetParent( pParent );

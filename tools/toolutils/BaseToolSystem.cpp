@@ -535,6 +535,9 @@ void CBaseToolSystem::SetMode( bool bGameInputEnabled, bool bFullscreen )
 //-----------------------------------------------------------------------------
 void CBaseToolSystem::LoadKeyBindings()
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedPanelWaitCursor scopedWaitCursor(this);
+
 	ReloadKeyBindings( m_KeyBindingsHandle );
 }
 

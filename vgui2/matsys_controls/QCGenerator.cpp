@@ -325,6 +325,9 @@ CQCGenerator::CQCGenerator( vgui::Panel *pParent, const char *pszPath, const cha
 		constexpr char pSurfacePropFilename[]{"\\scripts\\surfaceproperties.txt"};
 		V_sprintf_safe( szSearchPath, "%s%s", szGamePath, pSurfacePropFilename );
 
+		// dimhotepus: This can take a while, put up a waiting cursor.
+    	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		FileHandle_t fp = g_pFullFileSystem->Open( szSearchPath, "rb" );
 		if ( !fp )
 		{
@@ -488,6 +491,9 @@ bool CQCGenerator::GenerateQCFile()
 
 	char szPath[MAX_PATH];
 	char szName[MAX_PATH];
+
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
 	Q_strncpy( szPath, m_QCInfo_t.pszSMDPath, nameBegin - m_QCInfo_t.pszSMDPath + 2 );
 	V_strcpy_safe( szName, szPath);

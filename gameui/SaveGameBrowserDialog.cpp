@@ -1159,6 +1159,9 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
 	V_strcpy_safe( save->szShortName, pszShortName );
 	V_strcpy_safe( save->szFileName, pszFileName );
 
+	// dimhotepus: This can take a while, put up a waiting cursor.
+    const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 	FileHandle_t fh = g_pFullFileSystem->Open( pszFileName, "rb", "MOD" );
 	if (fh == FILESYSTEM_INVALID_HANDLE)
 		return false;

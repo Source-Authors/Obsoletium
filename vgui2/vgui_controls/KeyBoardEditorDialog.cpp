@@ -752,6 +752,9 @@ void CKeyBoardEditorSheet::OnSaveChanges()
 		page->OnSaveChanges();
 	}
 
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const ScopedPanelWaitCursor scopedWaitCursor{this};
+
 	if ( m_bSaveToExternalFile )
 	{
 		m_hPanel->SaveKeyBindingsToFile( m_Handle, m_SaveFileName.String(), m_SaveFilePathID.IsValid() ? m_SaveFilePathID.String() : NULL );

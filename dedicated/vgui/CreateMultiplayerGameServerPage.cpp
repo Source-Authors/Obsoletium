@@ -701,13 +701,18 @@ void CCreateMultiplayerGameServerPage::LoadMapList() {
     }
   }
 
-  // Load the maps for the GameDir
-  iMapsFound += LoadMaps(m_szMod);
+  {
+    // dimhotepus: This can take a while, put up a waiting cursor.
+    const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
-  // If we're using a "fallback_dir" in liblist.gam then include those maps...
-  const char *pszFallback = GetLiblistFallbackDir(m_szMod);
-  if (pszFallback[0]) {
-    iMapsFound += LoadMaps(pszFallback);
+    // Load the maps for the GameDir
+    iMapsFound += LoadMaps(m_szMod);
+
+    // If we're using a "fallback_dir" in liblist.gam then include those maps...
+    const char *pszFallback = GetLiblistFallbackDir(m_szMod);
+    if (pszFallback[0]) {
+      iMapsFound += LoadMaps(pszFallback);
+    }
   }
 
   if (iMapsFound < 1) {

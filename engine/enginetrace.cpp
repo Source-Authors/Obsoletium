@@ -1532,6 +1532,9 @@ void CEngineTrace::TraceRayAgainstLeafAndEntityList( const Ray_t &ray, CTraceLis
 
 CON_COMMAND( ray_save, "Save the rays" )
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor{vgui::surface()};
+
 	int count = s_BenchmarkRays.Count();
 	if ( count )
 	{
@@ -1549,6 +1552,9 @@ CON_COMMAND( ray_save, "Save the rays" )
 
 CON_COMMAND( ray_load, "Load the rays" )
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor{vgui::surface()};
+
 	s_BenchmarkRays.RemoveAll();
 	FileHandle_t hFile = g_pFileSystem->Open("rays.bin", "rb");
 	if ( hFile )

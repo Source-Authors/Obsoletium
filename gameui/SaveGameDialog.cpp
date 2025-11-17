@@ -85,6 +85,9 @@ void CSaveGameDialog::OnCommand( const char *command )
 	}
 	else if ( !stricmp( command, "SaveOverwriteConfirmed" ) )
 	{
+		// dimhotepus: This can take a while, put up a waiting cursor.
+		const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		intp saveIndex = GetSelectedItemSaveIndex();
 		if ( m_SaveGames.IsValidIndex(saveIndex) )
 		{

@@ -961,6 +961,40 @@ inline bool	Panel::IsMouseInputDisabledForThisPanel() const
 	return _flags.IsFlagSet( IS_MOUSE_DISABLED_FOR_THIS_PANEL_ONLY );
 }
 
+// dimhotepus: Simple RAII over wait cursor.
+class ScopedPanelWaitCursor
+{
+public:
+	explicit ScopedPanelWaitCursor(Panel *panel)
+		: panel_{panel}, oldCursor_{panel->GetCursor()}
+	{
+		panel->SetCursor(dc_hourglass);
+	}
+	~ScopedPanelWaitCursor()
+	{
+		HCursor nowCursor{panel_->GetCursor()};
+		if (nowCursor == dc_hourglass)
+		{
+			panel_->SetCursor(oldCursor_);
+		}
+		else
+		{
+			AssertMsg(nowCursor == dc_hourglass,
+				"Expected dc_hourglass cursor, got %s one.",
+				CursorCodeToString( nowCursor ) );
+		}
+	}
+
+	ScopedPanelWaitCursor(ScopedPanelWaitCursor&) = delete;
+	ScopedPanelWaitCursor(ScopedPanelWaitCursor&&) = delete;
+	ScopedPanelWaitCursor& operator=(ScopedPanelWaitCursor&) = delete;
+	ScopedPanelWaitCursor& operator=(ScopedPanelWaitCursor&&) = delete;
+
+private:
+	Panel *panel_;
+	HCursor oldCursor_;
+};
+
 #if 0
 // This function cannot be defined here because it requires on a full definition of
 // KeyValues (to call KeyValues::MakeCopy()) whereas the rest of this header file

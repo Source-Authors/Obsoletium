@@ -17,6 +17,8 @@
 #include "tier1/strtools.h"
 #include "tier2/tier2.h"
 #include "vstdlib/jobthread.h"
+#include "vgui/ISurface.h"
+#include "vgui_controls/Controls.h"
 
 #ifdef USE_SDL
 	#include "appframework/ilaunchermgr.h"
@@ -920,6 +922,9 @@ static void SetupNewBindings()
 //******************************************
 static void UseDefaultBindings()
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor{vgui::surface()};
+
 	char szFileName[ MAX_PATH ];
 	char token[ 1024 ];
 	char szKeyName[ 256 ];
@@ -1288,6 +1293,9 @@ CON_COMMAND( host_writeconfig, "Store current settings to config.cfg (or specifi
 //-----------------------------------------------------------------------------
 void Host_ReadPreStartupConfiguration()
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor{vgui::surface()};
+
 	FileHandle_t f = g_pFileSystem->Open( "//mod/cfg/config.cfg", "rt" );
 	if ( !f )
 		return;

@@ -1033,6 +1033,9 @@ void CConsolePanel::DumpConsoleTextToFile()
 	bool found = false;
 	char szfile[ 512 ];
 
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 	// we don't want to overwrite other condump.txt files
 	for ( int i = 0 ; i < CONDUMP_FILES_MAX_NUM ; ++i )
 	{

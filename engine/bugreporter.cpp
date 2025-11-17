@@ -2071,6 +2071,9 @@ void CBugUIPanel::OnSubmit()
 			void *mem = nullptr;
 			unsigned long len;
 
+			// dimhotepus: This can take a while, put up a waiting cursor.
+			const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 			if ( ZipGetMemory( m_hZip, &mem, &len ) == ZR_OK && mem != NULL && len > 0 )
 			{
 				// Store .zip file
@@ -2256,6 +2259,9 @@ int copyfile( const char *local, const char *remote, void *ignored, int ignoredF
 
 bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDeleteLocal )
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+    const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 	Msg( "Uploading %s to %s\n", local, remote );
 	FileHandle_t hLocal = g_pFileSystem->Open( local, "rb" );
 	if ( FILESYSTEM_INVALID_HANDLE == hLocal )
@@ -2681,7 +2687,10 @@ void CBugUIPanel::OnKeyCodePressed(KeyCode code)
 // Load game-specific bug reporter defaults as params
 void CBugUIPanel::ParseDefaultParams( void )
 {
-	const char *szDefaults = "scripts/bugreporter_defaults.txt";
+	// dimhotepus: This can take a while, put up a waiting cursor.
+    const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
+	constexpr char szDefaults[]{ "scripts/bugreporter_defaults.txt" };
 
 	FileHandle_t hLocal = g_pFileSystem->Open( szDefaults, "rb" );
 	if ( FILESYSTEM_INVALID_HANDLE == hLocal )

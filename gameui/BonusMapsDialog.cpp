@@ -998,12 +998,9 @@ void CBonusMapsDialog::OnFileSelected( const char *fullpath )
 {
 	if ( fullpath == NULL || fullpath[ 0 ] == '\0' )
 		return;
-
-	// this can take a while, put up a waiting cursor
-	surface()->SetCursor(dc_hourglass);
+	
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor{vgui::surface()};
 
 	ImportZippedBonusMaps( fullpath );
-
-	// change the cursor back to normal
-	surface()->SetCursor(dc_user);
 }

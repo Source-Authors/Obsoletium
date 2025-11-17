@@ -276,8 +276,7 @@ void UpdateLogoWAD( void *phdib, int r, int g, int b )
 	buffer.SeekPut( CUtlBuffer::SEEK_HEAD, savepos );
 
 	// Output to file
-	FileHandle_t file;
-	file = g_pFullFileSystem->Open( "pldecal.wad", "wb" );
+	FileHandle_t file = g_pFullFileSystem->Open( "pldecal.wad", "wb" );
 	if ( file != FILESYSTEM_INVALID_HANDLE )
 	{
 		g_pFullFileSystem->Write( buffer.Base(), buffer.TellPut(), file );

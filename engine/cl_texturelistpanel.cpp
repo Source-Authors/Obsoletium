@@ -1640,7 +1640,13 @@ void CRenderTextureEditor::OnCommand( const char *command )
 		argv[iArg++] = (char*)"-outdir";
 		argv[iArg++] = szVTFFilename;
 		argv[iArg++] = szContentFilename;
+
+		{
+			// dimhotepus: This can take a while, put up a waiting cursor.
+			const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		pIVTex->VTex( CubemapsFSFactory, pGameDir, iArg, argv );
+		}
 
 		VTex_Unload( pModule );
 

@@ -3523,6 +3523,9 @@ void CColorLookupUIPanel::ResetBlendFactorSlider()
 
 void CColorLookupUIPanel::OnFileSelected( const char *filename )
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 	m_pLookupOp->LoadLookupTable( filename );
 
 	SetButtonText( );
@@ -4924,6 +4927,9 @@ void CColorOperationListPanel::OnKeyCodeTyped( KeyCode code )
 
 void CColorOperationListPanel::OnFileSelected( const char *pFilename )
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
+
 	FileHandle_t file_handle = g_pFileSystem->Open( pFilename, "wb" );
 
 	colorcorrection->LockLookup( m_CCHandle );

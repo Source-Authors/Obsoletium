@@ -62,6 +62,10 @@ void CTGAImagePanel::Paint()
 		// load the file
 		CUtlMemory<unsigned char> tga;
 		int iImageWidth, iImageHeight;
+
+		// dimhotepus: This can take a while, put up a waiting cursor.
+		const ScopedPanelWaitCursor scopedWaitCursor{this};
+
 		if ( TGALoader::LoadRGBA8888( m_szTGAName, tga, iImageWidth, iImageHeight ) )
 		{
 			// set the textureID
