@@ -1857,7 +1857,7 @@ void CVideoMode_Common::TakeSnapshotJPEG( const char *pFilename, int quality )
     Q_strncpy( orig, Q_pretifymem( GetModeStereoWidth() * 3 * GetModeStereoHeight(), 2, true ), sizeof( orig ) );
     Q_strncpy( final, Q_pretifymem( finalSize, 2, true ), sizeof( final ) );
 
-    Msg( "Wrote '%s':  %s (%dx%d) compresssed (quality %i) to %s\n",
+    Msg( "Wrote '%s':  %s (%dx%d) compressed (quality %i) to %s\n",
         pFilename, orig, GetModeStereoWidth(), GetModeStereoHeight(), quality, final );
 
 	if ( finalSize > 0 )
