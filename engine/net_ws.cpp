@@ -448,7 +448,7 @@ socket_handle NET_OpenSocket ( const char *net_interface, int& port, int protoco
 
 	if ( newsocket == -1 )
 	{
-		int net_error = NET_GetLastError();
+		const int net_error = NET_GetLastError();
 		if ( net_error != WSAEAFNOSUPPORT )
 			Warning ("NET_OpenSocket: socket(protocol %d) failed: %s.\n", protocol, NET_ErrorString(net_error));
 
@@ -702,7 +702,7 @@ int NET_ReceiveStream( socket_handle nSock, char * buf, int len, int flags )
 	int ret = VCRHook_recv( nSock, buf, len, flags );
 	if ( ret == -1 )
 	{
-		int net_error = NET_GetLastError();
+		const int net_error = NET_GetLastError();
 		if ( net_error == WSAEWOULDBLOCK || 
 			 net_error == WSAENOTCONN )
 		{
