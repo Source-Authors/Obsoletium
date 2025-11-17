@@ -8,7 +8,8 @@
 #include "datamodel.h"
 #include "tier1/KeyValues.h"
 
-#ifndef _LINUX
+// dimhotepus: Use windows clipboard only in Windows.
+#ifdef _WIN32
 #define USE_WINDOWS_CLIPBOARD
 #endif
 
