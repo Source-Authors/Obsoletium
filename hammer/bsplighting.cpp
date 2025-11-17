@@ -709,7 +709,7 @@ void CBSPLighting::BuildLMGroups(
 }
 
 
-bool FindDrawCommand( CUtlVector<CBSPLighting::CDrawCommand*> &drawCommands, int lmPageID, int &index )
+bool FindDrawCommand( CUtlVector<CBSPLighting::CDrawCommand*> &drawCommands, int lmPageID, intp &index )
 {
 	for( intp i=0; i < drawCommands.Count(); i++ )
 	{
