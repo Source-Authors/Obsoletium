@@ -182,7 +182,7 @@ CElementTreeViewListControl::CElementTreeViewListControl( Panel *pParent, const 
 	: BaseClass( pParent, pName ), m_Panels( 0, 0, PanelsLessFunc )
 {
 
-	m_iTreeColumnWidth = 200;
+	m_iTreeColumnWidth = QuickPropScale( 200 );
 	m_iFontSize = 1;
 	m_bMouseLeftIsDown = false;
 	m_bMouseIsDragging = false;
@@ -195,7 +195,7 @@ CElementTreeViewListControl::CElementTreeViewListControl( Panel *pParent, const 
 	vgui::IScheme *scheme = vgui::scheme()->GetIScheme( GetScheme() );
 	HFont font = scheme->GetFont( "DefaultVerySmall", IsProportional() );
 
-	SetTitleBarInfo( font, 18 );
+	SetTitleBarInfo( font, QuickPropScale( 18 ) );
 
 	SetPostChildPaintEnabled( true );
 	SetBorderColor( Color( 255, 255, 196, 64 ) );
@@ -311,8 +311,8 @@ void CElementTreeViewListControl::ApplySchemeSettings( IScheme *pScheme )
 //-----------------------------------------------------------------------------
 void CElementTreeViewListControl::OnCursorMoved(int x, [[maybe_unused]] int y)
 {
-	if ( ( x > m_iTreeColumnWidth - 12 ) &&
-		 ( x < m_iTreeColumnWidth + 12 ) )
+	const int gap = QuickPropScale( 12 );
+	if ( ( x > m_iTreeColumnWidth - gap ) && ( x < m_iTreeColumnWidth + gap ) )
 	{
 		SetCursor( dc_sizewe );
 		if ( m_bMouseLeftIsDown )
@@ -362,9 +362,9 @@ void CElementTreeViewListControl::OnMouseDoublePressed( MouseCode code )
 	input()->GetCursorPos(x, y);
 	ScreenToLocal(x, y);
 
+	const int gap = QuickPropScale( 12 );
 	// resize the column to the max width of the tree
-	if ( ( x > m_iTreeColumnWidth - 12 ) &&
-		 ( x < m_iTreeColumnWidth + 12 ) )
+	if ( ( x > m_iTreeColumnWidth - gap ) && ( x < m_iTreeColumnWidth + gap ) )
 	{
 		ResizeTreeToExpandedWidth();
 	}
@@ -382,9 +382,9 @@ void CElementTreeViewListControl::ResizeTreeToExpandedWidth()
 	int vBarWidth = 0;
 	if ( nItemsVisible <= rows )
 	{
-		vBarWidth = 27;
+		vBarWidth = QuickPropScale( 27 );
 	}
-	SetTreeColumnWidth( GetTree()->GetVisibleMaxWidth() + vBarWidth + 14 );
+	SetTreeColumnWidth( GetTree()->GetVisibleMaxWidth() + vBarWidth + QuickPropScale( 14 ) );
 }
 
 void CElementTreeViewListControl::OnMouseWheeled(int delta)
@@ -917,7 +917,7 @@ void CPropertiesTreeToolbar::PerformLayout()
 
 	//x += textw;
 
-	//m_pShowSearchResults->SetBounds( x, 2, 75, buttonh );
+	//m_pShowSearchResults->SetBounds( x, QuickPropScale( 2 ), QuickPropScale( 75 ), buttonh );
 	
 }
 
@@ -956,7 +956,7 @@ CElementPropertiesTreeInternal::CElementPropertiesTreeInternal(
 	m_pTree->SetTreeView( dmeTree );
 	m_pTree->SetNumColumns( 2 );
 	m_pTree->SetColumnInfo( 0, "Tree", m_pTree->GetTreeColumnWidth() );
-	m_pTree->SetColumnInfo( 1, "Data", 1600 );
+	m_pTree->SetColumnInfo( 1, "Data", QuickPropScale( 1600 ) );
 
 	m_pToolBar = new CPropertiesTreeToolbar( this, "ElementTreeToolbar", this );
 	// m_pToolBar->SetTreeView( dmeTree );
