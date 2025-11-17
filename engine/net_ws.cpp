@@ -199,7 +199,7 @@ unsigned short NET_NetToHostShort( unsigned short us_in )
 NET_ErrorString
 ====================
 */
-const char *NET_ErrorString (int code)
+const char *NET_ErrorString (const int code)
 {
 #if defined( _WIN32 )
 	const std::string message = std::system_category().message(code);
@@ -301,7 +301,7 @@ bool NET_StringToSockaddr( const char *s, struct sockaddr *sadr )
 }
 
 
-static int NET_GetLastError()
+static const int NET_GetLastError()
 {
 #if defined( _WIN32 )
 	int net_error = WSAGetLastError();
@@ -448,7 +448,7 @@ socket_handle NET_OpenSocket ( const char *net_interface, int& port, int protoco
 
 	if ( newsocket == -1 )
 	{
-		int net_error = NET_GetLastError();
+		const int net_error = NET_GetLastError();
 		if ( net_error != WSAEAFNOSUPPORT )
 			Warning ("NET_OpenSocket: socket(protocol %d) failed: %s.\n", protocol, NET_ErrorString(net_error));
 
@@ -702,7 +702,7 @@ int NET_ReceiveStream( socket_handle nSock, char * buf, int len, int flags )
 	int ret = VCRHook_recv( nSock, buf, len, flags );
 	if ( ret == -1 )
 	{
-		int net_error = NET_GetLastError();
+		const int net_error = NET_GetLastError();
 		if ( net_error == WSAEWOULDBLOCK || 
 			 net_error == WSAENOTCONN )
 		{
