@@ -493,7 +493,8 @@ private:
 	bool m_bAppDrivesInput : 1;
 
 	// Are we currently in the think() loop
-	bool m_bInThink : 1;
+	// dimhotepus: Always false, drop.
+	// bool m_bInThink : 1;
 
 	bool m_bNeedsKeyboard : 1;
 	bool m_bNeedsMouse : 1;
@@ -501,7 +502,8 @@ private:
 
 	int m_nLastInputPollCount;
 
-	vgui::VPANEL m_CurrentThinkPanel;
+	// dimhotepus: Always invalid, drop.
+	// vgui::VPANEL m_CurrentThinkPanel;
 
 	// The attached HWND
 	void *m_HWnd;

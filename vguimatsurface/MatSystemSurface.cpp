@@ -200,10 +200,13 @@ CMatSystemSurface::CMatSystemSurface() : m_pWhite(NULL), m_pEmbeddedPanel(NULL)
 	m_b3DPaintRenderToTexture = false;
 	m_bDrawingIn3DWorld = false;
 	m_PlaySoundFunc = NULL;
-	m_bInThink = false;
+	// dimhotepus: Always false, drop.
+	// m_bInThink = false;
 	m_bAllowJavaScript = false;
 	m_bAppDrivesInput = false;
 	m_nLastInputPollCount = 0;
+	// dimhotepus: Always invalid, drop.
+	// m_CurrentThinkPanel = vgui::INVALID_PANEL;
 
 	m_hCurrentFont = NULL;
 	m_pRestrictedPanel = NULL;
@@ -3885,15 +3888,16 @@ void CMatSystemSurface::MovePopupToBack(VPANEL panel)
 
 bool CMatSystemSurface::IsInThink( VPANEL panel)
 {
-	if ( m_bInThink )
-	{
-		if ( panel == m_CurrentThinkPanel ) // HasParent() returns true if you pass yourself in
-		{
-			return false;
-		}
-
-		return ipanel()->HasParent( panel, m_CurrentThinkPanel);
-	}
+	// dimhotepus: m_bInThink always false.
+	// if ( m_bInThink )
+	// {
+	// 	if ( panel == m_CurrentThinkPanel ) // HasParent() returns true if you pass yourself in
+	// 	{
+	// 		return false;
+	// 	}
+	// 
+	// 	return ipanel()->HasParent( panel, m_CurrentThinkPanel);
+	// }
 	return false;
 }
 
