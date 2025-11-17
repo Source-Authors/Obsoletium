@@ -32,6 +32,13 @@ struct DecalEntry
 // This stores the list of all decals
 CUtlMap< FileNameHandle_t, DecalEntry >	g_DecalDictionary( 0, 0, DefLessFunc( FileNameHandle_t ) );
 
+// We could now use the CUtlMapMT but g_DecalLookup also exists and its easier to lock both and also reduces how many locks we create/destroy
+#if defined(WIN32) || defined(_WIN32)
+CThreadSpinRWLock g_DecalMutex;
+#else
+CThreadRWLock g_DecalMutex;
+#endif
+
 // This is a list of indices into the dictionary.
 // This list is indexed by network id, so it maps network ids to decal dictionary entries
 CUtlVector< int > g_DecalLookup;
@@ -56,6 +63,8 @@ int Draw_DecalMax( void )
 // called from gl_rsurf.cpp
 IMaterial *Draw_DecalMaterial( int index )
 {
+	AUTO_LOCK_READ( g_DecalMutex );
+
 	if ( index < 0 || index >= g_DecalLookup.Count() )
 		return NULL;
 
@@ -70,6 +79,8 @@ IMaterial *Draw_DecalMaterial( int index )
 #ifndef SWDS
 void Draw_DecalSetName( int decal, const char *name )
 {
+	AUTO_LOCK_WRITE( g_DecalMutex );
+
 	while ( decal >= g_DecalLookup.Count() )
 	{
 		MEM_ALLOC_CREDIT();
@@ -105,6 +116,8 @@ void Draw_DecalSetName( int decal, const char *name )
 // used for save/restore
 int Draw_DecalIndexFromName( const char *name, bool *found )
 {
+	AUTO_LOCK_READ( g_DecalMutex );
+
 	Assert( found );
 
 	FileNameHandle_t fnHandle = g_pFileSystem->FindOrAddFileName( name );
@@ -129,6 +142,8 @@ int Draw_DecalIndexFromName( const char *name, bool *found )
 
 const char *Draw_DecalNameFromIndex( int index )
 {
+	AUTO_LOCK_READ( g_DecalMutex );
+
 #if !defined(SWDS)
 	return g_DecalDictionary[index].material ? g_DecalDictionary[index].material->GetName() : "";
 #else
@@ -148,6 +163,8 @@ void Decal_Init( void )
 //-----------------------------------------------------------------------------
 void Decal_Shutdown( void )
 {
+	AUTO_LOCK_WRITE( g_DecalMutex );
+
 	for ( int index = g_DecalDictionary.FirstInorder(); index != g_DecalDictionary.InvalidIndex(); index = g_DecalDictionary.NextInorder(index) )
 	{
 		IMaterial *mat = g_DecalDictionary[index].material;

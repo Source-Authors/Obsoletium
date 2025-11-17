@@ -316,8 +316,8 @@ rotates through a bunch of string buffers of 512 bytes each
 */
 char *tmpstr512()
 {
-	static char	string[32][512];
-	static int	curstring = 0;
+	static thread_local char string[32][512];
+	static thread_local int curstring = 0;
 	curstring = ( curstring + 1 ) & 31;
 	return string[curstring];  
 }
