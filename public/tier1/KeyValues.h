@@ -425,6 +425,9 @@ inline bool  KeyValues::IsEmpty( HKeySymbol keySymbol ) const
 	return dat ? dat->IsEmpty( ) : true;
 }
 
+// dimhotepus: Allow to detect SteamDeck.
+[[nodiscard]] bool IsSteamDeck();
+
 bool EvaluateConditional( const char *str );
 
 class CUtlSortVectorKeyValuesByName

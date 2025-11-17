@@ -2269,7 +2269,7 @@ void KeyValues::RecursiveMergeKeyValues( KeyValues *baseKV )
 static int s_nSteamDeckCached = -1;
 
 // dimhotepus: Try add basic SteamDeck support.
-static bool IsSteamDeck()
+[[nodiscard]] bool IsSteamDeck()
 {
 	if (s_nSteamDeckCached == -1)
 	{
