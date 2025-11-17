@@ -1,6 +1,6 @@
 @echo off
 
-# RaphaelIT7: A useful helper script since when changing between x86 & x64 you may need a completely clean setup or such (I need this quite frequently)
+REM RaphaelIT7: A useful helper script since when changing between x86 & x64 you may need a completely clean setup or such (I need this quite frequently)
 
 echo WARNING: This will delete ALL untracked files, reset ALL changes, and clean all submodules.
 echo Are you sure you want to continue? (Y/N)
