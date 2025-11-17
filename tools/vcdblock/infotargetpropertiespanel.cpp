@@ -55,8 +55,8 @@ CScrollableEditablePanel::CScrollableEditablePanel( vgui::Panel *pParent, vgui::
 	m_pChild->SetParent( this );
 
 	m_pScrollBar = new vgui::ScrollBar( this, "VerticalScrollBar", true ); 
-	m_pScrollBar->SetWide( 16 );
-	m_pScrollBar->SetAutoResize( PIN_TOPRIGHT, AUTORESIZE_DOWN, 0, 0, -16, 0 );
+	m_pScrollBar->SetWide( QuickPropScale( 16 ) );
+	m_pScrollBar->SetAutoResize( PIN_TOPRIGHT, AUTORESIZE_DOWN, 0, 0, QuickPropScale( -16 ), 0 );
 	m_pScrollBar->AddActionSignalTarget( this );
 }
 
@@ -64,7 +64,7 @@ void CScrollableEditablePanel::PerformLayout()
 {
 	BaseClass::PerformLayout();
 
-	m_pChild->SetWide( GetWide() - 16 );
+	m_pChild->SetWide( GetWide() - QuickPropScale( 16 ) );
 	m_pScrollBar->SetRange( 0, m_pChild->GetTall() );
 	m_pScrollBar->SetRangeWindow( GetTall() );
 }
