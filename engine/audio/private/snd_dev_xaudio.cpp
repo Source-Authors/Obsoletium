@@ -378,10 +378,7 @@ static bool GetDefaultAudioDeviceFormFactor(
     // May fail.
     if (device_physical_speakers.as_uint(physical_speakers_mask)) {
       if ((physical_speakers_mask & KSAUDIO_SPEAKER_7POINT1_SURROUND) ==
-              KSAUDIO_SPEAKER_7POINT1_SURROUND ||
-          // Obsolete, but still.
-          (physical_speakers_mask & KSAUDIO_SPEAKER_7POINT1) &
-              KSAUDIO_SPEAKER_7POINT1) {
+              KSAUDIO_SPEAKER_7POINT1_SURROUND) {
         form_factor = AudioDeviceFormFactor::Digital7Dot1Surround;
         return true;
       }
