@@ -204,11 +204,13 @@ CMatSystemSurface::CMatSystemSurface() : m_pWhite(NULL), m_pEmbeddedPanel(NULL)
 	// m_bInThink = false;
 	m_bAllowJavaScript = false;
 	m_bAppDrivesInput = false;
+
 	m_nLastInputPollCount = 0;
 	// dimhotepus: Always invalid, drop.
 	// m_CurrentThinkPanel = vgui::INVALID_PANEL;
 
 	m_hCurrentFont = NULL;
+	_currentCursor = vgui::dc_user;
 	m_pRestrictedPanel = NULL;
 
 	m_bNeedsKeyboard = true;
@@ -220,6 +222,8 @@ CMatSystemSurface::CMatSystemSurface() : m_pWhite(NULL), m_pEmbeddedPanel(NULL)
 	m_nFullscreenViewportX = m_nFullscreenViewportY = 0;
 	m_nFullscreenViewportWidth = m_nFullscreenViewportHeight = 0;
 	m_pFullscreenRenderTarget = NULL;
+
+	m_flZPos = 0.0f;
 }
 
 CMatSystemSurface::~CMatSystemSurface()
