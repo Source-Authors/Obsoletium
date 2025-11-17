@@ -240,7 +240,7 @@ void CBrowseButton::SetCharVar( char **pVar, const char *pszNewText )
 
 void CBrowseButton::InitBrowseInfo( int x, int y, const char *pszName, const char *pszDir, const char *pszFilter, const char *pszField )
 {
-	SetSize( 24, 24 );
+	SetSize( QuickPropScale( 24 ), QuickPropScale( 24 ) );
 	SetPos( x, y );
 	SetName( pszName );
 	SetCharVar( GetStartingDirectory(), pszDir );
@@ -290,19 +290,19 @@ CQCGenerator::CQCGenerator( vgui::Panel *pParent, const char *pszPath, const cha
 
 	m_QCInfo_t.Init( this );
 
-	SetMinimumSize(846, 770);
+	SetMinimumSize(QuickPropScale( 846 ), QuickPropScale( 770 ));
 
 	m_pLODPanel = new ListPanel(this, "LODList");
 	m_pLODPanel->SetSelectIndividualCells( true );
-	m_pLODPanel->AddColumnHeader(0, "SMD", "LOD SMD", 450, 0);
-	m_pLODPanel->AddColumnHeader(1, "LOD", "LOD Distance", 50, 0);
+	m_pLODPanel->AddColumnHeader(0, "SMD", "LOD SMD", QuickPropScale( 450 ), 0);
+	m_pLODPanel->AddColumnHeader(1, "LOD", "LOD Distance", QuickPropScale( 50 ), 0);
 	m_pLODPanel->AddActionSignalTarget( this );
 	m_pLODPanel->SetMouseInputEnabled( true );
 
 	LoadControlSettings( "QCGenerator.res" );
 
 	m_pCollisionBrowseButton = new CBrowseButton( this );
-	m_pCollisionBrowseButton->InitBrowseInfo( 808, 158, "collisionBrowseButton", pszPath, "*.smd", "collisionSMDField" );
+	m_pCollisionBrowseButton->InitBrowseInfo( QuickPropScale( 808 ), QuickPropScale( 158 ), "collisionBrowseButton", pszPath, "*.smd", "collisionSMDField" );
 
 	char szTerminatedPath[1024] = "\0";
 	V_sprintf_safe( szTerminatedPath, "%s\\", pszPath );

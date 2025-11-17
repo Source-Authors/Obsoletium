@@ -4,7 +4,6 @@
 //
 //=============================================================================
 
-#include "filesystem.h"
 #include "matsys_controls/baseassetpicker.h"
 #include "tier1/KeyValues.h"
 #include "tier1/utlntree.h"
@@ -21,6 +20,7 @@
 #include "vgui/IInput.h"
 #include "vgui/IVGui.h"
 #include "vgui/Cursor.h"
+#include "filesystem.h"
 
 
 using namespace vgui;
@@ -33,7 +33,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // sorting function, should return true if node1 should be displayed before node2
 //-----------------------------------------------------------------------------
-bool AssetTreeViewSortFunc( KeyValues *node1, KeyValues *node2 )
+static bool AssetTreeViewSortFunc( KeyValues *node1, KeyValues *node2 )
 {
 	const char *pDir1 = node1->GetString( "text", NULL );
 	const char *pDir2 = node2->GetString( "text", NULL );
@@ -892,8 +892,8 @@ void CBaseAssetPicker::CreateStandardControls( vgui::Panel *pParent, bool bAllow
 	char pTemp[512];
 	Q_snprintf( pTemp, sizeof(pTemp), "No .%s files", m_pAssetExt );
 	m_pAssetBrowser = new vgui::ListPanel( pSplitterBottomSide, "AssetBrowser" );
- 	m_pAssetBrowser->AddColumnHeader( 0, "mod", "Mod", 52, 0 );
-	m_pAssetBrowser->AddColumnHeader( 1, "asset", m_pAssetType, 128, ListPanel::COLUMN_RESIZEWITHWINDOW );
+ 	m_pAssetBrowser->AddColumnHeader( 0, "mod", "Mod", QuickPropScale( 52 ), 0 );
+	m_pAssetBrowser->AddColumnHeader( 1, "asset", m_pAssetType, QuickPropScale( 128 ), ListPanel::COLUMN_RESIZEWITHWINDOW );
     m_pAssetBrowser->SetSelectIndividualCells( false );
     m_pAssetBrowser->SetMultiselectEnabled( bAllowMultiselect );
 	m_pAssetBrowser->SetEmptyListText( pTemp );

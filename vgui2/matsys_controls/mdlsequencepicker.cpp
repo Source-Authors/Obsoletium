@@ -83,7 +83,7 @@ CMDLSequencePicker::CMDLSequencePicker( vgui::Panel *pParent ) : BaseClass(pPare
 	m_pSequencesPage = new PropertyPage( m_pViewsSheet, "SequencesPage" );
 	m_pViewsSheet->AddPage( m_pSequencesPage, "Sequences" );
 	m_pSequencesList = new ListPanel( m_pSequencesPage, "SequencesList" );
- 	m_pSequencesList->AddColumnHeader( 0, "sequence", "sequence", 52, 0 );
+ 	m_pSequencesList->AddColumnHeader( 0, "sequence", "sequence", QuickPropScale( 52 ), 0 );
 	m_pSequencesList->AddActionSignalTarget( this );
 	m_pSequencesList->SetSelectIndividualCells( true );
  	m_pSequencesList->SetEmptyListText("No .MDL file currently selected.");
@@ -94,7 +94,7 @@ CMDLSequencePicker::CMDLSequencePicker( vgui::Panel *pParent ) : BaseClass(pPare
 	m_pActivitiesPage = new PropertyPage( m_pViewsSheet, "ActivitiesPage" );
 	m_pViewsSheet->AddPage( m_pActivitiesPage, "Activities" );
 	m_pActivitiesList = new ListPanel( m_pActivitiesPage, "ActivitiesList" );
- 	m_pActivitiesList->AddColumnHeader( 0, "activity", "activity", 52, 0 );
+ 	m_pActivitiesList->AddColumnHeader( 0, "activity", "activity", QuickPropScale( 52 ), 0 );
 	m_pActivitiesList->AddActionSignalTarget( this );
     m_pActivitiesList->SetSelectIndividualCells( true );
 	m_pActivitiesList->SetEmptyListText( "No .MDL file currently selected." );
@@ -472,7 +472,7 @@ CMDLSequencePickerFrame::CMDLSequencePickerFrame( vgui::Panel *parent, char cons
 	SetSizeable( false );
 	SetCloseButtonVisible( false );
 	SetMoveable( true );
-	SetMinimumSize( BASE_WIDTH, BASE_HEIGHT );
+	SetMinimumSize( QuickPropScale( BASE_WIDTH ), QuickPropScale( BASE_HEIGHT ) );
 	Activate();
 	m_pMDLSequencePicker->Activate();
 
@@ -505,19 +505,19 @@ void CMDLSequencePickerFrame::PerformLayout()
 
 	int x, y, w, h;
 	GetClientArea( x, y, w, h );
-	h -= 24;
+	h -= QuickPropScale( 24 );
 	m_pMDLSequencePicker->SetBounds( x, y, w, h );
 
-	h += 5;
+	h += QuickPropScale( 5 );
 
 
-	int bw = 120;
-	int bwwithGap = 2 * bw + 10;
+	int bw = QuickPropScale( 120 );
+	int bwwithGap = 2 * bw + QuickPropScale( 10 );
 
 	x = ( w - bwwithGap ) / 2;
-	m_pOK->SetBounds( x, y + h, bw, 16 );
-	x += bw + 10;
-	m_pCancel->SetBounds( x, y + h, bw, 16 );
+	m_pOK->SetBounds( x, y + h, bw, QuickPropScale( 16 ) );
+	x += bw + QuickPropScale( 10 );
+	m_pCancel->SetBounds( x, y + h, bw, QuickPropScale( 16 ) );
 }
 
 void CMDLSequencePickerFrame::OnCancel()

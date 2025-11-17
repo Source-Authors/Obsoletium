@@ -78,7 +78,7 @@ CSequencePicker::CSequencePicker( vgui::Panel *pParent, int nFlags ) : BaseClass
 		m_pSequencesPage = new PropertyPage( m_pViewsSheet, "SequencesPage" );
 		m_pViewsSheet->AddPage( m_pSequencesPage, "Sequences" );
 		m_pSequencesList = new ListPanel( m_pSequencesPage, "SequencesList" );
- 		m_pSequencesList->AddColumnHeader( 0, "sequence", "sequence", 52, 0 );
+ 		m_pSequencesList->AddColumnHeader( 0, "sequence", "sequence", QuickPropScale( 52 ), 0 );
 		m_pSequencesList->AddActionSignalTarget( this );
 		m_pSequencesList->SetSelectIndividualCells( true );
  		m_pSequencesList->SetEmptyListText(".MDL file contains no activities");
@@ -96,7 +96,7 @@ CSequencePicker::CSequencePicker( vgui::Panel *pParent, int nFlags ) : BaseClass
 		m_pActivitiesPage = new PropertyPage( m_pViewsSheet, "ActivitiesPage" );
 		m_pViewsSheet->AddPage( m_pActivitiesPage, "Activities" );
 		m_pActivitiesList = new ListPanel( m_pActivitiesPage, "ActivitiesList" );
- 		m_pActivitiesList->AddColumnHeader( 0, "activity", "activity", 52, 0 );
+ 		m_pActivitiesList->AddColumnHeader( 0, "activity", "activity", QuickPropScale( 52 ), 0 );
 		m_pActivitiesList->AddActionSignalTarget( this );
 		m_pActivitiesList->SetSelectIndividualCells( true );
 		m_pActivitiesList->SetEmptyListText( ".MDL file contains no activities" );
