@@ -37,6 +37,7 @@ extern ConVar  sv_packettrace;
 
 enum
 {
+	// dimhotepus: Bump from 9999 to int_max.
 	ENTITY_SENTINEL = INT_MAX	// larger number than any real entity number
 };
 
