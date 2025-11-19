@@ -157,7 +157,7 @@ void CPortalRenderable_FlatBasic::PortalMoved( void )
 	{
 		for( int i = 0; i != PORTALRENDERFIXMESH_OUTERBOUNDPLANES; ++i )
 		{
-			float fCirclePos = ((float)(i)) * ((M_PI * 2.0f) / (float)PORTALRENDERFIXMESH_OUTERBOUNDPLANES);
+			float fCirclePos = ((float)(i)) * ((M_PI_F * 2.0f) / (float)PORTALRENDERFIXMESH_OUTERBOUNDPLANES);
 			float fUpBlend = cosf( fCirclePos );
 			float fRightBlend = sinf( fCirclePos );
 

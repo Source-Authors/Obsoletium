@@ -101,7 +101,7 @@ void CPortalgunEffectBeam::Init( int startAttachment, int endAttachment, CBaseEn
 	beamInfo.m_flAmplitude = 16;
 	beamInfo.m_flBrightness = 128.0;
 	beamInfo.m_flSpeed = 150.0f;
-	beamInfo.m_nStartFrame = 0.0;
+	beamInfo.m_nStartFrame = 0;
 	beamInfo.m_flFrameRate = 30.0;
 	beamInfo.m_flRed = 255.0;
 	beamInfo.m_flGreen = 255.0;
@@ -198,7 +198,7 @@ void C_WeaponPortalgun::Spawn( void )
 	BaseClass::Spawn();
 
 	//SetThink( &C_BaseEntity::Think );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 }
 
 //-----------------------------------------------------------------------------

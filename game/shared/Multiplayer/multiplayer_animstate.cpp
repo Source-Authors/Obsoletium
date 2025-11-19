@@ -693,7 +693,7 @@ void CMultiPlayerAnimState::AddVCDSequenceToGestureSlot( int iGestureSlot, int i
 	m_aGestureSlots[iGestureSlot].m_pAnimLayer->m_flLayerAnimtime = 0.0f;
 	m_aGestureSlots[iGestureSlot].m_pAnimLayer->m_flLayerFadeOuttime = 0.0f;
 
-	pPlayer->m_flOverlayPrevEventCycle[iGestureSlot] = flCycle == 0.f ? -1.0 : flCycle;
+	pPlayer->m_flOverlayPrevEventCycle[iGestureSlot] = flCycle == 0.f ? -1.0f : flCycle;
 
 #else
 
@@ -1628,7 +1628,7 @@ void CMultiPlayerAnimState::EstimateYaw( void )
 	}
 	else
 	{
-		m_PoseParameterData.m_flEstimateYaw = ( atan2( vecEstVelocity.y, vecEstVelocity.x ) * 180.0f / M_PI );
+		m_PoseParameterData.m_flEstimateYaw = ( atan2( vecEstVelocity.y, vecEstVelocity.x ) * 180.0f / M_PI_F );
 		m_PoseParameterData.m_flEstimateYaw = clamp( m_PoseParameterData.m_flEstimateYaw, -180.0f, 180.0f );
 	}
 }
