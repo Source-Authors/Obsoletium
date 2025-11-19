@@ -3686,7 +3686,8 @@ void	CNPC_Citizen::TossHealthKit(CBaseCombatCharacter *pThrowAt, const Vector &o
 			// rotate upwards against gravity
 			float len = VectorLength(tossVelocity);
 			tossVelocity *= (MEDIC_THROW_SPEED / len);
-			tossVelocity.z += 0.57735026918962576450914878050196 * MEDIC_THROW_SPEED;
+			// dimhotepus: Truncate const to float.
+			tossVelocity.z += 0.57735026f * MEDIC_THROW_SPEED;
 		}
 	}
 
