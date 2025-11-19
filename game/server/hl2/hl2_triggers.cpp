@@ -203,7 +203,7 @@ Vector CTriggerWeaponDissolve::GetConduitPoint( CBaseEntity *pTarget )
 	float	testDist;
 
 	// Find the nearest conduit to the target
-	for ( int i = 0; i < m_pConduitPoints.Count(); i++ )
+	for ( intp i = 0; i < m_pConduitPoints.Count(); i++ )
 	{
 		testDist = ( m_pConduitPoints[i]->GetAbsOrigin() - pTarget->GetAbsOrigin() ).LengthSqr();
 
@@ -222,10 +222,10 @@ Vector CTriggerWeaponDissolve::GetConduitPoint( CBaseEntity *pTarget )
 //-----------------------------------------------------------------------------
 void CTriggerWeaponDissolve::DissolveThink( void )
 {
-	int	numWeapons = m_pWeapons.Count();
+	intp	numWeapons = m_pWeapons.Count();
 
 	// Dissolve all the items within the volume
-	for ( int i = 0; i < numWeapons; i++ )
+	for ( intp i = 0; i < numWeapons; i++ )
 	{
 		CBaseCombatWeapon *pWeapon = m_pWeapons[i];
 		Vector vecConduit = GetConduitPoint( pWeapon );
@@ -240,9 +240,9 @@ void CTriggerWeaponDissolve::DissolveThink( void )
 			//FIXME: Make them do this on a stagger!
 
 			// All conduits send power to the weapon
-			for ( int i = 0; i < m_pConduitPoints.Count(); i++ )
+			for ( intp j = 0; j < m_pConduitPoints.Count(); j++ )
 			{
-				CreateBeam( m_pConduitPoints[i]->GetAbsOrigin(), pWeapon, 4.0f );
+				CreateBeam( m_pConduitPoints[j]->GetAbsOrigin(), pWeapon, 4.0f );
 			}
 
 			PhysCannonBeginUpgrade( pWeapon );
@@ -694,9 +694,8 @@ void CTriggerWateryDeath::Touch( CBaseEntity *pOther )
 		return;
 
 	// Find our index
-	EHANDLE hOther;
-	hOther = pOther;
-	int iIndex = m_hTouchingEntities.Find( hOther );
+	EHANDLE hOther = pOther;
+	intp iIndex = m_hTouchingEntities.Find( hOther );
 	if ( iIndex == m_hTouchingEntities.InvalidIndex() )
 		return;
 
@@ -779,11 +778,10 @@ void CTriggerWateryDeath::EndTouch( CBaseEntity *pOther )
 {
 	if ( IsTouching( pOther ) )
 	{
-		EHANDLE hOther;
-		hOther = pOther;
+		EHANDLE hOther = pOther;
 
 		// Remove the time from our list
-		int iIndex = m_hTouchingEntities.Find( hOther );
+		intp iIndex = m_hTouchingEntities.Find( hOther );
 		if ( iIndex != m_hTouchingEntities.InvalidIndex() )
 		{
 			m_flEntityKillTimes.Remove( iIndex );

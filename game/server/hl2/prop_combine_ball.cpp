@@ -329,7 +329,7 @@ bool CPropCombineBall::CreateVPhysics()
 	SetCollisionBounds( Vector(-flSize, -flSize, -flSize), Vector(flSize, flSize, flSize) );
 	objectparams_t params = g_PhysDefaultObjectParams;
 	params.pGameData = static_cast<void *>(this);
-	int nMaterialIndex = physprops->GetSurfaceIndex("metal_bouncy");
+	intp nMaterialIndex = physprops->GetSurfaceIndex("metal_bouncy");
 	IPhysicsObject *pPhysicsObject = physenv->CreateSphereObject( flSize, nMaterialIndex, GetAbsOrigin(), GetAbsAngles(), &params, false );
 	if ( !pPhysicsObject )
 		return false;
@@ -1827,7 +1827,7 @@ void CFuncCombineBallSpawner::InputEnable( inputdata_t &inputdata )
 	m_bEnabled = true;
 	m_flDisableTime = 0.0f;
 
-	for ( int i = m_BallRespawnTime.Count(); --i >= 0; )
+	for ( intp i = m_BallRespawnTime.Count(); --i >= 0; )
 	{
 		m_BallRespawnTime[i] += gpGlobals->curtime;
 	}
@@ -1844,7 +1844,7 @@ void CFuncCombineBallSpawner::InputDisable( inputdata_t &inputdata )
 	m_flDisableTime = gpGlobals->curtime;
 	m_bEnabled = false;
 
-	for ( int i = m_BallRespawnTime.Count(); --i >= 0; )
+	for ( intp i = m_BallRespawnTime.Count(); --i >= 0; )
 	{
 		m_BallRespawnTime[i] -= gpGlobals->curtime;
 	}
@@ -2055,7 +2055,7 @@ void CFuncCombineBallSpawner::RespawnBallPostExplosion( void )
 //-----------------------------------------------------------------------------
 void CFuncCombineBallSpawner::BallThink()
 {
-	for ( int i = m_BallRespawnTime.Count(); --i >= 0; )
+	for ( intp i = m_BallRespawnTime.Count(); --i >= 0; )
 	{
 		if ( m_BallRespawnTime[i] < gpGlobals->curtime )
 		{

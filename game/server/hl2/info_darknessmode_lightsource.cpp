@@ -176,7 +176,7 @@ void CDarknessLightSourcesSystem::AddLightSource( CInfoDarknessLightSource *pEnt
 //-----------------------------------------------------------------------------
 void CDarknessLightSourcesSystem::RemoveLightSource( CInfoDarknessLightSource *pEntity )
 {
-	for ( int i = m_LightSources.Count() - 1; i >= 0; i-- )
+	for ( intp i = m_LightSources.Count() - 1; i >= 0; i-- )
 	{
 		if ( m_LightSources[i].hEntity == pEntity )
 		{
@@ -202,7 +202,7 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 	trace_t tr;
 
 	// Loop through all the light sources. Do it backwards, so we can remove dead ones.
-	for ( int i = m_LightSources.Count() - 1; i >= 0; i-- )
+	for ( intp i = m_LightSources.Count() - 1; i >= 0; i-- )
 	{
 		// Removed?
 		if ( m_LightSources[i].hEntity == NULL || m_LightSources[i].hEntity->IsMarkedForDeletion() )
@@ -313,7 +313,7 @@ bool CDarknessLightSourcesSystem::IsEntityVisibleToTarget( CBaseEntity *pLooker,
 bool CDarknessLightSourcesSystem::AreThereLightSourcesWithinRadius( CBaseEntity *pLooker, float flRadius )
 {
 	float flRadiusSqr = (flRadius * flRadius);
-	for ( int i = m_LightSources.Count() - 1; i >= 0; i-- )
+	for ( intp i = m_LightSources.Count() - 1; i >= 0; i-- )
 	{
 		// Removed?
 		if ( m_LightSources[i].hEntity == NULL || m_LightSources[i].hEntity->IsMarkedForDeletion() )
@@ -357,7 +357,7 @@ bool CDarknessLightSourcesSystem::AreThereLightSourcesWithinRadius( CBaseEntity 
 //-----------------------------------------------------------------------------
 void CDarknessLightSourcesSystem::SetDebug( bool bDebug )
 {
-	for ( int i = m_LightSources.Count() - 1; i >= 0; i-- )
+	for ( intp i = m_LightSources.Count() - 1; i >= 0; i-- )
 	{
 		CInfoDarknessLightSource *pLightSource = dynamic_cast<CInfoDarknessLightSource*>(m_LightSources[i].hEntity.Get());
 		if ( pLightSource )

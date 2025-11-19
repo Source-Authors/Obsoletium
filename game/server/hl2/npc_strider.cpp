@@ -4780,7 +4780,7 @@ void CNPC_Strider::StriderBusterAttached( CBaseEntity *pAttached )
 
 void CNPC_Strider::StriderBusterDetached( CBaseEntity *pAttached )
 {
-	int elem = m_hAttachedBusters.Find(pAttached);
+	intp elem = m_hAttachedBusters.Find(pAttached);
 	if (elem >= 0)
 	{
 		m_hAttachedBusters.FastRemove(elem);

@@ -606,7 +606,7 @@ void CEnvHeadcrabCanister::TestForCollisionsAgainstEntities( const Vector &vecEn
 	float flDamage = m_flDamage;
 
 	// Now get each entity and react accordinly!
-	for( int iEntity = collideList.m_Entities.Count(); --iEntity >= 0; )
+	for( intp iEntity = collideList.m_Entities.Count(); --iEntity >= 0; )
 	{
 		CBaseEntity *pEntity = collideList.m_Entities[iEntity];
 		Vector vecForceDir = m_Shared.m_vecDirection;
