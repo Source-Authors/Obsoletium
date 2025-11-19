@@ -4,6 +4,7 @@
 //
 //=============================================================================
 #include "vgui_controls/Controls.h"
+
 #include "vgui/IVGui.h"
 
 #include "vgui_controls/AnimatingImagePanel.h"
