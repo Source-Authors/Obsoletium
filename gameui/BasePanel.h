@@ -127,8 +127,8 @@ public:
 	void ApplySettings( KeyValues *inResourceData ) override;
 	void ApplySchemeSettings( vgui::IScheme *pScheme ) override;
 
-	int GetOffsetX(){ return m_nOffsetX; }
-	int GetOffsetY(){ return m_nOffsetY; }
+	int GetOffsetX() const { return m_nOffsetX; }
+	int GetOffsetY() const { return m_nOffsetY; }
 
 private:
 	int m_nOffsetX;

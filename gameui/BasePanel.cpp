@@ -3824,8 +3824,9 @@ void CMainMenuGameLogo::ApplySettings( KeyValues *inResourceData )
 {
 	BaseClass::ApplySettings( inResourceData );
 
-	m_nOffsetX = inResourceData->GetInt( "offsetX", 0 );
-	m_nOffsetY = inResourceData->GetInt( "offsetY", 0 );
+	// dimhotepus: Scale UI.
+	m_nOffsetX = QuickPropScale( inResourceData->GetInt( "offsetX", 0 ) );
+	m_nOffsetY = QuickPropScale( inResourceData->GetInt( "offsetY", 0 ) );
 }
 
 //-----------------------------------------------------------------------------
