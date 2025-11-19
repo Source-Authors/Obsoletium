@@ -95,15 +95,16 @@ void CBaseDialog::ApplySettings( KeyValues *inResourceData )
 {
 	BaseClass::ApplySettings( inResourceData );
 
-	m_nBorderWidth	= inResourceData->GetInt( "borderwidth", 0 );
+	// dimhotepus: Scale UI.
+	m_nBorderWidth	= QuickPropScale( inResourceData->GetInt( "borderwidth", 0 ) );
 
 	KeyValues *pFooter = inResourceData->FindKey( "Footer" );
 	if ( pFooter )
 	{
 		m_pFooterInfo = pFooter->MakeCopy();
 	}
-
-	m_nButtonGap = inResourceData->GetInt( "footer_buttongap", -1 );
+	// dimhotepus: Scale UI.
+	m_nButtonGap = QuickPropScale( inResourceData->GetInt( "footer_buttongap", -1 ) );
 }
 
 //---------------------------------------------------------
