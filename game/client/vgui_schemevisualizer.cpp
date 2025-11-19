@@ -130,7 +130,7 @@ void CSchemeVisualizer::PerformLayout()
 
 	const int nHorzBuffer = XRES( 2 );
 	const int nVertBuffer = YRES( 10 );
-	m_pList->SetBounds( nHorzBuffer, nVertBuffer, GetWide() - 2 * nHorzBuffer, GetTall() - 1.5f * nVertBuffer );
+	m_pList->SetBounds( nHorzBuffer, nVertBuffer, GetWide() - 2 * nHorzBuffer, GetTall() - 3 * nVertBuffer / 2 );
 }
 
 void CSchemeVisualizer::UpdateList( ListDataType_t nType )
