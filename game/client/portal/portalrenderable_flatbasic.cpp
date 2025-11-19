@@ -243,7 +243,6 @@ bool CPortalRenderable_FlatBasic::CalcFrustumThroughPortal( const Vector &ptCurr
 	int iInputFrustumPlaneCount = g_pPortalRender->m_RecursiveViewComplexFrustums[iViewRecursionLevel].Count();
 	Assert( iInputFrustumPlaneCount > 0 );
 
-	Vector ptTempWork[2];
 	int iAllocSize = 4 + iInputFrustumPlaneCount;
 
 	Vector *pInVerts = (Vector *)stackalloc( sizeof( Vector ) * iAllocSize * 2 ); //possible to add 1 point per cut, 4 starting points, iInputFrustumPlaneCount cuts
