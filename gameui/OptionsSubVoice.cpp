@@ -53,10 +53,6 @@ COptionsSubVoice::COptionsSubVoice(vgui::Panel *parent) : PropertyPage(parent, N
 
 	LoadControlSettings("Resource\\OptionsSubVoice.res");
 
-    // dimhotepus: Scale UI.
-    m_pMicMeter->SetShouldScaleImage(true);
-    m_pMicMeter2->SetShouldScaleImage(true);
-
     m_bVoiceOn = false;
     m_pMicMeter2->SetVisible(false);
     // no voice tweak - then disable all buttons
