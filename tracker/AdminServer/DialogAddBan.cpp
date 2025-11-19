@@ -26,7 +26,8 @@ CDialogAddBan::CDialogAddBan(vgui::Panel *parent) : Frame(parent, "DialogAddBan"
 {
 	m_cType = nullptr;
 
-	SetSize(320, 200);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 320 ), QuickPropScale( 200 ));
 	SetTitle("#Game_Ban_Add_Title", false);
 
 	m_pIDTextEntry = new TextEntry(this, "IDTextEntry");

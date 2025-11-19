@@ -24,7 +24,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CDialogCvarChange::CDialogCvarChange(vgui::Panel *parent) : Frame(parent, "DialogCvarChange")
 {
-	SetSize(320, 200);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 320 ), QuickPropScale( 200 ));
 
 	m_bAddCvarText = true;
 

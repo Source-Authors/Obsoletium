@@ -45,7 +45,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CGraphPanel::CGraphPanel(vgui::Panel *parent, const char *name) : PropertyPage(parent, name)
 {
-	SetMinimumSize(300,200);
+	// dimhotepus: Scale UI.
+	SetMinimumSize(QuickPropScale( 300 ),QuickPropScale( 200 ));
 
 	m_pGraphsPanel = new ImagePanel(this,"Graphs");
 	m_pGraphs = new CGraphsImage();
@@ -161,7 +162,8 @@ void CGraphPanel::PerformLayout()
 	{
 		int entry_x,entry_y;
 		entry->GetPos(entry_x,entry_y);
-		entry->SetPos(entry_x,y+(h/2)-8);
+		// dimhotepus: Scale UI.
+		entry->SetPos(entry_x,y+(h/2)-QuickPropScale( 8 ));
 	}
 }
 

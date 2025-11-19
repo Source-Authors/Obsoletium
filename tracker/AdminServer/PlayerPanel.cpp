@@ -31,13 +31,13 @@ using namespace vgui;
 CPlayerPanel::CPlayerPanel(vgui::Panel *parent, const char *name) : vgui::PropertyPage(parent, name)
 {
 	m_pPlayerListPanel = new vgui::ListPanel(this, "Players list");
-
-	m_pPlayerListPanel->AddColumnHeader(0, "name", "#Player_Panel_Name", 200, ListPanel::COLUMN_RESIZEWITHWINDOW ); //-V2017
-	m_pPlayerListPanel->AddColumnHeader(1, "authid", "#Player_Panel_ID", 100);
-	m_pPlayerListPanel->AddColumnHeader(2, "ping", "#Player_Panel_Ping", 50);
-	m_pPlayerListPanel->AddColumnHeader(3, "loss", "#Player_Panel_Loss", 50);
-	m_pPlayerListPanel->AddColumnHeader(4, "frags", "#Player_Panel_Frags", 50);
-	m_pPlayerListPanel->AddColumnHeader(5, "time", "#Player_Panel_Time", 75);
+	// dimhotepus: Scale UI.
+	m_pPlayerListPanel->AddColumnHeader(0, "name", "#Player_Panel_Name", QuickPropScale( 200 ), ListPanel::COLUMN_RESIZEWITHWINDOW ); //-V2017
+	m_pPlayerListPanel->AddColumnHeader(1, "authid", "#Player_Panel_ID", QuickPropScale( 100 ));
+	m_pPlayerListPanel->AddColumnHeader(2, "ping", "#Player_Panel_Ping", QuickPropScale( 50 ));
+	m_pPlayerListPanel->AddColumnHeader(3, "loss", "#Player_Panel_Loss", QuickPropScale( 50 ));
+	m_pPlayerListPanel->AddColumnHeader(4, "frags", "#Player_Panel_Frags", QuickPropScale( 50 ));
+	m_pPlayerListPanel->AddColumnHeader(5, "time", "#Player_Panel_Time", QuickPropScale( 75 ));
 
 /*
 	// TODO: update me!!	

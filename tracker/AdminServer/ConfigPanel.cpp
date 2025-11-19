@@ -31,9 +31,9 @@ static constexpr inline long RETRY_TIME = 10000;		// refresh server every 10 sec
 CConfigPanel::CConfigPanel(vgui::Panel *parent, bool autorefresh,bool savercon,int refreshtime,
 							bool graphs, int graphsrefreshtime,bool getlogs) : Frame(parent, "ConfigPanel")
 {
-	196, 181, 80,
-
-	SetMinimumSize(400,240);
+	
+	// dimhotepus: Scale UI.
+	SetMinimumSize(QuickPropScale( 400 ),QuickPropScale( 240 ));
 	SetSizeable(false);
 	MakePopup();
 
@@ -65,7 +65,7 @@ CConfigPanel::CConfigPanel(vgui::Panel *parent, bool autorefresh,bool savercon,i
 	m_pGraphsRefreshTimeTextEntry->SetEnabled(m_pGraphsButton->IsSelected());
 	m_pGraphsRefreshTimeTextEntry->SetEditable(m_pGraphsButton->IsSelected());
 
-	char refreshText[20];
+	char refreshText[16];
 
 	V_to_chars(refreshText,refreshtime);
 	m_pRefreshTextEntry->SetText(refreshText);
@@ -167,7 +167,8 @@ void CConfigPanel::OnCommand(const char *command)
 		}
 		else
 		{
-			MessageBox *dlg = new MessageBox ("#Config_Panel", "#Config_Time_Error");
+			// dimhotepus: Scale UI.
+			MessageBox *dlg = new MessageBox ("#Config_Panel", "#Config_Time_Error", this);
 			dlg->DoModal();
 		}
 	}

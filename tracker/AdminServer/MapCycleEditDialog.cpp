@@ -23,15 +23,18 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CMapCycleEditDialog::CMapCycleEditDialog(vgui::Panel *parent, const char *name) : BaseClass(parent, name)
 {
-	SetSize(480, 320);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 480 ), QuickPropScale( 320 ));
 	SetSizeable(false);
 
 	m_pAvailableMapList = new ListPanel(this, "AvailableMapList");
-	m_pAvailableMapList->AddColumnHeader(0, "Map", "#Available_Maps", 128);
+	// dimhotepus: Scale UI.
+	m_pAvailableMapList->AddColumnHeader(0, "Map", "#Available_Maps", QuickPropScale( 128 ));
 	m_pAvailableMapList->SetColumnSortable(0, false);
 
 	m_pMapCycleList = new ListPanel(this, "MapCycleList");
-	m_pMapCycleList->AddColumnHeader(0, "Map", "#Map_Cycle", 128);
+	// dimhotepus: Scale UI.
+	m_pMapCycleList->AddColumnHeader(0, "Map", "#Map_Cycle", QuickPropScale( 128 ));
 	m_pMapCycleList->SetColumnSortable(0, false);
 
 	m_RightArrow = new Button(this, "RightButton", "");

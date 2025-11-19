@@ -5,7 +5,7 @@
 // $NoKeywords: $
 //=============================================================================
 
-#include <vgui_controls/ListPanel.h>	
+#include <vgui_controls/ListPanel.h>
 
 #include "tier1/KeyValues.h"
 

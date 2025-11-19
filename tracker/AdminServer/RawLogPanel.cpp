@@ -33,7 +33,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CRawLogPanel::CRawLogPanel(vgui::Panel *parent, const char *name) : vgui::PropertyPage(parent, name)
 {
-	SetSize(200, 100);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 200 ), QuickPropScale( 100 ));
 	m_pConsole = new CConsolePanel( this, "Console", false );
 	
 	LoadControlSettings("Admin\\RawLogPanel.res", "PLATFORM");

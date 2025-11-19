@@ -145,7 +145,8 @@ void CBudgetPanelContainer::PerformLayout()
 	BaseClass::PerformLayout();
 	int x, y, wide, tall;
 	GetBounds( x, y, wide, tall );
-	m_pBudgetPanelAdmin->SetBounds( 12, 12, wide - 24, tall - 24 );
+	// dimhotepus: Scale UI.
+	m_pBudgetPanelAdmin->SetBounds( QuickPropScale( 12 ), QuickPropScale( 12 ), wide - QuickPropScale( 24 ), tall - QuickPropScale( 24 ) );
 	m_pBudgetPanelAdmin->SendConfigDataToBase();
 }
 

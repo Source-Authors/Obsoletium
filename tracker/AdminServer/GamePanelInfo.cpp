@@ -53,8 +53,9 @@ static constexpr inline long RESTART_TIME = 60000;		// refresh 60 seconds after 
 //-----------------------------------------------------------------------------
 CGamePanelInfo::CGamePanelInfo(vgui::Panel *parent, const char *name, const char *mod) :  Frame(parent, name)
 {
-	SetSize(560, 420);
-	SetMinimumSize(560, 420);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 560 ), QuickPropScale( 420 ));
+	SetMinimumSize(QuickPropScale( 560 ), QuickPropScale( 420 ));
 	m_bRemoteServer = false;
 	m_bShuttingDown = false;
 

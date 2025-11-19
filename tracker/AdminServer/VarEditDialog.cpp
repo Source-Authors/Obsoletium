@@ -24,7 +24,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CVarEditDialog::CVarEditDialog(vgui::Panel *parent, const char *name) : Frame(parent, name)
 {
-	SetSize(280, 180);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 280 ), QuickPropScale( 180 ));
 	SetSizeable(false);
 	m_pOKButton = new Button(this, "OKButton", "OK");
 	m_pCancelButton = new Button(this, "CancelButton", "Cancel");

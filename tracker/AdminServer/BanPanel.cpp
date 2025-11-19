@@ -36,9 +36,10 @@ using namespace vgui;
 CBanPanel::CBanPanel(vgui::Panel *parent, const char *name) : PropertyPage(parent, name)
 {
 	m_pBanListPanel = new ListPanel(this, "BanList");
-	m_pBanListPanel->AddColumnHeader(0, "type", "#Ban_List_Type", 150 );
-	m_pBanListPanel->AddColumnHeader(1, "id", "#Ban_List_ID", 200 );
-	m_pBanListPanel->AddColumnHeader(2, "time", "#Ban_List_Time", 200 );
+	// dimhotepus: Scale UI.
+	m_pBanListPanel->AddColumnHeader(0, "type", "#Ban_List_Type", QuickPropScale( 150 ) );
+	m_pBanListPanel->AddColumnHeader(1, "id", "#Ban_List_ID", QuickPropScale( 200 ) );
+	m_pBanListPanel->AddColumnHeader(2, "time", "#Ban_List_Time", QuickPropScale( 200 ) );
 	m_pBanListPanel->SetSortColumn(2);
 	m_pBanListPanel->SetEmptyListText("#Ban_List_Empty");
 
@@ -395,15 +396,15 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 	if (!rc)
 	{
 		while (std::get<char *>(f.gets(line)))
-	{	
-		// parse each line of the config file adding the ban
-		tok.SetLine(line);
-		if (tok.CountToken() == 3)
 		{
-			// add the ban
-			const char *id = tok.GetToken(2);
-			ChangeBanTimeByID(id, "0");
-		}
+			// parse each line of the config file adding the ban
+			tok.SetLine(line);
+			if (tok.CountToken() == 3)
+			{
+				// add the ban
+				const char *id = tok.GetToken(2);
+				ChangeBanTimeByID(id, "0");
+			}
 		}
 	}
 	else

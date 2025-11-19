@@ -16,7 +16,8 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CServerConfigPanel::CServerConfigPanel(vgui::Panel *parent, const char *name, const char *mod) : CVarListPropertyPage(parent, name)
 {
-	SetBounds(0, 0, 500, 170);
+	// dimhotepus: Scale UI.
+	SetBounds(0, 0, QuickPropScale( 500 ), QuickPropScale( 170 ));
 	LoadControlSettings("Admin\\ServerConfigPanel.res", "PLATFORM");
 
 	// load our rules
