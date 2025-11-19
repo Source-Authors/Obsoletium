@@ -1624,7 +1624,8 @@ void CMultiPlayerAnimState::EstimateYaw( void )
 		}
 
 		m_PoseParameterData.m_flEstimateYaw += flYawDelta;
-		AngleNormalize( m_PoseParameterData.m_flEstimateYaw );
+		// dimhotepus: Ensure estimate yaw is normalized.
+		m_PoseParameterData.m_flEstimateYaw = AngleNormalize( m_PoseParameterData.m_flEstimateYaw );
 	}
 	else
 	{
