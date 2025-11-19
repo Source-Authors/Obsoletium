@@ -785,9 +785,9 @@ bool CVGuiScreenPanel::Init( KeyValues* pKeyValues, VGuiScreenInitData_t* pInitD
 	}
 
 	// Dimensions in pixels
-	int nWidth, nHeight;
-	nWidth = pKeyValues->GetInt( "pixelswide", 240 );
-	nHeight = pKeyValues->GetInt( "pixelshigh", 160 );
+	// dimhotepus: Scale VGUI screen UI.
+	int nWidth = QuickPropScale( pKeyValues->GetInt( "pixelswide", 240 ) );
+	int nHeight = QuickPropScale( pKeyValues->GetInt( "pixelshigh", 160 ) );
 	if ((nWidth <= 0) || (nHeight <= 0))
 		return false;
 
