@@ -893,8 +893,8 @@ void UpdateClassImageEntity(
 
 	// Now, blend the lower and upper (aim) anims together
 	pPlayerModel->SetNumAnimOverlays( 2 );
-	int numOverlays = pPlayerModel->GetNumAnimOverlays();
-	for ( i=0; i < numOverlays; ++i )
+	intp numOverlays = pPlayerModel->GetNumAnimOverlays();
+	for ( intp i=0; i < numOverlays; ++i )
 	{
 		C_AnimationLayer *layer = pPlayerModel->GetAnimOverlay( i );
 

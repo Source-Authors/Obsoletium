@@ -143,14 +143,14 @@ BEGIN_PREDICTION_DATA( C_BaseAnimatingOverlay )
 
 END_PREDICTION_DATA()
 
-C_AnimationLayer* C_BaseAnimatingOverlay::GetAnimOverlay( int i )
+C_AnimationLayer* C_BaseAnimatingOverlay::GetAnimOverlay( intp i )
 {
 	Assert( i >= 0 && i < MAX_OVERLAYS );
 	return &m_AnimOverlay[i];
 }
 
 
-void C_BaseAnimatingOverlay::SetNumAnimOverlays( int num )
+void C_BaseAnimatingOverlay::SetNumAnimOverlays( intp num )
 {
 	if ( m_AnimOverlay.Count() < num )
 	{
@@ -163,7 +163,7 @@ void C_BaseAnimatingOverlay::SetNumAnimOverlays( int num )
 }
 
 
-int C_BaseAnimatingOverlay::GetNumAnimOverlays() const
+intp C_BaseAnimatingOverlay::GetNumAnimOverlays() const
 {
 	return m_AnimOverlay.Count();
 }

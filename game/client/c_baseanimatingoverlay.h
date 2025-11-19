@@ -29,9 +29,9 @@ public:
 
 	virtual CStudioHdr *OnNewModel();
 
-	C_AnimationLayer* GetAnimOverlay( int i );
-	void SetNumAnimOverlays( int num );	// This makes sure there is space for this # of layers.
-	int GetNumAnimOverlays() const;
+	C_AnimationLayer* GetAnimOverlay( intp i );
+	void SetNumAnimOverlays( intp num );	// This makes sure there is space for this # of layers.
+	intp GetNumAnimOverlays() const;
 
 	virtual void	GetRenderBounds( Vector& theMins, Vector& theMaxs );
 
