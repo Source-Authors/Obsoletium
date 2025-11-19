@@ -964,7 +964,8 @@ bool C_Portal_Player::ShouldDraw( void )
 
 	return true;
 
-	return BaseClass::ShouldDraw();
+	// dimhotepus: Drop unreachable code.
+	// return BaseClass::ShouldDraw();
 }
 
 const QAngle& C_Portal_Player::EyeAngles()

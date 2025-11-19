@@ -279,7 +279,8 @@ int C_PortalGhostRenderable::DrawModel( int flags )
 		return 1;
 	}
 
-	return 0;
+	// dimhotepus: Drop unreachable code.
+	// return 0;
 }
 
 ModelInstanceHandle_t C_PortalGhostRenderable::GetModelInstance()
