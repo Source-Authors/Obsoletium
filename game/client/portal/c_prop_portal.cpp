@@ -155,7 +155,7 @@ void __MsgFunc_EntityPortalled(bf_read &msg)
 		state.m_teleportMatrix = matTransform.As3x4();
 
 		// Post a message back to all IToolSystems
-		Assert( (int)pEntity->GetToolHandle() != 0 );
+		Assert( pEntity->GetToolHandle() != 0 );
 		ToolFramework_PostToolMessage( pEntity->GetToolHandle(), msg );
 
 		msg->deleteThis();
