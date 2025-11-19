@@ -1137,8 +1137,7 @@ bool CPortalGameRules::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 {
 #ifdef CLIENT_DLL
 	return false;
-#endif
-
+#else
 	if( !sv_robust_explosions.GetBool() )
 		return false;
 
@@ -1148,16 +1147,15 @@ bool CPortalGameRules::ShouldUseRobustRadiusDamage(CBaseEntity *pEntity)
 		return false;
 	}
 
-#ifndef CLIENT_DLL
 	CAI_BaseNPC *pNPC = pEntity->MyNPCPointer();
 	if( pNPC->CapabilitiesGet() & bits_CAP_SIMPLE_RADIUS_DAMAGE )
 	{
 		// This NPC only eligible for simple radius damage.
 		return false;
 	}
-#endif//CLIENT_DLL
 
 	return true;
+#endif
 }
 
 #ifndef CLIENT_DLL
