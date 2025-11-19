@@ -99,7 +99,6 @@ static int s_iPortalSimulatorGUID = 0; //used in standalone function that have n
 static void ConvertBrushListToClippedPolyhedronList( const int *pBrushes, int iBrushCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList );
 static void ClipPolyhedrons( CPolyhedron * const *pExistingPolyhedrons, int iPolyhedronCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList );
 static inline CPolyhedron *TransformAndClipSinglePolyhedron( CPolyhedron *pExistingPolyhedron, const VMatrix &Transform, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fCutEpsilon, bool bUseTempMemory );
-static intp GetEntityPhysicsObjects( IPhysicsEnvironment *pEnvironment, CBaseEntity *pEntity, IPhysicsObject **pRetList, int iRetListArraySize );
 static CPhysCollide *ConvertPolyhedronsToCollideable( CPolyhedron **pPolyhedrons, int iPolyhedronCount );
 
 #ifndef CLIENT_DLL
@@ -2690,27 +2689,6 @@ static inline CPolyhedron *TransformAndClipSinglePolyhedron( CPolyhedron *pExist
 	pExistingPolyhedron->pPolygons = pOriginalPolygons;
 
 	return pNewPolyhedron;
-}
-
-static intp GetEntityPhysicsObjects( IPhysicsEnvironment *pEnvironment, CBaseEntity *pEntity, IPhysicsObject **pRetList, int iRetListArraySize )
-{	
-	intp iCount, iRetCount = 0;
-	const IPhysicsObject **pList = pEnvironment->GetObjectList( &iCount );
-
-	if( iCount > iRetListArraySize )
-		iCount = iRetListArraySize;
-
-	for ( int i = 0; i < iCount; ++i )
-	{
-		CBaseEntity *pEnvEntity = reinterpret_cast<CBaseEntity *>(pList[i]->GetGameData());
-		if ( pEntity == pEnvEntity )
-		{
-			pRetList[iRetCount] = (IPhysicsObject *)(pList[i]);
-			++iRetCount;
-		}
-	}
-
-	return iRetCount;
 }
 
 
