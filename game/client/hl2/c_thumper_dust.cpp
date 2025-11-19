@@ -108,7 +108,7 @@ void FX_ThumperDust( const CEffectData &data )
 	int	numPuffs = THUMPER_MAX_PARTICLES;
 
 	float flYaw = 0;
-	float flIncr = (2*M_PI) / (float) numPuffs; // Radians
+	float flIncr = (2*M_PI_F) / (float) numPuffs; // Radians
 	Vector forward;
 	Vector vecColor;
 	int i = 0;
