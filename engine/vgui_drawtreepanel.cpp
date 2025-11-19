@@ -351,18 +351,18 @@ void VGui_RecursivePrintTree(
 	char name[1024];
 	const char *pInputName = ipanel->GetName( current );
 	if ( pInputName && pInputName[0] != 0 )
-		Q_snprintf( name, sizeof( name ), "%s", pInputName );
+		V_sprintf_safe( name, "%s", pInputName );
 	else
-		Q_snprintf( name, sizeof( name ), "%s", "(no name)" );
+		V_sprintf_safe( name, "%s", "(no name)" );
 
 	if ( ipanel->IsMouseInputEnabled( current ) )
 	{
-		Q_strncat( name, ", +m", sizeof( name ), COPY_ALL_CHARACTERS );
+		V_strcat_safe( name, ", +m" );
 	}
 
 	if ( ipanel->IsKeyBoardInputEnabled( current ) )
 	{
-		Q_strncat( name, ", +k", sizeof( name ), COPY_ALL_CHARACTERS );
+		V_strcat_safe( name, ", +k" );
 	}
 
 	if ( vgui_drawtree_bounds.GetBool() )
@@ -371,23 +371,23 @@ void VGui_RecursivePrintTree(
 		vgui::ipanel()->GetPos( current, x, y );
 		vgui::ipanel()->GetSize( current, w, h );
 		char b[ 128 ];
-		Q_snprintf( b, sizeof( b ), "[%-4i %-4i %-4i %-4i]", x, y, w, h );
+		V_sprintf_safe( b, "[%-4i %-4i %-4i %-4i]", x, y, w, h );
 
-		Q_strncat( name, ", ", sizeof( name ), COPY_ALL_CHARACTERS );
-		Q_strncat( name, b, sizeof( name ), COPY_ALL_CHARACTERS );
+		V_strcat_safe( name, ", " );
+		V_strcat_safe( name, b );
 	}
 
 	char str[1024];
 	if ( vgui_drawtree_panelptr.GetInt() )
-		Q_snprintf( str, sizeof( str ), "%s - [0x%llux]", name, current );
+		V_sprintf_safe( str, "%s - [0x%llux]", name, current );
 	else if (vgui_drawtree_panelalpha.GetInt() )
 	{
 		KeyValuesAD kv("alpha");
 		vgui::ipanel()->RequestInfo(current, kv);
-		Q_snprintf( str, sizeof( str ), "%s - [%d]", name, kv->GetInt("alpha") );
+		V_sprintf_safe( str, "%s - [%d]", name, kv->GetInt("alpha") );
 	}
 	else
-		Q_snprintf( str, sizeof( str ), "%s", name );
+		V_sprintf_safe( str, "%s", name );
 
 	pVal->SetString( "Text", str );
 	// dimhotepus: SetInt -> SetPtr
