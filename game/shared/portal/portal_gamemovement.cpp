@@ -333,17 +333,11 @@ void CPortalGameMovement::AirMove( void )
 	//
 	else if ( sv_player_funnel_into_portals.GetBool() )
 	{
-		int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
-		if( iPortalCount != 0 )
+		for( auto *pTempPortal : CProp_Portal_Shared::AllPortals )
 		{
-			CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
-			for( int i = 0; i != iPortalCount; ++i )
+			if( pTempPortal->IsActivedAndLinked() )
 			{
-				CProp_Portal *pTempPortal = pPortals[i];
-				if( pTempPortal->IsActivedAndLinked() )
-				{
-					FunnelIntoPortal( pTempPortal, wishdir );
-				}
+				FunnelIntoPortal( pTempPortal, wishdir );
 			}
 		}
 	}
