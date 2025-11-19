@@ -50,10 +50,10 @@ public:
 	bool IsImageLoaded( ButtonImageType_t type ) const;
 
 	// initialization from build-mode dialog style .res files
-	virtual void ApplySettings(KeyValues *inResourceData);
+	void ApplySettings(KeyValues *inResourceData) override;
 
-	virtual void Paint( void );
-	virtual void PaintBackground( void ) {}
+	void Paint( void ) override;
+	void PaintBackground( void ) override {}
 
 private:
 
