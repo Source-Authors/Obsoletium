@@ -6510,7 +6510,7 @@ void CNPC_Hunter::StriderBusterAttached( CBaseEntity *pAttached )
 //-----------------------------------------------------------------------------
 void CNPC_Hunter::StriderBusterDetached( CBaseEntity *pAttached )
 {
-	int elem = m_hAttachedBusters.Find(pAttached);
+	intp elem = m_hAttachedBusters.Find(pAttached);
 	if (elem >= 0)
 	{
 		m_hAttachedBusters.FastRemove(elem);
@@ -6952,13 +6952,13 @@ void CAI_HunterEscortBehavior::DistributeFreeHunters()
 	CAI_BaseNPC **ppNPCs = g_AI_Manager.AccessAIs();
 	for ( intp i = 0; i < g_AI_Manager.NumAIs() && freeHunters.Count(); i++ )
 	{
-		int nToAdd;
+		intp nToAdd;
 		CNPC_Strider *pStrider = ( ppNPCs[i]->IsAlive() ) ? dynamic_cast<CNPC_Strider *>( ppNPCs[i] ) : NULL;
 		if ( pStrider && !pStrider->CarriedByDropship() )
 		{
 			if ( ( nToAdd = 3 - AIGetNumFollowers( pStrider ) ) > 0 )
 			{
-				for ( int j = freeHunters.Count() - 1; j >= 0 && nToAdd > 0; --j )
+				for ( intp j = freeHunters.Count() - 1; j >= 0 && nToAdd > 0; --j )
 				{
 					DevMsg( "npc_hunter %d assigned to npc_strider %d\n", freeHunters[j]->entindex(), pStrider->entindex() );
 					freeHunters[j]->FollowStrider( pStrider );
