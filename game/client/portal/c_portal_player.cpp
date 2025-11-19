@@ -628,7 +628,8 @@ void C_Portal_Player::ClientThink( void )
 			if ( m_flDeathCCWeight < 1.0f )
 			{
 				m_flDeathCCWeight += DEATH_CC_FADE_SPEED;
-				clamp( m_flDeathCCWeight, 0.0f, 1.0f );
+				// dimhotepus: Ensure fading cc effect height is in correct range.
+				m_flDeathCCWeight = clamp( m_flDeathCCWeight, 0.0f, 1.0f );
 			}
 		}
 		else 
