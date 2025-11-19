@@ -328,7 +328,7 @@ void CBaseBudgetPanel::PerformLayout()
 		m_TimeLabels[i]->GetContentSize( labelWidth, labelHeight );
 		x = maxLabelWidth + ( i * m_ConfigData.m_flTimeLabelInterval ) / fRange * ( totalWidth - maxLabelWidth );
 		
-		m_TimeLabels[i]->SetPos( x - ( labelWidth * 0.5f ), totalHeight - labelHeight );
+		m_TimeLabels[i]->SetPos( x - labelWidth / 2, totalHeight - labelHeight );
 		m_TimeLabels[i]->SetSize( labelWidth, labelHeight );
 		m_TimeLabels[i]->SetContentAlignment( vgui::Label::a_east );
 	}
@@ -340,8 +340,8 @@ void CBaseBudgetPanel::PerformLayout()
 	{
 		int labelWidth, labelHeight;
 		m_HistoryLabels[i]->GetContentSize( labelWidth, labelHeight );
-		y = (fRange != 0) ? budgetHistoryHeight * m_ConfigData.m_HistoryLabelValues[i] / fRange : 0.0f;
-		int top = ( int )( budgetHistoryHeight - y - 1 - labelHeight * 0.5f );
+		y = (fRange != 0) ? budgetHistoryHeight * m_ConfigData.m_HistoryLabelValues[i] / fRange : 0;
+		int top = budgetHistoryHeight - y - 1 - labelHeight / 2;
 		m_HistoryLabels[i]->SetPos( totalWidth - maxFPSLabelWidth, top );
 		m_HistoryLabels[i]->SetSize( labelWidth, labelHeight );
 		m_HistoryLabels[i]->SetContentAlignment( vgui::Label::a_east );
