@@ -92,8 +92,8 @@ void C_PropEnergyBall::OnDataChanged(DataUpdateType_t updateType )
 		if ( (m_fTimeTillDeath > 0.0f) )
 		{
 			float fNewAlpha = m_fTimeTillDeath / fStartFadeTime;
-			clamp( fNewAlpha, 0.0f, 1.0f );
-			m_fCurAlpha = fNewAlpha;
+			// dimhotepus: Correctly clamp alpha.
+			m_fCurAlpha = clamp( fNewAlpha, 0.0f, 1.0f );
 		}
 	}
 }
