@@ -360,7 +360,7 @@ void C_Env_Lightrail_Endpoint::UpdateLargeFX( void )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 100;
+		alpha = 100;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;
@@ -423,7 +423,7 @@ void C_Env_Lightrail_Endpoint::UpdateLargeFX( void )
 		sParticle->m_flRoll			= Helper_RandomInt( 0, 360 );
 		sParticle->m_flRollDelta	= 0.0f;
 
-		float alpha = 255;
+		alpha = 255;
 
 		sParticle->m_uchColor[0]	= alpha;
 		sParticle->m_uchColor[1]	= alpha;
