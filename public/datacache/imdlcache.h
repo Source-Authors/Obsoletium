@@ -43,7 +43,7 @@ using MDLHandle_t = unsigned short;
 
 inline MDLHandle_t VoidPtrToMDLHandle( void *ptr )
 {
-	return ( MDLHandle_t ) ( int ) ( intp ) ptr;
+	return ( MDLHandle_t ) ( int ) ( intp ) ptr; //-V221
 }
 
 inline void* MDLHandleToVirtual( MDLHandle_t hndl )
