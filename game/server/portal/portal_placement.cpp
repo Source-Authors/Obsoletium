@@ -922,7 +922,8 @@ bool FitPortalOnSurface( const CProp_Portal *pIgnorePortal, Vector &vOrigin, con
 		break;
 	}
 
-	return true;
+	// dimhotepus: Mark as unreachable.
+	unreachable();
 }
 
 void FitPortalAroundOtherPortals( const CProp_Portal *pIgnorePortal, Vector &vOrigin, const Vector &vForward, const Vector &vRight, const Vector &vUp )
