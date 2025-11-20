@@ -694,7 +694,7 @@ protected:
 	//----------------------------------------------------------------------------
 	// Purpose: Functions implementing basic file system behavior.
 	//----------------------------------------------------------------------------
-	virtual FILE *FS_fopen( const char *filename, const char *options, unsigned flags, int64 *size ) = 0;
+	virtual FILE *FS_fopen( const char *filename, const char *options, unsigned flags, int64 *size, bool bNative ) = 0;
 	virtual void FS_setbufsize( FILE *fp, unsigned nBytes ) = 0;
 	virtual void FS_fclose( FILE *fp ) = 0;
 	// dimhotepus: FS_fseek now returns offset.
@@ -763,7 +763,7 @@ protected:
 	FileWarningLevel_t			m_fwLevel;
 	void						(*m_pfnWarning)( PRINTF_FORMAT_STRING const char *fmt, ... );
 
-	FILE						*Trace_FOpen( const char *filename, const char *options, unsigned flags, int64 *size );
+	FILE						*Trace_FOpen( const char *filename, const char *options, unsigned flags, int64 *size, bool bNative );
 	void						Trace_FClose( FILE *fp );
 	void						Trace_FRead( int size, FILE* file );
 	void						Trace_FWrite( int size, FILE* file );
@@ -787,9 +787,9 @@ protected:
 	void						AddVPKFile( const char *pPath, const char *pPathID, SearchPathAdd_t addType );
 	bool						RemoveVPKFile( const char *pPath, const char *pPathID );
 
-	void						HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAbsolutePath );
+	void						HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAbsolutePath, bool bNative );
 
-	FileHandle_t				FindFileInSearchPath( CFileOpenInfo &openInfo );
+	FileHandle_t				FindFileInSearchPath( CFileOpenInfo &openInfo, bool bNative );
 	time_t						FastFileTime( const CSearchPath *path, const char *pFileName );
 
 	const char					*GetWritePath( const char *pFilename, const char *pathID );

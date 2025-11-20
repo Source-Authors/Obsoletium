@@ -130,7 +130,9 @@ CFileHandle *CZipPackFile::OpenFile( const char *pFileName, const char *pOptions
 #endif
 		{
 			// Try to open it as a regular file first
-			m_hPackFileHandleFS = m_fs->Trace_FOpen( m_ZipName, "rb", 0, NULL );
+			m_hPackFileHandleFS = m_fs->Trace_FOpen( m_ZipName, "rb", 0, NULL, true );
+			if ( !m_hPackFileHandleFS )
+				m_hPackFileHandleFS = m_fs->Trace_FOpen( m_ZipName, "rb", 0, NULL, false );
 
 			// !NOTE! Pack files inside of VPK not supported
 		}

@@ -531,14 +531,19 @@ void CBaseFileSystem::LogAccessToFile( char const *accesstype, char const *fullp
 //			*options - 
 // Output : FILE
 //-----------------------------------------------------------------------------
-FILE *CBaseFileSystem::Trace_FOpen( const char *filenameT, const char *options, unsigned flags, int64 *size )
+FILE *CBaseFileSystem::Trace_FOpen( const char *filenameT, const char *options, unsigned flags, int64 *size, bool bNative )
 {
+#ifndef _WIN32
+	if ( bNative )
+		return NULL;
+#endif
+
 	AUTOBLOCKREPORTER_FN( Trace_FOpen, this, true, filenameT, FILESYSTEM_BLOCKING_SYNCHRONOUS, FileBlockingItem::FB_ACCESS_OPEN );
 
 	char filename[MAX_PATH];
 	FixUpPath ( filenameT, filename );
 
-	FILE *fp = FS_fopen( filename, options, flags, size );
+	FILE *fp = FS_fopen( filename, options, flags, size, bNative );
 	if ( fp )
 	{
 		if ( options[0] == 'r' )
@@ -859,7 +864,10 @@ bool CBaseFileSystem::AddPackFileFromPath( const char *pPath, const char *pakfil
 		return false;
 
 	CPackFile *pf = new CZipPackFile( this );
-	pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, nullptr );
+	pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, nullptr, true );
+	if ( !pf->m_hPackFileHandleFS )
+		pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, nullptr, false );
+
 	if ( !pf->m_hPackFileHandleFS )
 	{
 		delete pf;
@@ -1008,7 +1016,9 @@ void CBaseFileSystem::AddPackFiles( const char *pPath, const CUtlSymbol &pathID,
 			sp->SetPackFile( pf );
 			pf->m_lPackFileTime = GetFileTime( fullpath );
 
-			pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, nullptr );
+			pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, nullptr, true );
+			if ( !pf->m_hPackFileHandleFS )
+				pf->m_hPackFileHandleFS = Trace_FOpen( fullpath, "rb", 0, nullptr, false );
 
 			if ( pf->m_hPackFileHandleFS )
 			{
@@ -1134,7 +1144,10 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 	}
 
 	{
-		FILE *fp = Trace_FOpen( fullpath, "rb", 0, nullptr );
+		FILE *fp = Trace_FOpen( fullpath, "rb", 0, nullptr, true );
+		if ( !fp )
+			fp = Trace_FOpen( fullpath, "rb", 0, nullptr, false );
+
 		if ( !fp )
 		{
 			// Couldn't open it
@@ -1231,7 +1244,9 @@ void CBaseFileSystem::BeginMapAccess()
 #endif
 				{
 					// Try opening the file as a regular file 
-					pPackFile->m_hPackFileHandleFS = Trace_FOpen( pPackFile->m_ZipName, "rb", 0, nullptr );
+					pPackFile->m_hPackFileHandleFS = Trace_FOpen( pPackFile->m_ZipName, "rb", 0, nullptr, true );
+					if ( !pPackFile->m_hPackFileHandleFS )
+						pPackFile->m_hPackFileHandleFS = Trace_FOpen( pPackFile->m_ZipName, "rb", 0, nullptr, false );
 
 // !NOTE! Pack files inside of VPK not supported
 //#if defined( SUPPORT_PACKED_STORE )
@@ -2110,12 +2125,12 @@ public:
 };
 
 
-void CBaseFileSystem::HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAbsolutePath )
+void CBaseFileSystem::HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAbsolutePath, bool bNative )
 {
 	openInfo.m_pFileHandle = nullptr;
 
 	int64 size;
-	FILE *fp = Trace_FOpen( openInfo.m_AbsolutePath, openInfo.m_pOptions, openInfo.m_Flags, &size );
+	FILE *fp = Trace_FOpen( openInfo.m_AbsolutePath, openInfo.m_pOptions, openInfo.m_Flags, &size, bNative );
 	if ( fp )
 	{
 		if ( m_pLogFile )
@@ -2155,7 +2170,7 @@ void CBaseFileSystem::HandleOpenRegularFile( CFileOpenInfo &openInfo, bool bIsAb
 //			*filetime - 
 // Output : FileHandle_t
 //-----------------------------------------------------------------------------
-FileHandle_t CBaseFileSystem::FindFileInSearchPath( CFileOpenInfo &openInfo )
+FileHandle_t CBaseFileSystem::FindFileInSearchPath( CFileOpenInfo &openInfo, bool bNative )
 {
 	VPROF( "CBaseFileSystem::FindFile" );
 	
@@ -2209,7 +2224,7 @@ FileHandle_t CBaseFileSystem::FindFileInSearchPath( CFileOpenInfo &openInfo )
 	openInfo.SetAbsolutePath( "%s%s", openInfo.m_pSearchPath->GetPathString(), szLowercaseFilename );
 
 	// now have an absolute name
-	HandleOpenRegularFile( openInfo, false );
+	HandleOpenRegularFile( openInfo, false, bNative );
 	return (FileHandle_t)openInfo.m_pFileHandle;
 }
 
@@ -2336,7 +2351,9 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 		}
 
 		// Otherwise, it must be a regular file, specified by absolute filename
-		HandleOpenRegularFile( openInfo, true );
+		HandleOpenRegularFile( openInfo, true, true );
+		if ( !openInfo.m_pFileHandle )
+			HandleOpenRegularFile( openInfo, true, false );
 
 		// !FIXME! We probably need to deal with CRC tracking, right?
 
@@ -2349,7 +2366,37 @@ FileHandle_t CBaseFileSystem::OpenForRead( const char *pFileNameT, const char *p
 	CSearchPathsIterator iter( this, &pFileName, pathID, pathFilter );
 	for ( openInfo.m_pSearchPath = iter.GetFirst(); openInfo.m_pSearchPath != nullptr; openInfo.m_pSearchPath = iter.GetNext() )
 	{
-		FileHandle_t filehandle = FindFileInSearchPath( openInfo );
+		FileHandle_t filehandle = FindFileInSearchPath( openInfo, true );
+		if ( filehandle )
+		{
+			// Check if search path is excluded due to pure server white list,
+			// then we should make a note of this fact, and keep searching
+			if ( !openInfo.m_pSearchPath->m_bIsTrustedForPureServer && openInfo.m_ePureFileClass == ePureServerFileClass_AnyTrusted )
+			{
+				#ifdef PURE_SERVER_DEBUG_SPEW
+					Msg( "Ignoring %s from %s for pure server operation\n", openInfo.m_pFileName, openInfo.m_pSearchPath->GetDebugString() );
+				#endif
+
+				m_FileTracker2.NoteFileIgnoredForPureServer( openInfo.m_pFileName, pathID, openInfo.m_pSearchPath->m_storeId );
+				Close( filehandle );
+				openInfo.m_pFileHandle = NULL;
+				if ( ppszResolvedFilename && *ppszResolvedFilename )
+				{
+					free( *ppszResolvedFilename );
+					*ppszResolvedFilename = NULL;
+				}
+				continue;
+			}
+
+			// 
+			openInfo.HandleFileCRCTracking( openInfo.m_pFileName );
+			return filehandle;
+		}
+	}
+
+	for ( openInfo.m_pSearchPath = iter.GetFirst(); openInfo.m_pSearchPath != NULL; openInfo.m_pSearchPath = iter.GetNext() )
+	{
+		FileHandle_t filehandle = FindFileInSearchPath( openInfo, false );
 		if ( filehandle )
 		{
 			// Check if search path is excluded due to pure server white list,
@@ -2410,7 +2457,7 @@ FileHandle_t CBaseFileSystem::OpenForWrite( const char *pFileName, const char *p
 	}
 
 	int64 size;
-	FILE *fp = Trace_FOpen( pTmpFileName, pOptions, 0, &size );
+	FILE *fp = Trace_FOpen( pTmpFileName, pOptions, 0, &size, false ); // No Native since were writing not reading.
 	if ( !fp )
 	{
 		return nullptr;
