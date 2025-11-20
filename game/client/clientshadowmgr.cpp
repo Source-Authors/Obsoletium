@@ -324,12 +324,12 @@ void CTextureAllocator::DeallocateAllTextures()
 void CTextureAllocator::DebugPrintCache( void )
 {
 	// For each fragment
-	int nNumFragments = m_Fragments.TotalCount();
-	int nNumInvalidFragments = 0;
+	auto nNumFragments = m_Fragments.TotalCount();
+	decltype(nNumFragments) nNumInvalidFragments = 0;
 
 	Warning("Fragments (%d):\n===============\n", nNumFragments);
 
-	for ( int f = 0; f < nNumFragments; f++ )
+	for ( decltype(nNumFragments) f = 0; f < nNumFragments; f++ )
 	{
 		if ( ( m_Fragments[f].m_FrameUsed != 0 ) && ( m_Fragments[f].m_Texture != INVALID_TEXTURE_HANDLE ) )
 			Warning("Fragment %d, Block: %d, Index: %d, Texture: %d Frame Used: %d\n", f, m_Fragments[f].m_Block, m_Fragments[f].m_Index, m_Fragments[f].m_Texture, m_Fragments[f].m_FrameUsed );
@@ -1106,12 +1106,12 @@ void CVisibleShadowList::EnumShadow( unsigned short clientShadowHandle )
 //-----------------------------------------------------------------------------
 void CVisibleShadowList::PrioritySort()
 {
-	int nCount = m_ShadowsInView.Count();
+	intp nCount = m_ShadowsInView.Count();
 	m_PriorityIndex.EnsureCapacity( nCount );
 
 	m_PriorityIndex.RemoveAll();
 
-	int i, j;
+	intp i, j;
 	for ( i = 0; i < nCount; ++i )
 	{
 		m_PriorityIndex.AddToTail(i);
@@ -1119,7 +1119,7 @@ void CVisibleShadowList::PrioritySort()
 
 	for ( i = 0; i < nCount - 1; ++i )
 	{
-		int nLargestInd = i;
+		intp nLargestInd = i;
 		float flLargestArea = m_ShadowsInView[m_PriorityIndex[i]].m_flArea;
 		for ( j = i + 1; j < nCount; ++j )
 		{
@@ -1144,7 +1144,7 @@ int CVisibleShadowList::FindShadows( const CViewSetup *pView, int nLeafCount, Le
 
 	m_ShadowsInView.RemoveAll();
 	ClientLeafSystem()->EnumerateShadowsInLeaves( nLeafCount, pLeafList, this );
-	int nCount = m_ShadowsInView.Count();
+	intp nCount = m_ShadowsInView.Count();
 	if (nCount != 0)
 	{
 		// Sort based on screen area/priority
@@ -1899,7 +1899,7 @@ void CClientShadowMgr::DestroyFlashlight( ClientShadowHandle_t shadowHandle )
 //-----------------------------------------------------------------------------
 void CClientShadowMgr::RemoveShadowFromDirtyList( ClientShadowHandle_t handle )
 {
-	int idx = m_DirtyShadows.Find( handle );
+	auto idx = m_DirtyShadows.Find( handle );
 	if ( idx != m_DirtyShadows.InvalidIndex() )
 	{
 		// Clean up the shadow update bit.
@@ -2347,7 +2347,7 @@ void CClientShadowMgr::BuildOrthoShadow( IClientRenderable* pRenderable,
 
 	CShadowLeafEnum leafList;
 	BuildShadowLeafList( &leafList, worldOrigin, vecShadowDir, size, maxHeight );
-	int nCount = leafList.m_LeafList.Count();
+	intp nCount = leafList.m_LeafList.Count();
 	const int *pLeafList = leafList.m_LeafList.Base();
 
 	shadowmgr->ProjectShadow( m_Shadows[handle].m_ShadowHandle, worldOrigin,
@@ -2531,7 +2531,7 @@ void CClientShadowMgr::BuildRenderToTextureShadow( IClientRenderable* pRenderabl
 
 	CShadowLeafEnum leafList;
 	BuildShadowLeafList( &leafList, worldOrigin, vecShadowDir, size, maxHeight );
-	int nCount = leafList.m_LeafList.Count();
+	intp nCount = leafList.m_LeafList.Count();
 	const int *pLeafList = leafList.m_LeafList.Base();
 
 	shadowmgr->ProjectShadow( m_Shadows[handle].m_ShadowHandle, worldOrigin, 
@@ -2616,7 +2616,7 @@ void CClientShadowMgr::BuildFlashlight( ClientShadowHandle_t handle )
 	bool bLightModels = r_flashlightmodels.GetBool();
 	bool bLightSpecificEntity = shadow.m_hTargetEntity.Get() != NULL;
 	bool bLightWorld = ( shadow.m_Flags & SHADOW_FLAGS_LIGHT_WORLD ) != 0;
-	int nCount = 0;
+	intp nCount = 0;
 	const int *pLeafList = 0;
 
 	CShadowLeafEnum leafList;

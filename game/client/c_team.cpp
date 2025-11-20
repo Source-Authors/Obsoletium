@@ -149,7 +149,7 @@ int C_Team::Get_Ping( void )
 //-----------------------------------------------------------------------------
 // Purpose: Return the number of players in this team
 //-----------------------------------------------------------------------------
-int C_Team::Get_Number_Players( void )
+intp C_Team::Get_Number_Players( void )
 {
 	return m_aPlayers.Count();
 }
@@ -194,7 +194,7 @@ C_Team *GetLocalTeam( void )
 //-----------------------------------------------------------------------------
 C_Team *GetGlobalTeam( int iTeamNumber )
 {
-	for (int i = 0; i < g_Teams.Count(); i++ )
+	for (intp i = 0; i < g_Teams.Count(); i++ )
 	{
 		if ( g_Teams[i]->GetTeamNumber() == iTeamNumber )
 			return g_Teams[i];
@@ -206,7 +206,7 @@ C_Team *GetGlobalTeam( int iTeamNumber )
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of teams you can access via GetGlobalTeam() (hence the +1)
 //-----------------------------------------------------------------------------
-int GetNumTeams()
+intp GetNumTeams()
 {
 	return g_Teams.Count() + 1; 
 }
@@ -216,7 +216,7 @@ int GetNumTeams()
 //-----------------------------------------------------------------------------
 C_Team *GetPlayersTeam( int iPlayerIndex )
 {
-	for (int i = 0; i < g_Teams.Count(); i++ )
+	for (intp i = 0; i < g_Teams.Count(); i++ )
 	{
 		if ( g_Teams[i]->ContainsPlayer( iPlayerIndex ) )
 			return g_Teams[i];
@@ -238,7 +238,7 @@ C_Team *GetPlayersTeam( C_BasePlayer *pPlayer )
 //-----------------------------------------------------------------------------
 bool ArePlayersOnSameTeam( int iPlayerIndex1, int iPlayerIndex2 )
 {
-	for (int i = 0; i < g_Teams.Count(); i++ )
+	for (intp i = 0; i < g_Teams.Count(); i++ )
 	{
 		if ( g_Teams[i]->ContainsPlayer( iPlayerIndex1 ) && g_Teams[i]->ContainsPlayer( iPlayerIndex2 ) )
 			return true;
@@ -250,7 +250,7 @@ bool ArePlayersOnSameTeam( int iPlayerIndex1, int iPlayerIndex2 )
 //-----------------------------------------------------------------------------
 // Purpose: Get the number of team managers
 //-----------------------------------------------------------------------------
-int GetNumberOfTeams( void )
+intp GetNumberOfTeams( void )
 {
 	return g_Teams.Count();
 }

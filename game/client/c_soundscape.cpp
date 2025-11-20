@@ -146,9 +146,9 @@ public:
 	void PrintDebugInfo()
 	{
 		Msg( "\n------- CLIENT SOUNDSCAPES -------\n" );
-		for ( int i=0; i < m_soundscapes.Count(); i++ )
+		for ( intp i=0; i < m_soundscapes.Count(); i++ )
 		{
-			Msg( "- %d: %s\n", i, m_soundscapes[i]->GetName() );
+			Msg( "- %zd: %s\n", i, m_soundscapes[i]->GetName() );
 		}
 		if ( m_forcedSoundscapeIndex >= 0 )
 		{
@@ -170,12 +170,12 @@ public:
 	}
 	void DevReportSoundscapeName( int index );
 	void UpdateLoopingSounds( float frametime );
-	int AddLoopingAmbient( const char *pSoundName, float volume, int pitch );
+	intp AddLoopingAmbient( const char *pSoundName, float volume, int pitch );
 	void UpdateLoopingSound( loopingsound_t &loopSound );
 	void StopLoopingSound( loopingsound_t &loopSound );
-	int AddLoopingSound( const char *pSoundName, bool isAmbient, float volume, 
+	intp AddLoopingSound( const char *pSoundName, bool isAmbient, float volume, 
 		soundlevel_t soundLevel, int pitch, const Vector &position );
-	int AddRandomSound( const randomsound_t &sound );
+	intp AddRandomSound( const randomsound_t &sound );
 	void PlayRandomSound( randomsound_t &sound );
 	void UpdateRandomSounds( float gameClock );
 	Vector GenerateRandomSoundPosition();
@@ -1085,7 +1085,7 @@ void C_SoundscapeSystem::ProcessPlaySoundscape( KeyValues *pPlaySoundscape, subs
 }
 
 // special kind of looping sound with no spatialization
-int C_SoundscapeSystem::AddLoopingAmbient( const char *pSoundName, float volume, int pitch )
+intp C_SoundscapeSystem::AddLoopingAmbient( const char *pSoundName, float volume, int pitch )
 {
 	return AddLoopingSound( pSoundName, true, volume, SNDLVL_NORM, pitch, vec3_origin );
 }
@@ -1093,7 +1093,7 @@ int C_SoundscapeSystem::AddLoopingAmbient( const char *pSoundName, float volume,
 // add a looping sound to the list
 // NOTE: will reuse existing entry (fade from current volume) if possible
 //		this prevents pops
-int C_SoundscapeSystem::AddLoopingSound( const char *pSoundName, bool isAmbient, float volume, soundlevel_t soundlevel, int pitch, const Vector &position )
+intp C_SoundscapeSystem::AddLoopingSound( const char *pSoundName, bool isAmbient, float volume, soundlevel_t soundlevel, int pitch, const Vector &position )
 {
 	loopingsound_t *pSoundSlot = NULL;
 	intp soundSlot = m_loopingSounds.Count() - 1;
@@ -1227,7 +1227,7 @@ void C_SoundscapeSystem::UpdateLoopingSound( loopingsound_t &loopSound )
 }
 
 // add a recurring random sound event
-int C_SoundscapeSystem::AddRandomSound( const randomsound_t &sound )
+intp C_SoundscapeSystem::AddRandomSound( const randomsound_t &sound )
 {
 	intp index = m_randomSounds.AddToTail( sound );
 	m_randomSounds[index].nextPlayTime = gpGlobals->curtime + 0.5f * RandomInterval( sound.time );

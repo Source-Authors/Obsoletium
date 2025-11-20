@@ -60,7 +60,7 @@ public:
 	
 protected:
 
-	// int GetNumTeams() { return m_iNumTeams; }
+	// intp GetNumTeams() { return m_iNumTeams; }
 	
 	// VGUI2 overrides
 	void ApplySchemeSettings(vgui::IScheme *pScheme) override;

@@ -37,7 +37,7 @@ public:
 	virtual int		Get_Ping( void );
 
 	// Player Handling
-	virtual int		Get_Number_Players( void );
+	virtual intp	Get_Number_Players( void );
 	virtual bool	ContainsPlayer( int iPlayerIndex );
 	C_BasePlayer*	GetPlayer( int idx );
 
@@ -82,6 +82,6 @@ C_Team *GetGlobalTeam( int iTeamNumber );
 C_Team *GetPlayersTeam( int iPlayerIndex );
 C_Team *GetPlayersTeam( C_BasePlayer *pPlayer );
 bool ArePlayersOnSameTeam( int iPlayerIndex1, int iPlayerIndex2 );
-extern int GetNumberOfTeams( void );
+extern intp GetNumberOfTeams( void );
 
 #endif // C_TEAM_H
