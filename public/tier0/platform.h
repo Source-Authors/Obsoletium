@@ -827,7 +827,7 @@ inline long BigLong( long val )
 	if constexpr (isLittleEndian)
 	{
 		// dimhotepus: Honor size ex for LP64.
-		if constexpr (sizeof(val) <= 4)
+		if constexpr (sizeof(val) <= 4) //-V112
 			return DWordSwap( val );
 		else
 			return QWordSwap( val );
@@ -879,7 +879,7 @@ inline long LittleLong( long val )
 	if constexpr (isLittleEndian)
 		return val;
 	// dimhotepus: Honor size ex for LP64.
-	else if constexpr (sizeof(val) <= 4)
+	else if constexpr (sizeof(val) <= 4) //-V112
 		return DWordSwap( val );
 	else
 		return QWordSwap( val );
