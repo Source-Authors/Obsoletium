@@ -74,8 +74,8 @@ public:
 	virtual void ApplySchemeSettings( vgui::IScheme *pScheme )
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
-
-		SetFont( pScheme->GetFont( "ConsoleText", false ) );
+		// dimhotepus: Scale UI.
+		SetFont( pScheme->GetFont( "ConsoleText", IsProportional() ) );
 		//SetBgColor( Color( 0, 0, 0, 175 ) );
 		SetPaintBackgroundEnabled( false );
 	}
@@ -563,11 +563,11 @@ void VGui_DrawHierarchy( void )
 
 void VGui_CreateDrawTreePanel( vgui::Panel *parent )
 {
-	int widths = 300;
-	
 	g_pDrawTreeFrame = vgui::SETUP_PANEL( new CDrawTreeFrame( parent, "DrawTreeFrame" ) );
 	g_pDrawTreeFrame->SetVisible( false );
-	g_pDrawTreeFrame->SetBounds( parent->GetWide() - widths, 0, widths, parent->GetTall() - 10 );
+	// dimhotepus: Scale UI.
+	int widths = QuickPropScalePanel( 300, g_pDrawTreeFrame );
+	g_pDrawTreeFrame->SetBounds( parent->GetWide() - widths, 0, widths, parent->GetTall() - QuickPropScalePanel( 10, g_pDrawTreeFrame ) );
 	
 	g_pDrawTreeFrame->MakePopup( false, false );
 	g_pDrawTreeFrame->SetKeyBoardInputEnabled( true );
