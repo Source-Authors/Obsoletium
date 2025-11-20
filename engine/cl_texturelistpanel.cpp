@@ -72,13 +72,15 @@
 // dimhotepus: Restrict to 0...1 range as bool.
 static ConVar mat_texture_list( "mat_texture_list", "0", FCVAR_CHEAT, "For debugging, show a list of used textures per frame", true, 0, true, 1 );
 
-static enum class TxListPanelRequest
+enum class TxListPanelRequest
 {
 	TXR_NONE,
 	TXR_SHOW,
 	TXR_RUNNING,
 	TXR_HIDE
-} s_eTxListPanelRequest = TxListPanelRequest::TXR_NONE;
+};
+
+static TxListPanelRequest s_eTxListPanelRequest = TxListPanelRequest::TXR_NONE;
 
 IVTex* VTex_Load( CSysModule** pModule );
 void VTex_Unload( CSysModule *pModule );
@@ -119,7 +121,6 @@ static int g_nSaveQueueState = std::numeric_limits<int>::min();
 
 namespace vgui
 {
-
 
 class TileViewPanelEx : public Panel
 {
@@ -266,13 +267,15 @@ void TileViewPanelEx::PerformLayout()
 	GetSize( wide, tall );
 	wide -= m_hbar->GetWide();
 
-	m_hbar->SetPos( wide - 2, 0 );
+	// dimhotepus: Scale UI.
+	m_hbar->SetPos( wide - QuickPropScale( 2 ), 0 );
 	m_hbar->SetTall( tall );
 	
 	if ( !numTiles )
 		return;
 
-	int wideItem = 1, tallItem = 1;
+	int wideItem, tallItem;
+	wideItem = tallItem = QuickPropScale( 1 );
 	GetTileSize( wideItem, tallItem );
 	if ( !wideItem || !tallItem )
 		return;
@@ -308,7 +311,7 @@ bool TileViewPanelEx::ComputeLayoutInfo()
 	GetSize( m_li_wide, m_li_tall );
 	m_li_wide -= m_hbar->GetWide();
 
-	m_li_wideItem = 1, m_li_tallItem = 1;
+	m_li_wideItem = QuickPropScale( 1 ), m_li_tallItem = QuickPropScale( 1 );
 	GetTileSize( m_li_wideItem, m_li_tallItem );
 	if ( !m_li_wideItem || !m_li_tallItem )
 		return false;
@@ -1041,8 +1044,8 @@ public:
 	void Close() override;
 
 public:
-	void SetDispInfo( KeyValues *kv, int iHint );
-	void GetDispInfo( KeyValues *&kv, int &iHint );
+	void SetDispInfo( KeyValues *kv, intp iHint );
+	void GetDispInfo( KeyValues *&kv, intp &iHint );
 
 public:
 	void Paint() override;
@@ -1072,7 +1075,7 @@ protected:
 	KeyValues			*m_pInfo;
 	CUtlBuffer			m_bufInfoText;
 	CUtlVector< UtlSymId_t > m_lstMaterials;
-	int					m_iInfoHint;
+	intp				m_iInfoHint;
 };
 
 CRenderTextureEditor::CRenderTextureEditor( vgui::Panel *parent, char const *szName ) :
@@ -1124,13 +1127,13 @@ CRenderTextureEditor::~CRenderTextureEditor()
 	SetDispInfo( nullptr, 0 );
 }
 
-void CRenderTextureEditor::GetDispInfo( KeyValues *&kv, int &iHint )
+void CRenderTextureEditor::GetDispInfo( KeyValues *&kv, intp &iHint )
 {
 	iHint = m_iInfoHint;
 	kv = m_pInfo;
 }
 
-void CRenderTextureEditor::SetDispInfo( KeyValues *kv, int iHint )
+void CRenderTextureEditor::SetDispInfo( KeyValues *kv, intp iHint )
 {
 	m_iInfoHint = iHint;
 
@@ -1274,27 +1277,27 @@ void CRenderTextureEditor::PerformLayout()
 {
 	BaseClass::PerformLayout();
 
-	int iRenderedHeight = 4 * TILE_BORDER + TILE_TEXT + TILE_SIZE;
+	int iRenderedHeight = 4 * QuickPropScale( TILE_BORDER ) + QuickPropScale( TILE_TEXT + TILE_SIZE );
 
-	SetSize( 4 * TILE_BORDER + TILE_SIZE,
-		iRenderedHeight + 90 + TILE_BORDER );
+	SetSize( 4 * QuickPropScale( TILE_BORDER ) + QuickPropScale( TILE_SIZE ),
+		iRenderedHeight + QuickPropScale( 90 + TILE_BORDER ) );
 	
-	m_pMaterials->SetPos( TILE_BORDER, iRenderedHeight + 2 );
-	m_pMaterials->SetSize( 2 * TILE_BORDER + TILE_SIZE, 90 );
+	m_pMaterials->SetPos( QuickPropScale( TILE_BORDER ), iRenderedHeight + QuickPropScale( 2 ) );
+	m_pMaterials->SetSize( 2 * QuickPropScale( TILE_BORDER ) + QuickPropScale( TILE_SIZE ), QuickPropScale( 90 ) );
 
-	m_pExplore->SetPos( 2 * TILE_BORDER + TILE_SIZE - 50, 2 * TILE_BORDER );
-	m_pExplore->SetWide( 50 );
+	m_pExplore->SetPos( 2 * QuickPropScale( TILE_BORDER ) + QuickPropScale( TILE_SIZE - 50 ), 2 * QuickPropScale( TILE_BORDER ) );
+	m_pExplore->SetWide( QuickPropScale( 50 ) );
 
-	m_pReload->SetPos( 2 * TILE_BORDER + TILE_SIZE - 50 - 65, 2 * TILE_BORDER );
-	m_pReload->SetWide( 60 );
+	m_pReload->SetPos( 2 * QuickPropScale( TILE_BORDER ) + QuickPropScale( TILE_SIZE - 50 - 65 ), 2 * QuickPropScale( TILE_BORDER ) );
+	m_pReload->SetWide( QuickPropScale( 60 ) );
 	m_pReload->SetVisible( m_lstMaterials.Count() > 0 );
 
-	m_pRebuild->SetPos( 2 * TILE_BORDER + TILE_SIZE - 50 - 65 - 95, 2 * TILE_BORDER );
-	m_pRebuild->SetWide( 90 );
+	m_pRebuild->SetPos( 2 * QuickPropScale( TILE_BORDER ) + QuickPropScale( TILE_SIZE - 50 - 65 - 95 ), 2 * QuickPropScale( TILE_BORDER ) );
+	m_pRebuild->SetWide( QuickPropScale( 90 ) );
 	m_pRebuild->SetVisible( m_lstMaterials.Count() > 0 );
 
-	m_pToggleNoMip->SetPos( 2 * TILE_BORDER + TILE_SIZE - 50 - 95, (2 * TILE_BORDER) + m_pReload->GetTall() + 1 );
-	m_pToggleNoMip->SetWide( 90 );
+	m_pToggleNoMip->SetPos( 2 * QuickPropScale( TILE_BORDER ) + QuickPropScale( TILE_SIZE - 50 - 95 ), 2 * QuickPropScale( TILE_BORDER ) + m_pReload->GetTall() + QuickPropScale( 1 ) );
+	m_pToggleNoMip->SetWide( QuickPropScale( 90 ) );
 	m_pToggleNoMip->SetVisible( m_lstMaterials.Count() > 0 );
 
 	m_pExplore->SetVisible( false );
@@ -1321,36 +1324,36 @@ void CRenderTextureEditor::PerformLayout()
 
 			int posX, posY;
 			m_pExplore->GetPos( posX, posY );
-			m_pSizeControls[0]->SetPos( posX, posY + m_pExplore->GetTall() + 1 );
+			m_pSizeControls[0]->SetPos( posX, posY + m_pExplore->GetTall() + QuickPropScale( 1 ) );
 			m_pSizeControls[0]->SetWide( m_pExplore->GetWide() / 2 );
-			m_pSizeControls[1]->SetPos( posX + m_pSizeControls[0]->GetWide() + 1, posY + m_pExplore->GetTall() + 1 );
-			m_pSizeControls[1]->SetWide( m_pExplore->GetWide() - ( m_pSizeControls[0]->GetWide() + 1 ) );
+			m_pSizeControls[1]->SetPos( posX + m_pSizeControls[0]->GetWide() + QuickPropScale( 1 ), posY + m_pExplore->GetTall() + QuickPropScale( 1 ) );
+			m_pSizeControls[1]->SetWide( m_pExplore->GetWide() - ( m_pSizeControls[0]->GetWide() + QuickPropScale( 1 ) ) );
 		}
 	}
 
 	{
 		int posX, posY;
 		m_pExplore->GetPos( posX, posY );
-		posY += m_pExplore->GetTall() * 2 + 2;
+		posY += m_pExplore->GetTall() * 2 + QuickPropScale( 2 );
 		posX += m_pExplore->GetWide();
 
-		posX -= 80;
+		posX -= QuickPropScale( 80 );
 		m_pSaveImg->SetPos( posX, posY );
-		m_pSaveImg->SetWide( 80 );
+		m_pSaveImg->SetWide( QuickPropScale( 80 ) );
 
 #ifndef POSIX
-		posX -= 80 + 5;
+		posX -= QuickPropScale( 80 + 5 );
 		m_pCopyImg->SetPos( posX, posY );
-		m_pCopyImg->SetWide( 80 );
+		m_pCopyImg->SetWide( QuickPropScale( 80 ) );
 #endif
 
-		posX -= 80 + 5;
+		posX -= QuickPropScale( 80 + 5 );
 		m_pCopyTxt->SetPos( posX, posY );
-		m_pCopyTxt->SetWide( 80 );
+		m_pCopyTxt->SetWide( QuickPropScale( 80 ) );
 
-		posX -= 95 + 5;
+		posX -= QuickPropScale( 95 + 5 );
 		m_pFlashBtn->SetPos( posX, posY );
-		m_pFlashBtn->SetWide( 95 );
+		m_pFlashBtn->SetWide( QuickPropScale( 95 ) );
 	}
 }
 
@@ -1647,7 +1650,7 @@ void CRenderTextureEditor::OnCommand( const char *command )
 			// dimhotepus: This can take a while, put up a waiting cursor.
 			const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
-		pIVTex->VTex( CubemapsFSFactory, pGameDir, iArg, argv );
+			pIVTex->VTex( CubemapsFSFactory, pGameDir, iArg, argv );
 		}
 
 		VTex_Unload( pModule );
@@ -1701,7 +1704,8 @@ void CRenderTextureEditor::Paint()
 	int iTxSize = kv->GetInt( KEYNAME_SIZE );
 	char const *szTxFormat = kv->GetString( KEYNAME_FORMAT );
 
-	int x = TILE_BORDER, y = TILE_BORDER;
+	int x, y;
+	x = y = QuickPropScale( TILE_BORDER );
 
 	// Dimensions to draw
 	int iDrawWidth = iTxWidth;
@@ -1709,63 +1713,64 @@ void CRenderTextureEditor::Paint()
 
 	if ( pMatTexture && pMatTexture->IsCubeMap() )
 	{
-		iDrawWidth = 1024;
-		iDrawHeight = 1024;
+		// dimhotepus: Clamp to screen.
+		iDrawWidth = MIN(videomode->GetModeStereoWidth(), static_cast<int>(XRES( 1024 )));
+		iDrawHeight = MIN(videomode->GetModeStereoHeight(), static_cast<int>(YRES( 1024 )));
 	}
 
 	if ( iDrawHeight >= iDrawWidth )
 	{
-		if ( iDrawHeight > TILE_TEXTURE_SIZE )
+		if ( iDrawHeight > QuickPropScale( TILE_TEXTURE_SIZE ) )
 		{
-			iDrawWidth = iDrawWidth * ( float( TILE_TEXTURE_SIZE ) / iDrawHeight );
-			iDrawHeight = TILE_TEXTURE_SIZE;
+			iDrawWidth = iDrawWidth * ( (float)QuickPropScale( TILE_TEXTURE_SIZE ) / iDrawHeight );
+			iDrawHeight = QuickPropScale( TILE_TEXTURE_SIZE );
 		}
 
-		if ( iDrawHeight < 64 )
+		if ( iDrawHeight < QuickPropScale( 64 ) )
 		{
-			iDrawWidth = iDrawWidth * ( float( 64 ) / iDrawHeight );
-			iDrawHeight = 64;
+			iDrawWidth = iDrawWidth * ( (float)QuickPropScale( 64 ) / iDrawHeight );
+			iDrawHeight = QuickPropScale( 64 );
 		}
 	}
 	else
 	{
-		if ( iDrawWidth > TILE_TEXTURE_SIZE )
+		if ( iDrawWidth > QuickPropScale( TILE_TEXTURE_SIZE ) )
 		{
-			iDrawHeight = iDrawHeight * ( float( TILE_TEXTURE_SIZE ) / iDrawWidth );
-			iDrawWidth = TILE_TEXTURE_SIZE;
+			iDrawHeight = iDrawHeight * ( (float)QuickPropScale( TILE_TEXTURE_SIZE ) / iDrawWidth );
+			iDrawWidth = QuickPropScale( TILE_TEXTURE_SIZE );
 		}
 
-		if ( iDrawWidth < 64 )
+		if ( iDrawWidth < QuickPropScale( 64 ) )
 		{
-			iDrawHeight = iDrawHeight * ( float( 64 ) / iDrawWidth );
-			iDrawWidth = 64;
+			iDrawHeight = iDrawHeight * ( (float)QuickPropScale( 64 ) / iDrawWidth );
+			iDrawWidth = QuickPropScale( 64 );
 		}
 	}
 
-	iDrawHeight = iDrawHeight / ( float( TILE_TEXTURE_SIZE ) / float( TILE_SIZE ) );
-	iDrawWidth = iDrawWidth / ( float( TILE_TEXTURE_SIZE ) / float( TILE_SIZE ) );
+	iDrawHeight = iDrawHeight / ( (float)QuickPropScale( TILE_TEXTURE_SIZE ) / QuickPropScale( TILE_SIZE ) );
+	iDrawWidth = iDrawWidth / ( (float)QuickPropScale( TILE_TEXTURE_SIZE ) / QuickPropScale( TILE_SIZE ) );
 
-	iDrawHeight = max( iDrawHeight, 4 );
-	iDrawWidth = max( iDrawWidth, 4 );
+	iDrawHeight = max( iDrawHeight, QuickPropScale( 4 ) );
+	iDrawWidth = max( iDrawWidth, QuickPropScale( 4 ) );
 
 	//
 	// Draw frame
 	//
 	{
-		int tileWidth = 2 * TILE_BORDER + TILE_SIZE;
-		int tileHeight = 3 * TILE_BORDER + TILE_SIZE + TILE_TEXT;
+		int tileWidth = 2 * QuickPropScale( TILE_BORDER ) + QuickPropScale( TILE_SIZE );
+		int tileHeight = 3 * QuickPropScale( TILE_BORDER ) + QuickPropScale( TILE_SIZE + TILE_TEXT );
 
 		g_pMatSystemSurface->DrawSetColor( 255, 255, 255, 255 );
-		g_pMatSystemSurface->DrawOutlinedRect( x + 1, y + 1,
-			x + tileWidth - 2 , y + tileHeight - 2 );
+		g_pMatSystemSurface->DrawOutlinedRect( x + QuickPropScale( 1 ), y + QuickPropScale( 1 ),
+			x + tileWidth - QuickPropScale( 2 ) , y + tileHeight - QuickPropScale( 2 ) );
 	}
 
 	//
 	// Draw all
 	//
 
-	x += TILE_BORDER;
-	y += TILE_BORDER;
+	x += QuickPropScale( TILE_BORDER );
+	y += QuickPropScale( TILE_BORDER );
 
 	char chResolveName[ 256 ] = {0}, chResolveNameArg[ 256 ] = {0};
 	V_sprintf_safe( chResolveNameArg, "materials/%s.vtf", szTextureFile );
@@ -1780,7 +1785,7 @@ void CRenderTextureEditor::Paint()
 	else
 		chSizeBuf[0] = '-';
 
-	g_pMatSystemSurface->DrawColoredTextRect( GetFont(), x, y, TILE_SIZE, TILE_TEXT / 2,
+	g_pMatSystemSurface->DrawColoredTextRect( GetFont(), x, y, QuickPropScale( TILE_SIZE ), QuickPropScale( TILE_TEXT / 2 ),
 		255, 255, 255, 255,
 		"%s%s\n"
 		"%s KiB    %dx%d    %s",
@@ -1810,19 +1815,17 @@ void CRenderTextureEditor::Paint()
 		// Line 1
 		//
 		if ( iTxSize > g_warn_texkbytes )
-			sprintf( chLine1 + strlen( chLine1 ), "  Size(%s KiB)", chSizeBuf );
-		if ( ( iTxWidth > g_warn_texdimensions ) ||
-			( iTxHeight > g_warn_texdimensions ) )
-			sprintf( chLine1 + strlen( chLine1 ), "  Dimensions(%dx%d)", iTxWidth, iTxHeight );
-		if ( stricmp( szTxFormat, "DXT1" ) &&
-			stricmp( szTxFormat, "DXT5" ) )
-			sprintf( chLine1 + strlen( chLine1 ), "  Format(%s)", szTxFormat );
+			V_sprintfcat_safe( chLine1, "  Size(%s KiB)", chSizeBuf );
+		if ( ( iTxWidth > g_warn_texdimensions ) ||	( iTxHeight > g_warn_texdimensions ) )
+			V_sprintfcat_safe( chLine1, "  Dimensions(%dx%d)", iTxWidth, iTxHeight );
+		if ( stricmp( szTxFormat, "DXT1" ) || stricmp( szTxFormat, "DXT5" ) )
+			V_sprintfcat_safe( chLine1, "  Format(%s)", szTxFormat );
 		if ( pMatTexture->GetFlags() & TEXTUREFLAGS_NOLOD )
-			sprintf( chLine1 + strlen( chLine1 ), "  NoLod" );
+			V_sprintfcat_safe( chLine1, "  NoLod" );
 		if ( pMatTexture->GetFlags() & TEXTUREFLAGS_NOMIP )
-			sprintf( chLine1 + strlen( chLine1 ), "  NoMip" );
+			V_sprintfcat_safe( chLine1, "  NoMip" );
 		if ( pMatTexture->GetFlags() & TEXTUREFLAGS_ONEBITALPHA )
-			sprintf( chLine1 + strlen( chLine1 ), "  OneBitAlpha" );
+			V_sprintfcat_safe( chLine1, "  OneBitAlpha" );
 
 		//
 		// Line 2
@@ -1840,7 +1843,7 @@ void CRenderTextureEditor::Paint()
 				mem = ( mem + 511 ) / 1024;
 				FmtCommaNumber( chbuf, mem );
 				
-				sprintf ( chLine2 + strlen( chLine2 ), "  %s KiB @ lower mip", chbuf );
+				V_sprintfcat_safe( chLine2, "  %s KiB @ lower mip", chbuf );
 			}
 
 			if ( wmap > wact || hmap > hact || dmap > dact )
@@ -1850,35 +1853,46 @@ void CRenderTextureEditor::Paint()
 				mem = ( mem + 511 ) / 1024;
 				FmtCommaNumber( chbuf, mem );
 
-				sprintf ( chLine2 + strlen( chLine2 ), "      %s KiB @ higher mip", chbuf );
+				V_sprintfcat_safe( chLine2, "      %s KiB @ higher mip", chbuf );
 			}
 		}
 
-		if ( chLine1[0] )
+		if ( !Q_isempty( chLine1 ) )
 		{
 			g_pMatSystemSurface->DrawSetColor( 200, 0, 0, 255 );
-			g_pMatSystemSurface->DrawFilledRect( x - TILE_BORDER/2, y + TILE_TEXT/2, x + TILE_BORDER/2 + (TILE_SIZE/2), y + TILE_TEXT/2 + TILE_TEXT/4 );
-			g_pMatSystemSurface->DrawColoredTextRect( GetFont(), x, y + TILE_TEXT/2, TILE_SIZE, TILE_TEXT / 4,
+			g_pMatSystemSurface->DrawFilledRect( x - QuickPropScale( TILE_BORDER/2 ),
+				y + QuickPropScale( TILE_TEXT/2 ),
+				x + QuickPropScale( TILE_BORDER/2 + TILE_SIZE/2 ),
+				y + QuickPropScale( TILE_TEXT/2 + TILE_TEXT/4 ) );
+			g_pMatSystemSurface->DrawColoredTextRect( GetFont(),
+				x,
+				QuickPropScale( y + TILE_TEXT/2 ),
+				QuickPropScale( TILE_SIZE ),
+				QuickPropScale( TILE_TEXT/4 ),
 				255, 255, 255, 255,
 				"%s", chLine1 );
 		}
-		if ( chLine2[0] )
+		if ( !Q_isempty( chLine2 ) )
 		{
 			// g_pMatSystemSurface->DrawSetColor( 200, 0, 0, 255 );
 			// g_pMatSystemSurface->DrawFilledRect( x - TILE_BORDER/2, y + TILE_TEXT/2 + TILE_TEXT/4, x + TILE_BORDER/2 + TILE_SIZE, y + TILE_TEXT );
-			g_pMatSystemSurface->DrawColoredTextRect( GetFont(), x, y + TILE_TEXT/2 + TILE_TEXT/4, TILE_SIZE, TILE_TEXT / 4,
+			g_pMatSystemSurface->DrawColoredTextRect( GetFont(),
+				x,
+				y + QuickPropScale( TILE_TEXT/2 + TILE_TEXT/4 ),
+				QuickPropScale( TILE_SIZE ),
+				QuickPropScale( TILE_TEXT/4 ),
 				255, 255, 255, 255,
 				"%s", chLine2 );
 		}
 	}
 
-	y += TILE_TEXT + TILE_BORDER;
+	y += QuickPropScale( TILE_TEXT + TILE_BORDER );
 
 	// Images placement
 	bool bHasAlpha = !!stricmp( szTxFormat, "DXT1" );
 
-	int extTxWidth = TILE_SIZE;
-	int extTxHeight = TILE_SIZE;
+	int extTxWidth = QuickPropScale( TILE_SIZE );
+	int extTxHeight = QuickPropScale( TILE_SIZE );
 
 	int orgTxX = 0, orgTxXA = 0;
 	int orgTxY = 0, orgTxYA = 0;
@@ -1888,19 +1902,19 @@ void CRenderTextureEditor::Paint()
 		if ( iTxWidth >= iTxHeight * 2 )
 		{
 			extTxHeight /= 2;
-			orgTxYA = extTxHeight + TILE_BORDER/2;
-			extTxHeight -= 1;
+			orgTxYA = extTxHeight + QuickPropScale( TILE_BORDER/2 );
+			extTxHeight -= QuickPropScale( 1 );
 		}
 		else if ( iTxHeight >= iTxWidth * 2 )
 		{
 			extTxWidth /= 2;
-			orgTxXA = extTxWidth + TILE_BORDER/2;
-			extTxWidth -= 3;
+			orgTxXA = extTxWidth + QuickPropScale( TILE_BORDER/2 );
+			extTxWidth -= QuickPropScale( 3 );
 		}
 		else
 		{
 			extTxHeight /= 2;
-			orgTxYA = extTxHeight + TILE_BORDER/2;
+			orgTxYA = extTxHeight + QuickPropScale( TILE_BORDER/2 );
 			orgTxX = extTxWidth / 4;
 			extTxWidth /= 2;
 
@@ -1909,8 +1923,8 @@ void CRenderTextureEditor::Paint()
 				iDrawWidth /= 2;
 				iDrawHeight /= 2;
 			}
-			extTxWidth -= 1;
-			extTxHeight -= 1;
+			extTxWidth -= QuickPropScale( 1 );
+			extTxHeight -= QuickPropScale( 1 );
 		}
 	}
 
@@ -1918,8 +1932,10 @@ void CRenderTextureEditor::Paint()
 	if ( IMaterial *pMaterial = UseDebugMaterial( "debug/debugtexturecolor", pMatTexture, &auto_matsysdebugmode ) )
 	{
 		g_pMatSystemSurface->DrawSetColor( 255, 255, 255, 255 );
-		g_pMatSystemSurface->DrawOutlinedRect( x + orgTxX + ( extTxWidth - iDrawWidth ) / 2 - IMG_FRAME_OFF, y + orgTxY + ( extTxHeight - iDrawHeight ) / 2 - IMG_FRAME_OFF,
-			x + orgTxX + ( extTxWidth + iDrawWidth ) / 2 + IMG_FRAME_OFF, y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 + IMG_FRAME_OFF );
+		g_pMatSystemSurface->DrawOutlinedRect( x + orgTxX + ( extTxWidth - iDrawWidth ) / 2 - QuickPropScale( IMG_FRAME_OFF ),
+			y + orgTxY + ( extTxHeight - iDrawHeight ) / 2 - QuickPropScale( IMG_FRAME_OFF ),
+			x + orgTxX + ( extTxWidth + iDrawWidth ) / 2 + QuickPropScale( IMG_FRAME_OFF ),
+			y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 + QuickPropScale( IMG_FRAME_OFF ) );
 		RenderTexturedRect( this, pMaterial,
 			x + orgTxX + ( extTxWidth - iDrawWidth ) / 2, y + orgTxY + ( extTxHeight - iDrawHeight ) / 2,
 			x + orgTxX + ( extTxWidth + iDrawWidth ) / 2, y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 );
@@ -1930,8 +1946,10 @@ void CRenderTextureEditor::Paint()
 			orgTxY += orgTxYA;
 			if ( IMaterial *pMaterialDebug = UseDebugMaterial( "debug/debugtexturealpha", pMatTexture, &auto_matsysdebugmode ) )
 			{
-				g_pMatSystemSurface->DrawOutlinedRect( x + orgTxX + ( extTxWidth - iDrawWidth ) / 2 - IMG_FRAME_OFF, y + orgTxY + ( extTxHeight - iDrawHeight ) / 2 - IMG_FRAME_OFF,
-					x + orgTxX + ( extTxWidth + iDrawWidth ) / 2 + IMG_FRAME_OFF, y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 + IMG_FRAME_OFF );
+				g_pMatSystemSurface->DrawOutlinedRect( x + orgTxX + ( extTxWidth - iDrawWidth ) / 2 - QuickPropScale( IMG_FRAME_OFF ),
+					y + orgTxY + ( extTxHeight - iDrawHeight ) / 2 - QuickPropScale( IMG_FRAME_OFF ),
+					x + orgTxX + ( extTxWidth + iDrawWidth ) / 2 + QuickPropScale( IMG_FRAME_OFF ),
+					y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 + QuickPropScale( IMG_FRAME_OFF ) );
 				RenderTexturedRect( this, pMaterialDebug,
 					x + orgTxX + ( extTxWidth - iDrawWidth ) / 2, y + orgTxY + ( extTxHeight - iDrawHeight ) / 2,
 					x + orgTxX + ( extTxWidth + iDrawWidth ) / 2, y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 );
@@ -2003,7 +2021,7 @@ CRenderTexturesListViewPanel::CRenderTexturesListViewPanel( vgui::Panel *parent,
 	m_bPaintAlpha( false )
 {
 	m_pRenderTxEditor = new CRenderTextureEditor( this, "TxEdt" );
-	m_pRenderTxEditor->SetPos( 10, 10 );
+	m_pRenderTxEditor->SetPos( QuickPropScale( 10 ), QuickPropScale( 10 ) );
 	m_pRenderTxEditor->PerformLayout();
 	m_pRenderTxEditor->SetMoveable( true );
 	m_pRenderTxEditor->SetSizeable( false );
@@ -2055,10 +2073,10 @@ void CRenderTexturesListViewPanel::OnMousePressed( vgui::MouseCode code )
 	// Display the tx editor
 	m_pRenderTxEditor->SetDispInfo( kv, itemId );
 	
-	if ( tileX + m_pRenderTxEditor->GetWide() > m_li_wide - 2 )
-		tileX -= tileX + m_pRenderTxEditor->GetWide() - ( m_li_wide - 2 );
-	if ( tileY + m_pRenderTxEditor->GetTall() > m_li_tall - 2 )
-		tileY -= tileY + m_pRenderTxEditor->GetTall() - ( m_li_tall - 2 );
+	if ( tileX + m_pRenderTxEditor->GetWide() > m_li_wide - QuickPropScale( 2 ) )
+		tileX -= tileX + m_pRenderTxEditor->GetWide() - ( m_li_wide - QuickPropScale( 2 ) );
+	if ( tileY + m_pRenderTxEditor->GetTall() > m_li_tall - QuickPropScale( 2 ) )
+		tileY -= tileY + m_pRenderTxEditor->GetTall() - ( m_li_tall - QuickPropScale( 2 ) );
 
 	int iTopLeftX = 0, iTopLeftY = 0;
 	for ( vgui::Panel *pPanel = this; ( pPanel = pPanel->GetParent() ) != nullptr; )
@@ -2082,8 +2100,8 @@ intp CRenderTexturesListViewPanel::GetNumTiles()
 
 void CRenderTexturesListViewPanel::GetTileSize( int &wide, int &tall )
 {
-	wide = 2 * TILE_BORDER + TILE_SIZE;
-	tall = 2 * TILE_BORDER + TILE_SIZE + TILE_TEXT;
+	wide = QuickPropScale( 2 * TILE_BORDER + TILE_SIZE );
+	tall = QuickPropScale( 2 * TILE_BORDER + TILE_SIZE + TILE_TEXT );
 };
 
 KeyValues * CRenderTexturesListViewPanel::GetTileData( int iTile )
@@ -2156,44 +2174,45 @@ fmtlenreduce:
 
 	if ( pMatTexture && pMatTexture->IsCubeMap() )
 	{
-		iDrawWidth = 1024;
-		iDrawHeight = 1024;
+		// dimhotepus: Clamp to screen.
+		iDrawWidth = MIN(videomode->GetModeStereoWidth(), static_cast<int>(XRES( 1024 )));
+		iDrawHeight = MIN(videomode->GetModeStereoHeight(), static_cast<int>(YRES( 1024 )));
 	}
 
 	if ( iDrawHeight >= iDrawWidth )
 	{
-		if ( iDrawHeight > TILE_TEXTURE_SIZE )
+		if ( iDrawHeight > QuickPropScale( TILE_TEXTURE_SIZE ) )
 		{
-			iDrawWidth = iDrawWidth * ( float( TILE_TEXTURE_SIZE ) / iDrawHeight );
-			iDrawHeight = TILE_TEXTURE_SIZE;
+			iDrawWidth = iDrawWidth * ( (float)QuickPropScale( TILE_TEXTURE_SIZE ) / iDrawHeight );
+			iDrawHeight = QuickPropScale( TILE_TEXTURE_SIZE );
 		}
 
-		if ( iDrawHeight < 64 )
+		if ( iDrawHeight < QuickPropScale( 64 ) )
 		{
-			iDrawWidth = iDrawWidth * ( float( 64 ) / iDrawHeight );
-			iDrawHeight = 64;
+			iDrawWidth = iDrawWidth * ( (float)QuickPropScale( 64 ) / iDrawHeight );
+			iDrawHeight = QuickPropScale( 64 );
 		}
 	}
 	else
 	{
-		if ( iDrawWidth > TILE_TEXTURE_SIZE )
+		if ( iDrawWidth > QuickPropScale( TILE_TEXTURE_SIZE ) )
 		{
-			iDrawHeight = iDrawHeight * ( float( TILE_TEXTURE_SIZE ) / iDrawWidth );
-			iDrawWidth = TILE_TEXTURE_SIZE;
+			iDrawHeight = iDrawHeight * ( (float)QuickPropScale( TILE_TEXTURE_SIZE ) / iDrawWidth );
+			iDrawWidth = QuickPropScale( TILE_TEXTURE_SIZE );
 		}
 
-		if ( iDrawWidth < 64 )
+		if ( iDrawWidth < QuickPropScale( 64 ) )
 		{
-			iDrawHeight = iDrawHeight * ( float( 64 ) / iDrawWidth );
-			iDrawWidth = 64;
+			iDrawHeight = iDrawHeight * ( (float)QuickPropScale( 64 ) / iDrawWidth );
+			iDrawWidth = QuickPropScale( 64 );
 		}
 	}
 
-	iDrawHeight = iDrawHeight / ( float( TILE_TEXTURE_SIZE ) / float( TILE_SIZE ) );
-	iDrawWidth = iDrawWidth / ( float( TILE_TEXTURE_SIZE ) / float( TILE_SIZE ) );
+	iDrawHeight = iDrawHeight / ( (float)QuickPropScale( TILE_TEXTURE_SIZE ) / QuickPropScale( TILE_SIZE ) );
+	iDrawWidth = iDrawWidth / ( (float)QuickPropScale( TILE_TEXTURE_SIZE ) / QuickPropScale( TILE_SIZE ) );
 
-	iDrawHeight = max( iDrawHeight, 4 );
-	iDrawWidth = max( iDrawWidth, 4 );
+	iDrawHeight = max( iDrawHeight, QuickPropScale( 4 ) );
+	iDrawWidth = max( iDrawWidth, QuickPropScale( 4 ) );
 
 	//
 	// Draw frame
@@ -2202,16 +2221,16 @@ fmtlenreduce:
 		int tileWidth, tileHeight;
 		GetTileSize( tileWidth, tileHeight );
 		g_pMatSystemSurface->DrawSetColor( 255, 255, 255, 255 );
-		g_pMatSystemSurface->DrawOutlinedRect( x + 1, y + 1,
-			x + tileWidth - 2 , y + tileHeight - 2 );
+		g_pMatSystemSurface->DrawOutlinedRect( x + QuickPropScale( 1 ), y + QuickPropScale( 1 ),
+			x + tileWidth - QuickPropScale( 2 ) , y + tileHeight - QuickPropScale( 2 ) );
 	}
 
 	//
 	// Draw all
 	//
 
-	x += TILE_BORDER;
-	y += TILE_BORDER/2;
+	x += QuickPropScale( TILE_BORDER );
+	y += QuickPropScale( TILE_BORDER/2 );
 
 	intp iLenFile = V_strlen( szTextureFile );
 	char const *szPrintFilePrefix = ( iLenFile > 22 ) ? "..." : "";
@@ -2232,7 +2251,10 @@ fmtlenreduce:
 	static Color clrLblError( 200, 0, 0, 255 );
 	bool bWarnTile = ( !kv->GetInt( "SpecialTx" ) ) && ( g_warn_enable && ShallWarnTx( kv, pMatTexture ) );
 	g_pMatSystemSurface->DrawSetColor( bWarnTile ? clrLblWarn : clrLblNormal );
-	g_pMatSystemSurface->DrawFilledRect( x - TILE_BORDER/2, y, x + TILE_BORDER/2 + TILE_SIZE, y + TILE_TEXT );
+	g_pMatSystemSurface->DrawFilledRect( x - QuickPropScale( TILE_BORDER/2 ),
+		y,
+		x + QuickPropScale( TILE_BORDER/2 + TILE_SIZE ),
+		y + QuickPropScale( TILE_TEXT ) );
 
 	char chInfoText[256] = { 0 };
 	V_sprintf_safe( chInfoText, "%s KiB  %dx%d  %.*s%s  %s",
@@ -2263,18 +2285,31 @@ fmtlenreduce:
 	{
 		g_pMatSystemSurface->DrawSetColor( clrLblError );
 		if ( iTxSize > g_warn_texkbytes )
-			g_pMatSystemSurface->DrawFilledRect( x - 2, y + iTextHeight + 1, x + iTextMargins[0] - 5, y + TILE_TEXT );
+			g_pMatSystemSurface->DrawFilledRect( x - QuickPropScale( 2 ),
+				y + iTextHeight + QuickPropScale( 1 ),
+				x + iTextMargins[0] - QuickPropScale( 5 ),
+				y + QuickPropScale( TILE_TEXT ) );
 		if ( iTxWidth > g_warn_texdimensions || iTxHeight > g_warn_texdimensions )
-			g_pMatSystemSurface->DrawFilledRect( x + iTextMargins[0] - 2, y + iTextHeight + 1, x + iTextMargins[1] - 1, y + TILE_TEXT );
+			g_pMatSystemSurface->DrawFilledRect( x + iTextMargins[0] - QuickPropScale( 2 ),
+				y + iTextHeight + QuickPropScale( 1 ),
+				x + iTextMargins[1] - QuickPropScale( 1 ),
+				y + QuickPropScale( TILE_TEXT ) );
 		if ( strcmp( szTxFormat, "DXT1" ) && strcmp( szTxFormat, "DXT5" ) )
-			g_pMatSystemSurface->DrawFilledRect( x + iTextMargins[1] + 2, y + iTextHeight + 1, x + iTextMargins[2] - 1, y + TILE_TEXT );
+			g_pMatSystemSurface->DrawFilledRect( x + iTextMargins[1] + QuickPropScale( 2 ),
+				y + iTextHeight + QuickPropScale( 1 ),
+				x + iTextMargins[2] - QuickPropScale( 1 ),
+				y + QuickPropScale( TILE_TEXT ) );
 		if ( pMatTexture->GetFlags() & (
 			TEXTUREFLAGS_NOLOD | TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_ONEBITALPHA
 			) )
-			g_pMatSystemSurface->DrawFilledRect( x + iTextMargins[2] + 3, y + iTextHeight + 1, x + iTextMargins[3] + 2, y + TILE_TEXT );
+			g_pMatSystemSurface->DrawFilledRect( x + iTextMargins[2] + QuickPropScale( 3 ),
+				y + iTextHeight + QuickPropScale( 1 ),
+				x + iTextMargins[3] + QuickPropScale( 2 ),
+				y + QuickPropScale( TILE_TEXT ) );
 	}
 
-	g_pMatSystemSurface->DrawColoredTextRect( GetFont(), x, y, TILE_SIZE, TILE_TEXT,
+	g_pMatSystemSurface->DrawColoredTextRect( GetFont(),
+		x, y, QuickPropScale( TILE_SIZE ), QuickPropScale( TILE_TEXT ),
 		255, 255, 255, 255,
 		"%s%s\n"
 		"%s",
@@ -2282,13 +2317,13 @@ fmtlenreduce:
 		chInfoText
 		);
 
-	y += TILE_TEXT + TILE_BORDER/2;
+	y += QuickPropScale( TILE_TEXT + TILE_BORDER/2 );
 
 	// Images placement
 	bool bHasAlpha = m_bPaintAlpha && stricmp( szTxFormat, "DXT1" );
 
-	int extTxWidth = TILE_SIZE;
-	int extTxHeight = TILE_SIZE;
+	int extTxWidth = QuickPropScale( TILE_SIZE );
+	int extTxHeight = QuickPropScale( TILE_SIZE );
 
 	int orgTxX = 0, orgTxXA = 0;
 	int orgTxY = 0, orgTxYA = 0;
@@ -2298,21 +2333,21 @@ fmtlenreduce:
 		if ( iTxWidth >= iTxHeight * 2 )
 		{
 			extTxHeight /= 2;
-			orgTxYA = extTxHeight + TILE_BORDER/2;
+			orgTxYA = extTxHeight + QuickPropScale( TILE_BORDER/2 );
 		}
 		else if ( iTxHeight >= iTxWidth * 2 )
 		{
 			extTxWidth /= 2;
-			orgTxXA = extTxWidth + TILE_BORDER/2;
-			x -= TILE_BORDER/4 + 1;
+			orgTxXA = extTxWidth + QuickPropScale( TILE_BORDER/2 );
+			x -= QuickPropScale( TILE_BORDER/4 + 1 );
 		}
 		else
 		{
 			extTxHeight /= 2;
-			orgTxYA = extTxHeight + TILE_BORDER/2;
+			orgTxYA = extTxHeight + QuickPropScale( TILE_BORDER/2 );
 			orgTxX = extTxWidth / 4;
 			extTxWidth /= 2;
-			x -= TILE_BORDER/4 + 1;
+			x -= QuickPropScale( TILE_BORDER/4 + 1 );
 
 			if ( iDrawWidth > extTxWidth )
 			{
@@ -2326,12 +2361,14 @@ fmtlenreduce:
 	if ( IMaterial *pMaterial = UseDebugMaterial( "debug/debugtexturecolor", pMatTexture, &auto_matsysdebugmode ) )
 	{
 		g_pMatSystemSurface->DrawSetColor( 255, 255, 255, 255 );
-		g_pMatSystemSurface->DrawOutlinedRect( x + orgTxX + ( extTxWidth - iDrawWidth ) / 2 - IMG_FRAME_OFF, y + orgTxY + ( extTxHeight - iDrawHeight ) / 2 - IMG_FRAME_OFF,
-			x + orgTxX + ( extTxWidth + iDrawWidth ) / 2 + IMG_FRAME_OFF, y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 + IMG_FRAME_OFF );
+		g_pMatSystemSurface->DrawOutlinedRect( x + orgTxX + ( extTxWidth - iDrawWidth ) / 2 - QuickPropScale( IMG_FRAME_OFF ),
+			y + orgTxY + ( extTxHeight - iDrawHeight ) / 2 - QuickPropScale( IMG_FRAME_OFF ),
+			x + orgTxX + ( extTxWidth + iDrawWidth ) / 2 + QuickPropScale( IMG_FRAME_OFF ),
+			y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 + QuickPropScale( IMG_FRAME_OFF ) );
 		RenderTexturedRect( this, pMaterial,
 			x + orgTxX + ( extTxWidth - iDrawWidth ) / 2, y + orgTxY + ( extTxHeight - iDrawHeight ) / 2,
 			x + orgTxX + ( extTxWidth + iDrawWidth ) / 2, y + orgTxY + ( extTxHeight + iDrawHeight ) / 2,
-			2, 1 );
+			QuickPropScale( 2 ), QuickPropScale( 1 ) );
 
 		if ( bHasAlpha )
 		{
@@ -2339,12 +2376,14 @@ fmtlenreduce:
 			orgTxY += orgTxYA;
 			if ( IMaterial *pMaterialDebug = UseDebugMaterial( "debug/debugtexturealpha", pMatTexture, &auto_matsysdebugmode ) )
 			{
-				g_pMatSystemSurface->DrawOutlinedRect( x + orgTxX + ( extTxWidth - iDrawWidth ) / 2 - IMG_FRAME_OFF, y + orgTxY + ( extTxHeight - iDrawHeight ) / 2 - IMG_FRAME_OFF,
-					x + orgTxX + ( extTxWidth + iDrawWidth ) / 2 + IMG_FRAME_OFF, y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 + IMG_FRAME_OFF );
+				g_pMatSystemSurface->DrawOutlinedRect( x + orgTxX + ( extTxWidth - iDrawWidth ) / 2 - QuickPropScale( IMG_FRAME_OFF ),
+					y + orgTxY + ( extTxHeight - iDrawHeight ) / 2 - QuickPropScale( IMG_FRAME_OFF ),
+					x + orgTxX + ( extTxWidth + iDrawWidth ) / 2 + QuickPropScale( IMG_FRAME_OFF ),
+					y + orgTxY + ( extTxHeight + iDrawHeight ) / 2 + QuickPropScale( IMG_FRAME_OFF ) );
 				RenderTexturedRect( this, pMaterialDebug,
 					x + orgTxX + ( extTxWidth - iDrawWidth ) / 2, y + orgTxY + ( extTxHeight - iDrawHeight ) / 2,
 					x + orgTxX + ( extTxWidth + iDrawWidth ) / 2, y + orgTxY + ( extTxHeight + iDrawHeight ) / 2,
-					2, 1 );
+					QuickPropScale( 2 ), QuickPropScale( 1 ) );
 			}
 		}
 	}
@@ -2399,7 +2438,7 @@ private:
 	void OnCommand( const char *command ) override;
 	MESSAGE_FUNC( OnTextChanged, "TextChanged" );
 
-	int AddListItem( KeyValues *kv );
+	intp AddListItem( KeyValues *kv );
 
 	bool UpdateDisplayedItem( KeyValues *pDispData, KeyValues *kv );
 
@@ -2484,10 +2523,11 @@ CTextureListPanel::CTextureListPanel( vgui::Panel *parent ) :
 {
 	// Need parent here, before loading up textures, so getSurfaceBase 
 	//  will work on this panel ( it's null otherwise )
-	SetSize( videomode->GetModeStereoWidth() - 20, videomode->GetModeStereoHeight() - 20 );
-	SetPos( 10, 10 );
+	// dimhotepus: Scale UI.
+	SetSize( videomode->GetModeStereoWidth() - QuickPropScale( 20 ), videomode->GetModeStereoHeight() - QuickPropScale( 20 ) );
+	SetPos( QuickPropScale( 10 ), QuickPropScale( 10 ) );
 	SetVisible( true );
-	SetCursor( 0 );
+	SetCursor( vgui::dc_user );
 
 	SetTitle( "Texture list", false );
 	SetMenuButtonVisible( false );
@@ -2593,17 +2633,18 @@ CTextureListPanel::CTextureListPanel( vgui::Panel *parent ) :
 	m_pListPanel->SetVisible( !mat_texture_list_view.GetBool() );
 	
 	int col = -1;
-	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_NAME, "Texture Name", 200, 100, 700, vgui::ListPanel::COLUMN_RESIZEWITHWINDOW );
-	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_PATH, "Path", 50, 50, 300, 0 );
-	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_SIZE, "Kilobytes", 50, 50, 50, 0 );
-		m_pListPanel->SetSortFunc( col, KilobytesSortFunc );
-		m_pListPanel->SetSortColumnEx( col, 0, true );	// advanced sorting setup
-	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_TEXTURE_GROUP, "Group", 100, 100, 300, 0 );
-	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_FORMAT, "Format", 250, 50, 300, 0 );
-	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_WIDTH, "Width", 50, 50, 50, 0 );
-	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_HEIGHT, "Height", 50, 50, 50, 0 );
-	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_BINDS_FRAME, "# Binds", 50, 50, 50, 0 );
-	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_BINDS_MAX, "BindsMax", 50, 50, 50, 0 );
+	// dimhotepus: Scale UI.
+	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_NAME, "Texture Name", QuickPropScale( 200 ), QuickPropScale( 100 ), QuickPropScale( 700 ), vgui::ListPanel::COLUMN_RESIZEWITHWINDOW );
+	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_PATH, "Path", QuickPropScale( 50 ), QuickPropScale( 50 ), QuickPropScale( 300 ), 0 );
+	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_SIZE, "Kilobytes", QuickPropScale( 50 ), QuickPropScale( 50 ), QuickPropScale( 50 ), 0 );
+	m_pListPanel->SetSortFunc( col, KilobytesSortFunc );
+	m_pListPanel->SetSortColumnEx( col, 0, true );	// advanced sorting setup
+	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_TEXTURE_GROUP, "Group", QuickPropScale( 100 ), QuickPropScale( 100 ), QuickPropScale( 300 ), 0 );
+	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_FORMAT, "Format", QuickPropScale( 250 ), QuickPropScale( 50 ), QuickPropScale( 300 ), 0 );
+	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_WIDTH, "Width", QuickPropScale( 50 ), QuickPropScale( 50 ), QuickPropScale( 50 ), 0 );
+	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_HEIGHT, "Height", QuickPropScale( 50 ), QuickPropScale( 50 ), QuickPropScale( 50 ), 0 );
+	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_BINDS_FRAME, "# Binds", QuickPropScale( 50 ), QuickPropScale( 50 ), QuickPropScale( 50 ), 0 );
+	m_pListPanel->AddColumnHeader( ++ col, KEYNAME_BINDS_MAX, "BindsMax", QuickPropScale( 50 ), QuickPropScale( 50 ), QuickPropScale( 50 ), 0 );
 
 	SetBgColor( Color( 0, 0, 0, 100 ) );
 
@@ -2659,8 +2700,8 @@ void CTextureListPanel::PerformLayout()
 	BaseClass::PerformLayout();
 
 	// Put the collapse button in the corner
-	m_pCollapse->SetPos( 2, 10 );
-	m_pCollapse->SetSize( 10, 10 );
+	m_pCollapse->SetPos( QuickPropScale( 2 ), QuickPropScale( 10 ) );
+	m_pCollapse->SetSize( QuickPropScale( 10 ), QuickPropScale( 10 ) );
 	m_pCollapse->SetVisible( true );
 
 	bool bCollapsed = m_pCollapse->IsSelected();
@@ -2696,28 +2737,28 @@ void CTextureListPanel::PerformLayout()
 	{
 		button->SetPos( x, yOffset );
 		button->SetWide( w/2 );
-		yOffset += button->GetTall();
+		yOffset += button->GetTall() + QuickPropScale( 2 );
 		button->SetVisible( !bCollapsed );
 
 		if ( button == m_pViewTextures )
 		{
-			m_pViewTextures->SetWide( 170 );
-			int accumw = 170;
+			m_pViewTextures->SetWide( QuickPropScale( 170 ) );
+			int accumw = QuickPropScale( 170 );
 			
-			m_pAlpha->SetPos( x + accumw + 5, yOffset - m_pViewTextures->GetTall() );
-			m_pAlpha->SetWide( (accumw += 85, 85) );
+			m_pAlpha->SetPos( x + accumw + QuickPropScale( 5 ), yOffset - m_pViewTextures->GetTall() );
+			m_pAlpha->SetWide( (accumw += QuickPropScale( 85 ), QuickPropScale( 85 )) );
 
-			m_pThumbWarnings->SetPos( x + accumw + 5, yOffset - m_pViewTextures->GetTall() );
-			m_pThumbWarnings->SetWide( (accumw += 85, 85) );
+			m_pThumbWarnings->SetPos( x + accumw + QuickPropScale( 5 ), yOffset - m_pViewTextures->GetTall() );
+			m_pThumbWarnings->SetWide( (accumw += QuickPropScale( 85 ), QuickPropScale( 85 )) );
 		}
 
 		if ( button == m_pFilteringChk )
 		{
-			m_pFilteringChk->SetWide( 60 );
-			int accumw = 60;
+			m_pFilteringChk->SetWide( QuickPropScale( 60 ) );
+			int accumw = QuickPropScale( 60 );
 
-			m_pFilteringText->SetPos( x + accumw + 5, yOffset - m_pFilteringChk->GetTall() );
-			m_pFilteringText->SetWide( ( accumw += 170, 170 ) );
+			m_pFilteringText->SetPos( x + accumw + QuickPropScale( 5 ), yOffset - m_pFilteringChk->GetTall() );
+			m_pFilteringText->SetWide( ( accumw += QuickPropScale( 170 ), QuickPropScale( 170 ) ) );
 			m_pFilteringText->SetTall( m_pFilteringChk->GetTall() );
 			m_pFilteringText->SetVisible( !bCollapsed );
 		}
@@ -2725,7 +2766,7 @@ void CTextureListPanel::PerformLayout()
 
 	if ( bCollapsed )
 	{
-		int xOffset = 85, iWidth;
+		int xOffset = QuickPropScale( 85 ), iWidth;
 
 		struct LayoutHorz_t
 		{
@@ -2734,28 +2775,28 @@ void CTextureListPanel::PerformLayout()
 		}
 		layout[] =
 		{
-			{ m_pTotalUsageLabel, 290 },
-			{ m_pViewTextures, 170 },
-			{ m_pAlpha, 60 },
-			{ m_pAllTextures, 135 },
-			{ m_pHideMipped, 100 },
-			{ m_pFilteringChk, 60 },
-			{ m_pFilteringText, 130 },
-			{ m_pReloadAllMaterialsButton, 130 },
-			{ m_pCommitChangesButton, 130 },
-			{ m_pDiscardChangesButton, 130 },
+			{ m_pTotalUsageLabel, QuickPropScale( 290 ) },
+			{ m_pViewTextures, QuickPropScale( 170 ) },
+			{ m_pAlpha, QuickPropScale( 60 ) },
+			{ m_pAllTextures, QuickPropScale( 135 ) },
+			{ m_pHideMipped, QuickPropScale( 100 ) },
+			{ m_pFilteringChk, QuickPropScale( 60 ) },
+			{ m_pFilteringText, QuickPropScale( 130 ) },
+			{ m_pReloadAllMaterialsButton, QuickPropScale( 130 ) },
+			{ m_pCommitChangesButton, QuickPropScale( 130 ) },
+			{ m_pDiscardChangesButton, QuickPropScale( 130 ) },
 		};
 
 		for ( auto &&l : layout )
 		{
-			l.pPanel->SetPos( xOffset, 2 );
+			l.pPanel->SetPos( xOffset, QuickPropScale( 2 ) );
 			iWidth = l.iWidth;
-			iWidth = min( w - xOffset - 30, iWidth );
+			iWidth = min( w - xOffset - QuickPropScale( 30 ), iWidth );
 			l.pPanel->SetWide( iWidth );
-			l.pPanel->SetVisible( iWidth > 50 );
+			l.pPanel->SetVisible( iWidth > QuickPropScale( 50 ) );
 			
-			if ( iWidth > 50 )
-				xOffset += iWidth + 5;
+			if ( iWidth > QuickPropScale( 50 ) )
+				xOffset += iWidth + QuickPropScale( 5 );
 		}
 
 		yOffset = y;
@@ -3018,9 +3059,9 @@ bool CTextureListPanel::UpdateDisplayedItem( KeyValues *pDispData, KeyValues *kv
 	return bUpdate;
 }
 
-int CTextureListPanel::AddListItem( KeyValues *kv )
+intp CTextureListPanel::AddListItem( KeyValues *kv )
 {
-	int iItem = m_pListPanel->GetItem( kv->GetString( KEYNAME_NAME ) );
+	intp iItem = m_pListPanel->GetItem( kv->GetString( KEYNAME_NAME ) );
 	if ( iItem == -1 )
 	{
 		// Set this so the GetItem() call above can use the key's name (as opposed to the value of its
@@ -3107,7 +3148,7 @@ void CTextureListPanel::Paint()
 		 pRte->IsVisible() )
 	{
 		KeyValues *kv = nullptr;
-		int iHint = 0;
+		intp iHint = 0;
 		pRte->GetDispInfo( kv, iHint );
 		if ( kv && iHint )
 		{
@@ -3208,7 +3249,7 @@ void CTextureListPanel::Paint()
 			}
 		}
 
-		int iItem = AddListItem( pCur );
+		intp iItem = AddListItem( pCur );
 
 		if ( iItem < itemsTouched.GetNumBits() )
 			itemsTouched.Set( iItem );
@@ -3293,6 +3334,9 @@ void CL_CreateTextureListPanel( vgui::Panel *parent )
 
 CON_COMMAND( mat_texture_save_fonts, "Save all font textures" )
 {
+	// dimhotepus: This can take a while, put up a waiting cursor.
+	const vgui::ScopedSurfaceWaitCursor scopedWaitCursor{vgui::surface()};
+
 	for( int i = 0; i < 8192; i++ )
 	{
 		char szTextureName[ MAX_PATH ];
