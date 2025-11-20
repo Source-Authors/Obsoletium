@@ -85,7 +85,7 @@ void CWeaponPortalgun::Spawn( void )
 	BaseClass::Spawn();
 
 	SetThink( &CWeaponPortalgun::Think );
-	SetNextThink( gpGlobals->curtime + 0.1 );
+	SetNextThink( gpGlobals->curtime + 0.1f );
 
 	if( GameRules()->IsMultiplayer() )
 	{

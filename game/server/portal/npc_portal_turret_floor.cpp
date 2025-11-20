@@ -1024,7 +1024,7 @@ void CNPC_Portal_FloorTurret::SearchThink( void )
 		if ( gpGlobals->curtime > m_flNextActivateSoundTime )
 		{
 			EmitSound( "NPC_FloorTurret.Activate" );
-			m_flNextActivateSoundTime = gpGlobals->curtime + 3.0;
+			m_flNextActivateSoundTime = gpGlobals->curtime + 3.0f;
 		}
 		return;
 	}
@@ -1263,7 +1263,7 @@ void CNPC_Portal_FloorTurret::DisabledThink( void )
 	LaserOff();
 	RopesOff();
 
-	SetNextThink( gpGlobals->curtime + 0.5 );
+	SetNextThink( gpGlobals->curtime + 0.5f );
 	if ( OnSide() )
 	{
 		m_OnTipped.FireOutput( this, this );

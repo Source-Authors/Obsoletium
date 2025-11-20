@@ -30,7 +30,7 @@
 
 #define	ROCKET_TURRET_RANGE		8192
 #define ROCKET_TURRET_EMITER_OFFSET 0.0
-#define ROCKET_TURRET_THINK_RATE 0.05
+#define ROCKET_TURRET_THINK_RATE 0.05f
 #define ROCKET_TURRET_DEATH_EFFECT_TIME 1.5f
 #define ROCKET_TURRET_LOCKON_TIME 2.0f
 #define ROCKET_TURRET_HALF_LOCKON_TIME 1.0f
@@ -1135,7 +1135,7 @@ void CNPC_RocketTurret::Enable( void )
 	ResetSequence( LookupSequence("open") );
 
 	SetThink( &CNPC_RocketTurret::OpeningThink );
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	SetNextThink( gpGlobals->curtime + 0.05f );
 }
 
 //-----------------------------------------------------------------------------
@@ -1152,7 +1152,7 @@ void CNPC_RocketTurret::Disable( void )
 	ResetSequence(LookupSequence("close"));
 
 	SetThink( &CNPC_RocketTurret::ClosingThink );
-	SetNextThink( gpGlobals->curtime + 0.05 );
+	SetNextThink( gpGlobals->curtime + 0.05f );
 	SetEnemy( NULL );
 }
 

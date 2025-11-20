@@ -727,7 +727,7 @@ void CNPC_SecurityCamera::ActiveThink( void )
 	Vector vForward, vRight, vUp;
 	GetVectors( &vForward, &vRight, &vUp );
 
-	vecAnglesToEnemy.x = acosf( vecDirToEnemyEyes.Dot( -vUp ) ) * ( 180.0f / M_PI );
+	vecAnglesToEnemy.x = acosf( vecDirToEnemyEyes.Dot( -vUp ) ) * ( 180.0f / M_PI_F );
 
 	Vector vProjectedDirToEnemyEyes = vecDirToEnemyEyes - vecDirToEnemyEyes.Dot( vUp ) * vUp;
 	VectorNormalize( vProjectedDirToEnemyEyes );
@@ -737,9 +737,9 @@ void CNPC_SecurityCamera::ActiveThink( void )
 	else
 	{
 		if ( vProjectedDirToEnemyEyes.Dot( vForward ) > 0.0f )
-			vecAnglesToEnemy.y = acosf( vProjectedDirToEnemyEyes.Dot( vRight ) ) * ( 180.0f / M_PI ) - 90.0f;
+			vecAnglesToEnemy.y = acosf( vProjectedDirToEnemyEyes.Dot( vRight ) ) * ( 180.0f / M_PI_F ) - 90.0f;
 		else
-			vecAnglesToEnemy.y = -acosf( vProjectedDirToEnemyEyes.Dot( vRight ) ) * ( 180.0f / M_PI ) - 90.0f;
+			vecAnglesToEnemy.y = -acosf( vProjectedDirToEnemyEyes.Dot( vRight ) ) * ( 180.0f / M_PI_F ) - 90.0f;
 	}
 
 	vecAnglesToEnemy.y = AngleNormalize( vecAnglesToEnemy.y );

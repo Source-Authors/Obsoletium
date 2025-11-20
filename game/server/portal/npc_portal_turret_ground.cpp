@@ -53,7 +53,7 @@ void CNPC_Portal_GroundTurret::Spawn( void )
 
 	SetBloodColor( DONT_BLEED );
 	m_iHealth			= 125;
-	m_flFieldOfView		= cos( ((m_fViewconeDegrees / 2.0f) * M_PI / 180.0f) );
+	m_flFieldOfView		= cos( ((m_fViewconeDegrees / 2.0f) * M_PI_F / 180.0f) );
 	m_NPCState			= NPC_STATE_NONE;
 
 	m_vecSpread.x = 0.5;
@@ -184,7 +184,7 @@ void CNPC_Portal_GroundTurret::Shoot()
 
 	EmitSound( "NPC_FloorTurret.ShotSounds" );
 
-	m_flTimeNextShoot = gpGlobals->curtime + 0.09;
+	m_flTimeNextShoot = gpGlobals->curtime + 0.09f;
 }
 
 void CNPC_Portal_GroundTurret::Scan( void )
