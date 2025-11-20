@@ -224,7 +224,8 @@ void CTextureBudgetPanel::PerformLayout()
 
 	m_pModeLabel->SetText( pStr );
 	int width = g_pMatSystemSurface->DrawTextLen( m_pModeLabel->GetFont(), "%s", pStr );
-	m_pModeLabel->SetSize( width + 10, m_pModeLabel->GetTall() );
+	// dimhotepus: Scale UI.
+	m_pModeLabel->SetSize( width + QuickPropScale( 10 ), m_pModeLabel->GetTall() );
 
 	int x, y;
 	GetPos( x, y );
