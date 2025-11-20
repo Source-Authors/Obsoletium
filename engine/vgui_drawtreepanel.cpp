@@ -14,7 +14,7 @@
 #include <vgui_controls/Button.h>
 #include <vgui/IInput.h>
 #include "../vgui2/src/VPanel.h"
-#include "convar.h"
+#include "tier1/convar.h"
 #include "tier0/vprof.h"
 #include "vgui_baseui_interface.h"
 #include "vgui_helpers.h"
@@ -289,7 +289,7 @@ public:
 		// you will sometimes end up on a different panel or on garbage.
 	}
 
-	virtual void OnThink() override
+	void OnThink() override
 	{
 		BaseClass::OnThink();
 
@@ -533,7 +533,8 @@ void VGui_FillKeyValues( KeyValues *pCurrentParent )
 		VGui_RecursivePrintTree( 
 			hBase, 
 			pCurrentParent,
-			99999 );
+			// dimhotepus: 99999 -> max.
+			std::numeric_limits<int>::max() );
 	}
 }
 
@@ -562,7 +563,7 @@ void VGui_DrawHierarchy( void )
 
 
 void VGui_CreateDrawTreePanel( vgui::Panel *parent )
-{
+{	
 	g_pDrawTreeFrame = vgui::SETUP_PANEL( new CDrawTreeFrame( parent, "DrawTreeFrame" ) );
 	g_pDrawTreeFrame->SetVisible( false );
 	// dimhotepus: Scale UI.
