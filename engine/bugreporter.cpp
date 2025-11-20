@@ -905,7 +905,8 @@ bool CBugUIPanel::Init()
 	V_to_chars(buffer, build_number());
 	m_pBuildNumber->SetText( buffer );
 
-	return false;
+	// dimhotepus: Return true if exit ok.
+	return true;
 }
 
 void CBugUIPanel::Shutdown()
@@ -2070,7 +2071,7 @@ void CBugUIPanel::OnSubmit()
 		{
 			void *mem = nullptr;
 			unsigned long len;
-
+			
 			// dimhotepus: This can take a while, put up a waiting cursor.
 			const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
