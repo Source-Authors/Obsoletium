@@ -1007,7 +1007,6 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 		bUsable[i] = FindAimPointThroughPortal( pPortals[ i ], &portalAimPoints[ i ] );
 		if ( 1 )
 		{
-			QAngle goalAngles;
 			Vector vecToEnemy = portalAimPoints[ i ] - EyePosition();
 			vecToEnemy.NormalizeInPlace();
 
@@ -1023,7 +1022,6 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 	float fHighestDot = -1.0;
 	if ( bConsiderNonPortalAimPoint )
 	{
-		QAngle enemyRotToFace;
 		Vector vecToEnemy = vAimPoint - EyePosition();
 		vecToEnemy.NormalizeInPlace();
 	

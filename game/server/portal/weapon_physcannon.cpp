@@ -2119,9 +2119,6 @@ void CWeaponPhysCannon::ApplyVelocityBasedForce( CBaseEntity *pEntity, const Vec
 	}
 	else
 	{
-		Vector	vTempVel;
-		AngularImpulse vTempAVel;
-
 		ragdoll_t *pRagdollPhys = pRagdoll->GetRagdoll( );
 		for ( int j = 0; j < pRagdollPhys->listCount; ++j )
 		{

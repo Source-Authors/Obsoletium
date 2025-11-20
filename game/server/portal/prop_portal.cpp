@@ -1699,8 +1699,6 @@ void CProp_Portal::ForceEntityToFitInPortalWall( CBaseEntity *pEntity )
 	GetVectors( &vPortalForward, NULL, NULL );
 	Vector ptProjectedEntityCenter = ptPortalCenter + ( vPortalForward * vPortalCenterToEntityCenter.Dot( vPortalForward ) );
 
-	Vector ptDest;
-
 	if ( m_PortalSimulator.IsReadyToSimulate() )
 	{
 		Ray_t ray;

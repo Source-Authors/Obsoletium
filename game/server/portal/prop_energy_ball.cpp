@@ -479,7 +479,6 @@ void CEnergyBallLauncher::SpawnBall()
 
 	pBall->SetRadius( m_flBallRadius );
 	Vector vecAbsOrigin = GetAbsOrigin();
-	Vector zaxis;
 
 	pBall->SetAbsOrigin( vecAbsOrigin );
 	pBall->SetSpawner( this );
