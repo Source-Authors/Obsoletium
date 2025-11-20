@@ -882,12 +882,14 @@ static bool SetBufferValue( INOUT_Z_CAP(nTxtFileBufferSize) char *chTxtFileBuffe
 
 	size_t nTxtFileBufferLen = strlen( chTxtFileBuffer );
 	size_t lenTmp = strlen( szNewValue );
+	// dimhotepus: Cache invariant out of loop.
+	size_t lenLookup = strlen( szLookupKey );
 
 	for ( char *pch = chTxtFileBuffer;
 		( nullptr != ( pch = strstr( pch, szLookupKey ) ) );
 		++ pch )
 	{
-		char *val = pch + strlen( szLookupKey );
+		char *val = pch + lenLookup;
 		if ( !IsSpaceOrQuote( *val ) )
 			continue;
 		else
