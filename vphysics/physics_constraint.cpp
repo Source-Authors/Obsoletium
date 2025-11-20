@@ -277,7 +277,7 @@ CPhysicsConstraintGroup::CPhysicsConstraintGroup( IVP_Environment *pEnvironment,
 	cs_bp.m_minErrorTicks = group.minErrorTicks;
 	cs_bp.m_errorTolerance = ConvertDistanceToIVP(group.errorTolerance);
 	m_pLCS = new hk_Local_Constraint_System( static_cast<hk_Environment *>(pEnvironment), &cs_bp );
-	m_pLCS->set_client_data( (void *)this );
+	m_pLCS->set_client_data( this );
 }
 
 enum vphysics_save_constrainttypes_t
@@ -730,7 +730,7 @@ void CPhysicsConstraint::InitRagdoll( IVP_Environment *pEnvironment, CPhysicsCon
 	{
 		m_HkLCS->activate();
 	}
-	m_HkConstraint->set_client_data( (void *)this );
+	m_HkConstraint->set_client_data( this );
 }
 
 // hinge constraint
@@ -786,7 +786,7 @@ void CPhysicsConstraint::InitHinge( IVP_Environment *pEnvironment, CPhysicsConst
 	{
 		m_HkLCS->activate();
 	}
-	m_HkConstraint->set_client_data( (void *)this );
+	m_HkConstraint->set_client_data( this );
 }
 
 
@@ -826,7 +826,7 @@ void CPhysicsConstraint::InitFixed( IVP_Environment *pEnvironment, CPhysicsConst
 	{
 		m_HkLCS->activate();
 	}
-	m_HkConstraint->set_client_data( (void *)this );
+	m_HkConstraint->set_client_data( this );
 }
 
 void CPhysicsConstraint::InitBallsocket( IVP_Environment *pEnvironment, CPhysicsConstraintGroup *constraint_group, const constraint_ballsocketparams_t &ballsocket )
@@ -869,7 +869,7 @@ void CPhysicsConstraint::InitBallsocket( IVP_Environment *pEnvironment, CPhysics
 	{
 		m_HkLCS->activate();
 	}
-	m_HkConstraint->set_client_data( (void *)this );
+	m_HkConstraint->set_client_data( this );
 }
 
 void CPhysicsConstraint::InitSliding( IVP_Environment *pEnvironment, CPhysicsConstraintGroup *constraint_group, const constraint_slidingparams_t &sliding )
@@ -932,7 +932,7 @@ void CPhysicsConstraint::InitSliding( IVP_Environment *pEnvironment, CPhysicsCon
 	{
 		m_HkLCS->activate();
 	}
-	m_HkConstraint->set_client_data( (void *)this );
+	m_HkConstraint->set_client_data( this );
 }
 
 void CPhysicsConstraint::InitPulley( IVP_Environment *pEnvironment, CPhysicsConstraintGroup *constraint_group, const constraint_pulleyparams_t &pulley )
@@ -983,7 +983,7 @@ void CPhysicsConstraint::InitPulley( IVP_Environment *pEnvironment, CPhysicsCons
 	{
 		m_HkLCS->activate();
 	}
-	m_HkConstraint->set_client_data( (void *)this );
+	m_HkConstraint->set_client_data( this );
 }
 
 
@@ -1030,7 +1030,7 @@ void CPhysicsConstraint::InitLength( IVP_Environment *pEnvironment, CPhysicsCons
 	{
 		m_HkLCS->activate();
 	}
-	m_HkConstraint->set_client_data( (void *)this );
+	m_HkConstraint->set_client_data( this );
 }
 
 // Serialization: Write out a description for this constraint

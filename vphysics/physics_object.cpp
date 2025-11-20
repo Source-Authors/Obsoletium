@@ -104,7 +104,7 @@ void CPhysicsObject::Init( const CPhysCollide *pCollisionModel, IVP_Real_Object 
 	m_pCollide = pCollisionModel;
 	m_materialIndex = materialIndex;
 	m_pObject = pObject;
-	pObject->client_data = (void *)this;
+	pObject->client_data = this;
 	m_pGameData = NULL;
 	m_gameFlags = 0;
 	m_gameIndex = 0;
