@@ -225,7 +225,7 @@ void CPhysicsShadowClone::FullSync( bool bAllowAssumedSync )
 
 				//if we don't do this, objects just fall out of the world (it happens, I swear)
 				
-				for( int i = m_CloneLinks.Count(); --i >= 0; )
+				for( intp i = m_CloneLinks.Count(); --i >= 0; )
 				{
 					if( (m_CloneLinks[i].pSource->GetShadowController() == NULL) && m_CloneLinks[i].pClone->IsMotionEnabled() )
 					{
@@ -636,7 +636,7 @@ void CPhysicsShadowClone::FullSyncClonedPhysicsObjects( bool bTeleport )
 
 	//copy the existing list of clone links to a temp array, we're going to be starting from scratch and copying links as we need them
 	PhysicsObjectCloneLink_t *pExistingLinks = NULL;
-	int iExistingLinkCount = m_CloneLinks.Count();
+	intp iExistingLinkCount = m_CloneLinks.Count();
 	if( iExistingLinkCount != 0 )
 	{
 		pExistingLinks = (PhysicsObjectCloneLink_t *)stackalloc( sizeof(PhysicsObjectCloneLink_t) * m_CloneLinks.Count() );
@@ -645,7 +645,7 @@ void CPhysicsShadowClone::FullSyncClonedPhysicsObjects( bool bTeleport )
 	m_CloneLinks.RemoveAll();
 
 	//now, go over the object list we just got from the source entity, and either copy or create links as necessary
-	int i;
+	intp i;
 	for( i = 0; i != iObjectCount; ++i )
 	{
 		IPhysicsObject *pSource = pSourceObjects[i];
@@ -742,7 +742,7 @@ void CPhysicsShadowClone::PartialSync( bool bPullChanges )
 		else
 			pTransform = &m_matrixShadowTransform;
 
-		for( int i = m_CloneLinks.Count(); --i >= 0; )
+		for( intp i = m_CloneLinks.Count(); --i >= 0; )
 			PartialSyncPhysicsObject( m_CloneLinks[i].pSource, m_CloneLinks[i].pClone, pTransform );
 	}
 	else
@@ -752,7 +752,7 @@ void CPhysicsShadowClone::PartialSync( bool bPullChanges )
 		else
 			pTransform = &m_matrixShadowTransform_Inverse;
 
-		for( int i = m_CloneLinks.Count(); --i >= 0; )
+		for( intp i = m_CloneLinks.Count(); --i >= 0; )
 			PartialSyncPhysicsObject( m_CloneLinks[i].pClone, m_CloneLinks[i].pSource, pTransform );
 	}
 
@@ -763,11 +763,11 @@ void CPhysicsShadowClone::PartialSync( bool bPullChanges )
 
 int CPhysicsShadowClone::VPhysicsGetObjectList( IPhysicsObject **pList, int listMax )
 {
-	int iCountStop = m_CloneLinks.Count();
+	intp iCountStop = m_CloneLinks.Count();
 	if( iCountStop > listMax ) 
 		iCountStop = listMax;
 
-	for( int i = 0; i != iCountStop; ++i, ++pList )
+	for( intp i = 0; i != iCountStop; ++i, ++pList )
 		*pList = m_CloneLinks[i].pClone;
 
 	return iCountStop;
@@ -778,7 +778,7 @@ void CPhysicsShadowClone::VPhysicsDestroyObject( void )
 {
 	VPhysicsSetObject( NULL );
 	
-	for( int i = m_CloneLinks.Count(); --i >= 0; )
+	for( intp i = m_CloneLinks.Count(); --i >= 0; )
 	{
 		Assert( m_CloneLinks[i].pClone != NULL );
 		m_pOwnerPhysEnvironment->DestroyObject(	m_CloneLinks[i].pClone );
@@ -1010,7 +1010,7 @@ void CPhysicsShadowClone::Free( void )
 
 void CPhysicsShadowClone::FullSyncAllClones( void )
 {
-	for( int i = s_ActiveShadowClones.Count(); --i >= 0; )
+	for( intp i = s_ActiveShadowClones.Count(); --i >= 0; )
 	{
 		s_ActiveShadowClones[i]->FullSync( true );
 	}
@@ -1021,7 +1021,7 @@ IPhysicsObject *CPhysicsShadowClone::TranslatePhysicsToClonedEnt( const IPhysics
 {
 	if( m_hClonedEntity.Get() != NULL )
 	{
-		for( int i = m_CloneLinks.Count(); --i >= 0; )
+		for( intp i = m_CloneLinks.Count(); --i >= 0; )
 		{
 			if( m_CloneLinks[i].pClone == pPhysics )
 				return m_CloneLinks[i].pSource;
