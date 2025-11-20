@@ -1846,12 +1846,12 @@ void CProp_Portal::UpdatePortalLinkage( void )
 				pLink = NULL;
 			}
 
-			int iPortalCount = s_PortalLinkageGroups[m_iLinkageGroupID].Count();
+			intp iPortalCount = s_PortalLinkageGroups[m_iLinkageGroupID].Count();
 
 			if( iPortalCount != 0 )
 			{
 				CProp_Portal **pPortals = s_PortalLinkageGroups[m_iLinkageGroupID].Base();
-				for( int i = 0; i != iPortalCount; ++i )
+				for( intp i = 0; i != iPortalCount; ++i )
 				{
 					CProp_Portal *pCurrentPortal = pPortals[i];
 					if( pCurrentPortal == this )
@@ -2221,21 +2221,27 @@ void CProp_Portal::InputNewLocation( inputdata_t &inputdata )
 
 	// first 3 are location of new origin
 	Vector vNewOrigin;
-	char* pTok = strtok( sLocationStats, " " ); 
-	vNewOrigin.x = atof(pTok);
+	char* pTok = strtok( sLocationStats, " " );
+	// dimhotepus: atof -> strtof
+	vNewOrigin.x = strtof(pTok, nullptr);
 	pTok = strtok( NULL, " " );
-	vNewOrigin.y = atof(pTok);
+	// dimhotepus: atof -> strtof
+	vNewOrigin.y = strtof(pTok, nullptr);
 	pTok = strtok( NULL, " " );
-	vNewOrigin.z = atof(pTok);
+	// dimhotepus: atof -> strtof
+	vNewOrigin.z = strtof(pTok, nullptr);
 
 	// Next 3 entries are new angles
 	QAngle vNewAngles;
 	pTok = strtok( NULL, " " );
-	vNewAngles.x = atof(pTok);
+	// dimhotepus: atof -> strtof
+	vNewAngles.x = strtof(pTok, nullptr);
 	pTok = strtok( NULL, " " );
-	vNewAngles.y = atof(pTok);
+	// dimhotepus: atof -> strtof
+	vNewAngles.y = strtof(pTok, nullptr);
 	pTok = strtok( NULL, " " );
-	vNewAngles.z = atof(pTok);
+	// dimhotepus: atof -> strtof
+	vNewAngles.z = strtof(pTok, nullptr);
 
 	// Call main placement function (skipping placement rules)
 	NewLocation( vNewOrigin, vNewAngles );
@@ -2273,13 +2279,13 @@ void CProp_Portal::ChangeLinkageGroup( unsigned char iLinkageGroupID )
 
 CProp_Portal *CProp_Portal::FindPortal( unsigned char iLinkageGroupID, bool bPortal2, bool bCreateIfNothingFound /*= false*/ )
 {
-	int iPortalCount = s_PortalLinkageGroups[iLinkageGroupID].Count();
+	intp iPortalCount = s_PortalLinkageGroups[iLinkageGroupID].Count();
 
 	if( iPortalCount != 0 )
 	{
 		CProp_Portal *pFoundInactive = NULL;
 		CProp_Portal **pPortals = s_PortalLinkageGroups[iLinkageGroupID].Base();
-		for( int i = 0; i != iPortalCount; ++i )
+		for( intp i = 0; i != iPortalCount; ++i )
 		{
 			if( pPortals[i]->m_bIsPortal2 == bPortal2 )
 			{

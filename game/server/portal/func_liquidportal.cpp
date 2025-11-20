@@ -79,7 +79,7 @@ void CFunc_LiquidPortal::Activate( void )
 
 	SetThink( &CFunc_LiquidPortal::Think );
 
-	for( int i = m_hLeftToTeleportThisFill.Count(); --i >= 0; )
+	for( intp i = m_hLeftToTeleportThisFill.Count(); --i >= 0; )
 	{
 		CBaseEntity *pEnt = m_hLeftToTeleportThisFill[i].Get();
 
@@ -183,7 +183,7 @@ void CFunc_LiquidPortal::InputAddActivatorToTeleportList( inputdata_t &inputdata
 	if( inputdata.pActivator == NULL )
 		return;
 
-	for( int i = m_hTeleportList.Count(); --i >= 0; )
+	for( intp i = m_hTeleportList.Count(); --i >= 0; )
 	{
 		if( m_hTeleportList[i].Get() == inputdata.pActivator )
 			return; //only have 1 reference of each entity
@@ -202,7 +202,7 @@ void CFunc_LiquidPortal::InputRemoveActivatorFromTeleportList( inputdata_t &inpu
 	if( inputdata.pActivator == NULL )
 		return;
 
-	for( int i = m_hTeleportList.Count(); --i >= 0; )
+	for( intp i = m_hTeleportList.Count(); --i >= 0; )
 	{
 		if( m_hTeleportList[i].Get() == inputdata.pActivator )
 		{
@@ -214,7 +214,7 @@ void CFunc_LiquidPortal::InputRemoveActivatorFromTeleportList( inputdata_t &inpu
 			if( m_bFillInProgress )
 			{
 				//remove from the list for this fill as well
-				for( int j = m_hLeftToTeleportThisFill.Count(); --j >= 0; )
+				for( intp j = m_hLeftToTeleportThisFill.Count(); --j >= 0; )
 				{
 					if( m_hLeftToTeleportThisFill[j].Get() == inputdata.pActivator )
 					{
@@ -307,7 +307,7 @@ void CFunc_LiquidPortal::Think( void )
 			GetCollideable()->WorldSpaceSurroundingBounds( &vMins, &vMaxs );
 			vMaxs.z = vMins.z + ((vMaxs.z - vMins.z) * fInterp);
 
-			for( int i = m_hLeftToTeleportThisFill.Count(); --i >= 0; )
+			for( intp i = m_hLeftToTeleportThisFill.Count(); --i >= 0; )
 			{
 				CBaseEntity *pEntity = m_hLeftToTeleportThisFill[i].Get();
 				if( pEntity == NULL )
@@ -328,7 +328,7 @@ void CFunc_LiquidPortal::Think( void )
 		else
 		{
 			//teleport everything that's left in the list
-			for( int i = m_hLeftToTeleportThisFill.Count(); --i >= 0; )
+			for( intp i = m_hLeftToTeleportThisFill.Count(); --i >= 0; )
 			{
 				TeleportImmersedEntity( m_hLeftToTeleportThisFill[i].Get() );
 			}

@@ -124,11 +124,11 @@ void CFuncPortalOrientation::OnActivate( void )
 	if ( !GetCollideable() || m_bDisabled )
 		return;
 
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	intp iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount != 0 )
 	{
 		CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
-		for( int i = 0; i != iPortalCount; ++i )
+		for( intp i = 0; i != iPortalCount; ++i )
 		{
 			CProp_Portal *pTempPortal = pPortals[i];
 			if( IsOBBIntersectingOBB( pTempPortal->GetAbsOrigin(), pTempPortal->GetAbsAngles(), CProp_Portal_Shared::vLocalMins, CProp_Portal_Shared::vLocalMaxs, 

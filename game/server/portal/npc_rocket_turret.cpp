@@ -974,7 +974,7 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 	}
 	Vector vAimPoint = pTarget->GetAbsOrigin() + (pTarget->WorldAlignMins() + pTarget->WorldAlignMaxs()) * 0.5f;
 
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	intp iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
 	{
 		*pOutVec = vAimPoint;
@@ -991,7 +991,7 @@ bool CNPC_RocketTurret::TestPortalsForLOS( Vector* pOutVec, bool bConsiderNonPor
 	float *fPortalDot = (float *)stackalloc( sizeof( float ) * iPortalCount );
 
 	// Test through any active portals: This may be a shorter distance to the target
-	for( int i = 0; i != iPortalCount; ++i )
+	for( intp i = 0; i != iPortalCount; ++i )
 	{
 		CProp_Portal *pTempPortal = pPortals[i];
 

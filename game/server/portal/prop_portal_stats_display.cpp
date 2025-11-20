@@ -139,7 +139,7 @@ END_SEND_TABLE()
 
 CPropPortalStatsDisplay::~CPropPortalStatsDisplay()
 {
-	int i;
+	intp i;
 	// Kill the control panels
 	for ( i = m_hScreens.Count(); --i >= 0; )
 	{
@@ -405,7 +405,7 @@ void CPropPortalStatsDisplay::SpawnControlPanels()
 		pScreen->SetActive( true );
 		pScreen->MakeVisibleOnlyToTeammates( false );
 		pScreen->SetTransparency( true );
-		int nScreen = m_hScreens.AddToTail( );
+		intp nScreen = m_hScreens.AddToTail( );
 		m_hScreens[nScreen].Set( pScreen );	
 	}
 }
@@ -471,7 +471,7 @@ void CPropPortalStatsDisplay::RestoreControlPanels( void )
 
 		if ( pScreen )
 		{
-			int nScreen = m_hScreens.AddToTail( );
+			intp nScreen = m_hScreens.AddToTail( );
 			m_hScreens[nScreen].Set( pScreen );	
 		}
 	}

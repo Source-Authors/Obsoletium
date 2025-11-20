@@ -89,9 +89,8 @@ END_SEND_TABLE()
 
 CNeurotoxinCountdown::~CNeurotoxinCountdown()
 {
-	int i;
 	// Kill the control panels
-	for ( i = m_hScreens.Count(); --i >= 0; )
+	for ( intp i = m_hScreens.Count(); --i >= 0; )
 	{
 		DestroyVGuiScreen( m_hScreens[i].Get() );
 	}
@@ -265,7 +264,7 @@ void CNeurotoxinCountdown::SpawnControlPanels()
 		pScreen->SetActive( true );
 		pScreen->MakeVisibleOnlyToTeammates( false );
 		pScreen->SetTransparency( true );
-		int nScreen = m_hScreens.AddToTail( );
+		intp nScreen = m_hScreens.AddToTail( );
 		m_hScreens[nScreen].Set( pScreen );
 
 		return;
@@ -296,7 +295,7 @@ void CNeurotoxinCountdown::RestoreControlPanels( void )
 
 		if ( pScreen )
 		{
-			int nScreen = m_hScreens.AddToTail( );
+			intp nScreen = m_hScreens.AddToTail( );
 			m_hScreens[nScreen].Set( pScreen );
 			pScreen->SetActive( true );
 		}

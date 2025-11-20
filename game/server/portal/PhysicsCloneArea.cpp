@@ -115,7 +115,7 @@ void CPhysicsCloneArea::UpdatePosition( void )
 			TouchingEnts.AddToTail( link->entityTouched );
 
 
-		for( int i = TouchingEnts.Count(); --i >= 0; )
+		for( intp i = TouchingEnts.Count(); --i >= 0; )
 		{
 			CBaseEntity *pTouch = TouchingEnts[i];
 

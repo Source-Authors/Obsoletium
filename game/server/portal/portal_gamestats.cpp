@@ -15,12 +15,12 @@
 
 #define PORTALSTATS_PREPCHUNK( structType, bufName, SizePositionVarNameToUse )\
 	SaveBuffer.PutUnsignedShort( structType::CHUNKID );\
-	int SizePositionVarNameToUse = bufName.TellPut();\
+	intp SizePositionVarNameToUse = bufName.TellPut();\
 	bufName.PutUnsignedInt( 0 );
 
 #define PORTALSTATS_WRITECHUNKSIZE( bufName, SizePositionVariable ) \
 {\
-	int SizePositionVariable ## _askdjbhas = bufName.TellPut() - SizePositionVariable;\
+	intp SizePositionVariable ## _askdjbhas = bufName.TellPut() - SizePositionVariable;\
 	bufName.SeekPut( CUtlBuffer::SEEK_HEAD, SizePositionVariable );\
 	bufName.PutUnsignedInt( SizePositionVariable ## _askdjbhas );\
 	bufName.SeekPut( CUtlBuffer::SEEK_TAIL, 0 );\
@@ -73,9 +73,9 @@ void Portal_Gamestats_LevelStats_t::AppendSubChunksToBuffer( CUtlBuffer &SaveBuf
 		PORTALSTATS_TRIMEVENT( m_pDeaths, PlayerDeaths_t );
 		PORTALSTATS_PREPCHUNK( PlayerDeaths_t, SaveBuffer, iSubChunkSizePosition );
 
-		int iDeathStatsCount = m_pDeaths->Count();
+		intp iDeathStatsCount = m_pDeaths->Count();
 		SaveBuffer.PutUnsignedInt( iDeathStatsCount );
-		for( int i = 0; i != iDeathStatsCount; ++i )
+		for( intp i = 0; i != iDeathStatsCount; ++i )
 		{
 			PlayerDeaths_t &DeathStat = m_pDeaths->Element( i );
 			
@@ -94,9 +94,9 @@ void Portal_Gamestats_LevelStats_t::AppendSubChunksToBuffer( CUtlBuffer &SaveBuf
 		PORTALSTATS_TRIMEVENT( m_pPlacements, PortalPlacement_t );
 		PORTALSTATS_PREPCHUNK( PortalPlacement_t, SaveBuffer, iSubChunkSizePosition );
 
-		int iPlacementStatsCount = m_pPlacements->Count();
+		intp iPlacementStatsCount = m_pPlacements->Count();
 		SaveBuffer.PutUnsignedInt( iPlacementStatsCount );
-		for( int i = 0; i != iPlacementStatsCount; ++i )
+		for( intp i = 0; i != iPlacementStatsCount; ++i )
 		{
 			PortalPlacement_t &PortalPlacementStat = m_pPlacements->Element( i );
 
@@ -119,9 +119,9 @@ void Portal_Gamestats_LevelStats_t::AppendSubChunksToBuffer( CUtlBuffer &SaveBuf
 		PORTALSTATS_TRIMEVENT( m_pUseEvents, PlayerUse_t );
 		PORTALSTATS_PREPCHUNK( PlayerUse_t, SaveBuffer, iSubChunkSizePosition );
 
-		int iUseEventCount = m_pUseEvents->Count();
+		intp iUseEventCount = m_pUseEvents->Count();
 		SaveBuffer.PutUnsignedInt( iUseEventCount );
-		for( int i = 0; i != iUseEventCount; ++i )
+		for( intp i = 0; i != iUseEventCount; ++i )
 		{
 			PlayerUse_t &UseEvent = m_pUseEvents->Element( i );
 
@@ -144,9 +144,9 @@ void Portal_Gamestats_LevelStats_t::AppendSubChunksToBuffer( CUtlBuffer &SaveBuf
 		PORTALSTATS_TRIMEVENT( m_pStuckSpots, StuckEvent_t );
 		PORTALSTATS_PREPCHUNK( StuckEvent_t, SaveBuffer, iSubChunkSizePosition );
 
-		int iStuckStatsCount = m_pStuckSpots->Count();
+		intp iStuckStatsCount = m_pStuckSpots->Count();
 		SaveBuffer.PutUnsignedInt( iStuckStatsCount );
-		for( int i = 0; i != iStuckStatsCount; ++i )
+		for( intp i = 0; i != iStuckStatsCount; ++i )
 		{
 			StuckEvent_t &StuckStat = m_pStuckSpots->Element( i );
 
@@ -176,9 +176,9 @@ void Portal_Gamestats_LevelStats_t::AppendSubChunksToBuffer( CUtlBuffer &SaveBuf
 		PORTALSTATS_TRIMEVENT( m_pJumps, JumpEvent_t );
 		PORTALSTATS_PREPCHUNK( JumpEvent_t, SaveBuffer, iSubChunkSizePosition );
 
-		int iJumpStatsCount = m_pJumps->Count();
+		intp iJumpStatsCount = m_pJumps->Count();
 		SaveBuffer.PutUnsignedInt( iJumpStatsCount );
-		for( int i = 0; i != iJumpStatsCount; ++i )
+		for( intp i = 0; i != iJumpStatsCount; ++i )
 		{
 			JumpEvent_t &JumpStat = m_pJumps->Element( i );
 
@@ -199,9 +199,9 @@ void Portal_Gamestats_LevelStats_t::AppendSubChunksToBuffer( CUtlBuffer &SaveBuf
 		PORTALSTATS_TRIMEVENT( m_pTimeSpentInVisLeafs, LeafTimes_t );
 		PORTALSTATS_PREPCHUNK( LeafTimes_t, SaveBuffer, iSubChunkSizePosition );
 
-		int iLeafTimeStatsCount = m_pTimeSpentInVisLeafs->Count();
+		intp iLeafTimeStatsCount = m_pTimeSpentInVisLeafs->Count();
 		SaveBuffer.PutUnsignedInt( iLeafTimeStatsCount );
-		for( int i = 0; i != iLeafTimeStatsCount; ++i )
+		for( intp i = 0; i != iLeafTimeStatsCount; ++i )
 		{
 			LeafTimes_t &LeafTimeStat = m_pTimeSpentInVisLeafs->Element( i );
 
@@ -438,7 +438,7 @@ void CPortalGameStats::LoadCustomDataFromBuffer( CUtlBuffer &LoadBuffer )
 	LoadBuffer.GetUnsignedShort(); //don't really need the version
 #endif
 
-	int iEndPosition = LoadBuffer.TellPut();
+	intp iEndPosition = LoadBuffer.TellPut();
 
 	while( LoadBuffer.TellGet() != iEndPosition )
 	{
@@ -599,7 +599,7 @@ void CPortalGameStats::Event_MapChange( const char *szOldMapName, const char *sz
 
 void CPortalGameStats::Clear( void )
 {
-	for( int i =  m_CustomMapStats.First(); i != m_CustomMapStats.InvalidIndex(); i =  m_CustomMapStats.Next( i ) )
+	for( auto i =  m_CustomMapStats.First(); i != m_CustomMapStats.InvalidIndex(); i =  m_CustomMapStats.Next( i ) )
 	{
 		DestroyLevelStatPointers( &m_CustomMapStats[i] );
 	}
@@ -609,7 +609,7 @@ void CPortalGameStats::Clear( void )
 
 Portal_Gamestats_LevelStats_t *CPortalGameStats::FindOrAddMapStats( const char *szMapName )
 {
-	int idx = m_CustomMapStats.Find( szMapName );
+	auto idx = m_CustomMapStats.Find( szMapName );
 	if( idx == m_CustomMapStats.InvalidIndex() )
 	{
 		idx = m_CustomMapStats.Insert( szMapName );

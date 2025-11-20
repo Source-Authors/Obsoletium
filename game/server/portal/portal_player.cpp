@@ -1735,9 +1735,9 @@ void CPortal_Player::Event_Killed( const CTakeDamageInfo &info )
 
 #if PORTAL_HIDE_PLAYER_RAGDOLL
 	// Fizzle all portals so they don't see the player disappear
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	intp iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
-	for( int i = 0; i != iPortalCount; ++i )
+	for( intp i = 0; i != iPortalCount; ++i )
 	{
 		CProp_Portal *pTempPortal = pPortals[i];
 
@@ -2011,7 +2011,7 @@ void CPortal_Player::UpdatePortalViewAreaBits( unsigned char *pvs, int pvssize )
 {
 	Assert ( pvs );
 
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	intp iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
 		return;
 
@@ -2099,12 +2099,12 @@ void AddPortalCornersToEnginePVS( CProp_Portal* pPortal )
 
 void PortalSetupVisibility( CBaseEntity *pPlayer, int area, unsigned char *pvs, int pvssize )
 {
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	intp iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
 		return;
 
 	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
-	for( int i = 0; i != iPortalCount; ++i )
+	for( intp i = 0; i != iPortalCount; ++i )
 	{
 		CProp_Portal *pPortal = pPortals[i];
 
@@ -2326,7 +2326,8 @@ CON_COMMAND( startneurotoxins, "Starts the nerve gas timer." )
 	float fCoundownTime = 180.0f;
 
 	if ( args.ArgC() > 1 )
-		fCoundownTime = atof( args[ 1 ] );
+		// dimhotepus: atof -> strtof
+		fCoundownTime = strtof( args[ 1 ], nullptr );
 
 	if( pPlayer )
 		pPlayer->SetNeuroToxinDamageTime( fCoundownTime );

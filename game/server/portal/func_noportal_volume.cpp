@@ -88,11 +88,11 @@ void CFuncNoPortalVolume::OnActivate( void )
 	if ( !GetCollideable() )
 		return;
 
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	intp iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount != 0 )
 	{
 		CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
-		for( int i = 0; i != iPortalCount; ++i )
+		for( intp i = 0; i != iPortalCount; ++i )
 		{
 			CProp_Portal *pTempPortal = pPortals[i];
 			if( pTempPortal->m_bActivated && 
