@@ -78,11 +78,11 @@ template <typename T>
 {
 	if constexpr ( sizeof(item) == 4 ) //-V112
 		return Hash4( &item );
-	if constexpr ( sizeof(item) == 8 )
+	else if constexpr ( sizeof(item) == 8 )
 		return Hash8( &item );
-	if constexpr ( sizeof(item) == 12 )
+	else if constexpr ( sizeof(item) == 12 )
 		return Hash12( &item );
-	if constexpr ( sizeof(item) == 16 )
+	else if constexpr ( sizeof(item) == 16 )
 		return Hash16( &item );
 	else
 		return HashBlock( &item, sizeof(item) );
