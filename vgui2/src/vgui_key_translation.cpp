@@ -12,9 +12,7 @@
 
 #ifdef POSIX
 #define VK_RETURN -1
-#endif
-
-#if defined(WIN32)
+#elif defined(WIN32)
 #define VK_RETURN 0x0D
 #endif
 
