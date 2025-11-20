@@ -2118,7 +2118,7 @@ void CNPC_RollerMine::StickToVehicle( CBaseEntity *pOther )
 	fixed.constraint.forceLimit	= ImpulseScale( pPhysics->GetMass(), 200 );
 	fixed.constraint.torqueLimit = ImpulseScale( pPhysics->GetMass(), 800 );
 	m_pConstraint = physenv->CreateFixedConstraint( pOtherPhysics, pPhysics, NULL, fixed );
-	m_pConstraint->SetGameData( (void *)this );
+	m_pConstraint->SetGameData( this );
 
 	// Kick the vehicle so the player knows we've arrived
 	Vector impulse = pOther->GetAbsOrigin() - GetAbsOrigin();

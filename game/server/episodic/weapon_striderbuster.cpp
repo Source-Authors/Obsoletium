@@ -349,7 +349,7 @@ bool CWeaponStriderBuster::CreateConstraintToObject( CBaseEntity *pObject )
 
 	// Hold on to us
 	m_pConstraint = pConstraint;
-	pConstraint->SetGameData( (void *)this );
+	pConstraint->SetGameData( this );
 	m_hConstrainedEntity = pObject->GetOwnerEntity();;
 
 	// Disable collisions between the two ents
