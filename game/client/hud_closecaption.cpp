@@ -518,7 +518,7 @@ struct AsyncCaptionData_t
 
 		// async load the file	
 		FileAsyncRequest_t fileRequest;
-		fileRequest.pContext    = (void *)this;
+		fileRequest.pContext    = this;
 		fileRequest.pfnCallback = ::CaptionAsyncLoaderCallback;
 		fileRequest.pData       = m_pBlockData;
 		fileRequest.pszFilename = fileName;
