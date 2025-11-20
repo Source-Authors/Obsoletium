@@ -85,7 +85,7 @@ public:
 		m_nRestoreFrame = -1;
 	}
 
-	~C_SoundscapeSystem() {}
+	~C_SoundscapeSystem() = default;
 
 	void OnStopAllSounds()
 	{
