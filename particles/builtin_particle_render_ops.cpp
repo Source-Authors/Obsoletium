@@ -1745,7 +1745,7 @@ DEFINE_PARTICLE_OPERATOR( C_OP_RenderRope, "render_rope", OPERATOR_SINGLETON );
 BEGIN_PARTICLE_OPERATOR_UNPACK( C_OP_RenderRope ) 
 	DMXELEMENT_UNPACK_FIELD( "subdivision_count", "3", int, m_nSubdivCount )
 	DMXELEMENT_UNPACK_FIELD( "texel_size", "4.0f", float, m_flTexelSizeInUnits )
-	DMXELEMENT_UNPACK_FIELD( "texture_scroll_rate", "0.0f", float, m_flTextureScrollRate )
+	DMXELEMENT_UNPACK_FIELD( "texture_scroll_rate", "0.0", float, m_flTextureScrollRate )
 END_PARTICLE_OPERATOR_UNPACK( C_OP_RenderRope )
 
 
@@ -2332,8 +2332,8 @@ class C_OP_RenderScreenVelocityRotate : public CParticleRenderOperatorInstance
 DEFINE_PARTICLE_OPERATOR( C_OP_RenderScreenVelocityRotate, "render_screen_velocity_rotate", OPERATOR_SINGLETON );
 
 BEGIN_PARTICLE_RENDER_OPERATOR_UNPACK( C_OP_RenderScreenVelocityRotate ) 
-	DMXELEMENT_UNPACK_FIELD( "rotate_rate(dps)", "0.0f", float, m_flRotateRateDegrees )
-	DMXELEMENT_UNPACK_FIELD( "forward_angle", "-90.0f", float, m_flForwardDegrees )
+	DMXELEMENT_UNPACK_FIELD( "rotate_rate(dps)", "0.0", float, m_flRotateRateDegrees )
+	DMXELEMENT_UNPACK_FIELD( "forward_angle", "-90.0", float, m_flForwardDegrees )
 END_PARTICLE_OPERATOR_UNPACK( C_OP_RenderScreenVelocityRotate )
 
 
