@@ -29,12 +29,12 @@ ConVar showbudget_texture_global_sum( "showbudget_texture_global_sum", "0.0" );
 
 
 // Commands to turn on the texture budget panel, with per-FRAME settings.
-void showbudget_texture_on_f()
+static void showbudget_texture_on_f()
 {
 	texture_budget_panel_global.SetValue( 0 );
 	showbudget_texture.SetValue( 1 );
 }
-void showbudget_texture_off_f()
+static void showbudget_texture_off_f()
 {
 	showbudget_texture.SetValue( 0 );
 }
@@ -43,12 +43,12 @@ ConCommand showbudget_texture_off( "-showbudget_texture", showbudget_texture_off
 
 
 // Commands to turn on the texture budget panel, with GLOBAL settings.
-void showbudget_texture_global_on_f()
+static void showbudget_texture_global_on_f()
 {
 	texture_budget_panel_global.SetValue( 1 );
 	showbudget_texture.SetValue( 1 );
 }
-void showbudget_texture_global_off_f()
+static void showbudget_texture_global_off_f()
 {
 	showbudget_texture.SetValue( 0 );
 }
