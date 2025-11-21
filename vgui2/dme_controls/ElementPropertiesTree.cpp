@@ -181,8 +181,9 @@ void CElementTree::GenerateChildrenOfNode(intp itemIndex)
 CElementTreeViewListControl::CElementTreeViewListControl( Panel *pParent, const char *pName )
 	: BaseClass( pParent, pName ), m_Panels( 0, 0, PanelsLessFunc )
 {
+	// dimhotepus: Scale UI.
 	m_iTreeColumnWidth = QuickPropScale( 200 );
-	m_iFontSize = 1;
+	m_iFontSize = QuickPropScale( 1 );
 	m_bMouseLeftIsDown = false;
 	m_bMouseIsDragging = false;
 	m_bDrawGrid = false;
@@ -401,7 +402,8 @@ void CElementTreeViewListControl::OnMouseWheeled(int delta)
 	{
 		// scroll the treeview control
 		ScrollBar *sb = ((CElementTree *)GetTree())->GetScrollBar();
-		sb->SetValue( sb->GetValue() + ( delta * -3 ) );
+		// dimhotepus: Scale UI.
+		sb->SetValue( sb->GetValue() + ( delta * QuickPropScale( -3 ) ) );
 	}
 }
 
@@ -639,7 +641,8 @@ int CElementTreeViewListControl::GetFontSize()
 
 void CElementTreeViewListControl::SetFontSize( int size )
 {
-	m_iFontSize = min( 5, max( 1, size ) );
+	// dimhotepus: Scale UI.
+	m_iFontSize = min( QuickPropScale( 5 ), max( QuickPropScale( 1 ), size ) );
 	SetFont( GetFont( m_iFontSize ) );
 }
 
@@ -647,7 +650,7 @@ void CElementTreeViewListControl::ExpandItem(int itemIndex, bool bExpand)
 {
 	GetTree()->ExpandItem( itemIndex, bExpand );
 }
-				   
+
 bool CElementTreeViewListControl::IsItemExpanded( int itemIndex )
 {
 	return GetTree()->IsItemExpanded( itemIndex );
@@ -861,18 +864,20 @@ void CPropertiesTreeToolbar::OnKeyCodeTyped( KeyCode code )
 void CPropertiesTreeToolbar::ApplySchemeSettings( IScheme *scheme )
 {
 	BaseClass::ApplySchemeSettings( scheme );
-
-	m_pBack->SetFont( scheme->GetFont( "DefaultVerySmall" ) );
-	m_pFwd->SetFont( scheme->GetFont( "DefaultVerySmall" ) );
-	m_pSearch->SetFont( scheme->GetFont( "DefaultVerySmall" ) );
-	m_pSearchLabel->SetFont( scheme->GetFont( "DefaultVerySmall" ) );
-	//m_pShowSearchResults->SetFont( scheme->GetFont( "DefaultVerySmall" ) );
+	
+	// dimhotepus: Scale UI.
+	m_pBack->SetFont( scheme->GetFont( "DefaultVerySmall", IsProportional() ) );
+	m_pFwd->SetFont( scheme->GetFont( "DefaultVerySmall", IsProportional() ) );
+	m_pSearch->SetFont( scheme->GetFont( "DefaultVerySmall", IsProportional() ) );
+	m_pSearchLabel->SetFont( scheme->GetFont( "DefaultVerySmall", IsProportional() ) );
+	//m_pShowSearchResults->SetFont( scheme->GetFont( "DefaultVerySmall", IsProportional() ) );
 
 	m_pSearch->SendNewLine( true );
 	m_pSearch->SelectAllOnFocusAlways( true );
-
-	m_pBack->GetMenu()->SetFont( scheme->GetFont( "DefaultVerySmall" ) );
-	m_pFwd->GetMenu()->SetFont( scheme->GetFont( "DefaultVerySmall" ) );
+	
+	// dimhotepus: Scale UI.
+	m_pBack->GetMenu()->SetFont( scheme->GetFont( "DefaultVerySmall", IsProportional() ) );
+	m_pFwd->GetMenu()->SetFont( scheme->GetFont( "DefaultVerySmall", IsProportional() ) );
 }
 
 void CPropertiesTreeToolbar::PerformLayout()
@@ -1095,7 +1100,7 @@ void CElementPropertiesTreeInternal::OnCopy()
 		KeyValues *data = new KeyValues( "Clipboard" );
 		m_pTree->GetTree()->GenerateDragDataForItem( selected[ i ], data );
 		list.AddToTail( data );
-	}	
+	}
 
 	if ( list.Count() > 0 )
 	{
@@ -2453,7 +2458,7 @@ bool CElementPropertiesTreeInternal::ShowAddAttributeDialog( CDmElement *pElemen
 	return true;
 }
 
-																   
+
 //-----------------------------------------------------------------------------
 // Forwards commands to parent
 //-----------------------------------------------------------------------------
