@@ -25,7 +25,7 @@ static void TextureCVarChangedCallBack( IConVar *pConVar, const char *pOldString
 
 ConVar texture_budget_panel_global( "texture_budget_panel_global", "0", 0, "Show global times in the texture budget panel." );
 ConVar showbudget_texture( "showbudget_texture", "0", FCVAR_CHEAT, "Enable the texture budget panel." );
-ConVar showbudget_texture_global_sum( "showbudget_texture_global_sum", "0.0f" );
+ConVar showbudget_texture_global_sum( "showbudget_texture_global_sum", "0.0" );
 
 
 // Commands to turn on the texture budget panel, with per-FRAME settings.
