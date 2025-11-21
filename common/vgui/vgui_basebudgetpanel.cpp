@@ -72,11 +72,12 @@ void CBaseBudgetPanel::ClearTimesForAllGroupsForThisFrame()
 
 void CBaseBudgetPanel::ClearAllTimesForGroup( intp groupID )
 {
-	for( auto &t : m_BudgetGroupTimes[groupID].m_Time )
-	{
-		t = 0.0;
+	using time_type = std::remove_pointer_t<std::decay_t<decltype(m_BudgetGroupTimes[0].m_Time)>>;
+	static_assert(std::numeric_limits<time_type>::is_iec559);
+
+	// dimhotepus: Fast zeroing to +0 for IEEE-754.
+	BitwiseClear( m_BudgetGroupTimes[groupID].m_Time );
 	}
-}
 
 
 void CBaseBudgetPanel::OnConfigDataChanged( const CBudgetPanelConfigData &data )
