@@ -1628,8 +1628,8 @@ void CElementPropertiesTreeInternal::OnRemove()
 //-----------------------------------------------------------------------------
 int ElementNameSortFunc( const void *arg1, const void *arg2 )
 {
-	CDmElement *pElement1 = *(CDmElement**)arg1;
-	CDmElement *pElement2 = *(CDmElement**)arg2;
+	const CDmElement *pElement1 = *(const CDmElement**)arg1;
+	const CDmElement *pElement2 = *(const CDmElement**)arg2;
 
 	const char *pName1 = pElement1 ? pElement1->GetName() : "";
 	const char *pName2 = pElement2 ? pElement2->GetName() : "";
