@@ -141,12 +141,12 @@ ConVar sixense_played_tutorial("sixense_played_tutorial", "0", FCVAR_ARCHIVE);
 
 // 0 = low, 1 = med, 2 = high, 3 = custom
 ConVar sixense_sensitivity_level( "sixense_sensitivity_level", "-1", FCVAR_ARCHIVE );
-ConVar sixense_controller_angle_mode( "sixense_controller_angle_mode", "0.0f", FCVAR_ARCHIVE );
-ConVar sixense_roll_correct_blend( "sixense_roll_correct_blend", "0.965f", FCVAR_ARCHIVE );
+ConVar sixense_controller_angle_mode( "sixense_controller_angle_mode", "0.0", FCVAR_ARCHIVE );
+ConVar sixense_roll_correct_blend( "sixense_roll_correct_blend", "0.965", FCVAR_ARCHIVE );
 
 
 ConVar sixense_exit_one_to_one_dot( "sixense_exit_one_to_one_dot", "0.85", FCVAR_ARCHIVE );
-ConVar sixense_exit_metroid_blend( "sixense_exit_metroid_blend", "0.95f", FCVAR_ARCHIVE );
+ConVar sixense_exit_metroid_blend( "sixense_exit_metroid_blend", "0.95", FCVAR_ARCHIVE );
 
 ConVar sixense_max_charge_spin( "sixense_max_charge_spin", "3.0f", FCVAR_ARCHIVE );
 
