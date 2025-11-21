@@ -248,7 +248,7 @@ bool CBoneFollower::Init( CBaseEntity *pOwner, const char *pModelName, solid_t &
 	SetSolid( SOLID_VPHYSICS );
 	SetCollisionGroup( pOwner->GetCollisionGroup() );
 	AddSolidFlags( FSOLID_CUSTOMRAYTEST | FSOLID_CUSTOMBOXTEST );
-	solid.params.pGameData = (void *)this;
+	solid.params.pGameData = this;
 	IPhysicsObject *pPhysics = VPhysicsInitShadow( false, false, &solid );
 	if ( !pPhysics )
 		return false;

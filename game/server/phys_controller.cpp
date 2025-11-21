@@ -783,7 +783,7 @@ void CPhysMotor::Activate( void )
 				hingeParams.worldPosition = GetLocalOrigin();
 
 				m_pHinge = physenv->CreateHingeConstraint( g_PhysWorldObject, pPhys, NULL, hingeParams );
-				m_pHinge->SetGameData( (void *)this );
+				m_pHinge->SetGameData( this );
 				// can't grab this object
 				PhysSetGameFlags(pPhys, FVPHYSICS_NO_PLAYER_PICKUP);
 			}

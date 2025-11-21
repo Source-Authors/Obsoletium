@@ -677,7 +677,7 @@ bool CPhysConstraint::ActivateConstraint( void )
 	if ( !m_pConstraint )
 		return false;
 
-	m_pConstraint->SetGameData( (void *)this );
+	m_pConstraint->SetGameData( this );
 
 	if ( pGroup )
 	{
