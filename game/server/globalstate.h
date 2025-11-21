@@ -13,28 +13,28 @@
 
 typedef enum { GLOBAL_OFF = 0, GLOBAL_ON = 1, GLOBAL_DEAD = 2 } GLOBALESTATE;
 
-void		GlobalEntity_SetState( int globalIndex, GLOBALESTATE state );
-void		GlobalEntity_SetMap( int globalIndex, string_t mapname );
-int			GlobalEntity_Add( const char *pGlobalname, const char *pMapName, GLOBALESTATE state );
+void		GlobalEntity_SetState( intp globalIndex, GLOBALESTATE state );
+void		GlobalEntity_SetMap( intp globalIndex, string_t mapname );
+intp		GlobalEntity_Add( const char *pGlobalname, const char *pMapName, GLOBALESTATE state );
 
-int			GlobalEntity_GetIndex( const char *pGlobalname );
-GLOBALESTATE GlobalEntity_GetState( int globalIndex );
-const char	*GlobalEntity_GetMap( int globalIndex );
-const char	*GlobalEntity_GetName( int globalIndex );
+intp		GlobalEntity_GetIndex( const char *pGlobalname );
+GLOBALESTATE GlobalEntity_GetState( intp globalIndex );
+const char	*GlobalEntity_GetMap( intp globalIndex );
+const char	*GlobalEntity_GetName( intp globalIndex );
 
-int GlobalEntity_GetCounter( int globalIndex );
-void GlobalEntity_SetCounter( int globalIndex, int counter );
-int GlobalEntity_AddToCounter( int globalIndex, int delta );
+int GlobalEntity_GetCounter( intp globalIndex );
+void GlobalEntity_SetCounter( intp globalIndex, int counter );
+int GlobalEntity_AddToCounter( intp globalIndex, int delta );
 
-int			GlobalEntity_GetNumGlobals( void );
+intp		GlobalEntity_GetNumGlobals( void );
 void		GlobalEntity_EnableStateUpdates( bool bEnable );
 
-inline int GlobalEntity_Add( string_t globalname, string_t mapName, GLOBALESTATE state )
+inline intp GlobalEntity_Add( string_t globalname, string_t mapName, GLOBALESTATE state )
 {
 	return GlobalEntity_Add( STRING(globalname), STRING(mapName), state );
 }
 
-inline int GlobalEntity_GetIndex( string_t globalname )
+inline intp GlobalEntity_GetIndex( string_t globalname )
 {
 	return GlobalEntity_GetIndex( STRING(globalname) );
 }

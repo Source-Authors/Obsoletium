@@ -1404,9 +1404,9 @@ void CNavArea::FinishSplitEdit( CNavArea *newArea, NavDirType ignoreEdge )
 		if (d == ignoreEdge)
 			continue;
 
-		int count = GetAdjacentCount( (NavDirType)d );
+		intp count = GetAdjacentCount( (NavDirType)d );
 
-		for( int a=0; a<count; ++a )
+		for( intp a=0; a<count; ++a )
 		{
 			CNavArea *adj = GetAdjacentArea( (NavDirType)d, a );
 
@@ -1437,7 +1437,7 @@ void CNavArea::FinishSplitEdit( CNavArea *newArea, NavDirType ignoreEdge )
 					break;
 			}
 
-			for ( int a = 0; a < m_incomingConnect[d].Count(); a++ )
+			for ( intp a = 0; a < m_incomingConnect[d].Count(); a++ )
 			{			
 				CNavArea *adj = m_incomingConnect[d][a].area;
 
@@ -3293,9 +3293,9 @@ void CNavArea::DrawConnectedAreas( void ) const
 	{
 		NavDirType dir = (NavDirType)i;
 
-		int count = GetAdjacentCount( dir );
+		intp count = GetAdjacentCount( dir );
 
-		for( int a=0; a<count; ++a )
+		for( intp a=0; a<count; ++a )
 		{
 			CNavArea *adj = GetAdjacentArea( dir, a );
 

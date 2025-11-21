@@ -292,7 +292,7 @@ void CPropVehicle::AddPhysicsChild( CBaseEntity *pChild )
 //-----------------------------------------------------------------------------
 void CPropVehicle::RemovePhysicsChild( CBaseEntity *pChild )
 {
-	int elemID = m_hPhysicsChildren.Find( pChild );
+	intp elemID = m_hPhysicsChildren.Find( pChild );
 
 	if ( m_hPhysicsChildren.IsValidIndex( elemID ) )
 	{

@@ -94,7 +94,7 @@ public:
 	void AddToDeleteList( IServerNetworkable *ent );
 	// call this before and after each frame to delete all of the marked entities.
 	void CleanupDeleteList( void );
-	int ResetDeleteList( void );
+	intp ResetDeleteList( void );
 
 	// frees all entities in the game
 	void Clear( void );
@@ -352,12 +352,12 @@ public:
 extern INotify *g_pNotify;
 
 void EntityTouch_Add( CBaseEntity *pEntity );
-int AimTarget_ListCount();
-int AimTarget_ListCopy( CBaseEntity *pList[], int listMax );
+intp AimTarget_ListCount();
+intp AimTarget_ListCopy( CBaseEntity *pList[], intp listMax );
 void AimTarget_ForceRepopulateList();
 
 void SimThink_EntityChanged( CBaseEntity *pEntity );
-int SimThink_ListCount();
-int SimThink_ListCopy( CBaseEntity *pList[], int listMax );
+intp SimThink_ListCount();
+intp SimThink_ListCopy( CBaseEntity *pList[], intp listMax );
 
 #endif // ENTITYLIST_H

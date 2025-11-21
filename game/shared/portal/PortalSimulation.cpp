@@ -97,9 +97,9 @@ static int s_iPortalSimulatorGUID = 0; //used in standalone function that have n
 
 
 static void ConvertBrushListToClippedPolyhedronList( const int *pBrushes, int iBrushCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList );
-static void ClipPolyhedrons( CPolyhedron * const *pExistingPolyhedrons, int iPolyhedronCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList );
+static void ClipPolyhedrons( CPolyhedron * const *pExistingPolyhedrons, intp iPolyhedronCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList );
 static inline CPolyhedron *TransformAndClipSinglePolyhedron( CPolyhedron *pExistingPolyhedron, const VMatrix &Transform, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fCutEpsilon, bool bUseTempMemory );
-static CPhysCollide *ConvertPolyhedronsToCollideable( CPolyhedron **pPolyhedrons, int iPolyhedronCount );
+static CPhysCollide *ConvertPolyhedronsToCollideable( CPolyhedron **pPolyhedrons, intp iPolyhedronCount );
 
 #ifndef CLIENT_DLL
 static void UpdateShadowClonesPortalSimulationFlags( const CBaseEntity *pSourceEntity, unsigned int iFlags, int iSourceFlags );
@@ -170,7 +170,7 @@ CPortalSimulator::~CPortalSimulator( void )
 	DetachFromLinked();
 	ClearEverything();
 
-	for( int i = s_PortalSimulators.Count(); --i >= 0; )
+	for( intp i = s_PortalSimulators.Count(); --i >= 0; )
 	{
 		if( s_PortalSimulators[i] == this )
 		{
@@ -211,7 +211,7 @@ void CPortalSimulator::MoveTo( const Vector &ptCenter, const QAngle &angles )
 	//create a list of all entities that are actually within the portal hole, they will likely need to be moved out of solid space when the portal moves
 	CBaseEntity **pFixEntities = (CBaseEntity **)stackalloc( sizeof( CBaseEntity * ) * m_InternalData.Simulation.Dynamic.OwnedEntities.Count() );
 	int iFixEntityCount = 0;
-	for( int i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
 	{
 		CBaseEntity *pEntity = m_InternalData.Simulation.Dynamic.OwnedEntities[i];
 		if( CPhysicsShadowClone::IsShadowClone( pEntity ) ||
@@ -712,7 +712,7 @@ void CPortalSimulator::TakeOwnershipOfEntity( CBaseEntity *pEntity )
 	
 	CUtlVector<CBaseEntity *> childrenList;
 	GetAllChildren( pEntity, childrenList );
-	for ( int i = childrenList.Count(); --i >= 0; )
+	for ( intp i = childrenList.Count(); --i >= 0; )
 	{
 		CBaseEntity *pEnt = childrenList[i];
 		CPortalSimulator *pOwningSimulator = GetSimulatorThatOwnsEntity( pEnt );
@@ -750,7 +750,7 @@ void CPortalSimulator::TakePhysicsOwnership( CBaseEntity *pEntity )
 	{	
 #ifdef _DEBUG
 		{
-			int iDebugIndex;
+			intp iDebugIndex;
 			for( iDebugIndex = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
 			{
 				if( m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity )
@@ -779,7 +779,7 @@ void CPortalSimulator::TakePhysicsOwnership( CBaseEntity *pEntity )
 		{
 
 			DBG_CODE(
-				for( int i = m_pLinkedPortal->m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+				for( intp i = m_pLinkedPortal->m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 					AssertMsg( m_pLinkedPortal->m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[i]->GetClonedEntity() != pEntity, "Already cloning to linked portal." );
 			);
 
@@ -880,7 +880,7 @@ void CPortalSimulator::ReleaseOwnershipOfEntity( CBaseEntity *pEntity, bool bMov
 	MarkAsReleased( pEntity );
 	Assert( GetSimulatorThatOwnsEntity( pEntity ) == NULL );
 
-	for( int i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
 	{
 		if( m_InternalData.Simulation.Dynamic.OwnedEntities[i] == pEntity )
 		{
@@ -898,7 +898,7 @@ void CPortalSimulator::ReleaseOwnershipOfEntity( CBaseEntity *pEntity, bool bMov
 
 	CUtlVector<CBaseEntity *> childrenList;
 	GetAllChildren( pEntity, childrenList );
-	for ( int i = childrenList.Count(); --i >= 0; )
+	for ( intp i = childrenList.Count(); --i >= 0; )
 		ReleaseOwnershipOfEntity( childrenList[i] );
 }
 
@@ -947,7 +947,7 @@ void CPortalSimulator::ReleasePhysicsOwnership( CBaseEntity *pEntity, bool bCont
 	{
 #ifdef _DEBUG
 		{
-			int iDebugIndex;
+			intp iDebugIndex;
 			for( iDebugIndex = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --iDebugIndex >= 0; )
 			{
 				if( m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[iDebugIndex]->GetClonedEntity() == pEntity )
@@ -966,7 +966,7 @@ void CPortalSimulator::ReleasePhysicsOwnership( CBaseEntity *pEntity, bool bCont
 			if( m_pLinkedPortal )
 			{
 				DBG_CODE_NOSCOPE( bFoundAlready = false; );
-				for( int i = m_pLinkedPortal->m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+				for( intp i = m_pLinkedPortal->m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 				{
 					if( m_pLinkedPortal->m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[i]->GetClonedEntity() == pEntity )
 					{
@@ -1045,7 +1045,7 @@ void CPortalSimulator::StartCloningEntity( CBaseEntity *pEntity )
 		return; //already cloned, no work to do
 
 #ifdef _DEBUG
-	for( int i = m_InternalData.Simulation.Dynamic.ShadowClones.ShouldCloneFromMain.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Dynamic.ShadowClones.ShouldCloneFromMain.Count(); --i >= 0; )
 		Assert( m_InternalData.Simulation.Dynamic.ShadowClones.ShouldCloneFromMain[i] != pEntity );
 #endif
 
@@ -1084,7 +1084,7 @@ void CPortalSimulator::MarkAsOwned( CBaseEntity *pEntity )
 	int iEntIndex = pEntity->entindex();
 	Assert( s_OwnedEntityMap[iEntIndex] == NULL );
 #ifdef _DEBUG
-	for( int i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
 		Assert( m_InternalData.Simulation.Dynamic.OwnedEntities[i] != pEntity );
 #endif
 	Assert( (m_InternalData.Simulation.Dynamic.EntFlags[iEntIndex] & PSEF_OWNS_ENTITY) == 0 );
@@ -1108,7 +1108,7 @@ void CPortalSimulator::MarkAsReleased( CBaseEntity *pEntity )
 
 	s_OwnedEntityMap[iEntIndex] = NULL;
 	m_InternalData.Simulation.Dynamic.EntFlags[iEntIndex] &= ~PSEF_OWNS_ENTITY;
-	int i;
+	intp i;
 	for( i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
 	{
 		if( m_InternalData.Simulation.Dynamic.OwnedEntities[i] == pEntity )
@@ -1215,7 +1215,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 
 		//Assert( m_InternalData.Simulation.Static.World.StaticProps.PhysicsObjects.Count() == 0 ); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
 #ifdef _DEBUG
-		for( int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 		{
 			Assert( m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pPhysicsObject == NULL ); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
 		}
@@ -1224,7 +1224,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 		if( m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count() != 0 )
 		{
 			Assert( m_InternalData.Simulation.Static.World.StaticProps.bCollisionExists );
-			for( int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
+			for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 			{
 				PS_SD_Static_World_StaticProps_ClippedProp_t &Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
 				Assert( Representation.pCollide != NULL );
@@ -1264,7 +1264,7 @@ void CPortalSimulator::CreateLocalPhysics( void )
 	}
 
 	//re-acquire environment physics for owned entities
-	for( int i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
 		TakePhysicsOwnership( m_InternalData.Simulation.Dynamic.OwnedEntities[i] );
 
 	if( m_InternalData.Simulation.pCollisionEntity )
@@ -1321,7 +1321,7 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 	Assert( m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count() == 0 ); //Be sure to find graceful fixes for asserts, performance is a big concern with portal simulation
 	if( RemoteSimulationStaticWorld.StaticProps.ClippedRepresentations.Count() != 0 )
 	{
-		for( int i = RemoteSimulationStaticWorld.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
+		for( intp i = RemoteSimulationStaticWorld.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 		{
 			PS_SD_Static_World_StaticProps_ClippedProp_t &Representation = RemoteSimulationStaticWorld.StaticProps.ClippedRepresentations[i];
 			IPhysicsObject *pPhysObject = m_InternalData.Simulation.pPhysicsEnvironment->CreatePolyObjectStatic( Representation.pCollide, Representation.iTraceSurfaceProps, m_InternalData.Placement.ptaap_LinkedToThis.ptOriginTransform, m_InternalData.Placement.ptaap_LinkedToThis.qAngleTransform, &params );
@@ -1335,13 +1335,13 @@ void CPortalSimulator::CreateLinkedPhysics( void )
 
 	//re-clone physicsshadowclones from the remote environment
 	CUtlVector<CBaseEntity *> &RemoteOwnedEntities = m_pLinkedPortal->m_InternalData.Simulation.Dynamic.OwnedEntities;
-	for( int i = RemoteOwnedEntities.Count(); --i >= 0; )
+	for( intp i = RemoteOwnedEntities.Count(); --i >= 0; )
 	{
 		if( CPhysicsShadowClone::IsShadowClone( RemoteOwnedEntities[i] ) ||
 			CPSCollisionEntity::IsPortalSimulatorCollisionEntity( RemoteOwnedEntities[i] ) )
 			continue;
 
-		int j;
+		intp j;
 		for( j = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --j >= 0; )
 		{
 			if( m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[j]->GetClonedEntity() == RemoteOwnedEntities[i] )
@@ -1449,7 +1449,7 @@ void CPortalSimulator::ClearLocalPhysics( void )
 	if( m_InternalData.Simulation.Static.World.StaticProps.bPhysicsExists && 
 		(m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count() != 0) )
 	{
-		for( int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 		{
 			PS_SD_Static_World_StaticProps_ClippedProp_t &Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
 			if( Representation.pPhysicsObject )
@@ -1475,7 +1475,7 @@ void CPortalSimulator::ClearLocalPhysics( void )
 
 	//all physics clones
 	{
-		for( int i = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 		{
 			CPhysicsShadowClone *pClone = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[i];
 			Assert( GetSimulatorThatOwnsEntity( pClone ) == this );
@@ -1491,7 +1491,7 @@ void CPortalSimulator::ClearLocalPhysics( void )
 	Assert( m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count() == 0 );
 
 	//release physics ownership of owned entities
-	for( int i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Dynamic.OwnedEntities.Count(); --i >= 0; )
 		ReleasePhysicsOwnership( m_InternalData.Simulation.Dynamic.OwnedEntities[i], false );
 
 	Assert( m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count() == 0 );
@@ -1538,7 +1538,7 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 
 		if( m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count() )
 		{
-			for( int i = m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count(); --i >= 0; )
+			for( intp i = m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count(); --i >= 0; )
 				m_InternalData.Simulation.pPhysicsEnvironment->DestroyObject( m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects[i] );
 			
 			m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.RemoveAll();
@@ -1547,7 +1547,7 @@ void CPortalSimulator::ClearLinkedPhysics( void )
 
 	//clones from the linked portal
 	{
-		for( int i = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 		{
 			CPhysicsShadowClone *pClone = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[i];
 			m_InternalData.Simulation.Dynamic.EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
@@ -1588,7 +1588,7 @@ void CPortalSimulator::ClearLinkedEntities( void )
 {
 	//clones from the linked portal
 	{
-		for( int i = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal.Count(); --i >= 0; )
 		{
 			CPhysicsShadowClone *pClone = m_InternalData.Simulation.Dynamic.ShadowClones.FromLinkedPortal[i];
 			m_InternalData.Simulation.Dynamic.EntFlags[pClone->entindex()] &= ~PSEF_OWNS_PHYSICS;
@@ -1649,7 +1649,7 @@ void CPortalSimulator::CreateLocalCollision( void )
 	CREATEDEBUGTIMER( worldPropTimer );
 	STARTDEBUGTIMER( worldPropTimer );
 #ifdef _DEBUG
-	for( int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 	{
 		Assert( m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pCollide == NULL );
 	}
@@ -1659,7 +1659,7 @@ void CPortalSimulator::CreateLocalCollision( void )
 	{
 		Assert( m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count() != 0 );
 		CPolyhedron **pPolyhedronsBase = m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Base();
-		for( int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 		{
 			PS_SD_Static_World_StaticProps_ClippedProp_t &Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
 			
@@ -1811,7 +1811,7 @@ void CPortalSimulator::ClearLocalCollision( void )
 	if( m_InternalData.Simulation.Static.World.StaticProps.bCollisionExists && 
 		(m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count() != 0) )
 	{
-		for( int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 		{
 			PS_SD_Static_World_StaticProps_ClippedProp_t &Representation = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i];
 			if( Representation.pCollide )
@@ -1925,7 +1925,7 @@ void CPortalSimulator::CreatePolyhedrons( void )
 			//create locally clipped polyhedrons for the world
 			{
 				int *pBrushList = WorldBrushes.Base();
-				int iBrushCount = WorldBrushes.Count();
+				intp iBrushCount = WorldBrushes.Count();
 				ConvertBrushListToClippedPolyhedronList( pBrushList, iBrushCount, fWorldClipPlane_Reverse, 1, PORTAL_POLYHEDRON_CUT_EPSILON, &m_InternalData.Simulation.Static.World.Brushes.Polyhedrons );
 			}
 		}
@@ -1937,7 +1937,7 @@ void CPortalSimulator::CreatePolyhedrons( void )
 			CUtlVector<ICollideable *> StaticProps;
 			staticpropmgr->GetAllStaticPropsInAABB( vAABBMins, vAABBMaxs, &StaticProps );
 
-			for( int i = StaticProps.Count(); --i >= 0; )
+			for( intp i = StaticProps.Count(); --i >= 0; )
 			{
 				ICollideable *pProp = StaticProps[i];
 
@@ -1961,7 +1961,7 @@ void CPortalSimulator::CreatePolyhedrons( void )
 				indices.iNumPolyhedrons = m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count() - indices.iStartIndex;
 				if( indices.iNumPolyhedrons != 0 )
 				{
-					int index = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.AddToTail();
+					intp index = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.AddToTail();
 					PS_SD_Static_World_StaticProps_ClippedProp_t &NewEntry = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[index];
 
 					NewEntry.PolyhedronGroup = indices;
@@ -2082,7 +2082,7 @@ void CPortalSimulator::CreatePolyhedrons( void )
 		CUtlVector<int> WallBrushes;
 		CUtlVector<CPolyhedron *> WallBrushPolyhedrons_ClippedToWall;
 		CPolyhedron **pWallClippedPolyhedrons = NULL;
-		int iWallClippedPolyhedronCount = 0;
+		intp iWallClippedPolyhedronCount = 0;
 		if( IsSimulatingVPhysics() ) //if not simulating vphysics, we skip making the entire wall, and just create the minimal tube instead
 		{
 			enginetrace->GetBrushesInAABB( vAABBMins, vAABBMaxs, &WallBrushes, MASK_SOLID_BRUSHONLY );
@@ -2092,7 +2092,7 @@ void CPortalSimulator::CreatePolyhedrons( void )
 			
 			if( WallBrushPolyhedrons_ClippedToWall.Count() != 0 )
 			{
-				for( int i = WallBrushPolyhedrons_ClippedToWall.Count(); --i >= 0; )
+				for( intp i = WallBrushPolyhedrons_ClippedToWall.Count(); --i >= 0; )
 				{
 					CPolyhedron *pPolyhedron = ClipPolyhedron( WallBrushPolyhedrons_ClippedToWall[i], fSidePlanesOnly, 4, PORTAL_POLYHEDRON_CUT_EPSILON, true );
 					if( pPolyhedron )
@@ -2211,7 +2211,7 @@ void CPortalSimulator::CreatePolyhedrons( void )
 			ClipPolyhedrons( pWallClippedPolyhedrons, iWallClippedPolyhedronCount, fSidePlanesOnly, 4, PORTAL_POLYHEDRON_CUT_EPSILON, &m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons );
 		}
 
-		for( int i = WallBrushPolyhedrons_ClippedToWall.Count(); --i >= 0; )
+		for( intp i = WallBrushPolyhedrons_ClippedToWall.Count(); --i >= 0; )
 			WallBrushPolyhedrons_ClippedToWall[i]->Release();
 
 		WallBrushPolyhedrons_ClippedToWall.RemoveAll();
@@ -2239,7 +2239,7 @@ void CPortalSimulator::ClearPolyhedrons( void )
 	
 	if( m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.Count() != 0 )
 	{
-		for( int i = m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.Count(); --i >= 0; )
 			m_InternalData.Simulation.Static.World.Brushes.Polyhedrons[i]->Release();
 		
 		m_InternalData.Simulation.Static.World.Brushes.Polyhedrons.RemoveAll();
@@ -2247,13 +2247,13 @@ void CPortalSimulator::ClearPolyhedrons( void )
 
 	if( m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count() != 0 )
 	{
-		for( int i = m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.Count(); --i >= 0; )
 			m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons[i]->Release();
 
 		m_InternalData.Simulation.Static.World.StaticProps.Polyhedrons.RemoveAll();		
 	}
 #ifdef _DEBUG
-	for( int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 	{
 #ifndef CLIENT_DLL
 		Assert( m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pPhysicsObject == NULL );
@@ -2265,7 +2265,7 @@ void CPortalSimulator::ClearPolyhedrons( void )
 
 	if( m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.Count() != 0 )
 	{
-		for( int i = m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.Count(); --i >= 0; )
 			m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons[i]->Release();
 
 		m_InternalData.Simulation.Static.Wall.Local.Brushes.Polyhedrons.RemoveAll();
@@ -2273,7 +2273,7 @@ void CPortalSimulator::ClearPolyhedrons( void )
 
 	if( m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.Count() != 0 )
 	{
-		for( int i = m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.Count(); --i >= 0; )
+		for( intp i = m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.Count(); --i >= 0; )
 			m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons[i]->Release();
 
 		m_InternalData.Simulation.Static.Wall.Local.Tube.Polyhedrons.RemoveAll();
@@ -2381,23 +2381,23 @@ void CPortalSimulator::SetVPhysicsSimulationEnabled( bool bEnabled )
 #ifndef CLIENT_DLL
 void CPortalSimulator::PrePhysFrame( void )
 {
-	int iPortalSimulators = s_PortalSimulators.Count();
+	intp iPortalSimulators = s_PortalSimulators.Count();
 
 	if( iPortalSimulators != 0 )
 	{
 		CPortalSimulator **pAllSimulators = s_PortalSimulators.Base();
-		for( int i = 0; i != iPortalSimulators; ++i )
+		for( intp i = 0; i != iPortalSimulators; ++i )
 		{
 			CPortalSimulator *pSimulator = pAllSimulators[i];
 			if( !pSimulator->IsReadyToSimulate() )
 				continue;
 
-			int iOwnedEntities = pSimulator->m_InternalData.Simulation.Dynamic.OwnedEntities.Count();
+			intp iOwnedEntities = pSimulator->m_InternalData.Simulation.Dynamic.OwnedEntities.Count();
 			if( iOwnedEntities != 0 )
 			{
 				CBaseEntity **pOwnedEntities = pSimulator->m_InternalData.Simulation.Dynamic.OwnedEntities.Base();
 
-				for( int j = 0; j != iOwnedEntities; ++j )
+				for( intp j = 0; j != iOwnedEntities; ++j )
 				{
 					CBaseEntity *pEntity = pOwnedEntities[j];
 					if( CPhysicsShadowClone::IsShadowClone( pEntity ) )
@@ -2459,10 +2459,10 @@ void CPortalSimulator::PostPhysFrame( void )
 #ifndef CLIENT_DLL
 int CPortalSimulator::GetMoveableOwnedEntities( CBaseEntity **pEntsOut, int iEntOutLimit )
 {
-	int iOwnedEntCount = m_InternalData.Simulation.Dynamic.OwnedEntities.Count();
+	intp iOwnedEntCount = m_InternalData.Simulation.Dynamic.OwnedEntities.Count();
 	int iOutputCount = 0;
 
-	for( int i = 0; i != iOwnedEntCount; ++i )
+	for( intp i = 0; i != iOwnedEntCount; ++i )
 	{
 		CBaseEntity *pEnt = m_InternalData.Simulation.Dynamic.OwnedEntities[i];
 		Assert( pEnt != NULL );
@@ -2492,7 +2492,7 @@ CPortalSimulator *CPortalSimulator::GetSimulatorThatOwnsEntity( const CBaseEntit
 	int iEntIndex = pEntity->entindex();
 	CPortalSimulator *pOwningSimulatorCheck = NULL;
 
-	for( int i = s_PortalSimulators.Count(); --i >= 0; )
+	for( intp i = s_PortalSimulators.Count(); --i >= 0; )
 	{
 		if( s_PortalSimulators[i]->m_InternalData.Simulation.Dynamic.EntFlags[iEntIndex] & PSEF_OWNS_ENTITY )
 		{
@@ -2509,7 +2509,7 @@ CPortalSimulator *CPortalSimulator::GetSimulatorThatOwnsEntity( const CBaseEntit
 
 CPortalSimulator *CPortalSimulator::GetSimulatorThatCreatedPhysicsObject( const IPhysicsObject *pObject, PS_PhysicsObjectSourceType_t *pOut_SourceType )
 {
-	for( int i = s_PortalSimulators.Count(); --i >= 0; )
+	for( intp i = s_PortalSimulators.Count(); --i >= 0; )
 	{
 		if( s_PortalSimulators[i]->CreatedPhysicsObject( pObject, pOut_SourceType ) )
 			return s_PortalSimulators[i];
@@ -2536,7 +2536,7 @@ bool CPortalSimulator::CreatedPhysicsObject( const IPhysicsObject *pObject, PS_P
 		return true;
 	}
 
-	for( int i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations.Count(); --i >= 0; )
 	{
 		if( m_InternalData.Simulation.Static.World.StaticProps.ClippedRepresentations[i].pPhysicsObject == pObject )
 		{
@@ -2546,7 +2546,7 @@ bool CPortalSimulator::CreatedPhysicsObject( const IPhysicsObject *pObject, PS_P
 		}
 	}
 
-	for( int i = m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count(); --i >= 0; )
+	for( intp i = m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects.Count(); --i >= 0; )
 	{
 		if( m_InternalData.Simulation.Static.Wall.RemoteTransformedToLocal.StaticProps.PhysicsObjects[i] == pObject )
 		{
@@ -2592,7 +2592,7 @@ static void ConvertBrushListToClippedPolyhedronList( const int *pBrushes, int iB
 	}
 }
 
-static void ClipPolyhedrons( CPolyhedron * const *pExistingPolyhedrons, int iPolyhedronCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList )
+static void ClipPolyhedrons( CPolyhedron * const *pExistingPolyhedrons, intp iPolyhedronCount, const float *pOutwardFacingClipPlanes, int iClipPlaneCount, float fClipEpsilon, CUtlVector<CPolyhedron *> *pPolyhedronList )
 {
 	if( pPolyhedronList == NULL )
 		return;
@@ -2600,7 +2600,7 @@ static void ClipPolyhedrons( CPolyhedron * const *pExistingPolyhedrons, int iPol
 	if( (pExistingPolyhedrons == NULL) || (iPolyhedronCount == 0) )
 		return;
 
-	for( int i = 0; i != iPolyhedronCount; ++i )
+	for( intp i = 0; i != iPolyhedronCount; ++i )
 	{
 		CPolyhedron *pPolyhedron = ClipPolyhedron( pExistingPolyhedrons[i], pOutwardFacingClipPlanes, iClipPlaneCount, fClipEpsilon );
 		if( pPolyhedron )
@@ -2608,7 +2608,7 @@ static void ClipPolyhedrons( CPolyhedron * const *pExistingPolyhedrons, int iPol
 	}
 }
 
-static CPhysCollide *ConvertPolyhedronsToCollideable( CPolyhedron **pPolyhedrons, int iPolyhedronCount )
+static CPhysCollide *ConvertPolyhedronsToCollideable( CPolyhedron **pPolyhedrons, intp iPolyhedronCount )
 {
 	if( (pPolyhedrons == NULL) || (iPolyhedronCount == 0 ) )
 		return NULL;
@@ -2624,7 +2624,7 @@ static CPhysCollide *ConvertPolyhedronsToCollideable( CPolyhedron **pPolyhedrons
 
 	CREATEDEBUGTIMER( convexTimer );
 	STARTDEBUGTIMER( convexTimer );
-	for( int i = 0; i != iPolyhedronCount; ++i )
+	for( intp i = 0; i != iPolyhedronCount; ++i )
 	{
 		pConvexes[iConvexCount] = physcollision->ConvexFromConvexPolyhedron( *pPolyhedrons[i] );
 
@@ -2704,7 +2704,7 @@ static CUtlVector<UTIL_Remove_PhysicsStack_t> s_UTIL_Remove_PhysicsStack;
 
 void CPortalSimulator::Pre_UTIL_Remove( CBaseEntity *pEntity )
 {
-	int index = s_UTIL_Remove_PhysicsStack.AddToTail();
+	intp index = s_UTIL_Remove_PhysicsStack.AddToTail();
 	s_UTIL_Remove_PhysicsStack[index].pPhysicsEnvironment = physenv;
 	s_UTIL_Remove_PhysicsStack[index].pShadowList = g_pShadowEntities;
 	int iEntIndex = pEntity->entindex();
@@ -2722,11 +2722,11 @@ void CPortalSimulator::Pre_UTIL_Remove( CBaseEntity *pEntity )
 		}
 
 		//might be cloned from main to a few environments
-		for( int i = s_PortalSimulators.Count(); --i >= 0; )
+		for( intp i = s_PortalSimulators.Count(); --i >= 0; )
 			s_PortalSimulators[i]->StopCloningEntity( pEntity );
 	}
 
-	for( int i = s_PortalSimulators.Count(); --i >= 0; )
+	for( intp i = s_PortalSimulators.Count(); --i >= 0; )
 	{
 		s_PortalSimulators[i]->m_InternalData.Simulation.Dynamic.EntFlags[iEntIndex] = 0;
 	}
@@ -2738,7 +2738,7 @@ void CPortalSimulator::Pre_UTIL_Remove( CBaseEntity *pEntity )
 
 void CPortalSimulator::Post_UTIL_Remove( CBaseEntity *pEntity )
 {
-	int index = s_UTIL_Remove_PhysicsStack.Count() - 1;
+	intp index = s_UTIL_Remove_PhysicsStack.Count() - 1;
 	Assert( index >= 0 );
 	UTIL_Remove_PhysicsStack_t &PhysicsStackEntry = s_UTIL_Remove_PhysicsStack[index];
 	physenv = PhysicsStackEntry.pPhysicsEnvironment;
@@ -2746,7 +2746,7 @@ void CPortalSimulator::Post_UTIL_Remove( CBaseEntity *pEntity )
 	s_UTIL_Remove_PhysicsStack.FastRemove(index);
 
 #ifdef _DEBUG
-	for( int i = CPhysicsShadowClone::g_ShadowCloneList.Count(); --i >= 0; )
+	for( intp i = CPhysicsShadowClone::g_ShadowCloneList.Count(); --i >= 0; )
 	{
 		Assert( CPhysicsShadowClone::g_ShadowCloneList[i]->GetClonedEntity() != pEntity ); //shouldn't be any clones of this object anymore
 	}
@@ -2785,13 +2785,13 @@ void UpdateShadowClonesPortalSimulationFlags( const CBaseEntity *pSourceEntity, 
 public:
 	virtual void LevelInitPreEntity( void )
 	{
-		for( int i = s_PortalSimulators.Count(); --i >= 0; )
+		for( intp i = s_PortalSimulators.Count(); --i >= 0; )
 			s_PortalSimulators[i]->ClearEverything();
 	}
 
 	virtual void LevelShutdownPreEntity( void )
 	{
-		for( int i = s_PortalSimulators.Count(); --i >= 0; )
+		for( intp i = s_PortalSimulators.Count(); --i >= 0; )
 			s_PortalSimulators[i]->ClearEverything();
 	}
 

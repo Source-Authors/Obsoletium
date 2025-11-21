@@ -463,10 +463,10 @@ CAI_BaseNPC *CAI_Squad::GetNextMember( AISquadIter_t *pIter, bool bIgnoreSilentM
 
 int	CAI_Squad::NumMembers( bool bIgnoreSilentMembers )
 {
-	int nSilentMembers = 0;
+	intp nSilentMembers = 0;
 	if ( bIgnoreSilentMembers )
 	{
-		for ( int i = 0; i < m_SquadMembers.Count(); i++ )
+		for ( intp i = 0; i < m_SquadMembers.Count(); i++ )
 		{
 			if ( IsSilentMember( m_SquadMembers[i] ) )
 				nSilentMembers++;

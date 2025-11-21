@@ -2915,7 +2915,7 @@ int CEntitySaveRestoreBlockHandler::RestoreEntity( CBaseEntity *pEntity, IRestor
 #if !defined( CLIENT_DLL )		
 	if ( pEntity->m_iGlobalname != NULL_STRING ) 
 	{
-		int globalIndex = GlobalEntity_GetIndex( pEntity->m_iGlobalname );
+		intp globalIndex = GlobalEntity_GetIndex( pEntity->m_iGlobalname );
 		if ( globalIndex >= 0 )
 		{
 			// Already dead? delete
@@ -2956,7 +2956,7 @@ int CEntitySaveRestoreBlockHandler::RestoreGlobalEntity( CBaseEntity *pEntity, C
 
 	// -------------------
 
-	int globalIndex = GlobalEntity_GetIndex( globalName );
+	intp globalIndex = GlobalEntity_GetIndex( globalName );
 	
 	// Don't overlay any instance of the global that isn't the latest
 	// pSaveData->szCurrentMapName is the level this entity is coming from

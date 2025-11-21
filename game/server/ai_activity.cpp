@@ -67,7 +67,7 @@ const char *CAI_BaseNPC::GetActivityName(int actID)
 //-----------------------------------------------------------------------------
 // Purpose: Given and activity name, return the activity ID
 //-----------------------------------------------------------------------------
-int CAI_BaseNPC::GetActivityID(const char* actName) 
+intp CAI_BaseNPC::GetActivityID(const char* actName) 
 {
 	Assert( m_pActivitySR );
 	if ( !m_pActivitySR )

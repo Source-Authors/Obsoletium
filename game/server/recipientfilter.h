@@ -49,7 +49,7 @@ public:
 	void			AddRecipient( const CBasePlayer *player );
 	void			RemoveAllRecipients( void );
 	void			RemoveRecipient( CBasePlayer *player );
-	void			RemoveRecipientByPlayerIndex( intp playerindex );
+	void			RemoveRecipientByPlayerIndex( int playerindex );
 	void			AddRecipientsByTeam( CTeam *team );
 	void			RemoveRecipientsByTeam( CTeam *team );
 	void			RemoveRecipientsNotOnTeam( CTeam *team );

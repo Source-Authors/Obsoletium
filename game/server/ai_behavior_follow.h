@@ -73,7 +73,7 @@ public:
 
 //-----------------------------------------------------------------------------
 
-int AIGetNumFollowers( CBaseEntity *pEntity, string_t iszClassname = NULL_STRING );
+intp AIGetNumFollowers( CBaseEntity *pEntity, string_t iszClassname = NULL_STRING );
 
 //-----------------------------------------------------------------------------
 

@@ -434,7 +434,7 @@ void UTIL_Portal_TraceRay_With( const CProp_Portal *pPortal, const Ray_t &ray, u
 //-----------------------------------------------------------------------------
 bool UTIL_DidTraceTouchPortals( const Ray_t& ray, const trace_t& trace, CProp_Portal** pOutLocal, CProp_Portal** pOutRemote )
 {
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	intp iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
 	{
 		if( pOutLocal )
@@ -462,9 +462,9 @@ bool UTIL_DidTraceTouchPortals( const Ray_t& ray, const trace_t& trace, CProp_Po
 
 		Vector ptRayEndPoint = trace.endpos - ray.m_StartOffset; // The trace added the start offset to the end position, so remove it for the box test
 		CProp_Portal **pBoxIntersectsPortals = (CProp_Portal **)stackalloc( sizeof(CProp_Portal *) * iPortalCount );
-		int iBoxIntersectsPortalsCount = 0;
+		intp iBoxIntersectsPortalsCount = 0;
 
-		for( int i = 0; i != iPortalCount; ++i )
+		for( intp i = 0; i != iPortalCount; ++i )
 		{
 			CProp_Portal *pTempPortal = pPortals[i];
 			if( (pTempPortal->m_bActivated) && 
@@ -487,7 +487,7 @@ bool UTIL_DidTraceTouchPortals( const Ray_t& ray, const trace_t& trace, CProp_Po
 				//hit more than one, use the closest
 				float fDistToBeat = (ptRayEndPoint - pIntersectedPortal->GetAbsOrigin()).LengthSqr();
 
-				for( int i = 1; i != iBoxIntersectsPortalsCount; ++i )
+				for( intp i = 1; i != iBoxIntersectsPortalsCount; ++i )
 				{
 					float fDist = (ptRayEndPoint - pBoxIntersectsPortals[i]->GetAbsOrigin()).LengthSqr();
 					if( fDist < fDistToBeat )
@@ -691,7 +691,7 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 		{
 			//local clipped static props
 			{
-				int iLocalStaticCount = portalSimulator.m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
+				intp iLocalStaticCount = portalSimulator.m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
 				if( iLocalStaticCount != 0 && portalSimulator.m_DataAccess.Simulation.Static.World.StaticProps.bCollisionExists )
 				{
 					const PS_SD_Static_World_StaticProps_ClippedProp_t *pCurrentProp = portalSimulator.m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Base();
@@ -726,7 +726,7 @@ void UTIL_Portal_TraceRay( const CProp_Portal *pPortal, const Ray_t &ray, unsign
 				//remote clipped static props transformed into our wall space
 				if( bTraceTransformedGeometry && (pTraceFilter->GetTraceType() != TRACE_WORLD_ONLY) && sv_portal_trace_vs_staticprops.GetBool() )
 				{
-					int iLocalStaticCount = pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
+					intp iLocalStaticCount = pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
 					if( iLocalStaticCount != 0 )
 					{
 						const PS_SD_Static_World_StaticProps_ClippedProp_t *pCurrentProp = pLinkedPortalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Base();
@@ -1000,7 +1000,7 @@ void UTIL_Portal_TraceEntity( CBaseEntity *pEntity, const Vector &vecAbsStart, c
 				
 				//local clipped static props
 				{
-					int iLocalStaticCount = pPortalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
+					intp iLocalStaticCount = pPortalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Count();
 					if( iLocalStaticCount != 0 && pPortalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.bCollisionExists )
 					{
 						const PS_SD_Static_World_StaticProps_ClippedProp_t *pCurrentProp = pPortalSimulator->m_DataAccess.Simulation.Static.World.StaticProps.ClippedRepresentations.Base();
@@ -1203,7 +1203,7 @@ float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoi
 {
 	float fMinDist = vPoint1.DistToSqr( vPoint2 );	
 	
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	intp iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
 	{
 		if( pShortestDistPortal_Out )
@@ -1214,7 +1214,7 @@ float UTIL_Portal_ShortestDistanceSqr( const Vector &vPoint1, const Vector &vPoi
 	CProp_Portal **pPortals = CProp_Portal_Shared::AllPortals.Base();
 	CProp_Portal *pShortestDistPortal = NULL;
 
-	for( int i = 0; i != iPortalCount; ++i )
+	for( intp i = 0; i != iPortalCount; ++i )
 	{
 		CProp_Portal *pTempPortal = pPortals[i];
 		if( pTempPortal->m_bActivated )
@@ -1450,7 +1450,7 @@ bool UTIL_IsBoxIntersectingPortal( const Vector &vecBoxCenter, const Vector &vec
 
 CProp_Portal *UTIL_IntersectEntityExtentsWithPortal( const CBaseEntity *pEntity )
 {
-	int iPortalCount = CProp_Portal_Shared::AllPortals.Count();
+	intp iPortalCount = CProp_Portal_Shared::AllPortals.Count();
 	if( iPortalCount == 0 )
 		return NULL;
 

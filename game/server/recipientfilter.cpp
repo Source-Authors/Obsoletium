@@ -142,7 +142,7 @@ void CRecipientFilter::RemoveRecipient( CBasePlayer *player )
 	}
 }
 
-void CRecipientFilter::RemoveRecipientByPlayerIndex( intp playerindex )
+void CRecipientFilter::RemoveRecipientByPlayerIndex( int playerindex )
 {
 	Assert( playerindex >= 1 && playerindex <= ABSOLUTE_PLAYER_LIMIT );
 

@@ -59,7 +59,7 @@ void CAI_GlobalNamespace::AddSymbol( const char *pszSymbol, int symbolID )
 
 //-------------------------------------
 
-const char *CAI_GlobalNamespace::IdToSymbol( int symbolID ) const
+const char *CAI_GlobalNamespace::IdToSymbol( intp symbolID ) const
 {
 	AssertMsg( AI_IdIsGlobal( symbolID ), ("Local symbol ID passed to CAI_GlobalNamespace::IdToSymbol()") );
 	if ( symbolID == -1 )
@@ -69,7 +69,7 @@ const char *CAI_GlobalNamespace::IdToSymbol( int symbolID ) const
 
 //-------------------------------------
 
-int CAI_GlobalNamespace::SymbolToId( const char *pszSymbol ) const
+intp CAI_GlobalNamespace::SymbolToId( const char *pszSymbol ) const
 {
 	return (const_cast<CStringRegistry *>(m_pSymbols))->GetStringID( pszSymbol );
 }

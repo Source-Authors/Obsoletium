@@ -29,7 +29,7 @@ public:
 	// Purpose: Tries to linearly push an entity hierarchy, returns the blocker if any
 	CBaseEntity *PerformLinearPush( CBaseEntity *pRoot, float movetime );
 
-	int			CountMovedEntities() { return m_rgMoved.Count(); }
+	intp		CountMovedEntities() { return m_rgMoved.Count(); }
 	void		StoreMovedEntities( physicspushlist_t &list );
 	void		BeginPush( CBaseEntity *pRootEntity );
 

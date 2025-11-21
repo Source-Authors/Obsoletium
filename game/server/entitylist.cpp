@@ -36,15 +36,18 @@ CBaseEntityList *g_pEntityList = &gEntList;
 class CAimTargetManager : public IEntityListener
 {
 public:
+	explicit CAimTargetManager(CGlobalEntityList &entityList)
+		: m_entityList{entityList} {}
+
 	// Called by CEntityListSystem
 	void LevelInitPreEntity() 
 	{ 
-		gEntList.AddListenerEntity( this );
+		m_entityList.AddListenerEntity( this );
 		Clear(); 
 	}
 	void LevelShutdownPostEntity()
 	{
-		gEntList.RemoveListenerEntity( this );
+		m_entityList.RemoveListenerEntity( this );
 		Clear();
 	}
 
@@ -68,14 +71,14 @@ public:
 		}
 	}
 	
-	bool ShouldAddEntity( CBaseEntity *pEntity )
+	bool ShouldAddEntity( CBaseEntity *pEntity ) const
 	{
 		return ((pEntity->GetFlags() & FL_AIMTARGET) != 0);
 	}
 
 	// IEntityListener
-	virtual void OnEntityCreated( CBaseEntity *pEntity ) {}
-	virtual void OnEntityDeleted( CBaseEntity *pEntity )
+	void OnEntityCreated( CBaseEntity *pEntity ) override {}
+	void OnEntityDeleted( CBaseEntity *pEntity ) override
 	{
 		if ( !(pEntity->GetFlags() & FL_AIMTARGET) )
 			return;
@@ -89,31 +92,32 @@ public:
 	}
 	void RemoveEntity( CBaseEntity *pEntity )
 	{
-		int index = m_targetList.Find( pEntity );
+		intp index = m_targetList.Find( pEntity );
 		if ( m_targetList.IsValidIndex(index) )
 		{
 			m_targetList.FastRemove( index );
 		}
 	}
-	int ListCount() { return m_targetList.Count(); }
-	int ListCopy( CBaseEntity *pList[], int listMax )
+	intp ListCount() const { return m_targetList.Count(); }
+	intp ListCopy( CBaseEntity *pList[], intp listMax ) const
 	{
-		int count = MIN(listMax, ListCount() );
+		intp count = MIN(listMax, ListCount() );
 		memcpy( pList, m_targetList.Base(), sizeof(CBaseEntity *) * count );
 		return count;
 	}
 
 private:
 	CUtlVector<CBaseEntity *>	m_targetList;
+	CGlobalEntityList			&m_entityList;
 };
 
-static CAimTargetManager g_AimManager;
+static CAimTargetManager g_AimManager{gEntList};
 
-int AimTarget_ListCount()
+intp AimTarget_ListCount()
 {
 	return g_AimManager.ListCount();
 }
-int AimTarget_ListCopy( CBaseEntity *pList[], int listMax )
+intp AimTarget_ListCopy( CBaseEntity *pList[], intp listMax )
 {
 	return g_AimManager.ListCopy( pList, listMax );
 }
@@ -129,14 +133,15 @@ void AimTarget_ForceRepopulateList()
 // frame.
 struct simthinkentry_t
 {
-	unsigned short	entEntry;
-	unsigned short	unused0;
+	// dimhotepus: unsigned short -> int.
+	int				entEntry;
 	int				nextThinkTick;
 };
 class CSimThinkManager : public IEntityListener
 {
 public:
-	CSimThinkManager()
+	explicit CSimThinkManager(CGlobalEntityList &entityList)
+		: m_entityList{entityList}
 	{
 		Clear();
 	}
@@ -145,38 +150,38 @@ public:
 		m_simThinkList.Purge();
 		for ( auto &&i : m_entinfoIndex )
 		{
-			i = 0xFFFF;
+			i = InvalidEntInfoIndex;
 		}
 	}
 	void LevelInitPreEntity()
 	{
-		gEntList.AddListenerEntity( this );
+		m_entityList.AddListenerEntity( this );
 	}
 
 	void LevelShutdownPostEntity()
 	{
-		gEntList.RemoveListenerEntity( this );
+		m_entityList.RemoveListenerEntity( this );
 		Clear();
 	}
 
-	void OnEntityCreated( CBaseEntity *pEntity )
+	void OnEntityCreated( CBaseEntity *pEntity ) override
 	{
-		Assert( m_entinfoIndex[pEntity->GetRefEHandle().GetEntryIndex()] == 0xFFFF );
+		Assert( m_entinfoIndex[pEntity->GetRefEHandle().GetEntryIndex()] == InvalidEntInfoIndex );
 	}
-	void OnEntityDeleted( CBaseEntity *pEntity )
+	void OnEntityDeleted( CBaseEntity *pEntity ) override
 	{
 		RemoveEntinfoIndex( pEntity->GetRefEHandle().GetEntryIndex() );
 	}
 
 	void RemoveEntinfoIndex( int index )
 	{
-		unsigned short listHandle = m_entinfoIndex[index];
+		auto listHandle = m_entinfoIndex[index];
 		// If this guy is in the active list, remove him
-		if ( listHandle != 0xFFFF )
+		if ( listHandle != InvalidEntInfoIndex )
 		{
 			Assert(m_simThinkList[listHandle].entEntry == index);
 			m_simThinkList.FastRemove( listHandle );
-			m_entinfoIndex[index] = 0xFFFF;
+			m_entinfoIndex[index] = InvalidEntInfoIndex;
 			
 			// fast remove shifted someone, update that someone
 			if ( listHandle < m_simThinkList.Count() )
@@ -185,16 +190,17 @@ public:
 			}
 		}
 	}
-	int ListCount()
+
+	intp ListCount() const
 	{
 		return m_simThinkList.Count();
 	}
 
-	int ListCopy( CBaseEntity *pList[], int listMax )
+	intp ListCopy( CBaseEntity *pList[], intp listMax ) const
 	{
-		int count = MIN(listMax, ListCount());
-		int out = 0;
-		for ( int i = 0; i < count; i++ )
+		intp count = min(listMax, ListCount());
+		intp out = 0;
+		for ( intp i = 0; i < count; i++ )
 		{
 			// only copy out entities that will simulate or think this frame
 			if ( m_simThinkList[i].nextThinkTick <= gpGlobals->tickcount )
@@ -223,18 +229,19 @@ public:
 			return;
 
 		int index = eh.GetEntryIndex();
-		if ( pEntity->IsEFlagSet( EFL_NO_THINK_FUNCTION ) && pEntity->IsEFlagSet( EFL_NO_GAME_PHYSICS_SIMULATION ) )
+		if ( pEntity->IsEFlagSet( EFL_NO_THINK_FUNCTION ) &&
+			 pEntity->IsEFlagSet( EFL_NO_GAME_PHYSICS_SIMULATION ) )
 		{
 			RemoveEntinfoIndex( index );
 		}
 		else
 		{
 			// already in the list? (had think or sim last time, now has both - or had both last time, now just one)
-			if ( m_entinfoIndex[index] == 0xFFFF )
+			if ( m_entinfoIndex[index] == InvalidEntInfoIndex )
 			{
 				MEM_ALLOC_CREDIT();
 				m_entinfoIndex[index] = m_simThinkList.AddToTail();
-				m_simThinkList[m_entinfoIndex[index]].entEntry = (unsigned short)index;
+				m_simThinkList[m_entinfoIndex[index]].entEntry = index;
 				m_simThinkList[m_entinfoIndex[index]].nextThinkTick = 0;
 				if ( pEntity->IsEFlagSet(EFL_NO_GAME_PHYSICS_SIMULATION) )
 				{
@@ -259,18 +266,21 @@ public:
 	}
 
 private:
-	unsigned short m_entinfoIndex[NUM_ENT_ENTRIES];
+	static constexpr inline intp InvalidEntInfoIndex{-1};
+
+	CGlobalEntityList &m_entityList;
+	intp m_entinfoIndex[NUM_ENT_ENTRIES];
 	CUtlVector<simthinkentry_t>	m_simThinkList;
 };
 
-CSimThinkManager g_SimThinkManager;
+CSimThinkManager g_SimThinkManager{gEntList};
 
-int SimThink_ListCount()
+intp SimThink_ListCount()
 {
 	return g_SimThinkManager.ListCount();
 }
 
-int SimThink_ListCopy( CBaseEntity *pList[], int listMax )
+intp SimThink_ListCopy( CBaseEntity *pList[], intp listMax )
 {
 	return g_SimThinkManager.ListCopy( pList, listMax );
 }
@@ -319,7 +329,7 @@ void CGlobalEntityList::CleanupDeleteList( void )
 	PhysOnCleanupDeleteList();
 
 	g_bDisableEhandleAccess = true;
-	for ( int i = 0; i < g_DeleteList.Count(); i++ )
+	for ( intp i = 0; i < g_DeleteList.Count(); i++ )
 	{
 		g_DeleteList[i]->Release();
 	}
@@ -329,9 +339,9 @@ void CGlobalEntityList::CleanupDeleteList( void )
 	g_fInCleanupDelete = false;
 }
 
-int CGlobalEntityList::ResetDeleteList( void )
+intp CGlobalEntityList::ResetDeleteList( void )
 {
-	int result = g_DeleteList.Count();
+	intp result = g_DeleteList.Count();
 	g_DeleteList.RemoveAll();
 	return result;
 }
@@ -463,7 +473,7 @@ bool CGlobalEntityList::IsEntityPtr( void *pTest )
 		const CEntInfo *pInfo = FirstEntInfo();
 		for ( ;pInfo; pInfo = pInfo->m_pNext )
 		{
-			if ( pTest == (void *)pInfo->m_pEntity )
+			if ( pTest == pInfo->m_pEntity )
 				return true;
 		}
 	}
@@ -1105,8 +1115,7 @@ void CGlobalEntityList::OnRemoveEntity( IHandleEntity *pEnt, CBaseHandle handle 
 #ifdef DBGFLAG_ASSERT
 	if ( !g_fInCleanupDelete )
 	{
-		int i;
-		for ( i = 0; i < g_DeleteList.Count(); i++ )
+		for ( intp i = 0; i < g_DeleteList.Count(); i++ )
 		{
 			if ( g_DeleteList[i]->GetEntityHandle() == pEnt )
 			{
@@ -1131,7 +1140,7 @@ void CGlobalEntityList::NotifyCreateEntity( CBaseEntity *pEnt )
 		return;
 
 	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
-	for ( int i = m_entityListeners.Count()-1; i >= 0; i-- )
+	for ( intp i = m_entityListeners.Count()-1; i >= 0; i-- )
 	{
 		m_entityListeners[i]->OnEntityCreated( pEnt );
 	}
@@ -1143,7 +1152,7 @@ void CGlobalEntityList::NotifySpawn( CBaseEntity *pEnt )
 		return;
 
 	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
-	for ( int i = m_entityListeners.Count()-1; i >= 0; i-- )
+	for ( intp i = m_entityListeners.Count()-1; i >= 0; i-- )
 	{
 		m_entityListeners[i]->OnEntitySpawned( pEnt );
 	}
@@ -1159,7 +1168,7 @@ void CGlobalEntityList::NotifyRemoveEntity( CBaseHandle hEnt )
 		return;
 
 	//DevMsg(2,"Deleted %s\n", pBaseEnt->GetClassname() );
-	for ( int i = m_entityListeners.Count()-1; i >= 0; i-- )
+	for ( intp i = m_entityListeners.Count()-1; i >= 0; i-- )
 	{
 		m_entityListeners[i]->OnEntityDeleted( pBaseEnt );
 	}
@@ -1187,8 +1196,8 @@ public:
 	void ReportSystemEvent( CBaseEntity *pEntity, notify_system_event_t eventType, const notify_system_event_params_t &params );
 
 	// IEntityListener
-	virtual void OnEntityCreated( CBaseEntity *pEntity );
-	virtual void OnEntityDeleted( CBaseEntity *pEntity );
+	void OnEntityCreated( CBaseEntity *pEntity ) override;
+	void OnEntityDeleted( CBaseEntity *pEntity ) override;
 
 	// Called from CEntityListSystem
 	void LevelInitPreEntity();
@@ -1291,15 +1300,18 @@ INotify *g_pNotify = &g_NotifyList;
 class CEntityTouchManager : public IEntityListener
 {
 public:
+	explicit CEntityTouchManager(CGlobalEntityList &entityList)
+		: m_entityList{entityList} {}
+
 	// called by CEntityListSystem
 	void LevelInitPreEntity() 
 	{ 
-		gEntList.AddListenerEntity( this );
+		m_entityList.AddListenerEntity( this );
 		Clear(); 
 	}
 	void LevelShutdownPostEntity() 
 	{ 
-		gEntList.RemoveListenerEntity( this );
+		m_entityList.RemoveListenerEntity( this );
 		Clear(); 
 	}
 	void FrameUpdatePostEntityThink();
@@ -1310,8 +1322,8 @@ public:
 	}
 	
 	// IEntityListener
-	virtual void OnEntityCreated( CBaseEntity *pEntity ) {}
-	virtual void OnEntityDeleted( CBaseEntity *pEntity )
+	void OnEntityCreated( CBaseEntity *pEntity ) override {}
+	void OnEntityDeleted( CBaseEntity *pEntity ) override
 	{
 		if ( !pEntity->GetCheckUntouch() )
 			return;
@@ -1330,9 +1342,10 @@ public:
 
 private:
 	CUtlVector<CBaseEntity *>	m_updateList;
+	CGlobalEntityList	&m_entityList;
 };
 
-static CEntityTouchManager g_TouchManager;
+static CEntityTouchManager g_TouchManager{gEntList};
 
 void EntityTouch_Add( CBaseEntity *pEntity )
 {
@@ -1349,7 +1362,7 @@ void CEntityTouchManager::FrameUpdatePostEntityThink()
 	if ( count )
 	{
 		// copy off the list
-		CBaseEntity **ents = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * count );
+		CBaseEntity **ents = stackallocT( CBaseEntity *, count );
 		memcpy( ents, m_updateList.Base(), sizeof(CBaseEntity *) * count );
 		// clear it
 		m_updateList.RemoveAll();
@@ -1370,13 +1383,13 @@ void CEntityTouchManager::FrameUpdatePostEntityThink()
 class CRespawnEntitiesFilter : public IMapEntityFilter
 {
 public:
-	virtual bool ShouldCreateEntity( const char *pClassname )
+	bool ShouldCreateEntity( const char *pClassname ) override
 	{
 		// Create everything but the world
 		return Q_stricmp( pClassname, "worldspawn" ) != 0;
 	}
 
-	virtual CBaseEntity* CreateNextEntity( const char *pClassname )
+	CBaseEntity* CreateNextEntity( const char *pClassname ) override
 	{
 		return CreateEntityByName( pClassname );
 	}
@@ -1523,9 +1536,9 @@ public:
 	void ReportEntityList()
 	{
 		const char *pLastClass = "";
-		int count = 0;
-		int edicts = 0;
-		for ( int i = 0; i < m_sortedList.Count(); i++ )
+		intp count = 0;
+		intp edicts = 0;
+		for ( intp i = 0; i < m_sortedList.Count(); i++ )
 		{
 			CBaseEntity *pEntity = m_sortedList[i];
 			if ( !pEntity )
@@ -1539,7 +1552,7 @@ public:
 			{
 				if ( count )
 				{
-					Msg("Class: %s (%d)\n", pLastClass, count );
+					Msg("Class: %s (%zd)\n", pLastClass, count );
 				}
 
 				pLastClass = pClassname;
@@ -1550,16 +1563,16 @@ public:
 		}
 		if ( pLastClass[0] != 0 && count )
 		{
-			Msg("Class: %s (%d)\n", pLastClass, count );
+			Msg("Class: %s (%zd)\n", pLastClass, count );
 		}
 		if ( m_sortedList.Count() )
 		{
-			Msg("Total %d entities (%d empty, %d edicts)\n", m_sortedList.Count(), m_emptyCount, edicts );
+			Msg("Total %zd entities (%zd empty, %zd edicts)\n", m_sortedList.Count(), m_emptyCount, edicts );
 		}
 	}
 private:
 	CUtlSortVector< CBaseEntity *, CEntityReportLess > m_sortedList;
-	int		m_emptyCount;
+	intp	m_emptyCount;
 };
 
 
@@ -1596,7 +1609,7 @@ CON_COMMAND(report_touchlinks, "Lists all touchlinks")
 	{
 		if ( !pClassname || FClassnameIs(pEntity, pClassname) )
 		{
-			touchlink_t *root = ( touchlink_t * )pEntity->GetDataObject( TOUCHLINK );
+			auto *root = ( touchlink_t * )pEntity->GetDataObject( TOUCHLINK );
 			if ( root )
 			{
 				touchlink_t *link = root->nextLink;
@@ -1618,10 +1631,10 @@ CON_COMMAND(report_simthinklist, "Lists all simulating/thinking entities")
 		return;
 
 	CBaseEntity *pTmp[NUM_ENT_ENTRIES];
-	int count = SimThink_ListCopy( pTmp, ARRAYSIZE(pTmp) );
+	intp count = SimThink_ListCopy( pTmp, ssize(pTmp) );
 
 	CSortedEntityList list;
-	for ( int i = 0; i < count; i++ )
+	for ( intp i = 0; i < count; i++ )
 	{
 		if ( !pTmp[i] )
 			continue;

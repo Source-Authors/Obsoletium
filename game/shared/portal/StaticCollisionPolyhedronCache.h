@@ -26,7 +26,7 @@ public:
 	void Shutdown( void );
 
 	const CPolyhedron *GetBrushPolyhedron( int iBrushNumber );
-	int GetStaticPropPolyhedrons( ICollideable *pStaticProp, CPolyhedron **pOutputPolyhedronArray, int iOutputArraySize );
+	int GetStaticPropPolyhedrons( ICollideable *pStaticProp, CPolyhedron **pOutputPolyhedronArray, intp iOutputArraySize );
 
 private:
 	// See comments in LevelInitPreEntity for why these members are commented out
@@ -36,8 +36,8 @@ private:
 
 	struct StaticPropPolyhedronCacheInfo_t
 	{
-		int iStartIndex;
-		int iNumPolyhedrons;
+		intp iStartIndex;
+		intp iNumPolyhedrons;
 		int iStaticPropIndex; //helps us remap ICollideable pointers when the map is restarted
 	};
 

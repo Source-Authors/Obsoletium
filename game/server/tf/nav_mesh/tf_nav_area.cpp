@@ -309,8 +309,8 @@ public:
 		int dir;
 		for( dir=0; dir<NUM_DIRECTIONS; ++dir )
 		{
-			int count = area->GetAdjacentCount( (NavDirType)dir );
-			for( int i=0; i<count; ++i )
+			intp count = area->GetAdjacentCount( (NavDirType)dir );
+			for( intp i=0; i<count; ++i )
 			{
 				CTFNavArea *adjArea = static_cast< CTFNavArea * >( area->GetAdjacentArea( (NavDirType)dir, i ) );
 

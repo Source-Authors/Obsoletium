@@ -66,12 +66,12 @@ void CHintCriteria::AddHintType( int hintType )
 	m_HintTypes.AddToTail( hintType );
 }
 
-int CHintCriteria::NumHintTypes() const
+intp CHintCriteria::NumHintTypes() const
 {
 	return m_HintTypes.Count();
 }
 
-int	CHintCriteria::GetHintType( int idx ) const
+int	CHintCriteria::GetHintType( intp idx ) const
 {
 	return m_HintTypes[ idx ];
 }
@@ -98,8 +98,8 @@ bool CHintCriteria::MatchesSingleHintType() const
 //-----------------------------------------------------------------------------
 bool CHintCriteria::MatchesHintType( int hintType ) const
 {
-	int c = m_HintTypes.Count();
- 	for ( int i = 0; i < c; ++i )
+	intp c = m_HintTypes.Count();
+ 	for ( intp i = 0; i < c; ++i )
 	{
 		if ( m_HintTypes[i] == hintType )
 			return true;
@@ -216,10 +216,10 @@ void CHintCriteria::AddExcludePosition( const Vector &position, float radius )
 //-----------------------------------------------------------------------------
 inline bool CHintCriteria::InZone( const zoneList_t &zone, const Vector &testPosition ) const
 {
-	int	numZones = zone.Count();
+	intp	numZones = zone.Count();
 
 	//Iterate through all zones in the list
-	for ( int i = 0; i < numZones; i++ )
+	for ( intp i = 0; i < numZones; i++ )
 	{
 		if ( ((zone[i].position) - testPosition).LengthSqr() < (zone[i].radiussqr) )
 			return true;
@@ -306,10 +306,10 @@ bool CAI_HintManager::IsInFoundHintList( CAI_Hint *hint )
 }
 
 //-----------------------------------------------------------------------------
-int CAI_HintManager::FindAllHints( CAI_BaseNPC *pNPC, const Vector &position, const CHintCriteria &hintCriteria, CUtlVector<CAI_Hint *> *pResult )
+intp CAI_HintManager::FindAllHints( CAI_BaseNPC *pNPC, const Vector &position, const CHintCriteria &hintCriteria, CUtlVector<CAI_Hint *> *pResult )
 {
 	//  If we have no hints, bail
-	int c = CAI_HintManager::gm_AllHints.Count();
+	intp c = CAI_HintManager::gm_AllHints.Count();
 	if ( !c )
 		return NULL;
 
@@ -319,7 +319,7 @@ int CAI_HintManager::FindAllHints( CAI_BaseNPC *pNPC, const Vector &position, co
 
 	//  Now loop till we find a valid hint or return to the start
 	CAI_Hint *pTestHint;
-	for ( int i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		pTestHint = CAI_HintManager::gm_AllHints[ i ];
 		Assert( pTestHint );
@@ -386,7 +386,7 @@ CAI_Hint *CAI_HintManager::FindHint( CAI_BaseNPC *pNPC, const Vector &position, 
 	CUtlVector< CAIHintVector * > lists;
 	if ( singleType )
 	{
-		int slot = CAI_HintManager::gm_TypedHints.Find( hintCriteria.GetFirstHintType() );
+		auto slot = CAI_HintManager::gm_TypedHints.Find( hintCriteria.GetFirstHintType() );
 		if ( slot != CAI_HintManager::gm_TypedHints.InvalidIndex() )
 		{
 			lists.AddToTail( &CAI_HintManager::gm_TypedHints[ slot ] );
@@ -394,12 +394,12 @@ CAI_Hint *CAI_HintManager::FindHint( CAI_BaseNPC *pNPC, const Vector &position, 
 	}
 	else
 	{
-		int typeCount = hintCriteria.NumHintTypes();
+		intp typeCount = hintCriteria.NumHintTypes();
 		if ( typeCount > 0 )
 		{
-			for ( int listType = 0; listType < typeCount; ++listType )
+			for ( intp listType = 0; listType < typeCount; ++listType )
 			{
-				int slot = CAI_HintManager::gm_TypedHints.Find( hintCriteria.GetHintType( listType ) );
+				auto slot = CAI_HintManager::gm_TypedHints.Find( hintCriteria.GetHintType( listType ) );
 				if ( slot != CAI_HintManager::gm_TypedHints.InvalidIndex() )
 				{
 					lists.AddToTail( &CAI_HintManager::gm_TypedHints[ slot ] );
@@ -418,7 +418,7 @@ CAI_Hint *CAI_HintManager::FindHint( CAI_BaseNPC *pNPC, const Vector &position, 
 
 	int visited = 0;
 
-	int listCount = lists.Count();
+	intp listCount = lists.Count();
 
 	if ( listCount == 0 )
 		return NULL;
@@ -455,7 +455,7 @@ CAI_Hint *CAI_HintManager::FindHint( CAI_BaseNPC *pNPC, const Vector &position, 
 	// Longer search, reset best distance
 	flBestDistance = MAX_TRACE_LENGTH;
 
-	for ( int listNum = 0; listNum < listCount; ++listNum )
+	for ( intp listNum = 0; listNum < listCount; ++listNum )
 	{
 		CAIHintVector *list = lists[ listNum ];
 		count = list->Count();
@@ -806,8 +806,8 @@ void CAI_HintManager::ValidateHints()
 //------------------------------------------------------------------------------
 void CAI_HintManager::DrawHintOverlays(float flDrawDuration)
 {
-	int c = gm_AllHints.Count();
-	for ( int i = 0; i < c; ++i )
+	intp c = gm_AllHints.Count();
+	for ( intp i = 0; i < c; ++i )
 	{
         CAI_Hint *pHint = gm_AllHints[ i ];
 		int		r		= 0;

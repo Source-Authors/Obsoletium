@@ -6425,7 +6425,7 @@ void CBaseEntity::ModifyOrAppendCriteria( AI_CriteriaSet& set )
 
 	// Go through all the global states and append them
 
-	for ( int i = 0; i < GlobalEntity_GetNumGlobals(); i++ ) 
+	for ( intp i = 0; i < GlobalEntity_GetNumGlobals(); i++ ) 
 	{
 		const char *szGlobalName = GlobalEntity_GetName(i);
 		int iGlobalState = (int)GlobalEntity_GetStateByIndex(i);

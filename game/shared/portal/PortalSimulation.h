@@ -21,8 +21,8 @@
 
 struct StaticPropPolyhedronGroups_t //each static prop is made up of a group of polyhedrons, these help us pull those groups from an array
 {
-	int iStartIndex;
-	int iNumPolyhedrons;
+	intp iStartIndex;
+	intp iNumPolyhedrons;
 };
 
 enum PortalSimulationEntityFlags_t

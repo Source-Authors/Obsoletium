@@ -546,8 +546,8 @@ void SearchSurroundingAreas( CNavArea *startArea, const Vector &startPos, Functo
 			// explore adjacent floor areas
 			for( int dir=0; dir<NUM_DIRECTIONS; ++dir )
 			{
-				int count = area->GetAdjacentCount( (NavDirType)dir );
-				for( int i=0; i<count; ++i )
+				intp count = area->GetAdjacentCount( (NavDirType)dir );
+				for( intp i=0; i<count; ++i )
 				{
 					CNavArea *adjArea = area->GetAdjacentArea( (NavDirType)dir, i );
 					if ( options & EXCLUDE_OUTGOING_CONNECTIONS )
@@ -651,8 +651,8 @@ public:
 		// search adjacent outgoing connections
 		for( int dir=0; dir<NUM_DIRECTIONS; ++dir )
 		{
-			int count = area->GetAdjacentCount( (NavDirType)dir );
-			for( int i=0; i<count; ++i )
+			intp count = area->GetAdjacentCount( (NavDirType)dir );
+			for( intp i=0; i<count; ++i )
 			{
 				CNavArea *adjArea = area->GetAdjacentArea( (NavDirType)dir, i );
 
@@ -792,8 +792,8 @@ inline void CollectSurroundingAreas( CUtlVector< CNavArea * > *nearbyAreaVector,
 			// search adjacent outgoing connections
 			for( int dir=0; dir<NUM_DIRECTIONS; ++dir )
 			{
-				int count = area->GetAdjacentCount( (NavDirType)dir );
-				for( int i=0; i<count; ++i )
+				intp count = area->GetAdjacentCount( (NavDirType)dir );
+				for( intp i=0; i<count; ++i )
 				{
 					CNavArea *adjArea = area->GetAdjacentArea( (NavDirType)dir, i );
 

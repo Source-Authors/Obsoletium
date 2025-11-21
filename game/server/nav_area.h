@@ -369,8 +369,8 @@ public:
 
 	bool IsVisible( const Vector &eye, Vector *visSpot = NULL ) const;	// return true if area is visible from the given eyepoint, return visible spot
 
-	int GetAdjacentCount( NavDirType dir ) const	{ return m_connect[ dir ].Count(); }	// return number of connected areas in given direction
-	CNavArea *GetAdjacentArea( NavDirType dir, int i ) const;	// return the i'th adjacent area in the given direction
+	intp GetAdjacentCount( NavDirType dir ) const	{ return m_connect[ dir ].Count(); }	// return number of connected areas in given direction
+	CNavArea *GetAdjacentArea( NavDirType dir, intp i ) const;	// return the i'th adjacent area in the given direction
 	CNavArea *GetRandomAdjacentArea( NavDirType dir ) const;
 	void CollectAdjacentAreas( CUtlVector< CNavArea * > *adjVector ) const;	// build a vector of all adjacent areas
 
@@ -399,7 +399,7 @@ public:
 	const HidingSpotVector *GetHidingSpots( void ) const	{ return &m_hidingSpots; }
 
 	SpotEncounter *GetSpotEncounter( const CNavArea *from, const CNavArea *to );	// given the areas we are moving between, return the spots we will encounter
-	int GetSpotEncounterCount( void ) const				{ return m_spotEncounters.Count(); }
+	intp GetSpotEncounterCount( void ) const			{ return m_spotEncounters.Count(); }
 
 	//- "danger" ----------------------------------------------------------------------------------------
 	void IncreaseDanger( int teamID, float amount );			// increase the danger of this area for the given team
@@ -821,7 +821,7 @@ inline bool CNavArea::IsDegenerate( void ) const
 }
 
 //--------------------------------------------------------------------------------------------------------------
-inline CNavArea *CNavArea::GetAdjacentArea( NavDirType dir, int i ) const
+inline CNavArea *CNavArea::GetAdjacentArea( NavDirType dir, intp i ) const
 {
 	if ( ( i < 0 ) || ( i >= m_connect[dir].Count() ) )
 		return NULL;

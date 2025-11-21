@@ -1891,7 +1891,7 @@ int DispatchSpawn( CBaseEntity *pEntity )
 		if ( pEntity->m_iGlobalname != NULL_STRING ) 
 		{
 			// Handle global stuff here
-			int globalIndex = GlobalEntity_GetIndex( pEntity->m_iGlobalname );
+			intp globalIndex = GlobalEntity_GetIndex( pEntity->m_iGlobalname );
 			if ( globalIndex >= 0 )
 			{
 				// Already dead? delete

@@ -103,7 +103,7 @@ public:
 	virtual bool		CheckSceneEventCompletion( CSceneEventInfo *info, float currenttime, CChoreoScene *scene, CChoreoEvent *event );
 
 	// Finds the layer priority of the current scene
-	int					GetScenePriority( CChoreoScene *scene );
+	intp				GetScenePriority( CChoreoScene *scene );
 
 	// Returns true if the actor is not currently in a scene OR if the actor
 	//  is in a scene, but a PERMIT_RESPONSES event is active and the permit time

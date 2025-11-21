@@ -1890,7 +1890,7 @@ void CMultiPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 #endif
 
 	// Write out the layers and their data.
-	for ( int iAnim = 0; iAnim < GetBasePlayer()->GetNumAnimOverlays(); ++iAnim )
+	for ( intp iAnim = 0; iAnim < GetBasePlayer()->GetNumAnimOverlays(); ++iAnim )
 	{
 #ifdef CLIENT_DLL
 		C_AnimationLayer *pLayer = GetBasePlayer()->GetAnimOverlay( iAnim );
@@ -2004,7 +2004,7 @@ void CMultiPlayerAnimState::DebugShowAnimState( int iStartLine )
 	Anim_StatePrintf( iLine++, "main: %s, cycle: %.2f\n", GetSequenceName( GetBasePlayer()->GetModelPtr(), GetBasePlayer()->GetSequence() ), GetBasePlayer()->GetCycle() );
 
 #if defined( CLIENT_DLL )
-	for ( int i=0; i < GetBasePlayer()->GetNumAnimOverlays()-1; i++ )
+	for ( intp i=0; i < GetBasePlayer()->GetNumAnimOverlays()-1; i++ )
 	{
 		C_AnimationLayer *pLayer = GetBasePlayer()->GetAnimOverlay( i /*i+1?*/ );
 		Anim_StatePrintf( iLine++, "%s, weight: %.2f, cycle: %.2f, aim (%d)", 

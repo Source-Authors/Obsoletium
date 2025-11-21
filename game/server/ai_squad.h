@@ -95,7 +95,7 @@ public:
 	CAI_BaseNPC *			GetNextMember( AISquadIter_t *pIter, bool bIgnoreSilentMembers = true );
 	CAI_BaseNPC *			GetAnyMember();
 	int						NumMembers( bool bIgnoreSilentMembers = true );
-	int						GetSquadIndex( CAI_BaseNPC * );
+	intp					GetSquadIndex( CAI_BaseNPC * );
 
 	void					SquadNewEnemy ( CBaseEntity *pEnemy );
 	void					UpdateEnemyMemory( CAI_BaseNPC *pUpdater, CBaseEntity *pEnemy, const Vector &position );
@@ -260,9 +260,9 @@ inline CAI_BaseNPC *CAI_Squad::GetAnyMember()
 
 //-------------------------------------
 
-inline int CAI_Squad::GetSquadIndex( CAI_BaseNPC *pAI )
+inline intp CAI_Squad::GetSquadIndex( CAI_BaseNPC *pAI )
 {
-	for ( int i = 0; i < m_SquadMembers.Count(); i++ )
+	for ( intp i = 0; i < m_SquadMembers.Count(); i++ )
 	{
 		if ( m_SquadMembers[i] == pAI )
 			return i;

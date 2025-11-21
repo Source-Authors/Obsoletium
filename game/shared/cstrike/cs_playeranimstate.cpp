@@ -1032,7 +1032,7 @@ void CCSPlayerAnimState::ClearAnimationLayers()
 		return;
 
 	m_pOuter->SetNumAnimOverlays( NUM_LAYERS_WANTED );
-	for ( int i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
+	for ( intp i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
 	{
 		// Client obeys Order of CBaseAnimatingOverlay::MAX_OVERLAYS (15), but server trusts only the ANIM_LAYER_ACTIVE flag.
 		m_pOuter->GetAnimOverlay( i )->SetOrder( CBaseAnimatingOverlay::MAX_OVERLAYS );

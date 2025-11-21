@@ -604,7 +604,7 @@ void CSDKPlayerAnimState::ClearAnimationLayers()
 		return;
 
 	m_pOuter->SetNumAnimOverlays( NUM_LAYERS_WANTED );
-	for ( int i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
+	for ( intp i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
 	{
 		m_pOuter->GetAnimOverlay( i )->SetOrder( CBaseAnimatingOverlay::MAX_OVERLAYS );
 	}

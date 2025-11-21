@@ -230,7 +230,7 @@ void CBaseFlex::RemoveChoreoScene( CChoreoScene *scene, bool canceled )
 // Purpose: 
 //-----------------------------------------------------------------------------
 
-int CBaseFlex::GetScenePriority( CChoreoScene *scene )
+intp CBaseFlex::GetScenePriority( CChoreoScene *scene )
 {
 	intp iPriority = 0;
 	// count number of channels in scenes older than current

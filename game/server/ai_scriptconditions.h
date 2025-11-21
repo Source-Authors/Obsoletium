@@ -151,7 +151,7 @@ private:
 
 	void OnEntitySpawned( CBaseEntity *pEntity );
 
-	int AddNewElement( CBaseEntity *pActor );
+	intp AddNewElement( CBaseEntity *pActor );
 
 	bool ActorInList( CBaseEntity *pActor );
 	void UpdateOnRemove( void );

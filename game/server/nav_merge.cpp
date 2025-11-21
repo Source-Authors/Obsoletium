@@ -88,12 +88,12 @@ private:
 		KeyValues *dirKey = areaKey->FindKey( dirName, true );
 		if ( dirKey )
 		{
-			for ( int i=0; i<area->GetAdjacentCount( dir ); ++i )
+			for ( intp i=0; i<area->GetAdjacentCount( dir ); ++i )
 			{
 				CNavArea *other = area->GetAdjacentArea( dir, i );
 				if ( other && TheNavMesh->IsInSelectedSet( other ) )
 				{
-					CFmtStrN<32> name( "%d", i );
+					CFmtStrN<32> name( "%zd", i );
 					dirKey->SetInt( name.Access(), other->GetID() );
 				}
 			}

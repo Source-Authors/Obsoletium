@@ -590,7 +590,7 @@ void CAI_ScriptConditions::EvaluationThink()
 
 //-----------------------------------------------------------------------------
 
-int CAI_ScriptConditions::AddNewElement( CBaseEntity *pActor )
+intp CAI_ScriptConditions::AddNewElement( CBaseEntity *pActor )
 {
 	CAI_ScriptConditionsElement conditionelement;
 	conditionelement.SetActor( pActor );

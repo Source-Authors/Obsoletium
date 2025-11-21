@@ -154,11 +154,11 @@ public:
 	void	RemoveGesture( Activity activity );
 	void	RemoveAllGestures( void );
 
-	int		AddLayeredSequence( int sequence, int iPriority );
+	intp	AddLayeredSequence( int sequence, int iPriority );
 
-	void	SetLayerPriority( int iLayer, int iPriority );
+	void	SetLayerPriority( intp iLayer, int iPriority );
 
-	bool	IsValidLayer( int iLayer );
+	bool	IsValidLayer( intp iLayer );
 
 	void	SetLayerDuration( int iLayer, float flDuration );
 	float	GetLayerDuration( int iLayer );
@@ -185,16 +185,16 @@ public:
 	void	RemoveLayer( int iLayer, float flKillRate = 0.2f, float flKillDelay = 0.0f );
 	void	FastRemoveLayer( int iLayer );
 
-	CAnimationLayer *GetAnimOverlay( int iIndex );
-	int GetNumAnimOverlays() const;
-	void SetNumAnimOverlays( int num );
+	CAnimationLayer *GetAnimOverlay( intp iIndex );
+	intp GetNumAnimOverlays() const;
+	void SetNumAnimOverlays( intp num );
 
 	void VerifyOrder( void );
 
 	bool	HasActiveLayer( void );
 
 private:
-	int		AllocateLayer( int iPriority = 0 ); // lower priorities are processed first
+	intp	AllocateLayer( int iPriority = 0 ); // lower priorities are processed first
 
 	DECLARE_SERVERCLASS();
 	DECLARE_DATADESC();
@@ -203,7 +203,7 @@ private:
 
 EXTERN_SEND_TABLE(DT_BaseAnimatingOverlay);
 
-inline int CBaseAnimatingOverlay::GetNumAnimOverlays() const
+inline intp CBaseAnimatingOverlay::GetNumAnimOverlays() const
 {
 	return m_AnimOverlay.Count();
 }

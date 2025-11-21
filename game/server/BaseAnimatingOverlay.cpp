@@ -532,7 +532,7 @@ void CBaseAnimatingOverlay::OnRestore( )
 //-----------------------------------------------------------------------------
 int CBaseAnimatingOverlay::AddGestureSequence( int sequence, bool autokill /*= true*/ )
 {
-	int i = AddLayeredSequence( sequence, 0 );
+	intp i = AddLayeredSequence( sequence, 0 );
 	// No room?
 	if ( IsValidLayer( i ) )
 	{
@@ -636,9 +636,9 @@ float CBaseAnimatingOverlay::GetLayerDuration( int iLayer )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int	CBaseAnimatingOverlay::AddLayeredSequence( int sequence, int iPriority )
+intp	CBaseAnimatingOverlay::AddLayeredSequence( int sequence, int iPriority )
 {
-	int i = AllocateLayer( iPriority );
+	intp i = AllocateLayer( iPriority );
 	// No room?
 	if ( IsValidLayer( i ) )
 	{
@@ -655,7 +655,7 @@ int	CBaseAnimatingOverlay::AddLayeredSequence( int sequence, int iPriority )
 		m_AnimOverlay[i].m_bLooping = ((GetSequenceFlags( GetModelPtr(), sequence ) & STUDIO_LOOPING) != 0);
 		if (ai_sequence_debug.GetBool() == true && m_debugOverlays & OVERLAY_NPC_SELECTED_BIT)
 		{
-			Msg("%5.3f : adding %d (%d): %s : %5.3f (%.3f)\n", gpGlobals->curtime, i, m_AnimOverlay[ i ].m_nOrder.Get(), GetSequenceName( m_AnimOverlay[ i ].m_nSequence ), m_AnimOverlay[ i ].m_flCycle.Get(), m_AnimOverlay[ i ].m_flWeight.Get() );
+			Msg("%5.3f : adding %zd (%d): %s : %5.3f (%.3f)\n", gpGlobals->curtime, i, m_AnimOverlay[ i ].m_nOrder.Get(), GetSequenceName( m_AnimOverlay[ i ].m_nSequence ), m_AnimOverlay[ i ].m_flCycle.Get(), m_AnimOverlay[ i ].m_flWeight.Get() );
 		}
 	}
 
@@ -667,7 +667,7 @@ int	CBaseAnimatingOverlay::AddLayeredSequence( int sequence, int iPriority )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-bool CBaseAnimatingOverlay::IsValidLayer( int iLayer )
+bool CBaseAnimatingOverlay::IsValidLayer( intp iLayer )
 {
 	return (iLayer >= 0 && iLayer < m_AnimOverlay.Count() && m_AnimOverlay[iLayer].IsActive());
 }
@@ -677,15 +677,13 @@ bool CBaseAnimatingOverlay::IsValidLayer( int iLayer )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CBaseAnimatingOverlay::AllocateLayer( int iPriority )
+intp CBaseAnimatingOverlay::AllocateLayer( int iPriority )
 {
-	intp i;
-
 	// look for an open slot and for existing layers that are lower priority
 	int iNewOrder = 0;
 	intp iOpenLayer = -1;
 	int iNumOpen = 0;
-	for (i = 0; i < m_AnimOverlay.Count(); i++)
+	for (intp i = 0; i < m_AnimOverlay.Count(); i++)
 	{
 		if ( m_AnimOverlay[i].IsActive() )
 		{
@@ -724,12 +722,12 @@ int CBaseAnimatingOverlay::AllocateLayer( int iPriority )
 	{
 		if (m_AnimOverlay.Count() < MAX_OVERLAYS)
 		{
-			i = m_AnimOverlay.AddToTail();
+			intp i = m_AnimOverlay.AddToTail();
 			m_AnimOverlay[i].Init( this );
 		}
 	}
 
-	for (i = 0; i < m_AnimOverlay.Count(); i++)
+	for (intp i = 0; i < m_AnimOverlay.Count(); i++)
 	{
 		if ( m_AnimOverlay[i].m_nOrder >= iNewOrder && m_AnimOverlay[i].m_nOrder < MAX_OVERLAYS)
 		{
@@ -753,7 +751,7 @@ int CBaseAnimatingOverlay::AllocateLayer( int iPriority )
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-void CBaseAnimatingOverlay::SetLayerPriority( int iLayer, int iPriority )
+void CBaseAnimatingOverlay::SetLayerPriority( intp iLayer, int iPriority )
 {
 	if (!IsValidLayer( iLayer ))
 	{
@@ -766,8 +764,7 @@ void CBaseAnimatingOverlay::SetLayerPriority( int iLayer, int iPriority )
 	}
 
 	// look for an open slot and for existing layers that are lower priority
-	int i;
-	for (i = 0; i < m_AnimOverlay.Count(); i++)
+	for (intp i = 0; i < m_AnimOverlay.Count(); i++)
 	{
 		if ( m_AnimOverlay[i].IsActive() )
 		{
@@ -779,7 +776,7 @@ void CBaseAnimatingOverlay::SetLayerPriority( int iLayer, int iPriority )
 	}
 
 	int iNewOrder = 0;
-	for (i = 0; i < m_AnimOverlay.Count(); i++)
+	for (intp i = 0; i < m_AnimOverlay.Count(); i++)
 	{
 		if ( i != iLayer && m_AnimOverlay[i].IsActive() )
 		{
@@ -790,7 +787,7 @@ void CBaseAnimatingOverlay::SetLayerPriority( int iLayer, int iPriority )
 		}
 	}
 
-	for (i = 0; i < m_AnimOverlay.Count(); i++)
+	for (intp i = 0; i < m_AnimOverlay.Count(); i++)
 	{
 		if ( i != iLayer && m_AnimOverlay[i].IsActive() )
 		{
@@ -963,7 +960,7 @@ void CBaseAnimatingOverlay::SetLayerPlaybackRate( int iLayer, float flPlaybackRa
 	if (!IsValidLayer( iLayer ))
 		return;
 
-	Assert( flPlaybackRate > -1.0 && flPlaybackRate < 40.0);
+	Assert( flPlaybackRate > -1.0f && flPlaybackRate < 40.0f);
 
 	m_AnimOverlay[iLayer].m_flPlaybackRate = flPlaybackRate;
 }
@@ -1120,7 +1117,7 @@ void CBaseAnimatingOverlay::FastRemoveLayer( int iLayer )
 		return;
 
 	// shift the other layers down in order
-	for (int j = 0; j < m_AnimOverlay.Count(); j++ )
+	for (intp j = 0; j < m_AnimOverlay.Count(); j++ )
 	{
 		if ((m_AnimOverlay[ j ].IsActive()) && m_AnimOverlay[ j ].m_nOrder > m_AnimOverlay[ iLayer ].m_nOrder)
 		{
@@ -1132,15 +1129,15 @@ void CBaseAnimatingOverlay::FastRemoveLayer( int iLayer )
 	VerifyOrder();
 }
 
-CAnimationLayer *CBaseAnimatingOverlay::GetAnimOverlay( int iIndex )
+CAnimationLayer *CBaseAnimatingOverlay::GetAnimOverlay( intp iIndex )
 {
-	iIndex = clamp( (intp)iIndex, (intp)0, m_AnimOverlay.Count()-1 );
+	iIndex = clamp( iIndex, (intp)0, m_AnimOverlay.Count()-1 );
 
 	return &m_AnimOverlay[iIndex];
 }
 
 
-void CBaseAnimatingOverlay::SetNumAnimOverlays( int num )
+void CBaseAnimatingOverlay::SetNumAnimOverlays( intp num )
 {
 	if ( m_AnimOverlay.Count() < num )
 	{
@@ -1154,7 +1151,7 @@ void CBaseAnimatingOverlay::SetNumAnimOverlays( int num )
 
 bool CBaseAnimatingOverlay::HasActiveLayer( void )
 {
-	for (int j = 0; j < m_AnimOverlay.Count(); j++ )
+	for (intp j = 0; j < m_AnimOverlay.Count(); j++ )
 	{
 		if ( m_AnimOverlay[ j ].IsActive() )
 			return true;

@@ -7124,13 +7124,13 @@ QAngle CBasePlayer::AutoaimDeflection( Vector &vecSrc, autoaim_params_t &params 
 		}
 	}
 
-	int count = AimTarget_ListCount();
+	intp count = AimTarget_ListCount();
 	if ( count )
 	{
-		CBaseEntity **pList = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * count );
+		CBaseEntity **pList = stackallocT( CBaseEntity *, count );
 		AimTarget_ListCopy( pList, count );
 
-		for ( int i = 0; i < count; i++ )
+		for ( intp i = 0; i < count; i++ )
 		{
 			Vector center;
 			Vector dir;

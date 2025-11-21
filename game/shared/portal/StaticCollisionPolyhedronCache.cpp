@@ -147,7 +147,7 @@ void CStaticCollisionPolyhedronCache::Update( void )
 
 		while( enginetrace->GetBrushInfo( iBrush, &Planes, NULL ) )
 		{
-			int iPlaneCount = Planes.Count();
+			intp iPlaneCount = Planes.Count();
 			AssertMsg( iPlaneCount != 0, "A brush with no planes???????" );
 
 			const Vector4D *pReturnedPlanes = Planes.Base();
@@ -247,8 +247,8 @@ void CStaticCollisionPolyhedronCache::Update( void )
 
 			DevMsg( 2, "CStaticCollisionPolyhedronCache: Used %.2f KB to cache %d brush polyhedrons.\n", ((float)totalMemoryNeeded) / 1024.0f, m_BrushPolyhedrons.Count() );
 
-			int iCount = m_BrushPolyhedrons.Count();
-			for( int i = 0; i != iCount; ++i )
+			intp iCount = m_BrushPolyhedrons.Count();
+			for( intp i = 0; i != iCount; ++i )
 			{
 				CPolyhedron_LumpedMemory *pSource = (CPolyhedron_LumpedMemory *)m_BrushPolyhedrons[i];
 
@@ -265,7 +265,7 @@ void CStaticCollisionPolyhedronCache::Update( void )
 				m_BrushPolyhedrons[i] = pDest;
 				pFinalDest += memRequired;
 
-				int memoryOffset = ((uint8 *)pDest) - ((uint8 *)pSource);
+				intp memoryOffset = ((uint8 *)pDest) - ((uint8 *)pSource);
 
 				memcpy( pDest, pSource, memRequired );
 				//move all the pointers to their new location.
@@ -410,8 +410,8 @@ void CStaticCollisionPolyhedronCache::Update( void )
 
 				DevMsg( 2, "CStaticCollisionPolyhedronCache: Used %.2f KB to cache %d static prop polyhedrons.\n", ((float)totalMemoryNeeded) / 1024.0f, m_StaticPropPolyhedrons.Count() );
 
-				int iCount = m_StaticPropPolyhedrons.Count();
-				for( int i = 0; i != iCount; ++i )
+				intp iCount = m_StaticPropPolyhedrons.Count();
+				for( intp i = 0; i != iCount; ++i )
 				{
 					CPolyhedron_LumpedMemory *pSource = (CPolyhedron_LumpedMemory *)m_StaticPropPolyhedrons[i];
 
@@ -425,7 +425,7 @@ void CStaticCollisionPolyhedronCache::Update( void )
 					m_StaticPropPolyhedrons[i] = pDest;
 					pFinalDest += memRequired;
 
-					int memoryOffset = ((uint8 *)pDest) - ((uint8 *)pSource);
+					intp memoryOffset = ((uint8 *)pDest) - ((uint8 *)pSource);
 
 					memcpy( pDest, pSource, memRequired );
 					//move all the pointers to their new location.
@@ -459,7 +459,7 @@ const CPolyhedron *CStaticCollisionPolyhedronCache::GetBrushPolyhedron( int iBru
 	return m_BrushPolyhedrons[iBrushNumber];
 }
 
-int CStaticCollisionPolyhedronCache::GetStaticPropPolyhedrons( ICollideable *pStaticProp, CPolyhedron **pOutputPolyhedronArray, int iOutputArraySize )
+int CStaticCollisionPolyhedronCache::GetStaticPropPolyhedrons( ICollideable *pStaticProp, CPolyhedron **pOutputPolyhedronArray, intp iOutputArraySize )
 {
 	unsigned short iPropIndex = m_CollideableIndicesMap.Find( pStaticProp );
 	if( !m_CollideableIndicesMap.IsValidIndex( iPropIndex ) ) //static prop never made it into the cache for some reason (specifically no collision data when this workaround was written)
@@ -470,7 +470,7 @@ int CStaticCollisionPolyhedronCache::GetStaticPropPolyhedrons( ICollideable *pSt
 	if( cacheInfo.iNumPolyhedrons < iOutputArraySize )
 		iOutputArraySize = cacheInfo.iNumPolyhedrons;
 
-	for( int i = cacheInfo.iStartIndex, iWriteIndex = 0; iWriteIndex != iOutputArraySize; ++i, ++iWriteIndex )
+	for( intp i = cacheInfo.iStartIndex, iWriteIndex = 0; iWriteIndex != iOutputArraySize; ++i, ++iWriteIndex )
 	{
 		pOutputPolyhedronArray[iWriteIndex] = m_StaticPropPolyhedrons[i];
 	}

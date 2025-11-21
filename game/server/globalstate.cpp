@@ -35,14 +35,14 @@ public:
 	}
 
 	// IGameSystem
-	virtual void LevelShutdownPreEntity() 
+	void LevelShutdownPreEntity() override
 	{
 		// don't allow state updates during shutdowns
 		Assert( !m_disableStateUpdates );
 		m_disableStateUpdates = true;
 	}
 	
-	virtual void LevelShutdownPostEntity() 
+	void LevelShutdownPostEntity() override
 	{
 		Assert( m_disableStateUpdates );
 		m_disableStateUpdates = false;
@@ -53,56 +53,56 @@ public:
 		m_disableStateUpdates = !bEnable;
 	}
 
-	void SetState( int globalIndex, GLOBALESTATE state )
+	void SetState( intp globalIndex, GLOBALESTATE state )
 	{
 		if ( m_disableStateUpdates || !m_list.IsValidIndex(globalIndex) )
 			return;
 		m_list[globalIndex].state = state;
 	}
 
-	GLOBALESTATE GetState( int globalIndex )
+	GLOBALESTATE GetState( intp globalIndex )
 	{
 		if ( !m_list.IsValidIndex(globalIndex) )
 			return GLOBAL_OFF;
 		return m_list[globalIndex].state;
 	}
 
-	void SetCounter( int globalIndex, int counter )
+	void SetCounter( intp globalIndex, int counter )
 	{
 		if ( m_disableStateUpdates || !m_list.IsValidIndex(globalIndex) )
 			return;
 		m_list[globalIndex].counter = counter;
 	}
 
-	int AddToCounter( int globalIndex, int delta )
+	int AddToCounter( intp globalIndex, int delta )
 	{
 		if ( m_disableStateUpdates || !m_list.IsValidIndex(globalIndex) )
 			return 0;
 		return ( m_list[globalIndex].counter += delta );
 	}
 
-	int GetCounter( int globalIndex )
+	int GetCounter( intp globalIndex )
 	{
 		if ( !m_list.IsValidIndex(globalIndex) )
 			return 0;
 		return m_list[globalIndex].counter;
 	}
 
-	void SetMap( int globalIndex, string_t mapname )
+	void SetMap( intp globalIndex, string_t mapname )
 	{
 		if ( !m_list.IsValidIndex(globalIndex) )
 			return;
 		m_list[globalIndex].levelName = m_nameList.AddString( STRING(mapname) );
 	}
 
-	const char *GetMap( int globalIndex )
+	const char *GetMap( intp globalIndex )
 	{
 		if ( !m_list.IsValidIndex(globalIndex) )
 			return NULL;
 		return m_nameList.String( m_list[globalIndex].levelName );
 	}
 
-	const char *GetName( int globalIndex )
+	const char *GetName( intp globalIndex )
 	{
 		if ( !m_list.IsValidIndex(globalIndex) )
 			return NULL;
@@ -165,17 +165,17 @@ static CGlobalState gGlobalState( "CGlobalState" );
 static CUtlSymbolDataOps g_GlobalSymbolDataOps( gGlobalState.m_nameList );
 
 
-void GlobalEntity_SetState( int globalIndex, GLOBALESTATE state )
+void GlobalEntity_SetState( intp globalIndex, GLOBALESTATE state )
 {
 	gGlobalState.SetState( globalIndex, state );
 }
 
-void GlobalEntity_SetCounter( int globalIndex, int counter )
+void GlobalEntity_SetCounter( intp globalIndex, int counter )
 {
 	gGlobalState.SetCounter( globalIndex, counter );
 }
 
-int GlobalEntity_AddToCounter( int globalIndex, int delta )
+int GlobalEntity_AddToCounter( intp globalIndex, int delta )
 {
 	return gGlobalState.AddToCounter( globalIndex, delta );
 }
@@ -186,42 +186,42 @@ void GlobalEntity_EnableStateUpdates( bool bEnable )
 }
 
 
-void GlobalEntity_SetMap( int globalIndex, string_t mapname )
+void GlobalEntity_SetMap( intp globalIndex, string_t mapname )
 {
 	gGlobalState.SetMap( globalIndex, mapname );
 }
 
-int GlobalEntity_Add( const char *pGlobalname, const char *pMapName, GLOBALESTATE state )
+intp GlobalEntity_Add( const char *pGlobalname, const char *pMapName, GLOBALESTATE state )
 {
 	return gGlobalState.AddEntity( pGlobalname, pMapName, state );
 }
 
-int GlobalEntity_GetIndex( const char *pGlobalname )
+intp GlobalEntity_GetIndex( const char *pGlobalname )
 {
 	return gGlobalState.GetIndex( pGlobalname );
 }
 
-GLOBALESTATE GlobalEntity_GetState( int globalIndex )
+GLOBALESTATE GlobalEntity_GetState( intp globalIndex )
 {
 	return gGlobalState.GetState( globalIndex );
 }
 
-int GlobalEntity_GetCounter( int globalIndex )
+int GlobalEntity_GetCounter( intp globalIndex )
 {
 	return gGlobalState.GetCounter( globalIndex );
 }
 
-const char *GlobalEntity_GetMap( int globalIndex )
+const char *GlobalEntity_GetMap( intp globalIndex )
 {
 	return gGlobalState.GetMap( globalIndex );
 }
 
-const char *GlobalEntity_GetName( int globalIndex )
+const char *GlobalEntity_GetName( intp globalIndex )
 {
 	return gGlobalState.GetName( globalIndex );
 }
 
-int GlobalEntity_GetNumGlobals( void )
+intp GlobalEntity_GetNumGlobals( void )
 {
 	return gGlobalState.GetNumGlobals();
 }
@@ -241,7 +241,7 @@ void CGlobalState::DumpGlobals( void )
 	static const char *estates[] = { "Off", "On", "Dead" };
 
 	Msg( "-- Globals --\n" );
-	for ( int i = 0; i < m_list.Count(); i++ )
+	for ( intp i = 0; i < m_list.Count(); i++ )
 	{
 		Msg( "%s: %s (%s) = %d\n", m_nameList.String( m_list[i].name ), m_nameList.String( m_list[i].levelName ), estates[m_list[i].state], m_list[i].counter );
 	}

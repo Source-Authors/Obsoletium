@@ -934,8 +934,8 @@ void CNavMesh::CreateObstacleTopAreas()
 			NavDirType dir = (NavDirType) i;
 
 			// Look at all adjacent areas in this direction
-			int iConnections = area->GetAdjacentCount( dir );
-			for ( int j = 0; j < iConnections; j++ )
+			intp iConnections = area->GetAdjacentCount( dir );
+			for ( intp j = 0; j < iConnections; j++ )
 			{
 				CNavArea *areaOther = area->GetAdjacentArea( dir, j );
 				// if this is a jump node (which will ultimately get removed) or is an obstacle top, ignore it

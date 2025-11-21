@@ -101,7 +101,7 @@ private:
 
 	// helpers to simplify code
 	float	GetCycle()														{ return GetOuter()->GetCycle();								}
-	int		AddLayeredSequence( int sequence, int iPriority )				{ return GetOuter()->AddLayeredSequence( sequence, iPriority ); }
+	intp	AddLayeredSequence( int sequence, int iPriority )				{ return GetOuter()->AddLayeredSequence( sequence, iPriority ); }
 	void	SetLayerWeight( int iLayer, float flWeight )					{ GetOuter()->SetLayerWeight( iLayer, flWeight );				}
 	void	SetLayerPlaybackRate( int iLayer, float flPlaybackRate )		{ GetOuter()->SetLayerPlaybackRate( iLayer, flPlaybackRate );	}
 	void	SetLayerNoRestore( int iLayer, bool bNoRestore )				{ GetOuter()->SetLayerNoRestore( iLayer, bNoRestore );			}

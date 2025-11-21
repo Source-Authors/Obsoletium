@@ -814,7 +814,7 @@ void CDODPlayerAnimState::ClearAnimationLayers()
 		return;
 
 	m_pOuter->SetNumAnimOverlays( NUM_LAYERS_WANTED );
-	for ( int i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
+	for ( intp i=0; i < m_pOuter->GetNumAnimOverlays(); i++ )
 	{
 		m_pOuter->GetAnimOverlay( i )->SetOrder( CBaseAnimatingOverlay::MAX_OVERLAYS );
 	}
@@ -1363,7 +1363,7 @@ void CDODPlayerAnimState::DebugShowAnimStateForPlayer( bool bIsServer )
 	Anim_StatePrintf( iLine++, "Main: %s, Cycle: %.2f\n", GetSequenceName( GetOuter()->GetModelPtr(), GetOuter()->GetSequence() ), GetOuter()->GetCycle() );
 
 	// Write out the layers and their data.
-	for ( int iAnim = 0; iAnim < GetOuter()->GetNumAnimOverlays(); ++iAnim )
+	for ( intp iAnim = 0; iAnim < GetOuter()->GetNumAnimOverlays(); ++iAnim )
 	{
 		CAnimationLayer *pLayer = GetOuter()->GetAnimOverlay( iAnim );
 		if ( pLayer && ( pLayer->m_nOrder != CBaseAnimatingOverlay::MAX_OVERLAYS ) )

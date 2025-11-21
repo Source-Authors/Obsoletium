@@ -1964,7 +1964,7 @@ public:
 	virtual CAI_ClassScheduleIdSpace *	GetClassScheduleIdSpace()	{ return &gm_ClassScheduleIdSpace; }
 
 	static int			GetScheduleID	(const char* schedName);
-	static int			GetActivityID	(const char* actName);
+	static intp			GetActivityID	(const char* actName);
 	static int			GetConditionID	(const char* condName);
 	static int			GetTaskID		(const char* taskName);
 	static int			GetSquadSlotID	(const char* slotName);
@@ -1975,7 +1975,7 @@ public:
 	
 	static void			AddEventToSR(const char *eventName, int conID);
 	static const char*	GetEventName	(int actID);
-	static int			GetEventID	(const char* actName);
+	static intp			GetEventID	(const char* actName);
 
 public:
 	//-----------------------------------------------------

@@ -97,6 +97,6 @@ public:
 
 extern CUtlVector< CTeam * > g_Teams;
 extern CTeam *GetGlobalTeam( int iIndex );
-extern int GetNumberOfTeams( void );
+extern intp GetNumberOfTeams( void );
 
 #endif // TEAM_H

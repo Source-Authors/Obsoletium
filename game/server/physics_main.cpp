@@ -2043,17 +2043,17 @@ void Physics_RunThinkFunctions( bool simulating )
 	else
 	{
 		UTIL_DisableRemoveImmediate();
-		int listMax = SimThink_ListCount();
+		intp listMax = SimThink_ListCount();
 		listMax = MAX(listMax,1);
-		CBaseEntity **list = (CBaseEntity **)stackalloc( sizeof(CBaseEntity *) * listMax );
+		CBaseEntity **list = stackallocT( CBaseEntity *, listMax );
 		// iterate through all entities and have them think or simulate
 		
 		// UNDONE: This has problems with UTIL_RemoveImmediate() (now disabled during this loop).  
 		// Do we really need UTIL_RemoveImmediate()?
-		int count = SimThink_ListCopy( list, listMax );
+		intp count = SimThink_ListCopy( list, listMax );
 
 		//DevMsg(1, "Count: %d\n", count );
-		for ( int i = 0; i < count; i++ )
+		for ( intp i = 0; i < count; i++ )
 		{
 			if ( !list[i] )
 				continue;

@@ -151,7 +151,7 @@ static void GetAllChildren_r( CBaseEntity *pEntity, CUtlVector<CBaseEntity *> &l
 	}
 }
 
-int GetAllChildren( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list )
+intp GetAllChildren( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list )
 {
 	if ( !pParent )
 		return 0;
@@ -160,7 +160,7 @@ int GetAllChildren( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list )
 	return list.Count();
 }
 
-int	GetAllInHierarchy( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list )
+intp GetAllInHierarchy( CBaseEntity *pParent, CUtlVector<CBaseEntity *> &list )
 {
 	if (!pParent)
 		return 0;

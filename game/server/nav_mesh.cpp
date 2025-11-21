@@ -1535,8 +1535,8 @@ void CNavMesh::IncreaseDangerNearby( int teamID, float amount, CNavArea *startAr
 		// explore adjacent areas
 		for( int dir=0; dir<NUM_DIRECTIONS; ++dir )
 		{
-			int count = area->GetAdjacentCount( (NavDirType)dir );
-			for( int i=0; i<count; ++i )
+			intp count = area->GetAdjacentCount( (NavDirType)dir );
+			for( intp i=0; i<count; ++i )
 			{
 				CNavArea *adjArea = area->GetAdjacentArea( (NavDirType)dir, i );
 
@@ -3263,8 +3263,8 @@ void CNavMesh::EndVisibilityComputations( void )
 
 		for( int dir = NORTH; dir < NUM_DIRECTIONS; ++dir )
 		{
-			int count = area->GetAdjacentCount( (NavDirType)dir );
-			for( int i=0; i<count; ++i )
+			intp count = area->GetAdjacentCount( (NavDirType)dir );
+			for( intp i=0; i<count; ++i )
 			{
 				CNavArea *adjArea = (CNavArea *)area->GetAdjacentArea( (NavDirType)dir, i );
 

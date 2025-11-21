@@ -68,7 +68,7 @@ CTeam *GetGlobalTeam( int iIndex )
 //-----------------------------------------------------------------------------
 // Purpose: Get the number of team managers
 //-----------------------------------------------------------------------------
-int GetNumberOfTeams( void )
+intp GetNumberOfTeams( void )
 {
 	return g_Teams.Count();
 }

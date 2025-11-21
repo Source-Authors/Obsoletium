@@ -3389,7 +3389,7 @@ public:
 	{
 		breakable_precache_t sEntry;
 		sEntry.iszModelName = modelName;
-		int iEntry = m_modelList.Find(sEntry);
+		auto iEntry = m_modelList.Find(sEntry);
 		if ( iEntry != m_modelList.InvalidIndex() )
 		{
 			*iBreakableCount = m_modelList[iEntry].iBreakableCount;
@@ -4284,12 +4284,12 @@ void CBasePropDoor::MasterStartBlocked( CBaseEntity *pOther )
 {
 	if ( HasSlaves() )
 	{
-		int	numDoors = m_hDoorList.Count();
+		intp	numDoors = m_hDoorList.Count();
 
 		CBasePropDoor *pLinkedDoor = NULL;
 
 		// Open all linked doors
-		for ( int i = 0; i < numDoors; i++ )
+		for ( intp i = 0; i < numDoors; i++ )
 		{
 			pLinkedDoor = m_hDoorList[i];
 

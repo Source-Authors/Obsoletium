@@ -1325,7 +1325,7 @@ void CAI_BlendedMotor::BuildVelocityScript( const AILocalMoveGoal_t &move )
 	}
 
 	// clamp decel velocities
-	for (i = m_scriptMove.Count() - 1; i > 0; i-- )
+	for (intp i = m_scriptMove.Count() - 1; i > 0; i-- )
 	{
 		// find needed deceleration
 		float dv = m_scriptMove[i].flMaxVelocity - m_scriptMove[i-1].flMaxVelocity;

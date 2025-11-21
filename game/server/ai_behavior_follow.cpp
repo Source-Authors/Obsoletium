@@ -168,7 +168,7 @@ CAI_FollowManager g_AIFollowManager;
 
 //-----------------------------------------------------------------------------
 
-int AIGetNumFollowers( CBaseEntity *pEntity, string_t iszClassname )
+intp AIGetNumFollowers( CBaseEntity *pEntity, string_t iszClassname )
 {
 	return g_AIFollowManager.CountFollowers( pEntity, iszClassname );
 }

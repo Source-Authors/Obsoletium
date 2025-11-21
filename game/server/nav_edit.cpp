@@ -991,12 +991,11 @@ void CNavMesh::DrawEditMode( void )
 					if ( m_selectedArea->IsDamaging() )		Q_strncat( attrib, "DAMAGING ", sizeof( attrib ), -1 );
 					if ( m_selectedArea->IsUnderwater() )	Q_strncat( attrib, "UNDERWATER ", sizeof( attrib ), -1 );
 
-					int connected = 0;
-					connected += m_selectedArea->GetAdjacentCount( NORTH );
+					intp connected = m_selectedArea->GetAdjacentCount( NORTH );
 					connected += m_selectedArea->GetAdjacentCount( SOUTH );
 					connected += m_selectedArea->GetAdjacentCount( EAST );
 					connected += m_selectedArea->GetAdjacentCount( WEST );
-					Q_strncat( attrib, UTIL_VarArgs( "%d Connections ", connected ), sizeof( attrib ), -1 );
+					Q_strncat( attrib, UTIL_VarArgs( "%zd Connections ", connected ), sizeof( attrib ), -1 );
 				}
 
 				Q_snprintf( buffer, sizeof( buffer ), "Area #%d %s %s\n", m_selectedArea->GetID(), locName, attrib );
@@ -2645,13 +2644,12 @@ void CNavMesh::CommandNavMark( const CCommand &args )
 						player->EmitSound( "EDIT_MARK.Disable" );
 						SetMarkedArea( areaToMark );
 
-						int connected = 0;
-						connected += GetMarkedArea()->GetAdjacentCount( NORTH );
+						intp connected = GetMarkedArea()->GetAdjacentCount( NORTH );
 						connected += GetMarkedArea()->GetAdjacentCount( SOUTH );
 						connected += GetMarkedArea()->GetAdjacentCount( EAST );
 						connected += GetMarkedArea()->GetAdjacentCount( WEST );
 
-						Msg( "Marked Area is connected to %d other Areas\n", connected );
+						Msg( "Marked Area is connected to %zd other Areas\n", connected );
 					}
 				}
 			}
@@ -2663,13 +2661,12 @@ void CNavMesh::CommandNavMark( const CCommand &args )
 		player->EmitSound( "EDIT_MARK.Disable" );
 		SetMarkedArea( m_selectedArea );
 
-		int connected = 0;
-		connected += GetMarkedArea()->GetAdjacentCount( NORTH );
+		intp connected = GetMarkedArea()->GetAdjacentCount( NORTH );
 		connected += GetMarkedArea()->GetAdjacentCount( SOUTH );
 		connected += GetMarkedArea()->GetAdjacentCount( EAST );
 		connected += GetMarkedArea()->GetAdjacentCount( WEST );
 
-		Msg( "Marked Area is connected to %d other Areas\n", connected );
+		Msg( "Marked Area is connected to %zd other Areas\n", connected );
 	}
 	else if ( m_selectedLadder )
 	{
@@ -3422,13 +3419,12 @@ void CNavMesh::CommandNavMarkUnnamed( void )
 			{
 				player->EmitSound( "EDIT_MARK_UNNAMED.MarkedArea" );
 
-				int connected = 0;
-				connected += GetMarkedArea()->GetAdjacentCount( NORTH );
+				intp connected = GetMarkedArea()->GetAdjacentCount( NORTH );
 				connected += GetMarkedArea()->GetAdjacentCount( SOUTH );
 				connected += GetMarkedArea()->GetAdjacentCount( EAST );
 				connected += GetMarkedArea()->GetAdjacentCount( WEST );
 
-				int totalUnnamedAreas = 0;
+				intp totalUnnamedAreas = 0;
 				FOR_EACH_VEC( TheNavAreas, it )
 				{
 					CNavArea *area = TheNavAreas[ it ];
@@ -3438,7 +3434,7 @@ void CNavMesh::CommandNavMarkUnnamed( void )
 					}
 				}
 
-				Msg( "Marked Area is connected to %d other Areas - there are %d total unnamed areas\n", connected, totalUnnamedAreas );
+				Msg( "Marked Area is connected to %zd other Areas - there are %zd total unnamed areas\n", connected, totalUnnamedAreas );
 			}
 		}
 	}

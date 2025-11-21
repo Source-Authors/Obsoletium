@@ -44,8 +44,8 @@ public:
 	void AddSymbol( const char *pszSymbol, int symbolID );
 	int NextGlobalBase() const;
 
-	const char *IdToSymbol( int symbolID ) const;
-	int SymbolToId( const char *pszSymbol ) const;
+	const char *IdToSymbol( intp symbolID ) const;
+	intp SymbolToId( const char *pszSymbol ) const;
 
 private:
 	CStringRegistry * 	m_pSymbols;

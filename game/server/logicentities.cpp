@@ -830,7 +830,7 @@ void CC_Global_Set( const CCommand &args )
 
 	int nState = atoi( szState );
 
-	int nIndex = GlobalEntity_GetIndex( szGlobal );
+	intp nIndex = GlobalEntity_GetIndex( szGlobal );
 
 	if ( nIndex >= 0 )
 	{

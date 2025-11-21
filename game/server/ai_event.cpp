@@ -43,7 +43,7 @@ const char *CAI_BaseNPC::GetEventName(int eventID)
 //-----------------------------------------------------------------------------
 // Purpose: Given and activity name, return the activity ID
 //-----------------------------------------------------------------------------
-int CAI_BaseNPC::GetEventID(const char* eventName) 
+intp CAI_BaseNPC::GetEventID(const char* eventName) 
 {
 	return m_pEventSR->GetStringID( eventName );
 }
