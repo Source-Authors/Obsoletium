@@ -181,7 +181,6 @@ void CElementTree::GenerateChildrenOfNode(intp itemIndex)
 CElementTreeViewListControl::CElementTreeViewListControl( Panel *pParent, const char *pName )
 	: BaseClass( pParent, pName ), m_Panels( 0, 0, PanelsLessFunc )
 {
-
 	m_iTreeColumnWidth = QuickPropScale( 200 );
 	m_iFontSize = 1;
 	m_bMouseLeftIsDown = false;
@@ -387,7 +386,6 @@ void CElementTreeViewListControl::ResizeTreeToExpandedWidth()
 
 void CElementTreeViewListControl::OnMouseWheeled(int delta)
 {
-
 	bool ctrl = (input()->IsKeyDown(KEY_LCONTROL) || input()->IsKeyDown(KEY_RCONTROL));
 	bool alt = (input()->IsKeyDown(KEY_LALT) || input()->IsKeyDown(KEY_RALT));
 
@@ -624,7 +622,7 @@ void CElementTreeViewListControl::SetFont( HFont font )
 				continue;
 			}
 
-			CBaseAttributePanel *attrPanel = dynamic_cast< CBaseAttributePanel * >( panel );
+			auto *attrPanel = dynamic_cast< CBaseAttributePanel * >( panel );
 			if ( !attrPanel )
 			{
 				continue;
@@ -833,8 +831,7 @@ void CPropertiesTreeToolbar::OnTextNewLine()
 	char searchBuf[ 256 ];
 	m_pSearch->GetText( searchBuf, sizeof( searchBuf ) );
 
-	KeyValues *msg = new KeyValues( "OnNavigateSearch", "text", searchBuf );
-
+	auto *msg = new KeyValues( "OnNavigateSearch", "text", searchBuf );
 	PostMessage( parent, msg );
 }
 
