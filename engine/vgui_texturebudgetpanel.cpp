@@ -62,7 +62,8 @@ ConVar texture_budget_panel_width( "texture_budget_panel_width", "512", FCVAR_AR
 ConVar texture_budget_panel_height( "texture_budget_panel_height", "284", FCVAR_ARCHIVE, "height in pixels of the budget panel", TextureCVarChangedCallBack );
 ConVar texture_budget_panel_bottom_of_history_fraction( "texture_budget_panel_bottom_of_history_fraction", ".25", FCVAR_ARCHIVE, "number between 0 and 1", TextureCVarChangedCallBack );
 
-ConVar texture_budget_background_alpha( "texture_budget_background_alpha", "128", FCVAR_ARCHIVE, "how translucent the budget panel is" );
+// dimhotepus: Limit alpha to 0..255 byte range.
+ConVar texture_budget_background_alpha( "texture_budget_background_alpha", "128", FCVAR_ARCHIVE, "how translucent the budget panel is", true, 0, true, 255 );
 
 
 CTextureBudgetPanel *GetTextureBudgetPanel( void )
