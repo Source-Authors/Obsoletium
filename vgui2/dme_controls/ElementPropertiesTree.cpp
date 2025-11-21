@@ -1878,8 +1878,7 @@ void CElementPropertiesTreeInternal::FindMatchingElements_R( CUtlRBTree< CDmElem
 
 	if ( Q_stristr( element->GetName(), searchstr ) )
 	{
-		CDmeHandle< CDmElement > h;
-		h = element;
+		CDmeHandle< CDmElement > h{ element };
 
 		SearchResult_t sr;
 		sr.handle = h;
@@ -1896,8 +1895,7 @@ void CElementPropertiesTreeInternal::FindMatchingElements_R( CUtlRBTree< CDmElem
 		const char *attributeName = attribute->GetName();
 		if ( Q_stristr( attributeName, searchstr ) )
 		{
-			CDmeHandle< CDmElement > h;
-			h = element;
+			CDmeHandle< CDmElement > h{ element };
 
 			SearchResult_t sr;
 			sr.handle = h;
@@ -2213,8 +2211,7 @@ void CElementPropertiesTreeInternal::AddToHistory( CDmElement *element )
 	if ( !element )
 		return;
 
-	CDmeHandle< CDmElement > h;
-	h = element;
+	CDmeHandle< CDmElement > h{ element };
 
 	// Purge the forward list
 	if ( m_nCurrentHistoryPosition > 0 )
