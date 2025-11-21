@@ -602,7 +602,7 @@ HFont CElementTreeViewListControl::GetFont( int size )
 	case 5:
 		return scheme->GetFont( "DmePropertyVeryLarge", IsProportional() );
 	default:
-		return NULL;
+		return INVALID_FONT;
 	}
 }
 
