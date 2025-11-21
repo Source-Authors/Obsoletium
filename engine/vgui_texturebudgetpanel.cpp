@@ -319,7 +319,7 @@ void CTextureBudgetPanel::SetTimeLabelText()
 	for ( intp i=0; i < m_TimeLabels.Count(); i++ )
 	{
 		char text[512];
-		Q_snprintf( text, sizeof( text ), "%.1fM", (float)( i * GetConfigData().m_flTimeLabelInterval ) / 1024 );
+		V_sprintf_safe( text, "%.1fM", (float)( i * GetConfigData().m_flTimeLabelInterval ) / 1024 );
 		m_TimeLabels[i]->SetText( text );
 	}
 }
@@ -330,7 +330,7 @@ void CTextureBudgetPanel::SetHistoryLabelText()
 	for ( intp i=0; i < m_HistoryLabels.Count(); i++ )
 	{
 		char text[512];
-		Q_snprintf( text, sizeof( text ), "%.1fM", GetConfigData().m_HistoryLabelValues[i] / 1024 );
+		V_sprintf_safe( text, "%.1fM", GetConfigData().m_HistoryLabelValues[i] / 1024 );
 		m_HistoryLabels[i]->SetText( text );
 	}
 }
