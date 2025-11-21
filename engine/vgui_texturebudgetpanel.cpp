@@ -180,7 +180,7 @@ void CTextureBudgetPanel::SendConfigDataToBase()
 
 	// Use the middle three fifths for history labels.
 	data.m_HistoryLabelValues.SetSize( 3 );
-	for ( int i=0; i < data.m_HistoryLabelValues.Count(); i++ )
+	for ( intp i=0; i < data.m_HistoryLabelValues.Count(); i++ )
 	{
 		data.m_HistoryLabelValues[i] = (i+1) * data.m_flHistoryRange / 4;
 	}
@@ -316,7 +316,7 @@ void CTextureBudgetPanel::SnapshotTextureHistory()
 
 void CTextureBudgetPanel::SetTimeLabelText()
 {
-	for ( int i=0; i < m_TimeLabels.Count(); i++ )
+	for ( intp i=0; i < m_TimeLabels.Count(); i++ )
 	{
 		char text[512];
 		Q_snprintf( text, sizeof( text ), "%.1fM", (float)( i * GetConfigData().m_flTimeLabelInterval ) / 1024 );
@@ -327,7 +327,7 @@ void CTextureBudgetPanel::SetTimeLabelText()
 
 void CTextureBudgetPanel::SetHistoryLabelText()
 {
-	for ( int i=0; i < m_HistoryLabels.Count(); i++ )
+	for ( intp i=0; i < m_HistoryLabels.Count(); i++ )
 	{
 		char text[512];
 		Q_snprintf( text, sizeof( text ), "%.1fM", GetConfigData().m_HistoryLabelValues[i] / 1024 );
