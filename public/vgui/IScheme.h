@@ -135,10 +135,13 @@ public:
 
 constexpr inline char VGUI_SCHEME_INTERFACE_VERSION[]{"VGUI_Scheme012"};
 
+// dimhotepus: Helper to scale a custom panel when no this.
+#define QuickPropScalePanel( x, panel ) ( ::vgui::scheme()->QuickPropScaleCond( panel->IsProportional(), panel->GetScheme(), ( x ) ) )
+
 // dimhotepus: TF2 backport.
 // misyl: Added this to scale much quicker and easier
 // lots of things were broken with scaling.
 // Not a real virtual method etc, just a helper to derp into existing code.
-#define QuickPropScale( x ) ( ::vgui::scheme()->QuickPropScaleCond( this->IsProportional(), this->GetScheme(), ( x ) ) )
+#define QuickPropScale( x ) QuickPropScalePanel( x, this )
 
 #endif // ISCHEME_H
