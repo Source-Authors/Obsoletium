@@ -84,8 +84,8 @@ private:
 // Constructor
 //-----------------------------------------------------------------------------
 CElementTree::CElementTree( CElementPropertiesTreeInternal *parent, const char *panelName ) :
-	BaseClass( (Panel *)parent, panelName ),
-	m_pEditMenu( 0 ),
+	BaseClass( parent, panelName ),
+	m_pEditMenu( nullptr ),
 	m_pParent( parent )
 {
 	SetAllowLabelEditing( true );
