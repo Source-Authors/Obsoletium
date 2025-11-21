@@ -138,7 +138,8 @@ public:
 	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
-		SetFont( pScheme->GetFont( PROF_FONT ) );
+		// dimhotepus: Scale UI.
+		SetFont( pScheme->GetFont( PROF_FONT, IsProportional() ) );
 	}
 
 	void SetBgColor( Color color ) override
@@ -256,10 +257,10 @@ CProfileHierarchyPanel::~CProfileHierarchyPanel()
 
 void CProfileHierarchyPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
-	//SetProportional( true );
 	BaseClass::ApplySchemeSettings( pScheme );
-	m_itemFont = pScheme->GetFont( PROF_FONT );
-	SetTitleBarInfo( m_itemFont, 20 );
+	// dimhotepus: Scale UI.
+	m_itemFont = pScheme->GetFont( PROF_FONT, IsProportional() );
+	SetTitleBarInfo( m_itemFont, QuickPropScale( 20 ) );
 	SetBgColor( Color(0, 0, 0, 176) );
 	(( CProfileTree *)GetTree())->SetBgColor( Color( 0, 0, 0, 176 ) );
 }
@@ -406,7 +407,8 @@ void CProfileHierarchyPanel::PerformLayout()
 					continue;
 				}
 				
-				bool vis = ( top + offset - 20 ) >= 0 && ( bottom + offset ) < tall;
+				// dimhotepus: Scale UI.
+				bool vis = ( top + offset - QuickPropScale( 20 ) ) >= 0 && ( bottom + offset ) < tall;
 
 				p->SetParent( vis ? this : NULL );
 				p->SetVisible( vis );
@@ -508,11 +510,13 @@ CVProfPanel::CVProfPanel( vgui::Panel *pParent, const char *pElementName )
 	m_pHierarchy->SetTreeView( profileTree );
 	m_pHierarchy->SetNumColumns( 3 );
 
-	int treewide = wide - 780;
+	// dimhotepus: Scale UI.
+	int treewide = wide - QuickPropScale(780);
 	m_pHierarchy->SetColumnInfo( 0, "Tree", treewide );
 
-	m_pHierarchy->SetColumnInfo( 1, "Group", 120 );
-	m_pHierarchy->SetColumnInfo( 2, "Data", 180 );
+	// dimhotepus: Scale UI.
+	m_pHierarchy->SetColumnInfo( 1, "Group", QuickPropScale( 120 ) );
+	m_pHierarchy->SetColumnInfo( 2, "Data", QuickPropScale( 180 ) );
 
 	// Treeview of the hierarchical calls
 	m_pHierarchy->SetBounds(X_BORDER, VPROF_TITLE_SIZE_Y, wide - X_BORDER*2, tall - Y_BORDER*2 - VPROF_TITLE_SIZE_Y);
@@ -590,16 +594,19 @@ void CVProfPanel::PerformLayout()
 	int w, h;
 	GetSize( w, h );
 
-	int topoffset = 95;
-	int inset = 10;
+	// dimhotepus: Scale UI.
+	int topoffset = QuickPropScale( 95 );
+	int inset = QuickPropScale( 10 );
 
 	m_pHierarchy->SetBounds( inset, topoffset, w - 2 * inset, h - inset - topoffset );
 
-	int treewide = w - 900 - 20;
-	treewide = max( treewide, 240 );
+	// dimhotepus: Scale UI.
+	int treewide = w - QuickPropScale( 900 ) - QuickPropScale( 20 );
+	treewide = max( treewide, QuickPropScale( 240 ) );
 	m_pHierarchy->SetColumnInfo( 0, "Tree", treewide );
 
-	m_pHierarchy->SetColumnInfo( 1, "Group", 125 );
+	// dimhotepus: Scale UI.
+	m_pHierarchy->SetColumnInfo( 1, "Group", QuickPropScale( 125 ) );
 	char header[ 512 ];
 	Q_snprintf( header, sizeof( header ), DATA_FMT_STR,
 		"Frame Calls + Time + NoChild",
@@ -607,7 +614,8 @@ void CVProfPanel::PerformLayout()
 		"Sum Calls   + Time + NoChild + Peak",
 		"L2Miss" );
 
-	m_pHierarchy->SetColumnInfo( 2, header, 775, CTreeViewListControl::CI_HEADER_LEFTALIGN );
+	// dimhotepus: Scale UI.
+	m_pHierarchy->SetColumnInfo( 2, header, QuickPropScale( 775 ), CTreeViewListControl::CI_HEADER_LEFTALIGN );
 }
 
 //-----------------------------------------------------------------------------
@@ -633,7 +641,7 @@ void CVProfPanel::Close()
 	UserCmd_HideVProf();
 	BaseClass::Close();
 }
-			  
+
 
 //-----------------------------------------------------------------------------
 // Is it visible?
@@ -856,7 +864,8 @@ public:
 	void ApplySchemeSettings( IScheme *pScheme ) override
 	{
 		BaseClass::ApplySchemeSettings( pScheme );
-		SetFont( pScheme->GetFont( PROF_FONT ) );
+		// dimhotepus: Scale UI.
+		SetFont( pScheme->GetFont( PROF_FONT, IsProportional() ) );
 		SetBgColor( Color( 0, 0, 0, 255 ) );
 	}
 };
