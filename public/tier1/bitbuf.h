@@ -478,7 +478,7 @@ template<intp SIZE>
 class old_bf_write_static : public bf_write
 {
 public:
-	inline old_bf_write_static() : bf_write{m_StaticData, SIZE} {}
+	inline old_bf_write_static() : bf_write{m_StaticData, SIZE} {} //-V730
 
 	char	m_StaticData[SIZE];
 };
