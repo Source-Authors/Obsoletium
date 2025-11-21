@@ -1184,7 +1184,7 @@ template <typename NameArray>
 		return false;
 	}
 
-	V_snprintf( name, memsize, "%s%d", prefix, i );
+	V_snprintf( name, memsize, "%s%zd", prefix, i );
 	return true;
 }
 
