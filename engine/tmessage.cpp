@@ -206,7 +206,7 @@ static void TextMessageParse( byte *pMemFile, int fileSize );
 
 
 // Trims all whitespace from the front and end of a string
-[[nodiscard]] static void TrimSpace( const char *source, char *dest )
+static void TrimSpace( const char *source, char *dest )
 {
 	intp start, end, length;
 
