@@ -112,17 +112,11 @@ CTextureBudgetPanel::~CTextureBudgetPanel()
 void CTextureBudgetPanel::OnTick()
 {
 	BaseClass::OnTick();
-	if ( showbudget_texture.GetBool() )
-	{
-		m_pModeLabel->SetVisible( true );
-		SetVisible( true );
+
+	const bool isVisible = showbudget_texture.GetBool();
+	m_pModeLabel->SetVisible( isVisible );
+	SetVisible( isVisible );
 	}
-	else
-	{
-		m_pModeLabel->SetVisible( false );
-		SetVisible( false );
-	}
-}
 
 
 void CTextureBudgetPanel::Paint()
