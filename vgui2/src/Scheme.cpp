@@ -1275,11 +1275,11 @@ IImage *CSchemeManager::GetImage(const char *imageName, bool hardwareFiltered, b
 
 	if ( Q_stristr( imageName, ".pic" ) )
 	{
-		Q_snprintf( szFileName, sizeof(szFileName), "%s", imageName );
+		V_sprintf_safe( szFileName, "%s", imageName );
 	}
 	else
 	{
-		Q_snprintf( szFileName, sizeof(szFileName), "vgui/%s", imageName );
+		V_sprintf_safe( szFileName, "vgui/%s", imageName );
 	}
 
 	s_pszSearchString = szFileName;
