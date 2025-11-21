@@ -975,7 +975,7 @@ void RunDataTableTest()
 				nDeltaProps );
 		}
 
-		memcpy( prevEncoded, fullEncoded, sizeof( prevEncoded ) );
+		memcpy( prevEncoded, fullEncoded, sizeof( prevEncoded ) ); //-V614
 
 
 		// This step isn't necessary to have the client decode the data but it's here to test

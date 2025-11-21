@@ -2080,7 +2080,7 @@ void SV_CreateBaseline (void)
 			}
 
 			// copy baseline into baseline stringtable
-			SV_EnsureInstanceBaseline( pClass, entnum, packedData, writeBuf.GetNumBytesWritten() );
+			SV_EnsureInstanceBaseline( pClass, entnum, packedData, writeBuf.GetNumBytesWritten() ); //-V614
 
 			bytes += writeBuf.GetNumBytesWritten();
 			count ++;

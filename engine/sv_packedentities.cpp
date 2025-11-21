@@ -141,7 +141,7 @@ static inline void SV_PackEntity(
 		VCRGenericValueVerify( "writebuf", writeBuf.GetBasePointer(), writeBuf.GetNumBytesWritten()-1 );
 #endif
 
-	SV_EnsureInstanceBaseline( pServerClass, edictIdx, packedData, writeBuf.GetNumBytesWritten() );
+	SV_EnsureInstanceBaseline( pServerClass, edictIdx, packedData, writeBuf.GetNumBytesWritten() ); //-V614
 		
 	int nFlatProps = SendTable_GetNumFlatProps( pSendTable );
 	IChangeFrameList *pChangeFrame = NULL;

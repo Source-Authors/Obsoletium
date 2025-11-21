@@ -778,7 +778,7 @@ void CHLTVClientState::ReadDeltaEnt( CEntityReadInfo &u )
 	else
 	{
 		// store as normal
-		pToPackedEntity->AllocAndCopyPadded( packedData, writeBuf.GetNumBytesWritten() );
+		pToPackedEntity->AllocAndCopyPadded( packedData, writeBuf.GetNumBytesWritten() ); //-V614
 	}
 
 	u.m_pTo->last_entity = u.m_nNewEntity;
