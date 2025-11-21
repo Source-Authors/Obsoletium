@@ -1570,8 +1570,8 @@ static ConVar mat_picmip(			"mat_picmip", "1", FCVAR_ARCHIVE, "", true, 0, true,
 // dimhotepus: Allow -10 as it is the best allowed value ex for TF2 now. See https://developer.valvesoftware.com/wiki/Mat_picmip
 static ConVar mat_picmip(			"mat_picmip", "0", FCVAR_ARCHIVE, "", true, -10, true, 2 );
 #endif
-static ConVar mat_slopescaledepthbias_normal( "mat_slopescaledepthbias_normal", "0.0f", FCVAR_CHEAT );
-static ConVar mat_depthbias_normal( "mat_depthbias_normal", "0.0f", FCVAR_CHEAT | FCVAR_ALLOWED_IN_COMPETITIVE );
+static ConVar mat_slopescaledepthbias_normal( "mat_slopescaledepthbias_normal", "0.0", FCVAR_CHEAT );
+static ConVar mat_depthbias_normal( "mat_depthbias_normal", "0.0", FCVAR_CHEAT | FCVAR_ALLOWED_IN_COMPETITIVE );
 static ConVar mat_slopescaledepthbias_decal( "mat_slopescaledepthbias_decal", "-0.5", FCVAR_CHEAT );		// Reciprocals of these biases sent to API
 static ConVar mat_depthbias_decal(	"mat_depthbias_decal", "-262144", FCVAR_CHEAT | FCVAR_ALLOWED_IN_COMPETITIVE );						//
 
