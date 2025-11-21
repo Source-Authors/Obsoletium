@@ -17,7 +17,8 @@ CBaseBudgetPanel::CBaseBudgetPanel( vgui::Panel *pParent, const char *pElementNa
 	m_BudgetHistoryOffset = 0;
 	m_hFont = vgui::INVALID_FONT;
 
-	SetProportional( false );
+	// dimhotepus: Scale UI.
+	// SetProportional( false );
 	SetKeyBoardInputEnabled( false );
 	SetMouseInputEnabled( false );
 	SetVisible( true );
@@ -390,7 +391,8 @@ void CBaseBudgetPanel::ApplySchemeSettings( vgui::IScheme *pScheme )
 		}
 	}
 
-	m_hFont = pScheme->GetFont( "DefaultFixed" );
+	// dimhotepus: Scale UI.
+	m_hFont = pScheme->GetFont( "DefaultFixed", IsProportional() );
 
 	if ( m_bDedicated )
 	{

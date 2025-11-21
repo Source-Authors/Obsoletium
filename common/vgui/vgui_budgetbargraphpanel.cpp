@@ -27,7 +27,8 @@ CBudgetBarGraphPanel::CBudgetBarGraphPanel( CBaseBudgetPanel *pParent, const cha
 {
 	m_pBudgetPanel = pParent;
 
-	SetProportional( false );
+	// dimhotepus: Scale UI.
+	// SetProportional( false );
 	SetKeyBoardInputEnabled( false );
 	SetMouseInputEnabled( false );
 	SetVisible( true );
