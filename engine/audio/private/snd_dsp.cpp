@@ -9007,7 +9007,6 @@ void DSP_ReleaseMemory( void )
 bool DSP_LoadPresetFile( void )
 {
 	char szFile[ MAX_OSPATH ];
-	char *pbuffer;
 	const char *pstart;
 	bool bResult = false;
 	int cpresets;	
@@ -9033,7 +9032,7 @@ bool DSP_LoadPresetFile( void )
 	{
 		Error( "DSP_LoadPresetFile: unable to open '%s'\n", szFile );
 	}
-	pbuffer = (char *)buf.PeekGet(); // Use malloc - free at end of this routine
+	const char *pbuffer = static_cast<const char*>(buf.PeekGet()); // Use malloc - free at end of this routine
 
 	pstart = pbuffer;
 

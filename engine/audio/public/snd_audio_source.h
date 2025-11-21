@@ -187,7 +187,7 @@ public:
 
 	void	SetCachedData( const byte *data )
 	{
-		m_pCachedData = ( byte * )data;
+		m_pCachedData = data;
 		flags.m_bCachedData = ( data != NULL ) ? true : false;
 	}
 
@@ -208,7 +208,7 @@ public:
 
 	void	SetHeaderData( const byte *data )
 	{
-		m_pHeader = ( byte * )data;
+		m_pHeader = data;
 		flags.m_bHeader = ( data != NULL ) ? true : false;
 	}
 
@@ -292,8 +292,8 @@ private:
 	unsigned short	m_usHeaderSize;
 
 	CSentence		*m_pSentence;
-	byte			*m_pCachedData;
-	byte			*m_pHeader;
+	const byte		*m_pCachedData;
+	const byte		*m_pHeader;
 };
 
 class IAudioSourceCache
