@@ -108,7 +108,7 @@ CTextureBudgetPanel::~CTextureBudgetPanel()
 	}
 }
 
-			 
+
 void CTextureBudgetPanel::OnTick()
 {
 	BaseClass::OnTick();
@@ -116,7 +116,7 @@ void CTextureBudgetPanel::OnTick()
 	const bool isVisible = showbudget_texture.GetBool();
 	m_pModeLabel->SetVisible( isVisible );
 	SetVisible( isVisible );
-	}
+}
 
 
 void CTextureBudgetPanel::Paint()
@@ -189,10 +189,26 @@ void CTextureBudgetPanel::SendConfigDataToBase()
 
 	data.m_flBackgroundAlpha = texture_budget_background_alpha.GetFloat();
 	
+	// 0 by default.
 	data.m_xCoord = texture_budget_panel_x.GetInt();
 	data.m_yCoord = texture_budget_panel_y.GetInt();
+	// dimhotepus: Scale default values.
+	if ( data.m_yCoord == 450 )
+	{
+		data.m_yCoord = QuickPropScale( data.m_yCoord );
+	}
 	data.m_Width = texture_budget_panel_width.GetInt();
+	// dimhotepus: Scale default values.
+	if ( data.m_Width == 512 )
+	{
+		data.m_Width = QuickPropScale( data.m_Width );
+	}
 	data.m_Height = texture_budget_panel_height.GetInt();
+	// dimhotepus: Scale default values.
+	if ( data.m_Height == 284 )
+	{
+		data.m_Height = QuickPropScale( data.m_Height );
+	}
 
 	// Shift it..
 	if ( data.m_xCoord + data.m_Width > videomode->GetModeStereoWidth() )
