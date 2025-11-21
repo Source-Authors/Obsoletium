@@ -134,18 +134,20 @@ void CTextureBudgetPanel::SendConfigDataToBase()
 	CBudgetPanelConfigData data;
 
 	// Copy the budget group names in.
+	// dimhotepus: Cache loop invariants.
+	const auto currentCounterGroup = GetCurrentCounterGroup();
+	constexpr const char *pPrefixes[2] = { "TexGroup_global_", "TexGroup_frame_" };
+	char alternateName[256];
+
 	for ( int i=0; i < g_VProfCurrentProfile.GetNumCounters(); i++ )
 	{
-		if ( g_VProfCurrentProfile.GetCounterGroup( i ) == GetCurrentCounterGroup() )
+		if ( g_VProfCurrentProfile.GetCounterGroup( i ) == currentCounterGroup )
 		{		
 			// Strip off the TexGroup__ prefix.
 			const char *pGroupName = g_VProfCurrentProfile.GetCounterName( i );
-			char alternateName[256];
 
-			const char *pPrefixes[2] = { "TexGroup_global_", "TexGroup_frame_" };
 			for ( int iPrefix=0; iPrefix < 2; iPrefix++ )
 			{
-
 				if ( strstr( pGroupName, pPrefixes[iPrefix] ) == pGroupName )
 				{
 					intp len = V_strlen( pPrefixes[iPrefix] );
@@ -252,9 +254,11 @@ void CTextureBudgetPanel::SnapshotTextureHistory()
 	CVProfile *pProf = &g_VProfCurrentProfile;
 
 	m_SumOfValues = 0;
+	// dimhotepus: Cache loop invariants.
+	const auto currentCounterGroup1 = GetCurrentCounterGroup();
 	for ( int i=0; i < pProf->GetNumCounters(); i++ )
 	{
-		if ( pProf->GetCounterGroup( i ) == GetCurrentCounterGroup() )
+		if ( pProf->GetCounterGroup( i ) == currentCounterGroup1 )
 		{
 			// The counters are in bytes and the panel is all in kilobytes.
 			uintp value = pProf->GetCounterValue( i ) / 1024;
@@ -284,9 +288,11 @@ void CTextureBudgetPanel::SnapshotTextureHistory()
 
 	// Count up the current number of counters.
 	int nCounters = 0;
+	// dimhotepus: Cache loop invariants.
+	const auto currentCounterGroup2 = GetCurrentCounterGroup();
 	for ( int i=0; i < g_VProfCurrentProfile.GetNumCounters(); i++ )
 	{
-		if ( g_VProfCurrentProfile.GetCounterGroup( i ) == GetCurrentCounterGroup() )
+		if ( g_VProfCurrentProfile.GetCounterGroup( i ) == currentCounterGroup2 )
 			++nCounters;
 	}
 
@@ -301,9 +307,11 @@ void CTextureBudgetPanel::SnapshotTextureHistory()
 	m_BudgetHistoryOffset = ( m_BudgetHistoryOffset + 1 ) % BUDGET_HISTORY_COUNT;
 
 	int groupID = 0;
+	// dimhotepus: Cache loop invariants.
+	const auto currentCounterGroup3 = GetCurrentCounterGroup();
 	for ( int i=0; i < pProf->GetNumCounters(); i++ )
 	{
-		if ( pProf->GetCounterGroup( i ) == GetCurrentCounterGroup() )
+		if ( pProf->GetCounterGroup( i ) == currentCounterGroup3 )
 		{
 			// The counters are in bytes and the panel is all in kilobytes.
 			uintp value = pProf->GetCounterValue( i ) / 1024;
