@@ -744,7 +744,7 @@ void CSearchComboBox::OnMenuItemSelected()
 		return;
 
 	char name[ 256 ];
-	GetItemText( idx, name, sizeof( name ) );
+	GetItemText( idx, name );
 
 	Assert( m_pTree );
 	if ( m_pTree && name[ 0 ] )
@@ -829,7 +829,7 @@ void CPropertiesTreeToolbar::OnTextNewLine()
 		return;
 
 	char searchBuf[ 256 ];
-	m_pSearch->GetText( searchBuf, sizeof( searchBuf ) );
+	m_pSearch->GetText( searchBuf );
 
 	auto *msg = new KeyValues( "OnNavigateSearch", "text", searchBuf );
 	PostMessage( parent, msg );
