@@ -576,9 +576,9 @@ public:
 			if ( *ppszFilename && !Q_IsAbsolutePath( *ppszFilename ) )
 			{
 				// Copy paths to minimize mutex lock time
-				pFileSystem->m_SearchPathsMutex.Lock();
+				pFileSystem->m_SearchPathsMutex.LockForRead();
 				CopySearchPaths( pFileSystem->m_SearchPaths );
-				pFileSystem->m_SearchPathsMutex.Unlock();
+				pFileSystem->m_SearchPathsMutex.UnlockRead();
 
 				pFileSystem->FixUpPath ( *ppszFilename, m_Filename );
 			}
@@ -607,9 +607,9 @@ public:
 				m_pathID =  UTL_INVAL_SYMBOL;
 			}
 			// Copy paths to minimize mutex lock time
-			pFileSystem->m_SearchPathsMutex.Lock();
+			pFileSystem->m_SearchPathsMutex.LockForRead();
 			CopySearchPaths( pFileSystem->m_SearchPaths );
-			pFileSystem->m_SearchPathsMutex.Unlock();
+			pFileSystem->m_SearchPathsMutex.UnlockRead();
 			m_Filename[0] = '\0';
 		}
 
@@ -658,7 +658,12 @@ public:
 	// logging functions
 	CUtlVector< FileSystemLoggingFunc_t > m_LogFuncs;
 
-	CThreadMutex m_SearchPathsMutex;
+	// RaphaelIT7: A CThreadRWLock/CThreadSpinRWLock should perform better than a CThreadFastMutex
+#if defined(WIN32) || defined(_WIN32)
+	CThreadSpinRWLock m_SearchPathsMutex;
+#else
+	CThreadRWLock m_SearchPathsMutex;
+#endif
 	CUtlVector< CSearchPath > m_SearchPaths;
 	CUtlVector<CPathIDInfo*> m_PathIDInfos;
 	CUtlLinkedList<FindData_t> m_FindData;
