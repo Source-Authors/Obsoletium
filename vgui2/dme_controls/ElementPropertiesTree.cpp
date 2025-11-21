@@ -230,12 +230,11 @@ int CElementTreeViewListControl::AddItem( KeyValues *data, bool allowLabelEditin
 
 	info.SetList( columnPanels );
 
-	intp c = columnPanels.Count();
-	for ( intp i = 0; i < c; ++i )
+	for ( auto *p : columnPanels )
 	{
-		if ( columnPanels[ i ] )
+		if ( p )
 		{
-			columnPanels[ i ]->SetParent( this );
+			p->SetParent( this );
 		}
 	}
 
@@ -256,20 +255,19 @@ void CElementTreeViewListControl::RemoveItem_R( int nItemIndex )
 	if ( idx != m_Panels.InvalidIndex() )
 	{
 		ColumnPanels_t& info = m_Panels[ idx ];
-		intp nCount = info.m_Columns.Count();
-		for ( intp i = 0; i < nCount; ++i )
+		for ( auto *p : info.m_Columns )
 		{
-			if ( info.m_Columns[i] )
+			if ( p )
 			{
-				info.m_Columns[i]->SetParent( (Panel*)NULL );
-				info.m_Columns[i]->MarkForDeletion();
+				p->SetParent( nullptr );
+				p->MarkForDeletion();
 			}
 		}
 		m_Panels.RemoveAt( idx );
 	}
 
-	int nCount = GetTree()->GetNumChildren( nItemIndex );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = GetTree()->GetNumChildren( nItemIndex );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		RemoveItem_R( GetTree()->GetChild( nItemIndex, i ) ); 
 	}
@@ -500,7 +498,7 @@ void CElementTreeViewListControl::PerformLayout()
 
 	int headerHeight = GetTitleBarHeight();
 
-	int numColumns = GetNumColumns();
+	intp numColumns = GetNumColumns();
 	// Now position column panels into the correct spot
 	intp rows = GetNumRows();
 	int visItemCount = 0;
@@ -509,7 +507,7 @@ void CElementTreeViewListControl::PerformLayout()
 	{
 		int tvi = GetTreeItemAtRow( row );
 
-		for ( int col = 0; col < numColumns; ++col )
+		for ( intp col = 0; col < numColumns; ++col )
 		{
 			int left, top, right, bottom;
 			GetGridElementBounds( col, row, left, top, right, bottom );
@@ -561,10 +559,8 @@ void CElementTreeViewListControl::HideAll()
 	for ( int i = m_Panels.FirstInorder(); i != m_Panels.InvalidIndex(); i = m_Panels.NextInorder( i ) )
 	{
 		ColumnPanels_t& info = m_Panels[ i ];
-		intp c = info.m_Columns.Count();
-		for ( intp j = 0 ; j < c; ++j )
+		for ( auto *panel : info.m_Columns )
 		{
-			Panel *panel = info.m_Columns[ j ];
 			if ( !panel )
 			{
 				continue;
@@ -581,10 +577,9 @@ void CElementTreeViewListControl::RemoveAll()
 	for ( int i = m_Panels.FirstInorder(); i != m_Panels.InvalidIndex(); i = m_Panels.NextInorder( i ) )
 	{
 		ColumnPanels_t& info = m_Panels[ i ];
-		intp c = info.m_Columns.Count();
-		for ( intp j = 0 ; j < c; ++j )
+		for ( auto *panel : info.m_Columns )
 		{
-			delete info.m_Columns[ j ];
+			delete panel;
 		}
 		info.m_Columns.RemoveAll();
 	}
@@ -622,10 +617,8 @@ void CElementTreeViewListControl::SetFont( HFont font )
 	for ( int i = m_Panels.FirstInorder(); i != m_Panels.InvalidIndex(); i = m_Panels.NextInorder( i ) )
 	{
 		ColumnPanels_t& info = m_Panels[ i ];
-		intp c = info.m_Columns.Count();
-		for ( intp j = 0 ; j < c; ++j )
+		for ( auto *panel : info.m_Columns )
 		{
-			Panel *panel = info.m_Columns[ j ];
 			if ( !panel )
 			{
 				continue;
@@ -1043,10 +1036,9 @@ void CElementPropertiesTreeInternal::ApplyChanges()
 	if ( !m_hObject.Get() )
 		return;
 
-	intp nCount = m_AttributeWidgets.Count();
-	for ( intp i = 0; i < nCount; ++i )
+	for ( auto &w : m_AttributeWidgets )
 	{
-		attributewidgetfactorylist->ApplyChanges( m_AttributeWidgets[i].m_pValueWidget, this );
+		attributewidgetfactorylist->ApplyChanges( w.m_pValueWidget, this );
 	}
 }
 
@@ -1073,10 +1065,9 @@ void CElementPropertiesTreeInternal::Refresh( RefreshType_t rebuild /* = false *
 	{
 		RefreshTreeItemState( m_pTree->GetTree()->GetRootItemIndex() );
 	}
-	intp nCount = m_AttributeWidgets.Count();
-	for ( intp i = 0; i < nCount; ++i )
+	for ( auto &w : m_AttributeWidgets )
 	{
-		attributewidgetfactorylist->Refresh( m_AttributeWidgets[i].m_pValueWidget, this );
+		attributewidgetfactorylist->Refresh( w.m_pValueWidget, this );
 	}
 }
 
@@ -1115,9 +1106,9 @@ void CElementPropertiesTreeInternal::OnCopy()
 	}
 }
 
-void CElementPropertiesTreeInternal::GetPathToItem( CUtlVector< TreeItem_t > &path, int itemIndex )
+void CElementPropertiesTreeInternal::GetPathToItem( CUtlVector< TreeItem_t > &path, intp itemIndex )
 {
-	for ( int idx = itemIndex; idx != m_pTree->GetTree()->GetRootItemIndex(); idx = m_pTree->GetTree()->GetItemParent( idx ) )
+	for ( intp idx = itemIndex; idx != m_pTree->GetTree()->GetRootItemIndex(); idx = m_pTree->GetTree()->GetItemParent( idx ) )
 	{
 		KeyValues *itemData = m_pTree->GetTree()->GetItemData( idx );
 		bool isArrayElement = !itemData->IsEmpty( "arrayIndex" );
@@ -1134,7 +1125,7 @@ int CElementPropertiesTreeInternal::OpenPath( const CUtlVector< TreeItem_t > &pa
 {
 	bool bFound = false;
 
-	int itemIndex = m_pTree->GetTree()->GetRootItemIndex();
+	intp itemIndex = m_pTree->GetTree()->GetRootItemIndex();
 	intp nPathItems = path.Count();
 	for ( intp i = 0; i < nPathItems; ++i )
 	{
@@ -1142,10 +1133,10 @@ int CElementPropertiesTreeInternal::OpenPath( const CUtlVector< TreeItem_t > &pa
 
 		bFound = false;
 
-		int nChildren = m_pTree->GetTree()->GetNumChildren( itemIndex );
-		for ( int i = 0; i < nChildren; ++i )
+		intp nChildren = m_pTree->GetTree()->GetNumChildren( itemIndex );
+		for ( intp i = 0; i < nChildren; ++i )
 		{
-			int nChildIndex = m_pTree->GetTree()->GetChild( itemIndex, i );
+			intp nChildIndex = m_pTree->GetTree()->GetChild( itemIndex, i );
 			KeyValues *childData = m_pTree->GetTree()->GetItemData( nChildIndex );
 
 			bool isArrayElement = !childData->IsEmpty( "arrayIndex" );
@@ -1194,7 +1185,7 @@ void CElementPropertiesTreeInternal::OnPaste_( bool reference )
 		return;
 
 	// Just choose first item for now
-	int itemIndex = selected[ 0 ];
+	intp itemIndex = selected[ 0 ];
 	KeyValues *itemData = m_pTree->GetItemData( itemIndex );
 	if ( !itemData )
 		return;
@@ -1821,13 +1812,13 @@ bool CElementPropertiesTreeInternal::BuildExpansionListToFindElement_R(
 
 	visited.Insert( element );
 
-	int nAttributes = element->AttributeCount();
+	intp nAttributes = element->AttributeCount();
 
 	if ( element == sr.handle.Get() )
 	{
 		if ( sr.attributeName.Length() > 0 )
 		{
-			int idx = nAttributes - 1;
+			intp idx = nAttributes - 1;
 			for ( CDmAttribute *attribute = element->FirstAttribute(); attribute; attribute = attribute->NextAttribute(), --idx )
 			{
 				const char *attributeName = attribute->GetName();
@@ -1841,7 +1832,7 @@ bool CElementPropertiesTreeInternal::BuildExpansionListToFindElement_R(
 		return false;
 	}
 
-	int idx = nAttributes - 1;
+	intp idx = nAttributes - 1;
 	for ( CDmAttribute *attribute = element->FirstAttribute(); attribute; attribute = attribute->NextAttribute(), --idx )
 	{
 		const char *attributeName = attribute->GetName();
@@ -1999,7 +1990,7 @@ void CElementPropertiesTreeInternal::NavigateToSearchResult()
 	UpdateTree();
 
 	// NOTE: Updating the tree could have changed the root item index
-	int nIndex = m_pTree->GetTree()->GetRootItemIndex();
+	intp nIndex = m_pTree->GetTree()->GetRootItemIndex();
 	intp c = expandIndices.Count();
 	for ( intp i = c - 2; i >= 0 ; --i )
 	{
@@ -2009,14 +2000,14 @@ void CElementPropertiesTreeInternal::NavigateToSearchResult()
 		m_pTree->ExpandItem( nIndex, true );
 
 #ifdef _DEBUG
-		int children = m_pTree->GetTree()->GetNumChildren( nIndex );
+		intp children = m_pTree->GetTree()->GetNumChildren( nIndex );
 		if ( idx >= children ) 
 		{
 			Assert( 0 );
 			break;
 		}
 #endif
-		int childIndex = m_pTree->GetTree()->GetChild( nIndex, idx );
+		intp childIndex = m_pTree->GetTree()->GetChild( nIndex, idx );
 		nIndex = childIndex;
 	}
 
@@ -2068,7 +2059,7 @@ void CElementPropertiesTreeInternal::OnNavSearch( const char *text )
 			if ( array.IsValid() )
 			{
 				array.RemoveAll();
-				for ( int i = 0; i < c; ++i )
+				for ( intp i = 0; i < c; ++i )
 				{
 					if ( m_SearchResults[ i ].handle.Get() )
 					{
@@ -2088,7 +2079,7 @@ void CElementPropertiesTreeInternal::OnNavSearch( const char *text )
 		// Close the tree and re-create the root node only
 		UpdateTree();
 
-		int nIndex = m_pTree->GetTree()->GetRootItemIndex();
+		intp nIndex = m_pTree->GetTree()->GetRootItemIndex();
 		m_pTree->ExpandItem( nIndex, true );
 
 		m_pTree->ResizeTreeToExpandedWidth();
@@ -2254,9 +2245,8 @@ void CElementPropertiesTreeInternal::AddToHistory( CDmElement *element )
 
 void CElementPropertiesTreeInternal::ValidateHistory()
 {
-	intp i;
 	intp c = m_hHistory.Count();
-	for ( i = c - 1 ; i >= 0; --i )
+	for ( intp i = c - 1 ; i >= 0; --i )
 	{
 		if ( !m_hHistory[ i ].Get() )
 		{
@@ -2271,9 +2261,8 @@ void CElementPropertiesTreeInternal::ValidateHistory()
 
 void CElementPropertiesTreeInternal::SpewHistory()
 {
-	intp i;
 	intp c = m_hHistory.Count();
-	for ( i = 0 ; i < c; ++i )
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmElement *element = m_hHistory[ i ].Get();
 		Assert( element );
@@ -2963,7 +2952,6 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, [[maybe
 	m_hContextMenu = new Menu( this, "ActionMenu" );
 	m_hContextMenu->SetFont( m_pTree->GetTree()->GetFont() );
 	Menu::PlaceContextMenu( this, m_hContextMenu.Get() );
-	intp id;
 
 	// ----------------------------------------------------
 	// What have we clicked on?
@@ -3028,7 +3016,7 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, [[maybe
 	// cut / copy / paste
 	m_hContextMenu->AddMenuItem( "#DmeElementPropertiesCut", new KeyValues( "OnCut" ), this );
 	m_hContextMenu->AddMenuItem( "#DmeElementPropertiesCopy", new KeyValues( "OnCopy" ), this );
-	id = m_hContextMenu->AddMenuItem( "#DmeElementPropertiesPaste", new KeyValues( "OnPaste" ), this );
+	int id = m_hContextMenu->AddMenuItem( "#DmeElementPropertiesPaste", new KeyValues( "OnPaste" ), this );
 	m_hContextMenu->SetItemEnabled( id, vgui::system()->GetClipboardTextCount() > 0 );
 
 	// paste special
@@ -3041,7 +3029,7 @@ void CElementPropertiesTreeInternal::GenerateContextMenu( int itemIndex, [[maybe
 	pasteSpecial->SetItemEnabled( id, false );
 
 	// clear or remove
-	intp removeItemID;
+	int removeItemID;
 	if ( bIsArrayAttribute && !bIsArrayAttributeEmpty )
 	{
 		removeItemID = m_hContextMenu->AddMenuItem( "#DmeElementPropertiesClear", new KeyValues( "OnRemove" ), this );
@@ -3449,7 +3437,7 @@ void CElementPropertiesTreeInternal::DropItemsIntoArray( CDmrElementArray<> &arr
 
 	intp base = array.InsertMultipleBefore( nArrayIndex, nElements );
 	//			array.SetMultiple( base, nElements, list.Base() );
-	for ( int i = 0; i < nElements; ++i )
+	for ( intp i = 0; i < nElements; ++i )
 	{
 		array.Set( base + i, list[ i ] );
 		if ( array[ base + i ] != list[ i ] )
@@ -3661,10 +3649,10 @@ void CElementPropertiesTreeInternal::OnItemDropped( int itemIndex, CUtlVector< K
 			intp nElements = list.Count();
 			for ( intp i = 0; i < nElements; ++i )
 			{
-				int nChildren = m_pTree->GetTree()->GetNumChildren( itemIndex );
-				for ( int ci = 0; ci < nChildren; ++ci )
+				intp nChildren = m_pTree->GetTree()->GetNumChildren( itemIndex );
+				for ( intp ci = 0; ci < nChildren; ++ci )
 				{
-					int nChildItem = m_pTree->GetTree()->GetChild( itemIndex, ci );
+					intp nChildItem = m_pTree->GetTree()->GetChild( itemIndex, ci );
 					KeyValues *pChildData = m_pTree->GetTree()->GetItemData( nChildItem );
 					if ( list[ i ] == GetElementKeyValue< CDmElement >( pChildData, "dmeelement" ) )
 					{
@@ -3803,10 +3791,10 @@ void CElementPropertiesTreeInternal::GetTreeViewText( CDmElement* obj, CDmAttrib
 int CElementPropertiesTreeInternal::FindTreeItem( int nParentIndex, const TreeItem_t &info )
 {
 	// Look for a match
-	int nCount = m_pTree->GetTree()->GetNumChildren( nParentIndex );
-	for ( int i = nCount; --i >= 0; )
+	intp nCount = m_pTree->GetTree()->GetNumChildren( nParentIndex );
+	for ( intp i = nCount; --i >= 0; )
 	{
-		int nChildIndex = m_pTree->GetTree()->GetChild( nParentIndex, i );
+		intp nChildIndex = m_pTree->GetTree()->GetChild( nParentIndex, i );
 		KeyValues *data = m_pTree->GetItemData( nChildIndex );
 		Assert( data );
 
@@ -3965,7 +3953,7 @@ void CElementPropertiesTreeInternal::BuildOpenItemList( OpenItemTree_t &tree, in
 	if ( selected )
 	{
 		// Set up prev an next item
-		int preserve = preservePrevSelectedItem 
+		intp preserve = preservePrevSelectedItem 
 			?	m_pTree->GetTree()->GetPrevChildItemIndex( nItemIndex ) : 
 				m_pTree->GetTree()->GetNextChildItemIndex( nItemIndex );
 
@@ -3976,10 +3964,10 @@ void CElementPropertiesTreeInternal::BuildOpenItemList( OpenItemTree_t &tree, in
 	}
 
 	// Deal with children
-	int nCount = m_pTree->GetTree()->GetNumChildren( nItemIndex );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_pTree->GetTree()->GetNumChildren( nItemIndex );
+	for ( intp i = 0; i < nCount; ++i )
 	{
-		int nChildIndex = m_pTree->GetTree()->GetChild( nItemIndex, i );
+		intp nChildIndex = m_pTree->GetTree()->GetChild( nItemIndex, i );
 		BuildOpenItemList( tree, nChild, nChildIndex, preservePrevSelectedItem );
 	}
 }
@@ -3990,7 +3978,7 @@ void CElementPropertiesTreeInternal::BuildOpenItemList( OpenItemTree_t &tree, in
 //-----------------------------------------------------------------------------
 void CElementPropertiesTreeInternal::RefreshTreeView( bool preservePrevSelectedItem /*= false*/ )
 {
-	int nIndex = m_pTree->GetTree()->GetRootItemIndex();
+	intp nIndex = m_pTree->GetTree()->GetRootItemIndex();
 	if ( nIndex >= 0 )
 	{
 		// remember where the tree is scrolled to
@@ -4077,10 +4065,10 @@ void CElementPropertiesTreeInternal::RefreshTreeItemState( int nItemID )
 	bool bEditableLabel = kv->GetInt( "editablelabel", 0 );
 	SetTreeItemColor( nItemID, pEntryElement, bIsElementArrayItem, bEditableLabel );
 
-	int nChildCount = m_pTree->GetTree()->GetNumChildren( nItemID );
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = m_pTree->GetTree()->GetNumChildren( nItemID );
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
-		int nChildID = m_pTree->GetTree()->GetChild( nItemID, i );
+		intp nChildID = m_pTree->GetTree()->GetChild( nItemID, i );
 		RefreshTreeItemState( nChildID );
 	}
 }
@@ -4259,8 +4247,8 @@ void CElementPropertiesTreeInternal::InsertAttributes( int parentNodeIndex, CDmE
 	Assert( obj );
 
 	// Build a list of attributes for sorting
-	AttributeInfo_t *pInfo = (AttributeInfo_t*)_alloca( obj->AttributeCount() * sizeof(AttributeInfo_t) );
-	int nCount = 0;
+	AttributeInfo_t *pInfo = stackallocT( AttributeInfo_t, obj->AttributeCount() );
+	intp nCount = 0;
 	for ( CDmAttribute *pAttribute = obj->FirstAttribute(); pAttribute; pAttribute = pAttribute->NextAttribute() )
 	{
 		pInfo[nCount].m_pAttribute = pAttribute;
@@ -4269,7 +4257,7 @@ void CElementPropertiesTreeInternal::InsertAttributes( int parentNodeIndex, CDmE
 	}
 
 	// Iterate over each element and create a widget and tree entry for it
-	for ( int i = nCount - 1; i >= 0; --i )
+	for ( intp i = nCount - 1; i >= 0; --i )
 	{
 		InsertSingleAttribute( parentNodeIndex, obj, pInfo[i].m_pAttribute );
 	}
@@ -4292,8 +4280,8 @@ void CElementPropertiesTreeInternal::RemoveItem_R( int nItemIndex )
 		}
 	}
 
-	int nCount = m_pTree->GetTree()->GetNumChildren( nItemIndex );
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_pTree->GetTree()->GetNumChildren( nItemIndex );
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		RemoveItem_R( m_pTree->GetTree()->GetChild( nItemIndex, i ) ); 
 	}

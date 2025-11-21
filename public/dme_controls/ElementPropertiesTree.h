@@ -113,7 +113,7 @@ private:
 			}
 		}
 
-		int							treeViewItem;
+		intp						treeViewItem;
 		CUtlVector< vgui::Panel * >	m_Columns;
 	};
 
@@ -377,7 +377,7 @@ protected:
 	void						OnImportElement( const char *pFullPath, KeyValues *pContext );
 	void						OnExportElement( const char *pFullPath, KeyValues *pContext );
 
-	void GetPathToItem( CUtlVector< TreeItem_t > &path, int itemIndex );
+	void GetPathToItem( CUtlVector< TreeItem_t > &path, intp itemIndex );
 	int OpenPath( const CUtlVector< TreeItem_t > &path );
 
 	// Refreshes the color state of the tree
