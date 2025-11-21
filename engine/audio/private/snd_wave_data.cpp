@@ -62,7 +62,12 @@ void MaybeReportMissingWav( char const *wav );
 //-----------------------------------------------------------------------------
 struct asyncwaveparams_t
 {
-	asyncwaveparams_t() : hFilename{FILENAMEHANDLE_INVALID}, bPrefetch( false ), bCanBeQueued( false ) {}
+	asyncwaveparams_t() : hFilename{FILENAMEHANDLE_INVALID},
+		datasize( 0 ),
+		seekpos( 0 ),
+		alignment( 0 ),
+		bPrefetch( false ),
+		bCanBeQueued( false ) {}
 
 	FileNameHandle_t	hFilename;	// handle to sound item name (i.e. not with sound\ prefix)
 	int					datasize;
