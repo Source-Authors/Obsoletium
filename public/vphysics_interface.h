@@ -568,7 +568,7 @@ public:
 
 	// Create a polygonal fluid body out of the specified collision model
 	// This object will affect any other objects that collide with the collision model
-	[[nodiscard]] virtual IPhysicsFluidController	*CreateFluidController( IPhysicsObject *pFluidObject, fluidparams_t *pParams ) = 0;
+	virtual IPhysicsFluidController	*CreateFluidController( IPhysicsObject *pFluidObject, fluidparams_t *pParams ) = 0;
 	// Destroy an object created with CreateFluidController()
 	virtual void DestroyFluidController( IPhysicsFluidController * ) = 0;
 
