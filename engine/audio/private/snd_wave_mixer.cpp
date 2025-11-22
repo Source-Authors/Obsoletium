@@ -277,7 +277,7 @@ int CAudioMixerWave::SkipSamples( channel_t *pChannel, int sampleCount, int outp
 }
 
 // wrapper routine to append without overflowing the temp buffer
-static uint AppendToBuffer( char *pBuffer, const char *pSampleData, size_t nBytes, const char *pBufferEnd )
+static size_t AppendToBuffer( char *pBuffer, const char *pSampleData, size_t nBytes, const char *pBufferEnd )
 {
 #if defined(_WIN32) && !defined(_X360)
 	// FIXME: Some clients are crashing here. Let's try to detect why.
