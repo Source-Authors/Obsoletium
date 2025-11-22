@@ -112,8 +112,10 @@ public:
 	static constexpr size_t ElementSize()	{ return sizeof(ListElem_t); }
 
 	// list statistics
-	intp	Count( ListHandle_t list ) const;
-	[[nodiscard]] intp	TotalCount( ) const;
+	// dimhotepus: Count type should be index one.
+	[[nodiscard]] I	Count( ListHandle_t list ) const;
+	// dimhotepus: Count type should be index one.
+	[[nodiscard]] I	TotalCount( ) const;
 	I	MaxElementIndex() const;
 
 	// Traversing the list
@@ -269,13 +271,13 @@ bool CUtlMultiList<T,I>::IsValidList( ListHandle_t list ) const
 // list statistics
 //-----------------------------------------------------------------------------
 template <class T, class I>
-inline intp CUtlMultiList<T,I>::TotalCount() const      
+inline I CUtlMultiList<T,I>::TotalCount() const
 { 
 	return m_TotalElements; 
 }
 
 template <class T, class I>
-inline intp CUtlMultiList<T,I>::Count( ListHandle_t list ) const
+inline I CUtlMultiList<T,I>::Count( ListHandle_t list ) const
 {
 	Assert( IsValidList(list) );
 	return m_List[list].m_Count;

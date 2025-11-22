@@ -46,8 +46,8 @@ size_t CDataManagerBase::FlushAllUnlocked()
 {
 	Lock();
 
-	intp nFlush = m_memoryLists.Count( m_lruList );
-	void **pScratch = (void **)_alloca( nFlush * sizeof(void *) );
+	auto nFlush = m_memoryLists.Count( m_lruList );
+	void **pScratch = stackallocT( void *, nFlush );
 	CUtlVector<void *> destroyList( pScratch, nFlush );
 
 	size_t nBytesInitial = MemUsed_Inline();
@@ -63,7 +63,7 @@ size_t CDataManagerBase::FlushAllUnlocked()
 
 	Unlock();
 
-	for ( intp i = 0; i < nFlush; i++ )
+	for ( decltype(nFlush) i = 0; i < nFlush; i++ )
 	{
 		DestroyResourceStorage( destroyList[i] );
 	}
@@ -82,8 +82,8 @@ size_t CDataManagerBase::FlushAll()
 {
 	Lock();
 
-	intp nFlush = m_memoryLists.Count( m_lruList ) + m_memoryLists.Count( m_lockList );
-	void **pScratch = (void **)_alloca( nFlush * sizeof(void *) );
+	auto nFlush = m_memoryLists.Count( m_lruList ) + m_memoryLists.Count( m_lockList );
+	void **pScratch = stackallocT( void*, nFlush );
 	CUtlVector<void *> destroyList( pScratch, nFlush );
 
 	size_t result = MemUsed_Inline();
@@ -111,7 +111,7 @@ size_t CDataManagerBase::FlushAll()
 
 	Unlock();
 
-	for ( intp i = 0; i < nFlush; i++ )
+	for ( decltype(nFlush) i = 0; i < nFlush; i++ )
 	{
 		DestroyResourceStorage( destroyList[i] );
 	}
