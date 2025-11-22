@@ -245,11 +245,11 @@ public:
 class CRecordingList : public IRecordingList
 {
 public:
-	virtual void	AddToList( ClientEntityHandle_t add );
-	virtual void	RemoveFromList( ClientEntityHandle_t remove );
+	void	AddToList( ClientEntityHandle_t add ) override;
+	void	RemoveFromList( ClientEntityHandle_t remove ) override;
 
-	virtual int		Count();
-	IClientRenderable *Get( int index );
+	int		Count() override;
+	IClientRenderable *Get( int index ) override;
 private:
 	CUtlVector< ClientEntityHandle_t > m_Recording;
 };
