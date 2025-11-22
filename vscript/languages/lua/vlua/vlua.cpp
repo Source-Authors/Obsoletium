@@ -1065,7 +1065,7 @@ public:
 		}
 
 		lua_getfield( m_LuaState, LUA_REGISTRYINDEX, pInstanceContext->szName );	//--
-		strcpy( pInstanceContext->szName, pszId );
+		V_strcpy_safe( pInstanceContext->szName, pszId );
 		lua_setfield( m_LuaState, LUA_REGISTRYINDEX, pInstanceContext->szName );	//--
 #endif
 		Assert( 0 );
