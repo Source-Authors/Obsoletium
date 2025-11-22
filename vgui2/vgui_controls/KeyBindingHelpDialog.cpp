@@ -211,9 +211,9 @@ void CKeyBindingHelpDialog::GetMappingList( Panel *panel, CUtlVector< PanelKeyBi
 }
 
 
-void CKeyBindingHelpDialog::AnsiText( char const *token, char *out, int buflen )
+void CKeyBindingHelpDialog::AnsiText( char const *token, OUT_Z_CAP(buflen) char *out, int buflen )
 {
-	out[ 0 ] = 0;
+	out[0] = '\0';
 
 	wchar_t *str = g_pVGuiLocalize->Find( token );
 	if ( !str )
@@ -235,8 +235,6 @@ struct ListInfo_t
 void CKeyBindingHelpDialog::PopulateList()
 {
 	m_pList->DeleteAllItems();
-
-	intp i;
 
 	CUtlVector< ListInfo_t > maps;
 	vgui::Panel *pPanel = m_hPanel;
@@ -270,7 +268,7 @@ void CKeyBindingHelpDialog::PopulateList()
 
 	// add header item
 	intp c = maps.Count();
-	for ( i = 0; i < c; ++i )
+	for ( intp i = 0; i < c; ++i )
 	{
 		PanelKeyBindingMap *m = maps[ i ].m_pMap;
 		pPanel = maps[i].m_pPanel;
@@ -287,7 +285,7 @@ void CKeyBindingHelpDialog::PopulateList()
 			
 			// Fill in data
 			char loc[ 128 ];
-			Q_snprintf( loc, sizeof( loc ), "#%s", kbMap->bindingname );
+			V_sprintf_safe( loc, "#%s", kbMap->bindingname );
 
 			char ansi[ 256 ];
 			AnsiText( loc, ansi );
