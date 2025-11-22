@@ -194,6 +194,20 @@ class CLC_ClientInfo : public CNetMessage
 	DECLARE_CLC_MESSAGE( ClientInfo );
 
 public:
+	CLC_ClientInfo()
+		: m_pMessageHandler{nullptr}
+	{
+		m_bReliable = false;
+		m_nSendTableCRC = 0;
+		m_nServerCount = -1;
+		m_bIsHLTV = false;
+#if defined( REPLAY_ENABLED ) x
+		m_bIsReplay = false;
+#endif
+		m_nFriendsID = 0;
+		m_FriendsName[0] = '\0';
+	}
+
 	CRC32_t			m_nSendTableCRC;
 	int				m_nServerCount;
 	bool			m_bIsHLTV;
