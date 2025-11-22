@@ -186,16 +186,20 @@ void MenuBar::PerformLayout()
 	GetSize( nBarWidth, nBarHeight );
 
 	// Now position + resize all buttons
-	int x = MENUBARINDENT;
-	for ( int i = 0; i < m_pMenuButtons.Count(); ++i )
+	// dimhotepus: TF2 backport.
+	int x = QuickPropScale( MENUBARINDENT );
+	for ( intp i = 0; i < m_pMenuButtons.Count(); ++i )
 	{
 		int nWide, nTall;
 
 		m_pMenuButtons[i]->GetContentSize(nWide, nTall);
-		m_pMenuButtons[i]->SetPos( x, MENUBARINDENT );
-		m_pMenuButtons[i]->SetSize( nWide + Label::Content, nBarHeight - 2 * MENUBARINDENT );
+		// dimhotepus: TF2 backport.
+		m_pMenuButtons[i]->SetPos( x, QuickPropScale( MENUBARINDENT ) );
+		m_pMenuButtons[i]->SetSize( nWide + QuickPropScale( Label::Content ), nBarHeight - 2 * QuickPropScale( MENUBARINDENT ) );
 
-		x += nWide + MENUBARINDENT;
+		
+		// dimhotepus: TF2 backport.
+		x += nWide + QuickPropScale( MENUBARINDENT );
 	}
 
 	m_nRightEdge = x;
@@ -208,7 +212,8 @@ void MenuBar::PerformLayout()
 //-----------------------------------------------------------------------------
 void MenuBar::GetContentSize( int& w, int&h )
 {
-	w = m_nRightEdge + 2;
+	// dimhotepus: TF2 backport.
+	w = m_nRightEdge + QuickPropScale( 2 );
 	h = GetTall();
 }
 

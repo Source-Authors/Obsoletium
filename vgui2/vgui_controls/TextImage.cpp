@@ -492,11 +492,13 @@ void TextImage::GetTextSize(int &wide, int &tall)
 
 	// For height, use the remapped font
 	int fontHeight = surface()->GetFontTall(GetFont());
-	tall = fontHeight;
+	tall = 0;
 
-	intp textLen = wcslen(text);
+	intp textLen = V_wcslen(text);
 	for (intp i = 0; i < textLen; i++)
 	{
+		// dimhotepus: TF2 backport.
+		tall = Max( tall, fontHeight );
 		wchar_t ch = text[i];
 
 		// handle stupid special characters, these should be removed

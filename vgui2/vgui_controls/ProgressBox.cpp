@@ -86,14 +86,16 @@ void ProgressBox::Init()
 	m_pProgressBar->SetVisible(false);
 
 	m_pCancelButton = new Button(this, NULL, "#VGui_Cancel");
-	m_pCancelButton->SetSize(72, 24);
+	// dimhotepus: Scale UI.
+	m_pCancelButton->SetSize(QuickPropScale(72), QuickPropScale(24));
 	m_pCancelButton->SetCommand("Cancel");
 
 	SetMenuButtonResponsive(false);
 	SetMinimizeButtonVisible(false);
 	SetCancelButtonVisible(false);
 	SetSizeable(false);
-	SetSize(384, 128);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale(384), QuickPropScale(128));
 	m_flCurrentProgress = 0.0f;
 	m_flFirstProgressUpdate = -0.1f;
 	m_flLastProgressUpdate = 0.0f;
@@ -120,8 +122,9 @@ void ProgressBox::ApplySchemeSettings(IScheme *pScheme)
 
 	int wide, tall;
 	m_pMessageLabel->GetContentSize(wide, tall);
-	SetSize(384, tall + 92);
-	m_pMessageLabel->SetSize(344, tall);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale(384), tall + QuickPropScale(92));
+	m_pMessageLabel->SetSize(QuickPropScale(344), tall);
 }
 
 //-----------------------------------------------------------------------------
@@ -175,10 +178,11 @@ void ProgressBox::PerformLayout()
 	wide += x;
 	tall += y;
 
-	int leftEdge = x + 16;
-	m_pMessageLabel->SetPos(leftEdge, y + 12);
-	m_pProgressBar->SetPos(leftEdge, y + 14 + m_pMessageLabel->GetTall() + 2);
-	m_pProgressBar->SetSize(wide - 44, 24);
+	// dimhotepus: Scale UI.
+	int leftEdge = x + QuickPropScale( 16 );
+	m_pMessageLabel->SetPos(leftEdge, y + QuickPropScale( 12 ));
+	m_pProgressBar->SetPos(leftEdge, y + QuickPropScale( 14 ) + m_pMessageLabel->GetTall() + QuickPropScale( 2 ));
+	m_pProgressBar->SetSize(wide - QuickPropScale( 44 ), QuickPropScale( 24 ));
 
 	if (m_pCancelButton->IsVisible())
 	{
@@ -187,7 +191,8 @@ void ProgressBox::PerformLayout()
 		int offs = m_pCancelButton->GetWide();
 		m_pProgressBar->GetBounds(px, py, pw, pt);
 		m_pCancelButton->SetPos(px + pw - offs, py);
-		m_pProgressBar->SetSize(pw - offs - 10, pt);
+		// dimhotepus: Scale UI.
+		m_pProgressBar->SetSize(pw - offs - QuickPropScale( 10 ), pt);
 	}
 
 	BaseClass::PerformLayout();

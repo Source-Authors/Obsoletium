@@ -510,13 +510,15 @@ namespace vgui
 		
 		FrameButton(Panel *parent, const char *name, const char *text) : Button(parent, name, text)
 		{
-			SetSize( FrameButton::GetButtonSide( (Frame *)parent ), FrameButton::GetButtonSide( (Frame *)parent ) );
+			// dimhotepus: Scale UI.
+			SetSize( QuickPropScale( FrameButton::GetButtonSide( (Frame *)parent ) ), QuickPropScale( FrameButton::GetButtonSide( (Frame *)parent ) ) );
 			_brightBorder = NULL;
 			_depressedBorder = NULL;
 			_disabledBorder = NULL;
 			_disabledLook = true;
 			SetContentAlignment(Label::a_northwest);
-			SetTextInset(2, 1);
+			// dimhotepus: Scale UI.
+			SetTextInset( QuickPropScale( 2 ), QuickPropScale( 1 ) );
 			SetBlockDragChaining( true );
 		}
 		
@@ -665,8 +667,9 @@ public:
 			pScheme->GetResourceString( "FrameSystemButton.Icon" );
 		const char *pDisabledImage = m_DisabledImage.Length() ? m_DisabledImage.Get() : 
 			pScheme->GetResourceString( "FrameSystemButton.DisabledIcon" );
-		_enabled = scheme()->GetImage( pEnabledImage, false);
-		_disabled = scheme()->GetImage( pDisabledImage, false);
+		// dimhotepus: Scale UI.
+		_enabled = scheme()->GetImage( pEnabledImage, false, IsProportional() );
+		_disabled = scheme()->GetImage( pDisabledImage, false, IsProportional() );
 
 		SetTextInset(0, 0);
 	
@@ -769,10 +772,11 @@ Frame::Frame(Panel *parent, const char *panelName, bool showTaskbarIcon /*=true*
 	m_flTransitionEffectTime = 0.0f;
 	m_flFocusTransitionEffectTime = 0.0f;
 	m_bDeleteSelfOnClose = false;
-	m_iClientInsetX = 5; 
-	m_iClientInsetY = 5;
+	// dimhotepus: Scale UI.
+	m_iClientInsetX = m_iClientInsetY = QuickPropScale( 5 );
 	m_iClientInsetXOverridden = false;
-	m_iTitleTextInsetX = 28;
+	// dimhotepus: Scale UI.
+	m_iTitleTextInsetX = QuickPropScale( 28 );
 	m_bClipToParent = false;
 	m_bSmallCaption = false;
 	m_bChainKeysToParent = false;
@@ -783,8 +787,9 @@ Frame::Frame(Panel *parent, const char *panelName, bool showTaskbarIcon /*=true*
 	
 	// add ourselves to the build group
 	SetBuildGroup(GetBuildGroup());
-	
-	SetMinimumSize(128,66);
+
+	// dimhotepus: Scale UI.
+	SetMinimumSize(QuickPropScale( 128 ),QuickPropScale( 66 ));
 	
 	GetFocusNavGroup().SetFocusTopLevel(true);
 	
@@ -1020,19 +1025,14 @@ void Frame::LayoutProportional( FrameButton *bt )
 {
 	float scale = 1.0;
 
-	if( IsProportional() )
+	if ( IsProportional() )
 	{	
-		int screenW, screenH;
-		surface()->GetScreenSize( screenW, screenH );
-
-		int proW,proH;
-		surface()->GetProportionalBase( proW, proH );
-
-		scale =	( (float)( screenH ) / (float)( proH ) );
+		// dimhotepus: TF2 backport. Scale UI,
+		scale = scheme()->GetProportionalScaledValueEx( GetScheme(), 65535 ) / 65535.f;
 	}
 
 	bt->SetSize( (int)( FrameButton::GetButtonSide( this ) * scale ), (int)( FrameButton::GetButtonSide( this ) * scale ) );
-	bt->SetTextInset( (int)( ceil( 2 * scale ) ), (int) ( ceil(1 * scale ) ) );
+	bt->SetTextInset( (int)( ceil( 2 * scale ) ), (int) ( ceil( 1 * scale ) ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1222,10 +1222,11 @@ void Frame::PerformLayout()
 	GetSize(wide, tall);
 		
 #if !defined( _X360 )
-	int DRAGGER_SIZE = GetDraggerSize();
-	int CORNER_SIZE = GetCornerSize();
+	// dimhotepus: Scale UI.
+	int DRAGGER_SIZE = QuickPropScale( GetDraggerSize() );
+	int CORNER_SIZE = QuickPropScale( GetCornerSize() );
 	int CORNER_SIZE2 = CORNER_SIZE * 2;
-	int BOTTOMRIGHTSIZE = GetBottomRightSize();
+	int BOTTOMRIGHTSIZE = QuickPropScale( GetBottomRightSize() );
 
 	_topGrip->SetBounds(CORNER_SIZE, 0, wide - CORNER_SIZE2, DRAGGER_SIZE);
 	_leftGrip->SetBounds(0, CORNER_SIZE, DRAGGER_SIZE, tall - CORNER_SIZE2);
@@ -1239,7 +1240,8 @@ void Frame::PerformLayout()
 
 	_bottomRightGrip->SetBounds(wide - BOTTOMRIGHTSIZE, tall - BOTTOMRIGHTSIZE, BOTTOMRIGHTSIZE, BOTTOMRIGHTSIZE);
 	
-	_captionGrip->SetSize(wide-10,GetCaptionHeight());
+	// dimhotepus: Scale UI.
+	_captionGrip->SetSize(wide - QuickPropScale(10), QuickPropScale( GetCaptionHeight() ));
 	
 	_topGrip->MoveToFront();
 	_bottomGrip->MoveToFront();
@@ -1254,19 +1256,15 @@ void Frame::PerformLayout()
 	_menuButton->MoveToFront();
 	_minimizeButton->MoveToFront();
 	_minimizeToSysTrayButton->MoveToFront();
-	_menuButton->SetBounds(5+2, 5+3, GetCaptionHeight()-5, GetCaptionHeight()-5);
+	// dimhotepus: Scale UI.
+	_menuButton->SetBounds( QuickPropScale(5+2), QuickPropScale(5+3), QuickPropScale( GetCaptionHeight()-5 ), QuickPropScale( GetCaptionHeight()-5 ));
 #endif
 
 	float scale = 1;
 	if (IsProportional())
 	{
-		int screenW, screenH;
-		surface()->GetScreenSize( screenW, screenH );
-
-		int proW,proH;
-		surface()->GetProportionalBase( proW, proH );
-
-		scale =	( (float)( screenH ) / (float)( proH ) );
+		// dimhotepus: Scale UI.
+		scale = scheme()->GetProportionalScaledValueEx( GetScheme(), 65535 ) / 65535.f;
 	}
 	
 #if !defined( _X360 )
@@ -1434,19 +1432,21 @@ void Frame::GetClientArea(int &x, int &y, int &wide, int &tall)
 	if (_drawTitleBar)
 	{
 		int captionTall = surface()->GetFontTall(_title->GetFont());
-
-		int border = m_bSmallCaption ? CAPTION_TITLE_BORDER_SMALL : CAPTION_TITLE_BORDER;
+		// dimhotepus: Scale UI.
+		int border = QuickPropScale( m_bSmallCaption ? CAPTION_TITLE_BORDER_SMALL : CAPTION_TITLE_BORDER );
 		int yinset = m_bSmallCaption ? 0 : m_iClientInsetY;
+		// dimhotepus: Scale UI.
+		yinset += QuickPropScale( m_iTitleTextInsetYOverride );
 
-		yinset += m_iTitleTextInsetYOverride;
-
-		y = yinset + captionTall + border + 1;
+		// dimhotepus: Scale UI.
+		y = yinset + captionTall + border + QuickPropScale( 1 );
 		tall = (tall - yinset) - y;
 	}
 	
 	if ( m_bSmallCaption )
 	{
-		tall -= 5;
+		// dimhotepus: Scale UI.
+		tall -= QuickPropScale( 5 );
 	}
 
 	wide = (wide - m_iClientInsetX) - x;
@@ -1604,14 +1604,16 @@ void Frame::PaintBackground()
 
 		// caption
 		surface()->DrawSetColor(titleColor);
-		int inset = m_bSmallCaption ? 3 : 5;
-		int captionHeight = m_bSmallCaption ? 14: 28;
+		// dimhotepus: Scale UI.
+		int inset = QuickPropScale( m_bSmallCaption ? 3 : 5 );
+		int captionHeight = QuickPropScale( m_bSmallCaption ? 14 : 28 );
 
 		surface()->DrawFilledRect(inset, inset, wide - inset, captionHeight );
-		
+
 		{
-			int nTitleX = m_iTitleTextInsetXOverride ? m_iTitleTextInsetXOverride : m_iTitleTextInsetX;
-			int nTitleWidth = wide - 72;
+			// dimhotepus: Scale UI.
+			int nTitleX = m_iTitleTextInsetXOverride ? QuickPropScale( m_iTitleTextInsetXOverride ) : m_iTitleTextInsetX;
+			int nTitleWidth = wide - QuickPropScale( 72 );
 #if !defined( _X360 )
 			if ( _menuButton && _menuButton->IsVisible() )
 			{
@@ -1624,13 +1626,15 @@ void Frame::PaintBackground()
 			int nTitleY;
 			if ( m_iTitleTextInsetYOverride )
 			{
-				nTitleY = m_iTitleTextInsetYOverride;
+				// dimhotepus: Scale UI.
+				nTitleY = QuickPropScale( m_iTitleTextInsetYOverride );
 			}
 			else
 			{
-				nTitleY = m_bSmallCaption ? 2 : 9;
+				// dimhotepus: Scale UI.
+				nTitleY = QuickPropScale( m_bSmallCaption ? 2 : 9 );
 			}
-			_title->SetPos( nTitleX, nTitleY );		
+			_title->SetPos( nTitleX, nTitleY );
 			_title->SetSize( nTitleWidth, tall);
 			_title->Paint();
 		}
@@ -1699,17 +1703,20 @@ void Frame::ApplySchemeSettings(IScheme *pScheme)
 	const char *resourceString = pScheme->GetResourceString("Frame.ClientInsetX");
 	if ( resourceString )
 	{
-		m_iClientInsetX = atoi(resourceString);
+		// dimhotepus: Scale UI.
+		m_iClientInsetX = QuickPropScale( atoi(resourceString) );
 	}
 	resourceString = pScheme->GetResourceString("Frame.ClientInsetY");
 	if ( resourceString )
 	{
-		m_iClientInsetY = atoi(resourceString);
+		// dimhotepus: Scale UI.
+		m_iClientInsetY = QuickPropScale( atoi(resourceString) );
 	}
 	resourceString = pScheme->GetResourceString("Frame.TitleTextInsetX");
 	if ( resourceString )
 	{
-		m_iTitleTextInsetX = atoi(resourceString);
+		// dimhotepus: Scale UI.
+		m_iTitleTextInsetX = QuickPropScale( atoi(resourceString) );
 	}
 
 	SetBgColor(m_InFocusBgColor);

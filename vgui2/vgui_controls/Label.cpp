@@ -82,8 +82,12 @@ void Label::Init()
 	m_bWrap = false;
 	m_bCenterWrap = false;
 	m_bAutoWideToContents = false;
+	// dimhotepus: TF2 backport. Scale UI.
+	m_bAutoTallToContents = false;
 	m_bUseProportionalInsets = false;
 	m_bAutoWideDirty = false;
+	// dimhotepus: TF2 backport. Scale UI.
+	m_bAutoTallDirty = false;
 
 //	SetPaintBackgroundEnabled(false);
 }
@@ -289,7 +293,7 @@ void Label::SetText(const char *text)
 
 	if( text[0] == '#' )
 	{
-		SetHotkey(CalculateHotkey(g_pVGuiLocalize->Find(text)));		
+		SetHotkey(CalculateHotkey(g_pVGuiLocalize->Find(text)));
 	}
 	else
 	{	
@@ -297,6 +301,8 @@ void Label::SetText(const char *text)
 	}
 
 	m_bAutoWideDirty = m_bAutoWideToContents;
+	// dimhotepus: TF2 backport. Scale UI.
+	m_bAutoTallDirty = m_bAutoTallToContents;
 
 	InvalidateLayout();
 	Repaint();
@@ -308,6 +314,8 @@ void Label::SetText(const char *text)
 void Label::SetText(const wchar_t *unicodeString, bool bClearUnlocalizedSymbol)
 {
 	m_bAutoWideDirty = m_bAutoWideToContents;
+	// dimhotepus: TF2 backport. Scale UI.
+	m_bAutoTallDirty = m_bAutoTallToContents;
 
 	if ( unicodeString && _textImage->GetUText() && !Q_wcscmp(unicodeString,_textImage->GetUText()) )
 		return;
@@ -330,7 +338,7 @@ void Label::OnDialogVariablesChanged(KeyValues *dialogVariables )
 	if (index != INVALID_LOCALIZE_STRING_INDEX)
 	{
 		// reconstruct the string from the variables
-		wchar_t buf[1024];
+		wchar_t buf[4096];
 		g_pVGuiLocalize->ConstructString_safe(buf, index, dialogVariables);
 		SetText(buf);
 	}
@@ -504,7 +512,7 @@ void Label::Paint()
 	int imageYPos = 0; // a place to save the y offset for when we draw the disable version of the image
 
 	// draw the set of images
-	for (int i = 0; i < _imageDar.Count(); i++)
+	for (intp i = 0; i < _imageDar.Count(); i++)
 	{
 		TImageInfo &imageInfo = _imageDar[i];
 		IImage *image = imageInfo.image;
@@ -820,7 +828,7 @@ intp Label::AddImage(IImage *image, int offset)
 	intp newImage = _imageDar.AddToTail();
 	auto &dar = _imageDar[newImage];
 	dar.image = image;
-	dar.offset = (short)offset;
+	dar.offset = offset;
 	dar.xpos = -1;
 	dar.width = -1;
 	InvalidateLayout();
@@ -858,7 +866,7 @@ void Label::SetImageAtIndex(intp index, IImage *image, int offset)
 	if ( _imageDar[index].image != image || _imageDar[index].offset != offset)
 	{
 		_imageDar[index].image = image;
-		_imageDar[index].offset = (short)offset;
+		_imageDar[index].offset = offset;
 		InvalidateLayout();
 	}
 }
@@ -925,7 +933,7 @@ void Label::SetImagePreOffset(intp index, int preOffset)
 {
 	if (_imageDar.IsValidIndex(index) && _imageDar[index].offset != preOffset)
 	{
-		_imageDar[index].offset = (short)preOffset;
+		_imageDar[index].offset = preOffset;
 		InvalidateLayout();
 	}
 }
@@ -935,8 +943,8 @@ void Label::SetImagePreOffset(intp index, int preOffset)
 //-----------------------------------------------------------------------------
 void Label::SetImageBounds(int index, int x, int width)
 {
-	_imageDar[index].xpos = (short)x;
-	_imageDar[index].width = (short)width;
+	_imageDar[index].xpos = x;
+	_imageDar[index].width = width;
 }
 
 //-----------------------------------------------------------------------------
@@ -1012,6 +1020,17 @@ void Label::ApplySchemeSettings(IScheme *pScheme)
 	if ( m_bAutoWideToContents )
 	{
 		m_bAutoWideDirty = true;
+	}
+
+	// dimhotepus: TF2 backport. Scale UI.
+	if ( m_bAutoTallToContents )
+	{
+		m_bAutoTallDirty = true;
+	}
+
+	// dimhotepus: TF2 backport. Scale UI.
+	if ( m_bAutoWideToContents || m_bAutoTallToContents )
+	{
 		HandleAutoSizing();
 	}
 
@@ -1114,6 +1133,8 @@ void Label::GetSettings( KeyValues *outResourceData )
 		outResourceData->SetInt("textinsety", _textInset[1]);
 	}
 	outResourceData->SetInt("auto_wide_tocontents", ( m_bAutoWideToContents ? 1 : 0 ));
+    // dimhotepus: TF2 backport. Scale UI.
+	outResourceData->SetInt("auto_tall_tocontents", ( m_bAutoTallToContents ? 1 : 0 ));
 	outResourceData->SetInt("use_proportional_insets", ( m_bUseProportionalInsets ? 1 : 0 ));
 }
 
@@ -1237,17 +1258,33 @@ void Label::ApplySettings( KeyValues *inResourceData )
 	SetCenterWrap( bWrapText );
 
 	m_bAutoWideToContents = inResourceData->GetInt("auto_wide_tocontents", 0) > 0;
+	// dimhotepus: TF2 backport. Scale UI.
+	m_bAutoTallToContents = inResourceData->GetInt("auto_tall_tocontents", 0) > 0;
 
 	bWrapText = inResourceData->GetInt("wrap", 0) > 0;
 	SetWrap( bWrapText );
 
 	int inset_x = inResourceData->GetInt("textinsetx", _textInset[0]);
 	int inset_y = inResourceData->GetInt("textinsety", _textInset[1]);
+	// dimhotepus: TF2 backport. Scale UI.
+	float flInsetY = inResourceData->GetFloat("textinsety", (float)_textInset[1]);
 	// Had to play it safe and add a new key for backwards compatibility
 	m_bUseProportionalInsets = inResourceData->GetInt("use_proportional_insets", 0) > 0;
-	if ( m_bUseProportionalInsets )
+
+	// We need to check if "textinsetx" is set before we scale inset_x because code might
+	// have changed inset_x to some value > 0, which would cause GetProportionalScaledValueEx()
+	// to make inset_x to scale up every time this code is called
+	// dimhotepus: TF2 backport. Scale UI.
+	if ( m_bUseProportionalInsets && !inResourceData->IsEmpty( "textinsetx" ) )
 	{
 		inset_x = scheme()->GetProportionalScaledValueEx( GetScheme(), inset_x );
+	}
+
+	// dimhotepus: TF2 backport. Scale UI.
+	if ( m_bUseProportionalInsets && !inResourceData->IsEmpty( "textinsety" ) )
+	{
+		int nScale = scheme()->GetProportionalScaledValueEx( GetScheme(), 1000 );
+		inset_y = int( ceilf( ( flInsetY * nScale ) / 1000.0f ) );
 	}
 
 	SetTextInset( inset_x, inset_y );
@@ -1371,14 +1408,19 @@ void Label::SetAllCaps( bool bAllCaps )
 
 void Label::HandleAutoSizing( void )
 {
-	if ( m_bAutoWideDirty )
+	if ( m_bAutoWideDirty || m_bAutoTallDirty )
 	{
-		m_bAutoWideDirty = false;
-
-		// Only change our width to match our content
+		// dimhotepus: TF2 backport. Scale UI.
+		// Change our width and or height to match our content
 		int wide, tall;
 		GetContentSize(wide, tall);
-		SetSize(wide, GetTall());
+		wide = m_bAutoWideDirty ? wide : GetWide();
+		tall = m_bAutoTallDirty ? tall : GetTall();
+
+		m_bAutoTallDirty = false;
+		m_bAutoWideDirty = false;
+
+		SetSize(wide, tall);
 	}
 }
 

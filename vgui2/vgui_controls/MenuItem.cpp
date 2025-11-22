@@ -32,7 +32,8 @@ public:
 	{
 		_menuItem = item;
 
-		SetSize(20, 13);
+		// dimhotepus: Scale UI.
+		SetSize(QuickPropScalePanel( 20, item ), QuickPropScalePanel( 13, item ));
 	}
 
 	virtual void Paint()
@@ -87,6 +88,9 @@ MenuItem::MenuItem(Menu *parent, const char *panelName, const char *text, Menu *
 	SetButtonActivationType(ACTIVATE_ONRELEASED);
 	m_pUserData = NULL;
 	m_pCurrentKeyBinding = NULL;
+	// dimhotepus: TF2 backport. Scale UI.
+	m_nOffsetFromMainMenu = 0;
+	m_nPaddingY = 0;
 
 	// only one arg should be passed in.
 	Assert (!(cascadeMenu && checkable));
@@ -109,6 +113,9 @@ MenuItem::MenuItem(Menu *parent, const char *panelName, const wchar_t *wszText, 
 	SetButtonActivationType(ACTIVATE_ONRELEASED);
 	m_pUserData = NULL;
 	m_pCurrentKeyBinding = NULL;
+	// dimhotepus: TF2 backport. Scale UI.
+	m_nOffsetFromMainMenu = 0;
+	m_nPaddingY = 0;
 
 	// only one arg should be passed in.
 	Assert (!(cascadeMenu && checkable));
@@ -151,7 +158,8 @@ void MenuItem::Init( void )
 		// move the text image over so we have room for the check
 		SetTextImageIndex(1);
 		m_pCheck = new MenuItemCheckImage(this);
-		SetImageAtIndex(0, m_pCheck, CHECK_INSET);
+		// dimhotepus: Scale UI.
+		SetImageAtIndex(0, m_pCheck, QuickPropScale( CHECK_INSET ));
 		SetChecked(false);
 	}
 
@@ -386,7 +394,8 @@ void MenuItem::ApplySchemeSettings(IScheme *pScheme)
 	SetArmedColor(GetSchemeColor("Menu.ArmedTextColor", GetFgColor(), pScheme), GetSchemeColor("Menu.ArmedBgColor", GetBgColor(), pScheme));
 	SetDepressedColor(GetSchemeColor("Menu.ArmedTextColor", GetFgColor(), pScheme), GetSchemeColor("Menu.ArmedBgColor", GetBgColor(), pScheme));
 
-	SetTextInset(atoi(pScheme->GetResourceString("Menu.TextInset")), 0);
+	// dimhotepus: Scale UI.
+	SetTextInset(QuickPropScale( atoi(pScheme->GetResourceString("Menu.TextInset")) ), 0);
 	
 	// reload images since applyschemesettings in label wipes them out.
 	if ( m_pCascadeArrow )
@@ -398,7 +407,8 @@ void MenuItem::ApplySchemeSettings(IScheme *pScheme)
 	else if (m_bCheckable)
 	{
 		( static_cast<MenuItemCheckImage *>(m_pCheck) )->SetFont( pScheme->GetFont("Marlett", IsProportional()));
-		SetImageAtIndex(0, m_pCheck, CHECK_INSET);
+		// dimhotepus: Scale UI.
+		SetImageAtIndex(0, m_pCheck, QuickPropScale( CHECK_INSET ));
 		( static_cast<MenuItemCheckImage *>(m_pCheck) )->ResizeImageToContent();
 	}
 
@@ -467,7 +477,8 @@ void MenuItem::GetCheckImageSize(int &wide, int &tall)
 	    m_pCheck->GetSize(wide, tall);
 
 		// include the inset for the check, since nobody but us know about the inset
-		wide += CHECK_INSET;
+		// dimhotepus: Scale UI.
+		wide += QuickPropScale( CHECK_INSET );
 		return;
 	}	
 }
@@ -613,7 +624,8 @@ void MenuItem::Paint()
 	int iw, ih;
 	m_pCurrentKeyBinding->GetSize( iw, ih );
 
-	int x = w - iw - KEYBINDING_INSET;
+	// dimhotepus: Scale UI.
+	int x = w - iw - QuickPropScale( KEYBINDING_INSET );
 	int y = ( h - ih ) / 2;
 
 	if ( IsEnabled() )
@@ -639,12 +651,19 @@ void MenuItem::Paint()
 void MenuItem::GetContentSize( int& cw, int &ch )
 {
 	BaseClass::GetContentSize( cw, ch );
+	if ( m_nOffsetFromMainMenu > 0 )
+	{
+		// dimhotepus: TF2 backport. Scale UI.
+		cw += QuickPropScale( GetOffsetFromMainMenu() );
+	}
+
 	if ( !m_pCurrentKeyBinding )
 		return;
 
 	int iw, ih;
 	m_pCurrentKeyBinding->GetSize( iw, ih );
 
-	cw += iw + KEYBINDING_INSET;
+	// dimhotepus: Scale UI.
+	cw += iw + QuickPropScale( KEYBINDING_INSET );
 	ch = max( ch, ih );
 }

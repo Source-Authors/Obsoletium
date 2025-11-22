@@ -61,7 +61,8 @@ public:
 	{
 		BaseClass::ApplySchemeSettings( scheme );
 
-		SetFont( scheme->GetFont( "DefaultVerySmall" ) );
+		// dimhotepus: Scale UI.
+		SetFont( scheme->GetFont( "DefaultVerySmall", IsProportional() ) );
 	}
 };
 
@@ -227,8 +228,9 @@ intp GetBuildModeDialogCount()
 //-----------------------------------------------------------------------------
 BuildModeDialog::BuildModeDialog(BuildGroup *buildGroup) : Frame(buildGroup->GetContextPanel(), "BuildModeDialog")
 {
-	SetMinimumSize(300, 256);
-	SetSize(300, 420);
+	// dimhotepus: Scale UI.
+	SetMinimumSize( QuickPropScale( 300 ), QuickPropScale( 256 ) );
+	SetSize( QuickPropScale( 300 ), QuickPropScale( 420 ) );
 	m_pCurrentPanel = NULL;
 	m_pEditableParents = NULL;
 	m_pEditableChildren = NULL;
@@ -354,7 +356,8 @@ void BuildModeDialog::CreateControls()
 		m_pFileSelectionCombo->SetEnabled(false);
 	}
 
-	int buttonH = 18;
+	// dimhotepus: Scale UI.
+	int buttonH = QuickPropScale( 18 );
 
 	// status info at top of dialog
 	m_pStatusLabel = new Label(this, "StatusLabel", "[nothing currently selected]");
@@ -363,15 +366,18 @@ void BuildModeDialog::CreateControls()
 	m_pDivider = new Divider(this, "Divider");
 	// drop-down combo box for adding new controls
 	m_pAddNewControlCombo = new ComboBox(this, NULL, 30, false);
-	m_pAddNewControlCombo->SetSize(116, buttonH);
+	// dimhotepus: Scale UI.
+	m_pAddNewControlCombo->SetSize(QuickPropScale( 116 ), buttonH);
 	m_pAddNewControlCombo->SetOpenDirection(Menu::DOWN);
 
 	m_pEditableParents = new CBuildModeNavCombo( this, NULL, 15, false, true, m_pBuildGroup->GetContextPanel() );
-	m_pEditableParents->SetSize(116, buttonH);
+	// dimhotepus: Scale UI.
+	m_pEditableParents->SetSize(QuickPropScale( 116 ), buttonH);
 	m_pEditableParents->SetOpenDirection(Menu::DOWN);
 
 	m_pEditableChildren = new CBuildModeNavCombo( this, NULL, 15, false, false, m_pBuildGroup->GetContextPanel() );
-	m_pEditableChildren->SetSize(116, buttonH);
+	// dimhotepus: Scale UI.
+	m_pEditableChildren->SetSize(QuickPropScale( 116 ), buttonH);
 	m_pEditableChildren->SetOpenDirection(Menu::DOWN);
 
 	m_pNextChild = new Button( this, "NextChild", "Next", this );
@@ -402,16 +408,20 @@ void BuildModeDialog::CreateControls()
 	m_pAddNewControlCombo->ActivateItem(defaultItem);
 
 	m_pExitButton = new Button(this, "ExitButton", "&Exit");
-	m_pExitButton->SetSize(64, buttonH);
+	// dimhotepus: Scale UI.
+	m_pExitButton->SetSize(QuickPropScale( 64 ), buttonH);
 
 	m_pSaveButton = new Button(this, "SaveButton", "&Save");
-	m_pSaveButton->SetSize(64, buttonH);
+	// dimhotepus: Scale UI.
+	m_pSaveButton->SetSize(QuickPropScale( 64 ), buttonH);
 	
 	m_pApplyButton = new Button(this, "ApplyButton", "&Apply");
-	m_pApplyButton->SetSize(64, buttonH);
-
+	// dimhotepus: Scale UI.
+	m_pApplyButton->SetSize(QuickPropScale( 64 ), buttonH);
+	
 	m_pReloadLocalization = new Button( this, "Localization", "&Reload Localization" );
-	m_pReloadLocalization->SetSize( 100, buttonH );
+	// dimhotepus: Scale UI.
+	m_pReloadLocalization->SetSize(QuickPropScale( 100 ), buttonH);
 
 	m_pExitButton->SetCommand("Exit");
 	m_pSaveButton->SetCommand("Save");
@@ -419,11 +429,13 @@ void BuildModeDialog::CreateControls()
 	m_pReloadLocalization->SetCommand( new KeyValues( "ReloadLocalization" ) );
 
 	m_pDeleteButton = new Button(this, "DeletePanelButton", "Delete");
-	m_pDeleteButton->SetSize(64, buttonH);
+	// dimhotepus: Scale UI.
+	m_pDeleteButton->SetSize(QuickPropScale( 64 ), buttonH);
 	m_pDeleteButton->SetCommand("DeletePanel");
-
+	
 	m_pVarsButton = new MenuButton(this, "VarsButton", "Variables");
-	m_pVarsButton->SetSize(72, buttonH);
+	// dimhotepus: Scale UI.
+	m_pVarsButton->SetSize(QuickPropScale( 72 ), buttonH);
 	m_pVarsButton->SetOpenDirection(Menu::UP);
 	
 	// iterate the vars
@@ -470,8 +482,9 @@ void BuildModeDialog::CreateControls()
 void BuildModeDialog::ApplySchemeSettings( IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
-
-	HFont font =  pScheme->GetFont( "DefaultVerySmall" );
+	
+	// dimhotepus: Scale UI.
+	HFont font =  pScheme->GetFont( "DefaultVerySmall", IsProportional() );
 	m_pStatusLabel->SetFont( font );
 	m_pReloadLocalization->SetFont( font );
 	m_pExitButton->SetFont( font );
@@ -492,9 +505,15 @@ void BuildModeDialog::ApplySchemeSettings( IScheme *pScheme )
 void BuildModeDialog::PerformLayout()
 {
 	BaseClass::PerformLayout();
-
+	
+	// dimhotepus: Scale UI.
 	// layout parameters
-	const int BORDER_GAP = 16, YGAP_SMALL = 4, YGAP_LARGE = 8, TITLE_HEIGHT = 24, BOTTOM_CONTROLS_HEIGHT = 145, XGAP = 6;
+	const int BORDER_GAP = QuickPropScale( 16 ),
+		YGAP_SMALL = QuickPropScale( 4 ),
+		YGAP_LARGE = QuickPropScale( 8 ),
+		TITLE_HEIGHT = QuickPropScale( 24 ),
+		BOTTOM_CONTROLS_HEIGHT = QuickPropScale( 145 ),
+		XGAP = QuickPropScale( 6 );
 
 	int wide, tall;
 	GetSize(wide, tall);
@@ -535,26 +554,26 @@ void BuildModeDialog::PerformLayout()
 	// divider
 	xpos = BORDER_GAP;
 	ypos -= (YGAP_LARGE + m_pDivider->GetTall());
-	m_pDivider->SetBounds(xpos, ypos, wide - (xpos + BORDER_GAP), 2);
+	m_pDivider->SetBounds(xpos, ypos, wide - (xpos + BORDER_GAP), QuickPropScale( 2 ));
 
 	ypos -= (YGAP_LARGE  + m_pVarsButton->GetTall());
 
 	xpos = BORDER_GAP;
 	m_pEditableParents->SetPos( xpos, ypos );
-	m_pEditableChildren->SetPos( xpos + 150, ypos );
+	m_pEditableChildren->SetPos( xpos + QuickPropScale( 150 ), ypos );
 
-	ypos -= (YGAP_LARGE + 18 );
+	ypos -= (YGAP_LARGE + QuickPropScale( 18 ) );
 	xpos = BORDER_GAP;
 	m_pReloadLocalization->SetPos( xpos, ypos );
 
 	xpos += ( XGAP ) + m_pReloadLocalization->GetWide();
 	
 	m_pPrevChild->SetPos( xpos, ypos );
-	m_pPrevChild->SetSize( 64, m_pReloadLocalization->GetTall() );
+	m_pPrevChild->SetSize( QuickPropScale( 64 ), m_pReloadLocalization->GetTall() );
 	xpos += ( XGAP ) + m_pPrevChild->GetWide();
 
 	m_pNextChild->SetPos( xpos, ypos );
-	m_pNextChild->SetSize( 64, m_pReloadLocalization->GetTall() );
+	m_pNextChild->SetSize( QuickPropScale( 64 ), m_pReloadLocalization->GetTall() );
 
 	ypos -= (YGAP_LARGE  + m_pVarsButton->GetTall());
 	xpos = BORDER_GAP;
@@ -689,11 +708,12 @@ void BuildModeDialog::SetActiveControl(Panel *controlToEdit)
 		// get the field name
 		const char *fieldName = ParseTokenFromString(&controlDesc);
 
-		int itemHeight = 18;
+		int itemHeight = QuickPropScale( 18 );
 
 		// build a control & label
 		Label *label = new Label(this, NULL, fieldName);
-		label->SetSize(96, itemHeight);
+		// dimhotepus: Scale UI.
+		label->SetSize(QuickPropScale( 96 ), itemHeight);
 		label->SetContentAlignment(Label::a_east);
 
 		TextEntry *edit = NULL;
@@ -760,8 +780,9 @@ void BuildModeDialog::SetActiveControl(Panel *controlToEdit)
 			edit->SetTabPosition(tabPosition++);
 			label->SetAssociatedControl(edit);
 		}
-
-		HFont smallFont = scheme()->GetIScheme( GetScheme() )->GetFont( "DefaultVerySmall" );
+		
+		// dimhotepus: Scale UI.
+		HFont smallFont = scheme()->GetIScheme( GetScheme() )->GetFont( "DefaultVerySmall", IsProportional() );
 
 		label->SetFont( smallFont );
 		if ( edit )
@@ -1314,7 +1335,7 @@ void BuildModeDialog::OnPanelMoved()
 //-----------------------------------------------------------------------------
 void BuildModeDialog::OnSetClipboardText(const char *text)
 {
-	system()->SetClipboardText(text, strlen(text));
+	system()->SetClipboardText(text, V_strlen(text));
 }
 
 void BuildModeDialog::OnCreateNewControl( char const *text )

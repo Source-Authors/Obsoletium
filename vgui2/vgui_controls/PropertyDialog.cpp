@@ -116,22 +116,26 @@ void PropertyDialog::PerformLayout()
 
 
 	// move the buttons to the bottom-right corner
-	int xpos = x + wide - 80;
-	int ypos = tall + y - 28;
+	// dimhotepus: Scale UI.
+	int xpos = x + wide - QuickPropScale( 80 );
+	int ypos = tall + y - QuickPropScale( 28 );
 
 	if (_applyButton->IsVisible())
 	{
-		_applyButton->SetBounds(xpos, ypos, 72, 24);
-		xpos -= 80;
+		// dimhotepus: Scale UI.
+		_applyButton->SetBounds(xpos, ypos, QuickPropScale( 72 ), QuickPropScale( 24 ));
+		xpos -= QuickPropScale( 80 );
 	}
 
 	if (_cancelButton->IsVisible())
 	{
-		_cancelButton->SetBounds(xpos, ypos, 72, 24);
-		xpos -= 80;
+		// dimhotepus: Scale UI.
+		_cancelButton->SetBounds(xpos, ypos, QuickPropScale( 72 ), QuickPropScale( 24 ));
+		xpos -= QuickPropScale( 80 );
 	}
 
-	_okButton->SetBounds(xpos, ypos, 72, 24);
+	// dimhotepus: Scale UI.
+	_okButton->SetBounds(xpos, ypos, QuickPropScale( 72 ), QuickPropScale( 24 ));
 
 	_propertySheet->InvalidateLayout(); // tell the propertysheet to redraw!
 	Repaint();

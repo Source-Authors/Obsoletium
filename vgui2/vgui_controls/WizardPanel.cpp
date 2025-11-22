@@ -7,14 +7,14 @@
 
 #include <vgui_controls/WizardPanel.h>
 
-#include <tier1/KeyValues.h>
-
 #include <vgui/IVGui.h>
 
 #include <vgui_controls/BuildGroup.h>
 #include <vgui_controls/Button.h>
 #include <vgui_controls/Controls.h>
 #include <vgui_controls/WizardSubPanel.h>
+
+#include "tier1/KeyValues.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -26,10 +26,9 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 WizardPanel::WizardPanel(Panel *parent, const char *panelName) : Frame(parent, panelName)
 {
-	_currentSubPanel = NULL;
+	_currentSubPanel = nullptr;
 	_currentData = new KeyValues("WizardData");
 	_showButtons = true;
-
 
 	SetSizeable(false);
 
@@ -74,7 +73,8 @@ void WizardPanel::PerformLayout()
 		{
 			if( _showButtons )
 			{
-				_currentSubPanel->SetBounds(x, y, wide, tall - 35);
+				// dimhotepus: Scale UI.
+				_currentSubPanel->SetBounds(x, y, wide, tall - QuickPropScale( 35 ));
 			}
 			else
 			{
@@ -89,11 +89,13 @@ void WizardPanel::PerformLayout()
 		int bwide, btall;
 		_cancelButton->GetSize(bwide, btall);
 		
-		x = wide - (20 + bwide);
-		y = tall - (12 + btall);
+		// dimhotepus: Scale UI.
+		x = wide - (QuickPropScale( 20 ) + bwide);
+		y = tall - (QuickPropScale( 12 ) + btall);
 
 		_cancelButton->SetPos(x, y);
-		x -= (20 + bwide);
+		// dimhotepus: Scale UI.
+		x -= (QuickPropScale( 20 ) + bwide);
 
 		// only display one of the next or finish buttons (and only if both are visible)
 		if ( _showButtons )
@@ -111,8 +113,9 @@ void WizardPanel::PerformLayout()
 				_nextButton->SetPos(x, y);
 			}
 		}
-
-		x -= (1 + bwide);
+		
+		// dimhotepus: Scale UI.
+		x -= (QuickPropScale( 1 ) + bwide);
 		_prevButton->SetPos(x, y);
 
 		ResetDefaultButton();
@@ -251,10 +254,11 @@ void WizardPanel::CreateButtons()
 	SetFinishButtonText(NULL);
 	SetCancelButtonText(NULL);
 
-	_prevButton->SetSize(82, 24);
-	_nextButton->SetSize(82, 24);
-	_cancelButton->SetSize(82, 24);
-	_finishButton->SetSize(82, 24);
+	// dimhotepus: Scale UI.
+	_prevButton->SetSize(QuickPropScale( 82 ), QuickPropScale( 24 ));
+	_nextButton->SetSize(QuickPropScale( 82 ), QuickPropScale( 24 ));
+	_cancelButton->SetSize(QuickPropScale( 82 ), QuickPropScale( 24 ));
+	_finishButton->SetSize(QuickPropScale( 82 ), QuickPropScale( 24 ));
 }
 
 //-----------------------------------------------------------------------------
@@ -312,7 +316,7 @@ void WizardPanel::ActivateNextSubPanel(WizardSubPanel *subPanel)
 	if (!prevPanel)
 	{
 		// no previous panel, so disable the back button
-		_prevButton->SetEnabled(false);		
+		_prevButton->SetEnabled(false);
 	}
 
 	_currentSubPanel->RequestFocus();
@@ -329,7 +333,7 @@ void WizardPanel::ActivatePrevSubPanel()
 {
 	_currentSubPanel->SetVisible(false);
 
-	WizardSubPanel *prevPanel = NULL;
+	WizardSubPanel *prevPanel = nullptr;
 	if (_subPanelStack.GetCount())
 	{
 		// check to see if we need to jump back to a previous sub panel
@@ -387,7 +391,7 @@ void WizardPanel::ActivatePrevSubPanel()
 	if (!_subPanelStack.GetCount())
 	{
 		// no previous panel, so disable the back button
-		_prevButton->SetEnabled(false);		
+		_prevButton->SetEnabled(false);
 	}
 
 	RecalculateTabOrdering();
@@ -584,7 +588,7 @@ void WizardPanel::OnNextButton()
 
 			if (nextPanel)
 			{
-				KeyValues *kv = new KeyValues("ActivateNextSubPanel");
+				auto *kv = new KeyValues("ActivateNextSubPanel");
 				kv->SetPtr("panel", nextPanel);
 				ivgui()->PostMessage(GetVPanel(), kv, GetVPanel());
 			}

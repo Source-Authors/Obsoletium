@@ -34,6 +34,9 @@ public:
 		"ButtonToggled"
 			int "state"
 	*/
+	
+	// dimhotepus: TF2 backport.
+	virtual bool IsToggleButton() { return true; }
 
 protected:
 	// overrides

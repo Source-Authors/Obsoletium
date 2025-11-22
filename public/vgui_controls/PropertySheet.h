@@ -125,6 +125,9 @@ public:
 	bool		IsKBNavigationEnabled() const;
 
 	bool HasUserConfigSettings() override { return true; }
+	
+	// dimhotepus: TF2 backport.
+	void SetTabFont( vgui::HFont hFont );
 
 protected:
 	void PaintBorder() override;
@@ -178,9 +181,14 @@ private:
 	float m_flPageTransitionEffectTime;
 	bool	m_bSmallTabs;
 	HFont	m_tabFont;
+	// dimhotepus: TF2 backport.
+	bool	m_bOverrideTabFont = false;
 	bool	m_bDraggableTabs;
 	bool	m_bContextButton;
 	bool	m_bKBNavigationEnabled;
+	
+	// dimhotepus: TF2 backport.
+	CPanelAnimationVarAliasType( int, m_iPageYOffset, "yoffset", "0", "proportional_int" );
 
 	CPanelAnimationVarAliasType( int, m_iTabXIndent, "tabxindent", "0", "proportional_int" );
 	CPanelAnimationVarAliasType( int, m_iTabXDelta, "tabxdelta", "0", "proportional_int" );

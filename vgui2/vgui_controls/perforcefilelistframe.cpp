@@ -46,7 +46,7 @@ static int __cdecl FileBrowserSortFunc( vgui::ListPanel *pPanel, const vgui::Lis
 	return Q_stricmp( string1, string2 );
 }
 
-			 
+
 //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
@@ -73,8 +73,9 @@ COperationFileListFrame::COperationFileListFrame( vgui::Panel *pParent, const ch
 
 	// FIXME: Might be nice to have checkboxes per row
 	m_pFileBrowser = new vgui::ListPanel( pBrowserParent, "Browser" );
- 	m_pFileBrowser->AddColumnHeader( 0, "operation", "Operation", 52, 0 );
-	m_pFileBrowser->AddColumnHeader( 1, "filename", pColumnHeader, 128, vgui::ListPanel::COLUMN_RESIZEWITHWINDOW );
+ 	// dimhotepus: Scale UI.
+	m_pFileBrowser->AddColumnHeader( 0, "operation", "Operation", QuickPropScale( 52 ), 0 );
+	m_pFileBrowser->AddColumnHeader( 1, "filename", pColumnHeader, QuickPropScale( 128 ), vgui::ListPanel::COLUMN_RESIZEWITHWINDOW );
     m_pFileBrowser->SetSelectIndividualCells( false );
 	m_pFileBrowser->SetMultiselectEnabled( false );
 	m_pFileBrowser->SetEmptyListText( "No Perforce Operations" );
@@ -142,8 +143,9 @@ void COperationFileListFrame::PerformLayout()
 	{
 		int x, y, w, h;
 		GetClientArea( x, y, w, h );
-		y += 6;
-		h -= 36;
+		// dimhotepus: Scale UI.
+		y += QuickPropScale( 6 );
+		h -= QuickPropScale( 36 );
 		m_pSplitter->SetBounds( x, y, w, h );
 	}
 }

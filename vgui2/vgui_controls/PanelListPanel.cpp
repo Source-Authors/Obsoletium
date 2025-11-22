@@ -32,18 +32,21 @@ DECLARE_BUILD_FACTORY( PanelListPanel );
 //-----------------------------------------------------------------------------
 PanelListPanel::PanelListPanel( vgui::Panel *parent, char const *panelName ) : EditablePanel( parent, panelName )
 {
-	SetBounds( 0, 0, 100, 100 );
+	// dimhotepus: Scale UI.
+	SetBounds( 0, 0, QuickPropScale( 100 ), QuickPropScale( 100 ) );
 
 	m_vbar = new ScrollBar(this, "PanelListPanelVScroll", true);
 	m_vbar->SetVisible(false);
 	m_vbar->AddActionSignalTarget( this );
 
 	m_pPanelEmbedded = new EditablePanel(this, "PanelListEmbedded");
-	m_pPanelEmbedded->SetBounds(0, 0, 20, 20);
+	// dimhotepus: Scale UI.
+	m_pPanelEmbedded->SetBounds(0, 0, QuickPropScale( 20 ), QuickPropScale( 20 ) );
 	m_pPanelEmbedded->SetPaintBackgroundEnabled( false );
 	m_pPanelEmbedded->SetPaintBorderEnabled(false);
 
-	m_iFirstColumnWidth = 100; // default width
+	// dimhotepus: Scale UI.
+	m_iFirstColumnWidth = QuickPropScale( 100 ); // default width
 	m_iNumColumns = 1; // 1 column by default
 
 	// dimhotepus: Simplify scaling.
@@ -75,7 +78,7 @@ int	PanelListPanel::ComputeVPixelsNeeded()
 	int iLargestH = 0;
 
 	int pixels = 0;
-	for ( int i = 0; i < m_SortedItems.Count(); i++ )
+	for ( intp i = 0; i < m_SortedItems.Count(); i++ )
 	{
 		Panel *panel = m_DataItems[ m_SortedItems[i] ].panel;
 		if ( !panel )
@@ -290,8 +293,9 @@ void PanelListPanel::PerformLayout()
 	m_vbar->SetRangeWindow( tall );
 	m_vbar->SetButtonPressedScrollValue( tall / 4 ); // standard height of labels/buttons etc.
 
-	m_vbar->SetPos( wide - m_vbar->GetWide() - 2, 0 );
-	m_vbar->SetSize( m_vbar->GetWide(), tall - 2 );
+	// dimhotepus: Scale UI.
+	m_vbar->SetPos( wide - m_vbar->GetWide() - QuickPropScale( 2 ), 0 );
+	m_vbar->SetSize( m_vbar->GetWide(), tall - QuickPropScale( 2 ) );
 
 	int top = m_vbar->GetValue();
 
@@ -309,10 +313,10 @@ void PanelListPanel::PerformLayout()
 	// Now lay out the controls on the embedded panel
 	int y = 0;
 	int h = 0;
-	[[maybe_unused]] int totalh = 0;
 
 	int xpos = m_iFirstColumnWidth + m_iPanelBuffer;
-	int iColumnWidth = ( wide - xpos - m_vbar->GetWide() - 12 ) / m_iNumColumns;
+	// dimhotepus: Scale UI.
+	int iColumnWidth = ( wide - xpos - m_vbar->GetWide() - QuickPropScale( 12 ) ) / m_iNumColumns;
 	
 	for ( int i = 0; i < m_SortedItems.Count(); i++ )
 	{
@@ -337,7 +341,6 @@ void PanelListPanel::PerformLayout()
 		if ( iCurrentColumn >= m_iNumColumns - 1 )
 		{
 			y += h;
-			totalh += h;
 
 			h = 0;
 		}

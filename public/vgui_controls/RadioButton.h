@@ -20,38 +20,6 @@ namespace vgui
 {
 
 //-----------------------------------------------------------------------------
-// Purpose: Radio buton image
-//-----------------------------------------------------------------------------
-class RadioImage : public TextImage
-{
-public:
-	RadioImage(RadioButton *radioButton) : TextImage( "n" )
-	{
-		_radioButton = radioButton;
-
-		SetSize(20, 13);
-	}
-
-	void Paint() override;
-
-	void SetColor(Color color) override
-	{
-		_borderColor1 = color;
-		_borderColor2 = color;
-		_checkColor = color;
-	}
-
-	Color _borderColor1;
-	Color _borderColor2;
-	Color _checkColor;
-
-	Color _bgColor;
-
-private:
-	RadioButton *_radioButton;
-};
-
-//-----------------------------------------------------------------------------
 // Purpose: Radio buttons are automatically selected into groups by who their
 //			parent is. At most one radio button is active at any time.
 //-----------------------------------------------------------------------------
@@ -98,13 +66,48 @@ protected:
 	RadioButton *FindBestRadioButton(int direction);
 
 private:
-	RadioImage *_radioBoxImage;
+	class RadioImage *_radioBoxImage;
 	int _oldTabPosition;
 	Color _selectedFgColor;
 
 	int _subTabPosition;	// tab position with the radio button list
 
 	void InternalSetSelected(bool state, bool bFireEvents);
+};
+
+
+//-----------------------------------------------------------------------------
+// Purpose: Radio buton image
+//-----------------------------------------------------------------------------
+// dimhotepus: Moved after RadioButton to scale UI.
+class RadioImage : public TextImage
+{
+public:
+	RadioImage(RadioButton *radioButton) : TextImage( "n" )
+	{
+		_radioButton = radioButton;
+
+		// dimhotepus: Scale UI.
+		SetSize(QuickPropScalePanel( 20, radioButton ), QuickPropScalePanel( 13, radioButton ));
+	}
+
+	void Paint() override;
+
+	void SetColor(Color color) override
+	{
+		_borderColor1 = color;
+		_borderColor2 = color;
+		_checkColor = color;
+	}
+
+	Color _borderColor1;
+	Color _borderColor2;
+	Color _checkColor;
+
+	Color _bgColor;
+
+private:
+	RadioButton *_radioButton;
 };
 
 }; // namespace vgui

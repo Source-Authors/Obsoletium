@@ -650,8 +650,9 @@ void ListViewPanel::PerformLayout()
 		m_hbar->SetRange( 0, cols);	
 		m_hbar->SetButtonPressedScrollValue( 1 );
 	
-		m_hbar->SetPos(0, tall - (m_hbar->GetTall()+WINDOW_BORDER_WIDTH));
-		m_hbar->SetSize(wide - (WINDOW_BORDER_WIDTH*2), m_hbar->GetTall());
+		// dimhotepus: Scale UI.
+		m_hbar->SetPos(0, tall - (m_hbar->GetTall()+QuickPropScale( WINDOW_BORDER_WIDTH )));
+		m_hbar->SetSize(wide - (QuickPropScale( WINDOW_BORDER_WIDTH * 2)), m_hbar->GetTall());
 		m_hbar->InvalidateLayout();
 
 		int val = m_hbar->GetValue();

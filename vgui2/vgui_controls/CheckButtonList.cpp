@@ -53,7 +53,7 @@ intp CheckButtonList::AddItem(const char *itemText, bool startsSelected, KeyValu
 //-----------------------------------------------------------------------------
 void CheckButtonList::RemoveAll()
 {
-	for (int i = 0; i < m_CheckItems.Count(); i++)
+	for (intp i = 0; i < m_CheckItems.Count(); i++)
 	{
 		m_CheckItems[i].checkButton->MarkForDeletion();
 		if (m_CheckItems[i].userData)
@@ -90,16 +90,19 @@ void CheckButtonList::PerformLayout()
 	BaseClass::PerformLayout();
 
 	// get sizes
-	int x = 4, y = 4, wide = GetWide() - ((x * 2) + m_pScrollBar->GetWide()), tall = 22;
+	// dimhotepus: Scale UI.
+	int x = QuickPropScale( 4 ), y = QuickPropScale( 4 ), wide = GetWide() - ((x * 2) + m_pScrollBar->GetWide()), tall = QuickPropScale( 22 );
 
 	// set scrollbar
 	intp totalHeight = y + (m_CheckItems.Count() * tall);
 	if (totalHeight > GetTall())
 	{
-		m_pScrollBar->SetRange(0, totalHeight + 1);
+		// dimhotepus: Scale UI.
+		m_pScrollBar->SetRange(0, totalHeight + QuickPropScale( 1 ));
 		m_pScrollBar->SetRangeWindow(GetTall());
 		m_pScrollBar->SetVisible(true);
-		m_pScrollBar->SetBounds(GetWide() - 21, 0, 19, GetTall() - 2);
+		// dimhotepus: Scale UI.
+		m_pScrollBar->SetBounds(GetWide() - QuickPropScale( 21 ), 0, QuickPropScale( 19 ), GetTall() - QuickPropScale( 2 ));
 		SetPaintBorderEnabled(true);
 		y -= m_pScrollBar->GetValue();
 	}

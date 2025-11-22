@@ -8,6 +8,7 @@
 #include "vgui_controls/Menu.h"
 
 #include "vgui_controls/pch_vgui_controls.h"
+#include "tier1/strtools.h"
 
 // memdbgon must be the last include file in a .cpp file
 #include "tier0/memdbgon.h"
@@ -38,7 +39,8 @@ public:
 		GetSize( w, h );
 
 		surface()->DrawSetColor( GetFgColor() );
-		surface()->DrawFilledRect( 4, 1, w-1, 2 );
+		// dimhotepus: Scale UI.
+		surface()->DrawFilledRect( QuickPropScale( 4 ), QuickPropScale( 1 ), w - QuickPropScale( 1 ), QuickPropScale( 2 ) );
 	}
 
 	void ApplySchemeSettings( IScheme *pScheme ) override
@@ -112,10 +114,9 @@ void Menu::DeleteAllItems()
 	m_SortedItems.RemoveAll();
 	m_VisibleSortedItems.RemoveAll();
 	m_Separators.RemoveAll();
-	intp c = m_SeparatorPanels.Count();
-	for ( intp i = 0 ; i < c; ++i )
+	for ( auto *p : m_SeparatorPanels )
 	{
-		m_SeparatorPanels[ i ]->MarkForDeletion();
+		p->MarkForDeletion();
 	}
 	m_SeparatorPanels.RemoveAll();
 	InvalidateLayout();
@@ -553,10 +554,9 @@ int  Menu::GetMenuItemHeight() const
 intp Menu::CountVisibleItems()
 {
 	intp count = 0;
-	intp c = m_SortedItems.Count();
-	for ( intp i = 0 ; i < c; ++i )
+	for ( auto &si : m_SortedItems )
 	{
-		if ( m_MenuItems[ m_SortedItems[ i ] ]->IsVisible() )
+		if ( m_MenuItems[ si ]->IsVisible() )
 			++count;
 	}
 	return count;
@@ -570,7 +570,8 @@ void Menu::ComputeWorkspaceSize( int& workWide, int& workTall )
 
 	int workX, workY;
 	surface()->GetWorkspaceBounds(workX, workY, workWide, workTall);
-	workTall -= 20;
+	// dimhotepus: Scale UI.
+	workTall -= QuickPropScale( 20 );
 	workTall -= itop;
 	workTall -= ibottom;
 }
@@ -593,7 +594,8 @@ void Menu::PositionRelativeToPanel( Panel *relative, MenuDirection_e direction, 
 	{
 	   rx = 0; ry = 0;
 	   relative->ParentLocalToScreen(rx, ry);
-	   rx -= 1; // take border into account
+	   // dimhotepus: Scale UI.
+	   rx -= QuickPropScale( 1 ); // take border into account
 	   ry += rh + nAdditionalYOffset;
 	   rw = rh = 0;
 	}
@@ -621,7 +623,8 @@ void Menu::PositionRelativeToPanel( Panel *relative, MenuDirection_e direction, 
 			y = topOfReference - mTall;
 			if ( y < 0 )
 			{
-				int bottomOfReference = ry + rh + 1;
+				// dimhotepus: Scale UI.
+				int bottomOfReference = ry + rh + QuickPropScale( 1 );
 				int remainingPixels = workTall - bottomOfReference;
 
 				// Can't fit on bottom, either, move to side
@@ -650,7 +653,8 @@ void Menu::PositionRelativeToPanel( Panel *relative, MenuDirection_e direction, 
 	case Menu::DOWN:
 		{
 			x = rx;
-			int bottomOfReference = ry + rh + 1;
+			// dimhotepus: Scale UI.
+			int bottomOfReference = ry + rh + QuickPropScale( 1 );
 			y = bottomOfReference;
 			if ( bottomOfReference + mTall >= workTall )
 			{
@@ -699,16 +703,14 @@ int Menu::ComputeFullMenuHeightWithInsets()
 	int ileft, iright, itop, ibottom;
 	GetInset(ileft, iright, itop, ibottom);
 
-	int separatorHeight = 3;
+	// dimhotepus: Scale UI.
+	int separatorHeight = QuickPropScale(MENU_SEPARATOR_HEIGHT);
 
 	// add up the size of all the child panels
 	// move the child panels to the correct place in the menu
 	int totalTall = itop + ibottom;
-	int i;
-	for ( i = 0 ; i < m_SortedItems.Count() ; i++ )		// use sortedItems instead of MenuItems due to SetPos()
+	for ( auto itemId: m_SortedItems )		// use sortedItems instead of MenuItems due to SetPos()
 	{
-		int itemId = m_SortedItems[i];
-
 		MenuItem *child = m_MenuItems[ itemId ];
 		Assert( child );
 		if ( !child )
@@ -736,7 +738,7 @@ int Menu::ComputeFullMenuHeightWithInsets()
 void Menu::PerformLayout()
 {
 	MenuItem *parent = GetParentMenuItem();
-	bool cascading =  parent != NULL ? true : false;
+	bool cascading = parent != NULL ? true : false;
 
 	// make sure we factor in insets
 	int ileft, iright, itop, ibottom;
@@ -773,11 +775,8 @@ void Menu::PerformLayout()
 		RemoveScrollBar();
 		// Make everything visible
 		m_VisibleSortedItems.RemoveAll();
-		intp i;
-		intp c = m_SortedItems.Count();
-		for ( i = 0; i < c; ++i )
+		for ( auto itemID : m_SortedItems )
 		{
-			int itemID = m_SortedItems[ i ];
 			MenuItem *child = m_MenuItems[ itemID ];
 			if ( !child || !child->IsVisible() )
 				continue;
@@ -786,12 +785,11 @@ void Menu::PerformLayout()
 		}
 
 		// Hide the separators, the needed ones will be readded below
-		c = m_SeparatorPanels.Count();
-		for ( i = 0; i < c; ++i )
+		for ( auto *p : m_SeparatorPanels )
 		{
-			if ( m_SeparatorPanels[ i ] )
+			if ( p )
 			{
-				m_SeparatorPanels[ i ]->SetVisible( false );
+				p->SetVisible( false );
 			}
 		}
 	}
@@ -804,7 +802,8 @@ void Menu::PerformLayout()
 	{
 		trueW -= m_pScroller->GetWide();
 	}
-	int separatorHeight = MENU_SEPARATOR_HEIGHT;
+	// dimhotepus: Scale UI.
+	int separatorHeight = QuickPropScale( MENU_SEPARATOR_HEIGHT );
 
 	// add up the size of all the child panels
 	// move the child panels to the correct place in the menu
@@ -830,12 +829,31 @@ void Menu::PerformLayout()
 		{
 			child->SetFont( m_hItemFont );
 		}
+		// dimhotepus: TF2 backport. Scale UI.
+		int nX = QuickPropScale( child->GetOffsetFromMainMenu() );
 
 		// take into account inset
-		child->SetPos (0, menuTall);
-		child->SetTall( m_iMenuItemHeight ); // Width is set in a second pass
-		menuTall += m_iMenuItemHeight;
-		totalTall += m_iMenuItemHeight;
+		child->SetPos (nX, menuTall);
+		// dimhotepus: TF2 backport. Scale UI.
+		int nPaddingY = child->GetPaddingY();
+		if ( nPaddingY != 0 )
+		{
+			nPaddingY = QuickPropScale(nPaddingY);
+			int wide, tall;
+			surface()->GetScreenSize(wide, tall);
+
+			// special handling for resolutions where this feels cramped and the fonts have switched
+			if ( tall < 800 )
+			{
+				nPaddingY = clamp(nPaddingY, 0, Ceil2Int( (float)m_iMenuItemHeight * 1.5f) );
+			}
+		}
+
+		int nChildHeight = m_iMenuItemHeight + nPaddingY;
+
+		child->SetTall( nChildHeight ); // Width is set in a second pass
+		menuTall += nChildHeight;
+		totalTall += nChildHeight;
 
 		// this will make all the menuitems line up in a column with space for the checks to the left.
 		if ( ( !child->IsCheckable() ) && ( m_iCheckImageWidth > 0 ) )
@@ -855,7 +873,8 @@ void Menu::PerformLayout()
 			MenuSeparator *sep = m_SeparatorPanels[ sepIndex ];
 			Assert( sep );
 			sep->SetVisible( true );
-			sep->SetBounds( 0, menuTall, trueW, separatorHeight );
+			// dimhotepus: TF2 backport. Scale UI.
+			sep->SetBounds( nX, menuTall, nX + trueW, separatorHeight );
 			menuTall += separatorHeight;
 			totalTall += separatorHeight;
 		}
@@ -944,14 +963,16 @@ void Menu::CalculateWidth()
 	{
 		// find the biggest menu item
 		FOR_EACH_LL( m_MenuItems, i )
-		{		
+		{
 			int wide, tall;
 			m_MenuItems[i]->GetContentSize(wide, tall);
-			if (wide > _menuWide - Label::Content)
+			// dimhotepus: Scale UI.
+			if (wide > _menuWide - QuickPropScale( Label::Content ) )
 			{
-				_menuWide =  wide + Label::Content;	
+				// dimhotepus: Scale UI.
+				_menuWide =  wide + QuickPropScale( Label::Content );
 			}
-		}	
+		}
 	}
 	
 	// enfoce a minimumWidth 
@@ -984,7 +1005,8 @@ void Menu::LayoutScrollBar()
 	// with a scroll bar we take off the inset
 	wide -= iright;
 
-	m_pScroller->SetPos(wide - m_pScroller->GetWide(), 1);
+	// dimhotepus: Scale UI.
+	m_pScroller->SetPos(wide - m_pScroller->GetWide(), QuickPropScale( 1 ));
 	
 	// scrollbar is inside the menu's borders.
 	m_pScroller->SetSize(m_pScroller->GetWide(), tall - ibottom - itop);
@@ -1020,12 +1042,14 @@ void Menu::PositionCascadingMenu()
 		// orignalX - width of the parentmenuitem - width of this menu.
 		// add 2 pixels to offset one pixel onto the parent menu.
 		x -= (parentWide + wide);
-		x -= 2;
+		// dimhotepus: Scale UI.
+		x -= QuickPropScale( 2 );
 	}
 	else
 	{
 		// alignment move it in the amount of the insets.
-		x += 1;
+		// dimhotepus: Scale UI.
+		x += QuickPropScale( 1 );
 	}
 
 	if ( y + tall > workY + workTall )
@@ -1034,11 +1058,13 @@ void Menu::PositionCascadingMenu()
 		int pixelsOffBottom = ( y + tall ) - lastWorkY;
 
 		y -= pixelsOffBottom;
-		y -= 2;
+		// dimhotepus: Scale UI.
+		y -= QuickPropScale( 2 );
 	}
 	else
 	{
-		y -= 1;
+		// dimhotepus: Scale UI.
+		y -= QuickPropScale( 1 );
 	}
 	SetPos(x, y);
 	
@@ -1061,8 +1087,8 @@ void Menu::SizeMenuItems()
 		if (child )
 		{
 			// labels do thier own sizing. this will size the label to the width of the menu,
-			// this will put the cascading menu arrow on the right side automatically.	
-			child->SetWide(_menuWide - ileft - iright);			
+			// this will put the cascading menu arrow on the right side automatically.
+			child->SetWide(_menuWide - ileft - iright);
 		}
 	}
 }
@@ -1073,14 +1099,13 @@ void Menu::SizeMenuItems()
 void Menu::MakeItemsVisibleInScrollRange( int maxVisibleItems, int nNumPixelsAvailable )
 {
 	// Detach all items from tree
-	int i;
 	FOR_EACH_LL( m_MenuItems, item )
 	{
 		m_MenuItems[ item ]->SetBounds( 0, 0, 0, 0 );
 	}
-	for ( i = 0; i < m_SeparatorPanels.Count(); ++i )
+	for ( auto *p : m_SeparatorPanels )
 	{
-		m_SeparatorPanels[ i ]->SetVisible( false );
+		p->SetVisible( false );
 	}
 
 	m_VisibleSortedItems.RemoveAll();
@@ -1106,7 +1131,8 @@ void Menu::MakeItemsVisibleInScrollRange( int maxVisibleItems, int nNumPixelsAva
 		intp sepIndex = m_Separators.Find( itemId );
 		if ( sepIndex != m_Separators.InvalidIndex() )
 		{
-			itemHeight += MENU_SEPARATOR_HEIGHT;
+			// dimhotepus: Scale UI.
+			itemHeight += QuickPropScale( MENU_SEPARATOR_HEIGHT );
 		}
 
 		if ( tall + itemHeight > nNumPixelsAvailable )
@@ -1156,11 +1182,13 @@ void Menu::Paint()
 		surface()->DrawSetColor(_borderDark);
 		if( IsProportional() )
 		{
-			surface()->DrawFilledRect(wide - m_pScroller->GetWide(), -1, wide - m_pScroller->GetWide() + 1, tall);	
+			// dimhotepus: Scale UI.
+			surface()->DrawFilledRect(wide - m_pScroller->GetWide(), QuickPropScale( -1 ), wide - m_pScroller->GetWide() + QuickPropScale( 1 ), tall);	
 		}
 		else
 		{
-			surface()->DrawFilledRect(wide - m_pScroller->GetWide(), -1, wide - m_pScroller->GetWide() + 1, tall);	
+			// dimhotepus: Scale UI.
+			surface()->DrawFilledRect(wide - m_pScroller->GetWide(), QuickPropScale( -1 ), wide - m_pScroller->GetWide() + QuickPropScale( 1 ), tall);	
 		}
 	}	
 }
@@ -2605,7 +2633,8 @@ void Menu::SetFont( HFont font )
 	m_hItemFont = font;
 	if ( font )
 	{
-		m_iMenuItemHeight = surface()->GetFontTall( font ) + 2;
+		// dimhotepus: Scale UI.
+		m_iMenuItemHeight = surface()->GetFontTall( font ) + QuickPropScale( 2 );
 	}
 	InvalidateLayout();
 }
@@ -2728,10 +2757,31 @@ MenuItem* MenuBuilder::AddMenuItem( const char *pszButtonText, KeyValues *kvUser
 	return m_pMenu->GetMenuItem( m_pMenu->AddMenuItem( pszButtonText, kvUserData, m_pActionTarget ) );
 }
 
+// dimhotepus: TF2 backport. Scale UI.
+MenuItem* MenuBuilder::AddMenuItem( const wchar_t *pwszButtonText, const char *pszCommand, const char *pszCategoryName )
+{
+	AddSepratorIfNeeded( pszCategoryName );
+	return m_pMenu->GetMenuItem( m_pMenu->AddMenuItem( CStrAutoEncode( pwszButtonText ).ToString(), pwszButtonText, pszCommand, m_pActionTarget ) );
+}
+
+// dimhotepus: TF2 backport. Scale UI.
+MenuItem* MenuBuilder::AddMenuItem( const wchar_t *pwszButtonText, KeyValues *kvUserData, const char *pszCategoryName )
+{
+	AddSepratorIfNeeded( pszCategoryName );
+	return m_pMenu->GetMenuItem( m_pMenu->AddMenuItem( CStrAutoEncode( pwszButtonText ).ToString(), pwszButtonText, kvUserData, m_pActionTarget ) );
+}
+
 MenuItem* MenuBuilder::AddCascadingMenuItem( const char *pszButtonText, Menu *pSubMenu, const char *pszCategoryName )
 {
 	AddSepratorIfNeeded( pszCategoryName );
 	return m_pMenu->GetMenuItem( m_pMenu->AddCascadingMenuItem( pszButtonText, m_pActionTarget, pSubMenu ) );
+}
+
+// dimhotepus: TF2 backport. Scale UI.
+MenuItem* MenuBuilder::AddCascadingMenuItem( const wchar_t *pwszButtonText, Menu *pSubMenu, const char *pszCategoryName )
+{
+	AddSepratorIfNeeded( pszCategoryName );
+	return m_pMenu->GetMenuItem( m_pMenu->AddCascadingMenuItem( CStrAutoEncode( pwszButtonText ).ToString(), pwszButtonText, (KeyValues*)NULL, m_pActionTarget, pSubMenu ) );
 }
 
 void MenuBuilder::AddSepratorIfNeeded( const char *pszCategoryName )

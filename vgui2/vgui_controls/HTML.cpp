@@ -92,13 +92,15 @@ public:
 		BaseClass::PerformLayout();
 		int wide, tall;
 		GetSize( wide, tall );
-		m_pHTML->SetPos( horiz_inset, vert_inset );
-		m_pHTML->SetSize( wide - horiz_inset*2, tall - vert_inset*2 );
+		// dimhotepus: Scale UI.
+		m_pHTML->SetPos( QuickPropScale( horiz_inset ), QuickPropScale( vert_inset ) );
+		m_pHTML->SetSize( wide - QuickPropScale( horiz_inset * 2), tall - QuickPropScale( vert_inset * 2) );
 	}
 
 	void SetBounds( int x, int y, int wide, int tall )
 	{
-		BaseClass::SetBounds( x, y, wide + horiz_inset*2, tall + vert_inset*2 );
+		// dimhotepus: Scale UI.
+		BaseClass::SetBounds( x, y, wide + QuickPropScale( horiz_inset * 2), tall + QuickPropScale( vert_inset * 2) );
 	}
 
 	MESSAGE_FUNC( OnCloseWindow, "OnCloseWindow" )
@@ -312,32 +314,38 @@ void HTML::PerformLayout()
 
 	IScheme *pClientScheme = vgui::scheme()->GetIScheme( vgui::scheme()->GetScheme( "ClientScheme" ) );
 
-	int iSearchInsetY = 5;
-	int iSearchInsetX = 5;
-	int iSearchTall = 24;
-	int iSearchWide = 150;
+	// dimhotepus: Scale UI.
+	int iSearchInsetY = QuickPropScale( 5 );
+	int iSearchInsetX = QuickPropScale( 5 );
+	int iSearchTall = QuickPropScale( 24 );
+	int iSearchWide = QuickPropScale( 150 );
 	const char *resourceString = pClientScheme->GetResourceString( "HTML.SearchInsetY");
 	if ( resourceString )
 	{
-		iSearchInsetY = atoi(resourceString);
+		// dimhotepus: Scale UI.
+		iSearchInsetY = QuickPropScale( atoi(resourceString) );
 	}
 	resourceString = pClientScheme->GetResourceString( "HTML.SearchInsetX");
 	if ( resourceString )
 	{
-		iSearchInsetX = atoi(resourceString);
+		// dimhotepus: Scale UI.
+		iSearchInsetX = QuickPropScale( atoi(resourceString) );
 	}
 	resourceString = pClientScheme->GetResourceString( "HTML.SearchTall");
 	if ( resourceString )
 	{
-		iSearchTall = atoi(resourceString);
+		// dimhotepus: Scale UI.
+		iSearchTall = QuickPropScale( atoi(resourceString) );
 	}
 	resourceString = pClientScheme->GetResourceString( "HTML.SearchWide");
 	if ( resourceString )
 	{
-		iSearchWide = atoi(resourceString);
+		// dimhotepus: Scale UI.
+		iSearchWide = QuickPropScale( atoi(resourceString) );
 	}
 
-	m_pFindBar->SetBounds( GetWide() - iSearchWide - iSearchInsetX - vbarInset, m_pFindBar->BIsHidden() ? -1*iSearchTall-5: iSearchInsetY, iSearchWide, iSearchTall );
+	// dimhotepus: Scale UI.
+	m_pFindBar->SetBounds( GetWide() - iSearchWide - iSearchInsetX - vbarInset, m_pFindBar->BIsHidden() ? -1*iSearchTall-QuickPropScale( 5 ): iSearchInsetY, iSearchWide, iSearchTall );
 }
 
 
@@ -407,20 +415,13 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 	{
 		if ( pchPostData && !Q_isempty(pchPostData) )
 		{
-			// dimhotepus: NO_STEAM
-#ifndef NO_STEAM
 			if (m_SteamAPIContext.SteamHTMLSurface())
 				m_SteamAPIContext.SteamHTMLSurface()->LoadURL( m_unBrowserHandle, URL, pchPostData );
-#endif
-
 		}
 		else
 		{			
-			// dimhotepus: NO_STEAM
-#ifndef NO_STEAM
 			if (m_SteamAPIContext.SteamHTMLSurface())
 				m_SteamAPIContext.SteamHTMLSurface()->LoadURL( m_unBrowserHandle, URL, NULL );
-#endif
 		}
 	}
 }
@@ -431,11 +432,8 @@ void HTML::PostURL(const char *URL, const char *pchPostData, bool force)
 //-----------------------------------------------------------------------------
 bool HTML::StopLoading()
 {
-  // dimhotepus: NO_STEAM
-#ifndef NO_STEAM
 	if (m_SteamAPIContext.SteamHTMLSurface())
 		m_SteamAPIContext.SteamHTMLSurface()->StopLoad( m_unBrowserHandle );
-#endif
 	return true;
 }
 
@@ -445,11 +443,8 @@ bool HTML::StopLoading()
 //-----------------------------------------------------------------------------
 bool HTML::Refresh()
 {
-  // dimhotepus: NO_STEAM
-#ifndef NO_STEAM
 	if (m_SteamAPIContext.SteamHTMLSurface())
 		m_SteamAPIContext.SteamHTMLSurface()->Reload( m_unBrowserHandle );
-#endif
 	return true;
 }
 
@@ -722,7 +717,8 @@ void HTML::ShowFindDialog()
 	const char *resourceString = pClientScheme->GetResourceString( "HTML.SearchInsetY");
 	if ( resourceString )
 	{
-		iSearchInsetY = atoi(resourceString);
+		// dimhotepus: Scale UI.
+		iSearchInsetY = QuickPropScale( atoi(resourceString) );
 	}
 	float flAnimationTime = 0.0f;
 	resourceString = pClientScheme->GetResourceString( "HTML.SearchAnimationTime");
@@ -752,8 +748,8 @@ void HTML::HideFindDialog()
 	{
 		flAnimationTime = strtof(resourceString, nullptr);
 	}
-
-	GetAnimationController()->RunAnimationCommand( m_pFindBar, "ypos", -1*h-5, 0.0f, flAnimationTime, AnimationController::INTERPOLATOR_LINEAR );
+	// dimhotepus: Scale UI.
+	GetAnimationController()->RunAnimationCommand( m_pFindBar, "ypos", -1*h-QuickPropScale(5), 0.0f, flAnimationTime, AnimationController::INTERPOLATOR_LINEAR );
 	m_pFindBar->SetHidden( true );
 	StopFind();
 }
@@ -902,8 +898,9 @@ void HTML::BrowserResize()
 		m_iTalLastHTMLSize = h - m_iScrollBorderY - bottom;
 		if ( m_iTalLastHTMLSize <= 0 )
 		{
-			SetTall( 64 );
-			m_iTalLastHTMLSize = 64 - bottom;
+			// dimhotepus: Scale UI.
+			SetTall( QuickPropScale( 64 ) );
+			m_iTalLastHTMLSize = QuickPropScale( 64 ) - bottom;
 		}
 
 		{
@@ -1415,8 +1412,9 @@ void HTML::BrowserPopupHTMLWindow( HTML_NewWindow_t *pCmd )
 	int tall = pCmd->unTall;
 	if ( wide == 0 || tall == 0 )
 	{
-		wide = MAX( BASE_WIDTH, GetWide() );
-		tall = MAX( BASE_HEIGHT, GetTall() );
+		// dimhotepus: Scale UI.
+		wide = MAX( QuickPropScale( BASE_WIDTH ), GetWide() );
+		tall = MAX( QuickPropScale( BASE_HEIGHT ), GetTall() );
 	}
 
 	p->SetBounds( pCmd->unX, pCmd->unY, wide, tall  );

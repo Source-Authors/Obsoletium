@@ -63,12 +63,14 @@ SplitterHandle::SplitterHandle( Splitter *parent, const char *name, SplitterMode
 
 	if ( mode == SPLITTER_MODE_HORIZONTAL )
 	{
-		SetSize( w, SPLITTER_HANDLE_WIDTH );
+		// dimhotepus: Scale UI.
+		SetSize( w, QuickPropScale( SPLITTER_HANDLE_WIDTH ) );
 		SetCursor( dc_sizens );
 	}
 	else
 	{
-		SetSize( SPLITTER_HANDLE_WIDTH, h );
+		// dimhotepus: Scale UI.
+		SetSize( QuickPropScale( SPLITTER_HANDLE_WIDTH ), h );
 		SetCursor( dc_sizewe );
 	}
 
@@ -327,8 +329,9 @@ void Splitter::ApplySettings(KeyValues *inResourceData)
 	{
 		char pBuffer[512];
 		Q_snprintf( pBuffer, sizeof(pBuffer), "splitter%d", i );
-
-		int nSplitterPos = inResourceData->GetInt( pBuffer , -1 );
+		
+		// dimhotepus: Scale UI.
+		int nSplitterPos = QuickPropScale( inResourceData->GetInt( pBuffer , -1 ) );
 		if ( nSplitterPos >= 0 )
 		{
 			SetSplitterPosition( i, nSplitterPos );
@@ -356,7 +359,8 @@ void Splitter::LockChildSize( int nChildIndex, int nSize )
 {
 	Assert( nChildIndex < m_Splitters.Count() );
 	SplitterInfo_t &info = m_Splitters[nChildIndex];
-	nSize += SPLITTER_HANDLE_WIDTH;
+	// dimhotepus: Scale UI.
+	nSize += QuickPropScale( SPLITTER_HANDLE_WIDTH );
 	if ( !info.m_bLocked || (info.m_nLockedSize != nSize) )
 	{ 
 		float flPrevPos = (nChildIndex > 0) ? m_Splitters[nChildIndex-1].m_flPos : 0.0f;
@@ -449,9 +453,11 @@ void Splitter::OnSizeChanged( int newWide, int newTall )
 
 	int nNewTotalSize = (m_Mode == SPLITTER_MODE_HORIZONTAL) ? newTall : newWide;
 	int nNewUnlockedSize = nNewTotalSize - nLockedSize;
-	if ( nNewUnlockedSize < nUnlockedCount * SPLITTER_HANDLE_WIDTH )
+	// dimhotepus: Scale UI.
+	if ( nNewUnlockedSize < nUnlockedCount * QuickPropScale( SPLITTER_HANDLE_WIDTH ) )
 	{
-		nNewUnlockedSize = nUnlockedCount * SPLITTER_HANDLE_WIDTH;
+		// dimhotepus: Scale UI.
+		nNewUnlockedSize = nUnlockedCount * QuickPropScale( SPLITTER_HANDLE_WIDTH );
 	}
 
 	float flRatio = nNewUnlockedSize / flUnlockedSize;
@@ -510,21 +516,24 @@ void Splitter::SetSplitterPosition( int nIndex, int nPos )
 	{
 		if ( !m_Splitters[i].m_bLocked )
 		{
-			nMinPos += SPLITTER_HANDLE_WIDTH;
+			// dimhotepus: Scale UI.
+			nMinPos += QuickPropScale( SPLITTER_HANDLE_WIDTH );
 		}
 		else
 		{
 			nMinPos += m_Splitters[i].m_nLockedSize;
 		}
 	}
-
-	int nMaxPos = nPosRange - SPLITTER_HANDLE_WIDTH;
+	
+	// dimhotepus: Scale UI.
+	int nMaxPos = nPosRange - QuickPropScale( SPLITTER_HANDLE_WIDTH );
 	int c = GetSplitterCount();
 	for ( i = nIndex + 1; i < c; ++i )
 	{
 		if ( !m_Splitters[i].m_bLocked )
 		{
-			nMaxPos -= SPLITTER_HANDLE_WIDTH;
+            // dimhotepus: Scale UI.
+			nMaxPos -= QuickPropScale( SPLITTER_HANDLE_WIDTH );
 		}
 		else
 		{
@@ -542,7 +551,8 @@ void Splitter::SetSplitterPosition( int nIndex, int nPos )
 		if ( !m_Splitters[i+1].m_bLocked )
 		{
 			nMinPrevPos = -INT_MAX;
-			nMaxPrevPos = nPos - SPLITTER_HANDLE_WIDTH;
+			// dimhotepus: Scale UI.
+			nMaxPrevPos = nPos - QuickPropScale( SPLITTER_HANDLE_WIDTH );
 		}
 		else
 		{
@@ -567,7 +577,8 @@ void Splitter::SetSplitterPosition( int nIndex, int nPos )
 		int nMaxNextPos;
 		if ( !m_Splitters[i].m_bLocked )
 		{
-			nMinNextPos = nPos + SPLITTER_HANDLE_WIDTH;
+			// dimhotepus: Scale UI.
+			nMinNextPos = nPos + QuickPropScale( SPLITTER_HANDLE_WIDTH );
 			nMaxNextPos = INT_MAX;
 		}
 		else
@@ -621,9 +632,11 @@ void Splitter::EvenlyRespaceSplitters( )
 	int nLockedSize = ComputeLockedSize( 0 );
 	float flUnlockedSize = (float)( GetPosRange() - nLockedSize );
 	float flDPos = flUnlockedSize / (float)nSplitterCount;
-	if ( flDPos < SPLITTER_HANDLE_WIDTH )
+	// dimhotepus: Scale UI.
+	if ( flDPos < QuickPropScale( SPLITTER_HANDLE_WIDTH ) )
 	{
-		flDPos = SPLITTER_HANDLE_WIDTH;
+		// dimhotepus: Scale UI.
+		flDPos = QuickPropScale( SPLITTER_HANDLE_WIDTH );
 	}
 	float flPos = 0.0f;
 	for ( int i = 0; i  < nSplitterCount; ++i )
@@ -671,13 +684,14 @@ void Splitter::ApplyUserConfigSettings(KeyValues *userConfig)
 
 	// read the splitter sizes
 	intp c = m_Splitters.Count();
-	float *pFractions = (float*)_alloca( c * sizeof(float) );
+	float *pFractions = stackallocT( float, c );
 	float flTotalSize = 0.0f;
 	for ( intp i = 0; i < c; i++ )
 	{
 		char name[128];
 		V_sprintf_safe(name, "%zd_splitter_pos", i);
-		pFractions[i] = userConfig->GetFloat( name, flTotalSize + SPLITTER_HANDLE_WIDTH + 1 );
+		// dimhotepus: Scale UI.
+		pFractions[i] = userConfig->GetFloat( name, flTotalSize + QuickPropScale( SPLITTER_HANDLE_WIDTH + 1 ) );
 		flTotalSize = pFractions[i];
 	}
 
@@ -737,8 +751,9 @@ void Splitter::PerformLayout( )
 			pChild->SetSize( w, nSplitterPos - nLastPos );
 			if ( pHandle )
 			{
+				// dimhotepus: Scale UI.
 				pHandle->SetPos( 0, nSplitterPos );
-				pHandle->SetSize( w, SPLITTER_HANDLE_WIDTH );
+				pHandle->SetSize( w, QuickPropScale( SPLITTER_HANDLE_WIDTH ) );
 			}
 		}
 		else
@@ -747,12 +762,14 @@ void Splitter::PerformLayout( )
 			pChild->SetSize( nSplitterPos - nLastPos, h );
 			if ( pHandle )
 			{
+				// dimhotepus: Scale UI.
 				pHandle->SetPos( nSplitterPos, 0 );
-				pHandle->SetSize( SPLITTER_HANDLE_WIDTH, h );
+				pHandle->SetSize( QuickPropScale( SPLITTER_HANDLE_WIDTH ), h );
 			}
 		}
-
-		nLastPos = nSplitterPos + SPLITTER_HANDLE_WIDTH;
+		
+		// dimhotepus: Scale UI.
+		nLastPos = nSplitterPos + QuickPropScale( SPLITTER_HANDLE_WIDTH );
 	}
 }
 

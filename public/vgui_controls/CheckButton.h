@@ -78,7 +78,7 @@ public:
 	CheckImage *GetCheckImage() { return _checkBoxImage; }
 
 	virtual void SetHighlightColor(Color fgColor);
-	virtual void ApplySettings( KeyValues *inResourceData ) override;
+	void ApplySettings( KeyValues *inResourceData ) override;
 
 protected:
 	void ApplySchemeSettings(IScheme *pScheme) override;

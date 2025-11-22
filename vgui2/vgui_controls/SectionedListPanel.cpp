@@ -87,10 +87,10 @@ void SectionedListPanelHeader::Paint()
 		int x, y, wide, tall;
 		GetBounds(x, y, wide, tall);
 
-		y = (tall - 2);	// draw the line under the panel
+		y = (tall - QuickPropScale( 2 ));	// draw the line under the panel
 
 		surface()->DrawSetColor(m_SectionDividerColor);
-		surface()->DrawFilledRect(1, y, GetWide() - 2, y + 1);
+		surface()->DrawFilledRect(QuickPropScale( 1 ), y, GetWide() - QuickPropScale( 2 ), y + QuickPropScale( 1 ));
 	}
 }
 
@@ -186,11 +186,11 @@ void SectionedListPanelHeader::PerformLayout()
 
 			if (columnFlags & SectionedListPanel::COLUMN_RIGHT)
 			{
-				SetImageBounds(i, xpos + wide - contentWide, wide - SectionedListPanel::COLUMN_DATA_GAP);
+				SetImageBounds(i, xpos + wide - contentWide, wide - QuickPropScale(SectionedListPanel::COLUMN_DATA_GAP));
 			}
 			else
 			{
-				SetImageBounds(i, xpos, wide - SectionedListPanel::COLUMN_DATA_GAP);
+				SetImageBounds(i, xpos, wide - QuickPropScale(SectionedListPanel::COLUMN_DATA_GAP));
 			}
 			xpos += columnWidth;
 
@@ -245,7 +245,8 @@ public:
 		ClearImages();
 	}
 
-	int GetID()
+	// dimhotepus: Make const.
+	int GetID() const
 	{
 		return m_iID;
 	}
@@ -255,7 +256,8 @@ public:
 		m_iID = itemID;
 	}
 
-	int GetSectionID()
+	// dimhotepus: Make const.
+	int GetSectionID() const
 	{
 		return m_iSectionID;
 	}
@@ -267,9 +269,9 @@ public:
 			// free any existing textimage list 
 			ClearImages();
 			// delete any images we've created
-			for (int i = 0; i < m_TextImages.Count(); i++)
+			for (auto *i : m_TextImages)
 			{
-				delete m_TextImages[i];
+				delete i;
 			}
 			m_TextImages.RemoveAll();
 			// mark the list as needing rebuilding
@@ -321,7 +323,7 @@ public:
 							image->SetUseFallbackFont( true, fallback );
 						}
 						SetImageAtIndex(i, image, 0);
-					}				
+					}
 				}
 
 				{for ( intp i = GetImageCount(); i < colCount; i++ ) // make sure we have enough image slots
@@ -424,12 +426,21 @@ public:
 				}
 
 				// set the image position within the label
-				int imageWide = 0, tall = 0;
+				// dimhotepus: TF2 backport. Scale UI.
+				int imageContentWide = 0, imageContentTall = 0;
+				int imageWide = 0, imageTall = 0;
 				int wide;
 				if (image)
 				{
-					image->GetContentSize(imageWide, tall);
+					image->GetContentSize( imageContentWide, imageContentTall );
+
+					if ( imageContentTall )
+					{
+						imageTall = Min( imageContentTall, GetTall() );
+						imageWide = ( imageTall * imageContentWide ) / imageContentTall;
+					}
 				}
+
 				if (maxWidth >= 0)
 				{
 					wide = maxWidth;
@@ -442,22 +453,22 @@ public:
 				if (i == 0 && !(columnFlags & SectionedListPanel::COLUMN_IMAGE))
 				{
 					// first column has an extra indent
-					SetImageBounds(i, xpos + SectionedListPanel::COLUMN_DATA_INDENT, wide - (SectionedListPanel::COLUMN_DATA_INDENT + SectionedListPanel::COLUMN_DATA_GAP));
+					SetImageBounds(i, xpos + QuickPropScale( SectionedListPanel::COLUMN_DATA_INDENT ), wide - QuickPropScale(SectionedListPanel::COLUMN_DATA_INDENT + SectionedListPanel::COLUMN_DATA_GAP));
 				}
 				else
 				{
 					if (columnFlags & SectionedListPanel::COLUMN_CENTER)
 					{
 						int offSet = (wide / 2) - (imageWide / 2);
-						SetImageBounds(i, xpos + offSet, wide - offSet - SectionedListPanel::COLUMN_DATA_GAP);
+						SetImageBounds(i, xpos + offSet, wide - offSet - QuickPropScale(SectionedListPanel::COLUMN_DATA_GAP));
 					}
 					else if (columnFlags & SectionedListPanel::COLUMN_RIGHT)
 					{
-						SetImageBounds(i, xpos + wide - imageWide, wide - SectionedListPanel::COLUMN_DATA_GAP);
+						SetImageBounds(i, xpos + wide - imageWide, wide - QuickPropScale(SectionedListPanel::COLUMN_DATA_GAP));
 					}
 					else
 					{
-						SetImageBounds(i, xpos, wide - SectionedListPanel::COLUMN_DATA_GAP);
+						SetImageBounds(i, xpos, wide - QuickPropScale(SectionedListPanel::COLUMN_DATA_GAP));
 					}
 				}
 				xpos += wide;
@@ -569,11 +580,22 @@ public:
 					image = GetImageAtIndex(i);
 				}
 
-				int imageWide = 0;
-				if (image)
+				// set the image position within the label
+				// dimhotepus: TF2 backport. Scale UI.
+				int imageContentWide = 0, imageContentTall = 0;
+				int imageWide = 0, imageTall = 0;
+				int wide;
+				if ( image )
 				{
-					image->GetContentSize(imageWide, tall);
+					image->GetContentSize( imageContentWide, imageContentTall );
+
+					if ( imageContentTall )
+					{
+						imageTall = Min( imageContentTall, GetTall() );
+						imageWide = ( imageTall * imageContentWide ) / imageContentTall;
+					}
 				}
+
 				if (maxWidth >= 0)
 				{
 					wide = maxWidth;
@@ -680,8 +702,24 @@ public:
 				continue;
 
 			// set the image position within the label
-			int wide, tall;
-			image->GetContentSize(wide, tall);
+			// dimhotepus: TF2 backport. Scale UI.
+			int imageContentWide = 0, imageContentTall = 0;
+			int imageTall = 0, imageWide = 0;
+			if ( image )
+			{
+				image->GetContentSize( imageContentWide, imageContentTall );
+
+				if ( imageContentTall )
+				{
+					imageTall = Min( imageContentTall, GetTall() );
+					imageWide = ( imageTall * imageContentWide ) / imageContentTall;
+				}
+			}
+
+			// set the image position within the label
+			int wide = imageWide;
+			//int tall = imageTall;
+
 			if (maxWidth >= 0)
 			{
 				wide = maxWidth;
@@ -775,9 +813,9 @@ SectionedListPanel::SectionedListPanel(vgui::Panel *parent, const char *name) : 
 	m_iEditModeColumn = 0;
 	m_bSortNeeded = false;
 	m_bVerticalScrollbarEnabled = true;
-	m_iLineSpacing = DEFAULT_LINE_SPACING;
+	m_iLineSpacing = QuickPropScale( DEFAULT_LINE_SPACING );
 	m_iLineGap = 0;
-	m_iSectionGap = DEFAULT_SECTION_GAP;
+	m_iSectionGap = QuickPropScale( DEFAULT_SECTION_GAP );
 
 	m_pImageList = NULL;
 	m_bDeleteImageListWhenDone = false;
@@ -875,8 +913,8 @@ void SectionedListPanel::PerformLayout()
 		m_pScrollBar->SetVisible(true);
 		m_pScrollBar->MoveToFront();
 
-		m_pScrollBar->SetPos(cwide - m_pScrollBar->GetWide() - 2, 0);
-		m_pScrollBar->SetSize(m_pScrollBar->GetWide(), ctall - 2);
+		m_pScrollBar->SetPos(cwide - m_pScrollBar->GetWide() - QuickPropScale( 2 ), 0);
+		m_pScrollBar->SetSize(m_pScrollBar->GetWide(), ctall - QuickPropScale( 2 ));
 
 		m_pScrollBar->SetRangeWindow(ctall);
 
@@ -909,8 +947,8 @@ void SectionedListPanel::PerformLayout()
 void SectionedListPanel::LayoutPanels(int &contentTall)
 {
 	int tall = GetSectionTall();
-	int x = 5, wide = GetWide() - 10;
-	int y = 5;
+	int x = QuickPropScale( 5 ), wide = GetWide() - QuickPropScale( 10 );
+	int y = QuickPropScale( 5 );
 	
 	if (m_pScrollBar->IsVisible())
 	{
@@ -1111,22 +1149,15 @@ void SectionedListPanel::ApplySettings(KeyValues *inResourceData)
 	{
 		m_iLineSpacing = DEFAULT_LINE_SPACING;
 	}
-	if (IsProportional())
-	{
-		m_iLineSpacing = scheme()->GetProportionalScaledValueEx(GetScheme(), m_iLineSpacing);
-	}
+	m_iLineSpacing = QuickPropScale( m_iLineSpacing );
 
 	m_iSectionGap = inResourceData->GetInt("sectiongap", 0);
 	if (!m_iSectionGap)
 	{
 		m_iSectionGap = DEFAULT_SECTION_GAP;
 	}
-	m_iLineGap = inResourceData->GetInt( "linegap", 0 );
-	if (IsProportional())
-	{
-		m_iSectionGap = scheme()->GetProportionalScaledValueEx(GetScheme(), m_iSectionGap);
-		m_iLineGap = scheme()->GetProportionalScaledValueEx( GetScheme(), m_iLineGap );
-	}
+	m_iSectionGap = QuickPropScale( m_iSectionGap );
+	m_iLineGap = QuickPropScale( inResourceData->GetInt( "linegap", 0 ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -1137,10 +1168,9 @@ void SectionedListPanel::SetProportional(bool state)
 	BaseClass::SetProportional(state);
 
 	// now setup the section headers and items
-	int i;
-	for (i = 0; i < m_Sections.Count(); i++)
+	for ( auto &s : m_Sections )
 	{
-		m_Sections[i].m_pHeader->SetProportional(state);
+		s.m_pHeader->SetProportional(state);
 	}	
 	FOR_EACH_LL( m_Items, j )
 	{
@@ -1637,7 +1667,7 @@ void SectionedListPanel::OnMousePressed(MouseCode code)
 //-----------------------------------------------------------------------------
 void SectionedListPanel::ClearSelection( void )
 {
-	SetSelectedItem((CItemButton *)NULL);
+	SetSelectedItem(nullptr);
 }
 
 void SectionedListPanel::MoveSelectionDown( void )
@@ -2154,11 +2184,11 @@ int SectionedListPanel::GetSectionTall()
 		HFont font = m_Sections[0].m_pHeader->GetFont();
 		if (font != INVALID_FONT)
 		{
-			return surface()->GetFontTall(font) + BUTTON_HEIGHT_SPACER;
+			return surface()->GetFontTall(font) + QuickPropScale( BUTTON_HEIGHT_SPACER );
 		}
 	}
 
-	return BUTTON_HEIGHT_DEFAULT;
+	return QuickPropScale( BUTTON_HEIGHT_DEFAULT );
 }
 
 //-----------------------------------------------------------------------------
@@ -2242,7 +2272,7 @@ Color *SectionedListPanel::GetColorOverrideForCell( int sectionID, int itemID, i
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //-----------------------------------------------------------------------------

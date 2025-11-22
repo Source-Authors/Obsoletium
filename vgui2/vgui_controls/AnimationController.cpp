@@ -1157,7 +1157,7 @@ void AnimationController::RunAnimationCommand(vgui::Panel *panel,
 	animateCmd.duration = duration;
 
 	// start immediately
-	// dimhotpeus: Optional cancel. TF2 backport.
+	// dimhotepus: Optional cancel. TF2 backport.
 	StartCmd_Animate(panel, 0, animateCmd, bCanBeCancelled);
 }
 

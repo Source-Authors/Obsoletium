@@ -57,7 +57,9 @@ struct PanelKeyBindingMap;
 template< class T >
 inline std::enable_if_t<std::is_base_of_v<Panel, T>, T> *SETUP_PANEL(T *panel)
 {
-	panel->MakeReadyForUse();
+	// dimhotepus: TF2 backport. Check panel != nullptr.
+	if (panel)
+		panel->MakeReadyForUse();
 	return panel;
 }
 
@@ -81,10 +83,11 @@ class Menu;
 //-----------------------------------------------------------------------------
 struct OverridableColorEntry
 {
-	char const *name() { return m_pszScriptName; }
+	// dimhotepus: Make const.
+	char const *name() const { return m_pszScriptName; }
 
-	char const	*m_pszScriptName;
-	Color		*m_pColor;
+	char const	*m_pszScriptName{nullptr};
+	Color		*m_pColor{nullptr};
 	Color		m_colFromScript;
 	bool		m_bOverridden;
 };
@@ -221,7 +224,8 @@ public:
 
 	// panel hierarchy
 	virtual Panel *GetParent();
-	virtual VPANEL GetVParent();
+	// dimhotepus: Make const to scale UI.
+	virtual VPANEL GetVParent() const;
 	virtual void SetParent(Panel *newParent);
 	virtual void SetParent(VPANEL newParent);
 	virtual bool HasParent(VPANEL potentialParent);
@@ -254,7 +258,10 @@ public:
 	virtual void SetSilentMode( bool bSilent );						//change the panel's silent mode; if silent, the panel will not post any action signals
 
 	// install a mouse handler
-	virtual void InstallMouseHandler( Panel *pHandler );	// mouse events will be send to handler panel instead of this panel
+	// dimhotepus: TF2 backport. Added bThisHandlesAsWell, bMovementEvents.
+	virtual void InstallMouseHandler( Panel *pHandler, bool bThisHandlesAsWell = false, bool bMovementEvents = false );	// mouse events will be send to handler panel instead and, by default, not this panel
+	// dimhotepus: TF2 backport.
+	PHandle	GetMouseHandlerPanel() const { return m_hMouseEventHandler; }
 
 	// drawing state
 	virtual void   SetEnabled(bool state);
@@ -304,6 +311,8 @@ public:
 
 	void PinToSibling( const char *pszSibling, PinCorner_e pinOurCorner, PinCorner_e pinSibling );
 	void UpdateSiblingPin( void );
+	// dimhotepus: TF2 backport.
+	PHandle GetPinSibling() const { return m_pinSibling; }
 
 	// colors
 	virtual void SetBgColor(Color color);
@@ -346,11 +355,14 @@ public:
 	virtual bool CanAnimate() const { return true; } // If the panel can animate
 
 	// scheme access functions
-	HScheme GetScheme() override;
+	// dimhotepus: Make const.
+	HScheme GetScheme() const override;
 	virtual void SetScheme(const char *tag);
 	virtual void SetScheme(HScheme scheme);
 	virtual Color GetSchemeColor(const char *keyName,IScheme *pScheme);
 	virtual Color GetSchemeColor(const char *keyName, Color defaultColor,IScheme *pScheme);
+	// dimhotepus: TF2 backport.
+	Color GetColor( const char* pszColorName ) { return GetSchemeColor( pszColorName, vgui::scheme()->GetIScheme( GetScheme() ) ); }
 
 	// called when scheme settings need to be applied; called the first time before the panel is painted
 	virtual void ApplySchemeSettings(IScheme *pScheme);
@@ -504,7 +516,8 @@ public:
 	const char *GetEffectiveTooltipText() const;
 
 	// proportional mode settings
-	bool IsProportional() override { return _flags.IsFlagSet( IS_PROPORTIONAL ); }
+	// dimhotepus: Make const.
+	bool IsProportional() const override { return _flags.IsFlagSet( IS_PROPORTIONAL ); }
 	virtual void SetProportional(bool state);
 
 	// input interest
@@ -525,7 +538,8 @@ public:
 	virtual void DrawHollowBox( int x, int y, int wide, int tall, Color color, float normalizedAlpha, int cornerWide, int cornerTall );
 
 	// [tj] Simple getters and setters to decide which corners to draw rounded
-    unsigned char GetRoundedCorners() { return m_roundedCorners; }
+	// dimhotepus: Make const.
+	unsigned char GetRoundedCorners() const { return m_roundedCorners; }
 	void SetRoundedCorners (unsigned char cornerFlags) { m_roundedCorners = cornerFlags; }
 	bool ShouldDrawTopLeftCornerRounded() { return ( m_roundedCorners & PANEL_ROUND_CORNER_TOP_LEFT ) != 0; }
 	bool ShouldDrawTopRightCornerRounded() { return ( m_roundedCorners & PANEL_ROUND_CORNER_TOP_RIGHT ) != 0; }
@@ -741,6 +755,9 @@ public:
 		BUILDMODE_SAVE_WIDE_PROPORTIONAL_SELF = 1 << 17,
 		BUILDMODE_SAVE_TALL_PROPORTIONAL_SELF = 1 << 18,
 	};
+	
+	// dimhotepus: TF2 backport.
+	bool IsMarkedForDeletion() const { return _flags.IsFlagSet( MARKED_FOR_DELETION ); }
 
 protected:
 	//this will return m_NavDown and will not look for the next visible panel
@@ -830,8 +847,6 @@ private:
 	void FindDropTargetPanel_R( CUtlVector< VPANEL >& panelList, int x, int y, VPANEL check );
 	Panel *FindDropTargetPanel();
 
-	int GetProportionalScaledValue( int rootTall, int normalizedValue );
-
 #if defined( VGUI_USEDRAGDROP )
 	DragDrop_t		*m_pDragDrop;
 	Color			m_clrDragFrame;
@@ -916,6 +931,9 @@ private:
 	char			*_tooltipText;		// Tool tip text for panels that share tooltip panels with other panels
 
 	PHandle			m_hMouseEventHandler;
+	// dimhotepus: TF2 backport.
+	bool			m_bActOnHandledMouseInput = false;
+	bool			m_bSendMoveEventsToHandler = false;
 
 	bool			m_bWorldPositionCurrentFrame;		// if set, Panel gets PerformLayout called after the camera and the renderer's m_matrixWorldToScreen has been setup, so panels can be correctly attached to entities in the world
 

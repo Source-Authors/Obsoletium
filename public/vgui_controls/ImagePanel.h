@@ -79,6 +79,8 @@ private:
 	bool m_bCenterImage;
 	bool m_bScaleImage;
 	bool m_bTileImage;
+	// dimhotepus: TF2 backport.
+	int m_nScaleProportional = 0;
 	bool m_bTileHorizontally;
 	bool m_bTileVertically;
 	float m_fScaleAmount;

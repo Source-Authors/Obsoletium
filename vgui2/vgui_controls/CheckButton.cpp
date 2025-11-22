@@ -71,7 +71,8 @@ CheckButton::CheckButton(Panel *parent, const char *panelName, const char *text)
 	_checkBoxImage = new CheckImage(this);
 
 	SetTextImageIndex(1);
-	SetImageAtIndex(0, _checkBoxImage, CHECK_INSET);
+	// dimhotepus: Scale UI.
+	SetImageAtIndex(0, _checkBoxImage, QuickPropScale( CHECK_INSET ));
 
 	_selectedFgColor = Color( 196, 181, 80, 255 );
 	_disabledFgColor = Color(130, 130, 130, 255);
@@ -125,7 +126,8 @@ void CheckButton::ApplySchemeSettings(IScheme *pScheme)
 
 	_checkBoxImage->SetFont( pScheme->GetFont( m_bUseSmallCheckImage ? "MarlettSmall" : "Marlett", IsProportional()) );
 	_checkBoxImage->ResizeImageToContent();
-	SetImageAtIndex(0, _checkBoxImage, CHECK_INSET);
+	// dimhotepus: Scale UI.
+	SetImageAtIndex(0, _checkBoxImage, QuickPropScale( CHECK_INSET ));
 
 	// don't draw a background
 	SetPaintBackgroundEnabled(false);

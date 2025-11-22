@@ -8,8 +8,6 @@
 
 #include <vgui_controls/TreeViewListControl.h>
 
-#include <tier1/KeyValues.h>
-
 #include <vgui/Cursor.h>
 #include <vgui/IScheme.h>
 #include <vgui/IInput.h>
@@ -28,6 +26,8 @@
 #include <vgui_controls/ImageList.h>
 #include <vgui_controls/ImagePanel.h>
 
+#include "tier1/KeyValues.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
 
@@ -38,10 +38,11 @@ DECLARE_BUILD_FACTORY( CTreeViewListControl );
 CTreeViewListControl::CTreeViewListControl( vgui::Panel *pParent, const char *pName ) :
 	BaseClass( pParent, pName )
 {
-	m_pTree = NULL;
+	m_pTree = nullptr;
 	m_BorderColor.SetColor( 255, 255, 255, 255 );
-	m_TitleBarFont = NULL;
-	m_TitleBarHeight = 20;
+	m_TitleBarFont = 0;
+	// dimhotepus: Scale UI.
+	m_TitleBarHeight = QuickPropScale( 20 );
 	SetPostChildPaintEnabled( true );
 }
 
@@ -137,8 +138,9 @@ void CTreeViewListControl::GetGridElementBounds( int iColumn, int iRow, int &lef
 	}
 	if ( iRow == -1 )
 	{
-		top = 1;
-		bottom = m_TitleBarHeight - 2;
+		// dimhotepus: Scale UI.
+		top = QuickPropScale( 1 );
+		bottom = m_TitleBarHeight - QuickPropScale( 2 );
 	}
 	else if ( m_pTree )
 	{
@@ -207,19 +209,21 @@ int CTreeViewListControl::GetScrollBarSize()
 
 void CTreeViewListControl::RecalculateColumns()
 {
-	int rightEdge = GetWide()-1 - GetScrollBarSize();
+	// dimhotepus: Scale UI.
+	int rightEdge = GetWide()-QuickPropScale( 1 ) - GetScrollBarSize();
 
 	int x = 0;
 	intp c = m_Columns.Count();
 	for ( intp i=0; i < c; i++ )
 	{
-		m_Columns[i].m_Left = x + 1;
+		// dimhotepus: Scale UI.
+		m_Columns[i].m_Left = x + QuickPropScale( 1 );
 		int cw = m_Columns[i].m_Width;
 		if ( i == c - 1 )
 		{
-			cw = rightEdge - x - 2;
+			cw = rightEdge - x - QuickPropScale( 2 );
 		}
-		m_Columns[i].m_Right = x + cw - 2;
+		m_Columns[i].m_Right = x + cw - QuickPropScale( 2 );
 		x += cw;
 	}
 }
@@ -235,8 +239,8 @@ void CTreeViewListControl::PostChildPaint()
 		return;
 	
 	// Draw the horizontal lines.
-	int endX = 0;
-	endX = m_Columns[m_Columns.Count()-1].m_Right + 1;
+	// dimhotepus: Scale UI.
+	int endX = m_Columns[m_Columns.Count()-1].m_Right + QuickPropScale( 1 );
 
 	int bottomY = 0;
 	for ( intp i=0; i < m_Rows.Count(); i++ )

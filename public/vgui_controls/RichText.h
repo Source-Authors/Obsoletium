@@ -79,7 +79,7 @@ public:
 	void SetVerticalScrollbar(bool state);
 	// sets limit of number of characters insertable into field; set to -1 to remove maximum
 	// only works with if rich-edit is NOT enabled
-	void SetMaximumCharCount(int maxChars);
+	void SetMaximumCharCount(intp maxChars);
 
 	// rich edit commands
 	void InsertColorChange(Color col);
@@ -99,7 +99,7 @@ public:
 	// sets the height of the window so all text is visible.
 	// used by tooltips
 	void SetToFullHeight();
-	int GetNumLines();
+	intp GetNumLines();
 
 	/* CUSTOM MESSAGE HANDLING
 		"SetText"
@@ -167,7 +167,7 @@ protected:
 	void OnSetFocus() override;
 
 	// clickable url handling
-	int ParseTextStringForUrls(const char *text, int startPos, char *pchURLText, int cchURLText, char *pchURL, int cchURL, bool &clickable);
+	intp ParseTextStringForUrls(const char *text, intp startPos, char *pchURLText, intp cchURLText, char *pchURL, intp cchURL, bool &clickable);
 	virtual void OnTextClicked(const wchar_t *text);
 
 #ifdef DBGFLAG_VALIDATE
@@ -181,24 +181,29 @@ private:
 	int GetLineHeight();
 
 	const wchar_t *ResolveLocalizedTextAndVariables( char const *pchLookup, OUT_Z_BYTECAP(outbufsizeinbytes) wchar_t *outbuf, size_t outbufsizeinbytes );
+	template<intp outSize>
+	const wchar_t* ResolveLocalizedTextAndVariables( char const* pchLookup, OUT_Z_ARRAY wchar_t (&outbuf)[outSize] )
+	{
+		return ResolveLocalizedTextAndVariables( pchLookup, outbuf, sizeof(wchar_t) * outSize );
+	}
 
 	void GotoWordRight();	// move cursor to start of next word
 	void GotoWordLeft();	// move cursor to start of prev word
 
 	void TruncateTextStream();
-	bool GetSelectedRange(int& cx0,int& cx1);
-	void CursorToPixelSpace(int cursorPos, int &cx, int &cy);
-	int PixelToCursorSpace(int cx, int cy);
+	bool GetSelectedRange(intp& cx0,intp& cx1);
+	void CursorToPixelSpace(intp cursorPos, int &cx, int &cy);
+	intp PixelToCursorSpace(int cx, int cy);
 	void AddAnotherLine(int &cx, int &cy);
-	void RecalculateDefaultState(int startIndex);
+	void RecalculateDefaultState(intp startIndex);
 
 	void LayoutVerticalScrollBarSlider();
 	void OpenEditMenu();
 	void FinishingURL(int x, int y);
 	// Returns the character index the drawing should Start at
-	int GetStartDrawIndex(int &lineBreakIndexIndex);
-	int GetCursorLine();
-	int GetClickableTextIndexStart(int startIndex); 
+	intp GetStartDrawIndex(intp &lineBreakIndexIndex);
+	intp GetCursorLine();
+	intp GetClickableTextIndexStart(intp startIndex); 
 	void CreateEditMenu(); // create copy/cut/paste menu
 
 	MESSAGE_FUNC_INT( MoveScrollBar, "MoveScrollBar", delta );
@@ -239,27 +244,27 @@ private:
 
 	// data
 	CUtlVector<wchar_t>   m_TextStream;		// the text in the text window is stored in this buffer
-	CUtlVector<int>	   m_LineBreaks;		// an array that holds the index in the buffer to wrap lines at
+	CUtlVector<intp>	  m_LineBreaks;		// an array that holds the index in the buffer to wrap lines at
 	CUtlVector<TFormatStream> m_FormatStream;	// list of format changes
 
 	bool m_bRecalcLineBreaks;
 
-	int	_recalculateBreaksIndex;			// tells next linebreakindex index to Start recalculating line breaks	
+	intp			   _recalculateBreaksIndex;			// tells next linebreakindex index to Start recalculating line breaks	
 	bool			   _invalidateVerticalScrollbarSlider;
-	int                _cursorPos;			// the position in the text buffer of the blinking cursor
+	intp               _cursorPos;			// the position in the text buffer of the blinking cursor
 	bool			   _mouseSelection;		// whether we are highlighting text or not (selecting text)
 	bool			   _mouseDragSelection;	// tells weather mouse is outside window and button is down so we select text
-	int                _select[2];			// select[1] is the offset in the text to where the cursor is currently
+	intp               _select[2];			// select[1] is the offset in the text to where the cursor is currently
 											// select[0] is the offset to where the cursor was dragged to. or -1 if no drag.
 	int				   _pixelsIndent;
-	int				   _maxCharCount;		// max number of chars that can be in the text buffer
+	intp			   _maxCharCount;		// max number of chars that can be in the text buffer
 	HFont              _font;				// font of chars in the text buffer
 	HFont			   m_hFontUnderline;
 	Color			   _selectionColor;
 	Color			   _selectionTextColor;	// color of the highlighted text
 	bool			   _currentTextClickable;
 	CUtlVector<ClickPanel *>  _clickableTextPanels;
-	int				   _clickableTextIndex;
+	intp			   _clickableTextIndex;
 	Color				_defaultTextColor;
 	int					_drawOffsetX;
 	int					_drawOffsetY;
@@ -287,20 +292,20 @@ private:
 		bool textClickable;
 
 		// index into our current position in the formatting stream
-		int formatStreamIndex;
+		intp formatStreamIndex;
 	};
 	TRenderState m_CachedRenderState;	// cached render state for the beginning of painting
 
 	// updates a render state based on the formatting and color streams
 	// returns true if any state changed
-	bool UpdateRenderState(int textStreamPos, TRenderState &renderState);
+	bool UpdateRenderState(intp textStreamPos, TRenderState &renderState);
 	void CalculateFade( TRenderState &renderState );
 
-	void GenerateRenderStateForTextStreamIndex(int textStreamIndex, TRenderState &renderState);
-	int FindFormatStreamIndexForTextStreamPos(int textStreamIndex);
+	void GenerateRenderStateForTextStreamIndex(intp textStreamIndex, TRenderState &renderState);
+	intp FindFormatStreamIndexForTextStreamPos(intp textStreamIndex);
 
 	// draws a string of characters with the same formatting using the current render state
-	int DrawString(int iFirst, int iLast, TRenderState &renderState, HFont font);
+	int DrawString(intp iFirst, intp iLast, TRenderState &renderState, HFont font);
 };
 
 } // namespace vgui

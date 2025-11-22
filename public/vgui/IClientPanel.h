@@ -67,10 +67,12 @@ public:
 	virtual const char *GetName() = 0;
 	virtual const char *GetClassName() = 0;
 
+	// dimhotepus: Make const to scale UI.
 	// get scheme handles from panels
-	virtual HScheme GetScheme() = 0;
+	virtual HScheme GetScheme() const = 0;
+	// dimhotepus: Make const for UI scaling.
 	// gets whether or not this panel should scale with screen resolution
-	virtual bool IsProportional() = 0;
+	virtual bool IsProportional() const = 0;
 	// auto-deletion
 	virtual bool IsAutoDeleteSet() = 0;
 	// deletes this

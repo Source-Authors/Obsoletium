@@ -169,6 +169,9 @@ public:
 	void ApplySettings( KeyValues *inResourceData ) override;
 	void NavigateTo() override;
 	void NavigateFrom() override;
+	
+	// dimhotepus: TF2 backport.
+	virtual bool IsToggleButton() { return false; }
 
 protected:
 	virtual void DrawFocusBorder(int tx0, int ty0, int tx1, int ty1);

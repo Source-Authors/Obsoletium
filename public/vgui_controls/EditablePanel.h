@@ -69,7 +69,8 @@ public:
 	// as above, but copies the result into the specified buffer instead of a static buffer
 	virtual void GetControlString(const char *controlName, char *buf, int bufSize, const char *defaultString = "");
 	// sets the enabled state of a control
-	virtual void SetControlEnabled(const char *controlName, bool enabled);
+	// dimhotepus: TF2 backport. Added bRecurseDown.
+	virtual void SetControlEnabled(const char *controlName, bool enabled, bool bRecurseDown = false );
 	virtual void SetControlVisible(const char *controlName, bool visible, bool bRecurseDown = false );
 
 	// localization variables (used in constructing UI strings)

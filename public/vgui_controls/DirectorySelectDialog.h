@@ -75,7 +75,13 @@ private:
 	void BuildDriveChoices();
 	void ExpandTreeNode(const char *path, intp parentNodeIndex);
 	void GenerateChildrenOfDirectoryNode(intp nodeIndex);
-	void GenerateFullPathForNode(intp nodeIndex, char *path, intp pathBufferSize);
+	void GenerateFullPathForNode(intp nodeIndex, OUT_Z_CAP(pathBufferSize) char *path, intp pathBufferSize);
+	// dimhotepus: Bounds-safe API.
+	template<intp pathBufferSize>
+	void GenerateFullPathForNode(intp nodeIndex, OUT_Z_ARRAY char (&path)[pathBufferSize])
+	{
+		GenerateFullPathForNode(nodeIndex, path, pathBufferSize);
+	}
 	bool DoesDirectoryHaveSubdirectories(const char *path, const char *dir);
 
 	char m_szCurrentDir[512];

@@ -1715,6 +1715,8 @@ bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstr
 	memset( &header, 0, sizeof(header) );
 	
 	params.pRestore->ReadAll( &header );
+	// TODO: Fix me, why do we read pointer not to 0, but some invalid one?
+	header.pGroup = nullptr;
 	if ( IsValidConstraint( header ) )
 	{
 		switch ( header.constraintType )

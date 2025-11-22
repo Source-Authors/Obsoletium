@@ -79,11 +79,13 @@ void PerforceFileExplorer::PerformLayout()
 
 	int x, y, w, h;
 	GetClientArea( x, y, w, h );
+	
+	// dimhotepus: Scale UI.
+	m_pFullPathCombo->SetBounds( x, y + QuickPropScale( 6 ), w - QuickPropScale( 30 ), QuickPropScale( 24 ) ); 
+	m_pFolderUpButton->SetBounds( x + w - QuickPropScale( 24 ), y + QuickPropScale( 6 ), QuickPropScale( 24 ), QuickPropScale( 24 ) );
 
-	m_pFullPathCombo->SetBounds( x, y + 6, w - 30, 24 ); 
-	m_pFolderUpButton->SetBounds( x + w - 24, y + 6, 24, 24 );
-
-	m_pFileList->SetBounds( x, y + 36, w, h - 36 );
+	// dimhotepus: Scale UI.
+	m_pFileList->SetBounds( x, y + QuickPropScale( 36 ), w, h - QuickPropScale( 36 ) );
 }
 
 	

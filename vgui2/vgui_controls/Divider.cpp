@@ -21,7 +21,8 @@ DECLARE_BUILD_FACTORY( Divider );
 //-----------------------------------------------------------------------------
 Divider::Divider(Panel *parent, const char *name) : Panel(parent, name)
 {
-	SetSize(128, 2);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 128 ), QuickPropScale( 2 ));
 }
 
 //-----------------------------------------------------------------------------

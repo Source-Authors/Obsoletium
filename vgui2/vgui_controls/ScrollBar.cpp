@@ -157,10 +157,11 @@ ScrollBar::ScrollBar(Panel *parent, const char *panelName, bool vertical) : Pane
 		SetSlider(new ScrollBarSlider(NULL, "Slider", true));
 		SetButton(new ScrollBarButton(NULL, "UpButton", "t"), 0);
 		SetButton(new ScrollBarButton(NULL, "DownButton", "u"), 1);
-		_button[0]->SetTextInset(0, 1);
-		_button[1]->SetTextInset(0, -1);
+		// dimhotepus: Scale UI.
+		_button[0]->SetTextInset(0, QuickPropScale( 1 ));
+		_button[1]->SetTextInset(0, QuickPropScale( -1 ));
 
-		SetSize(SCROLLBAR_DEFAULT_WIDTH, 64);
+		SetSize( QuickPropScale( SCROLLBAR_DEFAULT_WIDTH ), QuickPropScale( 64 ) );
 	}
 	else
 	{
@@ -170,7 +171,7 @@ ScrollBar::ScrollBar(Panel *parent, const char *panelName, bool vertical) : Pane
 		_button[0]->SetTextInset(0, 0);
 		_button[1]->SetTextInset(0, 0);
 
-		SetSize(64, SCROLLBAR_DEFAULT_WIDTH);
+		SetSize( QuickPropScale( 64 ), QuickPropScale( SCROLLBAR_DEFAULT_WIDTH ) );
 	}
 
 	Panel::SetPaintBorderEnabled(true);
@@ -193,11 +194,8 @@ void ScrollBar::ApplySchemeSettings(IScheme *pScheme)
 
 	if (resourceString)
 	{
-		int value = atoi(resourceString);
-		if (IsProportional())
-		{
-			value = scheme()->GetProportionalScaledValueEx(GetScheme(), value);
-		}
+		// dimhotepus: Scale UI.
+		const int value = QuickPropScale( atoi(resourceString) );
 
 		if (_slider && _slider->IsVertical())
 		{
@@ -252,6 +250,10 @@ void ScrollBar::SetPaintEnabled(bool state)
 //-----------------------------------------------------------------------------
 void ScrollBar::PerformLayout()
 {
+	// dimhotepus: TF2 backport. Scale UI.
+	int nRepeats = Max( QuickPropScale( 1 ), 1 );
+	int nRepeatsMinusOne = Max( nRepeats - 1, 0 );
+
 	if (_slider)
 	{
 		int wide, tall;
@@ -260,24 +262,24 @@ void ScrollBar::PerformLayout()
 		{
 			if ( m_bNoButtons )
 			{
-				_slider->SetBounds(0, 0, wide, tall + 1);
+				_slider->SetBounds(0, 0, wide, tall + nRepeats );
 			}
 			else
 			{
-				_slider->SetBounds(0, wide, wide, tall-(wide*2)+1);
-				_button[0]->SetBounds(0,0, wide, wide );
-				_button[1]->SetBounds(0,tall-wide ,wide, wide );
+				_slider->SetBounds(0, wide, wide, tall-(wide*2)+ nRepeats );
+				_button[0]->SetBounds(0, nRepeatsMinusOne, wide - nRepeats, wide);
+				_button[1]->SetBounds(0,tall-wide - nRepeatsMinusOne, wide - nRepeats, wide);
 			}
 		}
 		else
 		{
 			if ( m_bNoButtons )
 			{
-				_slider->SetBounds(tall, 0, wide, tall + 1);
+				_slider->SetBounds(tall, 0, wide, tall + nRepeats );
 			}
 			else
 			{
-				_slider->SetBounds(tall, -1, wide-(tall*2)+1, tall + 1 );
+				_slider->SetBounds(tall, -nRepeats, wide-(tall*2)+ nRepeats, tall + nRepeats );
 				_button[0]->SetBounds(0, 0, tall, tall);
 				_button[1]->SetBounds(wide-tall, 0, tall, tall);
 			}

@@ -19,7 +19,8 @@
 CMessageDialog::CMessageDialog( vgui::Panel *pParent, const uint nType, const char *pTitle, const char *pMsg, const char *pCmdA, const char *pCmdB, vgui::Panel *pCreator, bool bShowActivity  ) 
 	: BaseClass( pParent, "MessageDialog" )
 {
-	SetSize( 500, 200 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 500 ), QuickPropScale( 200 ) );
 	SetDeleteSelfOnClose( true );
 	SetTitleBarVisible( false );
 	SetCloseButtonVisible( false );
@@ -260,10 +261,11 @@ void CMessageDialog::ApplySettings( KeyValues *inResourceData )
 
 	m_ButtonTextColor = inResourceData->GetColor( "buttontextcolor" );
 
-	m_FooterTall = inResourceData->GetInt( "footer_tall", 0 );
-	m_ButtonMargin = inResourceData->GetInt( "button_margin", 25 );
-	m_ButtonIconLabelSpace = inResourceData->GetInt( "button_separator", 10 );
-	m_ActivityIndent = inResourceData->GetInt( "activity_indent", 0 );
+	// dimhotepus: Scale UI.
+	m_FooterTall = QuickPropScale( inResourceData->GetInt( "footer_tall", 0 ) );
+	m_ButtonMargin = QuickPropScale( inResourceData->GetInt( "button_margin", 25 ) );
+	m_ButtonIconLabelSpace = QuickPropScale( inResourceData->GetInt( "button_separator", 10 ) );
+	m_ActivityIndent = QuickPropScale( inResourceData->GetInt( "activity_indent", 0 ) );
 }
 
 //-----------------------------------------------------------------------------
@@ -358,5 +360,6 @@ void CMessageDialog::PaintBackground( void )
 	Color darkColor;
 	darkColor.SetColor( 0.70f * (float)col.r(), 0.70f * (float)col.g(), 0.70f * (float)col.b(), col.a() );
 	vgui::surface()->DrawSetColor( darkColor );
-	vgui::surface()->DrawFilledRect( 8, y, wide - 8, tall - 8 );
+	// dimhotepus: Scale UI.
+	vgui::surface()->DrawFilledRect( 8, y, wide - QuickPropScale( 8 ), tall - QuickPropScale( 8 ) );
 }

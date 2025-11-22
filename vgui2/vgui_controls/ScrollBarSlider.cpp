@@ -358,7 +358,9 @@ void ScrollBarSlider::Paint()
 
 	if ( !IsSliderVisible() )	
 		return;
-
+	
+	// dimhotepus: TF2 backport. Scale UI.
+	int nRepeats = Max( QuickPropScale( 1 ), 1 );
 	Color col = GetFgColor();
 	surface()->DrawSetColor(col);
 
@@ -366,29 +368,29 @@ void ScrollBarSlider::Paint()
 	{
 		if ( GetPaintBackgroundType() == 2 )
 		{
-			DrawBox( 1, _nobPos[0], wide - 2, _nobPos[1] - _nobPos[0], col, 1.0f );
+			DrawBox( nRepeats, _nobPos[0], wide - nRepeats, _nobPos[1] - _nobPos[0], col, 1.0f );
 		}
 		else
 		{
 			// Nob
-			surface()->DrawFilledRect(1, _nobPos[0], wide - 2, _nobPos[1]);
+			surface()->DrawFilledRect(0, _nobPos[0], wide - nRepeats, _nobPos[1]);
 		}
 
 		// border
 		if (_ScrollBarSliderBorder)
 		{
-			_ScrollBarSliderBorder->Paint(0, _nobPos[0], wide, _nobPos[1]);
+			_ScrollBarSliderBorder->Paint2(0, _nobPos[0], wide - nRepeats, _nobPos[1], -1, 0, 0, nRepeats );
 		}
 	}
 	else
 	{
 		// horizontal nob
-		surface()->DrawFilledRect(_nobPos[0], 1, _nobPos[1], tall - 2 );
+		surface()->DrawFilledRect(_nobPos[0], nRepeats, _nobPos[1], tall - nRepeats * 2 );
 
 		// border
 		if (_ScrollBarSliderBorder)
 		{
-			_ScrollBarSliderBorder->Paint(_nobPos[0] - 1, 1, _nobPos[1], tall );
+			_ScrollBarSliderBorder->Paint2(_nobPos[0] - nRepeats, nRepeats, _nobPos[1], tall, -1, 0, 0, nRepeats );
 		}
 	}
 

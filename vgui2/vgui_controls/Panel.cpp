@@ -62,10 +62,6 @@ COMPILE_TIME_ASSERT( Panel::PIN_LAST == ssize( g_PinCornerStrings ) );
 
 extern intp GetBuildModeDialogCount();
 
-#ifdef STAGING_ONLY
-ConVar tf_strict_mouse_up_events( "tf_strict_mouse_up_events", "0", FCVAR_ARCHIVE, "Only allow Mouse-Release events to happens on panels we also Mouse-Downed in" );
-#endif
-
 // Temporary convar to help debug why the MvMVictoryMannUpPanel TabContainer is sometimes way off to the left.
 ConVar tf_debug_tabcontainer( "tf_debug_tabcontainer", "0", FCVAR_HIDDEN, "Spew TabContainer dimensions." );
 
@@ -950,7 +946,7 @@ void Panel::GetBounds(int &x, int &y, int &wide, int &tall)
 //-----------------------------------------------------------------------------
 // Purpose: returns safe handle to parent
 //-----------------------------------------------------------------------------
-VPANEL Panel::GetVParent()
+VPANEL Panel::GetVParent() const
 {
     if ( ipanel() )
     {
@@ -1442,19 +1438,23 @@ void Panel::SetParent(VPANEL newParent)
 		ipanel()->SetParent(GetVPanel(), NULL);
 	}
 
-	if (GetVParent() && !IsPopup())
+	if (GetVParent())
 	{
 		SetProportional(ipanel()->IsProportional(GetVParent()));
 
-		// most of the time KBInput == parents kbinput
-		if (ipanel()->IsKeyBoardInputEnabled(GetVParent()) != IsKeyBoardInputEnabled())
+		// dimhotepus: TF2 backport.
+		if (!IsPopup())
 		{
-			SetKeyBoardInputEnabled(ipanel()->IsKeyBoardInputEnabled(GetVParent()));
-		}
+			// most of the time KBInput == parents kbinput
+			if (ipanel()->IsKeyBoardInputEnabled(GetVParent()) != IsKeyBoardInputEnabled())
+			{
+				SetKeyBoardInputEnabled(ipanel()->IsKeyBoardInputEnabled(GetVParent()));
+			}
 
-		if (ipanel()->IsMouseInputEnabled(GetVParent()) != IsMouseInputEnabled())
-		{
-			SetMouseInputEnabled(ipanel()->IsMouseInputEnabled(GetVParent()));
+			if (ipanel()->IsMouseInputEnabled(GetVParent()) != IsMouseInputEnabled())
+			{
+				SetMouseInputEnabled(ipanel()->IsMouseInputEnabled(GetVParent()));
+			}
 		}
 	}
 
@@ -1689,7 +1689,7 @@ void Panel::DeletePanel()
 //-----------------------------------------------------------------------------
 // Purpose: data accessor
 //-----------------------------------------------------------------------------
-HScheme Panel::GetScheme()
+HScheme Panel::GetScheme() const
 {
 	if (m_iScheme)
 	{
@@ -1791,9 +1791,22 @@ void Panel::InternalCursorMoved(int x, int y)
 		m_pTooltips->ShowTooltip(this);
 	}
 
-	ScreenToLocal(x, y);
+	// dimhotepus: TF2 backport.
+	int localX = x;
+	int localY = y;
 
-	OnCursorMoved(x, y);
+	Panel *pMouseHandler = m_hMouseEventHandler.Get();
+	if ( pMouseHandler && m_bSendMoveEventsToHandler )
+	{
+		pMouseHandler->ScreenToLocal(localX, localY);
+		pMouseHandler->OnCursorMoved(localX, localY);
+	}
+
+	if ( !pMouseHandler || m_bActOnHandledMouseInput || !m_bSendMoveEventsToHandler )
+	{
+		ScreenToLocal(localX, localY);
+		OnCursorMoved(localX, localY);
+	}
 }
 
 void Panel::InternalCursorEntered()
@@ -1815,7 +1828,17 @@ void Panel::InternalCursorEntered()
 		m_pTooltips->ShowTooltip(this);
 	}
 
-	OnCursorEntered();
+	// dimhotepus: TF2 backport.
+	Panel *pMouseHandler = m_hMouseEventHandler.Get();
+	if ( pMouseHandler && m_bSendMoveEventsToHandler )
+	{
+		pMouseHandler->OnCursorEntered();
+	}
+	
+	if ( !pMouseHandler || m_bActOnHandledMouseInput || !m_bSendMoveEventsToHandler )
+	{
+		OnCursorEntered();
+	}
 }
 
 void Panel::InternalCursorExited()
@@ -1831,7 +1854,17 @@ void Panel::InternalCursorExited()
 		m_pTooltips->HideTooltip();
 	}
 
-	OnCursorExited();
+	// dimhotepus: TF2 backport.
+	Panel *pMouseHandler = m_hMouseEventHandler.Get();
+	if ( pMouseHandler && m_bSendMoveEventsToHandler )
+	{
+		pMouseHandler->OnCursorExited();
+	}
+
+	if ( !pMouseHandler || m_bActOnHandledMouseInput || !m_bSendMoveEventsToHandler )
+	{
+		OnCursorExited();
+	}
 }
 
 bool Panel::IsChildOfSurfaceModalPanel()
@@ -1937,32 +1970,13 @@ void Panel::InternalMousePressed(int code)
 		}
 	}
 
-#ifdef STAGING_ONLY
-	// If holding CTRL + ALT, invalidate layout.  For debugging purposes
-	if ( ( vgui::input()->IsKeyDown(KEY_LCONTROL) || vgui::input()->IsKeyDown(KEY_RCONTROL) ) 
-		&& ( vgui::input()->IsKeyDown(KEY_LALT) || vgui::input()->IsKeyDown(KEY_RALT) ) )
-	{
-		InvalidateLayout( true, true );
-	}
-#endif
-
-#ifdef STAGING_ONLY
-	const char *pGameDir = CommandLine()->ParmValue( "-game", "hl2" );
-	if ( !V_stricmp( pGameDir, "tf" ) )
-	{
-		if ( code >= MOUSE_LEFT && code <= MOUSE_MIDDLE )
-		{
-			m_sMousePressedPanels[ code - MOUSE_LEFT ] = this;
-		}
-	}
-#endif
-
 	Panel *pMouseHandler = m_hMouseEventHandler.Get();
 	if ( pMouseHandler )
 	{
 		pMouseHandler->OnMousePressed( (MouseCode)code );
 	}
-	else
+	// dimhotepus: TF2 backport.
+	if ( !pMouseHandler || m_bActOnHandledMouseInput )
 	{
 		OnMousePressed( (MouseCode)code );
 	}
@@ -2000,7 +2014,8 @@ void Panel::InternalMouseDoublePressed(int code)
 	{
 		pMouseHandler->OnMouseDoublePressed( (MouseCode)code );
 	}
-	else
+	// dimhotepus: TF2 backport.
+	if ( !pMouseHandler || m_bActOnHandledMouseInput )
 	{
 		OnMouseDoublePressed( (MouseCode)code );
 	}
@@ -2052,7 +2067,18 @@ void Panel::InternalMouseTriplePressed( int code )
 		return;
 	}
 
-	OnMouseTriplePressed((MouseCode)code);
+	// dimhotepus: TF2 backport.
+	Panel *pMouseHandler = m_hMouseEventHandler.Get();
+	if ( pMouseHandler )
+	{
+		pMouseHandler->OnMouseTriplePressed((MouseCode)code);
+	}
+
+	if ( !pMouseHandler || m_bActOnHandledMouseInput )
+	{
+		OnMouseTriplePressed((MouseCode)code);
+	}
+
 #if defined( VGUI_USEDRAGDROP )
 	DragDropStartDragging();
 #endif
@@ -2091,27 +2117,17 @@ void Panel::InternalMouseReleased(int code)
 		}
 	}
 
-#ifdef STAGING_ONLY
-	const char *pGameDir = CommandLine()->ParmValue( "-game", "hl2" );
-	if ( tf_strict_mouse_up_events.GetBool() && !V_stricmp( pGameDir, "tf" ) )
+	// dimhotepus: TF2 backport.
+	Panel *pMouseHandler = m_hMouseEventHandler.Get();
+	if ( pMouseHandler )
 	{
-		// Only allow mouse release events to go to panels that we also
-		// first clicked into
-		if ( code >= MOUSE_LEFT && code <= MOUSE_MIDDLE )
-		{
-			const int nIndex = code - MOUSE_LEFT;
-			Panel* pPressedPanel = m_sMousePressedPanels[ nIndex ];
-			m_sMousePressedPanels[ nIndex ] = NULL;	// Clear out pressed panel
-			if ( pPressedPanel != this )
-			{
-				OnMouseMismatchedRelease( (MouseCode)code, pPressedPanel );
-				return;
-			}
-		}
+		pMouseHandler->OnMouseReleased((MouseCode)code);
 	}
-#endif
 
-	OnMouseReleased((MouseCode)code);
+	if ( !pMouseHandler || m_bActOnHandledMouseInput )
+	{
+		OnMouseReleased((MouseCode)code);
+	}
 }
 
 void Panel::InternalMouseWheeled(int delta)
@@ -2124,7 +2140,17 @@ void Panel::InternalMouseWheeled(int delta)
 	if ( !ShouldHandleInputMessage() )
 		return;
 
-	OnMouseWheeled(delta);
+	// dimhotepus: TF2 backport.
+	Panel *pMouseHandler = m_hMouseEventHandler.Get();
+	if ( pMouseHandler )
+	{
+		pMouseHandler->InternalMouseWheeled( delta );
+	}
+
+	if ( !pMouseHandler || m_bActOnHandledMouseInput )
+	{
+		OnMouseWheeled(delta);
+	}
 }
 
 void Panel::InternalKeyCodePressed(int code)
@@ -3871,7 +3897,8 @@ void Panel::InvalidateLayout( bool layoutNow, bool reloadScheme )
 		for (int i = 0; i < GetChildCount(); i++)
 		{
 			vgui::Panel* panel = GetChild(i);
-			if( panel )
+			// dimhotepus: TF2 backport.
+			if( panel && !panel->_flags.IsFlagSet( MARKED_FOR_DELETION ) )
 			{
 				panel->InvalidateLayout(layoutNow, true);
 			}
@@ -5038,8 +5065,7 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 	for ( ; panelMap != NULL && !bFound; panelMap = panelMap->baseMap )
 	{
 #if defined( _DEBUG )
-//		char const *className = panelMap->pfnClassName();
-//		NOTE_UNUSED( className );
+//		[[maybe_unused]] char const *className = panelMap->pfnClassName();
 #endif
 
 		// iterate all the entries in the panel map
@@ -5149,6 +5175,12 @@ void Panel::OnMessage(const KeyValues *params, VPANEL ifromPanel)
 					{
 						typedef void (Panel::*MessageFunc_PtrInt_t)(void *, int);
 						(this->*((MessageFunc_PtrInt_t)pMap->func))( param1->GetPtr(), param2->GetInt() );
+					}
+					// dimhotepus: TF2 backport.
+					else if ( (DATATYPE_PTR == pMap->firstParamType) && (DATATYPE_PTR == pMap->secondParamType) )
+					{
+						typedef void (Panel::*MessageFunc_PtrPtr_t)(void *, void *);
+						(this->*((MessageFunc_PtrPtr_t)pMap->func))( param1->GetPtr(), param2->GetPtr() );
 					}
 					else if ( (DATATYPE_CONSTCHARPTR == pMap->firstParamType) && (DATATYPE_INT == pMap->secondParamType) )
 					{
@@ -5504,9 +5536,12 @@ void Panel::SetSilentMode( bool bSilent )
 //-----------------------------------------------------------------------------
 // Purpose: mouse events will be send to handler panel instead of this panel
 //-----------------------------------------------------------------------------
-void Panel::InstallMouseHandler( Panel *pHandler )
+void Panel::InstallMouseHandler( Panel *pHandler, bool bThisHandlesAsWell /* = false */, bool bMovementEvents /* = false */ )
 {
 	m_hMouseEventHandler = pHandler;
+	// dimhotepus: TF2 backport.
+	m_bActOnHandledMouseInput = bThisHandlesAsWell;
+	m_bSendMoveEventsToHandler = bMovementEvents;
 }
 
 //-----------------------------------------------------------------------------
@@ -6432,7 +6467,20 @@ void Panel::GetCornerTextureSize( int& w, int& h )
 		w = h = 0;
 		return;
 	}
-	surface()->DrawGetTextureSize(m_nBgTextureId1, w, h);
+	// dimhotepus: TF2 backport. Scale UI.
+	if ( IsProportional() )
+	{
+		// Do not use the scheme for this, so it's screen space that affects the rounding always.
+		w = MAX( scheme()->GetProportionalScaledValue( 8 ) / 2, 8 );
+		h = w;
+	}
+	else
+	{
+		// Legacy for size of all old 800corner1 (8x8) images.
+		// Nowe we use 8x80corner images (64x64)
+		w = 8;
+		h = 8;
+	}
 }
 
 //-----------------------------------------------------------------------------
@@ -8413,7 +8461,7 @@ bool Panel::IsConsoleStylePanel() const
 class CPanelMessageMapDictionary
 {
 public:
-	CPanelMessageMapDictionary() : m_PanelMessageMapPool( sizeof(PanelMessageMap), 32, CUtlMemoryPool::GROW_FAST, "CPanelMessageMapDictionary::m_PanelMessageMapPool" )
+	CPanelMessageMapDictionary() : m_PanelMessageMapPool( sizeof(PanelMessageMap), 32, CUtlMemoryPool::GROW_FAST, "CPanelMessageMapDictionary::m_PanelMessageMapPool", alignof( PanelMessageMap ) )
 	{
 		m_MessageMaps.RemoveAll();
 	}
@@ -8482,7 +8530,7 @@ PanelMessageMap *CPanelMessageMapDictionary::FindOrAddPanelMessageMap( char cons
 class CPanelKeyBindingMapDictionary
 {
 public:
-	CPanelKeyBindingMapDictionary() : m_PanelKeyBindingMapPool( sizeof(PanelKeyBindingMap), 32, CUtlMemoryPool::GROW_FAST, "CPanelKeyBindingMapDictionary::m_PanelKeyBindingMapPool" )
+	CPanelKeyBindingMapDictionary() : m_PanelKeyBindingMapPool( sizeof(PanelKeyBindingMap), 32, CUtlMemoryPool::GROW_FAST, "CPanelKeyBindingMapDictionary::m_PanelKeyBindingMapPool", alignof( PanelKeyBindingMap ) )
 	{
 		m_MessageMaps.RemoveAll();
 	}

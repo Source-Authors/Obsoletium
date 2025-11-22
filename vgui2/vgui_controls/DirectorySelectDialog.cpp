@@ -54,7 +54,8 @@ class CreateDirectoryDialog : public Frame
 public:
 	CreateDirectoryDialog(Panel *parent, const char *defaultCreateDirName) : BaseClass(parent, NULL)
 	{
-		SetSize(320, 100);
+		// dimhotepus: Scale UI.
+		SetSize(QuickPropScale( 320 ), QuickPropScale( 100 ));
 		SetSizeable(false);
 		SetTitle("Choose directory name", false);
 		MoveToCenterOfScreen();
@@ -84,10 +85,10 @@ public:
 	void PerformLayout() override
 	{
 		BaseClass::PerformLayout();
-
-		m_pNameEntry->SetBounds(24, 32, GetWide() - 48, 24);
-		m_pOKButton->SetBounds(GetWide() - 176, 64, 72, 24);
-		m_pCancelButton->SetBounds(GetWide() - 94, 64, 72, 24);
+		// dimhotepus: Scale UI.
+		m_pNameEntry->SetBounds(QuickPropScale( 24 ), QuickPropScale( 32 ), GetWide() - QuickPropScale( 48 ), QuickPropScale( 24 ));
+		m_pOKButton->SetBounds(GetWide() - QuickPropScale( 176 ), QuickPropScale( 64 ), QuickPropScale( 72 ), QuickPropScale( 24 ));
+		m_pCancelButton->SetBounds(GetWide() - QuickPropScale( 94 ), QuickPropScale( 64 ), QuickPropScale( 72 ), QuickPropScale( 24 ));
 	}
 
 	void OnCommand(const char *command) override
@@ -122,10 +123,12 @@ private:
 DirectorySelectDialog::DirectorySelectDialog(vgui::Panel *parent, const char *title) : Frame(parent, NULL)
 {
 	SetTitle(title, true);
-	SetSize(320, 360);
-	SetMinimumSize(300, 240);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 320 ), QuickPropScale( 360 ));
+	SetMinimumSize(QuickPropScale( 300 ), QuickPropScale( 240 ));
 	m_szCurrentDir[0] = 0;
 	m_szDefaultCreateDirName[0] = 0;
+	m_szCurrentDrive[0] = 0;
 
 	m_pDirTree = new DirectoryTreeView(this, "DirTree");
 	m_pDriveCombo = new ComboBox(this, "DriveCombo", 6, false);
@@ -145,12 +148,14 @@ void DirectorySelectDialog::PerformLayout()
 	BaseClass::PerformLayout();
 
 	// lay out all the controls
-	m_pDriveCombo->SetBounds(24, 30, GetWide() - 48, 24);
-	m_pDirTree->SetBounds(24, 64, GetWide() - 48, GetTall() - 128);
+	// dimhotepus: Scale UI.
+	m_pDriveCombo->SetBounds(QuickPropScale( 24 ), QuickPropScale( 30 ), GetWide() - QuickPropScale( 48 ), QuickPropScale( 24 ));
+	m_pDirTree->SetBounds(QuickPropScale( 24 ), QuickPropScale( 64 ), GetWide() - QuickPropScale( 48 ), GetTall() - QuickPropScale( 128 ));
 
-	m_pCreateButton->SetBounds(24, GetTall() - 48, 104, 24);
-	m_pSelectButton->SetBounds(GetWide() - 172, GetTall() - 48, 72, 24);
-	m_pCancelButton->SetBounds(GetWide() - 96, GetTall() - 48, 72, 24);
+	// dimhotepus: Scale UI.
+	m_pCreateButton->SetBounds(QuickPropScale( 24 ), GetTall() - QuickPropScale( 48 ), QuickPropScale( 104 ), QuickPropScale( 24 ));
+	m_pSelectButton->SetBounds(GetWide() - QuickPropScale( 172 ), GetTall() - QuickPropScale( 48 ), QuickPropScale( 72 ), QuickPropScale( 24 ));
+	m_pCancelButton->SetBounds(GetWide() - QuickPropScale( 96 ), GetTall() - QuickPropScale( 48 ), QuickPropScale( 72 ), QuickPropScale( 24 ));
 }
 
 //-----------------------------------------------------------------------------
@@ -171,7 +176,7 @@ void DirectorySelectDialog::ApplySchemeSettings(IScheme *pScheme)
 // Purpose: Move the start string forward until we hit a slash and return the
 //			the first character past the trailing slash
 //-----------------------------------------------------------------------------
-inline const char *MoveToNextSubDir( const char *pStart, intp *nCount )
+[[nodiscard]] static inline const char *MoveToNextSubDir( const char *pStart, intp *nCount )
 {
 	intp nMoved = 0;
 
@@ -212,8 +217,8 @@ void DirectorySelectDialog::ExpandTreeToPath( const char *lpszPath, bool bSelect
 {
 	// Make sure our slashes are correct!
 	char workPath[MAX_PATH];
-	Q_strncpy( workPath, lpszPath, sizeof(workPath) );
-	Q_FixSlashes( workPath );
+	V_strcpy_safe( workPath, lpszPath );
+	V_FixSlashes( workPath );
 	
 	// Set us to the work drive
 	SetStartDirectory( workPath );
@@ -295,7 +300,7 @@ void DirectorySelectDialog::SetStartDirectory(const char *path)
 	char *firstSlash = strchr(m_szCurrentDrive, '\\');
 	if (firstSlash)
 	{
-		firstSlash[1] = 0;
+		firstSlash[1] = '\0';
 	}
 
 	BuildDirTree();
@@ -418,7 +423,7 @@ bool DirectorySelectDialog::DoesDirectoryHaveSubdirectories(const char *path, co
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{
 		char szFullPath[ MAX_PATH ];
-		Q_snprintf( szFullPath, sizeof(szFullPath), "%s\\%s", path, pFileName );
+		V_sprintf_safe( szFullPath, "%s\\%s", path, pFileName );
 		Q_FixSlashes( szFullPath ); 
 		if ( g_pFullFileSystem->IsDirectory( szFullPath ) )
 		{
@@ -437,7 +442,7 @@ void DirectorySelectDialog::GenerateChildrenOfDirectoryNode(intp nodeIndex)
 {
 	// generate path
 	char path[512];
-	GenerateFullPathForNode(nodeIndex, path, sizeof(path));
+	GenerateFullPathForNode(nodeIndex, path);
 
 	// expand out
 	ExpandTreeNode(path, nodeIndex);
@@ -446,7 +451,7 @@ void DirectorySelectDialog::GenerateChildrenOfDirectoryNode(intp nodeIndex)
 //-----------------------------------------------------------------------------
 // Purpose: creates the full path for a node
 //-----------------------------------------------------------------------------
-void DirectorySelectDialog::GenerateFullPathForNode(intp nodeIndex, char *path, intp pathBufferSize)
+void DirectorySelectDialog::GenerateFullPathForNode(intp nodeIndex, OUT_Z_CAP(pathBufferSize) char *path, intp pathBufferSize)
 {
 	// dimhotepus: Do not overflow 0 size buffer.
 	if (pathBufferSize <= 0) return;
@@ -504,7 +509,7 @@ void DirectorySelectDialog::OnCreateDirectory(const char *dir)
 	if (m_pDirTree->IsItemIDValid(selectedIndex))
 	{
 		char fullPath[512];
-		GenerateFullPathForNode(selectedIndex, fullPath, sizeof(fullPath));
+		GenerateFullPathForNode(selectedIndex, fullPath);
 
 		// create the new directory underneath
 		V_strcat_safe(fullPath, dir);
@@ -556,7 +561,7 @@ void DirectorySelectDialog::OnCommand(const char *command)
 		if (m_pDirTree->IsItemIDValid(selectedIndex))
 		{
 			char fullPath[512];
-			GenerateFullPathForNode(selectedIndex, fullPath, sizeof(fullPath));
+			GenerateFullPathForNode(selectedIndex, fullPath);
 			PostActionSignal(new KeyValues("DirectorySelected", "dir", fullPath));
 			Close();
 		}
@@ -592,7 +597,7 @@ void DirectorySelectDialog::OnTreeViewItemSelected()
 
 	// build the string
 	char fullPath[512];
-	GenerateFullPathForNode(selectedIndex, fullPath, sizeof(fullPath));
+	GenerateFullPathForNode(selectedIndex, fullPath);
 
 	int itemID = m_pDriveCombo->GetActiveItem();
 	m_pDriveCombo->UpdateItem(itemID, fullPath, NULL);

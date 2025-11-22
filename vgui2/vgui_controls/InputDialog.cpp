@@ -30,7 +30,8 @@ BaseInputDialog::BaseInputDialog( vgui::Panel *parent, const char *title ) :
 
 	SetDeleteSelfOnClose( true );
 	SetTitle(title, true);
-	SetSize(320, 180);
+	// dimhotepus: Scale UI.
+	SetSize(QuickPropScale( 320 ), QuickPropScale( 180 ));
 	SetSizeable( false );
 
 	m_pCancelButton = new Button(this, "CancelButton", "#VGui_Cancel");
@@ -83,13 +84,16 @@ void BaseInputDialog::PerformLayout()
 	GetSize( w, h );
 
 	// lay out all the controls
-	int topy = IsSmallCaption() ? 15 : 30;
+	// dimhotepus: Scale UI.
+	int topy = IsSmallCaption() ? QuickPropScale( 15 ) : QuickPropScale( 30 );
 	int halfw = w / 2;
 
-	PerformLayout( 12, topy, w - 24, h - 100 );
+	// dimhotepus: Scale UI.
+	PerformLayout( QuickPropScale( 12 ), topy, w - QuickPropScale( 24 ), h - QuickPropScale( 100 ) );
 
-	m_pOKButton->SetBounds( halfw - 84, h - 30, 72, 24 );
-	m_pCancelButton->SetBounds( halfw + 12, h - 30, 72, 24 );
+	// dimhotepus: Scale UI.
+	m_pOKButton->SetBounds( halfw - QuickPropScale( 84 ), h - QuickPropScale( 30 ), QuickPropScale( 72 ), QuickPropScale( 24 ) );
+	m_pCancelButton->SetBounds( halfw + QuickPropScale( 12 ), h - QuickPropScale( 30 ), QuickPropScale( 72 ), QuickPropScale( 24 ) );
 }
 
 
@@ -130,7 +134,8 @@ void BaseInputDialog::OnCommand(const char *command)
 InputMessageBox::InputMessageBox( vgui::Panel *parent, const char *title, char const *prompt )
 : BaseClass( parent, title )
 {
-	SetSize( 320, 120 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 320 ), QuickPropScale( 120 ) );
 
 	m_pPrompt = new Label( this, "Prompt", prompt );
 }
@@ -141,7 +146,8 @@ InputMessageBox::~InputMessageBox()
 
 void InputMessageBox::PerformLayout( int x, int y, int w, int h )
 {
-	m_pPrompt->SetBounds( x, y, w, 24 );
+	// dimhotepus: Scale UI.
+	m_pPrompt->SetBounds( x, y, w, QuickPropScale( 24 ) );
 }
 
 
@@ -151,7 +157,8 @@ void InputMessageBox::PerformLayout( int x, int y, int w, int h )
 InputDialog::InputDialog(vgui::Panel *parent, const char *title, char const *prompt, char const *defaultValue /*=""*/ ) : 
 	BaseClass(parent, title)
 {
-	SetSize( 320, 120 );
+	// dimhotepus: Scale UI.
+	SetSize( QuickPropScale( 320 ), QuickPropScale( 120 ) );
 
 	m_pPrompt = new Label( this, "Prompt", prompt );
 	
@@ -194,8 +201,9 @@ void InputDialog::AllowNumericInputOnly( bool bOnlyNumeric )
 //-----------------------------------------------------------------------------
 void InputDialog::PerformLayout( int x, int y, int w, int h )
 {
-	m_pPrompt->SetBounds( x, y, w, 24 );
-	m_pInput ->SetBounds( x, y + 30, w, m_pInput->IsMultiline() ? h - 30 : 24 );
+	// dimhotepus: Scale UI.
+	m_pPrompt->SetBounds( x, y, w, QuickPropScale( 24 ) );
+	m_pInput ->SetBounds( x, y + QuickPropScale( 30 ), w, m_pInput->IsMultiline() ? h - QuickPropScale( 30 ) : QuickPropScale( 24 ) );
 }
 
 

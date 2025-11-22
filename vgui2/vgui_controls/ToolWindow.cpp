@@ -212,8 +212,10 @@ IToolWindowFactory *ToolWindow::GetToolWindowFactory()
 
 void ToolWindow::Grow( int edge, int from_x, int from_y )
 {
-	int status_h = 24;
-	int menubar_h = 27;
+	
+	// dimhotepus: Scale UI.
+	int status_h = QuickPropScale( 24 );
+	int menubar_h = QuickPropScale( 27 );
 
 	int sw, sh;
 	surface()->GetScreenSize( sw, sh );
@@ -395,12 +397,12 @@ void ToolWindow::GrowFromClick()
 {
 	int mx, my;
 	input()->GetCursorPos( mx, my );
-
-	int esz, csz, brsz, ch;
-	esz = GetDraggerSize();
-	csz = GetCornerSize();
-	brsz = GetBottomRightSize();
-	ch = GetCaptionHeight();
+	
+	// dimhotepus: Scale UI.
+	int esz = QuickPropScale( GetDraggerSize() );
+	int csz = QuickPropScale( GetCornerSize() );
+	int brsz = QuickPropScale( GetBottomRightSize() );
+	int ch = QuickPropScale( GetCaptionHeight() );
 
 	int x, y, w, h;
 	GetBounds( x, y, w, h );

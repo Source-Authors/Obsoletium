@@ -142,7 +142,8 @@ PerforceFileList::PerforceFileList( Panel *pParent, const char *pPanelName ) :
 	{
 		const ColumnInfo_t& info = g_ColInfo[ i ];
 
-		AddColumnHeader( i, info.columnName, info.columnText, info.startingWidth, info.minWidth, info.maxWidth, info.flags );
+		// dimhotepus: Scale UI.
+		AddColumnHeader( i, info.columnName, info.columnText, QuickPropScale( info.startingWidth ), QuickPropScale( info.minWidth ), QuickPropScale( info.maxWidth ), info.flags );
 		SetSortFunc( i, info.pfnSort );
 		SetColumnTextAlignment( i, info.alignment );
 	}

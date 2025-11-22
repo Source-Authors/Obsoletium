@@ -594,9 +594,7 @@ void EditablePanel::LoadUserConfig(const char *configName, int dialogID)
 	KeyValues *data = system()->GetUserConfigFileData(configName, dialogID);
 
 	delete [] m_pszConfigName;
-	intp len = Q_strlen(configName) + 1;
-	m_pszConfigName = new char[ len ];
-	Q_strncpy(m_pszConfigName, configName, len );
+	m_pszConfigName = V_strdup( configName );
 	m_iConfigID = dialogID;
 
 	// apply our user config settings (this will recurse through our children)
@@ -869,9 +867,10 @@ Panel *EditablePanel::HasHotkey(wchar_t key)
 //-----------------------------------------------------------------------------
 // Purpose: Shortcut function to setting enabled state of control
 //-----------------------------------------------------------------------------
-void EditablePanel::SetControlEnabled(const char *controlName, bool enabled)
+// dimhotepus: TF2 backport. Add bRecurseDown.
+void EditablePanel::SetControlEnabled(const char *controlName, bool enabled, bool bRecurseDown )
 {
-	Panel *control = FindChildByName(controlName);
+	Panel *control = FindChildByName(controlName, bRecurseDown);
 	if (control)
 	{
 		control->SetEnabled(enabled);

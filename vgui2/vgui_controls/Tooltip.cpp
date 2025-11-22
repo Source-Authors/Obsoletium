@@ -397,7 +397,8 @@ void TextTooltip::SizeTextWindow()
 		
 		s_TooltipWindow->GetSize( wide, tall );
 		
-		if (( wide < 100 ) && ( s_TooltipWindow->GetNumLines() == 2) ) 
+		// dimhotepus: Scale UI.
+		if (( wide < QuickPropScalePanel( 100, s_TooltipWindow ) ) && ( s_TooltipWindow->GetNumLines() == 2) ) 
 		{
 			s_TooltipWindow->SetMultiline(false);
 			s_TooltipWindow->SetToFullWidth();	

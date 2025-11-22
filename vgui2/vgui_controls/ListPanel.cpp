@@ -552,7 +552,8 @@ void ListPanel::AddColumnHeader(int index, const char *columnName, const char *c
 	}
 	else
 	{
-		AddColumnHeader( index, columnName, columnText, width, 20, 10000, columnFlags);
+		// dimhotepus: Scale UI.
+		AddColumnHeader( index, columnName, columnText, width, QuickPropScale( 20 ), QuickPropScale( 10000 ), columnFlags);
 	}
 }
 
@@ -579,7 +580,8 @@ void ListPanel::AddColumnHeader(int index, const char *columnName, const char *c
 	// create the column header button
 	Button *pButton = SETUP_PANEL(new ColumnButton(this, columnName, columnText));  // the cell rendering mucks with the button visibility during the solvetraverse loop,
 																					//so force applyschemesettings to make sure its run
-	pButton->SetSize(width, 24);
+	// dimhotepus: Scale UI.
+	pButton->SetSize(width, QuickPropScale( 24 ));
 	pButton->AddActionSignalTarget(this);
 	pButton->SetContentAlignment(Label::a_west);
 	pButton->SetTextInset(5, 0);
@@ -1463,10 +1465,12 @@ Panel *ListPanel::GetCellRenderer(intp itemID, intp col)
 		// set cell size
 		Panel *header = column.m_pHeader;
 	    int wide = header->GetWide();
-		m_pTextImage->SetSize( min( cw, wide - 5 ), tall);
+		// dimhotepus: Scale UI.
+		m_pTextImage->SetSize( min( cw, wide - QuickPropScale( 5 ) ), tall);
 
 		m_pLabel->SetTextImageIndex( 0 );
-		m_pLabel->SetImageAtIndex(0, m_pTextImage, 3);
+		// dimhotepus: Scale UI.
+		m_pLabel->SetImageAtIndex(0, m_pTextImage, QuickPropScale( 3 ));
 			
 		bool selected = false;
 		if ( m_SelectedItems.HasElement(itemID) && ( !m_bCanSelectIndividualCells || col == m_iSelectedColumn ) )
@@ -1538,7 +1542,8 @@ Panel *ListPanel::GetCellRenderer(intp itemID, intp col)
 			{
 				m_pLabel->SetTextImageIndex( 1 );
 				m_pLabel->SetImageAtIndex(0, pImage, 0);
-				m_pLabel->SetImageAtIndex(1, m_pTextImage, 3);
+				// dimhotepus: Scale UI.
+				m_pLabel->SetImageAtIndex(1, m_pTextImage, QuickPropScale( 3 ));
 			}
 		}
 		
@@ -1601,11 +1606,13 @@ void ListPanel::PerformLayout()
 
 	int wide, tall;
 	GetSize( wide, tall );
-	m_vbar->SetPos(wide - (m_vbar->GetWide()+WINDOW_BORDER_WIDTH), 0);
-	m_vbar->SetSize(m_vbar->GetWide(), tall - 2);
+	// dimhotepus: Scale UI.
+	m_vbar->SetPos(wide - (m_vbar->GetWide()+QuickPropScale( WINDOW_BORDER_WIDTH )), 0);
+	m_vbar->SetSize(m_vbar->GetWide(), tall - QuickPropScale( 2 ));
 	m_vbar->InvalidateLayout();
 
-	int buttonMaxXPos = wide - (m_vbar->GetWide()+WINDOW_BORDER_WIDTH);
+	// dimhotepus: Scale UI.
+	int buttonMaxXPos = wide - (m_vbar->GetWide()+QuickPropScale( WINDOW_BORDER_WIDTH ));
 	
 	intp nColumns = m_CurrentColumns.Count();
 	// number of bars that can be resized
@@ -1772,8 +1779,9 @@ void ListPanel::PerformLayout()
 				sizer->SetVisible(true);
 			}
 			sizer->MoveToFront();
-			sizer->SetPos(x - 4, 0);
-			sizer->SetSize(8, m_vbar->GetWide());
+			// dimhotepus: Scale UI.
+			sizer->SetPos(x - QuickPropScale( 4 ), 0);
+			sizer->SetSize(QuickPropScale( 8 ), m_vbar->GetWide());
 		}
 
 		// we made it all the way through
@@ -1866,8 +1874,9 @@ void ListPanel::PerformLayout()
 					 j == m_iEditModeColumn )
 				{
 
-					m_hEditModePanel->SetPos( x + m_iTableStartX + 2, (drawcount * m_iRowHeight) + m_iTableStartY);
-					m_hEditModePanel->SetSize( wide, m_iRowHeight - 1 );
+					// dimhotepus: Scale UI.
+					m_hEditModePanel->SetPos( x + m_iTableStartX + QuickPropScale( 2 ), (drawcount * m_iRowHeight) + m_iTableStartY);
+					m_hEditModePanel->SetSize( wide, m_iRowHeight - QuickPropScale( 1 ) );
 
 					bDone = true;
 				}
@@ -2010,8 +2019,9 @@ void ListPanel::Paint()
 	// if the list is empty, draw some help text
 	if (m_VisibleItems.Count() < 1 && m_pEmptyListText)
 	{
-		m_pEmptyListText->SetPos(m_iTableStartX + 8, m_iTableStartY + 4);
-		m_pEmptyListText->SetSize(wide - 8, m_iRowHeight);
+		// dimhotepus: Scale UI.
+		m_pEmptyListText->SetPos(m_iTableStartX + QuickPropScale( 8 ), m_iTableStartY + QuickPropScale( 4 ));
+		m_pEmptyListText->SetSize(wide - QuickPropScale( 8 ), m_iRowHeight);
 		m_pEmptyListText->Paint();
 	}
 
@@ -2726,7 +2736,8 @@ void ListPanel::OnColumnResized(int col, int delta)
 		column_t& nextCol = m_ColumnsData[m_CurrentColumns[i]];
 		restColumnsMinWidth += nextCol.m_iMinWidth;
 	}
-	panelWide -= ( x + restColumnsMinWidth + m_vbar->GetWide() + WINDOW_BORDER_WIDTH );
+	// dimhotepus: Scale UI.
+	panelWide -= ( x + restColumnsMinWidth + m_vbar->GetWide() + QuickPropScale( WINDOW_BORDER_WIDTH ) );
 	if ( wide > panelWide )
 	{
 		wide = panelWide;

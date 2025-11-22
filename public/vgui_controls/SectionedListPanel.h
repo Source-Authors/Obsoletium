@@ -171,11 +171,13 @@ public:
 
 	// [tj] Accessors for clickability
 	void SetClickable(bool clickable) { m_clickable = clickable; }
-	bool IsClickable() { return m_clickable; }
+	// dimhotepus: TF2 backport. Make const.
+	bool IsClickable() const { return m_clickable; }
 
 	// [tj] Accessors for header drawing
 	void SetDrawHeaders(bool drawHeaders) { m_bDrawSectionHeaders = drawHeaders; }
-	bool GetDrawHeaders() { return m_bDrawSectionHeaders; }
+	// dimhotepus: TF2 backport. Make const.
+	bool GetDrawHeaders() const { return m_bDrawSectionHeaders; }
 	 
 	//=============================================================================
 	// HPE_END

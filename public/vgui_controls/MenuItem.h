@@ -105,6 +105,15 @@ public:
 	void SetCurrentKeyBinding( char const *keyName );
 
 	void GetContentSize( int& cw, int &ch ) override;
+	
+	// dimhotepus: TF2 backport.
+	void SetOffsetFromMainMenu(int nOffset) { m_nOffsetFromMainMenu = nOffset; }
+	int GetOffsetFromMainMenu() const { return m_nOffsetFromMainMenu; }
+	
+	// dimhotepus: TF2 backport.
+	void SetPaddingY( int nPadding ) { m_nPaddingY = nPadding; }
+	int GetPaddingY() const { return m_nPaddingY; }
+
 
 protected:
 	void OnKeyCodeReleased(KeyCode code) override;
@@ -128,7 +137,10 @@ private:
 	TextImage	*m_pCurrentKeyBinding; // An optional indicator for the key currently bound to this menu item
 
 	KeyValues *m_pUserData;
-
+	
+	// dimhotepus: TF2 backport.
+	int m_nOffsetFromMainMenu;
+	int m_nPaddingY;
 };
 
 } // namespace vgui

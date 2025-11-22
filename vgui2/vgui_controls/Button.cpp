@@ -75,7 +75,8 @@ void Button::Init()
 	m_sArmedSoundName = UTL_INVAL_SYMBOL;
 	m_sDepressedSoundName = UTL_INVAL_SYMBOL;
 	m_sReleasedSoundName = UTL_INVAL_SYMBOL;
-	SetTextInset(6, 0);
+	// dimhotepus: Scale UI.
+	SetTextInset( QuickPropScale( 6 ), 0);
 	SetMouseClickEnabled( MOUSE_LEFT, true );
 	SetButtonActivationType(ACTIVATE_ONPRESSEDANDRELEASED);
 
@@ -688,6 +689,16 @@ void Button::SetReleasedSound(const char *sound)
 	}
 }
 
+// dimhotepus: TF2 backport.
+[[nodiscard]] static inline int MouseCodeToMask( MouseCode code )
+{
+	// MouseCodes do not start at zero. Make them start at zero before trying to fit them into a 32 bit mask..
+	// Otherwise, you would be trying to set bit 107 of an integer, and that would be bad.
+	const int recode = code - MOUSE_FIRST;
+	AssertMsg1( recode >= 0 && recode < 32, "MouseCode %d is invalid and cannot fit into a 32-bit mask\n", code );
+	return 1 << recode;
+}
+
 //-----------------------------------------------------------------------------
 // Purpose: Set button to be mouse clickable or not.
 //-----------------------------------------------------------------------------
@@ -696,12 +707,14 @@ void Button::SetMouseClickEnabled(MouseCode code,bool state)
 	if(state)
 	{
 		//set bit to 1
-		_mouseClickMask|=1<<((int)(code+1));
+		// dimhotepus: TF2 backport.
+		_mouseClickMask |= MouseCodeToMask(code); //set bit to 1
 	}
 	else
 	{
 		//set bit to 0
-		_mouseClickMask&=~(1<<((int)(code+1)));
+		// dimhotepus: TF2 backport.
+		_mouseClickMask &= ~MouseCodeToMask(code); //set bit to 0
 	}	
 }
 
@@ -710,7 +723,8 @@ void Button::SetMouseClickEnabled(MouseCode code,bool state)
 //-----------------------------------------------------------------------------
 bool Button::IsMouseClickEnabled(MouseCode code)
 {
-	if(_mouseClickMask&(1<<((int)(code+1))))
+	// dimhotepus: TF2 backport.
+	if ( _mouseClickMask & MouseCodeToMask(code) )
 	{
 		return true;
 	}
@@ -844,6 +858,9 @@ void Button::GetSettings( KeyValues *outResourceData )
 //-----------------------------------------------------------------------------
 void Button::ApplySettings( KeyValues *inResourceData )
 {
+	// dimhotepus: TF2 backport. Scale UI.
+	SetTextInset( QuickPropScale( 6 ), 0 );
+
 	BaseClass::ApplySettings(inResourceData);
 
 	const char *cmd = inResourceData->GetString("command", "");
@@ -886,8 +903,11 @@ void Button::ApplySettings( KeyValues *inResourceData )
 	{
 		SetReleasedSound(sound);
 	}
-
-	_activationType = (ActivationType_t)inResourceData->GetInt( "button_activation_type", ACTIVATE_ONRELEASED );
+	
+	_activationType = (ActivationType_t)inResourceData->GetInt( "button_activation_type",
+		// dimhotepus: TF2 backport. ACTIVATE_ONPRESSEDANDRELEASED support.
+		this->IsToggleButton() ? ACTIVATE_ONRELEASED : ACTIVATE_ONPRESSEDANDRELEASED
+	);
 }
 
 
@@ -1003,8 +1023,13 @@ void Button::OnMouseReleased(MouseCode code)
 	if (!IsSelected() && _activationType == ACTIVATE_ONPRESSEDANDRELEASED)
 		return;
 
-	// it has to be both enabled and (mouse over the button or using a key) to fire
-	if ( IsEnabled() && ( GetVPanel() == input()->GetMouseOver() || _buttonFlags.IsFlagSet( BUTTON_KEY_DOWN ) ) )
+	Panel* pMouseOverPanel = ipanel()->GetPanel( input()->GetMouseOver(), GetControlsModuleName() );
+
+	// It has to be both enabled and (mouse over the button or using a key) to fire
+	// or the panel that the mouse is over has us as its mouse handler
+	if ( IsEnabled() && ( GetVPanel() == input()->GetMouseOver() || _buttonFlags.IsFlagSet( BUTTON_KEY_DOWN ) 
+		// dimhotepus: TF2 backport. 
+		|| ( pMouseOverPanel && pMouseOverPanel->GetMouseHandlerPanel() == this ) ) )
 	{
 		DoClick();
 	}
@@ -1090,11 +1115,13 @@ void Button::OnKeyCodeReleased( KeyCode keycode )
 //-----------------------------------------------------------------------------
 void Button::DrawFocusBorder(int tx0, int ty0, int tx1, int ty1)
 {
+	// dimhotepus: Scale UI.
+	const int nSize = QuickPropScale( 1 );
 	surface()->DrawSetColor(_keyboardFocusColor);
-	DrawDashedLine(tx0, ty0, tx1, ty0+1, 1, 1);		// top
-	DrawDashedLine(tx0, ty0, tx0+1, ty1, 1, 1);		// left
-	DrawDashedLine(tx0, ty1-1, tx1, ty1, 1, 1);		// bottom
-	DrawDashedLine(tx1-1, ty0, tx1, ty1, 1, 1);		// right
+	DrawDashedLine(tx0, ty0, tx1, ty0+1, nSize, nSize);		// top
+	DrawDashedLine(tx0, ty0, tx0+1, ty1, nSize, nSize);		// left
+	DrawDashedLine(tx0, ty1-1, tx1, ty1, nSize, nSize);		// bottom
+	DrawDashedLine(tx1-1, ty0, tx1, ty1, nSize, nSize);		// right
 }
 
 //-----------------------------------------------------------------------------
@@ -1104,5 +1131,8 @@ void Button::SizeToContents()
 {
 	int wide, tall;
 	GetContentSize(wide, tall);
-	SetSize(wide + Label::Content, tall + Label::Content);
+
+	// dimhotepus: Scale UI. 
+	const int nBuffer = QuickPropScale( Label::Content );
+	SetSize(wide + nBuffer, tall + nBuffer);
 }

@@ -7,7 +7,7 @@
 
 #include <vgui_controls/TreeView.h>
 
-#include <tier1/KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "tier1/utlstring.h"
 
 #include <vgui/Cursor.h>
@@ -527,12 +527,14 @@ TreeNode::TreeNode(Panel *parent, TreeView *pTreeView) :
     m_pExpandImage->SetPos(3, 1);
 
     m_pImagePanel = new TreeNodeImage(this, "TreeImage");
-    m_pImagePanel->SetPos(TREE_INDENT_AMOUNT, 3);
+    // dimhotepus: Scale UI.
+	m_pImagePanel->SetPos(QuickPropScale( TREE_INDENT_AMOUNT ), QuickPropScale( 3 ));
 
     m_pText = new TreeNodeText(this, "TreeNodeText",pTreeView);
     m_pText->SetMultiline(false);
     m_pText->SetEditable(false);
-    m_pText->SetPos(TREE_INDENT_AMOUNT*2, 0);
+    // dimhotepus: Scale UI.
+	m_pText->SetPos(QuickPropScale( TREE_INDENT_AMOUNT * 2 ), 0);
 	m_pText->AddActionSignalTarget( this );
 
     m_bExpand = false;
@@ -709,11 +711,13 @@ void TreeNode::PerformLayout()
 	if (m_pData->GetInt("SelectedImage", 0) == 0 &&
 		m_pData->GetInt("Image", 0) == 0)
 	{
-		width = TREE_INDENT_AMOUNT;
+		// dimhotepus: Scale UI.
+		width = QuickPropScale( TREE_INDENT_AMOUNT );
 	}
 	else
 	{
-		width = TREE_INDENT_AMOUNT * 2;
+		// dimhotepus: Scale UI.
+		width = QuickPropScale( TREE_INDENT_AMOUNT * 2);
 	}
 
 	m_pText->SetPos(width, 0);
@@ -721,7 +725,8 @@ void TreeNode::PerformLayout()
     int contentWide, contentTall;
 	m_pText->SetToFullWidth();
     m_pText->GetSize(contentWide, contentTall);
-	contentWide += 10;
+	// dimhotepus: Scale UI.
+	contentWide += QuickPropScale( 10 );
 	m_pText->SetSize( contentWide, m_pTreeView->GetRowHeight() );
     width += contentWide;
     SetSize(width, m_pTreeView->GetRowHeight());
@@ -893,7 +898,8 @@ void TreeNode::CalculateVisibleMaxWidth()
 	if (m_bExpand)
 	{
 		int childMaxWidth = GetMaxChildrenWidth();
-		childMaxWidth += TREE_INDENT_AMOUNT;
+		// dimhotepus: Scale UI.
+		childMaxWidth += QuickPropScale( TREE_INDENT_AMOUNT );
 
 		width = max(childMaxWidth, m_iNodeWidth);
 	}
@@ -923,8 +929,7 @@ void TreeNode::OnChildWidthChange()
 int TreeNode::GetMaxChildrenWidth()
 {
 	int maxWidth = 0;
-	intp i;
-    for (i=0;i<GetChildrenCount();i++)
+    for (intp i=0;i<GetChildrenCount();i++)
     {
 		int childWidth = m_Children[i]->GetVisibleMaxWidth();
 		if (childWidth > maxWidth)
@@ -943,9 +948,9 @@ int TreeNode::GetVisibleMaxWidth()
 intp TreeNode::GetDepth()
 {
     intp depth = 0;
-        TreeNode *pParent = GetParentNode();
+    TreeNode *pParent = GetParentNode();
     while (pParent)
-    {								
+    {
         depth++;
         pParent = pParent->GetParentNode();
     }
@@ -983,8 +988,7 @@ void TreeNode::SetVisible(bool state)
     BaseClass::SetVisible(state);
 
     bool bChildrenVisible = state && m_bExpand;
-    intp i;
-    for (i=0;i<GetChildrenCount();i++)
+    for (intp i=0;i<GetChildrenCount();i++)
     {
         m_Children[i]->SetVisible(bChildrenVisible);
     }
@@ -1081,8 +1085,7 @@ void TreeNode::OnSetFocus()
 
 intp TreeNode::GetPrevChildItemIndex( TreeNode *pCurrentChild )
 {
-	intp i;
-    for (i=0;i<GetChildrenCount();i++)
+    for (intp i=0;i<GetChildrenCount();i++)
     {
         if ( m_Children[i] == pCurrentChild )
 		{
@@ -1098,8 +1101,7 @@ intp TreeNode::GetPrevChildItemIndex( TreeNode *pCurrentChild )
 
 intp TreeNode::GetNextChildItemIndex( TreeNode *pCurrentChild )
 {
-	intp i;
-    for (i=0;i<GetChildrenCount();i++)
+    for (intp i=0;i<GetChildrenCount();i++)
     {
         if ( m_Children[i] == pCurrentChild )
 		{
@@ -1391,7 +1393,8 @@ void TreeNode::OnMouseDoublePressed( MouseCode code )
 	if (code == MOUSE_LEFT)
 	{
 		ScreenToLocal(x, y);
-		if (x > TREE_INDENT_AMOUNT)
+		// dimhotepus: Scale UI.
+		if (x > QuickPropScale( TREE_INDENT_AMOUNT ))
 		{
 			SetNodeExpanded(!m_bExpand);
 		}
@@ -1403,7 +1406,8 @@ bool TreeNode::IsDragEnabled() const
 	int x, y;
 	input()->GetCursorPos(x, y);
 	((TreeNode *)this)->ScreenToLocal(x, y);
-	if ( x < TREE_INDENT_AMOUNT )
+	// dimhotepus: Scale UI.
+	if ( x < QuickPropScale( TREE_INDENT_AMOUNT ) )
 		return false;
 
 	return BaseClass::IsDragEnabled();
@@ -1422,7 +1426,8 @@ void TreeNode::OnMouseReleased(MouseCode code)
 	input()->GetCursorPos(x, y);
 	ScreenToLocal(x, y);
 
-	if ( x < TREE_INDENT_AMOUNT )
+	// dimhotepus: Scale UI.
+	if ( x < QuickPropScale( TREE_INDENT_AMOUNT ) )
 		return;
 
 	bool ctrldown = (input()->IsKeyDown(KEY_LCONTROL) || input()->IsKeyDown(KEY_RCONTROL));
@@ -1489,7 +1494,8 @@ void TreeNode::OnMousePressed( MouseCode code)
 	if ( code == MOUSE_LEFT )
 	{
 		ScreenToLocal(x, y);
-		if ( x < TREE_INDENT_AMOUNT )
+		// dimhotepus: Scale UI.
+		if ( x < QuickPropScale( TREE_INDENT_AMOUNT ) )
 		{
 			if ( bExpandTree )
 			{
@@ -1593,9 +1599,8 @@ void TreeNode::FindNodesInRange_R( CUtlVector< TreeNode * >& list, bool& finishe
 		return;
 
 
-	intp i;
 	intp c = GetChildrenCount();
-    for (i=0;i<c;i++)
+    for (intp i=0;i<c;i++)
     {
 		m_Children[i]->FindNodesInRange_R( list, finished, foundStart, startIndex, endIndex );
     }
@@ -1617,9 +1622,9 @@ void TreeNode::PositionAndSetVisibleNodes(int &nStart, intp &nCount, int x, int 
         BaseClass::SetVisible(false);
     }
 
-    x += TREE_INDENT_AMOUNT;
-    intp i;
-    for (i=0;i<GetChildrenCount();i++)
+    // dimhotepus: Scale UI.
+	x += QuickPropScale( TREE_INDENT_AMOUNT );
+    for (intp i=0;i<GetChildrenCount();i++)
     {
         if (nCount > 0 && m_bExpand)
         {
@@ -1651,9 +1656,9 @@ TreeNode *TreeNode::FindItemUnderMouse( int &nStart, intp& nCount, int x, int &y
         nStart--;
     }
 
-    x += TREE_INDENT_AMOUNT;
-    intp i;
-    for (i=0;i<GetChildrenCount();i++)
+    // dimhotepus: Scale UI.
+	x += QuickPropScale( TREE_INDENT_AMOUNT );
+    for (intp i=0;i<GetChildrenCount();i++)
     {
         if (nCount > 0 && m_bExpand)
         {
@@ -1674,8 +1679,7 @@ intp TreeNode::CountVisibleIndex()
     intp nCount = 1; // myself
     if (GetParentNode())
     {
-        intp i;
-        for (i=0;i<GetParentNode()->GetChildrenCount();i++)
+        for (intp i=0;i<GetParentNode()->GetChildrenCount();i++)
         {
             if (GetParentNode()->m_Children[i] == this)
                 break;
@@ -1699,7 +1703,8 @@ DECLARE_BUILD_FACTORY( TreeView );
 TreeView::TreeView(Panel *parent, const char *panelName) : Panel(parent, panelName)
 {
 	m_bScrollbarExternal[ 0 ] = m_bScrollbarExternal[ 1 ] = false;
-    m_nRowHeight = 20;
+    // dimhotepus: Scale UI.
+	m_nRowHeight = QuickPropScale( 20 );
     m_pRootNode = NULL;
     m_pImageList = NULL;
     m_pSortFunc = NULL;
@@ -1777,7 +1782,8 @@ void TreeView::SetFont(HFont font)
 		return;
 
     m_Font = font;
-	m_nRowHeight = surface()->GetFontTall(font) + 2;
+	// dimhotepus: Scale UI.
+	m_nRowHeight = surface()->GetFontTall(font) + QuickPropScale( 2 );
 
     if (m_pRootNode)
     {
@@ -1994,8 +2000,7 @@ void TreeView::RemoveItem(intp itemIndex, bool bPromoteChildren, bool bFullDelet
 //-----------------------------------------------------------------------------
 void TreeView::RemoveAll()
 {
-    intp i;
-    for (i=0;i<m_NodeList.MaxElementIndex();i++)
+    for (intp i=0;i<m_NodeList.MaxElementIndex();i++)
     {
         if (!m_NodeList.IsValidIndex(i))
             continue;
@@ -2272,7 +2277,8 @@ void TreeView::PerformLayout()
 
 	// count the number of visible items
 	intp visibleItemCount = m_pRootNode->CountVisibleNodes();
-    int maxWidth = m_pRootNode->GetVisibleMaxWidth() + 10; // 10 pixel buffer
+    // dimhotepus: Scale UI.
+	int maxWidth = m_pRootNode->GetVisibleMaxWidth() + QuickPropScale( 10 ); // 10 pixel buffer
 
     vbarNeeded = visibleItemCount > nodesVisible;
 
@@ -2291,7 +2297,8 @@ void TreeView::PerformLayout()
     else
     {
         // we've got the vertical bar here, so shrink the width
-        hbarNeeded = maxWidth > (wide - (sbvw+2));
+        // dimhotepus: Scale UI.
+        hbarNeeded = maxWidth > (wide - (sbvw + QuickPropScale( 2 )));
 
         if (hbarNeeded)
         {
@@ -2305,7 +2312,8 @@ void TreeView::PerformLayout()
 	int vbarPos = 0;
     if (vbarNeeded)
     {
-        subPanelWidth -= (sbvw + 2);
+		// dimhotepus: Scale UI.
+        subPanelWidth -= (sbvw + QuickPropScale( 2 ));
         int barSize = tall;
         if (hbarNeeded)
         {
@@ -2316,13 +2324,14 @@ void TreeView::PerformLayout()
     	m_pVertScrollBar->SetVisible(true);
     	m_pVertScrollBar->SetEnabled(false);
     	m_pVertScrollBar->SetRangeWindow( nodesVisible );
-    	m_pVertScrollBar->SetRange( 0, visibleItemCount);	
+    	m_pVertScrollBar->SetRange( 0, visibleItemCount );
     	m_pVertScrollBar->SetButtonPressedScrollValue( 1 );
 
 		if ( !m_bScrollbarExternal[ 0 ] )
 		{
-    		m_pVertScrollBar->SetPos(wide - (sbvw + WINDOW_BORDER_WIDTH), 0);
-    		m_pVertScrollBar->SetSize(sbvw, barSize - 2);
+    		// dimhotepus: Scale UI.
+			m_pVertScrollBar->SetPos(wide - (sbvw + QuickPropScale( WINDOW_BORDER_WIDTH ) ), 0);
+    		m_pVertScrollBar->SetSize(sbvw, barSize - QuickPropScale( 2 ));
 		}
 
         // need to figure out
@@ -2337,7 +2346,8 @@ void TreeView::PerformLayout()
     int hbarPos = 0;
     if (hbarNeeded)
     {
-        subPanelHeight -= (sbhh + 2);
+        // dimhotepus: Scale UI.
+		subPanelHeight -= (sbhh + QuickPropScale( 2 ));
         int barSize = wide;
         if (vbarNeeded)
         {
@@ -2351,8 +2361,9 @@ void TreeView::PerformLayout()
 
 		if ( !m_bScrollbarExternal[ 1 ] )
 		{
-			m_pHorzScrollBar->SetPos(0, tall - (sbhh + WINDOW_BORDER_WIDTH));
-			m_pHorzScrollBar->SetSize(barSize - 2, sbhh);
+			// dimhotepus: Scale UI.
+			m_pHorzScrollBar->SetPos(0, tall - (sbhh + QuickPropScale( WINDOW_BORDER_WIDTH )));
+			m_pHorzScrollBar->SetSize(barSize - QuickPropScale( 2 ), sbhh);
 		}
 
         hbarPos = m_pHorzScrollBar->GetValue();
@@ -2504,7 +2515,8 @@ intp TreeView::FindItemUnderMouse( int mx, int my )
 {
 	mx = clamp( mx, 0, GetWide() - 1 );
 	my = clamp( my, 0, GetTall() - 1 );
-	if ( mx >= TREE_INDENT_AMOUNT )
+	// dimhotepus: Scale UI.
+	if ( mx >= QuickPropScale( TREE_INDENT_AMOUNT ) )
 	{
 		// Find what's under this position
 		// need to figure out
@@ -2534,7 +2546,8 @@ void TreeView::OnMousePressed( MouseCode code )
 		int mx, my;
 		input()->GetCursorPos( mx, my );
 		ScreenToLocal( mx, my );
-		if ( mx >= TREE_INDENT_AMOUNT )
+		// dimhotepus: Scale UI.
+		if ( mx >= QuickPropScale( TREE_INDENT_AMOUNT ) )
 		{
 			// Find what's under this position
 			// need to figure out

@@ -201,9 +201,10 @@ private:
 	struct TImageInfo
 	{
 		IImage *image;
-		short offset;
-		short xpos;
-		short width;
+		// dimhotepus: TF2 backport. short -> int.
+		int offset;
+		int xpos;
+		int width;
 	};
 	CUtlVector<TImageInfo> _imageDar;
 
@@ -225,7 +226,11 @@ private:
 	bool	m_bCenterWrap;
 	bool	m_bAllCaps;
 	bool	m_bAutoWideToContents;
+	// dimhotepus: TF2 backport.
+	bool	m_bAutoTallToContents;
 	bool	m_bAutoWideDirty;
+	// dimhotepus: TF2 backport.
+	bool	m_bAutoTallDirty;
 	bool	m_bUseProportionalInsets;
 
 };

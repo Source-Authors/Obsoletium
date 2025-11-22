@@ -64,9 +64,10 @@ void WizardSubPanel::ApplySettings(KeyValues *inResourceData)
 	bool bVisible = IsVisible();
 
 	BaseClass::ApplySettings(inResourceData);
-
-	m_iDesiredWide = inResourceData->GetInt("WizardWide", 0);
-	m_iDesiredTall = inResourceData->GetInt("WizardTall", 0);
+	
+	// dimhotepus: Scale UI.
+	m_iDesiredWide = QuickPropScale( inResourceData->GetInt("WizardWide", 0) );
+	m_iDesiredTall = QuickPropScale( inResourceData->GetInt("WizardTall", 0) );
 
 	if (GetWizardPanel() && m_iDesiredWide && m_iDesiredTall)
 	{
@@ -94,7 +95,7 @@ bool WizardSubPanel::GetDesiredSize(int &wide, int &tall)
 	wide = m_iDesiredWide;
 	tall = m_iDesiredTall;
 
-	return (m_iDesiredWide && m_iDesiredTall);
+	return m_iDesiredWide && m_iDesiredTall;
 }
 
 //-----------------------------------------------------------------------------

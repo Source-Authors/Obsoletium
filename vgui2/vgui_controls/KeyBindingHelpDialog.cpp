@@ -49,9 +49,10 @@ CKeyBindingHelpDialog::CKeyBindingHelpDialog( Panel *parent, Panel *panelToView,
 
 	m_pList = new ListPanel( this, "KeyBindings" );
 	m_pList->SetIgnoreDoubleClick( true );
-	m_pList->AddColumnHeader(0, "Action", "#KBEditorBindingName", 175, 0);
-	m_pList->AddColumnHeader(1, "Binding", "#KBEditorBinding", 175, 0);
-	m_pList->AddColumnHeader(2, "Description", "#KBEditorDescription", 300, 0);
+	// dimhotepus: Scale UI.
+	m_pList->AddColumnHeader(0, "Action", "#KBEditorBindingName", QuickPropScale( 175 ), 0);
+	m_pList->AddColumnHeader(1, "Binding", "#KBEditorBinding", QuickPropScale( 175 ), 0);
+	m_pList->AddColumnHeader(2, "Description", "#KBEditorDescription", QuickPropScale( 300 ), 0);
 
 	LoadControlSettings( "resource/KeyBindingHelpDialog.res" );
 
@@ -65,7 +66,8 @@ CKeyBindingHelpDialog::CKeyBindingHelpDialog( Panel *parent, Panel *panelToView,
 	}
 
 	SetSmallCaption( true );
-	SetMinimumSize( 400, 400 );
+	// dimhotepus: Scale UI.
+	SetMinimumSize( QuickPropScale( 400 ), QuickPropScale( 400 ) );
 	SetMinimizeButtonVisible( false );
 	SetMaximizeButtonVisible( false );
 	SetSizeable( true );

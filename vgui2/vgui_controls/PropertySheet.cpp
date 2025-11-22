@@ -321,16 +321,20 @@ public:
 		if ( m_pImage )
 		{
 			ClearImages();
-			m_pImage->SetImage(scheme()->GetImage(m_pszImageName, false));
+			// dimhotepus: Scale UI.
+			m_pImage->SetImage(scheme()->GetImage(m_pszImageName, false, IsProportional()));
 			AddImage( m_pImage->GetImage(), 2 );
 			int w, h;
 			m_pImage->GetSize( w, h );
-			w += m_pContextLabel ? 10 : 0;
+			// dimhotepus: Scale UI.
+			w += m_pContextLabel ? QuickPropScale( 10 ) : 0;
 			if ( m_pContextLabel )
 			{
-				m_pImage->SetPos( 10, 0 );
+				// dimhotepus: Scale UI.
+				m_pImage->SetPos( QuickPropScale( 10 ), 0 );
 			}
-			SetSize( w + 4, h + 2 );
+			// dimhotepus: Scale UI.
+			SetSize( w + QuickPropScale( 4 ), h + QuickPropScale( 2 ) );
 		}
 		else
 		{
@@ -339,14 +343,16 @@ public:
 			GetSize(wide, tall);
 			GetContentSize(contentWide, contentTall);
 
-			wide = max(m_bMaxTabWidth, contentWide + 10);  // 10 = 5 pixels margin on each side
-			wide += m_pContextLabel ? 10 : 0;
+			// dimhotepus: Scale UI.
+			wide = max(m_bMaxTabWidth, contentWide + QuickPropScale( 10 ));  // 10 = 5 pixels margin on each side
+			wide += m_pContextLabel ? QuickPropScale( 10 ) : 0;
 			SetSize(wide, tall);
 		}
 
 		if ( m_pContextLabel )
 		{
-			SetTextInset( 12, 0 );
+			// dimhotepus: Scale UI.
+			SetTextInset( QuickPropScale( 12 ), 0 );
 		}
 	}
 
@@ -471,7 +477,8 @@ public:
 		{
 			int w, h;
 			GetSize( w, h );
-			m_pContextLabel->SetBounds( 0, 0, 10, h );
+			// dimhotepus: Scale UI.
+			m_pContextLabel->SetBounds( 0, 0, QuickPropScale( 10 ), h );
 		}
 	}
 };
@@ -489,7 +496,8 @@ PropertySheet::PropertySheet(
 {
 	_activePage = NULL;
 	_activeTab = NULL;
-	_tabWidth = 64;
+	// dimhotepus: Scale UI.
+	_tabWidth = QuickPropScale( 64 );
 	_activeTabIndex = 0;
 	_showTabs = true;
 	_combo = NULL;
@@ -517,7 +525,8 @@ PropertySheet::PropertySheet(Panel *parent, const char *panelName, ComboBox *com
 {
 	_activePage = NULL;
 	_activeTab = NULL;
-	_tabWidth = 64;
+	// dimhotepus: Scale UI.
+	_tabWidth = QuickPropScale( 64 );
 	_activeTabIndex = 0;
 	_combo=combo;
 	_combo->AddActionSignalTarget(this);
@@ -561,14 +570,30 @@ void PropertySheet::SetDraggableTabs( bool state )
 void PropertySheet::SetSmallTabs( bool state )
 {
 	m_bSmallTabs = state;
-	m_tabFont = scheme()->GetIScheme( GetScheme() )->GetFont( m_bSmallTabs ? "DefaultVerySmall" : "Default" );
-	int c = m_PageTabs.Count();
-	for ( int i = 0; i < c ; ++i )
+	// dimhotepus: Scale UI.
+	if ( m_bOverrideTabFont )
+		return;
+	m_tabFont = scheme()->GetIScheme( GetScheme() )->GetFont( m_bSmallTabs ? "DefaultVerySmall" : "Default", IsProportional() );
+	for ( auto *tab : m_PageTabs )
 	{
-		PageTab *tab = m_PageTabs[ i ];
 		Assert( tab );
 		tab->SetFont( m_tabFont );
 	}
+}
+
+// dimhotepus: TF2 backport. Scale UI.
+void PropertySheet::SetTabFont( vgui::HFont hFont )
+{
+	if ( m_tabFont == hFont )
+		return;
+
+	m_tabFont = hFont;
+	for ( auto *tab : m_PageTabs )
+	{
+		Assert( tab );
+		tab->SetFont( m_tabFont );
+	}
+	m_bOverrideTabFont = true;
 }
 
 //-----------------------------------------------------------------------------
@@ -899,13 +924,14 @@ void PropertySheet::ApplySchemeSettings(IScheme *pScheme)
 	SetBorder(pBorder);
 	m_flPageTransitionEffectTime = strtof(pScheme->GetResourceString("PropertySheet.TransitionEffectTime"), nullptr);
 
-	m_tabFont = pScheme->GetFont( m_bSmallTabs ? "DefaultVerySmall" : "Default" );
+	// dimhotepus: Scale UI.
+	m_tabFont = pScheme->GetFont( m_bSmallTabs ? "DefaultVerySmall" : "Default", IsProportional() );
 
 	if ( m_pTabKV )
 	{
-		for (int i = 0; i < m_PageTabs.Count(); i++)
+		for ( auto *tab : m_PageTabs )
 		{
-			m_PageTabs[i]->ApplySettings( m_pTabKV );
+			tab->ApplySettings( m_pTabKV );
 		}
 	}
 
@@ -916,16 +942,9 @@ void PropertySheet::ApplySchemeSettings(IScheme *pScheme)
 	//		This led to problems when we changes resolutions, so now we recalcuate the absolute 
 	//      size from the relative size each time (based on proportionality)
 	//=============================================================================
-	if ( IsProportional() )
-	{
-		m_iTabHeight = scheme()->GetProportionalScaledValueEx( GetScheme(), m_iSpecifiedTabHeight );
-		m_iTabHeightSmall = scheme()->GetProportionalScaledValueEx( GetScheme(), m_iSpecifiedTabHeightSmall );
-	}
-	else
-	{
-		m_iTabHeight = m_iSpecifiedTabHeight;
-		m_iTabHeightSmall = m_iSpecifiedTabHeightSmall;
-	}
+	// dimhotepus: Scale UI.
+	m_iTabHeight = QuickPropScale( m_iSpecifiedTabHeight );
+	m_iTabHeightSmall = QuickPropScale( m_iSpecifiedTabHeightSmall );
 	//=============================================================================
 	// HPE_END
 	//=============================================================================
@@ -976,17 +995,22 @@ void PropertySheet::PaintBorder()
 		return;
 
 	// draw the border, but with a break at the active tab
+	// dimhotepus: TF2 backport. Scale UI.
+	int nRepeats = max( QuickPropScale( 1 ), 1 );
+
+	// draw the border, but with a break at the active tab
 	int px = 0, py = 0, pwide = 0, ptall = 0;
 	if (_activeTab)
 	{
 		_activeTab->GetBounds(px, py, pwide, ptall);
-		ptall -= 1;
+		ptall -= nRepeats;
 	}
 
 	// draw the border underneath the buttons, with a break
 	int wide, tall;
 	GetSize(wide, tall);
-	border->Paint(0, py + ptall, wide, tall, IBorder::SIDE_TOP, px + 1, px + pwide - 1);
+	// dimhotepus: TF2 backport. Scale UI.
+	border->Paint2(0, py + ptall, wide, tall, IBorder::SIDE_TOP, px + nRepeats, px + pwide - nRepeats, nRepeats);
 }
 
 //-----------------------------------------------------------------------------
@@ -1004,51 +1028,55 @@ void PropertySheet::PerformLayout()
 
 		if(_showTabs)
 		{
-			_activePage->SetBounds(0, tabHeight, wide, tall - tabHeight);
+			// dimhotepus: TF2 backport. Scale UI.
+			_activePage->SetBounds(0, tabHeight + m_iPageYOffset, wide, tall - tabHeight);
 		}
 		else
 		{
-			_activePage->SetBounds(0, 0, wide, tall );
+			// dimhotepus: TF2 backport. Scale UI.
+			_activePage->SetBounds(0, m_iPageYOffset, wide, tall );
 		}
 		_activePage->InvalidateLayout();
 	}
 
-	
-	int xtab;
 	int limit = m_PageTabs.Count();
-
-	xtab = m_iTabXIndent;
+	int xtab = m_iTabXIndent;
 
 	// draw the visible tabs
 	if (_showTabs)
 	{
 		for (int i = 0; i < limit; i++)
 		{
-			int tabHeight = IsSmallTabs() ? (m_iTabHeightSmall-1) : (m_iTabHeight-1);
+			// dimhotepus: TF2 backport. Scale UI.
+			int tabHeight = IsSmallTabs() ? (m_iTabHeightSmall-QuickPropScale( 1 )) : (m_iTabHeight-QuickPropScale( 1 ));
 
-            m_PageTabs[i]->GetSize(wide, tall);
+			int width, tall;
+			m_PageTabs[i]->GetSize(width, tall);
 
 			if ( m_bTabFitText )
 			{
 				m_PageTabs[i]->SizeToContents();
-				wide = m_PageTabs[i]->GetWide();
+				width = m_PageTabs[i]->GetWide();
 
 				int iXInset, iYInset;
 				m_PageTabs[i]->GetTextInset( &iXInset, &iYInset );
-				wide += (iXInset * 2);
+				width += (iXInset * 2);
 			}
 
 			if (m_PageTabs[i] == _activeTab)
 			{
 				// active tab is taller
-				_activeTab->SetBounds(xtab, 2, wide, tabHeight);
+				// dimhotepus: TF2 backport. Scale UI.
+				_activeTab->SetBounds(xtab, QuickPropScale( 2 ) + m_iPageYOffset, width, tabHeight);
 			}
 			else
 			{
-				m_PageTabs[i]->SetBounds(xtab, 4, wide, tabHeight - 2);
+				// dimhotepus: TF2 backport. Scale UI.
+				m_PageTabs[i]->SetBounds(xtab, QuickPropScale( 4 ) + m_iPageYOffset, width, tabHeight - QuickPropScale( 2 ));
 			}
 			m_PageTabs[i]->SetVisible(true);
-			xtab += (wide + 1) + m_iTabXDelta;
+			// dimhotepus: TF2 backport. Scale UI.
+			xtab += (width + QuickPropScale( 1 )) + m_iTabXDelta;
 		}
 	}
 	else
@@ -1259,7 +1287,7 @@ void PropertySheet::ChangeActiveTab( int index )
 	{
 		ivgui()->PostMessage(_activePage->GetVPanel(), new KeyValues("PageHide"), GetVPanel());
 		KeyValues *msg = new KeyValues("PageTabActivated");
-		msg->SetPtr("panel", (Panel *)NULL);
+		msg->SetPtr("panel", nullptr);
 		ivgui()->PostMessage(_activePage->GetVPanel(), msg, GetVPanel());
 	}
 	if (_activeTab)
@@ -1606,7 +1634,8 @@ void PropertySheet::OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, C
 	GetSize( w, h );
 
 	int tabHeight = IsSmallTabs() ? m_iTabHeightSmall : m_iTabHeight;
-	h = tabHeight + 4;
+	// dimhotepus: TF2 backport. Scale UI.
+	h = tabHeight + QuickPropScale( 4 );
 
 	x = y = 0;
 	LocalToScreen( x, y );
@@ -1614,7 +1643,8 @@ void PropertySheet::OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, C
 	surface()->DrawSetColor( GetDropFrameColor() );
 	// Draw 2 pixel frame
 	surface()->DrawOutlinedRect( x, y, x + w, y + h );
-	surface()->DrawOutlinedRect( x+1, y+1, x + w-1, y + h-1 );
+	// dimhotepus: TF2 backport. Scale UI.
+	surface()->DrawOutlinedRect( x+ QuickPropScale( 1 ), y+QuickPropScale( 1 ), x + w-QuickPropScale( 1 ), y + h-QuickPropScale( 1 ) );
 
 	if ( !IsDroppable( msglist ) )
 	{
@@ -1629,8 +1659,9 @@ void PropertySheet::OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, C
 	// Draw a fake new tab...
 
 	x = 0;
-	y = 2;
-	w = 1;
+	// dimhotepus: TF2 backport. Scale UI.
+	y = QuickPropScale( 2 );
+	w = QuickPropScale( 1 );
 	h = tabHeight;
 
 	int last = m_PageTabs.Count();
@@ -1641,7 +1672,8 @@ void PropertySheet::OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, C
 
 	// Compute left edge of "fake" tab
 
-	x += ( w + 1 );
+	// dimhotepus: TF2 backport. Scale UI.
+	x += ( w + QuickPropScale( 1 ) );
 
 	// Compute size of new panel
 	KeyValues *data = msglist[ 0 ];
@@ -1649,7 +1681,8 @@ void PropertySheet::OnDroppablePanelPaint( CUtlVector< KeyValues * >& msglist, C
 	Assert( text );
 
 	PageTab *fakeTab = new PageTab( this, "FakeTab", text, NULL, _tabWidth, NULL, false );
-	fakeTab->SetBounds( x, 4, w, tabHeight - 4 );
+	// dimhotepus: TF2 backport. Scale UI.
+	fakeTab->SetBounds( x, QuickPropScale( 4 ), w, tabHeight - QuickPropScale( 4 ) );
 	fakeTab->SetFont( m_tabFont );
 	SETUP_PANEL( fakeTab );
 	fakeTab->Repaint();

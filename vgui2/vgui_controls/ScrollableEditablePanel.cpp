@@ -26,8 +26,9 @@ ScrollableEditablePanel::ScrollableEditablePanel( vgui::Panel *pParent, vgui::Ed
 	m_pChild->SetParent( this );
 
 	m_pScrollBar = new vgui::ScrollBar( this, "VerticalScrollBar", true ); 
-	m_pScrollBar->SetWide( 16 );
-	m_pScrollBar->SetAutoResize( PIN_TOPRIGHT, AUTORESIZE_DOWN, 0, 0, -16, 0 );
+	// dimhotepus: Scale UI.
+	m_pScrollBar->SetWide( QuickPropScale( 16 ) );
+	m_pScrollBar->SetAutoResize( PIN_TOPRIGHT, AUTORESIZE_DOWN, 0, 0, QuickPropScale( -16 ), 0 );
 	m_pScrollBar->AddActionSignalTarget( this );
 }
 
