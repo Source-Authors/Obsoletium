@@ -24,7 +24,7 @@ static char token[ 1024 ];
 
 extern IVEngineClient *engine;
 
-void StripFloatTrailingZeros(char *str)
+static void StripFloatTrailingZeros(char *str)
 {
 	// scan for a '.'
 	char *period = strchr(str, '.');
@@ -54,7 +54,7 @@ void StripFloatTrailingZeros(char *str)
 }
 
 /////////////////////
-objtypedesc_t objtypes[] =
+static constexpr objtypedesc_t objtypes[] =
 {
 	{ O_BOOL  , "BOOL" }, 
 	{ O_NUMBER, "NUMBER" }, 
@@ -197,7 +197,7 @@ CleanFloat
 Removes any ".000" from the end of floats
 ===================
 */
-char * CleanFloat( float val )
+static char * CleanFloat( float val )
 {
 	static int curstring  = 0;
 	static char string[2][32];
