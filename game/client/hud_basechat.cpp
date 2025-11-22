@@ -1638,6 +1638,7 @@ void CBaseHudChat::LevelInit( const char *newmap )
 	{
 	case 0:
 		m_iFilterFlags |= CHAT_FILTER_ACHIEVEMENT;
+        [[fallthrough]];
 		// fall through
 	case kChatFilterVersion:
 		break;
