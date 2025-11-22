@@ -7,8 +7,6 @@
 
 #include "vgui_controls/URLLabel.h"
 
-#include "tier1/KeyValues.h"
-
 #include "vgui/ISurface.h"
 #include "vgui/ISystem.h"
 #include "vgui/MouseCode.h"
@@ -16,13 +14,15 @@
 
 #include "vgui_controls/TextImage.h"
 
+#include "tier1/KeyValues.h"
+
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
 using namespace vgui;
 
 // dimhotepus: Add parent to scale UI.
-vgui::Panel *URLLabel_Factory( vgui::Panel* parent )
+static vgui::Panel *URLLabel_Factory( vgui::Panel* parent )
 {
 	return new URLLabel(parent, NULL, "URLLabel", NULL);
 }
@@ -33,10 +33,10 @@ DECLARE_BUILD_FACTORY_CUSTOM( URLLabel, URLLabel_Factory );
 //-----------------------------------------------------------------------------
 URLLabel::URLLabel(Panel *parent, const char *panelName, const char *text, const char *pszURL) : Label(parent, panelName, text)
 {
-    m_pszURL = NULL;
+    m_pszURL = nullptr;
 	m_bUnderline = false;
     m_iURLSize = 0;
-    if (pszURL && pszURL[0])
+    if ( !Q_isempty( pszURL ) )
     {
         SetURL(pszURL);
     }
@@ -47,7 +47,7 @@ URLLabel::URLLabel(Panel *parent, const char *panelName, const char *text, const
 //-----------------------------------------------------------------------------
 URLLabel::URLLabel(Panel *parent, const char *panelName, const wchar_t *wszText, const char *pszURL) : Label(parent, panelName, wszText)
 {
-    m_pszURL = NULL;
+    m_pszURL = nullptr;
 	m_bUnderline = false;
     m_iURLSize = 0;
     if ( !Q_isempty( pszURL ) )
