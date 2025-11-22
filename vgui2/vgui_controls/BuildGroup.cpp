@@ -990,7 +990,8 @@ void BuildGroup::LoadControlSettings(const char *controlResourceName, const char
 	delete [] m_pResourceName;
 	m_pResourceName = V_strdup(controlResourceName);
 
-	if (pathID)
+	// dimhotepus: Can be called with pathID == m_pResourcePathID, so protect against use-after-free.
+	if (pathID && pathID != m_pResourcePathID)
 	{
 		delete [] m_pResourcePathID;
 		m_pResourcePathID = V_strdup(pathID);
