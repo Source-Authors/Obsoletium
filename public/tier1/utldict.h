@@ -37,7 +37,7 @@ enum EDictCompareType
 //-----------------------------------------------------------------------------
 // A dictionary mapping from symbol to structure
 //-----------------------------------------------------------------------------
-template <class T, class I = intp > 
+template <class T, class I = intp, template <typename, typename, typename> class MapType = CUtlMap>
 class CUtlDict
 {
 public:
@@ -99,7 +99,7 @@ public:
 	using IndexType_t = I;
 
 protected:
-	using DictElementMap_t = CUtlMap<const char *, T, I>;
+	using DictElementMap_t = MapType<const char *, T, I>;
 	DictElementMap_t m_Elements;
 };
 
@@ -107,8 +107,8 @@ protected:
 //-----------------------------------------------------------------------------
 // constructor, destructor
 //-----------------------------------------------------------------------------
-template <class T, class I>
-CUtlDict<T, I>::CUtlDict( int compareType, intp growSize, intp initSize ) : m_Elements( growSize, initSize )
+template <class T, class I, template <typename, typename, typename> class MapType>
+CUtlDict<T, I, MapType>::CUtlDict( int compareType, intp growSize, intp initSize ) : m_Elements( growSize, initSize )
 {
 	if ( compareType == k_eDictCompareTypeFilenames )
 	{
@@ -124,14 +124,14 @@ CUtlDict<T, I>::CUtlDict( int compareType, intp growSize, intp initSize ) : m_El
 	}
 }
 
-template <class T, class I> 
-CUtlDict<T, I>::~CUtlDict()
+template <class T, class I, template <typename, typename, typename> class MapType> 
+CUtlDict<T, I, MapType>::~CUtlDict()
 {
 	Purge();
 }
 
-template <class T, class I>
-inline void CUtlDict<T, I>::EnsureCapacity( intp num )        
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline void CUtlDict<T, I, MapType>::EnsureCapacity( intp num )        
 { 
 	return m_Elements.EnsureCapacity( num ); 
 }
@@ -139,14 +139,14 @@ inline void CUtlDict<T, I>::EnsureCapacity( intp num )
 //-----------------------------------------------------------------------------
 // gets particular elements
 //-----------------------------------------------------------------------------
-template <class T, class I>
-inline T& CUtlDict<T, I>::Element( I i )        
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline T& CUtlDict<T, I, MapType>::Element( I i )        
 { 
 	return m_Elements[i]; 
 }
 
-template <class T, class I>
-inline const T& CUtlDict<T, I>::Element( I i ) const  
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline const T& CUtlDict<T, I, MapType>::Element( I i ) const  
 { 
 	return m_Elements[i]; 
 }
@@ -154,32 +154,32 @@ inline const T& CUtlDict<T, I>::Element( I i ) const
 //-----------------------------------------------------------------------------
 // gets element names
 //-----------------------------------------------------------------------------
-template <class T, class I>
-inline char *CUtlDict<T, I>::GetElementName( I i )
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline char *CUtlDict<T, I, MapType>::GetElementName( I i )
 {
 	return (char *)m_Elements.Key( i );
 }
 
-template <class T, class I>
-inline char const *CUtlDict<T, I>::GetElementName( I i ) const
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline char const *CUtlDict<T, I, MapType>::GetElementName( I i ) const
 {
 	return m_Elements.Key( i );
 }
 
-template <class T, class I>
-inline T& CUtlDict<T, I>::operator[]( I i )        
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline T& CUtlDict<T, I, MapType>::operator[]( I i )        
 { 
 	return Element(i); 
 }
 
-template <class T, class I>
-inline const T & CUtlDict<T, I>::operator[]( I i ) const  
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline const T & CUtlDict<T, I, MapType>::operator[]( I i ) const  
 { 
 	return Element(i); 
 }
 
-template <class T, class I>
-inline void CUtlDict<T, I>::SetElementName( I i, char const *pName )
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline void CUtlDict<T, I, MapType>::SetElementName( I i, char const *pName )
 {
 	MEM_ALLOC_CREDIT_CLASS();
 	// TODO:  This makes a copy of the old element
@@ -192,8 +192,8 @@ inline void CUtlDict<T, I>::SetElementName( I i, char const *pName )
 //-----------------------------------------------------------------------------
 // Num elements
 //-----------------------------------------------------------------------------
-template <class T, class I>
-inline	I CUtlDict<T, I>::Count() const          
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline	I CUtlDict<T, I, MapType>::Count() const          
 { 
 	return m_Elements.Count(); 
 }
@@ -201,8 +201,8 @@ inline	I CUtlDict<T, I>::Count() const
 //-----------------------------------------------------------------------------
 // Number of allocated slots
 //-----------------------------------------------------------------------------
-template <class T, class I>
-inline I CUtlDict<T, I>::MaxElement() const
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline I CUtlDict<T, I, MapType>::MaxElement() const
 {
 	return m_Elements.MaxElement();
 }
@@ -210,8 +210,8 @@ inline I CUtlDict<T, I>::MaxElement() const
 //-----------------------------------------------------------------------------
 // Checks if a node is valid and in the tree
 //-----------------------------------------------------------------------------
-template <class T, class I>
-inline	bool CUtlDict<T, I>::IsValidIndex( I i ) const 
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline	bool CUtlDict<T, I, MapType>::IsValidIndex( I i ) const 
 {
 	return m_Elements.IsValidIndex(i);
 }
@@ -220,8 +220,8 @@ inline	bool CUtlDict<T, I>::IsValidIndex( I i ) const
 //-----------------------------------------------------------------------------
 // Invalid index
 //-----------------------------------------------------------------------------
-template <class T, class I>
-inline constexpr I CUtlDict<T, I>::InvalidIndex()         
+template <class T, class I, template <typename, typename, typename> class MapType>
+inline constexpr I CUtlDict<T, I, MapType>::InvalidIndex()         
 { 
 	return DictElementMap_t::InvalidIndex(); 
 }
@@ -230,8 +230,8 @@ inline constexpr I CUtlDict<T, I>::InvalidIndex()
 //-----------------------------------------------------------------------------
 // Delete a node from the tree
 //-----------------------------------------------------------------------------
-template <class T, class I>
-void CUtlDict<T, I>::RemoveAt(I elem) 
+template <class T, class I, template <typename, typename, typename> class MapType>
+void CUtlDict<T, I, MapType>::RemoveAt(I elem) 
 {
 	free( (void *)m_Elements.Key( elem ) );
 	m_Elements.RemoveAt(elem);
@@ -241,7 +241,7 @@ void CUtlDict<T, I>::RemoveAt(I elem)
 //-----------------------------------------------------------------------------
 // remove a node in the tree
 //-----------------------------------------------------------------------------
-template <class T, class I> void CUtlDict<T, I>::Remove( const char *search )
+template <class T, class I, template <typename, typename, typename> class MapType> void CUtlDict<T, I, MapType>::Remove( const char *search )
 {
 	I node = Find( search );
 	if (node != InvalidIndex())
@@ -254,8 +254,8 @@ template <class T, class I> void CUtlDict<T, I>::Remove( const char *search )
 //-----------------------------------------------------------------------------
 // Removes all nodes from the tree
 //-----------------------------------------------------------------------------
-template <class T, class I>
-void CUtlDict<T, I>::RemoveAll()
+template <class T, class I, template <typename, typename, typename> class MapType>
+void CUtlDict<T, I, MapType>::RemoveAll()
 {
 	typename DictElementMap_t::IndexType_t index = m_Elements.FirstInorder();
 	while ( index != m_Elements.InvalidIndex() )
@@ -267,15 +267,15 @@ void CUtlDict<T, I>::RemoveAll()
 	m_Elements.RemoveAll();
 }
 
-template <class T, class I>
-void CUtlDict<T, I>::Purge()
+template <class T, class I, template <typename, typename, typename> class MapType>
+void CUtlDict<T, I, MapType>::Purge()
 {
 	RemoveAll();
 }
 
 
-template <class T, class I>
-void CUtlDict<T, I>::PurgeAndDeleteElements()
+template <class T, class I, template <typename, typename, typename> class MapType>
+void CUtlDict<T, I, MapType>::PurgeAndDeleteElements()
 {
 	// Delete all the elements.
 	I index = m_Elements.FirstInorder();
@@ -293,15 +293,15 @@ void CUtlDict<T, I>::PurgeAndDeleteElements()
 //-----------------------------------------------------------------------------
 // inserts a node into the tree
 //-----------------------------------------------------------------------------
-template <class T, class I> 
-I CUtlDict<T, I>::Insert( const char *pName, const T &element )
+template <class T, class I, template <typename, typename, typename> class MapType> 
+I CUtlDict<T, I, MapType>::Insert( const char *pName, const T &element )
 {
 	MEM_ALLOC_CREDIT_CLASS();
 	return m_Elements.Insert( strdup( pName ), element );
 }
 
-template <class T, class I> 
-I CUtlDict<T, I>::Insert( const char *pName )
+template <class T, class I, template <typename, typename, typename> class MapType> 
+I CUtlDict<T, I, MapType>::Insert( const char *pName )
 {
 	MEM_ALLOC_CREDIT_CLASS();
 	return m_Elements.Insert( strdup( pName ) );
@@ -311,8 +311,8 @@ I CUtlDict<T, I>::Insert( const char *pName )
 //-----------------------------------------------------------------------------
 // finds a node in the tree
 //-----------------------------------------------------------------------------
-template <class T, class I> 
-I CUtlDict<T, I>::Find( const char *pName ) const
+template <class T, class I, template <typename, typename, typename> class MapType> 
+I CUtlDict<T, I, MapType>::Find( const char *pName ) const
 {
 	MEM_ALLOC_CREDIT_CLASS();
 	if ( pName )
@@ -324,8 +324,8 @@ I CUtlDict<T, I>::Find( const char *pName ) const
 //-----------------------------------------------------------------------------
 // returns true if we already have this node
 //-----------------------------------------------------------------------------
-template <class T, class I> 
-bool CUtlDict<T, I>::HasElement( const char *pName ) const
+template <class T, class I, template <typename, typename, typename> class MapType> 
+bool CUtlDict<T, I, MapType>::HasElement( const char *pName ) const
 {
 	if ( pName )
 		return m_Elements.IsValidIndex( m_Elements.Find( pName ) );
@@ -337,14 +337,14 @@ bool CUtlDict<T, I>::HasElement( const char *pName ) const
 //-----------------------------------------------------------------------------
 // Iteration methods
 //-----------------------------------------------------------------------------
-template <class T, class I> 
-I CUtlDict<T, I>::First() const
+template <class T, class I, template <typename, typename, typename> class MapType> 
+I CUtlDict<T, I, MapType>::First() const
 {
 	return m_Elements.FirstInorder();
 }
 
-template <class T, class I> 
-I CUtlDict<T, I>::Next( I i ) const
+template <class T, class I, template <typename, typename, typename> class MapType> 
+I CUtlDict<T, I, MapType>::Next( I i ) const
 {
 	return m_Elements.NextInorder(i);
 }
