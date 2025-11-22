@@ -22,24 +22,6 @@ extern "C"
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: Comparison function used in query redblack tree
-//-----------------------------------------------------------------------------
-static bool QueryLessFunc( const struct challenge_s &item1, const struct challenge_s &item2 )
-{
-	// compare port then ip
-	if ( item1.addr.GetPort() < item2.addr.GetPort() )
-		return true;
-	else if ( item1.addr.GetPort() > item2.addr.GetPort() )
-		return false;
-
-	int ip1 = item1.addr.GetIPNetworkByteOrder();
-	int ip2 = item2.addr.GetIPNetworkByteOrder();
-
-	return ip1 < ip2;
-}
-
-
-//-----------------------------------------------------------------------------
 // Purpose: Constructor
 //-----------------------------------------------------------------------------
 CDialogGameInfo::CDialogGameInfo( vgui::Panel *parent, int serverIP, int queryPort, unsigned short connectionPort, const char *pszConnectCode ) : 
