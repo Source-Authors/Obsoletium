@@ -106,8 +106,8 @@ static CUtlLinkedList<C_BaseEntity*, unsigned short> g_TeleportList;
 class CPredictableList : public IPredictableList
 {
 public:
-	virtual C_BaseEntity *GetPredictable( int slot );
-	virtual int GetPredictableCount( void );
+	C_BaseEntity *GetPredictable( intp slot ) override;
+	intp GetPredictableCount( void ) override;
 
 protected:
 	void	AddToPredictableList( ClientEntityHandle_t add );
@@ -191,16 +191,16 @@ void CPredictableList::RemoveFromPredictablesList( ClientEntityHandle_t remove )
 // Input  : slot - 
 // Output : C_BaseEntity
 //-----------------------------------------------------------------------------
-C_BaseEntity *CPredictableList::GetPredictable( int slot )
+C_BaseEntity *CPredictableList::GetPredictable( intp slot )
 {
 	return cl_entitylist->GetBaseEntityFromHandle( m_Predictables[ slot ] );
 }
 
 //-----------------------------------------------------------------------------
 // Purpose: 
-// Output : int
+// Output : intp
 //-----------------------------------------------------------------------------
-int CPredictableList::GetPredictableCount( void )
+intp CPredictableList::GetPredictableCount( void )
 {
 	return m_Predictables.Count();
 }
@@ -212,10 +212,9 @@ int CPredictableList::GetPredictableCount( void )
 //-----------------------------------------------------------------------------
 static C_BaseEntity *FindPreviouslyCreatedEntity( CPredictableId& testId )
 {
-	int c = predictables->GetPredictableCount();
+	intp c = predictables->GetPredictableCount();
 
-	int i;
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		C_BaseEntity *e = predictables->GetPredictable( i );
 		if ( !e || !e->IsClientCreated() )
@@ -3030,8 +3029,8 @@ bool C_BaseEntity::ShouldInterpolate()
 
 void C_BaseEntity::ProcessTeleportList()
 {
-	int iNext;
-	for ( int iCur=g_TeleportList.Head(); iCur != g_TeleportList.InvalidIndex(); iCur=iNext )
+	unsigned short iNext;
+	for ( auto iCur=g_TeleportList.Head(); iCur != g_TeleportList.InvalidIndex(); iCur=iNext )
 	{
 		iNext = g_TeleportList.Next( iCur );
 		C_BaseEntity *pCur = g_TeleportList[iCur];
@@ -3100,8 +3099,8 @@ void C_BaseEntity::ProcessInterpolatedList()
 	CheckInterpolatedVarParanoidMeasurement();
 
 	// Interpolate the minimal set of entities that need it.
-	int iNext;
-	for ( int iCur=g_InterpolationList.Head(); iCur != g_InterpolationList.InvalidIndex(); iCur=iNext )
+	unsigned short iNext;
+	for ( auto iCur=g_InterpolationList.Head(); iCur != g_InterpolationList.InvalidIndex(); iCur=iNext )
 	{
 		iNext = g_InterpolationList.Next( iCur );
 		C_BaseEntity *pCur = g_InterpolationList[iCur];
@@ -3247,8 +3246,8 @@ void C_BaseEntity::AddVisibleEntities()
 	VPROF_BUDGET( "C_BaseEntity::AddVisibleEntities", VPROF_BUDGETGROUP_WORLD_RENDERING );
 
 	// Let non-dormant client created predictables get added, too
-	int c = predictables->GetPredictableCount();
-	for ( int i = 0 ; i < c ; i++ )
+	intp c = predictables->GetPredictableCount();
+	for ( intp i = 0 ; i < c ; i++ )
 	{
 		C_BaseEntity *pEnt = predictables->GetPredictable( i );
 		if ( !pEnt )

@@ -206,9 +206,9 @@ abstract_class IPredictableList
 {
 public:
 	// Get predictables by index
-	virtual CBaseEntity		*GetPredictable( int slot ) = 0;
+	virtual CBaseEntity		*GetPredictable( intp slot ) = 0;
 	// Get count of predictables
-	virtual int				GetPredictableCount( void ) = 0;
+	virtual intp			GetPredictableCount( void ) = 0;
 };
 
 // Expose interface to rest of .dll

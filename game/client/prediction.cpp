@@ -179,11 +179,11 @@ void CPrediction::ShutdownPredictables( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	// Transfer intermediate data from other predictables
-	int c = predictables->GetPredictableCount();
-	int i;
+	intp c = predictables->GetPredictableCount();
+	intp i;
 
-	int shutdown_count = 0;
-	int release_count = 0;
+	intp shutdown_count = 0;
+	intp release_count = 0;
 
 	for ( i = c - 1; i >= 0 ; i-- )
 	{
@@ -208,7 +208,7 @@ void CPrediction::ShutdownPredictables( void )
 	if ( ( release_count > 0 ) || 
 		 ( shutdown_count > 0 ) )
 	{
-		Msg( "Shutdown %i predictable entities and %i client-created entities\n",
+		Msg( "Shutdown %zd predictable entities and %zd client-created entities\n",
 			shutdown_count,
 			release_count );
 	}
@@ -225,9 +225,8 @@ void CPrediction::ReinitPredictables( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
 	// Go through all entities and init any eligible ones
-	int i;
 	int c = ClientEntityList().GetHighestEntityIndex();
-	for ( i = 0; i <= c; i++ )
+	for ( int i = 0; i <= c; i++ )
 	{
 		C_BaseEntity *e = ClientEntityList().GetBaseEntity( i );
 		if ( !e )
@@ -239,7 +238,7 @@ void CPrediction::ReinitPredictables( void )
 		e->CheckInitPredictable( "ReinitPredictables" );
 	}
 
-	Msg( "Reinitialized %i predictable entities\n",
+	Msg( "Reinitialized %zd predictable entities\n",
 		predictables->GetPredictableCount() );
 #endif
 }
@@ -267,7 +266,7 @@ void CPrediction::PreEntityPacketReceived ( int commands_acknowledged, int curre
 #if !defined( NO_ENTITY_PREDICTION )
 #if defined( _DEBUG )
 	char sz[ 32 ];
-	Q_snprintf( sz, sizeof( sz ), "preentitypacket%d", commands_acknowledged );
+	V_sprintf_safe( sz, "preentitypacket%d", commands_acknowledged );
 	PREDICTION_TRACKVALUECHANGESCOPE( sz );
 #endif
 	VPROF( "CPrediction::PreEntityPacketReceived" );
@@ -289,9 +288,8 @@ void CPrediction::PreEntityPacketReceived ( int commands_acknowledged, int curre
 		return;
 
 	// Transfer intermediate data from other predictables
-	int c = predictables->GetPredictableCount();
-	int i;
-	for ( i = 0; i < c; i++ )
+	intp c = predictables->GetPredictableCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		C_BaseEntity *ent = predictables->GetPredictable( i );
 		if ( !ent )
@@ -325,9 +323,8 @@ void CPrediction::PostEntityPacketReceived( void )
 		return;
 
 	// Transfer intermediate data from other predictables
-	int c = predictables->GetPredictableCount();
-	int i;
-	for ( i = 0; i < c; i++ )
+	intp c = predictables->GetPredictableCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		C_BaseEntity *ent = predictables->GetPredictable( i );
 		if ( !ent )
@@ -431,8 +428,8 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 		np.time_to_live = 2.0f;
 
 		// Transfer intermediate data from other predictables
-		int c = predictables->GetPredictableCount();
-		int i;
+		intp i;
+		intp c = predictables->GetPredictableCount();
 		for ( i = 0; i < c; i++ )
 		{
 			C_BaseEntity *ent = predictables->GetPredictable( i );
@@ -452,7 +449,7 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 				char sz[32];
 				if ( ent->entindex() == -1 )
 				{
-					Q_snprintf( sz, sizeof( sz ), "handle %u", (unsigned int)ent->GetClientHandle().ToInt() );
+					V_sprintf_safe( sz, "handle %u", (unsigned int)ent->GetClientHandle().ToInt() );
 				}
 				else
 				{
@@ -502,8 +499,8 @@ void CPrediction::PostNetworkDataReceived( int commands_acknowledged )
 			char sz1[32];
 			char sz2[32];
 
-			Q_strncpy( sz1, Q_pretifymem( (float)totalsize ), sizeof( sz1 ) );
-			Q_strncpy( sz2, Q_pretifymem( (float)totalsize_intermediate ), sizeof( sz2 ) );
+			V_strcpy_safe( sz1, Q_pretifymem( (float)totalsize ) );
+			V_strcpy_safe( sz2, Q_pretifymem( (float)totalsize_intermediate ) );
 
 			engine->Con_NXPrintf( &np, "%15s %27s (%s / %s)  %14s", 
 				"totals:", 
@@ -991,8 +988,8 @@ void CPrediction::RemoveStalePredictedEntities( int sequence_number )
 	int oldest_allowable_command = sequence_number;
 
 	// Walk backward due to deletion from UtlVector
-	int c = predictables->GetPredictableCount();
-	int i;
+	intp c = predictables->GetPredictableCount();
+	intp i;
 	for ( i = c - 1; i >= 0; i-- )
 	{
 		C_BaseEntity *ent = predictables->GetPredictable( i );
@@ -1086,9 +1083,8 @@ void CPrediction::RestoreOriginalEntityState( void )
 	Assert( C_BaseEntity::IsAbsRecomputationsEnabled() );
 
 	// Transfer intermediate data from other predictables
-	int pc = predictables->GetPredictableCount();
-	int p;
-	for ( p = 0; p < pc; p++ )
+	intp pc = predictables->GetPredictableCount();
+	for ( intp p = 0; p < pc; p++ )
 	{
 		C_BaseEntity *ent = predictables->GetPredictable( p );
 		if ( !ent )
@@ -1125,10 +1121,8 @@ void CPrediction::RunSimulation( int current_command, float curtime, CUserCmd *c
 
 	IPredictionSystem::SuppressEvents( !IsFirstTimePredicted() );
 
-	int i;
-
 	// Make sure simulation occurs at most once per entity per usercmd
-	for ( i = 0; i < predictables->GetPredictableCount(); i++ )
+	for ( intp i = 0; i < predictables->GetPredictableCount(); i++ )
 	{
 		C_BaseEntity *entity = predictables->GetPredictable( i );
 		if ( entity )
@@ -1138,7 +1132,7 @@ void CPrediction::RunSimulation( int current_command, float curtime, CUserCmd *c
 	}
 
 	// Don't used cached numpredictables since entities can be created mid-prediction by the player
-	for ( i = 0; i < predictables->GetPredictableCount(); i++ )
+	for ( intp i = 0; i < predictables->GetPredictableCount(); i++ )
 	{
 		// Always reset
 		gpGlobals->curtime		= curtime;
@@ -1205,11 +1199,10 @@ void CPrediction::RunSimulation( int current_command, float curtime, CUserCmd *c
 void CPrediction::Untouch( void )
 {
 #if !defined( NO_ENTITY_PREDICTION )
-	int numpredictables = predictables->GetPredictableCount();
+	intp numpredictables = predictables->GetPredictableCount();
 
 	// Loop through all entities again, checking their untouch if flagged to do so
-	int i;
-	for ( i = 0; i < numpredictables; i++ )
+	for ( intp i = 0; i < numpredictables; i++ )
 	{
 		C_BaseEntity *entity = predictables->GetPredictable( i );
 		if ( !entity )
@@ -1244,11 +1237,10 @@ void CPrediction::StorePredictionResults( int predicted_frame )
 	VPROF( "CPrediction::StorePredictionResults" );
 	PREDICTION_TRACKVALUECHANGESCOPE( "save" );
 
-	int i;
-	int numpredictables = predictables->GetPredictableCount();
+	intp numpredictables = predictables->GetPredictableCount();
 
 	// Now save off all of the results
-	for ( i = 0; i < numpredictables; i++ )
+	for ( intp i = 0; i < numpredictables; i++ )
 	{
 		C_BaseEntity *entity = predictables->GetPredictable( i );
 		if ( !entity )
@@ -1290,9 +1282,8 @@ void CPrediction::ShiftIntermediateDataForward( int slots_to_remove, int number_
 	if ( !cl_predict->GetInt() )
 		return;
 
-	int c = predictables->GetPredictableCount();
-	int i;
-	for ( i = 0; i < c; i++ )
+	intp c = predictables->GetPredictableCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		C_BaseEntity *ent = predictables->GetPredictable( i );
 		if ( !ent )
@@ -1326,9 +1317,8 @@ void CPrediction::RestoreEntityToPredictedFrame( int predicted_frame )
 	if ( !cl_predict->GetInt() )
 		return;
 
-	int c = predictables->GetPredictableCount();
-	int i;
-	for ( i = 0; i < c; i++ )
+	intp c = predictables->GetPredictableCount();
+	for ( intp i = 0; i < c; i++ )
 	{
 		C_BaseEntity *ent = predictables->GetPredictable( i );
 		if ( !ent )
@@ -1426,7 +1416,7 @@ int CPrediction::ComputeFirstCommandToExecute( bool received_new_world_update, i
 				float flPrev = gpGlobals->curtime;
 				gpGlobals->curtime = pLocalPlayer->GetTimeBase() - TICK_INTERVAL;
 				
-				for ( int i = 0; i < predictables->GetPredictableCount(); i++ )
+				for ( intp i = 0; i < predictables->GetPredictableCount(); i++ )
 				{
 					C_BaseEntity *entity = predictables->GetPredictable( i );
 					if ( entity )
