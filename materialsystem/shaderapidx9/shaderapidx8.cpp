@@ -6680,11 +6680,11 @@ void CShaderAPIDx8::SetupTextureGroup( ShaderAPITextureHandle_t hTexture, const 
 
 		AssertMsg( maxCounterValue - static_cast<uintp>(pTexture->GetMemUsage()) >=
 			*pTexture->m_pTextureGroupCounterGlobal,
-			"TexGroup_global_%s counter overflow. %s (total) + %s (texture) > %s (max).",
+			"TexGroup_global_%s counter overflow. %s (total) + %s (texture) > %s bytes (max).",
 			pTexture->m_TextureGroupName.String(),
-			V_pretifymem( *pTexture->m_pTextureGroupCounterGlobal, 2, true ),
-			V_pretifymem( pTexture->GetMemUsage(), 2, true ),
-			V_pretifymem( maxCounterValue, 2, true ) );
+			V_pretifymem( static_cast<double>( *pTexture->m_pTextureGroupCounterGlobal ), 2, true ),
+			V_pretifymem( static_cast<double>( pTexture->GetMemUsage() ), 2, true ),
+			V_pretifynum( maxCounterValue ) );
 		*pTexture->m_pTextureGroupCounterGlobal += pTexture->GetMemUsage();
 	}
 }
