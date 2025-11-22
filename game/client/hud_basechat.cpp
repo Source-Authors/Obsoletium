@@ -229,7 +229,8 @@ void CBaseHudChatLine::ApplySchemeSettings(vgui::IScheme *pScheme)
 {
 	BaseClass::ApplySchemeSettings(pScheme);
 
-	m_hFont = pScheme->GetFont( "Default" );
+	// dimhotepus: Scale UI.
+	m_hFont = pScheme->GetFont( "Default", IsProportional() );
 
 #ifdef HL1_CLIENT_DLL
 	SetBgColor( Color( 0, 0, 0, 0 ) );
@@ -240,8 +241,8 @@ void CBaseHudChatLine::ApplySchemeSettings(vgui::IScheme *pScheme)
 	SetBgColor( Color( 0, 0, 0, 100 ) );
 #endif
 
-
-	m_hFontMarlett = pScheme->GetFont( "Marlett" );
+	// dimhotepus: Scale UI.
+	m_hFontMarlett = pScheme->GetFont( "Marlett", IsProportional() );
 
 	m_clrText = pScheme->GetColor( "FgColor", GetFgColor() );
 	SetFont( m_hFont );
@@ -396,7 +397,8 @@ void CBaseHudChatInputLine::ApplySchemeSettings(vgui::IScheme *pScheme)
 	BaseClass::ApplySchemeSettings(pScheme);
 	
 	// FIXME:  Outline
-	vgui::HFont hFont = pScheme->GetFont( "ChatFont" );
+	// dimhotepus: Scale UI.
+	vgui::HFont hFont = pScheme->GetFont( "ChatFont", IsProportional() );
 
 	m_pPrompt->SetFont( hFont );
 	m_pInput->SetFont( hFont );
@@ -406,7 +408,8 @@ void CBaseHudChatInputLine::ApplySchemeSettings(vgui::IScheme *pScheme)
 	SetPaintBackgroundEnabled( true );
 	m_pPrompt->SetPaintBackgroundEnabled( true );
 	m_pPrompt->SetContentAlignment( vgui::Label::a_west );
-	m_pPrompt->SetTextInset( 2, 0 );
+	// dimhotepus: Scale UI.
+	m_pPrompt->SetTextInset( QuickPropScale( 2 ), 0 );
 
 	m_pInput->SetMouseInputEnabled( true );
 
@@ -454,8 +457,8 @@ void CBaseHudChatInputLine::PerformLayout()
 	int w,h;
 	m_pPrompt->GetContentSize( w, h); 
 	m_pPrompt->SetBounds( 0, 0, w, tall );
-
-	m_pInput->SetBounds( w + 2, 0, wide - w - 2 , tall );
+	// dimhotepus: Scale UI.
+	m_pInput->SetBounds( w + QuickPropScale( 2 ), 0, wide - w - QuickPropScale( 2 ), tall );
 }
 
 vgui::Panel *CBaseHudChatInputLine::GetInputPanel( void )
@@ -592,8 +595,8 @@ CHudChatHistory::CHudChatHistory( vgui::Panel *pParent, const char *panelName ) 
 void CHudChatHistory::ApplySchemeSettings( vgui::IScheme *pScheme )
 {
 	BaseClass::ApplySchemeSettings( pScheme );
-
-	SetFont( pScheme->GetFont( "ChatFont" ) );
+	// dimhotepus: Scale UI.
+	SetFont( pScheme->GetFont( "ChatFont", IsProportional() ) );
 	SetAlpha( 255 );
 }
 
@@ -1015,7 +1018,7 @@ void CBaseHudChat::OnTick( void )
 	if ( line )
 	{
 		vgui::HFont font = line->GetFont();
-		m_iFontHeight = vgui::surface()->GetFontTall( font ) + 2;
+		m_iFontHeight = vgui::surface()->GetFontTall( font ) + QuickPropScale( 2 );
 
 		// Put input area at bottom
 
