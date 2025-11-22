@@ -712,6 +712,8 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 CDescription::CDescription( )
 {
 	pObjList = nullptr;
+	m_pszHintText = nullptr;
+	m_pszDescriptionType = nullptr;
 }
 
 CDescription::~CDescription()
