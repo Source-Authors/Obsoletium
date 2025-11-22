@@ -52,8 +52,6 @@ enum BotGUIChatterType
 static const char *chatterArg[] = { "normal", "minimal", "radio", "off", NULL };
 
 
-extern void UTIL_StripInvalidCharacters( char *pszInput );
-
 
 //-----------------------------------------------------------------------------
 void CCreateMultiplayerGameBotPage::SetJoinTeamCombo( const char *team )

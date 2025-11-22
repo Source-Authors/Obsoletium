@@ -181,44 +181,11 @@ void CScriptObject::AddItem( CScriptListItem *pItem )
 	}
 }
 
-/*
-===================
-UTIL_StripInvalidCharacters
-
-Removes any possible formatting codes and double quote characters from the input string
-===================
-*/
-void UTIL_StripInvalidCharacters( char *pszInput, int maxlen )
-{
-	char szOutput[4096];
-	char *pIn, *pOut;
-	
-	pIn = pszInput;
-	pOut = szOutput;
-
-	*pOut = '\0';
-
-	while ( *pIn )
-	{
-		if ( ( *pIn != '"' ) &&
-			 ( *pIn != '%' ) )
-		{
-			*pOut++ = *pIn;
-		}
-		pIn++;
-	}
-
-	*pOut = '\0';
-
-	// Copy back over, in place
-	Q_strncpy( pszInput, szOutput, maxlen );
-}
-
 void FixupString( char *inString, int maxlen )
 {
 	char szBuffer[ 4096 ];
 	Q_strncpy( szBuffer, inString, sizeof( szBuffer ) );
-	UTIL_StripInvalidCharacters( szBuffer, sizeof( szBuffer ) );
+	V_StripInvalidCharacters( szBuffer );
 	Q_strncpy( inString, szBuffer, maxlen );
 }
 
@@ -317,8 +284,8 @@ void CScriptObject::WriteToScriptFile( FileHandle_t fp )
 		pItem = pListItems;
 		while ( pItem )
 		{
-			UTIL_StripInvalidCharacters( pItem->szItemText, sizeof( pItem->szItemText ) );
-			UTIL_StripInvalidCharacters( pItem->szValue, sizeof( pItem->szValue ) );
+			V_StripInvalidCharacters( pItem->szItemText );
+			V_StripInvalidCharacters( pItem->szValue );
 			g_pFullFileSystem->FPrintf( fp, "\t\t\t\"%s\" \"%s\"\r\n",
 				pItem->szItemText, pItem->szValue );
 
@@ -394,7 +361,7 @@ void CScriptObject::WriteToFile( FileHandle_t fp )
 
 		if ( pItem )
 		{
-			UTIL_StripInvalidCharacters( pItem->szValue, sizeof( pItem->szValue ) );
+			V_StripInvalidCharacters( pItem->szValue );
 			g_pFullFileSystem->FPrintf( fp, "\"%s\"\r\n", pItem->szValue );
 		}
 		else  //Couln't find index
@@ -433,8 +400,8 @@ void CScriptObject::WriteToConfig( )
 		V_to_chars( szValue, fVal );
 		break;
 	case O_STRING:
-		Q_snprintf( szValue, sizeof( szValue ), "\"%s\"", (char *)curValue );
-		UTIL_StripInvalidCharacters( szValue, sizeof( szValue ) );
+		Q_snprintf( szValue, sizeof( szValue ), "\"%s\"", curValue );
+		V_StripInvalidCharacters( szValue );
 		break;
 	case O_LIST:
 		pItem = pListItems;
@@ -449,7 +416,7 @@ void CScriptObject::WriteToConfig( )
 		if ( pItem )
 		{
 			Q_snprintf( szValue, sizeof( szValue ), "%s", pItem->szValue );
-			UTIL_StripInvalidCharacters( szValue, sizeof( szValue ) );
+			V_StripInvalidCharacters( szValue );
 		}
 		else  //Couldn't find index
 		{

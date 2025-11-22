@@ -150,6 +150,4 @@ public:
 	void WriteFileHeader( FileHandle_t fp ) override; 
 };
 
-void UTIL_StripInvalidCharacters( char *pszInput, int maxlen );
-
 #endif // SCRIPTOBJECT_H

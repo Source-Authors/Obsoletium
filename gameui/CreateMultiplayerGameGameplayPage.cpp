@@ -377,7 +377,7 @@ void CCreateMultiplayerGameGameplayPage::GatherCurrentValues()
 		}
 
 		// Remove double quotes and % characters
-		UTIL_StripInvalidCharacters( szValue, sizeof( szValue ) );
+		V_StripInvalidCharacters( szValue );
 
 		Q_strncpy( strValue, szValue, sizeof( strValue ) );
 

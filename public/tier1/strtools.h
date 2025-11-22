@@ -1605,6 +1605,32 @@ V_to_chars(OUT_Z_ARRAY char (&buffer)[size], TFloat value)
 	return std::errc::value_too_large;
 }
 
+// Removes any possible formatting codes and double quote characters from the input string
+template<intp maxlen>
+void V_StripInvalidCharacters( INOUT_Z_ARRAY char (&pszInput)[maxlen] )
+{
+	char szOutput[maxlen];
+	
+	char *pIn = pszInput;
+	char *pOut = szOutput;
+
+	*pOut = '\0';
+
+	while ( *pIn )
+	{
+		if ( ( *pIn != '"' ) && ( *pIn != '%' ) )
+		{
+			*pOut++ = *pIn;
+		}
+		pIn++;
+	}
+
+	*pOut = '\0';
+
+	// Copy back over, in place
+	V_strcpy_safe( pszInput, szOutput );
+}
+
 #endif // !defined( VSTDLIB_DLL_EXPORT )
 
 

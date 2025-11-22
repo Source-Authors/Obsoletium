@@ -556,7 +556,7 @@ void CTFAdvancedOptionsDialog::GatherCurrentValues()
 		}
 
 		// Remove double quotes and % characters
-		UTIL_StripInvalidCharacters( szValue, sizeof(szValue) );
+		V_StripInvalidCharacters( szValue );
 
 		V_strcpy_safe( strValue, szValue );
 
