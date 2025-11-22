@@ -85,7 +85,8 @@ void ImagePanel::SetImage(const char *imageName)
 		return;
 
 	delete [] m_pszImageName;
-	m_pszImageName = V_strdup(imageName);
+	// dimhotepus: Protect against nullptr.
+	m_pszImageName = imageName ? V_strdup(imageName) : nullptr;
 	InvalidateLayout(false, true); // force applyschemesettings to run
 }
 
