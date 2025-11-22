@@ -198,7 +198,7 @@ void CBotNPC::PrecacheArmorParts( void )
 
 	// filename is local to game dir for Steam, so we need to prepend game dir
 	char gamePath[256];
-	engine->GetGameDir( gamePath, 256 );
+	engine->GetGameDir( gamePath );
 
 	char filename[256];
 	Q_snprintf( filename, sizeof( filename ), "%s\\models\\bots\\knight\\armor_parts.txt", gamePath );
@@ -238,7 +238,7 @@ void CBotNPC::InstallArmorParts( void )
 
 	// filename is local to game dir for Steam, so we need to prepend game dir
 	char gamePath[256];
-	engine->GetGameDir( gamePath, 256 );
+	engine->GetGameDir( gamePath );
 
 	char filename[256];
 	Q_snprintf( filename, sizeof( filename ), "%s\\models\\bots\\knight\\armor_parts.txt", gamePath );

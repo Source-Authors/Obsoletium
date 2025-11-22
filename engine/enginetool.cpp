@@ -149,7 +149,7 @@ public:
 	virtual void		Con_NXPrintf( const struct con_nprint_s *info, const char *fmt, ... );
 
 	// Get the current game directory (hl2, tf2, hl1, cstrike, etc.)
-	virtual void        GetGameDir( char *szGetGameDir, int maxlength );
+	virtual void        GetGameDir( OUT_Z_CAP(maxlength) char *szGetGameDir, int maxlength );
 
 // Do we need separate rects for the 3d "viewport" vs. the tools surface??? and can we control viewports from
 	virtual void		GetScreenSize( int& width, int &height );
@@ -566,7 +566,7 @@ void CEngineTool::Con_NXPrintf( const struct con_nprint_s *info, const char *fmt
 	::Con_NXPrintf( info, "%s", buf );
 }
 
-void CEngineTool::GetGameDir( char *szGetGameDir, int maxlength )
+void CEngineTool::GetGameDir( OUT_Z_CAP(maxlength) char *szGetGameDir, int maxlength )
 {
 	Q_strncpy( szGetGameDir, com_gamedir, maxlength );
 }

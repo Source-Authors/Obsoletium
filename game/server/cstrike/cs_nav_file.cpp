@@ -891,7 +891,7 @@ const char *CNavMesh::GetFilename( void ) const
 {
 	// filename is local to game dir for Steam, so we need to prepend game dir for regular file save
 	char gamePath[256];
-	engine->GetGameDir( gamePath, 256 );
+	engine->GetGameDir( gamePath );
 
 	static char filename[256];
 	Q_snprintf( filename, sizeof( filename ), "%s\\maps\\%s.nav", gamePath, STRING( gpGlobals->mapname ) );

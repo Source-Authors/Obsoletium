@@ -382,7 +382,7 @@ bool CBaseGameStats::SaveToFileNOW( bool bForceSyncWrite /* = false */ )
 	{
 		// filename is local to game dir for Steam, so we need to prepend game dir for regular file save
 		char gamePath[256];
-		engine->GetGameDir( gamePath, 256 );
+		engine->GetGameDir( gamePath );
 		Q_StripTrailingSlash( gamePath );
 		Q_snprintf( fullpath, sizeof( fullpath ), "%s/%s", gamePath, GetStatSaveFileName() );
 		Q_strlower( fullpath );
@@ -970,7 +970,7 @@ void CBaseGameStats::SetHL2UnlockedChapterStatistic( void )
 	char const *relative = "cfg/config.cfg";
 	char fullpath[ 512 ];
 	char gamedir[256];
-	engine->GetGameDir( gamedir, 256 );
+	engine->GetGameDir( gamedir );
 	Q_snprintf( fullpath, sizeof( fullpath ), "%s/../hl2/%s", gamedir, relative );
 
 	if ( filesystem->FileExists( fullpath ) )

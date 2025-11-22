@@ -1716,7 +1716,7 @@ CON_COMMAND_F( nav_dump_selected_set_positions, "Write the (x,y,z) coordinates o
 
 	// filename is local to game dir for Steam, so we need to prepend game dir for regular file save
 	char gamePath[256];
-	engine->GetGameDir( gamePath, 256 );
+	engine->GetGameDir( gamePath );
 
 	char filename[256];
 	Q_snprintf( filename, sizeof( filename ), "%s\\maps\\%s_xyz.txt", gamePath, STRING( gpGlobals->mapname ) );
@@ -1742,7 +1742,7 @@ CON_COMMAND_F( nav_show_dumped_positions, "Show the (x,y,z) coordinate positions
 
 	// filename is local to game dir for Steam, so we need to prepend game dir for regular file save
 	char gamePath[256];
-	engine->GetGameDir( gamePath, 256 );
+	engine->GetGameDir( gamePath );
 
 	char filename[256];
 	Q_snprintf( filename, sizeof( filename ), "%s\\maps\\%s_xyz.txt", gamePath, STRING( gpGlobals->mapname ) );

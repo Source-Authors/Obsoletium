@@ -296,6 +296,11 @@ public:
 
 	// Get the current game directory (hl2, tf2, hl1, cstrike, etc.)
 	virtual void        GetGameDir( char *szGetGameDir, int maxlength ) = 0;
+	template<int maxlength>
+	void				GetGameDir( OUT_Z_ARRAY char (&szGetGameDir)[maxlength] )
+	{
+		return GetGameDir( szGetGameDir, maxlength );
+	}
 
 	// Used by AI node graph code to determine if .bsp and .ain files are out of date
 	virtual int 		CompareFileTime( const char *filename1, const char *filename2, int *iCompare ) = 0;

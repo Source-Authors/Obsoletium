@@ -989,7 +989,7 @@ const char *CNavMesh::GetFilename( void ) const
 {
 	// filename is local to game dir for Steam, so we need to prepend game dir for regular file save
 	char gamePath[256];
-	engine->GetGameDir( gamePath, 256 );
+	engine->GetGameDir( gamePath );
 
 	// persistant return value
 	static char filename[256];
