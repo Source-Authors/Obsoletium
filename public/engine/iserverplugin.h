@@ -99,7 +99,12 @@ public:
 
 	// Client is connecting to server ( set retVal to false to reject the connection )
 	//	You can specify a rejection message by writing it into reject
-	virtual PLUGIN_RESULT	ClientConnect( bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ) = 0;
+	virtual PLUGIN_RESULT	ClientConnect( bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen ) = 0;
+	template<int maxrejectlen>
+	PLUGIN_RESULT			ClientConnect( bool *bAllowConnect, edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_ARRAY char (&reject)[maxrejectlen] )
+	{
+		return ClientConnect( bAllowConnect, pEntity, pszName, pszAddress, reject, maxrejectlen );
+	}
 
 	// The client has typed a command at the console
 	virtual PLUGIN_RESULT	ClientCommand( edict_t *pEntity, const CCommand &args ) = 0;

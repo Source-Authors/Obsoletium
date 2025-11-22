@@ -81,7 +81,12 @@ public:
 	virtual void			ClientPutInServer( edict_t *pEntity, char const *playername );
 	virtual void			SetCommandClient( int index );
 	virtual void			ClientSettingsChanged( edict_t *pEdict );
-	virtual bool			ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen );
+	virtual bool			ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen );
+	template<int maxrejectlen>
+	bool					ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_ARRAY char (&reject)[maxrejectlen] )
+	{
+		return ClientConnect( pEntity, pszName, pszAddress, reject, maxrejectlen );
+	}
 	virtual void			ClientCommand( edict_t *pEntity, const CCommand &args );
 	virtual void			NetworkIDValidated( const char *pszUserName, const char *pszNetworkID );
 	virtual void			OnQueryCvarValueFinished( QueryCvarCookie_t iCookie, edict_t *pPlayerEntity, EQueryCvarValueStatus eStatus, const char *pCvarName, const char *pCvarValue );

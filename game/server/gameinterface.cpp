@@ -2623,7 +2623,7 @@ EXPOSE_SINGLE_INTERFACE_GLOBALVAR(CServerGameClients, IServerGameClients, INTERF
 //			the player was not allowed to connect.
 // Output : Returns TRUE if player is allowed to join, FALSE if connection is denied.
 //-----------------------------------------------------------------------------
-bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+bool CServerGameClients::ClientConnect( edict_t *pEdict, const char *pszName, const char *pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen )
 {	
 	if ( !g_pGameRules )
 		return false;

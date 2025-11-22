@@ -130,7 +130,7 @@ public:
 	// If ClientConnected returns FALSE, the connection is rejected and the user is provided the reason specified in
 	//  svRejectReason
 	// Only the client's name and remote address are provided to the dll for verification.
-	bool ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ) override;
+	bool ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen ) override;
 	void InitHUD( CBasePlayer *pl ) override;		// the client dll is ready for updating
 	void ClientDisconnected( edict_t *pClient ) override;
 

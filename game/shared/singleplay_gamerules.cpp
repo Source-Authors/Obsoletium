@@ -265,8 +265,13 @@ bool CSingleplayRules::Damage_ShouldNotBleed( int iDmgType )
 
 	//=========================================================
 	//=========================================================
-	bool CSingleplayRules::ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+	bool CSingleplayRules::ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen )
 	{
+		// dimhotepus: Ensure rejection reason is empty.
+		if ( reject && maxrejectlen )
+		{
+			*reject = '\0';
+		}
 		return true;
 	}
 

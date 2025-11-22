@@ -707,7 +707,12 @@ public:
 
 	// Client is connecting to server ( return false to reject the connection )
 	//	You can specify a rejection message by writing it into reject
-	virtual bool			ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen ) = 0;
+	virtual bool			ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen ) = 0;
+	template<int maxrejectlen>
+	bool					ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_ARRAY char (&reject)[maxrejectlen] )
+	{
+		return ClientConnect( pEntity, pszName, pszAddress, reject, maxrejectlen );
+	}
 
 	// Client is going active
 	// If bLoadGame is true, don't spawn the player because its state is already setup.

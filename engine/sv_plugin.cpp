@@ -476,7 +476,7 @@ void CServerPlugin::ClientSettingsChanged( edict_t *pEdict )
 	serverGameClients->ClientSettingsChanged( pEdict );
 }
 
-bool CServerPlugin::ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+bool CServerPlugin::ClientConnect( edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen )
 {
 	PLUGIN_RESULT result = PLUGIN_CONTINUE;
 	bool bAllowConnect = true, bSavedRetVal = true, bRetValOverridden = false;

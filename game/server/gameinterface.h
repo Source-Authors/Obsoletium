@@ -28,7 +28,7 @@ extern INetworkStringTable *g_pStringTableServerPopFiles;
 class CServerGameClients : public IServerGameClients
 {
 public:
-	virtual bool			ClientConnect( edict_t *pEntity, char const* pszName, char const* pszAddress, char *reject, int maxrejectlen ) override;
+	virtual bool			ClientConnect( edict_t *pEntity, char const* pszName, char const* pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen ) override;
 	virtual void			ClientActive( edict_t *pEntity, bool bLoadGame ) override;
 	virtual void			ClientDisconnect( edict_t *pEntity ) override;
 	virtual void			ClientPutInServer( edict_t *pEntity, const char *playername ) override;

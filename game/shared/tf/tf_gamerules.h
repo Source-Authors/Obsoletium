@@ -454,7 +454,7 @@ public:
 	CObjectSentrygun *FindSentryGunWithMostKills( int team = TEAM_ANY ) const;
 
 	// Client connection/disconnection
-	virtual bool ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen );
+	virtual bool ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen );
 
 	virtual bool ShouldSkipAutoScramble( void )
 	{ 

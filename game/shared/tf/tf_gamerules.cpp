@@ -17268,7 +17268,7 @@ CObjectSentrygun *CTFGameRules::FindSentryGunWithMostKills( int team ) const
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CTFGameRules::ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, char *reject, int maxrejectlen )
+bool CTFGameRules::ClientConnected( edict_t *pEntity, const char *pszName, const char *pszAddress, OUT_Z_CAP(maxrejectlen) char *reject, int maxrejectlen )
 {
 	if ( IsMannVsMachineMode() )
 	{
