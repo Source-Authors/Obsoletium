@@ -19,9 +19,9 @@
 
 #if defined( PLATFORM_64BITS )
 
-#if defined (PLATFORM_WINDOWS) && defined( _XM_SSE_INTRINSICS_ )
+#if defined (PLATFORM_WINDOWS) && defined( PLATFORM_SSE_INTRINSICS )
 #else  // PLATFORM_WINDOWS
-typedef __int128_t int128;
+using int128 = __int128_t;
 #define int128_zero() 0
 #endif// PLATFORM_WINDOWS
 

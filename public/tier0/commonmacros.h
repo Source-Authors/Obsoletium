@@ -82,6 +82,14 @@
 #endif
 #endif
 
+#if (defined(_M_IX86) || defined(_M_X64) || __i386__ || __x86_64__) && \
+    !defined(_M_HYBRID_X86_ARM64) && !defined(_M_ARM64EC)
+#define PLATFORM_SSE_INTRINSICS
+#elif defined(_M_ARM) || defined(_M_ARM64) || defined(_M_HYBRID_X86_ARM64) || \
+    defined(_M_ARM64EC) || __arm__ || __aarch64__
+#define PLATFORM_ARM_NEON_INTRINSICS
+#endif
+
 #ifdef _MSC_VER
 #define NO_VTABLE __declspec(novtable)
 #else
