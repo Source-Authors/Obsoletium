@@ -17,7 +17,7 @@
 #include <vgui/ILocalize.h>
 #include "vguicenterprint.h"
 #include "vgui/KeyCode.h"
-#include <KeyValues.h>
+#include "tier1/KeyValues.h"
 #include "ienginevgui.h"
 #include "c_playerresource.h"
 #include "ihudlcd.h"
