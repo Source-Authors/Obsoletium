@@ -916,19 +916,17 @@ bool CDescription::InitFromFile( const char *pszFileName, bool bAllowNewObject /
 	if ( !file )
 		return false;
 
-	int len =g_pFullFileSystem->Size( file );
+	int len = g_pFullFileSystem->Size( file );
 
 	// read the file
-	byte *buffer = new unsigned char[ len ];
+	std::unique_ptr<byte[]> buffer = std::make_unique<byte[]>( len );
 	Assert( buffer );
-	g_pFullFileSystem->Read( buffer, len, file );
+	g_pFullFileSystem->Read( buffer.get(), len, file );
 	g_pFullFileSystem->Close( file );
 
-	const char *pBuffer = (const char*)buffer;
+	const char *pBuffer = (const char*)buffer.get();
 	
 	ReadFromBuffer( &pBuffer, bAllowNewObject );
-
-	delete[] buffer;
 
 	return true;
 }
