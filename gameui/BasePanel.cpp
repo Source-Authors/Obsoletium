@@ -1324,8 +1324,13 @@ void CBasePanel::ApplySchemeSettings(IScheme *pScheme)
 	// load the loading icon
 	if ( m_iLoadingImageID == -1 )
 	{
+		// dimhotepus: Better SteamDeck support. HL2:DM before Anniversary Update has no gamepadui.
+		const bool isHl2Dm = Q_stricmp( COM_GetModDirectory(), "hl2mp" ) == 0;
+		const char* loadingVtf = !IsSteamDeck() || isHl2Dm
+			? "console/startup_loading"
+			: "gamepadui/game_logo";
 		m_iLoadingImageID = surface()->CreateNewTextureID();
-		surface()->DrawSetTextureFile( m_iLoadingImageID, "Console/startup_loading", false, false );
+		surface()->DrawSetTextureFile( m_iLoadingImageID, loadingVtf, false, false );
 	}
 }
 

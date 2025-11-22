@@ -782,11 +782,17 @@ void CVideoMode_Common::SetupStartupGraphic()
     }
 
     // loading.vtf
-	buf.Clear();	// added this Clear() because we saw cases where LoadVTF was not emptying the buf fully in the above section
-    m_pLoadingTexture = LoadVTF( buf, "materials/console/startup_loading.vtf" );
+    buf.Clear();	// added this Clear() because we saw cases where LoadVTF was not emptying the buf fully in the above section
+    // dimhotepus: Better SteamDeck support. HL2:DM before Anniversary Update
+    // has no gamepadui.
+    const bool isHl2Dm = Q_stricmp(COM_GetModDirectory(), "hl2mp") == 0;
+    const char *loadingVtf = !IsSteamDeck() || isHl2Dm
+        ? "materials/console/startup_loading.vtf"
+        : "materials/gamepadui/game_logo.vtf";
+    m_pLoadingTexture = LoadVTF( buf, loadingVtf );
     if ( !m_pLoadingTexture )
     {
-        Error( "Can't find background image materials/console/startup_loading.vtf\n" );
+        Error( "Can't find background image %s\n", loadingVtf );
         return;
     }
 }
@@ -841,8 +847,15 @@ void CVideoMode_Common::DrawStartupGraphic()
     pVMTKeyValues->SetInt( "$nocull", 1 );
     IMaterial *pMaterial = g_pMaterialSystem->CreateMaterial( "__background", pVMTKeyValues );
 
+    // dimhotepus: Better SteamDeck support. HL2:DM before Anniversary Update
+    // has no gamepadui.
+    const bool isHl2Dm = Q_stricmp(COM_GetModDirectory(), "hl2mp") == 0;
+    const char *loadingVtf = !IsSteamDeck() || isHl2Dm
+        ? "console/startup_loading.vtf"
+        : "gamepadui/game_logo.vtf";
+
     pVMTKeyValues = new KeyValues( "UnlitGeneric" );
-    pVMTKeyValues->SetString( "$basetexture", "Console/startup_loading.vtf" );
+    pVMTKeyValues->SetString( "$basetexture", loadingVtf );
     pVMTKeyValues->SetInt( "$translucent", 1 );
     pVMTKeyValues->SetInt( "$ignorez", 1 );
     pVMTKeyValues->SetInt( "$nofog", 1 );
