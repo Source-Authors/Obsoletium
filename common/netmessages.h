@@ -201,7 +201,7 @@ public:
 		m_nSendTableCRC = 0;
 		m_nServerCount = -1;
 		m_bIsHLTV = false;
-#if defined( REPLAY_ENABLED ) x
+#if defined( REPLAY_ENABLED )
 		m_bIsReplay = false;
 #endif
 		m_nFriendsID = 0;

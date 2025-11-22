@@ -82,6 +82,17 @@ static ConVar debug_clientstate_fake_replay( "debug_clientstate_fake_replay", "0
 
 CClientState::CClientState()
 {
+	m_pModelPrecacheTable = nullptr;	
+	m_pGenericPrecacheTable = nullptr;	
+	m_pSoundPrecacheTable = nullptr;
+	m_pDecalPrecacheTable = nullptr;
+	m_pInstanceBaselineTable = nullptr;
+	m_pLightStyleTable = nullptr;
+	m_pUserInfoTable = nullptr;
+	m_pServerStartupTable = nullptr;
+	m_pDownloadableFileTable = nullptr;
+	m_pDynamicModelsTable = nullptr;
+
 	m_bMarkedCRCsUnverified = false;
 	demonum = -1;
 	m_tickRemainder = 0;
