@@ -23,11 +23,14 @@ class CEntityInfo
 public:
 
 	CEntityInfo() {
+		m_bAsDelta = false;
 		m_pFrom = nullptr;
 		m_pTo = nullptr;
+		m_UpdateType = Failed; 
 		m_nOldEntity = -1;
 		m_nNewEntity = -1;
 		m_nHeaderBase = -1;
+		m_nHeaderCount = -1;
 	}
 	virtual	~CEntityInfo() {};
 	
@@ -89,12 +92,20 @@ class CEntityReadInfo : public CEntityInfo
 public:
 
 	CEntityReadInfo() 
-	{	
+	{
+		m_UpdateType = PreserveEnt;
+
 		m_pBuf = nullptr;
-		m_nPostDataUpdateCalls = 0;
+		m_UpdateFlags = 0;
+		m_bIsEntity = false;
+
+		m_nBaseline = -1;
+		m_bUpdateBaselines = false;
+		
 		m_nLocalPlayerBits = 0;
 		m_nOtherPlayerBits = 0;
-		m_UpdateType = PreserveEnt;
+
+		m_nPostDataUpdateCalls = 0;
 	}
 
 	bf_read			*m_pBuf;
