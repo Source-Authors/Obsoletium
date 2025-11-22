@@ -29,8 +29,6 @@
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
-#define CHAT_WIDTH_PERCENTAGE 0.6f
-
 #ifndef _XBOX
 ConVar hud_saytext_time( "hud_saytext_time", "12", 0 );
 ConVar cl_showtextmsg( "cl_showtextmsg", "1", 0, "Enable/disable text messages printing on the screen." );
@@ -667,8 +665,6 @@ void CBaseHudChat::CreateChatLines( void )
 #endif
 }
 
-
-#define BACKGROUND_BORDER_WIDTH 20
 
 CHudChatFilterPanel *CBaseHudChat::GetChatFilterPanel( void )
 {
