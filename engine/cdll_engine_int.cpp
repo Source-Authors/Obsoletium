@@ -462,8 +462,8 @@ public:
 	//
 	//-----------------------------------------------------------------------------
 
-	int SentenceGroupPick( int groupIndex, char *name, int nameLen ) override;
-	int SentenceGroupPickSequential( int groupIndex, char *name, int nameLen, int sentenceIndex, int reset ) override;
+	int SentenceGroupPick( int groupIndex, OUT_Z_CAP(nameLen) char *name, int nameLen ) override;
+	int SentenceGroupPickSequential( int groupIndex, OUT_Z_CAP(nameLen) char *name, int nameLen, int sentenceIndex, int reset ) override;
 	int SentenceIndexFromName( const char *pSentenceName ) override;
 	const char *SentenceNameFromIndex( int sentenceIndex ) override;
 	int SentenceGroupIndexFromName( const char *pGroupName ) override;
@@ -1217,13 +1217,13 @@ void CEngineClient::SetAudioState( const AudioState_t &audioState )
 //
 //-----------------------------------------------------------------------------
 
-int CEngineClient::SentenceGroupPick( int groupIndex, char *name, int nameLen )
+int CEngineClient::SentenceGroupPick( int groupIndex, OUT_Z_CAP(nameLen) char *name, int nameLen )
 {
 	return VOX_GroupPick( groupIndex, name, nameLen );
 }
 
 
-int CEngineClient::SentenceGroupPickSequential( int groupIndex, char *name, int nameLen, int sentenceIndex, int reset )
+int CEngineClient::SentenceGroupPickSequential( int groupIndex, OUT_Z_CAP(nameLen) char *name, int nameLen, int sentenceIndex, int reset )
 {
 	return VOX_GroupPickSequential( groupIndex, name, nameLen, sentenceIndex, reset );
 }

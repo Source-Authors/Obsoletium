@@ -789,7 +789,7 @@ public:
 	//
 	//-----------------------------------------------------------------------------
 	
-	int SentenceGroupPick( int groupIndex, char *name, int nameLen ) override
+	int SentenceGroupPick( int groupIndex, OUT_Z_CAP(nameLen) char *name, int nameLen ) override
 	{
 		if ( !name )
 		{
@@ -802,7 +802,7 @@ public:
 	}
 	
 	
-	int SentenceGroupPickSequential( int groupIndex, char *name, int nameLen, int sentenceIndex, int reset ) override
+	int SentenceGroupPickSequential( int groupIndex, OUT_Z_CAP(nameLen) char *name, int nameLen, int sentenceIndex, int reset ) override
 	{
 		if ( !name )
 		{

@@ -225,7 +225,17 @@ public:
 	
 	// Sentences / sentence groups
 	virtual int			SentenceGroupPick( int groupIndex, char *name, int nameBufLen ) = 0;
-	virtual int			SentenceGroupPickSequential( int groupIndex, char *name, int nameBufLen, int sentenceIndex, int reset ) = 0;
+	template<int nameBufLen>
+	int					SentenceGroupPick( int groupIndex, OUT_Z_ARRAY char (&name)[nameBufLen] )
+	{
+		return SentenceGroupPick( groupIndex, name, nameBufLen );
+	}
+	virtual int			SentenceGroupPickSequential( int groupIndex, OUT_Z_CAP(nameBufLen) char *name, int nameBufLen, int sentenceIndex, int reset ) = 0;
+	template<int nameBufLen>
+	int					SentenceGroupPickSequential( int groupIndex, OUT_Z_ARRAY char (&name)[nameBufLen], int sentenceIndex, int reset )
+	{
+		return SentenceGroupPickSequential( groupIndex, name, nameBufLen, sentenceIndex, reset );
+	}
 	virtual int			SentenceIndexFromName( const char *pSentenceName ) = 0;
 	virtual const char *SentenceNameFromIndex( int sentenceIndex ) = 0;
 	virtual int			SentenceGroupIndexFromName( const char *pGroupName ) = 0;

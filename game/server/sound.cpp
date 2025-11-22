@@ -1249,9 +1249,9 @@ int SENTENCEG_PlayRndI(edict_t *entity, int isentenceg,
 	if (!fSentencesInit)
 		return -1;
 
-	name[0] = 0;
+	name[0] = '\0';
 
-	ipick = engine->SentenceGroupPick( isentenceg, name, sizeof( name ) );
+	ipick = engine->SentenceGroupPick( isentenceg, name );
 	if ( ( ipick > 0 ) && name[0] )
 	{
 		int sentenceIndex = SENTENCEG_Lookup( name );
@@ -1276,7 +1276,7 @@ int SENTENCEG_PickRndSz(const char *szgroupname)
 	if (!fSentencesInit)
 		return -1;
 
-	name[0] = 0;
+	name[0] = '\0';
 
 	isentenceg = engine->SentenceGroupIndexFromName(szgroupname);
 	if (isentenceg < 0)
@@ -1285,7 +1285,7 @@ int SENTENCEG_PickRndSz(const char *szgroupname)
 		return -1;
 	}
 
-	ipick = engine->SentenceGroupPick(isentenceg, name, sizeof( name ));
+	ipick = engine->SentenceGroupPick(isentenceg, name);
 	if (ipick >= 0 && name[0])
 	{
 		return SENTENCEG_Lookup( name );
@@ -1325,7 +1325,7 @@ int SENTENCEG_PlayRndSz(edict_t *entity, const char *szgroupname,
 		return -1;
 	}
 
-	ipick = engine->SentenceGroupPick(isentenceg, name, sizeof( name ));
+	ipick = engine->SentenceGroupPick(isentenceg, name);
 	if (ipick >= 0 && name[0])
 	{
 		int sentenceIndex = SENTENCEG_Lookup( name );
@@ -1349,13 +1349,13 @@ int SENTENCEG_PlaySequentialSz(edict_t *entity, const char *szgroupname,
 	if (!fSentencesInit)
 		return -1;
 
-	name[0] = 0;
+	name[0] = '\0';
 
 	isentenceg = engine->SentenceGroupIndexFromName(szgroupname);
 	if (isentenceg < 0)
 		return -1;
 
-	ipicknext = engine->SentenceGroupPickSequential(isentenceg, name, sizeof( name ), ipick, freset);
+	ipicknext = engine->SentenceGroupPickSequential(isentenceg, name, ipick, freset);
 	if (ipicknext >= 0 && name[0])
 	{
 		int sentenceIndex = SENTENCEG_Lookup( name );
