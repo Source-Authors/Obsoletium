@@ -772,6 +772,8 @@ void ComputeIndirectLightingAtPoint( Vector &position, Vector &normal, Vector &o
 			default:
 				Error( "Unknown indirect lighting mode %d.\n", to_underlying(g_nIndirectPropLightingMode) );
 		}
+
+		VectorAdd( outColor, lightmapColor, outColor );
 	}
 
 	if ( totalDot )
