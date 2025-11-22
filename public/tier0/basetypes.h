@@ -17,7 +17,9 @@
 #define DLLExtTokenPaste2(x) DLLExtTokenPaste(x)
 #define DLL_EXT_STRING DLLExtTokenPaste2( _DLL_EXT )
 
-#include "protected_things.h"
+// dimhotepus: Disable protected things as we include
+// header before winlite.h and cause a lot of macro redefine warnings.
+// #include "protected_things.h"
 
 // There's a different version of this file in the xbox codeline
 // so the PC version built in the xbox branch includes things like 
