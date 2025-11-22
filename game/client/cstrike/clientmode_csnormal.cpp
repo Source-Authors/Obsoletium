@@ -157,7 +157,7 @@ void SetBuyData( const ConVar &buyVar, const char *filename )
 	char buystring[256];
 	V_sprintf_safe( buystring, "setinfo %s \"", buyVar.GetName() );
 
-	const char *pfile = engine->ParseFile( (const char *)buf.Base(), token, sizeof(token) );
+	const char *pfile = engine->ParseFile( (const char *)buf.Base(), token );
 
 	bool first = true;
 
@@ -174,7 +174,7 @@ void SetBuyData( const ConVar &buyVar, const char *filename )
 
 		Q_strncat(buystring, token, sizeof(buystring), COPY_ALL_CHARACTERS);
 
-		pfile = engine->ParseFile( pfile, token, sizeof(token) );
+		pfile = engine->ParseFile( pfile, token );
 	}
 
 	Q_strncat(buystring, "\"", sizeof(buystring), COPY_ALL_CHARACTERS);

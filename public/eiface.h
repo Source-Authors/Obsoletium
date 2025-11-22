@@ -236,7 +236,13 @@ public:
 	virtual const char	*GetClientConVarValue( intp clientIndex, const char *name ) = 0;
 	
 	// Parse a token from a file
-	virtual const char	*ParseFile( const char *data, char *token, int maxlen ) = 0;
+	virtual const char	*ParseFile( IN_Z const char *data, OUT_Z_CAP(maxlen) char *token, int maxlen ) = 0;
+	template<int maxlen>
+	const char	*ParseFile( IN_Z const char *data, OUT_Z_ARRAY char (&token)[maxlen] )
+	{
+		return ParseFile( data, token, maxlen );
+	}
+
 	// Copies a file
 	virtual bool		CopyFile( const char *source, const char *destination ) = 0;
 

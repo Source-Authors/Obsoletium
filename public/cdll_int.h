@@ -215,7 +215,12 @@ public:
 
 	// Given an input text buffer data pointer, parses a single token into the variable token and returns the new
 	//  reading position
-	virtual const char			*ParseFile( const char *data, char *token, int maxlen ) = 0;
+	virtual const char			*ParseFile( IN_Z const char *data, OUT_Z_CAP(maxlen) char *token, int maxlen ) = 0;
+	template<int maxlen>
+	const char					*ParseFile( IN_Z const char *data, OUT_Z_ARRAY char (&token)[maxlen] )
+	{
+		return ParseFile( data, token, maxlen );
+	}
 	virtual bool				CopyLocalFile( const char *source, const char *destination ) = 0;
 
 	// Gets the dimensions of the game window

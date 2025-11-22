@@ -1276,10 +1276,10 @@ void CSceneEntity::DispatchPauseScene( CChoreoScene *scene, const char *paramete
 
 	// Check for auto resume/cancel
 	const char *buffer = parameters;
-	buffer = engine->ParseFile( buffer, token, sizeof( token ) );
+	buffer = engine->ParseFile( buffer, token );
 	if ( !stricmp( token, "automate" ) )
 	{
-		buffer = engine->ParseFile( buffer, token, sizeof( token ) );
+		buffer = engine->ParseFile( buffer, token );
 		if ( !stricmp( token, "Cancel" ) )
 		{
 			m_nAutomatedAction = SCENE_ACTION_CANCEL;
@@ -1291,7 +1291,7 @@ void CSceneEntity::DispatchPauseScene( CChoreoScene *scene, const char *paramete
 
 		if ( m_nAutomatedAction != SCENE_ACTION_UNKNOWN )
 		{
-			buffer = engine->ParseFile( buffer, token, sizeof( token ) );
+			buffer = engine->ParseFile( buffer, token );
 			// dimhotepus: atof -> strtof
 			m_flAutomationDelay = strtof( token, nullptr );
 

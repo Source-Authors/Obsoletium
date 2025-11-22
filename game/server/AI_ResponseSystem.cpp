@@ -610,7 +610,7 @@ public:
 			return false;
 		}
 
-		m_ScriptStack[ 0 ].currenttoken = engine->ParseFile( m_ScriptStack[ 0 ].currenttoken, token, sizeof( token ) );
+		m_ScriptStack[ 0 ].currenttoken = engine->ParseFile( m_ScriptStack[ 0 ].currenttoken, token );
 		m_ScriptStack[ 0 ].tokencount++;
 		return m_ScriptStack[ 0 ].currenttoken != NULL ? true : false;
 	}

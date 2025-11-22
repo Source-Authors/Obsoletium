@@ -346,7 +346,7 @@ public:
 
 	Vector	GetLightForPoint(const Vector &pos, bool bClamp) override;
 	Vector	GetLightForPointFast(const Vector &pos, bool bClamp) override;
-	const char *ParseFile( const char *data, char *token, int maxlen ) override;
+	const char *ParseFile( IN_Z const char *data, OUT_Z_CAP(maxlen) char *token, int maxlen ) override;
 	virtual bool CopyLocalFile( const char *source, const char *destination ) override;
 	void GetScreenSize( int& w, int &h ) override;
 	void ServerCmd( const char *szCmdString, bool bReliable ) override;
@@ -650,7 +650,7 @@ Vector CEngineClient::GetLightForPointFast(const Vector &pos, bool bClamp)
 	return vRet;
 }
 
-const char *CEngineClient::ParseFile( const char *data, char *token, int maxlen )
+const char *CEngineClient::ParseFile( IN_Z const char *data, OUT_Z_CAP(maxlen) char *token, int maxlen )
 {
 	return ::COM_ParseFile( data, token, maxlen );
 }

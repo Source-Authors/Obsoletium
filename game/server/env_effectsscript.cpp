@@ -143,7 +143,7 @@ inline bool ParseToken( void )
 		return true;
 	}
 
-	currenttoken = engine->ParseFile( currenttoken, token, sizeof( token ) );
+	currenttoken = engine->ParseFile( currenttoken, token );
 	tokencount++;
 	return currenttoken != NULL ? true : false;
 }

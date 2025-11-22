@@ -6278,7 +6278,7 @@ void CCSPlayer::Rebuy( void )
 	BuyResult_e overallResult = BUY_ALREADY_HAVE;
 
 	char token[256];
-	rebuyString = engine->ParseFile( rebuyString, token, sizeof( token ) );
+	rebuyString = engine->ParseFile( rebuyString, token );
 
 	while (rebuyString != NULL)
 	{
@@ -6327,7 +6327,7 @@ void CCSPlayer::Rebuy( void )
 
 		overallResult = CombineBuyResults( overallResult, result );
 
-		rebuyString = engine->ParseFile( rebuyString, token, sizeof( token ) );
+		rebuyString = engine->ParseFile( rebuyString, token );
 	}
 
 	m_bIsInRebuy = false;

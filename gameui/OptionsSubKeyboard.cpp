@@ -156,7 +156,7 @@ void COptionsSubKeyboard::OnCommand( const char *command )
 template<intp size>
 const char *UTIL_Parse( const char *data, OUT_Z_ARRAY char (&token)[size] )
 {
-	return engine->ParseFile( data, token, size );
+	return engine->ParseFile( data, token );
 }
 
 #ifndef _XBOX

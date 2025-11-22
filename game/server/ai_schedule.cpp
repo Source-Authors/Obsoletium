@@ -194,11 +194,11 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 {
 	char token[1024];
 	char save_token[1024];
-	const char *pfile = engine->ParseFile(pStartFile, token, sizeof( token ) );
+	const char *pfile = engine->ParseFile(pStartFile, token );
 
 	while (!stricmp("Schedule",token))
 	{
-		pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+		pfile = engine->ParseFile(pfile, token );
 
 		// -----------------------------
 		// Check for duplicate schedule
@@ -223,7 +223,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 
 		CAI_Schedule *new_schedule = CreateSchedule(token,scheduleID);
 
-		pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+		pfile = engine->ParseFile(pfile, token );
 		if (stricmp(token,"Tasks"))
 		{
 			DevMsg( "ERROR: LoadSchd (%s): (%s) Malformed AI Schedule.  Expecting 'Tasks' keyword.\n",prefix,new_schedule->GetName());
@@ -238,7 +238,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 		Task_t tempTask[50];
 		int	   taskNum = 0;
 
-		pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+		pfile = engine->ParseFile(pfile, token );
 		while ((token[0]!='\0') && (stricmp("Interrupts",token)))
 		{
 			// Convert generic ID to sub-class specific enum
@@ -256,12 +256,12 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			Assert( AI_IdIsLocal( tempTask[taskNum].iTask ) );
 
 			// Read in the task argument
-			pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+			pfile = engine->ParseFile(pfile, token );
 
 			if (!stricmp("Activity",token))
 			{
 				// Skip the ";", but make sure it's present
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				if (stricmp(token,":"))
 				{
 					DevMsg( "ERROR: LoadSchd (%s): (%s) Malformed AI Schedule.  Expecting ':' after type 'ACTIVITY.\n",prefix,new_schedule->GetName());
@@ -270,7 +270,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 				}
 
 				// Load the activity and make sure its valid
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				tempTask[taskNum].flTaskData = CAI_BaseNPC::GetActivityID(token);
 				if (tempTask[taskNum].flTaskData == -1)
 				{
@@ -282,7 +282,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			else if (!stricmp("Task",token))
 			{
 				// Skip the ";", but make sure it's present
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				if (stricmp(token,":"))
 				{
 					DevMsg( "ERROR: LoadSchd (%s): (%s) Malformed AI Schedule.  Expecting ':' after type 'ACTIVITY.\n",prefix,new_schedule->GetName());
@@ -291,7 +291,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 				}
 
 				// Load the activity and make sure its valid
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 
 				// Convert generic ID to sub-class specific enum
 				int enumTaskID = CAI_BaseNPC::GetTaskID(token);
@@ -307,7 +307,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			else if (!stricmp("Schedule",token))
 			{
 				// Skip the ";", but make sure it's present
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				if (stricmp(token,":"))
 				{
 					DevMsg( "ERROR: LoadSchd (%s): (%s) Malformed AI Schedule.  Expecting ':' after type 'ACTIVITY.\n",prefix,new_schedule->GetName());
@@ -316,7 +316,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 				}
 
 				// Load the schedule and make sure its valid
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 
 				// Convert generic ID to sub-class specific enum
 				int schedID = CAI_BaseNPC::GetScheduleID(token);
@@ -332,7 +332,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			else if (!stricmp("State",token))
 			{
 				// Skip the ";", but make sure it's present
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				if (stricmp(token,":"))
 				{
 					DevMsg( "ERROR: LoadSchd (%s): (%s) Malformed AI Schedule.  Expecting ':' after type 'STATE.\n",prefix,new_schedule->GetName());
@@ -341,7 +341,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 				}
 
 				// Load the activity and make sure its valid
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				tempTask[taskNum].flTaskData = CAI_SchedulesManager::GetStateID(token);
 				if (tempTask[taskNum].flTaskData == -1)
 				{
@@ -354,7 +354,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			{
 
 				// Skip the ";", but make sure it's present
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				if (stricmp(token,":"))
 				{
 					DevMsg( "ERROR: LoadSchd (%s): (%s) Malformed AI Schedule.  Expecting ':' after type 'STATE.\n",prefix,new_schedule->GetName());
@@ -363,7 +363,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 				}
 
 				// Load the activity and make sure its valid
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				tempTask[taskNum].flTaskData = CAI_SchedulesManager::GetMemoryID(token);
 				if (tempTask[taskNum].flTaskData == -1)
 				{
@@ -375,7 +375,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			else if (!stricmp("Path",token))
 			{
 				// Skip the ";", but make sure it's present
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				if (stricmp(token,":"))
 				{
 					DevMsg( "ERROR: LoadSchd (%s): (%s) Malformed AI Schedule.  Expecting ':' after type 'PATH.\n",prefix,new_schedule->GetName());
@@ -384,7 +384,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 				}
 
 				// Load the activity and make sure its valid
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				tempTask[taskNum].flTaskData = CAI_SchedulesManager::GetPathID( token );
 				if (tempTask[taskNum].flTaskData == -1)
 				{
@@ -396,7 +396,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			else if (!stricmp("Goal",token))
 			{
 				// Skip the ";", but make sure it's present
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				if (stricmp(token,":"))
 				{
 					DevMsg( "ERROR: LoadSchd (%s): (%s) Malformed AI Schedule.  Expecting ':' after type 'GOAL.\n",prefix,new_schedule->GetName());
@@ -405,7 +405,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 				}
 
 				// Load the activity and make sure its valid
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				tempTask[taskNum].flTaskData = CAI_SchedulesManager::GetGoalID( token );
 				if (tempTask[taskNum].flTaskData == -1)
 				{
@@ -417,7 +417,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			else if ( !stricmp( "HintFlags",token ) )
 			{
 				// Skip the ":", but make sure it's present
-				pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				if (stricmp(token,":"))
 				{
 					DevMsg( "ERROR: LoadSchd (%s): (%s) Malformed AI Schedule.  Expecting ':' after type 'HINTFLAG'\n",prefix,new_schedule->GetName());
@@ -426,7 +426,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 				}
 
 				// Load the flags and make sure they are valid
-				pfile = engine->ParseFile( pfile, token, sizeof( token ) );
+				pfile = engine->ParseFile(pfile, token );
 				tempTask[taskNum].flTaskData = CAI_HintManager::GetFlags( token );
 				if (tempTask[taskNum].flTaskData == -1)
 				{
@@ -450,7 +450,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 
 			// Read the next token
 			Q_strncpy(save_token,token,sizeof(save_token));
-			pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+			pfile = engine->ParseFile(pfile, token );
 
 			// Check for malformed task argument type
 			if (!stricmp(token,":"))
@@ -476,7 +476,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 		// ==========================
 		// Now read in the interrupts
 		// ==========================
-		pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+		pfile = engine->ParseFile(pfile, token );
 		while ((token[0]!='\0') && (stricmp("Schedule",token)))
 		{
 			// Convert generic ID to sub-class specific enum
@@ -498,7 +498,7 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 			}
 
 			// Read the next token
-			pfile = engine->ParseFile(pfile, token, sizeof( token ) );
+			pfile = engine->ParseFile(pfile, token );
 		}
 	}
 	return true;

@@ -1304,7 +1304,7 @@ public:
 		return sv.GetClient( clientIndex - 1 )->GetUserSetting( name );
 	}
 	
-	const char *ParseFile(const char *data, char *token, int maxlen) override
+	const char *ParseFile(IN_Z const char *data, OUT_Z_CAP(maxlen) char *token, int maxlen) override
 	{
 		return ::COM_ParseFile(data, token, maxlen );
 	}
