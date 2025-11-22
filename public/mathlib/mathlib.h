@@ -1851,8 +1851,8 @@ void XM_CALLCONV CalcSqrDistAndClosestPointOnAABB( const Vector &mins, const Vec
 // If you pass in a value for t, it will tell you the t for (A + (B-A)t) to get the closest point.
 // If the closest point lies on the segment between A and B, then 0 <= t <= 1.
 void  XM_CALLCONV CalcClosestPointOnLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=nullptr );
-[[nodiscard]] float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
-[[nodiscard]] float XM_CALLCONV CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
+float XM_CALLCONV CalcDistanceToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
+float XM_CALLCONV CalcDistanceSqrToLine( const Vector &P, const Vector &vLineA, const Vector &vLineB, float *t=nullptr );
 
 // The same three functions as above, except now the line is closed between A and B.
 void  XM_CALLCONV CalcClosestPointOnLineSegment( const Vector &P, const Vector &vLineA, const Vector &vLineB, Vector &vClosest, float *t=nullptr );
