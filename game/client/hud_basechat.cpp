@@ -117,7 +117,7 @@ void StripEndNewlineFromString( wchar_t *str )
 	if ( s >= 0 )
 	{
 		if ( str[s] == L'\n' || str[s] == L'\r' )
-			str[s] = '\0';
+			str[s] = L'\0';
 	}
 }
 
