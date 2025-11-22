@@ -321,9 +321,9 @@ public:
 
 	void				GetLocalCopy( const char *pFileName ) override;
 
-	virtual bool		FixUpPath( const char *pFileName, char *pFixedUpFileName, int sizeFixedUpFileName );
+	virtual bool		FixUpPath( const char *pFileName, OUT_Z_CAP(sizeFixedUpFileName) char *pFixedUpFileName, int sizeFixedUpFileName );
 	template<int size>
-	bool				FixUpPath( const char *pFileName, char (&pFixedUpFileName)[size] )
+	bool				FixUpPath( const char *pFileName, OUT_Z_ARRAY char (&pFixedUpFileName)[size] )
 	{
 		return FixUpPath( pFileName, pFixedUpFileName, size );
 	}
