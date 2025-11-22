@@ -148,7 +148,8 @@ void CScriptObject::SetCurValue( char const *strValue )
 { 
 	Q_strncpy( curValue, strValue, sizeof( curValue ) );
 
-	fcurValue = (float)atof( curValue ); 
+	// dimhotepus: atof -> strtof.
+	fcurValue = strtof( curValue, nullptr ); 
 
 	if ( type == O_NUMBER || type == O_BOOL || type == O_SLIDER )
 	{
@@ -604,7 +605,8 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	
 		if ( isNewObject )
 		{
-			fMin = (float)atof( token );
+			// dimhotepus: atof -> strtof.
+			fMin = strtof( token, nullptr );
 		}
 
 		// Parse the Min
@@ -614,7 +616,8 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 	
 		if ( isNewObject )
 		{
-			fMax = (float)atof( token );
+			// dimhotepus: atof -> strtof.
+			fMax = strtof( token, nullptr );
 		}
 
 		// Parse the next {
@@ -700,7 +703,8 @@ bool CScriptObject::ReadFromBuffer( const char **pBuffer, bool isNewObject )
 
 	// Set the values
 	Q_strncpy( defValue, token, sizeof( defValue ) );
-	fdefValue = (float)atof( token );
+	// dimhotepus: atof -> strtof.
+	fdefValue = strtof( token, nullptr );
 
 	if (type == O_NUMBER || type == O_SLIDER)
 	{
@@ -832,9 +836,9 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 		Msg( "Expecting version #" );
 		return false;
 	}
-
-	float fVer;
-	fVer = (float)atof( token );
+	
+	// dimhotepus: atof -> strtof.
+	float fVer = strtof( token, nullptr );
 
 	if ( fVer != SCRIPT_VERSION )
 	{
@@ -1051,10 +1055,12 @@ void CDescription::TransferCurrentValues( const char *pszConfigFile )
 			// Fill in better default value
 			// 
 			Q_strncpy( pObj->curValue,  szValue, sizeof( pObj->curValue ) );
-			pObj->fcurValue = (float)atof( szValue );
+			// dimhotepus: atof -> strtof.
+			pObj->fcurValue = strtof( szValue, nullptr );
 
 			Q_strncpy( pObj->defValue, szValue, sizeof( pObj->defValue ) );
-			pObj->fdefValue = (float)atof( szValue );
+			// dimhotepus: atof -> strtof.
+			pObj->fdefValue = strtof( szValue, nullptr );
 		}
 
 		pObj = pObj->pNext;
