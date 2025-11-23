@@ -197,7 +197,6 @@ public:
 	CLC_ClientInfo()
 		: m_pMessageHandler{nullptr}
 	{
-		m_bReliable = false;
 		m_nSendTableCRC = 0;
 		m_nServerCount = -1;
 		m_bIsHLTV = false;
