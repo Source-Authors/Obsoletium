@@ -38,7 +38,12 @@ struct AttributeWidgetInfo_t
 {
 	AttributeWidgetInfo_t()
 	{
+		m_pElement = nullptr;
+		m_pAttributeName = nullptr;
 		m_nArrayIndex = -1;
+		m_pEditorTypeDictionary = nullptr;
+		m_pEditorInfo = nullptr;
+		m_pNotify = nullptr;
 	}
 
 	CDmElement *m_pElement;
