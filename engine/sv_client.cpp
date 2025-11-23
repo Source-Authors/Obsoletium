@@ -934,7 +934,7 @@ bool CGameClient::SendSignonData( void )
 
 	if ( sv.m_FullSendTables.IsOverflowed() )
 	{
-		Host_Error( "Send Table signon buffer overflowed %i bytes!!!\n", sv.m_FullSendTables.GetNumBytesWritten() );
+		Host_Error( "Send Table signon buffer overflowed %zd bytes!!!\n", sv.m_FullSendTables.GetNumBytesWritten() );
 		return false;
 	}
 
