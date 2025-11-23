@@ -381,12 +381,44 @@ class CDmaDataExternal
 protected:
 	typedef typename CDmAttributeInfo< T >::StorageType_t D;
 
-	CDmaDataExternal() : m_pStorage(0) {}
-	void Attach( void *pData ) { m_pStorage = (D*)pData; }
-	const T& Value() const { return *m_pStorage; }
-	T& Value( ) { return *m_pStorage; }
-	const D& Data() const { return *m_pStorage; }
-	D& Data( ) { return *m_pStorage; }
+	CDmaDataExternal() : m_pStorage(nullptr) {}
+	void Attach( void *pData ) { m_pStorage = static_cast<D*>(pData); }
+	const T& Value() const
+	{
+		// dimhotepus: Prevent nullptr dereference.
+		Assert(m_pStorage);
+		if (!m_pStorage)
+			Error(__FUNCTION__ " has no storage pointer.\n");
+
+		return *m_pStorage;
+	}
+	T& Value( )
+	{
+		// dimhotepus: Prevent nullptr dereference.
+		Assert(m_pStorage);
+		if (!m_pStorage)
+			Error(__FUNCTION__ " has no storage pointer.\n");
+
+		return *m_pStorage;
+	}
+	const D& Data() const 
+	{
+		// dimhotepus: Prevent nullptr dereference.
+		Assert(m_pStorage);
+		if (!m_pStorage)
+			Error(__FUNCTION__ " has no storage pointer.\n");
+
+		return *m_pStorage;
+	}
+	D& Data( )
+	{
+		// dimhotepus: Prevent nullptr dereference.
+		Assert(m_pStorage);
+		if (!m_pStorage)
+			Error(__FUNCTION__ " has no storage pointer.\n");
+
+		return *m_pStorage;
+	}
 
 private:
 	D* m_pStorage;
