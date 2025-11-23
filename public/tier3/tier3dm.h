@@ -20,25 +20,25 @@ class CTier3DmAppSystem : public CTier2DmAppSystem< IInterface, ConVarFlag >
 	using BaseClass = CTier2DmAppSystem<IInterface, ConVarFlag>;
 
 public:
-	CTier3DmAppSystem( bool bIsPrimaryAppSystem = true ) : BaseClass(	bIsPrimaryAppSystem )
+	explicit CTier3DmAppSystem( bool bIsPrimaryAppSystem = true ) : BaseClass( bIsPrimaryAppSystem )
 	{
 	}
 
-	virtual bool Connect( CreateInterfaceFn factory ) 
+	bool Connect( CreateInterfaceFn factory ) override
 	{
 		if ( !BaseClass::Connect( factory ) )
 			return false;
 
-		if ( IsPrimaryAppSystem() )
+		if ( BaseClass::IsPrimaryAppSystem() )
 		{
 			ConnectTier3Libraries( &factory, 1 );
 		}
 		return true;
 	}
 
-	virtual void Disconnect() 
+	void Disconnect() override
 	{
-		if ( IsPrimaryAppSystem() )
+		if ( BaseClass::IsPrimaryAppSystem() )
 		{
 			DisconnectTier3Libraries();
 		}
