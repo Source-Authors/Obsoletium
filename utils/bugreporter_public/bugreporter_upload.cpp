@@ -687,7 +687,7 @@ bool CWin32UploadBugReport::SendWholeFile( EBugReportUploadStatus& status, CUtlB
 	UpdateProgress( m_rBugReportParameters, "Uploading bug report data." );
 	// Send to server
 	char *filebuf = nullptr;
-	size_t sizeactual = g_pFileSystem->Size( m_rBugReportParameters.m_sAttachmentFile );
+	unsigned sizeactual = g_pFileSystem->Size( m_rBugReportParameters.m_sAttachmentFile );
 	if ( sizeactual > 0 )
 	{
 		filebuf = new char[ sizeactual + 1 ];
