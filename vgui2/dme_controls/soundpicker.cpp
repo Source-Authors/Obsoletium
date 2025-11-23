@@ -206,7 +206,7 @@ void CSoundPicker::BuildGameSoundList()
 	m_pGameSoundList->RemoveAll();
 
 	int nTotalCount = 0;
-	int i = SoundEmitterSystem()->First();
+	auto i = SoundEmitterSystem()->First();
 	while ( i != SoundEmitterSystem()->InvalidIndex() )
 	{
 		const char *pSoundName = SoundEmitterSystem()->GetSoundName( i );
