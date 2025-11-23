@@ -15,7 +15,7 @@
 #pragma once
 #endif
 
-
+#include "tier0/commonmacros.h"
 #include "client_render_handle.h"
 
 
