@@ -46,15 +46,35 @@ class CViewSetup
 public:
 	CViewSetup()
 	{
-		m_flAspectRatio = 0.0f;
-		m_bRenderToSubrectOfLargerScreen = false;
-		m_bDoBloomAndToneMapping = true;
-		m_bOrtho = false;
-		m_bOffCenter = false;
-		m_bCacheFullSceneState = false;
-//		m_bUseExplicitViewVector = false;
-        m_bViewToProjectionOverride = false;
+		x = m_nUnscaledX = y = m_nUnscaledY = 0;
+		width = m_nUnscaledWidth = height = m_nUnscaledHeight = -1;
 		m_eStereoEye = STEREO_EYE_MONO;
+		
+		m_bOrtho = false;
+		m_OrthoLeft = -1;
+		m_OrthoTop = -1;
+		m_OrthoRight = -1;
+		m_OrthoBottom = -1;
+
+		fov = fovViewmodel = -1.0f;
+
+		origin = vec3_invalid;
+		angles = QAngle{std::numeric_limits<float>::quiet_NaN(),
+			std::numeric_limits<float>::quiet_NaN(),
+			std::numeric_limits<float>::quiet_NaN()};
+
+		zNear = zFar = zNearViewmodel = zFarViewmodel = -1.0f;
+		
+		m_bRenderToSubrectOfLargerScreen = false;
+		m_flAspectRatio = 0.0f;
+		
+		m_bOffCenter = false;
+		m_flOffCenterTop = m_flOffCenterBottom = m_flOffCenterLeft = m_flOffCenterRight = -1.0f;
+
+		m_bDoBloomAndToneMapping = true;
+
+		m_bCacheFullSceneState = false;
+        m_bViewToProjectionOverride = false;
 	}
 
 // shared by 2D & 3D views
