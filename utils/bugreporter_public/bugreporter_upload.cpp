@@ -261,14 +261,14 @@ EBugReportUploadStatus Win32UploadBugReportBlocking
 	//-----------------------------------------------------------------------------
 // Purpose: encrypts an 8-byte sequence
 //-----------------------------------------------------------------------------
-inline void Encrypt8ByteSequence( IceKey& cipher, const unsigned char *plainText, unsigned char *cipherText)
+static inline void Encrypt8ByteSequence( IceKey& cipher, const unsigned char *plainText, unsigned char *cipherText)
 {
 	cipher.encrypt(plainText, cipherText);
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void EncryptBuffer( IceKey& cipher, unsigned char *bufData, uint bufferSize)
+static void EncryptBuffer( IceKey& cipher, unsigned char *bufData, uint bufferSize)
 {
 	unsigned char *cipherText = bufData;
 	unsigned char *plainText = bufData;
@@ -349,7 +349,7 @@ bool UploadBugReport(
 
 }
 
-void UpdateProgress( const TBugReportParameters & params, char const *fmt, ... )
+static void UpdateProgress( const TBugReportParameters & params, char const *fmt, ... )
 {
 	if ( !params.m_pOptionalProgressFunc )
 	{
