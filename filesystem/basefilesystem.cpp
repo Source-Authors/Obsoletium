@@ -4103,7 +4103,7 @@ void CBaseFileSystem::GetLocalCopy( const char *pFileName )
 //          *pFixedUpFileName - a buffer to put the converted filename into
 //          sizeFixedUpFileName - the size of the above buffer in chars 
 //-----------------------------------------------------------------------------
-bool CBaseFileSystem::FixUpPath( const char *pFileName, char *pFixedUpFileName, int sizeFixedUpFileName )
+bool CBaseFileSystem::FixUpPath( const char *pFileName, OUT_Z_CAP(sizeFixedUpFileName) char *pFixedUpFileName, int sizeFixedUpFileName )
 {
 	//  If appropriate fixes up the filename to ensure that it's handled properly by the system.
 	//
