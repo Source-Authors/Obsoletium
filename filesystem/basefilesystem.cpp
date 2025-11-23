@@ -422,7 +422,11 @@ void CBaseFileSystem::Shutdown()
 		if( CommandLine()->FindParm( "-fs_logbins" ) >= 0 )
 		{
 			char cwd[MAX_FILEPATH];
-			getcwd( cwd, MAX_FILEPATH-1 );
+			if( !getcwd( cwd, MAX_FILEPATH-1 ) ) 
+			{
+				// dimhotepus: Warn if getcwd failed.
+				Warning(FileWarningLevel_t::FILESYSTEM_WARNING, "Enable to get cd: %s.\n", strerror(errno));
+			}
 			fprintf( m_pLogFile, "set binsrc=\"%s\"\n", cwd );
 			fprintf( m_pLogFile, "mkdir \"%%fs_target%%\"\n" );
 			fprintf( m_pLogFile, "copy \"%%binsrc%%\\hl2.exe\" \"%%fs_target%%\"\n" );
@@ -1982,7 +1986,12 @@ void CBaseFileSystem::LogFileAccess( const char *pFullFileName )
 	fprintf( m_pLogFile, "%s", buf ); // STEAM OK
 #else
 	char cwd[MAX_FILEPATH];
-	getcwd( cwd, MAX_FILEPATH-1 );
+	if( !getcwd( cwd, MAX_FILEPATH-1 ) ) 
+	{
+		// dimhotepus: Warn if getcwd failed.
+		Warning(FileWarningLevel_t::FILESYSTEM_WARNING, "Enable to get cd: %s.\n", strerror(errno));
+		return;
+	}
 	V_strcat_safe( cwd, "\\" );
 	const size_t cwdLen = strlen( cwd );
 	if( Q_strnicmp( cwd, pFullFileName, cwdLen ) == 0 )
