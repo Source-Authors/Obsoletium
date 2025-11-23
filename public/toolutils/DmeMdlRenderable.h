@@ -6,11 +6,8 @@
 
 #ifndef DMEMDLRENDERABLE_H
 #define DMEMDLRENDERABLE_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-#include "toolutils/dmerenderable.h"
+#include "toolutils/DmeRenderable.h"
 #include "movieobjects/dmemdl.h"
 #include "movieobjects/dmetransform.h"
 #include "datacache/imdlcache.h"

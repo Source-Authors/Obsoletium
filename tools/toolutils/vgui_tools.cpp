@@ -13,7 +13,7 @@
 #include "tier0/vprof.h"
 #include "tier1/KeyValues.h"
 #include "vgui_controls/Panel.h"
-#include "dme_controls/dmeControls.h"
+#include "dme_controls/dmecontrols.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

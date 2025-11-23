@@ -9,7 +9,7 @@
 
 #include "ToolUI.h"
 #include "toolutils/toolmenubar.h"
-#include "toolutils/basetoolsystem.h"
+#include "toolutils/BaseToolSystem.h"
 #include "vgui/Cursor.h"
 #include "vgui/ISurface.h"
 #include "tier1/KeyValues.h"
@@ -18,10 +18,10 @@
 #include "tier0/memdbgon.h"
 
 
-#define MENU_HEIGHT 28
+constexpr inline int MENU_HEIGHT{28};
 // Height of the status bar, if the tool installs one
-#define STATUS_HEIGHT 24
-//-----------------------------------------------------------------------------
+constexpr inline int STATUS_HEIGHT{24};
+    //-----------------------------------------------------------------------------
 // Constructor
 //-----------------------------------------------------------------------------
 CToolUI::CToolUI( vgui::Panel *pParent, const char *panelName, CBaseToolSystem *pBaseToolSystem ) :

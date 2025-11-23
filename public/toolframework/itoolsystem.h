@@ -6,9 +6,6 @@
 
 #ifndef ITOOLSYSTEM_H
 #define ITOOLSYSTEM_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "itoolentity.h"
 #include "tier1/interface.h"

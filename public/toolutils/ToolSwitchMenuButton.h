@@ -7,9 +7,6 @@
 #ifndef TOOLSWITCHMENUBUTTON_H
 #define TOOLSWITCHMENUBUTTON_H
 
-#ifdef _WIN32
-#pragma once
-#endif
 
 
 //-----------------------------------------------------------------------------

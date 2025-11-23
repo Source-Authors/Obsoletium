@@ -26,14 +26,14 @@ class IToolSystem;
 // The engine will call CreateTools just before querying for the tools, so you 
 //  can instance any dynamically instanced tools during that call
 //-----------------------------------------------------------------------------
-class IToolDictionary : public IAppSystem
+abstract_class IToolDictionary : public IAppSystem
 {
 public:
 	virtual void		CreateTools() = 0;
-	virtual int			GetToolCount() const = 0;
-	virtual IToolSystem	*GetTool( int index ) = 0;
+	virtual intp		GetToolCount() const = 0;
+	virtual IToolSystem	*GetTool( intp index ) = 0;
 };
 
-#define VTOOLDICTIONARY_INTERFACE_VERSION "VTOOLDICTIONARY002"
+constexpr inline char VTOOLDICTIONARY_INTERFACE_VERSION[]{"VTOOLDICTIONARY002"};
 
 #endif // ITOOLDICTIONARY_H

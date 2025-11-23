@@ -5,7 +5,7 @@
 //=============================================================================
 
 #include "toolutils/recentfilelist.h"
-#include "vgui_controls/menu.h"
+#include "vgui_controls/Menu.h"
 #include "iregistry.h"
 #include "tier1/KeyValues.h"
 
@@ -94,8 +94,8 @@ void CRecentFileList::LoadFromRegistry( const char *pToolKeyName )
 	{
 		char sz[ 128 ];
 		char szType[ 128 ];
-		V_sprintf_safe( sz, "%s\\history%02i", pToolKeyName, i ); 
-		V_sprintf_safe( szType, "%s\\history_fileformat%02i", pToolKeyName, i ); 
+		V_sprintf_safe( sz, "%s\\history%02zd", pToolKeyName, i ); 
+		V_sprintf_safe( szType, "%s\\history_fileformat%02zd", pToolKeyName, i ); 
 		
 		// NOTE: Can't call registry->ReadString twice in a row!
 		char pFileName[MAX_PATH];
@@ -117,24 +117,24 @@ void CRecentFileList::SaveToRegistry( const char *pToolKeyName ) const
 {
 	char sz[ 128 ];
 
-	intp i, c;
-	c = m_RecentFiles.Count();
+	intp i;
+	intp c = m_RecentFiles.Count();
 	for ( i = 0 ; i < c; ++i )
 	{
-		V_sprintf_safe( sz, "%s\\history%02i", pToolKeyName, i ); 
+		V_sprintf_safe( sz, "%s\\history%02zd", pToolKeyName, i ); 
 		registry->WriteString( sz, m_RecentFiles[i].m_pFileName );
 
-		V_sprintf_safe( sz, "%s\\history_fileformat%02i", pToolKeyName, i ); 
+		V_sprintf_safe( sz, "%s\\history_fileformat%02zd", pToolKeyName, i ); 
 		registry->WriteString( sz, m_RecentFiles[i].m_pFileFormat );
 	}
 
 	// Clear out all other registry settings
 	for ( ; i < MAX_RECENT_FILES; ++i )
 	{
-		V_sprintf_safe( sz, "%s\\history%02i", pToolKeyName, i ); 
+		V_sprintf_safe( sz, "%s\\history%02zd", pToolKeyName, i ); 
 		registry->WriteString( sz, "" );
 
-		V_sprintf_safe( sz, "%s\\history_fileformat%02i", pToolKeyName, i ); 
+		V_sprintf_safe( sz, "%s\\history_fileformat%02zd", pToolKeyName, i ); 
 		registry->WriteString( sz, "" );
 	}
 }
@@ -145,12 +145,12 @@ void CRecentFileList::SaveToRegistry( const char *pToolKeyName ) const
 //-----------------------------------------------------------------------------
 void CRecentFileList::AddToMenu( vgui::Menu *menu, vgui::Panel *pActionTarget, const char *pCommandName ) const
 {
-	intp i, c;
-	c = m_RecentFiles.Count();
+	intp i;
+	intp c = m_RecentFiles.Count();
 	for ( i = 0 ; i < c; ++i )
 	{
 		char sz[ 32 ];
-		V_sprintf_safe( sz, "%s%02i", pCommandName, i );
+		V_sprintf_safe( sz, "%s%02zd", pCommandName, i );
 		char const *fn = m_RecentFiles[i].m_pFileName;
 		menu->AddMenuItem( fn, new KeyValues( "Command", "command", sz ), pActionTarget );
 	}

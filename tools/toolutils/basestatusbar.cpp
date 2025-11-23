@@ -65,8 +65,6 @@ void CBaseStatusBar::PerformLayout()
 
 	m_pConsole->SetBounds( x, QuickPropScale( 2 ), consoleWide, h - QuickPropScale( 4 ) ); //-V112
 
-	x += consoleWide + QuickPropScale( 4 ); //-V112
-
 	int infoW = QuickPropScale( 85 );
 
 	int rightx = oldw - infoW - QuickPropScale( 10 );
@@ -140,7 +138,7 @@ void CBaseStatusBar::OnThink()
 #include <psapi.h>
 static float GetMemoryUsage()
 {
-	PROCESS_MEMORY_COUNTERS counters;
+	PROCESS_MEMORY_COUNTERS counters = {};
 	counters.cb = sizeof( counters );
 
 	if ( GetProcessMemoryInfo( GetCurrentProcess(), &counters, sizeof( counters ) ) )

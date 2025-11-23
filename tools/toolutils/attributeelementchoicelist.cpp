@@ -6,7 +6,7 @@
 //
 //=============================================================================//
 
-#include "toolutils/attributeelementchoicelist.h"
+#include "toolutils/AttributeElementChoiceList.h"
 #include "datamodel/dmelement.h"
 
 	
@@ -24,7 +24,7 @@ const char *GetChoiceString( CDmElement *pElement )
 //-----------------------------------------------------------------------------
 // Recursively adds all elements referred to this element into the list of elements
 //-----------------------------------------------------------------------------
-void AddElementsRecursively_R( CDmElement *pElement, ElementChoiceList_t &list, ElementDict_t &dict, const char *pElementType )
+static void AddElementsRecursively_R( CDmElement *pElement, ElementChoiceList_t &list, ElementDict_t &dict, const char *pElementType )
 {
 	if ( !pElement )
 		return;

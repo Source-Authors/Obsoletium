@@ -113,9 +113,9 @@ void CWindowPositionMgr::SavePositions( char const *filename, char const *key )
 	float flOOW = (sw != 0.0f) ? 1.0f / (float)sw : 1.0f;
 	float flOOH = (sh != 0.0f) ? 1.0f / (float)sh : 1.0f;
 
-	int c = ToolWindow::GetToolWindowCount();
+	intp c = ToolWindow::GetToolWindowCount();
 
-	for ( int i = 0 ; i < c; ++i )
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		ToolWindow *tw = ToolWindow::GetToolWindow( i );
 		Assert( tw );
@@ -183,7 +183,7 @@ void CWindowPositionMgr::SavePositions( char const *filename, char const *key )
 	}
 }
 
-bool CWindowPositionMgr::LoadPositions( char const *filename, vgui::Panel *parent, vgui::IToolWindowFactory *factory, char const *key, bool force /*=false*/ )
+bool CWindowPositionMgr::LoadPositions( char const *filename, vgui::Panel *parent, vgui::IToolWindowFactory *factory, char const *key, [[maybe_unused]] bool force /*=false*/ )
 {
 	bool success = false;
 

@@ -10,12 +10,9 @@
 #ifndef TOOLUI_H
 #define TOOLUI_H
 
-#ifdef _WIN32
-#pragma once
-#endif
 
-#include "vgui_controls/panel.h"
-#include "vgui/mousecode.h"
+#include "vgui_controls/Panel.h"
+#include "vgui/MouseCode.h"
 
 
 //-----------------------------------------------------------------------------
@@ -37,16 +34,16 @@ namespace vgui
 //-----------------------------------------------------------------------------
 class CToolUI : public vgui::Panel
 {
-	DECLARE_CLASS_SIMPLE( CToolUI, vgui::Panel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CToolUI, vgui::Panel );
 
 public:
 	// Constructor
 	CToolUI( vgui::Panel *pParent, const char *pPanelName, CBaseToolSystem *pBaseToolSystem );
 
 	// Overrides of panel methods
-	virtual void	PerformLayout();
-	virtual void	OnCommand( const char *cmd );
-	virtual void	OnMousePressed( vgui::MouseCode code );
+	void	PerformLayout() override;
+	void	OnCommand( const char *cmd ) override;
+	void	OnMousePressed( vgui::MouseCode code ) override;
 
 	virtual void	UpdateMenuBarTitle();
 

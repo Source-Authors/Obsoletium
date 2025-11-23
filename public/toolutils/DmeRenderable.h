@@ -6,9 +6,6 @@
 
 #ifndef DMERENDERABLE_H
 #define DMERENDERABLE_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "iclientunknown.h"
 #include "iclientrenderable.h"
@@ -17,7 +14,7 @@
 #include "mathlib/mathlib.h"
 #include "basehandle.h"
 #include "toolutils/enginetools_int.h"
-#include "engine/iclientleafsystem.h"
+#include "engine/IClientLeafSystem.h"
 #include "datamodel/dmelementfactoryhelper.h"
 
 

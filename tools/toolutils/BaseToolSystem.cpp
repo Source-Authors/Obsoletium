@@ -4,7 +4,7 @@
 //
 //=============================================================================
 
-#include "toolutils/basetoolsystem.h"
+#include "toolutils/BaseToolSystem.h"
 #include "toolframework/ienginetool.h"
 #include "vgui/IPanel.h"
 #include "vgui_controls/Controls.h"
@@ -14,13 +14,13 @@
 #include "vgui_controls/FileOpenDialog.h"
 #include "vgui_controls/MessageBox.h"
 #include "vgui/Cursor.h"
-#include "vgui/iinput.h"
-#include "vgui/ivgui.h"
+#include "vgui/IInput.h"
+#include "vgui/IVGui.h"
 #include "vgui_controls/AnimationController.h"
 #include "ienginevgui.h"
-#include "toolui.h"
+#include "ToolUI.h"
 #include "toolutils/toolmenubar.h"
-#include "vgui/ilocalize.h"
+#include "vgui/ILocalize.h"
 #include "toolutils/enginetools_int.h"
 #include "toolutils/vgui_tools.h"
 #include "icvar.h"
@@ -33,7 +33,7 @@
 #include "materialsystem/imaterialsystem.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imesh.h"
-#include "toolutils/BaseStatusBar.h"
+#include "toolutils/basestatusbar.h"
 #include "movieobjects/movieobjects.h"
 #include "vgui_controls/KeyBoardEditorDialog.h"
 #include "vgui_controls/KeyBindingHelpDialog.h"
@@ -88,6 +88,7 @@ CBaseToolSystem::CBaseToolSystem( const char *pToolName /*="CBaseToolSystem"*/ )
 	m_pBackground( nullptr ),
 	m_pLogo( nullptr )
 {
+	m_KeyBindingsHandle = INVALID_KEYBINDINGCONTEXT_HANDLE;
 	RegisterTool( this );
 	SetAutoDelete( false );
 	m_bGameInputEnabled = false;
@@ -307,13 +308,13 @@ void CBaseToolSystem::ServerFrameUpdatePreEntityThink()
 {
 }
 
-void CBaseToolSystem::Think( bool finalTick )
+void CBaseToolSystem::Think( [[maybe_unused]] bool finalTick )
 {
 	// run vgui animations
 	vgui::GetAnimationController()->UpdateAnimations( enginetools->Time() );
 }
 
-void CBaseToolSystem::PostMessage( HTOOLHANDLE hEntity, KeyValues *message )
+void CBaseToolSystem::PostMessage( [[maybe_unused]] HTOOLHANDLE hEntity, KeyValues *message )
 {
 	if ( !Q_stricmp( message->GetName(), "ReleaseLayoffTexture" ) )
 	{
@@ -562,7 +563,7 @@ void CBaseToolSystem::ShowKeyBindingsHelp( Panel *panel, KeyBindingContextHandle
 	m_hKeyBindingsHelp = new CKeyBindingHelpDialog( GetClientArea(), panel, handle, boundKey, modifiers );
 }
 
-vgui::KeyBindingContextHandle_t CBaseToolSystem::GetKeyBindingsHandle()
+vgui::KeyBindingContextHandle_t CBaseToolSystem::GetKeyBindingsHandle() const
 {
 	return m_KeyBindingsHandle;
 }
@@ -715,7 +716,7 @@ void CBaseToolSystem::AdjustEngineViewport( int& x, int& y, int& width, int& hei
 //-----------------------------------------------------------------------------
 // Let tool override view/camera
 //-----------------------------------------------------------------------------
-bool CBaseToolSystem::SetupEngineView( Vector &origin, QAngle &angles, float &fov )
+bool CBaseToolSystem::SetupEngineView( [[maybe_unused]] Vector &origin, [[maybe_unused]] QAngle &angles, [[maybe_unused]] float &fov )
 {
 	return false;
 }
@@ -723,7 +724,7 @@ bool CBaseToolSystem::SetupEngineView( Vector &origin, QAngle &angles, float &fo
 //-----------------------------------------------------------------------------
 // Let tool override microphone
 //-----------------------------------------------------------------------------
-bool CBaseToolSystem::SetupAudioState( AudioState_t &audioState )
+bool CBaseToolSystem::SetupAudioState( [[maybe_unused]] AudioState_t &audioState )
 {
 	return false;
 }
@@ -761,13 +762,13 @@ bool CBaseToolSystem::IsToolRecording()
 	return false;
 }
 
-IMaterialProxy *CBaseToolSystem::LookupProxy( const char *proxyName )
+IMaterialProxy *CBaseToolSystem::LookupProxy( [[maybe_unused]] const char *proxyName )
 {
 	return NULL;
 }
 
 
-bool CBaseToolSystem::GetSoundSpatialization( int iUserData, int guid, SpatializationInfo_t& info )
+bool CBaseToolSystem::GetSoundSpatialization( [[maybe_unused]] int iUserData, [[maybe_unused]] int guid, [[maybe_unused]] SpatializationInfo_t& info )
 {
 	// Always hearable (no changes)
 	return true;
@@ -797,11 +798,11 @@ void CBaseToolSystem::RenderFrameEnd()
 {
 }
 
-void CBaseToolSystem::VGui_PreRender( int paintMode )
+void CBaseToolSystem::VGui_PreRender( [[maybe_unused]] int paintMode )
 {
 }
 
-void CBaseToolSystem::VGui_PostRender( int paintMode )
+void CBaseToolSystem::VGui_PostRender( [[maybe_unused]] int paintMode )
 {
 }
 
@@ -884,7 +885,7 @@ vgui::MenuBar *CBaseToolSystem::CreateMenuBar(CBaseToolSystem *pParent )
 //-----------------------------------------------------------------------------
 // Purpose: Derived classes implement this to create a custom status bar, or return NULL for no status bar
 //-----------------------------------------------------------------------------
-vgui::Panel *CBaseToolSystem::CreateStatusBar( vgui::Panel *pParent )
+vgui::Panel *CBaseToolSystem::CreateStatusBar( [[maybe_unused]] vgui::Panel *pParent )
 {
 	return new CBaseStatusBar( this, "Status Bar" );
 }
@@ -954,7 +955,7 @@ void CBaseToolSystem::ShutdownActionMenu()
 	}
 }
 
-void CBaseToolSystem::UpdateMenu( vgui::Menu *menu )
+void CBaseToolSystem::UpdateMenu( [[maybe_unused]] vgui::Menu *menu )
 {
 	// Nothing
 }

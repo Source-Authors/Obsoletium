@@ -21,7 +21,6 @@
 #include "texture_group_names.h"
 #include "vgui_controls/PropertySheet.h"
 #include "tier2/tier2.h"
-#include <windows.h>	// for MultiByteToWideChar
 #include "cdll_int.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -33,14 +32,14 @@ using namespace vgui;
 
 extern IMatSystemSurface *g_pMatSystemSurface;
 
-#define DEFAULT_PREVIEW_WIDTH 1280
+constexpr inline int DEFAULT_PREVIEW_WIDTH{1280};
 
 //-----------------------------------------------------------------------------
 // Purpose: This is a "frame" which is used to position the engine
 //-----------------------------------------------------------------------------
 class CMiniViewportPropertyPage : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CMiniViewportPropertyPage, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMiniViewportPropertyPage, vgui::EditablePanel );
 
 public:
 	CMiniViewportPropertyPage( Panel *parent, const char *panelName );
@@ -68,7 +67,7 @@ private:
 //-----------------------------------------------------------------------------
 class CMiniViewportEngineRenderArea : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CMiniViewportEngineRenderArea, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMiniViewportEngineRenderArea, vgui::EditablePanel );
 
 public:
 	CMiniViewportEngineRenderArea( Panel *parent, const char *panelName );

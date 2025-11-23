@@ -8,10 +8,6 @@
 #ifndef ATTRIBUTEELEMENTCHOICELIST_H
 #define ATTRIBUTEELEMENTCHOICELIST_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "dme_controls/inotifyui.h"
 #include "datamodel/dmehandle.h"
 

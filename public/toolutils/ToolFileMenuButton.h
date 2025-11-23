@@ -8,11 +8,7 @@
 #ifndef TOOLFILEMENUBUTTON_H
 #define TOOLFILEMENUBUTTON_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "toolutils/toolmenubutton.h"
+#include "toolutils/ToolMenuButton.h"
 
 
 //-----------------------------------------------------------------------------
@@ -66,11 +62,11 @@ public:
 //-----------------------------------------------------------------------------
 class CToolFileMenuButton : public CToolMenuButton
 {
-	DECLARE_CLASS_SIMPLE( CToolFileMenuButton, CToolMenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CToolFileMenuButton, CToolMenuButton );
 public:
 
 	CToolFileMenuButton( vgui::Panel *parent, const char *panelName, const char *text, vgui::Panel *pActionTarget, IFileMenuCallbacks *pFileMenuCallback );
-	virtual void OnShowMenu( vgui::Menu *menu );
+	void OnShowMenu( vgui::Menu *menu ) override;
 
 private:
 	MESSAGE_FUNC( OnPerforceAdd, "OnPerforceAdd" );

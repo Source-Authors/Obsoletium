@@ -68,11 +68,6 @@ vgui::VPANEL VGui_GetToolRootPanel( void )
 	return root;
 }
 
-vgui::VPANEL VGui_GetRootPanel( void )
-{
-	vgui::VPANEL root = enginevgui->GetPanel( PANEL_ROOT );
-	return root;
-}
 
 
 //-----------------------------------------------------------------------------
@@ -94,8 +89,8 @@ public:
 
 	// Inherited from IToolDictionary
 	void CreateTools() override;
-	int	GetToolCount() const override;
-	IToolSystem	*GetTool( int index ) override;
+	intp GetToolCount() const override;
+	IToolSystem	*GetTool( intp index ) override;
 
 public:
 	void RegisterTool( IToolSystem *tool );
@@ -201,12 +196,12 @@ void CToolDictionary::CreateTools()
 	::CreateTools( );
 }
 
-int	CToolDictionary::GetToolCount() const
+intp CToolDictionary::GetToolCount() const
 {
 	return m_Tools.Count();
 }
 
-IToolSystem	*CToolDictionary::GetTool( int index )
+IToolSystem	*CToolDictionary::GetTool( intp index )
 {
 	if ( index < 0 || index >= m_Tools.Count() )
 	{

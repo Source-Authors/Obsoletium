@@ -7,10 +7,6 @@
 #ifndef TOOLHELPMENUBUTTON_H
 #define TOOLHELPMENUBUTTON_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 
 //-----------------------------------------------------------------------------
 // forward declarations

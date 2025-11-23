@@ -7,11 +7,6 @@
 #ifndef ENGINETOOLS_INT_H
 #define ENGINETOOLS_INT_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-
 //-----------------------------------------------------------------------------
 // Forward declarations
 //-----------------------------------------------------------------------------

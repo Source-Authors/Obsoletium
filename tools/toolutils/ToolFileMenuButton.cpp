@@ -4,14 +4,14 @@
 //
 //=============================================================================
 
-#include "toolutils/toolfilemenubutton.h"
-#include "toolutils/toolmenubutton.h"
+#include "toolutils/ToolFileMenuButton.h"
+#include "toolutils/ToolMenuButton.h"
 #include "tier1/KeyValues.h"
 #include "tier1/utlstring.h"
-#include "vgui_controls/menu.h"
-#include "vgui_controls/frame.h"
-#include "vgui_controls/button.h"
-#include "vgui_controls/listpanel.h"
+#include "vgui_controls/Menu.h"
+#include "vgui_controls/Frame.h"
+#include "vgui_controls/Button.h"
+#include "vgui_controls/ListPanel.h"
 #include "toolutils/enginetools_int.h"
 // dimhotepus: Drop p4.
 // #include "p4lib/ip4.h"
@@ -58,6 +58,13 @@ CToolFileMenuButton::CToolFileMenuButton( vgui::Panel *pParent, const char *pane
 		m_pPerforce->AddSeparator();
 		m_nPerforceP4Win = m_pPerforce->AddMenuItem( "perforce_p4win", "#ToolPerforceP4Win", new KeyValues( "OnPerforceP4Win" ), this );
 		m_nPerforceListOpenFiles = m_pPerforce->AddMenuItem( "perforce_listopenfiles", "#ToolPerforceListOpenFiles", new KeyValues( "OnPerforceListOpenFiles" ), this );
+	}
+	else
+	{
+		m_pPerforce = nullptr;
+		m_nPerforceAdd = m_nPerforceOpen =
+			m_nPerforceRevert =	m_nPerforceSubmit =
+			m_nPerforceP4Win = m_nPerforceListOpenFiles = -1;
 	}
 
 	m_pRecentFiles = new vgui::Menu( this, "RecentFiles" );

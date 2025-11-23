@@ -510,8 +510,8 @@ void CToolFrameworkInternal::LoadToolsFromLibrary( const char *dllname )
 
 	dictionary->CreateTools();
 
-	int toolCount = dictionary->GetToolCount();
-	for ( int i = 0; i < toolCount; ++i )
+	intp toolCount = dictionary->GetToolCount();
+	for ( intp i = 0; i < toolCount; ++i )
 	{
 		IToolSystem *tool = dictionary->GetTool( i );
 		if ( tool )

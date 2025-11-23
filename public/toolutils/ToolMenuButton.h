@@ -7,11 +7,7 @@
 #ifndef TOOLMENUBUTTON_H
 #define TOOLMENUBUTTON_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
-#include "vgui_controls/menubutton.h"
+#include "vgui_controls/MenuButton.h"
 #include "tier1/utldict.h"
 #include "tier1/utlsymbol.h"
 
@@ -21,11 +17,11 @@
 //-----------------------------------------------------------------------------
 class CToolMenuButton : public vgui::MenuButton
 {
-	DECLARE_CLASS_SIMPLE( CToolMenuButton, vgui::MenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CToolMenuButton, vgui::MenuButton );
 public:
 	CToolMenuButton( vgui::Panel *parent, const char *panelName, const char *text, vgui::Panel *actionTarget );
 
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 
 	vgui::Menu	*GetMenu();
 

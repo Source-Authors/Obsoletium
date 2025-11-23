@@ -6,11 +6,8 @@
 
 #ifndef VGUI_TOOLS_H
 #define VGUI_TOOLS_H
-#ifdef _WIN32
-#pragma once
-#endif
 
-#include "interface.h"
+#include "tier1/interface.h"
 
 #include <vgui/VGUI.h>
 

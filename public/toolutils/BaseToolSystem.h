@@ -7,26 +7,22 @@
 #ifndef BASETOOLSYSTEM_H
 #define BASETOOLSYSTEM_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 #include "tier1/interface.h"
 #include "toolframework/itoolsystem.h"
 #include "vgui/IScheme.h"
 #include "vgui_controls/EditablePanel.h"
 #include "vgui_controls/PHandle.h"
 #include "toolutils/recentfilelist.h"
-#include "vgui/keycode.h"
-#include "vgui_controls/fileopenstatemachine.h"
+#include "vgui/KeyCode.h"
+#include "vgui_controls/FileOpenStateMachine.h"
 
 
 // #defines
-#define TOGGLE_WINDOWED_KEY_CODE    KEY_F11
-#define TOGGLE_WINDOWED_KEY_NAME    "F11"
+constexpr inline ButtonCode_t TOGGLE_WINDOWED_KEY_CODE{KEY_F11};
+constexpr inline char TOGGLE_WINDOWED_KEY_NAME[]{"F11"};
 
-#define TOGGLE_INPUT_KEY_CODE       KEY_F10
-#define TOGGLE_INPUT_KEY_NAME       "F10"
+constexpr inline ButtonCode_t TOGGLE_INPUT_KEY_CODE{KEY_F10};
+constexpr inline char TOGGLE_INPUT_KEY_NAME[]{"F10"};
 
 //-----------------------------------------------------------------------------
 // Forward declarations
@@ -71,63 +67,63 @@ enum SaveDocumentCloseType_t
 //-----------------------------------------------------------------------------
 class CBaseToolSystem : public vgui::EditablePanel, public IToolSystem, public vgui::IFileOpenStateMachineClient
 {
-	DECLARE_CLASS_SIMPLE( CBaseToolSystem, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CBaseToolSystem, vgui::EditablePanel );
 
 public:
 	// Methods inherited from IToolSystem
-	virtual bool	Init( );
-    virtual void	Shutdown();
-	virtual bool	ServerInit( CreateInterfaceFn serverFactory );
-	virtual bool	ClientInit( CreateInterfaceFn clientFactory );
-	virtual void	ServerShutdown();
-	virtual void	ClientShutdown();
-	virtual bool	CanQuit(); 
-    virtual void	PostMessage( HTOOLHANDLE hEntity, KeyValues *message );
-	virtual void	Think( bool finalTick );
-	virtual void	ServerLevelInitPreEntity();
-	virtual void	ServerLevelInitPostEntity();
-	virtual void	ServerLevelShutdownPreEntity();
-	virtual void	ServerLevelShutdownPostEntity();
-	virtual void	ServerFrameUpdatePreEntityThink();
-	virtual void	ServerFrameUpdatePostEntityThink();
-	virtual void	ServerPreClientUpdate();
-	virtual void	ServerPreSetupVisibility();
-	virtual const char* GetEntityData( const char *pActualEntityData );
-	virtual void	ClientLevelInitPreEntity();
-	virtual void	ClientLevelInitPostEntity();
-	virtual void	ClientLevelShutdownPreEntity();
-	virtual void	ClientLevelShutdownPostEntity();
-	virtual void	ClientPreRender();
-	virtual void	ClientPostRender();
-	virtual void	OnToolActivate();
-	virtual void	OnToolDeactivate();
-	virtual bool	TrapKey( ButtonCode_t key, bool down );
-	virtual void	AdjustEngineViewport( int& x, int& y, int& width, int& height );
-	virtual bool	SetupEngineView( Vector &origin, QAngle &angles, float &fov );
-	virtual bool	SetupAudioState( AudioState_t &audioState );
-	virtual bool	ShouldGameRenderView();
-	virtual bool	IsThirdPersonCamera();
-	virtual bool	IsToolRecording();
-	virtual IMaterialProxy *LookupProxy( const char *proxyName );
-	virtual bool	GetSoundSpatialization( int iUserData, int guid, SpatializationInfo_t& info );
-	virtual void	HostRunFrameBegin();
-	virtual void	HostRunFrameEnd();
-	virtual void	RenderFrameBegin();
-	virtual void	RenderFrameEnd();
-	virtual void	VGui_PreRender( int paintMode );
-	virtual void	VGui_PostRender( int paintMode );
-	virtual void	VGui_PreSimulate();
-	virtual void	VGui_PostSimulate();
+	bool	Init( ) override;
+    void	Shutdown() override;
+	bool	ServerInit( CreateInterfaceFn serverFactory ) override;
+	bool	ClientInit( CreateInterfaceFn clientFactory ) override;
+	void	ServerShutdown() override;
+	void	ClientShutdown() override;
+	bool	CanQuit() override; 
+    void	PostMessage( HTOOLHANDLE hEntity, KeyValues *message ) override;
+	void	Think( bool finalTick ) override;
+	void	ServerLevelInitPreEntity() override;
+	void	ServerLevelInitPostEntity() override;
+	void	ServerLevelShutdownPreEntity() override;
+	void	ServerLevelShutdownPostEntity() override;
+	void	ServerFrameUpdatePreEntityThink() override;
+	void	ServerFrameUpdatePostEntityThink() override;
+	void	ServerPreClientUpdate() override;
+	void	ServerPreSetupVisibility() override;
+	const char* GetEntityData( const char *pActualEntityData ) override;
+	void	ClientLevelInitPreEntity() override;
+	void	ClientLevelInitPostEntity() override;
+	void	ClientLevelShutdownPreEntity() override;
+	void	ClientLevelShutdownPostEntity() override;
+	void	ClientPreRender() override;
+	void	ClientPostRender() override;
+	void	OnToolActivate() override;
+	void	OnToolDeactivate() override;
+	bool	TrapKey( ButtonCode_t key, bool down ) override;
+	void	AdjustEngineViewport( int& x, int& y, int& width, int& height ) override;
+	bool	SetupEngineView( Vector &origin, QAngle &angles, float &fov ) override;
+	bool	SetupAudioState( AudioState_t &audioState ) override;
+	bool	ShouldGameRenderView() override;
+	bool	IsThirdPersonCamera() override;
+	bool	IsToolRecording() override;
+	IMaterialProxy *LookupProxy( const char *proxyName ) override;
+	bool	GetSoundSpatialization( int iUserData, int guid, SpatializationInfo_t& info ) override;
+	void	HostRunFrameBegin() override;
+	void	HostRunFrameEnd() override;
+	void	RenderFrameBegin() override;
+	void	RenderFrameEnd() override;
+	void	VGui_PreRender( int paintMode ) override;
+	void	VGui_PostRender( int paintMode ) override;
+	void	VGui_PreSimulate() override;
+	void	VGui_PostSimulate() override;
 
 	// Inherited from vgui::Panel
-	virtual void	OnMousePressed( vgui::MouseCode code );
-	virtual void	OnThink();
-	virtual void	ApplySchemeSettings( vgui::IScheme *pScheme);
+	void	OnMousePressed( vgui::MouseCode code ) override;
+	void	OnThink() override;
+	void	ApplySchemeSettings( vgui::IScheme *pScheme) override;
 
 	// Inherited from IFileOpenStateMachineClient
-	virtual void	SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues ) { Assert(0); }
-	virtual bool	OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) { Assert(0); return false; }
-	virtual bool	OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) { Assert(0); return false; }
+	void	SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues ) override { Assert(0); }
+	bool	OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override { Assert(0); return false; }
+	bool	OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override { Assert(0); return false; }
 
 	MESSAGE_FUNC_INT( OnUnhandledMouseClick, "UnhandledMouseClick", code );
 
@@ -188,7 +184,7 @@ public:
 	void	PostMessageToAllTools( KeyValues *message );
 
 protected:
-	virtual void	PaintBackground();
+	void	PaintBackground() override;
 
 	// Derived classes must implement this to specify where in the 
 	// registry to store registry settings
@@ -232,7 +228,7 @@ protected:
 	void	LoadKeyBindings();
 	void	ShowKeyBindingsEditor( vgui::Panel *panel, vgui::KeyBindingContextHandle_t handle );
 	void	ShowKeyBindingsHelp( vgui::Panel *panel, vgui::KeyBindingContextHandle_t handle, vgui::KeyCode boundKey, int modifiers );
-	vgui::KeyBindingContextHandle_t GetKeyBindingsHandle();
+	vgui::KeyBindingContextHandle_t GetKeyBindingsHandle() const;
 
 	// Registers tool window
 	void	RegisterToolWindow( vgui::PHandle hPanel );

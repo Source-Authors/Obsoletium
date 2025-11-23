@@ -6,9 +6,6 @@
 
 #ifndef MINIVIEWPORT_H
 #define MINIVIEWPORT_H
-#ifdef _WIN32
-#pragma once
-#endif
 
 #include "vgui_controls/ToolWindow.h"
 
@@ -16,7 +13,7 @@ class CMiniViewportPropertyPage;
 
 class CMiniViewport : public vgui::ToolWindow
 {
-	DECLARE_CLASS_SIMPLE( CMiniViewport, vgui::ToolWindow );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CMiniViewport, vgui::ToolWindow );
 public:
 	CMiniViewport( vgui::Panel *parent, 
 		bool contextLabel, 

@@ -4,10 +4,10 @@
 //
 //=============================================================================
 
-#include "toolutils/toolmenubutton.h"
+#include "toolutils/ToolMenuButton.h"
 #include "toolutils/toolmenubar.h"
-#include "toolutils/basetoolsystem.h"
-#include "vgui_controls/menu.h"
+#include "toolutils/BaseToolSystem.h"
+#include "vgui_controls/Menu.h"
 #include "vgui_controls/KeyBindingMap.h"
 #include "vgui/ILocalize.h"
 // memdbgon must be the last include file in a .cpp file!!!

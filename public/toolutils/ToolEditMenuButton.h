@@ -8,10 +8,6 @@
 #ifndef TOOLEDITMENUBUTTON_H
 #define TOOLEDITMENUBUTTON_H
 
-#ifdef _WIN32
-#pragma once
-#endif
-
 
 //-----------------------------------------------------------------------------
 // forward declarations
