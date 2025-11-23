@@ -39,44 +39,44 @@ public:
 	//---------------------------------
 	// Buffer operations
 	//
-	void Init( void *pNewBase, int nBytes );
+	void Init( void *pNewBase, intp nBytes );
 	void Rebase();
-	void Rewind( int nBytes );
+	void Rewind( intp nBytes );
 	char *GetBuffer();
-	int BytesAvailable() const;
-	int SizeBuffer() const;
-	bool Write( const void *pData, int nBytes );
-	bool Read( void *pOutput, int nBytes );
-	int GetCurPos();
+	intp BytesAvailable() const;
+	intp SizeBuffer() const;
+	bool Write( const void *pData, intp nBytes );
+	bool Read( void *pOutput, intp nBytes );
+	intp GetCurPos() const;
 	char *AccessCurPos();
-	bool Seek( int absPosition );
-	void MoveCurPos( int nBytes );
+	bool Seek( intp absPosition );
+	void MoveCurPos( intp nBytes );
 
 	//---------------------------------
 	// Symbol table operations
 	//
-	void InitSymbolTable( char **pNewTokens, int sizeTable);
+	void InitSymbolTable( char **pNewTokens, intp sizeTable);
 	char **DetachSymbolTable();
-	int SizeSymbolTable();
-	bool DefineSymbol( const char *pszToken, int token );
+	intp SizeSymbolTable() const;
+	bool DefineSymbol( const char *pszToken, intp token );
 	unsigned short FindCreateSymbol( const char *pszToken );
 	const char *StringFromSymbol( int token );
 
 private:
-	unsigned int HashString( const char *pszToken );
+	uintp HashString( const char *pszToken );
 	
 	//---------------------------------
 	// Buffer data
 	//
 	char		*pBaseData;		// Start of all entity save data
 	char		*pCurrentData;	// Current buffer pointer for sequential access
-	int			size;			// Current data size, aka, pCurrentData - pBaseData
-	int			bufferSize;		// Total space for data
+	intp		size;			// Current data size, aka, pCurrentData - pBaseData
+	intp		bufferSize;		// Total space for data
 	
 	//---------------------------------
 	// Symbol table
 	//
-	int			tokenCount;		// Number of elements in the pTokens table
+	intp		tokenCount;		// Number of elements in the pTokens table
 	char		**pTokens;		// Hash table of entity strings (sparse)
 };
 
@@ -208,16 +208,16 @@ public:
 	void		SetCurrentEntityContext(CBaseEntity *pEntity) { m_pCurrentEntity = pEntity; }
 
 	int NumEntities()						{ return tableCount; }
-	entitytable_t *GetEntityInfo( intp i )	{ return (pTable + i); }
+	entitytable_t *GetEntityInfo( int i )	{ return (pTable + i); }
 	float GetBaseTime() const				{ return levelInfo.time; }
 	Vector GetLandmark() const				{ return ( levelInfo.fUseLandmark ) ? levelInfo.vecLandmarkOffset : vec3_origin; }
 
 	void BuildEntityHash()
 	{
 #ifdef GAME_DLL
-		intp nEntities = NumEntities();
+		int nEntities = NumEntities();
 
-		for ( intp i = 0; i < nEntities; i++ )
+		for ( int i = 0; i < nEntities; i++ )
 		{
 			entitytable_t *info = GetEntityInfo( i );
 			m_EntityToIndex.Insert(  CHashElement( info->hEnt.Get(), i ) );
@@ -331,14 +331,14 @@ inline CSaveRestoreSegment::CSaveRestoreSegment()
 	memset( this, 0, sizeof(*this) );
 }
 
-inline void CSaveRestoreSegment::Init( void *pNewBase, int nBytes )
+inline void CSaveRestoreSegment::Init( void *pNewBase, intp nBytes )
 {
 	pCurrentData = pBaseData = (char *)pNewBase;
 	size = 0;
 	bufferSize = nBytes;
 }
 
-inline void CSaveRestoreSegment::MoveCurPos( int nBytes )
+inline void CSaveRestoreSegment::MoveCurPos( intp nBytes )
 {
 	pCurrentData += nBytes;
 	size += nBytes;
@@ -351,7 +351,7 @@ inline void CSaveRestoreSegment::Rebase()
 	size = 0;
 }
 
-inline void CSaveRestoreSegment::Rewind( int nBytes )
+inline void CSaveRestoreSegment::Rewind( intp nBytes )
 {
 	if ( size < nBytes )
 		nBytes = size;
@@ -364,17 +364,17 @@ inline char *CSaveRestoreSegment::GetBuffer()
 	return pBaseData;
 }
 
-inline int CSaveRestoreSegment::BytesAvailable() const
+inline intp CSaveRestoreSegment::BytesAvailable() const
 {
 	return (bufferSize - size);
 }
 
-inline int CSaveRestoreSegment::SizeBuffer() const
+inline intp CSaveRestoreSegment::SizeBuffer() const
 {
 	return bufferSize;
 }
 
-inline bool CSaveRestoreSegment::Write( const void *pData, int nBytes )
+inline bool CSaveRestoreSegment::Write( const void *pData, intp nBytes )
 {
 	if ( nBytes > BytesAvailable() )
 	{
@@ -388,7 +388,7 @@ inline bool CSaveRestoreSegment::Write( const void *pData, int nBytes )
 	return true;
 }
 
-inline bool CSaveRestoreSegment::Read( void *pOutput, int nBytes )
+inline bool CSaveRestoreSegment::Read( void *pOutput, intp nBytes )
 {
 	if ( !BytesAvailable() )
 		return false;
@@ -405,7 +405,7 @@ inline bool CSaveRestoreSegment::Read( void *pOutput, int nBytes )
 	return true;
 }
 
-inline int CSaveRestoreSegment::GetCurPos()
+inline intp CSaveRestoreSegment::GetCurPos() const
 {
 	return size;
 }
@@ -415,7 +415,7 @@ inline char *CSaveRestoreSegment::AccessCurPos()
 	return pCurrentData;
 }
 
-inline bool CSaveRestoreSegment::Seek( int absPosition )
+inline bool CSaveRestoreSegment::Seek( intp absPosition )
 {
 	if ( absPosition < 0 || absPosition >= bufferSize )
 		return false;
@@ -425,7 +425,7 @@ inline bool CSaveRestoreSegment::Seek( int absPosition )
 	return true;
 }
 
-inline void CSaveRestoreSegment::InitSymbolTable( char **pNewTokens, int sizeTable)
+inline void CSaveRestoreSegment::InitSymbolTable( char **pNewTokens, intp sizeTable)
 {
 	Assert( !pTokens );
 	tokenCount = sizeTable;
@@ -441,12 +441,12 @@ inline char **CSaveRestoreSegment::DetachSymbolTable()
 	return pResult;
 }
 
-inline int CSaveRestoreSegment::SizeSymbolTable()
+inline intp CSaveRestoreSegment::SizeSymbolTable() const
 {
 	return tokenCount;
 }
 
-inline bool CSaveRestoreSegment::DefineSymbol( const char *pszToken, int token )
+inline bool CSaveRestoreSegment::DefineSymbol( const char *pszToken, intp token )
 {
 	if ( pTokens[token] == NULL )
 	{
@@ -459,7 +459,8 @@ inline bool CSaveRestoreSegment::DefineSymbol( const char *pszToken, int token )
 
 inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToken )
 {
-	unsigned short	hash = (unsigned short)(HashString( pszToken ) % (unsigned)tokenCount );
+	// dimhotepus: unsigned short -> uintp.
+	uintp hash = HashString( pszToken ) % (uintp)tokenCount;
 	
 #if _DEBUG
 	[[maybe_unused]] static int tokensparsed = 0;
@@ -470,7 +471,7 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 	}
 #endif
 
-	for ( int i=0; i<tokenCount; i++ )
+	for ( intp i=0; i<tokenCount; i++ )
 	{
 #if _DEBUG
 		static bool beentheredonethat = false;
@@ -481,9 +482,9 @@ inline unsigned short CSaveRestoreSegment::FindCreateSymbol( const char *pszToke
 		}
 #endif
 
-		int	index = hash + i;
+		intp index = hash + i;
 		if ( index >= tokenCount )
-			index -= tokenCount;
+			index %= tokenCount;
 
 		if ( !pTokens[index] || strcmp( pszToken, pTokens[index] ) == 0 )
 		{
@@ -526,10 +527,9 @@ inline const char *CSaveRestoreSegment::StringFromSymbol( int token )
 //#endif
 
 
-inline unsigned int CSaveRestoreSegment::HashString( const char *pszToken )
+inline uintp CSaveRestoreSegment::HashString( const char *pszToken )
 {
-	COMPILE_TIME_ASSERT( sizeof( unsigned int ) == 4 );
-	unsigned int	hash = 0;
+	uintp	hash = 0;
 
 	// dimhotepus: x86-64 hashing support.
 	while ( *pszToken )
