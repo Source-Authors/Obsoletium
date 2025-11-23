@@ -149,7 +149,7 @@ public:
 
 	bool		IsPublicUI() override { return true; }
 
-	virtual char const	*GetUserName();
+	char const	*GetUserName() override;
 	char const	*GetUserName_Display() override;
 
 	intp			GetNameCount() override;
