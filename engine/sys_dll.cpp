@@ -47,7 +47,7 @@
 #include "cdll_engine_int.h"
 #include "dt_send.h"
 #include "idedicatedexports.h"
-#include "eifacev21.h"
+#include "eiface.h"
 #include "cl_steamauth.h"
 #include "tier0/etwprof.h"
 #include "tier2/tier2.h"
