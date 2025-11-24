@@ -96,7 +96,7 @@ CInfoTargetBrowserPanel::~CInfoTargetBrowserPanel()
 //-----------------------------------------------------------------------------
 void CInfoTargetBrowserPanel::OnProperties(void)
 {
-	int iSel = m_pEntities->GetSelectedItem( 0 );
+	intp iSel = m_pEntities->GetSelectedItem( 0 );
 	KeyValues *kv = m_pEntities->GetItem( iSel );
 	CDmeVMFEntity *pEntity = CastElement< CDmeVMFEntity >( (CDmElement *)kv->GetPtr( "entity" ) );
 	g_pVcdBlockTool->ShowEntityInEntityProperties( pEntity );
@@ -108,7 +108,7 @@ void CInfoTargetBrowserPanel::OnProperties(void)
 //-----------------------------------------------------------------------------
 void CInfoTargetBrowserPanel::OnDeleteEntities(void)
 {		
-	int iSel = m_pEntities->GetSelectedItem( 0 );
+	intp iSel = m_pEntities->GetSelectedItem( 0 );
 
 	{
 		// This is undoable
@@ -117,10 +117,10 @@ void CInfoTargetBrowserPanel::OnDeleteEntities(void)
 		//
 		// Build a list of objects to delete.
 		//
-		int nCount = m_pEntities->GetSelectedItemsCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = m_pEntities->GetSelectedItemsCount();
+		for (intp i = 0; i < nCount; i++)
 		{
-			int nItemID = m_pEntities->GetSelectedItem(i);
+			intp nItemID = m_pEntities->GetSelectedItem(i);
 			KeyValues *kv = m_pEntities->GetItem( nItemID );
 			CDmeVMFEntity *pEntity = (CDmeVMFEntity *)kv->GetPtr( "entity" );
 			if ( pEntity )
@@ -170,7 +170,7 @@ void CInfoTargetBrowserPanel::OnItemSelected( void )
 void CInfoTargetBrowserPanel::SelectNode( CDmeVMFEntity *pNode )
 {
 	m_pEntities->ClearSelectedItems();
-	for ( int nItemID = m_pEntities->FirstItem(); nItemID != m_pEntities->InvalidItemID(); nItemID = m_pEntities->NextItem( nItemID ) )
+	for ( intp nItemID = m_pEntities->FirstItem(); nItemID != m_pEntities->InvalidItemID(); nItemID = m_pEntities->NextItem( nItemID ) )
 	{
 		KeyValues *kv = m_pEntities->GetItem( nItemID );
 		CDmElement *pEntity = (CDmElement *)kv->GetPtr( "entity" );
@@ -246,8 +246,8 @@ void CInfoTargetBrowserPanel::UpdateEntityList(void)
 	if ( !entityList.IsValid() )
 		return;
 
-	int nCount = entityList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entityList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmElement *pEntity = entityList[i];
 
@@ -268,7 +268,7 @@ void CInfoTargetBrowserPanel::UpdateEntityList(void)
 		}
 		kv->SetString( "targetname", pTargetname ); 
 
-		int nItemID = m_pEntities->AddItem( kv, 0, false, false );
+		intp nItemID = m_pEntities->AddItem( kv, 0, false, false );
 
 		// Hide everything that isn't an info_target
 		m_pEntities->SetItemVisible( nItemID, !Q_stricmp( pClassName, "info_target" ) );
@@ -282,7 +282,7 @@ void CInfoTargetBrowserPanel::UpdateEntityList(void)
 //-----------------------------------------------------------------------------
 void CInfoTargetBrowserPanel::Refresh(void)
 {
-	for ( int nItemID = m_pEntities->FirstItem(); nItemID != m_pEntities->InvalidItemID(); nItemID = m_pEntities->NextItem( nItemID ) )
+	for ( intp nItemID = m_pEntities->FirstItem(); nItemID != m_pEntities->InvalidItemID(); nItemID = m_pEntities->NextItem( nItemID ) )
 	{
 		KeyValues *kv = m_pEntities->GetItem( nItemID );
 		CDmElement *pEntity = (CDmElement *)kv->GetPtr( "entity" );

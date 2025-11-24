@@ -125,7 +125,7 @@ CInfoTargetPropertiesPanel::CInfoTargetPropertiesPanel( CVcdBlockDoc *pDoc, vgui
 //-----------------------------------------------------------------------------
 void CInfoTargetPropertiesPanel::TextEntryToAttribute( vgui::TextEntry *pEntry, const char *pAttributeName )
 {
-	int nLen = pEntry->GetTextLength();
+	intp nLen = pEntry->GetTextLength();
 	char *pBuf = (char*)_alloca( nLen+1 );
 	pEntry->GetText( pBuf, nLen+1 );
 	m_hEntity->SetValue( pAttributeName, pBuf );
@@ -136,7 +136,7 @@ void CInfoTargetPropertiesPanel::TextEntriesToVector( vgui::TextEntry *pEntry[3]
 	Vector vec;
 	for ( int i = 0; i < 3; ++i )
 	{
-		int nLen = pEntry[i]->GetTextLength();
+		intp nLen = pEntry[i]->GetTextLength();
 		char *pBuf = (char*)_alloca( nLen+1 );
 		pEntry[i]->GetText( pBuf, nLen+1 );
 		vec[i] = atof( pBuf );

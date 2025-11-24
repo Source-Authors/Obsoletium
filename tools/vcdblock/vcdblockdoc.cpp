@@ -264,8 +264,8 @@ void CVcdBlockDoc::AddNewInfoTarget( void )
 void CVcdBlockDoc::DeleteInfoTarget( CDmeVMFEntity *pNode )
 {
 	CDmrElementArray<CDmElement> entities = GetEntityList();
-	int nCount = entities.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entities.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pNode == entities[i] )
 		{
@@ -287,8 +287,8 @@ void CVcdBlockDoc::DeleteInfoTarget( CDmeVMFEntity *pNode )
 CDmeVMFEntity *CVcdBlockDoc::GetInfoTargetForLocation( Vector &vecOrigin, QAngle &angAbsAngles )
 {
 	const CDmrElementArray<> entities = GetEntityList();
-	int nCount = entities.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entities.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeVMFEntity *pNode = CastElement< CDmeVMFEntity >( entities[ i ] );
 		Vector &vecAngles = *(Vector*)(&pNode->GetRenderAngles());
@@ -319,8 +319,8 @@ CDmeVMFEntity *CVcdBlockDoc::GetInfoTargetForLocation( Vector &vecStart, Vector 
 	float flMinDistFromLine = 1E30;
 
 	const CDmrElementArray<CDmElement> entities = GetEntityList();
-	int nCount = entities.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entities.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeVMFEntity *pNode = CastElement< CDmeVMFEntity >( entities[ i ] );
 		float flDistAway = DotProduct( pNode->GetRenderOrigin() - vecStart, vecDelta );
@@ -354,8 +354,8 @@ bool CVcdBlockDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement 
 		sChoice.m_pChoiceString = "";
 		list.AddToTail( sChoice );
 
-		int nCount = entities.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = entities.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			CDmeVMFEntity *pNode = CastElement< CDmeVMFEntity >( entities[ i ] );
 			if ( !V_stricmp( pNode->GetClassName(), "info_target" ) )
@@ -389,8 +389,8 @@ bool CVcdBlockDoc::GetElementChoiceList( const char *pChoiceListType, CDmElement
 		const CDmrElementArray<> entities = GetEntityList();
 
 		bool bFound = false;
-		int nCount = entities.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = entities.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			CDmeVMFEntity *pNode = CastElement< CDmeVMFEntity >( entities[ i ] );
 			if ( !V_stricmp( pNode->GetClassName(), "info_target" ) )
@@ -499,7 +499,7 @@ void CVcdBlockDoc::InitializeFromServer( CDmrElementArray<> &entityList )
 void CVcdBlockDoc::VerifyAllEdits( const CDmrElementArray<> &entityList )
 {
     // already filled in
-	for (int i = 0; i < entityList.Count(); i++)
+	for (intp i = 0; i < entityList.Count(); i++)
 	{
 		CDmeVMFEntity *pEntity = CastElement<CDmeVMFEntity>( entityList[i] );
 
@@ -542,8 +542,8 @@ bool CVcdBlockDoc::CopyEditsToVMF( )
 
 	CDmrElementArray<CDmElement> vmfEntities( pVMF, "entities" );
 
-	int nVMFCount = vmfEntities.Count();
-	for (int i = 0; i < nVMFCount; i++)
+	intp nVMFCount = vmfEntities.Count();
+	for (intp i = 0; i < nVMFCount; i++)
 	{
 		CDmElement *pVMFEntity = vmfEntities[i];
 
@@ -556,8 +556,8 @@ bool CVcdBlockDoc::CopyEditsToVMF( )
 		int nHammerID = atoi( pVMFEntity->GetName() );
 
 		// find a match.
-		int nCount = entityList.Count();
-		for (int j = 0; j < nCount; j++)
+		intp nCount = entityList.Count();
+		for (intp j = 0; j < nCount; j++)
 		{
 			CDmeVMFEntity *pEntity = CastElement<CDmeVMFEntity>( entityList[j] );
 
@@ -577,8 +577,8 @@ bool CVcdBlockDoc::CopyEditsToVMF( )
 	}
 
 	// add the new entities
-	int nCount = entityList.Count();
-	for (int j = 0; j < nCount; j++)
+	intp nCount = entityList.Count();
+	for (intp j = 0; j < nCount; j++)
 	{
 		CDmeVMFEntity *pEntity = CastElement<CDmeVMFEntity>( entityList[j] );
 
