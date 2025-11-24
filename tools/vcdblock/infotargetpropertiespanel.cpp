@@ -4,18 +4,18 @@
 //
 //===========================================================================//
 
-#include "InfoTargetPropertiesPanel.h"
+#include "infotargetpropertiespanel.h"
 #include "tier1/KeyValues.h"
 #include "tier1/utlbuffer.h"
 #include "iregistry.h"
-#include "vgui/ivgui.h"
-#include "vgui_controls/listpanel.h"
-#include "vgui_controls/textentry.h"
-#include "vgui_controls/checkbutton.h"
-#include "vgui_controls/combobox.h"
-#include "vgui_controls/radiobutton.h"
-#include "vgui_controls/messagebox.h"
-#include "vgui_controls/scrollbar.h"
+#include "vgui/IVGui.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/RadioButton.h"
+#include "vgui_controls/MessageBox.h"
+#include "vgui_controls/ScrollBar.h"
 #include "vcdblockdoc.h"
 #include "vcdblocktool.h"
 #include "datamodel/dmelement.h"
@@ -23,7 +23,7 @@
 #include "dme_controls/soundpicker.h"
 #include "dme_controls/soundrecordpanel.h"
 #include "matsys_controls/picker.h"
-#include "vgui_controls/fileopendialog.h"
+#include "vgui_controls/FileOpenDialog.h"
 #include "filesystem.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
@@ -33,12 +33,12 @@ using namespace vgui;
 
 class CScrollableEditablePanel : public vgui::EditablePanel
 {
-	DECLARE_CLASS_SIMPLE( CScrollableEditablePanel, vgui::EditablePanel );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CScrollableEditablePanel, vgui::EditablePanel );
 
 public:
 	CScrollableEditablePanel( vgui::Panel *pParent, vgui::EditablePanel *pChild, const char *pName );
 	virtual ~CScrollableEditablePanel() {}
-	virtual void PerformLayout();
+	void PerformLayout() override;
 
 	MESSAGE_FUNC( OnScrollBarSliderMoved, "ScrollBarSliderMoved" );
 

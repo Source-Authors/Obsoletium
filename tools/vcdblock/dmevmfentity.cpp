@@ -4,20 +4,20 @@
 //
 //=============================================================================
 
-#include "DmeVMFEntity.h"
+#include "dmevmfentity.h"
 #include "datamodel/dmelementfactoryhelper.h"
 #include "toolframework/itoolentity.h"
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialsystem.h"
-#include "engine/iclientleafsystem.h"
+#include "engine/IClientLeafSystem.h"
 #include "toolutils/enginetools_int.h"
 #include "vcdblocktool.h"
 #include "tier1/KeyValues.h"
 
 // for tracing
 #include "cmodel.h"
-#include "engine/ienginetrace.h"
+#include "engine/IEngineTrace.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"

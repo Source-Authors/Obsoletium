@@ -15,9 +15,9 @@
 #include "toolframework/ienginetool.h"
 #include "dmevmfentity.h"
 #include "datamodel/idatamodel.h"
-#include "toolutils/attributeelementchoicelist.h"
+#include "toolutils/AttributeElementChoiceList.h"
 #include "infotargetbrowserpanel.h"
-#include "vgui_controls/messagebox.h"
+#include "vgui_controls/MessageBox.h"
 
 
 //-----------------------------------------------------------------------------
@@ -344,8 +344,8 @@ CDmeVMFEntity *CVcdBlockDoc::GetInfoTargetForLocation( Vector &vecStart, Vector 
 //-----------------------------------------------------------------------------
 // Populate string choice lists
 //-----------------------------------------------------------------------------
-bool CVcdBlockDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-									const char *pAttributeName, bool bArrayElement, StringChoiceList_t &list )
+bool CVcdBlockDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
+									[[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, StringChoiceList_t &list )
 {
 	if ( !Q_stricmp( pChoiceListType, "info_targets" ) )
 	{
@@ -377,8 +377,8 @@ bool CVcdBlockDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement 
 //-----------------------------------------------------------------------------
 // Populate element choice lists
 //-----------------------------------------------------------------------------
-bool CVcdBlockDoc::GetElementChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-									 const char *pAttributeName, bool bArrayElement, ElementChoiceList_t &list )
+bool CVcdBlockDoc::GetElementChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
+									 [[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, ElementChoiceList_t &list )
 {
 	if ( !Q_stricmp( pChoiceListType, "allelements" ) )
 	{
@@ -423,17 +423,6 @@ void CVcdBlockDoc::OnDataChanged( const char *pReason, int nNotifySource, int nN
 	m_pCallback->OnDocChanged( pReason, nNotifySource, nNotifyFlags );
 }
 
-
-
-//-----------------------------------------------------------------------------
-// List of all entity classnames to copy over from the original block
-//-----------------------------------------------------------------------------
-static const char *s_pUseOriginalClasses[] =
-{
-	"worldspawn",
-	"func_occluder",
-	NULL
-};
 
 
 //-----------------------------------------------------------------------------

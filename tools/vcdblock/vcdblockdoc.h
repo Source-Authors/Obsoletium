@@ -34,7 +34,7 @@ class CVcdBlockDoc : public IDmNotify
 {
 public:
 	CVcdBlockDoc( IVcdBlockDocCallback *pCallback );
-	~CVcdBlockDoc();
+	virtual ~CVcdBlockDoc();
 
 	// Inherited from INotifyUI
 	virtual void NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags );
