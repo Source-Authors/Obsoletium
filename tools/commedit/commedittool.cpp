@@ -295,8 +295,8 @@ void CCommEditTool::DrawCommentaryNodeEntitiesInEngine( bool bDrawInEngine )
 		return;
 
 	CDisableUndoScopeGuard guard;
-	int nCount = entities.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entities.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeCommentaryNodeEntity *pEntity = entities[i];
 		Assert( pEntity );
@@ -558,8 +558,8 @@ void CCommEditTool::ShowEntityInEntityProperties( CDmeCommentaryNodeEntity *pEnt
 //-----------------------------------------------------------------------------
 void CCommEditTool::DestroyToolContainers()
 {
-	int c = ToolWindow::GetToolWindowCount();
-	for ( int i = c - 1; i >= 0 ; --i )
+	intp c = ToolWindow::GetToolWindowCount();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		ToolWindow *kill = ToolWindow::GetToolWindow( i );
 		delete kill;
@@ -711,8 +711,8 @@ void CCommEditTool::DestroyTools()
 {
 	m_hCurrentEntity = NULL;
 
-	int c = ToolWindow::GetToolWindowCount();
-	for ( int i = c - 1; i >= 0 ; --i )
+	intp c = ToolWindow::GetToolWindowCount();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		ToolWindow *kill = ToolWindow::GetToolWindow( i );
 		delete kill;
@@ -933,8 +933,8 @@ void CCommEditTool::OnRestartLevel()
 	enginetools->Execute();
 
 	CDmrCommentaryNodeEntityList entities = m_pDoc->GetEntityList();
-	int nCount = entities.IsValid() ? entities.Count() : 0;
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entities.IsValid() ? entities.Count() : 0;
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeCommentaryNodeEntity *pEntity = entities[i];
 		Assert( pEntity );
@@ -1187,9 +1187,9 @@ void CCommEditTool::OnDescribeUndo()
 	CUtlVector< UndoInfo_t > list;
 	g_pDataModel->GetUndoInfo( list );
 
-	Msg( "%i operations in stack\n", list.Count() );
+	Msg( "%zd operations in stack\n", list.Count() );
 
-	for ( int i = list.Count() - 1; i >= 0; --i )
+	for ( intp i = list.Count() - 1; i >= 0; --i )
 	{
 		UndoInfo_t& entry = list[ i ];
 		if ( entry.terminator )

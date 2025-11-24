@@ -46,7 +46,7 @@ struct PickerInfo_t
 struct PickerList_t
 {
 	PickerList_t() : m_Type( PICKER_CHOICE_STRING ) {}
-	PickerList_t( int nGrowSize, int nInitSize ) : m_Type( PICKER_CHOICE_STRING ), m_Choices( nGrowSize, nInitSize ) {}
+	PickerList_t( intp nGrowSize, intp nInitSize ) : m_Type( PICKER_CHOICE_STRING ), m_Choices( nGrowSize, nInitSize ) {}
 
 	intp Count() const { return m_Choices.Count(); }
 	PickerInfo_t& operator[]( intp i ) { return m_Choices[i]; }

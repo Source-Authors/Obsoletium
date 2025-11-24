@@ -132,7 +132,7 @@ CCommentaryPropertiesPanel::CCommentaryPropertiesPanel( CCommEditDoc *pDoc, vgui
 //-----------------------------------------------------------------------------
 void CCommentaryPropertiesPanel::TextEntryToAttribute( vgui::TextEntry *pEntry, const char *pAttributeName )
 {
-	int nLen = pEntry->GetTextLength();
+	intp nLen = pEntry->GetTextLength();
 	char *pBuf = (char*)_alloca( nLen+1 );
 	pEntry->GetText( pBuf, nLen+1 );
 	m_hEntity->SetValue( pAttributeName, pBuf );
@@ -340,12 +340,12 @@ void CCommentaryPropertiesPanel::OnPicked( KeyValues *pParams )
 void CCommentaryPropertiesPanel::PickInfoTarget( vgui::TextEntry *pControl )
 {
 	CDmrCommentaryNodeEntityList entities( m_pDoc->GetEntityList() );
-	int nCount = entities.Count();
+	intp nCount = entities.Count();
 	PickerList_t vec( 0, nCount+1 );
-	int j = vec.AddToTail( );
+	intp j = vec.AddToTail( );
 	vec[j].m_pChoiceString = "<no target>";
 	vec[j].m_pChoiceValue = "";
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeCommentaryNodeEntity *pNode = entities[ i ];
 		const char *pTargetName = pNode->GetTargetName();

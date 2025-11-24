@@ -318,8 +318,8 @@ void CCommEditDoc::AddNewCommentaryNode( void )
 void CCommEditDoc::DeleteCommentaryNode( CDmElement *pRemoveNode )
 {
 	CDmrCommentaryNodeEntityList entities = GetEntityList();
-	int nCount = entities.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entities.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pRemoveNode == entities[i] )
 		{
@@ -341,8 +341,8 @@ void CCommEditDoc::DeleteCommentaryNode( CDmElement *pRemoveNode )
 CDmeCommentaryNodeEntity *CCommEditDoc::GetCommentaryNodeForLocation( Vector &vecOrigin, QAngle &angAbsAngles )
 {
 	CDmrCommentaryNodeEntityList entities = GetEntityList();
-	int nCount = entities.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entities.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeCommentaryNodeEntity *pNode = entities[ i ];
 		if ( !pNode )
@@ -371,8 +371,8 @@ bool CCommEditDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement 
 		sChoice.m_pChoiceString = "";
 		list.AddToTail( sChoice );
 
-		int nCount = entities.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = entities.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			CDmeCommentaryNodeEntity *pNode = entities[ i ];
 			if ( !pNode )
@@ -408,8 +408,8 @@ bool CCommEditDoc::GetElementChoiceList( const char *pChoiceListType, CDmElement
 		CDmrCommentaryNodeEntityList entities = GetEntityList();
 
 		bool bFound = false;
-		int nCount = entities.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = entities.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			CDmeCommentaryNodeEntity *pNode = entities[ i ];
 			if ( pNode && !V_stricmp( pNode->GetClassName(), "info_target" ) )
