@@ -122,20 +122,22 @@ CFileHandle *CZipPackFile::OpenFile( const char *pFileName, const char *pOptions
 	// find the file's location in the pack
 	if ( GetFileInfo( pFileName, nIndex, nPosition, nOriginalSize, nCompressedSize, nCompressionMethod ) )
 	{
-		m_mutex.Lock();
-#if defined( SUPPORT_PACKED_STORE )
-		if ( m_nOpenFiles == 0 && m_hPackFileHandleFS == NULL && !m_hPackFileHandleVPK )
-#else
-		if ( m_nOpenFiles == 0 && m_hPackFileHandleFS == NULL )
-#endif
 		{
-			// Try to open it as a regular file first
-			m_hPackFileHandleFS = m_fs->Trace_FOpen( m_ZipName, "rb", 0, NULL );
+            AUTO_LOCK(m_mutex);
 
-			// !NOTE! Pack files inside of VPK not supported
+#if defined( SUPPORT_PACKED_STORE )
+			if ( m_nOpenFiles == 0 && m_hPackFileHandleFS == NULL && !m_hPackFileHandleVPK )
+#else
+			if ( m_nOpenFiles == 0 && m_hPackFileHandleFS == NULL )
+#endif
+			{
+				// Try to open it as a regular file first
+				m_hPackFileHandleFS = m_fs->Trace_FOpen( m_ZipName, "rb", 0, NULL );
+
+				// !NOTE! Pack files inside of VPK not supported
+			}
+			m_nOpenFiles++;
 		}
-		m_nOpenFiles++;
-		m_mutex.Unlock();
 		CPackFileHandle* ph = NULL;
 		if ( nCompressionMethod == ZIP_COMPRESSION_LZMA )
 		{
@@ -273,7 +275,7 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 #endif
 
 	// Otherwise, do the read from the pack
-	m_mutex.Lock();
+	AUTO_LOCK(m_mutex);
 
 	if ( fs_monitor_read_from_pack.GetInt() == 1 || ( fs_monitor_read_from_pack.GetInt() == 2 && ThreadInMainThread() ) )
 	{
@@ -298,7 +300,6 @@ int CZipPackFile::ReadFromPack( int nEntryIndex, void* pBuffer, int nDestBytes, 
 		nBytesRead = m_hPackFileHandleVPK.Read( pBuffer, nBytes );
 	}
 #endif
-	m_mutex.Unlock();
 
 	return nBytesRead;
 }
@@ -777,10 +778,9 @@ CZipPackFileHandle::CZipPackFileHandle( CZipPackFile* pOwner, int64 nBase, unsig
 
 CZipPackFileHandle::~CZipPackFileHandle()
 {
-	m_pOwner->m_mutex.Lock();
-	--m_pOwner->m_nOpenFiles;
+	AUTO_LOCK(m_pOwner->m_mutex);
 	// XXX(johns) this doesn't go here, the hell
-	if ( m_pOwner->m_nOpenFiles == 0 && m_pOwner->m_bIsMapPath )
+	if ( --m_pOwner->m_nOpenFiles == 0 && m_pOwner->m_bIsMapPath )
 	{
 		if ( m_pOwner->m_hPackFileHandleFS )
 		{
@@ -789,7 +789,6 @@ CZipPackFileHandle::~CZipPackFileHandle()
 		}
 	}
 	m_pOwner->Release();
-	m_pOwner->m_mutex.Unlock();
 }
 
 void CZipPackFileHandle::SetBufferSize( int nBytes )

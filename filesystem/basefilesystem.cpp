@@ -1226,7 +1226,7 @@ void CBaseFileSystem::BeginMapAccess()
 			if ( pPackFile && pPackFile->m_bIsMapPath )
 			{
 				pPackFile->AddRef();
-				pPackFile->m_mutex.Lock();
+				AUTO_LOCK(pPackFile->m_mutex);
 
 #if defined( SUPPORT_PACKED_STORE )
 				if ( pPackFile->m_nOpenFiles == 0 && pPackFile->m_hPackFileHandleFS == nullptr && !pPackFile->m_hPackFileHandleVPK )
@@ -1246,7 +1246,6 @@ void CBaseFileSystem::BeginMapAccess()
 //#endif
 				}
 				pPackFile->m_nOpenFiles++;
-				pPackFile->m_mutex.Unlock();
 			}
 		}
 	}
@@ -1263,9 +1262,8 @@ void CBaseFileSystem::EndMapAccess()
 
 			if ( pPackFile && pPackFile->m_bIsMapPath )
 			{
-				pPackFile->m_mutex.Lock();
-				pPackFile->m_nOpenFiles--;
-				if ( pPackFile->m_nOpenFiles == 0  )
+				AUTO_LOCK(pPackFile->m_mutex);
+				if ( --pPackFile->m_nOpenFiles == 0  )
 				{
 					if ( pPackFile->m_hPackFileHandleFS )
 					{
@@ -1273,7 +1271,6 @@ void CBaseFileSystem::EndMapAccess()
 						pPackFile->m_hPackFileHandleFS = nullptr;
 					}
 				}
-				pPackFile->m_mutex.Unlock();
 				pPackFile->Release();
 			}
 		}
