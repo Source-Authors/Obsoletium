@@ -244,8 +244,8 @@ void CFoundryTool::Shutdown()
 
 	{
 		CDisableUndoScopeGuard guard;
-		int nElements = m_toolElements.Count();
-		for ( int i = 0; i < nElements; ++i )
+		intp nElements = m_toolElements.Count();
+		for ( intp i = 0; i < nElements; ++i )
 		{
 			g_pDataModel->DestroyElement( m_toolElements[ i ] );
 		}
@@ -345,8 +345,8 @@ void CFoundryTool::DrawVMFEntitiesInEngine( bool bDrawInEngine )
 		return;
 
 	const CDmrElementArray<> entities( m_pDoc->GetEntityList() );
-	int nCount = entities.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entities.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeVMFEntity* pEntity = CastElement<CDmeVMFEntity>( entities[i] );
 		Assert( pEntity );
@@ -593,8 +593,8 @@ void CFoundryTool::ShowEntityInEntityProperties( CDmeVMFEntity *pEntity )
 //-----------------------------------------------------------------------------
 void CFoundryTool::DestroyToolContainers()
 {
-	int c = ToolWindow::GetToolWindowCount();
-	for ( int i = c - 1; i >= 0 ; --i )
+	intp c = ToolWindow::GetToolWindowCount();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		ToolWindow *kill = ToolWindow::GetToolWindow( i );
 		delete kill;
@@ -692,8 +692,8 @@ void CFoundryTool::DestroyTools()
 {
 	m_hCurrentEntity = NULL;
 
-	int c = ToolWindow::GetToolWindowCount();
-	for ( int i = c - 1; i >= 0 ; --i )
+	intp c = ToolWindow::GetToolWindowCount();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		ToolWindow *kill = ToolWindow::GetToolWindow( i );
 		delete kill;
@@ -1077,9 +1077,9 @@ void CFoundryTool::OnDescribeUndo()
 	CUtlVector< UndoInfo_t > list;
 	g_pDataModel->GetUndoInfo( list );
 
-	Msg( "%i operations in stack\n", list.Count() );
+	Msg( "%zd operations in stack\n", list.Count() );
 
-	for ( int i = list.Count() - 1; i >= 0; --i )
+	for ( intp i = list.Count() - 1; i >= 0; --i )
 	{
 		UndoInfo_t& entry = list[ i ];
 		if ( entry.terminator )

@@ -178,7 +178,7 @@ void CEntityReportPanel::SaveSettingsToRegistry()
 //-----------------------------------------------------------------------------
 void CEntityReportPanel::OnProperties(void)
 {
-	int iSel = m_pEntities->GetSelectedItem( 0 );
+	intp iSel = m_pEntities->GetSelectedItem( 0 );
 	KeyValues *kv = m_pEntities->GetItem( iSel );
 	CDmeVMFEntity *pEntity = (CDmeVMFEntity *)kv->GetPtr( "entity" );
 	g_pFoundryTool->ShowEntityInEntityProperties( pEntity );
@@ -193,15 +193,15 @@ void CEntityReportPanel::OnDeleteEntities(void)
 	// This is undoable
 	CAppUndoScopeGuard guard( NOTIFY_SETDIRTYFLAG, "Delete Entities", "Delete Entities" );
 
-	int iSel = m_pEntities->GetSelectedItem( 0 );
+	intp iSel = m_pEntities->GetSelectedItem( 0 );
 
 	//
 	// Build a list of objects to delete.
 	//
-	int nCount = m_pEntities->GetSelectedItemsCount();
-	for (int i = 0; i < nCount; i++)
+	intp nCount = m_pEntities->GetSelectedItemsCount();
+	for (intp i = 0; i < nCount; i++)
 	{
-		int nItemID = m_pEntities->GetSelectedItem(i);
+		intp nItemID = m_pEntities->GetSelectedItem(i);
 		KeyValues *kv = m_pEntities->GetItem( nItemID );
 		CDmeVMFEntity *pEntity = (CDmeVMFEntity *)kv->GetPtr( "entity" );
 		if ( pEntity )
@@ -335,7 +335,7 @@ void CEntityReportPanel::OnTextChanged( KeyValues *kv )
 {
 	TextEntry *pPanel = (TextEntry*)kv->GetPtr( "panel", NULL );
 
-	int nLength = pPanel->GetTextLength();
+	intp nLength = pPanel->GetTextLength();
 	char *pBuf = (char*)_alloca( nLength + 1 );
 	pPanel->GetText( pBuf, nLength+1 );
 
@@ -538,8 +538,8 @@ void CEntityReportPanel::UpdateEntityList(void)
 	m_pEntities->RemoveAll();
 
 	const CDmrElementArray<CDmElement> entityList( m_pDoc->GetEntityList() );
-	int nCount = entityList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entityList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeVMFEntity *pEntity = CastElement<CDmeVMFEntity>( entityList[i] );
 		if ( ShouldAddEntityToList( pEntity ) )

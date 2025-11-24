@@ -174,8 +174,8 @@ void CFoundryDoc::DeleteEntity( CDmeVMFEntity *pEntity )
 	if ( !entities.IsValid() )
 		return;
 
-	int nCount = entities.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = entities.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pEntity == CastElement< CDmeVMFEntity >( entities[i] ) )
 		{
@@ -273,8 +273,8 @@ void CFoundryDoc::AddVMFEntities( CUtlBuffer &entityBuf, const char *pActualEnti
 	if ( !entityArray.IsValid() )
 		return;
 
-	int nCount = entityArray.Count();
-	for ( int iEntity = 0; iEntity < nCount; ++iEntity )
+	intp nCount = entityArray.Count();
+	for ( intp iEntity = 0; iEntity < nCount; ++iEntity )
 	{
 		CDmElement *pEntity = entityArray[iEntity];
 		const char *pClassName = pEntity->GetValueString( "classname" );
@@ -283,7 +283,7 @@ void CFoundryDoc::AddVMFEntities( CUtlBuffer &entityBuf, const char *pActualEnti
 
 		// Don't spawn those classes we grab from the actual compiled map
 		bool bDontUse = false;
-		for ( int i = 0; s_pUseOriginalClasses[i]; ++i )
+		for ( intp i = 0; s_pUseOriginalClasses[i]; ++i )
 		{
 			if ( !Q_stricmp( pClassName, s_pUseOriginalClasses[i] ) )
 			{
