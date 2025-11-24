@@ -2352,7 +2352,8 @@ void RichText::ApplySettings(KeyValues *inResourceData)
 			delete [] m_pszInitialText;
 			m_pszInitialText = new char[ len + 1 ];
 			g_pFullFileSystem->Read( m_pszInitialText, len, f );
-			m_pszInitialText[len - 1] = 0;
+			// dimhotepus: Fix off by one error.
+			m_pszInitialText[len] = 0;
 			SetText( m_pszInitialText );
 
 			g_pFullFileSystem->Close( f );
