@@ -1783,24 +1783,22 @@ inline CThreadRWLock::CThreadRWLock()
 
 inline void CThreadRWLock::LockForRead()
 {
-	m_mutex.Lock();
+	AUTO_LOCK(m_mutex);
 	if ( m_nWriters)
 	{
 		WaitForRead();
 	}
 	m_nActiveReaders++;
-	m_mutex.Unlock();
 }
 
 inline void CThreadRWLock::UnlockRead()
 {
-	m_mutex.Lock();
+	AUTO_LOCK(m_mutex);
 	m_nActiveReaders--;
 	if ( m_nActiveReaders == 0 && m_nWriters != 0 )
 	{
 		m_CanWrite.Set();
 	}
-	m_mutex.Unlock();
 }
 
 

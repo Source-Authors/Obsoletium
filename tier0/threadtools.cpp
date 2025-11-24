@@ -1396,11 +1396,16 @@ void CThreadRWLock::WaitForRead()
 
 void CThreadRWLock::LockForWrite()
 {
-	m_mutex.Lock();
-	bool bWait = ( m_nWriters != 0 || m_nActiveReaders != 0 );
-	m_nWriters++;
-	m_CanRead.Reset();
-	m_mutex.Unlock();
+	bool bWait;
+
+	{
+		AUTO_LOCK(m_mutex);
+
+		bWait = m_nWriters != 0 || m_nActiveReaders != 0;
+
+		++m_nWriters;
+		m_CanRead.Reset();
+	}
 
 	if ( bWait )
 	{
@@ -1410,9 +1415,8 @@ void CThreadRWLock::LockForWrite()
 
 void CThreadRWLock::UnlockWrite()
 {
-	m_mutex.Lock();
-	m_nWriters--;
-	if ( m_nWriters == 0)
+	AUTO_LOCK(m_mutex);
+	if ( --m_nWriters == 0)
 	{
 		if ( m_nPendingReaders )
 		{
@@ -1423,7 +1427,6 @@ void CThreadRWLock::UnlockWrite()
 	{
 		m_CanWrite.Set();
 	}
-	m_mutex.Unlock();
 }
 
 //-----------------------------------------------------------------------------
