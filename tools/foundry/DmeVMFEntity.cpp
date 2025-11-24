@@ -168,8 +168,8 @@ int CDmeVMFEntity::DrawModel( int flags )
 		{
 			float u = j / ( float )(nTheta - 1);
 			float v = i / ( float )(nPhi - 1);
-			float theta = ( j != nTheta-1 ) ? 2.0f * M_PI * u : 0.0f;
-			float phi = M_PI * v;
+			float theta = ( j != nTheta-1 ) ? 2.0f * M_PI_F * u : 0.0f;
+			float phi = M_PI_F * v;
 
 			Vector vecPos;
 			vecPos.x = flRadius * sin(phi) * cos(theta);
