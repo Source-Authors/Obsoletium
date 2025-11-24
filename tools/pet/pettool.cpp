@@ -1069,7 +1069,8 @@ bool CPetTool::LoadDocument( const char *pDocName )
 
 	KeyValues *pMessage = new KeyValues( "ParticleSystemUpdated" );
 	pMessage->SetPtr( "definitionBits", buf.Base() );
-	pMessage->SetInt( "definitionSize", buf.TellMaxPut() );
+	// dimhotepus: int -> uint64.
+	pMessage->SetUint64( "definitionSize", buf.TellMaxPut() );
 	PostMessageToAllTools( pMessage );
 	pMessage->deleteThis();
 	return true;
