@@ -1100,7 +1100,7 @@ void CPackedStoreReadCache::RetryBadCacheLine( CachedVPKRead_t &cachedVPKRead )
 	FileHandleTracker_t &fHandle = m_pPackedStore->GetFileHandle( cachedVPKRead.m_nPackFileNumber );
 	{
 		AUTO_LOCK(fHandle.m_Mutex);
-	ReadCacheLine( fHandle, cachedVPKRead );
+		ReadCacheLine( fHandle, cachedVPKRead );
 	}
 	m_pFileTracker->BlockUntilMD5RequestComplete( cachedVPKRead.m_hMD5RequestHandle, &cachedVPKRead.m_md5Value );
 	cachedVPKRead.m_hMD5RequestHandle = 0;
