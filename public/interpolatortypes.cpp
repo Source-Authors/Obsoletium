@@ -104,17 +104,23 @@ unsigned short Interpolator_CurveTypeForName( const char *name )
 	{
 		char *p = sz + skip;
 		char *second = Q_stristr( p, "_to_curve_" );
-		
-		char save = *second;
-		*second = '\0';
 
-		leftcurve = Interpolator_InterpolatorForName( p );
+		// dimhotepus: Check curve name is expected and exit if not.
+		Assert(second);
 
-		*second = save;
+		if (second)
+		{
+			char save = *second;
+			*second = '\0';
 
-		p = second + ssize( "_to_curve_" ) - 1;
+			leftcurve = Interpolator_InterpolatorForName( p );
 
-		rightcurve = Interpolator_InterpolatorForName( p );
+			*second = save;
+
+			p = second + ssize( "_to_curve_" ) - 1;
+
+			rightcurve = Interpolator_InterpolatorForName( p );
+		}
 	}
 
 	return MAKE_CURVE_TYPE( leftcurve, rightcurve );
