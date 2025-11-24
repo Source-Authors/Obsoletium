@@ -1838,6 +1838,8 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 		}
 
 		char *pDIB = (LPSTR)::GlobalLock(hDIB);
+		// dimhotepus: Check global lock succeeds.
+		if ( pDIB )
 		{
 			g_pFullFileSystem->Read(pDIB, dwBitsSize, file );
 
@@ -1877,9 +1879,9 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 			}
 
 			success = true;
+			::GlobalUnlock( hDIB);
 		}
 
-		::GlobalUnlock( hDIB);
 		::GlobalFree((HGLOBAL) hDIB);
 	}
 
