@@ -254,7 +254,7 @@ void CEntityReportPanel::OnCommand( const char *pCommand )
 //-----------------------------------------------------------------------------
 void CEntityReportPanel::MarkDirty( bool bFilterDirty )
 {
-	float flTime = Plat_FloatTime();
+	double flTime = Plat_FloatTime();
 	m_bRegistrySettingsChanged = true;
 	m_flRegistryTime = flTime;
 	if ( bFilterDirty && !m_bFilterTextChanged )
@@ -454,7 +454,7 @@ void CEntityReportPanel::OnTick( )
 	BaseClass::OnTick();
 
 	// check filters
-	float flTime = Plat_FloatTime();
+	double flTime = Plat_FloatTime();
 	if ( m_bFilterTextChanged )
 	{
 		if ( (flTime - m_flFilterTime) > 1e-3 )

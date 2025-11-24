@@ -99,10 +99,12 @@ private:
 	CUtlString m_szFilterClass;
 
 	bool m_bFilterTextChanged;
-	float m_flFilterTime;
+	// dimhotepus: float -> double
+	double m_flFilterTime;
 
 	bool m_bRegistrySettingsChanged;
-	float m_flRegistryTime;
+	// dimhotepus: float -> double
+	double m_flRegistryTime;
 
 	vgui::CheckButton	*m_pExact;
 	vgui::ComboBox		*m_pFilterClass;
