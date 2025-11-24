@@ -8,14 +8,14 @@
 #include "tier1/KeyValues.h"
 #include "tier1/utlbuffer.h"
 #include "iregistry.h"
-#include "vgui/ivgui.h"
-#include "vgui_controls/listpanel.h"
-#include "vgui_controls/inputdialog.h"
-#include "vgui_controls/messagebox.h"
+#include "vgui/IVGui.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/InputDialog.h"
+#include "vgui_controls/MessageBox.h"
 #include "petdoc.h"
 #include "pettool.h"
 #include "datamodel/dmelement.h"
-#include "vgui/keycode.h"
+#include "vgui/KeyCode.h"
 #include "dme_controls/dmecontrols_utils.h"
 #include "dme_controls/particlesystempanel.h"
 #include "filesystem.h"
@@ -32,7 +32,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Sort by particle system definition name
 //-----------------------------------------------------------------------------
-static int __cdecl ParticleSystemNameSortFunc( vgui::ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
+static int __cdecl ParticleSystemNameSortFunc( [[maybe_unused]] vgui::ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
 {
 	const char *string1 = item1.kv->GetString("name");
 	const char *string2 = item2.kv->GetString("name");

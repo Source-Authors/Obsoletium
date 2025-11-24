@@ -4,7 +4,7 @@
 //
 //===========================================================================//
 
-#include "ParticleSystemPropertiesContainer.h"
+#include "particlesystempropertiescontainer.h"
 #include "petdoc.h"
 #include "pettool.h"
 #include "datamodel/dmelement.h"

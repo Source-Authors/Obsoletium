@@ -15,9 +15,9 @@
 #include "toolframework/ienginetool.h"
 #include "movieobjects/dmeparticlesystemdefinition.h"
 #include "datamodel/idatamodel.h"
-#include "toolutils/attributeelementchoicelist.h"
+#include "toolutils/AttributeElementChoiceList.h"
 #include "particlesystemdefinitionbrowser.h"
-#include "vgui_controls/messagebox.h"
+#include "vgui_controls/MessageBox.h"
 #include "particles/particles.h"
 #include "particlesystempropertiescontainer.h"
 #include "dme_controls/particlesystempanel.h"
@@ -57,8 +57,8 @@ void CPetDoc::NotifyDataChanged( const char *pReason, int nNotifySource, int nNo
 }
 
 	
-bool CPetDoc::GetIntChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-	const char *pAttributeName, bool bArrayElement, IntChoiceList_t &list )
+bool CPetDoc::GetIntChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
+	[[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, IntChoiceList_t &list )
 {
 	if ( !Q_stricmp( pChoiceListType, "particlefield" ) )
 	{
@@ -218,7 +218,7 @@ bool CPetDoc::LoadFromFile( const char *pFileName )
 
 void CPetDoc::SaveToFile( )
 {
-	if ( m_hRoot.Get() && m_pFileName && m_pFileName[0] )
+	if ( m_hRoot.Get() && !Q_isempty( m_pFileName ) )
 	{
 		g_pDataModel->SaveToFile( m_pFileName, NULL, "binary", PET_FILE_FORMAT, m_hRoot );
 	}
@@ -462,8 +462,8 @@ void CPetDoc::UpdateParticleDefinition( CDmeParticleSystemDefinition *pDef )
 //-----------------------------------------------------------------------------
 // Populate string choice lists
 //-----------------------------------------------------------------------------
-bool CPetDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-									const char *pAttributeName, bool bArrayElement, StringChoiceList_t &list )
+bool CPetDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
+									[[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, StringChoiceList_t &list )
 {
 	if ( !Q_stricmp( pChoiceListType, "particleSystemDefinitions" ) )
 	{
@@ -493,8 +493,8 @@ bool CPetDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement *pEle
 //-----------------------------------------------------------------------------
 // Populate element choice lists
 //-----------------------------------------------------------------------------
-bool CPetDoc::GetElementChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-									 const char *pAttributeName, bool bArrayElement, ElementChoiceList_t &list )
+bool CPetDoc::GetElementChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
+									 [[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, ElementChoiceList_t &list )
 {
 	if ( !Q_stricmp( pChoiceListType, "allelements" ) )
 	{

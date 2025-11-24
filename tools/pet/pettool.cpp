@@ -11,8 +11,8 @@
 #include "vgui/KeyCode.h"
 #include "vgui_controls/FileOpenDialog.h"
 #include "filesystem.h"
-#include "vgui/ilocalize.h"
-#include "dme_controls/elementpropertiestree.h"
+#include "vgui/ILocalize.h"
+#include "dme_controls/ElementPropertiesTree.h"
 #include "tier0/icommandline.h"
 #include "materialsystem/imaterialsystem.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
@@ -20,7 +20,7 @@
 #include "particlesystemdefinitionbrowser.h"
 #include "particlesystempropertiescontainer.h"
 #include "dme_controls/AttributeStringChoicePanel.h"
-#include "dme_controls/ParticleSystemPanel.h"
+#include "dme_controls/particlesystempanel.h"
 #include "datamodel/dmelementfactoryhelper.h"
 #include "matsys_controls/picker.h"
 #include "tier2/fileutils.h"
@@ -28,7 +28,7 @@
 #include "particles/particles.h"
 #include "dmserializers/idmserializers.h"
 #include "dme_controls/dmepanel.h"
-#include "vgui/ivgui.h"
+#include "vgui/IVGui.h"
 
 using namespace vgui;
 
@@ -49,7 +49,7 @@ const char *GetVGuiControlsModuleName()
 //-----------------------------------------------------------------------------
 // Connect, disconnect
 //-----------------------------------------------------------------------------
-bool ConnectTools( CreateInterfaceFn factory )
+bool ConnectTools( [[maybe_unused]] CreateInterfaceFn factory )
 {
 	// Attach to the dmserializers instance of the particle system
 	return (materials != NULL) && (g_pMatSystemSurface != NULL) && (g_pMDLCache != NULL) && (studiorender != NULL) && (g_pMaterialSystemHardwareConfig != NULL);
@@ -178,10 +178,10 @@ vgui::HScheme CPetTool::GetToolScheme()
 //-----------------------------------------------------------------------------
 class CPetViewMenuButton : public CToolMenuButton
 {
-	DECLARE_CLASS_SIMPLE( CPetViewMenuButton, CToolMenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPetViewMenuButton, CToolMenuButton );
 public:
 	CPetViewMenuButton( CPetTool *parent, const char *panelName, const char *text, vgui::Panel *pActionSignalTarget );
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 
 private:
 	CPetTool *m_pTool;
@@ -254,10 +254,10 @@ void CPetViewMenuButton::OnShowMenu(vgui::Menu *menu)
 //-----------------------------------------------------------------------------
 class CPetToolMenuButton : public CToolMenuButton
 {
-	DECLARE_CLASS_SIMPLE( CPetToolMenuButton, CToolMenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CPetToolMenuButton, CToolMenuButton );
 public:
 	CPetToolMenuButton( CPetTool *parent, const char *panelName, const char *text, vgui::Panel *pActionSignalTarget );
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 
 private:
 	CPetTool *m_pTool;
@@ -485,7 +485,7 @@ void CPetTool::OnToggleParticlePreview()
 //-----------------------------------------------------------------------------
 // Creates
 //-----------------------------------------------------------------------------
-void CPetTool::CreateTools( CPetDoc *doc )
+void CPetTool::CreateTools( [[maybe_unused]] CPetDoc *doc )
 {
 	if ( !m_hProperties.Get() )
 	{
@@ -721,7 +721,7 @@ void CPetTool::OnOpen( )
 	OpenFile( PET_FILE_FORMAT, pSaveFileName, PET_FILE_FORMAT, nFlags );
 }
 
-bool CPetTool::OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues )
+bool CPetTool::OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	OnCloseNoSave();
 
@@ -769,7 +769,7 @@ void CPetTool::SaveAndTest()
 	}
 }
 
-bool CPetTool::OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues )
+bool CPetTool::OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	if ( !m_pDoc )
 		return true;
@@ -867,7 +867,7 @@ void CPetTool::OpenFileFromHistory( int slot )
 //-----------------------------------------------------------------------------
 // Derived classes can implement this to get notified when files are saved/loaded
 //-----------------------------------------------------------------------------
-void CPetTool::OnFileOperationCompleted( const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues )
+void CPetTool::OnFileOperationCompleted( [[maybe_unused]] const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues )
 {
 	if ( bWroteFile )
 	{
@@ -910,7 +910,7 @@ void CPetTool::OnFileOperationCompleted( const char *pFileType, bool bWroteFile,
 //-----------------------------------------------------------------------------
 // Show the File browser dialog
 //-----------------------------------------------------------------------------
-void CPetTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues )
+void CPetTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, [[maybe_unused]] bool bOpenFile, [[maybe_unused]] const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	char pStartingDir[ MAX_PATH ];
 
@@ -987,7 +987,7 @@ const char *CPetTool::GetLogoTextureName()
 //-----------------------------------------------------------------------------
 // Inherited from IPetDocCallback
 //-----------------------------------------------------------------------------
-void CPetTool::OnDocChanged( const char *pReason, int nNotifySource, int nNotifyFlags )
+void CPetTool::OnDocChanged( [[maybe_unused]] const char *pReason, int nNotifySource, int nNotifyFlags )
 {
 	CDmeParticleSystemDefinition *pParticleSystem = GetCurrentParticleSystem();
 	if ( m_pDoc && GetParticlePreview() && pParticleSystem )

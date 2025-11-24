@@ -42,7 +42,7 @@ class CPetDoc : public IDmNotify, CBaseElementPropertiesChoices
 {
 public:
 	CPetDoc( IPetDocCallback *pCallback );
-	~CPetDoc();
+	virtual ~CPetDoc();
 
 	// Inherited from INotifyUI
 	virtual void NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags );
