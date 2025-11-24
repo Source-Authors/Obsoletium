@@ -19,39 +19,8 @@
 namespace vgui
 {
 
+class CheckImage;
 class TextImage;
-
-//-----------------------------------------------------------------------------
-// Purpose: Check box image
-//-----------------------------------------------------------------------------
-class CheckImage : public TextImage
-{
-public:
-	CheckImage(CheckButton *CheckButton) : TextImage( "g" )
-	{
-		_CheckButton = CheckButton;
-
-		SetSize(20, 13);
-	}
-
-	void Paint() override;
-
-	void SetColor(Color color) override
-	{
-		_borderColor1 = color;
-		_borderColor2 = color;
-		_checkColor = color;
-	}
-
-	Color _borderColor1;
-	Color _borderColor2;
-	Color _checkColor;
-
-	Color _bgColor;
-
-private:
-	CheckButton *_CheckButton;
-};
 
 //-----------------------------------------------------------------------------
 // Purpose: Tick-box button
@@ -102,6 +71,40 @@ private:
 	Color _disabledBgColor;
 	Color _highlightFgColor;
 };
+
+//-----------------------------------------------------------------------------
+// Purpose: Check box image
+//-----------------------------------------------------------------------------
+class CheckImage : public TextImage
+{
+public:
+	CheckImage(CheckButton *CheckButton) : TextImage( "g" )
+	{
+		_CheckButton = CheckButton;
+
+		// dimhotepus: Scale UI.
+		SetSize(QuickPropScalePanel( 20, CheckButton ), QuickPropScalePanel( 13, CheckButton ));
+	}
+
+	void Paint() override;
+
+	void SetColor(Color color) override
+	{
+		_borderColor1 = color;
+		_borderColor2 = color;
+		_checkColor = color;
+	}
+
+	Color _borderColor1;
+	Color _borderColor2;
+	Color _checkColor;
+
+	Color _bgColor;
+
+private:
+	CheckButton *_CheckButton;
+};
+
 
 } // namespace vgui
 
