@@ -171,7 +171,7 @@ static const char *PrefixMessageGroup(
     const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 
-  out_group = !Q_isempty( out_group ) ? out_group : group;
+  out_group = !Q_isempty(out_group) ? out_group : group;
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
@@ -387,23 +387,28 @@ void qprintf(PRINTF_FORMAT_STRING const char *format, ...) {
 
 // Helpers.
 
-static void CmdLib_getwd(char *out, int outSize) {
-#if defined(_WIN32) || defined(WIN32)
-  _getcwd(out, outSize);
-  Q_strncat(out, "\\", outSize, COPY_ALL_CHARACTERS);
+template<int outSize>
+static bool CmdLib_getwd(OUT_Z_ARRAY char (&out)[outSize]) {
+#if defined(_WIN32)
+  if (!_getcwd(out, outSize)) {
 #else
-  getcwd(out, outSize);
-  Q_strncat(out, "/", outSize, COPY_ALL_CHARACTERS);
+  if (!getcwd(out, outSize)) {
 #endif
+    if (out && outSize) out[0] = '\0';
+    return false;
+  }
 
-  Q_FixSlashes(out);
+  V_strcat_safe(out, CORRECT_PATH_SEPARATOR_S);
+
+  V_FixSlashes(out);
+  return true;
 }
 
 char *ExpandArg(char *path) {
   static char full[1024];
 
   if (path[0] != '/' && path[0] != '\\' && path[1] != ':') {
-    CmdLib_getwd(full, sizeof(full));
+    CmdLib_getwd(full);
 
     V_strcat_safe(full, path);
   } else {
@@ -424,8 +429,11 @@ const char *ExpandPath(const char *path) {
 }
 
 char *copystring(const char *s) {
-  char *b = (char *)malloc(strlen(s) + 1);
-  strcpy(b, s);
+  size_t len = strlen(s);
+  char *b = (char *)malloc(len + 1);
+  // dimhotepus: Use bounds-safe str APIs.
+  strncpy(b, s, len);
+  b[len] = '\0';
   return b;
 }
 
