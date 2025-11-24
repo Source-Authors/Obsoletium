@@ -446,10 +446,10 @@ void Interpolator_CurveInterpolate_NonNormalized( int interpolationType,
 
 
 void Interpolator_CurveInterpolate_NonNormalized( int interpolationType,
-												 const Quaternion &vPre,
+												 [[maybe_unused]] const Quaternion &vPre,
 												 const Quaternion &vStart,
 												 const Quaternion &vEnd,
-												 const Quaternion &vNext,
+												 [[maybe_unused]] const Quaternion &vNext,
 												 float f,
 												 Quaternion &vOut )
 {
