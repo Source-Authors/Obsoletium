@@ -978,7 +978,7 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_B
 		++inbuf;
 	}
 
-	outbuf[pos] = '\0';
+	outbuf[pos] = L'\0';
 }
 
 //-----------------------------------------------------------------------------
@@ -989,10 +989,7 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_B
 //-----------------------------------------------------------------------------
 byte *UTIL_LoadFileForMe( const char *filename, int *pLength )
 {
-	byte *buffer;
-
-	FileHandle_t file;
-	file = filesystem->Open( filename, "rb", "GAME" );
+	FileHandle_t file = filesystem->Open( filename, "rb", "GAME" );
 	if ( FILESYSTEM_INVALID_HANDLE == file )
 	{
 		if ( pLength ) *pLength = 0;
@@ -1000,7 +997,7 @@ byte *UTIL_LoadFileForMe( const char *filename, int *pLength )
 	}
 
 	int size = filesystem->Size( file );
-	buffer = new byte[ size + 1 ];
+	byte *buffer = new byte[ size + 1 ];
 	if ( !buffer )
 	{
 		Warning( "UTIL_LoadFileForMe:  Couldn't allocate buffer of size %i for file %s\n", size + 1, filename );
@@ -1011,7 +1008,7 @@ byte *UTIL_LoadFileForMe( const char *filename, int *pLength )
 	filesystem->Close( file );
 
 	// Ensure null terminator
-	buffer[ size ] =0;
+	buffer[ size ] = 0;
 
 	if ( pLength )
 	{
