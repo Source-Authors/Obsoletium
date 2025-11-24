@@ -4,13 +4,13 @@
 //
 //=============================================================================
 
-#include "toolutils/basetoolsystem.h"
+#include "toolutils/BaseToolSystem.h"
 #include "toolutils/recentfilelist.h"
 #include "toolutils/toolmenubar.h"
-#include "toolutils/toolswitchmenubutton.h"
-#include "toolutils/toolfilemenubutton.h"
-#include "toolutils/tooleditmenubutton.h"
-#include "toolutils/toolmenubutton.h"
+#include "toolutils/ToolSwitchMenuButton.h"
+#include "toolutils/ToolFileMenuButton.h"
+#include "toolutils/ToolEditMenuButton.h"
+#include "toolutils/ToolMenuButton.h"
 #include "vgui_controls/Menu.h"
 #include "tier1/KeyValues.h"
 #include "toolutils/enginetools_int.h"
@@ -20,11 +20,11 @@
 #include "vgui_controls/FileOpenDialog.h"
 #include "filesystem.h"
 #include "actbusydoc.h"
-#include "vgui/ilocalize.h"
-#include "dme_controls/elementpropertiestree.h"
+#include "vgui/ILocalize.h"
+#include "dme_controls/ElementPropertiesTree.h"
 #include "actbusytool.h"
 #include "movieobjects/dmeeditortypedictionary.h"
-#include "dme_controls/attributestringchoicepanel.h"
+#include "dme_controls/AttributeStringChoicePanel.h"
 #include "matsys_controls/mdlsequencepicker.h"
 #include "istudiorender.h"
 #include "materialsystem/imaterialsystem.h"
@@ -34,7 +34,7 @@
 #include "toolutils/savewindowpositions.h"
 #include "tier2/fileutils.h"
 #include "tier3/tier3.h"
-#include "vgui/ivgui.h"
+#include "vgui/IVGui.h"
 
 using namespace vgui;
 
@@ -57,7 +57,7 @@ const char *GetVGuiControlsModuleName()
 //-----------------------------------------------------------------------------
 // Connect, disconnect
 //-----------------------------------------------------------------------------
-bool ConnectTools( CreateInterfaceFn factory )
+bool ConnectTools( [[maybe_unused]] CreateInterfaceFn factory )
 {
 	return (g_pMDLCache != NULL) && (studiorender != NULL) && (materials != NULL) && (g_pMatSystemSurface != NULL);
 }
@@ -72,42 +72,42 @@ void DisconnectTools( )
 //-----------------------------------------------------------------------------
 class CActBusyTool : public CBaseToolSystem, public IFileMenuCallbacks, public IActBusyDocCallback
 {
-	DECLARE_CLASS_SIMPLE( CActBusyTool, CBaseToolSystem );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CActBusyTool, CBaseToolSystem );
 
 public:
 	CActBusyTool();
 
 	// Inherited from IToolSystem
-	virtual const char *GetToolName() { return "ActBusy Script Editor"; }
-	virtual const char *GetBindingsContextFile() { return "cfg/ActBusy.kb"; }
-	virtual bool	Init();
-    virtual void	Shutdown();
-	virtual bool	CanQuit();
+	const char *GetToolName() override { return "ActBusy Script Editor"; }
+	const char *GetBindingsContextFile() override { return "cfg/ActBusy.kb"; }
+	bool	Init() override;
+    void	Shutdown() override;
+	bool	CanQuit() override;
 
 	// Inherited from IFileMenuCallbacks
-	virtual int		GetFileMenuItemsEnabled( );
-	virtual void	AddRecentFilesToMenu( vgui::Menu *menu );
-	virtual bool	GetPerforceFileName( char *pFileName, int nMaxLen );
-	virtual vgui::Panel* GetRootPanel() { return this; }
+	int		GetFileMenuItemsEnabled( ) override;
+	void	AddRecentFilesToMenu( vgui::Menu *menu ) override;
+	bool	GetPerforceFileName( char *pFileName, int nMaxLen ) override;
+	vgui::Panel* GetRootPanel() override { return this; }
 
 	// Inherited from IActBusyDocCallback
-	virtual void	OnDocChanged( const char *pReason, int nNotifySource, int nNotifyFlags );
+	void	OnDocChanged( const char *pReason, int nNotifySource, int nNotifyFlags ) override;
 
 	// Inherited from CBaseToolSystem
-	virtual vgui::HScheme GetToolScheme();
-	virtual vgui::Menu *CreateActionMenu( vgui::Panel *pParent );
-	virtual void OnCommand( const char *cmd );
-	virtual const char *GetRegistryName() { return "ActBusy"; }
-	virtual vgui::MenuBar *CreateMenuBar( CBaseToolSystem *pParent );
-	virtual void OnToolActivate();
-	virtual void OnToolDeactivate();
+	vgui::HScheme GetToolScheme() override;
+	vgui::Menu *CreateActionMenu( vgui::Panel *pParent ) override;
+	void OnCommand( const char *cmd ) override;
+	const char *GetRegistryName() override { return "ActBusy"; }
+	vgui::MenuBar *CreateMenuBar( CBaseToolSystem *pParent ) override;
+	void OnToolActivate() override;
+	void OnToolDeactivate() override;
 	virtual CActBusyDoc *GetDocument();
 	virtual CBasePropertiesContainer	*GetProperties();
 	virtual CMDLSequencePicker			*GetSequencePicker();
-	virtual void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual void OnFileOperationCompleted( const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues );
+	void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	void OnFileOperationCompleted( const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues ) override;
 
 public:
 	// Commands related to the file menu
@@ -115,7 +115,7 @@ public:
 	MESSAGE_FUNC( OnOpen, "OnOpen" );
 	MESSAGE_FUNC( OnSave, "OnSave" );
 	MESSAGE_FUNC( OnSaveAs, "OnSaveAs" );
-	MESSAGE_FUNC( OnClose, "OnClose" );
+	MESSAGE_FUNC_OVERRIDE( OnClose, "OnClose" );
 	MESSAGE_FUNC( OnCloseNoSave, "OnCloseNoSave" );
 	MESSAGE_FUNC( OnMarkNotDirty, "OnMarkNotDirty" );
 	MESSAGE_FUNC( OnExit, "OnExit" );
@@ -172,7 +172,7 @@ private:
 
 	void	DestroyToolContainers();
 
-	virtual const char *GetLogoTextureName();
+	const char *GetLogoTextureName() override;
 
 private:	
 	// All editable data
@@ -392,10 +392,10 @@ void CActBusyTool::InitEditorDict()
 //-----------------------------------------------------------------------------
 class CActBusyViewMenuButton : public CToolMenuButton
 {
-	DECLARE_CLASS_SIMPLE( CActBusyViewMenuButton, CToolMenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CActBusyViewMenuButton, CToolMenuButton );
 public:
 	CActBusyViewMenuButton( CActBusyTool *parent, const char *panelName, const char *text, vgui::Panel *pActionSignalTarget );
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 
 private:
 	CActBusyTool *m_pTool;
@@ -459,10 +459,10 @@ void CActBusyViewMenuButton::OnShowMenu(vgui::Menu *menu)
 //-----------------------------------------------------------------------------
 class CActBusyMenuButton : public CToolMenuButton
 {
-	DECLARE_CLASS_SIMPLE( CActBusyMenuButton, CToolMenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CActBusyMenuButton, CToolMenuButton );
 public:
 	CActBusyMenuButton( CActBusyTool *parent, const char *panelName, const char *text, vgui::Panel *pActionSignalTarget );
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 
 private:
 	CActBusyTool *m_pTool;
@@ -693,7 +693,7 @@ void CActBusyTool::OnCommand( const char *cmd )
 //-----------------------------------------------------------------------------
 // Derived classes can implement this to get notified when files are saved/loaded
 //-----------------------------------------------------------------------------
-void CActBusyTool::OnFileOperationCompleted( const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues )
+void CActBusyTool::OnFileOperationCompleted( [[maybe_unused]] const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues )
 {
 	if ( bWroteFile )
 	{
@@ -730,7 +730,7 @@ void CActBusyTool::OnFileOperationCompleted( const char *pFileType, bool bWroteF
 //-----------------------------------------------------------------------------
 // Called by SaveFile to allow clients to set up the save dialog
 //-----------------------------------------------------------------------------
-void CActBusyTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues )
+void CActBusyTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, [[maybe_unused]] const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	// Compute starting directory
 	char pStartingDir[ MAX_PATH ];
@@ -753,7 +753,7 @@ void CActBusyTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpe
 //-----------------------------------------------------------------------------
 // Called by SaveFile to allow clients to actually write the file out
 //-----------------------------------------------------------------------------
-bool CActBusyTool::OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues )
+bool CActBusyTool::OnReadFileFromDisk( const char *pFileName, [[maybe_unused]] const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	OnCloseNoSave();
 	return LoadDocument( pFileName );
@@ -763,7 +763,7 @@ bool CActBusyTool::OnReadFileFromDisk( const char *pFileName, const char *pFileF
 //-----------------------------------------------------------------------------
 // Called by SaveFile to allow clients to actually write the file out
 //-----------------------------------------------------------------------------
-bool CActBusyTool::OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues )
+bool CActBusyTool::OnWriteFileToDisk( const char *pFileName, [[maybe_unused]] const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	if ( !m_pDoc )
 		return true; 
@@ -901,7 +901,7 @@ void CActBusyTool::OpenSpecificFile( const char *pFileName )
 //-----------------------------------------------------------------------------
 // Show the save document query dialog
 //-----------------------------------------------------------------------------
-void CActBusyTool::OpenFileFromHistory( int slot, const char *pCommand )
+void CActBusyTool::OpenFileFromHistory( int slot, [[maybe_unused]] const char *pCommand )
 {
 	const char *pFileName = m_RecentFiles.GetFile( slot );
 	if ( pFileName )
@@ -978,7 +978,7 @@ void CActBusyTool::OnDeleteActBusy()
 //-----------------------------------------------------------------------------
 // Inherited from IActBusyDocCallback
 //-----------------------------------------------------------------------------
-void CActBusyTool::OnDocChanged( const char *pReason, int nNotifySource, int nNotifyFlags )
+void CActBusyTool::OnDocChanged( [[maybe_unused]] const char *pReason, int nNotifySource, [[maybe_unused]] int nNotifyFlags )
 {
 	UpdateMenuBar();
 	if ( ( nNotifySource != NOTIFY_SOURCE_PROPERTIES_TREE ) && m_hProperties.Get() )
@@ -1125,7 +1125,7 @@ void CActBusyTool::DestroyTools()
 	}
 }
 
-void CActBusyTool::CreateTools( CActBusyDoc *doc )
+void CActBusyTool::CreateTools( [[maybe_unused]] CActBusyDoc *doc )
 {
 	if ( !m_hProperties.Get() )
 	{
