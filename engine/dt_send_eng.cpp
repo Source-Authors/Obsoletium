@@ -951,13 +951,10 @@ CRC32_t SendTable_ComputeCRC()
 	CRC32_Init( &result );
 
 	// walk the tables and checksum them
-	int c = g_SendTables.Count();
-	for ( int i = 0 ; i < c; i++ )
+	for ( auto *st : g_SendTables )
 	{
-		SendTable *st = g_SendTables[ i ];
 		result = SendTable_CRCTable( result, st );
 	}
-
 
 	CRC32_Final( &result );
 
