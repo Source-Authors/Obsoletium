@@ -654,14 +654,14 @@ void CPetTool::OnCommand( const char *cmd )
 			GetActionMenu()->SetVisible( false );
 		}
 	}
-	else if ( const char *pSuffix = StringAfterPrefix( cmd, "OnRecent" ) )
+	else if ( const char *pRecentSuffix = StringAfterPrefix( cmd, "OnRecent" ) )
 	{
-		int idx = Q_atoi( pSuffix );
+		int idx = Q_atoi( pRecentSuffix );
 		OpenFileFromHistory( idx );
 	}
-	else if ( const char *pSuffix = StringAfterPrefix( cmd, "OnTool" ) )
+	else if ( const char *pToolSuffex = StringAfterPrefix( cmd, "OnTool" ) )
 	{
-		int idx = Q_atoi( pSuffix );
+		int idx = Q_atoi( pToolSuffex );
 		enginetools->SwitchToTool( idx );
 	}
 	else if ( !V_stricmp( cmd, "OnUndo" ) )

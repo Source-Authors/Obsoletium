@@ -388,9 +388,9 @@ void CPetDoc::ReplaceParticleSystemDefinition( CDmeParticleSystemDefinition *pPa
 	if ( nFoundIndex < 0 )
 	{
 		CAppUndoScopeGuard guard( NOTIFY_SETDIRTYFLAG, "Replace Particle System", "Replace Particle System" );
-		CDmrParticleSystemList particleSystemList( GetParticleSystemDefinitionList() );
+		CDmrParticleSystemList psl( GetParticleSystemDefinitionList() );
 		pParticleSystem->SetFileId( m_hRoot->GetFileId(), TD_ALL );
-		particleSystemList.AddToTail( pParticleSystem );
+		psl.AddToTail( pParticleSystem );
 		return;
 	}
 
@@ -478,10 +478,10 @@ bool CPetDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement *pEle
 		{
 			CDmeParticleSystemDefinition *pParticleSystem = particleSystemList[ i ];
 
-			StringChoice_t sChoice;
-			sChoice.m_pValue = pParticleSystem->GetName();
-			sChoice.m_pChoiceString = pParticleSystem->GetName();
-			list.AddToTail( sChoice );
+			StringChoice_t sChoiceChild;
+			sChoiceChild.m_pValue = pParticleSystem->GetName();
+			sChoiceChild.m_pChoiceString = pParticleSystem->GetName();
+			list.AddToTail( sChoiceChild );
 		}
 		return true;
 	}
