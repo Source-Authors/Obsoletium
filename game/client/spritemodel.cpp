@@ -221,9 +221,9 @@ static unsigned int spriteOrientationCache = 0;
 bool CEngineSprite::Init( const char *pName )
 {
 	m_VideoMaterial = NULL;
-	for ( int i = 0; i < kRenderModeCount; ++i )
+	for ( auto *&m : m_material )
 	{
-		m_material[ i ] = NULL;
+		m = nullptr;
 	}
 
 	m_width = m_height = m_numFrames = 1;
@@ -240,9 +240,9 @@ bool CEngineSprite::Init( const char *pName )
 		IMaterial *pMaterial = m_VideoMaterial->GetMaterial();
 		m_VideoMaterial->GetVideoImageSize( &m_width, &m_height );
 		m_numFrames = m_VideoMaterial->GetFrameCount();
-		for ( int i = 0; i < kRenderModeCount; ++i )
+		for ( auto *&m : m_material )
 		{
-			m_material[i] = pMaterial;
+			m = pMaterial;
 			pMaterial->IncrementReferenceCount();
 		}
 	}
