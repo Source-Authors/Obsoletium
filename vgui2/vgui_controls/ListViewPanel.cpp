@@ -225,7 +225,8 @@ DECLARE_BUILD_FACTORY( ListViewPanel );
 //-----------------------------------------------------------------------------
 ListViewPanel::ListViewPanel(Panel *parent, const char *panelName) : Panel(parent, panelName)
 {
-	m_iRowHeight = 20;
+	// dimhotepus: Scale UI.
+	m_iRowHeight = QuickPropScale( 20 );
 	m_bNeedsSort = false;
 	m_hFont = NULL;
 	m_pImageList = NULL;
@@ -599,7 +600,8 @@ int ListViewPanel::GetItemsMaxWidth()
 		m_DataItems[i]->GetSize(labelWide, labelTall);
 		if (labelWide > maxWidth)
 		{
-			maxWidth = labelWide + 25;
+			// dimhotepus: Scale UI.
+			maxWidth = labelWide + QuickPropScale( 25 );
 		}
 	}
 	return maxWidth;
@@ -622,9 +624,10 @@ void ListViewPanel::PerformLayout()
 	GetSize(wide, tall);
 
 	int maxWidth = GetItemsMaxWidth();
-	if (maxWidth < 24)
+	// dimhotepus: Scale UI.
+	if (maxWidth < QuickPropScale( 24 ))
 	{
-		maxWidth = 24;
+		maxWidth = QuickPropScale( 24 );
 	}
 	int maxColVisible = wide / maxWidth;
 

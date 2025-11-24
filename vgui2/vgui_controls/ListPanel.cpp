@@ -427,8 +427,9 @@ ListPanel::ListPanel(Panel *parent, const char *panelName) : BaseClass(parent, p
 	m_iEditModeItemID = 0;
 	m_iEditModeColumn = 0;
 
-	m_iHeaderHeight = 20;
-	m_iRowHeight = 20;
+	// dimhotepus: Scale UI.
+	m_iHeaderHeight = QuickPropScale( 20 );
+	m_iRowHeight = QuickPropScale( 20 );
 	m_bCanSelectIndividualCells = false;
 	m_iSelectedColumn = -1;
 	m_bAllowUserAddDeleteColumns = false;
