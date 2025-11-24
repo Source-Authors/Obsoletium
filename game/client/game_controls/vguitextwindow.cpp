@@ -260,12 +260,13 @@ void CTextWindow::ShowFile( const char *filename )
 
 		char buffer[2048];
 			
-		int size = MIN( g_pFullFileSystem->Size( f ), sizeof(buffer)-1 ); // just allow 2KB
+		int size = MIN( g_pFullFileSystem->Size( f ), sizeof(buffer) ); // just allow 2KB
 
 		g_pFullFileSystem->Read( buffer, size, f );
 		g_pFullFileSystem->Close( f );
 
-		buffer[size]=0; //terminate string
+		// dimhotepus: Ensure zero termination.
+		buffer[size - 1]=0; //terminate string
 
 		ShowText( buffer );
 	}
