@@ -285,7 +285,7 @@ void CDmeVMFEntity::DrawSprite( IMaterial *pMaterial )
 {
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
-	float t = 0.5f * sin( Plat_FloatTime() * M_PI / 1.0f ) + 0.5f;
+	float t = 0.5f * sin( static_cast<float>(Plat_FloatTime()) * M_PI_F / 1.0f ) + 0.5f;
 
 	pRenderContext->Bind( pMaterial );
 	IMesh* pMesh = pRenderContext->GetDynamicMesh();
@@ -344,7 +344,7 @@ void CDmeVMFEntity::DrawDragHelpers( IMaterial *pMaterial )
 {
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
-	float t = 0.5f * sin( Plat_FloatTime() * M_PI / 1.0f ) + 0.5f;
+	float t = 0.5f * sin( static_cast<float>(Plat_FloatTime()) * M_PI_F / 1.0f ) + 0.5f;
 
 	VMatrix worldToCamera;
 	// pRenderContext->GetMatrix( MATERIAL_VIEW, &worldToCamera );
@@ -408,7 +408,7 @@ void CDmeVMFEntity::DrawFloorTarget( IMaterial *pMaterial )
 {
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 
-	float t = 0.5f * sin( Plat_FloatTime() * M_PI / 1.0f ) + 0.5f;
+	float t = 0.5f * sin( static_cast<float>(Plat_FloatTime()) * M_PI_F / 1.0f ) + 0.5f;
 
 	// test movement
 	Ray_t ray;
@@ -519,7 +519,7 @@ int CDmeVMFEntity::DrawModel( int flags )
 		// If we have a visible engine entity, we don't need to draw it here
 		// info targets always draw though, because they have no visible model.
 		CDisableUndoScopeGuard guard;
-		float t = 0.5f * sin( Plat_FloatTime() * M_PI / 1.0f ) + 0.5f;
+		float t = 0.5f * sin( static_cast<float>(Plat_FloatTime()) * M_PI_F / 1.0f ) + 0.5f;
 		unsigned char nAlpha = m_bIsDirty ? (unsigned char)(255 * t) : 255;
 		if ( bSelected )
 		{
