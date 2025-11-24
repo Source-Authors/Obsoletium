@@ -143,12 +143,14 @@ bool CVcdBlockDoc::LoadFromFile( const char *pFileName )
 
 	// Store the BSP file name
 	Q_strncpy( m_pBSPFileName, pFileName, sizeof( m_pBSPFileName ) );
+	// dimhotepus: Check for nullptr.
+	const char *pszExt = Q_GetFileExtension( pFileName );
 
 	// Set the txt file name. 
 	// If we loaded a .bsp, clear out what we're doing
 	// load the Edits file into memory, assign it as our "root"
 	CDmElement *pEdit = NULL;
-	if ( !V_stricmp( Q_GetFileExtension( pFileName ), "vle" ) )
+	if ( pszExt && !V_stricmp( pszExt, "vle" ) )
 	{
 		if ( g_pDataModel->RestoreFromFile( m_pEditFileName, NULL, "vmf", &pEdit ) != DMFILEID_INVALID )
 		{
