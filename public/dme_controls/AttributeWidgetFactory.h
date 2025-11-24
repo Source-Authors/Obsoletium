@@ -44,6 +44,9 @@ struct AttributeWidgetInfo_t
 		m_pEditorTypeDictionary = nullptr;
 		m_pEditorInfo = nullptr;
 		m_pNotify = nullptr;
+
+		m_bAutoApply = false;
+		m_bShowMemoryUsage = false;
 	}
 
 	CDmElement *m_pElement;
