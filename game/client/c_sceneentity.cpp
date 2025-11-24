@@ -825,9 +825,9 @@ CChoreoStringPool g_ChoreoStringPool;
 CChoreoScene *C_SceneEntity::LoadScene( const char *filename )
 {
 	char loadfile[ 512 ];
-	Q_strncpy( loadfile, filename, sizeof( loadfile ) );
-	Q_SetExtension( loadfile, ".vcd", sizeof( loadfile ) );
-	Q_FixSlashes( loadfile );
+	V_strcpy_safe( loadfile, filename );
+	V_SetExtension( loadfile, ".vcd" );
+	V_FixSlashes( loadfile );
 
 	size_t bufsize = scenefilecache->GetSceneBufferSize( loadfile );
 	if ( bufsize <= 0 )
