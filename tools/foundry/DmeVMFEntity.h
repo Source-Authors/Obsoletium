@@ -10,7 +10,7 @@
 #pragma once
 #endif
 
-#include "toolutils/dmerenderable.h"
+#include "toolutils/DmeRenderable.h"
 #include "datamodel/dmelement.h"
 #include "toolframework/itoolentity.h"
 #include "materialsystem/MaterialSystemUtil.h"
@@ -25,14 +25,14 @@ class CDmeVMFEntity : public CDmeVisibilityControl< CDmeRenderable< CDmElement >
 
 public:
 	// Inherited from CDmElement
-	virtual	void	OnAttributeChanged( CDmAttribute *pAttribute );
+	void	OnAttributeChanged( CDmAttribute *pAttribute ) override;
 
 public:
 	// Inherited from DmeRenderable
-	virtual const Vector &GetRenderOrigin( void );
-	virtual const QAngle &GetRenderAngles( void );
-	virtual int		DrawModel( int flags );
-	virtual void	GetRenderBounds( Vector& mins, Vector& maxs );
+	const Vector &GetRenderOrigin( void ) override;
+	const QAngle &GetRenderAngles( void ) override;
+	int		DrawModel( int flags ) override;
+	void	GetRenderBounds( Vector& mins, Vector& maxs ) override;
 
 public:
 	int GetEntityId() const;

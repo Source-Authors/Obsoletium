@@ -14,7 +14,7 @@
 #include "filesystem.h"
 #include "foundrytool.h"
 #include "toolframework/ienginetool.h"
-#include "dmevmfentity.h"
+#include "DmeVMFEntity.h"
 
 
 //-----------------------------------------------------------------------------
@@ -138,7 +138,7 @@ bool CFoundryDoc::LoadFromFile( const char *pFileName )
 
 void CFoundryDoc::SaveToFile( )
 {
-	if ( m_hRoot.Get() && m_pVMFFileName && m_pVMFFileName[0] )
+	if ( m_hRoot.Get() && !Q_isempty( m_pVMFFileName ) )
 	{
 		g_pDataModel->SaveToFile( m_pVMFFileName, NULL, "keyvalues", "vmf", m_hRoot );
 	}
@@ -267,7 +267,7 @@ void CFoundryDoc::AddOriginalEntities( CUtlBuffer &entityBuf, const char *pActua
 //-----------------------------------------------------------------------------
 // Copy in other entities from the editable VMF
 //-----------------------------------------------------------------------------
-void CFoundryDoc::AddVMFEntities( CUtlBuffer &entityBuf, const char *pActualEntityData )
+void CFoundryDoc::AddVMFEntities( CUtlBuffer &entityBuf, [[maybe_unused]] const char *pActualEntityData )
 {
 	const CDmrElementArray<CDmElement> entityArray( m_hRoot, "entities" );
 	if ( !entityArray.IsValid() )

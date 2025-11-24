@@ -10,7 +10,7 @@
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialsystem.h"
-#include "engine/iclientleafsystem.h"
+#include "engine/IClientLeafSystem.h"
 #include "toolutils/enginetools_int.h"
 #include "foundrytool.h"
 
@@ -130,7 +130,7 @@ void CDmeVMFEntity::AttachToEngineEntity( bool bAttach )
 //-----------------------------------------------------------------------------
 // Draws the helper for the entity
 //-----------------------------------------------------------------------------
-int CDmeVMFEntity::DrawModel( int flags )
+int CDmeVMFEntity::DrawModel( [[maybe_unused]] int flags )
 {
 	Assert( IsDrawingInEngine() );
 
@@ -176,10 +176,10 @@ int CDmeVMFEntity::DrawModel( int flags )
 			vecPos.y = flRadius * cos(phi);
 			vecPos.z = -flRadius * sin(phi) * sin(theta); 
 			    
-			unsigned char red = (int)( u * 255.0f );
-			unsigned char green = (int)( v * 255.0f );
-			unsigned char blue = (int)( v * 255.0f );
-			unsigned char alpha = (int)( v * 255.0f );
+			byte red = (byte)( u * 255.0f );
+			byte green = (byte)( v * 255.0f );
+			byte blue = (byte)( v * 255.0f );
+			byte alpha = (byte)( v * 255.0f );
 
 			meshBuilder.Position3fv( vecPos.Base() );
 			meshBuilder.Color4ub( red, green, blue, alpha );

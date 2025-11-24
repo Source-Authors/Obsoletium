@@ -5,13 +5,13 @@
 //=============================================================================
 
 #include "foundrytool.h"
-#include "toolutils/basetoolsystem.h"
+#include "toolutils/BaseToolSystem.h"
 #include "toolutils/recentfilelist.h"
 #include "toolutils/toolmenubar.h"
-#include "toolutils/toolswitchmenubutton.h"
-#include "toolutils/tooleditmenubutton.h"
-#include "toolutils/toolfilemenubutton.h"
-#include "toolutils/toolmenubutton.h"
+#include "toolutils/ToolSwitchMenuButton.h"
+#include "toolutils/ToolEditMenuButton.h"
+#include "toolutils/ToolFileMenuButton.h"
+#include "toolutils/ToolMenuButton.h"
 #include "vgui_controls/Menu.h"
 #include "tier1/KeyValues.h"
 #include "toolutils/enginetools_int.h"
@@ -20,8 +20,8 @@
 #include "vgui/KeyCode.h"
 #include "vgui_controls/FileOpenDialog.h"
 #include "filesystem.h"
-#include "vgui/ilocalize.h"
-#include "dme_controls/elementpropertiestree.h"
+#include "vgui/ILocalize.h"
+#include "dme_controls/ElementPropertiesTree.h"
 #include "tier0/icommandline.h"
 #include "materialsystem/imaterialsystem.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
@@ -32,10 +32,10 @@
 #include "entityreportpanel.h"
 #include "datamodel/dmelement.h"
 #include "movieobjects/dmeeditortypedictionary.h"
-#include "dmevmfentity.h"
+#include "DmeVMFEntity.h"
 #include "tier3/tier3.h"
 #include "tier2/fileutils.h"
-#include "vgui/ivgui.h"
+#include "vgui/IVGui.h"
 
 
 using namespace vgui;
@@ -54,7 +54,7 @@ const char *GetVGuiControlsModuleName()
 //-----------------------------------------------------------------------------
 // Connect, disconnect
 //-----------------------------------------------------------------------------
-bool ConnectTools( CreateInterfaceFn factory )
+bool ConnectTools( [[maybe_unused]] CreateInterfaceFn factory )
 {
 	return (materials != NULL) && (g_pMatSystemSurface != NULL);
 }
@@ -69,46 +69,46 @@ void DisconnectTools( )
 //-----------------------------------------------------------------------------
 class CFoundryTool : public CBaseToolSystem, public IFileMenuCallbacks, public IFoundryDocCallback, public IFoundryTool
 {
-	DECLARE_CLASS_SIMPLE( CFoundryTool, CBaseToolSystem );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFoundryTool, CBaseToolSystem );
 
 public:
 	CFoundryTool();
 
 	// Inherited from IToolSystem
-	virtual const char *GetToolName() { return "Foundry"; }
-	virtual const char *GetBindingsContextFile() { return "cfg/Foundry.kb"; }
-	virtual bool	Init( );
-    virtual void	Shutdown();
-	virtual bool	CanQuit();
-	virtual void	OnToolActivate();
-	virtual void	OnToolDeactivate();
-	virtual const char* GetEntityData( const char *pActualEntityData );
-	virtual void	ClientLevelInitPostEntity();
-	virtual void	ClientLevelShutdownPreEntity();
+	const char *GetToolName() override { return "Foundry"; }
+	const char *GetBindingsContextFile() override { return "cfg/Foundry.kb"; }
+	bool	Init( ) override;
+    void	Shutdown() override;
+	bool	CanQuit() override;
+	void	OnToolActivate() override;
+	void	OnToolDeactivate() override;
+	const char* GetEntityData( const char *pActualEntityData ) override;
+	void	ClientLevelInitPostEntity() override;
+	void	ClientLevelShutdownPreEntity() override;
 
 	// Inherited from IFileMenuCallbacks
-	virtual int		GetFileMenuItemsEnabled( );
-	virtual void	AddRecentFilesToMenu( vgui::Menu *menu );
-	virtual bool	GetPerforceFileName( char *pFileName, int nMaxLen );
+	int		GetFileMenuItemsEnabled( ) override;
+	void	AddRecentFilesToMenu( vgui::Menu *menu ) override;
+	bool	GetPerforceFileName( char *pFileName, int nMaxLen ) override;
 
 	// Inherited from IFoundryDocCallback
-	virtual void	OnDocChanged( const char *pReason, int nNotifySource, int nNotifyFlags );
-	virtual vgui::Panel *GetRootPanel() { return this; }
-	virtual void ShowEntityInEntityProperties( CDmeVMFEntity *pEntity );
+	void	OnDocChanged( const char *pReason, int nNotifySource, int nNotifyFlags ) override;
+	vgui::Panel *GetRootPanel() override { return this; }
+	void ShowEntityInEntityProperties( CDmeVMFEntity *pEntity ) override;
 
 	// Inherited from CBaseToolSystem
-	virtual vgui::HScheme GetToolScheme();
-	virtual vgui::Menu *CreateActionMenu( vgui::Panel *pParent );
-	virtual void OnCommand( const char *cmd );
-	virtual const char *GetRegistryName() { return "FoundryTool"; }
-	virtual vgui::MenuBar *CreateMenuBar( CBaseToolSystem *pParent );
+	vgui::HScheme GetToolScheme() override;
+	vgui::Menu *CreateActionMenu( vgui::Panel *pParent ) override;
+	void OnCommand( const char *cmd ) override;
+	const char *GetRegistryName() override { return "FoundryTool"; }
+	vgui::MenuBar *CreateMenuBar( CBaseToolSystem *pParent ) override;
 
 public:
 	MESSAGE_FUNC( OnNew, "OnNew" );
 	MESSAGE_FUNC( OnOpen, "OnOpen" );
 	MESSAGE_FUNC( OnSave, "OnSave" );
 	MESSAGE_FUNC( OnSaveAs, "OnSaveAs" );
-	MESSAGE_FUNC( OnClose, "OnClose" );
+	MESSAGE_FUNC_OVERRIDE( OnClose, "OnClose" );
 	MESSAGE_FUNC( OnCloseNoSave, "OnCloseNoSave" );
 	MESSAGE_FUNC( OnMarkNotDirty, "OnMarkNotDirty" );
 	MESSAGE_FUNC( OnExit, "OnExit" );
@@ -130,10 +130,10 @@ public:
 	void		PerformNew();
 	void		OpenFileFromHistory( int slot );
 	void		OpenSpecificFile( const char *pFileName );
-	virtual void SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual bool OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues );
-	virtual void OnFileOperationCompleted( const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues );
+	void		SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool		OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	bool		OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues ) override;
+	void		OnFileOperationCompleted( const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues ) override;
 
 	// returns the document
 	CFoundryDoc *GetDocument();
@@ -152,7 +152,7 @@ private:
 	// Shows element properties
 	void ShowElementProperties( );
 
-	virtual const char *GetLogoTextureName();
+	const char *GetLogoTextureName() override;
 
 	// Creates, destroys tools
 	void CreateTools( CFoundryDoc *doc );
@@ -384,10 +384,10 @@ vgui::HScheme CFoundryTool::GetToolScheme()
 //-----------------------------------------------------------------------------
 class CFoundryViewMenuButton : public CToolMenuButton
 {
-	DECLARE_CLASS_SIMPLE( CFoundryViewMenuButton, CToolMenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFoundryViewMenuButton, CToolMenuButton );
 public:
 	CFoundryViewMenuButton( CFoundryTool *parent, const char *panelName, const char *text, vgui::Panel *pActionSignalTarget );
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 
 private:
 	CFoundryTool *m_pTool;
@@ -450,10 +450,10 @@ void CFoundryViewMenuButton::OnShowMenu(vgui::Menu *menu)
 //-----------------------------------------------------------------------------
 class CFoundryToolMenuButton : public CToolMenuButton
 {
-	DECLARE_CLASS_SIMPLE( CFoundryToolMenuButton, CToolMenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CFoundryToolMenuButton, CToolMenuButton );
 public:
 	CFoundryToolMenuButton( CFoundryTool *parent, const char *panelName, const char *text, vgui::Panel *pActionSignalTarget );
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 
 private:
 	CFoundryTool *m_pTool;
@@ -652,7 +652,7 @@ void CFoundryTool::OnToggleEntityReport()
 //-----------------------------------------------------------------------------
 // Creates
 //-----------------------------------------------------------------------------
-void CFoundryTool::CreateTools( CFoundryDoc *doc )
+void CFoundryTool::CreateTools( [[maybe_unused]] CFoundryDoc *doc )
 {
 	if ( !m_hProperties.Get() )
 	{
@@ -874,7 +874,7 @@ void CFoundryTool::OnOpen( )
 	OpenFile( "bsp", pSaveFileName, "vmf", nFlags );
 }
 
-bool CFoundryTool::OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues )
+bool CFoundryTool::OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	OnCloseNoSave();
 	if ( !LoadDocument( pFileName ) )
@@ -901,7 +901,7 @@ void CFoundryTool::OnSaveAs()
 	}
 }
 
-bool CFoundryTool::OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues )
+bool CFoundryTool::OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	if ( !m_pDoc )
 		return true;
@@ -981,7 +981,7 @@ void CFoundryTool::OpenFileFromHistory( int slot )
 //-----------------------------------------------------------------------------
 // Derived classes can implement this to get notified when files are saved/loaded
 //-----------------------------------------------------------------------------
-void CFoundryTool::OnFileOperationCompleted( const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues )
+void CFoundryTool::OnFileOperationCompleted( [[maybe_unused]] const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	if ( bWroteFile )
 	{
@@ -1018,7 +1018,7 @@ void CFoundryTool::OnFileOperationCompleted( const char *pFileType, bool bWroteF
 //-----------------------------------------------------------------------------
 // Show the File browser dialog
 //-----------------------------------------------------------------------------
-void CFoundryTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues )
+void CFoundryTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, [[maybe_unused]] const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	char pStartingDir[ MAX_PATH ];
 
@@ -1121,7 +1121,7 @@ const char *CFoundryTool::GetLogoTextureName()
 //-----------------------------------------------------------------------------
 // Inherited from IFoundryDocCallback
 //-----------------------------------------------------------------------------
-void CFoundryTool::OnDocChanged( const char *pReason, int nNotifySource, int nNotifyFlags )
+void CFoundryTool::OnDocChanged( [[maybe_unused]] const char *pReason, [[maybe_unused]] int nNotifySource, [[maybe_unused]] int nNotifyFlags )
 {
 	UpdateMenuBar();
 

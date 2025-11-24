@@ -4,18 +4,18 @@
 //
 //===========================================================================//
 
-#include "EntityReportPanel.h"
+#include "entityreportpanel.h"
 #include "tier1/KeyValues.h"
 #include "tier1/utlbuffer.h"
 #include "iregistry.h"
-#include "vgui/ivgui.h"
-#include "vgui_controls/listpanel.h"
-#include "vgui_controls/textentry.h"
-#include "vgui_controls/checkbutton.h"
-#include "vgui_controls/combobox.h"
-#include "vgui_controls/radiobutton.h"
-#include "vgui_controls/messagebox.h"
-#include "dmevmfentity.h"
+#include "vgui/IVGui.h"
+#include "vgui_controls/ListPanel.h"
+#include "vgui_controls/TextEntry.h"
+#include "vgui_controls/CheckButton.h"
+#include "vgui_controls/ComboBox.h"
+#include "vgui_controls/RadioButton.h"
+#include "vgui_controls/MessageBox.h"
+#include "DmeVMFEntity.h"
 #include "foundrydoc.h"
 #include "foundrytool.h"
 
@@ -28,7 +28,7 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 // Sort by target name
 //-----------------------------------------------------------------------------
-static int __cdecl TargetNameSortFunc( vgui::ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
+static int __cdecl TargetNameSortFunc( [[maybe_unused]] vgui::ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
 {
 	const char *string1 = item1.kv->GetString("targetname");
 	const char *string2 = item2.kv->GetString("targetname");
@@ -44,7 +44,7 @@ static int __cdecl TargetNameSortFunc( vgui::ListPanel *pPanel, const ListPanelI
 //-----------------------------------------------------------------------------
 // Sort by class name
 //-----------------------------------------------------------------------------
-static int __cdecl ClassNameSortFunc( vgui::ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
+static int __cdecl ClassNameSortFunc( [[maybe_unused]] vgui::ListPanel *pPanel, const ListPanelItem &item1, const ListPanelItem &item2 )
 {
 	const char *string1 = item1.kv->GetString("classname");
 	const char *string2 = item2.kv->GetString("classname");
