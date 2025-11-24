@@ -89,7 +89,7 @@ struct OverridableColorEntry
 	char const	*m_pszScriptName{nullptr};
 	Color		*m_pColor{nullptr};
 	Color		m_colFromScript;
-	bool		m_bOverridden;
+	bool		m_bOverridden{false};
 };
 
 #define REGISTER_COLOR_AS_OVERRIDABLE( name, scriptname )			\
