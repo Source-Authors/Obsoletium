@@ -125,14 +125,14 @@ bool CVcdBlockDoc::LoadFromFile( const char *pFileName )
 
 	// Build map name
 	char mapname[ 256 ];
-	Q_StripExtension( pFileName, mapname, sizeof(mapname) );
+	V_StripExtension( pFileName, mapname );
 	char *pszFileName = (char*)Q_UnqualifiedFileName(mapname);
 
-	int nLen = (int)( (size_t)pGame - (size_t)pFileName ) + 1;
+	intp nLen = (intp)( pGame - pFileName ) + 1;
 	Q_strncpy( m_pVMFFileName, pFileName, nLen );
 	Q_strncat( m_pVMFFileName, "\\content\\", sizeof(m_pVMFFileName) );
 	Q_strncat( m_pVMFFileName, pGame + 6, sizeof(m_pVMFFileName) );
-	Q_SetExtension( m_pVMFFileName, ".vmf", sizeof(m_pVMFFileName) );
+	V_SetExtension( m_pVMFFileName, ".vmf" );
 
 	// Make sure new entities start with ids at 0
 	CDmeVMFEntity::SetNextEntityId( 0 );
@@ -604,8 +604,8 @@ bool CVcdBlockDoc::CopyEditsToVMF( )
 
 	// currently, don't overwrite the vmf, not sure if this is serializing correctly yet
 	char tmpname[ 256 ];
-	Q_StripExtension( m_pVMFFileName, tmpname, sizeof(tmpname) );
-	Q_SetExtension( tmpname, ".vme", sizeof(tmpname) );
+	V_StripExtension( m_pVMFFileName, tmpname );
+	V_SetExtension( tmpname, ".vme" );
 
 	if (!g_pDataModel->SaveToFile( tmpname, NULL, "keyvalues", "vmf", pVMF ))
 	{

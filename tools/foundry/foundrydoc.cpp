@@ -113,7 +113,7 @@ bool CFoundryDoc::LoadFromFile( const char *pFileName )
 	Q_strncpy( m_pVMFFileName, pFileName, nLen );
 	Q_strncat( m_pVMFFileName, "\\content\\", sizeof(m_pVMFFileName) );
 	Q_strncat( m_pVMFFileName, pGame + 6, sizeof(m_pVMFFileName) );
-	Q_SetExtension( m_pVMFFileName, ".vmf", sizeof(m_pVMFFileName) );
+	V_SetExtension( m_pVMFFileName, ".vmf" );
 
 	CDmElement *pVMF = NULL;
 	if ( g_pDataModel->RestoreFromFile( m_pVMFFileName, NULL, "vmf", &pVMF ) == DMFILEID_INVALID )
