@@ -919,10 +919,12 @@ bool CDescription::InitFromFile( const char *pszFileName, bool bAllowNewObject /
 	int len = g_pFullFileSystem->Size( file );
 
 	// read the file
-	std::unique_ptr<byte[]> buffer = std::make_unique<byte[]>( len );
+	std::unique_ptr<byte[]> buffer = std::make_unique<byte[]>( len + 1 );
 	Assert( buffer );
 	g_pFullFileSystem->Read( buffer.get(), len, file );
 	g_pFullFileSystem->Close( file );
+	// dimhotepus: Ensure text file is terminated.
+	buffer[len] = 0;
 
 	const char *pBuffer = (const char*)buffer.get();
 	
