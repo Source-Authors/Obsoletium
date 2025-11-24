@@ -3315,8 +3315,8 @@ CChoreoScene *CSceneEntity::LoadScene( const char *filename, IChoreoEventCallbac
 
 	char loadfile[MAX_PATH];
 	Q_strncpy( loadfile, filename, sizeof( loadfile ) );
-	Q_SetExtension( loadfile, ".vcd", sizeof( loadfile ) );
-	Q_FixSlashes( loadfile );
+	V_SetExtension( loadfile, ".vcd" );
+	V_FixSlashes( loadfile );
 
 	// binary compiled vcd
 	void *pBuffer;

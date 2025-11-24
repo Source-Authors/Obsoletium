@@ -203,9 +203,9 @@ void CEnvBeam::Precache( void )
 		//	STRING( m_iClassname ), entindex(), GetEntityName(), STRING(m_iszSpriteName) );
 
 		char fixedname[ 512 ];
-		Q_strncpy( fixedname, STRING( m_iszSpriteName ), sizeof( fixedname ) );
+		V_strcpy_safe( fixedname, STRING( m_iszSpriteName ) );
 
-		Q_SetExtension( fixedname, ".vmt", sizeof( fixedname ) );
+		V_SetExtension( fixedname, ".vmt" );
 		
 		m_iszSpriteName = AllocPooledString( fixedname );
 	}
