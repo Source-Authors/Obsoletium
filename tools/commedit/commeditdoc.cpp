@@ -15,9 +15,9 @@
 #include "toolframework/ienginetool.h"
 #include "dmecommentarynodeentity.h"
 #include "datamodel/idatamodel.h"
-#include "toolutils/attributeelementchoicelist.h"
+#include "toolutils/AttributeElementChoiceList.h"
 #include "commentarynodebrowserpanel.h"
-#include "vgui_controls/messagebox.h"
+#include "vgui_controls/MessageBox.h"
 
 
 //-----------------------------------------------------------------------------
@@ -114,11 +114,13 @@ bool CCommEditDoc::LoadFromFile( const char *pFileName )
 	//int nNameLen = (int)( (size_t)pComm - (size_t)pMaps ) - 5;
 	Q_StripExtension( pFileName, mapname, sizeof(mapname) );
 	char *pszFileName = (char*)Q_UnqualifiedFileName(mapname);
+	const char *pszFileExt = Q_GetFileExtension(pFileName);
 
 	// Set the txt file name. 
 	// If we loaded an existing commentary file, keep the same filename.
 	// If we loaded a .bsp, change the name & the extension.
-	if ( !V_stricmp( Q_GetFileExtension( pFileName ), "bsp" ) ) //-V1051
+	// dimhotepus: Check file extension exists.
+	if ( pszFileExt && !V_stricmp( pszFileExt, "bsp" ) ) //-V1051
 	{
 		const char *pCommentaryAppend = "_commentary.txt";
 		Q_StripExtension( pFileName, m_pTXTFileName, sizeof(m_pTXTFileName)- strlen(pCommentaryAppend) - 1 );
@@ -359,8 +361,8 @@ CDmeCommentaryNodeEntity *CCommEditDoc::GetCommentaryNodeForLocation( Vector &ve
 //-----------------------------------------------------------------------------
 // Populate string choice lists
 //-----------------------------------------------------------------------------
-bool CCommEditDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-									const char *pAttributeName, bool bArrayElement, StringChoiceList_t &list )
+bool CCommEditDoc::GetStringChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
+									[[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, StringChoiceList_t &list )
 {
 	if ( !Q_stricmp( pChoiceListType, "info_targets" ) )
 	{
@@ -394,8 +396,8 @@ bool CCommEditDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement 
 //-----------------------------------------------------------------------------
 // Populate element choice lists
 //-----------------------------------------------------------------------------
-bool CCommEditDoc::GetElementChoiceList( const char *pChoiceListType, CDmElement *pElement, 
-									 const char *pAttributeName, bool bArrayElement, ElementChoiceList_t &list )
+bool CCommEditDoc::GetElementChoiceList( const char *pChoiceListType, [[maybe_unused]] CDmElement *pElement, 
+									 [[maybe_unused]] const char *pAttributeName, [[maybe_unused]] bool bArrayElement, ElementChoiceList_t &list )
 {
 	if ( !Q_stricmp( pChoiceListType, "allelements" ) )
 	{

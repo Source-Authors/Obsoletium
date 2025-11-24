@@ -35,7 +35,7 @@ class CCommEditDoc : public IDmNotify
 {
 public:
 	CCommEditDoc( ICommEditDocCallback *pCallback );
-	~CCommEditDoc();
+	virtual ~CCommEditDoc();
 
 	// Inherited from INotifyUI
 	virtual void NotifyDataChanged( const char *pReason, int nNotifySource, int nNotifyFlags );

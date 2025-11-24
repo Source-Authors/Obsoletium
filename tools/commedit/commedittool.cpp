@@ -12,8 +12,8 @@
 #include "vgui_controls/FileOpenDialog.h"
 #include "vgui_controls/PropertySheet.h"
 #include "filesystem.h"
-#include "vgui/ilocalize.h"
-#include "dme_controls/elementpropertiestree.h"
+#include "vgui/ILocalize.h"
+#include "dme_controls/ElementPropertiesTree.h"
 #include "tier0/icommandline.h"
 #include "materialsystem/imaterialsystem.h"
 #include "VGuiMatSurface/IMatSystemSurface.h"
@@ -23,7 +23,7 @@
 #include "dme_controls/AttributeStringChoicePanel.h"
 #include "tier2/fileutils.h"
 #include "tier3/tier3.h"
-#include "vgui/ivgui.h"
+#include "vgui/IVGui.h"
 #include "toolutils/ConsolePage.h"
 
 
@@ -45,7 +45,7 @@ const char *GetVGuiControlsModuleName()
 //-----------------------------------------------------------------------------
 // Connect, disconnect
 //-----------------------------------------------------------------------------
-bool ConnectTools( CreateInterfaceFn factory )
+bool ConnectTools( [[maybe_unused]] CreateInterfaceFn factory )
 {
 	return (materials != NULL) && (g_pMatSystemSurface != NULL) && (g_pMDLCache != NULL) && (studiorender != NULL) && (g_pMaterialSystemHardwareConfig != NULL);
 }
@@ -338,10 +338,10 @@ vgui::HScheme CCommEditTool::GetToolScheme()
 //-----------------------------------------------------------------------------
 class CCommEditViewMenuButton : public CToolMenuButton
 {
-	DECLARE_CLASS_SIMPLE( CCommEditViewMenuButton, CToolMenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCommEditViewMenuButton, CToolMenuButton );
 public:
 	CCommEditViewMenuButton( CCommEditTool *parent, const char *panelName, const char *text, vgui::Panel *pActionSignalTarget );
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 
 private:
 	CCommEditTool *m_pTool;
@@ -413,10 +413,10 @@ void CCommEditViewMenuButton::OnShowMenu(vgui::Menu *menu)
 //-----------------------------------------------------------------------------
 class CCommEditToolMenuButton : public CToolMenuButton
 {
-	DECLARE_CLASS_SIMPLE( CCommEditToolMenuButton, CToolMenuButton );
+	DECLARE_CLASS_SIMPLE_OVERRIDE( CCommEditToolMenuButton, CToolMenuButton );
 public:
 	CCommEditToolMenuButton( CCommEditTool *parent, const char *panelName, const char *text, vgui::Panel *pActionSignalTarget );
-	virtual void OnShowMenu(vgui::Menu *menu);
+	void OnShowMenu(vgui::Menu *menu) override;
 
 private:
 	CCommEditTool *m_pTool;
@@ -664,7 +664,7 @@ void CCommEditTool::BringConsoleToFront()
 //-----------------------------------------------------------------------------
 // Creates
 //-----------------------------------------------------------------------------
-void CCommEditTool::CreateTools( CCommEditDoc *doc )
+void CCommEditTool::CreateTools( [[maybe_unused]] CCommEditDoc *doc )
 {
 	if ( !m_hProperties.Get() )
 	{
@@ -899,7 +899,7 @@ void CCommEditTool::OnOpen( )
 	OpenFile( "txt", pSaveFileName, "txt", nFlags );
 }
 
-bool CCommEditTool::OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues )
+bool CCommEditTool::OnReadFileFromDisk( const char *pFileName, const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	OnCloseNoSave();
 	if ( !LoadDocument( pFileName ) )
@@ -955,7 +955,7 @@ void CCommEditTool::SaveAndTest()
 	}
 }
 
-bool CCommEditTool::OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, KeyValues *pContextKeyValues )
+bool CCommEditTool::OnWriteFileToDisk( const char *pFileName, const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	if ( !m_pDoc )
 		return false;
@@ -1090,7 +1090,7 @@ void CCommEditTool::OpenFileFromHistory( int slot )
 //-----------------------------------------------------------------------------
 // Derived classes can implement this to get notified when files are saved/loaded
 //-----------------------------------------------------------------------------
-void CCommEditTool::OnFileOperationCompleted( const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues )
+void CCommEditTool::OnFileOperationCompleted( [[maybe_unused]] const char *pFileType, bool bWroteFile, vgui::FileOpenStateMachine::CompletionState_t state, KeyValues *pContextKeyValues )
 {
 	if ( bWroteFile )
 	{
@@ -1127,7 +1127,7 @@ void CCommEditTool::OnFileOperationCompleted( const char *pFileType, bool bWrote
 //-----------------------------------------------------------------------------
 // Show the File browser dialog
 //-----------------------------------------------------------------------------
-void CCommEditTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, bool bOpenFile, const char *pFileFormat, KeyValues *pContextKeyValues )
+void CCommEditTool::SetupFileOpenDialog( vgui::FileOpenDialog *pDialog, [[maybe_unused]] bool bOpenFile, const char *pFileFormat, [[maybe_unused]] KeyValues *pContextKeyValues )
 {
 	char pStartingDir[ MAX_PATH ];
 
@@ -1226,7 +1226,7 @@ const char *CCommEditTool::GetLogoTextureName()
 //-----------------------------------------------------------------------------
 // Inherited from ICommEditDocCallback
 //-----------------------------------------------------------------------------
-void CCommEditTool::OnDocChanged( const char *pReason, int nNotifySource, int nNotifyFlags )
+void CCommEditTool::OnDocChanged( [[maybe_unused]] const char *pReason, [[maybe_unused]] int nNotifySource, [[maybe_unused]] int nNotifyFlags )
 {
 	if ( GetCommentaryNodeBrowser() )
 	{

@@ -10,7 +10,7 @@
 #include "materialsystem/imesh.h"
 #include "materialsystem/imaterial.h"
 #include "materialsystem/imaterialsystem.h"
-#include "engine/iclientleafsystem.h"
+#include "engine/IClientLeafSystem.h"
 #include "toolutils/enginetools_int.h"
 #include "commedittool.h"
 #include "KeyValues.h"
@@ -32,7 +32,7 @@ IMPLEMENT_ELEMENT_FACTORY( DmeCommentaryNodeEntity, CDmeCommentaryNodeEntity );
 //-----------------------------------------------------------------------------
 void CDmeCommentaryNodeEntity::OnConstruction()
 {
-	m_ClassName.InitAndSet( this, "classname", false, FATTRIB_HAS_CALLBACK );
+	m_ClassName.InitAndSet( this, "classname", nullptr, FATTRIB_HAS_CALLBACK );
 	m_TargetName.Init( this, "targetname" );
 	m_bIsPlaceholder.InitAndSet( this, "_placeholder", false, FATTRIB_DONTSAVE );
 	m_vecLocalOrigin.Init( this, "origin" );
@@ -205,7 +205,7 @@ const QAngle &CDmeCommentaryNodeEntity::GetRenderAngles( void )
 //-----------------------------------------------------------------------------
 void CDmeCommentaryNodeEntity::DrawSprite( IMaterial *pMaterial )
 {
-	float t = 0.5f * sin( Plat_FloatTime() * M_PI / 1.0f ) + 0.5f;
+	float t = 0.5f * sin( static_cast<float>(Plat_FloatTime()) * M_PI_F / 1.0f ) + 0.5f;
 
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->Bind( pMaterial );
@@ -260,7 +260,7 @@ int CDmeCommentaryNodeEntity::DrawModel( int flags )
 		// If we have a visible engine entity, we don't need to draw it here
 		// info targets always draw though, because they have no visible model.
 		CDisableUndoScopeGuard guard;
-		float t = 0.5f * sin( Plat_FloatTime() * M_PI / 1.0f ) + 0.5f;
+		float t = 0.5f * sin( static_cast<float>(Plat_FloatTime()) * M_PI_F / 1.0f ) + 0.5f;
 		unsigned char nAlpha = m_bIsDirty ? (unsigned char)(255 * t) : 255;
 		if ( bSelected )
 		{
