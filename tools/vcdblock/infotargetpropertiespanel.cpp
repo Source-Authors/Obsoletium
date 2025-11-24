@@ -139,7 +139,8 @@ void CInfoTargetPropertiesPanel::TextEntriesToVector( vgui::TextEntry *pEntry[3]
 		intp nLen = pEntry[i]->GetTextLength();
 		char *pBuf = (char*)_alloca( nLen+1 );
 		pEntry[i]->GetText( pBuf, nLen+1 );
-		vec[i] = atof( pBuf );
+		// dimhotepus: atof -> strtof.
+		vec[i] = strtof( pBuf, nullptr );
 	}
 	m_hEntity->SetValue( pAttributeName, vec );
 	clienttools->MarkClientRenderableDirty( m_hEntity );
