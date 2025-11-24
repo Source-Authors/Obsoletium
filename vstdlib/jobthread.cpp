@@ -102,30 +102,32 @@ public:
 
 		m_pQueues[pJob->GetPriority()]->PushItem( pJob );
 
-		m_mutex.Lock();
-		if ( ++m_nItems == 1 )
 		{
-			m_JobAvailableEvent.Set();
+			AUTO_LOCK(m_mutex);
+
+			if ( ++m_nItems == 1 )
+			{
+				m_JobAvailableEvent.Set();
+			}
 		}
-		m_mutex.Unlock();
 
 		return nOverflow;
 	}
 
 	bool Pop( CJob **ppJob )
 	{
-		m_mutex.Lock();
-		if ( !m_nItems )
 		{
-			m_mutex.Unlock();
-			*ppJob = nullptr;
-			return false;
+			AUTO_LOCK(m_mutex);
+			if ( !m_nItems )
+			{
+				*ppJob = nullptr;
+				return false;
+			}
+			if ( --m_nItems == 0 )
+			{
+				m_JobAvailableEvent.Reset();
+			}
 		}
-		if ( --m_nItems == 0 )
-		{
-			m_JobAvailableEvent.Reset();
-		}
-		m_mutex.Unlock();
 
 		for ( int i = JP_HIGH; i >= 0; --i )
 		{
@@ -149,7 +151,7 @@ public:
 	void Flush()
 	{
 		// Only safe to call when system is suspended
-		m_mutex.Lock();
+		AUTO_LOCK(m_mutex);
 		m_nItems = 0;
 		m_JobAvailableEvent.Reset();
 		CJob *pJob;
@@ -161,7 +163,6 @@ public:
 				pJob->Release();
 			}
 		}
-		m_mutex.Unlock();
 	}
 
 private:
