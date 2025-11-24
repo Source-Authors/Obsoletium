@@ -1268,15 +1268,14 @@ void CSoundEmitterSystemBase::SaveChangesToSoundScript( intp scriptindex )
 		{
 			int len = filesystem->Size( header );
 			
-			unsigned char *data = new unsigned char[ len + 1 ];
-			Q_memset( data, 0, len + 1 );
+			std::unique_ptr<byte[]> data = std::make_unique<byte[]>(len + 1);
 			
-			filesystem->Read( data, len, header );
+			filesystem->Read( data.get(), len, header );
 			filesystem->Close( header );
 
 			data[ len ] = 0;
 
-			char *p = (char *)data;
+			char *p = (char *)data.get();
 			while ( *p )
 			{
 				if ( *p != '\r' )
@@ -1285,8 +1284,6 @@ void CSoundEmitterSystemBase::SaveChangesToSoundScript( intp scriptindex )
 				}
 				++p;
 			}
-
-			delete[] data;
 		}
 
 		buf.Printf( "\n" );
