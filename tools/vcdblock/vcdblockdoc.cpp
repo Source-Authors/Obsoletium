@@ -270,8 +270,8 @@ void CVcdBlockDoc::DeleteInfoTarget( CDmeVMFEntity *pNode )
 		if ( pNode == entities[i] )
 		{
 			CAppUndoScopeGuard guard( NOTIFY_SETDIRTYFLAG, "Delete Info Target", "Delete Info Target" );
-			CDmeVMFEntity *pNode = CastElement< CDmeVMFEntity >( entities[ i ] );
-			pNode->DrawInEngine( false );
+			CDmeVMFEntity *pNodeElement = CastElement< CDmeVMFEntity >( entities[ i ] );
+			pNodeElement->DrawInEngine( false );
 			entities.FastRemove( i );
 			return;
 		}
@@ -360,10 +360,10 @@ bool CVcdBlockDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement 
 			CDmeVMFEntity *pNode = CastElement< CDmeVMFEntity >( entities[ i ] );
 			if ( !V_stricmp( pNode->GetClassName(), "info_target" ) )
 			{
-				StringChoice_t sChoice;
-				sChoice.m_pValue = pNode->GetTargetName();
-				sChoice.m_pChoiceString = pNode->GetTargetName();
-				list.AddToTail( sChoice );
+				StringChoice_t sChoiceChild;
+				sChoiceChild.m_pValue = pNode->GetTargetName();
+				sChoiceChild.m_pChoiceString = pNode->GetTargetName();
+				list.AddToTail( sChoiceChild );
 			}
 		}
 		return true;
