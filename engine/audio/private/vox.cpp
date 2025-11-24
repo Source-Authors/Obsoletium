@@ -2666,7 +2666,6 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 {
 	char *pch;
 	byte *pFileData;
-	int fileSize;
 	char c;
 	char *pchlast, *pSentenceData;
 	characterset_t whitespace;
@@ -2684,18 +2683,17 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 
 	// load file
 
-	FileHandle_t file;
-	file = g_pFileSystem->Open( psentenceFileName, "rb" );
+	FileHandle_t file = g_pFileSystem->Open( psentenceFileName, "rb" );
 	if ( FILESYSTEM_INVALID_HANDLE == file )
 	{
 		DevMsg ("Couldn't load %s\n", psentenceFileName);
 		return;
 	}
 
-	fileSize = g_pFileSystem->Size( file );
-	if ( fileSize <= 0 )
+	unsigned fileSize = g_pFileSystem->Size( file );
+	if ( fileSize == 0 )
 	{
-		DevMsg ("VOX_ReadSentenceFile: %s has invalid size %i\n", psentenceFileName, fileSize );
+		DevMsg ("VOX_ReadSentenceFile: %s has invalid size %u\n", psentenceFileName, fileSize );
 		g_pFileSystem->Close( file );
 		return;
 	}
