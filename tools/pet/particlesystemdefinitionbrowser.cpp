@@ -72,9 +72,9 @@ CParticleSystemDefinitionBrowser::~CParticleSystemDefinitionBrowser()
 //-----------------------------------------------------------------------------
 // Gets the ith selected particle system
 //-----------------------------------------------------------------------------
-CDmeParticleSystemDefinition* CParticleSystemDefinitionBrowser::GetSelectedParticleSystem( int i )
+CDmeParticleSystemDefinition* CParticleSystemDefinitionBrowser::GetSelectedParticleSystem( intp i )
 {
-	int iSel = m_pParticleSystemsDefinitions->GetSelectedItem( i );
+	intp iSel = m_pParticleSystemsDefinitions->GetSelectedItem( i );
 	KeyValues *kv = m_pParticleSystemsDefinitions->GetItem( iSel );
 	return GetElementKeyValue< CDmeParticleSystemDefinition >( kv, "particleSystem" );
 }
@@ -85,8 +85,8 @@ CDmeParticleSystemDefinition* CParticleSystemDefinitionBrowser::GetSelectedParti
 //-----------------------------------------------------------------------------
 void CParticleSystemDefinitionBrowser::DeleteParticleSystems()
 {		
-	int iSel = m_pParticleSystemsDefinitions->GetSelectedItem( 0 );
-	int nRow = m_pParticleSystemsDefinitions->GetItemCurrentRow( iSel ) - 1;
+	intp iSel = m_pParticleSystemsDefinitions->GetSelectedItem( 0 );
+	intp nRow = m_pParticleSystemsDefinitions->GetItemCurrentRow( iSel ) - 1;
 	{
 		// This is undoable
 		CAppUndoScopeGuard guard( NOTIFY_SETDIRTYFLAG, "Delete Particle Systems", "Delete Particle Systems" );
@@ -95,8 +95,8 @@ void CParticleSystemDefinitionBrowser::DeleteParticleSystems()
 		// Build a list of objects to delete.
 		//
 		CUtlVector< CDmeParticleSystemDefinition* > itemsToDelete;
-		int nCount = m_pParticleSystemsDefinitions->GetSelectedItemsCount();
-		for (int i = 0; i < nCount; i++)
+		intp nCount = m_pParticleSystemsDefinitions->GetSelectedItemsCount();
+		for (intp i = 0; i < nCount; i++)
 		{
 			CDmeParticleSystemDefinition *pParticleSystem = GetSelectedParticleSystem( i );
 			if ( pParticleSystem )
@@ -106,7 +106,7 @@ void CParticleSystemDefinitionBrowser::DeleteParticleSystems()
 		}
 
 		nCount = itemsToDelete.Count();
-		for ( int i = 0; i < nCount; ++i )
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			m_pDoc->DeleteParticleSystemDefinition( itemsToDelete[i] );
 		}
@@ -144,7 +144,7 @@ void CParticleSystemDefinitionBrowser::LoadKVSection( CDmeParticleSystemDefiniti
 	// Function
 	FOR_EACH_TRUE_SUBKEY( pOperator, pFunctionBlock )
 	{
-		int iFunction = pNew->FindFunction( eType, pFunctionBlock->GetName() );
+		intp iFunction = pNew->FindFunction( eType, pFunctionBlock->GetName() );
 		if ( iFunction >= 0 )
 		{
 			CDmeParticleFunction *pDmeFunction = pNew->GetParticleFunction( eType, iFunction );
@@ -179,7 +179,7 @@ CDmeParticleSystemDefinition* CParticleSystemDefinitionBrowser::CreateParticleFr
 
 	// Get the Base Particle Effect Def
 	const char* pBaseParticleName = pKeyValue->GetString( "base_effect", "" );
-	for ( int i = 0; i < m_pParticleSystemsDefinitions->GetItemCount(); ++i )
+	for ( intp i = 0; i < m_pParticleSystemsDefinitions->GetItemCount(); ++i )
 	{
 		KeyValues *kv = m_pParticleSystemsDefinitions->GetItem( i );
 		if ( !V_strcmp( kv->GetString( "name", "" ), pBaseParticleName ) )
@@ -231,8 +231,8 @@ CDmeParticleSystemDefinition* CParticleSystemDefinitionBrowser::CreateParticleFr
 	LoadKVSection( pNew, pKeyValue, FUNCTION_CONSTRAINT );
 
 	// Remove copied children
-	int iChildrenCount = pNew->GetParticleFunctionCount( FUNCTION_CHILDREN );
-	for ( int i = iChildrenCount - 1; i >= 0; i-- )
+	intp iChildrenCount = pNew->GetParticleFunctionCount( FUNCTION_CHILDREN );
+	for ( intp i = iChildrenCount - 1; i >= 0; i-- )
 	{
 		pNew->RemoveFunction( FUNCTION_CHILDREN, i );
 	}
@@ -347,7 +347,7 @@ void CParticleSystemDefinitionBrowser::OnItemDeselected( void )
 void CParticleSystemDefinitionBrowser::SelectParticleSystem( CDmeParticleSystemDefinition *pFind )
 {
 	m_pParticleSystemsDefinitions->ClearSelectedItems();
-	for ( int nItemID = m_pParticleSystemsDefinitions->FirstItem(); nItemID != m_pParticleSystemsDefinitions->InvalidItemID(); nItemID = m_pParticleSystemsDefinitions->NextItem( nItemID ) )
+	for ( intp nItemID = m_pParticleSystemsDefinitions->FirstItem(); nItemID != m_pParticleSystemsDefinitions->InvalidItemID(); nItemID = m_pParticleSystemsDefinitions->NextItem( nItemID ) )
 	{
 		KeyValues *kv = m_pParticleSystemsDefinitions->GetItem( nItemID );
 		CDmeParticleSystemDefinition *pParticleSystem = GetElementKeyValue<CDmeParticleSystemDefinition>( kv, "particleSystem" );
@@ -382,7 +382,7 @@ void CParticleSystemDefinitionBrowser::OnInputCompleted( KeyValues *pKeyValues )
 	}
 	else if ( pKeyValues->FindKey( "copy" ) )
 	{
-		int nCount = m_pParticleSystemsDefinitions->GetSelectedItemsCount();
+		intp nCount = m_pParticleSystemsDefinitions->GetSelectedItemsCount();
 		if ( nCount )
 		{
 			CDmeParticleSystemDefinition *pParticleSystem = GetSelectedParticleSystem( 0 );
@@ -402,11 +402,11 @@ void CParticleSystemDefinitionBrowser::OnInputCompleted( KeyValues *pKeyValues )
 //-----------------------------------------------------------------------------
 void CParticleSystemDefinitionBrowser::CopyToClipboard( )
 {
-	int nCount = m_pParticleSystemsDefinitions->GetSelectedItemsCount();
+	intp nCount = m_pParticleSystemsDefinitions->GetSelectedItemsCount();
 
 	CUtlVector< KeyValues * > list;
 	CUtlRBTree< CDmeParticleSystemDefinition* > defs( 0, 0, DefLessFunc( CDmeParticleSystemDefinition* ) );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeParticleSystemDefinition *pParticleSystem = GetSelectedParticleSystem( i );
 
@@ -435,8 +435,8 @@ void CParticleSystemDefinitionBrowser::ReplaceDef_r( CUndoScopeGuard& guard, CDm
 		return;
 
 	m_pDoc->ReplaceParticleSystemDefinition( pDef );
-	int nChildCount = pDef->GetParticleFunctionCount( FUNCTION_CHILDREN );
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = pDef->GetParticleFunctionCount( FUNCTION_CHILDREN );
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeParticleChild *pChildFunction = static_cast< CDmeParticleChild* >( pDef->GetParticleFunction( FUNCTION_CHILDREN, i ) );
 		CDmeParticleSystemDefinition* pChild = pChildFunction->m_Child;
@@ -452,14 +452,14 @@ void CParticleSystemDefinitionBrowser::PasteFromClipboard( )
 	bool bRefreshAll = false;
 	CUtlVector< KeyValues * > list;
 	g_pDataModel->GetClipboardData( list );
-	int nItems = list.Count();
-	for ( int i = 0; i < nItems; ++i )
+	intp nItems = list.Count();
+	for ( intp i = 0; i < nItems; ++i )
 	{
 		const char *pData = list[i]->GetString( "pcf" );
 		if ( !pData )
 			continue;
 
-		int nLen = Q_strlen( pData );
+		intp nLen = Q_strlen( pData );
 		CUtlBuffer buf( pData, nLen, CUtlBuffer::TEXT_BUFFER | CUtlBuffer::READ_ONLY );
 
 		DmElementHandle_t hRoot;
@@ -553,8 +553,8 @@ void CParticleSystemDefinitionBrowser::UpdateParticleSystemList(void)
 
 	// Maintain selection if possible
 	CUtlVector< CUtlString > selectedItems;
-	int nCount = m_pParticleSystemsDefinitions->GetSelectedItemsCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_pParticleSystemsDefinitions->GetSelectedItemsCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeParticleSystemDefinition *pParticleSystem = GetSelectedParticleSystem( i );
 		if ( pParticleSystem )
@@ -564,9 +564,9 @@ void CParticleSystemDefinitionBrowser::UpdateParticleSystemList(void)
 	}
 
 	m_pParticleSystemsDefinitions->RemoveAll();
-	int nSelectedItemCount = selectedItems.Count();
+	intp nSelectedItemCount = selectedItems.Count();
 	nCount = particleSystemList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeParticleSystemDefinition *pParticleSystem = particleSystemList[i];
 		if ( !pParticleSystem )
@@ -582,9 +582,9 @@ void CParticleSystemDefinitionBrowser::UpdateParticleSystemList(void)
 		kv->SetString( "name", pName ); 
 		SetElementKeyValue( kv, "particleSystem", pParticleSystem );
 
-		int nItemID = m_pParticleSystemsDefinitions->AddItem( kv, 0, false, false );
+		intp nItemID = m_pParticleSystemsDefinitions->AddItem( kv, 0, false, false );
 
-		for ( int j = 0; j < nSelectedItemCount; ++j )
+		for ( intp j = 0; j < nSelectedItemCount; ++j )
 		{
 			if ( Q_stricmp( selectedItems[j], pName ) )
 				continue;

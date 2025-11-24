@@ -152,7 +152,7 @@ public:
 	// This reloads a portion or all of a particle definition file.
 	// It's up to the client to decide if it cares about this file
 	// Use a UtlBuffer to crack the data
-	virtual void			ReloadParticleDefintions( const char *pFileName, const void *pBufData, int nLen ) = 0;
+	virtual void			ReloadParticleDefintions( const char *pFileName, const void *pBufData, intp nLen ) = 0;
 
 	// Sends a mesage from the tool to the client
 	virtual void			PostToolMessage( KeyValues *pKeyValues ) = 0;
@@ -198,7 +198,7 @@ public:
 	// This reloads a portion or all of a particle definition file.
 	// It's up to the server to decide if it cares about this file
 	// Use a UtlBuffer to crack the data
-	virtual void ReloadParticleDefintions( const char *pFileName, const void *pBufData, int nLen ) = 0;
+	virtual void ReloadParticleDefintions( const char *pFileName, const void *pBufData, intp nLen ) = 0;
 
 	virtual void AddOriginToPVS( const Vector &org ) = 0;
 	virtual void MoveEngineViewTo( const Vector &vPos, const QAngle &vAngles ) = 0;

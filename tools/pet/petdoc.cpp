@@ -67,7 +67,7 @@ bool CPetDoc::GetIntChoiceList( const char *pChoiceListType, CDmElement *pElemen
 			const char *pName = g_pParticleSystemMgr->GetParticleFieldName( i );
 			if ( pName )
 			{
-				int j = list.AddToTail();
+				intp j = list.AddToTail();
 				list[j].m_nValue = i;
 				list[j].m_pChoiceString = pName;
 			}
@@ -85,7 +85,7 @@ bool CPetDoc::GetIntChoiceList( const char *pChoiceListType, CDmElement *pElemen
 			const char *pName = g_pParticleSystemMgr->GetParticleFieldName( i );
 			if ( pName )
 			{
-				int j = list.AddToTail();
+				intp j = list.AddToTail();
 				list[j].m_nValue = i;
 				list[j].m_pChoiceString = pName;
 			}
@@ -103,7 +103,7 @@ bool CPetDoc::GetIntChoiceList( const char *pChoiceListType, CDmElement *pElemen
 			const char *pName = g_pParticleSystemMgr->GetParticleFieldName( i );
 			if ( pName )
 			{
-				int j = list.AddToTail();
+				intp j = list.AddToTail();
 				list[j].m_nValue = i;
 				list[j].m_pChoiceString = pName;
 			}
@@ -301,8 +301,8 @@ void CPetDoc::UpdateAllParticleSystems( )
 	g_pDmElementFramework->BeginEdit();
 
 	CDmrParticleSystemList particleSystemList( GetParticleSystemDefinitionList() );
-	int nCount = particleSystemList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = particleSystemList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		UpdateParticleDefinition( particleSystemList[i] );
 	}
@@ -318,8 +318,8 @@ void CPetDoc::DeleteParticleSystemDefinition( CDmeParticleSystemDefinition *pPar
 		return;
 
 	CDmrParticleSystemList particleSystemList( GetParticleSystemDefinitionList() );
-	int nCount = particleSystemList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = particleSystemList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( pParticleSystem == particleSystemList[i] )
 		{
@@ -332,8 +332,8 @@ void CPetDoc::DeleteParticleSystemDefinition( CDmeParticleSystemDefinition *pPar
 	// Find all CDmeParticleChilds referring to this function
 	CUtlVector< CDmeParticleChild* > children;
 	FindAncestorsReferencingElement( pParticleSystem, children );
-	int nChildCount = children.Count();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = children.Count();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeParticleChild *pChildReference = children[i];
 		CDmeParticleSystemDefinition *pParent = FindReferringElement<CDmeParticleSystemDefinition>( pChildReference, "children" );
@@ -351,8 +351,8 @@ void CPetDoc::DeleteParticleSystemDefinition( CDmeParticleSystemDefinition *pPar
 CDmeParticleSystemDefinition *CPetDoc::FindParticleSystemDefinition( const char *pName )
 {
 	CDmrParticleSystemList particleSystemList( GetParticleSystemDefinitionList() );
-	int nCount = particleSystemList.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = particleSystemList.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeParticleSystemDefinition* pParticleSystem = particleSystemList[i];
 		if ( !Q_stricmp( pName, pParticleSystem->GetName() ) ) 
@@ -371,9 +371,9 @@ void CPetDoc::ReplaceParticleSystemDefinition( CDmeParticleSystemDefinition *pPa
 		return;
 
 	CDmrParticleSystemList particleSystemList( GetParticleSystemDefinitionList() );
-	int nCount = particleSystemList.Count();
-	int nFoundIndex = -1;
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = particleSystemList.Count();
+	intp nFoundIndex = -1;
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !particleSystemList[i] )
 			continue;
@@ -408,8 +408,8 @@ void CPetDoc::ReplaceParticleSystemDefinition( CDmeParticleSystemDefinition *pPa
 	// Find all CDmeParticleChilds referring to this function
 	CUtlVector< CDmeParticleChild* > children;
 	FindAncestorsReferencingElement( pOldParticleSystem, children );
-	int nChildCount = children.Count();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = children.Count();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeParticleChild *pChildReference = children[i];
 		pChildReference->m_Child = pParticleSystem; 
@@ -474,8 +474,8 @@ bool CPetDoc::GetStringChoiceList( const char *pChoiceListType, CDmElement *pEle
 		sChoice.m_pChoiceString = "";
 		list.AddToTail( sChoice );
 
-		int nCount = particleSystemList.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = particleSystemList.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			CDmeParticleSystemDefinition *pParticleSystem = particleSystemList[ i ];
 
@@ -506,8 +506,8 @@ bool CPetDoc::GetElementChoiceList( const char *pChoiceListType, CDmElement *pEl
 	{
 		CDmrParticleSystemList particleSystemList( GetParticleSystemDefinitionList() );
 
-		int nCount = particleSystemList.Count();
-		for ( int i = 0; i < nCount; ++i )
+		intp nCount = particleSystemList.Count();
+		for ( intp i = 0; i < nCount; ++i )
 		{
 			CDmeParticleSystemDefinition *pParticleSystem = particleSystemList[ i ];
 			ElementChoice_t sChoice;

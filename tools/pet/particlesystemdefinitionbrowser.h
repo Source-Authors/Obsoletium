@@ -66,7 +66,7 @@ private:
 	void ReplaceDef_r( CUndoScopeGuard& guard, CDmeParticleSystemDefinition *pDef );
 
 	// Gets the ith selected particle system
-	CDmeParticleSystemDefinition* GetSelectedParticleSystem( int i );
+	CDmeParticleSystemDefinition* GetSelectedParticleSystem( intp i );
 
 	// Called when the selection changes
 	void UpdateParticleSystemSelection();

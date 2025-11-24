@@ -101,7 +101,7 @@ public:
 
 	virtual Vector			GetAbsOrigin( HTOOLHANDLE handle );
 	virtual QAngle			GetAbsAngles( HTOOLHANDLE handle );
-	virtual void			ReloadParticleDefintions( const char *pFileName, const void *pBufData, int nLen );
+	virtual void			ReloadParticleDefintions( const char *pFileName, const void *pBufData, intp nLen );
 
 	// Sends a mesage from the tool to the client
 	virtual void			PostToolMessage( KeyValues *pKeyValues );
@@ -778,7 +778,7 @@ bool CClientTools::IsRenderingThirdPerson() const
 //-----------------------------------------------------------------------------
 // Reload particle definitions
 //-----------------------------------------------------------------------------
-void CClientTools::ReloadParticleDefintions( const char *pFileName, const void *pBufData, int nLen )
+void CClientTools::ReloadParticleDefintions( const char *pFileName, const void *pBufData, intp nLen )
 {
 	// Remove all new effects, because we are going to free internal structures they point to
 	ParticleMgr()->RemoveAllNewEffects();

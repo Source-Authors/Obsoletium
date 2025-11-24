@@ -37,7 +37,7 @@ public:
 	virtual bool SetKeyValue( CBaseEntity *pEntity, const char *szField, const Vector &vecValue );
 	virtual CBaseEntity *CreateEntityByName( const char *szClassName );
 	virtual void DispatchSpawn( CBaseEntity *pEntity );
-	virtual void ReloadParticleDefintions( const char *pFileName, const void *pBufData, int nLen );
+	virtual void ReloadParticleDefintions( const char *pFileName, const void *pBufData, intp nLen );
 	virtual void AddOriginToPVS( const Vector &org );
 	virtual void MoveEngineViewTo( const Vector &vPos, const QAngle &vAngles );
 	virtual bool DestroyEntityByHammerId( int iHammerID );
@@ -259,7 +259,7 @@ void CServerTools::DispatchSpawn( CBaseEntity *pEntity )
 //-----------------------------------------------------------------------------
 // Reload particle definitions
 //-----------------------------------------------------------------------------
-void CServerTools::ReloadParticleDefintions( const char *pFileName, const void *pBufData, int nLen )
+void CServerTools::ReloadParticleDefintions( const char *pFileName, const void *pBufData, intp nLen )
 {
 	// FIXME: Use file name to determine if we care about this data
 	CUtlBuffer buf( pBufData, nLen, CUtlBuffer::READ_ONLY );

@@ -41,9 +41,9 @@ void CParticleSystemPropertiesContainer::GetKnownParticleDefinitions( CUtlVector
 	if ( !particleSystemList.IsValid() )
 		return;
 
-	int nCount = particleSystemList.Count();
+	intp nCount = particleSystemList.Count();
 	definitions.EnsureCapacity( nCount );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeParticleSystemDefinition *pParticleSystem = particleSystemList[i];
 		definitions.AddToTail( pParticleSystem );
