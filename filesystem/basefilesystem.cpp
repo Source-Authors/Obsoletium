@@ -1459,7 +1459,7 @@ void CBaseFileSystem::AddSearchPath( const char *pPath, const char *pathID, Sear
 //-----------------------------------------------------------------------------
 int CBaseFileSystem::GetSearchPath( const char *pathID, bool bGetPackFiles, OUT_Z_CAP(maxLenInChars) char *pDest, intp maxLenInChars )
 {
-	AUTO_LOCK( m_SearchPathsMutex );
+	AUTO_LOCK_READ( m_SearchPathsMutex );
 
 	// Build up result into string object
 	// dimhotepus: Use std::string and reserve capacity. 
@@ -1583,7 +1583,7 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::FindWritePath( const char *pFilen
 {
 	CUtlSymbol lookup = g_PathIDTable.AddString( pathID );
 
-	AUTO_LOCK( m_SearchPathsMutex );
+	AUTO_LOCK_READ( m_SearchPathsMutex );
 
 	// a pathID has been specified, find the first match in the path list
 	intp c = m_SearchPaths.Count();
@@ -1965,7 +1965,7 @@ bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::RemoveAllSearchPaths( void )
 {
-	AUTO_LOCK( m_SearchPathsMutex );
+	AUTO_LOCK_WRITE( m_SearchPathsMutex );
 	m_SearchPaths.Purge();
 }
 
