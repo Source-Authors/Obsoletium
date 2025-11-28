@@ -319,11 +319,11 @@ bool CEntityMapData::SetValue( const char *keyName, char *NewValue, int nKeyInst
 				// Insert quotes if caller didn't
 				if ( NewValue[0] != '\"' )
 				{
-					Q_snprintf( newvaluebuf, sizeof( newvaluebuf ), "\"%s\"", NewValue );
+					V_sprintf_safe( newvaluebuf, "\"%s\"", NewValue );
 				}
 				else
 				{
-					Q_strncpy( newvaluebuf, NewValue, sizeof( newvaluebuf ) );
+					V_strcpy_safe( newvaluebuf, NewValue );
 				}
 
 				intp iNewValueLen = Q_strlen(newvaluebuf);
