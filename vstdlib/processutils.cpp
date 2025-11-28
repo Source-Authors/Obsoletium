@@ -360,7 +360,7 @@ intp CProcessUtils::GetActualProcessOutput( ProcessHandle_t hProcess, char *pBuf
 	}
 
 	dwCount = min( dwCount, (DWORD)nBufLen - 1 );
-	if ( !ReadFile( info.m_hChildStdoutRd, pTempBuf, dwCount, &dwRead, nullptr) )
+	if ( !::ReadFile( info.m_hChildStdoutRd, pTempBuf, dwCount, &dwRead, nullptr) )
 	{
 		char buf[ 512 ];
 		Warning( "Could not read from pipe associated with command %s\n"
