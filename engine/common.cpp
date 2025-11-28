@@ -472,15 +472,16 @@ Copies a file from pSourcePath to pDestPath.
 */
 bool COM_CopyFile ( IN_Z const char *pSourcePath, IN_Z const char *pDestPath )
 {
-	int             remaining, count;
-	char			buf[4096];
+	// dimhotepus: Copy file by x32 times greater chunks for performance.
+	constexpr unsigned bufferSize = 4096 * 32;
+	std::unique_ptr<char[]>	buf = std::make_unique<char[]>( bufferSize );
 
 	FileHandle_t in = g_pFileSystem->Open(pSourcePath, "rb");
 	AssertMsg( in, "COM_CopyFile(): Input file '%s' failed to open", pSourcePath );
 
 	if ( in == FILESYSTEM_INVALID_HANDLE )
 		return false;
-		
+
 	// create directories up to the cache file
 	COM_CreatePath( pDestPath );
 
@@ -493,19 +494,14 @@ bool COM_CopyFile ( IN_Z const char *pSourcePath, IN_Z const char *pDestPath )
 		return false;
 	}
 
-	remaining = g_pFileSystem->Size( in );
+	unsigned remaining = g_pFileSystem->Size( in );
 	while ( remaining > 0 )
 	{
-		if (remaining < static_cast<int>(sizeof(buf)))
-		{
-			count = remaining;
-		}
-		else
-		{
-			count = sizeof(buf);
-		}
-		g_pFileSystem->Read( buf, count, in );
-		g_pFileSystem->Write( buf, count, out );
+		const unsigned count = remaining < bufferSize ? remaining : bufferSize;
+
+		g_pFileSystem->Read( buf.get(), count, in );
+		g_pFileSystem->Write( buf.get(), count, out );
+
 		remaining -= count;
 	}
 
