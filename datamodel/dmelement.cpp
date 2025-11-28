@@ -1383,11 +1383,11 @@ void MakeElementNameUnique( CDmElement *pElement, const char *prefix, const CUtl
 	}
 	else
 	{
-		char *name = new char[ newlen + 1 ];
+		// dimhotepus: Heap -> stack for performance.
+		char *name = stackallocT( char, newlen + 1 );
 		// dimhotepus: Fix name buffer size.
 		Q_snprintf( name, newlen + 1, "%s%zd", prefix, i );
 		pElement->SetName( name );
-		delete[] name;
 	}
 }
 
