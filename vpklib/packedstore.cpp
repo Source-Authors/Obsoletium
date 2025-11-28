@@ -1231,6 +1231,7 @@ bool CPackedStore::HashEntirePackFile( CPackedStoreFileHandle &handle, int64 &nF
 #endif
 
 	FileHandleTracker_t &fHandle = GetFileHandle( handle.m_nFileNumber );
+	{
 	AUTO_LOCK(fHandle.m_Mutex);
 	
 #ifdef IS_WINDOWS_PC
@@ -1287,6 +1288,7 @@ bool CPackedStore::HashEntirePackFile( CPackedStoreFileHandle &handle, int64 &nF
 #else
 	m_pFileSystem->Seek( fHandle.m_hFileHandle, fHandle.m_nCurOfs, FILESYSTEM_SEEK_HEAD );
 #endif
+	}
 
 #ifdef COMPUTE_HASH_TIMES
 	timer.End();
