@@ -1265,7 +1265,7 @@ bool CPackedStore::HashEntirePackFile( CPackedStoreFileHandle &handle, int64 &nF
 		if ( chunkLen == 0 )
 			break;
 
-		int nRead;
+			unsigned int nRead;
 #ifdef IS_WINDOWS_PC
 			::ReadFile( fHandle.m_hFileHandle, tempBuf, chunkLen, (LPDWORD) &nRead, NULL );
 #else
