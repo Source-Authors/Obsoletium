@@ -289,6 +289,10 @@ bool CEntityMapData::SetValue( const char *keyName, char *NewValue, int nKeyInst
 	char newvaluebuf[ 1024 ];
 	int nCurrKeyInstance = 0;
 
+	// dimhotepus: Reduce allocations count by preallocating the buffer.
+	intp postDataSize = 1024;
+	std::unique_ptr<char[]> postData = std::make_unique<char[]>(postDataSize);
+
 	while ( inputData )
 	{
 		inputData = (char*)MapEntity_ParseToken( inputData, token );	// get keyname
@@ -303,10 +307,14 @@ bool CEntityMapData::SetValue( const char *keyName, char *NewValue, int nKeyInst
 			{
 				// Find the start & end of the token we're going to replace
 				intp entLen = V_strlen(m_pEntData);
-				char *postData = new char[entLen];
+				if (entLen > postDataSize)
+				{
+					postData.reset(new char[entLen]);
+					postDataSize = entLen;
+				}
 				prevData = inputData;
 				inputData = (char*)MapEntity_ParseToken( inputData, token );	// get keyname
-				Q_strncpy( postData, inputData, entLen );
+				Q_strncpy( postData.get(), inputData, entLen );
 
 				// Insert quotes if caller didn't
 				if ( NewValue[0] != '\"' )
@@ -324,10 +332,9 @@ bool CEntityMapData::SetValue( const char *keyName, char *NewValue, int nKeyInst
 				// prevData has a space at the start, seperating the value from the key.
 				// Add 1 to prevData when pasting in the new Value, to account for the space.
 				Q_strncpy( prevData+1, newvaluebuf, iNewValueLen+1 );	// +1 for the null terminator
-				Q_strcat( prevData, postData, m_nEntDataSize - ((prevData-m_pEntData)+1) );
+				Q_strcat( prevData, postData.get(), m_nEntDataSize - ((prevData-m_pEntData)+1) );
 
 				m_pCurrentKey += iPadding;
-				delete [] postData;
 				return true;
 			}
 		}
