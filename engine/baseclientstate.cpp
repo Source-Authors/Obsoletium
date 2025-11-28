@@ -1367,23 +1367,20 @@ bool CBaseClientState::ProcessCreateStringTable( SVC_CreateStringTable *msg )
 		     msgUncompressedSize < UINT_MAX/2 )
 		{
 			// allocate buffer for uncompressed data, align to 4 bytes boundary
-			char *uncompressedBuffer = new char[PAD_NUMBER( msgUncompressedSize, 4 )];
-			char *compressedBuffer = new char[PAD_NUMBER( msgCompressedSize, 4 )];
+			std::unique_ptr<char[]> uncompressedBuffer = std::make_unique<char[]>(PAD_NUMBER( msgUncompressedSize, 4 ));
+			std::unique_ptr<char[]> compressedBuffer = std::make_unique<char[]>(PAD_NUMBER( msgCompressedSize, 4 ));
 
-			msg->m_DataIn.ReadBits( compressedBuffer, msgCompressedSize * 8 );
+			msg->m_DataIn.ReadBits( compressedBuffer.get(), msgCompressedSize * 8 );
 
 			// uncompress data
-			bSuccess = COM_BufferToBufferDecompress( uncompressedBuffer, &uncompressedSize, compressedBuffer, msgCompressedSize );
+			bSuccess = COM_BufferToBufferDecompress( uncompressedBuffer.get(), &uncompressedSize, compressedBuffer.get(), msgCompressedSize );
 			bSuccess &= ( uncompressedSize == msgUncompressedSize );
 
 			if ( bSuccess )
 			{
-				bf_read data( uncompressedBuffer, uncompressedSize );
+				bf_read data( uncompressedBuffer.get(), uncompressedSize );
 				table->ParseUpdate( data, msg->m_nNumEntries );
 			}
-
-			delete[] uncompressedBuffer;
-			delete[] compressedBuffer;
 		}
 
 		if ( !bSuccess )

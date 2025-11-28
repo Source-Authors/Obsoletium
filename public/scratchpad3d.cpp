@@ -463,7 +463,7 @@ void CScratchPad3D::DrawImageBW(
 		bool bOutlineImage,
 		Vector *vCorners )
 {
-	SPRGBA *pRGBA = new SPRGBA[width*height];
+	std::unique_ptr<SPRGBA[]> pRGBA = std::make_unique<SPRGBA[]>(width*height);
 	for( int y=0; y < height; y++ )
 	{
 		SPRGBA *pDest = &pRGBA[ y * width ];
@@ -476,8 +476,7 @@ void CScratchPad3D::DrawImageBW(
 		}
 	}
 
-	DrawImageRGBA( pRGBA, width, height, width*sizeof(SPRGBA), bOutlinePixels, bOutlineImage, vCorners );
-	delete [] pRGBA;
+	DrawImageRGBA( pRGBA.get(), width, height, width*sizeof(SPRGBA), bOutlinePixels, bOutlineImage, vCorners );
 }
 
 

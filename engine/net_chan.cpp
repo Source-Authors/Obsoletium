@@ -168,9 +168,9 @@ void CNetChan::CompressFragments()
 
 			// fragments data is in memory
 			unsigned int compressedSize = COM_GetIdealDestinationCompressionBufferSize_Snappy( data->bytes );
-			char * compressedData = new char[ compressedSize ];
+			std::unique_ptr<char[]> compressedData = std::make_unique<char[]>( compressedSize );
 
-			if ( COM_BufferToBufferCompress_Snappy( compressedData, &compressedSize, data->buffer, data->bytes ) &&
+			if ( COM_BufferToBufferCompress_Snappy( compressedData.get(), &compressedSize, data->buffer, data->bytes ) &&
 				( compressedSize < data->bytes ) )
 			{
 				compressTimer.End(); 
@@ -178,15 +178,13 @@ void CNetChan::CompressFragments()
 						data->bytes, compressedSize, compressTimer.GetDuration().GetMillisecondsF() );
 
 				// copy compressed data but dont reallocate memory
-				Q_memcpy( data->buffer, compressedData, compressedSize );
+				Q_memcpy( data->buffer, compressedData.get(), compressedSize );
 
 				data->nUncompressedSize = data->bytes;
 				data->bytes = compressedSize;
 				data->numFragments = BYTES2FRAGMENTS(data->bytes);
 				data->isCompressed = true;				
 			}
-
-			delete [] compressedData; // free temp buffer
 		}
 		else // it's a file
 		{
@@ -219,14 +217,14 @@ void CNetChan::CompressFragments()
 				// create compressed version of source file
 				unsigned int uncompressedSize = data->bytes;
 				unsigned int compressedSize = COM_GetIdealDestinationCompressionBufferSize_Snappy( uncompressedSize );
-				char *uncompressed = new char[uncompressedSize];
-				char *compressed = new char[compressedSize];
+				std::unique_ptr<char[]> uncompressed = std::make_unique<char[]>(uncompressedSize);
+				std::unique_ptr<char[]> compressed = std::make_unique<char[]>(compressedSize);
 					
 				// read in source file
-				g_pFileSystem->Read( uncompressed, data->bytes, data->file );
+				g_pFileSystem->Read( uncompressed.get(), data->bytes, data->file );
 
 				// compress into buffer
-				if ( COM_BufferToBufferCompress_Snappy( compressed, &compressedSize, uncompressed, uncompressedSize ) )
+				if ( COM_BufferToBufferCompress_Snappy( compressed.get(), &compressedSize, uncompressed.get(), uncompressedSize ) )
 				{
 					// write out to disk compressed version
 					hZipFile = g_pFileSystem->Open( compressedfilename, "wb", NULL );
@@ -234,7 +232,7 @@ void CNetChan::CompressFragments()
 					if ( hZipFile != FILESYSTEM_INVALID_HANDLE )
 					{
 						DevMsg("Creating compressed version of file %s (%d -> %d)\n", data->filename, data->bytes, compressedSize);
-						g_pFileSystem->Write( compressed, compressedSize, hZipFile );
+						g_pFileSystem->Write( compressed.get(), compressedSize, hZipFile );
 						g_pFileSystem->Close( hZipFile );
 
 						// and open zip file it again for reading
@@ -247,9 +245,6 @@ void CNetChan::CompressFragments()
 						}
 					}
 				}
-				
-				delete [] uncompressed;
-				delete [] compressed;
 			}
 
 			if ( compressedFileSize > 0 )

@@ -2882,8 +2882,8 @@ bool CCoreDispInfo::SurfToBaseFacePlane( Vector const &surfPt, Vector &planePt )
 {
 	// Create bounding boxes
 	int nBoxCount = ( GetHeight() - 1 ) * ( GetWidth() - 1 );
-	CoreDispBBox_t *pBBox = new CoreDispBBox_t[nBoxCount];
-	CreateBoundingBoxes( pBBox, nBoxCount );
+	std::unique_ptr<CoreDispBBox_t[]> pBBox = std::make_unique<CoreDispBBox_t[]>( nBoxCount );
+	CreateBoundingBoxes( pBBox.get(), nBoxCount );
 
 	// Use the boxes as a first-pass culling mechanism.
 	for( int iBox = 0; iBox < nBoxCount; ++iBox )
@@ -2922,15 +2922,11 @@ bool CCoreDispInfo::SurfToBaseFacePlane( Vector const &surfPt, Vector &planePt )
 
 				planePt = ( vecFlatPoints[0] * c[0] ) + ( vecFlatPoints[1] * c[1] ) + ( vecFlatPoints[2] * c[2] );
 
-				// Delete temporary memory.
-				delete [] pBBox;
 				return true;
 			}
 		}
 	}
 
-	// Delete temporary memory
-	delete [] pBBox;
 	return false;
 }
 

@@ -300,8 +300,10 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 {
 	VPROF("MapEntity_ParseAllEntities");
 
-	HierarchicalSpawnMapData_t *pSpawnMapData = new HierarchicalSpawnMapData_t[NUM_ENT_ENTRIES];
-	HierarchicalSpawn_t *pSpawnList = new HierarchicalSpawn_t[NUM_ENT_ENTRIES];
+	std::unique_ptr<HierarchicalSpawnMapData_t[]> pSpawnMapData =
+		std::make_unique<HierarchicalSpawnMapData_t[]>(NUM_ENT_ENTRIES);
+	std::unique_ptr<HierarchicalSpawn_t[]> pSpawnList =
+		std::make_unique<HierarchicalSpawn_t[]>(NUM_ENT_ENTRIES);
 
 	CUtlVector< CPointTemplate* > pPointTemplates;
 	int nEntities = 0;
@@ -424,8 +426,8 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 	}
 
 	// Now loop through all our point_template entities and tell them to make templates of everything they're pointing to
-	int iTemplates = pPointTemplates.Count();
-	for ( int i = 0; i < iTemplates; i++ )
+	intp iTemplates = pPointTemplates.Count();
+	for ( intp i = 0; i < iTemplates; i++ )
 	{
 		VPROF( "MapEntity_ParseAllEntities_SpawnTemplates");
 		CPointTemplate *pPointTemplate = pPointTemplates[i];
@@ -470,10 +472,7 @@ void MapEntity_ParseAllEntities(const char *pMapData, IMapEntityFilter *pFilter,
 		pPointTemplate->FinishBuildingTemplates();
 	}
 
-	SpawnHierarchicalList( nEntities, pSpawnList, bActivateEntities );
-
-	delete [] pSpawnMapData;
-	delete [] pSpawnList;
+	SpawnHierarchicalList( nEntities, pSpawnList.get(), bActivateEntities );
 }
 
 void SpawnHierarchicalList( int nEntities, HierarchicalSpawn_t *pSpawnList, bool bActivateEntities )

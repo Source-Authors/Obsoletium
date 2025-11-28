@@ -1430,16 +1430,16 @@ void CNetworkStringTableContainer::WriteBaselines( bf_write &buf )
 			// TERROR: bzip-compress the stringtable before adding it to the packet.  Yes, the whole packet will be bzip'd,
 			// but the uncompressed data also has to be under the NET_MAX_PAYLOAD limit.
 			unsigned int numBytes = msg.m_DataOut.GetNumBytesWritten();
-			unsigned int compressedSize = (unsigned int)numBytes;
-			char *compressedData = new char[numBytes];
+			unsigned int compressedSize = numBytes;
+			std::unique_ptr<char[]> compressedData = std::make_unique<char[]>(numBytes);
 
-			if ( COM_BufferToBufferCompress_Snappy( compressedData, &compressedSize, (char *)msg.m_DataOut.GetData(), numBytes ) )
+			if ( COM_BufferToBufferCompress_Snappy( compressedData.get(), &compressedSize, (char *)msg.m_DataOut.GetData(), numBytes ) )
 			{
 				msg.m_bDataCompressed = true;
 				msg.m_DataOut.Reset();
 				msg.m_DataOut.WriteLong( numBytes );	// uncompressed size
 				msg.m_DataOut.WriteLong( compressedSize );	// compressed size
-				msg.m_DataOut.WriteBits( compressedData, compressedSize * 8 );	// compressed data
+				msg.m_DataOut.WriteBits( compressedData.get(), compressedSize * 8 );	// compressed data
 
 				// if ( compressstringtablbaselines > 1 )
 				{
@@ -1448,8 +1448,6 @@ void CNetworkStringTableContainer::WriteBaselines( bf_write &buf )
 							table->GetTableName(), numBytes, compressedSize, compressTimer.GetDuration().GetMillisecondsF() );
 				}
 			}
-
-			delete [] compressedData;
 		}
 
 		if ( !msg.WriteToBuffer( buf ) )
