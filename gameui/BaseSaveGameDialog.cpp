@@ -262,6 +262,8 @@ void CBaseSaveGameDialog::ScanSavedGames()
 	{
 		vgui::Label *pNoSavesLabel = SETUP_PANEL(new Label(m_pGameList, "NoSavesLabel", "#GameUI_NoSaveGamesToDisplay"));
 		pNoSavesLabel->SetTextColorState(vgui::Label::CS_DULL);
+		// dimhotepus: Ensure label looks good regarding of UI scaling.
+		pNoSavesLabel->SizeToContents();
 		m_pGameList->AddItem( NULL, pNoSavesLabel );
 	}
 
