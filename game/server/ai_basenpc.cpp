@@ -539,7 +539,8 @@ void CAI_BaseNPC::CleanupOnDeath( CBaseEntity *pCulprit, bool bFireDeathOutput )
 		RemoveActorFromScriptedScenes( this, false /*all scenes*/ );
 	}
 	else
-		DevMsg( "Unexpected double-death-cleanup\n" );
+		// dimhotepus: Dump for which entity double cleanup is done.
+		DevMsg( "Unexpected double-death-cleanup for %s.\n", GetEntityName() );
 }
 
 void CAI_BaseNPC::SelectDeathPose( const CTakeDamageInfo &info )
