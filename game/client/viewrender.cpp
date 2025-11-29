@@ -3046,10 +3046,8 @@ void CViewRender::ViewDrawScene_Intro( const CViewSetup &viewRender, int nClearF
 	pRenderContext->PushMatrix();
 	pRenderContext->LoadIdentity();
 	
-	int passID;
-	for( passID = 0; passID < introData.m_Passes.Count(); passID++ )
+	for( const auto &pass : introData.m_Passes )
 	{
-		const IntroDataBlendPass_t& pass = introData.m_Passes[passID];
 		if ( pass.m_Alpha == 0 )
 			continue;
 
