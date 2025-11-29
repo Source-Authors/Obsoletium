@@ -288,11 +288,7 @@ bool CEntityMapData::SetValue( const char *keyName, char *NewValue, int nKeyInst
 
 	char newvaluebuf[ 1024 ];
 	int nCurrKeyInstance = 0;
-
-	// dimhotepus: Reduce allocations count by preallocating the buffer.
-	intp postDataSize = 1024;
-	std::unique_ptr<char[]> postData = std::make_unique<char[]>(postDataSize);
-
+	
 	while ( inputData )
 	{
 		inputData = (char*)MapEntity_ParseToken( inputData, token );	// get keyname
@@ -307,11 +303,8 @@ bool CEntityMapData::SetValue( const char *keyName, char *NewValue, int nKeyInst
 			{
 				// Find the start & end of the token we're going to replace
 				intp entLen = V_strlen(m_pEntData);
-				if (entLen > postDataSize)
-				{
-					postData.reset(new char[entLen]);
-					postDataSize = entLen;
-				}
+				// dimhotepus: Reduce allocations count by preallocating the buffer.
+				std::unique_ptr<char[]> postData = std::make_unique<char[]>(entLen);
 				prevData = inputData;
 				inputData = (char*)MapEntity_ParseToken( inputData, token );	// get keyname
 				Q_strncpy( postData.get(), inputData, entLen );
