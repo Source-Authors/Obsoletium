@@ -36,7 +36,7 @@ class CSaveGamePanel : public vgui::EditablePanel
 {
 	DECLARE_CLASS_SIMPLE_OVERRIDE( CSaveGamePanel, vgui::EditablePanel );
 public:
-	CSaveGamePanel( PanelListPanel *parent, const char *name, int saveGameListItemID ) : BaseClass( parent, name )
+	CSaveGamePanel( PanelListPanel *parent, const char *name, intp saveGameListItemID ) : BaseClass( parent, name )
 	{
 		m_iSaveGameListItemID = saveGameListItemID;
 		m_pParent = parent;
@@ -136,7 +136,7 @@ public:
 		PostMessage( m_pParent->GetParent(), new KeyValues("Command", "command", "loadsave") );
 	}
 
-	int GetSaveGameListItemID()
+	intp GetSaveGameListItemID() const
 	{
 		return m_iSaveGameListItemID;
 	}
@@ -154,7 +154,7 @@ private:
 	Label *m_pFileTimeLabel;
 	Color m_TextColor, m_FillColor, m_SelectedColor;
 
-	int m_iSaveGameListItemID;
+	intp m_iSaveGameListItemID;
 };
 
 
@@ -335,7 +335,7 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 		}
 
 		// Chop elapsed out of comment.
-		int n = i - 6;
+		intp n = i - 6;
 		szComment[n] = '\0';
 	
 		n--;
