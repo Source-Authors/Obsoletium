@@ -419,6 +419,8 @@ CPhysConstraint::CPhysConstraint( void )
 	m_pConstraint = NULL;
 	m_nameAttach1 = NULL_STRING;
 	m_nameAttach2 = NULL_STRING;
+	m_breakSound = NULL_STRING;
+	m_nameSystem = NULL_STRING;
 	m_forceLimit = 0;
 	m_torqueLimit = 0;
 	m_teleportTick = 0xFFFFFFFF;
