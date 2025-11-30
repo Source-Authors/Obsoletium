@@ -72,7 +72,7 @@ public:
 
 	constraint_anchor_t *Find( string_t name )
 	{
-		for ( int i = m_list.Count()-1; i >=0; i-- )
+		for ( intp i = m_list.Count()-1; i >=0; i-- )
 		{
 			if ( FStrEq( STRING(m_list[i].name), STRING(name) ) )
 			{
