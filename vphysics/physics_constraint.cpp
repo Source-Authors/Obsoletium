@@ -280,7 +280,7 @@ CPhysicsConstraintGroup::CPhysicsConstraintGroup( IVP_Environment *pEnvironment,
 	m_pLCS->set_client_data( this );
 }
 
-enum vphysics_save_constrainttypes_t
+enum vphysics_save_constrainttypes_t : short
 {
 	CONSTRAINT_UNKNOWN = 0,
 	CONSTRAINT_RAGDOLL,
@@ -557,7 +557,8 @@ private:
 	hk_Local_Constraint_System *m_HkLCS;
 	void					*m_pGameData;
 	// these are used to crack the abstract pointers on save/load
-	short					m_constraintType;
+	// dimhotepus: short -> vphysics_save_constrainttypes_t.
+	vphysics_save_constrainttypes_t		m_constraintType;
 	short					m_isBreakable;
 };
 
@@ -1047,7 +1048,7 @@ void CPhysicsConstraint::WriteToTemplate( vphysics_save_cphysicsconstraint_t &he
 	header.pObjReference = m_pObjReference;
 	header.pObjAttached = m_pObjAttached;
 
-	switch( header.constraintType )
+	switch( m_constraintType )
 	{
 	case CONSTRAINT_UNKNOWN:
 		Assert(0);
