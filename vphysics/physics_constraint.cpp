@@ -1669,8 +1669,8 @@ bool SavePhysicsConstraint( const physsaveparams_t &params, CPhysicsConstraint *
 {
 	vphysics_save_cphysicsconstraint_t header;
 	vphysics_save_constraint_t constraintTemplate;
-	memset( &header, 0, sizeof(header) );
-	memset( &constraintTemplate, 0, sizeof(constraintTemplate) );
+	BitwiseClear( header );
+	BitwiseClear( constraintTemplate );
 
 	pConstraint->WriteToTemplate( header, constraintTemplate );
 	
