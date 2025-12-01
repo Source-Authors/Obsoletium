@@ -401,6 +401,7 @@ struct GenericVirtualClass : virtual public GenericClass
 
 // __virtual_inheritance classes go here
 #ifdef _MSC_VER
+#pragma warning( push )
 #pragma warning( disable : 4121 )
 #endif
 
@@ -436,7 +437,7 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 2*sizeof(int) >
 	}
 };
 #ifdef _MSC_VER
-#pragma warning( default : 4121 )
+#pragma warning( pop )
 #endif
 
 // Nasty hack for Microsoft and Intel (IA32 and Itanium)
