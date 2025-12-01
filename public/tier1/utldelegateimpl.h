@@ -439,50 +439,6 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 2*sizeof(int) >
 #pragma warning( default : 4121 )
 #endif
 
-#if (_MSC_VER <1300)
-
-// Nasty hack for Microsoft Visual C++ 6.0
-// unknown_inheritance classes go here
-// There is a compiler bug in MSVC6 which generates incorrect code in this case!!
-template <>
-struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3*sizeof(int) >
-{
-	template <class X, class XFuncType, class GenericMemFuncType>
-	inline static GenericClass *Convert(X *pthis, XFuncType function_to_bind, 
-		GenericMemFuncType &bound_func) 
-	{
-		// There is an apalling but obscure compiler bug in MSVC6 and earlier:
-		// vtable_index and 'vtordisp' are always set to 0 in the 
-		// unknown_inheritance case!
-		// This means that an incorrect function could be called!!!
-		// Compiling with the /vmg option leads to potentially incorrect code.
-		// This is probably the reason that the IDE has a user interface for specifying
-		// the /vmg option, but it is disabled -  you can only specify /vmg on 
-		// the command line. In VC1.5 and earlier, the compiler would ICE if it ever
-		// encountered this situation.
-		// It is OK to use the /vmg option if /vmm or /vms is specified.
-
-		// Fortunately, the wrong function is only called in very obscure cases.
-		// It only occurs when a derived class overrides a virtual function declared 
-		// in a virtual base class, and the member function 
-		// points to the *Derived* version of that function. The problem can be
-		// completely averted in 100% of cases by using the *Base class* for the 
-		// member fpointer. Ie, if you use the base class as an interface, you'll
-		// stay out of trouble.
-		// Occasionally, you might want to point directly to a derived class function
-		// that isn't an override of a base class. In this case, both vtable_index 
-		// and 'vtordisp' are zero, but a virtual_inheritance pointer will be generated.
-		// We can generate correct code in this case. To prevent an incorrect call from
-		// ever being made, on MSVC6 we generate a warning, and call a function to 
-		// make the program crash instantly. 
-		typedef char ERROR_VC6CompilerBug[-100];
-		return 0; 
-	}
-};
-
-
-#else 
-
 // Nasty hack for Microsoft and Intel (IA32 and Itanium)
 // unknown_inheritance classes go here 
 // This is probably the ugliest bit of code I've ever written. Look at the casts!
@@ -531,7 +487,6 @@ struct SimplifyMemFunc<SINGLE_MEMFUNCPTR_SIZE + 3*sizeof(int) >
 			reinterpret_cast<char *>(pthis) + u.s.delta + virtual_delta);
 	};
 };
-#endif // MSVC 7 and greater
 
 #endif // MS/Intel hacks
 
