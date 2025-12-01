@@ -372,10 +372,16 @@ public:
 			IVP_Real_Object *obj[2];
 			mdist->get_objects( obj );
 			IVP_BOOL check = pEnvironment->get_collision_filter()->check_objects_for_collision_detection( obj[0], obj[1] );
-			Assert(check);
 			if ( !check )
 			{
+#ifdef _DEBUG
+				AssertMsg(check,
+					"Changed collision rules for %s vs. %s without calling recheck!\n",
+					obj[0]->get_name(),
+					obj[1]->get_name() );
+#else
 				Msg("Changed collision rules for %s vs. %s without calling recheck!\n", obj[0]->get_name(), obj[1]->get_name() );
+#endif
 			}
 		}
 	}
