@@ -138,11 +138,11 @@ void CPhysicsEnvironment::PostRestore()
 
 void CVPhysPtrSaveRestoreOps::Save( const SaveRestoreFieldInfo_t &fieldInfo, ISave *pSave )
 {
-	char *pField = (char *)fieldInfo.pField;
+	const char *pField = (const char *)fieldInfo.pField;
 	int nObjects = fieldInfo.pTypeDesc->fieldSize;
 	for ( int i = 0; i < nObjects; i++ )
 	{
-		pSave->WriteData( (char*)pField, sizeof(void*) );
+		pSave->WriteData( pField, sizeof(void*) );
 		pField += sizeof(void*);
 	}
 }
