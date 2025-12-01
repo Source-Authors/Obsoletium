@@ -1215,7 +1215,8 @@ bool CPhysicsConstraint::GetConstraintParams( constraint_breakableparams_t *pPar
 
 CPhysicsConstraintGroup *CPhysicsConstraint::GetConstraintGroup() const
 {
-	if ( !m_HkConstraint )
+	// dimhotepus: m_HkLCS means no physics constraint group. See CPhysicsConstraint::Init*.
+	if ( !m_HkConstraint || m_HkLCS )
 		return NULL;
 
 	hk_Local_Constraint_System *plcs = m_HkConstraint->get_constraint_system();
@@ -1713,11 +1714,9 @@ bool SavePhysicsConstraint( const physsaveparams_t &params, CPhysicsConstraint *
 bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstraint **ppConstraint )
 {
 	vphysics_save_cphysicsconstraint_t header;
-	memset( &header, 0, sizeof(header) );
+	BitwiseClear( header );
 	
 	params.pRestore->ReadAll( &header );
-	// TODO: Fix me, why do we read pointer not to 0, but some invalid one?
-	header.pGroup = nullptr;
 	if ( IsValidConstraint( header ) )
 	{
 		switch ( header.constraintType )
