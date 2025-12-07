@@ -4947,11 +4947,13 @@ void CMeshMgr::CreateZeroVertexBuffer()
 		if ( SUCCEEDED( hr ) )
 		{
 			void *pData = NULL;
-			m_pZeroVertexBuffer->Lock( 0, nBufSize, &pData, D3DLOCK_NOSYSLOCK );
-			if ( pData )
+			hr = m_pZeroVertexBuffer->Lock( 0, nBufSize, &pData, D3DLOCK_NOSYSLOCK );
+			if ( SUCCEEDED( hr ) && pData )
 			{
 				V_memset( pData, 0, nBufSize );
-				m_pZeroVertexBuffer->Unlock();
+				hr = m_pZeroVertexBuffer->Unlock();
+
+				Assert(SUCCEEDED(hr));
 			}
 		}
 	}
