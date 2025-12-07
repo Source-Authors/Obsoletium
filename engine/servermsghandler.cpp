@@ -434,7 +434,8 @@ bool CClientState::ProcessClassInfo( SVC_ClassInfo *msg )
 
 	if ( !RecvTable_CreateDecoders( serverGameDLL->GetStandardSendProxies(), bAllowMismatches ) ) // create receive table decoders
 	{
-		Host_EndGame( true, "CL_ParseClassInfo_EndClasses: CreateDecoders failed.\n" );
+		//DecalOverdose: Resolves (#136) so we can play maps in Portal 
+		//Host_EndGame( true, "CL_ParseClassInfo_EndClasses: CreateDecoders failed.\n" );
 		return false;
 	}
 
