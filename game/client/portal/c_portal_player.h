@@ -159,7 +159,7 @@ private:
 	int	  m_iPlayerSoundType;
 
 	bool  m_bHeldObjectOnOppositeSideOfPortal;
-	CProp_Portal *m_pHeldObjectPortal;
+	CHandle<CProp_Portal> m_pHeldObjectPortal;
 
 	int	m_iForceNoDrawInPortalSurface; //only valid for one frame, used to temp disable drawing of the player model in a surface because of freaky artifacts
 
