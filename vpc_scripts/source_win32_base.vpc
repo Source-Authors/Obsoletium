@@ -13,8 +13,10 @@ $Configuration
 		// Request a specific compiler toolset.
 		$PlatformToolset "v100" [$VS2010]
 
-		// dimhotepus: Use newer toolset as XP is out of support.
-		$PlatformToolset "v143" [$VS2015]
+		// dimhotepus: Use newer toolsets as XP is out of support.
+		$PlatformToolset "v140" [$VS2015]
+		$PlatformToolset "v143" [$VS2022]
+		$PlatformToolset "v145" [$VS2026]
 	}
 
 	$General
