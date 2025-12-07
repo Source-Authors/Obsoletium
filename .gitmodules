@@ -1,19 +1,24 @@
 [submodule "thirdparty/SDL"]
 	path = thirdparty/SDL
 	url = git@github.com:Source-Authors/SDL.git
+	ignore = dirty
 [submodule "thirdparty/stb"]
 	path = thirdparty/stb
 	url = git@github.com:Source-Authors/stb.git
+	ignore = dirty
 [submodule "thirdparty/DirectXMath"]
 	path = thirdparty/DirectXMath
 	url = git@github.com:Source-Authors/DirectXMath.git
+	ignore = dirty
 [submodule "thirdparty/zlib"]
 	path = thirdparty/zlib
 	url = git@github.com:Source-Authors/zlib.git
 	ignore = dirty
+	ignore = dirty
 [submodule "thirdparty/libpng"]
 	path = thirdparty/libpng
 	url = git@github.com:Source-Authors/libpng.git
+	ignore = dirty
 [submodule "thirdparty/libjpeg-turbo"]
 	path = thirdparty/libjpeg-turbo
 	url = git@github.com:Source-Authors/libjpeg-turbo.git
@@ -22,6 +27,7 @@
 	path = thirdparty/openvr
 	url = git@github.com:Source-Authors/openvr.git
 	branch = 061cf411ee1125fe4b7cdf3837451a1c6a32a3c8
+	ignore = dirty
 [submodule "thirdparty/protobuf"]
 	path = thirdparty/protobuf
 	url = git@github.com:Source-Authors/protobuf.git
@@ -29,42 +35,53 @@
 [submodule "thirdparty/bzip2"]
 	path = thirdparty/bzip2
 	url = git@github.com:Source-Authors/bzip2.git
+	ignore = dirty
 [submodule "thirdparty/cryptopp"]
 	path = thirdparty/cryptopp
 	url = git@github.com:Source-Authors/cryptopp.git
+	ignore = dirty
 [submodule "ivp"]
 	path = ivp
 	url = git@github.com:Source-Authors/source-physics.git
 [submodule "thirdparty/snappy"]
 	path = thirdparty/snappy
 	url = git@github.com:Source-Authors/snappy.git
+	ignore = dirty
 [submodule "external/vpc"]
 	path = external/vpc
 	url = git@github.com:Source-Authors/vpc.git
 [submodule "thirdparty/mpaheaderinfo"]
 	path = thirdparty/mpaheaderinfo
 	url = git@github.com:Source-Authors/mpaheaderInfo.git
+	ignore = dirty
 [submodule "thirdparty/minimp3"]
 	path = thirdparty/minimp3
 	url = git@github.com:Source-Authors/minimp3.git
+	ignore = dirty
 [submodule "thirdparty/celt"]
 	path = thirdparty/celt
 	url = git@github.com:Source-Authors/celt.git
+	ignore = dirty
 [submodule "thirdparty/speex"]
 	path = thirdparty/speex
 	url = git@github.com:Source-Authors/speex.git
+	ignore = dirty
 [submodule "thirdparty/zip-utils"]
 	path = thirdparty/zip-utils
 	url = git@github.com:Source-Authors/zip-utils.git
+	ignore = dirty
 [submodule "thirdparty/speedtree"]
 	path = thirdparty/speedtree
 	url = git@github.com:Source-Authors/SpeedTree.git
+	ignore = dirty
 [submodule "thirdparty/nvtristrip"]
 	path = thirdparty/nvtristrip
 	url = git@github.com:Source-Authors/NvTriStrip.git
+	ignore = dirty
 [submodule "thirdparty/7zip"]
 	path = thirdparty/7zip
 	url = git@github.com:Source-Authors/7zip.git
+	ignore = dirty
 [submodule "thirdparty/lua"]
 	path = thirdparty/lua
 	url = git@github.com:Source-Authors/Lua.git
@@ -72,6 +89,7 @@
 [submodule "thirdparty/shadercompile"]
 	path = thirdparty/shadercompile
 	url = git@github.com:Source-Authors/ShaderCompile.git
+	ignore = dirty
 [submodule "thirdparty/squirrel"]
 	path = thirdparty/squirrel
 	url = git@github.com:Source-Authors/squirrel.git
