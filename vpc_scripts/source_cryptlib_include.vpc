@@ -31,7 +31,7 @@ $Project
 		$Libexternal "$SRCDIR\thirdparty\$(CRYPTOPPDIR)\libcryptopp" [$LINUXALL]
 	}
 
-	$Folder "Link Libraries" [$VS2015]
+	$Folder "Link Libraries" [$WINDOWS]
 	{
 		$File "$SRCDIR\thirdparty\cryptopp\Win32\Output\Release\cryptlib.lib" [$WIN32]
 		{

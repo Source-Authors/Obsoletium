@@ -44,7 +44,7 @@ $Project "vaudio_celt"
 		$File "source/linux/libcelt.a" [$LINUX]
 	}
 
-	$Folder "Link Libraries" [$VS2015]
+	$Folder "Link Libraries"
 	{
 		$File "$LIBCELTSRCDIR\win32\VS2022\libcelt\Release\libcelt.lib" [$WIN32]
 		{

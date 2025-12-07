@@ -19,6 +19,6 @@ $Configuration
 
 		// New warnings in VS 2012 that we want to ignore.
 		// warning C4005: 'DXGI_STATUS_OCCLUDED' : macro redefinition
-		$DisableSpecificWarnings	"$BASE;4005" [$ANALYZE && ($VS2015)]
+		$DisableSpecificWarnings	"$BASE;4005" [$ANALYZE && $WINDOWS]
 	}
 }

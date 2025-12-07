@@ -99,7 +99,6 @@ $Project "ihvtest1"
 	{
 		$Lib appframework
 		$Lib mathlib
-		$Lib $LIBCOMMON\vtuneapi [$WIN32&&!$VS2015]
-		$Lib $SRCDIR\lib\common\vtuneapi [$WIN32&&$VS2015]
+		$Lib $SRCDIR\lib\common\vtuneapi [$WIN32]
 	}
 }

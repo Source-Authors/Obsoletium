@@ -44,7 +44,7 @@ $Project "vaudio_speex"
 		$Lib "$LIBCOMMON/libspeex" [$POSIX]
 	}
 
-	$Folder "Link Libraries" [$VS2015]
+	$Folder "Link Libraries"
 	{
 		$File "$LIBSPEEXSRCDIR\win32\VS2022\libspeex\Release\libspeex.lib" [$WIN32]
 		{

@@ -204,7 +204,7 @@ $Project "replay"
 		$Lib	vtf
 		$Lib	"$LIBCOMMON/lzma"
 		$Lib	"$LIBCOMMON/replay_common"
-		$Lib	"$LIBCOMMON/libcurl" [$WINDOWS&&!$VS2015]
+		$Lib	"$LIBCOMMON/libcurl" [!$WINDOWS]
 		
 		$Libexternal	"$LIBBZOUTDIR/libbz2"
 		$Libexternal	"$LIBPNGOUTDIR/libpng16_static" [!$DEDICATED]

@@ -9,13 +9,13 @@ $Macro PROTOBUFDIR "$SRCDIR\thirdparty\protobuf"
 
 $Project
 {
-	$Folder "Link Libraries" [!$VS2015]
+	$Folder "Link Libraries" [!$WINDOWS]
 	{
 		$Libexternal $PROTOBUFDIR\libprotobuf [$OSX32]
 		$Libexternal $PROTOBUFDIR\libprotobuf [$LINUX32]
 	}
 
-	$Folder "Link Libraries" [$VS2015]
+	$Folder "Link Libraries" [$WINDOWS]
 	{
 		$File "$PROTOBUFDIR\vsprojects\Release\libprotobuf.lib" [$WIN32]
 		{
