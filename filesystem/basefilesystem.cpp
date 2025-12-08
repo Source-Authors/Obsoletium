@@ -297,6 +297,9 @@ CBaseFileSystem::CBaseFileSystem()
 
 	// allows very specifc constrained behavior
 	m_DVDMode = DVDMODE_OFF;
+
+	m_pBaseDir[0] = '\0';
+	m_iBaseLength = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -4112,20 +4115,30 @@ bool CBaseFileSystem::FixUpPath( const char *pFileName, OUT_Z_CAP(sizeFixedUpFil
 	}
 	else 
 	{
-		//  Get the BASE_PATH, skip past  - if necessary, and lowercase the rest
-		//  Not just yet...
-		char pBaseDir[MAX_PATH];
-
 		//  Need to get "BASE_PATH" from the filesystem paths, and then check this name against it.
-		//
-		const int iBaseLength = GetSearchPath_safe( "BASE_PATH", true, pBaseDir );
-		if ( iBaseLength )
+		if ( m_iBaseLength < 3 ) // If It's below 3 it's most likely empty. So we try again. (GetSearchPath never returns 0?)
+		{
+			static CThreadMutex pMutex;
+			AUTO_LOCK( pMutex );
+
+			// Why checking a second time?
+			// In case thread A held the mutex blocking it while thread B was waiting
+			// when thread B got the mutex after thread A finished
+			// we can avoid getting the base path again since thread A already did it for us
+			// m_pBaseDir should be safe since it's written inside and since it's usage fully depends on m_iBaseLength which is set at last it shouldn't be accessed outside
+			// Additionally, we also check m_iBaseLength after this- so if a thread sees a partial state of m_iBaseLength above, when it goes below it should be the full value already
+			// if it sees an outdated value it'll enter for the mutex and then see it can skip the thing
+			if ( m_iBaseLength < 3 )
+				m_iBaseLength = GetSearchPath_safe( "BASE_PATH", true, m_pBaseDir );
+		}
+
+		if ( m_iBaseLength >= 3 )
 		{
 			//  If the first part of the pFixedUpFilename is pBaseDir
 			//  then lowercase the part after that.
-			if ( *pBaseDir && (iBaseLength+1 < V_strlen( pFixedUpFileName ) ) && (0 != V_strncmp( pBaseDir, pFixedUpFileName, iBaseLength ) )  )
+			if ( !Q_isempty(m_pBaseDir) && (m_iBaseLength+1 < V_strlen( pFixedUpFileName ) ) && (0 != V_strncmp( m_pBaseDir, pFixedUpFileName, m_iBaseLength ) )  )
 			{
-				V_strlower( &pFixedUpFileName[iBaseLength-1] );
+				V_strlower( &pFixedUpFileName[m_iBaseLength-1] );
 			}
 		}
 	}
