@@ -760,13 +760,13 @@ void CBaseFileSystem::AddVPKFile( char const *pPath, const char *pPathID, Search
 
 	// See if we already have this vpk file as a search path
 	CPackedStoreRefCount *pVPK = nullptr;
-	for ( intp i = 0; i < m_SearchPaths.Count(); i++ )
+	for ( auto &s : m_SearchPaths )
 	{
-		CPackedStoreRefCount *p = m_SearchPaths[i].GetPackedStore();
+		CPackedStoreRefCount *p = s.GetPackedStore();
 		if ( p && V_stricmp( p->FullPathName(), nameBuf ) == 0 )
 		{
 			// Already present
-			if ( m_SearchPaths[i].GetPath() == pathIDSym )
+			if ( s.GetPath() == pathIDSym )
 				return;
 
 			// Present, but for a different path
@@ -1358,13 +1358,11 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 	}
 
 	// Make sure that it doesn't already exist
-	CUtlSymbol pathSym, pathIDSym;
-	pathSym = g_PathIDTable.AddString( newPath );
-	pathIDSym = g_PathIDTable.AddString( pathID );
-	intp i;
+	CUtlSymbol pathSym = g_PathIDTable.AddString( newPath );
+	CUtlSymbol pathIDSym = g_PathIDTable.AddString( pathID );
 	intp c = m_SearchPaths.Count();
 	int id = 0;
-	for ( i = 0; i < c; i++ )
+	for ( intp i = 0; i < c; i++ )
 	{
 		CSearchPath *pSearchPath = &m_SearchPaths[i];
 		if ( pSearchPath->GetPath() == pathSym && pSearchPath->GetPathID() == pathIDSym )
@@ -1422,10 +1420,10 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 //-----------------------------------------------------------------------------
 CBaseFileSystem::CSearchPath *CBaseFileSystem::FindSearchPathByStoreId( int storeId )
 {
-	FOR_EACH_VEC( m_SearchPaths, i )
+	for ( auto &s : m_SearchPaths )
 	{
-		if ( m_SearchPaths[i].m_storeId == storeId )
-			return &m_SearchPaths[i];
+		if ( s.m_storeId == storeId )
+			return &s;
 	}
 
 	return nullptr;
