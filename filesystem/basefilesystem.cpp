@@ -1340,9 +1340,9 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 
 	// Clean up the name
 	char newPath[ MAX_FILEPATH ];
-	if ( pPath[0] == 0 )
+	if ( Q_isempty( pPath ) )
 	{
-		newPath[0] = newPath[1] = 0;
+		newPath[0] = newPath[1] = '\0';
 	}
 	else
 	{
@@ -1360,6 +1360,13 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 		AddSeperatorAndFixPath( newPath );
 	}
 
+	// dimhotepus: As Raphael suggested, cache base path here.
+	if ( V_strcmp( newPath, "BASE_PATH" ) == 0 )
+	{
+		V_strcpy_safe( m_pBaseDir, newPath );
+		m_iBaseLength = V_strlen( m_pBaseDir );
+	}
+	
 	// Make sure that it doesn't already exist
 	CUtlSymbol pathSym = g_PathIDTable.AddString( newPath );
 	CUtlSymbol pathIDSym = g_PathIDTable.AddString( pathID );
@@ -4115,31 +4122,14 @@ bool CBaseFileSystem::FixUpPath( const char *pFileName, OUT_Z_CAP(sizeFixedUpFil
 	}
 	else 
 	{
-		//  Need to get "BASE_PATH" from the filesystem paths, and then check this name against it.
-		if ( m_iBaseLength < 3 ) // If It's below 3 it's most likely empty. So we try again. (GetSearchPath never returns 0?)
+		// raphael: BASE_PATH already in m_pBaseDir as quering it here wastes performance.
+		// If the first part of the pFixedUpFilename is pBaseDir
+		// then lowercase the part after that.
+		if ( !Q_isempty(m_pBaseDir) && m_iBaseLength > 0 &&
+			(m_iBaseLength+1 < V_strlen( pFixedUpFileName ) ) &&
+			(0 != V_strncmp( m_pBaseDir, pFixedUpFileName, m_iBaseLength ) )  )
 		{
-			static CThreadMutex pMutex;
-			AUTO_LOCK( pMutex );
-
-			// Why checking a second time?
-			// In case thread A held the mutex blocking it while thread B was waiting
-			// when thread B got the mutex after thread A finished
-			// we can avoid getting the base path again since thread A already did it for us
-			// m_pBaseDir should be safe since it's written inside and since it's usage fully depends on m_iBaseLength which is set at last it shouldn't be accessed outside
-			// Additionally, we also check m_iBaseLength after this- so if a thread sees a partial state of m_iBaseLength above, when it goes below it should be the full value already
-			// if it sees an outdated value it'll enter for the mutex and then see it can skip the thing
-			if ( m_iBaseLength < 3 )
-				m_iBaseLength = GetSearchPath_safe( "BASE_PATH", true, m_pBaseDir );
-		}
-
-		if ( m_iBaseLength >= 3 )
-		{
-			//  If the first part of the pFixedUpFilename is pBaseDir
-			//  then lowercase the part after that.
-			if ( !Q_isempty(m_pBaseDir) && (m_iBaseLength+1 < V_strlen( pFixedUpFileName ) ) && (0 != V_strncmp( m_pBaseDir, pFixedUpFileName, m_iBaseLength ) )  )
-			{
-				V_strlower( &pFixedUpFileName[m_iBaseLength-1] );
-			}
+			V_strlower( &pFixedUpFileName[m_iBaseLength-1] );
 		}
 	}
 
