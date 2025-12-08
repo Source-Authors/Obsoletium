@@ -1361,7 +1361,7 @@ void CBaseFileSystem::AddSearchPathInternal( const char *pPath, const char *path
 	}
 
 	// dimhotepus: As Raphael suggested, cache base path here.
-	if ( V_strcmp( newPath, "BASE_PATH" ) == 0 )
+	if ( V_strcmp( pathID, "BASE_PATH" ) == 0 )
 	{
 		V_strcpy_safe( m_pBaseDir, newPath );
 		m_iBaseLength = V_strlen( m_pBaseDir );
@@ -1444,20 +1444,19 @@ CBaseFileSystem::CSearchPath *CBaseFileSystem::FindSearchPathByStoreId( int stor
 //-----------------------------------------------------------------------------
 void CBaseFileSystem::AddSearchPath( const char *pPath, const char *pathID, SearchPathAdd_t addType )
 {
-	intp currCount = m_SearchPaths.Count();
+	[[maybe_unused]] const intp oldPathsCount = m_SearchPaths.Count();
 
 	AddSearchPathInternal( pPath, pathID, addType, true );
 
-	if ( currCount != m_SearchPaths.Count() )
+#ifdef _DEBUG
+	if ( oldPathsCount != m_SearchPaths.Count() )
 	{
 #if !defined( DEDICATED )
-		if ( IsDebug() )
-		{
-			// spew updated search paths
-			// PrintSearchPaths();
-		}
+		// spew updated search paths
+		// PrintSearchPaths();
 #endif
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------
