@@ -29,9 +29,8 @@ using socklen_t = int;
 //-----------------------------------------------------------------------------
 // Purpose: Implements INetAPI
 //-----------------------------------------------------------------------------
-class CNetAPI : public INetAPI
+struct CNetAPI final : public INetAPI
 {
-public:
 	void		NetAdrToSockAddr( netadr_t *a, struct sockaddr *s ) override;
 	void		SockAddrToNetAdr( struct sockaddr *s, netadr_t *a ) override;
 
@@ -47,7 +46,7 @@ public:
 
 // Expose interface
 static CNetAPI g_NetAPI;
-INetAPI *net = ( INetAPI * )&g_NetAPI;
+INetAPI *net = &g_NetAPI;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
