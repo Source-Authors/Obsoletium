@@ -258,7 +258,7 @@ void CNetAPI::GetLocalIP(netadr_t *a)
 {
 	char s[64];
 
-	if(!::gethostname(s,64))
+	if(!::gethostname(s,static_cast<int>(ssize(s))))
 	{
 		struct hostent *localip = ::gethostbyname(s);
 		if(localip)
