@@ -263,8 +263,8 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 	else
 	{
 		// Default to middle of the pose parameter range
-		int nPoseCount = studioHdr.GetNumPoseParameters();
-		for ( int i = 0; i < MAXSTUDIOPOSEPARAM; ++i )
+		intp nPoseCount = studioHdr.GetNumPoseParameters();
+		for ( intp i = 0; i < MAXSTUDIOPOSEPARAM; ++i )
 		{
 			pPoseParameter[i] = 0.5f;
 			if ( i < nPoseCount )
@@ -301,7 +301,7 @@ void CMDL::SetUpBones( const matrix3x4_t& rootToWorld, int nMaxBoneCount, matrix
 	// Accumulate the additional layers if specified.
 	if ( pSequenceLayers )
 	{
-		int nNumSeq = studioHdr.GetNumSeq();
+		intp nNumSeq = studioHdr.GetNumSeq();
 		for ( int i = 0; i < nNumSequenceLayers; ++i )
 		{
 			int nSeqIndex = pSequenceLayers[ i ].m_nSequenceIndex;
@@ -389,9 +389,9 @@ void CMDL::SetupBonesWithBoneMerge( const CStudioHdr *pMergeHdr, matrix3x4_t *pM
 									const matrix3x4_t &matModelToWorld )
 {
 	// Default to middle of the pose parameter range
-	int nPoseCount = pMergeHdr->GetNumPoseParameters();
+	intp nPoseCount = pMergeHdr->GetNumPoseParameters();
 	float pPoseParameter[MAXSTUDIOPOSEPARAM];
-	for ( int i = 0; i < MAXSTUDIOPOSEPARAM; ++i )
+	for ( intp i = 0; i < MAXSTUDIOPOSEPARAM; ++i )
 	{
 		pPoseParameter[i] = 0.5f;
 		if ( i < nPoseCount )
