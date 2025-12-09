@@ -3108,9 +3108,9 @@ inline void CMeshBuilder::ComputeNumVertsAndIndices( int *pMaxVertices, int *pMa
 	}
 
 	// FIXME: need to get this from meshdx8.cpp, or move it to somewhere common
-	// TODO(dimhotepus): Bump to 65535? See VERTEX_BUFFER_SIZE
-	Assert( *pMaxVertices <= 32768 );
-	Assert( *pMaxIndices <= 32768 );
+	// dimhotepus: Bumped to 65535. See VERTEX_BUFFER_SIZE and CMeshMgr::GetMaxToRender
+	Assert( *pMaxVertices <= 65535 );
+	Assert( *pMaxIndices <= 65535 );
 }
 
 
