@@ -77,7 +77,7 @@ void CBaseBudgetPanel::ClearAllTimesForGroup( intp groupID )
 
 	// dimhotepus: Fast zeroing to +0 for IEEE-754.
 	BitwiseClear( m_BudgetGroupTimes[groupID].m_Time );
-	}
+}
 
 
 void CBaseBudgetPanel::OnConfigDataChanged( const CBudgetPanelConfigData &data )
