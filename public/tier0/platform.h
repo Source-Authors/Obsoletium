@@ -968,7 +968,6 @@ template <typename Tdst, typename Tsrc>
       "Okay in my defense there weren't any types larger than 64-bits when "
       "this code was written.");
 
-#ifdef DEBUG
   if constexpr (sizeof(Tdst) < sizeof(Tsrc)) {
     Tdst cmpValDst = (Tdst)val;
 
@@ -982,7 +981,6 @@ template <typename Tdst, typename Tsrc>
       DebuggerBreak();
     }
   }
-#endif
 
   return (Tdst)val;
 }
