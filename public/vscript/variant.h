@@ -79,7 +79,7 @@ class CVariantDefaultAllocator
 public:
 	enum { ALWAYS_COPY = 0 };
 
-	static void* Allocate( uint nSize )
+	static void* Allocate( uintp nSize )
 	{
 		return malloc( nSize );
 	}

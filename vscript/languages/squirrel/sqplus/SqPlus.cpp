@@ -288,7 +288,7 @@ SQInteger setVarFunc(HSQUIRRELVM v) {
   StackHandler sa(v);
   if (sa.GetType(1) == OT_TABLE) {
     VarRefPtr vr;
-    int res = getVarInfo(sa,vr);
+    SQRESULT res = getVarInfo(sa,vr);
     if (res != SQ_OK) return res;
     return setVar(sa,vr,vr->offsetOrAddrOrConst);
   } // if
@@ -300,7 +300,7 @@ SQInteger getVarFunc(HSQUIRRELVM v) {
   StackHandler sa(v);
   if (sa.GetType(1) == OT_TABLE) {
     VarRefPtr vr;
-    int res = getVarInfo(sa,vr);
+    SQRESULT res = getVarInfo(sa,vr);
     if (res != SQ_OK) return res;
     return getVar(sa,vr,vr->offsetOrAddrOrConst);
   } // if
@@ -315,7 +315,7 @@ SQRESULT setInstanceVarFunc(HSQUIRRELVM v) {
   if (sa.GetType(1) == OT_INSTANCE) {
     VarRefPtr vr;
     void * data;
-    int res = getInstanceVarInfo(sa,vr,data);
+    SQRESULT res = getInstanceVarInfo(sa,vr,data);
     if (res != SQ_OK) return res;
     return setVar(sa,vr,data);
   } // if
@@ -328,7 +328,7 @@ SQRESULT getInstanceVarFunc(HSQUIRRELVM v) {
   if (sa.GetType(1) == OT_INSTANCE) {
     VarRefPtr vr;
     void * data;
-    int res = getInstanceVarInfo(sa,vr,data);
+    SQRESULT res = getInstanceVarInfo(sa,vr,data);
     if (res != SQ_OK) return res;
     return getVar(sa,vr,data);
   } // if
@@ -338,7 +338,7 @@ SQRESULT getInstanceVarFunc(HSQUIRRELVM v) {
 // === Classes ===
 
 BOOL CreateClass(HSQUIRRELVM v,SquirrelObject & newClass,SQUserPointer classType,const SQChar * name,const SQChar * baseName) {
-  int oldtop = sq_gettop(v);
+  SQInteger oldtop = sq_gettop(v);
   sq_pushroottable(v);
   sq_pushstring(v,name,-1);
   if (baseName) {
@@ -361,7 +361,7 @@ BOOL CreateClass(HSQUIRRELVM v,SquirrelObject & newClass,SQUserPointer classType
 
 SquirrelObject RegisterClassType(HSQUIRRELVM v,const SQChar * scriptClassName,SQUserPointer classType,SQFUNCTION constructor) {
   SquirrelVM::Init(v);  // For handling multi-VM setting right
-  int top = sq_gettop(v);
+  SQInteger top = sq_gettop(v);
   SquirrelObject newClass;
   if (CreateClass(v,newClass,classType,scriptClassName)) {
     SquirrelVM::CreateFunction(newClass,constructor,_SC("constructor"));

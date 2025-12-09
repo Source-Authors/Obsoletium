@@ -144,7 +144,7 @@ inline FUNCPTR_TYPE ScriptConvertFuncPtrFromVoid( ScriptFunctionBindingStorageTy
 	class CNonMemberScriptBinding##N \
 	{ \
 	public: \
- 		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, int nArguments, ScriptVariant_t *pReturn ) \
+ 		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, intp nArguments, ScriptVariant_t *pReturn ) \
  		{ \
 			Assert( nArguments == N ); \
 			Assert( pReturn ); \
@@ -165,7 +165,7 @@ inline FUNCPTR_TYPE ScriptConvertFuncPtrFromVoid( ScriptFunctionBindingStorageTy
 	class CNonMemberScriptBinding##N<FUNC_TYPE, void FUNC_BASE_TEMPLATE_FUNC_PARAMS_PASSTHRU_##N> \
 	{ \
 	public: \
-		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, int nArguments, ScriptVariant_t *pReturn ) \
+		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, intp nArguments, ScriptVariant_t *pReturn ) \
 		{ \
 			Assert( nArguments == N ); \
 			Assert( !pReturn ); \
@@ -184,7 +184,7 @@ inline FUNCPTR_TYPE ScriptConvertFuncPtrFromVoid( ScriptFunctionBindingStorageTy
 	class CMemberScriptBinding##N \
 	{ \
 	public: \
- 		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, int nArguments, ScriptVariant_t *pReturn ) \
+ 		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, intp nArguments, ScriptVariant_t *pReturn ) \
  		{ \
 			Assert( nArguments == N ); \
 			Assert( pReturn ); \
@@ -205,7 +205,7 @@ inline FUNCPTR_TYPE ScriptConvertFuncPtrFromVoid( ScriptFunctionBindingStorageTy
 	class CMemberScriptBinding##N<OBJECT_TYPE_PTR, FUNC_TYPE, void FUNC_BASE_TEMPLATE_FUNC_PARAMS_PASSTHRU_##N> \
 	{ \
 	public: \
-		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, int nArguments, ScriptVariant_t *pReturn ) \
+		static bool Call( ScriptFunctionBindingStorageType_t pFunction, void *pContext, ScriptVariant_t *pArguments, intp nArguments, ScriptVariant_t *pReturn ) \
 		{ \
 			Assert( nArguments == N ); \
 			Assert( !pReturn ); \

@@ -354,7 +354,7 @@ static constexpr SQRegFunction Vec3Functions[] = {
 }  // namespace
 
 SQInteger vsq_openvec3(HSQUIRRELVM hVM, HSQOBJECT *hExternalClass) {
-  int top = sq_gettop(hVM);
+  SQInteger top = sq_gettop(hVM);
 
   sq_pushroottable(hVM);
   sq_pushstring(hVM, TYPENAME_VECTOR, -1);
@@ -418,7 +418,7 @@ SQInteger vsq_releasevec3(SQUserPointer p, SQInteger size) {
   return SQ_OK;
 }
 
-SQInteger vsq_getvec3(HSQUIRRELVM hVM, StackHandler &sh, int idx, Vector &vec) {
+SQInteger vsq_getvec3(HSQUIRRELVM hVM, StackHandler &sh, intp idx, Vector &vec) {
   auto *instance = (Vector *)sh.GetInstanceUp(idx, TYPETAG_VECTOR);
   if (instance) {
     vec = *instance;

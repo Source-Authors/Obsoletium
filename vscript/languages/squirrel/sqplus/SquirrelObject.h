@@ -22,14 +22,14 @@ public:
 
   SquirrelObject & operator = (HSQOBJECT ho);
   SquirrelObject & operator = (const SquirrelObject &o);
-  SquirrelObject & operator = (int n);
+  SquirrelObject & operator = (SQInteger n);
   SquirrelObject & operator = (HSQUIRRELVM v);
   
   operator HSQOBJECT& (){ return _o; } 
   bool operator ==(const SquirrelObject& o);
   bool CompareUserPointer(const SquirrelObject& o);
   
-  void AttachToStackObject(int idx);
+  void AttachToStackObject(SQInteger idx);
   void Reset(void); // Release (any) reference and reset _o.
   SquirrelObject Clone();
   BOOL SetValue(const SquirrelObject &key,const SquirrelObject &val);
@@ -72,7 +72,7 @@ public:
   BOOL SetInstanceUP(SQUserPointer up);
   BOOL IsNull() const;
   int IsNumeric() const;
-  int Len() const;
+  SQInteger Len() const;
   BOOL SetDelegate(SquirrelObject &obj);
   SquirrelObject GetDelegate();
   const SQChar* ToString();
@@ -137,21 +137,21 @@ struct StackHandler {
     _top = sq_gettop(vm);
     this->v = vm;
   }
-  SQFloat GetFloat(int idx) {
+  SQFloat GetFloat(SQInteger idx) {
     SQFloat x = 0.0f;
     if(idx > 0 && idx <= _top) {
       sq_getfloat(v,idx,&x);
     }
     return x;
   }
-  SQInteger GetInt(int idx) {
+  SQInteger GetInt(SQInteger idx) {
     SQInteger x = 0;
     if(idx > 0 && idx <= _top) {
       sq_getinteger(v,idx,&x);
     }
     return x;
   }
-  HSQOBJECT GetObjectHandle(int idx) {
+  HSQOBJECT GetObjectHandle(SQInteger idx) {
     HSQOBJECT x;
     if(idx > 0 && idx <= _top) {
       sq_resetobject(&x);
@@ -164,7 +164,7 @@ struct StackHandler {
 		}
     return x;
   }
-  const SQChar *GetString(int idx)
+  const SQChar *GetString(SQInteger idx)
   {
     const SQChar *x = NULL;
     if(idx > 0 && idx <= _top) {
@@ -172,7 +172,7 @@ struct StackHandler {
     }
     return x;
   }
-  SQUserPointer GetUserPointer(int idx)
+  SQUserPointer GetUserPointer(SQInteger idx)
   {
     SQUserPointer x = 0;
     if(idx > 0 && idx <= _top) {
@@ -180,14 +180,14 @@ struct StackHandler {
     }
     return x;
   }
-  SQUserPointer GetInstanceUp(int idx,SQUserPointer tag)
+  SQUserPointer GetInstanceUp(SQInteger idx, SQUserPointer tag)
   {
     SQUserPointer self;
     if(SQ_FAILED(sq_getinstanceup(v,idx,(SQUserPointer*)&self,tag,1)))
       return NULL;
     return self;
   }
-  SQUserPointer GetUserData(int idx,SQUserPointer tag=0)
+  SQUserPointer GetUserData(SQInteger idx, SQUserPointer tag = 0)
   {
     SQUserPointer otag;
     SQUserPointer up;
@@ -199,17 +199,18 @@ struct StackHandler {
     }
     return NULL;
   }
-  BOOL GetBool(int idx)
+  BOOL GetBool(SQInteger idx)
   {
     SQBool ret;
     if(idx > 0 && idx <= _top) {
       if(SQ_SUCCEEDED(sq_getbool(v,idx,&ret)))
-        return ret;
+        // dimhotepus: Breaking change. Clamp SQBool to 0, 1.
+        return ret > 0 ? TRUE : FALSE;
     }
     return FALSE;
   }
   // dimhotepus: Return type instead of int.
-  SQObjectType GetType(int idx)
+  SQObjectType GetType(SQInteger idx)
   {
     if(idx > 0 && idx <= _top) {
       return sq_gettype(v,idx);
@@ -217,7 +218,7 @@ struct StackHandler {
     return (SQObjectType)-1;
   }
   
-  int GetParamCount() {
+  SQInteger GetParamCount() {
     return _top;
   }
   int Return(const SQChar *s)
@@ -234,28 +235,28 @@ struct StackHandler {
   {
     sq_pushinteger(v,i);
     return 1;
-	}
-	int Return(bool b)
-	{
-		sq_pushbool(v,b);
-		return 1;
-	}
-    int Return(SQUserPointer p) {
-        sq_pushuserpointer(v,p);
-        return 1;
-    }
-	int Return(SquirrelObject &o)
-	{
-		sq_pushobject(v,o.GetObjectHandle());
-		return 1;
-	}
-	int Return() { return 0; }
-	SQRESULT ThrowError(const SQChar *error) {
-		return sq_throwerror(v,error);
-	}
-    HSQUIRRELVM GetVMPtr() { return v; }
+  }
+  int Return(bool b)
+  {
+	sq_pushbool(v,b);
+	return 1;
+  }
+  int Return(SQUserPointer p) {
+    sq_pushuserpointer(v,p);
+    return 1;
+  }
+  int Return(SquirrelObject &o)
+  {
+	sq_pushobject(v,o.GetObjectHandle());
+	return 1;
+  }
+  int Return() { return 0; }
+  SQRESULT ThrowError(const SQChar *error) {
+    return sq_throwerror(v,error);
+  }
+  HSQUIRRELVM GetVMPtr() { return v; }
 private:
-	int _top;
+	SQInteger _top;
 	HSQUIRRELVM v;
 };
 

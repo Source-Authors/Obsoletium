@@ -61,7 +61,7 @@ SQINLINE char           Get(TypeWrapper<char>,HSQUIRRELVM v,int idx)            
 SQINLINE unsigned char  Get(TypeWrapper<unsigned char>,HSQUIRRELVM v,int idx)   { SQ_INT i; SQPLUS_CHECK_GET(sq_getinteger(v,idx,&i)); return static_cast<unsigned char>(i); }
 SQINLINE short          Get(TypeWrapper<short>,HSQUIRRELVM v,int idx)           { SQ_INT i; SQPLUS_CHECK_GET(sq_getinteger(v,idx,&i)); return static_cast<short>(i); }
 SQINLINE unsigned short	Get(TypeWrapper<unsigned short>,HSQUIRRELVM v,int idx)  { SQ_INT i; SQPLUS_CHECK_GET(sq_getinteger(v,idx,&i)); return static_cast<unsigned short>(i); }
-SQINLINE int            Get(TypeWrapper<int>,HSQUIRRELVM v,int idx)             { SQ_INT i; SQPLUS_CHECK_GET(sq_getinteger(v,idx,&i)); return i; }
+SQINLINE SQInteger      Get(TypeWrapper<SQInteger>,HSQUIRRELVM v,int idx)       { SQ_INT i; SQPLUS_CHECK_GET(sq_getinteger(v,idx,&i)); return i; }
 SQINLINE unsigned int   Get(TypeWrapper<unsigned int>,HSQUIRRELVM v,int idx)    { SQ_INT i; SQPLUS_CHECK_GET(sq_getinteger(v,idx,&i)); return static_cast<unsigned int>(i); }
 SQINLINE long           Get(TypeWrapper<long>,HSQUIRRELVM v,int idx)            { SQ_INT i; SQPLUS_CHECK_GET(sq_getinteger(v,idx,&i)); return static_cast<long>(i); }
 SQINLINE unsigned long  Get(TypeWrapper<unsigned long>,HSQUIRRELVM v,int idx)   { SQ_INT i; SQPLUS_CHECK_GET(sq_getinteger(v,idx,&i)); return static_cast<unsigned long>(i); }

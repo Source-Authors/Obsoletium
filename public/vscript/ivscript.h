@@ -229,7 +229,7 @@ struct ScriptFunctionBindingStorageType_t
 	intptr_t val_3;
 };
 
-using ScriptBindingFunc_t = bool (*)(ScriptFunctionBindingStorageType_t, void *, ScriptVariant_t *, int, ScriptVariant_t *);
+using ScriptBindingFunc_t = bool (*)(ScriptFunctionBindingStorageType_t, void *, ScriptVariant_t *, intp, ScriptVariant_t *);
 
 struct ScriptFunctionBinding_t
 {
@@ -537,8 +537,8 @@ public:
 	bool SetValue( const char *pszKey, const ScriptVariant_t &value )																{ return SetValue(nullptr, pszKey, value ); }
 
 	virtual void CreateTable( ScriptVariant_t &Table ) = 0;
-	virtual int	GetNumTableEntries( HSCRIPT hScope ) = 0;
-	virtual int GetKeyValue( HSCRIPT hScope, int nIterator, ScriptVariant_t *pKey, ScriptVariant_t *pValue ) = 0;
+	virtual intp GetNumTableEntries( HSCRIPT hScope ) = 0;
+	virtual intp GetKeyValue( HSCRIPT hScope, intp nIterator, ScriptVariant_t *pKey, ScriptVariant_t *pValue ) = 0;
 
 	virtual bool GetValue( HSCRIPT hScope, const char *pszKey, ScriptVariant_t *pValue ) = 0;
 	bool GetValue( const char *pszKey, ScriptVariant_t *pValue )																	{ return GetValue(nullptr, pszKey, pValue ); }

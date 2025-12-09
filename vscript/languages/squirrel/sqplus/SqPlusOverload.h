@@ -639,7 +639,7 @@ struct Arg<R(T::*)(A1, A2, A3, A4, A5, A6, A7) const> {
 };
 #endif
 
-static inline int classAllocationError(HSQUIRRELVM v) {
+static inline SQRESULT classAllocationError(HSQUIRRELVM v) {
     return sq_throwerror(v, _SC("Failed to allocate memory"));
 }
 

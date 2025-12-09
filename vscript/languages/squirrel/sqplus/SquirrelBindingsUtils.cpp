@@ -55,8 +55,8 @@ BOOL CreateStaticNamespace(HSQUIRRELVM v,ScriptNamespaceDecl *sn)
 
 BOOL CreateClass(HSQUIRRELVM v,SquirrelClassDecl *cd)
 {
-	int n = 0;
-	int oldtop = sq_gettop(v);
+	SQInteger n = 0;
+	SQInteger oldtop = sq_gettop(v);
 	sq_pushroottable(v);
 	sq_pushstring(v,cd->name,-1);
 	if(cd->base) {
@@ -102,7 +102,7 @@ BOOL CreateNativeClassInstance(HSQUIRRELVM v,
   // will be used by SquirrelObject. That crashes when using several VMs.
   SquirrelVM::Init( v );
   
-  int oldtop = sq_gettop(v);
+  SQInteger oldtop = sq_gettop(v);
   sq_pushroottable(v);
   sq_pushstring(v,classname,-1);
   if(SQ_FAILED(sq_rawget(v,-2))){ //Get the class (created with sq_newclass()).
@@ -136,7 +136,7 @@ BOOL CreateNativeClassInstance(HSQUIRRELVM v,
 
 // Create native class instance and leave on stack.
 BOOL CreateConstructNativeClassInstance(HSQUIRRELVM v,const SQChar * className) {
-  int oldtop = sq_gettop(v);
+  SQInteger oldtop = sq_gettop(v);
   sq_pushroottable(v);
   sq_pushstring(v,className,-1);
   if (SQ_FAILED(sq_rawget(v,-2))) { // Get the class (created with sq_newclass()).

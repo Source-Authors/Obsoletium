@@ -624,7 +624,7 @@ public:
 					ConvertToVariant( -1, m_LuaState, pReturn );
 				}
 
-				lua_pop( m_LuaState, nStackSize - GetStackSize() );
+				lua_pop( m_LuaState, size_cast<int>( nStackSize - GetStackSize() ) );
 
 				return SCRIPT_DONE;
 			}
@@ -647,7 +647,7 @@ public:
 	{
 		int										nActualParams = lua_gettop( pState );
 		auto									*pVMScriptFunction = ( ScriptFunctionBinding_t * )lua_touserdata( pState, lua_upvalueindex( 1 ) );
-		int										nFormalParams = pVMScriptFunction->m_desc.m_Parameters.Count();
+		int										nFormalParams = size_cast<int>( pVMScriptFunction->m_desc.m_Parameters.Count() );
 		CUtlVectorFixed<ScriptVariant_t, 14>	params;
 		ScriptVariant_t							returnValue;
 		bool									bCallFree = false;
@@ -1172,13 +1172,13 @@ public:
 	}
 
 	// stack good
-	int	GetNumTableEntries( HSCRIPT hScope ) override
+	intp GetNumTableEntries( HSCRIPT hScope ) override
 	{
 		// Should this also check for 0?
 		if ( hScope == INVALID_HSCRIPT )
 			return 0;
 
-		int nCount = 0;
+		intp nCount = 0;
 
 		lua_rawgeti( m_LuaState, LUA_REGISTRYINDEX, ( intp )hScope );
 
@@ -1196,9 +1196,9 @@ public:
 	}
 
 	// stack good
-	int GetKeyValue( HSCRIPT hScope, int nIterator, ScriptVariant_t *pKey, ScriptVariant_t *pValue ) override
+	intp GetKeyValue( HSCRIPT hScope, intp nIterator, ScriptVariant_t *pKey, ScriptVariant_t *pValue ) override
 	{
-		int nCount = 0;
+		intp nCount = 0;
 		intp nStackSize = GetStackSize();
 
 		lua_rawgeti( m_LuaState, LUA_REGISTRYINDEX, ( intp )hScope );
@@ -1214,7 +1214,7 @@ public:
 		ConvertToVariant( -1, m_LuaState, pValue );
 
 		lua_pop( m_LuaState, 3 ); /* removes value; keeps key for next iteration */
-		lua_pop( m_LuaState, nStackSize - GetStackSize() );
+		lua_pop( m_LuaState, size_cast<int>( nStackSize - GetStackSize() ) );
 
 		return nCount + 1;
 	}
@@ -1229,7 +1229,7 @@ public:
 			lua_getfield( m_LuaState, -1, pszKey );
 			if ( lua_isnil( m_LuaState, -1 ) )
 			{
-				lua_pop( m_LuaState, nStackSize - GetStackSize() );
+				lua_pop( m_LuaState, size_cast<int>( nStackSize - GetStackSize() ) );
 				return false;
 			}
 		}
@@ -1238,13 +1238,13 @@ public:
 			lua_getglobal( m_LuaState, pszKey );
 			if ( lua_isnil( m_LuaState, -1 ) )
 			{
-				lua_pop( m_LuaState, nStackSize - GetStackSize() );
+				lua_pop( m_LuaState, size_cast<int>( nStackSize - GetStackSize() ) );
 				return false;
 			}
 		}
 
 		ConvertToVariant( -1, m_LuaState, pValue );
-		lua_pop( m_LuaState, nStackSize - GetStackSize() );
+		lua_pop( m_LuaState, size_cast<int>( nStackSize - GetStackSize() ) );
 
 		return true;
 	}
@@ -1259,12 +1259,12 @@ public:
 			lua_rawgeti( m_LuaState, -1, nIndex );
 			if ( lua_isnil( m_LuaState, -1 ) )
 			{
-				lua_pop( m_LuaState, nStackSize - GetStackSize() );
+				lua_pop( m_LuaState, size_cast<int>( nStackSize - GetStackSize() ) );
 				return false;
 			}
 
 			ConvertToVariant( -1, m_LuaState, pValue );
-			lua_pop( m_LuaState, nStackSize - GetStackSize() );
+			lua_pop( m_LuaState, size_cast<int>( nStackSize - GetStackSize() ) );
 
 			return true;
 		}
@@ -1376,13 +1376,13 @@ static void FromScript_AddBehavior( const char *pBehaviorName, HSCRIPT hTable )
 
 	Msg( "Behavior: %s\n", pBehaviorName );
 
-	int nInterator = 0;
-	int index =	g_pScriptVM->GetNumTableEntries( hTable );
-	for( int i = 0; i < index; i++ )
+	intp nInterator = 0;
+	intp index =	g_pScriptVM->GetNumTableEntries( hTable );
+	for( intp i = 0; i < index; i++ )
 	{
 		nInterator = g_pScriptVM->GetKeyValue( hTable, nInterator, &KeyVariant, &ValueVariant );
 
-		Msg( "   %d: %s / %s\n", i, static_cast<const char*>(KeyVariant), static_cast<const char*>(ValueVariant) );
+		Msg( "   %zd: %s / %s\n", i, static_cast<const char*>(KeyVariant), static_cast<const char*>(ValueVariant) );
 
 		g_pScriptVM->ReleaseValue( KeyVariant );
 		g_pScriptVM->ReleaseValue( ValueVariant );

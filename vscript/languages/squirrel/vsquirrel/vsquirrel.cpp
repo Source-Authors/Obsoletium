@@ -649,7 +649,7 @@ public:
 			CSquirrelVM::RegisterClass( pClassDesc->m_pBaseDesc );
 		}
 
-		int top = sq_gettop(m_hVM);
+		SQInteger top = sq_gettop(m_hVM);
 
 		HSQOBJECT newClass;
 		newClass = CreateClass( pClassDesc );
@@ -893,7 +893,7 @@ public:
 	// Input  : hScope - the table
 	// Output : returns the number of elements in the table
 	//------------------------------------------------------------------------------
-	int	GetNumTableEntries( HSCRIPT hScope ) override
+	intp GetNumTableEntries( HSCRIPT hScope ) override
 	{
 		if ( !hScope )
 		{
@@ -908,7 +908,7 @@ public:
 			sq_pushobject( m_hVM, *((HSQOBJECT *)hScope) );
 		}
 
-		int nCount = sq_getsize( m_hVM, -1 );
+		SQInteger nCount = sq_getsize(m_hVM, -1);
 
 		sq_pop( m_hVM , 1 );
 
@@ -922,7 +922,7 @@ public:
 	// Output : returns the next iterator spot, otherwise -1 if error or end of table
 	//			pKey - the key entry
 	//			pValue - the value entry
-	int GetKeyValue( HSCRIPT hScope, int nIterator, ScriptVariant_t *pKey, ScriptVariant_t *pValue ) override
+	intp GetKeyValue( HSCRIPT hScope, intp nIterator, ScriptVariant_t *pKey, ScriptVariant_t *pValue ) override
 	{
 		HSQOBJECT KeyResult = { OT_NULL, NULL };
 		HSQOBJECT ValueResult = { OT_NULL, NULL };
@@ -1385,7 +1385,7 @@ private:
 	static SQInteger CallConstructor( HSQUIRRELVM hVM )
 	{
 		StackHandler sa(hVM);
-		int nActualParams = sa.GetParamCount();
+		SQInteger nActualParams = sa.GetParamCount();
 		ScriptClassDesc_t *pClassDesc = *((ScriptClassDesc_t **)sa.GetUserData( nActualParams ));
 		// dimhotepus: Check class desc exists.
 		if (!pClassDesc)
@@ -1404,23 +1404,23 @@ private:
 	static SQInteger TranslateCall( HSQUIRRELVM hVM )
 	{
 		StackHandler sa(hVM);
-		int nActualParams = sa.GetParamCount();
+		SQInteger nActualParams = sa.GetParamCount();
 		ScriptFunctionBinding_t *pVMScriptFunction = *((ScriptFunctionBinding_t **)sa.GetUserData( nActualParams ));
 		// dimhotepus: Check function binding exists.
 		if (!pVMScriptFunction)
 			return sq_throwerror(hVM, _SC("Unable to translate function call without binding."));
-		int nFormalParams = pVMScriptFunction->m_desc.m_Parameters.Count();
+		intp nFormalParams = pVMScriptFunction->m_desc.m_Parameters.Count();
 		CUtlVectorFixed<ScriptVariant_t, 14> params;
 		ScriptVariant_t returnValue;
 		bool bCallFree = false;
 
 		params.SetSize( nFormalParams );
 
-		int i = 0;
+		intp i = 0;
 
 		if ( nActualParams )
 		{
-			int iLimit = MIN( nActualParams, nFormalParams );
+			intp iLimit = MIN( nActualParams, nFormalParams );
 			ScriptDataType_t *pCurParamType = pVMScriptFunction->m_desc.m_Parameters.Base();
 			for ( i = 0; i < iLimit; i++, pCurParamType++ )
 			{
@@ -1608,7 +1608,7 @@ private:
 	//-------------------------------------------------------------
 	HSQOBJECT CreateClass( ScriptClassDesc_t *pDesc )
 	{
-		int oldtop = sq_gettop(m_hVM);
+		SQInteger oldtop = sq_gettop(m_hVM);
 		sq_pushroottable(m_hVM);
 		sq_pushstring(m_hVM,pDesc->m_pszScriptName,-1);
 		if (pDesc->m_pBaseDesc)
@@ -1959,7 +1959,7 @@ private:
 			WriteObject( pTable->_delegate );
 		}
 
-		int len = pTable->CountUsed();
+		SQInteger len = pTable->CountUsed();
 		m_pBuffer->PutInt( len );
 
 		SQObjectPtr out_key, out_val;
@@ -2984,13 +2984,13 @@ static void FromScript_AddBehavior( const char *pBehaviorName, HSCRIPT hTable )
 
 	Msg( "Behavior: %s\n", pBehaviorName );
 
-	int nInterator = 0;
-	int index =	g_pScriptVM->GetNumTableEntries( hTable );
-	for( int i = 0; i < index; i++ )
+	intp nInterator = 0;
+	intp index =	g_pScriptVM->GetNumTableEntries( hTable );
+	for( intp i = 0; i < index; i++ )
 	{
 		nInterator = g_pScriptVM->GetKeyValue( hTable, nInterator, &KeyVariant, &ValueVariant );
 
-		Msg( "   %d: %s / %s\n", i, static_cast<const char*>(KeyVariant), static_cast<const char*>(ValueVariant) );
+		Msg( "   %zd: %s / %s\n", i, static_cast<const char*>(KeyVariant), static_cast<const char*>(ValueVariant) );
 
 		g_pScriptVM->ReleaseValue( KeyVariant );
 		g_pScriptVM->ReleaseValue( ValueVariant );

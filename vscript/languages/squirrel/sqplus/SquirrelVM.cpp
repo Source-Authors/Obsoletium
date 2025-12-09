@@ -16,7 +16,7 @@
 
 HSQUIRRELVM     SquirrelVM::_VM;
 bool            SquirrelVM::_no_vm_ref;
-int             SquirrelVM::_CallState = -1;
+SQInteger       SquirrelVM::_CallState = -1;
 SquirrelObject* SquirrelVM::_root;
 HSQUIRRELVM     SquirrelVM::_sandboxVM;
 SquirrelObject  SquirrelVM::_vm;
@@ -369,8 +369,8 @@ SquirrelObject SquirrelVM::EndCall()
 {
     SquirrelObject ret;
     if(_CallState >= 0) { 
-        int oldtop = sq_gettop(_VM);
-        int nparams = _CallState;
+        SQInteger oldtop = sq_gettop(_VM);
+        SQInteger nparams = _CallState;
         _CallState = -1;
         if(SQ_SUCCEEDED(sq_call(_VM,nparams,SQTrue,SQ_CALL_RAISE_ERROR))) {
             ret.AttachToStackObject(-1);
@@ -387,7 +387,7 @@ SquirrelObject SquirrelVM::EndCall()
 SquirrelObject SquirrelVM::CreateInstance(SquirrelObject &oclass)
 {
     SquirrelObject ret;
-    int oldtop = sq_gettop(_VM);
+    SQInteger oldtop = sq_gettop(_VM);
     sq_pushobject(_VM,oclass._o);
     if(SQ_FAILED(sq_createinstance(_VM,-1))) {
         sq_settop(_VM,oldtop);

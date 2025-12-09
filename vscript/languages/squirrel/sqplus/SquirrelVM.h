@@ -161,7 +161,7 @@ private:
     static SquirrelObject _vm;        // This is a Squirrel reference to the VM
     static HSQUIRRELVM    _VM;        // The raw C++ pointer
     static bool           _no_vm_ref; // Set if we only keep the raw C++ pointer and no ref
-    static int _CallState;
+    static SQInteger      _CallState;
     static SquirrelObject * _root;    // Cached root table if non NULL
     static HSQUIRRELVM _sandboxVM;    // The sandbox VM (that cannot use bound functions)
 };
