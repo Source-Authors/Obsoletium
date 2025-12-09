@@ -698,7 +698,7 @@ void CPhysicsConstraint::InitRagdoll( IVP_Environment *pEnvironment, CPhysicsCon
 
 
 	hk_Local_Constraint_System *lcs = constraint_group ? constraint_group->GetLCS() : NULL;
-	hk_Environment *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
+	auto *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
 	if ( !lcs )
 	{
 		hk_Local_Constraint_System_BP csbp;
@@ -708,7 +708,7 @@ void CPhysicsConstraint::InitRagdoll( IVP_Environment *pEnvironment, CPhysicsCon
 
 	if ( breakable )
 	{
-		hk_Ragdoll_Constraint *pConstraint = new hk_Ragdoll_Constraint( hkEnvironment, bp, ref, att);
+		auto *pConstraint = new hk_Ragdoll_Constraint( hkEnvironment, bp, ref, att);
 		m_HkConstraint = CreateBreakableConstraint( pConstraint, lcs, ragdoll.constraint );
 	}
 	else
@@ -1550,19 +1550,6 @@ void SeedRandomGenerators()
 	ivp_srand(1);
 	hk_Math::srand01('h'+'a'+'v'+'o'+'k');
 	qh_RANDOMseed_(1);
-}
-
-extern int ivp_srand_read(void);
-void ReadRandom( int buffer[4] )
-{
-	buffer[0] = (int)hk_Math::hk_random_seed;
-	buffer[1] = ivp_srand_read();
-}
-
-void WriteRandom( int buffer[4] )
-{
-	hk_Math::srand01((unsigned int)buffer[0]);
-	ivp_srand(buffer[1]);
 }
 
 
