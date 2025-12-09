@@ -1813,9 +1813,9 @@ bool RestorePhysicsConstraintGroup( const physrestoreparams_t &params, CPhysicsC
 void PostRestorePhysicsConstraintGroup()
 {
 	MEM_ALLOC_CREDIT();
-	for ( intp i = 0; i < g_ConstraintGroupActivateList.Count(); i++ )
+	for ( auto *g : g_ConstraintGroupActivateList )
 	{
-		g_ConstraintGroupActivateList[i]->Activate();
+		g->Activate();
 	}
 	g_ConstraintGroupActivateList.Purge();
 }
