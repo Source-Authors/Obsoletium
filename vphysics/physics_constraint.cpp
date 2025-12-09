@@ -1486,54 +1486,6 @@ void CPhysicsConstraint::SetupRagdollAxis( int axis, const constraint_axislimit_
 }
 
 
-// UNDONE: Keep this around to clip "includeStatic" code
-#if 0
-void CPhysicsConstraint::SetBreakLimit( float breakLimitForce, float breakLimitTorque, bool includeStatic )
-{
-	float factor = ConvertDistanceToIVP( 1.0f );
-	
-	// convert to ivp
-	IVP_Environment *pEnvironment = m_pConstraint->get_associated_controlled_cores()->element_at(0)->environment;
-	float gravity = pEnvironment->get_gravity()->real_length();
-	breakLimitTorque = breakLimitTorque * gravity * factor;	// proportional to distance
-	breakLimitForce = breakLimitForce * gravity;
-	
-	if ( breakLimitForce != 0 )
-	{
-		if ( includeStatic )
-		{
-			breakLimitForce += m_pObjAttached->GetMass() * gravity * pEnvironment->get_delta_PSI_time();
-		}
-
-		m_pConstraint->change_max_translation_impulse( IVP_CFE_BREAK, breakLimitForce );
-	}
-	else
-	{
-		m_pConstraint->change_max_translation_impulse( IVP_CFE_NONE, 0 );
-	}
-
-	if ( breakLimitTorque != 0 )
-	{
-		if ( includeStatic )
-		{
-			const IVP_U_Point *massCenter = m_pObjAttached->GetObject()->get_core()->get_position_PSI();
-
-			IVP_U_Point tmp;
-			tmp.set( massCenter );
-			tmp.subtract( &m_constraintOrigin );
-			float dist = tmp.real_length();
-			breakLimitTorque += (m_pObjAttached->GetMass() * gravity * dist * pEnvironment->get_delta_PSI_time());
-		}
-		m_pConstraint->change_max_rotation_impulse( IVP_CFE_BREAK, breakLimitTorque );
-	}
-	else
-	{
-		m_pConstraint->change_max_rotation_impulse( IVP_CFE_NONE, 0 );
-	}
-}
-#endif
-
-
 IPhysicsObject *CPhysicsConstraint::GetReferenceObject( void ) const
 {
 	return m_pObjReference;
