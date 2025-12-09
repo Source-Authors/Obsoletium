@@ -727,7 +727,7 @@ void CPhysicsConstraint::InitRagdoll( IVP_Environment *pEnvironment, CPhysicsCon
 void CPhysicsConstraint::InitHinge( IVP_Environment *pEnvironment, CPhysicsConstraintGroup *constraint_group, const constraint_limitedhingeparams_t &hinge )
 {
 	m_constraintType = CONSTRAINT_HINGE;
-	hk_Environment *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
+	auto *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
 
 	bool breakable = IsBreakableConstraint( hinge.constraint );
 
@@ -765,7 +765,7 @@ void CPhysicsConstraint::InitHinge( IVP_Environment *pEnvironment, CPhysicsConst
 
 	if ( breakable )
 	{
-		hk_Hinge_Constraint *pHinge = new hk_Hinge_Constraint( hkEnvironment, builder.get_blueprint(), (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
+		auto *pHinge = new hk_Hinge_Constraint( hkEnvironment, builder.get_blueprint(), (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
 		m_HkConstraint = CreateBreakableConstraint( pHinge, lcs, hinge.constraint );
 	}
 	else
@@ -784,7 +784,7 @@ void CPhysicsConstraint::InitHinge( IVP_Environment *pEnvironment, CPhysicsConst
 void CPhysicsConstraint::InitFixed( IVP_Environment *pEnvironment, CPhysicsConstraintGroup *constraint_group, const constraint_fixedparams_t &fixed )
 {
 	m_constraintType = CONSTRAINT_FIXED;
-	hk_Environment *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
+	auto *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
 
 	bool breakable = IsBreakableConstraint( fixed.constraint );
 
@@ -803,8 +803,7 @@ void CPhysicsConstraint::InitFixed( IVP_Environment *pEnvironment, CPhysicsConst
 
 	if ( breakable )
 	{
-		hk_Constraint *pFixed = new hk_Fixed_Constraint( hkEnvironment, &fixed_bp, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
-
+		auto *pFixed = new hk_Fixed_Constraint( hkEnvironment, &fixed_bp, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
 		m_HkConstraint = CreateBreakableConstraint( pFixed, lcs, fixed.constraint );
 	}
 	else
@@ -823,7 +822,7 @@ void CPhysicsConstraint::InitBallsocket( IVP_Environment *pEnvironment, CPhysics
 {
 	m_constraintType = CONSTRAINT_BALLSOCKET;
 
-	hk_Environment *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
+	auto *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
 
 	bool breakable = IsBreakableConstraint( ballsocket.constraint );
 
@@ -847,7 +846,7 @@ void CPhysicsConstraint::InitBallsocket( IVP_Environment *pEnvironment, CPhysics
 
 	if ( breakable )
 	{
-		hk_Ball_Socket_Constraint *pConstraint = new hk_Ball_Socket_Constraint( hkEnvironment, &builder, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
+		auto *pConstraint = new hk_Ball_Socket_Constraint( hkEnvironment, &builder, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
 		m_HkConstraint = CreateBreakableConstraint( pConstraint, lcs, ballsocket.constraint );
 	}
 	else
@@ -865,7 +864,7 @@ void CPhysicsConstraint::InitBallsocket( IVP_Environment *pEnvironment, CPhysics
 void CPhysicsConstraint::InitSliding( IVP_Environment *pEnvironment, CPhysicsConstraintGroup *constraint_group, const constraint_slidingparams_t &sliding )
 {
 	m_constraintType = CONSTRAINT_SLIDING;
-	hk_Environment *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
+	auto *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
 
 	bool breakable = IsBreakableConstraint( sliding.constraint );
 
@@ -909,8 +908,7 @@ void CPhysicsConstraint::InitSliding( IVP_Environment *pEnvironment, CPhysicsCon
 
 	if ( breakable )
 	{
-		hk_Constraint *pFixed = new hk_Prismatic_Constraint( hkEnvironment, &prismatic_bp, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
-
+		auto *pFixed = new hk_Prismatic_Constraint( hkEnvironment, &prismatic_bp, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
 		m_HkConstraint = CreateBreakableConstraint( pFixed, lcs, sliding.constraint );
 	}
 	else
@@ -929,7 +927,7 @@ void CPhysicsConstraint::InitPulley( IVP_Environment *pEnvironment, CPhysicsCons
 {
 	m_constraintType = CONSTRAINT_PULLEY;
 
-	hk_Environment *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
+	auto *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
 
 	bool breakable = IsBreakableConstraint( pulley.constraint );
 
@@ -960,8 +958,7 @@ void CPhysicsConstraint::InitPulley( IVP_Environment *pEnvironment, CPhysicsCons
 
 	if ( breakable )
 	{
-		hk_Constraint *pPulley = new hk_Pulley_Constraint( hkEnvironment, &pulley_bp, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
-
+		auto *pPulley = new hk_Pulley_Constraint( hkEnvironment, &pulley_bp, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
 		m_HkConstraint = CreateBreakableConstraint( pPulley, lcs, pulley.constraint );
 	}
 	else
@@ -981,7 +978,7 @@ void CPhysicsConstraint::InitLength( IVP_Environment *pEnvironment, CPhysicsCons
 {
 	m_constraintType = CONSTRAINT_LENGTH;
 
-	hk_Environment *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
+	auto *hkEnvironment = static_cast<hk_Environment *>(pEnvironment);
 
 	bool breakable = IsBreakableConstraint( length.constraint );
 
@@ -1007,8 +1004,7 @@ void CPhysicsConstraint::InitLength( IVP_Environment *pEnvironment, CPhysicsCons
 
 	if ( breakable )
 	{
-		hk_Constraint *pLength = new hk_Stiff_Spring_Constraint( hkEnvironment, &stiff_bp, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
-
+		auto *pLength = new hk_Stiff_Spring_Constraint( hkEnvironment, &stiff_bp, (hk_Rigid_Body*)m_pObjReference->GetObject(), (hk_Rigid_Body*)m_pObjAttached->GetObject() );
 		m_HkConstraint = CreateBreakableConstraint( pLength, lcs, length.constraint );
 	}
 	else
@@ -1071,7 +1067,7 @@ void CPhysicsConstraint::SetLinearMotor( float speed, float maxLinearImpulse )
 	if ( m_constraintType != CONSTRAINT_SLIDING )
 		return;
 
-	hk_Prismatic_Constraint *pConstraint = (hk_Prismatic_Constraint *)GetRealConstraint();
+	auto *pConstraint = (hk_Prismatic_Constraint *)GetRealConstraint();
 	pConstraint->set_motor( ConvertDistanceToIVP( speed ), ConvertDistanceToIVP( maxLinearImpulse ) );
 }
 
@@ -1079,12 +1075,12 @@ void CPhysicsConstraint::SetAngularMotor( float rotSpeed, float maxAngularImpuls
 {
 	if ( m_constraintType == CONSTRAINT_RAGDOLL && rotSpeed == 0 )
 	{
-		hk_Ragdoll_Constraint *pConstraint = (hk_Ragdoll_Constraint *)GetRealConstraint();
+		auto *pConstraint = (hk_Ragdoll_Constraint *)GetRealConstraint();
 		pConstraint->update_friction( ConvertAngleToIVP( maxAngularImpulse ) );
 	}
 	else if ( m_constraintType == CONSTRAINT_HINGE )
 	{
-		hk_Hinge_Constraint *pConstraint = (hk_Hinge_Constraint *)GetRealConstraint();
+		auto *pConstraint = (hk_Hinge_Constraint *)GetRealConstraint();
 		pConstraint->set_motor( ConvertAngleToIVP( rotSpeed ), ConvertAngleToIVP( fabs(maxAngularImpulse) ) );
 	}
 }
@@ -1099,7 +1095,7 @@ void CPhysicsConstraint::UpdateRagdollTransforms( const matrix3x4_t &constraintT
 	ConvertHLLocalMatrixToHavanaLocal( constraintToReference, os_ks_0 );
 	ConvertHLLocalMatrixToHavanaLocal( constraintToAttached, os_ks_1 );
 
-	hk_Ragdoll_Constraint *pConstraint = (hk_Ragdoll_Constraint *)GetRealConstraint();
+	auto *pConstraint = (hk_Ragdoll_Constraint *)GetRealConstraint();
 	pConstraint->update_transforms( os_ks_0, os_ks_1 );
 }
 
@@ -1107,7 +1103,7 @@ bool CPhysicsConstraint::GetConstraintTransform( matrix3x4_t *pConstraintToRefer
 {
 	if ( m_constraintType == CONSTRAINT_RAGDOLL )
 	{
-		hk_Ragdoll_Constraint *pConstraint = (hk_Ragdoll_Constraint *)GetRealConstraint();
+		auto *pConstraint = (hk_Ragdoll_Constraint *)GetRealConstraint();
 		if ( pConstraintToReference )
 		{
 			ConvertHavanaLocalMatrixToHL( pConstraint->get_transform(0), *pConstraintToReference, NULL );
@@ -1120,7 +1116,7 @@ bool CPhysicsConstraint::GetConstraintTransform( matrix3x4_t *pConstraintToRefer
 	}
 	else if ( m_constraintType == CONSTRAINT_BALLSOCKET )
 	{
-		hk_Ball_Socket_Constraint *pConstraint = (hk_Ball_Socket_Constraint *)GetRealConstraint();
+		auto *pConstraint = (hk_Ball_Socket_Constraint *)GetRealConstraint();
 		Vector pos;
 		if ( pConstraintToReference )
 		{
@@ -1136,7 +1132,7 @@ bool CPhysicsConstraint::GetConstraintTransform( matrix3x4_t *pConstraintToRefer
 	}
 	else if ( m_constraintType == CONSTRAINT_FIXED )
 	{
-		hk_Fixed_Constraint *pConstraint = (hk_Fixed_Constraint *)GetRealConstraint();
+		auto *pConstraint = (hk_Fixed_Constraint *)GetRealConstraint();
 		if ( pConstraintToReference )
 		{
 			ConvertHavanaLocalMatrixToHL( pConstraint->get_transform(0), *pConstraintToReference, NULL );
@@ -1241,7 +1237,7 @@ void CPhysicsConstraint::ReadBreakableConstraint( constraint_breakableparams_t &
 
 void CPhysicsConstraint::WriteFixed( constraint_fixedparams_t &fixed ) const
 {
-	hk_Fixed_Constraint *pConstraint = (hk_Fixed_Constraint *)GetRealConstraint();
+	auto *pConstraint = (hk_Fixed_Constraint *)GetRealConstraint();
 	ReadBreakableConstraint( fixed.constraint );
 
 	hk_Fixed_BP fixed_bp;
@@ -1252,7 +1248,7 @@ void CPhysicsConstraint::WriteFixed( constraint_fixedparams_t &fixed ) const
 
 void CPhysicsConstraint::WriteRagdoll( constraint_ragdollparams_t &ragdoll ) const
 {
-	hk_Ragdoll_Constraint *pConstraint = (hk_Ragdoll_Constraint *)GetRealConstraint();
+	auto *pConstraint = (hk_Ragdoll_Constraint *)GetRealConstraint();
 	ReadBreakableConstraint( ragdoll.constraint );
 	hk_Ragdoll_Constraint_BP ragdoll_bp;
 	// BUGBUG: Write this and figure out how to recreate
@@ -1296,7 +1292,7 @@ void CPhysicsConstraint::WriteRagdoll( constraint_ragdollparams_t &ragdoll ) con
 
 void CPhysicsConstraint::WriteHinge( constraint_hingeparams_t &hinge ) const
 {
-	hk_Hinge_Constraint *pConstraint = (hk_Hinge_Constraint *)GetRealConstraint();
+	auto *pConstraint = (hk_Hinge_Constraint *)GetRealConstraint();
 	ReadBreakableConstraint( hinge.constraint );
 
 	hk_Hinge_BP hinge_bp;
@@ -1321,7 +1317,7 @@ void CPhysicsConstraint::WriteHinge( constraint_hingeparams_t &hinge ) const
 void CPhysicsConstraint::WriteSliding( constraint_slidingparams_t &sliding ) const
 {
 	sliding.Defaults();
-	hk_Prismatic_Constraint *pConstraint = (hk_Prismatic_Constraint *)GetRealConstraint();
+	auto *pConstraint = (hk_Prismatic_Constraint *)GetRealConstraint();
 	ReadBreakableConstraint( sliding.constraint );
 
 	hk_Prismatic_BP prismatic_bp;
@@ -1349,7 +1345,7 @@ void CPhysicsConstraint::WriteSliding( constraint_slidingparams_t &sliding ) con
 void CPhysicsConstraint::WritePulley( constraint_pulleyparams_t &pulley ) const
 {
 	pulley.Defaults();
-	hk_Pulley_Constraint *pConstraint = (hk_Pulley_Constraint *)GetRealConstraint();
+	auto *pConstraint = (hk_Pulley_Constraint *)GetRealConstraint();
 	ReadBreakableConstraint( pulley.constraint );
 
 	hk_Pulley_BP pulley_bp;
@@ -1371,7 +1367,7 @@ void CPhysicsConstraint::WritePulley( constraint_pulleyparams_t &pulley ) const
 void CPhysicsConstraint::WriteLength( constraint_lengthparams_t &length ) const
 {
 	length.Defaults();
-	hk_Stiff_Spring_Constraint *pConstraint = (hk_Stiff_Spring_Constraint *)GetRealConstraint();
+	auto *pConstraint = (hk_Stiff_Spring_Constraint *)GetRealConstraint();
 	ReadBreakableConstraint( length.constraint );
 
 	hk_Stiff_Spring_BP stiff_bp;
@@ -1391,7 +1387,7 @@ void CPhysicsConstraint::WriteLength( constraint_lengthparams_t &length ) const
 void CPhysicsConstraint::WriteBallsocket( constraint_ballsocketparams_t &ballsocket ) const
 {
 	ballsocket.Defaults();
-	hk_Ball_Socket_Constraint *pConstraint = (hk_Ball_Socket_Constraint *)GetRealConstraint();
+	auto *pConstraint = (hk_Ball_Socket_Constraint *)GetRealConstraint();
 	ReadBreakableConstraint( ballsocket.constraint );
 
 	hk_Ball_Socket_BP ballsocket_bp;
@@ -1436,7 +1432,7 @@ void CPhysicsConstraint::event_object_deleted( IVP_Event_Object *pEvent )
 	m_HkLCS = NULL;
 	if ( pEvent->environment )
 	{
-		CPhysicsEnvironment *pEnvironment = (CPhysicsEnvironment *)pEvent->environment->client_data;
+		auto *pEnvironment = (CPhysicsEnvironment *)pEvent->environment->client_data;
 		pEnvironment->NotifyConstraintDisabled( this );
 	}
 }
@@ -1520,14 +1516,14 @@ IPhysicsConstraintGroup *CreatePhysicsConstraintGroup( IVP_Environment *pEnviron
 IPhysicsConstraint *CreateRagdollConstraint( IVP_Environment *pEnvironment, CPhysicsObject *pReferenceObject, CPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_ragdollparams_t &ragdoll )
 {
 	MEM_ALLOC_CREDIT();
-	CPhysicsConstraint *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
+	auto *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
 	pConstraint->InitRagdoll( pEnvironment, (CPhysicsConstraintGroup *)pGroup, ragdoll );
 	return pConstraint;
 }
 IPhysicsConstraint *CreateHingeConstraint( IVP_Environment *pEnvironment, CPhysicsObject *pReferenceObject, CPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_limitedhingeparams_t &hinge )
 {
 	MEM_ALLOC_CREDIT();
-	CPhysicsConstraint *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
+	auto *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
 	pConstraint->InitHinge( pEnvironment, (CPhysicsConstraintGroup *)pGroup, hinge );
 	return pConstraint;
 }
@@ -1535,7 +1531,7 @@ IPhysicsConstraint *CreateHingeConstraint( IVP_Environment *pEnvironment, CPhysi
 IPhysicsConstraint *CreateFixedConstraint( IVP_Environment *pEnvironment, CPhysicsObject *pReferenceObject, CPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_fixedparams_t &fixed )
 {
 	MEM_ALLOC_CREDIT();
-	CPhysicsConstraint *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
+	auto *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
 	pConstraint->InitFixed( pEnvironment, (CPhysicsConstraintGroup *)pGroup, fixed );
 	return pConstraint;
 }
@@ -1543,7 +1539,7 @@ IPhysicsConstraint *CreateFixedConstraint( IVP_Environment *pEnvironment, CPhysi
 IPhysicsConstraint *CreateSlidingConstraint( IVP_Environment *pEnvironment, CPhysicsObject *pReferenceObject, CPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_slidingparams_t &sliding )
 {
 	MEM_ALLOC_CREDIT();
-	CPhysicsConstraint *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
+	auto *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
 	pConstraint->InitSliding( pEnvironment, (CPhysicsConstraintGroup *)pGroup, sliding );
 	return pConstraint;
 }
@@ -1551,7 +1547,7 @@ IPhysicsConstraint *CreateSlidingConstraint( IVP_Environment *pEnvironment, CPhy
 IPhysicsConstraint *CreateBallsocketConstraint( IVP_Environment *pEnvironment, CPhysicsObject *pReferenceObject, CPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_ballsocketparams_t &ballsocket )
 {
 	MEM_ALLOC_CREDIT();
-	CPhysicsConstraint *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
+	auto *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
 	pConstraint->InitBallsocket( pEnvironment, (CPhysicsConstraintGroup *)pGroup, ballsocket );
 	return pConstraint;
 }
@@ -1559,7 +1555,7 @@ IPhysicsConstraint *CreateBallsocketConstraint( IVP_Environment *pEnvironment, C
 IPhysicsConstraint *CreatePulleyConstraint( IVP_Environment *pEnvironment, CPhysicsObject *pReferenceObject, CPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_pulleyparams_t &pulley )
 {
 	MEM_ALLOC_CREDIT();
-	CPhysicsConstraint *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
+	auto *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
 	pConstraint->InitPulley( pEnvironment, (CPhysicsConstraintGroup *)pGroup, pulley );
 	return pConstraint;
 }
@@ -1567,7 +1563,7 @@ IPhysicsConstraint *CreatePulleyConstraint( IVP_Environment *pEnvironment, CPhys
 IPhysicsConstraint *CreateLengthConstraint( IVP_Environment *pEnvironment, CPhysicsObject *pReferenceObject, CPhysicsObject *pAttachedObject, IPhysicsConstraintGroup *pGroup, const constraint_lengthparams_t &length )
 {
 	MEM_ALLOC_CREDIT();
-	CPhysicsConstraint *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
+	auto *pConstraint = new CPhysicsConstraint( pReferenceObject, pAttachedObject );
 	pConstraint->InitLength( pEnvironment, (CPhysicsConstraintGroup *)pGroup, length );
 	return pConstraint;
 }
@@ -1584,7 +1580,7 @@ bool IsExternalConstraint( IVP_Controller *pLCS, void *pGameData )
 				IVP_Real_Object *pivp = pCores->element_at(i)->objects.element_at(0);
 				if ( pivp)
 				{
-					IPhysicsObject *pObject = static_cast<IPhysicsObject *>(pivp->client_data);
+					auto *pObject = static_cast<IPhysicsObject *>(pivp->client_data);
 					if ( pObject && pObject->GetGameData() != pGameData )
 						return true;
 				}
@@ -1657,7 +1653,7 @@ bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstr
 				vphysics_save_constrainthinge_t hinge;
 				BitwiseClear( hinge );
 				params.pRestore->ReadAll( &hinge );
-				CPhysicsEnvironment *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
+				auto *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
 				*ppConstraint = (CPhysicsConstraint *)pEnvironment->CreateHingeConstraint( header.pObjReference, header.pObjAttached, header.pGroup, hinge );
 			}
 			break;
@@ -1666,7 +1662,7 @@ bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstr
 				vphysics_save_constraintfixed_t fixed;
 				BitwiseClear( fixed );
 				params.pRestore->ReadAll( &fixed );
-				CPhysicsEnvironment *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
+				auto *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
 				*ppConstraint = (CPhysicsConstraint *)pEnvironment->CreateFixedConstraint( header.pObjReference, header.pObjAttached, header.pGroup, fixed );
 			}
 			break;
@@ -1675,7 +1671,7 @@ bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstr
 				vphysics_save_constraintsliding_t sliding;
 				BitwiseClear( sliding );
 				params.pRestore->ReadAll( &sliding );
-				CPhysicsEnvironment *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
+				auto *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
 				*ppConstraint = (CPhysicsConstraint *)pEnvironment->CreateSlidingConstraint( header.pObjReference, header.pObjAttached, header.pGroup, sliding );
 			}
 			break;
@@ -1684,7 +1680,7 @@ bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstr
 				vphysics_save_constraintpulley_t pulley;
 				BitwiseClear( pulley );
 				params.pRestore->ReadAll( &pulley );
-				CPhysicsEnvironment *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
+				auto *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
 				*ppConstraint = (CPhysicsConstraint *)pEnvironment->CreatePulleyConstraint( header.pObjReference, header.pObjAttached, header.pGroup, pulley );
 			}
 			break;
@@ -1693,7 +1689,7 @@ bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstr
 				vphysics_save_constraintlength_t length;
 				BitwiseClear( length );
 				params.pRestore->ReadAll( &length );
-				CPhysicsEnvironment *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
+				auto *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
 				*ppConstraint = (CPhysicsConstraint *)pEnvironment->CreateLengthConstraint( header.pObjReference, header.pObjAttached, header.pGroup, length );
 			}
 			break;
@@ -1702,7 +1698,7 @@ bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstr
 				vphysics_save_constraintballsocket_t ballsocket;
 				BitwiseClear( ballsocket );
 				params.pRestore->ReadAll( &ballsocket );
-				CPhysicsEnvironment *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
+				auto *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
 				*ppConstraint = (CPhysicsConstraint *)pEnvironment->CreateBallsocketConstraint( header.pObjReference, header.pObjAttached, header.pGroup, ballsocket );
 			}
 			break;
@@ -1711,7 +1707,7 @@ bool RestorePhysicsConstraint( const physrestoreparams_t &params, CPhysicsConstr
 				vphysics_save_constraintragdoll_t ragdoll;
 				BitwiseClear( ragdoll );
 				params.pRestore->ReadAll( &ragdoll );
-				CPhysicsEnvironment *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
+				auto *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
 				*ppConstraint = (CPhysicsConstraint *)pEnvironment->CreateRagdollConstraint( header.pObjReference, header.pObjAttached, header.pGroup, ragdoll );
 			}
 			break;
@@ -1753,7 +1749,7 @@ bool RestorePhysicsConstraintGroup( const physrestoreparams_t &params, CPhysicsC
 		groupTemplate.minErrorTicks = tmp.minErrorTicks;
 		groupTemplate.errorTolerance = tmp.errorTolerance;
 	}
-	CPhysicsEnvironment *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
+	auto *pEnvironment = (CPhysicsEnvironment *)params.pEnvironment;
 	*ppConstraintGroup = (CPhysicsConstraintGroup *)pEnvironment->CreateConstraintGroup( groupTemplate );
 	if ( *ppConstraintGroup && groupTemplate.isActive )
 	{
