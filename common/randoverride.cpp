@@ -15,6 +15,8 @@
 #define __cdecl 
 #endif
 
+// dimhotepus: Exclude in Multhreaded DLL mode as ucrt lib already has ones.
+#if !defined(_MT) || !defined(_DLL)
 void __cdecl srand(unsigned int)
 {
 }
@@ -23,5 +25,6 @@ int __cdecl rand()
 {
 	return RandomInt( 0, VALVE_RAND_MAX );
 }
+#endif
 
 #endif // !_STATIC_LINKED || _SHARED_LIB
