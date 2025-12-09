@@ -47,12 +47,12 @@
 
 #include "ivp_cache_object.hxx"
 #include "ivp_template_constraint.hxx"
-extern void qh_srand( int seed);
 #include "qhull_user.hxx"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
 
+extern void qh_srand(int seed);
 
 constexpr inline float UNBREAKABLE_BREAK_LIMIT = 1e12f;
 
