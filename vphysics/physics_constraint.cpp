@@ -56,7 +56,7 @@ extern void qh_srand(int seed);
 
 constexpr inline float UNBREAKABLE_BREAK_LIMIT = 1e12f;
 
-hk_Vector3 TransformHLWorldToHavanaLocal( const Vector &hlWorld, IVP_Real_Object *pObject )
+static hk_Vector3 TransformHLWorldToHavanaLocal( const Vector &hlWorld, IVP_Real_Object *pObject )
 {
 	IVP_U_Float_Point tmp;
 	IVP_U_Point pointOut;
@@ -66,7 +66,7 @@ hk_Vector3 TransformHLWorldToHavanaLocal( const Vector &hlWorld, IVP_Real_Object
 	return hk_Vector3( pointOut.k[0], pointOut.k[1], pointOut.k[2] );
 }
 
-Vector TransformHavanaLocalToHLWorld( const hk_Vector3 &input, IVP_Real_Object *pObject, bool translate )
+static Vector TransformHavanaLocalToHLWorld( const hk_Vector3 &input, IVP_Real_Object *pObject, bool translate )
 {
 	IVP_U_Float_Point ivpLocal( input.x, input.y, input.z );
 	IVP_U_Float_Point ivpWorld;
@@ -85,27 +85,27 @@ Vector TransformHavanaLocalToHLWorld( const hk_Vector3 &input, IVP_Real_Object *
 	return hlOut;
 }
 
-inline hk_Vector3 vec( const IVP_U_Point &point )
+static inline hk_Vector3 vec( const IVP_U_Point &point )
 {
 	hk_Vector3 tmp(point.k[0], point.k[1], point.k[2] );
 	return tmp;
 }
 
 // UNDONE: if vector were aligned we could simply cast these.
-inline hk_Vector3 vec( const Vector &point )
+static inline hk_Vector3 vec( const Vector &point )
 {
 	hk_Vector3 tmp(point.x, point.y, point.z );
 	return tmp;
 }
 
-void ConvertHLLocalMatrixToHavanaLocal( const matrix3x4_t& hlMatrix, hk_Transform &out )
+static void ConvertHLLocalMatrixToHavanaLocal( const matrix3x4_t& hlMatrix, hk_Transform &out )
 {
 	IVP_U_Matrix ivpMatrix;
 	ConvertMatrixToIVP( hlMatrix, ivpMatrix );
 	ivpMatrix.get_4x4_column_major( &out );
 }
 
-void set_4x4_column_major( IVP_U_Matrix &ivpMatrix, const float *in4x4 )
+static void set_4x4_column_major( IVP_U_Matrix &ivpMatrix, const float *in4x4 )
 {
 	ivpMatrix.set_elem( 0, 0, in4x4[0] );
 	ivpMatrix.set_elem( 1, 0, in4x4[1] );
@@ -124,14 +124,14 @@ void set_4x4_column_major( IVP_U_Matrix &ivpMatrix, const float *in4x4 )
 	ivpMatrix.vv.k[2] = in4x4[14];
 }
 
-inline void ConvertPositionToIVP( const Vector &point, hk_Vector3 &out )
+static inline void ConvertPositionToIVP( const Vector &point, hk_Vector3 &out )
 {
 	IVP_U_Float_Point ivp;
 	ConvertPositionToIVP( point, ivp );
 	out = vec( ivp );
 }
 
-inline void ConvertPositionToHL( const hk_Vector3 &point, Vector& out )
+static inline void ConvertPositionToHL( const hk_Vector3 &point, Vector& out )
 {
 	float tmpY = IVP2HL(point.z);
 	out.z = -IVP2HL(point.y);
@@ -139,7 +139,7 @@ inline void ConvertPositionToHL( const hk_Vector3 &point, Vector& out )
 	out.x = IVP2HL(point.x);
 }
 
-inline void ConvertDirectionToHL( const hk_Vector3 &point, Vector& out )
+static inline void ConvertDirectionToHL( const hk_Vector3 &point, Vector& out )
 {
 	float tmpY = point.z;
 	out.z = -point.y;
@@ -147,7 +147,7 @@ inline void ConvertDirectionToHL( const hk_Vector3 &point, Vector& out )
 	out.x = point.x;
 }
 
-void ConvertHavanaLocalMatrixToHL( const hk_Transform &in, matrix3x4_t& hlMatrix, [[maybe_unused]] IVP_Real_Object *pObject )
+static void ConvertHavanaLocalMatrixToHL( const hk_Transform &in, matrix3x4_t& hlMatrix, [[maybe_unused]] IVP_Real_Object *pObject )
 {
 	IVP_U_Matrix ivpMatrix;
 	set_4x4_column_major( ivpMatrix, (const hk_real *)&in );
