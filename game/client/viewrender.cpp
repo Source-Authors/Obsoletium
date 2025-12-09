@@ -3034,7 +3034,8 @@ void CViewRender::ViewDrawScene_Intro( const CViewSetup &viewRender, int nClearF
 	// Find the material that we use to render the overlays
 	IMaterial *pOverlayMaterial = materials->FindMaterial( "scripted/intro_screenspaceeffect", TEXTURE_GROUP_OTHER );
 	IMaterialVar *pModeVar = pOverlayMaterial->FindVar( "$mode", NULL );
-	IMaterialVar *pAlphaVar = pOverlayMaterial->FindVar( "$alpha", NULL );
+	// dimhotepus: There is no alpha var for intro_screenspaceeffect.
+	// IMaterialVar *pAlphaVar = pOverlayMaterial->FindVar( "$alpha", NULL );
 
 	pRenderContext->ClearBuffers( true, true );
 	
@@ -3061,7 +3062,8 @@ void CViewRender::ViewDrawScene_Intro( const CViewSetup &viewRender, int nClearF
 			Assert(0);
 		}
 		// Set the alpha value for the material.
-		pAlphaVar->SetFloatValue( pass.m_Alpha );
+		// dimhotepus: There is no alpha var for intro_screenspaceeffect.
+		// pAlphaVar->SetFloatValue( pass.m_Alpha );
 		
 		// Draw a quad for this pass.
 		ITexture *pTexture = GetFullFrameFrameBufferTexture( 0 );
