@@ -292,12 +292,6 @@ enum vphysics_save_constrainttypes_t : short
 	CONSTRAINT_LENGTH,
 };
 
-// dimhotepus: x64 support.
-#ifdef PLATFORM_64BITS
-// Ensure packing on x64 and x86 is same.
-#pragma pack(push, 4)
-#endif
-
 struct vphysics_save_cphysicsconstraint_t
 {
 	int constraintType;
@@ -306,11 +300,6 @@ struct vphysics_save_cphysicsconstraint_t
 	CPhysicsObject *pObjAttached;
 	DECLARE_SIMPLE_DATADESC();
 };
-
-#ifdef PLATFORM_64BITS
-// Ensure packing on x64 and x86 is same.
-#pragma pack(pop)
-#endif
 
 BEGIN_SIMPLE_DATADESC( vphysics_save_cphysicsconstraint_t )
 	DEFINE_FIELD( constraintType,		FIELD_INTEGER ),
