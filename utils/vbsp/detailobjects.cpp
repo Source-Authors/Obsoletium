@@ -204,7 +204,7 @@ static void ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 
 					// shape angle
 					// for the tri shape, this is the angle each side is fanned out
-					model.m_ShapeAngle = pIter->GetInt( "shape_angle", 0 );
+					model.m_ShapeAngle = size_cast<decltype(model.m_ShapeAngle)>( pIter->GetInt( "shape_angle", 0 ) );
 
 					// shape size
 					// for the tri shape, this is the distance from the origin to the center of a side
