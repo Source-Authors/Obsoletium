@@ -5005,7 +5005,8 @@ void CChoreoView::ProcessLoop( CChoreoScene *scene, CChoreoEvent *event )
 	if ( IsScrubbing() )
 		return;
 
-	float backtime = (float)atof( event->GetParameters() );
+	// dimhotepus: atof -> V_atof.
+	float backtime = V_atof( event->GetParameters(), nullptr );
 
 	bool process = true;
 	int counter = event->GetLoopCount();

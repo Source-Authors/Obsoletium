@@ -139,7 +139,8 @@ void CChoreoGlobalEventWidget::redraw( CChoreoWidgetDrawHelper& drawHelper )
 	DrawLabel( drawHelper, labelText, rcLine.left, rcLine.top + 2, false );
 
 	// Figure out loop spot
-	float looptime = (float)atof( event->GetParameters() );
+	// dimhotepus: atof -> V_atof.
+	float looptime = V_atof( event->GetParameters() );
 
 	// Find pixel for that
 	bool clipped = false;
