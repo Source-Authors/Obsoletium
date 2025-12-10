@@ -63,7 +63,8 @@ void CAngleBox::OnMouseMove(UINT nFlags, CPoint point)
 		//
 		// Calculate new yaw.
 		//
-		int nNewYaw = fixang(180 - (int)lineangle(point.x, point.y, m_ptClientCenter.x, m_ptClientCenter.y));
+		// dimhotepus: int -> float.
+		float nNewYaw = fixang(180 - (int)lineangle(size_cast<float>(point.x), size_cast<float>(point.y), size_cast<float>(m_ptClientCenter.x), size_cast<float>(m_ptClientCenter.y)));
 		m_vecAngles.Init();
 		m_vecAngles[YAW] = nNewYaw;
 		
@@ -143,14 +144,14 @@ void CAngleBox::DrawAngleLine(CDC *pDC)
 	GetClientRect(r);
 	m_ptClientCenter = r.CenterPoint();
 
-	float rad = r.Width() / 2 - 3;
+	float rad = size_cast<float>(r.Width() / 2 - 3);
 
 	float fSin, fCos;
 	DirectX::XMScalarSinCos(&fSin, &fCos, DEG2RAD(m_vecAngles[YAW] + 90));
 
 	CPoint pt;
-	pt.x = m_ptClientCenter.x + fSin * rad + 0.5f;
-	pt.y = m_ptClientCenter.y + fCos * rad + 0.5f;
+	pt.x = size_cast<LONG>(m_ptClientCenter.x + fSin * rad + 0.5f);
+	pt.y = size_cast<LONG>(m_ptClientCenter.y + fCos * rad + 0.5f);
 
 	pDC->MoveTo(m_ptClientCenter);
 	pDC->LineTo(pt);
@@ -552,7 +553,8 @@ void CAngleCombo::UpdateAngleBox(char *szText)
 
 		if (V_isdigit(szText[0]))
 		{
-			QAngle vecAngles(0, atoi(szText), 0);
+			// dimhotepus: atoi -> strtof.
+			QAngle vecAngles(0, strtof(szText, nullptr), 0);
 			m_pBox->SetAnglesInternal(vecAngles, true);
 		}
 		else if (!stricmp(szText, "down"))
