@@ -412,10 +412,10 @@ bool FindEnclosingTri(
 	const Vector2D &vert,
 	CUtlVector<Vector2D> &vertCoords,
 	CUtlVector<unsigned short> &indices,
-	int *pStartVert,
+	intp *pStartVert,
 	float bcCoords[3] )
 {
-	for ( int i=0; i < indices.Count(); i += 3 )
+	for ( intp i=0; i < indices.Count(); i += 3 )
 	{
 		GetBarycentricCoords2D( 
 			vertCoords[indices[i+0]],
@@ -473,7 +473,7 @@ void SnapRemainingVertsToSurface( CCoreDispInfo *pCoreDisp, ddispinfo_t *pDispIn
 			if ( !( vertsTouched[index] ) )
 			{
 				float bcCoords[3];
-				int iStartVert = -1;
+				intp iStartVert = -1;
 				if ( FindEnclosingTri( vertCoords[index], vertCoords, indices, &iStartVert, bcCoords ) )
 				{
 					const Vector &A = pCoreDisp->GetVert( indices[iStartVert+0] );
