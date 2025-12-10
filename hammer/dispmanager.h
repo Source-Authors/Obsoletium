@@ -68,7 +68,7 @@ public:
 	//
 	virtual intp SelectCount( void ) = 0;
 	virtual void SelectClear( void ) = 0;
-	virtual CMapDisp *GetFromSelect( int iSelectList ) = 0;
+	virtual CMapDisp *GetFromSelect( intp iSelectList ) = 0;
 
 	virtual void AddToSelect( EditDispHandle_t handle ) = 0;
 	virtual void RemoveFromSelect( EditDispHandle_t handle ) = 0;
