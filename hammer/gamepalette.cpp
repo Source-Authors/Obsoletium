@@ -80,9 +80,9 @@ BOOL CGamePalette::Create(LPCTSTR pszFile)
 		if(file.eof())
 			break;
 
-		pOriginalPalette->palPalEntry[i].peRed = file.get();
-		pOriginalPalette->palPalEntry[i].peGreen = file.get();
-		pOriginalPalette->palPalEntry[i].peBlue = file.get();
+		pOriginalPalette->palPalEntry[i].peRed = size_cast<byte>( file.get() );
+		pOriginalPalette->palPalEntry[i].peGreen = size_cast<byte>( file.get() );
+		pOriginalPalette->palPalEntry[i].peBlue = size_cast<byte>( file.get() );
 		// dimhotepus: Comment unused D3DRMPALETTE_READONLY.
 		pOriginalPalette->palPalEntry[i].peFlags = /*D3DRMPALETTE_READONLY |*/
 			PC_NOCOLLAPSE;

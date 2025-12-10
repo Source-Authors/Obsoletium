@@ -318,7 +318,7 @@ void CTextureBox::LoadGraphicList(void)
 
 	SetRedraw(FALSE);
 	ResetContent();
-	InitStorage(g_Textures.GetActiveTextureCount() + 32, sizeof(PVOID));
+	InitStorage(size_cast<int>( g_Textures.GetActiveTextureCount() + 32 ), sizeof(PVOID));
 
 	//
 	// Add the MRU textures to the list.
