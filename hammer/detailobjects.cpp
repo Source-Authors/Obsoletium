@@ -71,7 +71,7 @@ CUtlVector<DetailObjects::DetailObject_t>	DetailObjects::s_DetailObjectDict;		//
 //-----------------------------------------------------------------------------
 // Parses the key-value pairs in the detail.rad file
 //-----------------------------------------------------------------------------
-void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
+void DetailObjects::ParseDetailGroup( intp detailId, KeyValues* pGroupKeyValues )
 {
 	// Sort the group by alpha
 	float alpha = pGroupKeyValues->GetFloat( "alpha", 1.0f );
@@ -171,7 +171,7 @@ void DetailObjects::ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues )
 
 					// shape angle
 					// for the tri shape, this is the angle each side is fanned out
-					model.m_ShapeAngle = pIter->GetInt( "shape_angle", 0 );
+					model.m_ShapeAngle = size_cast<decltype(model.m_ShapeAngle)>( pIter->GetInt( "shape_angle", 0 ) );
 
 					// shape size
 					// for the tri shape, this is the distance from the origin to the center of a side
@@ -507,7 +507,7 @@ void DetailObjects::EmitDetailObjectsOnFace( CMapFace *pMapFace, DetailObject_t&
 		float	area = 0.5f * normalLength;
 
 		// Calculate the detail prop density based on the expected density and the tesselated triangle area
-		int numSamples = clamp( area * detail.m_Density * 0.000001f, 0.0f, MAX_DETAIL_SPRITES_PER_FACE * 1.f );
+		int numSamples = size_cast<int>( clamp( area * detail.m_Density * 0.000001f, 0.0f, MAX_DETAIL_SPRITES_PER_FACE * 1.f ) );
 		
 		// For each possible sample, attempt to randomly place a detail object there
 		for (int j = 0; j < numSamples; ++j )
@@ -589,7 +589,7 @@ void DetailObjects::EmitDetailObjectsOnDisplacementFace( CMapFace *pMapFace,
 	float area = ComputeDisplacementFaceArea( pMapFace );
 
 	// Compute the number of samples to take
-	int numSamples = area * detail.m_Density * 0.000001f;
+	int numSamples = size_cast<int>( area * detail.m_Density * 0.000001f );
 
 	EditDispHandle_t	editdisphandle = pMapFace->GetDisp();
 	CMapDisp			*pMapDisp = EditDispMgr()->GetDisp(editdisphandle);
@@ -735,7 +735,7 @@ void DetailObjects::EnableBuildDetailObjects( bool bEnable )
 void	DetailObjects::Render3D(CRender3D *pRender)
 {
 	Vector Mins, Maxs;
-	float fDetailDistance = Options.view3d.nDetailDistance;
+	float fDetailDistance = size_cast<float>( Options.view3d.nDetailDistance );
 	Vector viewPoint; pRender->GetCamera()->GetViewPoint( viewPoint );
 
 	intp models = m_DetailModels.Count();

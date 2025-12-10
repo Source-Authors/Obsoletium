@@ -135,7 +135,7 @@ public:
 protected:
 	static const char *FindDetailVBSPName( void );
 	static void	ParseDetailObjectFile( KeyValues& keyValues );
-	static void	ParseDetailGroup( int detailId, KeyValues* pGroupKeyValues );
+	static void	ParseDetailGroup( intp detailId, KeyValues* pGroupKeyValues );
 
 	bool	LoadStudioModel( char const* pFileName, char const* pEntityType, CUtlBuffer& buf );
 	float	ComputeDisplacementFaceArea( CMapFace *pMapFace );
