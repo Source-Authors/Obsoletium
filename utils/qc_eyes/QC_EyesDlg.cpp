@@ -222,7 +222,8 @@ void HandleYAxisUp(float &yVal, float &zVal) {
 float CQC_EyesDlg::GetDlgItemFloat(UINT id) {
   char text[4096];
   GetDlgItemText(id, text, sizeof(text));
-  return (float)atof(text);
+  // dimhotepus: atof -> V_atof.
+  return V_atof(text);
 }
 
 bool CQC_EyesDlg::IsOptionChecked(UINT option) {
