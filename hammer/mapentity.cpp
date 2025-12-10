@@ -1640,7 +1640,7 @@ bool CMapEntity::GetTransformMatrix( VMatrix& matrix )
 		if ( gotMatrix )
 		{
 			// return ParentMatrix * OurMatrix
-			VMatrix tmpMat, animatorMat;
+			VMatrix animatorMat;
 			bool gotAnimMatrix = m_pAnimatorChild->GetTransformMatrix( animatorMat );
 			if ( !gotAnimMatrix )
 			{

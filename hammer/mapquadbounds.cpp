@@ -106,7 +106,6 @@ void CMapQuadBounds::PresaveWorld(void)
 				}
 				else
 				{
-					Vector vLowerLeft,vUpperLeft,vLowerRight,vUpperRight;
 					pFace->GetPoint(m_vLowerLeft, 0);
 					pFace->GetPoint(m_vLowerRight,1);
 					pFace->GetPoint(m_vUpperRight,2);

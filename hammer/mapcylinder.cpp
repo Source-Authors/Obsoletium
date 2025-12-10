@@ -219,9 +219,6 @@ void CMapCylinder::CalcBounds(BOOL bFullUpdate)
 		//
 		// Update the 3D bounds.
 		//
-		Vector Start;
-		Vector End;
-
 		Vector pStartVerts[CYLINDER_VERTEX_COUNT];
 		Vector pEndVerts[CYLINDER_VERTEX_COUNT];
 		ComputeCylinderPoints( CYLINDER_VERTEX_COUNT, pStartVerts, pEndVerts );
