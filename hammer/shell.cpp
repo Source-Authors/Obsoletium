@@ -542,9 +542,9 @@ bool CShell::GrabVideoMemory(const char *pszCommand, const char *pszArguments)
 //-----------------------------------------------------------------------------
 bool CShell::RunCommand(const char *pszCommand)
 {
-	for (int nCommand = 0; nCommand < sizeof(m_DispatchTable) / sizeof(m_DispatchTable[0]); nCommand++)
+	for (intp nCommand = 0; nCommand < ssize(m_DispatchTable); nCommand++)
 	{
-		int nCommandLen = strlen(m_DispatchTable[nCommand].pszCommand);
+		size_t nCommandLen = strlen(m_DispatchTable[nCommand].pszCommand);
 
 		if (!_strnicmp(pszCommand, m_DispatchTable[nCommand].pszCommand, nCommandLen))
 		{

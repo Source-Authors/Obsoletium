@@ -825,7 +825,7 @@ static int __cdecl SortTexturesProc(IEditorTexture * const *elem1, IEditorTextur
 
 	if (IsSortChr(ch1) && !IsSortChr(ch2))
 	{
-		int iFamilyLen = strlen(pszName1+2);
+		size_t iFamilyLen = strlen(pszName1+2);
 		int iFamily = strnicmp(pszName1+2, pszName2, iFamilyLen);
 		if (!iFamily)
 		{
@@ -835,7 +835,7 @@ static int __cdecl SortTexturesProc(IEditorTexture * const *elem1, IEditorTextur
 	}
 	else if (!IsSortChr(ch1) && IsSortChr(ch2))
 	{
-		int iFamilyLen = strlen(pszName2+2);
+		size_t iFamilyLen = strlen(pszName2+2);
 		int iFamily = strnicmp(pszName1, pszName2+2, iFamilyLen);
 		if (!iFamily)
 		{

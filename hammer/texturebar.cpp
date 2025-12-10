@@ -49,8 +49,7 @@ static char szNullTexture[128] = {"editor/obsolete"};
 //-----------------------------------------------------------------------------
 void SetDefaultTextureName( const char *szTexName )
 {
-	int length = strlen( szTexName );
-	Assert( length < 128 );
+	Assert( strlen( szTexName ) < 128 );
 
 	V_strcpy_safe( szDefaultTexture, szTexName );
 }

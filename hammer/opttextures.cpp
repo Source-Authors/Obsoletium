@@ -194,10 +194,10 @@ BOOL COPTTextures::OnApply()
 	return __super::OnApply();
 }
 
-void GetDirectory(char *pDest, const char *pLongName)
+static void GetDirectory(char *pDest, const char *pLongName)
 {
 	strcpy(pDest, pLongName);
-	int i = strlen(pDest);
+	size_t i = strlen(pDest);
 	while (pLongName[i] != '\\' && pLongName[i] != '/' && i > 0)
 		i--;
 
