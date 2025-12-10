@@ -106,6 +106,8 @@ static MCIDEVICEID PlayMIDISong(LPCTSTR szMIDIFileName, BOOL bRestart)
 
 static unsigned __stdcall CantTouchThisThread( void * )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("HammerTime!");
 

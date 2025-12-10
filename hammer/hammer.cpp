@@ -454,6 +454,8 @@ CHammer::~CHammer(void)
 //-----------------------------------------------------------------------------
 bool CHammer::Connect( CreateInterfaceFn factory )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	if ( !BaseClass::Connect( factory ) )
 		return false;
 
@@ -517,6 +519,8 @@ bool CHammer::Connect( CreateInterfaceFn factory )
 
 void CHammer::Disconnect()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	g_Factory = nullptr;
 	g_pMDLCache = nullptr;
 	g_pEngineAPI = nullptr;
@@ -933,6 +937,8 @@ CGameConfig *CHammer::PromptForGameConfig()
 //-----------------------------------------------------------------------------
 bool CHammer::InitSessionGameConfig(const char *szGame)
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	CGameConfig *pConfig = NULL;
 	bool bManualChoice = false;
 
@@ -1034,6 +1040,8 @@ int CHammer::StaticHammerInternalInit( void *pParam )
 
 InitReturnVal_t CHammer::HammerInternalInit()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	SpewOutputFunc( HammerDbgOutput );
 
 	MathLib_Init( GAMMA, TEXGAMMA, 0.0f, OVERBRIGHT, false, false, false, false );
@@ -1258,6 +1266,8 @@ int CHammer::StaticInternalMainLoop( void *pParam )
 
 int CHammer::InternalMainLoop()
 {	
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	MSG msg;
 
 #ifdef PLATFORM_64BITS
@@ -1319,6 +1329,8 @@ int CHammer::InternalMainLoop()
 //-----------------------------------------------------------------------------
 void CHammer::Shutdown()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	if ( g_LPreviewThread )
 	{
 		MessageToLPreview StopMsg( LPREVIEW_MSG_EXIT );
@@ -1387,6 +1399,8 @@ const char *CHammer::GetDefaultModFullPath()
 //-----------------------------------------------------------------------------
 RequestRetval_t CHammer::RequestNewConfig()
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	if ( !Options.RunConfigurationDialog() )
 		return REQUEST_QUIT;
 
@@ -1804,6 +1818,8 @@ inline bool IsKeyStrokeMessage( MSG *pMsg )
 //-----------------------------------------------------------------------------
 BOOL CHammer::PreTranslateMessage(MSG* pMsg)
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	// CG: The following lines were added by the Splash Screen component.
 	if (CSplashWnd::PreTranslateAppMessage(pMsg))
 		return TRUE;
@@ -2018,6 +2034,7 @@ BOOL CHammer::OnIdle(LONG lCount)
 //-----------------------------------------------------------------------------
 void CHammer::RunFrame(void)
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
 
 	// Note: since hammer may well not even have a 3D window visible
 	// at any given time, we have to call into the material system to

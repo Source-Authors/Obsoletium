@@ -32,6 +32,8 @@ IBSPLightingThread* CreateBSPLightingThread( IVRadDLL *pDLL )
 
 static unsigned __stdcall ThreadMainLoop_Static( void* lpParameter )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	// dimhotepus: Add thread name to simplify debugging.
 	ThreadSetDebugName("BSPLighting");
 

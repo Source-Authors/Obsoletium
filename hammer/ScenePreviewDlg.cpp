@@ -100,6 +100,8 @@ BOOL CScenePreviewDlg::OnInitDialog()
 
 unsigned __stdcall CScenePreviewDlg::StaticIdleThread( void *pParameter )
 {
+	AFX_MANAGE_STATE(AfxGetStaticModuleState());
+
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("ScenePreview");
 
