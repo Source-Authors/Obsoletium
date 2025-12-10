@@ -46,7 +46,7 @@ struct Shoreline_t
 {
 	intp						m_nShorelineId;
 	CUtlVector<ShoreSegment_t>	m_aSegments;		// List of shore segments making up the shore line.
-	CUtlVector<int>				m_aSortedSegments;	// List of shore segments sorted (for connectivity).
+	CUtlVector<intp>			m_aSortedSegments;	// List of shore segments sorted (for connectivity).
 	CUtlVector<CMapOverlay>		m_aOverlays;
 	float						m_flLength;			// Total length of the shore line.
 	ShoreEntityData_t			m_ShoreData;
