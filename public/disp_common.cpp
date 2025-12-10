@@ -764,10 +764,10 @@ void GetDispBox( CCoreDispInfo *pDisp, CDispBox &box )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void SetupDispBoxes( CCoreDispInfo **ppListBase, int nListSize, CUtlVector<CDispBox> &out )
+void SetupDispBoxes( CCoreDispInfo **ppListBase, intp nListSize, CUtlVector<CDispBox> &out )
 {
 	out.SetSize( nListSize );
-	for ( int iDisp = 0; iDisp < nListSize; ++iDisp )
+	for ( intp iDisp = 0; iDisp < nListSize; ++iDisp )
 	{
 		CCoreDispInfo *pDisp = ppListBase[iDisp];
 		GetDispBox( pDisp, out[iDisp] );
@@ -928,7 +928,7 @@ void SetupEdgeNeighbors( CCoreDispInfo *pMain, CCoreDispInfo *pOther )
 //-----------------------------------------------------------------------------
 // Returns true if the displacement has an edge neighbor with the given index.
 //-----------------------------------------------------------------------------
-bool HasEdgeNeighbor( const CCoreDispInfo *pMain, int iNeighbor )
+bool HasEdgeNeighbor( const CCoreDispInfo *pMain, intp iNeighbor )
 {
 	for ( int i=0; i < 4; i++ )
 	{
@@ -1027,13 +1027,13 @@ bool VerifyNeighborVertConnection( CDispUtilsHelper *pDisp, const CVertIndex &no
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-void VerifyNeighborConnections( CCoreDispInfo **ppListBase, int nDisps )
+void VerifyNeighborConnections( CCoreDispInfo **ppListBase, intp nDisps )
 {
 	while ( 1 )
 	{
 		bool bHappy = true;
 
-		int iDisp;
+		intp iDisp;
 		for ( iDisp = 0; iDisp < nDisps; ++iDisp )
 		{
 			CCoreDispInfo *pDisp = ppListBase[iDisp];
