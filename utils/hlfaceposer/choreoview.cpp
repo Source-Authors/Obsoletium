@@ -5006,7 +5006,7 @@ void CChoreoView::ProcessLoop( CChoreoScene *scene, CChoreoEvent *event )
 		return;
 
 	// dimhotepus: atof -> V_atof.
-	float backtime = V_atof( event->GetParameters(), nullptr );
+	float backtime = V_atof( event->GetParameters() );
 
 	bool process = true;
 	int counter = event->GetLoopCount();
