@@ -731,7 +731,7 @@ intp CDispShoreManager::FindShorelineStart( Shoreline_t *pShoreline )
 		auto &segment1 = pShoreline->m_aSegments[iSegment];
 
 		intp nTouchCount = 0;
-		intp iStartPoint = -1;
+		unsigned int iStartPoint = std::numeric_limits<unsigned int>::max();
 		for ( intp iSegment2 = 0; iSegment2 < nSegmentCount; ++iSegment2 )
 		{
 			if ( iSegment == iSegment2 )
