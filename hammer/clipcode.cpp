@@ -164,9 +164,9 @@ static void R_DecalComputeBasis( Vector const& surfaceNormal, Vector const* pSAx
 {
 	// s, t, textureSpaceNormal (T cross S = textureSpaceNormal(N))
 	//   N     
-	//   \   
-	//    \     
-	//     \  
+	//   \
+	//    \
+	//     \
 	//      |---->S
 	//      | 
 	//		|  

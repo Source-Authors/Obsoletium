@@ -36,7 +36,7 @@ public:
 		return(m_szName);
 	}
 
-	inline int GetCount(void)
+	inline intp GetCount(void)
 	{
 		return m_Textures.Count();
 	}
@@ -154,8 +154,8 @@ public:
 	//
 	// Exposes a list of active textures based on the currently active texture group.
 	//
-	inline int GetActiveTextureCount(void) const;
-	inline IEditorTexture *GetActiveTexture(int nIndex) const;
+	inline intp GetActiveTextureCount(void) const;
+	inline IEditorTexture *GetActiveTexture(intp nIndex) const;
 	IEditorTexture *EnumActiveTextures(int *piIndex, TEXTUREFORMAT eDesiredFormat) const;
 	IEditorTexture *FindActiveTexture(LPCSTR pszName, int *piIndex = NULL, BOOL bDummy = TRUE);
 	bool HasTexturesForConfig(CGameConfig *pConfig);
@@ -299,7 +299,7 @@ void CTextureSystem::FilesGetInfo(GRAPHICSFILESTRUCT *pFileInfo, intp nIndex) co
 //-----------------------------------------------------------------------------
 // Purpose: Returns the number of textures in the active group.
 //-----------------------------------------------------------------------------
-int CTextureSystem::GetActiveTextureCount(void) const
+intp CTextureSystem::GetActiveTextureCount(void) const
 {
 	if (m_pActiveGroup != NULL)
 	{
@@ -310,7 +310,7 @@ int CTextureSystem::GetActiveTextureCount(void) const
 }
 
 
-IEditorTexture *CTextureSystem::GetActiveTexture(int nIndex) const
+IEditorTexture *CTextureSystem::GetActiveTexture(intp nIndex) const
 {
 	if (m_pActiveGroup != NULL)
 	{

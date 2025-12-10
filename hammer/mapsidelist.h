@@ -85,8 +85,8 @@ class CMapSideList : public CMapHelper
 		// 
 		// Getting face data.
 		//
-		int GetFaceCount( void )			{ return m_Faces.Count(); }
-		CMapFace *GetFace( int index )		{ return m_Faces.Element( index ); }
+		intp GetFaceCount( void )			{ return m_Faces.Count(); }
+		CMapFace *GetFace( intp index )		{ return m_Faces.Element( index ); }
 
 		const char *GetKeyName( void )		{ return m_szKeyName; }
 

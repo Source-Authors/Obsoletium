@@ -275,16 +275,16 @@ bool CMapOverlayTransition::BuildFaceCaches( void )
 				// Check name.
 				if ( !stricmp( "sides" ,pSideList->GetKeyName() ) )
 				{
-					int nFaceCount = pSideList->GetFaceCount();
-					for ( int iFace = 0; iFace < nFaceCount; ++iFace )
+					intp nFaceCount = pSideList->GetFaceCount();
+					for ( intp iFace = 0; iFace < nFaceCount; ++iFace )
 					{
 						m_aFaceCache1.AddToTail( pSideList->GetFace( iFace ) );
 					}
 				}
 				else if ( !stricmp( "sides2", pSideList->GetKeyName() ) )
 				{
-					int nFaceCount = pSideList->GetFaceCount();
-					for ( int iFace = 0; iFace < nFaceCount; ++iFace )
+					intp nFaceCount = pSideList->GetFaceCount();
+					for ( intp iFace = 0; iFace < nFaceCount; ++iFace )
 					{
 						if ( m_bIsWater )
 						{

@@ -290,8 +290,8 @@ BOOL CTextureBrowser::OnInitDialog()
 	__super::OnInitDialog();
 
 	// Iterate all the active textures for debugging.
-	//int nCount = g_Textures.GetActiveTextureCount();
-	//for (int nTexture = 0; nTexture < nCount; nTexture++)
+	//intp nCount = g_Textures.GetActiveTextureCount();
+	//for (intp nTexture = 0; nTexture < nCount; nTexture++)
 	//{
 	//	IEditorTexture *pTexture = g_Textures.GetActiveTexture(nTexture);
 	//	const char *pszName = pTexture->GetName();

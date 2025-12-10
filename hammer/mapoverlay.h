@@ -78,8 +78,8 @@ public:
 
 	void GetPlane( cplane_t &plane );
 
-	int	GetFaceCount( void ) { return m_Faces.Count(); }
-	CMapFace *GetFace( int iFace ) { return m_Faces.Element( iFace ); }
+	intp GetFaceCount( void ) { return m_Faces.Count(); }
+	CMapFace *GetFace( intp iFace ) { return m_Faces.Element( iFace ); }
 
 	void SetMaterial( const char *szMaterialName );
 	void SetMaterial( IEditorTexture *pTexture )		{ m_Material.m_pTexture = pTexture; }
@@ -260,7 +260,7 @@ private:
 	void OverlayPlaneToSurfFromList( const Vector &vecOverlayPoint, Vector &vecSurfPoint );
 	bool EntityOnSurfFromListToBaseFacePlane( const Vector &vecWorldPoint, Vector &vecBasePoint );
 
-	bool BuildEdgePlanes( Vector const *pPoints, int pointCount, cplane_t *pEdgePlanes, int edgePlaneCount );
+	bool BuildEdgePlanes( Vector const *pPoints, intp pointCount, cplane_t *pEdgePlanes, intp edgePlaneCount );
 	void UpdateDispBarycentric( void );
 	void PostModified( void );
 	void GetTriVerts( CMapDisp *pDisp, const Vector2D &vecSurfUV, int *pTris, Vector2D *pVertsUV );

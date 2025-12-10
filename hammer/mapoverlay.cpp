@@ -1724,8 +1724,8 @@ void CMapOverlay::OnClone( CMapClass *pClone, CMapWorld *pWorld,
 		if ( ( GetOverlayType() && OVERLAY_TYPE_SHORE ) == 0 )
 		{
 			// Update the clone's solid dependencies (this doesn't happen on clone generally).
-			int nFaceCount = pOverlay->GetFaceCount();
-			for ( int iFace = 0; iFace < nFaceCount; ++iFace )
+			intp nFaceCount = pOverlay->GetFaceCount();
+			for ( intp iFace = 0; iFace < nFaceCount; ++iFace )
 			{
 				CMapFace *pFace = pOverlay->GetFace( iFace );
 				CMapSolid *pSolid = ( CMapSolid* )pFace->GetParent();
@@ -2083,10 +2083,10 @@ void CMapOverlay::DoClipFace( CMapFace *pFace )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-bool CMapOverlay::BuildEdgePlanes( Vector const *pPoints, int nPointCount,
-								   cplane_t *pEdgePlanes, int nEdgePlaneCount )
+bool CMapOverlay::BuildEdgePlanes( Vector const *pPoints, intp nPointCount,
+								   cplane_t *pEdgePlanes, intp nEdgePlaneCount )
 {
-	for ( int iPoint = 0; iPoint < nPointCount; iPoint++ )
+	for ( intp iPoint = 0; iPoint < nPointCount; iPoint++ )
 	{
 		Vector vecEdge;
 		vecEdge = pPoints[(iPoint+1)%nPointCount] - pPoints[iPoint];
@@ -2501,11 +2501,11 @@ void CMapOverlay::OverlayPlaneToSurfFromList( const Vector &vecOverlayPoint, Vec
 	// Initialize the point with the overlay point.
 	vecSurfPoint = vecOverlayPoint;
 
-	int nFaceCount = GetFaceCount();
+	intp nFaceCount = GetFaceCount();
 	CUtlVector<Vector> aPoints;
 	CUtlVector<cplane_t> aPlanes;
 
-	for ( int iFace = 0; iFace < nFaceCount; ++iFace )
+	for ( intp iFace = 0; iFace < nFaceCount; ++iFace )
 	{
 		CMapFace *pFace = GetFace( iFace );
 		if ( !pFace )
@@ -2527,7 +2527,7 @@ void CMapOverlay::OverlayPlaneToSurfFromList( const Vector &vecOverlayPoint, Vec
 		BuildEdgePlanes( aPoints.Base(), aPoints.Count(), aPlanes.Base(), aPlanes.Count() );
 
 		// Check to see if a point lies behind all of the edge planes - this is our face.
-		int iPlane;
+		intp iPlane;
 		for ( iPlane = 0; iPlane < aPlanes.Count(); ++iPlane )
 		{
 			float flDist = aPlanes[iPlane].normal.Dot( vecOverlayPoint ) - aPlanes[iPlane].dist;
@@ -2569,8 +2569,8 @@ void CMapOverlay::OverlayPlaneToSurfFromList( const Vector &vecOverlayPoint, Vec
 //-----------------------------------------------------------------------------
 bool CMapOverlay::EntityOnSurfFromListToBaseFacePlane( const Vector &vecWorldPoint, Vector &vecBasePoint )
 {
-	int nFaceCount = GetFaceCount();
-	for ( int iFace = 0; iFace < nFaceCount; ++iFace )
+	intp nFaceCount = GetFaceCount();
+	for ( intp iFace = 0; iFace < nFaceCount; ++iFace )
 	{
 		CMapFace *pFace = GetFace( iFace );
 		if ( !pFace )

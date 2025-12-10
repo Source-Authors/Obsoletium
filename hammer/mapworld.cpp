@@ -1794,8 +1794,8 @@ bool CMapWorld::FindEntitiesByClassName(CMapEntityList &Found, const char *pszCl
 {
 	Found.RemoveAll();
 
-	int nCount = EntityList_GetCount();
-	for ( int i = 0; i < nCount; i++ )
+	intp nCount = EntityList_GetCount();
+	for ( intp i = 0; i < nCount; i++ )
 	{
 		CMapEntity *pEntity = EntityList_GetEntity( i );
 		
@@ -1822,8 +1822,8 @@ bool CMapWorld::FindEntitiesByKeyValue(CMapEntityList &Found, const char *pszKey
 {
 	Found.RemoveAll();
 
-	int nCount = EntityList_GetCount();
-	for ( int i = 0; i < nCount; i++ )
+	intp nCount = EntityList_GetCount();
+	for ( intp i = 0; i < nCount; i++ )
 	{
 		CMapEntity *pEntity = EntityList_GetEntity( i );
 		
@@ -1894,8 +1894,8 @@ bool CMapWorld::FindEntitiesByNameOrClassName(CMapEntityList &Found, const char 
 {
 	Found.RemoveAll();
 
-	int nCount = EntityList_GetCount();
-	for ( int i = 0; i < nCount; i++ )
+	intp nCount = EntityList_GetCount();
+	for ( intp i = 0; i < nCount; i++ )
 	{
 		CMapEntity *pEntity = EntityList_GetEntity( i );
 		

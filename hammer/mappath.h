@@ -87,7 +87,7 @@ class CMapPath
 			dirPingpong
 		};
 
-		int GetNodeCount() { return m_Nodes.Count(); }
+		intp GetNodeCount() { return m_Nodes.Count(); }
 
 	private:
 

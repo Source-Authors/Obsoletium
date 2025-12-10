@@ -82,7 +82,7 @@ void CEditGameClass::Connections_Add(CEntityConnection *pConnection)
 //-----------------------------------------------------------------------------
 bool CEditGameClass::Connections_Remove(CEntityConnection *pConnection)
 {
-	int nIndex = m_Connections.Find(pConnection);
+	intp nIndex = m_Connections.Find(pConnection);
 	if (nIndex != -1)
 	{
 		m_Connections.Remove(nIndex);
@@ -470,8 +470,8 @@ ChunkFileResult_t CEditGameClass::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInf
 		//
 		// For each variable from the base class...
 		//
-		int nVariableCount = pGameDataClass->GetVariableCount();
-		for (int i = 0; i < nVariableCount; i++)
+		intp nVariableCount = pGameDataClass->GetVariableCount();
+		for (intp i = 0; i < nVariableCount; i++)
 		{
 			GDinputvariable *pVar = pGameDataClass->GetVariableAt(i);
 			Assert(pVar != NULL);

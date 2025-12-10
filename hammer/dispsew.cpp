@@ -2151,7 +2151,7 @@ public:
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 bool FindEnclosingTri( const Vector2D &vert, CUtlVector<Vector2D> &vertCoords,
-	                   CUtlVector<unsigned short> &indices, int *pStartVert,
+	                   CUtlVector<unsigned short> &indices, intp *pStartVert,
 					   float bcCoords[3] )
 {
 	for ( intp i = 0; i < indices.Count(); i += 3 )
@@ -2215,7 +2215,7 @@ void SnapDependentVertsToSurface( CCoreDispInfo *pCoreDisp )
 			if ( !( vertsTouched[nIndex] ) )
 			{
 				float flBCoords[3];
-				int iStartVert = -1;
+				intp iStartVert = -1;
 
 				if ( FindEnclosingTri( vertCoords[nIndex], vertCoords, indices, &iStartVert, flBCoords ) )
 				{

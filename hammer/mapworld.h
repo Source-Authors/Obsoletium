@@ -137,8 +137,8 @@ class CMapWorld : public CMapClass, public CEditGameClass
 
 		// Interface to list of all the entities in the world:
 		const CMapEntityList *EntityList_GetList(void) { return(&m_EntityList); }
-		inline int EntityList_GetCount();
-		inline CMapEntity *EntityList_GetEntity( int nIndex );
+		inline intp EntityList_GetCount();
+		inline CMapEntity *EntityList_GetEntity( intp nIndex );
 
 		CMapEntity *FindEntityByName( const char *pszName, bool bVisiblesOnly = false, bool bSearchInstanceParms = false );
 		bool FindEntitiesByKeyValue(CMapEntityList &Found, const char *szKey, const char *szValue, bool bVisiblesOnly);
@@ -218,13 +218,13 @@ inline void CMapWorld::FaceID_SetNext(int nNextFaceID)
 }
 
 
-inline int CMapWorld::EntityList_GetCount()
+inline intp CMapWorld::EntityList_GetCount()
 {
 	return m_EntityList.Count();
 }
 
 
-inline CMapEntity *CMapWorld::EntityList_GetEntity( int nIndex )
+inline CMapEntity *CMapWorld::EntityList_GetEntity( intp nIndex )
 {
 	return m_EntityList.Element( nIndex );
 }
