@@ -78,8 +78,8 @@ void CAutoSelComboBox::OnUpdateText(void)
 	// the current selection. This won't do anything if they are deleting characters
 	// from the end of the text.
 	//
-	int nTypedLen = strlen(szTypedText);
-	int nLastLen = strlen(m_szLastText);
+	size_t nTypedLen = strlen(szTypedText);
+	size_t nLastLen = strlen(m_szLastText);
 
 	bool bSearched = false;
 	int nIndex = CB_ERR;
@@ -106,9 +106,9 @@ void CAutoSelComboBox::OnUpdateText(void)
 		if (nIndex != CB_ERR)
 		{
 			// Found a match.
-			if ((nEditEnd == -1) || (nEditEnd == (int)strlen(szTypedText)))
+			if ((nEditEnd == -1) || (nEditEnd == V_strlen(szTypedText)))
 			{
-				SetEditSel(strlen(szTypedText), -1);
+				SetEditSel(V_strlen(szTypedText), -1);
 			}
 			else
 			{
