@@ -346,7 +346,8 @@ void CAttributeTextEntry::WriteValueToAttribute()
 	switch (pPanel->GetAttributeType() )
 	{
 	case AT_FLOAT:
-		ApplyMouseWheel( (float)atof(newText), m_flOriginalValue );
+		// dimhotepus: atof -> V_atof.
+		ApplyMouseWheel( V_atof(newText), m_flOriginalValue );
 		break;
 	case AT_INT:
 		ApplyMouseWheel( atoi(newText), m_nOriginalValue );
