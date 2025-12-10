@@ -263,15 +263,20 @@ bool ReadUtlBufferFromFile( CUtlBuffer &buffer, const char *szPath )
 //-----------------------------------------------------------------------------
 bool SaveUtlBufferToFile( CUtlBuffer &buffer, const char *szPath )
 {
-	int nFile = _open( szPath, _O_TEXT | _O_CREAT | _O_TRUNC | _O_RDWR, _S_IWRITE );
+	// dimhotepus: Prevent overflow.
+	intp nSize = buffer.TellMaxPut();
+	if ( nSize > std::numeric_limits<unsigned>::max() )
+	{
+		return false;
+	}
+
+	auto nFile = _open( szPath, _O_TEXT | _O_CREAT | _O_TRUNC | _O_RDWR, _S_IWRITE );
 	if ( nFile == -1 )
 	{
 		return false;
-	} 
+	}
 
-	int nSize = buffer.TellMaxPut();
-
-	if ( _write( nFile, buffer.Base(), nSize ) < nSize )
+	if ( _write( nFile, buffer.Base(), size_cast<unsigned>( nSize ) ) < nSize )
 	{
 		_close( nFile );
 		return false;
