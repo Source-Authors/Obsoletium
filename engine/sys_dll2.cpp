@@ -564,8 +564,8 @@ public:
 					char var1[ MAX_OSPATH ];
 					char var2[ MAX_OSPATH ];
 
-					Q_strncpy( var1, Host_CleanupConVarStringValue( pCvar->GetString() ), sizeof( var1 ) );
-					Q_strncpy( var2, Host_CleanupConVarStringValue( pCvar->GetDefault() ), sizeof( var2 ) );
+					V_strcpy_safe( var1, Host_CleanupConVarStringValue( pCvar->GetString() ) );
+					V_strcpy_safe( var2, Host_CleanupConVarStringValue( pCvar->GetDefault() ) );
 
 					if ( !Q_stricmp( var1, var2 ) )
 						continue;
@@ -580,7 +580,7 @@ public:
 				if ( !(pCvar->IsFlagSet( FCVAR_NEVER_AS_STRING ) ) )
 					CommentPrintf( "%s '%s' '%s'\n", pCvar->GetName(), Host_CleanupConVarStringValue( pCvar->GetString() ), pCvar->GetDefault() );
 				else
-					CommentPrintf( "%s '%f' '%f'\n", pCvar->GetName(), pCvar->GetFloat(), Q_atof( pCvar->GetDefault() ) );
+					CommentPrintf( "%s '%f' '%f'\n", pCvar->GetName(), pCvar->GetFloat(), strtof( pCvar->GetDefault(), nullptr ) );
 			}
 
 			CommentCat( "\nConsole History (reversed)\n\n" );
