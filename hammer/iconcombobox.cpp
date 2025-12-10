@@ -67,7 +67,7 @@ int CIconComboBox::AddIcon( LPCTSTR pIconName )
 	//
 	// CB_ERR - general error
 	//
-	int result = SetItemData( ndx, ( DWORD )hIcon );
+	int result = SetItemData( ndx, ( DWORD_PTR )hIcon );
 	if( result == CB_ERR )
 		return result;
 
@@ -106,7 +106,7 @@ int CIconComboBox::InsertIcon( LPCTSTR pIconName, int ndx )
 	//
 	// CB_ERR - general error
 	//
-	result = SetItemData( ndx, ( DWORD )hIcon );
+	result = SetItemData( ndx, ( DWORD_PTR )hIcon );
 	if( result == CB_ERR )
 		return result;
 	
