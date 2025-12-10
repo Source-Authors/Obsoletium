@@ -71,7 +71,7 @@ void FreeWinding (winding_t *w)
 #ifdef PLATFORM_64BITS
 	if (*(size_t*)w == 0xdeaddeaddeaddead)
 		Error ("FreeWinding: freed a freed winding");
-	*(unsigned *)w = 0xdeaddeaddeaddead;
+	*(size_t *)w = 0xdeaddeaddeaddead;
 #else
 	if (*(size_t*)w == 0xdeaddead)
 		Error ("FreeWinding: freed a freed winding");
