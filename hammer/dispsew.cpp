@@ -459,9 +459,9 @@ void Faces_Update( void )
 	//
 	// for each face in list
 	//
-	int faceCount = pSheet->GetFaceListCount();
+	intp faceCount = pSheet->GetFaceListCount();
 
-	for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+	for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 	{
 		// get the current face
 		CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );
@@ -649,9 +649,9 @@ void SewCorner_Build( void )
 	//
 	// for each face in list
 	//
-	int faceCount = pSheet->GetFaceListCount();
+	intp faceCount = pSheet->GetFaceListCount();
 
-	for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+	for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 	{
 		// get the current face
 		CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );
@@ -676,7 +676,7 @@ void SewCorner_Build( void )
 			//
 			// compare this point to all of the other points on all the other faces in the list
 			//
-			for( int ndxFace2 = 0; ndxFace2 < faceCount; ndxFace2++ )
+			for( intp ndxFace2 = 0; ndxFace2 < faceCount; ndxFace2++ )
 			{
 				// don't compare to itself
 				if( ndxFace == ndxFace2 )
@@ -1028,9 +1028,9 @@ void SewTJunc_Build( void )
 	//
 	// for each face in list
 	//
-	int faceCount = pSheet->GetFaceListCount();
+	intp faceCount = pSheet->GetFaceListCount();
 
-	for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+	for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 	{
 		// get the current face
 		CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );
@@ -1057,7 +1057,7 @@ void SewTJunc_Build( void )
 			//
 			// compare this point to all of the other points on all the other faces in the list
 			//
-			for( int ndxFace2 = 0; ndxFace2 < faceCount; ndxFace2++ )
+			for( intp ndxFace2 = 0; ndxFace2 < faceCount; ndxFace2++ )
 			{
 				// don't compare to itself
 				if( ndxFace == ndxFace2 )
@@ -1548,9 +1548,9 @@ void SewEdge_Build( void )
 	//
 	// for each face in list
 	//
-	int faceCount = pSheet->GetFaceListCount();
+	intp faceCount = pSheet->GetFaceListCount();
 
-	for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+	for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 	{
 		// get the current face
 		CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );
@@ -1577,7 +1577,7 @@ void SewEdge_Build( void )
 			//
 			// compare this edge to all of the other edges on all the other faces in the list
 			//
-			for( int ndxFace2 = 0; ndxFace2 < faceCount; ndxFace2++ )
+			for( intp ndxFace2 = 0; ndxFace2 < faceCount; ndxFace2++ )
 			{
 				// don't compare to itself
 				if( ndxFace == ndxFace2 )
@@ -2096,8 +2096,8 @@ bool PrePlanarizeDependentVerts( void )
 	if( !pSheet )
 		return false;
 
-	int nFaceCount = pSheet->GetFaceListCount();
-	for( int iFace = 0; iFace < nFaceCount; ++iFace )
+	intp nFaceCount = pSheet->GetFaceListCount();
+	for( intp iFace = 0; iFace < nFaceCount; ++iFace )
 	{
 		CMapFace *pFace = pSheet->GetFaceListDataFace( iFace );
 		if( !pFace || !pFace->HasDisp() )

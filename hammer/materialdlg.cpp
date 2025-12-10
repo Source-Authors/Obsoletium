@@ -177,8 +177,8 @@ BOOL CFaceSmoothingDlg::OnButtonGroup( UINT uCmd )
 	CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
 	if ( pSheet )
 	{
-		int nFaceCount = pSheet->GetFaceListCount();
-		for ( int iFace = 0; iFace < nFaceCount; ++iFace )
+		intp nFaceCount = pSheet->GetFaceListCount();
+		for ( intp iFace = 0; iFace < nFaceCount; ++iFace )
 		{
 			CMapFace *pFace = pSheet->GetFaceListDataFace( iFace );
 			if ( pFace )
@@ -243,7 +243,7 @@ void CFaceSmoothingDlg::UpdateControls( void )
 		return;
 
 	// Check for a face count.
-	int nFaceCount = pSheet->GetFaceListCount();
+	intp nFaceCount = pSheet->GetFaceListCount();
 	if ( nFaceCount == 0 )
 		return;
 
@@ -254,7 +254,7 @@ void CFaceSmoothingDlg::UpdateControls( void )
 		nGroupCounts[iGroup] = 0;
 	}
 
-	for ( int iFace = 0; iFace < nFaceCount; ++iFace )
+	for ( intp iFace = 0; iFace < nFaceCount; ++iFace )
 	{
 		CMapFace *pFace = pSheet->GetFaceListDataFace( iFace );
 		if ( pFace )

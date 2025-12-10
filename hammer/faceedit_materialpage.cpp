@@ -608,7 +608,6 @@ void CFaceEditMaterialPage::CopyTCoordSystem( const CMapFace *pFrom, CMapFace *p
 //-----------------------------------------------------------------------------
 void CFaceEditMaterialPage::Apply( CMapFace *pOnlyFace, int flags )
 {
-	int			i;
 	float		fshiftX = NOT_INIT;
 	float		fshiftY = NOT_INIT;
 	float		fscaleX = NOT_INIT;
@@ -647,7 +646,7 @@ void CFaceEditMaterialPage::Apply( CMapFace *pOnlyFace, int flags )
 		// In the pOnlyFace case we do the Keep before calling ClickFace. Why?
 		CUtlVector<CMapSolid *> kept;
 		CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
-		for( i = 0; i < pSheet->GetFaceListCount(); i++ )
+		for( intp i = 0; i < pSheet->GetFaceListCount(); i++ )
 		{
 			CMapSolid *pSolid = pSheet->GetFaceListDataSolid( i );
 			if ( kept.Find( pSolid ) == -1 )
@@ -662,8 +661,8 @@ void CFaceEditMaterialPage::Apply( CMapFace *pOnlyFace, int flags )
 	// Run thru stored faces & apply.
 	//
 	CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
-	int faceCount = pSheet->GetFaceListCount();
-	for( i = 0; i < faceCount || pOnlyFace; i++ )
+	intp faceCount = pSheet->GetFaceListCount();
+	for( intp i = 0; i < faceCount || pOnlyFace; i++ )
 	{
 		CMapFace *pFace;
 		if( pOnlyFace )
@@ -833,9 +832,9 @@ void CFaceEditMaterialPage::UpdateDialogData( CMapFace *pOnlyFace )
 	nWorldAlignCount = 0;
 
 	CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
-	int faceCount = pSheet->GetFaceListCount();
+	intp faceCount = pSheet->GetFaceListCount();
 
-	for( int i = 0; i < faceCount || pOnlyFace; i++ )
+	for( intp i = 0; i < faceCount || pOnlyFace; i++ )
 	{
 		CMapFace *pFace;
 
@@ -1070,9 +1069,9 @@ BOOL CFaceEditMaterialPage::OnAlign( UINT uCmd )
 	GetHistory()->MarkUndoPosition(NULL, "Align texture");
 
 	CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
-	int faceCount = pSheet->GetFaceListCount();
+	intp faceCount = pSheet->GetFaceListCount();
 
-	for( int i = 0; i < faceCount; i++ )
+	for( intp i = 0; i < faceCount; i++ )
 	{
 		CMapFace *pFace = pSheet->GetFaceListDataFace( i );
 
@@ -1126,9 +1125,9 @@ void CFaceEditMaterialPage::GetAllFaceExtents( Extents_t Extents )
 	Extents_t	FaceExtents;
 
 	CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
-	int faceCount = pSheet->GetFaceListCount();	
+	intp faceCount = pSheet->GetFaceListCount();	
 
-	for( int nFace = 0; nFace < faceCount; nFace++ )
+	for( intp nFace = 0; nFace < faceCount; nFace++ )
 	{
 		CMapFace *pFace = pSheet->GetFaceListDataFace( nFace );
 		pFace->GetFaceExtents(FaceExtents);
@@ -1185,7 +1184,7 @@ BOOL CFaceEditMaterialPage::OnJustify( UINT uCmd )
 	GetHistory()->MarkUndoPosition( NULL, "Justify texture" );
 
 	CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
-	int faceCount = pSheet->GetFaceListCount();	
+	intp faceCount = pSheet->GetFaceListCount();	
 
 	// If multiple faces are selected, use the m_bTreatManyAsOneFace variable to determine
 	// how to perform the justification.
@@ -1203,7 +1202,7 @@ BOOL CFaceEditMaterialPage::OnJustify( UINT uCmd )
 		bTreatManyAsOneFace = FALSE;
 	}
 
-	for( int i = 0; i < faceCount; i++ )
+	for( intp i = 0; i < faceCount; i++ )
 	{
 		CMapFace *pFace = pSheet->GetFaceListDataFace( i );
 

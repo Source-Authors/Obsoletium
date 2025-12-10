@@ -56,15 +56,15 @@ class CEditGameClass
 		virtual void SetKeyValue(LPCTSTR pszKey, LPCTSTR pszValue) { m_KeyValues.SetValue(pszKey, pszValue); }
 		virtual void DeleteKeyValue(LPCTSTR pszKey) { m_KeyValues.RemoveKey(pszKey); }
 
-		inline void RemoveKey(int nIndex) { m_KeyValues.RemoveKeyAt(nIndex); }
+		inline void RemoveKey(unsigned short nIndex) { m_KeyValues.RemoveKeyAt(nIndex); }
 		inline void SetKeyValue(LPCTSTR pszKey, int iValue) { m_KeyValues.SetValue(pszKey, iValue); }
-		inline LPCTSTR GetKey(int nIndex) { return(m_KeyValues.GetKey(nIndex)); }
-		inline LPCTSTR GetKeyValue(int nIndex) const { return(m_KeyValues.GetValue(nIndex)); }
+		inline LPCTSTR GetKey(unsigned short nIndex) { return(m_KeyValues.GetKey(nIndex)); }
+		inline LPCTSTR GetKeyValue(unsigned short nIndex) const { return(m_KeyValues.GetValue(nIndex)); }
 		inline LPCTSTR GetKeyValue(LPCTSTR pszKey, intp *piIndex = NULL) const { return(m_KeyValues.GetValue(pszKey, piIndex)); }
 		
 		// Iterate the list of keyvalues.
 		inline int GetFirstKeyValue() const			{ return m_KeyValues.GetFirst(); }
-		inline int GetNextKeyValue( int i ) const	{ return m_KeyValues.GetNext( i ); }
+		inline int GetNextKeyValue( unsigned short i ) const	{ return m_KeyValues.GetNext( i ); }
 		static inline int GetInvalidKeyValue()		{ return WCKeyValues::GetInvalidIndex(); }
 
 		//

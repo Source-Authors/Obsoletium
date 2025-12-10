@@ -1082,8 +1082,8 @@ intp CToolDisplace::GetSelectedDisps( void )
 	if( !pSheet )
 		return 0;
 
-	int faceCount = pSheet->GetFaceListCount();
-	for( int i = 0; i < faceCount; i++ )
+	intp faceCount = pSheet->GetFaceListCount();
+	for( intp i = 0; i < faceCount; i++ )
 	{
 		CMapFace *pFace = pSheet->GetFaceListDataFace( i );
 		if( !pFace )

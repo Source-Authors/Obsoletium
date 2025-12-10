@@ -244,7 +244,7 @@ void CFaceEditDispPage::FillEditControls( bool bAllDisps )
 		CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
 		if( pSheet )
 		{
-			int faceCount = pSheet->GetFaceListCount();
+			intp faceCount = pSheet->GetFaceListCount();
 			if( faceCount > 0 )
 			{
 				CMapFace *pFace = pSheet->GetFaceListDataFace( 0 );
@@ -259,7 +259,7 @@ void CFaceEditDispPage::FillEditControls( bool bAllDisps )
 			//
 			// test all faces for "equal" attributes
 			//
-			for( int faceIndex = 0; faceIndex < faceCount; faceIndex++ )
+			for( intp faceIndex = 0; faceIndex < faceCount; faceIndex++ )
 			{
 				CMapFace *pFace = pSheet->GetFaceListDataFace( faceIndex );
 				EditDispHandle_t handle = pFace->GetDisp();
@@ -365,14 +365,14 @@ void CFaceEditDispPage::UpdateDialogData( void )
 	CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
 	if( pSheet )
 	{
-		int faceCount = pSheet->GetFaceListCount();
+		intp faceCount = pSheet->GetFaceListCount();
 		if( faceCount > 0 )
 		{
 			bHasFace = true;
 			bAllDisps = true;
 		}
 
-		for( int i = 0; i < faceCount; i++ )
+		for( intp i = 0; i < faceCount; i++ )
 		{
 			CMapFace *pFace = pSheet->GetFaceListDataFace( i );
 			if( !pFace->HasDisp() )
@@ -430,7 +430,7 @@ void CFaceEditDispPage::OnCheckNoPhysicsCollide( void )
 	if( pSheet )
 	{
 		// Check for a face list.
-		int nFaceCount = pSheet->GetFaceListCount();
+		intp nFaceCount = pSheet->GetFaceListCount();
 		if( nFaceCount == 0 )
 			return;
 
@@ -443,7 +443,7 @@ void CFaceEditDispPage::OnCheckNoPhysicsCollide( void )
 		}
 
 		// Get faces with displacements and toggle the collide flag.
-		int iFace = 0;
+		intp iFace = 0;
 		for( iFace = 0; iFace < nFaceCount; iFace++ )
 		{
 			CMapFace *pFace = pSheet->GetFaceListDataFace( iFace );
@@ -480,7 +480,7 @@ void CFaceEditDispPage::OnCheckNoHullCollide( void )
 	if( pSheet )
 	{
 		// Check for a face list.
-		int nFaceCount = pSheet->GetFaceListCount();
+		intp nFaceCount = pSheet->GetFaceListCount();
 		if( nFaceCount == 0 )
 			return;
 
@@ -493,7 +493,7 @@ void CFaceEditDispPage::OnCheckNoHullCollide( void )
 		}
 
 		// Get faces with displacements and toggle the collide flag.
-		int iFace = 0;
+		intp iFace = 0;
 		for( iFace = 0; iFace < nFaceCount; iFace++ )
 		{
 			CMapFace *pFace = pSheet->GetFaceListDataFace( iFace );
@@ -530,7 +530,7 @@ void CFaceEditDispPage::OnCheckNoRayCollide( void )
 	if( pSheet )
 	{
 		// Check for a face list.
-		int nFaceCount = pSheet->GetFaceListCount();
+		intp nFaceCount = pSheet->GetFaceListCount();
 		if( nFaceCount == 0 )
 			return;
 
@@ -543,7 +543,7 @@ void CFaceEditDispPage::OnCheckNoRayCollide( void )
 		}
 
 		// Get faces with displacements and toggle the collide flag.
-		int iFace = 0;
+		intp iFace = 0;
 		for( iFace = 0; iFace < nFaceCount; iFace++ )
 		{
 			CMapFace *pFace = pSheet->GetFaceListDataFace( iFace );
@@ -662,7 +662,7 @@ void CFaceEditDispPage::OnButtonCreate( void )
 	if( pSheet )
 	{
 		// check for faces to create
-		int faceCount = pSheet->GetFaceListCount();
+		intp faceCount = pSheet->GetFaceListCount();
 		if( faceCount == 0 )
 			return;
 	
@@ -690,7 +690,7 @@ void CFaceEditDispPage::OnButtonCreate( void )
 		//
 		// create faces
 		//
-		for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+		for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 		{
 			CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );
 			if( !pFace )
@@ -757,7 +757,7 @@ void CFaceEditDispPage::OnButtonDestroy( void )
 	if( pSheet )
 	{
 		// check for faces to destroy
-		int faceCount = pSheet->GetFaceListCount();
+		intp faceCount = pSheet->GetFaceListCount();
 		if( faceCount == 0 )
 			return;
 
@@ -769,7 +769,7 @@ void CFaceEditDispPage::OnButtonDestroy( void )
 		// mark history position
 		pDispMgr->PreUndo( "Displacement Destroy" );
 
-		for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+		for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 		{
 			// get the current displacement
 			// get current displacement
@@ -822,7 +822,7 @@ void CFaceEditDispPage::OnButtonNoise( void )
 	if( pSheet )
 	{
 		// check for faces to add noise to
-		int faceCount = pSheet->GetFaceListCount();
+		intp faceCount = pSheet->GetFaceListCount();
 		if( faceCount == 0 )
 			return;
 
@@ -845,7 +845,7 @@ void CFaceEditDispPage::OnButtonNoise( void )
 
 		pDispMgr->PreUndo( "Displacement Noise" );
 
-		for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+		for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 		{
 			// get current displacement
 			CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );
@@ -895,11 +895,11 @@ void CFaceEditDispPage::OnButtonSubdivide( void )
 	if( pSheet )
 	{
 		// check for faces to subdivide
-		int faceCount = pSheet->GetFaceListCount();
+		intp faceCount = pSheet->GetFaceListCount();
 		if( faceCount == 0 )
 			return;
 
-		for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+		for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 		{
 			// get current displacement
 			CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );
@@ -942,7 +942,7 @@ void CFaceEditDispPage::OnButtonSew( void )
 	if( pSheet )
 	{
 		// check for faces to sew
-		int faceCount = pSheet->GetFaceListCount();
+		intp faceCount = pSheet->GetFaceListCount();
 		if( faceCount == 0 )
 			return;
 
@@ -954,7 +954,7 @@ void CFaceEditDispPage::OnButtonSew( void )
 		// mark history position
 		pDispMgr->PreUndo( "Displacement Sewing" );
 
-		for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+		for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 		{
 			// get the current displacement
 			// get current displacement
@@ -977,7 +977,7 @@ void CFaceEditDispPage::OnButtonSew( void )
 		FaceListSewEdges();
 
 		// update the parents - force a rebuild
-		for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+		for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 		{
 			// get current displacement
 			CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );
@@ -1195,8 +1195,8 @@ void CFaceEditDispPage::OnButtonInvertAlpha( void )
 	CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
 	if( pSheet )
 	{
-		int nFaceCount = pSheet->GetFaceListCount();
-		for( int iFace = 0; iFace < nFaceCount; ++iFace )
+		intp nFaceCount = pSheet->GetFaceListCount();
+		for( intp iFace = 0; iFace < nFaceCount; ++iFace )
 		{
 			CMapFace *pFace = pSheet->GetFaceListDataFace( iFace );
 			if( pFace )
@@ -1230,11 +1230,11 @@ void CFaceEditDispPage::OnSelectAdjacent()
 		return;
 
 	// check for faces
-	int faceCount = pSheet->GetFaceListCount();
+	intp faceCount = pSheet->GetFaceListCount();
 	if( faceCount == 0 )
 		return;
 
-	for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+	for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 	{
 		// get current displacement
 		CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );
@@ -1414,8 +1414,8 @@ void CFaceEditDispPage::OnButtonApply( void )
 	CFaceEditSheet *pSheet = ( CFaceEditSheet* )GetParent();
 	if( pSheet )
 	{
-		int faceCount = pSheet->GetFaceListCount();
-		for( int ndxFace = 0; ndxFace < faceCount; ndxFace++ )
+		intp faceCount = pSheet->GetFaceListCount();
+		for( intp ndxFace = 0; ndxFace < faceCount; ndxFace++ )
 		{
 			// get current face
 			CMapFace *pFace = pSheet->GetFaceListDataFace( ndxFace );

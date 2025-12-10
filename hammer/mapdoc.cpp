@@ -3676,7 +3676,7 @@ void CMapDoc::UpdateStatusbar(void)
 	if (m_pToolManager->GetActiveToolID() == TOOL_FACEEDIT_MATERIAL)
 	{
 		CString str;
-		str.Format("%d faces selected", GetMainWnd()->m_pFaceEditSheet->GetFaceListCount() );
+		str.Format("%zd faces selected", GetMainWnd()->m_pFaceEditSheet->GetFaceListCount() );
 		SetStatusText(SBI_SELECTION, str);
 		SetStatusText(SBI_SIZE, "");
 		return;

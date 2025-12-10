@@ -94,9 +94,9 @@ public:
 	void EnableUpdate( bool bEnable );
 	inline bool HasUpdateEnabled( void );
 	
-	inline int GetFaceListCount( void );
-	inline CMapFace *GetFaceListDataFace( int index );
-	inline CMapSolid *GetFaceListDataSolid( int index );
+	inline intp GetFaceListCount( void );
+	inline CMapFace *GetFaceListDataFace( intp index );
+	inline CMapSolid *GetFaceListDataSolid( intp index );
 
 	// Called when a new material is detected.
 	void NotifyNewMaterial( IEditorTexture *pTex );
@@ -174,7 +174,7 @@ inline int CFaceEditSheet::GetClickMode( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-inline int CFaceEditSheet::GetFaceListCount( void )
+inline intp CFaceEditSheet::GetFaceListCount( void )
 {
 	return m_Faces.Count();
 }
@@ -182,7 +182,7 @@ inline int CFaceEditSheet::GetFaceListCount( void )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-inline CMapFace *CFaceEditSheet::GetFaceListDataFace( int index )
+inline CMapFace *CFaceEditSheet::GetFaceListDataFace( intp index )
 {
 	return m_Faces[index].pMapFace;
 }
@@ -190,7 +190,7 @@ inline CMapFace *CFaceEditSheet::GetFaceListDataFace( int index )
 
 //-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
-inline CMapSolid *CFaceEditSheet::GetFaceListDataSolid( int index )
+inline CMapSolid *CFaceEditSheet::GetFaceListDataSolid( intp index )
 {
 	return m_Faces[index].pMapSolid;
 }

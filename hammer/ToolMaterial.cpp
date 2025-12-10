@@ -196,7 +196,7 @@ bool CToolMaterial::OnMouseMove3D(CMapView3D *pView, UINT nFlags, const Vector2D
 void CToolMaterial::UpdateStatusBar()
 {
 	CString str;
-	str.Format("%d faces selected", GetMainWnd()->m_pFaceEditSheet->GetFaceListCount() );
+	str.Format("%zd faces selected", GetMainWnd()->m_pFaceEditSheet->GetFaceListCount() );
 	SetStatusText(SBI_SELECTION, str);
 	SetStatusText(SBI_SIZE, "");
 }
@@ -229,7 +229,7 @@ bool CToolMaterial::OnKeyDown3D( CMapView3D *pView, UINT nChar, UINT nRepCnt, UI
 		if( pSheet )
 		{
 			// Check for a face list.
-			int nFaceCount = pSheet->GetFaceListCount();
+			intp nFaceCount = pSheet->GetFaceListCount();
 			if( nFaceCount == 0 )
 			{
 				return false;
@@ -243,7 +243,7 @@ bool CToolMaterial::OnKeyDown3D( CMapView3D *pView, UINT nChar, UINT nRepCnt, UI
 				nGridSize = 1;
 			}
 
-			for( int ndxface = 0; ndxface < nFaceCount; ndxface++ )
+			for( intp ndxface = 0; ndxface < nFaceCount; ndxface++ )
 			{
 				CMapFace *pFace;
 				pFace = pSheet->GetFaceListDataFace( ndxface );
