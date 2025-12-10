@@ -159,8 +159,8 @@ inline void TesselateDisplacement_R(
 	TesselateDisplacementNode( pHelper, nodeIndex, iLevel, bActiveChildren );
 
 	// Now that we've tesselated, figure out how many indices we've added at this node
-	nodeInfo.m_Count = pHelper->m_nIndices - oldIndexCount;
-	nodeInfo.m_FirstTesselationIndex = oldIndexCount;
+	nodeInfo.m_Count = size_cast<decltype(nodeInfo.m_Count)>( pHelper->m_nIndices - oldIndexCount );
+	nodeInfo.m_FirstTesselationIndex = size_cast<decltype(nodeInfo.m_FirstTesselationIndex)>( oldIndexCount );
 	Assert( nodeInfo.m_Count % 3 == 0 );
 }
 
