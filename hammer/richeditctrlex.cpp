@@ -97,14 +97,16 @@ CRTFBuilder &doAddColor(CRTFBuilder &r, int n)
 }
 
 
-CRTFBuilder &doFont(CRTFBuilder &r, CString &s)
+// dimhotepus: Make CString const &
+CRTFBuilder &doFont(CRTFBuilder &r, const CString &s)
 {
 	r.font(s);
 	return r;
 }
 
 
-CRTFBuilder &doAddFont(CRTFBuilder &r, CString &s)
+// dimhotepus: Make CString const &
+CRTFBuilder &doAddFont(CRTFBuilder &r, const CString &s)
 {
 	r.addFont(s);
 	return r;
@@ -182,7 +184,8 @@ CRTFBuilder &operator<<(CRTFBuilder &b, RTFSM_PFUNC f)
 }
 
 
-CRTFBuilder &operator<<(CRTFBuilder &b, CManip &f)
+// dimhotepus: Make CString const &
+CRTFBuilder &operator<<(CRTFBuilder &b, const CManip &f)
 {
 	return f.go(b);
 }

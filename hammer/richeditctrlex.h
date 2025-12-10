@@ -38,7 +38,8 @@ class CIntManip;
 
 
 typedef CRTFBuilder &(*RTFSM_PFUNC)	(CRTFBuilder &);
-typedef CRTFBuilder &(*RTFSM_STRINGPFUNC) (CRTFBuilder &, CString &); 
+// dimhotepus: Make CString const &
+typedef CRTFBuilder &(*RTFSM_STRINGPFUNC) (CRTFBuilder &, const CString &); 
 typedef CRTFBuilder &(*RTFSM_INTPFUNC) (CRTFBuilder &, int);
 typedef CRTFBuilder &(*RTFSM_BOOLPFUNC)	(CRTFBuilder &, bool);
 typedef CRTFBuilder &(*RTFSM_CONTROLPFUNC) (CRTFBuilder &, CRichEditCtrl &);
@@ -203,8 +204,8 @@ class RICHED_DECL CManip
 		bool m_bVal;
 
 	public:
-
-		virtual CRTFBuilder &go(CRTFBuilder &) = 0;
+		// dimhotepus: Make const
+		virtual CRTFBuilder &go(CRTFBuilder &) const = 0;
 
 		CManip()
 		{ 
@@ -246,9 +247,9 @@ public:
 
 	CStringManip(RTFSM_STRINGPFUNC p, CString s = "") : CManip ((LPVOID)p, s) {};
 
-	CRTFBuilder &go(CRTFBuilder &b)
+	CRTFBuilder &go(CRTFBuilder &b) const override
 	{
-		return((RTFSM_STRINGPFUNC)m_pFunc) (b, m_strVal);
+		return ((RTFSM_STRINGPFUNC)m_pFunc)( b, m_strVal );
 	}
 };
 
@@ -263,9 +264,9 @@ class RICHED_DECL CControlManip : public CManip
 
 		CControlManip(RTFSM_CONTROLPFUNC p, CRichEditCtrl& c) : m_control(c), CManip((LPVOID)p, (CString)"") {};
 
-		CRTFBuilder &go(CRTFBuilder &b)
+		CRTFBuilder &go(CRTFBuilder &b) const override
 		{
-			return((RTFSM_CONTROLPFUNC)m_pFunc)(b, m_control);
+			return((RTFSM_CONTROLPFUNC)m_pFunc)( b, m_control );
 		}
 };
 
@@ -276,9 +277,9 @@ class RICHED_DECL CIntManip : public CManip
 
 		CIntManip(RTFSM_INTPFUNC p,	int n = 0) : CManip ((LPVOID)p, n) {};
 
-		CRTFBuilder &go(CRTFBuilder &b)
+		CRTFBuilder &go(CRTFBuilder &b) const override
 		{
-			return((RTFSM_INTPFUNC)m_pFunc)(b, m_nVal);
+			return((RTFSM_INTPFUNC)m_pFunc)( b, m_nVal );
 		}
 };
 
@@ -289,9 +290,9 @@ class RICHED_DECL CBoolManip : public CManip
 
 		CBoolManip(RTFSM_BOOLPFUNC p, bool b) : CManip((LPVOID)p, b) {};
 
-		CRTFBuilder &go(CRTFBuilder &b)
+		CRTFBuilder &go(CRTFBuilder &b) const override
 		{
-			return ((RTFSM_BOOLPFUNC	) m_pFunc)(	b, 	m_bVal);
+			return ((RTFSM_BOOLPFUNC) m_pFunc)(	b, m_bVal );
 		}
 };
 
@@ -391,7 +392,8 @@ RICHED_DECL CBoolManip		italic		(bool) noexcept;
 RICHED_DECL CBoolManip		underline	(bool) noexcept;
 
 RICHED_DECL CRTFBuilder & operator<<(CRTFBuilder &, RTFSM_PFUNC);
-RICHED_DECL CRTFBuilder & operator<<(CRTFBuilder &, CManip & m);
+// dimhotepus: Make CManip const &
+RICHED_DECL CRTFBuilder & operator<<(CRTFBuilder &, const CManip & m);
 
 
 class RICHED_DECL CRichEditCtrlEx : public CRichEditCtrl
