@@ -64,7 +64,7 @@ void CMapOverlayTransition::CalcBounds( BOOL bFullUpdate )
 {
 	CMapClass::CalcBounds( bFullUpdate );
 
-	Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( ( int )GetParent() );
+	Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( ( intp )GetParent() );
 	if ( pShoreline )
 	{
 		Vector vecMins( 99999.0f, 99999.0f, 99999.0f );
@@ -214,7 +214,7 @@ void CMapOverlayTransition::OnAddToWorld( CMapWorld *pWorld )
 //-----------------------------------------------------------------------------
 void CMapOverlayTransition::OnRemoveFromWorld( CMapWorld *pWorld, bool bNotifyChildren )
 {
-	GetShoreManager()->RemoveShoreline( ( int )GetParent() );
+	GetShoreManager()->RemoveShoreline( ( intp )GetParent() );
 }
 
 //-----------------------------------------------------------------------------
@@ -319,7 +319,7 @@ bool CMapOverlayTransition::OnApply( void )
 		{
 			if ( BuildFaceCaches() )
 			{
-				m_nShorelineId = ( int )GetParent();
+				m_nShorelineId = ( intp )GetParent();
 
 				GetShoreManager()->AddShoreline( m_nShorelineId );
 				Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( m_nShorelineId );
@@ -365,7 +365,7 @@ ChunkFileResult_t CMapOverlayTransition::SaveVMF( CChunkFile *pFile, CSaveInfo *
 {
 	ChunkFileResult_t eResult = pFile->BeginChunk("overlaytransition");
 
-	m_nShorelineId = ( int )GetParent();
+	m_nShorelineId = ( intp )GetParent();
 	Shoreline_t *pShoreline = GetShoreManager()->GetShoreline( m_nShorelineId );
 	if ( pShoreline )
 	{
