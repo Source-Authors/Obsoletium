@@ -972,7 +972,7 @@ ChunkFileResult_t CChunkFile::WriteLine(const char *pszLine)
 		//
 		if (m_nCurrentDepth > 0)
 		{
-			int nWritten = fwrite(m_szIndent, 1, m_nCurrentDepth, m_hFile);
+			intp nWritten = fwrite(m_szIndent, 1, m_nCurrentDepth, m_hFile);
 			if (nWritten != m_nCurrentDepth)
 			{
 				return(ChunkFile_Fail);

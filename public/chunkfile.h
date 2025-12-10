@@ -190,7 +190,7 @@ class CChunkFile
 		FILE *m_hFile;
 		char m_szErrorToken[80];
 		char m_szIndent[MAX_INDENT_DEPTH];
-		int m_nCurrentDepth;
+		intp m_nCurrentDepth;
 
 		// See SetDefaultChunkHandler..
 		DefaultChunkHandler_t	m_DefaultChunkHandler;
