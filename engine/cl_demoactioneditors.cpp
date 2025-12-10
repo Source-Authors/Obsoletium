@@ -135,7 +135,8 @@ bool CBaseActionEditDialog::OnSaveChanges( void )
 		break;
 	case ACTION_USES_TIME:
 		{
-			float t = (float)atof( starttext );
+			// dimhotepus: atof -> V_atof.
+			float t = V_atof( starttext );
 			if ( t != m_pAction->GetStartTime() )
 			{
 				m_pAction->SetStartTime( t );
@@ -313,8 +314,9 @@ bool CBaseActionSkipAheadDialog::OnSaveChanges( void )
 	char skipto[ 512 ];
 	m_pSkip->GetText( skipto );
 
-	float fskip = (float)atof( skipto );
-	int	 iskip = (int)atoi( skipto );
+	// dimhotepus: atof -> V_atof.
+	float fskip = V_atof( skipto );
+	int	 iskip = atoi( skipto );
 
 	if ( !Q_strcasecmp( skiptype, "TimeUseTick" ) )
 	{
@@ -470,16 +472,20 @@ bool CBaseActionScreenFadeStartDialog::OnSaveChanges( void )
 
 	char sz[ 512 ];
 	m_pDuration->GetText( sz );
-	if ( (float)atof( sz ) != duration )
+	// dimhotepus: atof -> V_atof.
+	const float dur = V_atof( sz );
+	if ( dur != duration )
 	{
 		bret = true;
-		f->duration = (unsigned short)((float)(1<<SCREENFADE_FRACBITS) * (float)atof( sz ) );
+		f->duration = (unsigned short)((float)(1<<SCREENFADE_FRACBITS) * dur );
 	}
 	m_pHoldTime->GetText( sz );
-	if ( (float)atof( sz ) != holdTime )
+	// dimhotepus: atof -> V_atof.
+	const float holdTm = V_atof( sz );
+	if ( holdTm != holdTime )
 	{
 		bret = true;
-		f->holdTime = (unsigned short)((float)(1<<SCREENFADE_FRACBITS) * (float)atof( sz ) );
+		f->holdTime = (unsigned short)((float)(1<<SCREENFADE_FRACBITS) * holdTm );
 	}
 
 	int rr, gg, bb, aa;
@@ -738,8 +744,8 @@ bool CBaseActionTextMessageStartDialog::SaveDifferingFloat( vgui::TextEntry *con
 
 	char sz[ 512 ];
 	control->GetText( sz );
-
-	float fcontrol = (float)atof( sz );
+	// dimhotepus: atof -> V_atof.
+	float fcontrol = V_atof( sz );
 	if ( fcontrol != *curval )
 	{
 		*curval = fcontrol;
@@ -1158,8 +1164,9 @@ bool CBaseActionWithStopTimeDialog::OnSaveChanges( void )
 	char stop[ 512 ];
 	m_pStop->GetText( stop );
 
-	float fstop = (float)atof( stop );
-	int	 istop = (int)atoi( stop );
+	// dimhotepus: atof -> V_atof.
+	float fstop = V_atof( stop );
+	int	 istop = atoi( stop );
 
 	if ( !Q_strcasecmp( stoptype, "TimeUseTick" ) )
 	{
@@ -1236,7 +1243,8 @@ bool CBaseActionChangePlaybackRateDialog::OnSaveChanges( void )
 	char rate[ 512 ];
 	m_pRate->GetText( rate );
 
-	float frate = (float)atof( rate );
+	// dimhotepus: atof -> V_atof.
+	float frate = V_atof( rate );
 
 	if ( GetAction()->GetPlaybackRate() != frate )
 	{
@@ -1302,7 +1310,8 @@ bool CBaseActionPauseDialog::OnSaveChanges( void )
 	char pausetime[ 512 ];
 	m_pPauseTime->GetText( pausetime );
 
-	float ftime = (float)atof( pausetime );
+	// dimhotepus: atof -> V_atof.
+	float ftime = V_atof( pausetime );
 
 	if ( GetAction()->GetPauseTime() != ftime )
 	{
@@ -1407,7 +1416,8 @@ bool CBaseActionZoomDialog::OnSaveChanges( void )
 
 	char sz[ 512 ];
 	m_pFinalFOV->GetText( sz );
-	float f = (float)atof( sz );
+	// dimhotepus: atof -> V_atof.
+	float f = V_atof( sz );
 
 	if ( GetAction()->m_flFinalFOV != f )
 	{
@@ -1416,7 +1426,8 @@ bool CBaseActionZoomDialog::OnSaveChanges( void )
 	}
 
 	m_pOutRate->GetText( sz );
-	f = (float)atof( sz );
+	// dimhotepus: atof -> V_atof.
+	f = V_atof( sz );
 
 	if ( GetAction()->m_flFOVRateOut != f )
 	{
@@ -1425,7 +1436,8 @@ bool CBaseActionZoomDialog::OnSaveChanges( void )
 	}
 
 	m_pInRate->GetText( sz );
-	f = (float)atof( sz );
+	// dimhotepus: atof -> V_atof.
+	f = V_atof( sz );
 
 	if ( GetAction()->m_flFOVRateIn != f )
 	{
@@ -1434,7 +1446,8 @@ bool CBaseActionZoomDialog::OnSaveChanges( void )
 	}
 
 	m_pHoldTime->GetText( sz );
-	f = (float)atof( sz );
+	// dimhotepus: atof -> V_atof.
+	f = V_atof( sz );
 
 	if ( GetAction()->m_flHoldTime != f )
 	{

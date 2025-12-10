@@ -572,7 +572,8 @@ public:
 				}
 				else
 				{
-					if ( pCvar->GetFloat() == Q_atof( pCvar->GetDefault() ) )
+					// dimhotepus: atof -> V_atof.
+					if ( pCvar->GetFloat() == V_atof( pCvar->GetDefault() ) )
 						continue;
 				}
 
