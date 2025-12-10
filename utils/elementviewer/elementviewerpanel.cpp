@@ -148,23 +148,23 @@ void RemoveFileId( DmFileId_t fileid )
 
 void ReportElementStats()
 {
-	int nCurrentElements = g_pDataModel->GetAllocatedElementCount();
-	int nTotalElements = g_pDataModel->GetElementsAllocatedSoFar();
-	int nMaxElements = g_pDataModel->GetMaxNumberOfElements();
+	intp nCurrentElements = g_pDataModel->GetAllocatedElementCount();
+	intp nTotalElements = g_pDataModel->GetElementsAllocatedSoFar();
+	intp nMaxElements = g_pDataModel->GetMaxNumberOfElements();
 //	int nCurrentAttributes = g_pDataModel->GetAllocatedAttributeCount();
-	Msg( "element count: current = %d max = %d total = %d\n", nCurrentElements, nMaxElements, nTotalElements );
+	Msg( "element count: current = %zd max = %zd total = %zd\n", nCurrentElements, nMaxElements, nTotalElements );
 
-	int nElementsInFiles = 0;
+	intp nElementsInFiles = 0;
 	int nFiles = g_pDataModel->NumFileIds();
 	for ( int fi = 0; fi < nFiles; ++fi )
 	{
 		DmFileId_t fileid = g_pDataModel->GetFileId( fi );
-		int nElements = g_pDataModel->NumElementsInFile( fileid );
+		intp nElements = g_pDataModel->NumElementsInFile( fileid );
 		nElementsInFiles += nElements;
 		const char *pFileName = g_pDataModel->GetFileName( fileid );
-		Msg( "elements in file \"%s\" = %d\n", pFileName, nElements );
+		Msg( "elements in file \"%s\" = %zd\n", pFileName, nElements );
 	}
-	Msg( "elements not in any file = %d\n", nCurrentElements - nElementsInFiles );
+	Msg( "elements not in any file = %zd\n", nCurrentElements - nElementsInFiles );
 }
 
 CElementViewerPanel::~CElementViewerPanel()
