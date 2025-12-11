@@ -639,7 +639,8 @@ void VTexConfigInfo_t::ParseOptionKey( const char *pKeyName,  const char *pKeyVa
 					if ( ( *szParse == 'e' || *szParse == 'E' ) && ( szParse[1] == '.' ) )
 					{
 						m_vtfProcOptions.flags0 |= VtfProcessingOptions::OPT_DECAY_EXP_R << ch;
-						m_vtfProcOptions.fDecayExponentBase[ch] = ( float ) atof( szParse + 1 );
+						// dimhotepus: atof -> V_atof
+						m_vtfProcOptions.fDecayExponentBase[ch] = V_atof( szParse + 1 );
 					}
 				}
 				else
