@@ -520,13 +520,10 @@ static void AddStaticPropToLump( StaticPropBuild_t const& build )
 	propLump.m_nLightmapResolutionY = build.m_LightmapResolutionY;
 
 	// Add the leaves to the leaf lump
-	for (int j = 0; j < leafList.Count(); ++j)
+	for ( auto leaf : leafList )
 	{
-		StaticPropLeafLump_t insert;
-		insert.m_Leaf = leafList[j];
-		s_StaticPropLeafLump.AddToTail( insert );
+		s_StaticPropLeafLump.AddToTail( { leaf } );
 	}
-
 }
 
 
