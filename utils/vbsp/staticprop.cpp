@@ -256,8 +256,7 @@ static CPhysCollide* GetCollisionModel( char const* pModelName )
 	}
 
 	// Find it in the cache
-	ModelCollisionLookup_t lookup;
-	lookup.m_Name = pTemp;
+	ModelCollisionLookup_t lookup{ pTemp, nullptr };
 	unsigned short i = s_ModelCollisionCache.Find( lookup );
 	if (i != s_ModelCollisionCache.InvalidIndex())
 		return s_ModelCollisionCache[i].m_pCollide;
