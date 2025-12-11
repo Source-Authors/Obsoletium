@@ -428,10 +428,12 @@ void StripOffMaterialDirectory( const char *pszDirectoryName, OUT_Z_ARRAY char (
 {
 	// clear name
 	if (nameSize)
-	pszName[0] = '\0';
+		pszName[0] = '\0';
+
+	V_strdup_stack( pszDirectoryName, pLowerCase );
+	V_strlower( pLowerCase );
 
 	// create a lower case version of the string
-	char *pLowerCase = _strlwr( _strdup( pszDirectoryName ) );
 	char *pAtMat = strstr( pLowerCase, "materials" );
 	if( !pAtMat )
 		return;
@@ -441,9 +443,6 @@ void StripOffMaterialDirectory( const char *pszDirectoryName, OUT_Z_ARRAY char (
 
 	// copy the rest to the name string
 	V_strcpy_safe( pszName, pAtMat );
-
-	// free duplicated string's memory
-	free( pLowerCase );
 }
 
 
