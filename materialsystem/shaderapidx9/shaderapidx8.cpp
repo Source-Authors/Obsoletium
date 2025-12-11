@@ -11190,7 +11190,7 @@ void CShaderAPIDx8::WriteHitRecord( )
 		// [ ALSO: As of Nov 2011, VS2010 exhibits a debug build code-gen bug if we cast the result to int32 instead of uint32 ]
 	    *m_pCurrSelectionRecord++ = (uint32)( 0.5 + m_SelectionMinZ*(double)((uint32)~0) );
 	    *m_pCurrSelectionRecord++ = (uint32)( 0.5 + m_SelectionMaxZ*(double)((uint32)~0) );
-		for (int i = 0; i < m_SelectionNames.Count(); ++i)
+		for (intp i = 0; i < m_SelectionNames.Count(); ++i)
 		{
 			*m_pCurrSelectionRecord++ = m_SelectionNames[i];
 		}
