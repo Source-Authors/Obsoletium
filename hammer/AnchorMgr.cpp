@@ -79,7 +79,7 @@ void CAnchorDef::Init( HWND hWnd, int dlgItemID, EAnchorHorz eLeftSide, EAnchorV
 	m_AnchorBottom = eBottomSide;
 }
 
-void CAnchorMgr::Init( HWND hParentWnd, CAnchorDef *pAnchors, int nAnchors )
+void CAnchorMgr::Init( HWND hParentWnd, CAnchorDef *pAnchors, intp nAnchors )
 {
 	m_Anchors.CopyArray( pAnchors, nAnchors );
 	

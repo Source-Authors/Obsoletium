@@ -80,7 +80,7 @@ public:
 	{
 		memset(m_OriginalParentSize, 0xFF, sizeof(m_OriginalParentSize));
 	}
-	void Init( HWND hParentWnd, CAnchorDef *pAnchors, int nAnchors );
+	void Init( HWND hParentWnd, CAnchorDef *pAnchors, intp nAnchors );
 
 	// Call this when the parent window's size changes and it'll resize all the subcontrols.
 	void OnSize();
