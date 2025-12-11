@@ -214,7 +214,15 @@ void CRender3D::BeginRenderHitTarget(CMapAtom *pObject, unsigned int uHandle)
 	}
 
 	CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
-	pRenderContext->PushSelectionName((unsigned int)pObject);
+#ifdef PLATFORM_64BITS
+	const uintp ptr = (uintp)pObject;
+	const int low = (int)(ptr & 0xFFFFFFFF);
+	const int hi = (int)((ptr >> 32) & 0xFFFFFFFF);
+	pRenderContext->PushSelectionName(low);
+	pRenderContext->PushSelectionName(hi);
+#else
+	pRenderContext->PushSelectionName((intp)pObject);
+#endif
 	pRenderContext->PushSelectionName(uHandle);
 }
 
@@ -238,14 +246,33 @@ void CRender3D::EndRenderHitTarget(void)
 		pRenderContext->PopSelectionName();
 		pRenderContext->PopSelectionName();
 
+#ifdef PLATFORM_64BITS
+		pRenderContext->PopSelectionName();
+#endif
+
 		if ((pRenderContext->SelectionMode(true) != 0) && (m_Pick.nNumHits < MAX_PICK_HITS))
 		{
+#ifdef PLATFORM_64BITS
+			if (m_Pick.uSelectionBuffer[0] == 3)
+#else
 			if (m_Pick.uSelectionBuffer[0] == 2)
+#endif
 			{
-				m_Pick.Hits[m_Pick.nNumHits].pObject = (CMapClass *)m_Pick.uSelectionBuffer[3];
-				m_Pick.Hits[m_Pick.nNumHits].uData = m_Pick.uSelectionBuffer[4];
-				m_Pick.Hits[m_Pick.nNumHits].nDepth = m_Pick.uSelectionBuffer[1];
-				m_Pick.Hits[m_Pick.nNumHits].m_LocalMatrix = m_LocalMatrix.Head();
+				auto &hit = m_Pick.Hits[m_Pick.nNumHits];
+				hit.nDepth = m_Pick.uSelectionBuffer[1];
+
+#ifdef PLATFORM_64BITS
+				const uintp low = (uintp)m_Pick.uSelectionBuffer[3];
+				const uintp hi = ((uintp)m_Pick.uSelectionBuffer[4] << 32);
+				const uintp ptr = hi | low;
+				hit.pObject = (CMapClass *)ptr;
+				hit.uData = m_Pick.uSelectionBuffer[5];
+#else
+				hit.pObject = (CMapClass *)m_Pick.uSelectionBuffer[3];
+				hit.uData = m_Pick.uSelectionBuffer[4];
+#endif
+				hit.m_LocalMatrix = m_LocalMatrix.Head();
+
 				m_Pick.nNumHits++;
 			}
 		}
