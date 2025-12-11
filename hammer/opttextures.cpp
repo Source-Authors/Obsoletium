@@ -538,7 +538,7 @@ void COPTTextures::OnMaterialExcludeListSel( void )
 	m_MaterialExcludeList.GetText( ndxSel, &szTmp[0] );
 
 	// Item data of 0 = FGD exclusion, 1 = user-created exclusion
-	DWORD dwData = m_MaterialExcludeList.GetItemData( ndxSel );
+	DWORD_PTR dwData = m_MaterialExcludeList.GetItemData( ndxSel );
 	GetDlgItem( ID_MATERIALEXCLUDE_REM )->EnableWindow( dwData ? TRUE : FALSE );
 }
 
