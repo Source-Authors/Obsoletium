@@ -451,7 +451,7 @@ static void ComputeStaticPropLeaves( CPhysCollide* pCollide, Vector const& origi
 //-----------------------------------------------------------------------------
 static bool ComputeLightingOrigin( StaticPropBuild_t const& build, Vector& lightingOrigin )
 {
-	for (int i = s_LightingInfo.Count(); --i >= 0; )
+	for (intp i = s_LightingInfo.Count(); --i >= 0; )
 	{
 		int entIndex = s_LightingInfo[i];
 
@@ -540,10 +540,10 @@ static void SetLumpData( )
 	if (handle != g_GameLumps.InvalidGameLump())
 		g_GameLumps.DestroyGameLump(handle);
 
-	int dictsize = s_StaticPropDictLump.Count() * sizeof(StaticPropDictLump_t);
-	int objsize = s_StaticPropLump.Count() * sizeof(StaticPropLump_t);
-	int leafsize = s_StaticPropLeafLump.Count() * sizeof(StaticPropLeafLump_t);
-	int size = dictsize + objsize + leafsize + 3 * sizeof(int);
+	intp dictsize = s_StaticPropDictLump.Count() * sizeof(StaticPropDictLump_t);
+	intp objsize = s_StaticPropLump.Count() * sizeof(StaticPropLump_t);
+	intp leafsize = s_StaticPropLeafLump.Count() * sizeof(StaticPropLeafLump_t);
+	intp size = dictsize + objsize + leafsize + 3 * sizeof(int);
 
 	handle = g_GameLumps.CreateGameLump( GAMELUMP_STATIC_PROPS, size, 0, GAMELUMP_STATIC_PROPS_VERSION );
 
@@ -576,8 +576,7 @@ void EmitStaticProps()
 	}
 
 	// Generate a list of lighting origins, and strip them out
-	int i;
-	for ( i = 0; i < num_entities; ++i)
+	for ( int i = 0; i < num_entities; ++i)
 	{
 		const char* pEntity = ValueForKey(&entities[i], "classname");
 		if (!Q_strcmp(pEntity, "info_lighting"))
@@ -587,7 +586,7 @@ void EmitStaticProps()
 	}
 
 	// Emit specifically specified static props
-	for ( i = 0; i < num_entities; ++i)
+	for ( int i = 0; i < num_entities; ++i)
 	{
 		const char* pEntity = ValueForKey(&entities[i], "classname");
 		if (!strcmp(pEntity, "static_prop") || !strcmp(pEntity, "prop_static"))
@@ -669,7 +668,7 @@ void EmitStaticProps()
 
 	// Strip out lighting origins; has to be done here because they are used when
 	// static props are made
-	for ( i = s_LightingInfo.Count(); --i >= 0; )
+	for ( intp i = s_LightingInfo.Count(); --i >= 0; )
 	{
 		// strip this ent from the .bsp file
 		entities[s_LightingInfo[i]].epairs = 0;
