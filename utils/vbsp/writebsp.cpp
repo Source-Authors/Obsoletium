@@ -1286,7 +1286,7 @@ void EndBSPFile (void)
 	// Figure out which faces want macro textures.
 	DiscoverMacroTextures();
 
-	char fileName[1024];
+	char fileName[MAX_PATH];
 	V_strcpy_safe( fileName, source );
 	V_DefaultExtension( fileName, ".bsp" );
 	Msg ("Writing %s\n", fileName);
