@@ -245,7 +245,8 @@ static CPhysCollide* GetCollisionModel( char const* pModelName )
 	// Convert to a common string
 	V_strdup_stack( pModelName, pTemp );
 
-	_strlwr( pTemp );
+	// dimhotepus: _strlwr -> V_strlower.
+	V_strlower( pTemp );
 
 	char* pSlash = strchr( pTemp, '\\' );
 	while( pSlash )
