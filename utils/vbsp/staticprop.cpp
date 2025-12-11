@@ -150,8 +150,8 @@ bool LoadStudioModel( char const* pModelName, char const* pEntityType, CUtlBuffe
 		return false;
 
 	// Check that it's valid
-	if (strncmp ((const char *) buf.PeekGet(), "IDST", 4) &&
-		strncmp ((const char *) buf.PeekGet(), "IDAG", 4))
+	if (strncmp (static_cast<const char *>( buf.PeekGet() ), "IDST", 4) &&
+		strncmp (static_cast<const char *>( buf.PeekGet() ), "IDAG", 4))
 	{
 		return false;
 	}
