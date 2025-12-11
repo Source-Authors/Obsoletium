@@ -292,7 +292,7 @@ static CPhysCollide* GetCollisionModel( char const* pModelName )
 	if (g_DumpStaticProps)
 	{
 		static int propNum = 0;
-		char tmp[128];
+		char tmp[64];
 		V_sprintf_safe( tmp, "staticprop%03d.txt", propNum );
 		DumpCollideToGlView( lookup.m_pCollide, tmp );
 		++propNum;
