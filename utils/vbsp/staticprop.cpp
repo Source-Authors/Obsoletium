@@ -80,7 +80,7 @@ static CUtlVector<int>	s_LightingInfo;
 //-----------------------------------------------------------------------------
 // Gets the keyvalues from a studiohdr
 //-----------------------------------------------------------------------------
-bool StudioKeyValues( studiohdr_t* pStudioHdr, KeyValues *pValue )
+static bool StudioKeyValues( studiohdr_t* pStudioHdr, KeyValues *pValue )
 {
 	if ( !pStudioHdr )
 		return false;
@@ -99,7 +99,7 @@ enum isstaticprop_ret
 	RET_FAIL_DYNAMIC,
 };
 
-isstaticprop_ret IsStaticProp( studiohdr_t* pHdr )
+static isstaticprop_ret IsStaticProp( studiohdr_t* pHdr )
 {
 	if (!(pHdr->flags & STUDIOHDR_FLAGS_STATIC_PROP))
 		return RET_FAIL_NOT_MARKED_STATIC_PROP;
