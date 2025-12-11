@@ -747,8 +747,10 @@ void Cubemap_FixupBrushSidesMaterials( void )
 			int sideIndex = SideIDToIndex( brushSideID );
 			if( sideIndex < 0 )
 			{
+				const auto &origin = g_CubemapSamples[cubemapID].origin;
+
 				Warning("env_cubemap pointing at deleted brushside near (%d, %d, %d)\n", 
-					g_CubemapSamples[cubemapID].origin[0], g_CubemapSamples[cubemapID].origin[1], g_CubemapSamples[cubemapID].origin[2] );
+					origin[0], origin[1], origin[2] );
 
 				continue;
 			}
@@ -776,10 +778,10 @@ void Cubemap_FixupBrushSidesMaterials( void )
 //-----------------------------------------------------------------------------
 void Cubemap_ResetCubemapSideData( void )
 {
-	for ( int iSide = 0; iSide < MAX_MAP_BRUSHSIDES; ++iSide )
+	for ( auto &d : s_aCubemapSideData )
 	{
-		s_aCubemapSideData[iSide].bHasEnvMapInMaterial = false;
-		s_aCubemapSideData[iSide].bManuallyPickedByAnEnvCubemap = false;
+		d.bHasEnvMapInMaterial = false;
+		d.bManuallyPickedByAnEnvCubemap = false;
 	}
 }
 
