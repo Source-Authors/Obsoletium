@@ -703,7 +703,7 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 		return (vertexFileHeader_t *)g_pActiveStudioHdr->GetVertexBase();
 	}
 
-	char fileName[MAX_PATH] = "models/";
+	char fileName[MAX_PATH] = "models" CORRECT_PATH_SEPARATOR_S;
 	// mandatory callback to make requested data resident
 	// load and persist the vertex file
 	V_strcat_safe( fileName, g_pActiveStudioHdr->pszName() );
