@@ -194,7 +194,7 @@ bool LoadStudioModel( char const* pModelName, char const* pEntityType, CUtlBuffe
 static CPhysConvex* ComputeConvexHull( mstudiomesh_t* pMesh )
 {
 	// Generate a list of all verts in the mesh
-	Vector** ppVerts = (Vector**)stackalloc(pMesh->numvertices * sizeof(Vector*) );
+	Vector** ppVerts = stackallocT( Vector*, pMesh->numvertices );
 	const mstudio_meshvertexdata_t *vertData = pMesh->GetVertexData();
 	Assert( vertData ); // This can only return NULL on X360 for now
 	for (int i = 0; i < pMesh->numvertices; ++i)
@@ -313,7 +313,7 @@ static bool TestLeafAgainstCollide( int depth, int* pNodeList,
 	Vector const& origin, QAngle const& angles, CPhysCollide* pCollide )
 {
 	// Copy the planes in the node list into a list of planes
-	float* pPlanes = (float*)_alloca(depth * 4 * sizeof(float) );
+	float* pPlanes = stackallocT( float, depth * 4 );
 	int idx = 0;
 	for (int i = depth; --i >= 0; ++idx )
 	{
