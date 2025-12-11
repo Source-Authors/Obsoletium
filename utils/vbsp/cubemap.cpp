@@ -738,12 +738,10 @@ void Cubemap_FixupBrushSidesMaterials( void )
 	Msg( "Fixing up env_cubemap materials on brush sides...\n" );
 	Assert( s_EnvCubemapToBrushSides.Count() == g_nCubemapSamples );
 
-	int cubemapID;
-	for( cubemapID = 0; cubemapID < g_nCubemapSamples; cubemapID++ )
+	for( int cubemapID = 0; cubemapID < g_nCubemapSamples; cubemapID++ )
 	{
 		IntVector_t &brushSidesVector = s_EnvCubemapToBrushSides[cubemapID];
-		int i;
-		for( i = 0; i < brushSidesVector.Count(); i++ )
+		for( intp i = 0; i < brushSidesVector.Count(); i++ )
 		{
 			int brushSideID = brushSidesVector[i];
 			int sideIndex = SideIDToIndex( brushSideID );
