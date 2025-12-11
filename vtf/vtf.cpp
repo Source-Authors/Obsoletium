@@ -2318,7 +2318,7 @@ void CVTFTexture::GenerateSpheremap( LookDir_t lookDir )
 	Assert( m_nDepth == 1 );
 	intp iMemRequired = ComputeFaceSize( 0, IMAGE_FORMAT_RGBA8888 );
 
-	std::unique_ptr<byte> pSphereMapBits = std::make_unique<byte>( iMemRequired );
+	std::unique_ptr<byte[]> pSphereMapBits = std::make_unique<byte[]>( iMemRequired );
 
 	// Generate a spheremap for each frame of the cubemap
 	for (int iFrame = 0; iFrame < m_nFrameCount; ++iFrame)
