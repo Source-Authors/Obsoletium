@@ -1189,7 +1189,7 @@ int RunVBSP( int argc, char **argv )
 			Msg( "--full-minidumps: true\n" );
 			se::utils::common::EnableFullMinidumps( true );
 		}
-		// dimhotpeus: Check arg is in bounds first.
+		// dimhotepus: Check arg is in bounds first.
 		else if ( i < argc - 1 && !Q_stricmp( argv[i], "-embed" ) )
 		{
 			V_MakeAbsolutePath( g_szEmbedDir, argv[++i], "." );
