@@ -1132,8 +1132,8 @@ void FileSystem_AddSearchPath_Platform( IFileSystem *pFileSystem, const char *sz
 {
 	char platform[MAX_PATH];
 	V_strcpy_safe( platform, szGameInfoPath );
-	Q_StripTrailingSlash( platform );
-	V_strcat_safe( platform, "/../platform", MAX_PATH );
+	V_StripTrailingSlash( platform );
+	V_strcat_safe( platform, CORRECT_PATH_SEPARATOR_S ".." CORRECT_PATH_SEPARATOR_S "platform", MAX_PATH );
 
 	pFileSystem->AddSearchPath( platform, "PLATFORM" );
 }
