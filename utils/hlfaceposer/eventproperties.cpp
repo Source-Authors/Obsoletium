@@ -147,7 +147,8 @@ int CMapEntities::FindNamedEntity( char const *name )
 {
 	char lowername[ 128 ];
 	V_strcpy_safe( lowername, name );
-	_strlwr( lowername );
+	// dimhotepus: _strlwr -> V_strlwr_safe
+	V_strlwr_safe( lowername );
 
 	int index = m_Entities.Find( lowername );
 	if ( index == m_Entities.InvalidIndex() )
