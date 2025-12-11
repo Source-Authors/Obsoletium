@@ -408,6 +408,7 @@ devtools/bin/vpc.pdb
 *.vcxproj.FileListAbsolute.txt
 *.vpc.sentinel
 *.sln
+*.slnx
 
 # Build artifacts
 *.dll
