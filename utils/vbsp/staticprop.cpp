@@ -699,10 +699,6 @@ static void FreeCurrentModelVertexes()
 
 const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 {
-	char				fileName[260];
-	FileHandle_t		fileHandle;
-	vertexFileHeader_t	*pVvdHdr;
-
 	Assert( pModelData == NULL );
 	Assert( g_pActiveStudioHdr );
 
@@ -711,15 +707,15 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 		return (vertexFileHeader_t *)g_pActiveStudioHdr->GetVertexBase();
 	}
 
+	char fileName[MAX_PATH] = "models/";
 	// mandatory callback to make requested data resident
 	// load and persist the vertex file
-	V_strcpy_safe( fileName, "models/" );	
 	V_strcat_safe( fileName, g_pActiveStudioHdr->pszName() );
-	Q_StripExtension( fileName, fileName );
+	V_StripExtension( fileName, fileName );
 	V_strcat_safe( fileName, ".vvd" );
 
 	// load the model
-	fileHandle = g_pFileSystem->Open( fileName, "rb" );
+	FileHandle_t fileHandle = g_pFileSystem->Open( fileName, "rb" );
 	if ( !fileHandle )
 	{
 		Error( "Unable to load vertex data \"%s\"\n", fileName );
@@ -733,10 +729,10 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 		Error( "Bad size for vertex data \"%s\"\n", fileName );
 	}
 
-	pVvdHdr = (vertexFileHeader_t *)malloc(size);
+	vertexFileHeader_t *pVvdHdr = (vertexFileHeader_t*)malloc(size);
 	if (!pVvdHdr)
 	{
-		Error("Error Vertex File %s allocation failure\n", fileName);
+		Error("Vertex file \"%s\" allocation (%d bytes) failure\n", fileName, size);
 	}
 
 	g_pFileSystem->Read( pVvdHdr, size, fileHandle );
@@ -745,15 +741,15 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 	// check header
 	if (pVvdHdr->id != MODEL_VERTEX_FILE_ID)
 	{
-		Error("Error Vertex File %s id %d should be %d\n", fileName, pVvdHdr->id, MODEL_VERTEX_FILE_ID);
+		Error("Error Vertex File \"%s\" id %d should be %d\n", fileName, pVvdHdr->id, MODEL_VERTEX_FILE_ID);
 	}
 	if (pVvdHdr->version != MODEL_VERTEX_FILE_VERSION)
 	{
-		Error("Error Vertex File %s version %d should be %d\n", fileName, pVvdHdr->version, MODEL_VERTEX_FILE_VERSION);
+		Error("Error Vertex File \"%s\" version %d should be %d\n", fileName, pVvdHdr->version, MODEL_VERTEX_FILE_VERSION);
 	}
 	if (pVvdHdr->checksum != g_pActiveStudioHdr->checksum)
 	{
-		Error("Error Vertex File %s checksum %d should be %d\n", fileName, pVvdHdr->checksum, g_pActiveStudioHdr->checksum);
+		Error("Error Vertex File \"%s\" checksum %d should be %d\n", fileName, pVvdHdr->checksum, g_pActiveStudioHdr->checksum);
 	}
 
 	g_pActiveStudioHdr->SetVertexBase(pVvdHdr);
