@@ -152,18 +152,18 @@ void CConfigPanel::OnCommand(const char *command)
 		int time,timeGraphs;
 
 		m_pRefreshTextEntry->GetText(timeText);
-		sscanf(timeText,"%i",&time);
+		// dimhotepus: Check time is read.
+		const bool isReadTime = sscanf(timeText,"%i",&time) == 1;
 	
 		BitwiseClear(timeText);
 		m_pGraphsRefreshTimeTextEntry->GetText(timeText);
-		sscanf(timeText,"%i",&timeGraphs);
+		// dimhotepus: Check graphs are read.
+		const bool isReadGraphs = sscanf(timeText,"%i",&timeGraphs) == 1;
 
-
-		if(time>0 && time < 9999 && timeGraphs>0 && timeGraphs< 9999) 
+		if (isReadTime && time > 0 && time < 9999 &&
+			isReadGraphs && timeGraphs > 0 && timeGraphs < 9999)
 		{
-
 			OnClose();
-
 		}
 		else
 		{
