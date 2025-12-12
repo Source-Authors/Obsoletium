@@ -24,7 +24,7 @@ static char g_szControlsModuleName[256];
 //-----------------------------------------------------------------------------
 extern "C" { extern int _heapmin(); }
 
-bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *, int )
+bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *, intp )
 {
 	g_nYou_Must_Add_Public_Vgui_Controls_Vgui_ControlsCpp_To_Your_Project = 1;
 

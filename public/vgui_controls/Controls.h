@@ -28,7 +28,7 @@ namespace vgui
 // handles the initialization of the vgui interfaces
 // interfaces (listed below) are first attempted to be loaded from primaryProvider, then secondaryProvider
 // moduleName should be the name of the module that this instance of the vgui_controls has been compiled into
-bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *factoryList, int numFactories );
+bool VGui_InitInterfacesList( const char *moduleName, CreateInterfaceFn *factoryList, intp numFactories );
 
 // returns the name of the module as specified above
 const char *GetControlsModuleName();
