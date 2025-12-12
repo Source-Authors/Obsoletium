@@ -151,7 +151,8 @@ DEFINE_FIXEDSIZE_ALLOCATOR( CMaterialVar, 1024, true );
 #endif
 
 // Stores symbols for the material vars
-static CUtlSymbolTableMT s_MaterialVarSymbols( 0, 32, true );
+// dimhotepus: Bump 32 -> 256 as usually it is 256+ vars.
+static CUtlSymbolTableMT s_MaterialVarSymbols( 0, 256, true );
 
 static bool g_bDeleteUnreferencedTexturesEnabled = false;
 
