@@ -1046,7 +1046,7 @@ int CMaterial::FindMaterialVarFlag( char const* pFlagName ) const
 		++pFlagName;
 	}
 
-	for( int i = 0; *ShaderSystem()->ShaderStateString(i); ++i )
+	for( intp i = 0; *ShaderSystem()->ShaderStateString(i); ++i )
 	{
 		const char *pStateString = ShaderSystem()->ShaderStateString(i);
 		const char *pFound = Q_stristr( pFlagName, pStateString );
@@ -1078,7 +1078,7 @@ int CMaterial::FindMaterialVarFlag( char const* pFlagName ) const
 //-----------------------------------------------------------------------------
 void CMaterial::PrintMaterialFlags( int flags, int flagsDefined )
 {
-	int i;
+	intp i;
 	for( i = 0; *ShaderSystem()->ShaderStateString(i); i++ )
 	{
 		if( flags & ( 1<<i ) )

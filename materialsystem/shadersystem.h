@@ -179,8 +179,8 @@ public:
 	virtual IShader*	FindShader( char const* pShaderName ) = 0;
 
 	// returns strings associated with the shader state flags...
-	virtual char const* ShaderStateString( int i ) const = 0;
-	virtual int ShaderStateCount( ) const = 0;
+	virtual char const* ShaderStateString( intp i ) const = 0;
+	virtual intp ShaderStateCount( ) const = 0;
 
 	// Rendering related methods
 
@@ -209,7 +209,7 @@ public:
 
 	// Used to iterate over all shaders for editing purposes
 	virtual intp ShaderCount() const = 0;
-	virtual int  GetShaders( int nFirstShader, int nCount, OUT_CAP_OPT(nCount) IShader **ppShaderList ) const = 0;
+	virtual intp GetShaders( intp nFirstShader, intp nCount, OUT_CAP_OPT(nCount) IShader **ppShaderList ) const = 0;
 };
 
 

@@ -1779,7 +1779,7 @@ public:
 		return 0;
 	}
 
-	virtual int  GetShaders( int nFirstShader, int nCount, IShader **ppShaderList ) const
+	virtual intp GetShaders( intp nFirstShader, intp nCount, IShader **ppShaderList ) const
 	{
 		return 0;
 	}
@@ -1904,12 +1904,12 @@ public:
 	{
 	}
 
-	virtual int ShaderFlagCount() const
+	virtual intp ShaderFlagCount() const
 	{
 		return 0;
 	}
 
-	virtual const char *ShaderFlagName( int nIndex ) const
+	virtual const char *ShaderFlagName( intp nIndex ) const
 	{
 		return "";
 	}

@@ -3674,7 +3674,7 @@ intp CMaterialSystem::ShaderCount() const
 	return ShaderSystem()->ShaderCount();
 }
 
-int CMaterialSystem::GetShaders( int nFirstShader, int nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const
+intp CMaterialSystem::GetShaders( intp nFirstShader, intp nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const
 {
 	return ShaderSystem()->GetShaders( nFirstShader, nMaxCount, ppShaderList );
 }
@@ -3684,12 +3684,12 @@ int CMaterialSystem::GetShaders( int nFirstShader, int nMaxCount, OUT_CAP_OPT(nM
 // FIXME: Is there a better way of doing this?
 // Returns shader flag names for editors to be able to edit them
 //-----------------------------------------------------------------------------
-int CMaterialSystem::ShaderFlagCount() const
+intp CMaterialSystem::ShaderFlagCount() const
 {
 	return ShaderSystem()->ShaderStateCount( );
 }
 
-const char *CMaterialSystem::ShaderFlagName( int nIndex ) const
+const char *CMaterialSystem::ShaderFlagName( intp nIndex ) const
 {
 	return ShaderSystem()->ShaderStateString( nIndex );
 }

@@ -71,8 +71,8 @@ public:
 	virtual IShader*	FindShader( char const* pShaderName );
 	virtual void		CreateDebugMaterials();
 	virtual void		CleanUpDebugMaterials();
-	virtual char const* ShaderStateString( int i ) const;
-	virtual int			ShaderStateCount( ) const;
+	virtual char const* ShaderStateString( intp i ) const;
+	virtual intp		ShaderStateCount( ) const;
 
 	virtual void		InitShaderParameters( IShader *pShader, IMaterialVar **params, const char *pMaterialName );
 	virtual void		InitShaderInstance( IShader *pShader, IMaterialVar **params, const char *pMaterialName, const char *pTextureGroupName );
@@ -82,7 +82,7 @@ public:
 
 	// Used to iterate over all shaders for editing purposes
 	virtual intp		ShaderCount() const;
-	virtual int			GetShaders( int nFirstShader, int nMaxCount, OUT_CAP(nMaxCount) IShader **ppShaderList ) const;
+	virtual intp		GetShaders( intp nFirstShader, intp nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const;
 
 	// Methods of IShaderInit
 	virtual void		LoadTexture( IMaterialVar *pTextureVar, const char *pTextureGroupName, int nAdditionalCreationFlags = 0 );
@@ -653,9 +653,9 @@ static const char* s_pShaderStateString[] =
 // returns strings associated with the shader state flags...
 // If you modify this, make sure and modify MaterialVarFlags_t in imaterial.h
 //-----------------------------------------------------------------------------
-int CShaderSystem::ShaderStateCount( ) const
+intp CShaderSystem::ShaderStateCount( ) const
 {
-	return sizeof( s_pShaderStateString ) / sizeof( char* ) - 1;
+	return ssize( s_pShaderStateString ) - 1;
 }
 
 
@@ -663,7 +663,7 @@ int CShaderSystem::ShaderStateCount( ) const
 // returns strings associated with the shader state flags...
 // If you modify this, make sure and modify MaterialVarFlags_t in imaterial.h
 //-----------------------------------------------------------------------------
-char const* CShaderSystem::ShaderStateString( int i ) const
+char const* CShaderSystem::ShaderStateString( intp i ) const
 {
 	return s_pShaderStateString[i];
 }
@@ -744,12 +744,12 @@ intp CShaderSystem::ShaderCount() const
 	return GetShaders( 0, 65536, NULL );
 }
 
-int CShaderSystem::GetShaders( int nFirstShader, int nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const
+intp CShaderSystem::GetShaders( intp nFirstShader, intp nMaxCount, OUT_CAP_OPT(nMaxCount) IShader **ppShaderList ) const
 {
 	CUtlSymbolTable	uniqueNames( 0, 512, true ); 
 
-	int nCount = 0;
-	int nActualCount = 0;
+	intp nCount = 0;
+	intp nActualCount = 0;
 	for ( intp i = m_ShaderDLLs.Count(); --i >= 0; )
 	{
 		const ShaderDLLInfo_t &info = m_ShaderDLLs[i];
