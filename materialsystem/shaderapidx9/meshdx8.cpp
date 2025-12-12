@@ -3312,53 +3312,43 @@ void CMeshDX8::CheckIndices( CPrimList *pPrim, int numPrimitives )
 	// g_pLastColorMesh - this is the current color mesh, if there is one.
 	// g_pLastIndex - this is the current index buffer.
 	// vertoffset : m_FirstIndex
-	int nIndexCount = 0;
-	if ( m_Mode == D3DPT_TRIANGLELIST )
-	{
-		nIndexCount = numPrimitives * 3;
-	}
-	else if (m_Mode == D3DPT_TRIANGLESTRIP)
-	{
-		nIndexCount = numPrimitives + 2;
-	}
+	const auto mode = m_Mode;
+	if (mode == D3DPT_TRIANGLELIST || mode == D3DPT_TRIANGLESTRIP) {
+		Assert(pPrim->m_FirstIndex >= 0 &&
+			pPrim->m_FirstIndex < g_pLastIndex->IndexCount());
 
-	if ( nIndexCount != 0 )
-	{
-		Assert( pPrim->m_FirstIndex >= 0 && pPrim->m_FirstIndex < g_pLastIndex->IndexCount() );
+		CVertexBuffer *pMesh = g_pLastVertex;
+		Assert(pMesh);
 
-		const unsigned maxVertexIdx = s_FirstVertex + m_FirstIndex;
+		const int nIndexCount = mode == D3DPT_TRIANGLELIST
+			? numPrimitives * 3 : numPrimitives + 2;
 
+		for (int i = 0; i < 2; ++i)
 		{
-			CVertexBuffer* pMesh = g_pLastVertex;
+			Assert(s_FirstVertex >= 0 &&
+				 (int)(s_FirstVertex + m_FirstIndex) < pMesh->VertexCount());
 
-			Assert( pMesh && maxVertexIdx < (unsigned)pMesh->VertexCount() );
-		}
-
-		if ( g_pLastColorMesh )
-		{
-			CVertexBuffer* pMesh = g_pLastColorMesh->m_pVertexBuffer;
-
-			Assert( maxVertexIdx < (unsigned)pMesh->VertexCount() );
-		}
-
-		const int upperPrimIndexBound = nIndexCount + pPrim->m_FirstIndex;
-		const int upperShadowIndexBound = s_FirstVertex + s_NumVertices;
-
-		for (int j = pPrim->m_FirstIndex; j < upperPrimIndexBound; j++)
-		{
-			const unsigned short index{g_pLastIndex->GetShadowIndex( j )};
-
-			if (index >= s_FirstVertex && static_cast<int>(index) < upperShadowIndexBound)
+			for (int j = 0; j < nIndexCount; j++)
 			{
-				continue;
+				const unsigned index = g_pLastIndex->GetShadowIndex(j + pPrim->m_FirstIndex);
+
+#ifdef _DEBUG
+				AssertMsg(index >= s_FirstVertex && index < s_FirstVertex + s_NumVertices,
+					"%s has invalid index: %u [%u..%u]\n", __FUNCTION__, index,
+					s_FirstVertex, s_FirstVertex + s_NumVertices - 1);
+#else
+				if (index < s_FirstVertex || index >= s_FirstVertex + s_NumVertices)
+				{
+					Warning("%s has invalid index: %u [%u..%u]\n", __FUNCTION__, index,
+						s_FirstVertex, s_FirstVertex + s_NumVertices - 1);
+				}
+#endif
 			}
 
-			// dimhotepus: Dump into console only once.
-#ifdef _DEBUG
-			AssertMsg(false, "%s invalid index: %hu [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, upperShadowIndexBound - 1);
-#else
-			Warning("%s invalid index: %hu [%u..%u]\n", __FUNCTION__, index, s_FirstVertex, upperShadowIndexBound - 1);
-#endif
+			if (!g_pLastColorMesh) return;
+
+			pMesh = g_pLastColorMesh->m_pVertexBuffer;
+			if (!pMesh) return;
 		}
 	}
 }
