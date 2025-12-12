@@ -200,7 +200,7 @@ static void CreateAnimationLogs( CDmeChannelsClip *channelsClip, CDmeGameModel *
 
 static CDmeChannelsClip *FindChannelsClipTargetingDmeGameModel( CDmeFilmClip *pClip, CDmeGameModel *pGameModel )
 {
-	uint nBoneCount = pGameModel->NumBones();
+	intp nBoneCount = pGameModel->NumBones();
 	CDmeTransform *pGameModelTransform = pGameModel->GetTransform();
 
 	intp gc = pClip->GetTrackGroupCount();
@@ -215,7 +215,7 @@ static CDmeChannelsClip *FindChannelsClipTargetingDmeGameModel( CDmeFilmClip *pC
 		if ( FindChannelTargetingElement( pChannelsClip, pGameModelTransform ) )
 			return pChannelsClip;
 
-		for ( uint j = 0; j < nBoneCount; ++j )
+		for ( intp j = 0; j < nBoneCount; ++j )
 		{
 			if ( FindChannelTargetingElement( pChannelsClip, pGameModel->GetBone( j ) ) )
 				return pChannelsClip;

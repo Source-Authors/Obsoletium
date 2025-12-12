@@ -290,8 +290,8 @@ void CFlexControlBuilder::RemoveUnusedExistingFlexControllers( CDmeGameModel *pG
 {
 	// These are the current flex controllers
 	// NOTE: Name of these controllers should match the names of the flex controllers
-	int nCount = pGameModel->NumGlobalFlexControllers();
-	for ( int i = nCount; --i >= 0; )
+	intp nCount = pGameModel->NumGlobalFlexControllers();
+	for ( intp i = nCount; --i >= 0; )
 	{
 		CDmeGlobalFlexControllerOperator *pOp = pGameModel->GetGlobalFlexController( i );
 		Assert( pOp );

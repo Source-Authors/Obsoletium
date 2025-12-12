@@ -239,8 +239,8 @@ CDmeDag *CSFMSession::FindOrCreateScene( CDmeFilmClip *pShot, const char *pScene
 	}
 	Assert( pScene );
 
-	int c = pScene->GetChildCount();
-	for ( int i = 0 ; i < c; ++i )
+	intp c = pScene->GetChildCount();
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		CDmeDag *pChild = pScene->GetChild( i );
 		if ( pChild && !Q_stricmp( pChild->GetName(), pSceneName ) )
