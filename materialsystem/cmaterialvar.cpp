@@ -275,8 +275,8 @@ MaterialVarSym_t IMaterialVar::GetSymbol( const char* pName )
 		return UTL_INVAL_SYMBOL;
 
 	char temp[1024];
-	Q_strncpy( temp, pName, sizeof( temp ) );
-	Q_strlower( temp );
+	V_strcpy_safe( temp, pName );
+	V_strlower( temp );
 	return s_MaterialVarSymbols.AddString( temp );
 }
 
