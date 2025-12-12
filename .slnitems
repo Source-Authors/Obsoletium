@@ -2,6 +2,7 @@
 .editorconfig
 .gitignore
 .github\workflows\build.yml
+.github\workflows\auto-assign.yml
 .github\actions\build-shared\action.yml
 .slnitems
 LICENSE
