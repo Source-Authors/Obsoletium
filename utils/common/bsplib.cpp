@@ -3970,7 +3970,7 @@ const char *ResolveStaticPropToModel( const char *pPropName )
 	// filename should be sp_???.vhv or sp_hdr_???.vhv
 	if ( V_strnicmp( pPropName, "sp_", 3 ) )
 	{
-		return NULL;
+		return nullptr;
 	}
 	const char *pPropNumber = V_strrchr( pPropName, '_' );
 	if ( pPropNumber )
@@ -3979,20 +3979,20 @@ const char *ResolveStaticPropToModel( const char *pPropName )
 	}
 	else
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	// look up the prop to get to the actual model
 	if ( iProp < 0 || iProp >= g_StaticPropInstances.Count() )
 	{
 		// prop out of range
-		return NULL;
+		return nullptr;
 	}
 	int iModel = g_StaticPropInstances[iProp];
 	if ( iModel < 0 || iModel >= g_StaticPropNames.Count() )
 	{
 		// model out of range
-		return NULL;
+		return nullptr;
 	}
 
 	return g_StaticPropNames[iModel].String();
