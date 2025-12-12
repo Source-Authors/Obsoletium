@@ -154,7 +154,7 @@ void CBudgetPanelShared::DrawColoredText(
 	vgui::HFont font, 
 	int x, int y, 
 	int r, int g, int b, int a,
-	const char *pText,
+	PRINTF_FORMAT_STRING const char *pText,
 	... )
 {
 	char msg[4096];
