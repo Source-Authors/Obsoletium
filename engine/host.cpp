@@ -4313,7 +4313,11 @@ void Host_Shutdown(void)
 #ifndef SWDS
 	TRACESHUTDOWN( Key_Shutdown() );
 #ifndef _X360
-	TRACESHUTDOWN( ShutdownMixerControls() );
+	// dimhotepus: Mixer controls may be not initialized. Do not warn if so.
+	if (g_pMixerControls)
+	{
+		TRACESHUTDOWN( ShutdownMixerControls() );
+	}
 #endif
 #endif
 
