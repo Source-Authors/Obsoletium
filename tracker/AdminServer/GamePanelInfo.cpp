@@ -287,13 +287,13 @@ void CGamePanelInfo::OnMasterOutOfDate( const char *msg)
 	if (!m_hOutOfDateQueryBox.Get())
 	{
 		const size_t msgLen = strlen(msg) + ssize("\n\nDo you wish to shutdown now?\n");
-		char *fullmsg = stackallocT( char, msgLen );
+		std::unique_ptr<char[]> fullmsg = std::make_unique<char[]>( msgLen );
 
 		// _snprintf -> strcpy + strcat
-		V_strncpy( fullmsg, msg, msgLen );
-		V_strncat( fullmsg, "\n\nDo you wish to shutdown now?\n", msgLen );
+		V_strncpy( fullmsg.get(), msg, msgLen );
+		V_strncat( fullmsg.get(), "\n\nDo you wish to shutdown now?\n", msgLen );
 		// dimhotepus: Own query box to scale it.
-		m_hOutOfDateQueryBox = new QueryBox("Server restart pending", fullmsg, this);
+		m_hOutOfDateQueryBox = new QueryBox("Server restart pending", fullmsg.get(), this);
 		m_hOutOfDateQueryBox->AddActionSignalTarget(this);
 		m_hOutOfDateQueryBox->SetOKCommand(new KeyValues("RestartServer"));
 		m_hOutOfDateQueryBox->ShowWindow();
