@@ -54,7 +54,7 @@ namespace
 
 template<typename T>
 T* ConnectLibrary( T **library,
-	CreateInterfaceFn *factory_list, int index,
+	CreateInterfaceFn *factory_list, intp index,
 	const char *interface_name )
 {
 	if ( !*library )
@@ -71,7 +71,7 @@ T* ConnectLibrary( T **library,
 // Call this to connect to all tier 3 libraries.
 // It's up to the caller to check the globals it cares about to see if ones are missing
 //-----------------------------------------------------------------------------
-void ConnectTier3Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
+void ConnectTier3Libraries( CreateInterfaceFn *pFactoryList, intp nFactoryCount )
 {
 	// Don't connect twice..
 	Assert(!g_pStudioRender && !studiorender &&
@@ -91,7 +91,7 @@ void ConnectTier3Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		!g_pSoundEmitterSystem &&
 		!g_pVTex);
 
-	for ( int i = 0; i < nFactoryCount; ++i )
+	for ( intp i = 0; i < nFactoryCount; ++i )
 	{
 		studiorender = ConnectLibrary(&g_pStudioRender, pFactoryList, i, STUDIO_RENDER_INTERFACE_VERSION);
 		ConnectLibrary(&g_pVGui, pFactoryList, i, VGUI_IVGUI_INTERFACE_VERSION);

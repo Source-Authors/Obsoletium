@@ -44,7 +44,7 @@ namespace
 
 template<typename T>
 T* ConnectLibrary( T **library,
-	CreateInterfaceFn *factory_list, int index,
+	CreateInterfaceFn *factory_list, intp index,
 	const char *interface_name )
 {
 	if ( !*library )
@@ -61,7 +61,7 @@ T* ConnectLibrary( T **library,
 // Call this to connect to all tier 2 libraries.
 // It's up to the caller to check the globals it cares about to see if ones are missing
 //-----------------------------------------------------------------------------
-void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
+void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, intp nFactoryCount )
 {
 	// Don't connect twice..
 	Assert( !g_pFullFileSystem && 
@@ -76,7 +76,7 @@ void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 		!mdllib && 
 		!g_pQueuedLoader );
 
-	for ( int i = 0; i < nFactoryCount; ++i )
+	for ( intp i = 0; i < nFactoryCount; ++i )
 	{
 		ConnectLibrary(&g_pFullFileSystem, pFactoryList, i, FILESYSTEM_INTERFACE_VERSION);
 		materials = ConnectLibrary(&g_pMaterialSystem, pFactoryList, i, MATERIAL_SYSTEM_INTERFACE_VERSION);

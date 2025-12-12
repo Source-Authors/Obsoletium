@@ -51,7 +51,7 @@ extern IQueuedLoader *g_pQueuedLoader;
 // Call this to connect to/disconnect from all tier 2 libraries.
 // It's up to the caller to check the globals it cares about to see if ones are missing
 //-----------------------------------------------------------------------------
-void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount );
+void ConnectTier2Libraries( CreateInterfaceFn *pFactoryList, intp nFactoryCount );
 void DisconnectTier2Libraries();
 
 

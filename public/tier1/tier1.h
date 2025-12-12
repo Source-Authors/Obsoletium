@@ -36,7 +36,7 @@ extern IProcessUtils *g_pProcessUtils;
 // Call this to connect to/disconnect from all tier 1 libraries.
 // It's up to the caller to check the globals it cares about to see if ones are missing
 //-----------------------------------------------------------------------------
-void ConnectTier1Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount );
+void ConnectTier1Libraries( CreateInterfaceFn *pFactoryList, intp nFactoryCount );
 void DisconnectTier1Libraries();
 
 

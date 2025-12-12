@@ -27,7 +27,7 @@ static bool s_bConnected = false;
 // Call this to connect to all tier 1 libraries.
 // It's up to the caller to check the globals it cares about to see if ones are missing
 //-----------------------------------------------------------------------------
-void ConnectTier1Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
+void ConnectTier1Libraries( CreateInterfaceFn *pFactoryList, intp nFactoryCount )
 {
 	// Don't connect twice..
 	if ( s_bConnected )
@@ -35,15 +35,15 @@ void ConnectTier1Libraries( CreateInterfaceFn *pFactoryList, int nFactoryCount )
 
 	s_bConnected = true;
 
-	for ( int i = 0; i < nFactoryCount; ++i )
+	for ( intp i = 0; i < nFactoryCount; ++i )
 	{
 		if ( !g_pCVar )
 		{
-			cvar = g_pCVar = ( ICvar * )pFactoryList[i]( CVAR_INTERFACE_VERSION, nullptr );
+			cvar = g_pCVar = static_cast<ICvar *>( pFactoryList[i]( CVAR_INTERFACE_VERSION, nullptr ) );
 		}
 		if ( !g_pProcessUtils )
 		{
-			g_pProcessUtils = ( IProcessUtils * )pFactoryList[i]( PROCESS_UTILS_INTERFACE_VERSION, nullptr );
+			g_pProcessUtils = static_cast<IProcessUtils *>( pFactoryList[i]( PROCESS_UTILS_INTERFACE_VERSION, nullptr ) );
 		}
 	}
 }
