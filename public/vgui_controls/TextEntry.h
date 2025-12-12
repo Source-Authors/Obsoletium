@@ -157,7 +157,7 @@ public:
 	virtual bool IsEditable();
 	void SetEnabled(bool state) override;
 	// move the cursor to line 'line', given how many pixels are in a line
-	virtual void MoveCursor(int line, int pixelsAcross);
+	virtual void MoveCursor(intp line, int pixelsAcross);
 
 	// sets the color of the background when the control is disabled
 	virtual void SetDisabledBgColor(Color col);
@@ -261,9 +261,9 @@ protected:
 	void GetSettings( KeyValues *outResourceData ) override;
 	const char *GetDescription( void ) override;
 	virtual void FireActionSignal();
-	virtual bool GetSelectedRange(int& cx0,int& cx1);
-	virtual void CursorToPixelSpace(int cursorPos, int &cx, int &cy);
-	virtual int  PixelToCursorSpace(int cx, int cy);
+	virtual bool GetSelectedRange(intp& cx0, intp& cx1);
+	virtual void CursorToPixelSpace(intp cursorPos, int &cx, int &cy);
+	virtual intp PixelToCursorSpace(int cx, int cy);
 	virtual void AddAnotherLine(int &cx, int &cy);
 	virtual int  GetYStart(); // works out ypixel position drawing started at
 
@@ -291,7 +291,7 @@ protected:
 	void OnSizeChanged(int newWide, int newTall) override;
 
 	// Returns the character index the drawing should Start at
-	virtual int GetStartDrawIndex(int &lineBreakIndexIndex);
+	virtual intp GetStartDrawIndex(intp &lineBreakIndexIndex);
 
 public:
 	// helper accessors for common gets
@@ -301,8 +301,8 @@ public:
 protected:
     void ScrollRight(); // scroll to right until cursor is visible
     void ScrollLeft();  // scroll to left 
-	bool IsCursorOffRightSideOfWindow(int cursorPos); // check if cursor is off right side of window
-	bool IsCursorOffLeftSideOfWindow(int cursorPos); // check if cursor is off left side of window
+	bool IsCursorOffRightSideOfWindow(intp cursorPos); // check if cursor is off right side of window
+	bool IsCursorOffLeftSideOfWindow(intp cursorPos); // check if cursor is off left side of window
     void ScrollLeftForResize();
 	
 	void OnSetFocus() override;
@@ -314,11 +314,11 @@ protected:
 private:
 	MESSAGE_FUNC_INT( OnSetState, "SetState", state );
 	// get index in buffer of the Start of the current line we are on
-	int GetCurrentLineStart();
+	intp GetCurrentLineStart();
 	// get index in buffer of the end of the current line we are on
-	int GetCurrentLineEnd();
-	bool IsLineBreak(int index);
-	int GetCursorLine();
+	intp GetCurrentLineEnd();
+	bool IsLineBreak(intp index);
+	intp GetCursorLine();
 	void MoveScrollBar(int delta);
 	void CalcBreakIndex(); // calculate _recalculateLineBreaksIndex
 	void CreateEditMenu(); // create copy/cut/paste menu
@@ -367,7 +367,7 @@ private:
 	Color			   _selectionColor;
 	Color			   _selectionTextColor;	 // color of the highlighted text
 	Color			   _defaultSelectionBG2Color;
-	int				   _currentStartLine; // use for checking vertical text scrolling (multiline)
+	intp			   _currentStartLine; // use for checking vertical text scrolling (multiline)
 	intp			   _currentStartIndex; // use for horizontal text scrolling (!multiline)
 	bool			   _horizScrollingAllowed;	// use to disable horizontal text scrolling period.
 	Color			   _focusEdgeColor;
@@ -379,7 +379,7 @@ private:
 	// selection data
 	Menu				*m_pEditMenu; ///cut/copy/paste popup
 
-	int					_recalculateBreaksIndex; // tells next linebreakindex index to Start recalculating line breaks	
+	intp				_recalculateBreaksIndex; // tells next linebreakindex index to Start recalculating line breaks	
 	bool				_selectAllOnFirstFocus : 1; // highlights all text in window when focus is gained.
 	bool				_selectAllOnFocusAlways : 1;
 	bool				m_bAllowNumericInputOnly;
@@ -393,7 +393,7 @@ private:
 
 	wchar_t				m_szComposition[ MAX_COMPOSITION_STRING ];
 	Menu				*m_pIMECandidates;
-	int					m_hPreviousIME;
+	intp				m_hPreviousIME;
 	bool				m_bDrawLanguageIDAtLeft;
 	int					m_nLangInset;
 

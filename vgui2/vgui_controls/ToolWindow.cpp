@@ -229,7 +229,7 @@ void ToolWindow::Grow( int edge, int from_x, int from_y )
 	new_w = old_w;
 	new_h = old_h;
 
-	int c = GetToolWindowCount();
+	intp c = GetToolWindowCount();
 
 	// grow up
 	if ( ( edge == 0 ) || ( edge == 1 ) )
@@ -245,7 +245,7 @@ void ToolWindow::Grow( int edge, int from_x, int from_y )
 		new_h = old_h + ( old_y - menubar_h );
 		new_y = menubar_h;
 
-		for ( int i = 0 ; i < c; ++i )
+		for ( intp i = 0 ; i < c; ++i )
 		{
 			ToolWindow *tw = GetToolWindow( i );
 			Assert( tw );

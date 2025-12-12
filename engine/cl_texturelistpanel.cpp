@@ -840,7 +840,7 @@ void CVmtTextEntry::OpenEditMenu()
 	int pos = pEditMenu->AddMenuItem( "Open VMT", new KeyValues("DoOpenVmtSelected"), this );
 	pEditMenu->MoveMenuItem( pos, 0 );
 
-	int x0, x1;
+	intp x0, x1;
 	pEditMenu->SetItemEnabled( "Open VMT", GetSelectedRange(x0, x1) );
 
 	BaseClass::OpenEditMenu();
@@ -848,7 +848,7 @@ void CVmtTextEntry::OpenEditMenu()
 
 void CVmtTextEntry::OpenVmtSelected()
 {
-	int x0, x1;
+	intp x0, x1;
 	if ( !GetSelectedRange(x0, x1) )
 		return;
 

@@ -191,7 +191,7 @@ private:
 	void GotoWordLeft();	// move cursor to start of prev word
 
 	void TruncateTextStream();
-	bool GetSelectedRange(intp& cx0,intp& cx1);
+	bool GetSelectedRange(intp& cx0, intp& cx1);
 	void CursorToPixelSpace(intp cursorPos, int &cx, int &cy);
 	intp PixelToCursorSpace(int cx, int cy);
 	void AddAnotherLine(int &cx, int &cy);

@@ -41,7 +41,7 @@ class CAttributeTextEntry : public vgui::TextEntry
 
 public:
 	CAttributeTextEntry( Panel *parent, const char *panelName );
-	bool GetSelectedRange(int& cx0,int& cx1) override
+	bool GetSelectedRange( intp& cx0, intp& cx1 ) override
 	{
 		return BaseClass::GetSelectedRange( cx0, cx1 );
 	}

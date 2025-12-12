@@ -259,7 +259,7 @@ void TextEntry::SetText(const char *text)
 		}
 	}
 
-	size_t len = strlen( text );
+	intp len = V_strlen( text );
 	if ( len < 1023 )
 	{
 		wchar_t unicode[ 1024 ];
@@ -268,7 +268,7 @@ void TextEntry::SetText(const char *text)
 	}
 	else
 	{
-		size_t lenUnicode = ( len * sizeof( wchar_t ) + 4 );
+		intp lenUnicode = ( len * sizeof( wchar_t ) + 4 );
 		wchar_t *unicode = ( wchar_t * ) malloc( lenUnicode );
 		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode, lenUnicode );
 		SetText( unicode );
@@ -384,15 +384,15 @@ int getCharWidth(HFont font, wchar_t ch)
 // Input: cursorPos: cursor index
 // Output: cx, cy, the corresponding coords in the local window
 //-----------------------------------------------------------------------------
-void TextEntry::CursorToPixelSpace(int cursorPos, int &cx, int &cy)
+void TextEntry::CursorToPixelSpace(intp cursorPos, int &cx, int &cy)
 {
 	int yStart = GetYStart();
 	
 	int x = DRAW_OFFSET_X(), y = yStart;
 	_pixelsIndent = 0;
-	int lineBreakIndexIndex = 0;
+	intp lineBreakIndexIndex = 0;
 	
-	for (int i = GetStartDrawIndex(lineBreakIndexIndex); i < m_TextStream.Count(); i++)
+	for (intp i = GetStartDrawIndex(lineBreakIndexIndex); i < m_TextStream.Count(); i++)
 	{
 		wchar_t ch = m_TextStream[i];
 		if (_hideText)
@@ -448,9 +448,8 @@ void TextEntry::CursorToPixelSpace(int cursorPos, int &cx, int &cy)
 // Input  : cx - 
 //			cy - pixel location
 //-----------------------------------------------------------------------------
-int TextEntry::PixelToCursorSpace(int cx, int cy)
+intp TextEntry::PixelToCursorSpace(int cx, int cy)
 {
-	
 	int w, h;
 	GetSize(w, h);
 	// dimhotepus: Scale UI.
@@ -465,11 +464,11 @@ int TextEntry::PixelToCursorSpace(int cx, int cy)
 	int yStart = GetYStart();
 	int x = DRAW_OFFSET_X(), y = yStart;
 	_pixelsIndent = 0;
-	int lineBreakIndexIndex = 0;
+	intp lineBreakIndexIndex = 0;
 	
-	int startIndex = GetStartDrawIndex(lineBreakIndexIndex);
+	intp startIndex = GetStartDrawIndex(lineBreakIndexIndex);
 	bool onRightLine = false;
-	int i;
+	intp i;
 	for (i = startIndex; i < m_TextStream.Count(); i++)
 	{
 		wchar_t ch = m_TextStream[i];
@@ -525,7 +524,7 @@ int TextEntry::PixelToCursorSpace(int cx, int cy)
 					return i;
 				}
 				else  // right side
-				{						 
+				{
 					return i + 1;
 				}
 			}
@@ -551,12 +550,12 @@ int TextEntry::DrawChar(wchar_t ch, HFont font, int index, int x, int y)
 	if (!iswcntrl(ch))
 	{
 		// draw selection, if any
-		int selection0 = -1, selection1 = -1;
+		intp selection0 = -1, selection1 = -1;
 		// dimhotepus: Check range is selected.
 		if (GetSelectedRange(selection0, selection1) && index >= selection0 && index < selection1)
 		{
 			// draw background selection color
-            VPANEL focus = input()->GetFocus();
+			VPANEL focus = input()->GetFocus();
 			Color bgColor;
 			bool hasFocus = HasFocus();
 			bool childOfFocus = focus && ipanel()->HasParent(focus, GetVPanel());
@@ -702,14 +701,14 @@ void TextEntry::PaintBackground()
 	surface()->DrawSetTextColor(col);
 	_pixelsIndent = 0;
 	
-	int lineBreakIndexIndex = 0;
-	int startIndex = GetStartDrawIndex(lineBreakIndexIndex);
+	intp lineBreakIndexIndex = 0;
+	intp startIndex = GetStartDrawIndex(lineBreakIndexIndex);
 	int remembery = y;
 
 	intp oldEnd = m_TextStream.Count();
-	int oldCursorPos = _cursorPos;
-	int nCompStart = -1;
-	int nCompEnd = -1;
+	intp oldCursorPos = _cursorPos;
+	intp nCompStart = -1;
+	intp nCompEnd = -1;
 
 	// FIXME: Should insert at cursor pos instead
 	bool composing = m_bAllowNonAsciiCharacters && m_szComposition[0];
@@ -897,8 +896,8 @@ void TextEntry::PaintBackground()
 		}
 	}
 
-	int newEnd = m_TextStream.Count();
-	int remove = newEnd - oldEnd;
+	intp newEnd = m_TextStream.Count();
+	intp remove = newEnd - oldEnd;
 	if ( remove > 0 )
 	{
 		m_TextStream.RemoveMultiple( oldCursorPos, remove );
@@ -1003,7 +1002,7 @@ void TextEntry::RecalculateLineBreaks()
 	else
 	{
 		// remove the rest of the linebreaks list since its out of date.
-		for (int i=_recalculateBreaksIndex+1; i < m_LineBreaks.Count(); ++i)
+		for (intp i=_recalculateBreaksIndex+1; i < m_LineBreaks.Count(); ++i)
 		{
 			m_LineBreaks.Remove((int)i);
 			--i; // removing shrinks the list!
@@ -1523,7 +1522,7 @@ void TextEntry::OnMouseReleased(MouseCode code)
 	input()->SetMouseCapture(NULL);
 	
 	// make sure something has been selected
-	int cx0, cx1;
+	intp cx0, cx1;
 	if (GetSelectedRange(cx0, cx1))
 	{
 		if (cx1 - cx0 == 0)
@@ -1562,7 +1561,7 @@ void TextEntry::OnMouseDoublePressed(MouseCode code)
 		// move the cursor just as if you single clicked.
 		OnMousePressed(code);
 		// then find the start and end of the word we are in to highlight it.
-		int selectSpot[2];
+		intp selectSpot[2];
 		GotoWordLeft();
 		selectSpot[0] = _cursorPos;
 		GotoWordRight();
@@ -1853,7 +1852,7 @@ void TextEntry::OnKeyCodeTyped(KeyCode code)
 			}
 		case KEY_BACKSPACE:
 			{
-				int x0, x1;
+				intp x0, x1;
 				if (GetSelectedRange(x0, x1))
 				{
 					// act just like delete if there is a selection
@@ -2088,9 +2087,9 @@ Panel *TextEntry::GetDragPanel()
 		int x, y;
 		input()->GetCursorPos(x, y);
 		ScreenToLocal(x, y);
-		int cursor = PixelToCursorSpace(x, y);
+		intp cursor = PixelToCursorSpace(x, y);
 	
-		int cx0, cx1;
+		intp cx0, cx1;
 		bool check = GetSelectedRange( cx0, cx1 );
 
 		if ( check && cursor >= cx0 && cursor < cx1 )
@@ -2111,10 +2110,10 @@ void TextEntry::OnCreateDragData( KeyValues *msg )
 	char txt[ 256 ];
 	GetText( txt );
 
-	int r0, r1;
+	intp r0, r1;
 	if ( GetSelectedRange( r0, r1 ) && r0 != r1 )
 	{
-		int len = r1 - r0;
+		intp len = r1 - r0;
 		// dimhotepus: Prevent out of txt range read.
 		if ( len > 0 && r0 < ssize(txt) )
 		{
@@ -2135,16 +2134,15 @@ bool TextEntry::SelectCheck( bool fromMouse /*=false*/ )
 	if (!HasFocus() || !(input()->IsKeyDown(KEY_LSHIFT) || input()->IsKeyDown(KEY_RSHIFT)))
 	{
 		bool deselect = true;
-		int cx0, cx1;
-		if ( fromMouse && 
-			GetDragPanel() != NULL )
+		if ( fromMouse && GetDragPanel() != NULL )
 		{
 			// move the cursor to where the mouse was pressed
 			int x, y;
 			input()->GetCursorPos(x, y);
 			ScreenToLocal(x, y);
-			int cursor = PixelToCursorSpace(x, y);
-		
+			intp cursor = PixelToCursorSpace(x, y);
+
+			intp cx0, cx1;
 			bool check = GetSelectedRange( cx0, cx1 );
 
 			if ( check && cursor >= cx0 && cursor < cx1 )
@@ -2210,9 +2208,9 @@ void TextEntry::SendNewLine(bool send)
 //-----------------------------------------------------------------------------
 // Purpose: Tell if an index is a linebreakindex
 //-----------------------------------------------------------------------------
-bool TextEntry::IsLineBreak(int index)
+bool TextEntry::IsLineBreak(intp index)
 {
-	for (int i=0; i<m_LineBreaks.Count(); ++i)
+	for (intp i=0; i<m_LineBreaks.Count(); ++i)
 	{
 		if (index ==  m_LineBreaks[i])
 			return true;
@@ -2296,10 +2294,10 @@ void TextEntry::GotoRight()
 //-----------------------------------------------------------------------------
 // Purpose: Find out what line the cursor is on
 //-----------------------------------------------------------------------------
-int TextEntry::GetCursorLine()
+intp TextEntry::GetCursorLine()
 {
 	// find which line the cursor is on
-	int cursorLine;
+	intp cursorLine;
 	for (cursorLine = 0; cursorLine < m_LineBreaks.Count(); cursorLine++)
 	{
 		if (_cursorPos < m_LineBreaks[cursorLine])
@@ -2391,7 +2389,7 @@ int TextEntry::GetYStart()
 //-----------------------------------------------------------------------------
 // Purpose: Move the cursor to a line, need to know how many pixels are in a line
 //-----------------------------------------------------------------------------
-void TextEntry::MoveCursor(int line, int pixelsAcross)
+void TextEntry::MoveCursor(intp line, int pixelsAcross)
 {
 	// clamp to a valid line
 	if (line < 0)
@@ -2405,7 +2403,7 @@ void TextEntry::MoveCursor(int line, int pixelsAcross)
 	int yStart = GetYStart();
 	
 	int x = DRAW_OFFSET_X(), y = yStart;
-	int lineBreakIndexIndex = 0;
+	intp lineBreakIndexIndex = 0;
 	_pixelsIndent = 0;
 	intp i;
 	for ( i = 0; i < m_TextStream.Count(); i++)
@@ -2434,7 +2432,7 @@ void TextEntry::MoveCursor(int line, int pixelsAcross)
 		}
 		
 		// add to the current position
-		int charWidth = getCharWidth(_font, ch);		
+		int charWidth = getCharWidth(_font, ch);
 		
 		if (line == lineBreakIndexIndex)
 		{
@@ -2567,7 +2565,7 @@ void TextEntry::ScrollRight()
 // Output:	true: cursor is outside right edge or window 
 //			false: cursor is inside right edge
 //-----------------------------------------------------------------------------
-bool TextEntry::IsCursorOffRightSideOfWindow(int cursorPos)
+bool TextEntry::IsCursorOffRightSideOfWindow(intp cursorPos)
 {
 	int cx, cy;
 	CursorToPixelSpace(cursorPos, cx, cy);
@@ -2586,7 +2584,7 @@ bool TextEntry::IsCursorOffRightSideOfWindow(int cursorPos)
 // Output:	true - cursor is outside left edge or window 
 //			false - cursor is inside left edge
 //-----------------------------------------------------------------------------
-bool TextEntry::IsCursorOffLeftSideOfWindow(int cursorPos)
+bool TextEntry::IsCursorOffLeftSideOfWindow(intp cursorPos)
 {
 	int cx, cy;
 	CursorToPixelSpace(cursorPos, cx, cy);
@@ -2720,7 +2718,7 @@ void TextEntry::GotoFirstOfLine()
 //-----------------------------------------------------------------------------
 // Purpose: Get the index of the first char on the current line
 //-----------------------------------------------------------------------------
-int TextEntry::GetCurrentLineStart()
+intp TextEntry::GetCurrentLineStart()
 {
 	if (!_multiline)			// quick out for non multline buffers
 		return _currentStartIndex;
@@ -2783,7 +2781,7 @@ void TextEntry::GotoEndOfLine()
 //-----------------------------------------------------------------------------
 // Purpose: Get the index of the last char on the current line
 //-----------------------------------------------------------------------------
-int TextEntry::GetCurrentLineEnd()
+intp TextEntry::GetCurrentLineEnd()
 {
 	intp i;
 	if (IsLineBreak(_cursorPos)	)
@@ -2907,7 +2905,7 @@ void TextEntry::InsertChar(wchar_t ch)
 					}
 					
 					// now redraw the buffer
-					for (int i = m_TextStream.Count() - 1; i >= 0; i--)
+					for (intp i = m_TextStream.Count() - 1; i >= 0; i--)
 					{
 						SetCharAt(m_TextStream[i], i+1);
 					}
@@ -2939,7 +2937,7 @@ void TextEntry::InsertChar(wchar_t ch)
 	else 
 	{
 		// move chars right 1 starting from cursor, then replace cursorPos with char and increment cursor
-		for (int i =  m_TextStream.Count()- 1; i >= _cursorPos; i--)
+		for (intp i =  m_TextStream.Count()- 1; i >= _cursorPos; i--)
 		{
 			SetCharAt(m_TextStream[i], i+1);
 		}
@@ -3064,7 +3062,7 @@ void TextEntry::Backspace()
 	SaveUndoState();
 	
 	//shift chars left one, starting at the cursor position, then make the line one smaller
-	for(int i=_cursorPos;i<m_TextStream.Count(); ++i)
+	for(intp i=_cursorPos;i<m_TextStream.Count(); ++i)
 	{
 		SetCharAt(m_TextStream[i],i-1);
 	}
@@ -3111,7 +3109,7 @@ void TextEntry::DeleteSelected()
 		return;
 	
 	// get the range to delete
-	int x0, x1;
+	intp x0, x1;
 	if (!GetSelectedRange(x0, x1))
 	{
 		// no selection, don't touch anything
@@ -3121,8 +3119,8 @@ void TextEntry::DeleteSelected()
 	SaveUndoState();
 	
 	// shift chars left one starting after cursor position, then make the line one smaller
-	int dif = x1 - x0;
-	for (int i = 0; i < dif; ++i)
+	intp dif = x1 - x0;
+	for (intp i = 0; i < dif; ++i)
 	{
 		m_TextStream.Remove(x0);
 	}
@@ -3159,7 +3157,7 @@ void TextEntry::Delete()
 		return;
 	
 	// get the range to delete
-	int x0, x1;
+	intp x0, x1;
 	if (!GetSelectedRange(x0, x1))
 	{
 		// no selection, so just delete the one character
@@ -3174,10 +3172,10 @@ void TextEntry::Delete()
 	SaveUndoState();
 	
 	// shift chars left one starting after cursor position, then make the line one smaller
-	int dif = x1 - x0;
-	for (int i = 0; i < dif; i++)
+	intp dif = x1 - x0;
+	for (intp i = 0; i < dif; i++)
 	{
-		m_TextStream.Remove((int)x0);
+		m_TextStream.Remove(x0);
 	}
 	
 	ResetCursorBlink();
@@ -3213,7 +3211,7 @@ void TextEntry::SelectNone()
 // Purpose: Load in the selection range so cx0 is the Start and cx1 is the end
 //			from smallest to highest (right to left)
 //-----------------------------------------------------------------------------
-bool TextEntry::GetSelectedRange(int& cx0,int& cx1)
+bool TextEntry::GetSelectedRange(intp& cx0,intp& cx1)
 {
 	// if there is nothing selected return false
 	if (_select[0] == -1)
@@ -3222,10 +3220,13 @@ bool TextEntry::GetSelectedRange(int& cx0,int& cx1)
 	}
 	
 	// sort the two position so cx0 is the smallest
-	cx0=_select[0];
-	cx1=_select[1];
-	int temp;
-	if(cx1<cx0){temp=cx0;cx0=cx1;cx1=temp;}
+	cx0 = _select[0];
+	cx1 = _select[1];
+
+	if (cx1 < cx0)
+	{
+		std::swap( cx0, cx1 );
+	}
 	
 	return true;
 }
@@ -3258,7 +3259,7 @@ void TextEntry::OpenEditMenu()
 	cursorY += y;
 	*/
 	
-	int x0, x1;
+	intp x0, x1;
 	if (GetSelectedRange(x0, x1)) // there is something selected
 	{
 		m_pEditMenu->SetItemEnabled("&Cut", true);
@@ -3338,11 +3339,11 @@ void TextEntry::CopySelected()
 	if (_hideText)
 		return;
 	
-	int x0, x1;
+	intp x0, x1;
 	if (GetSelectedRange(x0, x1))
 	{
 		CUtlVector<wchar_t> buf;
-		for (int i = x0; i < x1; i++)
+		for (intp i = x0; i < x1; i++)
 		{
 			if ( m_TextStream[i]=='\n') 
 			{
@@ -3373,14 +3374,14 @@ void TextEntry::Paste()
 		return;
 
 	CUtlVector<wchar_t> buf;
-	int bufferSize = system()->GetClipboardTextCount();
+	intp bufferSize = system()->GetClipboardTextCount();
 	if (!m_bAutoProgressOnHittingCharLimit)
 	{
 		bufferSize = _maxCharCount > 0 ? _maxCharCount + 1 : system()->GetClipboardTextCount();  // +1 for terminator
 	}
 
 	buf.AddMultipleToTail(bufferSize);
-	int len = system()->GetClipboardText(0, buf.Base(), bufferSize * sizeof(wchar_t));
+	intp len = system()->GetClipboardText(0, buf.Base(), bufferSize * sizeof(wchar_t));
 	if (len < 1)
 		return;
 	
@@ -3388,7 +3389,7 @@ void TextEntry::Paste()
 	bool bHaveMovedFocusAwayFromCurrentEntry = false;
 
 	// insert all the characters
-	for (int i = 0; i < len && buf[i] != 0; i++)
+	for (intp i = 0; i < len && buf[i] != 0; i++)
 	{
 		if (m_bAutoProgressOnHittingCharLimit)
 		{
@@ -3457,7 +3458,7 @@ void TextEntry::SaveUndoState()
 // Purpose: Returns the index in the text buffer of the
 //          character the drawing should Start at
 //-----------------------------------------------------------------------------
-int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
+intp TextEntry::GetStartDrawIndex(intp &lineBreakIndexIndex)
 {
 	intp startIndex = 0;
 	
@@ -3482,7 +3483,7 @@ int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 		}
 		if (numLines > displayLines)
 		{
-			int cursorLine = GetCursorLine();
+			intp cursorLine = GetCursorLine();
 			
 			startLine = _currentStartLine;
 			
@@ -3573,8 +3574,6 @@ int TextEntry::GetStartDrawIndex(int &lineBreakIndexIndex)
 		return startIndex;
 	else 
 		return _currentStartIndex;
-
-	
 }
 
 // helper accessors for common gets
@@ -3784,7 +3783,7 @@ void TextEntry::SetToFullHeight()
 	int wide, tall;
 	GetSize(wide, tall);
 	
-	tall = GetNumLines() * (surface()->GetFontTall(_font) + DRAW_OFFSET_Y()) + DRAW_OFFSET_Y() + 2;
+	tall = size_cast<int>(GetNumLines()) * (surface()->GetFontTall(_font) + DRAW_OFFSET_Y()) + DRAW_OFFSET_Y() + 2;
 	SetSize (wide, tall);
 	PerformLayout();
 	
@@ -4042,7 +4041,7 @@ void TextEntry::ShowIMECandidates()
 		wchar_t label[ 64 ];
 		V_swprintf_safe( label, L"%i %s", i - pageStart + startAtOne, unicode );
 
-		intp id = m_pIMECandidates->AddMenuItem( "Candidate", label, (KeyValues *)NULL, this );
+		int id = m_pIMECandidates->AddMenuItem( "Candidate", label, (KeyValues *)NULL, this );
 		if ( isSelected )
 		{
 			m_pIMECandidates->SetCurrentlyHighlightedItem( id );
