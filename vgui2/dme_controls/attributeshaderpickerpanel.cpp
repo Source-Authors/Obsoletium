@@ -42,7 +42,7 @@ void CAttributeShaderPickerPanel::ShowPickerDialog()
 	IShader** ppShaderList = stackallocT( IShader*, nCount );
 	vgui::MaterialSystem()->GetShaders( 0, nCount, ppShaderList );
 	PickerList_t shaderList( 0, nCount );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( ( ppShaderList[i]->GetFlags() & SHADER_NOT_EDITABLE ) == 0 )
 		{
