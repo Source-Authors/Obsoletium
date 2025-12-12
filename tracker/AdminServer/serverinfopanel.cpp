@@ -20,11 +20,13 @@ using namespace vgui;
 //-----------------------------------------------------------------------------
 CServerInfoPanel::CServerInfoPanel(vgui::Panel *parent, const char *name) : CVarListPropertyPage(parent, name)
 {
+	m_flUpdateTime = 0.0;
+	m_iPlayerCount = m_iMaxPlayers = -1;
+	m_flLastUptimeReceiveTime = m_iLastUptimeReceived = m_iLastUptimeDisplayed = 0.0;
+	m_bMapListRetrieved = false;
+
 	LoadControlSettings("Admin/GamePanelInfo.res", "PLATFORM");
 	LoadVarList("Admin/MainServerConfig.vdf");
-	m_iLastUptimeDisplayed = 0;
-	m_flUpdateTime = 0.0;
-	m_bMapListRetrieved = false;
 	RemoteServer().AddServerMessageHandler(this, "UpdatePlayers");
 	RemoteServer().AddServerMessageHandler(this, "UpdateMap");
 }
