@@ -2699,7 +2699,7 @@ bool CMDLCache::ProcessDataIntoCache( MDLHandle_t handle, MDLCacheDataType_t typ
 			if ( pStudioHdrCurrent->numincludemodels == 0 )
 			{
 				// perf optimization, calculate once and cache off the autoplay sequences
-				int nCount = pStudioHdrCurrent->CountAutoplaySequences();
+				intp nCount = pStudioHdrCurrent->CountAutoplaySequences();
 				if ( nCount )
 				{
 					AllocateAutoplaySequences( m_MDLDict[handle], nCount );
