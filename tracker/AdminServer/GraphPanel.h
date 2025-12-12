@@ -137,8 +137,6 @@ private:
 	CGraphsImage *m_pGraphs;
 	vgui::ImagePanel *m_pGraphsPanel;
 
-	vgui::Button *m_pClearButton;
-
 	vgui::CheckButton *m_pInButton;
 	vgui::CheckButton *m_pOutButton;
 	vgui::CheckButton *m_pFPSButton;
