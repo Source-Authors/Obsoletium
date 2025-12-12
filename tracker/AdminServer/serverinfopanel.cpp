@@ -64,7 +64,7 @@ void CServerInfoPanel::OnThink()
 		m_iLastUptimeDisplayed = time;
 		char timeText[64];
 		V_sprintf_safe(timeText, "%0.1i:%0.2i:%0.2i:%0.2i",
-			(time / 3600) / 24, (time / 3600), static_cast<int>(time / 60) % 60, static_cast<int>(time) % 60);
+			static_cast<int>(time / 3600) / 24, static_cast<int>(time / 3600), static_cast<int>(time / 60) % 60, static_cast<int>(time) % 60);
 		SetControlString("UpTimeText", timeText);
 	}
 }
