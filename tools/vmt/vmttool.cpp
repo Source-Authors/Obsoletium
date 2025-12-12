@@ -268,8 +268,8 @@ void CVMTTool::Shutdown()
 
 	{
 		CDisableUndoScopeGuard sg;
-		int nElements = m_toolElements.Count();
-		for ( int i = 0; i < nElements; ++i )
+		intp nElements = m_toolElements.Count();
+		for ( intp i = 0; i < nElements; ++i )
 		{
 			g_pDataModel->DestroyElement( m_toolElements[ i ] );
 		}
@@ -381,7 +381,7 @@ void CVMTTool::AddFlagParameter( const char *pParam )
 {
 	Assert( m_pVMTType->GetAttributeInfo( pParam ) == NULL );
 
-	int i = m_FlagParams.AddToTail( );
+	intp i = m_FlagParams.AddToTail( );
 	m_FlagParams[i] = pParam;
 
 	CDmeEditorAttributeInfo *pInfo = CreateElement< CDmeEditorAttributeInfo >( "flag param info", m_pVMTType->GetFileId() );
@@ -395,7 +395,7 @@ void CVMTTool::AddToolParameter( const char *pParam, const char *pWidget, const 
 {
 	Assert( m_pVMTType->GetAttributeInfo( pParam ) == NULL );
 
-	int i = m_ToolParams.AddToTail( );
+	intp i = m_ToolParams.AddToTail( );
 	m_ToolParams[i] = pParam;
 
 	CDmeEditorAttributeInfo *pInfo = CreateElement< CDmeEditorAttributeInfo >( "tool param info", m_pVMTType->GetFileId() );
@@ -411,8 +411,8 @@ void CVMTTool::AddToolParameter( const char *pParam, const char *pWidget, const 
 
 void CVMTTool::RemoveAllFlagParameters()
 {
-	int nCount = m_FlagParams.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_FlagParams.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		RemoveShaderParameter( m_FlagParams[i] );
 	}
@@ -421,8 +421,8 @@ void CVMTTool::RemoveAllFlagParameters()
 
 void CVMTTool::RemoveAllToolParameters()
 {
-	int nCount = m_ToolParams.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ToolParams.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		RemoveShaderParameter( m_ToolParams[i] );
 	}
@@ -724,14 +724,14 @@ void CVMTTool::OnCommand( const char *cmd )
 	{
 		OnDescribeUndo();
 	}
-	else if ( const char *pSuffix = StringAfterPrefix( cmd, "OnRecent" ) )
+	else if ( const char *pRecentSuffix = StringAfterPrefix( cmd, "OnRecent" ) )
 	{
-		int idx = Q_atoi( pSuffix );
+		int idx = Q_atoi( pRecentSuffix );
 		g_pVMTTool->OpenFileFromHistory( idx, cmd );
 	}
-	else if ( const char *pSuffix = StringAfterPrefix( cmd, "OnTool" ) )
+	else if ( const char *pToolSuffix = StringAfterPrefix( cmd, "OnTool" ) )
 	{
-		int idx = Q_atoi( pSuffix );
+		int idx = Q_atoi( pToolSuffix );
 		enginetools->SwitchToTool( idx );
 	}
 	else
@@ -1024,9 +1024,9 @@ void CVMTTool::OnDescribeUndo()
 	CUtlVector< UndoInfo_t > list;
 	g_pDataModel->GetUndoInfo( list );
 
-	Msg( "%i operations in stack\n", list.Count() );
+	Msg( "%zd operations in stack\n", list.Count() );
 
-	for ( int i = list.Count() - 1; i >= 0; --i )
+	for ( intp i = list.Count() - 1; i >= 0; --i )
 	{
 		UndoInfo_t& entry = list[ i ];
 		if ( entry.terminator )
@@ -1160,8 +1160,8 @@ void CVMTTool::DestroyTools()
 {
 	windowposmgr->SavePositions( "cfg/vmt.txt", "VMT" );
 
-	int c = ToolWindow::GetToolWindowCount();
-	for ( int i = c - 1; i >= 0 ; --i )
+	intp c = ToolWindow::GetToolWindowCount();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		ToolWindow *kill = ToolWindow::GetToolWindow( i );
 		delete kill;
@@ -1230,8 +1230,8 @@ void CVMTTool::ToggleToolWindow( Panel *tool, char const *toolName )
 
 void CVMTTool::DestroyToolContainers()
 {
-	int c = ToolWindow::GetToolWindowCount();
-	for ( int i = c - 1; i >= 0 ; --i )
+	intp c = ToolWindow::GetToolWindowCount();
+	for ( intp i = c - 1; i >= 0 ; --i )
 	{
 		ToolWindow *kill = ToolWindow::GetToolWindow( i );
 		delete kill;
@@ -1289,8 +1289,8 @@ void CVMTTool::OnShowFlags()
 {
 	m_bFlagParamsVisible = !m_bFlagParamsVisible;
 
-	int nCount = m_FlagParams.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_FlagParams.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeEditorAttributeInfo *pInfo = m_pVMTType->GetAttributeInfo( m_FlagParams[i] );
 		Assert( pInfo );
@@ -1306,8 +1306,8 @@ void CVMTTool::OnShowToolParams()
 {
 	m_bToolParamsVisible = !m_bToolParamsVisible;
 
-	int nCount = m_ToolParams.Count();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = m_ToolParams.Count();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeEditorAttributeInfo *pInfo = m_pVMTType->GetAttributeInfo( m_ToolParams[i] );
 		Assert( pInfo );

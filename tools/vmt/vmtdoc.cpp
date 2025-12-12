@@ -379,7 +379,7 @@ CDmElement* CVMTDoc::ExtractDefaultParameters( )
 		const char *pShaderParam = pAttribute->GetName();
 
 		// Check for standard params
-		int i;
+		intp i;
 		for ( i = 0; g_pStandardParams[i].m_pParamName != NULL; ++i )
 		{
 			if ( !Q_stricmp( g_pStandardParams[i].m_pParamName, pShaderParam ) )
@@ -406,7 +406,7 @@ CDmElement* CVMTDoc::ExtractDefaultParameters( )
 			continue;
 
 		// Remove flags whose value is 0
-		int nCount = g_pMaterialSystem->ShaderFlagCount();
+		intp nCount = g_pMaterialSystem->ShaderFlagCount();
 		for ( i = 0; i < nCount; ++i )
 		{
 			const char *pFlagName = g_pMaterialSystem->ShaderFlagName( i );
@@ -429,11 +429,11 @@ CDmElement* CVMTDoc::ExtractDefaultParameters( )
 		continue;
 
 		// Remove parameters which match the default value
-		nCount = m_pCurrentIShader->GetNumParams();
-		for ( i = 0; i < nCount; ++i )
+		int nCount2 = m_pCurrentIShader->GetNumParams();
+		for ( int j = 0; j < nCount2; ++j )
 		{
 			// FIXME: Check type matches
-			if ( Q_stricmp( pShaderParam, m_pCurrentIShader->GetParamName( i ) ) )
+			if ( Q_stricmp( pShaderParam, m_pCurrentIShader->GetParamName( j ) ) )
 				continue;
 
 			// NOTE: This isn't particularly efficient. Too bad!
@@ -443,7 +443,7 @@ CDmElement* CVMTDoc::ExtractDefaultParameters( )
 			CUtlBuffer buf( temp, sizeof(temp), CUtlBuffer::TEXT_BUFFER | CUtlBuffer::EXTERNAL_GROWABLE );
 			CUtlBuffer buf2( temp2, sizeof(temp2), CUtlBuffer::TEXT_BUFFER | CUtlBuffer::EXTERNAL_GROWABLE );
 			pAttribute->Serialize( buf );
-			SetAttributeValueFromDefault( pMaterial, pAttribute, m_pCurrentIShader->GetParamDefault( i ) );
+			SetAttributeValueFromDefault( pMaterial, pAttribute, m_pCurrentIShader->GetParamDefault( j ) );
 			pAttribute->Serialize( buf2 );
 
 			if ( ( buf.TellMaxPut() == buf2.TellMaxPut() ) && !memcmp( buf.Base(), buf2.Base(), buf.TellMaxPut() ) )
@@ -489,10 +489,10 @@ bool CVMTDoc::SaveToFile( )
 //-----------------------------------------------------------------------------
 IShader *CVMTDoc::FindShader( const char *pShaderName )
 {
-	int nCount = g_pMaterialSystem->ShaderCount();
-	IShader **ppShaderList = (IShader**)_alloca( nCount * sizeof(IShader*) );
+	intp nCount = g_pMaterialSystem->ShaderCount();
+	IShader **ppShaderList = stackallocT( IShader*, nCount );
 	g_pMaterialSystem->GetShaders( 0, nCount, ppShaderList );
-	for ( int i = 0; i < nCount; ++i )
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		if ( !Q_stricmp( pShaderName, ppShaderList[i]->GetName() ) )
 			return ppShaderList[i];
@@ -572,8 +572,8 @@ void CVMTDoc::RemoveUnusedShaderParams( CDmElement *pMaterial, IShader *pShader,
 			continue;
 
 		// Don't remove flags
-		int nCount = g_pMaterialSystem->ShaderFlagCount();
-		int i;
+		intp nCount = g_pMaterialSystem->ShaderFlagCount();
+		intp i;
 		for ( i = 0; i < nCount; ++i )
 		{
 			const char *pFlagName = g_pMaterialSystem->ShaderFlagName( i );
@@ -588,10 +588,10 @@ void CVMTDoc::RemoveUnusedShaderParams( CDmElement *pMaterial, IShader *pShader,
 
 		// Remove parameters we've currently got but which don't exist in the new shader
 		nCount = pShader->GetNumParams();
-		for ( i = 0; i < nCount; ++i )
+		for ( int j = 0; j < nCount; ++j )
 		{
 			// FIXME: Check type matches
-			if ( !Q_stricmp( pShaderParam, pShader->GetParamName( i ) ) )
+			if ( !Q_stricmp( pShaderParam, pShader->GetParamName( j ) ) )
 				break;
 		}
 
@@ -608,10 +608,10 @@ void CVMTDoc::RemoveUnusedShaderParams( CDmElement *pMaterial, IShader *pShader,
 		if ( pOldShader )
 		{
 			nCount = pOldShader->GetNumParams();
-			for ( i = 0; i < nCount; ++i )
+			for ( int j = 0; j < nCount; ++j )
 			{
 				// FIXME: Check type matches
-				if ( Q_stricmp( pShaderParam, pOldShader->GetParamName( i ) ) )
+				if ( Q_stricmp( pShaderParam, pOldShader->GetParamName( j ) ) )
 					continue;
 
 				// NOTE: This isn't particularly efficient. Too bad!
@@ -621,7 +621,7 @@ void CVMTDoc::RemoveUnusedShaderParams( CDmElement *pMaterial, IShader *pShader,
 				CUtlBuffer buf1( temp1, sizeof(temp1), CUtlBuffer::TEXT_BUFFER | CUtlBuffer::EXTERNAL_GROWABLE );
 				CUtlBuffer buf2( temp2, sizeof(temp2), CUtlBuffer::TEXT_BUFFER | CUtlBuffer::EXTERNAL_GROWABLE );
 				pAttribute->Serialize( buf1 );
-				SetAttributeValueFromDefault( pMaterial, pAttribute, pOldShader->GetParamDefault( i ) );
+				SetAttributeValueFromDefault( pMaterial, pAttribute, pOldShader->GetParamDefault( j ) );
 				pAttribute->Serialize( buf2 );
 
 				if ( ( buf1.TellMaxPut() == buf2.TellMaxPut() ) && !memcmp( buf1.Base(), buf2.Base(), buf1.TellMaxPut() ) )
@@ -932,9 +932,8 @@ void CVMTDoc::AddNewShaderParams( CDmElement *pMaterial, IShader *pShader )
 {
 	// First add all flags
 	m_pCallback->RemoveAllFlagParameters();
-	int nCount = g_pMaterialSystem->ShaderFlagCount();
- 	int i;
-	for ( i = 0; i < nCount; ++i )
+	intp nCount = g_pMaterialSystem->ShaderFlagCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		const char *pParamName = g_pMaterialSystem->ShaderFlagName( i );
 		AddNewShaderParam( pMaterial, pParamName, SHADER_PARAM_TYPE_BOOL, "0" );
@@ -942,17 +941,17 @@ void CVMTDoc::AddNewShaderParams( CDmElement *pMaterial, IShader *pShader )
 	}
 
 	// Next add all shader-specific parameters
-	nCount = pShader->GetNumParams();
-	for ( i = 0; i < nCount; ++i )
+	int nCount2 = pShader->GetNumParams();
+	for ( int j = 0; j < nCount2; ++j )
 	{
-		const char *pParamName = pShader->GetParamName( i );
+		const char *pParamName = pShader->GetParamName( j );
 
 		// Don't add parameters that don't want to be editable
-		if ( pShader->GetParamFlags( i ) & SHADER_PARAM_NOT_EDITABLE )
+		if ( pShader->GetParamFlags( j ) & SHADER_PARAM_NOT_EDITABLE )
 			continue;
 
-		ShaderParamType_t paramType = pShader->GetParamType( i );
-		const char *pDefault = pShader->GetParamDefault( i );
+		ShaderParamType_t paramType = pShader->GetParamType( j );
+		const char *pDefault = pShader->GetParamDefault( j );
 		AddNewShaderParam( pMaterial, pParamName, paramType, pDefault );
 	}
 }
