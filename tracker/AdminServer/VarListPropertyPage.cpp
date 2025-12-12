@@ -82,7 +82,7 @@ void CVarListPropertyPage::PerformLayout()
 void CVarListPropertyPage::EditVariable()
 {
 	// get rule from the list
-	int itemID = m_pRulesList->GetSelectedItem(0);
+	intp itemID = m_pRulesList->GetSelectedItem(0);
 	KeyValues *rule = m_pRulesList->GetItem(itemID);
 	if (!rule)
 		return;
@@ -125,7 +125,7 @@ void CVarListPropertyPage::RefreshVarList()
 void CVarListPropertyPage::SetVarString(const char *varName, const char *value)
 {
 	// find the item by name
-	int itemID = m_pRulesList->GetItem(varName);
+	intp itemID = m_pRulesList->GetItem(varName);
 	KeyValues *rule = m_pRulesList->GetItem(itemID);
 	if (!rule)
 		return;
@@ -155,7 +155,7 @@ void CVarListPropertyPage::SetVarString(const char *varName, const char *value)
 void CVarListPropertyPage::SetCustomStringList(const char *varName, const char *stringList)
 {
 	// find the item by name
-	int itemID = m_pRulesList->GetItem(varName);
+	intp itemID = m_pRulesList->GetItem(varName);
 	KeyValues *rule = m_pRulesList->GetItem(itemID);
 	if (!rule)
 		return;
@@ -168,7 +168,7 @@ void CVarListPropertyPage::SetCustomStringList(const char *varName, const char *
 //-----------------------------------------------------------------------------
 const char *CVarListPropertyPage::GetVarString(const char *varName)
 {
-	int itemID = m_pRulesList->GetItem(varName);
+	intp itemID = m_pRulesList->GetItem(varName);
 	KeyValues *rule = m_pRulesList->GetItem(itemID);
 	if (!rule)
 		return "";

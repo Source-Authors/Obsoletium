@@ -311,10 +311,10 @@ void CPlayerPanel::OnBanButtonPressed()
 //-----------------------------------------------------------------------------
 void CPlayerPanel::KickSelectedPlayers()
 {
-	for (int i = 0; i < m_pPlayerListPanel->GetSelectedItemsCount(); i++)
+	for (intp i = 0; i < m_pPlayerListPanel->GetSelectedItemsCount(); i++)
 	{
 		// get the player info
-		int row = m_pPlayerListPanel->GetSelectedItem(i);
+		intp row = m_pPlayerListPanel->GetSelectedItem(i);
 		KeyValues *pl = m_pPlayerListPanel->GetItem(row);
 		if (!pl)
 			continue;

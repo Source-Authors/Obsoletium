@@ -157,7 +157,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 		// move map from mapcycle to available list
 		while (m_pMapCycleList->GetSelectedItemsCount() > 0)
 		{
-			int itemID = m_pMapCycleList->GetSelectedItem(0);
+			intp itemID = m_pMapCycleList->GetSelectedItem(0);
 			KeyValues *data = m_pMapCycleList->GetItem(itemID);
 			if (!data)
 				return;
@@ -172,7 +172,7 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 		// move map from available list to mapcycle 
 		while (m_pAvailableMapList->GetSelectedItemsCount() > 0)
 		{
-			int itemID = m_pAvailableMapList->GetSelectedItem(0);
+			intp itemID = m_pAvailableMapList->GetSelectedItem(0);
 			KeyValues *data = m_pAvailableMapList->GetItem(itemID);
 			if (!data)
 				return;
@@ -184,13 +184,13 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 	}
 	else if (!stricmp(command, "ArrowUp"))
 	{
-		int itemID = m_pMapCycleList->GetSelectedItem(0);
-		int row = m_pMapCycleList->GetItemCurrentRow(itemID);
-		int prevRow = row - 1;
+		intp itemID = m_pMapCycleList->GetSelectedItem(0);
+		intp row = m_pMapCycleList->GetItemCurrentRow(itemID);
+		intp prevRow = row - 1;
 		if (prevRow < 0)
 			return;
 
-		int prevItemID = m_pMapCycleList->GetItemIDFromRow(prevRow);
+		intp prevItemID = m_pMapCycleList->GetItemIDFromRow(prevRow);
 
 		// get the data
 		KeyValues *d1 = m_pMapCycleList->GetItem(itemID);
@@ -208,13 +208,13 @@ void CMapCycleEditDialog::OnCommand(const char *command)
 	}
 	else if (!stricmp(command, "ArrowDown"))
 	{
-		int itemID = m_pMapCycleList->GetSelectedItem(0);
-		int row = m_pMapCycleList->GetItemCurrentRow(itemID);
-		int nextRow = row + 1;
+		intp itemID = m_pMapCycleList->GetSelectedItem(0);
+		intp row = m_pMapCycleList->GetItemCurrentRow(itemID);
+		intp nextRow = row + 1;
 		if (nextRow + 1 > m_pMapCycleList->GetItemCount())
 			return;
 
-		int nextItemID = m_pMapCycleList->GetItemIDFromRow(nextRow);
+		intp nextItemID = m_pMapCycleList->GetItemIDFromRow(nextRow);
 
 		// get the data
 		KeyValues *d1 = m_pMapCycleList->GetItem(itemID);

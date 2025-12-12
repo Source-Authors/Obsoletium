@@ -272,7 +272,7 @@ void CGraphPanel::CGraphsImage::Paint()
 	}
 	
 	if(fps)
-	{			
+	{
 		RangeFPS+=static_cast<float>(maxFPS*0.1); // don't let the top of the range touch the top of the panel
 
 		if(RangeFPS<=1) 
@@ -324,10 +324,9 @@ void CGraphPanel::CGraphsImage::Paint()
 		pPlayersY = new int[points.Count()];
 	}
 
-	for(int i=0;i<points.Count();i++)
+	for(intp i=0;i<points.Count();i++)
 	// draw the graphs, left to right
 	{
-	
 		if(cpu) 
 		{
 			pCpuX[i] = left+static_cast<int>(i*distPoints);
@@ -363,15 +362,13 @@ void CGraphPanel::CGraphsImage::Paint()
 			pPlayersX[i] = left+static_cast<int>(i*distPoints);
 			pPlayersY[i] = static_cast<int>(( (RangePlayers-points[i].players)/RangePlayers)*ySize-bottom);
 		}
-
-	
 	}
 	// we use DrawPolyLine, its much, much, much more efficient than calling lots of DrawLine()'s
 
 	if(cpu)
 	{
 		SetColor(CPUColor); // green
-		DrawPolyLine(pCpuX, pCpuY, points.Count());	
+		DrawPolyLine(pCpuX, pCpuY, points.Count());
 		delete [] pCpuX;
 		delete [] pCpuY;
 	} 
@@ -379,21 +376,23 @@ void CGraphPanel::CGraphsImage::Paint()
 	if(net_i) 
 	{
 		SetColor(NetInColor); // red
-		DrawPolyLine(pInX, pInY, points.Count());	
+		DrawPolyLine(pInX, pInY, points.Count());
 		delete [] pInX;
 		delete [] pInY;
 	}
+
 	if(net_o)
 	{
 		SetColor(NetOutColor); //yellow
-		DrawPolyLine(pOutX, pOutY, points.Count());	
+		DrawPolyLine(pOutX, pOutY, points.Count());
 		delete [] pOutX;
 		delete [] pOutY;
 	}
+
 	if(fps)
 	{
 		SetColor(FPSColor);
-		DrawPolyLine(pFPSX, pFPSY, points.Count());	
+		DrawPolyLine(pFPSX, pFPSY, points.Count());
 		delete [] pFPSX;
 		delete [] pFPSY;
 	}
@@ -401,7 +400,7 @@ void CGraphPanel::CGraphsImage::Paint()
 	if(ping)
 	{
 		SetColor(PingColor);
-		DrawPolyLine(pPingX, pPingY, points.Count());	
+		DrawPolyLine(pPingX, pPingY, points.Count());
 		delete [] pPingX;
 		delete [] pPingY;
 	}
@@ -409,11 +408,11 @@ void CGraphPanel::CGraphsImage::Paint()
 	if(players)
 	{
 		SetColor(PlayersColor);
-		DrawPolyLine(pPlayersX, pPlayersY, points.Count());	
+		DrawPolyLine(pPlayersX, pPlayersY, points.Count());
 		delete [] pPlayersX;
 		delete [] pPlayersY;
 	}
-}  
+}
 
 
 //-----------------------------------------------------------------------------
@@ -541,7 +540,7 @@ bool CGraphPanel::CGraphsImage::AddPoint(const Points_t &p)
 	} 
 	else if ( timeBetween==MINUTES) // most recent day
 	{
-			while(points.Count() && (p.time-points[0].time)>60*60*24)
+		while(points.Count() && (p.time-points[0].time)>60*60*24)
 		{
 			points.Remove(0);
 		}
@@ -590,7 +589,6 @@ bool CGraphPanel::CGraphsImage::AddPoint(const Points_t &p)
 			CheckBounds(points[i]);
 		}
 	}
-
 
 	CheckBounds(avgPoint);
 
