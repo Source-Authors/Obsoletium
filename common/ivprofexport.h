@@ -26,8 +26,8 @@ public:
 	class CExportedBudgetGroupInfo
 	{
 	public:
-		const char *m_pName;
-		int m_BudgetFlags;	// Combination of BUDGETFLAG_ defines (in vprof.h)
+		const char *m_pName{nullptr};
+		int m_BudgetFlags{0};	// Combination of BUDGETFLAG_ defines (in vprof.h)
 		Color m_Color;
 	};
 
