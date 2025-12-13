@@ -988,11 +988,8 @@ void CL_FullyConnected( void )
 
 	EngineVGui()->UpdateProgressBar( PROGRESS_READYTOPLAY );
 
-	if ( !IsX360() || cl.m_nMaxClients == 1 )
-	{
-		// Need this to persist for multiplayer respawns, 360 can't reload
-		CM_DiscardEntityString();
-	}
+	// Need this to persist for multiplayer respawns.
+	CM_DiscardEntityString();
 
 	g_pMDLCache->EndMapLoad();
 
@@ -1059,15 +1056,6 @@ void CL_FullyConnected( void )
 	{
 		scr_nextdrawtick = host_tickcount + TIME_TO_TICKS( 0.25f );
 	}
-
-#ifdef _X360
-	// At this point, check for a valid controller connection.  If it's been lost, then we need to pop our game UI up
-	XINPUT_CAPABILITIES caps;
-	if ( XInputGetCapabilities( XBX_GetPrimaryUserId(), XINPUT_FLAG_GAMEPAD, &caps ) == ERROR_DEVICE_NOT_CONNECTED )
-	{
-		EngineVGui()->ActivateGameUI();
-	}
-#endif // _X360
 
 	// Now that we're connected, toggle the clan tag so it gets sent to the server
 	int id = cl_clanid.GetInt();
