@@ -1337,7 +1337,7 @@ bool CBaseClient::ShouldSendMessages( void )
 	}
 
 	// check, if it's time to send the next packet
-	bool bSendMessage = m_fNextMessageTime <= net_time ;
+	bool bSendMessage = m_fNextMessageTime <= net_time;
 
 	if ( !bSendMessage && !IsActive() )
 	{
@@ -1391,7 +1391,7 @@ void CBaseClient::UpdateSendState( void )
 		else
 		{
 			// signon mode: only respond on request or after 1 second
-			m_fNextMessageTime = net_time + 1.0f;
+			m_fNextMessageTime = net_time + 1.0;
 		}
 	}
 }

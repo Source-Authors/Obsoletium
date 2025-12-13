@@ -311,7 +311,7 @@ void CHLTVClientState::SendPacket()
 	else
 	{
 		// during signon process send only 5 packets/second
-		m_flNextCmdTime = net_time + ( 1.0f / 5.0f );
+		m_flNextCmdTime = net_time + ( 1.0 / 5.0 );
 	}
 }
 
