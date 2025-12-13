@@ -154,7 +154,8 @@ protected:
 
 	CTree m_Lookup;
 	bool m_bInsensitive;
-	mutable const char* m_pUserSearchString;
+	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
+	mutable CThreadLocal<const char*> m_pUserSearchString;
 
 	// stores the string data
 	CUtlVector<StringPool_t*> m_StringPools;

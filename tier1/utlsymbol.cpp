@@ -129,9 +129,11 @@ bool CUtlSymbolTable::CLess::operator()( const CStringPoolIndex &i1, const CStri
 	// right now at least, because m_LessFunc is the first member of CUtlRBTree, and m_Lookup
 	// is the first member of CUtlSymbolTabke, this == pTable
 	CUtlSymbolTable *pTable = (CUtlSymbolTable *)( (byte *)this - offsetof(CUtlSymbolTable::CTree, m_LessFunc) ) - offsetof(CUtlSymbolTable, m_Lookup );
-	const char* str1 = (i1 == INVALID_STRING_INDEX) ? pTable->m_pUserSearchString :
+	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
+	const char* str1 = (i1 == INVALID_STRING_INDEX) ? pTable->m_pUserSearchString.Get() :
 													  pTable->StringFromIndex( i1 );
-	const char* str2 = (i2 == INVALID_STRING_INDEX) ? pTable->m_pUserSearchString :
+	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
+	const char* str2 = (i2 == INVALID_STRING_INDEX) ? pTable->m_pUserSearchString.Get() :
 													  pTable->StringFromIndex( i2 );
 
 	if ( !str1 && str2 )
@@ -152,8 +154,9 @@ bool CUtlSymbolTable::CLess::operator()( const CStringPoolIndex &i1, const CStri
 //-----------------------------------------------------------------------------
 CUtlSymbolTable::CUtlSymbolTable( intp growSize, intp initSize, bool caseInsensitive )
 	: m_Lookup( growSize, initSize ), m_bInsensitive( caseInsensitive ),
-	m_pUserSearchString{nullptr}, m_StringPools( 8 )
+	m_StringPools( 8 )
 {
+  m_pUserSearchString.Set(nullptr);
 }
 
 CUtlSymbolTable::~CUtlSymbolTable()
@@ -170,15 +173,17 @@ CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 	if (!pString)
 		return {};
 	
+	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
 	// Store a special context used to help with insertion
-	m_pUserSearchString = pString;
+	m_pUserSearchString.Set(pString);
 	
 	// Passing this special invalid symbol makes the comparison function
 	// use the string passed in the context
 	UtlSymId_t idx = m_Lookup.Find( INVALID_STRING_INDEX );
 
 #ifdef _DEBUG
-	m_pUserSearchString = nullptr;
+	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
+	m_pUserSearchString.Set(nullptr);
 #endif
 
 	return { idx };
