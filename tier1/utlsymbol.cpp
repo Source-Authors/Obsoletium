@@ -192,14 +192,15 @@ CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 
 intp CUtlSymbolTable::FindPoolWithSpace( intp len )	const
 {
-	for ( intp i=0; i < m_StringPools.Count(); i++ )
+	intp i = 0;
+	for ( auto *pPool : m_StringPools )
 	{
-		StringPool_t *pPool = m_StringPools[i];
-
 		if ( (pPool->m_TotalLen - pPool->m_SpaceUsed) >= len )
 		{
 			return i;
 		}
+
+		++i;
 	}
 
 	return -1;
