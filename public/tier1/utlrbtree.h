@@ -1590,9 +1590,10 @@ I CUtlRBTree<T, I, L, M>::Find( T const &search ) const
 	I current = m_Root;
 	while (current != InvalidIndex()) 
 	{
-		if (m_LessFunc( search, Element(current) ))
+		const auto &elem = Element(current);
+		if (m_LessFunc( search, elem ))
 			current = LeftChild(current);
-		else if (m_LessFunc( Element(current), search ))
+		else if (m_LessFunc( elem, search ))
 			current = RightChild(current);
 		else 
 			break;
