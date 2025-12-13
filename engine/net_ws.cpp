@@ -900,8 +900,7 @@ void NET_AdjustLag( void )
 	
 	// Bound time step
 	
-	double dt = net_time - s_LastTime;
-	dt = clamp( dt, 0.0, 0.2 );
+	const float dt = static_cast<float>( clamp( net_time - s_LastTime, 0.0, 0.2 ) );
 	
 	s_LastTime = net_time;
 
