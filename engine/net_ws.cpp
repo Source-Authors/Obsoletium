@@ -72,7 +72,8 @@ struct pendingsocket_t
 {
 	socket_handle	newsock;	// handle of new socket
 	intp			netsock;	// index of listen socket
-	float			time;
+	// dimhotepus: float -> double.
+	double			time;
 	netadr_t		addr;
 };
 
@@ -1054,7 +1055,7 @@ public:
 		}
 
 		memset( &netsplit, 0, sizeof( netsplit ) );
-		lastactivetime = 0.0f;
+		lastactivetime = 0.0;
 	}
 
 public:
@@ -1062,7 +1063,8 @@ public:
 	int				splitflags[ MAX_SPLITPACKET_SPLITS ];
 	LONGPACKET		netsplit;
 	// host_time the last time any entry was received for this entry
-	float			lastactivetime;
+	// dimhotepus: float -> double.
+	double			lastactivetime;
 };
 
 typedef CUtlVector< CSplitPacketEntry > vecSplitPacketEntries_t;
