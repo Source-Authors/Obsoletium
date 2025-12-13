@@ -1519,20 +1519,18 @@ template < class T, class I, typename L, class M >
 I CUtlRBTree<T, I, L, M>::InsertIfNotFound( T const &insert )
 {
 	// use copy constructor to copy it in
-	I parent;
-	bool leftchild;
-
 	I current = m_Root;
-	parent = InvalidIndex();
-	leftchild = false;
+	I parent = InvalidIndex();
+	bool leftchild = false;
 	while (current != InvalidIndex()) 
 	{
 		parent = current;
-		if (m_LessFunc( insert, Element(current) ))
+		const auto &elem = Element(current);
+		if (m_LessFunc( insert, elem ))
 		{
 			leftchild = true; current = LeftChild(current);
 		}
-		else if (m_LessFunc( Element(current), insert ))
+		else if (m_LessFunc( elem, insert ))
 		{
 			leftchild = false; current = RightChild(current);
 		}
@@ -1551,20 +1549,18 @@ template < class T, class I, typename L, class M >
 I CUtlRBTree<T, I, L, M>::InsertIfNotFound( T&& insert )
 {
 	// use move constructor to move it in
-	I parent;
-	bool leftchild;
-
 	I current = m_Root;
-	parent = InvalidIndex();
-	leftchild = false;
+	I parent = InvalidIndex();
+	bool leftchild = false;
 	while (current != InvalidIndex()) 
 	{
 		parent = current;
-		if (m_LessFunc( insert, Element(current) ))
+		const auto &elem = Element(current);
+		if (m_LessFunc( insert, elem ))
 		{
 			leftchild = true; current = LeftChild(current);
 		}
-		else if (m_LessFunc( Element(current), insert ))
+		else if (m_LessFunc( elem, insert ))
 		{
 			leftchild = false; current = RightChild(current);
 		}
