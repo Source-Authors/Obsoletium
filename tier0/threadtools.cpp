@@ -10,6 +10,8 @@
 	#include "winlite.h"
 	#include <process.h>
 
+	#include "scoped_dll.h"
+
 #elif defined(POSIX)
 
 #if !defined(OSX)
@@ -760,6 +762,15 @@ bool CThreadFullMutex::Release()
 
 #endif
 
+// dimhotepus: TlsGetValue2 and TlsGetValue have same signatures,
+// so use TlsGetValue as TlsGetValue2 is from Windows 11 24H2 SDK not installed for some users.
+using TlsGetValue2Function = decltype(&TlsGetValue);
+
+static const source::ScopedDll scopedKernel32Dll{ "kernel32.dll", LOAD_LIBRARY_SEARCH_SYSTEM32 };
+// dimhotepus: TlsGetValue2 doesn't set GetLastError (involves thread local storage) so is faster.
+const auto [tlsGetValue2, tlsRc] = scopedKernel32Dll.GetFunction<TlsGetValue2Function>("TlsGetValue2");
+static const TlsGetValue2Function tlsGetValueFunction = !tlsRc && tlsGetValue2 ? tlsGetValue2 : &TlsGetValue;
+
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
@@ -796,8 +807,9 @@ CThreadLocalBase::~CThreadLocalBase()
 void * CThreadLocalBase::Get() const
 {
 #ifdef _WIN32
+	// dimhotepus: Speedup access to thread local storage on Windows 11 24H2+.
 	if ( m_index != TLS_OUT_OF_INDEXES )
-		return TlsGetValue( m_index );
+		return tlsGetValueFunction( m_index );
 	AssertMsg( 0, "Bad thread local" );
 	return nullptr;
 #elif defined(POSIX)
