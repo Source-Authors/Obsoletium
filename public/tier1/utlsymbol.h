@@ -137,12 +137,32 @@ protected:
 		bool operator()( const CStringPoolIndex &left, const CStringPoolIndex &right ) const;
 	};
 
+	struct CLessForFind
+	{
+		CLessForFind( [[maybe_unused]] int ignored = 0 ) {} // permits default initialization to NULL in CUtlRBTree
+		bool operator!() const { return false; }
+		bool operator()( const CStringPoolIndex &left, const CStringPoolIndex &right, const char *searchString ) const;
+	};
+
 	// Stores the symbol lookup
-	class CTree : public CUtlRBTree<CStringPoolIndex, unsigned short, CLess>
+	class CTree : public CUtlRBTree<
+		CStringPoolIndex,
+		unsigned short,
+		CLess,
+		CUtlMemory< UtlRBTreeNode_t< CStringPoolIndex, unsigned short >, unsigned short >,
+		const char *,
+		CLessForFind>
 	{
 	public:
-		CTree(  intp growSize, intp initSize ) : CUtlRBTree<CStringPoolIndex, unsigned short, CLess>( growSize, initSize ) {}
+		CTree( intp growSize, intp initSize ) : CUtlRBTree<
+			CStringPoolIndex,
+			unsigned short,
+			CLess,
+			CUtlMemory< UtlRBTreeNode_t< CStringPoolIndex, unsigned short >, unsigned short >,
+			const char *,
+			CLessForFind>( growSize, initSize ) {}
 		friend class CUtlSymbolTable::CLess; // Needed to allow CLess to calculate pointer to symbol table
+		friend struct CUtlSymbolTable::CLessForFind; // Needed to allow CLess to calculate pointer to symbol table
 	};
 
 	struct StringPool_t
@@ -154,8 +174,6 @@ protected:
 
 	CTree m_Lookup;
 	bool m_bInsensitive;
-	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
-	mutable CThreadLocal<const char*> m_pUserSearchString;
 
 	// stores the string data
 	CUtlVector<StringPool_t*> m_StringPools;

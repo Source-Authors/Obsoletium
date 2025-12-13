@@ -122,18 +122,39 @@ inline const char* CUtlSymbolTable::StringFromIndex( const CStringPoolIndex &ind
 
 bool CUtlSymbolTable::CLess::operator()( const CStringPoolIndex &i1, const CStringPoolIndex &i2 ) const
 {
+	// Need to do pointer math because CUtlSymbolTable is used in CUtlVectors, and hence
+	// can be arbitrarily moved in memory on a realloc. Yes, this is portable. In reality,
+	// right now at least, because m_LessFunc is the first member of CUtlRBTree, and m_Lookup
+	// is the first member of CUtlSymbolTable, this == pTable
+	CUtlSymbolTable *pTable = (CUtlSymbolTable *)( (byte *)GET_OUTER( CUtlSymbolTable::CTree, m_LessFunc ) - offsetof(CUtlSymbolTable, m_Lookup ) );
+	const char* str1 = pTable->StringFromIndex( i1 );
+	const char* str2 = pTable->StringFromIndex( i2 );
+
+	if ( !str1 && str2 )
+		return false;
+	if ( !str2 && str1 )
+		return true;
+	if ( !str1 && !str2 )
+		return false;
+	if ( !pTable->m_bInsensitive )
+		return V_strcmp( str1, str2 ) < 0;
+	else
+		return V_stricmp( str1, str2 ) < 0;
+}
+
+
+bool CUtlSymbolTable::CLessForFind::operator()( const CStringPoolIndex &i1, const CStringPoolIndex &i2, const char *searchString ) const
+{
 	DEFINE_INVALID_STRING_INDEX;
 
 	// Need to do pointer math because CUtlSymbolTable is used in CUtlVectors, and hence
 	// can be arbitrarily moved in memory on a realloc. Yes, this is portable. In reality,
 	// right now at least, because m_LessFunc is the first member of CUtlRBTree, and m_Lookup
-	// is the first member of CUtlSymbolTabke, this == pTable
-	CUtlSymbolTable *pTable = (CUtlSymbolTable *)( (byte *)this - offsetof(CUtlSymbolTable::CTree, m_LessFunc) ) - offsetof(CUtlSymbolTable, m_Lookup );
-	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
-	const char* str1 = (i1 == INVALID_STRING_INDEX) ? pTable->m_pUserSearchString.Get() :
+	// is the first member of CUtlSymbolTable, this == pTable
+	CUtlSymbolTable *pTable = (CUtlSymbolTable *)( (byte*)GET_OUTER( CUtlSymbolTable::CTree, m_LessFindFunc ) - offsetof(CUtlSymbolTable, m_Lookup ) );
+	const char* str1 = (i1 == INVALID_STRING_INDEX) ? searchString :
 													  pTable->StringFromIndex( i1 );
-	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
-	const char* str2 = (i2 == INVALID_STRING_INDEX) ? pTable->m_pUserSearchString.Get() :
+	const char* str2 = (i2 == INVALID_STRING_INDEX) ? searchString :
 													  pTable->StringFromIndex( i2 );
 
 	if ( !str1 && str2 )
@@ -156,7 +177,6 @@ CUtlSymbolTable::CUtlSymbolTable( intp growSize, intp initSize, bool caseInsensi
 	: m_Lookup( growSize, initSize ), m_bInsensitive( caseInsensitive ),
 	m_StringPools( 8 )
 {
-  m_pUserSearchString.Set(nullptr);
 }
 
 CUtlSymbolTable::~CUtlSymbolTable()
@@ -172,19 +192,10 @@ CUtlSymbol CUtlSymbolTable::Find( const char* pString ) const
 
 	if (!pString)
 		return {};
-	
-	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
-	// Store a special context used to help with insertion
-	m_pUserSearchString.Set(pString);
-	
+
 	// Passing this special invalid symbol makes the comparison function
 	// use the string passed in the context
-	UtlSymId_t idx = m_Lookup.Find( INVALID_STRING_INDEX );
-
-#ifdef _DEBUG
-	// dimhotepus: Make threadlocal as can be set by multiple threads simultaneously.
-	m_pUserSearchString.Set(nullptr);
-#endif
+	UtlSymId_t idx = m_Lookup.Find( INVALID_STRING_INDEX, pString );
 
 	return { idx };
 }
