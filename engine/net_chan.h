@@ -94,9 +94,10 @@ private: // netchan structurs
 		unsigned short	msggroups[INetChannelInfo::TOTAL];	// received bytes for each message group
 	} netframe_t;
 
-	typedef struct
+	struct netflow_t
 	{
-		float		nextcompute;	// Time when we should recompute k/sec data
+		// dimhotepus: float -> double.
+		double		nextcompute;	// Time when we should recompute k/sec data
 		float		avgbytespersec;	// average bytes/sec
 		float		avgpacketspersec;// average packets/sec
 		float		avgloss;		// average packet loss [0..1]
@@ -108,7 +109,7 @@ private: // netchan structurs
 		int			currentindex;		// current frame index
 		netframe_t	frames[ NET_FRAMES_BACKUP ]; // frame history
 		netframe_t	*currentframe;	// current frame
-	} netflow_t;
+	};
 
 public: 
 	CNetChan();
