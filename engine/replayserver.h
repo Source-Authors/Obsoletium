@@ -169,7 +169,8 @@ public:
 	CReplayFrame	m_ReplayFrame;	// all incoming messages go here until Snapshot is made
 
 	bool			m_bSignonState;	// true if connecting to server
-	float			m_flStartTime;
+	// dimhotepus: float -> double.
+	double			m_flStartTime;
 	float			m_flFPS;		// FPS the proxy is running;
 	int				m_nGameServerMaxClients; // max clients on game server
 	double			m_fNextSendUpdateTime;	// time to send next Replay status messages 

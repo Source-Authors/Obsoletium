@@ -408,7 +408,7 @@ CReplayServer::CReplayServer()
 	m_nViewEntity = 0;
 	m_nPlayerSlot = 0;
 	m_bSignonState = false;
-	m_flStartTime = 0;
+	m_flStartTime = 0.0;
 	m_flFPS = 0;
 	m_nGameServerMaxClients = 0;
 	m_fNextSendUpdateTime = 0;
