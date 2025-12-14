@@ -207,7 +207,7 @@ class CAchievement_AchievedCount : public CBaseAchievement
 public:
 	void Init() override;
 	virtual void OnSteamUserStatsStored( void );
-	virtual bool IsMetaAchievement() { return true; }
+	bool IsMetaAchievement() override { return true; }
 
 	int GetLowRange() const { return m_iLowRange; }
 	int GetHighRange() const { return m_iHighRange; }
