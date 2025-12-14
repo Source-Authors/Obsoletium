@@ -2453,6 +2453,9 @@ void CSceneEntity::OnLoaded()
 	// Nothing
 }
 
+// dimhotepus: Dump missed scene files only once.
+static CUtlVector<const char *> missedSceneFiles;
+
 //-----------------------------------------------------------------------------
 // Purpose: Initiate scene playback
 //-----------------------------------------------------------------------------
@@ -2466,7 +2469,12 @@ void CSceneEntity::StartPlayback( void )
 		m_pScene = LoadScene( STRING( m_iszSceneFile ), this );
 		if ( !m_pScene )
 		{
-			DevMsg( "%s missing from scenes.image\n", STRING( m_iszSceneFile ) );
+			// dimhotepus: Dump missed scene files only once.
+			if ( !missedSceneFiles.Find( STRING( m_iszSceneFile ) ) )
+			{
+				DevMsg( "%s missing from scenes.image\n", STRING( m_iszSceneFile ) );
+				missedSceneFiles.AddToTail( STRING( m_iszSceneFile )) ;
+			}
 			m_bSceneMissing = true;
 			return;
 		}
