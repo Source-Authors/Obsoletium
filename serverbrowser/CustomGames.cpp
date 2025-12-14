@@ -141,10 +141,10 @@ void CCustomGames::UpdateDerivedLayouts( void )
 {
 	const char *pPathID = "PLATFORM";
 
-	KeyValues *pConditions = NULL;
+	KeyValuesAD pConditions( nullptr );
 	if ( ServerBrowser().IsWorkshopEnabled() )
 	{
-		pConditions = new KeyValues( "conditions" );
+		pConditions = KeyValuesAD( new KeyValues( "conditions" ) );
 		if ( pConditions )
 		{
 			KeyValues *pNewKey = new KeyValues( "if_workshop_enabled" );
@@ -172,11 +172,6 @@ void CCustomGames::UpdateDerivedLayouts( void )
 		}
 
 		LoadControlSettings( "servers/CustomGamesPage.res", pPathID, NULL, pConditions );
-	}
-
-	if ( pConditions )
-	{
-		pConditions->deleteThis();
 	}
 
 	if ( !GameSupportsReplay() )
