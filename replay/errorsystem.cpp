@@ -107,9 +107,6 @@ void CErrorSystem::AddFormattedErrorFromTokenName( const char *pFormatToken/*=NU
 
 	// Add the error
 	AddError( wszErrorStr );
-
-	// Delete args
-	pFormatArgs->deleteThis();
 }
 
 #if !defined( DEDICATED )
