@@ -274,13 +274,11 @@ void CParticleSystemDefinitionBrowser::CreateParticleSystemsFromKV( const char *
 	// Wrap it with a text buffer reader
 	CUtlBuffer bufText( bufRawData.Base(), bufRawData.TellPut(), CUtlBuffer::READ_ONLY | CUtlBuffer::TEXT_BUFFER );
 
-	KeyValues *pBaseKeyValue = NULL;
-	pBaseKeyValue = new KeyValues( "CCreateParticlesFromKV" );
+	KeyValuesAD pBaseKeyValue( "CCreateParticlesFromKV" );
 	
 	if ( !pBaseKeyValue->LoadFromBuffer( NULL, bufText ) )
 	{
 		Warning( "Unable to Read KV file [%s]\n", pFileName );
-		pBaseKeyValue->deleteThis();
 		return;
 	}
 
