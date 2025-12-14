@@ -79,21 +79,8 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
 //=============================================================================
 
 {
-#ifdef _X360
-	if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED )
-		return;
-#endif
-
 	char szFilename[MAX_PATH];
-
-	if ( IsX360() )
-	{
-		Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/%s_GameState.txt", COM_GetModDirectory() );
-	}
-	else
-	{
-		Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
-	}
+	V_sprintf_safe( szFilename, "GameState.txt" );
 
 	// Never call pKV->SaveToFile!!!!
 	// Save to a buffer instead.
@@ -110,14 +97,7 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
     if ( bPersistToSteamCloud )
     {
 #ifndef NO_STEAM
-		if ( IsX360() )
-        {
-            Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/%s_GameState.txt", COM_GetModDirectory() );
-        }
-        else
-        {
-            Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
-        }
+		V_sprintf_safe( szFilename, "GameState.txt" );
 
         ISteamRemoteStorage *pRemoteStorage = SteamClient()?(ISteamRemoteStorage *)SteamClient()->GetISteamGenericInterface(
             SteamAPI_GetHSteamUser(), SteamAPI_GetHSteamPipe(), STEAMREMOTESTORAGE_INTERFACE_VERSION ):NULL;
@@ -167,13 +147,6 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
     //=============================================================================
     // HPE_END
     //=============================================================================
-
-#ifdef _X360
-	if ( xboxsystem )
-	{
-		xboxsystem->FinishContainerWrites();
-	}
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -474,7 +447,7 @@ void CAchievementMgr::LevelInitPreEntity()
 {
 	m_bCheatsEverOn = false;
 
-	// load global state if we haven't already; X360 users may not have had a storage device available or selected at boot time
+	// load global state if we haven't already.
 	EnsureGlobalStateLoaded();
 
 #ifdef GAME_DLL
@@ -604,68 +577,13 @@ bool CAchievementMgr::HasAchieved( const char *pchName )
 //-----------------------------------------------------------------------------
 void CAchievementMgr::DownloadUserData()
 {
-	if ( IsPC() )
-	{
 #ifndef NO_STEAM
-		if ( steamapicontext->SteamUserStats() )
-		{
-			// request stat download; will get called back at OnUserStatsReceived when complete
-			steamapicontext->SteamUserStats()->RequestCurrentStats();
-		}
-#endif
-	}
-	else if ( IsX360() )
+	if ( steamapicontext->SteamUserStats() )
 	{
-#if defined( _X360 )
-		if ( XBX_GetPrimaryUserId() == INVALID_USER_ID )
-			return;
-
-		// Download achievements from XBox Live
-		bool bDownloadSuccessful = true;
-		int nTotalAchievements = 99;
-		uint bytes;
-		int ret = xboxsystem->EnumerateAchievements( XBX_GetPrimaryUserId(), 0, 0, nTotalAchievements, &bytes, 0, false );
-		if ( ret != ERROR_SUCCESS )
-		{
-			Warning( "Enumerate Achievements failed! Error %d", ret );
-			bDownloadSuccessful = false;
-		}
-		
-		// Enumerate the achievements from Live
-		void *pBuffer = new byte[bytes];
-		if ( bDownloadSuccessful )
-		{
-			ret = xboxsystem->EnumerateAchievements( XBX_GetPrimaryUserId(), 0, 0, nTotalAchievements, pBuffer, bytes, false );
-
-			if ( ret != nTotalAchievements )
-			{
-				Warning( "Enumerate Achievements failed! Error %d", ret );
-				bDownloadSuccessful = false;
-			}
-		}
-
-		if ( bDownloadSuccessful )
-		{
-			// Give live a chance to mark achievements as unlocked, in case the achievement manager
-			// wasn't able to get that data (storage device missing, read failure, etc)
-			XACHIEVEMENT_DETAILS *pXboxAchievements = (XACHIEVEMENT_DETAILS*)pBuffer;
-			for ( int i = 0; i < nTotalAchievements; ++i )
-			{
-				CBaseAchievement *pAchievement = GetAchievementByID( pXboxAchievements[i].dwId );
-				if ( !pAchievement )
-					continue;
-
-				// Give Live a chance to claim the achievement as unlocked
-				if ( AchievementEarned( pXboxAchievements[i].dwFlags ) )
-				{
-					pAchievement->SetAchieved( true );
-				}
-			}
-		}
-
-		delete pBuffer;
-#endif // X360
+		// request stat download; will get called back at OnUserStatsReceived when complete
+		steamapicontext->SteamUserStats()->RequestCurrentStats();
 	}
+#endif
 }
 
 const char *COM_GetModDirectory()
@@ -691,18 +609,15 @@ const char *COM_GetModDirectory()
 //-----------------------------------------------------------------------------
 void CAchievementMgr::UploadUserData()
 {
-	if ( IsPC() )
-	{
 #ifndef NO_STEAM
-		if ( steamapicontext->SteamUserStats() )
-		{
-			// Upload current Steam client achievements & stats state to Steam.  Will get called back at OnUserStatsStored when complete.
-			// Only values previously set via SteamUserStats() get uploaded
-			steamapicontext->SteamUserStats()->StoreStats();
-			m_bSteamDataDirty = false;
-		}
-#endif
+	if ( steamapicontext->SteamUserStats() )
+	{
+		// Upload current Steam client achievements & stats state to Steam.  Will get called back at OnUserStatsStored when complete.
+		// Only values previously set via SteamUserStats() get uploaded
+		steamapicontext->SteamUserStats()->StoreStats();
+		m_bSteamDataDirty = false;
 	}
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -710,24 +625,8 @@ void CAchievementMgr::UploadUserData()
 //-----------------------------------------------------------------------------
 void CAchievementMgr::LoadGlobalState()
 {
-	if ( IsX360() )
-	{
-#ifdef _X360
-		if ( XBX_GetStorageDeviceId() == XBX_INVALID_STORAGE_ID || XBX_GetStorageDeviceId() == XBX_STORAGE_DECLINED )
-			return;
-#endif
-	}
-
 	char	szFilename[MAX_PATH];
-
-	if ( IsX360() )
-	{
-		Q_snprintf( szFilename, sizeof( szFilename ), "cfg:/%s_GameState.txt", COM_GetModDirectory() );
-	}
-	else
-	{
-		Q_snprintf( szFilename, sizeof( szFilename ), "GameState.txt" );
-	}
+	V_sprintf_safe( szFilename, "GameState.txt" );
 
     //=============================================================================
     // HPE_BEGIN
@@ -921,31 +820,21 @@ void CAchievementMgr::AwardAchievement( int iAchievementID )
 	// save state at next good opportunity.  (Don't do it immediately, may hitch at bad time.)
 	SetDirty( true );
 
-	if ( IsPC() )
-	{		
 #ifndef NO_STEAM
-		if ( steamapicontext->SteamUserStats() )
-		{
-			VPROF_BUDGET( "AwardAchievement", VPROF_BUDGETGROUP_STEAM );
-			// set this achieved in the Steam client
-			bool bRet = steamapicontext->SteamUserStats()->SetAchievement( pAchievement->GetName() );
-			//		Assert( bRet );
-			if ( bRet )
-			{
-				m_AchievementsAwarded.AddToTail( iAchievementID );
-			}
-		}
-#else
-		m_AchievementsAwarded.AddToTail( iAchievementID );
-#endif
-    }
-	else if ( IsX360() )
+	if ( steamapicontext->SteamUserStats() )
 	{
-#ifdef _X360
-		if ( xboxsystem )
-			xboxsystem->AwardAchievement( XBX_GetPrimaryUserId(), iAchievementID );
-#endif
+		VPROF_BUDGET( "AwardAchievement", VPROF_BUDGETGROUP_STEAM );
+		// set this achieved in the Steam client
+		bool bRet = steamapicontext->SteamUserStats()->SetAchievement( pAchievement->GetName() );
+		//		Assert( bRet );
+		if ( bRet )
+		{
+			m_AchievementsAwarded.AddToTail( iAchievementID );
+		}
 	}
+#else
+	m_AchievementsAwarded.AddToTail( iAchievementID );
+#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -981,7 +870,7 @@ void CAchievementMgr::UpdateAchievement( int iAchievementID, int nData )
 //-----------------------------------------------------------------------------
 void CAchievementMgr::PreRestoreSavedGame()
 {
-	// load global state if we haven't already; X360 users may not have had a storage device available or selected at boot time
+	// load global state if we haven't already.
 	EnsureGlobalStateLoaded();
 
 	FOR_EACH_MAP( m_mapAchievement, i )
@@ -1008,19 +897,10 @@ extern bool IsInCommentaryMode( void );
 bool CAchievementMgr::CheckAchievementsEnabled()
 {
 #ifndef NO_STEAM
-	// if PC, Steam must be running and user logged in
-	if ( IsPC() && !LoggedIntoSteam() )
+	// Steam must be running and user logged in.
+	if ( !LoggedIntoSteam() )
 	{
 		Msg( "Achievements disabled: Steam not running.\n" );
-		return false;
-	}
-#endif
-
-#if defined( _X360 )
-	uint state = XUserGetSigninState( XBX_GetPrimaryUserId() );
-	if ( state == eXUserSigninState_NotSignedIn )
-	{
-		Msg( "Achievements disabled: not signed in to XBox user account.\n" );
 		return false;
 	}
 #endif
@@ -1083,21 +963,18 @@ bool CAchievementMgr::CheckAchievementsEnabled()
 	return true;
 #endif
 
-	if ( IsPC() )
+	// Don't award achievements if cheats are turned on.  
+	if ( WereCheatsEverOn() )
 	{
-		// Don't award achievements if cheats are turned on.  
-		if ( WereCheatsEverOn() )
-		{
-			// Cheats get turned on automatically if you run with -dev which many people do internally, so allow cheats if developer is turned on and we're not running
-			// on Steam public
-			if ( developer.GetInt() == 0
+		// Cheats get turned on automatically if you run with -dev which many people do internally, so allow cheats if developer is turned on and we're not running
+		// on Steam public
+		if ( developer.GetInt() == 0
 #ifndef NO_STEAM				
-				|| ( k_EUniverseInvalid == GetUniverse() ) || ( k_EUniversePublic == GetUniverse() )
+			|| ( k_EUniverseInvalid == GetUniverse() ) || ( k_EUniversePublic == GetUniverse() )
 #endif
-			) {
-				Msg( "Achievements disabled: cheats turned on in this app session.\n" );
-				return false;
-			}
+		) {
+			Msg( "Achievements disabled: cheats turned on in this app session.\n" );
+			return false;
 		}
 	}
 
@@ -1259,12 +1136,6 @@ int	CalcPlayerCount()
 //-----------------------------------------------------------------------------
 void CAchievementMgr::ResetAchievements()
 {
-	if ( !IsPC() )
-	{
-		DevMsg( "Only available on PC\n" );
-		return;
-	}
-
 #ifndef NO_STEAM
 	if ( !LoggedIntoSteam() )
 	{
@@ -1293,12 +1164,6 @@ void CAchievementMgr::ResetAchievements()
 
 void CAchievementMgr::ResetAchievement( int iAchievementID )
 {
-	if ( !IsPC() )
-	{
-		DevMsg( "Only available on PC\n" );
-		return;
-	}
-
 #ifndef NO_STEAM
 	if ( !LoggedIntoSteam() )
 	{
