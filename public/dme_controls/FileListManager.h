@@ -53,7 +53,7 @@ protected:
 	MESSAGE_FUNC_PARAMS( OnFileSelected, "FileSelected", pParams );
 	MESSAGE_FUNC_PARAMS( OnDataChanged, "DataChanged", pParams );
 
-	int AddItem( DmFileId_t fileid, const char *pFilename, const char *pPath, bool bLoaded, int nElements, bool bChanged, bool bInPerforce, bool bOpenForEdit );
+	intp AddItem( DmFileId_t fileid, const char *pFilename, const char *pPath, bool bLoaded, int nElements, bool bChanged, bool bInPerforce, bool bOpenForEdit );
 	void SetLoaded( DmFileId_t fileid, bool bLoaded );
 
 	vgui::CheckButtonList *m_pFileList;

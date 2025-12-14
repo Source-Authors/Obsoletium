@@ -108,7 +108,7 @@ CFileListManager::CFileListManager( vgui::Panel *parent ) : BaseClass( parent, "
 //	LoadControlSettings( "resource/BxFileListManager.res" );
 }
 
-int CFileListManager::AddItem( DmFileId_t fileid, const char *pFilename, const char *pPath, bool bLoaded, int nElements, bool bChanged, bool bInPerforce, bool bOpenForEdit )
+intp CFileListManager::AddItem( DmFileId_t fileid, const char *pFilename, const char *pPath, bool bLoaded, int nElements, bool bChanged, bool bInPerforce, bool bOpenForEdit )
 {
 	KeyValuesAD kv( new KeyValues( "", GetKey( CI_FILENAME ), pFilename, GetKey( CI_PATH ), pPath ) );
 	kv->SetInt   ( GetKey( CI_NUMELEMENTS ), nElements );
