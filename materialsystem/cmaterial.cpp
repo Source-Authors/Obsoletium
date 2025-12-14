@@ -1356,44 +1356,47 @@ static KeyValues *CheckConditionalFakeShaderName( char const *pShaderName, char 
 
 static KeyValues *FindBuiltinFallbackBlock( char const *pShaderName, KeyValues *pKeyValues )
 {
+	// dimhotepus; Cache dx support level once.
+	const int dxSupportLevel = HardwareConfig()->GetDXSupportLevel();
+
 	// handle "fake" shader fallbacks which are conditional upon mode. like _hdr_dx9, etc
-	if ( HardwareConfig()->GetDXSupportLevel() < 90 )
+	if ( dxSupportLevel < 90 )
 	{
 		KeyValues *pRet = CheckConditionalFakeShaderName( pShaderName,"<DX90", pKeyValues );
 		if ( pRet )
 			return pRet;
 	}
-	if ( HardwareConfig()->GetDXSupportLevel() < 95 )
+	if ( dxSupportLevel < 95 )
 	{
 		KeyValues *pRet = CheckConditionalFakeShaderName( pShaderName,"<DX95", pKeyValues );
 		if ( pRet )
 			return pRet;
 	}
-	if ( HardwareConfig()->GetDXSupportLevel() < 90 || !HardwareConfig()->SupportsPixelShaders_2_b() )
+	if ( dxSupportLevel < 90 || !HardwareConfig()->SupportsPixelShaders_2_b() )
 	{
 		KeyValues *pRet = CheckConditionalFakeShaderName( pShaderName,"<DX90_20b", pKeyValues );
 		if ( pRet )
 			return pRet;
 	}
-	if ( HardwareConfig()->GetDXSupportLevel() >= 90 && HardwareConfig()->SupportsPixelShaders_2_b() )
+	if ( dxSupportLevel >= 90 && HardwareConfig()->SupportsPixelShaders_2_b() )
 	{
 		KeyValues *pRet = CheckConditionalFakeShaderName( pShaderName,">=DX90_20b", pKeyValues );
 		if ( pRet )
 			return pRet;
 	}
-	if ( HardwareConfig()->GetDXSupportLevel() <= 90 )
+	if ( dxSupportLevel <= 90 )
 	{
 		KeyValues *pRet = CheckConditionalFakeShaderName( pShaderName,"<=DX90", pKeyValues );
 		if ( pRet )
 			return pRet;
 	}
-	if ( HardwareConfig()->GetDXSupportLevel() >= 90 )
+	if ( dxSupportLevel >= 90 )
 	{
 		KeyValues *pRet = CheckConditionalFakeShaderName( pShaderName,">=DX90", pKeyValues );
 		if ( pRet )
 			return pRet;
 	}
-	if ( HardwareConfig()->GetDXSupportLevel() > 90 )
+	if ( dxSupportLevel > 90 )
 	{
 		KeyValues *pRet = CheckConditionalFakeShaderName( pShaderName,">DX90", pKeyValues );
 		if ( pRet )
@@ -1420,7 +1423,7 @@ static KeyValues *FindBuiltinFallbackBlock( char const *pShaderName, KeyValues *
 		if ( pRet )
 			return pRet;
 	}
-	if ( HardwareConfig()->GetDXSupportLevel() >= 90 )
+	if ( dxSupportLevel >= 90 )
 	{
 		KeyValues *pRet = CheckConditionalFakeShaderName( pShaderName,"dx9", pKeyValues );
 		if ( pRet )
