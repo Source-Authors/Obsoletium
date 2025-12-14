@@ -193,7 +193,7 @@ public:
 
 class CMapAchievement : public CBaseAchievement
 {
-	virtual void Init()
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_MAP_EVENTS | ACH_SAVE_GLOBAL );
 		SetGoal( 1 );
@@ -205,7 +205,7 @@ class CMapAchievement : public CBaseAchievement
 class CAchievement_AchievedCount : public CBaseAchievement
 {
 public:
-	void Init();
+	void Init() override;
 	virtual void OnSteamUserStatsStored( void );
 	virtual bool IsMetaAchievement() { return true; }
 

@@ -21,7 +21,7 @@
 
 class CAchievementHLXKillWithPhysicsObjects : public CBaseAchievement
 {
-	void Init() 
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_PLAYER_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetInflictorFilter( "prop_physics" );
@@ -34,7 +34,7 @@ class CAchievementHLXKillWithPhysicsObjects : public CBaseAchievement
 		}
 	}
 
-	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event )
+	void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) override
 	{
 		int iDamageBits = event->GetInt( "damagebits" );
 		// was victim killed with crushing damage?
@@ -49,7 +49,7 @@ DECLARE_ACHIEVEMENT( CAchievementHLXKillWithPhysicsObjects, ACHIEVEMENT_HLX_KILL
 
 class CAchievementHLXKillWithHopper : public CBaseAchievement
 {
-	void Init() 
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetAttackerFilter( "combine_mine" );
@@ -62,7 +62,7 @@ class CAchievementHLXKillWithHopper : public CBaseAchievement
 		}
 	}
 
-	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event )
+	void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) override
 	{
 		// If we get here, a combine mine has killed a player enemy.  Now check and see if the player planted it
 		CBounceBomb *pBounceBomb = dynamic_cast<CBounceBomb *>( pAttacker );
@@ -76,7 +76,7 @@ DECLARE_ACHIEVEMENT( CAchievementHLXKillWithHopper, ACHIEVEMENT_HLX_KILL_ENEMY_W
 
 class CAchievementHLXKillWithManhack : public CBaseAchievement
 {
-	void Init() 
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_PLAYER_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetInflictorFilter( "npc_manhack" );
@@ -89,7 +89,7 @@ class CAchievementHLXKillWithManhack : public CBaseAchievement
 		}
 	}
 
-	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event )
+	void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) override
 	{
 		// We've already filtered to only get called when a player enemy gets killed with a manhack.  Now just check for the
 		// case of player smashing manhack into something, in which case the manhack is both the victim and inflictor.
@@ -105,7 +105,7 @@ DECLARE_ACHIEVEMENT( CAchievementHLXKillWithManhack, ACHIEVEMENT_HLX_KILL_ENEMIE
 class CAchievementHLXKillSoldierWithOwnGrenade : public CBaseAchievement
 {
 protected:
-	void Init() 
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetInflictorFilter( "npc_grenade_frag" );
@@ -119,7 +119,7 @@ protected:
 		}
 	}
 
-	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) 
+	void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) override
 	{
 		CBaseGrenade *pGrenade = dynamic_cast<CBaseGrenade *>( pInflictor );
 		if ( pGrenade )
@@ -140,7 +140,7 @@ DECLARE_ACHIEVEMENT( CAchievementHLXKillSoldierWithOwnGrenade, ACHIEVEMENT_HLX_K
 class CAchievementHLXKillWithOneEnergyBall : public CBaseAchievement
 {
 protected:
-	virtual void Init()
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_PLAYER_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetInflictorFilter( "prop_combine_ball" );
@@ -155,7 +155,7 @@ protected:
 		}
 	}
 
-	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) 
+	void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) override
 	{
 		// to count # of kills with same energy ball, keep track of previous inflictor
 		if ( m_pLastInflictor != NULL && pInflictor != m_pLastInflictor )
@@ -183,7 +183,7 @@ DECLARE_ACHIEVEMENT( CAchievementHLXKillWithOneEnergyBall, ACHIEVEMENT_HLX_KILL_
 class CAchievementHLXKillEliteSoldierWithOwnEnergyBall : public CBaseAchievement
 {
 protected:
-	virtual void Init()
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_PLAYER_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetInflictorFilter( "prop_combine_ball" );
@@ -197,7 +197,7 @@ protected:
 		}
 	}
 
-	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) 
+	void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) override
 	{
 		CPropCombineBall *pBall = dynamic_cast<CPropCombineBall *>( pInflictor );
 		if ( pBall )

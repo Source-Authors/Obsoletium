@@ -17,7 +17,7 @@ CAchievementMgr g_AchievementMgrHL2;	// global achievement mgr for HL2
 class CAchievementHL2KillBarnaclesWithOneBarrel : public CBaseAchievement
 {
 protected:
-	virtual void Init()
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_PLAYER_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetInflictorFilter( "prop_physics" );
@@ -27,7 +27,7 @@ protected:
 		m_iBarnacleCount = 0;
 	}
 
-	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event )
+	void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) override
 	{
 		int iDamageBits = event->GetInt( "damagebits" );
 		// only interested blast damage.  (Barrels or other explosive phys objects are all OK)
@@ -60,7 +60,7 @@ class CAchievementHL2BeatRavenholmNoWeapons : public CFailableAchievement
 {
 	DECLARE_CLASS( CAchievementHL2BeatRavenholmNoWeapons, CFailableAchievement );
 
-	void Init()
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_MAP_EVENTS | ACH_SAVE_WITH_GAME );
 		SetGoal( 1 );
@@ -68,24 +68,24 @@ class CAchievementHL2BeatRavenholmNoWeapons : public CFailableAchievement
 	}
 
 	// map event where achievement is activated
-	virtual const char *GetActivationEventName() { return "HL2_BEAT_RAVENHOLM_NOWEAPONS_START"; }
+	const char *GetActivationEventName() override { return "HL2_BEAT_RAVENHOLM_NOWEAPONS_START"; }
 	// map event where achievement is evaluated for success
-	virtual const char *GetEvaluationEventName() { return "HL2_BEAT_RAVENHOLM_NOWEAPONS_END"; }
+	const char *GetEvaluationEventName() override { return "HL2_BEAT_RAVENHOLM_NOWEAPONS_END"; }
 
-	virtual void PreRestoreSavedGame() 
+	void PreRestoreSavedGame() override
 	{
 		m_iInitialAttackCount = 0;
 		BaseClass::PreRestoreSavedGame();
 	}
 
-	virtual void OnActivationEvent()
+	void OnActivationEvent() override
 	{
 		// get current # of attacks by player w/all weapons (except grav gun) and store that
 		m_iInitialAttackCount = CalcPlayerAttacks( false );
 		BaseClass::OnActivationEvent();
 	}
 
-	virtual void OnEvaluationEvent()
+	void OnEvaluationEvent() override
 	{
 		// get current # of attacks by player w/all weapons (except grav gun) 
 		int iCurAttackCount = CalcPlayerAttacks( false );
@@ -99,7 +99,7 @@ class CAchievementHL2BeatRavenholmNoWeapons : public CFailableAchievement
 	}
 
 	// additional status for debugging
-	virtual void PrintAdditionalStatus()
+	void PrintAdditionalStatus() override
 	{
 		if ( m_bActivated )
 		{
@@ -120,7 +120,7 @@ END_DATADESC()
 
 class CAchievementHL2KillGunships : public CBaseAchievement
 {
-	void Init() 
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_PLAYER_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetVictimFilter( "npc_combinegunship" );
@@ -131,14 +131,14 @@ DECLARE_ACHIEVEMENT( CAchievementHL2KillGunships, ACHIEVEMENT_HL2_KILL_THREEGUNS
 
 class CAchievementHL2KillEnemiesWithAntlions : public CBaseAchievement
 {
-	void Init() 
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetInflictorFilter( "npc_antlion" );
 		SetGoal( 50 );
 	}
 
-	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event )
+	void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) override
 	{
 		CBasePlayer *pPlayer = UTIL_GetLocalPlayer();
 		if ( pPlayer )
@@ -155,14 +155,14 @@ DECLARE_ACHIEVEMENT( CAchievementHL2KillEnemiesWithAntlions, ACHIEVEMENT_HL2_KIL
 
 class CAchievementHL2KillEnemyWithToilet : public CBaseAchievement
 {
-	void Init() 
+	void Init() override
 	{
 		SetFlags( ACH_LISTEN_PLAYER_KILL_ENEMY_EVENTS | ACH_SAVE_WITH_GAME );
 		SetInflictorFilter( "prop_physics" );
 		SetGoal( 1 );
 	}
 
-	virtual void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event )
+	void Event_EntityKilled( CBaseEntity *pVictim, CBaseEntity *pAttacker, CBaseEntity *pInflictor, IGameEvent *event ) override
 	{
 		const char *pszName = GetModelName( pInflictor );
 
@@ -179,18 +179,18 @@ DECLARE_ACHIEVEMENT( CAchievementHL2KillEnemyWithToilet, ACHIEVEMENT_HL2_KILL_EN
 
 class CAchievementHL2DisintegrateSoldiersInField : public CBaseAchievement
 {
-	void Init() 
+	void Init() override
 	{
 		SetFlags( ACH_SAVE_WITH_GAME );
 		SetGoal( 15 );
 	}
 
-	virtual void ListenForEvents()
+	void ListenForEvents() override
 	{
 		ListenForGameEvent( "ragdoll_dissolved" );
 	}
 
-	void FireGameEvent_Internal( IGameEvent *event )
+	void FireGameEvent_Internal( IGameEvent *event ) override
 	{
 		if ( 0 == Q_strcmp( event->GetName(), "ragdoll_dissolved" ) )
 		{
@@ -215,7 +215,7 @@ DECLARE_ACHIEVEMENT( CAchievementHL2DisintegrateSoldiersInField, ACHIEVEMENT_HL2
 
 class CAchievementHL2FindAllLambdas : public CBaseAchievement
 {
-	virtual void Init()
+	void Init() override
 	{
 		static const char *szComponents[] =
 		{
