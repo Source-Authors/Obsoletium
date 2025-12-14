@@ -613,7 +613,7 @@ void CBaseAchievement::ApplySettings( KeyValues *pNodeIn )
 		uint64 iComponentBits = pNodeIn->GetUint64( "data" );
 		SetComponentBits( iComponentBits );
 	}
-	SetShowOnHUD( !!pNodeIn->GetInt( "hud" ) );
+	SetShowOnHUD( pNodeIn->GetBool( "hud" ) );
 	m_iProgressShown = pNodeIn->GetInt( "msg" );
 }
 
