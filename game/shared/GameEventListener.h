@@ -35,9 +35,9 @@ public:
 		m_bRegisteredForEvents = true;
 
 #ifdef CLIENT_DLL
-		bool bServerSide = false;
+		constexpr bool bServerSide = false;
 #else
-		bool bServerSide = true;
+		constexpr bool bServerSide = true;
 #endif
 		if ( gameeventmanager )
 		{
