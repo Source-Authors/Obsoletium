@@ -508,7 +508,7 @@ void CBaseAchievement::SetComponentBits( uint64 iComponentBits )
 { 
 	Assert( m_iFlags & ACH_HAS_COMPONENTS );
 	// set the bit field
-	m_iComponentBits = iComponentBits; 
+	m_iComponentBits = iComponentBits;
 
 	// dimhotepus: Use CPU instruction on x64 / ARM64.
 #if (defined(PLATFORM_INTEL) && (PLATFORM_X86 == 64)) || defined(PLATFORM_ARM_64)
@@ -657,7 +657,7 @@ void CFailableAchievement::PreRestoreSavedGame()
 void CFailableAchievement::PostRestoreSavedGame()
 {
 	// if there is no activation event set for this achievement, it is always active, activate it now
-	if ( !m_bFailed && !GetActivationEventName()[0] )
+	if ( !m_bFailed && Q_isempty( GetActivationEventName() ) )
 	{
 		m_bActivated = true;
 	}
@@ -730,8 +730,8 @@ void CFailableAchievement::SetFailed()
 		if ( cc_achievement_debug.GetInt() )
 		{
 			Msg( "Achievement failed: %s (%s)\n", GetName(), GetName() );
-		}	
-	}	
+		}
+	}
 }
 
 //===========================================
