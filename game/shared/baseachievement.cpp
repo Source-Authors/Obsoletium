@@ -509,6 +509,11 @@ void CBaseAchievement::SetComponentBits( uint64 iComponentBits )
 	Assert( m_iFlags & ACH_HAS_COMPONENTS );
 	// set the bit field
 	m_iComponentBits = iComponentBits; 
+
+	// dimhotepus: Use CPU instruction on x64 / ARM64.
+#if (defined(PLATFORM_INTEL) && (PLATFORM_X86 == 64)) || defined(PLATFORM_ARM_64)
+	m_iCount = size_cast<int>( __popcnt64(iComponentBits) );
+#else
 	// count how many bits are set and save that as the count
 	int iNumBitsSet = 0;
 	while ( iComponentBits > 0 )
@@ -520,6 +525,7 @@ void CBaseAchievement::SetComponentBits( uint64 iComponentBits )
 		iComponentBits >>= 1;
 	}
 	m_iCount = iNumBitsSet;
+#endif
 }
 
 //-----------------------------------------------------------------------------
