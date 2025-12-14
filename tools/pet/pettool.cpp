@@ -1067,12 +1067,11 @@ bool CPetTool::LoadDocument( const char *pDocName )
 	CUtlBuffer buf;
 	g_pDataModel->Serialize( buf, "binary", PET_FILE_FORMAT, m_pDoc->GetRootObject()->GetHandle() );
 
-	KeyValues *pMessage = new KeyValues( "ParticleSystemUpdated" );
+	KeyValuesAD pMessage( "ParticleSystemUpdated" );
 	pMessage->SetPtr( "definitionBits", buf.Base() );
 	// dimhotepus: int -> uint64.
 	pMessage->SetUint64( "definitionSize", buf.TellMaxPut() );
 	PostMessageToAllTools( pMessage );
-	pMessage->deleteThis();
 	return true;
 }
 

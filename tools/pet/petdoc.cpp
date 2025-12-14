@@ -450,12 +450,11 @@ void CPetDoc::UpdateParticleDefinition( CDmeParticleSystemDefinition *pDef )
 	}
 
 	// Let the other tools know
-	KeyValues *pMessage = new KeyValues( "ParticleSystemUpdated" );
+	KeyValuesAD pMessage( "ParticleSystemUpdated" );
 	pMessage->SetPtr( "definitionBits", buf.Base() );
 	// dimhotepus: int -> uint64.
 	pMessage->SetUint64( "definitionSize", buf.TellMaxPut() );
 	g_pPetTool->PostMessageToAllTools( pMessage );
-	pMessage->deleteThis();
 }
 
 
