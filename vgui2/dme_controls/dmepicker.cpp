@@ -107,9 +107,8 @@ void CDmePicker::OnKeyCodePressed( KeyCode code )
 {
 	if (( code == KEY_UP ) || ( code == KEY_DOWN ) || ( code == KEY_PAGEUP ) || ( code == KEY_PAGEDOWN ))
 	{
-		KeyValues *pMsg = new KeyValues("KeyCodePressed", "code", code);
+		KeyValuesAD pMsg( new KeyValues("KeyCodePressed", "code", code) );
 		vgui::ipanel()->SendMessage( m_pDmeBrowser->GetVPanel(), pMsg, GetVPanel());
-		pMsg->deleteThis();
 	}
 	else
 	{

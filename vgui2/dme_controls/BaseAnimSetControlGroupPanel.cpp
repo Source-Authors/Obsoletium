@@ -149,7 +149,7 @@ static intp AddItemToTree( TreeView *tv, const char *label, intp parentIndex, co
 {
 	Color bgColor( 128, 128, 128, 128 );
 
-	KeyValues *kv = new KeyValues( "item", "text", label );
+	KeyValuesAD kv( new KeyValues( "item", "text", label ) );
 	kv->SetUint64( "groupNumber", groupNumber );
 	kv->SetInt( "droppable", 1 );
 	kv->SetInt( "handle", handle );
@@ -161,8 +161,6 @@ static intp AddItemToTree( TreeView *tv, const char *label, intp parentIndex, co
 
 	tv->RemoveSelectedItem( idx );
 	tv->ExpandItem( idx, false );
-
-	kv->deleteThis();
 
 	return idx;
 }

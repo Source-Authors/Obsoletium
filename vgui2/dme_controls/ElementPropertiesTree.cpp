@@ -2860,7 +2860,7 @@ void CElementPropertiesTreeInternal::UpdateTree()
 		Q_snprintf( label, sizeof( label ), "%s", m_hObject->GetValueString( "name" ) );
 		constexpr bool editableLabel = true;
 
-		KeyValues *kv = new KeyValues( "item" );
+		KeyValuesAD kv( "item" );
 		kv->SetString( "Text", label );
 		kv->SetInt( "Expand", 1 );
 		kv->SetInt( "dmeelement", m_hObject.Get() ? m_hObject.Get()->GetHandle() : DMELEMENT_HANDLE_INVALID );
@@ -2879,8 +2879,6 @@ void CElementPropertiesTreeInternal::UpdateTree()
 
 		m_pTree->GetTree()->SetItemFgColor( rootIndex, Color( 66, 196, 66, 255 ) );
 		m_pTree->GetTree()->SetItemSelectionUnfocusedBgColor( rootIndex, Color( 255, 153, 35, 255 ) );
-
-		kv->deleteThis();
 
 		// open up the root item (for now)
 		m_pTree->ExpandItem(rootIndex, true);
@@ -4124,7 +4122,7 @@ void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmEl
 		bIsExpandable = array.Count() > 0;
 	}
 
-	KeyValues *kv = new KeyValues( "item" );
+	KeyValuesAD kv( "item" );
 	kv->SetString( "Text", pText );
 	kv->SetInt( "Expand", bIsExpandable );
 	SetElementKeyValue( kv, "dmeelement", pEntryElement );
@@ -4153,7 +4151,6 @@ void CElementPropertiesTreeInternal::CreateTreeEntry( int parentNodeIndex, CDmEl
 	columns.AddToTail( widgets.m_pValueWidget );
 	int itemIndex = m_pTree->AddItem( kv, bEditableLabel, parentNodeIndex, columns );
 	SetTreeItemColor( itemIndex, pEntryElement, bIsElementArrayItem, bEditableLabel );
-	kv->deleteThis();
 }
 
 //-----------------------------------------------------------------------------

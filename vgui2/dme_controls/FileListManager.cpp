@@ -110,14 +110,13 @@ CFileListManager::CFileListManager( vgui::Panel *parent ) : BaseClass( parent, "
 
 int CFileListManager::AddItem( DmFileId_t fileid, const char *pFilename, const char *pPath, bool bLoaded, int nElements, bool bChanged, bool bInPerforce, bool bOpenForEdit )
 {
-	KeyValues *kv = new KeyValues( "", GetKey( CI_FILENAME ), pFilename, GetKey( CI_PATH ), pPath );
+	KeyValuesAD kv( new KeyValues( "", GetKey( CI_FILENAME ), pFilename, GetKey( CI_PATH ), pPath ) );
 	kv->SetInt   ( GetKey( CI_NUMELEMENTS ), nElements );
 	kv->SetString( GetKey( CI_LOADED ),		 bLoaded	  ? "Y" : "N" );
 	kv->SetString( GetKey( CI_CHANGED ),	 bChanged	  ? "Y" : "N" );
 	kv->SetString( GetKey( CI_INPERFORCE ),  bInPerforce  ? "Y" : "N" );
 	kv->SetString( GetKey( CI_OPENFOREDIT ), bOpenForEdit ? "Y" : "N" );
-	int itemID = BaseClass::AddItem( kv, fileid, false, false );
-	kv->deleteThis();
+	intp itemID = BaseClass::AddItem( kv, fileid, false, false );
 	return itemID;
 }
 
@@ -183,9 +182,8 @@ void CFileListManager::OnMousePressed( vgui::MouseCode code )
 			}
 		}
 
-		KeyValues *kv = new KeyValues( "OpenContextMenu", "itemID", itemID );
+		KeyValuesAD kv( new KeyValues( "OpenContextMenu", "itemID", itemID ) );
 		OnOpenContextMenu( kv );
-		kv->deleteThis();
 		return;
 	}
 
