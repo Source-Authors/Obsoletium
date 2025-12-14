@@ -1344,13 +1344,10 @@ static KeyValues *CheckConditionalFakeShaderName( char const *pShaderName, char 
 		return pFallbackSection;
 
 	char nameBuf[256];
-	V_snprintf( nameBuf, sizeof(nameBuf), "%s_%s", pShaderName, pSuffixName );
+	V_sprintf_safe( nameBuf, "%s_%s", pShaderName, pSuffixName );
 	pFallbackSection = pKeyValues->FindKey( nameBuf );
 
-	if (pFallbackSection)
-		return pFallbackSection;
-
-	return NULL;
+	return pFallbackSection ? pFallbackSection : nullptr;
 }
 
 
