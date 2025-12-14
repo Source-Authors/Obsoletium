@@ -472,8 +472,71 @@ uint64 V_atoui64( IN_Z const char *str )
 }
 
 int V_atoi( IN_Z const char *str )
-{ 
-	return (int)V_atoi64( str );
+{
+	AssertValidStringPtr( str );
+
+	int             val;
+	int             sign;
+	int             c;
+	
+	Assert( str );
+	if (*str == '-')
+	{
+		sign = -1;
+		str++;
+	}
+	else if (*str == '+')
+	{
+		sign = 1;
+		str++;
+	}
+	else
+	{
+		sign = 1;
+	}
+		
+	val = 0;
+
+//
+// check for hex
+//
+	if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X') )
+	{
+		str += 2;
+		while (true)
+		{
+			c = *str++;
+			if (c >= '0' && c <= '9')
+				val = (val<<4) + c - '0';
+			else if (c >= 'a' && c <= 'f')
+				val = (val<<4) + c - 'a' + 10;
+			else if (c >= 'A' && c <= 'F')
+				val = (val<<4) + c - 'A' + 10;
+			else
+				return val*sign;
+		}
+	}
+	
+//
+// check for character
+//
+	if (str[0] == '\'')
+	{
+		return sign * str[1];
+	}
+	
+//
+// assume decimal
+//
+	while (true)
+	{
+		c = *str++;
+		if (c <'0' || c > '9')
+			return val*sign;
+		val = val*10 + c - '0';
+	}
+	
+	return 0;
 }
 
 float V_atof (IN_Z const char *str)
