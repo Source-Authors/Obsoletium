@@ -433,7 +433,7 @@ bool CSceneImage::CreateSceneImageFile( CUtlBuffer &targetBuffer, char const *pc
 			Error( "CreateSceneImageFile: Unexpected lack of scenes prefix on %s\n", g_SceneFiles[i].fileName.String() );
 		}
 
-		CRC32_t crcFilename = CRC32_ProcessSingleBuffer( pName, strlen( pName ) );
+		CRC32_t crcFilename = CRC32_ProcessSingleBuffer( pName, V_strlen( pName ) );
 		imageEntry.crcFilename = crcFilename;
 
 		// temp store an index to its file, fixup later, necessary to access post sort
