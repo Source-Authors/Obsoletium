@@ -43,8 +43,12 @@ public:
 		{
 			gameeventmanager->AddListener( this, name, bServerSide );
 		}
-		
-		AssertMsg1( gameeventmanager, "Failed to subscribe to event %s!", name );
+#ifdef _DEBUG
+		else
+		{
+			AssertMsg( gameeventmanager, "Failed to subscribe to event %s!", name );
+		}
+#endif
 	}
 
 	void StopListeningForAllEvents()
