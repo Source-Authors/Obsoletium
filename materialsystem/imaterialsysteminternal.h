@@ -33,7 +33,8 @@ public:
 #ifdef SWDS
 		constexpr size_t size = 2u*1024;
 #ifdef PLATFORM_64BITS
-		if ( !m_Allocator.Init( size, 0, 0, 8 ) )
+		// dimhotepus: x2 size on x86-64.
+		if ( !m_Allocator.Init( size * 2, 0, 0, 8 ) )
 #else
 		if ( !m_Allocator.Init( size, 0, 0, 4 ) )
 #endif
@@ -43,7 +44,8 @@ public:
 #else
 		constexpr size_t size = 8u*1024*1024;
 #ifdef PLATFORM_64BITS
-		if ( !m_Allocator.Init( size, 64u*1024, 256u*1024, 8u ) )
+		// dimhotepus: x2 size on x86-64.
+		if ( !m_Allocator.Init( size * 2, 64u*1024, 256u*1024, 8u ) )
 #else
 		if ( !m_Allocator.Init( size, 64u*1024, 256u*1024, 4u ) )
 #endif
