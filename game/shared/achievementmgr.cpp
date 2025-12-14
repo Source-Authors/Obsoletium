@@ -5,9 +5,6 @@
 //=============================================================================
 
 #include "cbase.h"
-#ifdef _WIN32
-#include <winerror.h>
-#endif
 #include "achievementmgr.h"
 #include "icommandline.h"
 #include "KeyValues.h"
@@ -26,20 +23,13 @@
 #else
 #include "enginecallback.h"
 #endif // CLIENT_DLL
-#ifndef _X360
 #include "steam/isteamuserstats.h"
 #include "steam/isteamfriends.h"
 #include "steam/isteamutils.h"
 #include "steam/steam_api.h"
 #include "steam/isteamremotestorage.h"
-#else
-#include "xbox/xbox_win32stubs.h"
-#endif
 #include "tier3/tier3.h"
 #include "vgui/ILocalize.h"
-#ifdef _X360
-#include "ixboxsystem.h"
-#endif  // _X360
 #include "engine/imatchmaking.h"
 #include "tier0/vprof.h"
 
