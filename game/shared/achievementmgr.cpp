@@ -72,7 +72,7 @@ ISteamUserStats *SteamUserStats()
 // [dwenger] Steam Cloud Support
 //=============================================================================
 
-static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamCloud = false )
+static void WriteAchievementGlobalState( KeyValuesAD &&pKV, bool bPersistToSteamCloud = false )
 
 //=============================================================================
 // HPE_END
@@ -86,8 +86,7 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
 	// Save to a buffer instead.
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	pKV->RecursiveSaveToFile( buf, 0 );
-	filesystem->WriteFile( szFilename, NULL, buf );
-	pKV->deleteThis();
+	filesystem->WriteFile( szFilename, nullptr, buf );
 
     //=============================================================================
     // HPE_BEGIN
@@ -155,51 +154,47 @@ static void WriteAchievementGlobalState( KeyValues *pKV, bool bPersistToSteamClo
 class CAchievementSaveThread : public CWorkerThread 
 {
 public:
-	CAchievementSaveThread() :
-	  m_pKV( NULL )
-	  {
-		  SetName( "AchievementSaver" );
-	  }
+	CAchievementSaveThread() : m_pKV( nullptr )
+	{
+		SetName( "AchievementSaver" );
+	}
 
-	  ~CAchievementSaveThread()
-	  {
-	  }
+	~CAchievementSaveThread() = default;
 
-	  enum
-	  {
-		  CALL_FUNC,
-		  EXIT,
-	  };
+	enum : unsigned
+	{
+		CALL_FUNC,
+		EXIT,
+	};
 
-	  void WriteAchievementGlobalState( KeyValues *pKV )
-	  {
-		  Assert( !m_pKV );
-		  m_pKV = pKV;
-		  CallWorker( CALL_FUNC );
-		  Assert( !m_pKV );
-	  }
+	void WriteAchievementGlobalState( KeyValuesAD &&pKV )
+	{
+		Assert( !m_pKV );
+		m_pKV = std::move( pKV );
+		CallWorker( CALL_FUNC );
+		Assert( !m_pKV );
+	}
 
-	  int Run()
-	  {
-		  unsigned nCall;
-		  while ( WaitForCall( &nCall ) )
-		  {
-			  if ( nCall == EXIT )
-			  {
-				  Reply( 1 );
-				  break;
-			  }
+	int Run() override
+	{
+		unsigned nCall;
+		while ( WaitForCall( &nCall ) )
+		{
+			if ( nCall == EXIT )
+			{
+				Reply( 1 );
+				break;
+			}
 
-			  KeyValues *pKV = m_pKV;
-			  m_pKV = NULL;
-			  Reply( 1 );
-			  ::WriteAchievementGlobalState( pKV );
-		  }
-		  return 0;
-	  }
+			KeyValuesAD pKV = std::move( m_pKV );
+			Reply( 1 );
+			::WriteAchievementGlobalState( std::move( pKV ) );
+		}
+		return 0;
+	}
 
 private:
-	KeyValues *m_pKV;
+	KeyValuesAD m_pKV;
 };
 
 static CAchievementSaveThread g_AchievementSaveThread;
@@ -712,7 +707,7 @@ void CAchievementMgr::SaveGlobalState( bool bAsync )
 {
 	VPROF_BUDGET( "CAchievementMgr::SaveGlobalState", "Achievements" );
 
-	KeyValues *pKV = new KeyValues("GameState" );
+	KeyValuesAD pKV( "GameState" );
 	FOR_EACH_MAP( m_mapAchievement, i )
 	{
 		CBaseAchievement *pAchievement = m_mapAchievement[i];
@@ -727,11 +722,11 @@ void CAchievementMgr::SaveGlobalState( bool bAsync )
 
 	if ( !bAsync )
 	{
-		WriteAchievementGlobalState( pKV, m_bPersistToSteamCloud );
+		WriteAchievementGlobalState( std::move( pKV ), m_bPersistToSteamCloud );
 	}
 	else
 	{
-		g_AchievementSaveThread.WriteAchievementGlobalState( pKV );
+		g_AchievementSaveThread.WriteAchievementGlobalState( std::move( pKV ) );
 	}
 
 	m_flTimeLastSaved = Plat_FloatTime();
