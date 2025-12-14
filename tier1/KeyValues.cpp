@@ -1451,12 +1451,8 @@ float KeyValues::GetFloat( const char *keyName, float defaultValue )
 			// dimhotepus: atof -> strtof
 			return strtof(dat->m_sValue, nullptr);
 		case TYPE_WSTRING:
-#ifdef WIN32
-			return (float)_wtof(dat->m_wsValue);		// no wtof
-#else
-			AssertMsg( false, "impl me" );
-			return 0.0;
-#endif
+			// dimhotepus: _wtof -> wcstof + add non-windows support.
+			return wcstof(dat->m_wsValue, nullptr);
 		case TYPE_FLOAT:
 			return dat->m_flValue;
 		case TYPE_INT:
