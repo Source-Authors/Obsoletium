@@ -359,6 +359,13 @@ int64 V_atoi64( IN_Z const char *str )
 	int64             c;
 	
 	Assert( str );
+
+	// dimhotepus: Like atoi should skip white spaces.
+	while ( *str && V_isspace( *str ) )
+	{
+		++str;
+	}
+
 	if (*str == '-')
 	{
 		sign = -1;
@@ -426,6 +433,12 @@ uint64 V_atoui64( IN_Z const char *str )
 	uint64             c;
 
 	Assert( str );
+
+	// dimhotepus: Like atoi should skip white spaces.
+	while ( *str && V_isspace( *str ) )
+	{
+		++str;
+	}
 
 	val = 0;
 
