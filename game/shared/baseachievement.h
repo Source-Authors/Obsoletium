@@ -40,7 +40,7 @@ public:
 	void SetGoal( int iGoal ) { m_iGoal = iGoal; }
 	int GetGoal() const override { return m_iGoal; }
 	void SetGameDirFilter( const char *pGameDir );
-	bool HasComponents() { return ( m_iFlags & ACH_HAS_COMPONENTS ) > 0; }	
+	bool HasComponents() const { return ( m_iFlags & ACH_HAS_COMPONENTS ) > 0; }	
 	void SetPointValue( int iPointValue ) { m_iPointValue = iPointValue; }
 	int	GetPointValue() const override { return m_iPointValue; }
 	bool ShouldHideUntilAchieved() const override { return m_bHideUntilAchieved; }
@@ -209,9 +209,9 @@ public:
 	virtual void OnSteamUserStatsStored( void );
 	virtual bool IsMetaAchievement() { return true; }
 
-	int GetLowRange() { return m_iLowRange; }
-	int GetHighRange() { return m_iHighRange; }
-	int GetNumRequired() { return m_iNumRequired; }
+	int GetLowRange() const { return m_iLowRange; }
+	int GetHighRange() const { return m_iHighRange; }
+	int GetNumRequired() const { return m_iNumRequired; }
 
 protected:
 	void SetAchievementsRequired( int iNumRequired, int iLowRange, int iHighRange );
