@@ -484,6 +484,12 @@ float V_atof (IN_Z const char *str)
 	int             c;
 	int             decimal, total;
 
+	// dimhotepus: Like atof should skip white spaces.
+	while ( *str && V_isspace( *str ) )
+	{
+		++str;
+	}
+
 	if (*str == '-')
 	{
 		sign = -1;
@@ -549,7 +555,7 @@ float V_atof (IN_Z const char *str)
 			decimal = total;
 			continue;
 		}
-		if (c <'0' || c > '9')
+		if (c < '0' || c > '9')
 		{
 			if ( c == 'e' || c == 'E' )
 			{
