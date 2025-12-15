@@ -483,7 +483,8 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 
 	s_pMap = &g_ModelLoader.m_worldBrushData;
 
-#if 0
+	// dimhotepus: Need to load lumps as they have useful data inside (ex. achievements).
+#if 1
 	// XXX(johns): There are security issues with this system currently. sv_pure doesn't handle unexpected/mismatched
 	//             lumps, so players can create lumps for maps not using them to wallhack/etc.. Currently unused,
 	//             disabling until we have time to make a proper security pass.
