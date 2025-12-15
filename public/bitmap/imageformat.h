@@ -448,7 +448,8 @@ namespace ImageLoader
 	//-----------------------------------------------------------------------------
 	// Makes a gamma table
 	//-----------------------------------------------------------------------------
-	void ConstructGammaTable( unsigned char* pTable, float srcGamma, float dstGamma );
+	// dimhotepus: Make internal.
+	// void ConstructGammaTable( unsigned char* pTable, float srcGamma, float dstGamma );
 
 
 	//-----------------------------------------------------------------------------

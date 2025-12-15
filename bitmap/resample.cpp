@@ -31,21 +31,22 @@ namespace ImageLoader
 //-----------------------------------------------------------------------------
 // Gamma correction
 //-----------------------------------------------------------------------------
-static void ConstructFloatGammaTable( float* pTable, float srcGamma, float dstGamma )
+template<int size>
+static void ConstructFloatGammaTable( float (&pTable)[size], float srcGamma, float dstGamma )
 {
-	for( int i = 0; i < 256; i++ )
+	for( int i = 0; i < size; i++ )
 	{
 		pTable[i] = 255.0f * powf( (float)i / 255.0f, srcGamma / dstGamma );
 	}
 }
 
-void ConstructGammaTable( unsigned char* pTable, float srcGamma, float dstGamma )
+template<int size>
+static void ConstructGammaTable( unsigned char (&pTable)[size], float srcGamma, float dstGamma )
 {
-	int v;
-	for( int i = 0; i < 256; i++ )
+	for( int i = 0; i < size; i++ )
 	{
 		float f = 255.0f * powf( (float)i / 255.0f, srcGamma / dstGamma );
-		v = ( int )(f + 0.5f);
+		int v = ( int )(f + 0.5f);
 		if( v < 0 )
 		{
 			v = 0;
