@@ -33,7 +33,7 @@ const char* ParseFileInternal( const char* pFileBytes, OUT_Z_CAP(nMaxTokenLen) c
 	const characterset_t& breaks = pCharSet ? *pCharSet : g_BreakSetIncludingColons;
 	
 	char c;
-	unsigned int len = 0;
+	size_t len = 0, maxLen = nMaxTokenLen - 1;
 	
 // skip whitespace
 skipwhite:
@@ -93,7 +93,7 @@ skipwhite:
 			len++;
 			
 			// dimhotepus: TF2: Ensure buffer length is not overrunning!
-			if ( len == nMaxTokenLen - 1 )
+			if ( len == maxLen )
 			{
 				pTokenOut[len] = '\0';
 				Assert(0);
@@ -106,7 +106,7 @@ skipwhite:
 	if ( breaks.HasChar( c ) )
 	{
 		pTokenOut[len] = c;
-		len += ( len < nMaxTokenLen-1 ) ? 1 : 0;
+		len += ( len < maxLen ) ? 1 : 0;
 		pTokenOut[len] = '\0';
 		return pFileBytes+1;
 	}
@@ -119,7 +119,7 @@ skipwhite:
 		len++;
 		
 		// dimhotepus: TF2: Ensure buffer length is not overrunning!
-		if ( len == nMaxTokenLen - 1 )
+		if ( len == maxLen )
 		{
 			pTokenOut[len] = '\0';
 			Assert(0);
@@ -131,6 +131,6 @@ skipwhite:
 			break;
 	} while (c>32);
 	
-	pTokenOut[len] = '\0';
+	pTokenOut[min(maxLen, len)] = '\0';
 	return pFileBytes;
 }
