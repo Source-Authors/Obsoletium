@@ -174,9 +174,9 @@ void CAchievementNotificationPanel::AddNotification( const char *szIconBaseName,
 	// put this notification in our queue
 	auto iQueueItem = m_queueNotification.AddToTail();
 	Notification_t &notification = m_queueNotification[iQueueItem];
-	Q_strncpy( notification.szIconBaseName, szIconBaseName, ARRAYSIZE( notification.szIconBaseName ) );
-	Q_wcsncpy( notification.szHeading, pHeading, sizeof( notification.szHeading ) );
-	Q_wcsncpy( notification.szTitle, pTitle, sizeof( notification.szTitle ) );
+	V_strcpy_safe( notification.szIconBaseName, szIconBaseName );
+	V_wcscpy_safe( notification.szHeading, pHeading );
+	V_wcscpy_safe( notification.szTitle, pTitle );
 
 	// if we are not currently displaying a notification, go ahead and show this one
 	if ( 0 == m_flHideTime )
