@@ -213,7 +213,7 @@ void VOX_Shutdown( void )
 //			scan - 
 // Output : char
 //-----------------------------------------------------------------------------
-char *ScanForwardUntil( char *string, char scan )
+static char *ScanForwardUntil( char *string, char scan )
 {
 	while( string[0] )
 	{
