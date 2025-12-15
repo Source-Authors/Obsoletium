@@ -19,7 +19,6 @@
 
 #define SIGN(d)				((d)<0?-1:1)
 
-#define ABS(a)	abs(a)
 
 #define MSEC_TO_SAMPS(a)	(((a)*SOUND_DMA_SPEED) / 1000)		// convert milliseconds to # samples in equivalent time
 #define SEC_TO_SAMPS(a)		((a)*SOUND_DMA_SPEED)				// convert seconds to # samples in equivalent time
@@ -1842,7 +1841,7 @@ void RMP_Init( rmp_t *prmp, float ramptime, int initval, int targetval, bool bEn
 	// init fixed point iterator to iterate along the height of the ramp 'rise'
 	// always iterates from 0..'rise', increasing in value
 
-	POS_ONE_Init( &prmp->ps, ABS( rise ), ABS((float) rise) / ((float) run) );
+	POS_ONE_Init( &prmp->ps, abs( rise ), abs((float) rise) / ((float) run) );
 	
 	prmp->yprev = initval;
 	prmp->initval = initval;
@@ -1901,7 +1900,7 @@ inline int RMP_GetNext( rmp_t *prmp )
 	
 	if (prmp->bEndAtTime)
 	{
-		if ( ABS( y - prmp->yprev ) >= 1 )
+		if ( abs( y - prmp->yprev ) >= 1 )
 			prmp->yprev += prmp->sign;
 	}
 	else
