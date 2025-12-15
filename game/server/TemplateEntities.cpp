@@ -392,11 +392,8 @@ char *Templates_GetEntityIOFixedMapData( int iIndex )
 //-----------------------------------------------------------------------------
 void Templates_RemoveAll(void)
 {
-	int nCount = g_Templates.Count();
-	for (int i = 0; i < nCount; i++)
+	for (auto *pTemplate : g_Templates)
 	{
-		TemplateEntityData_t *pTemplate = g_Templates.Element(i);
-
 		free((void *)pTemplate->pszName);
 		free(pTemplate->pszMapData);
 		delete[] pTemplate->pszFixedMapData;
