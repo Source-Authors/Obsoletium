@@ -1997,6 +1997,7 @@ void KeyValues::CopySubkeys( KeyValues *pParent ) const
 KeyValues *KeyValues::MakeCopy( ) const
 {
 	auto *newKeyValue = new KeyValues(GetName());
+	if (!newKeyValue) Error("Out of memory when copying keys for '%s'.\n", GetName());
 
 	newKeyValue->UsesEscapeSequences( m_bHasEscapeSequences != 0 );
 	newKeyValue->UsesConditionals( m_bEvaluateConditionals != 0 );
