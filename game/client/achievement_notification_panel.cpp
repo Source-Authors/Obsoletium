@@ -266,7 +266,7 @@ CON_COMMAND_F( achievement_notification_test, "Test the hud notification UI", FC
 			pPanel->AddNotification( "EP1_KILL_ANTLIONS_WITHCARS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
 				L"Test Message B" ) );
 		}
-		else if ( V_strcmp( pszGameName, "episodic" ) == 0 )
+		else if ( V_strcmp( pszGameName, "portal" ) == 0 )
 		{
 			pPanel->AddNotification( "PORTAL_DETACH_ALL_CAMERAS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
 				L"Test Message B" ) );
