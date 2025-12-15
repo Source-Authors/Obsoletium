@@ -143,7 +143,7 @@ void CLogicAchievement::InputFireEvent( inputdata_t &inputdata )
 
 		char const *pchName = STRING( m_iszAchievementEventID );
 
-		intp nPrefixLen = ssize( ACHIEVEMENT_PREFIX ) - 1;
+		constexpr intp nPrefixLen = ssize( ACHIEVEMENT_PREFIX ) - 1;
 		if ( !Q_strnicmp( pchName, ACHIEVEMENT_PREFIX, nPrefixLen ) )
 		{
 			// Skip the prefix
