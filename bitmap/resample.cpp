@@ -55,7 +55,7 @@ static void ConstructGammaTable( unsigned char (&pTable)[size], float srcGamma, 
 		{
 			v = 255;
 		}
-		pTable[i] = ( unsigned char )v;
+		pTable[i] = size_cast<unsigned char >(v);
 	}
 }
 
