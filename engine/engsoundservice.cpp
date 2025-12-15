@@ -210,12 +210,12 @@ public:
 			int length = g_pFileSystem->Size(resfilehandle);
 			if ( length > 0 )
 			{
-				char *pStart = (char *)new char[ length + 1 ];
-				if ( pStart && ( length == g_pFileSystem->Read(pStart, length, resfilehandle) )
+				std::unique_ptr<char[]> pStart = std::make_unique<char[]>( length + 1 );
+				if ( pStart && ( length == g_pFileSystem->Read(pStart.get(), length, resfilehandle) )
 				   )
 				{
 					pStart[ length ] = 0;
-					const char *pFileList = pStart;
+					const char *pFileList = pStart.get();
 
 					while ( 1 )
 					{
@@ -242,7 +242,6 @@ public:
 						}
 					}
 				}
-				delete[] pStart;
 			}
 
 			g_pFileSystem->Close(resfilehandle);
@@ -275,12 +274,12 @@ public:
 			int length = g_pFileSystem->Size(resfilehandle);
 			if ( length > 0 )
 			{
-				char *pStart = (char *)new char[ length + 1 ];
-				if ( pStart && ( length == g_pFileSystem->Read(pStart, length, resfilehandle) )
+				std::unique_ptr<char[]> pStart = std::make_unique<char[]>( length + 1 );
+				if ( pStart && ( length == g_pFileSystem->Read(pStart.get(), length, resfilehandle) )
 				   )
 				{
 					pStart[ length ] = 0;
-					const char *pFileList = pStart;
+					const char *pFileList = pStart.get();
 
 					while ( 1 )
 					{
@@ -301,7 +300,6 @@ public:
 						}
 					}
 				}
-				delete[] pStart;
 			}
 
 			g_pFileSystem->Close(resfilehandle);
@@ -418,12 +416,12 @@ private:
 			int length = g_pFileSystem->Size(resfilehandle);
 			if ( length > 0 )
 			{
-				char *pStart = (char *)new char[ length + 1 ];
-				if ( pStart && ( length == g_pFileSystem->Read(pStart, length, resfilehandle) )
+				std::unique_ptr<char[]> pStart = std::make_unique<char[]>( length + 1 );
+				if ( pStart && ( length == g_pFileSystem->Read(pStart.get(), length, resfilehandle) )
 				   )
 				{
 					pStart[ length ] = 0;
-					const char *pFileList = pStart;
+					const char *pFileList = pStart.get();
 
 					while ( 1 )
 					{
@@ -460,7 +458,6 @@ private:
 						}
 					}
 				}
-				delete[] pStart;
 			}
 
 			g_pFileSystem->Close(resfilehandle);

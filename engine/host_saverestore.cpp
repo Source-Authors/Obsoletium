@@ -1951,10 +1951,8 @@ bool CSaveRestore::SaveClientState( const char *name )
 //-----------------------------------------------------------------------------
 int CSaveRestore::SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) char *name, int nameSize, OUT_Z_CAP(commentSize) char *comment, int commentSize )
 {
-	int i, tag, size, tokenSize, tokenCount;
-	char *pSaveData = NULL;
+	int tag, size, tokenSize, tokenCount;
 	char *pFieldName = NULL;
-	char **pTokenList = NULL;
 
 	name[0] = '\0';
 	comment[0] = '\0';
@@ -1993,55 +1991,45 @@ int CSaveRestore::SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) ch
 		return 0;
 	}
 
-
-	pSaveData = (char *)new char[size];
-	if ( g_pSaveRestoreFileSystem->Read(pSaveData, size, f) != size )
+	std::unique_ptr<char[]> pSaveData = std::make_unique<char[]>( size );
+	if ( g_pSaveRestoreFileSystem->Read(pSaveData.get(), size, f) != size )
 	{
-		delete[] pSaveData;
 		return 0;
 	}
-
-	int nNumberOfFields;
-
-	char *pData;
-	int nFieldSize;
 	
-	pData = pSaveData;
+	char *pData = pSaveData.get();
+	std::unique_ptr<char*[]> pTokenList;
 
 	// Allocate a table for the strings, and parse the table
 	if ( tokenSize > 0 )
 	{
-		pTokenList = new char *[tokenCount];
+		pTokenList = std::make_unique<char*[]>( tokenCount );
 
 		// Make sure the token strings pointed to by the pToken hashtable.
-		for( i=0; i<tokenCount; i++ )
+		for( int i=0; i<tokenCount; i++ )
 		{
-			pTokenList[i] = *pData ? pData : NULL;	// Point to each string in the pToken table
+			pTokenList[i] = *pData ? pData : nullptr;	// Point to each string in the pToken table
 			while( *pData++ );				// Find next token (after next null)
 		}
 	}
-	else
-		pTokenList = NULL;
 
 	// short, short (size, index of field name)
-	nFieldSize = *(short *)pData;
+	int nFieldSize = *(short *)pData;
 	pData += sizeof(short);
 	pFieldName = pTokenList[ *(short *)pData ];
 
 	if ( !pFieldName || Q_stricmp( pFieldName, "GameHeader" ) )
 	{
-		delete[] pSaveData;
-		delete[] pTokenList;
 		return 0;
 	};
 
 	// int (fieldcount)
 	pData += sizeof(short);
-	nNumberOfFields = *(int*)pData;
+	int nNumberOfFields = *(int*)pData;
 	pData += nFieldSize;
 
 	// Each field is a short (size), short (index of name), binary string of "size" bytes (data)
-	for ( i = 0; i < nNumberOfFields; ++i )
+	for ( int i = 0; i < nNumberOfFields; ++i )
 	{
 		// Data order is:
 		// Size
@@ -2069,10 +2057,6 @@ int CSaveRestore::SaveReadNameAndComment( FileHandle_t f, OUT_Z_CAP(nameSize) ch
 		pData += nFieldSize;
 	}
 
-	// Delete the string table we allocated
-	delete[] pTokenList;
-	delete[] pSaveData;
-	
 	return name[0] && comment[0] ? 1 : 0;
 }
 

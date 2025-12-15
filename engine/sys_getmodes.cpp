@@ -1376,13 +1376,13 @@ void CVideoMode_Common::ReadScreenPixels( int x, int y, int w, int h, void *pBuf
 void CVideoMode_Common::TakeSnapshotTGA( const char *pFilename )
 {
     // bitmap bits
-    uint8 *pImage = new uint8[ GetModeStereoWidth() * 3 * GetModeStereoHeight() ];
+    std::unique_ptr<uint8[]> pImage = std::make_unique<uint8[]>( GetModeStereoWidth() * 3 * GetModeStereoHeight() );
 
     // Get Bits from the material system
-    ReadScreenPixels( 0, 0, GetModeStereoWidth(), GetModeStereoHeight(), pImage, IMAGE_FORMAT_RGB888 );
+    ReadScreenPixels( 0, 0, GetModeStereoWidth(), GetModeStereoHeight(), pImage.get(), IMAGE_FORMAT_RGB888 );
 
     CUtlBuffer outBuf;
-    if ( TGAWriter::WriteToBuffer( pImage, outBuf, GetModeStereoWidth(), GetModeStereoHeight(), IMAGE_FORMAT_RGB888,
+    if ( TGAWriter::WriteToBuffer( pImage.get(), outBuf, GetModeStereoWidth(), GetModeStereoHeight(), IMAGE_FORMAT_RGB888,
         IMAGE_FORMAT_RGB888 ) )
     {
         if ( !g_pFileSystem->WriteFile( pFilename, NULL, outBuf ) )
@@ -1399,8 +1399,6 @@ void CVideoMode_Common::TakeSnapshotTGA( const char *pFilename )
 			}
 		}
     }
-
-    delete[] pImage;
 }
 
 //-----------------------------------------------------------------------------
@@ -1547,17 +1545,17 @@ void CVideoMode_Common::TakeSnapshotTGARect( const char *pFilename, int x, int y
     }
 
     // bitmap bits
-    uint8 *pImage = new uint8[ w * h * 4 ];
-    uint8 *pImage1 = new uint8[ resampleWidth * resampleHeight * 4 ];
+    std::unique_ptr<uint8> pImage = std::make_unique<uint8>( w * h * 4 );
+    std::unique_ptr<uint8> pImage1 = std::make_unique<uint8>( resampleWidth * resampleHeight * 4 );
 
     // Get Bits from the material system
-    ReadScreenPixels( x, y, w, h, pImage, IMAGE_FORMAT_RGBA8888 );
+    ReadScreenPixels( x, y, w, h, pImage.get(), IMAGE_FORMAT_RGBA8888 );
 
     Assert( w == h ); // garymcthack - this only works for square images
 
     ImageLoader::ResampleInfo_t info;
-    info.m_pSrc = pImage;
-    info.m_pDest = pImage1;
+    info.m_pSrc = pImage.get();
+    info.m_pDest = pImage1.get();
     info.m_nSrcWidth = w;
     info.m_nSrcHeight = h;
     info.m_nDestWidth = resampleWidth;
@@ -1571,7 +1569,7 @@ void CVideoMode_Common::TakeSnapshotTGARect( const char *pFilename, int x, int y
     }
     
     CUtlBuffer outBuf;
-    if ( TGAWriter::WriteToBuffer( pImage1, outBuf, resampleWidth, resampleHeight, IMAGE_FORMAT_RGBA8888, IMAGE_FORMAT_RGBA8888 ) )
+    if ( TGAWriter::WriteToBuffer( pImage1.get(), outBuf, resampleWidth, resampleHeight, IMAGE_FORMAT_RGBA8888, IMAGE_FORMAT_RGBA8888 ) )
     {
         if ( !g_pFileSystem->WriteFile( pFilename, NULL, outBuf ) )
         {
@@ -1583,8 +1581,6 @@ void CVideoMode_Common::TakeSnapshotTGARect( const char *pFilename, int x, int y
 		}
     }
 
-    delete[] pImage1;
-    delete[] pImage;
     materials->SwapBuffers();
 }
 
@@ -1781,7 +1777,7 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
     quality = clamp( quality, 1, 100 );
 
     // Allocate space for bits
-    uint8 *pImage = new uint8[ GetModeStereoWidth() * 3 * GetModeStereoHeight() ];
+    std::unique_ptr<uint8[]> pImage = std::make_unique<uint8[]>( GetModeStereoWidth() * 3 * GetModeStereoHeight() );
     if ( !pImage )
     {
         Msg( "Unable to allocate %i bytes for image\n", GetModeStereoWidth() * 3 * GetModeStereoHeight() );
@@ -1789,7 +1785,7 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
     }
 
     // Get Bits from the material system
-    ReadScreenPixels( 0, 0, GetModeStereoWidth(), GetModeStereoHeight(), pImage, IMAGE_FORMAT_RGB888 );
+    ReadScreenPixels( 0, 0, GetModeStereoWidth(), GetModeStereoHeight(), pImage.get(), IMAGE_FORMAT_RGB888 );
 
     JSAMPROW row_pointer[1];     // pointer to JSAMPLE row[s]
     int row_stride;              // physical row width in image buffer
@@ -1839,7 +1835,6 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
     // Cleanup
     jpeg_destroy_compress(&cinfo);
     
-    delete[] pImage;
     return true;
 }
 

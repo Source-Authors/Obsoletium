@@ -228,11 +228,11 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 				int length = g_pFileSystem->Size(resfilehandle);
 				if ( length > 0 )
 				{
-					char *pStart = (char *)new char[ length + 1 ];
-					if ( pStart && ( length == g_pFileSystem->Read(pStart, length, resfilehandle) ) )
+					std::unique_ptr<char[]> pStart = std::make_unique<char[]>( length + 1 );
+					if ( pStart && ( length == g_pFileSystem->Read(pStart.get(), length, resfilehandle) ) )
 					{
 						pStart[ length ] = 0;
-						const char *pFileList = pStart;
+						const char *pFileList = pStart.get();
 
 						char token[COM_TOKEN_MAX_LENGTH];
 
@@ -263,7 +263,6 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 							aMaps->AddToTail( newMap );
 						}
 					}
-					delete[] pStart;
 				}
 
 				g_pFileSystem->Close(resfilehandle);
@@ -817,11 +816,11 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 		int length = g_pFileSystem->Size(deletionsfile);
 		if ( length > 0 )
 		{
-			char *pStart = (char *)new char[ length + 1 ];
-			if ( pStart && ( length == g_pFileSystem->Read(pStart, length, deletionsfile) ) )
+			std::unique_ptr<char[]> pStart = std::make_unique<char[]>( length + 1 );
+			if ( pStart && ( length == g_pFileSystem->Read(pStart.get(), length, deletionsfile) ) )
 			{
 				pStart[ length ] = 0;
-				const char *pFileList = pStart;
+				const char *pFileList = pStart.get();
 
 				char token[COM_TOKEN_MAX_LENGTH];
 
@@ -852,7 +851,6 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 					++deletions;
 				}
 			}
-			delete[] pStart;
 		}
 
 		g_pFileSystem->Close(deletionsfile);
@@ -871,11 +869,12 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 		int length = g_pFileSystem->Size(warningsfile);
 		if ( length > 0 )
 		{
-			char *pStart = (char *)new char[ length + 1 ];
-			if ( pStart && ( length == g_pFileSystem->Read(pStart, length, warningsfile) ) )
+			std::unique_ptr<char[]> pStart = std::make_unique<char[]>( length + 1 );
+			if ( pStart && ( length == g_pFileSystem->Read(pStart.get(), length, warningsfile) ) )
 			{
 				pStart[ length ] = 0;
-				const char *pFileList = pStart;
+				const char *pFileList = pStart.get();
+
 				char token[COM_TOKEN_MAX_LENGTH];
 
 				while ( 1 )
@@ -896,7 +895,6 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 					}
 				}
 			}
-			delete[] pStart;
 		}
 
 		g_pFileSystem->Close(warningsfile);
