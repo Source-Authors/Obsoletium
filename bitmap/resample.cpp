@@ -679,10 +679,10 @@ bool ResampleRGBA16161616( const ResampleInfo_t& info )
 	// HDRFIXME: This is some lame shit right here. (We need to get NICE working, etc, etc.)
 
 	// Make sure everything is power of two.
-	Assert( ( info.m_nSrcWidth & ( info.m_nSrcWidth - 1 ) ) == 0 );
-	Assert( ( info.m_nSrcHeight & ( info.m_nSrcHeight - 1 ) ) == 0 );
-	Assert( ( info.m_nDestWidth & ( info.m_nDestWidth - 1 ) ) == 0 );
-	Assert( ( info.m_nDestHeight & ( info.m_nDestHeight - 1 ) ) == 0 );
+	Assert( IsPowerOfTwo( info.m_nSrcWidth ) == 0 );
+	Assert( IsPowerOfTwo( info.m_nSrcHeight ) == 0 );
+	Assert( IsPowerOfTwo( info.m_nDestWidth ) == 0 );
+	Assert( IsPowerOfTwo( info.m_nDestHeight ) == 0 );
 
 	// Make sure that we aren't upscsaling the image. . .we do`n't support that very well.
 	Assert( info.m_nSrcWidth >= info.m_nDestWidth );
