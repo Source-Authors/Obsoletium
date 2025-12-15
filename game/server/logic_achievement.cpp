@@ -125,6 +125,7 @@ END_DATADESC()
 //-----------------------------------------------------------------------------
 CLogicAchievement::CLogicAchievement(void)
 {
+	m_bDisabled = false;
 	m_iszAchievementEventID		= NULL_STRING;
 }
 
