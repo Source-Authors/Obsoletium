@@ -4,24 +4,23 @@
 //
 //=============================================================================//
 #include "cbase.h"
-#include <stdio.h>
+#include <cstdio>
 #include <windows.h>
 #include <io.h>
 #include <sys/stat.h>
-#include "tier0/dbg.h"
-#pragma warning( disable : 4018 )
 
-#include "utlrbtree.h"
-#include "utlvector.h"
-#include "utldict.h"
 #include "filesystem.h"
 #include "FileSystem_Tools.h"
 #include "FileSystem_Helpers.h"
-#include "KeyValues.h"
 #include "cmdlib.h"
 #include "scriplib.h"
 #include "tier0/icommandline.h"
+#include "tier0/dbg.h"
 #include "tier1/fmtstr.h"
+#include "tier1/KeyValues.h"
+#include "tier1/utlrbtree.h"
+#include "tier1/utlvector.h"
+#include "tier1/utldict.h"
 
 bool uselogfile = false;
 bool spewdeletions = false;
@@ -1163,6 +1162,7 @@ void ParseFilesFromResList( UnusedContent::CUtlSymbol & resfilesymbol, CUtlRBTre
 
 bool BuildReferencedFileList( CUtlVector< UnusedContent::CUtlSymbol >& resfiles, CUtlRBTree< ReferencedFile, int >& files, const char *resfile )
 {
+	char token[COM_TOKEN_MAX_LENGTH];
 
 	// Load the reslist file
 	FileHandle_t resfilehandle;
@@ -1185,11 +1185,11 @@ bool BuildReferencedFileList( CUtlVector< UnusedContent::CUtlSymbol >& resfiles,
 				{
 					char szResList[ 256 ];
 
-					pFileList = COM_Parse( pFileList );
-					if ( strlen( com_token ) <= 0 )
+					pFileList = COM_Parse( pFileList, token );
+					if ( Q_isempty( token ) )
 						break;
 
-					Q_snprintf(szResList, sizeof( szResList ), "%s%s.lst", g_szReslistDir, com_token );
+					Q_snprintf(szResList, sizeof( szResList ), "%s%s.lst", g_szReslistDir, token );
 					_strlwr( szResList );
 					Q_FixSlashes( szResList );
 

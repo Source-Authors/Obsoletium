@@ -234,15 +234,17 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 						pStart[ length ] = 0;
 						const char *pFileList = pStart;
 
+						char token[COM_TOKEN_MAX_LENGTH];
+
 						while ( 1 )
 						{
 							char szMap[ MAX_OSPATH ];
 
-							pFileList = COM_Parse( pFileList );
-							if ( !com_token[0] )
+							pFileList = COM_Parse( pFileList, token );
+							if ( !token[0] )
 								break;
 
-							Q_strncpy(szMap, com_token, sizeof(szMap));
+							Q_strncpy(szMap, token, sizeof(szMap));
 
 							// ensure validity
 							char szMapFile[64] = { 0 };
@@ -253,7 +255,7 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 							// Any more tokens on this line?
 							while ( COM_TokenWaiting( pFileList ) )
 							{
-								pFileList = COM_Parse( pFileList );
+								pFileList = COM_Parse( pFileList, token );
 							}
 
 							maplist_map_t newMap;
@@ -821,23 +823,25 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 				pStart[ length ] = 0;
 				const char *pFileList = pStart;
 
+				char token[COM_TOKEN_MAX_LENGTH];
+
 				while ( 1 )
 				{
 					char filename[ MAX_OSPATH ];
 
-					pFileList = COM_Parse( pFileList );
-					if ( Q_isempty( com_token ) )
+					pFileList = COM_Parse( pFileList, token );
+					if ( Q_isempty( token ) )
 						break;
 
-					if ( !Q_stricmp( com_token, "del" ) )
+					if ( !Q_stricmp( token, "del" ) )
 						continue;
 
-					Q_snprintf(filename, sizeof( filename ), "%s/%s", com_gamedir, com_token );
+					Q_snprintf(filename, sizeof( filename ), "%s/%s", com_gamedir, token );
 
 					// Any more tokens on this line?
 					while ( COM_TokenWaiting( pFileList ) )
 					{
-						pFileList = COM_Parse( pFileList );
+						pFileList = COM_Parse( pFileList, token );
 					}
 
 					Q_FixSlashes( filename );
@@ -872,17 +876,18 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 			{
 				pStart[ length ] = 0;
 				const char *pFileList = pStart;
+				char token[COM_TOKEN_MAX_LENGTH];
 
 				while ( 1 )
 				{
-					pFileList = COM_Parse( pFileList );
-					if ( Q_isempty( com_token ) )
+					pFileList = COM_Parse( pFileList, token );
+					if ( Q_isempty( token ) )
 						break;
 
-					Q_FixSlashes( com_token );
-					Q_strlower( com_token );
+					Q_FixSlashes( token );
+					Q_strlower( token );
 	
-					CUtlSymbol sym = m_DeletionListWarningsSymbols.AddString( com_token );
+					CUtlSymbol sym = m_DeletionListWarningsSymbols.AddString( token );
 					auto idx = m_DeletionListWarnings.Find( sym );
 					if ( idx == m_DeletionListWarnings.InvalidIndex() )
 					{

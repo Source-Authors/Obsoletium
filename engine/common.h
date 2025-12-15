@@ -31,6 +31,9 @@ struct cache_user_t;
 // dimhotepus: Increase 1024 -> 65535 to speedup copying.
 constexpr inline int COM_COPY_CHUNK_SIZE{65535};  // For copying operations
 
+// dimhotepus: Expose to the public.
+constexpr inline int COM_TOKEN_MAX_LENGTH{1024};
+
 #include "tier1/strtools.h"
 
 //============================================================================
@@ -49,12 +52,27 @@ extern byte *COM_LoadFile (IN_Z const char *path, int usehunk, int *pLength);
 extern bool COM_IsValidPath (IN_Z const char *pszFilename );
 extern bool COM_IsValidLogFilename (IN_Z const char *pszFilename );
 
-const char *COM_Parse ( IN_Z const char *data);
-const char *COM_ParseLine ( IN_Z const char *data);
+[[deprecated("Not thread-safe. Use COM_Parse with token as arg.")]] const char *COM_Parse(IN_Z const char *data);
+[[deprecated("Not thread-safe. Use COM_ParseLine with token as arg.")]] const char *COM_ParseLine ( IN_Z const char *data);
 [[nodiscard]] int COM_TokenWaiting( IN_Z const char *buffer );
 
+const char *COM_Parse ( IN_Z const char *data, OUT_Z_CAP(tokenSize) char* token, size_t tokenSize );
+const char *COM_ParseLine( IN_Z const char *data, OUT_Z_CAP(tokenSize) char* token, size_t tokenSize );
+
+template<size_t tokenSize>
+const char *COM_Parse ( IN_Z const char *data, OUT_Z_ARRAY char (&token)[tokenSize] )
+{
+	return COM_Parse( data, token, tokenSize );
+}
+
+template<size_t tokenSize>
+const char *COM_ParseLine ( IN_Z const char *data, OUT_Z_ARRAY char (&token)[tokenSize] )
+{
+	return COM_ParseLine( data, token, tokenSize );
+}
+
 extern bool com_ignorecolons;
-extern char com_token[1024];
+extern char com_token[COM_TOKEN_MAX_LENGTH];
 
 void COM_Init();
 void COM_Shutdown();

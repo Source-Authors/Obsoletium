@@ -757,41 +757,42 @@ static eSteamInfoInit Sys_TryInitSteamInfo( [[maybe_unused]] void *pvAPI, SteamI
 
 	if ( bFoundInf )
 	{
+		char token[COM_TOKEN_MAX_LENGTH];
 		const char *pbuf = infBuf.Base<const char>();
 		while ( 1 )
 		{
-			pbuf = COM_Parse( pbuf );
-			if ( !pbuf || !com_token[ 0 ] )
+			pbuf = COM_Parse( pbuf, token );
+			if ( !pbuf || !token[ 0 ] )
 				break;
 
-			if ( !Q_strnicmp( com_token, VERSION_KEY, ssize( VERSION_KEY ) - 1 ) )
+			if ( !Q_strnicmp( token, VERSION_KEY, ssize( VERSION_KEY ) - 1 ) )
 			{
-				V_strcpy_safe( VerInfo.szVersionString, com_token + ssize( VERSION_KEY ) - 1 );
+				V_strcpy_safe( VerInfo.szVersionString, token + ssize( VERSION_KEY ) - 1 );
 				// Use version as client version by default.
 				VerInfo.ClientVersion = atoi( VerInfo.szVersionString );
 			}
 			// dimhotepus: Explicitly read client version if present.
-			else if ( !Q_strnicmp( com_token, CLIENT_VERSION_KEY, ssize( CLIENT_VERSION_KEY ) - 1 ) )
+			else if ( !Q_strnicmp( token, CLIENT_VERSION_KEY, ssize( CLIENT_VERSION_KEY ) - 1 ) )
 			{
 				char szClientVersion[32];
-				V_strcpy_safe( szClientVersion, com_token + ssize( CLIENT_VERSION_KEY ) - 1 );
+				V_strcpy_safe( szClientVersion, token + ssize( CLIENT_VERSION_KEY ) - 1 );
 				VerInfo.ClientVersion = atoi( szClientVersion );
 			}
-			else if ( !Q_strnicmp( com_token, SERVER_VERSION_KEY, ssize( SERVER_VERSION_KEY ) - 1 ) )
+			else if ( !Q_strnicmp( token, SERVER_VERSION_KEY, ssize( SERVER_VERSION_KEY ) - 1 ) )
 			{
-				VerInfo.ServerVersion = atoi( com_token + ssize( SERVER_VERSION_KEY ) - 1 );
+				VerInfo.ServerVersion = atoi( token + ssize( SERVER_VERSION_KEY ) - 1 );
 			}
-			else if ( !Q_strnicmp( com_token, PRODUCT_KEY, ssize( PRODUCT_KEY ) - 1 ) )
+			else if ( !Q_strnicmp( token, PRODUCT_KEY, ssize( PRODUCT_KEY ) - 1 ) )
 			{
-				V_strcpy_safe( VerInfo.szProductString, com_token + ssize( PRODUCT_KEY ) - 1 );
+				V_strcpy_safe( VerInfo.szProductString, token + ssize( PRODUCT_KEY ) - 1 );
 			}
-			else if ( !Q_strnicmp( com_token, APPID_KEY, ssize( APPID_KEY ) - 1 ) )
+			else if ( !Q_strnicmp( token, APPID_KEY, ssize( APPID_KEY ) - 1 ) )
 			{
-				VerInfo.AppID = atoi( com_token + ssize( APPID_KEY ) - 1 );
+				VerInfo.AppID = atoi( token + ssize( APPID_KEY ) - 1 );
 			}
-			else if ( !Q_strnicmp( com_token, SERVER_APPID_KEY, ssize( SERVER_APPID_KEY ) - 1 ) )
+			else if ( !Q_strnicmp( token, SERVER_APPID_KEY, ssize( SERVER_APPID_KEY ) - 1 ) )
 			{
-				VerInfo.ServerAppID = atoi( com_token + ssize( SERVER_APPID_KEY ) - 1 );
+				VerInfo.ServerAppID = atoi( token + ssize( SERVER_APPID_KEY ) - 1 );
 			}
 		}
 

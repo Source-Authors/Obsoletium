@@ -200,6 +200,8 @@ public:
 	{
 		list.RemoveAll();
 
+		char token[COM_TOKEN_MAX_LENGTH];
+
 		// Load them in
 		FileHandle_t resfilehandle = g_pFileSystem->Open( MAPLIST_FILE, "rb", "MOD" );
 		if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
@@ -217,12 +219,12 @@ public:
 
 					while ( 1 )
 					{
-						pFileList = COM_Parse( pFileList );
-						if ( Q_isempty( com_token ) )
+						pFileList = COM_Parse( pFileList, token );
+						if ( Q_isempty( token ) )
 							break;
 
 						char manifest_file[ 512 ];
-						V_sprintf_safe( manifest_file, "%s/%s.manifest", AUDIOSOURCE_CACHE_ROOTDIR, com_token );
+						V_sprintf_safe( manifest_file, "%s/%s.manifest", AUDIOSOURCE_CACHE_ROOTDIR, token );
 
 						if ( g_pFileSystem->FileExists( manifest_file, "MOD" ) )
 						{
@@ -236,7 +238,7 @@ public:
 						// Any more tokens on this line?
 						while ( COM_TokenWaiting( pFileList ) )
 						{
-							pFileList = COM_Parse( pFileList );
+							pFileList = COM_Parse( pFileList, token );
 						}
 					}
 				}
@@ -263,6 +265,8 @@ public:
 		Q_strncpy( reslistdir, MapReslistGenerator().GetResListDirectory(), sizeof( reslistdir ) );
 		list.RemoveAll();
 
+		char token[COM_TOKEN_MAX_LENGTH];
+
 		// Load them in
 		FileHandle_t resfilehandle = g_pFileSystem->Open( MAPLIST_FILE, "rb", "MOD" );
 		if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
@@ -282,18 +286,18 @@ public:
 					{
 						char resfile[ 512 ];
 
-						pFileList = COM_Parse( pFileList );
-						if ( Q_isempty( com_token ) )
+						pFileList = COM_Parse( pFileList, token );
+						if ( Q_isempty( token ) )
 							break;
 
-						Q_snprintf( resfile, sizeof( resfile ), "%s\\%s.lst", reslistdir, com_token );
+						Q_snprintf( resfile, sizeof( resfile ), "%s\\%s.lst", reslistdir, token );
 
 						CacheSoundsFromResFile( false, list, resfile );
 
 						// Any more tokens on this line?
 						while ( COM_TokenWaiting( pFileList ) )
 						{
-							pFileList = COM_Parse( pFileList );
+							pFileList = COM_Parse( pFileList, token );
 						}
 					}
 				}
@@ -405,6 +409,8 @@ private:
 
 		int oldCount = list.Count();
 
+		char token[COM_TOKEN_MAX_LENGTH];
+
 		FileHandle_t resfilehandle = g_pFileSystem->Open( resfile, "rb", "MOD" );
 		if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
 		{
@@ -421,18 +427,18 @@ private:
 
 					while ( 1 )
 					{
-						pFileList = COM_Parse( pFileList );
-						if ( Q_isempty( com_token ) )
+						pFileList = COM_Parse( pFileList, token );
+						if ( Q_isempty( token ) )
 							break;
 
 						if ( checkandcleanname )
 						{
-							if ( Q_stristr( com_token, ".wav" ) ||
-								 Q_stristr( com_token, ".mp3" ) )
+							if ( Q_stristr( token, ".wav" ) ||
+								 Q_stristr( token, ".mp3" ) )
 							{
 								// skip past the game/mod directory		   "hl2/sound/player/footstep.wav"
-								Q_FixSlashes(com_token);				// "hl2\sound\player\footstep.wav"
-								const char *pName = com_token;
+								Q_FixSlashes(token);				// "hl2\sound\player\footstep.wav"
+								const char *pName = token;
 								while (pName[0] && pName[0] != CORRECT_PATH_SEPARATOR)
 								{
 									pName++;
@@ -446,7 +452,7 @@ private:
 						}
 						else
 						{
-							FileNameHandle_t handle = g_pFileSystem->FindOrAddFileName( com_token );
+							FileNameHandle_t handle = g_pFileSystem->FindOrAddFileName( token );
 							if ( list.Find( handle ) == list.InvalidIndex() )
 							{
 								list.Insert( handle );

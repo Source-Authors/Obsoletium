@@ -259,10 +259,10 @@ void CBrowseButton::SetActionMessage()
 template<intp size>
 static const char *ParseKeyvalue( const char *pBuffer, char (&key)[size], char (&value)[size] )
 {
-	char com_token[1024];
+	char token[1024];
 
-	pBuffer = ParseFile( pBuffer, com_token, NULL );
-	V_strcpy_safe( key, com_token );
+	pBuffer = ParseFile( pBuffer, token, NULL );
+	V_strcpy_safe( key, token );
 	Q_strlower( key );
 
 	// no value on a close brace
@@ -272,8 +272,8 @@ static const char *ParseKeyvalue( const char *pBuffer, char (&key)[size], char (
 		return pBuffer;
 	}
 
-	pBuffer = ParseFile( pBuffer, com_token, NULL );
-	V_strcpy_safe( value, com_token );
+	pBuffer = ParseFile( pBuffer, token, NULL );
+	V_strcpy_safe( value, token );
 	Q_strlower( value );
 
 	return pBuffer;

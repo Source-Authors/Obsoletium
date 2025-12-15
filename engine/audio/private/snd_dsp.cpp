@@ -8835,14 +8835,16 @@ int DSP_CountFilePresets( const char *pstart )
 	bool binpreset = false;
 	bool blookleft = false;
 
+	char token[COM_TOKEN_MAX_LENGTH];
+
 	while ( 1 )
 	{
-		pstart = COM_Parse( pstart );
+		pstart = COM_Parse( pstart, token );
 		
-		if ( !com_token[0] )
+		if ( !token[0] )
 			break;
 
-		if ( com_token[0] == '{' )  // left paren
+		if ( token[0] == '{' )  // left paren
 		{	
 			if (!binpreset)
 			{
@@ -8858,7 +8860,7 @@ int DSP_CountFilePresets( const char *pstart )
 			continue;
 		} 
 
-		if ( com_token[0] == '}' )  // right paren
+		if ( token[0] == '}' )  // right paren
 		{
 			if (binpreset)
 			{
@@ -9006,7 +9008,7 @@ void DSP_ReleaseMemory( void )
 
 bool DSP_LoadPresetFile( void )
 {
-	char szFile[ MAX_OSPATH ];
+	char szFile[ MAX_OSPATH ], token[COM_TOKEN_MAX_LENGTH];
 	const char *pstart;
 	bool bResult = false;
 	int cpresets;	
@@ -9063,12 +9065,12 @@ bool DSP_LoadPresetFile( void )
 
 		while (1)
 		{
-			pstart = COM_Parse( pstart );
+			pstart = COM_Parse( pstart, token );
 		
-			if ( Q_isempty(com_token) )
+			if ( Q_isempty(token) )
 				break;
 
-			if ( com_token[0] != CHAR_LEFT_PAREN )
+			if ( token[0] != CHAR_LEFT_PAREN )
 				continue;
 
 			break;
@@ -9078,35 +9080,35 @@ bool DSP_LoadPresetFile( void )
 
 		// get preset #, type, cprocessors, gain
 		
-		pstart = COM_Parse( pstart );
-		ipreset = atoi( com_token );
+		pstart = COM_Parse( pstart, token );
+		ipreset = atoi( token );
 
-		pstart = COM_Parse( pstart );
-		itype = (int)DSP_LookupStringToken( com_token , ipreset);
+		pstart = COM_Parse( pstart, token );
+		itype = (int)DSP_LookupStringToken( token , ipreset);
 
-		pstart = COM_Parse( pstart );
+		pstart = COM_Parse( pstart, token );
 		// dimhotepus: atof -> strtof
-		mix_min = strtof( com_token, nullptr );
+		mix_min = strtof( token, nullptr );
 
-		pstart = COM_Parse( pstart );
+		pstart = COM_Parse( pstart, token );
 		// dimhotepus: atof -> strtof
-		mix_max = strtof( com_token, nullptr );
+		mix_max = strtof( token, nullptr );
 
-		pstart = COM_Parse( pstart );
+		pstart = COM_Parse( pstart, token );
 		// dimhotepus: atof -> strtof
-		duration = strtof( com_token, nullptr );
+		duration = strtof( token, nullptr );
 
-		pstart = COM_Parse( pstart );
+		pstart = COM_Parse( pstart, token );
 		// dimhotepus: atof -> strtof
-		fadeout = strtof( com_token, nullptr );
+		fadeout = strtof( token, nullptr );
 		
-		pstart = COM_Parse( pstart );
+		pstart = COM_Parse( pstart, token );
 		// dimhotepus: atof -> strtof
-		db_min = strtof( com_token, nullptr );
+		db_min = strtof( token, nullptr );
 
-		pstart = COM_Parse( pstart );
+		pstart = COM_Parse( pstart, token );
 		// dimhotepus: atof -> strtof
-		db_mixdrop = strtof( com_token, nullptr );
+		db_mixdrop = strtof( token, nullptr );
 
 
 		g_psettemplates[ipreset].fused = true;
@@ -9128,15 +9130,15 @@ bool DSP_LoadPresetFile( void )
 
 			while (1)
 			{
-				pstart = COM_Parse( pstart );
+				pstart = COM_Parse( pstart, token );
 
-				if ( !com_token[0] )
+				if ( !token[0] )
 					break;
 
-				if (com_token[0] == CHAR_LEFT_PAREN)
+				if (token[0] == CHAR_LEFT_PAREN)
 					break;
 
-				if (com_token[0] == CHAR_RIGHT_PAREN)
+				if (token[0] == CHAR_RIGHT_PAREN)
 				{
 					// if found right paren, no more processors: done with this preset
 					fdone = true;
@@ -9149,8 +9151,8 @@ bool DSP_LoadPresetFile( void )
 
 			// get processor type
 
-			pstart = COM_Parse( pstart );
-			g_psettemplates[ipreset].prcs[cproc].type = (int)DSP_LookupStringToken( com_token, ipreset );
+			pstart = COM_Parse( pstart, token );
+			g_psettemplates[ipreset].prcs[cproc].type = (int)DSP_LookupStringToken( token, ipreset );
 
 			// get param 0..n or stop when hit closing CHAR_RIGHT_PAREN
 
@@ -9158,15 +9160,15 @@ bool DSP_LoadPresetFile( void )
 
 			while (1)
 			{
-				pstart = COM_Parse( pstart );
+				pstart = COM_Parse( pstart, token );
 
-				if ( Q_isempty(com_token) )
+				if ( Q_isempty(token) )
 					break;
 
-				if ( com_token[0] == CHAR_RIGHT_PAREN )
+				if ( token[0] == CHAR_RIGHT_PAREN )
 					break;
 
-				g_psettemplates[ipreset].prcs[cproc].prm[ip++] = DSP_LookupStringToken( com_token, ipreset );
+				g_psettemplates[ipreset].prcs[cproc].prm[ip++] = DSP_LookupStringToken( token, ipreset );
 				
 				// cap at max params
 

@@ -33,7 +33,7 @@
 int myargc;
 char **myargv;
 
-char com_token[1024];
+char com_token[COM_TOKEN_MAX_LENGTH];
 
 qboolean archive;
 char archivedir[1024];
@@ -387,7 +387,7 @@ void qprintf(PRINTF_FORMAT_STRING const char *format, ...) {
 
 // Helpers.
 
-template<int outSize>
+template <int outSize>
 static bool CmdLib_getwd(OUT_Z_ARRAY char (&out)[outSize]) {
 #if defined(_WIN32)
   if (!_getcwd(out, outSize)) {
@@ -497,7 +497,17 @@ COM_Parse
 
 Parse a token out of a string
 */
-char *COM_Parse(char *data) { return ParseFile(data, com_token, nullptr); }
+char *COM_Parse(IN_Z char *data) { return COM_Parse(data, com_token); }
+
+/*
+COM_Parse
+
+Parse a token out of a string
+*/
+char *COM_Parse(IN_Z char *data, OUT_Z_CAP(tokenSize) char *token,
+                size_t tokenSize) {
+  return (char*)ParseFileInternal(data, token, nullptr, nullptr, tokenSize);
+}
 
 /*
     MISC FUNCTIONS

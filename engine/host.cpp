@@ -1315,6 +1315,7 @@ void Host_ReadPreStartupConfiguration()
 		"save_in_memory"			// needed to preread data from the correct location in UI
 	};
 
+	char token[COM_TOKEN_MAX_LENGTH];
 	// loop through looking for all the cvars to apply
 	for ( const auto *configVar : s_PreStartupConfigConVars )
 	{
@@ -1322,16 +1323,16 @@ void Host_ReadPreStartupConfiguration()
 		if (search)
 		{
 			// read over the token
-			search = COM_Parse(search);
+			search = COM_Parse(search, token);
 
 			// read the value
-			COM_Parse(search);
+			COM_Parse(search, token);
 
 			// apply the value
 			ConVar *var = g_pCVar->FindVar( configVar );
 			if ( var )
 			{
-				var->SetValue( com_token );
+				var->SetValue( token );
 			}
 		}
 	}

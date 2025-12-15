@@ -648,18 +648,20 @@ void Cmd_Exec_f( const CCommand &args )
 	// check to make sure we're not going to overflow the cmd_text buffer
 	CommandHandle_t hCommand = s_CommandBuffer.GetNextCommandHandle();
 
+	char token[COM_TOKEN_MAX_LENGTH];
+
 	// Execute each command immediately
 	const char *pszDataPtr = f;
 	while( true )
 	{
 		// parse a line out of the source
-		pszDataPtr = COM_ParseLine( pszDataPtr );
+		pszDataPtr = COM_ParseLine( pszDataPtr, token );
 
 		// no more tokens
-		if ( Q_isempty( com_token ) )
+		if ( Q_isempty( token ) )
 			break;
 
-		Cbuf_InsertText( com_token );
+		Cbuf_InsertText( token );
 
 		// Execute all commands provoked by the current line read from the file
 		while ( s_CommandBuffer.GetNextCommandHandle() != hCommand )

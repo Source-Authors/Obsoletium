@@ -2132,7 +2132,7 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 //-----------------------------------------------------------------------------
 void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 {
-	char tempBuffer[512];
+	char tempBuffer[512], token[COM_TOKEN_MAX_LENGTH];
 	intp tempBufferPos = 0;
 
 	if ( !pSentenceData )
@@ -2201,15 +2201,15 @@ void VOX_ParseLineCommands( char *pSentenceData, int sentenceIndex )
 
 					pSentenceData += 12;
 
-					pSentenceData = (char *)COM_Parse( pSentenceData );
+					pSentenceData = (char *)COM_Parse( pSentenceData, token );
 
 					// Skip until next } or whitespace character
 					while ( *pSentenceData && ( *pSentenceData != '}' && !( *pSentenceData <= 32 ) ) )
 						pSentenceData++;
 
-					if ( !Q_isempty( com_token ) )
+					if ( !Q_isempty( token ) )
 					{
-						g_Sentences[sentenceIndex].caption = com_token;
+						g_Sentences[sentenceIndex].caption = token;
 					}
 					else
 					{

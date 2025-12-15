@@ -126,9 +126,18 @@ void RestoreConsoleTextColor(unsigned short color);
 // Append all spew output to the specified file.
 void SetSpewFunctionLogFile(char const *pFilename);
 
-char *COM_Parse(char *data);
+[[deprecated("Not thread-safe. Use COM_Parse with token as arg.")]] char *COM_Parse( IN_Z char *data );
+char *COM_Parse( IN_Z char *data, OUT_Z_CAP(tokenSize) char* token, size_t tokenSize );
 
-extern char com_token[1024];
+template<size_t tokenSize>
+char *COM_Parse( IN_Z char *data, OUT_Z_ARRAY char (&token)[tokenSize] )
+{
+  return COM_Parse(data, token, tokenSize);
+}
+
+// dimhotepus: Expose to the public.
+constexpr inline int COM_TOKEN_MAX_LENGTH{1024};
+extern char com_token[COM_TOKEN_MAX_LENGTH];
 
 char *copystring(const char *s);
 

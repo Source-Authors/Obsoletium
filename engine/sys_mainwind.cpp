@@ -1544,19 +1544,20 @@ void CGame::PlayStartupVideos( void )
 	Audio_CreateSDLAudioDevice();
 #endif
 
+	char token[COM_TOKEN_MAX_LENGTH];
 	const char *start = buffer;
 
 	while( true )
 	{
-		start = COM_Parse(start);
-		if ( Q_isempty( com_token ) )
+		start = COM_Parse(start, token);
+		if ( Q_isempty( token ) )
 		{
 			break;
 		}
 
 		// get the path to the media file and play it.
 		char localPath[MAX_PATH];
- 		g_pFileSystem->GetLocalPath_safe( com_token, localPath );
+ 		g_pFileSystem->GetLocalPath_safe( token, localPath );
  		
 		PlayVideoAndWait( localPath, bNeedHealthWarning );
 		localPath[0] = 0; // just to make sure we don't play the same avi file twice in the case that one movie is there but another isn't.

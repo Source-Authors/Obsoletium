@@ -7856,12 +7856,12 @@ bool MXR_LoadAllSoundMixers( void )
 
 	// build array of sound mixers
 
-	char szFile[MAX_OSPATH];
+	char szFile[MAX_OSPATH], token[COM_TOKEN_MAX_LENGTH];
 	const char *pstart;
 	bool bResult = false;
 	char *pbuffer;
 
-	Q_snprintf( szFile, sizeof( szFile ), "scripts/soundmixers.txt" );
+	V_sprintf_safe( szFile, "scripts/soundmixers.txt" );
 
 	pbuffer = (char *)COM_LoadFile( szFile, 5, NULL ); // Use malloc - free at end of this routine
 	if ( !pbuffer )
@@ -7886,12 +7886,12 @@ bool MXR_LoadAllSoundMixers( void )
 
 	while (1)
 	{
-		pstart = COM_Parse( pstart );
+		pstart = COM_Parse( pstart, token );
 	
-		if ( Q_isempty(com_token) )
+		if ( Q_isempty(token) )
 			break; // eof
 
-		if ( com_token[0] != CHAR_LEFT_PAREN )
+		if ( token[0] != CHAR_LEFT_PAREN )
 			continue;
 
 		break;
@@ -7899,8 +7899,8 @@ bool MXR_LoadAllSoundMixers( void )
 
 	while (1)
 	{
-		pstart = COM_Parse( pstart );
-		if (com_token[0] == CHAR_RIGHT_PAREN)
+		pstart = COM_Parse( pstart, token );
+		if (token[0] == CHAR_RIGHT_PAREN)
 			break;
 		
 		grouprule_t *pgroup = &g_grouprules[g_cgrouprules];
@@ -7908,18 +7908,18 @@ bool MXR_LoadAllSoundMixers( void )
 		// copy mixgroup name, directory, classname
 		// if no value specified, set to 0 length string
 
-		if (com_token[0])
-			Q_memcpy(pgroup->szmixgroup, com_token, min((size_t)CMXRNAMEMAX-1, strlen(com_token)));
+		if (token[0])
+			Q_memcpy(pgroup->szmixgroup, token, min((size_t)CMXRNAMEMAX-1, strlen(token)));
 		
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
-			Q_memcpy(pgroup->szdir, com_token, min((size_t)CMXRNAMEMAX-1, strlen(com_token)));
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
+			Q_memcpy(pgroup->szdir, token, min((size_t)CMXRNAMEMAX-1, strlen(token)));
 
 		pgroup->classId = -1;
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
 		{
-			pgroup->classId = MXR_AddClassname( com_token );
+			pgroup->classId = MXR_AddClassname( token );
 		}
 
 		// make sure all copied strings are null terminated
@@ -7927,20 +7927,20 @@ bool MXR_LoadAllSoundMixers( void )
 		pgroup->szdir[CMXRNAMEMAX-1]		= 0;
 
 		// lookup chan
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
 		{
-			if (!Q_stricmp(com_token, "CHAN_STATIC"))
+			if (!Q_stricmp(token, "CHAN_STATIC"))
 				pgroup->chantype = CHAN_STATIC;
-			else if (!Q_stricmp(com_token, "CHAN_WEAPON"))
+			else if (!Q_stricmp(token, "CHAN_WEAPON"))
 				pgroup->chantype = CHAN_WEAPON;
-			else if (!Q_stricmp(com_token, "CHAN_VOICE"))
+			else if (!Q_stricmp(token, "CHAN_VOICE"))
 				pgroup->chantype = CHAN_VOICE;
-			else if (!Q_stricmp(com_token, "CHAN_VOICE2"))
+			else if (!Q_stricmp(token, "CHAN_VOICE2"))
 				pgroup->chantype = CHAN_VOICE2;
-			else if (!Q_stricmp(com_token, "CHAN_BODY"))
+			else if (!Q_stricmp(token, "CHAN_BODY"))
 				pgroup->chantype = CHAN_BODY;
-			else if (!Q_stricmp(com_token, "CHAN_ITEM"))
+			else if (!Q_stricmp(token, "CHAN_ITEM"))
 				pgroup->chantype = CHAN_ITEM;
 		}
 		else
@@ -7948,47 +7948,47 @@ bool MXR_LoadAllSoundMixers( void )
 
 		// get sndlvls
 		
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
-			pgroup->soundlevel_min = atoi(com_token);
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
+			pgroup->soundlevel_min = atoi(token);
 		else
 			pgroup->soundlevel_min = -1;
 
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
-			pgroup->soundlevel_max = atoi(com_token);
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
+			pgroup->soundlevel_max = atoi(token);
 		else
 			pgroup->soundlevel_max = -1;
 
 		// get duck priority, IsDucked, Causes_ducking, duck_target_pct
 
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
-			pgroup->priority = atoi(com_token);
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
+			pgroup->priority = atoi(token);
 		else
 			pgroup->priority = 50;
 
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
-			pgroup->is_ducked = atoi(com_token);
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
+			pgroup->is_ducked = atoi(token);
 		else
 			pgroup->is_ducked = 0;
 
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
-			pgroup->causes_ducking = atoi(com_token);
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
+			pgroup->causes_ducking = atoi(token);
 		else
 			pgroup->causes_ducking = 0;
 
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
-			pgroup->duck_target_pct = ((float)(atoi(com_token))) / 100.0f;
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
+			pgroup->duck_target_pct = ((float)(atoi(token))) / 100.0f;
 		else
 			pgroup->duck_target_pct = 0.5f;
 
-		pstart = COM_Parse( pstart );
-		if (com_token[0])
-			pgroup->ducker_threshold = ((float)(atoi(com_token))) / 100.0f;
+		pstart = COM_Parse( pstart, token );
+		if (token[0])
+			pgroup->ducker_threshold = ((float)(atoi(token))) / 100.0f;
 		else
 			pgroup->ducker_threshold = 0.5f;
 
@@ -8025,16 +8025,16 @@ bool MXR_LoadAllSoundMixers( void )
 	
 	while(1)
 	{
-		pstart = COM_Parse( pstart );
+		pstart = COM_Parse( pstart, token );
 
-		if ( !com_token[0] )
+		if ( !token[0] )
 			break;	// eof
 
 		// save name in soundmixer
 
 		soundmixer_t *pmixer = &g_soundmixers[g_csoundmixers];
 
-		Q_memcpy(pmixer->szsoundmixer, com_token, min((size_t)CMXRNAMEMAX-1, strlen(com_token)));
+		Q_memcpy(pmixer->szsoundmixer, token, min((size_t)CMXRNAMEMAX-1, strlen(token)));
 
 		// init all mixer values to -1.
 
@@ -8047,22 +8047,22 @@ bool MXR_LoadAllSoundMixers( void )
 
 		while (1)
 		{
-			pstart = COM_Parse( pstart );
+			pstart = COM_Parse( pstart, token );
 
-			if (com_token[0] == CHAR_LEFT_PAREN)
+			if (token[0] == CHAR_LEFT_PAREN)
 				continue;	// skip {
 
-			if (com_token[0] == CHAR_RIGHT_PAREN)
+			if (token[0] == CHAR_RIGHT_PAREN)
 				break;	// finished with this sounmixer
 			
 			// lookup mixgroupid for groupname
-			int mixgroupid = MXR_GetMixgroupFromName( com_token );
+			int mixgroupid = MXR_GetMixgroupFromName( token );
 			float value;
 			
 			// get mix value
-			pstart = COM_Parse( pstart );
+			pstart = COM_Parse( pstart, token );
 			// dimhotepus: atof -> strtof
-			value = strtof( com_token, nullptr );
+			value = strtof( token, nullptr );
 
 			// store value for mixgroupid
 			Assert(mixgroupid <= CMXRGROUPMAX);

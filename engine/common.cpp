@@ -51,7 +51,6 @@ bool com_ignorecolons = false;
 // wordbreak parsing set
 static constexpr characterset_t g_BreakSet{"{}()'"}, g_BreakSetIncludingColons{"{}()':"};
 
-#define COM_TOKEN_MAX_LENGTH 1024
 char	com_token[COM_TOKEN_MAX_LENGTH];
 
 /*
@@ -133,24 +132,40 @@ Parse a token out of a string
 */
 const char *COM_Parse ( IN_Z const char *data)
 {
-	unsigned char    c;
-	int             len;
+	return COM_Parse( data, com_token );
+}
+
+
+/*
+==============
+COM_Parse
+
+Parse a token out of a string
+==============
+*/
+const char *COM_Parse ( IN_Z const char *data, OUT_Z_CAP(tokenSize) char* token, size_t tokenSize )
+{
+	const bool hasToken{tokenSize != 0};
+
+	if ( hasToken )
+		token[0] = '\0';
+	
+	if ( !data || !hasToken )
+		return nullptr;
+
 	const characterset_t *breaks = !com_ignorecolons
 		? &g_BreakSetIncludingColons
 		: &g_BreakSet;
-	
-	len = 0;
-	com_token[0] = 0;
-	
-	if (!data)
-		return NULL;
-		
+
+	size_t len = 0, maxLen = tokenSize - 1;
+	unsigned char c;
+
 // skip whitespace
 skipwhite:
 	while ( (c = *data) <= ' ')
 	{
 		if (c == 0)
-			return NULL;                    // end of file;
+			return nullptr;                    // end of file;
 		data++;
 	}
 	
@@ -167,15 +182,34 @@ skipwhite:
 	if (c == '\"')
 	{
 		data++;
-		while (1)
+		while (true)
 		{
 			c = *data++;
+
 			if (c=='\"' || !c)
 			{
-				com_token[len] = 0;
+				if (len <= maxLen)
+				{
+					token[len] = '\0';
+				}
+				else
+				{
+					AssertMsg( "%s buffer token is truncated, %zu bytes is not enough.", data, tokenSize );
+					token[maxLen] = '\0';
+				}
 				return data;
 			}
-			com_token[len] = c;
+
+			if (len <= maxLen)
+			{
+				token[len] = c;
+			}
+			else
+			{
+				AssertMsg( "%s buffer token is truncated, %zu bytes is not enough.", data, tokenSize );
+				token[maxLen] = '\0';
+				return data;
+			}
 			len++;
 		}
 	}
@@ -183,24 +217,52 @@ skipwhite:
 // parse single characters
 	if ( breaks->HasChar( c ) )
 	{
-		com_token[len] = c;
+		token[len] = c;
 		len++;
-		com_token[len] = 0;
-		return data+1;
+
+		if (len <= maxLen)
+		{
+			token[len] = '\0';
+		}
+		else
+		{
+			AssertMsg( "%s buffer token is truncated, %zu bytes is not enough.", data, tokenSize );
+			token[maxLen] = '\0';
+			return data;
+		}
+		return data + 1;
 	}
 
 // parse a regular word
 	do
 	{
-		com_token[len] = c;
+		if (len <= maxLen)
+		{
+			token[len] = c;
+		}
+		else
+		{
+			AssertMsg( "%s buffer token is truncated, %zu bytes is not enough.", data, tokenSize );
+			token[maxLen] = '\0';
+			return data;
+		}
 		data++;
 		len++;
 		c = *data;
 		if ( breaks->HasChar( c ) )
 			break;
-	} while (c>32);
-	
-	com_token[len] = 0;
+	} while (c > 32);
+
+	if (len <= maxLen)
+	{
+		token[len] = '\0';
+	}
+	else
+	{
+		AssertMsg( "%s buffer token is truncated, %zu bytes is not enough.", data, tokenSize );
+		token[maxLen] = '\0';
+		return data;
+	}
 	return data;
 }
 
@@ -245,26 +307,60 @@ Parse a line out of a string
 */
 const char *COM_ParseLine ( IN_Z const char *data)
 {
-	com_token[0] = '\0';
+	return COM_ParseLine( data, com_token );
+}
+
+
+/*
+==============
+COM_Parse_Line
+
+Parse a line out of a string
+==============
+*/
+const char *COM_ParseLine ( IN_Z const char *data, OUT_Z_CAP(tokenSize) char* token, size_t tokenSize )
+{
+	const bool hasToken{tokenSize != 0};
+
+	if ( hasToken )
+		token[0] = '\0';
 	
-	if (!data)
+	if ( !data || !hasToken )
 		return nullptr;
 
-	size_t len = 0;
+	size_t len = 0, maxLen = tokenSize - 1;
 	char c = *data;
 
 	// parse a line out of the data
 	do
 	{
-		com_token[len] = c;
+		if (len <= maxLen)
+		{
+			token[len] = c;
+		}
+		else
+		{
+			AssertMsg( "%s buffer token is truncated, %zu bytes is not enough.", data, tokenSize );
+			token[maxLen] = '\0';
+			return data;
+		}
 
 		data++;
 		len++;
 
 		c = *data;
-	} while ( ( c >= ' ' || c < 0 || c == '\t' ) && len < std::size(com_token) - 1 );
+	} while ( ( c >= ' ' || c < 0 || c == '\t' ) && len < tokenSize - 1 );
 	
-	com_token[len] = '\0';
+	if (len <= maxLen)
+	{
+		token[len] = '\0';
+	}
+	else
+	{
+		AssertMsg( "%s buffer token is truncated, %zu bytes is not enough.", data, tokenSize );
+		token[maxLen] = '\0';
+		return data;
+	}
 
 	// end of file
 	if (c == '\0')
@@ -282,6 +378,7 @@ const char *COM_ParseLine ( IN_Z const char *data)
 
 	return data;
 }
+
 
 /*
 ==============
@@ -1106,9 +1203,7 @@ void COM_GetGameDir(OUT_Z_CAP(maxlen) char *szGameDir, int maxlen)
 //-----------------------------------------------------------------------------
 const char *COM_ParseFile( IN_Z const char *data, OUT_Z_CAP(maxtoken) char *token, intp maxtoken )
 {
-	const char *return_data = COM_Parse(data);
-	Q_strncpy(token, com_token, maxtoken);
-	return return_data;	
+	return COM_Parse(data, token, maxtoken);
 }
 
 //-----------------------------------------------------------------------------
