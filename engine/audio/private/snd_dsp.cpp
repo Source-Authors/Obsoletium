@@ -25,7 +25,10 @@
 #define SEC_TO_SAMPS(a)		((a)*SOUND_DMA_SPEED)				// convert seconds to # samples in equivalent time
 
 // Suppress the noisy warnings caused by CLIP_DSP
-#define CLIP_DSP(x) (x)
+template<typename T>
+[[nodiscard]] constexpr inline T CLIP_DSP(T x) {
+  return x;
+}
 
 extern ConVar das_debug;
 
@@ -7330,7 +7333,6 @@ inline void DSP_ProcessStereoToMono(dsp_t *pdsp, portable_samplepair_t *pbfront,
 			{
 				av = ( ( pbf->left + pbf->right ) >> 1 );
 				x = PSET_GetNext( pdsp->ppset[0], av );
-				x = CLIP_DSP( x );
 				pbf->left = pbf->right = x;
 				pbf++;
 			}
@@ -7386,11 +7388,6 @@ inline void DSP_ProcessStereoToMono(dsp_t *pdsp, portable_samplepair_t *pbfront,
 					frp = pbf->right;
 				}
 				
-				fl = CLIP_DSP(fl);
-				fr = CLIP_DSP(fr);
-				flp = CLIP_DSP(flp);
-				frp = CLIP_DSP(frp);
-
 				// get current ramp value
 
 				r = RMP_GetNext( &pdsp->xramp );	
@@ -7430,9 +7427,6 @@ inline void DSP_ProcessStereoToMono(dsp_t *pdsp, portable_samplepair_t *pbfront,
 			// get previous preset values
 
 			flp = PSET_GetNext( pdsp->ppsetprev[0], av );
-			
-			fl = CLIP_DSP(fl);
-			flp = CLIP_DSP(flp);
 			
 			// get current ramp value
 
@@ -7484,9 +7478,6 @@ inline void DSP_ProcessStereoToStereo(dsp_t *pdsp, portable_samplepair_t *pbfron
 				fl = PSET_GetNext( pdsp->ppset[0], pbf->left );
 				fr = PSET_GetNext( pdsp->ppset[1], pbf->right );
 
-				fl = CLIP_DSP( fl );
-				fr = CLIP_DSP( fr );
-
 				pbf->left =  fl;
 				pbf->right = fr;
 				pbf++;
@@ -7518,11 +7509,6 @@ inline void DSP_ProcessStereoToStereo(dsp_t *pdsp, portable_samplepair_t *pbfron
 			// get current ramp value
 
 			r = RMP_GetNext( &pdsp->xramp );	
-
-			fl = CLIP_DSP( fl );
-			fr = CLIP_DSP( fr );
-			flp = CLIP_DSP( flp );
-			frp = CLIP_DSP( frp );
 
 			// crossfade from previous to current preset
 			if (!bexp)
@@ -7600,7 +7586,6 @@ inline void DSP_ProcessQuadToMono(dsp_t *pdsp, portable_samplepair_t *pbfront, p
 			{
 				av = ((pbf->left + pbf->right + pbr->left + pbr->right) >> 2);
 				x = PSET_GetNext( pdsp->ppset[0], av );
-				x = CLIP_DSP( x );
 				pbr->left = pbr->right = pbf->left = pbf->right = x;
 				pbf++;
 				pbr++;
@@ -7657,15 +7642,6 @@ inline void DSP_ProcessQuadToMono(dsp_t *pdsp, portable_samplepair_t *pbfront, p
 					rrp = pbr->right;
 				}
 				
-				fl = CLIP_DSP(fl);
-				fr = CLIP_DSP(fr);
-				flp = CLIP_DSP(flp);
-				frp = CLIP_DSP(frp);
-				rl = CLIP_DSP(rl);
-				rr = CLIP_DSP(rr);
-				rlp = CLIP_DSP(rlp);
-				rrp = CLIP_DSP(rrp);
-
 				// get current ramp value
 
 				r = RMP_GetNext( &pdsp->xramp );	
@@ -7715,9 +7691,6 @@ inline void DSP_ProcessQuadToMono(dsp_t *pdsp, portable_samplepair_t *pbfront, p
 			// get current ramp value
 
 			r = RMP_GetNext( &pdsp->xramp );	
-
-			fl = CLIP_DSP( fl );
-			flp = CLIP_DSP( flp );
 
 			// crossfade from previous to current preset
 			if (!bexp)
@@ -7794,8 +7767,6 @@ inline void DSP_ProcessQuadToStereo(dsp_t *pdsp, portable_samplepair_t *pbfront,
 			{
 				fl = PSET_GetNext( pdsp->ppset[0], (pbf->left + pbr->left) >> 1);
 				fr = PSET_GetNext( pdsp->ppset[1], (pbf->right + pbr->right) >> 1);
-				fl = CLIP_DSP( fl );
-				fr = CLIP_DSP( fr );
 
 				pbr->left =  pbf->left =  fl;
 				pbr->right = pbf->right = fr;
@@ -7860,15 +7831,6 @@ inline void DSP_ProcessQuadToStereo(dsp_t *pdsp, portable_samplepair_t *pbfront,
 					rrp = pbr->right;
 				}
 				
-				fl = CLIP_DSP(fl);
-				fr = CLIP_DSP(fr);
-				flp = CLIP_DSP(flp);
-				frp = CLIP_DSP(frp);
-				rl = CLIP_DSP(rl);
-				rr = CLIP_DSP(rr);
-				rlp = CLIP_DSP(rlp);
-				rrp = CLIP_DSP(rrp);
-
 				// get current ramp value
 
 				r = RMP_GetNext( &pdsp->xramp );	
@@ -7917,14 +7879,6 @@ inline void DSP_ProcessQuadToStereo(dsp_t *pdsp, portable_samplepair_t *pbfront,
 			flp = PSET_GetNext( pdsp->ppsetprev[0], avl );
 			frp = PSET_GetNext( pdsp->ppsetprev[1], avr );
 			
-
-			fl = CLIP_DSP( fl );
-			fr = CLIP_DSP( fr );
-			
-			// get previous preset values
-
-			flp = CLIP_DSP( flp );
-			frp = CLIP_DSP( frp );
 
 			// get current ramp value
 
@@ -8124,7 +8078,6 @@ inline void DSP_Process5To1(dsp_t *pdsp, portable_samplepair_t *pbfront, portabl
 				av = (pbf->left + pbf->right + pbr->left + pbr->right + pbc->left) * 51;  // 51/255 = 1/5
 				av >>= 8;
 				x = PSET_GetNext( pdsp->ppset[0], av );
-				x = CLIP_DSP( x );
 				pbr->left = pbr->right = pbf->left = pbf->right = pbc->left = x;
 				pbf++;
 				pbr++;
@@ -8187,17 +8140,6 @@ inline void DSP_Process5To1(dsp_t *pdsp, portable_samplepair_t *pbfront, portabl
 					fcp = pbc->left;
 				}
 				
-				fl = CLIP_DSP(fl);
-				fr = CLIP_DSP(fr);
-				flp = CLIP_DSP(flp);
-				frp = CLIP_DSP(frp);
-				rl = CLIP_DSP(rl);
-				rr = CLIP_DSP(rr);
-				rlp = CLIP_DSP(rlp);
-				rrp = CLIP_DSP(rrp);
-				fc = CLIP_DSP(fc);
-				fcp = CLIP_DSP(fcp);
-
 				// get current ramp value
 
 				r = RMP_GetNext( &pdsp->xramp );	
@@ -8253,9 +8195,6 @@ inline void DSP_Process5To1(dsp_t *pdsp, portable_samplepair_t *pbfront, portabl
 			// get current ramp value
 
 			r = RMP_GetNext( &pdsp->xramp );	
-
-			fl = CLIP_DSP( fl );
-			flp = CLIP_DSP( flp );
 
 			// crossfade from previous to current preset
 			if (!bexp)
