@@ -753,7 +753,7 @@ typedef struct prm_rng_t
 	float hi;		// max value of parameter
 } prm_rng_s;
 
-void PRC_CheckParams ( prc_t *pprc, prm_rng_t *prng );
+void PRC_CheckParams ( prc_t *pprc, const prm_rng_t *prng );
 
 ///////////
 // Filters
@@ -915,7 +915,7 @@ typedef enum
 
 // filter parameter ranges
 
-prm_rng_t flt_rng[] = {
+constexpr prm_rng_t flt_rng[] = {
 
 	{flt_cparam,	0, 0},			// first entry is # of parameters
 
@@ -1563,7 +1563,7 @@ typedef enum {
 
 // delay parameter ranges
 
-prm_rng_t dly_rng[] = {
+constexpr prm_rng_t dly_rng[] = {
 
 	{dly_cparam,	0, 0},			// first entry is # of parameters
 		
@@ -2169,7 +2169,7 @@ typedef enum {
 
 // parameter ranges
 
-prm_rng_t mdy_rng[] = {
+constexpr prm_rng_t mdy_rng[] = {
 
 	{mdy_cparam,	0, 0},				// first entry is # of parameters
 		
@@ -2492,7 +2492,7 @@ rva_t * RVA_Alloc ( int *D, int *a, int *b, int m, flt_t *pflt, int fparallel, f
 //		otherwise, filter is in feedback loop
 
 
-int g_MapIntoPBITSDivInt[] = 
+constexpr int g_MapIntoPBITSDivInt[] = 
 {
 	0, PMAX/1, PMAX/2,	PMAX/3,	PMAX/4,	PMAX/5,	PMAX/6,	PMAX/7,	PMAX/8, 
 	   PMAX/9, PMAX/10, PMAX/11,PMAX/12,PMAX/13,PMAX/14,PMAX/15,PMAX/16, 
@@ -2605,7 +2605,7 @@ typedef enum
 
 // filter parameter ranges
 
-prm_rng_t rva_rng[] = {
+constexpr prm_rng_t rva_rng[] = {
 
 	{rva_cparam,	0, 0},			// first entry is # of parameters
 	
@@ -2643,8 +2643,8 @@ prm_rng_t rva_rng[] = {
 // nominal delay and feedback values. More delays = more density.
 
 #define RVADLYSMAX	49
-float rvadlys[] =   {18,  23,  28,  33,   42,  21,  26,  36,   39,  45,  47,  30};
-float rvafbs[] =	{0.9, 0.9, 0.9, 0.85, 0.8, 0.9, 0.9, 0.85, 0.8, 0.8, 0.8, 0.85};
+constexpr float rvadlys[] =   {18,  23,  28,  33,   42,  21,  26,  36,   39,  45,  47,  30};
+constexpr float rvafbs[] =	{0.9, 0.9, 0.9, 0.85, 0.8, 0.9, 0.9, 0.85, 0.8, 0.8, 0.8, 0.85};
 
 #define SWAP(a,b,t)				{(t) = (a); (a) = (b); (b) = (t);}
 
@@ -3030,8 +3030,8 @@ inline void DFR_GetNextN( dfr_t *pdfr, portable_samplepair_t *pbuffer, int Sampl
 
 // nominal diffusor delay and feedback values
 
-float dfrdlys[] =   {13,   19,   26,   21,   32,   36,   38,   16,   24,   28,   41,   35,   10,   46,   50,   27};
-float dfrfbs[] =    {1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0}; 
+constexpr float dfrdlys[] =   {13,   19,   26,   21,   32,   36,   38,   16,   24,   28,   41,   35,   10,   46,   50,   27};
+constexpr float dfrfbs[] =    {1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0,  1.0}; 
 
 
 // diffusor parameter order
@@ -3052,7 +3052,7 @@ typedef enum
 
 // diffusor parameter ranges
 
-prm_rng_t dfr_rng[] = {
+constexpr prm_rng_t dfr_rng[] = {
 
 	{dfr_cparam,	0, 0},			// first entry is # of parameters
 
@@ -3422,7 +3422,7 @@ typedef enum
 
 // parameter ranges
 
-prm_rng_t lfo_rng[] = {
+constexpr prm_rng_t lfo_rng[] = {
 
 	{lfo_cparam,	0, 0},			// first entry is # of parameters
 
@@ -3901,7 +3901,7 @@ typedef enum
 
 // diffusor parameter ranges
 
-prm_rng_t ptc_rng[] = {
+constexpr prm_rng_t ptc_rng[] = {
 
 	{ptc_cparam,	0, 0},				// first entry is # of parameters
 
@@ -4112,7 +4112,7 @@ typedef enum
 
 // parameter ranges
 
-prm_rng_t env_rng[] = {
+constexpr prm_rng_t env_rng[] = {
 
 	{env_cparam,	0, 0},			// first entry is # of parameters
 
@@ -4454,7 +4454,7 @@ typedef enum
 
 // parameter ranges
 
-prm_rng_t efo_rng[] = {
+constexpr prm_rng_t efo_rng[] = {
 
 	{efo_cparam,		0, 0},			// first entry is # of parameters
 
@@ -4683,7 +4683,7 @@ typedef enum {
 
 // parameter ranges
 
-prm_rng_t crs_rng[] = {
+constexpr prm_rng_t crs_rng[] = {
 
 	{crs_cparam,	0, 0},				// first entry is # of parameters
 		
@@ -4956,7 +4956,7 @@ typedef enum {
 
 // parameter ranges
 
-prm_rng_t amp_rng[] = {
+constexpr prm_rng_t amp_rng[] = {
 
 	{amp_cparam,	0, 0},				// first entry is # of parameters
 		
@@ -5197,7 +5197,7 @@ inline int PRC_GetNext ( prc_t *pprc, int x )
 // automatic parameter range limiting
 // force parameters between specified min/max in param_rng
 
-void PRC_CheckParams ( prc_t *pprc, prm_rng_t *prng )
+void PRC_CheckParams ( prc_t *pprc, const prm_rng_t *prng )
 {
 	// first entry in param_rng is # of parameters
 
@@ -6722,7 +6722,7 @@ autoshape_exit:
 	}
 }
 
-int MapReflectivityToDLYCutoff[] = 
+constexpr int MapReflectivityToDLYCutoff[] = 
 {
 	1000,	// DULL
 	2000,   // FLAT
@@ -6730,7 +6730,7 @@ int MapReflectivityToDLYCutoff[] =
 	6000	// BRIGHT
 };
 
-float MapSizeToDLYFeedback[] = 
+constexpr float MapSizeToDLYFeedback[] = 
 {
 	0.9, // 0.6,	// SMALL	
 	0.8, // 0.5,	// MEDIUM	
@@ -6799,7 +6799,7 @@ void ADSP_SetupAutoDelay( prc_t *pprc_dly, auto_params_t *pa )
 	pprc_dly->prm[dly_igain]		= 1.0;
 }
 
-int MapReflectivityToRVACutoff[] = 
+constexpr int MapReflectivityToRVACutoff[] = 
 {
 	1000,	// DULL
 	2000,   // FLAT
@@ -6807,7 +6807,7 @@ int MapReflectivityToRVACutoff[] =
 	6000	// BRIGHT
 };
 
-float MapSizeToRVANumDelays[] = 
+constexpr float MapSizeToRVANumDelays[] = 
 {
 	3,	// SMALL	3 reverbs
 	6,	// MEDIUM	6 reverbs
@@ -6816,7 +6816,7 @@ float MapSizeToRVANumDelays[] =
 	12,	// GIGANTIC	12 reverbs
 };
 
-float MapSizeToRVAFeedback[] =
+constexpr float MapSizeToRVAFeedback[] =
 {
 	0.75,	// SMALL	
 	0.8,	// MEDIUM	
@@ -8834,7 +8834,7 @@ struct dsp_stringmap_t
 
 // token map for dsp_preset.txt
 
-dsp_stringmap_t gdsp_stringmap[] = 
+constexpr dsp_stringmap_t gdsp_stringmap[] = 
 {
 	// PROCESSOR TYPE:
 	{"NULL",		PRC_NULL},
@@ -8899,7 +8899,7 @@ dsp_stringmap_t gdsp_stringmap[] =
 	{"MOD3",		PSET_MOD3}
 };
 
-int gcdsp_stringmap = sizeof(gdsp_stringmap) / sizeof (dsp_stringmap_t);
+constexpr inline int gcdsp_stringmap = ssize(gdsp_stringmap);
 
 #define isnumber(c) (c == '+' || c == '-' || c == '0' || c == '1' || c == '2' || c == '3' || c == '4' || c == '5' || c == '6' || c == '7'|| c == '8' || c == '9')\
 
