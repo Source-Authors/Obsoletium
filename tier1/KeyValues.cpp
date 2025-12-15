@@ -1390,7 +1390,8 @@ uint64 KeyValues::GetUint64( const char *keyName, uint64 defaultValue )
 		switch ( dat->m_iDataType )
 		{
 		case TYPE_STRING:
-			return (uint64)Q_atoi64(dat->m_sValue);
+			// dimhotepus: V_atoi64 -> V_atoui64
+			return V_atoui64(dat->m_sValue);
 		case TYPE_WSTRING:
 			return _wtoi64(dat->m_wsValue);
 		case TYPE_FLOAT:
