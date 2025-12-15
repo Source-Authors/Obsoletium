@@ -523,8 +523,8 @@ bool CBaseSaveGameDialog::SaveGameSortFunc( const SaveGameDescription_t &s1, con
 
 int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int nameSize, OUT_Z_CAP(commentSize) char *comment, int commentSize )
 {
-	int i, tag, size, tokenSize, tokenCount;
-	char *pSaveData, *pFieldName, **pTokenList;
+	int tag, size, tokenSize, tokenCount;
+	char *pFieldName;
 
 	name[0] = '\0';
 	comment[0] = '\0';
@@ -558,23 +558,22 @@ int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int 
 		return 0;
 	}
 
-	pSaveData = (char *)new char[size];
-	g_pFullFileSystem->Read(pSaveData, size, f);
+	std::unique_ptr<char[]> pSaveData = std::make_unique<char[]>(size);
+	g_pFullFileSystem->Read(pSaveData.get(), size, f);
 
 	int nNumberOfFields;
-
-	char *pData;
 	int nFieldSize;
 	
-	pData = pSaveData;
+	char *pData = pSaveData.get();
+	std::unique_ptr<char*[]> pTokenList;
 
 	// Allocate a table for the strings, and parse the table
 	if ( tokenSize > 0 )
 	{
-		pTokenList = new char *[tokenCount];
+		pTokenList = std::make_unique<char*[]>(tokenCount);
 
 		// Make sure the token strings pointed to by the pToken hashtable.
-		for( i=0; i<tokenCount; i++ )
+		for( int i=0; i<tokenCount; i++ )
 		{
 			pTokenList[i] = *pData ? pData : NULL;	// Point to each string in the pToken table
 			while( *pData++ );				// Find next token (after next null)
@@ -590,7 +589,6 @@ int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int 
 
 	if (stricmp(pFieldName, "GameHeader"))
 	{
-		delete[] pSaveData;
 		return 0;
 	};
 
@@ -600,7 +598,7 @@ int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int 
 	pData += nFieldSize;
 
 	// Each field is a short (size), short (index of name), binary string of "size" bytes (data)
-	for (i = 0; i < nNumberOfFields; i++)
+	for (int i = 0; i < nNumberOfFields; i++)
 	{
 		// Data order is:
 		// Size
@@ -628,10 +626,6 @@ int SaveReadNameAndComment( FileHandle_t f,	OUT_Z_CAP(nameSize) char *name,	int 
 		pData += nFieldSize;
 	};
 
-	// Delete the string table we allocated
-	delete[] pTokenList;
-	delete[] pSaveData;
-	
 	return name[0] && comment[0] ? 1 : 0;
 }
 
