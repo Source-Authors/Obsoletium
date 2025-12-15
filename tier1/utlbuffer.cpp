@@ -1438,7 +1438,7 @@ parseFailed:
 //-----------------------------------------------------------------------------
 // Parses the next token, given a set of character breaks to stop at
 //-----------------------------------------------------------------------------
-intp CUtlBuffer::ParseToken( characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments )
+intp CUtlBuffer::ParseToken( const characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments )
 {
 	Assert( nMaxLen > 0 );
 	pTokenBuf[0] = 0;
@@ -1492,7 +1492,7 @@ intp CUtlBuffer::ParseToken( characterset_t *pBreaks, char *pTokenBuf, intp nMax
 	}
 
 	// parse single characters
-	if ( IN_CHARACTERSET( *pBreaks, c ) )
+	if ( pBreaks->HasChar( c ) )
 	{
 		pTokenBuf[0] = c;
 		pTokenBuf[1] = 0;
@@ -1514,7 +1514,7 @@ intp CUtlBuffer::ParseToken( characterset_t *pBreaks, char *pTokenBuf, intp nMax
 			break;
 
 		// dimhotepus: c > '\0' to support UTF-8.
-		if ( IN_CHARACTERSET( *pBreaks, c ) || c == '\"' || ( c > '\0' && c <= ' ') )
+		if ( pBreaks->HasChar( c ) || c == '\"' || ( c > '\0' && c <= ' ') )
 		{
 			SeekGet( SEEK_CURRENT, -1 );
 			break;

@@ -49,7 +49,7 @@
 bool com_ignorecolons = false; 
 
 // wordbreak parsing set
-static characterset_t	g_BreakSet, g_BreakSetIncludingColons;
+static constexpr characterset_t g_BreakSet{"{}()'"}, g_BreakSetIncludingColons{"{}()':"};
 
 #define COM_TOKEN_MAX_LENGTH 1024
 char	com_token[COM_TOKEN_MAX_LENGTH];
@@ -135,11 +135,9 @@ const char *COM_Parse ( IN_Z const char *data)
 {
 	unsigned char    c;
 	int             len;
-	characterset_t	*breaks;
-	
-	breaks = &g_BreakSetIncludingColons;
-	if ( com_ignorecolons )
-		breaks = &g_BreakSet;
+	const characterset_t *breaks = !com_ignorecolons
+		? &g_BreakSetIncludingColons
+		: &g_BreakSet;
 	
 	len = 0;
 	com_token[0] = 0;
@@ -183,7 +181,7 @@ skipwhite:
 	}
 
 // parse single characters
-	if ( IN_CHARACTERSET( *breaks, c ) )
+	if ( breaks->HasChar( c ) )
 	{
 		com_token[len] = c;
 		len++;
@@ -198,7 +196,7 @@ skipwhite:
 		data++;
 		len++;
 		c = *data;
-		if ( IN_CHARACTERSET( *breaks, c ) )
+		if ( breaks->HasChar( c ) )
 			break;
 	} while (c>32);
 	
@@ -1119,8 +1117,6 @@ const char *COM_ParseFile( IN_Z const char *data, OUT_Z_CAP(maxtoken) char *toke
 //-----------------------------------------------------------------------------
 void COM_Init ( void )
 {
-	CharacterSetBuild( &g_BreakSet, "{}()'" );
-	CharacterSetBuild( &g_BreakSetIncludingColons, "{}()':" );
 }
 
 //-----------------------------------------------------------------------------

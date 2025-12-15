@@ -6,11 +6,31 @@
 #ifndef CHARACTERSET_H
 #define CHARACTERSET_H
 
-#include <climits>
+#include <limits>
+#include <string_view>
 
 struct characterset_t
 {
-	char set[1 << (sizeof(unsigned char) * CHAR_BIT)];
+	using char_type = unsigned char;
+
+	// +1 for [0, max()] range.
+	char set[std::numeric_limits<char_type>::max() + 1];
+
+	constexpr characterset_t() noexcept : set{'\0', '\0'} {}
+
+	explicit constexpr characterset_t(std::string_view char_set) noexcept
+		: characterset_t{}
+	{
+		for (auto ch : char_set)
+		{
+			set[static_cast<char_type>(ch)] = true;
+		}
+	 }
+
+	[[nodiscard]] constexpr bool HasChar(const char ch) const noexcept
+	{
+		return set[static_cast<char_type>(ch)];
+	}
 };
 
 
@@ -20,7 +40,7 @@ struct characterset_t
 // Input  : *pSetBuffer - pointer to the buffer for the group
 //			*pSetString - list of characters to flag
 //-----------------------------------------------------------------------------
-extern void CharacterSetBuild( characterset_t *pSetBuffer, const char *pSetString );
+[[deprecated("Use characterset_t ctor")]] extern void CharacterSetBuild( characterset_t *pSetBuffer, const char *pSetString );
 
 
 //-----------------------------------------------------------------------------
@@ -29,7 +49,7 @@ extern void CharacterSetBuild( characterset_t *pSetBuffer, const char *pSetStrin
 //			character - character to lookup
 // Output : int - 1 if the character was in the set
 //-----------------------------------------------------------------------------
-[[nodiscard]] constexpr inline int IN_CHARACTERSET( const characterset_t& SetBuffer, int character )
+[[deprecated("Use characterset_t::HasChar")]] [[nodiscard]] constexpr inline int IN_CHARACTERSET( const characterset_t& SetBuffer, char character )
 {
   return SetBuffer.set[static_cast<unsigned char>(character)];
 }

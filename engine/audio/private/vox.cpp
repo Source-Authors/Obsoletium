@@ -235,7 +235,7 @@ char **VOX_ParseString(char *psz)
 	int fdone = 0;
 	char *pszscan = psz;
 	char c;
-	characterset_t nextWord, skip;
+	constexpr characterset_t nextWord{" ,.({"}, skip{"., "};
 
 	BitwiseClear(rgpparseword);
 
@@ -245,13 +245,11 @@ char **VOX_ParseString(char *psz)
 	i = 0;
 	rgpparseword[i++] = psz;
 
-	CharacterSetBuild( &nextWord, " ,.({" );
-	CharacterSetBuild( &skip, "., " );
 	while (!fdone && i < CVOXWORDMAX)
 	{
 		// scan up to next word
 		c = *pszscan;
-		while (c && !IN_CHARACTERSET(nextWord,c) )
+		while (c && !nextWord.HasChar(c) )
 			c = *(++pszscan);
 			
 		// if '(' then scan for matching ')'
@@ -290,7 +288,7 @@ char **VOX_ParseString(char *psz)
 
 			// skip whitespace
 			c = *pszscan;
-			while (c && IN_CHARACTERSET(skip, c))
+			while (c && skip.HasChar(c))
 				c = *(++pszscan);
 
 			if (!c)
@@ -400,10 +398,8 @@ int VOX_ParseWordParams(char *psz, voxword_t *pvoxword, int fFirst)
 	char sznum[8];
 	int i;
 	static voxword_t voxwordDefault;
-	characterset_t commandSet, delimitSet;
-
 	// List of valid commands
-	CharacterSetBuild( &commandSet, "vpset)" );
+	constexpr characterset_t commandSet{"vpset)"}, delimitSet{"()"};
 
 	// init to defaults if this is the first word in string.
 	if (fFirst)
@@ -427,9 +423,8 @@ int VOX_ParseWordParams(char *psz, voxword_t *pvoxword, int fFirst)
 		return 1;		// no formatting, return
 
 	// scan forward to first '('
-	CharacterSetBuild( &delimitSet, "()" );
 	c = *psz;
-	while ( !IN_CHARACTERSET(delimitSet, c) )
+	while ( !delimitSet.HasChar(c) )
 		c = *(++psz);
 	
 	if ( c == ')' )
@@ -444,7 +439,7 @@ int VOX_ParseWordParams(char *psz, voxword_t *pvoxword, int fFirst)
 	{
 		// scan until we hit a character in the commandSet
 
-		while (ct && !IN_CHARACTERSET(commandSet, ct) )
+		while (ct && !commandSet.HasChar(ct) )
 			ct = *(++psz);
 		
 		if (ct == ')')
@@ -2667,7 +2662,7 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 	byte *pFileData;
 	char c;
 	char *pchlast, *pSentenceData;
-	characterset_t whitespace;
+	constexpr characterset_t whitespace{"\n\r\t "};
 
 	// Have we already loaded this file?
 	if ( VOX_ListFileIsLoaded( psentenceFileName ) )
@@ -2714,7 +2709,6 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 
 	pch = (char *)pFileData;
 	pchlast = pch + fileSize;
-	CharacterSetBuild( &whitespace, "\n\r\t " );
 	const char *pName = 0;
 	while (pch < pchlast)
 	{
@@ -2724,7 +2718,7 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 		// skip newline, cr, tab, space
 
 		c = *pch;
-		while (pch < pchlast && IN_CHARACTERSET( whitespace, c ))
+		while (pch < pchlast && whitespace.HasChar( c ))
 			c = *(++pch);
 
 		// YWB:  Fix possible crashes reading past end of file if the last line has only whitespace on it...

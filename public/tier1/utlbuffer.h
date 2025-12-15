@@ -282,12 +282,12 @@ public:
 
 	// Parses the next token, given a set of character breaks to stop at
 	// Returns the length of the token parsed in bytes (-1 if none parsed)
-	[[nodiscard]] intp			ParseToken( characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments = true );
+	[[nodiscard]] intp			ParseToken( const characterset_t *pBreaks, char *pTokenBuf, intp nMaxLen, bool bParseComments = true );
 
 	// Parses the next token, given a set of character breaks to stop at
 	// Returns the length of the token parsed in bytes (-1 if none parsed)
 	template<intp size>
-	[[nodiscard]] intp ParseToken( characterset_t *pBreaks, char (&pTokenBuf)[size], bool bParseComments = true )
+	[[nodiscard]] intp ParseToken( const characterset_t *pBreaks, char (&pTokenBuf)[size], bool bParseComments = true )
 	{
 		return ParseToken( pBreaks, pTokenBuf, size, bParseComments );
 	}

@@ -70,7 +70,8 @@ private:
 
 	const char *FindMtlEntry( const char *pTgaName );
 
-	static bool ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v, int &t, int &n );
+	// dimhotepus: Make const characterset_t.
+	static bool ParseVertex( CUtlBuffer& bufParse, const characterset_t &breakSet, int &v, int &t, int &n );
 
 	static const char *SkipSpace( const char *pBuf );
 

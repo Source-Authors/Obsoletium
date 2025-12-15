@@ -304,8 +304,7 @@ bool ConCommandBase::IsRegistered( ) const
 //-----------------------------------------------------------------------------
 // Global methods
 //-----------------------------------------------------------------------------
-static characterset_t s_BreakSet;
-static bool s_bBuiltBreakSet = false;
+static constexpr characterset_t s_BreakSet{"{}()':"};
 
 
 //-----------------------------------------------------------------------------
@@ -313,24 +312,12 @@ static bool s_bBuiltBreakSet = false;
 //-----------------------------------------------------------------------------
 CCommand::CCommand()
 {
-	if ( !s_bBuiltBreakSet )
-	{
-		s_bBuiltBreakSet = true;
-		CharacterSetBuild( &s_BreakSet, "{}()':" );
-	}
-
 	Reset();
 }
 
 CCommand::CCommand( int nArgC, const char **ppArgV )
 {
 	Assert( nArgC > 0 );
-
-	if ( !s_bBuiltBreakSet )
-	{
-		s_bBuiltBreakSet = true;
-		CharacterSetBuild( &s_BreakSet, "{}()':" );
-	}
 
 	Reset();
 
@@ -374,12 +361,12 @@ void CCommand::Reset()
 	m_pArgSBuffer[0] = 0;
 }
 
-characterset_t* CCommand::DefaultBreakSet()
+const characterset_t* CCommand::DefaultBreakSet()
 {
 	return &s_BreakSet;
 }
 
-bool CCommand::Tokenize( const char *pCommand, characterset_t *pBreakSet )
+bool CCommand::Tokenize( const char *pCommand, const characterset_t *pBreakSet )
 {
 	Reset();
 	if ( !pCommand )

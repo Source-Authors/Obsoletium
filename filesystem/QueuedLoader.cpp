@@ -1477,8 +1477,7 @@ void CQueuedLoader::AddResourceToTable( const char *pFilename )
 void CQueuedLoader::ParseResourceList( CUtlBuffer &resourceList )
 {
 	// parse resource list into known types
-	characterset_t breakSet;
-	CharacterSetBuild( &breakSet, "" );
+	constexpr characterset_t breakSet{""};
 	char szToken[MAX_PATH];
 	for ( ;; )
 	{

@@ -52,8 +52,7 @@ void LoadResourceListing(IFileSystem *file_system,
     return;
   }
 
-  characterset_t breakSet;
-  CharacterSetBuild(&breakSet, "");
+  constexpr characterset_t breakSet{""};
 
   // parse reslist
   char szToken[MAX_PATH];

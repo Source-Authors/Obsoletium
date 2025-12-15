@@ -82,7 +82,7 @@ const char *FindMtlEntry( const char *pTgaName )
 	return pTgaName;
 }									 
 
-static bool ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v, int &t, int &n )
+static bool ParseVertex( CUtlBuffer& bufParse, const characterset_t &breakSet, int &v, int &t, int &n )
 {
 	char	cmd[1024];
 	intp nLen = bufParse.ParseToken( &breakSet, cmd, false );
@@ -94,7 +94,7 @@ static bool ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v,
 	t = 0;
 
 	char c = *(const char*)bufParse.PeekGet();
-	bool bHasTexCoord = IN_CHARACTERSET( breakSet, c ) != 0;
+	bool bHasTexCoord = breakSet.HasChar( c );
 	bool bHasNormal = false;
 	if ( bHasTexCoord )
 	{
@@ -110,7 +110,7 @@ static bool ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v,
 			t = atoi( cmd );
 
 			c = *(const char*)bufParse.PeekGet();
-			bHasNormal = IN_CHARACTERSET( breakSet, c ) != 0;
+			bHasNormal = breakSet.HasChar( c );
 		}
 		else
 		{
@@ -171,8 +171,7 @@ int Load_OBJ( s_source_t *psource )
 	pSourceAnim->rawanim[0][0].rot.Init();
 	Build_Reference( psource, "BindPose" );
 
-	characterset_t breakSet;
-	CharacterSetBuild( &breakSet, "/\\" );
+	constexpr characterset_t breakSet{"/\\"};
 
 	while ( GetLineInput() ) 
 	{

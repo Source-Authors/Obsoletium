@@ -32,13 +32,12 @@ private:
 	const char	*m_pBuffer{nullptr};
 	char		m_szToken[ 1024 ];
 
-	characterset_t	m_BreakSetIncludingColons;
+	static constexpr characterset_t m_BreakSetIncludingColons{"{}()':"};
 };
 
-CSceneTokenProcessor::CSceneTokenProcessor()  
+CSceneTokenProcessor::CSceneTokenProcessor()
 {
 	m_szToken[0] = '\0';
-	CharacterSetBuild( &m_BreakSetIncludingColons, "{}()':" );
 }
 
 //-----------------------------------------------------------------------------
@@ -54,9 +53,6 @@ const char *CSceneTokenProcessor::ParseNextToken (const char *data)
 {
 	unsigned char    c;
 	int             len;
-	characterset_t	*breaks;
-	
-	breaks = &m_BreakSetIncludingColons;
 	
 	len = 0;
 	m_szToken[0] = 0;
@@ -100,7 +96,7 @@ skipwhite:
 	}
 
 // parse single characters
-	if ( IN_CHARACTERSET( *breaks, c ) )
+	if ( m_BreakSetIncludingColons.HasChar( c ) )
 	{
 		m_szToken[len] = c;
 		len++;
@@ -115,7 +111,7 @@ skipwhite:
 		data++;
 		len++;
 		c = *data;
-		if ( IN_CHARACTERSET( *breaks, c ) )
+		if ( m_BreakSetIncludingColons.HasChar( c ) )
 			break;
 	} while (c>32);
 	

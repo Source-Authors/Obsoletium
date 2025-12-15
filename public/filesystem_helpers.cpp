@@ -12,21 +12,10 @@
 #include "tier0/memdbgon.h"
 
 // wordbreak parsing set
-static characterset_t	g_BreakSet, g_BreakSetIncludingColons;
-
-static void InitializeCharacterSets()
-{
-	static bool s_CharacterSetInitialized = false;
-	if (!s_CharacterSetInitialized)
-	{
-		CharacterSetBuild( &g_BreakSet, "{}()'" );
-		CharacterSetBuild( &g_BreakSetIncludingColons, "{}()':" );
-		s_CharacterSetInitialized = true;
-	}
-}
+static constexpr characterset_t g_BreakSetIncludingColons{"{}()':"};
 
 
-const char* ParseFileInternal( const char* pFileBytes, OUT_Z_CAP(nMaxTokenLen) char* pTokenOut, bool* pWasQuoted, characterset_t *pCharSet, size_t nMaxTokenLen )
+const char* ParseFileInternal( const char* pFileBytes, OUT_Z_CAP(nMaxTokenLen) char* pTokenOut, bool* pWasQuoted, const characterset_t *pCharSet, size_t nMaxTokenLen )
 {
 	pTokenOut[0] = '\0';
 
@@ -40,11 +29,8 @@ const char* ParseFileInternal( const char* pFileBytes, OUT_Z_CAP(nMaxTokenLen) c
 	if ( nMaxTokenLen <= 1 )
 		return nullptr;
 
-	InitializeCharacterSets();
-
 	// YWB:  Ignore colons as token separators in COM_Parse
-	static bool com_ignorecolons = false;  
-	characterset_t& breaks = pCharSet ? *pCharSet : (com_ignorecolons ? g_BreakSet : g_BreakSetIncludingColons);
+	const characterset_t& breaks = pCharSet ? *pCharSet : g_BreakSetIncludingColons;
 	
 	char c;
 	unsigned int len = 0;
@@ -117,7 +103,7 @@ skipwhite:
 	}
 
 // parse single characters
-	if ( IN_CHARACTERSET( breaks, c ) )
+	if ( breaks.HasChar( c ) )
 	{
 		pTokenOut[len] = c;
 		len += ( len < nMaxTokenLen-1 ) ? 1 : 0;
@@ -141,7 +127,7 @@ skipwhite:
 		}
 
 		c = *pFileBytes;
-		if ( IN_CHARACTERSET( breaks, c ) )
+		if ( breaks.HasChar( c ) )
 			break;
 	} while (c>32);
 	

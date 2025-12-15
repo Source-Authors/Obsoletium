@@ -379,8 +379,7 @@ InitReturnVal_t CBaseFileSystem::Init()
 			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 			if ( ReadFile( szExcludeFile, nullptr, buf, 0, 0 ) )
 			{
-				characterset_t breakSet;
-				CharacterSetBuild( &breakSet, "" );
+				constexpr characterset_t breakSet{""};
 				char szPath[MAX_PATH];
 				char szToken[MAX_PATH];
 				for ( ;; )

@@ -478,8 +478,7 @@ CDmElement *CDmObjSerializer::ReadOBJ( CUtlBuffer &buf,
 	char tmpBuf0[ 4096 ];
 	char tmpBuf1[ 4097 ];
 
-	characterset_t breakSet;
-	CharacterSetBuild( &breakSet, "/\\" );
+	constexpr characterset_t breakSet{"/\\"};
 
 	const char *pBuf;
 
@@ -1220,7 +1219,7 @@ const char *CDmObjSerializer::FindMtlEntry( const char *pTgaName )
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-bool CDmObjSerializer::ParseVertex( CUtlBuffer& bufParse, characterset_t &breakSet, int &v, int &t, int &n )
+bool CDmObjSerializer::ParseVertex( CUtlBuffer& bufParse, const characterset_t &breakSet, int &v, int &t, int &n )
 {
 	char	cmd[1024];
 	intp nLen = bufParse.ParseToken( &breakSet, cmd, false );
@@ -1232,7 +1231,7 @@ bool CDmObjSerializer::ParseVertex( CUtlBuffer& bufParse, characterset_t &breakS
 	t = 0;
 
 	char c = *(char*)bufParse.PeekGet();
-	bool bHasTexCoord = IN_CHARACTERSET( breakSet, c ) != 0;
+	bool bHasTexCoord = breakSet.HasChar( c );
 	bool bHasNormal = false;
 	if ( bHasTexCoord )
 	{
@@ -1241,14 +1240,14 @@ bool CDmObjSerializer::ParseVertex( CUtlBuffer& bufParse, characterset_t &breakS
 		Assert( nLen == 1 );
 
 		c = *(char*)bufParse.PeekGet();
-		if ( !IN_CHARACTERSET( breakSet, c ) )
+		if ( !breakSet.HasChar( c ) )
 		{
 			nLen = bufParse.ParseToken( &breakSet, cmd, false );
 			Assert( nLen > 0 );
 			t = atoi( cmd );
 
 			c = *(char*)bufParse.PeekGet();
-			bHasNormal = IN_CHARACTERSET( breakSet, c ) != 0;
+			bHasNormal = breakSet.HasChar( c );
 		}
 		else
 		{

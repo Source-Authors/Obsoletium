@@ -22,7 +22,7 @@
 #define MAX_MESSAGES		600			// I don't know if this table will balloon like every other feature in Half-Life
 										// But, for now, I've set this to a reasonable value
 // Defined in other files.
-static characterset_t	g_WhiteSpace;
+static constexpr characterset_t g_WhiteSpace{" \r\n\t"};
 
 client_textmessage_t	gMessageParms;
 client_textmessage_t	*gMessageTable = NULL;
@@ -122,7 +122,7 @@ static void TextMessageParse( byte *pMemFile, int fileSize );
 
 [[nodiscard]] static int IsWhiteSpace( char space )
 {
-	return IN_CHARACTERSET( g_WhiteSpace, space );
+	return g_WhiteSpace.HasChar( space );
 }
 
 
@@ -378,8 +378,6 @@ void TextMessageParse( byte *pMemFile, int fileSize )
 
 	intp filePos = 0;
 	bool bSpew = CommandLine()->FindParm( "-textmessagedebug" ) ? true : false;
-
-	CharacterSetBuild( &g_WhiteSpace, " \r\n\t" );
 
 	while( memfgets( pMemFile, fileSize, &filePos, buf ) != NULL )
 	{

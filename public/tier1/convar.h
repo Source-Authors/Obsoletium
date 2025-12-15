@@ -170,7 +170,8 @@ class CCommand
 public:
 	CCommand();
 	CCommand( int nArgC, const char **ppArgV );
-	bool Tokenize( const char *pCommand, characterset_t *pBreakSet = nullptr );
+	// dimhotepus: Add const to characterset_t.
+	bool Tokenize( const char *pCommand, const characterset_t *pBreakSet = nullptr );
 	void Reset();
 
 	[[nodiscard]] int ArgC() const;
@@ -185,7 +186,8 @@ public:
 	[[nodiscard]] int FindArgInt( const char *pName, int nDefaultVal ) const;
 
 	[[nodiscard]] static int MaxCommandLength();
-	[[nodiscard]] static characterset_t* DefaultBreakSet();
+	// dimhotepus: Add const.
+	[[nodiscard]] static const characterset_t* DefaultBreakSet();
 
 private:
 	enum
