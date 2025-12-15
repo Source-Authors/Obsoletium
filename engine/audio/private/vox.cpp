@@ -141,7 +141,7 @@ struct WordBuf
 
 	WordBuf( const WordBuf& src )
 	{
-		Q_strncpy( word, src.word, sizeof( word ) );
+		V_strcpy_safe( word, src.word );
 	}
 
 	void Set( char const *w )
@@ -152,7 +152,7 @@ struct WordBuf
 			return;
 		}
 
-		Q_strncpy( word, w, sizeof( word ) );
+		V_strcpy_safe( word, w );
 		intp size = V_strlen( word );
 
 		while ( size >= 1 && word[ size - 1 ] == ' ' )
@@ -237,7 +237,7 @@ char **VOX_ParseString(char *psz)
 	char c;
 	characterset_t nextWord, skip;
 
-	memset(rgpparseword, 0, sizeof(char *) * CVOXWORDMAX);
+	BitwiseClear(rgpparseword);
 
 	if (!psz)
 		return NULL;
@@ -305,15 +305,14 @@ char **VOX_ParseString(char *psz)
 // backwards scan psz for last '/'
 // return substring in szpath null terminated
 // if '/' not found, return 'vox/'
-
-char *VOX_GetDirectory(char *szpath, int maxpath, char *psz)
+template<intp maxpath>
+static char *VOX_GetDirectory(char (&szpath)[maxpath], char *psz)
 {
-	char c;
-	int cb = 0;
+	intp cb = 0;
 	char *pszscan = psz + Q_strlen( psz ) - 1;
 
 	// scan backwards until first '/' or start of string
-	c = *pszscan;
+	char c = *pszscan;
 	while (pszscan > psz && c != '/')
 	{
 		c = *(--pszscan);
@@ -323,17 +322,17 @@ char *VOX_GetDirectory(char *szpath, int maxpath, char *psz)
 	if (c != '/')
 	{
 		// didn't find '/', return default directory
-		Q_strncpy(szpath, "vox/", maxpath );
+		V_strcpy_safe(szpath, "vox/");
 		return psz;
 	}
 
 	cb = Q_strlen(psz) - cb;
 
-	cb = clamp( cb, 0, maxpath - 1 );
+	cb = clamp( cb, static_cast<intp>(0), maxpath - 1 );
 
 	// FIXME:  Is this safe?
 	Q_memcpy(szpath, psz, cb);
-	szpath[cb] = 0;
+	szpath[cb] = '\0';
 	return pszscan + 1;
 }
 
@@ -451,7 +450,7 @@ int VOX_ParseWordParams(char *psz, voxword_t *pvoxword, int fFirst)
 		if (ct == ')')
 			break;
 
-		memset(sznum, 0, sizeof(sznum));
+		BitwiseClear(sznum);
 		i = 0;
 
 		c = *(++psz);
@@ -532,8 +531,8 @@ int g_entnamelastsaved = 0;
 void VOX_InitAllEntnames( void )
 {
 	g_entnamelastsaved = 0;	
-	Q_memset(g_entnames, 0, sizeof(g_entnames));
-	Q_memset(g_rgmapnames, 0, sizeof(g_rgmapnames));
+	BitwiseClear(g_entnames);
+	BitwiseClear(g_rgmapnames);
 	g_cmapnames = 0;
 }
 
@@ -1446,15 +1445,15 @@ void VOX_Precache( IEngineSound *pSoundSystem, int sentenceIndex, const char *pP
 		g_Sentences[sentenceIndex].isPrecached = true;
 	}
 
-	memset(rgvoxword, 0, sizeof (voxword_t) * CVOXWORDMAX);
+	BitwiseClear(rgvoxword);
 	char *psz = (char *)(g_Sentences[sentenceIndex].pName + Q_strlen(g_Sentences[sentenceIndex].pName) + 1);
 	// get directory from string, advance psz
-	psz = VOX_GetDirectory(szpath, sizeof( szpath ), psz );
-	Q_strncpy(buffer, psz, sizeof( buffer ) );
+	psz = VOX_GetDirectory(szpath, psz );
+	V_strcpy_safe(buffer, psz );
 	psz = buffer;
 	if ( pPathOverride )
 	{
-		Q_strncpy(szpath, pPathOverride, sizeof(szpath));
+		V_strcpy_safe(szpath, pPathOverride);
 	}
 
 	// parse sentence (also inserts null terminators between words)
@@ -1530,8 +1529,8 @@ void VOX_LoadSound( channel_t *pchan, const char *pszin )
 	if (!pszin)
 		return;
 
-	memset(rgvoxword, 0, sizeof (voxword_t) * CVOXWORDMAX);
-	memset(buffer, 0, sizeof(buffer));
+	BitwiseClear(rgvoxword);
+	BitwiseClear(buffer);
 
 	// lookup actual string in g_Sentences, 
 	// set pointer to string data
@@ -1545,7 +1544,7 @@ void VOX_LoadSound( channel_t *pchan, const char *pszin )
 	}
 
 	// get directory from string, advance psz
-	psz = VOX_GetDirectory(szpath, sizeof( szpath ), psz );
+	psz = VOX_GetDirectory(szpath, psz );
 
 	if ( Q_strlen(psz) > ssize(buffer) - 1 )
 	{
@@ -1554,7 +1553,7 @@ void VOX_LoadSound( channel_t *pchan, const char *pszin )
 	}
 
 	// copy into buffer
-	Q_strncpy(buffer, psz, sizeof( buffer ) );
+	V_strcpy_safe(buffer, psz);
 	psz = buffer;
 
 	// parse sentence (also inserts null terminators between words)
@@ -1574,7 +1573,7 @@ void VOX_LoadSound( channel_t *pchan, const char *pszin )
 	char captionstream[ 1024 ];
 
 	char groupname[ 512 ];
-	Q_strncpy( groupname, pszin, sizeof( groupname ) );
+	V_strcpy_safe( groupname, pszin );
 
 	intp len = Q_strlen( groupname );
 
@@ -1603,9 +1602,9 @@ void VOX_LoadSound( channel_t *pchan, const char *pszin )
 			rgvoxword[cword].fKeepCached = 1;
 
 			char captiontoken[ 128 ];
-			Q_snprintf( captiontoken, sizeof( captiontoken ), "S(%s%s) ", szpath, rgpparseword[i] );
+			V_sprintf_safe( captiontoken, "S(%s%s) ", szpath, rgpparseword[i] );
 
-			Q_strncat( captionstream, captiontoken, sizeof( captionstream ), COPY_ALL_CHARACTERS );
+			V_strcat_safe( captionstream, captiontoken );
 
 			cword++;
 		}
@@ -1739,7 +1738,7 @@ void VOX_BuildVirtualNameList( char *word, CUtlVector< WordBuf >& list )
 
 	// copy word to temp location so we can perform in-place substitutions
 
-	Q_strncpy( szparseword, word, sizeof( szparseword ) );
+	V_strcpy_safe( szparseword, word );
 
 	// fbymap is true if lookup is performed via mapname instead of via ordinal
 
@@ -1978,8 +1977,8 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 	if (!pszin)
 		return;
 
-	memset(rgvoxword, 0, sizeof (voxword_t) * CVOXWORDMAX);
-	memset(buffer, 0, sizeof(buffer));
+	BitwiseClear(rgvoxword);
+	BitwiseClear(buffer);
 
 	// lookup actual string in g_Sentences, 
 	// set pointer to string data
@@ -1993,7 +1992,7 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 	}
 
 	// get directory from string, advance psz
-	psz = VOX_GetDirectory(szpath, sizeof( szpath ), psz );
+	psz = VOX_GetDirectory(szpath, psz );
 
 	if ( Q_strlen(psz) > ssize(buffer) - 1 )
 	{
@@ -2002,7 +2001,7 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 	}
 
 	// copy into buffer
-	Q_strncpy(buffer, psz, sizeof( buffer ) );
+	V_strcpy_safe(buffer, psz);
 	psz = buffer;
 
 	// parse sentence (also inserts null terminators between words)
@@ -2109,16 +2108,16 @@ void VOX_TouchSound( const char *pszin, CUtlDict< int, int >& filelist, CUtlRBTr
 				// Don't end sentence with comma..
 				if ( i != rep.Count() - 1 )
 				{
-					Q_strncat( outbuf, ", ", sizeof( outbuf ), COPY_ALL_CHARACTERS );
+					V_strcat_safe( outbuf, ", " );
 				}
 				continue;
 			}
 			*/
 
-			Q_strncat( outbuf, rep[ i ].word, sizeof( outbuf ), COPY_ALL_CHARACTERS );
+			V_strcat_safe( outbuf, rep[ i ].word );
 			if ( i != rep.Count() - 1 )
 			{
-				Q_strncat( outbuf, " ", sizeof( outbuf ), COPY_ALL_CHARACTERS );
+				V_strcat_safe( outbuf, " " );
 			}
 		}
 
@@ -2280,7 +2279,7 @@ intp VOX_GroupAdd( const char *pSentenceName )
 	}
 
 	// make a copy of the actual group name
-	char *groupName = (char *)stackalloc( len + 2 );
+	char *groupName = stackallocT( char, len + 2 );
 	Q_strncpy( groupName, pSentenceName, len+2 );
 
 	// check for it in the list
