@@ -21,6 +21,7 @@
 #include "steam/steam_api.h"
 #include "iachievementmgr.h"
 #include "fmtstr.h"
+#include "tier0/icommandline.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -253,21 +254,27 @@ CON_COMMAND_F( achievement_notification_test, "Test the hud notification UI", FC
 
 	CAchievementNotificationPanel *pPanel = GET_HUDELEMENT( CAchievementNotificationPanel );
 	if ( pPanel )
-	{	
-#if defined(HL2_DLL)	
-		pPanel->AddNotification( "HL2_KILL_ODESSAGUNSHIP", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
-			L"Test Message B" ) );
-#endif
-
-#if defined(HL2_EPISODIC)
-		pPanel->AddNotification( "EP1_KILL_ANTLIONS_WITHCARS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
-			L"Test Message B" ) );
-#endif
-
-#if defined(PORTAL)
-		pPanel->AddNotification( "PORTAL_DETACH_ALL_CAMERAS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
-			L"Test Message B" ) );
-#endif
+	{
+		const char *pszGameName = CommandLine()->ParmValue( "-game", "hl2" );
+		if ( V_strcmp( pszGameName, "hl2" ) == 0 )
+		{
+			pPanel->AddNotification( "HL2_KILL_ODESSAGUNSHIP", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
+				L"Test Message B" ) );
+		}
+		else if ( V_strcmp( pszGameName, "episodic" ) == 0 )
+		{
+			pPanel->AddNotification( "EP1_KILL_ANTLIONS_WITHCARS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
+				L"Test Message B" ) );
+		}
+		else if ( V_strcmp( pszGameName, "episodic" ) == 0 )
+		{
+			pPanel->AddNotification( "PORTAL_DETACH_ALL_CAMERAS", L"Achievement Progress", ( 0 == ( iCount % 2 ) ? L"Test Notification Message A (1/10)" :
+				L"Test Message B" ) );
+		}
+		else
+		{
+			Warning( "Unknown -game name '%s' to add achievement notification.\n", pszGameName );
+		}
 	}
 
 #if 0
@@ -281,6 +288,6 @@ CON_COMMAND_F( achievement_notification_test, "Test the hud notification UI", FC
 		gameeventmanager->FireEvent( event );
 	}	
 #endif
-
+	
 	iCount++;
 }
