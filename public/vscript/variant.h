@@ -719,7 +719,7 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( QAngle *pDest ) const
 	switch( m_type )
 	{
 	case FIELD_VOID:	*pDest = vec3_angle; return false;
-	case FIELD_VECTOR:	*pDest = *(QAngle*)m_pVector; return true;	// Should we allow this free assignment?
+	case FIELD_VECTOR:	*pDest = QAngle{m_pVector->x, m_pVector->y, m_pVector-z}; return true;	// Should we allow this free assignment?
 	case FIELD_QANGLE:	*pDest = *(QAngle*)m_pData; return true;
 	case FIELD_CSTRING:
 		{
