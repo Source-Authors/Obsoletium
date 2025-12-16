@@ -112,7 +112,7 @@ bool CCommEditDoc::LoadFromFile( const char *pFileName )
 
 	// Build map name
 	//int nNameLen = (int)( (size_t)pComm - (size_t)pMaps ) - 5;
-	Q_StripExtension( pFileName, mapname, sizeof(mapname) );
+	Q_StripExtension( pFileName, mapname );
 	char *pszFileName = (char*)Q_UnqualifiedFileName(mapname);
 	const char *pszFileExt = Q_GetFileExtension(pFileName);
 

@@ -1213,7 +1213,7 @@ bool CDmMeshUtils::RemapMaterial( CDmeMesh *pMesh, const CUtlString &src, const 
 	char matName[ MAX_PATH ];
 	char dstName[ MAX_PATH ];
 
-	Q_StripExtension( src.Get(), srcName, sizeof( srcName ) );
+	Q_StripExtension( src.Get(), srcName );
 	Q_FixSlashes( srcName, '/' );
 
 	Q_strncpy( dstName, dst.Get(), sizeof( dstName ) );
@@ -1231,7 +1231,7 @@ bool CDmMeshUtils::RemapMaterial( CDmeMesh *pMesh, const CUtlString &src, const 
 			continue;
 
 		const char *pMaterialName = pMaterial->GetMaterialName();
-		Q_StripExtension( pMaterialName, matName, sizeof( matName ) );
+		Q_StripExtension( pMaterialName, matName );
 		Q_FixSlashes( matName, '/' );
 
 		// TODO: Regular expressions or at least glob style matching would be cool

@@ -138,7 +138,7 @@ bool CVcdBlockDoc::LoadFromFile( const char *pFileName )
 	CDmeVMFEntity::SetNextEntityId( 0 );
 
 	// Build the Edit file name
-	Q_StripExtension( m_pVMFFileName, m_pEditFileName, sizeof(m_pEditFileName) );
+	Q_StripExtension( m_pVMFFileName, m_pEditFileName );
 	Q_strncat( m_pEditFileName, ".vle", sizeof( m_pEditFileName ) );
 
 	// Store the BSP file name

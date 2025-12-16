@@ -3341,7 +3341,7 @@ bool CParticleSystemMgr::ReadParticleConfigFile( const char *pFileName, bool bPr
 	{
 		// Look for fallback particle systems
 		char pTemp[MAX_PATH];
-		Q_StripExtension( pFileName, pTemp, sizeof(pTemp) );
+		Q_StripExtension( pFileName, pTemp );
 		const char *pExt = Q_GetFileExtension( pFileName );
 		if ( !pExt )
 		{
@@ -3367,12 +3367,6 @@ bool CParticleSystemMgr::ReadParticleConfigFile( const char *pFileName, bool bPr
 	}
 
 	CUtlBuffer buf( (intp)0, 0, 0 );
-	if ( IsX360() )
-	{
-		// fell through, load as pc particle resource file
-		buf.ActivateByteSwapping( true );
-	}
-
 	if ( g_pFullFileSystem->ReadFile( pFileName, "GAME", buf ) )
 	{
 		return ReadParticleConfigFile( buf, bPrecache, bDecommitTempMemory, pFileName );

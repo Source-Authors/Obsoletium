@@ -297,7 +297,7 @@ public:
 		}
 		else
 		{
-			Q_StripExtension( mapname, scriptfile, sizeof( scriptfile ) );
+			Q_StripExtension( mapname, scriptfile );
 			Q_strncat( scriptfile, "_level_sounds.txt", sizeof( scriptfile ), COPY_ALL_CHARACTERS );
 			if ( filesystem->FileExists( scriptfile, "GAME" ) )
 			{
@@ -305,7 +305,7 @@ public:
 			}
 		}
 #else
-		Q_StripExtension( mapname, scriptfile, sizeof( scriptfile ) );
+		Q_StripExtension( mapname, scriptfile );
 		Q_strncat( scriptfile, "_level_sounds.txt", sizeof( scriptfile ), COPY_ALL_CHARACTERS );
 
 		if ( filesystem->FileExists( scriptfile, "GAME" ) )

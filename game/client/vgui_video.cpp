@@ -369,7 +369,7 @@ CON_COMMAND( playvideo, "Plays a video: <filename> [width height]" )
 	char strFullpath[MAX_PATH];
 	Q_strncpy( strFullpath, "media/", MAX_PATH );	// Assume we must play out of the media directory
 	char strFilename[MAX_PATH];
-	Q_StripExtension( args[1], strFilename, MAX_PATH );
+	Q_StripExtension( args[1], strFilename );
 	Q_strncat( strFullpath, args[1], MAX_PATH );
 	
 	if ( nScreenWidth == 0 )
@@ -404,7 +404,7 @@ CON_COMMAND( playvideo_exitcommand, "Plays a video and fires and exit command wh
 	char strFullpath[MAX_PATH];
 	Q_strncpy( strFullpath, "media/", MAX_PATH );	// Assume we must play out of the media directory
 	char strFilename[MAX_PATH];
-	Q_StripExtension( args[1], strFilename, MAX_PATH );
+	Q_StripExtension( args[1], strFilename );
 	Q_strncat( strFullpath, args[1], MAX_PATH );
 
 	char *pExitCommand = Q_strstr( args.GetCommandString(), args[2] );

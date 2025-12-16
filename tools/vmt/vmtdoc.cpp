@@ -302,7 +302,7 @@ void CVMTDoc::SetupPreviewMaterial( )
 
 	// Skip the '/' also
 	char pMaterialName[MAX_PATH];
-	Q_StripExtension( pLocalName + 10, pMaterialName, sizeof(pMaterialName) );
+	Q_StripExtension( pLocalName + 10, pMaterialName );
 	IMaterial *pMaterial = g_pMaterialSystem->FindMaterial( pMaterialName, "Editable material", false );
 	if ( !pMaterial || pMaterial->IsErrorMaterial() )
 		goto noMaterialConnection;
