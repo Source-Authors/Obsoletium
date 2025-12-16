@@ -264,14 +264,13 @@ inline unsigned short CDataManagerBase::FromHandle( memhandle_t handle )
 
 inline int CDataManagerBase::LockCount( memhandle_t handle )
 {
-	Lock();
+	AUTO_LOCK( *this );
 	int result = 0;
 	unsigned short memoryIndex = FromHandle(handle);
 	if ( memoryIndex != m_memoryLists.InvalidIndex() )
 	{
 		result = m_memoryLists[memoryIndex].lockCount;
 	}
-	Unlock();
 	return result;
 }
 
