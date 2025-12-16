@@ -2597,9 +2597,10 @@ public:
 		// A tuple of a sequence and its corresponding weight. Lists of these correspond to activities.
 		struct SequenceTuple
 		{
+			// dimhotepus: Reorder to put pActivityModifiers first - reduces allocation size.
+			CUtlSymbol	*pActivityModifiers;		// list of activity modifier symbols
 			short		seqnum;
 			short		weight; // the absolute value of the weight from the sequence header
-			CUtlSymbol	*pActivityModifiers;		// list of activity modifier symbols
 			int			iNumActivityModifiers;
 		};
 
