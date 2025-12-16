@@ -118,18 +118,20 @@ StudioDecalHandle_t CStudioRender::CreateDecalList( studiohwdata_t *pHardwareDat
 	if ( !pHardwareData || pHardwareData->m_NumLODs <= 0 )
 		return STUDIORENDER_DECAL_INVALID;
 
-	// NOTE: This function is called directly without queueing 
-	m_DecalMutex.Lock();
-	intp handle = m_DecalList.AddToTail();
-	m_DecalMutex.Unlock();
+	// NOTE: This function is called directly without queueing
+	// dimhotepus: Lock should live till decal list accessed, or DestroyDecalList will break it.
+	AUTO_LOCK(m_DecalMutex);
 
-	m_DecalList[handle].m_pHardwareData = pHardwareData;
-	m_DecalList[handle].m_pLod = new DecalLod_t[pHardwareData->m_NumLODs];
-	m_DecalList[handle].m_nLods = pHardwareData->m_NumLODs;
+	const intp handle = m_DecalList.AddToTail();
+	auto &decal = m_DecalList[handle];
+
+	decal.m_pHardwareData = pHardwareData;
+	decal.m_pLod = new DecalLod_t[pHardwareData->m_NumLODs];
+	decal.m_nLods = pHardwareData->m_NumLODs;
 
 	for (int i = 0; i < pHardwareData->m_NumLODs; i++)
 	{
-		m_DecalList[handle].m_pLod[i].m_FirstMaterial = m_DecalMaterial.InvalidIndex();
+		decal.m_pLod[i].m_FirstMaterial = m_DecalMaterial.InvalidIndex();
 	}
 
 	return (StudioDecalHandle_t)handle;
@@ -141,13 +143,18 @@ void CStudioRender::DestroyDecalList( StudioDecalHandle_t hDecal )
 		return;
 
 	RemoveDecalListFromLRU( hDecal );
+	
+	// dimhotepus: Lock should live till decal list accessed, or other DestroyDecalList will break it.
+	AUTO_LOCK(m_DecalMutex);
 
 	intp h = (intp)hDecal;
+	auto &decal = m_DecalList[h];
+
 	// Clean up 
-	for (int i = 0; i < m_DecalList[h].m_nLods; i++ )
+	for (int i = 0; i < decal.m_nLods; i++ )
 	{
 		// Blat out all geometry associated with all materials
-		unsigned short mat = m_DecalList[h].m_pLod[i].m_FirstMaterial;
+		unsigned short mat = decal.m_pLod[i].m_FirstMaterial;
 		unsigned short next;
 		while (mat != m_DecalMaterial.InvalidIndex())
 		{
@@ -161,12 +168,9 @@ void CStudioRender::DestroyDecalList( StudioDecalHandle_t hDecal )
 		}
 	}
 
-	delete[] m_DecalList[h].m_pLod;
-	m_DecalList[h].m_pLod = NULL;
-
-	m_DecalMutex.Lock();
+	delete[] decal.m_pLod;
+	decal.m_pLod = NULL;
 	m_DecalList.Remove( h );
-	m_DecalMutex.Unlock();
 }
 
 
