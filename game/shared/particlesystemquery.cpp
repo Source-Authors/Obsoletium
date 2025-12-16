@@ -91,7 +91,6 @@ static CThreadFastMutex s_LightMutex;
 // This mutex exists because EntityToWorldTransform was not threadsafe, and could potentially have been called from multiple
 // particle update threads. It has now been fixed to be threadsafe, so this mutex can safely just be a no-op (meaingful perf win for this).
 // static CThreadFastMutex s_BoneMutex;
-static CThreadNullMutex s_BoneMutex;
 
 //-----------------------------------------------------------------------------
 // Inherited from IParticleSystemQuery
@@ -107,10 +106,13 @@ void CParticleSystemQuery::GetLightingAtPoint( const Vector& vecOrigin, Color &c
 
 	if ( engine->IsInGame() )
 	{
-		s_LightMutex.Lock();
-		// Compute our lighting at our position
-		Vector totalColor = engine->GetLightForPoint( vecOrigin, true );
-		s_LightMutex.Unlock();
+		Vector totalColor;
+
+		{
+			AUTO_LOCK(s_LightMutex);
+			// Compute our lighting at our position
+			totalColor = engine->GetLightForPoint( vecOrigin, true );
+		}
 
 		// Get our lighting information
 		cTint.SetColor( totalColor.x*255, totalColor.y*255, totalColor.z*255, 0 );
@@ -130,9 +132,8 @@ void CParticleSystemQuery::SetUpLightingEnvironment( const Vector& pos )
 	if ( !engine->IsInGame() )
 		return;
 
-	s_LightMutex.Lock();
+	AUTO_LOCK(s_LightMutex);
 	modelrender->SetupLighting( pos );
-	s_LightMutex.Unlock();
 #endif
 }
 
@@ -216,17 +217,16 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 		float flRandMin = 1.0f - flBBoxScale;
 		Vector vecBasePos;
 		pParticles->GetControlPointAtTime( nControlPointNumber, pParticles->m_flCurTime, &vecBasePos );
-
-		s_BoneMutex.Lock();
+		
 		C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
 		if ( pAnimating )
 		{
-			
+
 			matrix3x4_t	*hitboxbones[MAXSTUDIOBONES];
 			
 			if ( pAnimating->HitboxToWorldTransforms( hitboxbones ) )
 			{
-		
+
 				studiohdr_t *pStudioHdr = modelinfo->GetStudiomodel( pAnimating->GetModel() );
 				
 				if ( pStudioHdr )
@@ -370,8 +370,6 @@ void CParticleSystemQuery::GetRandomPointsOnControllingObjectHitBox(
 					*( pHitBoxIndexOut++ ) = nHitbox;
 			}
 		}
-
-		s_BoneMutex.Unlock();
 	}
 #endif
 	if (! bSucesss )
@@ -400,8 +398,6 @@ int CParticleSystemQuery::GetControllingObjectHitBoxInfo(
 	int nRet = 0;
 
 #ifndef GAME_DLL
-	s_BoneMutex.Lock();
-
 	EHANDLE *phMoveParent = reinterpret_cast<EHANDLE *> ( pParticles->m_ControlPoints[nControlPointNumber].m_pObject );
 	CBaseEntity *pMoveParent = NULL;
 	if ( phMoveParent )
@@ -458,7 +454,6 @@ int CParticleSystemQuery::GetControllingObjectHitBoxInfo(
 			nRet = 1;
 		}
 	}
-	s_BoneMutex.Unlock();
 #endif
 	return nRet;
 }
@@ -480,18 +475,14 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 	}
 	if ( pMoveParent )
 	{
-		s_BoneMutex.Lock();
 		C_BaseAnimating *pAnimating = pMoveParent->GetBaseAnimating();
 
 		bool bInBBox = false;
-		Vector vecBBoxMin;
-		Vector vecBBoxMax;
 
-		vecBBoxMin = pMoveParent->CollisionProp()->OBBMins();
-		vecBBoxMax = pMoveParent->CollisionProp()->OBBMaxs();
+		Vector vecBBoxMin = pMoveParent->CollisionProp()->OBBMins();
+		Vector vecBBoxMax = pMoveParent->CollisionProp()->OBBMaxs();
 
-		matrix3x4_t matOrientation;
-		matOrientation = pMoveParent->EntityToWorldTransform();
+		matrix3x4_t matOrientation = pMoveParent->EntityToWorldTransform();
 		Vector vecLocalPos;
 		VectorITransform( vecPos, matOrientation, vecLocalPos );
 		if ( IsPointInBox( vecLocalPos, vecBBoxMin, vecBBoxMax ) )
@@ -534,8 +525,6 @@ bool CParticleSystemQuery::IsPointInControllingObjectHitBox(
 			if ( tr.startsolid )
 				bSuccess = true;
 		}
-
-		s_BoneMutex.Unlock();
 	}
 #endif
 	return bSuccess;

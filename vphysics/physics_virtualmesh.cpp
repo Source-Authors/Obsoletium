@@ -441,13 +441,12 @@ CMeshInstance *CPhysCollideVirtualMesh::AddRef()
 	CMeshInstance *pMesh = g_MeshManager.LockResource( m_hMemory );
 	if ( !pMesh )
 	{
-		s_BuildVirtualMeshMutex.Lock();
+		AUTO_LOCK(s_BuildVirtualMeshMutex);
 		pMesh = g_MeshManager.LockResource( m_hMemory );
 		if ( !pMesh )
 		{
 			pMesh = BuildLedges();
 		}
-		s_BuildVirtualMeshMutex.Unlock();
 	}
 	Assert( pMesh );
 	return pMesh;

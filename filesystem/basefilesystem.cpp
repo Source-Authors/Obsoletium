@@ -616,22 +616,26 @@ void CBaseFileSystem::Trace_FClose( FILE *fp )
 {
 	if ( fp )
 	{
-		m_OpenedFilesMutex.Lock();
-
 		COpenedFile file;
 		file.m_pFile = fp;
 
-		intp result = m_OpenedFiles.Find( file );
-		if ( result != -1 /*m_OpenedFiles.InvalidIdx()*/ )
+		intp result;
 		{
-			COpenedFile found = m_OpenedFiles[ result ];
-			if ( m_fwLevel >= FILESYSTEM_WARNING_REPORTALLACCESSES && !V_stristr( found.GetName(), "console.log" ) )
+			AUTO_LOCK( m_OpenedFilesMutex );
+
+			result = m_OpenedFiles.Find( file );
+			if ( result != -1 )
 			{
-				Warning( FILESYSTEM_WARNING_REPORTALLACCESSES, "---FS%s:  close %s %p %zd (%.3f)\n", ThreadInMainThread() ? "" : "[a]", found.GetName(), fp, m_OpenedFiles.Count(), Plat_FloatTime() );
+				const COpenedFile &found = m_OpenedFiles[ result ];
+				if ( m_fwLevel >= FILESYSTEM_WARNING_REPORTALLACCESSES && !V_stristr( found.GetName(), "console.log" ) )
+				{
+					Warning( FILESYSTEM_WARNING_REPORTALLACCESSES, "---FS%s:  close %s %p %zd (%.3f)\n", ThreadInMainThread() ? "" : "[a]", found.GetName(), fp, m_OpenedFiles.Count(), Plat_FloatTime() );
+				}
+				m_OpenedFiles.Remove( result );
 			}
-			m_OpenedFiles.Remove( result );
 		}
-		else
+
+		if (result == -1)
 		{
 			Assert( 0 );
 
@@ -640,8 +644,6 @@ void CBaseFileSystem::Trace_FClose( FILE *fp )
 				Warning( FILESYSTEM_WARNING_REPORTALLACCESSES, "Tried to close unknown file pointer %p\n", fp );
 			}
 		}
-
-		m_OpenedFilesMutex.Unlock();
 
 		FS_fclose( fp );
 	}
@@ -4646,7 +4648,7 @@ void CBaseFileSystem::COpenedFile::SetName( char const *name )
 // Purpose: 
 // Output : char
 //-----------------------------------------------------------------------------
-char const *CBaseFileSystem::COpenedFile::GetName( void )
+char const *CBaseFileSystem::COpenedFile::GetName( void ) const
 {
 	return m_pName ? m_pName : "???";
 }

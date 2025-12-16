@@ -2464,13 +2464,12 @@ bool CGameServer::SpawnServer( const char *szMapName, const char *szMapFile, con
 
 #if !defined( SWDS )
 		extern CThreadMutex g_SndMutex;
-		g_SndMutex.Lock();
+		AUTO_LOCK(g_SndMutex); // dimhotepus: Why?
 		g_pFileSystem->AsyncSuspend();
 		g_pThreadPool->SuspendExecution();
 		MemAlloc_CompactHeap();
 		g_pThreadPool->ResumeExecution();
 		g_pFileSystem->AsyncResume();
-		g_SndMutex.Unlock();
 #endif // SWDS
 	}
 

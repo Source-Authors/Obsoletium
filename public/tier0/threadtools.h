@@ -1597,30 +1597,36 @@ public:
 		{
 			while( ! MessageWaiting() )
 				SignalEvent.Wait();
-			QueueAccessMutex.Lock();
-			if (! Head )
+
 			{
-				// multiple readers could make this null
-				QueueAccessMutex.Unlock();
-				continue;
+				MsgNode *remove_this;
+
+				{
+					AUTO_LOCK(QueueAccessMutex);
+					if (! Head )
+					{
+						// multiple readers could make this null
+						continue;
+					}
+
+					*( pMsg ) = Head->Data;
+					remove_this = Head;
+					Head = Head->Next;
+					if (! Head )										// if empty, fix tail ptr
+						Tail = nullptr;
+				}
+
+				delete remove_this;
+				break;
 			}
-			*( pMsg ) = Head->Data;
-			MsgNode *remove_this = Head;
-			Head = Head->Next;
-			if (! Head)										// if empty, fix tail ptr
-				Tail = nullptr;
-			QueueAccessMutex.Unlock();
-			delete remove_this;
-			break;
 		}
 	}
 
 	void QueueMessage( T const &Msg)
 	{
-		MsgNode *new1=new MsgNode;
-		new1->Data=Msg;
-		new1->Next=nullptr;
-		QueueAccessMutex.Lock();
+		MsgNode *new1 = new MsgNode{nullptr, Msg};
+
+		AUTO_LOCK(QueueAccessMutex);
 		if ( Tail )
 		{
 			Tail->Next=new1;
@@ -1632,7 +1638,6 @@ public:
 			Tail = new1;
 		}
 		SignalEvent.Set();
-		QueueAccessMutex.Unlock();
 	}
 };
 

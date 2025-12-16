@@ -575,10 +575,11 @@ public:
 
 			if ( *ppszFilename && !Q_IsAbsolutePath( *ppszFilename ) )
 			{
+				{
 				// Copy paths to minimize mutex lock time
-				pFileSystem->m_SearchPathsMutex.Lock();
+					AUTO_LOCK( pFileSystem->m_SearchPathsMutex );
 				CopySearchPaths( pFileSystem->m_SearchPaths );
-				pFileSystem->m_SearchPathsMutex.Unlock();
+				}
 
 				pFileSystem->FixUpPath ( *ppszFilename, m_Filename );
 			}
@@ -606,10 +607,13 @@ public:
 			{
 				m_pathID =  UTL_INVAL_SYMBOL;
 			}
+
+			{
 			// Copy paths to minimize mutex lock time
-			pFileSystem->m_SearchPathsMutex.Lock();
+				AUTO_LOCK( pFileSystem->m_SearchPathsMutex );
 			CopySearchPaths( pFileSystem->m_SearchPaths );
-			pFileSystem->m_SearchPathsMutex.Unlock();
+			}
+
 			m_Filename[0] = '\0';
 		}
 
@@ -744,7 +748,8 @@ protected:
 		bool operator==( const COpenedFile& src ) const;
 
 		void		SetName( char const *name );
-		char const	*GetName( void );
+		// dimhotepus: Add const.
+		char const	*GetName( void ) const;
 
 		FILE		*m_pFile;
 		char		*m_pName;

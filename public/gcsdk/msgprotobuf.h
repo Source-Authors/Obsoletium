@@ -339,14 +339,13 @@ public:
 		if ( !s_bRegisteredWithMemoryPoolMgr )
 		{
 			// Get the lock and make sure we still haven't
-			s_PoolRegMutex.Lock();
+			AUTO_LOCK(s_PoolRegMutex);
 			if ( !s_bRegisteredWithMemoryPoolMgr )
 			{
 				s_pMemoryPool = new CProtoBufMsgMemoryPool< PB_OBJECT_TYPE >();
 				GProtoBufMsgMemoryPoolMgr()->RegisterPool( s_pMemoryPool );
 				s_bRegisteredWithMemoryPoolMgr = true;
 			}
-			s_PoolRegMutex.Unlock();
 		}
 
 		return static_cast<PB_OBJECT_TYPE *>( s_pMemoryPool->Alloc() );

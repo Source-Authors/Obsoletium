@@ -5966,190 +5966,190 @@ void S_Update( const AudioState_t *pAudioState )
 	if ( !g_AudioDevice->IsActive() )
 		return;
 
-	g_SndMutex.Lock();
-
-	// Update any client side sound fade
-	S_UpdateSoundFade();
-
-	if ( pAudioState )
 	{
-		VectorCopy( pAudioState->m_Origin, listener_origin );
-		AngleVectors( pAudioState->m_Angles, &listener_forward, &listener_right, &listener_up ); 
-		s_bIsListenerUnderwater = pAudioState->m_bIsUnderwater;
-	}
-	else
-	{
-		VectorCopy( vec3_origin, listener_origin );
-		VectorCopy( vec3_origin, listener_forward );
-		VectorCopy( vec3_origin, listener_right );
-		VectorCopy( vec3_origin, listener_up );
-		s_bIsListenerUnderwater = false;
-	}
+		AUTO_LOCK(g_SndMutex);
 
-	g_AudioDevice->UpdateListener( listener_origin, listener_forward, listener_right, listener_up );
+		// Update any client side sound fade
+		S_UpdateSoundFade();
+
+		if ( pAudioState )
+		{
+			VectorCopy( pAudioState->m_Origin, listener_origin );
+			AngleVectors( pAudioState->m_Angles, &listener_forward, &listener_right, &listener_up ); 
+			s_bIsListenerUnderwater = pAudioState->m_bIsUnderwater;
+		}
+		else
+		{
+			VectorCopy( vec3_origin, listener_origin );
+			VectorCopy( vec3_origin, listener_forward );
+			VectorCopy( vec3_origin, listener_right );
+			VectorCopy( vec3_origin, listener_up );
+			s_bIsListenerUnderwater = false;
+		}
+
+		g_AudioDevice->UpdateListener( listener_origin, listener_forward, listener_right, listener_up );
  
-	combine = NULL;
+		combine = NULL;
 
-	int voiceChannelCount = 0;
-	int voiceChannelMaxVolume = 0;
+		int voiceChannelCount = 0;
+		int voiceChannelMaxVolume = 0;
 
-	// reset traceline counter for this frame
-	g_snd_trace_count = 0;
+		// reset traceline counter for this frame
+		g_snd_trace_count = 0;
 
-	// calculate distance to nearest walls, update dsp_spatial
-	// updates one wall only per frame (one trace per frame)
-	SND_SetSpatialDelays();
+		// calculate distance to nearest walls, update dsp_spatial
+		// updates one wall only per frame (one trace per frame)
+		SND_SetSpatialDelays();
 
-	// updates dsp_room if automatic room detection enabled
-	DAS_CheckNewRoomDSP();
+		// updates dsp_room if automatic room detection enabled
+		DAS_CheckNewRoomDSP();
 
-	// update spatialization for static and dynamic sounds	
-	CChannelList list;
-	g_ActiveChannels.GetActiveChannels( list );
+		// update spatialization for static and dynamic sounds	
+		CChannelList list;
+		g_ActiveChannels.GetActiveChannels( list );
 
-	if (snd_spatialize_roundrobin.GetInt() == 0)
-	{
-		// spatialize each channel each time
-		for ( auto &ch : list )
+		if (snd_spatialize_roundrobin.GetInt() == 0)
 		{
-			Assert(ch.sfx);
-			Assert(ch.activeIndex > 0);
-
-			SND_Spatialize(&ch);         // respatialize channel
-
-			if ( ch.sfx->pSource && ch.sfx->pSource->IsVoiceSource() )
+			// spatialize each channel each time
+			for ( auto &ch : list )
 			{
-				voiceChannelCount++;
-				voiceChannelMaxVolume = max(voiceChannelMaxVolume, ChannelGetMaxVol( &ch ) );
-			}
-		}
-	}
-	else	// lowend performance improvement: spatialize only some  channels each frame.
-	{
-		unsigned int robinmask = (1 << snd_spatialize_roundrobin.GetInt()) - 1;
-		unsigned int i = 0;
+				Assert(ch.sfx);
+				Assert(ch.activeIndex > 0);
 
-		// now do static channels
-		for ( auto &ch : list )
-		{
-			Assert(ch.sfx);
-			Assert(ch.activeIndex > 0);
-
-			// need to check bfirstpass because sound tracing may have been deferred
-			if ( ch.flags.bfirstpass || (robinmask & s_roundrobin) == ( i & robinmask ) )
-			{
 				SND_Spatialize(&ch);         // respatialize channel
-			}
 
-			if ( ch.sfx->pSource && ch.sfx->pSource->IsVoiceSource() )
-			{
-				voiceChannelCount++;
-				voiceChannelMaxVolume = max( voiceChannelMaxVolume, ChannelGetMaxVol( &ch ) );
+				if ( ch.sfx->pSource && ch.sfx->pSource->IsVoiceSource() )
+				{
+					voiceChannelCount++;
+					voiceChannelMaxVolume = max(voiceChannelMaxVolume, ChannelGetMaxVol( &ch ) );
+				}
 			}
-
-			++i;
 		}
-
-		++s_roundrobin;
-	}
-
-
-
-	SND_ChannelTraceReset();
-
-	// set new target for voice ducking
-	float frametime = g_pSoundServices->GetHostFrametime();
-	S_UpdateVoiceDuck( voiceChannelCount, voiceChannelMaxVolume, frametime );
-
-	// update x360 music volume
-	g_DashboardMusicMixValue = Approach( g_DashboardMusicMixTarget, g_DashboardMusicMixValue, g_DashboardMusicFadeRate * frametime );
-
-	//
-	// debugging output
-	//
-	if (snd_show.GetInt())
-	{
-		con_nprint_t np;
-		np.time_to_live = 2.0f;
-		np.fixed_width_font = true;
-
-		int total = 0;
-
-		CChannelList activeChannels;
-		g_ActiveChannels.GetActiveChannels( activeChannels );
-		for ( auto &channel : activeChannels )
+		else	// lowend performance improvement: spatialize only some  channels each frame.
 		{
-			if ( !channel.sfx )
-				continue;
+			unsigned int robinmask = (1 << snd_spatialize_roundrobin.GetInt()) - 1;
+			unsigned int i = 0;
 
-			np.index = total + 2;
-			if ( channel.flags.fromserver )
+			// now do static channels
+			for ( auto &ch : list )
 			{
-				np.color[0] = 1.0;
-				np.color[1] = 0.8;
-				np.color[2] = 0.1;
-			}
-			else
-			{
-				np.color[0] = 0.1;
-				np.color[1] = 0.9;
-				np.color[2] = 1.0;
-			}
+				Assert(ch.sfx);
+				Assert(ch.activeIndex > 0);
 
-			unsigned int sampleCount = RemainingSamples( &channel );
-			float timeleft = (float)sampleCount / (float)channel.sfx->pSource->SampleRate();
-			bool bLooping = channel.sfx->pSource->IsLooped();
+				// need to check bfirstpass because sound tracing may have been deferred
+				if ( ch.flags.bfirstpass || (robinmask & s_roundrobin) == ( i & robinmask ) )
+				{
+					SND_Spatialize(&ch);         // respatialize channel
+				}
 
-			if (snd_surround.GetInt() < 4)
-			{
-				Con_NXPrintf ( &np, "%02i l(%03d) r(%03d) vol(%03d) ent(%03d) pos(%6d %6d %6d) timeleft(%f) looped(%d) %50s", 
-					total+ 1, 
-					(int)channel.fvolume[IFRONT_LEFT],
-					(int)channel.fvolume[IFRONT_RIGHT],
-					channel.master_vol,
-					channel.soundsource,
-					(int)channel.origin[0],
-					(int)channel.origin[1],
-					(int)channel.origin[2],
-					timeleft,
-					bLooping, 
-					channel.sfx->getname());
-			}
-			else
-			{
-				Con_NXPrintf ( &np, "%02i l(%03d) c(%03d) r(%03d) rl(%03d) rr(%03d) vol(%03d) ent(%03d) pos(%6d %6d %6d) timeleft(%f) looped(%d) %50s", 
-					total+ 1, 
-					(int)channel.fvolume[IFRONT_LEFT],
-					(int)channel.fvolume[IFRONT_CENTER],
-					(int)channel.fvolume[IFRONT_RIGHT],
-					(int)channel.fvolume[IREAR_LEFT],
-					(int)channel.fvolume[IREAR_RIGHT],
-					channel.master_vol,
-					channel.soundsource,
-					(int)channel.origin[0],
-					(int)channel.origin[1],
-					(int)channel.origin[2],
-					timeleft,
-					bLooping,
-					channel.sfx->getname());
+				if ( ch.sfx->pSource && ch.sfx->pSource->IsVoiceSource() )
+				{
+					voiceChannelCount++;
+					voiceChannelMaxVolume = max( voiceChannelMaxVolume, ChannelGetMaxVol( &ch ) );
+				}
+
+				++i;
 			}
 
-			if ( snd_visualize.GetInt() )
-			{
-				CDebugOverlay::AddTextOverlay( channel.origin, 0.05f, channel.sfx->getname() );
-			}
-
-			total++;
+			++s_roundrobin;
 		}
 
-		while ( total <= 128 )
+
+
+		SND_ChannelTraceReset();
+
+		// set new target for voice ducking
+		float frametime = g_pSoundServices->GetHostFrametime();
+		S_UpdateVoiceDuck( voiceChannelCount, voiceChannelMaxVolume, frametime );
+
+		// update x360 music volume
+		g_DashboardMusicMixValue = Approach( g_DashboardMusicMixTarget, g_DashboardMusicMixValue, g_DashboardMusicFadeRate * frametime );
+
+		//
+		// debugging output
+		//
+		if (snd_show.GetInt())
 		{
-			Con_NPrintf( total + 2, "" );
-			total++;
+			con_nprint_t np;
+			np.time_to_live = 2.0f;
+			np.fixed_width_font = true;
+
+			int total = 0;
+
+			CChannelList activeChannels;
+			g_ActiveChannels.GetActiveChannels( activeChannels );
+			for ( auto &channel : activeChannels )
+			{
+				if ( !channel.sfx )
+					continue;
+
+				np.index = total + 2;
+				if ( channel.flags.fromserver )
+				{
+					np.color[0] = 1.0;
+					np.color[1] = 0.8;
+					np.color[2] = 0.1;
+				}
+				else
+				{
+					np.color[0] = 0.1;
+					np.color[1] = 0.9;
+					np.color[2] = 1.0;
+				}
+
+				unsigned int sampleCount = RemainingSamples( &channel );
+				float timeleft = (float)sampleCount / (float)channel.sfx->pSource->SampleRate();
+				bool bLooping = channel.sfx->pSource->IsLooped();
+
+				if (snd_surround.GetInt() < 4)
+				{
+					Con_NXPrintf ( &np, "%02i l(%03d) r(%03d) vol(%03d) ent(%03d) pos(%6d %6d %6d) timeleft(%f) looped(%d) %50s", 
+						total+ 1, 
+						(int)channel.fvolume[IFRONT_LEFT],
+						(int)channel.fvolume[IFRONT_RIGHT],
+						channel.master_vol,
+						channel.soundsource,
+						(int)channel.origin[0],
+						(int)channel.origin[1],
+						(int)channel.origin[2],
+						timeleft,
+						bLooping, 
+						channel.sfx->getname());
+				}
+				else
+				{
+					Con_NXPrintf ( &np, "%02i l(%03d) c(%03d) r(%03d) rl(%03d) rr(%03d) vol(%03d) ent(%03d) pos(%6d %6d %6d) timeleft(%f) looped(%d) %50s", 
+						total+ 1, 
+						(int)channel.fvolume[IFRONT_LEFT],
+						(int)channel.fvolume[IFRONT_CENTER],
+						(int)channel.fvolume[IFRONT_RIGHT],
+						(int)channel.fvolume[IREAR_LEFT],
+						(int)channel.fvolume[IREAR_RIGHT],
+						channel.master_vol,
+						channel.soundsource,
+						(int)channel.origin[0],
+						(int)channel.origin[1],
+						(int)channel.origin[2],
+						timeleft,
+						bLooping,
+						channel.sfx->getname());
+				}
+
+				if ( snd_visualize.GetInt() )
+				{
+					CDebugOverlay::AddTextOverlay( channel.origin, 0.05f, channel.sfx->getname() );
+				}
+
+				total++;
+			}
+
+			while ( total <= 128 )
+			{
+				Con_NPrintf( total + 2, "" );
+				total++;
+			}
 		}
 	}
-
-	g_SndMutex.Unlock();
 
 	if ( s_bOnLoadScreen )
 		return;

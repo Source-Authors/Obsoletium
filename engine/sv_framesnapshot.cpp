@@ -323,10 +323,13 @@ CThreadFastMutex &CFrameSnapshotManager::GetMutex()
 
 PackedEntity* CFrameSnapshotManager::CreatePackedEntity( CFrameSnapshot* pSnapshot, int entity )
 {
-	m_WriteMutex.Lock();
-	PackedEntity *packedEntity = m_PackedEntitiesPool.Alloc();
+	PackedEntity *packedEntity;
+	{
+		AUTO_LOCK(m_WriteMutex);
+		packedEntity = m_PackedEntitiesPool.Alloc();
+	}
+	
 	PackedEntityHandle_t handle = reinterpret_cast< PackedEntityHandle_t >( packedEntity );
-	m_WriteMutex.Unlock();
 	
 	Assert( entity < pSnapshot->m_nNumEntities );
 

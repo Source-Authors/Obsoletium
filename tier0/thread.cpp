@@ -129,7 +129,7 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 	Assert( pAddress );
 	Assert( nWatchBytes == 0 || nWatchBytes == 1 || nWatchBytes == 2 || nWatchBytes == 4 || nWatchBytes == 8 );
 
-	s_BreakpointStateMutex.Lock();
+	AUTO_LOCK(s_BreakpointStateMutex);
 
 	if ( nWatchBytes == 0 )
 	{
@@ -184,13 +184,11 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 		WaitForSingleObject( hWorkThread, INFINITE );
 		CloseHandle( hWorkThread );
 	}
-
-	s_BreakpointStateMutex.Unlock();
 }
 
 void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
 {
-	s_BreakpointStateMutex.Lock();
+	AUTO_LOCK(s_BreakpointStateMutex);
 	if ( dwThreadID != GetCurrentThreadId() )
 	{
 		X86ApplyBreakpointsToThread( dwThreadID );
@@ -203,9 +201,7 @@ void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
 			WaitForSingleObject( hWorkThread, INFINITE );
 			CloseHandle( hWorkThread );
 		}
-
 	}
-	s_BreakpointStateMutex.Unlock();
 }
 
 #else
