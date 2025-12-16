@@ -1096,7 +1096,7 @@ template<int nFlags, int nNumTexCoords> FORCEINLINE void CVertexBuilder::Advance
 		IncrementFloatPointer( m_pCurrTexCoord[2], m_VertexSize_TexCoord[2] );
 	if ( nNumTexCoords > 3 )
 		IncrementFloatPointer( m_pCurrTexCoord[3], m_VertexSize_TexCoord[3] );
-	if ( nNumTexCoords > 4 )
+	if ( nNumTexCoords > 4 ) //-V112
 		IncrementFloatPointer( m_pCurrTexCoord[4], m_VertexSize_TexCoord[4] );
 	if ( nNumTexCoords > 5 )
 		IncrementFloatPointer( m_pCurrTexCoord[5], m_VertexSize_TexCoord[5] );
@@ -1237,7 +1237,7 @@ inline void CVertexBuilder::Fast4VerticesSSE(
 	DirectX::XMStoreFloat4A( dst + 10, DirectX::XMLoadFloat4A( src + 1 ) );
 	DirectX::XMStoreFloat4A( dst + 11, DirectX::XMLoadFloat4A( src + 2 ) );
 
-	IncrementFloatPointer( m_pCurrPosition, 4*m_VertexSize_Position );
+	IncrementFloatPointer( m_pCurrPosition, 4*m_VertexSize_Position ); //-V112
 
 #if ( defined( _DEBUG ) && ( COMPRESSED_NORMALS_TYPE == COMPRESSED_NORMALS_COMBINEDTANGENTS_UBYTE4 ) )
 	m_bWrittenNormal   = false;
@@ -1984,7 +1984,7 @@ inline void CVertexBuilder::BoneMatrix( int idx, int matrixIdx )
 {
 	Assert( m_pBoneMatrixIndex );
 	Assert( idx >= 0 );
-	Assert( idx < 4 );
+	Assert( idx < 4 ); //-V112
 
 	// garymcthack
 	if ( matrixIdx == BONE_MATRIX_INDEX_INVALID )
@@ -3087,7 +3087,7 @@ inline void CMeshBuilder::ComputeNumVertsAndIndices( int *pMaxVertices, int *pMa
 		break;
 
 	case MATERIAL_QUADS:
-		*pMaxVertices = nPrimitiveCount * 4;
+		*pMaxVertices = nPrimitiveCount * 4; //-V112
 		*pMaxIndices = nPrimitiveCount * 6;
 		break;
 
@@ -3120,7 +3120,7 @@ inline int CMeshBuilder::IndicesFromVertices( MaterialPrimitiveType_t type, int 
 	{
 	case MATERIAL_QUADS:
 		Assert( (nVertexCount & 0x3) == 0 );
-		return (nVertexCount * 6) / 4;
+		return (nVertexCount * 6) / 4; //-V112
 
 	case MATERIAL_INSTANCED_QUADS:
 		// This primtype is unindexed
@@ -3421,7 +3421,7 @@ inline void CMeshBuilder::DrawQuad( IMesh* pMesh, const float* v1, const float* 
 	}
 	else
 	{
-		Begin( pMesh, MATERIAL_LINE_LOOP, 4 );
+		Begin( pMesh, MATERIAL_LINE_LOOP, 4 ); //-V112
 		Position3fv (v1);
 		Color4ubv( pColor );
 		AdvanceVertexF<VTX_HAVEPOS | VTX_HAVECOLOR, 0>();

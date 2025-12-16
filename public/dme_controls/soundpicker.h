@@ -38,9 +38,9 @@ public:
 		PICK_NONE		= 0,
 		PICK_GAMESOUNDS	= 0x1,
 		PICK_WAVFILES	= 0x2,
-		PICK_ALL		= 0x7FFFFFFF,
+		PICK_ALL		= 0x7FFFFFFF, //-V112
 
-		ALLOW_MULTISELECT = 0x80000000,
+		ALLOW_MULTISELECT = 0x80000000, //-V112
 	};
 
 	CSoundPicker( vgui::Panel *pParent, int nFlags );
