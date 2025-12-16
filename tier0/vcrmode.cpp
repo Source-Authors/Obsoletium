@@ -1428,14 +1428,8 @@ void ReadAndVerifyShortString( const char *pStr )
 	if ( incomingSize != len )
 		VCR_Error( "ReadAndVerifyShortString (%s), lengths different.", pStr );
 
-	static char *pTempData = nullptr;
-	static size_t tempDataLen = 0;
-	if ( tempDataLen < len )
-	{
-		delete [] pTempData;
-		pTempData = new char[len];
-		tempDataLen = len;
-	}
+	// dimhotepus: Allocate on stack for performance.
+	char *pTempData = stackallocT( char, len );
 
 	VCR_Read( pTempData, len );
 	if ( memcmp( pTempData, pStr, len ) != 0 )
