@@ -248,7 +248,7 @@ void CRegistry::WriteString( const char *key, const char *value )
 		key,	// value name
 		0,			// reserved
 		REG_SZ,		// type buffer
-		(const LPBYTE)value,    // data buffer
+		reinterpret_cast<const byte*>(value),    // data buffer
 		dwSize );  // size of data buffer
 }
 
