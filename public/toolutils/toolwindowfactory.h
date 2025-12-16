@@ -48,7 +48,7 @@ vgui::ToolWindow *CToolWindowFactory<T>::InstanceToolWindow( vgui::Panel *parent
 
 	T *container = new T( parent, contextLabel, this, firstPage, title, contextMenu );
 	Assert( container );
-	if ( container )
+	if ( container ) //-V668
 	{
 		container->SetBounds( mx, my, TOOLWINDOW_DEFAULT_WIDTH, TOOLWINDOW_DEFAULT_HEIGHT );
 		container->SetMinimumSize( TOOLWINDOW_MIN_WIDTH, TOOLWINDOW_MIN_HEIGHT );

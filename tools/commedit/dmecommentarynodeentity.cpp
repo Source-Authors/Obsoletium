@@ -212,7 +212,7 @@ void CDmeCommentaryNodeEntity::DrawSprite( IMaterial *pMaterial )
 	IMesh* pMesh = pRenderContext->GetDynamicMesh();
 
 	CMeshBuilder meshBuilder;
-	meshBuilder.Begin( pMesh, MATERIAL_TRIANGLE_STRIP, 4, 4 );
+	meshBuilder.Begin( pMesh, MATERIAL_TRIANGLE_STRIP, 4, 4 ); //-V112
 
 	unsigned char nBaseR = 255;
 	unsigned char nBaseG = 255;
