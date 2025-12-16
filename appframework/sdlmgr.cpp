@@ -862,7 +862,7 @@ int CSDLMgr::GetEvents( CCocoaEvent *pEvents, int nMaxEventsToReturn, bool debug
 {
 	SDLAPP_FUNC;
 
-	m_CocoaEventsMutex.Lock();
+	AUTO_LOCK(m_CocoaEventsMutex);
 
 	CUtlLinkedList<CCocoaEvent,int> &queue = debugEvent ? m_CocoaEvents : m_DebugEvents;
 
@@ -878,8 +878,6 @@ int CSDLMgr::GetEvents( CCocoaEvent *pEvents, int nMaxEventsToReturn, bool debug
 		++pCurEvent;
 	}
 
-	m_CocoaEventsMutex.Unlock();
-
 	return nToWrite;
 }
 
@@ -889,7 +887,7 @@ int CSDLMgr::PeekAndRemoveKeyboardEvents( bool *pbEsc, bool *pbReturn, bool *pbS
 {
 	SDLAPP_FUNC;
 
-	m_CocoaEventsMutex.Lock();
+	AUTO_LOCK(m_CocoaEventsMutex);
 
 	int nRead = 0;
 	CUtlLinkedList<CCocoaEvent,int> &queue = debugEvent ? m_CocoaEvents : m_DebugEvents;
@@ -926,7 +924,6 @@ int CSDLMgr::PeekAndRemoveKeyboardEvents( bool *pbEsc, bool *pbReturn, bool *pbS
 		}
 	}
 
-	m_CocoaEventsMutex.Unlock();
 	return nRead;
 }
 
@@ -960,12 +957,10 @@ void CSDLMgr::PostEvent( const CCocoaEvent &theEvent, bool debugEvent )
 {
 	SDLAPP_FUNC;
 
-	m_CocoaEventsMutex.Lock();
+	AUTO_LOCK(m_CocoaEventsMutex);
 	
 	CUtlLinkedList<CCocoaEvent,int> &queue = debugEvent ? m_CocoaEvents : m_DebugEvents;
 	queue.AddToTail( theEvent );
-	
-	m_CocoaEventsMutex.Unlock();
 }
 
 void CSDLMgr::SetMouseVisible( bool bState )
