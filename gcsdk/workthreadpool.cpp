@@ -658,7 +658,7 @@ void CWorkThreadPool::OnWorkItemCompleted( CWorkItem *pWorkItem )
 	{
 		// In the ordered case we need to lock completely here since we'll be moving around between
 		// various data structures and also need to ensure the ordering of items in the TS queue
-		m_MutexOnItemCompletedOrdered.Lock();
+		AUTO_LOCK( m_MutexOnItemCompletedOrdered );
 		if ( m_ulLastCompletedSequenceNumber + 1 == pWorkItem->m_ulSequenceNumber )
 		{
 			m_ulLastCompletedSequenceNumber = pWorkItem->m_ulSequenceNumber;
@@ -689,7 +689,6 @@ void CWorkThreadPool::OnWorkItemCompleted( CWorkItem *pWorkItem )
 		{
 			m_vecCompletedAndWaiting.AddToTail( pWorkItem );
 		}
-		m_MutexOnItemCompletedOrdered.Unlock();
 	}
 }
 
