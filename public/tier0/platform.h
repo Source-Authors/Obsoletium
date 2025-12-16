@@ -1558,6 +1558,39 @@ inline void Destruct( T (*pMemory)[N] )
 }
 
 
+// dimhotepus: TF2 backport.
+// misyl: Shamelessly nicked from Source 2 =)
+//
+//--------------------------------------------------------------------------------------------------
+// RunCodeAtScopeExit
+//
+// Example:
+//	int *x = new int;
+//	RunCodeAtScopeExit( delete x )
+//--------------------------------------------------------------------------------------------------
+template <typename LambdaType>
+class CScopeGuardLambdaImpl
+{
+public:
+	explicit CScopeGuardLambdaImpl( LambdaType&& lambda ) : m_lambda( std::move( lambda ) ) { }
+	~CScopeGuardLambdaImpl() { m_lambda(); }
+private:
+	LambdaType m_lambda;
+};
+
+//--------------------------------------------------------------------------------------------------
+template <typename LambdaType>
+CScopeGuardLambdaImpl< LambdaType > MakeScopeGuardLambda( LambdaType&& lambda )
+{
+	return CScopeGuardLambdaImpl< LambdaType >( std::move( lambda ) );
+}
+
+//--------------------------------------------------------------------------------------------------
+#define RunLambdaAtScopeExit2( VarName, ... )		const auto VarName( MakeScopeGuardLambda( __VA_ARGS__ ) ); (void)VarName
+#define RunLambdaAtScopeExit( ... )					RunLambdaAtScopeExit2( UNIQUE_ID, __VA_ARGS__ )
+#define RunCodeAtScopeExit( ... )					RunLambdaAtScopeExit( [&]() { __VA_ARGS__ ; } )
+
+
 //
 // GET_OUTER()
 //
