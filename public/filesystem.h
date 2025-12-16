@@ -361,7 +361,11 @@ typedef void (*FSAsyncCallbackFunc_t)(const FileAsyncRequest_t &request, int nBy
 //---------------------------------------------------------
 struct FileAsyncRequest_t
 {
-	FileAsyncRequest_t()	{ memset( this, 0, sizeof(*this) ); hSpecificAsyncFile = FS_INVALID_ASYNC_FILE;	}
+	FileAsyncRequest_t()
+		: pszFilename{nullptr}, pData{nullptr}, nOffset{0}, nBytes{0},
+		pfnCallback{nullptr}, pContext{nullptr}, priority{0}, flags{0},
+		pszPathID{nullptr}, hSpecificAsyncFile{FS_INVALID_ASYNC_FILE}, pfnAlloc{nullptr}
+	{}
 	const char *			pszFilename;		// file system name
 	void *					pData;				// optional, system will alloc/free if nullptr
 	int						nOffset;			// optional initial seek_set, 0=beginning
