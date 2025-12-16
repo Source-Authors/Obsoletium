@@ -2567,7 +2567,7 @@ public:
 
 public:
 	int IsSequenceLooping( int iSequence );
-	float GetSequenceCycleRate( int iSequence );
+	float GetSequenceCycleRate( intp iSequence );
 
 	void				RunFlexRules( const float *src, float *dest );
 
