@@ -752,7 +752,7 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( Vector4D *pDest ) const
 	case FIELD_CSTRING:
 		{
 			int nParsed = sscanf( m_pszString, "%f %f %f %f", &pDest->x, &pDest->y, &pDest->z, &pDest->w );
-			if ( nParsed == 4 )
+			if ( nParsed == 4 ) //-V112
 				return true;
 			*pDest = vec4_origin; 
 			return false;
@@ -776,7 +776,7 @@ inline bool CVariantBase<CValueAllocator>::AssignTo( Quaternion *pDest ) const
 	case FIELD_CSTRING:
 		{
 			int nParsed = sscanf( m_pszString, "%f %f %f %f", &pDest->x, &pDest->y, &pDest->z, &pDest->w );
-			if ( nParsed == 4 )
+			if ( nParsed == 4 ) //-V112
 				return true;
 			*pDest = quat_identity; 
 			return false;
