@@ -2361,8 +2361,8 @@ struct studiohdr_t
 	void				SetVirtualModel( void* ptr )
 	{
 		// dimhotepus: Check we are in range.
-		Assert(static_cast<int>(reinterpret_cast<intp>(ptr)) <= std::numeric_limits<int>::max());
-		virtualModel = (int)(intp)ptr;
+		Assert(static_cast<int>(reinterpret_cast<intp>(ptr)) <= std::numeric_limits<int>::max()); //-V221
+		virtualModel = (int)(intp)ptr; //-V221
 	}
 
 
