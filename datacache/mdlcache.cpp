@@ -1543,9 +1543,13 @@ bool CMDLCache::BuildHardwareData( MDLHandle_t handle, studiodata_t *pStudioData
 
 	Assert( GetVertexData( handle ) );
 
-	BeginLock();
-	bool bLoaded = g_pStudioRender->LoadModel( pStudioHdr, pVtxHdr, &pStudioData->m_HardwareData );
-	EndLock();
+	bool bLoaded;
+
+	{
+		BeginLock();
+		RunCodeAtScopeExit( EndLock() );
+		bLoaded = g_pStudioRender->LoadModel( pStudioHdr, pVtxHdr, &pStudioData->m_HardwareData );
+	}
 
 	if ( bLoaded )
 	{
@@ -1622,26 +1626,32 @@ studiohwdata_t *CMDLCache::GetHardwareData( MDLHandle_t handle )
 		return NULL;
 
 	studiodata_t *pStudioData = m_MDLDict[handle];
-	m_pMeshCacheSection->LockMutex();
-	if ( ( pStudioData->m_nFlags & (STUDIODATA_FLAGS_STUDIOMESH_LOADED | STUDIODATA_FLAGS_NO_STUDIOMESH) ) == 0 )
+	bool bShouldLoadData = false;
+
 	{
-		m_pMeshCacheSection->UnlockMutex();
-		if ( !LoadHardwareData( handle ) )
+		m_pMeshCacheSection->LockMutex();
+		RunCodeAtScopeExit( m_pMeshCacheSection->UnlockMutex() );
+
+		if ( ( pStudioData->m_nFlags & (STUDIODATA_FLAGS_STUDIOMESH_LOADED | STUDIODATA_FLAGS_NO_STUDIOMESH) ) == 0 )
 		{
-			return NULL;
+			bShouldLoadData = true;
+		}
+		else
+		{
+#if defined( USE_HARDWARE_CACHE )
+			CheckData( pStudioData->m_HardwareDataCache, MDLCACHE_STUDIOHWDATA );
+#endif
 		}
 	}
-	else
+
+	if ( bShouldLoadData && !LoadHardwareData( handle ) )
 	{
-#if defined( USE_HARDWARE_CACHE )
-		CheckData( pStudioData->m_HardwareDataCache, MDLCACHE_STUDIOHWDATA );
-#endif
-		m_pMeshCacheSection->UnlockMutex();
+		return nullptr;
 	}
 
 	// didn't load, don't return an empty pointer
 	if ( pStudioData->m_nFlags & STUDIODATA_FLAGS_NO_STUDIOMESH )
-		return NULL;
+		return nullptr;
 
 	return &pStudioData->m_HardwareData;
 }
@@ -1656,6 +1666,7 @@ void CMDLCache::ReleaseMaterialSystemObjects()
 	m_bLostVideoMemory = true;
 
 	BreakFrameLock( false );
+	RunCodeAtScopeExit( RestoreFrameLock() );
 
 	// Free all hardware data
 	MDLHandle_t i = m_MDLDict.First();
@@ -1664,8 +1675,6 @@ void CMDLCache::ReleaseMaterialSystemObjects()
 		UnloadHardwareData( i );
 		i = m_MDLDict.Next( i );
 	}
-
-	RestoreFrameLock();
 }
 
 void CMDLCache::RestoreMaterialSystemObjects( int nChangeFlags )
@@ -1674,6 +1683,7 @@ void CMDLCache::RestoreMaterialSystemObjects( int nChangeFlags )
 	m_bLostVideoMemory = false;
 
 	BreakFrameLock( false );
+	RunCodeAtScopeExit( RestoreFrameLock() );
 
 	// Restore all hardware data
 	MDLHandle_t i = m_MDLDict.First();
@@ -1705,8 +1715,6 @@ void CMDLCache::RestoreMaterialSystemObjects( int nChangeFlags )
 
 		i = m_MDLDict.Next( i );
 	}
-
-	RestoreFrameLock();
 }
 
 
