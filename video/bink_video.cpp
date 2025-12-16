@@ -423,12 +423,11 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 
 			// Lock the buffer for writing
 			if ( BinkBufferLock( hBINKBuffer ) ) {
+				RunCodeAtScopeExit( BinkBufferUnlock( hBINKBuffer ) );
+
 				// Copy the decompressed frame into the BinkBuffer
 				BinkCopyToBuffer( hBINK, hBINKBuffer->Buffer, hBINKBuffer->BufferPitch,
 									hBINKBuffer->Height, 0, 0, hBINKBuffer->SurfaceType );
-
-				// Unlock the buffer
-				BinkBufferUnlock( hBINKBuffer );
 			}
 
 			// Blit the pixels to the screen
