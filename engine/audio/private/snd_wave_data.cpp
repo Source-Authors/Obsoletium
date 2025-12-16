@@ -219,13 +219,6 @@ CAsyncWaveData *CAsyncWaveData::CreateResource( const asyncwaveparams_t &params 
 	Assert( pData );
 	if ( pData )
 	{
-		if ( IsX360() )
-		{
-			// create buffer now for re-use during streaming process
-			pData->m_nBufferBytes = AlignValue( params.datasize, params.alignment );
-			pData->m_pAlloc = new byte[pData->m_nBufferBytes];
-			pData->m_pvData = pData->m_pAlloc;
-		}
 		pData->StartAsyncLoading( params );
 	}
 
@@ -239,17 +232,7 @@ CAsyncWaveData *CAsyncWaveData::CreateResource( const asyncwaveparams_t &params 
 //-----------------------------------------------------------------------------
 size_t CAsyncWaveData::EstimatedSize( const asyncwaveparams_t &params )
 {
-	size_t size = sizeof( CAsyncWaveData );
-
-	if ( IsPC() )
-	{
-		size += params.datasize;
-	}
-	if ( IsX360() )
-	{
-		// the expected size of this object's allocations
-		size += AlignValue( params.datasize, params.alignment );
-	}
+	size_t size = sizeof( CAsyncWaveData ) + params.datasize;
 
 	return size;
 }
@@ -689,24 +672,9 @@ bool CAsyncWavDataCache::Init( size_t memSize )
 	if ( m_bInitialized )
 		return true;
 	
-	if ( IsX360() )
-	{			
-		const char *pGame = engineClient->GetGameDirectory();
-		if ( !Q_stricmp( Q_UnqualifiedFileName( pGame ), "tf" ) )
-		{
-			memSize = TF_XBOX_WAV_MEMORY_CACHE;
-		}
-		else
-		{
-			memSize = DEFAULT_XBOX_WAV_MEMORY_CACHE;
-		}
-	}
-	else
+	if ( memSize < DEFAULT_WAV_MEMORY_CACHE )
 	{
-		if ( memSize < DEFAULT_WAV_MEMORY_CACHE )
-		{
-			memSize = DEFAULT_WAV_MEMORY_CACHE;
-		}
+		memSize = DEFAULT_WAV_MEMORY_CACHE;
 	}
 
 #if FORCE_SMALL_MEMORY_CACHE_SIZE
@@ -869,7 +837,7 @@ StreamHandle_t CAsyncWavDataCache::OpenStreamedLoad( char const *pFileName, int 
 	streamedEntry.m_BufferSize = bufferSize;
 	streamedEntry.m_numBuffers = numBuffers;
 	streamedEntry.m_bSinglePlay = ( flags & STREAMED_SINGLEPLAY ) != 0;
-	streamedEntry.m_SectorSize = ( IsX360() && ( flags & STREAMED_FROMDVD ) ) ? XBOX_DVD_SECTORSIZE : 1;
+	streamedEntry.m_SectorSize = 1;
 
 	// single play streams expect to uniquely own and thus recycle their buffers though the data
 	// single play streams are guaranteed that their buffers are private and cannot be shared
@@ -1649,12 +1617,6 @@ CON_COMMAND( snd_async_showmem, "Show async memory stats" )
 //-----------------------------------------------------------------------------
 void PrefetchDataStream( const char *pFileName, int dataOffset, int dataSize )
 {
-	if ( IsX360() )
-	{
-		// Xbox streaming buffer implementation does not support this "hinting"
-		return;
-	}
-
 	wavedatacache->PrefetchCache( pFileName, dataSize, dataOffset );
 }
 
@@ -1751,11 +1713,8 @@ CWaveDataStreamAsync::CWaveDataStreamAsync
 	m_sampleIndex = 0;
 	m_bufferCount = 0;
 
-	if ( IsPC() )
-	{
-		m_buffer = new char[SINGLE_BUFFER_SIZE];
-		Q_memset( m_buffer, 0, SINGLE_BUFFER_SIZE );
-	}
+	m_buffer = new char[SINGLE_BUFFER_SIZE];
+	Q_memset( m_buffer, 0, SINGLE_BUFFER_SIZE );
 
 	m_nCachedDataSize = 0;
 
@@ -1765,19 +1724,16 @@ CWaveDataStreamAsync::CWaveDataStreamAsync
 		return;
 	}
 
-	if ( IsPC() )
-	{
-		m_hCache = wavedatacache->AsyncLoadCache( GetFileName(), m_dataSize, m_dataStart );
+	m_hCache = wavedatacache->AsyncLoadCache( GetFileName(), m_dataSize, m_dataStart );
 
-		// size of a sample
-		m_sampleSize = source.SampleSize();
-		// size in samples of the buffer
-		m_bufferSize = SINGLE_BUFFER_SIZE / m_sampleSize;
-		// size in samples (not bytes) of the wave itself
-		m_waveSize = fileSize / m_sampleSize;
+	// size of a sample
+	m_sampleSize = source.SampleSize();
+	// size in samples of the buffer
+	m_bufferSize = SINGLE_BUFFER_SIZE / m_sampleSize;
+	// size in samples (not bytes) of the wave itself
+	m_waveSize = fileSize / m_sampleSize;
 
-		m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
-	}
+	m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
 
 	m_bValid = true;
 }
@@ -1787,15 +1743,10 @@ CWaveDataStreamAsync::CWaveDataStreamAsync
 //-----------------------------------------------------------------------------
 CWaveDataStreamAsync::~CWaveDataStreamAsync( void ) 
 {
-	if ( IsPC() && m_source.IsPlayOnce() && m_source.CanDelete() )
+	if ( m_source.IsPlayOnce() && m_source.CanDelete() )
 	{
 		m_source.SetPlayOnce( false ); // in case it gets used again
 		wavedatacache->Unload( m_hCache );
-	}
-
-	if ( IsX360() )
-	{
-		wavedatacache->CloseStreamedLoad( m_hStream ); 
 	}
 
 	delete [] m_buffer;
@@ -1827,29 +1778,19 @@ char const *CWaveDataStreamAsync::GetFileName()
 //-----------------------------------------------------------------------------
 bool CWaveDataStreamAsync::IsReadyToMix()
 {
-	if ( IsPC() )
+	// If not async loaded, start mixing right away
+	if ( !m_source.IsAsyncLoad() && !snd_async_fullyasync.GetBool() )
 	{
-		// If not async loaded, start mixing right away
-		if ( !m_source.IsAsyncLoad() && !snd_async_fullyasync.GetBool() )
-		{
-			return true;
-		}
-
-		bool bCacheValid;
-		bool bLoaded = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
-		if ( !bCacheValid )
-		{
-			wavedatacache->RestartDataLoad( &m_hCache, GetFileName(), m_dataSize, m_dataStart );
-		}
-		return bLoaded;
+		return true;
 	}
 
-	if ( IsX360() )
+	bool bCacheValid;
+	bool bLoaded = wavedatacache->IsDataLoadCompleted( m_hCache, &bCacheValid );
+	if ( !bCacheValid )
 	{
-		return wavedatacache->IsStreamedDataReady( m_hStream );
+		wavedatacache->RestartDataLoad( &m_hCache, GetFileName(), m_dataSize, m_dataStart );
 	}
-
-	return false;
+	return bLoaded;
 }
 
 
@@ -1928,74 +1869,71 @@ int CWaveDataStreamAsync::ReadSourceData( void **pData, int sampleIndex, int sam
 		if ( m_bufferCount > m_bufferSize )
 			m_bufferCount = m_bufferSize;
 
-		if ( IsPC() )
+		// See if we can load in the intial data right out of the cached data lump instead.
+		int cacheddatastartpos = ( seekpos - m_dataStart );
+
+		// FastGet doesn't call into IsPrecachedSound if the handle appears valid...
+		CAudioSourceCachedInfo *info = m_AudioCacheHandle.FastGet();
+		if ( !info )
 		{
-			// See if we can load in the intial data right out of the cached data lump instead.
-			int cacheddatastartpos = ( seekpos - m_dataStart );
+			// Full recache
+			info = m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
+		}
 
-			// FastGet doesn't call into IsPrecachedSound if the handle appears valid...
-			CAudioSourceCachedInfo *info = m_AudioCacheHandle.FastGet();
-			if ( !info )
+		bool startupCacheUsed = false;
+
+		if  ( info && 
+			( m_nCachedDataSize > 0 ) && 
+			( cacheddatastartpos < m_nCachedDataSize ) )
+		{
+			// Get a ptr to the cached data
+			const byte *cacheddata = info->CachedData();
+			if ( cacheddata )
 			{
-				// Full recache
-				info = m_AudioCacheHandle.Get( CAudioSource::AUDIO_SOURCE_WAV, m_pSfx->IsPrecachedSound(), m_pSfx, &m_nCachedDataSize );
-			}
+				// See how many samples of cached data are available (cacheddatastartpos is zero on the first read)
+				int availSamples = ( m_nCachedDataSize - cacheddatastartpos ) / m_sampleSize;
 
-			bool startupCacheUsed = false;
-
-			if  ( info && 
-				( m_nCachedDataSize > 0 ) && 
-				( cacheddatastartpos < m_nCachedDataSize ) )
-			{
-				// Get a ptr to the cached data
-				const byte *cacheddata = info->CachedData();
-				if ( cacheddata )
+				// Clamp to size of our internal buffer
+				if ( availSamples > m_bufferSize )
 				{
-					// See how many samples of cached data are available (cacheddatastartpos is zero on the first read)
-					int availSamples = ( m_nCachedDataSize - cacheddatastartpos ) / m_sampleSize;
-
-					// Clamp to size of our internal buffer
-					if ( availSamples > m_bufferSize )
-					{
-						availSamples = m_bufferSize;
-					}
-
-					// Mark how many we are returning
-					m_bufferCount = availSamples;
-					// Copy raw sample data directly out of cache
-					Q_memcpy( m_buffer, ( const char * )cacheddata + cacheddatastartpos, availSamples * m_sampleSize );
-
-					startupCacheUsed = true;
+					availSamples = m_bufferSize;
 				}
-			}
 
-			// Not in startup cache, grab data from async cache loader (will block if data hasn't arrived yet)
-			if ( !startupCacheUsed )
-			{
-				bool postprocessed = false;
+				// Mark how many we are returning
+				m_bufferCount = availSamples;
+				// Copy raw sample data directly out of cache
+				Q_memcpy( m_buffer, ( const char * )cacheddata + cacheddatastartpos, availSamples * m_sampleSize );
+
+				startupCacheUsed = true;
+			}
+		}
+
+		// Not in startup cache, grab data from async cache loader (will block if data hasn't arrived yet)
+		if ( !startupCacheUsed )
+		{
+			bool postprocessed = false;
 				
-				// read in the max bufferable, available samples
-				if ( !wavedatacache->CopyDataIntoMemory( 
-					m_hCache, 
-					GetFileName(), 
-					m_dataSize, 
-					m_dataStart,
-					m_buffer, 
-					m_bufferSize * m_sampleSize,
-					seekpos, 
-					m_bufferCount * m_sampleSize,
-					&postprocessed ) )
-				{
-					return 0;
-				}
+			// read in the max bufferable, available samples
+			if ( !wavedatacache->CopyDataIntoMemory( 
+				m_hCache, 
+				GetFileName(), 
+				m_dataSize, 
+				m_dataStart,
+				m_buffer, 
+				m_bufferSize * m_sampleSize,
+				seekpos, 
+				m_bufferCount * m_sampleSize,
+				&postprocessed ) )
+			{
+				return 0;
+			}
 
-				// do any conversion the source needs (mixer will decode/decompress)
-				if ( !postprocessed )
-				{
-					// Note that we don't set the postprocessed flag on the underlying data, since for streaming we're copying the
-					//  original data into this buffer instead.
-					m_pStreamSource->UpdateSamples( m_buffer, m_bufferCount );
-				}
+			// do any conversion the source needs (mixer will decode/decompress)
+			if ( !postprocessed )
+			{
+				// Note that we don't set the postprocessed flag on the underlying data, since for streaming we're copying the
+				//  original data into this buffer instead.
+				m_pStreamSource->UpdateSamples( m_buffer, m_bufferCount );
 			}
 		}
 	}
@@ -2081,17 +2019,8 @@ bool CWaveDataMemoryAsync::IsReadyToMix()
 		return true;
 	}
 
-	if ( IsPC() )
-	{
-		// Msg( "Waiting for data '%s'\n", m_source.GetFileName() );
-		m_source.CacheLoad();
-	}
-
-	if ( IsX360() )
-	{
-		// expected to be resident and valid, otherwise being called prior to load
-		Assert( 0 );
-	}
+	// Msg( "Waiting for data '%s'\n", m_source.GetFileName() );
+	m_source.CacheLoad();
 
 	return false;
 }
