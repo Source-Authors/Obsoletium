@@ -34,8 +34,7 @@
 void StudioChangeCallback( IConVar *var, const char *pOldValue, float flOldValue )
 {
 	// NOTE: This is necessary to flush the queued thread when this value changes
-	MaterialLock_t hLock = g_pMaterialSystem->Lock();
-	g_pMaterialSystem->Unlock( hLock );
+	g_pMaterialSystem->Unlock( g_pMaterialSystem->Lock() );
 }
 
 static ConVar studio_queue_mode( "studio_queue_mode", "1", 0, "", StudioChangeCallback );
@@ -1606,8 +1605,8 @@ void CStudioRenderContext::SetLODSwitchValue( studiohwdata_t &hardwareData, int 
 	// NOTE: This must block the hardware thread since it reads this data.
 	// This method is only used in tools, though.
 	MaterialLock_t hLock = g_pMaterialSystem->Lock();
+	RunCodeAtScopeExit(g_pMaterialSystem->Unlock( hLock ));
 	hardwareData.m_pLODs[nLOD].m_SwitchPoint = flSwitchValue;
-	g_pMaterialSystem->Unlock( hLock );
 }
 
 
