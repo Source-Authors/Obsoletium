@@ -61,7 +61,7 @@ bool TokenLine::SetLine(const char * newLine)
 					charPointer++;
 			}
 			else 
-			{				m_token[m_tokenNumber] = charPointer;
+			{
 				while (*charPointer && ((*charPointer > 32) && (*charPointer <= 126)))
 					charPointer++;
 			}
