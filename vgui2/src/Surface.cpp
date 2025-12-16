@@ -616,18 +616,19 @@ private:
 
 		if (pDataObject->GetData(&format, &storage) == S_OK)
 		{
+			RunCodeAtScopeExit(ReleaseStgMedium(&storage));
+
 			// we got some data
 			if (storage.tymed & TYMED_HGLOBAL)
 			{
 				const char *buf = (const char *)GlobalLock(storage.hGlobal);
 				if (buf)
 				{
+					RunCodeAtScopeExit(GlobalUnlock(storage.hGlobal));
+
 					dragData = new KeyValues("DragDrop", "type", "text", "text", buf);
-					GlobalUnlock(storage.hGlobal);
 				}
 			}
-
-			ReleaseStgMedium(&storage);
 		}
 		else
 		{
@@ -635,6 +636,8 @@ private:
 			format.cfFormat = CF_HDROP;
 			if (pDataObject->GetData(&format, &storage) == S_OK && storage.tymed & TYMED_HGLOBAL)
 			{
+				RunCodeAtScopeExit(ReleaseStgMedium(&storage));
+
 				dragData = new KeyValues("DragDrop", "type", "files");
 				KeyValues *fileList = dragData->FindKey("list", true);
 
@@ -642,6 +645,8 @@ private:
 				HDROP hdrop = (HDROP)GlobalLock(storage.hGlobal);
 				if (hdrop)
 				{
+					RunCodeAtScopeExit(GlobalUnlock(storage.hGlobal));
+
 					char namebuf[32], buf[512];
 					int count = DragQueryFile(hdrop, 0xFFFFFFFF, buf, 511);
 					for (int i = 0; i < count; i++)
@@ -650,7 +655,6 @@ private:
 						DragQueryFile(hdrop, i, buf, 511);
 						fileList->SetString(namebuf, buf);
 					}
-					GlobalUnlock(storage.hGlobal);
 				}
 			}
 		}
@@ -1836,11 +1840,14 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 			g_pFullFileSystem->Close(file);
 			return false;
 		}
+		RunCodeAtScopeExit(::GlobalFree(hDIB));
 
 		char *pDIB = (LPSTR)::GlobalLock(hDIB);
 		// dimhotepus: Check global lock succeeds.
 		if ( pDIB )
 		{
+			RunCodeAtScopeExit(::GlobalUnlock(hDIB));
+
 			g_pFullFileSystem->Read(pDIB, dwBitsSize, file );
 
 			lpbmi = (LPBITMAPINFO)pDIB;
@@ -1879,10 +1886,7 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 			}
 
 			success = true;
-			::GlobalUnlock( hDIB);
 		}
-
-		::GlobalFree((HGLOBAL) hDIB);
 	}
 
 	g_pFullFileSystem->Close(file);
