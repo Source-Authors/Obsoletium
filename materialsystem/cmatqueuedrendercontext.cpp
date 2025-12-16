@@ -1638,38 +1638,38 @@ void CMatQueuedRenderContext::FreeIndices( uint16 *pIndices, int nIndices )
 ColorCorrectionHandle_t CMatQueuedRenderContext::AddLookup( const char *pName )
 {
 	MaterialLock_t hLock = m_pMaterialSystem->Lock();
+	RunCodeAtScopeExit(m_pMaterialSystem->Unlock( hLock ));
 	ColorCorrectionHandle_t hCC = ColorCorrectionSystem()->AddLookup( pName );
-	m_pMaterialSystem->Unlock( hLock );
 	return hCC;
 }
 
 bool CMatQueuedRenderContext::RemoveLookup( ColorCorrectionHandle_t handle )
 {
 	MaterialLock_t hLock = m_pMaterialSystem->Lock();
+	RunCodeAtScopeExit(m_pMaterialSystem->Unlock( hLock ));
 	bool bRemoved = ColorCorrectionSystem()->RemoveLookup( handle );
-	m_pMaterialSystem->Unlock( hLock );
 	return bRemoved;
 }
 
 void CMatQueuedRenderContext::LockLookup( ColorCorrectionHandle_t handle )
 {
 	MaterialLock_t hLock = m_pMaterialSystem->Lock();
+	RunCodeAtScopeExit(m_pMaterialSystem->Unlock( hLock ));
 	ColorCorrectionSystem()->LockLookup( handle );
-	m_pMaterialSystem->Unlock( hLock );
 }
 
 void CMatQueuedRenderContext::LoadLookup( ColorCorrectionHandle_t handle, const char *pLookupName )
 {
 	MaterialLock_t hLock = m_pMaterialSystem->Lock();
+	RunCodeAtScopeExit(m_pMaterialSystem->Unlock( hLock ));
 	ColorCorrectionSystem()->LoadLookup( handle, pLookupName );
-	m_pMaterialSystem->Unlock( hLock );
 }
 
 void CMatQueuedRenderContext::UnlockLookup( ColorCorrectionHandle_t handle )
 {
 	MaterialLock_t hLock = m_pMaterialSystem->Lock();
+	RunCodeAtScopeExit(m_pMaterialSystem->Unlock( hLock ));
 	ColorCorrectionSystem()->UnlockLookup( handle );
-	m_pMaterialSystem->Unlock( hLock );
 }
 
 // NOTE: These are synchronous calls!  The rendering thread is stopped, the current queue is drained and the pixels are read
@@ -1677,20 +1677,24 @@ void CMatQueuedRenderContext::UnlockLookup( ColorCorrectionHandle_t handle )
 void CMatQueuedRenderContext::ReadPixels( int x, int y, int width, int height, unsigned char *data, ImageFormat dstFormat )
 {
 	EndRender();
-	MaterialLock_t hLock = m_pMaterialSystem->Lock();
-	this->CallQueued(false);
-	g_pShaderAPI->ReadPixels( x, y, width, height, data, dstFormat );
-	m_pMaterialSystem->Unlock( hLock );
+	{
+		MaterialLock_t hLock = m_pMaterialSystem->Lock();
+		RunCodeAtScopeExit(m_pMaterialSystem->Unlock( hLock ));
+		this->CallQueued(false);
+		g_pShaderAPI->ReadPixels( x, y, width, height, data, dstFormat );
+	}
 	BeginRender();
 }
 
 void CMatQueuedRenderContext::ReadPixelsAndStretch( Rect_t *pSrcRect, Rect_t *pDstRect, unsigned char *pBuffer, ImageFormat dstFormat, int nDstStride )
 {
 	EndRender();
-	MaterialLock_t hLock = m_pMaterialSystem->Lock();
-	this->CallQueued(false);
-	g_pShaderAPI->ReadPixels( pSrcRect, pDstRect, pBuffer, dstFormat, nDstStride );
-	m_pMaterialSystem->Unlock( hLock );
+	{
+		MaterialLock_t hLock = m_pMaterialSystem->Lock();
+		RunCodeAtScopeExit(m_pMaterialSystem->Unlock( hLock ));
+		this->CallQueued(false);
+		g_pShaderAPI->ReadPixels( pSrcRect, pDstRect, pBuffer, dstFormat, nDstStride );
+	}
 	BeginRender();
 }
 
