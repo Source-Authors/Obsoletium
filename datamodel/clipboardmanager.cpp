@@ -46,8 +46,8 @@ void CClipboardManager::EmptyClipboard( bool bClearWindowsClipboard )
 	{
 		if ( ::OpenClipboard( ::GetDesktopWindow() ) )
 		{
+			RunCodeAtScopeExit(::CloseClipboard());
 			::EmptyClipboard();
-			::CloseClipboard();
 		}
 	}
 #endif
@@ -70,20 +70,20 @@ void CClipboardManager::SetClipboardData( CUtlVector< KeyValues * >& data, IClip
 
 			if ( ::OpenClipboard( ::GetDesktopWindow() ) )
 			{
+				RunCodeAtScopeExit(::CloseClipboard());
 				HANDLE hmem = ::GlobalAlloc(GMEM_MOVEABLE, textLen + 1);
 				if (hmem)
 				{
 					void *ptr = ::GlobalLock( hmem );
 					if ( ptr  )
 					{
+						RunCodeAtScopeExit(::GlobalUnlock( hmem ));
 						Q_memset( ptr, 0, textLen + 1 );
 						Q_memcpy( ptr, text, textLen );
-						::GlobalUnlock( hmem );
 
 						::SetClipboardData( CF_TEXT, hmem );
 					}
 				}
-				::CloseClipboard();
 			}
 		}
 	}
@@ -104,6 +104,7 @@ void CClipboardManager::AddToClipboardData( KeyValues *add )
 
 			if ( ::OpenClipboard( ::GetDesktopWindow() ) )
 			{
+				RunCodeAtScopeExit(::CloseClipboard());
 				::EmptyClipboard();
 
 				HANDLE hmem = ::GlobalAlloc(GMEM_MOVEABLE, textLen + 1);
@@ -112,14 +113,13 @@ void CClipboardManager::AddToClipboardData( KeyValues *add )
 					void *ptr = ::GlobalLock( hmem );
 					if ( ptr  )
 					{
+						RunCodeAtScopeExit(::GlobalUnlock( hmem ));
 						Q_memset( ptr, 0, textLen + 1 );
 						Q_memcpy( ptr, text, textLen );
-						::GlobalUnlock( hmem );
 
 						::SetClipboardData( CF_TEXT, hmem );
 					}
 				}
-				::CloseClipboard();
 			}
 		}
 	}
@@ -136,6 +136,7 @@ void CClipboardManager::GetClipboardData( CUtlVector< KeyValues * >& data )
 		// See if windows has some text since we didn't have any internally
 		if ( ::OpenClipboard( ::GetDesktopWindow() ) )
 		{
+			RunCodeAtScopeExit(::CloseClipboard());
 			HANDLE hmem = ::GetClipboardData( CF_TEXT );
 			if ( hmem )
 			{
@@ -145,18 +146,16 @@ void CClipboardManager::GetClipboardData( CUtlVector< KeyValues * >& data )
 					void *ptr = ::GlobalLock( hmem );
 					if ( ptr )
 					{
+						RunCodeAtScopeExit(::GlobalUnlock( hmem ));
 						// dimhotepus: Do not truncate copied text.
 						std::unique_ptr<char[]> buf = std::make_unique<char[]>( len + 1 );
 						memcpy( buf.get(), ptr, len );
 						buf[ len ] = '\0';
 
-						::GlobalUnlock( hmem );
-
 						data.AddToTail( new KeyValues( "ClipBoard", "text", buf.get() ) );
 					}
 				}
 			}
-			::CloseClipboard();
 		}
 	}
 #endif
