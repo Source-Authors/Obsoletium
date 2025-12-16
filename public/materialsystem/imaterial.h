@@ -294,7 +294,7 @@ inline unsigned short GetVertexElementSize( VertexElement_t element, VertexCompr
 	{
 		case VERTEX_ELEMENT_POSITION:		return ( 3 * sizeof( float ) );
 		case VERTEX_ELEMENT_NORMAL:			return ( 3 * sizeof( float ) );
-		case VERTEX_ELEMENT_COLOR:			return ( 4 * sizeof( unsigned char ) );
+		case VERTEX_ELEMENT_COLOR:			return ( 4 * sizeof( unsigned char ) ); //-V1037
 		case VERTEX_ELEMENT_SPECULAR:		return ( 4 * sizeof( unsigned char ) );
 		case VERTEX_ELEMENT_TANGENT_S:		return ( 3 * sizeof( float ) );
 		case VERTEX_ELEMENT_TANGENT_T:		return ( 3 * sizeof( float ) );
