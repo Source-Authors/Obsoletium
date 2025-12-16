@@ -3482,9 +3482,8 @@ void CMDLCache::ProcessDynamicLoad( ModelParts_t *pModelParts )
 		pModelParts->bTexturesPending = false;
 
 		// Perform the real material loads now while raw texture files are cached.
-		FOR_EACH_VEC( pModelParts->Materials, i )
+		for ( auto *pMaterial : pModelParts->Materials )
 		{
-			IMaterial* pMaterial = pModelParts->Materials[i];
 			if ( !IsErrorMaterial( pMaterial ) && pMaterial->IsPrecached() )
 			{
 				// Do a full reload to get the correct textures and computed flags
@@ -3517,9 +3516,9 @@ void CMDLCache::CleanupDynamicLoad( CleanupModelParts_t *pCleanup )
 	Assert( IsPC() && ThreadInMainThread() );
 
 	// remove extra material refs, unload cached files
-	FOR_EACH_VEC( pCleanup->Materials, i )
+	for ( auto *pMaterial : pCleanup->Materials )
 	{
-		pCleanup->Materials[i]->DecrementReferenceCount();
+		pMaterial->DecrementReferenceCount();
 	}
 
 	g_pFullFileSystem->DestroyFileCache( pCleanup->hFileCache );

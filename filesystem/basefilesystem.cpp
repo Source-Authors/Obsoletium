@@ -1123,9 +1123,8 @@ void CBaseFileSystem::AddMapPackFile( const char *pPath, const char *pPathID, Se
 
 	// Look through already-open packfiles in case we intentionally
 	// preserved this ZIP across a map reload via refcount holding
-	FOR_EACH_VEC( m_ZipFiles, i )
+	for ( auto *pf : m_ZipFiles )
 	{
-		CPackFile* pf = m_ZipFiles[i];
 		if ( pf && pf->m_bIsMapPath && pf->GetPath() == pathSymbol && V_stricmp( pf->m_ZipName.Get(), fullpath ) == 0 )
 		{
 			CSearchPath *sp = &m_SearchPaths[ ( addType == PATH_ADD_TO_TAIL ) ? m_SearchPaths.AddToTail() : m_SearchPaths.AddToHead() ];
@@ -3339,9 +3338,8 @@ void CBaseFileSystem::CacheAllVPKFileHashes( bool bCacheAllVPKHashes, bool bReca
 		if ( bCacheAllVPKHashes )
 		{
 			Msg( "Loaded %zd VPK file hashes from %s for pure server operation.\n", vecChunkHash.Count(), pVPK->FullPathName() );
-			FOR_EACH_VEC( vecChunkHash, j )
+			for ( auto &f : vecChunkHash )
 			{
-				ChunkHashFraction_t &f = vecChunkHash[j];
 				m_FileTracker2.AddFileHashForVPKFile( f.m_nPackFileNumber, f.m_nFileFraction, f.m_cbChunkLen, f.m_md5contents, fhandle );
 			}
 		}
@@ -3417,9 +3415,9 @@ void CBaseFileSystem::RegisterFileWhitelist( IPureServerWhitelist *pWhiteList, I
 	}
 
 	// update which search paths are considered trusted
-	FOR_EACH_VEC( m_SearchPaths, i )
+	for ( auto &path : m_SearchPaths )
 	{
-		SetSearchPathIsTrustedSource( &m_SearchPaths[i] );
+		SetSearchPathIsTrustedSource( &path );
 	}
 
 	// See if we need to reload any files
@@ -3678,9 +3676,9 @@ bool CBaseFileSystem::IsDirectory( const char *pFileName, const char *pathID )
 			CUtlStringList outDir, outFile;
 			pSearchPath->GetPackedStore()->GetFileAndDirLists( outDir, outFile, false );
 
-			FOR_EACH_VEC( outDir, i )
+			for ( auto *dir : outDir )
 			{
-				if ( !V_stricmp( outDir[i], pFileName ) )
+				if ( !V_stricmp( dir, pFileName ) )
 					return true;
 			}
 		}

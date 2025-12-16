@@ -571,11 +571,12 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		CUtlStringList vecPaths;
 		vecPaths.EnsureCapacity(2);
 		V_SplitString( pszExtraSearchPath, ",", vecPaths );
-		FOR_EACH_VEC( vecPaths, idxExtraPath )
+		for ( auto *path : vecPaths )
 		{
 			char szAbsSearchPath[MAX_PATH];
-			Q_StripPrecedingAndTrailingWhitespace( vecPaths[ idxExtraPath ] );
-			V_MakeAbsolutePath( szAbsSearchPath, vecPaths[ idxExtraPath ], baseDir );
+
+			Q_StripPrecedingAndTrailingWhitespace( path );
+			V_MakeAbsolutePath( szAbsSearchPath, path, baseDir );
 			V_FixSlashes( szAbsSearchPath );
 
 			if ( !V_RemoveDotSlashes( szAbsSearchPath ) )
@@ -721,17 +722,17 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		CUtlStringList vecPathIDs;
 		vecPathIDs.EnsureCapacity(2);
 		V_SplitString( pCur->GetName(), "+", vecPathIDs );
-		FOR_EACH_VEC( vecPathIDs, idxPathID )
+		for ( auto *path : vecPathIDs )
 		{
-			Q_StripPrecedingAndTrailingWhitespace( vecPathIDs[ idxPathID ] );
+			Q_StripPrecedingAndTrailingWhitespace( path );
 		}
 
 		// Mount them.
-		FOR_EACH_VEC( vecFullLocationPaths, idxLocation )
+		for ( auto *path : vecFullLocationPaths )
 		{
-			FOR_EACH_VEC( vecPathIDs, idxPathID )
+			for ( auto *pathId : vecPathIDs )
 			{
-				FileSystem_AddLoadedSearchPath( initInfo, vecPathIDs[ idxPathID ], vecFullLocationPaths[ idxLocation ], bLowViolence );
+				FileSystem_AddLoadedSearchPath( initInfo, pathId, path, bLowViolence );
 			}
 		}
 	}

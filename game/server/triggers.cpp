@@ -4976,11 +4976,11 @@ void CTriggerApplyImpulse::Spawn()
 void CTriggerApplyImpulse::InputApplyImpulse( inputdata_t& )
 {
 	Vector vecImpulse = m_flForce * m_vecImpulseDir;
-	FOR_EACH_VEC( m_hTouchingEntities, i )
+	for ( auto &e : m_hTouchingEntities )
 	{
-		if ( m_hTouchingEntities[i] )
+		if ( e )
 		{
-			m_hTouchingEntities[i]->ApplyAbsVelocityImpulse( vecImpulse );
+			e->ApplyAbsVelocityImpulse( vecImpulse );
 		}
 	}
 }

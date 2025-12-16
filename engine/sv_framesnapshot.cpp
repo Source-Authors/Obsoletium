@@ -209,9 +209,8 @@ void CFrameSnapshotManager::RemoveEntityReference( PackedEntityHandle_t handle )
 		m_PackedEntitiesPool.Free( packedEntity );
 
 		// if we have a uncompression cache, remove reference too
-		FOR_EACH_VEC( m_PackedEntityCache, i )
+		for ( auto &pdc : m_PackedEntityCache )
 		{
-			UnpackedDataCache_t &pdc = m_PackedEntityCache[i];
 			if ( pdc.pEntity == packedEntity )
 			{
 				pdc.pEntity = NULL;
@@ -385,10 +384,10 @@ UnpackedDataCache_t *CFrameSnapshotManager::GetCachedUncompressedEntity( PackedE
 		m_nPackedEntityCacheCounter = 0;
 		m_PackedEntityCache.SetCount( 128 );
 
-		FOR_EACH_VEC( m_PackedEntityCache, i )
+		for ( auto &c : m_PackedEntityCache )
 		{
-			m_PackedEntityCache[i].pEntity = NULL;
-			m_PackedEntityCache[i].counter = 0;
+			c.pEntity = NULL;
+			c.counter = 0;
 		}
 	}
 
@@ -399,21 +398,19 @@ UnpackedDataCache_t *CFrameSnapshotManager::GetCachedUncompressedEntity( PackedE
 	int oldestValue = m_nPackedEntityCacheCounter;
 
 
-	FOR_EACH_VEC( m_PackedEntityCache, i )
+	for ( auto &pdc : m_PackedEntityCache )
 	{
-		UnpackedDataCache_t *pdc = &m_PackedEntityCache[i];
-
-		if ( pdc->pEntity == packedEntity )
+		if ( pdc.pEntity == packedEntity )
 		{
 			// hit, found it, update counter
-			pdc->counter = m_nPackedEntityCacheCounter;
-			return pdc;
+			pdc.counter = m_nPackedEntityCacheCounter;
+			return &pdc;
 		}
 
-		if( pdc->counter < oldestValue )
+		if( pdc.counter < oldestValue )
 		{
-			oldestValue = pdc->counter;
-			pdcOldest = pdc;
+			oldestValue = pdc.counter;
+			pdcOldest = &pdc;
 		}
 	}
 
