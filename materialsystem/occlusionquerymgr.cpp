@@ -59,23 +59,23 @@ void COcclusionQueryMgr::FlushQuery( OcclusionQueryObjectHandle_t hOcclusionQuer
 {
 	// Flush out any previous queries
 	intp h = (intp)hOcclusionQuery;
+	ShaderAPIOcclusionQuery_t hQuery = nullptr;
 	
-	m_Mutex.Lock();
-
-	const auto &object = m_OcclusionQueryObjects[h];
-	if ( object.m_bHasBeenIssued[nIndex] )
 	{
-		ShaderAPIOcclusionQuery_t hQuery = object.m_QueryHandle[nIndex];
-		
-		m_Mutex.Unlock();
-		
+		AUTO_LOCK( m_Mutex );
+
+		const auto &object = m_OcclusionQueryObjects[h];
+		if ( object.m_bHasBeenIssued[nIndex] )
+		{
+			hQuery = object.m_QueryHandle[nIndex];
+		}
+	}
+
+	if ( hQuery )
+	{
 		// dimhotepus: Slow, may cause wait for a long.
 		while ( OCCLUSION_QUERY_RESULT_PENDING == g_pShaderAPI->OcclusionQuery_GetNumPixelsRendered( hQuery, true ) )
 			continue;
-	}
-	else
-	{
-		m_Mutex.Unlock();
 	}
 }
 
