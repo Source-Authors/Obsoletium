@@ -1586,7 +1586,7 @@ CScopeGuardLambdaImpl< LambdaType > MakeScopeGuardLambda( LambdaType&& lambda )
 }
 
 //--------------------------------------------------------------------------------------------------
-#define RunLambdaAtScopeExit2( VarName, ... )		const auto VarName( MakeScopeGuardLambda( __VA_ARGS__ ) ); (void)VarName
+#define RunLambdaAtScopeExit2( VarName, ... )		[[maybe_unused]] const auto VarName( MakeScopeGuardLambda( __VA_ARGS__ ) );
 #define RunLambdaAtScopeExit( ... )					RunLambdaAtScopeExit2( UNIQUE_ID, __VA_ARGS__ )
 #define RunCodeAtScopeExit( ... )					RunLambdaAtScopeExit( [&]() { __VA_ARGS__ ; } )
 
