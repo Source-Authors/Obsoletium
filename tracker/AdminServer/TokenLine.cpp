@@ -45,7 +45,7 @@ bool TokenLine::SetLine(const char * newLine)
 	
 	while (*charPointer && (m_tokenNumber < MAX_LINE_TOKENS))
 	{
-		while (*charPointer && ((*charPointer <= 32) || (*charPointer > 126)))
+		while (*charPointer && ((*charPointer <= ' ') || (*charPointer > '~')))
 			charPointer++;
 
 		if (*charPointer)
@@ -62,7 +62,7 @@ bool TokenLine::SetLine(const char * newLine)
 			}
 			else 
 			{
-				while (*charPointer && ((*charPointer > 32) && (*charPointer <= 126)))
+				while (*charPointer && ((*charPointer > ' ') && (*charPointer <= '~')))
 					charPointer++;
 			}
 
