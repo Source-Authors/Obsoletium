@@ -60,7 +60,7 @@
 	// fourth byte
 	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 24) & 0xFF );
 	// fifth byte
-	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 32) & 0xFF );
+	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 32) & 0xFF ); //-V112
 	// sixth byte
 	hash = ( hash << 5 ) + hash + static_cast<unsigned char>( (n >> 40) & 0xFF );
 	// seventh byte

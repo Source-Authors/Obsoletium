@@ -84,7 +84,7 @@ enum DmPhase_t
 //-----------------------------------------------------------------------------
 enum DmFileId_t
 {
-	DMFILEID_INVALID = 0xffffffff
+	DMFILEID_INVALID = 0xffffffff //-V112
 };
 
 //-----------------------------------------------------------------------------
@@ -92,7 +92,7 @@ enum DmFileId_t
 //-----------------------------------------------------------------------------
 enum DmAttributeHandle_t
 {  
-	DMATTRIBUTE_HANDLE_INVALID = 0xffffffff
+	DMATTRIBUTE_HANDLE_INVALID = 0xffffffff //-V112
 };
 
 //-----------------------------------------------------------------------------

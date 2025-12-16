@@ -40,7 +40,7 @@ public:
 		FILE_CLEAR_RECENT	= 0x40,
 		FILE_EXIT	= 0x80,
 
-		FILE_ALL = 0xFFFFFFFF
+		FILE_ALL = 0xFFFFFFFF //-V112
 	};
 
 	// Logically OR together all items that should be enabled

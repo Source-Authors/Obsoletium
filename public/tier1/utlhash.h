@@ -167,7 +167,7 @@ template<class Data, typename C, typename K>
 inline intp CUtlHash<Data, C, K>::GetBucketIndex( UtlHashHandle_t handle ) const
 {
 #ifdef PLATFORM_64BITS
-	return ( ( ( handle >> 32 ) & 0x00000000ffffffffLL ) );
+	return ( ( ( handle >> 32 ) & 0x00000000ffffffffLL ) ); //-V112
 #else
 	return ( ( ( handle >> 16 ) & 0x0000ffff ) );
 #endif
@@ -180,7 +180,7 @@ template<class Data, typename C, typename K>
 inline intp CUtlHash<Data, C, K>::GetKeyDataIndex( UtlHashHandle_t handle ) const
 {
 #ifdef PLATFORM_64BITS
-	return ( handle & 0x00000000ffffffffLL );
+	return ( handle & 0x00000000ffffffffLL ); //-V112
 #else
 	return ( handle & 0x0000ffff );
 #endif
@@ -203,7 +203,7 @@ inline UtlHashHandle_t CUtlHash<Data, C, K>::BuildHandle( intp ndxBucket, intp n
 	UtlHashHandle_t handle = ndxKeyData;
 	
 #ifdef PLATFORM_64BITS
-	handle |= ( ndxBucket << 32 );
+	handle |= ( ndxBucket << 32 ); //-V112
 #else
 	handle |= ( ndxBucket << 16 );
 #endif
@@ -753,7 +753,7 @@ public:
 
 		if ( NUM_BUCKETS <= UINT_MAX )
 		{
-			hash ^= ( hash >> 32 );
+			hash ^= ( hash >> 32 ); //-V112
 		}
 #else
 		intp hash = HashIntConventional( key );

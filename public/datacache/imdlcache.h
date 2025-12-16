@@ -99,7 +99,7 @@ enum MDLCacheFlush_t
 	MDLCACHE_FLUSH_VERTEXES         = 0x40,
 
 	MDLCACHE_FLUSH_IGNORELOCK       = 0x80000000,
-	MDLCACHE_FLUSH_ALL              = 0xFFFFFFFF
+	MDLCACHE_FLUSH_ALL              = 0xFFFFFFFF //-V112
 };
 
 /*

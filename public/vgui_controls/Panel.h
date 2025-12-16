@@ -111,7 +111,7 @@ public:
 #if defined( VGUI_USEKEYBINDINGMAPS )
 enum KeyBindingContextHandle_t
 {
-	INVALID_KEYBINDINGCONTEXT_HANDLE = 0xffffffff,
+	INVALID_KEYBINDINGCONTEXT_HANDLE = 0xffffffff, //-V112
 };
 #endif
 

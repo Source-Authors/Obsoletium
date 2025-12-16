@@ -48,7 +48,7 @@ enum HDRType_t
 enum VertexCompressionType_t
 {
 	// This indicates an uninitialized VertexCompressionType_t value
-	VERTEX_COMPRESSION_INVALID = 0xFFFFFFFF,
+	VERTEX_COMPRESSION_INVALID = 0xFFFFFFFF, //-V112
 
 	// 'VERTEX_COMPRESSION_NONE' means that no elements of a vertex are compressed
 	VERTEX_COMPRESSION_NONE = 0,
