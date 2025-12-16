@@ -97,7 +97,7 @@ template<typename T>
 inline T* RetAddRef( T *p ) { p->AddRef(); return p; }
 
 template<typename T>
-inline T* InlineAddRef( T *p ) { p->AddRef(); return p; }
+inline T* InlineAddRef( T *p ) { p->AddRef(); return p; } //-V524
 
 
 // A class to both hold a pointer to an object and its reference.  Base exists
