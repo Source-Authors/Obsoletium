@@ -640,11 +640,14 @@ void CBlockingFileIOPanel::Paint()
 				h.m_flCurrent = 0.0f;
 			}
 
+	{
 			// Grab mutex (prevents async thread from filling in even more data...)
 			list->LockMutex();
+		// Finished
+		RunCodeAtScopeExit( list->UnlockMutex() );
+
+		for ( auto j = list->First() ; j != list->InvalidIndex(); j = list->Next( j ) )
 		{
-			for ( int j = list->First() ; j != list->InvalidIndex(); j = list->Next( j ) )
-			{
 				const FileBlockingItem& item = list->Get( j );
 
 				m_History[ item.m_ItemType ].m_flCurrent += item.m_flElapsed;
@@ -676,8 +679,6 @@ void CBlockingFileIOPanel::Paint()
 			}
 			list->Reset();
 		}
-		// Finished
-		list->UnlockMutex();
 
 		// Now draw some bars...
 		int itemHeight = ( vgui::surface()->GetFontTall( m_hFont ) + 2 );
