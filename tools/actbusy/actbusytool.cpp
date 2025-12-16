@@ -1154,7 +1154,10 @@ void CActBusyTool::ShowToolWindow( Panel *tool, const char *toolName, bool visib
 	{
 		ToolWindow *tw = dynamic_cast< ToolWindow * >( tool->GetParent()->GetParent() );
 		Assert( tw );
-		tw->RemovePage( tool );
+		if ( tw )
+		{
+			tw->RemovePage( tool );
+		}
 	}
 }
 
