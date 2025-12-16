@@ -42,7 +42,7 @@ public:
 	// Writing functions
 	void			WriteByte(unsigned char c);
 	void			WriteShort(short c);
-	void			WriteLong(int c);
+	void			WriteLong(int32 c);
 	void			WriteFloat(float f);
 	void			WriteString(const char *s);
 	void			WriteBuf(intp iSize, IN_Z_CAP(iSize) const void *buf);

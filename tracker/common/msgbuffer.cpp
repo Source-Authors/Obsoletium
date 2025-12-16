@@ -165,11 +165,11 @@ void CMsgBuffer::WriteShort ( short c )
 // Purpose: 
 // Input  : c - 
 //-----------------------------------------------------------------------------
-void CMsgBuffer::WriteLong (int c)
+void CMsgBuffer::WriteLong (int32 c)
 {
 	unsigned char    *buf;
 	
-	buf = (unsigned char *)GetSpace( 4 );
+	buf = (unsigned char *)GetSpace( sizeof(c) );
 	buf[0] = c&0xff;
 	buf[1] = (c>>8)&0xff;
 	buf[2] = (c>>16)&0xff;
@@ -189,7 +189,7 @@ void CMsgBuffer::WriteFloat (float f)
 	} dat;
 	
 	dat.f = f;
-	Write( &dat.l, 4 );
+	Write( &dat.l, sizeof(dat.l) );
 }
 
 //-----------------------------------------------------------------------------
@@ -277,9 +277,9 @@ int CMsgBuffer::ReadShort (void)
 //-----------------------------------------------------------------------------
 int CMsgBuffer::ReadLong (void)
 {
-	int     c;
+	int32     c;
 	
-	if (m_nReadCount+4 > m_nCurSize)
+	if (m_nReadCount+static_cast<intp>(sizeof(c)) > m_nCurSize)
 	{
 		m_bBadRead = true;
 		return -1;
@@ -290,7 +290,7 @@ int CMsgBuffer::ReadLong (void)
 	+ (m_rgData[m_nReadCount+2]<<16)
 	+ (m_rgData[m_nReadCount+3]<<24);
 	
-	m_nReadCount += 4;
+	m_nReadCount += sizeof(c);
 	
 	return c;
 }
@@ -303,7 +303,7 @@ float CMsgBuffer::ReadFloat (void)
 {
 	union
 	{
-		unsigned char    b[4];
+		unsigned char    b[4]; //-V112
 		float   f;
 	} dat;
 	
@@ -311,7 +311,7 @@ float CMsgBuffer::ReadFloat (void)
 	dat.b[1] =      m_rgData[m_nReadCount+1];
 	dat.b[2] =      m_rgData[m_nReadCount+2];
 	dat.b[3] =      m_rgData[m_nReadCount+3];
-	m_nReadCount += 4;
+	m_nReadCount += sizeof(dat);
 	return dat.f;   
 }
 
