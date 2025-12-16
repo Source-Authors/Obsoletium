@@ -1135,7 +1135,8 @@ public:
 // 			}
 #endif
 			FourVectors Position;
-			Position.LoadAndSwizzleAligned(dst[0].m_vecPosition,dst[1].m_vecPosition,dst[2].m_vecPosition,dst[3].m_vecPosition);
+			// dimhotepus: LoadAndSwizzleAligned -> LoadAndSwizzle
+			Position.LoadAndSwizzle(dst[0].m_vecPosition,dst[1].m_vecPosition,dst[2].m_vecPosition,dst[3].m_vecPosition);
 			FourVectors Normal(dst[0].m_vecNormal,dst[1].m_vecNormal,dst[2].m_vecNormal,dst[3].m_vecNormal);
 			FourVectors Color;
 			g_StudioRender.R_ComputeLightAtPoints3( Position, Normal, Color);
@@ -1166,7 +1167,8 @@ public:
 		else if ( nLighting == LIGHTING_MOUTH )
 		{
 			FourVectors Position;
-			Position.LoadAndSwizzleAligned(dst[0].m_vecPosition,dst[1].m_vecPosition,dst[2].m_vecPosition,dst[3].m_vecPosition);
+			// dimhotepus: LoadAndSwizzleAligned -> LoadAndSwizzle
+			Position.LoadAndSwizzle(dst[0].m_vecPosition,dst[1].m_vecPosition,dst[2].m_vecPosition,dst[3].m_vecPosition);
 			FourVectors Normal(dst[0].m_vecNormal,dst[1].m_vecNormal,dst[2].m_vecNormal,dst[3].m_vecNormal);
 			FourVectors Color;
 

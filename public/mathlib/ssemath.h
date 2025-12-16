@@ -1905,13 +1905,30 @@ public:
 	//	// x y z ?
 	//	TransposeSIMD( x, y, z, w );
 	//}
-
+	
+	// dimhotepus: It is not aligned actually :(.
 	FORCEINLINE void LoadAndSwizzleAligned(Vector const &a, Vector const &b, Vector const &c, Vector const &d)
 	{
+		// dimhotepus: It was expected to be aligned initially which is too unsafe. 
 		x		= DirectX::XMLoadFloat3( a.XmBase() );
 		y		= DirectX::XMLoadFloat3( b.XmBase() );
 		z		= DirectX::XMLoadFloat3( c.XmBase() );
 		fltx4 w = DirectX::XMLoadFloat3( d.XmBase() );
+		// now, matrix is:
+		// x y z ?
+		// x y z ?
+		// x y z ?
+		// x y z ?
+		TransposeSIMD( x, y, z, w );
+	}
+
+	// dimhotepus: Accept VectorAligned instead of Vector.
+	FORCEINLINE void LoadAndSwizzleAligned(VectorAligned const &a, VectorAligned const &b, VectorAligned const &c, VectorAligned const &d)
+	{
+		x		= LoadAlignedSIMD( a );
+		y		= LoadAlignedSIMD( b );
+		z		= LoadAlignedSIMD( c );
+		fltx4 w = LoadAlignedSIMD( d );
 		// now, matrix is:
 		// x y z ?
 		// x y z ?

@@ -56,21 +56,22 @@ void RayTracingEnvironment::RenderScene(
 	RayTraceLightingMode_t lmode)
 {
 	// first, compute deltas
-	Vector dxvector=URCorner;
+	VectorAligned dxvector(URCorner);
 	dxvector-=ULCorner;
 	dxvector*=(1.0f/width);
-	Vector dxvectortimes2=dxvector;
+	VectorAligned dxvectortimes2(dxvector);
 	dxvectortimes2+=dxvector;
 
 	// dimhotepus: Fix y delta computation.
-	Vector dyvector=LRCorner;
+	VectorAligned dyvector(LRCorner);
 	dyvector-=LLCorner;
 	dyvector*=(1.0f/height);
 
 
 	// block_offsets-relative offsets for eahc of the 4 pixels in the block, in sse format
 	FourVectors block_offsets;
-	block_offsets.LoadAndSwizzle(Vector(0,0,0),dxvector,dyvector,dxvector+dyvector);
+	// dimhotepus: LoadAndSwizzle -> LoadAndSwizzleAligned
+	block_offsets.LoadAndSwizzleAligned(VectorAligned(0,0,0),dxvector,dyvector,VectorAligned(dxvector+dyvector));
 	
 	FourRays myrays;
 	myrays.origin.DuplicateVector(CameraOrigin);
@@ -82,7 +83,7 @@ void RayTracingEnvironment::RenderScene(
 	// now, we will ray trace pixels. we will do the rays in a 2x2 pattern
 	for(int y=0;y<height;y+=2)
 	{
-		Vector SLoc=dyvector;
+		VectorAligned SLoc(dyvector);
 		SLoc*=((float) y);
 		SLoc+=ULCorner;
 		uint32 *dest=output_buffer+y*stride;
