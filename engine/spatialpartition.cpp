@@ -2542,20 +2542,23 @@ void CSpatialPartition::InvokeQueryCallbacks( SpatialPartitionListMask_t listMas
 //-----------------------------------------------------------------------------
 SpatialPartitionHandle_t CSpatialPartition::CreateHandle( IHandleEntity *pHandleEntity )
 {
-	m_HandlesMutex.Lock();
-	SpatialPartitionHandle_t hPartition = m_aHandles.AddToTail();
-	m_HandlesMutex.Unlock();
-	m_aHandles[hPartition].m_pHandleEntity = pHandleEntity;
-	m_aHandles[hPartition].m_vecMin.Init( FLT_MAX, FLT_MAX, FLT_MAX );
-	m_aHandles[hPartition].m_vecMax.Init( FLT_MIN, FLT_MIN, FLT_MIN );
-	m_aHandles[hPartition].m_fList = 0;
-	m_aHandles[hPartition].m_flags = 0;
+	// dimhotepus: Lock should live till end of m_aHandles modification as DestroyHandle may cause data race.
+	AUTO_LOCK(m_HandlesMutex);
+
+	const SpatialPartitionHandle_t hPartition = m_aHandles.AddToTail();
+	auto &handle = m_aHandles[hPartition];
+
+	handle.m_pHandleEntity = pHandleEntity;
+	handle.m_vecMin.Init( FLT_MAX, FLT_MAX, FLT_MAX );
+	handle.m_vecMax.Init( FLT_MIN, FLT_MIN, FLT_MIN );
+	handle.m_fList = 0;
+	handle.m_flags = 0;
 
 	for ( int i = 0; i < NUM_TREES; i++ )
 	{
-		m_aHandles[hPartition].m_nVisitBit[i] = 0xffff;
-		m_aHandles[hPartition].m_nLevel[i] = (uint8)-1;
-		m_aHandles[hPartition].m_iLeafList[i] = CLeafList::InvalidIndex();
+		handle.m_nVisitBit[i] = 0xffff;
+		handle.m_nLevel[i] = (uint8)-1;
+		handle.m_iLeafList[i] = CLeafList::InvalidIndex();
 	}
 	
 	return hPartition;
@@ -2571,10 +2574,10 @@ void CSpatialPartition::DestroyHandle( SpatialPartitionHandle_t hPartition )
 	if ( hPartition != PARTITION_INVALID_HANDLE )
 	{
 		RemoveFromTree( hPartition );
-		m_HandlesMutex.Lock();
+
+		AUTO_LOCK(m_HandlesMutex);
 //		memset( &m_aHandles[hPartition], 0xcd, sizeof(EntityInfo_t) );
 		m_aHandles.Remove( hPartition );
-		m_HandlesMutex.Unlock();
 	}
 }
 
@@ -2653,9 +2656,8 @@ void CSpatialPartition::UnhideElement( SpatialPartitionHandle_t handle, SpatialT
 {
 	Assert( m_aHandles.IsValidIndex( handle ) );
 
-	m_HandlesMutex.Lock();
+	AUTO_LOCK(m_HandlesMutex);
 	m_aHandles[handle].m_flags &= ~ENTITY_HIDDEN;
-	m_HandlesMutex.Unlock();
 }
 
 
@@ -2666,10 +2668,8 @@ void CSpatialPartition::UnhideElement( SpatialPartitionHandle_t handle, SpatialT
 SpatialTempHandle_t CSpatialPartition::HideElement( SpatialPartitionHandle_t handle )
 {
 	Assert( m_aHandles.IsValidIndex( handle ) );
-	m_HandlesMutex.Lock();
+	AUTO_LOCK(m_HandlesMutex);
 	m_aHandles[handle].m_flags |= ENTITY_HIDDEN;
-	m_HandlesMutex.Unlock();
-
 	return 1;
 }
 
