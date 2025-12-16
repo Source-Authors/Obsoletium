@@ -23,7 +23,7 @@ struct characterset_t
 	{
 		for (auto ch : char_set)
 		{
-			set[static_cast<char_type>(ch)] = true;
+			set[static_cast<char_type>(ch)] = 1;
 		}
 	 }
 
