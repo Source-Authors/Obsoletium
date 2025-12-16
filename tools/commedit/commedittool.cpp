@@ -590,7 +590,11 @@ void CCommEditTool::OnDefaultLayout()
 	ToolWindow *pEntityReportWindow = m_ToolWindowFactory.InstanceToolWindow( GetClientArea(), false, pEntityReport, "#CommEditEntityReport", false );
 
 	ToolWindow *pMiniViewport = dynamic_cast< ToolWindow* >( GetMiniViewport() );
-	pMiniViewport->AddPage( pConsole, "#BxConsole", false );
+	Assert(pMiniViewport);
+	if ( pMiniViewport )
+	{
+		pMiniViewport->AddPage( pConsole, "#BxConsole", false );
+	}
 
 	int halfScreen = usew / 2;
 	int bottom = useh - y;
@@ -755,7 +759,10 @@ void CCommEditTool::ShowToolWindow( Panel *tool, char const *toolName, bool visi
 	{
 		ToolWindow *tw = dynamic_cast< ToolWindow * >( tool->GetParent()->GetParent() );
 		Assert( tw );
-		tw->RemovePage( tool );
+		if (tw)
+		{
+			tw->RemovePage( tool );
+		}
 	}
 }
 
