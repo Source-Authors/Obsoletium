@@ -240,6 +240,34 @@ constexpr inline bool IsPowerOfTwo(T value) noexcept {
   return (value & (value - static_cast<T>(1))) == T{};
 }
 
+/**
+ * @brief Reference cast.
+ * @tparam R Result type.
+ * @tparam T Source type.
+ * @param ref Reference to cast from.
+ * @return Reference to cast to.
+ */
+template <typename R, typename T>
+[[nodiscard]] inline R& reference_cast(T& ref) noexcept {
+  static_assert(sizeof(T) == sizeof(R));
+  static_assert(alignof(T) == alignof(R));
+  return *reinterpret_cast<R*>(&ref);
+}
+
+/**
+ * @brief Reference cast.
+ * @tparam R Result type.
+ * @tparam T Source type.
+ * @param ref Reference to cast from.
+ * @return Reference to cast to.
+ */
+template <typename R, typename T>
+[[nodiscard]] inline const R& reference_cast(const T& ref) noexcept {
+  static_assert(sizeof(T) == sizeof(R));
+  static_assert(alignof(T) == alignof(R));
+  return *reinterpret_cast<const R*>(&ref);
+}
+
 // dimhotepus: ssize support.
 #ifdef __cpp_lib_ssize
 // C++20 ssize
