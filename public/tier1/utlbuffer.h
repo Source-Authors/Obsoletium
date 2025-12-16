@@ -203,12 +203,12 @@ public:
 	template<typename T>
 	std::enable_if_t<!std::is_pointer_v<T>, bool> Get( T &mem )
 	{
-		return Get( &mem, static_cast<intp>(sizeof(T)) );
+		return Get( &mem, static_cast<intp>(sizeof(T)) ); //-V2002
 	}
 	template<typename T, intp size>
 	bool Get( T (&mem)[size] )
 	{
-		return Get( &mem, static_cast<intp>(sizeof(T)) * size );
+		return Get( &mem, static_cast<intp>(sizeof(T)) * size ); //-V2002
 	}
 	void GetLine( char* pLine, intp nMaxChars = 0 );
 	template<intp maxSize>
@@ -315,7 +315,7 @@ public:
 	template<typename T> 
 	std::enable_if_t<!std::is_pointer_v<T>> Put( const T &pMem )
 	{
-		Put( &pMem, static_cast<intp>( sizeof(pMem) ) );
+		Put( &pMem, static_cast<intp>( sizeof(pMem) ) ); //-V2002
 	}
 
 	// Used for putting objects that have a byteswap datadesc defined
@@ -1151,7 +1151,7 @@ inline void	CUtlBuffer::CopyBuffer( const void *pubData, intp cubData )
 	Clear();
 	if ( cubData )
 	{
-		Put( pubData, cubData );
+		Put( pubData, cubData ); //-V2002
 	}
 }
 

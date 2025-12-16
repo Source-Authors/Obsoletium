@@ -2666,7 +2666,7 @@ FORCEINLINE float XM_CALLCONV VectorNormalize( Vector& vec )
 
 	DirectX::XMStoreFloat3( vec.XmBase(), val );
 
-	return DirectX::XMVectorGetX( len );
+	return DirectX::XMVectorGetX( len ); //-V2002
 }
 
 [[nodiscard]] FORCEINLINE float XM_CALLCONV VectorNormalize( DirectX::XMFLOAT4 *v )
@@ -2683,7 +2683,7 @@ FORCEINLINE float XM_CALLCONV VectorNormalize( Vector& vec )
 
 	DirectX::XMStoreFloat4( v, val );
 	
-	return DirectX::XMVectorGetX( len );
+	return DirectX::XMVectorGetX( len ); //-V2002
 }
 
 // FIXME: Obsolete version of VectorNormalize, once we remove all the friggin float*s
