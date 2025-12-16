@@ -133,7 +133,7 @@ bool CCommEditDoc::LoadFromFile( const char *pFileName )
 			m_pTXTFileName[0] = 0;
 			vgui::MessageBox *pMessageBox = new vgui::MessageBox( "Unable to overwrite file!\n", pBuf, g_pCommEditTool );
 			pMessageBox->DoModal( );
-			return false;
+			return false; //-V773
 		}
 
 		DmFileId_t fileid = g_pDataModel->FindOrCreateFileId( m_pTXTFileName );
@@ -155,7 +155,7 @@ bool CCommEditDoc::LoadFromFile( const char *pFileName )
 			m_pTXTFileName[0] = 0;
 			vgui::MessageBox *pMessageBox = new vgui::MessageBox( "Bad file name!\n", pBuf, g_pCommEditTool );
 			pMessageBox->DoModal( );
-			return false;
+			return false; //-V773
 		}
 
 		// Clip off the "_commentary" at the end of the filename
