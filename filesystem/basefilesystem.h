@@ -558,6 +558,8 @@ public:
 		  : m_iCurrent( -1 ),
 			m_PathTypeFilter( pathTypeFilter )
 		{
+			m_Filename[0] = '\0';
+
 			char tempPathID[MAX_PATH];
 			if ( *ppszFilename && (*ppszFilename)[0] == '/' && (*ppszFilename)[1] == '/' ) // ONLY '//' (and not '\\') for our special format
 			{
@@ -576,9 +578,9 @@ public:
 			if ( *ppszFilename && !Q_IsAbsolutePath( *ppszFilename ) )
 			{
 				{
-				// Copy paths to minimize mutex lock time
+					// Copy paths to minimize mutex lock time
 					AUTO_LOCK( pFileSystem->m_SearchPathsMutex );
-				CopySearchPaths( pFileSystem->m_SearchPaths );
+					CopySearchPaths( pFileSystem->m_SearchPaths );
 				}
 
 				pFileSystem->FixUpPath ( *ppszFilename, m_Filename );
@@ -591,7 +593,6 @@ public:
 				m_EmptySearchPath.m_pPathIDInfo = &m_EmptyPathIDInfo;
 				m_EmptySearchPath.SetPath( m_pathID );
 				m_EmptySearchPath.m_storeId = -1;
-				m_Filename[0] = '\0';
 			}
 		}
 
@@ -609,9 +610,9 @@ public:
 			}
 
 			{
-			// Copy paths to minimize mutex lock time
+				// Copy paths to minimize mutex lock time
 				AUTO_LOCK( pFileSystem->m_SearchPathsMutex );
-			CopySearchPaths( pFileSystem->m_SearchPaths );
+				CopySearchPaths( pFileSystem->m_SearchPaths );
 			}
 
 			m_Filename[0] = '\0';
