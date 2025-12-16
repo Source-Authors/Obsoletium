@@ -332,9 +332,8 @@ void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const cha
 	if ( !key || !key[ 0 ] )
 		return;
 
-	char *pszKey = V_strdup( key );
-	if ( !pszKey )
-		return;
+	// dimhotepus: Allocate on stack for performance.
+	V_strdup_stack( key, pszKey );
 
 	for (intp i = 0; i < m_pKeyBindList->GetItemCount(); i++)
 	{
@@ -367,8 +366,6 @@ void COptionsSubKeyboard::RemoveKeyFromBindItems( KeyValues *org_item, const cha
 			}
 		}
 	}
-
-	delete [] pszKey;
 
 	// Make sure the display is up to date
 	m_pKeyBindList->InvalidateLayout();
