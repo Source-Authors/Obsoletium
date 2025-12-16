@@ -1688,7 +1688,7 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 				physcollision->VCollideLoad( &collide, pPhysModel->solidCount, (const char *)pSrc, dataSize, false );
 			}
 
-			int *offsets = new int[ pPhysModel->solidCount ];
+			std::unique_ptr<int[]> offsets = std::make_unique<int[]>( pPhysModel->solidCount );
 
 			// Swap the collision data headers
 			for ( int i = 0; i < pPhysModel->solidCount; ++i )
@@ -1775,7 +1775,6 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 
 			// Free the memory
 			physcollision->VCollideUnload( &collide );
-			delete [] offsets;
 		}
 
 		// avoid infinite loop on badly formed file
