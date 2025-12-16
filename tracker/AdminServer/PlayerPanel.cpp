@@ -270,7 +270,7 @@ void CPlayerPanel::OnKickButtonPressed()
 	box->AddActionSignalTarget(this);
 	box->SetOKCommand(new KeyValues("KickSelectedPlayers"));
 	box->ShowWindow();
-}
+} //-V773
 
 //-----------------------------------------------------------------------------
 // Purpose: Prompts a user to be banned
@@ -294,7 +294,7 @@ void CPlayerPanel::OnBanButtonPressed()
 	if ( !strcmp( authid, "UNKNOWN" ) )
 	{
 		int s1, s2, s3, s4;
-		if (4 == sscanf(netAdr, "%d.%d.%d.%d", &s1, &s2, &s3, &s4))
+		if (4 == sscanf(netAdr, "%d.%d.%d.%d", &s1, &s2, &s3, &s4)) //-V112
 		{
 			V_sprintf_safe( buf, "%d.%d.%d.%d", s1, s2, s3, s4 );
 			authid = buf;
@@ -350,7 +350,7 @@ void CPlayerPanel::AddBanByID(const char *id, const char *newtime)
 	const char *banCmd = "banid";
 	const char *saveCmd = "writeip";
 	int s1, s2, s3, s4;
-	if (4 == sscanf(id, "%d.%d.%d.%d", &s1, &s2, &s3, &s4))
+	if (4 == sscanf(id, "%d.%d.%d.%d", &s1, &s2, &s3, &s4)) //-V112
 	{
 		banCmd = "addip";
 		saveCmd = "writeid";

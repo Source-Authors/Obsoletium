@@ -249,7 +249,7 @@ void CBanPanel::RemoveBan()
 		box->SetOKCommand(new KeyValues("removebanbyid", "id", kv->GetString("id"))); //-V2017
 		box->AddActionSignalTarget(this);
 		box->DoModal();
-	}
+	} //-V773
 }
 
 //-----------------------------------------------------------------------------
@@ -377,7 +377,7 @@ void CBanPanel::ImportBanList()
 	pFileDialog->AddFilter( "*.*", "#All_files", false );
 	pFileDialog->DoModal(true);
 	pFileDialog->Activate();
-}
+} //-V773
 
 //-----------------------------------------------------------------------------
 // Purpose: When a file is selected print out its full path in the debugger
@@ -419,5 +419,5 @@ void CBanPanel::OnFileSelected(const char *fullpath)
 [[nodiscard]] bool CBanPanel::IsIPAddress(const char *id)
 {
 	int s1, s2, s3, s4;
-	return (4 == sscanf(id, "%d.%d.%d.%d", &s1, &s2, &s3, &s4));
+	return (4 == sscanf(id, "%d.%d.%d.%d", &s1, &s2, &s3, &s4)); //-V112
 }

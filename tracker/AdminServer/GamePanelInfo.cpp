@@ -212,7 +212,7 @@ void CGamePanelInfo::OnStop()
 	box->SetOKButtonText("#Game_Stop_Server");
 	box->SetOKCommand(new KeyValues("Command", "command", "stop2"));
 	box->ShowWindow();
-}
+} //-V773
 
 //-----------------------------------------------------------------------------
 // Purpose: displays the help page

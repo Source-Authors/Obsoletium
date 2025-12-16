@@ -170,7 +170,7 @@ void CConfigPanel::OnCommand(const char *command)
 			// dimhotepus: Scale UI.
 			MessageBox *dlg = new MessageBox ("#Config_Panel", "#Config_Time_Error", this);
 			dlg->DoModal();
-		}
+		} //-V773
 	}
 	else if(!stricmp(command,"close") )
 	{
