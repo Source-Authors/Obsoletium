@@ -92,6 +92,7 @@ int GrabMip ( HANDLE hdib, unsigned char *lump_p, char *lumpname, COLORREF crf, 
 
 	/* get pointer to BITMAPINFO (Win 3.0) */
 	lpbmi = (LPBITMAPINFO)::GlobalLock((HGLOBAL)hdib);
+	RunCodeAtScopeExit(::GlobalUnlock(lpbmi));
 	unsigned char *lump_start = lump_p;
 	
 	xl = yl = 0;
@@ -175,8 +176,6 @@ int GrabMip ( HANDLE hdib, unsigned char *lump_p, char *lumpname, COLORREF crf, 
 			}	
 		}
 	}
-
-	::GlobalUnlock(lpbmi);
 
 	// Write out palette in 16bit mode
 	*(unsigned short *) lump_p = 256;	// palette size
