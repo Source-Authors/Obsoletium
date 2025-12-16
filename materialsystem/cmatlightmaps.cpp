@@ -601,6 +601,8 @@ void CMatLightmaps::InitLightmapBits( int lightmap )
 	if ( !g_pShaderAPI->TexLock( 0, 0, 0, 0, width, height, writer ) )
 		return;
 
+	RunCodeAtScopeExit(g_pShaderAPI->TexUnlock());
+
 	// Debug mode, make em green checkerboard
 	if ( writer.IsUsingFloatFormat() )
 	{
@@ -648,8 +650,6 @@ void CMatLightmaps::InitLightmapBits( int lightmap )
 			}
 		}
 	}
-
-	g_pShaderAPI->TexUnlock();
 }
 
 bool CMatLightmaps::LockLightmap( int lightmap )
