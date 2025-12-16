@@ -5352,9 +5352,13 @@ void CModelLoader::UpdateDynamicModelLoadQueue()
 	if ( m_bDynamicLoadQueueHeadActive )
 	{
 		Assert( m_DynamicModelLoadQueue.Count() >= 1 );
-		MaterialLock_t matLock = g_pMaterialSystem->Lock(); // ASDFADFASFASEGAafliejsfjaslaslgsaigas
-		bool bComplete = g_pQueuedLoader->CompleteDynamicLoad();
-		g_pMaterialSystem->Unlock(matLock);
+		bool bComplete;
+
+		{
+			MaterialLock_t matLock = g_pMaterialSystem->Lock(); // ASDFADFASFASEGAafliejsfjaslaslgsaigas
+			RunCodeAtScopeExit(g_pMaterialSystem->Unlock(matLock));
+			bComplete = g_pQueuedLoader->CompleteDynamicLoad();
+		}
 
 		if ( bComplete )
 		{
@@ -5417,8 +5421,8 @@ void CModelLoader::UpdateDynamicModelLoadQueue()
 			}
 
 			MaterialLock_t matLock = g_pMaterialSystem->Lock();
+			RunCodeAtScopeExit(g_pMaterialSystem->Unlock(matLock));
 			g_pQueuedLoader->DynamicLoadMapResource( pName, NULL, NULL, NULL );
-			g_pMaterialSystem->Unlock(matLock);
 		}
 		else
 		{
