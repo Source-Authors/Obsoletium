@@ -547,16 +547,11 @@ CBlockingFileIOPanel::CBlockingFileIOPanel( vgui::VPANEL parent ) : BaseClass( N
 	int wide, tall;
 	vgui::ipanel()->GetSize( parent, wide, tall );
 
-	int x = 2;
-	int y = 100;
-	if ( IsX360() )
-	{
-		x += XBOX_MAXBORDERSAFE * wide;
-		y += XBOX_MAXBORDERSAFE * tall;
-	}
+	int x = QuickPropScale( 2 );
+	int y = QuickPropScale( 100 );
 	SetPos( x, y );
 
-	SetSize( IO_PANEL_WIDTH, 140 );
+	SetSize( QuickPropScale( IO_PANEL_WIDTH ), QuickPropScale( 140 ) );
 
 	SetVisible( false );
 	SetCursor( 0 );
@@ -625,92 +620,90 @@ bool CBlockingFileIOPanel::ShouldDraw( void )
 //-----------------------------------------------------------------------------
 void CBlockingFileIOPanel::Paint() 
 {
-	int x = 2;
+	int x = QuickPropScale( 2 );
 	
 	int maxRecent = clamp( 0, cl_blocking_recentsize.GetInt(), 1000 );
 	int bval = cl_showblocking.GetInt();
-	if ( bval > 0 )
+	if ( bval <= 0 ) return;
+
+	IBlockingFileItemList *list = filesystem->RetrieveBlockingFileAccessInfo();
+	if ( !list ) return;
+
+	int i;
+	for ( auto &&h : m_History )
 	{
-		IBlockingFileItemList *list = filesystem->RetrieveBlockingFileAccessInfo();
-		if ( list )
-		{
-			int i;
-			for ( auto &&h : m_History )
-			{
-				h.m_flCurrent = 0.0f;
-			}
+		h.m_flCurrent = 0.0f;
+	}
 
 	{
-			// Grab mutex (prevents async thread from filling in even more data...)
-			list->LockMutex();
+		// Grab mutex (prevents async thread from filling in even more data...)
+		list->LockMutex();
 		// Finished
 		RunCodeAtScopeExit( list->UnlockMutex() );
 
 		for ( auto j = list->First() ; j != list->InvalidIndex(); j = list->Next( j ) )
 		{
-				const FileBlockingItem& item = list->Get( j );
+			const FileBlockingItem& item = list->Get( j );
 
-				m_History[ item.m_ItemType ].m_flCurrent += item.m_flElapsed;
+			m_History[ item.m_ItemType ].m_flCurrent += item.m_flElapsed;
 
-				RecentPeaks_t recent;
-				recent.time = gpGlobals->realtime;
-				recent.elapsed = item.m_flElapsed;
-				recent.fileName = item.GetFileName();
-				recent.reason = item.m_ItemType;
-				recent.ioType = item.m_nAccessType;
-				while ( m_Recent.Count() > maxRecent )
+			RecentPeaks_t recent;
+			recent.time = gpGlobals->realtime;
+			recent.elapsed = item.m_flElapsed;
+			recent.fileName = item.GetFileName();
+			recent.reason = item.m_ItemType;
+			recent.ioType = item.m_nAccessType;
+			while ( m_Recent.Count() > maxRecent )
+			{
+				m_Recent.Remove( m_Recent.Head() );
+			}
+
+			m_Recent.AddToTail( recent );
+
+			m_History[ item.m_ItemType ].m_LastFile = item.GetFileName();
+
+			// Only care about time consuming synch or async blocking calls
+			if ( item.m_ItemType == FILESYSTEM_BLOCKING_SYNCHRONOUS ||
+					item.m_ItemType == FILESYSTEM_BLOCKING_ASYNCHRONOUS_BLOCK )
+			{
+				if ( item.m_flElapsed > cl_blocking_threshold.GetFloat() )
 				{
-					m_Recent.Remove( m_Recent.Head() );
-				}
-
-				m_Recent.AddToTail( recent );
-
-				m_History[ item.m_ItemType ].m_LastFile = item.GetFileName();
-
-				// Only care about time consuming synch or async blocking calls
-				if ( item.m_ItemType == FILESYSTEM_BLOCKING_SYNCHRONOUS ||
-					 item.m_ItemType == FILESYSTEM_BLOCKING_ASYNCHRONOUS_BLOCK )
-				{
-					if ( item.m_flElapsed > cl_blocking_threshold.GetFloat() )
-					{
-						SpewItem( recent );
-					}
+					SpewItem( recent );
 				}
 			}
-			list->Reset();
 		}
+		list->Reset();
+	}
 
-		// Now draw some bars...
-		int itemHeight = ( vgui::surface()->GetFontTall( m_hFont ) + 2 );
+	// Now draw some bars...
+	int itemHeight = ( vgui::surface()->GetFontTall( m_hFont ) + QuickPropScale( 2 ) );
 
-		int y = 2;
-		int w = GetWide();
+	int y = QuickPropScale( 2 );
+	int w = GetWide();
 
-		DrawIOTime( x, y, w, itemHeight, FILESYSTEM_BLOCKING_SYNCHRONOUS, "Synchronous", Color( 255, 0, 0, 255 ) );
-		y += 2*( itemHeight + 2 );
-		DrawIOTime( x, y, w, itemHeight, FILESYSTEM_BLOCKING_ASYNCHRONOUS_BLOCK, "Async Block", Color( 255, 100, 0, 255 ) );
-		y += 2*( itemHeight + 2 );
-		DrawIOTime( x, y, w, itemHeight, FILESYSTEM_BLOCKING_CALLBACKTIMING, "Callback", Color( 255, 255, 0, 255 ) );
-		y += 2*( itemHeight + 2 );
-		DrawIOTime( x, y, w, itemHeight, FILESYSTEM_BLOCKING_ASYNCHRONOUS, "Asynchronous", Color( 0, 255, 0, 255 ) );
+	DrawIOTime( x, y, w, itemHeight, FILESYSTEM_BLOCKING_SYNCHRONOUS, "Synchronous", Color( 255, 0, 0, 255 ) );
+	y += 2*( itemHeight + QuickPropScale( 2 ) );
+	DrawIOTime( x, y, w, itemHeight, FILESYSTEM_BLOCKING_ASYNCHRONOUS_BLOCK, "Async Block", Color( 255, 100, 0, 255 ) );
+	y += 2*( itemHeight + QuickPropScale( 2 ) );
+	DrawIOTime( x, y, w, itemHeight, FILESYSTEM_BLOCKING_CALLBACKTIMING, "Callback", Color( 255, 255, 0, 255 ) );
+	y += 2*( itemHeight + QuickPropScale( 2 ) );
+	DrawIOTime( x, y, w, itemHeight, FILESYSTEM_BLOCKING_ASYNCHRONOUS, "Asynchronous", Color( 0, 255, 0, 255 ) );
 
-		for ( i = 0; i < c; ++i )
+	for ( i = 0; i < c; ++i )
+	{
+		if ( m_History[ i ].m_flCurrent > m_History[ i ].m_flHistory )
 		{
-			if ( m_History[ i ].m_flCurrent > m_History[ i ].m_flHistory )
-			{
-				m_History[ i ].m_flHistory = m_History[ i ].m_flCurrent;
-				m_History[ i ].m_flHistorySpike = m_History[ i ].m_flCurrent;
-				m_History[ i ].m_flLatchTime = gpGlobals->realtime;
-			}
-			else
-			{
-				// After this long, start to decay the previous history value
-				if ( gpGlobals->realtime > m_History[ i ].m_flLatchTime + 1.0f )
-				{
-					m_History[ i ].m_flHistory = m_History[ i ].m_flHistory * IO_DECAY_FRAC + ( 1.0f - IO_DECAY_FRAC ) * m_History[ i ].m_flCurrent;
-				}
-			}
+			m_History[ i ].m_flHistory = m_History[ i ].m_flCurrent;
+			m_History[ i ].m_flHistorySpike = m_History[ i ].m_flCurrent;
+			m_History[ i ].m_flLatchTime = gpGlobals->realtime;
 		}
+		else
+		{
+			// After this long, start to decay the previous history value
+			if ( gpGlobals->realtime > m_History[ i ].m_flLatchTime + 1.0f )
+			{
+				m_History[ i ].m_flHistory = m_History[ i ].m_flHistory * IO_DECAY_FRAC + ( 1.0f - IO_DECAY_FRAC ) * m_History[ i ].m_flCurrent;
+			}
 		}
 	}
 }
@@ -768,7 +761,7 @@ void CBlockingFileIOPanel::SpewItem( const RecentPeaks_t& item )
 	{
 		default:
 			Assert( 0 );
-			// break; -- intentionally fall through
+			[[fallthrough]];
 		case FILESYSTEM_BLOCKING_ASYNCHRONOUS:
 		case FILESYSTEM_BLOCKING_CALLBACKTIMING:
 			Msg( "%8.3f %16.16s i/o [%6.6s] took %8.3f msec:  %33.33s\n", 
@@ -782,12 +775,12 @@ void CBlockingFileIOPanel::SpewItem( const RecentPeaks_t& item )
 		case FILESYSTEM_BLOCKING_SYNCHRONOUS:
 		case FILESYSTEM_BLOCKING_ASYNCHRONOUS_BLOCK:
 			Warning( "%8.3f %16.16s i/o [%6.6s] took %8.3f msec:  %33.33s\n", 
-					 item.time, 
-					 GetBlockReason( item.reason ), 
-					 GetIOType( item.ioType ),
-					 item.elapsed * 1000.0f, 
-					 item.fileName.String()
-				);
+				item.time, 
+				GetBlockReason( item.reason ), 
+				GetIOType( item.ioType ),
+				item.elapsed * 1000.0f, 
+				item.fileName.String()
+			);
 			break;
 	}
 }
@@ -801,12 +794,13 @@ void CBlockingFileIOPanel::SpewRecent()
 	}
 }
 
-void  CBlockingFileIOPanel::DrawIOTime( int x, int y, int w, int h, int slot, char const *label, const Color& clr )
+void CBlockingFileIOPanel::DrawIOTime( int x, int y, int w, int h, int slot, char const *label, const Color& clr )
 {
-	float t = m_History[ slot ].m_flCurrent;
-	float history = m_History[ slot ].m_flHistory;
-	float latchedtime = m_History[ slot ].m_flLatchTime;
-	float historyspike = m_History[ slot ].m_flHistorySpike;
+	auto &item = m_History[ slot ];
+	float t = item.m_flCurrent;
+	float history = item.m_flHistory;
+	float latchedtime = item.m_flLatchTime;
+	float historyspike = item.m_flHistorySpike;
 
 	// 250 msec is considered a huge spike
 	float maxTime = cl_blocking_msec.GetFloat() * 0.001f;
@@ -816,33 +810,33 @@ void  CBlockingFileIOPanel::DrawIOTime( int x, int y, int w, int h, int slot, ch
 	float hfrac = clamp( history / maxTime, 0.0f, 1.0f );
 	float spikefrac = clamp( historyspike / maxTime, 0.0f, 1.0f );
 
-	g_pMatSystemSurface->DrawColoredText( m_hFont, x + 2, y + 1, 
+	g_pMatSystemSurface->DrawColoredText( m_hFont, x + QuickPropScale( 2 ), y + QuickPropScale( 1 ), 
 										  clr[0], clr[1], clr[2], clr[3], 
 										  "%s", 
 										  label );
 
-	int textWidth = 95;
+	int textWidth = QuickPropScale( 95 );
 
 	x += textWidth;
-	w -= ( textWidth + 5 );
+	w -= ( textWidth + QuickPropScale( 5 ) );
 
-	int prevFileWidth = 140;
+	int prevFileWidth = QuickPropScale( 140 );
 	w -= prevFileWidth;
 
 	bool bDrawHistorySpike = false;
 
-	if ( m_History[ slot ].m_LastFile.IsValid() && 
+	if ( item.m_LastFile.IsValid() && 
 		 ( gpGlobals->realtime < latchedtime + 10.0f ) )
 	{
 		bDrawHistorySpike = true;
-		g_pMatSystemSurface->DrawColoredText( m_hFont, x + w + 5, y + 1, 
-											  255, 255, 255, 200, "[%8.3f ms]", m_History[ slot ].m_flHistorySpike * 1000.0f );
-		g_pMatSystemSurface->DrawColoredText( m_hFont, x, y + h + 1, 
-											  255, 255, 255, 200, "%s", m_History[ slot ].m_LastFile.String() );
+		g_pMatSystemSurface->DrawColoredText( m_hFont, x + w + QuickPropScale( 5 ), y + QuickPropScale( 1 ), 
+											  255, 255, 255, 200, "[%8.3f ms]", item.m_flHistorySpike * 1000.0f );
+		g_pMatSystemSurface->DrawColoredText( m_hFont, x, y + h + QuickPropScale( 1 ), 
+											  255, 255, 255, 200, "%s", item.m_LastFile.String() );
 	}
 
-	y += 2;
-	h -= 4;
+	y += QuickPropScale( 2 );
+	h -= QuickPropScale( 4 );
 
 	int barWide = ( int )( w * frac + 0.5f );
 	int historyWide = ( int ) ( w * hfrac + 0.5f );
@@ -855,11 +849,11 @@ void  CBlockingFileIOPanel::DrawIOTime( int x, int y, int w, int h, int slot, ch
 	vgui::surface()->DrawSetColor( Color( 255, 255, 255, 128 ) );
 	vgui::surface()->DrawOutlinedRect( x, y, x + w, y + h );
 	vgui::surface()->DrawSetColor( clr );
-	vgui::surface()->DrawFilledRect( x+1, y+1, x + useWide, y + h -1 );
+	vgui::surface()->DrawFilledRect( x+QuickPropScale( 1 ), y+QuickPropScale( 1 ), x + useWide, y + h - QuickPropScale( 1 ) );
 	if ( bDrawHistorySpike )
 	{
 		vgui::surface()->DrawSetColor( Color( 255, 255, 255, 192 ) );
-		vgui::surface()->DrawFilledRect( x + spikeWide, y + 1, x + spikeWide + 1, y + h - 1 );
+		vgui::surface()->DrawFilledRect( x + spikeWide, y + QuickPropScale( 1 ), x + spikeWide + QuickPropScale( 1 ), y + h - QuickPropScale( 1 ) );
 	}
 }
 
@@ -898,7 +892,7 @@ public:
 };
 
 static CBlockingFileIO g_IOPanel;
-IShowBlockingPanel *iopanel = ( IShowBlockingPanel * )&g_IOPanel;
+IShowBlockingPanel *iopanel = &g_IOPanel;
 
 CON_COMMAND( spewblocking, "Spew current blocking file list." )
 {
