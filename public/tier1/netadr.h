@@ -111,11 +111,11 @@ public:
 
 	CUtlNetAdrRender( const struct sockaddr &s )
 	{
+		m_rgchString[0] = '\0';
+
 		netadr_t addr;
 		if ( addr.SetFromSockadr( &s ) )
 			addr.ToString_safe( m_rgchString, false );
-		else
-			m_rgchString[0] = '\0';
 	}
 
 	[[nodiscard]] const char * String() const
