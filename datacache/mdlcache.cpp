@@ -625,9 +625,7 @@ InitReturnVal_t CMDLCache::Init()
 
 	if ( !m_pAnimBlockCacheSection )
 	{
-		// 360 tuned to worst case, ep_outland_12a, less than 6 MiB is not a viable working set
-		unsigned int animBlockLimit = IsX360() ? 6*1024*1024 : (unsigned)-1;
-		DataCacheLimits_t limits( animBlockLimit, (unsigned)-1, 0, 0 );
+		DataCacheLimits_t limits( (unsigned)-1, (unsigned)-1, 0, 0 );
 		m_pAnimBlockCacheSection = g_pDataCache->AddSection( this, MODEL_CACHE_ANIMBLOCK_SECTION_NAME, limits );
 	}
 
@@ -974,12 +972,6 @@ void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 
 		char pFileName[MAX_PATH];
 		MakeFilename( handle, ".phy", pFileName, sizeof(pFileName) );
-		if ( IsX360() )
-		{
-			char pX360Filename[MAX_PATH];
-			UpdateOrCreate( NULL, pFileName, pX360Filename, sizeof( pX360Filename ), "GAME" );
-			Q_strncpy( pFileName, pX360Filename, sizeof(pX360Filename) );
-		}
 
 		bool bAsyncLoad = mod_load_vcollide_async.GetBool() && !synchronousLoad;
 
@@ -1162,12 +1154,6 @@ unsigned char *CMDLCache::UnserializeAnimBlock( MDLHandle_t handle, int nBlock )
 #ifdef _LINUX
 		Q_strlower( pFileName );
 #endif
-		if ( IsX360() )
-		{
-			char pX360Filename[MAX_PATH];
-			UpdateOrCreate( pStudioHdr, pFileName, pX360Filename, sizeof( pX360Filename ), "GAME" );
-			Q_strncpy( pFileName, pX360Filename, sizeof(pX360Filename) );
-		}
 
 		MdlCacheMsg( "MDLCache: Begin load Anim Block %s (block %i)\n", GetModelName( handle ), nBlock );
 
@@ -1402,12 +1388,6 @@ void CMDLCache::UnserializeAllVirtualModelsAndAnimBlocks( MDLHandle_t handle )
 	// if not present, will instance and load the submodels
 	GetVirtualModel( handle );
 
-	if ( IsX360() )
-	{
-		// 360 does not drive the anims into its small cache section
-		return;
-	}
-
 	// Note that the animblocks start at 1!!!
 	studiohdr_t *pStudioHdr = GetStudioHdr( handle );
 	for ( int i = 1 ; i < pStudioHdr->numanimblocks; ++i )
@@ -1474,12 +1454,6 @@ bool CMDLCache::LoadHardwareData( MDLHandle_t handle )
 		// use model name for correct path
 		char pFileName[MAX_PATH];
 		MakeFilename( handle, GetVTXExtension(), pFileName, sizeof(pFileName) );
-		if ( IsX360() )
-		{
-			char pX360Filename[MAX_PATH];
-			UpdateOrCreate( pStudioHdr, pFileName, pX360Filename, sizeof( pX360Filename ), "GAME" );
-			Q_strncpy( pFileName, pX360Filename, sizeof(pX360Filename) );
-		}
 
 		MdlCacheMsg("MDLCache: Begin load VTX %s\n", GetModelName( handle ) );
 
@@ -1801,22 +1775,8 @@ int CMDLCache::UpdateOrCreate( studiohdr_t *pHdr, const char *pSourceName, char 
 //-----------------------------------------------------------------------------
 bool CMDLCache::ReadFileNative( char *pFileName, const char *pPath, CUtlBuffer &buf, int nMaxBytes )
 {
-	bool bOk = false;
-
-	if ( IsX360() )
-	{
-		// Read the 360 version
-		char pX360Filename[ MAX_PATH ];
-		UpdateOrCreate( NULL, pFileName, pX360Filename, sizeof( pX360Filename ), pPath );
-		bOk = g_pFullFileSystem->ReadFile( pX360Filename, pPath, buf, nMaxBytes );
-	}
-	else
-	{
-		// Read the PC version
-		bOk = g_pFullFileSystem->ReadFile( pFileName, pPath, buf, nMaxBytes );
-	}
-
-	return bOk;
+	// Read the PC version
+	return g_pFullFileSystem->ReadFile( pFileName, pPath, buf, nMaxBytes );
 }
 
 //-----------------------------------------------------------------------------
@@ -2099,14 +2059,11 @@ void CMDLCache::TouchAllData( MDLHandle_t handle )
 		}
 	}
 
-	if ( !IsX360() )
+	// cache the anims
+	// Note that the animblocks start at 1!!!
+	for ( int i=1; i< pStudioHdr->numanimblocks; ++i )
 	{
-		// cache the anims
-		// Note that the animblocks start at 1!!!
-		for ( int i=1; i< pStudioHdr->numanimblocks; ++i )
-		{
-			pStudioHdr->GetAnimBlock( i );
-		}
+		pStudioHdr->GetAnimBlock( i );
 	}
 
 	// cache the vertexes
@@ -3044,7 +3001,7 @@ vertexFileHeader_t *CMDLCache::BuildAndCacheVertexData( studiohdr_t *pStudioHdr,
 		return NULL;
 	}
 
-	bool bNeedsTangentS = IsX360() || (g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 80);
+	bool bNeedsTangentS = g_pMaterialSystemHardwareConfig->GetDXSupportLevel() >= 80;
 	int rootLOD = min( (int)pStudioHdr->rootLOD, pRawVvdHdr->numLODs - 1 );
 
 	// determine final cache footprint, possibly truncated due to lod
@@ -3098,12 +3055,6 @@ vertexFileHeader_t *CMDLCache::LoadVertexData( studiohdr_t *pStudioHdr )
 		// load the VVD file
 		// use model name for correct path
 		MakeFilename( handle, ".vvd", pFileName, sizeof(pFileName) );
-		if ( IsX360() )
-		{
-			char pX360Filename[MAX_PATH];
-			UpdateOrCreate( pStudioHdr, pFileName, pX360Filename, sizeof( pX360Filename ), "GAME" );
-			Q_strncpy( pFileName, pX360Filename, sizeof(pX360Filename) );
-		}
 
 		MdlCacheMsg( "MDLCache: Begin load VVD %s\n", pFileName );
 
