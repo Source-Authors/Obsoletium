@@ -1907,7 +1907,7 @@ public:
 	//}
 	
 	// dimhotepus: It is not aligned actually :(.
-	FORCEINLINE void LoadAndSwizzleAligned(Vector const &a, Vector const &b, Vector const &c, Vector const &d)
+	FORCEINLINE void LoadAndSwizzleAligned(Vector const &a, Vector const &b, Vector const &c, Vector const &d) //-V524
 	{
 		// dimhotepus: It was expected to be aligned initially which is too unsafe. 
 		x		= DirectX::XMLoadFloat3( a.XmBase() );
