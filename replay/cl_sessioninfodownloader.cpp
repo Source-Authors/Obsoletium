@@ -178,7 +178,7 @@ void CSessionInfoDownloader::OnDownloadComplete( CHttpDownloader *pDownloader, c
 							else
 							{
 								// Attempt to decompress the payload
-								ICompressor *pCompressor = CreateCompressor( header.m_nCompressorType );
+								auto pCompressor = CreateCompressor( header.m_nCompressorType );
 								if ( !pCompressor )
 								{
 									bPayloadValid = false;

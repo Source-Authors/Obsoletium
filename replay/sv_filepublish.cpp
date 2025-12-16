@@ -161,12 +161,11 @@ CCompressionJob::CCompressionJob( const uint8 *pSrcData, uint32 nSrcSize, Compre
 :	m_pSrcData( pSrcData ),
 	m_nSrcSize( nSrcSize ),
 	m_pCompressionResult( pOutResult ),
-	m_pResultSize( pResultSize )
+	m_pResultSize( pResultSize ),
+	m_pCompressor( CreateCompressor( nType ) )
 {
 	*m_pCompressionResult = false;
 	*m_pResultSize = 0;
-
-	m_pCompressor = CreateCompressor( nType );
 }
 
 JobStatus_t	CCompressionJob::DoExecute()

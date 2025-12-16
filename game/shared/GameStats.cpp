@@ -1466,13 +1466,13 @@ void CBaseGameStats::SetHL2UnlockedChapterStatistic( void )
 		{
 			// read file into memory
 			int size = filesystem->Size(fh);
-			char *configBuffer = new char[ size + 1 ];
-			filesystem->Read( configBuffer, size, fh );
-			configBuffer[size] = 0;
+			std::unique_ptr<char[]> configBuffer = std::make_unique<char[]>( size + 1 );
+			int read = filesystem->Read( configBuffer.get(), size, fh );
+			configBuffer[min(read, size)] = '\0';
 			filesystem->Close( fh );
 
 			// loop through looking for all the cvars to apply
-			const char *search = Q_stristr(configBuffer, "sv_unlockedchapters" );
+			const char *search = Q_stristr(configBuffer.get(), "sv_unlockedchapters" );
 			if ( search )
 			{
 				// read over the token
@@ -1486,9 +1486,6 @@ void CBaseGameStats::SetHL2UnlockedChapterStatistic( void )
 				int iChapter = Q_atoi( search );
 				m_BasicStats.m_nHL2ChaptureUnlocked = iChapter;
 			}
-
-			// free
-			delete [] configBuffer;
 		}
 	}	
 }

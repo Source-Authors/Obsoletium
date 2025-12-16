@@ -126,7 +126,7 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 			break;
 		}
 
-		char *pBuffer = (char *)new char[ nSize ];
+		std::unique_ptr<char[]> pBuffer = std::make_unique<char[]>( nSize );
 		if ( !pBuffer )
 		{
 			CL_GetErrorSystem()->AddErrorFromTokenName( "#Replay_Err_Recon_OutOfMemory" );
@@ -135,7 +135,7 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 		else
 		{
 			// Read the file
-			if ( nSize != g_pFullFileSystem->Read( pBuffer, nSize, hBlockFile ) )
+			if ( nSize != g_pFullFileSystem->Read( pBuffer.get(), nSize, hBlockFile ) )
 			{
 				CL_GetErrorSystem()->AddErrorFromTokenName( "#Replay_Err_Recon_FailedToRead" );
 				bFailed = true;
@@ -146,8 +146,7 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 				CompressorType_t nCompressorType = (CompressorType_t)pCurBlock->m_nCompressorType;
 				if ( nCompressorType != COMPRESSORTYPE_INVALID )
 				{
-					ICompressor *pCompressor = CreateCompressor( nCompressorType );
-
+					auto pCompressor = CreateCompressor( nCompressorType );
 					if ( !pCompressor )
 					{
 						CL_GetErrorSystem()->AddErrorFromTokenName( "#Replay_Err_Recon_DecompressorCreate" );
@@ -157,7 +156,7 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 					{
 						const unsigned int nCompressedSize = nSize;
 						unsigned int nUncompressedSize = pCurBlock->m_uUncompressedSize;
-						char *pUncompressedBuffer = new char[ nUncompressedSize ];
+						std::unique_ptr<char[]> pUncompressedBuffer = std::make_unique<char[]>( nUncompressedSize );
 
 						if ( !pUncompressedBuffer )
 						{
@@ -171,31 +170,24 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 								CL_GetErrorSystem()->AddErrorFromTokenName( "#Replay_Err_Recon_UncompressedSizeIsZero" );
 								bFailed = true;
 							}
-							else if ( !pCompressor->Decompress( pUncompressedBuffer, &nUncompressedSize, pBuffer, nCompressedSize ) )
+							else if ( !pCompressor->Decompress( pUncompressedBuffer.get(), &nUncompressedSize, pBuffer.get(), nCompressedSize ) )
 							{
 								CL_GetErrorSystem()->AddErrorFromTokenName( "#Replay_Err_Recon_Decompression" );
 								bFailed = true;
 							}
 						}
 
-						if ( bFailed )
-						{
-							delete [] pUncompressedBuffer;
-						}
-						else
+						if ( !bFailed )
 						{
 							// Overwrite buffer pointer and buffer size
-							pBuffer = pUncompressedBuffer;
+							pBuffer = std::move( pUncompressedBuffer );
 							nSize = nUncompressedSize;
 						}
-
-						// Free compressor
-						delete pCompressor;
 					}
 				}
 
 				// Append the read data to the mother file
-				if ( g_pFullFileSystem->Write( pBuffer, nSize, hReconstructedFile ) == nSize )
+				if ( g_pFullFileSystem->Write( pBuffer.get(), nSize, hReconstructedFile ) == nSize )
 				{
 					g_pFullFileSystem->Close( hBlockFile );
 				}
@@ -206,9 +198,6 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 				}
 			}
 		}
-
-		// Free
-		delete [] pBuffer;
 	}
 
 	if ( !bFailed )

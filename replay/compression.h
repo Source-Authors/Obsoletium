@@ -7,7 +7,9 @@
 
 //----------------------------------------------------------------------------------------
 
-#include "platform.h"
+#include <memory>
+
+#include "tier0/platform.h"
 
 //----------------------------------------------------------------------------------------
 
@@ -39,7 +41,7 @@ extern const char *g_pCompressorTypes[ NUM_COMPRESSOR_TYPES ];
 
 //----------------------------------------------------------------------------------------
 
-ICompressor *CreateCompressor( CompressorType_t nType );
+std::unique_ptr<ICompressor> CreateCompressor(CompressorType_t nType);
 const char *GetCompressorNameSafe( CompressorType_t nType );
 
 //----------------------------------------------------------------------------------------

@@ -162,7 +162,7 @@ private:
 	bool				*m_pCompressionResult;
 	uint8				*m_pResult;
 	unsigned int		*m_pResultSize;
-	ICompressor			*m_pCompressor;
+	std::unique_ptr<ICompressor> m_pCompressor;
 };
 
 //----------------------------------------------------------------------------------------

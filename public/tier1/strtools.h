@@ -1377,20 +1377,14 @@ private:
 			return;					// already been converted to UTF-16; no work to do
 
 		intp cchMax = V_strlen( m_pch ) + 1;
-		ucs2 *pwchTemp = new ucs2[ cchMax ];
-		if ( V_UTF8ToUCS2( m_pch, cchMax, pwchTemp, cchMax * sizeof( ucs2 ) ) )
+		std::unique_ptr<ucs2[]> pwchTemp = std::make_unique<ucs2[]>( cchMax );
+		if ( V_UTF8ToUCS2( m_pch, cchMax, pwchTemp.get(), cchMax * sizeof( ucs2 ) ) )
 		{
 			intp cchAlloc = cchMax;
 			ucs2 *pwchHeap = new ucs2[ cchAlloc ];
-			memcpy( pwchHeap, pwchTemp, cchAlloc * sizeof( ucs2 ) );
-			delete [] pwchTemp;
+			memcpy( pwchHeap, pwchTemp.get(), cchAlloc * sizeof( ucs2 ) );
 			m_pucs2 = pwchHeap;
 		}
-		else
-		{
-		// do nothing, and leave the UTF-16 string nullptr
-		delete [] pwchTemp;
-	}
 	}
 #endif
 

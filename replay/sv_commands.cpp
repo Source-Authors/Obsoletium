@@ -129,7 +129,7 @@ void PrintSessionInfo( const char *pFilename )
 			return;
 		}
 
-		ICompressor *pCompressor = CreateCompressor( header.m_nCompressorType );
+		auto pCompressor = CreateCompressor( header.m_nCompressorType );
 		if ( !pCompressor )
 		{
 			Msg( "Failed to create compressor.\n" );
@@ -140,13 +140,10 @@ void PrintSessionInfo( const char *pFilename )
 		if ( !pUncompressedPayload )
 		{
 			Msg( "Failed to allocate uncompressed payload.\n" );
-			delete [] pCompressor;
 			return;
 		}
 
 		pCompressor->Decompress( (char *)pUncompressedPayload, &uUncompressedPayloadSize, (const char *)pPayload, header.m_uPayloadSize );
-
-		delete pCompressor;
 	}
 
 	if ( uUncompressedPayloadSize <= MIN_SESSION_INFO_PAYLOAD_SIZE )

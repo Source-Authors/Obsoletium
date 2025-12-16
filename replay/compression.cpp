@@ -102,15 +102,15 @@ private:
 
 //----------------------------------------------------------------------------------------
 
-ICompressor *CreateCompressor( CompressorType_t nType )
+std::unique_ptr<ICompressor> CreateCompressor( CompressorType_t nType )
 {
 	switch ( nType )
 	{
-	case COMPRESSORTYPE_BZ2:	return new CCompressor_Bz2();
-	case COMPRESSORTYPE_LZSS:	return new CCompressor_Lzss();
+	case COMPRESSORTYPE_BZ2:	return std::make_unique<CCompressor_Bz2>();
+	case COMPRESSORTYPE_LZSS:	return std::make_unique<CCompressor_Lzss>();
 	}
 
-	return NULL;
+	return {};
 }
 
 const char *GetCompressorNameSafe( CompressorType_t nType )
@@ -180,9 +180,9 @@ CON_COMMAND( replay_testcompress, "Test compression" )
 	}
 	else
 	{
-		ICompressor *pCompressor = CreateCompressor( nCompressorType );
+		auto pCompressor = CreateCompressor( nCompressorType );
 		unsigned int nCompressedSize = pCompressor->GetEstimatedCompressionSize( nInFileSize );
-		char *pCompressed = new char[ nCompressedSize ];
+		std::unique_ptr<char[]> pCompressed = std::make_unique<char[]>( nCompressedSize );
 		if ( !pCompressed )
 		{
 			Warning( "Failed to allocate %u bytes for compressed buffer.\n", nCompressedSize );
@@ -190,7 +190,7 @@ CON_COMMAND( replay_testcompress, "Test compression" )
 		}
 
 		// Compress
-		if ( !pCompressor->Compress( pCompressed, &nCompressedSize, pUncompressed, nInFileSize ) )
+		if ( !pCompressor->Compress( pCompressed.get(), &nCompressedSize, pUncompressed, nInFileSize ) )
 		{
 			Warning( "Compression failed.\n" );
 		}
@@ -204,7 +204,7 @@ CON_COMMAND( replay_testcompress, "Test compression" )
 			}
 			else
 			{
-				if ( g_pFullFileSystem->Write( pCompressed, nCompressedSize, hOutFile ) != (int)nCompressedSize )
+				if ( g_pFullFileSystem->Write( pCompressed.get(), nCompressedSize, hOutFile ) != (int)nCompressedSize )
 				{
 					Warning( "Failed to write compressed data to %s\n", fmtOutFilename.Access() );
 				}
@@ -217,8 +217,6 @@ CON_COMMAND( replay_testcompress, "Test compression" )
 				g_pFullFileSystem->Close( hOutFile );
 			}
 		}
-
-		delete [] pCompressed;
 	}
 
 	g_pFullFileSystem->Close( hInFile );

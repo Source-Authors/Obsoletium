@@ -446,12 +446,11 @@ extern "C"
 
 void CShaderSystem::VerifyBaseShaderDLL( CSysModule *pModule )
 {
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 	const char *pErrorStr = "Corrupt shader DLL.";
 
-	unsigned char *testData1 = new unsigned char[SHADER_DLL_VERIFY_DATA_LEN1];
-
-	ShaderDLLVerifyFn fn = (ShaderDLLVerifyFn)GetProcAddress( (void *)pModule, SHADER_DLL_FNNAME_1 );
+	auto testData1 = std::make_unique<byte[]>(SHADER_DLL_VERIFY_DATA_LEN1);
+	const auto fn = static_cast<ShaderDLLVerifyFn>(GetProcAddress( pModule, SHADER_DLL_FNNAME_1 ));
 	if ( !fn )
 		Error( pErrorStr );
 
@@ -463,26 +462,24 @@ void CShaderSystem::VerifyBaseShaderDLL( CSysModule *pModule )
 	// Test the first CRC.
 	CRC32_t testCRC;
 	CRC32_Init( &testCRC );
-	CRC32_ProcessBuffer( &testCRC, testData1, SHADER_DLL_VERIFY_DATA_LEN1 );
+	CRC32_ProcessBuffer( &testCRC, testData1.get(), SHADER_DLL_VERIFY_DATA_LEN1 );
 	CRC32_ProcessBuffer( &testCRC, &pModule, sizeof(pModule) );
 	CRC32_ProcessBuffer( &testCRC, &pVerify, sizeof(pVerify) );
 	CRC32_Final( &testCRC );
-	if ( testCRC != pVerify->Function1( testData1 - SHADER_DLL_VERIFY_DATA_PTR_OFFSET ) )
+	if ( testCRC != pVerify->Function1( testData1.get() - SHADER_DLL_VERIFY_DATA_PTR_OFFSET ) )
 		Error( pErrorStr );
 
 	// Test the next one.
 	unsigned char digest[MD5_DIGEST_LENGTH];
 	MD5Context_t md5Context;
 	MD5Init( &md5Context );
-	MD5Update( &md5Context, testData1 + SHADER_DLL_VERIFY_DATA_PTR_OFFSET, SHADER_DLL_VERIFY_DATA_LEN1 - SHADER_DLL_VERIFY_DATA_PTR_OFFSET );
+	MD5Update( &md5Context, testData1.get() + SHADER_DLL_VERIFY_DATA_PTR_OFFSET, SHADER_DLL_VERIFY_DATA_LEN1 - SHADER_DLL_VERIFY_DATA_PTR_OFFSET );
 	MD5Final( digest, &md5Context );
 	pVerify->Function2( 2, 3, 3 ); // fn2 is supposed to place the result in testData1.
-	if ( memcmp( digest, testData1, MD5_DIGEST_LENGTH ) != 0 )
+	if ( memcmp( digest, testData1.get(), MD5_DIGEST_LENGTH ) != 0 )
 		Error( pErrorStr );
 
 	pVerify->Function5();
-
-	delete [] testData1;
 #endif
 }
 
