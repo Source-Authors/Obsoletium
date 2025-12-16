@@ -162,8 +162,7 @@ CUtlNTree<T,I>::~CUtlNTree( )
 template <class T, class I>
 void CUtlNTree<T,I>::ConstructList()
 {
-	m_Root = InvalidIndex(); 
-	m_FirstFree = InvalidIndex();
+	m_Root = m_FirstFree = InvalidIndex(); 
 	m_ElementCount = m_MaxElementIndex = 0;
 }
 
