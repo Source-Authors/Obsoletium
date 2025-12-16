@@ -332,7 +332,7 @@ void CDmeCommentaryNodeEntity::SetRenderOrigin( const Vector &vecOrigin )
 
 void CDmeCommentaryNodeEntity::SetRenderAngles( const QAngle &angles )
 {
-	m_vecLocalAngles = *(Vector*)&angles;
+	m_vecLocalAngles = *(const Vector*)&angles;
 	clienttools->MarkClientRenderableDirty( this );
 }
 
