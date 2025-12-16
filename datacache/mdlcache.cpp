@@ -986,10 +986,6 @@ void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 		MdlCacheMsg( "MDLCache: %s load vcollide %s\n", bAsyncLoad ? "Async" : "Sync", GetModelName( handle ) );
 
 		AsyncInfo_t info;
-		if ( IsDebug() )
-		{
-			memset( &info, 0xdd, sizeof( AsyncInfo_t ) );
-		}
 		info.hModel = handle;
 		info.type = MDLCACHE_VCOLLIDE;
 		info.iAnimBlock = 0;
@@ -1176,10 +1172,6 @@ unsigned char *CMDLCache::UnserializeAnimBlock( MDLHandle_t handle, int nBlock )
 		MdlCacheMsg( "MDLCache: Begin load Anim Block %s (block %i)\n", GetModelName( handle ), nBlock );
 
 		AsyncInfo_t info;
-		if ( IsDebug() )
-		{
-			memset( &info, 0xdd, sizeof( AsyncInfo_t ) );
-		}
 		info.hModel = handle;
 		info.type = MDLCACHE_ANIMBLOCK;
 		info.iAnimBlock = nBlock;
@@ -1492,10 +1484,6 @@ bool CMDLCache::LoadHardwareData( MDLHandle_t handle )
 		MdlCacheMsg("MDLCache: Begin load VTX %s\n", GetModelName( handle ) );
 
 		AsyncInfo_t info;
-		if ( IsDebug() )
-		{
-			memset( &info, 0xdd, sizeof( AsyncInfo_t ) );
-		}
 		info.hModel = handle;
 		info.type = MDLCACHE_STUDIOHWDATA;
 		info.iAnimBlock = 0;
@@ -3120,10 +3108,6 @@ vertexFileHeader_t *CMDLCache::LoadVertexData( studiohdr_t *pStudioHdr )
 		MdlCacheMsg( "MDLCache: Begin load VVD %s\n", pFileName );
 
 		AsyncInfo_t info;
-		if ( IsDebug() )
-		{
-			memset( &info, 0xdd, sizeof( AsyncInfo_t ) );
-		}
 		info.hModel = handle;
 		info.type = MDLCACHE_VERTEXES;
 		info.iAnimBlock = 0;
