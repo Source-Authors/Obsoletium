@@ -3308,7 +3308,7 @@ void CBaseFileSystem::CacheAllVPKFileHashes( bool bCacheAllVPKHashes, bool bReca
 			Msg( "Recomputing all VPK file hashes.\n" );
 			vecChunkHashFractionCopy.Swap( vecChunkHash );
 		}
-		int cFailures = 0;
+		intp cFailures = 0;
 		if ( vecChunkHash.Count() == 0 )
 		{
 			if ( vecChunkHashFractionCopy.Count() == 0 )
@@ -3348,7 +3348,7 @@ void CBaseFileSystem::CacheAllVPKFileHashes( bool bCacheAllVPKHashes, bool bReca
 			if ( cFailures == 0 && vecChunkHash.Count() == vecChunkHashFractionCopy.Count() )
 				Msg( "File hashes checked. %zd matches. no failures.\n", vecChunkHash.Count() );
 			else
-				Msg( "File hashes checked. %zd matches. %d failures.\n", vecChunkHash.Count(), cFailures );
+				Msg( "File hashes checked. %zd matches. %zd failures.\n", vecChunkHash.Count(), cFailures );
 		}
 	}
 #endif
