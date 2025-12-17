@@ -384,6 +384,10 @@ void CBaseAchievement::AwardAchievement()
 	if ( IsAchieved() )
 		return;
 
+	// dimhotepus: Show achievement notification.
+#ifdef NO_STEAM
+	ShowProgressNotification();
+#endif
 	m_pAchievementMgr->AwardAchievement( m_iAchievementID );
 }
 
