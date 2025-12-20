@@ -1537,7 +1537,7 @@ bool CEngineAPI::MainLoop()
 bool CEngineAPI::InitRegistry( const char *pModName )
 {
 	char szRegSubPath[MAX_PATH];
-	Q_snprintf( szRegSubPath, sizeof(szRegSubPath), "%s\\%s", "Source", pModName );
+	V_sprintf_safe( szRegSubPath, "%s\\%s", "Source", pModName );
 	return registry->Init( szRegSubPath );
 }
 
