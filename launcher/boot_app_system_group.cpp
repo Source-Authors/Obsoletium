@@ -44,13 +44,12 @@ std::unique_ptr<FileLogger> BootAppSystemGroup::file_logger_ = nullptr;
 bool BootAppSystemGroup::Create() {
   double start_time{Plat_FloatTime()};
 
-  auto *file_system =
-      FindSystem<IFileSystem>(FILESYSTEM_INTERFACE_VERSION);
+  auto *file_system = FindSystem<IFileSystem>(FILESYSTEM_INTERFACE_VERSION);
   resource_listing_ = CreateResourceListing(command_line_, file_system);
 
   AppSystemInfo_t app_systems[] = {
-      {"engine" DLL_EXT_STRING,
-       CVAR_QUERY_INTERFACE_VERSION},  // NOTE: This one must be first!!
+      // NOTE: This one must be first!!
+      {"engine" DLL_EXT_STRING, CVAR_QUERY_INTERFACE_VERSION},
       {"inputsystem" DLL_EXT_STRING, INPUTSYSTEM_INTERFACE_VERSION},
       {"materialsystem" DLL_EXT_STRING, MATERIAL_SYSTEM_INTERFACE_VERSION},
       {"datacache" DLL_EXT_STRING, DATACACHE_INTERFACE_VERSION},
@@ -193,18 +192,15 @@ bool BootAppSystemGroup::PreInit() {
   fs_mount.m_pDirectoryName = steam_setup.m_GameInfoPath;
   if (FileSystem_MountContent(fs_mount) != FS_OK) return false;
 
-  if (IsPC()) {
-    fs_mount.m_pFileSystem->AddSearchPath("platform", "PLATFORM");
+  fs_mount.m_pFileSystem->AddSearchPath("platform", "PLATFORM");
 
-    // This will get called multiple times due to being here, but only the first
-    // one will do anything
-    resource_listing_->Init(base_dir_,
-                            command_line_->ParmValue("-game", "hl2"));
+  // This will get called multiple times due to being here, but only the first
+  // one will do anything
+  resource_listing_->Init(base_dir_, command_line_->ParmValue("-game", "hl2"));
 
-    // This will also get called each time, but will actually fix up the command
-    // line as needed
-    resource_listing_->SetupCommandLine();
-  }
+  // This will also get called each time, but will actually fix up the command
+  // line as needed
+  resource_listing_->SetupCommandLine();
 
   Assert(!file_logger_);
 
