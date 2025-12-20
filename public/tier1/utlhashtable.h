@@ -227,8 +227,8 @@ public:
 	CUtlHashtable &operator=( CUtlHashtable const &src );
 
 	// Set external memory
-	void SetExternalBuffer( byte* pRawBuffer, unsigned int nBytes, bool bAssumeOwnership = false, bool bGrowable = false );
-	void SetExternalBuffer( entry_t* pBuffer, unsigned int nSize, bool bAssumeOwnership = false, bool bGrowable = false );
+	void SetExternalBuffer( byte* pRawBuffer, uintp nBytes, bool bAssumeOwnership = false, bool bGrowable = false );
+	void SetExternalBuffer( entry_t* pBuffer, uintp nSize, bool bAssumeOwnership = false, bool bGrowable = false );
 
 	// Functor/function-pointer access
 	KeyHashT& GetHashRef() { return m_hash; }
@@ -237,7 +237,7 @@ public:
 	KeyIsEqualT const &GetEqualRef() const { return m_eq; }
 
 	// Handle validation
-	[[nodiscard]] bool IsValidHandle( handle_t idx ) const { return (unsigned)idx < (unsigned)m_table.Count() && m_table[idx].IsValid(); }
+	[[nodiscard]] bool IsValidHandle( handle_t idx ) const { return (uintp)idx < (uintp)m_table.Count() && m_table[idx].IsValid(); }
 	static handle_t InvalidHandle() { return (handle_t) -1; }
 
 	// Iteration functions
@@ -342,7 +342,7 @@ public:
 
 // Set external memory (raw byte buffer, best-fit)
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
-void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::SetExternalBuffer( byte* pRawBuffer, unsigned int nBytes, bool bAssumeOwnership, bool bGrowable )
+void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::SetExternalBuffer( byte* pRawBuffer, uintp nBytes, bool bAssumeOwnership, bool bGrowable )
 {
 	Assert( ((uintptr_t)pRawBuffer % __alignof(int)) == 0 );
 	uint32 bestSize = LargestPowerOfTwoLessThanOrEqual( nBytes / sizeof(entry_t) );
@@ -353,11 +353,11 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::SetExternalBuf
 
 // Set external memory (typechecked, must be power of two)
 template <typename KeyT, typename ValueT, typename KeyHashT, typename KeyIsEqualT, typename AltKeyT>
-void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::SetExternalBuffer( entry_t* pBuffer, unsigned int nSize, bool bAssumeOwnership, bool bGrowable )
+void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::SetExternalBuffer( entry_t* pBuffer, uintp nSize, bool bAssumeOwnership, bool bGrowable )
 {
 	Assert( IsPowerOfTwo(nSize) );
 	Assert( m_nUsed == 0 );
-	for ( uint i = 0; i < nSize; ++i )
+	for ( uintp i = 0; i < nSize; ++i )
 		pBuffer[i].MarkInvalid();
 	if ( bAssumeOwnership )
 		m_table.AssumeMemory( pBuffer, nSize );
@@ -409,14 +409,14 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::BumpEntry( uns
 	Assert( m_nUsed < m_table.Count() );
 
 	entry_t* table = m_table.Base();
-	unsigned int slotmask = m_table.Count()-1;
-	unsigned int new_flags_and_hash = table[idx].flags_and_hash & (FLAG_LAST | MASK_HASH);
+	uintp slotmask = m_table.Count()-1;
+	auto new_flags_and_hash = table[idx].flags_and_hash & (FLAG_LAST | MASK_HASH);
 
-	unsigned int chainid = entry_t::IdealIndex( new_flags_and_hash, slotmask );
+	auto chainid = entry_t::IdealIndex( new_flags_and_hash, slotmask );
 
 	// Look for empty slots scanning forward, stripping FLAG_LAST as we go.
 	// Note: this potentially strips FLAG_LAST from table[idx] if we pass it
-	int newIdx = chainid; // start at ideal slot
+	auto newIdx = chainid; // start at ideal slot
 	for ( ; ; newIdx = (newIdx + 1) & slotmask )
 	{
 		if ( table[newIdx].IdealIndex( slotmask ) == chainid )
@@ -442,14 +442,14 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::BumpEntry( uns
 #ifdef _DEBUG
 		Assert( new_flags_and_hash & FLAG_LAST );
 		// Verify logic: we must have moved to an earlier slot, right?
-		uint offset = ((uint)idx - chainid + slotmask + 1) & slotmask;
-		uint newOffset = ((uint)newIdx - chainid + slotmask + 1) & slotmask;
+		uintp offset = ((uintp)idx - chainid + slotmask + 1) & slotmask;
+		uintp newOffset = ((uintp)newIdx - chainid + slotmask + 1) & slotmask;
 		Assert( newOffset < offset );
 #endif
 		// Scan backwards from old to new location, depositing FLAG_LAST on
 		// the first match we find. (+slotmask) is the same as (-1) without
 		// having to make anyone think about two's complement shenanigans.
-		int scan = (idx + slotmask) & slotmask;
+		uintp scan = (idx + slotmask) & slotmask;
 		while ( scan != newIdx )
 		{
 			if ( table[scan].IdealIndex( slotmask ) == chainid )
@@ -486,9 +486,9 @@ int CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoInsertUnconst
 	++m_nUsed;
 
 	entry_t* table = m_table.Base();
-	unsigned int slotmask = m_table.Count()-1;
-	unsigned int new_flags_and_hash = FLAG_LAST | (h & MASK_HASH);
-	unsigned int idx = entry_t::IdealIndex( h, slotmask );
+	uintp slotmask = m_table.Count()-1;
+	auto new_flags_and_hash = FLAG_LAST | (h & MASK_HASH);
+	auto idx = entry_t::IdealIndex( h, slotmask );
 	if ( table[idx].IdealIndex( slotmask ) == idx )
 	{
 		// There is already an entry in this chain.
@@ -520,9 +520,9 @@ UtlHashHandle_t CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoL
 	const entry_t* table = m_table.Base();
 	size_t slotmask = m_table.Count()-1;
 	Assert( m_table.Count() > 0 && (slotmask & m_table.Count()) == 0 );
-	unsigned int chainid = entry_t::IdealIndex( h, slotmask );
+	auto chainid = entry_t::IdealIndex( h, slotmask );
 
-	unsigned int idx = chainid;
+	auto idx = chainid;
 	if ( table[idx].IdealIndex( slotmask ) != chainid )
 	{
 		// Nothing in root position? No match.
@@ -618,7 +618,7 @@ int CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRemove( KeyPa
 	}
 
 	enum { FAKEFLAG_ROOT = 1 };
-	int nLastAndRootFlags = m_table[idx].flags_and_hash & FLAG_LAST;
+	auto nLastAndRootFlags = m_table[idx].flags_and_hash & FLAG_LAST;
 	nLastAndRootFlags |= ( (uint)idx == m_table[idx].IdealIndex( slotmask ) );
 
 	// Remove from table
@@ -638,7 +638,7 @@ int CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DoRemove( KeyPa
 	{
 		// If we are removing the root and there is more to the chain,
 		// scan to find the next chain entry and move it to the root.
-		unsigned int chainid = entry_t::IdealIndex( h, slotmask );
+		auto chainid = entry_t::IdealIndex( h, slotmask );
 		unsigned int nextIdx = idx;
 		while (1)
 		{
@@ -772,17 +772,17 @@ void CUtlHashtable<KeyT, ValueT, KeyHashT, KeyIsEqualT, AltKeyT>::DbgCheckIntegr
 	// and also the validity of the user's Hash and Equal function objects.
 	// NOTE: will fail if function objects require any sort of state!
 	CUtlHashtable clone;
-	unsigned int bytes = sizeof(entry_t)*max(16,m_table.Count());
+	uintp bytes = sizeof(entry_t)*max(16,m_table.Count());
 	byte* tempbuf = (byte*) malloc(bytes);
 	clone.SetExternalBuffer( tempbuf, bytes, false, false );
 	clone = *this;
 
-	int count = 0, roots = 0, ends = 0;
-	int slotmask = m_table.Count() - 1;
-	for (int i = 0; i < m_table.Count(); ++i)
+	intp count = 0, roots = 0, ends = 0;
+	intp slotmask = m_table.Count() - 1;
+	for (intp i = 0; i < m_table.Count(); ++i)
 	{
 		if (!(m_table[i].flags_and_hash & FLAG_FREE)) ++count;
-		if (m_table[i].IdealIndex(slotmask) == (uint)i) ++roots;
+		if (m_table[i].IdealIndex(slotmask) == (uintp)i) ++roots;
 		if (m_table[i].flags_and_hash & FLAG_LAST) ++ends;
 		if (m_table[i].IsValid())
 		{
