@@ -189,11 +189,20 @@
        <Item Name="[sse4a]">m_bSSE4a</Item>
        <Item Name="[sse4.1]">m_bSSE41</Item>
        <Item Name="[sse4.2]">m_bSSE42</Item>
+       <Item Name="[avx]">(bool)(m_nFeatures[1] &amp; 268435456)</Item>
+       <Item Name="[fma]">(bool)(m_nFeatures[1] &amp; 4096)</Item>
+       <Item Name="[f16c]">(bool)(m_nFeatures[1] &amp; 536870912)</Item>
+       <Item Name="[aes]">(bool)(m_nFeatures[1] &amp; 33554432)</Item>
+       <Item Name="[rdrand]">(bool)(m_nFeatures[1] &amp; 1073741824)</Item>
+       <Item Name="[cmpxchg8b]">(bool)(m_nFeatures[0] &amp; 256)</Item>
+       <Item Name="[cmpxchg16b]">(bool)(m_nFeatures[1] &amp; 8192)</Item>
        <Item Name="[3dnow]">m_b3DNow</Item>
        <Item Name="[mmx]">m_bMMX</Item>
        <Item Name="[hyperthreaded]">m_bHT</Item>
        <Item Name="[vendor]">m_szProcessorID</Item>
        <Item Name="[brand]">m_szProcessorBrand</Item>
+       <Item Name="[p.cores]">(unsigned)m_nPhysicalProcessors</Item>
+       <Item Name="[l.cores]">(unsigned)m_nLogicalProcessors</Item>
     </Expand>
   </Type>
 
