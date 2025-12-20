@@ -214,7 +214,7 @@ static void OverlayFrameBufferTexture( int nFrameBufferIndex )
 	float offsetT = ( 0.5f / 256.0f );
 	IMaterial *pMaterial;
 	char buf[MAX_PATH];
-	Q_snprintf( buf, MAX_PATH, "debug/debugfbtexture%d", nFrameBufferIndex );
+	V_sprintf_safe( buf, "debug/debugfbtexture%d", nFrameBufferIndex );
 	pMaterial = materials->FindMaterial( buf, TEXTURE_GROUP_OTHER, true );
 	if( !IsErrorMaterial( pMaterial ) )
 	{
