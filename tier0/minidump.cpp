@@ -13,6 +13,7 @@
 #include "winlite.h"
 #include <DbgHelp.h>
 #include <ctime>
+#include <atomic>
 
 // MiniDumpWriteDump() function declaration (so we can just get the function directly from windows)
 using MINIDUMPWRITEDUMP = decltype(&::MiniDumpWriteDump);
@@ -224,7 +225,7 @@ void InternalWriteMiniDumpUsingExceptionInfo( unsigned int uStructuredExceptionC
 }
 
 // minidump function to use
-static FnMiniDump g_pfnWriteMiniDump = InternalWriteMiniDumpUsingExceptionInfo;
+static std::atomic<FnMiniDump> g_pfnWriteMiniDump = InternalWriteMiniDumpUsingExceptionInfo;
 
 //-----------------------------------------------------------------------------
 // Purpose: Set a function to call which will write our minidump, overriding
@@ -234,27 +235,42 @@ static FnMiniDump g_pfnWriteMiniDump = InternalWriteMiniDumpUsingExceptionInfo;
 //-----------------------------------------------------------------------------
 FnMiniDump SetMiniDumpFunction( FnMiniDump pfn )
 {
-	FnMiniDump pfnTemp = g_pfnWriteMiniDump;
-	g_pfnWriteMiniDump = pfn;
-	return pfnTemp;
+	return g_pfnWriteMiniDump.exchange( pfn, std::memory_order::memory_order_relaxed );
 }
 
 
 //-----------------------------------------------------------------------------
 // Unhandled exceptions
 //-----------------------------------------------------------------------------
-static FnMiniDump g_UnhandledExceptionFunction;
+static std::atomic<FnMiniDump> g_UnhandledExceptionFunction;
 static LONG STDCALL ValveUnhandledExceptionFilter( _EXCEPTION_POINTERS* pExceptionInfo )
 {
 	uint uStructuredExceptionCode = pExceptionInfo->ExceptionRecord->ExceptionCode;
-	g_UnhandledExceptionFunction( uStructuredExceptionCode, pExceptionInfo, nullptr );
-	return EXCEPTION_CONTINUE_SEARCH;
+	const auto handler = g_UnhandledExceptionFunction.load( std::memory_order::memory_order_relaxed );
+	if ( handler )
+	{
+		// dimhotepus: Check and execute handler, and proceed with 
+		handler( uStructuredExceptionCode, pExceptionInfo, nullptr );
+		return EXCEPTION_CONTINUE_SEARCH;
+	}
+	else
+	{
+		// dimhotepus: No our handler causes associated exception handler to execute.
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
 }
 
 void MinidumpSetUnhandledExceptionFunction( FnMiniDump pfn )
 {
-	g_UnhandledExceptionFunction = pfn;
-	SetUnhandledExceptionFilter( ValveUnhandledExceptionFilter );
+	g_UnhandledExceptionFunction.store( pfn, std::memory_order::memory_order_relaxed );
+	::SetUnhandledExceptionFilter( ValveUnhandledExceptionFilter );
+}
+
+FnMiniDump MinidumpSetUnhandledExceptionFunction2( FnMiniDump pfn )
+{
+	const auto old = g_UnhandledExceptionFunction.exchange( pfn, std::memory_order::memory_order_relaxed );
+	::SetUnhandledExceptionFilter( ValveUnhandledExceptionFilter );
+	return old;
 }
 
 
@@ -302,7 +318,7 @@ void WriteMiniDump( const char *pszFilenameSuffix )
 	}
 	// Write the minidump from inside the filter (GetExceptionInformation() is only 
 	// valid in the filter)
-	__except ( g_pfnWriteMiniDump( EXCEPTION_BREAKPOINT, GetExceptionInformation(), pszFilenameSuffix ), EXCEPTION_EXECUTE_HANDLER )
+	__except ( g_pfnWriteMiniDump.load( std::memory_order::memory_order_relaxed )( EXCEPTION_BREAKPOINT, GetExceptionInformation(), pszFilenameSuffix ), EXCEPTION_EXECUTE_HANDLER )
 	{
 	}
 }
@@ -435,7 +451,7 @@ int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
 	{
 		return ctx.Invoke();
 	}
-	__except ( g_pfnWriteMiniDump( GetExceptionCode(), GetExceptionInformation(), GetExceptionCodeName( GetExceptionCode() ) ), EXCEPTION_EXECUTE_HANDLER )
+	__except ( g_pfnWriteMiniDump.load( std::memory_order::memory_order_relaxed )( GetExceptionCode(), GetExceptionInformation(), GetExceptionCodeName( GetExceptionCode() ) ), EXCEPTION_EXECUTE_HANDLER )
 	{
 		// dimhotepus: EXIT_FAILURE -> EOTHER
 		TerminateProcess( GetCurrentProcess(), EOTHER ); // die, die RIGHT NOW! (don't call exit() so destructors will not get run)

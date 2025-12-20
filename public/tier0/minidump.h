@@ -71,6 +71,9 @@ PLATFORM_INTERFACE bool WriteMiniDumpUsingExceptionInfo(
 // Call this to enable a handler for unhandled exceptions.
 PLATFORM_INTERFACE void MinidumpSetUnhandledExceptionFunction( FnMiniDump pfn );
 
+// Call this to enable a handler for unhandled exceptions.
+PLATFORM_INTERFACE FnMiniDump MinidumpSetUnhandledExceptionFunction2( FnMiniDump pfn );
+
 // Call this to prevent crashes in kernel callbacks such as window procs from
 // being silently swallowed. We should always call this at startup.
 PLATFORM_INTERFACE void EnableCrashingOnCrashes();

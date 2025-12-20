@@ -1855,7 +1855,7 @@ int CEngineAPI::Run()
 		Host_DisallowSecureServers();
 	}
 
-#if defined ( _WIN32 )
+#if defined (_WIN32)
 	// Ensure that we crash when we do something naughty in a callback
 	// such as a window proc. Otherwise on a 64-bit OS the crashes will be
 	// silently swallowed.
@@ -1863,7 +1863,9 @@ int CEngineAPI::Run()
 
 	// Set the default minidump handling function. This is necessary so that Steam
 	// will upload crashes, with comments.
-	SetMiniDumpFunction( WriteSteamMiniDumpWithComment );
+	const auto oldMiniDump = SetMiniDumpFunction( WriteSteamMiniDumpWithComment );
+	// dimhotepus: Restore old mindump on exit.
+	RunCodeAtScopeExit(SetMiniDumpFunction( oldMiniDump ));
 
 	// Catch unhandled crashes. A normal __try/__except block will not work across
 	// the kernel callback boundary, but this does. To be clear, __try/__except
@@ -1878,20 +1880,22 @@ int CEngineAPI::Run()
 	// of catching exceptions that aren't in callbacks.
 	// The unhandled exception filter will also catch crashes in threads that
 	// don't have a try/catch or __try/__except block.
-	bool noMinidumps = CommandLine()->FindParm( "-nominidumps");
-	if ( !noMinidumps )
-		MinidumpSetUnhandledExceptionFunction( WriteSteamMiniDumpWithComment );
+	bool hasMinidumps = !CommandLine()->FindParm( "-nominidumps");
+	if ( hasMinidumps )
+	{
+		const auto oldUnhandled = MinidumpSetUnhandledExceptionFunction2( WriteSteamMiniDumpWithComment );
+		// dimhotepus: Restore old unhandled exception function.
+		RunCodeAtScopeExit(MinidumpSetUnhandledExceptionFunction2( oldUnhandled ));
 
-	if ( !Plat_IsInDebugSession() && !noMinidumps )
-	{
-		int nRetVal = RUN_OK;
-		CatchAndWriteMiniDumpForVoidPtrFn( StaticRunListenServer, &nRetVal, true );
-		return nRetVal;
+		if ( !Plat_IsInDebugSession() )
+		{
+			int nRetVal = RUN_OK;
+			CatchAndWriteMiniDumpForVoidPtrFn( StaticRunListenServer, &nRetVal, true );
+			return nRetVal;
+		}
 	}
-	else
-	{
-		return RunListenServer();
-	}
+
+	return RunListenServer();
 #else
 	return RunListenServer();
 #endif
