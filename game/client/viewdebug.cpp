@@ -122,15 +122,16 @@ static void RenderMaterial( const char *pMaterialName )
 	}
 }
 
-static void OverlayWaterTexture( IMaterial *pMaterial, int xOffset, int yOffset, bool bFlip )
+template<bool bFlip>
+static void OverlayWaterTexture( IMaterial *pMaterial, int xOffset, int yOffset )
 {
 	// screen safe
-	float xBaseOffset = IsPC() ? 0 : 32;
-	float yBaseOffset = IsPC() ? 0 : 32;
-	float offsetS = ( 0.5f / 256.0f );
-	float offsetT = ( 0.5f / 256.0f );
-	float fFlip0 = bFlip ? 1.0f : 0.0f;
-	float fFlip1 = bFlip ? 0.0f : 1.0f;
+	constexpr float xBaseOffset = IsPC() ? 0 : 32;
+	constexpr float yBaseOffset = IsPC() ? 0 : 32;
+	constexpr float offsetS = ( 0.5f / 256.0f );
+	constexpr float offsetT = ( 0.5f / 256.0f );
+	constexpr float fFlip0 = bFlip ? 1.0f : 0.0f;
+	constexpr float fFlip1 = bFlip ? 0.0f : 1.0f;
 
 	if( !IsErrorMaterial( pMaterial ) )
 	{
@@ -167,14 +168,14 @@ static void OverlayWaterTexture( IMaterial *pMaterial, int xOffset, int yOffset,
 
 static void OverlayWaterTextures( void )
 {
-	OverlayWaterTexture( materials->FindMaterial( "debug/debugreflect", NULL ), 0, 0, false );
-	OverlayWaterTexture( materials->FindMaterial( "debug/debugrefract", NULL ), 0, 1, true );
+	OverlayWaterTexture<false>( materials->FindMaterial( "debug/debugreflect", NULL ), 0, 0 );
+	OverlayWaterTexture<true>( materials->FindMaterial( "debug/debugrefract", NULL ), 0, 1 );
 }
 
 void OverlayCameraRenderTarget( const char *pszMaterialName, float flX, float flY, float w, float h )
 {
-	float offsetS = ( 0.5f / 256.0f );
-	float offsetT = ( 0.5f / 256.0f );
+	constexpr float offsetS = ( 0.5f / 256.0f );
+	constexpr float offsetT = ( 0.5f / 256.0f );
 	IMaterial *pMaterial;
 	pMaterial = materials->FindMaterial( pszMaterialName, TEXTURE_GROUP_OTHER, true );
 	if( !IsErrorMaterial( pMaterial ) )
@@ -210,8 +211,8 @@ void OverlayCameraRenderTarget( const char *pszMaterialName, float flX, float fl
 
 static void OverlayFrameBufferTexture( int nFrameBufferIndex )
 {
-	float offsetS = ( 0.5f / 256.0f );
-	float offsetT = ( 0.5f / 256.0f );
+	constexpr float offsetS = ( 0.5f / 256.0f );
+	constexpr float offsetT = ( 0.5f / 256.0f );
 	IMaterial *pMaterial;
 	char buf[MAX_PATH];
 	V_sprintf_safe( buf, "debug/debugfbtexture%d", nFrameBufferIndex );
