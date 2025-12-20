@@ -1936,10 +1936,10 @@ bool CModAppSystemGroup::Create()
 {
 #ifndef SWDS
 	if ( !IsServerOnly() )
-{
+	{
 		if ( !ClientDLL_Load() )
-	return false;
-}
+			return false;
+	}
 #endif 
 
 	if ( !ServerDLL_Load( IsServerOnly() ) )
@@ -1956,34 +1956,33 @@ bool CModAppSystemGroup::Create()
 	}
 #endif
 
-		IServerDLLSharedAppSystems *serverSharedSystems = ( IServerDLLSharedAppSystems * )g_ServerFactory( SERVER_DLL_SHARED_APPSYSTEMS, NULL );
-		if ( !serverSharedSystems )
-		{
-			AssertMsg( false, "Expected both game and client .dlls to have or not have shared app systems interfaces!!!" );
-			return AddLegacySystems();
-		}
+	IServerDLLSharedAppSystems *serverSharedSystems = ( IServerDLLSharedAppSystems * )g_ServerFactory( SERVER_DLL_SHARED_APPSYSTEMS, NULL );
+	if ( !serverSharedSystems )
+	{
+		AssertMsg( false, "Expected both game and client ." DLL_EXT_STRING "s to have or not have shared app systems interfaces!!!" );
+		return AddLegacySystems();
+	}
 	
 	// Load game and client .dlls and build list then
 	CUtlVector< AppSystemInfo_t >	systems;
 
-	int i;
-		int serverCount = serverSharedSystems->Count();
-	for ( i = 0 ; i < serverCount; ++i )
-		{
-			const char *dllName = serverSharedSystems->GetDllName( i );
-			const char *interfaceName = serverSharedSystems->GetInterfaceName( i );
+	int serverCount = serverSharedSystems->Count();
+	for ( int i = 0 ; i < serverCount; ++i )
+	{
+		const char *dllName = serverSharedSystems->GetDllName( i );
+		const char *interfaceName = serverSharedSystems->GetInterfaceName( i );
 	
-			AppSystemInfo_t info;
-			info.m_pModuleName = dllName;
-			info.m_pInterfaceName = interfaceName;
+		AppSystemInfo_t info;
+		info.m_pModuleName = dllName;
+		info.m_pInterfaceName = interfaceName;
 	
-			systems.AddToTail( info );
-		}
+		systems.AddToTail( info );
+	}
 
 	if ( !IsServerOnly() )
 	{
 		int clientCount = clientSharedSystems->Count();
-		for ( i = 0 ; i < clientCount; ++i )
+		for ( int i = 0 ; i < clientCount; ++i )
 		{
 			const char *dllName = clientSharedSystems->GetDllName( i );
 			const char *interfaceName = clientSharedSystems->GetInterfaceName( i );
