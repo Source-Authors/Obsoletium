@@ -1774,17 +1774,16 @@ int CEngineAPI::RunListenServer()
 	// Happens every time we start up and shut down a mod
 	if ( ModInit( m_StartupInfo.m_pInitialMod, m_StartupInfo.m_pInitialGame ) )
 	{
+		// Shuts down the mod
+		RunCodeAtScopeExit(ModShutdown());
+
 		CModAppSystemGroup modAppSystemGroup( false, m_StartupInfo.m_pParentAppSystemGroup );
 
 		// Store off the app system factory...
 		g_AppSystemFactory = modAppSystemGroup.GetFactory();
+		RunCodeAtScopeExit(g_AppSystemFactory = nullptr);
 
 		nRunResult = modAppSystemGroup.Run();
-
-		g_AppSystemFactory = NULL;
-
-		// Shuts down the mod
-		ModShutdown();
 
 		// Disconnects from the editor window
 		videomode->SetGameWindow( NULL );
