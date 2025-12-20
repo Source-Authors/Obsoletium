@@ -1240,7 +1240,7 @@ bool CEngineAPI::IsRunningSimulation() const
 void CEngineAPI::SetMap( const char *pMapName )
 {
 	char buf[MAX_PATH];
-	Q_snprintf( buf, MAX_PATH, "map %s", pMapName );
+	V_sprintf_safe( buf, "map %s", pMapName );
 	Cbuf_AddText( buf );
 }
 
