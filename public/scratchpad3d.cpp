@@ -209,6 +209,8 @@ bool CScratchPad3D::LoadCommandsFromFile( )
 	if( !fp )
 		return false;
 
+	RunCodeAtScopeExit(m_pFileSystem->Close(fp));
+
 	long fileEndPos = m_pFileSystem->Size( fp );
 
 	CFileRead fileRead( m_pFileSystem, fp );
@@ -234,15 +236,13 @@ bool CScratchPad3D::LoadCommandsFromFile( )
 		if( !pCmd )
 		{
 			AssertMsg( false, "LoadCommandsFromFile: invalid file" );
-			m_pFileSystem->Close( fp );
 			return false;
 		}
 
 		pCmd->Read( &fileRead );
 		m_Commands.AddToTail( pCmd );
-	}	
+	}
 
-	m_pFileSystem->Close( fp );
 	return true;
 }
 
@@ -427,7 +427,7 @@ void CScratchPad3D::Clear()
 		ThreadSleep( 5 );
 	}
 
-	m_pFileSystem->Close( fp );
+	RunCodeAtScopeExit(m_pFileSystem->Close(fp));
 
 	DeleteCommands();
 }
@@ -441,6 +441,8 @@ void CScratchPad3D::Flush()
 	{
 		ThreadSleep( 5 );
 	}
+
+	RunCodeAtScopeExit(m_pFileSystem->Close(fp));
 	
 	// Append the new commands to the file.
 	for( auto *c : m_Commands )
@@ -448,8 +450,6 @@ void CScratchPad3D::Flush()
 		m_pFileSystem->Write( &c->m_iCommand, sizeof(c->m_iCommand), fp );
 		c->Write( m_pFileSystem, fp );
 	}
-	
-	m_pFileSystem->Close( fp );
 
 	DeleteCommands();
 }
