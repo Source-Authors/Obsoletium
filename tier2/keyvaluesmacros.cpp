@@ -143,6 +143,8 @@ static KeyValues *HandleKeyValuesMacro_Insert( KeyValues *pkvInsert, KeyValues *
 		Msg( "Error: #insert couldn't open file: %s\n", pszInsert );
 		return nullptr;
 	}
+	
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( f ));
 
 	uint nFileSize = g_pFullFileSystem->Size( f );
 	if ( nFileSize == 0 )
@@ -162,8 +164,6 @@ static KeyValues *HandleKeyValuesMacro_Insert( KeyValues *pkvInsert, KeyValues *
 	pBuf[5] = '\n';
 
 	bool bRetOK = ( g_pFullFileSystem->ReadEx( pBuf + 6, nBufSize - 6, nFileSize, f ) != 0 );
-
-	g_pFullFileSystem->Close( f );
 
 	KeyValues *pkvNew = nullptr;
 

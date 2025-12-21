@@ -237,6 +237,7 @@ void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, con
 	// get the list of files
 	FileFindHandle_t hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFoundFile = g_pFullFileSystem->FindFirstEx( pSearchString, pPathID, &hFind );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( hFind ));
 
 	// add all the items
 	CUtlVector< CUtlString > subDirs;
@@ -274,8 +275,6 @@ void AddFilesToList( CUtlVector< CUtlString > &list, const char *pDirectory, con
 		V_FixSlashes( pFullPath );
 		list.AddToTail( pFullPath );
 	}
-
-	g_pFullFileSystem->FindClose( hFind );
 
 	for ( const auto &subDir : subDirs )
 	{
