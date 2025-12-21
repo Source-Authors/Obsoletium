@@ -703,10 +703,11 @@ bool CWin32UploadBugReport::SendWholeFile( EBugReportUploadStatus& status, CUtlB
 	}
 
 	FileHandle_t fh = g_pFileSystem->Open(  m_rBugReportParameters.m_sAttachmentFile, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE != fh )
-	{		
+	if ( fh )
+	{
+		RunCodeAtScopeExit(g_pFileSystem->Close( fh ));
+
 		g_pFileSystem->Read( filebuf.get(), sizeactual, fh );
-		g_pFileSystem->Close( fh );
 	}
 	filebuf[ sizeactual ] = '\0';
 
