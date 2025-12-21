@@ -3955,7 +3955,7 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 		case WM_SYSCHAR:
 		case WM_CHAR:
 		{
-			int unichar = static_cast<int>(wparam);
+			wchar_t unichar = static_cast<wchar_t>(static_cast<int>(wparam));
 			g_pInput->InternalKeyTyped(unichar);
 			break;
 		}
