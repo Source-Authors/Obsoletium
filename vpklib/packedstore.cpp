@@ -763,8 +763,9 @@ void CPackedStore::Write( void )
 
 	// Now actually write the data to disk
 	COutputFile dirFile( szOutFileName );
+	RunCodeAtScopeExit(dirFile.Close());
+
 	dirFile.Write( bufDirFile.Base(), bufDirFile.TellPut() );
-	dirFile.Close();
 }
 
 #ifdef VPK_ENABLE_SIGNING
@@ -1689,9 +1690,10 @@ ePackedStoreAddResultCode CPackedStore::AddFile( char const *pFile, uint16 nMeta
 		if ( !fHandle )
 			Error( "Cannot open %s for writing", szDataFileName );
 
+		RunCodeAtScopeExit(m_pFileSystem->Close(fHandle));
+
 		m_pFileSystem->Seek( fHandle, dirEntry.m_iOffsetInChunk, FILESYSTEM_SEEK_HEAD );
 		m_pFileSystem->Write( pDataStart, nBytesInChunk, fHandle );
-		m_pFileSystem->Close( fHandle );
 
 		// Force on the use of the "dir" file
 		m_bUseDirFile = true;
