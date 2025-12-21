@@ -3035,6 +3035,8 @@ int CVTex::VTex( int argc, char **argv )
 		HANDLE hResult = FindFirstFile( search, &wfd );
 		if ( hResult != INVALID_HANDLE_VALUE )
 		{
+			RunCodeAtScopeExit(FindClose( hResult ));
+
 			V_sprintf_safe( filename, "%s%s", basedir, wfd.cFileName );
 
 			if ( wfd.cFileName[0] != '.' ) 
@@ -3051,8 +3053,6 @@ int CVTex::VTex( int argc, char **argv )
 
 				iFFType = Find_Files( wfd, hResult, basedir, ext );
 			}
-
-			FindClose( hResult );
 		}
 #endif
 
