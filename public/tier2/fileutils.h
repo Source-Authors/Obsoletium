@@ -113,8 +113,10 @@ public:
 	void Close()
 	{
 		if ( m_FileHandle != FILESYSTEM_INVALID_HANDLE )
+		{
 			g_pFullFileSystem->Close( m_FileHandle );
-		m_FileHandle = FILESYSTEM_INVALID_HANDLE;
+			m_FileHandle = FILESYSTEM_INVALID_HANDLE;
+		}
 	}
 
 	void Open( char const *fname, char const *modes )
