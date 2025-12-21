@@ -877,16 +877,15 @@ VPANEL CWin32Surface::GetEmbeddedPanel()
  }
  void CWin32Surface::DrawTexturedPolygon(int n, Vertex_t *pVertices, [[maybe_unused]] bool bClipVertices /*= true*/)
  {
-	POINT *pt;
 	HDC hdc = PLAT(_currentContextPanel)->hdc;
 	
-	pt = (POINT *)malloc(sizeof(POINT) * n);
+	std::unique_ptr<POINT[]> pt = std::make_unique<POINT[]>(n);
 	if(pt) 
 	{
 		for(int i=0;i<n;i++)
 		{
-			pt[i].x= pVertices[i].m_Position.x;
-			pt[i].y= pVertices[i].m_Position.y;
+			pt[i].x = pVertices[i].m_Position.x;
+			pt[i].y = pVertices[i].m_Position.y;
 		}
 
 		COLORREF pencolor = ::GetTextColor(hdc);
@@ -894,19 +893,17 @@ VPANEL CWin32Surface::GetEmbeddedPanel()
 
 		//Set the pen color to the current brush color to avoid strange outlines on our polygons
 		DrawSetTextColor(GetRValue(brushcolor),GetGValue(brushcolor),GetBValue(brushcolor),255);
+		//restore pen colour 
+		RunCodeAtScopeExit(DrawSetTextColor(GetRValue(pencolor),GetGValue(pencolor),GetBValue(pencolor),255));
 
 		//create a brush
 		HBRUSH hbrush = ::CreateSolidBrush(brushcolor);
-		HBRUSH oldBrush = (HBRUSH)::SelectObject(hdc, hbrush);
-
-		::Polygon(hdc, pt, n);
+		RunCodeAtScopeExit(::DeleteObject(hbrush));
 		
-		::SelectObject(hdc, oldBrush);
-		::DeleteObject(hbrush);
-		free(pt);
+		HBRUSH oldBrush = (HBRUSH)::SelectObject(hdc, hbrush);
+		RunCodeAtScopeExit(::SelectObject(hdc, oldBrush));
 
-		//restore pen colour 
-		DrawSetTextColor(GetRValue(pencolor),GetGValue(pencolor),GetBValue(pencolor),255);
+		::Polygon(hdc, pt.get(), n);
 	}
  }
 
@@ -1820,6 +1817,8 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 	if (!file)
 		return false;
 
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(file));
+
 	bool success = false;
 
 	// Parse bitmap
@@ -1837,9 +1836,9 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 		HGLOBAL hDIB = ::GlobalAlloc( GMEM_MOVEABLE | GMEM_ZEROINIT, dwBitsSize );
 		if ( !hDIB )
 		{
-			g_pFullFileSystem->Close(file);
 			return false;
 		}
+
 		RunCodeAtScopeExit(::GlobalFree(hDIB));
 
 		char *pDIB = (LPSTR)::GlobalLock(hDIB);
@@ -1889,11 +1888,7 @@ bool CWin32Surface::LoadBMP(Texture *texture, const char *filename)
 		}
 	}
 
-	g_pFullFileSystem->Close(file);
-
 	return success;
-
-
 }
 
 //-----------------------------------------------------------------------------
@@ -1913,9 +1908,11 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 		return LoadBMP( texture, filename );
 	}
 
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(file));
+
 	// read the header
 	tga_header_t tgaHeader;
-	g_pFullFileSystem->Read(&tgaHeader, sizeof(tgaHeader), file);		
+	g_pFullFileSystem->Read(&tgaHeader, sizeof(tgaHeader), file);
 
 	if (tgaHeader.image_type != 2 && tgaHeader.image_type != 10)
 	{
@@ -1939,7 +1936,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 	}
 
 	// allocate memory for the destination
-	uchar *rgba = (unsigned char *)malloc(tgaHeader.width * tgaHeader.height * 4);
+	std::unique_ptr<byte[]> rgba = std::make_unique<byte[]>(tgaHeader.width * tgaHeader.height * 4);
 
 	int column, row;
 	uchar *ptr;
@@ -1949,7 +1946,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 	{
 		for (row = tgaHeader.height - 1; row >= 0; row--)
 		{
-			ptr = ((uchar *)rgba) + (row * tgaHeader.width * 4);
+			ptr = rgba.get() + (row * tgaHeader.width * 4);
 			for (column = 0; column < tgaHeader.width; column++) 
 			{
 				switch (tgaHeader.pixel_size) 
@@ -2004,7 +2001,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 
 		for(row = tgaHeader.height - 1; row >= 0; row--)
 		{
-			ptr = ((uchar*)rgba) + row * tgaHeader.width * 4;
+			ptr = rgba.get() + row * tgaHeader.width * 4;
 			for(column=0;column<tgaHeader.width;) 
 			{
 				g_pFullFileSystem->Read(&packetHeader, 1, file);
@@ -2067,7 +2064,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 							{
 								goto breakOut;
 							}
-							ptr = ((uchar*)rgba) + (row * tgaHeader.width * 4);
+							ptr = rgba.get() + row * tgaHeader.width * 4;
 						}
 					}
 				}
@@ -2125,7 +2122,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 							{
 								goto breakOut;
 							}
-							ptr = ((uchar*)rgba) + row * tgaHeader.width * 4;
+							ptr = rgba.get() + row * tgaHeader.width * 4;
 						}
 					}
 				}
@@ -2133,9 +2130,6 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 		}
 		breakOut:;
 	}
-
-	g_pFullFileSystem->Close(file);
-
 
 	// we now have a block of memory, rgba
 	// throw a bitmap header on it and register it in windows
@@ -2154,7 +2148,7 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 		for (int i = 0; i < texture->_wide; i++)
 		{
 			int offs = (j * texture->_wide + i) * 4;
-			char *src = ((char*)rgba) + offs;
+			char *src = ((char*)rgba.get()) + offs;
 			char *dst = ((char*)texture->_dib) + offs;
 			
 			if (bMask)
@@ -2192,7 +2186,6 @@ bool CWin32Surface::LoadTGA(Texture *texture, const char *filename)
 		}
 	}
 
-	free(rgba);
 	return true;
 }
 
