@@ -132,7 +132,7 @@ void HostState_RunGameInit()
 //-----------------------------------------------------------------------------
 void HostState_NewGame( char const *pMapName, bool remember_location, bool background )
 {
-	Q_strncpy( g_HostState.m_levelName, pMapName, sizeof( g_HostState.m_levelName ) );
+	V_strcpy_safe( g_HostState.m_levelName, pMapName );
 
 	g_HostState.m_landmarkName[0] = 0;
 	g_HostState.m_bRememberLocation = remember_location;
@@ -154,12 +154,12 @@ void HostState_LoadGame( char const *pSaveFileName, bool remember_location )
 	// Make sure the freaking save file exists....
 	if ( !saverestore->SaveFileExists( pSaveFileName ) )
 	{
-			Warning("Save file %s can't be found!\n", pSaveFileName );
-			SCR_EndLoadingPlaque();
-			return;
+		Warning("Save file %s can't be found!\n", pSaveFileName );
+		SCR_EndLoadingPlaque();
+		return;
 	}
 
-	Q_strncpy( g_HostState.m_saveName, pSaveFileName, sizeof( g_HostState.m_saveName )  );
+	V_strcpy_safe( g_HostState.m_saveName, pSaveFileName );
 
 	// Tell the game .dll we are loading another game
 	serverGameDLL->PreSaveGameLoaded( pSaveFileName, sv.IsActive() );
@@ -179,8 +179,8 @@ void HostState_LoadGame( char const *pSaveFileName, bool remember_location )
 // change level (single player style - smooth transition)
 void HostState_ChangeLevelSP( char const *pNewLevel, char const *pLandmarkName )
 {
-	Q_strncpy( g_HostState.m_levelName, pNewLevel, sizeof( g_HostState.m_levelName ) );
-	Q_strncpy( g_HostState.m_landmarkName, pLandmarkName, sizeof( g_HostState.m_landmarkName ) );
+	V_strcpy_safe( g_HostState.m_levelName, pNewLevel );
+	V_strcpy_safe( g_HostState.m_landmarkName, pLandmarkName );
 	g_HostState.SetNextState( HOSTSTATES::HS_CHANGE_LEVEL_SP );
 }
 
@@ -189,8 +189,8 @@ void HostState_ChangeLevelMP( char const *pNewLevel, char const *pLandmarkName )
 {
 	Steam3Server().NotifyOfLevelChange();
 
-	Q_strncpy( g_HostState.m_levelName, pNewLevel, sizeof( g_HostState.m_levelName ) );
-	Q_strncpy( g_HostState.m_landmarkName, pLandmarkName, sizeof( g_HostState.m_landmarkName ) );
+	V_strcpy_safe( g_HostState.m_levelName, pNewLevel );
+	V_strcpy_safe( g_HostState.m_landmarkName, pLandmarkName );
 	g_HostState.SetNextState( HOSTSTATES::HS_CHANGE_LEVEL_MP );
 }
 
