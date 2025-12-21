@@ -21,7 +21,7 @@
 //				argv[] - argument list
 //------------------------------------------------------------------------------------------------------
 
-void main(int argc, const char* argv[])
+int main(int argc, const char* argv[])
 {
 	//make OS application object, and operating system interface
 	g_pApp=new CTFStatsApplication;
@@ -34,5 +34,5 @@ void main(int argc, const char* argv[])
 	g_pApp->os=new CTFStatsLinuxInterface();
 #endif
 	//hand off execution to real main
-	g_pApp->main(argc,argv);
+	return g_pApp->main(argc,argv);
 }

@@ -14,7 +14,7 @@ careful and make backups.
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <memory.h>   
+#include <memory.h>
 #include <math.h>
 
 #include "texpow2.h"
@@ -32,7 +32,7 @@ long countval(char *str);
 // Glob vars...
 long width, height;
 
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
   unsigned char *animname=NULL;
   unsigned char odname[256];
@@ -45,13 +45,13 @@ void main(int argc, char *argv[])
 	t_i_image *in;
 	t_i_image *out;
 
-  printf("TEXPOW2 by Iikka Ker„nen 2001\n\n");
+  printf("TEXPOW2 by Iikka Keranen 2001\n\n");
   if (argc<2)
-	{
-    printf("Usage: TEXPOW2 <source> [source2] [source3] ... [options]\n");
-    printf("Options:\n");
-    printf("-o output dir -- output directory (by default, replaces original)\n\n");
-    return;
+  {
+    fprintf(stderr, "Usage: TEXPOW2 <source> [source2] [source3] ... [options]\n");
+    fprintf(stderr, "Options:\n");
+    fprintf(stderr, "-o output dir -- output directory (by default, replaces original)\n\n");
+    return EINVAL;
   }
 
   for (x=1;x<argc;x++)
@@ -97,6 +97,8 @@ void main(int argc, char *argv[])
 			}
 		}
   }
+
+  return 0;
 }
 
 /*

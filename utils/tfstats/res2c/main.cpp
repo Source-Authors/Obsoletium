@@ -44,12 +44,12 @@ char* id4filename(const char* filename)
 
 	return id;
 }
-void main(int argc, const char* argv[])
+int main(int argc, const char* argv[])
 {
 	if (argc < 4)
 	{
 		printUsage();
-		return;
+		return EINVAL;
 	}
 	char cppname[200];
 	sprintf(cppname,"%s.cpp",argv[2]);
@@ -108,4 +108,6 @@ void main(int argc, const char* argv[])
 	fclose(cppout);
 	fclose(hout);
 	fclose(f);
+
+	return 0;
 }

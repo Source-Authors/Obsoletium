@@ -4,14 +4,17 @@
 //
 //===========================================================================//
 
+#include <cstdio>
+
 #include "tier0/platform.h"
-#include <stdio.h>
 #include "bitmap/float_bm.h"
 #include "mathlib/mathlib.h"
 #include "tier2/tier2.h"
 
 #define BRIGHT_THRESH 0.90      // pixels within this % of average are "bright"
 #define GROUND_IMPORTANCE 0.2   // weight for downward pointing skymap pixels
+
+namespace {
 
 float Importance(Vector const &direction)
 {
@@ -26,15 +29,16 @@ float Importance(Vector const &direction)
 
 }
 
-void main(int argc,char **argv)
+}
+
+int main(int argc,char **argv)
 {
 	InitCommandLineProgram(argc, argv);
 	if (argc!=2)
 	{
-		printf("format is %s basename\n",argv[0]);
+		fprintf(stderr, "format is %s basename\n",argv[0]);
+		return EINVAL;
 	}
-	else
-	{
 		FloatCubeMap_t cmap(argv[1]);
 		// find the brightest pixel. We will consider the pixels neat this to be the
 		// ones contrinbuting to the light source
@@ -161,9 +165,6 @@ void main(int argc,char **argv)
 						cmap.face_maps[f].Pixel(x,y,comp)=AmbientColor[comp]+dot*AverageHue[comp];
 				}
 		cmap.WritePFMs("directional_plus_ambient_");
-	}
-
-
-
+	return 0;
 }
 

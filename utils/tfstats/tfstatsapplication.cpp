@@ -5,7 +5,6 @@
 // $NoKeywords: $
 //
 //=============================================================================//
-#pragma warning (disable:4786)
 //=========== (C) Copyright 1999 Valve, L.L.C. All rights reserved. ===========
 //
 // The copyright to the contents herein is the property of Valve, L.L.C.
@@ -302,9 +301,9 @@ void CTFStatsApplication::ParseCommandLine(int argc,const char* argv[])
 // Input:	argc - count of arguments from commandline
 //				argv[] - the arguments
 //------------------------------------------------------------------------------------------------------
-void CTFStatsApplication::main(int argc,const char* argv[])
+int CTFStatsApplication::main(int argc,const char* argv[])
 {
-	if (argc<=1){printUsage();return;}
+	if (argc<=1){printUsage();return 1;}
 	g_pApp=this;
 	
 	//TODO: move this into OS interface
@@ -378,6 +377,8 @@ void CTFStatsApplication::main(int argc,const char* argv[])
 		}
 	}
 	printf("TFStats completed successfully\n\n\n");
+
+	return 0;
 }
 
 //------------------------------------------------------------------------------------------------------

@@ -1,24 +1,29 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
-#include <tier0/platform.h>
+
+#include "tier0/platform.h"
+#include "tier2/tier2.h"
 #include "bitmap/float_bm.h"
 #include "mathlib/mathlib.h"
-#include <tier2/tier2.h>
 
 
 
 
 
-void main(int argc,char **argv)
+int main(int argc,char **argv)
 {
 	InitCommandLineProgram( argc, argv );
 	if ((argc<2) || (argc>3))
 	{
-		printf("format is %s imagefile.pfm [scalefactor]\n",argv[0]);
+		fprintf(stderr, "format is %s imagefile.pfm [scalefactor]\n",argv[0]);
+		return EINVAL;
 	}
-	else
-	{
+
 		FloatBitMap_t cmap;
-		cmap.LoadFromPFM(argv[1]);
+		if (!cmap.LoadFromPFM(argv[1]))
+		{
+			fprintf(stderr, "Unable to load %s\n",argv[1]);
+		}
+
 		if (argc==3)										// scale factor specified
 		{
 			float scale_factor=atof(argv[2]);
@@ -47,7 +52,6 @@ void main(int argc,char **argv)
 		strcpy(dot,"_ref_orig.tga");
 		save_orig.WriteTGAFile(fname);
 #endif
-
-	}
+	return 0;
 }
 

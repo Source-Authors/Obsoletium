@@ -7,7 +7,7 @@
 #include "bitmap/float_bm.h"
 #include "tier0/memdbgon.h"
 
-void main(int argc,char **argv)
+int main(int argc,char **argv)
 {
 	InitCommandLineProgram( argc, argv );
 
@@ -75,5 +75,6 @@ void main(int argc,char **argv)
 	}
 #endif
 
+	return 0;
 }
 

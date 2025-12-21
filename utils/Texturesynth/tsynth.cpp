@@ -86,7 +86,7 @@ void SynthesizeTexture(FloatBitMap_t & output, FloatBitMap_t const & input)
 
 
 
-void main(int argc,char **argv)
+int main(int argc,char **argv)
 {
 	InitCommandLineProgram( argc, argv );
 	FloatBitMap_t src_texture(argv[1]);
@@ -99,4 +99,5 @@ void main(int argc,char **argv)
 
 	SynthesizeTexture(output_map,src_texture);
 
+	return 0;
 }

@@ -63,7 +63,7 @@ public:
 	void DoMatchResults();
 	
 	void printUsage();
-	void main(int argc, const char* argv[]);
+	int main(int argc, const char* argv[]);
 
 	int majorVer;
 	int minorVer;
