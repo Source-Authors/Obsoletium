@@ -666,7 +666,7 @@ void CHostState::FrameUpdate( float time )
 }
 
 
-bool CHostState::IsGameShuttingDown( void )
+bool CHostState::IsGameShuttingDown()
 {
 	return ( ( m_currentState == HOSTSTATES::HS_GAME_SHUTDOWN ) || ( m_nextState == HOSTSTATES::HS_GAME_SHUTDOWN ) );
 }
