@@ -309,11 +309,13 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 
 	// Open the bink file with audio
 	HBINK hBINK = BinkOpen( filename, binkFlags );
-	if ( hBINK == 0 )
+	if ( !hBINK )
 	{
 		Warning( "Bink video %s open error: %s.", filename, BinkGetError() );
 		return SetResult( VideoResult::FILE_ERROR_OCCURED );
 	}
+
+	RunCodeAtScopeExit(BinkClose( hBINK ));
 
 	// what size do we set the output rect to?
 	// Integral scaling is much faster, so always scale the video as such
@@ -343,8 +345,6 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 #if defined ( OSX )
 		SetSystemUIMode( oldMode, oldOptions );
 #endif
-		BinkClose( hBINK );
-
 		return SetResult( VideoResult::VIDEO_ERROR_OCCURED );
 	}
 
@@ -354,13 +354,13 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 		mainWindow, hBINK->Width, hBINK->Height,
 		BINKBUFFERDIBSECTION | BINKBUFFERSTRETCHXINT | BINKBUFFERSTRETCHYINT |
 			BINKBUFFERSHRINKXINT | BINKBUFFERSHRINKYINT );
-	if ( hBINKBuffer == 0 )
+	if ( !hBINKBuffer )
 	{
-		BinkClose( hBINK );
-		
 		Warning( "Bink video %s buffer open error: %s.", filename, BinkGetError() );
 		return SetResult( VideoResult::FILE_ERROR_OCCURED );
 	}
+
+	RunCodeAtScopeExit(BinkBufferClose( hBINKBuffer ));
 
 	// Scale if we need to
 	BinkBufferSetScale( hBINKBuffer, nBufferWidth, nBufferHeight );
@@ -374,9 +374,6 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 #if defined ( OSX )
 		SetSystemUIMode( oldMode, oldOptions );
 #endif
-
-		BinkBufferClose( hBINKBuffer );
-		BinkClose( hBINK );
 
 		return GetLastResult();
 	}
@@ -392,7 +389,7 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 			// check for aborting the movie
 			if ( bAbortEvent || bQuitEvent )
 			{
-				goto abort_playback;
+				break;
 			}
 
 			// check for pausing the movie?
@@ -422,7 +419,8 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 			BinkDoFrame( hBINK );
 
 			// Lock the buffer for writing
-			if ( BinkBufferLock( hBINKBuffer ) ) {
+			if ( BinkBufferLock( hBINKBuffer ) )
+			{
 				RunCodeAtScopeExit( BinkBufferUnlock( hBINKBuffer ) );
 
 				// Copy the decompressed frame into the BinkBuffer
@@ -435,7 +433,8 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 							BinkGetRects( hBINK, hBINKBuffer->SurfaceType ) );
 
 			// Wait until the next frame is ready
-			while ( BinkWait( hBINK ) ) {
+			while ( BinkWait( hBINK ) )
+			{
 				ThreadSleep( 1 );
 			}
 
@@ -459,12 +458,6 @@ VideoResult_t CBinkVideoSubSystem::PlayVideoFileFullScreen( const char *filename
 			BinkNextFrame( hBINK );
 		}
 	}
-
-	// Close it all down
-abort_playback:
-	// Close it all down
-	BinkBufferClose( hBINKBuffer );
-	BinkClose( hBINK );
 
 	return SetResult( VideoResult::SUCCESS );
 }
