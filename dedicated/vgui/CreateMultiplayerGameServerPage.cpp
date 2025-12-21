@@ -46,8 +46,9 @@ const char *GetLiblistFallbackDir(const char *pszGameDir) {
   g_pFullFileSystem->GetLocalCopy(szTemp);
 
   FileHandle_t hFile = g_pFullFileSystem->Open(szTemp, "rt");
-
   if (hFile) {
+    RunCodeAtScopeExit(g_pFullFileSystem->Close(hFile));
+
     char szLine[512];
 
     // look for the line starting with 'fallback_dir'
@@ -82,8 +83,6 @@ const char *GetLiblistFallbackDir(const char *pszGameDir) {
         }
       }
     }
-
-    g_pFullFileSystem->Close(hFile);
   }
 
   return szFallback;
@@ -530,6 +529,8 @@ void CCreateMultiplayerGameServerPage::LoadModListInDirectory(
   FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
   const char *filename =
       g_pFullFileSystem->FindFirst(searchString, &findHandle);
+  RunCodeAtScopeExit(g_pFullFileSystem->FindClose(findHandle));
+
   while (filename) {
     // add to the mod list
     if (filename[0] != '.' && g_pFullFileSystem->FindIsDirectory(findHandle)) {
@@ -550,7 +551,6 @@ void CCreateMultiplayerGameServerPage::LoadModListInDirectory(
 
     filename = g_pFullFileSystem->FindNext(findHandle);
   }
-  g_pFullFileSystem->FindClose(findHandle);
 }
 
 void CCreateMultiplayerGameServerPage::LoadPossibleMod(
@@ -624,6 +624,8 @@ int CCreateMultiplayerGameServerPage::LoadMaps(const char *pszMod) {
 
   FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
   const char *pszFilename = g_pFullFileSystem->FindFirst(szSearch, &findHandle);
+  RunCodeAtScopeExit(g_pFullFileSystem->FindClose(findHandle));
+
   KeyValues *hiddenMaps =
       m_pGameInfo ? m_pGameInfo->FindKey("hidden_maps") : nullptr;
 
@@ -638,9 +640,7 @@ int CCreateMultiplayerGameServerPage::LoadMaps(const char *pszMod) {
     }
 
     char *ext = strstr(mapname, ".bsp");
-    if (ext) {
-      *ext = 0;
-    }
+    if (ext) *ext = 0;
 
     //!! hack: strip out single player HL maps
     // this needs to be specified in a seperate file
@@ -665,8 +665,6 @@ int CCreateMultiplayerGameServerPage::LoadMaps(const char *pszMod) {
   nextFile:
     pszFilename = g_pFullFileSystem->FindNext(findHandle);
   }
-
-  g_pFullFileSystem->FindClose(findHandle);
 
   return iMapsFound;
 }

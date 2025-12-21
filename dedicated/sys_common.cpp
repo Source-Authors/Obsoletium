@@ -134,11 +134,12 @@ SpewRetval_t DedicatedSpewOutputFunc(SpewType_t spewType, char const *pMsg) {
     // these wind up being lost because Sys_InitGame hasn't been called yet, and
     // Sys_SpewFunc is the thing that logs stuff to -consolelog, etc.
     const char *filename = get_consolelog_filename(CommandLine());
-    if (filename[0] && message[0]) {
+    if (!Q_isempty(filename)) {
       FileHandle_t fh = g_pFullFileSystem->Open(filename, "a");
-      if (fh != FILESYSTEM_INVALID_HANDLE) {
+      if (fh) {
+        RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
         g_pFullFileSystem->Write(message, V_strlen(message), fh);
-        g_pFullFileSystem->Close(fh);
       }
     }
   }

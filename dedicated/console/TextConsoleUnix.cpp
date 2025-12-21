@@ -303,9 +303,10 @@ void CTextConsoleUnix::Print(const char *pszMsg) {
   if (nChars > 0) {
     if (m_bConDebug) {
       FileHandle_t fh = g_pFullFileSystem->Open(CONSOLE_LOG_FILE, "a");
-      if (fh != FILESYSTEM_INVALID_HANDLE) {
+      if (fh) {
+        RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
         g_pFullFileSystem->Write(pszMsg, nChars, fh);
-        g_pFullFileSystem->Close(fh);
       }
     }
 
