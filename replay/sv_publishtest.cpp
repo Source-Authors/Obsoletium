@@ -242,14 +242,17 @@ bool CPublishTester::Test_IO( const char *pFilename )
 	g_pBlockSpewer->PrintValue( "Temp path", SV_GetTmpDir() );
 	g_pBlockSpewer->PrintEmptyLine();
 
+	g_pBlockSpewer->PrintEventStartMsg( "Opening temp file" );
 	// Open the file
 	FileHandle_t hTmpFile = g_pFullFileSystem->Open( pFilename, "wb+" );
-	g_pBlockSpewer->PrintEventStartMsg( "Opening temp file" );
 	if ( !hTmpFile )
 	{
 		g_pBlockSpewer->PrintEventResult( false );
 		return false;
 	}
+	
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( hTmpFile ));
+
 	g_pBlockSpewer->PrintEventResult( true );
 
 	// Write the file
@@ -268,9 +271,6 @@ bool CPublishTester::Test_IO( const char *pFilename )
 		return false;
 	}
 	g_pBlockSpewer->PrintEventResult( true );
-
-	// Close the file
-	g_pFullFileSystem->Close( hTmpFile );
 	
 	return true;
 }

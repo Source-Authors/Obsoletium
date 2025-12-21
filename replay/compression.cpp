@@ -167,14 +167,16 @@ CON_COMMAND( replay_testcompress, "Test compression" )
 		return;
 	}
 
-	char *pUncompressed = new char[ nInFileSize ];
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( hInFile ));
+
+	std::unique_ptr<char[]> pUncompressed = std::make_unique<char[]>( nInFileSize );
 	if ( !pUncompressed )
 	{
 		Warning( "Failed to alloc %u bytes\n", nInFileSize );
 		return;
 	}
 
-	if ( g_pFullFileSystem->Read( pUncompressed, nInFileSize, hInFile ) != (int)nInFileSize )
+	if ( g_pFullFileSystem->Read( pUncompressed.get(), nInFileSize, hInFile ) != (int)nInFileSize )
 	{
 		Warning( "Failed to read file %s\n", pInFilename );
 	}
@@ -190,20 +192,22 @@ CON_COMMAND( replay_testcompress, "Test compression" )
 		}
 
 		// Compress
-		if ( !pCompressor->Compress( pCompressed.get(), &nCompressedSize, pUncompressed, nInFileSize ) )
+		if ( !pCompressor->Compress( pCompressed.get(), &nCompressedSize, pUncompressed.get(), nInFileSize ) )
 		{
 			Warning( "Compression failed.\n" );
 		}
 		else
 		{
 			CFmtStr fmtOutFilename( "%s.%s", pInFilename, pCompressionTypeName );
-			FileHandle_t hOutFile = g_pFullFileSystem->Open( fmtOutFilename.Access(), "wb+" );	
+			FileHandle_t hOutFile = g_pFullFileSystem->Open( fmtOutFilename.Access(), "wb+" );
 			if ( !hOutFile )
 			{
 				Warning( "Failed to open out file, %s\n", fmtOutFilename.Access() );
 			}
 			else
 			{
+				RunCodeAtScopeExit(g_pFullFileSystem->Close( hOutFile ));
+
 				if ( g_pFullFileSystem->Write( pCompressed.get(), nCompressedSize, hOutFile ) != (int)nCompressedSize )
 				{
 					Warning( "Failed to write compressed data to %s\n", fmtOutFilename.Access() );
@@ -213,13 +217,9 @@ CON_COMMAND( replay_testcompress, "Test compression" )
 					const float flRatio = (float)nInFileSize / nCompressedSize;
 					Warning( "Wrote compressed file to successfully (%s) - ratio: %.2f:1\n", fmtOutFilename.Access(), flRatio );
 				}
-
-				g_pFullFileSystem->Close( hOutFile );
 			}
 		}
 	}
-
-	g_pFullFileSystem->Close( hInFile );
 }
 
 #endif	// _DEBUG

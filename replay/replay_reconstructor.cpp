@@ -95,11 +95,13 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 	CUtlString strReconstructedFileFilename;
 	strReconstructedFileFilename.Format( "%s%s_%i.dem", CL_GetReplayManager()->GetIndexPath(), pSession->m_strName.Get(), pReplay->GetHandle() );
 	FileHandle_t hReconstructedFile = g_pFullFileSystem->Open( strReconstructedFileFilename.Get(), "wb" );
-	if ( hReconstructedFile == FILESYSTEM_INVALID_HANDLE )
+	if ( !hReconstructedFile )
 	{
 		CL_GetErrorSystem()->AddErrorFromTokenName( "#Replay_Err_Recon_OpenOutFile" );
 		return false;
 	}
+	
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( hReconstructedFile ));
 
 	// Now that we have an ordered list of replays to reconstruct, create the mother file
 	bool bFailed = false;
@@ -111,12 +113,14 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 		const char *pFilename = pCurBlock->m_szFullFilename;
 		
 		FileHandle_t hBlockFile = g_pFullFileSystem->Open( pFilename, "rb" );
-		if ( hBlockFile == FILESYSTEM_INVALID_HANDLE )
+		if ( !hBlockFile )
 		{
 			CL_GetErrorSystem()->AddErrorFromTokenName( "#Replay_Err_Recon_BlockDNE" );
 			bFailed = true;
 			break;
 		}
+		
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( hBlockFile ));
 
 		int nSize = g_pFullFileSystem->Size( hBlockFile );
 		if ( nSize == 0 )
@@ -187,11 +191,7 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 				}
 
 				// Append the read data to the mother file
-				if ( g_pFullFileSystem->Write( pBuffer.get(), nSize, hReconstructedFile ) == nSize )
-				{
-					g_pFullFileSystem->Close( hBlockFile );
-				}
-				else
+				if ( g_pFullFileSystem->Write( pBuffer.get(), nSize, hReconstructedFile ) != nSize )
 				{
 					CL_GetErrorSystem()->AddErrorFromTokenName( "#Replay_Err_Recon_FailedToWrite" );
 					bFailed = true;
@@ -232,9 +232,6 @@ bool Replay_Reconstruct( CReplay *pReplay, bool bDeleteBlocks/*=true*/ )
 			pSession->DeleteBlocks();
 		}
 	}
-
-	// Close reconstructed file
-	g_pFullFileSystem->Close( hReconstructedFile );
 
 	return true;
 }
