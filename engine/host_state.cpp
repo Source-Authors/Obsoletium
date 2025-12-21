@@ -577,7 +577,7 @@ void CHostState::State_Shutdown()
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void CHostState::State_Restart( void )
+void CHostState::State_Restart()
 {
 	// Just like a regular shutdown
 	State_Shutdown();
@@ -766,7 +766,7 @@ void CHostState::OnClientDisconnected()
 }
 
 // Determine if this is a valid game
-static bool Host_ValidGame( void )
+static bool Host_ValidGame()
 {
 	// No multi-client single player games
 	if ( sv.IsMultiplayer() )
