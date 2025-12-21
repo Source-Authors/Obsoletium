@@ -48,7 +48,7 @@ extern bool		g_bAbortServerSet;
 extern ConVar	reload_materials;
 #endif
 
-typedef enum 
+enum class HOSTSTATES
 {
 	HS_NEW_GAME = 0,
 	HS_LOAD_GAME,
@@ -58,7 +58,7 @@ typedef enum
 	HS_GAME_SHUTDOWN,
 	HS_SHUTDOWN,
 	HS_RESTART,
-} HOSTSTATES;
+};
 
 // a little class that manages the state machine for the host
 class CHostState
@@ -142,7 +142,7 @@ void HostState_NewGame( char const *pMapName, bool remember_location, bool backg
 	{
 		g_HostState.RememberLocation();
 	}
-	g_HostState.SetNextState( HS_NEW_GAME );
+	g_HostState.SetNextState( HOSTSTATES::HS_NEW_GAME );
 }
 
 //-----------------------------------------------------------------------------
@@ -172,7 +172,7 @@ void HostState_LoadGame( char const *pSaveFileName, bool remember_location )
 		g_HostState.RememberLocation();
 	}
 
-	g_HostState.SetNextState( HS_LOAD_GAME );
+	g_HostState.SetNextState( HOSTSTATES::HS_LOAD_GAME );
 #endif
 }
 
@@ -181,7 +181,7 @@ void HostState_ChangeLevelSP( char const *pNewLevel, char const *pLandmarkName )
 {
 	Q_strncpy( g_HostState.m_levelName, pNewLevel, sizeof( g_HostState.m_levelName ) );
 	Q_strncpy( g_HostState.m_landmarkName, pLandmarkName, sizeof( g_HostState.m_landmarkName ) );
-	g_HostState.SetNextState( HS_CHANGE_LEVEL_SP );
+	g_HostState.SetNextState( HOSTSTATES::HS_CHANGE_LEVEL_SP );
 }
 
 // change level (multiplayer style - respawn all connected clients)
@@ -191,7 +191,7 @@ void HostState_ChangeLevelMP( char const *pNewLevel, char const *pLandmarkName )
 
 	Q_strncpy( g_HostState.m_levelName, pNewLevel, sizeof( g_HostState.m_levelName ) );
 	Q_strncpy( g_HostState.m_landmarkName, pLandmarkName, sizeof( g_HostState.m_landmarkName ) );
-	g_HostState.SetNextState( HS_CHANGE_LEVEL_MP );
+	g_HostState.SetNextState( HOSTSTATES::HS_CHANGE_LEVEL_MP );
 }
 
 // shutdown the game as soon as possible
@@ -200,12 +200,12 @@ void HostState_GameShutdown()
 	Steam3Server().NotifyOfLevelChange();
 
 	// This will get called during shutdown, ignore it.
-	if ( g_HostState.m_currentState != HS_SHUTDOWN &&
-		 g_HostState.m_currentState != HS_RESTART &&
-		 g_HostState.m_currentState != HS_GAME_SHUTDOWN
+	if ( g_HostState.m_currentState != HOSTSTATES::HS_SHUTDOWN &&
+		 g_HostState.m_currentState != HOSTSTATES::HS_RESTART &&
+		 g_HostState.m_currentState != HOSTSTATES::HS_GAME_SHUTDOWN
 		 )
 	{
-		g_HostState.SetNextState( HS_GAME_SHUTDOWN );
+		g_HostState.SetNextState( HOSTSTATES::HS_GAME_SHUTDOWN );
 	}
 }
 
@@ -221,7 +221,7 @@ void HostState_Shutdown()
 	}
 #endif
 
-	g_HostState.SetNextState( HS_SHUTDOWN );
+	g_HostState.SetNextState( HOSTSTATES::HS_SHUTDOWN );
 }
 
 //-----------------------------------------------------------------------------
@@ -229,7 +229,7 @@ void HostState_Shutdown()
 //-----------------------------------------------------------------------------
 void HostState_Restart()
 {
-	g_HostState.SetNextState( HS_RESTART );
+	g_HostState.SetNextState( HOSTSTATES::HS_RESTART );
 }
 
 bool HostState_IsGameShuttingDown()
@@ -239,9 +239,9 @@ bool HostState_IsGameShuttingDown()
 
 bool HostState_IsShuttingDown()
 {
-	return ( g_HostState.m_currentState == HS_SHUTDOWN ||
-		g_HostState.m_currentState == HS_RESTART ||
-			g_HostState.m_currentState == HS_GAME_SHUTDOWN );
+	return ( g_HostState.m_currentState == HOSTSTATES::HS_SHUTDOWN ||
+		g_HostState.m_currentState == HOSTSTATES::HS_RESTART ||
+		g_HostState.m_currentState == HOSTSTATES::HS_GAME_SHUTDOWN );
 }
 
 
@@ -276,9 +276,9 @@ CHostState::CHostState() = default;
 
 void CHostState::Init()
 {
-	SetState( HS_RUN, true );
-	m_currentState = HS_RUN;
-	m_nextState = HS_RUN;
+	SetState( HOSTSTATES::HS_RUN, true );
+	m_currentState = HOSTSTATES::HS_RUN;
+	m_nextState = HOSTSTATES::HS_RUN;
 	m_activeGame = false;
 	m_levelName[0] = 0;
 	m_saveName[0] = 0;
@@ -304,7 +304,7 @@ void CHostState::SetState( HOSTSTATES newState, bool clearNext )
 
 void CHostState::SetNextState( HOSTSTATES next )
 {
-	Assert( m_currentState == HS_RUN );
+	Assert( m_currentState == HOSTSTATES::HS_RUN );
 	m_nextState = next;
 }
 
@@ -352,7 +352,7 @@ void CHostState::State_NewGame()
 			if ( Host_NewGame( m_levelName, false, m_bBackgroundLevel ) )
 			{
 				// succesfully started the new game
-				SetState( HS_RUN, true );
+				SetState( HOSTSTATES::HS_RUN, true );
 				return;
 			}
 		}
@@ -363,7 +363,7 @@ void CHostState::State_NewGame()
 	// new game failed
 	GameShutdown();
 	// run the server at the console
-	SetState( HS_RUN, true );
+	SetState( HOSTSTATES::HS_RUN, true );
 }
 
 void CHostState::State_LoadGame()
@@ -374,8 +374,8 @@ void CHostState::State_LoadGame()
 	if ( saverestore->LoadGame( m_saveName ) )
 	{
 		// succesfully started the new game
-        GetTestScriptMgr()->CheckPoint( "load_game" );
-		SetState( HS_RUN, true );
+		GetTestScriptMgr()->CheckPoint( "load_game" );
+		SetState( HOSTSTATES::HS_RUN, true );
 		return;
 	}
 #endif
@@ -385,7 +385,7 @@ void CHostState::State_LoadGame()
 	// load game failed
 	GameShutdown();
 	// run the server at the console
-	SetState( HS_RUN, true );
+	SetState( HOSTSTATES::HS_RUN, true );
 }
 
 
@@ -401,13 +401,13 @@ void CHostState::State_ChangeLevelMP()
 #endif
 		if ( Host_Changelevel( false, m_levelName, m_landmarkName ) )
 		{
-			SetState( HS_RUN, true );
+			SetState( HOSTSTATES::HS_RUN, true );
 			return;
 		}
 	}
 	// fail
 	ConMsg( "Unable to change level!\n" );
-	SetState( HS_RUN, true );
+	SetState( HOSTSTATES::HS_RUN, true );
 
 	IGameEvent *event = g_GameEventManager.CreateEvent( "server_changelevel_failed" );
 	if ( event )
@@ -423,12 +423,12 @@ void CHostState::State_ChangeLevelSP()
 	if ( Host_ValidGame() )
 	{
 		Host_Changelevel( true, m_levelName, m_landmarkName );
-		SetState( HS_RUN, true );
+		SetState( HOSTSTATES::HS_RUN, true );
 		return;
 	}
 	// fail
 	ConMsg( "Unable to change level!\n" );
-	SetState( HS_RUN, true );
+	SetState( HOSTSTATES::HS_RUN, true );
 }
 
 static bool IsClientActive()
@@ -499,34 +499,34 @@ void CHostState::State_Run( float frameTime )
 
 	switch( m_nextState )
 	{
-	case HS_RUN:
+	case HOSTSTATES::HS_RUN:
 		break;
 
-	case HS_LOAD_GAME:
-	case HS_NEW_GAME:
+	case HOSTSTATES::HS_LOAD_GAME:
+	case HOSTSTATES::HS_NEW_GAME:
 #if !defined( SWDS )
 		SCR_BeginLoadingPlaque();
 #endif
 		// FALL THROUGH INTENTIONALLY TO SHUTDOWN
 		[[fallthrough]];
 
-	case HS_SHUTDOWN:
-	case HS_RESTART:
+	case HOSTSTATES::HS_SHUTDOWN:
+	case HOSTSTATES::HS_RESTART:
 		// NOTE: The game must be shutdown before a new game can start, 
 		// before a game can load, and before the system can be shutdown.
 		// This is done here instead of pathfinding through a state transition graph.
 		// That would be equivalent as the only way to get from HS_RUN to HS_LOAD_GAME is through HS_GAME_SHUTDOWN.
-	case HS_GAME_SHUTDOWN:
-		SetState( HS_GAME_SHUTDOWN, false );
+	case HOSTSTATES::HS_GAME_SHUTDOWN:
+		SetState( HOSTSTATES::HS_GAME_SHUTDOWN, false );
 		break;
 
-	case HS_CHANGE_LEVEL_MP:
-	case HS_CHANGE_LEVEL_SP:
+	case HOSTSTATES::HS_CHANGE_LEVEL_MP:
+	case HOSTSTATES::HS_CHANGE_LEVEL_SP:
 		SetState( m_nextState, true );
 		break;
 
 	default:
-		SetState( HS_RUN, true );
+		SetState( HOSTSTATES::HS_RUN, true );
 		break;
 	}
 }
@@ -550,14 +550,14 @@ void CHostState::State_GameShutdown()
 
 	switch( m_nextState )
 	{
-	case HS_LOAD_GAME:
-	case HS_NEW_GAME:
-	case HS_SHUTDOWN:
-	case HS_RESTART:
+	case HOSTSTATES::HS_LOAD_GAME:
+	case HOSTSTATES::HS_NEW_GAME:
+	case HOSTSTATES::HS_SHUTDOWN:
+	case HOSTSTATES::HS_RESTART:
 		SetState( m_nextState, true );
 		break;
 	default:
-		SetState( HS_RUN, true );
+		SetState( HOSTSTATES::HS_RUN, true );
 		break;
 	}
 }
@@ -606,51 +606,51 @@ void CHostState::FrameUpdate( float time )
 
 	while ( true )
 	{
-		int oldState = m_currentState;
+		HOSTSTATES oldState = m_currentState;
 
 		// execute the current state (and transition to the next state if not in HS_RUN)
 		switch( m_currentState )
 		{
-		case HS_NEW_GAME:
+		case HOSTSTATES::HS_NEW_GAME:
 			g_pMDLCache->BeginMapLoad();
 			State_NewGame();
 			break;
-		case HS_LOAD_GAME:
+		case HOSTSTATES::HS_LOAD_GAME:
 			g_pMDLCache->BeginMapLoad();
 			State_LoadGame();
 			break;
-		case HS_CHANGE_LEVEL_MP:
+		case HOSTSTATES::HS_CHANGE_LEVEL_MP:
 			g_pMDLCache->BeginMapLoad();
 			m_flShortFrameTime = 0.5f;
 			State_ChangeLevelMP();
 			break;
-		case HS_CHANGE_LEVEL_SP:
+		case HOSTSTATES::HS_CHANGE_LEVEL_SP:
 			g_pMDLCache->BeginMapLoad();
 			m_flShortFrameTime = 1.5f; // 1.5s of slower frames
 			State_ChangeLevelSP();
 			break;
-		case HS_RUN:
+		case HOSTSTATES::HS_RUN:
 			State_Run( time );
 			break;
-		case HS_GAME_SHUTDOWN:
+		case HOSTSTATES::HS_GAME_SHUTDOWN:
 			State_GameShutdown();
 			break;
-		case HS_SHUTDOWN:
+		case HOSTSTATES::HS_SHUTDOWN:
 			State_Shutdown();
 			break;
-		case HS_RESTART:
+		case HOSTSTATES::HS_RESTART:
 			g_pMDLCache->BeginMapLoad();
 			State_Restart();
 			break;
 		}
 
 		// only do a single pass at HS_RUN per frame.  All other states loop until they reach HS_RUN 
-		if ( oldState == HS_RUN )
+		if ( oldState == HOSTSTATES::HS_RUN )
 			break;
 
 		// shutting down
-		if ( oldState == HS_SHUTDOWN ||
-			 oldState == HS_RESTART )
+		if ( oldState == HOSTSTATES::HS_SHUTDOWN ||
+			 oldState == HOSTSTATES::HS_RESTART )
 			break;
 
 		// Only HS_RUN is allowed to persist across loops!!!
@@ -668,7 +668,7 @@ void CHostState::FrameUpdate( float time )
 
 bool CHostState::IsGameShuttingDown( void )
 {
-	return ( ( m_currentState == HS_GAME_SHUTDOWN ) || ( m_nextState == HS_GAME_SHUTDOWN ) );
+	return ( ( m_currentState == HOSTSTATES::HS_GAME_SHUTDOWN ) || ( m_nextState == HOSTSTATES::HS_GAME_SHUTDOWN ) );
 }
 
 void CHostState::RememberLocation()
