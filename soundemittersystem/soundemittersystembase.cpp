@@ -1264,14 +1264,15 @@ void CSoundEmitterSystemBase::SaveChangesToSoundScript( intp scriptindex )
 	if ( filesystem->FileExists( GAME_SOUNDS_HEADER_BLOCK ) )
 	{
 		FileHandle_t header = filesystem->Open( GAME_SOUNDS_HEADER_BLOCK, "rb", NULL );
-		if ( header != FILESYSTEM_INVALID_HANDLE )
+		if ( header )
 		{
+			RunCodeAtScopeExit(filesystem->Close( header ));
+
 			int len = filesystem->Size( header );
 			
 			std::unique_ptr<byte[]> data = std::make_unique<byte[]>(len + 1);
 			
 			filesystem->Read( data.get(), len, header );
-			filesystem->Close( header );
 
 			data[ len ] = 0;
 
@@ -1379,8 +1380,9 @@ void CSoundEmitterSystemBase::SaveChangesToSoundScript( intp scriptindex )
 	FileHandle_t fh = filesystem->Open( outfile, "wt" );
 	if (fh)
 	{
+		RunCodeAtScopeExit(filesystem->Close( fh ));
+
 		filesystem->Write( buf.Base(), buf.TellPut(), fh );
-		filesystem->Close(fh);
 
 		// Changed saved successfully
 		m_SoundKeyValues[ scriptindex ].dirty = false;
