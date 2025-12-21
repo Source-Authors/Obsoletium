@@ -910,11 +910,11 @@ bool CDescription::ReadFromBuffer( const char **pBuffer, bool bAllowNewObject )
 
 bool CDescription::InitFromFile( const char *pszFileName, bool bAllowNewObject /*= true*/ )
 {
-
 	// Load file into memory
 	FileHandle_t file = g_pFullFileSystem->Open( pszFileName, "rb" );
 	if ( !file )
 		return false;
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( file ));
 
 	int len = g_pFullFileSystem->Size( file );
 
@@ -922,7 +922,6 @@ bool CDescription::InitFromFile( const char *pszFileName, bool bAllowNewObject /
 	std::unique_ptr<byte[]> buffer = std::make_unique<byte[]>( len + 1 );
 	Assert( buffer );
 	g_pFullFileSystem->Read( buffer.get(), len, file );
-	g_pFullFileSystem->Close( file );
 	// dimhotepus: Ensure text file is terminated.
 	buffer[len] = 0;
 
