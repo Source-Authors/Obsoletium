@@ -1581,11 +1581,16 @@ void CEngineAPI::ShutdownVR()
 //-----------------------------------------------------------------------------
 bool CEngineAPI::OnStartup( void *pInstance, const char *pStartupModName )
 {
-	// This fixes a bug on certain machines where the input will 
-	// stop coming in for about 1 second when someone hits a key.
-	// (true means to disable priority boost)
 #ifdef WIN32
-	SetThreadPriorityBoost( GetCurrentThread(), true ); 
+	if ( const auto *cpuInfo = GetCPUInformation();
+		 cpuInfo->m_nPhysicalProcessors == 1 )
+	{
+		// This fixes a bug on certain machines where the input will 
+		// stop coming in for about 1 second when someone hits a key.
+		// (true means to disable priority boost)
+		// dimhotepus: Should be applied on single core PCs only. HT is not counted.
+		SetThreadPriorityBoost( GetCurrentThread(), true );
+	}
 #endif
 
 	// FIXME: Turn videomode + game into IAppSystems?
