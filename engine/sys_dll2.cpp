@@ -227,7 +227,7 @@ private:
 	bool ModuleAlreadyInList( CUtlVector< AppSystemInfo_t >& list, const char *moduleName, const char *interfaceName );
 
 	bool AddLegacySystems();
-	bool	m_bServerOnly;
+	const bool	m_bServerOnly;
 };
 
 #if defined( STAGING_ONLY )
@@ -2079,26 +2079,33 @@ int CModAppSystemGroup::Main()
 		eng->SetQuitting( IEngine::QUIT_NOTQUITTING );
 
 		COM_TimestampedLog( "eng->Load" );
+		
+		bool ok;
 
-		// Start up the game engine
-		static const char engineLoadMessage[] = "Calling CEngine::Load";
-		int64 nStartTime = ETWBegin( engineLoadMessage );
-		if ( eng->Load( false, host_parms.basedir ) )					
 		{
-#if !defined(SWDS)
-			ETWEnd( engineLoadMessage, nStartTime );
-			toolframework->ServerInit( g_ServerFactory );
+			// Start up the game engine
+			const CETWScope timer{"Calling CEngine::Load"};
 
-			if ( s_EngineAPI.MainLoop() )
+			ok = eng->Load( false, host_parms.basedir );
+		}
+
+		if ( ok )
+		{
 			{
-				nRunResult = RUN_RESTART;
+				// unload systems
+				RunCodeAtScopeExit(eng->Unload());
+
+#if !defined(SWDS)
+				toolframework->ServerInit( g_ServerFactory );
+				RunCodeAtScopeExit(toolframework->ServerShutdown());
+
+				if ( s_EngineAPI.MainLoop() )
+				{
+					nRunResult = RUN_RESTART;
+				}
+#endif
 			}
 
-			// unload systems
-			eng->Unload();
-
-			toolframework->ServerShutdown();
-#endif
 			SV_ShutdownGameDLL();
 		}
 	}
