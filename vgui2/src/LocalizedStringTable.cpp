@@ -351,6 +351,8 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		{
 			continue;
 		}
+		
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(file));
 
 		if ( first )
 		{
@@ -358,7 +360,6 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		}
 		else if ( !bIncludeFallbackSearchPaths )
 		{
-			g_pFullFileSystem->Close(file);
 			break;
 		}
 
@@ -372,9 +373,6 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		int bufferSize = g_pFullFileSystem->GetOptimalReadSize( file, fileSize + sizeof(ucs2) );
 		ucs2 *memBlock = (ucs2 *)g_pFullFileSystem->AllocOptimalReadBuffer(file, bufferSize);
 		bool bReadOK = ( g_pFullFileSystem->ReadEx(memBlock, bufferSize, fileSize, file) != 0 );
-
-		// finished with file
-		g_pFullFileSystem->Close(file);
 
 		// null-terminate the stream
 		memBlock[fileSize / sizeof(ucs2)] = 0x0000;
@@ -582,7 +580,7 @@ bool CLocalizedStringTable::AddAllLanguageFiles( const char *baseFileName )
 
 	// work out the path the files are in
 	char szFilePath[MAX_PATH];
-	Q_strncpy( szFilePath, baseFileName, sizeof(szFilePath) );
+	V_strcpy_safe( szFilePath, baseFileName );
 	char *lastSlash = strrchr( szFilePath, '\\' );
 	if (!lastSlash)
 	{
@@ -600,15 +598,18 @@ bool CLocalizedStringTable::AddAllLanguageFiles( const char *baseFileName )
 	// iterate through and add all the languages (for development)
 	// the longest string out of all the languages will be used
 	char szSearchPath[MAX_PATH];
-	Q_snprintf( szSearchPath, sizeof(szSearchPath), "%s*.txt", baseFileName );
+	V_sprintf_safe( szSearchPath, "%s*.txt", baseFileName );
 
 	FileFindHandle_t hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *file = g_pFullFileSystem->FindFirst( szSearchPath, &hFind );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( hFind ));
+	
+	char szFile[MAX_PATH];
+
 	while ( file )
 	{
 		// re-add in the search path
-		char szFile[MAX_PATH];
-		Q_snprintf( szFile, sizeof(szFile), "%s%s", szFilePath, file );
+		V_sprintf_safe( szFile, "%s%s", szFilePath, file );
 
 		// add the file
 		success &= AddFile( szFile, NULL, true );
@@ -616,7 +617,7 @@ bool CLocalizedStringTable::AddAllLanguageFiles( const char *baseFileName )
 		// next file
 		file = g_pFullFileSystem->FindNext( hFind );
 	}
-	g_pFullFileSystem->FindClose( hFind );
+
 	return success;
 }
 
@@ -629,6 +630,8 @@ bool CLocalizedStringTable::SaveToFile( const char *szFileName )
 	FileHandle_t file = g_pFullFileSystem->Open(szFileName, "wb");
 	if (!file)
 		return false;
+
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(file));
 
 	// only save the symbols relevant to this file
 	CUtlSymbol fileName = szFileName;
@@ -691,7 +694,6 @@ bool CLocalizedStringTable::SaveToFile( const char *szFileName )
 	strLength = ConvertANSIToUnicode(endStr, unicodeString);
 	g_pFullFileSystem->Write(unicodeString, strLength * sizeof(wchar_t), file);
 
-	g_pFullFileSystem->Close(file);
 	return true;
 }
 
