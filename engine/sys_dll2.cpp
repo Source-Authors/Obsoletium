@@ -1304,7 +1304,7 @@ void CEngineAPI::PumpMessages()
 	// This message pumping happens in SDL if SDL is enabled.
 #if defined( PLATFORM_WINDOWS ) && !defined( USE_SDL )
 	MSG msg = {};
-	const DWORD end_ticks{GetTickCount() + 1u};
+	const unsigned long long end_ticks{GetTickCount64() + 1ULL};
 	uint new_messages{0};
 
 	while ( PeekMessage( &msg, nullptr, 0, 0, PM_REMOVE ) )
