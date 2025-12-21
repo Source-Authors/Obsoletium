@@ -30,14 +30,15 @@ bool SaveResourceListing(IFileSystem *file_system,
                          const CUtlRBTree<CUtlString, int> &list,
                          const char *pchFileName, const char *pchSearchPath) {
   FileHandle_t fh = file_system->Open(pchFileName, "wt", pchSearchPath);
-  if (fh != FILESYSTEM_INVALID_HANDLE) {
+  if (fh) {
+    RunCodeAtScopeExit(file_system->Close(fh));
+
     for (int i = list.FirstInorder(); i != list.InvalidIndex();
          i = list.NextInorder(i)) {
-      file_system->Write(list[i].String(), Q_strlen(list[i].String()), fh);
+      file_system->Write(list[i].String(), V_strlen(list[i].String()), fh);
       file_system->Write("\n", 1, fh);
     }
 
-    file_system->Close(fh);
     return true;
   }
   return false;
@@ -149,8 +150,7 @@ ResourceListing::ResourceListing(ICommandLine *command_line,
     : command_line_{command_line},
       file_system_{file_system},
       final_dir_{"reslists"},
-      working_dir_{"reslists_work"}
-      {
+      working_dir_{"reslists_work"} {
   MEM_ALLOC_CREDIT();
 }
 
