@@ -692,10 +692,11 @@ bool CAssetCache::ContinueSearchForAssets( AssetList_t hList, float flDuration )
 			pStartingFile = g_pFullFileSystem->FindNext( list.m_hFind );
 		}
 
+		RunCodeAtScopeExit(g_pFullFileSystem->FindClose(list.m_hFind));
+
 		if ( !AddFilesInDirectory( list, pStartingFile, pFilePath, hCurrentDir, flStartTime, flDuration ) )
 			return false;
 
-		g_pFullFileSystem->FindClose( list.m_hFind );
 		list.m_hFind = FILESYSTEM_INVALID_FIND_HANDLE;
 		list.m_DirectoriesToCheck.Remove( list.m_DirectoriesToCheck.Head() );
 	}

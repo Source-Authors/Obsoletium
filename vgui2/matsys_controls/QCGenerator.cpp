@@ -508,6 +508,8 @@ bool CQCGenerator::GenerateQCFile()
 		return 0;
 	}
 
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(pSaveFile));
+
 	//write qc header
 	g_pFullFileSystem->FPrintf( pSaveFile, "//\n// .qc file version 1.0\n\n");
 	//write out modelname info
@@ -584,8 +586,6 @@ bool CQCGenerator::GenerateQCFile()
 		}
 		g_pFullFileSystem->FPrintf( pSaveFile, "}\n\n");
 	}
-
-	g_pFullFileSystem->Close( pSaveFile );
 
 	char szCommand[MAX_PATH * 3];
 	char szGamePath[MAX_PATH];

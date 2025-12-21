@@ -117,7 +117,7 @@ void CGameFileTreeView::PopulateRootNode( intp itemIndex )
 bool CGameFileTreeView::DoesDirectoryHaveSubdirectories( const char *pFilePath )
 {
 	char pSearchString[MAX_PATH];
-	Q_snprintf( pSearchString, MAX_PATH, "%s\\*", pFilePath );
+	V_sprintf_safe( pSearchString, "%s\\*", pFilePath );
 
 	// get the list of files
 	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
@@ -125,6 +125,8 @@ bool CGameFileTreeView::DoesDirectoryHaveSubdirectories( const char *pFilePath )
 	// generate children
 	// add all the items
 	const char *pszFileName = g_pFullFileSystem->FindFirstEx( pSearchString, "GAME", &findHandle );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( findHandle ));
+
 	while ( pszFileName )
 	{
 		bool bIsDirectory = g_pFullFileSystem->FindIsDirectory( findHandle );
@@ -134,7 +136,6 @@ bool CGameFileTreeView::DoesDirectoryHaveSubdirectories( const char *pFilePath )
 		pszFileName = g_pFullFileSystem->FindNext( findHandle );
 	}
 
-	g_pFullFileSystem->FindClose( findHandle );
 	return false;
 }
 
@@ -145,7 +146,7 @@ bool CGameFileTreeView::DoesDirectoryHaveSubdirectories( const char *pFilePath )
 void CGameFileTreeView::AddDirectoriesOfNode( intp itemIndex, const char *pFilePath )
 {
 	char pSearchString[MAX_PATH];
-	Q_snprintf( pSearchString, MAX_PATH, "%s\\*", pFilePath );
+	V_sprintf_safe( pSearchString, "%s\\*", pFilePath );
 
 	// get the list of files
 	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
@@ -153,6 +154,8 @@ void CGameFileTreeView::AddDirectoriesOfNode( intp itemIndex, const char *pFileP
 	// generate children
 	// add all the items
 	const char *pszFileName = g_pFullFileSystem->FindFirstEx( pSearchString, "GAME", &findHandle );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( findHandle ));
+
 	while ( pszFileName )
 	{
 		bool bIsDirectory = g_pFullFileSystem->FindIsDirectory( findHandle );
@@ -161,7 +164,7 @@ void CGameFileTreeView::AddDirectoriesOfNode( intp itemIndex, const char *pFileP
 			KeyValuesAD kv( new KeyValues( "node", "text", pszFileName ) );
 			 
 			char pFullPath[MAX_PATH];
-			Q_snprintf( pFullPath, sizeof(pFullPath), "%s/%s", pFilePath, pszFileName );
+			V_sprintf_safe( pFullPath, "%s/%s", pFilePath, pszFileName );
 			Q_FixSlashes( pFullPath );
 			Q_strlower( pFullPath );
 			bool bHasSubdirectories = DoesDirectoryHaveSubdirectories( pFullPath );
@@ -179,8 +182,6 @@ void CGameFileTreeView::AddDirectoriesOfNode( intp itemIndex, const char *pFileP
 
 		pszFileName = g_pFullFileSystem->FindNext( findHandle );
 	}
-
-	g_pFullFileSystem->FindClose( findHandle );
 }
 
 
@@ -190,7 +191,7 @@ void CGameFileTreeView::AddDirectoriesOfNode( intp itemIndex, const char *pFileP
 void CGameFileTreeView::AddFilesOfNode( intp itemIndex, const char *pFilePath, const char *pExt )
 {
 	char pSearchString[MAX_PATH];
-	Q_snprintf( pSearchString, MAX_PATH, "%s\\*.%s", pFilePath, pExt );
+	V_sprintf_safe( pSearchString, "%s\\*.%s", pFilePath, pExt );
 
 	// get the list of files
 	FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
@@ -198,14 +199,17 @@ void CGameFileTreeView::AddFilesOfNode( intp itemIndex, const char *pFilePath, c
 	// generate children
 	// add all the items
 	const char *pszFileName = g_pFullFileSystem->FindFirst( pSearchString, &findHandle );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( findHandle ));
+
+	char pFullPath[MAX_PATH];
+
 	while ( pszFileName )
 	{
 		if ( !g_pFullFileSystem->FindIsDirectory( findHandle ) )
 		{
 			KeyValuesAD kv( new KeyValues( "node", "text", pszFileName ) );
 
-			char pFullPath[MAX_PATH];
-			Q_snprintf( pFullPath, MAX_PATH, "%s\\%s", pFilePath, pszFileName );
+			V_sprintf_safe( pFullPath, "%s\\%s", pFilePath, pszFileName );
 			kv->SetString( "path", pFullPath );
 			kv->SetInt( "image", IMAGE_FILE );
 
@@ -214,8 +218,6 @@ void CGameFileTreeView::AddFilesOfNode( intp itemIndex, const char *pFilePath, c
 
 		pszFileName = g_pFullFileSystem->FindNext( findHandle );
 	}
-
-	g_pFullFileSystem->FindClose( findHandle );
 }
 
 

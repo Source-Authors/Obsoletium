@@ -727,6 +727,7 @@ void CMDLPicker::WriteBackbackVMTFiles( const char *pAssetName )
 		FileHandle_t fileHandle = g_pFullFileSystem->Open( pVMTFilename, "w" );
 		if ( fileHandle )
 		{
+			RunCodeAtScopeExit(g_pFullFileSystem->Close(fileHandle));
 
 			g_pFullFileSystem->FPrintf( fileHandle, "\"UnlitGeneric\"\n" );
 			g_pFullFileSystem->FPrintf( fileHandle, "{\n" );
@@ -734,8 +735,6 @@ void CMDLPicker::WriteBackbackVMTFiles( const char *pAssetName )
 			g_pFullFileSystem->FPrintf( fileHandle, "	$translucent 1\n" );
 			g_pFullFileSystem->FPrintf( fileHandle, "	$vertexcolor 1\n" );
 			g_pFullFileSystem->FPrintf( fileHandle, "}\n" );
-
-			g_pFullFileSystem->Close( fileHandle );
 		}
 	}
 
@@ -754,13 +753,13 @@ void CMDLPicker::WriteBackbackVMTFiles( const char *pAssetName )
 		FileHandle_t fileHandle = g_pFullFileSystem->Open( pVMTFilename, "w" );
 		if ( fileHandle )
 		{
+			RunCodeAtScopeExit(g_pFullFileSystem->Close(fileHandle));
+
 			g_pFullFileSystem->FPrintf( fileHandle, "\"UnlitGeneric\"\n" );
 			g_pFullFileSystem->FPrintf( fileHandle, "{\n" );
 			g_pFullFileSystem->FPrintf( fileHandle, "	\"$baseTexture\" \"%s\"\n", pBaseTextureName );
 			g_pFullFileSystem->FPrintf( fileHandle, "	$translucent 1\n" );
 			g_pFullFileSystem->FPrintf( fileHandle, "}\n" );
-
-			g_pFullFileSystem->Close( fileHandle );
 		}
 	}
 }
@@ -900,9 +899,10 @@ void CMDLPicker::GenerateBackpackIcons( void )
 		FileHandle_t hVTexOptionsFile = g_pFullFileSystem->Open( pVTexOptionsFileName, "w" );
 		if ( hVTexOptionsFile )
 		{
+			RunCodeAtScopeExit(g_pFullFileSystem->Close(hVTexOptionsFile));
+
 			g_pFullFileSystem->FPrintf( hVTexOptionsFile, "nomip 1\n" );
 			g_pFullFileSystem->FPrintf( hVTexOptionsFile, "nolod 1\n" );
-			g_pFullFileSystem->Close( hVTexOptionsFile );
 		}
 	}
 
@@ -1028,9 +1028,10 @@ void CMDLPicker::GenerateBackpackIcons( void )
 		FileHandle_t hVTexOptionsFile = g_pFullFileSystem->Open( pVTexOptionsFileName, "w" );
 		if ( hVTexOptionsFile )
 		{
+			RunCodeAtScopeExit(g_pFullFileSystem->Close(hVTexOptionsFile));
+
 			g_pFullFileSystem->FPrintf( hVTexOptionsFile, "nomip 1\n" );
 			g_pFullFileSystem->FPrintf( hVTexOptionsFile, "nolod 1\n" );
-			g_pFullFileSystem->Close( hVTexOptionsFile );
 		}
 	}
 
