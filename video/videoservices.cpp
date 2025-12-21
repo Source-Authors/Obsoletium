@@ -902,7 +902,8 @@ search_for_video:
 	
 	FileFindHandle_t searchHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pMatchingFile = g_pFullFileSystem->FindFirstEx( SearchFileSpec, pPathID, &searchHandle );
-	
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( searchHandle ));
+
 	while ( pMatchingFile != nullptr )
 	{
 		const char *pExt = GetFileExtension( pMatchingFile );
@@ -940,8 +941,6 @@ search_for_video:
 							// Return the system
 							*pResolvedVideoSystem = GetSystemForIndex( sysIdx );
 							
-							g_pFullFileSystem->FindClose( searchHandle );
-							
 							return SetResult( VideoResult::SUCCESS );
 						}
 					}
@@ -949,13 +948,10 @@ search_for_video:
 			}
 		}
 	
-		// not usable.. keep searching		
+		// not usable.. keep searching
 		pMatchingFile = g_pFullFileSystem->FindNext( searchHandle );
-	}	
-	
-	// we didn't find anything we could use
-	g_pFullFileSystem->FindClose( searchHandle );
-		
+	}
+
 	return SetResult( VideoResult::VIDEO_FILE_NOT_FOUND );
 }
 
