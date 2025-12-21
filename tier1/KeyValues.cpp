@@ -761,6 +761,8 @@ bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceN
 		COM_TimestampedLog("KeyValues::LoadFromFile(%s%s%s): End / FileNotFound", pathID ? pathID : "", pathID && resourceName ? "/" : "", resourceName ? resourceName : "");
 		return false;
 	}
+	
+	RunCodeAtScopeExit(filesystem->Close( f ));
 
 	s_LastFileLoadingFrom = (char*)resourceName;
 
@@ -773,9 +775,6 @@ bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceN
 	
 	// read into local buffer
 	bool bRetOK = ( ((IFileSystem *)filesystem)->ReadEx( buffer, bufSize, fileSize, f ) != 0 );
-
-	filesystem->Close( f );	// close file after reading
-
 	if ( bRetOK )
 	{
 		buffer[fileSize] = 0; // null terminate file as EOF
@@ -805,20 +804,20 @@ bool KeyValues::SaveToFile( IBaseFileSystem *filesystem, const char *resourceNam
 {
 	// create a write file
 	FileHandle_t f = filesystem->Open(resourceName, "wb", pathID);
-
-	if ( f == FILESYSTEM_INVALID_HANDLE )
+	if ( !f )
 	{
-		DevMsg(1, "KeyValues::SaveToFile: couldn't open file \"%s\" in path \"%s\".\n",
+		DevWarning(1, "KeyValues::SaveToFile: couldn't open file \"%s\" in path \"%s\".\n",
 			resourceName?resourceName:"NULL", pathID?pathID:"NULL" );
 		return false;
 	}
+
+	RunCodeAtScopeExit(filesystem->Close( f ));
 
 	KeyValuesSystem()->InvalidateCacheForFile( resourceName, pathID );
 	if ( bCacheResult ) {
 		KeyValuesSystem()->AddFileKeyValuesToCache( this, resourceName, pathID );
 	}
 	RecursiveSaveToFile(filesystem, f, nullptr, 0, sortKeys, bAllowEmptyString );
-	filesystem->Close(f);
 
 	return true;
 }
