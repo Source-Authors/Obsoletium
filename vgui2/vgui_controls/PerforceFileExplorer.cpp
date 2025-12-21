@@ -187,6 +187,8 @@ void PerforceFileExplorer::PopulateFileList()
 	// Find all files on disk
 	FileFindHandle_t h = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( pFilter, NULL, &h );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( h ));
+
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{
 		if ( !Q_stricmp( pFileName, ".." ) || !Q_stricmp( pFileName, "." ) )
@@ -194,14 +196,13 @@ void PerforceFileExplorer::PopulateFileList()
 
 		if ( !Q_IsAbsolutePath( pFileName ) )
 		{
-			Q_snprintf( pFullFoundPath, sizeof(pFullFoundPath), "%s\\%s", m_CurrentDirectory.Get(), pFileName );
+			V_sprintf_safe( pFullFoundPath, "%s\\%s", m_CurrentDirectory.Get(), pFileName );
 			pFileName = pFullFoundPath;
 		}
 
 		int nItemID = m_pFileList->AddFile( pFileName, true );
 		m_pFileList->RefreshPerforceState( nItemID, true, NULL );
 	}
-	g_pFullFileSystem->FindClose( h );
 
 	// dimhotepus: No perforce
 	// Now find all files in perforce

@@ -147,6 +147,7 @@ bool AnimationController::LoadScriptFile(const char *fileName)
 		Warning("Couldn't find script file %s\n", fileName);
 		return false;
 	}
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( f ));
 
 	// read the whole thing into memory
 	int size = g_pFullFileSystem->Size(f);
@@ -156,7 +157,6 @@ bool AnimationController::LoadScriptFile(const char *fileName)
 	int bytesRead = g_pFullFileSystem->ReadEx(mem.get(), nBufSize, size, f);
 	Assert(bytesRead <= size);
 	mem[bytesRead] = 0;
-	g_pFullFileSystem->Close(f);
 	// parse
 	bool success = ParseScriptFile(mem.get(), bytesRead);
 	return success;

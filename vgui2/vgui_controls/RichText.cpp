@@ -2348,6 +2348,8 @@ void RichText::ApplySettings(KeyValues *inResourceData)
 				return;
 			}
 
+			RunCodeAtScopeExit(g_pFullFileSystem->Close( f ));
+
 			int len = g_pFullFileSystem->Size( f );
 			delete [] m_pszInitialText;
 			m_pszInitialText = new char[ len + 1 ];
@@ -2355,8 +2357,6 @@ void RichText::ApplySettings(KeyValues *inResourceData)
 			// dimhotepus: Fix off by one error.
 			m_pszInitialText[len] = 0;
 			SetText( m_pszInitialText );
-
-			g_pFullFileSystem->Close( f );
 		}
 	}
 }

@@ -493,10 +493,11 @@ void Panel::SaveKeyBindingsToFile( KeyBindingContextHandle_t handle, char const 
 	}
 
 	FileHandle_t h = g_pFullFileSystem->Open( filename, "wb", pathID );
-	if ( FILESYSTEM_INVALID_HANDLE != h )
+	if ( h )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( h ));
+
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), h );
-		g_pFullFileSystem->Close( h );
 	}
 }
 

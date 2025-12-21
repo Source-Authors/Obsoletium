@@ -1200,10 +1200,12 @@ void FileOpenDialog::PopulateFileList()
 				break;
 			}
 
-			Q_snprintf( dir, MAX_PATH*4, "%s%s", currentDir, curFilter );
+			V_sprintf_safe( dir, "%s%s", currentDir, curFilter );
 
 			// Open the directory and walk it, loading files
 			const char *pszFileName = g_pFullFileSystem->FindFirst( dir, &findHandle );
+			RunCodeAtScopeExit( g_pFullFileSystem->FindClose( findHandle ) );
+
 			while ( pszFileName )
 			{
 				if ( !g_pFullFileSystem->FindIsDirectory( findHandle )
@@ -1247,7 +1249,6 @@ void FileOpenDialog::PopulateFileList()
 
 				pszFileName = g_pFullFileSystem->FindNext( findHandle );
 			}
-			g_pFullFileSystem->FindClose( findHandle );
 		}
 	}
 
@@ -1256,6 +1257,8 @@ void FileOpenDialog::PopulateFileList()
 	Q_strncat(dir, "*", sizeof( dir ), COPY_ALL_CHARACTERS);
 	
 	const char *pszFileName = g_pFullFileSystem->FindFirst( dir, &findHandle );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( findHandle ) );
+
 	while ( pszFileName )
 	{
 		if ( pszFileName[0] != '.' && g_pFullFileSystem->FindIsDirectory( findHandle )
@@ -1286,7 +1289,6 @@ void FileOpenDialog::PopulateFileList()
 
 		pszFileName = g_pFullFileSystem->FindNext( findHandle );
 	}
-	g_pFullFileSystem->FindClose( findHandle );
 
 	m_pFileList->SortList();
 }

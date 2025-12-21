@@ -1054,8 +1054,10 @@ void CConsolePanel::DumpConsoleTextToFile()
 	}
 
 	FileHandle_t handle = g_pFullFileSystem->Open(szfile, "wb");
-	if ( handle != FILESYSTEM_INVALID_HANDLE )
+	if ( handle )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( handle ));
+
 		intp pos = 0;
 		while (1)
 		{
@@ -1085,8 +1087,6 @@ void CConsolePanel::DumpConsoleTextToFile()
 				g_pFullFileSystem->Write( ansi + i, 1, handle );
 			}
 		}
-
-		g_pFullFileSystem->Close( handle );
 
 		Print( "console dumped to " );
 		Print( szfile );

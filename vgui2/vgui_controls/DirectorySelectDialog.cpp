@@ -394,6 +394,8 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, intp parentNodeInde
 
 	FileFindHandle_t h = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( searchString, NULL, &h );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( h ) );
+
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{
 		if ( !Q_stricmp( pFileName, ".." ) || !Q_stricmp( pFileName, "." ) )
@@ -407,7 +409,6 @@ void DirectorySelectDialog::ExpandTreeNode(const char *path, intp parentNodeInde
 		kv->SetInt("Expand", DoesDirectoryHaveSubdirectories(path, pFileName));	
 		m_pDirTree->AddItem(kv, parentNodeIndex);
 	}
-	g_pFullFileSystem->FindClose( h );
 }
 
 //-----------------------------------------------------------------------------
@@ -417,21 +418,23 @@ bool DirectorySelectDialog::DoesDirectoryHaveSubdirectories(const char *path, co
 {
 	char searchString[512];
 	V_sprintf_safe(searchString, "%s%s\\*.*", path, dir);
+	
+	char szFullPath[ MAX_PATH ];
 
 	FileFindHandle_t h = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( searchString, NULL, &h );
+	RunCodeAtScopeExit( g_pFullFileSystem->FindClose( h ) );
+
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( h ) )
 	{
-		char szFullPath[ MAX_PATH ];
 		V_sprintf_safe( szFullPath, "%s\\%s", path, pFileName );
-		Q_FixSlashes( szFullPath ); 
+		V_FixSlashes( szFullPath );
+
 		if ( g_pFullFileSystem->IsDirectory( szFullPath ) )
 		{
-			g_pFullFileSystem->FindClose( h );
 			return true;
 		}
 	}
-	g_pFullFileSystem->FindClose( h );
 	return false;
 }
 
