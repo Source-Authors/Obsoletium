@@ -287,7 +287,7 @@ void CEngine::Frame( void )
 {
 	// yield the CPU for a little while when paused, minimized, or not the focus
 	// FIXME:  Move this to main windows message pump?
-	if ( IsPC() && !game->IsActiveApp() && !sv.IsDedicated() && engine_no_focus_sleep.GetInt() > 0 )
+	if ( !game->IsActiveApp() && !sv.IsDedicated() && engine_no_focus_sleep.GetInt() > 0 )
 	{
 		VPROF_BUDGET( "Sleep", VPROF_BUDGETGROUP_SLEEPING );
 #if defined( RAD_TELEMETRY_ENABLED )
@@ -338,7 +338,7 @@ void CEngine::Frame( void )
 			break;
 		}
 
-		if ( IsPC() && ( !sv.IsDedicated() || host_timer_spin_ms.GetFloat() != 0 ) )
+		if ( !sv.IsDedicated() || host_timer_spin_ms.GetFloat() != 0 )
 		{
 			// ThreadSleep may be imprecise. On non-dedicated servers, we busy-sleep
 			// for the last one or two milliseconds to ensure very tight timing.
@@ -471,10 +471,6 @@ void CEngine::Frame( void )
 
 	// Remember old time
 	m_flPreviousTime = m_flCurrentTime;
-
-#if defined( VPROF_ENABLED ) && defined( _X360 )
-	UpdateVXConsoleProfile();
-#endif
 }
 
 
