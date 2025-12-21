@@ -1763,6 +1763,8 @@ bool CBaseFileSystem::ReadFile( const char *pFileName, const char *pPath, CUtlBu
 	if ( !fp )
 		return false;
 
+	RunCodeAtScopeExit( Close( fp ) );
+
 	if ( nStartingByte != 0 )
 	{
 		Seek( fp, nStartingByte, FILESYSTEM_SEEK_HEAD );
@@ -1773,11 +1775,7 @@ bool CBaseFileSystem::ReadFile( const char *pFileName, const char *pPath, CUtlBu
 		g_pszReadFilename.Set( pFileName );
 	}
 
-	bool bSuccess = ReadToBuffer( fp, buf, nMaxBytes, pfnAlloc );
-
-	Close( fp );
-
-	return bSuccess;
+	return ReadToBuffer( fp, buf, nMaxBytes, pfnAlloc );
 }
 
 //-----------------------------------------------------------------------------
@@ -1791,11 +1789,7 @@ int CBaseFileSystem::ReadFileEx( const char *pFileName, const char *pPath, void 
 		return 0;
 	}
 
-	if ( IsX360() )
-	{
-		// callers are sloppy, always want optimal
-		bOptimalAlloc = true;
-	}
+	RunCodeAtScopeExit(Close( fp ));
 
 	SetBufferSize( fp, 0 );  // TODO: what if it's a pack file? restore buffer size?
 
@@ -1850,7 +1844,6 @@ int CBaseFileSystem::ReadFileEx( const char *pFileName, const char *pPath, void 
 		}
 	}
 
-	Close( fp );
 	return nBytesRead;
 }
 
@@ -1874,10 +1867,10 @@ bool CBaseFileSystem::WriteFile( const char *pFileName, const char *pPath, CUtlB
 	if ( !fp )
 		return false;
 
-	int nBytesWritten = Write( buf.Base(), buf.TellPut(), fp );
+	RunCodeAtScopeExit(Close( fp ));
 
-	Close( fp );
-	return (nBytesWritten == buf.TellPut());
+	const int nBytesWritten = Write( buf.Base(), buf.TellPut(), fp );
+	return nBytesWritten == buf.TellPut();
 }
 
 
@@ -2614,8 +2607,9 @@ unsigned int CBaseFileSystem::Size( FileHandle_t file )
 unsigned int CBaseFileSystem::Size( const char* pFileName, const char *pPathID )
 {
 	VPROF_BUDGET( "CBaseFileSystem::Size", VPROF_BUDGETGROUP_OTHER_FILESYSTEM );
+
 	// handle the case where no name passed...
-	if ( !pFileName || !pFileName[0] )
+	if ( Q_isempty( pFileName ) )
 	{
 		Warning( FILESYSTEM_WARNING, "FS:  Tried to Size nullptr filename!\n" );
 		return 0;
@@ -2624,15 +2618,15 @@ unsigned int CBaseFileSystem::Size( const char* pFileName, const char *pPathID )
 	CHECK_DOUBLE_SLASHES( pFileName );
 	
 	// Ok, fall through to the fast path.
-	unsigned result = 0;
 	FileHandle_t h = Open( pFileName, "rb", pPathID );
 	if ( h )
 	{
-		result = Size( h );
-		Close(h);
+		RunCodeAtScopeExit(Close( h ));
+
+		return Size( h );
 	}
 
-	return result;
+	return 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -2853,16 +2847,17 @@ bool CBaseFileSystem::LookupKeyValuesRootKeyName( char const *filename, char con
 {
 	// open file and get shader name
 	FileHandle_t hFile = Open( filename, "r", pPathID );
-	if ( hFile == FILESYSTEM_INVALID_HANDLE )
+	if ( !hFile )
 	{
 		// dimhotepus: Always zero-terminate.
 		if (bufsize) rootName[0] = '\0';
 		return false;
 	}
 
+	RunCodeAtScopeExit(Close( hFile ));
+
 	char buf[ 128 ];
 	static_cast<IFileSystem *>(this)->ReadLine( buf, hFile );
-	Close( hFile );
 
 	// The name will possibly come in as "foo"\n
 
@@ -3085,11 +3080,11 @@ bool CBaseFileSystem::Precache( const char *pFileName, const char *pPathID)
 	if ( !f )
 		return false;
 
+	RunCodeAtScopeExit(Close( f ));
+
 	// dimhotepus: Double buffer size.
 	char buffer[65535];
 	while( sizeof(buffer) == Read(buffer,sizeof(buffer),f) );
-
-	Close( f );
 
 	return true;
 }
@@ -3547,7 +3542,7 @@ bool CBaseFileSystem::FileExists( const char *pFileName, const char *pPathID )
 	FileHandle_t h = Open( pFileName, "rb", pPathID );
 	if ( h )
 	{
-		Close(h);
+		RunCodeAtScopeExit(Close(h));
 		return true;
 	}
 

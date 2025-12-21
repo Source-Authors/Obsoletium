@@ -1273,7 +1273,7 @@ FSAsyncStatus_t CBaseFileSystem::SyncRead( const FileAsyncRequest_t &request )
 
 	FileHandle_t hFile;
 	
-	if ( !pHeldFile || pHeldFile->hFile == FILESYSTEM_INVALID_HANDLE )
+	if ( !pHeldFile || !pHeldFile->hFile )
 	{
 		hFile = OpenEx( request.pszFilename, "rb", 0, request.pszPathID );
 		if ( pHeldFile ) //-V1051
@@ -1387,9 +1387,11 @@ FSAsyncStatus_t CBaseFileSystem::SyncWrite(const char *pszFilename, const void *
 	FileHandle_t hFile = OpenEx( pszFilename, ( bAppend ) ? "ab+" : "wb", 0, NULL );
 	if ( hFile )
 	{
+		RunCodeAtScopeExit( Close( hFile ) );
+
 		SetBufferSize( hFile, 0 );
 		Write( pSrc, nSrcBytes, hFile );
-		Close( hFile );
+
 		if ( bFreeMemory )
 		{
 			free( (void*)pSrc );
