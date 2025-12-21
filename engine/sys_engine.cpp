@@ -289,7 +289,7 @@ void CEngine::Frame( void )
 	// FIXME:  Move this to main windows message pump?
 	if ( !game->IsActiveApp() && !sv.IsDedicated() && engine_no_focus_sleep.GetInt() > 0 )
 	{
-		VPROF_BUDGET( "Sleep", VPROF_BUDGETGROUP_SLEEPING );
+		VPROF_BUDGET( "SleepUntilInput", VPROF_BUDGETGROUP_SLEEPING );
 #if defined( RAD_TELEMETRY_ENABLED )
 		if( !g_Telemetry.Level )
 #endif
