@@ -495,19 +495,6 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 		return nullptr;
 	}
 
-	//CJpegSourceMgr src;
-	//FileHandle_t fileHandle = g_pFullFileSystem->Open( jpegPath, "rb" );
-	//if ( fileHandle == FILESYSTEM_INVALID_HANDLE )
-	//{
-	//	errcode = CE_CANT_OPEN_SOURCE_FILE;
-	//	return NULL;
-	//}
-	//if ( !src.Init( g_pFullFileSystem, fileHandle ) ) {
-	//	errcode = CE_CANT_OPEN_SOURCE_FILE;
-	//	g_pFullFileSystem->Close( fileHandle );
-	//	return NULL;
-	//}
-
 	// setup error to print to stderr.
 	memset( &jpegInfo, 0, sizeof( jpegInfo ) );
 	jpegInfo.err = jpeg_std_error(&jerr.m_Base);
@@ -523,7 +510,6 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 		jpeg_destroy_decompress( &jpegInfo );
 
 		fclose( infile );
-		//g_pFullFileSystem->Close( fileHandle );
 
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
@@ -536,7 +522,6 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	if (jpeg_read_header(&jpegInfo, TRUE) != JPEG_HEADER_OK)
 	{
 		fclose( infile );
-		//g_pFullFileSystem->Close( fileHandle );
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
@@ -546,7 +531,6 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	{
 		jpeg_destroy_decompress(&jpegInfo);
 		fclose( infile );
-		//g_pFullFileSystem->Close( fileHandle );
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
@@ -556,7 +540,6 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	{
 		jpeg_destroy_decompress(&jpegInfo);
 		fclose( infile );
-		//g_pFullFileSystem->Close( fileHandle );
 		errcode = CE_SOURCE_FILE_SIZE_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -574,7 +557,6 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	{
 		jpeg_destroy_decompress(&jpegInfo);
 		fclose( infile );
-		//g_pFullFileSystem->Close( fileHandle );
 		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
@@ -604,7 +586,6 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 
 	// Clean up
 	fclose( infile );
-	//g_pFullFileSystem->Close( fileHandle );
 	jpeg_destroy_decompress(&jpegInfo);
 
 	// Check success status
