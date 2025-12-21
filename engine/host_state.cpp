@@ -711,53 +711,58 @@ void CHostState::OnClientConnected()
 	}
 
 	// Spew global texture memory usage if asked to
-	if( CommandLine()->CheckParm( "-dumpvidmemstats" ) )
-	{
-		// dimhotepus: vidmemstats.txt -> gpu_memstats.txt.
-		// dimhotepus: Notify user we dump stats.
-		constexpr char kGpuMemStatsName[]{"gpu_memstats.txt"};
-		Msg("Dumping GPU memory stats to '%s' as requested by '%s' switch.",
-			kGpuMemStatsName, "-dumpvidmemstats");
+	if( !CommandLine()->CheckParm( "-dumpvidmemstats" ) ) return;
+	
+	// dimhotepus: vidmemstats.txt -> gpu_memstats.txt.
+	// dimhotepus: Notify user we dump stats.
+	constexpr char kGpuMemStatsName[]{"gpu_memstats.txt"};
+	Msg("Dumping GPU memory stats to '%s' as requested by '%s' switch.",
+		kGpuMemStatsName, "-dumpvidmemstats");
 
-		FileHandle_t fp = g_pFileSystem->Open( kGpuMemStatsName, "a" );
-		g_pFileSystem->FPrintf( fp, "%s:\n", g_HostState.m_levelName );
+	FileHandle_t fp = g_pFileSystem->Open( kGpuMemStatsName, "a" );
+	if (!fp)
+	{
+		Warning("Unable to open '%s'. GPU VRAM stats will not be available.\n", kGpuMemStatsName);
+		return;
+	}
+	RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
+	g_pFileSystem->FPrintf( fp, "%s:\n", g_HostState.m_levelName );
 	
 #ifdef VPROF_ENABLED
-		constexpr char kGroupNamePrefix[]{"TexGroup_Global_"};
-		constexpr intp kGroupNamePrefixLen{ssize( kGroupNamePrefix ) - 1};
-		constexpr float kMibsMultiplier{1.0f / (1024.0f * 1024.0f)};
+	constexpr char kGroupNamePrefix[]{"TexGroup_Global_"};
+	constexpr intp kGroupNamePrefixLen{ssize( kGroupNamePrefix ) - 1};
+	constexpr float kMibsMultiplier{1.0f / (1024.0f * 1024.0f)};
 
-		const CVProfile &profile{g_VProfCurrentProfile};
-		float totalMibs{0.0f};
+	const CVProfile &profile{g_VProfCurrentProfile};
+	float totalMibs{0.0f};
 
-		for ( int i = 0; i < profile.GetNumCounters(); i++ )
+	for ( int i = 0; i < profile.GetNumCounters(); i++ )
+	{
+		if ( profile.GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
 		{
-			if ( profile.GetCounterGroup( i ) == COUNTER_GROUP_TEXTURE_GLOBAL )
+			const float valueMibs = profile.GetCounterValue( i ) * kMibsMultiplier;
+
+			totalMibs += valueMibs;
+
+			const char *counterName = profile.GetCounterName( i );
+			if ( Q_strnicmp( counterName, kGroupNamePrefix, kGroupNamePrefixLen ) == 0 )
 			{
-				const float valueMibs = profile.GetCounterValue( i ) * kMibsMultiplier;
-
-				totalMibs += valueMibs;
-
-				const char *counterName = profile.GetCounterName( i );
-				if ( Q_strnicmp( counterName, kGroupNamePrefix, kGroupNamePrefixLen ) == 0 )
-				{
-					counterName += kGroupNamePrefixLen;
-				}
-
-				g_pFileSystem->FPrintf( fp, "%s: %0.3f MiB\n", counterName, valueMibs );
+				counterName += kGroupNamePrefixLen;
 			}
+
+			g_pFileSystem->FPrintf( fp, "%s: %0.3f MiB\n", counterName, valueMibs );
 		}
-		g_pFileSystem->FPrintf( fp, "GPU memory total: %0.3f MiB\n", totalMibs );
+	}
+	g_pFileSystem->FPrintf( fp, "GPU memory total: %0.3f MiB\n", totalMibs );
 #else
-		// dimhotepus: Notify user VProfiler is not supported.
-		g_pFileSystem->FPrintf( fp, "VProfiler is not supported.\n" );
+	// dimhotepus: Notify user VProfiler is not supported.
+	g_pFileSystem->FPrintf( fp, "VProfiler is not supported.\n" );
 #endif
 
-		g_pFileSystem->FPrintf( fp, "---------------------------------\n" );
-		g_pFileSystem->Close( fp );
+	g_pFileSystem->FPrintf( fp, "---------------------------------\n" );
 
-		Cbuf_AddText( "quit\n" );
-	}
+	Cbuf_AddText( "quit\n" );
 #endif
 }
 
