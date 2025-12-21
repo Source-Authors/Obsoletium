@@ -176,10 +176,11 @@ void CWindowPositionMgr::SavePositions( char const *filename, char const *key )
 	}
 
 	FileHandle_t h = g_pFullFileSystem->Open( filename, "wb", "DEFAULT_WRITE_PATH" );
-	if ( FILESYSTEM_INVALID_HANDLE != h )
+	if ( h )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( h ));
+
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), h );
-		g_pFullFileSystem->Close( h );
 	}
 }
 
