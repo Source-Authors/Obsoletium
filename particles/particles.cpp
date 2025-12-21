@@ -3709,6 +3709,14 @@ void CParticleSystemMgr::DumpProfileInformation( void )
 {
 #if MEASURE_PARTICLE_PERF
 	FileHandle_t fh = g_pFullFileSystem->Open( "particle_profile.csv", "w" );
+	if (!fh)
+	{
+		Warning("Unable to open for write particle_profile.csv.\n");
+		return;
+	}
+
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
 	g_pFullFileSystem->FPrintf( fh, "numframes,%d\n", m_nNumFramesMeasured );
 	g_pFullFileSystem->FPrintf( fh, "name, total time, max time, max particles, allocated particles\n");
 	for( UtlSymId_t i=0; i < m_pParticleSystemDictionary->NameCount(); i++ )
@@ -3729,7 +3737,6 @@ void CParticleSystemMgr::DumpProfileInformation( void )
 											m_ParticleOperators[i][j]->GetName(), fltotal, flmax );
 		}	   
 	}
-	g_pFullFileSystem->Close( fh );
 #endif
 }
 
