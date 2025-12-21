@@ -399,24 +399,24 @@ void CEngine::Frame( void )
 		}
 	}
 
+	{
 #ifdef VPROF_ENABLED
-	PreUpdateProfile( m_flFrameTime );
+		PreUpdateProfile( m_flFrameTime );
+		RunCodeAtScopeExit(PostUpdateProfile());
 #endif
 	
-	// Reset swallowed time...
-	m_flFilteredTime = 0.0f;
+		// Reset swallowed time...
+		m_flFilteredTime = 0.0f;
 
 #ifndef SWDS
-	if ( !sv.IsDedicated() )
-	{
-		ClientDLL_FrameStageNotify( FRAME_START );
-		ETWRenderFrameMark( false );
+		if ( !sv.IsDedicated() )
+		{
+			ClientDLL_FrameStageNotify( FRAME_START );
+			ETWRenderFrameMark( false );
+		}
+#endif
 	}
-#endif
 
-#ifdef VPROF_ENABLED
-	PostUpdateProfile();
-#endif
 	TelemetryTick();
 
 	{ // profile scope
