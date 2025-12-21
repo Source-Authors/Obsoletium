@@ -776,13 +776,6 @@ static bool Host_ValidGame( void )
 	}
 	else
 	{
-		/*
-		// Single player must have CD validation
-		if ( IsValidCD() )
-		{
-			return true;
-		}
-		*/
 		return true;
 	}
 
