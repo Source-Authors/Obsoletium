@@ -870,8 +870,9 @@ bool CDmePresetGroup::ExportToVFE( const char *pFileName, CDmeAnimationSet *pAni
 		return false;
 	}
 
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
 	g_pFullFileSystem->Write( pDataStart, fhdr->length, fh );
-	g_pFullFileSystem->Close( fh );
 	free( pDataStart );
 	return true;
 }
