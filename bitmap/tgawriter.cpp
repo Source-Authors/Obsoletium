@@ -258,6 +258,9 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 		return false;
 	}
 	FileHandle_t fp = g_pFullFileSystem->Open( fileName, "r+b" );
+	if (!fp) return false;
+	
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fp));
 
 	//
 	// Read in the targa header
@@ -283,20 +286,15 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 		nPixelSize = 8;
 		break;
 	default:
-		// dimhotepus: Do not leak file.
-		g_pFullFileSystem->Close( fp );
 		return false;
 	}
 
 	// Verify src data matches the targa we're going to write into
 	if ( nPixelSize != tgaHeader.pixel_size )
 	{
-		// dimhotepus: Do not leak file.
-		g_pFullFileSystem->Close( fp );
 		Warning( "TGA doesn't match source data.\n" );
 		return false;
 	}
-
 
 	// Seek to the origin of the target subrect from the beginning of the file
 	g_pFullFileSystem->Seek( fp, nBytesPerPixel * (tgaHeader.width * nYOrigin + nXOrigin), FILESYSTEM_SEEK_CURRENT );
@@ -315,7 +313,6 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 		g_pFullFileSystem->Seek( fp, nBytesPerPixel * ( tgaHeader.width - width ), FILESYSTEM_SEEK_CURRENT );
 	}
 
-	g_pFullFileSystem->Close( fp );
 	return true;
 }
 

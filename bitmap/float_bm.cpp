@@ -52,9 +52,9 @@ constexpr static inline float BiLinInterp(float Xfrac, float Yfrac, float UL, fl
     Warning("Unable to open PFM '%s' for writing.\n", file_path);
     return false;
   }
+  RunCodeAtScopeExit(file_system->Close(f));
 
   if (!file_system->FPrintf(f, "PF\n%d %d\n-1.000000\n", width, height)) {
-    file_system->Close(f);
     Warning("Unable to write PFM header to '%s'.\n", file_path);
     return false;
   }
@@ -63,14 +63,12 @@ constexpr static inline float BiLinInterp(float Xfrac, float Yfrac, float UL, fl
     const float *row = &img[3 * width * i];
 
     if (!file_system->Write(row, width * sizeof(float) * 3, f)) {
-      file_system->Close(f);
       Warning("Unable to write PFM row #%d to '%s'.\n", height - i,
               file_path);
       return false;
     }
   }
 
-  file_system->Close(f);
   return true;
 }
 
@@ -144,6 +142,8 @@ bool FloatBitMap_t::LoadFromPFM(char const *fname)
 	FileHandle_t f = g_pFullFileSystem->Open(fname, "rb");
 	if (f)
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( f ));
+
 		if( GetChar(g_pFullFileSystem, f) == 'P' &&
 			GetChar(g_pFullFileSystem, f) == 'F' &&
 			GetChar(g_pFullFileSystem, f) == '\n' )
@@ -196,7 +196,6 @@ bool FloatBitMap_t::LoadFromPFM(char const *fname)
 				}
 			}
 		}
-		g_pFullFileSystem->Close( f );	// close file after reading
 	}
 	return RGBAData != nullptr;
 }
@@ -309,6 +308,8 @@ bool FloatBitMap_t::WriteTGAFile(char const *filename) const
 	FileHandle_t f = g_pFullFileSystem->Open(filename, "wb");
 	if (!f) return false;
 
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(f));
+
 	TGAHeader_t myheader = {};
 	myheader.image_type=2;
 	myheader.pixel_size=32;
@@ -332,7 +333,6 @@ bool FloatBitMap_t::WriteTGAFile(char const *filename) const
 			g_pFullFileSystem->Write(pixels, sizeof(pixels), f);
 		}
 	}
-	g_pFullFileSystem->Close( f );	// close file after reading
 		
 	return true;
 }

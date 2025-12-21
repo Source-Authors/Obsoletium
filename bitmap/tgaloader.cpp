@@ -93,6 +93,8 @@ using CTempImage = CUtlMemory<unsigned char>;
 	if( !fileHandle )
 		return false;
 
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fileHandle));
+
 	// How big is the file?
 	long pos;
 	if (maxbytes < 0)
@@ -112,9 +114,6 @@ using CTempImage = CUtlMemory<unsigned char>;
 
 	// Read the file into the vector memory
 	int len = g_pFullFileSystem->Read( image.Base(), pos, fileHandle );
-
-	// Close the file
-	g_pFullFileSystem->Close( fileHandle );
 
 	// It's an error if we didn't read in enough goodies
 	return len == pos;
