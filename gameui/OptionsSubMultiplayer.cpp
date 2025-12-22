@@ -1556,6 +1556,8 @@ void COptionsSubMultiplayer::RemapLogo()
 		if ( !fp )
 			return;
 
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fp));
+
 		char data[1024];
 		V_sprintf_safe( data, "\"UnlitGeneric\"\n\
 {\n\
@@ -1570,7 +1572,6 @@ void COptionsSubMultiplayer::RemapLogo()
 ", logoname );
 
 		g_pFullFileSystem->Write( data, V_strlen( data ), fp );
-		g_pFullFileSystem->Close( fp );
 	}
 
 	V_sprintf_safe( fullLogoName, "logos/UI/%s", logoname );

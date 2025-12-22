@@ -423,19 +423,18 @@ void CMultiplayerAdvancedDialog::SaveValues()
 	if ( m_pDescription )
 	{
 		// dimhotepus: This can take a while, put up a waiting cursor.
-    	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
-
-		FileHandle_t fp;
+		const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
 		// Add settings to config.cfg
 		m_pDescription->WriteToConfig();
 
 		g_pFullFileSystem->CreateDirHierarchy( OPTIONS_DIR );
-		fp = g_pFullFileSystem->Open( OPTIONS_FILE, "wb" );
+		FileHandle_t fp = g_pFullFileSystem->Open( OPTIONS_FILE, "wb" );
 		if ( fp )
 		{
+			RunCodeAtScopeExit(g_pFullFileSystem->Close( fp ));
+
 			m_pDescription->WriteToScriptFile( fp );
-			g_pFullFileSystem->Close( fp );
 		}
 	}
 }

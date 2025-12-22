@@ -276,10 +276,10 @@ void UpdateLogoWAD( void *phdib, int r, int g, int b )
 
 	// Output to file
 	FileHandle_t file = g_pFullFileSystem->Open( "pldecal.wad", "wb" );
-	if ( file != FILESYSTEM_INVALID_HANDLE )
+	if ( file )
 	{
-		g_pFullFileSystem->Write( buffer.Base(), buffer.TellPut(), file );
-		g_pFullFileSystem->Close( file );
-	}
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( file ));
 
+		g_pFullFileSystem->Write( buffer.Base(), buffer.TellPut(), file );
+	}
 }

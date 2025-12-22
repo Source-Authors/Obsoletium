@@ -1163,14 +1163,14 @@ bool CSaveGameBrowserDialog::ParseSaveData( char const *pszFileName, char const 
     const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
 	FileHandle_t fh = g_pFullFileSystem->Open( pszFileName, "rb", "MOD" );
-	if (fh == FILESYSTEM_INVALID_HANDLE)
+	if (!fh)
 		return false;
+
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
 
 	save->iSize = g_pFullFileSystem->Size( fh );
 
 	int readok = SaveReadNameAndComment( fh, szMapName, szComment );
-	g_pFullFileSystem->Close(fh);
-
 	if ( !readok )
 	{
 		return false;

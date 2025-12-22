@@ -301,12 +301,12 @@ bool CBaseSaveGameDialog::ParseSaveData( char const *pszFileName, char const *ps
 	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
 	FileHandle_t fh = g_pFullFileSystem->Open( pszFileName, "rb", "MOD" );
-	if (fh == FILESYSTEM_INVALID_HANDLE)
+	if (!fh)
 		return false;
 
-	int readok = SaveReadNameAndComment( fh, szMapName, szComment );
-	g_pFullFileSystem->Close(fh);
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
 
+	int readok = SaveReadNameAndComment( fh, szMapName, szComment );
 	if ( !readok )
 	{
 		return false;

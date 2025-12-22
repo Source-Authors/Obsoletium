@@ -153,8 +153,9 @@ void CCreateMultiplayerGameGameplayPage::OnApplyChanges()
 		FileHandle_t fp = g_pFullFileSystem->Open( OPTIONS_FILE, "wb", "GAME" );
 		if ( fp )
 		{
+			RunCodeAtScopeExit(g_pFullFileSystem->Close( fp ));
+
 			m_pDescription->WriteToScriptFile( fp );
-			g_pFullFileSystem->Close( fp );
 		}
 	}
 }

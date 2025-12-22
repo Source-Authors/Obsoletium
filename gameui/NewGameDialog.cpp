@@ -339,7 +339,9 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 				V_sprintf_safe( szFullFileName, "cfg/%s", fileName );
 				FileHandle_t f = g_pFullFileSystem->Open( szFullFileName, "rb", "MOD" );
 				if ( f )
-				{	
+				{
+					RunCodeAtScopeExit(g_pFullFileSystem->Close( f ));
+
 					// don't load chapter files that are empty, used in the demo
 					if ( g_pFullFileSystem->Size(f) > 0	)
 					{
@@ -347,7 +349,6 @@ CNewGameDialog::CNewGameDialog(vgui::Panel *parent, bool bCommentaryMode) : Base
 						chapters[chapterIndex].length = V_strlen(chapters[chapterIndex].filename);
 						++chapterIndex;
 					}
-					g_pFullFileSystem->Close( f );
 				}
 			}
 			fileName = g_pFullFileSystem->FindNext(findHandle);
