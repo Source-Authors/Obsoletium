@@ -1783,21 +1783,22 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
     ReadScreenPixels( 0, 0, GetModeStereoWidth(), GetModeStereoHeight(), pImage.get(), IMAGE_FORMAT_RGB888 );
 
     JSAMPROW row_pointer[1];     // pointer to JSAMPLE row[s]
-    int row_stride;              // physical row width in image buffer
 
     // stderr handler
-    struct jpeg_error_mgr jerr;
+    jpeg_error_mgr jerr;
 
     // compression data structure
-    struct jpeg_compress_struct cinfo;
+    jpeg_compress_struct cinfo;
 
-    row_stride = GetModeStereoWidth() * 3; // JSAMPLEs per row in image_buffer
+    // physical row width in image buffer
+    int row_stride = GetModeStereoWidth() * 3; // JSAMPLEs per row in image_buffer
 
     // point at stderr
     cinfo.err = jpeg_std_error(&jerr);
 
     // create compressor
     jpeg_create_compress(&cinfo);
+    RunCodeAtScopeExit(jpeg_destroy_compress(&cinfo));
 
     // Hook CUtlBuffer to compression
     jpeg_UtlBuffer_dest(&cinfo, &buf );
@@ -1816,6 +1817,7 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
 
     // Start compressor
     jpeg_start_compress(&cinfo, TRUE);
+    RunCodeAtScopeExit(jpeg_finish_compress(&cinfo));
     
     // Write scanlines
     while ( cinfo.next_scanline < cinfo.image_height ) 
@@ -1824,12 +1826,6 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
         jpeg_write_scanlines( &cinfo, row_pointer, 1 );
     }
 
-    // Finalize image
-    jpeg_finish_compress(&cinfo);
-
-    // Cleanup
-    jpeg_destroy_compress(&cinfo);
-    
     return true;
 }
 
@@ -1847,20 +1843,22 @@ void CVideoMode_Common::TakeSnapshotJPEG( const char *pFilename, int quality )
 
     int finalSize = 0;
     FileHandle_t fh = g_pFileSystem->Open( pFilename, "wb" );
-    if ( FILESYSTEM_INVALID_HANDLE != fh )
+    if ( fh )
     {
+        RunCodeAtScopeExit(g_pFileSystem->Close( fh ));
+
         g_pFileSystem->Write( buf.Base(), buf.TellPut(), fh );
+
         finalSize = g_pFileSystem->Tell( fh );
-        g_pFileSystem->Close( fh );
     }
 
     // Show info to console.
     char orig[ 64 ];
     char final[ 64 ];
-    Q_strncpy( orig, Q_pretifymem( GetModeStereoWidth() * 3 * GetModeStereoHeight(), 2, true ), sizeof( orig ) );
-    Q_strncpy( final, Q_pretifymem( finalSize, 2, true ), sizeof( final ) );
+    V_strcpy_safe( orig, Q_pretifymem( GetModeStereoWidth() * 3 * GetModeStereoHeight(), 2, true ) );
+    V_strcpy_safe( final, Q_pretifymem( finalSize, 2, true ) );
 
-    Msg( "Wrote '%s':  %s (%dx%d) compressed (quality %i) to %s\n",
+    Msg( "Wrote '%s': %s (%dx%d) compressed (quality %d) to %s.\n",
         pFilename, orig, GetModeStereoWidth(), GetModeStereoHeight(), quality, final );
 
 	if ( finalSize > 0 )
