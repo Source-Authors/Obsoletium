@@ -1540,8 +1540,8 @@ void CVideoMode_Common::TakeSnapshotTGARect( const char *pFilename, int x, int y
     }
 
     // bitmap bits
-    std::unique_ptr<uint8> pImage = std::make_unique<uint8>( w * h * 4 );
-    std::unique_ptr<uint8> pImage1 = std::make_unique<uint8>( resampleWidth * resampleHeight * 4 );
+    std::unique_ptr<uint8[]> pImage = std::make_unique<uint8[]>( w * h * 4 );
+    std::unique_ptr<uint8[]> pImage1 = std::make_unique<uint8[]>( resampleWidth * resampleHeight * 4 );
 
     // Get Bits from the material system
     ReadScreenPixels( x, y, w, h, pImage.get(), IMAGE_FORMAT_RGBA8888 );
