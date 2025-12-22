@@ -329,30 +329,29 @@ void CSystem::SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 )
 		return;
 
 	// Prepare the blit
-	HBITMAP hBmMem = NULL;
-	{
-		// Device contexts
-		HDC hDc = GetDC( hWnd );
-		HDC hDcMem = CreateCompatibleDC( hDc );
-		hBmMem = CreateCompatibleBitmap( hDc, x2 - x1, y2 - y1 );
-		HBITMAP hBmOld = ( HBITMAP ) SelectObject( hDcMem, hBmMem );
-		BitBlt( hDcMem, 0, 0, x2 - x1, y2 - y1, hDc, x1, y1, SRCCOPY );
-		SelectObject( hDcMem, hBmOld );
-		DeleteDC( hDcMem );
-		ReleaseDC( hWnd, hDc );
-		// hBmMem now holds the image.
-	}
+	HDC hDc = ::GetDC( hWnd );
+	RunCodeAtScopeExit(::ReleaseDC( hWnd, hDc ));
 
-	if ( !OpenClipboard( GetDesktopWindow() ) )
-		return;
-	
-	RunCodeAtScopeExit(::CloseClipboard());
+	HDC hDcMem = ::CreateCompatibleDC( hDc );
+	RunCodeAtScopeExit(::DeleteDC( hDcMem ));
 
-	EmptyClipboard();
+	HBITMAP hBmMem = ::CreateCompatibleBitmap(hDc, x2 - x1, y2 - y1);
+
+	HBITMAP hBmOld = ( HBITMAP )::SelectObject( hDcMem, hBmMem );
+	RunCodeAtScopeExit(::SelectObject( hDcMem, hBmOld ));
+
+	::BitBlt( hDcMem, 0, 0, x2 - x1, y2 - y1, hDc, x1, y1, SRCCOPY );
+	// hBmMem now holds the image.
 
 	if (hBmMem)
 	{
-		SetClipboardData(CF_BITMAP, hBmMem);
+		if ( !::OpenClipboard( ::GetDesktopWindow() ) )
+			return;
+	
+		RunCodeAtScopeExit(::CloseClipboard());
+
+		::EmptyClipboard();
+		::SetClipboardData(CF_BITMAP, hBmMem);
 	}
 #endif
 }
