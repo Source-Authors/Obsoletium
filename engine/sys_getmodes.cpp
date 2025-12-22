@@ -819,7 +819,7 @@ void CVideoMode_Common::DrawStartupVideo()
 //-----------------------------------------------------------------------------
 void CVideoMode_Common::DrawStartupGraphic()
 {
-    char debugstartup = CommandLine()->FindParm("-debugstartupscreen");
+    bool debugstartup = CommandLine()->HasParm("-debugstartupscreen");
 
     SetupStartupGraphic();
 
@@ -846,6 +846,7 @@ void CVideoMode_Common::DrawStartupGraphic()
     pVMTKeyValues->SetInt( "$no_fullbright", 1 );
     pVMTKeyValues->SetInt( "$nocull", 1 );
     IMaterial *pMaterial = g_pMaterialSystem->CreateMaterial( "__background", pVMTKeyValues );
+    RunCodeAtScopeExit(pMaterial->Release());
 
     // dimhotepus: Better SteamDeck support. HL2:DM before Anniversary Update
     // has no gamepadui.
@@ -862,6 +863,7 @@ void CVideoMode_Common::DrawStartupGraphic()
     pVMTKeyValues->SetInt( "$no_fullbright", 1 );
     pVMTKeyValues->SetInt( "$nocull", 1 );
     IMaterial *pLoadingMaterial = g_pMaterialSystem->CreateMaterial( "__loading", pVMTKeyValues );
+    RunCodeAtScopeExit(pLoadingMaterial->Release());
 
     int w = GetModeStereoWidth();
     int h = GetModeStereoHeight();
@@ -921,7 +923,7 @@ void CVideoMode_Common::DrawStartupGraphic()
 				}
 			}
 
-			g_pMaterialSystem->SwapBuffers();			
+			g_pMaterialSystem->SwapBuffers();
 		}
 	}
 	else
@@ -946,9 +948,6 @@ void CVideoMode_Common::DrawStartupGraphic()
 #ifdef DX_TO_GL_ABSTRACTION
 	g_pMaterialSystem->DoStartupShaderPreloading();
 #endif
-
-    pMaterial->Release();
-    pLoadingMaterial->Release();
 
     // release graphics
     DestroyVTFTexture( m_pBackgroundTexture );
