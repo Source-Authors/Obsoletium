@@ -506,7 +506,7 @@ Parse a token out of a string
 */
 char *COM_Parse(IN_Z char *data, OUT_Z_CAP(tokenSize) char *token,
                 size_t tokenSize) {
-  return (char*)ParseFileInternal(data, token, nullptr, nullptr, tokenSize);
+  return (char *)ParseFileInternal(data, token, nullptr, nullptr, tokenSize);
 }
 
 /*
@@ -646,21 +646,19 @@ qboolean FileExists(const char *filename) {
   FileHandle_t hFile = g_pFileSystem->Open(filename, "rb");
   if (!hFile) return false;
 
-  g_pFileSystem->Close(hFile);
+  RunCodeAtScopeExit(g_pFileSystem->Close(hFile));
   return true;
 }
 
 int LoadFile(const char *filename, void **bufferptr) {
-  // dimhotepus: int -> unsigned for file length.
-  unsigned length = 0;
-
   FileHandle_t f = SafeOpenRead(filename);
-  length = Q_filelength(f);
+  RunCodeAtScopeExit(g_pFileSystem->Close(f));
+  // dimhotepus: int -> unsigned for file length.
+  unsigned length = Q_filelength(f);
 
   void *buffer = malloc(length + 1);
   ((char *)buffer)[length] = 0;
   SafeRead(f, buffer, length);
-  g_pFileSystem->Close(f);
 
   *bufferptr = buffer;
 
@@ -669,10 +667,9 @@ int LoadFile(const char *filename, void **bufferptr) {
 
 void SaveFile(const char *filename, void *buffer, int count) {
   FileHandle_t f = SafeOpenWrite(filename);
+  RunCodeAtScopeExit(g_pFileSystem->Close(f));
 
   SafeWrite(f, buffer, count);
-
-  g_pFileSystem->Close(f);
 }
 
 /*
