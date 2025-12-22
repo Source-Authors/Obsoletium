@@ -517,19 +517,21 @@ qboolean EndOfScript (qboolean crossline)
 static void FindFileAbsoluteList( CUtlVector< CUtlString > &outAbsolutePathNames, const char *pszFindName )
 {
 	char szPath[MAX_PATH];
-	V_strncpy( szPath, pszFindName, sizeof( szPath ) );
+	V_strcpy_safe( szPath, pszFindName );
 	V_StripFilename( szPath );
 
 	char szResult[MAX_PATH];
 	FileFindHandle_t hFile = FILESYSTEM_INVALID_FIND_HANDLE;
+	const char *pszFoundFile = g_pFullFileSystem->FindFirst( pszFindName, &hFile );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( hFile ));
 
-	for ( const char *pszFoundFile = g_pFullFileSystem->FindFirst( pszFindName, &hFile ); pszFoundFile && hFile != FILESYSTEM_INVALID_FIND_HANDLE; pszFoundFile = g_pFullFileSystem->FindNext( hFile ) )
+	for ( ;
+		  pszFoundFile && hFile != FILESYSTEM_INVALID_FIND_HANDLE;
+		  pszFoundFile = g_pFullFileSystem->FindNext( hFile ) )
 	{
 		V_ComposeFileName( szPath, pszFoundFile, szResult );
 		outAbsolutePathNames.AddToTail( szResult );
 	}
-
-	g_pFullFileSystem->FindClose( hFile );
 }
 
 
@@ -1182,6 +1184,8 @@ intp CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVe
 		return 0;
 	}
 
+	RunCodeAtScopeExit(_findclose( h ));
+
 	do
 	{
 		// dos attribute complexities i.e. _A_NORMAL is 0
@@ -1213,8 +1217,6 @@ intp CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVe
 		fileList[j].timeWrite = findData.time_write;
 	}
 	while ( !_findnext( h, &findData ) );
-
-	_findclose( h );
 #elif defined(POSIX)
 	FIND_DATA findData;
 	Q_FixSlashes( fullPath );
@@ -1223,6 +1225,8 @@ intp CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVe
 	{
 		return 0;
 	}
+
+	RunCodeAtScopeExit(FindClose(h));
 
 	do
 	{
@@ -1263,13 +1267,9 @@ intp CScriptLib::GetFileList( const char* pDirPath, const char* pPattern, CUtlVe
 			fileList[j].timeWrite = 0;
 	}
 	while ( !FindNextFile( h, &findData ) );
-
-	FindClose( h );
-
 #else
 #error "Please define your platform"
 #endif
-	
 
 	return fileList.Count();
 }
