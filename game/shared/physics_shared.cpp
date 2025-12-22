@@ -510,17 +510,18 @@ static void AddSurfacepropFile( const char *pFileName, IPhysicsSurfaceProps *pPr
 {
 	// Load file into memory
 	FileHandle_t file = pFileSystem->Open( pFileName, "rb", "GAME" );
-
 	if ( file )
 	{
+		RunCodeAtScopeExit(pFileSystem->Close(file));
+
 		int len = pFileSystem->Size( file );
 
 		// read the file
 		int nBufSize = len+1;
 		char *buffer = stackallocT( char, nBufSize );
 		pFileSystem->ReadEx( buffer, nBufSize, len, file );
-		pFileSystem->Close( file );
 		buffer[len] = 0;
+
 		pProps->ParseSurfaceData( pFileName, buffer );
 		// buffer is on the stack, no need to free
 	}

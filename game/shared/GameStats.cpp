@@ -772,7 +772,7 @@ void CBaseGameStats_Driver::Shutdown()
 			SendData();
 		}
 	}
-	if ( FILESYSTEM_INVALID_HANDLE != g_LogFileHandle )
+	if ( g_LogFileHandle )
 	{
 		filesystem->Close( g_LogFileHandle );
 		g_LogFileHandle = FILESYSTEM_INVALID_HANDLE;
@@ -1462,14 +1462,15 @@ void CBaseGameStats::SetHL2UnlockedChapterStatistic( void )
 	if ( filesystem->FileExists( fullpath ) )
 	{
 		FileHandle_t fh = filesystem->Open( fullpath, "rb" );
-		if ( FILESYSTEM_INVALID_HANDLE != fh )
+		if ( fh )
 		{
+			RunCodeAtScopeExit(filesystem->Close( fh ));
+
 			// read file into memory
 			int size = filesystem->Size(fh);
 			std::unique_ptr<char[]> configBuffer = std::make_unique<char[]>( size + 1 );
 			int read = filesystem->Read( configBuffer.get(), size, fh );
 			configBuffer[min(read, size)] = '\0';
-			filesystem->Close( fh );
 
 			// loop through looking for all the cvars to apply
 			const char *search = Q_stristr(configBuffer.get(), "sv_unlockedchapters" );

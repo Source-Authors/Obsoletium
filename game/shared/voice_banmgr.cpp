@@ -52,6 +52,8 @@ bool CVoiceBanMgr::Init(const char *pGameDir)
 	FileHandle_t fh = filesystem->Open(g_pBanMgrFilename, "rb");
 	if (fh)
 	{
+		RunCodeAtScopeExit(filesystem->Close(fh));
+
 		int version;
 		filesystem->Read(&version, sizeof(version), fh);
 		if(version == BANMGR_FILEVERSION && filesystem->Size(fh) > 4 )
@@ -63,10 +65,8 @@ bool CVoiceBanMgr::Init(const char *pGameDir)
 				char playerID[SIGNED_GUID_LEN];
 				filesystem->Read(playerID, SIGNED_GUID_LEN, fh);
 				AddBannedPlayer(playerID);
-			}			
+			}
 		}
-
-		filesystem->Close(fh);
 	}
 
 	return true;
@@ -76,11 +76,10 @@ bool CVoiceBanMgr::Init(const char *pGameDir)
 void CVoiceBanMgr::Term()
 {
 	// Free all the player structures.
-	for(int i=0; i < 256; i++)
+	for(auto &player : m_PlayerHash)
 	{
-		BannedPlayer *pListHead = &m_PlayerHash[i];
 		BannedPlayer *pNext;
-		for(BannedPlayer *pCur=pListHead->m_pNext; pCur != pListHead; pCur=pNext)
+		for(BannedPlayer *pCur=player.m_pNext; pCur != &player; pCur=pNext)
 		{
 			pNext = pCur->m_pNext;
 			delete pCur;
@@ -95,21 +94,20 @@ void CVoiceBanMgr::SaveState(const char *pGameDir)
 {
 	// Save the file out.
 	FileHandle_t fh = filesystem->Open(g_pBanMgrFilename, "wb");
-	if(fh)
+	if (fh)
 	{
+		RunCodeAtScopeExit(filesystem->Close(fh));
+
 		int version = BANMGR_FILEVERSION;
 		filesystem->Write(&version, sizeof(version), fh);
 
-		for(int i=0; i < 256; i++)
+		for(auto &player : m_PlayerHash)
 		{
-			BannedPlayer *pListHead = &m_PlayerHash[i];
-			for(BannedPlayer *pCur=pListHead->m_pNext; pCur != pListHead; pCur=pCur->m_pNext)
+			for(BannedPlayer *pCur=player.m_pNext; pCur != &player; pCur=pCur->m_pNext)
 			{
 				filesystem->Write(pCur->m_PlayerID, SIGNED_GUID_LEN, fh);
 			}
 		}
-
-		filesystem->Close(fh);
 	}
 }
 
