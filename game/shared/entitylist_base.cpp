@@ -140,17 +140,16 @@ bool CBaseEntityList::CEntInfoList::IsInList( CEntInfo *pElement )
 CBaseEntityList::CBaseEntityList()
 {
 	// These are not in any list (yet)
-	int i;
-	for ( i = 0; i < NUM_ENT_ENTRIES; i++ )
+	for ( auto &ent : m_EntPtrArray )
 	{
-		m_EntPtrArray[i].ClearLinks();
-		m_EntPtrArray[i].m_SerialNumber = (rand()& SERIAL_MASK); // generate random starting serial number
-		m_EntPtrArray[i].m_pEntity = NULL;
+		ent.ClearLinks();
+		ent.m_SerialNumber = (rand()& SERIAL_MASK); // generate random starting serial number
+		ent.m_pEntity = nullptr;
 	}
 
 	// make a free list of the non-networkable entities
 	// Initially, all the slots are free.
-	for ( i=MAX_EDICTS+1; i < NUM_ENT_ENTRIES; i++ )
+	for ( int i=MAX_EDICTS+1; i < NUM_ENT_ENTRIES; i++ )
 	{
 		CEntInfo *pList = &m_EntPtrArray[i];
 		m_freeNonNetworkableList.AddToTail( pList );
