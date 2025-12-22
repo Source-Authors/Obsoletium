@@ -2227,6 +2227,8 @@ bool LoadBSPFile( const char *filename )
 	dheader_t *header = OpenBSPFile( filename );
 	if (!header) return false;
 
+	RunCodeAtScopeExit(CloseBSPFile(header));
+
 	nummodels = CopyLump( header, LUMP_MODELS, dmodels );
 	numvertexes = CopyLump( header, LUMP_VERTEXES, dvertexes );
 	numplanes = CopyLump( header, LUMP_PLANES, dplanes );
@@ -2328,9 +2330,6 @@ bool LoadBSPFile( const char *filename )
 	// NOTE: Do NOT call CopyLump after Lumps_Parse() it parses all un-Copied lumps
 	// parse any additional lumps
 	Lumps_Parse(header);
-
-	// everything has been copied out
-	CloseBSPFile(header);
 
 	g_Swap.ActivateByteSwapping( false );
 	return true;
@@ -2681,6 +2680,9 @@ void WriteBSPFile( const char *filename, char * )
 	header->mapRevision = g_MapRevision;
 
 	FileHandle_t bspHanle = SafeOpenWrite( filename );
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(bspHanle));
+
 	WriteData( bspHanle, header );	// overwritten later
 
 	AddLump( header, bspHanle, LUMP_PLANES, dplanes, numplanes );
@@ -2777,7 +2779,6 @@ void WriteBSPFile( const char *filename, char * )
 
 	g_pFileSystem->Seek( bspHanle, 0, FILESYSTEM_SEEK_HEAD );
 	WriteData( bspHanle, header );
-	g_pFileSystem->Close( bspHanle );
 }
 
 // Generate the next clear lump filename for the bsp file
@@ -2814,6 +2815,8 @@ bool WriteLumpToFile( dheader_t *header, char *filename, int lump )
 		return false;
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->Close(lumpfile));
+
 	int ofs = header->lumps[lump].fileofs;
 	int length = header->lumps[lump].filelen;
 
@@ -2828,9 +2831,6 @@ bool WriteLumpToFile( dheader_t *header, char *filename, int lump )
 
 	// Write the lump
 	SafeWrite (lumpfile, (byte *)header + ofs, length);
-
-	// dimhotepus: Do not leak file handle.
-	g_pFileSystem->Close(lumpfile);
 
 	return true;
 }
@@ -2852,6 +2852,8 @@ void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer,
 		return;
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->Close(lumpfile));
+
 	// Write the header
 	lumpfileheader_t lumpHeader = {};
 	lumpHeader.lumpID = lump;
@@ -2863,8 +2865,6 @@ void	WriteLumpToFile( char *filename, int lump, int nLumpVersion, void *pBuffer,
 
 	// Write the lump
 	SafeWrite( lumpfile, pBuffer, nBufLen );
-
-	g_pFileSystem->Close( lumpfile );
 }
 
 
@@ -3861,6 +3861,8 @@ static bool CRC_MapFile(dheader_t *header, CRC32_t *crcvalue, const char *pszFil
 	if ( !fp )
 		return false;
 
+	RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+
 	// CRC across all lumps except for the Entities lump
 	for ( int l = 0; l < HEADER_LUMPS; ++l )
 	{
@@ -3890,13 +3892,11 @@ static bool CRC_MapFile(dheader_t *header, CRC32_t *crcvalue, const char *pszFil
 			}
 			else
 			{
-				g_pFileSystem->Close( fp );
 				return false;
 			}
 		}
 	}
 	
-	g_pFileSystem->Close( fp );
 	return true;
 }
 
@@ -5038,8 +5038,10 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 			Warning( "Error! Couldn't open output file '%s' - BSP swap failed!\n", pOutFilename ); 
 			return false;
 		}
+		
+		RunCodeAtScopeExit(g_pFileSystem->Close(bspHanle));
+
 		SafeWrite( bspHanle, outputBuffer.Base(), outputBuffer.TellPut() );
-		g_pFileSystem->Close( bspHanle );
 	}
 
 	return true;
@@ -5074,13 +5076,13 @@ bool GetPakFileLump( const char *pBSPFilename, void **pPakData, int *pPakSize )
 
 	dheader_t *header = OpenBSPFile(pBSPFilename);
 	if (!header) return false;
+
+	RunCodeAtScopeExit(CloseBSPFile(header));
 	
 	if ( header->lumps[LUMP_PAKFILE].filelen )
 	{
 		*pPakSize = CopyVariableLump<byte>( header, FIELD_CHARACTER, LUMP_PAKFILE, pPakData );
 	}
-
-	CloseBSPFile(header);
 
 	return true;
 }
@@ -5164,6 +5166,8 @@ bool SetPakFileLump( const char *pBSPFilename, const char *pNewFilename, void *p
 	dheader_t *header = OpenBSPFile(pBSPFilename);
 	if (!header) return false;
 
+	RunCodeAtScopeExit(CloseBSPFile(header));
+
 	// save a copy of the old header
 	// generating a new bsp is a destructive operation
 	dheader_t oldHeader = *header;
@@ -5171,10 +5175,10 @@ bool SetPakFileLump( const char *pBSPFilename, const char *pNewFilename, void *p
 	FileHandle_t bspHanle = SafeOpenWrite( pNewFilename );
 	if ( !bspHanle )
 	{
-		// dimhotepus: Do not leak BSP data.
-		CloseBSPFile(header);
 		return false;
 	}
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(bspHanle));
 
 	// placeholder only, reset at conclusion
 	WriteData( bspHanle, &oldHeader );
@@ -5226,9 +5230,6 @@ bool SetPakFileLump( const char *pBSPFilename, const char *pNewFilename, void *p
 	// Write the updated header
 	g_pFileSystem->Seek( bspHanle, 0, FILESYSTEM_SEEK_HEAD );
 	WriteData( bspHanle, header );
-	g_pFileSystem->Close( bspHanle );
-
-	CloseBSPFile(header);
 	
 	return true;
 }
