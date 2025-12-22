@@ -365,24 +365,25 @@ void CSystem::SetClipboardText(const char *text, intp textLen)
 	if (textLen <= 0)
 		return;
 
-	if (!OpenClipboard(GetDesktopWindow() ))
+	if (!::OpenClipboard(::GetDesktopWindow() ))
 		return;
 	
 	RunCodeAtScopeExit(::CloseClipboard());
 
-	EmptyClipboard();
-
-	HANDLE hmem = GlobalAlloc(GMEM_MOVEABLE, textLen + 1);
+	HANDLE hmem = ::GlobalAlloc(GMEM_MOVEABLE, textLen + 1);
 	if (hmem)
 	{
-		void *ptr = GlobalLock(hmem);
+		void *ptr = ::GlobalLock(hmem);
 		if (ptr != nullptr)
 		{
-			RunCodeAtScopeExit(GlobalUnlock(hmem));
+			RunCodeAtScopeExit(::GlobalUnlock(hmem));
+
+			::EmptyClipboard();
+
 			memset(ptr, 0, textLen + 1);
 			memcpy(ptr, text, textLen);
 
-			SetClipboardData(CF_TEXT, hmem);
+			::SetClipboardData(CF_TEXT, hmem);
 		}
 	}
 #endif
