@@ -1581,7 +1581,7 @@ void CGame::PlayStartupVideos( void )
 void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 {
 	// do we have a filename and a video system, and not on a console?
-	if ( !filename || !filename[0] || g_pVideo == NULL )
+	if ( Q_isempty( filename ) || g_pVideo == NULL )
 		return;
 
 	// is it the valve logo file?		
@@ -1591,20 +1591,17 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 	float forcedMinTime = ( bIsValveLogo && bNeedHealthWarning ) ? 11.0f : -1.0f;
 
 #if defined( WIN32 ) && !defined( USE_SDL )
-	// Black out the back of the screen once at the beginning of each video (since we're not scaling to fit)
-	HDC dc = ::GetDC( m_hWindow );
+	{
+		// Black out the back of the screen once at the beginning of each video (since we're not scaling to fit)
+		HDC dc = ::GetDC( m_hWindow );
+		RunCodeAtScopeExit(::ReleaseDC( m_hWindow, dc ));
 
-	RECT rect;
-	rect.top = 0;
-	rect.bottom = m_height;
-	rect.left = 0;
-	rect.right = m_width;
+		RECT rect{0, 0, m_width, m_height};
 
-	HBRUSH hBlackBrush = (HBRUSH) ::GetStockObject( BLACK_BRUSH );
-	::SetViewportOrgEx( dc, 0, 0, NULL );
-	::FillRect( dc, &rect, hBlackBrush );
-	::ReleaseDC( (HWND) GetMainWindow(), dc );
-    
+		HBRUSH hBlackBrush = (HBRUSH) ::GetStockObject( BLACK_BRUSH );
+		::SetViewportOrgEx( dc, 0, 0, nullptr );
+		::FillRect( dc, &rect, hBlackBrush );
+	}
 #else
 	// need OS specific way to clear screen
     

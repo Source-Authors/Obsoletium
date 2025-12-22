@@ -996,20 +996,25 @@ void CVideoMode_Common::DrawNullBackground( void *hHDC, int w, int h )
          CLEARTYPE_NATURAL_QUALITY,
          DEFAULT_PITCH,
          "Arial" );
+        RunCodeAtScopeExit(DeleteObject(fnt));
 
         HFONT oldFont = (HFONT)SelectObject( hdc, fnt );
-        int oldBkMode = SetBkMode( hdc, TRANSPARENT );
-        COLORREF oldFgColor = SetTextColor( hdc, RGB( 255, 255, 255 ) );
+        RunCodeAtScopeExit(SelectObject(hdc, oldFont));
 
-        HBRUSH br = CreateSolidBrush( RGB( 0, 0, 0  ) );
+        int oldBkMode = SetBkMode( hdc, TRANSPARENT );
+        RunCodeAtScopeExit(SetBkMode(hdc, oldBkMode));
+
+        COLORREF oldFgColor = SetTextColor( hdc, RGB( 255, 255, 255 ) );
+        RunCodeAtScopeExit(SetTextColor(hdc, oldFgColor));
+
+        HBRUSH br = ::CreateSolidBrush( RGB( 0, 0, 0  ) );
+        RunCodeAtScopeExit(::DeleteObject(br));
+
         HBRUSH oldBr = (HBRUSH)SelectObject( hdc, br );
+        RunCodeAtScopeExit(SelectObject(hdc, oldBr));
+
         Rectangle( hdc, 0, 0, w, h );
-        
-        RECT rc;
-        rc.left = 0;
-        rc.top = 0;
-        rc.right = w;
-        rc.bottom = h;
+        RECT rc{0, 0, w, h};
 
         DrawText( hdc, "Running with -noshaderapi", -1, &rc, DT_NOPREFIX | DT_VCENTER | DT_CENTER | DT_SINGLELINE  );
 
@@ -1020,15 +1025,6 @@ void CVideoMode_Common::DrawNullBackground( void *hHDC, int w, int h )
             rc.left += 10;
             DrawText( hdc, modelloader->GetName( host_state.worldmodel ), -1, &rc, DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE  );
         }
-
-        SetTextColor( hdc, oldFgColor );
-
-        SelectObject( hdc, oldBr );
-        SetBkMode( hdc, oldBkMode );
-        SelectObject( hdc, oldFont );
-
-        DeleteObject( br );
-        DeleteObject( fnt );
     }
 #else
     AssertMsg( false, "Impl me" );
