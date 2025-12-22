@@ -301,9 +301,10 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 	}
 
 	IVTFTexture *pVTFTexture = CreateVTFTexture();
+	RunCodeAtScopeExit(DestroyVTFTexture( pVTFTexture ));
+
 	if ( !pVTFTexture->Unserialize( bufFileContents ) )
 	{
-		DestroyVTFTexture( pVTFTexture );
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
@@ -316,13 +317,10 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 	auto *pMemImage = (unsigned char *)malloc(nMemSize);
 	if ( pMemImage == nullptr )
 	{
-		DestroyVTFTexture( pVTFTexture );
 		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
 	Q_memcpy( pMemImage, pVTFTexture->ImageData(), nMemSize );
-
-	DestroyVTFTexture( pVTFTexture );
 
 	errcode = CE_SUCCESS;
 	return pMemImage;
