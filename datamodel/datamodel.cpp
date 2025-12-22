@@ -944,21 +944,21 @@ bool CDataModel::Unserialize( CUtlBuffer &inBuf, const char *pEncodingName, cons
 		const char *pDestEncodingName = "binary";
 		const char *pDestFormatName = IsLegacyFormat( header.formatName ) ? GENERIC_DMX_FORMAT : header.formatName;
 		char cmdline[ 256 ];
-		V_snprintf( cmdline, sizeof( cmdline ), "dmxconvert -allowdebug -i %s -o %s -oe %s -of %s", pFileName, tempFileName, pDestEncodingName, pDestFormatName );
+		V_sprintf_safe( cmdline, "dmxconvert -allowdebug -i %s -o %s -oe %s -of %s", pFileName, tempFileName, pDestEncodingName, pDestFormatName );
 
 		ProcessHandle_t hProcess = PROCESS_HANDLE_INVALID;
 		if ( g_pProcessUtils )
 		{
 			hProcess = g_pProcessUtils->StartProcess( cmdline, false );
-
 			if ( hProcess == PROCESS_HANDLE_INVALID )
 			{
 				Warning( "Unserialize: Unable to run conversion process \"%s\"\n", cmdline );
 				return false;
 			}
 
+			RunCodeAtScopeExit(g_pProcessUtils->CloseProcess( hProcess ));
+
 			g_pProcessUtils->WaitUntilProcessCompletes( hProcess );
-			g_pProcessUtils->CloseProcess( hProcess );
 		}
 
 		bool bSuccess;
