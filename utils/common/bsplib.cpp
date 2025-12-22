@@ -2672,9 +2672,9 @@ void WriteBSPFile( const char *filename, char * )
 	}
 
 	dheader_t outHeader;
-	dheader_t *header = &outHeader;
-	memset( header, 0, sizeof( dheader_t ) );
+	BitwiseClear( outHeader );
 
+	dheader_t *header = &outHeader;
 	header->ident = IDBSPHEADER;
 	header->version = BSPVERSION;
 	header->mapRevision = g_MapRevision;
