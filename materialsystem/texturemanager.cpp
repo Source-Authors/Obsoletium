@@ -2855,9 +2855,11 @@ void CTextureManager::ReadFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 	if ( !fh )
 		return;
 
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
 	CUtlBuffer fileContents( (intp)0, 0, CUtlBuffer::TEXT_BUFFER ); 
 	if ( !g_pFullFileSystem->ReadToBuffer( fh, fileContents ) )
-		goto cleanup;
+		return;
 
 	char buffer[MAX_PATH + 1];
 	while ( 1 ) 
@@ -2875,9 +2877,6 @@ void CTextureManager::ReadFilesToLoad( CUtlDict< int >* pOutFilesToLoad, const c
 		if ( pOutFilesToLoad->Find( buffer ) == pOutFilesToLoad->InvalidIndex() )
 			( *pOutFilesToLoad ).Insert( buffer, 0 );
 	}
-
-cleanup:
-	g_pFullFileSystem->Close( fh );
 }
 
 void CTextureManager::UpdatePostAsync()
