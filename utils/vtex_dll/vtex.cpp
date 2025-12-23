@@ -109,8 +109,15 @@ private:
 static VTexVMTParam_t g_VMTParams[MAX_VMT_PARAMS];
 
 static int g_NumVMTParams = 0;
+
+enum class Mode {
+  eModePSD,
+  eModeTGA,
+  eModePFM
+};
+
 // dimhotepus: Make scoped enum.
-static enum class Mode { eModePSD, eModeTGA, eModePFM } g_eMode = Mode::eModePSD;
+static Mode g_eMode = Mode::eModePSD;
 
 // NOTE: these must stay in the same order as CubeMapFaceIndex_t.
 static const char *g_CubemapFacingNames[7] = { "rt", "lf", "bk", "ft", "up", "dn", "sph" };
