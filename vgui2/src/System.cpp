@@ -401,25 +401,26 @@ void CSystem::SetClipboardText(const wchar_t *text, intp textLen)
 	if (textLen <= 0)
 		return;
 
-	BOOL cb = OpenClipboard(GetDesktopWindow() );
+	BOOL cb = ::OpenClipboard(::GetDesktopWindow() );
 	if (!cb)
 		return;
 	
 	RunCodeAtScopeExit(::CloseClipboard());
 
-	EmptyClipboard();
-
-	HANDLE hmem = GlobalAlloc(GMEM_MOVEABLE, (textLen + 1) * sizeof(wchar_t));
+	HANDLE hmem = ::GlobalAlloc(GMEM_MOVEABLE, (textLen + 1) * sizeof(wchar_t));
 	if (hmem)
 	{
-		void *ptr = GlobalLock(hmem);
+		void *ptr = ::GlobalLock(hmem);
 		if (ptr != nullptr)
 		{
-			RunCodeAtScopeExit( GlobalUnlock(hmem) );
+			RunCodeAtScopeExit( ::GlobalUnlock(hmem) );
+
+			::EmptyClipboard();
+
 			memset(ptr, 0, (textLen + 1) * sizeof(wchar_t));
 			memcpy(ptr, text, textLen * sizeof(wchar_t));
 
-			SetClipboardData( CF_UNICODETEXT, hmem );
+			::SetClipboardData( CF_UNICODETEXT, hmem );
 		}
 	}
 #endif
@@ -432,13 +433,14 @@ intp CSystem::GetClipboardTextCount()
 	
 	if ( VCRGetMode() != VCR_Playback )
 	{
-		if (OpenClipboard(GetDesktopWindow() ))
+		if (::OpenClipboard(::GetDesktopWindow() ))
 		{
 			RunCodeAtScopeExit(::CloseClipboard());
-			HANDLE hmem = GetClipboardData(CF_TEXT);
+
+			HANDLE hmem = ::GetClipboardData(CF_TEXT);
 			if (hmem)
 			{
-				count = GlobalSize(hmem);
+				count = ::GlobalSize(hmem);
 			}
 		}
 	}
@@ -455,13 +457,14 @@ intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 	intp count = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
-		if (OpenClipboard(GetDesktopWindow()))
+		if (::OpenClipboard(::GetDesktopWindow()))
 		{
 			RunCodeAtScopeExit(::CloseClipboard());
-			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
+
+			HANDLE hmem = ::GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				intp len = (intp)GlobalSize(hmem);
+				intp len = (intp)::GlobalSize(hmem);
 				if (len <= offset)
 				{
 					count = 0;
@@ -473,10 +476,11 @@ intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 					{
 						count = bufLen;
 					}
-					void *ptr = GlobalLock(hmem);
+					void *ptr = ::GlobalLock(hmem);
 					if (ptr)
 					{
-						RunCodeAtScopeExit(GlobalUnlock(hmem));
+						RunCodeAtScopeExit(::GlobalUnlock(hmem));
+
 						memcpy(buf, ((char *)ptr) + offset, count);
 					}
 				}
@@ -497,13 +501,13 @@ intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 	intp retVal = 0;
 	if ( buf && bufLen > 0 && VCRGetMode() != VCR_Playback )
 	{
-		if (OpenClipboard( GetDesktopWindow() ) )
+		if (::OpenClipboard( ::GetDesktopWindow() ) )
 		{
 			RunCodeAtScopeExit(::CloseClipboard());
-			HANDLE hmem = GetClipboardData(CF_UNICODETEXT);
+			HANDLE hmem = ::GetClipboardData(CF_UNICODETEXT);
 			if (hmem)
 			{
-				intp len = (intp)GlobalSize(hmem);
+				intp len = (intp)::GlobalSize(hmem);
 				if (len > offset)
 				{
 					intp count = len - offset;
@@ -511,10 +515,11 @@ intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 					{
 						count = bufLen;
 					}
-					void *ptr = GlobalLock(hmem);
+					void *ptr = ::GlobalLock(hmem);
 					if (ptr)
 					{
-						RunCodeAtScopeExit(GlobalUnlock(hmem));
+						RunCodeAtScopeExit(::GlobalUnlock(hmem));
+
 						memcpy(buf, ((wchar_t *)ptr) + offset, count);
 						retVal = count / sizeof(wchar_t);
 					}
