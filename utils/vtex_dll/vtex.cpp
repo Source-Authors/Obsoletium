@@ -1668,6 +1668,8 @@ static IVTFTexture* PostProcessSkyBox( IVTFTexture *pTexture, int iSkyboxFace )
 	nFlags &= ~TEXTUREFLAGS_ENVMAP;			// But it ends now!
 
 	IVTFTexture *pRet = CreateVTFTexture();
+	RunCodeAtScopeExit(DestroyVTFTexture( pTexture ));
+
 	if ( !pRet->Init( pTexture->Width(), pTexture->Height(), 1, pTexture->Format(), nFlags, pTexture->FrameCount() ) )
 		Error( "PostProcessSkyBox: IVTFTexture::Init() failed.\n" );
 
@@ -1691,9 +1693,8 @@ static IVTFTexture* PostProcessSkyBox( IVTFTexture *pTexture, int iSkyboxFace )
 
 	// Note: there are a few things that don't get copied here, like alpha test threshold
 	// and bumpscale, but we shouldn't need those for skyboxes anyway.
-
+	// 
 	// Get rid of the full cubemap one and return the single-face one.
-	DestroyVTFTexture( pTexture );
 	return pRet;
 }
 
@@ -2497,6 +2498,8 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 		V_sprintf_safe( chFileNameConvert, "%s.vtf", pInputBaseName );
 
 		IVTFTexture *pVtf = CreateVTFTexture();
+		RunCodeAtScopeExit(DestroyVTFTexture( pVtf ));
+
 		CUtlBuffer bufFile;
 		LoadFile( chFileNameConvert, bufFile, true, NULL );
 		bool bRes = pVtf->Unserialize( bufFile );
@@ -2523,8 +2526,6 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 		bRes = pVtf->Serialize( bufFile );
 		if ( !bRes )
 			VTexError( "Failed to write '%s'!\n", chFileNameConvert );
-
-		DestroyVTFTexture( pVtf );
 
 		auto [fw, rc] = se::posix::posix_file_stream_factory::open(chFileNameConvert, "wb");
 		if ( !rc )
