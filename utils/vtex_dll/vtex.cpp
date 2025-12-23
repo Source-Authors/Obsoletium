@@ -2579,44 +2579,41 @@ static bool Process_File( char (&pInputBaseName)[maxlen] )
 		char buf[1024];
 		V_sprintf_safe( buf, "%s/%s.vmt", outputDir, pBaseName );
 		const char *tmp = Q_stristr( outputDir, "materials" );
-		FILE *fp;
 		if( tmp )
 		{
 			// check if the file already exists.
-			fp = fopen( buf, "r" );
-			if( fp )
+			auto [exists, rc] = se::posix::posix_file_stream::exists( buf );
+			if( exists && !rc )
 			{
 				if ( !g_Quiet )
 					fprintf( stderr, "vmt file '%s' already exists\n", buf );
-
-				fclose( fp );
 			}
 			else
 			{
-				fp = fopen( buf, "w" );
-				if( fp )
+				auto [fp, rc2] = se::posix::posix_file_stream_factory::open( buf, "r" );
+				if( !rc2 )
 				{
 					if ( !g_Quiet )
 						fprintf( stderr, "Creating vmt file: %s/%s\n", tmp, pBaseName );
-					tmp += ssize( "materials/" ) - 1;
-					fprintf( fp, "\"%s\"\n", g_ShaderName );
-					fprintf( fp, "{\n" );
-					fprintf( fp, "\t\"$baseTexture\" \"%s/%s\"\n", tmp, pBaseName );
 
-					int i;
-					for( i=0;i<g_NumVMTParams;i++ )
+					tmp += ssize( "materials/" ) - 1;
+
+					std::tie(std::ignore, rc) = fp.print( "\"%s\"\n", g_ShaderName );
+					std::tie(std::ignore, rc) = fp.print( "{\n" );
+					std::tie(std::ignore, rc) = fp.print( "\t\"$baseTexture\" \"%s/%s\"\n", tmp, pBaseName );
+
+					for( int i=0;i<g_NumVMTParams;i++ )
 					{
-						fprintf( fp, "\t\"%s\" \"%s\"\n", g_VMTParams[i].m_szParam, g_VMTParams[i].m_szValue );
+						std::tie(std::ignore, rc) = fp.print( "\t\"%s\" \"%s\"\n", g_VMTParams[i].m_szParam, g_VMTParams[i].m_szValue );
 					}
 
-					fprintf( fp, "}\n" );
-					fclose( fp );
+					std::tie(std::ignore, rc) = fp.print( "}\n" );
 
 					CP4AutoAddFile autop4( buf );
 				}
 				else
 				{
-					VTexWarning( "Couldn't open '%s' for writing.\n", buf );
+					VTexWarning( "Couldn't open '%s' for writing: %s.\n", buf, rc2.message().c_str() );
 				}
 			}
 
