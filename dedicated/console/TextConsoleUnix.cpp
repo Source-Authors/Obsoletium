@@ -294,6 +294,12 @@ void CTextConsoleUnix::ShutDown() {
     pthread_join(tid, &status);
   }
 
+  // dimhotepus: Do not leak TTY.
+  if (m_tty && m_tty != stdout) {
+    fclose(m_tty);
+    m_tty = nullptr;
+  }
+
   pthread_mutex_destroy(&g_lock);
 }
 
