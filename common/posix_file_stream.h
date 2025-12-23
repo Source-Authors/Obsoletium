@@ -3,6 +3,8 @@
 #ifndef SRC_POSIX_FILE_STREAM_H_
 #define SRC_POSIX_FILE_STREAM_H_
 
+#include <sys/stat.h>
+
 #include <cerrno>
 #include <cstdarg>
 #include <cstdio>
@@ -66,13 +68,26 @@ class posix_file_stream {
     return *this;
   }
 
+  // Check |path| exists.
+  static [[nodiscard]] io_result<bool> exists(const char* path) noexcept {
+#ifdef _WIN32
+    struct _stat64i32 st = {};
+    const bool exists{_stat(path, &st) == 0};
+    return {exists, internal::posix_error_last()};
+#else
+    struct stat st = {};
+    const bool exists{stat(path, &st) == 0};
+    return {exists, internal::posix_error_last()};
+#endif
+  }
+
   // Like fscanf_s, read from file by |format|.
   [[nodiscard]] io_result<size_t> scan(
       _In_z_ _Scanf_s_format_string_ const char* format, ...) const noexcept {
     // fscanf_s analog.
     int fields_assigned_count;
     va_list arg_list;
-    va_start(arg_list, format); //-V2019 //-V2018
+    va_start(arg_list, format);  //-V2019 //-V2018
 #ifdef _WIN32
     fields_assigned_count = vfscanf_s(fd_, format, arg_list);
 #else
@@ -174,7 +189,7 @@ class posix_file_stream {
     // fprintf_s analog.
     int bytes_written_count;
     va_list arg_list;
-    va_start(arg_list, format); //-V2019 //-V2018
+    va_start(arg_list, format);  //-V2019 //-V2018
 #ifdef _WIN32
     bytes_written_count = vfprintf_s(fd_, format, arg_list);
 #else
