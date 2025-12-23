@@ -28,6 +28,10 @@
 #include "view.h"
 #include "ixboxsystem.h"
 #include "inputsystem/iinputsystem.h"
+#include <unordered_map>
+#include <unordered_set>
+#include <vector>
+#include <vprof.h>
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -1286,4 +1290,128 @@ bool UTIL_HasLoadedAnyMap()
 		return false;
 
 	return g_pFullFileSystem->FileExists( szFilename, "MOD" );
+}
+
+struct CPhysEntry
+{
+	int references = 1;
+	int modelIndex = 0;
+	float scale = 1.0f;
+};
+
+std::unordered_map<CPhysCollide*, CPhysEntry> g_pScaledReferences;
+std::unordered_map<int, std::unordered_map<float, CPhysCollide*>*> g_pScaledCollidables;
+CPhysCollide *UTIL_GetScaledPhysCollide( int modelIndex, float scale ) // Based off UTIL_CreateScaledPhysObject
+{
+	VPROF( "UTIL_GetScaledPhysCollide", VPROF_BUDGETGROUP_PHYSICS );
+
+	if (scale == 1.0f)
+		return NULL;
+
+	std::unordered_map<float, CPhysCollide*>* scaledCollidables = nullptr;
+	auto iModel = g_pScaledCollidables.find( modelIndex );
+	if ( iModel != g_pScaledCollidables.end() )
+	{
+		std::unordered_map<float, CPhysCollide*>* collidables = iModel->second;
+		auto iCollidable = collidables->find( scale );
+		if ( iCollidable != collidables->end() )
+		{
+			auto it = g_pScaledReferences.find( iCollidable->second );
+			if ( it != g_pScaledReferences.end() )
+			{
+				++it->second.references;
+			} else {
+				DevWarning( "UTIL_GetScaledPhysCollide: Failed to find reference counter!\n" );
+			}
+
+			return iCollidable->second;
+		} else {
+			scaledCollidables = collidables;
+		}
+	} else {
+		scaledCollidables = new std::unordered_map<float, CPhysCollide*>;
+		g_pScaledCollidables[modelIndex] = scaledCollidables;
+	}
+
+	ICollisionQuery *pQuery = physcollision->CreateQueryModel( modelinfo->GetVCollide( modelIndex )->solids[0] );
+	if ( pQuery == NULL )
+	{
+		Warning( "UTIL_GetScaledPhysCollide: Failed to created scaled CPhysCollide for model %s!\n", modelinfo->GetModelName( modelinfo->GetModel( modelIndex ) ) );
+		return NULL;
+	}
+
+	const int nNumConvex = pQuery->ConvexCount();
+	CPhysPolysoup *pPolySoups = physcollision->PolysoupCreate();
+
+	for ( int i = 0; i < nNumConvex; ++i )
+	{
+		int nNumTris = pQuery->TriangleCount( i );
+		int nNumVerts = nNumTris * 3;
+
+		Vector *pVerts = (Vector *) stackalloc( sizeof(Vector) * nNumVerts );
+		for ( int j = 0; j < nNumTris; ++j )
+		{
+			int p = j*3;
+			pQuery->GetTriangleVerts( i, j, pVerts+p );
+			*(pVerts+p) *= scale;
+			*(pVerts+p+1) *= scale;
+			*(pVerts+p+2) *= scale;
+		}
+
+		for ( int j = 0; j < nNumVerts; j += 3 )
+		{
+			physcollision->PolysoupAddTriangle( pPolySoups, pVerts[j], pVerts[j + 1], pVerts[j + 2], 0 );
+		}
+	}
+
+	physcollision->DestroyQueryModel( pQuery );
+
+	CPhysCollide* physCollide = physcollision->ConvertPolysoupToCollide( pPolySoups, true );
+	physcollision->PolysoupDestroy( pPolySoups );
+	if ( physCollide == NULL )
+	{
+		Warning( "UTIL_GetScaledPhysCollide: Failed to created scaled CPhysCollide for model %s %f!\n", modelinfo->GetModelName( modelinfo->GetModel( modelIndex ) ), scale );
+		return NULL;
+	}
+
+	(*scaledCollidables)[scale] = physCollide;
+
+	CPhysEntry entry;
+	entry.modelIndex = modelIndex;
+	entry.scale = scale;
+	g_pScaledReferences[physCollide] = entry;
+
+	return physCollide;
+}
+
+void UTIL_RemoveScaledPhysCollide( CPhysCollide *physCollide )
+{
+	VPROF( "UTIL_RemoveScaledPhysCollide", VPROF_BUDGETGROUP_PHYSICS );
+
+	auto it = g_pScaledReferences.find( physCollide );
+	if ( it != g_pScaledReferences.end() )
+	{
+		--it->second.references;
+		if (it->second.references > 0)
+			return;
+	} else {
+		DevWarning( "UTIL_GetScaledPhysCollide: Failed to find reference counter!\n" );
+	}
+
+	auto iModel = g_pScaledCollidables.find( it->second.modelIndex );
+	if ( iModel == g_pScaledCollidables.end() )
+		return;
+
+	std::unordered_map<float, CPhysCollide*> scaledCollibales = *iModel->second;
+	auto iEntry = scaledCollibales.find( it->second.scale );
+	if ( iEntry == scaledCollibales.end() )
+		return;
+
+	scaledCollibales.erase( iEntry->first );
+	physcollision->DestroyCollide( physCollide );
+
+	if ( scaledCollibales.size() == 0 )
+		g_pScaledCollidables.erase( iModel );
+
+	DevMsg( "UTIL_RemoveScaledPhysCollide: Freed model %s\n", modelinfo->GetModelName(modelinfo->GetModel(it->second.modelIndex)) );
 }
