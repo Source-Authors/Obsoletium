@@ -135,7 +135,6 @@ static void Pause()
 
 static bool VTexErrorAborts()
 {
-
 	// dimhotepus: Use simple HasParm API.
 	return !CommandLine()->HasParm( "-crcvalidate" );
 }
@@ -268,11 +267,11 @@ struct VTexConfigInfo_t
 		m_nMaxDimensionY = -1;
 		m_nMaxDimensionY_360 = -1;
 
-		memset( &m_exSettings0, 0, sizeof( m_exSettings0 ) );
+		BitwiseClear( m_exSettings0 );
 
-		memset( &m_vtfProcOptions, 0, sizeof( m_vtfProcOptions ) );
+		BitwiseClear( m_vtfProcOptions );
+
 		m_vtfProcOptions.cbSize = sizeof( m_vtfProcOptions );
-		
 		m_vtfProcOptions.flags0 |= VtfProcessingOptions::OPT_FILTER_NICE;
 
 		CRC32_Init( &m_uiInputHash );
