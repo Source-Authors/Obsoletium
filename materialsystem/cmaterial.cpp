@@ -2661,9 +2661,9 @@ char const* CMaterial::GetPreviewImageFileName( void ) const
 
 PreviewImageRetVal_t CMaterial::GetPreviewImageProperties( int *width, int *height, 
 				 		ImageFormat *imageFormat, bool* isTranslucent ) const
-{	
+{
 	char const* pFileName = GetPreviewImageFileName();
-	if ( IsX360() || !pFileName )
+	if ( !pFileName )
 	{
 		*width = *height = 0;
 		*imageFormat = IMAGE_FORMAT_RGBA8888;
@@ -2672,7 +2672,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImageProperties( int *width, int *heig
 	}
 
 	unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
-	unsigned char *pMem = (unsigned char *)stackalloc( nHeaderSize );
+	unsigned char *pMem = stackallocT( unsigned char, nHeaderSize );
 	CUtlBuffer buf( pMem, nHeaderSize );
 	if( !g_pFullFileSystem->ReadFile( pFileName, NULL, buf, nHeaderSize ) )
 	{
@@ -2681,10 +2681,11 @@ PreviewImageRetVal_t CMaterial::GetPreviewImageProperties( int *width, int *heig
 	}
 	
 	IVTFTexture *pVTFTexture = CreateVTFTexture();
+	RunCodeAtScopeExit(DestroyVTFTexture( pVTFTexture ));
+
 	if (!pVTFTexture->Unserialize( buf, true ))
 	{
 		Warning( "Error reading material \"%s\"\n", pFileName );
-		DestroyVTFTexture( pVTFTexture );
 		return MATERIAL_PREVIEW_IMAGE_BAD;
 	}
 
@@ -2692,7 +2693,6 @@ PreviewImageRetVal_t CMaterial::GetPreviewImageProperties( int *width, int *heig
 	*height = pVTFTexture->Height();
 	*imageFormat = pVTFTexture->Format();
 	*isTranslucent = (pVTFTexture->Flags() & (TEXTUREFLAGS_ONEBITALPHA | TEXTUREFLAGS_EIGHTBITALPHA)) != 0;
-	DestroyVTFTexture( pVTFTexture );
 	return MATERIAL_PREVIEW_IMAGE_OK;
 }
 
@@ -2704,7 +2704,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 	intp nImageOffset, nImageSize;
 
 	char const* pFileName = GetPreviewImageFileName();
-	if ( IsX360() || !pFileName )
+	if ( !pFileName )
 	{
 		return MATERIAL_NO_PREVIEW_IMAGE;
 	}
@@ -2712,12 +2712,19 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 	int nBytesRead = 0;
 
 	IVTFTexture *pVTFTexture = CreateVTFTexture();
+	RunCodeAtScopeExit(DestroyVTFTexture( pVTFTexture ));
+
 	FileHandle_t fileHandle = g_pFullFileSystem->Open( pFileName, "rb" );
 	if( !fileHandle )
 	{
 		Warning( "\"%s\": cached version doesn't exist\n", pFileName );
-		goto fail;
+
+		intp nSize = ImageLoader::GetMemRequired( width, height, 1, imageFormat, false );
+		memset( pData, 0xff, nSize );
+		return MATERIAL_PREVIEW_IMAGE_BAD;
 	}
+
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fileHandle));
 
 	nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 	buf.EnsureCapacity( nHeaderSize );
@@ -2725,52 +2732,46 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 	// read the header first.. it's faster!!
 	nBytesRead = g_pFullFileSystem->Read( buf.Base(), nHeaderSize, fileHandle );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
-		
+
 	// Unserialize the header
 	if (!pVTFTexture->Unserialize( buf, true ))
 	{
 		Warning( "Error reading material \"%s\"\n", pFileName );
-		goto fail;
+
+		intp nSize = ImageLoader::GetMemRequired( width, height, 1, imageFormat, false );
+		memset( pData, 0xff, nSize );
+		return MATERIAL_PREVIEW_IMAGE_BAD;
 	}
-		
+
 	// FIXME: Make sure the preview image size requested is the same
 	// size as mip level 0 of the texture
 	Assert( (width == pVTFTexture->Width()) && (height == pVTFTexture->Height()) );
-		
+
 	// Determine where in the file to start reading (frame 0, face 0, mip 0)
 	pVTFTexture->ImageFileInfo( 0, 0, 0, &nImageOffset, &nImageSize );
 
 	if ( nImageSize == 0 )
 	{
 		Warning( "Couldn't determine offset and size of material \"%s\"\n", pFileName );
-		goto fail;
+
+		intp nSize = ImageLoader::GetMemRequired( width, height, 1, imageFormat, false );
+		memset( pData, 0xff, nSize );
+		return MATERIAL_PREVIEW_IMAGE_BAD;
 	}
-		
+
 	// Prep the utlbuffer for reading
 	buf.EnsureCapacity( nImageSize );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, 0 );
-		
+
 	// Read in the bits at the specified location
 	g_pFullFileSystem->Seek( fileHandle, nImageOffset, FILESYSTEM_SEEK_HEAD );
 	g_pFullFileSystem->Read( buf.Base(), nImageSize, fileHandle );
-	g_pFullFileSystem->Close( fileHandle );
-		
+
 	// Convert from the format read in to the requested format
-	ImageLoader::ConvertImageFormat( buf.Base<unsigned char>(), pVTFTexture->Format(), 
+	ImageLoader::ConvertImageFormat( buf.Base<unsigned char>(), pVTFTexture->Format(),
 		pData, imageFormat, width, height );
 
-	DestroyVTFTexture( pVTFTexture );
 	return MATERIAL_PREVIEW_IMAGE_OK;
-
-fail:
-	if( fileHandle )
-	{
-		g_pFullFileSystem->Close( fileHandle );
-	}
-	intp nSize = ImageLoader::GetMemRequired( width, height, 1, imageFormat, false );
-	memset( pData, 0xff, nSize );
-	DestroyVTFTexture( pVTFTexture );
-	return MATERIAL_PREVIEW_IMAGE_BAD;
 }
 
 //-----------------------------------------------------------------------------

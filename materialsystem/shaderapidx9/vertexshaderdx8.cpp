@@ -1954,7 +1954,7 @@ bool CShaderManager::LoadAndCreateShaders_Dynamic( ShaderLookup_t &lookup, bool 
 FileHandle_t CShaderManager::OpenFileAndLoadHeader( const char *pFileName, ShaderHeader_t *pHeader )
 {
 	FileHandle_t fp = g_pFullFileSystem->Open( pFileName, "rb", "GAME" );
-	if ( fp == FILESYSTEM_INVALID_HANDLE )
+	if ( !fp )
 	{
 		return FILESYSTEM_INVALID_HANDLE;
 	}
@@ -2363,7 +2363,7 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 		const char *shaderFileName = m_ShaderSymbolTable.String( pFileCache.m_Filename );
 		// using cached header, just open file, no read of header needed
 		hFile = OpenFileAndLoadHeader( shaderFileName, NULL );
-		if ( hFile == FILESYSTEM_INVALID_HANDLE )
+		if ( !hFile )
 		{
 			// shouldn't happen
 			AssertMsg( false, "Couldn't load shader '%s'.\n", shaderFileName );
@@ -2378,7 +2378,7 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 		char filename[MAX_PATH];
 		V_sprintf_safe( filename, "shaders\\%s\\%s" SHADER_FNAME_EXTENSION, bVertexShader ? "vsh" : "psh", pName );
 		hFile = OpenFileAndLoadHeader( filename, &pHeader );
-		if ( hFile == FILESYSTEM_INVALID_HANDLE )
+		if ( !hFile )
 		{
 #ifdef DYNAMIC_SHADER_COMPILE
 			// Dynamically compile if it's HLSL.
@@ -2387,7 +2387,7 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 			// next, try the fxc dir
 			V_sprintf_safe( filename, "shaders\\fxc\\%s" SHADER_FNAME_EXTENSION, pName );
 			hFile = OpenFileAndLoadHeader( filename, &pHeader );
-			if ( hFile == FILESYSTEM_INVALID_HANDLE )
+			if ( !hFile )
 			{
 				lookup.m_Flags |= SHADER_FAILED_LOAD;
 				Warning( "Couldn't load %s shader %s.\n", bVertexShader ? "vertex" : "pixel", pName );
@@ -2430,9 +2430,10 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 						nNumDups * sizeof( StaticComboAliasRecord_t ), hFile );
 				}
 			}
-
 		}
 	}
+
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( hFile ));
 
 	// FIXME: should make lookup and ShaderStaticCombos_t are pool allocated.
 	lookup.m_ShaderStaticCombos.m_nCount = pHeader.m_nDynamicCombos;
@@ -2480,7 +2481,6 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 		}
 		if ( !nStartingOffset )
 		{
-			g_pFullFileSystem->Close( hFile );
 			Warning( "Shader '%s' - All dynamic combos skipped. This is bad!\n",
 				m_ShaderSymbolTable.String( pFileCache.m_Filename ) );
 			return false;
@@ -2491,7 +2491,6 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 		intp nStaticComboIdx = pFileCache.FindCombo( lookup.m_nStaticIndex / pFileCache.m_Header.m_nDynamicCombos );
 		if ( nStaticComboIdx == -1 )
 		{
-			g_pFullFileSystem->Close( hFile );
 			lookup.m_Flags |= SHADER_FAILED_LOAD;
 			Warning( "Shader '%s' - Couldn't load combo %d of shader (dyn=%d).\n",
 				m_ShaderSymbolTable.String( pFileCache.m_Filename ), lookup.m_nStaticIndex, pFileCache.m_Header.m_nDynamicCombos );
@@ -2530,8 +2529,6 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 
 		g_pFullFileSystem->FreeOptimalReadBuffer( pOptimalBuffer );
 	}
-
-	g_pFullFileSystem->Close( hFile );
 
 	if ( !bOK )
 	{

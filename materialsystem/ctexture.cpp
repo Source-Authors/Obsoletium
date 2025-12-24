@@ -2397,13 +2397,14 @@ bool CTexture::AsyncReadTextureFromFile( IVTFTexture* pVTFTexture, unsigned int 
 		return false;
 	}
 
+	RunCodeAtScopeExit(g_pFullFileSystem->Close(fileHandle));
+
 	// dimhotepus: Drop debug code.
 	// if ( V_strstr( GetName(), "c_sniperrifle_scope" ) )
 	// {
 	// 	int i = 0;
 	// 	i = 3;
 	// }
-
 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - %s", __FUNCTION__, tmDynamicString( TELEMETRY_LEVEL0, pCacheFileName ) );
 	
@@ -2417,12 +2418,9 @@ bool CTexture::AsyncReadTextureFromFile( IVTFTexture* pVTFTexture, unsigned int 
 
 	if ( !SLoadTextureBitsFromFile( &pVTFTexture, fileHandle, m_nFlags | nPreserveFlags, &settings, m_nDesiredDimensionLimit, &dontCareStreamedMips, GetName(), pCacheFileName, &m_dimsMapping ) )
 	{
-		g_pFullFileSystem->Close( fileHandle );
 		m_bStreamingFileReadFailed = true;
 		return false;
 	}
-
-	g_pFullFileSystem->Close( fileHandle );
 
 	m_pStreamingVTF = pVTFTexture;
 
@@ -3207,14 +3205,13 @@ IVTFTexture *CTexture::LoadTextureBitsFromFile( char *pCacheFileName, char **ppR
 		if ( !GetFileHandle( &fileHandle, pCacheFileName, ppResolvedFilename ) )
 			return HandleFileLoadFailedTexture( pVTFTexture );
 
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fileHandle));
+
 		TextureLODControlSettings_t settings = m_cachedFileLodSettings;
 		if ( !SLoadTextureBitsFromFile( &pVTFTexture, fileHandle, m_nFlags | nPreserveFlags, &settings, m_nDesiredDimensionLimit, &m_nStreamingMips, GetName(), pCacheFileName, &m_dimsMapping, &m_dimsActual, &m_dimsAllocated, &stripFlags ) )
 		{
-			g_pFullFileSystem->Close( fileHandle );
 			return HandleFileLoadFailedTexture( pVTFTexture );
 		}
-
-		g_pFullFileSystem->Close( fileHandle );
 	}
 
 
