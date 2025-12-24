@@ -333,20 +333,19 @@ bool Plat_IsUserAnAdmin() {
 	HKEY personalizeKey;
 	// Light mode by default if not supported.
 	DWORD value = 1;
-	LSTATUS ok{::RegOpenKeyExW(HKEY_CURRENT_USER,
+	if (::RegOpenKeyExW(HKEY_CURRENT_USER,
 		L"Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize",
-		0, KEY_READ, &personalizeKey)};
-	if (personalizeKey) {
+		0, KEY_READ, &personalizeKey) == ERROR_SUCCESS) {
+		RunCodeAtScopeExit(::RegCloseKey(personalizeKey));
+
 		DWORD valueType, valueSize = sizeof(value);
 
-		ok = ::RegQueryValueExW(personalizeKey,
+		const LSTATUS ok{::RegQueryValueExW(personalizeKey,
 			L"AppsUseLightTheme",
 			nullptr,
 			&valueType,
 			reinterpret_cast<byte*>(&value),
-			&valueSize);
-
-		::RegCloseKey(personalizeKey);
+			&valueSize)};
 
 		// Light mode by default if not supported.
 		value = ok == ERROR_SUCCESS && valueType == REG_DWORD ? value : 1;

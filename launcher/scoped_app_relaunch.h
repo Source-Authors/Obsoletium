@@ -73,6 +73,8 @@ class ScopedAppRelaunch {
     HKEY key;
     if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Valve\\Source", 0,
                       KEY_ALL_ACCESS, &key) == ERROR_SUCCESS) {
+      RunCodeAtScopeExit(RegCloseKey(key));
+
       wchar_t value[MAX_PATH];
       DWORD value_size = std::size(value);
 
@@ -82,8 +84,6 @@ class ScopedAppRelaunch {
         ShellExecuteW(nullptr, L"open", value, nullptr, nullptr, SW_SHOW);
         RegDeleteValueW(key, L"Relaunch URL");
       }
-
-      RegCloseKey(key);
     }
 #endif
   }

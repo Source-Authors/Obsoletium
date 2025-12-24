@@ -597,16 +597,10 @@ bool CSystem::SetRegistryString(const char *key, const char *value)
 	{
 		return false;
 	}
+	
+	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
 
-	if (VCRHook_RegSetValueEx(hKey, key1, NULL, REG_SZ, (uchar*)value, value ? strlen(value) + 1 : 0) == ERROR_SUCCESS)
-	{
-		VCRHook_RegCloseKey(hKey);
-		return true;
-	}
-
-	VCRHook_RegCloseKey(hKey);
-
-	return false;
+	return VCRHook_RegSetValueEx(hKey, key1, NULL, REG_SZ, (uchar*)value, value ? strlen(value) + 1 : 0) == ERROR_SUCCESS;
 }
 
 bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
@@ -640,16 +634,10 @@ bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
 		return false;
 	}
 
+	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
+
 	unsigned long len=valueLen;
-	if(VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)value,&len)==ERROR_SUCCESS)
-	{		
-		VCRHook_RegCloseKey(hKey);
-		return true;
-	}
-
-	VCRHook_RegCloseKey(hKey);
-
-	return false;
+	return VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)value,&len)==ERROR_SUCCESS;
 }
 
 bool CSystem::SetRegistryInteger(const char *key, int value)
@@ -677,15 +665,10 @@ bool CSystem::SetRegistryInteger(const char *key, int value)
 	{
 		return false;
 	}
-		
-	if(VCRHook_RegSetValueEx(hKey,key1,0,REG_DWORD,(uchar*)&value,4)==ERROR_SUCCESS)
-	{
-		VCRHook_RegCloseKey(hKey);
-		return true;
-	}
 
-	VCRHook_RegCloseKey(hKey);
-	return false;
+	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
+		
+	return VCRHook_RegSetValueEx(hKey,key1,0,REG_DWORD,(uchar*)&value,4)==ERROR_SUCCESS;
 }
 
 bool CSystem::GetRegistryInteger(const char *key, int &value)
@@ -714,15 +697,10 @@ bool CSystem::GetRegistryInteger(const char *key, int &value)
 		return false;
 	}
 
-	unsigned long len=4;
-	if(VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)&value,&len)==ERROR_SUCCESS)
-	{		
-		VCRHook_RegCloseKey(hKey);
-		return true;
-	}
+	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
 
-	VCRHook_RegCloseKey(hKey);
-	return false;
+	unsigned long len=4;
+	return VCRHook_RegQueryValueEx(hKey,key1,0,nullptr,(uchar*)&value,&len)==ERROR_SUCCESS;
 }
 
 //-----------------------------------------------------------------------------

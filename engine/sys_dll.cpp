@@ -1193,6 +1193,8 @@ void Sys_GetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return;
 
+	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
+
 	// First time, just set to Valve default
 	if (dwDisposition == REG_CREATED_NEW_KEY)
 	{
@@ -1222,9 +1224,6 @@ void Sys_GetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 			lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszDefaultValue, static_cast<unsigned long>(strlen(pszDefaultValue)) + 1 ); 
 		}
 	};
-
-	// Always close this key before exiting.
-	VCRHook_RegCloseKey(hKey);
 }
 
 
@@ -1256,6 +1255,8 @@ void Sys_GetRegKeyValueUnderRootInt( HKEY rootKey, const char *pszSubKey, const 
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return;
 
+	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
+
 	// First time, just set to Valve default
 	if (dwDisposition == REG_CREATED_NEW_KEY)
 	{
@@ -1276,9 +1277,6 @@ void Sys_GetRegKeyValueUnderRootInt( HKEY rootKey, const char *pszSubKey, const 
 			lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_DWORD, (const LPBYTE)&lDefaultValue, sizeof( DWORD ) ); 
 		}
 	};
-
-	// Always close this key before exiting.
-	VCRHook_RegCloseKey(hKey);
 }
 
 
@@ -1301,11 +1299,10 @@ void Sys_SetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return;
 
+	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
+
 	// Just Set the Values according to the defaults
 	lResult = VCRHook_RegSetValueEx( hKey, pszElement, 0, REG_SZ, (CONST BYTE *)pszValue, static_cast<unsigned long>(strlen(pszValue)) + 1 ); 
-
-	// Always close this key before exiting.
-	VCRHook_RegCloseKey(hKey);
 }
 #endif
 

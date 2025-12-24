@@ -409,11 +409,10 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 				regPathName[ std::size( regPathName ) - 1 ] = '\0';
 
 				HKEY key;
-				LONG regResult = RegOpenKeyA( HKEY_LOCAL_MACHINE,
-							regPathName,
-							&key );
-				if ( regResult == ERROR_SUCCESS )
+				if ( RegOpenKeyA( HKEY_LOCAL_MACHINE, regPathName, &key ) == ERROR_SUCCESS )
 				{
+					RunCodeAtScopeExit(RegCloseKey( key ));
+
 					// If PageHeapFlags exists then that means that App Verifier is enabled
 					// for this application. The StackTraceDatabaseSizeInMB is only
 					// set by Valve's enabling batch file so this indicates that
@@ -426,8 +425,6 @@ static bool IsPageHeapEnabled( bool& bETWHeapEnabled )
 
 					if ( RegQueryValueExA( key, "TracingFlags", 0, NULL, NULL, NULL) == ERROR_SUCCESS )
 						bETWHeapEnabled = true;
-
-					RegCloseKey( key );
 				}
 			}
 		}

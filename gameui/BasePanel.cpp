@@ -1629,9 +1629,9 @@ void CBasePanel::RunMenuCommand(const char *command)
 
 		if ( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Valve\\Source", NULL, KEY_WRITE, &hKey) == ERROR_SUCCESS )
 		{
-			RegSetValueEx( hKey, "Relaunch URL", 0, REG_SZ, (const unsigned char *)szSteamURL, sizeof( szSteamURL ) );
+			RunCodeAtScopeExit(RegCloseKey(hKey));
 
-			RegCloseKey(hKey);
+			RegSetValueEx( hKey, "Relaunch URL", 0, REG_SZ, (const unsigned char *)szSteamURL, sizeof( szSteamURL ) );
 		}
 #elif defined( OSX ) || defined( LINUX )
 		FILE *fp = fopen( "/tmp/hl2_relaunch", "w+" );

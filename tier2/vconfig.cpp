@@ -6,6 +6,8 @@
 
 #include "tier2/vconfig.h"
 
+#include "tier0/platform.h"
+
 #ifdef _WIN32
 #include "winlite.h"
 #endif
@@ -29,19 +31,12 @@ bool GetVConfigRegistrySetting( const char *pName, char *pReturn, unsigned long 
 	// Changed to HKEY_CURRENT_USER from HKEY_LOCAL_MACHINE
 	if ( RegOpenKeyEx( HKEY_CURRENT_USER, VPROJECT_REG_KEY, 0, KEY_QUERY_VALUE, &hregkey ) != ERROR_SUCCESS )
 		return false;
+
+	RunCodeAtScopeExit( RegCloseKey( hregkey ) );
 	
 	// Get the value
 	DWORD dwSize = size;
-	if ( RegQueryValueEx( hregkey, pName, nullptr, nullptr,(LPBYTE) pReturn, &dwSize ) != ERROR_SUCCESS )
-	{
-		// dimhotepus: Do not leak the key. 
-		RegCloseKey( hregkey );
-		return false;
-	}
-	
-	// Close the key
-	RegCloseKey( hregkey );
-	return true;
+	return RegQueryValueEx( hregkey, pName, nullptr, nullptr,(LPBYTE) pReturn, &dwSize ) == ERROR_SUCCESS;
 }
 
 //-----------------------------------------------------------------------------
@@ -81,6 +76,8 @@ void SetVConfigRegistrySetting( const char *pName, const char *pValue, bool bNot
 	{
 		return;
 	}
+
+	RunCodeAtScopeExit( RegCloseKey( hregkey ) );
 	
 	// Set the value to the string passed in
 	const DWORD nType = strchr( pValue, '%' ) ? REG_EXPAND_SZ : REG_SZ;
@@ -92,9 +89,6 @@ void SetVConfigRegistrySetting( const char *pName, const char *pValue, bool bNot
 	{
 		NotifyVConfigRegistrySettingChanged();
 	}
-	
-	// Close the key
-	RegCloseKey( hregkey );
 }
 
 //-----------------------------------------------------------------------------
@@ -104,36 +98,33 @@ void SetVConfigRegistrySetting( const char *pName, const char *pValue, bool bNot
 //-----------------------------------------------------------------------------
 bool RemoveObsoleteVConfigRegistrySetting( const char *pValueName, char *pOldValue, unsigned long size )
 {
-	// Open the key
-	HKEY hregkey; 
-	// dimhotepus: Use const instead of magic value.
-	if ( RegOpenKeyEx( HKEY_CURRENT_USER, VPROJECT_REG_KEY, 0, KEY_ALL_ACCESS, &hregkey ) != ERROR_SUCCESS )
-		return false;
-
-	// Return the old state if they've requested it
-	if ( pOldValue != nullptr )
 	{
-		DWORD dwSize = size;
+		// Open the key
+		HKEY hregkey; 
+		// dimhotepus: Use const instead of magic value.
+		if ( RegOpenKeyEx( HKEY_CURRENT_USER, VPROJECT_REG_KEY, 0, KEY_ALL_ACCESS, &hregkey ) != ERROR_SUCCESS )
+			return false;
+		
+		RunCodeAtScopeExit( RegCloseKey( hregkey ) );
 
-		// Get the value
-		if ( RegQueryValueEx( hregkey, pValueName, nullptr, nullptr, (LPBYTE) pOldValue, &dwSize ) != ERROR_SUCCESS )
+		// Return the old state if they've requested it
+		if ( pOldValue != nullptr )
 		{
-			// dimhotepus: Do not leak the key. 
-			RegCloseKey( hregkey );
+			DWORD dwSize = size;
+
+			// Get the value
+			if ( RegQueryValueEx( hregkey, pValueName, nullptr, nullptr, (LPBYTE) pOldValue, &dwSize ) != ERROR_SUCCESS )
+			{
+				return false;
+			}
+		}
+		
+		// Remove the value
+		if ( RegDeleteValue( hregkey, pValueName ) != ERROR_SUCCESS )
+		{
 			return false;
 		}
 	}
-	
-	// Remove the value
-	if ( RegDeleteValue( hregkey, pValueName ) != ERROR_SUCCESS )
-	{
-		// dimhotepus: Do not leak the key. 
-		RegCloseKey( hregkey );
-		return false;
-	}
-
-	// Close the key
-	RegCloseKey( hregkey );
 
 	// Notify other programs
 	NotifyVConfigRegistrySettingChanged();
