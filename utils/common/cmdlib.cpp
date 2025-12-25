@@ -772,10 +772,10 @@ void SafeCreatePath(char *path) {
 // Used to archive source files
 void QCopyFile(char *from, char *to) {
   void *buffer;
+
   int length = LoadFile(from, &buffer);
+  RunCodeAtScopeExit(free(buffer));
 
   CreatePath(to);
   SaveFile(to, buffer, length);
-
-  free(buffer);
 }
