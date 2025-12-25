@@ -593,6 +593,7 @@ bool Base_CmdKeyValues::ReadFromBuffer( bf_read &buffer )
 	{
 		return false;
 	}
+	RunCodeAtScopeExit(free( pvBuffer ));
 
 	buffer.ReadBits( pvBuffer, numBytes * 8 );
 
@@ -600,11 +601,9 @@ bool Base_CmdKeyValues::ReadFromBuffer( bf_read &buffer )
 	if ( !m_pKeyValues->ReadAsBinary( bufRead ) )
 	{
 		Assert( false );
-		free( pvBuffer );
 		return false;
 	}
 
-	free( pvBuffer );
 	return !buffer.IsOverflowed();
 }
 

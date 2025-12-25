@@ -1178,23 +1178,30 @@ intp ByteswapANIFile( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, 
 
 intp ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, const intp fileSize )
 {
-	// Make a working copy of the source to allow for alignment fixups
-	void *pNewSrcBase = malloc( fileSize + BYTESWAP_ALIGNMENT_PADDING );
-	Q_memcpy( pNewSrcBase, pSrcBase, fileSize );
+	intp fixedFileSize;
 
-	intp fixedFileSize = ByteswapANIFile( pHdr, pDestBase, pNewSrcBase, fileSize );
-	if ( fixedFileSize != fileSize )
 	{
-		intp finalSize = ByteswapANIFile( pHdr, pDestBase, pNewSrcBase, fixedFileSize );
-		if ( finalSize != fixedFileSize )
+		// Make a working copy of the source to allow for alignment fixups
+		void *pNewSrcBase = malloc( fileSize + BYTESWAP_ALIGNMENT_PADDING );
+		if ( !pNewSrcBase)
+			Error("Out of memory in byteswap ANI (%zd bytes)", fileSize + BYTESWAP_ALIGNMENT_PADDING );
+
+		RunCodeAtScopeExit( free( pNewSrcBase ) );
+
+		Q_memcpy( pNewSrcBase, pSrcBase, fileSize );
+
+		fixedFileSize = ByteswapANIFile( pHdr, pDestBase, pNewSrcBase, fileSize );
+		if ( fixedFileSize != fileSize )
 		{
-			if ( g_bVerbose )
-				Warning( "Alignment fixups failed on ANI swap!\n" );
-			fixedFileSize = 0;
+			intp finalSize = ByteswapANIFile( pHdr, pDestBase, pNewSrcBase, fixedFileSize );
+			if ( finalSize != fixedFileSize )
+			{
+				if ( g_bVerbose )
+					Warning( "Alignment fixups failed on ANI swap!\n" );
+				fixedFileSize = 0;
+			}
 		}
 	}
-
-	free( pNewSrcBase );
 
 	// the compression needs to happen on the final or "fixed" pass
 	if ( g_pCompressFunc && pHdr->numanimblocks >= 2 && fixedFileSize )
@@ -1205,6 +1212,8 @@ intp ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, cons
 		byte *pNewDestBase = (byte *)malloc( fixedFileSize );
 		if (!pNewDestBase)
 			Error("Out of memory in byteswap ANI (%zd bytes)", fixedFileSize );
+
+		RunCodeAtScopeExit( free( pNewDestBase ) );
 
 		Q_memset( pNewDestBase, 0, fixedFileSize );
 		byte *pNewDest = pNewDestBase;
@@ -1253,7 +1262,6 @@ intp ByteswapANI( studiohdr_t* pHdr, void *pDestBase, const void *pSrcBase, cons
 
 		fixedFileSize = pNewDest - pNewDestBase;
 		V_memcpy( pDestBase, pNewDestBase, fixedFileSize );
-		free( pNewDestBase );
 	}
 
 	return fixedFileSize;
@@ -1951,22 +1959,28 @@ intp ByteswapMDLFile( void *pDestBase, void *pSrcBase, const intp fileSize )
 //----------------------------------------------------------------------
 intp ByteswapMDL( void *pDestBase, const void *pSrcBase, const intp fileSize )
 {
-	// Make a working copy of the source to allow for alignment fixups
-	void *pNewSrcBase = malloc( fileSize + BYTESWAP_ALIGNMENT_PADDING );
-	Q_memcpy( pNewSrcBase, pSrcBase, fileSize );
-
-	intp fixedFileSize = ByteswapMDLFile( pDestBase, pNewSrcBase, fileSize );
-	if ( fixedFileSize != fileSize )
+	intp fixedFileSize;
 	{
-		intp finalSize = ByteswapMDLFile( pDestBase, pNewSrcBase, fixedFileSize );
-		if ( finalSize != fixedFileSize )
+		// Make a working copy of the source to allow for alignment fixups
+		void *pNewSrcBase = malloc( fileSize + BYTESWAP_ALIGNMENT_PADDING );
+		if ( !pNewSrcBase )
+			Error("Out of memory in byteswap MDL (%zd bytes)", fileSize + BYTESWAP_ALIGNMENT_PADDING );
+
+		RunCodeAtScopeExit( free( pNewSrcBase ) );
+
+		Q_memcpy( pNewSrcBase, pSrcBase, fileSize );
+
+		fixedFileSize = ByteswapMDLFile( pDestBase, pNewSrcBase, fileSize );
+		if ( fixedFileSize != fileSize )
 		{
-			Warning( "Alignment fixups failed on MDL swap!\n" );
-			fixedFileSize = 0;
+			intp finalSize = ByteswapMDLFile( pDestBase, pNewSrcBase, fixedFileSize );
+			if ( finalSize != fixedFileSize )
+			{
+				Warning( "Alignment fixups failed on MDL swap!\n" );
+				fixedFileSize = 0;
+			}
 		}
 	}
-
-	free( pNewSrcBase );
 
 	// the compression needs to happen on the final or "fixed" pass
 	if ( g_pCompressFunc && fixedFileSize )
