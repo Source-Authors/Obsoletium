@@ -1587,6 +1587,8 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 	// first the src chunks have to be aligned properly
 	// swap increases size, allocate enough expansion room
 	byte *pSrcAlignedBase = (byte*)malloc( 2*count );
+	RunCodeAtScopeExit(	free( pSrcAlignedBase ) );
+
 	byte *basePtr = pSrcAlignedBase;
 	byte *pSrcAligned = pSrcAlignedBase;
 
@@ -1782,8 +1784,6 @@ static void SwapPhyscollideLump( byte *pDestBase, byte *pSrcBase, unsigned int &
 			break;
 
 	} while ( pPhysModel->dataSize > 0 );
-
-	free( pSrcAlignedBase );
 }
 
 
@@ -2313,6 +2313,8 @@ bool LoadBSPFile( const char *filename )
 	// Load PAK file lump into appropriate data structure
 	byte *pakbuffer = NULL;
 	int paksize = CopyVariableLump<byte>( header, FIELD_CHARACTER, LUMP_PAKFILE, ( void ** )&pakbuffer );
+	RunCodeAtScopeExit(free( pakbuffer ));
+	
 	if ( paksize > 0 )
 	{
 		GetPakFile()->ActivateByteSwapping( IsX360() );
@@ -2322,8 +2324,6 @@ bool LoadBSPFile( const char *filename )
 	{
 		GetPakFile()->Reset();
 	}
-
-	free( pakbuffer );
 
 	g_GameLumps.ParseGameLump( header );
 
@@ -2456,12 +2456,16 @@ bool LoadBSPFile_FileSystemOnly( const char *filename )
 		Warning("Unable to load map '%s'.\n", filename);
 		return false;
 	}
+	RunCodeAtScopeExit(free( header ));
 
 	ValidateHeader( filename, header );
 
 	// Load PAK file lump into appropriate data structure
 	byte *pakbuffer = NULL;
 	int paksize = CopyVariableLump<byte>( header, FIELD_CHARACTER, LUMP_PAKFILE, ( void ** )&pakbuffer, 1 );
+
+	RunCodeAtScopeExit(free( pakbuffer ));
+
 	if ( paksize > 0 )
 	{
 		GetPakFile()->ParseFromBuffer( pakbuffer, paksize );
@@ -2471,10 +2475,6 @@ bool LoadBSPFile_FileSystemOnly( const char *filename )
 		GetPakFile()->Reset();
 	}
 
-	free( pakbuffer );
-
-	// everything has been copied out
-	free( header );
 	return true;
 }
 
@@ -4179,6 +4179,7 @@ int SwapLumpToDisk( dheader_t *header, FileHandle_t file, int fieldType, int lum
 
 	// lump swap may expand, allocate enough expansion room
 	void *pBuffer = malloc( 2*header->lumps[lumpnum].filelen );
+	RunCodeAtScopeExit(free( pBuffer ));
 
 	// CopyLumpInternal will handle the swap on load case
 	unsigned int fieldSize = ( fieldType == FIELD_VECTOR ) ? sizeof(Vector) : sizeof(T);
@@ -4213,8 +4214,6 @@ int SwapLumpToDisk( dheader_t *header, FileHandle_t file, int fieldType, int lum
 	SetAlignedLumpPosition( header, file, lumpnum );
 	SafeWrite( file, pBuffer, header->lumps[lumpnum].filelen );
 
-	free( pBuffer );
-
 	return header->lumps[lumpnum].filelen;
 }
 
@@ -4228,6 +4227,7 @@ int SwapLumpToDisk( dheader_t *dheader, FileHandle_t file, int lumpnum )
 
 	// lump swap may expand, allocate enough room
 	void *pBuffer = malloc( 2*dheader->lumps[lumpnum].filelen );
+	RunCodeAtScopeExit(free( pBuffer ));
 
 	// CopyLumpInternal will handle the swap on load case
 	int count = CopyLumpInternal<T>( dheader, lumpnum, (T*)pBuffer, dheader->lumps[lumpnum].version );
@@ -4241,7 +4241,6 @@ int SwapLumpToDisk( dheader_t *dheader, FileHandle_t file, int lumpnum )
 
 	SetAlignedLumpPosition(dheader, file, lumpnum);
 	SafeWrite( file, pBuffer, dheader->lumps[lumpnum].filelen );
-	free( pBuffer );
 
 	return dheader->lumps[lumpnum].filelen;
 }
@@ -4393,6 +4392,8 @@ void SwapPakfileLumpToDisk( dheader_t *header, FileHandle_t file, const char *pI
 
 	byte *pakbuffer = NULL;
 	int paksize = CopyVariableLump<byte>( header, FIELD_CHARACTER, LUMP_PAKFILE, ( void ** )&pakbuffer );
+	RunCodeAtScopeExit( free( pakbuffer ) );
+
 	if ( paksize > 0 )
 	{
 		GetPakFile()->ActivateByteSwapping( IsX360() );
@@ -4400,7 +4401,6 @@ void SwapPakfileLumpToDisk( dheader_t *header, FileHandle_t file, const char *pI
 
 		ConvertPakFileContents( pInFilename );
 	}
-	free( pakbuffer );
 
 	SetAlignedLumpPosition( header, file, LUMP_PAKFILE, XBOX_DVD_SECTORSIZE );
 	WritePakFileLump(header, file);
@@ -4866,14 +4866,14 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 	dheader_t *header = OpenBSPFile(pInFilename);
 	if (!header) return false;
 
+	RunCodeAtScopeExit(CloseBSPFile(header));
+
 	// CRC the bsp first
 	CRC32_t mapCRC;
 	CRC32_Init(&mapCRC);
 	if ( !CRC_MapFile( header, &mapCRC, pInFilename ) )
 	{
 		Warning( "Failed to CRC the map '%s'.\n", pInFilename );
-		// dimhotepus: Do not leak BSP data.
-		CloseBSPFile(header);
 		return false;
 	}
 
@@ -5008,8 +5008,6 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 	// Cleanup
 	g_Swap.ActivateByteSwapping( false );
 
-	CloseBSPFile(header);
-
 	g_StaticPropNames.Purge();
 	g_StaticPropInstances.Purge();
 
@@ -5068,8 +5066,10 @@ bool GetPakFileLump( const char *pBSPFilename, void **pPakData, int *pPakSize )
 		Warning("Unable to load map '%s'.\n", pBSPFilename);
 		return false;
 	}
+
+	RunCodeAtScopeExit(free( pHeader ));
+
 	bool bSwap = ( pHeader->ident == BigLong( IDBSPHEADER ) );
-	free( pHeader );
 
 	g_bSwapOnLoad = bSwap;
 	g_bSwapOnWrite = !bSwap;
@@ -5157,8 +5157,9 @@ bool SetPakFileLump( const char *pBSPFilename, const char *pNewFilename, void *p
 		return false;
 	}
 
+	RunCodeAtScopeExit(free( pHeader ));
+
 	bool bSwap = ( pHeader->ident == BigLong( IDBSPHEADER ) );
-	free( pHeader );
 
 	g_bSwapOnLoad = bSwap;
 	g_bSwapOnWrite = bSwap;
