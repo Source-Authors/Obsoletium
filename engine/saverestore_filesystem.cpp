@@ -188,16 +188,19 @@ public:
 
 		// build the directory list
 		char basefindfn[ MAX_PATH ];
-		const char *findfn = Sys_FindFirstEx(pPath, "DEFAULT_WRITE_PATH", basefindfn, sizeof( basefindfn ) );
-		while ( findfn )
-		{
-			intp index = list.AddToTail();
-			memset( list[index].szFileName, 0, sizeof(list[index].szFileName) );
-			V_strcpy_safe( list[index].szFileName, findfn );
 
-			findfn = Sys_FindNext( basefindfn, sizeof( basefindfn ) );
+		{
+			const char *findfn = Sys_FindFirstEx(pPath, "DEFAULT_WRITE_PATH", basefindfn, sizeof( basefindfn ) );
+			RunCodeAtScopeExit(Sys_FindClose());
+			while ( findfn )
+			{
+				intp index = list.AddToTail();
+				memset( list[index].szFileName, 0, sizeof(list[index].szFileName) );
+				V_strcpy_safe( list[index].szFileName, findfn );
+
+				findfn = Sys_FindNext( basefindfn, sizeof( basefindfn ) );
+			}
 		}
-		Sys_FindClose();
 
 		// write the list of files to the save file
 		char szName[MAX_PATH];
@@ -271,13 +274,13 @@ public:
 	{
 		int count = 0;
 		const char *findfn = Sys_FindFirstEx( pPath, "DEFAULT_WRITE_PATH", NULL, 0 );
+		RunCodeAtScopeExit(Sys_FindClose());
 
 		while ( findfn != NULL )
 		{
 			count++;
 			findfn = Sys_FindNext(NULL, 0 );
 		}
-		Sys_FindClose();
 
 		return count;
 	}
@@ -287,10 +290,10 @@ public:
 	//-----------------------------------------------------------------------------
 	void DirectoryClear( const char *pPath, bool bIsXSave )
 	{
-		char const	*findfn;
 		char		szPath[ MAX_PATH ];
 		
-		findfn = Sys_FindFirstEx( pPath, "DEFAULT_WRITE_PATH", NULL, 0 );
+		const char *findfn = Sys_FindFirstEx( pPath, "DEFAULT_WRITE_PATH", NULL, 0 );
+		RunCodeAtScopeExit(Sys_FindClose());
 		while ( findfn != NULL )
 		{
 			if ( !bIsXSave )
@@ -308,7 +311,6 @@ public:
 			// Any more save files
 			findfn = Sys_FindNext( NULL, 0 );
 		}
-		Sys_FindClose();
 	}
 
 	void AuditFiles( void )

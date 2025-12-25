@@ -943,8 +943,9 @@ int Sys_InitGame( CreateInterfaceFn appSystemFactory, const char* pBaseDir, void
 		FileHandle_t pidFile = g_pFileSystem->Open( CommandLine()->ParmValue ( "-pidfile", "srcds.pid" ), "w+" );
 		if ( pidFile )
 		{
+			RunCodeAtScopeExit(g_pFileSystem->Close(pidFile));
+
 			g_pFileSystem->FPrintf( pidFile, "%i\n", getpid() );
-			g_pFileSystem->Close(pidFile);
 		}
 		else
 		{
@@ -1298,7 +1299,7 @@ void Sys_SetRegKeyValueUnderRoot( HKEY rootKey, const char *pszSubKey, const cha
 		&dwDisposition);    // Type of creation
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return;
-
+	
 	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
 
 	// Just Set the Values according to the defaults

@@ -912,6 +912,7 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 	Q_strlower( friendly_com_gamedir );
 	
 	char const *findfn = Sys_FindFirst( mapwild, NULL, 0 );
+	RunCodeAtScopeExit(Sys_FindClose());
 	while ( findfn )
 	{
 		char curDir[MAX_PATH];
@@ -937,7 +938,6 @@ void CServerRemoteAccess::GetMapList(CUtlBuffer &value)
 		findfn = Sys_FindNext( NULL, 0 );
 	}
 
-	Sys_FindClose();
 	value.PutChar(0);
 }
 

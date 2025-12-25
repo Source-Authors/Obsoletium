@@ -178,6 +178,7 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 			// Search the directory structure.
 			const char *mapwild = "maps/*.bsp";
 			char const *findfn = Sys_FindFirst( mapwild, NULL, 0 );
+			RunCodeAtScopeExit(Sys_FindClose());
 			while ( findfn )
 			{
 				// make sure that it's in the mod filesystem
@@ -210,8 +211,6 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 				Q_strncpy(newMap.name, sz, sizeof(newMap.name));
 				aMaps->AddToTail( newMap );
 			}
-
-			Sys_FindClose();
 		}
 	}
 	else
@@ -220,10 +219,11 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 		if ( pMapFile )
 		{
 			// Load them in
-			FileHandle_t resfilehandle;
-			resfilehandle = g_pFileSystem->Open( pMapFile, "rb" );
-			if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
+			FileHandle_t resfilehandle = g_pFileSystem->Open( pMapFile, "rb" );
+			if ( resfilehandle )
 			{
+				RunCodeAtScopeExit(g_pFileSystem->Close(resfilehandle));
+
 				// Read in and parse mapcycle.txt
 				int length = g_pFileSystem->Size(resfilehandle);
 				if ( length > 0 )
@@ -264,8 +264,6 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 						}
 					}
 				}
-
-				g_pFileSystem->Close(resfilehandle);
 			}
 			else
 			{

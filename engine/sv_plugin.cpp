@@ -223,6 +223,7 @@ void CServerPlugin::LoadPlugins()
 	m_Plugins.PurgeAndDeleteElements();
 
 	char const *findfn = Sys_FindFirst( "addons/*.vdf", NULL, 0 );
+	RunCodeAtScopeExit(Sys_FindClose());
 	while ( findfn )
 	{
 		DevMsg( "Plugins: found file \"%s\"\n", findfn );
@@ -246,8 +247,6 @@ void CServerPlugin::LoadPlugins()
 		// move to next item
 		findfn = Sys_FindNext( NULL, 0  );
 	}
-
-	Sys_FindClose();
 
 	CreateInterfaceFnT<IPluginHelpersCheck> gameServerFactory = Sys_GetFactory<IPluginHelpersCheck>( g_GameDLL );
 	m_PluginHelperCheck = gameServerFactory( INTERFACEVERSION_PLUGINHELPERSCHECK, nullptr );
