@@ -449,6 +449,8 @@ inline void CUtlHash<Data, C, K>::Log( const char *filename )
 	if( !pDebugFp )
 		return;
 
+	RunCodeAtScopeExit(fclose(pDebugFp));
+
 	intp maxBucketSize = 0;
 	intp numBucketsEmpty = 0;
 
@@ -468,8 +470,6 @@ inline void CUtlHash<Data, C, K>::Log( const char *filename )
 
 	fprintf( pDebugFp, "\nBucketHeads Used: %zd\n", bucketCount - numBucketsEmpty );
 	fprintf( pDebugFp, "Max Bucket Size: %zd\n", maxBucketSize );
-
-	fclose( pDebugFp );
 }
 
 //=============================================================================
