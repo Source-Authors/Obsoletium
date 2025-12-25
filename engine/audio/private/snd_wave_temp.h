@@ -11,8 +11,8 @@
 #pragma once
 #endif
 
-extern void WaveCreateTmpFile( const char *filename, int rate, int bits, int channels );
-extern void WaveAppendTmpFile( const char *filename, void *buffer, int sampleBits, int numSamples );
-extern void WaveFixupTmpFile( const char *filename );
+extern bool WaveCreateTmpFile( const char *filename, int rate, int bits, int channels );
+extern bool WaveAppendTmpFile( const char *filename, void *buffer, int sampleBits, int numSamples );
+extern bool WaveFixupTmpFile( const char *filename );
 
 #endif // SND_WAVE_TEMP_H

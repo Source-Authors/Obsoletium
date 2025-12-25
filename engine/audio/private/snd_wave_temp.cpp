@@ -16,16 +16,17 @@
 extern IFileSystem *g_pFileSystem;
 
 // Create a wave file
-void WaveCreateTmpFile( const char *filename, int rate, int bits, int nChannels )
+bool WaveCreateTmpFile( const char *filename, int rate, int bits, int nChannels )
 {
 	char tmpfilename[MAX_PATH];
 	V_StripExtension( filename, tmpfilename );
 	V_DefaultExtension( tmpfilename, ".WAV" );
 
-	FileHandle_t file;
-	file = g_pFileSystem->Open( tmpfilename, "wb" );
-	if ( file == FILESYSTEM_INVALID_HANDLE )
-		return;
+	FileHandle_t file = g_pFileSystem->Open( tmpfilename, "wb" );
+	if ( !file )
+		return false;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(file));
 
 	int chunkid = LittleLong( RIFF_ID );
 	int chunksize = LittleLong( 0 );
@@ -55,37 +56,41 @@ void WaveCreateTmpFile( const char *filename, int rate, int bits, int nChannels 
 	g_pFileSystem->Write( &chunkid, sizeof(int), file );
 	g_pFileSystem->Write( &chunksize, sizeof(int), file );
 
-	g_pFileSystem->Close( file );
+	return true;
 }
 
-void WaveAppendTmpFile( const char *filename, void *pBuffer, int sampleBits, int numSamples )
+bool WaveAppendTmpFile( const char *filename, void *pBuffer, int sampleBits, int numSamples )
 {
 	char tmpfilename[MAX_PATH];
 	V_StripExtension( filename, tmpfilename );
 	V_DefaultExtension( tmpfilename, ".WAV" );
 
 	FileHandle_t file = g_pFileSystem->Open( tmpfilename, "r+b" );
-	if ( file == FILESYSTEM_INVALID_HANDLE )
-		return;
+	if ( !file )
+		return false;
+	
+	RunCodeAtScopeExit(g_pFileSystem->Close(file));
 
 	g_pFileSystem->Seek( file, 0, FILESYSTEM_SEEK_TAIL );
 	g_pFileSystem->Write( pBuffer, numSamples * sampleBits/8, file );
-	g_pFileSystem->Close( file );
+
+	return true;
 }
 
-void WaveFixupTmpFile( const char *filename )
+bool WaveFixupTmpFile( const char *filename )
 {
 	char tmpfilename[MAX_PATH];
 	V_StripExtension( filename, tmpfilename );
 	V_DefaultExtension( tmpfilename, ".WAV" );
 
-	FileHandle_t file;
-	file = g_pFileSystem->Open( tmpfilename, "r+b" );
-	if ( FILESYSTEM_INVALID_HANDLE == file )
+	FileHandle_t file = g_pFileSystem->Open( tmpfilename, "r+b" );
+	if ( !file )
 	{
-		Warning( "WaveFixupTmpFile( '%s' ) failed to open file for editing\n", tmpfilename );
-		return;
+		Warning( "WaveFixupTmpFile('%s') failed to open file for editing.\n", tmpfilename );
+		return false;
 	}
+	
+	RunCodeAtScopeExit(g_pFileSystem->Close(file));
 	
 	// file size goes in RIFF chunk
 	int size = g_pFileSystem->Size( file ) - 2*sizeof( int );
@@ -103,7 +108,7 @@ void WaveFixupTmpFile( const char *filename )
 	g_pFileSystem->Seek( file, headerSize+sizeof( int ), FILESYSTEM_SEEK_HEAD );
 	g_pFileSystem->Write( &dataSize, sizeof( int ), file );
 
-	g_pFileSystem->Close( file );
+	return true;
 }
 
 CON_COMMAND( movie_fixwave, "Fixup corrupted .wav file if engine crashed during startmovie/endmovie, etc." )
