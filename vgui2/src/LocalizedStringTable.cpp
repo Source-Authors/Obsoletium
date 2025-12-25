@@ -524,14 +524,9 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 								{
 									// the language symbols are true if we are in that language
 									// english is assumed when no language is present
-									const char *pLanguageString;
-#ifdef _X360
-									pLanguageString = XBX_GetLanguageString();
-#else
 									static ConVarRef cl_language( "cl_language" );
-									pLanguageString = cl_language.GetString();
-#endif
-									if ( !pLanguageString || !pLanguageString[0] )
+									const char *pLanguageString = cl_language.GetString();
+									if ( Q_isempty( pLanguageString ) )
 									{
 										pLanguageString = "english";
 									}
