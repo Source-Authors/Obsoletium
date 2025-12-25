@@ -281,9 +281,10 @@ bool LZMA_Uncompress( unsigned char *pInBuffer,
 	}
 
 	unsigned char *pOutBuffer = (unsigned char *)malloc( pHeader->actualSize );
+	RunCodeAtScopeExit( LzmaDec_Free(&state, &g_Alloc) );
+
 	if ( !pOutBuffer )
 	{
-		LzmaDec_Free(&state, &g_Alloc);
 		return false;
 	}
 
@@ -293,9 +294,6 @@ bool LZMA_Uncompress( unsigned char *pInBuffer,
 	ELzmaStatus status;
 	SRes result = LzmaDecode( (Byte *)pOutBuffer, &outProcessed, (Byte *)(pInBuffer + sizeof( lzma_header_t ) ),
 	                          &inProcessed, (Byte *)pHeader->properties, LZMA_PROPS_SIZE, LZMA_FINISH_END, &status, &g_Alloc );
-
-
-	LzmaDec_Free(&state, &g_Alloc);
 
 	if ( result != SZ_OK || pHeader->actualSize != outProcessed )
 	{
