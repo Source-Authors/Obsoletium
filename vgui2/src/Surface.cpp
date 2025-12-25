@@ -740,6 +740,7 @@ static void staticGenerateIconForTexture(Texture *texture, HDC hdc)
 
 	memset(planeAND, 0x00, sizeof(planeAND));
 	HBITMAP mask = ::CreateBitmap(texture->_wide, texture->_tall, 1, 1, planeAND);
+	RunCodeAtScopeExit(::DeleteObject(mask));
 
 	// create the icon
 	ICONINFO iconInfo;
@@ -750,8 +751,6 @@ static void staticGenerateIconForTexture(Texture *texture, HDC hdc)
 	iconInfo.hbmColor = texture->_bitmap;
 
 	texture->_icon = ::CreateIconIndirect(&iconInfo);
-
-	::DeleteObject(mask);
 }
 
 
