@@ -501,6 +501,8 @@ virtualmeshhull_t *CPhysCollideVirtualMesh::CreateMeshBoundingHull( const virtua
 		IVP_Compact_Surface *pSurface = CreateBoundingSurfaceFromRange( list, 0, list.indexCount );
 		if ( pSurface )
 		{
+			RunCodeAtScopeExit(ivp_free_aligned(pSurface));
+
 			const IVP_Compact_Ledge *pLedge = pSurface->get_compact_ledge_tree_root()->get_compact_hull();
 			if ( CVPhysicsVirtualMeshWriter::LedgeCanBePacked(pLedge, list) )
 			{
@@ -510,14 +512,13 @@ virtualmeshhull_t *CPhysCollideVirtualMesh::CreateMeshBoundingHull( const virtua
 			{
 				// too big to pack to 8-bits, split in two
 				IVP_Compact_Surface *pSurface0 = CreateBoundingSurfaceFromRange( list, 0, list.indexCount/2 );
+				RunCodeAtScopeExit(ivp_free_aligned(pSurface0));
 				IVP_Compact_Surface *pSurface1 = CreateBoundingSurfaceFromRange( list, list.indexCount/2, list.indexCount/2 );
-
+				RunCodeAtScopeExit(ivp_free_aligned(pSurface1));
+				
 				const IVP_Compact_Ledge *pLedges[2] = {pSurface0->get_compact_ledge_tree_root()->get_compact_hull(), pSurface1->get_compact_ledge_tree_root()->get_compact_hull()};
 				pHull = CVPhysicsVirtualMeshWriter::CreatePackedHullFromLedges( list, pLedges, 2 );
-				ivp_free_aligned(pSurface0);
-				ivp_free_aligned(pSurface1);
 			}
-			ivp_free_aligned(pSurface);
 		}
 	}
 	return pHull;
