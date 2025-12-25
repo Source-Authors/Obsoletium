@@ -1085,28 +1085,9 @@ int CScriptLib::CompareFileTime( const char *pFilenameA, const char *pFilenameB 
 //-----------------------------------------------------------------------------
 [[deprecated]] char *CScriptLib::MakeTemporaryFilename( char const *pchModPath, char *pPath, intp pathSize )
 {
-#if 0
-	char *pBuffer = _tempnam( pchModPath, "mgd_" );
-	if ( pBuffer[0] == '\\' )
-	{
-		pBuffer++;
-	}
-	auto len = V_strlen( pBuffer )-1;
-
-	if ( pBuffer[len] == '.' )
-	{
-		pBuffer[len] = '\0';
-	}
-	V_snprintf( pPath, pathSize, "%s.tmp", pBuffer );
-
-	free( pBuffer );
-
-	return pPath;
-#else
 	AssertMsg( false, "Deprecated MakeTemporaryFilename." );
 
 	return nullptr;
-#endif
 }
 
 //-----------------------------------------------------------------------------
