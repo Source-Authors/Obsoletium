@@ -255,30 +255,32 @@ void CCountedStringPool::DereferenceString( const char* pIntrinsic )
 
 	for( unsigned short previous = INVALID_ELEMENT; nCurrentBucket != INVALID_ELEMENT ; nCurrentBucket = m_Elements[nCurrentBucket].nNextElement )
 	{
-		if( !Q_stricmp( pIntrinsic, m_Elements[nCurrentBucket].pString ) )
+		auto &elem = m_Elements[nCurrentBucket];
+
+		if( !Q_stricmp( pIntrinsic, elem.pString ) )
 		{
 			// Anyone who hits 65k references is permanant
-			if( m_Elements[nCurrentBucket].nReferenceCount < MAX_REFERENCE )
+			if( elem.nReferenceCount < MAX_REFERENCE )
 			{
-				m_Elements[nCurrentBucket].nReferenceCount --;
+				elem.nReferenceCount --;
 			}
 
-			if( m_Elements[nCurrentBucket].nReferenceCount == 0 )
+			if( elem.nReferenceCount == 0 )
 			{
 				if( previous == INVALID_ELEMENT )
 				{
-					m_HashTable[nHashBucketIndex] = m_Elements[nCurrentBucket].nNextElement;
+					m_HashTable[nHashBucketIndex] = elem.nNextElement;
 				}
 				else
 				{
-					m_Elements[previous].nNextElement = m_Elements[nCurrentBucket].nNextElement;
+					m_Elements[previous].nNextElement = elem.nNextElement;
 				}
 
-				delete [] m_Elements[nCurrentBucket].pString;
-				m_Elements[nCurrentBucket].pString = nullptr;
-				m_Elements[nCurrentBucket].nReferenceCount = 0;
+				delete [] elem.pString;
+				elem.pString = nullptr;
+				elem.nReferenceCount = 0;
 
-				m_Elements[nCurrentBucket].nNextElement = m_FreeListStart;
+				elem.nNextElement = m_FreeListStart;
 				m_FreeListStart = nCurrentBucket;
 				break;
 
