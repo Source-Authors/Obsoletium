@@ -4,11 +4,12 @@
 //
 //=============================================================================//
 
-// dimhotepus: Exclude nvtc as proprietary.
 #include <algorithm>
 #include <cmath>
 #include <cstring>
 #include <utility>
+
+#include <memory>
 
 #include "bitmap/imageformat.h"
 #include "tier0/basetypes.h"
@@ -17,6 +18,7 @@
 #include "mathlib/mathlib.h"
 #include "tier1/utlmemory.h"
 
+// dimhotepus: Exclude nvtc as proprietary.
 #ifndef NO_NVTC
 #include "nvtc.h"
 #endif
@@ -564,8 +566,8 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 	
 	KernelInfo_t kernel = {};
 
-	float* pTempMemory = nullptr;
-	float* pTempInvMemory = nullptr;
+	std::unique_ptr<float[]> pTempMemory;
+	std::unique_ptr<float[]> pTempInvMemory;
 	static float* kernelCache[10] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	static float* pInvKernelCache[10] = { nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr, nullptr };
 	float pKernelMem, pInvKernelMem;
@@ -618,11 +620,11 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 		else
 		{
 			// Don't cache non-square kernels, or 3d kernels
-			pTempMemory = new float[kernel.m_nWidth * kernel.m_nHeight * kernel.m_nDepth];
-			pTempInvMemory = new float[kernel.m_nWidth * kernel.m_nHeight * kernel.m_nDepth];
-			GenerateNiceFilter( wratio, hratio, dratio, kernel.m_nDiameter, pTempMemory, pTempInvMemory ); 
-			kernel.m_pKernel = pTempMemory;
-			kernel.m_pInvKernel = pTempInvMemory;
+			pTempMemory = std::make_unique<float[]>(kernel.m_nWidth * kernel.m_nHeight * kernel.m_nDepth);
+			pTempInvMemory = std::make_unique<float[]>(kernel.m_nWidth * kernel.m_nHeight * kernel.m_nDepth);
+			GenerateNiceFilter( wratio, hratio, dratio, kernel.m_nDiameter, pTempMemory.get(), pTempInvMemory.get() ); 
+			kernel.m_pKernel = pTempMemory.get();
+			kernel.m_pInvKernel = pTempInvMemory.get();
 		}
 	}
 	else
@@ -641,7 +643,7 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 		kernel.m_pInvKernel = &pInvKernelMem;
 	}
 
-	float *pAlphaResult = nullptr;
+	std::unique_ptr<float[]> pAlphaResult;
 	KernelType_t type;
 	if ( info.m_nFlags & RESAMPLE_NORMALMAP )
 	{
@@ -649,9 +651,9 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 	}
 	else if ( info.m_nFlags & RESAMPLE_ALPHATEST )
 	{
-		intp nSize = static_cast<intp>(info.m_nSrcHeight) * info.m_nSrcWidth * info.m_nSrcDepth * sizeof(float);
-		pAlphaResult = (float*)malloc( nSize );
-		memset( pAlphaResult, 0, nSize );
+		intp nSize = static_cast<intp>(info.m_nSrcHeight) * info.m_nSrcWidth * info.m_nSrcDepth;
+		pAlphaResult = std::make_unique<float[]>( nSize );
+		memset( pAlphaResult.get(), 0, nSize * sizeof(float) );
 		type = KERNEL_ALPHATEST;
 	}
 	else
@@ -660,16 +662,13 @@ bool ResampleRGBA8888( const ResampleInfo_t& info )
 	}
 
 	if ( info.m_nFlags & RESAMPLE_NICE_FILTER )
-	{	
-		g_KernelFuncNice[type]( kernel, info, wratio, hratio, dratio, gammaToLinear, pAlphaResult );
-		delete[] pTempMemory;
+	{
+		g_KernelFuncNice[type]( kernel, info, wratio, hratio, dratio, gammaToLinear, pAlphaResult.get() );
 	}
 	else
 	{
-		g_KernelFunc[type]( kernel, info, wratio, hratio, dratio, gammaToLinear, pAlphaResult );
+		g_KernelFunc[type]( kernel, info, wratio, hratio, dratio, gammaToLinear, pAlphaResult.get() );
 	}
-
-	free( pAlphaResult );
 
 	return true;
 }
