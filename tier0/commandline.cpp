@@ -169,7 +169,7 @@ void CCommandLine::LoadParametersFromFile( const char *&pSrc, char *&pDst, size_
 	}
 	else
 	{
-		fprintf( stderr, "Parameter file '%s' not found, skipping...", szFileName );
+		fprintf( stderr, "Can't open cmd line file '%s', skipping due to %s...", szFileName, strerror(errno) );
 	}
 }
 
