@@ -1637,9 +1637,9 @@ void CBasePanel::RunMenuCommand(const char *command)
 		FILE *fp = fopen( "/tmp/hl2_relaunch", "w+" );
 		if ( fp )
 		{
+			RunCodeAtScopeExit(fclose( fp ));
 			fprintf( fp, "%s\n", szSteamURL );
 		}
-		fclose( fp );
 #endif
 	}
 	else
