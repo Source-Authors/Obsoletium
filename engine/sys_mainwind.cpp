@@ -1798,10 +1798,11 @@ void CGame::GetDesktopInfo( int &width, int &height, int &refreshrate )
 	if ( m_iDesktopWidth == 0 )
 	{
 		HDC dc = ::GetDC( NULL );
+		RunCodeAtScopeExit( ReleaseDC( NULL, dc ));
+
 		width = ::GetDeviceCaps(dc, HORZRES);
 		height = ::GetDeviceCaps(dc, VERTRES);
 		refreshrate = ::GetDeviceCaps(dc, VREFRESH);
-		::ReleaseDC( NULL, dc );
 		return;
 	}
 	width = m_iDesktopWidth;
@@ -1825,10 +1826,11 @@ void CGame::UpdateDesktopInformation( )
 	m_iDesktopRefreshRate = mode.refresh_rate;
 #else
 	HDC dc = ::GetDC( m_hWindow );
+	RunCodeAtScopeExit( ReleaseDC( m_hWindow, dc ) );
+
 	m_iDesktopWidth = ::GetDeviceCaps(dc, HORZRES);
 	m_iDesktopHeight = ::GetDeviceCaps(dc, VERTRES);
 	m_iDesktopRefreshRate = ::GetDeviceCaps(dc, VREFRESH);
-	::ReleaseDC( m_hWindow, dc );
 #endif
 }
 
