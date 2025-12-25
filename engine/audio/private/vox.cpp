@@ -1922,9 +1922,9 @@ void VOX_TouchSounds( CUtlDict< int, int >& list, CUtlRBTree< ccpair, int >& ccp
 		Q_snprintf( expanded, sizeof( expanded ), "sound/%s", fn );
 
 		FileHandle_t fh = g_pFileSystem->Open( expanded, "rb" );
-		if ( FILESYSTEM_INVALID_HANDLE != fh )
+		if ( fh )
 		{
-			g_pFileSystem->Close( fh );
+			RunCodeAtScopeExit(g_pFileSystem->Close( fh ));
 		}
 	}
 
@@ -1940,19 +1940,19 @@ void VOX_TouchSounds( CUtlDict< int, int >& list, CUtlRBTree< ccpair, int >& ccp
 		}
 
 		FileHandle_t fh = g_pFileSystem->Open( "sentences.m3u", "wt", "GAME" );
-		if ( FILESYSTEM_INVALID_HANDLE != fh )
+		if ( fh )
 		{
+			RunCodeAtScopeExit(g_pFileSystem->Close( fh ));
+
 			for ( auto i = ccpairs.FirstInorder() ; i != ccpairs.InvalidIndex(); i = ccpairs.NextInorder( i ) )
 			{
 				ccpair& pair = ccpairs[ i ];
 
 				char outline[ 512 ];
-				Q_snprintf( outline, sizeof( outline ), "%s\n", pair.fullpath.word );
+				V_sprintf_safe( outline, "%s\n", pair.fullpath.word );
 
 				g_pFileSystem->Write( outline, Q_strlen(outline), fh );
 			}
-
-			g_pFileSystem->Close( fh );
 		}
 	}
 }
@@ -2678,17 +2678,18 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 	// load file
 
 	FileHandle_t file = g_pFileSystem->Open( psentenceFileName, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE == file )
+	if ( !file )
 	{
 		DevMsg ("Couldn't load %s\n", psentenceFileName);
 		return;
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->Close(file));
+
 	unsigned fileSize = g_pFileSystem->Size( file );
 	if ( fileSize == 0 )
 	{
 		DevMsg ("VOX_ReadSentenceFile: %s has invalid size %u\n", psentenceFileName, fileSize );
-		g_pFileSystem->Close( file );
 		return;
 	}
 
@@ -2696,13 +2697,13 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 	if ( !pFileData )
 	{
 		DevMsg ("VOX_ReadSentenceFile: %s couldn't allocate %i bytes for data\n", psentenceFileName, fileSize );
-		g_pFileSystem->Close( file );
 		return;
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->FreeOptimalReadBuffer(pFileData));
+
 	// Read the data and close the file
 	g_pFileSystem->ReadEx( pFileData, g_pFileSystem->GetOptimalReadSize( file, fileSize ), fileSize, file );
-	g_pFileSystem->Close( file );
 
 	// Make sure we end with a null terminator
 	pFileData[ fileSize ] = 0;
@@ -2770,7 +2771,6 @@ void VOX_ReadSentenceFile( const char *psentenceFileName )
 	}
 	// now compact the file data in memory
 	VOX_CompactSentenceFile();
-	g_pFileSystem->FreeOptimalReadBuffer( pFileData );
 
 	VOX_GroupInitAllLRUs();
 	
