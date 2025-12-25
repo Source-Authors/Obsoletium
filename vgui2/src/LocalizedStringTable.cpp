@@ -341,7 +341,7 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 	bool first = true;
 	bool bLoadedAtLeastOne = false;
 
-	for ( int sp = 0; sp < searchList.Count(); ++sp )
+	for ( intp sp = 0; sp < searchList.Count(); ++sp )
 	{
 		const char *fullpath = pathStrings.String( searchList[ sp ] );
 
