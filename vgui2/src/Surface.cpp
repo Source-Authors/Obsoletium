@@ -1360,6 +1360,8 @@ void CWin32Surface::DrawPolyLine(int *px, int *py, intp numPoints)
 	POINT *pt = (POINT *)malloc(sizeof(POINT) * numPoints);
 	if(pt) 
 	{
+		RunCodeAtScopeExit(free(pt));
+
 		for(intp i=0;i<numPoints;i++)
 		{
 			pt[i].x= px[i];
@@ -1368,7 +1370,6 @@ void CWin32Surface::DrawPolyLine(int *px, int *py, intp numPoints)
 
 		Assert(numPoints <= INT_MAX);
 		Polyline(PLAT(_currentContextPanel)->hdc, pt , static_cast<int>(numPoints));
-		free(pt);
 	}
 }
 

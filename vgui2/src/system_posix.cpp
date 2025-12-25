@@ -337,12 +337,13 @@ void CSystem::SetClipboardText(const char *text, intp textLen)
 		char *ClipText = ( char *)malloc( textLen + 1 );
 		if ( ClipText )
 		{
+			RunCodeAtScopeExit(free( ClipText ));
+
 			Q_strncpy( ClipText, text, textLen + 1 );
 			if ( SDL_SetClipboardText( ClipText ) )
 			{
 				Msg( "SDL_SetClipboardText failed: %s\n", SDL_GetError() );
 			}
-			free( ClipText );
 		}
 	}
 #endif
@@ -361,6 +362,7 @@ void CSystem::SetClipboardImage( void *pWnd, int x1, int y1, int x2, int y2 )
 void CSystem::SetClipboardText(const wchar_t *text, intp textLen)
 {
 	char *charStr = (char *)malloc( textLen * 4 );
+	RunCodeAtScopeExit(free( charStr ));
 
 	Q_UnicodeToUTF8( text, charStr, textLen*4 );
 
@@ -374,8 +376,6 @@ void CSystem::SetClipboardText(const wchar_t *text, intp textLen)
 #elif defined( USE_SDL )
 	SetClipboardText( charStr, Q_strlen( charStr ) );
 #endif
-
-	free( charStr );
 }
 
 intp CSystem::GetClipboardTextCount()
@@ -413,8 +413,9 @@ intp CSystem::GetClipboardTextCount()
 
 		if ( text )
 		{
+			RunCodeAtScopeExit(SDL_free( text ));
+
 			Count = Q_strlen( text ) + 1;
-			SDL_free( text );
 		}
 	}
 
@@ -459,8 +460,9 @@ intp CSystem::GetClipboardText(intp offset, char *buf, intp bufLen)
 
 		if ( text )
 		{
+			RunCodeAtScopeExit(SDL_free( text ));
+
 			Q_strncpy( buf, text, bufLen );
-			SDL_free( text );
 			return Q_strlen( buf );
 		}
 	}
@@ -479,6 +481,8 @@ intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 	Assert( !offset );
 
 	char *outputUTF8 = (char *)malloc( bufLen*4 );
+	RunCodeAtScopeExit(free( outputUTF8 ));
+
 	int ret = GetClipboardText( offset, outputUTF8, bufLen );
 
 	if ( ret )
@@ -490,7 +494,6 @@ intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 		buf[ 0 ] = 0;
 	}
 
-	free( outputUTF8 );
 	return ret;
 }
 
