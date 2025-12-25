@@ -219,10 +219,7 @@ void CEntityFactoryDictionary::ReportEntitySizes()
 	}
 
 	// dimhotepus: Dump total entities count.
-	char prefix[64];
-	V_vsprintf_safe( prefix, " %32s", "Total %zu entities size" );
-
-	Msg( "%s: %.2f MiB.\n", prefix, totalCount, totalSize / (1024.f * 1024.f) );
+	Msg( "Total %zu entities size: %.2f MiB", totalCount, totalSize / (1024.f * 1024.f) );
 }
 
 
