@@ -605,29 +605,30 @@ public:
 	{
 		CommentPrintf( "\n%s:\n", filename );
 
-		intp nStart = Q_strlen( m_errorText );
-		intp nMaxLen = sizeof( m_errorText ) - nStart - 1;
+		const intp nStart = V_strlen( m_errorText );
+		const intp nMaxLen = sizeof( m_errorText ) - nStart - 1;
 
-		if ( nMaxLen > 0 )
+		if ( nMaxLen <= 0 ) return;
+
+		auto [fh, rc] = se::posix::posix_file_stream_factory::open( filename, "r" );
+		if ( rc )
 		{
-			FILE *fh = fopen( filename, "r" );
-
-			if ( fh )
-			{
-				size_t ret = fread( m_errorText + nStart, 1, nMaxLen, fh );
-				fclose( fh );
-
-				// Replace tab characters with spaces.
-				for ( size_t i = 0; i < ret; i++ )
-				{
-					if ( m_errorText[ nStart + i ] == '\t' )
-						m_errorText[ nStart + i ] = ' ';
-				}
-			}
-
-			// Entire buffer should have been zeroed out, but just super sure...
-			m_errorText[ sizeof( m_errorText ) - 1 ] = 0;
+			Warning( "Unable to open file '%s' to add to comment: %s.\n", filename, rc.message().c_str() );
+			return;
 		}
+
+		size_t ret;
+		std::tie(ret, rc) = fh.read( m_errorText + nStart, nMaxLen, 1, nMaxLen );
+
+		// Replace tab characters with spaces.
+		for ( size_t i = 0; i < ret; i++ )
+		{
+			if ( m_errorText[ nStart + i ] == '\t' )
+				m_errorText[ nStart + i ] = ' ';
+		}
+
+		// Entire buffer should have been zeroed out, but just super sure...
+		m_errorText[ sizeof( m_errorText ) - 1 ] = 0;
 	}
 
 #endif // LINUX
