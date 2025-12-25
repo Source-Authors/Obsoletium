@@ -193,12 +193,14 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 	{
 		for( ; nCurrentBucket != INVALID_ELEMENT ; nCurrentBucket = m_Elements[nCurrentBucket].nNextElement )
 		{
-			if( !Q_stricmp( pIntrinsic, m_Elements[nCurrentBucket].pString ) )
+			auto& elem = m_Elements[nCurrentBucket];
+
+			if( !Q_stricmp( pIntrinsic, elem.pString ) )
 			{
 				// Anyone who hits 65k references is permanant
-				if( m_Elements[nCurrentBucket].nReferenceCount < MAX_REFERENCE )
+				if( elem.nReferenceCount < MAX_REFERENCE )
 				{
-					m_Elements[nCurrentBucket].nReferenceCount ++ ;
+					elem.nReferenceCount ++ ;
 				}
 				Assert(nCurrentBucket <= std::numeric_limits<unsigned short>::max());
 				return static_cast<unsigned short>(nCurrentBucket);
