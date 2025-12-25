@@ -366,15 +366,19 @@ bool CUtlCachedFileData<T>::IsUpToDate()
 	m_uCurrentMetaChecksum = m_pfnMetaChecksum ? (*m_pfnMetaChecksum)() : 0;
 
 	FileHandle_t fh = g_pFullFileSystem->Open( m_sRepositoryFileName, "rb", "MOD" );
-	if ( fh == FILESYSTEM_INVALID_HANDLE )
+	if ( !fh )
 	{
 		return false;
 	}
 
 	// Version data is in first 12 bytes of file
 	alignas(int) byte	header[ sizeof(int) + sizeof(int) + sizeof(unsigned) ];
-	g_pFullFileSystem->Read( header, sizeof( header ), fh );
-	g_pFullFileSystem->Close( fh );
+
+	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
+		g_pFullFileSystem->Read( header, sizeof( header ), fh );
+	}
 
 	const int cacheversion = *( int *)&header[ 0 ];
 	if ( UTL_CACHE_SYSTEM_VERSION != cacheversion )
@@ -429,7 +433,6 @@ void CUtlCachedFileData<T>::InitSmallBuffer( FileHandle_t& fh, bool& deleteFile 
 
 	CUtlBuffer loadBuf;
 	g_pFullFileSystem->ReadToBuffer( fh, loadBuf );
-	g_pFullFileSystem->Close( fh );
 
 	int cacheversion = 0;
 	loadBuf.Get( &cacheversion, sizeof( cacheversion ) );
@@ -609,8 +612,6 @@ void CUtlCachedFileData<T>::InitLargeBuffer( FileHandle_t& fh, bool& deleteFile 
 		DevMsg( "Discarding repository '%s' due to cache system version change\n", m_sRepositoryFileName.String() );
 		deleteFile = true;
 	}
-
-	g_pFullFileSystem->Close( fh );
 }
 
 template <class T>
@@ -632,24 +633,30 @@ bool CUtlCachedFileData<T>::Init()
 	m_uCurrentMetaChecksum = m_pfnMetaChecksum ? (*m_pfnMetaChecksum)() : 0;
 
 	FileHandle_t fh = g_pFullFileSystem->Open( m_sRepositoryFileName, "rb", "MOD" );
-	if ( fh == FILESYSTEM_INVALID_HANDLE )
+	if ( !fh )
 	{
 		// Nothing on disk, we'll recreate everything from scratch...
 		SetDirty( true );
 		return true;
 	}
-	time_t fileTime = g_pFullFileSystem->GetFileTime( m_sRepositoryFileName, "MOD" );
-	unsigned size = g_pFullFileSystem->Size( fh );
-
+	
 	bool deletefile = false;
+	time_t fileTime;
 
-	if ( size > 1024 * 1024 )
 	{
-		InitLargeBuffer( fh, deletefile );
-	}
-	else
-	{
-		InitSmallBuffer( fh, deletefile );
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+	
+		fileTime = g_pFullFileSystem->GetFileTime( m_sRepositoryFileName, "MOD" );
+		unsigned size = g_pFullFileSystem->Size( fh );
+
+		if ( size > 1024 * 1024 )
+		{
+			InitLargeBuffer( fh, deletefile );
+		}
+		else
+		{
+			InitSmallBuffer( fh, deletefile );
+		}
 	}
 
 	// dimhotepus: File may be in pack, so delete only if local.
@@ -682,14 +689,15 @@ void CUtlCachedFileData<T>::Save()
 	}
 
 	// Now write to file
-	FileHandle_t fh;
-	fh = g_pFullFileSystem->Open( m_sRepositoryFileName, "wb" );
-	if ( FILESYSTEM_INVALID_HANDLE == fh )
+	FileHandle_t fh = g_pFullFileSystem->Open( m_sRepositoryFileName, "wb" );
+	if ( !fh )
 	{
 		ExecuteNTimes( 25, Warning( "Unable to persist cache '%s', check file permissions\n", m_sRepositoryFileName.String() ) );
 	}
 	else
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
 		SetDirty( false );
 
 		int v = UTL_CACHE_SYSTEM_VERSION;
@@ -735,8 +743,6 @@ void CUtlCachedFileData<T>::Save()
 			g_pFullFileSystem->Write( &bufsize, sizeof( bufsize ), fh );
 			g_pFullFileSystem->Write( buf.Base(), bufsize, fh );
 		}
-
-		g_pFullFileSystem->Close( fh );
 	}
 
 	if ( m_bSaveManifest )
@@ -812,10 +818,11 @@ void CUtlCachedFileData<T>::SaveManifest()
 
 	// Now write to file
 	FileHandle_t fh = g_pFullFileSystem->Open( manifest_name, "wb" );
-	if ( FILESYSTEM_INVALID_HANDLE != fh )
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( fh ));
+
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), fh );
-		g_pFullFileSystem->Close( fh );
 
 		// DevMsg( "Persisting cache manifest '%s' (%d entries)\n", manifest_name, c );
 	}
