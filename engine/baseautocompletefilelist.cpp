@@ -48,6 +48,8 @@ int CBaseAutoCompleteFileList::AutoCompletionFunc( char const *partial, char com
 	const size_t substringLength = strlen( substring );
 
 	char const *findfn = Sys_FindFirst( searchpath, NULL, 0 );
+	RunCodeAtScopeExit(Sys_FindClose());
+
 	while ( findfn )
 	{
 		Q_snprintf( sz, sizeof( sz ), "%s", findfn );
@@ -83,8 +85,6 @@ int CBaseAutoCompleteFileList::AutoCompletionFunc( char const *partial, char com
 		if ( symbols.Count() >= COMMAND_COMPLETION_MAXITEMS )
 			break;
 	}
-
-	Sys_FindClose();
 
 	size_t i{0};
 	for ( auto &s : symbols )

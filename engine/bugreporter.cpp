@@ -2079,10 +2079,11 @@ void CBugUIPanel::OnSubmit()
 			{
 				// Store .zip file
 				FileHandle_t fh = g_pFileSystem->Open( "bug.zip", "wb" );
-				if ( FILESYSTEM_INVALID_HANDLE != fh )
+				if ( fh )
 				{
+					RunCodeAtScopeExit(g_pFileSystem->Close( fh ));
+
 					g_pFileSystem->Write( mem, len, fh );
-					g_pFileSystem->Close( fh );
 
 					m_pBugReporter->SetZipAttachmentName( "bug.zip" );
 				}
@@ -2265,17 +2266,18 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 
 	Msg( "Uploading %s to %s\n", local, remote );
 	FileHandle_t hLocal = g_pFileSystem->Open( local, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE == hLocal )
+	if ( !hLocal )
 	{
 		Warning( "CBugUIPanel::UploadFile:  Unable to open local path '%s'\n", local );
 		return false;
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->Close( hLocal ));
+
 	unsigned nLocalFileSize = g_pFileSystem->Size( hLocal );
 	if ( nLocalFileSize == 0 )
 	{
 		Warning( "CBugUIPanel::UploadFile:  Local file has 0 size '%s'\n", local );
-		g_pFileSystem->Close( hLocal );
 		return false;
 	}
 	NonFileSystem_CreatePath( remote );
@@ -2283,7 +2285,6 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 	bool bResult;
 	if ( !g_pFileSystem->IsSteam() )
 	{
-		g_pFileSystem->Close( hLocal );
 #ifdef WIN32
 		bResult = CopyFile( local, remote, false ) ? true : false;
 #elif POSIX
@@ -2298,7 +2299,6 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 		if ( rc )
 		{
 			Warning( "CBugUIPanel::UploadFile:  Unable to open remote path '%s': %s\n", remote, rc.message().c_str() );
-			g_pFileSystem->Close( hLocal );
 			return false;
 		}
 
@@ -2309,7 +2309,6 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 		if ( !pCopyBuf )
 		{
 			Warning( "CBugUIPanel::UploadFile:  Unable to allocate copy buffer of %zu bytes\n", nCopyBufferSize );
-			g_pFileSystem->Close( hLocal );
 			return false;
 		}
 
@@ -2322,13 +2321,10 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 			if ( rc )
 			{
 				Warning( "CBugUIPanel::UploadFile:  Unable to copy file: %s\n", rc.message().c_str() );
-				g_pFileSystem->Close( hLocal );
 				return false;
 			}
 			nRemainingBytes -= nBytesToCopy;
 		}
-
-		g_pFileSystem->Close( hLocal );
 
 		bResult = true;
 	}
@@ -2694,10 +2690,12 @@ void CBugUIPanel::ParseDefaultParams( void )
 	constexpr char szDefaults[]{ "scripts/bugreporter_defaults.txt" };
 
 	FileHandle_t hLocal = g_pFileSystem->Open( szDefaults, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE == hLocal )
+	if ( !hLocal )
 	{
 		return;
 	}
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(hLocal));
 
 	// load file into a null-terminated buffer
 	int fileSize = g_pFileSystem->Size(hLocal);
@@ -2707,7 +2705,6 @@ void CBugUIPanel::ParseDefaultParams( void )
 
 	g_pFileSystem->Read(buffer, fileSize, hLocal); // read into local buffer
 	buffer[fileSize] = 0; // null terminate file as EOF
-	g_pFileSystem->Close( hLocal );	// close file after reading
 
 	char token[64];
 	const char *pfile = COM_ParseFile(buffer, token);

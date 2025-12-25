@@ -315,14 +315,18 @@ static void BuildSingleCubemap( const char *pVTFName, const Vector &vecOrigin,
 
 	// HDRFIXME: Make this go to a buffer instead.
 	FileHandle_t fp = g_pFileSystem->Open( pTXTName, "w" );
-	if( bHDR )
+	if (fp)
 	{
-		g_pFileSystem->FPrintf( fp, "\"pfm\" \"1\"\n" );
-		// HDRFIXME: Make sure that we can mip and lod and get rid of this.
+		RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
+		if( bHDR )
+		{
+			g_pFileSystem->FPrintf( fp, "\"pfm\" \"1\"\n" );
+			// HDRFIXME: Make sure that we can mip and lod and get rid of this.
+		}
+		// don't let any dest alpha creep into the image
+		g_pFileSystem->FPrintf( fp, "\"stripalphachannel\" \"1\"\n" );
 	}
-	// don't let any dest alpha creep into the image
-	g_pFileSystem->FPrintf( fp, "\"stripalphachannel\" \"1\"\n" );
-	g_pFileSystem->Close( fp );
 
 	if ( ivt )
 	{
