@@ -270,9 +270,10 @@ void TextEntry::SetText(const char *text)
 	{
 		intp lenUnicode = ( len * sizeof( wchar_t ) + 4 );
 		wchar_t *unicode = ( wchar_t * ) malloc( lenUnicode );
+		RunCodeAtScopeExit(free( unicode ));
+
 		g_pVGuiLocalize->ConvertANSIToUnicode( text, unicode, lenUnicode );
 		SetText( unicode );
-		free( unicode );
 	}
 }
 
