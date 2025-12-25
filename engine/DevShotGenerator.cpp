@@ -104,7 +104,7 @@ void CDevShotGenerator::NextMap()
 
 	if (m_Maps.IsValidIndex(m_iCurrentMap))
 	{
-		//Msg("DEVSHOTS: Switching to %s (%d).\n", m_Maps[m_iCurrentMap].name, m_iCurrentMap );
+		//Msg("DEVSHOTS: Switching to %s (%zd).\n", m_Maps[m_iCurrentMap].name, m_iCurrentMap );
 		CFmtStr str("map %s\n", m_Maps[m_iCurrentMap].name);
 		Cbuf_AddText( str.Access() );
 
@@ -112,7 +112,7 @@ void CDevShotGenerator::NextMap()
 	}
 	else
 	{
-		//Msg("DEVSHOTS: Finished on map %d.\n", m_iCurrentMap);
+		//Msg("DEVSHOTS: Finished on map %zd.\n", m_iCurrentMap);
 
 		// no more levels, just quit
 		Cbuf_AddText( "quit\n" );

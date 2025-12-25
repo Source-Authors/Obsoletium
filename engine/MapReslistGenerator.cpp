@@ -151,7 +151,7 @@ void CMapReslistGenerator::BuildMapList()
 	}
 }
 
-bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile, const char *pMapFile, const char *pSystemMsg, int *iCurrentMap )
+bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile, const char *pMapFile, const char *pSystemMsg, intp *iCurrentMap )
 {
 	if ( !bUseMapListFile )
 	{
@@ -161,12 +161,12 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 		{
 			// ensure validity
 			char szMapFile[64] = { 0 };
-			V_snprintf( szMapFile, sizeof( szMapFile ), "maps/%s.bsp", pMapName );
+			V_sprintf_safe( szMapFile, "maps/%s.bsp", pMapName );
 			if (g_pVEngineServer->IsMapValid( szMapFile ))
 			{
 				// add to list
 				maplist_map_t newMap;
-				Q_strncpy(newMap.name, pMapName, sizeof(newMap.name));
+				V_strcpy_safe(newMap.name, pMapName);
 				aMaps->AddToTail( newMap );
 			}
 
@@ -190,11 +190,11 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 
 				// strip extension
 				char sz[ MAX_PATH ];
-				Q_strncpy( sz, findfn, sizeof( sz ) );
+				V_strcpy_safe( sz, findfn );
 				char *ext = strchr( sz, '.' );
 				if (ext)
 				{
-					ext[0] = 0;
+					ext[0] = '\0';
 				}
 
 				// move to next item
@@ -202,13 +202,13 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 
 				// ensure validity
 				char szMapFile[64] = { 0 };
-				V_snprintf( szMapFile, sizeof( szMapFile ), "maps/%s.bsp", sz );
+				V_sprintf_safe( szMapFile, "maps/%s.bsp", sz );
 				if (!g_pVEngineServer->IsMapValid( szMapFile ))
 					continue;
 
 				// add to list
 				maplist_map_t newMap;
-				Q_strncpy(newMap.name, sz, sizeof(newMap.name));
+				V_strcpy_safe(newMap.name, sz);
 				aMaps->AddToTail( newMap );
 			}
 		}
@@ -235,20 +235,19 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 						const char *pFileList = pStart.get();
 
 						char token[COM_TOKEN_MAX_LENGTH];
+						char szMap[ MAX_OSPATH ];
 
 						while ( 1 )
 						{
-							char szMap[ MAX_OSPATH ];
-
 							pFileList = COM_Parse( pFileList, token );
-							if ( !token[0] )
+							if ( Q_isempty( token ) )
 								break;
 
-							Q_strncpy(szMap, token, sizeof(szMap));
+							V_strcpy_safe(szMap, token);
 
 							// ensure validity
 							char szMapFile[64] = { 0 };
-							V_snprintf( szMapFile, sizeof( szMapFile ), "maps/%s.bsp", szMap );
+							V_sprintf_safe( szMapFile, "maps/%s.bsp", szMap );
 							if (!g_pVEngineServer->IsMapValid( szMapFile ))
 								continue;
 
@@ -259,7 +258,7 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 							}
 
 							maplist_map_t newMap;
-							Q_strncpy(newMap.name, szMap, sizeof(newMap.name));
+							V_strcpy_safe(newMap.name, szMap);
 							aMaps->AddToTail( newMap );
 						}
 					}
@@ -277,7 +276,7 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 		}
 	}
 
-	int c = aMaps->Count();
+	intp c = aMaps->Count();
 	if ( c == 0 )
 	{
 		Msg( "%s: No maps found\n", pSystemMsg );
@@ -291,7 +290,7 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 	char const *startmap = NULL;
 	if ( CommandLine()->CheckParm( "-startmap", &startmap ) && startmap )
 	{
-		for ( int i = 0 ; i < c; ++i )
+		for ( intp i = 0 ; i < c; ++i )
 		{
 			if ( !Q_stricmp( aMaps->Element(i).name, startmap ) )
 			{
@@ -300,7 +299,7 @@ bool BuildGeneralMapList( CUtlVector<maplist_map_t> *aMaps, bool bUseMapListFile
 		}
 	}
 
-	for ( int i = 0 ; i < c; ++i )
+	for ( intp i = 0 ; i < c; ++i )
 	{
 		if ( i < *iCurrentMap )
 		{

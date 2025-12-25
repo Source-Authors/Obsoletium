@@ -44,7 +44,7 @@ public:
 
 private:
 	bool	m_bDevShotsEnabled;
-	int		m_iCurrentMap;
+	intp	m_iCurrentMap;
 	bool	m_bUsingMapList;
 
 	// list of all maps to scan
