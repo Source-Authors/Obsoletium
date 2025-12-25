@@ -283,9 +283,10 @@ font_t *CFontManager::CreateOrFindWin32Font(const char *windowsFontName, int tal
 			char *filename = CLinuxFont::GetFontFileName( windowsFontName, flags );
 			if( filename )
 			{
+				RunCodeAtScopeExit(free( filename ));
+
 				// ... and try to add it to the font cache.
 				pchFontData = m_pFontDataHelper( windowsFontName, memSize, filename );
-				free( filename );
 			}
 		}
 
