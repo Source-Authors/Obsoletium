@@ -96,8 +96,12 @@ void SpewToFile( char const* pFmt, ... )
 	if ( 1 ) //s_RecordingBuffer.Size() > 8192)
 	{
 		FileHandle_t fp = OpenRecordingFile();
-		g_pFileSystem->Write( s_RecordingBuffer.Base(), s_RecordingBuffer.Size(), fp );
-		g_pFileSystem->Close( fp );
+		if (fp)
+		{
+			RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
+			g_pFileSystem->Write( s_RecordingBuffer.Base(), s_RecordingBuffer.Size(), fp );
+		}
 
 		s_RecordingBuffer.RemoveAll();
 	}
