@@ -96,15 +96,9 @@ using CTempImage = CUtlMemory<unsigned char>;
 	RunCodeAtScopeExit(g_pFullFileSystem->Close(fileHandle));
 
 	// How big is the file?
-	long pos;
-	if (maxbytes < 0)
-	{
-		pos = g_pFullFileSystem->Size( fileHandle );
-	}
-	else
-	{
-		pos = maxbytes;
-	}
+	int pos = maxbytes < 0
+		? g_pFullFileSystem->Size( fileHandle )
+		: maxbytes;
 	
 	// Allocate enough space
 	image.EnsureCapacity( pos );
