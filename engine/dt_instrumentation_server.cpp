@@ -95,9 +95,10 @@ void ServerDTI_Flush()
 
 	// Write out a file that can be used by Excel.
 	FileHandle_t fp = g_pFileSystem->Open( g_pServerDTIFilename, "wt", "LOGDIR" );
-	
-	if( fp != FILESYSTEM_INVALID_HANDLE )
+	if( fp )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+
 		// Write the header.
 		g_pFileSystem->FPrintf( fp, 
 			"DTName"
@@ -230,8 +231,6 @@ void ServerDTI_Flush()
 			totalDeltaProps.GetMillisecondsF(),
 			totalDeltaProps.GetMillisecondsF() * 100.0 / runningTime.GetMillisecondsF()
 			);
-		
-		g_pFileSystem->Close( fp );
 
 		Msg( "DTI: Wrote delta distances into %s.\n", g_pServerDTIFilename );
 	}
@@ -240,8 +239,10 @@ void ServerDTI_Flush()
 	// Write the delta distances.
 	const char *pDeltaDistancesFilename = "dti_delta_distances.txt";
 	fp = g_pFileSystem->Open( pDeltaDistancesFilename, "wt", "LOGDIR" );
-	if( fp != FILESYSTEM_INVALID_HANDLE )
+	if( fp )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+
 		// Write the column labels.
 		g_pFileSystem->FPrintf( fp, "ClassName" );
 		for ( int i=0; i < NUM_DELTA_DISTANCE_BANDS; i++ )
@@ -264,9 +265,7 @@ void ServerDTI_Flush()
 				g_pFileSystem->FPrintf( fp, "\t%d", pTable->m_DistanceDeltaCounts[i] );
 			}
 			g_pFileSystem->FPrintf( fp, "\n" );
-		}		
-
-		g_pFileSystem->Close( fp );
+		}
 		
 		Msg( "DTI: Wrote instrumentation data into %s.\n", pDeltaDistancesFilename );
 	}

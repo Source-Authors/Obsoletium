@@ -537,8 +537,9 @@ void COM_WriteFile ( IN_Z const char *filename, IN_BYTECAP(len) void *data, int 
 		return;
 	}
 	
+	RunCodeAtScopeExit(g_pFileSystem->Close( handle ));
+	
 	g_pFileSystem->Write( data, len, handle );
-	g_pFileSystem->Close( handle );
 }
 
 /*
@@ -574,8 +575,10 @@ bool COM_CopyFile ( IN_Z const char *pSourcePath, IN_Z const char *pDestPath )
 	FileHandle_t in = g_pFileSystem->Open(pSourcePath, "rb");
 	AssertMsg( in, "COM_CopyFile(): Input file '%s' failed to open", pSourcePath );
 
-	if ( in == FILESYSTEM_INVALID_HANDLE )
+	if ( !in )
 		return false;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(in));
 
 	// create directories up to the cache file
 	COM_CreatePath( pDestPath );
@@ -583,11 +586,12 @@ bool COM_CopyFile ( IN_Z const char *pSourcePath, IN_Z const char *pDestPath )
 	FileHandle_t out = g_pFileSystem->Open( pDestPath, "wb" );
 	AssertMsg( out, "COM_CopyFile(): Output file '%s' failed to open", pDestPath );
 	
-	if ( out == FILESYSTEM_INVALID_HANDLE )
+	if ( !out )
 	{
-		g_pFileSystem->Close( in );
 		return false;
 	}
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(out));
 
 	unsigned remaining = g_pFileSystem->Size( in );
 	while ( remaining > 0 )
@@ -600,9 +604,6 @@ bool COM_CopyFile ( IN_Z const char *pSourcePath, IN_Z const char *pDestPath )
 		remaining -= count;
 	}
 
-	g_pFileSystem->Close( in );
-	g_pFileSystem->Close( out );
-	
 	return true;
 }
 
@@ -1131,8 +1132,9 @@ void COM_LogString( char const *pchFile, char const *pchString )
 	FileHandle_t fp = g_pFileSystem->Open( pfilename, "a+t");
 	if (fp)
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+
 		g_pFileSystem->Write( pchString, V_strlen( pchString), fp );
-		g_pFileSystem->Close(fp);
 	}
 }
 

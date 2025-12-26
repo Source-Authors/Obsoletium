@@ -321,10 +321,11 @@ void CDemoActionManager::SaveToFile( void )
 
 	// Write to file
 	FileHandle_t fh = g_pFileSystem->Open( metafile, "w" );
-	if ( fh != FILESYSTEM_INVALID_HANDLE )
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close( fh ));
+
 		g_pFileSystem->Write( buf.Base(), buf.TellPut(), fh );
-		g_pFileSystem->Close( fh );
 	}
 
 	m_bDirty = false;

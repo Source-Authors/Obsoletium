@@ -106,8 +106,10 @@ void DTI_Flush()
 		return;
 
 	FileHandle_t fp = g_pFileSystem->Open( g_pDTIFilename, "wt" );
-	if( fp != FILESYSTEM_INVALID_HANDLE )
+	if( fp )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
 		// Write the header.
 		g_pFileSystem->FPrintf( fp,
 			"Class"
@@ -173,8 +175,6 @@ void DTI_Flush()
 					);
 			}
 		}
-
-		g_pFileSystem->Close( fp );
 
 		Msg( "DTI: wrote client stats into %s.\n", g_pDTIFilename );
 	}
