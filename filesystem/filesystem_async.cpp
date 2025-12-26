@@ -1427,24 +1427,34 @@ FSAsyncStatus_t CBaseFileSystem::SyncAppendFile(const char *pAppendToFileName, c
 			RunCodeAtScopeExit(Close(hSourceFile));
 
 			SetBufferSize( hSourceFile, 0 );
-			const int BUFSIZE = 128 * 1024;
+
+			int BUFSIZE = 128 * 1024;
 			int fileSize = Size( hSourceFile );
-			char *buf = (char *)malloc( BUFSIZE );
-			int size;
 
-			while ( fileSize > 0 )
+			if (fileSize > 0)
 			{
-				if ( fileSize > BUFSIZE )
-					size = BUFSIZE;
-				else
-					size = fileSize;
-				Read( buf, size, hSourceFile );
-				Write( buf, size, hDestFile );
+				// dimhotepus: No sense in too large buffer.
+				if (fileSize < BUFSIZE)
+					BUFSIZE = fileSize;
 
-				fileSize -= size;
+				std::unique_ptr<char[]> buf = std::make_unique<char[]>(BUFSIZE);
+				int size;
+
+				while ( fileSize > 0 )
+				{
+					if ( fileSize > BUFSIZE )
+						size = BUFSIZE;
+					else
+						size = fileSize;
+
+					// dimhotepus: Write only read amount of bytes.
+					const int read = Read( buf.get(), size, hSourceFile );
+					Write( buf.get(), read, hDestFile );
+
+					fileSize -= size;
+				}
 			}
 
-			free(buf);
 			result = FSASYNC_OK;
 		}
 	}
