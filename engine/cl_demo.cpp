@@ -1751,6 +1751,14 @@ void CDemoPlayer::WriteTimeDemoResults( void )
 	ConMsg ("%i frames %5.3f seconds %5.2f fps (%5.2f ms/f) %5.3f fps variability\n", frames, time, frames/time, 1000*time/frames, flVariability );
 	bool bFileExists = g_pFileSystem->FileExists( "SourceBench.csv" );
 	FileHandle_t fileHandle = g_pFileSystem->Open( "SourceBench.csv", "a+" );
+	if (!fileHandle)
+	{
+		ConWarning("Unable to open SourceBench.csv to write time demo results.\n");
+		return;
+	}
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(fileHandle));
+
 	int width, height;
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->GetWindowSize( width, height );
@@ -1831,7 +1839,6 @@ void CDemoPlayer::WriteTimeDemoResults( void )
 	const char *timedemo_comment = itimedemo_comment ? CommandLine()->GetParm( itimedemo_comment + 1 ) : "";
 	g_pFileSystem->FPrintf( fileHandle, "%s,", timedemo_comment );
 	g_pFileSystem->FPrintf( fileHandle, "\n" );
-	g_pFileSystem->Close( fileHandle );
 }
 
 
