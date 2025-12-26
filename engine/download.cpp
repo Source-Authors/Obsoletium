@@ -190,9 +190,9 @@ static bool DecompressBZipToDisk( const char *outFilename, const char *srcFilena
 	}
 
 	// Create the subdirs
-	char * tmpDir = V_strdup( outFilename );
+	// dimhotepus: Use stack alloc for performance
+	V_strdup_stack( outFilename, tmpDir );
 	COM_CreatePath( tmpDir );
-	delete[] tmpDir;
 
 	{
 		// open the file for writing
@@ -312,9 +312,9 @@ void DownloadCache::PersistToDisk( const RequestContext_t *rc )
 		if ( !g_pFileSystem->FileExists( absPath ) )
 		{
 			// Create the subdirs
-			char * tmpDir = V_strdup( absPath );
+			// dimhotepus: Use stack alloc for performance
+			V_strdup_stack( absPath, tmpDir );
 			COM_CreatePath( tmpDir );
-			delete[] tmpDir;
 
 			bool success = false;
 			if ( rc->bIsBZ2 )
