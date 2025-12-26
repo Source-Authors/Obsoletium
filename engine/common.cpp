@@ -598,12 +598,13 @@ bool COM_CopyFile ( IN_Z const char *pSourcePath, IN_Z const char *pDestPath )
 	{
 		const unsigned count = remaining < bufferSize ? remaining : bufferSize;
 
-		g_pFileSystem->Read( buf.get(), count, in );
-		g_pFileSystem->Write( buf.get(), count, out );
+		// dimhotepus: Write only read bytes.
+		const int read = g_pFileSystem->Read( buf.get(), count, in );
+		g_pFileSystem->Write( buf.get(), read, out );
 
-		remaining -= count;
+		remaining -= read;
 	}
-
+	
 	return true;
 }
 
@@ -749,13 +750,16 @@ void COM_CopyFileChunk( FileHandle_t dst, FileHandle_t src, int nSize )
 
 	while (copysize > COM_COPY_CHUNK_SIZE)
 	{
-		g_pFileSystem->Read ( copybuf, COM_COPY_CHUNK_SIZE, src );
-		g_pFileSystem->Write( copybuf, COM_COPY_CHUNK_SIZE, dst );
-		copysize -= COM_COPY_CHUNK_SIZE;
+		// dimhotepus: Write exactly bytes count which was read.
+		const int read = g_pFileSystem->Read( copybuf, COM_COPY_CHUNK_SIZE, src );
+		g_pFileSystem->Write( copybuf, read, dst );
+
+		copysize -= read;
 	}
 
-	g_pFileSystem->Read ( copybuf, copysize, src );
-	g_pFileSystem->Write( copybuf, copysize, dst );
+	// dimhotepus: Write exactly bytes count which was read.
+	const int read = g_pFileSystem->Read( copybuf, copysize, src );
+	g_pFileSystem->Write( copybuf, read, dst );
 
 	g_pFileSystem->Flush ( src );
 	g_pFileSystem->Flush ( dst );
