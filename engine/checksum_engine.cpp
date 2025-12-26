@@ -25,7 +25,6 @@
 byte COM_BlockSequenceCRCByte( byte *base, int length, int sequence )
 {
 	CRC32_t crc;
-	byte *p;
 	byte chkb[60 + 4];
 
 	if (sequence < 0)
@@ -33,9 +32,8 @@ byte COM_BlockSequenceCRCByte( byte *base, int length, int sequence )
 		Sys_Error("sequence < 0, in COM_BlockSequenceCRCByte\n");
 	}
 
-	CRC32_t entry;
-	entry = CRC32_GetTableEntry( ( sequence + 1 ) % ( 256 * sizeof(CRC32_t) - 4 ) );
-	p = (byte *)&entry;
+	CRC32_t entry = CRC32_GetTableEntry( ( sequence + 1 ) % ( 256 * sizeof(CRC32_t) - 4 ) );
+	byte *p = reinterpret_cast<byte *>( &entry );
 
 	// Use up to the first 60 bytes of data and a 4 byte value from the 
 	//  CRC lookup table (divided into the sequence)
@@ -83,8 +81,12 @@ bool CRC_File(CRC32_t *crcvalue, const char *pszFileName)
 	int nBytesRead;
 	
 	int nSize = COM_OpenFile(pszFileName, &fp);
-	if ( !fp || ( nSize == -1 ) )
-		return FALSE;
+	if ( !fp )
+		return false;
+	
+	RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+	if ( nSize == -1 )
+		return false;
 
 	// Now read in 1K chunks
 	while (nSize > 0)
@@ -109,15 +111,11 @@ bool CRC_File(CRC32_t *crcvalue, const char *pszFileName)
 		// If there was a disk error, indicate failure.
 		else if ( nBytesRead <= 0 || !g_pFileSystem->IsOk(fp) )
 		{
-			if ( fp )
-				g_pFileSystem->Close(fp);
-			return FALSE;
+			return false;
 		}
-	}	
+	}
 
-	if ( fp )
-		g_pFileSystem->Close(fp);
-	return TRUE;
+	return true;
 }
 
 // YWB:  5/18
@@ -145,7 +143,11 @@ bool CRC_MapFile(CRC32_t *crcvalue, const char *pszFileName)
 	long startOfs;
 
 	nSize = COM_OpenFile(pszFileName, &fp);
-	if ( !fp || ( nSize == -1 ) )
+	if ( !fp )
+		return false;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+	if ( nSize == -1 )
 		return false;
 
 	startOfs = g_pFileSystem->Tell(fp);
@@ -154,24 +156,14 @@ bool CRC_MapFile(CRC32_t *crcvalue, const char *pszFileName)
 	if (g_pFileSystem->Read(&header, sizeof(dheader_t), fp) == 0)
 	{
 		ConMsg("Could not read BSP header for map [%s].\n", pszFileName);
-		g_pFileSystem->Close(fp);
 		return false;
 	}
 
 	i = header.version;
 	if ( i < MINBSPVERSION || i > BSPVERSION )
 	{
-		g_pFileSystem->Close(fp);
 		ConMsg("Map [%s] has incorrect BSP version (%i should be %i).\n", pszFileName, i, BSPVERSION);
 		return false;
-	}
-
-	if ( IsX360() )
-	{
-		// 360 bsp's store the pc checksum in the flags lump header
-		g_pFileSystem->Close(fp);
-		*crcvalue = header.lumps[LUMP_MAP_FLAGS].version;
-		return true;
 	}
 
 	// CRC across all lumps except for the Entities lump
@@ -203,15 +195,11 @@ bool CRC_MapFile(CRC32_t *crcvalue, const char *pszFileName)
 			// If there was a disk error, indicate failure.
 			if ( !g_pFileSystem->IsOk(fp) )
 			{
-				if ( fp )
-					g_pFileSystem->Close(fp);
 				return false;
 			}
-		}	
+		}
 	}
 	
-	if ( fp )
-		g_pFileSystem->Close(fp);
 	return true;
 }
 
@@ -227,7 +215,11 @@ bool MD5_MapFile(MD5Value_t *md5value, const char *pszFileName)
 	long startOfs;
 
 	nSize = COM_OpenFile(pszFileName, &fp);
-	if ( !fp || ( nSize == -1 ) )
+	if ( !fp )
+		return false;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+	if ( nSize == -1 )
 		return false;
 
 	MD5Context_t ctx;
@@ -240,14 +232,12 @@ bool MD5_MapFile(MD5Value_t *md5value, const char *pszFileName)
 	if (g_pFileSystem->Read(&header, sizeof(dheader_t), fp) == 0)
 	{
 		ConMsg("Could not read BSP header for map [%s].\n", pszFileName);
-		g_pFileSystem->Close(fp);
 		return false;
 	}
 
 	i = header.version;
 	if ( i < MINBSPVERSION || i > BSPVERSION )
 	{
-		g_pFileSystem->Close(fp);
 		ConMsg("Map [%s] has incorrect BSP version (%i should be %i).\n", pszFileName, i, BSPVERSION);
 		return false;
 	}
@@ -281,15 +271,10 @@ bool MD5_MapFile(MD5Value_t *md5value, const char *pszFileName)
 			// If there was a disk error, indicate failure.
 			if ( !g_pFileSystem->IsOk(fp) )
 			{
-				if ( fp )
-					g_pFileSystem->Close(fp);
 				return false;
 			}
-		}	
+		}
 	}
-
-	if ( fp )
-		g_pFileSystem->Close(fp);
 
 	MD5Final( md5value->bits, &ctx );
 
@@ -311,10 +296,12 @@ bool MD5_Hash_File(unsigned char digest[16], const char *pszFileName, bool bSeed
 	int nBytesRead;
 	MD5Context_t ctx;
 	
-	int nSize;
+	int nSize = COM_OpenFile( pszFileName, &fp );
+	if ( !fp )
+		return false;
 
-	nSize = COM_OpenFile( pszFileName, &fp );
-	if ( !fp || ( nSize == -1 ) )
+	RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+	if ( nSize == -1 )
 		return false;
 
 	memset(&ctx, 0, sizeof(MD5Context_t));
@@ -345,25 +332,19 @@ bool MD5_Hash_File(unsigned char digest[16], const char *pszFileName, bool bSeed
 		// We we are end of file, break loop and return
 		if ( g_pFileSystem->EndOfFile( fp ) )
 		{
-			g_pFileSystem->Close( fp );
 			fp = NULL;
 			break;
 		}
 		// If there was a disk error, indicate failure.
 		else if ( !g_pFileSystem->IsOk(fp) )
 		{
-			if ( fp )
-				g_pFileSystem->Close(fp);
-			return FALSE;
+			return false;
 		}
-	}	
-
-	if ( fp )
-		g_pFileSystem->Close(fp);
+	}
 
 	MD5Final(digest, &ctx);
 
-	return TRUE;
+	return true;
 }
 
 //-----------------------------------------------------------------------------
@@ -392,8 +373,9 @@ bool MD5_Hash_Buffer( unsigned char pDigest[16], const unsigned char *pBuffer, i
 		const int nChunkSize = MIN( 1024, nSize );
 		MD5Update( &ctx, pChunk, nChunkSize );
 		nSize -= nChunkSize;
-		pChunk += nChunkSize;	AssertValidReadPtr( pChunk );
-	}	
+		pChunk += nChunkSize;
+		AssertValidReadPtr( pChunk );
+	}
 
 	MD5Final( pDigest, &ctx );
 
