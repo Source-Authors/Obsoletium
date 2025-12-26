@@ -743,14 +743,20 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	if ( bClearFile )
 	{
 		FileHandle_t pSaveFile = g_pSaveRestoreFileSystem->Open( name, "wb", MOD_DIR );
-		if (!pSaveFile && g_pFileSystem->FileExists( name, MOD_DIR ) )
+		if (pSaveFile)
 		{
-			Msg("Save failed: invalid file name '%s'\n", pSaveName);
-			m_szSaveGameName[ 0 ] = 0;
-			return 0;
+			RunCodeAtScopeExit(g_pSaveRestoreFileSystem->Close(pSaveFile));
 		}
-		if ( pSaveFile )
-			g_pSaveRestoreFileSystem->Close( pSaveFile );
+		else
+		{
+			if ( g_pFileSystem->FileExists( name, MOD_DIR ) )
+			{
+				// dimhotepus: Msg -> Warning
+				Warning("Save failed: save '%s' already exists.\n", pSaveName);
+				m_szSaveGameName[ 0 ] = 0;
+				return 0;
+			}
+		}
 		S_ExtraUpdate();
 	}
 
@@ -1024,6 +1030,8 @@ bool CSaveRestore::LoadGame( const char *pName )
 	pFile = g_pSaveRestoreFileSystem->Open( name, "rb", MOD_DIR );
 	if ( pFile )
 	{
+		RunCodeAtScopeExit(g_pSaveRestoreFileSystem->Close(pFile));
+
 		char szDummyName[ MAX_PATH ];
 		char szComment[ MAX_PATH ];
 		char szElapsedTime[ MAX_PATH ];
@@ -1045,7 +1053,6 @@ bool CSaveRestore::LoadGame( const char *pName )
 		}
 		else
 		{
-			g_pSaveRestoreFileSystem->Close( pFile );
 			if ( bLoadedToMemory )
 			{
 				g_pSaveRestoreFileSystem->RemoveFile( name );
@@ -1067,8 +1074,6 @@ bool CSaveRestore::LoadGame( const char *pName )
 			Warning( "Map '%s' missing or invalid\n", gameHeader.mapName );
 			validload = false;
 		}
-
-		g_pSaveRestoreFileSystem->Close( pFile );
 		
 		if ( bLoadedToMemory )
 		{
@@ -1637,20 +1642,19 @@ void CSaveRestore::ReapplyDecal( bool adjacent, RestoreLookupTable *table, decal
 
 void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 {
-	FileHandle_t pFile;
-
-	pFile = g_pSaveRestoreFileSystem->Open( fileName, "rb", MOD_DIR );
+	FileHandle_t pFile = g_pSaveRestoreFileSystem->Open( fileName, "rb", MOD_DIR );
 	if ( !pFile )
 	{
 		DevMsg( "Failed to open client state file %s\n", fileName );
 		return;
 	}
 
+	RunCodeAtScopeExit(g_pSaveRestoreFileSystem->Close(pFile));
+
 	SaveFileHeaderTag_t tag;
 	g_pSaveRestoreFileSystem->Read( &tag, sizeof(tag), pFile );
 	if ( tag != CURRENT_SAVEFILE_HEADER_TAG )
 	{
-		g_pSaveRestoreFileSystem->Close( pFile );
 		return;
 	}
 
@@ -1669,7 +1673,6 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 
 		if ( sectionheaderversion != SECTION_VERSION_NUMBER )
 		{
-			g_pSaveRestoreFileSystem->Close( pFile );
 			return;
 		}
 		g_pSaveRestoreFileSystem->Read( &sections, sizeof(baseclientsections_t), pFile );
@@ -1705,7 +1708,6 @@ void CSaveRestore::RestoreClientState( char const *fileName, bool adjacent )
 	Q_strncpy( pSaveData->levelInfo.szCurrentMapName, fileName, sizeof( pSaveData->levelInfo.szCurrentMapName ) );
 
 	g_pSaveRestoreFileSystem->Read( (char *)(pSaveData + 1), sections.SumBytes(), pFile );
-	g_pSaveRestoreFileSystem->Close( pFile );
 
 	char *pszTokenList = (char *)(pSaveData + 1);
 
