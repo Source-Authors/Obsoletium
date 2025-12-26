@@ -204,8 +204,10 @@ public:
 
 		// Load them in
 		FileHandle_t resfilehandle = g_pFileSystem->Open( MAPLIST_FILE, "rb", "MOD" );
-		if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
+		if ( resfilehandle )
 		{
+			RunCodeAtScopeExit(g_pFileSystem->Close(resfilehandle));
+
 			// Read in and parse mapcycle.txt
 			int length = g_pFileSystem->Size(resfilehandle);
 			if ( length > 0 )
@@ -243,8 +245,6 @@ public:
 					}
 				}
 			}
-
-			g_pFileSystem->Close(resfilehandle);
 		}
 		else
 		{
@@ -268,8 +268,10 @@ public:
 
 		// Load them in
 		FileHandle_t resfilehandle = g_pFileSystem->Open( MAPLIST_FILE, "rb", "MOD" );
-		if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
+		if ( resfilehandle )
 		{
+			RunCodeAtScopeExit(g_pFileSystem->Close(resfilehandle));
+
 			// Read in and parse mapcycle.txt
 			int length = g_pFileSystem->Size(resfilehandle);
 			if ( length > 0 )
@@ -301,8 +303,6 @@ public:
 					}
 				}
 			}
-
-			g_pFileSystem->Close(resfilehandle);
 
 			CacheSoundsFromResFile( false, list, CFmtStr( "%s\\engine.lst", reslistdir ) );
 			CacheSoundsFromResFile( false, list, CFmtStr( "%s\\all.lst", reslistdir ) );
@@ -410,8 +410,10 @@ private:
 		char token[COM_TOKEN_MAX_LENGTH];
 
 		FileHandle_t resfilehandle = g_pFileSystem->Open( resfile, "rb", "MOD" );
-		if ( FILESYSTEM_INVALID_HANDLE != resfilehandle )
+		if ( resfilehandle )
 		{
+			RunCodeAtScopeExit(g_pFileSystem->Close(resfilehandle));
+
 			// Read in and parse mapcycle.txt
 			int length = g_pFileSystem->Size(resfilehandle);
 			if ( length > 0 )
@@ -459,8 +461,6 @@ private:
 					}
 				}
 			}
-
-			g_pFileSystem->Close(resfilehandle);
 		}
 
 		int newCount = list.Count();

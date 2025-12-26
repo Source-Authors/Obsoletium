@@ -595,10 +595,9 @@ static bool GetFileFromRemoteStorage( ISteamRemoteStorage *pRemoteStorage, const
 			FileHandle_t hFile = g_pFileSystem->Open( pszLocalFileName, "wb", "MOD" );
 			if( hFile )
 			{
+				RunCodeAtScopeExit(g_pFileSystem->Close(hFile));
 
 				bSuccess = g_pFileSystem->Write( buf.Base(), nFileSize, hFile ) == nFileSize;
-				g_pFileSystem->Close( hFile );
-
 				if ( bSuccess )
 				{
 					DevMsg( "[Cloud]: SUCCEESS retrieved %s from remote storage into %s\n", pszRemoteFileName, pszLocalFileName );
@@ -938,13 +937,14 @@ static void UseDefaultBindings()
 		return;
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->Close(f));
+
 	// read file into memory
 	int size = g_pFileSystem->Size(f);
 
 	// dimhotepus: ASAN catch. Missed space for '\0'.
 	std::unique_ptr<char[]> startbuf = std::make_unique<char[]>( static_cast<intp>( size ) + 1 );
 	g_pFileSystem->Read( startbuf.get(), size, f );
-	g_pFileSystem->Close( f );
 	startbuf[ size ] = '\0';
 
 	const char *buf = startbuf.get();
@@ -1076,8 +1076,10 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 						{
 							// store logo .VTF file
 							FileHandle_t hFile = g_pFileSystem->Open( szLogoFileName, "rb", "MOD" );
-							if ( FILESYSTEM_INVALID_HANDLE != hFile )
+							if ( hFile )
 							{
+								RunCodeAtScopeExit(g_pFileSystem->Close(hFile));
+
 								unsigned int unSize = g_pFileSystem->Size( hFile );
 
 								byte *pBuffer = (byte*) malloc( unSize );
@@ -1094,14 +1096,15 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 									}
 								}
 								free( pBuffer );
-								g_pFileSystem->Close( hFile );
 							}
 
 							// store logo .VMT file
 							Q_SetExtension( szLogoFileName, ".vmt" );
 							hFile = g_pFileSystem->Open( szLogoFileName, "rb", "MOD" );
-							if ( FILESYSTEM_INVALID_HANDLE != hFile )
+							if ( hFile )
 							{
+								RunCodeAtScopeExit(g_pFileSystem->Close(hFile));
+
 								unsigned int unSize = g_pFileSystem->Size( hFile );
 
 								byte *pBuffer = (byte*) malloc( unSize );
@@ -1118,7 +1121,6 @@ void Host_WriteConfiguration( const char *filename, bool bAllVars )
 									}
 								}
 								free( pBuffer );
-								g_pFileSystem->Close( hFile );
 							}
 						}
 					}
@@ -1300,12 +1302,13 @@ void Host_ReadPreStartupConfiguration()
 	if ( !f )
 		return;
 
+	RunCodeAtScopeExit(g_pFileSystem->Close(f));
+
 	// read file into memory
 	int size = g_pFileSystem->Size(f);
 	std::unique_ptr<char[]> configBuffer = std::make_unique<char[]>(size + 1);
 	g_pFileSystem->Read( configBuffer.get(), size, f );
 	configBuffer[size] = 0;
-	g_pFileSystem->Close( f );
 
 	// parse out file
 	constexpr char *s_PreStartupConfigConVars[] =

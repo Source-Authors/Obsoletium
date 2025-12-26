@@ -138,8 +138,9 @@ int CMapListItem::CheckFSHeaderVersion( char const *name )
 	FileHandle_t fp = g_pFileSystem->Open ( name, "rb" );
 	if ( fp )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+
 		g_pFileSystem->Read( &header, sizeof( header ), fp );
-		g_pFileSystem->Close( fp );
 	}
 
 	return ( header.version >= MINBSPVERSION && header.version <= BSPVERSION ) ? VALID : INVALID;
@@ -264,6 +265,7 @@ void CMapListManager::RefreshList( void )
 	char mapwild[MAX_QPATH];
 	Q_strncpy(mapwild,"maps/*.bsp", sizeof( mapwild ) );
 	char const *findfn = Sys_FindFirst( mapwild, NULL, 0 );
+	RunCodeAtScopeExit(Sys_FindClose());
 	while ( findfn )
 	{
 		if ( IsPC() && V_stristr( findfn, ".360.bsp" ) )
@@ -320,8 +322,6 @@ void CMapListManager::RefreshList( void )
 
 		findfn = Sys_FindNext( NULL, 0 );
 	}
-
-	Sys_FindClose();
 
 	m_flLastRefreshTime = realtime;
 }
@@ -383,6 +383,7 @@ void CMapListManager::BuildList( void )
 	char mapwild[MAX_QPATH];
 	Q_strncpy(mapwild,"maps/*.bsp", sizeof( mapwild ) );
 	char const *findfn = Sys_FindFirst( mapwild, NULL, 0 );
+	RunCodeAtScopeExit(Sys_FindClose());
 	while ( findfn )
 	{
 		if ( V_stristr( findfn, ".360.bsp" ) )
@@ -417,8 +418,6 @@ void CMapListManager::BuildList( void )
 
 		findfn = Sys_FindNext( NULL, 0 );
 	}
-
-	Sys_FindClose();
 
 	// Remember time we build the list
 	m_flLastRefreshTime = realtime;

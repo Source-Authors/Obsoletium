@@ -1541,9 +1541,10 @@ CON_COMMAND( ray_save, "Save the rays" )
 		FileHandle_t hFile = g_pFileSystem->Open("rays.bin", "wb");
 		if ( hFile )
 		{
+			RunCodeAtScopeExit(g_pFileSystem->Close(hFile));
+
 			g_pFileSystem->Write( &count, sizeof(count), hFile );
 			g_pFileSystem->Write( s_BenchmarkRays.Base(), sizeof(s_BenchmarkRays[0])*count, hFile );
-			g_pFileSystem->Close( hFile );
 		}
 	}
 
@@ -1559,6 +1560,8 @@ CON_COMMAND( ray_load, "Load the rays" )
 	FileHandle_t hFile = g_pFileSystem->Open("rays.bin", "rb");
 	if ( hFile )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close(hFile));
+
 		int count = 0;
 		g_pFileSystem->Read( &count, sizeof(count), hFile );
 		if ( count )
@@ -1566,7 +1569,6 @@ CON_COMMAND( ray_load, "Load the rays" )
 			s_BenchmarkRays.EnsureCount( count );
 			g_pFileSystem->Read( s_BenchmarkRays.Base(), sizeof(s_BenchmarkRays[0])*count, hFile );
 		}
-		g_pFileSystem->Close( hFile );
 	}
 
 	Msg("Loaded %d rays\n", s_BenchmarkRays.Count() );

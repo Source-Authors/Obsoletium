@@ -981,12 +981,13 @@ bool CEngineTool::ShouldSuppressDeInit() const
 void CEngineTool::StartRecordingVoiceToFile( const char *filename, const char *pPathID /*= 0*/ )
 {	
 	FileHandle_t fh = g_pFileSystem->Open( filename, "wb", pPathID );
-	if ( fh != FILESYSTEM_INVALID_HANDLE )
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close(fh));
+
 		byte foo = 'b';
 
 		g_pFileSystem->Write( &foo, 1, fh );
-		g_pFileSystem->Close( fh );
 	}
 
 	g_pFileSystem->RelativePathToFullPath_safe( filename, pPathID, m_szVoiceoverFile );
