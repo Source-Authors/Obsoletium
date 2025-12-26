@@ -2271,7 +2271,7 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 		Warning( "CBugUIPanel::UploadFile:  Unable to open local path '%s'\n", local );
 		return false;
 	}
-
+	
 	RunCodeAtScopeExit(g_pFileSystem->Close( hLocal ));
 
 	unsigned nLocalFileSize = g_pFileSystem->Size( hLocal );
@@ -2346,102 +2346,6 @@ bool CBugUIPanel::UploadFile( char const *local, char const *remote, bool bDelet
 }
 
 CCallQueue g_UploadQueue;
-
-// dimhotepus: Drop as only public repo used.
-// bool CBugUIPanel::UploadBugSubmission( char const *levelname, int bugId, char const *savefile, char const *screenshot, char const *bsp, char const *vmf,
-// 	CUtlVector< includedfile >& files )
-// {
-// 	bool bret = true;
-// 	bool bAsync = bugreporter_uploadasync.GetBool();
-// 
-// 	char localfile[ 512 ];
-// 	char remotefile[ 512 ];
-// 
-// 	if ( savefile && savefile[ 0 ] )
-// 	{
-// 		Q_snprintf( localfile, sizeof( localfile ), "%s/save" PLATFORM_DIR CORRECT_PATH_SEPARATOR_S "%s.sav", com_gamedir, savefile );
-// 		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.sav", GetSubmissionURL(bugId), savefile );
-// 		Q_FixSlashes( localfile );
-// 		Q_FixSlashes( remotefile );
-// 
-// 		g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-// 	}
-// 
-// 	if ( screenshot && screenshot[ 0 ] )
-// 	{
-// 		Q_snprintf( localfile, sizeof( localfile ), "%s/screenshots/%s.jpg", com_gamedir, screenshot );
-// 		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.jpg", GetSubmissionURL(bugId), screenshot );
-// 		Q_FixSlashes( localfile );
-// 		Q_FixSlashes( remotefile );
-// 		
-// 		g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-// 	}
-// 
-// 	if ( bsp && bsp[ 0 ] )
-// 	{
-// 		Q_snprintf( localfile, sizeof( localfile ), "maps/%s.bsp", levelname );
-// 		char *pszMapPath;
-// 		FileHandle_t hBsp = g_pFileSystem->OpenEx( localfile, "rb", 0, 0, &pszMapPath );
-// 		if ( !hBsp )
-// 		{
-// 			Q_snprintf( localfile, sizeof( localfile ), "%s/maps/%s.bsp", com_gamedir, levelname );
-// 		}
-// 		else
-// 		{
-// 			V_strncpy( localfile, pszMapPath, sizeof( localfile ) );
-// 			delete pszMapPath;
-// 			g_pFileSystem->Close( hBsp );
-// 		}
-// 		Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.bsp", GetSubmissionURL(bugId), bsp );
-// 		Q_FixSlashes( localfile );
-// 		Q_FixSlashes( remotefile );
-// 		
-// 		g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-// 	}
-// 
-// 	if ( vmf && vmf[ 0 ] )
-// 	{
-// 		Q_snprintf( localfile, sizeof( localfile ), "%s/%s.vmf", m_szVMFContentDirFullpath, levelname );
-// 		if ( g_pFileSystem->FileExists( localfile, NULL ) )
-// 		{
-// 			Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s.vmf", GetSubmissionURL(bugId), vmf );
-// 			Q_FixSlashes( localfile );
-// 			Q_FixSlashes( remotefile );
-// 		
-// 			g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-// 		}
-// 		else
-// 		{
-// 			Msg( "Unable to locate .vmf file %s\n", localfile );
-// 		}
-// 	}
-// 
-// 	if ( files.Count() > 0 )
-// 	{
-// 		bAsync = false;
-// 		intp c = files.Count();
-// 		for ( intp i = 0 ; i < c; ++i )
-// 		{
-// 			Q_snprintf( localfile, sizeof( localfile ), "%s/%s", com_gamedir, files[ i ].name );
-// 			Q_snprintf( remotefile, sizeof( remotefile ), "%s/%s", GetSubmissionURL(bugId), files[ i ].fixedname );
-// 			Q_FixSlashes( localfile );
-// 			Q_FixSlashes( remotefile );
-// 			
-// 			g_UploadQueue.QueueCall( this, &CBugUIPanel::UploadFile, CUtlEnvelope<const char *>(localfile), CUtlEnvelope<const char *>(remotefile), false );
-// 		}
-// 	}
-// 
-// 	if ( !bAsync )
-// 	{
-// 		g_UploadQueue.CallQueued();
-// 	}
-// 	else
-// 	{
-// 		ThreadExecuteSolo( "BugUpload", &g_UploadQueue, &CCallQueue::CallQueued );
-// 	}
-// 
-// 	return bret;
-// }
 
 void CBugUIPanel::Close()
 {
@@ -2529,50 +2433,6 @@ void CBugUIPanel::DetermineSubmitterName()
 		m_bCanSeeRepository = true;
 		m_bCanSubmit = true;
 	}
-	// dimhotepus: Drop as only public repo used.
-	// else
-	// {
-	// 	Color clr( 100, 200, 255, 255 );
-	// 
-	// 	const char *pUserName = m_pBugReporter->GetUserName();
-	// 	const char *pUserDisplayName = m_pBugReporter->GetUserName_Display();
-	// 
-	// 	if ( pUserName && pUserName[0] && pUserDisplayName && pUserDisplayName[0] )
-	// 	{
-	// 		ConColorMsg( clr, "Username '%s' -- '%s'\n", pUserName, pUserDisplayName );
-	// 	}
-	// 	else if ( cl.IsActive() )
-	// 	{
-	// 		m_bUseNameForSubmitter = true;
-	// 		pUserDisplayName = cl_name.GetString();
-	// 		ConColorMsg( clr, "Using '%s' as bug submission name.\n", pUserDisplayName );
-	// 	}
-	// 	else
-	// 	{
-	// 		ConColorMsg( clr, "Failed to determine bug submission name.\n" );
-	// 	}
-	// 
-	// 	// See if we can see the bug repository right now
-	// 	char fn[ 512 ];
-	// 	Q_snprintf( fn, sizeof( fn ), "%s/%s", GetRepositoryURL(), REPOSITORY_VALIDATION_FILE );
-	// 	Q_FixSlashes( fn );
-	// 
-	// 	FILE *fp = fopen( fn, "rb" );
-	// 	if ( fp )
-	// 	{
-	// 		ConColorMsg( clr, "Bug Repository '%s'\n", GetRepositoryURL() );
-	// 		fclose( fp );
-	// 
-	// 		m_bCanSeeRepository = true;
-	// 	}
-	// 	else
-	// 	{
-	// 		Warning( "Unable to see '%s', check permissions and network connectivity\n", fn );
-	// 		m_bCanSubmit = false;
-	// 	}
-	// 
-	// 	m_pSubmitter->SetText( pUserDisplayName );
-	// }
 }
 
 void CBugUIPanel::PopulateControls()
