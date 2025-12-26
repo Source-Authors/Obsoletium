@@ -268,15 +268,9 @@ void CMapListManager::RefreshList( void )
 	RunCodeAtScopeExit(Sys_FindClose());
 	while ( findfn )
 	{
-		if ( IsPC() && V_stristr( findfn, ".360.bsp" ) )
+		if ( V_stristr( findfn, ".360.bsp" ) )
 		{
 			// ignore 360 bsp
-			findfn = Sys_FindNext( NULL, 0 );
-			continue;
-		}
-		else if ( IsX360() && !V_stristr( findfn, ".360.bsp" ) )
-		{
-			// ignore pc bsp
 			findfn = Sys_FindNext( NULL, 0 );
 			continue;
 		}
