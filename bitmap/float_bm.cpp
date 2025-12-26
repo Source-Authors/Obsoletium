@@ -140,64 +140,67 @@ static int GetInt(IFileSystem *file_system, FileHandle_t &f)
 bool FloatBitMap_t::LoadFromPFM(char const *fname)
 {
 	FileHandle_t f = g_pFullFileSystem->Open(fname, "rb");
-	if (f)
+	if (!f) return false;
+
+	RunCodeAtScopeExit(g_pFullFileSystem->Close( f ));
+
+	if( GetChar(g_pFullFileSystem, f) == 'P' &&
+		GetChar(g_pFullFileSystem, f) == 'F' &&
+		GetChar(g_pFullFileSystem, f) == '\n' )
 	{
-		RunCodeAtScopeExit(g_pFullFileSystem->Close( f ));
+		Width = GetInt(g_pFullFileSystem, f);
+		Height = GetInt(g_pFullFileSystem, f);
 
-		if( GetChar(g_pFullFileSystem, f) == 'P' &&
-			GetChar(g_pFullFileSystem, f) == 'F' &&
-			GetChar(g_pFullFileSystem, f) == '\n' )
+		// dimhotepus: Protect from overflow as input is untrusted.
+		constexpr int kMaxDimension = std::numeric_limits<int>::max() /
+			( static_cast<int>( sizeof(float) ) * 3 );
+		if ( Width < 0 || Width > kMaxDimension ||
+				Height < 0 || Height > kMaxDimension )
 		{
-			Width = GetInt(g_pFullFileSystem, f);
-			Height = GetInt(g_pFullFileSystem, f);
+			fprintf(stderr, "'%s': width (%d) and height (%d) should be in range [0...%d].\n",
+				fname, Width, Height, kMaxDimension );
+			return false;
+		}
 
-			// dimhotepus: Protect from overflow as input is untrusted.
-			constexpr int kMaxDimension = std::numeric_limits<int>::max() /
-				( static_cast<int>( sizeof(float) ) * 3 );
-			if ( Width < 0 || Width > kMaxDimension ||
-				 Height < 0 || Height > kMaxDimension )
-			{
-				fprintf(stderr, "'%s': width (%d) and height (%d) should be in range [0...%d].\n",
-					fname, Width, Height, kMaxDimension );
-				return false;
-			}
-
-			// eat crap until the next newline
-			while( GetChar(g_pFullFileSystem, f) != '\n')
-			{
-			}
+		// eat crap until the next newline
+		while( GetChar(g_pFullFileSystem, f) != '\n')
+		{
+		}
 			
-			// dimhotepus: Handle OOM.
-			std::unique_ptr<float[]> linebuffer = std::make_unique<float[]>( Width * 3 );
-			if ( !linebuffer )
-			{
-				fprintf(stderr, "'%s': unable to allocate %zu bytes line buffer.\n",
-					fname, sizeof(float) * Width * 3 );
-				return false;
-			}
+		// dimhotepus: Handle OOM.
+		std::unique_ptr<float[]> linebuffer = std::make_unique<float[]>( Width * 3 );
+		if ( !linebuffer )
+		{
+			fprintf(stderr, "'%s': unable to allocate %zu bytes line buffer.\n",
+				fname, sizeof(float) * Width * 3 );
+			return false;
+		}
 
-			// dimhotepus: Handle OOM.
-			if ( !AllocateRGB(Width, Height) )
-			{
-				fprintf(stderr, "'%s': unable to allocate %zu bytes result buffer.\n",
-					fname, sizeof(float) * Width * Height * 4 );
-				return false;
-			}
+		// dimhotepus: Handle OOM.
+		if ( !AllocateRGB(Width, Height) )
+		{
+			fprintf(stderr, "'%s': unable to allocate %zu bytes result buffer.\n",
+				fname, sizeof(float) * Width * Height * 4 );
+			return false;
+		}
 
-			for( int y = Height-1; y >= 0; y-- )
+		for( int y = Height-1; y >= 0; y-- )
+		{
+			g_pFullFileSystem->Read(linebuffer.get(), 3*Width*sizeof(float), f);
+			for (int x=0;x<Width;x++)
 			{
-				g_pFullFileSystem->Read(linebuffer.get(), 3*Width*sizeof(float), f);
-				for (int x=0;x<Width;x++)
+				for (int c=0;c<3;c++)
 				{
-					for (int c=0;c<3;c++)
-					{
-						Pixel(x,y,c) = linebuffer[x*3+c];
-					}
+					Pixel(x,y,c) = linebuffer[x*3+c];
 				}
 			}
 		}
+
+		// dimhotepus: Only loaded PFMs should be accepted.
+		return true;
 	}
-	return RGBAData != nullptr;
+
+	return false;
 }
 
 bool FloatBitMap_t::WritePFM(char const *fname) const
