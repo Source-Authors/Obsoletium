@@ -257,6 +257,7 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 	{
 		return false;
 	}
+
 	FileHandle_t fp = g_pFullFileSystem->Open( fileName, "r+b" );
 	if (!fp) return false;
 	
@@ -266,8 +267,12 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 	// Read in the targa header
 	//
 	TGAHeader_t tgaHeader;
-	g_pFullFileSystem->Read( &tgaHeader, sizeof(tgaHeader), fp );
-
+	int read = g_pFullFileSystem->Read( &tgaHeader, sizeof(tgaHeader), fp );
+	if ( read != sizeof(tgaHeader) )
+	{
+		Warning( "TGA '%s' is not TGA file.\n", fileName );
+		return false;
+	}
 
 	int nBytesPerPixel, nPixelSize;
 
@@ -292,7 +297,7 @@ bool WriteRectNoAlloc( unsigned char *pImageData, const char *fileName, int nXOr
 	// Verify src data matches the targa we're going to write into
 	if ( nPixelSize != tgaHeader.pixel_size )
 	{
-		Warning( "TGA doesn't match source data.\n" );
+		Warning( "TGA '%s' doesn't match source data.\n", fileName );
 		return false;
 	}
 
