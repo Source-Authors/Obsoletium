@@ -844,6 +844,10 @@ void CCvarUtilities::CvarList( const CCommand &args )
 		ipLen = Q_strlen( partial );
 	}
 
+	RunCodeAtScopeExit({
+        if (f) g_pFileSystem->Close(f);
+    });
+
 	// Banner
 	ConMsg( "cvar list\n--------------\n" );
 
@@ -901,11 +905,6 @@ void CCvarUtilities::CvarList( const CCommand &args )
 	else
 	{
 		ConMsg("--------------\n%3hu total convars/concommands\n", sorted.Count() );
-	}
-
-	if ( bLogging )
-	{
-		g_pFileSystem->Close( f );
 	}
 }
 

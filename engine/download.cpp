@@ -156,14 +156,14 @@ void DownloadCache::GetCachedData( RequestContext_t *rc )
 		return;
 
 	FileHandle_t fp = g_pFileSystem->Open( cachePath, "rb" );
-
-	if ( fp == FILESYSTEM_INVALID_HANDLE )
+	if ( !fp )
 		return;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(fp));
 
 	int size = g_pFileSystem->Size(fp);
 	rc->cacheData = new unsigned char[size];
 	int status = g_pFileSystem->Read( rc->cacheData, size, fp );
-	g_pFileSystem->Close( fp );
 	if ( !status )
 	{
 		delete[] rc->cacheData;
@@ -194,91 +194,98 @@ static bool DecompressBZipToDisk( const char *outFilename, const char *srcFilena
 	COM_CreatePath( tmpDir );
 	delete[] tmpDir;
 
-	// open the file for writing
-	char fullSrcPath[MAX_PATH];
-	V_MakeAbsolutePath( fullSrcPath, srcFilename, com_gamedir );
-
-	if ( !g_pFileSystem->FileExists( fullSrcPath ) )
 	{
-		// Write out the .bz2 file, for simplest decompression
-		FileHandle_t ifp = g_pFileSystem->Open( fullSrcPath, "wb" );
-		if ( !ifp )
+		// open the file for writing
+		char fullSrcPath[MAX_PATH];
+		V_MakeAbsolutePath( fullSrcPath, srcFilename, com_gamedir );
+
+		if ( !g_pFileSystem->FileExists( fullSrcPath ) )
 		{
-			return false;
+			// Write out the .bz2 file, for simplest decompression
+			FileHandle_t ifp = g_pFileSystem->Open( fullSrcPath, "wb" );
+			if ( !ifp )
+			{
+				return false;
+			}
+
+			int bytesWritten;
+			{
+				RunCodeAtScopeExit(g_pFileSystem->Close(ifp));
+
+				bytesWritten = g_pFileSystem->Write( data, bytesTotal, ifp );
+			}
+
+			if ( bytesWritten != bytesTotal )
+			{
+				// couldn't write out all of the .bz2 file
+				g_pFileSystem->RemoveFile( srcFilename );
+				return false;
+			}
 		}
-		int bytesWritten = g_pFileSystem->Write( data, bytesTotal, ifp );
-		g_pFileSystem->Close( ifp );
-		if ( bytesWritten != bytesTotal )
+
+		// Prepare the uncompressed filehandle
+		FileHandle_t ofp = g_pFileSystem->Open( outFilename, "wb" );
+		if ( !ofp )
 		{
-			// couldn't write out all of the .bz2 file
 			g_pFileSystem->RemoveFile( srcFilename );
 			return false;
 		}
-	}
 
-	// Prepare the uncompressed filehandle
-	FileHandle_t ofp = g_pFileSystem->Open( outFilename, "wb" );
-	if ( !ofp )
-	{
-		g_pFileSystem->RemoveFile( srcFilename );
-		return false;
-	}
+		RunCodeAtScopeExit(g_pFileSystem->Close(ofp));
 
-	// And decompress!
-	constexpr int OutBufSize = 65536;
-	char    buf[ OutBufSize ];
-	BZFILE *bzfp = BZ2_bzopen( fullSrcPath, "rb" );
-	int totalBytes = 0;
+		// And decompress!
+		constexpr int OutBufSize = 65536;
+		char    buf[ OutBufSize ];
+		BZFILE *bzfp = BZ2_bzopen( fullSrcPath, "rb" );
+		RunCodeAtScopeExit(BZ2_bzclose( bzfp ));
+		int totalBytes = 0;
 
-	bool bMapFile = false;
-	char szOutFilenameBase[MAX_PATH];
-	Q_FileBase( outFilename, szOutFilenameBase );
-	const char *pszMapName = cl.m_szLevelBaseName;
-	if ( pszMapName && pszMapName[0] )
-	{
-		bMapFile = ( Q_stricmp( szOutFilenameBase, pszMapName ) == 0 );
-	}
-
-	while ( 1 )
-	{
-		int bytesRead = BZ2_bzread( bzfp, buf, OutBufSize );
-		if ( bytesRead < 0 )
+		bool bMapFile = false;
+		char szOutFilenameBase[MAX_PATH];
+		Q_FileBase( outFilename, szOutFilenameBase );
+		const char *pszMapName = cl.m_szLevelBaseName;
+		if ( pszMapName && pszMapName[0] )
 		{
-			break; // error out
+			bMapFile = ( Q_stricmp( szOutFilenameBase, pszMapName ) == 0 );
 		}
 
-		if ( bytesRead > 0 )
+		while ( 1 )
 		{
-			int bytesWritten = g_pFileSystem->Write( buf, bytesRead, ofp );
-			if ( bytesWritten != bytesRead )
+			int bytesRead = BZ2_bzread( bzfp, buf, OutBufSize );
+			if ( bytesRead < 0 )
 			{
 				break; // error out
 			}
-			else
+
+			if ( bytesRead > 0 )
 			{
-				totalBytes += bytesWritten;
-				if ( !bMapFile ) 
+				int bytesWritten = g_pFileSystem->Write( buf, bytesRead, ofp );
+				if ( bytesWritten != bytesRead )
 				{
-					if ( totalBytes > MAX_FILE_SIZE )
+					break; // error out
+				}
+				else
+				{
+					totalBytes += bytesWritten;
+					if ( !bMapFile ) 
 					{
-						ConDColorMsg( DownloadErrorColor, "DecompressBZipToDisk: '%s' too big (max %i bytes).\n", srcFilename, MAX_FILE_SIZE );
-						break; // error out
+						if ( totalBytes > MAX_FILE_SIZE )
+						{
+							ConDColorMsg( DownloadErrorColor, "DecompressBZipToDisk: '%s' too big (max %i bytes).\n", srcFilename, MAX_FILE_SIZE );
+							break; // error out
+						}
 					}
 				}
 			}
-		}
-		else
-		{
-			g_pFileSystem->Close( ofp );
-			BZ2_bzclose( bzfp );
-			g_pFileSystem->RemoveFile( srcFilename );
-			return true;
+			else
+			{
+				g_pFileSystem->RemoveFile( srcFilename );
+				return true;
+			}
 		}
 	}
 
 	// We failed somewhere, so clean up and exit
-	g_pFileSystem->Close( ofp );
-	BZ2_bzclose( bzfp );
 	g_pFileSystem->RemoveFile( srcFilename );
 	g_pFileSystem->RemoveFile( outFilename );
 	return false;
@@ -319,8 +326,10 @@ void DownloadCache::PersistToDisk( const RequestContext_t *rc )
 				FileHandle_t fp = g_pFileSystem->Open( absPath, "wb" );
 				if ( fp )
 				{
+					RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
 					g_pFileSystem->Write( rc->data, rc->nBytesTotal, fp );
-					g_pFileSystem->Close( fp );
+
 					success = true;
 				}
 			}
@@ -365,8 +374,9 @@ void DownloadCache::PersistToCache( const RequestContext_t *rc )
 	FileHandle_t fp = g_pFileSystem->Open( cachePath, "wb" );
 	if ( fp )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
 		g_pFileSystem->Write( rc->data, rc->nBytesCurrent, fp );
-		g_pFileSystem->Close( fp );
 
 		m_cache->SaveToFile( g_pFileSystem, CacheFilename, NULL );
 	}
