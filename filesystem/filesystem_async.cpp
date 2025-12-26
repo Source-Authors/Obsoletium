@@ -1418,10 +1418,14 @@ FSAsyncStatus_t CBaseFileSystem::SyncAppendFile(const char *pAppendToFileName, c
 	FSAsyncStatus_t result = FSASYNC_ERR_FAILURE;
 	if ( hDestFile )
 	{
+		RunCodeAtScopeExit(Close(hDestFile));
+
 		SetBufferSize( hDestFile, 0 );
 		FileHandle_t hSourceFile = OpenEx( pAppendFromFileName, "rb", IsX360() ? FSOPEN_NEVERINPACK : 0, NULL );
 		if ( hSourceFile )
 		{
+			RunCodeAtScopeExit(Close(hSourceFile));
+
 			SetBufferSize( hSourceFile, 0 );
 			const int BUFSIZE = 128 * 1024;
 			int fileSize = Size( hSourceFile );
@@ -1441,10 +1445,8 @@ FSAsyncStatus_t CBaseFileSystem::SyncAppendFile(const char *pAppendToFileName, c
 			}
 
 			free(buf);
-			Close( hSourceFile );
 			result = FSASYNC_OK;
 		}
-		Close( hDestFile );
 	}
 
 	if ( m_fwLevel >= FILESYSTEM_WARNING_REPORTALLACCESSES_ASYNC )
