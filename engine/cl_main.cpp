@@ -352,7 +352,7 @@ bool CL_CheckCRCs( const char *pszMap )
 	if (!couldHash )
 	{
 		// Does the file exist?
-		FileHandle_t fp = 0;
+		FileHandle_t fp = FILESYSTEM_INVALID_HANDLE;
 		int nSize = COM_OpenFile( pszMap, &fp );
 		if ( fp )
 			g_pFileSystem->Close( fp );
@@ -1288,13 +1288,13 @@ void CL_TakeSnapshotAndSwap()
 
 			// !KLUDGE! Don't save this screenshot to steam
 			ConVarRef cl_savescreenshotstosteam( "cl_savescreenshotstosteam" );
-			bool bSaveValue = cl_savescreenshotstosteam.GetBool();
+
+			const bool bSaveValue = cl_savescreenshotstosteam.GetBool();
 			cl_savescreenshotstosteam.SetValue( false );
+			RunCodeAtScopeExit(cl_savescreenshotstosteam.SetValue( bSaveValue ));
 
 			V_sprintf_safe( filename, "screenshots/%s.jpg", cl_snapshotname );
 			videomode->TakeSnapshotJPEG( filename, cl_jpegquality );
-
-			cl_savescreenshotstosteam.SetValue( bSaveValue );
 		}
 		else
 		{
