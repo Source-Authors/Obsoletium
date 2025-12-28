@@ -138,18 +138,18 @@ bool ServiceHelpers_StartService( const char *pServiceName, void (*pFn)( void *p
 void ServiceHelpers_ExitEarly()
 {
 	EnterCriticalSection( &g_CtrlHandlerMutex );
+	RunCodeAtScopeExit(LeaveCriticalSection( &g_CtrlHandlerMutex ));
+ 
 	g_bShouldExit = true;
-	LeaveCriticalSection( &g_CtrlHandlerMutex );
 }
 
 
 bool ServiceHelpers_ShouldExit()
 {
 	EnterCriticalSection( &g_CtrlHandlerMutex );
-	bool bRet = g_bShouldExit;
-	LeaveCriticalSection( &g_CtrlHandlerMutex );
+	RunCodeAtScopeExit(LeaveCriticalSection( &g_CtrlHandlerMutex ));
 
-	return bRet;
+	return g_bShouldExit;
 }
 
 
