@@ -29,13 +29,6 @@
 #include "bitmap/bitmap.h"
 #include "vtf/vtf.h"
 
-// clang3 on OSX folks the attribute into the prototype, causing a compile failure
-// filed radar bug 10397783
-#if ( __clang_major__ == 3 )
-#include <setjmp.h>
-extern void longjmp( jmp_buf, int ) __attribute__((noreturn));
-#endif
-
 
 #ifdef ENGINE_DLL
 	#include "common.h"
