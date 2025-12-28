@@ -131,11 +131,9 @@ void DTI_Flush()
 			if ( !pTable->m_bSawAction )
 				continue;
 			
-			for ( int iProp=0; iProp < pTable->m_Props.Count(); iProp++ )
+			for ( auto &prop : pTable->m_Props )
 			{
-				CDTIProp *pProp = &pTable->m_Props[iProp];
-
-				if ( pProp->m_nDecodes == 0 )
+				if ( prop.m_nDecodes == 0 )
 					continue;
 			
 				g_pFileSystem->FPrintf( fp,
@@ -159,20 +157,20 @@ void DTI_Flush()
 					
 					// Class/Prop names
 					pTable->m_Name.String(),
-					pProp->m_Name.String(),
+					prop.m_Name.String(),
 
 					// Decode count
-					pProp->m_nDecodes,
+					prop.m_nDecodes,
 
 					// Total/Avg bits
-					pProp->m_nDataBits,
-					(float)pProp->m_nDataBits / pProp->m_nDecodes,
+					prop.m_nDataBits,
+					(float)prop.m_nDataBits / prop.m_nDecodes,
 
 					// Total/Avg index bits
-					pProp->m_nIndexBits,
-					(float)pProp->m_nIndexBits / pProp->m_nDecodes,
+					prop.m_nIndexBits,
+					(float)prop.m_nIndexBits / prop.m_nDecodes,
 					row++
-					);
+				);
 			}
 		}
 
