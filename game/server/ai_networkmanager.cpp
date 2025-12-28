@@ -351,8 +351,9 @@ void CAI_NetworkManager::SaveNetworkGraph( void )
 		return;
 	}
 
+	RunCodeAtScopeExit(filesystem->Close(fh));
+
 	filesystem->Write( buf.Base(), buf.TellPut(), fh );
-	filesystem->Close(fh);
 }
 
 /* Keep this around for debugging

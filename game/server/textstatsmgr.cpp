@@ -32,17 +32,19 @@ bool CTextStatsMgr::WriteFile( IFileSystem *pFileSys, const char *pFilename )
 	}
 
 	FileHandle_t hFile = pFileSys->Open( pFilename, "wt", "LOGDIR" );
-	if ( hFile == FILESYSTEM_INVALID_HANDLE )
+	if ( !hFile )
 		return false;
-	
-	CTextStat *pHead = CTextStat::GetTextStatsList();
-	for ( CTextStat *pCur=pHead->m_pNext; pCur != pHead; pCur=pCur->m_pNext )
-	{
-		if ( pCur->m_pMgr == this )
-			pCur->m_PrintFn( pFileSys, hFile, pCur->m_pUserData );
-	}
 
-	pFileSys->Close( hFile );
+	{
+		RunCodeAtScopeExit(pFileSys->Close(hFile));
+		
+		CTextStat *pHead = CTextStat::GetTextStatsList();
+		for ( CTextStat *pCur=pHead->m_pNext; pCur != pHead; pCur=pCur->m_pNext )
+		{
+			if ( pCur->m_pMgr == this )
+				pCur->m_PrintFn( pFileSys, hFile, pCur->m_pUserData );
+		}
+	}
 
 	// Call each CTextStatFile..
 	for( CTextStatFile *pCurFile=CTextStatFile::s_pHead; pCurFile; pCurFile=pCurFile->m_pNext )
