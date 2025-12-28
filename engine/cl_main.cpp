@@ -1273,7 +1273,9 @@ void CL_TakeSnapshotAndSwap()
 	{
 		// Disable threading for the duration of the screenshots, because we need to get pointers to the (complete) 
 		// back buffer right now.
-		bool bEnabled = materials->AllowThreading( false, g_nMaterialSystemThread );
+		const bool bEnabled = materials->AllowThreading( false, g_nMaterialSystemThread );
+		// Restore threading if it was previously enabled (if it wasn't this will do nothing).
+		RunCodeAtScopeExit(materials->AllowThreading( bEnabled, g_nMaterialSystemThread ));
 
 		char base[MAX_OSPATH];
 		char filename[MAX_OSPATH];
@@ -1370,9 +1372,6 @@ void CL_TakeSnapshotAndSwap()
 		cl_takesnapshot = false;
 		cl_takesnapshot_internal = false;
 		GetTestScriptMgr()->CheckPoint( "screenshot" );
-
-		// Restore threading if it was previously enabled (if it wasn't this will do nothing).
-		materials->AllowThreading( bEnabled, g_nMaterialSystemThread );
 	}
 
 	// If recording movie and the console is totally up, then write out this frame to movie file.

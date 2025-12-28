@@ -2178,27 +2178,28 @@ void CEngineClient::TakeScreenshot( const char *pszFilename, const char *pszFold
 		Shader_SwapBuffers();
 	}
 
-	// Disable threading for the duration of the screenshots, because we need to get pointers to the (complete) 
-	// back buffer right now.
-	bool bEnabled = materials->AllowThreading( false, g_nMaterialSystemThread );
-
-	char szFinal[MAX_OSPATH] = {0};
-
-	if ( bUseFolder )
 	{
-		V_sprintf_safe( szFinal, "%s%c%s", pszFolder, CORRECT_PATH_SEPARATOR, pszFilename );
+		// Disable threading for the duration of the screenshots, because we need to get pointers to the (complete) 
+		// back buffer right now.
+		const bool bEnabled = materials->AllowThreading( false, g_nMaterialSystemThread );
+		// Restore threading if it was previously enabled (if it wasn't this will do nothing).
+		RunCodeAtScopeExit(materials->AllowThreading( bEnabled, g_nMaterialSystemThread ));
+
+		char szFinal[MAX_OSPATH] = {0};
+
+		if ( bUseFolder )
+		{
+			V_sprintf_safe( szFinal, "%s%c%s", pszFolder, CORRECT_PATH_SEPARATOR, pszFilename );
+		}
+		else
+		{
+			V_sprintf_safe( szFinal, "%s", pszFilename );
+		}
+
+		V_SetExtension( szFinal, ".tga" ); 
+
+		videomode->TakeSnapshotTGA( szFinal );
 	}
-	else
-	{
-		V_sprintf_safe( szFinal, "%s", pszFilename );
-	}
-
-	V_SetExtension( szFinal, ".tga" ); 
-
-	videomode->TakeSnapshotTGA( szFinal );
-
-	// Restore threading if it was previously enabled (if it wasn't this will do nothing).
-	materials->AllowThreading( bEnabled, g_nMaterialSystemThread );
 
 	if ( !bReadPixelsFromFrontBuffer )
 	{
