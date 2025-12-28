@@ -370,16 +370,20 @@ static [[nodiscard]] bool WriteTGAHeader(FILE *outfile, TGAHeader &header)
 unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &height, ConversionErrorType &errcode, TGAHeader &tgaHeader )
 {
 	FILE *tgaFile = fopen(tgaPath, "rb");
-	if (tgaFile == nullptr)
+	if (!tgaFile)
 	{
+		Warning( "Unable to read TGA file: %s.\n", tgaPath);
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
 		return nullptr;
 	}
+
+	RunCodeAtScopeExit(fclose(tgaFile));
 
 	// read header for TGA file.
 	// dimhotepus: Check header is read.
 	if (!ImgUtl_ReadTGAHeader(tgaFile, tgaHeader))
 	{
+		Warning( "Unable to read TGA header from file: %s.\n", tgaPath);
 		errcode = CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -390,25 +394,28 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 		|| ( tgaHeader.bits != 24 && tgaHeader.bits != 32 ) // Must be 24- ot 32-bit
 	)
 	{
-		fclose(tgaFile);
-
+		Warning( "Invalid TGA file format: %s.\n", tgaPath);
 		errcode = CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
 
 	int tgaDataSize = tgaHeader.width * tgaHeader.height * tgaHeader.bits / 8;
 	auto *tgaData = (unsigned char *)malloc(tgaDataSize);
-	if (tgaData == nullptr)
+	if (!tgaData)
 	{
-		fclose(tgaFile);
-
+		Warning( "Out of memory (%d bytes) when read TGA file data: %s.\n", tgaDataSize, tgaPath);
 		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
 
-	fread(tgaData, 1, tgaDataSize, tgaFile);
-
-	fclose(tgaFile);
+	size_t readDataSize = fread(tgaData, 1, tgaDataSize, tgaFile);
+	if (size_cast<int>(readDataSize) != tgaDataSize)
+	{
+		free(tgaData);
+		Warning( "Invalid TGA file format: %s.\n", tgaPath);
+		errcode = CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
+		return nullptr;
+	}
 
 	width = tgaHeader.width;
 	height = tgaHeader.height;
@@ -422,7 +429,8 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 		if (retBuf == nullptr)
 		{
 			free(tgaData);
-
+			
+			Warning( "Out of memory (%d bytes) when read TGA file data: %s.\n", numPixels * 4, tgaPath);
 			errcode = CE_MEMORY_ERROR;
 			return nullptr;
 		}
