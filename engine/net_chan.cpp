@@ -2428,7 +2428,7 @@ void CNetChan::ProcessPacket( netpacket_t * packet, bool bHasHeader )
 
 	if ( net_showudp.GetInt() && net_showudp.GetInt() != 3 )
 	{
-		ConMsg ("UDP <- %s: sz=%i seq=%i ack=%i rel=%i ch=%d, tm=%f rt=%f wire=%i\n"
+		ConMsg ("UDP <- %s: sz=%i seq=%i ack=%i rel=%i ch=%d, tm=%f rt=%lf wire=%i\n"
 			, GetName()
 			, packet->size
 			, m_nInSequenceNr & 63
@@ -2436,7 +2436,7 @@ void CNetChan::ProcessPacket( netpacket_t * packet, bool bHasHeader )
 			, flags & PACKET_FLAG_RELIABLE ? 1 : 0
 			, flags & PACKET_FLAG_CHALLENGE ? 1 : 0
 			, net_time
-			, (float)Plat_FloatTime()
+			, Plat_FloatTime()
 			, packet->wiresize );
 	}
 	

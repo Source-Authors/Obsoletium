@@ -518,7 +518,7 @@ CEngineVGui::CEngineVGui()
 	m_eLastProgressPoint = PROGRESS_NONE;
 
 	m_nLastProgressPointRepeatCount = -1;
-	m_flLoadingStartTime = -1.f;
+	m_flLoadingStartTime = -1.0;
 
 	m_bSaveProgress = false;
 	m_bNoShaderAPI = false;
@@ -1264,21 +1264,20 @@ void CEngineVGui::OnLevelLoadingFinished()
 
 #if defined(ENABLE_LOADING_PROGRESS_PROFILING)
 	// display progress bar stats (for debugging/tuning progress bar)
-	float flEndTime = (float)Plat_FloatTime();
+	double flEndTime = Plat_FloatTime();
 	// add a finished entry
 	LoadingProgressEntry_t &entry = m_LoadingProgress[m_LoadingProgress.AddToTail()];
 	entry.flTime = flEndTime - m_flLoadingStartTime;
 	entry.eProgress = PROGRESS_HIGHESTITEM;
 	// dump the info
 	Msg("Level load timings:\n");
-	float flTotalTime = flEndTime - m_flLoadingStartTime;
+	double flTotalTime = flEndTime - m_flLoadingStartTime;
 	int nRepeatCount = 0;
-	float flTimeTaken = 0.0f;
-	float flFirstLoadProgressTime = 0.0f;
+	double flTimeTaken = 0.0, flFirstLoadProgressTime = 0.0;
 	for (int i = 0; i < m_LoadingProgress.Count() - 1; i++)
 	{
 		// keep track of time
-		flTimeTaken += (float)m_LoadingProgress[i+1].flTime - m_LoadingProgress[i].flTime;
+		flTimeTaken += m_LoadingProgress[i+1].flTime - m_LoadingProgress[i].flTime;
 
 		// keep track of how often something is repeated
 		if (m_LoadingProgress[i+1].eProgress == m_LoadingProgress[i].eProgress)
