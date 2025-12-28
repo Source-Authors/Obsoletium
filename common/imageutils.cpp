@@ -5,6 +5,8 @@
 //
 //=======================================================================================//
 
+#include "imageutils.h"
+
 // @note Tom Bui: we need to use fopen below in the jpeg code, so we can't have this on...
 #ifdef PROTECTED_THINGS_ENABLE
 #if !defined( POSIX )
@@ -22,9 +24,8 @@
 #endif
 #endif
 
-#include "imageutils.h"
 #include "filesystem.h"
-#include "utlbuffer.h"
+#include "tier1/utlbuffer.h"
 #include "bitmap/bitmap.h"
 #include "vtf/vtf.h"
 
