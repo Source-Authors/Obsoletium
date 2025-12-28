@@ -82,8 +82,10 @@ SpewRetval_t CmdLib_SpewOutputFunc( SpewType_t type, char const *pMsg )
 	WORD old;
 	SpewRetval_t retVal;
 	
-	EnterCriticalSection( &g_SpewCS );
 	{
+		EnterCriticalSection( &g_SpewCS );
+		RunCodeAtScopeExit(	LeaveCriticalSection( &g_SpewCS ) );
+
 		if (( type == SPEW_MESSAGE ) || (type == SPEW_LOG ))
 		{
 			old = SetConsoleTextColor( 1, 1, 1, 0 );
@@ -132,7 +134,6 @@ SpewRetval_t CmdLib_SpewOutputFunc( SpewType_t type, char const *pMsg )
 
 		RestoreConsoleTextColor( old );
 	}
-	LeaveCriticalSection( &g_SpewCS );
 
 	if ( type == SPEW_ERROR )
 	{
