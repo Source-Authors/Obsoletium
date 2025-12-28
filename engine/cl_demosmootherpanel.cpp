@@ -2635,11 +2635,12 @@ void CDemoSmootherPanel::SaveSmoothingInfo( char const *filename, CSmoothingCont
 
 	IFileSystem *fs = g_pFileSystem;
 
-	FileHandle_t infile, outfile;
-
+	FileHandle_t infile;
 	COM_OpenFile( filename, &infile );
-	if ( infile == FILESYSTEM_INVALID_HANDLE )
+	if ( !infile )
 		return;
+	
+	RunCodeAtScopeExit(fs->Close(infile));
 
 	int filesize = fs->Size( infile );
 
@@ -2647,35 +2648,32 @@ void CDemoSmootherPanel::SaveSmoothingInfo( char const *filename, CSmoothingCont
 	Q_StripExtension( filename, outfilename );
 	V_strcat_safe( outfilename, "_smooth" );
 	Q_DefaultExtension( outfilename, ".dem" );
-	outfile = fs->Open( outfilename, "wb" );
-	if ( outfile == FILESYSTEM_INVALID_HANDLE )
+
+	FileHandle_t outfile = fs->Open( outfilename, "wb" );
+	if ( !outfile )
 	{
-		fs->Close( infile );
 		return;
 	}
 
-	int lastwritepos = 0;
-	for ( int i = 0; i < c; i++ )
-	{
-		demosmoothing_t	*p = &smoothing.smooth[ i ];
+	RunCodeAtScopeExit(fs->Close(outfile));
 
-		int copyamount = p->file_offset - lastwritepos;
+	int lastwritepos = 0;
+	for ( auto &p : smoothing.smooth )
+	{
+		int copyamount = p.file_offset - lastwritepos;
 
 		COM_CopyFileChunk( outfile, infile, copyamount );
 
-		fs->Seek( infile, p->file_offset, FILESYSTEM_SEEK_HEAD );
-
+		fs->Seek( infile, p.file_offset, FILESYSTEM_SEEK_HEAD );
 		// wacky hacky overwriting 
-		fs->Write( &p->info, sizeof( democmdinfo_t ), outfile );
+		fs->Write( &p.info, sizeof( democmdinfo_t ), outfile );
 
 		lastwritepos = fs->Tell( outfile );
-		fs->Seek( infile, p->file_offset + sizeof( democmdinfo_t ), FILESYSTEM_SEEK_HEAD );
+
+		fs->Seek( infile, p.file_offset + sizeof( democmdinfo_t ), FILESYSTEM_SEEK_HEAD );
 	}
 
 	int final = filesize - lastwritepos;
 
 	COM_CopyFileChunk( outfile, infile, final );
-
-	fs->Close( outfile );
-	fs->Close( infile );
 }

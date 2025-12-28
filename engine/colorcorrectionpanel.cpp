@@ -3333,15 +3333,17 @@ void CColorLookupOperation::SetBlendFactor( float flBlend )
 //-----------------------------------------------------------------------------
 void CColorLookupOperation::LoadLookupTable( const char *pFilename )
 {
+	{
 	FileHandle_t file_handle = g_pFileSystem->Open( pFilename, "rb" );
 	if( !file_handle )
 		return;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close( file_handle ));
 
     unsigned int file_size = g_pFileSystem->Size( file_handle );
     int res = (int)powf( (float)(file_size/sizeof(color24)), 1.0f/3.0f );
 	if( res*res*res*sizeof(color24) != file_size )
 	{
-		g_pFileSystem->Close( file_handle );
 		return;
 	}
 
@@ -3353,8 +3355,7 @@ void CColorLookupOperation::LoadLookupTable( const char *pFilename )
 		g_pFileSystem->Read( &color, sizeof(color24), file_handle );
 		m_LookupTable[i] = color;
 	}
-
-	g_pFileSystem->Close( file_handle );
+	}
 
 	V_strcpy_safe( m_pFilename, pFilename );
 
@@ -4931,8 +4932,16 @@ void CColorOperationListPanel::OnFileSelected( const char *pFilename )
 	const vgui::ScopedPanelWaitCursor scopedWaitCursor{this};
 
 	FileHandle_t file_handle = g_pFileSystem->Open( pFilename, "wb" );
+	if (!file_handle)
+	{
+		Warning( "Unable to open %s.\n", pFilename );
+		return;
+	}
+	
+	RunCodeAtScopeExit(g_pFileSystem->Close( file_handle ));
 
 	colorcorrection->LockLookup( m_CCHandle );
+	RunCodeAtScopeExit(colorcorrection->UnlockLookup( m_CCHandle ));
     
 	RGBX5551_t inColor;
 
@@ -4952,10 +4961,6 @@ void CColorOperationListPanel::OnFileSelected( const char *pFilename )
 			}
 		}
 	}
-
-	colorcorrection->UnlockLookup( m_CCHandle );
-
-	g_pFileSystem->Close( file_handle );
 }
 
 void CColorOperationListPanel::LaunchOperationPanel( IColorOperation *pOp )

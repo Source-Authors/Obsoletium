@@ -367,12 +367,13 @@ void CMapReslistGenerator::LogToEngineReslist( char const *pLine )
 
 	// Open for append, write data, close.
 	FileHandle_t fh = g_pFileSystem->Open( CFmtStr( "%s\\%s", m_sResListDir.String(), ENGINE_RESLIST_FILE ), "at", "DEFAULT_WRITE_PATH" );
-	if ( fh != FILESYSTEM_INVALID_HANDLE )
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close( fh ));
+
 		g_pFileSystem->Write( "\"", 1, fh );
 		g_pFileSystem->Write( pLine, Q_strlen( pLine  ), fh );
 		g_pFileSystem->Write( "\"\n", 2, fh );
-		g_pFileSystem->Close( fh );
 	}
 }
 
@@ -771,6 +772,10 @@ void CMapReslistGenerator::WriteMapLog()
 	char path[MAX_PATH];
 	Q_snprintf( path, sizeof( path ), "%s\\%s.lst", m_sResListDir.String(), m_szLevelName );
 	FileHandle_t fh = g_pFileSystem->Open( path, "wt", "DEFAULT_WRITE_PATH" );
+	if (!fh) return;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(fh));
+
 	for ( int i = m_MapLog.FirstInorder(); i != m_MapLog.InvalidIndex(); i = m_MapLog.NextInorder( i ) )
 	{
 		const char *pLine = m_MapLog[i].String();
@@ -778,7 +783,6 @@ void CMapReslistGenerator::WriteMapLog()
 		g_pFileSystem->Write( pLine, Q_strlen( pLine ), fh );
 		g_pFileSystem->Write( "\"\n", 2, fh );
 	}
-	g_pFileSystem->Close( fh );
 }
 
 //-----------------------------------------------------------------------------
