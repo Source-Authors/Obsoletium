@@ -389,35 +389,6 @@ void CCreateMultiplayerGameServerPage::OnCommand(const char *cmd) {
 
       KeyValues *gameData = m_pGameCombo->GetActiveItemUserData();
 
-      //			// mount the caches
-      //			if (CommandLine()->CheckParm("-steam"))
-      //			{
-      //				if (gameData)
-      //				{
-      //					KeyValues *pFileSystem =
-      // gameData->FindKey( "FileSystem" );
-      // if ( !pFileSystem ) 						Error(
-      // "Game %s missing FileSystem key.", gameData->GetString( "game" ) );
-      //
-      //					// Mods just specify their app
-      // ID (CS, HL2, HL2MP, etc), and it mounts all the necessary caches.
-      // int iAppId = pFileSystem->GetInt( "SteamAppId" );
-      // if ( iAppId )
-      //					{
-      //						CUtlVector<unsigned int>
-      // depList;
-      // MountDependencies( iAppId, depList );
-      //
-      //						char
-      // gameinfoFilename[MAX_PATH];
-      // Q_snprintf( gameinfoFilename, sizeof( gameinfoFilename ),
-      // "%s\\gameinfo.txt", m_iServer.gameDir );
-      //						g_pFullFileSystem->GetLocalCopy(
-      // gameinfoFilename );
-      //					}
-      //				}
-      //			}
-
       // Launch the old dedicated server if necessary.
       if (LaunchOldDedicatedServer(gameData)) {
         vgui::ivgui()->PostMessage(m_MainPanel->GetVPanel(),
