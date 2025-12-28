@@ -221,14 +221,16 @@ void CTextWindow::ShowIndex( const char *entry )
 		return;
 	}
 
-	// data is a HTML, we have to write to a file and then load the file
-	FileHandle_t hFile = g_pFullFileSystem->Open( TEMP_HTML_FILE, "wb", "DEFAULT_WRITE_PATH" );
+	{
+		// data is a HTML, we have to write to a file and then load the file
+		FileHandle_t hFile = g_pFullFileSystem->Open( TEMP_HTML_FILE, "wb", "DEFAULT_WRITE_PATH" );
+		if ( !hFile )
+			return;
 
-	if ( hFile == FILESYSTEM_INVALID_HANDLE )
-		return;
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(hFile));
 
-	g_pFullFileSystem->Write( data, length, hFile );
-	g_pFullFileSystem->Close( hFile );
+		g_pFullFileSystem->Write( data, length, hFile );
+	}
 
 	if ( g_pFullFileSystem->Size( TEMP_HTML_FILE ) != (unsigned int)length )
 		return; // something went wrong while writing
@@ -254,16 +256,16 @@ void CTextWindow::ShowFile( const char *filename )
 	{
 		// read from local text from file
 		FileHandle_t f = g_pFullFileSystem->Open( m_szMessage, "rb", "GAME" );
-
 		if ( !f )
 			return;
+
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(f));
 
 		char buffer[2048];
 			
 		int size = MIN( g_pFullFileSystem->Size( f ), sizeof(buffer) ); // just allow 2KB
 
 		g_pFullFileSystem->Read( buffer, size, f );
-		g_pFullFileSystem->Close( f );
 
 		// dimhotepus: Ensure zero termination.
 		buffer[size - 1]=0; //terminate string

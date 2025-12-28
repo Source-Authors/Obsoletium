@@ -990,22 +990,22 @@ void UTIL_ReplaceKeyBindings( const wchar_t *inbuf, intp inbufsizebytes, OUT_Z_B
 byte *UTIL_LoadFileForMe( const char *filename, int *pLength )
 {
 	FileHandle_t file = filesystem->Open( filename, "rb", "GAME" );
-	if ( FILESYSTEM_INVALID_HANDLE == file )
+	if ( !file )
 	{
 		if ( pLength ) *pLength = 0;
 		return NULL;
 	}
+
+	RunCodeAtScopeExit(filesystem->Close(file));
 
 	int size = filesystem->Size( file );
 	byte *buffer = new byte[ size + 1 ];
 	if ( !buffer )
 	{
 		Warning( "UTIL_LoadFileForMe:  Couldn't allocate buffer of size %i for file %s\n", size + 1, filename );
-		filesystem->Close( file );
 		return NULL;
 	}
 	filesystem->Read( buffer, size, file );
-	filesystem->Close( file );
 
 	// Ensure null terminator
 	buffer[ size ] = 0;
