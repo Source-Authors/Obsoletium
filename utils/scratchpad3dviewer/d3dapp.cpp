@@ -366,9 +366,11 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case WM_PAINT:
 	{
-		PAINTSTRUCT ps;
-		BeginPaint( hWnd, &ps );
-		EndPaint( hWnd, &ps );
+		{
+			PAINTSTRUCT ps;
+			BeginPaint( hWnd, &ps );
+			RunCodeAtScopeExit(EndPaint( hWnd, &ps ));
+		}
 		
 		if( g_pDevice )
 			CallAppRender( true );

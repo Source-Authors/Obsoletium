@@ -397,9 +397,10 @@ void GenerateTextGreyscaleBitmap(
 {
 	*pWidth = *pHeight = 0;
 
-	
 	// Create a bitmap, font, and HDC.
 	HDC hDC = CreateCompatibleDC( NULL );
+	RunCodeAtScopeExit(DeleteDC(hDC));
+
 	Assert( hDC );
 
 	HFONT hFont = ::CreateFontA(
@@ -412,24 +413,23 @@ void GenerateTextGreyscaleBitmap(
 		ANSI_CHARSET, 
 		OUT_DEFAULT_PRECIS, 
 		CLIP_DEFAULT_PRECIS, 
-		ANTIALIASED_QUALITY, 
+		// dimhotepus: Antialiased -> cleartype natural.
+		CLEARTYPE_NATURAL_QUALITY, 
 		DEFAULT_PITCH | FF_DONTCARE, 
 		"Arial" );
-	Assert( hDC );
+	RunCodeAtScopeExit(DeleteObject( hFont ));
+
+	Assert( hFont );
 	if ( !hFont )
 	{
-		DeleteDC( hDC );
 		return;
 	}
 
-	
 	// Create a bitmap. Allow for width of 512. Hopefully, that can fit all the text we need.
 	int bigImageWidth = 512;
 	int bigImageHeight = 64;
 
-	BITMAPINFOHEADER bmi;
-	memset( &bmi, 0, sizeof( bmi ) );
-
+	BITMAPINFOHEADER bmi = {};
 	bmi.biSize         = sizeof(BITMAPINFOHEADER);
 	bmi.biWidth        = bigImageWidth;
 	bmi.biHeight       = -bigImageHeight;
@@ -440,19 +440,20 @@ void GenerateTextGreyscaleBitmap(
 	void *pBits = NULL;
 	HBITMAP hBitmap = CreateDIBSection( hDC, 
 		(BITMAPINFO*)&bmi, DIB_RGB_COLORS, (void**)&pBits, NULL, 0 );
-	Assert( hBitmap && pBits );
+	RunCodeAtScopeExit(DeleteObject( hBitmap ));
 
+	Assert( hBitmap && pBits );
 	if ( !hBitmap )
 	{
-		DeleteObject( hFont );
-		DeleteDC( hDC );
 		return;
 	}
 
 	// Select the font and bitmap into the DC.
 	HFONT hOldFont = (HFONT)SelectObject( hDC, hFont );
-	HBITMAP hOldBitmap = (HBITMAP)SelectObject( hDC, hBitmap );
+	RunCodeAtScopeExit(SelectObject( hDC, hOldFont ));
 
+	HBITMAP hOldBitmap = (HBITMAP)SelectObject( hDC, hBitmap );
+	RunCodeAtScopeExit(SelectObject( hDC, hOldBitmap ));
 
 	// Draw the text into the DC.
 	SIZE size;
@@ -476,16 +477,6 @@ void GenerateTextGreyscaleBitmap(
 			*pDest = 0xFF - (unsigned char)avg;
 		}
 	}
-
-
-	// Unselect the objects from the DC and cleanup everything.
-	SelectObject( hDC, hOldFont );
-	DeleteObject( hFont );
-
-	SelectObject( hDC, hOldBitmap );
-	DeleteObject( hBitmap );
-
-	DeleteDC( hDC );
 }
 
 
