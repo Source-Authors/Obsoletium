@@ -1963,34 +1963,33 @@ void CDemoPlayer::SetBenchframe( int tick, const char *filename )
 
 static bool ComputeNextIncrementalDemoFilename( char *name, int namesize )
 {
-	FileHandle_t test;
-	
-	test = g_pFileSystem->Open( name, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE == test )
+	FileHandle_t test = g_pFileSystem->Open( name, "rb" );
+	if ( !test )
 	{
 		// file doesn't exist, so we can use that 
 		return true;
 	}
-	g_pFileSystem->Close( test );
+
+	RunCodeAtScopeExit(g_pFileSystem->Close( test ));
 
 	char basename[ MAX_OSPATH ];
+	V_StripExtension( name, basename );
 
-	Q_StripExtension( name, basename );
-
+	// dimhotepus: 1000 -> 1024
 	// Start looking for a valid name
-	int i = 0;
-	for ( i = 0; i < 1000; i++ )
+	for ( int i = 0; i < 1024; i++ )
 	{
 		char newname[ MAX_OSPATH ];
-		Q_snprintf( newname, sizeof( newname ), "%s%03i.dem", basename, i );
+		V_sprintf_safe( newname, "%s%03i.dem", basename, i );
 
-		test = g_pFileSystem->Open( newname, "rb" );
-		if ( FILESYSTEM_INVALID_HANDLE == test )
+		FileHandle_t test2 = g_pFileSystem->Open( newname, "rb" );
+		if ( !test2 )
 		{
 			Q_strncpy( name, newname, namesize );
 			return true;
 		}
-		g_pFileSystem->Close( test );
+
+		RunCodeAtScopeExit(g_pFileSystem->Close( test2 ));
 	}
 
 	ConMsg( "Unable to find a valid incremental demo filename for %s, try clearing the directory of %snnn.dem\n", name, basename );
