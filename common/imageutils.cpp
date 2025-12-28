@@ -372,7 +372,7 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 	FILE *tgaFile = fopen(tgaPath, "rb");
 	if (!tgaFile)
 	{
-		Warning( "Unable to read TGA file: %s.\n", tgaPath);
+		Warning( "Unable to read TGA %s: %s.\n", tgaPath, strerror(errno));
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
 		return nullptr;
 	}
@@ -483,8 +483,6 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 
 unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &height, ConversionErrorType &errcode )
 {
-	jpeg_decompress_struct jpegInfo;
-	ValveJpegErrorHandler_t jerr;
 	JSAMPROW row_pointer[1];
 	int row_stride;
 	int cur_row = 0;
@@ -493,30 +491,32 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	int image_height;
 	int image_width;
 
+	jpeg_decompress_struct jpegInfo;
+	memset( &jpegInfo, 0, sizeof( jpegInfo ) );
+
 	// open the jpeg image file.
 	FILE *infile = fopen(jpegPath, "rb");
-	if (infile == nullptr)
+	if (!infile)
 	{
+		Warning( "Unable to read JPEG %s: %s.\n", jpegPath, strerror(errno) );
 		errcode = CE_CANT_OPEN_SOURCE_FILE;
 		return nullptr;
 	}
 
-	// setup error to print to stderr.
-	memset( &jpegInfo, 0, sizeof( jpegInfo ) );
-	jpegInfo.err = jpeg_std_error(&jerr.m_Base);
+	RunCodeAtScopeExit(fclose(infile));
 
+	// setup error to print to stderr.
+	ValveJpegErrorHandler_t jerr;
+	jpegInfo.err = jpeg_std_error(&jerr.m_Base);
 	jpegInfo.err->error_exit = &ValveJpegErrorHandler;
 
 	// create the decompress struct.
 	jpeg_create_decompress(&jpegInfo);
+	RunCodeAtScopeExit(jpeg_destroy_decompress( &jpegInfo ));
 
 	if ( setjmp( jerr.m_ErrorContext ) )
 	{
 		// Get here if there is any error
-		jpeg_destroy_decompress( &jpegInfo );
-
-		fclose( infile );
-
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
@@ -527,7 +527,6 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	// read in the jpeg header and make sure that's all good.
 	if (jpeg_read_header(&jpegInfo, TRUE) != JPEG_HEADER_OK)
 	{
-		fclose( infile );
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
@@ -535,17 +534,15 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	// start the decompress with the jpeg engine.
 	if ( !jpeg_start_decompress(&jpegInfo) )
 	{
-		jpeg_destroy_decompress(&jpegInfo);
-		fclose( infile );
 		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
+	
+	RunCodeAtScopeExit(jpeg_finish_decompress( &jpegInfo ));
 
 	// We only support 24-bit JPEG's
 	if ( jpegInfo.out_color_space != JCS_RGB || jpegInfo.output_components != 3 )
 	{
-		jpeg_destroy_decompress(&jpegInfo);
-		fclose( infile );
 		errcode = CE_SOURCE_FILE_SIZE_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -559,10 +556,8 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 
 	// allocate the memory to read the image data into.
 	auto *buf = (unsigned char *)malloc(mem_required);
-	if (buf == nullptr)
+	if (!buf)
 	{
-		jpeg_destroy_decompress(&jpegInfo);
-		fclose( infile );
 		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
@@ -591,8 +586,6 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	}
 
 	// Clean up
-	fclose( infile );
-	jpeg_destroy_decompress(&jpegInfo);
 
 	// Check success status
 	if (!working)
@@ -616,7 +609,7 @@ static void ReadPNGData( png_structp png_ptr, png_bytep outBytes, png_size_t byt
 	Assert( pBuf );
 
 	// Check for IO error
-	if ( pBuf->TellGet() + (int)byteCountToRead > pBuf->TellPut() )
+	if ( pBuf->TellGet() + (intp)byteCountToRead > pBuf->TellPut() )
 	{
 		// Attempt to read past the end of the buffer.
 		// Use longjmp to report the error
@@ -642,12 +635,12 @@ unsigned char *ImgUtl_ReadPNGAsRGBA( const char *pngPath, int &width, int &heigh
 	return ImgUtl_ReadPNGAsRGBAFromBuffer( bufFileContents, width, height, errcode );
 }
 
-unsigned char		*ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, int &height, ConversionErrorType &errcode )
+unsigned char *ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, int &height, ConversionErrorType &errcode )
 {
 	png_const_bytep pngData = buffer.Base<const png_byte>();
 	if (png_sig_cmp( pngData, 0, 8))
 	{
-        errcode = CE_ERROR_PARSING_SOURCE;
+		errcode = CE_ERROR_PARSING_SOURCE;
 		return nullptr;
 	}
 
@@ -793,11 +786,9 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 #ifdef WIN32
 	// Load up bitmap
 	auto hBitmap = (HBITMAP)LoadImage(nullptr, bmpPath, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE | LR_DEFAULTSIZE);
-
 	// Handle failure
-	if ( hBitmap == nullptr)
+	if ( !hBitmap )
 	{
-
 		// !KLUDGE! Try to detect what went wrong
 		FILE *fp = fopen( bmpPath, "rb" );
 		if (fp == nullptr)
@@ -813,8 +804,9 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		return nullptr;
 	}
 
-	BITMAP bitmap;
+	RunCodeAtScopeExit(::DeleteObject(hBitmap));
 
+	BITMAP bitmap;
 	GetObject(hBitmap, sizeof(bitmap), &bitmap);
 
 	BITMAPINFO *bitmapInfo;
@@ -832,7 +824,6 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	}
 	else
 	{
-		DeleteObject(hBitmap);
 		errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
@@ -844,18 +835,18 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		bitmapInfo->bmiHeader.biBitCount = bitmap.bmBitsPixel; // need to specify the bits per pixel so GDI will generate a color table for us.
 	}
 
-	HDC dc = CreateCompatibleDC(nullptr);
-
-	int retcode = GetDIBits(dc, hBitmap, 0, bitmap.bmHeight, nullptr, bitmapInfo, DIB_RGB_COLORS);
-
-	DeleteDC(dc);
-
-	if (retcode == 0)
 	{
-		// error getting the bitmap info for some reason.
-		free(bitmapInfo);
-		errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
-		return nullptr;
+		HDC dc = CreateCompatibleDC(nullptr);
+		RunCodeAtScopeExit(DeleteDC(dc));
+
+		int retcode = GetDIBits(dc, hBitmap, 0, bitmap.bmHeight, nullptr, bitmapInfo, DIB_RGB_COLORS);
+		if (retcode == 0)
+		{
+			// error getting the bitmap info for some reason.
+			free(bitmapInfo);
+			errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
+			return nullptr;
+		}
 	}
 
 	int nDestStride = 4 * bitmap.bmWidth;
@@ -1040,13 +1031,11 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	{
 		free(bitmapInfo);
 		free(buf);
-		DeleteObject(hBitmap);
 		errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
 
 	free(bitmapInfo);
-	DeleteObject(hBitmap);
 
 	// OK!
 	width = bitmap.bmWidth;
@@ -1994,7 +1983,7 @@ bool ImgUtl_WriteRGBToJPEG( unsigned char *pSrcBuf, unsigned int nSrcWidth, unsi
 	jpeg_error_mgr jerr;
 
 	// compression data structure
-	jpeg_compress_struct cinfo;
+	jpeg_compress_struct cinfo = {};
 
 	row_stride = nSrcWidth * 3; // JSAMPLEs per row in image_buffer
 
@@ -2041,16 +2030,14 @@ bool ImgUtl_WriteRGBToJPEG( unsigned char *pSrcBuf, unsigned int nSrcWidth, unsi
 ConversionErrorType ImgUtl_WriteRGBAAsJPEGToBuffer( const unsigned char *pRGBAData, int nWidth, int nHeight, CUtlBuffer &bufOutData, int nStride )
 {
 	JSAMPROW row_pointer[1];     // pointer to JSAMPLE row[s]
-	int row_stride;              // physical row width in image buffer
+
+	// physical row width in image buffer
+	int row_stride = nWidth * 4;
 
 	// stderr handler
 	jpeg_error_mgr jerr;
-
 	// compression data structure
-	jpeg_compress_struct cinfo;
-
-	row_stride = nWidth * 4;
-
+	jpeg_compress_struct cinfo = {};
 	// point at stderr
 	cinfo.err = jpeg_std_error(&jerr);
 
