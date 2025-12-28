@@ -1784,15 +1784,13 @@ bool CVideoMode_Common::TakeSnapshotJPEGToBuffer( CUtlBuffer& buf, int quality )
 
     JSAMPROW row_pointer[1];     // pointer to JSAMPLE row[s]
 
-    // stderr handler
-    jpeg_error_mgr jerr;
-
-    // compression data structure
-    jpeg_compress_struct cinfo;
-
     // physical row width in image buffer
     int row_stride = GetModeStereoWidth() * 3; // JSAMPLEs per row in image_buffer
 
+    // stderr handler
+    jpeg_error_mgr jerr;
+    // compression data structure
+    jpeg_compress_struct cinfo = {};
     // point at stderr
     cinfo.err = jpeg_std_error(&jerr);
 
