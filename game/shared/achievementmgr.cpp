@@ -122,10 +122,9 @@ static void WriteAchievementGlobalState( KeyValuesAD &&pKV, bool bPersistToSteam
 
                             if (handle)
                             {
+                                RunCodeAtScopeExit(filesystem->Close(handle));
+
                                 int32 nRead = filesystem->Read(pData, filesize, handle);
-
-                                filesystem->Close(handle);
-
                                 if (nRead == filesize)
                                 {
                                     // Write out the data to steam cloud
@@ -652,13 +651,13 @@ void CAchievementMgr::LoadGlobalState()
                         if (sizeRead == fileSize)
                         {
                             // Write out data to a filesystem GameState file that can be read by the original code below
-                            FileHandle_t    handle = filesystem->Open(szFilename, "w");
+                            FileHandle_t handle = filesystem->Open(szFilename, "w");
 
                             if (handle)
                             {
-                                filesystem->Write(pData, fileSize, handle);
+                                RunCodeAtScopeExit(filesystem->Close(handle));
 
-                                filesystem->Close(handle);
+                                filesystem->Write(pData, fileSize, handle);
                             }
                         }
 

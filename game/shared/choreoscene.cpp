@@ -1754,8 +1754,9 @@ bool CChoreoScene::ExportMarkedToFile( const char *filename )
 	FileHandle_t fh = g_pFullFileSystem->Open( filename, "wt" );
 	if (fh)
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), fh );
-		g_pFullFileSystem->Close(fh);
 		return true;
 	}
 	return false;
@@ -1809,8 +1810,9 @@ bool CChoreoScene::SaveToFile( const char *filename )
 	FileHandle_t fh = g_pFullFileSystem->Open( filename, "wt" );
 	if (fh)
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), fh );
-		g_pFullFileSystem->Close(fh);
 		return true;
 	}
 	return false;
@@ -3311,8 +3313,9 @@ void CChoreoScene::ExportEvents( const char *filename, CUtlVector< CChoreoEvent 
 	FileHandle_t fh = g_pFullFileSystem->Open( filename, "wt" );
 	if (fh)
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close(fh));
+
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), fh );
-		g_pFullFileSystem->Close(fh);
 	}
 }
 
@@ -3754,10 +3757,11 @@ bool CChoreoScene::SaveBinary( char const *pszBinaryFileName, char const *pPathI
 	}
 
 	FileHandle_t fh = g_pFullFileSystem->Open( pszBinaryFileName, "wb", pPathID );
-	if ( FILESYSTEM_INVALID_HANDLE != fh )
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFullFileSystem->Close( fh ));
+
 		g_pFullFileSystem->Write( buf.Base(), buf.TellPut(), fh );
-		g_pFullFileSystem->Close( fh );
 
 		// Success
 		bret = true;
