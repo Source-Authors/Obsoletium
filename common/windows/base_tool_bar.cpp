@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "base_tool_bar.h"
 #include "bitmap_scale.h"
+#include "tier0/platform.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include "tier0/memdbgon.h"
@@ -110,23 +111,24 @@ BOOL CBaseToolBar::LoadBitmapForDpi(LPCTSTR lpszResourceName,
       ::FindResource(hInstImageWell, lpszResourceName, RT_BITMAP)};
   if (hRsrcImageWell == nullptr) return FALSE;
 
-  // load the colored bitmap
-  HBITMAP hbmImageWell{(HBITMAP)::LoadImage(
-      ::AfxGetInstanceHandle(), lpszResourceName, IMAGE_BITMAP, 0, 0,  // cx, cy
-      LR_CREATEDIBSECTION | (isTransparent ? LR_LOADTRANSPARENT : 0))};
-  if (hbmImageWell == nullptr) return FALSE;
+  {
+    // load the colored bitmap
+    HBITMAP hbmImageWell{(HBITMAP)::LoadImage(
+        ::AfxGetInstanceHandle(), lpszResourceName, IMAGE_BITMAP, 0, 0,
+        LR_CREATEDIBSECTION | (isTransparent ? LR_LOADTRANSPARENT : 0))};
+    if (hbmImageWell == nullptr) return FALSE;
 
-  // scale the bitmap
-  HBITMAP scaledBitmap{se::windows::ui::ScaleBitmapForDpi(
-      hbmImageWell, m_dpi_behavior.GetPreviousDpiX(),
-      m_dpi_behavior.GetPreviousDpiY(), m_dpi_behavior.GetCurrentDpiX(),
-      m_dpi_behavior.GetCurrentDpiY())};
+    RunCodeAtScopeExit(::DeleteObject(hbmImageWell));
 
-  // free old bitmap
-  ::DeleteObject(hbmImageWell);
+    // scale the bitmap
+    HBITMAP scaledBitmap{se::windows::ui::ScaleBitmapForDpi(
+        hbmImageWell, m_dpi_behavior.GetPreviousDpiX(),
+        m_dpi_behavior.GetPreviousDpiY(), m_dpi_behavior.GetCurrentDpiX(),
+        m_dpi_behavior.GetCurrentDpiY())};
 
-  // tell common control toolbar about the new bitmap
-  if (!AddReplaceBitmap(scaledBitmap)) return FALSE;
+    // tell common control toolbar about the new bitmap
+    if (!AddReplaceBitmap(scaledBitmap)) return FALSE;
+  }
 
   // remember the resource handles so the bitmap can be recolored if necessary
   m_hInstImageWell = hInstImageWell;
