@@ -142,15 +142,15 @@ enum class SystemPowerBatteryChargeStatusFlags : unsigned char
 	 */
 	kNotChargingAndBetween33And66Percent = 0,
 	/**
-	 * @brief High — the battery capacity is at more than 66 percent.
+	 * @brief High - the battery capacity is at more than 66 percent.
 	 */
 	kMoreThan66Percent = 1,
 	/**
-	 * @brief Low — the battery capacity is at less than 33 percent.
+	 * @brief Low - the battery capacity is at less than 33 percent.
 	 */
 	kLessThan33Percent = 2,
 	/**
-	 * @brief Critical — the battery capacity is at less than five percent.
+	 * @brief Critical - the battery capacity is at less than five percent.
 	 */
 	kLessThan5Percent = 4,
 	/**
@@ -162,7 +162,7 @@ enum class SystemPowerBatteryChargeStatusFlags : unsigned char
 	 */
 	kNoSystemBattery = 128,
 	/**
-	 * @brief Unknown status — unable to read the battery flag information.
+	 * @brief Unknown status - unable to read the battery flag information.
 	 */
 	kUnknown = 255
 };
@@ -743,7 +743,7 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 								GetBatterySaverStatusDescription(new_battery_saver_status));
 
 							// The number of seconds of battery life remaining, or
-							// –1 if remaining seconds are unknown or if the device
+							// -1 if remaining seconds are unknown or if the device
 							// is connected to AC power.
 							if (power_status.BatteryLifeTime != static_cast<DWORD>(-1))
 							{
@@ -967,6 +967,8 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		PAINTSTRUCT	ps;
 		HDC hdc = BeginPaint(hWnd, &ps);
+		RunCodeAtScopeExit(EndPaint(hWnd, &ps));
+
 #ifndef SWDS
 		RECT rc_client;
 		GetClientRect( hWnd, &rc_client );
@@ -977,7 +979,6 @@ LRESULT CGame::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 			videomode->DrawNullBackground( hdc, rc_client.right - rc_client.left, rc_client.bottom - rc_client.top );
 		}
 #endif
-		EndPaint(hWnd, &ps);
 	}
 		break;
 
