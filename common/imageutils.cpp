@@ -295,47 +295,75 @@ unsigned char *ImgUtl_ReadVTFAsRGBA( const char *vtfPath, int &width, int &heigh
 }
 
 // read a TGA header from the current point in the file stream.
-static void ImgUtl_ReadTGAHeader(FILE *infile, TGAHeader &header)
+static [[nodiscard]] bool ImgUtl_ReadTGAHeader(FILE *infile, TGAHeader &header)
 {
 	if (infile == nullptr)
 	{
-		return;
+		return false;
 	}
 
-	fread(&header.identsize, sizeof(header.identsize), 1, infile);
-	fread(&header.colourmaptype, sizeof(header.colourmaptype), 1, infile);
-	fread(&header.imagetype, sizeof(header.imagetype), 1, infile);
-	fread(&header.colourmapstart, sizeof(header.colourmapstart), 1, infile);
-	fread(&header.colourmaplength, sizeof(header.colourmaplength), 1, infile);
-	fread(&header.colourmapbits, sizeof(header.colourmapbits), 1, infile);
-	fread(&header.xstart, sizeof(header.xstart), 1, infile);
-	fread(&header.ystart, sizeof(header.ystart), 1, infile);
-	fread(&header.width, sizeof(header.width), 1, infile);
-	fread(&header.height, sizeof(header.height), 1, infile);
-	fread(&header.bits, sizeof(header.bits), 1, infile);
-	fread(&header.descriptor, sizeof(header.descriptor), 1, infile);
+	size_t read = fread(&header.identsize, sizeof(header.identsize), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.colourmaptype, sizeof(header.colourmaptype), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.imagetype, sizeof(header.imagetype), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.colourmapstart, sizeof(header.colourmapstart), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.colourmaplength, sizeof(header.colourmaplength), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.colourmapbits, sizeof(header.colourmapbits), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.xstart, sizeof(header.xstart), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.ystart, sizeof(header.ystart), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.width, sizeof(header.width), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.height, sizeof(header.height), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.bits, sizeof(header.bits), 1, infile);
+	if (read != 1) return false;
+	read = fread(&header.descriptor, sizeof(header.descriptor), 1, infile);
+	if (read != 1) return false;
+
+	return true;
 }
 
 // write a TGA header to the current point in the file stream.
-static void WriteTGAHeader(FILE *outfile, TGAHeader &header)
+static [[nodiscard]] bool WriteTGAHeader(FILE *outfile, TGAHeader &header)
 {
 	if (outfile == nullptr)
 	{
-		return;
+		return false;
 	}
 
-	fwrite(&header.identsize, sizeof(header.identsize), 1, outfile);
+	size_t write = fwrite(&header.identsize, sizeof(header.identsize), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.colourmaptype, sizeof(header.colourmaptype), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.imagetype, sizeof(header.imagetype), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.colourmapstart, sizeof(header.colourmapstart), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.colourmaplength, sizeof(header.colourmaplength), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.colourmapbits, sizeof(header.colourmapbits), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.xstart, sizeof(header.xstart), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.ystart, sizeof(header.ystart), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.width, sizeof(header.width), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.height, sizeof(header.height), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.bits, sizeof(header.bits), 1, outfile);
+	if (write != 1) return false;
 	fwrite(&header.descriptor, sizeof(header.descriptor), 1, outfile);
+	if (write != 1) return false;
+
+	return true;
 }
 
 // reads in a TGA file and converts it to 32 bit RGBA color values in a memory buffer.
@@ -349,7 +377,12 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 	}
 
 	// read header for TGA file.
-	ImgUtl_ReadTGAHeader(tgaFile, tgaHeader);
+	// dimhotepus: Check header is read.
+	if (!ImgUtl_ReadTGAHeader(tgaFile, tgaHeader))
+	{
+		errcode = CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
+		return nullptr;
+	}
 
 	if (
 		( tgaHeader.imagetype != 2 ) // image type 2 is uncompressed RGB, other types not supported.
@@ -1166,7 +1199,14 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 	tgaHeader.width = paddedImageWidth;
 	tgaHeader.height = paddedImageHeight;
 
-	WriteTGAHeader(outfile, tgaHeader);
+	// dimhotepus: Check header is written.
+	if (!WriteTGAHeader(outfile, tgaHeader))
+	{
+		free(resizeBuffer);
+		free(finalBuffer);
+
+		return CE_ERROR_WRITING_OUTPUT_FILE;
+	}
 
 	// Write the image data --- remember that TGA uses BGRA data
 	int numPixels = paddedImageWidth * paddedImageHeight;
@@ -1360,7 +1400,12 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 
 	// read out the header of the image.
 	TGAHeader header;
-	ImgUtl_ReadTGAHeader(infile, header);
+	// dimhotepus: Check TGA header was read.
+	if (!ImgUtl_ReadTGAHeader(infile, header))
+	{
+		Msg( "Failed to read TGA header: %s\n", tgaPath);
+		return CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
+	}
 
 	// check to make sure that the TGA has the proper dimensions and size.
 	if (!IsPowerOfTwo(header.width) || !IsPowerOfTwo(header.height))
