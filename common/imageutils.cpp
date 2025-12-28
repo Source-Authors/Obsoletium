@@ -231,10 +231,11 @@ ConversionErrorType ImgUtl_ConvertBMPToTGA(const char *bmpPath, const char *tgaP
 	int nWidth, nHeight;
 	ConversionErrorType result;
 	unsigned char *pBufRGBA = ImgUtl_ReadBMPAsRGBA( bmpPath, nWidth, nHeight, result );
+	RunCodeAtScopeExit(free( pBufRGBA ));
+
 	if ( result != CE_SUCCESS)
 	{
 		Assert( !pBufRGBA );
-		free( pBufRGBA );
 		return result;
 	}
 	Assert( pBufRGBA );
@@ -242,8 +243,6 @@ ConversionErrorType ImgUtl_ConvertBMPToTGA(const char *bmpPath, const char *tgaP
 	// write out the TGA file using the RGB data buffer.
 	CUtlBuffer outBuf;
 	bool retval = TGAWriter::WriteToBuffer(pBufRGBA, outBuf, nWidth, nHeight, IMAGE_FORMAT_RGBA8888, IMAGE_FORMAT_RGB888);
-	free( pBufRGBA );
-
 	if ( retval )
 	{
 		if ( !g_pFullFileSystem->WriteFile( tgaPath, nullptr, outBuf ) )
