@@ -207,7 +207,7 @@ void CNetChan::CompressFragments()
 				hZipFile = g_pFileSystem->Open( compressedfilename, "rb", NULL );
 			}
 
-			if ( hZipFile != FILESYSTEM_INVALID_HANDLE )
+			if ( hZipFile )
 			{
 				// use the existing compressed file
 				compressedFileSize = g_pFileSystem->Size( hZipFile );
@@ -228,17 +228,18 @@ void CNetChan::CompressFragments()
 				{
 					// write out to disk compressed version
 					hZipFile = g_pFileSystem->Open( compressedfilename, "wb", NULL );
-
-					if ( hZipFile != FILESYSTEM_INVALID_HANDLE )
+					if ( hZipFile )
 					{
-						DevMsg("Creating compressed version of file %s (%d -> %d)\n", data->filename, data->bytes, compressedSize);
-						g_pFileSystem->Write( compressed.get(), compressedSize, hZipFile );
-						g_pFileSystem->Close( hZipFile );
+						{
+							RunCodeAtScopeExit(g_pFileSystem->Close( hZipFile ));
+
+							DevMsg("Creating compressed version of file %s (%d -> %d)\n", data->filename, data->bytes, compressedSize);
+							g_pFileSystem->Write( compressed.get(), compressedSize, hZipFile );
+						}
 
 						// and open zip file it again for reading
 						hZipFile = g_pFileSystem->Open( compressedfilename, "rb", NULL );
-
-						if ( hZipFile != FILESYSTEM_INVALID_HANDLE )
+						if ( hZipFile )
 						{
 							// ok, now everything if fine
 							compressedFileSize = compressedSize;
@@ -979,7 +980,7 @@ void CNetChan::RemoveHeadInWaitingList( int nList )
 
 	delete [] data->buffer;	// free data buffer
 
-	if ( data->file	!= FILESYSTEM_INVALID_HANDLE )
+	if ( data->file )
 	{
 		g_pFileSystem->Close( data->file );
 		data->file = FILESYSTEM_INVALID_HANDLE;
@@ -2124,14 +2125,17 @@ bool CNetChan::HandleUpload( dataFragments_t *data, INetChannelHandler *MessageH
 				// Open new file for write binary.
 				data->file = g_pFileSystem->Open( data->filename, "wb", pszPathID );
 
-				if ( FILESYSTEM_INVALID_HANDLE == data->file )
+				if ( !data->file )
 				{
 					szErrorStr = "failed to write!";
 				}
 				else
 				{
-					g_pFileSystem->Write( data->buffer, data->bytes, data->file );
-					g_pFileSystem->Close( data->file );
+					{
+						RunCodeAtScopeExit(g_pFileSystem->Close( data->file ));
+
+						g_pFileSystem->Write( data->buffer, data->bytes, data->file );
+					}
 
 					if ( net_showfragments.GetInt() == 2 )
 					{

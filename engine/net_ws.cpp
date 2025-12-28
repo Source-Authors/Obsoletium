@@ -1757,29 +1757,36 @@ void NET_ProcessSocket( intp sock, IConnectionlessPacketHandler *handler )
 
 void NET_LogBadPacket(netpacket_t * packet)
 {
-	FileHandle_t fp;
 	int i = 0;
 	char filename[ MAX_OSPATH ];
 	bool done = false;
 
-	while ( i < 1000 && !done )
+	// dimhotepus: 1000 -> 1024.
+	while ( i < 1024 && !done )
 	{
 		Q_snprintf( filename, sizeof( filename ), "badpacket%03i.dat", i );
-		fp = g_pFileSystem->Open( filename, "rb" );
+		FileHandle_t fp = g_pFileSystem->Open( filename, "rb" );
 		if ( !fp )
 		{
 			fp = g_pFileSystem->Open( filename, "wb" );
-			g_pFileSystem->Write( packet->data, packet->size, fp );
-			done = true;
+			// dimhotepus: Only if file is open.
+			if ( fp )
+			{
+				RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
+				g_pFileSystem->Write( packet->data, packet->size, fp );
+
+				done = true;
+			}
 		}
-		if ( fp )
+		else
 		{
 			g_pFileSystem->Close( fp );
 		}
 		i++;
 	}
 
-	if ( i < 1000 )
+	if ( i < 1024 )
 	{
 		Msg( "Error buffer for %s written to %s\n", packet->from.ToString(), filename );
 	}
@@ -1895,14 +1902,14 @@ char const *NET_GetDebugFilename( char const *prefix )
 //-----------------------------------------------------------------------------
 void NET_StorePacket( char const *filename, byte const *buf, int len )
 {
-	FileHandle_t fh;
-
 	g_pFileSystem->CreateDirHierarchy( "debug/", "DEFAULT_WRITE_PATH" );
-	fh = g_pFileSystem->Open( filename, "wb" );
-	if ( FILESYSTEM_INVALID_HANDLE != fh )
+
+	FileHandle_t fh = g_pFileSystem->Open( filename, "wb" );
+	if ( fh )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close( fh ));
+
 		g_pFileSystem->Write( buf, len, fh );
-		g_pFileSystem->Close( fh );
 	}
 }
 

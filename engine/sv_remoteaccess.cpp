@@ -664,8 +664,10 @@ void CServerRemoteAccess::SetValue(const char *variable, const char *value)
 					return;
 				}
 			}
+
+			RunCodeAtScopeExit(g_pFileSystem->Close( f ));
+
 			g_pFileSystem->Write(value, Q_strlen(value) + 1, f);
-			g_pFileSystem->Close(f);
 		}
 	}
 	else
@@ -741,12 +743,13 @@ bool CServerRemoteAccess::LookupValue(const char *variable, CUtlBuffer &value)
 		{
 			// send the mapcycle list file
 			FileHandle_t f = g_pFileSystem->Open(mapcycle.GetString(), "rb" );
-
-			if ( f == FILESYSTEM_INVALID_HANDLE )
+			if ( !f )
 				return true;
+
+			RunCodeAtScopeExit(g_pFileSystem->Close(f));
 			
 			int len = g_pFileSystem->Size(f);
-			char *mapcycleData = (char *)_alloca( len+1 );
+			char *mapcycleData = stackallocT( char, len+1 );
 			if ( len && g_pFileSystem->Read( mapcycleData, len, f ) )
 			{
 				mapcycleData[len] = 0; // Make sure it's null terminated.
@@ -758,10 +761,6 @@ bool CServerRemoteAccess::LookupValue(const char *variable, CUtlBuffer &value)
 				value.PutString( "" );
 				value.PutChar(0);
 			}
-
-			g_pFileSystem->Close( f );
-
-
 		}
 	}
 	else

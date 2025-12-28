@@ -567,48 +567,49 @@ void CDemoRecorder::StartupDemoFile( void )
 
 	// open demo header file containing sigondata
 	FileHandle_t hDemoHeader = g_pFileSystem->Open( DEMO_HEADER_FILE, "rb"	);
-	if ( hDemoHeader == FILESYSTEM_INVALID_HANDLE )
+	if ( !hDemoHeader )
 	{
-		ConMsg ("StartupDemoFile: couldn't open demo file header.\n");
+		ConMsg ("StartupDemoFile: couldn't open demo file header %s.\n", DEMO_HEADER_FILE);
 		return;
 	}
 
-	Assert( m_MessageData.GetBasePointer() == NULL );
+	{
+		RunCodeAtScopeExit(g_pFileSystem->Close(hDemoHeader));
 
-	// setup writing data buffer
-	m_MessageData.StartWriting( new unsigned char[NET_MAX_PAYLOAD], NET_MAX_PAYLOAD );
-	m_MessageData.SetDebugName( "DemoFileWriteBuffer" );
+		Assert( m_MessageData.GetBasePointer() == NULL );
 
-	// fill demo header info
-	demoheader_t *dh = &m_DemoFile.m_DemoHeader;
-	Q_memset(dh, 0, sizeof(demoheader_t));
+		// setup writing data buffer
+		m_MessageData.StartWriting( new unsigned char[NET_MAX_PAYLOAD], NET_MAX_PAYLOAD );
+		m_MessageData.SetDebugName( "DemoFileWriteBuffer" );
 
-	dh->demoprotocol = DEMO_PROTOCOL;
-	dh->networkprotocol = PROTOCOL_VERSION;
-	V_strcpy_safe( dh->demofilestamp, DEMO_HEADER_ID );
+		// fill demo header info
+		demoheader_t *dh = &m_DemoFile.m_DemoHeader;
+		Q_memset(dh, 0, sizeof(demoheader_t));
 
-	Q_FileBase( modelloader->GetName( host_state.worldmodel ), dh->mapname );
+		dh->demoprotocol = DEMO_PROTOCOL;
+		dh->networkprotocol = PROTOCOL_VERSION;
+		V_strcpy_safe( dh->demofilestamp, DEMO_HEADER_ID );
 
-	char szGameDir[MAX_OSPATH];
-	V_strcpy_safe(szGameDir, com_gamedir );
-	Q_FileBase ( szGameDir, dh->gamedirectory );
+		Q_FileBase( modelloader->GetName( host_state.worldmodel ), dh->mapname );
 
-	V_strcpy_safe( dh->servername, cl.m_szRetryAddress );
-	V_strcpy_safe( dh->clientname, cl_name.GetString() );
+		char szGameDir[MAX_OSPATH];
+		V_strcpy_safe(szGameDir, com_gamedir );
+		Q_FileBase ( szGameDir, dh->gamedirectory );
 
-	
-	// get size	signon data size
-	dh->signonlength = g_pFileSystem->Size(hDemoHeader);
-	
-	// write demo file header info
-	m_DemoFile.WriteDemoHeader();
-	
-	// copy signon data from header file to demo file
-	m_DemoFile.WriteFileBytes( hDemoHeader, dh->signonlength );
+		V_strcpy_safe( dh->servername, cl.m_szRetryAddress );
+		V_strcpy_safe( dh->clientname, cl_name.GetString() );
 
-	// close but keep header file, we might need it for a second record
-	g_pFileSystem->Close( hDemoHeader );
-	
+		
+		// get size	signon data size
+		dh->signonlength = g_pFileSystem->Size(hDemoHeader);
+		
+		// write demo file header info
+		m_DemoFile.WriteDemoHeader();
+		
+		// copy signon data from header file to demo file
+		m_DemoFile.WriteFileBytes( hDemoHeader, dh->signonlength );
+	}
+
 	m_nFrameCount = 0;
 	m_bIsDemoHeader = false;
 		
@@ -1761,8 +1762,8 @@ void CDemoPlayer::WriteTimeDemoResults( void )
 
 	int width, height;
 	{
-	CMatRenderContextPtr pRenderContext( materials );
-	pRenderContext->GetWindowSize( width, height );
+		CMatRenderContextPtr pRenderContext( materials );
+		pRenderContext->GetWindowSize( width, height );
 	}
 
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();

@@ -406,6 +406,8 @@ CON_COMMAND( writeip, "Save the ban list to " BANNED_IP_FILENAME "." )
 		ConMsg( "Couldn't open %s.\n", name );
 		return;
 	}
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(f));
 	
 	byte b[4];
 	for ( const auto &ipf : g_IPFilters )
@@ -421,8 +423,6 @@ CON_COMMAND( writeip, "Save the ban list to " BANNED_IP_FILENAME "." )
 
 		g_pFileSystem->FPrintf( f, "addip 0 %i.%i.%i.%i\r\n", b[0], b[1], b[2], b[3] );
 	}
-	
-	g_pFileSystem->Close( f );
 }
 
 
@@ -524,6 +524,8 @@ CON_COMMAND( writeid, "Writes a list of permanently-banned user IDs to " BANNED_
 		ConMsg( "Couldn't open %s.\n", name );
 		return;
 	}
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(f));
 	
 	for ( intp i = 0 ; i < g_UserFilters.Count() ; i++ )
 	{
@@ -535,8 +537,6 @@ CON_COMMAND( writeid, "Writes a list of permanently-banned user IDs to " BANNED_
 
 		g_pFileSystem->FPrintf( f, "banid 0 %s\r\n", GetUserIDString( g_UserFilters[i].userid ) );
 	}
-
-	g_pFileSystem->Close( f );
 }
 
 

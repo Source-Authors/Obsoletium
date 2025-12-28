@@ -809,10 +809,11 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 
 	// Open up deletions.bat and parse out all filenames
 	// Load them in
-	FileHandle_t deletionsfile;
-	deletionsfile = g_pFileSystem->Open( DELETIONS_BATCH_FILE, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE != deletionsfile )
+	FileHandle_t deletionsfile = g_pFileSystem->Open( DELETIONS_BATCH_FILE, "rb" );
+	if ( deletionsfile )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close(deletionsfile));
+
 		// Read in and parse mapcycle.txt
 		int length = g_pFileSystem->Size(deletionsfile);
 		if ( length > 0 )
@@ -853,8 +854,6 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 				}
 			}
 		}
-
-		g_pFileSystem->Close(deletionsfile);
 	}
 	else
 	{
@@ -864,8 +863,10 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 	}
 
 	FileHandle_t warningsfile = g_pFileSystem->Open( DELETIONS_WARNINGS_FILE, "rb" );
-	if ( FILESYSTEM_INVALID_HANDLE != warningsfile )
+	if ( warningsfile )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close(warningsfile));
+
 		// Read in and parse mapcycle.txt
 		int length = g_pFileSystem->Size(warningsfile);
 		if ( length > 0 )
@@ -897,8 +898,6 @@ void CMapReslistGenerator::EnableDeletionsTracking()
 				}
 			}
 		}
-
-		g_pFileSystem->Close(warningsfile);
 	}
 	
 	// Hook up logging function
@@ -990,12 +989,14 @@ void CMapReslistGenerator::SpewTrackedDeletionsLog()
 		return;
 
 	FileHandle_t hUndeleteFile = g_pFileSystem->Open( DELETIONS_WARNINGS_FILE, "wt", "DEFAULT_WRITE_PATH" );
-	if ( FILESYSTEM_INVALID_HANDLE == hUndeleteFile )
+	if ( !hUndeleteFile )
 	{
 		return;
 	}
 
-	for ( int i = m_DeletionListWarnings.FirstInorder(); i != m_DeletionListWarnings.InvalidIndex() ; i = m_DeletionListWarnings.NextInorder( i ) )
+	RunCodeAtScopeExit(g_pFileSystem->Close( hUndeleteFile ));
+
+	for ( auto i = m_DeletionListWarnings.FirstInorder(); i != m_DeletionListWarnings.InvalidIndex() ; i = m_DeletionListWarnings.NextInorder( i ) )
 	{
 		char const *filename = m_DeletionListWarningsSymbols.String( m_DeletionListWarnings[ i ] );
 
@@ -1003,8 +1004,6 @@ void CMapReslistGenerator::SpewTrackedDeletionsLog()
 		g_pFileSystem->Write(filename, Q_strlen(filename), hUndeleteFile);
 		g_pFileSystem->Write("\"\n", 2, hUndeleteFile);
 	}
-
-	g_pFileSystem->Close( hUndeleteFile );
 }
 
 	

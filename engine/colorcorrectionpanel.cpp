@@ -2003,8 +2003,8 @@ void CColorLevelsUIPanel::ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char 
 	Rect_t dstRect;
 	dstRect.x = 0;
 	dstRect.y = 0;
-	dstRect.width  = g_nPreviewImageWidth;
-	dstRect.height = g_nPreviewImageHeight;
+	dstRect.width  = QuickPropScale( g_nPreviewImageWidth );
+	dstRect.height = QuickPropScale( g_nPreviewImageHeight );
 
 	m_pHistogramPanel->ComputeHistogram( dstRect, pPreviewImage, IMAGE_FORMAT_BGRX8888, dstRect.width * 4 );
 }
@@ -2597,10 +2597,12 @@ void CFullScreenSelectionPanel::OnCursorMoved( int x, int y )
 {
 	if( m_bMouseDown )
 	{
-		CMatRenderContextPtr pRenderContext( materials );
-
 		BGRA8888_t pixelValue;
-		pRenderContext->ReadPixels( x, y, 1, 1, (unsigned char *)&pixelValue, IMAGE_FORMAT_BGRX8888 );
+
+		{
+			CMatRenderContextPtr pRenderContext( materials );
+			pRenderContext->ReadPixels( x, y, 1, 1, (unsigned char *)&pixelValue, IMAGE_FORMAT_BGRX8888 );
+		}
 
 		bool bCTRLDown = ( input()->IsKeyDown(KEY_LCONTROL) || input()->IsKeyDown(KEY_RCONTROL) );
 
@@ -2942,10 +2944,11 @@ CSelectedHSVUIPanel::CSelectedHSVUIPanel( vgui::Panel *parent, CSelectedHSVOpera
 	ResetHSVSliders();
 	ResetBlendFactorSlider();
 
-	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
-
 	int x, y, w, h;
-	pRenderContext->GetViewport( x, y, w, h );
+	{
+		CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
+		pRenderContext->GetViewport( x, y, w, h );
+	}
 
 	m_pFullScreenSelection = new CFullScreenSelectionPanel( "SelectionPanel", pOp, this );
 	m_pFullScreenSelection->SetSize( w, h );
@@ -3081,12 +3084,12 @@ void CSelectedHSVUIPanel::ReadUncorrectedImage( Rect_t *pSrcRect, unsigned char 
 	Rect_t dstRect;
 	dstRect.x = 0;
 	dstRect.y = 0;
-	dstRect.width = g_nPreviewImageWidth;
-	dstRect.height = g_nPreviewImageHeight;
+	dstRect.width = QuickPropScale( g_nPreviewImageWidth );
+	dstRect.height = QuickPropScale( g_nPreviewImageHeight );
 
-	for( int i=0;i<g_nPreviewImageHeight;i++ )
+	for( int i=0;i<dstRect.height;i++ )
 	{
-		Q_memcpy( m_pUncorrectedImage->GetImageBuffer()+i*IMAGE_BUFFER_MAX_DIM, pPreviewImage + i*g_nPreviewImageWidth*4, g_nPreviewImageWidth*4 );
+		Q_memcpy( m_pUncorrectedImage->GetImageBuffer()+i*IMAGE_BUFFER_MAX_DIM, pPreviewImage + i*dstRect.width*4, dstRect.width*4 );
 	}
 	m_pUncorrectedImage->SetTextureSubRect( dstRect );
 	m_pUncorrectedImage->DownloadTexture();
@@ -3334,27 +3337,27 @@ void CColorLookupOperation::SetBlendFactor( float flBlend )
 void CColorLookupOperation::LoadLookupTable( const char *pFilename )
 {
 	{
-	FileHandle_t file_handle = g_pFileSystem->Open( pFilename, "rb" );
-	if( !file_handle )
-		return;
+		FileHandle_t file_handle = g_pFileSystem->Open( pFilename, "rb" );
+		if( !file_handle )
+			return;
 
-	RunCodeAtScopeExit(g_pFileSystem->Close( file_handle ));
+		RunCodeAtScopeExit(g_pFileSystem->Close( file_handle ));
 
-    unsigned int file_size = g_pFileSystem->Size( file_handle );
-    int res = (int)powf( (float)(file_size/sizeof(color24)), 1.0f/3.0f );
-	if( res*res*res*sizeof(color24) != file_size )
-	{
-		return;
-	}
+		unsigned int file_size = g_pFileSystem->Size( file_handle );
+		int res = (int)powf( (float)(file_size/sizeof(color24)), 1.0f/3.0f );
+		if( res*res*res*sizeof(color24) != file_size )
+		{
+			return;
+		}
 
-	SetResolution( res );
+		SetResolution( res );
 
-	for( int i=0;i<res*res*res;i++ )
-	{
-		color24 color;
-		g_pFileSystem->Read( &color, sizeof(color24), file_handle );
-		m_LookupTable[i] = color;
-	}
+		for( int i=0;i<res*res*res;i++ )
+		{
+			color24 color;
+			g_pFileSystem->Read( &color, sizeof(color24), file_handle );
+			m_LookupTable[i] = color;
+		}
 	}
 
 	V_strcpy_safe( m_pFilename, pFilename );
@@ -4186,8 +4189,8 @@ public:
 	CLookupViewWindow( vgui::Panel *parent, ColorCorrectionHandle_t CCHandle );
    ~CLookupViewWindow( );
 
-   virtual void Init();
-   virtual void Shutdown();
+   void Init();
+   void Shutdown();
 
    void UpdateColorCorrection();
 
@@ -4942,7 +4945,7 @@ void CColorOperationListPanel::OnFileSelected( const char *pFilename )
 
 	colorcorrection->LockLookup( m_CCHandle );
 	RunCodeAtScopeExit(colorcorrection->UnlockLookup( m_CCHandle ));
-    
+
 	RGBX5551_t inColor;
 
 	inColor.b = 0;
@@ -5303,9 +5306,17 @@ void CColorCorrectionTools::Init( void )
 	if ( g_pColorCorrectionUI )
 	{
 		g_pColorCorrectionUI->Init();
+		
+		m_pPreviewImage = new BGRA8888_t[
+			QuickPropScalePanel( g_nPreviewImageWidth, g_pColorCorrectionUI ) *
+			QuickPropScalePanel( g_nPreviewImageHeight, g_pColorCorrectionUI )
+		];
 	}
-
-	m_pPreviewImage = new BGRA8888_t[ g_nPreviewImageWidth*g_nPreviewImageHeight ];
+	else
+	{
+		// TODO: Think how to set scaled as we expect the one.
+		m_pPreviewImage = new BGRA8888_t[g_nPreviewImageWidth * g_nPreviewImageHeight];
+	}
 }
 
 void CColorCorrectionTools::Shutdown( void )
@@ -5337,8 +5348,6 @@ void CColorCorrectionTools::GrabPreColorCorrectedFrame( int x, int y, int width,
 	if ( !g_pColorCorrectionUI->IsVisible() )
 		return;
 
-	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
-
 	Rect_t srcRect;
 	srcRect.x = x; srcRect.y = y;
 	srcRect.width = width; srcRect.height = height;
@@ -5346,10 +5355,13 @@ void CColorCorrectionTools::GrabPreColorCorrectedFrame( int x, int y, int width,
 	Rect_t dstRect;
 	dstRect.x = 0;
 	dstRect.y = 0;
-	dstRect.width  = g_nPreviewImageWidth;
-	dstRect.height = g_nPreviewImageHeight;
-
-	pRenderContext->ReadPixelsAndStretch( &srcRect, &dstRect, (unsigned char*)m_pPreviewImage, IMAGE_FORMAT_BGRX8888, g_nPreviewImageWidth*4 );
+	dstRect.width  = QuickPropScalePanel( g_nPreviewImageWidth, g_pColorCorrectionUI );
+	dstRect.height = QuickPropScalePanel( g_nPreviewImageHeight, g_pColorCorrectionUI );
+	
+	{
+		CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
+		pRenderContext->ReadPixelsAndStretch( &srcRect, &dstRect, (unsigned char*)m_pPreviewImage, IMAGE_FORMAT_BGRX8888, g_nPreviewImageWidth*4 );
+	}
 
 	g_pColorCorrectionUI->ReadUncorrectedImage( &srcRect, (unsigned char *)m_pPreviewImage );
 }

@@ -444,7 +444,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 	}
 
 	s_MapFileHandle = g_pFileSystem->OpenEx( s_szMapName, "rb", 0, NULL );
-	if ( s_MapFileHandle == FILESYSTEM_INVALID_HANDLE )
+	if ( !s_MapFileHandle )
 	{
 		Host_Error( "CMapLoadHelper::Init, unable to open %s\n", s_szMapName );
 		return;
@@ -502,7 +502,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 
 			// Open the lump file
 			FileHandle_t lumpFile = g_pFileSystem->Open( lumpfilename, "rb" );
-			if ( lumpFile == FILESYSTEM_INVALID_HANDLE )
+			if ( !lumpFile )
 			{
 				Host_Error( "CMapLoadHelper::Init, failed to load lump file %s\n", lumpfilename );
 				return;
@@ -516,13 +516,14 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 			{
 				// We may find multiple lump files for the same lump ID. If so,
 				// close the earlier lump file, because the later one overwrites it.
-				if ( s_MapLumpFiles[lumpHeader.lumpID].file != FILESYSTEM_INVALID_HANDLE )
+				if ( s_MapLumpFiles[lumpHeader.lumpID].file )
 				{
 					g_pFileSystem->Close( s_MapLumpFiles[lumpHeader.lumpID].file );
 				}
 
 				s_MapLumpFiles[lumpHeader.lumpID].file = lumpFile;
 				s_MapLumpFiles[lumpHeader.lumpID].lumpfileindex = iIndex;
+
 				memcpy( &(s_MapLumpFiles[lumpHeader.lumpID].header), &lumpHeader, sizeof(lumpHeader) );
 			}
 			else
@@ -553,24 +554,21 @@ void CMapLoadHelper::Shutdown( void )
 		return;
 	}
 
-	if ( s_MapFileHandle != FILESYSTEM_INVALID_HANDLE )
+	if ( s_MapFileHandle )
 	{
 		g_pFileSystem->Close( s_MapFileHandle );
 		s_MapFileHandle = FILESYSTEM_INVALID_HANDLE;
 	}
 
-	if ( IsPC() )
-	{
 		// Close our open lump files
-		for ( int i = 0; i < HEADER_LUMPS; i++ )
+	for ( auto &f : s_MapLumpFiles )
 		{
-			if ( s_MapLumpFiles[i].file != FILESYSTEM_INVALID_HANDLE )
+		if ( f.file )
 			{
-				g_pFileSystem->Close( s_MapLumpFiles[i].file );
+			g_pFileSystem->Close( f.file );
 			}
 		}
-		V_memset( &s_MapLumpFiles, 0, sizeof( s_MapLumpFiles ) );
-	}
+	BitwiseClear( s_MapLumpFiles );
 
 	s_szLoadName[ 0 ] = 0;
 	V_memset( &s_MapHeader, 0, sizeof( s_MapHeader ) );
@@ -2582,10 +2580,12 @@ bool Mod_LoadGameLump( int lumpId, void *pOutBuffer, int size )
 	{
 		// Load file into buffer
 		FileHandle_t fileHandle = g_pFileSystem->Open( g_GameLumpFilename, "rb" );
-		if ( fileHandle == FILESYSTEM_INVALID_HANDLE )
+		if ( !fileHandle )
 		{
 			return false;
 		}
+
+		RunCodeAtScopeExit(g_pFileSystem->Close(fileHandle));
 
 		g_pFileSystem->Seek( fileHandle, g_GameLumpDict[i].offset, FILESYSTEM_SEEK_HEAD );
 
@@ -2593,7 +2593,6 @@ bool Mod_LoadGameLump( int lumpId, void *pOutBuffer, int size )
 		{
 			// read directly into user's buffer
 			bool bOK = ( g_pFileSystem->Read( pOutBuffer, outSize, fileHandle ) > 0 );
-			g_pFileSystem->Close( fileHandle );
 			return bOK;
 		}
 		else
@@ -2601,7 +2600,6 @@ bool Mod_LoadGameLump( int lumpId, void *pOutBuffer, int size )
 			// data is compressed, read into temporary
 			pData = (byte *)malloc( dataLength );
 			bool bOK = ( g_pFileSystem->Read( pData, dataLength, fileHandle ) > 0 );
-			g_pFileSystem->Close( fileHandle );
 			if ( !bOK )
 			{
 				free( pData );
@@ -5176,12 +5174,13 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 	}
 
 	FileHandle_t mapfile = g_pFileSystem->OpenEx( szMapFile, "rb", 0, "GAME" );
-	if ( mapfile != FILESYSTEM_INVALID_HANDLE )
+	if ( mapfile )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close( mapfile ));
+
 		dheader_t header;
 		memset( &header, 0, sizeof( header ) );
 		g_pFileSystem->Read( &header, sizeof( dheader_t ), mapfile );
-		g_pFileSystem->Close( mapfile );
 
 		if ( header.ident == IDBSPHEADER )
 		{
@@ -5887,9 +5886,10 @@ CON_COMMAND_F( model_list, "Dump model list to file", FCVAR_CHEAT | FCVAR_DONTRE
 	if ( g_pFileSystem )
 	{
 		FileHandle_t fileHandle = g_pFileSystem->Open( "model_list.csv", "wt", "GAME" );
-
 		if ( fileHandle )
 		{
+			RunCodeAtScopeExit(g_pFileSystem->Close( fileHandle ));
+
 			const char *substring = NULL;
 			if ( args.ArgC() > 1 )
 			{
@@ -5946,7 +5946,6 @@ CON_COMMAND_F( model_list, "Dump model list to file", FCVAR_CHEAT | FCVAR_DONTRE
 				}
 			}
 
-			g_pFileSystem->Close( fileHandle );
 			Msg( "Created \"model_list.csv\" in the game folder.\n" );
 		}
 	}
