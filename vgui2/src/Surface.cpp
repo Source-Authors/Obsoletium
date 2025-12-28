@@ -4022,12 +4022,13 @@ static LRESULT CALLBACK staticProc(HWND hwnd,UINT msg,WPARAM wparam,LPARAM lpara
 			{
 				PAINTSTRUCT ps;
 				::BeginPaint(hwnd,&ps);
+				RunCodeAtScopeExit(::EndPaint(hwnd,&ps));
+
 	//			startTime = system()->GetCurrentTime();
  				g_Surface.SolveTraverse(panel, false);
 	//			solveTime = system()->GetCurrentTime();
 				g_Surface.PaintTraverse(panel);
 	//			paintTime = system()->GetCurrentTime();
-				::EndPaint(hwnd,&ps);
 			}
 
 //			debug timing code
