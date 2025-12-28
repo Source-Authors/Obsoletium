@@ -103,7 +103,8 @@ private:
 	// list of all maps to scan
 	CUtlVector<maplist_map_t> m_Maps;
 	intp m_iCurrentMap;
-	float m_flNextMapRunTime;
+	// dimhotepus: float -> double.
+	double m_flNextMapRunTime;
 	int m_iFrameCountdownToRunningNextMap;
 	CUtlSymbolTable m_AlreadyWrittenFileNames;
 	int m_iPauseTimeBetweenMaps;

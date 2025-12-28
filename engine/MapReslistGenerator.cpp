@@ -29,7 +29,7 @@
 #include "tier0/memdbgon.h"
 
 #define PAUSE_FRAMES_BETWEEN_MAPS	300
-#define PAUSE_TIME_BETWEEN_MAPS		2.0f
+#define PAUSE_TIME_BETWEEN_MAPS		2
 
 extern engineparms_t host_parms;
 
@@ -113,7 +113,7 @@ CMapReslistGenerator::CMapReslistGenerator() :
 	m_bTrackingDeletions = false;
 	m_bLoggingEnabled = false;
 	m_iCurrentMap = 0;
-	m_flNextMapRunTime = 0.0f;
+	m_flNextMapRunTime = 0.0;
 	m_iFrameCountdownToRunningNextMap = 0;
 	m_szPrefix[0] = '\0';
 	m_szLevelName[0] = '\0';
@@ -562,7 +562,7 @@ void CMapReslistGenerator::RunFrame()
 
 		if ( m_Maps.IsValidIndex( m_iCurrentMap ) )
 		{
-			m_flNextMapRunTime = 0.0f;
+			m_flNextMapRunTime = 0.0;
 			m_iFrameCountdownToRunningNextMap = 0;
 
 			if ( !m_bRestartOnTransition )
