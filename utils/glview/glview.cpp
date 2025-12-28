@@ -977,8 +977,8 @@ LRESULT WINAPI WCam_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 
     case WM_PAINT: {
       PAINTSTRUCT ps;
-
       BeginPaint(hWnd, &ps);
+      RunCodeAtScopeExit(EndPaint(hWnd, &ps));
 
       if (!::wglMakeCurrent(camdc, baseRC)) {
         Error("wglMakeCurrent failed: '%s'.\n",
@@ -987,8 +987,6 @@ LRESULT WINAPI WCam_WndProc(HWND hWnd, UINT uMsg, WPARAM wParam,
 
       Draw();
       SwapBuffers(camdc);
-
-      EndPaint(hWnd, &ps);
     } break;
 
     case WM_KEYDOWN:
