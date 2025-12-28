@@ -431,22 +431,15 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 	s_pMap = NULL;
 	s_szLoadName[ 0 ] = 0;
 	s_MapFileHandle = FILESYSTEM_INVALID_HANDLE;
-	V_memset( &s_MapHeader, 0, sizeof( s_MapHeader ) );
-	V_memset( &s_MapLumpFiles, 0, sizeof( s_MapLumpFiles ) );
+	BitwiseClear( s_MapHeader );
+	BitwiseClear( s_MapLumpFiles );
 
-	if ( !pMapModel )
-	{
-		V_strcpy_safe( s_szMapName, loadname );
-	}
-	else
-	{
-		V_strcpy_safe( s_szMapName, pMapModel->strName );
-	}
+	V_strcpy_safe( s_szMapName, !pMapModel ? loadname : pMapModel->strName );
 
 	s_MapFileHandle = g_pFileSystem->OpenEx( s_szMapName, "rb", 0, NULL );
 	if ( !s_MapFileHandle )
 	{
-		Host_Error( "CMapLoadHelper::Init, unable to open %s\n", s_szMapName );
+		Host_Error( "CMapLoadHelper::Init, unable to open %s.\n", s_szMapName );
 		return;
 	}
 
@@ -463,7 +456,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 	{
 		g_pFileSystem->Close( s_MapFileHandle );
 		s_MapFileHandle = FILESYSTEM_INVALID_HANDLE;
-		Host_Error( "CMapLoadHelper::Init, map %s has wrong version (%i when expecting %i)\n", s_szMapName,
+		Host_Error( "CMapLoadHelper::Init, map %s has wrong version (%d when expecting %d)\n", s_szMapName,
 			s_MapHeader.version, BSPVERSION );
 		return;
 	}
@@ -488,7 +481,6 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 	// XXX(johns): There are security issues with this system currently. sv_pure doesn't handle unexpected/mismatched
 	//             lumps, so players can create lumps for maps not using them to wallhack/etc.. Currently unused,
 	//             disabling until we have time to make a proper security pass.
-	if ( IsPC() )
 	{
 		// Now find and open our lump files, and create the master list of them.
 		for ( int iIndex = 0; iIndex < MAX_LUMPFILES; iIndex++ )
@@ -509,7 +501,7 @@ void CMapLoadHelper::Init( model_t *pMapModel, const char *loadname )
 			}
 
 			// Read the lump header
-			memset( &lumpHeader, 0, sizeof( lumpHeader ) );
+			BitwiseClear( lumpHeader );
 			g_pFileSystem->Read( &lumpHeader, sizeof( lumpfileheader_t ), lumpFile );
 
 			if ( lumpHeader.lumpID >= 0 && lumpHeader.lumpID < HEADER_LUMPS )
@@ -571,7 +563,7 @@ void CMapLoadHelper::Shutdown( void )
 	BitwiseClear( s_MapLumpFiles );
 
 	s_szLoadName[ 0 ] = 0;
-	V_memset( &s_MapHeader, 0, sizeof( s_MapHeader ) );
+	BitwiseClear( s_MapHeader );
 	s_pMap = NULL;
 
 	// discard from memory
@@ -608,7 +600,7 @@ int CMapLoadHelper::LumpOffset( int lumpID  )
 {
 	// If we have a lump file for this lump, return 
 	// the offset to move past the lump file header.
-	if ( IsPC() && s_MapLumpFiles[lumpID].file != FILESYSTEM_INVALID_HANDLE )
+	if ( s_MapLumpFiles[lumpID].file )
 	{
 		return s_MapLumpFiles[lumpID].header.lumpOffset;
 	}
@@ -811,7 +803,7 @@ char *CMapLoadHelper::GetLoadName( void )
 {
 	// If we have a custom lump file for the lump this helper 
 	// is loading, return it instead.
-	if ( IsPC() && s_MapLumpFiles[m_nLumpID].file != FILESYSTEM_INVALID_HANDLE )
+	if ( s_MapLumpFiles[m_nLumpID].file )
 	{
 		return m_szLumpFilename;
 	}
@@ -5179,7 +5171,8 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 		RunCodeAtScopeExit(g_pFileSystem->Close( mapfile ));
 
 		dheader_t header;
-		memset( &header, 0, sizeof( header ) );
+		BitwiseClear( header );
+
 		g_pFileSystem->Read( &header, sizeof( dheader_t ), mapfile );
 
 		if ( header.ident == IDBSPHEADER )
