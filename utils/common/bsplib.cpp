@@ -2431,10 +2431,10 @@ void UnloadBSPFile()
 
 	g_GameLumps.DestroyAllGameLumps();
 
-	for ( int i = 0; i < HEADER_LUMPS; i++ )
+	for ( auto *&l : g_Lumps.pLumps )
 	{
-		free( g_Lumps.pLumps[i] );
-		g_Lumps.pLumps[i] = NULL;
+		free( l );
+		l = NULL;
 	}
 
 	ReleasePakFileLumps();
