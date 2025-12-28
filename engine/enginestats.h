@@ -107,8 +107,7 @@ inline void CEngineStats::BeginTimedStat( EngineTimedStatId_t stat )
 {
 	if (m_InFrame)
 	{
-		m_StatGroup.m_StatStartTime[stat] = 
-			Sys_FloatTime();
+		m_StatGroup.m_StatStartTime[stat] = Sys_FloatTime();
 	}
 }
 
@@ -116,8 +115,8 @@ inline void CEngineStats::EndTimedStat( EngineTimedStatId_t stat )
 {
 	if (m_InFrame)
 	{
-		float dt = (float)Sys_FloatTime() - (float)(m_StatGroup.m_StatStartTime[stat]);
-		m_StatGroup.m_StatFrameTime[stat] += dt; 
+		float dt = (float)(Sys_FloatTime() - m_StatGroup.m_StatStartTime[stat]);
+		m_StatGroup.m_StatFrameTime[stat] += dt;
 	}
 }
 
