@@ -85,7 +85,7 @@ extern void longjmp( jmp_buf, int ) __attribute__((noreturn));
 struct ValveJpegErrorHandler_t 
 {
 	// The default manager
-	struct jpeg_error_mgr	m_Base;
+	jpeg_error_mgr	m_Base;
 	// For handling any errors
 	jmp_buf					m_ErrorContext;
 };
@@ -96,7 +96,7 @@ enum {
 
 struct JPEGDestinationManager_t
 {
-	struct jpeg_destination_mgr pub; // public fields
+	jpeg_destination_mgr pub; // public fields
 
 	CUtlBuffer  *pBuffer;       // target/final buffer
 	byte        *buffer;        // start of temp buffer
@@ -125,14 +125,12 @@ static void ValveJpegErrorHandler( j_common_ptr cinfo )
 // convert the JPEG file given to a TGA file at the given output path.
 ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *tgaPath, bool bRequirePowerOfTwo )
 {
-#if !defined( _X360 )
-
 	//
 	// !FIXME! This really probably should use ImgUtl_ReadJPEGAsRGBA, to avoid duplicated code.
 	//
 
-	struct jpeg_decompress_struct jpegInfo;
-	struct ValveJpegErrorHandler_t jerr;
+	jpeg_decompress_struct jpegInfo;
+	ValveJpegErrorHandler_t jerr;
 	JSAMPROW row_pointer[1];
 	int row_stride;
 	int cur_row = 0;
@@ -245,18 +243,11 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 
 	free(buf);
 	return bRetVal ? CE_SUCCESS : CE_ERROR_WRITING_OUTPUT_FILE;
-
-#else
-	return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-#endif
 }
 
 // convert the bmp file given to a TGA file at the given destination path.
 ConversionErrorType ImgUtl_ConvertBMPToTGA(const char *bmpPath, const char *tgaPath)
 {
-	if ( !IsPC() )
-		return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-
 #ifdef WIN32
 
 	int nWidth, nHeight;
@@ -474,9 +465,8 @@ unsigned char * ImgUtl_ReadTGAAsRGBA(const char *tgaPath, int &width, int &heigh
 
 unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &height, ConversionErrorType &errcode )
 {
-#if !defined( _X360 )
-	struct jpeg_decompress_struct jpegInfo;
-	struct ValveJpegErrorHandler_t jerr;
+	jpeg_decompress_struct jpegInfo;
+	ValveJpegErrorHandler_t jerr;
 	JSAMPROW row_pointer[1];
 	int row_stride;
 	int cur_row = 0;
@@ -599,16 +589,10 @@ unsigned char *ImgUtl_ReadJPEGAsRGBA( const char *jpegPath, int &width, int &hei
 	height = image_height;
 	errcode = CE_SUCCESS;
 	return buf;
-
-#else
-	errcode = CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-	return NULL;
-#endif
 }
 
 static void ReadPNGData( png_structp png_ptr, png_bytep outBytes, png_size_t byteCountToRead )
 {
-
 	// Cast pointer
 	auto *pBuf = (CUtlBuffer *)png_get_io_ptr( png_ptr );
 	Assert( pBuf );
@@ -628,8 +612,6 @@ static void ReadPNGData( png_structp png_ptr, png_bytep outBytes, png_size_t byt
 
 unsigned char *ImgUtl_ReadPNGAsRGBA( const char *pngPath, int &width, int &height, ConversionErrorType &errcode )
 {
-#if !defined( _X360 )
-
 	// Just load the whole file into a memory buffer
 	CUtlBuffer bufFileContents;
 	if ( !g_pFullFileSystem->ReadFile( pngPath, nullptr, bufFileContents ) )
@@ -640,17 +622,10 @@ unsigned char *ImgUtl_ReadPNGAsRGBA( const char *pngPath, int &width, int &heigh
 
 	// Load it
 	return ImgUtl_ReadPNGAsRGBAFromBuffer( bufFileContents, width, height, errcode );
-
-#else
-	errcode = CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-	return NULL;
-#endif
 }
 
 unsigned char		*ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, int &height, ConversionErrorType &errcode )
 {
-#if !defined( _X360 )
-
 	png_const_bytep pngData = buffer.Base<const png_byte>();
 	if (png_sig_cmp( pngData, 0, 8))
 	{
@@ -793,11 +768,6 @@ fail:
 	height = png_height;
 	errcode = CE_SUCCESS;
 	return pResultData;
-
-#else
-	errcode = CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-	return NULL;
-#endif
 }
 
 unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &height, ConversionErrorType &errcode )
@@ -1073,7 +1043,6 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 
 unsigned char *ImgUtl_ReadImageAsRGBA( const char *path, int &width, int &height, ConversionErrorType &errcode )
 {
-
 	// Split out the file extension
 	const char *pExt = V_GetFileExtension( path );
 	if ( pExt )
@@ -1509,7 +1478,6 @@ static void DoDeleteFile( const char *filename )
 
 ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const char *pMaterialsSubDir, int nMaxWidth/*=-1*/, int nMaxHeight/*=-1*/ )
 {
-#ifndef _XBOX
 	if ((pInPath == nullptr) || (pInPath[0] == 0))
 	{
 		return CE_ERROR_PARSING_SOURCE;
@@ -1743,7 +1711,6 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 	}
 
 	return nErrorCode;
-#endif
 }
 
 ConversionErrorType ImgUtl_WriteGenericVMT( const char *vtfPath, const char *pMaterialsSubDir )
@@ -1820,7 +1787,6 @@ static void FlushPNGData( png_structp png_ptr )
 
 ConversionErrorType ImgUtl_WriteRGBAAsPNGToBuffer( const unsigned char *pRGBAData, int nWidth, int nHeight, CUtlBuffer &bufOutData, int nStride )
 {
-#if !defined( _X360 )
 	// Auto detect image stride
 	if ( nStride <= 0 )
 	{
@@ -1897,9 +1863,6 @@ fail:
 	row_pointers = nullptr;
 	png_destroy_write_struct(&png_ptr, &info_ptr);
 	return CE_SUCCESS;
-#else
-	return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-#endif
 }
 
 //-----------------------------------------------------------------------------
@@ -1998,10 +1961,10 @@ bool ImgUtl_WriteRGBToJPEG( unsigned char *pSrcBuf, unsigned int nSrcWidth, unsi
 	int row_stride;              // physical row width in image buffer
 
 	// stderr handler
-	struct jpeg_error_mgr jerr;
+	jpeg_error_mgr jerr;
 
 	// compression data structure
-	struct jpeg_compress_struct cinfo;
+	jpeg_compress_struct cinfo;
 
 	row_stride = nSrcWidth * 3; // JSAMPLEs per row in image_buffer
 
@@ -2047,16 +2010,14 @@ bool ImgUtl_WriteRGBToJPEG( unsigned char *pSrcBuf, unsigned int nSrcWidth, unsi
 
 ConversionErrorType ImgUtl_WriteRGBAAsJPEGToBuffer( const unsigned char *pRGBAData, int nWidth, int nHeight, CUtlBuffer &bufOutData, int nStride )
 {
-#if !defined( _X360 )
-
 	JSAMPROW row_pointer[1];     // pointer to JSAMPLE row[s]
 	int row_stride;              // physical row width in image buffer
 
 	// stderr handler
-	struct jpeg_error_mgr jerr;
+	jpeg_error_mgr jerr;
 
 	// compression data structure
-	struct jpeg_compress_struct cinfo;
+	jpeg_compress_struct cinfo;
 
 	row_stride = nWidth * 4;
 
@@ -2109,9 +2070,6 @@ ConversionErrorType ImgUtl_WriteRGBAAsJPEGToBuffer( const unsigned char *pRGBADa
 	free( pDstRow );
 
 	return CE_SUCCESS;
-#else
-	return CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-#endif
 }
 
 ConversionErrorType ImgUtl_LoadBitmap( const char *pszFilename, Bitmap_t &bitmap )
