@@ -17,7 +17,7 @@
 #if defined( WIN32 ) && !defined( _X360 )
 #include "winlite.h"// SRC only!!
 #elif defined( POSIX )
-#include <cstdio.>
+#include <cstdio>
 #include <sys/stat.h>
 #ifdef OSX
 #include <copyfile.h>
@@ -123,8 +123,6 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	// !FIXME! This really probably should use ImgUtl_ReadJPEGAsRGBA, to avoid duplicated code.
 	//
 
-	jpeg_decompress_struct jpegInfo;
-	ValveJpegErrorHandler_t jerr;
 	JSAMPROW row_pointer[1];
 	int row_stride;
 	int cur_row = 0;
@@ -135,26 +133,25 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 
 	// open the jpeg image file.
 	FILE *infile = fopen(jpegpath, "rb");
-	if (infile == nullptr)
+	if (!infile)
 	{
 		return CE_CANT_OPEN_SOURCE_FILE;
 	}
 
+	RunCodeAtScopeExit(fclose(infile));
+
+	ValveJpegErrorHandler_t jerr;
+	jpeg_decompress_struct jpegInfo;
 	// setup error to print to stderr.
 	jpegInfo.err = jpeg_std_error(&jerr.m_Base);
-
 	jpegInfo.err->error_exit = &ValveJpegErrorHandler;
 
 	// create the decompress struct.
 	jpeg_create_decompress(&jpegInfo);
+	RunCodeAtScopeExit(jpeg_destroy_decompress( &jpegInfo ));
 
 	if ( setjmp( jerr.m_ErrorContext ) )
 	{
-		// Get here if there is any error
-		jpeg_destroy_decompress( &jpegInfo );
-
-		fclose(infile);
-
 		return CE_ERROR_PARSING_SOURCE;
 	}
 
@@ -163,24 +160,21 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	// read in the jpeg header and make sure that's all good.
 	if (jpeg_read_header(&jpegInfo, TRUE) != JPEG_HEADER_OK)
 	{
-		fclose(infile);
 		return CE_ERROR_PARSING_SOURCE;
 	}
 
 	// start the decompress with the jpeg engine.
 	if ( !jpeg_start_decompress(&jpegInfo) )
 	{
-		jpeg_destroy_decompress(&jpegInfo);
-		fclose(infile);
 		return CE_ERROR_PARSING_SOURCE;
 	}
+
+	RunCodeAtScopeExit(jpeg_finish_decompress(&jpegInfo));
 
 	// Check for valid width and height (ie. power of 2 and print out an error and exit if not).
 	if ( ( bRequirePowerOfTwo && ( !IsPowerOfTwo(jpegInfo.image_height) || !IsPowerOfTwo(jpegInfo.image_width) ) )
 		|| jpegInfo.output_components != 3 )
 	{
-		jpeg_destroy_decompress(&jpegInfo);
-		fclose( infile );
 		return CE_SOURCE_FILE_SIZE_NOT_SUPPORTED;
 	}
 
@@ -192,11 +186,9 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 	int mem_required = jpegInfo.image_height * jpegInfo.image_width * jpegInfo.output_components;
 
 	// allocate the memory to read the image data into.
-	auto *buf = (unsigned char *)malloc(mem_required);
-	if (buf == nullptr)
+	std::unique_ptr<byte[]> buf = std::make_unique<byte[]>(mem_required);
+	if (!buf)
 	{
-		jpeg_destroy_decompress(&jpegInfo);
-		fclose(infile);
 		return CE_MEMORY_ERROR;
 	}
 
@@ -214,19 +206,12 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 
 	if (!working)
 	{
-		free(buf);
-		jpeg_destroy_decompress(&jpegInfo);
-		fclose(infile);
 		return CE_ERROR_PARSING_SOURCE;
 	}
 
-	jpeg_finish_decompress(&jpegInfo);
-
-	fclose(infile);
-	
 	// ok, at this point we have read in the JPEG image to our buffer, now we need to write it out as a TGA file.
 	CUtlBuffer outBuf;
-	bool bRetVal = TGAWriter::WriteToBuffer( buf, outBuf, image_width, image_height, IMAGE_FORMAT_RGB888, IMAGE_FORMAT_RGB888 );
+	bool bRetVal = TGAWriter::WriteToBuffer( buf.get(), outBuf, image_width, image_height, IMAGE_FORMAT_RGB888, IMAGE_FORMAT_RGB888 );
 	if ( bRetVal )
 	{
 		if ( !g_pFullFileSystem->WriteFile( tgaPath, nullptr, outBuf ) )
@@ -235,7 +220,6 @@ ConversionErrorType ImgUtl_ConvertJPEGToTGA( const char *jpegpath, const char *t
 		}
 	}
 
-	free(buf);
 	return bRetVal ? CE_SUCCESS : CE_ERROR_WRITING_OUTPUT_FILE;
 }
 
