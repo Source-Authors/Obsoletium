@@ -311,12 +311,15 @@ static bool GetEntityOriginClientOrServer( int ent_num, Vector& origin )
 int ScreenPosition(const Vector& point, Vector& screen)
 {
 	AUTO_LOCK( s_OverlayMutex );
-	CMatRenderContextPtr pRenderContext( materials );
 
 	int retval = g_EngineRenderer->ClipTransform(point,&screen);
 	
 	int x, y, w, h;
-	pRenderContext->GetViewport( x, y, w, h );
+	
+	{
+		CMatRenderContextPtr pRenderContext( materials );
+		pRenderContext->GetViewport( x, y, w, h );
+	}
 
 	screen[0] =  screen[0] * w / 2;
 	screen[1] = -screen[1] * h / 2;
@@ -336,10 +339,13 @@ int ScreenPosition(float flXPos, float flYPos, Vector& screen)
 		return 1; // Fail
 
 	AUTO_LOCK( s_OverlayMutex );
-	CMatRenderContextPtr pRenderContext( materials );
 
 	int x, y, w, h;
-	pRenderContext->GetViewport( x, y, w, h );
+	
+	{
+		CMatRenderContextPtr pRenderContext( materials );
+		pRenderContext->GetViewport( x, y, w, h );
+	}
 
 	screen[0] =  flXPos * w;
 	screen[1] =  flYPos * h;
