@@ -128,10 +128,14 @@ static LRESULT CALLBACK TrackerWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, 
 			LeaveCriticalSection( &g_CS );
 
 			PAINTSTRUCT ps;
-			HDC hDC = BeginPaint( hwnd, &ps );		
+
+			HDC hDC = BeginPaint( hwnd, &ps );
+			RunCodeAtScopeExit(EndPaint( hwnd, &ps ));
+
 			for ( intp iState=0; iState < ssize( hStateColors ); iState++ )
 			{
 				HGDIOBJ hOldObj = SelectObject( hDC, hStateColors[iState] );
+				RunCodeAtScopeExit(SelectObject( hDC, hOldObj ));
 
 				for ( intp iWU=0; iWU < wuStatus.Count(); iWU++ )
 				{
@@ -142,10 +146,8 @@ static LRESULT CALLBACK TrackerWindowProc( HWND hwnd, UINT uMsg, WPARAM wParam, 
 					Rectangle( hDC, rc.left, rc.top, rc.right, rc.bottom );
 				}
 				
-				SelectObject( hDC, hOldObj );
 				DeleteObject( hStateColors[iState] );
 			}
-			EndPaint( hwnd, &ps );
 		}
 		break;
 		
