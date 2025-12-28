@@ -552,14 +552,14 @@ void CMapLoadHelper::Shutdown( void )
 		s_MapFileHandle = FILESYSTEM_INVALID_HANDLE;
 	}
 
-		// Close our open lump files
+	// Close our open lump files
 	for ( auto &f : s_MapLumpFiles )
-		{
+	{
 		if ( f.file )
-			{
+		{
 			g_pFileSystem->Close( f.file );
-			}
 		}
+	}
 	BitwiseClear( s_MapLumpFiles );
 
 	s_szLoadName[ 0 ] = 0;
@@ -5179,7 +5179,7 @@ bool CModelLoader::Map_IsValid( char const *pMapFile, bool bQuiet /* = false */ 
 		{
 			if ( header.version >= MINBSPVERSION && header.version <= BSPVERSION )
 			{
-				V_strncpy( s_szLastMapFile, szMapFile, sizeof( s_szLastMapFile ) );
+				V_strcpy_safe( s_szLastMapFile, szMapFile );
 				return true;
 			}
 			else
