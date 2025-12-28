@@ -2585,10 +2585,10 @@ void CDemoSmootherPanel::LoadSmoothingInfo( const char *filename, CSmoothingCont
 	}
 
 	demoheader_t * header = demoFile.ReadDemoHeader();
+	RunCodeAtScopeExit(demoFile.Close());
 
 	if ( !header )
 	{
-		demoFile.Close();
 		return;
 	}
 
@@ -2602,8 +2602,6 @@ void CDemoSmootherPanel::LoadSmoothingInfo( const char *filename, CSmoothingCont
 	ClearSmoothingInfo( smoothing );
 
 	ParseSmoothingInfo( demoFile, smoothing );
-	
-	demoFile.Close();
 	
 	//Performsmoothing( smooth );
 	//SaveSmoothedDemo( name, smooth );
