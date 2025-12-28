@@ -1760,8 +1760,10 @@ void CDemoPlayer::WriteTimeDemoResults( void )
 	RunCodeAtScopeExit(g_pFileSystem->Close(fileHandle));
 
 	int width, height;
+	{
 	CMatRenderContextPtr pRenderContext( materials );
 	pRenderContext->GetWindowSize( width, height );
+	}
 
 	const MaterialSystem_Config_t &config = materials->GetCurrentConfigForVideoCard();
 
