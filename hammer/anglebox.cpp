@@ -353,11 +353,13 @@ void CAngleBox::OnPaint(void)
 {
 	PAINTSTRUCT ps;
 	CDC *pDC = BeginPaint(&ps);
-
+	
 	if (pDC == NULL)
 	{
 		return;
 	}
+
+	RunCodeAtScopeExit(EndPaint(&ps));
 
 	CBrush brushWindow(GetSysColor(COLOR_3DFACE));
 	CBrush brushBlack(RGB(0, 0, 0));
@@ -401,8 +403,6 @@ void CAngleBox::OnPaint(void)
 	{
 		DrawAngleLine(pDC);
 	}
-
-	EndPaint(&ps);
 }
 
 
