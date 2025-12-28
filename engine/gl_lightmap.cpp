@@ -1009,7 +1009,7 @@ void R_RedownloadAllLightmaps()
 	{		
 		int iSurfaceCount = host_state.worldbrush->numsurfaces;
 		
-		SurfaceHandle_t *pSortedSurfaces = (SurfaceHandle_t *)stackalloc( sizeof( SurfaceHandle_t ) * iSurfaceCount );
+			SurfaceHandle_t *pSortedSurfaces = stackallocT( SurfaceHandle_t, iSurfaceCount );
 		for( int surfaceIndex = 0; surfaceIndex < iSurfaceCount; surfaceIndex++ )
 		{
 			SurfaceHandle_t surfID = SurfaceHandleFromIndex( surfaceIndex );
