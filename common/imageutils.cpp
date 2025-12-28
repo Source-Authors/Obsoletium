@@ -17,7 +17,7 @@
 #if defined( WIN32 ) && !defined( _X360 )
 #include "winlite.h"// SRC only!!
 #elif defined( POSIX )
-#include <stdio.h>
+#include <cstdio.>
 #include <sys/stat.h>
 #ifdef OSX
 #include <copyfile.h>
