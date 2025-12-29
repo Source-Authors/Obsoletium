@@ -1688,21 +1688,26 @@ void CVTFTexture::ComputeMipLevelDimensions( int iMipLevel, int *pMipWidth, int 
 {
 	Assert( iMipLevel < m_nMipCount );
 
-	*pMipWidth = m_nWidth >> iMipLevel;
-	*pMipHeight = m_nHeight >> iMipLevel;
-	*pMipDepth = m_nDepth >> iMipLevel;
-	if ( *pMipWidth < 1 )
+	int width = m_nWidth >> iMipLevel;
+	int height = m_nHeight >> iMipLevel;
+	int depth = m_nDepth >> iMipLevel;
+
+	if ( width < 1 )
 	{
-		*pMipWidth = 1;
+		width = 1;
 	}
-	if ( *pMipHeight < 1 )
+	if ( height < 1 )
 	{
-		*pMipHeight = 1;
+		height = 1;
 	}
-	if ( *pMipDepth < 1 )
+	if ( depth < 1 )
 	{
-		*pMipDepth = 1;
+		depth = 1;
 	}
+
+	*pMipWidth = width;
+	*pMipHeight = height;
+	*pMipDepth = depth;
 }
 
 
@@ -1745,7 +1750,8 @@ void CVTFTexture::ConvertImageFormat( ImageFormat fmt, bool bNormalToDUDV )
 		fmt = IMAGE_FORMAT_RGBA8888;
 	}
 
-	if ( bNormalToDUDV && !( fmt == IMAGE_FORMAT_UV88 || fmt == IMAGE_FORMAT_UVWQ8888 || fmt == IMAGE_FORMAT_UVLX8888 ) )
+	if ( bNormalToDUDV &&
+		!( fmt == IMAGE_FORMAT_UV88 || fmt == IMAGE_FORMAT_UVWQ8888 || fmt == IMAGE_FORMAT_UVLX8888 ) )
 	{
 		Assert( 0 );
 		return;
@@ -1756,18 +1762,9 @@ void CVTFTexture::ConvertImageFormat( ImageFormat fmt, bool bNormalToDUDV )
 		return;
 	}
 
-	if ( IsX360() && ( m_nVersion[0] == VTF_X360_MAJOR_VERSION ) )
-	{
-		// 360 textures should be baked in final format
-		Assert( 0 );
-		return;
-	}
-
 	// FIXME: Should this be re-written to not do an allocation?
-	intp iConvertedSize = ComputeTotalSize( fmt );
-
+	const intp iConvertedSize = ComputeTotalSize( fmt );
 	std::unique_ptr<byte[]> pConvertedImage = std::make_unique<byte[]>( iConvertedSize );
-
 	// This can happen for large, bogus textures.
 	if ( !pConvertedImage )
 		return;
@@ -1836,7 +1833,7 @@ void CVTFTexture::ConvertImageFormat( ImageFormat fmt, bool bNormalToDUDV )
 			m_nFlags |= TEXTUREFLAGS_EIGHTBITALPHA;
 			m_nFlags &= ~TEXTUREFLAGS_ONEBITALPHA;
 		}
-		if ( nAlphaBits <= 1 )
+		else
 		{
 			m_nFlags &= ~TEXTUREFLAGS_EIGHTBITALPHA;
 			if ( nAlphaBits == 0 )
