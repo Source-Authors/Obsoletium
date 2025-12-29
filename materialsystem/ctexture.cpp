@@ -3628,7 +3628,6 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 	int oldFrameCount = m_nFrameCount;
 
 	// FIXME: Should RenderTargets be a special case of Procedural?
-	char *pResolvedFilename = NULL;
 	IVTFTexture *pVTFTexture = NULL;
 	
 	{
@@ -3655,9 +3654,14 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 			char pCacheFileName[ MATERIAL_MAX_PATH ] = { 0 };
 			GetCacheFilename( pCacheFileName, ssize( pCacheFileName ) );
 		
+			char *pResolvedFilename = NULL;
+
 			// Get the data from disk...
 			// NOTE: Reloading the texture bits can cause the texture size, frames, format, pretty much *anything* can change.
 			pVTFTexture = LoadTextureBitsFromFile( pCacheFileName, &pResolvedFilename );
+
+			// allocated by strdup
+			free( pResolvedFilename );
 		}
 	}
 
@@ -3759,9 +3763,6 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 	pVTFTexture = NULL;
 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Final Cleanup", __FUNCTION__ );
-
-	// allocated by strdup
-	free( pResolvedFilename );
 
 	// the pc can afford to persist a large buffer
 	FreeOptimalReadBuffer( 6*1024*1024 );
