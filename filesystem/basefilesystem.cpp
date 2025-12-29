@@ -364,52 +364,6 @@ InitReturnVal_t CBaseFileSystem::Init()
 
 	InitAsync();
 
-	if ( IsX360() && m_DVDMode == DVDMODE_DEV )
-	{
-		// exclude paths are valid ony in dvddev mode
-		char szExcludeFile[MAX_PATH];
-		const char *pRemotePath = CommandLine()->ParmValue( "-remote" );
-		const char *pBasePath = CommandLine()->ParmValue( "-basedir" );
-		if ( pRemotePath && pBasePath )
-		{
-			// the optional exclude path file only exists at the remote path
-			V_ComposeFileName( pRemotePath, "xbox_exclude_paths.txt", szExcludeFile );
-
-			// populate the exclusion list
-			CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
-			if ( ReadFile( szExcludeFile, nullptr, buf, 0, 0 ) )
-			{
-				constexpr characterset_t breakSet{""};
-				char szPath[MAX_PATH];
-				char szToken[MAX_PATH];
-				for ( ;; )
-				{
-					intp nTokenSize = buf.ParseToken( &breakSet, szToken );
-					if ( nTokenSize <= 0 )
-					{
-						break;
-					}
-
-					char *pToken = szToken;
-					if ( pToken[0] == '\\' )
-					{
-						// skip past possible initial seperator
-						pToken++;
-					}
-
-					V_ComposeFileName( pBasePath, pToken, szPath );
-					V_AppendSlash( szPath );
-					
-					FileNameHandle_t hFileName = FindOrAddFileName( szPath );
-					if ( m_ExcludePaths.Find( hFileName ) == -1 )
-					{
-						m_ExcludePaths.AddToTail( hFileName );
-					}
-				}
-			}
-		}
-	}
-
 	return INIT_OK;
 }
 
@@ -418,7 +372,6 @@ void CBaseFileSystem::Shutdown()
 	ShutdownAsync();
 	m_FileTracker2.ShutdownAsync();
 
-#ifndef _X360
 	if( m_pLogFile )
 	{
 		if( CommandLine()->FindParm( "-fs_logbins" ) >= 0 )
@@ -468,7 +421,6 @@ void CBaseFileSystem::Shutdown()
 		fprintf( m_pLogFile, ":done\n" );
 		fclose( m_pLogFile ); // STEAM OK
 	}
-#endif
 
 	UnloadCompiledKeyValues();
 
