@@ -22,6 +22,7 @@
 #include "tier1/checksum_crc.h"
 #include "tier1/byteswap.h"
 #include "tier1/utlstring.h"
+#include "posix_file_stream.h"
 
 #include "tier1/lzmaDecoder.h"
 
@@ -1250,24 +1251,26 @@ bool CZipFile::FileExistsInZip( const char *pRelativeName )
 //-----------------------------------------------------------------------------
 void CZipFile::AddFileToZip( const char *relativename, const char *fullpath, IZip::eCompressionType compressionType )
 {
-	FILE *temp = fopen( fullpath, "rb" );
-	if ( !temp )
+	auto [temp, rc] = se::posix::posix_file_stream_factory::open( fullpath, "rb" );
+	if ( rc )
 		return;
 
+	int64_t size;
 	// Determine length
-	fseek( temp, 0, SEEK_END );
-	int size = ftell( temp );
-	fseek( temp, 0, SEEK_SET );
-	byte *buf = (byte *)malloc( size + 1 );
+	std::tie(size, rc) = temp.size();
+	if ( rc )
+		return;
 
+	std::unique_ptr<byte[]> buf = std::make_unique<byte[]>(size + 1);
+
+	size_t read;
 	// Read data
-	fread( buf, size, 1, temp );
-	fclose( temp );
+	std::tie(read, rc) = temp.read( buf.get(), size, 1, size );
+	if ( rc || size_cast<int64>( read ) != size )
+		return;
 
 	// Now add as a buffer
-	AddBufferToZip( relativename, buf, size, false, compressionType );
-
-	free( buf );
+	AddBufferToZip( relativename, buf.get(), size, false, compressionType );
 }
 
 //-----------------------------------------------------------------------------
