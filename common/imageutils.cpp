@@ -340,27 +340,27 @@ static [[nodiscard]] bool WriteTGAHeader(FILE *outfile, TGAHeader &header)
 
 	size_t write = fwrite(&header.identsize, sizeof(header.identsize), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.colourmaptype, sizeof(header.colourmaptype), 1, outfile);
+	write = fwrite(&header.colourmaptype, sizeof(header.colourmaptype), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.imagetype, sizeof(header.imagetype), 1, outfile);
+	write = fwrite(&header.imagetype, sizeof(header.imagetype), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.colourmapstart, sizeof(header.colourmapstart), 1, outfile);
+	write = fwrite(&header.colourmapstart, sizeof(header.colourmapstart), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.colourmaplength, sizeof(header.colourmaplength), 1, outfile);
+	write = fwrite(&header.colourmaplength, sizeof(header.colourmaplength), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.colourmapbits, sizeof(header.colourmapbits), 1, outfile);
+	write = fwrite(&header.colourmapbits, sizeof(header.colourmapbits), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.xstart, sizeof(header.xstart), 1, outfile);
+	write = fwrite(&header.xstart, sizeof(header.xstart), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.ystart, sizeof(header.ystart), 1, outfile);
+	write = fwrite(&header.ystart, sizeof(header.ystart), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.width, sizeof(header.width), 1, outfile);
+	write = fwrite(&header.width, sizeof(header.width), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.height, sizeof(header.height), 1, outfile);
+	write = fwrite(&header.height, sizeof(header.height), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.bits, sizeof(header.bits), 1, outfile);
+	write = fwrite(&header.bits, sizeof(header.bits), 1, outfile);
 	if (write != 1) return false;
-	fwrite(&header.descriptor, sizeof(header.descriptor), 1, outfile);
+	write = fwrite(&header.descriptor, sizeof(header.descriptor), 1, outfile);
 	if (write != 1) return false;
 
 	return true;
