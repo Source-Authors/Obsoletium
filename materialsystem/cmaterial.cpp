@@ -2671,7 +2671,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImageProperties( int *width, int *heig
 		return MATERIAL_NO_PREVIEW_IMAGE;
 	}
 
-	unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
+	constexpr unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 	unsigned char *pMem = stackallocT( unsigned char, nHeaderSize );
 	CUtlBuffer buf( pMem, nHeaderSize );
 	if( !g_pFullFileSystem->ReadFile( pFileName, NULL, buf, nHeaderSize ) )
@@ -2700,7 +2700,6 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 					             ImageFormat imageFormat ) const
 {
 	CUtlBuffer buf;
-	unsigned short nHeaderSize;
 	intp nImageOffset, nImageSize;
 
 	char const* pFileName = GetPreviewImageFileName();
@@ -2726,7 +2725,7 @@ PreviewImageRetVal_t CMaterial::GetPreviewImage( unsigned char *pData, int width
 
 	RunCodeAtScopeExit(g_pFullFileSystem->Close(fileHandle));
 
-	nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
+	constexpr unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 	buf.EnsureCapacity( nHeaderSize );
 	
 	// read the header first.. it's faster!!

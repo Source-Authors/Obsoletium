@@ -357,16 +357,9 @@ IVTFTexture *CreateVTFTexture();
 void DestroyVTFTexture( IVTFTexture *pTexture );
 
 //-----------------------------------------------------------------------------
-// Allows us to only load in the first little bit of the VTF file to get info
-// Clients should read this much into a UtlBuffer and then pass it in to
-// Unserialize
-//-----------------------------------------------------------------------------
-unsigned short VTFFileHeaderSize( int nMajorVersion = -1, int nMinorVersion = -1 );
-
-//-----------------------------------------------------------------------------
 // 360 Conversion
 //-----------------------------------------------------------------------------
-typedef bool (*CompressFunc_t)( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer );
+using CompressFunc_t = bool (*)( CUtlBuffer &inputBuffer, CUtlBuffer &outputBuffer );
 
 #include "mathlib/vector.h"
 
@@ -617,5 +610,54 @@ struct TextureStreamSettings_t
 };
 
 #pragma pack()
+
+
+#ifndef VTF_FILE_FORMAT_ONLY
+//-----------------------------------------------------------------------------
+// Allows us to only load in the first little bit of the VTF file to get info
+// Clients should read this much into a UtlBuffer and then pass it in to
+// Unserialize
+//-----------------------------------------------------------------------------
+constexpr [[nodiscard]] unsigned short VTFFileHeaderSize( int nMajorVersion = -1, int nMinorVersion = -1 )
+{
+	if ( nMajorVersion == -1 )
+	{
+		nMajorVersion = VTF_MAJOR_VERSION;
+	}
+
+	if ( nMinorVersion == -1 )
+	{
+		nMinorVersion = VTF_MINOR_VERSION;
+	}
+
+	switch ( nMajorVersion )
+	{
+	case VTF_MAJOR_VERSION:
+		switch ( nMinorVersion )
+		{
+		case 0: // fall through
+		case 1:
+			return sizeof( VTFFileHeaderV7_1_t );
+		case 2:
+			return sizeof( VTFFileHeaderV7_2_t );
+		case 3:
+			return sizeof( VTFFileHeaderV7_3_t ) + sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES; //-V119
+		case VTF_MINOR_VERSION:
+		// dimhotepus: CS-GO backport.
+		case 5:
+			constexpr size_t size1 = sizeof( VTFFileHeader_t );
+			constexpr size_t size2 = sizeof( ResourceEntryInfo ) * MAX_RSRC_DICTIONARY_ENTRIES;
+			constexpr size_t result = size1 + size2;
+			return static_cast<unsigned int>(result);
+		}
+		break;
+	
+	case VTF_X360_MAJOR_VERSION:
+		return sizeof( VTFFileHeaderX360_t ) + sizeof( ResourceEntryInfo ) * MAX_X360_RSRC_DICTIONARY_ENTRIES; //-V119
+	}
+
+	return 0;
+}
+#endif
 
 #endif // VTF_H

@@ -2764,7 +2764,7 @@ void CTexture::Precache()
 	char pCacheFileName[MATERIAL_MAX_PATH];
 	Q_snprintf( pCacheFileName, sizeof( pCacheFileName ), "materials/%s" TEXTURE_FNAME_EXTENSION, m_Name.String() );
 
-	unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
+	constexpr unsigned short nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 	unsigned char *pMem = (unsigned char *)stackalloc( nHeaderSize );
 	CUtlBuffer buf( pMem, nHeaderSize );
 	if ( !g_pFullFileSystem->ReadFile( pCacheFileName, NULL, buf, nHeaderSize ) )	
@@ -4120,26 +4120,20 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 	// NOTE! NOTE! NOTE! or by the streaming texture code!
 	Assert( ppOutVtfTexture != NULL && *ppOutVtfTexture != NULL );
 
-	// dimhotepus: Drop debug code.
-	//if ( V_strstr( pName, "c_rocketlauncher/c_rocketlauncher" ) )
-	//{
-	//	int i = 0;
-	//	i = 3;
-	//}
-
 	CUtlBuffer buf;
 
 	{
 		tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - ReadHeaderFromFile", __FUNCTION__ );
-		unsigned int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
+		constexpr unsigned int nHeaderSize = VTFFileHeaderSize( VTF_MAJOR_VERSION );
 
 		// restrict read to the header only!
 		// header provides info to avoid reading the entire file
 		int nBytesOptimalRead = GetOptimalReadBuffer( &buf, hFile, nHeaderSize );
 		int nBytesRead = g_pFullFileSystem->ReadEx( buf.Base(), nBytesOptimalRead, Min( nHeaderSize, ( unsigned ) g_pFullFileSystem->Size( hFile ) ), hFile ); // only read as much as the file has
 		buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
-		nBytesRead = nHeaderSize = ( buf.Base<VTFFileBaseHeader_t>() )->headerSize;
-		g_pFullFileSystem->Seek( hFile, nHeaderSize, FILESYSTEM_SEEK_HEAD );
+		unsigned nRealHeaderSize;
+		nBytesRead = nRealHeaderSize = ( buf.Base<VTFFileBaseHeader_t>() )->headerSize;
+		g_pFullFileSystem->Seek( hFile, nRealHeaderSize, FILESYSTEM_SEEK_HEAD );
 	}
 
 	// Unserialize the header only
@@ -4179,6 +4173,8 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 	// Read only the portion of the file that we care about
 	g_pFullFileSystem->Seek( hFile, 0, FILESYSTEM_SEEK_HEAD );
 	int nBytesOptimalRead = GetOptimalReadBuffer( &buf, hFile, nFileSize );
+	RunCodeAtScopeExit(FreeOptimalReadBuffer( 6*1024*1024 ));
+
 	int nBytesRead = g_pFullFileSystem->ReadEx( buf.Base(), nBytesOptimalRead, nFileSize, hFile );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 
@@ -4191,9 +4187,6 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 
 	// NOTE: Skipping mip levels here will cause the size to be changed
 	bool bRetVal = ( *ppOutVtfTexture )->UnserializeEx( buf, false, nForceFlags, nMipSkipCount );
-
-	FreeOptimalReadBuffer( 6*1024*1024 );
-
 	if ( !bRetVal )
 	{
 		Warning( "Error reading texture data \"%s\"\n", pCacheFileName );
