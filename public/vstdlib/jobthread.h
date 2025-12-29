@@ -207,7 +207,8 @@ public:
 	//-----------------------------------------------------
 	// Add an function object to the queue (master thread)
 	//-----------------------------------------------------
-	virtual void AddFunctor( CFunctor *pFunctor, CJob **ppJob = nullptr, const char *pszDescription = nullptr, unsigned flags = 0 ) { AddFunctorInternal( RetAddRef( pFunctor ), ppJob, pszDescription, flags ); }
+	// dimhotepus: flags unsigned -> unsigned char
+	virtual void AddFunctor( CFunctor *pFunctor, CJob **ppJob = nullptr, const char *pszDescription = nullptr, unsigned char flags = 0 ) { AddFunctorInternal( RetAddRef( pFunctor ), ppJob, pszDescription, flags ); }
 
 	//-----------------------------------------------------
 	// Change the priority of an active job
@@ -543,7 +544,8 @@ public:
 	}
 
 private:
-	virtual void AddFunctorInternal( CFunctor *, CJob ** = nullptr, const char *pszDescription = nullptr, unsigned flags = 0 ) = 0;
+	// dimhotepus: flags unsigned -> unsigned char
+	virtual void AddFunctorInternal( CFunctor *, CJob ** = nullptr, const char *pszDescription = nullptr, unsigned char flags = 0 ) = 0;
 
 	//-----------------------------------------------------
 	// Services for internal use by job instances
@@ -1097,7 +1099,7 @@ template <class ITEM_PROCESSOR_TYPE>
 class CParallelLoopProcessor
 {
 public:
-	explicit CParallelLoopProcessor( const char *pszDescription )
+	explicit CParallelLoopProcessor( const char *pszDescription ) : m_ItemProcessor{}
 	{
 		m_lIndex.store( 0, std::memory_order::memory_order_relaxed );
 		m_lLimit = 0;

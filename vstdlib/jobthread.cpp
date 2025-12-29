@@ -230,7 +230,8 @@ public:
 	//-----------------------------------------------------
 	// Add an function object to the queue (master thread)
 	//-----------------------------------------------------
-	void AddFunctorInternal( CFunctor *, CJob ** = nullptr, const char *pszDescription = nullptr, unsigned flags = 0 ) override;
+	// dimhotepus: flags unsigned -> unsigned char
+	void AddFunctorInternal( CFunctor *, CJob ** = nullptr, const char *pszDescription = nullptr, unsigned char flags = 0 ) override;
 
 	//-----------------------------------------------------
 	// Remove a job from the queue (master thread)
@@ -759,7 +760,8 @@ void CThreadPool::InsertJobInQueue( CJob *pJob )
 // Add an function object to the queue (master thread)
 //---------------------------------------------------------
 
-void CThreadPool::AddFunctorInternal( CFunctor *pFunctor, CJob **ppJob, const char *pszDescription, unsigned flags )
+// dimhotepus: flags unsigned -> unsigned char
+void CThreadPool::AddFunctorInternal( CFunctor *pFunctor, CJob **ppJob, const char *pszDescription, unsigned char flags )
 {
 	// Note: assumes caller has handled refcount
 	CJob *pJob = new CFunctorJob( pFunctor, pszDescription );
