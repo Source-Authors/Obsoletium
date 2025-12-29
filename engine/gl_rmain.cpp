@@ -297,6 +297,10 @@ CRender::CRender()
 	intp i = m_ViewStack.Push();
 	memset( &m_ViewStack[i], 0, sizeof( CViewSetup ) );
 	m_ViewStack[i].m_bIs2DView = true;
+
+	m_yFOV = -1;
+	m_framerate = -1;
+	m_zNear = m_zFar = -1;
 	m_iLightmapUpdateDepth = 0;
 }
 
