@@ -24,6 +24,8 @@
 #include <fcntl.h>
 #endif
 
+#include "posix_file_stream.h"
+
 #include "tier0/memdbgon.h"
 // Benchmark mode uses this heavy-handed method 
 
@@ -90,18 +92,33 @@ From https://man7.org/linux/man-pages/man5/proc.5.html:
                   dt         (7) dirty pages (unused in Linux 2.6)
 */
 
-// This returns the resident memory size (RES column in 'top') in bytes.
+	// This returns the resident memory size (RES column in 'top') in bytes.
 	size_t nRet = 0;
-	FILE *pFile = fopen( "/proc/self/statm", "r" );
-	if ( pFile )
+
+	constexpr char kStatsFilePath[] = "/proc/self/statm";
+
+	auto [file, rc] = se::posix::posix_file_stream_factory::open( kStatsFilePath, "r" );
+	if ( !rc )
 	{
 		size_t nSize, nResident, nShare, nText, nLib_Unused, nDataPlusStack, nDt_Unused;
-		if ( fscanf( pFile, "%zu %zu %zu %zu %zu %zu %zu", &nSize, &nResident, &nShare, &nText, &nLib_Unused, &nDataPlusStack, &nDt_Unused ) >= 2 )
+		if ( auto [read, rc2] = file.scan( "%zu %zu %zu %zu %zu %zu %zu",
+				&nSize, &nResident, &nShare, &nText, &nLib_Unused, &nDataPlusStack, &nDt_Unused );
+			 !rc2 && read >= 2 )
 		{
 			nRet = 4096 * nResident;
 		}
-		fclose( pFile );
+		else
+		{
+			Warning( "Unable to read resident memory size from %s: missed resident memory value.\n",
+				kStatsFilePath );
+		}
 	}
+	else
+	{
+		Warning( "Unable to read resident memory size from %s: %s.\n",
+			kStatsFilePath, rc.message().c_str() );
+	}
+
 	return nRet;
 }
 
@@ -111,13 +128,15 @@ static void InitTimeSystem( void )
 {
 	s_bTimeInitted = true;
 
-	// now, see if we can use rdtsc instead. If this is one of the chips with a separate constant clock for rdtsc, we can
-	FILE *pCpuInfo = fopen( "/proc/cpuinfo", "r" );
-	if ( pCpuInfo )
+	// now, see if we can use rdtsc instead.
+	// If this is one of the chips with a separate constant clock for rdtsc, we can
+	auto [file, rc] = se::posix::posix_file_stream_factory::open("/proc/cpuinfo", "r");
+	if ( !rc )
 	{
 		bool bAnyBadCores = false;
 		char lbuf[2048];
-		while( fgets( lbuf, sizeof( lbuf ), pCpuInfo ) )
+
+		while( std::get<char*>( file.gets( lbuf ) ) )
 		{
 			if ( memcmp( lbuf, "flags", 4 ) == 0 )
 			{
@@ -128,7 +147,7 @@ static void InitTimeSystem( void )
 				}
 			}
 		}
-		fclose( pCpuInfo );
+
 		if ( ! bAnyBadCores )
 		{
 			// this system appears to have the proper cpu setup to use rdtsc from reliable timing. Let's either read the cpu frequency from an
