@@ -919,9 +919,9 @@ void CacheAndUnloadLightmapData()
 	for ( int i = 0; i < numSurfaces; ++i, ++pLighting )
 	{
 		int nStyleCt = 0;
-		for ( int map = 0 ; map < MAXLIGHTMAPS; ++map )
+		for ( auto s : pLighting->m_nStyles )
 		{
-			if ( pLighting->m_nStyles[map] != 255 )
+			if ( s != 255 )
 				++nStyleCt;
 		}
 
