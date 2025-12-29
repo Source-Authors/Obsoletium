@@ -617,7 +617,7 @@ static void ReadPNGData( png_structp png_ptr, png_bytep outBytes, png_size_t byt
 	}
 
 	// Read the bytes
-	pBuf->Get( outBytes, byteCountToRead );
+	pBuf->Get( outBytes, byteCountToRead ); //-V2002
 }
 
 
@@ -1488,7 +1488,7 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 	Q_strncpy(tgaPath, pInPath, sizeof(tgaPath));
 
 	// Construct a TGA version if necessary
-	if (stricmp(extension, "tga"))
+	if (stricmp(extension, "tga") != 0)
 	{
 		//  It is not a TGA file, so create a temporary file name for the TGA you have to create
 
@@ -1654,7 +1654,7 @@ ConversionErrorType	ImgUtl_ConvertToVTFAndDumpVMT( const char *pInPath, const ch
 		//g_pFullFileSystem->CreateDirHierarchy("materials/VGUI/logos/", "GAME");
 
 		// write out the spray VMT file.
-		if ( strcmp(vtfPath, finalPath) )  // If they're not already the same
+		if ( strcmp(vtfPath, finalPath) != 0 )  // If they're not already the same
 		{
 			nErrorCode = ImgUtl_WriteGenericVMT(finalPath, pMaterialsSubDir);
 			if (nErrorCode != CE_SUCCESS)
@@ -1759,7 +1759,7 @@ static void WritePNGData( png_structp png_ptr, png_bytep inBytes, png_size_t byt
 	Assert( pBuf );
 
 	// Write the bytes
-	pBuf->Put( inBytes, byteCountToWrite );
+	pBuf->Put( inBytes, byteCountToWrite ); //-V2002
 
 	// What?  Put() returns void.  No way to detect error?
 }
@@ -1863,7 +1863,7 @@ METHODDEF(boolean) empty_output_buffer (j_compress_ptr cinfo)
 	CUtlBuffer *buf = dest->pBuffer;
 
 	// Add some data
-	buf->Put( dest->buffer, JPEG_OUTPUT_BUF_SIZE );
+	buf->Put( dest->buffer, JPEG_OUTPUT_BUF_SIZE ); //-V2002
 
 	dest->pub.next_output_byte = dest->buffer;
 	dest->pub.free_in_buffer = JPEG_OUTPUT_BUF_SIZE;
@@ -1889,7 +1889,7 @@ METHODDEF(void) term_destination (j_compress_ptr cinfo)
 	/* Write any data remaining in the buffer */
 	if (datacount > 0) 
 	{
-		buf->Put( dest->buffer, datacount );
+		buf->Put( dest->buffer, datacount ); //-V2002
 	}
 }
 
