@@ -163,10 +163,9 @@ void R_DrawPortals()
 	}
 
 	// Draw the clip rectangles.
-	for( intp i=0; i < g_PortalRects.Count(); i++ )
+	for( auto &rect : g_PortalRects )
 	{
-		CPortalRect *pRect = &g_PortalRects[i];
-		R_DrawScreenRect( pRect->left, pRect->top, pRect->right, pRect->bottom );
+		R_DrawScreenRect( rect.left, rect.top, rect.right, rect.bottom );
 	}
 	g_PortalRects.Purge();
 }
