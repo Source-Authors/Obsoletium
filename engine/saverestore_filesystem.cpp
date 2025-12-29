@@ -38,15 +38,15 @@ CON_COMMAND( audit_save_in_memory, "Audit the memory usage and files in the save
 	g_pSaveRestoreFileSystem->AuditFiles();
 }
 
-#define FILECOPYBUFSIZE (1024 * 1024)
-
 //-----------------------------------------------------------------------------
 // Purpose: Copy one file to another file
 //-----------------------------------------------------------------------------
 static bool FileCopy( FileHandle_t pOutput, FileHandle_t pInput, int fileSize )
 {
+	constexpr int FILECOPYBUFSIZE{1024 * 1024};
+
 	// allocate a reasonably large file copy buffer, since otherwise write performance under steam suffers
-	char	*buf = (char *)malloc(FILECOPYBUFSIZE);
+	std::unique_ptr<char[]>	buf = std::make_unique<char[]>(FILECOPYBUFSIZE);
 	int		size;
 	int		readSize;
 	bool	success = true;
@@ -57,19 +57,19 @@ static bool FileCopy( FileHandle_t pOutput, FileHandle_t pInput, int fileSize )
 			size = FILECOPYBUFSIZE;
 		else
 			size = fileSize;
-		if ( ( readSize = g_pSaveRestoreFileSystem->Read( buf, size, pInput ) ) < size )
+
+		if ( ( readSize = g_pSaveRestoreFileSystem->Read( buf.get(), size, pInput ) ) < size )
 		{
 			Warning( "Unexpected end of file expanding save game\n" );
 			fileSize = 0;
 			success = false;
 			break;
 		}
-		g_pSaveRestoreFileSystem->Write( buf, readSize, pOutput );
+		g_pSaveRestoreFileSystem->Write( buf.get(), readSize, pOutput );
 		
 		fileSize -= size;
 	}
 
-	free(buf);
 	return success;
 }
 
