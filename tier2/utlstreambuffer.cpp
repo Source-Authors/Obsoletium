@@ -111,7 +111,7 @@ void CUtlStreamBuffer::Close()
 		}
 	}
 
-	if ( m_hFileHandle != FILESYSTEM_INVALID_HANDLE )
+	if ( m_hFileHandle )
 	{
 		if ( g_pFullFileSystem )
 			g_pFullFileSystem->Close( m_hFileHandle );

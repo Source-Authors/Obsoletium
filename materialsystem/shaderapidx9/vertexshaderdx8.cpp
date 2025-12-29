@@ -1632,8 +1632,7 @@ retry_compile:
 
 	// Try and open the file to see if it exists
 	FileHandle_t fp = g_pFullFileSystem->Open( filename, "r" );
-
-	if ( fp == FILESYSTEM_INVALID_HANDLE )
+	if ( !fp )
 	{
 		// Maybe this is a specific version [20 & 20b] -> [2x]
 		if ( strlen( pShaderName ) >= 3 )
@@ -1685,7 +1684,7 @@ retry_compile:
 		}
 	}
 
-	if ( fp != FILESYSTEM_INVALID_HANDLE )
+	if ( fp )
 	{
 		g_pFullFileSystem->Close( fp );
 	}
