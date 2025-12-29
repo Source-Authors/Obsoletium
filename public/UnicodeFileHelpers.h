@@ -18,13 +18,13 @@
 [[nodiscard]] ucs2 *AdvanceOverWhitespace(ucs2 *start);
 ucs2 *ReadUnicodeToken(ucs2 *start, OUT_CAP(tokenBufferSize) ucs2 *token, intp tokenBufferSize, bool &quoted);
 template<intp tokenSize>
-ucs2 *ReadUnicodeToken(ucs2 *start, ucs2 (&token)[tokenSize], bool &quoted)
+ucs2 *ReadUnicodeToken(ucs2 *start, OUT_Z_ARRAY ucs2 (&token)[tokenSize], bool &quoted)
 {
 	return ReadUnicodeToken( start, token, tokenSize, quoted );
 }
 ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, OUT_CAP(tokenBufferSize) ucs2 *token, intp tokenBufferSize, bool &quoted);
 template<intp tokenSize>
-ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, ucs2 (&token)[tokenSize], bool &quoted)
+ucs2 *ReadUnicodeTokenNoSpecial(ucs2 *start, OUT_Z_ARRAY ucs2 (&token)[tokenSize], bool &quoted)
 {
 	return ReadUnicodeTokenNoSpecial( start, token, tokenSize, quoted );
 }
