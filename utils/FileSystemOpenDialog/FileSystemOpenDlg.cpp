@@ -542,7 +542,7 @@ void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 {
 	// Build a dictionary with all the .jpeg files.
 	CUtlDict<int,int> jpgFiles;
-	for ( int i=0; i < files.Count(); i++ )
+	for ( intp i=0; i < files.Count(); i++ )
 	{
 		// dimhotepus: Honor .jpeg.
 		CString extension = files[i].Right( 5 );
@@ -555,7 +555,7 @@ void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 	}
 
 	// Now look for all mdls and remove them if they have a jpg.
-	for ( int i=0; i < files.Count(); i++ )
+	for ( intp i=0; i < files.Count(); i++ )
 	{
 		CString extension = files[i].Right( 4 ); //-V112
 		extension.MakeLower();
@@ -567,7 +567,7 @@ void FilterMdlAndJpgFiles( CUtlVector<CString> &files )
 				files.Remove( i );
 				--i;
 			}
-		}		
+		}
 	}
 }
 
