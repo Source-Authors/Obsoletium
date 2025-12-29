@@ -832,17 +832,17 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 
 	// get the data from the backbuffer and save to disk
 	// bitmap bits
-	unsigned char *pImage = ( unsigned char * )malloc( width * height * 3 );
+	std::unique_ptr<byte[]> pImage = std::make_unique<byte[]>( width * height * 3 );
 
 	// Get Bits from the material system
-	pRenderContext->ReadPixels( 0, 0, width, height, pImage, IMAGE_FORMAT_RGB888 );
+	pRenderContext->ReadPixels( 0, 0, width, height, pImage.get(), IMAGE_FORMAT_RGB888 );
 
 	// Some stuff to be setup dependent on padded vs. not padded
 	int nSrcWidth, nSrcHeight;
 	unsigned char *pSrcImage;
 
 	// Create a padded version if necessary
-	unsigned char *pPaddedImage = NULL;
+	std::unique_ptr<byte[]> pPaddedImage;
 	if ( bCreatePowerOf2Padded )
 	{
 		// Setup dimensions as needed
@@ -851,30 +851,30 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 
 		// Allocate
 		int nPaddedImageSize = nPaddedWidth * nPaddedHeight * 3;
-		pPaddedImage = ( unsigned char * )malloc( nPaddedImageSize );
+		pPaddedImage = std::make_unique<byte[]>( nPaddedImageSize );
 		
 		// Zero out the entire thing
-		V_memset( pPaddedImage, 255, nPaddedImageSize );
+		V_memset( pPaddedImage.get(), 255, nPaddedImageSize );
 
 		// Copy over each row individually
 		for ( int nRow = 0; nRow < height; ++nRow )
 		{
-			unsigned char *pDst = pPaddedImage + 3 * ( nRow * nPaddedWidth );
-			const unsigned char *pSrc = pImage + 3 * ( nRow * width );
+			unsigned char *pDst = pPaddedImage.get() + 3 * ( nRow * nPaddedWidth );
+			const unsigned char *pSrc = pImage.get() + 3 * ( nRow * width );
 			V_memcpy( pDst, pSrc, 3 * width );
 		}
 
 		// Setup source data
 		nSrcWidth = nPaddedWidth;
 		nSrcHeight = nPaddedHeight;
-		pSrcImage = pPaddedImage;
+		pSrcImage = pPaddedImage.get();
 	}
 	else
 	{
 		// Use non-padded info
 		nSrcWidth = width;
 		nSrcHeight = height;
-		pSrcImage = pImage;
+		pSrcImage = pImage.get();
 	}
 
 	// allocate a buffer to write the tga into
@@ -924,13 +924,10 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 	{
 		Error( "Couldn't write bitmap data snapshot.\n" );
 	}
-	
-	free( pImage );
-	free( pPaddedImage );
 
 	// async write to disk (this will take ownership of the memory)
 	char szPathedFileName[MAX_PATH];
-	Q_snprintf( szPathedFileName, sizeof(szPathedFileName), "//MOD/%s", pFilename );
+	V_sprintf_safe( szPathedFileName, "//MOD/%s", pFilename );
 
 	filesystem->AsyncWrite( szPathedFileName, buffer.Base(), buffer.TellPut(), true );
 
