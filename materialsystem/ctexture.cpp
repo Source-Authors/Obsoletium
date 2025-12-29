@@ -4481,7 +4481,7 @@ int GetOptimalReadBuffer( CUtlBuffer* pOutOptimalBuffer, FileHandle_t hFile, int
 	Assert( pOutOptimalBuffer != NULL );
 
 	// get an optimal read buffer, only resize if necessary
-	const int minSize = 2 * 1024 * 1024;	// Uses 2MB min to avoid fragmentation
+	constexpr int minSize = 2 * 1024 * 1024;	// Uses 2MB min to avoid fragmentation
 	nSize = max( nSize, minSize );
 	int nBytesOptimalRead = g_pFullFileSystem->GetOptimalReadSize( hFile, nSize );
 
