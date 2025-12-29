@@ -188,6 +188,8 @@ void R_DrawPortals()
 	if( !r_DrawPortals.GetInt() )
 		return;
 
+	// dimhotepus: Reduce render context scope.
+	{
 	IMaterial *pMaterial = materials->FindMaterial( "debug/debugportals", TEXTURE_GROUP_OTHER );
 	CMatRenderContextPtr pRenderContext( materials );
 	IMesh *pMesh = pRenderContext->GetDynamicMesh( true, NULL, NULL, pMaterial );
@@ -217,6 +219,7 @@ void R_DrawPortals()
 		}
 
 		builder.End( false, true );
+	}
 	}
 
 	// Draw the clip rectangles.
@@ -631,6 +634,7 @@ void CRender::Push3DView( const CViewSetup &view, int nFlags, ITexture* pRenderT
 
 	if ( !m_ViewStack[i].m_bNoDraw )
 	{
+		{
 		CMatRenderContextPtr pRenderContext( materials );
 
 		if ( !pRenderTarget )
@@ -656,6 +660,7 @@ void CRender::Push3DView( const CViewSetup &view, int nFlags, ITexture* pRenderT
 
 		pRenderContext->MatrixMode( MATERIAL_MODEL );
 		pRenderContext->PushMatrix();
+		}
 
 		OnViewActive( frustumPlanes );
 	}

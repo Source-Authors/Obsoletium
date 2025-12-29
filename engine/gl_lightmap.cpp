@@ -1002,52 +1002,54 @@ void R_RedownloadAllLightmaps()
 		bOnlyUseLightStyles = true;
 	}
 
-	// Can't build lightmaps if the source data has been dumped
-	CMatRenderContextPtr pRenderContext( materials );
-	ICallQueue *pCallQueue = pRenderContext->GetCallQueue();
-	if ( !host_state.worldbrush->unloadedlightmaps )
-	{		
-		int iSurfaceCount = host_state.worldbrush->numsurfaces;
+	{
+		// Can't build lightmaps if the source data has been dumped
+		CMatRenderContextPtr pRenderContext( materials );
+		ICallQueue *pCallQueue = pRenderContext->GetCallQueue();
+		if ( !host_state.worldbrush->unloadedlightmaps )
+		{
+			int iSurfaceCount = host_state.worldbrush->numsurfaces;
 		
 			SurfaceHandle_t *pSortedSurfaces = stackallocT( SurfaceHandle_t, iSurfaceCount );
-		for( int surfaceIndex = 0; surfaceIndex < iSurfaceCount; surfaceIndex++ )
-		{
-			SurfaceHandle_t surfID = SurfaceHandleFromIndex( surfaceIndex );
-			pSortedSurfaces[surfaceIndex] = surfID;
-		}
-
-		SortSurfacesByLightmapID( pSortedSurfaces, iSurfaceCount ); //sorts in place, so now the array really is sorted
-
-		if( pCallQueue )
-			pCallQueue->QueueCall( materials, &IMaterialSystem::BeginUpdateLightmaps );
-		else
-			materials->BeginUpdateLightmaps();
-		
-		matrix3x4_t xform;
-		SetIdentityMatrix(xform);
-		for( int surfaceIndex = 0; surfaceIndex < iSurfaceCount; surfaceIndex++ )
-		{
-			SurfaceHandle_t surfID = pSortedSurfaces[surfaceIndex];
-
-			ASSERT_SURF_VALID( surfID );
-			R_BuildLightMap( &cl_dlights[0], pCallQueue, surfID, xform, bOnlyUseLightStyles );
-		}
-
-		if( pCallQueue )
-			pCallQueue->QueueCall( materials, &IMaterialSystem::EndUpdateLightmaps );
-		else
-			materials->EndUpdateLightmaps();		
-
-		if ( !g_bHunkAllocLightmaps && r_unloadlightmaps.GetInt() == 1 )
-		{
-			// Delete the lightmap data from memory
-			if ( !pCallQueue )
+			for( int surfaceIndex = 0; surfaceIndex < iSurfaceCount; surfaceIndex++ )
 			{
-				CacheAndUnloadLightmapData();
+				SurfaceHandle_t surfID = SurfaceHandleFromIndex( surfaceIndex );
+				pSortedSurfaces[surfaceIndex] = surfID;
 			}
+
+			SortSurfacesByLightmapID( pSortedSurfaces, iSurfaceCount ); //sorts in place, so now the array really is sorted
+
+			if( pCallQueue )
+				pCallQueue->QueueCall( materials, &IMaterialSystem::BeginUpdateLightmaps );
 			else
+				materials->BeginUpdateLightmaps();
+		
+			matrix3x4_t xform;
+			SetIdentityMatrix(xform);
+			for( int surfaceIndex = 0; surfaceIndex < iSurfaceCount; surfaceIndex++ )
 			{
-				pCallQueue->QueueCall( CacheAndUnloadLightmapData );
+				SurfaceHandle_t surfID = pSortedSurfaces[surfaceIndex];
+
+				ASSERT_SURF_VALID( surfID );
+				R_BuildLightMap( &cl_dlights[0], pCallQueue, surfID, xform, bOnlyUseLightStyles );
+			}
+
+			if( pCallQueue )
+				pCallQueue->QueueCall( materials, &IMaterialSystem::EndUpdateLightmaps );
+			else
+				materials->EndUpdateLightmaps();		
+
+			if ( !g_bHunkAllocLightmaps && r_unloadlightmaps.GetInt() == 1 )
+			{
+				// Delete the lightmap data from memory
+				if ( !pCallQueue )
+				{
+					CacheAndUnloadLightmapData();
+				}
+				else
+				{
+					pCallQueue->QueueCall( CacheAndUnloadLightmapData );
+				}
 			}
 		}
 	}
