@@ -991,13 +991,9 @@ void R_RedownloadAllLightmaps()
 
 	double st = Sys_FloatTime();
 
-	bool bOnlyUseLightStyles = false;
+	bool bOnlyUseLightStyles = r_dynamic.GetInt() == 0;
 
-	if( r_dynamic.GetInt() == 0 )
-	{
-		bOnlyUseLightStyles = true;
-	}
-
+	// dimhotepus: Reduce render context scope.
 	{
 		// Can't build lightmaps if the source data has been dumped
 		CMatRenderContextPtr pRenderContext( materials );
@@ -1033,18 +1029,18 @@ void R_RedownloadAllLightmaps()
 			if( pCallQueue )
 				pCallQueue->QueueCall( materials, &IMaterialSystem::EndUpdateLightmaps );
 			else
-				materials->EndUpdateLightmaps();		
+				materials->EndUpdateLightmaps();
 
 			if ( !g_bHunkAllocLightmaps && r_unloadlightmaps.GetInt() == 1 )
 			{
 				// Delete the lightmap data from memory
-				if ( !pCallQueue )
+				if ( pCallQueue )
 				{
-					CacheAndUnloadLightmapData();
+					pCallQueue->QueueCall( CacheAndUnloadLightmapData );
 				}
 				else
 				{
-					pCallQueue->QueueCall( CacheAndUnloadLightmapData );
+					CacheAndUnloadLightmapData();
 				}
 			}
 		}
