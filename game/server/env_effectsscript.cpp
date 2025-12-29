@@ -390,9 +390,9 @@ void CEnvEffectsScript::ParseScriptFile( void )
 	}
 
 	currenttoken = (const char *)buffer;
-	LoadFromBuffer( pScriptName, (const char *)buffer );
 
-	UTIL_FreeFile( buffer );
+	LoadFromBuffer( pScriptName, (const char *)buffer );
+	RunCodeAtScopeExit(UTIL_FreeFile( buffer ));
 }
 
 void CEnvEffectsScript::LoadFromBuffer( const char *scriptfile, const char *buffer )

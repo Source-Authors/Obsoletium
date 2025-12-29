@@ -321,6 +321,8 @@ bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparam
 		byte *pFile = UTIL_LoadFileForMe( pScriptName, NULL );
 		if ( pFile )
 		{
+			RunCodeAtScopeExit(UTIL_FreeFile(pFile));
+
 			// new script, parse it and write to the table
 			index = m_vehicleScripts.AddToTail();
 			m_vehicleScripts[index].scriptName = AllocPooledString(pScriptName);
@@ -346,7 +348,6 @@ bool CPhysicsHook::FindOrAddVehicleScript( const char *pScriptName, vehicleparam
 				}
 			}
 			physcollision->VPhysicsKeyParserDestroy( pParse );
-			UTIL_FreeFile( pFile );
 		}
 	}
 

@@ -507,23 +507,23 @@ bool CAI_SchedulesManager::LoadSchedulesFromBuffer( const char *prefix, const ch
 bool CAI_SchedulesManager::LoadSchedules( const char *prefix, CAI_ClassScheduleIdSpace *pIdSpace  )
 {
 	char sz[128];
-
 	// Open the weapon's data file and read the weaponry details
 	Q_snprintf(sz,sizeof(sz), "scripts/%s.sch",prefix);
-	char *pfile = (char*)UTIL_LoadFileForMe(sz, NULL);
 
+	char *pfile = (char*)UTIL_LoadFileForMe(sz, NULL);
 	if (!pfile)
 	{
 		DevMsg( "Unable to open AI Schedule data file for: %s\n", sz);
 		return false;
 	}
+
+	RunCodeAtScopeExit(UTIL_FreeFile( (byte*)pfile ));
+
 	if (!LoadSchedulesFromBuffer( prefix, pfile, pIdSpace))
 	{
 		DevMsg( "       Schedule file: %s\n", sz );
-		UTIL_FreeFile( (byte*)pfile );
 		return false;
 	}
-	UTIL_FreeFile( (byte*)pfile );
 	return true;
 }
 

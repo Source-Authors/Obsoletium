@@ -1968,8 +1968,7 @@ void CResponseSystem::LoadRuleSet( const char *basescript )
 	CStringPool includedFiles;
 
 	LoadFromBuffer( basescript, (const char *)buffer, includedFiles );
-
-	UTIL_FreeFile( buffer );
+	RunCodeAtScopeExit(UTIL_FreeFile( buffer ));
 
 	Assert( m_ScriptStack.Count() == 0 );
 }
