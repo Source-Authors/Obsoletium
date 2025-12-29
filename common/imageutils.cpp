@@ -644,37 +644,24 @@ unsigned char *ImgUtl_ReadPNGAsRGBAFromBuffer( CUtlBuffer &buffer, int &width, i
 		return nullptr;
 	}
 
-	png_structp png_ptr = nullptr;
-	png_infop info_ptr = nullptr;
-
     /* could pass pointers to user-defined error handlers instead of NULLs: */
 
-    png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
+    png_structp png_ptr = png_create_read_struct( PNG_LIBPNG_VER_STRING, NULL, NULL, NULL );
     if (!png_ptr)
     {
         errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
 
-	unsigned char *pResultData = nullptr;
-	png_bytepp  row_pointers = nullptr;
-
-    info_ptr = png_create_info_struct( png_ptr );
+    png_infop info_ptr = png_create_info_struct( png_ptr );
     if ( !info_ptr ) 
 	{
         errcode = CE_MEMORY_ERROR;
-fail:
         png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
-        if ( row_pointers )
-        {
-			free( row_pointers );
-		}
-        if ( pResultData )
-        {
-			free( pResultData );
-		}
         return nullptr;
     }
+
+	RunCodeAtScopeExit(png_destroy_read_struct( &png_ptr, &info_ptr, nullptr ));
 
     /* setjmp() must be called in every function that calls a PNG-reading
      * libpng function */
@@ -682,7 +669,7 @@ fail:
     if ( setjmp( png_jmpbuf(png_ptr) ) ) 
 	{
         errcode = CE_ERROR_PARSING_SOURCE;
-        goto fail;
+		return nullptr;
     }
 
 	png_set_read_fn( png_ptr, &buffer, ReadPNGData );
@@ -702,9 +689,6 @@ fail:
 
 	width = png_width;
 	height = png_height;
-
-	// dimhotepus: Use size_t for memsize type.
-    size_t rowbytes;
 
     /* expand palette images to RGB, low-bit-depth grayscale images to 8 bits,
      * transparency chunks to full alpha channel; strip 16-bit-per-sample
@@ -739,22 +723,24 @@ fail:
 
     png_read_update_info( png_ptr, info_ptr );
 
-    rowbytes = png_get_rowbytes( png_ptr, info_ptr );
+	// dimhotepus: Use size_t for memsize type.
+    size_t rowbytes = png_get_rowbytes( png_ptr, info_ptr );
     png_byte channels = png_get_channels( png_ptr, info_ptr );
 	if ( channels != 4 )
 	{
 		Assert( channels == 4 );
         errcode = CE_SOURCE_FILE_FORMAT_NOT_SUPPORTED;
-        goto fail;
+        return nullptr;
 	}
 
-	row_pointers = (png_bytepp)malloc( height*sizeof(png_bytep) );
-	pResultData = (unsigned char *)malloc( rowbytes*height );
+	png_bytepp row_pointers = (png_bytepp)malloc( height*sizeof(png_bytep) );
+	RunCodeAtScopeExit(free( row_pointers ));
 
+	unsigned char *pResultData = (unsigned char *)malloc(rowbytes * height);
 	if ( row_pointers == nullptr || pResultData == nullptr ) 
 	{
         errcode = CE_MEMORY_ERROR;
-        goto fail;
+        return nullptr;
     }
 
     /* set the individual row_pointers to point at the correct offsets */
@@ -767,12 +753,6 @@ fail:
     png_read_image( png_ptr, row_pointers );
 
     png_read_end(png_ptr, NULL);
-
-	free( row_pointers );
-	row_pointers = nullptr;
-
-	// Clean up
-	png_destroy_read_struct( &png_ptr, &info_ptr, nullptr );
 
 	// OK!
 	width = png_width;
