@@ -28,6 +28,7 @@
 #include "tier1/utlbuffer.h"
 #include "bitmap/bitmap.h"
 #include "vtf/vtf.h"
+#include "scoped_dll.h"
 
 
 #ifdef ENGINE_DLL
@@ -1396,25 +1397,25 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	inbuf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 
 	// load vtex_dll.dll and get the interface to it.
-	CSysModule *vtexmod = Sys_LoadModule("vtex_dll");
-	if (vtexmod == nullptr)
+	source::ScopedDll vtexmod{"vtex_dll" DLL_EXT_STRING, 0};
+	if (vtexmod.error_code())
 	{
-		Warning( "Failed to open TGA conversion module vtex_dll: %s\n", tgaPath);
+		Warning( "Failed to open TGA conversion module vtex_dll %s: %s.\n",
+			tgaPath, vtexmod.error_code().message().c_str() );
 		return CE_ERROR_LOADING_DLL;
 	}
 
-	CreateInterfaceFnT<IVTex> factory = Sys_GetFactory<IVTex>(vtexmod);
-	if (factory == NULL)
+	auto [factory, rc] = vtexmod.GetFunction<CreateInterfaceFnT<IVTex>>(CREATEINTERFACE_PROCNAME);
+	if (rc)
 	{
-		Sys_UnloadModule(vtexmod);
-		Warning( "Failed to open TGA conversion module vtex_dll Factory: %s\n", tgaPath);
+		Warning( "Failed to open TGA conversion module vtex_dll Factory %s: %s.\n",
+			tgaPath, rc.message().c_str() );
 		return CE_ERROR_LOADING_DLL;
 	}
 
 	IVTex *vtex = factory(IVTEX_VERSION_STRING, NULL);
-	if (vtex == nullptr)
+	if (!vtex)
 	{
-		Sys_UnloadModule(vtexmod);
 		Warning( "Failed to open TGA conversion module vtex_dll Factory (is null): %s\n", tgaPath);
 		return CE_ERROR_LOADING_DLL;
 	}
@@ -1427,12 +1428,9 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	vtfParams[2] = (char *)"-dontusegamedir";
 	vtfParams[3] = (char *)tgaPath;
 
+	// dimhotepus: Check it succeeds.
 	// call vtex to do the conversion.
-	vtex->VTex(4, vtfParams);  // how do we know this works?
-
-	Sys_UnloadModule(vtexmod);
-
-	return CE_SUCCESS;
+	return vtex->VTex(4, vtfParams) == 0 ? CE_SUCCESS : CE_ERROR_DOING_VTEX_CONVERSION;
 }
 
 static void DoCopyFile( const char *source, const char *destination )

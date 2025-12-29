@@ -24,7 +24,9 @@ enum ConversionErrorType
 	CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED,
 	CE_SOURCE_FILE_SIZE_NOT_SUPPORTED,
 	CE_ERROR_WRITING_OUTPUT_FILE,
-	CE_ERROR_LOADING_DLL
+	CE_ERROR_LOADING_DLL,
+	// dimhotepus: Add error code for VTex failure.
+	CE_ERROR_DOING_VTEX_CONVERSION
 };
 
 enum ImageFileFormat
@@ -33,7 +35,7 @@ enum ImageFileFormat
 	kImageFileFormat_JPG,
 };
 
-struct TGAHeader {
+struct TGAHeader { //-V802
 	byte  identsize;          // size of ID field that follows 18 byte header (0 usually)
 	byte  colourmaptype;      // type of colour map 0=none, 1=has palette
 	byte  imagetype;          // type of image 0=none,1=indexed,2=rgb,3=grey,+8=rle packed
