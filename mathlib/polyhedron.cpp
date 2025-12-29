@@ -8,10 +8,11 @@
 
 #include "mathlib/polyhedron.h"
 #include "mathlib/vmatrix.h"
+#include "tier1/utlvector.h"
+#include "posix_file_stream.h"
+
 #include <cstdlib>
 #include <cstdio>
-#include "tier1/utlvector.h"
-
 
 
 struct GeneratePolyhedronFromPlanes_Point;
@@ -36,8 +37,8 @@ CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_Uno
 #ifdef _DEBUG
 void DumpPolyhedronToGLView( const CPolyhedron *pPolyhedron, const char *pFilename, const VMatrix *pTransform );
 void DumpPlaneToGlView( const float *pPlane, float fGrayScale, const char *pszFileName, const VMatrix *pTransform );
-void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vector &vPoint2, const Vector &vColor2, float fThickness, FILE *pFile );
-void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, FILE *pFile );
+void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vector &vPoint2, const Vector &vColor2, float fThickness, se::posix::posix_file_stream &file );
+void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, se::posix::posix_file_stream &file );
 
 #if defined( ENABLE_DEBUG_POLYHEDRON_DUMPS ) && defined( WIN32 )
 #include "winlite.h"
@@ -784,19 +785,22 @@ void DumpPointListToGLView( GeneratePolyhedronFromPlanes_UnorderedPointLL *pHead
 	if( pTransform == NULL )
 		pTransform = &s_matIdentity;
 	
-	FILE *pFile = fopen( szDumpFile, "ab" );
-	
+	auto [file, rc] = se::posix::posix_file_stream_factory::open( szDumpFile, "ab" );
+	if ( rc )
+	{
+		Warning( "Unable to dump point list to %s: %s.\n", szDumpFile, rc.message().c_str() );
+		return;
+	}
+
 	while( pHead )
 	{
 		if( pHead->pPoint->planarity == planarity )
 		{
 			const Vector vPointExtents( 0.5f, 0.5f, 0.01f );
-			DumpAABBToGLView( (*pTransform) * pHead->pPoint->ptPosition, vPointExtents, vColor, pFile );
+			DumpAABBToGLView( (*pTransform) * pHead->pPoint->ptPosition, vPointExtents, vColor, file );
 		}
 		pHead = pHead->pNext;
 	}
-
-	fclose( pFile );
 #endif
 }
 
@@ -825,7 +829,7 @@ const char * DumpPolyhedronCutHistory( const CUtlVector<CPolyhedron *> &DumpedHi
 }
 
 #ifdef ENABLE_DEBUG_POLYHEDRON_DUMPS
-#define AssertMsg_DumpPolyhedron(condition, message)\
+#define AssertMsg_DumpPolyhedron(condition, msg)\
 	if( (condition) == false )\
 	{\
 		VMatrix matTransform;\
@@ -838,12 +842,19 @@ const char * DumpPolyhedronCutHistory( const CUtlVector<CPolyhedron *> &DumpedHi
 		DumpPointListToGLView( pDeadPointCollection, POINT_DEAD, Vector( 0.1f, 0.1f, 0.1f ), szLastDumpFile, &matTransform );\
 		if( pStartPoint )\
 		{\
-			FILE *pFileDumpRepairProgress = fopen( szLastDumpFile, "ab" );\
-			DumpAABBToGLView( matTransform * pStartPoint->ptPosition, Vector( 2.0f, 0.05f, 0.05f ), Vector( 0.0f, 1.0f, 0.0f ), pFileDumpRepairProgress );\
-			DumpAABBToGLView( matTransform * pWorkPoint->ptPosition, Vector( 2.0f, 0.05f, 0.05f ), Vector( 1.0f, 0.0f, 0.0f ), pFileDumpRepairProgress );\
-			fclose( pFileDumpRepairProgress );\
+			auto [file, rc] = se::posix::posix_file_stream_factory::open(szLastDumpFile, "ab"); \
+			if (rc) \
+			{ \
+			  Warning("Unable to dump point list to %s: %s.\n", szLastDumpFile, \
+			          rc.message().c_str()); \
+			} \
+			else \
+			{ \
+			  DumpAABBToGLView( matTransform * pStartPoint->ptPosition, Vector( 2.0f, 0.05f, 0.05f ), Vector( 0.0f, 1.0f, 0.0f ), file );\
+			  DumpAABBToGLView( matTransform * pWorkPoint->ptPosition, Vector( 2.0f, 0.05f, 0.05f ), Vector( 1.0f, 0.0f, 0.0f ), file );\
+			}\
 		}\
-		AssertMsg( condition, message );\
+		AssertMsg( condition, msg );\
 	}
 #else
 #define AssertMsg_DumpPolyhedron(condition, message) AssertMsg( condition, message )
@@ -2018,99 +2029,99 @@ CPolyhedron *GeneratePolyhedronFromPlanes( const float *pOutwardFacingPlanes, in
 
 
 #ifdef _DEBUG
-void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, FILE *pFile )
+void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, se::posix::posix_file_stream &file )
 {
 #ifdef ENABLE_DEBUG_POLYHEDRON_DUMPS
 	Vector vMins = vCenter - vExtents;
 	Vector vMaxs = vCenter + vExtents;
 
 	//x min side
-	fprintf( pFile, "4\n" );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
-	fprintf( pFile, "4\n" );	
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );	
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
 	//x max side
-	fprintf( pFile, "4\n" );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
-	fprintf( pFile, "4\n" );	
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );	
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
 
 	//y min side
-	fprintf( pFile, "4\n" );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
-	fprintf( pFile, "4\n" );	
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );	
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
 
 
 	//y max side
-	fprintf( pFile, "4\n" );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
-	fprintf( pFile, "4\n" );	
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );	
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
 
 
 	//z min side
-	fprintf( pFile, "4\n" );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
-	fprintf( pFile, "4\n" );	
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );	
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMins.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMins.z, vColor.x, vColor.y, vColor.z );
 
 
 	//z max side
-	fprintf( pFile, "4\n" );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
 
-	fprintf( pFile, "4\n" );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "4\n" );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMaxs.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMaxs.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
+	std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vMins.x, vMins.y, vMaxs.z, vColor.x, vColor.y, vColor.z );
 #endif
 }
 
-void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vector &vPoint2, const Vector &vColor2, float fThickness, FILE *pFile )
+void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vector &vPoint2, const Vector &vColor2, float fThickness, se::posix::posix_file_stream &file )
 {
 #ifdef ENABLE_DEBUG_POLYHEDRON_DUMPS
 	Vector vDirection = vPoint2 - vPoint1;
@@ -2148,14 +2159,14 @@ void DumpLineToGLView( const Vector &vPoint1, const Vector &vColor1, const Vecto
 	const Vector *pLineColors[8] = { &vColor1, &vColor1, &vColor1, &vColor1, &vColor2, &vColor2, &vColor2, &vColor2 };
 
 
-#define DPTGLV_LINE_WRITEPOINT(index) fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vLinePoints[index].x, vLinePoints[index].y, vLinePoints[index].z, pLineColors[index]->x, pLineColors[index]->y, pLineColors[index]->z );
+#define DPTGLV_LINE_WRITEPOINT(index) std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vLinePoints[index].x, vLinePoints[index].y, vLinePoints[index].z, pLineColors[index]->x, pLineColors[index]->y, pLineColors[index]->z );
 #define DPTGLV_LINE_DOUBLESIDEDQUAD(index1,index2,index3,index4)\
-	fprintf( pFile, "4\n" );\
+	std::tie(std::ignore, std::ignore) = file.print("4\n");\
 	DPTGLV_LINE_WRITEPOINT(index1);\
 	DPTGLV_LINE_WRITEPOINT(index2);\
 	DPTGLV_LINE_WRITEPOINT(index3);\
 	DPTGLV_LINE_WRITEPOINT(index4);\
-	fprintf( pFile, "4\n" );\
+	std::tie(std::ignore, std::ignore) = file.print("4\n");\
 	DPTGLV_LINE_WRITEPOINT(index4);\
 	DPTGLV_LINE_WRITEPOINT(index3);\
 	DPTGLV_LINE_WRITEPOINT(index2);\
@@ -2182,7 +2193,12 @@ void DumpPolyhedronToGLView( const CPolyhedron *pPolyhedron, const char *pFilena
 
 	printf("Writing %s...\n", pFilename );
 
-	FILE *pFile = fopen( pFilename, "ab" );
+	auto [file, rc] = se::posix::posix_file_stream_factory::open( pFilename, "ab" );
+	if ( rc )
+	{
+		Warning( "Unable to dump polyhedron to %s: %s.\n", pFilename, rc.message().c_str() );
+		return;
+	}
 
 	//randomizing an array of colors to help spot shared/unshared vertices
 	Vector *pColors = (Vector *)stackalloc( sizeof( Vector ) * pPolyhedron->iVertexCount );	
@@ -2200,7 +2216,7 @@ void DumpPolyhedronToGLView( const CPolyhedron *pPolyhedron, const char *pFilena
 
 	for ( counter = 0; counter != pPolyhedron->iPolygonCount; ++counter )
 	{
-		fprintf( pFile, "%i\n", pPolyhedron->pPolygons[counter].iIndexCount );
+		std::tie(std::ignore, std::ignore) = file.print( "%i\n", pPolyhedron->pPolygons[counter].iIndexCount );
 		int counter2;
 		for( counter2 = 0; counter2 != pPolyhedron->pPolygons[counter].iIndexCount; ++counter2 )
 		{
@@ -2208,7 +2224,7 @@ void DumpPolyhedronToGLView( const CPolyhedron *pPolyhedron, const char *pFilena
 
 			Vector *pVertex = &pTransformedPoints[pPolyhedron->pLines[pLineReference->iLineIndex].iPointIndices[pLineReference->iEndPointIndex]];
 			Vector *pColor = &pColors[pPolyhedron->pLines[pLineReference->iLineIndex].iPointIndices[pLineReference->iEndPointIndex]];
-			fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n",pVertex->x, pVertex->y, pVertex->z, pColor->x, pColor->y, pColor->z );
+			std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n",pVertex->x, pVertex->y, pVertex->z, pColor->x, pColor->y, pColor->z );
 		}
 	}
 
@@ -2217,16 +2233,14 @@ void DumpPolyhedronToGLView( const CPolyhedron *pPolyhedron, const char *pFilena
 		const Vector vOne( 1.0f, 1.0f, 1.0f );
 		DumpLineToGLView( pTransformedPoints[pPolyhedron->pLines[counter].iPointIndices[0]], vOne - pColors[pPolyhedron->pLines[counter].iPointIndices[0]],
 							pTransformedPoints[pPolyhedron->pLines[counter].iPointIndices[1]], vOne - pColors[pPolyhedron->pLines[counter].iPointIndices[1]], 
-							0.1f, pFile );
+							0.1f, file );
 	}
 
 	for( counter = 0; counter != pPolyhedron->iVertexCount; ++counter )
 	{
 		const Vector vPointHalfSize(0.15f, 0.15f, 0.15f );
-		DumpAABBToGLView( pTransformedPoints[counter], vPointHalfSize, pColors[counter], pFile );
+		DumpAABBToGLView( pTransformedPoints[counter], vPointHalfSize, pColors[counter], file );
 	}
-
-	fclose( pFile );
 #endif
 }
 
@@ -2237,7 +2251,12 @@ void DumpPlaneToGlView( const float *pPlane, float fGrayScale, const char *pszFi
 	if( pTransform == NULL )
 		pTransform = &s_matIdentity;
 
-	FILE *pFile = fopen( pszFileName, "ab" );
+	auto [file, rc] = se::posix::posix_file_stream_factory::open( pszFileName, "ab" );
+	if ( rc )
+	{
+		Warning( "Unable to dump plane to %s: %s.\n", pszFileName, rc.message().c_str() );
+		return;
+	}
 
 	//transform the plane
 	Vector vNormal = pTransform->ApplyRotation( *(Vector *)pPlane );
@@ -2246,16 +2265,15 @@ void DumpPlaneToGlView( const float *pPlane, float fGrayScale, const char *pszFi
 	
 	Vector vPlaneVerts[4];
 
-	PolyFromPlane( vPlaneVerts, vNormal, fDist, 100000.0f );
+	// dimhotepus: Print only vertexes count.
+	const intp count = PolyFromPlane( vPlaneVerts, vNormal, fDist, 100000.0f );
+	std::tie(std::ignore, std::ignore) = file.print( "%zd\n", count );
 
-	fprintf( pFile, "4\n" );
-
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vPlaneVerts[0].x, vPlaneVerts[0].y, vPlaneVerts[0].z, fGrayScale, fGrayScale, fGrayScale );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vPlaneVerts[1].x, vPlaneVerts[1].y, vPlaneVerts[1].z, fGrayScale, fGrayScale, fGrayScale );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vPlaneVerts[2].x, vPlaneVerts[2].y, vPlaneVerts[2].z, fGrayScale, fGrayScale, fGrayScale );
-	fprintf( pFile, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", vPlaneVerts[3].x, vPlaneVerts[3].y, vPlaneVerts[3].z, fGrayScale, fGrayScale, fGrayScale );
-
-	fclose( pFile );
+	for (int i = 0; i < min(count, ssize(vPlaneVerts)); ++i)
+	{
+		std::tie(std::ignore, std::ignore) = file.print( "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n",
+			vPlaneVerts[i].x, vPlaneVerts[i].y, vPlaneVerts[i].z, fGrayScale, fGrayScale, fGrayScale );
+	}
 #endif
 }
 #endif
