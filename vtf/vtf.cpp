@@ -1583,7 +1583,7 @@ inline intp CVTFTexture::ComputeMipSize( int iMipLevel, ImageFormat fmt ) const
 	Assert( iMipLevel < m_nMipCount );
 	int w, h, d;
 	ComputeMipLevelDimensions( iMipLevel, &w, &h, &d );
-	return ImageLoader::GetMemRequired( w, h, d, fmt, false );		
+	return ImageLoader::GetMemRequired( w, h, d, fmt, false );
 }
 
 intp CVTFTexture::ComputeMipSize( int iMipLevel ) const
@@ -1664,41 +1664,15 @@ intp CVTFTexture::GetImageOffset( int iFrame, int iFace, int iMipLevel, ImageFor
 	Assert( iFace < m_nFaceCount );
 	Assert( iMipLevel < m_nMipCount );
 
-	int i;
-	intp iOffset = 0;
-
-	if ( IsX360() && ( m_nVersion[0] == VTF_X360_MAJOR_VERSION ) )
-	{
-		// 360 data is stored same as disk, 1x1 up to NxN
-		// get to the right miplevel
-		int iMipWidth, iMipHeight, iMipDepth;
-		for ( i = m_nMipCount - 1; i > iMipLevel; --i )
-		{
-			ComputeMipLevelDimensions( i, &iMipWidth, &iMipHeight, &iMipDepth );
-			intp iMipLevelSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, fmt, false );
-			iOffset += m_nFrameCount * m_nFaceCount * iMipLevelSize;
-		}
-
-		// get to the right frame
-		ComputeMipLevelDimensions( iMipLevel, &iMipWidth, &iMipHeight, &iMipDepth );
-		intp nFaceSize = ImageLoader::GetMemRequired( iMipWidth, iMipHeight, iMipDepth, fmt, false );
-		iOffset += iFrame * m_nFaceCount * nFaceSize;
-		
-		// get to the right face
-		iOffset += iFace * nFaceSize;
-
-		return iOffset;
-	}
-
 	// get to the right frame
-	intp iFaceSize = ComputeFaceSize( 0, fmt );
-	iOffset = iFrame * m_nFaceCount * iFaceSize;
+	const intp iFaceSize = ComputeFaceSize( 0, fmt );
+	intp iOffset = iFrame * m_nFaceCount * iFaceSize;
 
 	// Get to the right face
 	iOffset += iFace * iFaceSize;
 
 	// Get to the right mip level
-	for (i = 0; i < iMipLevel; ++i)
+	for (int i = 0; i < iMipLevel; ++i)
 	{
 		iOffset += ComputeMipSize( i, fmt );
 	}
