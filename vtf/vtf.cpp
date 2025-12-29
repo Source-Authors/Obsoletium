@@ -1600,9 +1600,9 @@ intp CVTFTexture::ComputeMipSize( int iMipLevel ) const
 inline intp CVTFTexture::ComputeFaceSize( int iStartingMipLevel, ImageFormat fmt ) const
 {
 	intp iSize = 0;
-	int w = m_nWidth;
-	int h = m_nHeight;
-	int d = m_nDepth;
+	int w = m_nWidth ? m_nWidth : 1;
+	int h = m_nHeight ? m_nHeight : 1;
+	int d = m_nDepth ? m_nDepth : 1;
 
 	for( int i = 0; i < m_nMipCount; ++i )
 	{
@@ -1610,21 +1610,16 @@ inline intp CVTFTexture::ComputeFaceSize( int iStartingMipLevel, ImageFormat fmt
 		{
 			iSize += ImageLoader::GetMemRequired( w, h, d, fmt, false );
 		}
-		w >>= 1;
-		h >>= 1;
-		d >>= 1;
-		if ( w < 1 )
-		{
-			w = 1;
-		}
-		if ( h < 1 )
-		{
-			h = 1;
-		}
-		if ( d < 1 )
-		{
-			d = 1;
-		}
+
+		// dimhotepus: Simply logic to shift only if > 1.
+		if ( w > 1 )
+			w >>= 1;
+
+		if ( h > 1 )
+			h >>= 1;
+
+		if ( d > 1 )
+			d >>= 1;
 	}
 	return iSize;
 }
