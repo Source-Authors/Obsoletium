@@ -885,7 +885,9 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 	{
 		// Create and initialize a VTF texture
 		IVTFTexture *pVTFTexture = CreateVTFTexture();
-		const int nFlags = TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD | TEXTUREFLAGS_SRGB;
+		RunCodeAtScopeExit(DestroyVTFTexture( pVTFTexture ));
+
+		constexpr int nFlags = TEXTUREFLAGS_NOMIP | TEXTUREFLAGS_NOLOD | TEXTUREFLAGS_SRGB;
 		if ( pVTFTexture->Init( nSrcWidth, nSrcHeight, 1, IMAGE_FORMAT_RGB888, nFlags, 1, 1 ) )
 		{
 			// Copy the image data over to the VTF
@@ -901,9 +903,6 @@ void CViewRender::WriteSaveGameScreenshotOfSize( const char *pFilename, int widt
 
 			// Serialize to the buffer
 			bWriteResult = pVTFTexture->Serialize( buffer );
-		
-			// Free the VTF texture
-			DestroyVTFTexture( pVTFTexture );
 		}
 		else
 		{
