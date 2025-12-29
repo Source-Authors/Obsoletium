@@ -2515,6 +2515,8 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 		// single optimal read of all dynamic combos into monolithic buffer
 		uint8 *pOptimalBuffer = (uint8 *)
 			g_pFullFileSystem->AllocOptimalReadBuffer( hFile, nAlignedBytesToRead, nAlignedOffset );
+		RunCodeAtScopeExit(g_pFullFileSystem->FreeOptimalReadBuffer( pOptimalBuffer ));
+		
 		g_pFullFileSystem->Seek( hFile, nAlignedOffset, FILESYSTEM_SEEK_HEAD );
 		g_pFullFileSystem->Read( pOptimalBuffer, nAlignedBytesToRead, hFile );
 
@@ -2526,8 +2528,6 @@ bool CShaderManager::LoadAndCreateShaders( ShaderLookup_t &lookup, bool bVertexS
 		{
 			bOK = CreateDynamicCombos_Ver5( &lookup, pOptimalBuffer, debugLabel );
 		}
-
-		g_pFullFileSystem->FreeOptimalReadBuffer( pOptimalBuffer );
 	}
 
 	if ( !bOK )

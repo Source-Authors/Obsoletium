@@ -371,7 +371,10 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		// read into a memory block
 		int fileSize = g_pFullFileSystem->Size(file);
 		int bufferSize = g_pFullFileSystem->GetOptimalReadSize( file, fileSize + sizeof(ucs2) );
+
 		ucs2 *memBlock = (ucs2 *)g_pFullFileSystem->AllocOptimalReadBuffer(file, bufferSize);
+		RunCodeAtScopeExit(g_pFullFileSystem->FreeOptimalReadBuffer( memBlock ));
+
 		bool bReadOK = ( g_pFullFileSystem->ReadEx(memBlock, bufferSize, fileSize, file) != 0 );
 
 		// null-terminate the stream
@@ -383,7 +386,6 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 		if ( !bReadOK || signature != 0xFEFF )
 		{
 			Msg( "Ignoring non-unicode close caption file %s\n", fullpath );
-			g_pFullFileSystem->FreeOptimalReadBuffer( memBlock );
 			return false;
 		}
 
@@ -552,8 +554,6 @@ bool CLocalizedStringTable::AddFile( const char *szFileName, const char *pPathID
 				}
 			}
 		}
-
-		g_pFullFileSystem->FreeOptimalReadBuffer( memBlock );
 	}
 
 	if ( !bLoadedAtLeastOne )

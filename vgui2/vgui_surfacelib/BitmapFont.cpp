@@ -89,14 +89,14 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 	if ( !pFontTable )
 	{
 		void *pBuf = NULL;
-		int nLength; 
-
-		nLength = FontManager().FileSystem()->ReadFileEx( pFontFilename, "GAME", &pBuf ); 
+		int nLength = FontManager().FileSystem()->ReadFileEx( pFontFilename, "GAME", &pBuf ); 
 		if ( nLength <= 0 || !pBuf )
 		{
 			// not found
 			return false;
 		}
+
+		RunCodeAtScopeExit(FontManager().FileSystem()->FreeOptimalReadBuffer( pBuf ));
 
 		if ( ((BitmapFont_t*)pBuf)->m_id != LittleLong( BITMAPFONT_ID ) || ((BitmapFont_t*)pBuf)->m_Version != LittleLong( BITMAPFONT_VERSION ) )
 		{
@@ -115,8 +115,6 @@ bool CBitmapFont::Create( const char *pFontFilename, float scalex, float scaley,
 
 		pFontTable->m_pBitmapGlyphs = new BitmapGlyph_t[pFontTable->m_pBitmapFont->m_NumGlyphs];
 		memcpy( pFontTable->m_pBitmapGlyphs, (unsigned char*)pBuf + sizeof(BitmapFont_t), pFontTable->m_pBitmapFont->m_NumGlyphs*sizeof(BitmapGlyph_t) );
-
-		FontManager().FileSystem()->FreeOptimalReadBuffer( pBuf );
 
 		// load the art resources
 		char textureName[MAX_PATH];

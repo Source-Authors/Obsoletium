@@ -156,6 +156,8 @@ static KeyValues *HandleKeyValuesMacro_Insert( KeyValues *pkvInsert, KeyValues *
 
 	uint nBufSize = g_pFullFileSystem->GetOptimalReadSize( f, nFileSize + 2 /* null termination */ + 8 /* "\"x\"\n{\n}\n" */ );
 	char *pBuf = ( char* )g_pFullFileSystem->AllocOptimalReadBuffer( f, nBufSize );
+	RunCodeAtScopeExit(g_pFullFileSystem->FreeOptimalReadBuffer( pBuf ));
+
 	pBuf[0] = '"';
 	pBuf[1] = 'i';
 	pBuf[2] = '"';
@@ -182,8 +184,6 @@ static KeyValues *HandleKeyValuesMacro_Insert( KeyValues *pkvInsert, KeyValues *
 	{
 		Msg( "Error: #insert couldn't read file: %s\n", pszInsert );
 	}
-
-	g_pFullFileSystem->FreeOptimalReadBuffer( pBuf );
 
 	KeyValues *pkvReturn = nullptr;
 

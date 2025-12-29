@@ -755,31 +755,34 @@ bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceN
 		return true;
 	}
 
-	FileHandle_t f = filesystem->Open(resourceName, "rb", pathID);
+	IFileSystem *fs = static_cast<IFileSystem *>(filesystem);
+
+	FileHandle_t f = fs->Open(resourceName, "rb", pathID);
 	if ( !f )
 	{
 		COM_TimestampedLog("KeyValues::LoadFromFile(%s%s%s): End / FileNotFound", pathID ? pathID : "", pathID && resourceName ? "/" : "", resourceName ? resourceName : "");
 		return false;
 	}
 	
-	RunCodeAtScopeExit(filesystem->Close( f ));
+	RunCodeAtScopeExit(fs->Close( f ));
 
 	s_LastFileLoadingFrom = (char*)resourceName;
 
 	// load file into a null-terminated buffer
-	int fileSize = filesystem->Size( f );
-	unsigned bufSize = ((IFileSystem *)filesystem)->GetOptimalReadSize( f, fileSize + 2 );
+	int fileSize = fs->Size( f );
+	unsigned bufSize = fs->GetOptimalReadSize( f, fileSize + 2 );
 
-	char *buffer = (char*)((IFileSystem *)filesystem)->AllocOptimalReadBuffer( f, bufSize );
+	char *buffer = (char*)fs->AllocOptimalReadBuffer( f, bufSize );
+	RunCodeAtScopeExit(fs->FreeOptimalReadBuffer( buffer ));
 	Assert( buffer );
 	
 	// read into local buffer
-	bool bRetOK = ( ((IFileSystem *)filesystem)->ReadEx( buffer, bufSize, fileSize, f ) != 0 );
+	bool bRetOK = fs->ReadEx( buffer, bufSize, fileSize, f ) != 0;
 	if ( bRetOK )
 	{
 		buffer[fileSize] = 0; // null terminate file as EOF
 		buffer[fileSize+1] = 0; // double NULL terminating in case this is a unicode file
-		bRetOK = LoadFromBuffer( resourceName, buffer, filesystem );
+		bRetOK = LoadFromBuffer( resourceName, buffer, fs );
 	}
 	
 	// The cache relies on the KeyValuesSystem string table, which will only be valid if we're
@@ -788,8 +791,6 @@ bool KeyValues::LoadFromFile( IBaseFileSystem *filesystem, const char *resourceN
 	{
 		KeyValuesSystem()->AddFileKeyValuesToCache( this, resourceName, pathID );
 	}
-
-	( (IFileSystem *)filesystem )->FreeOptimalReadBuffer( buffer );
 
 	COM_TimestampedLog("KeyValues::LoadFromFile(%s%s%s): End / Success", pathID ? pathID : "", pathID && resourceName ? "/" : "", resourceName ? resourceName : "");
 
