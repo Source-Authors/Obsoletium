@@ -611,15 +611,15 @@ void CRender::Push3DView( const CViewSetup &view, int nFlags, ITexture* pRenderT
 
 void CRender::Push2DView( const CViewSetup &view, int nFlags, ITexture* pRenderTarget, Frustum frustumPlanes )
 {
-	intp i = m_ViewStack.Push( );
-	m_ViewStack[i].m_View = view;
-	m_ViewStack[i].m_bIs2DView = true;
-	m_ViewStack[i].m_bNoDraw = ( ( nFlags & VIEW_NO_DRAW ) != 0 );
-	m_ViewStack[i].m_matrixView = m_matrixView;
-	m_ViewStack[i].m_matrixProjection = m_matrixProjection;
-	m_ViewStack[i].m_matrixWorldToScreen = m_matrixWorldToScreen;
+	auto &viewStack = m_ViewStack[m_ViewStack.Push( )];
+	viewStack.m_View = view;
+	viewStack.m_bIs2DView = true;
+	viewStack.m_bNoDraw = ( ( nFlags & VIEW_NO_DRAW ) != 0 );
+	viewStack.m_matrixView = m_matrixView;
+	viewStack.m_matrixProjection = m_matrixProjection;
+	viewStack.m_matrixWorldToScreen = m_matrixWorldToScreen;
 
-	CViewSetup &topView = m_ViewStack[i].m_View;
+	CViewSetup &topView = viewStack.m_View;
 	g_bCanAccessCurrentView = false;
 
 	CMatRenderContextPtr pRenderContext( materials );
