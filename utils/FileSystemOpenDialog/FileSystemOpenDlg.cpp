@@ -358,12 +358,13 @@ bool ReadJpeg( IFileSystem *pFileSystem, const char *pFilename, CUtlVector<unsig
 
 	// Read the data.
 	FileHandle_t fp = pFileSystem->Open( pFilename, "rb", pPathID );
-	if ( fp == FILESYSTEM_INVALID_HANDLE )
+	if ( !fp )
 		return false;
+
+	RunCodeAtScopeExit(pFileSystem->Close(fp));
 
 	CJpegSourceMgr sourceMgr;
 	bool bRet = sourceMgr.Init( pFileSystem, fp );
-	pFileSystem->Close( fp );
 	if ( !bRet )
 		return false;
 
@@ -371,31 +372,39 @@ bool ReadJpeg( IFileSystem *pFileSystem, const char *pFilename, CUtlVector<unsig
 	sourceMgr.next_input_byte = (unsigned char*)sourceMgr.m_Data.Base();
 
 	// Load the jpeg.
-	struct jpeg_decompress_struct jpegInfo;
-	struct jpeg_error_mgr jerr;
+	jpeg_decompress_struct jpegInfo;
+	jpeg_error_mgr jerr;
 
 	memset( &jpegInfo, 0, sizeof( jpegInfo ) );
 	jpegInfo.client_data = &sourceMgr;
 	jpegInfo.err = jpeg_std_error(&jerr);
 	jerr.error_exit = &CJpegSourceMgr::error_exit;
+
 	jpeg_create_decompress(&jpegInfo);
+	RunCodeAtScopeExit(jpeg_destroy_decompress(&jpegInfo));
+
 	jpegInfo.src = &sourceMgr;
 
 	if ( setjmp( sourceMgr.m_JmpBuf ) == 1 )
 	{
-		jpeg_destroy_decompress(&jpegInfo);
 		return false;
 	}
 
 	if (jpeg_read_header(&jpegInfo, TRUE) != JPEG_HEADER_OK)
 	{
 		return false;
-	}	
+	}
 
 	// start the decompress with the jpeg engine.
-	if (jpeg_start_decompress(&jpegInfo) != TRUE || jpegInfo.output_components != 3)
+	if (jpeg_start_decompress(&jpegInfo) != TRUE)
 	{
-		jpeg_destroy_decompress(&jpegInfo);
+		return false;
+	}
+
+	RunCodeAtScopeExit(jpeg_finish_decompress(&jpegInfo));
+
+	if (jpegInfo.output_components != 3)
+	{
 		return false;
 	}
 
@@ -424,14 +433,7 @@ bool ReadJpeg( IFileSystem *pFileSystem, const char *pFilename, CUtlVector<unsig
 		++cur_row;
 	}
 
-	if (!working)
-	{
-		jpeg_destroy_decompress(&jpegInfo);
-		return false;
-	}
-
-	jpeg_finish_decompress(&jpegInfo);
-	return true;
+	return working;
 }
 
 void DownsampleRGBToRGBAImage( 
