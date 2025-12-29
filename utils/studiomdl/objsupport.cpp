@@ -103,7 +103,7 @@ static bool ParseVertex( CUtlBuffer& bufParse, const characterset_t &breakSet, i
 		Assert( nLen == 1 );
 
 		c = *(const char*)bufParse.PeekGet();
-		if ( !IN_CHARACTERSET( breakSet, c ) )
+		if ( !breakSet.HasChar( c ) )
 		{
 			nLen = bufParse.ParseToken( &breakSet, cmd, sizeof(cmd), false );
 			Assert( nLen > 0 );
