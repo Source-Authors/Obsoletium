@@ -308,6 +308,8 @@ SRC_DX_PROXY_API HRESULT WINAPI Proxy_D3DCompileFromFile(
       include->Open(D3D_INCLUDE_LOCAL, pFileName, nullptr, &data, &numBytes)};
   if (FAILED(hr)) return hr;
 
+  RunCodeAtScopeExit(include->Close(data));
+
 #if defined(DX9_V00_PC) || defined(DX9_V30_PC)
   // The current HLSL shader D3DCompile* functions don't support legacy 1.x
   // pixel shaders.  The last version of HLSL to support these targets was D3DX9
@@ -349,9 +351,6 @@ SRC_DX_PROXY_API HRESULT WINAPI Proxy_D3DCompileFromFile(
   hr = D3DCompile(data, numBytes, pFileName, pDefines, include, pEntrypoint,
                   pTarget, Flags1, Flags2, ppCode, ppErrorMsgs);
 #endif  // defined(DX9_V00_PC) || defined(DX9_V30_PC)
-
-  // Close the file
-  include->Close(data);
 
   return hr;
 }
