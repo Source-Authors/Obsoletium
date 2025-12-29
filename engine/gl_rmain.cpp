@@ -624,7 +624,8 @@ void CRender::Push2DView( const CViewSetup &view, int nFlags, ITexture* pRenderT
 
 	CMatRenderContextPtr pRenderContext( materials );
 
-	if ( !pRenderContext )
+	// dimhotepus: Check render target for null and reinit.
+	if ( !pRenderTarget )
 	{
 		pRenderTarget = pRenderContext->GetRenderTarget();
 	}
