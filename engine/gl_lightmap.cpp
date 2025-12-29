@@ -951,11 +951,7 @@ static void SortSurfacesByLightmapID( SurfaceHandle_t *pToSort, int iSurfaceCoun
 	for( int radix = 0; radix < 4; ++radix )
 	{
 		//swap the inputs for the next pass
-		{
-			SurfaceHandle_t *pTemp = pToSort;
-			pToSort = pSortTemp;
-			pSortTemp = pTemp;
-		}
+		std::swap(pToSort, pSortTemp);
 
 		int iCounts[256] = { 0 };
 		int iBitOffset = radix * 8;
