@@ -173,8 +173,8 @@ static int  GetThreadId();
 static bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile, unsigned int nFlags, TextureLODControlSettings_t* pInOutCachedFileLodSettings, int nDesiredDimensionLimit, unsigned short* pOutStreamedMips, const char* pName, const char* pCacheFileName, TexDimensions_t* pOptOutMappingDims = NULL, TexDimensions_t* pOptOutActualDims = NULL, TexDimensions_t* pOptOutAllocatedDims = NULL, unsigned int* pOptOutStripFlags = NULL );
 static int  ComputeActualMipCount( const TexDimensions_t& actualDims, unsigned int nFlags );
 static int  ComputeMipSkipCount( const char* pName, const TexDimensions_t& mappingDims, bool bIgnorePicmip, IVTFTexture *pOptVTFTexture, unsigned int nFlags, int nDesiredDimensionLimit, unsigned short* pOutStreamedMips, TextureLODControlSettings_t* pInOutCachedFileLodSettings, TexDimensions_t* pOptOutActualDims, TexDimensions_t* pOptOutAllocatedDims, unsigned int* pOptOutStripFlags  );
-static int  GetOptimalReadBuffer( CUtlBuffer *pOutOptimalBuffer, FileHandle_t hFile, int nFileSize );
-static void FreeOptimalReadBuffer( int nMaxSize );
+static int  GetOptimalReadBuffer( int threadId, CUtlBuffer *pOutOptimalBuffer, FileHandle_t hFile, int nFileSize );
+static void FreeOptimalReadBuffer( int threadId, int nMaxSize );
 
 
 namespace TextureLodOverride
@@ -3612,6 +3612,10 @@ void CTexture::NotifyUnloadedFile()
 	g_pFullFileSystem->NotifyFileUnloaded( pCacheFileName, "GAME" );
 }
 
+// Get an optimal read buffer, only resize if necessary.
+// dimhotepus: Moved here. 2 MiB -> 8 MiB as modern textures are larger.
+constexpr int kMinimumTextureBufferSize = 8 * 1024 * 1024;
+
 //-----------------------------------------------------------------------------
 // Sets or updates the texture bits
 //-----------------------------------------------------------------------------
@@ -3765,7 +3769,7 @@ void CTexture::ReconstructTexture( bool bCopyFromCurrent )
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s - Final Cleanup", __FUNCTION__ );
 
 	// the pc can afford to persist a large buffer
-	FreeOptimalReadBuffer( 6*1024*1024 );
+	FreeOptimalReadBuffer( GetThreadId(), kMinimumTextureBufferSize + 1 );
 }
 
 void CTexture::GetCacheFilename( char* pOutBuffer, int nBufferSize ) const
@@ -4129,7 +4133,7 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 
 		// restrict read to the header only!
 		// header provides info to avoid reading the entire file
-		int nBytesOptimalRead = GetOptimalReadBuffer( &buf, hFile, nHeaderSize );
+		int nBytesOptimalRead = GetOptimalReadBuffer( GetThreadId(), &buf, hFile, nHeaderSize );
 		int nBytesRead = g_pFullFileSystem->ReadEx( buf.Base(), nBytesOptimalRead, Min( nHeaderSize, ( unsigned ) g_pFullFileSystem->Size( hFile ) ), hFile ); // only read as much as the file has
 		buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 		unsigned nRealHeaderSize;
@@ -4173,10 +4177,12 @@ bool SLoadTextureBitsFromFile( IVTFTexture **ppOutVtfTexture, FileHandle_t hFile
 
 	// Read only the portion of the file that we care about
 	g_pFullFileSystem->Seek( hFile, 0, FILESYSTEM_SEEK_HEAD );
-	int nBytesOptimalRead = GetOptimalReadBuffer( &buf, hFile, nFileSize );
-	RunCodeAtScopeExit(FreeOptimalReadBuffer( 6*1024*1024 ));
 
-	int nBytesRead = g_pFullFileSystem->ReadEx( buf.Base(), nBytesOptimalRead, nFileSize, hFile );
+	const int threadId = GetThreadId();
+	const int nBytesOptimalRead = GetOptimalReadBuffer( threadId, &buf, hFile, nFileSize );
+	RunCodeAtScopeExit(FreeOptimalReadBuffer( threadId, kMinimumTextureBufferSize + 1 ));
+
+	const int nBytesRead = g_pFullFileSystem->ReadEx( buf.Base(), nBytesOptimalRead, nFileSize, hFile );
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 
 	// Some hardware doesn't support copying textures to other textures. For them, we need to reread the 
@@ -4471,37 +4477,37 @@ int ComputeMipSkipCount( const char* pName, const TexDimensions_t& mappingDims, 
 //-----------------------------------------------------------------------------
 // Get an optimal read buffer, persists and avoids excessive allocations
 //-----------------------------------------------------------------------------
-int GetOptimalReadBuffer( CUtlBuffer* pOutOptimalBuffer, FileHandle_t hFile, int nSize )
+int GetOptimalReadBuffer( int threadId, CUtlBuffer* pOutOptimalBuffer, FileHandle_t hFile, int nSize )
 {
 	// NOTE! NOTE! NOTE! If you are making changes to this function, be aware that it has threading
 	// NOTE! NOTE! NOTE! implications. It can be called synchronously by the Main thread, 
 	// NOTE! NOTE! NOTE! or by the streaming texture code!
-	Assert( GetThreadId() < MAX_RENDER_THREADS );
+	Assert( threadId < MAX_RENDER_THREADS );
 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s (%d bytes)", __FUNCTION__, nSize );
 	Assert( pOutOptimalBuffer != NULL );
 
-	// get an optimal read buffer, only resize if necessary
-	constexpr int minSize = 2 * 1024 * 1024;	// Uses 2MB min to avoid fragmentation
-	nSize = max( nSize, minSize );
+	nSize = max( nSize, kMinimumTextureBufferSize );
 	int nBytesOptimalRead = g_pFullFileSystem->GetOptimalReadSize( hFile, nSize );
 
-	const int ti = GetThreadId();
+	void *&buffer = s_pOptimalReadBuffer[threadId];
+	int &size = s_nOptimalReadBufferSize[threadId];
 
-	if ( nBytesOptimalRead > s_nOptimalReadBufferSize[ ti ] )
+	if ( nBytesOptimalRead > size )
 	{
-		FreeOptimalReadBuffer( 0 );
+		FreeOptimalReadBuffer( threadId, 0 );
 
-		s_nOptimalReadBufferSize[ ti ] = nBytesOptimalRead;
-		s_pOptimalReadBuffer[ ti ] = g_pFullFileSystem->AllocOptimalReadBuffer( hFile, nSize );
+		size = nBytesOptimalRead;
+		buffer = g_pFullFileSystem->AllocOptimalReadBuffer( hFile, nSize );
+
 		if ( mat_spewalloc.GetBool() )
 		{
-			Msg( "Allocated optimal read buffer of %d bytes @ 0x%p for thread %d\n", s_nOptimalReadBufferSize[ ti ], s_pOptimalReadBuffer[ ti ], ti );
+			Msg( "Allocated optimal read buffer of %d bytes @ 0x%p for thread %d\n", size, buffer, threadId );
 		}
 	}
 
 	// set external buffer and reset to empty
-	( *pOutOptimalBuffer ).SetExternalBuffer( s_pOptimalReadBuffer[ ti ], s_nOptimalReadBufferSize[ ti ], 0 );
+	( *pOutOptimalBuffer ).SetExternalBuffer( buffer, size, 0 );
 
 	// return the optimal read size
 	return nBytesOptimalRead;
@@ -4510,26 +4516,29 @@ int GetOptimalReadBuffer( CUtlBuffer* pOutOptimalBuffer, FileHandle_t hFile, int
 //-----------------------------------------------------------------------------
 // Free the optimal read buffer if it grows too large
 //-----------------------------------------------------------------------------
-void FreeOptimalReadBuffer( int nMaxSize )
+void FreeOptimalReadBuffer( int threadId, int nMaxSize )
 {
 	// NOTE! NOTE! NOTE! If you are making changes to this function, be aware that it has threading
 	// NOTE! NOTE! NOTE! implications. It can be called synchronously by the Main thread, 
 	// NOTE! NOTE! NOTE! or by the streaming texture code!
-	Assert( GetThreadId() < MAX_RENDER_THREADS );
+	Assert( threadId < MAX_RENDER_THREADS );
 
 	tmZone( TELEMETRY_LEVEL0, TMZF_NONE, "%s", __FUNCTION__ );
 
-	const int ti = GetThreadId();
+	void *&buffer = s_pOptimalReadBuffer[threadId];
+	int &size = s_nOptimalReadBufferSize[threadId];
 
-	if ( s_pOptimalReadBuffer[ ti ] && s_nOptimalReadBufferSize[ ti ] >= nMaxSize )
+	if ( buffer && size >= nMaxSize )
 	{
 		if ( mat_spewalloc.GetBool() )
 		{
-			Msg( "Freeing optimal read buffer of %d bytes @ 0x%p for thread %d\n", s_nOptimalReadBufferSize[ ti ], s_pOptimalReadBuffer[ ti ], ti );
+			Msg( "Freeing optimal read buffer of %d bytes @ 0x%p for thread %d\n", size, buffer, threadId );
 		}
-		g_pFullFileSystem->FreeOptimalReadBuffer( s_pOptimalReadBuffer[ ti ] );
-		s_pOptimalReadBuffer[ ti ] = NULL;
-		s_nOptimalReadBufferSize[ ti ] = 0;
+
+		g_pFullFileSystem->FreeOptimalReadBuffer( buffer );
+
+		buffer = nullptr;
+		size = 0;
 	}
 }
 
