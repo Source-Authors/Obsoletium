@@ -1422,35 +1422,36 @@ void DumpTGAofRenderTarget( const int width, const int height, const char *pFile
 		return;
 	}
 
-	CMatRenderContextPtr pRenderContext( materials );
-
 	// Get the data from the render target and save to disk bitmap bits
-	unsigned char *pImage = ( unsigned char * )malloc( width * 4 * height );
+	std::unique_ptr<byte[]> pImage = std::make_unique<byte[]>( width * 4 * height );
 
-	// Get Bits from the material system
-	pRenderContext->ReadPixels( 0, 0, width, height, pImage, IMAGE_FORMAT_RGBA8888 );
+	{
+		CMatRenderContextPtr pRenderContext( materials );
+		// Get Bits from the material system
+		pRenderContext->ReadPixels( 0, 0, width, height, pImage.get(), IMAGE_FORMAT_RGBA8888 );
+	}
 
 	// allocate a buffer to write the tga into
-	int iMaxTGASize = 1024 + (width * height * 4);
-	void *pTGA = malloc( iMaxTGASize );
-	CUtlBuffer buffer( pTGA, iMaxTGASize );
+	const int iMaxTGASize = 1024 + (width * height * 4);
+	std::unique_ptr<byte[]> pTGA = std::make_unique<byte[]>( iMaxTGASize );
+	CUtlBuffer buffer( pTGA.get(), iMaxTGASize );
 
-	if( !TGAWriter::WriteToBuffer( pImage, buffer, width, height, IMAGE_FORMAT_RGBA8888, IMAGE_FORMAT_RGBA8888 ) )
+	if( !TGAWriter::WriteToBuffer( pImage.get(), buffer, width, height, IMAGE_FORMAT_RGBA8888, IMAGE_FORMAT_RGBA8888 ) )
 	{
 		Error( "Couldn't write bitmap data snapshot.\n" );
 	}
 
-	free( pImage );
-
 	// async write to disk (this will take ownership of the memory)
 	char szPathedFileName[MAX_PATH];
-	Q_snprintf( szPathedFileName, sizeof(szPathedFileName), "//MOD/%d_%s_%s.tga", s_nRTIndex++, pFilename, IsOSX() ? "OSX" : "PC" );
+	V_sprintf_safe( szPathedFileName, "//MOD/%d_%s_%s.tga", s_nRTIndex++, pFilename, IsOSX() ? "OSX" : "PC" );
 
 	FileHandle_t fileTGA = filesystem->Open( szPathedFileName, "wb" );
-	filesystem->Write( buffer.Base(), buffer.TellPut(), fileTGA );
-	filesystem->Close( fileTGA );
+	if (fileTGA)
+	{
+		RunCodeAtScopeExit(filesystem->Close(fileTGA));
 
-	free( pTGA );
+		filesystem->Write( buffer.Base(), buffer.TellPut(), fileTGA );
+	}
 }
 
 
