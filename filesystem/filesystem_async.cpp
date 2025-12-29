@@ -196,7 +196,7 @@ public:
 		Assert( m_map.IsValidIndex( iEntry ) );
 		if ( m_map[iEntry]->Release() == 0 )
 		{
-			if ( m_map[iEntry]->hFile != FILESYSTEM_INVALID_HANDLE )
+			if ( m_map[iEntry]->hFile )
 			{
 				BaseFileSystem()->Close( m_map[iEntry]->hFile );
 			}
