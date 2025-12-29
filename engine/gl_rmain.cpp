@@ -130,36 +130,36 @@ void R_DrawPortals()
 
 	// dimhotepus: Reduce render context scope.
 	{
-	IMaterial *pMaterial = materials->FindMaterial( "debug/debugportals", TEXTURE_GROUP_OTHER );
-	CMatRenderContextPtr pRenderContext( materials );
-	IMesh *pMesh = pRenderContext->GetDynamicMesh( true, NULL, NULL, pMaterial );
+		IMaterial *pMaterial = materials->FindMaterial( "debug/debugportals", TEXTURE_GROUP_OTHER );
+		CMatRenderContextPtr pRenderContext( materials );
+		IMesh *pMesh = pRenderContext->GetDynamicMesh( true, NULL, NULL, pMaterial );
 
-	worldbrushdata_t *pBrushData = host_state.worldbrush;
-	for( int i=0; i < pBrushData->m_nAreaPortals; i++ )
-	{
-		dareaportal_t *pAreaPortal = &pBrushData->m_pAreaPortals[i];
-
-		if( !R_IsAreaVisible( pAreaPortal->otherarea ) )
-			continue;
-
-		CMeshBuilder builder;
-		builder.Begin( pMesh, MATERIAL_LINES, pAreaPortal->m_nClipPortalVerts );
-
-		for( unsigned short j=0; j < pAreaPortal->m_nClipPortalVerts; j++ )
+		worldbrushdata_t *pBrushData = host_state.worldbrush;
+		for( int i=0; i < pBrushData->m_nAreaPortals; i++ )
 		{
-			unsigned short iVert = pAreaPortal->m_FirstClipPortalVert + j;
-			builder.Position3f( VectorExpand( pBrushData->m_pClipPortalVerts[iVert] ) );
-			builder.Color4f( 0, 0, 0, 1 );
-			builder.AdvanceVertex();
+			dareaportal_t *pAreaPortal = &pBrushData->m_pAreaPortals[i];
 
-			iVert = pAreaPortal->m_FirstClipPortalVert + (j+1) % pAreaPortal->m_nClipPortalVerts;
-			builder.Position3f( VectorExpand( pBrushData->m_pClipPortalVerts[iVert] ) );
-			builder.Color4f( 0, 0, 0, 1 );
-			builder.AdvanceVertex();
+			if( !R_IsAreaVisible( pAreaPortal->otherarea ) )
+				continue;
+
+			CMeshBuilder builder;
+			builder.Begin( pMesh, MATERIAL_LINES, pAreaPortal->m_nClipPortalVerts );
+
+			for( unsigned short j=0; j < pAreaPortal->m_nClipPortalVerts; j++ )
+			{
+				unsigned short iVert = pAreaPortal->m_FirstClipPortalVert + j;
+				builder.Position3f( VectorExpand( pBrushData->m_pClipPortalVerts[iVert] ) );
+				builder.Color4f( 0, 0, 0, 1 );
+				builder.AdvanceVertex();
+
+				iVert = pAreaPortal->m_FirstClipPortalVert + (j+1) % pAreaPortal->m_nClipPortalVerts;
+				builder.Position3f( VectorExpand( pBrushData->m_pClipPortalVerts[iVert] ) );
+				builder.Color4f( 0, 0, 0, 1 );
+				builder.AdvanceVertex();
+			}
+
+			builder.End( false, true );
 		}
-
-		builder.End( false, true );
-	}
 	}
 
 	// Draw the clip rectangles.
@@ -578,31 +578,31 @@ void CRender::Push3DView( const CViewSetup &view, int nFlags, ITexture* pRenderT
 	if ( !m_ViewStack[i].m_bNoDraw )
 	{
 		{
-		CMatRenderContextPtr pRenderContext( materials );
+			CMatRenderContextPtr pRenderContext( materials );
 
-		if ( !pRenderTarget )
-		{
-			pRenderTarget = pRenderContext->GetRenderTarget();
-		}
+			if ( !pRenderTarget )
+			{
+				pRenderTarget = pRenderContext->GetRenderTarget();
+			}
 
-		// Push render target and viewport 
-		pRenderContext->PushRenderTargetAndViewport( pRenderTarget, pDepthTexture, topView.x, topView.y, topView.width, topView.height );
+			// Push render target and viewport 
+			pRenderContext->PushRenderTargetAndViewport( pRenderTarget, pDepthTexture, topView.x, topView.y, topView.width, topView.height );
 
-		// Handle an initial clear request if asked for
-		ClearView( topView, nFlags, pRenderTarget, pDepthTexture );
+			// Handle an initial clear request if asked for
+			ClearView( topView, nFlags, pRenderTarget, pDepthTexture );
 
-		pRenderContext->DepthRange( 0, 1 );
+			pRenderContext->DepthRange( 0, 1 );
 
-		pRenderContext->MatrixMode( MATERIAL_PROJECTION );
-		pRenderContext->PushMatrix();
-		pRenderContext->LoadMatrix( m_matrixProjection );
+			pRenderContext->MatrixMode( MATERIAL_PROJECTION );
+			pRenderContext->PushMatrix();
+			pRenderContext->LoadMatrix( m_matrixProjection );
 
-		pRenderContext->MatrixMode( MATERIAL_VIEW );
-		pRenderContext->PushMatrix();
-		pRenderContext->LoadMatrix( m_matrixView );
+			pRenderContext->MatrixMode( MATERIAL_VIEW );
+			pRenderContext->PushMatrix();
+			pRenderContext->LoadMatrix( m_matrixView );
 
-		pRenderContext->MatrixMode( MATERIAL_MODEL );
-		pRenderContext->PushMatrix();
+			pRenderContext->MatrixMode( MATERIAL_MODEL );
+			pRenderContext->PushMatrix();
 		}
 
 		OnViewActive( frustumPlanes );
