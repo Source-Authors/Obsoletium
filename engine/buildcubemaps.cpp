@@ -574,6 +574,7 @@ static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pS
 			Warning("*** Error unserializing skybox texture: '%s'.\n", srcVTFFileName );
 			// dimhotepus: Do not leak VTF texture.
 			DestroyVTFTexture(texture);
+			texture = nullptr;
 			return false;
 		}
 
@@ -591,6 +592,7 @@ static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pS
 				pSrcVTFTextures[0]->Width(), src0VTFFileName,
 				texture->Width(), srcVTFFileName);
 			DestroyVTFTexture(texture);
+			texture = nullptr;
 			return false;
 		}
 
@@ -605,6 +607,7 @@ static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pS
 				pSrcVTFTextures[0]->Height(), src0VTFFileName,
 				texture->Height(), srcVTFFileName);
 			DestroyVTFTexture(texture);
+			texture = nullptr;
 			return false;
 		}
 		
@@ -615,6 +618,7 @@ static bool LoadSrcVTFFiles( IVTFTexture * (&pSrcVTFTextures)[6], const char *pS
 				srcVTFFileName,
 				flagsFirstNoAlpha, src0VTFFileName, flagsNoAlpha, srcVTFFileName);
 			DestroyVTFTexture(texture);
+			texture = nullptr;
 			return false;
 		}
 	}
@@ -658,6 +662,8 @@ void Cubemap_CreateDefaultCubemap( const char *pMapName, IBSPPack *iBSPPack )
 
 	// Create the destination cubemap
 	IVTFTexture *pDstCubemap = CreateVTFTexture();
+	RunCodeAtScopeExit(DestroyVTFTexture( pDstCubemap ));
+
 	pDstCubemap->Init( DEFAULT_CUBEMAP_SIZE, DEFAULT_CUBEMAP_SIZE, 1,
 		pSrcVTFTextures[0]->Format(), pSrcVTFTextures[0]->Flags() | TEXTUREFLAGS_ENVMAP, 
 		pSrcVTFTextures[0]->FrameCount() );
@@ -733,11 +739,10 @@ void Cubemap_CreateDefaultCubemap( const char *pMapName, IBSPPack *iBSPPack )
 	iBSPPack->AddBufferToPack( dstVTFFileName, outputBuf.Base(), outputBuf.TellPut(), false );
 
 	// Clean up the textures
-	for( i = 0; i < 6; i++ )
+	for( auto *t : pSrcVTFTextures )
 	{
-		DestroyVTFTexture( pSrcVTFTextures[i] );
+		DestroyVTFTexture( t );
 	}
-	DestroyVTFTexture( pDstCubemap );
 }
 
 static void AddSampleToBSPFile( bool bHDR, mcubemapsample_t *pSample, const char *matDir, IBSPPack *iBSPPack )
