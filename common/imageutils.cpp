@@ -771,14 +771,14 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	{
 		// !KLUDGE! Try to detect what went wrong
 		FILE *fp = fopen( bmpPath, "rb" );
-		if (fp == nullptr)
+		if (!fp)
 		{
 			errcode = CE_CANT_OPEN_SOURCE_FILE;
 		}
 		else
 		{
 			// dimhotepus: Do not leak file resource.
-			fclose( fp );
+			RunCodeAtScopeExit(fclose( fp ));
 			errcode = CE_ERROR_PARSING_SOURCE;
 		}
 		return nullptr;
@@ -808,6 +808,8 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		return nullptr;
 	}
 
+	RunCodeAtScopeExit(free( bitmapInfo ));
+
 	memset(bitmapInfo, 0, sizeof(BITMAPINFO));
 	bitmapInfo->bmiHeader.biSize = sizeof(bitmapInfo->bmiHeader);
 	if (bUseColorTable)
@@ -823,7 +825,6 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 		if (retcode == 0)
 		{
 			// error getting the bitmap info for some reason.
-			free(bitmapInfo);
 			errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
 			return nullptr;
 		}
@@ -835,7 +836,6 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	auto *buf = (unsigned char *)malloc(mem_required);
 	if (buf == nullptr)
 	{
-		free(bitmapInfo);
 		errcode = CE_MEMORY_ERROR;
 		return nullptr;
 	}
@@ -1009,13 +1009,10 @@ unsigned char *ImgUtl_ReadBMPAsRGBA( const char *bmpPath, int &width, int &heigh
 	}
 	else
 	{
-		free(bitmapInfo);
 		free(buf);
 		errcode = CE_SOURCE_FILE_BMP_FORMAT_NOT_SUPPORTED;
 		return nullptr;
 	}
-
-	free(bitmapInfo);
 
 	// OK!
 	width = bitmap.bmWidth;
@@ -1070,17 +1067,17 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 	ConversionErrorType errcode;
 	TGAHeader tgaHeader;
 	unsigned char *srcBuffer = ImgUtl_ReadTGAAsRGBA(tgaPath, tgaWidth, tgaHeight, errcode, tgaHeader);
-
 	if (srcBuffer == nullptr)
 	{
 		return errcode;
 	}
 
+	RunCodeAtScopeExit(free(srcBuffer));
+
 	int paddedImageWidth, paddedImageHeight;
 
 	if ((tgaWidth <= 0) || (tgaHeight <= 0))
 	{
-		free(srcBuffer);
 		return CE_ERROR_PARSING_SOURCE;
 	}
 
@@ -1151,27 +1148,24 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 		finalWidth = paddedImageWidth;
 	}
 
-	auto *resizeBuffer = (unsigned char *)malloc(finalWidth * finalHeight * 4);
+	std::unique_ptr<byte[]> resizeBuffer = std::make_unique<byte[]>(finalWidth * finalHeight * 4);
 
 	// do the actual stretching
-	ImgUtl_StretchRGBAImage(srcBuffer, tgaWidth, tgaHeight, resizeBuffer, finalWidth, finalHeight);
-
-	free(srcBuffer);  // don't need this anymore.
+	ImgUtl_StretchRGBAImage(srcBuffer, tgaWidth, tgaHeight, resizeBuffer.get(), finalWidth, finalHeight);
 
 	///////////////////////////////////////////////////////////////////////
 	///// need to pad the image so both dimensions are power of two's /////
 	///////////////////////////////////////////////////////////////////////
-	auto *finalBuffer = (unsigned char *)malloc(paddedImageWidth * paddedImageHeight * 4);
-	ImgUtl_PadRGBAImage(resizeBuffer, finalWidth, finalHeight, finalBuffer, paddedImageWidth, paddedImageHeight);
+	std::unique_ptr<byte[]> finalBuffer = std::make_unique<byte[]>(paddedImageWidth * paddedImageHeight * 4);
+	ImgUtl_PadRGBAImage(resizeBuffer.get(), finalWidth, finalHeight, finalBuffer.get(), paddedImageWidth, paddedImageHeight);
 
 	FILE *outfile = fopen(tgaPath, "wb");
-	if (outfile == nullptr)
+	if (!outfile)
 	{
-		free(resizeBuffer);
-		free(finalBuffer);
-
 		return CE_ERROR_WRITING_OUTPUT_FILE;
 	}
+
+	RunCodeAtScopeExit(fclose(outfile));
 
 	tgaHeader.width = paddedImageWidth;
 	tgaHeader.height = paddedImageHeight;
@@ -1179,9 +1173,6 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 	// dimhotepus: Check header is written.
 	if (!WriteTGAHeader(outfile, tgaHeader))
 	{
-		free(resizeBuffer);
-		free(finalBuffer);
-
 		return CE_ERROR_WRITING_OUTPUT_FILE;
 	}
 
@@ -1194,11 +1185,6 @@ ConversionErrorType ImgUtl_ConvertTGA(const char *tgaPath, int nMaxWidth/*=-1*/,
 		fputc( finalBuffer[i*4    ], outfile ); // R
 		fputc( finalBuffer[i*4 + 3], outfile ); // A
 	}
-
-	fclose(outfile);
-
-	free(resizeBuffer);
-	free(finalBuffer);
 
 	return CE_SUCCESS;
 }
@@ -1369,34 +1355,34 @@ ConversionErrorType ImgUtl_PadRGBAImage(const unsigned char *srcBuf, const int s
 ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=-1*/, int nMaxHeight/*=-1*/ )
 {
 	FILE *infile = fopen(tgaPath, "rb");
-	if (infile == nullptr)
+	if (!infile)
 	{
-		Msg( "Failed to open TGA: %s\n", tgaPath);
+		Warning( "Failed to open TGA: %s\n", tgaPath);
 		return CE_CANT_OPEN_SOURCE_FILE;
 	}
+
+	RunCodeAtScopeExit(fclose(infile));
 
 	// read out the header of the image.
 	TGAHeader header;
 	// dimhotepus: Check TGA header was read.
 	if (!ImgUtl_ReadTGAHeader(infile, header))
 	{
-		Msg( "Failed to read TGA header: %s\n", tgaPath);
+		Warning( "Failed to read TGA header: %s\n", tgaPath);
 		return CE_SOURCE_FILE_TGA_FORMAT_NOT_SUPPORTED;
 	}
 
 	// check to make sure that the TGA has the proper dimensions and size.
 	if (!IsPowerOfTwo(header.width) || !IsPowerOfTwo(header.height))
 	{
-		fclose(infile);
-		Msg( "Failed to open TGA - size dimensions (%d, %d) not power of 2: %s\n", header.width, header.height, tgaPath);
+		Warning( "Failed to open TGA - size dimensions (%d, %d) not power of 2: %s\n", header.width, header.height, tgaPath);
 		return CE_SOURCE_FILE_SIZE_NOT_SUPPORTED;
 	}
 
 	// check to make sure that the TGA isn't too big, if we care.
 	if ( ( nMaxWidth != -1 && header.width > nMaxWidth ) || ( nMaxHeight != -1 && header.height > nMaxHeight ) )
 	{
-		fclose(infile);
-		Msg( "Failed to open TGA - dimensions too large (%d, %d) (max: %d, %d): %s\n", header.width, header.height, nMaxWidth, nMaxHeight, tgaPath);
+		Warning( "Failed to open TGA - dimensions too large (%d, %d) (max: %d, %d): %s\n", header.width, header.height, nMaxWidth, nMaxHeight, tgaPath);
 		return CE_SOURCE_FILE_SIZE_NOT_SUPPORTED;
 	}
 
@@ -1405,16 +1391,15 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	CUtlBuffer inbuf((intp)0, imageMemoryFootprint);
 
 	// read in the image
-	int nBytesRead = fread(inbuf.Base(), imageMemoryFootprint, 1, infile);
+	intp nBytesRead = fread(inbuf.Base(), imageMemoryFootprint, 1, infile);
 
-	fclose(infile);
 	inbuf.SeekPut( CUtlBuffer::SEEK_HEAD, nBytesRead );
 
 	// load vtex_dll.dll and get the interface to it.
 	CSysModule *vtexmod = Sys_LoadModule("vtex_dll");
 	if (vtexmod == nullptr)
 	{
-		Msg( "Failed to open TGA conversion module vtex_dll: %s\n", tgaPath);
+		Warning( "Failed to open TGA conversion module vtex_dll: %s\n", tgaPath);
 		return CE_ERROR_LOADING_DLL;
 	}
 
@@ -1422,7 +1407,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	if (factory == NULL)
 	{
 		Sys_UnloadModule(vtexmod);
-		Msg( "Failed to open TGA conversion module vtex_dll Factory: %s\n", tgaPath);
+		Warning( "Failed to open TGA conversion module vtex_dll Factory: %s\n", tgaPath);
 		return CE_ERROR_LOADING_DLL;
 	}
 
@@ -1430,7 +1415,7 @@ ConversionErrorType ImgUtl_ConvertTGAToVTF(const char *tgaPath, int nMaxWidth/*=
 	if (vtex == nullptr)
 	{
 		Sys_UnloadModule(vtexmod);
-		Msg( "Failed to open TGA conversion module vtex_dll Factory (is null): %s\n", tgaPath);
+		Warning( "Failed to open TGA conversion module vtex_dll Factory (is null): %s\n", tgaPath);
 		return CE_ERROR_LOADING_DLL;
 	}
 
@@ -1745,10 +1730,12 @@ ConversionErrorType ImgUtl_WriteGenericVMT( const char *vtfPath, const char *pMa
 
 	// create the vmt file.
 	FILE *vmtFile = fopen(vmtPath, "w");
-	if (vmtFile == nullptr)
+	if (!vmtFile)
 	{
 		return CE_ERROR_WRITING_OUTPUT_FILE;
 	}
+
+	RunCodeAtScopeExit(fclose(vmtFile));
 
 	// make a copy of the subdir and remove any trailing slash
 	char szMaterialsSubDir[ MAX_PATH*2 ];
@@ -1760,8 +1747,6 @@ ConversionErrorType ImgUtl_WriteGenericVMT( const char *vtfPath, const char *pMa
 
 	// write the contents of the file.
 	fprintf(vmtFile, "\"UnlitGeneric\"\n{\n\t\"$basetexture\"	\"%s%c%s\"\n\t\"$translucent\" \"1\"\n\t\"$ignorez\" \"1\"\n\t\"$vertexcolor\" \"1\"\n\t\"$vertexalpha\" \"1\"\n}\n", szMaterialsSubDir, CORRECT_PATH_SEPARATOR, filename);
-
-	fclose(vmtFile);
 
 	return CE_SUCCESS;
 }
@@ -1795,39 +1780,30 @@ ConversionErrorType ImgUtl_WriteRGBAAsPNGToBuffer( const unsigned char *pRGBADat
     /* could pass pointers to user-defined error handlers instead of NULLs: */
 	png_structp png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
 		NULL, NULL, NULL);
-	if (png_ptr == nullptr)
+	if (!png_ptr)
 	{
 		return CE_MEMORY_ERROR;
 	}
 
-	ConversionErrorType errcode = CE_MEMORY_ERROR;
-
-	png_bytepp  row_pointers = nullptr;
-
 	png_infop info_ptr = png_create_info_struct(png_ptr);
     if ( !info_ptr ) 
 	{
-        errcode = CE_MEMORY_ERROR;
-fail:
-		if ( row_pointers )
-		{
-			free( row_pointers );
-		}
         png_destroy_write_struct( &png_ptr, &info_ptr );
-        return errcode;
+        return CE_MEMORY_ERROR;
     }
+
+	RunCodeAtScopeExit(png_destroy_write_struct(&png_ptr, &info_ptr));
 
 	// We'll use the default setjmp / longjmp error handling.
     if ( setjmp( png_jmpbuf(png_ptr) ) ) 
 	{
 		// Error "writing".  But since we're writing to a memory bufferm,
 		// that just means we must have run out of memory
-        errcode = CE_MEMORY_ERROR;
-        goto fail;
+        return CE_MEMORY_ERROR;
     }
 
 	// Setup stream writing callbacks
-	png_set_write_fn(png_ptr, (void *)&bufOutData, WritePNGData, FlushPNGData);
+	png_set_write_fn(png_ptr, &bufOutData, WritePNGData, FlushPNGData);
 
 	// Setup info structure
 	png_set_IHDR(png_ptr, info_ptr, nWidth, nHeight, 8, PNG_COLOR_TYPE_RGB_ALPHA,
@@ -1840,11 +1816,10 @@ fail:
 	// Write the file header information.
 	png_write_info(png_ptr, info_ptr);
 
-	row_pointers = (png_bytepp)malloc( nHeight*sizeof(png_bytep) );
-	if ( row_pointers == nullptr  ) 
+	std::unique_ptr<png_bytep[]> row_pointers = std::make_unique<png_bytep[]>( nHeight );
+	if ( !row_pointers ) 
 	{
-        errcode = CE_MEMORY_ERROR;
-        goto fail;
+        return CE_MEMORY_ERROR;
     }
 
 	/* set the individual row_pointers to point at the correct offsets */
@@ -1852,15 +1827,11 @@ fail:
 		row_pointers[i] = const_cast<unsigned char *>(pRGBAData + i*nStride);
 
 	// Write the image
-	png_write_image(png_ptr, row_pointers);
+	png_write_image(png_ptr, row_pointers.get());
 
 	/* It is REQUIRED to call this to finish writing the rest of the file */
 	png_write_end(png_ptr, info_ptr);
 
-	// Clean up, and we're done
-	free( row_pointers );
-	row_pointers = nullptr;
-	png_destroy_write_struct(&png_ptr, &info_ptr);
 	return CE_SUCCESS;
 }
 
@@ -1957,21 +1928,20 @@ bool ImgUtl_WriteRGBToJPEG( unsigned char *pSrcBuf, unsigned int nSrcWidth, unsi
 	CUtlBuffer dstBuf;
 
 	JSAMPROW row_pointer[1];     // pointer to JSAMPLE row[s]
-	int row_stride;              // physical row width in image buffer
 
+	// physical row width in image buffer
+	int row_stride = nSrcWidth * 3; // JSAMPLEs per row in image_buffer
+	
 	// stderr handler
 	jpeg_error_mgr jerr;
-
 	// compression data structure
 	jpeg_compress_struct cinfo = {};
-
-	row_stride = nSrcWidth * 3; // JSAMPLEs per row in image_buffer
-
 	// point at stderr
 	cinfo.err = jpeg_std_error(&jerr);
 
 	// create compressor
 	jpeg_create_compress(&cinfo);
+	RunCodeAtScopeExit(jpeg_destroy_compress(&cinfo));
 
 	// Hook CUtlBuffer to compression
 	jpeg_UtlBuffer_dest(&cinfo, &dstBuf );
@@ -1990,6 +1960,7 @@ bool ImgUtl_WriteRGBToJPEG( unsigned char *pSrcBuf, unsigned int nSrcWidth, unsi
 
 	// Start compressor
 	jpeg_start_compress(&cinfo, TRUE);
+	RunCodeAtScopeExit(jpeg_finish_compress(&cinfo));
 
 	// Write scanlines
 	while ( cinfo.next_scanline < cinfo.image_height ) 
@@ -1997,12 +1968,6 @@ bool ImgUtl_WriteRGBToJPEG( unsigned char *pSrcBuf, unsigned int nSrcWidth, unsi
 		row_pointer[ 0 ] = &pSrcBuf[ cinfo.next_scanline * row_stride ];
 		jpeg_write_scanlines( &cinfo, row_pointer, 1 );
 	}
-
-	// Finalize image
-	jpeg_finish_compress(&cinfo);
-
-	// Cleanup
-	jpeg_destroy_compress(&cinfo);
 	
 	return CE_SUCCESS;
 }
@@ -2023,6 +1988,7 @@ ConversionErrorType ImgUtl_WriteRGBAAsJPEGToBuffer( const unsigned char *pRGBADa
 
 	// create compressor
 	jpeg_create_compress(&cinfo);
+	RunCodeAtScopeExit(jpeg_destroy_compress(&cinfo));
 
 	// Hook CUtlBuffer to compression
 	jpeg_UtlBuffer_dest(&cinfo, &bufOutData );
@@ -2041,9 +2007,10 @@ ConversionErrorType ImgUtl_WriteRGBAAsJPEGToBuffer( const unsigned char *pRGBADa
 
 	// Start compressor
 	jpeg_start_compress(&cinfo, TRUE);
+	RunCodeAtScopeExit(jpeg_finish_compress(&cinfo));
 
 	// Write scanlines
-	auto *pDstRow = (unsigned char *)malloc( sizeof(unsigned char) * nWidth * 4 );
+	std::unique_ptr<byte[]> pDstRow = std::make_unique<byte[]>( nWidth * 4 );
 	while ( cinfo.next_scanline < cinfo.image_height ) 
 	{
 		const unsigned char *pSrcRow = &(pRGBAData[cinfo.next_scanline * row_stride]);
@@ -2054,17 +2021,10 @@ ConversionErrorType ImgUtl_WriteRGBAAsJPEGToBuffer( const unsigned char *pRGBADa
 			pDstRow[x*3+1] = pSrcRow[x*4+1];
 			pDstRow[x*3] = pSrcRow[x*4];
 		}
-		row_pointer[ 0 ] = pDstRow;
+		row_pointer[ 0 ] = pDstRow.get();
+
 		jpeg_write_scanlines( &cinfo, row_pointer, 1 );
 	}
-
-	// Finalize image
-	jpeg_finish_compress(&cinfo);
-
-	// Cleanup
-	jpeg_destroy_compress(&cinfo);
-
-	free( pDstRow );
 
 	return CE_SUCCESS;
 }
