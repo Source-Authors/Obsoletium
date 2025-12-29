@@ -945,7 +945,7 @@ void CacheAndUnloadLightmapData()
 //sorts the surfaces in place
 static void SortSurfacesByLightmapID( SurfaceHandle_t *pToSort, int iSurfaceCount )
 {
-	SurfaceHandle_t *pSortTemp = (SurfaceHandle_t *)stackalloc( sizeof( SurfaceHandle_t ) * iSurfaceCount );
+	SurfaceHandle_t *pSortTemp = stackallocT( SurfaceHandle_t, iSurfaceCount );
 	
 	//radix sort
 	for( int radix = 0; radix < 4; ++radix )
