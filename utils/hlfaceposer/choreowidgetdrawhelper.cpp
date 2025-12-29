@@ -271,7 +271,7 @@ int CChoreoWidgetDrawHelper::CalcTextWidth( const char *font, int pointsize, int
 	RunCodeAtScopeExit(DeleteObject( fnt ));
 
 	HDC screen = GetDC( NULL );
-	RunCodeAtScopeExit(ReleaseDC(screen));
+	RunCodeAtScopeExit(ReleaseDC(nullptr, screen));
 
 	HFONT oldFont = (HFONT)SelectObject( screen, fnt );
 	RunCodeAtScopeExit(SelectObject( screen, oldFont ));
