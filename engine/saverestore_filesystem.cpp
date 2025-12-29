@@ -231,7 +231,6 @@ public:
 	bool DirectoryExtract( FileHandle_t pFile, int fileCount, bool bIsXSave )
 	{
 		int				fileSize;
-		FileHandle_t	pCopy;
 		char			szName[ MAX_PATH ], fileName[ MAX_PATH ];
 		bool			success = true;
 
@@ -257,11 +256,14 @@ public:
 			}
 
 			Q_FixSlashes( szName );
-			pCopy = g_pSaveRestoreFileSystem->Open( szName, "wb", "MOD" );
+
+			FileHandle_t pCopy = g_pSaveRestoreFileSystem->Open( szName, "wb", "MOD" );
 			if ( !pCopy )
 				return false;
+
+			RunCodeAtScopeExit(g_pSaveRestoreFileSystem->Close( pCopy ));
+
 			success = FileCopy( pCopy, pFile, fileSize );
-			g_pSaveRestoreFileSystem->Close( pCopy );
 		}
 
 		return success;
