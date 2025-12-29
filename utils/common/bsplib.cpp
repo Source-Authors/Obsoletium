@@ -5156,7 +5156,7 @@ bool SetPakFileLump( const char *pBSPFilename, const char *pNewFilename, void *p
 		Warning( "Unable to load map '%s'.\n", pBSPFilename );
 		return false;
 	}
-
+	
 	RunCodeAtScopeExit(free( pHeader ));
 
 	bool bSwap = ( pHeader->ident == BigLong( IDBSPHEADER ) );
