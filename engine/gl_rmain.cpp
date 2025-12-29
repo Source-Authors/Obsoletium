@@ -58,60 +58,6 @@ bool g_bCanAccessCurrentView = false;
 
 int	d_lightstyleframe[256];
 
-void ProjectPointOnPlane( Vector& dst, const Vector& p, const Vector& normal )
-{
-	float d;
-	Vector n;
-	float inv_denom;
-
-	inv_denom = 1.0F / DotProduct( normal, normal );
-
-	d = DotProduct( normal, p ) * inv_denom;
-
-	n[0] = normal[0] * inv_denom;
-	n[1] = normal[1] * inv_denom;
-	n[2] = normal[2] * inv_denom;
-
-	dst[0] = p[0] - d * n[0];
-	dst[1] = p[1] - d * n[1];
-	dst[2] = p[2] - d * n[2];
-}
-
-/*
-** assumes "src" is normalized
-*/
-void PerpendicularVector( Vector& dst, const Vector& src )
-{
-	int	pos;
-	int i;
-	float minelem = 1.0F;
-	Vector tempvec;
-
-	/*
-	** find the smallest magnitude axially aligned vector
-	*/
-	for ( pos = 0, i = 0; i < 3; i++ )
-	{
-		if ( fabsf( src[i] ) < minelem )
-		{
-			pos = i;
-			minelem = fabsf( src[i] );
-		}
-	}
-	tempvec[0] = tempvec[1] = tempvec[2] = 0.0F;
-	tempvec[pos] = 1.0F;
-
-	/*
-	** project the point onto the plane defined by src
-	*/
-	ProjectPointOnPlane( dst, tempvec, src );
-
-	/*
-	** normalize the result
-	*/
-	VectorNormalize( dst );
-}
-
 
 //-----------------------------------------------------------------------------
 // Returns the aspect ratio of the screen
