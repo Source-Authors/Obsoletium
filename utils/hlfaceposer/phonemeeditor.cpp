@@ -2017,11 +2017,12 @@ void PhonemeEditor::redraw( void )
 		f += granularity;
 	}
 
-	HBRUSH br = CreateSolidBrush( PEColor( COLOR_PHONEME_TEXT ) );
+	{
+		HBRUSH br = CreateSolidBrush( PEColor( COLOR_PHONEME_TEXT ) );
+		RunCodeAtScopeExit(DeleteObject( br ));
 
-	FrameRect( dc, &rc, br );
-
-	DeleteObject( br );
+		FrameRect( dc, &rc, br );
+	}
 
 	RECT rcTags = rc;
 	rcTags.top = TAG_TOP;
@@ -8547,6 +8548,7 @@ void PhonemeEditor::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper )
 	GetScrubHandleRect( rcHandle, true );
 
 	HBRUSH br = CreateSolidBrush( RGB( 0, 150, 100 ) );
+	RunCodeAtScopeExit(DeleteObject( br ));
 
 	COLORREF areaBorder = RGB( 230, 230, 220 );
 
@@ -8569,8 +8571,6 @@ void PhonemeEditor::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper )
 	rcText.left += ( textw - len ) / 2;
 
 	drawHelper.DrawColoredText( "Arial", 9, 500, RGB( 255, 255, 255 ), rcText, sz );
-
-	DeleteObject( br );
 }
 
 //-----------------------------------------------------------------------------

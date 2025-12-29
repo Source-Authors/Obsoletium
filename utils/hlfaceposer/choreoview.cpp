@@ -9590,6 +9590,7 @@ void CChoreoView::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper )
 	GetScrubHandleRect( rcHandle, true );
 
 	HBRUSH br = CreateSolidBrush( RGB( 0, 150, 100 ) );
+	RunCodeAtScopeExit(DeleteObject( br ));
 
 	drawHelper.DrawFilledRect( br, rcHandle );
 
@@ -9605,8 +9606,6 @@ void CChoreoView::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper )
 	rcText.left += ( textw - len ) / 2;
 
 	drawHelper.DrawColoredText( "Arial", 9, 500, RGB( 255, 255, 255 ), rcText, sz );
-
-	DeleteObject( br );
 }
 
 //-----------------------------------------------------------------------------

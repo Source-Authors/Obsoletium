@@ -1616,15 +1616,20 @@ void CFacePoserSound::RenderWavToDC( HDC dc, RECT& outrect, COLORREF clr,
 	float selectionstarttime = pWave->GetRunningLength() * ( float )selectionstart  / ( float )totalsamples;
 	float selectionendtime = pWave->GetRunningLength() * ( float )selectionend  / ( float )totalsamples;
 
+	HPEN pen = CreatePen( PS_SOLID, 1, RGB( 175, 175, 250 ) );
+	RunCodeAtScopeExit(DeleteObject( pen ));
 
-	HPEN oldPen, pen, pen2, pen3, pen4;
+	HPEN pen2 = CreatePen( PS_SOLID, 1, clr );
+	RunCodeAtScopeExit(DeleteObject( pen2 ));
 
-	pen = CreatePen( PS_SOLID, 1, RGB( 175, 175, 250 ) );
-	pen2 = CreatePen( PS_SOLID, 1, clr );
-	pen3 = CreatePen( PS_SOLID, 1, RGB( 127, 200, 249 ) );
-	pen4 = CreatePen( PS_SOLID, 2, RGB( 0, 0, 200 ) );
+	HPEN pen3 = CreatePen( PS_SOLID, 1, RGB( 127, 200, 249 ) );
+	RunCodeAtScopeExit(DeleteObject( pen3 ));
 
-	oldPen = (HPEN)SelectObject( dc, pen );
+	HPEN pen4 = CreatePen( PS_SOLID, 2, RGB( 0, 0, 200 ) );
+	RunCodeAtScopeExit(DeleteObject( pen4 ));
+
+	HPEN oldPen = (HPEN)SelectObject( dc, pen );
+	RunCodeAtScopeExit(SelectObject( dc, oldPen ));
 
 	MoveToEx( dc, outrect.left, ( outrect.bottom + outrect.top ) / 2, NULL );
 	LineTo( dc, outrect.right, ( outrect.bottom + outrect.top ) / 2 );
@@ -1707,11 +1712,10 @@ void CFacePoserSound::RenderWavToDC( HDC dc, RECT& outrect, COLORREF clr,
 					}
 
 					HPEN old = (HPEN)SelectObject( dc, *usePen );
+					RunCodeAtScopeExit(SelectObject( dc, old ));
 		
 					MoveToEx( dc, outrect.left + pixel, top, NULL );
 					LineTo( dc, outrect.left + pixel, bottom-1 );
-
-					SelectObject( dc, old );
 				}
 			}
 
@@ -1752,11 +1756,6 @@ void CFacePoserSound::RenderWavToDC( HDC dc, RECT& outrect, COLORREF clr,
 	}
 
 	delete[] samples;
-
-	SelectObject( dc, oldPen );
-	DeleteObject( pen );
-	DeleteObject( pen2 );
-	DeleteObject( pen3 );
 
 	delete pMixer;
 }

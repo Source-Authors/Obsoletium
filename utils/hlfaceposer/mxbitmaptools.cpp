@@ -12,7 +12,6 @@
 
 bool LoadBitmapFromFile( const char *relative, mxbitmapdata_t& bitmap )
 {
-
 	bitmap.valid = false;
 	bitmap.image = NULL;
 	bitmap.width = -1;
@@ -24,30 +23,34 @@ bool LoadBitmapFromFile( const char *relative, mxbitmapdata_t& bitmap )
 	{
 		return false;
 	}
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	int width, height;
 
 	width	= 100;
 	height	= 100;
 
-	HBITMAP  bmNewImage = (HBITMAP)0;
+	HBITMAP  bmNewImage = nullptr;
 
-	HBITMAP bm, oldbm;
-	bm = CreateCompatibleBitmap( dc, width, height );
+	HBITMAP bm = CreateCompatibleBitmap( dc, width, height );
 	if ( bm )
 	{
-		oldbm = (HBITMAP)SelectObject( dc, bm );
+		RunCodeAtScopeExit(DeleteObject( bm ));
+
+		HBITMAP oldbm = (HBITMAP)SelectObject( dc, bm );
+		RunCodeAtScopeExit(SelectObject( dc, oldbm ));
 		
 		HDC memdc = CreateCompatibleDC( dc );
 		if ( memdc )
 		{
+			RunCodeAtScopeExit(DeleteDC( memdc ));
+
 			char filename[ 512 ];
 			filesystem->RelativePathToFullPath_safe( relative, "MOD", filename );
 
 			bmNewImage = (HBITMAP)LoadImage( 
 				(HINSTANCE) GetModuleHandle(0), filename,
 				IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE | LR_DEFAULTSIZE );
-
 			if ( !bmNewImage )
 			{
 				filesystem->RelativePathToFullPath_safe( relative, "GAME", filename );
@@ -60,9 +63,9 @@ bool LoadBitmapFromFile( const char *relative, mxbitmapdata_t& bitmap )
 			if ( bmNewImage )
 			{
 				HBITMAP oldmembm = (HBITMAP)SelectObject( memdc, bmNewImage );
+				RunCodeAtScopeExit(SelectObject( memdc, oldmembm ));
 				
-				BITMAPINFO bmi;
-				memset( &bmi, 0, sizeof( bmi ) );
+				BITMAPINFO bmi = {};
 				bmi.bmiHeader.biSize = sizeof( BITMAPINFOHEADER );
 				
 				if ( GetDIBits( memdc, bmNewImage, 0, 0, NULL, &bmi, DIB_RGB_COLORS ) )
@@ -70,18 +73,9 @@ bool LoadBitmapFromFile( const char *relative, mxbitmapdata_t& bitmap )
 					bitmap.width = bmi.bmiHeader.biWidth;
 					bitmap.height = bmi.bmiHeader.biHeight;
 				}
-				
-				SelectObject( memdc, oldmembm );
 			}
-			
-			DeleteDC( memdc );
 		}
-		
-		SelectObject( dc, oldbm );
-		DeleteObject( bm );
 	}
-	
-	ReleaseDC( NULL, dc );
 
 	if ( bmNewImage && 
 		bitmap.width != -1 && 
@@ -99,30 +93,30 @@ void DrawBitmapToWindow( mxWindow *wnd, int x, int y, int w, int h, mxbitmapdata
 	if ( !bitmap.valid )
 		return;
 
-	// Draw
-	HDC dc = GetDC( (HWND) wnd->getHandle() );
-	if ( !dc )
-		return;
+	{
+		// Draw
+		HDC dc = GetDC( (HWND) wnd->getHandle() );
+		if ( !dc )
+			return;
+		RunCodeAtScopeExit(ReleaseDC( (HWND) wnd->getHandle(), dc ));
 
-	HBITMAP bm, oldbm;
-	bm = CreateCompatibleBitmap( dc, w, h );
-	oldbm = (HBITMAP)SelectObject( dc, bm );
+		HBITMAP bm = CreateCompatibleBitmap( dc, w, h );
+		RunCodeAtScopeExit(DeleteObject( bm ));
 
-	HDC memdc = CreateCompatibleDC( dc );
-	HBITMAP oldmembm = (HBITMAP)SelectObject( memdc, bitmap.image );
+		HBITMAP oldbm = (HBITMAP)SelectObject( dc, bm );
+		RunCodeAtScopeExit(SelectObject( dc, oldbm ));
 
-	int oldmode = SetStretchBltMode( dc, COLORONCOLOR );
+		HDC memdc = CreateCompatibleDC( dc );
+		RunCodeAtScopeExit(DeleteDC( memdc ));
 
-	StretchBlt( dc, x, y, w, h, memdc, 0, 0, bitmap.width, bitmap.height, SRCCOPY );
+		HBITMAP oldmembm = (HBITMAP)SelectObject( memdc, bitmap.image );
+		RunCodeAtScopeExit(SelectObject( memdc, oldmembm ));
 
-	SetStretchBltMode( dc, oldmode );
+		int oldmode = SetStretchBltMode( dc, COLORONCOLOR );
+		RunCodeAtScopeExit(SetStretchBltMode( dc, oldmode ));
 
-	SelectObject( memdc, oldmembm );
-	DeleteDC( memdc );
-
-	SelectObject( dc, oldbm );
-	DeleteObject( bm );
-	ReleaseDC( (HWND) wnd->getHandle(), dc );
+		StretchBlt( dc, x, y, w, h, memdc, 0, 0, bitmap.width, bitmap.height, SRCCOPY );
+	}
 
 	RECT rc;
 	rc.left = x;

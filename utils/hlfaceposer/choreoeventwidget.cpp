@@ -292,7 +292,10 @@ void CChoreoEventWidget::DrawSpeakEvent(  CChoreoWidgetDrawHelper& drawHelper, R
 	HDC dc = drawHelper.GrabDC();
 
 	HBRUSH brEvent = CreateSolidBrush( GrayOutColor( COLOR_CHOREO_EVENT ) );
+	RunCodeAtScopeExit(DeleteObject( brEvent ));
+	
 	HBRUSH brBackground = CreateSolidBrush( GrayOutColor( COLOR_CHOREO_DARKBACKGROUND ) );
+	RunCodeAtScopeExit(DeleteObject( brBackground ));
 
 	if ( !ramponly )
 	{
@@ -311,9 +314,6 @@ void CChoreoEventWidget::DrawSpeakEvent(  CChoreoWidgetDrawHelper& drawHelper, R
 	drawHelper.DrawColoredLine( GrayOutColor( COLOR_CHOREO_EVENT ), PS_SOLID, 3,
 		rcEventLine.right, rcEventLine.top, rcEventLine.right, rcEventLine.bottom );
 	
-	DeleteObject( brBackground );
-	DeleteObject( brEvent );
-
 	//rcEventLine.top -= 3;
 	DrawRelativeTags( drawHelper, rcEventLine, m_pWaveFile->GetRunningLength(), event );
 }
@@ -353,14 +353,15 @@ void CChoreoEventWidget::DrawGestureEvent(  CChoreoWidgetDrawHelper& drawHelper,
 		nullevent = true;
 	}
 
-	HBRUSH brEvent = CreateSolidBrush( clrEvent );
-
-	if ( !ramponly )
 	{
-		FillRect( dc, &rcEventLine2, brEvent );
-	}
+		HBRUSH brEvent = CreateSolidBrush( clrEvent );
+		RunCodeAtScopeExit(DeleteObject( brEvent ));
 
-	DeleteObject( brEvent );
+		if ( !ramponly )
+		{
+			FillRect( dc, &rcEventLine2, brEvent );
+		}
+	}
 
 	if ( ramponly && IsSelected() )
 	{
@@ -428,14 +429,15 @@ void CChoreoEventWidget::DrawGenericEvent( CChoreoWidgetDrawHelper& drawHelper, 
 		clrEvent = GrayOutColor( RGB( 200, 180, 200 ) );
 	}
 
-	HBRUSH brEvent = CreateSolidBrush( clrEvent );
-
-	if ( !ramponly )
 	{
-		FillRect( dc, &rcEventLine, brEvent );
-	}
+		HBRUSH brEvent = CreateSolidBrush( clrEvent );
+		RunCodeAtScopeExit(DeleteObject( brEvent ));
 
-	DeleteObject( brEvent );
+		if ( !ramponly )
+		{
+			FillRect( dc, &rcEventLine, brEvent );
+		}
+	}
 
 	if ( ramponly && IsSelected() )
 	{
@@ -505,7 +507,11 @@ void CChoreoEventWidget::redraw( CChoreoWidgetDrawHelper& drawHelper )
 		COLORREF clrBorder = GrayOutColor( RGB( 100, 200, 255 ) );
 
 		HBRUSH brBorder = CreateSolidBrush( clrBorder );
+		RunCodeAtScopeExit(DeleteObject( brBorder ));
+
 		HBRUSH brSelected = CreateHatchBrush( HS_FDIAGONAL, clrSelection );
+		RunCodeAtScopeExit(DeleteObject( brSelected ));
+
 		for ( int i = 0; i < 2; i++ )
 		{
 			FrameRect( dc, &rcFrame, brSelected );
@@ -514,8 +520,6 @@ void CChoreoEventWidget::redraw( CChoreoWidgetDrawHelper& drawHelper )
 		FrameRect( dc, &rcBorder, brBorder );
 		FrameRect( dc, &rcFrame, brBorder );
 
-		DeleteObject( brSelected );
-		DeleteObject( brBorder );
 		rcClient.right -= 1;
 		//rcClient.bottom += 1;
 		InflateRect( &rcClient, -3, -1 );

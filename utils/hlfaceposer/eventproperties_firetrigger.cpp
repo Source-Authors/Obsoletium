@@ -117,12 +117,11 @@ BOOL CEventPropertiesFireTriggerDialog::HandleMessage( HWND hwndDlg, UINT uMsg, 
 	{
 	case WM_PAINT:
 		{
-			PAINTSTRUCT ps; 
-			HDC hdc;
-			
-            hdc = BeginPaint(hwndDlg, &ps); 
+			PAINTSTRUCT ps;
+			HDC hdc = BeginPaint(hwndDlg, &ps);
+			RunCodeAtScopeExit(EndPaint(hwndDlg, &ps));
+
 			DrawSpline( hdc, GetControl( IDC_STATIC_SPLINE ), g_Params.m_pEvent );
-            EndPaint(hwndDlg, &ps); 
 
             return FALSE; 
 		}

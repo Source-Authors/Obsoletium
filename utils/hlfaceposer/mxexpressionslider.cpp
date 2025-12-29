@@ -274,20 +274,19 @@ void mxExpressionSlider::GetThumbRect( int barnum, RECT &rcThumb )
 void mxExpressionSlider::DrawBar( HDC& dc )
 {
 	RECT rcBar;
-
 	GetBarRect( rcBar );
 
-	HPEN oldPen;
+	HPEN shadow = CreatePen( PS_SOLID, 1, GetSysColor( COLOR_3DSHADOW ) );
+	RunCodeAtScopeExit(DeleteObject( shadow ));
 
-	HPEN shadow;
-	HBRUSH face;
-	HPEN hilight;
+	HPEN hilight = CreatePen( PS_SOLID, 1, GetSysColor( COLOR_3DHIGHLIGHT ) );
+	RunCodeAtScopeExit(DeleteObject( hilight ));
 
-	shadow = CreatePen( PS_SOLID, 1, GetSysColor( COLOR_3DSHADOW ) );
-	hilight = CreatePen( PS_SOLID, 1, GetSysColor( COLOR_3DHIGHLIGHT ) );
-	face = CreateSolidBrush( GetSysColor( COLOR_3DFACE ) );
+	HBRUSH face = CreateSolidBrush( GetSysColor( COLOR_3DFACE ) );
+	RunCodeAtScopeExit(DeleteObject( face ));
 
-	oldPen = (HPEN)SelectObject( dc, hilight );
+	HPEN oldPen = (HPEN)SelectObject( dc, hilight );
+	RunCodeAtScopeExit(SelectObject( dc, oldPen ));
 
 	MoveToEx( dc, rcBar.left, rcBar.bottom, NULL );
 	LineTo( dc, rcBar.left, rcBar.top );
@@ -304,31 +303,21 @@ void mxExpressionSlider::DrawBar( HDC& dc )
 	rcBar.bottom -= 1;
 
 	FillRect( dc, &rcBar, face );
-
-	SelectObject( dc, oldPen );
-
-	DeleteObject( face );
-	DeleteObject( shadow );
-	DeleteObject( hilight );
 }
 
 void mxExpressionSlider::DrawThumb( int barnum, HDC& dc )
 {
 	RECT rcThumb;
-
 	GetThumbRect( barnum, rcThumb );
 
 	// Draw it
-
-
-	HPEN oldPen;
-
-	HPEN shadow;
 	HBRUSH face;
-	HPEN hilight;
 
-	shadow = CreatePen( PS_SOLID, 1, GetSysColor( COLOR_3DDKSHADOW ) );
-	hilight = CreatePen( PS_SOLID, 1, GetSysColor( COLOR_3DHIGHLIGHT ) );
+	HPEN shadow = CreatePen( PS_SOLID, 1, GetSysColor( COLOR_3DDKSHADOW ) );
+	RunCodeAtScopeExit(DeleteObject( shadow ));
+
+	HPEN hilight = CreatePen( PS_SOLID, 1, GetSysColor( COLOR_3DHIGHLIGHT ) );
+	RunCodeAtScopeExit(DeleteObject( hilight ));
 	
 	switch ( barnum )
 	{
@@ -385,6 +374,8 @@ void mxExpressionSlider::DrawThumb( int barnum, HDC& dc )
 		break;
 	}
 
+	RunCodeAtScopeExit(DeleteObject( face ));
+
 	//rcThumb.left += 1;
 	//rcThumb.right -= 1;
 	//rcThumb.top += 1;
@@ -430,28 +421,37 @@ void mxExpressionSlider::DrawThumb( int barnum, HDC& dc )
 		break;
 	}
 
-	HRGN rgn = CreatePolygonRgn( region, cPoints, ALTERNATE );
+	{
+		HRGN rgn = CreatePolygonRgn( region, cPoints, ALTERNATE );
+		RunCodeAtScopeExit(DeleteObject( rgn ));
 
-	int oldPF = SetPolyFillMode( dc, ALTERNATE );
-	FillRgn( dc, rgn, face );
-	SetPolyFillMode( dc, oldPF );
+		int oldPF = SetPolyFillMode( dc, ALTERNATE );
+		RunCodeAtScopeExit(SetPolyFillMode( dc, oldPF ));
 
-	DeleteObject( rgn );
+		FillRgn( dc, rgn, face );
+	}
 
-	oldPen = (HPEN)SelectObject( dc, hilight );
+	{
+		HPEN oldPen = (HPEN)SelectObject( dc, hilight );
+		RunCodeAtScopeExit(SelectObject( dc, oldPen ));
 
-	MoveToEx( dc, region[0].x, region[0].y, NULL );
-	LineTo( dc, region[1].x, region[1].y );
-	SelectObject( dc, shadow );
-	LineTo( dc, region[2].x, region[2].y );
-	SelectObject( dc, hilight );
-	LineTo( dc, region[0].x, region[0].y );
+		MoveToEx( dc, region[0].x, region[0].y, NULL );
+		LineTo( dc, region[1].x, region[1].y );
+	}
 
-	SelectObject( dc, oldPen );
+	{
+		HPEN oldPen = (HPEN)SelectObject( dc, shadow );
+		RunCodeAtScopeExit(SelectObject( dc, oldPen ));
 
-	DeleteObject( face );
-	DeleteObject( shadow );
-	DeleteObject( hilight );
+		LineTo( dc, region[2].x, region[2].y );
+	}
+
+	{
+		HPEN oldPen = (HPEN)SelectObject( dc, hilight );
+		RunCodeAtScopeExit(SelectObject( dc, oldPen ));
+
+		LineTo( dc, region[0].x, region[0].y );
+	}
 }
 
 void mxExpressionSlider::DrawTitle( HDC &dc )
@@ -473,9 +473,7 @@ void mxExpressionSlider::DrawTitle( HDC &dc )
 	char sz[ 128 ];
 	V_sprintf_safe( sz, "%s", getLabel() );
 
-	HFONT fnt, oldfont;
-
-	fnt = CreateFont(
+	HFONT fnt = CreateFont(
 		-12					             // H
 		, 0   					         // W
 		, 0								 // Escapement
@@ -490,9 +488,9 @@ void mxExpressionSlider::DrawTitle( HDC &dc )
 		, PROOF_QUALITY   			     // Qual.
 		, VARIABLE_PITCH | FF_DONTCARE   // Pitch and Fam.
 		, "Arial" );
+	RunCodeAtScopeExit(DeleteObject( fnt ));
 
 	COLORREF oldColor;
-
 	if (!isEdited( 0 ))
 	{
 		oldColor = SetTextColor( dc, GetSysColor( COLOR_BTNTEXT ) );
@@ -501,15 +499,15 @@ void mxExpressionSlider::DrawTitle( HDC &dc )
 	{
 		oldColor = SetTextColor( dc, RGB( 255, 0, 0 ) );
 	}
+	RunCodeAtScopeExit(SetTextColor( dc, oldColor ));
+
 	int oldMode = SetBkMode( dc, TRANSPARENT );
-	oldfont = (HFONT)SelectObject( dc, fnt );
+	RunCodeAtScopeExit(SetBkMode( dc, oldMode ));
+
+	HFONT oldfont = (HFONT)SelectObject( dc, fnt );
+	RunCodeAtScopeExit(SelectObject( dc, oldfont ));
 
 	DrawText( dc, sz, -1, &rc, DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_LEFT | DT_WORD_ELLIPSIS );
-	
-	SelectObject( dc, oldfont );
-	DeleteObject( fnt );
-	SetBkMode( dc, oldMode );
-	SetTextColor( dc, oldColor );
 }
 
 void mxExpressionSlider::redraw()
@@ -522,6 +520,8 @@ void mxExpressionSlider::redraw()
 	if ( !finalDC )
 		return;
 
+	RunCodeAtScopeExit(ReleaseDC( wnd, finalDC ));
+
 	RECT rc;
 	GetClientRect( wnd, &rc );
 
@@ -529,17 +529,18 @@ void mxExpressionSlider::redraw()
 	int h = rc.bottom - rc.top;
 
 	HDC dc = CreateCompatibleDC( finalDC );
-	HBITMAP oldbm, bm;
+	RunCodeAtScopeExit(DeleteDC( dc ));
 
-	bm = CreateCompatibleBitmap( finalDC, w, h );
+	HBITMAP bm = CreateCompatibleBitmap( finalDC, w, h );
+	RunCodeAtScopeExit(DeleteObject( bm ));
 
-	oldbm = (HBITMAP)SelectObject( dc, bm );
+	HBITMAP oldbm = (HBITMAP)SelectObject( dc, bm );
+	RunCodeAtScopeExit(SelectObject( dc, oldbm ));
 
 	HBRUSH br = CreateSolidBrush( GetSysColor( COLOR_3DFACE ) );
+	RunCodeAtScopeExit(DeleteObject( br ));
 
 	FillRect( dc, &rc, br );
-
-	DeleteObject( br );
 
 	DrawTitle( dc );
 
@@ -553,13 +554,6 @@ void mxExpressionSlider::redraw()
 
 	BitBlt( finalDC, 0, 0, w, h, dc, 0, 0, SRCCOPY );
 
-	SelectObject( dc, oldbm );
-
-	DeleteObject( bm );
-
-	DeleteDC( dc );
-
-	ReleaseDC( wnd, finalDC );
 	ValidateRect( wnd, &rc );
 }
 

@@ -118,11 +118,12 @@ void CChoreoWidgetDrawHelper::Init( mxWindow *widget, int x, int y, int w, int h
 	if ( !noPageFlip )
 	{
 		HBRUSH br = CreateSolidBrush( bgColor );
+		RunCodeAtScopeExit(DeleteObject( br ));
+
 		FillRect( m_dcMemory, &rcFill, br );
-		DeleteObject( br );
 	}
 
-	m_ClipRegion = (HRGN)0;
+	m_ClipRegion = nullptr;
 }
 
 //-----------------------------------------------------------------------------
@@ -226,13 +227,12 @@ void CChoreoWidgetDrawHelper::CalcTextRect( const char *font, int pointsize, int
 		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
+	RunCodeAtScopeExit(DeleteObject( fnt ));
 
-	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, fnt );
+	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, fnt );\
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldFont ));
 
 	DrawText( m_dcMemory, output, -1, &rcText, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_WORDBREAK | DT_CALCRECT );
-
-	SelectObject( m_dcMemory, oldFont );
-	DeleteObject( fnt );
 }
 
 //-----------------------------------------------------------------------------
@@ -268,10 +268,13 @@ int CChoreoWidgetDrawHelper::CalcTextWidth( const char *font, int pointsize, int
 		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
+	RunCodeAtScopeExit(DeleteObject( fnt ));
 
 	HDC screen = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC(screen));
 
 	HFONT oldFont = (HFONT)SelectObject( screen, fnt );
+	RunCodeAtScopeExit(SelectObject( screen, oldFont ));
 
 	RECT rcText;
 	rcText.left = rcText.top = 0;
@@ -279,11 +282,6 @@ int CChoreoWidgetDrawHelper::CalcTextWidth( const char *font, int pointsize, int
 	rcText.right = rcText.left + 2048;
 
 	DrawText( screen, output, -1, &rcText, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_CALCRECT );
-
-	SelectObject( screen, oldFont );
-	DeleteObject( fnt );
-
-	ReleaseDC( NULL, screen );
 
 	return rcText.right;
 }
@@ -321,10 +319,13 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( const char *font, int pointsize, in
 		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
+	RunCodeAtScopeExit(DeleteObject( fnt ));
 
 	HDC screen = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, screen ));
 
 	HFONT oldFont = (HFONT)SelectObject( screen, fnt );
+	RunCodeAtScopeExit(SelectObject( screen, oldFont ));
 
 	RECT rcText;
 	rcText.left = rcText.top = 0;
@@ -332,11 +333,6 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( const char *font, int pointsize, in
 	rcText.right = rcText.left + 2048;
 
 	DrawTextW( screen, output, -1, &rcText, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_CALCRECT );
-
-	SelectObject( screen, oldFont );
-	DeleteObject( fnt );
-
-	ReleaseDC( NULL, screen );
 
 	return rcText.right;
 }
@@ -528,7 +524,6 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharset( const char *font, int poin
 	va_start( args, fmt );
 	V_vsprintf_safe( output, fmt, args );
 	va_end( args  );
-	
 
 	HFONT fnt = CreateFont(
 		 -pointsize, 
@@ -545,22 +540,21 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharset( const char *font, int poin
 		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
+	RunCodeAtScopeExit(DeleteObject( fnt ));
 
 	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, fnt );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldFont ));
+
 	COLORREF oldColor = SetTextColor( m_dcMemory, clr );
+	RunCodeAtScopeExit(SetTextColor( m_dcMemory, oldColor ));
+
 	int oldMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldMode ));
 
 	RECT rcTextOffset = rcText;
 	OffsetSubRect( rcTextOffset );
 
 	DrawText( m_dcMemory, output, -1, &rcTextOffset, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS );
-
-	SetBkMode( m_dcMemory, oldMode );
-
-	SetTextColor( m_dcMemory, oldColor );
-
-	SelectObject( m_dcMemory, oldFont );
-	DeleteObject( fnt );
 }
 
 void CChoreoWidgetDrawHelper::DrawColoredTextCharsetW( const char *font, int pointsize, int weight, DWORD charset, COLORREF clr, RECT& rcText, const wchar_t *fmt, ... )
@@ -588,22 +582,21 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharsetW( const char *font, int poi
 		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
+	RunCodeAtScopeExit(DeleteObject( fnt ));
 
 	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, fnt );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldFont ));
+
 	COLORREF oldColor = SetTextColor( m_dcMemory, clr );
+	RunCodeAtScopeExit(SetTextColor( m_dcMemory, oldColor ));
+
 	int oldMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldMode ));
 
 	RECT rcTextOffset = rcText;
 	OffsetSubRect( rcTextOffset );
 
 	DrawTextW( m_dcMemory, output, -1, &rcTextOffset, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS );
-
-	SetBkMode( m_dcMemory, oldMode );
-
-	SetTextColor( m_dcMemory, oldColor );
-
-	SelectObject( m_dcMemory, oldFont );
-	DeleteObject( fnt );
 }
 
 //-----------------------------------------------------------------------------
@@ -640,22 +633,21 @@ void CChoreoWidgetDrawHelper::DrawColoredTextMultiline( const char *font, int po
 		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 font );
+	RunCodeAtScopeExit(DeleteObject( fnt ));
 
 	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, fnt );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldFont ));
+
 	COLORREF oldColor = SetTextColor( m_dcMemory, clr );
+	RunCodeAtScopeExit(SetTextColor( m_dcMemory, oldColor ));
+
 	int oldMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldMode ));
 
 	RECT rcTextOffset = rcText;
 	OffsetSubRect( rcTextOffset );
 
 	DrawText( m_dcMemory, output, -1, &rcTextOffset, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_WORDBREAK | DT_WORD_ELLIPSIS );
-
-	SetBkMode( m_dcMemory, oldMode );
-
-	SetTextColor( m_dcMemory, oldColor );
-
-	SelectObject( m_dcMemory, oldFont );
-	DeleteObject( fnt );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -672,11 +664,13 @@ void CChoreoWidgetDrawHelper::DrawColoredTextMultiline( const char *font, int po
 void CChoreoWidgetDrawHelper::DrawColoredLine( COLORREF clr, int style, int width, int x1, int y1, int x2, int y2 )
 {
 	HPEN pen = CreatePen( style, width, clr );
+	RunCodeAtScopeExit(DeleteObject( pen ));
+
 	HPEN oldPen = (HPEN)SelectObject( m_dcMemory, pen );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldPen ));
+
 	MoveToEx( m_dcMemory, x1-m_x, y1-m_y, NULL );
 	LineTo( m_dcMemory, x2-m_x, y2-m_y );
-	SelectObject( m_dcMemory, oldPen );
-	DeleteObject( pen );
 };
 
 //-----------------------------------------------------------------------------
@@ -694,7 +688,10 @@ void CChoreoWidgetDrawHelper::DrawColoredPolyLine( COLORREF clr, int style, int 
 		return;
 
 	HPEN pen = CreatePen( style, width, clr );
+	RunCodeAtScopeExit(DeleteObject( pen ));
+
 	HPEN oldPen = (HPEN)SelectObject( m_dcMemory, pen );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldPen ));
 
 	POINT *temp = (POINT *)_alloca( c * sizeof( POINT ) );
 	Assert( temp );
@@ -709,9 +706,6 @@ void CChoreoWidgetDrawHelper::DrawColoredPolyLine( COLORREF clr, int style, int 
 	
 	Assert(c <= std::numeric_limits<int>::max());
 	Polyline( m_dcMemory, temp, static_cast<int>(c) );
-
-	SelectObject( m_dcMemory, oldPen );
-	DeleteObject( pen );
 }
 
 //-----------------------------------------------------------------------------
@@ -729,14 +723,16 @@ void CChoreoWidgetDrawHelper::DrawColoredPolyLine( COLORREF clr, int style, int 
 POINTL CChoreoWidgetDrawHelper::DrawColoredRamp( COLORREF clr, int style, int width, int x1, int y1, int x2, int y2, float rate, float sustain )
 {
 	HPEN pen = CreatePen( style, width, clr );
+	RunCodeAtScopeExit(DeleteObject( pen ));
+
 	HPEN oldPen = (HPEN)SelectObject( m_dcMemory, pen );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldPen ));
+
 	MoveToEx( m_dcMemory, x1-m_x, y1-m_y, NULL );
 	int dx = x2 - x1;
 	int dy = y2 - y1;
 
-	POINTL p;
-	p.x = 0L;
-	p.y = 0L;
+	POINTL p{0, 0};
 	for (float i = 0.1f; i <= 1.09f; i += 0.1f)
 	{
 		float j = 3.0f * i * i - 2.0f * i * i * i;
@@ -744,8 +740,6 @@ POINTL CChoreoWidgetDrawHelper::DrawColoredRamp( COLORREF clr, int style, int wi
 		p.y = y1+(int)(dy*sustain*j)-m_y;
 		LineTo( m_dcMemory, p.x, p.y );
 	}
-	SelectObject( m_dcMemory, oldPen );
-	DeleteObject( pen );
 
 	return p;
 };
@@ -763,9 +757,10 @@ void CChoreoWidgetDrawHelper::DrawFilledRect( COLORREF clr, RECT& rc )
 	RECT rcCopy = rc;
 
 	HBRUSH br = CreateSolidBrush( clr );
+	RunCodeAtScopeExit(DeleteObject( br ));
+
 	OffsetSubRect( rcCopy );
 	FillRect( m_dcMemory, &rcCopy, br );
-	DeleteObject( br );
 }
 
 //-----------------------------------------------------------------------------
@@ -779,6 +774,8 @@ void CChoreoWidgetDrawHelper::DrawFilledRect( COLORREF clr, RECT& rc )
 void CChoreoWidgetDrawHelper::DrawFilledRect( COLORREF clr, int x1, int y1, int x2, int y2 )
 {
 	HBRUSH br = CreateSolidBrush( clr );
+	RunCodeAtScopeExit(DeleteObject( br ));
+
 	RECT rc;
 	rc.left = x1;
 	rc.right = x2;
@@ -786,7 +783,6 @@ void CChoreoWidgetDrawHelper::DrawFilledRect( COLORREF clr, int x1, int y1, int 
 	rc.bottom = y2;
 	OffsetSubRect( rc );
 	FillRect( m_dcMemory, &rc, br );
-	DeleteObject( br );
 }
 
 //-----------------------------------------------------------------------------
@@ -813,14 +809,17 @@ void CChoreoWidgetDrawHelper::DrawOutlinedRect( COLORREF clr, int style, int wid
 //-----------------------------------------------------------------------------
 void CChoreoWidgetDrawHelper::DrawOutlinedRect( COLORREF clr, int style, int width, int x1, int y1, int x2, int y2 )
 {
-	HPEN oldpen, pen;
-	HBRUSH oldbrush, brush;
+	HPEN pen = CreatePen( PS_SOLID, width, clr );
+	RunCodeAtScopeExit(DeleteObject( pen ));
 
-	pen = CreatePen( PS_SOLID, width, clr );
-	oldpen = (HPEN)SelectObject( m_dcMemory, pen );
+	HPEN oldpen = (HPEN)SelectObject( m_dcMemory, pen );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldpen ));
 
-	brush = (HBRUSH)GetStockObject( NULL_BRUSH );
-	oldbrush = (HBRUSH)SelectObject( m_dcMemory, brush );
+	HBRUSH brush = (HBRUSH)GetStockObject( NULL_BRUSH );
+	RunCodeAtScopeExit(DeleteObject( brush ));
+
+	HBRUSH oldbrush = (HBRUSH)SelectObject( m_dcMemory, brush );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldbrush ));
 
 	RECT rc;
 	rc.left = x1;
@@ -830,11 +829,6 @@ void CChoreoWidgetDrawHelper::DrawOutlinedRect( COLORREF clr, int style, int wid
 	OffsetSubRect( rc);
 
 	Rectangle( m_dcMemory, rc.left, rc.top, rc.right, rc.bottom );
-
-	SelectObject( m_dcMemory, oldbrush );
-	DeleteObject( brush );
-	SelectObject( m_dcMemory, oldpen );
-	DeleteObject( pen );
 }
 
 //-----------------------------------------------------------------------------
@@ -848,14 +842,17 @@ void CChoreoWidgetDrawHelper::DrawOutlinedRect( COLORREF clr, int style, int wid
 //-----------------------------------------------------------------------------
 void CChoreoWidgetDrawHelper::DrawLine( int x1, int y1, int x2, int y2, COLORREF clr, int thickness )
 {
-	HPEN oldpen, pen;
-	HBRUSH oldbrush, brush;
+	HPEN pen = CreatePen( PS_SOLID, thickness, clr );
+	RunCodeAtScopeExit(DeleteObject( pen ));
 
-	pen = CreatePen( PS_SOLID, thickness, clr );
-	oldpen = (HPEN)SelectObject( m_dcMemory, pen );
+	HPEN oldpen = (HPEN)SelectObject( m_dcMemory, pen );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldpen ));
 
-	brush = (HBRUSH)GetStockObject( NULL_BRUSH );
-	oldbrush = (HBRUSH)SelectObject( m_dcMemory, brush );
+	HBRUSH brush = (HBRUSH)GetStockObject( NULL_BRUSH );
+	RunCodeAtScopeExit(DeleteObject( brush ));
+
+	HBRUSH oldbrush = (HBRUSH)SelectObject( m_dcMemory, brush );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldbrush ));
 
 	// Offset
 	x1 -= m_x;
@@ -865,11 +862,6 @@ void CChoreoWidgetDrawHelper::DrawLine( int x1, int y1, int x2, int y2, COLORREF
 
 	MoveToEx( m_dcMemory, x1, y1, NULL );
 	LineTo( m_dcMemory, x2, y2 );
-
-	SelectObject( m_dcMemory, oldbrush );
-	DeleteObject( brush );
-	SelectObject( m_dcMemory, oldpen );
-	DeleteObject( pen );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -907,18 +899,15 @@ void CChoreoWidgetDrawHelper::DrawTriangleMarker( RECT& rc, COLORREF fill, bool 
 	}
 
 	HRGN rgn = CreatePolygonRgn( region, cPoints, ALTERNATE );
+	RunCodeAtScopeExit(DeleteObject( rgn ));
 
 	int oldPF = SetPolyFillMode( m_dcMemory, ALTERNATE );
+	RunCodeAtScopeExit(SetPolyFillMode( m_dcMemory, oldPF ));
 	
 	HBRUSH brFace = CreateSolidBrush( fill );
+	RunCodeAtScopeExit(DeleteObject( brFace ));
 
 	FillRgn( m_dcMemory, rgn, brFace );
-
-	DeleteObject( brFace );
-	
-	SetPolyFillMode( m_dcMemory, oldPF );
-
-	DeleteObject( rgn );
 }
 
 void CChoreoWidgetDrawHelper::StartClipping( RECT& clipRect )
@@ -960,12 +949,13 @@ void CChoreoWidgetDrawHelper::ClipToRects( void )
 			RECT add = m_ClipRects[ i ];
 
 			HRGN addIn = CreateRectRgn( add.left, add.top, add.right, add.bottom );
+			RunCodeAtScopeExit(DeleteObject( addIn ));
+
 			HRGN result = CreateRectRgn( 0, 0, 100, 100 );
 
 			CombineRgn( result, m_ClipRegion, addIn, RGN_AND );
 			
 			DeleteObject( m_ClipRegion );
-			DeleteObject( addIn );
 
 			m_ClipRegion = result;
 		}
@@ -1008,10 +998,16 @@ void CChoreoWidgetDrawHelper::DrawCircle( COLORREF clr, int x, int y, int radius
 	OffsetSubRect( rc );
 
 	HPEN pen = CreatePen( PS_SOLID, 1, clr );
+	RunCodeAtScopeExit(DeleteObject( pen ));
+
 	HBRUSH br = CreateSolidBrush( clr );
+	RunCodeAtScopeExit(DeleteObject( br ));
 
 	HPEN oldPen = (HPEN)SelectObject( m_dcMemory, pen );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldPen ));
+
 	HBRUSH oldBr = (HBRUSH)SelectObject( m_dcMemory, br );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldBr ));
 
 	if ( filled )
 	{
@@ -1022,12 +1018,6 @@ void CChoreoWidgetDrawHelper::DrawCircle( COLORREF clr, int x, int y, int radius
 		Arc( m_dcMemory, rc.left, rc.top, rc.right, rc.bottom,
 			rc.left, rc.top, rc.left, rc.top );
 	}
-	
-	SelectObject( m_dcMemory, oldPen );
-	SelectObject( m_dcMemory, oldBr );
-
-	DeleteObject( pen );
-	DeleteObject( br );
 }
 
 //-----------------------------------------------------------------------------

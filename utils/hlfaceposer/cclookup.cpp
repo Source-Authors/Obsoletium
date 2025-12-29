@@ -227,13 +227,13 @@ intp CloseCaptionLookup( CCloseCaptionLookupParams *params )
 		 CLEARTYPE_NATURAL_QUALITY,
 		 DEFAULT_PITCH,
 		 "Tahoma" );
+	RunCodeAtScopeExit(DeleteObject( g_UnicodeFont ));
 
 	INT_PTR retval = DialogBox( (HINSTANCE)GetModuleHandle( 0 ), 
 		MAKEINTRESOURCE( IDD_CCLOOKUP ),
 		(HWND)g_MDLViewer->getHandle(),
 		(DLGPROC)CloseCaptionLookupDialogProc );
 
-	DeleteObject( g_UnicodeFont );
 	g_UnicodeFont = NULL;
 
 	*params = g_Params;

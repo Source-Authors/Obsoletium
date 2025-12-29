@@ -173,8 +173,9 @@ int CFileLoaderThread::DoThreadWork()
 		m_Pending.AddToHead( m_FileList[ i ] );
 
 		EnterCriticalSection( &m_CountCS );
+		RunCodeAtScopeExit(LeaveCriticalSection( &m_CountCS ));
+
 		m_nTotalPending++;
-		LeaveCriticalSection( &m_CountCS );
 	}
 	m_FileList.RemoveAll();
 	// Done adding new work items
@@ -195,10 +196,13 @@ int CFileLoaderThread::DoThreadWork()
 
 		transfer.AddToTail( r );
 		
-		// Do the work
-		EnterCriticalSection( &m_CountCS );
-		m_nTotalProcessed++;
-		LeaveCriticalSection( &m_CountCS );
+		{
+			// Do the work
+			EnterCriticalSection( &m_CountCS );
+			RunCodeAtScopeExit(LeaveCriticalSection( &m_CountCS ));
+
+			m_nTotalProcessed++;
+		}
 
 		Lock();
 		bool load = !r->wavefile->HasLoadedSentenceInfo();
@@ -419,13 +423,8 @@ void CFileLoaderThread::Unlock( void )
 
 int CFileLoaderThread::GetPendingLoadCount()
 {
-	int iret = 0;
-
 	EnterCriticalSection( &m_CountCS );
+	RunCodeAtScopeExit(LeaveCriticalSection( &m_CountCS ));
 
-	iret = m_nTotalPending - m_nTotalProcessed;
-
-	LeaveCriticalSection( &m_CountCS );
-
-	return iret;
+	return m_nTotalPending - m_nTotalProcessed;
 }

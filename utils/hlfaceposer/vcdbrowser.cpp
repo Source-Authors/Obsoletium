@@ -340,22 +340,19 @@ CVCDBrowser::CVCDBrowser( mxWindow *parent )
 
 HIMAGELIST CVCDBrowser::CreateImageList()
 {
-	HIMAGELIST list;
-	
-	list = ImageList_Create( CX_ICON, CY_ICON, 
+	HIMAGELIST list = ImageList_Create( CX_ICON, CY_ICON, 
 		FALSE, VCD_NUM_IMAGES, 0 );
 
     // Load the icon resources, and add the icons to the image list. 
-    HICON hicon;
-	int slot;
 #if defined( DBGFLAG_ASSERT )
 	int c = 0;
 #endif
 
-	hicon = LoadIcon(GetModuleHandle( 0 ), MAKEINTRESOURCE(IDI_VCD)); 
-    slot = ImageList_AddIcon(list, hicon); 
+	HICON hicon = LoadIcon(GetModuleHandle( 0 ), MAKEINTRESOURCE(IDI_VCD));
+	RunCodeAtScopeExit(DeleteObject( hicon ));
+
+    const int slot = ImageList_AddIcon(list, hicon);
 	Assert( slot == c++ );
-	DeleteObject( hicon );
 
 	return list;
 }

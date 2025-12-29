@@ -223,6 +223,7 @@ void GestureTool::GetScrubHandleReferenceRect( RECT& rcHandle, float scrub, bool
 void GestureTool::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper, RECT& rcHandle, float scrub, bool reference )
 {
 	HBRUSH br = CreateSolidBrush( reference ? RGB( 150, 0, 0 ) : RGB( 0, 150, 100 ) );
+	RunCodeAtScopeExit(DeleteObject( br ));
 
 	COLORREF areaBorder = RGB( 230, 230, 220 );
 
@@ -260,8 +261,6 @@ void GestureTool::DrawScrubHandle( CChoreoWidgetDrawHelper& drawHelper, RECT& rc
 	rcText.left += ( textw - len ) / 2;
 
 	drawHelper.DrawColoredText( "Arial", 9, 500, RGB( 255, 255, 255 ), rcText, sz );
-
-	DeleteObject( br );
 }
 
 //-----------------------------------------------------------------------------
