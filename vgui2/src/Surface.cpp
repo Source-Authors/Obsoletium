@@ -1719,12 +1719,13 @@ void CWin32Surface::DrawSetTextureFile(int id, const char *filename, int, bool f
 //-----------------------------------------------------------------------------
 void CWin32Surface::DrawTexturedRect(int x0,int y0,int x1,int y1)
 {
-	if (m_pCurrentTexture == nullptr)
+	if (!m_pCurrentTexture)
 	{
 		return;
 	}
 
-	if (PLAT(_currentContextPanel)->textureDC == nullptr)
+	HDC dc = PLAT(_currentContextPanel)->textureDC;
+	if (!dc)
 	{
 		return;
 	}
@@ -1733,30 +1734,33 @@ void CWin32Surface::DrawTexturedRect(int x0,int y0,int x1,int y1)
 	int wide = m_pCurrentTexture->_wide;
 	int tall = m_pCurrentTexture->_tall;
 
-	HGDIOBJ oldObject;
-
 	if (m_pCurrentTexture->_bMask)
 	{
 		HBITMAP bitmap_mask = m_pCurrentTexture->_maskBitmap;
 
-		// draw the mask first to clear out the background to black 
-		oldObject = ::SelectObject(PLAT(_currentContextPanel)->textureDC, bitmap_mask);
-		::StretchBlt(PLAT(_currentContextPanel)->hdc,x0,y0,x1-x0,y1-y0,PLAT(_currentContextPanel)->textureDC,0,0,wide,tall,SRCAND);
+		{
+			// draw the mask first to clear out the background to black 
+			HGDIOBJ oldObjectMask = ::SelectObject(dc, bitmap_mask);
+			RunCodeAtScopeExit(::SelectObject(dc, oldObjectMask));
+
+			::StretchBlt(PLAT(_currentContextPanel)->hdc,x0,y0,x1-x0,y1-y0,dc,0,0,wide,tall,SRCAND);
+		}
 
 		// draw over the 'black areas' with the bitmap
-		::SelectObject(PLAT(_currentContextPanel)->textureDC, bitmap);
-		::StretchBlt(PLAT(_currentContextPanel)->hdc,x0,y0,x1-x0,y1-y0,PLAT(_currentContextPanel)->textureDC,0,0,wide,tall,SRCPAINT);
+		::SelectObject(dc, bitmap);
+		::StretchBlt(PLAT(_currentContextPanel)->hdc,x0,y0,x1-x0,y1-y0,dc,0,0,wide,tall,SRCPAINT);
 	}
 	else
 	{
-		oldObject = ::SelectObject(PLAT(_currentContextPanel)->textureDC, bitmap);
-		::StretchBlt(PLAT(_currentContextPanel)->hdc,x0,y0,x1-x0,y1-y0,PLAT(_currentContextPanel)->textureDC,0,0,wide,tall,SRCCOPY);
+		HGDIOBJ oldObject = ::SelectObject(dc, bitmap);
+		RunCodeAtScopeExit(::SelectObject(dc, oldObject));
+
+		::StretchBlt(PLAT(_currentContextPanel)->hdc,x0,y0,x1-x0,y1-y0,dc,0,0,wide,tall,SRCCOPY);
 	}
-	::SelectObject(PLAT(_currentContextPanel)->textureDC, oldObject);
 
 // test code, should be used in win98/win2k for true alpha
 //	BLENDFUNCTION blendFunction = { AC_SRC_OVER, 0, 255, 0 };
-//	::AlphaBlend(PLAT(_currentContextPanel)->hdc,x0,y0,x1-x0,y1-y0,PLAT(_currentContextPanel)->textureDC,0,0,wide,tall,blendFunction);
+//	::AlphaBlend(PLAT(_currentContextPanel)->hdc,x0,y0,x1-x0,y1-y0,dc,0,0,wide,tall,blendFunction);
 }
 
 //-----------------------------------------------------------------------------
