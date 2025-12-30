@@ -495,14 +495,15 @@ void CTextureConverter::RescaleFaceTexture( CMapFace * pFace, IEditorTexture * p
 	{
 		return;
 	}
+	RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
 
 	char line[512];
 	int nScanned = 0;
-	if ( g_pFullFileSystem->ReadLine( line, sizeof( line ), fp ) )
+	if ( g_pFullFileSystem->ReadLine( line, fp ) )
 	{
 		nScanned = sscanf( line, "%d %d", &nOldWidth, &nOldHeight );
 	}
-	g_pFileSystem->Close( fp );
+
 	if ( nScanned != 2 || nOldWidth < 0 || nOldHeight < 0 || nOldWidth > 5000 || nOldHeight > 5000 )
 		return;
 	
