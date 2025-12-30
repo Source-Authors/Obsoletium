@@ -1,6 +1,6 @@
 @echo OFF
 
-MSBuild.exe /?
+MSBuild.exe /? >NUL
 if ERRORLEVEL 1 (
   echo MsBuild not found in PATH. Please, start from Developer Command Prompt or add MSVC MsBuild directory to the PATH.
   exit /B 1
