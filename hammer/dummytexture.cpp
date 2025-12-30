@@ -166,15 +166,16 @@ void CDummyTexture::GetSize( SIZE &size ) const
 void CDummyTexture::Draw(CDC *pDC, RECT &rect, int iFontHeight, int iIconHeight, DrawTexData_t &DrawTexData)
 {
 	CFont *pOldFont = (CFont *)pDC->SelectStockObject(ANSI_VAR_FONT);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldFont));
+
 	COLORREF crText = pDC->SetTextColor(RGB(0xff, 0xff, 0xff));
+	RunCodeAtScopeExit(pDC->SetTextColor(crText));
+
 	COLORREF crBack = pDC->SetBkColor(RGB(0, 0, 0));
+	RunCodeAtScopeExit(pDC->SetBkColor(crBack));
 
 	pDC->FillRect(&rect, CBrush::FromHandle(HBRUSH(GetStockObject(BLACK_BRUSH))));
 	pDC->TextOut(rect.left + 2, rect.top + 2, "No Image", 8);
-
-	pDC->SelectObject(pOldFont);
-	pDC->SetTextColor(crText);
-	pDC->SetBkColor(crBack);
 }
 
 

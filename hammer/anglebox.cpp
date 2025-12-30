@@ -137,8 +137,11 @@ void CAngleBox::DrawAngleLine(CDC *pDC)
 		return;
 	}
 
-	pDC->SetROP2(R2_XORPEN);
-	pDC->SelectStockObject(WHITE_PEN);
+	int oldRop2 = pDC->SetROP2(R2_XORPEN);
+	RunCodeAtScopeExit(pDC->SetROP2(oldRop2));
+
+	CGdiObject *pOldObj = pDC->SelectStockObject(WHITE_PEN);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldObj));
 
 	CRect r;
 	GetClientRect(r);
@@ -379,17 +382,30 @@ void CAngleBox::OnPaint(void)
 	//
 	m_ptClientCenter = r.CenterPoint();
 	
-	pDC->SelectStockObject(NULL_PEN);
-	pDC->SelectObject(pBackBrush);
+	CGdiObject *pOldObj = pDC->SelectStockObject(NULL_PEN);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldObj));
+
+	CBrush *oldBr1 = pDC->SelectObject(pBackBrush);
+	RunCodeAtScopeExit(pDC->SelectObject(oldBr1));
+
 	pDC->Ellipse(r);
 
 	CPen hi(PS_SOLID, 2, GetSysColor(COLOR_3DSHADOW));
 	CPen lo(PS_SOLID, 2, GetSysColor(COLOR_3DHILIGHT));
 
-	pDC->SelectObject(hi);
-	pDC->Arc(r, CPoint(r.right, r.top), CPoint(r.left, r.bottom));
-	pDC->SelectObject(lo);
-	pDC->Arc(r, CPoint(r.left, r.bottom), CPoint(r.right, r.top));
+	{
+		HGDIOBJ oldHi = pDC->SelectObject(hi);
+		RunCodeAtScopeExit(pDC->SelectObject(oldHi));
+
+		pDC->Arc(r, CPoint(r.right, r.top), CPoint(r.left, r.bottom));
+	}
+
+	{
+		HGDIOBJ oldLo = pDC->SelectObject(lo);
+		RunCodeAtScopeExit(pDC->SelectObject(oldLo));
+
+		pDC->Arc(r, CPoint(r.left, r.bottom), CPoint(r.right, r.top));
+	}
 
 	//
 	// Draw center point.

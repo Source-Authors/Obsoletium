@@ -109,8 +109,9 @@ int CEntityHelpDlg::GetTextWidth(const char *pszText, CDC *pDC)
 		}
 
 		CGdiObject *pOldFont = pDC->SelectStockObject(DEFAULT_GUI_FONT);
-		CSize Size = pDC->GetTabbedTextExtent(pszText, V_strlen(pszText), 0, NULL);
-		pDC->SelectObject(pOldFont);
+		RunCodeAtScopeExit(pDC->SelectObject(pOldFont));
+
+		CSize Size = pDC->GetTabbedTextExtent(pszText, size_cast<int>(V_strlen(pszText)), 0, NULL);
 
 		if (bRelease)
 		{
@@ -132,6 +133,7 @@ int CEntityHelpDlg::GetTextWidth(const char *pszText, CDC *pDC)
 int CEntityHelpDlg::GetMaxVariableWidth(GDclass *pClass)
 {
 	CDC *pDC = m_pHelpText->GetDC();
+	RunCodeAtScopeExit(m_pHelpText->ReleaseDC(pDC));
 
 	int nWidthMax = 0;
 
@@ -146,8 +148,6 @@ int CEntityHelpDlg::GetMaxVariableWidth(GDclass *pClass)
 			nWidthMax = nWidth;
 		}
 	}
-
-	m_pHelpText->ReleaseDC(pDC);
 
 	return(nWidthMax);
 }

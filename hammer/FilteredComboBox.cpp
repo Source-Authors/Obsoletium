@@ -824,6 +824,7 @@ void CFilteredComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
 	CDC dc;
 	dc.Attach( lpDrawItemStruct->hDC );
+	RunCodeAtScopeExit(dc.Detach());
 
 	// Save these values to restore them when done drawing.
 	COLORREF crOldTextColor = dc.GetTextColor();
@@ -836,7 +837,9 @@ void CFilteredComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	// "(lpDrawItemStruct->itemAction | ODA_SELECT)", which is always true.
 	// To suppress the associated /analyze warning without changing
 	// behavior the expression was fixed but commented out.
-	if ( /*(lpDrawItemStruct->itemAction & ODA_SELECT) &&*/ (lpDrawItemStruct->itemState & ODS_SELECTED) )
+
+	bool bNewBackground = /*(lpDrawItemStruct->itemAction & ODA_SELECT) &&*/ (lpDrawItemStruct->itemState & ODS_SELECTED);
+	if ( bNewBackground )
 	{
 		dc.SetTextColor( ::GetSysColor(COLOR_HIGHLIGHTTEXT) );
 		dc.SetBkColor( ::GetSysColor(COLOR_HIGHLIGHT) );
@@ -848,18 +851,20 @@ void CFilteredComboBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	}
 
 	CFont *pOldFont = dc.SelectObject( &m_NormalFont );
+	RunCodeAtScopeExit(dc.SelectObject( pOldFont ));
 
 	// Draw the text.
 	RECT rcDraw = lpDrawItemStruct->rcItem;
 	rcDraw.left += 1;
 	dc.DrawText( str, -1, &rcDraw, DT_LEFT|DT_SINGLELINE|DT_VCENTER );
 
-	// Restore stuff.
-	dc.SelectObject( pOldFont );
-	dc.SetTextColor(crOldTextColor);
-	dc.SetBkColor(crOldBkColor);
-
-	dc.Detach();
+	if ( bNewBackground )
+	{
+		// Restore stuff.
+		
+		dc.SetBkColor(crOldBkColor);
+		dc.SetTextColor(crOldTextColor);
+	}
 }
 
 

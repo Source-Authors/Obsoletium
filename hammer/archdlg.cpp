@@ -182,11 +182,11 @@ void CArchDlg::DrawArch(CDC* pDC)
 	float fScaleX;
 	float fScaleY;
 
-	CPen m_hPen, *pOldPen;
-
+	CPen m_hPen;
 	m_hPen.CreatePen(PS_SOLID, 1, RGB(255,255,255));
 
-	pOldPen = pDC->SelectObject(&m_hPen);
+	CPen *pOldPen = pDC->SelectObject(&m_hPen);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldPen));
 
 	CRect rcItem;
 	m_cPreview.GetWindowRect(&rcItem);
@@ -282,13 +282,12 @@ void CArchDlg::DrawArch(CDC* pDC)
 	/*CPen hPen2;
 	hPen2.CreatePen(PS_SOLID, 1, RGB(255,255,0));
 
-	pDC->SelectObject(&hPen2);
+	CPen *pOldPen2 = pDC->SelectObject(&hPen2);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldPen2));
 
 	pDC->MoveTo(pt.x + (int)((bmins[0] - fCenter[0])*fScaleX), pt.y - (int)((bmins[1] - fCenter[1])*fScaleY));
 	pDC->LineTo(pt.x + (int)((bmins[0] - fCenter[0])*fScaleX), pt.y - (int)((bmaxs[1] - fCenter[1])*fScaleY));
 	pDC->LineTo(pt.x + (int)((bmaxs[0] - fCenter[0])*fScaleX), pt.y - (int)((bmaxs[1] - fCenter[1])*fScaleY));
 	pDC->LineTo(pt.x + (int)((bmaxs[0] - fCenter[0])*fScaleX), pt.y - (int)((bmins[1] - fCenter[1])*fScaleY));
 	*/
-	pDC->SelectObject(pOldPen);
-
 }
