@@ -1219,7 +1219,7 @@ void CMapSolid::OnAddToWorld(CMapWorld *pWorld)
 					faceIDs.Insert( pFace->GetFaceID() );
 				}
 				
-				for (int i = CheckList.Count() - 1; i >= 0; i--)
+				for (intp i = CheckList.Count() - 1; i >= 0; i--)
 				{
 					CMapFace *pFace = CheckList.Element(i);
 
