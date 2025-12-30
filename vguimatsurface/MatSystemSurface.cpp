@@ -4324,24 +4324,22 @@ vgui::IImage *CMatSystemSurface::GetIconImageForFullPath( char const *pFullPath 
 			if ( idx == m_FileTypeImages.InvalidIndex() )
 			{
 				ICONINFO iconInfo;
-				if ( 0 != GetIconInfo( info.hIcon, &iconInfo ) )
+				if ( GetIconInfo( info.hIcon, &iconInfo ) )
 				{
 					int w, h;
 					size_t bufsize = 0;
 					
 					HDC hdc = ::GetDC(reinterpret_cast<HWND>(m_HWnd));
+					RunCodeAtScopeExit(::ReleaseDC( reinterpret_cast<HWND>(m_HWnd), hdc );)
 
 					if ( GetIconBits( hdc, iconInfo, w, h, NULL, bufsize ) )
 					{
-						byte *bits = new byte[ bufsize ];
-						if ( bits && GetIconBits( hdc, iconInfo, w, h, bits, bufsize ) )
+						std::unique_ptr<byte[]> bits = std::make_unique<byte[]>( bufsize );
+						if ( bits && GetIconBits( hdc, iconInfo, w, h, bits.get(), bufsize ) )
 						{
-							newIcon = new MemoryBitmap( bits, w, h );
+							newIcon = new MemoryBitmap( bits.get(), w, h );
 						}
-						delete[] bits;
 					}
-
-					::ReleaseDC( reinterpret_cast<HWND>(m_HWnd), hdc );
 				}
 
 				idx = m_FileTypeImages.Insert( lookup, newIcon );
