@@ -1123,9 +1123,12 @@ void Save_SMD(char const *filename, s_source_t *source) {
   SaveAnimation(source, buf);
 
   FileHandle_t fh = g_pFileSystem->Open(filename, "wb");
-  if (FILESYSTEM_INVALID_HANDLE != fh) {
-    g_pFileSystem->Write(buf.Base(), buf.TellPut(), fh);
-    g_pFileSystem->Close(fh);
+  if (fh) {
+    RunCodeAtScopeExit(g_pFileSystem->Close(fh));
+
+    g_pFileSystem->Write(buf.Base(), size_cast<int>(buf.TellPut()), fh);
+  } else {
+    Warning("Warning: Unable to save SMD %s.\n", filename);
   }
 }
 
