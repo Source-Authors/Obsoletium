@@ -873,45 +873,62 @@ void CShaderSystem::PrintBufferedSpew( void )
 {
 	AUTO_LOCK( g_StgoredSpewMutex );
 
-	while ( m_StoredSpew.GetBytesRemaining() > 0 )
+	if ( m_StoredSpew.GetBytesRemaining() > 0 )
 	{
-		static_assert(SpewType_t::SPEW_TYPE_COUNT <= std::numeric_limits<unsigned char>::max());
-		SpewType_t spewType	= (SpewType_t)m_StoredSpew.GetUnsignedChar();
+		// dimhotepus: Enough for most cases. Truncate to this.
+		constexpr intp maxMessageLen = 1024;
+		char *message = stackallocT(char, maxMessageLen);
 
-		intp nGroupLen = m_StoredSpew.PeekStringLength();
-		char *pGroup = stackallocT( char, nGroupLen );
-		if ( nGroupLen )
+		while ( m_StoredSpew.GetBytesRemaining() > 0 )
 		{
-			m_StoredSpew.GetStringManualCharCount( pGroup, nGroupLen );
-		}
-		
-		const int rawColor = m_StoredSpew.GetInt();
+			static_assert(SpewType_t::SPEW_TYPE_COUNT <= std::numeric_limits<unsigned char>::max());
+			SpewType_t spewType	= (SpewType_t)m_StoredSpew.GetUnsignedChar();
 
-		Color c;
-		c.SetRawColor( rawColor );
-		
-		intp nMsgLen = m_StoredSpew.PeekStringLength();
-		if ( nMsgLen )
-		{
-			char *pMsg = stackallocT( char, nMsgLen );
-			m_StoredSpew.GetStringManualCharCount( pMsg, nMsgLen );
-
-			if ( nGroupLen && !Q_isempty(pGroup) )
+			intp nGroupLen = m_StoredSpew.PeekStringLength();
+			char *pGroup = stackallocT( char, nGroupLen );
+			if ( nGroupLen )
 			{
-				DColorSpewMessage( spewType, pGroup, &c, "%s", pMsg );
+				m_StoredSpew.GetStringManualCharCount( pGroup, nGroupLen );
+			}
+		
+			const int rawColor = m_StoredSpew.GetInt();
+
+			Color c;
+			c.SetRawColor( rawColor );
+		
+			intp nMsgLen = m_StoredSpew.PeekStringLength();
+			if ( nMsgLen )
+			{
+				const intp nSkipMsgLen = nMsgLen - maxMessageLen;
+				if ( nSkipMsgLen > 0 )
+				{
+					m_StoredSpew.GetStringManualCharCount( message, maxMessageLen );
+
+					// dimhotepus: Skip message remainder.
+					m_StoredSpew.SeekGet( CUtlBuffer::SEEK_CURRENT, nSkipMsgLen );
+				}
+				else
+				{
+					m_StoredSpew.GetStringManualCharCount( message, nMsgLen );
+				}
+
+				if ( nGroupLen && !Q_isempty(pGroup) )
+				{
+					DColorSpewMessage( spewType, pGroup, &c, "%s", message );
+				}
+				else
+				{
+					ColorSpewMessage( spewType, &c, "%s", message );
+				}
 			}
 			else
 			{
-				ColorSpewMessage( spewType, &c, "%s", pMsg );
+				break;
 			}
 		}
-		else
-		{
-			break;
-		}
-	}
 
-	m_StoredSpew.Clear();
+		m_StoredSpew.Clear();
+	}
 }
 
 static SpewRetval_t MySpewOutputFunc( SpewType_t spewType, char const *pMsg )
