@@ -604,18 +604,20 @@ bool LoadPhysicsProperties( void )
 		return false;
 
 	FileHandle_t fp = g_pFileSystem->Open( pMaterialFilename, "rb" );
-	if ( fp == FILESYSTEM_INVALID_HANDLE )
+	if ( !fp )
 		return false;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(fp));
 
 	int len = g_pFileSystem->Size( fp );
 
-	char *pText = new char[len+1];
-	g_pFileSystem->Read( pText, len, fp );
-	g_pFileSystem->Close( fp );
+	std::unique_ptr<char[]> pText = std::make_unique<char[]>(len+1);
+
+	g_pFileSystem->Read( pText.get(), len, fp );
+
 	pText[len]=0;
 
-	physprop->ParseSurfaceData( pMaterialFilename, pText );
+	physprop->ParseSurfaceData( pMaterialFilename, pText.get() );
 
-	delete[] pText;
 	return true;
 }
