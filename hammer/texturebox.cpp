@@ -72,7 +72,10 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 {
 	CDC dc;
 	dc.Attach(lpDrawItemStruct->hDC);
+	RunCodeAtScopeExit(dc.Detach());
+
 	dc.SaveDC();
+	RunCodeAtScopeExit(dc.RestoreDC(-1));
 
 	RECT& r = lpDrawItemStruct->rcItem;
 
@@ -81,7 +84,9 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	if (lpDrawItemStruct->itemID != -1)
 	{
 		IEditorTexture *pTex = (IEditorTexture *)GetItemDataPtr(lpDrawItemStruct->itemID);
-		dc.SetROP2(R2_COPYPEN);
+		int oldRop2 = dc.SetROP2(R2_COPYPEN);
+		RunCodeAtScopeExit(dc.SetROP2(oldRop2));
+
 		CPalette *pOldPalette = NULL;
 
 		if (pTex != NULL)
@@ -109,7 +114,9 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		if (pTex == NULL)
 		{
 			// separator
-			dc.SelectStockObject(BLACK_PEN);
+			CGdiObject *pOldObj = dc.SelectStockObject(BLACK_PEN);
+			RunCodeAtScopeExit(dc.SelectObject(pOldObj));
+
 			dc.MoveTo(r.left, r.top+5);
 			dc.LineTo(r.right, r.top+5);
 		}
@@ -133,8 +140,12 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				pTex->Draw(&dc, r2, 0, 0, DrawTexData);
 
 				// draw name
-				dc.SetTextColor(dwForeColor);
-				dc.SetBkMode(TRANSPARENT);
+				COLORREF oldColor = dc.SetTextColor(dwForeColor);
+				RunCodeAtScopeExit(dc.SetTextColor(oldColor));
+
+				int oldBkMode = dc.SetBkMode(TRANSPARENT);
+				RunCodeAtScopeExit(dc.SetBkMode(oldBkMode));
+
 				dc.TextOut(r2.right + 4, r2.top + 4, szName, iLen);
 				
 				// draw size
@@ -146,8 +157,12 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 			else
 			{
 				// just draw name - 
-				dc.SetTextColor(dwForeColor);
-				dc.SetBkMode(TRANSPARENT);
+				COLORREF oldColor = dc.SetTextColor(dwForeColor);
+				RunCodeAtScopeExit(dc.SetTextColor(oldColor));
+				
+				int oldBkMode = dc.SetBkMode(TRANSPARENT);
+				RunCodeAtScopeExit(dc.SetBkMode(oldBkMode));
+
 				dc.TextOut(r.left + 4, r.top + 2, szName, iLen);
 			}
 		}
@@ -161,9 +176,6 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	{
 		dc.DrawFocusRect(&r);
 	}
-
-	dc.RestoreDC(-1);
-	dc.Detach();
 }
 
 
@@ -462,7 +474,10 @@ BOOL CTextureBox::OnEraseBkgnd(CDC *pDC)
 {
 	CRect r;
 	GetUpdateRect(r);
-	pDC->SetROP2(R2_COPYPEN);
+
+	int oldRop2 = pDC->SetROP2(R2_COPYPEN);
+	RunCodeAtScopeExit(pDC->SetROP2(oldRop2));
+
 	FillRect(pDC->m_hDC, r, HBRUSH(GetStockObject(BLACK_BRUSH)));
 	return TRUE;
 }

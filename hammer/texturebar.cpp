@@ -435,7 +435,9 @@ void wndTex::OnPaint(void)
 	DrawTexData_t DrawTexData;
 	DrawTexData.nFlags = drawResizeAlways;
 
-	dc.SelectPalette(m_pTexture->HasPalette() ? m_pTexture->GetPalette() : g_pGameConfig->Palette, FALSE);
+	CPalette *pOldPalette = dc.SelectPalette(m_pTexture->HasPalette() ? m_pTexture->GetPalette() : g_pGameConfig->Palette, FALSE);
+	RunCodeAtScopeExit(dc.SelectPalette(pOldPalette, FALSE));
+
 	dc.RealizePalette();
 	m_pTexture->Draw(&dc, r, 0, 0, DrawTexData);
 }

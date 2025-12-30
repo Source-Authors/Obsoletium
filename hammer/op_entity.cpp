@@ -141,19 +141,25 @@ void CColoredListCtrl::DrawItem( LPDRAWITEMSTRUCT p )
 	logBrush.lbStyle = BS_SOLID;
 	CPen dashedPen( PS_ALTERNATE, 1, &logBrush );
 	
+	CPen *pOldPen;
 	if ( p->itemState & ODS_SELECTED )
-		pDC->SelectObject( &dashedPen );
+		pOldPen = pDC->SelectObject( &dashedPen );
 	else
-		pDC->SelectObject( &pen );
+		pOldPen = pDC->SelectObject( &pen );
+
+	RunCodeAtScopeExit(pDC->SelectObject(pOldPen));
 
 	br.CreateSolidBrush( bgColor );
-	pDC->SelectObject( &br );
+	CBrush *pOldBrush = pDC->SelectObject( &br );
+	RunCodeAtScopeExit(pDC->SelectObject(pOldBrush));
+
 	RECT rcFill = p->rcItem;
 	rcFill.bottom -= 1;
 	pDC->Rectangle( &rcFill );
 
 	// Setup for drawing text.
-	pDC->SetTextColor( txtColor );
+	COLORREF oldColor = pDC->SetTextColor( txtColor );
+	RunCodeAtScopeExit(pDC->SetTextColor(oldColor));
 
 	// Draw the first column.
 	RECT rcItem = p->rcItem;
@@ -4753,9 +4759,12 @@ bool COP_Entity::CustomDrawItemValue( const LPDRAWITEMSTRUCT p, const RECT *pRec
 			}
 
 			HBRUSH hBrush = CreateSolidBrush( RGB( r, g, b ) );
+			HGDIOBJ hOldBrush = SelectObject( p->hDC, hBrush );
+			RunCodeAtScopeExit(SelectObject( p->hDC, hOldBrush ));
+
 			HPEN hPen = CreatePen( PS_SOLID, 0, RGB(0,0,0) );
-			SelectObject( p->hDC, hBrush );
-			SelectObject( p->hDC, hPen );
+			HGDIOBJ hOldPen = SelectObject( p->hDC, hPen );
+			RunCodeAtScopeExit(SelectObject( p->hDC, hOldPen ));
 
 			RECT rc = *pRect;
 			Rectangle( p->hDC, rc.left+6, rc.top+2, rc.right-6, rc.bottom-2 );

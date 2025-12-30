@@ -379,6 +379,7 @@ void CSplashWnd::OnPaint()
 
 	// Paint the image.
 	CBitmap* pOldBitmap = dcImage.SelectObject(&m_bitmap);
+	RunCodeAtScopeExit(dcImage.SelectObject(pOldBitmap));
+
 	dc.BitBlt(0, 0, bm.bmWidth, bm.bmHeight, &dcImage, 0, 0, SRCCOPY);
-	dcImage.SelectObject(pOldBitmap);
 }

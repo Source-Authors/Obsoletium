@@ -56,13 +56,13 @@ BOOL CMDIClientWnd::OnEraseBkgnd(CDC *pDC)
 
 	// Save old brush
 	CBrush *pOldBrush = pDC->SelectObject(&backBrush);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldBrush));
 
 	CRect rect;
 	pDC->GetClipBox(&rect);     // Erase the area needed
 
 	pDC->PatBlt(rect.left, rect.top, rect.Width(), rect.Height(), PATCOPY);
 
-	pDC->SelectObject(pOldBrush);
 	return TRUE;
 } 
 
