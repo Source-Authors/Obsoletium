@@ -155,18 +155,17 @@ bool IsRestrictedFileType(const char *pcFileName) {
 
 void ReadFile(char const *pName) {
   FileHandle_t f = g_pFullFileSystem->Open(pName, "rb");
-
   if (f) {
-    const unsigned fileSize = g_pFullFileSystem->Size(f);
+    RunCodeAtScopeExit(g_pFullFileSystem->Close(f));
 
-    unsigned bufSize = g_pFullFileSystem->GetOptimalReadSize(f, fileSize);
+    const unsigned fileSize = g_pFullFileSystem->Size(f);
+    const unsigned bufSize = g_pFullFileSystem->GetOptimalReadSize(f, fileSize);
+
     void *buffer = g_pFullFileSystem->AllocOptimalReadBuffer(f, bufSize);
+    RunCodeAtScopeExit(g_pFullFileSystem->FreeOptimalReadBuffer(buffer));
 
     // read into local buffer
     (g_pFullFileSystem->ReadEx(buffer, bufSize, fileSize, f) != 0);
-    g_pFullFileSystem->Close(f);  // close file after reading
-
-    g_pFullFileSystem->FreeOptimalReadBuffer(buffer);
   }
 }
 
@@ -844,6 +843,8 @@ void VPKBuilder::BuildSteamPipeFriendlyFromInputKeys() {
     FileHandle_t fChunkWrite = g_pFullFileSystem->Open(szDataFilename, "wb");
     if (!fChunkWrite) Error("Can't create %s\n", szDataFilename);
 
+    RunCodeAtScopeExit(g_pFullFileSystem->Close(fChunkWrite));
+
     // Scan input files in order.
     uint32 iOffsetInChunk = 0;
     for (auto idxFile = r.m_iFirstInputFile; idxFile <= r.m_iLastInputFile;
@@ -894,7 +895,6 @@ void VPKBuilder::BuildSteamPipeFriendlyFromInputKeys() {
       // Let's clear this pointer just for grins
       f->m_pPreloadData = nullptr;
     }
-    g_pFullFileSystem->Close(fChunkWrite);
 
     // While we know the data is sitting in the OS file cache,
     // let's immediately re-calc the chunk hashes
