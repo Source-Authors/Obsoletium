@@ -1390,15 +1390,15 @@ void CWin32Surface::DrawSetTextColor(Color col)
 void CWin32Surface::SetLineColor(Color col)
 {
 	HPEN tmp=pen;
-	pen = CreatePen(PS_SOLID,0,RGB(col[0], col[1], col[2]));
+	pen = ::CreatePen(PS_SOLID,0,RGB(col[0], col[1], col[2]));
 	if(pen) 
 	{
-		SelectObject(PLAT(_currentContextPanel)->hdc, pen ); 
+		::SelectObject(PLAT(_currentContextPanel)->hdc, pen ); 
 	}
 	// you must delete the pen AFTER a new one is selected
 	if(tmp) 
 	{
-		DeleteObject(tmp);
+		::DeleteObject(tmp);
 	}
 }
 
