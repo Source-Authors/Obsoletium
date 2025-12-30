@@ -1098,6 +1098,8 @@ MatSysWindow::dumpViewport (const char *filename)
 		glReadPixels (0, 0, w, h, GL_RGB, GL_UNSIGNED_BYTE, image->data);
 #else
 		HDC hdc = GetDC ((HWND) getHandle ());
+		RunCodeAtScopeExit(	ReleaseDC ((HWND) getHandle (), hdc));
+
 		byte *data = (byte *) image->data;
 		int i = 0;
 		for (int y = 0; y < h; y++)
@@ -1110,7 +1112,6 @@ MatSysWindow::dumpViewport (const char *filename)
 				data[i++] = (byte) ((cref >> 16) & 0xff);
 			}
 		}
-		ReleaseDC ((HWND) getHandle (), hdc);
 #endif
 		if (!mxTgaWrite (filename, image))
 			mxMessageBox (this, "Error writing screenshot.", g_appTitle, MX_MB_OK | MX_MB_ERROR);
