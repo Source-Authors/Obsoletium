@@ -92,7 +92,7 @@ typedef struct
 	int iValue;
 } Buffy;
 
-void main(void)
+int main()
 {
 	BlockArray<Buffy, 16, 16> Buffies;
 
