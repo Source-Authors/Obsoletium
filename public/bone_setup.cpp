@@ -128,7 +128,7 @@ CBoneCache::CBoneCache( const bonecacheparams_t &params, unsigned int size, unsi
 	m_timeValid = params.curtime;
 	m_boneMask = params.boneMask;
 
-	unsigned short studioTableSize = static_cast<unsigned short>(params.pStudioHdr->numbones()) * sizeof(short);
+	unsigned short studioTableSize = size_cast<unsigned short>(params.pStudioHdr->numbones()) * sizeof(short);
 	m_cachedToStudioOffset = studioTableSize;
 	memcpy( StudioToCached(), pStudioToCached, studioTableSize );
 

@@ -712,9 +712,9 @@ bool CChunkFile::ReadKeyValueColor(const char *pszValue, unsigned char &chRed, u
 			Assert(g >= 0 && g <= std::numeric_limits<unsigned char>::max());
 			Assert(b >= 0 && b <= std::numeric_limits<unsigned char>::max());
 
-			chRed = static_cast<unsigned char>(r);
-			chGreen = static_cast<unsigned char>(g);
-			chBlue = static_cast<unsigned char>(b);
+			chRed = size_cast<unsigned char>(r);
+			chGreen = size_cast<unsigned char>(g);
+			chBlue = size_cast<unsigned char>(b);
 
 			return(true);
 		}
