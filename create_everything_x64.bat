@@ -24,4 +24,4 @@ IF ERRORLEVEL 1 (
   EXIT /B 1
 )
 
-devtools\bin\vpc.exe /2022 /windows /define:WORKSHOP_IMPORT_DISABLE /define:SIXENSE_DISABLE /define:NO_X360_XDK /define:RAD_TELEMETRY_DISABLED /define:DISABLE_ETW /define:NO_STEAM /define:NO_ATI_COMPRESS /define:NO_NVTC /define:LTCG /no_ceg /nofpo +everything /mksln everything.sln /slnitems .slnitems
+devtools\bin\vpc.exe /2026 /windows /define:WORKSHOP_IMPORT_DISABLE /define:SIXENSE_DISABLE /define:NO_X360_XDK /define:RAD_TELEMETRY_DISABLED /define:DISABLE_ETW /define:NO_STEAM /define:NO_ATI_COMPRESS /define:NO_NVTC /define:LTCG /no_ceg /nofpo +everything /mksln everything.sln /slnitems .slnitems

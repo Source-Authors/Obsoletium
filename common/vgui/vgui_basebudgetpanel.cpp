@@ -90,6 +90,12 @@ void CBaseBudgetPanel::OnConfigDataChanged( const CBudgetPanelConfigData &data )
 	if ( m_ConfigData.m_BudgetGroupInfo.Count() > m_BudgetGroupTimes.Count() )
 	{
 		m_BudgetGroupTimes.EnsureCount( m_ConfigData.m_BudgetGroupInfo.Count() );
+		// dimhotepus: Fix use-after-free as m_BudgetGroupTimes were deallocated and m_pBudgetHistoryPanel pointer must be updated.
+		m_pBudgetHistoryPanel->SetData(
+			m_BudgetGroupTimes.Count() ? &m_BudgetGroupTimes[0].m_Time[0] : nullptr,
+			GetNumCachedBudgetGroups(),
+			static_cast<int>(ARRAYSIZE(BudgetGroupTimeData_t::m_Time)),
+			m_BudgetHistoryOffset );
 		for ( intp i = oldNumGroups; i < m_ConfigData.m_BudgetGroupInfo.Count(); i++ )
 		{
 			ClearAllTimesForGroup( i );
@@ -98,6 +104,12 @@ void CBaseBudgetPanel::OnConfigDataChanged( const CBudgetPanelConfigData &data )
 	else
 	{
 		m_BudgetGroupTimes.SetSize( m_ConfigData.m_BudgetGroupInfo.Count() );
+		// dimhotepus: Fix use-after-free as m_BudgetGroupTimes were deallocated and m_pBudgetHistoryPanel pointer must be updated.
+		m_pBudgetHistoryPanel->SetData(
+			m_BudgetGroupTimes.Count() ? &m_BudgetGroupTimes[0].m_Time[0] : nullptr,
+			GetNumCachedBudgetGroups(),
+			static_cast<int>(ARRAYSIZE(BudgetGroupTimeData_t::m_Time)),
+			m_BudgetHistoryOffset );
 		for ( intp i = 0; i < m_BudgetGroupTimes.Count(); i++ )
 		{
 			ClearAllTimesForGroup( i );

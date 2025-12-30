@@ -79,7 +79,7 @@ if ["%CMAKE_MSVC_ARCH_NAME%"]==["x64"] (
 
 
 REM Finally create solution.
-devtools\bin\vpc.exe /2022 %WIN_X64% /define:WORKSHOP_IMPORT_DISABLE /define:SIXENSE_DISABLE /define:NO_X360_XDK /define:RAD_TELEMETRY_DISABLED /define:DISABLE_ETW /define:NO_STEAM /define:NO_ATI_COMPRESS /define:NO_NVTC /define:LTCG /no_ceg /nofpo +%GROUP_NAME% /mksln %SOLUTION_NAME% /slnitems .slnitems
+devtools\bin\vpc.exe /2026 %WIN_X64% /define:WORKSHOP_IMPORT_DISABLE /define:SIXENSE_DISABLE /define:NO_X360_XDK /define:RAD_TELEMETRY_DISABLED /define:DISABLE_ETW /define:NO_STEAM /define:NO_ATI_COMPRESS /define:NO_NVTC /define:LTCG /no_ceg /nofpo +%GROUP_NAME% /mksln %SOLUTION_NAME% /slnitems .slnitems
 if ERRORLEVEL 1 (
   ECHO MSBuild for %SOLUTION_NAME%.sln failed.
   EXIT /B 1

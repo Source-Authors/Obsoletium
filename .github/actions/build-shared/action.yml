@@ -15,6 +15,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+  - name: Install Visual Studio 2026 Build Tools
+    run: |
+      echo "Installing VS 2026 Build Tools..."
+      choco install visualstudio2026buildtools --package-parameters "--add Microsoft.VisualStudio.Workload.VCTools --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --includeRecommended --quiet" -y --ignore-package-exit-codes=3010
+      echo "VS 2026 Build Tools installation completed"
+    shell: cmd
+
   - name: Add MSBuild ${{inputs.platform-name}} to PATH
     uses: microsoft/setup-msbuild@v2
     with:
@@ -53,7 +60,7 @@ runs:
       type dependencies.shas.txt
     shell: cmd
 
-  - name: 'Cache dependencies output for ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
+  - name: 'Cache dependencies output for ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx'
     id: cache-dependencies
     uses: actions/cache@v4
     with:
@@ -77,16 +84,20 @@ runs:
       echo Building ${{inputs.solution-name}} v.%PATCH_VERSION%
     shell: cmd
 
-  - name: 'Build dependencies for ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
+  - name: 'Build dependencies for ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx'
     working-directory: ${{env.GITHUB_WORKSPACE}}
     if: steps.cache-dependencies.outputs.cache-hit != 'true'
-    run: .\build_game_thirdparty.bat ${{inputs.platform-name}}
+    run: |
+      call "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat"
+      .\build_game_thirdparty.bat ${{inputs.platform-name}}
     shell: cmd
 
   - name: Build VPC
     working-directory: ${{env.GITHUB_WORKSPACE}}
     if: steps.cache-vpc.outputs.cache-hit != 'true'
-    run: .\build_vpc.bat
+    run: |
+      call "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat"
+      .\build_vpc.bat
     shell: cmd
 
   - name: Generate build version information
@@ -94,14 +105,16 @@ runs:
     run: .\generate_build_info.bat
     shell: cmd
 
-  - name: 'Generate solution ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
+  - name: 'Generate solution ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx'
     working-directory: ${{env.GITHUB_WORKSPACE}}
     run: .\create_game_projects.bat ${{inputs.solution-name}} ${{inputs.platform-name}}
     shell: cmd
 
-  - name: '${{inputs.configuration-name}} build solution ${{inputs.solution-name}}_${{inputs.platform-name}}.sln'
+  - name: '${{inputs.configuration-name}} build solution ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx'
     working-directory: ${{env.GITHUB_WORKSPACE}}
-    run: msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.sln /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}}
+    run: |
+      call "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat"
+      msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}}
     shell: cmd
 
   - name: Get build artifacts path
