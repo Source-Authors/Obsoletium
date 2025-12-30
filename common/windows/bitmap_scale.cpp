@@ -50,15 +50,14 @@ HBITMAP ScaleBitmapForDpi(HBITMAP sourceBmp, unsigned oldDpiX, unsigned oldDpiY,
 
   CMemDC srcDC{srcCompatDC, CRect(CPoint(), sourceSize)};
   auto oldSrcBmp = srcDC.GetDC().SelectObject(sourceBmp);
+  RunCodeAtScopeExit(srcDC.GetDC().SelectObject(oldSrcBmp));
 
   CMemDC destDC{destCompatDC, CRect(CPoint(), scaledSize)};
   auto oldDestBmp = destDC.GetDC().SelectObject(scaledBmp);
+  RunCodeAtScopeExit(destDC.GetDC().SelectObject(oldDestBmp));
 
   destDC.GetDC().StretchBlt(0, 0, scaledSize.cx, scaledSize.cy, &srcDC.GetDC(),
                             0, 0, sourceSize.cx, sourceSize.cy, SRCCOPY);
-
-  srcDC.GetDC().SelectObject(oldSrcBmp);
-  destDC.GetDC().SelectObject(oldDestBmp);
 
   return scaledBmp;
 }
