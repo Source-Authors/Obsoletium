@@ -700,10 +700,9 @@ void TimelineItem::DrawFocusRect( void )
 	OffsetRect( &rcFocus, offset.x, offset.y );
 
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	::DrawFocusRect( dc, &rcFocus );
-
-	ReleaseDC( NULL, dc );
 }
 
 void TimelineItem::DrawSelf( void )
@@ -1742,10 +1741,9 @@ void TimelineItem::DrawGrowRect()
 	OffsetRect( &rcFocus, offset.x, offset.y );
 
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	::DrawFocusRect( dc, &rcFocus );
-
-	ReleaseDC( NULL, dc );
 }
 
 void TimelineItem::GetWorkList( bool reflect, CUtlVector< TimelineItem * >& list )

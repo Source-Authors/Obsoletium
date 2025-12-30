@@ -2600,6 +2600,7 @@ int PhonemeEditor::IsMouseOverBoundary( mxEvent *event )
 void PhonemeEditor::DrawFocusRect( char *reason )
 {
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
@@ -2607,8 +2608,6 @@ void PhonemeEditor::DrawFocusRect( char *reason )
 
 		::DrawFocusRect( dc, &rc );
 	}
-
-	ReleaseDC( NULL, dc );
 }
 
 //-----------------------------------------------------------------------------

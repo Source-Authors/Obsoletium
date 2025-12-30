@@ -477,6 +477,7 @@ void SceneRampTool::GetWorkspaceLeftRight( int& left, int& right )
 void SceneRampTool::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
@@ -484,8 +485,6 @@ void SceneRampTool::DrawFocusRect( void )
 
 		::DrawFocusRect( dc, &rc );
 	}
-
-	ReleaseDC( NULL, dc );
 }
 
 void SceneRampTool::SetClickedPos( int x, int y )

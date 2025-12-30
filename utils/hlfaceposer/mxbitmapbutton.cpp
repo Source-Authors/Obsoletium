@@ -39,10 +39,9 @@ void mxBitmapButton::redraw()
 	GetClientRect( wnd, &rc );
 	
 	HDC dc = GetDC( wnd );
+	RunCodeAtScopeExit(ReleaseDC( wnd, dc ));
 
 	DrawBitmapToDC( dc, 0, 0, w(), h(), m_bmImage );
-
-	ReleaseDC( wnd, dc );
 
 	ValidateRect( wnd, &rc );
 }

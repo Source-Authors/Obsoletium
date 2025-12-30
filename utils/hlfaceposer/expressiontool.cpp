@@ -1991,6 +1991,7 @@ void ExpressionTool::ShowContextMenu( mxEvent *event, bool include_track_menus )
 void ExpressionTool::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
@@ -1998,8 +1999,6 @@ void ExpressionTool::DrawFocusRect( void )
 
 		::DrawFocusRect( dc, &rc );
 	}
-
-	ReleaseDC( NULL, dc );
 }
 
 void ExpressionTool::SetClickedPos( int x, int y )

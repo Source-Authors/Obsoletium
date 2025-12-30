@@ -285,14 +285,17 @@ void mxExpressionSlider::DrawBar( HDC& dc )
 	HBRUSH face = CreateSolidBrush( GetSysColor( COLOR_3DFACE ) );
 	RunCodeAtScopeExit(DeleteObject( face ));
 
-	HPEN oldPen = (HPEN)SelectObject( dc, hilight );
-	RunCodeAtScopeExit(SelectObject( dc, oldPen ));
+	{
+		HPEN oldPen1 = (HPEN)SelectObject( dc, hilight );
+		RunCodeAtScopeExit(SelectObject( dc, oldPen1 ));
 
-	MoveToEx( dc, rcBar.left, rcBar.bottom, NULL );
-	LineTo( dc, rcBar.left, rcBar.top );
-	LineTo( dc, rcBar.right, rcBar.top );
+		MoveToEx( dc, rcBar.left, rcBar.bottom, NULL );
+		LineTo( dc, rcBar.left, rcBar.top );
+		LineTo( dc, rcBar.right, rcBar.top );
+	}
 
-	SelectObject( dc, shadow );
+	HPEN oldPen2 = (HPEN)SelectObject( dc, shadow );
+	RunCodeAtScopeExit(SelectObject( dc, oldPen2 ));
 
 	LineTo( dc, rcBar.right, rcBar.bottom );
 	LineTo( dc, rcBar.left, rcBar.bottom );
@@ -501,11 +504,11 @@ void mxExpressionSlider::DrawTitle( HDC &dc )
 	}
 	RunCodeAtScopeExit(SetTextColor( dc, oldColor ));
 
-	int oldMode = SetBkMode( dc, TRANSPARENT );
-	RunCodeAtScopeExit(SetBkMode( dc, oldMode ));
+	int oldBkMode = SetBkMode( dc, TRANSPARENT );
+	RunCodeAtScopeExit(SetBkMode( dc, oldBkMode ));
 
-	HFONT oldfont = (HFONT)SelectObject( dc, fnt );
-	RunCodeAtScopeExit(SelectObject( dc, oldfont ));
+	HFONT oldFont = (HFONT)SelectObject( dc, fnt );
+	RunCodeAtScopeExit(SelectObject( dc, oldFont ));
 
 	DrawText( dc, sz, -1, &rc, DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_LEFT | DT_WORD_ELLIPSIS );
 }

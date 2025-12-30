@@ -191,10 +191,9 @@ void CChoreoGlobalEventWidget::DrawLabel( CChoreoWidgetDrawHelper& drawHelper, C
 void CChoreoGlobalEventWidget::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	::DrawFocusRect( dc, &m_rcFocus );
-
-	ReleaseDC( NULL, dc );
 }
 
 //-----------------------------------------------------------------------------

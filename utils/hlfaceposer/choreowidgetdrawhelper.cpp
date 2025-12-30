@@ -147,7 +147,7 @@ CChoreoWidgetDrawHelper::~CChoreoWidgetDrawHelper( void )
 		SelectObject( m_dcMemory, m_bmOld );
 		DeleteObject( m_bmMemory );
 
-		DeleteObject( m_dcMemory );
+		DeleteDC( m_dcMemory );
 	}
 
 	ReleaseDC( m_hWnd, m_dcReal );
@@ -229,7 +229,7 @@ void CChoreoWidgetDrawHelper::CalcTextRect( const char *font, int pointsize, int
 		 font );
 	RunCodeAtScopeExit(DeleteObject( fnt ));
 
-	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, fnt );\
+	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, fnt );
 	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldFont ));
 
 	DrawText( m_dcMemory, output, -1, &rcText, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_WORDBREAK | DT_CALCRECT );
@@ -353,8 +353,10 @@ int CChoreoWidgetDrawHelper::CalcTextWidth( HFONT fnt, const char *fmt, ... )
 	V_vsprintf_safe( output, fmt, args );
 
 	HDC screen = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, screen ));
 
 	HFONT oldFont = (HFONT)SelectObject( screen, fnt );
+	RunCodeAtScopeExit(SelectObject( screen, oldFont ));
 
 	RECT rcText;
 	rcText.left = rcText.top = 0;
@@ -362,10 +364,6 @@ int CChoreoWidgetDrawHelper::CalcTextWidth( HFONT fnt, const char *fmt, ... )
 	rcText.right = rcText.left + 2048;
 
 	DrawText( screen, output, -1, &rcText, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_CALCRECT );
-
-	SelectObject( screen, oldFont );
-
-	ReleaseDC( NULL, screen );
 
 	return rcText.right;
 }
@@ -380,8 +378,10 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( HFONT fnt, const wchar_t *fmt, ... 
 	vswprintf( output, std::size(output), fmt, args );
 
 	HDC screen = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, screen ));
 
 	HFONT oldFont = (HFONT)SelectObject( screen, fnt );
+	RunCodeAtScopeExit(SelectObject( screen, oldFont ));
 
 	RECT rcText;
 	rcText.left = rcText.top = 0;
@@ -389,10 +389,6 @@ int CChoreoWidgetDrawHelper::CalcTextWidthW( HFONT fnt, const wchar_t *fmt, ... 
 	rcText.right = rcText.left + 2048;
 
 	DrawTextW( screen, output, -1, &rcText, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_CALCRECT );
-
-	SelectObject( screen, oldFont );
-
-	ReleaseDC( NULL, screen );
 
 	return rcText.right;
 }
@@ -459,19 +455,18 @@ void CChoreoWidgetDrawHelper::DrawColoredText( HFONT font, COLORREF clr, RECT& r
 	va_end( args  );
 	
 	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, font );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldFont ));
+
 	COLORREF oldColor = SetTextColor( m_dcMemory, clr );
-	int oldMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetTextColor( m_dcMemory, oldColor ));
+
+	int oldBkMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldBkMode ));
 
 	RECT rcTextOffset = rcText;
 	OffsetSubRect( rcTextOffset );
 
 	DrawText( m_dcMemory, output, -1, &rcTextOffset, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS );
-
-	SetBkMode( m_dcMemory, oldMode );
-
-	SetTextColor( m_dcMemory, oldColor );
-
-	SelectObject( m_dcMemory, oldFont );
 }
 
 //-----------------------------------------------------------------------------
@@ -492,19 +487,18 @@ void CChoreoWidgetDrawHelper::DrawColoredTextW( HFONT font, COLORREF clr, RECT& 
 	va_end( args  );
 	
 	HFONT oldFont = (HFONT)SelectObject( m_dcMemory, font );
+	RunCodeAtScopeExit(SelectObject( m_dcMemory, oldFont ));
+
 	COLORREF oldColor = SetTextColor( m_dcMemory, clr );
-	int oldMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetTextColor( m_dcMemory, oldColor ));
+
+	int oldBkMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldBkMode ));
 
 	RECT rcTextOffset = rcText;
 	OffsetSubRect( rcTextOffset );
 
 	DrawTextW( m_dcMemory, output, -1, &rcTextOffset, DT_LEFT | DT_NOPREFIX | DT_VCENTER | DT_SINGLELINE | DT_WORD_ELLIPSIS );
-
-	SetBkMode( m_dcMemory, oldMode );
-
-	SetTextColor( m_dcMemory, oldColor );
-
-	SelectObject( m_dcMemory, oldFont );
 }
 //-----------------------------------------------------------------------------
 // Purpose: 
@@ -548,8 +542,8 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharset( const char *font, int poin
 	COLORREF oldColor = SetTextColor( m_dcMemory, clr );
 	RunCodeAtScopeExit(SetTextColor( m_dcMemory, oldColor ));
 
-	int oldMode = SetBkMode( m_dcMemory, TRANSPARENT );
-	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldMode ));
+	int oldBkMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldBkMode ));
 
 	RECT rcTextOffset = rcText;
 	OffsetSubRect( rcTextOffset );
@@ -590,8 +584,8 @@ void CChoreoWidgetDrawHelper::DrawColoredTextCharsetW( const char *font, int poi
 	COLORREF oldColor = SetTextColor( m_dcMemory, clr );
 	RunCodeAtScopeExit(SetTextColor( m_dcMemory, oldColor ));
 
-	int oldMode = SetBkMode( m_dcMemory, TRANSPARENT );
-	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldMode ));
+	int oldBkMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldBkMode ));
 
 	RECT rcTextOffset = rcText;
 	OffsetSubRect( rcTextOffset );
@@ -641,8 +635,8 @@ void CChoreoWidgetDrawHelper::DrawColoredTextMultiline( const char *font, int po
 	COLORREF oldColor = SetTextColor( m_dcMemory, clr );
 	RunCodeAtScopeExit(SetTextColor( m_dcMemory, oldColor ));
 
-	int oldMode = SetBkMode( m_dcMemory, TRANSPARENT );
-	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldMode ));
+	int oldBkMode = SetBkMode( m_dcMemory, TRANSPARENT );
+	RunCodeAtScopeExit(SetBkMode( m_dcMemory, oldBkMode ));
 
 	RECT rcTextOffset = rcText;
 	OffsetSubRect( rcTextOffset );

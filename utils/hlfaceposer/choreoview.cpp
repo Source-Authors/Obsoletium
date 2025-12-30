@@ -1545,6 +1545,7 @@ void CChoreoView::AssociateBSP( void )
 void CChoreoView::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
@@ -1552,8 +1553,6 @@ void CChoreoView::DrawFocusRect( void )
 
 		::DrawFocusRect( dc, &rc );
 	}
-
-	ReleaseDC( NULL, dc );
 }
 
 intp CChoreoView::GetSelectedEventWidgets( CUtlVector< CChoreoEventWidget * >& events )

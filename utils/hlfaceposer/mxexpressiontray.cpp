@@ -725,10 +725,9 @@ void mxExpressionTray::ShowRightClickMenu( int mx, int my )
 void mxExpressionTray::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	::DrawFocusRect( dc, &m_rcFocus );
-
-	ReleaseDC( NULL, dc );
 }
 
 static bool IsWindowOrChild( mxWindow *parent, HWND test )

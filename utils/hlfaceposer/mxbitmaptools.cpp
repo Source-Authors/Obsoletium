@@ -135,14 +135,13 @@ void DrawBitmapToDC( void *hdc, int x, int y, int w, int h, mxbitmapdata_t& bitm
 	HDC dc = (HDC)hdc;
 
 	HDC memdc = CreateCompatibleDC( dc );
+	RunCodeAtScopeExit(DeleteDC( memdc ));
+
 	HBITMAP oldmembm = (HBITMAP)SelectObject( memdc, bitmap.image );
+	RunCodeAtScopeExit(SelectObject( memdc, oldmembm ));
 
 	int oldmode = SetStretchBltMode( dc, COLORONCOLOR );
+	RunCodeAtScopeExit(SetStretchBltMode( dc, oldmode ));
 
 	StretchBlt( dc, x, y, w, h, memdc, 0, 0, bitmap.width, bitmap.height, SRCCOPY );
-
-	SetStretchBltMode( dc, oldmode );
-
-	SelectObject( memdc, oldmembm );
-	DeleteDC( memdc );
 }

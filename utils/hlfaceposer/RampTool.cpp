@@ -550,6 +550,7 @@ void RampTool::GetWorkspaceLeftRight( int& left, int& right )
 void RampTool::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
@@ -557,8 +558,6 @@ void RampTool::DrawFocusRect( void )
 
 		::DrawFocusRect( dc, &rc );
 	}
-
-	ReleaseDC( NULL, dc );
 }
 
 void RampTool::SetClickedPos( int x, int y )

@@ -590,6 +590,7 @@ void GestureTool::GetWorkspaceLeftRight( int& left, int& right )
 void GestureTool::DrawFocusRect( void )
 {
 	HDC dc = GetDC( NULL );
+	RunCodeAtScopeExit(ReleaseDC( NULL, dc ));
 
 	for ( intp i = 0; i < m_FocusRects.Count(); i++ )
 	{
@@ -597,8 +598,6 @@ void GestureTool::DrawFocusRect( void )
 
 		::DrawFocusRect( dc, &rc );
 	}
-
-	ReleaseDC( NULL, dc );
 }
 
 void GestureTool::SetClickedPos( int x, int y )
