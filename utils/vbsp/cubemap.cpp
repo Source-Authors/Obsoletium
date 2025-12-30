@@ -348,6 +348,8 @@ void CreateDefaultCubemaps( bool bHDR )
 
 	// Create the destination cubemap
 	IVTFTexture *pDstCubemap = CreateVTFTexture();
+	RunCodeAtScopeExit(DestroyVTFTexture( pDstCubemap ));
+
 	pDstCubemap->Init( DEFAULT_CUBEMAP_SIZE, DEFAULT_CUBEMAP_SIZE, 1,
 		pSrcVTFTextures[0]->Format(), unionTextureFlags | TEXTUREFLAGS_ENVMAP, 
 		pSrcVTFTextures[0]->FrameCount() );
@@ -502,8 +504,7 @@ void CreateDefaultCubemaps( bool bHDR )
 	{
 		DestroyVTFTexture( t );
 	}
-	DestroyVTFTexture( pDstCubemap );
-}	
+}
 
 void Cubemap_CreateDefaultCubemaps( void )
 {
