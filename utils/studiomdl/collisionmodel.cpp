@@ -2168,19 +2168,19 @@ static bool LoadSurfaceProps( const char *pMaterialFilename )
 		return false;
 
 	FileHandle_t fp = g_pFileSystem->Open( pMaterialFilename, "rb", TOOLS_READ_PATH_ID );
-	if ( fp == FILESYSTEM_INVALID_HANDLE )
+	if ( !fp )
 		return false;
 
+	RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
 	int len = g_pFileSystem->Size( fp );
-	char *pText = new char[len+1];
-	g_pFileSystem->Read( pText, len, fp );
-	g_pFileSystem->Close( fp );
+	std::unique_ptr<char[]> pText = std::make_unique<char[]>(len+1);
+
+	g_pFileSystem->Read( pText.get(), len, fp );
 	
 	pText[len]=0;
 
-	physprops->ParseSurfaceData( pMaterialFilename, pText );
-
-	delete[] pText;
+	physprops->ParseSurfaceData( pMaterialFilename, pText.get() );
 
 	return true;
 }
