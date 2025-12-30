@@ -463,6 +463,8 @@ void VMPI_DistributeLightData()
 		if ( !fp )
 			Error( "Can't open '%s' to read lighting info.", g_LightResultsFilename.Base() );
 
+		RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
 		int size = g_pFileSystem->Size( fp );
 		int faceSize = (numfaces*(MAXLIGHTMAPS+sizeof(int)));
 
@@ -475,7 +477,6 @@ void VMPI_DistributeLightData()
 
 			g_pFileSystem->Read( pdlightdata->Base(), lightSize, fp );
 			g_pFileSystem->Read( faceData.Base(), faceSize, fp );
-			g_pFileSystem->Close( fp );
 
 			faceData.SeekPut( CUtlBuffer::SEEK_HEAD, faceSize );
 

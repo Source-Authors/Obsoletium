@@ -58,6 +58,10 @@ void DumpRayToGlView( Ray_t const& ray, float dist, Vector* pColor, const char *
 	VectorMA( ray.m_Start, 2, crossDir, start2 );
 
 	FileHandle_t fp = g_pFileSystem->Open( pFilename, "a" );
+	if (!fp) return;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
 	int vert = 0;
 	CmdLib_FPrintf( fp, "3\n" );
 	CmdLib_FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", start1.x, start1.y, start1.z,
@@ -69,7 +73,6 @@ void DumpRayToGlView( Ray_t const& ray, float dist, Vector* pColor, const char *
 	CmdLib_FPrintf( fp, "%6.3f %6.3f %6.3f %.2f %.2f %.2f\n", end.x, end.y, end.z,
 		pColor->x, pColor->y, pColor->z );
 	vert++;
-	g_pFileSystem->Close( fp );
 }
 
 

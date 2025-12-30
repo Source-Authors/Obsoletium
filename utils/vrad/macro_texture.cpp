@@ -43,16 +43,16 @@ CMacroTextureData* FindMacroTexture( const char *pFilename )
 CMacroTextureData* LoadMacroTextureFile( const char *pFilename )
 {
 	FileHandle_t hFile = g_pFileSystem->Open( pFilename, "rb" );
-	if ( hFile == FILESYSTEM_INVALID_HANDLE )
+	if ( !hFile )
 		return NULL;
+
+	RunCodeAtScopeExit(g_pFileSystem->Close( hFile ));
 
 	// Read the file in.
 	CUtlVector<char> tempData;
 	tempData.SetSize( g_pFileSystem->Size( hFile ) );
 	g_pFileSystem->Read( tempData.Base(), tempData.Count(), hFile );
-	g_pFileSystem->Close( hFile );
-	
-	
+
 	// Now feed the data into a CUtlBuffer (great...)
 	CUtlBuffer buf;
 	buf.Put( tempData.Base(), tempData.Count() );
@@ -60,20 +60,19 @@ CMacroTextureData* LoadMacroTextureFile( const char *pFilename )
 	
 	// Now make a texture out of it.
 	IVTFTexture *pTex = CreateVTFTexture();
+	RunCodeAtScopeExit(DestroyVTFTexture( pTex ));
+
 	if ( !pTex->Unserialize( buf ) )
 		Error( "IVTFTexture::Unserialize( %s ) failed.", pFilename );
 
 	pTex->ConvertImageFormat( IMAGE_FORMAT_RGBA8888, false );	// Get it in a format we like.
 
-	
 	// Now convert to a CMacroTextureData.
 	CMacroTextureData *pData = new CMacroTextureData;
 	pData->m_Width = pTex->Width();
 	pData->m_Height = pTex->Height();
 	pData->m_ImageData.EnsureCapacity( pData->m_Width * pData->m_Height * 4 );
 	memcpy( pData->m_ImageData.Base(), pTex->ImageData(), pData->m_Width * pData->m_Height * 4 );
-
-	DestroyVTFTexture( pTex );
 
 	Msg( "-- LoadMacroTextureFile: %s\n", pFilename );
 	return pData;

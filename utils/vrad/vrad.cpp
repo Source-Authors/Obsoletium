@@ -213,6 +213,8 @@ void ReadLightFile (char *filename)
 		return;
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->Close( f ));
+
 	Msg("Reading texlights from '%s'.\n", filename);
 	while ( CmdLib_FGets( buf, sizeof( buf ), f ) )
 	{
@@ -313,7 +315,6 @@ void ReadLightFile (char *filename)
 		}
 	}
 	qprintf ( "%d texlights parsed from '%s' (%.2fs)\n\n", file_texlights, filename, Plat_FloatTime() - start);
-	g_pFileSystem->Close( f );
 }
 
 
@@ -1287,18 +1288,16 @@ WriteWorld
 */
 void WriteWorld (char *name, int iBump)
 {
-	unsigned	j;
-	FileHandle_t out;
-	CPatch		*patch;
-
-	out = g_pFileSystem->Open( name, "w" );
+	FileHandle_t out = g_pFileSystem->Open( name, "w" );
 	if (!out)
 		Error ("Couldn't open %s", name);
+	
+	RunCodeAtScopeExit(g_pFileSystem->Close( out ));
 
 	unsigned int uiPatchCount = g_Patches.Count();
-	for (j=0; j<uiPatchCount; j++)
+	for (unsigned j=0; j<uiPatchCount; j++)
 	{
-		patch = &g_Patches.Element( j );
+		CPatch *patch = &g_Patches.Element( j );
 
 		// skip parent patches
 		if (patch->child1 != g_Patches.InvalidIndex() )
@@ -1321,19 +1320,19 @@ void WriteWorld (char *name, int iBump)
 			}
 		}
 	}
-
-	g_pFileSystem->Close( out );
 }
 
 void WriteRTEnv (char *name)
 {
-	FileHandle_t out;
-
-	out = g_pFileSystem->Open( name, "w" );
+	FileHandle_t out = g_pFileSystem->Open( name, "w" );
 	if (!out)
 		Error ("Couldn't open %s", name);
 
+	RunCodeAtScopeExit(g_pFileSystem->Close( out ));
+
 	winding_t *triw = AllocWinding( 3 );
+	RunCodeAtScopeExit(FreeWinding(triw));
+
 	triw->numpoints = 3;
 
 	for( int i = 0; i < g_RtEnv.OptimizedTriangleList.Count(); i++ )
@@ -1352,9 +1351,6 @@ void WriteRTEnv (char *name)
 
 		WriteWinding(out, triw, color);
 	}
-	FreeWinding(triw);
-
-	g_pFileSystem->Close( out );
 }
 
 void WriteWinding (FileHandle_t out, winding_t *w, Vector& color )
@@ -1402,11 +1398,11 @@ void WriteLine( FileHandle_t out, const Vector &vecPos1, const Vector &vecPos2, 
 
 void WriteTrace( const char *pFileName, const FourRays &rays, const RayTracingResult& result )
 {
-	FileHandle_t out;
-
-	out = g_pFileSystem->Open( pFileName, "a" );
+	FileHandle_t out = g_pFileSystem->Open( pFileName, "a" );
 	if (!out)
 		Error ("Couldn't open %s", pFileName);
+
+	RunCodeAtScopeExit(g_pFileSystem->Close( out ));
 
 	// Draws rays
 	for ( int i = 0; i < 4; ++i )
@@ -1419,8 +1415,6 @@ void WriteTrace( const char *pFileName, const FourRays &rays, const RayTracingRe
 		WriteLine( out, vecOrigin, vecEnd, Vector( 256, 0, 0 ) );
 		WriteNormal( out, vecEnd, result.surface_normal.Vec(i), 10.0f, Vector( 256, 265, 0 ) );
 	}
-
-	g_pFileSystem->Close( out );
 }
 
 
@@ -1678,39 +1672,6 @@ void BounceLight (void)
 		// NOTE: This means that only the bounced light is integrated into totallight!
 		VectorFill( g_Patches[i].totallight.light[0], 0 );
 	}
-
-#if 0
-	FileHandle_t dFp = g_pFileSystem->Open( "lightemit.txt", "w" );
-
-	unsigned int uiPatchCount = g_Patches.Size();
-	for (i=0 ; i<uiPatchCount; i++)
-	{
-		CmdLib_FPrintf( dFp, "Emit %d: %f %f %f\n", i, emitlight[i].x, emitlight[i].y, emitlight[i].z );
-	}
-
-	g_pFileSystem->Close( dFp );
-
-	for (i=0; i<num_patches ; i++)
-	{
-		Vector total;
-
-		VectorSubtract (g_Patches[i].maxs, g_Patches[i].mins, total);
-		Msg("%4d %4zd %4zd %4d (%d) %.0f", i, g_Patches[i].parent, g_Patches[i].child1, g_Patches[i].child2, g_Patches[i].samples, g_Patches[i].area );
-		Msg(" [%.0f %.0f %.0f]", total[0], total[1], total[2] );
-		if (g_Patches[i].child1 != g_Patches.InvalidIndex() )
-		{
-			Vector tmp;
-			VectorScale( g_Patches[i].totallight.light[0], g_Patches[i].area, tmp );
-
-			VectorMA( tmp, -g_Patches[g_Patches[i].child1].area, g_Patches[g_Patches[i].child1].totallight.light[0], tmp );
-			VectorMA( tmp, -g_Patches[g_Patches[i].child2].area, g_Patches[g_Patches[i].child2].totallight.light[0], tmp );
-			// Msg("%.0f ", VectorLength( tmp ) );
-			// Msg("%d ", g_Patches[i].samples - g_Patches[g_Patches[i].child1].samples - g_Patches[g_Patches[i].child2].samples );
-			// Msg("%d ", g_Patches[i].samples );
-		}
-		Msg("\n");
-	}
-#endif
 
 	i = 0;
 	while ( bouncing )

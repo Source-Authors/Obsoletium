@@ -174,12 +174,15 @@ bool CVRadDLL::DoIncrementalLight( char const *pVMFFile )
 	GetTempPath( sizeof( tempPath ), tempPath );
 	GetTempFileName( tempPath, "vmf_entities_", 0, tempFilename );
 
-	FileHandle_t fp = g_pFileSystem->Open( tempFilename, "wb" );
-	if( !fp )
-		return false;
+	{
+		FileHandle_t fp = g_pFileSystem->Open( tempFilename, "wb" );
+		if( !fp )
+			return false;
 
-	g_pFileSystem->Write( pVMFFile, strlen(pVMFFile)+1, fp );
-	g_pFileSystem->Close( fp );
+		RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
+		g_pFileSystem->Write( pVMFFile, strlen(pVMFFile)+1, fp );
+	}
 
 	// Parse the new entities.
 	if( !LoadEntsFromMapFile( tempFilename ) )
