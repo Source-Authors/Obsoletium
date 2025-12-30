@@ -1145,12 +1145,13 @@ int CMasterMulticastThread::FindOrAddFile(const char *pFilename,
     return -1;
   }
 
+  RunCodeAtScopeExit(m_pPassThru->Close(fp));
+
   if (!bFileAlreadyExisted) pFile = new CMulticastFile;
 
   pFile->m_UncompressedData.SetSize(m_pPassThru->Size(fp));
   m_pPassThru->Read(pFile->m_UncompressedData.Base(),
                     pFile->m_UncompressedData.Count(), fp);
-  m_pPassThru->Close(fp);
 
   int iRet = FinishFileSetup(pFile, pFilename, pPathID, bFileAlreadyExisted);
   if (bFileAlreadyExisted) LeaveCriticalSection(&m_CS);
