@@ -687,23 +687,21 @@ intp TexinfoForBrushTexture (plane_t *plane, brush_texture_t *bt, const Vector& 
 void LoadSurfacePropFile( const char *pMaterialFilename )
 {
 	FileHandle_t fp = g_pFileSystem->Open( pMaterialFilename, "rb" );
-
-	if ( fp == FILESYSTEM_INVALID_HANDLE )
+	if ( !fp )
 	{
 		return;
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
 	const unsigned len = g_pFileSystem->Size( fp );
 
-	char *pText = new char[len + 1];
-	g_pFileSystem->Read( pText, len, fp );
-	g_pFileSystem->Close( fp );
+	std::unique_ptr<char[]> pText = std::make_unique<char[]>(len + 1);
+	g_pFileSystem->Read( pText.get(), len, fp );
 	// dimhotepus: Ensure null termination.
 	pText[len] = '\0';
 
-	physprops->ParseSurfaceData( pMaterialFilename, pText );
-
-	delete[] pText;
+	physprops->ParseSurfaceData( pMaterialFilename, pText.get() );
 }
 //-----------------------------------------------------------------------------
 // Purpose: Loads the surface properties database into the physics DLL

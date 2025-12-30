@@ -237,6 +237,10 @@ void NumberLeafs( const CUtlVector<node_t *> &leaves )
 		char name[256];
 		V_sprintf_safe(name, "u:\\main\\game\\ep2\\maps\\vis_%02d.gl", i );
 		FileHandle_t fp = g_pFileSystem->Open( name, "w" );
+		if (!fp) continue;
+
+		RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
 		Msg("Writing %s\n", name );
 		for ( bspbrush_t *pBrush = g_VisClusters[i].pBrushes; pBrush; pBrush = pBrush->next )
 		{
@@ -252,7 +256,6 @@ void NumberLeafs( const CUtlVector<node_t *> &leaves )
 					OutputWindingColor( pBrush->sides[k].winding, fp, 64 + (j&31), 64, 64 - (j&31) );
 			}
 		}
-		g_pFileSystem->Close(fp);
 	}
 #endif
 }

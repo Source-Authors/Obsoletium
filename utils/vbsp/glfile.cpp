@@ -161,20 +161,21 @@ void WriteGLViewFaces_r( node_t *node, FileHandle_t glview )
 WriteGLView
 =============
 */
-void WriteGLView (tree_t *tree, char *source)
+void WriteGLView (tree_t *tree, char *src)
 {
 	char	name[1024];
-	FileHandle_t glview;
 
 	c_glfaces = 0;
-	V_sprintf_safe (name, "%s%s.gl",outbase, source);
+	V_sprintf_safe (name, "%s%s.gl",outbase, src);
 	Msg("Writing %s\n", name);
 
-	glview = g_pFileSystem->Open( name, "w" );
+	FileHandle_t glview = g_pFileSystem->Open(name, "w");
 	if (!glview)
 		Error ("Couldn't open %s", name);
+	
+	RunCodeAtScopeExit(g_pFileSystem->Close(glview));
+
 	WriteGLView_r (tree->headnode, glview);
-	g_pFileSystem->Close( glview );
 
 	Msg("%5i c_glfaces\n", c_glfaces);
 }
@@ -183,17 +184,18 @@ void WriteGLView (tree_t *tree, char *source)
 void WriteGLViewFaces( tree_t *tree, const char *pName )
 {
 	char	name[1024];
-	FileHandle_t glview;
 
 	c_glfaces = 0;
 	V_sprintf_safe (name, "%s%s.gl", outbase, pName);
 	Msg("Writing %s\n", name);
 
-	glview = g_pFileSystem->Open( name, "w" );
+	FileHandle_t glview = g_pFileSystem->Open( name, "w" );
 	if (!glview)
 		Error ("Couldn't open %s", name);
+
+	RunCodeAtScopeExit(g_pFileSystem->Close(glview));
+
 	WriteGLViewFaces_r (tree->headnode, glview);
-	g_pFileSystem->Close( glview );
 
 	Msg("%5i c_glfaces\n", c_glfaces);
 }
@@ -202,18 +204,19 @@ void WriteGLViewFaces( tree_t *tree, const char *pName )
 void WriteGLViewBrushList( bspbrush_t *pList, const char *pName )
 {
 	char	name[1024];
-	FileHandle_t glview;
 
 	V_sprintf_safe (name, "%s%s.gl", outbase, pName );
 	Msg("Writing %s\n", name);
 
-	glview = g_pFileSystem->Open( name, "w" );
+	FileHandle_t glview = g_pFileSystem->Open(name, "w");
 	if (!glview)
-	Error ("Couldn't open %s", name);
+		Error ("Couldn't open %s", name);
+
+	RunCodeAtScopeExit(g_pFileSystem->Close( glview ));
+
 	for ( bspbrush_t *pBrush = pList; pBrush; pBrush = pBrush->next )
 	{
 		for (int i =  0; i < pBrush->numsides; i++ )
 			OutputWinding( pBrush->sides[i].winding, glview );
 	}
-	g_pFileSystem->Close( glview );
 }

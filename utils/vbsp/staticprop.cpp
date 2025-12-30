@@ -717,11 +717,12 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 		Error( "Unable to load vertex data \"%s\"\n", fileName );
 	}
 
+	RunCodeAtScopeExit(g_pFileSystem->Close( fileHandle ));
+
 	// Get the file size
 	int size = g_pFileSystem->Size( fileHandle );
 	if (size == 0)
 	{
-		g_pFileSystem->Close( fileHandle );
 		Error( "Bad size for vertex data \"%s\"\n", fileName );
 	}
 
@@ -732,7 +733,6 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 	}
 
 	g_pFileSystem->Read( pVvdHdr, size, fileHandle );
-	g_pFileSystem->Close( fileHandle );
 
 	// check header
 	if (pVvdHdr->id != MODEL_VERTEX_FILE_ID)
