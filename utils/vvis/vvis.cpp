@@ -426,23 +426,30 @@ void LoadPortals (char *name)
 		{
 			Error( "LoadPortals: GetTempFileName failed.\n" );
 		}
-
-		// Read all the data from the network file into memory.
-		FileHandle_t hFile = g_pFileSystem->Open(name, "r");
-		if ( hFile == FILESYSTEM_INVALID_HANDLE )
-			Error( "LoadPortals( %s ): couldn't get file from master.\n", name );
-
+		
 		CUtlVector<char> data;
-		data.SetCount( g_pFileSystem->Size( hFile ) );
-		g_pFileSystem->Read( data.Base(), data.Count(), hFile );
-		g_pFileSystem->Close( hFile );
+
+		{
+			// Read all the data from the network file into memory.
+			FileHandle_t hFile = g_pFileSystem->Open(name, "r");
+			if ( !hFile )
+				Error( "LoadPortals( %s ): couldn't get file from master.\n", name );
+
+			RunCodeAtScopeExit(g_pFileSystem->Close(hFile));
+
+			data.SetCount( g_pFileSystem->Size( hFile ) );
+			g_pFileSystem->Read( data.Base(), data.Count(), hFile );
+		}
 
 		// Dump it into a temp file.
 		f = fopen( tempFile, "wt" );
 		if (f)
 		{
-			fwrite( data.Base(), 1, data.Count(), f );
-			fclose( f );
+			{
+				RunCodeAtScopeExit(fclose( f ));
+
+				fwrite( data.Base(), 1, data.Count(), f );
+			}
 
 			// Open the temp file up.
 			f = fopen( tempFile, "rSTD" ); // read only, sequential, temporary, delete on close
@@ -456,6 +463,8 @@ void LoadPortals (char *name)
 
 	if ( !f )
 		Error ("LoadPortals: couldn't read %s\n",name);
+
+	RunCodeAtScopeExit(fclose(f));
 	
 	char magic[80];
 	if (fscanf (f,"%79s\n%i\n%i\n",magic, &portalclusters, &g_numportals) != 3)
@@ -564,8 +573,6 @@ void LoadPortals (char *name)
 		p++;
 
 	}
-	
-	fclose (f);
 }
 
 

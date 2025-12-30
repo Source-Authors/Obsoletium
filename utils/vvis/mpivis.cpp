@@ -283,6 +283,8 @@ void RunMPIBasePortalVis()
 		if ( !fp )
 			Error( "Can't open '%s' to read portal info.", g_BasePortalVisResultsFilename.Base() );
 
+		RunCodeAtScopeExit(g_pFileSystem->Close(fp));
+
 		for ( i=0; i < g_numportals * 2; i++) 
 		{
 			portal_t *p = &portals[i];
@@ -297,8 +299,6 @@ void RunMPIBasePortalVis()
 		
 			p->nummightsee = CountBits (p->portalflood, g_numportals*2);
 		}
-
-		g_pFileSystem->Close( fp );
 	}
 
 	
