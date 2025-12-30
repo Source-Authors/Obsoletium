@@ -3781,15 +3781,14 @@ void ExpressionTool::OnExportFlexAnimation( void )
 
 	// Write it out baby
 	FileHandle_t fh = filesystem->Open( fafilename, "wt" );
-	if (fh)
-	{
-		filesystem->Write( buf.Base(), buf.TellPut(), fh );
-		filesystem->Close(fh);
-	}
-	else
+	if (!fh)
 	{
 		Con_Printf( "Unable to write file %s!!!\n", fafilename );
+		return;
 	}
+	
+	RunCodeAtScopeExit(filesystem->Close(fh));
+	filesystem->Write( buf.Base(), buf.TellPut(), fh );
 }
 
 void ExpressionTool::OnImportFlexAnimation( void )

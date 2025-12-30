@@ -4641,18 +4641,17 @@ void PhonemeEditor::ExportValveDataChunk( char const *tempfile )
 		Con_ErrorPrintf( "PhonemeEditor::ExportValveDataChunk:  Unable to write to %s (read-only?)\n", tempfile );
 		return;
 	}
-	else
-	{
-		// Buffer and dump data
-		CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
-		m_Tags.SaveToBuffer( buf );
+	RunCodeAtScopeExit(filesystem->Close(fh));
 
-		filesystem->Write( buf.Base(), buf.TellPut(), fh );
-		filesystem->Close(fh);
+	// Buffer and dump data
+	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 
-		Con_Printf( "Exported %zi words to %s\n", m_Tags.m_Words.Count(), tempfile );
-	}
+	m_Tags.SaveToBuffer( buf );
+
+	filesystem->Write( buf.Base(), buf.TellPut(), fh );
+
+	Con_Printf( "Exported %zi words to %s\n", m_Tags.m_Words.Count(), tempfile );
 }
 
 //-----------------------------------------------------------------------------
@@ -4668,6 +4667,8 @@ void PhonemeEditor::ImportValveDataChunk( char const *tempfile )
 		return;
 	}
 
+	RunCodeAtScopeExit(filesystem->Close( fh ));
+
 	int len = filesystem->Size( fh );
 	if ( len <= 4 )
 	{
@@ -4677,14 +4678,11 @@ void PhonemeEditor::ImportValveDataChunk( char const *tempfile )
 
 	ClearExtracted();
 
-	unsigned char *buf = new unsigned char[ len + 1 ];
+	std::unique_ptr<byte[]> buf = std::make_unique<byte[]>( len + 1 );
 
-	filesystem->Read( buf, len, fh );
-	filesystem->Close( fh );
+	filesystem->Read( buf.get(), len, fh );
 
-	m_TagsExt.InitFromDataChunk( (void *)( buf ), len );
-
-	delete[] buf;
+	m_TagsExt.InitFromDataChunk( buf.get(), len );
 
 	Con_Printf( "Imported %zi words from %s\n", m_TagsExt.m_Words.Count(), tempfile );
 

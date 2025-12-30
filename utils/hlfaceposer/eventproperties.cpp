@@ -174,8 +174,13 @@ void CMapEntities::CheckUpdateMap( char const *mapname )
 	m_Entities.RemoveAll();
 
 	FileHandle_t hfile = filesystem->Open( mapname, "rb" );
-	if ( hfile == FILESYSTEM_INVALID_HANDLE )
+	if ( !hfile )
+	{
+		Con_ErrorPrintf( "Unable to read BSP file %s.\n", mapname );
 		return;
+	}
+
+	RunCodeAtScopeExit(filesystem->Close( hfile ));
 
 	dheader_t header;
 	filesystem->Read( &header, sizeof( header ), hfile );
@@ -189,7 +194,6 @@ void CMapEntities::CheckUpdateMap( char const *mapname )
 			header.version, 
 			BSPVERSION );
 
-		filesystem->Close( hfile );
 		return;
 	}
 
@@ -200,24 +204,21 @@ void CMapEntities::CheckUpdateMap( char const *mapname )
 		Con_ErrorPrintf( "BSP file %s is missing entity lump\n", mapname );
 
 		// It's empty or only contains a file header ( so there are no entries ), so don't add to search paths
-		filesystem->Close( hfile );
 		return;
 	}
 
 	// Seek to correct position
 	filesystem->Seek( hfile, entlump->fileofs, FILESYSTEM_SEEK_HEAD );
 
-	char *buffer = new char[ entlump->filelen + 1 ];
+	std::unique_ptr<char[]> buffer = std::make_unique<char[]>( entlump->filelen + 1 );
 	Assert( buffer );
 
-	filesystem->Read( buffer, entlump->filelen, hfile );
-
-	filesystem->Close( hfile );
+	filesystem->Read( buffer.get(), entlump->filelen, hfile );
 
 	buffer[ entlump->filelen ] = 0;
 
 	// Now we have entity buffer, now parse it
-	ParseFromMemory( buffer, entlump->filelen );
+	ParseFromMemory( buffer.get(), entlump->filelen );
 
 	while ( 1 )
 	{
@@ -305,8 +306,6 @@ void CMapEntities::CheckUpdateMap( char const *mapname )
 			}
 		}
 	}
-
-	delete[] buffer;
 }
 
 int CMapEntities::Count( void )

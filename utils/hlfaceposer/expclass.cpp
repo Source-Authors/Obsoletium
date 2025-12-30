@@ -168,11 +168,9 @@ void CExpClass::Save( void )
 		Con_ErrorPrintf( "Unable to write to %s (read-only?)\n", relative );
 		return;
 	}
-	else
-	{
-		filesystem->Write( buf.Base(), buf.TellPut(), fh );
-		filesystem->Close(fh);
-	}
+
+	RunCodeAtScopeExit(filesystem->Close( fh ));
+	filesystem->Write( buf.Base(), buf.TellPut(), fh );
 
 	SetDirty( false );
 
@@ -344,11 +342,9 @@ void CExpClass::Export( void )
 		Con_ErrorPrintf( "Unable to write to %s (read-only?)\n", relative );
 		return;
 	}
-	else
-	{
-		filesystem->Write( pDataStart, fhdr->length, fh );
-		filesystem->Close(fh);
-	}
+
+	RunCodeAtScopeExit(filesystem->Close(fh));
+	filesystem->Write( pDataStart, fhdr->length, fh );
 }
 
 //-----------------------------------------------------------------------------
