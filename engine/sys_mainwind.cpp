@@ -1599,7 +1599,9 @@ void CGame::PlayVideoAndWait( const char *filename, bool bNeedHealthWarning )
 
 		RECT rect{0, 0, m_width, m_height};
 
-		HBRUSH hBlackBrush = (HBRUSH) ::GetStockObject( BLACK_BRUSH );
+		HBRUSH hBlackBrush = (HBRUSH)::GetStockObject( BLACK_BRUSH );
+		RunCodeAtScopeExit(::DeleteObject(hBlackBrush));
+
 		::SetViewportOrgEx( dc, 0, 0, nullptr );
 		::FillRect( dc, &rect, hBlackBrush );
 	}
