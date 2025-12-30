@@ -575,17 +575,19 @@ void CWADTexture::DrawNoImage(CDC *pDC, RECT& rect, int iFontHeight)
 {
 	// draw "no data"
 	CFont *pOldFont = (CFont*) pDC->SelectStockObject(ANSI_VAR_FONT);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldFont));
+
 	COLORREF cr = pDC->SetTextColor(RGB(0xff, 0xff, 0xff));
+	RunCodeAtScopeExit(pDC->SetTextColor(cr));
+
 	COLORREF cr2 = pDC->SetBkColor(RGB(0, 0, 0));
+	RunCodeAtScopeExit(pDC->SetTextColor(cr2));
 
 	// draw black rect first
 	pDC->FillRect(&rect, CBrush::FromHandle(HBRUSH(GetStockObject(BLACK_BRUSH))));
 
 	// then text
 	pDC->TextOut(rect.left+2, rect.top+2, "No Image", 8);
-	pDC->SelectObject(pOldFont);
-	pDC->SetTextColor(cr);
-	pDC->SetBkColor(cr2);
 }
 
 
@@ -684,7 +686,7 @@ void CWADTexture::Draw(CDC *pDC, RECT& rect, int iFontHeight, int iIconHeight, D
 		// draw name
 		char szShortName[MAX_PATH];
 		intp iLen = static_cast<IEditorTexture*>(this)->GetShortName(szShortName);
-		pDC->TextOut(rect.left, rect.bottom - (iFontHeight + 4), szShortName, iLen);
+		pDC->TextOut(rect.left, rect.bottom - (iFontHeight + 4), szShortName, size_cast<int>( iLen ));
 	}
 }
 

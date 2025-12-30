@@ -90,8 +90,12 @@ void CTitleWnd::SetTitle(LPCTSTR pszTitle)
 			CDC *pDC = GetDC();
 			if (pDC != NULL)
 			{
-				pDC->SelectObject(&m_FontActive);
-				CSize TextSize = pDC->GetTextExtent(m_szTitle, V_strlen(m_szTitle));
+				RunCodeAtScopeExit(ReleaseDC(pDC));
+
+				CFont *pOldFont = pDC->SelectObject(&m_FontActive);
+				RunCodeAtScopeExit(pDC->SelectObject(pOldFont));
+
+				CSize TextSize = pDC->GetTextExtent(m_szTitle, size_cast<int>(V_strlen(m_szTitle)));
 				SetWindowPos(NULL, 0, 0, TextSize.cx, TextSize.cy, SWP_NOMOVE | SWP_NOZORDER);
 				Invalidate();
 				UpdateWindow();
@@ -152,21 +156,26 @@ void CTitleWnd::OnPaint(void)
 		{
 			CPaintDC dc(this);
 			CFont *pFontOld;
+			COLORREF oldTextColor;
 
 			if ((m_bMouseOver) || (m_bMenuOpen))
 			{
 				pFontOld = dc.SelectObject(&m_FontActive);
-				dc.SetTextColor(RGB(255, 255, 255));
+				oldTextColor = dc.SetTextColor(RGB(255, 255, 255));
 			}
 			else
 			{
 				pFontOld = dc.SelectObject(&m_FontNormal);
-				dc.SetTextColor(RGB(200, 200, 200));
+				oldTextColor = dc.SetTextColor(RGB(200, 200, 200));
 			}
 
-			dc.SetBkMode(TRANSPARENT);
-			dc.TextOut(0, 0, m_szTitle, V_strlen(m_szTitle));
-			dc.SelectObject(pFontOld);
+			RunCodeAtScopeExit(dc.SelectObject(pFontOld));
+			RunCodeAtScopeExit(dc.SetTextColor(oldTextColor));
+
+			int oldBkMode = dc.SetBkMode(TRANSPARENT);
+			RunCodeAtScopeExit(dc.SetBkMode(oldBkMode));
+
+			dc.TextOut(0, 0, m_szTitle, size_cast<int>(V_strlen(m_szTitle)));
 		}
 	}
 }

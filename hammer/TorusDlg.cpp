@@ -328,11 +328,11 @@ void CTorusDlg::DrawTorusCrossSection(CDC* pDC )
 
 	UpdateData(TRUE);
 
-	CPen m_hPen, *pOldPen;
-
+	CPen m_hPen;
 	m_hPen.CreatePen(PS_SOLID, 1, RGB(255,255,255));
 
-	pOldPen = pDC->SelectObject(&m_hPen);
+	CPen *pOldPen = pDC->SelectObject(&m_hPen);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldPen));
 
 	CRect rcItem;
 	m_cPreview.GetWindowRect(&rcItem);
@@ -419,8 +419,6 @@ void CTorusDlg::DrawTorusCrossSection(CDC* pDC )
 	{
 		pDC->LineTo(pt.x + (int)points[1][0], pt.y - (int)points[1][1]);
 	}
-
-	pDC->SelectObject(pOldPen);
 }
 
 
@@ -435,11 +433,11 @@ void CTorusDlg::DrawTorusTopView( CDC* pDC )
 
 	UpdateData(TRUE);
 
-	CPen m_hPen, *pOldPen;
-
+	CPen m_hPen;
 	m_hPen.CreatePen(PS_SOLID, 1, RGB(255,255,255));
 
-	pOldPen = pDC->SelectObject(&m_hPen);
+	CPen *pOldPen = pDC->SelectObject(&m_hPen);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldPen));
 
 	CRect rcItem;
 	m_cTopViewPreview.GetWindowRect(&rcItem);
@@ -535,6 +533,4 @@ void CTorusDlg::DrawTorusTopView( CDC* pDC )
 	{
 		pDC->LineTo(pt.x + (int)points[1][0], pt.y - (int)points[1][1]);
 	}
-
-	pDC->SelectObject(pOldPen);
 }

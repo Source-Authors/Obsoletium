@@ -114,11 +114,13 @@ void CTextureWindow::Create(CWnd *pParentWnd, RECT& rect)
 		TexFont.CreatePointFont(iTexNameFontHeight * 10, "Courier New");
 
 	CDC *pDC = GetDC();
+	RunCodeAtScopeExit(ReleaseDC(pDC));
+
 	HGDIOBJ old = pDC->SelectObject(TexFont);
-	pDC->GetCharWidth('A', 'A', &iTexNameCharWidth);
 	// dimhotepus: Restore old font.
-	pDC->SelectObject(old);
-	ReleaseDC(pDC);
+	RunCodeAtScopeExit(pDC->SelectObject(old));
+
+	pDC->GetCharWidth('A', 'A', &iTexNameCharWidth);
 }
 
 
@@ -474,10 +476,16 @@ void CTextureWindow::OnPaint(void)
 	CPaintDC dc(this); // device context for painting
 
 	// setup font
-	HGDIOBJ old = dc.SelectObject(TexFont);
-	dc.SetTextColor(RGB(255, 255, 255));
+	HGDIOBJ oldFont = dc.SelectObject(TexFont);
+	// dimhotepus: Restore old font.
+	RunCodeAtScopeExit(dc.SelectObject(oldFont));
+
+	COLORREF oldColor = dc.SetTextColor(RGB(255, 255, 255));
+	RunCodeAtScopeExit(dc.SetTextColor(oldColor));
+
 	//dc.SetBkColor(RGB(0,0,0));
-	dc.SetBkMode(TRANSPARENT);
+	int oldBkMode = dc.SetBkMode(TRANSPARENT);
+	RunCodeAtScopeExit(dc.SetBkMode(oldBkMode));
 
 	CRect clientrect;
 	GetClientRect(clientrect);
@@ -508,7 +516,9 @@ void CTextureWindow::OnPaint(void)
 			// ensure loaded
 			TE.pTex->Load();
 
-			CPalette *pOld = dc.SelectPalette(TE.pTex->HasPalette() ? TE.pTex->GetPalette() : g_pGameConfig->Palette, FALSE);
+			CPalette *pOldPalette = dc.SelectPalette(TE.pTex->HasPalette() ? TE.pTex->GetPalette() : g_pGameConfig->Palette, FALSE);
+			RunCodeAtScopeExit(dc.SelectPalette(pOldPalette, FALSE));
+
 			dc.RealizePalette();
 
 			int flags = drawCaption | drawIcons;
@@ -519,8 +529,6 @@ void CTextureWindow::OnPaint(void)
 			DrawTexData.nFlags = flags | (m_pSpecificList ? drawUsageCount : 0);
 			DrawTexData.nUsageCount = TE.nUsageCount;
 			TE.pTex->Draw(&dc, TE.texrect, iTexNameFontHeight, iTexIconHeight, DrawTexData);
-
-			dc.SelectPalette(pOld, FALSE);
 		}
 
 		//
@@ -545,8 +553,6 @@ void CTextureWindow::OnPaint(void)
 		// select first texture
 		SelectTexture(szFirstDrawnTexture);
 	}
-	// dimhotepus: Restore old font.
-	dc.SelectObject(old);
 }
 
 
@@ -686,9 +692,15 @@ void CTextureWindow::HighlightCurTexture(CDC *pDC)
 		pDC = &dc;
 	}
 
-	pDC->SelectStockObject(WHITE_PEN);
-	pDC->SelectStockObject(NULL_BRUSH);
-	pDC->SetROP2(R2_XORPEN);
+	CGdiObject *pOldPen = pDC->SelectStockObject(WHITE_PEN);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldPen));
+
+	CGdiObject *pOldBrush = pDC->SelectStockObject(NULL_BRUSH);
+	RunCodeAtScopeExit(pDC->SelectObject(pOldBrush));
+
+	int oldRop2 = pDC->SetROP2(R2_XORPEN);
+	RunCodeAtScopeExit(pDC->SetROP2(oldRop2));
+
 	pDC->Rectangle(rectHighlight);
 
 	if(bMadeDC)
