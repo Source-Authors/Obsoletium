@@ -706,11 +706,6 @@ $Project "replay_common"
 	"replay\common\replay_common.vpc" [$WINDOWS||$POSIX]
 }
 
-$Project "res2c"
-{
-	"utils\tfstats\res2c\res2c.vpc" [$WINDOWS]
-}
-
 $Project "rpt"
 {
 	"utils\rpt\rpt.vpc" [$WINDOWS]
@@ -991,11 +986,6 @@ $Project "texturesynth"
 	"utils\Texturesynth\texturesynth.vpc" [$WINDOWS]
 }
 
-$Project "tfstats"
-{
-	"utils\tfstats\tfstats.vpc" [$WINDOWS]
-}
-
 $Project "tgadiff"
 {
 	"utils\tgadiff\tgadiff.vpc" [$WINDOWS]
@@ -1049,11 +1039,6 @@ $Project "toolutils"
 $Project "traceperf"
 {
 	"vphysics\traceperf\traceperf.vpc"
-}
-
-$Project "ui"
-{
-	"utils\tfstats\ui\ui.vpc" [$WINDOWS]
 }
 
 $Project "uninstall"
