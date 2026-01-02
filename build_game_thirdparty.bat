@@ -35,7 +35,7 @@ if ["%CMAKE_MSVC_ARCH_NAME%"]==["x64"] (
 )
 
 REM Set CMake / MSVC generator / architecture / platform.
-SET CMAKE_MSVC_GEN_NAME="Visual Studio 17 2022"
+SET CMAKE_MSVC_GEN_NAME="Visual Studio 18 2026"
 
 REM Build bzip2.
 PUSHD thirdparty\bzip2
