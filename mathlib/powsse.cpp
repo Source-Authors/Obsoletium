@@ -58,31 +58,38 @@ static constexpr float OOshift23=1.0/(1<<23);
 
 float XM_CALLCONV FastLog2(float i)
 {
-	float LogBodge=0.346607f;
-	float x;
-	float y;
-	x=*(int *)&i;
-	x*= OOshift23; //1/pow(2,23);
-	x=x-127;
+	static_assert(std::numeric_limits<float>::is_iec559);
 
-	y=x-floorf(x);
-	y=(y-y*y)*LogBodge;
-	return x+y;
+	constexpr float LogBodge=0.346607f;
+
+	float x = *(int *)&i;
+	x *= OOshift23;
+	x -= 127;
+
+	float y = x - floorf(x);
+	y = (y - y * y) * LogBodge;
+
+	return x + y;
 }
 float XM_CALLCONV FastPow2(float i)
 {
-	float PowBodge=0.33971f;
-	float x;
-	float y=i-floorf(i);
-	y=(y-y*y)*PowBodge;
+	static_assert(std::numeric_limits<float>::is_iec559);
 
-	x=i+127-y;
-	x*= shift23; //pow(2,23);
-	*(int*)&x=(int)x;
+	constexpr float PowBodge=0.33971f;
+
+	float y = i - floorf(i);
+	y = (y-y*y) * PowBodge;
+
+	float x = i + 127 - y;
+	x *= shift23;
+	*(int*)&x = (int)x;
+
 	return x;
 }
 float XM_CALLCONV FastPow(float a, float b)
 {
+	static_assert(std::numeric_limits<float>::is_iec559);
+
 	if (a <= OOshift23)
 	{
 		return 0.0f;
