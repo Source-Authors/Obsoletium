@@ -209,7 +209,7 @@ bool CSHA1::HashFile(char *szFileName)
 		std::tie(std::ignore, errc) = fIn.read(uData, ulRest);
 		if(errc) return false;
 
-		Update(uData, ulRest);
+		Update(uData, size_cast<unsigned>(ulRest));
 	}
 
 	return(true);
