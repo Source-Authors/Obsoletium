@@ -1128,11 +1128,8 @@ int CElementPropertiesTreeInternal::OpenPath( const CUtlVector< TreeItem_t > &pa
 	bool bFound = false;
 
 	intp itemIndex = m_pTree->GetTree()->GetRootItemIndex();
-	intp nPathItems = path.Count();
-	for ( intp i = 0; i < nPathItems; ++i )
+	for ( const TreeItem_t &childTreeItem : path )
 	{
-		const TreeItem_t &childTreeItem = path[ i ];
-
 		bFound = false;
 
 		intp nChildren = m_pTree->GetTree()->GetNumChildren( itemIndex );
@@ -2172,10 +2169,8 @@ void CElementPropertiesTreeInternal::PopulateHistoryMenu( int whichMenu, Menu *m
 		break;
 	case DME_PROPERTIESTREE_MENU_SEARCHHSITORY:
 		{
-			intp c = m_SearchHistory.Count();
-			for ( intp i = 0; i < c; ++i )
+			for ( CUtlString& str : m_SearchHistory )
 			{
-				CUtlString& str = m_SearchHistory[ i ];
                 menu->AddMenuItem( "search", str.Get(), new KeyValues( "OnNavSearch", "text", str.Get() ), this );
 			}
 		}
