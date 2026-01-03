@@ -462,9 +462,9 @@ void CAssetBuilder::BuildFileIDList( CDmeMakefile *pMakeFile, CUtlVector<DmFileI
 	}
 
 	intp nSourceCount = pMakeFile->GetSourceCount();
-	for ( intp i = 0; i < nSourceCount; ++i )
+	for ( intp j = 0; j < nSourceCount; ++j )
 	{
-		CDmeSource *pSource = pMakeFile->GetSource(i);
+		CDmeSource *pSource = pMakeFile->GetSource(j);
 		BuildFileIDList( pSource->GetDependentMakefile(), fileIds );
 	}
 }
