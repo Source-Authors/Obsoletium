@@ -328,7 +328,7 @@ IceKey::scheduleBuild (
 		    int	bit = *curr_kb & 1;
 
 		    *curr_sk = (*curr_sk << 1) | bit;
-		    *curr_kb = (*curr_kb >> 1) | ((bit ^ 1) << 15);
+		    *curr_kb = static_cast<unsigned short>((*curr_kb >> 1) | ((bit ^ 1) << 15));
 		}
 	    }
 	}
