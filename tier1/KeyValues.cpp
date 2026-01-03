@@ -45,7 +45,7 @@ CKeyValuesGrowableStringTable *KeyValues::s_pGrowableStringTable = nullptr;
 static char s_pTokenBuf[KEYVALUES_TOKEN_SIZE];
 
 
-#define INTERNALWRITE( pData, len ) InternalWrite( filesystem, f, pBuf, pData, len )
+#define INTERNALWRITE( pData, len ) InternalWrite( filesystem, f, pBuf, pData, size_cast<int>( len ) )
 
 
 // a simple class to keep track of a stack of valid parsed symbols

@@ -369,7 +369,7 @@ uint32 MurmurHash2LowerCase( char const *pString, uint32 nSeed )
 	{
 		p[i] = TOLOWERU( pString[i] );
 	}
-	return MurmurHash2( p, nLen, nSeed );
+	return MurmurHash2( p, size_cast<int>( nLen ), nSeed );
 }
 
 
