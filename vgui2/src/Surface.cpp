@@ -2608,7 +2608,11 @@ bool CWin32Surface::RecreateContext(VPANEL panel)
 				::DeleteObject(plat->bitmap);
 			}
 
-			plat->hwndDC = GetDC(plat->hwnd);
+			plat->hwndDC = ::GetDC(plat->hwnd);
+			RunCodeAtScopeExit({
+				::ReleaseDC(plat->hwnd, plat->hwndDC);
+				plat->hwndDC = NULL;
+			});
 
 			plat->bitmap = ::CreateCompatibleBitmap(plat->hwndDC, wide + 100, tall + 100);
 			plat->bitmapSize[0] = wide + 100;
@@ -2621,9 +2625,6 @@ bool CWin32Surface::RecreateContext(VPANEL panel)
 
 			::SelectObject(plat->hdc, plat->bitmap);
 			plat->textureDC = ::CreateCompatibleDC(plat->hdc);
-
-			::ReleaseDC(plat->hwnd, plat->hwndDC);
-			plat->hwndDC = NULL;
 		}
 	}
  
@@ -2669,16 +2670,19 @@ void CWin32Surface::SwapBuffers(VPANEL panel)
 		int wide,tall;
 		((VPanel *)panel)->GetSize(wide,tall);
 		
+		{
 		plat->hwndDC = ::GetDC(plat->hwnd);
+			RunCodeAtScopeExit({
+				::ReleaseDC(plat->hwnd, plat->hwndDC);
+				plat->hwndDC = NULL;
+			});
 
 		// reset origin and clipping then blit
 		::SetRectRgn(plat->clipRgn, 0, 0, wide, tall);
 		::SelectObject(plat->hdc, plat->clipRgn);
 		::SetViewportOrgEx(plat->hdc, 0, 0, NULL);
 		::BitBlt(plat->hwndDC, 0, 0, wide, tall, plat->hdc, 0, 0, SRCCOPY);
-
-		::ReleaseDC(plat->hwnd, plat->hwndDC);
-		plat->hwndDC = NULL;
+		}
 
 		END_TIMER("SwapBuffers time: %.2fms\n");
 	}
