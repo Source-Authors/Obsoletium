@@ -4049,7 +4049,7 @@ void XM_CALLCONV HSVtoRGB( const Vector &hsv, Vector &rgb )
 		hue = 0.0F;
 	}
 	hue /= 60.0F;
-	int     i = hue;        // integer part
+	int     i = static_cast<int>(hue);        // integer part
 	float32 f = hue - i;    // fractional part
 	float32 p = hsv.z * (1.0F - hsv.y);
 	float32 q = hsv.z * (1.0F - hsv.y * f);
