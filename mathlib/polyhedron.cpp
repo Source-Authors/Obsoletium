@@ -186,14 +186,16 @@ struct GeneratePolyhedronFromPlanes_Point
 	GeneratePolyhedronFromPlanes_LineLL *pConnectedLines; //keep these in a clockwise order, circular linking
 	float fPlaneDist; //used in plane cutting
 	PolyhedronPointPlanarity planarity;
-	int iSaveIndices;
+	// dimhotepus: int -> unsigned short. 
+	unsigned short iSaveIndices;
 };
 
 struct GeneratePolyhedronFromPlanes_Line
 {
 	GeneratePolyhedronFromPlanes_Point *pPoints[2]; //the 2 connecting points in no particular order
 	GeneratePolyhedronFromPlanes_Polygon *pPolygons[2]; //viewing from the outside with the point connections going up, 0 is the left polygon, 1 is the right
-	int iSaveIndices;
+	// dimhotepus: int -> unsigned short.
+	unsigned short iSaveIndices;
 	bool bAlive; //connected to at least one living point
 	bool bCut; //connected to at least one dead point
 
@@ -207,7 +209,8 @@ struct GeneratePolyhedronFromPlanes_Line
 struct GeneratePolyhedronFromPlanes_LineLL
 {
 	GeneratePolyhedronFromPlanes_Line *pLine;
-	int iReferenceIndex; //whatever is referencing the line should know which side of the line it's on (points and polygons), for polygons, it's which point to follow to continue going clockwise, which makes polygon 0 the one on the left side of an upward facing line vector, for points, it's the OTHER point's index
+	// dimhotepus: int -> unsigned char.
+	unsigned char iReferenceIndex; //whatever is referencing the line should know which side of the line it's on (points and polygons), for polygons, it's which point to follow to continue going clockwise, which makes polygon 0 the one on the left side of an upward facing line vector, for points, it's the OTHER point's index
 	GeneratePolyhedronFromPlanes_LineLL *pPrev;
 	GeneratePolyhedronFromPlanes_LineLL *pNext;
 };
@@ -343,7 +346,8 @@ CPolyhedron *ClipPolyhedron( const CPolyhedron *pExistingPolyhedron, const float
 	//setup lines and interlink to points (line links are not yet circularly linked, and are unordered)
 	for( int i = 0; i != pExistingPolyhedron->iLineCount; ++i )
 	{
-		for( int j = 0; j != 2; ++j )
+		// dimhotepus: int -> unsigned short.
+		for( unsigned char j = 0; j < 2; ++j )
 		{
 			pStartLines[i].pPoints[j] = &pStartPoints[pExistingPolyhedron->pLines[i].iPointIndices[j]];
 
@@ -667,7 +671,8 @@ bool FindConvexShapeLooseAABB( const float *pInwardFacingPlanes, int iPlaneCount
 CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_UnorderedPolygonLL *pPolygons, GeneratePolyhedronFromPlanes_UnorderedLineLL *pLines, GeneratePolyhedronFromPlanes_UnorderedPointLL *pPoints, bool bUseTemporaryMemory )
 {
 	Assert( (pPolygons != nullptr) && (pLines != nullptr) && (pPoints != nullptr) );
-	unsigned int iPolyCount = 0, iLineCount = 0, iPointCount = 0, iIndexCount = 0;
+	// dimhotepus: unsigned int -> unsigned short.
+	unsigned short iPolyCount = 0, iLineCount = 0, iPointCount = 0, iIndexCount = 0;
 
 	GeneratePolyhedronFromPlanes_UnorderedPolygonLL *pActivePolygonWalk = pPolygons;	
 	do
@@ -717,7 +722,8 @@ CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_Uno
 
 	//copy points
 	pActivePointWalk = pPoints;
-	for( unsigned int i = 0; i != iPointCount; ++i )
+	// dimhotepus: unsigned int -> unsigned short.
+	for( unsigned short i = 0; i != iPointCount; ++i )
 	{
 		pVertexArray[i] = pActivePointWalk->pPoint->ptPosition;
 		pActivePointWalk->pPoint->iSaveIndices = i; //storing array indices
@@ -726,10 +732,11 @@ CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_Uno
 
 	//copy lines
 	pActiveLineWalk = pLines;
-	for( unsigned int i = 0; i != iLineCount; ++i )
+	// dimhotepus: unsigned int -> unsigned short.
+	for( unsigned short i = 0; i != iLineCount; ++i )
 	{
-		pLineArray[i].iPointIndices[0] = (unsigned short)pActiveLineWalk->pLine->pPoints[0]->iSaveIndices;
-		pLineArray[i].iPointIndices[1] = (unsigned short)pActiveLineWalk->pLine->pPoints[1]->iSaveIndices;
+		pLineArray[i].iPointIndices[0] = pActiveLineWalk->pLine->pPoints[0]->iSaveIndices;
+		pLineArray[i].iPointIndices[1] = pActiveLineWalk->pLine->pPoints[1]->iSaveIndices;
 
 		pActiveLineWalk->pLine->iSaveIndices = i; //storing array indices
 
@@ -739,7 +746,8 @@ CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_Uno
 	//copy polygons and indices at the same time
 	pActivePolygonWalk = pPolygons;
 	iIndexCount = 0;
-	for( unsigned int i = 0; i != iPolyCount; ++i )
+	// dimhotepus: unsigned int -> unsigned short.
+	for( unsigned short i = 0; i != iPolyCount; ++i )
 	{
 		pPolyArray[i].polyNormal = pActivePolygonWalk->pPolygon->vSurfaceNormal;
 		pPolyArray[i].iFirstIndex = iIndexCount;		
@@ -1313,7 +1321,8 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 					Assert_DumpPolyhedron( (pLinePoints[0]->planarity == POINT_DEAD) || (pLinePoints[1]->planarity == POINT_DEAD) ); //one of the two has to be a dead point
 
 					int iDeadIndex = (pLinePoints[0]->planarity == POINT_DEAD)?(0):(1);
-					int iLivingIndex = 1 - iDeadIndex;
+					// dimhotepus: int -> unsigned char.
+					unsigned char iLivingIndex = static_cast<unsigned char>(1 - iDeadIndex);
 					GeneratePolyhedronFromPlanes_Point *pDeadPoint = pLinePoints[iDeadIndex];
 					GeneratePolyhedronFromPlanes_Point *pLivingPoint = pLinePoints[iLivingIndex];
 
