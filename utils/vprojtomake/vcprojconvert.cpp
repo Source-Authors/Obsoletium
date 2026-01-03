@@ -270,7 +270,7 @@ CVCProjConvert::CConfiguration &CVCProjConvert::GetConfiguration(intp i) {
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: extracts the project name from the loaded vcproj
+// Purpose: extracts the project name from the loaded vcxproj
 //-----------------------------------------------------------------------------
 bool CVCProjConvert::ExtractProjectName(IXMLDOMDocument *pDoc) {
 #ifdef _WIN32
@@ -312,7 +312,7 @@ bool CVCProjConvert::ExtractProjectName(IXMLDOMDocument *pDoc) {
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: extracts the list of configuration names from the vcproj
+// Purpose: extracts the list of configuration names from the vcxproj
 //-----------------------------------------------------------------------------
 bool CVCProjConvert::ExtractConfigurations(IXMLDOMDocument *pDoc) {
   m_Configurations.RemoveAll();
@@ -580,7 +580,7 @@ bool CVCProjConvert::IterateFileConfigurations(IXMLDOMElement *pFile,
 }
 
 //-----------------------------------------------------------------------------
-// Purpose: walks the file elements in the vcproj and inserts them into configs
+// Purpose: walks the file elements in the vcxproj and inserts them into configs
 //-----------------------------------------------------------------------------
 bool CVCProjConvert::ExtractFiles(IXMLDOMDocument *pDoc) {
   if (!pDoc) return false;

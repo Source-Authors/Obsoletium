@@ -98,7 +98,7 @@ class MyFileSystem : public IBaseFileSystem {
 MyFileSystem g_MyFS;
 
 // Purpose: help text
-void printusage() { Warning("usage:  vcprojtomake <vcproj filename> \n"); }
+void printusage() { Warning("usage:  vcprojtomake <vcxproj filename> \n"); }
 
 // Debug helper, spits out a human readable keyvalues version of the various
 // configs

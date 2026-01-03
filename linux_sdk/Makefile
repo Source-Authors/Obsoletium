@@ -9,8 +9,8 @@
 
 # the name of the mod binary (_i486.so is appended to the end)
 NAME=server
-# the location of the vcproj that builds the mod
-MOD_PROJ=../dlls/hl_sdk.vcproj
+# the location of the vcxproj that builds the mod
+MOD_PROJ=../dlls/hl_sdk.vcxproj
 # the name of the mod configuration (typically <proj name>_<build type><build target>)
 MOD_CONFIG=hl_ReleaseSDKWin32
 
@@ -30,7 +30,7 @@ USER_CFLAGS=
 # link flags for your mod, make sure to include any special libraries here
 LDFLAGS="-lm -ldl $(GAME_DIR)/bin/tier0_i486.so $(GAME_DIR)/bin/vstdlib_i486.so"
 
-# XERCES 2.6.0 or above ( http://xml.apache.org/xerces-c/ ) is used by the vcproj to makefile converter
+# XERCES 2.6.0 or above ( http://xml.apache.org/xerces-c/ ) is used by the vcxproj to makefile converter
 # it must be installed before being able to run this makefile
 XERCES_INC_DIR=/home/alfred/tmp/xerces-c-src_2_6_0/include
 XERCES_LIB_DIR=/home/alfred/tmp/xerces-c-src_2_6_0/lib

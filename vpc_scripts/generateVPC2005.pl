@@ -41,7 +41,7 @@ elsif ( $ARGV[1] =~ /-o/ )
 
 
 ##############################################################################
-# Match vcproj option keywords with vpc keywords - only string value options
+# Match vcxproj option keywords with vpc keywords - only string value options
 # String on the left matches the option name in the VCProj.
 # String on the right matches the option name in vpc
 
@@ -224,7 +224,7 @@ my(%configOptionsSingleValue) = (
 	);
 
 ##############################################################################
-# Match vcproj option keywords with vpc keywords - only multi-value options
+# Match vcxproj option keywords with vpc keywords - only multi-value options
 # String on the left matches the option name in the VCProj.
 # String on the right matches the option name in vpc
 
@@ -1079,7 +1079,7 @@ my(%configOptionValues) = (
 	);
 
 
-# Hash matches vcproj configuration names with their output versions
+# Hash matches vcxproj configuration names with their output versions
 my(%configurationNames) = (	"Base"		=>	"base",
 				"DoD"		=>	"dod",
 				"CounterStrike"	=>	"cstrike",
@@ -1624,25 +1624,25 @@ if ( !$ARGV[0] )
 # Read in the source file
 
 my $infile = $ARGV[0];
-$infile =~ s/.vcproj//;
-open(INFILE, "$infile.vcproj" );
+$infile =~ s/.vcxproj//;
+open(INFILE, "$infile.vcxproj" );
 
 @lines = <INFILE>;
 close( INFILE );
 
 my(@pathArray) = split(/\\/, $infile );
-my($vcprojname) = $pathArray[$#pathArray];
+my($vcxprojname) = $pathArray[$#pathArray];
 
 unless ( $outputPath )
 {
 	$outputPath = $infile;
-	$outputPath =~ s/$vcprojname//;
+	$outputPath =~ s/$vcxprojname//;
 }
 
 # build the fileheader
 my(@fileheader);
 push( @fileheader, "\/\/-----------------------------------------------------------------------------\n" );
-push( @fileheader, "\/\/\t",uc($vcprojname),".VPC\n" );
+push( @fileheader, "\/\/\t",uc($vcxprojname),".VPC\n" );
 push( @fileheader, "\/\/\n" );
 push( @fileheader, "\/\/\tProject Script\n" );
 push( @fileheader, "\/\/-----------------------------------------------------------------------------\n" );
@@ -1690,7 +1690,7 @@ for( $lineCt = 0; $lineCt < @lines; ++$lineCt )
 #		for ( @configurations )
 #		{
 #			# delete the existing files
-#			my($filename) = join('_', $vcprojname, $configurationNames{$_} );
+#			my($filename) = join('_', $vcxprojname, $configurationNames{$_} );
 #			if( $outputPath )
 #			{
 #				$filename = join('/', $outputPath, $filename );
@@ -1758,7 +1758,7 @@ for( $lineCt = 0; $lineCt < @lines; ++$lineCt )
 			# print the configs
 			if ( @{ $configOutput{$joinedname} } > 0 )
 			{
-				my($filename) = join('_', $vcprojname, $configurationNames{$_} );
+				my($filename) = join('_', $vcxprojname, $configurationNames{$_} );
 				if( $outputPath )
 				{
 					$filename = join('/', $outputPath, $filename );
@@ -1821,7 +1821,7 @@ for ( @configurations )
 		++$projectCt;
 
 		# print the files
-		my($filename) = join('_', $vcprojname, $configurationNames{$_} );
+		my($filename) = join('_', $vcxprojname, $configurationNames{$_} );
 		if( $outputPath )
 		{
 			$filename = join('/', $outputPath, $filename );
@@ -1834,8 +1834,8 @@ for ( @configurations )
 
 if ( $projectCt == 1 )
 {
-	my $oldname = join('_', $vcprojname, "base.vpc" );
-	my $newname = join('', $vcprojname, ".vpc" );
+	my $oldname = join('_', $vcxprojname, "base.vpc" );
+	my $newname = join('', $vcxprojname, ".vpc" );
 	if( $outputPath )
 	{
 		$oldname = join('/', $outputPath, $oldname );

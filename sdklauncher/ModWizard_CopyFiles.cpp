@@ -917,13 +917,13 @@ bool IsVCProjFile( const char *pFilename )
 {
 	char ext[512];
 	Q_StrRight( pFilename, 7, ext, sizeof( ext ) );
-	return ( Q_stricmp( ext, ".vcproj" ) == 0 );
+	return ( Q_stricmp( ext, ".vcxproj" ) == 0 );
 }	
 
 
 bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFiles( CFileCopyInfo *pInfo, bool &bErrorStatus )
 {
-	// Speed up the copy process a bit, if it's not a vcproj, get out.
+	// Speed up the copy process a bit, if it's not a vcxproj, get out.
 	if ( !IsVCProjFile( pInfo->m_InFilename ) )
 		return false;
 
@@ -939,7 +939,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 	};
 
 	// No 'dx8' shaders in orange box, at least any time soon, just keeping it cleaned up.
-	if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\materialsystem\\stdshaders\\stdshader_dx9-2005.vcproj" ) == 0 )
+	if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\materialsystem\\stdshaders\\stdshader_dx9-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
@@ -947,8 +947,8 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 
 		return true;
 	}
-	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\client\\client_scratch-2005.vcproj" ) == 0 ||
-		Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\server\\server_scratch-2005.vcproj" ) == 0 )
+	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\client\\client_scratch-2005.vcxproj" ) == 0 ||
+		Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\server\\server_scratch-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		if ( m_ModType == ModType_FromScratch )
@@ -961,8 +961,8 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 		return true;
 	}
 	// removed 'hl2' projects as they're not needed in orange box anymore.
-	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\client\\client_episodic-2005.vcproj" ) == 0 ||
-		Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\server\\server_episodic-2005.vcproj" ) == 0 )
+	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\client\\client_episodic-2005.vcxproj" ) == 0 ||
+		Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\server\\server_episodic-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2 || m_ModType == ModType_SourceCodeOnly )
@@ -974,8 +974,8 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 
 		return true;
 	}
-	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\client\\client_hl2mp-2005.vcproj" ) == 0 || 
-		Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\server\\server_hl2mp-2005.vcproj" ) == 0 )
+	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\client\\client_hl2mp-2005.vcxproj" ) == 0 || 
+		Q_stricmp( pInfo->m_InFilename, "src_mod\\source2009\\game\\server\\server_hl2mp-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2_Multiplayer )
@@ -994,7 +994,7 @@ bool CModWizardSubPanel_CopyFiles_Source2009::HandleReplacements_GameProjectFile
 
 bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFiles( CFileCopyInfo *pInfo, bool &bErrorStatus )
 {
-	// Speed up the copy process a bit, if it's not a vcproj, get out.
+	// Speed up the copy process a bit, if it's not a vcxproj, get out.
 	if ( !IsVCProjFile( pInfo->m_InFilename ) )
 		return false;
 
@@ -1010,7 +1010,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 	};
 
 	// No 'dx8' shaders in orange box, at least any time soon, just keeping it cleaned up.
-	if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\materialsystem\\stdshaders\\stdshader_dx9-2005.vcproj" ) == 0 )
+	if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\materialsystem\\stdshaders\\stdshader_dx9-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
@@ -1018,8 +1018,8 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 
 		return true;
 	}
-	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\client\\client_scratch-2005.vcproj" ) == 0 ||
-		      Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\server\\server_scratch-2005.vcproj" ) == 0 )
+	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\client\\client_scratch-2005.vcxproj" ) == 0 ||
+		      Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\server\\server_scratch-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		if ( m_ModType == ModType_FromScratch )
@@ -1032,8 +1032,8 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 		return true;
 	}
 	// removed 'hl2' projects as they're not needed in orange box anymore.
-	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\client\\client_episodic-2005.vcproj" ) == 0 ||
-			  Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\server\\server_episodic-2005.vcproj" ) == 0 )
+	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\client\\client_episodic-2005.vcxproj" ) == 0 ||
+			  Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\server\\server_episodic-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2 || m_ModType == ModType_SourceCodeOnly )
@@ -1045,8 +1045,8 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 
 		return true;
 	}
-	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\client\\client_hl2mp-2005.vcproj" ) == 0 || 
-			  Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\server\\server_hl2mp-2005.vcproj" ) == 0 )
+	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\client\\client_hl2mp-2005.vcxproj" ) == 0 || 
+			  Q_stricmp( pInfo->m_InFilename, "src_mod\\orangebox\\game\\server\\server_hl2mp-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2_Multiplayer )
@@ -1064,7 +1064,7 @@ bool CModWizardSubPanel_CopyFiles_Source2007::HandleReplacements_GameProjectFile
 
 bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFiles( CFileCopyInfo *pInfo, bool &bErrorStatus )
 {
-	// Speed up the copy process a bit, if it's not a vcproj, get out.
+	// Speed up the copy process a bit, if it's not a vcxproj, get out.
 	if ( !IsVCProjFile( pInfo->m_InFilename ) )
 		return false;
 
@@ -1078,10 +1078,10 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		"..\\game\\" PLATFORM_BIN_DIR, "..\\" PLATFORM_BIN_DIR
 	};
 
-	if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx8-2003.vcproj" ) == 0 ||
-		 Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx8-2005.vcproj" ) == 0 || 
-		 Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx9-2003.vcproj" ) == 0 ||
-		 Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx9-2005.vcproj" ) == 0 )
+	if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx8-2003.vcxproj" ) == 0 ||
+		 Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx8-2005.vcxproj" ) == 0 || 
+		 Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx9-2003.vcxproj" ) == 0 ||
+		 Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\materialsystem\\stdshaders\\stdshader_dx9-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		Q_snprintf( replaceWith, sizeof( replaceWith ), "%s", m_OutModGamedirName );
@@ -1089,10 +1089,10 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 
 		return true;
 	}
-	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_scratch-2003.vcproj" ) == 0 || 
-              Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_scratch-2005.vcproj" ) == 0 ||
-              Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_scratch-2003.vcproj" ) == 0 ||
-              Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_scratch-2005.vcproj" ) == 0 )
+	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_scratch-2003.vcxproj" ) == 0 || 
+              Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_scratch-2005.vcxproj" ) == 0 ||
+              Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_scratch-2003.vcxproj" ) == 0 ||
+              Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_scratch-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		if ( m_ModType == ModType_FromScratch )
@@ -1104,10 +1104,10 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 
 		return true;
 	}
-	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_hl2-2003.vcproj" ) == 0 || 
-		      Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_hl2-2005.vcproj" ) == 0 ||
-			  Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_hl2-2003.vcproj" ) == 0 ||
-		      Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_hl2-2005.vcproj" ) == 0 )
+	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_hl2-2003.vcxproj" ) == 0 || 
+		      Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_hl2-2005.vcxproj" ) == 0 ||
+			  Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_hl2-2003.vcxproj" ) == 0 ||
+		      Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_hl2-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2 || m_ModType == ModType_SourceCodeOnly )
@@ -1119,10 +1119,10 @@ bool CModWizardSubPanel_CopyFiles_Source2006::HandleReplacements_GameProjectFile
 		
 		return true;
 	}
-	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_hl2mp-2003.vcproj" ) == 0 || 
-		      Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_hl2mp-2005.vcproj" ) == 0 || 
-		      Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_hl2mp-2003.vcproj" ) == 0 ||
-			  Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_hl2mp-2005.vcproj" ) == 0 )
+	else if ( Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_hl2mp-2003.vcxproj" ) == 0 || 
+		      Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\cl_dll\\client_hl2mp-2005.vcxproj" ) == 0 || 
+		      Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_hl2mp-2003.vcxproj" ) == 0 ||
+			  Q_stricmp( pInfo->m_InFilename, "src_mod\\ep1\\dlls\\server_hl2mp-2005.vcxproj" ) == 0 )
 	{
 		bErrorStatus = true;
 		if ( m_ModType == ModType_HL2_Multiplayer )
@@ -1145,13 +1145,13 @@ bool CModWizardSubPanel_CopyFiles::HandleReplacements_GenericVCProj( CFileCopyIn
 	{	
 		// This code is for all the tools. Internally, Valve uses <base dir>\game\bin{\x64}, and externally,
 		// they're using <game dir>\bin{\x64} to store tools.
-		const char *vcprojReplacements[] =
+		const char *vcxprojReplacements[] =
 		{
 			// dimhotepus: x86-64 port.
 			"..\\game\\" PLATFORM_BIN_DIR, "..\\" PLATFORM_BIN_DIR
 		};
 
-		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, vcprojReplacements, ARRAYSIZE( vcprojReplacements ), "%s", pInfo->m_OutFilename );
+		bErrorStatus = CopyWithReplacements( pInfo->m_InFilename, vcxprojReplacements, ARRAYSIZE( vcxprojReplacements ), "%s", pInfo->m_OutFilename );
 		return true;
 	}
 

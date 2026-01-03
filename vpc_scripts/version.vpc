@@ -4,7 +4,7 @@
 //	Version tag for VPC scripts. All base scripts include this file first.
 //-----------------------------------------------------------------------------
 
-// This version tag serves as a critical safeguard to ensure all vcproj's can
+// This version tag serves as a critical safeguard to ensure all vcxproj's can
 // be forced to rebuild. Changing the version or anything about this
 // file will cause the CRC checking to fail, and thus cause a rebuild.
 
