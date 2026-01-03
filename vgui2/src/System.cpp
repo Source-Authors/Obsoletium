@@ -529,7 +529,7 @@ intp CSystem::GetClipboardText(intp offset, wchar_t *buf, intp bufLen)
 	}
 
 	VCRGenericValue( "cb", &retVal, sizeof( retVal ) );
-	VCRGenericValue( "cb", buf, retVal*sizeof(wchar_t) );
+	VCRGenericValue( "cb", buf, size_cast<int>( retVal*sizeof(wchar_t) ) );
 
 	return retVal;
 }
