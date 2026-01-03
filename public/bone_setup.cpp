@@ -135,7 +135,7 @@ CBoneCache::CBoneCache( const bonecacheparams_t &params, unsigned int size, unsi
 	unsigned int cachedTableSize = cachedBoneCount * sizeof(short);
 	memcpy( CachedToStudio(), pCachedToStudio, cachedTableSize );
 
-	m_matrixOffset = ( m_cachedToStudioOffset + cachedTableSize + 3U ) & ~3U;
+	m_matrixOffset = size_cast<unsigned short>( ( m_cachedToStudioOffset + cachedTableSize + 3U ) & ~3U );
 	
 	UpdateBones( params.pBoneToWorld, params.pStudioHdr->numbones(), params.curtime );
 }
@@ -3973,7 +3973,7 @@ void CIKContext::AutoIKRelease( void )
 				ikrule.chain = pTarget->chain;
 				ikrule.bone = 0;
 				ikrule.type = IK_RELEASE;
-				ikrule.slot = i;
+				ikrule.slot = size_cast<int>(i);
 				ikrule.flWeight = SimpleSpline( pTarget->error.ramp );
 				ikrule.flRuleWeight = 1.0f;
 				ikrule.latched = dt < 0.25f ? 0.0f : ikrule.flWeight;
@@ -4371,7 +4371,7 @@ void CIKContext::SolveAllLocks(
 
 	for (intp i = 0; i < m_ikLock.Count(); i++)
 	{
-		lock.chain = i;
+		lock.chain = size_cast<int>(i);
 		lock.flPosWeight = 1.0;
 		lock.flLocalQWeight = 0.0;
 		lock.flags = 0;

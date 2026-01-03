@@ -1750,7 +1750,7 @@ void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict
 
 			// You might be tempted to collapse this pointer math into a single pointer --
 			// don't! the tuple list is marked __restrict above.
-			it->seqnum = i; // store sequence number
+			it->seqnum = size_cast<short>(i); // store sequence number
 			it->weight = abs(seqdesc.actweight);
 
 			// We can't have weights of 0

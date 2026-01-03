@@ -1524,7 +1524,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 		Assert( e );
 
 		// Fix up the offset
-		e->m_ZipOffset = stream.Tell() - zipOffsetInStream;
+		e->m_ZipOffset = size_cast<unsigned>( stream.Tell() - zipOffsetInStream );
 
 		if ( e->m_nCompressedSize > 0 && ( m_hDiskCacheWriteFile != INVALID_HANDLE_VALUE ) )
 		{
@@ -1567,7 +1567,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 			// Swap header in place
 			m_Swap.SwapFieldsToTargetEndian( &hdr );
 			stream.Put( &hdr, sizeof( hdr ) );
-			stream.Put( pFilename, strlen( pFilename ) );
+			stream.Put( pFilename, size_cast<unsigned>( strlen( pFilename ) ) );
 			stream.Put( pPaddingBuffer, extraFieldLength );
 			stream.Put( e->m_pData, e->m_nCompressedSize );
 
@@ -1591,7 +1591,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	{
 		// align the central directory starting position
 		uintp newDirStart = AlignValue( centralDirStart, m_AlignmentSize );
-		unsigned padLength = newDirStart - centralDirStart;
+		unsigned padLength = size_cast<unsigned>( newDirStart - centralDirStart );
 		if ( padLength )
 		{
 			stream.Put( pPaddingBuffer, padLength );
@@ -1640,7 +1640,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 			// Swap the header in place
 			m_Swap.SwapFieldsToTargetEndian( &hdr );
 			stream.Put( &hdr, sizeof( hdr ) );
-			stream.Put( e->m_Name.String(), strlen( e->m_Name.String() ) );
+			stream.Put( e->m_Name.String(), size_cast<unsigned>( strlen( e->m_Name.String() ) ) );
 			if ( m_bCompatibleFormat )
 			{
 				stream.Put( pPaddingBuffer, extraFieldLength );
@@ -1661,7 +1661,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 	{
 		// align the central directory starting position
 		uintp newDirEnd = AlignValue( centralDirEnd, m_AlignmentSize );
-		unsigned padLength = newDirEnd - centralDirEnd;
+		unsigned padLength = size_cast<unsigned>( newDirEnd - centralDirEnd );
 		if ( padLength )
 		{
 			stream.Put( pPaddingBuffer, padLength );
@@ -1678,8 +1678,8 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 
 	rec.nCentralDirectoryEntries_ThisDisk = static_cast<unsigned short>(realNumFiles);
 	rec.nCentralDirectoryEntries_Total = static_cast<unsigned short>(realNumFiles);
-	rec.centralDirectorySize = centralDirEnd - centralDirStart;
-	rec.startOfCentralDirOffset = centralDirStart;
+	rec.centralDirectorySize = size_cast<unsigned>( centralDirEnd - centralDirStart );
+	rec.startOfCentralDirOffset = size_cast<unsigned>( centralDirStart );
 
 	char commentString[128];
 	unsigned short commentLength = MakeXZipCommentString( commentString );

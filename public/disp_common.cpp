@@ -672,8 +672,8 @@ int CDispUtilsHelper::VertIndexToInt( const CVertIndex &i ) const
 
 CVertIndex CDispUtilsHelper::GetEdgeMidPoint( int iEdge ) const
 {
-	int end = GetSideLength() - 1;
-	int mid = GetPowerInfo()->GetMidPoint();
+	short end = size_cast<short>(GetSideLength() - 1);
+	short mid = size_cast<short>(GetPowerInfo()->GetMidPoint());
 
 	if ( iEdge == NEIGHBOREDGE_LEFT )
 		return CVertIndex( 0, mid );
@@ -854,15 +854,15 @@ void AddNeighbor( CCoreDispInfo *pMain,
 	}
 
 	// Now just copy the data into each displacement.	
-	pSub->m_iNeighbor = pOther->GetListIndex();
+	pSub->m_iNeighbor = size_cast<unsigned short>(pOther->GetListIndex());
 	pSub->m_NeighborOrientation = g_CoreDispNeighborOrientationMap[iEdge][iNeighborEdge];
-	pSub->m_Span = span;
-	pSub->m_NeighborSpan = nbSpan;
+	pSub->m_Span = size_cast<unsigned char>(span);
+	pSub->m_NeighborSpan = size_cast<unsigned char>(nbSpan);
 
-	pNeighborSub->m_iNeighbor = pMain->GetListIndex();
+	pNeighborSub->m_iNeighbor = size_cast<unsigned short>(pMain->GetListIndex());
 	pNeighborSub->m_NeighborOrientation = g_CoreDispNeighborOrientationMap[iNeighborEdge][iEdge];
-	pNeighborSub->m_Span = nbSpan;
-	pNeighborSub->m_NeighborSpan = span;
+	pNeighborSub->m_Span = size_cast<unsigned char>(nbSpan);
+	pNeighborSub->m_NeighborSpan = size_cast<unsigned char>(span);
 
 #if defined( _DEBUG )
 	// Walk an iterator over the new connection to make sure it works.
@@ -984,8 +984,8 @@ void SetupCornerNeighbors( CCoreDispInfo *pMain, CCoreDispInfo *pOther, int *nOv
 		if ( pMainCorner->m_nNeighbors < MAX_DISP_CORNER_NEIGHBORS &&
 			pOtherCorner->m_nNeighbors < MAX_DISP_CORNER_NEIGHBORS )
 		{
-			pMainCorner->m_Neighbors[pMainCorner->m_nNeighbors++] = pOther->GetListIndex();
-			pOtherCorner->m_Neighbors[pOtherCorner->m_nNeighbors++] = pMain->GetListIndex();
+			pMainCorner->m_Neighbors[pMainCorner->m_nNeighbors++] = size_cast<unsigned short>(pOther->GetListIndex());
+			pOtherCorner->m_Neighbors[pOtherCorner->m_nNeighbors++] = size_cast<unsigned short>(pMain->GetListIndex());
 		}
 		else
 		{

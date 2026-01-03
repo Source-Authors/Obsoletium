@@ -895,14 +895,14 @@ void CCoreDispInfo::BuildTriTLtoBR( int ndx )
     // get width and height of displacement maps
 	int nWidth = ( ( 1 << m_Power ) + 1 );
 	
-	m_RenderIndices[m_RenderIndexCount] = ndx;
-	m_RenderIndices[m_RenderIndexCount+1] = ndx + nWidth;
-	m_RenderIndices[m_RenderIndexCount+2] = ndx + 1;
+	m_RenderIndices[m_RenderIndexCount] = size_cast<unsigned short>(ndx);
+	m_RenderIndices[m_RenderIndexCount+1] = size_cast<unsigned short>(ndx + nWidth);
+	m_RenderIndices[m_RenderIndexCount+2] = size_cast<unsigned short>(ndx + 1);
 	m_RenderIndexCount += 3;
 
-	m_RenderIndices[m_RenderIndexCount] = ndx + 1;
-	m_RenderIndices[m_RenderIndexCount+1] = ndx + nWidth;
-	m_RenderIndices[m_RenderIndexCount+2] = ndx + nWidth + 1;
+	m_RenderIndices[m_RenderIndexCount] = size_cast<unsigned short>(ndx + 1);
+	m_RenderIndices[m_RenderIndexCount+1] = size_cast<unsigned short>(ndx + nWidth);
+	m_RenderIndices[m_RenderIndexCount+2] = size_cast<unsigned short>(ndx + nWidth + 1);
 	m_RenderIndexCount += 3;
 }
 
@@ -914,14 +914,14 @@ void CCoreDispInfo::BuildTriBLtoTR( int ndx )
     // get width and height of displacement maps
 	int nWidth = ( ( 1 << m_Power ) + 1 );
 	
-	m_RenderIndices[m_RenderIndexCount] = ndx;
-	m_RenderIndices[m_RenderIndexCount+1] = ndx + nWidth;
-	m_RenderIndices[m_RenderIndexCount+2] = ndx + nWidth + 1;
+	m_RenderIndices[m_RenderIndexCount] = size_cast<unsigned short>(ndx);
+	m_RenderIndices[m_RenderIndexCount+1] = size_cast<unsigned short>(ndx + nWidth);
+	m_RenderIndices[m_RenderIndexCount+2] = size_cast<unsigned short>(ndx + nWidth + 1);
 	m_RenderIndexCount += 3;
 
-	m_RenderIndices[m_RenderIndexCount] = ndx;
-	m_RenderIndices[m_RenderIndexCount+1] = ndx + nWidth + 1;
-	m_RenderIndices[m_RenderIndexCount+2] = ndx + 1;
+	m_RenderIndices[m_RenderIndexCount] = size_cast<unsigned short>(ndx);
+	m_RenderIndices[m_RenderIndexCount+1] = size_cast<unsigned short>(ndx + nWidth + 1);
+	m_RenderIndices[m_RenderIndexCount+2] = size_cast<unsigned short>(ndx + 1);
 	m_RenderIndexCount += 3;
 }
 
