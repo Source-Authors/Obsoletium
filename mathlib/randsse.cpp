@@ -25,7 +25,7 @@ static constexpr inline float GetStepRand( uint32 seed )
 	return (seed >> 16) / 65536.0f;
 }
 
-static constexpr inline float GetNextStepSeed( uint32 seed )
+static constexpr inline uint32 GetNextStepSeed( uint32 seed )
 {
 	return (seed + 1) * 3141592621u;
 }
