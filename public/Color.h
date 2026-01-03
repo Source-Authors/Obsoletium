@@ -15,15 +15,14 @@ class alignas(int) Color
 	using component = unsigned char;
 public:
 	// constructors
-	Color() : Color{0,0,0}
+	constexpr Color() : Color{0, 0, 0}
 	{
 	}
-	Color(int r,int g,int b) : Color{r,g,b,0}
+	constexpr Color(Color::component r,Color::component g,Color::component b) : Color{r,g,b,0}
 	{
 	}
-	Color(int r,int g,int b,int a)
+	constexpr Color(Color::component r,Color::component g,Color::component b,Color::component a) : _color{r, g, b, a}
 	{
-		SetColor(r, g, b, a);
 	}
 	
 	// set the color
