@@ -20,29 +20,33 @@
 
 #include "tier0/memdbgon.h"
 
-#define MAX_IMAGES_PER_FRAME 4
+namespace {
 
 struct Sequence;
 
 struct SequenceFrame {
-  SequenceFrame() : m_mapSequences(DefLessFunc(Sequence *)) {}
+  SequenceFrame()
+      : m_pImage{nullptr},
+        m_XCoord{-1},
+        m_YCoord{-1},
+        m_mapSequences(DefLessFunc(Sequence *)) {}
 
   FloatBitMap_t *m_pImage;
   int m_XCoord, m_YCoord;  // where it ended up packed
   CUtlMap<Sequence *, int> m_mapSequences;
 };
 
-enum PackingMode_t {
+enum class PackingMode_t {
   PCKM_INVALID = 0,
   PCKM_FLAT,   // Default mode - every frame consumes entire RGBA space
   PCKM_RGB_A,  // Some sequences consume RGB space and some Alpha space
 };
 
-static CUtlStringMap<SequenceFrame *> ImageList;
-static PackingMode_t s_ePackingMode = PCKM_FLAT;
+CUtlStringMap<SequenceFrame *> ImageList;
+PackingMode_t s_ePackingMode = PackingMode_t::PCKM_FLAT;
 
 struct SequenceEntry {
-  SequenceFrame *m_pSeqFrame[MAX_IMAGES_PER_FRAME];
+  SequenceFrame *m_pSeqFrame[4];
   float m_fDisplayTime;
 };
 
@@ -58,31 +62,33 @@ struct Sequence {
   SeqMode_t m_eMode;
   CUtlVector<SequenceEntry> m_Frames;
 
-  Sequence(void) {
+  Sequence() {
+    m_nSequenceNumber = -1;
     m_Clamp = true;
     m_eMode = SQM_RGBA;
   }
 };
 
-static int GetChannelIndexFromChar(char c) {
+[[nodiscard]] int GetChannelIndexFromChar(char c) {
   // r->0 b->1 g->2 a->3 else -1
 
   constexpr char s_ChannelIDs[] = "rgba";
 
   char const *pChanChar = strchr(s_ChannelIDs, c);
   if (!pChanChar) {
-    fprintf(stderr, " bad channel name '%c'\n", c);
+    fprintf(stderr, " bad channel name '%c'.\n", c);
     return -1;
   }
 
-  return pChanChar - s_ChannelIDs;
+  return size_cast<int>(pChanChar - s_ChannelIDs);
 }
 
-static FloatBitMap_t *CreateFBM(const char *fname) {
+[[nodiscard]] FloatBitMap_t *CreateFBM(const char *fname) {
   if (strchr(fname, ',')) {
     // parse extended specifications
     CUtlVector<char *> Images;
     V_SplitString(fname, ",", Images);
+
     FloatBitMap_t *pBM = NULL;
     // now, process bitmaps, performing copy operations specified by {} syntax
     for (intp i = 0; i < Images.Count(); i++) {
@@ -93,16 +99,19 @@ static FloatBitMap_t *CreateFBM(const char *fname) {
       if (pBrace) {
         *pBrace = 0;  // null it
         pBrace++;     // point at control specifier
+
         char *pEndBrace = strchr(pBrace, '}');
         if (!pEndBrace)
-          printf("bad extended bitmap synax (no close brace) - %s \n",
-                 Images[i]);
+          fprintf(stderr, "bad extended bitmap synax (no close brace) - %s\n",
+                  Images[i]);
       }
+
       FloatBitMap_t NewBM(fnamebuf);
       if (!pBM) {
         // first image sets size
         pBM = new FloatBitMap_t(&NewBM);
       }
+
       // now, process operation specifiers of the form "{chan=chan}" or
       // "{chan=0}"
       if (pBrace) {
@@ -129,30 +138,32 @@ static FloatBitMap_t *CreateFBM(const char *fname) {
         }
       }
     }
+
     return pBM;
-  } else
-    return new FloatBitMap_t(fname);
+  }
+
+  return new FloatBitMap_t(fname);
 }
 
-static CUtlVector<Sequence *> Sequences;
+CUtlVector<Sequence *> Sequences;
+Sequence *pCurSequence = nullptr;
 
-static Sequence *pCurSequence = NULL;
+int s_nWidth, s_nHeight;
 
-static int s_nWidth;
-static int s_nHeight;
-
-static void ApplyMacros(char *in_buf, intp buffer_size) {
+void ApplyMacros(char *in_buf, intp buffer_size) {
   CUtlVector<char *> Words;
   V_SplitString(in_buf, " ", Words);
+
   if ((Words.Count() == 4) && (!stricmp(Words[0], "ga_frame"))) {
     // ga_frame frm1 frm2 n -> frame frm1{r=a},frm1{g=a},frm1{b=a},frm2{a=a} n
     V_snprintf(in_buf, buffer_size, "frame %s{r=0},%s{g=a},%s{b=0},%s{a=a} %s",
                Words[1], Words[1], Words[1], Words[2], Words[3]);
   }
+
   Words.PurgeAndDeleteElements();
 }
 
-static void ReadTextControlFile(char const *fname) {
+void ReadTextControlFile(char const *fname) {
   CRequiredInputTextFile f(fname);
   char linebuffer[4096];
   int numActualLinesRead = 0;
@@ -171,37 +182,42 @@ static void ReadTextControlFile(char const *fname) {
     if (in_str[0]) {
       strlwr(in_str);
       ApplyMacros(in_str, ssize(linebuffer) + linebuffer - in_str);
+
       CUtlVector<char *> Words;
       V_SplitString(in_str, " ", Words);
+
       if ((Words.Count() == 1) && (!stricmp(Words[0], "loop"))) {
         if (pCurSequence) pCurSequence->m_Clamp = false;
       } else if ((Words.Count() == 2) && (!stricmp(Words[0], "packmode"))) {
-        PackingMode_t eRequestedMode = PCKM_INVALID;
+        PackingMode_t eRequestedMode = PackingMode_t::PCKM_INVALID;
         if (!stricmp(Words[1], "flat") || !stricmp(Words[1], "rgba"))
-          eRequestedMode = PCKM_FLAT;
+          eRequestedMode = PackingMode_t::PCKM_FLAT;
         else if (!stricmp(Words[1], "rgb+a"))
-          eRequestedMode = PCKM_RGB_A;
+          eRequestedMode = PackingMode_t::PCKM_RGB_A;
 
-        if (eRequestedMode == PCKM_INVALID)
-          printf(
-              "*** line %d: invalid packmode specified, allowed values are "
-              "'rgba' or 'rgb+a'!\n",
-              numActualLinesRead),
-              exit(EINVAL);
-        else if (!Sequences.Count())
+        if (eRequestedMode == PackingMode_t::PCKM_INVALID) {
+          fprintf(stderr,
+                  "*** line %d: invalid packmode specified, allowed values are "
+                  "'rgba' or 'rgb+a'!\n",
+                  numActualLinesRead);
+          exit(EINVAL);
+        } else if (!Sequences.Count())
           s_ePackingMode = eRequestedMode;
         else if (s_ePackingMode != eRequestedMode) {
           // Allow special changes:
           // flat -> rgb+a
-          if (s_ePackingMode == PCKM_FLAT && eRequestedMode == PCKM_RGB_A)
+          if (s_ePackingMode == PackingMode_t::PCKM_FLAT &&
+              eRequestedMode == PackingMode_t::PCKM_RGB_A)
             s_ePackingMode = eRequestedMode;
           // everything else
-          else
-            printf(
+          else {
+            fprintf(
+                stderr,
                 "*** line %d: incompatible packmode change when %zd sequences "
                 "already defined!\n",
-                numActualLinesRead, Sequences.Count()),
-                exit(EINVAL);
+                numActualLinesRead, Sequences.Count());
+            exit(EINVAL);
+          }
         }
       } else if ((Words.Count() == 2) &&
                  StringHasPrefix(Words[0], "sequence")) {
@@ -217,38 +233,41 @@ static void ReadTextControlFile(char const *fname) {
           pCurSequence->m_eMode = Sequence::SQM_RGB;
         else if (!stricmp(szSeqType, "-a"))
           pCurSequence->m_eMode = Sequence::SQM_ALPHA;
-        else
-          printf(
-              "*** line %d: invalid sequence type '%s', allowed "
-              "'sequence-rgba' or 'sequence-rgb' or 'sequence-a'!\n",
-              numActualLinesRead, Words[0]),
-              exit(EINVAL);
+        else {
+          fprintf(stderr,
+                  "*** line %d: invalid sequence type '%s', allowed "
+                  "'sequence-rgba' or 'sequence-rgb' or 'sequence-a'!\n",
+                  numActualLinesRead, Words[0]);
+          exit(EINVAL);
+        }
 
         // Validate sequence type
         switch (s_ePackingMode) {
-          case PCKM_FLAT:
+          case PackingMode_t::PCKM_FLAT:
             switch (pCurSequence->m_eMode) {
               case Sequence::SQM_RGBA:
                 break;
               default:
-                printf(
+                fprintf(
+                    stderr,
                     "*** line %d: invalid sequence type '%s', packing 'flat' "
                     "allows only 'sequence-rgba'!\n",
-                    numActualLinesRead, Words[0]),
-                    exit(EINVAL);
+                    numActualLinesRead, Words[0]);
+                exit(EINVAL);
             }
             break;
-          case PCKM_RGB_A:
+          case PackingMode_t::PCKM_RGB_A:
             switch (pCurSequence->m_eMode) {
               case Sequence::SQM_RGB:
               case Sequence::SQM_ALPHA:
                 break;
               default:
-                printf(
+                fprintf(
+                    stderr,
                     "*** line %d: invalid sequence type '%s', packing 'rgb+a' "
                     "allows only 'sequence-rgb' or 'sequence-a'!\n",
-                    numActualLinesRead, Words[0]),
-                    exit(EINVAL);
+                    numActualLinesRead, Words[0]);
+                exit(EINVAL);
             }
             break;
         }
@@ -273,17 +292,17 @@ static void ReadTextControlFile(char const *fname) {
             new_entry.m_pSeqFrame[i] = pBM;
 
             // Validate that frame packing is correct
-            if (s_ePackingMode == PCKM_RGB_A) {
+            if (s_ePackingMode == PackingMode_t::PCKM_RGB_A) {
               for (uint16 idx = 0; idx < pBM->m_mapSequences.Count(); ++idx) {
                 Sequence *pSeq = pBM->m_mapSequences.Key(idx);
                 if (pSeq->m_eMode != Sequence::SQM_RGBA &&
                     pSeq->m_eMode != pCurSequence->m_eMode) {
-                  printf(
-                      "*** line %d: 'rgb+a' packing cannot pack frame '%s' "
-                      "belonging to sequences %d and %d!\n",
-                      numActualLinesRead, fnamebuf, pSeq->m_nSequenceNumber,
-                      pCurSequence->m_nSequenceNumber),
-                      exit(EINVAL);
+                  fprintf(stderr,
+                          "*** line %d: 'rgb+a' packing cannot pack frame '%s' "
+                          "belonging to sequences %d and %d!\n",
+                          numActualLinesRead, fnamebuf, pSeq->m_nSequenceNumber,
+                          pCurSequence->m_nSequenceNumber);
+                  exit(EINVAL);
                 }
               }
             }
@@ -291,31 +310,32 @@ static void ReadTextControlFile(char const *fname) {
             pBM->m_mapSequences.Insert(pCurSequence, 1);
 
             if (i == 0)
-              for (int j = 1; j < MAX_IMAGES_PER_FRAME; j++)
+              for (intp j = 1; j < ssize(new_entry.m_pSeqFrame); j++)
                 new_entry.m_pSeqFrame[j] = new_entry.m_pSeqFrame[0];
           }
           pCurSequence->m_Frames.AddToTail(new_entry);
         }
       } else {
-        printf("*** line %d: Bad command \"%s\"!\n", numActualLinesRead,
-               in_str),
-            exit(EINVAL);
+        fprintf(stderr, "*** line %d: Bad command \"%s\"!\n",
+                numActualLinesRead, in_str);
+        exit(EINVAL);
       }
       Words.PurgeAndDeleteElements();
     }
   }
 }
 
-inline float UCoord(int u) {
+[[nodiscard]] inline float UCoord(int u) {
   float uc = u + 0.5f;
   return uc / (float)s_nWidth;
 }
-inline float VCoord(int v) {
+
+[[nodiscard]] inline float VCoord(int v) {
   float vc = v + 0.5f;
   return vc / (float)s_nHeight;
 }
 
-bool PackImages_Flat(char const *pFname, int nWidth) {
+[[nodiscard]] bool PackImages_Flat(char const *pFname, int nWidth) {
   // !! bug !! packing algorithm is dumb and no error checking is done!
   FloatBitMap_t output(nWidth, 2048);
   int cur_line = 0;
@@ -371,9 +391,9 @@ bool PackImages_Flat(char const *pFname, int nWidth) {
 
     bool bWritten = cropped_output.WriteTGAFile(pFname);
     if (!bWritten)
-      fprintf(stderr, "Error: failed to save TGA \"%s\"!\n", pFname);
+      fprintf(stderr, "error: failed to save TGA \"%s\"!\n", pFname);
     else
-      printf("Ok: successfully saved TGA \"%s\"\n", pFname);
+      printf("ok: successfully saved TGA \"%s\"\n", pFname);
   }
 
   // Store these for UV calculation later on
@@ -407,21 +427,24 @@ bool PackImages_Rgb_A(char const *pFname, int nWidth) {
         bPackingRGBA = false;
         break;
       case Sequence::SQM_RGBA:
-        if (!bPackingRGBA)
-          printf(
+        if (!bPackingRGBA) {
+          fprintf(
+              stderr,
               "*** error when packing 'rgb+a', bad sequence %d encountered for "
               "frame '%s' after all rgba frames packed!\n",
               frm.m_mapSequences.Key(0)->m_nSequenceNumber,
-              ImageList.String(i)),
-              exit(EINVAL);
+              ImageList.String(i));
+          exit(EINVAL);
+        }
         idxfrm = 0;
         break;
       default:
-        printf(
+        fprintf(
+            stderr,
             "*** error when packing 'rgb+a', bad sequence %d encountered for "
             "frame '%s'!\n",
-            frm.m_mapSequences.Key(0)->m_nSequenceNumber, ImageList.String(i)),
-            exit(EINVAL);
+            frm.m_mapSequences.Key(0)->m_nSequenceNumber, ImageList.String(i));
+        exit(EINVAL);
     }
 
     if (cur_column[idxfrm] + frm.m_pImage->Width > output.Width) {
@@ -497,9 +520,9 @@ bool PackImages_Rgb_A(char const *pFname, int nWidth) {
 
     bool bWritten = cropped_output.WriteTGAFile(pFname);
     if (!bWritten)
-      fprintf(stderr, "Error: failed to save TGA \"%s\"!\n", pFname);
+      fprintf(stderr, "error: failed to save TGA \"%s\"!\n", pFname);
     else
-      printf("Ok: successfully saved TGA \"%s\"\n", pFname);
+      printf("ok: successfully saved TGA \"%s\"\n", pFname);
   }
 
   // Store these for UV calculation later on
@@ -510,15 +533,17 @@ bool PackImages_Rgb_A(char const *pFname, int nWidth) {
 
 bool PackImages(char const *pFname, int nWidth) {
   switch (s_ePackingMode) {
-    case PCKM_FLAT:
+    case PackingMode_t::PCKM_FLAT:
       return PackImages_Flat(pFname, nWidth);
-    case PCKM_RGB_A:
+    case PackingMode_t::PCKM_RGB_A:
       return PackImages_Rgb_A(pFname, nWidth);
-    case PCKM_INVALID:
+    case PackingMode_t::PCKM_INVALID:
     default:
       return false;
   }
 }
+
+}  // namespace
 
 int main(int argc, char **argv) {
   // Install an exception handler.
@@ -536,32 +561,30 @@ int main(int argc, char **argv) {
   if (argc < 2 || argc > 4) {
     fprintf(stderr,
             "format is 'mksheet sheet.mks [output.sht] [output.tga]'\n");
-    return 1;
+    return EINVAL;
   }
 
   char pMksFileBuf[MAX_PATH];
   char pShtFileBuf[MAX_PATH];
   char pTgaFileBuf[MAX_PATH];
 
-  const char *pSourceFile;
-  const char *pShtFile;
-  const char *pTgaFile;
-
   V_strcpy_safe(pMksFileBuf, argv[1]);
-  Q_DefaultExtension(pMksFileBuf, ".mks");
-  pSourceFile = pMksFileBuf;
+  V_DefaultExtension(pMksFileBuf, ".mks");
+  const char *pSourceFile = pMksFileBuf;
 
+  const char *pTgaFile;
   if (argc < 4) {
-    Q_StripExtension(pSourceFile, pTgaFileBuf);
-    Q_SetExtension(pTgaFileBuf, ".tga");
+    V_StripExtension(pSourceFile, pTgaFileBuf);
+    V_SetExtension(pTgaFileBuf, ".tga");
     pTgaFile = pTgaFileBuf;
   } else {
     pTgaFile = argv[3];
   }
 
+  const char *pShtFile;
   if (argc < 3) {
-    Q_StripExtension(pSourceFile, pShtFileBuf);
-    Q_SetExtension(pShtFileBuf, ".sht");
+    V_StripExtension(pSourceFile, pShtFileBuf);
+    V_SetExtension(pShtFileBuf, ".sht");
     pShtFile = pShtFileBuf;
   } else {
     pShtFile = argv[2];
@@ -574,6 +597,7 @@ int main(int argc, char **argv) {
   int nBestWidth = -1;
   int nBestSize = (1 << 30);
   int nBestSquareness = (1 << 30);  // how square the texture is
+
   for (int nTryWidth = 2048; nTryWidth >= 64; nTryWidth >>= 1) {
     bool bSuccess = PackImages(NULL, nTryWidth);
     if (bSuccess) {
@@ -614,57 +638,55 @@ int main(int argc, char **argv) {
          (s_nWidth == s_nHeight) ? " : square texture" : "");
   PackImages(pTgaFile, nBestWidth);
 
-  // now, write ouput
+  // now, write output
   ReportProgress("Writing SHT output file", 0, 0);
+
   COutputFile Outfile(pShtFile);
   if (Outfile.IsOk()) {
     Outfile.PutInt(1);  // version #
-    Outfile.PutInt(Sequences.Count());
-    for (intp i = 0; i < Sequences.Count(); i++) {
-      Outfile.PutInt(Sequences[i]->m_nSequenceNumber);
-      Outfile.PutInt(Sequences[i]->m_Clamp);
-      Outfile.PutInt(Sequences[i]->m_Frames.Count());
+    Outfile.PutInt(size_cast<int>(Sequences.Count()));
+
+    for (const auto *s : Sequences) {
+      Outfile.PutInt(s->m_nSequenceNumber);
+      Outfile.PutInt(s->m_Clamp);
+      Outfile.PutInt(size_cast<int>(s->m_Frames.Count()));
+
       // write total sequence length
-      float fTotal = 0.;
-      for (intp j = 0; j < Sequences[i]->m_Frames.Count(); j++) {
-        fTotal += Sequences[i]->m_Frames[j].m_fDisplayTime;
+      float fTotal = 0.0f;
+      for (const auto &f : s->m_Frames) {
+        fTotal += f.m_fDisplayTime;
       }
       Outfile.PutFloat(fTotal);
-      for (intp j = 0; j < Sequences[i]->m_Frames.Count(); j++) {
-        Outfile.PutFloat(Sequences[i]->m_Frames[j].m_fDisplayTime);
+
+      for (const auto &ff : s->m_Frames) {
+        Outfile.PutFloat(ff.m_fDisplayTime);
+
+        // intp t = 0;
         // output texture coordinates
-        for (int t = 0; t < MAX_IMAGES_PER_FRAME; t++) {
+        for (auto *sf : ff.m_pSeqFrame) {
           // xmin
-          Outfile.PutFloat(
-              UCoord(Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_XCoord));
+          Outfile.PutFloat(UCoord(sf->m_XCoord));
           // ymin
-          Outfile.PutFloat(
-              VCoord(Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_YCoord));
+          Outfile.PutFloat(VCoord(sf->m_YCoord));
           // xmax
-          Outfile.PutFloat(UCoord(
-              Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_XCoord +
-              Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_pImage->Width - 1));
+          Outfile.PutFloat(UCoord(sf->m_XCoord + sf->m_pImage->Width - 1));
           // ymax
-          Outfile.PutFloat(VCoord(
-              Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_YCoord +
-              Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_pImage->Height - 1));
-          // 				printf( "T %d UV1:( %.2f, %.2f ) UV2:(
-          // %.2f, %.2f )\n", t, 					UCoord(
-          // Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_XCoord ),
-          // VCoord( Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_YCoord ),
-          // UCoord(
-          // Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_XCoord+Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_pImage->Width-1
-          // ), 					VCoord(
-          // Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_YCoord+Sequences[i]->m_Frames[j].m_pSeqFrame[t]->m_pImage->Height-1
-          // ));
+          Outfile.PutFloat(VCoord(sf->m_YCoord + sf->m_pImage->Height - 1));
+
+          // printf("T %zd UV1:( %.2f, %.2f ) UV2:(%.2f, %.2f )\n", t,
+          //        UCoord(sf->m_XCoord), VCoord(sf->m_YCoord),
+          //        UCoord(sf->m_XCoord + sf->m_pImage->Width - 1),
+          //        VCoord(sf->m_YCoord + sf->m_pImage->Height - 1));
+          //
+          // ++t;
         }
       }
     }
 
-    printf("Ok: successfully saved SHT \"%s\"\n", pShtFile);
+    printf("ok: successfully saved SHT \"%s\"\n", pShtFile);
     return 0;
   }
 
-  fprintf(stderr, "Error: failed to write SHT \"%s\"!\n", pShtFile);
+  fprintf(stderr, "error: failed to write SHT \"%s\"!\n", pShtFile);
   return 3;
 }
