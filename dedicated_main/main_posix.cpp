@@ -107,7 +107,7 @@ int main(int argc, char *argv[]) {
     return 2;
   }
 
-  constexpr char dedicated_name[]{"dedicated" DLL_EXT_STRING};
+  constexpr char dedicated_name[]{"libdedicated" DLL_EXT_STRING};
   const source::ScopedDll dedicated{dedicated_name, RTLD_NOW};
   if (!dedicated) {
     fprintf(stderr, "open %s failed: %s\n", dedicated_name, ::dlerror());

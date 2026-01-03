@@ -14,6 +14,12 @@ $include "$SRCDIR\vpc_scripts\source_cryptlib_include.vpc"
 
 $Configuration
 {
+	// dimhotepus: Add lib prefix to match other libs in dedicated launcher.
+	$General [$POSIX]
+	{
+		$GameOutputFile				"$OUTBINDIR/$_IMPLIB_DLL_PREFIX$OUTBINNAME$_DLL_EXT"
+	}
+
 	$Compiler
 	{
 		$AdditionalIncludeDirectories		"$BASE;$SRCDIR\out\build;.\;$SRCDIR\engine"
