@@ -901,7 +901,7 @@ void CUtlBuffer::SeekGet( SeekType_t type, intp offset )
 		m_Error &= ~GET_OVERFLOW;
 		if ( m_Get < m_nOffset || m_Get >= m_nOffset + Size() )
 		{
-			OnGetOverflow( -1 );
+			(void)OnGetOverflow( -1 );
 		}
 	}
 }
@@ -1775,7 +1775,7 @@ void CUtlBuffer::SeekPut( SeekType_t type, intp offset )
 	// the entire buffer if you seek outside the current range
 
 	// NOTE: This call will write and will also seek the file to nNextPut.
-	OnPutOverflow( -nNextPut-1 );
+	(void)OnPutOverflow( -nNextPut-1 );
 	m_Put = nNextPut;
 
 	AddNullTermination();
