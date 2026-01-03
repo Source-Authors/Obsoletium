@@ -13,13 +13,6 @@ $MacroRequired		"PLATSUBDIR"
 
 $Configuration
 {
-
-	$General
-	{
-		// X360 version publishes to some other directory then copies here so we need to tell VPC to track this
-		// or else it won't know what depends on this project.
-	}
-	
 	$Compiler
 	{
 		$PreprocessorDefinitions	"$BASE;VSTDLIB_DLL_EXPORT"
