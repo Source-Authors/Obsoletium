@@ -185,6 +185,8 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 	{
 		CUtlVector< CBaseHandle > vecStillDirty;
 		m_partitionMutex.LockForWrite();
+		RunCodeAtScopeExit(m_partitionMutex.UnlockWrite());
+
 		m_partitionWriteId = ThreadGetCurrentId();
 		CTSListWithFreeList<CBaseHandle>::Node_t *pCurrent, *pNext;
 		while ( ( pCurrent = m_DirtyEntities.Detach() ) != NULL )
@@ -218,15 +220,11 @@ void CDirtySpatialPartitionEntityList::OnPreQuery( SpatialPartitionListMask_t li
 				}
 			}
 		}
-		if ( vecStillDirty.Count() > 0 )
+		for ( auto &h : vecStillDirty )
 		{
-			for ( int i = 0; i < vecStillDirty.Count(); i++ )
-			{
-				m_DirtyEntities.PushItem( vecStillDirty[i] );
-			}
+			m_DirtyEntities.PushItem( h );
 		}
 		m_partitionWriteId = INVALID_THREAD_ID;
-		m_partitionMutex.UnlockWrite();
 	}
 	LockPartitionForRead();
 }

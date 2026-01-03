@@ -105,16 +105,18 @@ void *CThreadSafeMemoryPool::Alloc( unsigned int amount )
 	int cAttempts = 1000;
 	while ( --cAttempts )
 	{
-		// pull first from the free list
-		m_threadRWLock.LockForRead();
-		FreeListItem_t *pFreeListItem = m_ptslistFreeBlocks->Pop();
-		if ( pFreeListItem )
 		{
-			m_threadRWLock.UnlockRead();
-			++m_cBlocksInUse;
-			return (void *)pFreeListItem;
+			// pull first from the free list
+			m_threadRWLock.LockForRead();
+			RunCodeAtScopeExit(m_threadRWLock.UnlockRead());
+
+			FreeListItem_t *pFreeListItem = m_ptslistFreeBlocks->Pop();
+			if ( pFreeListItem )
+			{
+				++m_cBlocksInUse;
+				return (void *)pFreeListItem;
+			}
 		}
-		m_threadRWLock.UnlockRead();
 
 		// no free items, add a new block
 
@@ -170,13 +172,14 @@ void CThreadSafeMemoryPool::Free( void *pMem )
 //-----------------------------------------------------------------------------
 void CThreadSafeMemoryPool::Free( void *pMem, int cubAlloc )
 {
-	m_threadRWLock.LockForRead();
+	{
+		m_threadRWLock.LockForRead();
+		RunCodeAtScopeExit(m_threadRWLock.UnlockRead());
 
-	// push the item back onto the free list
-	m_ptslistFreeBlocks->Push( (FreeListItem_t *)pMem );
-	--m_cBlocksInUse;
-
-	m_threadRWLock.UnlockRead();
+		// push the item back onto the free list
+		m_ptslistFreeBlocks->Push( (FreeListItem_t *)pMem );
+		--m_cBlocksInUse;
+	}
 
 	// if we're completely free, and have too much memory allocated, free some
 	if ( m_cBlocksInUse == 0 

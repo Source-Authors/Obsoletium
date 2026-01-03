@@ -196,25 +196,25 @@ public:
 	CUtlSymbol AddString( const char* pString )
 	{
 		m_lock.LockForWrite();
-		CUtlSymbol result = CUtlSymbolTable::AddString( pString );
-		m_lock.UnlockWrite();
-		return result;
+		RunCodeAtScopeExit(m_lock.UnlockWrite());
+
+		return CUtlSymbolTable::AddString( pString );
 	}
 
 	CUtlSymbol Find( const char* pString ) const
 	{
 		m_lock.LockForRead();
-		CUtlSymbol result = CUtlSymbolTable::Find( pString );
-		m_lock.UnlockRead();
-		return result;
+		RunCodeAtScopeExit(m_lock.UnlockRead());
+
+		return CUtlSymbolTable::Find( pString );
 	}
 
 	const char* String( CUtlSymbol id ) const
 	{
 		m_lock.LockForRead();
-		const char *pszResult = CUtlSymbolTable::String( id );
-		m_lock.UnlockRead();
-		return pszResult;
+		RunCodeAtScopeExit(m_lock.UnlockRead());
+
+		return CUtlSymbolTable::String( id );
 	}
 	
 private:

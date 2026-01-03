@@ -354,10 +354,13 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindOrAddFileName( const char *pFileNa
 
 	// not found, lock and look again
 	alignas(FileNameHandle_t) FileNameHandleInternal_t handle;
-	m_lock.LockForWrite();
-	handle.path = m_Strings->Insert( basepath ) + 1;
-	handle.file = m_Strings->Insert( filename ) + 1;
-	m_lock.UnlockWrite();
+	{
+		m_lock.LockForWrite();
+		RunCodeAtScopeExit(m_lock.UnlockWrite());
+
+		handle.path = m_Strings->Insert( basepath ) + 1;
+		handle.file = m_Strings->Insert( filename ) + 1;
+	}
 
 	return *( FileNameHandle_t * )( &handle );
 }
@@ -387,10 +390,13 @@ FileNameHandle_t CUtlFilenameSymbolTable::FindFileName( const char *pFileName )
 
 	Assert( (uint16)(m_Strings->InvalidHandle() + 1) == 0 );
 
-	m_lock.LockForRead();
-	handle.path = m_Strings->Find(basepath) + 1;
-	handle.file = m_Strings->Find(filename) + 1;
-	m_lock.UnlockRead();
+	{
+		m_lock.LockForRead();
+		RunCodeAtScopeExit(m_lock.UnlockRead());
+
+		handle.path = m_Strings->Find(basepath) + 1;
+		handle.file = m_Strings->Find(filename) + 1;
+	}
 
 	if ( handle.path == 0 || handle.file == 0 )
 		return nullptr;
@@ -417,10 +423,15 @@ bool CUtlFilenameSymbolTable::String( const FileNameHandle_t& handle, OUT_Z_CAP(
 		return false;
 	}
 
-	m_lock.LockForRead();
-	const char *path = (*m_Strings)[ internal->path - 1 ].Get();
-	const char *fn = (*m_Strings)[ internal->file - 1].Get();
-	m_lock.UnlockRead();
+	const char *path, *fn;
+
+	{
+		m_lock.LockForRead();
+		RunCodeAtScopeExit(m_lock.UnlockRead());
+
+		path = (*m_Strings)[ internal->path - 1 ].Get();
+		fn = (*m_Strings)[ internal->file - 1].Get();
+	}
 
 	if ( !path || !fn )
 	{

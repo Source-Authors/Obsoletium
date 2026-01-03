@@ -1782,38 +1782,41 @@ void CVoxelTree::InsertIntoTree( SpatialPartitionHandle_t hPartition, const Vect
 		UnlockRead();
 	}
 
-	m_lock.LockForWrite();
-	Assert( hPartition != PARTITION_INVALID_HANDLE );
-
-	EntityInfo_t &info = EntityInfo( hPartition );
-	if ( m_AvailableVisitBits.Count() )
 	{
-		info.m_nVisitBit[m_TreeId] = m_AvailableVisitBits.Tail();
-		m_AvailableVisitBits.Remove( m_AvailableVisitBits.Count() - 1 );
-	}
-	else
-	{
-		info.m_nVisitBit[m_TreeId] = m_nNextVisitBit++;
-	}
+		m_lock.LockForWrite();
+		RunCodeAtScopeExit(m_lock.UnlockWrite());
 
-	// Bloat by an eps before inserting the object into the tree.
-	Vector vecMin( mins.x - SPHASH_EPS, mins.y - SPHASH_EPS, mins.z - SPHASH_EPS );
-	Vector vecMax( maxs.x + SPHASH_EPS, maxs.y + SPHASH_EPS, maxs.z + SPHASH_EPS );
+		Assert( hPartition != PARTITION_INVALID_HANDLE );
 
-	ClampVector(vecMin, s_PartitionMin, s_PartitionMax);
-	ClampVector(vecMax, s_PartitionMin, s_PartitionMax);
-	Vector vecSize;
-	VectorSubtract( vecMax, vecMin, vecSize );
+		EntityInfo_t &info = EntityInfo( hPartition );
+		if ( m_AvailableVisitBits.Count() )
+		{
+			info.m_nVisitBit[m_TreeId] = m_AvailableVisitBits.Tail();
+			m_AvailableVisitBits.Remove( m_AvailableVisitBits.Count() - 1 );
+		}
+		else
+		{
+			info.m_nVisitBit[m_TreeId] = m_nNextVisitBit++;
+		}
 
-	int nLevel;
-	for ( nLevel = 0; nLevel < m_nLevelCount - 1; ++nLevel )
-	{
-		int nVoxelSize = m_pVoxelHash[nLevel].VoxelSize();
-		if ( (nVoxelSize > vecSize.x) && (nVoxelSize > vecSize.y) && (nVoxelSize > vecSize.z) )
-			break;
+		// Bloat by an eps before inserting the object into the tree.
+		Vector vecMin( mins.x - SPHASH_EPS, mins.y - SPHASH_EPS, mins.z - SPHASH_EPS );
+		Vector vecMax( maxs.x + SPHASH_EPS, maxs.y + SPHASH_EPS, maxs.z + SPHASH_EPS );
+
+		ClampVector(vecMin, s_PartitionMin, s_PartitionMax);
+		ClampVector(vecMax, s_PartitionMin, s_PartitionMax);
+		Vector vecSize;
+		VectorSubtract( vecMax, vecMin, vecSize );
+
+		int nLevel;
+		for ( nLevel = 0; nLevel < m_nLevelCount - 1; ++nLevel )
+		{
+			int nVoxelSize = m_pVoxelHash[nLevel].VoxelSize();
+			if ( (nVoxelSize > vecSize.x) && (nVoxelSize > vecSize.y) && (nVoxelSize > vecSize.z) )
+				break;
+		}
+		m_pVoxelHash[nLevel].InsertIntoTree( hPartition, vecMin, vecMax );
 	}
-	m_pVoxelHash[nLevel].InsertIntoTree( hPartition, vecMin, vecMax );
-	m_lock.UnlockWrite();
 
 	if ( bWasReading )
 	{
@@ -1838,12 +1841,15 @@ void CVoxelTree::RemoveFromTree( SpatialPartitionHandle_t hPartition )
 			// If we're recursing in this thread, need to release our read lock to allow ourselves to write
 			UnlockRead();
 		}
+		
+		{
+			m_lock.LockForWrite();
+			RunCodeAtScopeExit(m_lock.UnlockWrite());
 
-		m_lock.LockForWrite();
-		m_pVoxelHash[nLevel].RemoveFromTree( hPartition );
-		m_AvailableVisitBits.AddToTail( info.m_nVisitBit[m_TreeId] );
-		info.m_nVisitBit[m_TreeId] = (unsigned short)-1;
-		m_lock.UnlockWrite();
+			m_pVoxelHash[nLevel].RemoveFromTree( hPartition );
+			m_AvailableVisitBits.AddToTail( info.m_nVisitBit[m_TreeId] );
+			info.m_nVisitBit[m_TreeId] = (unsigned short)-1;
+		}
 
 		if ( bWasReading )
 		{
@@ -1915,12 +1921,15 @@ void CVoxelTree::EnumerateElementsInBox( SpatialPartitionListMask_t listMask,
 	CPartitionVisits *pPrevVisits = BeginVisit();
 
 	m_lock.LockForRead();
+	RunCodeAtScopeExit({
+		m_lock.UnlockRead();
+		EndVisit( pPrevVisits );
+	});
+
 	Voxel_t vs = m_pVoxelHash[0].VoxelIndexFromPoint( mins );
 	Voxel_t ve = m_pVoxelHash[0].VoxelIndexFromPoint( maxs );
 	if ( !m_pVoxelHash[0].EnumerateElementsInBox( listMask, vs, ve, mins, maxs, pIterator ) )
 	{
-		m_lock.UnlockRead();
-		EndVisit( pPrevVisits );
 		return;
 	}
 
@@ -1928,8 +1937,6 @@ void CVoxelTree::EnumerateElementsInBox( SpatialPartitionListMask_t listMask,
 	ve = ConvertToNextLevel( ve );
 	if ( !m_pVoxelHash[1].EnumerateElementsInBox( listMask, vs, ve, mins, maxs, pIterator ) )
 	{
-		m_lock.UnlockRead();
-		EndVisit( pPrevVisits );
 		return;
 	}
 
@@ -1937,17 +1944,12 @@ void CVoxelTree::EnumerateElementsInBox( SpatialPartitionListMask_t listMask,
 	ve = ConvertToNextLevel( ve );
 	if ( !m_pVoxelHash[2].EnumerateElementsInBox( listMask, vs, ve, mins, maxs, pIterator ) )
 	{
-		m_lock.UnlockRead();
-		EndVisit( pPrevVisits );
 		return;
 	}
 
 	vs = ConvertToNextLevel( vs );
 	ve = ConvertToNextLevel( ve );
 	m_pVoxelHash[3].EnumerateElementsInBox( listMask, vs, ve, mins, maxs, pIterator );
-
-	m_lock.UnlockRead();
-	EndVisit( pPrevVisits );
 }
 
 
@@ -2300,6 +2302,11 @@ void CVoxelTree::EnumerateElementsAlongRay( SpatialPartitionListMask_t listMask,
 	CPartitionVisits *pPrevVisits = BeginVisit();
 
 	m_lock.LockForRead();
+	RunCodeAtScopeExit({
+		m_lock.UnlockRead();
+		EndVisit( pPrevVisits );
+	});
+
 	if ( ray.m_IsRay )
 	{
 		EnumerateElementsAlongRay_Ray( listMask, clippedRay, vecInvDelta, vecEnd, pIterator );
@@ -2308,9 +2315,6 @@ void CVoxelTree::EnumerateElementsAlongRay( SpatialPartitionListMask_t listMask,
 	{
 		EnumerateElementsAlongRay_ExtrudedRay( listMask, clippedRay, vecInvDelta, vecEnd, pIterator );
 	}
-
-	m_lock.UnlockRead();
-	EndVisit( pPrevVisits );
 }
 
 
@@ -2328,31 +2332,29 @@ void CVoxelTree::EnumerateElementsAtPoint( SpatialPartitionListMask_t listMask,
 		return;
 
 	m_lock.LockForRead();
+	RunCodeAtScopeExit(m_lock.UnlockRead());
+
 	// Callbacks.
 	Voxel_t v = m_pVoxelHash[0].VoxelIndexFromPoint( pt );
 	if ( !m_pVoxelHash[0].EnumerateElementsAtPoint( listMask, v, pt, pIterator ) )
 	{
-		m_lock.UnlockRead();
 		return;
 	}
 
 	v = ConvertToNextLevel( v );
 	if ( !m_pVoxelHash[1].EnumerateElementsAtPoint( listMask, v, pt, pIterator ) )
 	{
-		m_lock.UnlockRead();
 		return;
 	}
 
 	v = ConvertToNextLevel( v );
 	if ( !m_pVoxelHash[2].EnumerateElementsAtPoint( listMask, v, pt, pIterator ) )
 	{
-		m_lock.UnlockRead();
 		return;
 	}
 
 	v = ConvertToNextLevel( v );
 	m_pVoxelHash[3].EnumerateElementsAtPoint( listMask, v, pt, pIterator );
-	m_lock.UnlockRead();
 }
 
 
@@ -2362,12 +2364,14 @@ void CVoxelTree::EnumerateElementsAtPoint( SpatialPartitionListMask_t listMask,
 void CVoxelTree::RenderAllObjectsInTree( float flTime )
 {
 	MDLCACHE_CRITICAL_SECTION_(g_pMDLCache);
+
 	m_lock.LockForRead();
+	RunCodeAtScopeExit(m_lock.UnlockRead());
+
 	for ( int i = 0; i < m_nLevelCount; ++i )
 	{
 		m_pVoxelHash[i].RenderAllObjectsInTree( flTime );
 	}
-	m_lock.UnlockRead();
 }
 
 
@@ -2378,12 +2382,14 @@ void CVoxelTree::RenderAllObjectsInTree( float flTime )
 void CVoxelTree::RenderObjectsInPlayerLeafs( const Vector &vecPlayerMin, const Vector &vecPlayerMax, float flTime )
 {
 	MDLCACHE_CRITICAL_SECTION_(g_pMDLCache);
+
 	m_lock.LockForRead();
+	RunCodeAtScopeExit(m_lock.UnlockRead());
+
 	for ( int i = 0; i < m_nLevelCount; ++i )
 	{
 		m_pVoxelHash[i].RenderObjectsInPlayerLeafs( vecPlayerMin, vecPlayerMax, flTime );
 	}
-	m_lock.UnlockRead();
 }
 
 
@@ -2881,7 +2887,7 @@ void CVoxelTree::ReportStats( const char *pFileName )
 
 void CSpatialPartition::ReportStats( const char *pFileName )
 {
-	Msg( "Handle Count %zd (%zu bytes)\n", m_aHandles.Count(), m_aHandles.Count() * ( sizeof(EntityInfo_t) + 2 * sizeof(SpatialPartitionHandle_t) ) );
+	Msg( "Handle Count %hu (%zu bytes)\n", m_aHandles.Count(), m_aHandles.Count() * ( sizeof(EntityInfo_t) + 2 * sizeof(SpatialPartitionHandle_t) ) );
 	for ( int i = 0; i < NUM_TREES; i++ )
 	{
 		m_VoxelTrees[i].ReportStats( pFileName );
@@ -2897,6 +2903,8 @@ void CVoxelTree::DrawDebugOverlays()
 		return;
 
 	m_lock.LockForRead();
+	RunCodeAtScopeExit(m_lock.UnlockRead());
+
 	for ( int i = 0; i < m_nLevelCount; ++i )
 	{
 		if ( ( nLevel >= 0 ) && ( nLevel != i ) )
@@ -2905,7 +2913,6 @@ void CVoxelTree::DrawDebugOverlays()
 		m_pVoxelHash[i].RenderGrid();
 		m_pVoxelHash[i].RenderAllObjectsInTree( 0.01f );
 	}
-	m_lock.UnlockRead();
 }
 
 void CSpatialPartition::DrawDebugOverlays()
