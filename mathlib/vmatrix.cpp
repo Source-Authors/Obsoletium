@@ -1187,7 +1187,7 @@ void FrustumPlanesFromMatrix( const VMatrix &clipToWorld, Frustum_t &frustum )
 	frustum.SetPlane( FRUSTUM_BOTTOM, PLANE_ANYZ, normal, dist );
 }
 
-void MatrixBuildOrtho( VMatrix& dst, double left, double top, double right, double bottom, double zNear, double zFar )
+void MatrixBuildOrtho( VMatrix& dst, float left, float top, float right, float bottom, float zNear, float zFar )
 {
 	// FIXME: This is being used incorrectly! Should read:
 	// matrix = XMMatrixOrthographicOffCenterRH( left, right, bottom, top, zNear, zFar );
@@ -1240,7 +1240,7 @@ void MatrixBuildPerspectiveX( VMatrix& dst, float flFovX, float flAspect, float 
 	MatrixBuildPerspectiveZRange ( dst, flZNear, flZFar );
 }
 
-void MatrixBuildPerspectiveOffCenterX( VMatrix& dst, double flFovX, double flAspect, double flZNear, double flZFar, double bottom, double top, double left, double right )
+void MatrixBuildPerspectiveOffCenterX( VMatrix& dst, float flFovX, float flAspect, float flZNear, float flZFar, float bottom, float top, float left, float right )
 {
 	float flWidth = tanf( flFovX * M_PI_F / 360.0f );
 	float flHeight = flWidth / flAspect;

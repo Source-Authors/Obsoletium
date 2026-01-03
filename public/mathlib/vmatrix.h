@@ -1030,12 +1030,15 @@ inline void MatrixTransformAxisAlignedPlane( const VMatrix &src, int nDim, float
 //-----------------------------------------------------------------------------
 //
 //-----------------------------------------------------------------------------
-void MatrixBuildOrtho( VMatrix& dst, double left, double top, double right, double bottom, double zNear, double zFar );
+// dimhotepus: double -> float.
+void MatrixBuildOrtho( VMatrix& dst, float left, float top, float right, float bottom, float zNear, float zFar );
 void MatrixBuildPerspectiveX( VMatrix& dst, float flFovX, float flAspect, float flZNear, float flZFar );
-void MatrixBuildPerspectiveOffCenterX( VMatrix& dst, double flFovX, double flAspect, double flZNear, double flZFar, double bottom, double top, double left, double right );
+// dimhotepus: double -> float.
+void MatrixBuildPerspectiveOffCenterX( VMatrix& dst, float flFovX, float flAspect, float flZNear, float flZFar, float bottom, float top, float left, float right );
 void MatrixBuildPerspectiveZRange( VMatrix& dst, float flZNear, float flZFar );
 
-inline void MatrixOrtho( VMatrix& dst, double left, double top, double right, double bottom, double zNear, double zFar )
+// dimhotepus: double -> float.
+inline void MatrixOrtho( VMatrix& dst, float left, float top, float right, float bottom, float zNear, float zFar )
 {
 	VMatrix mat;
 	MatrixBuildOrtho( mat, left, top, right, bottom, zNear, zFar );
@@ -1054,8 +1057,8 @@ inline void MatrixPerspectiveX( VMatrix& dst, float flFovX, float flAspect, floa
 	MatrixMultiply( dst, mat, temp );
 	dst = temp;
 }
-
-inline void MatrixPerspectiveOffCenterX( VMatrix& dst, double flFovX, double flAspect, double flZNear, double flZFar, double bottom, double top, double left, double right )
+// dimhotepus: double -> float.
+inline void MatrixPerspectiveOffCenterX( VMatrix& dst, float flFovX, float flAspect, float flZNear, float flZFar, float bottom, float top, float left, float right )
 {
 	VMatrix mat;
 	MatrixBuildPerspectiveOffCenterX( mat, flFovX, flAspect, flZNear, flZFar, bottom, top, left, right );
