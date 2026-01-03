@@ -38,7 +38,7 @@ typedef void (*SoftwareProcessMeshFunc_t)( const mstudio_meshvertexdata_t *, mat
 class IClientEntity;
 
 
-static int boxpnt[6][4] = 
+static constexpr int boxpnt[6][4] = 
 {
 	{ 0, 4, 6, 2 }, // +X
 	{ 0, 1, 5, 4 }, // +Y
@@ -243,9 +243,9 @@ void CStudioRender::R_StudioDrawBones (void)
 			CMeshBuilder meshBuilder;
 			meshBuilder.Begin( pMesh, MATERIAL_QUADS, 1 );
 
-			for (int k = 0; k < 4; ++k)
+			for (auto v : boxpnt[j])
 			{
-				meshBuilder.Position3fv( p[boxpnt[j][k]].Base() );
+				meshBuilder.Position3fv( p[v].Base() );
 				meshBuilder.AdvanceVertex();
 			}
 			
@@ -503,13 +503,13 @@ void CStudioRender::DrawShadows( const DrawModelInfo_t& info, int flags, int bon
 	pRenderContext->SetFlashlightMode( false );
 
 	// Here, we have to redraw the model one time for each shadow
-	for (intp i = 0; i < m_ShadowState.Count(); ++i )
+	for (auto &state : m_ShadowState)
 	{
-		if( m_ShadowState[i].m_pMaterial )
+		if( state.m_pMaterial )
 		{
-			m_pRC->m_pForcedMaterial = m_ShadowState[i].m_pMaterial;
+			m_pRC->m_pForcedMaterial = state.m_pMaterial;
 			m_pRC->m_nForcedMaterialType = OVERRIDE_NORMAL;
-			R_StudioRenderModel( pRenderContext, 0, info.m_Body, 0, m_ShadowState[i].m_pProxyData,
+			R_StudioRenderModel( pRenderContext, 0, info.m_Body, 0, state.m_pProxyData,
 				NULL, NULL, flags, boneMask, info.m_Lod, NULL );
 		}
 	}
