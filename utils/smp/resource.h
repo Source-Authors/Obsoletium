@@ -5,13 +5,13 @@
 #define IDS_PROJNAME                    100
 #define IDR_SMP                         100
 #define IDI_ICON1                       204
-#define SRC_IDI_APP_MAIN                207
+#define SE_IDI_APP_MAIN                 207
 #define ID_HALF_SIZE                    33000
 #define ID_FULL_SIZE                    33001
 #define ID_DOUBLE_SIZE                  33002
 #define ID_STRETCH_TO_FIT               33003
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "Steam Media Player"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING "Steam Media Player"
 
 // Next default values for new objects
 // 

@@ -11,7 +11,7 @@
 //
 #define IDI_ICON1                       102
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "Valve Model Viewer"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING "Valve Model Viewer"
 
 // Next default values for new objects
 // 

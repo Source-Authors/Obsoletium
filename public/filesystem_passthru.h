@@ -83,8 +83,8 @@ public:
 		m_pFileSystemPassThru = nullptr;
 	}
 
-SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
-SRC_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING()
+SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+SE_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING()
 	virtual void InitPassThru( IFileSystem *pFileSystemPassThru, bool bBaseOnly )
 	{
 		if ( !bBaseOnly )
@@ -92,7 +92,7 @@ SRC_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING()
 		
 		BaseClass::InitPassThru( pFileSystemPassThru );
 	}
-SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
+SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 
 	// IAppSystem stuff.
 	// Here's where the app systems get to learn about each other 

@@ -1222,7 +1222,7 @@ void CConPanel::PaintBackground()
 	wchar_t ver[ 256 ];
 	// dimhotepus: Add SemVer version number.
 	V_swprintf_safe(ver, L"Source Engine %i (build %d [v.%S])",
-		PROTOCOL_VERSION, build_number(), SRC_PRODUCT_VERSION_INFO_STRING );
+		PROTOCOL_VERSION, build_number(), SE_PRODUCT_VERSION_INFO_STRING );
 
 	vgui::surface()->DrawSetTextColor( Color( 255, 255, 255, 255 ) );
 	int xTwoOffset = vgui::scheme()->GetProportionalScaledValue( 2 );

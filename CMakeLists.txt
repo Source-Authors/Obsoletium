@@ -18,7 +18,7 @@ if (POLICY CMP0077)
 endif()
 
 # Setup root directory of the Obsoletium project.
-set(SRC_ROOT_DIR "${CMAKE_SOURCE_DIR}" CACHE STRING
+set(SE_ROOT_DIR "${CMAKE_SOURCE_DIR}" CACHE STRING
   "Directory root of the Obsoletium project.")
 
 ## Package information.
@@ -35,13 +35,13 @@ if (NOT DEFINED PACKAGE_VERSION)
   message(STATUS "[common]: Extracting Git software version.")
 
   if ("${CMAKE_HOST_SYSTEM_NAME}" STREQUAL "Windows")
-    execute_process(COMMAND cmd /c "git rev-list --branches HEAD | find /v " " /c" OUTPUT_VARIABLE SRC_GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    execute_process(COMMAND cmd /c "git rev-list --branches HEAD | find /v " " /c" OUTPUT_VARIABLE SE_GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   else()
-    execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE SRC_GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+    execute_process(COMMAND bash "-c" "git rev-list --branches HEAD | wc -l | tr -d ' ' | tr -d '\n'" OUTPUT_VARIABLE SE_GIT_VERSION WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
   endif()
 
   set(PACKAGE_VER_PATCH 2)
-  math(EXPR PACKAGE_VER_TWEAK ${SRC_GIT_VERSION})
+  math(EXPR PACKAGE_VER_TWEAK ${SE_GIT_VERSION})
   message(STATUS
     "[common]: Build version from Git (patch.tweak): ${PACKAGE_VER_PATCH}.${PACKAGE_VER_TWEAK}.")
 
@@ -64,36 +64,36 @@ message(STATUS "[common]: ${PACKAGE_NAME} version: ${PACKAGE_VERSION}.")
 
 ## Common variables.
 
-set(SRC_BINARY_DIR "${CMAKE_BINARY_DIR}" CACHE STRING
+set(SE_BINARY_DIR "${CMAKE_BINARY_DIR}" CACHE STRING
   "Directory of the Obsoletium binaries output.")
-set(SRC_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}" CACHE STRING
+set(SE_SYSTEM_NAME "${CMAKE_SYSTEM_NAME}" CACHE STRING
   "Name of the Obsoletium build system.")
 
-if (${SRC_SYSTEM_NAME} STREQUAL "Darwin")
-  set(SRC_OS_MACOS ON CACHE BOOL "MacOS is build system.")
+if (${SE_SYSTEM_NAME} STREQUAL "Darwin")
+  set(SE_OS_MACOS ON CACHE BOOL "MacOS is build system.")
 else()
-  set(SRC_OS_MACOS OFF CACHE BOOL "MacOS is NOT build system.")
+  set(SE_OS_MACOS OFF CACHE BOOL "MacOS is NOT build system.")
 endif()
 
-if (${SRC_SYSTEM_NAME} STREQUAL "Linux")
-  set(SRC_OS_LINUX ON CACHE BOOL "Linux distro is build system.")
+if (${SE_SYSTEM_NAME} STREQUAL "Linux")
+  set(SE_OS_LINUX ON CACHE BOOL "Linux distro is build system.")
 else()
-  set(SRC_OS_LINUX OFF CACHE BOOL "Linux distro is NOT build system.")
+  set(SE_OS_LINUX OFF CACHE BOOL "Linux distro is NOT build system.")
 endif()
 
-if (${SRC_SYSTEM_NAME} STREQUAL "Windows")
-  set(SRC_OS_WIN ON CACHE BOOL "Windows is build system.")
+if (${SE_SYSTEM_NAME} STREQUAL "Windows")
+  set(SE_OS_WIN ON CACHE BOOL "Windows is build system.")
 else()
-  set(SRC_OS_WIN OFF CACHE BOOL "Windows is NOT build system.")
+  set(SE_OS_WIN OFF CACHE BOOL "Windows is NOT build system.")
 endif()
 
-if (SRC_OS_MACOS OR SRC_OS_LINUX)
-  set(SRC_OS_POSIX ON CACHE BOOL "POSIX compatible os is build system.")
+if (SE_OS_MACOS OR SE_OS_LINUX)
+  set(SE_OS_POSIX ON CACHE BOOL "POSIX compatible os is build system.")
 else()
-  set(SRC_OS_POSIX OFF CACHE BOOL "POSIX compatible os is NOT build system.")
+  set(SE_OS_POSIX OFF CACHE BOOL "POSIX compatible os is NOT build system.")
 endif()
 
-set(SRC_PRODUCT_NAME "Obsoletium" CACHE STRING
+set(SE_PRODUCT_NAME "Obsoletium" CACHE STRING
   "Name of the Obsoletium product.")
 
 # Minimum standard level is C++17.
@@ -102,35 +102,35 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(SRC_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
+set(SE_BUILD_TYPE "${CMAKE_BUILD_TYPE}" CACHE STRING
   "CMake build type used to build ${PACKAGE_NAME}.")
-set(SRC_CMAKE_GENERATOR "${CMAKE_GENERATOR}" CACHE STRING
+set(SE_CMAKE_GENERATOR "${CMAKE_GENERATOR}" CACHE STRING
   "CMake generator used to generate build tree." FORCE)
-set(SRC_CXX_COMPILER "${CMAKE_CXX_COMPILER}" CACHE STRING
+set(SE_CXX_COMPILER "${CMAKE_CXX_COMPILER}" CACHE STRING
   "Compiler used to build ${PACKAGE_NAME}.")
-set(SRC_CXX_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}" CACHE STRING
+set(SE_CXX_COMPILER_ID "${CMAKE_CXX_COMPILER_ID}" CACHE STRING
   "Compiler id used to build ${PACKAGE_NAME}.")
-set(SRC_CXX_COMPILER_FRONTEND_VARIANT "${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}"
+set(SE_CXX_COMPILER_FRONTEND_VARIANT "${CMAKE_CXX_COMPILER_FRONTEND_VARIANT}"
   CACHE STRING "Compiler frontend used to build ${PACKAGE_NAME}.")
-set(SRC_EXPORT_COMPILE_COMMANDS ${CMAKE_EXPORT_COMPILE_COMMANDS} CACHE BOOL
+set(SE_EXPORT_COMPILE_COMMANDS ${CMAKE_EXPORT_COMPILE_COMMANDS} CACHE BOOL
   "Enable/Disable output of compile commands during generation.")
 
-if (SRC_CXX_COMPILER_ID MATCHES "Clang")
-  set(SRC_COMPILER_CLANG ON CACHE BOOL "Compiler is Clang.")
+if (SE_CXX_COMPILER_ID MATCHES "Clang")
+  set(SE_COMPILER_CLANG ON CACHE BOOL "Compiler is Clang.")
 else()
-  set(SRC_COMPILER_CLANG OFF CACHE BOOL "Compiler is NOT Clang.")
+  set(SE_COMPILER_CLANG OFF CACHE BOOL "Compiler is NOT Clang.")
 endif()
 
-if (SRC_CXX_COMPILER_ID STREQUAL "GNU")
-  set(SRC_COMPILER_GCC ON CACHE BOOL "Compiler is GCC.")
+if (SE_CXX_COMPILER_ID STREQUAL "GNU")
+  set(SE_COMPILER_GCC ON CACHE BOOL "Compiler is GCC.")
 else()
-  set(SRC_COMPILER_GCC OFF CACHE BOOL "Compiler is NOT GCC.")
+  set(SE_COMPILER_GCC OFF CACHE BOOL "Compiler is NOT GCC.")
 endif()
 
-if (SRC_CXX_COMPILER_ID STREQUAL "MSVC")
-  set(SRC_COMPILER_MSVC ON CACHE BOOL "Compiler is MSVC.")
+if (SE_CXX_COMPILER_ID STREQUAL "MSVC")
+  set(SE_COMPILER_MSVC ON CACHE BOOL "Compiler is MSVC.")
 else()
-  set(SRC_COMPILER_MSVC OFF CACHE BOOL "Compiler is NOT MSVC.")
+  set(SE_COMPILER_MSVC OFF CACHE BOOL "Compiler is NOT MSVC.")
 endif()
 
 ## Common dependencies.
@@ -142,73 +142,73 @@ if (Git_FOUND)
   # Get the current working branch.
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" rev-parse --abbrev-ref HEAD
-    WORKING_DIRECTORY ${SRC_ROOT_DIR}
-    OUTPUT_VARIABLE SRC_GIT_BRANCH
+    WORKING_DIRECTORY ${SE_ROOT_DIR}
+    OUTPUT_VARIABLE SE_GIT_BRANCH
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   # Get the latest commit hash.
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" rev-parse HEAD
-    WORKING_DIRECTORY ${SRC_ROOT_DIR}
-    OUTPUT_VARIABLE SRC_GIT_COMMIT_HASH
+    WORKING_DIRECTORY ${SE_ROOT_DIR}
+    OUTPUT_VARIABLE SE_GIT_COMMIT_HASH
     OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   # Get the subject of the commit.
   execute_process(
     COMMAND "${GIT_EXECUTABLE}" log -1 --format=%s
-    WORKING_DIRECTORY "${SRC_ROOT_DIR}"
-    OUTPUT_VARIABLE SRC_GIT_COMMIT_SUBJECT
+    WORKING_DIRECTORY "${SE_ROOT_DIR}"
+    OUTPUT_VARIABLE SE_GIT_COMMIT_SUBJECT
     ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
 
   message(STATUS
-    "[common]: Git using branch '${SRC_GIT_BRANCH}', "
-    "commit ${SRC_GIT_COMMIT_HASH} | ${SRC_GIT_COMMIT_SUBJECT}.")
+    "[common]: Git using branch '${SE_GIT_BRANCH}', "
+    "commit ${SE_GIT_COMMIT_HASH} | ${SE_GIT_COMMIT_SUBJECT}.")
 endif()
 
 message(STATUS
-  "[common]: ${PACKAGE_NAME} using CMake generator: ${SRC_CMAKE_GENERATOR}.")
+  "[common]: ${PACKAGE_NAME} using CMake generator: ${SE_CMAKE_GENERATOR}.")
 
 # Select correct threading library.
-if (NOT SRC_OS_WIN)
+if (NOT SE_OS_WIN)
   set(CMAKE_THREAD_PREFER_PTHREAD ON)
   set(THREADS_PREFER_PTHREAD_FLAG ON)
 endif()
 find_package(Threads REQUIRED)
 list(APPEND CMAKE_REQUIRED_LIBRARIES Threads::Threads)
 if (NOT CMAKE_THREAD_LIBS_INIT)
-  set(SRC_THREADS_LIBRARY "system default" CACHE STRING
+  set(SE_THREADS_LIBRARY "system default" CACHE STRING
     "Threads library used to build ${PACKAGE_NAME}.")
 else()
-  set(SRC_THREADS_LIBRARY "${CMAKE_THREAD_LIBS_INIT}" CACHE STRING
+  set(SE_THREADS_LIBRARY "${CMAKE_THREAD_LIBS_INIT}" CACHE STRING
     "Threads library used to build ${PACKAGE_NAME}.")
 endif()
 message(STATUS
-  "[common]: ${PACKAGE_NAME} using threading library: ${SRC_THREADS_LIBRARY}.")
+  "[common]: ${PACKAGE_NAME} using threading library: ${SE_THREADS_LIBRARY}.")
 
 if (XCODE_VERSION)
   message(STATUS
     "[common]: ${PACKAGE_NAME} using XCode version: ${XCODE_VERSION}.")
 endif()
 
-message(STATUS "[common]: ${PACKAGE_NAME} cxx compiler: ${SRC_CXX_COMPILER}.")
-message(STATUS "[common]: ${PACKAGE_NAME} build type: ${SRC_BUILD_TYPE}.")
+message(STATUS "[common]: ${PACKAGE_NAME} cxx compiler: ${SE_CXX_COMPILER}.")
+message(STATUS "[common]: ${PACKAGE_NAME} build type: ${SE_BUILD_TYPE}.")
 
-if (SRC_OS_WIN)
+if (SE_OS_WIN)
   # Generate common product version info.
   configure_file(
-    ${SRC_ROOT_DIR}/build/product_version_config.h.cmake.in
-    ${SRC_BINARY_DIR}/build/product_version_config.h
+    ${SE_ROOT_DIR}/build/product_version_config.h.cmake.in
+    ${SE_BINARY_DIR}/build/product_version_config.h
   )
 
   # Generate app version info.
   configure_file(
-    ${SRC_ROOT_DIR}/build/app_version_config.h.cmake.in
-    ${SRC_BINARY_DIR}/build/app_version_config.h
+    ${SE_ROOT_DIR}/build/app_version_config.h.cmake.in
+    ${SE_BINARY_DIR}/build/app_version_config.h
   )
 
   # Generate visual styles manifest info.
   configure_file(
-    ${SRC_ROOT_DIR}/build/win/manifests/enable-visual-styles.manifest.cmake.in
-    ${SRC_BINARY_DIR}/manifests/enable-visual-styles.manifest
+    ${SE_ROOT_DIR}/build/win/manifests/enable-visual-styles.manifest.cmake.in
+    ${SE_BINARY_DIR}/manifests/enable-visual-styles.manifest
   )
 endif()

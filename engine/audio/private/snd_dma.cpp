@@ -6830,9 +6830,9 @@ static void S_Say( const CCommand &args )
 	{
 		// build a fake sentence name, then play the sentence text
 
-		#define SRC_SPEAK_TEST_SOUND_NAME "xxtestxx"
+		#define SE_SPEAK_TEST_SOUND_NAME "xxtestxx"
 
-		V_strcpy_safe( sound, SRC_SPEAK_TEST_SOUND_NAME " " );
+		V_strcpy_safe( sound, SE_SPEAK_TEST_SOUND_NAME " " );
 		V_strcat_safe( sound, args[1] );
 
 		sentence_t *pSentence = &g_Sentences[g_Sentences.AddToTail()];
@@ -6840,9 +6840,9 @@ static void S_Say( const CCommand &args )
 		pSentence->length = 0;
 
 		// insert null terminator after sentence name
-		sound[std::size(SRC_SPEAK_TEST_SOUND_NAME) - 1] = '\0';
+		sound[std::size(SE_SPEAK_TEST_SOUND_NAME) - 1] = '\0';
 
-		CSfxTable *pSfx = S_PrecacheSound("!" SRC_SPEAK_TEST_SOUND_NAME);
+		CSfxTable *pSfx = S_PrecacheSound("!" SE_SPEAK_TEST_SOUND_NAME);
 		if (!pSfx)
 		{
 			Warning("speak: can't cache '%s'.\n", sound);

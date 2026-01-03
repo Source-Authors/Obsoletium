@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_FILE_LOGGER_H
-#define SRC_LAUNCHER_FILE_LOGGER_H
+#ifndef SE_LAUNCHER_FILE_LOGGER_H
+#define SE_LAUNCHER_FILE_LOGGER_H
 
 #include "tier0/icommandline.h"
 #include "tier1/utlrbtree.h"
@@ -39,4 +39,4 @@ class FileLogger {
 
 }  // namespace se::launcher
 
-#endif  // SRC_LAUNCHER_FILE_LOGGER_H
+#endif  // SE_LAUNCHER_FILE_LOGGER_H

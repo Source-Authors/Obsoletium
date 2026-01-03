@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_DX_PROXY_FILEMEMCACHE_H_
-#define SRC_UTILS_DX_PROXY_FILEMEMCACHE_H_
+#ifndef SE_UTILS_DX_PROXY_FILEMEMCACHE_H_
+#define SE_UTILS_DX_PROXY_FILEMEMCACHE_H_
 
 #include <atomic>
 
@@ -92,4 +92,4 @@ class FileCache final {
 
 }  // namespace se::dx_proxy
 
-#endif  // !SRC_UTILS_DX_PROXY_FILEMEMCACHE_H_
+#endif  // !SE_UTILS_DX_PROXY_FILEMEMCACHE_H_

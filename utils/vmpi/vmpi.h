@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_VMPI_H_
-#define SRC_UTILS_VMPI_VMPI_H_
+#ifndef SE_UTILS_VMPI_VMPI_H_
+#define SE_UTILS_VMPI_VMPI_H_
 
 #include "vmpi_defs.h"
 #include "messbuf.h"
@@ -210,4 +210,4 @@ bool VMPI_IsParamUsed(EVMPICmdLineParam eParam);
 // automatically restart the process.
 bool VMPI_HandleAutoRestart();
 
-#endif  // !SRC_UTILS_VMPI_VMPI_H_
+#endif  // !SE_UTILS_VMPI_VMPI_H_

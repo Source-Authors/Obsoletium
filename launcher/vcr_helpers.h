@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_VCR_HELPERS_H
-#define SRC_LAUNCHER_VCR_HELPERS_H
+#ifndef SE_LAUNCHER_VCR_HELPERS_H
+#define SE_LAUNCHER_VCR_HELPERS_H
 
 #include <tuple>
 
@@ -21,4 +21,4 @@ struct VCRHelpers : public IVCRHelpers {
 
 }  // namespace se::launcher
 
-#endif  // SRC_LAUNCHER_VCR_HELPERS_H
+#endif  // SE_LAUNCHER_VCR_HELPERS_H

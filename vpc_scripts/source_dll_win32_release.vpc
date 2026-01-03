@@ -317,7 +317,7 @@ $Configuration "Release"
 	$Resources
 	{
 		// General
-		$PreprocessorDefinitions			"$BASE;NDEBUG;SRC_PRODUCT_INTERNAL_NAME_STRING=\$QUOTE$(TargetName)\$QUOTE;SRC_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTE$(TargetFileName)\$QUOTE;%(PreprocessorDefinitions)"
+		$PreprocessorDefinitions			"$BASE;NDEBUG;SE_PRODUCT_INTERNAL_NAME_STRING=\$QUOTE$(TargetName)\$QUOTE;SE_PRODUCT_ORIGINAL_NAME_STRING=\$QUOTE$(TargetFileName)\$QUOTE;%(PreprocessorDefinitions)"
 		$Culture							"English (United States) (0x409)"
 		$AdditionalIncludeDirectories		"$(SolutionDir)out\build"
 		$IgnoreStandardIncludePath

@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_RESOURCE_LISTING_H
-#define SRC_LAUNCHER_RESOURCE_LISTING_H
+#ifndef SE_LAUNCHER_RESOURCE_LISTING_H
+#define SE_LAUNCHER_RESOURCE_LISTING_H
 
 #include <memory>
 #include "tier0/icommandline.h"
@@ -28,4 +28,4 @@ void SortResourceListing(IFileSystem *file_system, const char *file_name,
 
 }  // namespace se::launcher
 
-#endif  // SRC_LAUNCHER_RESOURCE_LISTING_H
+#endif  // SE_LAUNCHER_RESOURCE_LISTING_H

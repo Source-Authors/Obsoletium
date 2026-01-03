@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_PUBLIC_ISHADERCOMPILEDLL_H_
-#define SRC_PUBLIC_ISHADERCOMPILEDLL_H_
+#ifndef SE_PUBLIC_ISHADERCOMPILEDLL_H_
+#define SE_PUBLIC_ISHADERCOMPILEDLL_H_
 
 #include "tier1/interface.h"
 
@@ -16,4 +16,4 @@ abstract_class IShaderCompileDLL {
   virtual int main(int argc, char **argv) = 0;
 };
 
-#endif  // !SRC_PUBLIC_ISHADERCOMPILEDLL_H_
+#endif  // !SE_PUBLIC_ISHADERCOMPILEDLL_H_

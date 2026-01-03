@@ -9,13 +9,13 @@
 #include <D3DX9Shader.h>
 
 #ifdef DX_PROXY_EXPORTS
-#define SRC_DX_PROXY_API extern "C" __declspec(dllexport)
+#define SE_DX_PROXY_API extern "C" __declspec(dllexport)
 #else
-#define SRC_DX_PROXY_API extern "C" __declspec(dllexport)
+#define SE_DX_PROXY_API extern "C" __declspec(dllimport)
 #endif
 
 // Aux function prototype
-SRC_DX_PROXY_API const char* WINAPI GetDllVersion();
+SE_DX_PROXY_API const char* WINAPI GetDllVersion();
 
 // DX9_V00_PC
 //
@@ -77,7 +77,7 @@ BOOL WINAPI DllMain(HMODULE module, DWORD reason, void*) {
 }
 
 // Obtain DLL version
-SRC_DX_PROXY_API const char* WINAPI GetDllVersionLong() {
+SE_DX_PROXY_API const char* WINAPI GetDllVersionLong() {
 #if defined(DX9_V00_PC) && defined(_DEBUG)
   return "{DX_PROXY for DX9_V00_PC DEBUG}";
 #endif
@@ -103,7 +103,7 @@ SRC_DX_PROXY_API const char* WINAPI GetDllVersionLong() {
 #endif
 }
 
-SRC_DX_PROXY_API const char* WINAPI GetDllVersion() {
+SE_DX_PROXY_API const char* WINAPI GetDllVersion() {
 #if defined(DX9_V00_PC) && defined(_DEBUG)
   return "DXPRX_DX9_V00_PC_d";
 #endif
@@ -289,7 +289,7 @@ bool IsTargetEqual(const char* target, const char* expected) noexcept {
 #endif  // defined(DX9_V00_PC) || defined(DX9_V30_PC)
 
 // Proxied routines
-SRC_DX_PROXY_API HRESULT WINAPI Proxy_D3DCompileFromFile(
+SE_DX_PROXY_API HRESULT WINAPI Proxy_D3DCompileFromFile(
     LPCSTR pFileName, CONST D3D_SHADER_MACRO* pDefines, ID3DInclude* include,
     LPCSTR pEntrypoint, LPCSTR pTarget, UINT Flags1, UINT Flags2,
     ID3DBlob** ppCode, ID3DBlob** ppErrorMsgs) {

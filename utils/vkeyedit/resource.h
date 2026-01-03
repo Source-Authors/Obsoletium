@@ -5,10 +5,10 @@
 // Used by vkeyedit.rc
 //
 #define IDD_ABOUTBOX                    100
-#define SRC_IDI_APP_MAIN                128
+#define SE_IDI_APP_MAIN                 128
 #define ID_FILE_OPEN_TITLE              129
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "Valve KeyValue Editor"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING "Valve KeyValue Editor"
 
 // Next default values for new objects
 // 

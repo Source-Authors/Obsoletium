@@ -95,14 +95,14 @@ int main(int argc, char *argv[]) {
 
   const source::ScopedDll tier0{"libtier0" DLL_EXT_STRING, RTLD_NOW};
   if (!tier0) {
-    fprintf(stderr, "Failed to open %s: %s\n", "libtier0" DLL_EXT_STRING,
+    fprintf(stderr, "open %s failed: %s\n", "libtier0" DLL_EXT_STRING,
             ::dlerror());
     return 1;
   }
 
   const source::ScopedDll vstdlib{"libvstdlib" DLL_EXT_STRING, RTLD_NOW};
   if (!vstdlib) {
-    fprintf(stderr, "Failed to open %s: %s\n", "libvstdlib" DLL_EXT_STRING,
+    fprintf(stderr, "open %s failed: %s\n", "libvstdlib" DLL_EXT_STRING,
             ::dlerror());
     return 2;
   }
@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
   constexpr char dedicated_name[]{"dedicated" DLL_EXT_STRING};
   const source::ScopedDll dedicated{dedicated_name, RTLD_NOW};
   if (!dedicated) {
-    fprintf(stderr, "Failed to open %s: %s\n", dedicated_name, ::dlerror());
+    fprintf(stderr, "open %s failed: %s\n", dedicated_name, ::dlerror());
     return 3;
   }
 

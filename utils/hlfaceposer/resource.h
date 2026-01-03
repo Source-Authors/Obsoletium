@@ -137,7 +137,7 @@
 #define IDC_FP_PROGRESS_PERCENT2        1096
 #define IDC_FP_PROGRESS_ETA             1096
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "Valve Face Poser GUI"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING   "Valve Face Poser GUI"
 
 // Next default values for new objects
 // 

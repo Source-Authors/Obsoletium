@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_MATERIALSYSTEM_SHADERAPIDX11_MESH_DX11_H_
-#define SRC_MATERIALSYSTEM_SHADERAPIDX11_MESH_DX11_H_
+#ifndef SE_MATERIALSYSTEM_SHADERAPIDX11_MESH_DX11_H_
+#define SE_MATERIALSYSTEM_SHADERAPIDX11_MESH_DX11_H_
 
 #include "meshbase.h"
 #include "shaderapi/IShaderDevice.h"
@@ -269,4 +269,4 @@ class CMeshDx11 final : public CMeshBase {
 
 }  // namespace se::shaderapidx11
 
-#endif  // !SRC_MATERIALSYSTEM_SHADERAPIDX11_MESH_DX11_H_
+#endif  // !SE_MATERIALSYSTEM_SHADERAPIDX11_MESH_DX11_H_

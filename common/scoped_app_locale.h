@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_COMMON_SCOPED_APP_LOCALE_H_
-#define SRC_COMMON_SCOPED_APP_LOCALE_H_
+#ifndef SE_COMMON_SCOPED_APP_LOCALE_H_
+#define SE_COMMON_SCOPED_APP_LOCALE_H_
 
 #include <clocale>
 #include <string>
@@ -49,4 +49,4 @@ class ScopedAppLocale {
 
 }  // namespace se
 
-#endif  // SRC_COMMON_SCOPED_APP_LOCALE_H_
+#endif  // SE_COMMON_SCOPED_APP_LOCALE_H_

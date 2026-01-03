@@ -10,7 +10,7 @@
 #include "vaudio/ivaudio.h"
 #include "tier0/dbg.h"
 
-#ifndef SRC_USE_MILES_MP3
+#ifndef SE_USE_MILES_MP3
 // Strip MP1 / MP2 to reduce attack surface.
 #define MINIMP3_ONLY_MP3
 // Saves some code bytes, and enforces non-standard but
@@ -29,7 +29,7 @@
 // dimhotepus: Miles MP3 decoder changed AudioStreamEventCB callback signature around 9.0+ version.
 // We have no modern MSS headers, so use open-source minimp3 decoder.
 
-#ifdef SRC_USE_MILES_MP3
+#ifdef SE_USE_MILES_MP3
 
 static S32 AILCALLBACK AudioStreamEventCB( UINTa user, void *dest, S32 bytes_requested, S32 offset )
 {
@@ -404,7 +404,7 @@ public:
 
 	IAudioStream *CreateMP3StreamDecoder( IAudioStreamEvent *pEventHandler ) override
 	{
-#ifdef SRC_USE_MILES_MP3
+#ifdef SE_USE_MILES_MP3
 		CMilesMP3 *pMP3 = new CMilesMP3;
 		if ( !pMP3->Init( pEventHandler ) )
 		{

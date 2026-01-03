@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_COMMON_THREADS_H_
-#define SRC_UTILS_COMMON_THREADS_H_
+#ifndef SE_UTILS_COMMON_THREADS_H_
+#define SE_UTILS_COMMON_THREADS_H_
 
 #include "vstdlib/jobthread.h"
 
@@ -79,4 +79,4 @@ class ScopedThreadsLock {
   }
 #endif
 
-#endif  // !SRC_UTILS_COMMON_THREADS_H_
+#endif  // !SE_UTILS_COMMON_THREADS_H_

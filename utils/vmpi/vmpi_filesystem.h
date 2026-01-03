@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_VMPI_FILESYSTEM_H_
-#define SRC_UTILS_VMPI_VMPI_FILESYSTEM_H_
+#ifndef SE_UTILS_VMPI_VMPI_FILESYSTEM_H_
+#define SE_UTILS_VMPI_VMPI_FILESYSTEM_H_
 
 #include "tier1/interface.h"
 
@@ -46,4 +46,4 @@ CreateInterfaceFn VMPI_FileSystem_GetFactory();
 void VMPI_FileSystem_CreateVirtualFile(const char *pFilename, const void *pData,
                                        unsigned long fileLength);
 
-#endif  // !SRC_UTILS_VMPI_VMPI_FILESYSTEM_H_
+#endif  // !SE_UTILS_VMPI_VMPI_FILESYSTEM_H_

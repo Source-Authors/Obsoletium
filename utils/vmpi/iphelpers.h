@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_IPHELPERS_H_
-#define SRC_UTILS_VMPI_IPHELPERS_H_
+#ifndef SE_UTILS_VMPI_IPHELPERS_H_
+#define SE_UTILS_VMPI_IPHELPERS_H_
 
 #include <cstdint>
 
@@ -125,4 +125,4 @@ bool ConvertIPAddrToString(const IpV4 *pIn, char *pOut, int outLen);
 void SockAddrToIPAddr(const struct sockaddr_in *pIn, IpV4 *pOut);
 void IPAddrToSockAddr(const IpV4 *pIn, struct sockaddr_in *pOut);
 
-#endif  // !SRC_UTILS_VMPI_IPHELPERS_H_
+#endif  // !SE_UTILS_VMPI_IPHELPERS_H_

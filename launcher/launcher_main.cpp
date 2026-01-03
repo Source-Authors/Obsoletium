@@ -318,26 +318,26 @@ void DumpAppInformation(
 #ifdef __GLIBCXX__
   Msg("%s v.%s build with %s on glibc v.%u.%u [compiled], %s [runtime]. "
       "glibc++ v.%u, ABI v.%u.\n",
-      SRC_PRODUCT_FILE_DESCRIPTION_STRING, SRC_PRODUCT_FILE_VERSION_INFO_STRING,
+      SE_PRODUCT_FILE_DESCRIPTION_STRING, SE_PRODUCT_FILE_VERSION_INFO_STRING,
       kCompilerVersion.c_str(), __GLIBC__, __GLIBC_MINOR__,
       gnu_get_libc_version(), _GLIBCXX_RELEASE, __GLIBCXX__);
 #endif
 
 #ifdef _LIBCPP_VERSION
   Msg("%s v.%s build with %s on libc++ v.%u, ABI v.%u.\n",
-      SRC_PRODUCT_FILE_DESCRIPTION_STRING, SRC_PRODUCT_FILE_VERSION_INFO_STRING,
+      SE_PRODUCT_FILE_DESCRIPTION_STRING, SE_PRODUCT_FILE_VERSION_INFO_STRING,
       kCompilerVersion.c_str(), _LIBCPP_VERSION, _LIBCPP_ABI_VERSION);
 #endif
 #endif  // POSIX
 
 #ifdef _WIN32
-  Msg("%s v.%s build with MSVC %u.%u\n", SRC_PRODUCT_FILE_DESCRIPTION_STRING,
-      SRC_PRODUCT_FILE_VERSION_INFO_STRING, _MSC_FULL_VER, _MSC_BUILD);
+  Msg("%s v.%s build with MSVC %u.%u\n", SE_PRODUCT_FILE_DESCRIPTION_STRING,
+      SE_PRODUCT_FILE_VERSION_INFO_STRING, _MSC_FULL_VER, _MSC_BUILD);
   Msg("%s started with command line '%s'\n",
-      SRC_PRODUCT_FILE_DESCRIPTION_STRING, cmd_line);
+      SE_PRODUCT_FILE_DESCRIPTION_STRING, cmd_line);
 #else
   Msg("%s started with command line args:\n",
-      SRC_PRODUCT_FILE_DESCRIPTION_STRING);
+      SE_PRODUCT_FILE_DESCRIPTION_STRING);
   for (int i{0}; i < argc; ++i) {
     Msg("  %s\n", argv[i]);
   }
@@ -345,7 +345,7 @@ void DumpAppInformation(
 
 #ifdef __SANITIZE_ADDRESS__
   Msg("%s running under AddressSanitizer.\n",
-      SRC_PRODUCT_FILE_DESCRIPTION_STRING);
+      SE_PRODUCT_FILE_DESCRIPTION_STRING);
 #endif
 }
 

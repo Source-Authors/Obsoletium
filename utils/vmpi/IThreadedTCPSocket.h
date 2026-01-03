@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_ITHREADEDTCPSOCKET_H_
-#define SRC_UTILS_VMPI_ITHREADEDTCPSOCKET_H_
+#ifndef SE_UTILS_VMPI_ITHREADEDTCPSOCKET_H_
+#define SE_UTILS_VMPI_ITHREADEDTCPSOCKET_H_
 
 #include "iphelpers.h"
 
@@ -149,4 +149,4 @@ void ThreadedTCP_EnableTimeouts(bool bEnable);
 void ThreadedTCP_SetTCPSocketThreadPriorities(
     bool bSetTCPSocketThreadPriorities);
 
-#endif  // !SRC_UTILS_VMPI_ITHREADEDTCPSOCKET_H_
+#endif  // !SE_UTILS_VMPI_ITHREADEDTCPSOCKET_H_

@@ -2,8 +2,8 @@
 //
 // Purpose: A redirection tool that allows the DLLs to reside elsewhere.
 
-#ifndef SRC_COMMON_SCOPED_DLL_H_
-#define SRC_COMMON_SCOPED_DLL_H_
+#ifndef SE_COMMON_SCOPED_DLL_H_
+#define SE_COMMON_SCOPED_DLL_H_
 
 #include <type_traits>
 #include <system_error>
@@ -142,4 +142,4 @@ class ScopedDll {
 
 }  // namespace source
 
-#endif  // !SRC_COMMON_SCOPED_DLL_H_
+#endif  // !SE_COMMON_SCOPED_DLL_H_

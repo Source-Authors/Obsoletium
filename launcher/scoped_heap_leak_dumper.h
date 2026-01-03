@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_SCOPED_HEAP_LEAK_DUMPER_H
-#define SRC_LAUNCHER_SCOPED_HEAP_LEAK_DUMPER_H
+#ifndef SE_LAUNCHER_SCOPED_HEAP_LEAK_DUMPER_H
+#define SE_LAUNCHER_SCOPED_HEAP_LEAK_DUMPER_H
 
 #include "tier0/memalloc.h"
 #include "tier0/dbg.h"
@@ -29,4 +29,4 @@ class ScopedHeapLeakDumper {
 
 }  // namespace se::launcher
 
-#endif  // SRC_LAUNCHER_SCOPED_HEAP_LEAK_DUMPER_H
+#endif  // SE_LAUNCHER_SCOPED_HEAP_LEAK_DUMPER_H

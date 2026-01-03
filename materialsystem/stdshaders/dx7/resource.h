@@ -1,3 +1,3 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "Standard Shaders Collection for DirectX 7.0 capable GPUs"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING   "Standard Shaders Collection for DirectX 7.0 capable GPUs"

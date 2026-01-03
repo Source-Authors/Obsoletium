@@ -2,8 +2,8 @@
 //
 // Tools minidump stuff.
 
-#ifndef SRC_UTILS_COMMON_TOOLS_MINIDUMP_H_
-#define SRC_UTILS_COMMON_TOOLS_MINIDUMP_H_
+#ifndef SE_UTILS_COMMON_TOOLS_MINIDUMP_H_
+#define SE_UTILS_COMMON_TOOLS_MINIDUMP_H_
 
 namespace se::utils::common {
 
@@ -77,4 +77,4 @@ class ScopedDefaultMinidumpHandler {
 
 }  // namespace se::utils::common
 
-#endif  // !SRC_UTILS_COMMON_TOOLS_MINIDUMP_H_
+#endif  // !SE_UTILS_COMMON_TOOLS_MINIDUMP_H_

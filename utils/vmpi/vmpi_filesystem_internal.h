@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_VMPI_FILESYSTEM_INTERNAL_H_
-#define SRC_UTILS_VMPI_VMPI_FILESYSTEM_INTERNAL_H_
+#ifndef SE_UTILS_VMPI_VMPI_FILESYSTEM_INTERNAL_H_
+#define SE_UTILS_VMPI_VMPI_FILESYSTEM_INTERNAL_H_
 
 #include "vmpi_filesystem.h"
 #include "filesystem.h"
@@ -112,4 +112,4 @@ inline int VMPI_GetChunkPayloadSize() {
 extern bool g_bDisableFileAccess;
 extern CBaseVMPIFileSystem *g_pBaseVMPIFileSystem;
 
-#endif  // SRC_UTILS_VMPI_VMPI_FILESYSTEM_INTERNAL_H_
+#endif  // SE_UTILS_VMPI_VMPI_FILESYSTEM_INTERNAL_H_

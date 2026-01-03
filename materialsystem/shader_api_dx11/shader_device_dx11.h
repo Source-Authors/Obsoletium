@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_MATERIALSYSTEM_SHADERAPIDX11_SHADER_DEVICE_DX11_H_
-#define SRC_MATERIALSYSTEM_SHADERAPIDX11_SHADER_DEVICE_DX11_H_
+#ifndef SE_MATERIALSYSTEM_SHADERAPIDX11_SHADER_DEVICE_DX11_H_
+#define SE_MATERIALSYSTEM_SHADERAPIDX11_SHADER_DEVICE_DX11_H_
 
 #include "tier1/utlvector.h"
 #include "tier1/utlrbtree.h"
@@ -332,4 +332,4 @@ inline void SetDebugName(ID3D11DeviceChild *child, const char (&name)[size]) {
 
 }  // namespace se::shaderapidx11
 
-#endif  // !SRC_MATERIALSYSTEM_SHADERAPIDX11_SHADER_DEVICE_DX11_H_
+#endif  // !SE_MATERIALSYSTEM_SHADERAPIDX11_SHADER_DEVICE_DX11_H_

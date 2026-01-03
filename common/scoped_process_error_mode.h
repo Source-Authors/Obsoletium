@@ -1,8 +1,8 @@
 // Copyright Valve Corporation, All rights reserved.
 //
 
-#ifndef SRC_COMMON_SCOPED_PROCESS_ERROR_MODE_H_
-#define SRC_COMMON_SCOPED_PROCESS_ERROR_MODE_H_
+#ifndef SE_COMMON_SCOPED_PROCESS_ERROR_MODE_H_
+#define SE_COMMON_SCOPED_PROCESS_ERROR_MODE_H_
 
 #ifdef _WIN32
 
@@ -42,4 +42,4 @@ class ScopedProcessErrorMode {
 
 }  // namespace source
 
-#endif  // !SRC_COMMON_SCOPED_PROCESS_ERROR_MODE_H_
+#endif  // !SE_COMMON_SCOPED_PROCESS_ERROR_MODE_H_

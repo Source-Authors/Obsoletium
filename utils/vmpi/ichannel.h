@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_ICHANNEL_H_
-#define SRC_UTILS_VMPI_ICHANNEL_H_
+#ifndef SE_UTILS_VMPI_ICHANNEL_H_
+#define SE_UTILS_VMPI_ICHANNEL_H_
 
 #include "tier0/basetypes.h"
 #include "tier1/utlvector.h"
@@ -38,4 +38,4 @@ struct IChannel {
   virtual void GetDisconnectReason(CUtlVector<char> &reason) = 0;
 };
 
-#endif  // !SRC_UTILS_VMPI_ICHANNEL_H_
+#endif  // !SE_UTILS_VMPI_ICHANNEL_H_

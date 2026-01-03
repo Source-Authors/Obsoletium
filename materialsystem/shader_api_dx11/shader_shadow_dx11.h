@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_MATERIALSYSTEM_SHADERAPIDX11_SHADER_SHADOW_DX11_H_
-#define SRC_MATERIALSYSTEM_SHADERAPIDX11_SHADER_SHADOW_DX11_H_
+#ifndef SE_MATERIALSYSTEM_SHADERAPIDX11_SHADER_SHADOW_DX11_H_
+#define SE_MATERIALSYSTEM_SHADERAPIDX11_SHADER_SHADOW_DX11_H_
 
 #include "shaderapi/ishaderapi.h"
 #include "shaderapi/ishadershadow.h"
@@ -136,4 +136,4 @@ extern CShaderShadowDx11* g_pShaderShadowDx11;
 
 }  // namespace se::shaderapidx11
 
-#endif  // !SRC_MATERIALSYSTEM_SHADERAPIDX11_SHADER_SHADOW_DX11_H_
+#endif  // !SE_MATERIALSYSTEM_SHADERAPIDX11_SHADER_SHADOW_DX11_H_

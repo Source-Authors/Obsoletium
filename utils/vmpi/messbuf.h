@@ -4,8 +4,8 @@
 // MessageBuffer - handy for packing and upacking structures to be sent as
 // messages.
 
-#ifndef SRC_UTILS_VMPI_MESSAGEBUFFER_H_
-#define SRC_UTILS_VMPI_MESSAGEBUFFER_H_
+#ifndef SE_UTILS_VMPI_MESSAGEBUFFER_H_
+#define SE_UTILS_VMPI_MESSAGEBUFFER_H_
 
 #include <cstdio>
 
@@ -46,4 +46,4 @@ class MessageBuffer {
   ptrdiff_t len;
 };
 
-#endif  // !SRC_UTILS_VMPI_MESSAGEBUFFER_H_
+#endif  // !SE_UTILS_VMPI_MESSAGEBUFFER_H_

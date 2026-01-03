@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_COLOR_H_
-#define SRC_COLOR_H_
+#ifndef SE_COLOR_H_
+#define SE_COLOR_H_
 
 #include <utility>
 #include "tier0/dbg.h"
@@ -134,4 +134,4 @@ struct colorVec
 	unsigned r, g, b, a;
 };
 
-#endif  // !SRC_COLOR_H_
+#endif  // !SE_COLOR_H_

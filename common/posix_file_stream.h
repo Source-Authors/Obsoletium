@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_POSIX_FILE_STREAM_H_
-#define SRC_POSIX_FILE_STREAM_H_
+#ifndef SE_POSIX_FILE_STREAM_H_
+#define SE_POSIX_FILE_STREAM_H_
 
 #include <sys/stat.h>
 
@@ -356,4 +356,4 @@ class posix_file_stream_factory {
 
 }  // namespace se::posix
 
-#endif  // !SRC_POSIX_FILE_STREAM_H_
+#endif  // !SE_POSIX_FILE_STREAM_H_

@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_BOOT_APP_SYSTEM_GROUP_H
-#define SRC_LAUNCHER_BOOT_APP_SYSTEM_GROUP_H
+#ifndef SE_LAUNCHER_BOOT_APP_SYSTEM_GROUP_H
+#define SE_LAUNCHER_BOOT_APP_SYSTEM_GROUP_H
 
 #include <memory>
 
@@ -56,4 +56,4 @@ class BootAppSystemGroup : public CSteamAppSystemGroup {
 
 }  // namespace se::launcher
 
-#endif  // SRC_LAUNCHER_BOOT_APP_SYSTEM_GROUP_H
+#endif  // SE_LAUNCHER_BOOT_APP_SYSTEM_GROUP_H

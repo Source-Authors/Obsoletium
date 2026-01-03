@@ -66,8 +66,8 @@
 #define IDC_LOWER_LEFT_LID_LOWERED_LABEL 1048
 
 
-#define SRC_IDI_APP_MAIN 101
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "Valve Model Eyes Editor"
+#define SE_IDI_APP_MAIN 101
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING   "Valve Model Eyes Editor"
 
 // Next default values for new objects
 // 

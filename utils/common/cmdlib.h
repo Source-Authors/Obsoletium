@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_COMMON_CMDLIB_H_
-#define SRC_UTILS_COMMON_CMDLIB_H_
+#ifndef SE_UTILS_COMMON_CMDLIB_H_
+#define SE_UTILS_COMMON_CMDLIB_H_
 
 #include "tier0/basetypes.h"
 
@@ -170,4 +170,4 @@ struct cblock_t {
   int count;
 };
 
-#endif  // SRC_UTILS_COMMON_CMDLIB_H_
+#endif  // SE_UTILS_COMMON_CMDLIB_H_

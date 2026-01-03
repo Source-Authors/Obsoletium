@@ -2,8 +2,8 @@
 //
 // Hashed intrusive linked list.
 
-#ifndef SRC_UTILS_SHADERCOMPILE_UTLNODEHASH_H_
-#define SRC_UTILS_SHADERCOMPILE_UTLNODEHASH_H_
+#ifndef SE_UTILS_SHADERCOMPILE_UTLNODEHASH_H_
+#define SE_UTILS_SHADERCOMPILE_UTLNODEHASH_H_
 
 #include "tier1/utlmemory.h"
 #include "tier1/utlintrusivelist.h"
@@ -69,4 +69,4 @@ class CUtlNodeHash {
   intp m_nNumNodes;
 };
 
-#endif  // !SRC_UTILS_SHADERCOMPILE_UTLNODEHASH_H_
+#endif  // !SE_UTILS_SHADERCOMPILE_UTLNODEHASH_H_

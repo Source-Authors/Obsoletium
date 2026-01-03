@@ -2,8 +2,8 @@
 //
 // Make dynamic loading of dx_proxy.dll and methods acquisition easier.
 
-#ifndef SRC_COMMON_DX_PROXY_H_
-#define SRC_COMMON_DX_PROXY_H_
+#ifndef SE_COMMON_DX_PROXY_H_
+#define SE_COMMON_DX_PROXY_H_
 
 #include "tier0/commonmacros.h"
 #include "winlite.h"
@@ -108,4 +108,4 @@ inline HRESULT DxProxyModule::D3DCompileFromFile(
 
 }  // namespace se::dx_proxy
 
-#endif  // !SRC_COMMON_DX_PROXY_H_
+#endif  // !SE_COMMON_DX_PROXY_H_

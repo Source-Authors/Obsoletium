@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_
-#define SRC_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_
+#ifndef SE_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_
+#define SE_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_
 
 #include <cstdio>   // FILE
 #include <cstdint>  // uint64_t
@@ -79,4 +79,4 @@ void Combo_Free(ComboHandle &combo_free);
 
 };  // namespace se::shader_compile::shader_combo_processor
 
-#endif  //  !SRC_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_
+#endif  //  !SE_UTILS_SHADERCOMPILE_CFGPROCESSOR_H_

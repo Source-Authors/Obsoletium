@@ -1360,7 +1360,7 @@
 #define ID_VIEW_MANIFEST_BAR            0xE811
 #define ID_HDR                          0xf000
 #define IDC_LPRVWINDOW                  0xf010
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "Hammer World Editor Computation Kernel"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING "Hammer World Editor Computation Kernel"
 
 // Next default values for new objects
 // 

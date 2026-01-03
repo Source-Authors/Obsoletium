@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_ITCPSOCKET_H_
-#define SRC_UTILS_VMPI_ITCPSOCKET_H_
+#ifndef SE_UTILS_VMPI_ITCPSOCKET_H_
+#define SE_UTILS_VMPI_ITCPSOCKET_H_
 
 #include "ichannel.h"
 #include "iphelpers.h"
@@ -67,4 +67,4 @@ ITCPListenSocket *CreateTCPListenSocket(const unsigned short port,
 // By default, timeouts are on. It's helpful to turn them off during debugging.
 void TCPSocket_EnableTimeout(bool bEnable);
 
-#endif  // !SRC_UTILS_VMPI_ITCPSOCKET_H_
+#endif  // !SE_UTILS_VMPI_ITCPSOCKET_H_

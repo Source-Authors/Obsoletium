@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_FILESYSTEM_HELPERS_H_
-#define SRC_FILESYSTEM_HELPERS_H_
+#ifndef SE_FILESYSTEM_HELPERS_H_
+#define SE_FILESYSTEM_HELPERS_H_
 
 #include "tier0/annotations.h"
 
@@ -28,4 +28,4 @@ char* ParseFile( char* pFileBytes, OUT_Z_ARRAY char (&pTokenOut)[count], bool* p
 	return const_cast<char*>( ParseFileInternal( pFileBytes, pTokenOut, pWasQuoted, nullptr, count ) );
 }
 
-#endif // FILESYSTEM_HELPERS_H
+#endif  // SE_FILESYSTEM_HELPERS_H_

@@ -65,14 +65,14 @@ END
 // Bitmap
 //
 
-SRC_IDI_APP_MAIN           BITMAP  MOVEABLE PURE   "resources\\Toolbar.bmp"
+SE_IDI_APP_MAIN           BITMAP  MOVEABLE PURE   "resources\\Toolbar.bmp"
 
 /////////////////////////////////////////////////////////////////////////////
 //
 // Toolbar
 //
 
-SRC_IDI_APP_MAIN TOOLBAR DISCARDABLE 16,
+SE_IDI_APP_MAIN TOOLBAR DISCARDABLE 16,
     15 BEGIN
     BUTTON      ID_FILE_NEW
     BUTTON      ID_FILE_OPEN
@@ -93,7 +93,7 @@ END
 // Menu
 //
 
-SRC_IDI_APP_MAIN MENU PRELOAD DISCARDABLE 
+SE_IDI_APP_MAIN MENU PRELOAD DISCARDABLE 
 BEGIN
     POPUP "&File"
     BEGIN
@@ -135,7 +135,7 @@ END
 // Accelerator
 //
 
-SRC_IDI_APP_MAIN ACCELERATORS PRELOAD MOVEABLE PURE 
+SE_IDI_APP_MAIN ACCELERATORS PRELOAD MOVEABLE PURE 
 BEGIN
     "N",            ID_FILE_NEW,            VIRTKEY, CONTROL
     "O",            ID_FILE_OPEN,           VIRTKEY, CONTROL

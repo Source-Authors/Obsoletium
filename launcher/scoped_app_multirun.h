@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_SCOPED_APP_MULTIRUN_H
-#define SRC_LAUNCHER_SCOPED_APP_MULTIRUN_H
+#ifndef SE_LAUNCHER_SCOPED_APP_MULTIRUN_H
+#define SE_LAUNCHER_SCOPED_APP_MULTIRUN_H
 
 #ifdef _WIN32
 #include <sal.h>
@@ -195,4 +195,4 @@ class ScopedAppMultiRun {
 
 }  // namespace se::launcher
 
-#endif  // SRC_LAUNCHER_SCOPED_APP_MULTIRUN_H
+#endif  // SE_LAUNCHER_SCOPED_APP_MULTIRUN_H

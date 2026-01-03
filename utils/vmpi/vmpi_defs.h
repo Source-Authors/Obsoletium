@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_VMPI_DEFS_H_
-#define SRC_UTILS_VMPI_VMPI_DEFS_H_
+#ifndef SE_UTILS_VMPI_VMPI_DEFS_H_
+#define SE_UTILS_VMPI_VMPI_DEFS_H_
 
 // This goes in front of all packets.
 constexpr inline unsigned char VMPI_PROTOCOL_VERSION{5};
@@ -136,4 +136,4 @@ enum VmpiState {
   VMPI_STATE_DOWNLOADING = 5
 };
 
-#endif  // !SRC_UTILS_VMPI_VMPI_DEFS_H_
+#endif  // !SE_UTILS_VMPI_VMPI_DEFS_H_

@@ -4,7 +4,7 @@
 // Used by FileSystemOpenDialog.rc
 //
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "File System Open Dialog"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING "File System Open Dialog"
 
 #define IDS_NO_RELATIVE_PATH            1
 #define IDD_FILESYSTEM_OPENDIALOG       327

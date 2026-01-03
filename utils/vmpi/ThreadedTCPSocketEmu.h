@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_THREADEDTCPSOCKETEMU_H_
-#define SRC_UTILS_VMPI_THREADEDTCPSOCKETEMU_H_
+#ifndef SE_UTILS_VMPI_THREADEDTCPSOCKETEMU_H_
+#define SE_UTILS_VMPI_THREADEDTCPSOCKETEMU_H_
 
 #include "tcpsocket.h"
 
@@ -14,4 +14,4 @@ ITCPSocket* CreateTCPSocketEmu();
 ITCPListenSocket* CreateTCPListenSocketEmu(const unsigned short port,
                                            int nQueueLength = -1);
 
-#endif  // !SRC_UTILS_VMPI_THREADEDTCPSOCKETEMU_H_
+#endif  // !SE_UTILS_VMPI_THREADEDTCPSOCKETEMU_H_

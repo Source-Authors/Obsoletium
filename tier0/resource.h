@@ -1,6 +1,6 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "Low-level Operating System Abstractions"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING   "Low-level Operating System Abstractions"
 
 #define IDD_ASSERT_DIALOG                     101
 #define IDC_FILENAME_CONTROL                  1000

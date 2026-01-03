@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_LAUNCHER_SCOPED_APP_RELAUNCH_H
-#define SRC_LAUNCHER_SCOPED_APP_RELAUNCH_H
+#ifndef SE_LAUNCHER_SCOPED_APP_RELAUNCH_H
+#define SE_LAUNCHER_SCOPED_APP_RELAUNCH_H
 
 #ifdef _WIN32
 #include <winerror.h>
@@ -96,4 +96,4 @@ class ScopedAppRelaunch {
 
 }  // namespace se::launcher
 
-#endif  // SRC_LAUNCHER_SCOPED_APP_RELAUNCH_H
+#endif  // SE_LAUNCHER_SCOPED_APP_RELAUNCH_H

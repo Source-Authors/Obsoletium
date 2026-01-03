@@ -5,7 +5,7 @@
 // Used by sptconvert.rc
 //
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "SpeedTree *.spt to Valve *.smd Converter"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING "SpeedTree *.spt to Valve *.smd Converter"
 
 // Next default values for new objects
 // 

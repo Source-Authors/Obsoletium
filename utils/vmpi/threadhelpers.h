@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_VMPI_THREADHELPERS_H_
-#define SRC_UTILS_VMPI_THREADHELPERS_H_
+#ifndef SE_UTILS_VMPI_THREADHELPERS_H_
+#define SE_UTILS_VMPI_THREADHELPERS_H_
 
 #include "tier1/utllinkedlist.h"
 
@@ -84,4 +84,4 @@ class CEvent {
   void *m_hEvent;
 };
 
-#endif  // !SRC_UTILS_VMPI_THREADHELPERS_H_
+#endif  // !SE_UTILS_VMPI_THREADHELPERS_H_

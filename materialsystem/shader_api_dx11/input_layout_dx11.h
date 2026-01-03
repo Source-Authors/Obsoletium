@@ -1,7 +1,7 @@
 // Copyright Valve Corporation, All rights reserved.
 
-#ifndef SRC_MATERIALSYSTEM_SHADERAPIDX11_INPUT_LAYOUT_DX11_H_
-#define SRC_MATERIALSYSTEM_SHADERAPIDX11_INPUT_LAYOUT_DX11_H_
+#ifndef SE_MATERIALSYSTEM_SHADERAPIDX11_INPUT_LAYOUT_DX11_H_
+#define SE_MATERIALSYSTEM_SHADERAPIDX11_INPUT_LAYOUT_DX11_H_
 
 #include <cstddef>  // std::size_t
 #include <cstdint>
@@ -25,4 +25,4 @@ win::com::com_ptr<ID3D11InputLayout> CreateInputLayout(
 
 }  // namespace se::shaderapidx11
 
-#endif  // !SRC_MATERIALSYSTEM_SHADERAPIDX11_INPUT_LAYOUT_DX11_H_
+#endif  // !SE_MATERIALSYSTEM_SHADERAPIDX11_INPUT_LAYOUT_DX11_H_

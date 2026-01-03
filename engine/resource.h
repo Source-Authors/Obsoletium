@@ -1,6 +1,6 @@
 //========= Copyright Valve Corporation, All rights reserved. ============//
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING   "Orchestration Engine"
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING   "Orchestration Engine"
 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS

@@ -22,7 +22,7 @@
 #define IDS_VOICEINPUT                  16
 #define IDS_VOLUME                      17
 #define IDS_ENABLEGAIN                  18
-#define SRC_IDI_APP_MAIN                101
+#define SE_IDI_APP_MAIN                 101
 #define IDD_VOICE_TWEAK_DIALOG          102
 #define IDS_SPANISH_HELPTEXT            201
 #define IDS_SPANISH_ERROR               202
@@ -103,7 +103,7 @@
 #define IDC_VOICEINPUTFRAME             1005
 #define IDC_VOLUMELABEL                 1006
 
-#define SRC_PRODUCT_FILE_DESCRIPTION_STRING "Valve Voice Tweaker" 
+#define SE_PRODUCT_FILE_DESCRIPTION_STRING "Valve Voice Tweaker" 
 
 // Next default values for new objects
 // 

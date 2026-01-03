@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_PUBLIC_ILAUNCHABLEDLL_H_
-#define SRC_PUBLIC_ILAUNCHABLEDLL_H_
+#ifndef SE_PUBLIC_ILAUNCHABLEDLL_H_
+#define SE_PUBLIC_ILAUNCHABLEDLL_H_
 
 constexpr inline char LAUNCHABLE_DLL_INTERFACE_VERSION[]{"launchable_dll_1"};
 
@@ -14,4 +14,4 @@ struct ILaunchableDLL {
   virtual int main(int argc, char **argv) = 0;
 };
 
-#endif  // SRC_PUBLIC_ILAUNCHABLEDLL_H_
+#endif  // SE_PUBLIC_ILAUNCHABLEDLL_H_

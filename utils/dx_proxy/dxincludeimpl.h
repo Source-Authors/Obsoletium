@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_DX_PROXY_DXINCLUDEIMPL_H_
-#define SRC_UTILS_DX_PROXY_DXINCLUDEIMPL_H_
+#ifndef SE_UTILS_DX_PROXY_DXINCLUDEIMPL_H_
+#define SE_UTILS_DX_PROXY_DXINCLUDEIMPL_H_
 
 #include <d3dcompiler.h>
 
@@ -46,4 +46,4 @@ class D3DIncludeImpl : public ID3DInclude {
 
 }  // namespace se::dx_proxy
 
-#endif  // !SRC_UTILS_DX_PROXY_DXINCLUDEIMPL_H_
+#endif  // !SE_UTILS_DX_PROXY_DXINCLUDEIMPL_H_

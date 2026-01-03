@@ -510,55 +510,55 @@ constexpr T ClampedArrayElement(const T (&buffer)[N], size_t index) noexcept {
 /*
  * @brief Begins GCC / Clang warning override scope.
  */
-#define SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE() _Pragma("GCC diagnostic push")
+#define SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE() _Pragma("GCC diagnostic push")
 
 /*
  * @brief Disables GCC / Clang cast-function-type-mismatch.
  */
-#define SRC_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING() \
+#define SE_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING() \
   _Pragma("GCC diagnostic ignored \"-Wcast-function-type-mismatch\"")
 
 /*
  * @brief Disables GCC / Clang overloaded-virtual.
  */
-#define SRC_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING() \
+#define SE_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING() \
   _Pragma("GCC diagnostic ignored \"-Woverloaded-virtual\"")
 
 /*
  * @brief Disables GCC / Clang switch warning.
  */
-#define SRC_GCC_DISABLE_SWITCH_WARNING() \
+#define SE_GCC_DISABLE_SWITCH_WARNING() \
   _Pragma("GCC diagnostic ignored \"-Wswitch\"")
 
 /*
  * @brief Ends GCC / Clang warning override scope.
  */
-#define SRC_GCC_END_WARNING_OVERRIDE_SCOPE() _Pragma("GCC diagnostic pop")
+#define SE_GCC_END_WARNING_OVERRIDE_SCOPE() _Pragma("GCC diagnostic pop")
 #else
 /*
  * @brief Do nothing.
  */
-#define SRC_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
+#define SE_GCC_BEGIN_WARNING_OVERRIDE_SCOPE()
 
 /*
  * @brief Do nothing.
  */
-#define SRC_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING()
+#define SE_GCC_DISABLE_CAST_FUNCTION_TYPE_MISMATCH_WARNING()
 
 /*
  * @brief Do nothing.
  */
-#define SRC_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING()
+#define SE_GCC_DISABLE_OVERLOADED_VIRTUAL_WARNING()
 
 /*
  * @brief Do nothing.
  */
-#define SRC_GCC_DISABLE_SWITCH_WARNING()
+#define SE_GCC_DISABLE_SWITCH_WARNING()
 
 /*
  * @brief Do nothing.
  */
-#define SRC_GCC_END_WARNING_OVERRIDE_SCOPE()
+#define SE_GCC_END_WARNING_OVERRIDE_SCOPE()
 #endif
 
 #endif  // !SE_PUBLIC_TIER0_COMMONMACROS_H_

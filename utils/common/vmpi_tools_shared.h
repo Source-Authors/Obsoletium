@@ -2,8 +2,8 @@
 //
 //
 
-#ifndef SRC_UTILS_COMMON_VMPI_TOOLS_SHARED_H_
-#define SRC_UTILS_COMMON_VMPI_TOOLS_SHARED_H_
+#ifndef SE_UTILS_COMMON_VMPI_TOOLS_SHARED_H_
+#define SE_UTILS_COMMON_VMPI_TOOLS_SHARED_H_
 
 // Subpacket IDs.
 enum VmpiSubpacketId {
@@ -37,4 +37,4 @@ void VMPI_ExceptionFilter(unsigned long uCode, void *pvExceptionInfo);
 
 void HandleMPIDisconnect(int procID, const char *pReason);
 
-#endif  // !SRC_UTILS_COMMON_VMPI_TOOLS_SHARED_H_
+#endif  // !SE_UTILS_COMMON_VMPI_TOOLS_SHARED_H_

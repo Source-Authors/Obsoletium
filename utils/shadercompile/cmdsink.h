@@ -3,8 +3,8 @@
 // Purpose: Command sink interface implementation.
 //
 
-#ifndef SRC_UTILS_SHADERCOMPILE_CMDSINK_H_
-#define SRC_UTILS_SHADERCOMPILE_CMDSINK_H_
+#ifndef SE_UTILS_SHADERCOMPILE_CMDSINK_H_
+#define SE_UTILS_SHADERCOMPILE_CMDSINK_H_
 
 #include <cstdio>
 #include "tier1/utlbuffer.h"
@@ -96,4 +96,4 @@ struct CResponseError : public IResponse {
 
 };  // namespace se::shader_compile::command_sink
 
-#endif  // !SRC_UTILS_SHADERCOMPILE_CMDSINK_H_
+#endif  // !SE_UTILS_SHADERCOMPILE_CMDSINK_H_
