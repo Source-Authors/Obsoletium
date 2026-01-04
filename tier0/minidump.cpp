@@ -56,6 +56,8 @@ bool WriteMiniDumpUsingExceptionInfo(
 	if ( !hDbgHelpDll )
 		return false;
 
+	RunCodeAtScopeExit(::FreeLibrary(hDbgHelpDll));
+
 	bool bReturnValue = false;
 
 	auto pfnMiniDumpWrite =
@@ -193,8 +195,6 @@ bool WriteMiniDumpUsingExceptionInfo(
 			}
 		}
 	}
-
-	::FreeLibrary( hDbgHelpDll );
 
 	return bReturnValue;
 }
