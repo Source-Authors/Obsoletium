@@ -599,49 +599,34 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 
 	{
 		// we're not under steam, so setup using path relative to game
-		if ( IsPC() )
-		{
 #ifdef WIN32
 		if ( HMODULE module{nullptr};
 			::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, nullptr, &module ) &&
 			::GetModuleFileName( module, platformDir, bufferSize ) )
-			{
-				char *lastslash = strrchr(platformDir, '\\'); // this should be just before the filename
-				if ( lastslash )
-				{
-					*lastslash = 0;
-					Q_strncat(platformDir, "\\platform\\", bufferSize, COPY_ALL_CHARACTERS );
-					return true;
-				}
-			}
-#else
-			if ( getcwd( platformDir, bufferSize ) )
-			{
-				V_AppendSlash( platformDir, bufferSize );
-				Q_strncat(platformDir, "platform", bufferSize, COPY_ALL_CHARACTERS );
-				V_AppendSlash( platformDir, bufferSize );
-				return true;
-			}
-#endif			
-		}
-		else
 		{
-			// xbox fetches the platform path from exisiting platform search path
-			// path to executeable is not correct for xbox remote configuration
-			if ( g_pFullFileSystem->GetSearchPath( "PLATFORM", false, platformDir, bufferSize ) )
+			char *lastslash = strrchr(platformDir, '\\'); // this should be just before the filename
+			if ( lastslash )
 			{
-				char *pSeperator = strchr( platformDir, ';' );
-				if ( pSeperator )
-					*pSeperator = '\0';
+				*lastslash = 0;
+				Q_strncat(platformDir, "\\platform\\", bufferSize, COPY_ALL_CHARACTERS );
 				return true;
 			}
 		}
+#else
+		if ( getcwd( platformDir, bufferSize ) )
+		{
+			V_AppendSlash( platformDir, bufferSize );
+			Q_strncat(platformDir, "platform", bufferSize, COPY_ALL_CHARACTERS );
+			V_AppendSlash( platformDir, bufferSize );
+			return true;
+		}
+#endif
 
-		Error( "Unable to determine platform directory\n" );
+		Error( "Unable to determine platform directory.\n" );
 		return false;
 	}
 
-	return (platformDir[0] != 0);
+	return !Q_isempty( platformDir );
 }
 
 //-----------------------------------------------------------------------------
