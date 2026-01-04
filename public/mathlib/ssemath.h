@@ -1075,7 +1075,9 @@ FORCEINLINE float& XM_CALLCONV SubFloat( fltx4 & a, size_t idx )
 [[nodiscard]]
 FORCEINLINE uint32 XM_CALLCONV SubFloatConvertToInt( DirectX::FXMVECTOR a, size_t idx )
 {
-	return (uint32)SubFloat(a,idx);
+	// dimhotepus: Use correct float -> uint32 conversion.
+	DirectX::XMVECTOR vUint32 = DirectX::XMConvertVectorFloatToUInt( a, 0 );
+	return DirectX::XMVectorGetIntByIndex( vUint32, idx );
 }
 
 // Performance loss. Use with care.
