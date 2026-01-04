@@ -1655,7 +1655,7 @@ FORCEINLINE i32x4 XM_CALLCONV IntShiftLeftWordSIMD(const i32x4 vSrcA, const i32x
 // pDest->x = Int (vSrc.x)
 FORCEINLINE void XM_CALLCONV ConvertStoreAsIntsSIMD(intx4 * RESTRICT pDest, DirectX::FXMVECTOR vSrc)
 {
-	// dimhotepus: Use correct converion float -> int.
+	// dimhotepus: Use correct conversion float -> int.
 	DirectX::XMVECTOR vInt32 = DirectX::XMConvertVectorFloatToInt( vSrc, 0 );
 	DirectX::XMStoreInt4A( reinterpret_cast<uint32_t *>( pDest->Base() ), vInt32 );
 }
