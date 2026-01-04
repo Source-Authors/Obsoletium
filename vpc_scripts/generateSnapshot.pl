@@ -7,14 +7,14 @@ system( "rmdir \/s \/q backup" );
 print( "\nMoving previous snapshot to backup\n" );
 system( "ren snapshot backup" );
 
-print( "\nSearching for .vcproj files...\n" );
+print( "\nSearching for .vcxproj files...\n" );
 
-# Find all vcproj's in src
-system( "dir \/s U:\\main\\src\\*.vcproj \> vcproj.txt" );
+# Find all vcxproj's in src
+system( "dir \/s U:\\main\\src\\*.vcxproj \> vcxproj.txt" );
 
 # Read in the source file
 
-open(INFILE, "vcproj.txt" );
+open(INFILE, "vcxproj.txt" );
 my @lines = <INFILE>;
 close( INFILE );
 
@@ -44,8 +44,8 @@ for( my($i) = 0; $i < @lines; ++$i )
 			next;
 		}
 
-		# Grab the .vcproj filenames
-		while ( $lines[++$i] =~ /[\d+\/]{2}\d+\s+\S+\s+\w{2}\s+\S+\s+(\w+).vcproj/ )
+		# Grab the .vcxproj filenames
+		while ( $lines[++$i] =~ /[\d+\/]{2}\d+\s+\S+\s+\w{2}\s+\S+\s+(\w+).vcxproj/ )
 		{
 			if ( $1 =~ /_x360/ )
 			{
@@ -63,8 +63,8 @@ for( my($i) = 0; $i < @lines; ++$i )
 			# generate the vpc
 			system ( "generateVPC2005.pl ..\\$path\\$projectName -o $fullpath" );
 
-			# copy the .vcproj into the script tree
-			system ( "copy /y ..\\$path\\$projectName.vcproj $fullpath" );
+			# copy the .vcxproj into the script tree
+			system ( "copy /y ..\\$path\\$projectName.vcxproj $fullpath" );
 		}
 	}
 }
