@@ -4837,8 +4837,8 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 		return false;
 	}
 
-	FileHandle_t bspHanle = SafeOpenWrite( pOutFilename );
-	if ( !bspHanle )
+	FileHandle_t bspHandle = SafeOpenWrite( pOutFilename );
+	if ( !bspHandle )
 	{
 		Warning( "Error! Couldn't open output file %s - BSP swap failed!\n", pOutFilename ); 
 		return false;
@@ -4883,100 +4883,100 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 
 	// Set the output file pointer after the header
 	dheader_t dummyHeader = {};
-	SafeWrite( bspHanle, &dummyHeader, sizeof( dheader_t ) );
+	SafeWrite( bspHandle, &dummyHeader, sizeof( dheader_t ) );
 
 	// To allow for alignment fixups, the lumps will be written to the
 	// output file in the order they appear in this function.
 
 	// NOTE: Flags for 360 !!!MUST!!! be first	
-	SwapLumpToDisk< dflagslump_t >(header, bspHanle, LUMP_MAP_FLAGS );
+	SwapLumpToDisk< dflagslump_t >(header, bspHandle, LUMP_MAP_FLAGS );
 
 	// complex lump swaps first or for later contingent data
-	SwapLeafLumpToDisk(header, bspHanle);
-	SwapOcclusionLumpToDisk(header, bspHanle);
-	SwapGameLumpsToDisk(header, bspHanle);
+	SwapLeafLumpToDisk(header, bspHandle);
+	SwapOcclusionLumpToDisk(header, bspHandle);
+	SwapGameLumpsToDisk(header, bspHandle);
 
 	// Strip dead or non relevant lumps
 	header->lumps[LUMP_DISP_LIGHTMAP_ALPHAS].filelen = 0;
 	header->lumps[LUMP_FACEIDS].filelen = 0;
 
 	// Strip obsolete LDR in favor of HDR
-	if ( SwapLumpToDisk<dface_t>( header, bspHanle, LUMP_FACES_HDR ) )
+	if ( SwapLumpToDisk<dface_t>( header, bspHandle, LUMP_FACES_HDR ) )
 	{
 		header->lumps[LUMP_FACES].filelen = 0;
 	}
 	else
 	{
 		// no HDR, keep LDR version
-		SwapLumpToDisk<dface_t>( header, bspHanle, LUMP_FACES );
+		SwapLumpToDisk<dface_t>( header, bspHandle, LUMP_FACES );
 	}
 
-	if ( SwapLumpToDisk<dworldlight_t>( header, bspHanle, LUMP_WORLDLIGHTS_HDR ) )
+	if ( SwapLumpToDisk<dworldlight_t>( header, bspHandle, LUMP_WORLDLIGHTS_HDR ) )
 	{
 		header->lumps[LUMP_WORLDLIGHTS].filelen = 0;
 	}
 	else
 	{
 		// no HDR, keep LDR version
-		SwapLumpToDisk<dworldlight_t>( header, bspHanle, LUMP_WORLDLIGHTS );
+		SwapLumpToDisk<dworldlight_t>( header, bspHandle, LUMP_WORLDLIGHTS );
 	}
 
 	// Simple lump swaps
-	SwapLumpToDisk<byte>( header, bspHanle, FIELD_CHARACTER, LUMP_PHYSDISP );
-	SwapLumpToDisk<byte>( header, bspHanle, FIELD_CHARACTER, LUMP_PHYSCOLLIDE );
-	SwapLumpToDisk<byte>( header, bspHanle, FIELD_CHARACTER, LUMP_VISIBILITY );
-	SwapLumpToDisk<dmodel_t>( header, bspHanle, LUMP_MODELS );
-	SwapLumpToDisk<dvertex_t>( header, bspHanle, LUMP_VERTEXES );
-	SwapLumpToDisk<dplane_t>( header, bspHanle, LUMP_PLANES );
-	SwapLumpToDisk<dnode_t>( header, bspHanle, LUMP_NODES );
-	SwapLumpToDisk<texinfo_t>( header, bspHanle, LUMP_TEXINFO );
-	SwapLumpToDisk<dtexdata_t>( header, bspHanle, LUMP_TEXDATA );
-	SwapLumpToDisk<ddispinfo_t>( header, bspHanle, LUMP_DISPINFO );
-    SwapLumpToDisk<CDispVert>( header, bspHanle, LUMP_DISP_VERTS );
-	SwapLumpToDisk<CDispTri>( header, bspHanle,  LUMP_DISP_TRIS );
-    SwapLumpToDisk<char>( header, bspHanle,  FIELD_CHARACTER, LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS );
-	SwapLumpToDisk<CFaceMacroTextureInfo>( header, bspHanle,  LUMP_FACE_MACRO_TEXTURE_INFO );
-	SwapLumpToDisk<dprimitive_t>( header, bspHanle,  LUMP_PRIMITIVES );
-	SwapLumpToDisk<dprimvert_t>( header, bspHanle,  LUMP_PRIMVERTS );
-	SwapLumpToDisk<unsigned short>( header, bspHanle,  FIELD_SHORT, LUMP_PRIMINDICES );
-    SwapLumpToDisk<dface_t>( header, bspHanle,  LUMP_ORIGINALFACES );
-	SwapLumpToDisk<unsigned short>( header, bspHanle,  FIELD_SHORT, LUMP_LEAFFACES );
-	SwapLumpToDisk<unsigned short>( header, bspHanle,  FIELD_SHORT, LUMP_LEAFBRUSHES );
-	SwapLumpToDisk<int>( header, bspHanle,  FIELD_INTEGER, LUMP_SURFEDGES );
-	SwapLumpToDisk<dedge_t>( header, bspHanle,  LUMP_EDGES );
-	SwapLumpToDisk<dbrush_t>( header, bspHanle,  LUMP_BRUSHES );
-	SwapLumpToDisk<dbrushside_t>( header, bspHanle,  LUMP_BRUSHSIDES );
-	SwapLumpToDisk<darea_t>( header, bspHanle,  LUMP_AREAS );
-	SwapLumpToDisk<dareaportal_t>( header, bspHanle,  LUMP_AREAPORTALS );
-	SwapLumpToDisk<char>( header, bspHanle,  FIELD_CHARACTER, LUMP_ENTITIES );
-	SwapLumpToDisk<dleafwaterdata_t>( header, bspHanle,  LUMP_LEAFWATERDATA );
-	SwapLumpToDisk<float>( header, bspHanle,  FIELD_VECTOR, LUMP_VERTNORMALS );
-	SwapLumpToDisk<short>( header, bspHanle,  FIELD_SHORT, LUMP_VERTNORMALINDICES );
-	SwapLumpToDisk<float>( header, bspHanle,  FIELD_VECTOR, LUMP_CLIPPORTALVERTS );
-	SwapLumpToDisk<dcubemapsample_t>( header, bspHanle,  LUMP_CUBEMAPS );	
-	SwapLumpToDisk<char>( header, bspHanle,  FIELD_CHARACTER, LUMP_TEXDATA_STRING_DATA );
-	SwapLumpToDisk<int>( header, bspHanle,  FIELD_INTEGER, LUMP_TEXDATA_STRING_TABLE );
-	SwapLumpToDisk<doverlay_t>( header, bspHanle,  LUMP_OVERLAYS );
-	SwapLumpToDisk<dwateroverlay_t>( header, bspHanle,  LUMP_WATEROVERLAYS );
-	SwapLumpToDisk<unsigned short>( header, bspHanle,  FIELD_SHORT, LUMP_LEAFMINDISTTOWATER );
-	SwapLumpToDisk<doverlayfade_t>( header, bspHanle,  LUMP_OVERLAY_FADES );
+	SwapLumpToDisk<byte>( header, bspHandle, FIELD_CHARACTER, LUMP_PHYSDISP );
+	SwapLumpToDisk<byte>( header, bspHandle, FIELD_CHARACTER, LUMP_PHYSCOLLIDE );
+	SwapLumpToDisk<byte>( header, bspHandle, FIELD_CHARACTER, LUMP_VISIBILITY );
+	SwapLumpToDisk<dmodel_t>( header, bspHandle, LUMP_MODELS );
+	SwapLumpToDisk<dvertex_t>( header, bspHandle, LUMP_VERTEXES );
+	SwapLumpToDisk<dplane_t>( header, bspHandle, LUMP_PLANES );
+	SwapLumpToDisk<dnode_t>( header, bspHandle, LUMP_NODES );
+	SwapLumpToDisk<texinfo_t>( header, bspHandle, LUMP_TEXINFO );
+	SwapLumpToDisk<dtexdata_t>( header, bspHandle, LUMP_TEXDATA );
+	SwapLumpToDisk<ddispinfo_t>( header, bspHandle, LUMP_DISPINFO );
+    SwapLumpToDisk<CDispVert>( header, bspHandle, LUMP_DISP_VERTS );
+	SwapLumpToDisk<CDispTri>( header, bspHandle,  LUMP_DISP_TRIS );
+    SwapLumpToDisk<char>( header, bspHandle,  FIELD_CHARACTER, LUMP_DISP_LIGHTMAP_SAMPLE_POSITIONS );
+	SwapLumpToDisk<CFaceMacroTextureInfo>( header, bspHandle,  LUMP_FACE_MACRO_TEXTURE_INFO );
+	SwapLumpToDisk<dprimitive_t>( header, bspHandle,  LUMP_PRIMITIVES );
+	SwapLumpToDisk<dprimvert_t>( header, bspHandle,  LUMP_PRIMVERTS );
+	SwapLumpToDisk<unsigned short>( header, bspHandle,  FIELD_SHORT, LUMP_PRIMINDICES );
+    SwapLumpToDisk<dface_t>( header, bspHandle,  LUMP_ORIGINALFACES );
+	SwapLumpToDisk<unsigned short>( header, bspHandle,  FIELD_SHORT, LUMP_LEAFFACES );
+	SwapLumpToDisk<unsigned short>( header, bspHandle,  FIELD_SHORT, LUMP_LEAFBRUSHES );
+	SwapLumpToDisk<int>( header, bspHandle,  FIELD_INTEGER, LUMP_SURFEDGES );
+	SwapLumpToDisk<dedge_t>( header, bspHandle,  LUMP_EDGES );
+	SwapLumpToDisk<dbrush_t>( header, bspHandle,  LUMP_BRUSHES );
+	SwapLumpToDisk<dbrushside_t>( header, bspHandle,  LUMP_BRUSHSIDES );
+	SwapLumpToDisk<darea_t>( header, bspHandle,  LUMP_AREAS );
+	SwapLumpToDisk<dareaportal_t>( header, bspHandle,  LUMP_AREAPORTALS );
+	SwapLumpToDisk<char>( header, bspHandle,  FIELD_CHARACTER, LUMP_ENTITIES );
+	SwapLumpToDisk<dleafwaterdata_t>( header, bspHandle,  LUMP_LEAFWATERDATA );
+	SwapLumpToDisk<float>( header, bspHandle,  FIELD_VECTOR, LUMP_VERTNORMALS );
+	SwapLumpToDisk<short>( header, bspHandle,  FIELD_SHORT, LUMP_VERTNORMALINDICES );
+	SwapLumpToDisk<float>( header, bspHandle,  FIELD_VECTOR, LUMP_CLIPPORTALVERTS );
+	SwapLumpToDisk<dcubemapsample_t>( header, bspHandle,  LUMP_CUBEMAPS );	
+	SwapLumpToDisk<char>( header, bspHandle,  FIELD_CHARACTER, LUMP_TEXDATA_STRING_DATA );
+	SwapLumpToDisk<int>( header, bspHandle,  FIELD_INTEGER, LUMP_TEXDATA_STRING_TABLE );
+	SwapLumpToDisk<doverlay_t>( header, bspHandle,  LUMP_OVERLAYS );
+	SwapLumpToDisk<dwateroverlay_t>( header, bspHandle,  LUMP_WATEROVERLAYS );
+	SwapLumpToDisk<unsigned short>( header, bspHandle,  FIELD_SHORT, LUMP_LEAFMINDISTTOWATER );
+	SwapLumpToDisk<doverlayfade_t>( header, bspHandle,  LUMP_OVERLAY_FADES );
 
 
 	// NOTE: this data placed at the end for the sake of 360:
 	{
 		// NOTE: lighting must be the penultimate lump
 		//       (allows 360 to free this memory part-way through map loading)
-		if ( SwapLumpToDisk<byte>( header, bspHanle, FIELD_CHARACTER, LUMP_LIGHTING_HDR ) )
+		if ( SwapLumpToDisk<byte>( header, bspHandle, FIELD_CHARACTER, LUMP_LIGHTING_HDR ) )
 		{
 			header->lumps[LUMP_LIGHTING].filelen = 0;
 		}
 		else
 		{
 			// no HDR, keep LDR version
-			SwapLumpToDisk<byte>( header, bspHanle, FIELD_CHARACTER, LUMP_LIGHTING );
+			SwapLumpToDisk<byte>( header, bspHandle, FIELD_CHARACTER, LUMP_LIGHTING );
 		}
 		// NOTE: Pakfile for 360 !!!MUST!!! be last	
-		SwapPakfileLumpToDisk( header, bspHanle, pInFilename );
+		SwapPakfileLumpToDisk( header, bspHandle, pInFilename );
 	}
 
 
@@ -4984,7 +4984,7 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 	header->lumps[LUMP_MAP_FLAGS].version = mapCRC;
 
 	// Pad out the end of the file to a sector boundary for optimal IO
-	AlignFilePosition( bspHanle, XBOX_DVD_SECTORSIZE );
+	AlignFilePosition( bspHandle, XBOX_DVD_SECTORSIZE );
 
 	// Warn of any lumps that didn't get swapped
 	for ( int i = 0; i < HEADER_LUMPS; ++i )
@@ -5000,10 +5000,10 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 	}
 
 	// Write the updated header
-	g_pFileSystem->Seek( bspHanle, 0, FILESYSTEM_SEEK_HEAD );
-	WriteData( bspHanle, header );
-	g_pFileSystem->Close( bspHanle );
-	bspHanle = 0;
+	g_pFileSystem->Seek( bspHandle, 0, FILESYSTEM_SEEK_HEAD );
+	WriteData( bspHandle, header );
+	g_pFileSystem->Close( bspHandle );
+	bspHandle = 0;
 
 	// Cleanup
 	g_Swap.ActivateByteSwapping( false );
@@ -5030,16 +5030,16 @@ bool SwapBSPFile( const char *pInFilename, const char *pOutFilename, bool bSwapO
 			return false;
 		}
 
-		bspHanle = SafeOpenWrite( pOutFilename );
-		if ( !bspHanle )
+		FileHandle_t bspHandle2 = SafeOpenWrite( pOutFilename );
+		if ( !bspHandle2 )
 		{
 			Warning( "Error! Couldn't open output file '%s' - BSP swap failed!\n", pOutFilename ); 
 			return false;
 		}
 		
-		RunCodeAtScopeExit(g_pFileSystem->Close(bspHanle));
+		RunCodeAtScopeExit(g_pFileSystem->Close(bspHandle2));
 
-		SafeWrite( bspHanle, outputBuffer.Base(), outputBuffer.TellPut() );
+		SafeWrite( bspHandle2, outputBuffer.Base(), outputBuffer.TellPut() );
 	}
 
 	return true;
