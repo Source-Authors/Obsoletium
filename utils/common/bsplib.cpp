@@ -1314,7 +1314,7 @@ static void AddGameLumps( dheader_t *dheader, FileHandle_t file )
 
 	// write dictionary
 	dgamelump_t dict;
-	int offset = lump->fileofs + sizeof(header) + clumpCount * sizeof(dgamelump_t);
+	int offset = size_cast<int>( lump->fileofs + sizeof(header) + clumpCount * sizeof(dgamelump_t) );
 	GameLumpHandle_t h;
 	for( h = g_GameLumps.FirstGameLump(); h != g_GameLumps.InvalidGameLump(); h = g_GameLumps.NextGameLump( h ) )
 	{
@@ -4166,7 +4166,7 @@ static void SetAlignedLumpPosition
 	unsigned int alignment = LUMP_ALIGNMENT
 )
 {
-	header->lumps[lumpnum].fileofs = AlignFilePosition( file, alignment );
+	header->lumps[lumpnum].fileofs = size_cast<int>( AlignFilePosition( file, alignment ) );
 }
 
 template< class T >
@@ -4289,11 +4289,11 @@ void SwapLeafAmbientLightingLumpToDisk(dheader_t *header, FileHandle_t file)
 
 			SetAlignedLumpPosition( header, file, LUMP_LEAF_AMBIENT_LIGHTING_HDR );
 			header->lumps[LUMP_LEAF_AMBIENT_LIGHTING_HDR].version = LUMP_LEAF_AMBIENT_LIGHTING_VERSION;
-			header->lumps[LUMP_LEAF_AMBIENT_LIGHTING_HDR].filelen = g_LeafAmbientLightingHDR.Count() * sizeof( dleafambientlighting_t );
+			header->lumps[LUMP_LEAF_AMBIENT_LIGHTING_HDR].filelen = size_cast<int>( g_LeafAmbientLightingHDR.Count() * sizeof( dleafambientlighting_t ) );
 			SafeWrite( file, g_LeafAmbientLightingHDR.Base(), header->lumps[LUMP_LEAF_AMBIENT_LIGHTING_HDR].filelen );
 
 			SetAlignedLumpPosition( header, file, LUMP_LEAF_AMBIENT_INDEX_HDR );
-			header->lumps[LUMP_LEAF_AMBIENT_INDEX_HDR].filelen = g_LeafAmbientIndexHDR.Count() * sizeof( dleafambientindex_t );
+			header->lumps[LUMP_LEAF_AMBIENT_INDEX_HDR].filelen = size_cast<int>( g_LeafAmbientIndexHDR.Count() * sizeof( dleafambientindex_t ) );
 			SafeWrite( file, g_LeafAmbientIndexHDR.Base(), header->lumps[LUMP_LEAF_AMBIENT_INDEX_HDR].filelen );
 
 			// mark as processed
@@ -4318,11 +4318,11 @@ void SwapLeafAmbientLightingLumpToDisk(dheader_t *header, FileHandle_t file)
 
 			SetAlignedLumpPosition( header, file, LUMP_LEAF_AMBIENT_LIGHTING );
 			header->lumps[LUMP_LEAF_AMBIENT_LIGHTING].version = LUMP_LEAF_AMBIENT_LIGHTING_VERSION;
-			header->lumps[LUMP_LEAF_AMBIENT_LIGHTING].filelen = g_LeafAmbientLightingLDR.Count() * sizeof( dleafambientlighting_t );
+			header->lumps[LUMP_LEAF_AMBIENT_LIGHTING].filelen = size_cast<int>( g_LeafAmbientLightingLDR.Count() * sizeof( dleafambientlighting_t ) );
 			SafeWrite( file, g_LeafAmbientLightingLDR.Base(), header->lumps[LUMP_LEAF_AMBIENT_LIGHTING].filelen );
 
 			SetAlignedLumpPosition( header, file, LUMP_LEAF_AMBIENT_INDEX );
-			header->lumps[LUMP_LEAF_AMBIENT_INDEX].filelen = g_LeafAmbientIndexLDR.Count() * sizeof( dleafambientindex_t );
+			header->lumps[LUMP_LEAF_AMBIENT_INDEX].filelen = size_cast<int>( g_LeafAmbientIndexLDR.Count() * sizeof( dleafambientindex_t ) );
 			SafeWrite( file, g_LeafAmbientIndexLDR.Base(), header->lumps[LUMP_LEAF_AMBIENT_INDEX].filelen );
 
 			// mark as processed
@@ -5221,7 +5221,7 @@ bool SetPakFileLump( const char *pBSPFilename, const char *pNewFilename, void *p
 
 	// Always write the pak file at the end
 	// Pad out the end of the file to a sector boundary for optimal IO
-	header->lumps[LUMP_PAKFILE].fileofs = AlignFilePosition( bspHanle, XBOX_DVD_SECTORSIZE );
+	header->lumps[LUMP_PAKFILE].fileofs = size_cast<int>( AlignFilePosition( bspHanle, XBOX_DVD_SECTORSIZE ) );
 	header->lumps[LUMP_PAKFILE].filelen = pakSize;
 	SafeWrite( bspHanle, pPakData, pakSize );
 
