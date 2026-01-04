@@ -251,7 +251,7 @@ inline void CCycleCount::Init()
 inline void CCycleCount::Init( float initTimeMsec )
 {
 	if ( g_ClockSpeedMillisecondsMultiplier > 0 )
-		Init( static_cast<uint64>(initTimeMsec / g_ClockSpeedMillisecondsMultiplier) );
+		Init( static_cast<uint64>(initTimeMsec / g_ClockSpeedMillisecondsMultiplier) ); //-V2004
 	else
 		Init( static_cast<uint64>(0) );
 }
