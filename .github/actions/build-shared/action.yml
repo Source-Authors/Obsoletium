@@ -114,7 +114,7 @@ runs:
     working-directory: ${{env.GITHUB_WORKSPACE}}
     run: |
       call "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\Common7\Tools\VsDevCmd.bat"
-      msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}}
+      msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}} || msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}} || msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}} || msbuild ${{inputs.solution-name}}_${{inputs.platform-name}}.slnx /m -verbosity:minimal /p:Configuration=${{inputs.configuration-name}} /p:Platform=${{inputs.platform-name}}
     shell: cmd
 
   - name: Get build artifacts path
