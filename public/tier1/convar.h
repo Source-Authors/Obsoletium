@@ -215,7 +215,7 @@ inline int CCommand::ArgC() const
 
 inline const char **CCommand::ArgV() const
 {
-	return m_nArgc ? (const char**)m_ppArgv : nullptr;
+	return m_nArgc ? const_cast<const char**>(m_ppArgv) : nullptr;
 }
 
 inline const char *CCommand::ArgS() const

@@ -91,15 +91,15 @@ public:
 	{
 		for ( unsigned int i = 0; i < objectCount; ++i, ++pOutputBuffer )
 		{
-			SwapFieldsToTargetEndian( (void*)pOutputBuffer, pBaseData, &T::m_DataMap );
-			pBaseData = (const byte*)pBaseData + sizeof(T);
+			SwapFieldsToTargetEndian( static_cast<void*>(pOutputBuffer), pBaseData, &T::m_DataMap );
+			pBaseData = static_cast<const byte*>(pBaseData) + sizeof(T);
 		}
 	}
 
 	// Swaps fields for the templated type in place.
 	template<typename T> inline void SwapFieldsToTargetEndian( T* pOutputBuffer, unsigned int objectCount = 1 )
 	{
-		SwapFieldsToTargetEndian<T>( pOutputBuffer, (void*)pOutputBuffer, objectCount );
+		SwapFieldsToTargetEndian<T>( pOutputBuffer, static_cast<void*>(pOutputBuffer), objectCount );
 	}
 
 	//-----------------------------------------------------------------------------

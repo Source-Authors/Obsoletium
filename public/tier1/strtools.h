@@ -217,9 +217,9 @@ void V_normalizeFloatString( INOUT_Z char* pFloat );
 	return c >= '0' && c <= '9';
 }
 
-[[nodiscard]] inline bool V_iswdigit( int c ) 
+[[nodiscard]] inline bool V_iswdigit( int c )
 { 
-	return ( ( (uint)( c - '0' ) ) < 10 ); 
+	return static_cast<uint>( c - '0' ) < 10;
 }
 
 [[nodiscard]] inline bool V_isempty( IN_OPT_Z const char* pszString ) { return !pszString || !pszString[ 0 ]; }
@@ -236,31 +236,31 @@ void V_normalizeFloatString( INOUT_Z char* pFloat );
 // considerations make some of the CRT functions slow.
 //#undef isdigit // In case this is implemented as a macro
 //#define isdigit use_V_isdigit_instead_of_isdigit
-[[nodiscard]] inline bool V_isalpha(char c) { return isalpha( (unsigned char)c ) != 0; }
+[[nodiscard]] inline bool V_isalpha(char c) { return isalpha( static_cast<unsigned char>(c) ) != 0; }
 //#undef isalpha
 //#define isalpha use_V_isalpha_instead_of_isalpha
-[[nodiscard]] inline bool V_isalnum(char c) { return isalnum( (unsigned char)c ) != 0; }
+[[nodiscard]] inline bool V_isalnum(char c) { return isalnum( static_cast<unsigned char>(c) ) != 0; }
 //#undef isalnum
 //#define isalnum use_V_isalnum_instead_of_isalnum
-[[nodiscard]] inline bool V_isprint(char c) { return isprint( (unsigned char)c ) != 0; }
+[[nodiscard]] inline bool V_isprint(char c) { return isprint( static_cast<unsigned char>(c) ) != 0; }
 //#undef isprint
 //#define isprint use_V_isprint_instead_of_isprint
-[[nodiscard]] inline bool V_isxdigit(char c) { return isxdigit( (unsigned char)c ) != 0; }
+[[nodiscard]] inline bool V_isxdigit(char c) { return isxdigit( static_cast<unsigned char>(c) ) != 0; }
 //#undef isxdigit
 //#define isxdigit use_V_isxdigit_instead_of_isxdigit
-[[nodiscard]] inline bool V_ispunct(char c) { return ispunct( (unsigned char)c ) != 0; }
+[[nodiscard]] inline bool V_ispunct(char c) { return ispunct( static_cast<unsigned char>(c) ) != 0; }
 //#undef ispunct
 //#define ispunct use_V_ispunct_instead_of_ispunct
-[[nodiscard]] inline bool V_isgraph(char c) { return isgraph( (unsigned char)c ) != 0; }
+[[nodiscard]] inline bool V_isgraph(char c) { return isgraph( static_cast<unsigned char>(c) ) != 0; }
 //#undef isgraph
 //#define isgraph use_V_isgraph_instead_of_isgraph
-[[nodiscard]] inline bool V_isupper(char c) { return isupper( (unsigned char)c ) != 0; }
+[[nodiscard]] inline bool V_isupper(char c) { return isupper( static_cast<unsigned char>(c) ) != 0; }
 //#undef isupper
 //#define isupper use_V_isupper_instead_of_isupper
-[[nodiscard]] inline bool V_islower(char c) { return islower( (unsigned char)c ) != 0; }
+[[nodiscard]] inline bool V_islower(char c) { return islower( static_cast<unsigned char>(c) ) != 0; }
 //#undef islower
 //#define islower use_V_islower_instead_of_islower
-[[nodiscard]] inline bool V_iscntrl(char c) { return iscntrl( (unsigned char)c ) != 0; }
+[[nodiscard]] inline bool V_iscntrl(char c) { return iscntrl( static_cast<unsigned char>(c) ) != 0; }
 //#undef iscntrl
 //#define iscntrl use_V_iscntrl_instead_of_iscntrl
 [[nodiscard]] inline bool V_isspace(int c) {
@@ -1177,7 +1177,7 @@ template <typename NameArray>
 		return true;
 	}
 
-	intp newlen = prefixLength + static_cast<intp>( log10( i ) ) + 1;
+	intp newlen = prefixLength + static_cast<intp>( log10( i ) ) + 1; //-V2003
 	if ( newlen + 1 > memsize )
 	{
 		V_strncpy( name, prefix, memsize );
@@ -1422,7 +1422,7 @@ size_t Q_URLDecodeRaw( OUT_Z_CAP(nDecodeDestLen) char *pchDecodeDest, intp nDeco
 	// trim
 	while ( pString < ( pEnd-- ) )
 	{
-		if ( uint( *pEnd ) <= uint( ' ' ) )
+		if ( static_cast<uint>( *pEnd ) <= static_cast<uint>( ' ' ) )
 		{
 			*pEnd = '\0';
 		}
@@ -1437,14 +1437,14 @@ size_t Q_URLDecodeRaw( OUT_Z_CAP(nDecodeDestLen) char *pchDecodeDest, intp nDeco
 	Assert(pString);
 
 	const char *p = pString;
-	while ( *p && uint( *p ) <= uint( ' ' ) )
+	while ( *p && static_cast<uint>( *p ) <= static_cast<uint>( ' ' ) )
 	{
 		p++;
 	}
 	return p;
 }
 
-[[nodiscard]] inline intp V_strcspn( IN_Z const char *s1, IN_Z const char *search )		{ return (intp)( strcspn( s1, search ) ); }
+[[nodiscard]] inline intp V_strcspn( IN_Z const char *s1, IN_Z const char *search )		{ return static_cast<intp>( strcspn( s1, search ) ); }
 // Encodes a string (or binary data) in URL encoding format, this isn't the strict rfc1738 format, but instead uses + for spaces.  
 // This is for historical reasons and HTML spec foolishness that lead to + becoming a de facto standard for spaces when encoding form data.
 // Dest buffer should be 3 times the size of source buffer to guarantee it has room to encode.

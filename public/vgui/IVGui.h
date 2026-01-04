@@ -28,10 +28,7 @@ using HPanel = uint32;
 using HContext = int;
 
 // dimhotepus: Make of HContext type.
-enum : HContext
-{
-	DEFAULT_VGUI_CONTEXT = ((vgui::HContext)~0)
-};
+constexpr inline HContext DEFAULT_VGUI_CONTEXT{static_cast<vgui::HContext>(~0)};
 
 //-----------------------------------------------------------------------------
 // Purpose: Interface to core vgui components

@@ -36,10 +36,7 @@ class IFileSystem;
 //-----------------------------------------------------------------------------
 using AppModule_t = intp;
 
-enum
-{
-	APP_MODULE_INVALID = (AppModule_t)~0
-};
+constexpr inline AppModule_t APP_MODULE_INVALID{static_cast<AppModule_t>(~0)};
 
 
 //-----------------------------------------------------------------------------

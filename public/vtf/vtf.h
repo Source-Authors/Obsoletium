@@ -471,7 +471,7 @@ struct VTFFileHeaderV7_2_t : public VTFFileHeaderV7_1_t
 
 constexpr inline uint32 BYTE_POS(uint8 byteVal, uint32 shft)
 {
-	return uint32( uint32(uint8(byteVal)) << uint8(shft * 8) );
+	return static_cast<uint32>( static_cast<uint32>(byteVal) << static_cast<uint8>(shft * 8) );
 }
 
 constexpr inline uint32 MK_VTF_RSRC_ID(uint8 a, uint8 b, uint8 c)

@@ -30,9 +30,9 @@ enum JoystickCount
 #define JOYSTICK_POV_BUTTON_INTERNAL( _joystick, _button ) ( JOYSTICK_FIRST_POV_BUTTON + ((_joystick) * to_underlying(JOYSTICK_POV_BUTTON_COUNT)) + (_button) )
 #define JOYSTICK_AXIS_BUTTON_INTERNAL(_joystick, _button) ( JOYSTICK_FIRST_AXIS_BUTTON + ((_joystick) * to_underlying(JOYSTICK_AXIS_BUTTON_COUNT)) + (_button) )
 
-#define JOYSTICK_BUTTON( _joystick, _button ) ( (ButtonCode_t)JOYSTICK_BUTTON_INTERNAL( _joystick, _button ) )
-#define JOYSTICK_POV_BUTTON( _joystick, _button ) ( (ButtonCode_t)JOYSTICK_POV_BUTTON_INTERNAL( _joystick, _button ) )
-#define JOYSTICK_AXIS_BUTTON( _joystick, _button ) ( (ButtonCode_t)JOYSTICK_AXIS_BUTTON_INTERNAL( _joystick, _button ) )
+#define JOYSTICK_BUTTON( _joystick, _button ) ( static_cast<ButtonCode_t>( JOYSTICK_BUTTON_INTERNAL( _joystick, _button ) ) )
+#define JOYSTICK_POV_BUTTON( _joystick, _button ) ( static_cast<ButtonCode_t>( JOYSTICK_POV_BUTTON_INTERNAL( _joystick, _button ) ) )
+#define JOYSTICK_AXIS_BUTTON( _joystick, _button ) ( static_cast<ButtonCode_t>( JOYSTICK_AXIS_BUTTON_INTERNAL( _joystick, _button ) ) )
 
 //-----------------------------------------------------------------------------
 // Button enum. "Buttons" are binary-state input devices (mouse buttons, keyboard keys)
@@ -46,8 +46,8 @@ enum
 #define STEAMCONTROLLER_BUTTON_INTERNAL( _joystick, _button ) ( STEAMCONTROLLER_FIRST_BUTTON + ((_joystick) * STEAMCONTROLLER_MAX_BUTTON_COUNT) + (_button) )
 #define STEAMCONTROLLER_AXIS_BUTTON_INTERNAL( _joystick, _button ) ( STEAMCONTROLLER_FIRST_AXIS_BUTTON + ((_joystick) * STEAMCONTROLLER_AXIS_BUTTON_COUNT) + (_button) )
 
-#define STEAMCONTROLLER_BUTTON( _joystick, _button ) ( (ButtonCode_t)STEAMCONTROLLER_BUTTON_INTERNAL( _joystick, _button ) )
-#define STEAMCONTROLLER_AXIS_BUTTON( _joystick, _button ) ( (ButtonCode_t)STEAMCONTROLLER_AXIS_BUTTON_INTERNAL( _joystick, _button ) )
+#define STEAMCONTROLLER_BUTTON( _joystick, _button ) ( static_cast<ButtonCode_t>( STEAMCONTROLLER_BUTTON_INTERNAL( _joystick, _button ) ) )
+#define STEAMCONTROLLER_AXIS_BUTTON( _joystick, _button ) ( static_cast<ButtonCode_t>( STEAMCONTROLLER_AXIS_BUTTON_INTERNAL( _joystick, _button ) ) )
 
 enum ButtonCode_t
 {
@@ -388,31 +388,31 @@ inline ButtonCode_t GetBaseButtonCode( ButtonCode_t code )
 	if ( IsJoystickButtonCode( code ) )
 	{
 		auto offset = ( to_underlying(code) - to_underlying(JOYSTICK_FIRST_BUTTON) ) % to_underlying(JOYSTICK_MAX_BUTTON_COUNT);
-		return (ButtonCode_t)( JOYSTICK_FIRST_BUTTON + offset );
+		return static_cast<ButtonCode_t>( JOYSTICK_FIRST_BUTTON + offset );
 	}
 
 	if ( IsJoystickPOVCode( code ) )
 	{
 		auto offset = ( to_underlying(code) - to_underlying(JOYSTICK_FIRST_POV_BUTTON) ) % to_underlying(JOYSTICK_POV_BUTTON_COUNT);
-		return (ButtonCode_t)( JOYSTICK_FIRST_POV_BUTTON + offset );
+		return static_cast<ButtonCode_t>( JOYSTICK_FIRST_POV_BUTTON + offset );
 	}
 
 	if ( IsJoystickAxisCode( code ) )
 	{
 		auto offset = ( to_underlying(code) - to_underlying(JOYSTICK_FIRST_AXIS_BUTTON) ) % to_underlying(JOYSTICK_AXIS_BUTTON_COUNT);
-		return (ButtonCode_t)( JOYSTICK_FIRST_AXIS_BUTTON + offset );
+		return static_cast<ButtonCode_t>( JOYSTICK_FIRST_AXIS_BUTTON + offset );
 	}
 
 	if ( IsSteamControllerButtonCode( code ) )
 	{
 		auto offset = ( to_underlying(code) - to_underlying(STEAMCONTROLLER_FIRST_BUTTON) ) % to_underlying(STEAMCONTROLLER_MAX_BUTTON_COUNT);
-		return ( ButtonCode_t )( STEAMCONTROLLER_FIRST_BUTTON + offset );
+		return static_cast<ButtonCode_t>( STEAMCONTROLLER_FIRST_BUTTON + offset );
 	}
 
 	if ( IsSteamControllerAxisCode( code ) )
 	{
 		auto offset = ( to_underlying(code) - to_underlying(STEAMCONTROLLER_FIRST_AXIS_BUTTON) ) % to_underlying(STEAMCONTROLLER_AXIS_BUTTON_COUNT);
-		return ( ButtonCode_t )( STEAMCONTROLLER_FIRST_AXIS_BUTTON + offset );
+		return static_cast<ButtonCode_t>( STEAMCONTROLLER_FIRST_AXIS_BUTTON + offset );
 	}
 
 	return code;

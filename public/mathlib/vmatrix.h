@@ -751,7 +751,7 @@ inline VMatrix VMatrix::operator-() const
 	VMatrix ret;
 	for( int i=0; i < 16; i++ )
 	{
-		((float*)ret.m)[i] = ((const float*)m)[i];
+		reinterpret_cast<float*>(ret.m)[i] = -reinterpret_cast<const float*>(m)[i];
 	}
 	return ret;
 }
@@ -971,7 +971,7 @@ inline void MatrixSetColumn( VMatrix &src, int nCol, const Vector &column )
 inline void MatrixGetRow( const VMatrix &src, int nRow, Vector *pRow )
 {
 	Assert( (nRow >= 0) && (nRow <= 3) );
-	*pRow = *(const Vector*)src[nRow];
+	*pRow = *reinterpret_cast<const Vector*>(src[nRow]);
 }
 
 inline void MatrixSetRow( VMatrix &dst, int nRow, const Vector &row )

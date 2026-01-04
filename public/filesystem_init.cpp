@@ -284,10 +284,12 @@ static KeyValuesAD ReadKeyValuesFile( const char *pFilename )
 	if ( errc || size > std::numeric_limits<intp>::max() - 1 )
 		return KeyValuesAD{ nullptr };
 
-	CUtlVector<char> buf;
-	buf.SetSize( static_cast<intp>(size) + 1 );
+	const auto safe_size = size_cast<intp>(size);
 
-	std::tie(std::ignore, errc) = fp.read( buf.Base(), static_cast<intp>(size) );
+	CUtlVector<char> buf;
+	buf.SetSize( safe_size + 1 );
+
+	std::tie(std::ignore, errc) = fp.read( buf.Base(), safe_size );
 	if ( errc )
 		return KeyValuesAD{ nullptr };
 
@@ -307,9 +309,9 @@ static bool Sys_GetExecutableName( char *out, unsigned len )
 	if ( HMODULE module{nullptr};
 		 !::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, nullptr, &module ) ||
 		 !::GetModuleFileName( module, out, len ) )
-    {
+	{
 		return false;
-    }
+	}
 
 	return true;
 #else
@@ -319,7 +321,7 @@ static bool Sys_GetExecutableName( char *out, unsigned len )
 		return true;
 	}
 
-		return false;
+	return false;
 #endif
 }
 
@@ -644,7 +646,7 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		else
 		{
 			FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
-			const char *pszFoundShortName = initInfo.m_pFileSystem->FindFirst( szAbsSearchPath, &findHandle );
+			const char *pszFoundShortName = initInfo.m_pFileSystem->FindFirst( szAbsSearchPath, &findHandle ); //-V2001
 			if ( pszFoundShortName )
 			{
 				do 

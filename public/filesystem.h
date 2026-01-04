@@ -296,7 +296,7 @@ typedef void (*FSDirtyDiskReportFunc_t)();
 //-----------------------------------------------------------------------------
 DECLARE_POINTER_HANDLE(FSAsyncControl_t);
 DECLARE_POINTER_HANDLE(FSAsyncFile_t);
-const FSAsyncFile_t FS_INVALID_ASYNC_FILE = (FSAsyncFile_t)(0x0000ffff);
+const FSAsyncFile_t FS_INVALID_ASYNC_FILE = reinterpret_cast<FSAsyncFile_t>(static_cast<size_t>(0x0000ffff));
 
 
 //---------------------------------------------------------
@@ -584,9 +584,9 @@ public:
 	// converts a partial path into a full path
 	// Prefer using the RelativePathToFullPath_safe template wrapper to calling this directly
 	virtual const char		*RelativePathToFullPath( const char *pFileName, const char *pPathID, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars, PathTypeFilter_t pathFilter = FILTER_NONE, PathTypeQuery_t *pPathType = nullptr ) = 0;
-	template <size_t maxLenInChars> const char *RelativePathToFullPath_safe( const char *pFileName, const char *pPathID, OUT_Z_ARRAY char (&pDest)[maxLenInChars], PathTypeFilter_t pathFilter = FILTER_NONE, PathTypeQuery_t *pPathType = nullptr )
+	template <int maxLenInChars> const char *RelativePathToFullPath_safe( const char *pFileName, const char *pPathID, OUT_Z_ARRAY char (&pDest)[maxLenInChars], PathTypeFilter_t pathFilter = FILTER_NONE, PathTypeQuery_t *pPathType = nullptr )
 	{
-		return RelativePathToFullPath( pFileName, pPathID, pDest, (int)maxLenInChars, pathFilter, pPathType );
+		return RelativePathToFullPath( pFileName, pPathID, pDest, maxLenInChars, pathFilter, pPathType );
 	}
 
 	// Returns the search path, each path is separated by ;s. Returns the length of the string returned
@@ -677,18 +677,18 @@ public:
 	// converts a partial path into a full path
 	// Prefer using the GetLocalPath_safe template wrapper to calling this directly
 	virtual const char		*GetLocalPath( const char *pFileName, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) = 0;
-	template <size_t maxLenInChars> const char *GetLocalPath_safe( const char *pFileName, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
+	template <int maxLenInChars> const char *GetLocalPath_safe( const char *pFileName, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
-		return GetLocalPath( pFileName, pDest, (int)maxLenInChars );
+		return GetLocalPath( pFileName, pDest, maxLenInChars );
 	}
 
 	// Returns true on success ( based on current list of search paths, otherwise false if 
 	//  it can't be resolved )
 	// Prefer using the FullPathToRelativePath_safe template wrapper to calling this directly
 	virtual bool			FullPathToRelativePath( const char *pFullpath, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) = 0;
-	template <size_t maxLenInChars> bool FullPathToRelativePath_safe( const char *pFullpath, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
+	template <int maxLenInChars> bool FullPathToRelativePath_safe( const char *pFullpath, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
-		return FullPathToRelativePath( pFullpath, pDest, (int)maxLenInChars ); //-V2001
+		return FullPathToRelativePath( pFullpath, pDest, maxLenInChars ); //-V2001
 	}
 
 	// Gets the current working directory
@@ -862,9 +862,9 @@ public:
 	// Returns true on success, otherwise false if it can't be resolved
 	// Prefer using the FullPathToRelativePathEx_safe template wrapper to calling this directly
 	virtual bool		FullPathToRelativePathEx( const char *pFullpath, const char *pPathId, OUT_Z_CAP(maxLenInChars) char *pDest, int maxLenInChars ) = 0;
-	template <size_t maxLenInChars> bool FullPathToRelativePathEx_safe( const char *pFullpath, const char *pPathId, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
+	template <int maxLenInChars> bool FullPathToRelativePathEx_safe( const char *pFullpath, const char *pPathId, OUT_Z_ARRAY char (&pDest)[maxLenInChars] )
 	{
-		return FullPathToRelativePathEx( pFullpath, pPathId, pDest, (int)maxLenInChars );
+		return FullPathToRelativePathEx( pFullpath, pPathId, pDest, maxLenInChars );
 	}
 
 	virtual int			GetPathIndex( const FileNameHandle_t &handle ) = 0;
@@ -948,9 +948,9 @@ public:
 	// Returns true on successfully retrieve case-sensitive full path, otherwise false
 	// Prefer using the GetCaseCorrectFullPath template wrapper to calling this directly
 	virtual bool			GetCaseCorrectFullPath_Ptr( const char *pFullPath, OUT_Z_CAP( maxLenInChars ) char *pDest, int maxLenInChars ) = 0;
-	template <size_t maxLenInChars> bool GetCaseCorrectFullPath( const char *pFullPath, OUT_Z_ARRAY char( &pDest )[maxLenInChars] )
+	template <int maxLenInChars> bool GetCaseCorrectFullPath( const char *pFullPath, OUT_Z_ARRAY char( &pDest )[maxLenInChars] )
 	{
-		return GetCaseCorrectFullPath_Ptr( pFullPath, pDest, (int)maxLenInChars );
+		return GetCaseCorrectFullPath_Ptr( pFullPath, pDest, maxLenInChars );
 	}
 };
 
@@ -965,7 +965,7 @@ public:
 	// (this free can't skip memdbg if paired malloc used memdbg)
 #include <tier0/memdbgon.h>
 	CMemoryFileBacking( IFileSystem* pFS ) : m_pFS( pFS ), m_nRegistered( 0 ), m_pFileName( nullptr ), m_pData( nullptr ), m_nLength( 0 ) { }
-	~CMemoryFileBacking() { free( (char*)m_pFileName ); if ( m_pData ) m_pFS->FreeOptimalReadBuffer( (char*)m_pData ); }
+	~CMemoryFileBacking() { free( (char*)m_pFileName ); if ( m_pData ) m_pFS->FreeOptimalReadBuffer( const_cast<char*>(m_pData) ); }
 #include <tier0/memdbgoff.h>
 
 	IFileSystem* m_pFS;

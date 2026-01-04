@@ -1761,7 +1761,7 @@ bool CThread::Start( unsigned nBytesStack )
 // Return true if the thread exists. false otherwise
 //
 
-bool CThread::IsAlive()
+bool CThread::IsAlive() const
 {
 #ifdef _WIN32
 	DWORD dwExitCode;
@@ -1819,7 +1819,7 @@ uint CThread::GetThreadId()
 
 //---------------------------------------------------------
 
-int CThread::GetResult()
+int CThread::GetResult() const
 {
 	return m_result;
 }

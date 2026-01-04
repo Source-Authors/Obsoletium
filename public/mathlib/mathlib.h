@@ -543,7 +543,7 @@ template<class T>
 // return the largest power of two <= x. Will return 0 if passed 0
 [[nodiscard]] FORCEINLINE constexpr uint XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int x )
 {
-	if ( (uint)x >= 0x80000000 ) //-V112
+	if ( static_cast<uint>( x ) >= 0x80000000 ) //-V112
 		return 0x80000000; //-V112
 
 	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;
@@ -561,7 +561,7 @@ template<class T>
 // return the largest power of two <= x. Will return 0 if passed 0
 [[nodiscard]] FORCEINLINE constexpr int64 XM_CALLCONV LargestPowerOfTwoLessThanOrEqual( int64 x )
 {
-	if ( (uint64)x >= 0x8000000000000000 )
+	if ( static_cast<uint64>( x ) >= 0x8000000000000000 )
 		return 0x8000000000000000;
 
 	return SmallestPowerOfTwoGreaterOrEqual( x + 1 ) >> 1;

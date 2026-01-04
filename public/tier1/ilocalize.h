@@ -22,7 +22,7 @@ typedef unsigned short wchar_t;
 
 // direct references to localized strings
 using StringIndex_t = unsigned long;
-constexpr inline unsigned long INVALID_LOCALIZE_STRING_INDEX = (StringIndex_t) -1;
+constexpr inline unsigned long INVALID_LOCALIZE_STRING_INDEX{static_cast<StringIndex_t>(-1)};
 
 //-----------------------------------------------------------------------------
 // Purpose: Handles localization of text
