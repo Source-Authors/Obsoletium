@@ -9,7 +9,7 @@
 #ifndef POLYHEDRON_H_
 #define	POLYHEDRON_H_
 
-#include "mathlib.h"
+#include "vector.h"
 
 
 struct Polyhedron_IndexedLine_t
@@ -25,7 +25,7 @@ struct Polyhedron_IndexedLineReference_t
 
 struct Polyhedron_IndexedPolygon_t
 {
-	unsigned short iFirstIndex;
+	unsigned short iFirstIndex;	
 	unsigned short iIndexCount;
 	Vector polyNormal;
 };
@@ -53,11 +53,11 @@ public:
 class CPolyhedron_AllocByNew : public CPolyhedron
 {
 public:
-	void Release( ) override;
+	void Release() override;
 	[[nodiscard]] static CPolyhedron_AllocByNew *Allocate( unsigned short iVertices, unsigned short iLines, unsigned short iIndices, unsigned short iPolygons ); //creates the polyhedron along with enough memory to hold all it's data in a single allocation
 
 private:
-	CPolyhedron_AllocByNew( ) { } //CPolyhedron_AllocByNew::Allocate() is the only way to create one of these.
+	CPolyhedron_AllocByNew() = default; //CPolyhedron_AllocByNew::Allocate() is the only way to create one of these.
 };
 
 [[nodiscard]] CPolyhedron *GeneratePolyhedronFromPlanes( const float *pOutwardFacingPlanes, int iPlaneCount, float fOnPlaneEpsilon, bool bUseTemporaryMemory = false ); //be sure to polyhedron->Release()
