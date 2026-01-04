@@ -1617,13 +1617,7 @@ FORCEINLINE void XM_CALLCONV StoreUnalignedIntSIMD( int32 * RESTRICT pSIMD, Dire
 [[nodiscard]]
 FORCEINLINE fltx4 XM_CALLCONV UnsignedIntConvertToFltSIMD( const u32x4 vSrcA )
 {
-	fltx4 retval;
-	// dimhotepus: Fix source, was assigned self to self.
-	SubFloat( retval, 0 ) = ( (float) SubInt( vSrcA, 0 ) );
-	SubFloat( retval, 1 ) = ( (float) SubInt( vSrcA, 1 ) );
-	SubFloat( retval, 2 ) = ( (float) SubInt( vSrcA, 2 ) );
-	SubFloat( retval, 3 ) = ( (float) SubInt( vSrcA, 3 ) );
-	return retval;
+	return DirectX::XMConvertVectorUIntToFloat( vSrcA, 0 );
 }
 
 
