@@ -173,7 +173,7 @@ IceKey::IceKey (int n)
 	    _rounds = n * 16;
 	}
 
-	_keysched = new IceSubkey[_rounds];
+	_keysched = new IceSubkey[_rounds]; //-V121
 }
 
 
