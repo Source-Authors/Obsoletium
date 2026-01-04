@@ -6,6 +6,8 @@
 
 #include "tier0/valve_off.h"
 
+#include <system_error>
+
 #ifdef _WIN32
 #include "winlite.h"
 #include <TlHelp32.h>
@@ -21,43 +23,49 @@ ThreadId_t Plat_GetCurrentThreadID()
 }
 
 
-#if defined(_WIN32) && defined(_M_IX86)
+#if defined(_WIN32)
 
-static CThreadMutex s_BreakpointStateMutex;
+namespace {
 
-struct X86HardwareBreakpointState_t
+CThreadMutex s_BreakpointStateMutex;
+
+struct X86_64HardwareBreakpointState_t
 {
 	const void *pAddress[4];
 	char nWatchBytes[4];
 	bool bBreakOnRead[4];
 };
-static X86HardwareBreakpointState_t s_BreakpointState = { {0,0,0,0}, {0,0,0,0}, {false,false,false,false} };
+X86_64HardwareBreakpointState_t s_BreakpointState = { {0,0,0,0}, {0,0,0,0}, {false,false,false,false} };
 
-static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
+void X86_64ApplyBreakpointsToThread( DWORD dwThreadId )
 {
-	CONTEXT ctx;
+	X86_64HardwareBreakpointState_t *pState = &s_BreakpointState;
+
+	CONTEXT ctx = {};
 	ctx.ContextFlags = CONTEXT_DEBUG_REGISTERS;
-	X86HardwareBreakpointState_t *pState = &s_BreakpointState;
-	ctx.Dr0 = (DWORD) (DWORD_PTR) pState->pAddress[0];
-	ctx.Dr1 = (DWORD) (DWORD_PTR) pState->pAddress[1];
-	ctx.Dr2 = (DWORD) (DWORD_PTR) pState->pAddress[2];
-	ctx.Dr3 = (DWORD) (DWORD_PTR) pState->pAddress[3];
-	ctx.Dr7 = (DWORD) (DWORD_PTR) 0;
+	ctx.Dr0 = static_cast<decltype(ctx.Dr0)>( (DWORD_PTR) pState->pAddress[0] );
+	ctx.Dr1 = static_cast<decltype(ctx.Dr1)>( (DWORD_PTR) pState->pAddress[1] );
+	ctx.Dr2 = static_cast<decltype(ctx.Dr2)>( (DWORD_PTR) pState->pAddress[2] );
+	ctx.Dr3 = static_cast<decltype(ctx.Dr3)>( (DWORD_PTR) pState->pAddress[3] );
+	ctx.Dr7 = static_cast<decltype(ctx.Dr7)>( (DWORD_PTR) 0 );
+
 	for ( int i = 0; i < 4; ++i )
 	{
 		if ( pState->pAddress[i] && pState->nWatchBytes[i] )
 		{
-			ctx.Dr7 |= 1 << (i*2);
+			ctx.Dr7 |= static_cast<decltype(ctx.Dr7)>(1ULL << (i*2));
+
 			if ( pState->bBreakOnRead[i] )
-				ctx.Dr7 |= 3 << (16 + i*4);
+				ctx.Dr7 |= static_cast<decltype(ctx.Dr7)>(3ULL << (16 + i*4));
 			else
-				ctx.Dr7 |= 1 << (16 + i*4);
+				ctx.Dr7 |= static_cast<decltype(ctx.Dr7)>(1ULL << (16 + i*4));
+
 			switch ( pState->nWatchBytes[i] )
 			{
-			case 1: ctx.Dr7 |= 0<<(18 + i*4); break; //-V684
-			case 2: ctx.Dr7 |= 1<<(18 + i*4); break;
-			case 4: ctx.Dr7 |= 3<<(18 + i*4); break;
-			case 8: ctx.Dr7 |= 2<<(18 + i*4); break;
+				case 1: ctx.Dr7 |= static_cast<decltype(ctx.Dr7)>(0ULL<<(18 + i*4)); break; //-V684
+				case 2: ctx.Dr7 |= static_cast<decltype(ctx.Dr7)>(1ULL<<(18 + i*4)); break;
+				case 4: ctx.Dr7 |= static_cast<decltype(ctx.Dr7)>(3ULL<<(18 + i*4)); break;
+				case 8: ctx.Dr7 |= static_cast<decltype(ctx.Dr7)>(2ULL<<(18 + i*4)); break;
 			}
 		}
 	}
@@ -66,28 +74,40 @@ static void X86ApplyBreakpointsToThread( DWORD dwThreadId )
 	HANDLE hThread = OpenThread( THREAD_SUSPEND_RESUME | THREAD_SET_CONTEXT, FALSE, dwThreadId );
 	if ( hThread )
 	{
+		RunCodeAtScopeExit(CloseHandle( hThread ));
+
 		// dimhotepus: x64 support.
-#ifndef PLATFORM_64BITS
 		if ( SuspendThread( hThread ) != static_cast<DWORD>(-1) ) //-V720
-#else
-		if ( Wow64SuspendThread( hThread ) != static_cast<DWORD>(-1) )
-#endif
 		{
-			SetThreadContext( hThread, &ctx );
-			ResumeThread( hThread );
+			RunCodeAtScopeExit(ResumeThread( hThread ));
+
+			if ( !SetThreadContext( hThread, &ctx ) )
+			{
+				Warning( "Unable to set context for thread #%lu: %s. Hardware breakpoints will not be applied.\n",
+					dwThreadId, std::system_category().message(::GetLastError()).c_str() );
+			}
 		}
-		CloseHandle( hThread );
+		else
+		{
+			Warning( "Unable to suspend thread #%lu: %s. Hardware breakpoints will not be applied.\n",
+				dwThreadId, std::system_category().message(::GetLastError()).c_str() );
+		}
+	}
+	else
+	{
+		Warning( "Unable to open thread #%lu: %s. Hardware breakpoints will not be applied.\n",
+			dwThreadId, std::system_category().message(::GetLastError()).c_str() );
 	}
 }
 
-static unsigned STDCALL ThreadProcX86SetDataBreakpoints( void* pvParam )
+unsigned STDCALL ThreadProcX86_64SetDataBreakpoints( void* pvParam )
 {
 	// dimhotepus: Add thread name to aid debugging.
 	ThreadSetDebugName("SetX86DataBreaks");
 
 	if ( pvParam )
 	{
-		X86ApplyBreakpointsToThread( *(unsigned long*)pvParam );
+		X86_64ApplyBreakpointsToThread( *static_cast<unsigned long*>(pvParam) );
 		return 0;
 	}
 
@@ -96,14 +116,18 @@ static unsigned STDCALL ThreadProcX86SetDataBreakpoints( void* pvParam )
 
 	DWORD dwProcId = GetCurrentProcessId();
 	DWORD dwThisThreadId = GetCurrentThreadId();
-	HANDLE hSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD, 0 );
-	if ( hSnap != INVALID_HANDLE_VALUE )
+
+	if ( HANDLE hSnap = CreateToolhelp32Snapshot( TH32CS_SNAPTHREAD, 0 );
+		 hSnap != INVALID_HANDLE_VALUE )
 	{
-		THREADENTRY32 threadEntry;
+		RunCodeAtScopeExit(CloseHandle( hSnap ));
+
+		THREADENTRY32 threadEntry = {};
 		// Thread32First/Thread32Next may adjust dwSize to be smaller. It's weird. Read the doc.
-		const DWORD dwMinSize = (char*)(&threadEntry.th32OwnerProcessID + 1) - (char*)&threadEntry;
+		const DWORD_PTR dwMinSize = (char*)(&threadEntry.th32OwnerProcessID + 1) - (char*)&threadEntry;
 
 		threadEntry.dwSize = sizeof( THREADENTRY32 );
+
 		BOOL bContinue = Thread32First( hSnap, &threadEntry );
 		while ( bContinue )
 		{
@@ -111,18 +135,18 @@ static unsigned STDCALL ThreadProcX86SetDataBreakpoints( void* pvParam )
 			{
 				if ( threadEntry.th32OwnerProcessID == dwProcId && threadEntry.th32ThreadID != dwThisThreadId )
 				{
-					X86ApplyBreakpointsToThread( threadEntry.th32ThreadID );
+					X86_64ApplyBreakpointsToThread( threadEntry.th32ThreadID );
 				}
 			}
 
-			threadEntry.dwSize = sizeof( THREADENTRY32 );			
+			threadEntry.dwSize = sizeof( THREADENTRY32 );
 			bContinue = Thread32Next( hSnap, &threadEntry );
 		}
-
-		CloseHandle( hSnap );
 	}
 	return 0;
 }
+
+}  // namespace
 
 void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool bBreakOnRead )
 {
@@ -143,7 +167,7 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 					s_BreakpointState.nWatchBytes[i] = s_BreakpointState.nWatchBytes[i+1];
 					s_BreakpointState.bBreakOnRead[i] = s_BreakpointState.bBreakOnRead[i+1];
 				}
-				s_BreakpointState.pAddress[3] = NULL;
+				s_BreakpointState.pAddress[3] = nullptr;
 				s_BreakpointState.nWatchBytes[3] = 0;
 				s_BreakpointState.bBreakOnRead[3] = false;
 				break;
@@ -178,28 +202,33 @@ void Plat_SetHardwareDataBreakpoint( const void *pAddress, int nWatchBytes, bool
 	}
 	
 
-	HANDLE hWorkThread = (HANDLE)_beginthreadex( NULL, 0, &ThreadProcX86SetDataBreakpoints, NULL, 0, NULL );
+	HANDLE hWorkThread = (HANDLE)_beginthreadex( nullptr, 0,
+		&ThreadProcX86_64SetDataBreakpoints, nullptr, 0, nullptr );
 	if ( hWorkThread )
 	{
+		RunCodeAtScopeExit( CloseHandle( hWorkThread ) );
+
 		WaitForSingleObject( hWorkThread, INFINITE );
-		CloseHandle( hWorkThread );
 	}
 }
 
 void Plat_ApplyHardwareDataBreakpointsToNewThread( unsigned long dwThreadID )
 {
 	AUTO_LOCK(s_BreakpointStateMutex);
+
 	if ( dwThreadID != GetCurrentThreadId() )
 	{
-		X86ApplyBreakpointsToThread( dwThreadID );
+		X86_64ApplyBreakpointsToThread( dwThreadID );
 	}
 	else
 	{
-		HANDLE hWorkThread = (HANDLE)_beginthreadex( NULL, 0, &ThreadProcX86SetDataBreakpoints, &dwThreadID, 0, NULL );
+		HANDLE hWorkThread = (HANDLE)_beginthreadex( nullptr, 0,
+			&ThreadProcX86_64SetDataBreakpoints, &dwThreadID, 0, nullptr );
 		if ( hWorkThread )
 		{
+			RunCodeAtScopeExit( CloseHandle( hWorkThread ) );
+
 			WaitForSingleObject( hWorkThread, INFINITE );
-			CloseHandle( hWorkThread );
 		}
 	}
 }
