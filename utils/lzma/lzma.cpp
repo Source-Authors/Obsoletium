@@ -222,7 +222,7 @@ unsigned char *LZMA_Compress( unsigned char *pInput,
 	lzma_header_t *pHeader = (lzma_header_t *)pOutputBuffer;
 	pHeader->id = LZMA_ID;
 	pHeader->actualSize = inputSize;
-	pHeader->lzmaSize = compressedSize - LZMA_ORIGINAL_HEADER_SIZE;
+	pHeader->lzmaSize = size_cast<unsigned>( compressedSize - LZMA_ORIGINAL_HEADER_SIZE );
 	memcpy( pHeader->properties, pOutputBuffer + sizeof( lzma_header_t ), LZMA_PROPS_SIZE );
 
 	// shift the compressed data into place
@@ -231,7 +231,7 @@ unsigned char *LZMA_Compress( unsigned char *pInput,
 	         compressedSize - LZMA_ORIGINAL_HEADER_SIZE );
 
 	// final output size is our header plus compressed bits
-	*pOutputSize = sizeof( lzma_header_t ) + compressedSize - LZMA_ORIGINAL_HEADER_SIZE;
+	*pOutputSize = size_cast<unsigned>( sizeof( lzma_header_t ) + compressedSize - LZMA_ORIGINAL_HEADER_SIZE );
 
 	return pOutputBuffer;
 }
