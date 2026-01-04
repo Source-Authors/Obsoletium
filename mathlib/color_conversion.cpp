@@ -395,7 +395,7 @@ byte XM_CALLCONV LinearToScreenGamma( float f )
 	return lineartoscreen[i];
 }
 
-void XM_CALLCONV ColorRGBExp32ToVector( const ColorRGBExp32& in, Vector& out )
+void XM_CALLCONV ColorRGBExp32ToVector( ColorRGBExp32 in, Vector& out )
 {
 	Assert( s_bMathlibInitialized );
 	// FIXME: Why is there a factor of 255 built into this?

@@ -1070,7 +1070,7 @@ struct ColorRGBExp32
 	signed char exponent;
 };
 
-void XM_CALLCONV ColorRGBExp32ToVector( const ColorRGBExp32& in, Vector& out );
+void XM_CALLCONV ColorRGBExp32ToVector( ColorRGBExp32 in, Vector& out );
 void XM_CALLCONV VectorToColorRGBExp32( const Vector& v, ColorRGBExp32 &c );
 
 // solve for "x" where "a x^2 + b x + c = 0", return true if solution exists
