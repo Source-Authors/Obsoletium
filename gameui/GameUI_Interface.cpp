@@ -602,7 +602,9 @@ bool CGameUI::FindPlatformDirectory(char *platformDir, int bufferSize)
 		if ( IsPC() )
 		{
 #ifdef WIN32
-			if ( ::GetModuleFileName( ( HINSTANCE )GetModuleHandle( NULL ), platformDir, bufferSize ) )
+		if ( HMODULE module{nullptr};
+			::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, nullptr, &module ) &&
+			::GetModuleFileName( module, platformDir, bufferSize ) )
 			{
 				char *lastslash = strrchr(platformDir, '\\'); // this should be just before the filename
 				if ( lastslash )

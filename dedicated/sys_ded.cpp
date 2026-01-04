@@ -132,7 +132,10 @@ char g_posix_exe_name[MAX_PATH];
 template <int size>
 bool GetExecutableName(char (&out)[size]) {
 #ifdef _WIN32
-  if (!::GetModuleFileNameA(::GetModuleHandleA(nullptr), out, size)) {
+  if (HMODULE module{nullptr};
+      !::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                            nullptr, &module) ||
+      !::GetModuleFileName(module, out, size)) {
     return false;
   }
 #else
@@ -202,14 +205,16 @@ void DumpAppInformation(int argc, char **argv) {
 #ifdef _WIN32
   Msg("%s v.%s build with MSVC %u.%u\n", SE_PRODUCT_FILE_DESCRIPTION_STRING,
       SE_PRODUCT_FILE_VERSION_INFO_STRING, _MSC_FULL_VER, _MSC_BUILD);
-  Msg("%s started with command line args:\n", SE_PRODUCT_FILE_DESCRIPTION_STRING);
+  Msg("%s started with command line args:\n",
+      SE_PRODUCT_FILE_DESCRIPTION_STRING);
   for (int i{0}; i < argc; ++i) {
     Msg("  %s\n", argv[i]);
   }
 #endif
 
 #ifdef __SANITIZE_ADDRESS__
-  Msg("%s running under AddressSanitizer.\n", SE_PRODUCT_FILE_DESCRIPTION_STRING);
+  Msg("%s running under AddressSanitizer.\n",
+      SE_PRODUCT_FILE_DESCRIPTION_STRING);
 #endif
 }
 

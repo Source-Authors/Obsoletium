@@ -303,23 +303,24 @@ static KeyValuesAD ReadKeyValuesFile( const char *pFilename )
 
 static bool Sys_GetExecutableName( char *out, unsigned len )
 {
-#if defined( _WIN32 )
-    if ( !::GetModuleFileName( ( HINSTANCE )GetModuleHandle( nullptr ), out, len ) )
+#if defined(_WIN32)
+	if ( HMODULE module{nullptr};
+		 !::GetModuleHandleEx( GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, nullptr, &module ) ||
+		 !::GetModuleFileName( module, out, len ) )
     {
 		return false;
     }
-#else
-	if ( CommandLine()->GetParm(0) )
-	{
-		V_MakeAbsolutePath( out, len, CommandLine()->GetParm(0) );
-	}
-	else
-	{
-		return false;
-	}
-#endif
 
 	return true;
+#else
+	if ( const char *arg = CommandLine()->GetParm(0); arg )
+	{
+		V_MakeAbsolutePath( out, len, arg );
+		return true;
+	}
+
+		return false;
+#endif
 }
 
 bool FileSystem_GetExecutableDir( OUT_Z_CAP(exeDirLen) char *exedir, unsigned exeDirLen )

@@ -58,7 +58,7 @@ const char *PrefixMessageGroup(char (&out)[out_size], const char *group,
                                const char *message) {
   const char *out_group{GetSpewOutputGroup()};
 
-  out_group = !Q_isempty( out_group ) ? out_group : group;
+  out_group = !Q_isempty(out_group) ? out_group : group;
 
   const size_t length{strlen(message)};
   if (length > 1 && message[length - 1] == '\n') {
@@ -108,7 +108,10 @@ SpewRetval_t DefaultSpew(SpewType_t spew_type, const char *raw) {
 template <DWORD out_size>
 bool GetExecutableName(char (&out)[out_size]) {
 #ifdef WIN32
-  if (!::GetModuleFileName(GetModuleHandle(nullptr), out, out_size)) {
+  if (HMODULE module{nullptr};
+      !::GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                           nullptr, &module) ||
+      !::GetModuleFileName(module, out, out_size)) {
     return false;
   }
   return true;
@@ -333,8 +336,8 @@ void DumpAppInformation(
 #ifdef _WIN32
   Msg("%s v.%s build with MSVC %u.%u\n", SE_PRODUCT_FILE_DESCRIPTION_STRING,
       SE_PRODUCT_FILE_VERSION_INFO_STRING, _MSC_FULL_VER, _MSC_BUILD);
-  Msg("%s started with command line '%s'\n",
-      SE_PRODUCT_FILE_DESCRIPTION_STRING, cmd_line);
+  Msg("%s started with command line '%s'\n", SE_PRODUCT_FILE_DESCRIPTION_STRING,
+      cmd_line);
 #else
   Msg("%s started with command line args:\n",
       SE_PRODUCT_FILE_DESCRIPTION_STRING);
