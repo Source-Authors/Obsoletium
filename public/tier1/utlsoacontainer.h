@@ -137,26 +137,32 @@ protected:
 
 	size_t m_nStrideInBytes[MAX_SOA_FIELDS];			  // stride from one field datum to another
 	size_t m_nRowStrideInBytes[MAX_SOA_FIELDS];			  // stride from one row datum to another per field
-	size_t m_nSliceStrideInBytes[MAX_SOA_FIELDS];         // stride from one slice datum to another per field
-
-
+	size_t m_nSliceStrideInBytes[MAX_SOA_FIELDS];		  // stride from one slice datum to another per field
 
 	uint32 m_nFieldPresentMask;
 
 	FORCEINLINE void Init( )
 	{
+		m_nColumns = m_nRows = m_nSlices = 0;
+		m_nPaddedColumns = m_nNumQuadsPerRow = 0;
+		
+		m_pDataMemory = nullptr;
+		BitwiseClear(m_pAttributePtrs);
+		BitwiseClear(m_nRowStrideInBytes);
+		BitwiseClear(m_nSliceStrideInBytes);
+
 		for (auto& t : m_nDataType)
 		{
 			t = ATTRDATATYPE_NONE;
 		}
-		m_pDataMemory = nullptr;
-		m_nColumns = m_nPaddedColumns = m_nRows = m_nSlices = 0;
+
+		BitwiseClear(m_nStrideInBytes);
 		m_nFieldPresentMask = 0;
 	}
 public:
 
 
-	CSOAContainer( )									// an empoty one with no attributes
+	CSOAContainer( )									// an empty one with no attributes
 	{
 		Init();
 	}
