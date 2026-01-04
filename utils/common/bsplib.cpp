@@ -4751,7 +4751,11 @@ bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFun
 			else if ( lumpNum == LUMP_PAKFILE )
 			{
 				IZip *newPakFile = IZip::CreateZip( NULL );
+				RunCodeAtScopeExit(IZip::ReleaseZip( newPakFile ));
+
 				IZip *oldPakFile = IZip::CreateZip( NULL );
+				RunCodeAtScopeExit(IZip::ReleaseZip( oldPakFile ));
+
 				oldPakFile->ParseFromBuffer( inputBuffer.Base(), inputBuffer.Size() );
 
 				int id = -1;
@@ -4784,9 +4788,6 @@ bool RepackBSP( CUtlBuffer &inputBufferIn, CUtlBuffer &outputBuffer, CompressFun
 				sOutBSPHeader.lumps[lumpNum].filelen = outputBuffer.TellPut() - newOffset;
 				// Note that this *lump* is uncompressed, it just contains a packfile that uses compression, so we're
 				// not setting lumps[lumpNum].uncompressedSize
-
-				IZip::ReleaseZip( oldPakFile );
-				IZip::ReleaseZip( newPakFile );
 			}
 			else
 			{
