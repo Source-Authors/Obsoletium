@@ -74,8 +74,20 @@ public:
 		SetSize( width, height );
 	}
 
+	// dimhotepus: Add copy constructor.
+	CSIMDVectorMatrix( CSIMDVectorMatrix const &src )
+	{
+		SetSize( src.m_nWidth, src.m_nHeight );
+		if ( m_pData )
+			memcpy( m_pData, src.m_pData, m_nHeight*m_nPaddedWidth*sizeof(m_pData[0]) ); 
+	}
+
 	CSIMDVectorMatrix &operator=( CSIMDVectorMatrix const &src )
 	{
+		// dimhotepus: Protect against self-assignment.
+		if ( &src == this )
+			return *this;
+
 		SetSize( src.m_nWidth, src.m_nHeight );
 		if ( m_pData )
 			memcpy( m_pData, src.m_pData, m_nHeight*m_nPaddedWidth*sizeof(m_pData[0]) ); 
