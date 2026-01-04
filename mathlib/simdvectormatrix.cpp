@@ -64,7 +64,7 @@ void CSIMDVectorMatrix::RaiseToPower( float power )
 	int nv=NVectors();
 	if ( nv )
 	{
-		int fixed_point_exp=(int) ( 4.0*power );
+		int fixed_point_exp=static_cast<int>( 4.0f * power );
 		FourVectors *src=m_pData;
 		do
 		{
