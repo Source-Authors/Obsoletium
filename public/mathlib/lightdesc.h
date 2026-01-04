@@ -56,7 +56,7 @@ protected:
 	float m_RangeSquared;
 public:
 
-	void RecalculateDerivedValues();			 // calculate m_xxDot, m_Type for changed parms
+	void RecalculateDerivedValues();			 // calculate m_xxDot, m_Type for changed parameters
 
 	LightDesc_t() = default;
 
@@ -64,12 +64,14 @@ public:
 
 	// a point light with infinite range
 	LightDesc_t( const Vector &pos, const Vector &color )
+		: m_ThetaDot{0.0F}, m_PhiDot{0.0F},
+		m_Falloff{0.0F}, m_Theta{0.0F}, m_Phi{0.0F}
 	{
 		InitPoint( pos, color );
 	}
 	
 	/// a simple light. cone boundaries in radians. you pass a look_at point and the
-	/// direciton is derived from that.
+	/// direction is derived from that.
 	LightDesc_t( const Vector &pos, const Vector &color, const Vector &point_at,
 				float inner_cone_boundary, float outer_cone_boundary )
 			: m_ThetaDot{0.0F}, m_PhiDot{0.0F}, m_Flags{0},
