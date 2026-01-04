@@ -1829,85 +1829,87 @@ bool CBaseFileSystem::WriteFile( const char *pFileName, const char *pPath, CUtlB
 bool CBaseFileSystem::UnzipFile( const char *pFileName, const char *pPath, const char *pDestination )
 {
 	IZip *pZip = IZip::CreateZip( nullptr, true );
+	RunCodeAtScopeExit(IZip::ReleaseZip(pZip));
 
-	HANDLE hZipFile = pZip->ParseFromDisk( pFileName );
-	if ( !hZipFile )
 	{
-		Msg( "Bad or missing zip file, failed to open '%s'\n", pFileName );
-		return false;
-	}
-
-	int iZipIndex = -1;
-	int iFileSize;
-	char szFileName[MAX_PATH];
-
-	// Create Directories
-	CreateDirHierarchy( pDestination, pPath );
-
-	while ( 1 )
-	{
-		// Get the next file in the zip
-		szFileName[0] = '\0';
-		iFileSize = 0;
-		iZipIndex = pZip->GetNextFilename( iZipIndex, szFileName, sizeof( szFileName ), iFileSize );
-
-		// If there aren't any more files then break out of this while
-		if ( iZipIndex == -1 )
-			break;
-
-		intp iFileNameLength = Q_strlen( szFileName );
-		if ( szFileName[ iFileNameLength - 1 ] == '/' )
+		HANDLE hZipFile = pZip->ParseFromDisk( pFileName );
+		if ( !hZipFile )
 		{
-			// Its a directory, so create it
-			szFileName[ iFileNameLength - 1 ] = '\0';
-
-			char szFinalName[ MAX_PATH ];
-			Q_snprintf( szFinalName, sizeof( szFinalName ), "%s%c%s", pDestination, CORRECT_PATH_SEPARATOR, szFileName );
-			CreateDirHierarchy( szFinalName, pPath );
+			Msg( "Bad or missing zip file, failed to open '%s'\n", pFileName );
+			return false;
 		}
-	}
+	
+#ifdef WIN32
+		RunCodeAtScopeExit(::CloseHandle( hZipFile ));
+#else
+		RunCodeAtScopeExit(fclose( (FILE *)hZipFile ));
+#endif
 
-	// Write Files
-	while ( 1 )
-	{
-		szFileName[0] = '\0';
-		iFileSize = 0;
-		iZipIndex = pZip->GetNextFilename( iZipIndex, szFileName, sizeof( szFileName ), iFileSize );
+		int iZipIndex = -1;
+		int iFileSize;
+		char szFileName[MAX_PATH];
 
-		// If there aren't any more files then break out of this while
-		if ( iZipIndex == -1 )
-			break;
+		// Create Directories
+		CreateDirHierarchy( pDestination, pPath );
 
-		intp iFileNameLength = Q_strlen( szFileName );
-		if ( szFileName[ iFileNameLength - 1 ] != '/' )
+		while ( 1 )
 		{
-			// It's not a directory, so write the file
-			CUtlBuffer fileBuffer;
-			fileBuffer.Purge();
+			// Get the next file in the zip
+			szFileName[0] = '\0';
+			iFileSize = 0;
+			iZipIndex = pZip->GetNextFilename( iZipIndex, szFileName, sizeof( szFileName ), iFileSize );
 
-			if ( pZip->ReadFileFromZip( hZipFile, szFileName, false, fileBuffer ) )
+			// If there aren't any more files then break out of this while
+			if ( iZipIndex == -1 )
+				break;
+
+			intp iFileNameLength = Q_strlen( szFileName );
+			if ( szFileName[ iFileNameLength - 1 ] == '/' )
 			{
+				// Its a directory, so create it
+				szFileName[ iFileNameLength - 1 ] = '\0';
+
 				char szFinalName[ MAX_PATH ];
 				Q_snprintf( szFinalName, sizeof( szFinalName ), "%s%c%s", pDestination, CORRECT_PATH_SEPARATOR, szFileName );
+				CreateDirHierarchy( szFinalName, pPath );
+			}
+		}
 
-				// Make sure the directory actually exists in case the ZIP doesn't list it (our zip utils create zips like this)
-				char szFilePath[ MAX_PATH ];
-				Q_strncpy( szFilePath, szFinalName, sizeof(szFilePath) );
-				V_StripFilename( szFilePath );
-				CreateDirHierarchy( szFilePath, pPath );
+		// Write Files
+		while ( 1 )
+		{
+			szFileName[0] = '\0';
+			iFileSize = 0;
+			iZipIndex = pZip->GetNextFilename( iZipIndex, szFileName, sizeof( szFileName ), iFileSize );
 
-				WriteFile( szFinalName, pPath, fileBuffer );
+			// If there aren't any more files then break out of this while
+			if ( iZipIndex == -1 )
+				break;
+
+			intp iFileNameLength = Q_strlen( szFileName );
+			if ( szFileName[ iFileNameLength - 1 ] != '/' )
+			{
+				// It's not a directory, so write the file
+				CUtlBuffer fileBuffer;
+				fileBuffer.Purge();
+
+				if ( pZip->ReadFileFromZip( hZipFile, szFileName, false, fileBuffer ) )
+				{
+					char szFinalName[ MAX_PATH ];
+					Q_snprintf( szFinalName, sizeof( szFinalName ), "%s%c%s", pDestination, CORRECT_PATH_SEPARATOR, szFileName );
+
+					// Make sure the directory actually exists in case the ZIP doesn't list it (our zip utils create zips like this)
+					char szFilePath[ MAX_PATH ];
+					Q_strncpy( szFilePath, szFinalName, sizeof(szFilePath) );
+					V_StripFilename( szFilePath );
+					CreateDirHierarchy( szFilePath, pPath );
+
+					WriteFile( szFinalName, pPath, fileBuffer );
+				}
 			}
 		}
 	}
 
-#ifdef WIN32
-	::CloseHandle( hZipFile );
-#else
-	fclose( (FILE *)hZipFile );
-#endif
-
-	IZip::ReleaseZip( pZip );
 	return true;
 }
 

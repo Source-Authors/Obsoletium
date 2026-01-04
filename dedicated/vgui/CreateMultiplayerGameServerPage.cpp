@@ -435,11 +435,11 @@ bool CCreateMultiplayerGameServerPage::LaunchOldDedicatedServer(
         if (!CreateProcess(NULL, commandLine, NULL, NULL, false, 0, NULL,
                            steamDir, &si, &pi)) {
           Error("LaunchOldDedicatedServer: Unable to launch old srcds.");
-        } else {
-          // dimhotepus: Do not leak handles.
-          CloseHandle(pi.hThread);
-          CloseHandle(pi.hProcess);
         }
+
+        // dimhotepus: Do not leak handles.
+        RunCodeAtScopeExit(CloseHandle(pi.hThread));
+        RunCodeAtScopeExit(CloseHandle(pi.hProcess));
 
         return true;
       }

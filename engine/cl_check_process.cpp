@@ -65,6 +65,8 @@ int CheckOtherInstancesRunningWithSnapShot( const char *thisProcessNameShort )
 	HANDLE hSnapshot = CreateToolhelp32Snapshot( TH32CS_SNAPPROCESS, 0 );
 	if( hSnapshot )
 	{
+		RunCodeAtScopeExit(CloseHandle(hSnapshot));
+
 		PROCESSENTRY32 pe32 = {};
 		pe32.dwSize = sizeof(PROCESSENTRY32);
 
@@ -81,8 +83,6 @@ int CheckOtherInstancesRunningWithSnapShot( const char *thisProcessNameShort )
 				}
 			} while( Process32Next( hSnapshot, &pe32 ) );
 		}
-
-		CloseHandle(hSnapshot);
 	}
 
 	return iSnapShotCount;
@@ -206,6 +206,8 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 	
 			if ( process != NULL )
 			{
+				RunCodeAtScopeExit(CloseHandle( process ));
+
 				//  Query the name of the executable for the process we opened.  If the query
 				//  fails, we ignore this process.
 				nLength = MAX_PATH;
@@ -223,8 +225,6 @@ int CheckOtherInstancesWithEnumProcess( const char *thisProcessNameShort )
 						iProcessCount++;
 					}
 				}
-	
-				CloseHandle( process );
 			}
 		}
 	}
