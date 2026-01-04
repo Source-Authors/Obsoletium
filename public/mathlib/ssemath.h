@@ -1664,27 +1664,11 @@ FORCEINLINE i32x4 XM_CALLCONV IntShiftLeftWordSIMD(const i32x4 vSrcA, const i32x
 
 // Fixed-point conversion and save as SIGNED INTS.
 // pDest->x = Int (vSrc.x)
-// NOTE: Some architectures have means of doing fixed point conversion
-// when the fix depth is specified as an immediate.. but there is no
-// way to guarantee an immediate as a parameter to function like this.
 FORCEINLINE void XM_CALLCONV ConvertStoreAsIntsSIMD(intx4 * RESTRICT pDest, DirectX::FXMVECTOR vSrc)
 {
-#if defined( COMPILER_MSVC64 ) || !defined(_XM_SSE_INTRINSICS_)
-
-	(*pDest)[0] = (int)SubFloat( vSrc, 0 );
-	(*pDest)[1] = (int)SubFloat( vSrc, 1 );
-	(*pDest)[2] = (int)SubFloat( vSrc, 2 );
-	(*pDest)[3] = (int)SubFloat( vSrc, 3 );
-
-#else
-	__m64 bottom = _mm_cvttps_pi32( vSrc );
-	__m64 top    = _mm_cvttps_pi32( _mm_movehl_ps(vSrc,vSrc) );
-
-	memcpy( &(*pDest)[0], &bottom, sizeof(bottom) );
-	memcpy( &(*pDest)[2], &top, sizeof(top) );
-
-	_mm_empty();
-#endif
+	// dimhotepus: Use correct converion float -> int.
+	DirectX::XMVECTOR vInt32 = DirectX::XMConvertVectorFloatToInt( vSrc, 0 );
+	DirectX::XMStoreInt4A( reinterpret_cast<uint32_t *>( pDest->Base() ), vInt32 );
 }
 
 #endif  // !USE_STDC_FOR_SIMD
