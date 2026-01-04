@@ -1058,7 +1058,7 @@ FORCEINLINE fltx4 XM_CALLCONV ReplicateX4(float flValue) {
 
 // Performance loss. Use with care.
 [[nodiscard]]
-FORCEINLINE float XM_CALLCONV SubFloat( const fltx4& a, size_t idx )
+FORCEINLINE float XM_CALLCONV SubFloat( const fltx4& a, size_t idx ) //-V835
 {
 	return DirectX::XMVectorGetByIndex( a, idx ); //-V2002
 }
@@ -1082,7 +1082,7 @@ FORCEINLINE uint32 XM_CALLCONV SubFloatConvertToInt( DirectX::FXMVECTOR a, size_
 
 // Performance loss. Use with care.
 [[nodiscard]]
-FORCEINLINE uint32 XM_CALLCONV SubInt( const fltx4& a, size_t idx )
+FORCEINLINE uint32 XM_CALLCONV SubInt( const fltx4& a, size_t idx ) //-V835
 {
 	return DirectX::XMVectorGetIntByIndex( a, idx ); //-V2002
 }
