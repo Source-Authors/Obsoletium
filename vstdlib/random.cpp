@@ -17,7 +17,12 @@ constexpr inline int IM{2147483647}; //-V707
 constexpr inline int IQ{127773}; //-V707
 constexpr inline int IR{2836}; //-V707
 constexpr inline int NDIV{1 + (IM - 1) / NTAB};
-constexpr inline unsigned long MAX_RANDOM_RANGE{0x7FFFFFFFUL};
+constexpr inline uint32 MAX_RANDOM_RANGE_32BIT{0x7FFF'FFFFU};
+
+#ifdef PLATFORM_64BITS
+// dimhotepus: int64 support.
+constexpr inline uint64 MAX_RANDOM_RANGE_64BIT{0x7FFF'FFFF'FFFF'FFFFU};
+#endif
 
 // fran1 -- return a random floating-point number on the interval [0,1)
 //
@@ -65,6 +70,14 @@ int RandomInt( int iMinVal, int iMaxVal )
 	return s_pUniformStream->RandomInt( iMinVal, iMaxVal );
 }
 
+#ifdef PLATFORM_64BITS
+// dimhotepus: int64 support.
+int64 RandomInt64( int64 iMinVal, int64 iMaxVal )
+{
+	return s_pUniformStream->RandomInt64( iMinVal, iMaxVal );
+}
+#endif
+
 float RandomGaussianFloat( float flMean, float flStdDev )
 {
 	return s_GaussianStream.RandomFloat( flMean, flStdDev );
@@ -86,6 +99,12 @@ void CUniformRandomStream::SetSeed( int iSeed )
 	AUTO_LOCK( m_mutex );
 	m_idum = ( ( iSeed < 0 ) ? iSeed : -iSeed );
 	m_iy = 0;
+
+#ifdef PLATFORM_64BITS
+	// dimhotepus: int64 support.
+	m_idum64 = ( ( iSeed < 0 ) ? iSeed : -iSeed );
+	m_iy64 = 0;
+#endif
 }
 
 int CUniformRandomStream::GenerateRandomNumber()
@@ -126,7 +145,7 @@ int CUniformRandomStream::GenerateRandomNumber()
 		DebuggerBreakIfDebugging();
 		Warning("CUniformRandomStream had an array overrun: tried to write to element %d of 0..31. Contact Tom or Elan.\n", j);
 		// Ensure that NTAB is a power of two.
-		COMPILE_TIME_ASSERT( ( NTAB & ( NTAB - 1 ) ) == 0 );
+		COMPILE_TIME_ASSERT( IsPowerOfTwo( NTAB ) );
 		// Clamp j.
 		j &= NTAB - 1;
 	}
@@ -136,6 +155,58 @@ int CUniformRandomStream::GenerateRandomNumber()
 
 	return m_iy;
 }
+
+#ifdef PLATFORM_64BITS
+// dimhotepus: int64 support.
+int64 CUniformRandomStream::GenerateRandomNumber64()
+{
+	AUTO_LOCK( m_mutex );
+	int64 j;
+	int64 k;
+	
+	if (m_idum64 <= 0 || !m_iy64)
+	{
+		if (-(m_idum64) < 1) 
+			m_idum64=1;
+		else 
+			m_idum64 = -(m_idum64);
+
+		for ( j=NTAB+7; j>=0; j--)
+		{
+			k = (m_idum64)/IQ;
+			m_idum64 = IA*(m_idum64-k*IQ)-IR*k;
+			if (m_idum64 < 0) 
+				m_idum64 += IM;
+			if (j < NTAB)
+				m_iv64[j] = m_idum64;
+		}
+		m_iy64=m_iv64[0];
+	}
+	k=(m_idum64)/IQ;
+	m_idum64=IA*(m_idum64-k*IQ)-IR*k;
+	if (m_idum64 < 0) 
+		m_idum64 += IM;
+	j=m_iy64/NDIV;
+
+	// We're seeing some strange memory corruption in the contents of s_pUniformStream. 
+	// Perhaps it's being caused by something writing past the end of this array? 
+	// Bounds-check in release to see if that's the case.
+	if (j >= NTAB || j < 0)
+	{
+		DebuggerBreakIfDebugging();
+		Warning("CUniformRandomStream had an array overrun: tried to write to element %lld of 0..31. Contact Tom or Elan.\n", j);
+		// Ensure that NTAB is a power of two.
+		COMPILE_TIME_ASSERT( IsPowerOfTwo( NTAB ) );
+		// Clamp j.
+		j &= NTAB - 1;
+	}
+
+	m_iy64=m_iv64[j];
+	m_iv64[j] = m_idum64;
+
+	return m_iy64;
+}
+#endif
 
 float CUniformRandomStream::RandomFloat( float flLow, float flHigh )
 {
@@ -172,9 +243,9 @@ int CUniformRandomStream::RandomInt( int iLow, int iHigh )
 
 	// If you hit either of these assert, you're not getting back the random number that you thought you were.
 	Assert( x == iHigh-(int64)iLow+1 ); // Check that we didn't overflow int
-	Assert( x-1 <= MAX_RANDOM_RANGE ); // Check that the values provide an acceptable range
+	Assert( x-1 <= MAX_RANDOM_RANGE_32BIT ); // Check that the values provide an acceptable range
 
-	if (x <= 1 || MAX_RANDOM_RANGE < x-1)
+	if (x <= 1 || MAX_RANDOM_RANGE_32BIT < x-1)
 	{
 		Assert( iLow == iHigh ); // This is the only time it is OK to have a range containing a single number
 		return iLow;
@@ -188,7 +259,7 @@ int CUniformRandomStream::RandomInt( int iLow, int iHigh )
 	// much smaller than MAX_RANDOM_RANGE, the average number of times through the
 	// loop is very close to 1.
 	//
-	maxAcceptable = MAX_RANDOM_RANGE - ((MAX_RANDOM_RANGE+1) % x );
+	maxAcceptable = MAX_RANDOM_RANGE_32BIT - ((MAX_RANDOM_RANGE_32BIT+1) % x );
 	do
 	{
 		n = GenerateRandomNumber();
@@ -197,6 +268,42 @@ int CUniformRandomStream::RandomInt( int iLow, int iHigh )
 	return iLow + (n % x);
 }
 
+#ifdef PLATFORM_64BITS
+// dimhotepus: int64 support.
+int64 CUniformRandomStream::RandomInt64( int64 iLow, int64 iHigh )
+{
+	//ASSERT(lLow <= lHigh);
+	uint64 maxAcceptable;
+	uint64 x = iHigh-iLow+1;
+	uint64 n;
+
+	// If you hit either of these assert, you're not getting back the random number that you thought you were.
+	Assert( x == iHigh-(uint64)iLow+1 ); // Check that we didn't overflow int
+	Assert( x-1 <= MAX_RANDOM_RANGE_64BIT ); // Check that the values provide an acceptable range
+
+	if (x <= 1 || MAX_RANDOM_RANGE_64BIT < x-1)
+	{
+		Assert( iLow == iHigh ); // This is the only time it is OK to have a range containing a single number
+		return iLow;
+	}
+
+	// The following maps a uniform distribution on the interval [0,MAX_RANDOM_RANGE]
+	// to a smaller, client-specified range of [0,x-1] in a way that doesn't bias
+	// the uniform distribution unfavorably. Even for a worst case x, the loop is
+	// guaranteed to be taken no more than half the time, so for that worst case x,
+	// the average number of times through the loop is 2. For cases where x is
+	// much smaller than MAX_RANDOM_RANGE, the average number of times through the
+	// loop is very close to 1.
+	//
+	maxAcceptable = MAX_RANDOM_RANGE_64BIT - ((MAX_RANDOM_RANGE_64BIT+1) % x );
+	do
+	{
+		n = GenerateRandomNumber64();
+	} while (n > maxAcceptable);
+
+	return iLow + (n % x);
+}
+#endif
 
 //-----------------------------------------------------------------------------
 //

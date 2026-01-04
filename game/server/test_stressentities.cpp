@@ -87,7 +87,7 @@ void Test_SpawnRandomEntities( const CCommand &args )
 
 	if ( g_StressEntities.Count() == 0 )
 	{
-		Error( "Test_SpawnRandomEntities: not initialized (call Test_InitRandomEntitySpawner frst)." );
+		Error( "Test_SpawnRandomEntities: not initialized (call Test_InitRandomEntitySpawner first)." );
 	} 
 
 	int nMin = atoi( args[ 1 ] );
@@ -96,14 +96,14 @@ void Test_SpawnRandomEntities( const CCommand &args )
 
 	for ( int i=0; i < count; i++ )
 	{
-		int iSlot = RandomInt( 0, g_StressEntities.Count() - 1 );
+		intp iSlot = RandomIntp( 0, g_StressEntities.Count() - 1 );
 
 		// Remove any old entity in this slot.
 		if ( g_StressEntities[iSlot].Get() )
 			UTIL_RemoveImmediate( g_StressEntities[iSlot] );
 
 		// Create a new one in this slot.
-		int iType = RandomInt( 0, g_StressEntityRegs.Count() - 1 );
+		intp iType = RandomIntp( 0, g_StressEntityRegs.Count() - 1 );
 		g_StressEntities[iSlot] = g_StressEntityRegs[iType]->GetFn()();
 	}
 }

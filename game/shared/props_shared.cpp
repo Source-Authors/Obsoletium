@@ -476,15 +476,15 @@ const char *CPropData::GetRandomChunkModel( const char *pszBreakableSection, int
 		return NULL;
 
 	// Now pick a random one and return it
-	int iRandom;
+	intp iRandom;
 	if ( iMaxSize == -1 )
 	{
-		iRandom = RandomInt( 0, m_BreakableChunks[i].iszChunkModels.Count()-1 );
+		iRandom = RandomIntp( 0, m_BreakableChunks[i].iszChunkModels.Count()-1 );
 	}
 	else
 	{
 		// Don't pick anything over the specified size
-		iRandom = RandomInt( 0, MIN(iMaxSize, m_BreakableChunks[i].iszChunkModels.Count()-1) );
+		iRandom = RandomIntp( 0, MIN(iMaxSize, m_BreakableChunks[i].iszChunkModels.Count()-1) );
 	}
 
 	return STRING(m_BreakableChunks[i].iszChunkModels[iRandom]);

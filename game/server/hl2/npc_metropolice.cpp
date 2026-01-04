@@ -3892,7 +3892,7 @@ void CNPC_MetroPolice::AnnounceHarrassment( void )
 		"METROPOLICE_BACK_UP_C",
 	};
 
-	m_Sentences.Speak( pWarnings[ random->RandomInt( 0, ARRAYSIZE(pWarnings)-1 ) ], SENTENCE_PRIORITY_MEDIUM, SENTENCE_CRITERIA_NORMAL );
+	m_Sentences.Speak( pWarnings[ random->RandomIntp( 0, ssize(pWarnings)-1 ) ], SENTENCE_PRIORITY_MEDIUM, SENTENCE_CRITERIA_NORMAL );
 }
 
 //-----------------------------------------------------------------------------

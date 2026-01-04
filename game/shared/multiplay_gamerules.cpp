@@ -145,7 +145,7 @@ ConVar nextlevel( "nextlevel",
 
 #ifndef CLIENT_DLL
 time_t CMultiplayRules::m_nMapCycleTimeStamp = 0;
-int CMultiplayRules::m_nMapCycleindex = 0;
+intp CMultiplayRules::m_nMapCycleindex = 0;
 CUtlVector<char*> CMultiplayRules::m_MapList;
 #endif
 
@@ -1208,7 +1208,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 		if ( bRandom )
 		{
-			m_nMapCycleindex = RandomInt( 0, m_MapList.Count() - 1 );
+			m_nMapCycleindex = RandomIntp( 0, m_MapList.Count() - 1 );
 		}
 
 		// Here's the return value
@@ -1380,7 +1380,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 
 	void CMultiplayRules::LoadMapCycleFile( void )
 	{
-		int nOldCycleIndex = m_nMapCycleindex;
+		intp nOldCycleIndex = m_nMapCycleindex;
 		m_nMapCycleindex = 0;
 
 		char mapcfile[MAX_PATH];
@@ -1491,7 +1491,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		else
 		{
 			// Otherwise, if the current map selection is in the list, set m_nMapCycleindex to the map that follows it.
-			for ( int i = 0; i < m_MapList.Count(); i++ )
+			for ( intp i = 0; i < m_MapList.Count(); i++ )
 			{
 				if ( V_strcmp( STRING( gpGlobals->mapname ), m_MapList[i] ) == 0 )
 				{
@@ -1799,7 +1799,7 @@ ConVarRef suitcharger( "sk_suitcharger" );
 		int iSpeaker = iNumRandomPlayer;
 		while ( iSpeaker > 0 && speakCandidates.Count() > 0 )
 		{
-			int iRandomSpeaker = RandomInt( 0, speakCandidates.Count() - 1 );
+			intp iRandomSpeaker = RandomIntp( 0, speakCandidates.Count() - 1 );
 			speakCandidates[ iRandomSpeaker ]->SpeakConceptIfAllowed( iConcept, modifiers );
 			speakCandidates.FastRemove( iRandomSpeaker );
 			iSpeaker--;

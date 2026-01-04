@@ -401,7 +401,7 @@ int CStudioHdr::CActivityToSequenceMapping::SelectWeightedSequenceFromModifiers(
 		return topScoring[ SharedRandomInt( "SelectWeightedSequence", 0, topScoring.Count() - 1 ) ];
 	}
 	
-	return topScoring[ RandomInt( 0, topScoring.Count() - 1 ) ];
+	return topScoring[ RandomIntp( 0, topScoring.Count() - 1 ) ];
 }
 
 

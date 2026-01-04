@@ -327,7 +327,7 @@ void C_Plasma::Start( void )
 		// Setup all the information for the client entity
 		m_entFlames[i].SetModelByIndex( nModelIndex );
 		m_entFlames[i].SetLocalOrigin( GetLocalOrigin() );
-		m_entFlames[i].m_flFrame			= random->RandomInt( 0.0f, maxFrames );
+		m_entFlames[i].m_flFrame			= random->RandomInt( 0, maxFrames );
 		m_entFlames[i].m_flSpriteFramerate	= (float) random->RandomInt( 15, 20 );
 		m_entFlames[i].SetScale( m_flStartScale );
 		m_entFlames[i].SetRenderMode( kRenderTransAddFrameBlend );

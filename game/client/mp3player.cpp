@@ -1583,7 +1583,7 @@ void CMP3Player::GoToNextSong( int skip )
 	{
 		if ( shuffle )
 		{
-			m_nCurrentPlaylistSong = random->RandomInt( 0, m_PlayList.Count() - 1 );
+			m_nCurrentPlaylistSong = random->RandomIntp( 0, m_PlayList.Count() - 1 );
 		}
 		else
 		{
@@ -1601,7 +1601,7 @@ void CMP3Player::GoToNextSong( int skip )
 	{
 		if ( shuffle )
 		{
-			nextSong = random->RandomInt( 0, m_Files.Count() - 1 );
+			nextSong = random->RandomIntp( 0, m_Files.Count() - 1 );
 		}
 		else
 		{

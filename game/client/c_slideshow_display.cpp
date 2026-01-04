@@ -161,7 +161,7 @@ void C_SlideshowDisplay::ClientThink( void )
 	switch ( m_iCycleType )
 	{
 		case SLIDESHOW_CYCLE_RANDOM:
-			m_iCurrentSlide = RandomInt( 0, pSlideMaterialList->iSlideMaterials.Count() - 1 );
+			m_iCurrentSlide = RandomIntp( 0, pSlideMaterialList->iSlideMaterials.Count() - 1 );
 			break;
 
 		case SLIDESHOW_CYCLE_FORWARD:

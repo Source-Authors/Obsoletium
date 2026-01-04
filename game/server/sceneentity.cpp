@@ -2208,7 +2208,7 @@ void CSceneEntity::InputInterjectResponse( inputdata_t &inputdata )
 		while (candidates.Count() > 0)
 		{
 			// Pick a random slot in the candidates array.
-			int slot = RandomInt( 0, candidates.Count() - 1 );
+			intp slot = RandomIntp( 0, candidates.Count() - 1 );
 
 			CAI_BaseActor *npc = candidates[ slot ];
 
@@ -3822,7 +3822,7 @@ CBaseEntity *CSceneEntity::FindNamedEntity( const char *name, CBaseEntity *pActo
 
 		if ( iCount > 0 )
 		{
-			entity = entityList[ RandomInt( 0, iCount - 1 ) ];
+			entity = entityList[ RandomIntp( 0, iCount - 1 ) ];
 		}
 		else
 		{

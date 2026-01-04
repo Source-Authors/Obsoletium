@@ -1579,7 +1579,7 @@ void CPropJeep::SpawnPerchedSeagull( void )
 	// Find a point on the car to sit
 	Vector vecOrigin;
 	QAngle vecAngles;
-	int iAttachment = Studio_FindRandomAttachment( GetModelPtr(), "seagull_perch" );
+	intp iAttachment = Studio_FindRandomAttachment( GetModelPtr(), "seagull_perch" );
 	if ( iAttachment == -1 )
 		return;
 

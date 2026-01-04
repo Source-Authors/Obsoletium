@@ -777,16 +777,14 @@ template< typename T, class A >
 inline T& CUtlVector<T, A>::Random()
 {
 	Assert( m_Size > 0 );
-	const int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
-	return m_Memory[ RandomInt( 0, upperBound ) ];
+	return m_Memory[ RandomIntp( 0, m_Size - 1 ) ];
 }
 
 template< typename T, class A >
 inline const T& CUtlVector<T, A>::Random() const
 {
 	Assert( m_Size > 0 );
-	const int upperBound = static_cast<int>( std::min( m_Size - 1, static_cast<intp>( std::numeric_limits<int>::max() ) ) );
-	return m_Memory[ RandomInt( 0, upperBound ) ];
+	return m_Memory[ RandomIntp( 0, m_Size - 1 ) ];
 }
 
 
@@ -798,8 +796,7 @@ void CUtlVector<T, A>::Shuffle( IUniformRandomStream* pSteam )
 {
 	for ( intp i = 0; i < m_Size; i++ )
 	{
-		// TODO: Only up to INT_MAX elements shuffled, need to extend for x64.
-		intp j = pSteam ? pSteam->RandomInt( i, m_Size - 1 ) : RandomInt( i, m_Size - 1 );
+		intp j = pSteam ? pSteam->RandomIntp( i, m_Size - 1 ) : RandomIntp( i, m_Size - 1 );
 		if ( i != j )
 		{
 			V_swap( m_Memory[ i ], m_Memory[ j ] );

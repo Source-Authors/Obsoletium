@@ -349,7 +349,7 @@ CAI_Hint *CAI_HintManager::FindHintRandom( CAI_BaseNPC *pNPC, const Vector &posi
 	if ( FindAllHints( pNPC, position, hintCriteria, &hintList ) > 0 )
 	{
 		// Pick one randomly
-		return ( CAI_HintManager::AddFoundHint( hintList[ random->RandomInt( 0, hintList.Count() - 1 ) ]  ) );
+		return ( CAI_HintManager::AddFoundHint( hintList[ random->RandomIntp( 0, hintList.Count() - 1 ) ]  ) );
 	}
 
 	// start at the top of the list for the next search

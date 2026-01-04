@@ -1570,7 +1570,7 @@ bool CResponseSystem::GetBestResponse( ResponseSearchResult& searchResult, Rule 
 	if ( !c )
 		return false;
 
-	int index = random->RandomInt( 0, static_cast<int>(min(static_cast<intp>(std::numeric_limits<int>::max()), c) - 1) );
+	intp index = random->RandomIntp( 0, c - 1 );
 	auto groupIndex = rule->m_Responses[ index ];
 
 	ResponseGroup *g = &m_Responses[ groupIndex ];
@@ -1695,10 +1695,10 @@ short CResponseSystem::FindBestMatchingRule( const AI_CriteriaSet& set, bool ver
 		return bestrules[0];
 
 	// Randomly pick one of the tied matching rules
-	int idx = random->RandomInt( 0, static_cast<int>(min(static_cast<intp>(std::numeric_limits<int>::max()), bestCount - 1)) );
+	intp idx = random->RandomIntp( 0, bestCount - 1 );
 	if ( verbose )
 	{
-		DevMsg( "Found %zd matching rules, selecting slot %d\n", bestCount, idx );
+		DevMsg( "Found %zd matching rules, selecting slot %zd\n", bestCount, idx );
 	}
 	return bestrules[ idx ];
 }

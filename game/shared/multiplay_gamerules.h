@@ -263,7 +263,7 @@ protected:
 
 	float m_flIntermissionEndTime;
 	static time_t m_nMapCycleTimeStamp;
-	static int m_nMapCycleindex;
+	static intp m_nMapCycleindex;
 	static CUtlVector<char*> m_MapList;
 
 	// dimhotepus: float -> double.

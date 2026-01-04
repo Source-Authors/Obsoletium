@@ -223,10 +223,10 @@ public:
 
 				if ( curPlayers.Count() > 0 && m_PhysicsModelNames.Count() > 0 )
 				{
-					int iModelName = this->RandomInt( 0, m_PhysicsModelNames.Count() - 1 );
+					intp iModelName = this->RandomIntp( 0, m_PhysicsModelNames.Count() - 1 );
 					const char *pModelName = m_PhysicsModelNames[iModelName];
 
-					int iPlayer = this->RandomInt( 0, curPlayers.Count() - 1 );
+					intp iPlayer = this->RandomIntp( 0, curPlayers.Count() - 1 );
 						
 					Vector vSpawnPos = curPlayers[iPlayer]->EyePosition() + Vector( 0, 0, 50 );
 					
@@ -364,6 +364,12 @@ public:
 	virtual float RandomFloat( float nMin, float nMax )
 	{
 		return m_RandomStream.RandomInt( nMin, nMax );
+	}
+
+	// dimhotepus: CPU arch word support.
+	virtual int RandomIntp( intp nMin, intp nMax )
+	{
+		return m_RandomStream.RandomIntp( nMin, nMax );
 	}
 
 

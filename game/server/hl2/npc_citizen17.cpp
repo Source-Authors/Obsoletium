@@ -1992,19 +1992,19 @@ const char *CNPC_Citizen::SelectRandomExpressionForState( NPC_STATE state )
 	{
 	case CIT_EXP_SCARED:
 		{
-			int iRandom = RandomInt( 0, ARRAYSIZE(ScaredExpressions[iExpressionState].szExpressions)-1 );
+			intp iRandom = RandomIntp( 0, ssize(ScaredExpressions[iExpressionState].szExpressions)-1 );
 			return ScaredExpressions[iExpressionState].szExpressions[iRandom];
 		}
 
 	case CIT_EXP_NORMAL:
 		{
-			int iRandom = RandomInt( 0, ARRAYSIZE(NormalExpressions[iExpressionState].szExpressions)-1 );
+			intp iRandom = RandomIntp( 0, ssize(NormalExpressions[iExpressionState].szExpressions)-1 );
 			return NormalExpressions[iExpressionState].szExpressions[iRandom];
 		}
 
 	case CIT_EXP_ANGRY:
 		{
-			int iRandom = RandomInt( 0, ARRAYSIZE(AngryExpressions[iExpressionState].szExpressions)-1 );
+			intp iRandom = RandomInt( 0, ssize(AngryExpressions[iExpressionState].szExpressions)-1 );
 			return AngryExpressions[iExpressionState].szExpressions[iRandom];
 		}
 

@@ -5843,7 +5843,7 @@ int Studio_FindAttachment( const CStudioHdr *pStudioHdr, const char *pAttachment
 // Purpose: lookup attachments by substring. Randomly return one of the matching attachments.
 //-----------------------------------------------------------------------------
 
-int Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAttachmentName )
+intp Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAttachmentName )
 {
 	if ( pStudioHdr )
 	{
@@ -5861,7 +5861,7 @@ int Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAtta
 
 		// Then randomly return one of the attachments
 		if ( matchingAttachments.Count() > 0 )
-			return matchingAttachments[ RandomInt( 0, matchingAttachments.Count()-1 ) ];
+			return matchingAttachments[ RandomIntp( 0, matchingAttachments.Count()-1 ) ];
 	}
 
 	return -1;

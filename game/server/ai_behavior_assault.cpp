@@ -289,13 +289,13 @@ CAssaultPoint *CAI_AssaultBehavior::FindAssaultPoint( string_t iszAssaultPointNa
 
 	// NONE left. Just return a random assault point, knowing that it's blocked. This is the old behavior, anyway.
 	if( pClearAssaultPoints.Count() < 1 )
-		return pAssaultPoints[ random->RandomInt(0, (pAssaultPoints.Count() - 1)) ];
+		return pAssaultPoints[ random->RandomIntp(0, (pAssaultPoints.Count() - 1)) ];
 
 	// We found several! First throw out the one most recently used.
 	// This prevents picking the same point at this branch twice in a row.
 	float flMostRecentTime = -1.0f; // Impossibly old
-	int iMostRecentIndex = -1;
-	for( int i = 0 ; i < pClearAssaultPoints.Count() ; i++ )
+	intp iMostRecentIndex = -1;
+	for( intp i = 0 ; i < pClearAssaultPoints.Count() ; i++ )
 	{
 		if( pClearAssaultPoints[i]->m_flTimeLastUsed > flMostRecentTime )
 		{
@@ -308,7 +308,7 @@ CAssaultPoint *CAI_AssaultBehavior::FindAssaultPoint( string_t iszAssaultPointNa
 
 	// Remove the most recently used 
 	pClearAssaultPoints.Remove( iMostRecentIndex );
-	return pClearAssaultPoints[ random->RandomInt(0, (pClearAssaultPoints.Count() - 1)) ];
+	return pClearAssaultPoints[ random->RandomIntp(0, (pClearAssaultPoints.Count() - 1)) ];
 }
 
 //-----------------------------------------------------------------------------
@@ -997,7 +997,7 @@ void CAI_AssaultBehavior::SetParameters( string_t rallypointname, AssaultCue_t a
 
 			if( rallyPoints.Count() > 0 )
 			{
-				pBest = rallyPoints[ random->RandomInt(0, rallyPoints.Count()- 1) ];
+				pBest = rallyPoints[ random->RandomIntp(0, rallyPoints.Count()- 1) ];
 			}
 		}
 		break;
