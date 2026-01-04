@@ -22,17 +22,17 @@
 #if ALLOW_SIMD_QUATERNION_MATH
 
 // Using STDC or SSE
-[[nodiscard]] FORCEINLINE fltx4 LoadAlignedSIMD( const QuaternionAligned & pSIMD )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV LoadAlignedSIMD( const QuaternionAligned & pSIMD )
 {
 	return DirectX::XMLoadFloat4A( pSIMD.XmBase() );
 }
 
-[[nodiscard]] FORCEINLINE fltx4 LoadAlignedSIMD( const QuaternionAligned * RESTRICT pSIMD )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV LoadAlignedSIMD( const QuaternionAligned * RESTRICT pSIMD )
 {
 	return DirectX::XMLoadFloat4A( pSIMD->XmBase() );
 }
 
-FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const fltx4 & a )
+FORCEINLINE void XM_CALLCONV StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, fltx4 a )
 {
 	DirectX::XMStoreFloat4A( pSIMD->XmBase(), a );
 }
@@ -40,7 +40,7 @@ FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const flt
 //---------------------------------------------------------------------
 // Make sure quaternions are within 180 degrees of one another, if not, reverse q
 //---------------------------------------------------------------------
-[[nodiscard]] FORCEINLINE fltx4 QuaternionAlignSIMD( const fltx4 &p, const fltx4 &q )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionAlignSIMD( fltx4 p, fltx4 q )
 {
 	// decide if one of the quaternions is backwards
 	fltx4 a = SubSIMD( p, q );
@@ -57,7 +57,7 @@ FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const flt
 //---------------------------------------------------------------------
 #if USE_STDC_FOR_SIMD
 
-[[nodiscard]] FORCEINLINE fltx4 QuaternionNormalizeSIMD( const fltx4 &q )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionNormalizeSIMD( const fltx4 &q )
 {
 	fltx4 radius, result;
 	radius = Dot4SIMD( q, q );
@@ -74,7 +74,7 @@ FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const flt
 
 #else
 
-[[nodiscard]] FORCEINLINE fltx4 QuaternionNormalizeSIMD( const fltx4 &q )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionNormalizeSIMD( fltx4 q )
 {
 	fltx4 radiusSq = DirectX::XMVector4Dot( q, q );
 	fltx4 zeroMask = DirectX::XMVectorEqual( radiusSq, Four_Zeros ); // all ones iff radius = 0
@@ -90,7 +90,7 @@ FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const flt
 //---------------------------------------------------------------------
 // 0.0 returns p, 1.0 return q.
 //---------------------------------------------------------------------
-[[nodiscard]] FORCEINLINE fltx4 QuaternionBlendNoAlignSIMD( const fltx4 &p, const fltx4 &q, float t )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionBlendNoAlignSIMD( fltx4 p, fltx4 q, float t )
 {
 	fltx4 sclq = DirectX::XMVectorReplicate( t ); //-V2002
 	fltx4 sclp = DirectX::XMVectorSubtract( Four_Ones, sclq );
@@ -103,7 +103,7 @@ FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const flt
 //---------------------------------------------------------------------
 // Blend Quaternions
 //---------------------------------------------------------------------
-[[nodiscard]] FORCEINLINE fltx4 QuaternionBlendSIMD( const fltx4 &p, const fltx4 &q, float t )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionBlendSIMD( fltx4 p, fltx4 q, float t )
 {
 	// decide if one of the quaternions is backwards
 	fltx4 q2 = QuaternionAlignSIMD( p, q );
@@ -117,7 +117,7 @@ FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const flt
 //---------------------------------------------------------------------
 
 // SSE and STDC
-[[nodiscard]] FORCEINLINE fltx4 QuaternionMultSIMD( const fltx4 &p, const fltx4 &q )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionMultSIMD( fltx4 p, fltx4 q )
 {
 	// decide if one of the quaternions is backwards
 	fltx4 q1 = QuaternionAlignSIMD( p, q );
@@ -131,7 +131,7 @@ FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const flt
 //---------------------------------------------------------------------
 
 // SSE and STDC
-[[nodiscard]] FORCEINLINE fltx4 QuaternionScaleSIMD( const fltx4 &p, float t )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionScaleSIMD( fltx4 p, float t )
 {
 	// FIXME: nick, this isn't overly sensitive to accuracy, and it may be faster to 
 	// use the cos part (w) of the quaternion (sin(omega)*N,cos(omega)) to figure the new scale.
@@ -217,50 +217,8 @@ FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const flt
 //-----------------------------------------------------------------------------
 
 // SSE and STDC
-[[nodiscard]] FORCEINLINE fltx4 QuaternionSlerpNoAlignSIMD( const fltx4 &p, const fltx4 &q, float t )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionSlerpNoAlignSIMD( fltx4 p, fltx4 q, float t )
 {
-	//float omega, cosom, sinom, sclp, sclq;
-
-	//fltx4 result;
-
-	//// 0.0 returns p, 1.0 return q.
-	//cosom = SubFloat( p, 0 ) * SubFloat( q, 0 ) + SubFloat( p, 1 ) * SubFloat( q, 1 ) + 
-	//	SubFloat( p, 2 ) * SubFloat( q, 2 ) + SubFloat( p, 3 ) * SubFloat( q, 3 );
-
-	//if ( (1.0f + cosom ) > 0.000001f ) 
-	//{
-	//	if ( (1.0f - cosom ) > 0.000001f ) 
-	//	{
-	//		omega = acosf( cosom );
-	//		sinom = sinf( omega );
-	//		sclp = sinf( (1.0f - t)*omega) / sinom;
-	//		sclq = sinf( t*omega ) / sinom;
-	//	}
-	//	else 
-	//	{
-	//		// TODO: add short circuit for cosom == 1.0f?
-	//		sclp = 1.0f - t;
-	//		sclq = t;
-	//	}
-
-	//	result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, sclp ), DirectX::XMVectorScale( q, sclq ) );
-	//}
-	//else 
-	//{
-	//	SubFloat( result, 0 ) = -SubFloat( q, 1 );
-	//	SubFloat( result, 1 ) =  SubFloat( q, 0 );
-	//	SubFloat( result, 2 ) = -SubFloat( q, 3 );
-
-	//	sclp = sinf( (1.0f - t) * (0.5f * M_PI_F));
-	//	sclq = sinf( t * (0.5f * M_PI_F));
-
-	//	result = DirectX::XMVectorAdd( DirectX::XMVectorScale( p, sclp ), DirectX::XMVectorScale( result, sclq ) );
-
-	//	SubFloat( result, 3 ) = SubFloat( q, 2 );
-	//}
-
-	//return result;
-
 	// dimhotepus: More SSE below:
 
 	// 0.0 returns p, 1.0 return q.
@@ -314,7 +272,7 @@ FORCEINLINE void StoreAlignedSIMD( QuaternionAligned * RESTRICT pSIMD, const flt
 }
 
 
-[[nodiscard]] FORCEINLINE fltx4 QuaternionSlerpSIMD( const fltx4 &p, const fltx4 &q, float t )
+[[nodiscard]] FORCEINLINE fltx4 XM_CALLCONV QuaternionSlerpSIMD( fltx4 p, fltx4 q, float t )
 {
 	fltx4 q2 = QuaternionAlignSIMD( p, q );
 	fltx4 result = QuaternionSlerpNoAlignSIMD( p, q2, t );
