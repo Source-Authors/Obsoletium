@@ -1627,12 +1627,7 @@ FORCEINLINE fltx4 XM_CALLCONV UnsignedIntConvertToFltSIMD( const u32x4 vSrcA )
 [[nodiscard]]
 FORCEINLINE fltx4 XM_CALLCONV SignedIntConvertToFltSIMD( const i32x4 vSrcA )
 {
-	fltx4 retval;
-	SubFloat( retval, 0 ) = ( (float) (reinterpret_cast<const int32 *>(&vSrcA)[0]));
-	SubFloat( retval, 1 ) = ( (float) (reinterpret_cast<const int32 *>(&vSrcA)[1]));
-	SubFloat( retval, 2 ) = ( (float) (reinterpret_cast<const int32 *>(&vSrcA)[2]));
-	SubFloat( retval, 3 ) = ( (float) (reinterpret_cast<const int32 *>(&vSrcA)[3]));
-	return retval;
+	return DirectX::XMConvertVectorIntToFloat( vSrcA, 0 );
 }
 
 /*
