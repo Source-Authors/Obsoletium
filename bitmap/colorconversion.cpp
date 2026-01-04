@@ -33,8 +33,11 @@ typedef int32 *DWORD_PTR;
 #endif
 #include "bitmap/float_bm.h"
 
+MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
+MSVC_DISABLE_WARNING(4244)
 #define STB_DXT_IMPLEMENTATION
 #include "stb_dxt.h"
+MSVC_END_WARNING_OVERRIDE_SCOPE()
 
 // Should be last include
 #include "tier0/memdbgon.h"
