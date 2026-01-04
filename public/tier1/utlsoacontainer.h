@@ -162,7 +162,7 @@ protected:
 public:
 
 
-	CSOAContainer( )									// an empty one with no attributes
+	CSOAContainer( )									// an empty one with no attributes //-V730
 	{
 		Init();
 	}
