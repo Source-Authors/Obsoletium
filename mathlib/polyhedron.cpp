@@ -1421,7 +1421,7 @@ CPolyhedron *ClipLinkedGeometry( GeneratePolyhedronFromPlanes_UnorderedPolygonLL
 			else
 			{
 				//apparently the plane was entirely through existing polygonal borders, extremely rare but it can happen with inefficient cutting planes
-                GeneratePolyhedronFromPlanes_UnorderedPointLL *pActivePointWalk = pAllPoints;
+				GeneratePolyhedronFromPlanes_UnorderedPointLL *pActivePointWalk = pAllPoints;
 				while( (pActivePointWalk != nullptr) && (pActivePointWalk->pPoint->planarity != POINT_ONPLANE) )
 				{
 					pActivePointWalk = pActivePointWalk->pNext;
@@ -1994,47 +1994,6 @@ CPolyhedron *GeneratePolyhedronFromPlanes( const float *pOutwardFacingPlanes, in
 
 	return ClipLinkedGeometry( StartingPolygonList, StartingLineList, StartingPointList, pOutwardFacingPlanes, iPlaneCount, fOnPlaneEpsilon, bUseTemporaryMemory );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 #ifdef _DEBUG
 void DumpAABBToGLView( const Vector &vCenter, const Vector &vExtents, const Vector &vColor, se::posix::posix_file_stream &file )
