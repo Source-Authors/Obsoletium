@@ -43,7 +43,7 @@ void ColorQuantize(uint8 const *Image,
 			for(c=0;c<3;c++)
 				NthSample(s,y*Width+x,N_DIMENSIONS)->Value[c]=PIXEL(x,y,c);
 			// now, let's generate extra values to quantize on
-			for(int i=0;i<N_EXTRAVALUES;i++)
+			for(int i=0;i<N_EXTRAVALUES;i++) //-V1008
 			{
 				int val1=0;
 				for(c=0;c<3;c++)

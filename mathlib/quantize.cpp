@@ -107,7 +107,7 @@ int CompressSamples(Sample *s, int nsamples, int ndims)
 	int noutput=1;
 	while(--nsamples)		// while some remain
 	{
-		if (memcmp(src->Value,lastdst->Value,current_ndims))
+		if (memcmp(src->Value,lastdst->Value,current_ndims)) //-V526
 		{
 			// yikes, a difference has been found!
 			memcpy(dst,src,current_ssize);
