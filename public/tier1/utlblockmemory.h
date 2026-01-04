@@ -259,7 +259,7 @@ void CUtlBlockMemory<T,I>::ChangeSize( intp nBlocks )
 		}
 
 		MEM_ALLOC_CREDIT_CLASS();
-		m_pMemory = (T**)realloc( m_pMemory, m_nBlocks * sizeof(T*) );
+		m_pMemory = (T**)realloc( m_pMemory, m_nBlocks * sizeof(T*) ); //-V206
 		Assert( m_pMemory );
 	}
 	else
