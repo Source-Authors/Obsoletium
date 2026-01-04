@@ -2201,9 +2201,9 @@ void BGR565ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 		unsigned red = (*pSrcShort >> 11) & 0x1FU;
 
 		// Expand to 8 bits
-		dst[0] = static_cast<uint8>((red << 3) | (red >> 2));
-		dst[1] = static_cast<uint8>((green << 2) | (green >> 4));
-		dst[2] = static_cast<uint8>((blue << 3) | (blue >> 2));
+		dst[0] = size_cast<uint8>((red << 3) | (red >> 2));
+		dst[1] = size_cast<uint8>((green << 2) | (green >> 4));
+		dst[2] = size_cast<uint8>((blue << 3) | (blue >> 2));
 		dst[3] = 255U;
 	}
 }
@@ -2219,9 +2219,9 @@ void BGRX5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 		unsigned red = (*pSrcShort >> 10) & 0x1FU;
 
 		// Expand to 8 bits
-		dst[0] = static_cast<uint8>((red << 3) | (red >> 2));
-		dst[1] = static_cast<uint8>((green << 3) | (green >> 2));
-		dst[2] = static_cast<uint8>((blue << 3) | (blue >> 2));
+		dst[0] = size_cast<uint8>((red << 3) | (red >> 2));
+		dst[1] = size_cast<uint8>((green << 3) | (green >> 2));
+		dst[2] = size_cast<uint8>((blue << 3) | (blue >> 2));
 		dst[3] = 255U;
 	}
 }
@@ -2238,9 +2238,9 @@ void BGRA5551ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 		unsigned alpha = *pSrcShort & ( 1 << 15 );
 
 		// Expand to 8 bits
-		dst[0] = static_cast<uint8>((red << 3) | (red >> 2));
-		dst[1] = static_cast<uint8>((green << 3) | (green >> 2));
-		dst[2] = static_cast<uint8>((blue << 3) | (blue >> 2));
+		dst[0] = size_cast<uint8>((red << 3) | (red >> 2));
+		dst[1] = size_cast<uint8>((green << 3) | (green >> 2));
+		dst[2] = size_cast<uint8>((blue << 3) | (blue >> 2));
 		// garymcthack
 		if( alpha )
 		{
@@ -2266,10 +2266,10 @@ void BGRA4444ToRGBA8888( const uint8 *src, uint8 *dst, int numPixels )
 
 		// Expand to 8 bits
 		// FIXME: shouldn't this be (red << 4) | red?
-		dst[0] = static_cast<uint8>((red << 4) | (red >> 4));
-		dst[1] = static_cast<uint8>((green << 4) | (green >> 4));
-		dst[2] = static_cast<uint8>((blue << 4) | (blue >> 4));
-		dst[3] = static_cast<uint8>((alpha << 4) | (alpha >> 4));
+		dst[0] = size_cast<uint8>((red << 4) | (red >> 4));
+		dst[1] = size_cast<uint8>((green << 4) | (green >> 4));
+		dst[2] = size_cast<uint8>((blue << 4) | (blue >> 4));
+		dst[3] = size_cast<uint8>((alpha << 4) | (alpha >> 4));
 	}
 }
 
@@ -2302,10 +2302,10 @@ void RGBA16161616ToRGBA8888( const uint8 *src_, uint8 *dst, int numPixels )
 	unsigned short *pEndSrc = src + numPixels * 4;
 	for ( ; src < pEndSrc; src += 4, dst += 4 )
 	{
-		dst[0] = static_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[0] >> 4) ));
-		dst[1] = static_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[1] >> 4) ));
-		dst[2] = static_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[2] >> 4) ));
-		dst[3] = static_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[3] >> 8) ));
+		dst[0] = size_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[0] >> 4) ));
+		dst[1] = size_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[1] >> 4) ));
+		dst[2] = size_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[2] >> 4) ));
+		dst[3] = size_cast<uint8>(min( static_cast<unsigned short>(255U), static_cast<unsigned short>(src[3] >> 8) ));
 	}
 }
 
