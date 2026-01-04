@@ -11,6 +11,14 @@
 
 #include <memory.h>
 
+#ifdef PLATFORM_64BITS
+#define SE_MD5_ARG_0 MD5Value_t
+#define SE_MD5_ARG_1 MD5Value_t
+#else
+#define SE_MD5_ARG_0 const MD5Value_t &
+#define SE_MD5_ARG_1 const MD5Value_t &
+#endif
+
 // 16 bytes == 128 bit digest
 constexpr inline int MD5_DIGEST_LENGTH{16};
 constexpr inline size_t MD5_BIT_LENGTH{MD5_DIGEST_LENGTH * sizeof(unsigned char)};
@@ -22,8 +30,8 @@ struct MD5Value_t
 	void Zero();
 	[[nodiscard]] bool IsZero() const;
 
-	[[nodiscard]] bool operator==( const MD5Value_t &src ) const;
-	[[nodiscard]] bool operator!=( const MD5Value_t &src ) const;
+	[[nodiscard]] bool operator==( SE_MD5_ARG_0 src ) const;
+	[[nodiscard]] bool operator!=( SE_MD5_ARG_0 src ) const;
 };
 
 // MD5 Hash
@@ -67,17 +75,17 @@ void MD5_ProcessSingleBuffer( IN_BYTECAP(len) const void *p, unsigned int len, M
 /// Returns true if the values match.
 //-----------------------------------------------------------------------------
 // dimhotepus: Inline for performance.
-[[nodiscard]] inline bool MD5_Compare( const MD5Value_t &data, const MD5Value_t &compare )
+[[nodiscard]] inline bool MD5_Compare( SE_MD5_ARG_0 data, SE_MD5_ARG_1 compare )
 {
 	return std::memcmp( data.bits, compare.bits, MD5_DIGEST_LENGTH ) == 0;
 }
 
-[[nodiscard]] inline bool MD5Value_t::operator==( const MD5Value_t &src ) const
+[[nodiscard]] inline bool MD5Value_t::operator==( SE_MD5_ARG_0 src ) const
 {
 	return MD5_Compare( *this, src );
 }
 
-[[nodiscard]] inline bool MD5Value_t::operator!=( const MD5Value_t &src ) const
+[[nodiscard]] inline bool MD5Value_t::operator!=( SE_MD5_ARG_0 src ) const
 {
 	return !(*this == src);
 }
