@@ -641,7 +641,7 @@ bool FindConvexShapeLooseAABB( const float *pInwardFacingPlanes, int iPlaneCount
 		}
 		*pAABBMins = vAABBMins;
 	}
-	else //they only want the max
+	else if( pAABBMaxs ) //they only want the max
 	{
 		for( int i = 0; i != iPolyCount; ++i )
 		{
@@ -674,7 +674,7 @@ CPolyhedron *ConvertLinkedGeometryToPolyhedron( GeneratePolyhedronFromPlanes_Uno
 	// dimhotepus: unsigned int -> unsigned short.
 	unsigned short iPolyCount = 0, iLineCount = 0, iPointCount = 0, iIndexCount = 0;
 
-	GeneratePolyhedronFromPlanes_UnorderedPolygonLL *pActivePolygonWalk = pPolygons;	
+	GeneratePolyhedronFromPlanes_UnorderedPolygonLL *pActivePolygonWalk = pPolygons;
 	do
 	{
 		++iPolyCount;
