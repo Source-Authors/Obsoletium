@@ -24,8 +24,8 @@ if ["%~1"]==["x86"] (
 
 REM This check previously was in create_game_projects.bat but we split a part of it into here since this way earlier in the build process
 if ["%CMAKE_MSVC_ARCH_NAME%"]==["x64"] (
-  ECHO Searching for ml64 in PATH...
-  WHERE ml64.exe
+  ECHO Searching for ml64 in PATH... >NUL
+  WHERE ml64.exe >NUL
 
   if ERRORLEVEL 1 (
     REM RaphaelIT7: Had it happen that this errored since I used the x86 one but there all things already compiled for 32x making a mess to clean up
