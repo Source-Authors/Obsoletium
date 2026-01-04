@@ -57,6 +57,7 @@ set(PACKAGE_BUGREPORT  "https://github.com/Source-Authors/obsolete-source-engine
 
 project(${PACKAGE_NAME}
   VERSION ${PACKAGE_VER_MAJOR}.${PACKAGE_VER_MINOR}.${PACKAGE_VER_PATCH}.${PACKAGE_VER_TWEAK}
+  DESCRIPTION "Obsoletium"
   LANGUAGES CXX)
 
 message(STATUS "[common]: CMake version: ${CMAKE_VERSION}.")
