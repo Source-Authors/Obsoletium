@@ -1376,7 +1376,7 @@ void CPackedStore::ComputeChunkHash( MD5Value_t &md5ChunkHashes )
 	MD5Context_t ctx;
 	memset(&ctx, 0, sizeof(MD5Context_t));
 	MD5Init(&ctx);
-	MD5Update(&ctx, m_vecChunkHashFraction.Base(), m_vecChunkHashFraction.Count()*sizeof(m_vecChunkHashFraction[0]) );
+	MD5Update(&ctx, m_vecChunkHashFraction.Base(), size_cast<unsigned>(m_vecChunkHashFraction.Count()*sizeof(m_vecChunkHashFraction[0])) );
 	MD5Final( md5ChunkHashes.bits, &ctx);
 }
 
