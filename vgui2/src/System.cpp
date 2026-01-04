@@ -600,7 +600,7 @@ bool CSystem::SetRegistryString(const char *key, const char *value)
 	
 	RunCodeAtScopeExit(VCRHook_RegCloseKey(hKey));
 
-	return VCRHook_RegSetValueEx(hKey, key1, NULL, REG_SZ, (uchar*)value, value ? strlen(value) + 1 : 0) == ERROR_SUCCESS;
+	return VCRHook_RegSetValueEx(hKey, key1, NULL, REG_SZ, (uchar*)value, size_cast<unsigned long>(value ? strlen(value) + 1 : 0)) == ERROR_SUCCESS;
 }
 
 bool CSystem::GetRegistryString(const char *key, char *value, int valueLen)
