@@ -1395,7 +1395,7 @@ int32x4_t
 [[nodiscard]] FORCEINLINE int XM_CALLCONV Float2Int( float a )
 {
 	// Rely on compiler to generate CVTTSS2SI on x86
-	return (int) a;
+	return static_cast<int>( a );
 }
 
 // Over 15x faster than: (int)floor(value)
