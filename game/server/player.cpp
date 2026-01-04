@@ -1004,11 +1004,8 @@ void CBasePlayer::DamageEffect(float flDamage, int fDamageType)
 		UTIL_ScreenFade( this, blue, 0.2, 0.4, FFADE_MODULATE );
 
 		// Very small screen shake
-		// Both -0.1 and 0.1 map to 0 when converted to integer, so all of these RandomInt
-		// calls are just expensive ways of returning zero. This code has always been this
-		// way and has never had any value. clang complains about the conversion from a
-		// literal floating-point number to an integer.
-		//ViewPunch(QAngle(random->RandomInt(-0.1,0.1), random->RandomInt(-0.1,0.1), random->RandomInt(-0.1,0.1)));
+		// dimhotepus: Restore original idea plasma shakes screen a bit.
+		ViewPunch(QAngle(random->RandomFloat(-0.1f,0.1f), random->RandomFloat(-0.1f,0.1f), random->RandomFloat(-0.1f,0.1f)));
 
 		// Burn sound 
 		EmitSound( "Player.PlasmaDamage" );
