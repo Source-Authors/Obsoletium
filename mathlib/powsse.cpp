@@ -62,7 +62,11 @@ float XM_CALLCONV FastLog2(float i)
 
 	constexpr float LogBodge=0.346607f;
 
-	float x = *(int *)&i;
+	// dimhotepus: Fix UB on type punning.
+	float x;
+	static_assert(sizeof(x) == sizeof(i));
+	memcpy(&x, &i, sizeof(i));
+
 	x *= OOshift23;
 	x -= 127;
 
