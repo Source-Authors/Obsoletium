@@ -79,7 +79,7 @@ public:
 	{
 		SetSize( src.m_nWidth, src.m_nHeight );
 		if ( m_pData )
-			memcpy( m_pData, src.m_pData, m_nHeight*m_nPaddedWidth*sizeof(m_pData[0]) ); 
+			memcpy( m_pData, src.m_pData, src.m_nHeight*src.m_nPaddedWidth*sizeof(src.m_pData[0]) ); 
 	}
 
 	CSIMDVectorMatrix &operator=( CSIMDVectorMatrix const &src )
