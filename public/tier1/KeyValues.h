@@ -319,7 +319,7 @@ private:
 	{
 		int m_iValue;
 		float m_flValue;
-		void *m_pValue;
+		void *m_pValue; //-V117
 		unsigned char m_Color[4]; //-V112
 	};
 	
