@@ -285,7 +285,7 @@ static void SubdivideNode(QuantizedValue *n, int whichdim)
 		totsamps[whichside]+=sl->Count;
 		for(int d=0;d<current_ndims;d++)
 			LocalMean[d][whichside]+=
-				sl->Count*sl->Value[d];
+				static_cast<double>(sl->Count)*sl->Value[d];
 	}
 
 	if (totsamps[0] && totsamps[1])
@@ -471,7 +471,7 @@ double MinimumError(QuantizedValue const *q, uint8 const *sample,
 		{
 			val1=(val2<=q->Mins[i])?q->Mins[i]:q->Maxs[i];
 		}
-		err+=weights[i]*Square(val1-val2);
+		err+=static_cast<double>(weights[i])*Square(val1-val2);
 	}
 	return err;
 }
@@ -486,7 +486,7 @@ double MaximumError(QuantizedValue const *q, uint8 const *sample,
 		int val1=(abs(val2-q->Mins[i])>abs(val2-q->Maxs[i]))?
 			q->Mins[i]:
 			q->Maxs[i];
-		err+=weights[i]*Square(val2-val1);
+		err+=static_cast<double>(weights[i])*Square(val2-val1);
 	}
 	return err;
 }
