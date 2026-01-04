@@ -2171,7 +2171,7 @@ void CElementPropertiesTreeInternal::PopulateHistoryMenu( int whichMenu, Menu *m
 		{
 			for ( CUtlString& str : m_SearchHistory )
 			{
-                menu->AddMenuItem( "search", str.Get(), new KeyValues( "OnNavSearch", "text", str.Get() ), this );
+				menu->AddMenuItem( "search", str.Get(), new KeyValues( "OnNavSearch", "text", str.Get() ), this );
 			}
 		}
 		break;
