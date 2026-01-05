@@ -208,7 +208,7 @@ struct physicstest_t
 		for ( int i = 0; i < pModel->ConvexCount(); i++ )
 		{
 			float color[4];
-			RandomColor( color, i + (int)pObject );
+			RandomColor( color, i + (intp)pObject );
 			IMesh* pMatMesh = pRenderContext->GetDynamicMesh( );
 			CMeshBuilder meshBuilder;
 			int triCount = pModel->TriangleCount( i );
