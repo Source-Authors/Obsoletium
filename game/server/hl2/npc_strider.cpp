@@ -103,7 +103,8 @@ ConVar strider_ar2_altfire_dmg( "strider_ar2_altfire_dmg", "25" );
 // Number of RPG hits it takes to kill a strider on each skill level.
 ConVar sk_strider_num_missiles1("sk_strider_num_missiles1", "5");
 ConVar sk_strider_num_missiles2("sk_strider_num_missiles2", "7");
-ConVar sk_strider_num_missiles3("sk_strider_num_missiles3", "7");
+// dimhotepus: Bump default missles to kill strider on hard 7 -> 9.
+ConVar sk_strider_num_missiles3("sk_strider_num_missiles3", "9");
 
 ConVar strider_missile_suppress_dist( "strider_missile_suppress_dist", "240" );
 ConVar strider_missile_suppress_time( "strider_missile_suppress_time", "3" );
