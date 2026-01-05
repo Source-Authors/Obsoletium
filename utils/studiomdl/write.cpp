@@ -1827,7 +1827,7 @@ static void WriteVertices( studiohdr_t *phdr )
 	int				i;
 	int				j;
 	int				k;
-	int				cur;
+	intp			cur;
 
 	if (!g_nummodelsbeforeLOD)
 		return;
@@ -1876,7 +1876,7 @@ static void WriteVertices( studiohdr_t *phdr )
 
 		// save vertices
 		ALIGN16( pData );
-		cur = (int)pData;
+		cur = (intp)pData;
 		mstudiovertex_t *pVert = (mstudiovertex_t *)pData;
 		pData += pLodData->numvertices * sizeof( mstudiovertex_t );
 		for (j = 0; j < pLodData->numvertices; j++)
@@ -1903,7 +1903,7 @@ static void WriteVertices( studiohdr_t *phdr )
 
 		if (!g_quiet)
 		{
-			printf( "vertices   %7d bytes (%d vertices)\n", (int)(pData - cur), pLodData->numvertices );
+			printf( "vertices   %7zd bytes (%d vertices)\n", (intp)(pData - cur), pLodData->numvertices );
 		}
 	}
 
@@ -1920,7 +1920,7 @@ static void WriteVertices( studiohdr_t *phdr )
 
 		// save tangent space S
 		ALIGN4( pData );
-		cur = (int)pData;
+		cur = (intp)pData;
 		Vector4D *ptangents = (Vector4D *)pData;
 		pData += pLodData->numvertices * sizeof( Vector4D );
 		for (j = 0; j < pLodData->numvertices; j++)
@@ -1934,7 +1934,7 @@ static void WriteVertices( studiohdr_t *phdr )
 
 		if (!g_quiet)
 		{
-			printf( "tangents   %7d bytes (%d vertices)\n", (int)(pData - cur), pLodData->numvertices );
+			printf( "tangents   %7zd bytes (%d vertices)\n", (intp)(pData - cur), pLodData->numvertices );
 		}
 	}
 
@@ -2055,7 +2055,7 @@ static void WriteModel( studiohdr_t *phdr )
 	mstudiovertanim_t	*pvertanim;
 	s_vertanim_t		*pvanim;
 
-	int cur	= (int)pData;
+	intp cur	= (intp)pData;
 
 	// vertex data is written to external file, offsets kept internal
 	// track expected external base to store proper offsets
@@ -2357,9 +2357,9 @@ static void WriteModel( studiohdr_t *phdr )
 
 	if( !g_quiet )
 	{
-		printf("ik/pose    %7d bytes\n", (int)(pData - cur) );
+		printf("ik/pose    %7zd bytes\n", (intp)(pData - cur) );
 	}
-	cur = (int)pData;
+	cur = (intp)pData;
 
 	const float flVertAnimFixedPointScale = ComputeVertAnimFixedPointScale( phdr );
 
@@ -2427,7 +2427,7 @@ static void WriteModel( studiohdr_t *phdr )
 		pmodel[i].tangentsindex = (int)externalTangentsIndex;
 		externalTangentsIndex += pmodel[i].numvertices * sizeof( Vector4D );
 
-		cur = (int)pData;
+		cur = (intp)pData;
 
 		// save eyeballs
 		mstudioeyeball_t *peyeball;
@@ -2465,11 +2465,11 @@ static void WriteModel( studiohdr_t *phdr )
 
 		if ( !g_quiet )
 		{
-			printf("eyeballs   %7d bytes (%d eyeballs)\n", (int)(pData - cur), g_model[i]->numeyeballs );
+			printf("eyeballs   %7zd bytes (%d eyeballs)\n", (intp)(pData - cur), g_model[i]->numeyeballs );
 		}
 
 		// move flexes into individual meshes
-		cur = (int)pData;
+		cur = (intp)pData;
 		for (m = 0; m < pmodel[i].nummeshes; m++)
 		{
 			int numflexkeys[MAXSTUDIOFLEXKEYS];
@@ -2576,9 +2576,9 @@ static void WriteModel( studiohdr_t *phdr )
 
 		if( !g_quiet )
 		{
-			printf("flexes     %7d bytes (%d flexes)\n", (int)(pData - cur), g_numflexkeys );
+			printf("flexes     %7zd bytes (%d flexes)\n", (intp)(pData - cur), g_numflexkeys );
 		}
-		cur = (int)pData;
+		cur = (intp)pData;
 	}
 
 
