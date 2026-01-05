@@ -423,7 +423,7 @@ void CHudCredits::DrawLogo( void )
 	}
 
 	vgui::HScheme scheme = vgui::scheme()->GetScheme( "ClientScheme" );
-	vgui::HFont m_hTFont = vgui::scheme()->GetIScheme(scheme)->GetFont( szLogoFont );
+	vgui::HFont m_hTFont = vgui::scheme()->GetIScheme(scheme)->GetFont( szLogoFont, true );
 
 	int iFontTall = surface()->GetFontTall ( m_hTFont );
 
