@@ -572,6 +572,18 @@ void    GLMDisplayInfo::PopulateModes( void )
                 { 1680, 1050 },
                 { 1920, 1200 },
                 { 2560, 1600 },
+                
+                // dimhotepus: Add Mac Pro resolutions.
+
+                // 14 inch.
+                { 1800, 1169 }, // More space
+                { 1512, 982 },  // HiDPI (Default)
+                { 3024, 1964 }, // Native
+
+                // 16 inch.
+                { 2048, 1280 }, // More space
+                { 1728, 1080 }, // HiDPI (Default)
+                { 3456, 2234 }, // Native
         };
 
         for ( int i = 0; i < ARRAYSIZE( s_Resolutions ); i++ )
