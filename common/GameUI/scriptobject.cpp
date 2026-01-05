@@ -13,6 +13,7 @@
 #include <cstdlib>
 #include <vgui_controls/Label.h>
 #include "filesystem.h"
+#include "tier0/vcrmode.h"
 #include "tier1/convar.h"
 #include "cdll_int.h"
 
