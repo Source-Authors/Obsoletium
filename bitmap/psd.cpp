@@ -6,7 +6,6 @@
 
 #include "bitmap/psd.h"
 
-#include <malloc.h>
 #include <cstring>
 
 #include "tier0/dbg.h"

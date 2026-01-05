@@ -6,8 +6,6 @@
 
 #include "bitmap/imageformat.h"
 
-#include <malloc.h>
-
 #include <cmath>
 #include <cstring>
 #include <utility>
