@@ -24,9 +24,11 @@ CSheet::CSheet( void )
 
 CSheet::CSheet( CUtlBuffer &buf )
 {
-	memset( m_pSamples, 0, sizeof( m_pSamples ) );
-	memset( m_bClamp, 0, sizeof( m_bClamp ) );
-	memset( m_bSequenceIsCopyOfAnotherSequence, 0, sizeof( m_bSequenceIsCopyOfAnotherSequence ) );
+	BitwiseClear( m_pSamples );
+	BitwiseClear( m_bClamp );
+	BitwiseClear( m_bSequenceIsCopyOfAnotherSequence );
+	BitwiseClear( m_nNumFrames );
+	BitwiseClear( m_flFrameSpan );
 
 	// lets read a sheet
 	buf.ActivateByteSwappingIfBigEndian();
