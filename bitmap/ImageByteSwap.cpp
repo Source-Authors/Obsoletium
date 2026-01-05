@@ -11,6 +11,7 @@
 // Should be last include
 #include "tier0/memdbgon.h"
 
+// dimhotepus: Disable x360 code paths.
 #define NO_X360_XDK
 
 namespace ImageLoader
