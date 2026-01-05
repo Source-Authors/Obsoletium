@@ -432,7 +432,7 @@ static void DrawVertexLitGeneric_DX9_Internal( CBaseVSShader *pShader, IMaterial
 	
 	if ( pShader->IsSnapshotting() || (! pContextData ) || ( pContextData->m_bMaterialVarsChanged ) )
 	{
-/*^*/ // 	printf("\t\t[1] snapshotting=%d  pContextData=%08x  pContextData->m_bMaterialVarsChanged=%d \n",(int)pShader->IsSnapshotting(), (int)pContextData, pContextData ? (int)pContextData->m_bMaterialVarsChanged : -1 );
+/*^*/ // 	printf("\t\t[1] snapshotting=%d  pContextData=%16x  pContextData->m_bMaterialVarsChanged=%d \n",(int)pShader->IsSnapshotting(), (intp)pContextData, pContextData ? (int)pContextData->m_bMaterialVarsChanged : -1 );
 		bool bSeamlessBase = IsBoolSet( info.m_nSeamlessBase, params );
 		bool bSeamlessDetail = IsBoolSet( info.m_nSeamlessDetail, params );
 		bool bDistanceAlpha = IsBoolSet( info.m_nDistanceAlpha, params );
