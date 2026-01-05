@@ -809,6 +809,8 @@ CConPanel::CConPanel( vgui::Panel *parent ) : CBasePanel( parent, "CConPanel" )
 //-----------------------------------------------------------------------------
 CConPanel::~CConPanel()
 {
+	// dimhotepus: Cleanup global panel.
+	g_pConPanel = nullptr;
 }
 
 void CConPanel::Con_NPrintf( int idx, const char *msg )
