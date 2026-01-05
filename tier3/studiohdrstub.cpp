@@ -20,7 +20,7 @@
 const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
 {
 	MDLHandle_t handle = g_pMDLCache->FindMDL( pModelName );
-	*cache = (void*)(uintp)handle;
+	*cache = MDLHandleToVirtual( handle );
 	return g_pMDLCache->GetStudioHdr( handle );
 }
 

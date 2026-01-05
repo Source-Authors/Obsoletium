@@ -2701,7 +2701,7 @@ void Mod_TouchAllData( model_t *pModel, int nServerCount )
 		// skip self, start at children
 		for ( int i=1; i<pVirtualModel->m_group.Count(); ++i )
 		{
-			MDLHandle_t childHandle = (MDLHandle_t)(intp)pVirtualModel->m_group[i].cache&0xffff;
+			MDLHandle_t childHandle = VoidPtrToMDLHandle( pVirtualModel->m_group[i].cache );
 			model_t *pChildModel = (model_t *)g_pMDLCache->GetUserData( childHandle );
 			if ( pChildModel )
 			{

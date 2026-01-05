@@ -1186,7 +1186,7 @@ const vertexFileHeader_t * mstudiomodel_t::CacheVertexData( void * pModelData )
 const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
 {
 	MDLHandle_t handle = g_pMDLCache->FindMDL( pModelName );
-	*cache = (void*)handle;
+	*cache = MDLHandleToVirtual( handle );
 	return g_pMDLCache->GetStudioHdr( handle );
 }
 
@@ -1208,12 +1208,12 @@ intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 {
 	Assert((intp)cache <= 0xFFFF);
-	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
+	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
 }
 
 // dimhotepus: Add const-correct API.
 studiohdr_t *virtualgroup_t::GetStudioHdr( void )
 {
 	Assert((intp)cache <= 0xFFFF);
-	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
+	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
 }

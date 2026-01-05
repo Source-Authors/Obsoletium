@@ -380,7 +380,7 @@ public:
 
 	// Queued loading
 	void ProcessQueuedData( ModelParts_t *pModelParts, bool bHeaderOnly = false );
-	static void	QueuedLoaderCallback_MDL( void *pContext, void  *pContext2, const void *pData, int nSize, LoaderError_t loaderError );
+	static void	QueuedLoaderCallback_MDL( void *pContext, void *pContext2, const void *pData, int nSize, LoaderError_t loaderError );
 	static void	ProcessDynamicLoad( ModelParts_t *pModelParts );
 	static void CleanupDynamicLoad( CleanupModelParts_t *pCleanup );
 
@@ -954,7 +954,7 @@ void CMDLCache::UnserializeVCollide( MDLHandle_t handle, bool synchronousLoad )
 			{
 				for ( intp i = 1; i < pVirtualModel->m_group.Count(); i++ )
 				{
-					MDLHandle_t sharedHandle = (MDLHandle_t) (intp)pVirtualModel->m_group[i].cache & 0xffff;
+					MDLHandle_t sharedHandle = VoidPtrToMDLHandle( pVirtualModel->m_group[i].cache );
 					studiodata_t *pData = m_MDLDict[sharedHandle];
 					if ( !(pData->m_nFlags & STUDIODATA_FLAGS_VCOLLISION_LOADED) )
 					{
@@ -1304,12 +1304,12 @@ void CMDLCache::FreeVirtualModel( MDLHandle_t handle )
 	if ( pStudioData && pStudioData->m_pVirtualModel )
 	{
 		intp nGroupCount = pStudioData->m_pVirtualModel->m_group.Count();
-		Assert( (nGroupCount >= 1) && pStudioData->m_pVirtualModel->m_group[0].cache == (void*)(uintp)handle );
+		Assert( (nGroupCount >= 1) && pStudioData->m_pVirtualModel->m_group[0].cache == MDLHandleToVirtual( handle ) );
 
 		// NOTE: Start at *1* here because the 0th element contains a reference to *this* handle
 		for ( intp i = 1; i < nGroupCount; ++i )
 		{
-			MDLHandle_t h = (MDLHandle_t)(intp)pStudioData->m_pVirtualModel->m_group[i].cache&0xffff;
+			MDLHandle_t h = VoidPtrToMDLHandle( pStudioData->m_pVirtualModel->m_group[i].cache );
 			FreeVirtualModel( h );
 			Release( h );
 		}
@@ -1359,7 +1359,7 @@ virtualmodel_t *CMDLCache::GetVirtualModelFast( const studiohdr_t *pStudioHdr, M
 		// Group has to be zero to ensure refcounting is correct
 		auto nGroup = pStudioData->m_pVirtualModel->m_group.AddToTail( );
 		Assert( nGroup == 0 );
-		pStudioData->m_pVirtualModel->m_group[nGroup].cache = (void *)(uintp)handle;
+		pStudioData->m_pVirtualModel->m_group[nGroup].cache = MDLHandleToVirtual( handle );
 
 		// Add all dependent data
 		pStudioData->m_pVirtualModel->AppendModels( 0, pStudioHdr );
@@ -2058,7 +2058,7 @@ void CMDLCache::TouchAllData( MDLHandle_t handle )
 		// ensure all sub models are cached
 		for ( intp i = 1; i < pVModel->m_group.Count(); ++i )
 		{
-			MDLHandle_t childHandle = (MDLHandle_t)(intp)pVModel->m_group[i].cache&0xffff;
+			MDLHandle_t childHandle = VoidPtrToMDLHandle( pVModel->m_group[i].cache );
 			if ( childHandle != MDLHANDLE_INVALID )
 			{
 				// FIXME: Should this be calling TouchAllData on the child?
@@ -3590,7 +3590,7 @@ void CMDLCache::MarkFrame()
 const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
 {
 	MDLHandle_t handle = g_MDLCache.FindMDL( pModelName );
-	*cache = (void*)(uintp)handle;
+	*cache = MDLHandleToVirtual( handle );
 	return g_MDLCache.GetStudioHdr( handle );
 }
 
@@ -3614,12 +3614,12 @@ intp studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 {
-	return g_MDLCache.GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
+	return g_MDLCache.GetStudioHdr( VoidPtrToMDLHandle( cache ) );
 }
 
 // dimhotepus: Add const-correct API.
 studiohdr_t *virtualgroup_t::GetStudioHdr( void )
 {
-	return g_MDLCache.GetStudioHdr( (MDLHandle_t)(intp)cache&0xffff );
+	return g_MDLCache.GetStudioHdr( VoidPtrToMDLHandle( cache ) );
 }
 

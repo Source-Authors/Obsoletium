@@ -1215,28 +1215,28 @@ void CDmeTestMesh::SetUpBones( CDmeTransform *pTransform, int nMaxBoneCount, mat
 const studiohdr_t *studiohdr_t::FindModel( void **cache, char const *pModelName ) const
 {
 	MDLHandle_t handle = g_pMDLCache->FindMDL( pModelName );
-	*cache = (void*)handle;
+	*cache = MDLHandleToVirtual( handle );
 	return g_pMDLCache->GetStudioHdr( handle );
 }
 
 virtualmodel_t *studiohdr_t::GetVirtualModel( void ) const
 {
-	return g_pMDLCache->GetVirtualModel( (MDLHandle_t)virtualModel );
+	return g_pMDLCache->GetVirtualModel( VoidPtrToMDLHandle( VirtualModel() ) );
 }
 
 byte *studiohdr_t::GetAnimBlock( int i ) const
 {
-	return g_pMDLCache->GetAnimBlock( (MDLHandle_t)virtualModel, i );
+	return g_pMDLCache->GetAnimBlock( VoidPtrToMDLHandle( VirtualModel() ), i );
 }
 
 int studiohdr_t::GetAutoplayList( unsigned short **pOut ) const
 {
-	return g_pMDLCache->GetAutoplayList( (MDLHandle_t)virtualModel, pOut );
+	return g_pMDLCache->GetAutoplayList( VoidPtrToMDLHandle( VirtualModel() ), pOut );
 }
 
 const studiohdr_t *virtualgroup_t::GetStudioHdr( void ) const
 {
-	return g_pMDLCache->GetStudioHdr( (MDLHandle_t)cache );
+	return g_pMDLCache->GetStudioHdr( VoidPtrToMDLHandle( cache ) );
 }
 
 //-----------------------------------------------------------------------------
