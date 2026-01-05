@@ -138,7 +138,8 @@ ConVar	sk_helicopter_grenade_puntscale( "sk_helicopter_grenade_puntscale","1.5",
 // Number of bomb hits it takes to kill a chopper on each skill level.
 ConVar sk_helicopter_num_bombs1("sk_helicopter_num_bombs1", "3");
 ConVar sk_helicopter_num_bombs2("sk_helicopter_num_bombs2", "5");
-ConVar sk_helicopter_num_bombs3("sk_helicopter_num_bombs3", "5");
+// dimhotepus: 5 -> 7 bombs on hard.
+ConVar sk_helicopter_num_bombs3("sk_helicopter_num_bombs3", "7");
 
 ConVar	sk_npc_dmg_helicopter_to_plr( "sk_npc_dmg_helicopter_to_plr","3", 0, "Damage helicopter shots deal to the player" );
 ConVar	sk_npc_dmg_helicopter( "sk_npc_dmg_helicopter","6", 0, "Damage helicopter shots deal to everything but the player" );
