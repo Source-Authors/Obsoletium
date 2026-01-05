@@ -65,6 +65,7 @@
 #include "cl_steamauth.h"
 #include "sv_steamauth.h"
 #include "engine/ivmodelinfo.h"
+#include "language.h"
 
 #if defined( REPLAY_ENABLED )
 #include "replay_internal.h"
@@ -2498,6 +2499,25 @@ void CL_InitLanguageCvar()
 	}
 	else
 	{
+		// dimhotepus: Allow to set language by command line and env var (handy for *nix).
+		if ( const char *langOverride; CommandLine()->CheckParm( "-language", &langOverride ) && langOverride )
+		{
+			cl_language.SetValue( langOverride );
+			return;
+		}
+		
+		if ( const char *langEnv{ getenv( "LANG") }; langEnv )
+		{
+			const ELanguage elang{ PchLanguageICUCodeToELanguage( langEnv, k_Lang_English ) };
+			const char *langShort{ GetLanguageShortName( elang ) };
+
+			if ( Q_strncmp( langShort, "none", 4 ) != 0 )
+			{
+				cl_language.SetValue( langShort );
+				return;
+			}
+		}
+
 		cl_language.SetValue( "english" );
 	}
 }

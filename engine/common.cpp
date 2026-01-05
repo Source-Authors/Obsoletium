@@ -925,21 +925,31 @@ void COM_InitFilesystem( const char *pFullModPath )
 		// -audiolanguage <language>
 		// User must have the .vpk files for the language installed though in order to use the command line switch
 		
+		constexpr char kAudioLanguageArg[]{"-audiolanguage"};
+
 		if ( Steam3Client().SteamApps() )
 		{
 			// use -audiolanguage command line to override audio language, otherwise take language from steam
-			V_strcpy_safe(language, CommandLine()->ParmValue("-audiolanguage", Steam3Client().SteamApps()->GetCurrentGameLanguage()));
+			V_strcpy_safe(language, CommandLine()->ParmValue(kAudioLanguageArg, Steam3Client().SteamApps()->GetCurrentGameLanguage()));
 		}
 		else
 		{
 			// still allow command line override even when not running steam
-			if (CommandLine()->CheckParm("-audiolanguage"))
+			if (CommandLine()->CheckParm(kAudioLanguageArg))
 			{
-				V_strcpy_safe(language, CommandLine()->ParmValue("-audiolanguage", "english"));
+				V_strcpy_safe(language, CommandLine()->ParmValue(kAudioLanguageArg, "english"));
+			}
+			else if ( const char *langEnv = getenv("LANG"); langEnv )
+			{
+				const ELanguage elang{ PchLanguageICUCodeToELanguage( langEnv, k_Lang_English ) };
+				const char *langShort{ GetLanguageShortName( elang ) };
+
+				if ( Q_strncmp( langShort, "none", 4 ) != 0 )
+					V_strcpy_safe(language, langShort );
 			}
 		}
 
-		if ( ( !Q_isempty(language) ) && ( Q_stricmp(language, "english") ) )
+		if ( !Q_isempty(language) && Q_stricmp(language, "english") )
 		{
 			initInfo.m_pLanguage = language;
 		}
