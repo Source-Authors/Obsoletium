@@ -2659,22 +2659,15 @@ void NET_SetTime( double flRealtime )
 {
 	static double s_last_realtime = 0;
 
-	double frametime = flRealtime - s_last_realtime;
+	const double frametime = flRealtime - s_last_realtime;
+
 	s_last_realtime = flRealtime;
 
-	if ( frametime > 1.0f )
-	{
-		// if we have very long frame times because of loading stuff
-		// don't apply that to net time to avoid unwanted timeouts
-		frametime = 1.0f;
-	}
-	else if ( frametime < 0.0f )
-	{
-		frametime = 0.0f;
-	}
-
+	// if we have very long frame times because of loading stuff
+	// don't apply that to net time to avoid unwanted timeouts
+	//
 	// adjust network time so fake lag works with host_timescale
-	net_time += frametime * host_timescale.GetFloat();
+	net_time += std::clamp( frametime, 0.0, 1.0 ) * host_timescale.GetFloat();
 }
 
 /*
