@@ -64,7 +64,7 @@ CSheet::CSheet( CUtlBuffer &buf )
 		for( int nFrm = 0 ; nFrm < nFrameCount; nFrm++ )
 		{
 			float fThisDuration = buf.GetFloat();
-			InterpValue[ nFrm ] = nFrm;
+			InterpValue[ nFrm ] = static_cast<int>( nFrm );
 			InterpKnot [ nFrm ] = SEQUENCE_SAMPLE_COUNT*( fCurTime/ fTotalSequenceTime );
 			SheetSequenceSample_t &seq = Samples[ nFrm ];
 			seq.m_fBlendFactor = 0.0f;
