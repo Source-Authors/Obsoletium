@@ -1870,7 +1870,7 @@ void CShaderSystem::LoadTexture( IMaterialVar *pTextureVar, const char *pTexture
 	// Force local cubemaps when using the editor
 	if ( MaterialSystem()->CanUseEditorMaterials() && ( stricmp( pName, "env_cubemap" ) == 0 ) )
 	{
-		pTexture = (ITextureInternal*)-1;
+		pTexture = (ITextureInternal*)(intp)-1;
 	}
 	else
 	{

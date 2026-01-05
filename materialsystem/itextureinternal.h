@@ -157,7 +157,7 @@ public:
 
 inline bool IsTextureInternalEnvCubemap( const ITextureInternal *pTexture )
 {
-	return ( pTexture == ( ITextureInternal * )-1 );
+	return pTexture == (ITextureInternal*)(intp)-1;
 }
 
 //-----------------------------------------------------------------------------
