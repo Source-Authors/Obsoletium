@@ -2673,7 +2673,7 @@ void NET_SetTime( double flRealtime )
 		frametime = 0.0f;
 	}
 
-	// adjust network time so fakelag works with host_timescale
+	// adjust network time so fake lag works with host_timescale
 	net_time += frametime * host_timescale.GetFloat();
 }
 
@@ -2758,7 +2758,7 @@ void NET_Config ( void )
 
 	net_time = 0.0f;
 
-	// now reconfiguare
+	// now reconfigure
 
 	if ( net_multiplayer )
 	{
@@ -2955,7 +2955,7 @@ void NET_Init( bool bIsDedicated )
 	for ( int i = 0; i < MAX_SOCKETS; ++i )
 	{
 		s_pLagData[i] = NULL;
-		Q_memset( &net_sockets[i], 0, sizeof(netsocket_t) );
+		BitwiseClear( net_sockets[i] );
 	}
 
 	const char *ip = CommandLine()->ParmValue( "-ip" );
