@@ -1620,11 +1620,9 @@ void NET_ProcessPending( void )
 	}
 }
 
-void NET_ProcessListen(intp sock)
+static void NET_ProcessListen(netsocket_t &netsock, intp sock)
 {
-	netsocket_t * netsock = &net_sockets[sock];
-		
-	if ( !netsock->bListening )
+	if ( !netsock.bListening )
 		return;
 
 	sockaddr sa;
@@ -1632,7 +1630,7 @@ void NET_ProcessListen(intp sock)
 		
 	socket_handle newSocket;
 
-	VCR_NONPLAYBACKFN( accept( netsock->hTCP, &sa, &nLengthAddr), newSocket, "accept" );
+	VCR_NONPLAYBACKFN( accept( netsock.hTCP, &sa, &nLengthAddr), newSocket, "accept" );
 #if !defined( NO_VCR )
 	VCRGenericValue( "sockaddr", &sa, sizeof( sa ) );
 #endif
@@ -1649,16 +1647,13 @@ void NET_ProcessListen(intp sock)
 	// new connection TCP request, put in pending queue
 
 	pendingsocket_t psock;
-
 	psock.newsock = newSocket;
 	psock.netsock = sock;
-
+	psock.time = net_time;
 	if ( !psock.addr.SetFromSockadr( &sa ) )
 	{
 		Warning( "Unable to set IPv4 address with family %hu.\n", sa.sa_family );
 	}
-
-	psock.time = net_time;
 
 	AUTO_LOCK( s_PendingSockets );
 	s_PendingSockets.AddToTail( psock );
@@ -1667,7 +1662,7 @@ void NET_ProcessListen(intp sock)
 
 	char authcmd = STREAM_CMD_AUTH;
 
-	NET_SendStream( newSocket, &authcmd, 1 , 0 );	
+	NET_SendStream( newSocket, &authcmd, 1 , 0 );
 
 	if ( net_showtcp.GetInt() )
 	{
@@ -2707,13 +2702,17 @@ void NET_RunFrame( double flRealtime )
 	if ( !NET_IsMultiplayer() || net_notcp )
 		return;
 
+	intp i{0};
+
 	// process TCP sockets:
-	for ( intp i=0; i< net_sockets.Count(); i++ )
+	for ( auto &ns : net_sockets )
 	{
-		if ( net_sockets[i].hTCP && net_sockets[i].bListening )
+		if ( ns.hTCP && ns.bListening )
 		{
-			NET_ProcessListen( i );
+			NET_ProcessListen( ns, i );
 		}
+
+		++i;
 	}
 
 	NET_ProcessPending();
