@@ -1655,8 +1655,11 @@ static void NET_ProcessListen(netsocket_t &netsock, intp sock)
 		Warning( "Unable to set IPv4 address with family %hu.\n", sa.sa_family );
 	}
 
-	AUTO_LOCK( s_PendingSockets );
-	s_PendingSockets.AddToTail( psock );
+	{
+		// dimhotepus: Reduce lock scope.
+		AUTO_LOCK( s_PendingSockets );
+		s_PendingSockets.AddToTail( psock );
+	}
 
 	// tell client to send challenge number to identify
 
