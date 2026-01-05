@@ -2588,25 +2588,25 @@ void C_OP_ControlpointLight::Render( CParticleCollection *pParticles ) const
 
 	if ( m_bLightActive1 )
 	{
-		Color LightColor1Outer( m_LightColor1[0] / 2.0f, m_LightColor1[1] / 2.0f, m_LightColor1[2] / 2.0f, 255 );
+		Color LightColor1Outer( m_LightColor1[0] / 2, m_LightColor1[1] / 2, m_LightColor1[2] / 2, 255 );
 		RenderWireframeSphere( vecOrigin1, m_LightFiftyDist1, 16, 8, m_LightColor1, false );
 		RenderWireframeSphere( vecOrigin1, m_LightZeroDist1, 16, 8, LightColor1Outer, false );
 	}
 	if ( m_bLightActive2 )
 	{	
-		Color LightColor2Outer( m_LightColor2[0] / 2.0f, m_LightColor2[1] / 2.0f, m_LightColor2[2] / 2.0f, 255 );
+		Color LightColor2Outer( m_LightColor2[0] / 2, m_LightColor2[1] / 2, m_LightColor2[2] / 2, 255 );
 		RenderWireframeSphere( vecOrigin2, m_LightFiftyDist2, 16, 8, m_LightColor2, false );
 		RenderWireframeSphere( vecOrigin2, m_LightZeroDist2, 16, 8, LightColor2Outer, false );
 	}
 	if ( m_bLightActive3 )
 	{
-		Color LightColor3Outer( m_LightColor3[0] / 2.0f, m_LightColor3[1] / 2.0f, m_LightColor3[2] / 2.0f, 255 );
+		Color LightColor3Outer( m_LightColor3[0] / 2, m_LightColor3[1] / 2, m_LightColor3[2] / 2, 255 );
 		RenderWireframeSphere( vecOrigin3, m_LightFiftyDist3, 16, 8, m_LightColor3, false );
 		RenderWireframeSphere( vecOrigin3, m_LightZeroDist3, 16, 8, LightColor3Outer, false );
 	}
 	if ( m_bLightActive4 )
 	{
-		Color LightColor4Outer( m_LightColor4[0] / 2.0f, m_LightColor4[1] / 2.0f, m_LightColor4[2] / 2.0f, 255 );
+		Color LightColor4Outer( m_LightColor4[0] / 2, m_LightColor4[1] / 2, m_LightColor4[2] / 2, 255 );
 		RenderWireframeSphere( vecOrigin4, m_LightFiftyDist4, 16, 8, m_LightColor4, false );
 		RenderWireframeSphere( vecOrigin4, m_LightZeroDist4, 16, 8, LightColor4Outer, false );
 	}
