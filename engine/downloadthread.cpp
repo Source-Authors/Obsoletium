@@ -927,7 +927,8 @@ void DownloadThread( void *voidPtr )
 	// Delete rc.data, which was allocated in this thread
 	if ( rc.data != NULL )
 	{
-		delete[] rc.data;
+		// dimhotepus: On POSIX it is malloc'ed
+		free(rc.data);
 		rc.data = NULL;
 	}
 	
