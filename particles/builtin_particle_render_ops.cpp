@@ -205,10 +205,11 @@ struct SpriteRenderInfo_t
 	float m_flAgeScale2;
 
 	CSheet *m_pSheet;
-	int m_nVertexOffset;
+	// dimhotepus: int -> unsigned short.
+	unsigned short m_nVertexOffset;
 	CParticleCollection *m_pParticles;
 
-	void Init( CParticleCollection *pParticles, int nVertexOffset, float flAgeScale, float flAgeScale2, CSheet *pSheet )
+	void Init( CParticleCollection *pParticles, unsigned short nVertexOffset, float flAgeScale, float flAgeScale2, CSheet *pSheet )
 	{
 		m_pParticles = pParticles;
 		m_pXYZ = pParticles->GetM128AttributePtr( PARTICLE_ATTRIBUTE_XYZ, &m_nXYZStride );
@@ -1231,6 +1232,8 @@ void C_OP_RenderSprites::Render( IMatRenderContext *pRenderContext, CParticleCol
 	Vector vecCamera;
 	pRenderContext->GetWorldSpaceCameraPosition( &vecCamera );
 
+	const int trianglesCount = primType == MATERIAL_TRIANGLES ? 3 : 4;
+
 	while ( nParticles )
 	{
 		int nParticlesInBatch = min( nMaxParticlesInBatch, nParticles );
@@ -1244,12 +1247,12 @@ void C_OP_RenderSprites::Render( IMatRenderContext *pRenderContext, CParticleCol
 
 		if ( bUseInstancing )
 		{
-			g_pParticleSystemMgr->TallyParticlesRendered( vertexCount * ( primType == MATERIAL_TRIANGLES ? 3 : 4 ) );
+			g_pParticleSystemMgr->TallyParticlesRendered( vertexCount * trianglesCount );
 			meshBuilder.Begin( pMesh, primType, vertexCount );
 		}
 		else
 		{
-			g_pParticleSystemMgr->TallyParticlesRendered( vertexCount * ( primType == MATERIAL_TRIANGLES ? 3 : 4 ), indexCount * ( primType == MATERIAL_TRIANGLES ? 3 : 4 ) );
+			g_pParticleSystemMgr->TallyParticlesRendered( vertexCount * trianglesCount, indexCount * trianglesCount );
 			meshBuilder.Begin( pMesh, primType, vertexCount, indexCount );
 		}
 		info.m_nVertexOffset = 0;
@@ -1262,7 +1265,7 @@ void C_OP_RenderSprites::Render( IMatRenderContext *pRenderContext, CParticleCol
 			}
 		}
 		else
-		{			
+		{
 			for( int i = 0; i < nParticlesInBatch; i++ )
 			{
 				int hParticle = (--pSortList)->m_nIndex;
