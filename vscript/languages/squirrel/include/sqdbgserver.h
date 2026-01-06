@@ -44,8 +44,8 @@ inline bool dbg_less(const SQChar *x, const SQChar *y) {
 namespace sq::dbg {
 
 struct BreakPoint {
-  BreakPoint() { _line = 0; }
-  BreakPoint(int line, const SQChar *src) {
+  BreakPoint() : BreakPoint{0, nullptr} {}
+  BreakPoint(SQInteger line, const SQChar *src) {
     _line = line;
     _src = src;
   }
@@ -74,7 +74,7 @@ struct BreakPoint {
     return _line == bp._line && _src == bp._src;
   }
 
-  int _line;
+  SQInteger _line;
   SQDBGString _src;
 };
 
@@ -129,7 +129,7 @@ struct SQDbgServer {
 
   bool ReadMsg();
   void BusyWait();
-  void Hook(int type, int line, const SQChar *src, const SQChar *func);
+  void Hook(SQInteger type, SQInteger line, const SQChar *src, const SQChar *func);
   void ParseMsg(const char *msg);
   bool ParseBreakpoint(const char *msg, BreakPoint &out);
   bool ParseWatch(const char *msg, Watch &out);
@@ -139,7 +139,7 @@ struct SQDbgServer {
   void BreakExecution();
   void Send(const SQChar *s, ...);
   void SendChunk(const SQChar *chunk);
-  void Break(int line, const SQChar *src, const SQChar *type,
+  void Break(SQInteger line, const SQChar *src, const SQChar *type,
              const SQChar *error = nullptr);
 
   void SerializeState();

@@ -41,9 +41,9 @@ constexpr XMLEscape g_escapes[] = {
     {_SC('\"'), _SC("&quot;")},  {_SC('\n'), _SC("&quot;n")},
     {_SC('\r'), _SC("&quot;r")}, {NULL, NULL}};
 
-const SQChar *IntToString(int n) {
+const SQChar *IntToString(SQInteger n) {
   static SQChar temp[256];
-  scsprintf(temp, sizeof(temp), _SC("%d"), n);
+  scsprintf(temp, sizeof(temp), _SC("%zd"), n);
   return temp;
 }
 
@@ -256,7 +256,7 @@ void SQDbgServer::Terminated() {
   ThreadSleep(200);
 }
 
-void SQDbgServer::Hook(int type, int line, const SQChar *src,
+void SQDbgServer::Hook(SQInteger type, SQInteger line, const SQChar *src,
                        const SQChar *func) {
   switch (_state) {
     case eDbgState::eDBG_Running:
@@ -342,7 +342,7 @@ void SQDbgServer::ParseMsg(const char *msg) {
       BreakPoint bp;
       if (ParseBreakpoint(msg + 3, bp)) {
         AddBreakpoint(bp);
-        scprintf(_SC("added bp %d %s\n"), bp._line, bp._src.c_str());
+        scprintf(_SC("added bp %zd %s\n"), bp._line, bp._src.c_str());
       } else {
         scprintf(_SC("error parsing add breakpoint"));
       }
@@ -352,7 +352,7 @@ void SQDbgServer::ParseMsg(const char *msg) {
       BreakPoint bp;
       if (ParseBreakpoint(msg + 3, bp)) {
         RemoveBreakpoint(bp);
-        scprintf(_SC("removed bp %d %s\n"), bp._line, bp._src.c_str());
+        scprintf(_SC("removed bp %zd %s\n"), bp._line, bp._src.c_str());
       } else {
         scprintf(_SC("error parsing remove breakpoint"));
       }
@@ -563,7 +563,7 @@ void SQDbgServer::RemoveBreakpoint(BreakPoint &bp) {
   }
 }
 
-void SQDbgServer::Break(int line, const SQChar *src, const SQChar *type,
+void SQDbgServer::Break(SQInteger line, const SQChar *src, const SQChar *type,
                         const SQChar *error) {
   if (!error) {
     BeginDocument();
