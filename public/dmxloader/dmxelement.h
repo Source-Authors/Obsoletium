@@ -130,7 +130,7 @@ public:
 
 	// Set methods
 	CDmxAttribute* SetValue( const char *pAttributeName, const char *pString );
-	CDmxAttribute* SetValue( const char *pAttributeName, void *pBuffer, intp nLen );
+	CDmxAttribute* SetValue( const char *pAttributeName, const void *pBuffer, intp nLen );
 	template< class T > CDmxAttribute* SetValue( const char *pAttributeName, const T& value );
 
 	// Method to unpack data into a structure
@@ -289,7 +289,7 @@ inline CDmxAttribute* CDmxElement::SetValue( const char *pAttributeName, const c
 	return pAttribute;
 }
 
-inline CDmxAttribute* CDmxElement::SetValue( const char *pAttributeName, void *pBuffer, intp nLen )
+inline CDmxAttribute* CDmxElement::SetValue( const char *pAttributeName, const void *pBuffer, intp nLen )
 {
 	CDmxElementModifyScope modify( this );
 	CDmxAttribute *pAttribute = AddAttribute( pAttributeName );
