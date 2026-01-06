@@ -120,7 +120,7 @@ void C_OP_BasicMovement::Operate( CParticleCollection *pParticles, float flStren
 	fltx4 accFactorY = ReplicateX4( acc.y );
 	fltx4 accFactorZ = ReplicateX4( acc.z );
 
-	int nAccumulators = pParticles->m_pDef->m_ForceGenerators.Count();
+	intp nAccumulators = pParticles->m_pDef->m_ForceGenerators.Count();
 
 	FourVectors PerParticleForceAccumulator[MAX_PARTICLES_IN_A_SYSTEM / 4];	// xbox fixme - memory
 
@@ -138,7 +138,7 @@ void C_OP_BasicMovement::Operate( CParticleCollection *pParticles, float flStren
 			pAccOut++;
 		} 
 		// now, call all force accumulators
-		for(int i=0;i < nAccumulators ; i++ )
+		for(intp i=0;i < nAccumulators ; i++ )
 		{
 			float flStrengthOp;
 			CParticleOperatorInstance *pOp = pParticles->m_pDef->m_ForceGenerators[i];
@@ -190,12 +190,12 @@ void C_OP_BasicMovement::Operate( CParticleCollection *pParticles, float flStren
 	CHECKSYSTEM( pParticles );
 	pParticles->SwapPosAndPrevPos();
 	// now, enforce constraints
-	int nConstraints = pParticles->m_pDef->m_Constraints.Count();
+	intp nConstraints = pParticles->m_pDef->m_Constraints.Count();
 	if ( nConstraints && pParticles->m_nPaddedActiveParticles )
 	{
 		bool bConstraintSatisfied[ MAXIMUM_NUMBER_OF_CONSTRAINTS ];
 		bool bFinalConstraint[ MAXIMUM_NUMBER_OF_CONSTRAINTS ];
-		for(int i=0;i<nConstraints; i++)
+		for(intp i=0;i<nConstraints; i++)
 		{
 			bFinalConstraint[i] = pParticles->m_pDef->m_Constraints[i]->IsFinalConstraint();
 
@@ -209,7 +209,7 @@ void C_OP_BasicMovement::Operate( CParticleCollection *pParticles, float flStren
 		for(int p=0; p < m_nMaxConstraintPasses ; p++ )
 		{
 //			int nSaveOffset=pParticles->m_nOperatorRandomSampleOffset;
-			for(int i=0;i<nConstraints; i++)
+			for(intp i=0;i<nConstraints; i++)
 			{
 //				pParticles->m_nOperatorRandomSampleOffset += 23;
 				if ( ! bConstraintSatisfied[i] )
@@ -229,7 +229,7 @@ void C_OP_BasicMovement::Operate( CParticleCollection *pParticles, float flStren
 						if ( bDidSomething )
 						{
 							// other constraints now not satisfied, maybe
-							for( int j=0; j<nConstraints; j++)
+							for( intp j=0; j<nConstraints; j++)
 							{
 								if ( i != j )
 								{
@@ -243,7 +243,7 @@ void C_OP_BasicMovement::Operate( CParticleCollection *pParticles, float flStren
 //			pParticles->m_nOperatorRandomSampleOffset = nSaveOffset;
 		}
 		// now, run final constraints
-		for(int i=0;i<nConstraints; i++)
+		for(intp i=0;i<nConstraints; i++)
 		{
 			CParticleOperatorInstance *pOp = pParticles->m_pDef->m_Constraints[i];
 			if ( ( bFinalConstraint[i] ) &&
@@ -2873,7 +2873,7 @@ class C_OP_DistanceBetweenCPs : public CParticleOperatorInstance
 	{
 		return 0;
 	}
-	uint32 GetReadInitialAttributes( void ) const
+	uint32 GetReadInitialAttributes( void ) const //-V524
 	{
 		return 1 << m_nFieldOutput;
 	}
@@ -2992,7 +2992,7 @@ class C_OP_DistanceToCP : public CParticleOperatorInstance
 		return PARTICLE_ATTRIBUTE_XYZ_MASK;
 	}
 
-	uint32 GetReadInitialAttributes( void ) const
+	uint32 GetReadInitialAttributes( void ) const //-V524
 	{
 		return 1 << m_nFieldOutput;
 	}
@@ -3704,7 +3704,7 @@ class C_OP_VelocityMatchingForce : public CParticleOperatorInstance
 		return PARTICLE_ATTRIBUTE_XYZ_MASK | PARTICLE_ATTRIBUTE_PREV_XYZ_MASK ;
 	}
 
-	uint32 GetReadAttributes( void ) const
+	uint32 GetReadAttributes( void ) const //-V524
 	{
 		return PARTICLE_ATTRIBUTE_XYZ_MASK | PARTICLE_ATTRIBUTE_PREV_XYZ_MASK ;
 	}
@@ -3939,7 +3939,7 @@ class C_OP_MaxVelocity : public CParticleOperatorInstance
 		return PARTICLE_ATTRIBUTE_XYZ_MASK | PARTICLE_ATTRIBUTE_PREV_XYZ_MASK ;
 	}
 
-	uint32 GetReadAttributes( void ) const
+	uint32 GetReadAttributes( void ) const //-V524
 	{
 		return PARTICLE_ATTRIBUTE_XYZ_MASK | PARTICLE_ATTRIBUTE_PREV_XYZ_MASK ;
 	}
@@ -4376,7 +4376,7 @@ class C_OP_MovementRotateParticleAroundAxis : public CParticleOperatorInstance
 		return PARTICLE_ATTRIBUTE_XYZ_MASK | PARTICLE_ATTRIBUTE_PREV_XYZ_MASK ;
 	}
 
-	uint32 GetReadAttributes( void ) const override
+	uint32 GetReadAttributes( void ) const override //-V524
 	{
 		return PARTICLE_ATTRIBUTE_XYZ_MASK | PARTICLE_ATTRIBUTE_PREV_XYZ_MASK ;
 	}
