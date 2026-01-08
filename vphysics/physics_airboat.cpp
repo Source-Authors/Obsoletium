@@ -761,8 +761,8 @@ void CPhysics_Airboat::DoSimulationDrag( IVP_Raycast_Airboat_Impact *pImpacts,
 	int nPointsOnGround = 0;
 	float flGroundFriction = 0;
 	float flAverageDampening = 0.0f;
-	int *pSurfacePropCount = (int *)stackalloc( n_wheels * sizeof(int) );
-	int *pSurfaceProp  = (int *)stackalloc( n_wheels * sizeof(int) );
+	int *pSurfacePropCount = stackallocT( int, n_wheels );
+	int *pSurfaceProp = stackallocT( int, n_wheels );
 	memset( pSurfacePropCount, 0, n_wheels * sizeof(int) );
 	memset( pSurfaceProp, 0xFF, n_wheels * sizeof(int) );
 	int nSurfacePropCount = 0;
