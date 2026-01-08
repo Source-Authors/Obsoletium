@@ -1747,7 +1747,10 @@ void CWin32Surface::DrawTexturedRect(int x0,int y0,int x1,int y1)
 		}
 
 		// draw over the 'black areas' with the bitmap
-		::SelectObject(dc, bitmap);
+		// dimhotepus: Restore old object after draw.
+		HGDIOBJ oldObject = ::SelectObject(dc, bitmap);
+		RunCodeAtScopeExit(::SelectObject(dc, oldObject));
+
 		::StretchBlt(PLAT(_currentContextPanel)->hdc,x0,y0,x1-x0,y1-y0,dc,0,0,wide,tall,SRCPAINT);
 	}
 	else
@@ -2671,17 +2674,17 @@ void CWin32Surface::SwapBuffers(VPANEL panel)
 		((VPanel *)panel)->GetSize(wide,tall);
 		
 		{
-		plat->hwndDC = ::GetDC(plat->hwnd);
+			plat->hwndDC = ::GetDC(plat->hwnd);
 			RunCodeAtScopeExit({
 				::ReleaseDC(plat->hwnd, plat->hwndDC);
 				plat->hwndDC = NULL;
 			});
 
-		// reset origin and clipping then blit
-		::SetRectRgn(plat->clipRgn, 0, 0, wide, tall);
-		::SelectObject(plat->hdc, plat->clipRgn);
-		::SetViewportOrgEx(plat->hdc, 0, 0, NULL);
-		::BitBlt(plat->hwndDC, 0, 0, wide, tall, plat->hdc, 0, 0, SRCCOPY);
+			// reset origin and clipping then blit
+			::SetRectRgn(plat->clipRgn, 0, 0, wide, tall);
+			::SelectObject(plat->hdc, plat->clipRgn);
+			::SetViewportOrgEx(plat->hdc, 0, 0, NULL);
+			::BitBlt(plat->hwndDC, 0, 0, wide, tall, plat->hdc, 0, 0, SRCCOPY);
 		}
 
 		END_TIMER("SwapBuffers time: %.2fms\n");
