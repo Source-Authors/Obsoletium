@@ -1091,7 +1091,7 @@ void CEngineAPI::SetStartupInfo( StartupInfo_t &info )
 	g_bTextMode = info.m_bTextMode;
 
 	// Set up the engineparms_t which contains global information about the mod
-	host_parms.basedir = const_cast<char*>( info.m_pBaseDirectory );
+	host_parms.basedir = info.m_pBaseDirectory;
 
 	// Copy off all the startup info
 	m_StartupInfo = info;
@@ -2368,9 +2368,9 @@ bool CDedicatedServerAPI::ModInit( ModInfo_t &info )
 	eng->SetQuitting( IEngine::QUIT_NOTQUITTING );
 
 	// Set up the engineparms_t which contains global information about the mod
-	host_parms.basedir = const_cast<char*>(info.m_pBaseDirectory);
-	host_parms.mod = const_cast<char*>(GetModDirFromPath(info.m_pInitialMod));
-	host_parms.game = const_cast<char*>(info.m_pInitialGame);
+	host_parms.basedir = info.m_pBaseDirectory;
+	host_parms.mod = GetModDirFromPath(info.m_pInitialMod);
+	host_parms.game = info.m_pInitialGame;
 
 	g_bTextMode = info.m_bTextMode;
 

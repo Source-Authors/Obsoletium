@@ -1508,8 +1508,7 @@ void CGame::PlayStartupVideos( void )
 	int vidFileLength;
 
 	// have to use the malloc memory allocation option in COM_LoadFile since the memory system isn't set up at this point.
-	const char *buffer = (const char *) COM_LoadFile( pszFile, 5, &vidFileLength );
-	
+	char *buffer = (char *) COM_LoadFile( pszFile, 5, &vidFileLength );
 	if ((buffer == NULL) || (vidFileLength == 0))
 	{
 		return;
@@ -1570,7 +1569,7 @@ void CGame::PlayStartupVideos( void )
   #endif
 
 	// call free on the buffer since the buffer was malloc'd in COM_LoadFile
-	free( (void *)buffer );
+	free( buffer );
 
 #endif // SWDS
 }

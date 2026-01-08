@@ -37,9 +37,9 @@ extern CCommonHostState host_state;
 // and the amount of memory available for the program to use
 struct engineparms_t
 {
-	char	*basedir;	// Executable directory ("c:/program files/half-life 2", for example)
-	char	*mod;		// Mod name ("cstrike", for example)
-	char	*game;		// Root game name ("hl2", for example, in the case of cstrike)
+	const char	*basedir;	// Executable directory ("c:/program files/half-life 2", for example)
+	const char	*mod;		// Mod name ("cstrike", for example)
+	const char	*game;		// Root game name ("hl2", for example, in the case of cstrike)
 	uintp	memsize;
 };
 extern engineparms_t host_parms;
