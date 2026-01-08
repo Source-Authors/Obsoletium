@@ -830,8 +830,9 @@ void CScheme::ReloadFontGlyphs()
 		{
 			// skip over fonts not meant for this resolution
 			int fontYResMin = 0, fontYResMax = 0;
-			sscanf(fontdata->GetString("yres", ""), "%d %d", &fontYResMin, &fontYResMax);
-			if (fontYResMin)
+			const char *yres = fontdata->GetString("yres", "");
+			// dimhotepus: Check we read at least one font res.
+			if (sscanf(yres, "%d %d", &fontYResMin, &fontYResMax) >= 1 && fontYResMin)
 			{
 				if (!fontYResMax)
 				{
