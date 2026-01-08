@@ -2018,7 +2018,7 @@ void R_DrawDecalsAllImmediate_Gathered( IMatRenderContext *pRenderContext, decal
 	SurfaceHandle_t lastSurf = NULL;
 	decalcontext_t context( pRenderContext, vModelOrg );
 	bool bWireframe = ShouldDrawInWireFrameMode() || (r_drawdecals.GetInt() == 2);
-	for( int i = 0; i != iDecalCount; ++i )
+	for( int i = 0; i < iDecalCount; ++i )
 	{
 		decal_t * pDecal = ppDecals[i];
 
@@ -2391,7 +2391,7 @@ void R_DrawDecalsAll_Gathered( IMatRenderContext *pRenderContext, decal_t **ppDe
 	decalcontext_t context(pRenderContext, vModelOrg);
 	bool bWireframe = ShouldDrawInWireFrameMode() || (r_drawdecals.GetInt() == 2);
 
-	for( int i = 0; i != iDecalCount; ++i )
+	for( int i = 0; i < iDecalCount; ++i )
 	{
 		decal_t *pDecal = ppDecals[i];
 		if( (pDecal == DECALMARKERS_SWITCHSORTTREE) || (pDecal == DECALMARKERS_SWITCHBUCKET) )

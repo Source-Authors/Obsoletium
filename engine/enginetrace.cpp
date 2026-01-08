@@ -577,7 +577,7 @@ void CEngineTrace::GetBrushesInAABB( const Vector &vMins, const Vector &vMaxs, C
 	CCollisionBSPData *pBSPData = GetCollisionBSPData();
 
 	Vector ptBBoxExtents[8]; //for fast plane checking
-	for( int i = 0; i != 8; ++i )
+	for( int i = 0; i < 8; ++i )
 	{
 		//set these up to be opposite that of cplane_t's signbits for it's normal
 		ptBBoxExtents[i].x = (i & (1<<0)) ? (vMaxs.x) : (vMins.x);
@@ -591,7 +591,7 @@ void CEngineTrace::GetBrushesInAABB( const Vector &vMins, const Vector &vMaxs, C
 	CUtlVector<int> counters;
 	counters.SetSize( pBSPData->numbrushes );
 	memset( counters.Base(), 0, pBSPData->numbrushes * sizeof(int) );
-	for( int i = 0; i != iNumLeafs; ++i )
+	for( int i = 0; i < iNumLeafs; ++i )
 		GetBrushesInAABB_ParseLeaf( ptBBoxExtents, pBSPData, &pBSPData->map_leafs[pLeafList[i]], pOutput, iContentsMask, counters.Base() );
 }
 
