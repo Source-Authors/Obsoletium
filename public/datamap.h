@@ -432,9 +432,9 @@ public:
 	
 	~CDatadescGeneratedNameHolder()
 	{
-		for ( intp i = 0; i < m_Names.Count(); i++ )
+		for ( auto &n : m_Names )
 		{
-			delete m_Names[i];
+			delete n;
 		}
 	}
 	
