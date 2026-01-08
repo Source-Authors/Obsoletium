@@ -743,15 +743,15 @@ CPhysConvex *CPhysicsCollision::ConvexFromConvexPolyhedron( const CPolyhedron &C
 	IVP_Template_Polygon polyTemplate(ConvexPolyhedron.iVertexCount, ConvexPolyhedron.iLineCount, ConvexPolyhedron.iPolygonCount );
 
 	//convert/copy coordinates
-	for( int i = 0; i != ConvexPolyhedron.iVertexCount; ++i )
+	for( int i = 0; i < ConvexPolyhedron.iVertexCount; ++i )
 		ConvertPositionToIVP( ConvexPolyhedron.pVertices[i], polyTemplate.points[i] );
 
 	//copy lines
-	for( int i = 0; i != ConvexPolyhedron.iLineCount; ++i )
+	for( int i = 0; i < ConvexPolyhedron.iLineCount; ++i )
 		polyTemplate.lines[i].set( ConvexPolyhedron.pLines[i].iPointIndices[0], ConvexPolyhedron.pLines[i].iPointIndices[1] );
 
 	//copy polygons
-	for( int i = 0; i != ConvexPolyhedron.iPolygonCount; ++i )
+	for( int i = 0; i < ConvexPolyhedron.iPolygonCount; ++i )
 	{
 		polyTemplate.surfaces[i].init_surface( ConvexPolyhedron.pPolygons[i].iIndexCount ); //num vertices in a convex polygon == num lines
 		polyTemplate.surfaces[i].templ_poly = &polyTemplate;
@@ -770,7 +770,7 @@ CPhysConvex *CPhysicsCollision::ConvexFromConvexPolyhedron( const CPolyhedron &C
 	IVP_Compact_Ledge *pLedge = IVP_SurfaceBuilder_Polygon_Convex::convert_template_to_ledge(&polyTemplate);
 
 	//cleanup
-	for( int i = 0; i != ConvexPolyhedron.iPolygonCount; ++i )
+	for( int i = 0; i < ConvexPolyhedron.iPolygonCount; ++i )
 		polyTemplate.surfaces[i].close_surface();
 
 	return reinterpret_cast<CPhysConvex *>(pLedge);
@@ -833,7 +833,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 
 	int iInsertIndex = 0;
 
-	for( unsigned i = 0; i != iHighestPointIndex; ++i )
+	for( unsigned i = 0; i < iHighestPointIndex; ++i )
 	{
 		if( pPointRemapping[i] )
 		{
@@ -884,7 +884,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	//copy/convert vertices
 	const IVP_Compact_Poly_Point *pLedgePoints = pLedge->get_point_array();
 	Vector *pWriteVertices = pReturn->pVertices;
-	for( unsigned i = 0; i != iHighestPointIndex; ++i )
+	for( unsigned i = 0; i < iHighestPointIndex; ++i )
 	{
 		if( pPointRemapping[i] != -1 )
 			ConvertPositionToHL( pLedgePoints[i], pWriteVertices[pPointRemapping[i]] );
@@ -893,7 +893,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
     
 	//convert lines
 	iInsertIndex = 0;
-	for( int i = 0; i != iNumPoints; ++i )
+	for( int i = 0; i < iNumPoints; ++i )
 	{
 		for( int j = i + 1; j != iNumPoints; ++j )
 		{
@@ -912,7 +912,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	pStartIndices[0] = 0; //the lowest index point drives links, so if the first point isn't the first link, then something is extremely messed up
 	Assert( pReturn->pLines[0].iPointIndices[0] == 0 );
 	iInsertIndex = 1;
-	for( int i = 1; i != iNumPoints; ++i )
+	for( int i = 1; i < iNumPoints; ++i )
 	{
 		for( int j = iInsertIndex; j != iLinkCount; ++j )
 		{
@@ -974,7 +974,7 @@ int CPhysicsCollision::GetConvexesUsedInCollideable( const CPhysCollide *pCollid
 	if( iLedgeCount > iOutputArrayLimit )
 		iLedgeCount = iOutputArrayLimit;
 
-	for( int i = 0; i != iLedgeCount; ++i )
+	for( int i = 0; i < iLedgeCount; ++i )
 	{
 		IVP_Compact_Ledge *pLedge = ledges.element_at(i); //doing as a 2 step since a single convert seems more error prone (without compile error) in this case
 		pOutputArray[i] = (CPhysConvex *)pLedge;
