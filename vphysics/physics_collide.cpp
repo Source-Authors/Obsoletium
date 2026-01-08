@@ -825,7 +825,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	//apparently points might be shared between ledges and not all points will be used. So now we get to compress them into a smaller set
 	int *pPointRemapping = stackallocT( int, iHighestPointIndex );
 	memset( pPointRemapping, 0, iHighestPointIndex * sizeof( int ) );
-	for( int i = 0; i != iTriangles; ++i )
+	for( int i = 0; i < iTriangles; ++i )
 	{
 		for( int j = 0; j != 3; ++j )
 			++(pPointRemapping[pTriangles[i].Edges[j].iPointIndices[0]]);
@@ -848,7 +848,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 
 	const int iNumPoints = iInsertIndex;
 
-	for( int i = 0; i != iTriangles; ++i )
+	for( int i = 0; i < iTriangles; ++i )
 	{
 		for( int j = 0; j != 3; ++j )
 		{
@@ -862,7 +862,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 	memset( bLinks, 0, iNumPoints * iNumPoints * sizeof( bool ) );
 
 	int iLinkCount = 0;
-	for( int i = 0; i != iTriangles; ++i )
+	for( int i = 0; i < iTriangles; ++i )
 	{
 		for( int j = 0; j != 3; ++j )
 		{
@@ -927,7 +927,7 @@ CPolyhedron *CPhysicsCollision::PolyhedronFromConvex( CPhysConvex * const pConve
 
 	//convert polygons and setup line references as a subtask
 	iInsertIndex = 0;
-	for( int i = 0; i != iTriangles; ++i )
+	for( int i = 0; i < iTriangles; ++i )
 	{
 		pReturn->pPolygons[i].iFirstIndex = iInsertIndex;
 		pReturn->pPolygons[i].iIndexCount = 3;
