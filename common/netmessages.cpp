@@ -1133,7 +1133,7 @@ bool NET_SetConVar::WriteToBuffer( bf_write &buffer )
 	Assert( numvars <= UCHAR_MAX );
 
 	// Note how many we're sending
-	buffer.WriteByte( numvars );
+	buffer.WriteByte( size_cast<uint8>( numvars ) );
 
 	for (auto &ccvar : m_ConVars)
 	{
@@ -1456,7 +1456,7 @@ bool SVC_ClassInfo::WriteToBuffer( bf_write &buffer )
 	}
 
 	Assert( m_nNumServerClasses <= SHRT_MAX );
-	int numServerClasses = static_cast<int>(m_nNumServerClasses);
+	int numServerClasses = size_cast<int>(m_nNumServerClasses);
 	
 	buffer.WriteUBitLong( GetType(), NETMSG_TYPE_BITS );
 	buffer.WriteShort( numServerClasses );
