@@ -2474,7 +2474,7 @@ void CClientShadowMgr::BuildRenderToTextureShadow( IClientRenderable* pRenderabl
 	// dimhotepus: Default initialize. TF2 backport.
 	Vector yvec = vec3_origin;
 	float fProjMax = 0.0f;
-	for( int i = 0; i != 3; ++i )
+	for( int i = 0; i < 3; ++i )
 	{
 		Vector test = vec[i] - ( vecShadowDir * DotProduct( vecShadowDir, vec[i] ) );
 		test *= boxSize[i]; //doing after the projection to simplify projection math
