@@ -87,11 +87,11 @@ void CScratchPad3D::CCommand_Polygon::Read( CFileRead *pFile )
 
 void CScratchPad3D::CCommand_Polygon::Write( IFileSystem* pFileSystem, FileHandle_t fp )
 {
-	intp count = m_Verts.Count();
+	int count = size_cast<int>( m_Verts.Count() );
 	pFileSystem->Write( &count, sizeof(count), fp );
 	
 	if( count )
-		pFileSystem->Write( &m_Verts[0], static_cast<intp>(sizeof(CSPVert))*count, fp );
+		pFileSystem->Write( &m_Verts[0], static_cast<int>(sizeof(CSPVert))*count, fp );
 }
 
 
@@ -144,7 +144,7 @@ void CScratchPad3D::CCommand_Text::Read( CFileRead *pFile )
 
 void CScratchPad3D::CCommand_Text::Write( IFileSystem* pFileSystem, FileHandle_t fp )
 {
-	int strLen = m_String.Count();
+	int strLen = size_cast<int>( m_String.Count() );
 	pFileSystem->Write( &strLen, sizeof( strLen ), fp );
 	pFileSystem->Write( m_String.Base(), strLen, fp );
 
