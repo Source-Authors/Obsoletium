@@ -1507,9 +1507,9 @@ void CAsyncWavDataCache::OnMixEnd()
 {
 	m_bQueueCacheUnlocks = false;
 	// flush the unlock queue
-	for ( intp i = 0; i < m_unlockQueue.Count(); i++ )
+	for ( auto &u : m_unlockQueue )
 	{
-		CacheUnlock( m_unlockQueue[i] );
+		CacheUnlock( u );
 	}
 	m_unlockQueue.RemoveAll();
 }
