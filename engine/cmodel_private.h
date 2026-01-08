@@ -256,7 +256,7 @@ public:
 		// can preload as required
 		if ( pData )
 		{
-			m_buf.Put( pData, nCount );
+			m_buf.Put( pData, nCount ); //-V2002
 		}
 	}
 

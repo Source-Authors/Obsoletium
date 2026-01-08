@@ -645,7 +645,7 @@ bool CWin32UploadGameStats::DoBlockingReceive( uint bytesExpected, CUtlBuffer& b
 		if ( bytesReceived <= 0 )
 			return false;
 
-		buf.Put( temp, bytesReceived );
+		buf.Put( temp, bytesReceived ); //-V2002
 		uintp totalReceived = buf.TellPut();
 		if ( totalReceived >= bytesExpected )
 			break;

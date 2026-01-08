@@ -1068,7 +1068,7 @@ void Mod_LoadVertices( void )
 	CMapLoadHelper lh( LUMP_VERTEXES );
 
 	auto *in = lh.LumpBase<dvertex_t>();
-	if ( lh.LumpSize() % sizeof(*in) )
+	if ( lh.LumpSize() % sizeof(dvertex_t) )
 		Host_Error( "Mod_LoadVertices: funny lump size in %s", lh.GetMapName() );
 
 	int count = lh.LumpSize() / sizeof(*in);
@@ -1108,7 +1108,7 @@ void Mod_LoadSubmodels( CUtlVector<mmodel_t> &submodelList )
 	CMapLoadHelper lh( LUMP_MODELS );
 
 	auto *in = lh.LumpBase<dmodel_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dmodel_t))
 		Host_Error("Mod_LoadSubmodels: funny lump size in %s",lh.GetMapName());
 
 	int count = lh.LumpSize() / sizeof(*in);
@@ -1141,7 +1141,7 @@ std::unique_ptr<medge_t[]> Mod_LoadEdges()
 	CMapLoadHelper lh( LUMP_EDGES );
 
 	auto *in = lh.LumpBase<dedge_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dedge_t))
 		Host_Error( "Mod_LoadEdges: funny lump size in %s", lh.GetMapName() );
 
 	int count = lh.LumpSize() / sizeof(*in);
@@ -1191,7 +1191,7 @@ void Mod_LoadOcclusion( void )
 			{
 				b->occluders = Hunk_AllocName<doccluderdata_t>( b->numoccluders, "occluder data" );
 				int nSize = b->numoccluders * sizeof(doccluderdata_t);
-				buf.Get( b->occluders, nSize );
+				buf.Get( b->occluders, nSize ); //-V2002
 			}
 
 			b->numoccluderpolys = buf.GetInt();
@@ -1199,7 +1199,7 @@ void Mod_LoadOcclusion( void )
 			{
 				b->occluderpolys = Hunk_AllocName<doccluderpolydata_t>( b->numoccluderpolys, "occluder poly data" );
 				int nSize = b->numoccluderpolys * sizeof(doccluderpolydata_t);
-				buf.Get( b->occluderpolys, nSize );
+				buf.Get( b->occluderpolys, nSize ); //-V2002
 			}
 
 			b->numoccludervertindices = buf.GetInt();
@@ -1207,7 +1207,7 @@ void Mod_LoadOcclusion( void )
 			{
 				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertices" );
 				int nSize = b->numoccludervertindices * sizeof(int);
-				buf.Get( b->occludervertindices, nSize );
+				buf.Get( b->occludervertindices, nSize ); //-V2002
 			}
 		}
 		break;
@@ -1222,7 +1222,7 @@ void Mod_LoadOcclusion( void )
 				doccluderdataV1_t temp;
 				for ( int i = 0; i < b->numoccluders; ++i )
 				{
-					buf.Get( temp );
+					buf.Get( temp ); //-V2002
 					memcpy( &b->occluders[i], &temp, sizeof(doccluderdataV1_t) );
 					b->occluders[i].area = 1;
 				}
@@ -1233,7 +1233,7 @@ void Mod_LoadOcclusion( void )
 			{
 				b->occluderpolys = Hunk_AllocName<doccluderpolydata_t>( b->numoccluderpolys, "occluder poly data" );
 				int nSize = b->numoccluderpolys * sizeof(doccluderpolydata_t);
-				buf.Get( b->occluderpolys, nSize );
+				buf.Get( b->occluderpolys, nSize ); //-V2002
 			}
 
 			b->numoccludervertindices = buf.GetInt();
@@ -1241,7 +1241,7 @@ void Mod_LoadOcclusion( void )
 			{
 				b->occludervertindices = Hunk_AllocName<int>( b->numoccludervertindices, "occluder vertices" );
 				int nSize = b->numoccludervertindices * sizeof(int);
-				buf.Get( b->occludervertindices, nSize );
+				buf.Get( b->occludervertindices, nSize ); //-V2002
 			}
 		}
 		break;
@@ -1282,7 +1282,7 @@ void Mod_LoadTexinfo( void )
 	CMapLoadHelper lh( LUMP_TEXINFO );
 
 	auto *in = lh.LumpBase<texinfo_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(texinfo_t))
 		Host_Error ("Mod_LoadTexinfo: funny lump size in %s",lh.GetMapName());
 
 	int count = lh.LumpSize() / sizeof(*in);

@@ -611,7 +611,7 @@ void CServerRemoteAccess::RequestValue( ra_listener_id listener, int requestID, 
 	response.PutInt(value.TellPut());
 	if (value.TellPut())
 	{
-		response.Put(value.Base(), value.TellPut());
+		response.Put(value.Base(), value.TellPut()); //-V2002
 	}
 }
 
@@ -976,7 +976,7 @@ void CServerRemoteAccess::SendResponseToClient( ra_listener_id listenerID, Serve
 	response.PutInt( 0 );
 	response.PutInt( type );
 	response.PutInt( nDataLen );
-	response.Put( pData, nDataLen );
+	response.Put( pData, nDataLen ); //-V2002
 }
 
 

@@ -122,7 +122,7 @@ void CDemoFile::WriteCmdInfo( democmdinfo_t& info )
 	ByteSwap_democmdinfo_t( littleEndianInfo );
 
 	Assert( m_pBuffer && m_pBuffer->IsValid() );
-	m_pBuffer->Put( &littleEndianInfo, sizeof(democmdinfo_t) );
+	m_pBuffer->Put( &littleEndianInfo, sizeof(democmdinfo_t) ); //-V2002
 }
 
 //-----------------------------------------------------------------------------
@@ -131,7 +131,7 @@ void CDemoFile::WriteCmdInfo( democmdinfo_t& info )
 void CDemoFile::ReadCmdInfo( democmdinfo_t& info )
 {
 	Assert( m_pBuffer && m_pBuffer->IsValid() );
-	m_pBuffer->Get( &info, sizeof(democmdinfo_t) );
+	m_pBuffer->Get( &info, sizeof(democmdinfo_t) ); //-V2002
 
 	ByteSwap_democmdinfo_t( info );
 }
@@ -371,7 +371,7 @@ int CDemoFile::ReadRawData( char *buffer, int length )
 	}
 
 	// read data into buffer
-	m_pBuffer->Get( buffer, size );
+	m_pBuffer->Get( buffer, size ); //-V2002
 
 	return size;
 }
@@ -383,7 +383,7 @@ void CDemoFile::WriteRawData( const char *buffer, int length )
 
 	Assert( m_pBuffer && m_pBuffer->IsValid() );
 	m_pBuffer->PutInt( length );
-	m_pBuffer->Put( buffer, length );
+	m_pBuffer->Put( buffer, length ); //-V2002
 }
 
 void CDemoFile::WriteDemoHeader()
@@ -419,7 +419,7 @@ void CDemoFile::WriteDemoHeader()
 	m_pBuffer->SeekPut( CUtlBuffer::SEEK_HEAD, 0 );
 
 	// Write
-	m_pBuffer->Put( &m_DemoHeader, sizeof( m_DemoHeader ) );
+	m_pBuffer->Put( &m_DemoHeader, sizeof( m_DemoHeader ) ); //-V2002
 }
 
 demoheader_t *CDemoFile::ReadDemoHeader()
@@ -430,7 +430,7 @@ demoheader_t *CDemoFile::ReadDemoHeader()
 	if ( !m_pBuffer || !m_pBuffer->IsValid() )
 		return NULL;
 	m_pBuffer->SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
-	m_pBuffer->Get( &m_DemoHeader, sizeof(demoheader_t) );
+	m_pBuffer->Get( &m_DemoHeader, sizeof(demoheader_t) ); //-V2002
 	bOk = m_pBuffer->IsValid();
 
 	ByteSwap_demoheader_t( m_DemoHeader );
@@ -477,12 +477,12 @@ void CDemoFile::WriteFileBytes( FileHandle_t fh, int length )
 	while ( copysize > COM_COPY_CHUNK_SIZE )
 	{
 		g_pFileSystem->Read ( copybuf, COM_COPY_CHUNK_SIZE, fh );
-		m_pBuffer->Put( copybuf, COM_COPY_CHUNK_SIZE );
+		m_pBuffer->Put( copybuf, COM_COPY_CHUNK_SIZE ); //-V2002
 		copysize -= COM_COPY_CHUNK_SIZE;
 	}
 
 	g_pFileSystem->Read ( copybuf, copysize, fh );
-	m_pBuffer->Put( copybuf, copysize );
+	m_pBuffer->Put( copybuf, copysize ); //-V2002
 	
 	g_pFileSystem->Flush ( fh );
 }

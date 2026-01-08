@@ -1706,7 +1706,7 @@ METHODDEF(boolean) empty_output_buffer (j_compress_ptr cinfo)
     CUtlBuffer *buf = dest->pBuffer;
 
     // Add some data
-    buf->Put( dest->buffer, OUTPUT_BUF_SIZE );
+    buf->Put( dest->buffer, OUTPUT_BUF_SIZE ); //-V2002
     
     dest->pub.next_output_byte = dest->buffer;
     dest->pub.free_in_buffer = OUTPUT_BUF_SIZE;
@@ -1732,7 +1732,7 @@ METHODDEF(void) term_destination (j_compress_ptr cinfo)
     /* Write any data remaining in the buffer */
     if (datacount > 0) 
     {
-        buf->Put( dest->buffer, datacount );
+        buf->Put( dest->buffer, datacount ); //-V2002
     }
 }
 

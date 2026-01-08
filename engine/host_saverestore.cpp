@@ -775,19 +775,19 @@ int CSaveRestore::SaveGameSlot( const char *pSaveName, const char *pSaveComment,
 	// Write the header -- THIS SHOULD NEVER CHANGE STRUCTURE, USE SAVE_HEADER FOR NEW HEADER INFORMATION
 	// THIS IS ONLY HERE TO IDENTIFY THE FILE AND GET IT'S SIZE.
 	tag = MAKEID('J','S','A','V');
-	saveHeader.Put( &tag, sizeof(int) );
+	saveHeader.Put( &tag, sizeof(int) ); //-V2002
 	tag = SAVEGAME_VERSION;
-	saveHeader.Put( &tag, sizeof(int) );
+	saveHeader.Put( &tag, sizeof(int) ); //-V2002
 	tag = pSaveData->GetCurPos();
-	saveHeader.Put( &tag, sizeof(int) ); // Does not include token table
+	saveHeader.Put( &tag, sizeof(int) ); // Does not include token table //-V2002
 
 	// Write out the tokens first so we can load them before we load the entities
 	tag = pSaveData->SizeSymbolTable();
-	saveHeader.Put( &tag, sizeof(int) );
-	saveHeader.Put( &tokenSize, sizeof(int) );
-	saveHeader.Put( pTokenData, tokenSize );
+	saveHeader.Put( &tag, sizeof(int) ); //-V2002
+	saveHeader.Put( &tokenSize, sizeof(int) ); //-V2002
+	saveHeader.Put( pTokenData, tokenSize ); //-V2002
 
-	saveHeader.Put( pSaveData->GetBuffer(), pSaveData->GetCurPos() );
+	saveHeader.Put( pSaveData->GetBuffer(), pSaveData->GetCurPos() ); //-V2002
 	
 	// Create the save game container before the directory copy 
 	g_AsyncSaveCallQueue.QueueCall( g_pSaveRestoreFileSystem, &ISaveRestoreFileSystem::AsyncWrite, CUtlEnvelope<const char *>(name), saveHeader.Base(), saveHeader.TellPut(), true, false, (FSAsyncControl_t *) NULL );
@@ -1368,13 +1368,13 @@ bool CSaveRestore::SaveGameState( bool bTransition, CSaveRestoreData **ppReturnS
 	// Write the header -- THIS SHOULD NEVER CHANGE STRUCTURE, USE SAVE_HEADER FOR NEW HEADER INFORMATION
 	// THIS IS ONLY HERE TO IDENTIFY THE FILE AND GET IT'S SIZE.
 
-	buffer.Put( &CURRENT_SAVEFILE_HEADER_TAG, sizeof(CURRENT_SAVEFILE_HEADER_TAG) );
+	buffer.Put( &CURRENT_SAVEFILE_HEADER_TAG, sizeof(CURRENT_SAVEFILE_HEADER_TAG) ); //-V2002
 
 	// Write out the tokens and table FIRST so they are loaded in the right order, then write out the rest of the data in the file.
-	buffer.Put( &sectionsInfo, sizeof(sectionsInfo) );
-	buffer.Put( sections.pSymbols, sectionsInfo.nBytesSymbols );
-	buffer.Put( sections.pDataHeaders, sectionsInfo.nBytesDataHeaders );
-	buffer.Put( sections.pData, sectionsInfo.nBytesData );
+	buffer.Put( &sectionsInfo, sizeof(sectionsInfo) ); //-V2002
+	buffer.Put( sections.pSymbols, sectionsInfo.nBytesSymbols ); //-V2002
+	buffer.Put( sections.pDataHeaders, sectionsInfo.nBytesDataHeaders ); //-V2002
+	buffer.Put( sections.pData, sectionsInfo.nBytesData ); //-V2002
 
 	Q_snprintf( name, 256, "//%s/%s/%s.HL1", MOD_DIR, GetSaveDir(), GetSaveGameMapName( sv.GetMapName() ) ); // DON'T FixSlashes on this, it needs to be //MOD
 	SaveMsg( "Queue COM_CreatePath\n" );
@@ -1928,15 +1928,15 @@ bool CSaveRestore::SaveClientState( const char *name )
 
 	void *pBuffer = new char[nBytes];
 	CUtlBuffer buffer( pBuffer, nBytes );
-	buffer.Put( &CURRENT_SAVEFILE_HEADER_TAG, sizeof(CURRENT_SAVEFILE_HEADER_TAG) );
-	buffer.Put( &magicnumber, sizeof( magicnumber ) );
-	buffer.Put( &sectionheaderversion, sizeof( sectionheaderversion ) );
-	buffer.Put( (baseclientsections_t * )&sections, sizeof( baseclientsections_t ) );
-	buffer.Put( sections.symboldata, sections.symbolsize );
-	buffer.Put( sections.headerdata, sections.headersize );
-	buffer.Put( sections.entitydata, sections.entitysize );
-	buffer.Put( sections.decaldata, sections.decalsize );
-	buffer.Put( sections.musicdata, sections.musicsize );
+	buffer.Put( &CURRENT_SAVEFILE_HEADER_TAG, sizeof(CURRENT_SAVEFILE_HEADER_TAG) ); //-V2002
+	buffer.Put( &magicnumber, sizeof( magicnumber ) ); //-V2002
+	buffer.Put( &sectionheaderversion, sizeof( sectionheaderversion ) ); //-V2002
+	buffer.Put( (baseclientsections_t * )&sections, sizeof( baseclientsections_t ) ); //-V2002
+	buffer.Put( sections.symboldata, sections.symbolsize ); //-V2002
+	buffer.Put( sections.headerdata, sections.headersize ); //-V2002
+	buffer.Put( sections.entitydata, sections.entitysize ); //-V2002
+	buffer.Put( sections.decaldata, sections.decalsize ); //-V2002
+	buffer.Put( sections.musicdata, sections.musicsize ); //-V2002
 
 	SaveMsg( "Queue AsyncWrite (%s)\n", name );
 	g_AsyncSaveCallQueue.QueueCall( g_pSaveRestoreFileSystem, &ISaveRestoreFileSystem::AsyncWrite, CUtlEnvelope<const char *>(name), pBuffer, nBytes, true, false, (FSAsyncControl_t *)NULL );
@@ -2234,11 +2234,11 @@ void CSaveRestore::EntityPatchWrite( CSaveRestoreData *pSaveData, const char *le
 	CUtlBuffer buffer( pBuffer, nBytesEntityPatch );
 
 	// Patch count
-	buffer.Put( &size, sizeof(int) );
+	buffer.Put( &size, sizeof(int) ); //-V2002
 	for ( i = 0; i < pSaveData->NumEntities(); i++ )
 	{
 		if ( pSaveData->GetEntityInfo(i)->flags & FENTTABLE_REMOVED )
-			buffer.Put( &i, sizeof(int) );
+			buffer.Put( &i, sizeof(int) ); //-V2002
 	}
 
 

@@ -441,7 +441,7 @@ void CPureServerWhitelist::Encode( CUtlBuffer &buf )
 	{
 		uint32 nKeySize = m_vecTrustedKeys[i].Count();
 		buf.PutUnsignedInt( nKeySize );
-		buf.Put( m_vecTrustedKeys[i].Base(), nKeySize );
+		buf.Put( m_vecTrustedKeys[i].Base(), nKeySize ); //-V2002
 	}
 }
 
@@ -506,7 +506,7 @@ void CPureServerWhitelist::Decode( CUtlBuffer &buf )
 		{
 			uint32 nKeySize = buf.GetUnsignedInt();
 			m_vecTrustedKeys[i].SetCount( nKeySize );
-			buf.Get( m_vecTrustedKeys[i].Base(), nKeySize );
+			buf.Get( m_vecTrustedKeys[i].Base(), nKeySize ); //-V2002
 		}
 	}
 }

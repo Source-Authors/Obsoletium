@@ -296,7 +296,7 @@ void CRConServer::RunFrame()
 					break;
 				}
 
-				response.Put( recvBuf, recvLen );
+				response.Put( recvBuf, recvLen ); //-V2002
 				len += recvLen;
 			}
 			
@@ -348,19 +348,19 @@ void CRConServer::RunFrame()
 				CUtlBuffer tmpBuf;
 				if ( response.TellPut() - response.TellGet() > 0 )
 				{
-					tmpBuf.Put( response.PeekGet(), response.TellPut() - response.TellGet() );
+					tmpBuf.Put( response.PeekGet(), response.TellPut() - response.TellGet() ); //-V2002
 				}
 
 				response.Purge();
 
 				if ( size > 0 )
 				{
-					response.Put( &size, sizeof(size));
+					response.Put( &size, sizeof(size)); //-V2002
 				}
 
 				if ( tmpBuf.TellPut() > 0 )
 				{
-					response.Put( tmpBuf.Base(), tmpBuf.TellPut() );
+					response.Put( tmpBuf.Base(), tmpBuf.TellPut() ); //-V2002
 				}
 			}
 			else
@@ -446,7 +446,7 @@ bool CRConServer::SendRCONResponse( int nIndex, const void *data, int len, bool 
 		}
 
 		auto index = pSocketData->m_OutstandingSends.AddToTail();
-		pSocketData->m_OutstandingSends[index].Put( data, len );
+		pSocketData->m_OutstandingSends[index].Put( data, len ); //-V2002
 		return true;
 	}
 
@@ -470,7 +470,7 @@ bool CRConServer::SendRCONResponse( int nIndex, const void *data, int len, bool 
 					// yet, add a new one
 			{
 				auto index = pSocketData->m_OutstandingSends.AddToHead();
-				pSocketData->m_OutstandingSends[index].Put( (const char *)data + sendLen, len - sendLen );
+				pSocketData->m_OutstandingSends[index].Put( (const char *)data + sendLen, len - sendLen ); //-V2002
 			}
 			else // update the existing queued item to show we 
 			     // sent some of it (we only ever send the head of the list)

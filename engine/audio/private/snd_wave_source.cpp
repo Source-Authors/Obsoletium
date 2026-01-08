@@ -1880,7 +1880,7 @@ void CAudioSourceCachedInfo::Save( CUtlBuffer& buf )
 	if ( flags.m_bCachedData && m_pCachedData )
 	{
 		buf.PutInt( m_usCachedDataSize );
-		buf.Put( m_pCachedData, m_usCachedDataSize );
+		buf.Put( m_pCachedData, m_usCachedDataSize ); //-V2002
 	}
 
 	Assert( m_usHeaderSize <= 32767 );
@@ -1888,7 +1888,7 @@ void CAudioSourceCachedInfo::Save( CUtlBuffer& buf )
 	if ( flags.m_bHeader )
 	{
 		buf.PutShort( m_usHeaderSize );
-		buf.Put( m_pHeader, m_usHeaderSize );
+		buf.Put( m_pHeader, m_usHeaderSize ); //-V2002
 	}
 }
 
@@ -1917,7 +1917,7 @@ void CAudioSourceCachedInfo::Restore( CUtlBuffer& buf )
 		if ( m_usCachedDataSize > 0 )
 		{
 			byte *data = new byte[ m_usCachedDataSize ];
-			buf.Get( data, m_usCachedDataSize );
+			buf.Get( data, m_usCachedDataSize ); //-V2002
 			SetCachedData( data );
 		}
 	}
@@ -1929,7 +1929,7 @@ void CAudioSourceCachedInfo::Restore( CUtlBuffer& buf )
 		if ( m_usHeaderSize > 0 )
 		{
 			byte *data = new byte[ m_usHeaderSize ];
-			buf.Get( data, m_usHeaderSize );
+			buf.Get( data, m_usHeaderSize ); //-V2002
 			SetHeaderData( data );
 		}
 	}

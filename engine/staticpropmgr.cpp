@@ -1273,7 +1273,7 @@ void CStaticPropMgr::UnserializeModelDict( CUtlBuffer& buf )
 	for ( int i=0; i < count; i++ )
 	{
 		StaticPropDictLump_t lump;
-		buf.Get( lump );
+		buf.Get( lump ); //-V2002
 
 		StaticPropDict_t &dict = m_StaticPropDict[i];
 
@@ -1291,7 +1291,7 @@ void CStaticPropMgr::UnserializeLeafList( CUtlBuffer& buf )
 	if ( nCount > 0 )
 	{
 		m_StaticPropLeaves.AddMultipleToTail( nCount );
-		buf.Get( m_StaticPropLeaves.Base(), nCount * sizeof(StaticPropLeafLump_t) );
+		buf.Get( m_StaticPropLeaves.Base(), nCount * sizeof(StaticPropLeafLump_t) ); //-V2002
 	}
 }
 
@@ -1301,7 +1301,7 @@ void UnserializeLump( StaticPropLump_t* _output, CUtlBuffer& buf )
 	Assert(_output != NULL);
 	
 	SerializedLumpType srcLump;
-	buf.Get( srcLump );
+	buf.Get( srcLump ); //-V2002
 
 	(*_output) = srcLump;
 }
@@ -1312,7 +1312,7 @@ void UnserializeLump<StaticPropLump_t>(StaticPropLump_t* _output, CUtlBuffer& bu
 {
 	Assert(_output != NULL);
 
-	buf.Get(*_output);
+	buf.Get(*_output); //-V2002
 }
 
 void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )

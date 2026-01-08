@@ -318,7 +318,7 @@ void CollisionBSPData_LoadTextures( CCollisionBSPData *pBSPData )
 	int *pStringTable = lhStringTable.LumpBase<int>();
 
 	auto *in = lh.LumpBase<dtexdata_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dtexdata_t))
 	{
 		Sys_Error( "Map '%s' textures size %d is not multiple of sizeof(int) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(int) );
@@ -380,7 +380,7 @@ void CollisionBSPData_LoadTexinfo( CCollisionBSPData *pBSPData,
 	int			i, count;
 
 	auto *in = lh.LumpBase<texinfo_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(texinfo_t))
 	{
 		Sys_Error( "Map '%s' texinfo size %d is not multiple of sizeof(texinfo) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
@@ -422,7 +422,7 @@ void CollisionBSPData_LoadLeafs_Version_0( CCollisionBSPData *pBSPData, CMapLoad
 	int			count;
 	
 	auto *in = lh.LumpBase<dleaf_version_0_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dleaf_version_0_t))
 	{
 		Sys_Error( "Map '%s' leaf V0 size %d is not multiple of sizeof(dleaf_version_0) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
@@ -482,9 +482,9 @@ void CollisionBSPData_LoadLeafs_Version_1( CCollisionBSPData *pBSPData, CMapLoad
 	int			i;
 	
 	auto *in = lh.LumpBase<dleaf_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dleaf_t))
 	{
-		Sys_Error( "Map '%s' leaf V1 size %d is not multiple of sizeof(dleaf_version_1) %zu",
+		Sys_Error( "Map '%s' leaf V1 size %d is not multiple of sizeof(dleaf) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
 	}
 
@@ -566,7 +566,7 @@ void CollisionBSPData_LoadLeafBrushes( CCollisionBSPData *pBSPData )
 	int			count;
 	
 	auto *in = lh.LumpBase<unsigned short>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(unsigned short))
 	{
 		Sys_Error( "Map '%s' leaf brushes size %d is not multiple of sizeof(unsigned short) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
@@ -605,7 +605,7 @@ void CollisionBSPData_LoadPlanes( CCollisionBSPData *pBSPData )
 	int			bits;
 	
 	auto *in = lh.LumpBase<dplane_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dplane_t))
 	{
 		Sys_Error( "Map '%s' planes size %d is not multiple of sizeof(dplane) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
@@ -655,7 +655,7 @@ void CollisionBSPData_LoadBrushes( CCollisionBSPData *pBSPData )
 	CMapLoadHelper lh( LUMP_BRUSHES );
 
 	auto *in = lh.LumpBase<dbrush_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dbrush_t))
 	{
 		Sys_Error( "Map '%s' brushes size %d is not multiple of sizeof(dbrush) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
@@ -736,7 +736,7 @@ void CollisionBSPData_LoadBrushSides( CCollisionBSPData *pBSPData, CUtlVector<un
 	int				i, j;
 
 	auto *in = lh.LumpBase<dbrushside_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dbrushside_t))
 	{
 		Sys_Error( "Map '%s' brush sides size %d is not multiple of sizeof(dbrushside) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
@@ -836,7 +836,7 @@ void CollisionBSPData_LoadSubmodels( CCollisionBSPData *pBSPData )
 	int			i, j, count;
 
 	auto *in = lh.LumpBase<dmodel_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dmodel_t))
 	{
 		Sys_Error( "Map '%s' models size %d is not multiple of sizeof(dmodel) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
@@ -876,7 +876,7 @@ void CollisionBSPData_LoadNodes( CCollisionBSPData *pBSPData )
 	int			i, j, count;
 	
 	auto *in = lh.LumpBase<dnode_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dnode_t))
 		Sys_Error( "Map '%s' nodes size %d is not multiple of sizeof(dnode) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
 	count = lh.LumpSize() / sizeof(*in);
@@ -915,7 +915,7 @@ void CollisionBSPData_LoadAreas( CCollisionBSPData *pBSPData )
 	int			count;
 
 	auto *in = lh.LumpBase<darea_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(darea_t))
 	{
 		Sys_Error( "Map '%s' areas size %d is not multiple of sizeof(darea) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );
@@ -952,7 +952,7 @@ void CollisionBSPData_LoadAreaPortals( CCollisionBSPData *pBSPData )
 	int				count;
 
 	auto *in = lh.LumpBase<dareaportal_t>();
-	if (lh.LumpSize() % sizeof(*in))
+	if (lh.LumpSize() % sizeof(dareaportal_t))
 	{
 		Sys_Error( "Map '%s' area portals size %d is not multiple of sizeof(dareaportal) %zu",
 			pBSPData->map_name, lh.LumpSize(), sizeof(*in) );

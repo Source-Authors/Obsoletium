@@ -1953,8 +1953,8 @@ int NET_QueuePacketForSend( CNetChan *chan, bool verbose, socket_handle s, const
 		SendQueueItem_t *sq = &g_SendQueue.m_SendQueue[ g_SendQueue.m_SendQueue.AddToTail() ];
 		sq->m_Socket = s;
 		sq->m_pChannel = chan;
-		sq->m_Buffer.Put( (const void *)buf, len );
-		sq->m_To.Put( (const void *)to, tolen );
+		sq->m_Buffer.Put( (const void *)buf, len ); //-V2002
+		sq->m_To.Put( (const void *)to, tolen ); //-V2002
 		sq->m_pChannel->IncrementQueuedPackets();
 	}
 	

@@ -433,7 +433,7 @@ public:
 		}
 
 		CVoiceWriterData *slot = &m_VoiceWriter[ idx ];
-		slot->m_Buffer.Put( data, datalen );
+		slot->m_Buffer.Put( data, datalen ); //-V2002
 	}
 private:
 

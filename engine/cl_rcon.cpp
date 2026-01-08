@@ -381,9 +381,9 @@ void CRConClient::SendQueuedData()
 	// In this case, we've still got queued messages to send
 	// Keep the portion of the buffer we didn't process for next time
 	CUtlBuffer tmpBuf;
-	tmpBuf.Put( m_SendBuffer.PeekGet(), nSizeRemaining );
+	tmpBuf.Put( m_SendBuffer.PeekGet(), nSizeRemaining ); //-V2002
 	m_SendBuffer.Purge();
-	m_SendBuffer.Put( tmpBuf.Base(), tmpBuf.TellPut() );
+	m_SendBuffer.Put( tmpBuf.Base(), tmpBuf.TellPut() ); //-V2002
 }
 
 
@@ -494,7 +494,7 @@ void CRConClient::ParseReceivedData()
 		CUtlBuffer tmpBuf;
 		if ( m_RecvBuffer.TellPut() - m_RecvBuffer.TellGet() > 0 )
 		{
-			tmpBuf.Put( m_RecvBuffer.PeekGet(), m_RecvBuffer.TellPut() - m_RecvBuffer.TellGet() );
+			tmpBuf.Put( m_RecvBuffer.PeekGet(), m_RecvBuffer.TellPut() - m_RecvBuffer.TellGet() ); //-V2002
 		}
 		m_RecvBuffer.Purge();
 		if ( size > 0 )
@@ -503,7 +503,7 @@ void CRConClient::ParseReceivedData()
 		}
 		if ( tmpBuf.TellPut() > 0 )
 		{
-			m_RecvBuffer.Put( tmpBuf.Base(), tmpBuf.TellPut() );
+			m_RecvBuffer.Put( tmpBuf.Base(), tmpBuf.TellPut() ); //-V2002
 		}
 	}
 	else
@@ -571,7 +571,7 @@ void CRConClient::RunFrame()
 			break;
 		}
 
-		m_RecvBuffer.Put( recvbuffer, recvLen );
+		m_RecvBuffer.Put( recvbuffer, recvLen ); //-V2002
 		len += recvLen;
 	}
 	
@@ -589,7 +589,7 @@ void CRConClient::SendResponse( CUtlBuffer &response, bool bAutoAuthenticate )
 		Authenticate();
 		if ( IsConnected() )
 		{
-			m_SendBuffer.Put( response.Base(), response.TellMaxPut() );
+			m_SendBuffer.Put( response.Base(), response.TellMaxPut() ); //-V2002
 		}
 		return;
 	}
@@ -599,7 +599,7 @@ void CRConClient::SendResponse( CUtlBuffer &response, bool bAutoAuthenticate )
 	{
 		if ( SocketWouldBlock() )
 		{
-			m_SendBuffer.Put( response.Base(), response.TellMaxPut() );
+			m_SendBuffer.Put( response.Base(), response.TellMaxPut() ); //-V2002
 		}
 		else
 		{

@@ -971,7 +971,7 @@ bool CClientState::ProcessTempEntities( SVC_TempEntities *msg )
 
 		// deltaBitsReader.ReadNextPropIndex reads uint32s, so make sure we alloc in 4-byte chunks.
 		ei->pData			= new byte[ AlignValue( size, 4 ) ]; // copy raw data
-		Q_memcpy( ei->pData, data, size );
+		Q_memcpy( ei->pData, data, size ); //-V614
 	}
 
 	return true;
