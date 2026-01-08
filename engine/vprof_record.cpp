@@ -596,10 +596,10 @@ public:
 
 	CNodeAverage* FindNodeAverage( CUtlVector<CNodeAverage> &averages, CVProfNode *pNode )
 	{
-		for ( int i=0; i < averages.Count(); i++ )
+		for ( auto &a : averages )
 		{
-			if ( averages[i].m_pNode == pNode )
-				return &averages[i];
+			if ( a.m_pNode == pNode )
+				return &a;
 		}
 		return NULL;
 	}
