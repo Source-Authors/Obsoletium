@@ -285,8 +285,13 @@ public:
 CVoiceChannel::CVoiceChannel()
 {
 	m_iEntity = -1;
-	m_pVoiceCodec = NULL;
+	m_LastFraction = -1;
+	m_LastSample = -1;
+	m_bStarved = false;
+	m_TimePad = -1;
+	m_pVoiceCodec = nullptr;
 	m_pNext = nullptr;
+	m_bProximity = false;
 	m_nViewEntityIndex = -1;
 	m_nSoundGuid = -1;
 }
