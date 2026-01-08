@@ -1458,7 +1458,7 @@ void CZipFile::SaveToBuffer( CUtlBuffer& buf )
 	// Estimate size for buffer, since the linear growth of CUtlBuffer is a virtual memory steamroller. This is
 	// best-effort. Ideally CUtlBuffer's growth strategy would be sane and this would be unnecessary.
 	intp sizeEstimate = 0;
-	for ( int i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
+	for ( auto i = m_Files.FirstInorder(); i != m_Files.InvalidIndex(); i = m_Files.NextInorder( i ) )
 	{
 		CZipEntry *e = &m_Files[i];
 		Assert( e );
