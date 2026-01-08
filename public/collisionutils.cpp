@@ -47,10 +47,10 @@ static DirectX::XMVECTOR XM_CALLCONV ComputeBoxOffset
 )
 {
 	if (isRay)
-		return DirectX::XMVectorReplicate( 1e-3F );
+		return DirectX::XMVectorReplicate( 1e-3F ); //-V2002
 
-	extent = DirectX::XMVectorSetW( extent, 0.0f );
-	delta = DirectX::XMVectorSetW( delta, 0.0f );
+	extent = DirectX::XMVectorSetW( extent, 0.0f ); //-V2002
+	delta = DirectX::XMVectorSetW( delta, 0.0f ); //-V2002
 
 	// Find the projection of the box diagonal along the ray...
 	DirectX::XMVECTOR offset = DirectX::XMVectorSum
@@ -61,13 +61,13 @@ static DirectX::XMVECTOR XM_CALLCONV ComputeBoxOffset
 	// We need to divide twice: Once to normalize the computation above
 	// so we get something in units of extents, and the second to normalize
 	// that with respect to the entire raycast.
-	return DirectX::XMVectorSetW
+	return DirectX::XMVectorSetW //-V2002
 	(
 		DirectX::XMVectorAdd
 		(
 			DirectX::XMVectorMultiply( offset, InvRSquared( delta ) ),
 			// 1e-3 is an epsilon
-			DirectX::XMVectorReplicate( 1e-3F )
+			DirectX::XMVectorReplicate( 1e-3F ) //-V2002
 		),
 		0.0f
 	);
@@ -134,8 +134,8 @@ float IntersectRayWithTriangle( const Ray_t& ray,
 	//		| -Dx E1x E2x |
 	// det	| -Dy E1y E2y | = (D x E2) dot E1
 	//		| -Dz E1z E2z |
-	DirectX::XMVECTOR denom = DirectX::XMVectorSetW( DirectX::XMVector3Dot( dirCrossEdge2, edge1 ), 1.0f );
-	if ( DirectX::XMVector3Less( DirectX::XMVectorAbs( denom ), DirectX::XMVectorReplicate( 1e-6f ) ) )
+	DirectX::XMVECTOR denom = DirectX::XMVectorSetW( DirectX::XMVector3Dot( dirCrossEdge2, edge1 ), 1.0f ); //-V2002
+	if ( DirectX::XMVector3Less( DirectX::XMVectorAbs( denom ), DirectX::XMVectorReplicate( 1e-6f ) ) ) //-V2002
 	{
 		return -1.0f;
 	}
@@ -186,7 +186,7 @@ float IntersectRayWithTriangle( const Ray_t& ray,
 		return -1.0f;
 	}
 
-	return DirectX::XMVectorGetX( DirectX::XMVectorClamp( t, DirectX::g_XMZero, DirectX::g_XMOne ) );
+	return DirectX::XMVectorGetX( DirectX::XMVectorClamp( t, DirectX::g_XMZero, DirectX::g_XMOne ) ); //-V2002
 }
 
 //-----------------------------------------------------------------------------
@@ -212,8 +212,8 @@ bool ComputeIntersectionBarycentricCoordinates( const Ray_t& ray,
 	//		| -Dx E1x E2x |
 	// det	| -Dy E1y E2y | = (D x E2) dot E1
 	//		| -Dz E1z E2z |
-	DirectX::XMVECTOR denom = DirectX::XMVectorSetW( DirectX::XMVector3Dot( dirCrossEdge2, edge1 ), 1.0f );
-	if ( DirectX::XMVector3Less( DirectX::XMVectorAbs( denom ), DirectX::XMVectorReplicate( 1e-6f ) ) )
+	DirectX::XMVECTOR denom = DirectX::XMVectorSetW( DirectX::XMVector3Dot( dirCrossEdge2, edge1 ), 1.0f ); //-V2002
+	if ( DirectX::XMVector3Less( DirectX::XMVectorAbs( denom ), DirectX::XMVectorReplicate( 1e-6f ) ) ) //-V2002
 	{
 		return false;
 	}
@@ -239,7 +239,7 @@ bool ComputeIntersectionBarycentricCoordinates( const Ray_t& ray,
 		return false;
 	}
 
-	u = DirectX::XMVectorGetX( vu );
+	u = DirectX::XMVectorGetX( vu ); //-V2002
 
 	// Compute t and v the same way...
 	// In barycentric coords, u + v < 1
@@ -255,7 +255,7 @@ bool ComputeIntersectionBarycentricCoordinates( const Ray_t& ray,
 		return false;
 	}
 
-	v = DirectX::XMVectorGetX( vv );
+	v = DirectX::XMVectorGetX( vv ); //-V2002
 
 	// Compute the distance along the ray direction that we need to fudge 
 	// when using swept boxes
@@ -276,7 +276,7 @@ bool ComputeIntersectionBarycentricCoordinates( const Ray_t& ray,
 			return false;
 		}
 
-		*t = DirectX::XMVectorGetX( vt );
+		*t = DirectX::XMVectorGetX( vt ); //-V2002
 	}
 
 	return true;

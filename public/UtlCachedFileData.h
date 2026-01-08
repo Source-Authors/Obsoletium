@@ -435,7 +435,7 @@ void CUtlCachedFileData<T>::InitSmallBuffer( FileHandle_t& fh, bool& deleteFile 
 	g_pFullFileSystem->ReadToBuffer( fh, loadBuf );
 
 	int cacheversion = 0;
-	loadBuf.Get( &cacheversion, sizeof( cacheversion ) );
+	loadBuf.Get( &cacheversion, sizeof( cacheversion ) ); //-V2002
 
 	if ( UTL_CACHE_SYSTEM_VERSION != cacheversion )
 	{
@@ -476,7 +476,7 @@ void CUtlCachedFileData<T>::InitSmallBuffer( FileHandle_t& fh, bool& deleteFile 
 		buf.Clear();
 		buf.EnsureCapacity( bufsize );
 					
-		loadBuf.Get( buf.Base(), bufsize );
+		loadBuf.Get( buf.Base(), bufsize ); //-V2002
 
 		buf.SeekGet( CUtlBuffer::SEEK_HEAD, 0 );
 		buf.SeekPut( CUtlBuffer::SEEK_HEAD, bufsize );

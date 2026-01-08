@@ -608,7 +608,7 @@ void CSentence::ParseCloseCaption( CUtlBuffer& buf )
 
 			// Skip space
 			(void)buf.GetChar();
-			buf.Get( cc_stream, cc_length );
+			buf.Get( cc_stream, cc_length ); //-V2002
 			cc_stream[ cc_length ] = 0;
 			
 			// Skip space
@@ -1007,7 +1007,7 @@ void CSentence::InitFromDataChunk( void *data, intp size )
 {
 	CUtlBuffer buf( (intp)0, 0, CUtlBuffer::TEXT_BUFFER );
 	buf.EnsureCapacity( size );
-	buf.Put( data, size );
+	buf.Put( data, size ); //-V2002
 	buf.SeekPut( CUtlBuffer::SEEK_HEAD, size );
 
 	InitFromBuffer( buf );
