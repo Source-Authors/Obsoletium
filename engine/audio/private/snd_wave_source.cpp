@@ -2351,20 +2351,27 @@ void CAudioSourceCache::BuildCache( char const *pszSearchPath )
 	V_MakeAbsolutePath( szAbsPath, pszSearchPath );
 	V_FixSlashes( szAbsPath );
 
-	// Add a search path to the filesystem.  We'll add one search path as a kludge so we
-	// can use the existing file finder system easily
-	g_pFullFileSystem->AddSearchPath( szAbsPath, "soundcache_kludge", PATH_ADD_TO_HEAD );
-
-	Msg( "Finding .wav files...\n");
 	CUtlVector< CUtlString > vecFilenames;
-	AddFilesToList( vecFilenames, "sound", "soundcache_kludge", "wav" );
 
-	Msg( "Finding .mp3 files...\n");
-	AddFilesToList( vecFilenames, "sound", "soundcache_kludge", "mp3" );
+	{
+		// Add a search path to the filesystem.  We'll add one search path as a kludge so we
+		// can use the existing file finder system easily
+		g_pFullFileSystem->AddSearchPath( szAbsPath, "soundcache_kludge", PATH_ADD_TO_HEAD );
+		RunCodeAtScopeExit(g_pFullFileSystem->RemoveSearchPaths( "soundcache_kludge" ));
 
-	Msg( "Found %d audio files.\n", vecFilenames.Count() );
+		Msg( "Finding .wav files...\n");
+		AddFilesToList( vecFilenames, "sound", "soundcache_kludge", "wav" );
+		const intp wavCount{vecFilenames.Count()};
+		// dimhotepus: Dump found wav files count.
+		Msg( "Found %zd .wav files.\n", wavCount );
 
-	g_pFullFileSystem->RemoveSearchPaths( "soundcache_kludge" );
+		Msg( "Finding .mp3 files...\n");
+		AddFilesToList( vecFilenames, "sound", "soundcache_kludge", "mp3" );
+		// dimhotepus: Dump found mp3 files count.
+		Msg( "Found %zd .mp3 files.\n", vecFilenames.Count() - wavCount );
+
+		Msg( "Found %zd .wav and .mp3 audio files.\n", vecFilenames.Count() );
+	}
 
 	if ( vecFilenames.Count() < 1 )
 	{
@@ -2388,7 +2395,7 @@ void CAudioSourceCache::BuildCache( char const *pszSearchPath )
 
 	g_pFullFileSystem->AddSearchPath( szAbsPath, "game", PATH_ADD_TO_HEAD );
 	intp nLenAbsPath = V_strlen( szAbsPath );
-	int iLastShownPct = -1;
+	intp iLastShownPct = -1;
 	FOR_EACH_VEC( vecFilenames, idxFilename )
 	{
 		const char *pszFilename = vecFilenames[ idxFilename ];
@@ -2410,10 +2417,10 @@ void CAudioSourceCache::BuildCache( char const *pszSearchPath )
 		const char *pszName = pszRelName + 6;
 
 		// Show progress
-		int iPct = idxFilename * 100 / vecFilenames.Count();
+		intp iPct = idxFilename * 100 / vecFilenames.Count();
 		if ( iPct != iLastShownPct )
 		{
-			Msg( "  %3d%% %s\n", iPct, pszName );
+			Msg( "  %3zd%% %s\n", iPct, pszName );
 			iLastShownPct = iPct;
 		}
 
