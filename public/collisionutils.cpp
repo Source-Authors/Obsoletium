@@ -3047,12 +3047,12 @@ bool OBBHasFullyContainedIntersectionWithQuad( const Vector &vOBBExtent1_Scaled,
 	ptOBB[7] = ptOBBCenter + vOBBExtent1_Scaled + vOBBExtent2_Scaled - vOBBExtent3_Scaled;
 
 	float fDists[8];
-	for( int i = 0; i != 8; ++i )
+	for( int i = 0; i < 8; ++i )
 		fDists[i] = vQuadNormal.Dot( ptOBB[i] ) - fQuadPlaneDist;
 
 	int iSides[8];
 	int iSideMask = 0;
-	for( int i = 0; i != 8; ++i )
+	for( int i = 0; i < 8; ++i )
 	{
 		if( fDists[i] > 0.0f )
 		{
@@ -3072,7 +3072,7 @@ bool OBBHasFullyContainedIntersectionWithQuad( const Vector &vOBBExtent1_Scaled,
 	Vector ptPlaneIntersections[12]; //only have 12 lines, can only possibly generate 12 split points
 	int iPlaneIntersectionsCount = 0;
 
-	for( int i = 0; i != 8; ++i )
+	for( int i = 0; i < 8; ++i )
 	{
 		if( iSides[i] == 2 ) //point behind the plane
 		{
@@ -3099,7 +3099,7 @@ bool OBBHasFullyContainedIntersectionWithQuad( const Vector &vOBBExtent1_Scaled,
 
 	Assert( iPlaneIntersectionsCount != 0 );
 
-	for( int i = 0; i != iPlaneIntersectionsCount; ++i )
+	for( int i = 0; i < iPlaneIntersectionsCount; ++i )
 	{
 		//these points are guaranteed to be on the plane, now just check to see if they're within the quad's extents
 		Vector vToPointFromQuadCenter = ptPlaneIntersections[i] - ptQuadCenter;
@@ -3144,12 +3144,11 @@ bool RayHasFullyContainedIntersectionWithQuad( const Ray_t &ray,
 			ptEndPoints[0] = ray.m_Start;
 			ptEndPoints[1] = ptEndPoints[0] + ray.m_Delta;
 
-			int i;
 			float fDists[2];
-			for( i = 0; i != 2; ++i )
+			for( int i = 0; i < 2; ++i )
 				fDists[i] = vQuadNormal.Dot( ptEndPoints[i] ) - fQuadPlaneDist;
-	       
-			for( i = 0; i != 2; ++i )
+			int i;
+			for( i = 0; i < 2; ++i )
 			{
 				if( fDists[i] <= 0.0f )
 				{
@@ -3201,7 +3200,7 @@ bool RayHasFullyContainedIntersectionWithQuad( const Ray_t &ray,
 		float fDists[2][8];
 		int iSides[2][8];
 		int iSideMask[2] = { 0, 0 };
-		for( int i = 0; i != 8; ++i )
+		for( int i = 0; i < 8; ++i )
 		{
 			fDists[0][i] = vQuadNormal.Dot( ptEndPoints[0][i] ) - fQuadPlaneDist;
 			if( fDists[0][i] > 0.0f )
@@ -3218,10 +3217,10 @@ bool RayHasFullyContainedIntersectionWithQuad( const Ray_t &ray,
 
 		if( ray.m_IsSwept )
 		{
-			for( int i = 0; i != 8; ++i )
+			for( int i = 0; i < 8; ++i )
 				ptEndPoints[1][i] = ptEndPoints[0][i] + ray.m_Delta;
 
-			for( int i = 0; i != 8; ++i )
+			for( int i = 0; i < 8; ++i )
 			{
 				fDists[1][i] = vQuadNormal.Dot( ptEndPoints[1][i] ) - fQuadPlaneDist;
 				if( fDists[1][i] > 0.0f )
@@ -3249,7 +3248,7 @@ bool RayHasFullyContainedIntersectionWithQuad( const Ray_t &ray,
 		{
 			if( iSideMask[k] == 3 ) //box is split by the plane
 			{
-				for( int i = 0; i != 8; ++i )
+				for( int i = 0; i < 8; ++i )
 				{
 					if( iSides[k][i] == 2 ) //point behind the plane
 					{
@@ -3278,7 +3277,7 @@ bool RayHasFullyContainedIntersectionWithQuad( const Ray_t &ray,
 
 		if( ray.m_IsSwept )
 		{
-			for( int i = 0; i != 8; ++i )
+			for( int i = 0; i < 8; ++i )
 			{
 				if( iSides[0][i] != iSides[1][i] )
 				{
@@ -3310,7 +3309,7 @@ bool RayHasFullyContainedIntersectionWithQuad( const Ray_t &ray,
 	//down here, we should simply have a collection of plane intersections, now we see if they reside within the quad
 	Assert( iPlaneIntersectionsCount != 0 );
 
-	for( int i = 0; i != iPlaneIntersectionsCount; ++i )
+	for( int i = 0; i < iPlaneIntersectionsCount; ++i )
 	{
 		//these points are guaranteed to be on the plane, now just check to see if they're within the quad's extents
 		Vector vToPointFromQuadCenter = ptPlaneIntersections[i] - ptQuadCenter;
