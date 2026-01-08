@@ -1392,9 +1392,8 @@ void CStaticPropMgr::UnserializeModels( CUtlBuffer& buf )
 void CStaticPropMgr::OutputLevelStats( void )
 {
 	// STATS
-	int i;
-	int totalVerts = 0;
-	for( i = 0; i < m_StaticProps.Count(); i++ )
+	intp totalVerts = 0;
+	for( intp i = 0; i < m_StaticProps.Count(); i++ )
 	{
 		CStaticProp *pStaticProp = &m_StaticProps[i];
 		model_t *pModel = (model_t*)pStaticProp->GetModel();
@@ -1403,22 +1402,20 @@ void CStaticPropMgr::OutputLevelStats( void )
 			continue;
 		}
 		Assert( pModel->type == mod_studio );
-		studiohdr_t *pStudioHdr = ( studiohdr_t * )modelloader->GetExtraData( pModel );
-		int bodyPart;
-		for( bodyPart = 0; bodyPart < pStudioHdr->numbodyparts; bodyPart++ )
+		const auto *pStudioHdr = ( const studiohdr_t * )modelloader->GetExtraData( pModel );
+		for( int bodyPart = 0; bodyPart < pStudioHdr->numbodyparts; bodyPart++ )
 		{
 			mstudiobodyparts_t *pBodyPart = pStudioHdr->pBodypart( bodyPart );
-			int model;
-			for( model = 0; model < pBodyPart->nummodels; model++ )
+			for( int model = 0; model < pBodyPart->nummodels; model++ )
 			{
 				mstudiomodel_t *pStudioModel = pBodyPart->pModel( model );
 				totalVerts += pStudioModel->numvertices;
 			}
 		}
 	}
-	Warning( "%d static prop instances in map\n", ( int )m_StaticProps.Count() );
-	Warning( "%d static prop models in map\n", ( int )m_StaticPropDict.Count() );
-	Warning( "%d static prop verts in map\n", ( int )totalVerts );
+	Warning( "%zd static prop instances in map\n", m_StaticProps.Count() );
+	Warning( "%zd static prop models in map\n", m_StaticPropDict.Count() );
+	Warning( "%zd static prop verts in map\n", totalVerts );
 }
 
 

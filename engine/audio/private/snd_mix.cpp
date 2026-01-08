@@ -131,7 +131,7 @@ int dsp_room_GetInt ( void );
 void DSP_SetDspAuto( int dsp_preset );
 bool DSP_CheckDspAutoEnabled( void );
 
-void MIX_ScalePaintBuffer( int bufferIndex, int count, float fgain );
+void MIX_ScalePaintBuffer( intp bufferIndex, int count, float fgain );
 
 bool IsReplayRendering()
 {
@@ -155,19 +155,19 @@ void MIX_FreeAllPaintbuffers(void)
 			g_temppaintbuffer = NULL;
 		}
 
-		for ( intp i = 0; i < g_paintBuffers.Count(); i++ )
+		for ( auto &b : g_paintBuffers )
 		{
-			if ( g_paintBuffers[i].pbuf )
+			if ( b.pbuf )
 			{
-				_aligned_free( g_paintBuffers[i].pbuf );
+				_aligned_free( b.pbuf );
 			}
-			if ( g_paintBuffers[i].pbufrear )
+			if ( b.pbufrear )
 			{
-				_aligned_free( g_paintBuffers[i].pbufrear );
+				_aligned_free( b.pbufrear );
 			}
-			if ( g_paintBuffers[i].pbufcenter )
+			if ( b.pbufcenter )
 			{
-				_aligned_free( g_paintBuffers[i].pbufcenter );
+				_aligned_free( b.pbufcenter );
 			}
 		}
 
@@ -900,7 +900,7 @@ paintbuffer_t *MIX_GetCurrentPaintbufferPtr( void )
 
 // return pointer to front paintbuffer pbuf, given index
 
-inline portable_samplepair_t *MIX_GetPFrontFromIPaint(int ipaintbuffer)
+inline portable_samplepair_t *MIX_GetPFrontFromIPaint( intp ipaintbuffer )
 {
 	return g_paintBuffers[ipaintbuffer].pbuf;
 }
@@ -916,7 +916,7 @@ paintbuffer_t *MIX_GetPPaintFromIPaint( intp ipaintbuffer )
 // return pointer to rear buffer, given index.
 // returns null if fsurround is false;
 
-inline portable_samplepair_t *MIX_GetPRearFromIPaint(int ipaintbuffer)
+inline portable_samplepair_t *MIX_GetPRearFromIPaint(intp ipaintbuffer)
 {
 	if ( g_paintBuffers[ipaintbuffer].fsurround )
 		return g_paintBuffers[ipaintbuffer].pbufrear;
@@ -927,7 +927,7 @@ inline portable_samplepair_t *MIX_GetPRearFromIPaint(int ipaintbuffer)
 // return pointer to center buffer, given index.
 // returns null if fsurround_center is false;
 
-inline portable_samplepair_t *MIX_GetPCenterFromIPaint(int ipaintbuffer)
+inline portable_samplepair_t *MIX_GetPCenterFromIPaint(intp ipaintbuffer)
 {
 	if ( g_paintBuffers[ipaintbuffer].fsurround_center )
 		return g_paintBuffers[ipaintbuffer].pbufcenter;
@@ -939,9 +939,7 @@ inline portable_samplepair_t *MIX_GetPCenterFromIPaint(int ipaintbuffer)
 
 inline intp MIX_GetIPaintFromPFront( portable_samplepair_t *pbuf )
 {
-	intp i;
-
-	for ( i = 0; i < g_paintBuffers.Count(); i++ )
+	for ( intp i = 0; i < g_paintBuffers.Count(); i++ )
 	{
 		if ( pbuf == g_paintBuffers[i].pbuf )
 			return i;
@@ -954,16 +952,14 @@ inline intp MIX_GetIPaintFromPFront( portable_samplepair_t *pbuf )
 
 inline paintbuffer_t *MIX_GetPPaintFromPFront( portable_samplepair_t *pbuf )
 {
-	int i;
-	i = MIX_GetIPaintFromPFront( pbuf );
-
+	const intp i = MIX_GetIPaintFromPFront( pbuf );
 	return &g_paintBuffers[i];
 }
 
 
 // up convert mono buffer to full surround
 
-inline void MIX_ConvertBufferToSurround( int ipaintbuffer )
+inline void MIX_ConvertBufferToSurround( intp ipaintbuffer )
 {
 	paintbuffer_t *ppaint = &g_paintBuffers[ipaintbuffer];
 
@@ -992,7 +988,7 @@ inline void MIX_ConvertBufferToSurround( int ipaintbuffer )
 // Activate a paintbuffer.  All active paintbuffers are mixed in parallel within 
 // MIX_MixChannelsToPaintbuffer, according to flags
 
-inline void MIX_ActivatePaintbuffer(int ipaintbuffer)
+inline void MIX_ActivatePaintbuffer(intp ipaintbuffer)
 {
 	Assert( ipaintbuffer < g_paintBuffers.Count() );
 	g_paintBuffers[ipaintbuffer].factive = true;
@@ -1000,7 +996,7 @@ inline void MIX_ActivatePaintbuffer(int ipaintbuffer)
 
 // Don't mix into this paintbuffer
 
-inline void MIX_DeactivatePaintbuffer(int ipaintbuffer)
+inline void MIX_DeactivatePaintbuffer(intp ipaintbuffer)
 {
 	Assert( ipaintbuffer < g_paintBuffers.Count() );
 	g_paintBuffers[ipaintbuffer].factive = false;
@@ -1010,22 +1006,19 @@ inline void MIX_DeactivatePaintbuffer(int ipaintbuffer)
 
 inline void MIX_DeactivateAllPaintbuffers(void)
 {
-	int i;
-	for ( i = 0; i < g_paintBuffers.Count(); i++ )
-		g_paintBuffers[i].factive = false;
+	for ( auto &b : g_paintBuffers )
+		b.factive = false;
 }
 
 // set upsampling filter indexes back to 0
 
 inline void MIX_ResetPaintbufferFilterCounters( void )
-
 {
-	int i;
-	for ( i = 0; i < g_paintBuffers.Count(); i++ )
-		g_paintBuffers[i].ifilter = 0;
+	for ( auto &b : g_paintBuffers )
+		b.ifilter = 0;
 }
 
-inline void MIX_ResetPaintbufferFilterCounter( int ipaintbuffer )
+inline void MIX_ResetPaintbufferFilterCounter( intp ipaintbuffer )
 {
 	Assert ( ipaintbuffer < g_paintBuffers.Count() );
 	g_paintBuffers[ipaintbuffer].ifilter = 0;
@@ -1033,7 +1026,7 @@ inline void MIX_ResetPaintbufferFilterCounter( int ipaintbuffer )
 
 // Change paintbuffer's flags
 
-inline void MIX_SetPaintbufferFlags(int ipaintbuffer, int flags)
+inline void MIX_SetPaintbufferFlags(intp ipaintbuffer, int flags)
 {
 	Assert( ipaintbuffer < g_paintBuffers.Count() );
 	g_paintBuffers[ipaintbuffer].flags = flags;
@@ -1050,27 +1043,26 @@ void MIX_ClearAllPaintBuffers( int SampleCount, bool clearFilters )
 		return;
 	}
 
-	int i;
 	int count = min(SampleCount, PAINTBUFFER_SIZE);
 
 	// zero out all paintbuffer data (ignore sampleCount)
 
-	for ( i = 0; i < g_paintBuffers.Count(); i++ )
+	for ( auto &b : g_paintBuffers )
 	{
-		if (g_paintBuffers[i].pbuf != NULL)
-			Q_memset(g_paintBuffers[i].pbuf, 0, (count+1) * sizeof(portable_samplepair_t));
+		if (b.pbuf != NULL)
+			Q_memset(b.pbuf, 0, (count+1) * sizeof(portable_samplepair_t));
 
-		if (g_paintBuffers[i].pbufrear != NULL)
-			Q_memset(g_paintBuffers[i].pbufrear, 0, (count+1) * sizeof(portable_samplepair_t));
+		if (b.pbufrear != NULL)
+			Q_memset(b.pbufrear, 0, (count+1) * sizeof(portable_samplepair_t));
 
-		if (g_paintBuffers[i].pbufcenter != NULL)
-			Q_memset(g_paintBuffers[i].pbufcenter, 0, (count+1) * sizeof(portable_samplepair_t));
+		if (b.pbufcenter != NULL)
+			Q_memset(b.pbufcenter, 0, (count+1) * sizeof(portable_samplepair_t));
 
 		if ( clearFilters )
 		{
-			Q_memset( g_paintBuffers[i].fltmem, 0, sizeof(g_paintBuffers[i].fltmem) );
-			Q_memset( g_paintBuffers[i].fltmemrear, 0, sizeof(g_paintBuffers[i].fltmemrear) );
-			Q_memset( g_paintBuffers[i].fltmemcenter, 0, sizeof(g_paintBuffers[i].fltmemcenter) );
+			BitwiseClear( b.fltmem );
+			BitwiseClear( b.fltmemrear );
+			BitwiseClear( b.fltmemcenter );
 		}
 	}
 
@@ -1142,7 +1134,7 @@ inline void MIX_CenterFromLeftRight( int *pl, int *pr, int *pc )
 // NOTE: for performance, conversion and mixing are done in a single pass instead of 
 // a two pass channel convert + mix scheme.
 
-void MIX_MixPaintbuffers(int ibuf1, int ibuf2, int ibuf3, int count, float fgain_out)
+void MIX_MixPaintbuffers(intp ibuf1, intp ibuf2, int ibuf3, int count, float fgain_out)
 {
 	VPROF("Mixpaintbuffers");
 	int i;
@@ -1580,7 +1572,7 @@ gain5ch:
 
 // multiply all values in paintbuffer by fgain
 
-void MIX_ScalePaintBuffer( int bufferIndex, int count, float fgain )
+void MIX_ScalePaintBuffer( intp bufferIndex, int count, float fgain )
 {
 	portable_samplepair_t *pbuf = g_paintBuffers[bufferIndex].pbuf;
 	portable_samplepair_t *pbufrear = g_paintBuffers[bufferIndex].pbufrear;
@@ -1745,7 +1737,7 @@ void MIX_CompressPaintbuffer(int ipaint, int count)
 // will advance any internal pointers on mixed channels; subsequent calls will be at 
 // incorrect offset.
 
-void MIX_MixUpsampleBuffer( CChannelList &list, int ipaintbuffer, int end, int count, int flags )
+void MIX_MixUpsampleBuffer( CChannelList &list, intp ipaintbuffer, int end, int count, int flags )
 {
 	VPROF("MixUpsampleBuffer");
 	intp ipaintcur = MIX_GetCurrentPaintbufferIndex(); // save current paintbuffer
@@ -1811,9 +1803,9 @@ void MIX_UpsampleAllPaintbuffers( CChannelList &list, int end, int count )
 
 	// mix and upsample all 'special dsp' sounds (channels) to 44khz SOUND_BUFFER_SPECIALs paintbuffer
 
-	for ( int iDSP = 0; iDSP < list.m_nSpecialDSPs.Count(); ++iDSP )
+	for ( intp iDSP = 0; iDSP < list.m_nSpecialDSPs.Count(); ++iDSP )
 	{
-		for ( int i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
+		for ( intp i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
 		{
 			paintbuffer_t *pSpecialBuffer = MIX_GetPPaintFromIPaint( i );
 			if ( pSpecialBuffer->nSpecialDSP == list.m_nSpecialDSPs[ iDSP ] && pSpecialBuffer->idsp_specialdsp != -1 )
@@ -2343,7 +2335,7 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 			{
 				bool bFoundMixer = false;
 				
-				for ( int i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
+				for ( intp i = SOUND_BUFFER_SPECIAL_START; i < g_paintBuffers.Count(); ++i )
 				{
 					paintbuffer_t *pSpecialBuffer = MIX_GetPPaintFromIPaint( i );
 					if ( pSpecialBuffer->nSpecialDSP == list.m_nSpecialDSPs[ iDSP ] && pSpecialBuffer->idsp_specialdsp != -1 )
@@ -2417,7 +2409,7 @@ void MIX_PaintChannels( int endtime, bool bIsUnderwater )
 			// Mix IFACING buffer with SOUND_BUFFER_ROOM
 			// (SOUND_BUFFER_FACINGAWAY contains no data, IFACINGBBUFFER has full dry mix based on distance from listener)
 			// if dsp disabled, mix 100% facingbuffer, otherwise, mix 75% facingbuffer + roombuffer
-			float mix = g_bDspOff ? 1.0 : DSP_ROOM_MIX;
+			float mix = g_bDspOff ? 1.0f : DSP_ROOM_MIX;
 			MIX_MixPaintbuffers( SOUND_BUFFER_ROOM, SOUND_BUFFER_FACING, SOUND_BUFFER_PAINT, count, mix );	
 		}
 
