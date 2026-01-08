@@ -171,9 +171,9 @@ public:
 
 	void HandleTouchedEntities( )
 	{
-		for ( int i = 0; i < m_TouchedEntities.Count(); ++i )
+		for ( auto &e : m_TouchedEntities )
 		{
-			serverGameEnts->MarkEntitiesAsTouching( m_TouchedEntities[i], m_pEnt );
+			serverGameEnts->MarkEntitiesAsTouching( e, m_pEnt );
 		}
 	}
 
@@ -267,9 +267,9 @@ public:
 
 	void HandleTouchedEntities( )
 	{
-		for ( int i = 0; i < m_TouchedEntities.Count(); ++i )
+		for ( auto &e : m_TouchedEntities )
 		{
-			serverGameEnts->MarkEntitiesAsTouching( m_TouchedEntities[i], m_pTriggerEntity );
+			serverGameEnts->MarkEntitiesAsTouching( e, m_pTriggerEntity );
 		}
 	}
 
