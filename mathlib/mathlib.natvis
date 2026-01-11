@@ -50,6 +50,20 @@
     <DisplayString>(r={(unsigned)r}, g={(unsigned)g}, b={(unsigned)b}, exp={(unsigned)exponent})</DisplayString>
   </Type>
 
+  <Type Name="cplane_t">
+    <DisplayString>(normal={normal}, distance={dist})</DisplayString>
+      <Expand>
+        <Item Name="[normal]">normal</Item>
+        <Item Name="[distance]">dist</Item>
+        <Item Name="[type]" Condition="type == 0">"x"</Item>
+        <Item Name="[type]" Condition="type == 1">"y"</Item>
+        <Item Name="[type]" Condition="type == 2">"z"</Item>
+        <Item Name="[type]" Condition="type == 3">"any x"</Item>
+        <Item Name="[type]" Condition="type == 4">"any y"</Item>
+        <Item Name="[type]" Condition="type == 5">"any z"</Item>
+      </Expand>
+  </Type>
+
   <!-- mathlib/simdvectormatrix.h -->
 
   <Type Name="CSIMDVectorMatrix">
