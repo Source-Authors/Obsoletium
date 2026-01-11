@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<!-- networkvar.h -->
+	<Type Name="CNetworkVarBase&lt;*&gt;">
+		<DisplayString>{m_Value}</DisplayString>
+		<Expand>
+			<Item Name="[value]">m_Value</Item>
+		</Expand>
+	</Type>
+	
+	<!-- string_t.h -->
+	<Type Name="string_t">
+		<AlternativeType Name="castable_string_t" />
+		<DisplayString Condition="pszValue == nullptr">nullptr</DisplayString>
+		<DisplayString Condition="pszValue != nullptr">{pszValue}</DisplayString>
+		<Expand>
+			<Item Name="[value]">pszValue</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

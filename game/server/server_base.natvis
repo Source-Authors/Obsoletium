@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<!-- variant_t.h -->
+	<Type Name="variant_t">
+		<DisplayString Condition="fieldType == FIELD_VOID">none</DisplayString>
+		<DisplayString Condition="fieldType == FIELD_BOOLEAN">{bVal}</DisplayString>
+		<DisplayString Condition="fieldType == FIELD_STRING">{iszVal}</DisplayString>
+		<DisplayString Condition="fieldType == FIELD_INTEGER">{iVal}</DisplayString>
+		<DisplayString Condition="fieldType == FIELD_FLOAT">{flVal}</DisplayString>
+		<DisplayString Condition="fieldType == FIELD_VECTOR">{{vecVal[0], vecVal[1], vecVal[2]}}</DisplayString>
+		<DisplayString Condition="fieldType == FIELD_COLOR32">{rgbaVal}</DisplayString>
+		<DisplayString Condition="fieldType == FIELD_EHANDLE">{eVal}</DisplayString>
+	</Type>
+	
+	<!-- entityputput.h -->
+	<Type Name="CBaseEntityOutput">
+		<DisplayString Condition="m_ActionList == nullptr">{{value={m_Value}, no actions}}</DisplayString>
+		<DisplayString Condition="m_ActionList != nullptr">{{value={m_Value}, actions={*m_ActionList}}}</DisplayString>
+	</Type>
+</AutoVisualizer>

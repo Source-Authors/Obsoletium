@@ -1222,7 +1222,12 @@ $Project
 		$File	"game_controls\vguitextwindow.h"
 		$File	"game_controls\IconPanel.h"
 	}
-	
+
+	$Folder "Debugger Visualizers" [$WINDOWS]
+	{
+		$File	"client_base.natvis"
+	}
+
 	$Folder	"Link Libraries"
 	{
 		$Lib		bitmap

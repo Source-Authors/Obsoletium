@@ -983,6 +983,12 @@ $Project
 		$File	"$SRCDIR\public\haptics\haptic_utils.h"	[$WINDOWS]
 	}
 
+	$Folder "Debugger Visualizers" [$WINDOWS]
+	{
+		$File	"$SRCDIR\public\public.natvis"
+		$File	"server_base.natvis"
+	}
+
 	$Folder	"Tools Framework"
 	{
 		$File	"entity_tools_server.cpp"
