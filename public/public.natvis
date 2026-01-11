@@ -1,20 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-	<!-- networkvar.h -->
-	<Type Name="CNetworkVarBase&lt;*&gt;">
-		<DisplayString>{m_Value}</DisplayString>
-		<Expand>
-			<Item Name="[value]">m_Value</Item>
-		</Expand>
-	</Type>
-	
-	<!-- string_t.h -->
-	<Type Name="string_t">
-		<AlternativeType Name="castable_string_t" />
-		<DisplayString Condition="pszValue == nullptr">nullptr</DisplayString>
-		<DisplayString Condition="pszValue != nullptr">{pszValue}</DisplayString>
-		<Expand>
-			<Item Name="[value]">pszValue</Item>
-		</Expand>
-	</Type>
+  <!-- Color.h -->
+  <Type Name="Color">
+    <DisplayString>({(int)_color[0]}, {(int)_color[1]}, {(int)_color[2]}, {(int)_color[3]})</DisplayString>
+    <Expand>
+      <Item Name="[r]">(int)_color[0]</Item>
+      <Item Name="[g]">(int)_color[1]</Item>
+      <Item Name="[b]">(int)_color[2]</Item>
+      <Item Name="[a]">(int)_color[3]</Item>
+    </Expand>
+  </Type>
+
+  <Type Name="color32_s">
+    <DisplayString>({(int)r}, {(int)g}, {(int)b}, {(int)a})</DisplayString>
+    <Expand>
+      <Item Name="[r]">(int)r</Item>
+      <Item Name="[g]">(int)g</Item>
+      <Item Name="[b]">(int)b</Item>
+      <Item Name="[a]">(int)a</Item>
+    </Expand>
+  </Type>
+
+  <!-- networkvar.h -->
+  <Type Name="CNetworkVarBase&lt;*&gt;">
+      <DisplayString>{m_Value}</DisplayString>
+      <Expand>
+          <Item Name="[value]">m_Value</Item>
+      </Expand>
+  </Type>
+
+  <!-- string_t.h -->
+  <Type Name="string_t">
+    <AlternativeType Name="castable_string_t" />
+    <DisplayString Condition="pszValue == nullptr">nullptr</DisplayString>
+    <DisplayString Condition="pszValue != nullptr">{pszValue}</DisplayString>
+    <Expand>
+      <Item Name="[value]">pszValue</Item>
+    </Expand>
+  </Type>
+
+  <!-- trace.h -->
+  <Type Name="CBaseTrace">
+    <Expand>
+      <Item Name="[start]">startpos</Item>
+      <Item Name="[end]">endpos</Item>
+      <Item Name="[normal]" Condition="allsolid == false &amp;&amp; contents != 0x0">plane</Item>
+      <Item Name="[normal]" Condition="allsolid == true">"no plane"</Item>
+      <Item Name="[has hit]" Condition="fraction != 1.0f">true</Item>
+      <Item Name="[is start in solid]" Condition="startsolid">true</Item>
+      <Item Name="[contents]" Condition="contents == 0x0">"empty"</Item>
+      <Item Name="[contents]" Condition="(contents &amp; 0x1) == 0x1">"solid"</Item>
+      <Item Name="[contents]" Condition="(contents &amp; 0x2) == 0x2">"translucent"</Item>
+      <Item Name="[contents]" Condition="(contents &amp; 0x4) == 0x4">"aux"</Item>
+      <Item Name="[contents]" Condition="(contents &amp; 0x8) == 0x8">"grate"</Item>
+      <Item Name="[contents]" Condition="(contents &amp; 0x10) == 0x10">"slime"</Item>
+      <Item Name="[contents]" Condition="(contents &amp; 0x20) == 0x20">"water"</Item>
+      <Item Name="[contents]" Condition="(contents &amp; 0x40) == 0x40">"block AI line of sight"</Item>
+      <Item Name="[contents]" Condition="(contents &amp; 0x80) == 0x80">"opaque"</Item>
+      <Item Name="[displacement]" Condition="dispFlags == 0">"none"</Item>
+      <Item Name="[displacement]" Condition="(dispFlags &amp; 0x1) == 0x1">"surface"</Item>
+      <Item Name="[displacement]" Condition="(dispFlags &amp; 0x2) == 0x2">"walkable"</Item>
+      <Item Name="[displacement]" Condition="(dispFlags &amp; 0x4) == 0x4">"buildable"</Item>
+      <Item Name="[displacement]" Condition="(dispFlags &amp; 0x8) == 0x4">"property 1"</Item>
+      <Item Name="[displacement]" Condition="(dispFlags &amp; 0x10) == 0x10">"property 2"</Item>
+    </Expand>
+  </Type>
 </AutoVisualizer>
