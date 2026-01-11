@@ -91,8 +91,8 @@ public:
 	// Attached models.
 	void	SetMergeMDL( MDLHandle_t handle, void *pProxyData = NULL, int nSkin = -1 );
 	MDLHandle_t SetMergeMDL( const char *pMDLName, void *pProxyData = NULL, int nSkin = -1 );
-	int		GetMergeMDLIndex( void *pProxyData );
-	int		GetMergeMDLIndex( MDLHandle_t handle );
+	intp	GetMergeMDLIndex( void *pProxyData );
+	intp	GetMergeMDLIndex( MDLHandle_t handle );
 	CMDL	*GetMergeMDL(MDLHandle_t handle );
 	void	ClearMergeMDLs( void );
 

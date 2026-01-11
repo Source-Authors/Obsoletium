@@ -459,8 +459,8 @@ void CMDLPanel::OnPaint3D()
 
 	// Draw the merge MDLs.
 	matrix3x4_t matMergeBoneToWorld[MAXSTUDIOBONES];
-	int nMergeCount = m_aMergeMDLs.Count();
-	for ( int iMerge = 0; iMerge < nMergeCount; ++iMerge )
+	intp nMergeCount = m_aMergeMDLs.Count();
+	for ( intp iMerge = 0; iMerge < nMergeCount; ++iMerge )
 	{
 		if ( m_aMergeMDLs[iMerge].m_bDisabled )
 			continue;
@@ -511,10 +511,9 @@ void CMDLPanel::SetLOD( int nLOD )
 {
 	m_RootMDL.m_MDL.m_nLOD = nLOD;
 
-	int nMergeCount = m_aMergeMDLs.Count();
-	for ( int iMerge = 0; iMerge < nMergeCount; ++iMerge )
+	for ( auto &m : m_aMergeMDLs )
 	{
-		m_aMergeMDLs[iMerge].m_MDL.m_nLOD = nLOD;
+		m.m_MDL.m_nLOD = nLOD;
 	}
 }
 
@@ -561,9 +560,9 @@ void CMDLPanel::SetPoseParameters( const float *pPoseParameters, int nCount )
 bool CMDLPanel::SetPoseParameterByName( const char *pszName, float fValue )
 {
 	CStudioHdr studioHdr( g_pMDLCache->GetStudioHdr( m_RootMDL.m_MDL.GetMDL() ), g_pMDLCache );
-	int nPoseCount = studioHdr.GetNumPoseParameters();
+	intp nPoseCount = studioHdr.GetNumPoseParameters();
 
-	for ( int i = 0; i < nPoseCount; ++i )
+	for ( intp i = 0; i < nPoseCount; ++i )
 	{
 		const mstudioposeparamdesc_t &Pose = studioHdr.pPoseParameter( i );
 		if ( V_strcasecmp( pszName, Pose.pszName() ) == 0 )
@@ -852,10 +851,10 @@ MDLHandle_t CMDLPanel::SetMergeMDL( const char *pMDLName, void *pProxyData, int 
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CMDLPanel::GetMergeMDLIndex( void *pProxyData )
+intp CMDLPanel::GetMergeMDLIndex( void *pProxyData )
 {
-	int nMergeCount = m_aMergeMDLs.Count();
-	for ( int iMerge = 0; iMerge < nMergeCount; ++iMerge )
+	intp nMergeCount = m_aMergeMDLs.Count();
+	for ( intp iMerge = 0; iMerge < nMergeCount; ++iMerge )
 	{
 		if ( m_aMergeMDLs[iMerge].m_MDL.m_pProxyData == pProxyData )
 			return iMerge;
@@ -867,10 +866,10 @@ int CMDLPanel::GetMergeMDLIndex( void *pProxyData )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int CMDLPanel::GetMergeMDLIndex( MDLHandle_t handle )
+intp CMDLPanel::GetMergeMDLIndex( MDLHandle_t handle )
 {
-	int nMergeCount = m_aMergeMDLs.Count();
-	for ( int iMerge = 0; iMerge < nMergeCount; ++iMerge )
+	intp nMergeCount = m_aMergeMDLs.Count();
+	for ( intp iMerge = 0; iMerge < nMergeCount; ++iMerge )
 	{
 		if ( m_aMergeMDLs[iMerge].m_MDL.GetMDL() == handle )
 			return iMerge;
@@ -884,11 +883,10 @@ int CMDLPanel::GetMergeMDLIndex( MDLHandle_t handle )
 //-----------------------------------------------------------------------------
 CMDL *CMDLPanel::GetMergeMDL( MDLHandle_t handle )
 {
-	int nMergeCount = m_aMergeMDLs.Count();
-	for ( int iMerge = 0; iMerge < nMergeCount; ++iMerge )
+	for ( auto &m : m_aMergeMDLs )
 	{
-		if ( m_aMergeMDLs[iMerge].m_MDL.GetMDL() == handle )
-			return (&m_aMergeMDLs[iMerge].m_MDL);
+		if ( m.m_MDL.GetMDL() == handle )
+			return &m.m_MDL;
 	}
 
 	return NULL;
