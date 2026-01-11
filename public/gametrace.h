@@ -80,7 +80,7 @@ public:
 	}
 
 	// No copy constructors allowed
-	CGameTrace(const CGameTrace&) = delete;
+	CGameTrace(const CGameTrace&) = default;
 	CGameTrace& operator=(const CGameTrace&) = default;
 };
 
