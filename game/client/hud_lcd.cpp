@@ -314,7 +314,7 @@ void CLCD::Update( void )
 	bool changed = hasplayer != m_bHadPlayer;
 	m_bHadPlayer = hasplayer;
 
-	int pageCount = m_Pages.Count();
+	intp pageCount = m_Pages.Count();
 
 	int prevPage = m_nCurrentPage;
 
@@ -337,7 +337,7 @@ void CLCD::Update( void )
 		{
 			m_nSubPage = 0;
 
-			for ( int i = 0; i < pageCount; ++i )
+			for ( intp i = 0; i < pageCount; ++i )
 			{
                 m_nCurrentPage = ( m_nCurrentPage + 1 ) % pageCount;
 				if ( !IsPageValid( m_nCurrentPage, player ) )
