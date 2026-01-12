@@ -25,9 +25,8 @@
 #define	BOGUS_RANGE	( MAX_COORD_INTEGER * 4 )
 
 
-float		lightaxis[3] = {1, 0.6f, 0.75f};
+constexpr inline int MAX_POINTS_ON_WINDING = 128;
 
-constexpr inline int MAX_POINTS_ON_WINDING	= 128;
 
 
 void Error(char* fmt, ...)
