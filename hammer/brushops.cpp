@@ -80,7 +80,7 @@ void FreeWinding (winding_t *w)
 
 	if (w->p)
 	{
-	    free (w->p);
+		free (w->p);
 		w->p = nullptr;
 	}
 	free (w);
@@ -118,7 +118,7 @@ void RemoveDuplicateWindingPoints(winding_t *pWinding, float fMinDist)
 
 				pWinding->numpoints--;
 			}
-		}		
+		}
 	}
 }
 
@@ -147,27 +147,26 @@ Frees the input winding.
 ==================
 */
 // YWB ADDED SPLIT EPS to match qcsg splitting
-#define	SPLIT_EPSILON	0.01
+constexpr inline float SPLIT_EPSILON{0.01f};
+
 winding_t *ClipWinding (winding_t *in, PLANE *split)
 {
 	float	dists[MAX_POINTS_ON_WINDING];
-	SideType	sides[MAX_POINTS_ON_WINDING];
-	int		counts[3];
-	float	dot;
-	int		i, j;
-	Vector	*p1, *p2, *mid;
-	winding_t	*neww;
-	int		maxpts;
-
 	// dimhotepus: Initialize to prevent UB on uninitialized read.
-	dists[0] = 0.0f;
+	BitwiseClear(dists);
+
+	SideType	sides[MAX_POINTS_ON_WINDING];
+	int		counts[3]{0, 0, 0};
+	int		i;
+	Vector	*p1, *p2, *mid;
+
 	sides[0] = SIDE_ON;
 	counts[0] = counts[1] = counts[2] = 0;
 
 	// determine sides for each point
 	for (i=0 ; i<in->numpoints ; i++)
 	{
-		dot = DotProduct (in->p[i], split->normal);
+		float dot = DotProduct (in->p[i], split->normal);
 		dot -= split->dist;
 		dists[i] = dot;
 		if (dot > SPLIT_EPSILON)
@@ -194,9 +193,9 @@ winding_t *ClipWinding (winding_t *in, PLANE *split)
 	if (!counts[1])
 		return in;
 
-	maxpts = in->numpoints+4;	// can't use counts[0]+2 because
-								// of fp grouping errors
-	neww = NewWinding (maxpts);
+	int maxpts = in->numpoints+4;	// can't use counts[0]+2 because
+									// of fp grouping errors
+	winding_t	*neww = NewWinding (maxpts);
 
 	for (i=0 ; i<in->numpoints ; i++)
 	{
@@ -224,8 +223,8 @@ winding_t *ClipWinding (winding_t *in, PLANE *split)
 
 		neww->numpoints++;
 
-		dot = dists[i] / (dists[i]-dists[i+1]);
-		for (j=0 ; j<3 ; j++)
+		float dot = dists[i] / (dists[i]-dists[i+1]);
+		for (int j=0 ; j<3 ; j++)
 		{	// avoid round off error when possible
 			if (split->normal[j] == 1)
 				mid[0][j] = split->dist;
@@ -255,17 +254,14 @@ winding_t *ClipWinding (winding_t *in, PLANE *split)
 // dvs: read through this and clean it up
 winding_t *CreateWindingFromPlane(PLANE *pPlane)
 {
-	int		i, x;
-	float	max, v;
 	Vector	org, vright, vup;
-	winding_t	*w;
-	
+
 	// find the major axis
-	max = -BOGUS_RANGE;
-	x = -1;
-	for (i=0 ; i<3; i++)
+	float max = -BOGUS_RANGE;
+	int x = -1;
+	for (int i=0 ; i<3; i++)
 	{
-		v = fabs(pPlane->normal[i]);
+		float v = fabs(pPlane->normal[i]);
 		if (v > max)
 		{
 			x = i;
@@ -287,7 +283,7 @@ winding_t *CreateWindingFromPlane(PLANE *pPlane)
 			break;
 	}
 
-	v = DotProduct (vup, pPlane->normal);
+	float v = DotProduct (vup, pPlane->normal);
 	VectorMA (vup, -v, pPlane->normal, vup);
 	VectorNormalize (vup);
 
@@ -299,7 +295,7 @@ winding_t *CreateWindingFromPlane(PLANE *pPlane)
 	vright = vright * MAX_TRACE_LENGTH;
 
 	// project a really big	axis aligned box onto the plane
-	w = NewWinding (4);
+	winding_t *w = NewWinding (4);
 	w->numpoints = 4;
 
 	VectorSubtract (org, vright, w->p[0]);
@@ -323,10 +319,7 @@ static int nErrors;
 
 void Add3dError(DWORD dwObjectID, LPCTSTR pszReason, PVOID pInfo)
 {
-	error3d err;
-	err.dwObjectID = dwObjectID;
-	err.pszReason = pszReason;
-	err.pInfo = pInfo;
+	error3d err{dwObjectID, pszReason, pInfo};
 	Errors.Add(err);
 	++nErrors;
 }
@@ -344,9 +337,7 @@ error3d * Enum3dErrors(BOOL bStart)
 		iCurrent = 0;
 
 	if(iCurrent == nErrors)
-		return NULL;
+		return nullptr;
 
 	return & Errors.GetData()[iCurrent++];
 }
-
-
