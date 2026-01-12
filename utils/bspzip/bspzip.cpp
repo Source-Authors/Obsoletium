@@ -196,9 +196,9 @@ int main(int argc, char **argv) {
           fprintf(stderr, "Could not write '%s'.\n", targetName);
           return 2;
         }
+        RunCodeAtScopeExit(fclose(fp));
 
         fwrite(buf.Base(), fileSize, 1, fp);
-        fclose(fp);
 
         numFilesExtracted++;
       }
@@ -258,8 +258,9 @@ int main(int argc, char **argv) {
           return 4;
         }
 
+        RunCodeAtScopeExit(fclose(fp));
+
         fwrite(buf.Base(), fileSize, 1, fp);
-        fclose(fp);
 
         numFilesExtracted++;
       }
