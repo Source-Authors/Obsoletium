@@ -43,7 +43,8 @@ static void ExtractAutoStateFromParams( CGlobalEventParams *params )
 		if ( TokenAvailable() )
 		{
 			GetToken( false );
-			params->m_flWaitTime = (float)atof( token );
+			// dimhotepus: atof -> V_atof
+			params->m_flWaitTime = V_atof( token );
 		}
 	}
 }
@@ -154,8 +155,8 @@ static BOOL CALLBACK GlobalEventPropertiesDialogProc( HWND hwndDlg, UINT uMsg, W
 				SendMessage( GetDlgItem( hwndDlg, IDC_CB_AUTOACTION ), WM_GETTEXT, (WPARAM)sizeof( g_Params.m_szType ), (LPARAM)g_Params.m_szType );
 
 				GetDlgItemText( hwndDlg, IDC_DURATION, szTime, sizeof( szTime ) );
-				// dimhotepus: atof -> strtof.
-				g_Params.m_flWaitTime = strtof( szTime, nullptr );
+				// dimhotepus: atof -> V_atof
+				g_Params.m_flWaitTime = V_atof( szTime );
 
 				g_Params.m_bAutomate = SendMessage( GetDlgItem( hwndDlg, IDC_CHECK_AUTOCHECK ), BM_GETCHECK, 0, 0 ) == BST_CHECKED ? true : false;
 
@@ -164,14 +165,15 @@ static BOOL CALLBACK GlobalEventPropertiesDialogProc( HWND hwndDlg, UINT uMsg, W
 				GetDlgItemText( hwndDlg, IDC_EVENTNAME, g_Params.m_szName, sizeof( g_Params.m_szName ) );
 
 				GetDlgItemText( hwndDlg, IDC_STARTTIME, szTime, sizeof( szTime ) );
-				// dimhotepus: atof -> strtof.
-				g_Params.m_flStartTime = strtof( szTime, nullptr );
+				// dimhotepus: atof -> V_atof
+				g_Params.m_flStartTime = V_atof( szTime );
 				
 				char szLoop[ 32 ];
 				GetDlgItemText( hwndDlg, IDC_LOOPCOUNT, szLoop, sizeof( szLoop ) );
 				g_Params.m_nLoopCount = atoi( szLoop );
 				GetDlgItemText( hwndDlg, IDC_LOOPTIME, szLoop, sizeof( szLoop ) );
-				g_Params.m_flLoopTime = (float)atof( szLoop );
+				// dimhotepus: atof -> V_atof
+				g_Params.m_flLoopTime = V_atof( szLoop );
 
 				EndDialog( hwndDlg, 1 );
 			}

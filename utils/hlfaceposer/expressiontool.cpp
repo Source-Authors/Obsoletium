@@ -4334,8 +4334,9 @@ void ExpressionTool::OnChangeScale( void )
 
 	if ( !InputProperties( &params ) )
 		return;
-
-	g_pChoreoView->SetTimeZoom( GetToolName(), clamp( (int)( 100.0f * atof( params.m_szInputText ) ), 1, MAX_TIME_ZOOM ), false );
+	
+	// dimhotepus: atof -> V_atof
+	g_pChoreoView->SetTimeZoom( GetToolName(), clamp( (int)( 100.0f * V_atof( params.m_szInputText ) ), 1, MAX_TIME_ZOOM ), false );
 
 	m_nLastHPixelsNeeded = -1;
 	InvalidateLayout();

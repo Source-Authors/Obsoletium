@@ -5275,7 +5275,8 @@ void CChoreoView::ProcessPause( CChoreoScene *scene, CChoreoEvent *event )
 					m_nAutomatedAction != SCENE_ACTION_UNKNOWN )
 				{
 					tokenprocessor->GetToken( false );
-					m_flAutomationDelay = (float)atof( tokenprocessor->CurrentToken() );
+					// dimhotepus: atof -> V_atof
+					m_flAutomationDelay = V_atof( tokenprocessor->CurrentToken() );
 
 					if ( m_flAutomationDelay > 0.0f )
 					{
@@ -7019,7 +7020,8 @@ void CChoreoView::EditGlobalEvent( CChoreoEvent *event )
 		{
 			V_strcpy_safe( params.m_szDialogTitle, "Edit Loop Point" );
 			V_strcpy_safe( params.m_szAction, "" );
-			params.m_flLoopTime = (float)atof( event->GetParameters() );
+			// dimhotepus: atof -> V_atof
+			params.m_flLoopTime = V_atof( event->GetParameters() );
 			params.m_nLoopCount = event->GetLoopCount();
 		}
 		break;
@@ -9868,8 +9870,9 @@ void CChoreoView::OnChangeScale( void )
 
 	if ( !InputProperties( &params ) )
 		return;
-
-	SetTimeZoom( GetToolName(), clamp( (int)( 100.0f * atof( params.m_szInputText ) ), 1, MAX_TIME_ZOOM ), false );
+	
+	// dimhotepus: atof -> V_atof
+	SetTimeZoom( GetToolName(), clamp( (int)( 100.0f * V_atof( params.m_szInputText ) ), 1, MAX_TIME_ZOOM ), false );
 
 	// Force scroll bars to recompute
 	ForceScrollBarsToRecompute( false );
