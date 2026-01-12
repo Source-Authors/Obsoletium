@@ -431,15 +431,17 @@ void WritePortalTrace( const char *source )
 	
 	char filename[1024];
 	V_sprintf_safe (filename, "%s.lin", source);
+
 	FILE *linefile = fopen (filename, "w");
 	if (!linefile)
 		Error ("Couldn't open %s\n", filename);
+
+	RunCodeAtScopeExit(fclose(linefile));
 
 	for ( auto &p : g_PortalTrace.m_list )
 	{
 		fprintf (linefile, "%f %f %f\n", p[0], p[1], p[2]);
 	}
-	fclose (linefile);
 	Warning("Wrote %s!!!\n", filename);
 }
 
