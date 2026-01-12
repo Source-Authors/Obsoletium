@@ -725,6 +725,8 @@ void GetDBInfo( const char *pDBInfoFilename, CDBInfo *pInfo )
 		Error( "Can't open %s for database info.\n", dbInfoFilename );
 	}
 
+	RunCodeAtScopeExit(fclose(fp));
+
 	if ( !ReadStringFromFile( fp, pInfo->m_HostName, sizeof( pInfo->m_HostName ) ) ||
 		 !ReadStringFromFile( fp, pInfo->m_DBName, sizeof( pInfo->m_DBName ) ) || 
 		 !ReadStringFromFile( fp, pInfo->m_UserName, sizeof( pInfo->m_UserName ) ) 
@@ -732,8 +734,6 @@ void GetDBInfo( const char *pDBInfoFilename, CDBInfo *pInfo )
 	{
 		Error( "%s is not a valid database info file.\n", dbInfoFilename );
 	}
-
-	fclose( fp );
 }
 
 

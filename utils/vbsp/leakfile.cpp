@@ -49,6 +49,8 @@ void LeakFile (tree_t *tree)
 	linefile = fopen (filename, "w");
 	if (!linefile)
 		Error ("Couldn't open %s\n", filename);
+	
+	RunCodeAtScopeExit(fclose(linefile));
 
 	count = 0;
 	node = &tree->outside_node;
@@ -85,8 +87,6 @@ void LeakFile (tree_t *tree)
 
 	fprintf (linefile, "%f %f %f\n", origin[0], origin[1], origin[2]);
 	qprintf ("%5i point linefile\n", count+1);
-
-	fclose (linefile);
 
 	// Emit a leak warning.
 	const char *cl = ValueForKey (node->occupant, "classname");

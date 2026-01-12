@@ -146,6 +146,10 @@ void DumpCollideToGlView( CPhysCollide *pCollide, const char *pFilename )
 	Vector *outVerts;
 	int vertCount = physcollision->CreateDebugMesh( pCollide, &outVerts );
 	FILE *fp = fopen( pFilename, "w" );
+	if (!fp) return;
+
+	RunCodeAtScopeExit(fclose(fp));
+
 	int triCount = vertCount / 3;
 	int vert = 0;
 	for ( int i = 0; i < triCount; i++ )
@@ -158,7 +162,6 @@ void DumpCollideToGlView( CPhysCollide *pCollide, const char *pFilename )
 		fprintf( fp, "%6.3f %6.3f %6.3f 0 0 1\n", outVerts[vert].x, outVerts[vert].y, outVerts[vert].z );
 		vert++;
 	}
-	fclose( fp );
 	physcollision->DestroyDebugMesh( vertCount, outVerts );
 }
 
@@ -167,6 +170,10 @@ void DumpCollideToPHY( CPhysCollide *pCollide, CTextBuffer *text,   const char *
 {
 	Msg("Writing %s...\n", pFilename );
 	FILE *fp = fopen( pFilename, "wb" );
+	if (!fp) return;
+
+	RunCodeAtScopeExit(fclose(fp));
+
 	phyheader_t header;
 	header.size = sizeof(header);
 	header.id = 0;
@@ -183,7 +190,6 @@ void DumpCollideToPHY( CPhysCollide *pCollide, CTextBuffer *text,   const char *
 	fwrite( buf, size, 1, fp );
 
 	fwrite( text->GetData(), text->GetSize(), 1, fp );
-	fclose( fp );
 	free( buf );
 }
 

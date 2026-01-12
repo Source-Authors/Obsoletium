@@ -503,6 +503,8 @@ void WriteBrushMap (char *name, bspbrush_t *list)
 	if (!f)
 		Error ("Can't write %s\b", name);
 
+	RunCodeAtScopeExit(fclose(f));
+
 	fprintf (f, "{\n\"classname\" \"worldspawn\"\n");
 
 	for ( ; list ; list=list->next )
@@ -522,9 +524,6 @@ void WriteBrushMap (char *name, bspbrush_t *list)
 		fprintf (f, "}\n");
 	}
 	fprintf (f, "}\n");
-
-	fclose (f);
-
 }
 
 // UNDONE: This isn't quite working yet
@@ -541,6 +540,8 @@ void WriteBrushVMF(char *name, bspbrush_t *list)
 	f = fopen (name, "w");
 	if (!f)
 		Error ("Can't write %s\b", name);
+
+	RunCodeAtScopeExit(fclose(f));
 
 	fprintf (f, "world\n{\n\"classname\" \"worldspawn\"\n");
 
@@ -572,9 +573,6 @@ void WriteBrushVMF(char *name, bspbrush_t *list)
 		fprintf (f, "\t}\n");
 	}
 	fprintf (f, "}\n");
-
-	fclose (f);
-
 }
 #endif
 

@@ -86,6 +86,8 @@ void vprint(bool uselogfile, int depth, const char *fmt, ...) {
   Plat_DebugString(string);
 
   if (fp) {
+    RunCodeAtScopeExit(fclose(fp));
+
     char *p = string;
     while (*p) {
       if (*p == '\n') {
@@ -94,8 +96,6 @@ void vprint(bool uselogfile, int depth, const char *fmt, ...) {
       fputc(*p, fp);
       p++;
     }
-
-    fclose(fp);
   }
 }
 

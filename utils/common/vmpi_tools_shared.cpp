@@ -99,8 +99,9 @@ bool SharedDispatch(MessageBuffer *pBuf, int iSource, int iPacketID) {
                          InterlockedIncrement(&s_numMiniDumps));
 
           if (FILE *fDump = fopen(chSaveFileName, "wb")) {
+            RunCodeAtScopeExit(fclose(fDump));
+
             fwrite(pInPos, 1, iFileSize, fDump);
-            fclose(fDump);
 
             Warning("\nSaved worker crash minidump '%s', size %d byte(s).\n",
                     chSaveFileName, iFileSize);

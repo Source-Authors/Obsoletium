@@ -215,6 +215,9 @@ void CreateMakefile_OutputMakefile( void )
 	{
 		MdlError( "can't open makefile.tmp!\n" );
 	}
+
+	RunCodeAtScopeExit(fclose( fp ));
+
 	char mdlname[MAX_PATH];
 	V_strcpy_safe( mdlname, gamedir );
 //	if( *g_pPlatformName )
@@ -240,7 +243,6 @@ void CreateMakefile_OutputMakefile( void )
 	V_StripFilename( mkdirpath );
 	fprintf( fp, "\tmkdir \"%s\"\n", mkdirpath );
 	fprintf( fp, "\t%s -quiet %s\n\n", CommandLine()->GetParm( 0 ), fullpath );
-	fclose( fp );
 }
 
 //-----------------------------------------------------------------------------
@@ -10144,8 +10146,10 @@ bool WriteFileToDisk( const char *pFileName, const char *pPath, CUtlBuffer &buf 
 	if ( !f )
 		return false;
 
+	RunCodeAtScopeExit(fclose( f ));
+
 	fwrite( buf.Base(), 1, buf.TellPut(), f );
-	fclose( f );
+
 	return true;
 }
 

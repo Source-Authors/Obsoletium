@@ -625,10 +625,11 @@ void ReadPHYFile(const char *name, phyviewparams_t &params) {
   FILE *fp = fopen(name, "rb");
   if (!fp) Error("Couldn't open PHY file '%s'.\n", name);
 
+  RunCodeAtScopeExit(fclose(fp));
+
   phyheader_t header;
   fread(&header, sizeof(header), 1, fp);
   if (header.size != sizeof(header) || header.solidCount <= 0) {
-    fclose(fp);
     return;
   }
 
@@ -639,7 +640,6 @@ void ReadPHYFile(const char *name, phyviewparams_t &params) {
 
   char *buf = (char *)_alloca(fileSize);
   fread(buf, fileSize, 1, fp);
-  fclose(fp);
 
   vcollide_t collide;
   physcollision->VCollideLoad(&collide, header.solidCount, (const char *)buf,
@@ -691,6 +691,8 @@ void ReadPortalFile(char *name) {
   FILE *f = fopen(name, "r");
   if (!f) Error("Couldn't open portal file '%s'.\n", name);
 
+  RunCodeAtScopeExit(fclose(f));
+
   c = 0;
 
   glNewList(2, GL_COMPILE);
@@ -727,8 +729,6 @@ void ReadPortalFile(char *name) {
     c++;
   }
 
-  fclose(f);
-
   glEndList();
 }
 
@@ -745,6 +745,8 @@ BOOL ReadDisplacementFile(const char *filename) {
   //
   FILE *pFile = fopen(filename, "r");
   if (!pFile) Error("Couldn't open dsplacement file '%s'.\n", filename);
+
+  RunCodeAtScopeExit(fclose(pFile));
 
   //
   // read data in file
@@ -763,8 +765,6 @@ BOOL ReadDisplacementFile(const char *filename) {
     // end of file check
     if (!fileCount || (fileCount == EOF)) break;
   }
-
-  fclose(pFile);
 
   return TRUE;
 }

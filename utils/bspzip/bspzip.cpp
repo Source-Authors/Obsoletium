@@ -327,6 +327,8 @@ int main(int argc, char **argv) {
     char fullpathName[MAX_PATH] = {0};
     FILE *fp = fopen(filelistName, "r");
     if (fp) {
+      RunCodeAtScopeExit(fclose(fp));
+
       printf("Opening bsp file: %s.\n", bspName);
       LoadBSPFile(bspName);
 
@@ -349,14 +351,12 @@ int main(int argc, char **argv) {
           AddFileToPak(GetPakFile(), relativeName, fullpathName);
         } else if (!feof(fp)) {
           fprintf(stderr, "Missing full path names.\n");
-          fclose(fp);
           return 5;
         }
       }
 
       printf("Writing new bsp file: %s.\n", newbspName);
       WriteBSPFile(newbspName);
-      fclose(fp);
     }
   } else if ((stricmp(pAction, "-dir") == 0) && nActionArgs == 1) {
     // bspzip -dir <bspfile>
@@ -411,6 +411,8 @@ int main(int argc, char **argv) {
     char fullpathName[MAX_PATH] = {0};
     FILE *fp = fopen(filelistName, "r");
     if (fp) {
+      RunCodeAtScopeExit(fclose(fp));
+
       printf("Opening bsp file: %s.\n", bspName);
       LoadBSPFile(bspName);
 
@@ -437,14 +439,12 @@ int main(int argc, char **argv) {
           fprintf(stderr,
                   "Missing paired relative '%s'/full path '%s' names.\n",
                   relativeName, fullpathName);
-          fclose(fp);
           return 6;
         }
       }
 
       printf("Writing new bsp file: %s.\n", newbspName);
       WriteBSPFile(newbspName);
-      fclose(fp);
     }
   } else if ((stricmp(pAction, "-addorupdatelist") == 0) && nActionArgs == 3) {
     // bspzip -addorupdatelist <bspfile> <listfile> <newbspfile>
@@ -467,6 +467,8 @@ int main(int argc, char **argv) {
     char fullpathName[MAX_PATH] = {0};
     FILE *fp = fopen(filelistName, "r");
     if (fp) {
+      RunCodeAtScopeExit(fclose(fp));
+
       printf("Opening bsp file: %s.\n", bspName);
       LoadBSPFile(bspName);
 
@@ -499,14 +501,12 @@ int main(int argc, char **argv) {
           fprintf(stderr,
                   "Missing paired relative '%s'/full path '%s' names.\n",
                   relativeName, fullpathName);
-          fclose(fp);
           return 7;
         }
       }
 
       printf("Writing new bsp file: %s.\n", newbspName);
       WriteBSPFile(newbspName);
-      fclose(fp);
     }
   } else if ((stricmp(pAction, "-repack") == 0) &&
              (nActionArgs == 1 || nActionArgs == 2)) {
