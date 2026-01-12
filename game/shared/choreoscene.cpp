@@ -678,9 +678,11 @@ void CCurveData::Parse( ISceneTokenProcessor *tokenizer, ICurveDataAccessor *dat
 		
 		CUtlVector< CExpressionSample > samples;
 		
-		float time = strtof(tokenizer->CurrentToken(), nullptr);
+		// dimhotepus: atof -> V_atof
+		float time = V_atof(tokenizer->CurrentToken());
 		tokenizer->GetToken( false );
-		float value = strtof(tokenizer->CurrentToken(), nullptr);
+		// dimhotepus: atof -> V_atof
+		float value = V_atof(tokenizer->CurrentToken());
 		
 		// Add to counter
 		CExpressionSample *s = &samples[ samples.AddToTail() ];
