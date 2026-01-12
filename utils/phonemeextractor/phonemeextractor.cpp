@@ -236,7 +236,7 @@ void AddWordRule( ISpRecoGrammar* cpRecoGrammar, SPSTATEHANDLE *root, CUtlVector
 	const intp idx = (*rules).AddToTail();
 
 	WORDRULETYPE *newrule = &(*rules)[idx];
-	newrule->ruleId = DYN_SENTENCERULE + idx + 1;
+	newrule->ruleId = size_cast<int>( DYN_SENTENCERULE + idx + 1 );
 	newrule->word = word;
 
 	V_strcpy_safe( newrule->plaintext, W2T( word ) );
@@ -405,7 +405,7 @@ void PrintAlternates( ISpRecoResult* cpResult, void (*pfnPrint)( const char *fmt
 				HRESULT hr = cpResult->GetAlternates(
 					pElements->Rule.ulFirstElement,
 					pElements->Rule.ulCountOfElements, 
-					32,
+					std::size( rgPhraseAlt ),
 					rgPhraseAlt,
 					&ulCount);
 				Assert( SUCCEEDED( hr ) );
@@ -1004,7 +1004,7 @@ void PartitionWords( CSentence& outwords, intp start, intp end, int sampleStart,
 {
 	intp wordCount = end - start + 1;
 	Assert( wordCount >= 1 );
-	int stepSize  = ( sampleEnd - sampleStart ) / wordCount;
+	int stepSize  = size_cast<int>( ( sampleEnd - sampleStart ) / wordCount );
 
 	int currentStart = sampleStart;
 
