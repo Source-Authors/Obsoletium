@@ -376,7 +376,8 @@ bool CPositionInterpolator_Rope::ProcessKey( char const *pName, char const *pVal
 {
 	if( stricmp( pName, "Slack" ) == 0 )
 	{
-		m_flSlack = strtof( pValue, nullptr ) + ROPESLACK_FUDGEFACTOR;
+		// dimhotepus: atof -> V_atof
+		m_flSlack = V_atof( pValue ) + ROPESLACK_FUDGEFACTOR;
 		m_bChange = true;
 		return true;
 	}
