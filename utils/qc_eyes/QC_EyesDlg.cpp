@@ -21,7 +21,7 @@ CQC_EyesDlg::CQC_EyesDlg(CWnd *pParent /*=NULL*/)
   // NOTE: the ClassWizard will add member initialization here
   //}}AFX_DATA_INIT
   // Note that LoadIcon does not require a subsequent DestroyIcon in Win32
-  m_hIcon = AfxGetApp()->LoadIcon(SRC_IDI_APP_MAIN);
+  m_hIcon = AfxGetApp()->LoadIcon(SE_IDI_APP_MAIN);
   m_hOutputText = nullptr;
   m_pBitmapHead = nullptr;
   m_BufSize = 0;
