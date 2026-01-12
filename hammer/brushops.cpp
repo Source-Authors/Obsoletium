@@ -28,11 +28,14 @@
 constexpr inline int MAX_POINTS_ON_WINDING = 128;
 
 
-
-void Error(char* fmt, ...)
+void Error(PRINTF_FORMAT_STRING char* fmt, ...)
 {
-	char str[300];
-	V_sprintf_safe(str, fmt, (&fmt)+1);
+	char str[256];
+	va_list va;
+
+	va_start(va, fmt);
+	V_vsprintf_safe(str, fmt, va);
+	va_end(va);
 	Msg(mwError, str);
 }
 
