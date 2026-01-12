@@ -802,32 +802,38 @@ void CBoneControlWindow::OnHitboxChanged( )
 	const char* pLabel = m_eOriginX->getLabel();
 	if (!pLabel)
 		goto errOut;
-	origin.x = atof( pLabel );
+	// dimhotepus: atof -> V_atof
+	origin.x = V_atof( pLabel );
 
 	pLabel = m_eOriginY->getLabel();
 	if (!pLabel)
 		goto errOut;
-	origin.y = atof( pLabel );
+	// dimhotepus: atof -> V_atof
+	origin.y = V_atof( pLabel );
 
 	pLabel = m_eOriginZ->getLabel();
 	if (!pLabel)
 		goto errOut;
-	origin.z = atof( pLabel );
+	// dimhotepus: atof -> V_atof
+	origin.z = V_atof( pLabel );
 
 	pLabel = m_eSizeX->getLabel();
 	if (!pLabel)
 		goto errOut;
-	size.x = atof( pLabel );
+	// dimhotepus: atof -> V_atof
+	size.x = V_atof( pLabel );
 
 	pLabel = m_eSizeY->getLabel();
 	if (!pLabel)
 		goto errOut;
-	size.y = atof( pLabel );
+	// dimhotepus: atof -> V_atof
+	size.y = V_atof( pLabel );
 
 	pLabel = m_eSizeZ->getLabel();
  	if (!pLabel)
 		goto errOut;
-	size.z = atof( pLabel );
+	// dimhotepus: atof -> V_atof
+	size.z = V_atof( pLabel );
 
 	pHitbox = &g_pStudioModel->m_HitboxSets[ m_nHitboxSet ].m_Hitboxes[m_Hitbox].m_BBox;
 
@@ -1858,8 +1864,9 @@ ControlPanel::handleEvent (mxEvent *event)
 		{
 			int index = event->action - IDC_POSEPARAMETER_VALUE;
 			int poseparam = cPoseParameter[index]->getSelectedIndex();
-
-			float value =  atof( lePoseParameter[index]->getLabel() );
+			
+			// dimhotepus: atof -> V_atof
+			float value = V_atof( lePoseParameter[index]->getLabel() );
 			setBlend( poseparam, value );
 			slPoseParameter[index]->setValue( g_pStudioModel->GetPoseParameter( poseparam ) );
 			return 1;
@@ -1951,7 +1958,8 @@ ControlPanel::handleEvent (mxEvent *event)
 		{
 			mxLineEdit *pLineEdit = ((mxLineEdit *) event->widget);
 			const char *pText = pLineEdit->getLabel();
-			float val = atof( pText );
+			// dimhotepus: atof -> V_atof
+			float val = V_atof( pText );
 			g_viewerSettings.fov = val;
 			break;
 		}
@@ -1976,7 +1984,8 @@ ControlPanel::handleEvent (mxEvent *event)
 		{
 			mxLineEdit *pLineEdit = ((mxLineEdit *) event->widget);
 			const char *pText = pLineEdit->getLabel();
-			float val = atof( pText );
+			// dimhotepus: atof -> V_atof
+			float val = V_atof( pText );
 			g_pStudioModel->SetLODSwitchValue( g_viewerSettings.lod, val );
 			break;
 		}
@@ -2832,10 +2841,11 @@ ControlPanel::updatePoseParameters( )
 		{
 			int j = cPoseParameter[i]->getSelectedIndex();
 			float value = g_pStudioModel->GetPoseParameter( j );
+			
+			// dimhotepus: atof -> V_atof
+			float temp = V_atof( lePoseParameter[i]->getLabel( ) );
 
-			float temp = atof( lePoseParameter[i]->getLabel( ) );
-
-			if (fabs( temp - value ) > 0.1)
+			if (fabs( temp - value ) > 0.1f)
 			{
 				slPoseParameter[i]->setValue( value );
 				lePoseParameter[i]->setLabel( "%.1f", value );
@@ -3939,7 +3949,8 @@ void ControlPanel::writePhysicsData( void )
 	float mass = 0;
 	if ( pMass )
 	{
-		mass = atof( pMass );
+		// dimhotepus: atof -> V_atof
+		mass = V_atof( pMass );
 	}
 
 	g_pStudioModel->Physics_SetMass( mass );
