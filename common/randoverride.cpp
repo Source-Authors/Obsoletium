@@ -15,7 +15,7 @@
 #define __cdecl 
 #endif
 
-// dimhotepus: Exclude in Multhreaded DLL mode as ucrt lib already has ones.
+// dimhotepus: Exclude in Multihreaded DLL mode as ucrt lib already has ones.
 #if !defined(_MT) || !defined(_DLL)
 void __cdecl srand(unsigned int)
 {
