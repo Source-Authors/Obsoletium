@@ -71,9 +71,9 @@ bool g_bOldFileDialogs = false;
 
 MDLViewer *g_MDLViewer = 0;
 #ifdef PLATFORM_64BITS
-char g_appTitle[] = "Valve Model Viewer v" SRC_PRODUCT_FILE_VERSION_INFO_STRING " - 64 bit";
+char g_appTitle[] = "Valve Model Viewer v" SE_PRODUCT_FILE_VERSION_INFO_STRING " - 64 bit";
 #else
-char g_appTitle[] = "Valve Model Viewer v" SRC_PRODUCT_FILE_VERSION_INFO_STRING;
+char g_appTitle[] = "Valve Model Viewer v" SE_PRODUCT_FILE_VERSION_INFO_STRING;
 #endif
 static char recentFiles[8][256] = { "", "", "", "", "", "", "", "" };
 extern int g_dxlevel;
@@ -944,7 +944,7 @@ MDLViewer::handleEvent (mxEvent *event)
 
 		case IDC_HELP_ABOUT:
 			mxMessageBox (this,
-				"Valve Model Viewer v" SRC_PRODUCT_FILE_VERSION_INFO_STRING " (c) 2004-2025 Valve Corp.\n"
+				"Valve Model Viewer v" SE_PRODUCT_FILE_VERSION_INFO_STRING " (c) 2004-2025 Valve Corp.\n"
 				"Portions (c) 1999 by Mete Ciragan\n\n"
 				"Left-drag inside circle to spin.\n"
 				"Left-drag outside circle to rotate.\n"
