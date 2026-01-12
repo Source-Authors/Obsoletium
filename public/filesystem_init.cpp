@@ -647,6 +647,8 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 		{
 			FileFindHandle_t findHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 			const char *pszFoundShortName = initInfo.m_pFileSystem->FindFirst( szAbsSearchPath, &findHandle ); //-V2001
+			RunCodeAtScopeExit(initInfo.m_pFileSystem->FindClose(findHandle));
+			
 			if ( pszFoundShortName )
 			{
 				do 
@@ -687,8 +689,6 @@ FSReturnCode_t FileSystem_LoadSearchPaths( CFSSearchPathsInit &initInfo )
 					}
 					pszFoundShortName = initInfo.m_pFileSystem->FindNext( findHandle );
 				} while ( pszFoundShortName );
-
-				initInfo.m_pFileSystem->FindClose( findHandle );
 			}
 
 			// Sort alphabetically.  Also note that this will put
