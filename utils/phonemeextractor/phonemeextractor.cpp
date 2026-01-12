@@ -12,12 +12,12 @@
 #include "sentence.h"
 #include "filesystem.h"
 
-#include <io.h>
 #include <cstdio>
 
 #include "winlite.h"
 MSVC_BEGIN_WARNING_OVERRIDE_SCOPE()
-MSVC_DISABLE_WARNING(4996)
+MSVC_DISABLE_WARNING(4805)  // Mix BOOL and bool.
+MSVC_DISABLE_WARNING(4996)  // GetVersionExA deprecated.
 #include <sphelper.h>
 #include <spddkhlp.h>
 MSVC_END_WARNING_OVERRIDE_SCOPE()
