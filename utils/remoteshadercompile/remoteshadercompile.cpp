@@ -653,7 +653,7 @@ void ShaderCompileClient(ShaderCompileClientArgs &args) {
           send_buffer_size =
               static_cast<int>(expected_buffer_size + sizeof(uint32_t));
 
-          printf("%s compiled successfullly.\n", shader_file_name);
+          printf("%s compiled successfully.\n", shader_file_name);
 
           if (args.should_disassemble_shaders) {
             printf("Filename: %s\n", shader_file_name);
