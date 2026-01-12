@@ -49,14 +49,14 @@ static CWorkspaceFiles g_WorkspaceFiles;
 IWorkspaceFiles *workspacefiles = ( IWorkspaceFiles * )&g_WorkspaceFiles;
 
 CWorkspaceFiles::CWorkspaceFiles( void ) :
-	m_hKeyMain( (HKEY)0 )
+	m_hKeyMain( nullptr )
 {
 	memset( m_nStoredFiles, 0, sizeof( m_nStoredFiles ) );
 }
 
 CWorkspaceFiles::~CWorkspaceFiles( void )
 {
-	if ( (HKEY)0 != m_hKeyMain )
+	if ( m_hKeyMain )
 	{
 		RegCloseKey( m_hKeyMain );
 	}
