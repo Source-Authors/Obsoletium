@@ -1509,8 +1509,11 @@ void GenerateKeyPair(const char *pszBaseKeyName) {
   {
     CUtlString sPubFilename(pszBaseKeyName);
     sPubFilename += ".publickey.vdf";
+
     FILE *f = fopen(sPubFilename, "wt");
     if (f == nullptr) Error("Cannot create %s.", sPubFilename.String());
+
+    RunCodeAtScopeExit(fclose(f));
 
     // Write public keyfile
     fprintf(f,
@@ -1524,7 +1527,6 @@ void GenerateKeyPair(const char *pszBaseKeyName) {
             "\trsa_public_key \"%s\"\n"
             "}\n",
             rgchEncodedPublicKey);
-    fclose(f);
     printf("  Saved %s\n", sPubFilename.String());
   }
 
@@ -1532,8 +1534,12 @@ void GenerateKeyPair(const char *pszBaseKeyName) {
   {
     CUtlString sPrivFilename(pszBaseKeyName);
     sPrivFilename += ".privatekey.vdf";
+
     FILE *f = fopen(sPrivFilename, "wt");
     if (f == nullptr) Error("Cannot create %s.", sPrivFilename.String());
+
+    RunCodeAtScopeExit(fclose(f));
+
     fprintf(f,
             "// Private key file.\n"
             "// This key can be used to sign files.  Third parties can verify "
@@ -1565,7 +1571,6 @@ void GenerateKeyPair(const char *pszBaseKeyName) {
             "\t}\n"
             "}\n",
             rgchEncodedEncryptedPrivateKey, rgchEncodedPublicKey);
-    fclose(f);
     printf("  Saved %s\n", sPrivFilename.String());
   }
 
