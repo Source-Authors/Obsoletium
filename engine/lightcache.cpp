@@ -2195,8 +2195,11 @@ static ITexture *FindEnvCubemapForPoint( const Vector& origin )
 //-----------------------------------------------------------------------------
 // Create static light cache entry
 //-----------------------------------------------------------------------------
+static CThreadMutex g_pPropCacheMutex;
 LightCacheHandle_t CreateStaticLightingCache( const Vector& origin, const Vector& mins, const Vector& maxs )
 {
+	AUTO_LOCK( g_pPropCacheMutex );
+
 	PropLightcache_t* pcache = s_PropCache.Alloc();
 
 	pcache->m_LightingOrigin = origin;
