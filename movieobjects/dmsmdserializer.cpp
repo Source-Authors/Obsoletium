@@ -413,8 +413,8 @@ bool CQcData::ParseQc(
 			}
 			else if ( !V_stricmp( tokens[0], "$scale" ) )
 			{
-				// dimhotepus: strtod -> strtof
-				m_scale = strtof( tokens[1].Get(), NULL );
+				// dimhotepus: strtod -> V_atof
+				m_scale = V_atof( tokens[1].Get() );
 			}
 			else if ( !V_stricmp( tokens[0], "$cdmaterials" ) )
 			{
@@ -1047,7 +1047,8 @@ static void HandleVertexWeights(
 		{
 			nId = strtol( tokens[ i ].Get(), NULL, 0 );
 			++i;
-			flWeight = strtof( tokens[ i ].Get(), NULL );
+			// dimhotepus: atof -> V_atof
+			flWeight = V_atof( tokens[ i ].Get() );
 
 			if ( nId < 0 || flWeight < flEps )
 				continue;
