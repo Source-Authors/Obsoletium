@@ -1065,7 +1065,7 @@ void WCam_Register(HINSTANCE hInstance, const char *className) {
   wc.cbClsExtra = 0;
   wc.cbWndExtra = 0;
   wc.hInstance = hInstance;
-  wc.hIcon = LoadIcon(NULL, MAKEINTRESOURCE(SRC_IDI_APP_MAIN));
+  wc.hIcon = LoadIcon(NULL, MAKEINTRESOURCE(SE_IDI_APP_MAIN));
   wc.hCursor = LoadCursor(NULL, IDC_ARROW);
   wc.hbrBackground = NULL;
   wc.lpszMenuName = 0;
