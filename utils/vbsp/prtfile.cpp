@@ -358,6 +358,8 @@ void WritePortalFile (tree_t *tree)
 	if (!pf)
 		Error ("Error opening %s", filename);
 		
+	RunCodeAtScopeExit(fclose(pf));
+
 	fprintf (pf, "%s\n", PORTALFILE);
 	fprintf (pf, "%i\n", num_visclusters);
 	fprintf (pf, "%i\n", num_visportals);
@@ -366,8 +368,6 @@ void WritePortalFile (tree_t *tree)
 	qprintf ("%5i visportals\n", num_visportals);
 
 	WritePortalFile(pf, portalList);
-
-	fclose (pf);
 
 	// we need to store the clusters out now because ordering
 	// issues made us do this after writebsp...

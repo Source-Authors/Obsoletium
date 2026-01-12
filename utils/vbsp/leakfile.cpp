@@ -117,6 +117,8 @@ void AreaportalLeakFile( tree_t *tree, portal_t *pStartPortal, portal_t *pEndPor
 	if (!linefile)
 		Error ("Couldn't open %s\n", filename);
 
+	RunCodeAtScopeExit(fclose(linefile));
+
 	count = 2;
 	WindingCenter (pEndPortal->winding, mid);
 	fprintf (linefile, "%f %f %f\n", mid[0], mid[1], mid[2]);
@@ -163,7 +165,6 @@ void AreaportalLeakFile( tree_t *tree, portal_t *pStartPortal, portal_t *pEndPor
 
 	qprintf ("%5i point linefile\n", count);
 
-	fclose (linefile);
 	Warning( "Wrote %s\n", filename );
 	Color red(255,0,0,255);
 	ColorSpewMessage( SPEW_MESSAGE, &red, "Areaportal leak ! File: %s ", filename );

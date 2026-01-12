@@ -1873,12 +1873,13 @@ static KeyValuesAD ReadKeyValuesFile( const char *pFilename )
 	if ( !fp )
 		return KeyValuesAD{nullptr};
 
+	RunCodeAtScopeExit(fclose( fp ));
+
 	CUtlVector<char> buf;
 	fseek( fp, 0, SEEK_END );
 	buf.SetSize( ftell( fp ) + 1 );
 	fseek( fp, 0, SEEK_SET );
 	fread( buf.Base(), 1, buf.Count()-1, fp );
-	fclose( fp );
 	buf[buf.Count()-1] = 0;
 
 	KeyValuesAD kv( "" );
@@ -3143,7 +3144,6 @@ Expands all the brush planes and saves a new map out
 */
 void CMapFile::TestExpandBrushes (void)
 {
-	FILE	*f;
 	side_t	*s;
 	int		i, j, bn;
 	winding_t	*w;
@@ -3152,9 +3152,12 @@ void CMapFile::TestExpandBrushes (void)
 	vec_t	dist;
 
 	Msg ("writing %s\n", name);
-	f = fopen (name, "wb");
+
+	FILE *f = fopen (name, "wb");
 	if (!f)
 		Error ("Can't write %s\b", name);
+
+	RunCodeAtScopeExit(fclose( f ));
 
 	fprintf (f, "{\n\"classname\" \"worldspawn\"\n");
 	fprintf( f, "\"mapversion\" \"220\"\n\"sounds\" \"1\"\n\"MaxRange\" \"4096\"\n\"mapversion\" \"220\"\n\"wad\" \"vert.wad;dev.wad;generic.wad;spire.wad;urb.wad;cit.wad;water.wad\"\n" );
@@ -3185,8 +3188,6 @@ void CMapFile::TestExpandBrushes (void)
 		fprintf (f, "}\n");
 	}
 	fprintf (f, "}\n");
-
-	fclose (f);
 
 	Error ("can't proceed after expanding brushes");
 }
