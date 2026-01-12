@@ -1336,6 +1336,8 @@ void CModelPresetGroupManager::LoadModelPresets( const char *pModelName, PresetG
 
 	FileFindHandle_t fh = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( pPresetNameBuf, "GAME", &fh );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( fh ));
+
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( fh ) )
 	{
 		char pRelativePresetPath[MAX_PATH];
@@ -1364,7 +1366,6 @@ void CModelPresetGroupManager::LoadModelPresets( const char *pModelName, PresetG
 
 		list[list.AddToTail()] = pPresetGroup;
 	}
-	g_pFullFileSystem->FindClose( fh );
 }
 
 
