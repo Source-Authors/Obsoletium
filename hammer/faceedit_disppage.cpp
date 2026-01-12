@@ -1325,8 +1325,8 @@ void CFaceEditDispPage::UpdateElevation( CMapDisp *pDisp )
 	//
 	CString strElevation;
 	GetDlgItemText( ID_DISP_ELEVATION, strElevation );
-	// dimhotepus: atof -> strtof.
-	float elevation = strtof( strElevation, nullptr );
+	// dimhotepus: atof -> V_atof.
+	float elevation = V_atof( strElevation );
 
 	// check for change and set new elevation if need be
 	if( elevation != pDisp->GetElevation() )
@@ -1369,8 +1369,8 @@ void CFaceEditDispPage::OnSpinUpDown( NMHDR *pNMHDR, LRESULT *pResult )
 			CEdit *pEdit = ( CEdit* )GetDlgItem( ID_DISP_ELEVATION );
 			CString strElevation;
 			pEdit->GetWindowText( strElevation );
-			// dimhotepus: atof -> strtof
-			float elevation = strtof( strElevation, nullptr );
+			// dimhotepus: atof -> V_atof
+			float elevation = V_atof( strElevation );
 			elevation += 0.5f * ( -pNMUpDown->iDelta );
 			strElevation.Format( "%4.2f", elevation );
 			pEdit->SetWindowText( strElevation );
@@ -1393,8 +1393,8 @@ void CFaceEditDispPage::UpdateScale( CMapDisp *pDisp )
 	//
 	CString strScale;
 	GetDlgItemText( ID_DISP_SCALE, strScale );
-	// dimhotepus: atof -> strtof
-	float scale = strtof( strScale, nullptr );
+	// dimhotepus: atof -> V_atof
+	float scale = V_atof( strScale );
 
 	// check for change and set new scale if need be
 	if( scale != pDisp->GetScale() )

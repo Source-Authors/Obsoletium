@@ -670,8 +670,8 @@ bool CChunkFile::ReadKeyValueBool(const char *pszValue, bool &bBool)
 //-----------------------------------------------------------------------------
 bool CChunkFile::ReadKeyValueFloat(const char *pszValue, float &flFloat)
 {
-	// dimhotepus: atof -> strtof.
-	flFloat = strtof(pszValue, nullptr);
+	// dimhotepus: atof -> V_atof.
+	flFloat = V_atof(pszValue);
 	return(true);
 }
 

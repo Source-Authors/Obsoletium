@@ -173,8 +173,8 @@ void CDispNoiseDlg::OnSpinUpDown( NMHDR *pNMHDR, LRESULT *pResult )
 			CEdit *pEdit = ( CEdit* )GetDlgItem( ID_DISP_NOISE_MIN );
 			CString strMin;
 			pEdit->GetWindowText( strMin );
-			// dimhotepus: atof -> strtof.
-			m_Min = strtof( strMin, nullptr );
+			// dimhotepus: atof -> V_atof.
+			m_Min = V_atof( strMin );
 			m_Min += 0.5f * ( -pNMUpDown->iDelta );
 			strMin.Format( "%4.2f", m_Min );
 			pEdit->SetWindowText( strMin );
@@ -187,8 +187,8 @@ void CDispNoiseDlg::OnSpinUpDown( NMHDR *pNMHDR, LRESULT *pResult )
 			CEdit *pEdit = ( CEdit* )GetDlgItem( ID_DISP_NOISE_MAX );
 			CString strMax;
 			pEdit->GetWindowText( strMax );
-            // dimhotepus: atof -> strtof.
-			m_Max = strtof( strMax, nullptr );
+			// dimhotepus: atof -> V_atof.
+			m_Max = V_atof( strMax );
 			m_Max += 0.5f * ( -pNMUpDown->iDelta );
 			strMax.Format( "%4.2f", m_Max );
 			pEdit->SetWindowText( strMax );
@@ -978,8 +978,8 @@ void CDispPaintDistDlg::OnEditDistance( void )
 	//
 	CString strDistance;
 	m_editDistance.GetWindowText( strDistance );
-	// dimhotepus: atof -> strtof
-	float flDistance = strtof( strDistance, nullptr );
+	// dimhotepus: atof -> V_atof
+	float flDistance = V_atof( strDistance );
 
 	// get the displacement tool
 	CToolDisplace *pTool = GetDisplacementTool();
@@ -1001,8 +1001,8 @@ void CDispPaintDistDlg::OnEditRadius( void )
 	//
 	CString strRadius;
 	m_editRadius.GetWindowText( strRadius );
-	// dimhotepus: atof -> strtof
-	float flRadius = strtof( strRadius, nullptr );
+	// dimhotepus: atof -> V_atof
+	float flRadius = V_atof( strRadius );
 
 	// get the displacement tool
 	CToolDisplace *pTool = GetDisplacementTool();
@@ -1832,8 +1832,8 @@ void CDispPaintDataDlg::OnEditValue( void )
 	//
 	CString strValue;
 	m_editValue.GetWindowText( strValue );
-	// dimhotepus: atof -> strtof
-	float fValue = strtof( strValue, nullptr );
+	// dimhotepus: atof -> V_atof
+	float fValue = V_atof( strValue );
 
 	// get the displacement tool
 	CToolDisplace *pDispTool = GetDisplacementTool();

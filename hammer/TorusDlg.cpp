@@ -44,20 +44,20 @@ CTorusDlg::CTorusDlg(Vector& boxmins, Vector& boxmaxs, CWnd* pParent /*=NULL*/)
 	CString str;
 	m_iWallWidth = AfxGetApp()->GetProfileInt(pszSection, "Wall Width", 32);
 	str = AfxGetApp()->GetProfileString(pszSection, "Arc_", "360");
-	// dimhotepus: atof -> strtof.
-	m_fArc = strtof(str, nullptr);
+	// dimhotepus: atof -> V_atof.
+	m_fArc = V_atof(str);
 	m_iSides = AfxGetApp()->GetProfileInt(pszSection, "Sides", 16);
 	str = AfxGetApp()->GetProfileString(pszSection, "Start Angle_", "0");
-	// dimhotepus: atof -> strtof.
-	m_fAngle = strtof(str, nullptr);
+	// dimhotepus: atof -> V_atof.
+	m_fAngle = V_atof(str);
 
 	str = AfxGetApp()->GetProfileString(pszSection, "Rotation Arc_", "360");
-	// dimhotepus: atof -> strtof.
-	m_fRotationArc = strtof(str, nullptr);
+	// dimhotepus: atof -> V_atof.
+	m_fRotationArc = V_atof(str);
 	m_iRotationSides = AfxGetApp()->GetProfileInt(pszSection, "Rotation Sides", 16);
 	str = AfxGetApp()->GetProfileString(pszSection, "Rotation Start Angle_", "0");
-	// dimhotepus: atof -> strtof.
-	m_fRotationAngle = strtof(str, nullptr);
+	// dimhotepus: atof -> V_atof.
+	m_fRotationAngle = V_atof(str);
 	
 	m_iAddHeight = AfxGetApp()->GetProfileInt(pszSection, "Add Height", 0);
 

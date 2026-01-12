@@ -354,7 +354,8 @@ void TransferToFloat( CWnd *pWnd, float &fValue )
 
 	if( !str.IsEmpty() )
 	{
-		fValue = ( float )atof( str );
+		// dimhotepus: atof -> V_atof.
+		fValue = V_atof( str );
 	}
 }
 
@@ -1372,8 +1373,8 @@ void CFaceEditMaterialPage::OnDeltaPosFloatSpin( NMHDR *pNMHDR, LRESULT *pResult
 	{
 		CString str;
 		pEdit->GetWindowText(str);
-		// dimhotepus: atof -> strtof
-		float fTmp = strtof(str, nullptr);
+		// dimhotepus: atof -> V_atof
+		float fTmp = V_atof(str);
 		fTmp += 0.1f * float( pNMUpDown->iDelta );
 		str.Format( "%.2f", fTmp );
 		pEdit->SetWindowText( str );

@@ -592,7 +592,8 @@ ChunkFileResult_t CEditGameClass::LoadKeyCallback(const char *szKey, const char 
 	psz = nexttoken(szToken, psz, ',');
 	if (szToken[0] != '\0')
 	{
-		pConnection->SetDelay((float)atof(szToken));
+		// dimhotepus: atof -> V_atof.
+		pConnection->SetDelay(V_atof(szToken));
 	}
 
 	//

@@ -381,7 +381,8 @@ void COPTConfigs::SaveInfo(CGameConfig *pConfig)
 	//
 	char szText[100];
 	m_cDefaultTextureScale.GetWindowText(szText, sizeof(szText));
-	float fScale = (float)atof(szText);
+	// dimhotepus: atof -> V_atof
+	float fScale = V_atof(szText);
 	if (fScale == 0)
 	{
 		fScale = 1;
