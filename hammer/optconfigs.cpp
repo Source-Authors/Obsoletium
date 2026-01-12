@@ -38,14 +38,13 @@ bool GetPersistentEnvironmentVariable( const char *pName, char *pReturn, int siz
 	if ( RegOpenKeyEx( HKEY_CURRENT_USER, VPROJECT_REG_KEY, 0, KEY_QUERY_VALUE, &hregkey ) != ERROR_SUCCESS )
 		return false;
 	
+	RunCodeAtScopeExit(RegCloseKey(hregkey));
+
 	// Get the value
 	DWORD dwSize = size;
 	if ( RegQueryValueEx( hregkey, pName, NULL, NULL,(LPBYTE) pReturn, &dwSize ) != ERROR_SUCCESS )
 		return false;
 	
-	// Close the key
-	RegCloseKey( hregkey );
-
 	return true;
 }
 
@@ -63,15 +62,14 @@ void SetPersistentEnvironmentVariable( const char *pName, const char *pValue )
 	// Changed from HKEY_LOCAL_MACHINE to HKEY_CURRENT_USER
 	if ( RegOpenKeyEx( HKEY_CURRENT_USER, VPROJECT_REG_KEY, 0, KEY_ALL_ACCESS, &hregkey ) != ERROR_SUCCESS )
 		return;
+
+	RunCodeAtScopeExit(RegCloseKey(hregkey));
 	
 	// Set the value to the string passed in
 	RegSetValueEx( hregkey, pName, 0, REG_SZ, (const unsigned char *)pValue, (int) strlen(pValue) );
 	
 	// Propagate changes so that environment variables takes immediate effect!
 	SendMessageTimeout( HWND_BROADCAST, WM_SETTINGCHANGE, 0, (LPARAM) "Environment", SMTO_ABORTIFHUNG, 5000, &dwReturnValue );
-
-	// Close the key
-	RegCloseKey( hregkey );
 }
 
 
@@ -731,22 +729,20 @@ BOOL COPTConfigs::BrowseForFolder(char *pszTitle, char *pszDirectory)
 {
 	char szTmp[MAX_PATH];
 
-	BROWSEINFO bi;
-	memset(&bi, 0, sizeof bi);
+	BROWSEINFO bi = {};
 	bi.hwndOwner = m_hWnd;
 	bi.pszDisplayName = szTmp;
 	bi.lpszTitle = pszTitle;
 	bi.ulFlags = BIF_RETURNONLYFSDIRS;
 
 	LPITEMIDLIST idl = SHBrowseForFolder(&bi);
-
-	if(idl == NULL)
+	if (idl == NULL)
 		return FALSE;
 
-	SHGetPathFromIDList(idl, pszDirectory);
-	CoTaskMemFree(idl);
+	RunCodeAtScopeExit(::CoTaskMemFree(idl));
 
-	return TRUE;
+	// dimhotepus: Only if success.
+	return SHGetPathFromIDList(idl, pszDirectory);
 }
 
 

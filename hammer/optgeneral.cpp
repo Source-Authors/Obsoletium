@@ -274,21 +274,19 @@ BOOL COPTGeneral::BrowseForFolder(char *pszTitle, char *pszDirectory)
 {
 	char szTmp[MAX_PATH];
 
-	BROWSEINFO bi;
-	memset(&bi, 0, sizeof bi);
+	BROWSEINFO bi = {};
 	bi.hwndOwner = m_hWnd;
 	bi.pszDisplayName = szTmp;
 	bi.lpszTitle = pszTitle;
 	bi.ulFlags = BIF_RETURNONLYFSDIRS;
 
 	LPITEMIDLIST idl = SHBrowseForFolder(&bi);
-
-	if(idl == NULL)
+	if (idl == NULL)
 		return FALSE;
 
-	SHGetPathFromIDList(idl, pszDirectory);
-	CoTaskMemFree(idl);
+	RunCodeAtScopeExit(::CoTaskMemFree(idl));
 
-	return TRUE;
+	// dimhotepus: Only if success.
+	return SHGetPathFromIDList(idl, pszDirectory);
 }
 

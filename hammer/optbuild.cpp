@@ -287,25 +287,27 @@ void COPTBuild::OnBrowseBspdir()
 	EditorUtil_ConvertPath(str, true);
 
 	char szTemp[MAX_PATH];
-	Q_strncpy(szTemp, str, MAX_PATH);
+	V_strcpy_safe(szTemp, str);
 
-	BROWSEINFO bi;
-	memset(&bi, 0, sizeof bi);
+	BROWSEINFO bi = {};
 	bi.hwndOwner = m_hWnd;
 	bi.pszDisplayName = szTemp;
 	bi.lpszTitle = "Select BSP file directory";
 	bi.ulFlags = BIF_RETURNONLYFSDIRS;
 
 	LPITEMIDLIST idl = SHBrowseForFolder(&bi);
-
 	if (idl == NULL)
 		return;
 
-	SHGetPathFromIDList(idl, szTemp);
-	CoTaskMemFree(idl);
+	RunCodeAtScopeExit(::CoTaskMemFree(idl));
+	
+	// dimhotepus: Only if success.
+	if (SHGetPathFromIDList(idl, szTemp))
+	{
+		// Convert back to %STEAM%.
+		str = szTemp;
 
-	// Convert back to %STEAM%.
-	str = szTemp;
-	EditorUtil_ConvertPath(str, false);
-	m_cBSPDir.SetWindowText(str);
+		EditorUtil_ConvertPath(str, false);
+		m_cBSPDir.SetWindowText(str);
+	}
 }

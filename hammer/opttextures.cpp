@@ -11,7 +11,9 @@
 #include "OPTTextures.h"
 #include "Options.h"
 #include "tier1/strtools.h"
+
 #include <shlobj.h>
+#include "com_ptr.h"
 
 // memdbgon must be the last include file in a .cpp file!!!
 #include <tier0/memdbgon.h>
@@ -212,9 +214,9 @@ static void GetDirectory(char *pDest, const char *pLongName)
 
 void COPTTextures::OnAddtexfile2() 
 {
-	BROWSEINFO bi;
 	char szDisplayName[MAX_PATH];
 
+	BROWSEINFO bi = {};
 	bi.hwndOwner = m_hWnd;
 	bi.pidlRoot = NULL;
 	bi.pszDisplayName = szDisplayName;
@@ -224,17 +226,17 @@ void COPTTextures::OnAddtexfile2()
 	bi.lParam = 0;
 	
 	LPITEMIDLIST pidlNew = SHBrowseForFolder(&bi);
-
-	if(pidlNew)
+	if (pidlNew)
 	{
+		RunCodeAtScopeExit(::CoTaskMemFree(pidlNew));
 
 		// get path from the id list
 		char szPathName[MAX_PATH];
-		SHGetPathFromIDList(pidlNew, szPathName);
-		
-		
+		const BOOL ok{SHGetPathFromIDList(pidlNew, szPathName)};
+		// dimhotepus: Exit when get path failed. 
+		if (!ok) return;
+
 		if (AfxMessageBox("Add all subdirectories as separate Texture Groups?", MB_YESNO) == IDYES)
-		//if (!strcmpi("\\textures", &szPathName[strlen(szPathName) - strlen("\\textures")]))
 		{
 			char szNewPath[MAX_PATH];
 			V_strcpy_safe(szNewPath, szPathName);
@@ -242,18 +244,22 @@ void COPTTextures::OnAddtexfile2()
 			WIN32_FIND_DATA FindData;
 			HANDLE hFile = FindFirstFile(szNewPath, &FindData);
 
-			if (hFile != INVALID_HANDLE_VALUE) do
+			if (hFile != INVALID_HANDLE_VALUE)
 			{
-				if ((FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
-						&&(FindData.cFileName[0] != '.'))
-				{
-					V_sprintf_safe(szNewPath, "%s\\%s", szPathName, FindData.cFileName);
-					strlwr(szNewPath);
-					if (m_TextureFiles.FindStringExact(-1, szNewPath) == CB_ERR)
-						m_TextureFiles.AddString(szNewPath);
-				}
-			} while (FindNextFile(hFile, &FindData));
+				RunCodeAtScopeExit(FindClose(hFile));
 
+				do
+				{
+					if ((FindData.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+							&&(FindData.cFileName[0] != '.'))
+					{
+						V_sprintf_safe(szNewPath, "%s\\%s", szPathName, FindData.cFileName);
+						strlwr(szNewPath);
+						if (m_TextureFiles.FindStringExact(-1, szNewPath) == CB_ERR)
+							m_TextureFiles.AddString(szNewPath);
+					}
+				} while (FindNextFile(hFile, &FindData));
+			}
 		}
 		else
 		{
@@ -261,11 +267,8 @@ void COPTTextures::OnAddtexfile2()
 			if (m_TextureFiles.FindStringExact(-1, szPathName) == CB_ERR)
 				m_TextureFiles.AddString(strlwr(szPathName));
 		}
+
 		SetModified();
-
-		// free the previous return value from SHBrowseForFolder
-		CoTaskMemFree(pidlNew);
-
 	}
 }
 
@@ -313,19 +316,21 @@ BOOL COPTTextures::BrowseForFolder( char *pszTitle, char *pszDirectory )
 
 	LPITEMIDLIST pidlStartFolder = NULL;
 
-	IShellFolder *pshDesktop = NULL;
-	SHGetDesktopFolder( &pshDesktop );
-	if ( pshDesktop )
+	se::win::com::com_ptr<IShellFolder> pshDesktop;
+	HRESULT hr = SHGetDesktopFolder( &pshDesktop );
+	if ( SUCCEEDED( hr ) )
 	{
 		ULONG ulEaten;
 		ULONG ulAttributes;
-		pshDesktop->ParseDisplayName( NULL, NULL, A2OLE( s_szStartFolder ), &ulEaten, &pidlStartFolder, &ulAttributes );
-	}	
+
+		hr = pshDesktop->ParseDisplayName( NULL, NULL, A2OLE( s_szStartFolder ), &ulEaten, &pidlStartFolder, &ulAttributes );
+	}
+
+	RunCodeAtScopeExit(::CoTaskMemFree(pidlStartFolder));
 	
 	char szTmp[MAX_PATH];
 
-	BROWSEINFO bi;
-	memset( &bi, 0, sizeof( bi ) );
+	BROWSEINFO bi = {};
 	bi.hwndOwner = m_hWnd;
 	bi.pszDisplayName = szTmp;
 	bi.lpszTitle = pszTitle;
@@ -334,21 +339,23 @@ BOOL COPTTextures::BrowseForFolder( char *pszTitle, char *pszDirectory )
 	bi.lParam = TRUE;
 
 	LPITEMIDLIST idl = SHBrowseForFolder( &bi );
-
 	if ( idl == NULL )
 	{
 		return FALSE;
 	}
 
-	SHGetPathFromIDList( idl, pszDirectory );
+	RunCodeAtScopeExit(::CoTaskMemFree( idl ));
 
-	// Start in this folder next time.	
+	// dimhotepus: Only if success.
+	if ( SHGetPathFromIDList( idl, pszDirectory ) )
+	{
+		// Start in this folder next time.
 		V_strcpy_safe( s_szStartFolder, pszDirectory );
 
-	CoTaskMemFree( pidlStartFolder );
-	CoTaskMemFree( idl );
+		return TRUE;
+	}
 
-	return TRUE;
+	return FALSE;
 }
 
 
