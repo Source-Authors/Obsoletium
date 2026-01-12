@@ -352,8 +352,8 @@ CMaterialVar::CMaterialVar( IMaterial* pMaterial, const char *pKey, const char *
 	m_pStringVal = new char[ len ];
 	Q_strncpy( m_pStringVal, pVal, len );
 	m_Type = MATERIAL_VAR_TYPE_STRING;
-	// dimhotepus: atof -> strtof.
-	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = strtof( m_pStringVal, nullptr );
+	// dimhotepus: atof -> V_atof.
+	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = V_atof( m_pStringVal );
 	m_intVal = int( m_VecVal[0] );
 }
 
@@ -784,8 +784,8 @@ void CMaterialVar::SetStringValue( const char *val )
 	Q_strncpy( m_pStringVal, val, len );
 	m_Type = MATERIAL_VAR_TYPE_STRING;
 	m_intVal = atoi( val );
-	// dimhotepus: atof -> strtof.
-	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = strtof( m_pStringVal, nullptr );
+	// dimhotepus: atof -> V_atof.
+	m_VecVal[0] = m_VecVal[1] = m_VecVal[2] = m_VecVal[3] = V_atof( m_pStringVal );
 	VarChanged();
 }
 
