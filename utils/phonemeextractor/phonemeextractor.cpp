@@ -323,7 +323,7 @@ bool BuildRules( ISpRecoGrammar* cpRecoGrammar, SPSTATEHANDLE *root, CUtlVector<
 
 	// Add transition
 	HRESULT hr = cpRecoGrammar->AddWordTransition( *root, rule->hRule, nullptr, nullptr, SPWT_LEXICAL, CONFIDENCE_WEIGHT, nullptr );
-	Assert( !FAILED( hr ) );
+	Assert( SUCCEEDED( hr ) );
 
 	for ( intp i = 0; i < numrules; i++ )
 	{
@@ -398,6 +398,8 @@ void PrintAlternates( ISpRecoResult* cpResult, void (*pfnPrint)( const char *fmt
 		SPPHRASE *pElements;
 		if ( SUCCEEDED( phrase->GetPhrase( &pElements ) ) )
 		{
+			RunCodeAtScopeExit(::CoTaskMemFree( pElements ));
+
 			if ( pElements->Rule.ulCountOfElements > 0 )
 			{
 				HRESULT hr = cpResult->GetAlternates(
@@ -420,8 +422,6 @@ void PrintAlternates( ISpRecoResult* cpResult, void (*pfnPrint)( const char *fmt
 				}
 			}
 		}
-		
-		::CoTaskMemFree( pElements );
 	}
 
 	for ( auto *p : rgPhraseAlt )
@@ -860,8 +860,11 @@ void RecursiveRegDelKey(HKEY hKey)
 		
 		if (lResult2==ERROR_SUCCESS)
 		{
-			RecursiveRegDelKey(subkey);
-			RegCloseKey(subkey);
+			{
+				RunCodeAtScopeExit(RegCloseKey(subkey));
+
+				RecursiveRegDelKey(subkey);
+			}
 
 			LONG lDelResult=RegDeleteKey(hKey,keyname);
 			Assert( lDelResult == ERROR_SUCCESS );
@@ -1208,8 +1211,9 @@ static SR_RESULT SAPI_ExtractPhonemes(
 		&hkwipe );
 	if ( lResult == ERROR_SUCCESS )
 	{
+		RunCodeAtScopeExit(RegCloseKey( hkwipe ));
+
 		RecursiveRegDelKey( hkwipe );
-		RegCloseKey( hkwipe );
 	}
 
 	if ( Q_isempty( inwords.GetText() ) )
