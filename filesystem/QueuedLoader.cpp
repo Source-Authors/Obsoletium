@@ -434,7 +434,7 @@ void AdjustAsyncIOSpeed()
 			{
 				if ( g_QueuedLoader.GetSpewDetail() )
 				{
-					Msg( "QueuedLoader: Suspending I/O at %.2f MiB\n", (float)g_nIOMemory / ( 1024.0f * 1024.0f ) );
+					Msg( "QueuedLoader: Suspending I/O at %s.\n", V_pretifymem( g_nIOMemory, 2, true ) );
 				}
 				g_pFullFileSystem->AsyncSuspend();
 			}
@@ -449,7 +449,7 @@ void AdjustAsyncIOSpeed()
 			{
 				if ( g_QueuedLoader.GetSpewDetail() )
 				{
-					Msg( "QueuedLoader: Resuming I/O at %.2f MiB\n", (float)g_nIOMemory / ( 1024.0f * 1024.0f ) );
+					Msg( "QueuedLoader: Resuming I/O at %s.\n", V_pretifymem( g_nIOMemory, 2, true ) );
 				}
 				g_pFullFileSystem->AsyncResume();
 			}
@@ -1259,13 +1259,13 @@ void CQueuedLoader::SpewInfo()
 			iIndex = m_SubmittedJobs.Next( iIndex );
 		}
 
-		Msg( "%zd Total Jobs\n", m_SubmittedJobs.Count() );
+		Msg( "%hu Total Jobs\n", m_SubmittedJobs.Count() );
 	}
 
 	Msg( "%d Queued Jobs\n", (int)g_nQueuedJobs );
 	Msg( "%d Active Jobs\n", (int)g_nActiveJobs );
-	Msg( "Peak IO Memory: %.2f MiB\n", (float)g_nIOMemoryPeak / ( 1024.0f * 1024.0f ) );
-	Msg( "Peak Anonymous IO Memory: %.2f MiB\n", (float)g_nAnonymousIOMemoryPeak / ( 1024.0f * 1024.0f ) );
+	Msg( "Peak IO Memory: %s\n", V_pretifymem( g_nIOMemoryPeak, 2, true ) );
+	Msg( "Peak Anonymous IO Memory: %s\n", V_pretifymem( g_nAnonymousIOMemoryPeak, 2, true ) );
 	Msg( "  Total Anonymous Claimed: %d\n", totalClaimed );
 	Msg( "  Total Anonymous Unclaimed: %d\n", totalUnclaimed );
 	if ( m_EndTime )
