@@ -969,7 +969,8 @@ int ParseCommandLine( int argc, char **argv )
 		else if( !Q_stricmp( argv[i], "-radius_override" ) )
 		{
 			g_bUseRadius = true;
-			g_VisRadius = atof( argv[i+1] );
+			// dimhotepus: atof -> V_atof
+			g_VisRadius = V_atof( argv[i+1] );
 			i++;
 			Msg( "--radius-override: %4.2f\n", g_VisRadius );
 			g_VisRadius = g_VisRadius * g_VisRadius;   // so distance check can be squared
