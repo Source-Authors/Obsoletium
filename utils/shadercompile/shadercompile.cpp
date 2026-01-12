@@ -745,57 +745,61 @@ void WriteShaderFiles(
   // Set the CRC to zero for now. . will patch in copyshaders.pl with the
   // correct CRC.
   unsigned int crc32 = 0;
+  intp nDictionaryOffset = 0;
 
-  //
-  // Shader file stream buffer
-  //
-  // Streaming buffer for vcs file (since this can blow memory)
-  CUtlStreamBuffer ShaderFile(szVCSfilename, nullptr);
-  ShaderFile.SetBigEndian(false);  // Swap the header bytes to X360 format
+  {
+    //
+    // Shader file stream buffer
+    //
+    // Streaming buffer for vcs file (since this can blow memory)
+    CUtlStreamBuffer ShaderFile(szVCSfilename, nullptr);
+    RunCodeAtScopeExit(ShaderFile.Close());
+    ShaderFile.SetBigEndian(false);  // Swap the header bytes to X360 format
 
-  // ------ Header --------------
-  ShaderFile.PutInt(SHADER_VCS_VERSION_NUMBER);  // Version
-  ShaderFile.PutInt(uint64_as_uint32(shaderInfo.m_nTotalShaderCombos));
-  ShaderFile.PutInt(uint64_as_uint32(shaderInfo.m_nDynamicCombos));
-  ShaderFile.PutUnsignedInt(shaderInfo.m_Flags);
-  ShaderFile.PutUnsignedInt(shaderInfo.m_CentroidMask);
-  ShaderFile.PutUnsignedInt(StaticComboHeaders.Count());
-  ShaderFile.PutUnsignedInt(crc32);
+    // ------ Header --------------
+    ShaderFile.PutInt(SHADER_VCS_VERSION_NUMBER);  // Version
+    ShaderFile.PutInt(uint64_as_uint32(shaderInfo.m_nTotalShaderCombos));
+    ShaderFile.PutInt(uint64_as_uint32(shaderInfo.m_nDynamicCombos));
+    ShaderFile.PutUnsignedInt(shaderInfo.m_Flags);
+    ShaderFile.PutUnsignedInt(shaderInfo.m_CentroidMask);
+    ShaderFile.PutUnsignedInt(StaticComboHeaders.Count());
+    ShaderFile.PutUnsignedInt(crc32);
 
-  // static combo dictionary
-  intp nDictionaryOffset = ShaderFile.TellPut();
+    // static combo dictionary
+    nDictionaryOffset = ShaderFile.TellPut();
 
-  // we will re write this one we know the offsets
-  // dummy write, 8 bytes per static combo
-  ShaderFile.Put(StaticComboHeaders.Base(),
-                 sizeof(StaticComboRecord_t) * StaticComboHeaders.Count());
+    // we will re write this one we know the offsets
+    // dummy write, 8 bytes per static combo
+    ShaderFile.Put(StaticComboHeaders.Base(),
+                   sizeof(StaticComboRecord_t) * StaticComboHeaders.Count());
 
-  ShaderFile.PutUnsignedInt(duplicateCombos.Count());
-  // now, write out all duplicate header records
-  // sort duplicate combo records for binary search
-  duplicateCombos.Sort(CompareDupComboIndices);
+    ShaderFile.PutUnsignedInt(duplicateCombos.Count());
+    // now, write out all duplicate header records
+    // sort duplicate combo records for binary search
+    duplicateCombos.Sort(CompareDupComboIndices);
 
-  for (auto &c : duplicateCombos) {
-    ShaderFile.PutUnsignedInt(c.m_nStaticComboID);
-    ShaderFile.PutUnsignedInt(c.m_nSourceStaticCombo);
-  }
+    for (auto &c : duplicateCombos) {
+      ShaderFile.PutUnsignedInt(c.m_nStaticComboID);
+      ShaderFile.PutUnsignedInt(c.m_nSourceStaticCombo);
+    }
 
-  // now, write out all static combos
-  for (auto &SRec : StaticComboHeaders) {
-    SRec.m_nFileOffset = ShaderFile.TellPut();
-    if (SRec.m_nStaticComboID != 0xffffffff)  // sentinel key?
-    {
-      CStaticCombo *pStatic = pByteCodeArray->FindByKey(SRec.m_nStaticComboID);
-      Assert(pStatic);
+    // now, write out all static combos
+    for (auto &SRec : StaticComboHeaders) {
+      SRec.m_nFileOffset = ShaderFile.TellPut();
+      if (SRec.m_nStaticComboID != 0xffffffff)  // sentinel key?
+      {
+        CStaticCombo *pStatic =
+            pByteCodeArray->FindByKey(SRec.m_nStaticComboID);
+        Assert(pStatic);
 
-      // Put the packed chunk of code for this static combo
-      if (size_t nPackedLen = pStatic->m_abPackedCode.GetLength())
-        ShaderFile.Put(pStatic->m_abPackedCode.GetData(), nPackedLen);
+        // Put the packed chunk of code for this static combo
+        if (size_t nPackedLen = pStatic->m_abPackedCode.GetLength())
+          ShaderFile.Put(pStatic->m_abPackedCode.GetData(), nPackedLen);
 
-      ShaderFile.PutInt(0xffffffff);  // end of dynamic combos
+        ShaderFile.PutInt(0xffffffff);  // end of dynamic combos
+      }
     }
   }
-  ShaderFile.Close();
 
   //
   // Re-writing the combo header
@@ -809,6 +813,8 @@ void WriteShaderFiles(
       exit(rc);
     }
 
+    RunCodeAtScopeExit(fclose(Handle));
+
     _fseeki64(Handle, nDictionaryOffset, SEEK_SET);
 
     // now, rewrite header. data is already byte-swapped appropriately
@@ -816,8 +822,6 @@ void WriteShaderFiles(
       fwrite(&(c.m_nStaticComboID), 4, 1, Handle);
       fwrite(&(c.m_nFileOffset), 4, 1, Handle);
     }
-
-    fclose(Handle);
   }
 
   // Finalize, free memory
