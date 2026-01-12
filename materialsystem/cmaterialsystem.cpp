@@ -4556,6 +4556,7 @@ void CMaterialSystem::ScanDirForReplacements( const char *pszPathName )
 
 	FileFindHandle_t FindHandle = FILESYSTEM_INVALID_FIND_HANDLE;
 	const char *pFindFileName = g_pFullFileSystem->FindFirst( szBaseName, &FindHandle );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( FindHandle ));
 	
 	char szNextBaseName[ MAX_PATH ];
 	while ( !Q_isempty( pFindFileName ) )
@@ -4573,9 +4574,6 @@ void CMaterialSystem::ScanDirForReplacements( const char *pszPathName )
 
 		pFindFileName = g_pFullFileSystem->FindNext( FindHandle );
 	}
-
-	g_pFullFileSystem->FindClose( FindHandle );
-
 }
 
 void CMaterialSystem::InitReplacementsFromFile( const char *pszPathName )
