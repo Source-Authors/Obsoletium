@@ -726,8 +726,8 @@ void CChoreoScene::ParseEdgeInfo( ISceneTokenProcessor *tokenizer, EdgeInfo_t *e
 	edgeinfo->m_bActive = true;
 	edgeinfo->m_CurveType = Interpolator_CurveTypeForName( tokenizer->CurrentToken() );
 	tokenizer->GetToken( false );
-	// dimhotepus: atof -> strtof.
-	edgeinfo->m_flZeroPos = strtof( tokenizer->CurrentToken(), nullptr );
+	// dimhotepus: atof -> atof.
+	edgeinfo->m_flZeroPos = V_atof( tokenizer->CurrentToken() );
 	tokenizer->GetToken( true );
 }
 
@@ -842,11 +842,11 @@ void CChoreoScene::ParseFlexAnimations( ISceneTokenProcessor *tokenizer, CChoreo
 		if ( !Q_stricmp( tokenizer->CurrentToken(), "range" ) )
 		{
 			tokenizer->GetToken( false );
-			// dimhotepus: atof -> strtof.
-			range_min = strtof( tokenizer->CurrentToken(), nullptr );
+			// dimhotepus: atof -> V_atof.
+			range_min = V_atof( tokenizer->CurrentToken() );
 			tokenizer->GetToken( false );
-			// dimhotepus: atof -> strtof.
-			range_max = strtof( tokenizer->CurrentToken(), nullptr );
+			// dimhotepus: atof -> V_atof.
+			range_max = V_atof( tokenizer->CurrentToken() );
 			tokenizer->GetToken( true );
 		}
 		
@@ -882,9 +882,11 @@ void CChoreoScene::ParseFlexAnimations( ISceneTokenProcessor *tokenizer, CChoreo
 				if ( !Q_stricmp( tokenizer->CurrentToken(), "}" ) )
 					break;
 				
-				float time = strtof(tokenizer->CurrentToken(), nullptr);
+				// dimhotepus: atof -> V_atof
+				float time = V_atof(tokenizer->CurrentToken());
 				tokenizer->GetToken( false );
-				float value = strtof(tokenizer->CurrentToken(), nullptr);
+				// dimhotepus: atof -> V_atof
+				float value = V_atof(tokenizer->CurrentToken());
 				
 				// Add to counter
 				CExpressionSample *s = &samples[ samplecount ][ samples[ samplecount ].AddToTail() ];
@@ -1009,11 +1011,13 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 			float start, end = 1.0f;
 
 			m_pTokenizer->GetToken( false );
-			start = strtof(m_pTokenizer->CurrentToken(), nullptr);
+			// dimhotepus: atof -> V_atof
+			start = V_atof(m_pTokenizer->CurrentToken());
 			if ( m_pTokenizer->TokenAvailable() )
 			{
 				m_pTokenizer->GetToken( false );
-				end = strtof(m_pTokenizer->CurrentToken(), nullptr);
+				// dimhotepus: atof -> V_atof
+				end = V_atof(m_pTokenizer->CurrentToken());
 			}
 
 			e->SetStartTime( start );
@@ -1024,16 +1028,19 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 			hadramp = true;
 
 			m_pTokenizer->GetToken( false );
-			attack = strtof(m_pTokenizer->CurrentToken(), nullptr);
+			// dimhotepus: atof -> V_atof
+			attack = V_atof(m_pTokenizer->CurrentToken());
 			if ( m_pTokenizer->TokenAvailable() )
 			{
 				m_pTokenizer->GetToken( false );
-				sustain = strtof(m_pTokenizer->CurrentToken(), nullptr);
+				// dimhotepus: atof -> V_atof
+				sustain = V_atof(m_pTokenizer->CurrentToken());
 			}
 			if ( m_pTokenizer->TokenAvailable() )
 			{
 				m_pTokenizer->GetToken( false );
-				decay = strtof(m_pTokenizer->CurrentToken(), nullptr);
+				// dimhotepus: atof -> V_atof
+				decay = V_atof(m_pTokenizer->CurrentToken());
 			}
 		}
 		else if ( !Q_stricmp( m_pTokenizer->CurrentToken(), "param" ) )
@@ -1131,7 +1138,8 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 
 				Q_strncpy( tagname, m_pTokenizer->CurrentToken(), sizeof( tagname ) );
 				m_pTokenizer->GetToken( false );
-				percentage = strtof(m_pTokenizer->CurrentToken(), nullptr);
+				// dimhotepus: atof -> V_atof
+				percentage = V_atof(m_pTokenizer->CurrentToken());
 
 				e->AddRelativeTag( tagname, percentage );
 			}
@@ -1141,7 +1149,8 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 			float duration = 0.0f;
 
 			m_pTokenizer->GetToken( false );
-			duration = strtof(m_pTokenizer->CurrentToken(), nullptr);
+			// dimhotepus: atof -> V_atof
+			duration = V_atof(m_pTokenizer->CurrentToken());
 
 			e->SetGestureSequenceDuration( duration );
 		}
@@ -1183,7 +1192,8 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 
 				Q_strncpy( tagname, m_pTokenizer->CurrentToken(), sizeof( tagname ) );
 				m_pTokenizer->GetToken( false );
-				t = strtof(m_pTokenizer->CurrentToken(), nullptr);
+				// dimhotepus: atof -> V_atof
+				t = V_atof(m_pTokenizer->CurrentToken());
 
 				e->AddAbsoluteTag( tagtype, tagname, t );
 			}
@@ -1216,7 +1226,8 @@ CChoreoEvent *CChoreoScene::ParseEvent( CChoreoActor *actor, CChoreoChannel *cha
 
 				Q_strncpy( tagname, m_pTokenizer->CurrentToken(), sizeof( tagname ) );
 				m_pTokenizer->GetToken( false );
-				percentage = strtof(m_pTokenizer->CurrentToken(), nullptr);
+				// dimhotepus: atof -> V_atof
+				percentage = V_atof(m_pTokenizer->CurrentToken());
 
 				m_pTokenizer->GetToken( false );
 				locked = atoi( m_pTokenizer->CurrentToken() ) ? true : false;
