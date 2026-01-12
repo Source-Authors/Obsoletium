@@ -22,8 +22,9 @@ MSVC_DISABLE_WARNING(4996)  // GetVersionExA deprecated.
 #include <spddkhlp.h>
 MSVC_END_WARNING_OVERRIDE_SCOPE()
 
-// ATL Header Files
-#include <atlbase.h>
+#include <atlconv.h>
+
+#include "com_ptr.h"
 
 // Extract phoneme grammar id
 #define EP_GRAM_ID			101
@@ -465,15 +466,16 @@ SR_RESULT ExtractPhonemes( const char *wavname, CSpDynamicString& text, CSentenc
 	
 	CUtlVector < WORDRULETYPE > wordRules;
 
-	CComPtr<ISpStream> cpInputStream;
-	CComPtr<ISpRecognizer> cpRecognizer;
-	CComPtr<ISpRecoContext> cpRecoContext;
-	CComPtr<ISpRecoGrammar> cpRecoGrammar;
-	CComPtr<ISpPhoneConverter>  cpPhoneConv;
+	// dimhotepus: Use our own com ptr.
+	se::win::com::com_ptr<ISpStream> cpInputStream;
+	se::win::com::com_ptr<ISpRecognizer> cpRecognizer;
+	se::win::com::com_ptr<ISpRecoContext> cpRecoContext;
+	se::win::com::com_ptr<ISpRecoGrammar> cpRecoGrammar;
+	se::win::com::com_ptr<ISpPhoneConverter>  cpPhoneConv;
  
 	// Create basic SAPI stream object
 	// NOTE: The helper SpBindToFile can be used to perform the following operations
-	HRESULT hr = cpInputStream.CoCreateInstance(CLSID_SpStream);
+	HRESULT hr = cpInputStream.CreateInstance(CLSID_SpStream);
 	if ( FAILED( hr ) )
 	{
 		pfnPrint( "Error:  SAPI 0x%x Stream object not installed?\n", _SAPI_VER );
@@ -496,9 +498,9 @@ SR_RESULT ExtractPhonemes( const char *wavname, CSpDynamicString& text, CSentenc
 		pfnPrint( "Error: couldn't open wav file %s\n", wavname );
 		return result;
 	}
-	
+
 	// Create in-process speech recognition engine
-	hr = cpRecognizer.CoCreateInstance(CLSID_SpInprocRecognizer);
+	hr = cpRecognizer.CreateInstance(CLSID_SpInprocRecognizer);
 	if ( FAILED( hr ) )
 	{
 		pfnPrint( "Error:  SAPI 0x%x In process recognizer object not installed?\n", _SAPI_VER );
@@ -755,8 +757,7 @@ SR_RESULT ExtractPhonemes( const char *wavname, CSpDynamicString& text, CSentenc
 			case SPEI_RECOGNITION:
 			case SPEI_FALSE_RECOGNITION:
 				{
-                    CComPtr<ISpRecoResult> cpResult;
-                    cpResult = spEvent.RecoResult();
+					se::win::com::com_ptr<ISpRecoResult> cpResult{spEvent.RecoResult()};
 
                     CSpDynamicString dstrText;
                     if (spEvent.eEventId == SPEI_FALSE_RECOGNITION)
@@ -782,8 +783,6 @@ SR_RESULT ExtractPhonemes( const char *wavname, CSpDynamicString& text, CSentenc
 
 						pfnPrint( va( "%s%s\r\n", spEvent.eEventId == SPEI_HYPOTHESIS ? "[ Hypothesis ] " : "", dstrText.CopyToChar() ) );
 					}
-                    
-                    cpResult.Release();
 				}
 				break;
 				// end of the wav file was reached by the speech recognition engine
