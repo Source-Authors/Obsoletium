@@ -7914,6 +7914,8 @@ void PhonemeEditor::LoadPhonemeConverters()
 	// Enumerate modules under bin folder of exe
 	FileFindHandle_t findHandle;
 	const char *pFilename = filesystem->FindFirstEx( "phonemeextractors/*" DLL_EXT_STRING, "EXECUTABLE_PATH", &findHandle );
+	RunCodeAtScopeExit(filesystem->FindClose( findHandle ));
+
 	while( pFilename )
 	{	
 		char fullpath[ 512 ];
@@ -7949,8 +7951,6 @@ void PhonemeEditor::LoadPhonemeConverters()
 		g_Extractors.AddToTail( e );
 		pFilename = filesystem->FindNext( findHandle );
 	}
-
-	filesystem->FindClose( findHandle );
 }
 
 void PhonemeEditor::ValidateSpeechAPIIndex()

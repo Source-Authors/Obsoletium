@@ -1771,6 +1771,7 @@ void BuildRecursiveFileList(const char *pcDirName, CUtlStringList &fileList) {
 
   char const *pcResult =
       g_pFullFileSystem->FindFirst(szDirWildcard, &findHandle);
+  RunCodeAtScopeExit(g_pFullFileSystem->FindClose(findHandle));
 
   if (pcResult) {
     do {
@@ -1796,8 +1797,6 @@ void BuildRecursiveFileList(const char *pcDirName, CUtlStringList &fileList) {
       pcResult = g_pFullFileSystem->FindNext(findHandle);
 
     } while (pcResult);
-
-    g_pFullFileSystem->FindClose(findHandle);
   }
 }
 

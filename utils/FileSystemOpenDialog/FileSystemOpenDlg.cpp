@@ -275,8 +275,10 @@ void CFileSystemOpenDlg::GetEntries( const char *pMask, CUtlVector<CString> &ent
 	if ( searchStr == ".\\*.*" )
 		searchStr = "*.*";
 	
-	FileFindHandle_t handle;	
+	FileFindHandle_t handle;
 	const char *pFile = m_pFileSystem->FindFirst( searchStr, &handle );
+	RunCodeAtScopeExit(m_pFileSystem->FindClose( handle ));
+
 	while ( pFile )
 	{
 		bool bIsDir = m_pFileSystem->FindIsDirectory( handle );
@@ -287,7 +289,6 @@ void CFileSystemOpenDlg::GetEntries( const char *pMask, CUtlVector<CString> &ent
 
 		pFile = m_pFileSystem->FindNext( handle );
 	}
-	m_pFileSystem->FindClose( handle );
 }
 
 

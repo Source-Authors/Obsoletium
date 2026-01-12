@@ -659,6 +659,8 @@ void CExpClass::CheckBitmapConsistency( void )
 
 	FileFindHandle_t hFindFile;
 	char const *fn = filesystem->FindFirstEx( path, "MOD", &hFindFile );
+	RunCodeAtScopeExit(filesystem->FindClose( hFindFile ));
+
 	if ( fn )
 	{
 		while ( fn )
@@ -668,14 +670,10 @@ void CExpClass::CheckBitmapConsistency( void )
 			{
 				CUtlString s = fn;
 				workList.AddToTail( s );
-
-				
 			}
 
 			fn = filesystem->FindNext( hFindFile );
 		}
-
-		filesystem->FindClose( hFindFile );
 	}
 
 	CUtlRBTree< CRC32_t > tree( 0, 0, DefLessFunc( CRC32_t ) );

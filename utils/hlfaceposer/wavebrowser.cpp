@@ -716,6 +716,8 @@ bool CWaveBrowser::LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& sound
 
 	FileFindHandle_t findHandle;
 	const char *pFileName = filesystem->FindFirst( pWildCard, &findHandle );
+	RunCodeAtScopeExit(filesystem->FindClose( findHandle ));
+
 	while( pFileName )
 	{
 		if( !filesystem->FindIsDirectory( findHandle ) )
@@ -741,8 +743,6 @@ bool CWaveBrowser::LoadWaveFilesInDirectory( CUtlDict< CWaveFile *, int >& sound
 	}
 
 	m_pFileTree->FindOrAddSubdirectory( &pDirectoryName[ SOUND_PREFIX_LEN ] );
-
-	filesystem->FindClose( findHandle );
 	return true;
 }
 

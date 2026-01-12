@@ -6102,6 +6102,8 @@ void CChoreoView::LoadNext( void )
 
 		FileFindHandle_t hFindFile;
 		char const *fn = filesystem->FindFirstEx( path, "MOD", &hFindFile );
+		RunCodeAtScopeExit(filesystem->FindClose( hFindFile ));
+
 		if ( fn )
 		{
 			while ( fn )
@@ -6115,8 +6117,6 @@ void CChoreoView::LoadNext( void )
 
 				fn = filesystem->FindNext( hFindFile );
 			}
-
-			filesystem->FindClose( hFindFile );
 		}
 	}
 

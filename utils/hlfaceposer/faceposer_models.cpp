@@ -477,6 +477,7 @@ void IFaceposerModels::CFacePoserModel::ReconcileAnimationBitmaps()
 	FileFindHandle_t hFindFile;
 
 	char const *fn = filesystem->FindFirstEx( path, "MOD", &hFindFile );
+	RunCodeAtScopeExit(filesystem->FindClose( hFindFile ));
 
 	g_pProgressDialog->Start( CFmtStr( "%s - Reconcile Animation Thumbnails", GetShortModelName() ), "", true );
 
@@ -495,8 +496,6 @@ void IFaceposerModels::CFacePoserModel::ReconcileAnimationBitmaps()
 
 			fn = filesystem->FindNext( hFindFile );
 		}
-
-		filesystem->FindClose( hFindFile );
 	}
 
 	CUtlRBTree< CRC32_t > tree( 0, 0, DefLessFunc( CRC32_t ) );

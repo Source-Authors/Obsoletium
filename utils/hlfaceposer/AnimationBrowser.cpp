@@ -1181,6 +1181,8 @@ void AnimationBrowser::FindCustomFiles( char const *subdir, CUtlVector< FileName
 
 	FileFindHandle_t findHandle;
 	const char *pFileName = filesystem->FindFirst( search, &findHandle );
+	RunCodeAtScopeExit(filesystem->FindClose( findHandle ));
+
 	while( pFileName )
 	{
 		if( !filesystem->FindIsDirectory( findHandle ) )
@@ -1189,14 +1191,11 @@ void AnimationBrowser::FindCustomFiles( char const *subdir, CUtlVector< FileName
 			char fn[ 512 ];
 			Q_snprintf( fn, sizeof( fn ), "%s/%s", subdir, pFileName );
 
-			FileNameHandle_t fh;
-			fh = filesystem->FindOrAddFileName( fn );
+			FileNameHandle_t fh = filesystem->FindOrAddFileName( fn );
 			files.AddToTail( fh );
 		}
 		pFileName = filesystem->FindNext( findHandle );
 	}
-
-	filesystem->FindClose( findHandle );
 }
 
 void AnimationBrowser::PurgeCustom()

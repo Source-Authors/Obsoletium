@@ -495,6 +495,8 @@ bool CVCDBrowser::LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CN
 
 	FileFindHandle_t findHandle;
 	const char *pFileName = filesystem->FindFirst( pWildCard, &findHandle );
+	RunCodeAtScopeExit(filesystem->FindClose( findHandle ));
+
 	while( pFileName )
 	{
 		if( !filesystem->FindIsDirectory( findHandle ) )
@@ -515,7 +517,6 @@ bool CVCDBrowser::LoadVCDsFilesInDirectory( CUtlSortVector< FileNameHandle_t, CN
 
 	m_pFileTree->FindOrAddSubdirectory( &pDirectoryName[ SCENES_PREFIX_LEN ] );
 
-	filesystem->FindClose( findHandle );
 	return true;
 }
 
