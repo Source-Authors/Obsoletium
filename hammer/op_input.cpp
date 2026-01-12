@@ -209,7 +209,7 @@ void COP_Input::AddEntityConnections(const char *pTargetName, CMapEntity *pTestE
 	if (nConnCount != 0)
 	{
 		int nItemCount = m_ListCtrl.GetItemCount();	
-		m_ListCtrl.SetItemCount(nItemCount + nConnCount);
+		m_ListCtrl.SetItemCount(size_cast<int>(nItemCount + nConnCount));
 
 		for (intp i = 0; i < nConnCount; i++)
 		{

@@ -408,7 +408,7 @@ void COPTConfigs::OnSelchangeConfigurations(void)
 
 	// load info from newly selected config into controls
 	int iCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
+	CGameConfig *pConfig = Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
 
 	BOOL bKillFields = FALSE;
 	if (pConfig == NULL)
@@ -550,7 +550,7 @@ void UpdateConfigList(CComboBox &combo)
 	DWORD dwSelID = 0xffffffff;
 	if (iCurSel != CB_ERR)
 	{
-		dwSelID = static_cast<DWORD>(combo.GetItemData(iCurSel));
+		dwSelID = size_cast<DWORD>(combo.GetItemData(iCurSel));
 	}
 
 	combo.ResetContent();
@@ -573,7 +573,7 @@ void UpdateConfigList(CComboBox &combo)
 	int nSelIndex = -1;
 	for (int i = 0; i < Options.configs.nConfigs; i++)
 	{
-		DWORD dwData = static_cast<DWORD>(combo.GetItemData(i));
+		DWORD dwData = size_cast<DWORD>(combo.GetItemData(i));
 		if (dwData == dwSelID)
 		{
 			nSelIndex = i;
@@ -600,7 +600,7 @@ void SelectActiveConfig(CComboBox &combo)
 			int nCount = combo.GetCount();
 			for (int i = 0; i < nCount; i++)
 			{
-				DWORD dwData = static_cast<DWORD>(combo.GetItemData(i));
+				DWORD dwData = size_cast<DWORD>(combo.GetItemData(i));
 				if (pConfig->dwID == dwData)
 				{
 					nSelIndex = i;
@@ -663,7 +663,7 @@ BOOL COPTConfigs::OnInitDialog(void)
 	UpdateConfigList();
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	m_pInitialSelectedConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
+	m_pInitialSelectedConfig = Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
 
 	m_strInitialGameDir.Empty();
 	if (m_pInitialSelectedConfig)
@@ -706,7 +706,7 @@ BOOL COPTConfigs::OnApply(void)
 	SaveInfo(m_pLastSelConfig);
 
 	int nCurSel = m_cConfigs.GetCurSel();
-	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
+	CGameConfig *pConfig = Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(nCurSel)));
 
 	if ( pConfig != NULL && ConfigChanged( pConfig ) )
 	{

@@ -107,9 +107,9 @@ bool COP_Flags::SaveData(void)
 			{
 				CheckListItem currentItem = m_CheckListItems.Element( i );
 				// don't save tri-stated bit
-				if ( m_CheckList.GetCheck(i) != 2 )
+				if ( int check = m_CheckList.GetCheck(size_cast<int>(i)); check != 2 )
 				{
-					pEdit->SetSpawnFlag( currentItem.nItemBit, m_CheckList.GetCheck(i) ? TRUE : FALSE );
+					pEdit->SetSpawnFlag( currentItem.nItemBit, check ? TRUE : FALSE );
 				}
 			}
 		}

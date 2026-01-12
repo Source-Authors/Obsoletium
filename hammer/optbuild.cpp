@@ -143,7 +143,7 @@ void COPTBuild::OnSelchangeConfigs()
 		return;
 
 	// get pointer to the configuration
-	m_pConfig = Options.configs.FindConfig(static_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
+	m_pConfig = Options.configs.FindConfig(size_cast<DWORD>(m_cConfigs.GetItemData(iCurSel)));
 
 	// update dialog data
 	EditorUtil_TransferPath(this, IDC_BSP, m_pConfig->szBSP, false);

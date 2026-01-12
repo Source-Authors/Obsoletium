@@ -189,7 +189,7 @@ BOOL CObjectBar::GetPrefabBounds(BoundBox *pBox)
 //-----------------------------------------------------------------------------
 CPrefab* CObjectBar::FindPrefabByName( const char *pName )
 {
-	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( m_CategoryList.GetItemData(m_CategoryList.GetCurSel() ) );
+	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( size_cast<DWORD>( m_CategoryList.GetItemData(m_CategoryList.GetCurSel() ) ) );
 	if ( pLibrary )
 	{
 		POSITION p = ENUM_START;
@@ -658,7 +658,7 @@ void CObjectBar::LoadPrefabItems( void )
 	CUtlVector<CString> suggestions;
 	
 	// get the active library and add the prefabs from it
-	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( static_cast<DWORD>( m_CategoryList.GetItemData(m_CategoryList.GetCurSel() ) ) );
+	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID( size_cast<DWORD>( m_CategoryList.GetItemData(m_CategoryList.GetCurSel() ) ) );
 	
 	POSITION p = ENUM_START;
 	CPrefab *pPrefab = pLibrary->EnumPrefabs( p );
@@ -841,7 +841,7 @@ void CObjectBar::OnTextChanged( const char *pSelection )
 
 		case listEntities:
 		{
-			_iNewObjIndex = FindGameDataClass( pSelection );
+			_iNewObjIndex = size_cast<int>( FindGameDataClass( pSelection ) );
 			Assert( _iNewObjIndex != -1 );
 			if ( _iNewObjIndex != -1 )
 			{
@@ -859,7 +859,7 @@ void CObjectBar::OnTextChanged( const char *pSelection )
 
 	int nSolidIndex = _iNewObjIndex;
 
-	m_FacesSpin.SetRange(SolidTypes[nSolidIndex].nFacesMin, SolidTypes[nSolidIndex].nFacesMax);
+	m_FacesSpin.SetRange(size_cast<short>(SolidTypes[nSolidIndex].nFacesMin), size_cast<short>(SolidTypes[nSolidIndex].nFacesMax));
 	m_FacesSpin.SetPos(SolidTypes[nSolidIndex].nFaces);
 	
 	itoa(SolidTypes[nSolidIndex].nFaces, szBuf, 10);

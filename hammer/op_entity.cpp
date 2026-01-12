@@ -1307,7 +1307,7 @@ void COP_Entity::PresentProperties()
 			//
 			if (strcmpi(pVar->GetName(), SPAWNFLAGS_KEYNAME) != 0)
 			{
-				int iItem = m_VarList.InsertItem( i, pVar->GetLongName() );
+				int iItem = m_VarList.InsertItem( size_cast<int>(i), pVar->GetLongName() );
 				m_VarList.SetItemData( iItem, (DWORD_PTR)pVar->GetName() );
 			}
 		}

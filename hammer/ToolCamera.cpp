@@ -413,7 +413,7 @@ void Camera3D::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 
 	// dimhotepus: Ensure not overflow in DEBUG.
 	Assert(Cameras.Count() <= INT_MAX);
-	int nCameras = static_cast<int>(Cameras.Count());
+	int nCameras = size_cast<int>(Cameras.Count());
 
 	if(fIsStoring)
 	{
@@ -463,7 +463,7 @@ ChunkFileResult_t Camera3D::SaveVMF(CChunkFile *pFile, CSaveInfo *pSaveInfo)
 	ChunkFileResult_t eResult = pFile->BeginChunk( GetVMFChunkName() );
 	if (eResult == ChunkFile_Ok)
 	{
-		eResult = pFile->WriteKeyValueInt("activecamera", m_iActiveCamera);
+		eResult = pFile->WriteKeyValueInt("activecamera", size_cast<int>(m_iActiveCamera));
 	}
 	
 	if (eResult == ChunkFile_Ok)

@@ -566,7 +566,7 @@ void CMapSideList::Render3D(CRender3D *pRender)
 	CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 	IMesh* pMesh = pRenderContext->GetDynamicMesh();
 
-	meshBuilder.Begin(pMesh, MATERIAL_LINES, m_Faces.Count());
+	meshBuilder.Begin(pMesh, MATERIAL_LINES, size_cast<int>(m_Faces.Count()));
 
 	for (int i = 0; i < m_Faces.Count(); i++)
 	{

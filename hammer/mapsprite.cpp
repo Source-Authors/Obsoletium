@@ -503,13 +503,13 @@ void CMapSprite::SpriteColor(unsigned char *pColor, int eRenderMode, colorVec Re
 	
 	if ((RenderColor.r == 0) && (RenderColor.g == 0) && (RenderColor.b == 0))
 	{
-		pColor[0] = pColor[1] = pColor[2] = (255 * a) >> 8;
+		pColor[0] = pColor[1] = pColor[2] = size_cast<byte>((255 * a) >> 8);
 	}
 	else
 	{
-		pColor[0] = ((int)RenderColor.r * a)>>8;
-		pColor[1] = ((int)RenderColor.g * a)>>8;
-		pColor[2] = ((int)RenderColor.b * a)>>8;
+		pColor[0] = size_cast<byte>(((int)RenderColor.r * a)>>8);
+		pColor[1] = size_cast<byte>(((int)RenderColor.g * a)>>8);
+		pColor[2] = size_cast<byte>(((int)RenderColor.b * a)>>8);
 	}
 }
 

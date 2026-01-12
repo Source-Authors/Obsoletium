@@ -1003,7 +1003,7 @@ NoData:
 		// draw name
 		char szShortName[MAX_PATH];
 		intp iLen = static_cast<IEditorTexture*>(this)->GetShortName(szShortName);
-		pDC->TextOut(rect.left, rect.bottom - (iFontHeight + 4), szShortName, iLen);
+		pDC->TextOut(rect.left, rect.bottom - (iFontHeight + 4), szShortName, size_cast<int>(iLen));
 
 		// draw usage count
 		if (DrawTexData.nFlags & drawUsageCount)

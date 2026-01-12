@@ -250,7 +250,7 @@ bool RunCommands(CCommandArray& Commands, LPCTSTR pszOrigDocName, CWnd *parent)
 	s_bRunsCommands = true;
 
 	char szCurDir[MAX_PATH];
-	if ( !_getcwd(szCurDir, ssize(szCurDir)) )
+	if ( !_getcwd(szCurDir, size_cast<int>(ssize(szCurDir))) )
 	{
 		// dimhotepus: Add warning when current directory unavailable.
 		Warning( "Unable to get current directory: %s\n",

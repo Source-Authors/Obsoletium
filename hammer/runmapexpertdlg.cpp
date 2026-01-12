@@ -634,8 +634,8 @@ void CRunMapExpertDlg::OnSelchangeConfigurations()
 	for(intp i = 0; i < Commands.GetSize(); i++)
 	{
 		PCCOMMAND pCommand = new CCOMMAND(Commands[i]);
-		AddCommand(i, pCommand);
-		m_cCommandList.SetCheck(i, pCommand->bEnable);
+		AddCommand(size_cast<int>(i), pCommand);
+		m_cCommandList.SetCheck(size_cast<int>(i), pCommand->bEnable);
 	}
 
 	// set to 0th element in list ..

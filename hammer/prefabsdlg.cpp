@@ -286,7 +286,7 @@ void CPrefabsDlg::OnRemoveobject()
 	CPrefabLibrary *pLibrary = GetCurrentLibrary();
 	while(iIndex != -1)
 	{
-		CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iIndex)));
+		CPrefab *pPrefab = CPrefab::FindID(size_cast<DWORD>(m_Objects.GetItemData(iIndex)));
 		if(pPrefab)
 		{
 			// delete it
@@ -325,7 +325,7 @@ void CPrefabsDlg::OnExportobject()
 	int iIndex = m_Objects.GetNextItem(-1, LVNI_SELECTED);
 	while(iIndex != -1)
 	{
-		CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iIndex)));
+		CPrefab *pPrefab = CPrefab::FindID(size_cast<DWORD>(m_Objects.GetItemData(iIndex)));
 		if(pPrefab)
 		{
 			// export it
@@ -368,7 +368,7 @@ void CPrefabsDlg::SetCurObject(int iItem)
 	}
 
 	// update data..
-	CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iCurObject)));
+	CPrefab *pPrefab = CPrefab::FindID(size_cast<DWORD>(m_Objects.GetItemData(iCurObject)));
 	Assert(pPrefab);
 
 	m_ObjectNotes.SetWindowText(pPrefab->GetNotes());
@@ -400,7 +400,7 @@ CPrefabLibrary *CPrefabsDlg::GetCurrentLibrary(int *piSel)
 	int iSel = m_Libraries.GetCurSel();
 	if(iSel == CB_ERR)
 		return NULL;
-	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID(static_cast<DWORD>(
+	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID(size_cast<DWORD>(
 		m_Libraries.GetItemData(iSel)));
 
 	if(piSel)
@@ -416,7 +416,7 @@ CPrefab *CPrefabsDlg::GetCurrentObject(int *piSel)
 	int iSel = iCurObject;
 	if(iSel == -1)
 		return NULL;
-	CPrefab *pPrefab= CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(iSel)));
+	CPrefab *pPrefab= CPrefab::FindID(size_cast<DWORD>(m_Objects.GetItemData(iSel)));
 
 	if(piSel)
 		piSel[0] = iSel;
@@ -428,7 +428,7 @@ void CPrefabsDlg::OnSelchangeLibraries()
 {
 	// get last library
 	CPrefabLibrary *pLibrary = CPrefabLibrary::FindID(
-		static_cast<DWORD>(m_Libraries.GetItemData(iCurLibrary)));
+		size_cast<DWORD>(m_Libraries.GetItemData(iCurLibrary)));
 
 	// save its index
 	if(bCurLibraryModified)
@@ -619,7 +619,7 @@ void CPrefabsDlg::OnEndlabeleditObjects(NMHDR* pNMHDR, LRESULT* pResult)
 	if(item.pszText == NULL)
 		return;
 
-	CPrefab *pPrefab = CPrefab::FindID(static_cast<DWORD>(m_Objects.GetItemData(item.iItem)));
+	CPrefab *pPrefab = CPrefab::FindID(size_cast<DWORD>(m_Objects.GetItemData(item.iItem)));
 	pPrefab->SetName(item.pszText);
 	m_Objects.SetItemText(item.iItem, 0, item.pszText);
 	bCurLibraryModified = TRUE;

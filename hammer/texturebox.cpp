@@ -446,7 +446,7 @@ LRESULT CTextureBox::OnSelectString(WPARAM wParam, LPARAM lParam)
 	LPCTSTR pszSelect = LPCTSTR(lParam);
 	int nCount = GetCount();
 	// dimhotepus: wParam is int here per https://learn.microsoft.com/en-us/windows/win32/controls/cb-selectstring spec.
-	for(int i = static_cast<int>(wParam) + 1; i < nCount; i++)
+	for(int i = size_cast<int>(wParam) + 1; i < nCount; i++)
 	{
 		IEditorTexture *pTex = (IEditorTexture *)GetItemDataPtr(i);
 		if (pTex != NULL)

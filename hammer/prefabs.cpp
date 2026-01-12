@@ -718,7 +718,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 		file << pLibHeader;
 		// write binary header (in case notes have changed)
 		PrefabLibraryHeader plh;
-		plh.dwNumEntries = Prefabs.GetCount();
+		plh.dwNumEntries = size_cast<DWORD>(Prefabs.GetCount());
 		plh.fVersion = fLibVersion;
 		plh.dwDirOffset = m_dwDirOffset;
 		V_strcpy_safe(plh.szNotes, szNotes);
@@ -790,7 +790,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 	// save current position so we can seek back and rewrite it
 	std::streampos dwBinaryHeaderOffset = file.tellp();
 	PrefabLibraryHeader plh;
-	plh.dwNumEntries = Prefabs.GetCount();
+	plh.dwNumEntries = size_cast<DWORD>(Prefabs.GetCount());
 	plh.fVersion = fLibVersion;
 	V_strcpy_safe(plh.szNotes, szNotes);
 	file.write((char*)&plh, sizeof plh);
@@ -808,7 +808,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 		CPrefabRMF *pPrefab = (CPrefabRMF *)Prefabs.GetNext(p);
 
 		// setup this dir entry
-		ph[iCur].dwOffset = file.tellp();
+		ph[iCur].dwOffset = size_cast<DWORD>(static_cast<std::streamoff>(file.tellp()));
 		V_strcpy_safe( ph[iCur].szName, pPrefab->GetName() );
 		V_strcpy_safe( ph[iCur].szNotes, pPrefab->GetNotes() );
 		ph[iCur].iType = pPrefab->GetType();
@@ -840,7 +840,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 
 		// set size info
 		ph[iCur].dwSize = pPrefab->dwFileSize = 
-			file.tellp() - (std::streamoff)ph[iCur].dwOffset;
+			size_cast<DWORD>(static_cast<std::streamoff>(file.tellp()) - static_cast<std::streamoff>(ph[iCur].dwOffset));
 
 		++iCur;	// increase current directory entry
 	}
@@ -849,7 +849,7 @@ int CPrefabLibraryRMF::Save(LPCTSTR pszFilename, BOOL bIndexOnly)
 	delete[] pCopyBuf;
 
 	// rewrite binary header
-	plh.dwDirOffset = m_dwDirOffset = file.tellp();
+	plh.dwDirOffset = m_dwDirOffset = size_cast<DWORD>(static_cast<std::streamoff>(file.tellp()));
 	file.seekp(dwBinaryHeaderOffset);
 	file.write((char*)&plh, sizeof(plh));
 	file.seekp(0, std::ios::end);
