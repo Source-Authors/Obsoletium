@@ -56,14 +56,12 @@ NewWinding
 */
 winding_t *NewWinding (int points)
 {
-	winding_t	*w;
-
 	if (points > MAX_POINTS_ON_WINDING)
 		Error ("NewWinding: %i points", points);
 
-	w = (winding_t *)malloc(sizeof(*w));
+	auto *w = static_cast<winding_t *>(malloc( sizeof(winding_t) ));
 	w->numpoints = 0; // None are occupied yet even though allocated.
-	w->p = (Vector *)calloc( points, sizeof(Vector) );
+	w->p = static_cast<Vector *>(calloc( points, sizeof(Vector) ));
 
 	return w;
 }
@@ -83,7 +81,7 @@ void FreeWinding (winding_t *w)
 	if (w->p)
 	{
 	    free (w->p);
-		w->p = NULL;
+		w->p = nullptr;
 	}
 	free (w);
 }
@@ -134,7 +132,7 @@ winding_t	*CopyWinding (winding_t *w)
 {
 	winding_t	*c = NewWinding (w->numpoints);
 	c->numpoints = w->numpoints;
-	int size = w->numpoints*sizeof(w->p[0]);
+	int size = w->numpoints * sizeof(w->p[0]);
 	memcpy (c->p, w->p, size);
 	return c;
 }
