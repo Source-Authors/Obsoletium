@@ -1079,7 +1079,7 @@ InitReturnVal_t CHammer::HammerInternalInit()
 		return INIT_FAILED;
 	}
 
-	srand(time(NULL));
+	srand(static_cast<unsigned>(time(NULL)));
 
 	WriteProfileString("General", "Directory", m_szAppDir);
 
@@ -1922,9 +1922,9 @@ void CHammer::SaveSequences(void)
 
 	// write out each sequence..
 	intp nSeq = m_CmdSequences.GetSize();
-	DWORD dwSize = nSeq;
+	DWORD dwSize = size_cast<DWORD>(nSeq);
 	file.write((char*)&dwSize, sizeof dwSize);
-	for(intp i = 0; i < nSeq; i++)
+	for(unsigned i = 0; i < dwSize; i++)
 	{
 		CCommandSequence *pSeq = m_CmdSequences[i];
 
@@ -1932,10 +1932,10 @@ void CHammer::SaveSequences(void)
 		file.write(pSeq->m_szName, std::size(pSeq->m_szName));
 		// write number of commands
 		intp nCmd = pSeq->m_Commands.GetSize();
-		dwSize = nCmd;
+		dwSize = size_cast<DWORD>(nCmd);
 		file.write((char*)&dwSize, sizeof dwSize);
 		// write commands .. 
-		for(intp iCmd = 0; iCmd < nCmd; iCmd++)
+		for(unsigned iCmd = 0; iCmd < dwSize; iCmd++)
 		{
 			const CCOMMAND &cmd = pSeq->m_Commands[iCmd];
 			file.write((char*)&cmd, sizeof cmd);

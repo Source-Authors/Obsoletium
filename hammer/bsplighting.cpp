@@ -521,7 +521,7 @@ void CBSPLighting::Draw()
 			for( auto *cmd : pBuf->m_DrawCommands )
 			{
 				pRenderContext->BindLightmapPage( cmd->m_LightmapPageID );
-				pBuf->m_pMesh->Draw( cmd->m_PrimLists.Base(), cmd->m_PrimLists.Count() );
+				pBuf->m_pMesh->Draw( cmd->m_PrimLists.Base(), size_cast<int>( cmd->m_PrimLists.Count() ) );
 			}
 		}
 	}

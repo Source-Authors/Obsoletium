@@ -103,5 +103,5 @@ BOOL CEditPrefabDlg::OnInitDialog()
 
 void CEditPrefabDlg::OnSelchangeCreatein() 
 {
-	m_dwLibraryID = static_cast<DWORD>(m_CreateIn.GetItemData(m_CreateIn.GetCurSel()));	
+	m_dwLibraryID = size_cast<DWORD>(m_CreateIn.GetItemData(m_CreateIn.GetCurSel()));	
 }

@@ -77,7 +77,7 @@ void CEditGameConfigs::OnCopy()
 	if(iCurSel == CB_ERR)
 		return;
 
-	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(
+	CGameConfig *pConfig = Options.configs.FindConfig(size_cast<DWORD>(
 		m_cConfigs.GetItemData(iCurSel)));
 
 	CGameConfig *pNewConfig = Options.configs.AddConfig();
@@ -93,12 +93,12 @@ void CEditGameConfigs::OnRemove()
 		return;
 
 	int iArrayIndex;
-	CGameConfig *pConfig = Options.configs.FindConfig(static_cast<DWORD>(
+	CGameConfig *pConfig = Options.configs.FindConfig(size_cast<DWORD>(
 		m_cConfigs.GetItemData(iCurSel)), &iArrayIndex);
 
 	// check to see if any docs use this game - if so, can't
 	//  delete it.
-	for ( int i=0; i<CMapDoc::GetDocumentCount(); i++ )
+	for ( intp i=0; i<CMapDoc::GetDocumentCount(); i++ )
 	{
 		CMapDoc *pDoc = CMapDoc::GetDocument(i);
 		if(pDoc->GetGame() == pConfig)
@@ -153,7 +153,7 @@ void CEditGameConfigs::FillConfigList(DWORD dwSelectID)
 	
 	if(m_cConfigs.GetCurSel() != LB_ERR && dwCurID == 0xFFFFFFFF)
 	{
-		dwCurID = static_cast<DWORD>(m_cConfigs.GetItemData(m_cConfigs.GetCurSel()));
+		dwCurID = size_cast<DWORD>(m_cConfigs.GetItemData(m_cConfigs.GetCurSel()));
 	}
 
 	m_cConfigs.ResetContent();
@@ -188,7 +188,7 @@ void CEditGameConfigs::OnSelchangeConfigs()
 	if(iCurSel == LB_ERR)
 		return;
 
-	m_pSelectedGame = Options.configs.FindConfig(static_cast<DWORD>(
+	m_pSelectedGame = Options.configs.FindConfig(size_cast<DWORD>(
 		m_cConfigs.GetItemData(iCurSel)));
 }
 

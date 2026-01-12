@@ -1128,7 +1128,7 @@ void CDispShoreManager::DrawShorelines( intp iShoreline )
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 		IMesh* pMesh = pRenderContext->GetDynamicMesh();
-		meshBuilder.Begin( pMesh, MATERIAL_LINES, ( nSegmentCount * 2 ) );
+		meshBuilder.Begin( pMesh, MATERIAL_LINES, size_cast<int>( nSegmentCount * 2 ) );
 
 		for ( intp iSegment = 0; iSegment < nSegmentCount; ++iSegment )
 		{
@@ -1170,7 +1170,7 @@ void CDispShoreManager::DrawShorelineNormals( intp iShoreline )
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( materials );
 		IMesh* pMesh = pRenderContext->GetDynamicMesh();
-		meshBuilder.Begin( pMesh, MATERIAL_LINES, ( nSegmentCount * 4 ) );
+		meshBuilder.Begin( pMesh, MATERIAL_LINES, size_cast<int>( nSegmentCount * 4 ) );
 
 		for ( intp iSegment = 0; iSegment < nSegmentCount; ++iSegment )
 		{

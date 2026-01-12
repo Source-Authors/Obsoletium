@@ -108,7 +108,7 @@ void CAutoSelComboBox::OnUpdateText(void)
 			// Found a match.
 			if ((nEditEnd == -1) || (nEditEnd == V_strlen(szTypedText)))
 			{
-				SetEditSel(V_strlen(szTypedText), -1);
+				SetEditSel(size_cast<int>(V_strlen(szTypedText)), -1);
 			}
 			else
 			{
