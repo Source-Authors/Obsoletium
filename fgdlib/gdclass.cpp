@@ -665,8 +665,8 @@ bool GDclass::ParseSize(TokenReader &tr)
 			return(false);
 		}
 
-		// dimhotepus: atof -> strtof.
-		m_bmins[i] = strtof(szToken, nullptr);
+		// dimhotepus: atof -> V_atof.
+		m_bmins[i] = V_atof(szToken);
 	}
 
 	if (tr.PeekTokenType(szToken) == OPERATOR && IsToken(szToken, ","))
@@ -685,8 +685,8 @@ bool GDclass::ParseSize(TokenReader &tr)
 			{
 				return(false);
 			}
-			// dimhotepus: atof -> strtof.
-			m_bmaxs[i] = strtof(szToken, nullptr);
+			// dimhotepus: atof -> V_atof.
+			m_bmaxs[i] = V_atof(szToken);
 		}
 	}
 	else
