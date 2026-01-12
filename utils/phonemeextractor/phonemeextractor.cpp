@@ -103,8 +103,15 @@ void EnumeratePhonemes( ISpPhoneConverter *converter, const ISpRecoResult* resul
 		return;
 
 	SPPHRASE *pElements;
-	if ( FAILED( phrase->GetPhrase( &pElements ) ) )
+	HRESULT hr{phrase->GetPhrase( &pElements )};
+	if ( FAILED( hr ) )
+	{
+		// dimhotepus: Dump info on failures.
+		Warning( "Unable to get phrase: 0x%x.\n", hr );
 		return;
+	}
+
+	RunCodeAtScopeExit(::CoTaskMemFree(pElements));
 
 	// Only use it if it's better/same size as what we already had on-hand
 	if ( pElements->Rule.ulCountOfElements > 0 )
@@ -142,9 +149,17 @@ void EnumeratePhonemes( ISpPhoneConverter *converter, const ISpRecoResult* resul
 				pstr[ 0 ] = phoneme;
 				wszPhoneme[ 0 ] = L'\0';
 
-				converter->IdToPhone( pstr, wszPhoneme );
-
-				total_weight += WeightForPhoneme( W2A( wszPhoneme ) );
+				hr = converter->IdToPhone( pstr, wszPhoneme );
+				if ( SUCCEEDED( hr ) )
+				{
+					// dimhotepus: Count only if success.
+					total_weight += WeightForPhoneme( W2A( wszPhoneme ) );
+				}
+				else
+				{
+					// dimhotepus: Dump info on failures.
+					Warning( "Missed phoneme for id %S: 0x%x.\n", pstr, hr );
+				}
 			}
 
 			current = pElements->pElements[i].pszPronunciation;
@@ -167,28 +182,33 @@ void EnumeratePhonemes( ISpPhoneConverter *converter, const ISpRecoResult* resul
 				pstr[ 0 ] = phoneme;
 				wszPhoneme[ 0 ] = L'\0';
 
-				converter->IdToPhone( pstr, wszPhoneme );
- 
-				auto *p = new CPhonemeTag( W2A( wszPhoneme ) );
-				Assert( p );
-				
-				float weight = WeightForPhoneme( W2A( wszPhoneme ) );
+				hr = converter->IdToPhone( pstr, wszPhoneme );
+				// dimhotepus: Only if success.
+				if ( SUCCEEDED( hr) )
+				{
+					auto *p = new CPhonemeTag( W2A( wszPhoneme ) );
+					Assert( p );
+					
+					float weight = WeightForPhoneme( W2A( wszPhoneme ) );
 
-				p->m_uiStartByte = wordstart + (unsigned)( startWeight * psize );
-				p->m_uiEndByte	 = p->m_uiStartByte + (unsigned)( psize * weight );
+					p->m_uiStartByte = wordstart + (unsigned)( startWeight * psize );
+					p->m_uiEndByte	 = p->m_uiStartByte + (unsigned)( psize * weight );
 
-				startWeight += weight;
+					startWeight += weight;
 
-				// Convert to IPA phoneme code
-				p->SetPhonemeCode( TextToPhoneme( p->GetTag() ) );
+					// Convert to IPA phoneme code
+					p->SetPhonemeCode( TextToPhoneme( p->GetTag() ) );
 
-				sentence.AddPhonemeTag( w, p );
+					sentence.AddPhonemeTag( w, p );
+				}
+				else
+				{
+					// dimhotepus: Dump info on failures.
+					Warning( "Missed phoneme for id %S: 0x%x.\n", pstr, hr );
+				}
 			}
 		}
 	}
-
-	// Free memory
-    ::CoTaskMemFree(pElements);
 }
 
 //-----------------------------------------------------------------------------
