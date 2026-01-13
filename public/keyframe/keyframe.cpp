@@ -280,8 +280,8 @@ void CRopeDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes
 class CPositionInterpolator_Rope final : public IPositionInterpolator
 {
 public:
-						CPositionInterpolator_Rope();
-	virtual ~CPositionInterpolator_Rope() {}
+	CPositionInterpolator_Rope();
+	~CPositionInterpolator_Rope() {}
 
 	virtual void		Release();
 	virtual void		GetDetails( const char **outName, int *outMinKeyReq, int *outMaxKeyReq );
