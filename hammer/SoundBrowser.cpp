@@ -102,7 +102,7 @@ BOOL CSoundBrowser::OnInitDialog()
 	{
 		m_SoundList.SetCurSel( nIndex );
 		m_nSelectedSoundIndex = nIndex;
-		int nSoundIndex = static_cast<int>(m_SoundList.GetItemData(nIndex));
+		int nSoundIndex = size_cast<int>(m_SoundList.GetItemData(nIndex));
 		m_SoundFile = g_Sounds.SoundFile( GetSoundType(), nSoundIndex ); 
 		m_SoundSource = g_Sounds.SoundSourceFile( GetSoundType(), nSoundIndex ); 
 		UpdateData( FALSE );
@@ -221,7 +221,7 @@ void CSoundBrowser::CopySoundNameToSelected()
 	int nIndex = m_SoundList.GetCurSel();
 	if ( nIndex != LB_ERR )
 	{
-		int nSoundIndex = static_cast<int>(m_SoundList.GetItemData(nIndex));
+		int nSoundIndex = size_cast<int>(m_SoundList.GetItemData(nIndex));
 		m_SoundNameSelected = g_Sounds.SoundName( GetSoundType(), nSoundIndex );
 		m_SoundFile = g_Sounds.SoundFile( GetSoundType(), nSoundIndex ); 
 		m_SoundSource = g_Sounds.SoundSourceFile( GetSoundType(), nSoundIndex ); 
