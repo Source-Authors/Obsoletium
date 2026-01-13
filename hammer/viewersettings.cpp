@@ -65,8 +65,9 @@ LoadViewerSettings (const char *filename)
 	if (!file)
 		return 0;
 
+	RunCodeAtScopeExit(fclose (file) );
+
 	fread (&g_viewerSettings, sizeof (ViewerSettings), 1, file);
-	fclose (file);
 
 	return 1;
 }
@@ -80,8 +81,9 @@ SaveViewerSettings (const char *filename)
 	if (!file)
 		return 0;
 
+	RunCodeAtScopeExit(fclose (file) );
+
 	fwrite (&g_viewerSettings, sizeof (ViewerSettings), 1, file);
-	fclose (file);
 
 	return 1;
 }
