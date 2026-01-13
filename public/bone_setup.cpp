@@ -5848,7 +5848,7 @@ intp Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAtt
 	if ( pStudioHdr )
 	{
 		// First move them all matching attachments into a list
-		CUtlVector<int> matchingAttachments;
+		CUtlVector<intp> matchingAttachments;
 
 		// Extract the bone index from the name
 		for (intp i = 0; i < pStudioHdr->GetNumAttachments(); i++)
