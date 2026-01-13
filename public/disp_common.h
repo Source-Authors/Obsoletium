@@ -180,10 +180,7 @@ void	DispCommon_GenerateTriIndices( int power, unsigned short *indices );
 // Returns a NEIGHBOREDGE_ value for the edge that the index is on.
 // Returns -1 if the index is not on a side.
 // If the point is on a corner, the edges are tested in the order of the NEIGHBOREDGE_ defines.
-int		GetEdgeIndexFromPoint( CVertIndex const &index, int iPower );
-
-// Returns a CORNER_ value for the corner the point is on, or -1 if it's not on a corner.
-int		GetEdgeIndexFromPoint( CVertIndex const &index, int iPower );
+short	GetEdgeIndexFromPoint( CVertIndex const &index, int iPower );
 
 // This returns the neighbor's power, possibly +1 or -1.
 //

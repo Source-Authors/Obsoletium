@@ -119,7 +119,7 @@ static inline void RotateVertIncrement(
 // CDispHelper functions.
 // --------------------------------------------------------------------------------- //
 
-int GetEdgeIndexFromPoint( CVertIndex const &index, int iMaxPower )
+short GetEdgeIndexFromPoint( CVertIndex const &index, int iMaxPower )
 {
 	int sideLengthMinus1 = 1 << iMaxPower;
 
@@ -992,7 +992,7 @@ bool VerifyNeighborVertConnection( CDispUtilsHelper *pDisp, const CVertIndex &no
 			return false;
 
 		CVertIndex testIndex( -1, -1 );
-		int iSide = GetEdgeIndexFromPoint( nbIndex, pNeighbor->GetPowerInfo()->m_Power );
+		short iSide = GetEdgeIndexFromPoint( nbIndex, pNeighbor->GetPowerInfo()->m_Power );
 		if ( iSide == -1 )
 		{
 			return false;
@@ -1124,7 +1124,7 @@ bool IsVertAllowed( CDispUtilsHelper *pDisp, CVertIndex const &sideVert, int iLe
 	if ( IsCorner( sideVert, pDisp->GetPowerInfo()->GetSideLength() ) )
 		return true;
 
-	int iSide = GetEdgeIndexFromPoint( sideVert, pDisp->GetPowerInfo()->GetPower() );
+	short iSide = GetEdgeIndexFromPoint( sideVert, pDisp->GetPowerInfo()->GetPower() );
 	if ( iSide == -1 )
 		return true;
 
