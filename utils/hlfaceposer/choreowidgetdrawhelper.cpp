@@ -698,8 +698,7 @@ void CChoreoWidgetDrawHelper::DrawColoredPolyLine( COLORREF clr, int style, int 
 		temp[ i ].y = pt->y - m_y;
 	}
 	
-	Assert(c <= std::numeric_limits<int>::max());
-	Polyline( m_dcMemory, temp, static_cast<int>(c) );
+	Polyline( m_dcMemory, temp, size_cast<int>(c) );
 }
 
 //-----------------------------------------------------------------------------
