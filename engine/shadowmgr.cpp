@@ -821,8 +821,7 @@ inline ShadowVertex_t* CShadowMgr::AllocateVertices( ShadowVertexCache_t& cache,
 		return m_LargeVertexList[cache.m_CachedVerts].m_Verts;
 	}
 
-	Assert(count <= std::numeric_limits<unsigned short>::max());
-	cache.m_Count = static_cast<unsigned short>(count);
+	cache.m_Count = size_cast<unsigned short>(count);
 	if (count > 0)
 	{
 		cache.m_pVerts = new ShadowVertex_t[count];
