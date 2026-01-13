@@ -488,8 +488,8 @@ bool CFontManager::IsBitmapFont(HFont font)
 //-----------------------------------------------------------------------------
 int CFontManager::GetCharacterWidth(HFont font, wchar_t ch)
 {
-  Assert( ch <= std::numeric_limits<wint_t>::max() );
-  if (!iswcntrl( ch ))
+	Assert( ch <= std::numeric_limits<wint_t>::max() );
+	if (!iswcntrl( ch ))
 	{
 		int a, b, c;
 		GetCharABCwide(font, ch, a, b, c);
