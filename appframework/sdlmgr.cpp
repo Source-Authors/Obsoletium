@@ -1234,22 +1234,25 @@ void CSDLMgr::ShowPixels( CShowPixelsParams *params )
 
 			glBegin(GL_QUADS);
 
-			if (texing)
-				glTexCoord2f( 0.0, botv );
-			glVertex3f		( -1.0, -1.0, 0.0 );
+			{
+				RunCodeAtScopeExit(glEnd());
 
-			if (texing)
-				glTexCoord2f( 1.0, botv );
-			glVertex3f		( 1.0, -1.0, 0.0 );
+				if (texing)
+					glTexCoord2f( 0.0, botv );
+				glVertex3f		( -1.0, -1.0, 0.0 );
 
-			if (texing)
-				glTexCoord2f( 1.0, topv );
-			glVertex3f		( 1.0, 1.0, 0.0 );
+				if (texing)
+					glTexCoord2f( 1.0, botv );
+				glVertex3f		( 1.0, -1.0, 0.0 );
 
-			if (texing)
-				glTexCoord2f( 0.0, topv );
-			glVertex3f		( -1.0, 1.0, 0.0 );
-			glEnd();
+				if (texing)
+					glTexCoord2f( 1.0, topv );
+				glVertex3f		( 1.0, 1.0, 0.0 );
+
+				if (texing)
+					glTexCoord2f( 0.0, topv );
+				glVertex3f		( -1.0, 1.0, 0.0 );
+			}
 			CheckGLError( __LINE__ );
 
 			if (texing)
