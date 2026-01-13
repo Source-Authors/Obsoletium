@@ -1295,13 +1295,13 @@ bool IntersectRayWithBox( const Vector &vecRayStart, const Vector &vecRayDelta,
 				trace.hitside -= 3;
 				pTrace->plane.dist = boxMaxs[trace.hitside];
 				pTrace->plane.normal[trace.hitside] = 1.0f;
-				pTrace->plane.type = trace.hitside;
+				pTrace->plane.type = size_cast<byte>( trace.hitside );
 			}
 			else
 			{
 				pTrace->plane.dist = -boxMins[trace.hitside];
 				pTrace->plane.normal[trace.hitside] = -1.0f;
-				pTrace->plane.type = trace.hitside;
+				pTrace->plane.type = size_cast<byte>( trace.hitside );
 			}
 			return true;
 		}

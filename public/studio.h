@@ -1475,7 +1475,7 @@ inline const mstudio_meshvertexdata_t *mstudiomesh_t::GetVertexData( void *pMode
 #ifdef PLATFORM_64BITS
 	modelvertexdata = &this->pModel()->vertexdata;
 	// Distance must fit int.
-	vertexdata.index_modelvertexdata = static_cast<int>((byte *)&modelvertexdata - (byte *)&vertexdata);
+	vertexdata.index_modelvertexdata = size_cast<int>((byte *)&modelvertexdata - (byte *)&vertexdata);
 #else
 	vertexdata.modelvertexdata = &this->pModel()->vertexdata;
 #endif
@@ -1871,7 +1871,7 @@ private:
 		}
 
 		// Treat 'zero weights' as '100% binding to bone zero':
-		pBoneWeights->numbones = static_cast<byte>(m_numBoneInfluences ? m_numBoneInfluences : 1);
+		pBoneWeights->numbones = size_cast<byte>(m_numBoneInfluences ? m_numBoneInfluences : 1);
 	}
 
 	int				m_numBoneInfluences;// Number of bone influences per vertex, N
@@ -2361,8 +2361,7 @@ struct studiohdr_t
 	void				SetVirtualModel( void* ptr )
 	{
 		// dimhotepus: Check we are in range.
-		Assert(static_cast<int>(reinterpret_cast<intp>(ptr)) <= std::numeric_limits<int>::max()); //-V221
-		virtualModel = (int)(intp)ptr; //-V221
+		virtualModel = size_cast<int>((intp)ptr); //-V221
 	}
 
 

@@ -683,9 +683,7 @@ intp studiohdr_t::CopyAutoplaySequences( unsigned short *pOut, intp outCount ) c
 		const mstudioseqdesc_t &seqdesc = pSeqdesc( i );
 		if (seqdesc.flags & STUDIO_AUTOPLAY)
 		{
-			Assert(i <= std::numeric_limits<unsigned short>::max());
-
-			pOut[outIndex] = static_cast<unsigned short>(i);
+			pOut[outIndex] = size_cast<unsigned short>(i);
 			outIndex++;
 		}
 	}
@@ -1751,7 +1749,7 @@ void CStudioHdr::CActivityToSequenceMapping::Initialize( CStudioHdr * __restrict
 			// You might be tempted to collapse this pointer math into a single pointer --
 			// don't! the tuple list is marked __restrict above.
 			it->seqnum = size_cast<short>(i); // store sequence number
-			it->weight = abs(seqdesc.actweight);
+			it->weight = size_cast<short>(abs(seqdesc.actweight));
 
 			// We can't have weights of 0
 			// Assert( it->weight > 0 );

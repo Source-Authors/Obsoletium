@@ -1559,8 +1559,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 			hdr.compressedSize = e->m_nCompressedSize;
 			hdr.uncompressedSize = e->m_nUncompressedSize;
 			size_t nFilenameLen = strlen( pFilename );
-			Assert( nFilenameLen <= std::numeric_limits<decltype(hdr.fileNameLength)>::max() );
-			hdr.fileNameLength = static_cast<unsigned short>( nFilenameLen );
+			hdr.fileNameLength = size_cast<unsigned short>( nFilenameLen );
 			hdr.extraFieldLength = CalculatePadding( hdr.fileNameLength, e->m_ZipOffset );
 			int extraFieldLength = hdr.extraFieldLength;
 
@@ -1627,8 +1626,7 @@ void CZipFile::SaveDirectory( IWriteStream& stream )
 			hdr.compressedSize = e->m_nCompressedSize;
 			hdr.uncompressedSize = e->m_nUncompressedSize;
 			size_t nFilenameLen = strlen( e->m_Name.String() );
-			Assert( nFilenameLen <= std::numeric_limits<decltype(hdr.fileNameLength)>::max() );
-			hdr.fileNameLength = static_cast<unsigned short>( nFilenameLen );
+			hdr.fileNameLength = size_cast<unsigned short>( nFilenameLen );
 			hdr.extraFieldLength = CalculatePadding( hdr.fileNameLength, e->m_ZipOffset );
 			hdr.fileCommentLength = 0;
 			hdr.diskNumberStart = 0;

@@ -92,8 +92,8 @@ static CVertIndex Transform2D(
 	CVertIndex translated = vert - centerPoint;
 	
 	CVertIndex transformed(
-		translated.x*mat[0][0] + translated.y*mat[0][1],
-		translated.x*mat[1][0] + translated.y*mat[1][1] );
+		size_cast<short>(translated.x*mat[0][0] + translated.y*mat[0][1]),
+		size_cast<short>(translated.x*mat[1][0] + translated.y*mat[1][1]) );
 	
 	return transformed + centerPoint;
 }
@@ -105,13 +105,13 @@ static void GetEdgeVertIndex( int sideLength, int iEdge, int iVert, CVertIndex &
 {
 	if( iEdge == NEIGHBOREDGE_RIGHT )
 	{
-		out.x = sideLength - 1;
+		out.x = size_cast<short>(sideLength - 1);
 		out.y = iVert;
 	}
 	else if( iEdge == NEIGHBOREDGE_TOP )
 	{
 		out.x = iVert;
-		out.y = sideLength - 1;
+		out.y = size_cast<short>(sideLength - 1);
 	}
 	else if( iEdge == NEIGHBOREDGE_LEFT )
 	{
@@ -129,7 +129,7 @@ static void GetEdgeVertIndex( int sideLength, int iEdge, int iVert, CVertIndex &
 // Generate an index given a CVertIndex and the size of the displacement it resides in.
 static int VertIndex( CVertIndex const &vert, int iMaxPower )
 {
-	return vert.y * ((1 << iMaxPower) + 1) + vert.x;
+	return size_cast<unsigned short>(vert.y * ((1 << iMaxPower) + 1) + vert.x);
 }
  
 
@@ -140,7 +140,7 @@ static CVertIndex WrapVertIndex( CVertIndex const &in, int sideLength )
 	for( int i=0; i < 2; i++ )
 	{
 		if( in[i] < 0 )
-			out[i] = sideLength - 1 - (-in[i] % sideLength);
+			out[i] = size_cast<short>( sideLength - 1 - (-in[i] % sideLength) );
 		else if( in[i] >= sideLength )
 			out[i] = in[i] % sideLength;
 		else
@@ -377,7 +377,7 @@ static void InitPowerInfo_R(
 	int iNodeIndex = VertIndex( nodeIndex, iMaxPower );
 	
 	pPowerInfo->m_pVertInfo[iNodeIndex].m_iParent = iParent;
-	pPowerInfo->m_pVertInfo[iNodeIndex].m_iNodeLevel = iLevel + 1;
+	pPowerInfo->m_pVertInfo[iNodeIndex].m_iNodeLevel = size_cast<short>( iLevel + 1 );
 
 	pPowerInfo->m_pErrorEdges[iNodeIndex].m_Values[0] = (unsigned short)(VertIndex( nodeEdge1, iMaxPower ));
 	pPowerInfo->m_pErrorEdges[iNodeIndex].m_Values[1] = (unsigned short)(VertIndex( nodeEdge2, iMaxPower ));

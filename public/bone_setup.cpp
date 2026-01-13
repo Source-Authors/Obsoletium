@@ -102,7 +102,7 @@ CBoneCache *CBoneCache::CreateResource( const bonecacheparams_t &params )
 	size_t tableSizeStudio = sizeof(short) * bonesCount;
 	size_t tableSizeCached = sizeof(short) * cachedBoneCount;
 	size_t matrixSize = sizeof(matrix3x4_t) * cachedBoneCount;
-	size_t size = ( sizeof(CBoneCache) + tableSizeStudio + tableSizeCached + matrixSize + 3U ) & ~3U;
+	unsigned size = size_cast<unsigned>(( sizeof(CBoneCache) + tableSizeStudio + tableSizeCached + matrixSize + 3U ) & ~3U);
 	
 	CBoneCache *pMem = (CBoneCache *)malloc( size );
 	Construct( pMem, params, size, studioToCachedIndex, cachedToStudioIndex, cachedBoneCount );
@@ -5285,10 +5285,10 @@ bool SweepBoxToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, CStudioHd
 		tr.hitbox = hitbox;
 		const mstudiobone_t *pBone = pStudioHdr->pBone( set->pHitbox(hitbox)->bone );
 		tr.contents = pBone->contents | CONTENTS_HITBOX;
-		tr.physicsbone = pBone->physicsbone;
+		tr.physicsbone = size_cast<short>( pBone->physicsbone );
 		tr.surface.name = "**studio**";
 		tr.surface.flags = SURF_HITBOX;
-		tr.surface.surfaceProps = pProps->GetSurfaceIndex( pBone->pszSurfaceProp() );
+		tr.surface.surfaceProps = size_cast<short>( pProps->GetSurfaceIndex( pBone->pszSurfaceProp() ) );
 
 		Assert( tr.physicsbone >= 0 );
 		return true;
@@ -5386,10 +5386,10 @@ bool TraceToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, CStudioHdr *
 		tr.hitbox = hitbox;
 		const mstudiobone_t *pBone = pStudioHdr->pBone( pbox->bone );
 		tr.contents = pBone->contents | CONTENTS_HITBOX;
-		tr.physicsbone = pBone->physicsbone;
+		tr.physicsbone = size_cast<short>( pBone->physicsbone );
 		tr.surface.name = "**studio**";
 		tr.surface.flags = SURF_HITBOX;
-		tr.surface.surfaceProps = pProps->GetSurfaceIndex( pBone->pszSurfaceProp() );
+		tr.surface.surfaceProps = size_cast<short>( pProps->GetSurfaceIndex( pBone->pszSurfaceProp() ) );
 
 		Assert( tr.physicsbone >= 0 );
 		matrix3x4_t& matrix = *hitboxbones[pbox->bone];

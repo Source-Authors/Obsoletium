@@ -708,10 +708,6 @@ bool CChunkFile::ReadKeyValueColor(const char *pszValue, unsigned char &chRed, u
 		if (sscanf(pszValue, "%d %d %d", &r, &g, &b) == 3)
 		{
 			// dimhotepus: Check color range.
-			Assert(r >= 0 && r <= std::numeric_limits<unsigned char>::max());
-			Assert(g >= 0 && g <= std::numeric_limits<unsigned char>::max());
-			Assert(b >= 0 && b <= std::numeric_limits<unsigned char>::max());
-
 			chRed = size_cast<unsigned char>(r);
 			chGreen = size_cast<unsigned char>(g);
 			chBlue = size_cast<unsigned char>(b);

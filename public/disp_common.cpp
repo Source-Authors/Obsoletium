@@ -617,7 +617,7 @@ static unsigned short* DispCommon_GenerateTriIndices_R(
 				for( int iTriVert=2; iTriVert >= 0; iTriVert-- )
 				{
 					int index = verts[iTriVert].y * sideLength + verts[iTriVert].x;
-					*indices = index;
+					*indices = size_cast<short>( index );
 					++indices;
 				}
 
