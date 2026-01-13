@@ -116,6 +116,10 @@ static unsigned __stdcall CantTouchThisThread( void * )
 	int file = _open( songName, _O_BINARY| _O_CREAT | _O_RDWR, _S_IREAD | _S_IWRITE );
 	if ( file != -1 )
 	{
+		CString strTitle;
+		AfxGetApp()->GetMainWnd()->GetWindowText( strTitle );
+		RunCodeAtScopeExit( AfxGetApp()->GetMainWnd()->SetWindowText( strTitle ) );
+
 		AfxGetApp()->GetMainWnd()->SetWindowText( "Hammer time!" );
 		// dimhotepus: Comment as threaded access to control is not allowed.
 		//SetStatusText(SBI_PROMPT, "Stop, Hammer time!");
@@ -130,7 +134,6 @@ static unsigned __stdcall CantTouchThisThread( void * )
 
 		// dimhotepus: Comment as threaded access to control is not allowed.
 		//SetStatusText(SBI_PROMPT, "You can't touch this");
-		AfxGetApp()->GetMainWnd()->SetWindowText( "Hammer" );
 		// dimhotepus: Comment as threaded access to control is not allowed.
 		// Sleep(1500);
 		//SetStatusText(SBI_PROMPT, "For Help, press F1");

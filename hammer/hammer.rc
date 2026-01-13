@@ -2954,7 +2954,11 @@ IDC_CROSSHAIR           CURSOR                  "res\\crosshair.cur"
 
 STRINGTABLE 
 BEGIN
+#ifdef PLATFORM_64BITS
     IDR_MAINFRAME           "Hammer"
+#else
+    IDR_MAINFRAME           "Hammer - 64 bit"
+#endif
     IDR_FORGEMAPTYPE        "\nvmf\nValve Map Files\nValve Map Files (*.vmf)\n.vmf"
     IDR_FORGEPAKTYPE        "\npak\nQuake PAK archive\nQuake PAK archive (*.pak)\n.pak\nWorldcraft.Pak\nQuake PAK archive"
     IDS_NONE                "(none)"
