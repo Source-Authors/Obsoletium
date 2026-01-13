@@ -349,6 +349,8 @@ void ReadPolyFileType(const char *name, int nList, BOOL drawLines) {
     else
       glBegin(GL_POLYGON);
 
+    RunCodeAtScopeExit(glEnd());
+
     for (i = 0; i < numverts; i++) {
       r = fscanf(f, "%f %f %f %f %f %f\n", &v[0], &v[1], &v[2], &v[3], &v[4],
                  &v[5]);
@@ -385,7 +387,7 @@ void ReadPolyFileType(const char *name, int nList, BOOL drawLines) {
 
       g_nTotalPoints++;
     }
-    glEnd();
+
     c++;
   }
 
@@ -559,14 +561,16 @@ void Benchmark_PHY(const CPhysCollide *pCollide) {
 
   // draw the traces in yellow
   glColor3f(1.0f, 1.0f, 0.0f);
+
   glBegin(GL_LINES);
+  RunCodeAtScopeExit(glEnd());
+
   for (int i = 0; i < NUM_COLLISION_TESTS; i++) {
     if (!g_Traces[i].hit) continue;
     glVertex3fv(g_Traces[i].end.Base());
     Vector tmp = g_Traces[i].end + g_Traces[i].normal * 10.0f;
     glVertex3fv(tmp.Base());
   }
-  glEnd();
 }
 #endif
 
@@ -608,13 +612,14 @@ void AddVCollideToList(phyheader_t &header, vcollide_t &collide,
         AddPointToBounds(v2, params.mins, params.maxs);
 
         glBegin(params.outputType);
+        RunCodeAtScopeExit(glEnd());
+
         glColor3ub(255, 0, 0);
         glVertex3fv(v0.Base());
         glColor3ub(0, 255, 0);
         glVertex3fv(v1.Base());
         glColor3ub(0, 0, 255);
         glVertex3fv(v2.Base());
-        glEnd();
       }
     }
     physcollision->DestroyQueryModel(pQuery);
@@ -712,6 +717,8 @@ void ReadPortalFile(char *name) {
     if (r != 3) break;
 
     glBegin(GL_LINE_LOOP);
+    RunCodeAtScopeExit(glEnd());
+
     for (i = 0; i < numverts; i++) {
       r = fscanf(f, "(%f %f %f )\n", &v[0], &v[1], &v[2]);
       if (r != 3) break;
@@ -725,7 +732,6 @@ void ReadPortalFile(char *name) {
       glVertex3f(v[0], v[1], v[2]);
     }
 
-    glEnd();
     c++;
   }
 
@@ -787,11 +793,12 @@ void DrawDisplacementData() {
     // draw the normal (in yellow)
     glColor3f(1.0f, 1.0f, 0.0f);
     glBegin(GL_LINES);
+    RunCodeAtScopeExit(glEnd());
+
     glVertex3f(dispPoints[i][0], dispPoints[i][1], dispPoints[i][2]);
     glVertex3f(dispPoints[i][0] + (dispNormals[i][0] * 50.0f),
                dispPoints[i][1] + (dispNormals[i][1] * 50.0f),
                dispPoints[i][2] + (dispNormals[i][2] * 50.0f));
-    glEnd();
   }
 
   int halfCount = dispPointCount / 2;
@@ -803,6 +810,8 @@ void DrawDisplacementData() {
   for (i = 0; i < halfWidth - 1; i++) {
     for (j = 0; j < halfWidth - 1; j++) {
       glBegin(GL_POLYGON);
+      RunCodeAtScopeExit(glEnd());
+
       glVertex3f(dispPoints[i * halfWidth + j][0],
                  dispPoints[i * halfWidth + j][1],
                  dispPoints[i * halfWidth + j][2]);
@@ -815,7 +824,6 @@ void DrawDisplacementData() {
       glVertex3f(dispPoints[i * halfWidth + (j + 1)][0],
                  dispPoints[i * halfWidth + (j + 1)][1],
                  dispPoints[i * halfWidth + (j + 1)][2]);
-      glEnd();
     }
   }
 
@@ -823,6 +831,8 @@ void DrawDisplacementData() {
   for (i = 0; i < halfWidth - 1; i++) {
     for (j = 0; j < halfWidth - 1; j++) {
       glBegin(GL_POLYGON);
+      RunCodeAtScopeExit(glEnd());
+
       glVertex3f(dispPoints[i * halfWidth + j][0] +
                      (dispNormals[i * halfWidth + j][0] * 150.0f),
                  dispPoints[i * halfWidth + j][1] +
@@ -850,7 +860,6 @@ void DrawDisplacementData() {
                      (dispNormals[i * halfWidth + (j + 1)][1] * 150.0f),
                  dispPoints[i * halfWidth + (j + 1)][2] +
                      (dispNormals[i * halfWidth + (j + 1)][2] * 150.0f));
-      glEnd();
     }
   }
 
@@ -860,6 +869,8 @@ void DrawDisplacementData() {
   for (i = 0; i < halfWidth - 1; i++) {
     for (j = 0; j < halfWidth - 1; j++) {
       glBegin(GL_LINE_LOOP);
+      RunCodeAtScopeExit(glEnd());
+
       glVertex3f(dispPoints[i * halfWidth + j][0] +
                      (dispNormals[i * halfWidth + j][0] * 150.0f),
                  dispPoints[i * halfWidth + j][1] +
@@ -887,7 +898,6 @@ void DrawDisplacementData() {
                      (dispNormals[i * halfWidth + (j + 1)][1] * 150.0f),
                  dispPoints[i * halfWidth + (j + 1)][2] +
                      (dispNormals[i * halfWidth + (j + 1)][2] * 150.0f));
-      glEnd();
     }
   }
 
