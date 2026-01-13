@@ -463,7 +463,7 @@ void StockCylinder::CreateMapSolid(CMapSolid *pSolid, TextureAlignment_t eTextur
 		Points[3][2] = origin[2] + fHeight;
 
 		Face.CreateFace(Points, 4);
-		Face.texture.smooth = 1.f;
+		Face.texture.smooth = 1;
 		pSolid->AddFace(&Face);
 	}
 
@@ -678,7 +678,7 @@ void StockSphere::CreateMapSolid(CMapSolid *pSolid, TextureAlignment_t eTextureA
 				Face.CreateFace(Points, 4);
 			}
 
-			Face.texture.smooth = 1.f;
+			Face.texture.smooth = 1;
 			pSolid->AddFace(&Face);
 		}
 	
