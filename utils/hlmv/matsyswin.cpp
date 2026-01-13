@@ -888,7 +888,7 @@ void PlaySounds( StudioModel *pStudioModel )
 	if ( pStudioHdr == NULL )
 		return;
 
-	int seq = pStudioModel->GetSequence();
+	intp seq = pStudioModel->GetSequence();
 	mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( seq );
 
 	for ( int i = 0; i < (int)seqdesc.numevents; ++i )

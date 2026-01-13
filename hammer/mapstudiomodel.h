@@ -71,20 +71,20 @@ class CMapStudioModel : public CMapHelper
 		int GetFrame(void);
 		void SetFrame(int nFrame);
 
-		int GetSequence(void);
-		int GetSequenceCount(void);
-		void GetSequenceName(int nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize);
+		intp GetSequence(void);
+		intp GetSequenceCount(void);
+		void GetSequenceName(intp nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize);
 		template<intp nameSize>
-		void GetSequenceName(int nIndex, OUT_Z_ARRAY char (&szName)[nameSize])
+		void GetSequenceName(intp nIndex, OUT_Z_ARRAY char (&szName)[nameSize])
 		{
 			GetSequenceName(nIndex, szName, nameSize);
 		}
 		
-		void SetSequence(int nIndex);
+		void SetSequence(intp nIndex);
 		
 		// Returns the index of the sequence (does a case-insensitive search).
 		// Returns -1 if the sequence doesn't exist.
-		int GetSequenceIndex( const char *pSequenceName ) const;
+		intp GetSequenceIndex( const char *pSequenceName ) const;
 
 	protected:
 

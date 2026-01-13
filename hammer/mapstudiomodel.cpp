@@ -835,7 +835,7 @@ void CMapStudioModel::SetFrame(int nFrame)
 //-----------------------------------------------------------------------------
 // Purpose: Returns the current sequence being used for rendering.
 //-----------------------------------------------------------------------------
-int CMapStudioModel::GetSequence(void)
+intp CMapStudioModel::GetSequence(void)
 {
 	if (!m_pStudioModel)
 	{
@@ -849,7 +849,7 @@ int CMapStudioModel::GetSequence(void)
 // Purpose: 
 // Output : int
 //-----------------------------------------------------------------------------
-int CMapStudioModel::GetSequenceCount(void)
+intp CMapStudioModel::GetSequenceCount(void)
 {
 	if (!m_pStudioModel)
 	{
@@ -864,7 +864,7 @@ int CMapStudioModel::GetSequenceCount(void)
 // Input  : nIndex - 
 //			szName - 
 //-----------------------------------------------------------------------------
-void CMapStudioModel::GetSequenceName(int nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize)
+void CMapStudioModel::GetSequenceName(intp nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize)
 {
 	if (nameSize > 0)
 		szName[0] = '\0';
@@ -880,7 +880,7 @@ void CMapStudioModel::GetSequenceName(int nIndex, OUT_Z_CAP(nameSize) char *szNa
 // Purpose: 
 // Input  : nIndex - 
 //-----------------------------------------------------------------------------
-void CMapStudioModel::SetSequence(int nIndex)
+void CMapStudioModel::SetSequence(intp nIndex)
 {
 	if (m_pStudioModel)
 	{
@@ -889,12 +889,12 @@ void CMapStudioModel::SetSequence(int nIndex)
 }
 
 
-int CMapStudioModel::GetSequenceIndex( const char *pSequenceName ) const
+intp CMapStudioModel::GetSequenceIndex( const char *pSequenceName ) const
 {
 	if ( m_pStudioModel )
 	{
-		int cnt = m_pStudioModel->GetSequenceCount();
-		for ( int i=0; i < cnt; i++ )
+		intp cnt = m_pStudioModel->GetSequenceCount();
+		for ( intp i=0; i < cnt; i++ )
 		{
 			char name[2048];
 			m_pStudioModel->GetSequenceName( i, name );

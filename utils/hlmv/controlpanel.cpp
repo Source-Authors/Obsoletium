@@ -3131,7 +3131,7 @@ void ControlPanel::initSequenceChoices()
 }
 
 
-void ControlPanel::setSequence(int index)
+void ControlPanel::setSequence(intp index)
 {
 	cSequence[0]->select( iSequenceToSelection[index] );
 	g_pStudioModel->SetSequence(index);
@@ -3434,7 +3434,7 @@ void ControlPanel::initMaterialChoices()
 	}
 }
 
-void ControlPanel::showActivityModifiers( int sequence )
+void ControlPanel::showActivityModifiers( intp sequence )
 {
 	CStudioHdr *hdr = g_pStudioModel->GetStudioHdr();
 	if ( !hdr->SequencesAvailable() )

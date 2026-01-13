@@ -107,7 +107,7 @@ public:
 	void setHighlightBone( int index );
 
 	void initSequenceChoices( );
-	void setSequence (int index);
+	void setSequence (intp index);
 
 	void setSpeed( float value );
 

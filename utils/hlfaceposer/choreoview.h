@@ -307,7 +307,7 @@ public:
 	void				ProcessGesture( CChoreoScene *scene, CChoreoEvent *event );
 	void				ProcessSequence( CChoreoScene *scene, CChoreoEvent *event );
 	void				ProcessMoveto( CChoreoScene *scene, CChoreoEvent *event );
-	int					GetMovetoSequence( CChoreoScene *scene, CChoreoEvent *event, StudioModel *model );
+	intp				GetMovetoSequence( CChoreoScene *scene, CChoreoEvent *event, StudioModel *model );
 	void				ProcessSubscene( CChoreoScene *scene, CChoreoEvent *event );
 	void				ProcessPause( CChoreoScene *scene, CChoreoEvent *event );
 	void				ProcessSpeak( CChoreoScene *scene, CChoreoEvent *event );

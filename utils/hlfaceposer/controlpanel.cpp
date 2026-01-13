@@ -440,7 +440,7 @@ ControlPanel::initSequenceChoices()
 
 
 void
-ControlPanel::setSequence (int index)
+ControlPanel::setSequence (intp index)
 {
 	cSequence->select (index);
 	models->GetActiveStudioModel()->SetSequence(index);
@@ -681,15 +681,15 @@ void ControlPanel::CenterOnFace( void )
 
 	setSpeed( 1.0f );
 
-	int oldSeq = models->GetActiveStudioModel()->GetSequence();
+	intp oldSeq = models->GetActiveStudioModel()->GetSequence();
 
-	int seq = models->GetActiveStudioModel()->LookupSequence( "idle_suble" );
+	intp seq = models->GetActiveStudioModel()->LookupSequence( "idle_suble" );
 	if ( seq == -1 )
 		seq = 0;
 
 	if ( seq != oldSeq )
 	{
-		Con_Printf( "Centering changed model sequence # to %d\n", seq );
+		Con_Printf( "Centering changed model sequence # to %zd\n", seq );
 	}
 
 	setSequence( seq );
@@ -705,7 +705,7 @@ void ControlPanel::CenterOnFace( void )
 
 	if ( hdr->GetNumAttachments() > 0 )
 	{
-		for (int i = 0; i < hdr->GetNumAttachments(); i++)
+		for (intp i = 0; i < hdr->GetNumAttachments(); i++)
 		{
 			const mstudioattachment_t &attachment = hdr->pAttachment( i );
 			int iBone = hdr->GetAttachmentBone( i );

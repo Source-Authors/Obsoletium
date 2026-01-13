@@ -402,8 +402,8 @@ public:
 	void setOriginAxisLength( float originAxisLength );
 
 	void initSequenceChoices();
-	void setSequence( int index );
-	void showActivityModifiers( int sequence );
+	void setSequence( intp index );
+	void showActivityModifiers( intp sequence );
 	void updateGroundSpeed( void );
 	void setOverlaySequence(int num, int index, float weight);
 	void updateTransitionAmount();

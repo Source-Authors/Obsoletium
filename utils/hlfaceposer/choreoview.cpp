@@ -5153,7 +5153,7 @@ void CChoreoView::ProcessMoveto( CChoreoScene *scene, CChoreoEvent *event )
 	if ( !event->GetActor() )
 		return;
 
-	int iSequence = GetMovetoSequence( scene, event, model );
+	intp iSequence = GetMovetoSequence( scene, event, model );
 	if (iSequence < 0)
 		return;
 
@@ -5189,7 +5189,7 @@ void CChoreoView::ProcessMoveto( CChoreoScene *scene, CChoreoEvent *event )
 
 
 
-int CChoreoView::GetMovetoSequence( CChoreoScene *scene, CChoreoEvent *event, StudioModel *model )
+intp CChoreoView::GetMovetoSequence( CChoreoScene *scene, CChoreoEvent *event, StudioModel *model )
 {
 	// FIXME: needs to pull from event (activity or sequence?)
 	if ( !event->GetParameters2() || !event->GetParameters2()[0] )
@@ -5222,7 +5222,7 @@ int CChoreoView::GetMovetoSequence( CChoreoScene *scene, CChoreoEvent *event, St
 		pszAct = "ACT_WALK_CROUCH";
 	}
 
-	int iSequence = model->LookupActivity( pszAct );
+	intp iSequence = model->LookupActivity( pszAct );
 
 	if (iSequence == -1)
 	{

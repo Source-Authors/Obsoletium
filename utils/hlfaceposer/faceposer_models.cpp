@@ -754,7 +754,7 @@ intp IFaceposerModels::LoadModel( char const *filename )
 		g_pStudioModel = save;
 
 		model->SetSequence( model->LookupSequence( "idle_subtle" ) );
-		int sidx = model->GetSequence();
+		intp sidx = model->GetSequence();
 		model->SetSequence( sidx );
 
 		SetupModelFlexcontrollerLinks( model );

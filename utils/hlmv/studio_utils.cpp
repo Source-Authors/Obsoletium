@@ -450,15 +450,13 @@ float StudioModel::GetOverlaySequenceWeight( int iLayer )
 }
 
 
-int StudioModel::LookupSequence( const char *szSequence )
+intp StudioModel::LookupSequence( const char *szSequence )
 {
-	int i;
-
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
 		return -1;
 
-	for (i = 0; i < pStudioHdr->GetNumSeq(); i++)
+	for (intp i = 0; i < pStudioHdr->GetNumSeq(); i++)
 	{
 		if (!stricmp( szSequence, pStudioHdr->pSeqdesc( i ).pszLabel() ))
 		{
@@ -468,15 +466,13 @@ int StudioModel::LookupSequence( const char *szSequence )
 	return -1;
 }
 
-int StudioModel::LookupActivity( const char *szActivity )
+intp StudioModel::LookupActivity( const char *szActivity )
 {
-	int i;
-
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if ( !pStudioHdr )
 		return -1;
 
-	for (i = 0; i < pStudioHdr->GetNumSeq(); i++)
+	for (intp i = 0; i < pStudioHdr->GetNumSeq(); i++)
 	{
 		if (!stricmp( szActivity, pStudioHdr->pSeqdesc( i ).pszActivityName() ))
 		{

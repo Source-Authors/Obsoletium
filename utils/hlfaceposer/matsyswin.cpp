@@ -387,7 +387,7 @@ int MatSysWindow::handleEvent (mxEvent *event)
 				break;
 			case 32:
 				{
-					int iSeq = models->GetActiveStudioModel()->GetSequence();
+					intp iSeq = models->GetActiveStudioModel()->GetSequence();
 					if (iSeq == models->GetActiveStudioModel()->SetSequence (iSeq + 1))
 					{
 						g_pControlPanel->setSequence( 0 );
