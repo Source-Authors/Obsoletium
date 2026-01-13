@@ -692,16 +692,18 @@ void CTextureWindow::HighlightCurTexture(CDC *pDC)
 		pDC = &dc;
 	}
 
-	CGdiObject *pOldPen = pDC->SelectStockObject(WHITE_PEN);
-	RunCodeAtScopeExit(pDC->SelectObject(pOldPen));
+	{
+		CGdiObject *pOldPen = pDC->SelectStockObject(WHITE_PEN);
+		RunCodeAtScopeExit(pDC->SelectObject(pOldPen));
 
-	CGdiObject *pOldBrush = pDC->SelectStockObject(NULL_BRUSH);
-	RunCodeAtScopeExit(pDC->SelectObject(pOldBrush));
+		CGdiObject *pOldBrush = pDC->SelectStockObject(NULL_BRUSH);
+		RunCodeAtScopeExit(pDC->SelectObject(pOldBrush));
 
-	int oldRop2 = pDC->SetROP2(R2_XORPEN);
-	RunCodeAtScopeExit(pDC->SetROP2(oldRop2));
+		int oldRop2 = pDC->SetROP2(R2_XORPEN);
+		RunCodeAtScopeExit(pDC->SetROP2(oldRop2));
 
-	pDC->Rectangle(rectHighlight);
+		pDC->Rectangle(rectHighlight);
+	}
 
 	if(bMadeDC)
 		::ReleaseDC(m_hWnd, dc.Detach());
