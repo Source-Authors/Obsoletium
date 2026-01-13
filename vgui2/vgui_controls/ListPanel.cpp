@@ -1972,20 +1972,23 @@ void ListPanel::Paint()
 				{
 					render->SetVisible(true);
 				}
-				int xpos = x + m_iTableStartX + 2;
+				// dimhotepus: Scale UI.
+				int xpos = x + m_iTableStartX + QuickPropScale( 2 );
 
 				render->SetPos( xpos, (drawcount * m_iRowHeight) + m_iTableStartY);
 
 				int right = min( xpos + hWide, maxw );
 				int usew = right - xpos;
-				render->SetSize( usew, m_iRowHeight - 1 );
+				// dimhotepus: Scale UI.
+				render->SetSize( usew, m_iRowHeight - QuickPropScale( 1 ) );
 
 				// mark the panel to draw immediately (since it will probably be recycled to draw other cells)
 				render->Repaint();
 				surface()->SolveTraverse(render->GetVPanel());
 				int x0, y0, x1, y1;
 				render->GetClipRect(x0, y0, x1, y1);
-				if ((y1 - y0) < (m_iRowHeight - 3))
+				// dimhotepus: Scale UI.
+				if ((y1 - y0) < (m_iRowHeight - QuickPropScale( 3 )))
 				{
 					bDone = true;
 					break;
@@ -2685,7 +2688,8 @@ void ListPanel::SetFont(HFont font)
 		return;
 
 	m_pTextImage->SetFont(font);
-	m_iRowHeight = surface()->GetFontTall(font) + 2;
+	// dimhotepus: Scale UI.
+	m_iRowHeight = surface()->GetFontTall(font) + QuickPropScale( 2 );
 }
 
 //-----------------------------------------------------------------------------

@@ -498,7 +498,8 @@ void ListViewPanel::SetFont(HFont font)
 		return;
 
 	m_hFont = font;
-	m_iRowHeight = surface()->GetFontTall(font) + 1;
+	// dimhotepus: Scale UI.
+	m_iRowHeight = surface()->GetFontTall(font) + QuickPropScale( 1 );
 	
 	FOR_EACH_LL( m_DataItems, i )
 	{
