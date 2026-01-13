@@ -253,21 +253,21 @@ class CRopeDelegate : public CSimplePhysics::IHelper
 public:
 	CRopeDelegate() { m_CurEndPoints[0] = vec3_invalid; m_CurEndPoints[1] = vec3_invalid; }
 
-	virtual void	GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel );
-	virtual void	ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes );
+	void	GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel ) override;
+	void	ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes ) override;
 
 
 public:
 	Vector			m_CurEndPoints[2];
 };
 
-void CRopeDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel )
+void CRopeDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel )
 {
 	// Gravity.
 	pAccel->Init( 0, 0, -1500 );
 }
 
-void CRopeDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes )
+void CRopeDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes )
 {
 	if( nNodes >= 2 )
 	{

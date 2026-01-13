@@ -44,8 +44,8 @@ public:
 	class IHelper
 	{
 	public:
-		virtual void	GetNodeForces( CNode *pNodes, int iNode, Vector *pAccel ) = 0;
-		virtual void	ApplyConstraints( CNode *pNodes, int nNodes ) = 0;
+		virtual void	GetNodeForces( CNode *pNodes, intp iNode, Vector *pAccel ) = 0;
+		virtual void	ApplyConstraints( CNode *pNodes, intp nNodes ) = 0;
 	};
 
 

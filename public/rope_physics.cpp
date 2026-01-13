@@ -99,7 +99,7 @@ void CBaseRopePhysics::Simulate( float dt )
 }
 
 
-void CBaseRopePhysics::GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel )
+void CBaseRopePhysics::GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel )
 {
 	if( m_pDelegate )
 		m_pDelegate->GetNodeForces( pNodes, iNode, pAccel );
@@ -108,7 +108,7 @@ void CBaseRopePhysics::GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, 
 }
 
 
-void CBaseRopePhysics::ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes )
+void CBaseRopePhysics::ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes )
 {
 	// Handle springs..
 	//

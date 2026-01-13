@@ -29,11 +29,11 @@ class CBaseRopePhysics : public CSimplePhysics::IHelper
 public:
 	DECLARE_CLASS_NOBASE( CBaseRopePhysics );
 
-					CBaseRopePhysics( 
-						CSimplePhysics::CNode *pNodes, 
-						int nNodes, 
-						CRopeSpring *pSprings,
-						float *flSpringDistsSqr );
+	CBaseRopePhysics( 
+		CSimplePhysics::CNode *pNodes, 
+		int nNodes, 
+		CRopeSpring *pSprings,
+		float *flSpringDistsSqr );
 
 	// nNodes should be less than or equal to what you passed into the constructor.
 	void			SetNumNodes( int nNodes );
@@ -63,8 +63,8 @@ public:
 
 public:
 
-	virtual void	GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel );
-	virtual void	ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes );
+	void	GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel ) override;
+	void	ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes ) override;
 
 
 private:
