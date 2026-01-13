@@ -149,11 +149,25 @@ public:
 // Globals.
 // ----------------------------------------------------------------------------- //
 
+// This tells which dimension (0 or 1) is locked on an edge for each NEIGHBOREDGE_ enum.
+constexpr int g_EdgeDims[4] =
+{
+	0,		// NEIGHBOREDGE_LEFT   = X
+	1,		// NEIGHBOREDGE_TOP    = Y
+	0,		// NEIGHBOREDGE_RIGHT  = X
+	1		// NEIGHBOREDGE_BOTTOM = Y
+};
 
-extern int			g_EdgeDims[4];		// This tells which dimension (0 or 1) is locked on an edge for each NEIGHBOREDGE_ enum.
 extern CShiftInfo	g_ShiftInfos[3][3];	// See CShiftInfo.
-extern int			g_EdgeSideLenMul[4];// Multiply these by the side length to get the index of the edge.
 
+// Multiply these by the side length to get the index of the edge.
+constexpr int g_EdgeSideLenMul[4] =
+{
+	0,
+	1,
+	1,
+	0
+};
 
 // ----------------------------------------------------------------------------- //
 // Helper functions.

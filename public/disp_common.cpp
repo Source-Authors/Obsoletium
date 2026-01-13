@@ -54,14 +54,6 @@ static constexpr int g_CornerEdges[4][2] =
 	{ NEIGHBOREDGE_BOTTOM,	NEIGHBOREDGE_RIGHT }	// CORNER_LOWER_RIGHT
 };
 
-int g_EdgeDims[4] =
-{
-	0,		// NEIGHBOREDGE_LEFT   = X
-	1,		// NEIGHBOREDGE_TOP    = Y
-	0,		// NEIGHBOREDGE_RIGHT  = X
-	1		// NEIGHBOREDGE_BOTTOM = Y
-};
-
 CShiftInfo g_ShiftInfos[3][3] =
 {
 	{
@@ -81,14 +73,6 @@ CShiftInfo g_ShiftInfos[3][3] =
 		{0,  0, false},		// MIDPOINT_TO_CORNER -> CORNER_TO_MIDPOINT (invalid)
 		{0,  0, false}		// MIDPOINT_TO_CORNER -> MIDPOINT_TO_CORNER (invalid)
 	}
-};
-
-int g_EdgeSideLenMul[4] =
-{
-	0,
-	1,
-	1,
-	0
 };
 
 
@@ -714,12 +698,12 @@ void DispCommon_GenerateTriIndices( int power, unsigned short *indices )
 //
 
 // This table swaps MIDPOINT_TO_CORNER and CORNER_TO_MIDPOINT.
-static NeighborSpan g_SpanFlip[3] = {CORNER_TO_CORNER, MIDPOINT_TO_CORNER, CORNER_TO_MIDPOINT};
-static bool			g_bEdgeNeighborFlip[4] = {false, false, true, true};
+static constexpr NeighborSpan g_SpanFlip[3] = {CORNER_TO_CORNER, MIDPOINT_TO_CORNER, CORNER_TO_MIDPOINT};
+static constexpr bool		  g_bEdgeNeighborFlip[4] = {false, false, true, true};
 
 // These map CCoreDispSurface neighbor orientations (which are actually edge indices)
 // into our 'degrees of rotation' representation.
-static int g_CoreDispNeighborOrientationMap[4][4] =
+static constexpr unsigned char g_CoreDispNeighborOrientationMap[4][4] =
 {
 	{ORIENTATION_CCW_180, ORIENTATION_CCW_270, ORIENTATION_CCW_0,   ORIENTATION_CCW_90},
 	{ORIENTATION_CCW_90,  ORIENTATION_CCW_180, ORIENTATION_CCW_270, ORIENTATION_CCW_0},
