@@ -212,11 +212,11 @@ void CSoundPicker::BuildGameSoundList()
 
 		bool bInRoot = !strchr( pSoundName, '\\' ) && !strchr( pSoundName, '/' );
 		KeyValues *kv = new KeyValues( "node", "gamesound", pSoundName );
-		kv->SetInt( "gameSoundHandle", i );
+		kv->SetInt( "gameSoundHandle", size_cast<int>( i ) );
 		kv->SetInt( "root", bInRoot );
 
 		int nItemID = m_pGameSoundList->AddItem( kv, 0, false, false );
-		m_pGameSoundList->SetItemVisible( nItemID, IsGameSoundVisible( i ) );
+		m_pGameSoundList->SetItemVisible( nItemID, IsGameSoundVisible( size_cast<int>( i ) ) );
 		KeyValues *pDrag = new KeyValues( "drag", "text", pSoundName );
 		pDrag->SetString( "texttype", "gamesoundName" );
 		m_pGameSoundList->SetItemDragData( nItemID, pDrag );
