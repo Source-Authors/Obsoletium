@@ -101,7 +101,7 @@ static CVertIndex Transform2D(
 
 // Rotate a given CVertIndex with a specified orientation.
 // Do this with a lookup table eventually!
-static void GetEdgeVertIndex( int sideLength, int iEdge, int iVert, CVertIndex &out )
+static void GetEdgeVertIndex( int sideLength, int iEdge, short iVert, CVertIndex &out )
 {
 	if( iEdge == NEIGHBOREDGE_RIGHT )
 	{
@@ -127,7 +127,7 @@ static void GetEdgeVertIndex( int sideLength, int iEdge, int iVert, CVertIndex &
 
 
 // Generate an index given a CVertIndex and the size of the displacement it resides in.
-static int VertIndex( CVertIndex const &vert, int iMaxPower )
+static unsigned short VertIndex( CVertIndex const &vert, int iMaxPower )
 {
 	return size_cast<unsigned short>(vert.y * ((1 << iMaxPower) + 1) + vert.x);
 }
@@ -135,9 +135,9 @@ static int VertIndex( CVertIndex const &vert, int iMaxPower )
 
 static CVertIndex WrapVertIndex( CVertIndex const &in, int sideLength )
 {
-	int out[2];
+	short out[2];
 
-	for( int i=0; i < 2; i++ )
+	for( short i=0; i < 2; i++ )
 	{
 		if( in[i] < 0 )
 			out[i] = size_cast<short>( sideLength - 1 - (-in[i] % sideLength) );
@@ -173,7 +173,7 @@ static void AddDependency(
 	bool bCheckNeighborDependency,
 	bool bAddReverseDependency )
 {
-	int iNodeIndex = VertIndex( nodeIndex, iMaxPower );
+	unsigned short iNodeIndex = VertIndex( nodeIndex, iMaxPower );
 	CVertInfo *pNode = &dependencies[iNodeIndex];
 
 	int iDep = GetFreeDependency( pNode->m_Dependencies, sizeof(pNode->m_Dependencies)/sizeof(pNode->m_Dependencies[0]) );
@@ -192,7 +192,7 @@ static void AddDependency(
 	// Internal verts wind up in here twice anyway so it doesn't need to 
 	if( bCheckNeighborDependency )
 	{
-		int iConnection = GetEdgeIndexFromPoint( nodeIndex, iMaxPower );
+		short iConnection = GetEdgeIndexFromPoint( nodeIndex, iMaxPower );
 		if( iConnection != -1 )
 		{
 			Assert( !pNode->m_Dependencies[1].IsValid() );
@@ -315,7 +315,7 @@ static void InitPowerInfoTriInfos_R(
 	int iMaxPower,
 	int iLevel )
 {
-	int iNodeIndex = VertIndex( nodeIndex, iMaxPower );
+	unsigned short iNodeIndex = VertIndex( nodeIndex, iMaxPower );
 
 	if( iLevel+1 < iMaxPower )
 	{
@@ -374,13 +374,13 @@ static void InitPowerInfo_R(
 	int iLevel )
 {
 	int sideLength = ((1 << iMaxPower) + 1);
-	int iNodeIndex = VertIndex( nodeIndex, iMaxPower );
+	unsigned short iNodeIndex = VertIndex( nodeIndex, iMaxPower );
 	
 	pPowerInfo->m_pVertInfo[iNodeIndex].m_iParent = iParent;
 	pPowerInfo->m_pVertInfo[iNodeIndex].m_iNodeLevel = size_cast<short>( iLevel + 1 );
 
-	pPowerInfo->m_pErrorEdges[iNodeIndex].m_Values[0] = (unsigned short)(VertIndex( nodeEdge1, iMaxPower ));
-	pPowerInfo->m_pErrorEdges[iNodeIndex].m_Values[1] = (unsigned short)(VertIndex( nodeEdge2, iMaxPower ));
+	pPowerInfo->m_pErrorEdges[iNodeIndex].m_Values[0] = VertIndex( nodeEdge1, iMaxPower );
+	pPowerInfo->m_pErrorEdges[iNodeIndex].m_Values[1] = VertIndex( nodeEdge2, iMaxPower );
 	
 	// Add this node's dependencies.
 	AddDependency( pPowerInfo->m_pVertInfo, sideLength, nodeIndex, dependency1, iMaxPower, false, true );
@@ -394,7 +394,7 @@ static void InitPowerInfo_R(
 	{
 		// Store the side vert index.
 		CVertIndex sideVert( nodeIndex.x + g_SideVertMul[iSide][0]*vertInc, nodeIndex.y + g_SideVertMul[iSide][1]*vertInc );
-		int iSideVert = VertIndex( sideVert, iMaxPower );
+		unsigned short iSideVert = VertIndex( sideVert, iMaxPower );
 
 		pPowerInfo->m_pSideVerts[iNodeIndex].m_Verts[iSide] = sideVert;
 
@@ -405,8 +405,8 @@ static void InitPowerInfo_R(
 		pPowerInfo->m_pSideVertCorners[iNodeIndex].m_Verts[iSide] = sideVertCorner0;
 
 		// Write the side vert corners into the error-edges list.
-		pPowerInfo->m_pErrorEdges[iSideVert].m_Values[0] = (unsigned short)VertIndex( sideVertCorner0, iMaxPower );
-		pPowerInfo->m_pErrorEdges[iSideVert].m_Values[1] = (unsigned short)VertIndex( sideVertCorner1, iMaxPower );
+		pPowerInfo->m_pErrorEdges[iSideVert].m_Values[0] = VertIndex( sideVertCorner0, iMaxPower );
+		pPowerInfo->m_pErrorEdges[iSideVert].m_Values[1] = VertIndex( sideVertCorner1, iMaxPower );
 
 		AddDependency( 
 			pPowerInfo->m_pVertInfo, 
