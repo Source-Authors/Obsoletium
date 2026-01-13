@@ -388,6 +388,12 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 			se::win::com::com_error_category().message(hr).c_str());
 
 		ok = false;
+
+		// Invalid handle means no sense to continue.
+		if (hr == E_HANDLE)
+		{
+			return ok;
+		}
 	}
 
 	const DWM_SYSTEMBACKDROP_TYPE dwm_backdrop_type =
