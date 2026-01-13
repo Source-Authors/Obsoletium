@@ -1629,16 +1629,12 @@ Color KeyValues::GetColor( const char *keyName )
 		else if ( dat->m_iDataType == TYPE_FLOAT )
 		{
 			// dimhotepus: Check value is in color range.
-			Assert(dat->m_flValue >= std::numeric_limits<byte>::min() &&
-				dat->m_flValue <= std::numeric_limits<byte>::max());
-			color[0] = static_cast<byte>( dat->m_flValue );
+			color[0] = size_cast<byte>( dat->m_flValue );
 		}
 		else if ( dat->m_iDataType == TYPE_INT )
 		{
 			// dimhotepus: Check value is in color range.
-			Assert(dat->m_iValue >= std::numeric_limits<byte>::min() &&
-				dat->m_iValue <= std::numeric_limits<byte>::max());
-			color[0] = static_cast<byte>( dat->m_iValue );
+			color[0] = size_cast<byte>( dat->m_iValue );
 		}
 		else if ( dat->m_iDataType == TYPE_STRING )
 		{

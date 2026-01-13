@@ -202,8 +202,7 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 				{
 					elem.nReferenceCount ++ ;
 				}
-				Assert(nCurrentBucket <= std::numeric_limits<unsigned short>::max());
-				return static_cast<unsigned short>(nCurrentBucket);
+				return size_cast<unsigned short>(nCurrentBucket);
 			}
 		}
 	}
@@ -223,8 +222,7 @@ unsigned short CCountedStringPool::ReferenceStringHandle( const char* pIntrinsic
 	// Insert at the beginning of the bucket:
 	m_Elements[nCurrentBucket].nNextElement = m_HashTable[ nHashBucketIndex ];
 	
-	Assert(nCurrentBucket <= std::numeric_limits<unsigned short>::max());
-	m_HashTable[ nHashBucketIndex ] = static_cast<unsigned short>(nCurrentBucket);
+	m_HashTable[ nHashBucketIndex ] = size_cast<unsigned short>(nCurrentBucket);
 
 	m_Elements[nCurrentBucket].pString = V_strdup( pIntrinsic );
 	
