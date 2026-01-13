@@ -590,6 +590,9 @@ bool SaveViewerSettings (const char *filename, StudioModel *pModel )
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 
+	// dimhotepus: Do not leak registry key.
+	RunCodeAtScopeExit(RegCloseKey(hModelKey));
+
 	MDLCACHE_CRITICAL_SECTION_( g_pMDLCache );
 	CStudioHdr *hdr = pModel->GetStudioHdr();
 	if ( !hdr )
