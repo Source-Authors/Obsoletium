@@ -1332,8 +1332,7 @@ bool CVTFTexture::Serialize( CUtlBuffer &buf )
 	header.version[0] = VTF_MAJOR_VERSION;
 	header.version[1] = VTF_MINOR_VERSION;
 	const size_t headerSize = sizeof(VTFFileHeader_t) + m_arrResourcesInfo.Count() * sizeof( ResourceEntryInfo ); //-V119
-	Assert(headerSize <= std::numeric_limits<unsigned>::max());
-	header.headerSize = static_cast<unsigned>(headerSize);
+	header.headerSize = size_cast<unsigned>(headerSize);
 
 	header.width = m_nWidth;
 	header.height = m_nHeight;
