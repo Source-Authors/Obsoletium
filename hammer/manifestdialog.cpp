@@ -150,11 +150,15 @@ void CManifestListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	ItemRect.left += 36;
 
 	dc.Attach( lpDrawItemStruct->hDC );
-	dc.SetROP2( R2_COPYPEN );
+	RunCodeAtScopeExit(dc.Detach());
 
-	CPen m_hPen, *pOldPen;
+	int oldRop2 = dc.SetROP2( R2_COPYPEN );
+	RunCodeAtScopeExit(dc.SetROP2(oldRop2));
+
+	CPen m_hPen;
 	m_hPen.CreatePen( PS_SOLID, 1, ::GetSysColor( COLOR_3DSHADOW ) );
-	pOldPen = dc.SelectObject( &m_hPen );
+	CPen *pOldPen = dc.SelectObject( &m_hPen );
+	RunCodeAtScopeExit(dc.SelectObject( pOldPen ));
 
 	int iBackIndex = COLOR_WINDOW;
 	int iForeIndex = COLOR_WINDOWTEXT;
@@ -244,10 +248,15 @@ void CManifestListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 		}
 
 
-		dc.SetTextColor( GetSysColor( iForeIndex ) );
-		dc.SetBkColor( GetSysColor( iBackIndex ) );
+		COLORREF oldTextColor = dc.SetTextColor( GetSysColor( iForeIndex ) );
+		RunCodeAtScopeExit(dc.SetTextColor( oldTextColor ));
+
+		COLORREF oldBkColor = dc.SetBkColor( GetSysColor( iBackIndex ) );
+		RunCodeAtScopeExit(dc.SetBkColor( oldBkColor ));
 	
-		dc.SetBkMode( TRANSPARENT );
+		int oldBkMode = dc.SetBkMode( TRANSPARENT );
+		RunCodeAtScopeExit(dc.SetBkMode( oldBkMode ));
+
 		VisibleRect.left = r.left + 36;
 		VisibleRect.top = r.top + 1;
 		VisibleRect.right = r.right - 1;
@@ -260,9 +269,6 @@ void CManifestListBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 	{
 		dc.DrawFocusRect( &ItemRect );
 	}
-
-	dc.SelectObject( pOldPen );
-	dc.Detach();
 }
 
 

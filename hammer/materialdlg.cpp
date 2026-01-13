@@ -298,12 +298,15 @@ void CFaceSmoothingDlg::CheckGroupButtons( int *pGroupCounts, int nFaceCount )
 		{
 			// Todo: Come up with a better effect here!
 			CDC *pDC = pGroupButton->GetDC();
+			RunCodeAtScopeExit(pGroupButton->ReleaseDC( pDC ));
+
 			m_Brush.CreateSolidBrush( pDC->GetTextColor() );
+			RunCodeAtScopeExit(m_Brush.DeleteObject());
+
 			CRect buttonRect;
 			pGroupButton->GetClientRect( buttonRect );
+
 			pDC->FillRect( buttonRect, &m_Brush );
-			m_Brush.DeleteObject();
-			pGroupButton->ReleaseDC( pDC );
 		}
 	}
 

@@ -227,8 +227,9 @@ void CIconComboBox::DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct )
 	if( !IsWindowEnabled() )
 	{
 		SetDisabledBrushAndPen( lpDrawItemStruct, &pOldBrush, &pOldPen );
-        OnDrawIcon( lpDrawItemStruct );
-		ResetBrushAndPen( lpDrawItemStruct, pOldBrush, pOldPen );
+		RunCodeAtScopeExit(ResetBrushAndPen( lpDrawItemStruct, pOldBrush, pOldPen ));
+
+		OnDrawIcon( lpDrawItemStruct );
 		return;
 	}
 
@@ -239,8 +240,9 @@ void CIconComboBox::DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct )
 		( lpDrawItemStruct->itemAction & ( ODA_SELECT | ODA_DRAWENTIRE ) ) ) 
 	{
 		SetSelectedBrushAndPen( lpDrawItemStruct, &pOldBrush, &pOldPen );
+		RunCodeAtScopeExit(ResetBrushAndPen( lpDrawItemStruct, pOldBrush, pOldPen ));
+
 		OnDrawIcon( lpDrawItemStruct );
-		ResetBrushAndPen( lpDrawItemStruct, pOldBrush, pOldPen );
 	}
 
 	//
@@ -250,8 +252,9 @@ void CIconComboBox::DrawItem( LPDRAWITEMSTRUCT lpDrawItemStruct )
 		 ( lpDrawItemStruct->itemAction & ( ODA_SELECT | ODA_DRAWENTIRE ) ) ) 
 	{
 		SetUnSelectedBrushAndPen( lpDrawItemStruct, &pOldBrush, &pOldPen );
+		RunCodeAtScopeExit(ResetBrushAndPen( lpDrawItemStruct, pOldBrush, pOldPen ));
+
 		OnDrawIcon( lpDrawItemStruct );
-		ResetBrushAndPen( lpDrawItemStruct, pOldBrush, pOldPen );
 	}
 
 	//

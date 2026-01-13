@@ -107,7 +107,7 @@ void CMessageWnd::AddMsg(MWMSGTYPE type, TCHAR* msg)
 	}
 
 	// format message
-	MWMSGSTRUCT mws;	
+	MWMSGSTRUCT mws;
 	mws.MsgLen = size_cast<int>(V_strlen(msg));
 	mws.type = type;
 	Assert(mws.MsgLen < ssize(mws.szMsg));
@@ -230,8 +230,11 @@ void CMessageWnd::OnPaint()
 	int			nScrollMax;
 
 	// select font
-	dc.SelectObject(&Font);
-	dc.SetBkMode(TRANSPARENT);
+	CFont *pOldFont = dc.SelectObject(&Font);
+	RunCodeAtScopeExit(dc.SelectObject(pOldFont));
+
+	int oldBkMode = dc.SetBkMode(TRANSPARENT);
+	RunCodeAtScopeExit(dc.SetBkMode(oldBkMode));
 
 	// first paint?
 	if(iCharWidth == -1)
@@ -259,22 +262,40 @@ void CMessageWnd::OnPaint()
 		if ( r.top > nScrollMax )
 			break;
 
+		bool isNewColor = false;
+		COLORREF oldColor;
+
 		// color of msg
 		switch(mws.type)
 		{
 		case mwError:
-			dc.SetTextColor(RGB(255, 60, 60));
+			oldColor = dc.SetTextColor(RGB(255, 60, 60));
+			isNewColor = true;
 			break;
 		case mwStatus:
-			dc.SetTextColor(RGB(0, 0, 0));
+			oldColor = dc.SetTextColor(RGB(0, 0, 0));
+			isNewColor = true;
 			break;
 		}
 
-		// draw text
-		dc.TextOut(r.left, r.top, mws.szMsg, mws.MsgLen);
+		if ( isNewColor )
+		{
+			RunCodeAtScopeExit(dc.SetTextColor(oldColor));
 
-		// move rect down
-		r.OffsetRect(0, m_dpi_behavior.ScaleOnY( iMsgPtSize + 2 ));
+			// draw text
+			dc.TextOut(r.left, r.top, mws.szMsg, mws.MsgLen);
+
+			// move rect down
+			r.OffsetRect(0, m_dpi_behavior.ScaleOnY( iMsgPtSize + 2 ));
+		}
+		else
+		{
+			// draw text
+			dc.TextOut(r.left, r.top, mws.szMsg, mws.MsgLen);
+
+			// move rect down
+			r.OffsetRect(0, m_dpi_behavior.ScaleOnY( iMsgPtSize + 2 ));
+		}
 	}
 }
 

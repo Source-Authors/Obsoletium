@@ -922,17 +922,20 @@ void CMaterial::Draw(CDC *pDC, RECT& rect, int iFontHeight, int iIconHeight, Dra
 NoData:
 		// draw "no data"
 		CFont *pOldFont = (CFont*) pDC->SelectStockObject(ANSI_VAR_FONT);
+		RunCodeAtScopeExit(pDC->SelectObject(pOldFont));
+
 		COLORREF cr = pDC->SetTextColor(RGB(0xff, 0xff, 0xff));
+		RunCodeAtScopeExit(pDC->SetTextColor(cr));
+
 		COLORREF cr2 = pDC->SetBkColor(RGB(0, 0, 0));
+		RunCodeAtScopeExit(pDC->SetBkColor(cr2));
 
 		// draw black rect first
 		pDC->FillRect(&rect, CBrush::FromHandle(HBRUSH(GetStockObject(BLACK_BRUSH))));
 
 		// then text
 		pDC->TextOut(rect.left+2, rect.top+2, "No Image", 8);
-		pDC->SelectObject(pOldFont);
-		pDC->SetTextColor(cr);
-		pDC->SetBkColor(cr2);
+
 		return;
 	}
 

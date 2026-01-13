@@ -1009,6 +1009,8 @@ bool CHammer::Check16BitColor()
 	HDC hDC = ::CreateCompatibleDC(NULL);
 	if (hDC)
 	{
+		RunCodeAtScopeExit(::DeleteDC(hDC));
+
 		int bpp = GetDeviceCaps(hDC, BITSPIXEL);
 		// dimhotepus: Correctly check BPP is 16+
 		if (bpp < 16)
@@ -1016,7 +1018,6 @@ bool CHammer::Check16BitColor()
 			AfxMessageBox("Your screen must be in 16-bit color or higher to run Hammer.", MB_ICONERROR);
 			return false;
 		}
-		::DeleteDC(hDC);
 	}
 
 	return true;
