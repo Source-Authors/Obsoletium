@@ -24,11 +24,21 @@
 // Access to Windows 10 features.
 #define _WIN32_WINNT 0x0A00
 
-#define NOMINMAX
-#define NOWINRES
-#define NOSERVICE
-#define NOMCX
-#define NOIME
+#define NOGDICAPMASKS     // - CC_*, LC_*, PC_*, CP_*, TC_*, RC_
+#define NOMEMMGR          // - GMEM_*, LMEM_*, GHND, LHND, associated routines
+#define NOMETAFILE        // - typedef METAFILEPICT
+#define NOMINMAX          // - Macros min(a, b) and max(a, b)
+#define NOOPENFILE        // - OpenFile(), OemToAnsi, AnsiToOem, and OF_*
+#define NOSERVICE         // - All Service Controller routines, SERVICE_ equates, etc.
+#define NOSOUND           // - Sound driver routines
+#define NOCOMM            // - COMM driver routines
+#define NOKANJI           // - Kanji support stuff.
+#define NOPROFILER        // - Profiler interface.
+#define NODEFERWINDOWPOS  // - DeferWindowPos routines
+#define NOMCX             // - Modem Configuration Extensions
+#define NOIME             // - Input method editor
+#define NOCRYPT           // - No crypto
+#define NOWINRES          // - No windows resources.
 
 #if !defined( _X360 )
 #include <Windows.h>

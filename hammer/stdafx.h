@@ -10,8 +10,8 @@
 //      are changed infrequently
 //
 
-#if !defined(AFX_STDAFX_H__2871A74F_7D2F_4026_9DB0_DBACAFB3B7F5__INCLUDED_)
-#define AFX_STDAFX_H__2871A74F_7D2F_4026_9DB0_DBACAFB3B7F5__INCLUDED_
+#ifndef SE_HAMMER_STDAFX_H_
+#define SE_HAMMER_STDAFX_H_
 
 #if _MSC_VER > 1000
 #pragma once
@@ -23,6 +23,7 @@
 #include "tier0/vprof.h"
 
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
+#define WIN32_LEAN_AND_MEAN
 
 // Strict types mode.
 #ifndef STRICT
@@ -33,11 +34,23 @@
 #define _WIN32_WINNT 0x0A00
 
 // Disable unused things to speedup compile.
-#define NOMINMAX
-#define NOWINRES
-#define NOSERVICE
-#define NOMCX
-#define NOIME
+#define NOGDICAPMASKS     // - CC_*, LC_*, PC_*, CP_*, TC_*, RC_
+#define NOMEMMGR          // - GMEM_*, LMEM_*, GHND, LHND, associated routines
+#define NOMETAFILE        // - typedef METAFILEPICT
+#define NOMINMAX          // - Macros min(a, b) and max(a, b)
+#define NOOPENFILE        // - OpenFile(), OemToAnsi, AnsiToOem, and OF_*
+#define NOSERVICE         // - All Service Controller routines, SERVICE_ equates, etc.
+#define NOSOUND           // - Sound driver routines
+#define NOCOMM            // - COMM driver routines
+#define NOKANJI           // - Kanji support stuff.
+#define NOPROFILER        // - Profiler interface.
+#define NODEFERWINDOWPOS  // - DeferWindowPos routines
+#define NOMCX             // - Modem Configuration Extensions
+#define NOIME             // - Input method editor
+#define NOCRYPT           // - No crypto
+#define NOWINRES          // - No windows resources.
+
+#define NOWH              // - SetWindowsHook and WH_*
 
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
@@ -70,7 +83,7 @@
 //{{AFX_INSERT_LOCATION}}
 // Microsoft Visual C++ will insert additional declarations immediately before the previous line.
 
-#endif // !defined(AFX_STDAFX_H__2871A74F_7D2F_4026_9DB0_DBACAFB3B7F5__INCLUDED_)
+#endif // !defined(SE_HAMMER_STDAFX_H_)
 
 
 
