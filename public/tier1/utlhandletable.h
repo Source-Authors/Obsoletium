@@ -113,8 +113,7 @@ UtlHandle_t CUtlHandleTable<T, HandleBits>::AddHandle()
 	Assert(m_nValidHandles < std::numeric_limits<int>::max());
 	++m_nValidHandles;
 
-	Assert(nIndex >= 0 && static_cast<size_t>(nIndex) <= std::numeric_limits<unsigned>::max());
-	return CreateHandle( entry.m_nSerial, static_cast<unsigned>(nIndex) );
+	return CreateHandle( entry.m_nSerial, size_cast<unsigned>(nIndex) );
 }
 
 template< class T, int HandleBits >
@@ -220,8 +219,7 @@ template< class T, int HandleBits >
 int CUtlHandleTable<T, HandleBits>::GetHandleCount() const
 {
 	intp count = m_list.Count();
-	Assert(count <= std::numeric_limits<int>::max());
-	return static_cast<int>(count);
+	return size_cast<int>(count);
 }
 
 template< class T, int HandleBits >
