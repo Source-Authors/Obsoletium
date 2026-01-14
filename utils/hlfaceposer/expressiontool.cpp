@@ -3630,7 +3630,7 @@ void ExpressionTool::OnCopyFromFlex( float scenetime, bool isEdited )
 bool ExpressionTool::SetFlexAnimationTrackFromExpression( int mx, int my, CExpClass *cl, CExpression *exp )
 {
 	CChoreoEvent *e = GetSafeEvent();
-	if ( !e | !e->GetDuration() )
+	if ( !e || !e->GetDuration() )
 	{
 		return false;
 	}
