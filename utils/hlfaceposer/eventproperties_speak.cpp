@@ -356,7 +356,8 @@ void CEventPropertiesSpeakDialog::OnCheckChangedVolumeLevel( CEventParams *param
 
 	// Look up the sound level from the soundemitter system
 	CSoundParametersInternal *soundparams = soundemitter->InternalGetParametersForSound( soundindex );
-	if ( !params )
+	// dimhotepus: Check sound params are here.
+	if ( !soundparams )
 	{
 		return;
 	}
