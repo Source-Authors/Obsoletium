@@ -777,7 +777,7 @@ void CExpressionToolWorkspace::OnDeleteColumn()
 	int clickedframe = ( int ) ( scenefps * snapped + 0.5f );
 
 	// One half of 1/fps on each side
-	float epsilon = epsilon = 0.5f / (float)scenefps;
+	float epsilon = 0.5f / (float)scenefps;
 
 	CInputParams params;
 	memset( &params, 0, sizeof( params ) );
