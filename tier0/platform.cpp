@@ -24,6 +24,8 @@
 #include "tier0/minidump.h"
 #include "tier0/vcrmode.h"
 
+#include <atomic>
+
 #if !defined(STEAM) && !defined(NO_MALLOC_OVERRIDE)
 #include "tier0/memalloc.h"
 
@@ -45,7 +47,7 @@ static LARGE_INTEGER g_ClockStart;
 static bool s_bTimeInitted;
 
 // Benchmark mode uses this heavy-handed method 
-static bool g_bBenchmarkMode = false;
+static std::atomic_bool g_bBenchmarkMode = false;
 static double g_FakeBenchmarkTime = 0;
 constexpr double g_FakeBenchmarkTimeInc = 1.0 / 66.0;
 
@@ -76,12 +78,12 @@ void InitTime()
 
 bool Plat_IsInBenchmarkMode()
 {
-	return g_bBenchmarkMode;
+	return g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed);
 }
 
 void Plat_SetBenchmarkMode( bool bBenchmark )
 {
-	g_bBenchmarkMode = bBenchmark;
+	g_bBenchmarkMode.store(bBenchmark, std::memory_order::memory_order_relaxed);
 }
 
 static long long Plat_CycleTime()
@@ -96,7 +98,7 @@ static long long Plat_CycleTime()
 
 double Plat_FloatTime()
 {
-	if ( !g_bBenchmarkMode )
+	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
 	{
 		Assert( s_bTimeInitted );
 
@@ -110,7 +112,7 @@ double Plat_FloatTime()
 
 uint32 Plat_MSTime()
 {
-	if ( !g_bBenchmarkMode )
+	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
 	{
 		Assert( s_bTimeInitted );
 
@@ -124,7 +126,7 @@ uint32 Plat_MSTime()
 
 uint64 Plat_USTime()
 {
-	if ( !g_bBenchmarkMode )
+	if ( !g_bBenchmarkMode.load(std::memory_order::memory_order_relaxed) )
 	{
 		Assert ( s_bTimeInitted );
 
@@ -282,10 +284,8 @@ bool vtune( bool resume )
 
 bool Plat_IsInDebugSession()
 {
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 	return (IsDebuggerPresent() != 0);
-#elif defined( _WIN32 ) && defined( _X360 )
-	return (XBX_IsDebuggerPresent() != 0);
 #elif defined( LINUX )
 	#error This code is implemented in platform_posix.cpp
 #else
@@ -318,7 +318,7 @@ static BOOL IsUserAdmin() {
 
 // dimhotepus: Additional bug info.
 bool Plat_IsUserAnAdmin() {
-#if defined(_WIN32) && !defined(_X360)
+#if defined(_WIN32)
   return ::IsUserAdmin() ? true : false;
 #else
   const uid_t uid{getuid()}, euid{geteuid()};
@@ -424,10 +424,8 @@ bool Plat_ApplySystemTitleBarTheme(void *window,
 
 void Plat_DebugString( const char * psz )
 {
-#if defined( _WIN32 ) && !defined( _X360 )
+#if defined( _WIN32 )
 	::OutputDebugStringA( psz );
-#elif defined( _WIN32 ) && defined( _X360 )
-	XBX_OutputDebugString( psz );
 #endif
 }
 
