@@ -60,6 +60,7 @@ CTextureWindow::CTextureWindow(void)
 
 	m_szFilter[0] = '\0';
 	m_nFilters = 0;
+	m_Filters[0] = '\0';
 
 	m_szKeywords[0] = '\0';
 	m_nKeywords = 0;
