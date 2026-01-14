@@ -184,7 +184,7 @@ bool CCheckUVCmd::CheckOverlap( const struct s_source_t *pSource ) const
 		if ( overlapList.IsEmpty() )
 			continue;;
 
-		const int nFaceA = i;
+		const int nFaceA = size_cast<int>(i);
 		const int nMeshA = FindMeshIndex( pSource, nFaceA );
 		PrintFace( pSource, nMeshA, nFaceA );
 		Msg( "       Overlaps\n" );

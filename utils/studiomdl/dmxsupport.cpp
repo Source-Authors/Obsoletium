@@ -770,7 +770,7 @@ static bool AddDagJoint( CDmeModel *pModel, CDmeDag *pDag, s_node_t *pNodes, int
 	}
 	
 	boneMap.m_ppTransforms[ nJointIndex ] = pDmeTransform;
-	int nFoundIndex = 0;
+	intp nFoundIndex = 0;
 	if ( pModel )
 	{
 		nFoundIndex = pModel->GetJointTransformIndex( pDmeTransform );
@@ -784,8 +784,8 @@ static bool AddDagJoint( CDmeModel *pModel, CDmeDag *pDag, s_node_t *pNodes, int
 	pNodes[ nJointIndex ].parent = nParentIndex;
 
 	// Now deal with children
-	int nChildCount = pDag->GetChildCount();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = pDag->GetChildCount();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeDag *pChild = pDag->GetChild( i );
 		if ( !pChild )
@@ -824,8 +824,8 @@ static int LoadSkeleton( CDmeDag *pRoot, CDmeModel *pModel, s_node_t *pNodes, Bo
 	}
 
 	// Don't create joints for the the root dag ever.. just deal with the children
-	int nChildCount = pRoot->GetChildCount();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = pRoot->GetChildCount();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeDag *pChild = pRoot->GetChild( i );
 		if ( !pChild )
@@ -844,8 +844,8 @@ static int LoadSkeleton( CDmeDag *pRoot, CDmeModel *pModel, s_node_t *pNodes, Bo
 		return map.m_nBoneCount + 1;
 
 	// Look for joints listed in the transform list which aren't in the hierarchy
-	int nInitialBoneCount = pModel->GetJointTransformCount();
-	for ( int i = 0; i < nInitialBoneCount; ++i )
+	intp nInitialBoneCount = pModel->GetJointTransformCount();
+	for ( intp i = 0; i < nInitialBoneCount; ++i )
 	{
 		int nIndex = map.m_pBoneRemap[i];
 		if ( nIndex < 0 )
@@ -889,8 +889,8 @@ static void LoadAttachments( CDmeDag *pRoot, CDmeDag *pDag, s_source_t *pSource 
 	}
 
 	// Don't create joints for the the root dag ever.. just deal with the children
-	int nChildCount = pDag->GetChildCount();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = pDag->GetChildCount();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeDag *pChild = pDag->GetChild( i );
 		if ( !pChild )
@@ -923,8 +923,8 @@ static void LoadBindPose( CDmeModel *pModel, float flScale, int *pBoneRemap, s_s
 	// NOTE: This means that bones that are not in the bind pose are set to identity!
 	// Is this correct? I think it shouldn't matter, but we may need to fix this.
 	CDmeTransformList *pBindPose = pModel->FindBaseState( "bind" );
-	int nCount = pBindPose ? pBindPose->GetTransformCount() : pModel->GetJointTransformCount();
-	for ( int i = 0; i < nCount; ++i )
+	intp nCount = pBindPose ? pBindPose->GetTransformCount() : pModel->GetJointTransformCount();
+	for ( intp i = 0; i < nCount; ++i )
 	{
 		CDmeTransform *pTransform = pBindPose ? pBindPose->GetTransform(i) : pModel->GetJointTransform(i);
 
@@ -1000,8 +1000,8 @@ static void ComputeFramePose( s_sourceanim_t *pSourceAnim, int nFrame, float flS
 //-----------------------------------------------------------------------------
 static void LoadAnimations( s_source_t *pSource, CDmeAnimationList *pAnimationList, float flScale, BoneTransformMap_t &boneMap )
 {
-	int nAnimationCount = pAnimationList->GetAnimationCount();
-	for ( int i = 0; i < nAnimationCount; ++i )
+	intp nAnimationCount = pAnimationList->GetAnimationCount();
+	for ( intp i = 0; i < nAnimationCount; ++i )
 	{
 		CDmeChannelsClip *pAnimation = pAnimationList->GetAnimation( i );
 
@@ -1057,8 +1057,8 @@ static void AddFlexKeys( CDmeDag *pRoot, CDmeDag *pDag, CDmeCombinationOperator 
 	CDmeMesh *pMesh = CastElement< CDmeMesh >( pDag->GetShape() );
 	if ( pMesh && ( pDag != pRoot ) )
 	{
-		int nDeltaStateCount = pMesh->DeltaStateCount();
-		for ( int i = 0; i < nDeltaStateCount; ++i )
+		intp nDeltaStateCount = pMesh->DeltaStateCount();
+		for ( intp i = 0; i < nDeltaStateCount; ++i )
 		{
 			CDmeVertexDeltaData *pDeltaState = pMesh->GetDeltaState( i );
 			AddFlexKey( pSource, pComboOp, pDeltaState->GetName() );
@@ -1066,8 +1066,8 @@ static void AddFlexKeys( CDmeDag *pRoot, CDmeDag *pDag, CDmeCombinationOperator 
 	}
 
 	// Don't create joints for the the root dag ever.. just deal with the children
-	int nChildCount = pDag->GetChildCount();
-	for ( int i = 0; i < nChildCount; ++i )
+	intp nChildCount = pDag->GetChildCount();
+	for ( intp i = 0; i < nChildCount; ++i )
 	{
 		CDmeDag *pChild = pDag->GetChild( i );
 		if ( !pChild )

@@ -393,7 +393,7 @@ int AddToVlist( int v, int m, int n, int t, int firstref )
 		if (cur->m == m && cur->n == n && cur->t == t)
 		{
 			cur->refcount++;
-			return cur - v_listdata;
+			return size_cast<int>( cur - v_listdata );
 		}
 		prev = cur;
 		cur = cur->next;

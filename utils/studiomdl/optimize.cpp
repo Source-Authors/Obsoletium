@@ -1075,9 +1075,9 @@ bool COptimizedModel::GenerateStripGroupVerticesFromFace(	mstudioiface_t* pFace,
 		}
 
 		// Set the fields of the strip group's vert
-		pStripGroupVert[faceIndex].origMeshVertID = vertex;
+		pStripGroupVert[faceIndex].origMeshVertID = size_cast<unsigned short>(vertex);
 
-		pStripGroupVert[faceIndex].numBones = bonesAffectingVertex;
+		pStripGroupVert[faceIndex].numBones = size_cast<byte>(bonesAffectingVertex);
 
 		int boneID;
 
@@ -1085,12 +1085,12 @@ bool COptimizedModel::GenerateStripGroupVerticesFromFace(	mstudioiface_t* pFace,
 		for( boneID = 0; boneID < bonesAffectingVertex; boneID++ )
 		{
 			pStripGroupVert[faceIndex].boneID[boneID] = pBoneWeight->bone[boneID];
-			pStripGroupVert[faceIndex].boneWeightIndex[boneID] = boneID;
+			pStripGroupVert[faceIndex].boneWeightIndex[boneID] = size_cast<byte>(boneID);
 		}
 		for( ; boneID < MAX_NUM_BONES_PER_VERT; boneID++ )
 		{
 			pStripGroupVert[faceIndex].boneID[boneID] = -1;
-			pStripGroupVert[faceIndex].boneWeightIndex[boneID] = boneID;
+			pStripGroupVert[faceIndex].boneWeightIndex[boneID] = size_cast<byte>(boneID);
 		}
 #else
 		// don't let bones have any influence.
@@ -1235,7 +1235,7 @@ struct EdgeInfo_t
 	int m_nTriangleId;
 };
 
-static void FindMatchingEdge( TriangleList_t& list, int nTriangleId, int nEdgeIndex, 
+static void FindMatchingEdge( TriangleList_t& list, intp nTriangleId, int nEdgeIndex, 
 	const int *pVertIds, CUtlVector< int >& vertexToEdges, CUtlFixedLinkedList< EdgeInfo_t >& edges )
 {
 	// Have we already attached this edge to something?
@@ -1246,7 +1246,7 @@ static void FindMatchingEdge( TriangleList_t& list, int nTriangleId, int nEdgeIn
 	int nVertIndex = ( pVertIds[0] < pVertIds[1] ) ? 0 : 1;
 	int nConnectedVertId = pVertIds[ 1-nVertIndex ];
 	int hFirstEdge = vertexToEdges[nVertIndex];
-	for ( int hEdge = hFirstEdge; hEdge != edges.InvalidIndex(); hEdge = edges.Next(hEdge) )
+	for ( intp hEdge = hFirstEdge; hEdge != edges.InvalidIndex(); hEdge = edges.Next(hEdge) )
 	{
 		EdgeInfo_t &edge = edges[hEdge];
 		if ( edge.m_nConnectedVertId != nConnectedVertId )
@@ -1268,7 +1268,7 @@ static void FindMatchingEdge( TriangleList_t& list, int nTriangleId, int nEdgeIn
 	}
 
 	// No match! Insert the disconnected edge into the edge list
-	int hNewEdge = edges.Alloc( true );
+	intp hNewEdge = edges.Alloc( true );
 	EdgeInfo_t &newEdge = edges[hNewEdge];
 	newEdge.m_nConnectedVertId = nConnectedVertId;
 	newEdge.m_nEdgeIndex = nEdgeIndex;
@@ -1925,9 +1925,9 @@ void COptimizedModel::CreateLODTriangleList( s_model_t *pSrcModel, int nLodID, s
 		intp index = meshTriangleList.AddToTail();
 		mstudioiface_t& newFace = meshTriangleList[index];
 		const s_face_t &srcFace = pSrc->face[pSrcMesh->faceoffset + i];
-		newFace.a = indexMapping[srcFace.a];
-		newFace.b = indexMapping[srcFace.b];
-		newFace.c = indexMapping[srcFace.c];
+		newFace.a = size_cast<unsigned short>(indexMapping[srcFace.a]);
+		newFace.b = size_cast<unsigned short>(indexMapping[srcFace.b]);
+		newFace.c = size_cast<unsigned short>(indexMapping[srcFace.c]);
 	}
 }
 

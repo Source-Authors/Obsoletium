@@ -1346,7 +1346,7 @@ void BuildConvexListByVertID( s_source_t *pmodel, CUtlVector<convexlist_t> &conv
 		if ( vertID[i] < 0 || vertID[i] > pmodel->numfaces )
 			continue;
 
-		current.firstVertIndex = vertList.Count();
+		current.firstVertIndex = size_cast<int>(vertList.Count());
 		current.numVertIndex = 0;
 
 		int id = vertID[i];
