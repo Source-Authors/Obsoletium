@@ -109,7 +109,7 @@ void AddScriptToStack (const char *filename, ScriptPathMode_t pathMode = SCRIPT_
 LoadScriptFile
 ==============
 */
-void LoadScriptFile (char *filename, ScriptPathMode_t pathMode)
+void LoadScriptFile (const char *filename, ScriptPathMode_t pathMode)
 {
 	script = scriptstack;
 	AddScriptToStack (filename, pathMode);

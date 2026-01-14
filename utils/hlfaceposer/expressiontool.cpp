@@ -3808,7 +3808,7 @@ void ExpressionTool::OnImportFlexAnimation( void )
 	char fullpath[ 512 ];
 	filesystem->RelativePathToFullPath_safe( fafilename, "MOD", fullpath );
 
-	LoadScriptFile( (char *)fullpath );
+	LoadScriptFile( fullpath );
 
 	tokenprocessor->GetToken( true );
 	if ( stricmp( tokenprocessor->CurrentToken(), "flexanimations" ) )

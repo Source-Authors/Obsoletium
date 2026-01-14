@@ -38,7 +38,7 @@ extern	qboolean	endofscript;
 // If pathMode is SCRIPT_USE_ABSOLUTE_PATH, then it uses ExpandPath() on the filename before
 // trying to open it. Otherwise, it passes the filename straight into the filesystem
 // (so you can leave it as a relative path).
-void LoadScriptFile (char *filename, ScriptPathMode_t pathMode=SCRIPT_USE_ABSOLUTE_PATH);
+void LoadScriptFile (const char *filename, ScriptPathMode_t pathMode=SCRIPT_USE_ABSOLUTE_PATH);
 void ParseFromMemory (char *buffer, intp size);
 
 qboolean GetToken (qboolean crossline, char (&out)[MAXTOKEN]);

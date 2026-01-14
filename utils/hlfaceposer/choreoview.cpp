@@ -7582,7 +7582,7 @@ CChoreoScene *CChoreoView::LoadScene( char const *filename )
 	if ( !filesystem->FileExists( filename ) )
 		return NULL;
 
-	LoadScriptFile( const_cast<char*>( filename ) );
+	LoadScriptFile( filename );
 
 	CChoreoScene *scene = ChoreoLoadScene( filename, this, tokenprocessor, Con_Printf );
 	return scene;
