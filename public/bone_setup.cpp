@@ -3017,16 +3017,9 @@ bool Studio_IKAnimationError( const CStudioHdr *pStudioHdr, const mstudioikrule_
 	}
 
 	mstudiocompressedikerror_t *pCompressed = pRule->pCompressedError();
-	if (pCompressed != NULL)
-	{
 		CalcDecompressedAnimation( pCompressed, iFrame - pRule->iStart, fraq, pos, q );
 		return true;
 	}
-	// no data, disable IK rule
-	Assert( 0 );
-	flWeight = 0.0f;
-	return false;
-}
 
 //-----------------------------------------------------------------------------
 // Purpose: For a specific sequence:rule, find where it starts, stops, and what 
@@ -3983,14 +3976,9 @@ void CIKContext::AutoIKRelease( void )
 				if ( pTarget->chain >= 0 && pTarget->chain < m_pStudioHdr->numikchains())
 				{
 					mstudioikchain_t *pchain = m_pStudioHdr->pIKChain( pTarget->chain );
-					if (pchain != NULL)
-					{
 						int bone = pchain->pLink( 2 )->bone;
 						if (bone >= 0 && bone < m_pStudioHdr->numbones())
 						{
-							mstudiobone_t *pBone = m_pStudioHdr->pBone( bone );
-							if (pBone != NULL)
-							{
 								if ( !(m_pStudioHdr->boneFlags( bone ) & m_boneMask))
 								{
 									pTarget->error.bInError = false;
@@ -4007,21 +3995,11 @@ void CIKContext::AutoIKRelease( void )
 							}
 							else
 							{
-								DevWarning( 1, "AutoIKRelease (%s) got a NULL pBone %d\n", m_pStudioHdr->pszName(), bone );
-							}
-						}
-						else
-						{
 							DevWarning( 1, "AutoIKRelease (%s) got an out of range bone %d (%d)\n", m_pStudioHdr->pszName(), bone, m_pStudioHdr->numbones() );
 						}
 					}
 					else
 					{
-						DevWarning( 1, "AutoIKRelease (%s) got a NULL pchain %d\n", m_pStudioHdr->pszName(), pTarget->chain );
-					}
-				}
-				else
-				{
 					DevWarning( 1, "AutoIKRelease (%s) got an out of range chain %d (%d)\n", m_pStudioHdr->pszName(), pTarget->chain, m_pStudioHdr->numikchains());
 				}
 			}
