@@ -212,10 +212,7 @@ CDispMapImageFilterManager::CDispMapImageFilterManager()
 	m_ActiveFilter = -1;
 	m_FilterCount = 0;
 
-	for (auto &f : m_pFilterList)
-	{
-		f = nullptr;
-	}
+	BitwiseClear(m_pFilterList);
 
 	m_PaintType = -1;
 	m_PaintDir = vec3_invalid;
