@@ -2346,7 +2346,6 @@ void VRAD_Finish()
 void VRAD_Init()
 {
 	MathLib_Init( 2.2f, 2.2f, 0.0f, 2.0f, false, false, false, false );
-	InstallSpewFunction();
 	SpewActivate( "developer", 1 );
 }
 
@@ -3071,6 +3070,9 @@ int RunVRAD( int argc, char **argv )
 int VRAD_Main(int argc, char **argv)
 {
 	g_pFileSystem = NULL;	// Safeguard against using it before it's properly initialized.
+
+	InstallSpewFunction();
+	RunCodeAtScopeExit(UninstallSpewFunction());
 
 	VRAD_Init();
 

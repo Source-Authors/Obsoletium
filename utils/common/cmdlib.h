@@ -100,6 +100,8 @@ void ColorPrintf(FILE *pFile, bool red, bool green, bool blue, bool intensity,
 
 // Initialize spew output.
 void InstallSpewFunction();
+// dimhotepus: Cleanup spew output.
+void UninstallSpewFunction();
 
 // This registers an extra callback for spew output.
 typedef void (*SpewHookFn)(const char *);

@@ -122,6 +122,14 @@ static void GetInitialColors() {
   g_BadColor = badColor;
 }
 
+// dimhotepus: Reset initial colors.
+static void ResetInitialColors() {
+  g_BadColor = 0xFFFF;
+  g_BackgroundFlags = 0xFFFF;
+  g_InitialColor = 0xFFFF;
+  g_LastColor = 0xFFFF;
+}
+
 WORD SetConsoleTextColor(int red, int green, int blue, int intensity) {
   WORD ret = std::exchange(g_LastColor, static_cast<unsigned short>(0));
 
@@ -267,12 +275,26 @@ SpewRetval_t CmdLib_SpewOutputFunc(SpewType_t type, char const *pMsg) {
   return retVal;
 }
 
+std::atomic<SpewOutputFunc_t> g_oldSpew = nullptr;
+char g_ioBuffer[BUFSIZ] = {};
+
 void InstallSpewFunction() {
   setvbuf(stdout, NULL, _IONBF, 0);
   setvbuf(stderr, NULL, _IONBF, 0);
 
-  SpewOutputFunc(CmdLib_SpewOutputFunc);
+  g_oldSpew = SpewOutputFunc2(CmdLib_SpewOutputFunc);
+
   GetInitialColors();
+}
+
+// dimhotepus: Cleanup spew output.
+void UninstallSpewFunction() {
+  ResetInitialColors();
+
+  SpewOutputFunc(g_oldSpew);
+
+  setvbuf(stderr, g_ioBuffer, _IOFBF, std::size(g_ioBuffer));
+  setvbuf(stdout, g_ioBuffer, _IOFBF, std::size(g_ioBuffer));
 }
 
 void InstallExtraSpewHook(SpewHookFn pFn) { g_ExtraSpewHooks.AddToTail(pFn); }

@@ -896,6 +896,8 @@ void PrintCommandLine( int argc, char **argv )
 int RunVBSP( int argc, char **argv )
 {
 	InstallSpewFunction();
+	RunCodeAtScopeExit(UninstallSpewFunction());
+
 	SpewActivate( "developer", 1 );
 
 #ifdef PLATFORM_64BITS

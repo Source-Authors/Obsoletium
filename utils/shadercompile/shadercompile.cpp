@@ -1762,7 +1762,9 @@ int ShaderCompileMain(int argc, char *argv[]) {
   const ScopedConsoleCtrlHandler scoped_ctrl_handler{OnCtrlBreak};
 
   EnableCrashingOnCrashes();
+
   InstallSpewFunction();
+  RunCodeAtScopeExit(UninstallSpewFunction());
 
   ThreadSetDebugName("ShaderCompile_Main");
 

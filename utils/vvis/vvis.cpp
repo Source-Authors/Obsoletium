@@ -1275,6 +1275,8 @@ int main (int argc, char **argv)
 	CommandLine()->CreateCmdLine( argc, argv );
 	
 	InstallSpewFunction();
+	RunCodeAtScopeExit(UninstallSpewFunction());
+
 	SpewActivate( "developer", 1 );
 	
 	// dimhotepus: Apply en_US UTF8 locale for printf/scanf.

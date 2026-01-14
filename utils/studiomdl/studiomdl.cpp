@@ -9533,6 +9533,7 @@ int main( int argc, char **argv )
 	const ScopedSuggestGameInfoDir scoped_sugest_game_info_dir( CStudioMDLApp_SuggestGameInfoDirFn );
 
 	InstallSpewFunction();
+	RunCodeAtScopeExit(UninstallSpewFunction());
 	
 	// override the default spew function
 	const ScopedSpewOutputFunc scoped_spew_output{ MdlSpewOutputFunc };

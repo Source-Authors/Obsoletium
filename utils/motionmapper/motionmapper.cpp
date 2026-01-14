@@ -2824,7 +2824,9 @@ int main(int argc, char **argv) {
 
   // Init command line stuff
   CommandLine()->CreateCmdLine(argc, argv);
+
   InstallSpewFunction();
+  RunCodeAtScopeExit(UninstallSpewFunction());
 
   // init math stuff
   MathLib_Init(2.2f, 2.2f, 0.0f, 2, false, false, false, false);
