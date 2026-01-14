@@ -318,7 +318,7 @@ MatSysWindow::handleEvent (mxEvent *event)
 		// clamp to 100fps
 		if (dt >= 0.0 && dt < 0.01)
 		{
-			Sleep( 10 - dt * 1000.0 );
+			Sleep( 10 - static_cast<int>( dt * 1000.0 ) );
 			return 1;
 		}
 
@@ -388,7 +388,7 @@ MatSysWindow::handleEvent (mxEvent *event)
 		oldlry = g_viewerSettings.lightrot[0];
 		g_viewerSettings.pause = false;
 
-		float r = 1.0/3.0 * min( w(), h() );
+		float r = 1.0f/3.0f * min( w(), h() );
 
 		float d = sqrt( ( float )( (event->x - w()/2) * (event->x - w()/2) + (event->y - h()/2) * (event->y - h()/2) ) );
 
@@ -458,8 +458,8 @@ MatSysWindow::handleEvent (mxEvent *event)
 				}
 				else
 				{
-					float ang1 = ( 180 / 3.1415 ) * atan2( oldx - w() / 2.0, oldy - h() / 2.0 );
-					float ang2 = ( 180 / 3.1415 ) * atan2( event->x - w() / 2.0, event->y - h() / 2.0 );
+					float ang1 = ( 180.0f / 3.1415f ) * atan2( oldx - w() / 2.0f, oldy - h() / 2.0f );
+					float ang2 = ( 180.0f / 3.1415f ) * atan2( event->x - w() / 2.0f, event->y - h() / 2.0f );
 					oldx = event->x;
 					oldy = event->y;
 
