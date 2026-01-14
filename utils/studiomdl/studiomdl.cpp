@@ -495,34 +495,34 @@ void kmemset( void *ptr, int value, int size )
 }
 
 
-int verify_atoi( const char *token )
+int verify_atoi( const char *in )
 {
-	if (token[0] != '-' && (token[0] < '0' || token[0] > '9'))
+	if (in[0] != '-' && (in[0] < '0' || in[0] > '9'))
 	{
-		TokenError( "expecting number, got \"%s\"\n", token );
+		TokenError( "expecting number, got \"%s\"\n", in );
 	}
-	return atoi( token );
+	return atoi( in );
 }
 
-float verify_atof( const char *token )
+float verify_atof( const char *in )
 {
-	if (token[0] != '-' && token[0] != '.' && (token[0] < '0' || token[0] > '9'))
+	if (in[0] != '-' && in[0] != '.' && (in[0] < '0' || in[0] > '9'))
 	{
-		TokenError( "expecting number, got \"%s\"\n", token );
+		TokenError( "expecting number, got \"%s\"\n", in );
 	}
-	return strtof( token, nullptr );
+	return strtof( in, nullptr );
 }
 
-float verify_atof_with_null( const char *token )
+float verify_atof_with_null( const char *in )
 {
-	if (strcmp( token, ".." ) == 0)
+	if (strcmp( in, ".." ) == 0)
 		return -1;
 
-	if (token[0] != '-' && token[0] != '.' && (token[0] < '0' || token[0] > '9'))
+	if (in[0] != '-' && in[0] != '.' && (in[0] < '0' || in[0] > '9'))
 	{
-		TokenError( "expecting number, got \"%s\"\n", token );
+		TokenError( "expecting number, got \"%s\"\n", in );
 	}
-	return strtof( token, nullptr );
+	return strtof( in, nullptr );
 }
 
 //-----------------------------------------------------------------------------
