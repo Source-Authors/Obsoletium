@@ -1419,7 +1419,7 @@ inline int mstudio_modelvertexdata_t::GetGlobalVertexIndex( int i ) const
 
 inline int mstudio_modelvertexdata_t::GetGlobalTangentIndex( int i ) const
 {
-	mstudiomodel_t *modelptr = (mstudiomodel_t *)((byte *)this - offsetof(mstudiomodel_t, vertexdata));
+	const mstudiomodel_t *modelptr = (const mstudiomodel_t *)((const byte *)this - offsetof(mstudiomodel_t, vertexdata));
 	Assert( ( modelptr->tangentsindex % sizeof( Vector4D ) ) == 0 );
 	return ( i + ( modelptr->tangentsindex / sizeof( Vector4D ) ) );
 }
@@ -2440,20 +2440,24 @@ public:
 	inline bool IsReadyForAccess( void ) const { return (m_pStudioHdr != nullptr); }
 	inline virtualmodel_t		*GetVirtualModel( void ) const { return m_pVModel; }
 	inline const studiohdr_t	*GetRenderHdr( void ) const { return m_pStudioHdr; }
-	const studiohdr_t *pSeqStudioHdr( intp sequence );
-	const studiohdr_t *pAnimStudioHdr( intp animation );
+	// dimhotepus: Make const.
+	const studiohdr_t *pSeqStudioHdr( intp sequence ) const;
+	// dimhotepus: Make const.
+	const studiohdr_t *pAnimStudioHdr( intp animation ) const;
 
 private:
-	mutable const studiohdr_t		*m_pStudioHdr;
+	mutable const studiohdr_t	*m_pStudioHdr;
 	mutable virtualmodel_t	*m_pVModel;
 
 	const virtualmodel_t * ResetVModel( const virtualmodel_t *pVModel ) const;
-	const studiohdr_t *GroupStudioHdr( intp group );
+	// dimhotepus: Make const.
+	const studiohdr_t *GroupStudioHdr( intp group ) const;
 	mutable CUtlVector< const studiohdr_t * > m_pStudioHdrCache;
 
 	mutable int			m_nFrameUnlockCounter;
 	int	*				m_pFrameUnlockCounter;
-	CThreadFastMutex	m_FrameUnlockCounterMutex;
+	// dimhotepus: Make mutable as used in const as actually implementation details.
+	mutable CThreadFastMutex	m_FrameUnlockCounterMutex;
 
 public:
 	inline int			numbones( void ) const { return m_pStudioHdr->numbones; }
@@ -2463,8 +2467,12 @@ public:
 
 	bool				SequencesAvailable() const;
 	intp				GetNumSeq( void ) const;
-	mstudioanimdesc_t	&pAnimdesc( intp i );
-	mstudioseqdesc_t	&pSeqdesc( intp iSequence );
+	mstudioanimdesc_t		&pAnimdesc( intp i );
+	// dimhotepus: Make const reference and const.
+	const mstudioanimdesc_t	&pAnimdesc( intp i ) const;
+	mstudioseqdesc_t		&pSeqdesc( intp iSequence );
+	// dimhotepus: Make const reference and const.
+	const mstudioseqdesc_t	&pSeqdesc( intp iSequence ) const;
 	int					iRelativeAnim( intp baseseq, int relanim ) const;	// maps seq local anim reference to global anim index
 	int					iRelativeSeq( intp baseseq, int relseq ) const;		// maps seq local seq reference to global seq index
 
@@ -2476,23 +2484,27 @@ public:
 	void				SetEventListVersion( int version );
 
 	intp				GetNumAttachments( void ) const;
-	const mstudioattachment_t &pAttachment( intp i );
+	// dimhotepus: Make const.
+	const mstudioattachment_t &pAttachment( intp i ) const;
 	int					GetAttachmentBone( intp i );
 	// used on my tools in hlmv, not persistant
 	void				SetAttachmentBone( intp iAttachment, int iBone );
 
 	int					EntryNode( intp iSequence );
 	int					ExitNode( intp iSequence );
-	const char			*pszNodeName( intp iNode );
+	// dimhotepus: Make const.
+	const char			*pszNodeName( intp iNode ) const;
 	// FIXME: where should this one be?
 	int					GetTransition( intp iFrom, int iTo ) const;
 
 	intp				GetNumPoseParameters( void ) const;
-	const mstudioposeparamdesc_t &pPoseParameter( intp i );
+	// dimhotepus: Make const.
+	const mstudioposeparamdesc_t &pPoseParameter( intp i ) const;
 	int					GetSharedPoseParameter( intp iSequence, int iLocalPose ) const;
 
 	intp				GetNumIKAutoplayLocks( void ) const;
-	const mstudioiklock_t &pIKAutoplayLock( intp i );
+	// dimhotepus: Make const.
+	const mstudioiklock_t &pIKAutoplayLock( intp i ) const;
 
 	inline intp			CountAutoplaySequences() const { return m_pStudioHdr->CountAutoplaySequences(); }
 	inline intp			CopyAutoplaySequences( unsigned short *pOut, int outCount ) const { return m_pStudioHdr->CopyAutoplaySequences( pOut, outCount ); }
@@ -2511,10 +2523,10 @@ public:
 	inline int			numflexdesc() const{ return m_pStudioHdr->numflexdesc; }
 	inline mstudioflexdesc_t *pFlexdesc( int i ) const { return m_pStudioHdr->pFlexdesc( i ); }
 
-	inline LocalFlexController_t			numflexcontrollers() const{ return (LocalFlexController_t)m_pStudioHdr->numflexcontrollers; }
+	inline LocalFlexController_t numflexcontrollers() const { return (LocalFlexController_t)m_pStudioHdr->numflexcontrollers; }
 	inline mstudioflexcontroller_t *pFlexcontroller( LocalFlexController_t i ) const { return m_pStudioHdr->pFlexcontroller( i ); }
 
-	inline int			numflexcontrollerui() const{ return m_pStudioHdr->numflexcontrollerui; }
+	inline int			numflexcontrollerui() const { return m_pStudioHdr->numflexcontrollerui; }
 	inline mstudioflexcontrollerui_t *pFlexcontrollerUI( int i ) const { return m_pStudioHdr->pFlexControllerUI( i ); }
 
 	inline const char	*pszName() const { return m_pStudioHdr->pszName(); }
@@ -2568,7 +2580,7 @@ public:
 	int IsSequenceLooping( int iSequence );
 	float GetSequenceCycleRate( intp iSequence );
 
-	void				RunFlexRules( const float *src, float *dest );
+	void RunFlexRules( const float *src, float *dest );
 
 
 public:

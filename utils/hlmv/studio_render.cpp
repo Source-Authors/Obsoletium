@@ -57,15 +57,15 @@ static int			first = 1;
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-mstudioseqdesc_t &StudioModel::GetSeqDesc( int seq )
+const mstudioseqdesc_t &StudioModel::GetSeqDesc( int seq ) const
 {
-	CStudioHdr *pStudioHdr = GetStudioHdr();
+	const CStudioHdr *pStudioHdr = GetStudioHdr();
 	return pStudioHdr->pSeqdesc( seq );
 }
 
-mstudioanimdesc_t &StudioModel::GetAnimDesc( int anim )
+const mstudioanimdesc_t &StudioModel::GetAnimDesc( int anim ) const
 {
-	CStudioHdr *pStudioHdr = GetStudioHdr();
+	const CStudioHdr *pStudioHdr = GetStudioHdr();
 	return pStudioHdr->pAnimdesc( anim );
 }
 
@@ -402,7 +402,7 @@ void StudioModel::SetUpBones( bool mergeBones )
 	static Vector		pos2[MAXSTUDIOBONES];
 
 	CStudioHdr *pStudioHdr = GetStudioHdr();
-	mstudioseqdesc_t	&seqdesc = pStudioHdr->pSeqdesc( m_sequence );
+	const mstudioseqdesc_t	&seqdesc = pStudioHdr->pSeqdesc( m_sequence );
 
 	QAngle a1;
 	Vector p1;
@@ -1247,7 +1247,7 @@ void StudioModel::DrawAttachments( )
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	for (int i = 0; i < pStudioHdr->GetNumAttachments(); i++)
 	{
-		mstudioattachment_t &pattachments = (mstudioattachment_t &)pStudioHdr->pAttachment( i );
+		const mstudioattachment_t &pattachments = pStudioHdr->pAttachment( i );
 
 		matrix3x4_t world;
 		ConcatTransforms( m_pBoneToWorld[ pStudioHdr->GetAttachmentBone( i ) ], pattachments.local, world );
@@ -1340,7 +1340,7 @@ void StudioModel::DrawEditAttachment()
 		CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 		pRenderContext->Bind( g_materialBones );
 		
-		mstudioattachment_t &pAttachment = (mstudioattachment_t &)pStudioHdr->pAttachment( iEditAttachment );
+		const mstudioattachment_t &pAttachment = pStudioHdr->pAttachment( iEditAttachment );
 
 		matrix3x4_t world;
 		ConcatTransforms( m_pBoneToWorld[ pStudioHdr->GetAttachmentBone( iEditAttachment ) ], pAttachment.local, world );
@@ -1527,7 +1527,7 @@ void StudioModel::SetViewTarget( void )
 
 	// look forward
 	CStudioHdr *pStudioHdr = GetStudioHdr();
-	mstudioattachment_t &patt = (mstudioattachment_t &)pStudioHdr->pAttachment( iEyeAttachment );
+	const mstudioattachment_t &patt = pStudioHdr->pAttachment( iEyeAttachment );
 	matrix3x4_t attToWorld;
 	ConcatTransforms( m_pBoneToWorld[ pStudioHdr->GetAttachmentBone( iEyeAttachment ) ], patt.local, attToWorld ); 
 	local = Vector( 32, 0, 0 );
@@ -1736,7 +1736,7 @@ void StudioModel::CalcHeadRotation( Vector pos[], Quaternion q[] )
 		return;
 
 	CStudioHdr *pStudioHdr = GetStudioHdr();
-	mstudioattachment_t &patt = (mstudioattachment_t &)pStudioHdr->pAttachment( iForwardAttachment );
+	const mstudioattachment_t &patt = pStudioHdr->pAttachment( iForwardAttachment );
 
 	matrix3x4_t attToWorld;
 	int iBone =  pStudioHdr->GetAttachmentBone( iForwardAttachment );
@@ -1749,7 +1749,7 @@ void StudioModel::CalcHeadRotation( Vector pos[], Quaternion q[] )
   	float dt = m_dt;
   	if (m_nSolveHeadTurn == 2)
   	{
-  		dt = 0.1;
+  		dt = 0.1f;
   	}
 
 	Vector vEyes;
@@ -1936,8 +1936,7 @@ int StudioModel::DrawModel( bool mergeBones )
 	extern float g_flexdescweight[MAXSTUDIOFLEXDESC]; // garymcthack
 	extern float g_flexdescweight2[MAXSTUDIOFLEXDESC]; // garymcthack
 
-	int i;
-	for (i = 0; i < pStudioHdr->numflexdesc(); i++)
+	for (int i = 0; i < pStudioHdr->numflexdesc(); i++)
 	{
 		g_flexdescweight[i] = 0.0;
 	}
@@ -1954,7 +1953,7 @@ int StudioModel::DrawModel( bool mergeBones )
 	float *pFlexWeights, *pFlexDelayedWeights;
 	g_pStudioRender->LockFlexWeights( pStudioHdr->numflexdesc(), &pFlexWeights, &pFlexDelayedWeights );
 
-	for (i = 0; i < pStudioHdr->numflexdesc(); i++)
+	for (int i = 0; i < pStudioHdr->numflexdesc(); i++)
 	{
 		g_flexdescweight2[i] = g_flexdescweight2[i] * d + g_flexdescweight[i] * (1 - d);
 

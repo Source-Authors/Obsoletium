@@ -72,7 +72,7 @@ void SlerpBones(
 	const CStudioHdr *pStudioHdr,
 	Quaternion q1[MAXSTUDIOBONES], 
 	Vector pos1[MAXSTUDIOBONES], 
-	mstudioseqdesc_t &seqdesc, // source of q2 and pos2
+	const mstudioseqdesc_t &seqdesc, // source of q2 and pos2
 	int sequence, 
 	const Quaternion q2[MAXSTUDIOBONES], 
 	const Vector pos2[MAXSTUDIOBONES], 
@@ -270,7 +270,7 @@ class CIKContext
 public:
 	CIKContext( );
 	void Init( const CStudioHdr *pStudioHdr, const QAngle &angles, const Vector &pos, float flTime, int iFramecounter, int boneMask );
-	void AddDependencies(  mstudioseqdesc_t &seqdesc, int iSequence, float flCycle, const float poseParameters[], float flWeight = 1.0f );
+	void AddDependencies( const mstudioseqdesc_t &seqdesc, int iSequence, float flCycle, const float poseParameters[], float flWeight = 1.0f );
 
 	void ClearTargets( void );
 	void UpdateTargets( Vector pos[], Quaternion q[], matrix3x4_t boneToWorld[], CBoneBitList &boneComputed );
@@ -280,8 +280,8 @@ public:
 	void AddAutoplayLocks( Vector pos[], Quaternion q[] );
 	void SolveAutoplayLocks( Vector pos[], Quaternion q[] );
 
-	void AddSequenceLocks( mstudioseqdesc_t &SeqDesc, Vector pos[], Quaternion q[] );
-	void SolveSequenceLocks( mstudioseqdesc_t &SeqDesc, Vector pos[], 	Quaternion q[] );
+	void AddSequenceLocks( const mstudioseqdesc_t &SeqDesc, Vector pos[], Quaternion q[] );
+	void SolveSequenceLocks( const mstudioseqdesc_t &SeqDesc, Vector pos[], Quaternion q[] );
 	
 	void AddAllLocks( Vector pos[], Quaternion q[] );
 	void SolveAllLocks( Vector pos[], Quaternion q[] );
@@ -353,28 +353,28 @@ float Studio_GetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 float Studio_SetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, float flValue, float &ctlValue );
 
 // converts a global 0..1 pose parameter into the local sequences blending value
-void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, intp iSequence, int iLocalIndex, float &flSetting, int &index );
+void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], const mstudioseqdesc_t &seqdesc, intp iSequence, int iLocalIndex, float &flSetting, int &index );
 
-void Studio_SeqAnims( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[], mstudioanimdesc_t *panim[4], float *weight );
+void Studio_SeqAnims( const CStudioHdr *pStudioHdr, const mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[], const mstudioanimdesc_t *panim[4], float *weight );
 int Studio_MaxFrame( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
 float Studio_FPS( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
-float Studio_CPS( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[] );
+float Studio_CPS( const CStudioHdr *pStudioHdr, const mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[] );
 float Studio_Duration( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] );
 
 // void Studio_Movement( const CStudioHdr *pStudioHdr, int iSequence, const float poseParameter[], Vector *pVec );
 
-//void Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPos, Vector &vecAngle );
-//void Studio_AnimVelocity( mstudioanimdesc_t *panim, float flCycle, Vector &vecVelocity );
-//float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist );
-bool Studio_AnimMovement( mstudioanimdesc_t *panim, float flCycleFrom, float flCycleTo, Vector &deltaPos, QAngle &deltaAngle );
+//bool Studio_AnimPosition( const mstudioanimdesc_t *panim, float flCycle, Vector &vecPos, QAngle &vecAngle );
+//bool Studio_AnimVelocity( const mstudioanimdesc_t *panim, float flCycle, Vector &vecVelocity );
+//float Studio_FindAnimDistance( const mstudioanimdesc_t *panim, float flDist );
+bool Studio_AnimMovement( const mstudioanimdesc_t *panim, float flCycleFrom, float flCycleTo, Vector &deltaPos, QAngle &deltaAngle );
 bool Studio_SeqMovement( const CStudioHdr *pStudioHdr, intp iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector &deltaMovement, QAngle &deltaAngle );
 bool Studio_SeqVelocity( const CStudioHdr *pStudioHdr, intp iSequence, float flCycle, const float poseParameter[], Vector &vecVelocity );
 float Studio_FindSeqDistance( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[], float flDist );
 int Studio_FindAttachment( const CStudioHdr *pStudioHdr, const char *pAttachmentName );
 intp Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAttachmentName );
 int Studio_BoneIndexByName( const CStudioHdr *pStudioHdr, const char *pName );
-const char *Studio_GetDefaultSurfaceProps( CStudioHdr *pstudiohdr );
-float Studio_GetMass( CStudioHdr *pstudiohdr );
+const char *Studio_GetDefaultSurfaceProps( const CStudioHdr *pstudiohdr );
+float Studio_GetMass( const CStudioHdr *pstudiohdr );
 const char *Studio_GetKeyValueText( const CStudioHdr *pStudioHdr, intp iSequence );
 
 FORWARD_DECLARE_HANDLE( memhandle_t );

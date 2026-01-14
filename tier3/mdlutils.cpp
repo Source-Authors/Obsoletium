@@ -396,7 +396,7 @@ void CMDL::SetupBonesWithBoneMerge( const CStudioHdr *pMergeHdr, matrix3x4_t *pM
 		pPoseParameter[i] = 0.5f;
 		if ( i < nPoseCount )
 		{
-			const mstudioposeparamdesc_t &Pose = ((CStudioHdr *)pMergeHdr)->pPoseParameter( i );
+			const mstudioposeparamdesc_t &Pose = pMergeHdr->pPoseParameter( i );
 
 			// Want to try for a zero state.  If one doesn't exist set it to .5 by default.
 			if ( Pose.start < 0.0f && Pose.end > 0.0f )

@@ -720,7 +720,7 @@ static int GetSequenceFlags( CStudioHdr *pstudiohdr, int sequence )
 		return 0;
 	}
 
-	mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( sequence );
+	const mstudioseqdesc_t &seqdesc = pstudiohdr->pSeqdesc( sequence );
 
 	return seqdesc.flags;
 }
@@ -869,17 +869,17 @@ bool StudioModel::IsHidden( int iSequence )
 
 
 
-void StudioModel::GetSeqAnims( intp iSequence, mstudioanimdesc_t *panim[4], float *weight )
+void StudioModel::GetSeqAnims( intp iSequence, const mstudioanimdesc_t *panim[4], float *weight )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if (!pStudioHdr)
 		return;
 
-	mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
 	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, m_poseparameter, panim, weight );
 }
 
-void StudioModel::GetSeqAnims( mstudioanimdesc_t *panim[4], float *weight )
+void StudioModel::GetSeqAnims( const mstudioanimdesc_t *panim[4], float *weight )
 {
 	GetSeqAnims( m_sequence, panim, weight );
 }

@@ -836,9 +836,9 @@ const virtualmodel_t * CStudioHdr::ResetVModel( const virtualmodel_t *pVModel ) 
 		Assert( !pVModel->m_Lock.GetOwnerId() );
 		m_pStudioHdrCache.SetCount( m_pVModel->m_group.Count() );
 
-		for (intp i = 0; i < m_pStudioHdrCache.Count(); i++)
+		for (auto &h : m_pStudioHdrCache)
 		{
-			m_pStudioHdrCache[ i ] = nullptr;
+			h = nullptr;
 		}
 		
 		return pVModel;
@@ -848,7 +848,7 @@ const virtualmodel_t * CStudioHdr::ResetVModel( const virtualmodel_t *pVModel ) 
 	return nullptr;
 }
 
-const studiohdr_t *CStudioHdr::GroupStudioHdr( intp i )
+const studiohdr_t *CStudioHdr::GroupStudioHdr( intp i ) const
 {
 	if ( m_nFrameUnlockCounter != *m_pFrameUnlockCounter )
 	{
@@ -873,7 +873,7 @@ const studiohdr_t *CStudioHdr::GroupStudioHdr( intp i )
 	{
 		Assert( !m_pVModel->m_Lock.GetOwnerId() );
 
-		virtualgroup_t *pGroup = &m_pVModel->m_group[ i ];
+		const virtualgroup_t *pGroup = &m_pVModel->m_group[ i ];
 		pStudioHdr = pGroup->GetStudioHdr();
 		m_pStudioHdrCache[ i ] = pStudioHdr;
 	}
@@ -883,7 +883,7 @@ const studiohdr_t *CStudioHdr::GroupStudioHdr( intp i )
 }
 
 
-const studiohdr_t *CStudioHdr::pSeqStudioHdr( intp sequence )
+const studiohdr_t *CStudioHdr::pSeqStudioHdr( intp sequence ) const
 {
 	if (m_pVModel == nullptr)
 	{
@@ -896,7 +896,7 @@ const studiohdr_t *CStudioHdr::pSeqStudioHdr( intp sequence )
 }
 
 
-const studiohdr_t *CStudioHdr::pAnimStudioHdr( intp animation )
+const studiohdr_t *CStudioHdr::pAnimStudioHdr( intp animation ) const
 {
 	if (m_pVModel == nullptr)
 	{
@@ -909,8 +909,20 @@ const studiohdr_t *CStudioHdr::pAnimStudioHdr( intp animation )
 }
 
 
-
 mstudioanimdesc_t &CStudioHdr::pAnimdesc( intp i )
+{ 
+	if (m_pVModel == nullptr)
+	{
+		return *m_pStudioHdr->pLocalAnimdesc( i );
+	}
+
+	const studiohdr_t *pStudioHdr = GroupStudioHdr( m_pVModel->m_anim[i].group );
+
+	return *pStudioHdr->pLocalAnimdesc( m_pVModel->m_anim[i].index );
+}
+
+
+const mstudioanimdesc_t &CStudioHdr::pAnimdesc( intp i ) const
 { 
 	if (m_pVModel == nullptr)
 	{
@@ -941,6 +953,40 @@ intp CStudioHdr::GetNumSeq( void ) const
 //-----------------------------------------------------------------------------
 
 mstudioseqdesc_t &CStudioHdr::pSeqdesc( intp i )
+{
+	Assert( ( i >= 0 && i < GetNumSeq() ) || ( i == 1 && GetNumSeq() <= 1 ) );
+	if ( i < 0 || i >= GetNumSeq() )
+	{
+		if ( GetNumSeq() <= 0 )
+		{
+			// Return a zero'd out struct reference if we've got nothing.
+			// C_BaseObject::StopAnimGeneratedSounds was crashing due to this function
+			//	returning a reference to garbage. It should now see numevents is 0,
+			//	and bail.
+			static mstudioseqdesc_t s_nil_seq;
+			return s_nil_seq;
+		}
+
+		// Avoid reading random memory.
+		i = 0;
+	}
+	
+	if (m_pVModel == nullptr)
+	{
+		return *m_pStudioHdr->pLocalSeqdesc( i );
+	}
+
+	const studiohdr_t *pStudioHdr = GroupStudioHdr( m_pVModel->m_seq[i].group );
+
+	return *pStudioHdr->pLocalSeqdesc( m_pVModel->m_seq[i].index );
+}
+
+
+//-----------------------------------------------------------------------------
+// Purpose:
+//-----------------------------------------------------------------------------
+
+const mstudioseqdesc_t &CStudioHdr::pSeqdesc( intp i ) const
 {
 	Assert( ( i >= 0 && i < GetNumSeq() ) || ( i == 1 && GetNumSeq() <= 1 ) );
 	if ( i < 0 || i >= GetNumSeq() )
@@ -1026,7 +1072,7 @@ intp	CStudioHdr::GetNumPoseParameters() const
 // Purpose:
 //-----------------------------------------------------------------------------
 
-const mstudioposeparamdesc_t &CStudioHdr::pPoseParameter( intp i )
+const mstudioposeparamdesc_t &CStudioHdr::pPoseParameter( intp i ) const
 {
 	if (m_pVModel == nullptr)
 	{
@@ -1083,7 +1129,7 @@ int CStudioHdr::EntryNode( intp iSequence )
 
 	Assert( m_pVModel );
 
-	virtualgroup_t *pGroup = &m_pVModel->m_group[ m_pVModel->m_seq[iSequence].group ];
+	const virtualgroup_t *pGroup = &m_pVModel->m_group[ m_pVModel->m_seq[iSequence].group ];
 
 	return pGroup->masterNode[seqdesc.localentrynode-1]+1;
 }
@@ -1133,7 +1179,7 @@ intp	CStudioHdr::GetNumAttachments() const
 // Purpose:
 //-----------------------------------------------------------------------------
 
-const mstudioattachment_t &CStudioHdr::pAttachment( intp i )
+const mstudioattachment_t &CStudioHdr::pAttachment( intp i ) const
 {
 	if (m_pVModel == nullptr)
 	{
@@ -1188,7 +1234,7 @@ void CStudioHdr::SetAttachmentBone( intp iAttachment, int iBone )
 // Purpose:
 //-----------------------------------------------------------------------------
 
-const char *CStudioHdr::pszNodeName( intp iNode )
+const char *CStudioHdr::pszNodeName( intp iNode ) const
 {
 	if (m_pVModel == nullptr)
 	{
@@ -1321,7 +1367,7 @@ intp CStudioHdr::GetNumIKAutoplayLocks() const
 	return m_pVModel->m_iklock.Count();
 }
 
-const mstudioiklock_t &CStudioHdr::pIKAutoplayLock( intp i )
+const mstudioiklock_t &CStudioHdr::pIKAutoplayLock( intp i ) const
 {
 	if (m_pVModel == nullptr)
 	{

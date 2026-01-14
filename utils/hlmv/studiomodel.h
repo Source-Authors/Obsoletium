@@ -179,8 +179,8 @@ public:
 	bool							GetSequenceLoops( intp iSequence );
 	void							GetMovement( float prevCycle[5], Vector &vecPos, QAngle &vecAngles );
 	void							GetMovement( intp iSequence, float prevCycle, float currCycle, Vector &vecPos, QAngle &vecAngles );
-	void							GetSeqAnims( intp iSequence, mstudioanimdesc_t *panim[4], float *pweights );
-	void							GetSeqAnims( mstudioanimdesc_t *panim[4], float *pweights );
+	void							GetSeqAnims( intp iSequence, const mstudioanimdesc_t *panim[4], float *pweights );
+	void							GetSeqAnims( const mstudioanimdesc_t *panim[4], float *pweights );
 	float							GetGroundSpeed( int iSequence );
 	float							GetGroundSpeed( void );
 	float							GetCurrentVelocity( void );
@@ -320,11 +320,13 @@ private:
 	float							m_physMass;
 
 public:
-	mstudioseqdesc_t				&GetSeqDesc( int seq );
+	// dimhotepus: make const reference and const.
+	const mstudioseqdesc_t			&GetSeqDesc( int seq ) const;
 	const matrix3x4_t*				BoneToWorld( int nBoneIndex ) const;
 
 private:
-	mstudioanimdesc_t				&GetAnimDesc( int anim );
+	// dimhotepus: make const reference and const.
+	const mstudioanimdesc_t			&GetAnimDesc( int anim ) const;
 	mstudioanim_t					*GetAnim( int anim );
 
 	void							DrawPhysmesh( CPhysmesh *pMesh, int boneIndex, IMaterial *pMaterial, float *color );

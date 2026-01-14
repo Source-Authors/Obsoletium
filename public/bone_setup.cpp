@@ -37,8 +37,8 @@ public:
 	void AccumulatePose( Vector pos[], Quaternion q[], int sequence, float cycle, float flWeight, float flTime, CIKContext *pIKContext );
 	void CalcAutoplaySequences(	Vector pos[], Quaternion q[], float flRealTime, CIKContext *pIKContext );
 private:
-	void AddSequenceLayers( Vector pos[], Quaternion q[], mstudioseqdesc_t &seqdesc, int sequence, float cycle, float flWeight, float flTime, CIKContext *pIKContext );
-	void AddLocalLayers( Vector pos[], Quaternion q[], mstudioseqdesc_t &seqdesc, int sequence, float cycle, float flWeight, float flTime, CIKContext *pIKContext );
+	void AddSequenceLayers( Vector pos[], Quaternion q[], const mstudioseqdesc_t &seqdesc, int sequence, float cycle, float flWeight, float flTime, CIKContext *pIKContext );
+	void AddLocalLayers( Vector pos[], Quaternion q[], const mstudioseqdesc_t &seqdesc, int sequence, float cycle, float flWeight, float flTime, CIKContext *pIKContext );
 public:
 	const CStudioHdr *m_pStudioHdr;
 	int m_boneMask;
@@ -260,7 +260,7 @@ void BuildBoneChain(
 //-----------------------------------------------------------------------------
 // Purpose: return a sub frame rotation for a single bone
 //-----------------------------------------------------------------------------
-void ExtractAnimValue( int frame, mstudioanimvalue_t *panimvalue, float scale, float &v1, float &v2 )
+static void ExtractAnimValue( int frame, mstudioanimvalue_t *panimvalue, float scale, float &v1, float &v2 )
 {
 	if ( !panimvalue )
 	{
@@ -332,7 +332,7 @@ void ExtractAnimValue( int frame, mstudioanimvalue_t *panimvalue, float scale, f
 }
 
 
-void ExtractAnimValue( int frame, mstudioanimvalue_t *panimvalue, float scale, float &v1 )
+static void ExtractAnimValue( int frame, mstudioanimvalue_t *panimvalue, float scale, float &v1 )
 {
 	if ( !panimvalue )
 	{
@@ -367,7 +367,7 @@ void ExtractAnimValue( int frame, mstudioanimvalue_t *panimvalue, float scale, f
 //-----------------------------------------------------------------------------
 // Purpose: return a sub frame rotation for a single bone
 //-----------------------------------------------------------------------------
-void CalcBoneQuaternion( int frame, float s, 
+static void CalcBoneQuaternion( int frame, float s, 
 						const Quaternion &baseQuat, const RadianEuler &baseRot, const Vector &baseRotScale, 
 						int iBaseFlags, const Quaternion &baseAlignment, 
 						const mstudioanim_t *panim, Quaternion &q )
@@ -491,7 +491,7 @@ inline void CalcBoneQuaternion( int frame, float s,
 //-----------------------------------------------------------------------------
 // Purpose: return a sub frame position for a single bone
 //-----------------------------------------------------------------------------
-void CalcBonePosition(	int frame, float s,
+static void CalcBonePosition( int frame, float s,
 						const Vector &basePos, const Vector &baseBoneScale, 
 						const mstudioanim_t *panim, Vector &pos	)
 {
@@ -570,8 +570,8 @@ void SetupSingleBoneMatrix(
 	int iBone, 
 	matrix3x4_t &mBoneLocal )
 {
-	mstudioseqdesc_t &seqdesc = pOwnerHdr->pSeqdesc( nSequence );
-	mstudioanimdesc_t &animdesc = pOwnerHdr->pAnimdesc( seqdesc.anim( 0, 0 ) );
+	const mstudioseqdesc_t &seqdesc = pOwnerHdr->pSeqdesc( nSequence );
+	const mstudioanimdesc_t &animdesc = pOwnerHdr->pAnimdesc( seqdesc.anim( 0, 0 ) );
 	int iLocalFrame = iFrame;
 	const mstudioanim_t *panim = animdesc.pAnim( &iLocalFrame );
 	float s = 0;
@@ -774,7 +774,7 @@ static void CalcLocalHierarchyAnimation(
 // Purpose: Calc Zeroframe Data
 //-----------------------------------------------------------------------------
 
-static void CalcZeroframeData( const CStudioHdr *pStudioHdr, const studiohdr_t *pAnimStudioHdr, const virtualgroup_t *pAnimGroup, const mstudiobone_t *pAnimbone, mstudioanimdesc_t &animdesc, float fFrame, Vector *pos, Quaternion *q, int boneMask, float flWeight )
+static void CalcZeroframeData( const CStudioHdr *pStudioHdr, const studiohdr_t *pAnimStudioHdr, const virtualgroup_t *pAnimGroup, const mstudiobone_t *pAnimbone, const mstudioanimdesc_t &animdesc, float fFrame, Vector *pos, Quaternion *q, int boneMask, float flWeight )
 {
 	byte *pData = animdesc.pZeroFrameData();
 
@@ -883,17 +883,17 @@ static void CalcZeroframeData( const CStudioHdr *pStudioHdr, const studiohdr_t *
 // Purpose: Find and decode a sub-frame of animation, remapping the skeleton bone indexes
 //-----------------------------------------------------------------------------
 static void CalcVirtualAnimation( virtualmodel_t *pVModel, const CStudioHdr *pStudioHdr, Vector *pos, Quaternion *q, 
-	mstudioseqdesc_t &seqdesc, int sequence, int animation,
+	const mstudioseqdesc_t &seqdesc, int sequence, int animation,
 	float cycle, int boneMask )
 {
 	const virtualgroup_t *pSeqGroup = pVModel->pSeqGroup( sequence );
 	int baseanimation = pStudioHdr->iRelativeAnim( sequence, animation );
-	mstudioanimdesc_t &animdesc = ((CStudioHdr *)pStudioHdr)->pAnimdesc( baseanimation );
-	const studiohdr_t *pSeqStudioHdr = ((CStudioHdr *)pStudioHdr)->pSeqStudioHdr( sequence );
+	const mstudioanimdesc_t &animdesc = pStudioHdr->pAnimdesc( baseanimation );
+	const studiohdr_t *pSeqStudioHdr = pStudioHdr->pSeqStudioHdr( sequence );
 	const mstudiolinearbone_t *pSeqLinearBones = pSeqStudioHdr->pLinearBones();
 	const mstudiobone_t *pSeqbone = pSeqStudioHdr->pBone( 0 );
 	const virtualgroup_t *pAnimGroup = pVModel->pAnimGroup( baseanimation );
-	const studiohdr_t *pAnimStudioHdr = ((CStudioHdr *)pStudioHdr)->pAnimStudioHdr( baseanimation );
+	const studiohdr_t *pAnimStudioHdr = pStudioHdr->pAnimStudioHdr( baseanimation );
 	const mstudiolinearbone_t *pAnimLinearBones = pAnimStudioHdr->pLinearBones();
 	const mstudiobone_t *pAnimbone = pAnimStudioHdr->pBone( 0 );
 
@@ -941,7 +941,7 @@ static void CalcVirtualAnimation( virtualmodel_t *pVModel, const CStudioHdr *pSt
 	// if the animation isn't available, look for the zero frame cache
 	if (!panim)
 	{
-		CalcZeroframeData( ((CStudioHdr *)pStudioHdr), pAnimStudioHdr, pAnimGroup, pAnimbone, animdesc, fFrame, pos, q, boneMask, 1.0 );
+		CalcZeroframeData( pStudioHdr, pAnimStudioHdr, pAnimGroup, pAnimbone, animdesc, fFrame, pos, q, boneMask, 1.0f );
 		return;
 	}
 
@@ -1011,7 +1011,7 @@ static void CalcVirtualAnimation( virtualmodel_t *pVModel, const CStudioHdr *pSt
 //-----------------------------------------------------------------------------
 
 static void CalcAnimation( const CStudioHdr *pStudioHdr, Vector *pos, Quaternion *q, 
-	mstudioseqdesc_t &seqdesc,
+	const mstudioseqdesc_t &seqdesc,
 	int sequence, int animation,
 	float cycle, int boneMask )
 {
@@ -1027,7 +1027,7 @@ static void CalcAnimation( const CStudioHdr *pStudioHdr, Vector *pos, Quaternion
 		return;
 	}
 
-	mstudioanimdesc_t &animdesc = ((CStudioHdr *)pStudioHdr)->pAnimdesc( animation );
+	const mstudioanimdesc_t &animdesc = pStudioHdr->pAnimdesc( animation );
 	mstudiobone_t *pbone = pStudioHdr->pBone( 0 );
 	const mstudiolinearbone_t *pLinearBones = pStudioHdr->pLinearBones();
 
@@ -1283,11 +1283,11 @@ static void QuaternionAccumulate( const Quaternion &p, float s, const Quaternion
 //			0 returns q1, pos1.  1 returns q2, pos2
 //-----------------------------------------------------------------------------
 
-void WorldSpaceSlerp(
+static void WorldSpaceSlerp(
 	const CStudioHdr *pStudioHdr,
 	Quaternion q1[MAXSTUDIOBONES], 
 	Vector pos1[MAXSTUDIOBONES], 
-	mstudioseqdesc_t &seqdesc, 
+	const mstudioseqdesc_t &seqdesc, 
 	int sequence, 
 	const Quaternion q2[MAXSTUDIOBONES], 
 	const Vector pos2[MAXSTUDIOBONES], 
@@ -1411,7 +1411,7 @@ void SlerpBones(
 	const CStudioHdr *pStudioHdr,
 	Quaternion q1[MAXSTUDIOBONES], 
 	Vector pos1[MAXSTUDIOBONES], 
-	mstudioseqdesc_t &seqdesc,  // source of q2 and pos2
+	const mstudioseqdesc_t &seqdesc,  // source of q2 and pos2
 	int sequence, 
 	const QuaternionAligned q2[MAXSTUDIOBONES], 
 	const Vector pos2[MAXSTUDIOBONES], 
@@ -1523,11 +1523,11 @@ void SlerpBones(
 //			blend together q1,pos1 with q2,pos2.  Return result in q1,pos1.  
 //			0 returns q1, pos1.  1 returns q2, pos2
 //-----------------------------------------------------------------------------
-void BlendBones( 
+static void BlendBones( 
 	const CStudioHdr *pStudioHdr,
 	Quaternion q1[MAXSTUDIOBONES], 
 	Vector pos1[MAXSTUDIOBONES], 
-	mstudioseqdesc_t &seqdesc, 
+	const mstudioseqdesc_t &seqdesc, 
 	int sequence,
 	const Quaternion q2[MAXSTUDIOBONES], 
 	const Vector pos2[MAXSTUDIOBONES], 
@@ -1624,7 +1624,7 @@ void BlendBones(
 //-----------------------------------------------------------------------------
 // Purpose: Scale a set of bones.  Must be of type delta
 //-----------------------------------------------------------------------------
-void ScaleBones( 
+static void ScaleBones( 
 	const CStudioHdr *pStudioHdr,
 	Quaternion q1[MAXSTUDIOBONES], 
 	Vector pos1[MAXSTUDIOBONES], 
@@ -1634,7 +1634,7 @@ void ScaleBones(
 {
 	int			i, j;
 
-	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( sequence );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( sequence );
 
 	virtualmodel_t *pVModel = pStudioHdr->GetVirtualModel();
 	const virtualgroup_t *pSeqGroup = NULL;
@@ -1674,7 +1674,7 @@ void ScaleBones(
 //-----------------------------------------------------------------------------
 // Purpose: resolve a global pose parameter to the specific setting for this sequence
 //-----------------------------------------------------------------------------
-void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], mstudioseqdesc_t &seqdesc, intp iSequence, int iLocalIndex, float &flSetting, int &index )
+void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float poseParameter[], const mstudioseqdesc_t &seqdesc, intp iSequence, int iLocalIndex, float &flSetting, int &index )
 {
 	if (!pStudioHdr)
 	{
@@ -1692,7 +1692,7 @@ void Studio_LocalPoseParameter( const CStudioHdr *pStudioHdr, const float posePa
 		return;
 	}
 
-	const mstudioposeparamdesc_t &Pose = ((CStudioHdr *)pStudioHdr)->pPoseParameter( iPose );
+	const mstudioposeparamdesc_t &Pose = pStudioHdr->pPoseParameter( iPose );
 
 	float flValue = poseParameter[iPose];
 
@@ -1774,7 +1774,7 @@ void Studio_CalcBoneToBoneTransform( const CStudioHdr *pStudioHdr, int inputBone
 //-----------------------------------------------------------------------------
 // Purpose: calculate a pose for a single sequence
 //-----------------------------------------------------------------------------
-void InitPose(
+static void InitPose(
 	const CStudioHdr *pStudioHdr,
 	Vector pos[], 
 	Quaternion q[],
@@ -1811,16 +1811,14 @@ void InitPose(
 inline bool PoseIsAllZeros( 
 	const CStudioHdr *pStudioHdr,
 	int sequence, 
-	mstudioseqdesc_t	&seqdesc,
+	const mstudioseqdesc_t	&seqdesc,
 	int i0,
 	int i1
 	)
 {
-	int baseanim;
-		
 	// remove "zero" positional blends
-	baseanim = pStudioHdr->iRelativeAnim( sequence, seqdesc.anim(i0  ,i1 ) );
-	mstudioanimdesc_t		&anim = ((CStudioHdr *)pStudioHdr)->pAnimdesc( baseanim );
+	int baseanim = pStudioHdr->iRelativeAnim( sequence, seqdesc.anim(i0  ,i1 ) );
+	const mstudioanimdesc_t &anim = pStudioHdr->pAnimdesc( baseanim );
 	return (anim.flags & STUDIO_ALLZEROS) != 0;
 }
 
@@ -1832,7 +1830,7 @@ inline bool PoseIsAllZeros(
 
 static ConVar anim_3wayblend( "anim_3wayblend", "1", FCVAR_REPLICATED, "Toggle the 3-way animation blending code." );
 
-void Calc3WayBlendIndices( int i0, int i1, float s0, float s1, const mstudioseqdesc_t &seqdesc, int *pAnimIndices, float *pWeight )
+static void Calc3WayBlendIndices( int i0, int i1, float s0, float s1, const mstudioseqdesc_t &seqdesc, int *pAnimIndices, float *pWeight )
 {
 	// Figure out which bi-section direction we are using to make triangles.
 	bool bEven = ( ( ( i0 + i1 ) & 0x1 ) == 0 );
@@ -1914,11 +1912,11 @@ void Calc3WayBlendIndices( int i0, int i1, float s0, float s1, const mstudioseqd
 //-----------------------------------------------------------------------------
 // Purpose: calculate a pose for a single sequence
 //-----------------------------------------------------------------------------
-bool CalcPoseSingle(
+static bool CalcPoseSingle(
 	const CStudioHdr *pStudioHdr,
 	Vector pos[], 
 	Quaternion q[], 
-	mstudioseqdesc_t &seqdesc,
+	const mstudioseqdesc_t &seqdescIn,
 	int sequence, 
 	float cycle,
 	const float poseParameter[],
@@ -1926,7 +1924,19 @@ bool CalcPoseSingle(
 	float flTime
 	)
 {
-	bool bResult = true;
+	bool bResult = true, isSetToZero = false;
+
+	// dimhotepus: Compute reset to zero flag.
+	const auto sequenceCount = pStudioHdr->GetNumSeq();
+	if (sequence >= sequenceCount) 
+	{
+		sequence = 0;
+		isSetToZero = true;
+	}
+
+	// dimhotepus: Use reference to a correct sequence description.
+	const mstudioseqdesc_t &seqdesc = !isSetToZero
+		? seqdescIn : pStudioHdr->pSeqdesc(sequence);
 	
 	Vector		*pos2 = g_VectorPool.Alloc();
 	RunCodeAtScopeExit(g_VectorPool.Free( pos2 ));
@@ -1939,13 +1949,6 @@ bool CalcPoseSingle(
 
 	Quaternion	*q3 = g_QaternionPool.Alloc();
 	RunCodeAtScopeExit(g_QaternionPool.Free( q3 ));
-
-	if (sequence >= pStudioHdr->GetNumSeq()) 
-	{
-		sequence = 0;
-		seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( sequence );
-	}
-
 
 	int i0 = 0, i1 = 0;
 	float s0 = 0, s1 = 0;
@@ -1989,9 +1992,9 @@ bool CalcPoseSingle(
 		}
 	}
 
-	if (s0 < 0.001)
+	if (s0 < 0.001f)
 	{
-		if (s1 < 0.001)
+		if (s1 < 0.001f)
 		{
 			if (PoseIsAllZeros( pStudioHdr, sequence, seqdesc, i0, i1 ))
 			{
@@ -2002,7 +2005,7 @@ bool CalcPoseSingle(
 				CalcAnimation( pStudioHdr, pos,  q,  seqdesc, sequence, seqdesc.anim( i0  , i1   ), cycle, boneMask );
 			}
 		}
-		else if (s1 > 0.999)
+		else if (s1 > 0.999f)
 		{
 			CalcAnimation( pStudioHdr, pos,  q,  seqdesc, sequence, seqdesc.anim( i0  , i1+1 ), cycle, boneMask );
 		}
@@ -2013,9 +2016,9 @@ bool CalcPoseSingle(
 			BlendBones( pStudioHdr, q, pos, seqdesc, sequence, q2, pos2, s1, boneMask );
 		}
 	}
-	else if (s0 > 0.999)
+	else if (s0 > 0.999f)
 	{
-		if (s1 < 0.001)
+		if (s1 < 0.001f)
 		{
 			if (PoseIsAllZeros( pStudioHdr, sequence, seqdesc, i0+1, i1 ))
 			{
@@ -2026,7 +2029,7 @@ bool CalcPoseSingle(
 				CalcAnimation( pStudioHdr, pos,  q,  seqdesc, sequence, seqdesc.anim( i0+1, i1   ), cycle, boneMask );
 			}
 		}
-		else if (s1 > 0.999)
+		else if (s1 > 0.999f)
 		{
 			CalcAnimation( pStudioHdr, pos,  q,  seqdesc, sequence, seqdesc.anim( i0+1, i1+1 ), cycle, boneMask );
 		}
@@ -2039,7 +2042,7 @@ bool CalcPoseSingle(
 	}
 	else
 	{
-		if (s1 < 0.001)
+		if (s1 < 0.001f)
 		{
 			if (PoseIsAllZeros( pStudioHdr, sequence, seqdesc, i0+1, i1 ))
 			{
@@ -2059,7 +2062,7 @@ bool CalcPoseSingle(
 				BlendBones( pStudioHdr, q, pos, seqdesc, sequence, q2, pos2, s0, boneMask );
 			}
 		}
-		else if (s1 > 0.999)
+		else if (s1 > 0.999f)
 		{
 			CalcAnimation( pStudioHdr, pos,  q,  seqdesc, sequence, seqdesc.anim( i0  ,i1+1  ), cycle, boneMask );
 			CalcAnimation( pStudioHdr, pos2, q2, seqdesc, sequence, seqdesc.anim( i0+1,i1+1  ), cycle, boneMask );
@@ -2090,7 +2093,7 @@ bool CalcPoseSingle(
 			Plat_DebugString( buf );
 			*/
 
-			if (weight[1] < 0.001)
+			if (weight[1] < 0.001f)
 			{
 				// on diagonal
 				CalcAnimation( pStudioHdr, pos,  q,  seqdesc, sequence, iAnimIndices[0], cycle, boneMask );
@@ -2122,7 +2125,7 @@ bool CalcPoseSingle(
 void CBoneSetup::AddSequenceLayers(
    Vector pos[], 
    Quaternion q[], 
-   mstudioseqdesc_t &seqdesc,
+   const mstudioseqdesc_t &seqdesc,
    int sequence, 
    float cycle,
    float flWeight,
@@ -2155,7 +2158,7 @@ void CBoneSetup::AddSequenceLayers(
 				int iPose = m_pStudioHdr->GetSharedPoseParameter( iSequence, pLayer->iPose );
 				if (iPose != -1)
 				{
-					const mstudioposeparamdesc_t &Pose = ((CStudioHdr *)m_pStudioHdr)->pPoseParameter( iPose );
+					const mstudioposeparamdesc_t &Pose = m_pStudioHdr->pPoseParameter( iPose );
 					index = m_flPoseParameter[ iPose ] * (Pose.end - Pose.start) + Pose.start;
 				}
 				else
@@ -2215,7 +2218,7 @@ void CBoneSetup::AddSequenceLayers(
 void CBoneSetup::AddLocalLayers(
 	Vector pos[], 
 	Quaternion q[], 
-	mstudioseqdesc_t &seqdesc,
+	const mstudioseqdesc_t &seqdesc,
 	int sequence, 
 	float cycle,
 	float flWeight,
@@ -2350,7 +2353,7 @@ void CalcPose(
 	float flTime
 	)
 {
-	mstudioseqdesc_t	&seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( sequence );
+	const mstudioseqdesc_t	&seqdesc = pStudioHdr->pSeqdesc( sequence );
 
 	Assert( flWeight >= 0.0f && flWeight <= 1.0f );
 	// This shouldn't be necessary, but the Assert should help us catch whoever is screwing this up
@@ -2412,7 +2415,7 @@ void CBoneSetup::AccumulatePose(
 	}
 #endif
 
-	mstudioseqdesc_t	&seqdesc = ((CStudioHdr *)m_pStudioHdr)->pSeqdesc( sequence );
+	const mstudioseqdesc_t	&seqdesc = m_pStudioHdr->pSeqdesc( sequence );
 
 	// add any IK locks to prevent extremities from moving
 	CIKContext seq_ik;
@@ -2938,7 +2941,7 @@ float Studio_IKRuleWeight( const ikcontextikrule_t &ikRule, float flCycle )
 // Purpose: 
 //-----------------------------------------------------------------------------
 
-bool Studio_IKShouldLatch( ikcontextikrule_t &ikRule, float flCycle )
+static bool Studio_IKShouldLatch( const ikcontextikrule_t &ikRule, float flCycle )
 {
 	if (ikRule.end > 1.0f && flCycle < ikRule.start)
 	{
@@ -2961,7 +2964,7 @@ bool Studio_IKShouldLatch( ikcontextikrule_t &ikRule, float flCycle )
 // Purpose: 
 //-----------------------------------------------------------------------------
 
-float Studio_IKTail( ikcontextikrule_t &ikRule, float flCycle )
+static float Studio_IKTail( const ikcontextikrule_t &ikRule, float flCycle )
 {
 	if (ikRule.end > 1.0f && flCycle < ikRule.start)
 	{
@@ -2985,7 +2988,7 @@ float Studio_IKTail( ikcontextikrule_t &ikRule, float flCycle )
 //-----------------------------------------------------------------------------
 
 
-bool Studio_IKAnimationError( const CStudioHdr *pStudioHdr, const mstudioikrule_t *pRule, const mstudioanimdesc_t *panim, float flCycle, Vector &pos, Quaternion &q, float &flWeight )
+static bool Studio_IKAnimationError( const CStudioHdr *pStudioHdr, const mstudioikrule_t *pRule, const mstudioanimdesc_t *panim, float flCycle, Vector &pos, Quaternion &q, float &flWeight )
 {
 	float fraq;
 	int iFrame;
@@ -3017,9 +3020,9 @@ bool Studio_IKAnimationError( const CStudioHdr *pStudioHdr, const mstudioikrule_
 	}
 
 	mstudiocompressedikerror_t *pCompressed = pRule->pCompressedError();
-		CalcDecompressedAnimation( pCompressed, iFrame - pRule->iStart, fraq, pos, q );
-		return true;
-	}
+	CalcDecompressedAnimation( pCompressed, iFrame - pRule->iStart, fraq, pos, q );
+	return true;
+}
 
 //-----------------------------------------------------------------------------
 // Purpose: For a specific sequence:rule, find where it starts, stops, and what 
@@ -3027,7 +3030,7 @@ bool Studio_IKAnimationError( const CStudioHdr *pStudioHdr, const mstudioikrule_
 //			return true if the rule is within bounds.
 //-----------------------------------------------------------------------------
 
-bool Studio_IKSequenceError( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, float flCycle, int iRule, const float poseParameter[], mstudioanimdesc_t *panim[4], float weight[4], ikcontextikrule_t &ikRule )
+static bool Studio_IKSequenceError( const CStudioHdr *pStudioHdr, const mstudioseqdesc_t &seqdesc, intp iSequence, float flCycle, int iRule, const float poseParameter[], const mstudioanimdesc_t *panim[4], const float weight[4], ikcontextikrule_t &ikRule )
 {
 	int i;
 
@@ -3240,7 +3243,7 @@ void CIKContext::Init( const CStudioHdr *pStudioHdr, const QAngle &angles, const
 	m_boneMask = boneMask;
 }
 
-void CIKContext::AddDependencies( mstudioseqdesc_t &seqdesc, int iSequence, float flCycle, const float poseParameters[], float flWeight )
+void CIKContext::AddDependencies( const mstudioseqdesc_t &seqdesc, int iSequence, float flCycle, const float poseParameters[], float flWeight )
 {
 	int i;
 
@@ -3276,7 +3279,7 @@ void CIKContext::AddDependencies( mstudioseqdesc_t &seqdesc, int iSequence, floa
 		}
 	}
 
-	mstudioanimdesc_t *panim[4];
+	const mstudioanimdesc_t *panim[4];
 	float	weight[4];
 
 	Studio_SeqAnims( m_pStudioHdr, seqdesc, iSequence, poseParameters, panim, weight );
@@ -3347,7 +3350,7 @@ void CIKContext::AddAutoplayLocks( Vector pos[], Quaternion q[] )
 
 	for (int i = 0; i < m_pStudioHdr->GetNumIKAutoplayLocks(); i++)
 	{
-		const mstudioiklock_t &lock = ((CStudioHdr *)m_pStudioHdr)->pIKAutoplayLock( i );
+		const mstudioiklock_t &lock = m_pStudioHdr->pIKAutoplayLock( i );
 		mstudioikchain_t *pchain = m_pStudioHdr->pIKChain( lock.chain );
 		int bone = pchain->pLink( 2 )->bone;
 
@@ -3385,7 +3388,7 @@ void CIKContext::AddAutoplayLocks( Vector pos[], Quaternion q[] )
 // Purpose: 
 //-----------------------------------------------------------------------------
 
-void CIKContext::AddSequenceLocks( mstudioseqdesc_t &seqdesc, Vector pos[], Quaternion q[] )
+void CIKContext::AddSequenceLocks( const mstudioseqdesc_t &seqdesc, Vector pos[], Quaternion q[] )
 {
 	if ( m_pStudioHdr->numikchains() == 0)
 	{
@@ -3489,10 +3492,10 @@ void BuildBoneChain(
 //-----------------------------------------------------------------------------
 // Purpose: turn a specific bones boneToWorld transform into a pos and q in parents bonespace
 //-----------------------------------------------------------------------------
-void SolveBone( 
+static void SolveBone( 
 	const CStudioHdr *pStudioHdr,
 	int	iBone,
-	matrix3x4_t *pBoneToWorld,
+	const matrix3x4_t *pBoneToWorld,
 	Vector pos[], 
 	Quaternion q[]
 	)
@@ -3976,30 +3979,30 @@ void CIKContext::AutoIKRelease( void )
 				if ( pTarget->chain >= 0 && pTarget->chain < m_pStudioHdr->numikchains())
 				{
 					mstudioikchain_t *pchain = m_pStudioHdr->pIKChain( pTarget->chain );
-						int bone = pchain->pLink( 2 )->bone;
-						if (bone >= 0 && bone < m_pStudioHdr->numbones())
+					int bone = pchain->pLink( 2 )->bone;
+					if (bone >= 0 && bone < m_pStudioHdr->numbones())
+					{
+						if ( !(m_pStudioHdr->boneFlags( bone ) & m_boneMask))
 						{
-								if ( !(m_pStudioHdr->boneFlags( bone ) & m_boneMask))
-								{
-									pTarget->error.bInError = false;
-									continue;
-								}
-								/*
-								char buf[256];
-								V_sprintf_safe( buf, "dt %.4f ft %.4f weight %.4f latched %.4f\n", dt, ft, ikrule.flWeight, ikrule.latched );
-								Plat_DebugString( buf );
-								*/
-
-								intp nIndex = m_ikChainRule.Element( ikrule.chain ).AddToTail( );
-  								m_ikChainRule.Element( ikrule.chain ).Element( nIndex ) = ikrule;
-							}
-							else
-							{
-							DevWarning( 1, "AutoIKRelease (%s) got an out of range bone %d (%d)\n", m_pStudioHdr->pszName(), bone, m_pStudioHdr->numbones() );
+							pTarget->error.bInError = false;
+							continue;
 						}
+						/*
+						char buf[256];
+						V_sprintf_safe( buf, "dt %.4f ft %.4f weight %.4f latched %.4f\n", dt, ft, ikrule.flWeight, ikrule.latched );
+						Plat_DebugString( buf );
+						*/
+
+						intp nIndex = m_ikChainRule.Element( ikrule.chain ).AddToTail( );
+  						m_ikChainRule.Element( ikrule.chain ).Element( nIndex ) = ikrule;
 					}
 					else
 					{
+						DevWarning( 1, "AutoIKRelease (%s) got an out of range bone %d (%d)\n", m_pStudioHdr->pszName(), bone, m_pStudioHdr->numbones() );
+					}
+				}
+				else
+				{
 					DevWarning( 1, "AutoIKRelease (%s) got an out of range chain %d (%d)\n", m_pStudioHdr->pszName(), pTarget->chain, m_pStudioHdr->numikchains());
 				}
 			}
@@ -4250,7 +4253,7 @@ void CIKContext::SolveAutoplayLocks(
 
 	for (intp i = 0; i < m_ikLock.Count(); i++)
 	{
-		const mstudioiklock_t &lock = ((CStudioHdr *)m_pStudioHdr)->pIKAutoplayLock( i );
+		const mstudioiklock_t &lock = m_pStudioHdr->pIKAutoplayLock( i );
 		SolveLock( &lock, i, pos, q, boneToWorld, boneComputed );
 	}
 }
@@ -4262,7 +4265,7 @@ void CIKContext::SolveAutoplayLocks(
 //-----------------------------------------------------------------------------
 
 void CIKContext::SolveSequenceLocks(
-	mstudioseqdesc_t &seqdesc,
+	const mstudioseqdesc_t &seqdesc,
 	Vector pos[], 
 	Quaternion q[]
 	)
@@ -4439,7 +4442,7 @@ void CBoneSetup::CalcAutoplaySequences(
 	for (intp i = 0; i < count; i++)
 	{
 		int sequenceIndex = pList[i];
-		mstudioseqdesc_t &seqdesc = ((CStudioHdr *)m_pStudioHdr)->pSeqdesc( sequenceIndex );
+		const mstudioseqdesc_t &seqdesc = m_pStudioHdr->pSeqdesc( sequenceIndex );
 		if (seqdesc.flags & STUDIO_AUTOPLAY)
 		{
 			float cycle = 0;
@@ -4548,7 +4551,7 @@ void Studio_BuildMatrices(
 //			points down the 6 cardinal axis (all negative weights are clamped to 0).
 //-----------------------------------------------------------------------------
 
-void DoAxisInterpBone(
+static void DoAxisInterpBone(
 	mstudiobone_t		*pbones,
 	int	ibone,
 	CBoneAccessor &bonetoworld
@@ -4662,7 +4665,7 @@ void DoAxisInterpBone(
 // Purpose: Generate a procedural transformation based on how that another bones 
 //			local transformation matches a set of target orientations.
 //-----------------------------------------------------------------------------
-void DoQuatInterpBone(
+static void DoQuatInterpBone(
 	mstudiobone_t		*pbones,
 	int	ibone,
 	CBoneAccessor &bonetoworld
@@ -4804,7 +4807,7 @@ void DoAimAtBone(
 	if ( pStudioHdr )
 	{
 		// This means it's AIMATATTACH
-		const mstudioattachment_t &attachment( ((CStudioHdr *)pStudioHdr)->pAttachment( pProc->aim ) );
+		const mstudioattachment_t &attachment( pStudioHdr->pAttachment( pProc->aim ) );
 		ConcatTransforms(
 			bonetoworld.GetBone( attachment.localbone ),
 			attachment.local,
@@ -5043,7 +5046,7 @@ void Studio_CalcDefaultPoseParameters( const CStudioHdr *pStudioHdr, float flPos
 		flPoseParameter[ i ] = 0.5f;
 		if ( i < nPoseCount )
 		{
-			const mstudioposeparamdesc_t &Pose = ((CStudioHdr *)pStudioHdr)->pPoseParameter( i );
+			const mstudioposeparamdesc_t &Pose = pStudioHdr->pPoseParameter( i );
 
 			// Want to try for a zero state.  If one doesn't exist set it to .5 by default.
 			if ( Pose.start < 0.0f && Pose.end > 0.0f )
@@ -5068,7 +5071,7 @@ float Studio_SetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 		return 0;
 	}
 
-	const mstudioposeparamdesc_t &PoseParam = ((CStudioHdr *)pStudioHdr)->pPoseParameter( iParameter );
+	const mstudioposeparamdesc_t &PoseParam = pStudioHdr->pPoseParameter( iParameter );
 
 	Assert( IsFinite( flValue ) );
 
@@ -5103,7 +5106,7 @@ float Studio_GetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 		return 0;
 	}
 
-	const mstudioposeparamdesc_t &PoseParam = ((CStudioHdr *)pStudioHdr)->pPoseParameter( iParameter );
+	const mstudioposeparamdesc_t &PoseParam = pStudioHdr->pPoseParameter( iParameter );
 
 	return ctlValue * (PoseParam.end - PoseParam.start) + PoseParam.start;
 }
@@ -5113,7 +5116,7 @@ float Studio_GetPoseParameter( const CStudioHdr *pStudioHdr, int iParameter, flo
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-static int ClipRayToHitbox( const Ray_t &ray, mstudiobbox_t *pbox, matrix3x4_t& matrix, trace_t &tr )
+static int ClipRayToHitbox( const Ray_t &ray, const mstudiobbox_t *pbox, const matrix3x4_t& matrix, trace_t &tr )
 {
 	constexpr float flProjEpsilon = 0.01f;
 	// scale by current t so hits shorten the ray and increase the likelihood of early outs
@@ -5221,10 +5224,10 @@ static int ClipRayToHitbox( const Ray_t &ray, mstudiobbox_t *pbox, matrix3x4_t& 
 //-----------------------------------------------------------------------------
 // Purpose:
 //-----------------------------------------------------------------------------
-bool SweepBoxToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, CStudioHdr *pStudioHdr, mstudiohitboxset_t *set, 
-				   matrix3x4_t **hitboxbones, int fContentsMask, trace_t &tr )
+static bool SweepBoxToStudio( const IPhysicsSurfaceProps *pProps, const Ray_t& ray, const CStudioHdr *pStudioHdr, const mstudiohitboxset_t *set, 
+	matrix3x4_t **hitboxbones, int fContentsMask, trace_t &tr )
 {
-	tr.fraction = 1.0;
+	tr.fraction = 1.0f;
 	tr.startsolid = false;
 
 	// OPTIMIZE: Partition these?
@@ -5286,7 +5289,7 @@ bool TraceToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, CStudioHdr *
 		return SweepBoxToStudio( pProps, ray, pStudioHdr, set, hitboxbones, fContentsMask, tr );
 	}
 
-	tr.fraction = 1.0;
+	tr.fraction = 1.0f;
 	tr.startsolid = false;
 
 	// no hit yet
@@ -5399,7 +5402,7 @@ bool TraceToStudio( IPhysicsSurfaceProps *pProps, const Ray_t& ray, CStudioHdr *
 // Purpose: returns array of animations and weightings for a sequence based on current pose parameters
 //-----------------------------------------------------------------------------
 
-void Studio_SeqAnims( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[], mstudioanimdesc_t *panim[4], float *weight )
+void Studio_SeqAnims( const CStudioHdr *pStudioHdr, const mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[], const mstudioanimdesc_t *panim[4], float *weight )
 {
 #if _DEBUG
 	VPROF_INCREMENT_COUNTER("SEQ_ANIMS",1);
@@ -5416,16 +5419,16 @@ void Studio_SeqAnims( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, i
 	Studio_LocalPoseParameter( pStudioHdr, poseParameter, seqdesc, iSequence, 0, s0, i0 );
 	Studio_LocalPoseParameter( pStudioHdr, poseParameter, seqdesc, iSequence, 1, s1, i1 );
 
-	panim[0] = &((CStudioHdr *)pStudioHdr)->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0  , i1 ) ) );
+	panim[0] = &pStudioHdr->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0  , i1 ) ) );
 	weight[0] = (1 - s0) * (1 - s1);
 
-	panim[1] = &((CStudioHdr *)pStudioHdr)->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0+1, i1 ) ) );
+	panim[1] = &pStudioHdr->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0+1, i1 ) ) );
 	weight[1] = (s0) * (1 - s1);
 
-	panim[2] = &((CStudioHdr *)pStudioHdr)->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0  , i1+1 ) ) );
+	panim[2] = &pStudioHdr->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0  , i1+1 ) ) );
 	weight[2] = (1 - s0) * (s1);
 
-	panim[3] = &((CStudioHdr *)pStudioHdr)->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0+1, i1+1 ) ) );
+	panim[3] = &pStudioHdr->pAnimdesc( pStudioHdr->iRelativeAnim( iSequence, seqdesc.anim( i0+1, i1+1 ) ) );
 	weight[3] = (s0) * (s1);
 
 	Assert( weight[0] >= 0.0f && weight[1] >= 0.0f && weight[2] >= 0.0f && weight[3] >= 0.0f );
@@ -5437,10 +5440,10 @@ void Studio_SeqAnims( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, i
 
 int Studio_MaxFrame( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] )
 {
-	mstudioanimdesc_t *panim[4];
+	const mstudioanimdesc_t *panim[4];
 	float	weight[ssize(panim)];
 
-	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
 	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
 
 	float maxFrame = 0.0f;
@@ -5466,10 +5469,10 @@ int Studio_MaxFrame( const CStudioHdr *pStudioHdr, intp iSequence, const float p
 
 float Studio_FPS( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] )
 {
-	mstudioanimdesc_t *panim[4];
+	const mstudioanimdesc_t *panim[4];
 	float	weight[4];
 
-	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
 	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
 
 	float t = 0.0f;
@@ -5489,9 +5492,9 @@ float Studio_FPS( const CStudioHdr *pStudioHdr, intp iSequence, const float pose
 // Purpose: returns cycles per second of a sequence (cycles/second)
 //-----------------------------------------------------------------------------
 
-float Studio_CPS( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[] )
+float Studio_CPS( const CStudioHdr *pStudioHdr, const mstudioseqdesc_t &seqdesc, intp iSequence, const float poseParameter[] )
 {
-	mstudioanimdesc_t *panim[4];
+	const mstudioanimdesc_t *panim[4];
 	float	weight[4];
 
 	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
@@ -5515,7 +5518,7 @@ float Studio_CPS( const CStudioHdr *pStudioHdr, mstudioseqdesc_t &seqdesc, intp 
 
 float Studio_Duration( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[] )
 {
-	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
 	float cps = Studio_CPS( pStudioHdr, seqdesc, iSequence, poseParameter );
 
 	if( cps == 0 )
@@ -5531,7 +5534,7 @@ float Studio_Duration( const CStudioHdr *pStudioHdr, intp iSequence, const float
 //			returns false if animation is not a movement animation
 //-----------------------------------------------------------------------------
 
-bool Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPos, QAngle &vecAngle )
+static bool Studio_AnimPosition( const mstudioanimdesc_t *panim, float flCycle, Vector &vecPos, QAngle &vecAngle )
 {
 	float	prevframe = 0;
 	vecPos.Init( );
@@ -5592,7 +5595,7 @@ bool Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPo
 //			returns false if animation is not a movement animation
 //-----------------------------------------------------------------------------
 
-bool Studio_AnimVelocity( mstudioanimdesc_t *panim, float flCycle, Vector &vecVelocity )
+static bool Studio_AnimVelocity( const mstudioanimdesc_t *panim, float flCycle, Vector &vecVelocity )
 {
 	float	prevframe = 0;
 
@@ -5629,7 +5632,7 @@ bool Studio_AnimVelocity( mstudioanimdesc_t *panim, float flCycle, Vector &vecVe
 //			returns false if animation is not a movement animation
 //-----------------------------------------------------------------------------
 
-bool Studio_AnimMovement( mstudioanimdesc_t *panim, float flCycleFrom, float flCycleTo, Vector &deltaPos, QAngle &deltaAngle )
+bool Studio_AnimMovement( const mstudioanimdesc_t *panim, float flCycleFrom, float flCycleTo, Vector &deltaPos, QAngle &deltaAngle )
 {
 	if (panim->nummovements == 0)
 		return false;
@@ -5654,7 +5657,7 @@ bool Studio_AnimMovement( mstudioanimdesc_t *panim, float flCycleFrom, float flC
 // Purpose: finds how much of an animation to play to move given linear distance
 //-----------------------------------------------------------------------------
 
-float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist )
+static float Studio_FindAnimDistance( const mstudioanimdesc_t *panim, float flDist )
 {
 	if (flDist <= 0)
 		return 0.0f;
@@ -5698,10 +5701,10 @@ float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist )
 
 bool Studio_SeqMovement( const CStudioHdr *pStudioHdr, intp iSequence, float flCycleFrom, float flCycleTo, const float poseParameter[], Vector &deltaPos, QAngle &deltaAngles )
 {
-	mstudioanimdesc_t *panim[4];
+	const mstudioanimdesc_t *panim[4];
 	float	weight[4];
 
-	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
 
 	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
 	
@@ -5745,10 +5748,10 @@ bool Studio_SeqMovement( const CStudioHdr *pStudioHdr, intp iSequence, float flC
 
 bool Studio_SeqVelocity( const CStudioHdr *pStudioHdr, intp iSequence, float flCycle, const float poseParameter[], Vector &vecVelocity )
 {
-	mstudioanimdesc_t *panim[4];
+	const mstudioanimdesc_t *panim[4];
 	float	weight[4];
 
-	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
 	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
 	
 	vecVelocity.Init( );
@@ -5777,10 +5780,10 @@ bool Studio_SeqVelocity( const CStudioHdr *pStudioHdr, intp iSequence, float flC
 
 float Studio_FindSeqDistance( const CStudioHdr *pStudioHdr, intp iSequence, const float poseParameter[], float flDist )
 {
-	mstudioanimdesc_t *panim[4];
+	const mstudioanimdesc_t *panim[4];
 	float	weight[4];
 
-	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
 	Studio_SeqAnims( pStudioHdr, seqdesc, iSequence, poseParameter, panim, weight );
 	
 	float flCycle = 0;
@@ -5807,7 +5810,7 @@ int Studio_FindAttachment( const CStudioHdr *pStudioHdr, const char *pAttachment
 		// Extract the bone index from the name
 		for (int i = 0; i < pStudioHdr->GetNumAttachments(); i++)
 		{
-			if (!V_stricmp(pAttachmentName,((CStudioHdr *)pStudioHdr)->pAttachment(i).pszName( ))) 
+			if (!V_stricmp(pAttachmentName,pStudioHdr->pAttachment(i).pszName( ))) 
 			{
 				return i;
 			}
@@ -5831,7 +5834,7 @@ intp Studio_FindRandomAttachment( const CStudioHdr *pStudioHdr, const char *pAtt
 		// Extract the bone index from the name
 		for (intp i = 0; i < pStudioHdr->GetNumAttachments(); i++)
 		{
-			if ( strstr( ((CStudioHdr *)pStudioHdr)->pAttachment(i).pszName(), pAttachmentName ) ) 
+			if ( strstr( pStudioHdr->pAttachment(i).pszName(), pAttachmentName ) ) 
 			{
 				matchingAttachments.AddToTail(i);
 			}
@@ -5880,12 +5883,12 @@ int Studio_BoneIndexByName( const CStudioHdr *pStudioHdr, const char *pName )
 	return -1;
 }
 
-const char *Studio_GetDefaultSurfaceProps( CStudioHdr *pstudiohdr )
+const char *Studio_GetDefaultSurfaceProps( const CStudioHdr *pstudiohdr )
 {
 	return pstudiohdr->pszSurfaceProp();
 }
 
-float Studio_GetMass( CStudioHdr *pstudiohdr )
+float Studio_GetMass( const CStudioHdr *pstudiohdr )
 {
 	return pstudiohdr->mass();
 }
@@ -5900,7 +5903,7 @@ const char *Studio_GetKeyValueText( const CStudioHdr *pStudioHdr, intp iSequence
 	{
 		if (iSequence >= 0 && iSequence < pStudioHdr->GetNumSeq())
 		{
-			return ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence ).KeyValueText();
+			return pStudioHdr->pSeqdesc( iSequence ).KeyValueText();
 		}
 	}
 	return NULL;
@@ -5909,14 +5912,14 @@ const char *Studio_GetKeyValueText( const CStudioHdr *pStudioHdr, intp iSequence
 bool Studio_PrefetchSequence( const CStudioHdr *pStudioHdr, intp iSequence )
 {
 	bool pendingload = false;
-	mstudioseqdesc_t &seqdesc = ((CStudioHdr *)pStudioHdr)->pSeqdesc( iSequence );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( iSequence );
 	int size0 = seqdesc.groupsize[ 0 ];
 	int size1 = seqdesc.groupsize[ 1 ];
 	for ( int i = 0; i < size0; ++i )
 	{
 		for ( int j = 0; j < size1; ++j )
 		{
-			mstudioanimdesc_t &animdesc = ((CStudioHdr *)pStudioHdr)->pAnimdesc( seqdesc.anim( i, j ) );
+			const mstudioanimdesc_t &animdesc = pStudioHdr->pAnimdesc( seqdesc.anim( i, j ) );
 			int iFrame = 0;
 			const mstudioanim_t *panim = animdesc.pAnim( &iFrame );
 			if ( !panim )

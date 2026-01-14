@@ -890,7 +890,7 @@ void PlaySounds( StudioModel *pStudioModel )
 		return;
 
 	intp seq = pStudioModel->GetSequence();
-	mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( seq );
+	const mstudioseqdesc_t &seqdesc = pStudioHdr->pSeqdesc( seq );
 
 	for ( int i = 0; i < (int)seqdesc.numevents; ++i )
 	{

@@ -3443,7 +3443,7 @@ void ControlPanel::showActivityModifiers( intp sequence )
 	if ( sequence < 0 || sequence >= hdr->GetNumSeq() )
 		return;
 
-	mstudioseqdesc_t &desc = hdr->pSeqdesc( sequence );
+	const mstudioseqdesc_t &desc = hdr->pSeqdesc( sequence );
 
 	cActivityModifiers->setEnabled( desc.numactivitymodifiers > 0);
 	cActivityModifiers->removeAll();
