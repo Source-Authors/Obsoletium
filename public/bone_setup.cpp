@@ -975,6 +975,7 @@ static void CalcVirtualAnimation( virtualmodel_t *pVModel, const CStudioHdr *pSt
 	if (animdesc.numlocalhierarchy)
 	{
 		matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
+		RunCodeAtScopeExit( g_MatrixPool.Free( boneToWorld ) );
 		CBoneBitList boneComputed;
 
 		for (int i = 0; i < animdesc.numlocalhierarchy; i++)
@@ -1000,8 +1001,6 @@ static void CalcVirtualAnimation( virtualmodel_t *pVModel, const CStudioHdr *pSt
 				}
 			}
 		}
-
-		g_MatrixPool.Free( boneToWorld );
 	}
 }
 
@@ -1117,10 +1116,11 @@ static void CalcAnimation( const CStudioHdr *pStudioHdr, Vector *pos, Quaternion
 	if (animdesc.numlocalhierarchy)
 	{
 		matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
+		RunCodeAtScopeExit( g_MatrixPool.Free( boneToWorld ) );
+
 		CBoneBitList boneComputed;
 
-		int i;
-		for (i = 0; i < animdesc.numlocalhierarchy; i++)
+		for (int i = 0; i < animdesc.numlocalhierarchy; i++)
 		{
 			const mstudiolocalhierarchy_t *pHierarchy = animdesc.pHierarchy( i );
 
@@ -1135,8 +1135,6 @@ static void CalcAnimation( const CStudioHdr *pStudioHdr, Vector *pos, Quaternion
 				}
 			}
 		}
-
-		g_MatrixPool.Free( boneToWorld );
 	}
 
 }
@@ -1306,12 +1304,15 @@ void WorldSpaceSlerp(
 
 	// matrices for q2, pos2
 	matrix3x4_t *srcBoneToWorld = g_MatrixPool.Alloc();
+	RunCodeAtScopeExit(g_MatrixPool.Free( srcBoneToWorld ));
 	CBoneBitList srcBoneComputed;
 
 	matrix3x4_t *destBoneToWorld = g_MatrixPool.Alloc();
+	RunCodeAtScopeExit(g_MatrixPool.Free( destBoneToWorld ));
 	CBoneBitList destBoneComputed;
 
 	matrix3x4_t *targetBoneToWorld = g_MatrixPool.Alloc();
+	RunCodeAtScopeExit(g_MatrixPool.Free( targetBoneToWorld ));
 	CBoneBitList targetBoneComputed;
 
 	virtualmodel_t *pVModel = pStudioHdr->GetVirtualModel();
@@ -1398,9 +1399,6 @@ void WorldSpaceSlerp(
 			}
 		}
 	}
-	g_MatrixPool.Free( srcBoneToWorld );
-	g_MatrixPool.Free( destBoneToWorld );
-	g_MatrixPool.Free( targetBoneToWorld );
 }
 
 
@@ -1931,9 +1929,16 @@ bool CalcPoseSingle(
 	bool bResult = true;
 	
 	Vector		*pos2 = g_VectorPool.Alloc();
+	RunCodeAtScopeExit(g_VectorPool.Free( pos2 ));
+
 	Quaternion	*q2 = g_QaternionPool.Alloc();
+	RunCodeAtScopeExit(g_QaternionPool.Free( q2 ));
+
 	Vector		*pos3= g_VectorPool.Alloc();
+	RunCodeAtScopeExit(g_VectorPool.Free( pos3 ));
+
 	Quaternion	*q3 = g_QaternionPool.Alloc();
+	RunCodeAtScopeExit(g_QaternionPool.Free( q3 ));
 
 	if (sequence >= pStudioHdr->GetNumSeq()) 
 	{
@@ -2103,11 +2108,6 @@ bool CalcPoseSingle(
 			}
 		}
 	}
-
-	g_VectorPool.Free( pos2 );
-	g_QaternionPool.Free( q2 );
-	g_VectorPool.Free( pos3 );
-	g_QaternionPool.Free( q3 );
 
 	return bResult;
 }
@@ -3346,6 +3346,7 @@ void CIKContext::AddAutoplayLocks( Vector pos[], Quaternion q[] )
 	}
 
 	matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
+	RunCodeAtScopeExit( g_MatrixPool.Free( boneToWorld ) );
 	CBoneBitList boneComputed;
 
 	intp ikOffset = m_ikLock.AddMultipleToTail( m_pStudioHdr->GetNumIKAutoplayLocks() );
@@ -3384,7 +3385,6 @@ void CIKContext::AddAutoplayLocks( Vector pos[], Quaternion q[] )
 			ikrule.kneeDir.Init( );
 		}
 	}
-	g_MatrixPool.Free( boneToWorld );
 }
 
 
@@ -3405,6 +3405,7 @@ void CIKContext::AddSequenceLocks( mstudioseqdesc_t &seqdesc, Vector pos[], Quat
 	}
 
 	matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
+	RunCodeAtScopeExit( g_MatrixPool.Free( boneToWorld ) );
 	CBoneBitList boneComputed;
 
 	intp ikOffset = m_ikLock.AddMultipleToTail( seqdesc.numiklocks );
@@ -3441,7 +3442,6 @@ void CIKContext::AddSequenceLocks( mstudioseqdesc_t &seqdesc, Vector pos[], Quat
 			ikrule.kneeDir.Init( );
 		}
 	}
-	g_MatrixPool.Free( boneToWorld );
 }
 
 //-----------------------------------------------------------------------------
@@ -4267,6 +4267,7 @@ void CIKContext::SolveAutoplayLocks(
 	)
 {
 	matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
+	RunCodeAtScopeExit( g_MatrixPool.Free( boneToWorld ) );
 	CBoneBitList boneComputed;
 
 	for (intp i = 0; i < m_ikLock.Count(); i++)
@@ -4274,7 +4275,6 @@ void CIKContext::SolveAutoplayLocks(
 		const mstudioiklock_t &lock = ((CStudioHdr *)m_pStudioHdr)->pIKAutoplayLock( i );
 		SolveLock( &lock, i, pos, q, boneToWorld, boneComputed );
 	}
-	g_MatrixPool.Free( boneToWorld );
 }
 
 
@@ -4290,6 +4290,7 @@ void CIKContext::SolveSequenceLocks(
 	)
 {
 	matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
+	RunCodeAtScopeExit( g_MatrixPool.Free( boneToWorld ) );
 	CBoneBitList boneComputed;
 
 	for (intp i = 0; i < m_ikLock.Count(); i++)
@@ -4297,7 +4298,6 @@ void CIKContext::SolveSequenceLocks(
 		mstudioiklock_t *plock = seqdesc.pIKLock( i );
 		SolveLock( plock, i, pos, q, boneToWorld, boneComputed );
 	}
-	g_MatrixPool.Free( boneToWorld );
 }
 
 
@@ -4314,6 +4314,7 @@ void CIKContext::AddAllLocks( Vector pos[], Quaternion q[] )
 	}
 
 	matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
+	RunCodeAtScopeExit( g_MatrixPool.Free( boneToWorld ) );
 	CBoneBitList boneComputed;
 
 	intp ikOffset = m_ikLock.AddMultipleToTail( m_pStudioHdr->GetNumIKChains() );
@@ -4351,7 +4352,6 @@ void CIKContext::AddAllLocks( Vector pos[], Quaternion q[] )
 			ikrule.kneeDir.Init( );
 		}
 	}
-	g_MatrixPool.Free( boneToWorld );
 }
 
 
@@ -4366,6 +4366,7 @@ void CIKContext::SolveAllLocks(
 	)
 {
 	matrix3x4_t *boneToWorld = g_MatrixPool.Alloc();
+	RunCodeAtScopeExit( g_MatrixPool.Free( boneToWorld ) );
 	CBoneBitList boneComputed;
 	mstudioiklock_t lock;
 
@@ -4378,7 +4379,6 @@ void CIKContext::SolveAllLocks(
 
 		SolveLock( &lock, i, pos, q, boneToWorld, boneComputed );
 	}
-	g_MatrixPool.Free( boneToWorld );
 }
 
 
