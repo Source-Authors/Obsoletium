@@ -961,35 +961,35 @@ template< class T > inline typename CDmaVar<T>::D& CDmaVar<T>::Storage()
 //-----------------------------------------------------------------------------
 inline void CDmaColor::SetColor( int r, int g, int b, int a )
 {
-	Color clr( r, g, b, a );
+	Color clr( size_cast<byte>(r), size_cast<byte>(g), size_cast<byte>(b), size_cast<byte>(a) );
 	m_pAttribute->SetValue( clr );
 }
 
 inline void CDmaColor::SetRed( int r )
 {
 	Color org = Value();
-	org[ 0 ] = static_cast<unsigned char>(r);
+	org[ 0 ] = size_cast<byte>(r);
 	m_pAttribute->SetValue( org );
 }
 
 inline void CDmaColor::SetGreen( int g )
 {
 	Color org = Value();
-	org[ 1 ] = static_cast<unsigned char>(g);
+	org[ 1 ] = size_cast<byte>(g);
 	m_pAttribute->SetValue( org );
 }
 
 inline void CDmaColor::SetBlue( int b )
 {
 	Color org = Value();
-	org[ 2 ] = static_cast<unsigned char>(b);
+	org[ 2 ] = size_cast<byte>(b);
 	m_pAttribute->SetValue( org );
 }
 
 inline void CDmaColor::SetAlpha( int a )
 {
 	Color org = Value();
-	org[ 3 ] = static_cast<unsigned char>(a);
+	org[ 3 ] = size_cast<byte>(a);
 	m_pAttribute->SetValue( org );
 }
 
