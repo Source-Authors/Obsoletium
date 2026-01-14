@@ -340,9 +340,8 @@ char *CAudioMixerWave::LoadMixBuffer( channel_t *pChannel, int sample_load_reque
 
 
 
-	if ( IsX360() || IsDebug() )
+	if ( IsDebug() )
 	{	
-		// for safety, 360 always validates sample request, due to new xma audio code and possible logic flaws
 		// PC can expect number of requested samples to be within tolerances due to exisiting aged code
 		// otherwise buffer overruns cause hard to track random crashes
 		if ( ( ( sample_load_request + 1 ) * samplesize ) > nTempCopyBufferSize )
