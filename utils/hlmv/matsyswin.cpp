@@ -602,7 +602,8 @@ void DrawHelpers()
 
 		for (int i = 0; i < 360; i += 5)
 		{
-			float a = i * (3.151492653/180.0f);
+			// dimhotepus: Use correct rad to degrees conversion.
+			float a = RAD2DEG( i * 1.0f );
 
 			if (g_viewerSettings.rotating)
 				meshBuilder.Color3ub( 255, 255, 0 );
