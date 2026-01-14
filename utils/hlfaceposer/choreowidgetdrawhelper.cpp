@@ -108,6 +108,7 @@ void CChoreoWidgetDrawHelper::Init( mxWindow *widget, int x, int y, int w, int h
 	{
 		m_dcMemory = m_dcReal;
 		m_x = m_y = 0;
+		m_bmMemory = m_bmOld = nullptr;
 	}
 
 	m_clrOld = SetBkColor( m_dcMemory, bgColor );

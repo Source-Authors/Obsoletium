@@ -131,11 +131,13 @@ CAudioMixer *CreateWaveMixer( CWaveData *data, int format, int channels, int bit
 //-----------------------------------------------------------------------------
 CAudioMixerWave::CAudioMixerWave( CWaveData *data ) : m_pData(data), m_pChannel(NULL)
 {
-	m_loop = 0;
 	m_sample = 0;
 	m_absoluteSample = 0;
 	m_scrubSample = -1;
+	m_startpos = -1;
+	m_loop = 0;
 	m_fracOffset = 0;
+	m_absoluteStartPos = -1;
 	m_bActive = false;
 	m_nModelIndex = -1;
 	m_bForward = true;
