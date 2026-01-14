@@ -267,18 +267,15 @@ intp CWADTexture::GetKeywords(OUT_Z_CAP(keywordsSize) char *pszKeywords, intp ke
 	//
 	// Set the keywords to the WAD file name.
 	//
-	if (pszKeywords != NULL)
+	const char *pszLastSlash = strrchr(m_szFileName, '\\');
+	if (pszLastSlash != NULL)
 	{
-		const char *pszLastSlash = strrchr(m_szFileName, '\\');
-		if (pszLastSlash != NULL)
-		{
-			pszLastSlash++;
-			V_strncpy(pszKeywords, pszLastSlash, keywordsSize);
-		}
-		else
-		{
-			V_strncpy(pszKeywords, m_szFileName, keywordsSize);
-		}
+		pszLastSlash++;
+		V_strncpy(pszKeywords, pszLastSlash, keywordsSize);
+	}
+	else
+	{
+		V_strncpy(pszKeywords, m_szFileName, keywordsSize);
 	}
 
 	return V_strlen(m_szFileName);
@@ -295,14 +292,6 @@ intp CWADTexture::GetShortName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize)
 	if (nameSize > 0)
 		pszName[0] = '\0';
 
-	char szBuf[MAX_PATH];
-	szBuf[0] = '\0';
-
-	if (pszName == NULL)
-	{
-		pszName = szBuf;
-	}
-
 	if (format == tfWAL)
 	{
 		const char *pszCopy = strstr(m_szName, "textures");
@@ -317,8 +306,9 @@ intp CWADTexture::GetShortName(OUT_Z_CAP(nameSize) char *pszName, intp nameSize)
 
 		V_strncpy(pszName, pszCopy, nameSize);
 
+		// dimhotepus: Fix extension removal.
 		// remove extension
-		char *psz = strstr(szBuf, ".wal");
+		char *psz = strstr(pszName, ".wal");
 		if (psz != NULL)
 		{
 			*psz = '\0';
