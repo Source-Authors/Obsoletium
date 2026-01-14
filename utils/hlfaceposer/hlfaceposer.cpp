@@ -313,14 +313,14 @@ void FPCopyFile( const char *source, const char *dest, bool bCheckOut )
 bool FacePoser_HasWindowStyle( mxWidget *w, int bits )
 {
 	HWND wnd = (HWND)w->getHandle();
-	DWORD style = GetWindowLong( wnd, GWL_STYLE ); //-V303
+	DWORD style = GetWindowLong( wnd, GWL_STYLE ); //-V303 //-V2002
 	return ( style & bits ) ? true : false;
 }
 
 bool FacePoser_HasWindowExStyle( mxWidget *w, int bits )
 {
 	HWND wnd = (HWND)w->getHandle();
-	DWORD style = GetWindowLong( wnd, GWL_EXSTYLE ); //-V303
+	DWORD style = GetWindowLong( wnd, GWL_EXSTYLE ); //-V303 //-V2002
 	return ( style & bits ) ? true : false;
 }
 
@@ -336,7 +336,7 @@ static bool FacePoser_SetWindowLong( HWND wnd, int index, LONG newLong )
 	// a GetLastError result that is nonzero.
 	SetLastError(ERROR_SUCCESS);
 
-	const LONG rc = SetWindowLong( wnd, index, newLong ); //-V303
+	const LONG rc = SetWindowLong( wnd, index, newLong ); //-V303 //-V2002
 	const bool ok = rc || GetLastError() == ERROR_SUCCESS;
 
 	char windowTitle[256];
@@ -351,7 +351,7 @@ static bool FacePoser_SetWindowLong( HWND wnd, int index, LONG newLong )
 void FacePoser_AddWindowStyle( mxWidget *w, int addbits )
 {
 	HWND wnd = (HWND)w->getHandle();
-	DWORD style = GetWindowLong( wnd, GWL_STYLE ); //-V303
+	DWORD style = GetWindowLong( wnd, GWL_STYLE ); //-V303 //-V2002
 	style |= addbits;
 	FacePoser_SetWindowLong( wnd, GWL_STYLE, style );
 }
@@ -359,7 +359,7 @@ void FacePoser_AddWindowStyle( mxWidget *w, int addbits )
 void FacePoser_AddWindowExStyle( mxWidget *w, int addbits )
 {
 	HWND wnd = (HWND)w->getHandle();
-	DWORD style = GetWindowLong( wnd, GWL_EXSTYLE ); //-V303
+	DWORD style = GetWindowLong( wnd, GWL_EXSTYLE ); //-V303 //-V2002
 	style |= addbits;
 	FacePoser_SetWindowLong( wnd, GWL_EXSTYLE, style );
 }
@@ -367,7 +367,7 @@ void FacePoser_AddWindowExStyle( mxWidget *w, int addbits )
 void FacePoser_RemoveWindowStyle( mxWidget *w, int removebits )
 {
 	HWND wnd = (HWND)w->getHandle();
-	DWORD style = GetWindowLong( wnd, GWL_STYLE ); //-V303
+	DWORD style = GetWindowLong( wnd, GWL_STYLE ); //-V303 //-V2002
 	style &= ~removebits;
 	FacePoser_SetWindowLong( wnd, GWL_STYLE, style );
 }
@@ -375,7 +375,7 @@ void FacePoser_RemoveWindowStyle( mxWidget *w, int removebits )
 void FacePoser_RemoveWindowExStyle( mxWidget *w, int removebits )
 {
 	HWND wnd = (HWND)w->getHandle();
-	DWORD style = GetWindowLong( wnd, GWL_EXSTYLE ); //-V303
+	DWORD style = GetWindowLong( wnd, GWL_EXSTYLE ); //-V303 //-V2002
 	style &= ~removebits;
 	FacePoser_SetWindowLong( wnd, GWL_EXSTYLE, style );
 }
