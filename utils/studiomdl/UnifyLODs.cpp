@@ -988,35 +988,6 @@ static int FindOrCreateExactVertexInDictionary( CVertexDictionary &vertexDict,
 	return nMeshVertID - pDstMesh->vertexoffset;
 }
 
-static void PrintBonesUsedInLOD( s_source_t *pSrc )
-{
-	printf( "PrintBonesUsedInLOD\n" );
-
-	intp nVertexCount = pSrc->m_GlobalVertices.Count();
-	for( intp i = 0; i <nVertexCount; i++ )
-	{
-		Vector &pos = pSrc->m_GlobalVertices[i].position;
-		Vector &norm = pSrc->m_GlobalVertices[i].normal;
-		Vector2D &texcoord = pSrc->m_GlobalVertices[i].texcoord;
-
-		printf( "pos: %f %f %f norm: %f %f %f texcoord: %f %f\n",
-			pos[0], pos[1], pos[2], norm[0], norm[1], norm[2], texcoord[0], texcoord[1] );
-
-		s_boneweight_t *pBoneWeight = &pSrc->m_GlobalVertices[i].boneweight;
-
-		for( int j = 0; j < pBoneWeight->numbones; j++ )
-		{
-			int globalBoneID = pBoneWeight->bone[j];
-			const char *pBoneName = g_bonetable[globalBoneID].name;
-
-			printf( "vert: %zd bone: %d boneid: %d weight: %f name: \"%s\"\n", i, j, pBoneWeight->bone[j], 
-				pBoneWeight->weight[j], pBoneName );
-		}
-		printf( "\n" );
-		fflush( stdout );
-	}
-}
-
 
 //-----------------------------------------------------------------------------
 // Indicates a particular set of bones is used by a particular LOD
@@ -1031,20 +1002,6 @@ static void	MarkBonesUsedByLod( const s_boneweight_t &boneWeight, int nLodID )
 		pBone->flags |= ( BONE_USED_BY_VERTEX_LOD0 << nLodID );
 	}
 }
-
-
-static void PrintSBoneWeight( s_boneweight_t *pBoneWeight, const s_source_t *pSrc )
-{
-	for( int j = 0; j < pBoneWeight->numbones; j++ )
-	{
-		int globalBoneID = pBoneWeight->bone[j];
-		const char *pBoneName = g_bonetable[globalBoneID].name;
-
-		printf( "bone: %d boneid: %d weight: %f name: \"%s\"\n", j, pBoneWeight->bone[j], 
-			pBoneWeight->weight[j], pBoneName );
-	}
-}
-
 
 
 //-----------------------------------------------------------------------------
@@ -1119,24 +1076,24 @@ static void CreateLODVertsInDictionary( int nLodID, const s_source_t *pRootLODSr
 	}
 }
 
-static void PrintSourceVerts( s_source_t *pSrc )
-{
-	intp nVertexCount = pSrc->m_GlobalVertices.Count();
-	for( intp i = 0; i < nVertexCount; i++ )
-	{
-		const s_vertexinfo_t &srcVertex = pSrc->m_GlobalVertices[i];
-		printf( "v %zd ", i );
-		printf( "pos: %f %f %f ", srcVertex.position[0], srcVertex.position[1], srcVertex.position[2] );
-		printf( "norm: %f %f %f ", srcVertex.normal[0], srcVertex.normal[1], srcVertex.normal[2] );
-		printf( "texcoord: %f %f\n", srcVertex.texcoord[0], srcVertex.texcoord[1] );
-		for( int j = 0; j < srcVertex.boneweight.numbones; j++ )
-		{
-			printf( "\t%d: %d %f\n", j, ( int )srcVertex.boneweight.bone[j], 
-				srcVertex.boneweight.weight[j] );
-		}
-		fflush( stdout );
-	}
-}
+// static void PrintSourceVerts( s_source_t *pSrc )
+// {
+// 	intp nVertexCount = pSrc->m_GlobalVertices.Count();
+// 	for( intp i = 0; i < nVertexCount; i++ )
+// 	{
+// 		const s_vertexinfo_t &srcVertex = pSrc->m_GlobalVertices[i];
+// 		printf( "v %zd ", i );
+// 		printf( "pos: %f %f %f ", srcVertex.position[0], srcVertex.position[1], srcVertex.position[2] );
+// 		printf( "norm: %f %f %f ", srcVertex.normal[0], srcVertex.normal[1], srcVertex.normal[2] );
+// 		printf( "texcoord: %f %f\n", srcVertex.texcoord[0], srcVertex.texcoord[1] );
+// 		for( int j = 0; j < srcVertex.boneweight.numbones; j++ )
+// 		{
+// 			printf( "\t%d: %d %f\n", j, ( int )srcVertex.boneweight.bone[j], 
+// 				srcVertex.boneweight.weight[j] );
+// 		}
+// 		fflush( stdout );
+// 	}
+// }
 
 
 //-----------------------------------------------------------------------------
