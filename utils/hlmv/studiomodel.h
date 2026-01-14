@@ -450,6 +450,8 @@ inline studiohdr_t *StudioModel::getAnimHeader( int i ) const
 { 
 //	return g_pMDLCache->GetStudioHdr( m_AnimHandle[i] );
 //	return m_panimhdr[i]; 
+	Error("Not implemented");
+	return nullptr;
 }
 
 inline char const *StudioModel::GetFileName( void ) 
