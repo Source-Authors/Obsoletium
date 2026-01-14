@@ -365,7 +365,7 @@ bool RegWriteString( HKEY hKey, const char *szSubKey, const char *string )
 		szSubKey,	// value name
 		0,			// reserved
 		REG_SZ,		// type buffer
-		(LPBYTE)string,    // data buffer
+		(const LPBYTE)string,    // data buffer
 		dwSize );  // size of data buffer
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
