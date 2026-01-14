@@ -3143,8 +3143,6 @@ typedef struct
 	lodMeshInfo_t	lodMeshInfo;
 } vertexPool_t;
 
-#define ALIGN(b,s)		(((unsigned int)(b)+(s)-1)&~((s)-1))
-
 //-----------------------------------------------------------------------------
 // FindVertexOffsets
 // 
@@ -3609,7 +3607,7 @@ bool FixupVVDFile(const char *fileName,  const studiohdr_t *pStudioHdr, const vo
 
 	pStart_base = (byte*)malloc(FILEBUFFER);
 	memset(pStart_base, 0, FILEBUFFER);
-	pStart_new  = (byte*)ALIGN(pStart_base,16);
+	pStart_new  = AlignValue(pStart_base,16);
 	pData_new   = pStart_new;
 
 	// setup headers
@@ -3622,19 +3620,19 @@ bool FixupVVDFile(const char *fileName,  const studiohdr_t *pStudioHdr, const vo
 	pFileHdr_new->numFixups = numFixups;
 
 	// skip new fixup table
-	pData_new   = (byte*)ALIGN(pData_new, 4);
+	pData_new   = AlignValue(pData_new, 4);
 	pFixupTable = (vertexFileFixup_t*)pData_new;
 	pFileHdr_new->fixupTableStart = pData_new - pStart_new;
 	pData_new += numFixups*sizeof(vertexFileFixup_t);
 
 	// skip new vertex data
-	pData_new    = (byte*)ALIGN(pData_new, 16);
+	pData_new    = AlignValue(pData_new, 16);
 	pVertex_new  = (mstudiovertex_t*)pData_new;
 	pFileHdr_new->vertexDataStart = pData_new - pStart_new;
 	pData_new += numVertexes*sizeof(mstudiovertex_t);
 
 	// skip new tangent data
-	pData_new    = (byte*)ALIGN(pData_new, 16);
+	pData_new    = AlignValue(pData_new, 16);
 	pTangent_new = (Vector4D*)pData_new;
 	pFileHdr_new->tangentDataStart = pData_new - pStart_new;
 	pData_new += numVertexes*sizeof(Vector4D);
