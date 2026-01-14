@@ -356,7 +356,7 @@ void CStudioFileChangeWatcher::Update()
 		
 		m_ChangedModels.Purge();
 	
-		for ( int i=0; i < CMapDoc::GetDocumentCount(); i++ )
+		for ( intp i=0; i < CMapDoc::GetDocumentCount(); i++ )
 		{
 			CMapDoc *pDoc = CMapDoc::GetDocument( i );
 			pDoc->GetMapWorld()->CalcBounds( true );
@@ -819,7 +819,7 @@ bool StudioModel::PostLoadModel(const char *modelname)
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-int StudioModel::GetSequenceCount( void )
+intp StudioModel::GetSequenceCount( void )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	return pStudioHdr->GetNumSeq();
@@ -831,7 +831,7 @@ int StudioModel::GetSequenceCount( void )
 // Input  : nIndex - 
 //			szName - 
 //-----------------------------------------------------------------------------
-void StudioModel::GetSequenceName( int nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize )
+void StudioModel::GetSequenceName( intp nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize )
 {
 	if (nameSize > 0)
 		szName[0] = '\0';
@@ -847,7 +847,7 @@ void StudioModel::GetSequenceName( int nIndex, OUT_Z_CAP(nameSize) char *szName,
 //-----------------------------------------------------------------------------
 // Purpose: Returns the index of the current sequence.
 //-----------------------------------------------------------------------------
-int StudioModel::GetSequence( )
+intp StudioModel::GetSequence( )
 {
 	return m_sequence;
 }
@@ -856,7 +856,7 @@ int StudioModel::GetSequence( )
 //-----------------------------------------------------------------------------
 // Purpose: Sets the current sequence by index.
 //-----------------------------------------------------------------------------
-int StudioModel::SetSequence( int iSequence )
+intp StudioModel::SetSequence( intp iSequence )
 {
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	if (iSequence > pStudioHdr->GetNumSeq())

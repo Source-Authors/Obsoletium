@@ -87,12 +87,12 @@ public:
 	void					ExtractMovementBbox( Vector &mins, Vector &maxs );
 	void					RotateBbox( Vector &Mins, Vector &Maxs, const QAngle &Angles );
 
-	int						SetSequence( int iSequence );
-	int						GetSequence( void );
-	int						GetSequenceCount( void );
-	void					GetSequenceName( int nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize );
+	intp					SetSequence( intp iSequence );
+	intp					GetSequence( void );
+	intp					GetSequenceCount( void );
+	void					GetSequenceName( intp nIndex, OUT_Z_CAP(nameSize) char *szName, intp nameSize );
 	template<intp nameSize>
-	void GetSequenceName(int nIndex, OUT_Z_ARRAY char (&szName)[nameSize])
+	void GetSequenceName(intp nIndex, OUT_Z_ARRAY char (&szName)[nameSize])
 	{
 		GetSequenceName(nIndex, szName, nameSize);
 	}
@@ -116,7 +116,7 @@ private:
 	// entity settings
 	Vector					m_origin;
 	QAngle					m_angles;	
-	int						m_sequence;			// sequence index
+	intp					m_sequence;			// sequence index
 	float					m_cycle;			// pos in animation cycle
 	int						m_bodynum;			// bodypart selection	
 	int						m_skinnum;			// skin group selection
