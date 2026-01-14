@@ -207,7 +207,8 @@ inline bool CEditGameClass::IsClass(const char *pszClass) const
 //-----------------------------------------------------------------------------
 void CEditGameClass::SetComments(const char *pszComments)
 {
-	delete m_pszComments;
+	// dimhotepus: Use delete[] for new[].
+	delete[] m_pszComments;
 
 	if (pszComments != NULL)
 	{

@@ -48,7 +48,8 @@ CEditGameClass::CEditGameClass(void)
 //-----------------------------------------------------------------------------
 CEditGameClass::~CEditGameClass(void)
 {
-	delete m_pszComments;
+	// dimhotepus: Use delete[] for new[].
+	delete[] m_pszComments;
 
 	Connections_RemoveAll();
 	Upstream_RemoveAll();
