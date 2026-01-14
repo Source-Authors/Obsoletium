@@ -413,6 +413,8 @@ void CPrefabLibrary::LoadAllLibraries()
 		return;	// no libraries
 	}
 
+	RunCodeAtScopeExit(FindClose(hnd));
+
 	do
 	{
 		if ((fd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && (fd.cFileName[0] != '.'))
@@ -434,8 +436,6 @@ void CPrefabLibrary::LoadAllLibraries()
 			}
 		}
 	} while (FindNextFile(hnd, &fd));
-
-	FindClose(hnd);
 }
 
 
@@ -970,6 +970,8 @@ int CPrefabLibraryVMF::Load(LPCTSTR pszFilename)
 		return(1);
 	}
 
+	RunCodeAtScopeExit(FindClose(hnd));
+
 	*strrchr(szDir, '*') = '\0';
 
 	do
@@ -989,8 +991,6 @@ int CPrefabLibraryVMF::Load(LPCTSTR pszFilename)
 			Add(pPrefab);
 		}
 	} while (FindNextFile(hnd, &fd));
-
-	FindClose(hnd);
 
 	return 1;
 }

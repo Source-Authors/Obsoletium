@@ -1831,8 +1831,9 @@ void CMapDoc::Postload(const char *pszFileName)
 	FileHandle_t searchReplaceFP = g_pFileSystem->Open( translationFilename, "r" );
 	if( searchReplaceFP )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close( searchReplaceFP ));
+
 		BatchReplaceTextures( searchReplaceFP );
-		g_pFileSystem->Close( searchReplaceFP );
 	}
 	if ( pProgDlg )
 	{
@@ -2478,6 +2479,7 @@ BOOL CMapDoc::Serialize(std::fstream& file, BOOL fIsStoring, BOOL bRMF)
 	}
 
 	GetHistory()->Pause();
+	RunCodeAtScopeExit(GetHistory()->Resume());
 
 	if(bRMF)
 	{
@@ -2569,8 +2571,6 @@ Done:;
 			delete pCordonWorld;
 		}
 	}
-
-	GetHistory()->Resume();
 
 	if (!fIsStoring)
 	{
@@ -3257,12 +3257,13 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		BOOL bSaved = FALSE;
 
 		BeginWaitCursor();
+		RunCodeAtScopeExit(EndWaitCursor());
+
 		if (SaveVMF(lpszPathName, 0))
 		{
 			bSaved = TRUE;
 			SetModifiedFlag(FALSE);
 		}
-		EndWaitCursor();
 
 		return(bSaved);
 	}
@@ -3280,13 +3281,15 @@ BOOL CMapDoc::OnSaveDocument(LPCTSTR lpszPathName)
 		return(FALSE);
 	}
 
+	{
 	BeginWaitCursor();
+		RunCodeAtScopeExit(EndWaitCursor());
+
 	if (!Serialize(file, TRUE, bRMF))
 	{
-		EndWaitCursor();
 		return(FALSE);
 	}
-	EndWaitCursor();
+	}
 
 	SetModifiedFlag(FALSE);
 	return(TRUE);
@@ -4741,6 +4744,7 @@ void CMapDoc::Copy( IHammerClipboard *pClipboard )
 	}
 
 	BeginWaitCursor();
+	RunCodeAtScopeExit(EndWaitCursor());
 
 	// Delete the contents of the clipboard.
 	GetHammerClipboard( pClipboard )->Objects.PurgeAndDeleteElements();
@@ -4749,6 +4753,7 @@ void CMapDoc::Copy( IHammerClipboard *pClipboard )
 	m_pSelection->GetBounds(GetHammerClipboard( pClipboard )->Bounds.bmins, GetHammerClipboard( pClipboard )->Bounds.bmaxs);
 
 	GetHistory()->Pause();
+	RunCodeAtScopeExit(GetHistory()->Resume());
 
 	GetHammerClipboard( pClipboard )->pSourceWorld = m_pWorld;
 
@@ -4779,10 +4784,6 @@ void CMapDoc::Copy( IHammerClipboard *pClipboard )
 
 		GetHammerClipboard( pClipboard )->Objects.AddToTail(pNewobj);
 	}
-
-	GetHistory()->Resume();
-
-	EndWaitCursor();
 }
 
 
@@ -5078,6 +5079,8 @@ void CMapDoc::Delete( void )
 void CMapDoc::OnEditPaste(void)
 {
 	BeginWaitCursor();
+	RunCodeAtScopeExit(EndWaitCursor());
+
 	GetHistory()->MarkUndoPosition( m_pSelection->GetList(), "Paste");
 
 	// first, clear selection so we can select all pasted objects
@@ -5099,7 +5102,6 @@ void CMapDoc::OnEditPaste(void)
 	m_pToolManager->SetTool(TOOL_POINTER);
 	
 	SetModifiedFlag();
-	EndWaitCursor();
 }
 
 //-----------------------------------------------------------------------------
@@ -6751,9 +6753,12 @@ void CMapDoc::OnEditPastespecial(void)
 	{
 		return;
 	}
-	dlg.SaveToIni();
 
 	BeginWaitCursor();
+	RunCodeAtScopeExit(EndWaitCursor());
+
+	dlg.SaveToIni();
+
 	GetHistory()->MarkUndoPosition( m_pSelection->GetList(), "Paste");
 
 	// first, clear selection so we can select all pasted objects
@@ -6835,7 +6840,6 @@ void CMapDoc::OnEditPastespecial(void)
 	m_pToolManager->SetTool(TOOL_POINTER);
 
 	SetModifiedFlag();
-	EndWaitCursor();
 }
 
 
@@ -8950,12 +8954,17 @@ void CMapDoc::OnFileExporttodxf(void)
 	if(str.ReverseFind('.') == -1)
 		str += ".dxf";
 	
-	FILE *fp = fopen(str, "wb");
+	// export solids
+	BeginWaitCursor();
+	RunCodeAtScopeExit(EndWaitCursor());
 
 	m_pWorld->CalcBounds(TRUE);
 
 	BoundBox box;
 	m_pWorld->GetRender2DBox(box.bmins, box.bmaxs);
+
+	FILE *fp = fopen(str, "wb");
+	RunCodeAtScopeExit(fclose(fp));
 
 	fprintf(fp,"0\nSECTION\n2\nHEADER\n");
 	fprintf(fp,"9\n$ACADVER\n1\nAC1008\n");
@@ -8992,9 +9001,6 @@ void CMapDoc::OnFileExporttodxf(void)
 	/* Entities section */
 	fprintf(fp,"0\nSECTION\n2\nENTITIES\n");
 
-	// export solids
-	BeginWaitCursor();
-
 	ExportDXFInfo_s info;
 	info.bVisOnly = dlg.bVisibles!=0;
 	info.nObject = 0;
@@ -9003,10 +9009,7 @@ void CMapDoc::OnFileExporttodxf(void)
 
 	m_pWorld->EnumChildren(&SaveDXF, &info);
 
-	EndWaitCursor();
-
 	fprintf(fp,"0\nENDSEC\n0\nEOF\n");
-	fclose(fp);
 }
 
 
@@ -9074,7 +9077,9 @@ void CMapDoc::OnMapLoadportalfile(void)
 		AfxMessageBox("Couldn't find portal file.");
 		return;
 	}
+
 	FILE *fp = fopen(m_pPortalFile->fileName, "r");
+	RunCodeAtScopeExit(fclose(fp));
 	char szLine[256];
 
 	int clusterCount;
@@ -9114,7 +9119,6 @@ void CMapDoc::OnMapLoadportalfile(void)
 		Assert( m_pPortalFile->vertCount.Count() == portalCount );
 	}
 
-	fclose(fp);
 	if ( m_pPortalFile )
 	{
 		if ( m_pPortalFile->vertCount.Count() != portalCount || portalCount <= 0 )
@@ -9711,6 +9715,7 @@ CMapWorld *CMapDoc::CordonCreateWorld()
 	CMapWorld *pWorld = new CMapWorld( NULL );
 
 	GetHistory()->Pause();
+	RunCodeAtScopeExit(GetHistory()->Resume());
 
 	// create solids
 	CMapSolid *pBigSolid = new CMapSolid;
@@ -9779,8 +9784,6 @@ CMapWorld *CMapDoc::CordonCreateWorld()
 		pChild = pWorld->GetNextDescendent(pos);
 	}
 
-	GetHistory()->Resume();
-
 	return(pWorld);
 }
 
@@ -9826,9 +9829,14 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 
 	ChunkFileResult_t eResult = File.Open(pszFileName, ChunkFile_Write);
 	BeginWaitCursor();
+	RunCodeAtScopeExit(EndWaitCursor());
+	
+	char title[MAX_PATH + 32];
+	V_sprintf_safe(title, "Saving %s...", pszFileName);
 	
 	// Change the main title bar.
-	GetMainWnd()->SetWindowText( "Saving..." );
+	GetMainWnd()->SetWindowText( title );
+	RunCodeAtScopeExit(GetMainWnd()->OnUpdateFrameTitle( true ));
 	// We can optionally use these calls if we want the document name to go away so the title bar only says "Saving...".
 	//GetMainWnd()->ModifyStyle( FWS_ADDTOTITLE, 0 );  //GetMainWnd()->ModifyStyle( 0, FWS_ADDTOTITLE );
 
@@ -9939,9 +9947,6 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 		eResult = File.Close();
 	}
 
-	// Restore the main window's title.
-	GetMainWnd()->OnUpdateFrameTitle( true );
-
 	if (eResult != ChunkFile_Ok)
 	{
 		GetMainWnd()->MessageBox(File.GetErrorText(eResult), "Hammer - Saving File Error", MB_OK | MB_ICONERROR);
@@ -9952,7 +9957,6 @@ bool CMapDoc::SaveVMF(const char *pszFileName, int saveFlags )
 		AfxGetApp()->WriteProfileString("General", "Last Good Save", pszFileName);		
 	}
 	
-	EndWaitCursor();
 	return( eResult == ChunkFile_Ok );
 }
 
@@ -10991,11 +10995,12 @@ void CMapDoc::OnUpdateLightPreview()
 		return;
 	}
 
+	RunCodeAtScopeExit(fclose(fp));
+
 	fseek( fp, 0, SEEK_END );
 	fileData.SetSize( ftell( fp ) + 1 );
 	fseek( fp, 0, SEEK_SET );
 	fread( fileData.Base(), 1, fileData.Count(), fp );
-	fclose( fp );
 
 	// Null-terminate it.
 	fileData[ fileData.Count() - 1 ] = 0;

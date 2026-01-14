@@ -35,92 +35,96 @@ void MakePrefabLibrary(LPCTSTR pszName)
 	// get files
 	static BOOL bFirst = TRUE;
 Again:
-	WIN32_FIND_DATA fd;
-	HANDLE hnd = FindFirstFile(bFirst ? "*.rmf" : "*.map", &fd);
 
-	if(hnd != INVALID_HANDLE_VALUE)	do
+	if( HANDLE hnd = FindFirstFile(bFirst ? "*.rmf" : "*.map", &fd);
+		hnd != INVALID_HANDLE_VALUE)
 	{
-		// check file type
-		CPrefab *pPrefab = NULL;
-		int iLoadResult = -1;
+		RunCodeAtScopeExit(FindClose(hnd));
 
-		switch (CPrefab::CheckFileType(fd.cFileName))
+		do
 		{
-			case CPrefab::pftUnknown:
+			// check file type
+			CPrefab *pPrefab = NULL;
+			int iLoadResult = -1;
+
+			switch (CPrefab::CheckFileType(fd.cFileName))
 			{
-				continue;
-			}
-
-			case CPrefab::pftRMF:
-			{
-				CPrefabRMF *pNew = new CPrefabRMF;
-				iLoadResult = pNew->Init(fd.cFileName, TRUE, CPrefab::lsRMF);
-				pPrefab = (CPrefab *)pNew;
-				break;
-			}
-
-			case CPrefab::pftMAP:
-			{
-				CPrefabRMF *pNew = new CPrefabRMF;
-				iLoadResult = pNew->Init(fd.cFileName, TRUE, CPrefab::lsMAP);
-				pPrefab = (CPrefab *)pNew;
-				break;
-			}
-
-			case CPrefab::pftScript:
-			{
-				Assert(0);	// not supported yet
-				break;
-			}
-		}
-
-		if(iLoadResult == -1)
-		{
-			// pPrefab might be null but delete doesn't care
-			delete pPrefab;
-			pPrefab = NULL;
-		}
-
-		if(!pPrefab)
-			continue;
-
-		Msg("  including %s\n", fd.cFileName);
-		++nPrefabs;
-
-		// find text file - set info with it
-		CString strTextFile = fd.cFileName;
-		int iPos = strTextFile.Find('.');
-		strTextFile.GetBuffer(0)[iPos] = 0;
-		strTextFile.ReleaseBuffer();
-		strTextFile += ".txt";
-
-		if(GetFileAttributes(strTextFile) != INVALID_FILE_ATTRIBUTES)
-		{
-			std::ifstream tfile(strTextFile);
-			char szBuffer[1024], szBuffer2[1024];
-			memset(szBuffer, 0, sizeof szBuffer);
-			// read file
-			tfile.read(szBuffer, 1023);
-			// get rid of \r and \n chars
-			char *p1 = szBuffer, *p2 = szBuffer2;
-			while(p1[0])
-			{
-				if(p1[0] != '\n' && p1[0] != '\r')
+				case CPrefab::pftUnknown:
 				{
-					p2[0] = p1[0];
-					++p2;
+					continue;
 				}
-				++p1;
+
+				case CPrefab::pftRMF:
+				{
+					CPrefabRMF *pNew = new CPrefabRMF;
+					iLoadResult = pNew->Init(fd.cFileName, TRUE, CPrefab::lsRMF);
+					pPrefab = (CPrefab *)pNew;
+					break;
+				}
+
+				case CPrefab::pftMAP:
+				{
+					CPrefabRMF *pNew = new CPrefabRMF;
+					iLoadResult = pNew->Init(fd.cFileName, TRUE, CPrefab::lsMAP);
+					pPrefab = (CPrefab *)pNew;
+					break;
+				}
+
+				case CPrefab::pftScript:
+				{
+					Assert(0);	// not supported yet
+					break;
+				}
 			}
-			p2[0] = 0;
-			// set the prefab's info
-			pPrefab->SetNotes(szBuffer2);
-		}
 
-		// add to new library
-		pLibrary->Add(pPrefab);
+			if(iLoadResult == -1)
+			{
+				// pPrefab might be null but delete doesn't care
+				delete pPrefab;
+				pPrefab = NULL;
+			}
 
-	} while(FindNextFile(hnd, &fd));
+			if(!pPrefab)
+				continue;
+
+			Msg("  including %s\n", fd.cFileName);
+			++nPrefabs;
+
+			// find text file - set info with it
+			CString strTextFile = fd.cFileName;
+			int iPos = strTextFile.Find('.');
+			strTextFile.GetBuffer(0)[iPos] = 0;
+			strTextFile.ReleaseBuffer();
+			strTextFile += ".txt";
+
+			if(GetFileAttributes(strTextFile) != INVALID_FILE_ATTRIBUTES)
+			{
+				std::ifstream tfile(strTextFile);
+				char szBuffer[1024], szBuffer2[1024];
+				memset(szBuffer, 0, sizeof szBuffer);
+				// read file
+				tfile.read(szBuffer, 1023);
+				// get rid of \r and \n chars
+				char *p1 = szBuffer, *p2 = szBuffer2;
+				while(p1[0])
+				{
+					if(p1[0] != '\n' && p1[0] != '\r')
+					{
+						p2[0] = p1[0];
+						++p2;
+					}
+					++p1;
+				}
+				p2[0] = 0;
+				// set the prefab's info
+				pPrefab->SetNotes(szBuffer2);
+			}
+
+			// add to new library
+			pLibrary->Add(pPrefab);
+
+		} while(FindNextFile(hnd, &fd));
+	}
 
 	if(bFirst)
 	{

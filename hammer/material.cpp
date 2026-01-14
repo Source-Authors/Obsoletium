@@ -441,6 +441,8 @@ bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, int nDirec
 
 	FileFindHandle_t findHandle;
 	const char *pFileName = g_pFullFileSystem->FindFirstEx( pWildCard, "GAME", &findHandle );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( findHandle ));
+
 	while( pFileName )
 	{
 		if (IsIgnoredMaterial(pFileName))
@@ -470,7 +472,6 @@ bool CMaterial::LoadMaterialsInDirectory( char const* pDirectoryName, int nDirec
 		}
 		pFileName = g_pFullFileSystem->FindNext( findHandle );
 	}
-	g_pFullFileSystem->FindClose( findHandle );
 	return true;
 }
 

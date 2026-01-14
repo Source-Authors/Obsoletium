@@ -195,6 +195,8 @@ void CSoundSystem::BuildFileListInDirectory( char const* pDirectoryName, const c
 
 	FileFindHandle_t findHandle;
 	const char *pFileName = g_pFullFileSystem->FindFirst( pWildCard, &findHandle );
+	RunCodeAtScopeExit(g_pFullFileSystem->FindClose( findHandle ));
+
 	for ( ; pFileName; pFileName = g_pFullFileSystem->FindNext( findHandle ) )
 	{
 		if( g_pFullFileSystem->FindIsDirectory( findHandle ) )
@@ -213,7 +215,6 @@ void CSoundSystem::BuildFileListInDirectory( char const* pDirectoryName, const c
 		Q_strnlwr( pFileNameWithPath, nAllocSize );
 		AddSoundToList( soundType, pFileNameWithPath, pFileNameWithPath, NULL );
 	}
-	g_pFullFileSystem->FindClose( findHandle );
 }
 
 
@@ -499,13 +500,14 @@ bool CSoundSystem::Play( SoundType_t type, int nIndex )
 	FileHandle_t fp = g_pFileSystem->Open( pRelativePath, "rb" );
 	if ( fp )
 	{
+		RunCodeAtScopeExit(g_pFileSystem->Close( fp ));
+
 		g_SoundPlayData.SetSize( g_pFileSystem->Size( fp ) );
 		if ( g_pFileSystem->Read( g_SoundPlayData.Base(), g_SoundPlayData.Count(), fp ) == g_SoundPlayData.Count() )
 		{
 			// dimhotepus: Do not play default sound on error.
 			return (PlaySound( g_SoundPlayData.Base(), NULL, SND_ASYNC | SND_MEMORY | SND_NODEFAULT | SND_SENTRY ) != FALSE);
 		}
-		g_pFileSystem->Close( fp );
 	}
 	return false;
 }

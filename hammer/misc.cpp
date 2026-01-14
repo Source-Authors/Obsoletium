@@ -102,8 +102,12 @@ void WriteDebug(char *pszStr)
 	bFirst = FALSE;
 
 	FILE *fp = fopen("wcdebug.txt", "ab");
+	if (fp)
+	{
+		RunCodeAtScopeExit(fclose(fp));
+
 	fprintf(fp, "%s\r\n", pszStr);
-	fclose(fp);
+	}
 #endif
 }
 

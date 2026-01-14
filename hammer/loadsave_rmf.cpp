@@ -898,11 +898,12 @@ int CMapWorld::SerializeRMF(std::fstream &file, BOOL fIsStoring)
 			// do batch search and replace of textures from trans.txt if it exists.
 			char translationFilename[MAX_PATH];
 			Q_snprintf( translationFilename, sizeof( translationFilename ), "materials/trans.txt" );
-			FileHandle_t searchReplaceFP = fopen( translationFilename, "r" );
+			FileHandle_t searchReplaceFP = g_pFileSystem->Open( translationFilename, "r" );
 			if( searchReplaceFP )
 			{
+				RunCodeAtScopeExit(g_pFileSystem->Close( searchReplaceFP ));
+
 				CMapDoc::GetActiveMapDoc()->BatchReplaceTextures( searchReplaceFP );
-				g_pFileSystem->Close( searchReplaceFP );
 			}
 		}
 	}

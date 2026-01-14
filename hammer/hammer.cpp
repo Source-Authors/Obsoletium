@@ -2183,13 +2183,13 @@ int CHammer::GetNextAutosaveNumber( CUtlMap<FILETIME, WIN32_FIND_DATA, int> *pFi
 	int nMaxAutosavesPerMap = Options.general.iMaxAutosavesPerMap; 
 
 	WIN32_FIND_DATA fileData;
-	HANDLE hFile;
 	DWORD dwTotalAutosaveDirectorySize = 0;
 			
-	hFile = FindFirstFile( strAutosaveDirectory + "*.vmf_autosave", &fileData );
-
-    if ( hFile != INVALID_HANDLE_VALUE )
+	if ( HANDLE hFile = FindFirstFile( strAutosaveDirectory + "*.vmf_autosave", &fileData );
+		 hFile != INVALID_HANDLE_VALUE )
 	{
+		RunCodeAtScopeExit(	FindClose(hFile) );
+
 		//go through and for each file check to see if it is an autosave for this map; also keep track of total file size
 		//for directory.
 		while( GetLastError() != ERROR_NO_MORE_FILES && hFile != INVALID_HANDLE_VALUE )
@@ -2240,7 +2240,6 @@ int CHammer::GetNextAutosaveNumber( CUtlMap<FILETIME, WIN32_FIND_DATA, int> *pFi
 			}	
 			FindNextFile(hFile, &fileData);
 		}
-		FindClose(hFile);
 	}		
 
     if ( nNumberActualAutosaves < nMaxAutosavesPerMap ) 

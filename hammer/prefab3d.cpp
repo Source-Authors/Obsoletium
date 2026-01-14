@@ -262,6 +262,7 @@ int CPrefabRMF::DoLoad(std::fstream& file, DWORD dwFlags)
 	int iRvl;
 
 	GetHistory()->Pause();
+	RunCodeAtScopeExit(GetHistory()->Resume());
 
 	AddMRU(this);
 
@@ -277,13 +278,10 @@ int CPrefabRMF::DoLoad(std::fstream& file, DWORD dwFlags)
 	// error?
 	if(iRvl == -1)
 	{
-		GetHistory()->Resume();
 		return iRvl;
 	}
 
 	m_pWorld->CalcBounds(TRUE);
-
-	GetHistory()->Resume();
 
 	return 1;
 }
