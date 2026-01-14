@@ -1747,11 +1747,9 @@ void CHammer::OnFileOpen()
 //-----------------------------------------------------------------------------
 CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName) 
 {
-	if(GetFileAttributes(lpszFileName) == INVALID_FILE_ATTRIBUTES)
+	if (GetFileAttributes(lpszFileName) == INVALID_FILE_ATTRIBUTES)
 	{
-		CString		Message;
-
-		Message = "The file '" + CString( lpszFileName ) + "' does not exist.";
+		CString	Message = "The file '" + CString( lpszFileName ) + "' does not exist.";
 		AfxMessageBox( Message, MB_ICONERROR );
 
 		return NULL;
