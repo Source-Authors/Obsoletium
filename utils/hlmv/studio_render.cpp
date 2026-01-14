@@ -400,7 +400,6 @@ void StudioModel::SetUpBones( bool mergeBones )
 
 	// For blended transitions
 	static Vector		pos2[MAXSTUDIOBONES];
-	static Quaternion	q2[MAXSTUDIOBONES];
 
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	mstudioseqdesc_t	&seqdesc = pStudioHdr->pSeqdesc( m_sequence );
@@ -1723,9 +1722,6 @@ void StudioModel::GetBodyPoseParametersFromFlex( )
 
 void StudioModel::CalcHeadRotation( Vector pos[], Quaternion q[] )
 {
-	static Vector		pos2[MAXSTUDIOBONES];
-	static Quaternion	q2[MAXSTUDIOBONES];
-
 	if (m_nSolveHeadTurn == 0)
 		return;
 
