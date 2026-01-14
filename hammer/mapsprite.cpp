@@ -222,7 +222,7 @@ CMapClass *CMapSprite::Copy(bool bUpdateDependencies)
 CMapClass *CMapSprite::CopyFrom(CMapClass *pObject, bool bUpdateDependencies)
 {
 	CMapSprite *pFrom = dynamic_cast<CMapSprite *>(pObject);
-	Assert(pObject != NULL);
+	Assert(pFrom != NULL);
 
 	if (pObject != NULL)
 	{
