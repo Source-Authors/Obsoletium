@@ -75,12 +75,11 @@ int DebugDrawModel( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 			meshBuilder.AdvanceVertex();
 		}
 
-		intp i;
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
-		for( i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
+		for( intp i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
 		{
-			meshBuilder.FastIndex( materialBatch.m_TriListIndices[i] );
+			meshBuilder.FastIndex( size_cast<unsigned short>( materialBatch.m_TriListIndices[i] ) );
 		}
 		meshBuilder.End();
 		pBuildMesh->Draw();
@@ -377,12 +376,11 @@ int DebugDrawModelBadVerts( IStudioRender *pStudioRender, DrawModelInfo_t& info,
 			meshBuilder.AdvanceVertex();
 		}
 
-		intp i;
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
-		for( i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
+		for( intp i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
 		{
-			meshBuilder.FastIndex( materialBatch.m_TriListIndices[i] );
+			meshBuilder.FastIndex( size_cast<unsigned short>( materialBatch.m_TriListIndices[i] ) );
 		}
 		meshBuilder.End();
 		pBuildMesh->Draw();
@@ -451,12 +449,11 @@ int DebugDrawModelWireframe( IStudioRender *pStudioRender, DrawModelInfo_t& info
 			meshBuilder.AdvanceVertex();
 		}
 
-		intp i;
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
-		for( i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
+		for( intp i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
 		{
-			meshBuilder.FastIndex( materialBatch.m_TriListIndices[i] );
+			meshBuilder.FastIndex( size_cast<unsigned short>( materialBatch.m_TriListIndices[i] ) );
 		}
 		meshBuilder.End();
 		pBuildMesh->Draw();
@@ -559,12 +556,11 @@ int DebugDrawModelBoneWeights( IStudioRender *pStudioRender, DrawModelInfo_t& in
 			meshBuilder.AdvanceVertex();
 		}
 
-		intp i;
 		// Set the indices down to the hardware.
 		// Each triplet of indices is a triangle.
-		for( i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
+		for( intp i = 0; i < materialBatch.m_TriListIndices.Count(); i++ )
 		{
-			meshBuilder.FastIndex( materialBatch.m_TriListIndices[i] );
+			meshBuilder.FastIndex( size_cast<unsigned short>( materialBatch.m_TriListIndices[i] ) );
 		}
 		meshBuilder.End();
 		pBuildMesh->Draw();
@@ -743,7 +739,7 @@ int DebugDrawModelTexCoord( IStudioRender *pStudioRender, const char *pMaterialN
 		// Each triplet of indices is a triangle.
 		for( intp j = 0; j < materialBatch.m_TriListIndices.Count(); j++ )
 		{
-			meshBuilder.FastIndex( materialBatch.m_TriListIndices[j] );
+			meshBuilder.FastIndex( size_cast<unsigned short>( materialBatch.m_TriListIndices[j] ) );
 		}
 		meshBuilder.End();
 		pBuildMesh->Draw();

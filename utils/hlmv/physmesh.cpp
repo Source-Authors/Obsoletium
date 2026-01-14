@@ -315,7 +315,7 @@ void CStudioPhysics::ParseKeydata( void )
 			CSolidParse solidParse;
 
 			pParser->ParseSolid( &solid, &solidParse );
-			solid.surfacePropIndex = FindPhysprop( solid.surfaceprop );
+			solid.surfacePropIndex = size_cast<int>( FindPhysprop( solid.surfaceprop ) );
 
 			if ( solid.index >= 0 && solid.index < m_listCount )
 			{
