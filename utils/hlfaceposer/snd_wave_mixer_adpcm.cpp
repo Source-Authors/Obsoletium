@@ -81,6 +81,11 @@ CAudioMixerWaveADPCM::CAudioMixerWaveADPCM( CWaveData *data ) : CAudioMixerWave(
 		m_blockSize += 7 * m_pFormat->wfx.nChannels;
 //		Assert(m_blockSize < MAX_BLOCK_SIZE);
 	}
+	else
+	{
+		m_pCoefficients = nullptr;
+		m_blockSize = 0;
+	}
 }
 
 
