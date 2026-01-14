@@ -24,6 +24,9 @@ void *CChoreoWidget::operator new( size_t stAllocateBlock )
 	return calloc( 1, stAllocateBlock );
 };
 
+// dimhotepus: Ensure compiler doesn't drop memset.
+const volatile auto secureMemset = &memset;
+
 //-----------------------------------------------------------------------------
 // Purpose: 
 // Input  : *pMem - 
@@ -33,7 +36,7 @@ void CChoreoWidget::operator delete( void *pMem )
 	widgets--;
 	// set the memory to a known value
 	size_t size = _msize( pMem );
-	memset( pMem, 0xfe, size );
+	secureMemset( pMem, 0xfe, size );
 
 	// get the engine to free the memory
 	free( pMem );
