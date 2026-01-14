@@ -1779,10 +1779,10 @@ CDocument* CHammer::OpenDocumentFile(LPCTSTR lpszFileName)
 
 	if ( pMapDoc->IsAutosave() )
 	{			
-		char szRenameMessage[MAX_PATH+MAX_PATH+256];
+		char szRenameMessage[MAX_PATH+MAX_PATH+MAX_PATH];
 		CString newMapPath = *pMapDoc->AutosavedFrom();
 
-		V_sprintf_safe( szRenameMessage, "This map was loaded from an autosave file.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", lpszFileName, (const char*)newMapPath );
+		V_sprintf_safe( szRenameMessage, "This map was loaded from an autosave file.\n\nWould you like to rename it from \"%s\" to \"%s\"?\n\nNOTE: This will not save the file with the new name; it will only rename it.", lpszFileName, (const char*)newMapPath );
 
 		if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 		{			
