@@ -5597,7 +5597,7 @@ bool Studio_AnimPosition( mstudioanimdesc_t *panim, float flCycle, Vector &vecPo
 		}
 		else
 		{
-			prevframe = pmove->endframe;
+			prevframe = static_cast<float>(pmove->endframe);
 			vecPos = pmove->position;
 			vecAngle.y = pmove->angle;
 		}
@@ -5638,7 +5638,7 @@ bool Studio_AnimVelocity( mstudioanimdesc_t *panim, float flCycle, Vector &vecVe
 		}
 		else
 		{
-			prevframe = pmove->endframe;
+			prevframe = static_cast<float>(pmove->endframe);
 		}
 	}
 	return false;
@@ -5704,7 +5704,7 @@ float Studio_FindAnimDistance( mstudioanimdesc_t *panim, float flDist )
 		else
 		{
 			flDist -= flMove;
-			prevframe = pmove->endframe;
+			prevframe = static_cast<float>(pmove->endframe);
 		}
 	}
 
