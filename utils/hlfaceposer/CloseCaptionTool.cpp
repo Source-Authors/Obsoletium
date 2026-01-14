@@ -737,9 +737,7 @@ struct WorkUnitParams
 		newline = false;
 	}
 
-	~WorkUnitParams()
-	{
-	}
+	~WorkUnitParams() = default;
 
 	void Finalize()
 	{

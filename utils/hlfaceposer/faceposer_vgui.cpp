@@ -136,6 +136,4 @@ void CFacePoserVGui::Shutdown()
 	vgui::ivgui()->Stop();
 }
 
-CFacePoserVGui::~CFacePoserVGui(void)
-{
-}
+CFacePoserVGui::~CFacePoserVGui() = default;

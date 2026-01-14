@@ -261,7 +261,7 @@ private:
 		class CTrackData
 		{
 		public:
-			CTrackData() {};
+			CTrackData() = default;
 			CTrackData( const CTrackData& other )
 			{
 				m_Samples[ 0 ].CopyArray( other.m_Samples[ 0 ].Base(), other.m_Samples[ 0 ].Count() );
