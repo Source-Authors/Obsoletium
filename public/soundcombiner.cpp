@@ -116,6 +116,8 @@ bool CSoundCombiner::CreateWorkList( IFileSystem *pFilesystem, CUtlVector< Combi
 		{
 			Warning( "CSoundCombiner::CreateWorkList couldn't load %s for work item (%d)\n",
 				fullpath, i );
+			// dimhotepus: Delete work item on error.
+			delete workitem;
 			return false;
 		}
 		
