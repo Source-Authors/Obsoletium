@@ -26,6 +26,8 @@
 #include <dlfcn.h>
 #endif
 
+#include <atomic>
+
 #if defined( LINUX ) || defined( USE_SDL )
 
 // We lazily load the SDL shared object, and only reference functions if it's
@@ -64,17 +66,18 @@ struct CAssertDisable
 static HINSTANCE g_hTier0Instance = nullptr;
 #endif
 
-static bool g_bAssertsEnabled = true;
+// dimhotepus: Make all this things thread-safe as may be used from different threads.
+static std::atomic_bool g_bAssertsEnabled = true;
 
 static CAssertDisable *g_pAssertDisables = nullptr;
 
 #if ( defined( _WIN32 ) && !defined( _X360 ) )
-static int g_iLastLineRange = 5;
 static int g_nLastIgnoreNumTimes = 1;
 #endif
 
-// Set to true if they want to break in the debugger.
-static bool g_bBreak = false;
+// dimhotepus: Make all this things thread-safe as may be used from different
+// threads.// Set to true if they want to break in the debugger.
+static std::atomic_bool g_bBreak = false;
 
 static CDialogInitInfo g_Info;
 
@@ -225,7 +228,7 @@ static INT_PTR CALLBACK AssertDialogProc(
 			SetDlgItemText( hDlg, IDC_FILENAME_CONTROL, g_Info.m_pFilename );
 #endif
 			SetDlgItemInt( hDlg, IDC_LINE_CONTROL, g_Info.m_iLine, false );
-			SetDlgItemInt( hDlg, IDC_IGNORE_NUMLINES, g_iLastLineRange, false );
+			SetDlgItemInt( hDlg, IDC_IGNORE_NUMLINES, 5, false );
 			SetDlgItemInt( hDlg, IDC_IGNORE_NUMTIMES, g_nLastIgnoreNumTimes, false );
 
 			// dimhotepus: Honor per monitor V2 DPI.
@@ -300,14 +303,14 @@ static INT_PTR CALLBACK AssertDialogProc(
 
 				case IDC_IGNORE_ALL:
 				{
-					g_bAssertsEnabled = false;
+					g_bAssertsEnabled.store(false, std::memory_order::memory_order_relaxed);
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
 
 				case IDC_BREAK:
 				{
-					g_bBreak = true;
+					g_bBreak.store(true, std::memory_order::memory_order_relaxed);
 					EndDialog( hDlg, 0 );
 					return TRUE;
 				}
@@ -403,12 +406,12 @@ static HWND FindLikelyParentWindow()
 // provides access to the global that turns asserts on and off
 DBG_INTERFACE bool AreAllAssertsDisabled()
 {
-	return !g_bAssertsEnabled;
+	return !g_bAssertsEnabled.load(std::memory_order::memory_order_relaxed);
 }
 
 DBG_INTERFACE void SetAllAssertsDisabled( bool bAssertsDisabled )
 {
-	g_bAssertsEnabled = !bAssertsDisabled;
+	g_bAssertsEnabled.store(!bAssertsDisabled, std::memory_order::memory_order_relaxed);
 }
 
 #if defined( LINUX ) || defined( USE_SDL )
@@ -495,7 +498,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		return false;
 
 	// Have ALL Asserts been disabled?
-	if ( !g_bAssertsEnabled )
+	if ( !g_bAssertsEnabled.load(std::memory_order::memory_order_relaxed) )
 		return false;
 
 	// Has this specific Assert been disabled?
@@ -533,7 +536,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 	g_Info.m_iLine = line;
 	g_Info.m_pExpression = pExpression;
 
-	g_bBreak = false;
+	g_bBreak.store(false, std::memory_order::memory_order_relaxed);
 
 #if defined( _WIN32 )
 
@@ -558,7 +561,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 
 		if ( IDRETRY == nButtonPressed )
 		{
-			g_bBreak = true;
+			g_bBreak.store(true, std::memory_order::memory_order_relaxed);
 		}
 		else if ( IDCANCEL == nButtonPressed )
 		{
@@ -620,7 +623,7 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 		default:
 		case IDC_BREAK:
 			// Break on this Assert
-			g_bBreak = true;
+			g_bBreak.store(true, std::memory_order::memory_order_relaxed);
 			break;
 		case IDC_IGNORE_THIS:
 			// Ignore this Assert once
@@ -634,21 +637,21 @@ DBG_INTERFACE bool DoNewAssertDialog( const tchar *pFilename, int line, const tc
 			break;
 		case IDC_IGNORE_ALL:
 			// Ignore all Asserts from now on
-			g_bAssertsEnabled = false;
+			g_bAssertsEnabled.store(false, std::memory_order::memory_order_relaxed);
 			break;
 		}
 	}
 	else
 	{
 		// Couldn't SDL it up
-		g_bBreak = true;
+		g_bBreak.store(true, std::memory_order::memory_order_relaxed);
 	}
 
 #else
 	// No dialog mode on this platform
-	g_bBreak = true;
+	g_bBreak.store(true, std::memory_order::memory_order_relaxed);
 #endif
 
-	return g_bBreak;
+	return g_bBreak.load(std::memory_order::memory_order_relaxed);
 }
 
