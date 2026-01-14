@@ -118,12 +118,15 @@ void *StudioModel::operator new( size_t stAllocateBlock )
 	return calloc( 1, stAllocateBlock );
 }
 
+// dimhotepus: Ensure compiler doesn't drop memset.
+const volatile auto secureMemset = &memset;
+
 void StudioModel::operator delete( void *pMem )
 {
 #ifdef _DEBUG
 	// set the memory to a known value
 	size_t size = _msize( pMem );
-	memset( pMem, 0xcd, size );
+	secureMemset( pMem, 0xcd, size );
 #endif
 
 	// get the engine to free the memory
@@ -142,7 +145,7 @@ void StudioModel::operator delete( void *pMem, int nBlockUse, const char *pFileN
 #ifdef _DEBUG
 	// set the memory to a known value
 	size_t size = _msize( pMem );
-	memset( pMem, 0xcd, size );
+	secureMemset( pMem, 0xcd, size );
 #endif
 	// get the engine to free the memory
 	free( pMem );
