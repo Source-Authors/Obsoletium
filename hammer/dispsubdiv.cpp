@@ -853,9 +853,9 @@ void CEditDispSubdivMesh::AddDispTo( CMapDisp *pDisp )
 	// setup mapping between the displacement size and initial quad indices
 	//
 	pQuad->m_QuadIndices[0] = 0;
-	pQuad->m_QuadIndices[1] = dispWidth * ( dispHeight - 1 );
-	pQuad->m_QuadIndices[2] = ( dispWidth * dispHeight ) - 1;
-	pQuad->m_QuadIndices[3] = ( dispWidth - 1 );
+	pQuad->m_QuadIndices[1] = size_cast<short>( dispWidth * ( dispHeight - 1 ) );
+	pQuad->m_QuadIndices[2] = size_cast<short>( ( dispWidth * dispHeight ) - 1 );
+	pQuad->m_QuadIndices[3] = size_cast<short>( ( dispWidth - 1 ) );
 
 	//
 	// find point normals and neighbors -- "smooth"

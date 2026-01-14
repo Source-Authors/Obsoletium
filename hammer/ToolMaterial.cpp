@@ -101,7 +101,7 @@ bool CToolMaterial::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 		// Otherwise, select a single face.
 		else
 		{
-			pDoc->SelectFace(pSolid, ulFace, cmd);
+			pDoc->SelectFace(pSolid, size_cast<short>(ulFace), cmd);
 		}
 	}
 
@@ -160,7 +160,7 @@ bool CToolMaterial::OnRMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 			// If not, apply to a single face.
 			else
 			{
-				GetMainWnd()->m_pFaceEditSheet->ClickFace(pSolid, ulFace, cmdFlags, eMode);
+				GetMainWnd()->m_pFaceEditSheet->ClickFace(pSolid, size_cast<short>(ulFace), cmdFlags, eMode);
 			}
 		}				
 	}

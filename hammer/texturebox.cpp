@@ -146,11 +146,11 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				int oldBkMode = dc.SetBkMode(TRANSPARENT);
 				RunCodeAtScopeExit(dc.SetBkMode(oldBkMode));
 
-				dc.TextOut(r2.right + 4, r2.top + 4, szName, iLen);
+				dc.TextOut(r2.right + 4, r2.top + 4, szName, size_cast<int>(iLen));
 				
 				// draw size
 				V_sprintf_safe(szName, "%dx%d", pTex->GetWidth(), pTex->GetHeight());
-				dc.TextOut(r2.right + 4, r2.top + 4 + iFontHeight, szName, V_strlen(szName));
+				dc.TextOut(r2.right + 4, r2.top + 4 + iFontHeight, szName, size_cast<int>(V_strlen(szName)));
 			}
 			// if it's < 32, we're drawing the item in the "closed"
 			//	combo box, so just draw the name of the texture
@@ -163,7 +163,7 @@ void CTextureBox::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 				int oldBkMode = dc.SetBkMode(TRANSPARENT);
 				RunCodeAtScopeExit(dc.SetBkMode(oldBkMode));
 
-				dc.TextOut(r.left + 4, r.top + 2, szName, iLen);
+				dc.TextOut(r.left + 4, r.top + 2, szName, size_cast<int>(iLen));
 			}
 		}
 

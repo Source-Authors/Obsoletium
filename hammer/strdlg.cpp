@@ -69,7 +69,7 @@ BOOL CStrDlg::OnInitDialog()
 	if(dwFlags & Spin)	// enable spin
 	{
 		m_cSpin.EnableWindow(TRUE);
-		m_cSpin.SetRange(iRangeLow, iRangeHigh);
+		m_cSpin.SetRange(size_cast<short>(iRangeLow), size_cast<short>(iRangeHigh));
 		m_cSpin.SetBuddy(&m_cEdit);
 	}
 	else

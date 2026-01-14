@@ -1440,9 +1440,9 @@ void CMapDisp::UpdateWalkable( void )
 			unsigned short newTriIndices[3];
 			GetTriIndices( iTri, triIndices[0], triIndices[1], triIndices[2] );
 
-			newTriIndices[0] = m_aWalkableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[0] ) );
-			newTriIndices[1] = m_aWalkableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[1] ) );
-			newTriIndices[2] = m_aWalkableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[2] ) );
+			newTriIndices[0] = size_cast<unsigned short>(m_aWalkableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[0] ) ));
+			newTriIndices[1] = size_cast<unsigned short>(m_aWalkableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[1] ) ));
+			newTriIndices[2] = size_cast<unsigned short>(m_aWalkableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[2] ) ));
 
 			if ( IsTriTag( iTri, COREDISPTRI_TAG_FORCE_WALKABLE_BIT ) )
 			{
@@ -1499,9 +1499,9 @@ void CMapDisp::UpdateBuildable( void )
 			unsigned short newTriIndices[3];
 			GetTriIndices( iTri, triIndices[0], triIndices[1], triIndices[2] );
 
-			newTriIndices[0] = m_aBuildableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[0] ) );
-			newTriIndices[1] = m_aBuildableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[1] ) );
-			newTriIndices[2] = m_aBuildableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[2] ) );
+			newTriIndices[0] = size_cast<unsigned short>(m_aBuildableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[0] ) ));
+			newTriIndices[1] = size_cast<unsigned short>(m_aBuildableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[1] ) ));
+			newTriIndices[2] = size_cast<unsigned short>(m_aBuildableVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[2] ) ));
 
 			if ( IsTriTag( iTri, COREDISPTRI_TAG_FORCE_BUILDABLE_BIT ) )
 			{
@@ -1538,9 +1538,9 @@ void CMapDisp::UpdateTriRemove( void )
 			unsigned short newTriIndices[3];
 			GetTriIndices( iTri, triIndices[0], triIndices[1], triIndices[2] );
 
-			newTriIndices[0] = m_aRemoveVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[0] ) );
-			newTriIndices[1] = m_aRemoveVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[1] ) );
-			newTriIndices[2] = m_aRemoveVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[2] ) );
+			newTriIndices[0] = size_cast<unsigned short>(m_aRemoveVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[0] ) ));
+			newTriIndices[1] = size_cast<unsigned short>(m_aRemoveVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[1] ) ));
+			newTriIndices[2] = size_cast<unsigned short>(m_aRemoveVerts.AddToTail( m_CoreDispInfo.GetDispVert( triIndices[2] ) ));
 
 			m_aRemoveIndices.AddToTail( newTriIndices[0] );
 			m_aRemoveIndices.AddToTail( newTriIndices[1] );
@@ -2188,7 +2188,7 @@ void CMapDisp::RenderWalkableSurface( CRender3D *pRender, bool bIsSelected, Sele
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 		IMesh *pMesh = pRenderContext->GetDynamicMesh();
-		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, nVertCount, nIndexCount );
+		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 		
 		CoreDispVert_t **ppVerts = m_aWalkableVerts.Base();
 		for (int i = 0; i < nVertCount; ++i )
@@ -2237,7 +2237,7 @@ void CMapDisp::RenderWalkableSurface( CRender3D *pRender, bool bIsSelected, Sele
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 		IMesh *pMesh = pRenderContext->GetDynamicMesh();
-		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, nVertCount, nIndexCount );
+		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 		
 		CoreDispVert_t **ppVerts = m_aWalkableVerts.Base();
 		for (int i = 0; i < nVertCount; ++i )
@@ -2292,7 +2292,7 @@ void CMapDisp::RenderBuildableSurface( CRender3D *pRender, bool bIsSelected, Sel
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 		IMesh *pMesh = pRenderContext->GetDynamicMesh();
-		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, nVertCount, nIndexCount );
+		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 		
 		CoreDispVert_t **ppVerts = m_aBuildableVerts.Base();
 		for (int i = 0; i < nVertCount; ++i )
@@ -2341,7 +2341,7 @@ void CMapDisp::RenderBuildableSurface( CRender3D *pRender, bool bIsSelected, Sel
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 		IMesh *pMesh = pRenderContext->GetDynamicMesh();
-		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, nVertCount, nIndexCount );
+		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 		
 		CoreDispVert_t **ppVerts = m_aBuildableVerts.Base();
 		for (int i = 0; i < nVertCount; ++i )
@@ -2396,7 +2396,7 @@ void CMapDisp::RenderRemoveSurface( CRender3D *pRender, bool bIsSelected, Select
 		CMeshBuilder meshBuilder;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 		IMesh *pMesh = pRenderContext->GetDynamicMesh();
-		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, nVertCount, nIndexCount );
+		meshBuilder.Begin( pMesh, MATERIAL_TRIANGLES, size_cast<int>(nVertCount), size_cast<int>(nIndexCount) );
 
 		CoreDispVert_t **ppVerts = m_aRemoveVerts.Base();
 		for (int i = 0; i < nVertCount; ++i )

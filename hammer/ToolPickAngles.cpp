@@ -88,7 +88,7 @@ bool CToolPickAngles::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vecto
 
 			Vector HitPos;
 			Vector HitNormal;
-			CMapFace *pFace = pSolid->GetFace(ulFace);
+			CMapFace *pFace = pSolid->GetFace(size_cast<short>(ulFace));
 			if (pFace->TraceLine(HitPos, HitNormal, Start, End))
 			{
 				if (m_pNotifyTarget)

@@ -268,9 +268,9 @@ void CMapFrustum::OnParentKeyChanged(const char *szKey, const char *szValue)
 		int nBlue;
 		sscanf(szValue, "%d %d %d", &nRed, &nGreen, &nBlue);
 
-		r = nRed;
-		g = nGreen;
-		b = nBlue;
+		r = size_cast<byte>(nRed);
+		g = size_cast<byte>(nGreen);
+		b = size_cast<byte>(nBlue);
 	}
 	else if (!stricmp(szKey, m_szFOVKeyName))
 	{

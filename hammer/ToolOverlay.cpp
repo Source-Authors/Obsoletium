@@ -94,7 +94,7 @@ bool CToolOverlay::OnLMouseDown3D( CMapView3D *pView, UINT nFlags, const Vector2
 		CMapSolid *pSolid = dynamic_cast<CMapSolid*>( pObject );
 		if ( pSolid )
 		{
-			return CreateOverlay( pSolid, ulFace, pView, vPoint );
+			return CreateOverlay( pSolid, size_cast<short>(ulFace), pView, vPoint );
 		}
 	}
 

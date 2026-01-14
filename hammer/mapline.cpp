@@ -52,19 +52,19 @@ CMapClass *CMapLine::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 	const char *pszParam = pHelperInfo->GetParameter(0);
 	if (pszParam != NULL)
 	{
-		chRed = atoi(pszParam);
+		chRed = size_cast<byte>(atoi(pszParam));
 	}
 
 	pszParam = pHelperInfo->GetParameter(1);
 	if (pszParam != NULL)
 	{
-		chGreen = atoi(pszParam);
+		chGreen = size_cast<byte>(atoi(pszParam));
 	}
 
 	pszParam = pHelperInfo->GetParameter(2);
 	if (pszParam != NULL)
 	{
-		chBlue = atoi(pszParam);
+		chBlue = size_cast<byte>(atoi(pszParam));
 	}
 
 	const char *pszStartKey = pHelperInfo->GetParameter(3);

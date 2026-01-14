@@ -384,7 +384,7 @@ const char *CMapClass::GetEditorKey(int nIndex)
 		return NULL;
 	}
 
-	return m_pEditorKeys->GetKey(nIndex);
+	return m_pEditorKeys->GetKey(size_cast<unsigned short>(nIndex));
 }
 
 
@@ -398,7 +398,7 @@ const char *CMapClass::GetEditorKeyValue(int nIndex)
 		return NULL;
 	}
 
-	return m_pEditorKeys->GetValue(nIndex);
+	return m_pEditorKeys->GetValue(size_cast<unsigned short>(nIndex));
 }
 
 
@@ -1141,7 +1141,7 @@ size_t CMapClass::GetSize(void)
 bool CMapClass::HitTest2D(CMapView2D *pView, const Vector2D &point, HitInfo_t &HitData)
 {
 	HitData.pObject = NULL;
-	HitData.nDepth = g_MAX_MAP_COORD*3;
+	HitData.nDepth = size_cast<unsigned>(g_MAX_MAP_COORD*3);
 	HitData.uData = 0;
 	bool bFoundHit = false;
 	

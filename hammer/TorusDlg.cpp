@@ -187,7 +187,7 @@ BOOL CTorusDlg::OnInitDialog()
 	
 	m_cArcSpin.SetRange(8, 360);
 	m_cSidesSpin.SetRange(3, 100);
-	m_cWallWidthSpin.SetRange(2, m_iMaxWallWidth);
+	m_cWallWidthSpin.SetRange(2, size_cast<short>(m_iMaxWallWidth));
 	m_cStartAngleSpin.SetRange(0, 360);
 
 	m_cPreview.ShowWindow(SW_HIDE);

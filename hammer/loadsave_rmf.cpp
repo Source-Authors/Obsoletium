@@ -45,7 +45,7 @@ static void WriteString(std::fstream& file, LPCTSTR pszString)
 	// dimhotepus: Check string is in range.
 	size_t len = strlen(pszString)+1;
 	Assert(len <= UCHAR_MAX);
-	BYTE cLen = static_cast<BYTE>(len);
+	BYTE cLen = size_cast<BYTE>(len);
 	file.write((char*)&cLen, 1);
 	file.write(pszString, cLen);
 }
@@ -409,7 +409,7 @@ int CMapSolid::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 		// serialize the Faces
 		iSize = Faces.GetCount();
 		file.write((char*) &iSize, sizeof(int));
-		for(int i = 0; i < iSize; i++)
+		for(short i = 0, max = size_cast<short>(iSize); i < max; i++)
 		{
 			iRvl = Faces[i].SerializeRMF(file, fIsStoring);
 			if(iRvl < 0)
@@ -426,9 +426,9 @@ int CMapSolid::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 
 		// read Faces
 		file.read((char*) &iSize, sizeof(int));
-		Faces.SetCount(iSize);
+		Faces.SetCount(size_cast<short>(iSize));
 	
-		for(int i = 0; i < iSize; i++)
+		for(short i = 0, max = size_cast<short>(iSize); i < max; i++)
 		{
 			// extract face
 			iRvl = Faces[i].SerializeRMF(file, fIsStoring);
@@ -788,7 +788,7 @@ int CMapWorld::SerializeRMF(std::fstream &file, BOOL fIsStoring)
 			goto FatalError;
 
 		// save paths
-		iSize = m_Paths.Count();
+		iSize = size_cast<short>(m_Paths.Count());
 		file.write((char*) &iSize, sizeof(iSize));
 
 		FOR_EACH_OBJ( m_Paths, pos )

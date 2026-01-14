@@ -660,9 +660,9 @@ void CBSPLighting::BuildLMGroups(
 						// Write the indices.
 						for( int iTri=0; iTri < pFace->m_nVerts-2; iTri++ )
 						{
-							mb.Index( iCurBaseVert );			mb.AdvanceIndex();
-							mb.Index( iCurBaseVert+iTri+1 );	mb.AdvanceIndex();
-							mb.Index( iCurBaseVert+iTri+2 );	mb.AdvanceIndex();
+							mb.Index( size_cast<unsigned short>( iCurBaseVert ) );			mb.AdvanceIndex();
+							mb.Index( size_cast<unsigned short>( iCurBaseVert+iTri+1 ) );	mb.AdvanceIndex();
+							mb.Index( size_cast<unsigned short>( iCurBaseVert+iTri+2 ) );	mb.AdvanceIndex();
 						}
 						
 						iCurBaseVert += pFace->m_nVerts;
@@ -682,7 +682,7 @@ void CBSPLighting::BuildLMGroups(
 
 						for( int iIndex=0; iIndex < nRequired; iIndex++ )
 						{
-							mb.Index( indices[iIndex] + iCurBaseVert );
+							mb.Index( size_cast<unsigned short>( indices[iIndex] + iCurBaseVert ) );
 							mb.AdvanceIndex();
 						}
 

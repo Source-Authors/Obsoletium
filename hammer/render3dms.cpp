@@ -2313,7 +2313,7 @@ void CRender3D::RenderPointsAndPortals(void)
 		CMeshBuilder meshBuilder3D;
 		CMatRenderContextPtr pRenderContext( MaterialSystemInterface() );
 		IMesh* pMesh = pRenderContext->GetDynamicMesh( );
-		meshBuilder3D.Begin( pMesh, MATERIAL_LINE_STRIP, nPFPoints - 1 );
+		meshBuilder3D.Begin( pMesh, MATERIAL_LINE_STRIP, size_cast<int>( nPFPoints - 1 ) );
 
 		for (int i = 0; i < nPFPoints; i++)
 		{

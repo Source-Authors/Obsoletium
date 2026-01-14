@@ -4313,7 +4313,7 @@ GDinputvariable *COP_Entity::GetVariableAt( int index )
 
 	if ( m_VarMap[ index ] <= INSTANCE_VAR_MAP_START )
 	{
-		return m_InstanceParmData[ INSTANCE_VAR_MAP_START - m_VarMap[ index ] ].m_ParmVariable;
+		return m_InstanceParmData[ size_cast<unsigned short>( INSTANCE_VAR_MAP_START - m_VarMap[ index ] ) ].m_ParmVariable;
 	}
 
 	return m_pDisplayClass->GetVariableAt( m_VarMap[ index ] );

@@ -866,7 +866,7 @@ void CMapWorld::PostloadWorld(void)
 	if (pszValue != NULL)
 	{
 		SetClass(pszValue);
-		RemoveKey(nIndex);
+		RemoveKey(size_cast<unsigned short>(nIndex));
 	}
 
 	//

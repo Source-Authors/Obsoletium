@@ -102,7 +102,7 @@ bool CToolDecal::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2D &
 		pView->GetCamera()->BuildRay( vPoint, Start, End);
 
 		Vector HitPos, HitNormal;
-		CMapFace *pFace = pSolid->GetFace(ulFace);
+		CMapFace *pFace = pSolid->GetFace(size_cast<short>(ulFace));
 		if (pFace->TraceLine(HitPos, HitNormal, Start, End))
 		{
 			GetHistory()->MarkUndoPosition(NULL, "Create decal");

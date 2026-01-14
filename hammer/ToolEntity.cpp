@@ -524,7 +524,7 @@ bool CToolEntity::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2D 
 		pView->GetCamera()->BuildRay( vPoint, Start, End);
 
 		Vector HitPos, HitNormal;
-		CMapFace *pFace = pSolid->GetFace(ulFace);
+		CMapFace *pFace = pSolid->GetFace(size_cast<short>(ulFace));
 		Vector vFinalStart, vFinalEnd;
 		LocalMatrixNeg.V3Mul( Start, vFinalStart );
 		LocalMatrixNeg.V3Mul( End, vFinalEnd );

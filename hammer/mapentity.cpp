@@ -1103,7 +1103,7 @@ void CMapEntity::PostloadWorld(CMapWorld *pWorld)
 	if (pszValue != NULL)
 	{
 		ImportAngle(atoi(pszValue));
-		RemoveKey(nIndex);
+		RemoveKey(size_cast<unsigned short>(nIndex));
 	}
 
 	//
@@ -1128,7 +1128,7 @@ void CMapEntity::PostloadWorld(CMapWorld *pWorld)
 		pszValue = m_KeyValues.GetValue("classname", &nIndex);
 		if (pszValue != NULL)
 		{
-			RemoveKey(nIndex);
+			RemoveKey(size_cast<unsigned short>(nIndex));
 		}
 	}
 
@@ -1141,7 +1141,7 @@ void CMapEntity::PostloadWorld(CMapWorld *pWorld)
 		pszValue = m_KeyValues.GetValue("origin", &nIndex);
 		if (pszValue != NULL)
 		{
-			RemoveKey(nIndex);
+			RemoveKey(size_cast<unsigned short>(nIndex));
 		}
 	}
 

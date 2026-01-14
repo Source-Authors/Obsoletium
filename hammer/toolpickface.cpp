@@ -114,7 +114,7 @@ bool CToolPickFace::OnLMouseDown3D(CMapView3D *pView, UINT nFlags, const Vector2
 				//
 				// Get the face that we clicked on.
 				//
-				CMapFace *pFace = pSolid->GetFace(uFace);
+				CMapFace *pFace = pSolid->GetFace(size_cast<short>(uFace));
 				Assert(pFace != NULL);
 
 				if (pFace != NULL)

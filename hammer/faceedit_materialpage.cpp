@@ -711,7 +711,7 @@ void CFaceEditMaterialPage::Apply( CMapFace *pOnlyFace, int flags )
 		{
 			if ( material != NOT_INIT )
 			{
-				pFace->texture.material = material;
+				pFace->texture.material = size_cast<byte>(material);
 			}
 		}
 

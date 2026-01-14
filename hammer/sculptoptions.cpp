@@ -3122,7 +3122,7 @@ void CSculptCarveOptions::DoPaintOperation( CMapView3D *pView, const Vector2D &v
 	int nVertCount = pDisp->GetSize();
 	for ( int iVert = 0; iVert < nVertCount; iVert++ )
 	{
-		if ( IsPointAffected( pView, pDisp, pOrigDisp, iVert, nTestPoint, vViewVert ) )
+		if ( IsPointAffected( pView, pDisp, pOrigDisp, iVert, size_cast<int>(nTestPoint), vViewVert ) )
 		{
 			pDisp->GetVert( iVert, vVert );
 

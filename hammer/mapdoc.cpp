@@ -4638,7 +4638,7 @@ void CMapDoc::GetBestPastePoint(Vector &vecPasteOrigin)
 					{
 						// Build a ray to trace against the face that they clicked on to
 						// find the point of intersection.
-						CMapFace *pFace = pSolid->GetFace(Hits.uData);
+						CMapFace *pFace = pSolid->GetFace(size_cast<unsigned short>(Hits.uData));
 						bOk = pFace->TraceLine(HitPos, HitNormal, vFinalStart, vFinalEnd);
 					}
 					else if ( pObject != NULL )
@@ -12122,7 +12122,7 @@ ChunkFileResult_t CMapDoc::QuickHide_SaveVMF( CChunkFile *pFile, CSaveInfo *pSav
 
 	if ( eResult == ChunkFile_Ok )
 	{
-		int nCount = m_QuickHideGroup.Count();
+		int nCount = size_cast<int>( m_QuickHideGroup.Count() );
 		eResult = pFile->WriteKeyValueInt( "count", nCount );
 	}
 

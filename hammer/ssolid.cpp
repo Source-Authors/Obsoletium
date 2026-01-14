@@ -181,14 +181,15 @@ BOOL CSSolid::GetHandleInfo(SSHANDLEINFO *pInfo, SSHANDLE id)
 	// try vertices .. 
 	for(int i = 0; i < m_nVertices; i++)
 	{
-		if(m_Vertices[i].id != id)
+		const short ii = size_cast<short>(i);
+		if(m_Vertices[ii].id != id)
 			continue;	// not this one
 
 		pInfo->Type = shtVertex;
 		pInfo->iIndex = i;
-		pInfo->pData = & m_Vertices[i];
-		pInfo->p2DHandle = & m_Vertices[i];
-		pInfo->pos = m_Vertices[i].pos;
+		pInfo->pData = & m_Vertices[ii];
+		pInfo->p2DHandle = & m_Vertices[ii];
+		pInfo->pos = m_Vertices[ii].pos;
 
 		return TRUE;
 	}
@@ -196,14 +197,15 @@ BOOL CSSolid::GetHandleInfo(SSHANDLEINFO *pInfo, SSHANDLE id)
 	// try edges .. 
 	for(int i = 0; i < m_nEdges; i++)
 	{
-		if(m_Edges[i].id != id)
+		const short ii = size_cast<short>(i);
+		if(m_Edges[ii].id != id)
 			continue;	// not this one
 
 		pInfo->Type = shtEdge;
 		pInfo->iIndex = i;
-		pInfo->pData = PVOID(& m_Edges[i]);
-		pInfo->p2DHandle = & m_Edges[i];
-		pInfo->pos = m_Edges[i].ptCenter;
+		pInfo->pData = PVOID(& m_Edges[ii]);
+		pInfo->p2DHandle = & m_Edges[ii];
+		pInfo->pos = m_Edges[ii].ptCenter;
 
 		return TRUE;
 	}
@@ -233,7 +235,7 @@ int CSSolid::GetEdgeIndex(SSHANDLE v1, SSHANDLE v2)
 {
 	for(int i = 0; i < m_nEdges; i++)
 	{
-		CSSEdge & theEdge = m_Edges[i];
+		CSSEdge & theEdge = m_Edges[size_cast<short>(i)];
 		if((theEdge.hvStart == v1 && theEdge.hvEnd == v2) ||
 			(theEdge.hvStart == v2 && theEdge.hvEnd == v1))
 		{
@@ -254,7 +256,7 @@ int CSSolid::GetEdgeIndex(const Vector &Point, float fLeniency)
 {
 	for (int i = 0; i < m_nEdges; i++)
 	{
-		Vector ptEdgeCenter = m_Edges[i].ptCenter;
+		Vector ptEdgeCenter = m_Edges[size_cast<short>(i)].ptCenter;
 
 		float fDiff = 0.0f;
 		for (int j = 0; j < 3; j++)
@@ -280,7 +282,7 @@ int CSSolid::GetVertexIndex(const Vector &Point, float fLeniency)
 {
 	for(int i = 0; i < m_nVertices; i++)
 	{
-		Vector Vertex = m_Vertices[i].pos;
+		Vector Vertex = m_Vertices[size_cast<short>(i)].pos;
 
 		float fDiff = 0.0f;
 		for(int j = 0; j < 3; j++)
@@ -315,10 +317,10 @@ void CSSolid::CalcEdgeCenter(CSSEdge *pEdge)
 	SSHANDLEINFO hi;
 
 	GetHandleInfo(&hi, pEdge->hvStart);
-	Vector &pt1 = m_Vertices[hi.iIndex].pos;
+	Vector &pt1 = m_Vertices[size_cast<short>(hi.iIndex)].pos;
 
 	GetHandleInfo(&hi, pEdge->hvEnd);
-	Vector &pt2 = m_Vertices[hi.iIndex].pos;
+	Vector &pt2 = m_Vertices[size_cast<short>(hi.iIndex)].pos;
 
 	for (int i = 0; i < 3; i++)
 	{
@@ -625,10 +627,10 @@ CSSFace* CSSolid::AddFace(int* piNewIndex)
 
 CSSEdge* CSSolid::AddEdge(int* piNewIndex)
 {
-	m_Edges.SetCount(++m_nEdges);
+	m_Edges.SetCount(size_cast<short>(++m_nEdges));
 	if(piNewIndex)
 		piNewIndex[0] = m_nEdges-1;
-	CSSEdge *pEdge = & m_Edges[m_nEdges-1];
+	CSSEdge *pEdge = & m_Edges[size_cast<short>(m_nEdges-1)];
 	pEdge->id = GetNewID();
 	return pEdge;
 }
@@ -637,10 +639,10 @@ CSSEdge* CSSolid::AddEdge(int* piNewIndex)
 
 CSSVertex* CSSolid::AddVertex(int* piNewIndex)
 {
-	m_Vertices.SetCount(++m_nVertices);
+	m_Vertices.SetCount(size_cast<short>(++m_nVertices));
 	if(piNewIndex)
 		piNewIndex[0] = m_nVertices-1;
-	CSSVertex *pVertex = & m_Vertices[m_nVertices-1];
+	CSSVertex *pVertex = & m_Vertices[size_cast<short>(m_nVertices-1)];
 	pVertex->id = GetNewID();
 	return pVertex;
 }
@@ -730,7 +732,7 @@ void CSSolid::FromMapSolid(CMapSolid *p, bool bSkipDisplacementFaces)
 				}
 
 				// assign this vertex handle
-				hThisVertex = m_Vertices[iVertex].id;
+				hThisVertex = m_Vertices[size_cast<short>(iVertex)].id;
 
 				if (pt == 0)
 					hFirstVertex = hThisVertex;
@@ -759,7 +761,7 @@ void CSSolid::FromMapSolid(CMapSolid *p, bool bSkipDisplacementFaces)
 				}
 				else
 				{
-					pEdge = &m_Edges[iEdge];
+					pEdge = &m_Edges[size_cast<short>(iEdge)];
 				}
 
 				// add the edge to the face
@@ -795,7 +797,7 @@ CSSEdge ** CSSolid::FindAffectedEdges(SSHANDLE *pHandles, int iNumHandles, int& 
 	{
 		for(int i = 0; i < m_nEdges; i++)
 		{
-			CSSEdge *pEdge = &m_Edges[i];
+			CSSEdge *pEdge = &m_Edges[size_cast<short>(i)];
 			if(pEdge->hvStart == pHandles[h] || 
 				pEdge->hvEnd == pHandles[h])
 			{
@@ -834,13 +836,14 @@ void CSSolid::MoveSelectedHandles(const Vector &Delta)
 	
 	for(int i = 0; i < m_nVertices; i++)
 	{
-		if(m_Vertices[i].m_bSelected)
-			MoveVertices[nMoveVertices++] = m_Vertices[i].id;
+		const short ii = size_cast<short>(i);
+		if(m_Vertices[ii].m_bSelected)
+			MoveVertices[nMoveVertices++] = m_Vertices[ii].id;
 	}
 
 	for(int i = 0; i < m_nEdges; i++)
 	{
-		CSSEdge* pEdge = &m_Edges[i];
+		CSSEdge* pEdge = &m_Edges[size_cast<short>(i)];
 
 		if(!pEdge->m_bSelected)	// make sure it's selected
 			continue;
@@ -906,7 +909,7 @@ void CSSolid::CheckFaces()
 
 void CSSolid::SetVertexPosition(int iVertex, float x, float y, float z)
 {
-	m_Vertices[iVertex].pos = Vector(x, y, z);
+	m_Vertices[size_cast<short>(iVertex)].pos = Vector(x, y, z);
 }
 
 
@@ -1023,7 +1026,7 @@ BOOL CSSolid::SplitFaceByVertices(CSSVertex *pVertex1, CSSVertex *pVertex2)
 		int iNextVertex = GetNext(i, 1, nVertices);
 		int iEdgeIndex = GetEdgeIndex(phVertexList[i], 
 			phVertexList[iNextVertex]);
-		CSSEdge *pEdge = &m_Edges[iEdgeIndex];
+		CSSEdge *pEdge = &m_Edges[size_cast<short>(iEdgeIndex)];
 		AssignFace(pEdge, pFace->id, TRUE);
 
 		if(phVertexList[i] == pVertex1->id)
@@ -1046,9 +1049,9 @@ DoNextFace:
 		int iEdgeIndex = GetEdgeIndex(phVertexList[i], phVertexList[iNextVertex]);
 		Assert(iEdgeIndex != -1);
 
-		hNewEdges[nNewEdges++] = m_Edges[iEdgeIndex].id;
+		hNewEdges[nNewEdges++] = m_Edges[size_cast<short>(iEdgeIndex)].id;
 
-		AssignFace(&m_Edges[iEdgeIndex], pFace->id);
+		AssignFace(&m_Edges[size_cast<short>(iEdgeIndex)], pFace->id);
 	}
 	// now add the middle edge
 	hNewEdges[nNewEdges++] = pNewEdge->id;
@@ -1106,8 +1109,8 @@ BOOL CSSolid::SplitFaceByEdges(CSSEdge *pEdge1, CSSEdge *pEdge2)
 	memcpy(&pNewFace->texture, &pFace->texture, sizeof(TEXTURE));
 
 	// set vertex positions
-	m_Vertices[iNewVertex1].pos = pEdge1->ptCenter;
-	m_Vertices[iNewVertex2].pos = pEdge2->ptCenter;
+	m_Vertices[size_cast<short>(iNewVertex1)].pos = pEdge1->ptCenter;
+	m_Vertices[size_cast<short>(iNewVertex2)].pos = pEdge2->ptCenter;
 
 	// set up middle edge
 	pNewEdgeMid->hvStart = pNewVertex1->id;
@@ -1167,7 +1170,7 @@ BOOL CSSolid::SplitFaceByEdges(CSSEdge *pEdge1, CSSEdge *pEdge2)
 		int iNextVertex = GetNext(i, 1, nVertices);
 		int iEdgeIndex = GetEdgeIndex(phVertexList[i], 
 			phVertexList[iNextVertex]);
-		CSSEdge *pEdge = &m_Edges[iEdgeIndex];
+		CSSEdge *pEdge = &m_Edges[size_cast<short>(iEdgeIndex)];
 		Assert(pEdge->id != pEdge1->id);
 		Assert(pEdge->id != pEdge2->id);
 		AssignFace(pEdge, pFace->id, TRUE);
@@ -1187,9 +1190,9 @@ DoNextFace:
 		int iEdgeIndex = GetEdgeIndex(phVertexList[i], phVertexList[iNextVertex]);
 		Assert(iEdgeIndex != -1);
 
-		hNewEdges[nNewEdges++] = m_Edges[iEdgeIndex].id;
+		hNewEdges[nNewEdges++] = m_Edges[size_cast<short>(iEdgeIndex)].id;
 
-		AssignFace(&m_Edges[iEdgeIndex], pStoreFace->id);
+		AssignFace(&m_Edges[size_cast<short>(iEdgeIndex)], pStoreFace->id);
 	}
 	// now add the middle edge
 	hNewEdges[nNewEdges++] = pNewEdgeMid->id;
@@ -1235,8 +1238,8 @@ DoNextFace:
 			int iEdgeIndex = GetEdgeIndex(phVertexList[i], phVertexList[iNextVertex]);
 			Assert(iEdgeIndex != -1);
 
-			AssignFace(&m_Edges[iEdgeIndex], pUpdFace->id);
-			hNewEdges[nNewEdges++] = m_Edges[iEdgeIndex].id;
+			AssignFace(&m_Edges[size_cast<short>(iEdgeIndex)], pUpdFace->id);
+			hNewEdges[nNewEdges++] = m_Edges[size_cast<short>(iEdgeIndex)].id;
 		}
 
 		// now set up in face

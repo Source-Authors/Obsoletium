@@ -707,8 +707,8 @@ void CMapView2DBase::UpdateClientView(void)
 		si.cbSize = sizeof(si);
 		si.fMask = SIF_PAGE | SIF_RANGE | SIF_POS;
 
-		si.nMin = g_MIN_MAP_COORD - m_fClientWidthHalf;
-		si.nMax = g_MAX_MAP_COORD + m_fClientWidthHalf;
+		si.nMin = size_cast<int>(g_MIN_MAP_COORD - m_fClientWidthHalf);
+		si.nMax = size_cast<int>(g_MAX_MAP_COORD + m_fClientWidthHalf);
 		si.nPage = viewWidth;
 		si.nPos = m_vViewOrigin[axHorz];
 
@@ -717,8 +717,8 @@ void CMapView2DBase::UpdateClientView(void)
 
 		SetScrollInfo(SB_HORZ, &si);
 
-		si.nMin = g_MIN_MAP_COORD-m_fClientHeightHalf;
-		si.nMax = g_MAX_MAP_COORD+m_fClientHeightHalf;
+		si.nMin = size_cast<int>(g_MIN_MAP_COORD - m_fClientHeightHalf);
+		si.nMax = size_cast<int>(g_MAX_MAP_COORD + m_fClientHeightHalf);
 		si.nPage = viewHeight;
 		si.nPos = m_vViewOrigin[axVert];
 

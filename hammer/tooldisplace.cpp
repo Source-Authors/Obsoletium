@@ -492,7 +492,7 @@ void CToolDisplace::LiftFaceNormal( CMapView3D *pView, const Vector2D &vPoint )
 
 			// trace a line and get the normal -- will get a displacement normal
 			// if one exists
-			CMapFace *pFace = pSolid->GetFace( ulFace );
+			CMapFace *pFace = pSolid->GetFace( size_cast<short>(ulFace) );
 			if( !pFace )
 				return;
 
@@ -896,7 +896,7 @@ void CToolDisplace::HandleSelection( CMapView3D *pView, const Vector2D &vPoint )
 			// Otherwise, select a single face.
 			else
 			{
-				pDoc->SelectFace( pSolid, ulFace, cmd );
+				pDoc->SelectFace( pSolid, size_cast<short>(ulFace), cmd );
 			}
 		}
 	}
@@ -917,7 +917,7 @@ void CToolDisplace::HandleTagging( CMapView3D *pView, const Vector2D &vPoint )
 		{
 			// Get the face and check for a displacement.
 			CMapSolid *pSolid = ( CMapSolid* )pObject;
-			CMapFace *pFace = pSolid->GetFace( ulFace );
+			CMapFace *pFace = pSolid->GetFace( size_cast<short>(ulFace) );
 			if ( pFace && pFace->HasDisp() )
 			{
 				EditDispHandle_t hDisp = pFace->GetDisp();
@@ -1008,7 +1008,7 @@ void CToolDisplace::HandleTaggingReset( CMapView3D *pView, const Vector2D &vPoin
 		{
 			// Get the face and check for a displacement.
 			CMapSolid *pSolid = ( CMapSolid* )pObject;
-			CMapFace *pFace = pSolid->GetFace( ulFace );
+			CMapFace *pFace = pSolid->GetFace( size_cast<short>(ulFace) );
 			if ( pFace && pFace->HasDisp() )
 			{
 				EditDispHandle_t hDisp = pFace->GetDisp();

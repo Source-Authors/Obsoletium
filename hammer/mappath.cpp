@@ -197,8 +197,6 @@ void CMapPath::DeleteNode(DWORD dwID)
 //-----------------------------------------------------------------------------
 void CMapPath::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 {
-	int iSize;
-
 	if(fIsStoring)
 	{
 		// save!!
@@ -206,9 +204,9 @@ void CMapPath::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 		file.write(m_szClass, 128);
 		file.write((char*) &m_iDirection, sizeof(m_iDirection));
 	
-		iSize = m_Nodes.Count();
+		int iSize = size_cast<int>(m_Nodes.Count());
 		file.write((char*) &iSize, sizeof iSize);
-		for(int i = 0; i < m_Nodes.Count(); i++)
+		for(int i = 0; i < iSize; i++)
 		{
 			CMapPathNode& node = m_Nodes[i];
 			// store each node
@@ -247,6 +245,7 @@ void CMapPath::SerializeRMF(std::fstream& file, BOOL fIsStoring)
 		file.read(m_szClass, 128);
 		file.read((char*) &m_iDirection, sizeof m_iDirection);
 
+		int iSize;
 		file.read((char*) &iSize, sizeof iSize);
 		int nNodes = iSize;
 		m_Nodes.RemoveAll();
