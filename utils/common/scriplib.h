@@ -30,8 +30,7 @@ enum ScriptPathMode_t
 #define	MAXTOKEN	1024
 
 extern	char	token[MAXTOKEN];
-extern	char	*scriptbuffer,*script_p,*scriptend_p;
-extern	int		grabbed;
+extern	char	*script_p;
 extern	int		scriptline;
 extern	qboolean	endofscript;
 
