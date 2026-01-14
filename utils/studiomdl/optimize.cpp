@@ -2770,7 +2770,7 @@ void COptimizedModel::PrintVerts( studiohdr_t *phdr, int lod )
 	}
 }
 
-static int CalcNumMaterialReplacements()
+static intp CalcNumMaterialReplacements()
 {
 	intp numReplacements = 0;
 	intp numLODs = g_ScriptLODs.Count();
