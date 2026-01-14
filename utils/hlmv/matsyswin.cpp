@@ -338,7 +338,7 @@ MatSysWindow::handleEvent (mxEvent *event)
 							continue;
 
 						// match weapon sequence and frame to marine
-						int iSequence = g_pStudioExtraModel[ i ]->LookupSequence( pszMainSequenceName );
+						intp iSequence = g_pStudioExtraModel[ i ]->LookupSequence( pszMainSequenceName );
 						if ( iSequence == -1 )
 						{
 							g_pStudioExtraModel[ i ]->SetFrame( 0 );
@@ -507,7 +507,7 @@ MatSysWindow::handleEvent (mxEvent *event)
 			}
 		case VK_SPACE:
 			{
-				int iSeq = g_pStudioModel->GetSequence ();
+				intp iSeq = g_pStudioModel->GetSequence ();
 				if (iSeq == g_pStudioModel->SetSequence (iSeq + 1))
 				{
 					g_pStudioModel->SetSequence ((intp)0);
