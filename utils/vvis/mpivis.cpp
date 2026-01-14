@@ -59,7 +59,7 @@ IpV4 g_PortalMCAddr;
 bool g_bGotMCAddr = false;
 HANDLE g_hMCThread = NULL;
 CEvent g_MCThreadExitEvent;
-unsigned long g_PortalMCThreadUniqueID = 0;
+unsigned g_PortalMCThreadUniqueID = 0;
 int g_nMulticastPortalsReceived = 0;
 
 
@@ -377,7 +377,7 @@ unsigned WINAPI PortalMCThreadFn( void* p )
 				// Perform more validation...
 				if ( data[0] == VMPI_VVIS_PACKET_ID && data[1] == VMPI_PORTALFLOW_RESULTS )
 				{
-					if ( *((unsigned long*)&data[2]) == g_PortalMCThreadUniqueID )
+					if ( *((unsigned*)&data[2]) == g_PortalMCThreadUniqueID )
 					{
 						int iWorkUnit = *((int*)&data[6]);
 						if ( iWorkUnit >= 0 && iWorkUnit < g_numportals*2 )
