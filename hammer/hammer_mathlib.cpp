@@ -480,7 +480,7 @@ void RoundVector( Vector2D &v )
 
 void PointsRevertOrder( Vector *pPoints, int nPoints)
 {
-	Vector *tmpPoints = (Vector*)_alloca( sizeof(Vector)*nPoints );
+	Vector *tmpPoints = stackallocT( Vector, nPoints );
 	memcpy( tmpPoints, pPoints, sizeof(Vector)*nPoints );
 	for ( int i = 0; i<nPoints; i++)
 	{
