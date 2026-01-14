@@ -244,7 +244,7 @@ void SpewPerfStats( studiohdr_t *pStudioHdr, const char *pFilename, unsigned int
 				g_pStudioRender->GetPerfStats( &results, drawModelInfo, &statsOutput );
 				if( flags & SPEWPERFSTATS_SPREADSHEET )
 				{
-					printf( "%d,%d,%d,", results.m_ActualTriCount, results.m_NumBatches, results.m_NumMaterials  );
+					printf( "%zd,%d,%d,", results.m_ActualTriCount, results.m_NumBatches, results.m_NumMaterials  );
 				}
 				else
 				{
