@@ -159,6 +159,7 @@ CFaceEditMaterialPage::CFaceEditMaterialPage() : CPropertyPage( IDD )
 	m_bInitialized = FALSE;
 	m_bIgnoreResize = FALSE;
 	m_bTreatAsOneFace = FALSE;
+	m_eOrientation = FACE_ORIENTATION_INVALID;
 	m_pCurTex = nullptr;
 }
 
