@@ -1539,11 +1539,8 @@ void MDLViewer::Refresh( void )
 			continue;
 		}
 
-		if ( retval == 0 )
-		{
-			soundemitter->SaveChangesToSoundScript( i );
-			Con_ColorPrintf( RGB( 50, 255, 100 ), "  saving changes to script file '%s'\n", scriptname );
-		}
+		soundemitter->SaveChangesToSoundScript( i );
+		Con_ColorPrintf( RGB( 50, 255, 100 ), "  saving changes to script file '%s'\n", scriptname );
 	}
 
 	// kill the soundemitter system
