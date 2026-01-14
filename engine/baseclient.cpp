@@ -485,8 +485,8 @@ void CBaseClient::SetName(const char * playerName)
 			Q_snprintf(newname, sizeof(newname), "(%d)%-.*s", dupc++, MAX_PLAYER_NAME_LENGTH - 4, p );
 			Q_strncpy(m_Name, newname, sizeof(m_Name));
 			
-			val = m_Name;		
-		}	
+			val = m_Name;
+		}
 	}
 
 	m_ConVars->SetString( "name", m_Name );
@@ -617,7 +617,7 @@ void CBaseClient::Disconnect( PRINTF_FORMAT_STRING const char *fmt, ... )
 	m_Server->UserInfoChanged( m_nClientSlot );
 
 	va_start (argptr,fmt); //-V2019 //-V2018
-	Q_vsnprintf (string, sizeof( string ), fmt,argptr);
+	V_sprintf_safe (string,fmt,argptr);
 	va_end (argptr);
 
 	ConMsg("Dropped %s from server (%s)\n", GetClientName(), string );
