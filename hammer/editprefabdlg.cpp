@@ -26,6 +26,7 @@ CEditPrefabDlg::CEditPrefabDlg(CWnd* pParent /*=NULL*/)
 	//{{AFX_DATA_INIT(CEditPrefabDlg)
 	m_strDescript = _T("");
 	m_strName = _T("");
+	m_dwLibraryID = DWORD_MAX;
 	//}}AFX_DATA_INIT
 
 	iMaxDescriptChars = 80;
