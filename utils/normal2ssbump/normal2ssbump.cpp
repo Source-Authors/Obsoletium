@@ -20,9 +20,11 @@
 
 namespace {
 
-[[nodiscard]] float RangeAdjust(float x) { return 2 * (x - .5f); }
+[[nodiscard]] constexpr inline float RangeAdjust(float x) {
+  return 2 * (x - .5f);
+}
 
-[[nodiscard]] float SaturateAndSquare(float x) {
+[[nodiscard]] constexpr inline float SaturateAndSquare(float x) {
   x = max(0.f, min(1.f, x));
   return x * x;
 }
