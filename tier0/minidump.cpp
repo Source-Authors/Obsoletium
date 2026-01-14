@@ -323,8 +323,6 @@ void WriteMiniDump( const char *pszFilenameSuffix )
 	}
 }
 
-bool g_bInException = false;
-
 //-----------------------------------------------------------------------------
 // Purpose: Catches and writes out any exception throw by the specified function.
 // Input:	pfn -			Function to call within protective exception block
@@ -457,9 +455,6 @@ int CatchAndWriteMiniDump_Impl( CatchAndWriteContext_t &ctx )
 		TerminateProcess( GetCurrentProcess(), EOTHER ); // die, die RIGHT NOW! (don't call exit() so destructors will not get run)
 	}
 
-	// if we get here, we definitely are not in an exception handler
-	g_bInException = false;
-	
 	return 0;
 #else
 //	if ( ctx.m_pargv != 0 )
