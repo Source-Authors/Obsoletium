@@ -366,14 +366,16 @@ void CMapCylinder::OnParentKeyChanged( const char* key, const char* value )
 		if (m_pStartEntity && stricmp(key, m_szStartRadiusKey) == 0)
 		{
 			const char *pRadiusKey = m_pStartEntity->GetKeyValue( m_szStartRadiusKey );
-			m_flStartRadius = pRadiusKey ? atof( pRadiusKey ) : 0.0f;
+			// dimhotepus: atof -> V_atof
+			m_flStartRadius = pRadiusKey ? V_atof( pRadiusKey ) : 0.0f;
 			BuildCylinder();
 		}
 
 		if (m_pEndEntity && stricmp(key, m_szEndRadiusKey) == 0)
 		{
 			const char *pRadiusKey = m_pEndEntity->GetKeyValue( m_szEndRadiusKey );
-			m_flEndRadius = pRadiusKey ? atof( pRadiusKey ) : 0.0f;
+			// dimhotepus: atof -> V_atof
+			m_flEndRadius = pRadiusKey ? V_atof( pRadiusKey ) : 0.0f;
 			BuildCylinder();
 		}
 	}
@@ -633,7 +635,8 @@ void CMapCylinder::UpdateDependencies(CMapWorld *pWorld, CMapClass *pObject)
 			if ( m_pStartEntity && m_szStartRadiusKey[0] != '\0' )
 			{
 				const char *pRadiusKey = m_pStartEntity->GetKeyValue( m_szStartRadiusKey );
-				m_flStartRadius = pRadiusKey ? atof( pRadiusKey ) : 0.0f;
+				// dimhotepus: atof -> V_atof
+				m_flStartRadius = pRadiusKey ? V_atof( pRadiusKey ) : 0.0f;
 			}
 		}
 
@@ -643,7 +646,8 @@ void CMapCylinder::UpdateDependencies(CMapWorld *pWorld, CMapClass *pObject)
 			if ( m_pEndEntity && m_szEndRadiusKey[0] != '\0' )
 			{
 				const char *pRadiusKey = m_pEndEntity->GetKeyValue( m_szEndRadiusKey );
-				m_flEndRadius = pRadiusKey ? atof( pRadiusKey ) : 0.0f;
+				// dimhotepus: atof -> V_atof
+				m_flEndRadius = pRadiusKey ? V_atof( pRadiusKey ) : 0.0f;
 			}
 		}
 

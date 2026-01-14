@@ -158,29 +158,35 @@ void CMapOverlayTransition::OnParentKeyChanged( const char* szKey, const char* s
 	// Texture data.
 	if ( !stricmp( szKey, "LengthTexcoordStart" ) )	
 	{ 
-		m_ShoreData.m_vecLengthTexcoord[0] = atof( szValue );
+		// dimhotepus: atof -> V_atof
+		m_ShoreData.m_vecLengthTexcoord[0] = V_atof( szValue );
 	}
 	if ( !stricmp( szKey, "LengthTexcoordEnd" ) )	
 	{ 
-		m_ShoreData.m_vecLengthTexcoord[1] = atof( szValue );
+		// dimhotepus: atof -> V_atof
+		m_ShoreData.m_vecLengthTexcoord[1] = V_atof( szValue );
 	}
 	if ( !stricmp( szKey, "WidthTexcoordStart" ) )	
 	{ 
-		m_ShoreData.m_vecWidthTexcoord[0] = atof( szValue );
+		// dimhotepus: atof -> V_atof
+		m_ShoreData.m_vecWidthTexcoord[0] = V_atof( szValue );
 	}
 	if ( !stricmp( szKey, "WidthTexcoordEnd" ) )	
 	{ 
-		m_ShoreData.m_vecWidthTexcoord[1] = atof( szValue );
+		// dimhotepus: atof -> V_atof
+		m_ShoreData.m_vecWidthTexcoord[1] = V_atof( szValue );
 	}
 
 	// Width data.
 	if ( !stricmp( szKey, "Width1" ) )	
 	{ 
-		m_ShoreData.m_flWidths[0] = atof( szValue );
+		// dimhotepus: atof -> V_atof
+		m_ShoreData.m_flWidths[0] = V_atof( szValue );
 	}
 	if ( !stricmp( szKey, "Width2" ) )	
 	{ 
-		m_ShoreData.m_flWidths[1] = atof( szValue );
+		// dimhotepus: atof -> V_atof
+		m_ShoreData.m_flWidths[1] = V_atof( szValue );
 	}
 
 	// Debug data.

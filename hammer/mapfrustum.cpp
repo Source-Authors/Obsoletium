@@ -62,7 +62,7 @@ CMapClass *CMapFrustum::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		pszKeyName = pHelperInfo->GetParameter(4);
 		if (pszKeyName != NULL)
 		{
-			new1->m_flPitchScale = Q_atof( pszKeyName );
+			new1->m_flPitchScale = V_atof( pszKeyName );
 		}
 		else
 		{
@@ -274,15 +274,18 @@ void CMapFrustum::OnParentKeyChanged(const char *szKey, const char *szValue)
 	}
 	else if (!stricmp(szKey, m_szFOVKeyName))
 	{
-		m_flFOV = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_flFOV = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, m_szNearPlaneKeyName))
 	{
-		m_flNearPlane = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_flNearPlane = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, m_szFarPlaneKeyName))
 	{
-		m_flFarPlane = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_flFarPlane = V_atof(szValue);
 	}
 	else
 	{

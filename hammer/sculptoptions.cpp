@@ -2136,8 +2136,8 @@ void CSculptPushOptions::OnEnChangeSculptPushOptionOffsetDistance()
 	char	temp[ 1024 ];
 
 	m_OffsetDistanceControl.GetWindowText( temp, sizeof( temp ) );
-	// dimhotepus: atof -> strtof.
-	m_OffsetDistance = strtof( temp, nullptr );
+	// dimhotepus: atof -> V_atof.
+	m_OffsetDistance = V_atof( temp );
 }
 
 
@@ -3186,8 +3186,8 @@ void CSculptCarveOptions::OnEnChangeSculptPushOptionOffsetDistance()
 	char	temp[ 1024 ];
 
 	m_OffsetDistanceControl.GetWindowText( temp, sizeof( temp ) );
-	// dimhotepus: atof -> strtof
-	m_OffsetDistance = strtof( temp, nullptr );
+	// dimhotepus: atof -> V_atof
+	m_OffsetDistance = V_atof( temp );
 }
 
 

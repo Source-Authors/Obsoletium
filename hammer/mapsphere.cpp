@@ -290,7 +290,8 @@ void CMapSphere::OnParentKeyChanged(const char *szKey, const char *szValue)
 {
 	if (!stricmp(szKey, m_szKeyName))
 	{
-		m_flRadius = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_flRadius = V_atof(szValue);
 		PostUpdate(Notify_Changed);
 	}
 }

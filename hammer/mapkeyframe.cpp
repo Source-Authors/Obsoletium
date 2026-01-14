@@ -346,11 +346,13 @@ void CMapKeyFrame::OnParentKeyChanged( const char* key, const char* value )
 	}
 	else if ( !stricmp(key, "NextTime") )
 	{
-		m_flMoveTime = atof( value );
+		// dimhotepus: atof -> V_atof
+		m_flMoveTime = V_atof( value );
 	}
 	else if ( !stricmp(key, "MoveSpeed") )
 	{
-		m_flSpeed = atof( value );
+		// dimhotepus: atof -> V_atof
+		m_flSpeed = V_atof( value );
 		m_bRebuildPath = true;
 	}
 	else if (!stricmp(key, "angles"))

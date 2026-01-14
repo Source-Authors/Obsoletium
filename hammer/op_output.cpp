@@ -1591,7 +1591,8 @@ void COP_Output::UpdateEditedDelays(void)
 	{
 		char strDelay[MAX_IO_NAME_LEN];
 		pDelayEdit->GetWindowText(strDelay, sizeof(strDelay));
-		float flDelay = atof(strDelay);
+		// dimhotepus: atof -> V_atof
+		float flDelay = V_atof(strDelay);
 
 		// Update the connections
 		int nConnCount = m_EditList.Count();

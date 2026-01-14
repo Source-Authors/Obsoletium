@@ -2606,7 +2606,8 @@ ChunkFileResult_t CMapFace::LoadKeyCallback(const char *szKey, const char *szVal
 	}
 	else if (!stricmp(szKey, "rotation"))
 	{
-		pFace->texture.rotate = atof(szValue);
+		// dimhotepus: atof -> V_atof.
+		pFace->texture.rotate = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, "plane"))
 	{

@@ -56,8 +56,8 @@ void CScaleVerticesDlg::OnChangeScale()
 {
 	CString str;
 	m_cScale.GetWindowText(str);
-	// dimhotepus: atof -> strtof.
-	m_fScale = strtof(str, nullptr);
+	// dimhotepus: atof -> V_atof.
+	m_fScale = V_atof(str);
 
 	if (m_fScale <= 0)
 	{
@@ -74,8 +74,8 @@ void CScaleVerticesDlg::OnDeltaposScalespin(NMHDR* pNMHDR, LRESULT* pResult)
 
 	CString str;
 	m_cScale.GetWindowText(str);
-	// dimhotepus: atof -> strtof.
-	m_fScale = strtof(str, nullptr);
+	// dimhotepus: atof -> V_atof.
+	m_fScale = V_atof(str);
 	m_fScale += 0.1f * float(pNMUpDown->iDelta);
 	if(m_fScale <= 0)
 		m_fScale = 0;

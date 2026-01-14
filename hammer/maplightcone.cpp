@@ -85,7 +85,7 @@ CMapClass *CMapLightCone::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 		pszKeyName = pHelperInfo->GetParameter(3);
 		if (pszKeyName != NULL)
 		{
-			new1->m_flPitchScale = Q_atof( pszKeyName );
+			new1->m_flPitchScale = V_atof( pszKeyName );
 		}
 		else
 		{
@@ -496,37 +496,44 @@ void CMapLightCone::OnParentKeyChanged(const char *szKey, const char *szValue)
 	{
 		// Pitch
 		m_bPitchSet = true;
-		m_fPitch = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_fPitch = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, "_constant_attn"))
 	{
 		// Constant attenuation
-		m_fConstantAttn = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_fConstantAttn = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, "_linear_attn"))
 	{
 		// Linear attenuation
-		m_fLinearAttn = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_fLinearAttn = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, "_quadratic_attn"))
 	{
 		// Quadratic attenuation
-		m_fQuadraticAttn = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_fQuadraticAttn = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, "_exponent"))
 	{
 		// Focus
-		m_fFocus = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_fFocus = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, "_fifty_percent_distance"))
 	{
 		// Focus
-		m_fFiftyPercentDistance = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_fFiftyPercentDistance = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, "_zero_percent_distance"))
 	{
 		// Focus
-		m_fZeroPercentDistance = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_fZeroPercentDistance = V_atof(szValue);
 	}
 	else if (!stricmp(szKey, m_szInnerConeKeyName) || !stricmp(szKey, m_szOuterConeKeyName))
 	{
@@ -534,12 +541,14 @@ void CMapLightCone::OnParentKeyChanged(const char *szKey, const char *szValue)
 		if( !stricmp(szKey, m_szInnerConeKeyName ))
 		{
 			// Inner Cone angle
-			m_fInnerConeAngle = atof(szValue);
+			// dimhotepus: atof -> V_atof
+			m_fInnerConeAngle = V_atof(szValue);
 		}
 		if( !stricmp(szKey, m_szOuterConeKeyName ))
 		{
 			// Outer Cone angle
-			m_fOuterConeAngle = atof(szValue);
+			// dimhotepus: atof -> V_atof
+			m_fOuterConeAngle = V_atof(szValue);
 		}
 	}
 	else

@@ -2795,7 +2795,8 @@ ChunkFileResult_t CMapDisp::LoadDispDistancesKeyCallback(const char *szKey, cons
 
 		while (pszNext != NULL)
 		{
-			dispDistance = (float)atof(pszNext);
+			// dimhotepus: atof -> V_atof.
+			dispDistance = V_atof(pszNext);
 			pDisp->m_CoreDispInfo.SetFieldDistance( nIndex, dispDistance );
 			pszNext = strtok(NULL, " ");
 			nIndex++;
@@ -2845,9 +2846,10 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetsKeyCallback(const char *szKey, const 
 
 		while( ( pszNext0 != NULL ) && ( pszNext1 != NULL ) && ( pszNext2 != NULL ) )
 		{
-			subdivVector[0] = ( float )atof( pszNext0 );
-			subdivVector[1] = ( float )atof( pszNext1 );
-			subdivVector[2] = ( float )atof( pszNext2 );
+			// dimhotepus: atof -> V_atof. 
+			subdivVector[0] = V_atof( pszNext0 );
+			subdivVector[1] = V_atof( pszNext1 );
+			subdivVector[2] = V_atof( pszNext2 );
 
 			pDisp->m_CoreDispInfo.SetSubdivPosition( nIndex, subdivVector );
 
@@ -2903,9 +2905,10 @@ ChunkFileResult_t CMapDisp::LoadDispOffsetNormalsKeyCallback(const char *szKey, 
 
 		while( ( pszNext0 != NULL ) && ( pszNext1 != NULL ) && ( pszNext2 != NULL ) )
 		{
-			normalVector[0] = ( float )atof( pszNext0 );
-			normalVector[1] = ( float )atof( pszNext1 );
-			normalVector[2] = ( float )atof( pszNext2 );
+			// dimhotepus: atof -> V_atof.
+			normalVector[0] = V_atof( pszNext0 );
+			normalVector[1] = V_atof( pszNext1 );
+			normalVector[2] = V_atof( pszNext2 );
 
 			pDisp->m_CoreDispInfo.SetSubdivNormal( nIndex, normalVector );
 
@@ -3041,7 +3044,8 @@ ChunkFileResult_t CMapDisp::LoadDispAlphasKeyCallback(const char *szKey, const c
 
 		while (pszNext != NULL) 
 		{
-			alpha = (float)atof(pszNext);
+			// dimhotepus: atof -> V_atof.
+			alpha = V_atof(pszNext);
 
 			pDisp->m_CoreDispInfo.SetAlpha( nIndex, alpha );
 
@@ -3162,9 +3166,10 @@ ChunkFileResult_t CMapDisp::LoadDispNormalsKeyCallback(const char *szKey, const 
 
 		while ((pszNext0 != NULL) && (pszNext1 != NULL) && (pszNext2 != NULL))
 		{
-			vectorFieldVector[0] = (float)atof(pszNext0);
-			vectorFieldVector[1] = (float)atof(pszNext1);
-			vectorFieldVector[2] = (float)atof(pszNext2);
+			// dimhotepus: atof -> V_atof.
+			vectorFieldVector[0] = V_atof(pszNext0);
+			vectorFieldVector[1] = V_atof(pszNext1);
+			vectorFieldVector[2] = V_atof(pszNext2);
 
 			pDisp->m_CoreDispInfo.SetFieldVector( nIndex, vectorFieldVector );
 

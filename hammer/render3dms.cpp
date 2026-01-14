@@ -937,8 +937,8 @@ static float GetFloatForKey( CMapEntity *e, char const *kname)
 {
 	char const *pk = e->GetKeyValue( kname );
 	if ( pk )
-		// dimhotepus: atof -> strtof.
-		return strtof( pk,  nullptr );
+		// dimhotepus: atof -> V_atof.
+		return V_atof( pk );
 	else
 		return 0.0;
 }

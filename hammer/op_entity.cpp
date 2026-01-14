@@ -4365,11 +4365,14 @@ void COP_Entity::OnPickColor(void)
 			else
 			{
 				if(iCurToken == 0)
-					r = BYTE(atof(pTmp) * 255.f);
+					// dimhotepus: atof -> V_atof
+					r = BYTE(V_atof(pTmp) * 255.f);
 				if(iCurToken == 1)
-					g = BYTE(atof(pTmp) * 255.f);
+					// dimhotepus: atof -> V_atof
+					g = BYTE(V_atof(pTmp) * 255.f);
 				if(iCurToken == 2)
-					b = BYTE(atof(pTmp) * 255.f);
+					// dimhotepus: atof -> V_atof
+					b = BYTE(V_atof(pTmp) * 255.f);
 			}
 			++iCurToken;
 		}

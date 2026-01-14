@@ -531,7 +531,8 @@ void CMapSprite::OnParentKeyChanged(const char* szKey, const char* szValue)
 	}
 	else if (!stricmp(szKey, "scale"))
 	{
-		m_fScale = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_fScale = V_atof(szValue);
 		if (m_fScale == 0)
 		{
 			m_fScale = 1;

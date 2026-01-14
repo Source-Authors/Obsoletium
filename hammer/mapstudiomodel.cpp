@@ -317,7 +317,8 @@ void CMapStudioModel::OnParentKeyChanged(const char* szKey, const char* szValue)
 	}
 	else if (!stricmp(szKey, "pitch"))
 	{
-		m_flPitch = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_flPitch = V_atof(szValue);
 		m_bPitchSet = true;
 
 		PostUpdate(Notify_Changed);
@@ -341,11 +342,13 @@ void CMapStudioModel::OnParentKeyChanged(const char* szKey, const char* szValue)
 	}
 	else if (!stricmp(szKey, "fadescale"))
 	{
-		m_flFadeScale = atof(szValue);
+		// dimhotepus: atof -> V_atof
+		m_flFadeScale = V_atof(szValue);
 	}
 	else if ( !stricmp( szKey, "solid") )
 	{
-		m_iSolid = atof( szValue );
+		// dimhotepus: atof -> atoi
+		m_iSolid = atoi( szValue );
 	}
 }
 

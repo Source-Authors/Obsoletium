@@ -1509,19 +1509,23 @@ void CMapOverlay::OnParentKeyChanged( const char* szKey, const char* szValue )
 
 	if ( !stricmp( szKey, "StartU" ) )	
 	{ 
-		m_Material.m_vecTextureU.x = atof( szValue ); 
+		// dimhotepus: atof -> V_atof
+		m_Material.m_vecTextureU.x = V_atof( szValue ); 
 	}
 	if ( !stricmp( szKey, "EndU" ) )	
 	{ 
-		m_Material.m_vecTextureU.y = atof( szValue ); 
+		// dimhotepus: atof -> V_atof
+		m_Material.m_vecTextureU.y = V_atof( szValue ); 
 	}
 	if ( !stricmp( szKey, "StartV" ) )	
 	{ 
-		m_Material.m_vecTextureV.x = atof( szValue ); 
+		// dimhotepus: atof -> V_atof
+		m_Material.m_vecTextureV.x = V_atof( szValue ); 
 	}
 	if ( !stricmp( szKey, "EndV" ) )	
 	{ 
-		m_Material.m_vecTextureV.y = atof( szValue ); 
+		// dimhotepus: atof -> V_atof
+		m_Material.m_vecTextureV.y = V_atof( szValue ); 
 	}
 
 	if ( m_bLoaded )

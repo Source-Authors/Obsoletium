@@ -254,17 +254,17 @@ bool CShell::EntityRotateIncremental(const char *pszCommand, const char *pszArgu
 		}
 		if ( arg == NUM_ROTATE_INCREMENTAL_ARGS )
 		{
-			// dimhotepus: atof -> strtof.
-			x = strtof(szArgs[1], nullptr);
-			y = strtof(szArgs[2], nullptr);
-			z = strtof(szArgs[3], nullptr);
+			// dimhotepus: atof -> V_atof.
+			x = V_atof(szArgs[1]);
+			y = V_atof(szArgs[2]);
+			z = V_atof(szArgs[3]);
 			CMapEntity *pEntity = m_pDoc->FindEntity(szArgs[0], x, y, z);
 			if (pEntity != NULL)
 			{
-				// dimhotepus: atof -> strtof.
-				rotation.x = strtof(szArgs[4], nullptr);
-				rotation.y = strtof(szArgs[5], nullptr);
-				rotation.z = strtof(szArgs[6], nullptr);
+				// dimhotepus: atof -> V_atof.
+				rotation.x = V_atof(szArgs[4]);
+				rotation.y = V_atof(szArgs[5]);
+				rotation.z = V_atof(szArgs[6]);
 				RotateMapEntity( pEntity, rotation );
 				return true;
 			}
@@ -303,10 +303,10 @@ bool CShell::EntitySetKeyValue(const char *pszCommand, const char *pszArguments)
 		}
 		if ( arg == NUM_KEY_VALUE_ARGS )
 		{
-			// dimhotepus: atof -> strtof.
-			x = strtof(szArgs[1], nullptr);
-			y = strtof(szArgs[2], nullptr);
-			z = strtof(szArgs[3], nullptr);
+			// dimhotepus: atof -> V_atof.
+			x = V_atof(szArgs[1]);
+			y = V_atof(szArgs[2]);
+			z = V_atof(szArgs[3]);
 			CMapEntity *pEntity = m_pDoc->FindEntity(szArgs[0], x, y, z);
 			if (pEntity != NULL)
 			{

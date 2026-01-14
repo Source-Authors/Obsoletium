@@ -62,13 +62,13 @@ CMapClass *CMapAlignedBox::Create(CHelperInfo *pHelperInfo, CMapEntity *pParent)
 
 			if (nParam < 3)
 			{
-				// dimhoteous: atof -> strtof.
-				Mins[nParam] = strtof(pszParam, nullptr);
+				// dimhoteous: atof -> V_atof.
+				Mins[nParam] = V_atof(pszParam);
 			}
 			else if (nParam < 6)
 			{
-				// dimhoteous: atof -> strtof.
-				Maxs[nParam % 3] = strtof(pszParam, nullptr);
+				// dimhoteous: atof -> V_atof.
+				Maxs[nParam % 3] = V_atof(pszParam);
 			}
 			else
 			{

@@ -569,8 +569,8 @@ void CAngleCombo::UpdateAngleBox(char *szText)
 
 		if (V_isdigit(szText[0]))
 		{
-			// dimhotepus: atoi -> strtof.
-			QAngle vecAngles(0, strtof(szText, nullptr), 0);
+			// dimhotepus: atoi -> V_atof.
+			QAngle vecAngles(0, V_atof(szText), 0);
 			m_pBox->SetAnglesInternal(vecAngles, true);
 		}
 		else if (!stricmp(szText, "down"))
