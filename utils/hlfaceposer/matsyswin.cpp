@@ -776,8 +776,8 @@ MatSysWindow::TakeScreenShot (const char *filename)
 	int w = w2 ();
 	int h = h2 ();
 
-	mxImage *image = new mxImage ();
-	if (image->create (w, h, 24))
+	mxImage image;
+	if (image.create (w, h, 24))
 	{
 #if 0
 		glReadBuffer (GL_FRONT);
@@ -786,7 +786,7 @@ MatSysWindow::TakeScreenShot (const char *filename)
 		HDC hdc = GetDC ((HWND) getHandle ());
 		RunCodeAtScopeExit(ReleaseDC ((HWND) getHandle (), hdc));
 
-		byte *data = (byte *) image->data;
+		byte *data = (byte *) image.data;
 		int i = 0;
 		for (int y = 0; y < h; y++)
 		{
@@ -799,9 +799,7 @@ MatSysWindow::TakeScreenShot (const char *filename)
 			}
 		}
 #endif
-		if (!mxTgaWrite (filename, image))
+		if (!mxTgaWrite (filename, &image))
 			mxMessageBox (this, "Error writing screenshot.", g_appTitle, MX_MB_OK | MX_MB_ERROR);
-
-		delete image;
 	}
 }
