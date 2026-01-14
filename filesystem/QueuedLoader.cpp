@@ -170,8 +170,8 @@ private:
 	};
 	typedef CUtlSortVector< FileNameHandle_t, CResourceNameLessFunc > ResourceList_t;
 
-	static void							BuildResources( IResourcePreload *pLoader, ResourceList_t *pList, float *pBuildTime );
-	static void							BuildMaterialResources( IResourcePreload *pLoader, ResourceList_t *pList, float *pBuildTime );
+	static void							BuildResources( IResourcePreload *pLoader, ResourceList_t *pList, double *pBuildTime );
+	static void							BuildMaterialResources( IResourcePreload *pLoader, ResourceList_t *pList, double *pBuildTime );
 
 	void								PurgeQueue();
 	void								CleanQueue();
@@ -213,7 +213,7 @@ private:
 
 	CUtlSortVector< FileNameHandle_t, CResourceNameLessFunc >	m_ResourceNames[RESOURCEPRELOAD_COUNT];
 	IResourcePreload					*m_pLoaders[RESOURCEPRELOAD_COUNT];
-	float								m_LoaderTimes[RESOURCEPRELOAD_COUNT];
+	double								m_LoaderTimes[RESOURCEPRELOAD_COUNT];
 	ILoaderProgress						*m_pProgress;
 	CThreadFastMutex					m_Mutex;
 };
@@ -318,7 +318,7 @@ CQueuedLoader::~CQueuedLoader()
 //-----------------------------------------------------------------------------
 // Computation job to build out objects
 //-----------------------------------------------------------------------------
-void CQueuedLoader::BuildResources( IResourcePreload *pLoader, ResourceList_t *pList, float *pBuildTime )
+void CQueuedLoader::BuildResources( IResourcePreload *pLoader, ResourceList_t *pList, double *pBuildTime )
 {
 	double t0 = Plat_FloatTime();
 
@@ -349,7 +349,7 @@ void CQueuedLoader::BuildResources( IResourcePreload *pLoader, ResourceList_t *p
 //-----------------------------------------------------------------------------
 // Computation job to build out material objects
 //-----------------------------------------------------------------------------
-void CQueuedLoader::BuildMaterialResources( IResourcePreload *pLoader, ResourceList_t *pList, float *pBuildTime )
+void CQueuedLoader::BuildMaterialResources( IResourcePreload *pLoader, ResourceList_t *pList, double *pBuildTime )
 {
 	double t0 = Plat_FloatTime();
 
