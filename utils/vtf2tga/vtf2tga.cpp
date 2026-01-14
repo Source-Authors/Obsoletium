@@ -48,7 +48,7 @@ SpewRetval_t VTF2TGAOutputFunc(SpewType_t spewType, char const *pMsg) {
 }
 
 [[noreturn]] void Usage() {
-  Error("Usage: vtf2tga -i <input vtf> [-o <output tga>] [-mip]\n");
+  Warning("usage: vtf2tga -i <input vtf> [-o <output tga>] [-mip]\n");
   exit(EINVAL);
 }
 
@@ -88,9 +88,10 @@ int main(int argc, char **argv) {
 
   char cwd[MAX_PATH];
   if (_getcwd(cwd, sizeof(cwd)) == nullptr) {
-    fprintf(stderr, "Unable to get the current directory: %s.\n",
-            std::generic_category().message(errno).c_str());
-    return 1;
+    const int err = errno;
+    fprintf(stderr, "unable to get the current directory: %s.\n",
+            std::generic_category().message(err).c_str());
+    return err;
   }
   V_StripTrailingSlash(cwd);
 
@@ -114,15 +115,17 @@ int main(int argc, char **argv) {
   auto [f, errc] =
       se::posix::posix_file_stream_factory::open(actual_vtf_file_name, "rb");
   if (errc) {
-    Error("Unable to open '%s' for reading: %s.\n", actual_vtf_file_name,
-          errc.message().c_str());
+    Warning("unable to open '%s' for reading: %s.\n", actual_vtf_file_name,
+            errc.message().c_str());
+    return errc.value();
   }
 
   int64 size;
   std::tie(size, errc) = f.size();
   if (errc || size > std::numeric_limits<intp>::max()) {
-    Error("Unable to get size of '%s': %s.\n", actual_vtf_file_name,
-          errc.message().c_str());
+    Warning("unable to get size of '%s': %s.\n", actual_vtf_file_name,
+            errc.message().c_str());
+    return errc.value();
   }
 
   intp correct_size = static_cast<intp>(size);
@@ -134,19 +137,22 @@ int main(int argc, char **argv) {
   std::tie(bytes_read, errc) =
       f.read(vtf_buffer.Base(), correct_size, 1, correct_size);
   if (errc) {
-    Error("Unable to read '%s': %s.\n", actual_vtf_file_name,
-          errc.message().c_str());
+    Warning("unable to read '%s': %s.\n", actual_vtf_file_name,
+            errc.message().c_str());
+    return errc.value();
   }
 
   vtf_buffer.SeekPut(CUtlBuffer::SEEK_HEAD, bytes_read);
 
   IVTFTexture *pTex = CreateVTFTexture();
   if (!pTex) {
-    Error("Error allocating .VTF for file '%s'.\n", actual_vtf_file_name);
+    Warning("error allocating .VTF for file '%s'.\n", actual_vtf_file_name);
+    return ENOMEM;
   }
 
   if (!pTex->Unserialize(vtf_buffer)) {
-    Error("Error deserializing .VTF file '%s'.\n", actual_vtf_file_name);
+    Warning("error deserializing .VTF file '%s'.\n", actual_vtf_file_name);
+    return EINVAL;
   }
 
   Msg("vtf width: %d\n", pTex->Width());
@@ -282,9 +288,10 @@ int main(int argc, char **argv) {
           if (!ImageLoader::ConvertImageFormat(src_data, src_format,  //-V1051
                                                dst_data.get(), dst_format,
                                                mip_width, mip_height, 0, 0)) {
-            Error("Error converting '%s' from '%s' to '%s'.\n",
-                  actual_vtf_file_name, ImageLoader::GetName(src_format),
-                  ImageLoader::GetName(dst_format));
+            Warning("error converting '%s' from '%s' to '%s'.\n",
+                    actual_vtf_file_name, ImageLoader::GetName(src_format),
+                    ImageLoader::GetName(dst_format));
+            return EINVAL;
           }
 
           if (dst_format != IMAGE_FORMAT_RGB323232F) {
@@ -298,9 +305,10 @@ int main(int argc, char **argv) {
               if (!ImageLoader::ConvertImageFormat(
                       tmp_data.get(), dst_format, dst_data.get(),
                       IMAGE_FORMAT_RGBA8888, mip_width, mip_height, 0, 0)) {
-                Error("Error converting '%s' from '%s' to '%s'.\n",
-                      actual_vtf_file_name, ImageLoader::GetName(dst_format),
-                      ImageLoader::GetName(IMAGE_FORMAT_RGBA8888));
+                Warning("error converting '%s' from '%s' to '%s'.\n",
+                        actual_vtf_file_name, ImageLoader::GetName(dst_format),
+                        ImageLoader::GetName(IMAGE_FORMAT_RGBA8888));
+                return EINVAL;
               }
 
               dst_format = IMAGE_FORMAT_RGBA8888;
@@ -314,9 +322,10 @@ int main(int argc, char **argv) {
               if (!ImageLoader::ConvertImageFormat(
                       tmp_data.get(), dst_format, dst_data.get(),
                       IMAGE_FORMAT_RGB888, mip_width, mip_height, 0, 0)) {
-                Error("Error converting '%s' from '%s' to '%s'.\n",
-                      actual_vtf_file_name, ImageLoader::GetName(dst_format),
-                      ImageLoader::GetName(IMAGE_FORMAT_RGB888));
+                Warning("error converting '%s' from '%s' to '%s'.\n",
+                        actual_vtf_file_name, ImageLoader::GetName(dst_format),
+                        ImageLoader::GetName(IMAGE_FORMAT_RGB888));
+                return EINVAL;
               }
 
               dst_format = IMAGE_FORMAT_RGB888;
@@ -325,14 +334,14 @@ int main(int argc, char **argv) {
             CUtlBuffer outBuffer;
             if (!TGAWriter::WriteToBuffer(dst_data.get(), outBuffer, mip_width,
                                           mip_height, dst_format, dst_format)) {
-              Error("Unable to write TGA in format '%s'.\n",
-                    ImageLoader::GetName(dst_format));
+              Warning("unable to write TGA in format '%s'.\n",
+                      ImageLoader::GetName(dst_format));
               return EIO;
             }
 
             if (!g_pFullFileSystem->WriteFile(temp_name.get(), nullptr,
                                               outBuffer)) {
-              Error("Unable to write result '%s'.\n", temp_name.get());
+              Warning("unable to write result '%s'.\n", temp_name.get());
               return EIO;
             }
           } else {
