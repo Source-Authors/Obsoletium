@@ -3622,19 +3622,19 @@ bool FixupVVDFile(const char *fileName,  const studiohdr_t *pStudioHdr, const vo
 	// skip new fixup table
 	pData_new   = AlignValue(pData_new, 4);
 	pFixupTable = (vertexFileFixup_t*)pData_new;
-	pFileHdr_new->fixupTableStart = pData_new - pStart_new;
+	pFileHdr_new->fixupTableStart = size_cast<int>(pData_new - pStart_new);
 	pData_new += numFixups*sizeof(vertexFileFixup_t);
 
 	// skip new vertex data
 	pData_new    = AlignValue(pData_new, 16);
 	pVertex_new  = (mstudiovertex_t*)pData_new;
-	pFileHdr_new->vertexDataStart = pData_new - pStart_new;
+	pFileHdr_new->vertexDataStart = size_cast<int>(pData_new - pStart_new);
 	pData_new += numVertexes*sizeof(mstudiovertex_t);
 
 	// skip new tangent data
 	pData_new    = AlignValue(pData_new, 16);
 	pTangent_new = (Vector4D*)pData_new;
-	pFileHdr_new->tangentDataStart = pData_new - pStart_new;
+	pFileHdr_new->tangentDataStart = size_cast<int>(pData_new - pStart_new);
 	pData_new += numVertexes*sizeof(Vector4D);
 
 	pVertexBase_old  = (byte*)pFileHdr_old + pFileHdr_old->vertexDataStart;
