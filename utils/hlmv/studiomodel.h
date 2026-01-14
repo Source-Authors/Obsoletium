@@ -98,6 +98,7 @@ class StudioModel
 {
 public:
 	StudioModel();
+	virtual ~StudioModel() = default;
 
 	// memory handling, uses calloc so members are zero'd out on instantiation
 	static void *operator new( size_t nSize );
