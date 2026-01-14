@@ -1230,7 +1230,8 @@ bool CToolDisplace::RayPlaneTest( PLANE *pPlane, const Vector& rayStart, const V
 	if( ( distStart > 0.0f ) && ( distEnd > 0.0f ) )
 		return false;
 
-	if( ( distStart > 0.0f ) && ( distEnd > 0.0f ) )
+	// dimhotepus: Correctly check ray behind the plane.
+	if( ( distStart < 0.0f ) && ( distEnd < 0.0f ) )
 		return false;
 
 	// calculate the parameterized "t" component along the ray
