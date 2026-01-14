@@ -158,14 +158,12 @@ void CDependencyGraph::Cleanup()
 {
 	VPROF_BUDGET( "CDependencyGraph::Cleanup", VPROF_BUDGETGROUP_TOOLS );
 
-	intp on = m_opNodes.Count();
-	for ( intp oi = 0; oi < on; ++oi )
+	for ( auto *n : m_opNodes )
 	{
-		g_OperatorNodePool.Free( m_opNodes[ oi ] );
+		g_OperatorNodePool.Free( n );
 	}
 
-	UtlHashHandle_t h = m_attrNodes.GetFirstHandle();
-	for ( ; h != m_attrNodes.InvalidHandle(); h = m_attrNodes.GetNextHandle( h ) )
+	for ( auto h = m_attrNodes.GetFirstHandle(); h != m_attrNodes.InvalidHandle(); h = m_attrNodes.GetNextHandle( h ) )
 	{
 		g_AttrNodePool.Free( m_attrNodes[ h ] );
 	}
