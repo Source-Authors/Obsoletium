@@ -131,9 +131,8 @@ void mxStatusWindow::StatusPrint( COLORREF clr, bool overwrite, const char *text
 	Plat_DebugString( text );
 
 	char fixedtext[ 512 ];
-	char *in, *out;
-	in = (char *)text;
-	out = fixedtext;
+	const char *in = text;
+	char *out = fixedtext;
 
 	int c = 0;
 	while ( *in && c < 511 )

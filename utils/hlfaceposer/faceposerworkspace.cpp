@@ -248,7 +248,7 @@ bool CWorkspaceFiles::WriteString( const char *szSubKey, const char *value )
 		szSubKey,	// value name
 		0,			// reserved
 		REG_SZ,		// type buffer
-		(LPBYTE)value,    // data buffer
+		(const LPBYTE)value,    // data buffer
 		dwSize );  // size of data buffer
 
 	if (lResult != ERROR_SUCCESS)  // Failure

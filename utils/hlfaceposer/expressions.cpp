@@ -45,13 +45,13 @@ void ChecksumFlexControllers( bool bSpew, char const *name, CRC32_t &crc, const 
 			 continue;
 		}
 
-		CRC32_ProcessBuffer( &crc, (void *)pszName, Q_strlen( pszName ) );
-		CRC32_ProcessBuffer( &crc, (void *)&s, sizeof( s ) );
-		CRC32_ProcessBuffer( &crc, (void *)&w, sizeof( w ) );
+		CRC32_ProcessBuffer( &crc, pszName, Q_strlen( pszName ) );
+		CRC32_ProcessBuffer( &crc, &s, sizeof( s ) );
+		CRC32_ProcessBuffer( &crc, &w, sizeof( w ) );
 
 		if ( bSpew )
 		{
-			Msg( "[%d] %s == %f %f\n", controllerIndex, pszName, s, w );
+			Msg( "[%zd] %s == %f %f\n", controllerIndex, pszName, s, w );
 		}
 	}
 

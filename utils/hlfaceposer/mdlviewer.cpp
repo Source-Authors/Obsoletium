@@ -1848,7 +1848,7 @@ int MDLViewer::handleEvent (mxEvent *event)
 
 			case IDC_OPTIONS_MAKESCREENSHOT:
 				{
-					char *ptr = (char *) mxGetSaveFileName (this, "", "*.tga");
+					const char *ptr = mxGetSaveFileName (this, "", "*.tga");
 					if (ptr)
 					{
 						char fn[ 512 ];

@@ -209,7 +209,8 @@ void MakeFileWriteable( const char *filename )
 	char *pFullPath;
 	if ( !Q_IsAbsolutePath( filename ) )
 	{
-		pFullPath = (char*)filesystem->RelativePathToFullPath_safe( filename, NULL, pFullPathBuf );
+		filesystem->RelativePathToFullPath_safe( filename, NULL, pFullPathBuf );
+		pFullPath = pFullPathBuf;
 	}
 	else
 	{
@@ -236,7 +237,8 @@ bool IsFileWriteable( const char *filename )
 	char *pFullPath;
 	if ( !Q_IsAbsolutePath( filename ) )
 	{
-		pFullPath = (char*)filesystem->RelativePathToFullPath_safe( filename, NULL, pFullPathBuf );
+		filesystem->RelativePathToFullPath_safe( filename, NULL, pFullPathBuf );
+		pFullPath = pFullPathBuf;
 	}
 	else
 	{
@@ -707,7 +709,7 @@ static bool charsmatch( char c1, char c2 )
 }
 
 
-char *Q_stristr_slash( char const *pStr, char const *pSearch )
+const char *Q_stristr_slash( char const *pStr, char const *pSearch )
 {
 	AssertValidStringPtr(pStr);
 	AssertValidStringPtr(pSearch);
@@ -741,7 +743,7 @@ char *Q_stristr_slash( char const *pStr, char const *pSearch )
 
 			// Found a match!
 			if (*pTest == 0)
-				return (char *)pLetter;
+				return pLetter;
 		}
 
 		++pLetter;

@@ -279,11 +279,11 @@ static bool ValidatePhonemeString( bool allowmultiple, char const *input, char (
 	// Go one by one
 	int count = 1;
 	char phoneme[ 128 ];
-	char *in, *out;
+	char *out;
 
 	*output = 0;
 
-	in = (char *)input;
+	const char *in = input;
 	do
 	{
 		out = phoneme;

@@ -3746,7 +3746,7 @@ void PhonemeEditor::SentenceFromString( CSentence& sentence, char const *str )
 	}
 
 	char word[ 256 ];
-	unsigned char const *in = (unsigned char *)str;
+	unsigned char const *in = (const unsigned char *)str;
 	char *out = word;
 	
 	while ( *in )

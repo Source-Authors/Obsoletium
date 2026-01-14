@@ -92,12 +92,12 @@ CRC32_t IFaceposerModels::CFacePoserModel::GetBitmapCRC( intp sequence )
 
 	// For sequences, we'll checsum a bit of data
 
-	CRC32_ProcessBuffer( &crc, (void *)seqdesc.pszLabel(), Q_strlen( seqdesc.pszLabel() ) );
-	CRC32_ProcessBuffer( &crc, (void *)seqdesc.pszActivityName(), Q_strlen( seqdesc.pszActivityName() ) );
-	CRC32_ProcessBuffer( &crc, (void *)&seqdesc.flags, sizeof( seqdesc.flags ) );
+	CRC32_ProcessBuffer( &crc, seqdesc.pszLabel(), Q_strlen( seqdesc.pszLabel() ) );
+	CRC32_ProcessBuffer( &crc, seqdesc.pszActivityName(), Q_strlen( seqdesc.pszActivityName() ) );
+	CRC32_ProcessBuffer( &crc, &seqdesc.flags, sizeof( seqdesc.flags ) );
 	//CRC32_ProcessBuffer( &crc, (void *)&seqdesc.numevents, sizeof( seqdesc.numevents ) );
-	CRC32_ProcessBuffer( &crc, (void *)&seqdesc.numblends, sizeof( seqdesc.numblends ) );
-	CRC32_ProcessBuffer( &crc, (void *)seqdesc.groupsize, sizeof( seqdesc.groupsize ) );
+	CRC32_ProcessBuffer( &crc, &seqdesc.numblends, sizeof( seqdesc.numblends ) );
+	CRC32_ProcessBuffer( &crc, seqdesc.groupsize, sizeof( seqdesc.groupsize ) );
 
 	KeyValuesAD seqKeyValues("");
 	if ( seqKeyValues->LoadFromBuffer( m_pModel->GetFileName( ), m_pModel->GetKeyValueText( sequence ) ) )
@@ -105,7 +105,7 @@ CRC32_t IFaceposerModels::CFacePoserModel::GetBitmapCRC( intp sequence )
 		// Yuck, but I need it in a contiguous block of memory... oh well...
 		CUtlBuffer buf;
 		seqKeyValues->RecursiveSaveToFile( buf, 0 );
-		CRC32_ProcessBuffer( &crc, ( void * )buf.Base(), buf.TellPut() );
+		CRC32_ProcessBuffer( &crc, buf.Base(), buf.TellPut() );
 	}
 
 	CRC32_Final( &crc );

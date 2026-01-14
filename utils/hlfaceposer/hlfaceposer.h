@@ -68,7 +68,7 @@ char const *FacePoser_TranslateSoundNameGender( char const *soundname, gender_t 
 extern class IFileSystem *filesystem;
 extern class ISceneTokenProcessor *tokenprocessor;
 
-char *Q_stristr_slash( char const *pStr, char const *pSearch );
+const char *Q_stristr_slash( char const *pStr, char const *pSearch );
 
 void				SetCloseCaptionLanguageId( int id, bool force = false ); // from sentence.h enum
 int					GetCloseCaptionLanguageId();
