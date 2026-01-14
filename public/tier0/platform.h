@@ -968,13 +968,13 @@ template <typename Tdst, typename Tsrc>
       "Okay in my defense there weren't any types larger than 64-bits when "
       "this code was written.");
 
-  if constexpr (sizeof(Tdst) < sizeof(Tsrc)) {
-    Tdst cmpValDst = (Tdst)val;
+  Tdst dst = (Tdst)val;
 
+  if constexpr (sizeof(Tdst) < sizeof(Tsrc)) {
     // If this fails, the source value didn't actually fit in the destination
     // value--you'll need to change the return type's size to match the source
     // type in the calling code.
-    if (val != (Tsrc)cmpValDst) {
+    if (val != (Tsrc)dst) {
       // Can't use assert here, and if this happens when running on a machine
       // internally we should crash in preference to missing the problem ( so
       // not DebuggerBreakIfDebugging() ).
@@ -982,7 +982,7 @@ template <typename Tdst, typename Tsrc>
     }
   }
 
-  return (Tdst)val;
+  return dst;
 }
 
 //-----------------------------------------------------------------------------
