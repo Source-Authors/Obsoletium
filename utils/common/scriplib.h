@@ -42,8 +42,18 @@ extern	qboolean	endofscript;
 void LoadScriptFile (char *filename, ScriptPathMode_t pathMode=SCRIPT_USE_ABSOLUTE_PATH);
 void ParseFromMemory (char *buffer, intp size);
 
-qboolean GetToken (qboolean crossline);
-qboolean GetExprToken (qboolean crossline);
+qboolean GetToken (qboolean crossline, char (&out)[MAXTOKEN]);
+qboolean GetToken (qboolean crossline)
+{
+	return GetToken( crossline, token );
+}
+
+qboolean GetExprToken (qboolean crossline, char (&out)[MAXTOKEN]);
+qboolean GetExprToken (qboolean crossline)
+{
+	return GetToken( crossline, token );
+}
+
 void UnGetToken (void);
 qboolean TokenAvailable (void);
 qboolean GetTokenizerStatus( char **pFilename, int *pLine );

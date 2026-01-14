@@ -127,7 +127,7 @@ void LoadScriptFile (char *filename, ScriptPathMode_t pathMode)
 script_t	*macrolist[256];
 int nummacros;
 
-void DefineMacro( char *macroname )
+static void DefineMacro( char *macroname, char (&out)[MAXTOKEN] )
 {
 	script_t	*pmacro = (script_t *)malloc( sizeof( script_t ) );
 	if (!pmacro) Error("Out of memory in DefineMacro for %s", macroname);
@@ -141,9 +141,9 @@ void DefineMacro( char *macroname )
 
 	while (TokenAvailable( ))
 	{
-		GetToken( false );
+		GetToken( false, out );
 
-		if (token[0] == '\\' && token[1] == '\\')
+		if (out[0] == '\\' && out[1] == '\\')
 		{
 			break;
 		}
@@ -151,8 +151,8 @@ void DefineMacro( char *macroname )
 
 		pmacro->macroparam[pmacro->nummacroparams++] = mp;
 
-		V_strncpy( mp, token, ssize(pmacro->macrobuffer) );
-		mp += strlen( token ) + 1;
+		V_strncpy( mp, out, ssize(pmacro->macrobuffer) );
+		mp += strlen( out ) + 1;
 
 		if (mp >= pmacro->macrobuffer + sizeof( pmacro->macrobuffer ))
 			Error("Macro buffer overflow\n");
@@ -198,15 +198,15 @@ void DefineMacro( char *macroname )
 }
 
 
-void DefineVariable( char *variablename )
+static void DefineVariable( char *variablename, char (&out)[MAXTOKEN] )
 {
 	variable_t v;
 
 	v.param = strdup( variablename );
 
-	GetToken( false );
+	GetToken( false, out );
 	
-	v.value = strdup( token );
+	v.value = strdup( out );
 
 	g_definevariable.AddToTail( v );
 }
@@ -217,7 +217,7 @@ void DefineVariable( char *variablename )
 ==============
 ==============
 */
-bool AddMacroToStack( char *macroname )
+static bool AddMacroToStack( char *macroname, char (&out)[MAXTOKEN] )
 {
 	// lookup macro
 	if (macroname[0] != '$')
@@ -250,13 +250,13 @@ bool AddMacroToStack( char *macroname )
 
 	for (i = 0; i < pnext->nummacroparams; i++)
 	{
-		GetToken(false);
+		GetToken(false, out);
 
-		strcpy( cp, token );
+		strcpy( cp, out );
 		pnext->macroparam[i] = pmacro->macroparam[i];
 		pnext->macrovalue[i] = cp;
 
-		cp += strlen( token ) + 1;
+		cp += strlen( out ) + 1;
 
 		if (cp >= pnext->macrobuffer + sizeof( pnext->macrobuffer ))
 			Error("Macro buffer overflow\n");
@@ -279,7 +279,7 @@ bool AddMacroToStack( char *macroname )
 
 
 
-bool ExpandMacroToken( char *&token_p )
+static bool ExpandMacroToken( char *&token_p, char (&out)[MAXTOKEN] )
 {
 	if ( script->nummacroparams && *script->script_p == '$' )
 	{
@@ -321,7 +321,7 @@ bool ExpandMacroToken( char *&token_p )
 		if (script->script_p >= script->end_p)
 			Error ("Macro expand overflow\n");
 
-		if (token_p >= &token[MAXTOKEN])
+		if (token_p >= &out[MAXTOKEN])
 			Error ("Token too large on line %i\n",scriptline);
 
 		return true;
@@ -336,7 +336,7 @@ bool ExpandMacroToken( char *&token_p )
 ==============
 */
 // FIXME: this should create a new script context so the individual tokens in the variable can be parsed
-bool ExpandVariableToken( char *&token_p )
+static bool ExpandVariableToken( char *&token_p, char (&out)[MAXTOKEN] )
 {
 	if ( *script->script_p == '$' )
 	{
@@ -380,7 +380,7 @@ bool ExpandVariableToken( char *&token_p )
 		if (script->script_p >= script->end_p)
 			Error ("Macro expand overflow\n");
 
-		if (token_p >= &token[MAXTOKEN])
+		if (token_p >= &out[MAXTOKEN])
 			Error ("Token too large on line %i\n",scriptline);
 
 		return true;
@@ -485,7 +485,7 @@ void UnGetToken (void)
 }
 
 
-qboolean EndOfScript (qboolean crossline)
+qboolean EndOfScript (qboolean crossline, char (&out)[MAXTOKEN])
 {
 	if (!crossline)
 		Error ("Line %i is incomplete\n",scriptline);
@@ -506,7 +506,7 @@ qboolean EndOfScript (qboolean crossline)
 	script--;
 	scriptline = script->line;
 	// printf ("returning to %s\n", script->filename);
-	return GetToken (crossline);
+	return GetToken (crossline, out);
 }
 
 
@@ -579,7 +579,7 @@ CUtlString SetSingleCharTokenList( const char *pszSingleCharTokenList )
 GetToken
 ==============
 */
-qboolean GetToken (qboolean crossline)
+qboolean GetToken (qboolean crossline, char (&out)[MAXTOKEN])
 {
 	char    *token_p;
 
@@ -593,18 +593,18 @@ qboolean GetToken (qboolean crossline)
 
 	if (script->script_p >= script->end_p)
 	{
-		return EndOfScript (crossline);
+		return EndOfScript (crossline, out);
 	}
 
 	tokenready = false;
 
 	// skip space, ctrl chars
 skipspace:
-	while (*script->script_p <= 32)
+	while (*script->script_p <= ' ')
 	{
 		if (script->script_p >= script->end_p)
 		{
-			return EndOfScript (crossline);
+			return EndOfScript (crossline, out);
 		}
 		if (*(script->script_p++) == '\n')
 		{
@@ -618,7 +618,7 @@ skipspace:
 
 	if (script->script_p >= script->end_p)
 	{
-		return EndOfScript (crossline);
+		return EndOfScript (crossline, out);
 	}
 
 	// strip single line comments
@@ -631,7 +631,7 @@ skipspace:
 		{
 			if (script->script_p >= script->end_p)
 			{
-				return EndOfScript (crossline);
+				return EndOfScript (crossline, out);
 			}
 		}
 		scriptline = ++script->line;
@@ -648,7 +648,7 @@ skipspace:
 			{
 				if (script->script_p >= script->end_p)
 				{
-					return EndOfScript (crossline);
+					return EndOfScript (crossline, out);
 				}
 
 				scriptline = ++script->line;
@@ -659,7 +659,7 @@ skipspace:
 	}
 
 	// copy token to buffer
-	token_p = token;
+	token_p = out;
 
 	if (*script->script_p == '"')
 	{
@@ -670,7 +670,7 @@ skipspace:
 			*token_p++ = *script->script_p++;
 			if (script->script_p == script->end_p)
 				break;
-			if (token_p == &token[MAXTOKEN])
+			if (token_p == &out[MAXTOKEN])
 				Error ("Token too large on line %i\n",scriptline);
 		}
 		script->script_p++;
@@ -682,14 +682,14 @@ skipspace:
 	else	// regular token
 	while ( *script->script_p > 32 && *script->script_p != ';')
 	{
-		if ( !ExpandMacroToken( token_p ) )
+		if ( !ExpandMacroToken( token_p, out ) )
 		{
-			if ( !ExpandVariableToken( token_p ) )
+			if ( !ExpandVariableToken( token_p, out ) )
 			{
 				*token_p++ = *script->script_p++;
 				if (script->script_p == script->end_p)
 					break;
-				if (token_p == &token[MAXTOKEN])
+				if (token_p == &out[MAXTOKEN])
 					Error ("Token too large on line %i\n",scriptline);
 
 			}
@@ -700,15 +700,15 @@ skipspace:
 	*token_p = 0;
 
 	// check for other commands
-	if ( !stricmp( token, "$include" ) )
+	if ( !stricmp( out, "$include" ) )
 	{
-		GetToken( false );
+		GetToken( false, out );
 
 		bool bFallbackToToken = true;
 
 		CUtlVector< CUtlString > expandedPathList;
 
-		if ( CmdLib_ExpandWithBasePaths( expandedPathList, token ) > 0 )
+		if ( CmdLib_ExpandWithBasePaths( expandedPathList, out ) > 0 )
 		{
 			for ( intp i = 0; i < expandedPathList.Count(); ++i )
 			{
@@ -732,26 +732,26 @@ skipspace:
 
 		if ( bFallbackToToken )
 		{
-			AddScriptToStack( token );
+			AddScriptToStack( out );
 		}
 
-		return GetToken( crossline );
+		return GetToken( crossline, out );
 	}
-	else if (!stricmp (token, "$definemacro"))
+	else if (!stricmp (out, "$definemacro"))
 	{
-		GetToken (false);
-		DefineMacro(token);
-		return GetToken (crossline);
+		GetToken (false, out);
+		DefineMacro(out, out);
+		return GetToken( crossline, out );
 	}
-	else if (!stricmp (token, "$definevariable"))
+	else if (!stricmp (out, "$definevariable"))
 	{
-		GetToken (false);
-		DefineVariable(token);
-		return GetToken (crossline);
+		GetToken (false, out);
+		DefineVariable(out, out);
+		return GetToken (crossline, out);
 	}
-	else if (AddMacroToStack( token ))
+	else if (AddMacroToStack( out, out ))
 	{
-		return GetToken (crossline);
+		return GetToken (crossline, out);
 	}
 
 	return true;
@@ -763,7 +763,7 @@ skipspace:
 GetExprToken - use C mathematical operator parsing rules to split tokens instead of whitespace
 ==============
 */
-qboolean GetExprToken (qboolean crossline)
+qboolean GetExprToken (qboolean crossline, char (&out)[MAXTOKEN])
 {
 	char    *token_p;
 
@@ -774,7 +774,7 @@ qboolean GetExprToken (qboolean crossline)
 	}
 
 	if (script->script_p >= script->end_p)
-		return EndOfScript (crossline);
+		return EndOfScript (crossline, out);
 
 	tokenready = false;
 
@@ -785,7 +785,7 @@ skipspace:
 	while (*script->script_p <= 32)
 	{
 		if (script->script_p >= script->end_p)
-			return EndOfScript (crossline);
+			return EndOfScript (crossline, out);
 		if (*script->script_p++ == '\n')
 		{
 			if (!crossline)
@@ -795,7 +795,7 @@ skipspace:
 	}
 
 	if (script->script_p >= script->end_p)
-		return EndOfScript (crossline);
+		return EndOfScript (crossline, out);
 
 	if (*script->script_p == ';' || *script->script_p == '#' ||		 // semicolon and # is comment field
 		(*script->script_p == '/' && *((script->script_p)+1) == '/')) // also make // a comment field
@@ -804,14 +804,14 @@ skipspace:
 			Error ("Line %i is incomplete\n",scriptline);
 		while (*script->script_p++ != '\n')
 			if (script->script_p >= script->end_p)
-				return EndOfScript (crossline);
+				return EndOfScript (crossline, out);
 		goto skipspace;
 	}
 
 //
 // copy token
 //
-	token_p = token;
+	token_p = out;
 
 	if (*script->script_p == '"')
 	{
@@ -822,7 +822,7 @@ skipspace:
 			*token_p++ = *script->script_p++;
 			if (script->script_p == script->end_p)
 				break;
-			if (token_p == &token[MAXTOKEN])
+			if (token_p == &out[MAXTOKEN])
 				Error ("Token too large on line %i\n",scriptline);
 		}
 		script->script_p++;
@@ -837,7 +837,7 @@ skipspace:
 				*token_p++ = *script->script_p++;
 				if (script->script_p == script->end_p)
 					break;
-				if (token_p == &token[MAXTOKEN])
+				if (token_p == &out[MAXTOKEN])
 					Error ("Token too large on line %i\n",scriptline);
 			}
 		}
@@ -849,7 +849,7 @@ skipspace:
 				*token_p++ = *script->script_p++;
 				if (script->script_p == script->end_p)
 					break;
-				if (token_p == &token[MAXTOKEN])
+				if (token_p == &out[MAXTOKEN])
 					Error ("Token too large on line %i\n",scriptline);
 			}
 		}
@@ -862,11 +862,11 @@ skipspace:
 
 	*token_p = 0;
 
-	if (!stricmp (token, "$include"))
+	if (!stricmp (out, "$include"))
 	{
-		GetToken (false);
-		AddScriptToStack (token);
-		return GetToken (crossline);
+		GetToken (false, out);
+		AddScriptToStack (out);
+		return GetToken (crossline, out);
 	}
 
 	return true;
