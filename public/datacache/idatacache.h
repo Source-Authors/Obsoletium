@@ -504,7 +504,7 @@ public:
 		m_pCache->UnlockMutex();
 	}
 
-	bool HandleCacheNotification( const DataCacheNotification_t &notification )
+	bool HandleCacheNotification( const DataCacheNotification_t &notification ) override
 	{
 		switch ( notification.type )
 		{
