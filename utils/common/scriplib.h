@@ -43,13 +43,13 @@ void LoadScriptFile (char *filename, ScriptPathMode_t pathMode=SCRIPT_USE_ABSOLU
 void ParseFromMemory (char *buffer, intp size);
 
 qboolean GetToken (qboolean crossline, char (&out)[MAXTOKEN]);
-qboolean GetToken (qboolean crossline)
+inline qboolean GetToken (qboolean crossline)
 {
 	return GetToken( crossline, token );
 }
 
 qboolean GetExprToken (qboolean crossline, char (&out)[MAXTOKEN]);
-qboolean GetExprToken (qboolean crossline)
+inline qboolean GetExprToken (qboolean crossline)
 {
 	return GetToken( crossline, token );
 }
