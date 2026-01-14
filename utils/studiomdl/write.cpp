@@ -1940,7 +1940,7 @@ static void WriteVertices( studiohdr_t *phdr )
 
 	if (!g_quiet)
 	{
-		printf( "total      %7d bytes\n", pData - pStart );
+		printf( "total      %7zd bytes\n", pData - pStart );
 	}
 
 	// fileHeader->length = pData - pStart;
