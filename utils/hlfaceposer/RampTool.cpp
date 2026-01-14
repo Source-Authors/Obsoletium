@@ -1401,10 +1401,9 @@ void RampTool::DrawTimingTags( CChoreoWidgetDrawHelper& drawHelper, RECT& rc )
 		if ( !e->HasEndTime() )
 			continue;
 
-		if ( ( e->GetEndTime() - e->GetStartTime() ) < starttime )
-			continue;
-
-		if ( ( e->GetStartTime() - e->GetStartTime() ) > endtime )
+		// dimhotepus: Correctly exit when time delta > endtime.
+		const float timeDelta = e->GetEndTime() - e->GetStartTime();
+		if ( timeDelta < starttime || timeDelta > endtime )
 			continue;
 
 		if ( e->GetNumRelativeTags() > 0 )
