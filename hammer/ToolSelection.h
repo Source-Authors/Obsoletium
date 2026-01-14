@@ -86,8 +86,8 @@ protected:
 	void TransformSelection();
 	void TransformLogicalSelection( const Vector2D &vecTranslation );
 
-	void FinishTranslation(bool bSave, bool bClone );
-	void StartTranslation(CMapView *pView, const Vector2D &vPoint, const Vector &vHandleOrigin );
+	void FinishTranslation( bool bSave, bool bClone );
+	void StartTranslation( CMapView *pView, const Vector2D &vPoint, const Vector &vHandleOrigin );
 	bool StartBoxSelection( CMapView *pView, const Vector2D &vPoint, const Vector &vStart);
 	
 	void UpdateHandleState();
