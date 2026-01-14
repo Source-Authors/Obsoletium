@@ -91,7 +91,8 @@ private:
 	void						GetCloseCaptionLanguageRect( RECT& rc, bool previous );
 	void						GetCloseCaptions( CUtlVector< CloseCaptionInfo >& selectors );
 
-	intp						GetVerticalStackingCount( bool dolayout, RECT* rc );
+	// dimhotepus: Drop bool dolayout as rc is enough.
+	intp						GetVerticalStackingCount( RECT* rc );
 	void						LayoutEventInRow( CChoreoEventWidget *event, intp row, RECT& rc );
 
 	void						RenderCloseCaptionInfo( CChoreoWidgetDrawHelper& drawHelper, RECT& rcEventArea );

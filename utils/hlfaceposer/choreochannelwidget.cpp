@@ -150,7 +150,7 @@ static bool EventCollidesWithRows( CUtlLinkedList< CChoreoEventWidget *, int >& 
 	return false;
 }
 
-intp CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
+intp CChoreoChannelWidget::GetVerticalStackingCount( RECT *rc )
 {
 	CUtlRBTree< CChoreoEventWidget * >  sorted( 0, 0, EventStartTimeLessFunc );
 
@@ -174,7 +174,7 @@ intp CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
 			CUtlLinkedList< CChoreoEventWidget *, int >& list = rows[ 0 ];
 			list.AddToHead( event );
 
-			if ( layout )
+			if ( rc )
 			{
 				LayoutEventInRow( event, 0, *rc );
 			}
@@ -194,7 +194,7 @@ intp CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
 				// Update row event list
 				list.AddToHead( event );
 				addrow = false;
-				if ( layout )
+				if ( rc )
 				{
 					LayoutEventInRow( event, j, *rc );
 				}
@@ -208,7 +208,7 @@ intp CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
 			intp idx = rows.AddToTail();
 			CUtlLinkedList< CChoreoEventWidget *, int >& list = rows[ idx ];
 			list.AddToHead( event );
-			if ( layout )
+			if ( rc )
 			{
 				LayoutEventInRow( event, rows.Count() - 1, *rc );
 			}
@@ -221,7 +221,7 @@ intp CChoreoChannelWidget::GetVerticalStackingCount( bool layout, RECT *rc )
 int	CChoreoChannelWidget::GetItemHeight( void )
 {
 	int itemHeight = BaseClass::GetItemHeight();
-	intp stackCount = GetVerticalStackingCount( false, NULL );
+	intp stackCount = GetVerticalStackingCount( NULL );
 
 	CheckHasAudio();
 
@@ -263,7 +263,7 @@ void CChoreoChannelWidget::Layout( RECT& rc )
 {
 	setBounds( rc.left, rc.top, rc.right - rc.left, rc.bottom - rc.top );
 
-	GetVerticalStackingCount( true, &rc );
+	GetVerticalStackingCount( &rc );
 	CheckHasAudio();
 
 	/*
