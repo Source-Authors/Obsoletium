@@ -1608,6 +1608,8 @@ void CSSFace::Init(void)
 
 	texture.scale[0] = g_pGameConfig->GetDefaultTextureScale();
 	texture.scale[1] = g_pGameConfig->GetDefaultTextureScale();
+
+	id = 0;
 }
 
 //-----------------------------------------------------------------------------
@@ -1633,6 +1635,7 @@ CSSFace::~CSSFace(void)
 CSSEdge::CSSEdge(void)
 {
 	Faces[0] = Faces[1] = 0;
+	id = 0;
 }
 
 
@@ -1657,7 +1660,7 @@ void CSSEdge::GetCenterPoint(Vector& Point)
 }
 
 
-CSSVertex::CSSVertex(void)
+CSSVertex::CSSVertex(void) : id(0)
 {
 }
 
