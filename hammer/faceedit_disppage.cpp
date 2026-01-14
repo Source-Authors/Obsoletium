@@ -71,6 +71,7 @@ CFaceEditDispPage::CFaceEditDispPage() : CPropertyPage( IDD )
 
 	m_bForceShowWalkable = false;
 	m_bForceShowBuildable = false;
+	m_bIsEditable = false;
 }
 
 //-----------------------------------------------------------------------------
