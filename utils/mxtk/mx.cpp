@@ -940,7 +940,8 @@ mx::init(int argc, char **argv)
 	if (!RegisterClass (&wc))
 		return 0;
 
-	InitCommonControls ();
+	// dimhotepus: Not needed as we use manifests.
+	// InitCommonControls ();
 
 	g_widgetList = new mxLinkedList ();
 
