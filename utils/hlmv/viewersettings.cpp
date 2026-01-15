@@ -171,7 +171,7 @@ bool RegWriteVector( HKEY hKey, const char *szSubKey, Vector& value )
 	char szBuff[128];       // Temp. buffer
 
 	V_sprintf_safe( szBuff, "(%f %f %f)", value[0], value[1], value[2] );
-	DWORD dwSize = strlen( szBuff );
+	DWORD dwSize = size_cast<DWORD>( strlen( szBuff ) );
 
 	LONG lResult = RegSetValueEx(
 		hKey,		// handle to key
@@ -200,7 +200,7 @@ bool RegWriteColor( HKEY hKey, const char *szSubKey, float value[4] )
 	char szBuff[128];       // Temp. buffer
 	V_sprintf_safe( szBuff, "(%f %f %f %f)", value[0], value[1], value[2], value[3] );
 
-	DWORD dwSize = strlen( szBuff );
+	DWORD dwSize = size_cast<DWORD>( strlen( szBuff ) );
 
 	LONG lResult = RegSetValueEx(
 		hKey,		// handle to key
@@ -316,7 +316,7 @@ bool RegWriteFloat( HKEY hKey, const char *szSubKey, float value )
 	char szBuff[128];       // Temp. buffer
 
 	V_sprintf_safe( szBuff, "%f", value );
-	DWORD dwSize = strlen( szBuff );
+	DWORD dwSize = size_cast<DWORD>( strlen( szBuff ) );
 
 	LONG lResult = RegSetValueEx(
 		hKey,		// handle to key
@@ -358,7 +358,7 @@ bool RegReadString( HKEY hKey, const char *szSubKey, char *string, int size )
 
 bool RegWriteString( HKEY hKey, const char *szSubKey, const char *string )
 {
-	DWORD dwSize = strlen( string );
+	DWORD dwSize = size_cast<DWORD>( strlen( string ) );
 
 	LONG lResult = RegSetValueEx(
 		hKey,		// handle to key
@@ -438,6 +438,8 @@ bool LoadViewerSettingsInt( char const *keyname, int *value )
 	LONG lResult = RegViewerSettingsKey( "hlfaceposer", &hModelKey, &dwDisposition);
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
+	
+	RunCodeAtScopeExit( RegCloseKey(hModelKey) );
 
 	// First time, just set to Valve default
 	if (dwDisposition == REG_CREATED_NEW_KEY)
@@ -456,9 +458,10 @@ bool SaveViewerSettingsInt ( const char *keyname, int value )
 	HKEY hModelKey;
 
 	LONG lResult = RegViewerSettingsKey( "hlfaceposer", &hModelKey, &dwDisposition);
-
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
+
+	RunCodeAtScopeExit( RegCloseKey(hModelKey) );
 
 	RegWriteInt( hModelKey, keyname, value );
 	return true;
@@ -476,6 +479,8 @@ bool LoadViewerSettings (const char *filename, StudioModel *pModel )
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
 
+	RunCodeAtScopeExit( RegCloseKey(hModelKey) );
+
 	// First time, just set to Valve default
 	if (dwDisposition == REG_CREATED_NEW_KEY)
 	{
@@ -490,7 +495,7 @@ bool LoadViewerSettings (const char *filename, StudioModel *pModel )
 	RegReadColor( hModelKey, "aColor", g_viewerSettings.aColor );
 	RegReadQAngle( hModelKey, "lightrot", g_viewerSettings.lightrot );
 
-	int iTemp;
+	intp iTemp;
 	float flTemp;
 	char szTemp[256];
 
@@ -565,6 +570,8 @@ bool LoadViewerRootSettings( void )
 	LONG lResult = RegViewerRootKey( &hRootKey, &dwDisposition);
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
+
+	RunCodeAtScopeExit( RegCloseKey(hRootKey) );
 
 	RegReadInt( hRootKey, "renderxpos", &g_viewerSettings.xpos );
 	RegReadInt( hRootKey, "renderypos", &g_viewerSettings.ypos );
@@ -647,6 +654,8 @@ bool SaveViewerRootSettings( void )
 	LONG lResult = RegViewerRootKey( &hRootKey, &dwDisposition);
 	if (lResult != ERROR_SUCCESS)  // Failure
 		return false;
+
+	RunCodeAtScopeExit( RegCloseKey(hRootKey) );
 
 	RegWriteInt( hRootKey, "renderxpos", g_viewerSettings.xpos );
 	RegWriteInt( hRootKey, "renderypos", g_viewerSettings.ypos );
