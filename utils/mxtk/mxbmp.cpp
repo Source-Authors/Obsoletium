@@ -30,7 +30,7 @@ mxBmpRead (const char *filename)
 	mxBitmapRGBQuad rgrgbPalette[256];
 	int cbBmpBits;
 	byte *pbBmpBits;
-	byte *pb, *pbPal = 0;
+	byte *pb = 0;
 	int cbPalBytes;
 	int biTrueWidth;
 	mxImage *image = 0;
@@ -112,14 +112,12 @@ mxBmpRead (const char *filename)
 	pb = (byte *) malloc (cbBmpBits * sizeof (byte));
 	if (pb == 0)
 	{
-		free (pbPal);
 		goto GetOut;
 	}
 
 	if (fread (pb, cbBmpBits, 1/*count*/, pfile) != 1)
 	{
 		free (pb);
-		free (pbPal);
 		goto GetOut;
 	}
 /*
@@ -127,7 +125,6 @@ mxBmpRead (const char *filename)
 	if (pbBmpBits == 0)
 	{
 		free (pb);
-		free (pbPal);
 		goto GetOut;
 	}
 */
