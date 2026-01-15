@@ -57,7 +57,7 @@ mxPcxRead (const char *filename)
 		return 0;
 	}
 
-    if (fread ((byte *) image->palette, sizeof (byte), 768, file) == 0)
+    if (fread ((byte *) image->palette, sizeof (byte), 768, file) == 0) //-V124
 	{
 		delete image;
         fclose (file);
