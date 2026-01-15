@@ -127,7 +127,7 @@ void SetupModelFlexcontrollerLinks( StudioModel *model )
 	for (LocalFlexController_t i = LocalFlexController_t(0); i < hdr->numflexcontrollers(); i++)
 	{
 		auto j = AddGlobalFlexController( model, hdr->pFlexcontroller( i )->pszName() );
-		hdr->pFlexcontroller( i )->localToGlobal = j;
+		hdr->pFlexcontroller( i )->localToGlobal = size_cast<int>( j );
 		model->SetFlexController( i, 0.0f );
 	}
 }
