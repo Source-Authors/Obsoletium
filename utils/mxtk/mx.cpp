@@ -202,7 +202,7 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 			UINT uFile = 0;
 			HDROP hDrop = (HDROP)wParam;
 
-			uFile = DragQueryFile( hDrop, 0xFFFFFFFF, NULL, NULL );
+			uFile = DragQueryFile( hDrop, 0xFFFFFFFF, NULL, NULL ); //-V112
 			for ( UINT i=0; i<uFile; i++ )
 			{
 				if ( DragQueryFile( hDrop, i, lpszFile, MAX_PATH ) )
@@ -323,7 +323,7 @@ static LRESULT CALLBACK WndProc (HWND hwnd, UINT uMessage, WPARAM wParam, LPARAM
 
 				RECT rc;
 				HTREEITEM hItem = TreeView_GetSelection (nmhdr->hwndFrom);
-				TreeView_GetItemRect (nmhdr->hwndFrom, hItem, &rc, TRUE);
+				TreeView_GetItemRect (nmhdr->hwndFrom, hItem, &rc, TRUE); //-V1032
 				event.x = (int) rc.left;
 				event.y = (int) rc.bottom;
 				RecursiveHandleEvent( window, &event );
