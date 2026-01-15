@@ -39,8 +39,8 @@ public:
 	// IMaterialSystem *Init( const char *szGamedir, const char *szMaterialSystem, const char *szShader, const char *szProxy );
 
 	// MANIPULATORS
-	virtual int handleEvent (mxEvent *event);
-	virtual void redraw ();
+	int handleEvent (mxEvent *event) override;
+	void redraw () override;
 	virtual void draw ();
 
 	int makeCurrent ();
