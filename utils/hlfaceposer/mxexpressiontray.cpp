@@ -329,7 +329,7 @@ int mxExpressionTray::ComputePixelsNeeded( void )
 	// At least one
 	colsperrow = max( 1, colsperrow );
 
-	int rowsneeded = ( ( active->GetNumExpressions() + colsperrow - 1 ) / colsperrow  );
+	intp rowsneeded = ( ( active->GetNumExpressions() + colsperrow - 1 ) / colsperrow  );
 	return rowsneeded * ( m_nSnapshotHeight + m_nGap ) + m_nGap + TOP_GAP + GetCaptionHeight();
 }
 
@@ -534,7 +534,7 @@ void mxExpressionTray::redraw()
 			updateSelection = true;
 		}
 
-		int selected = active->GetSelectedExpression();
+		intp selected = active->GetSelectedExpression();
 
 		int rcx, rcy, rcw, rch;
 
