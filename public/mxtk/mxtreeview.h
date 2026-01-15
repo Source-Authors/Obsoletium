@@ -26,11 +26,7 @@ class mxWindow;
 
 typedef void *mxTreeViewItem;
 
-#if defined(_WIN64)
-typedef __int64 LONG_PTR, *PLONG_PTR;
-#else
-typedef _W64 long LONG_PTR, *PLONG_PTR;
-#endif
+#include <basetsd.h>
 
 typedef int (__stdcall *TreeSortFunc)(LONG_PTR lParam1, LONG_PTR lParam2, LONG_PTR lParamSort);
 
