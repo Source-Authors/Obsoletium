@@ -70,6 +70,9 @@ public:
 			if (!palette)
 			{
 				delete[] (byte*)data;
+				width = 0;
+				height = 0;
+				bpp = 0;
 				return false;
 			}
 		}
