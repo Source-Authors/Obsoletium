@@ -28,7 +28,7 @@ bool
 mx_setcwd (const char *path)
 {
 #ifdef WIN32
-	return (SetCurrentDirectory (path) == TRUE);
+	return (SetCurrentDirectory (path) != FALSE);
 #else
 	return (chdir (path) != -1);
 #endif
