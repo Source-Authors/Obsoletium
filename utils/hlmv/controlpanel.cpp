@@ -119,7 +119,7 @@ static void PopulateSoundNameList( mxListBox *pListBox )
 
 	if ( g_pSoundEmitterBase )
 	{
-		for ( int i = g_pSoundEmitterBase->First(); i != g_pSoundEmitterBase->InvalidIndex(); i = g_pSoundEmitterBase->Next( i ) )
+		for ( auto i = g_pSoundEmitterBase->First(); i != g_pSoundEmitterBase->InvalidIndex(); i = g_pSoundEmitterBase->Next( i ) )
 		{
 			pListBox->add( g_pSoundEmitterBase->GetSoundName( i ) );
 		}
