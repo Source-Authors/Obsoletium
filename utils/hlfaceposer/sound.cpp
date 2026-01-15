@@ -91,7 +91,8 @@ private:
 
 	WAVEHDR	*m_pReadyList;
 
-	int		m_sampleSize;
+	// dimhotepus: int -> unsigned short.
+	unsigned short	m_sampleSize;
 	int		m_sampleRate;
 	bool	m_isStereo;
 
