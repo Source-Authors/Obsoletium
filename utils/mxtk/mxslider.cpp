@@ -31,7 +31,7 @@ mxSlider::mxSlider (mxWindow *parent, int x, int y, int w, int h, int id, int st
 	if (!parent)
 		return;
 
-	DWORD dwStyle = WS_CHILD | WS_VISIBLE;
+	DWORD dwStyle;
 	HWND hwndParent = (HWND) ((mxWidget *) parent)->getHandle ();
 
 	if (style == Horizontal)
