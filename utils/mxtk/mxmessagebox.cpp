@@ -28,7 +28,7 @@ mxMessageBox (mxWindow *parent, const char *msg, const char *title, int style)
 
 	UINT uType = 0;
 
-	if (style & MX_MB_OK)
+	if (style == MX_MB_OK)
 		uType |= MB_OK;
 	else if (style & MX_MB_YESNO)
 		uType |= MB_YESNO;
