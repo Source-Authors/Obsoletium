@@ -398,9 +398,6 @@ void StudioModel::SetUpBones( bool mergeBones )
 
 	static matrix3x4_t	boneCache[MAXSTUDIOBONES];
 
-	// For blended transitions
-	static Vector		pos2[MAXSTUDIOBONES];
-
 	CStudioHdr *pStudioHdr = GetStudioHdr();
 	const mstudioseqdesc_t	&seqdesc = pStudioHdr->pSeqdesc( m_sequence );
 
