@@ -106,7 +106,7 @@ void WriteDebug(char *pszStr)
 	{
 		RunCodeAtScopeExit(fclose(fp));
 
-	fprintf(fp, "%s\r\n", pszStr);
+		fprintf(fp, "%s\r\n", pszStr);
 	}
 #endif
 }
