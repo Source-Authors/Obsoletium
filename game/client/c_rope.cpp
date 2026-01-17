@@ -918,7 +918,7 @@ DECLARE_CLIENT_EFFECT( "ShakeRopes", ShakeRopesCallback );
 // ------------------------------------------------------------------------------------ //
 #define WIND_FORCE_FACTOR 10
 
-void C_RopeKeyframe::CPhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel )
+void C_RopeKeyframe::CPhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel )
 {
 	// Gravity.
 	if ( !( m_pKeyframe->GetRopeFlags() & ROPE_NO_GRAVITY ) )
@@ -988,7 +988,7 @@ void LockNodeDirection(
 }
 
 
-void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes )
+void C_RopeKeyframe::CPhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes )
 {
 	VPROF( "CPhysicsDelegate::ApplyConstraints" );
 

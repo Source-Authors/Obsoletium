@@ -11,6 +11,8 @@
 #pragma once
 #endif
 
+#include "tier0/basetypes.h"
+
 typedef int TABLEID;
 
 #define INVALID_STRING_TABLE -1
