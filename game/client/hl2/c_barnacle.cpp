@@ -80,8 +80,8 @@ private:
 	class CBarnaclePhysicsDelegate : public CSimplePhysics::IHelper
 	{
 	public:
-		virtual void	GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel );
-		virtual void	ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes );
+		virtual void	GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel );
+		virtual void	ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes );
 	
 		C_NPC_Barnacle	*m_pBarnacle;
 	};
@@ -269,7 +269,7 @@ void C_NPC_Barnacle::StandardBlendingRules( CStudioHdr *hdr, Vector pos[], Quate
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_NPC_Barnacle::CBarnaclePhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, int iNode, Vector *pAccel )
+void C_NPC_Barnacle::CBarnaclePhysicsDelegate::GetNodeForces( CSimplePhysics::CNode *pNodes, intp iNode, Vector *pAccel )
 {
 	// Gravity.
 	pAccel->Init( TONGUE_GRAVITY );
@@ -304,7 +304,7 @@ void C_NPC_Barnacle::ComputeVisualTipPoint( Vector *pTip )
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-void C_NPC_Barnacle::CBarnaclePhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, int nNodes )
+void C_NPC_Barnacle::CBarnaclePhysicsDelegate::ApplyConstraints( CSimplePhysics::CNode *pNodes, intp nNodes )
 {
 	// Startpoint always stays at the root
 	pNodes[0].m_vPos = m_pBarnacle->m_vecRoot;
