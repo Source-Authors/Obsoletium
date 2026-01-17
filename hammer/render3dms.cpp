@@ -1237,9 +1237,6 @@ void CRender3D::EndRenderFrame(void)
 
 			if (m_pView->m_bUpdateView && (m_eCurrentRenderMode == RENDER_MODE_LIGHT_PREVIEW_RAYTRACED))
 			{
-
-				// dimhotepus: Disable dumping of images to files for performance.
-				static bool did_dump=true;
 				static double Last_SendTime=0;
 				// now, lets create floatbms with the deferred rendering data, so we can pass it to the lpreview thread
 				double newtime=Plat_FloatTime();
@@ -1279,18 +1276,8 @@ void CRender3D::EndRenderFrame(void)
 
 							pRenderContext->ReadPixels(0, 0, nTargetWidth, nTargetHeight,
 								(uint8 *) &(fbm->Pixel(0,0,0)), IMAGE_FORMAT_RGBA32323232F);
-
-							if ( (i==0) && (! did_dump) )
-							{
-								fbm->WriteTGAFile("albedo.tga");
-							}
-							if ( (i==1) && (! did_dump) )
-							{
-								fbm->WriteTGAFile("normal.tga");
-							}
 						}
 						pRenderContext->SetRenderTarget( NULL );
-						did_dump = true;
 						n_gbufs_queued++;
 						pCamera->GetViewPoint( Msg.m_EyePosition );
 						Msg.m_nBitmapGenerationCounter=g_nBitmapGenerationCounter;
