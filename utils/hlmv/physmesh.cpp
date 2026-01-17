@@ -49,6 +49,7 @@ public:
 	CStudioPhysics( void )
 	{
 		m_pList = NULL;
+		m_MDLHandle = 0;
 		m_listCount = 0;
 		m_mass = 0;
 		m_noselfCollisions = false;
