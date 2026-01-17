@@ -34,7 +34,7 @@ END_MESSAGE_MAP()
 
 
 //-----------------------------------------------------------------------------
-// Purpose: CMapAnimationDlg contructor
+// Purpose: CMapAnimationDlg constructor
 //-----------------------------------------------------------------------------
 CMapAnimationDlg::CMapAnimationDlg()
 {
@@ -59,7 +59,7 @@ bool CMapAnimationDlg::Create( CWnd *pParentWnd )
         return false;
     }
 
-    // to remain consistant with the other toolbars in the editor
+    // to remain consistent with the other toolbars in the editor
     SetWindowText( _T( "Animation" ) );
 
     // set dialog bar style
@@ -267,8 +267,8 @@ void CMapAnimationDlg::AdvanceAnimationTime( void )
 		return;
 	}
 
-	// set the new animtion time
-	m_TimeSlider.SetPos( (m_flAnimTime / m_flAnimationDuration) * ANIMSLIDER_NUMTICS );
+	// set the new animation time
+	m_TimeSlider.SetPos( static_cast<int>( (m_flAnimTime / m_flAnimationDuration) * ANIMSLIDER_NUMTICS ) );
 
 	UpdateAnimationTime();
 }
