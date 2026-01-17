@@ -10,9 +10,6 @@
 #include "stdafx.h"
 #include <oleauto.h>
 #include <oaidl.h>
-#if _MSC_VER < 1300
-#include <afxpriv.h>
-#endif
 #include <mmsystem.h>
 #include "Camera.h"
 #include "GlobalFunctions.h"

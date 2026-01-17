@@ -140,11 +140,7 @@ protected:
 	afx_msg void OnUpdateApplicatorUI(CCmdUI *pUI);
 	afx_msg BOOL OnHelpInfo(HELPINFO*);
 	afx_msg void OnEnterMenuLoop( BOOL bIsTrackPopupMenu );
-#if _MSC_VER < 1300
-	afx_msg void OnActivateApp(BOOL bActive, HTASK hTask);
-#else
 	afx_msg void OnActivateApp(BOOL bActive, DWORD hThread);
-#endif
 	afx_msg void OnUpdateEditFunction(CCmdUI *pCmdUI);
 	afx_msg BOOL OnApplicator(UINT nID);
 	afx_msg BOOL OnSoundBrowser(UINT nID);

@@ -728,11 +728,7 @@ void CMainFrame::UpdateAllDocViews(DWORD dwCmd)
 // Input  : bActive - TRUE to activate, FALSE to deactivate.
 //			hTask - task becoming active.
 //-----------------------------------------------------------------------------
-#if _MSC_VER < 1300
-void CMainFrame::OnActivateApp(BOOL bActive, HTASK hTask)
-#else
 void CMainFrame::OnActivateApp(BOOL bActive, DWORD hTask)
-#endif
 {
 	CMDIFrameWnd::OnActivateApp(bActive, hTask);
 
