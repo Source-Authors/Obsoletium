@@ -56,7 +56,7 @@ public:
 
 	intp	GetCount();
 	bool	IsEmpty();
-	bool	IsSelected(CMapClass *pObject);
+	bool	IsSelected(CMapClass *pObject) const;
 	bool	IsAnEntitySelected();
 	bool	IsEditable();
 	bool	IsCopyable();

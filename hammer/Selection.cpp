@@ -44,7 +44,7 @@ void CSelection::Init( CMapDoc *pDocument )
 	UpdateSelectionBounds();
 }
 
-bool CSelection::IsSelected(CMapClass *pobj)
+bool CSelection::IsSelected(CMapClass *pobj) const
 {
 	return (m_SelectionList.Find(pobj) != m_SelectionList.InvalidIndex());
 }
