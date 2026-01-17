@@ -290,6 +290,8 @@ void VGui_DrawHierarchy( void )
 int CElementViewerApp::Main()
 {
 	g_pMaterialSystem->ModInit();
+	RunCodeAtScopeExit(g_pMaterialSystem->ModShutdown());
+
 	if (!SetVideoMode())
 		return 0;
 
@@ -313,6 +315,7 @@ int CElementViewerApp::Main()
 
 	// add our main window
 	vgui::Panel *mainPanel = CreateElementViewerPanel();
+	RunCodeAtScopeExit(delete mainPanel);
 
 	// run app frame loop
 	vgui::VPANEL root = vgui::surface()->GetEmbeddedPanel();
@@ -340,21 +343,18 @@ int CElementViewerApp::Main()
 		vgui::GetAnimationController()->UpdateAnimations( Plat_FloatTime() );
 
 		g_pMaterialSystem->BeginFrame( 0 );
+		RunCodeAtScopeExit({ 
+			g_pMaterialSystem->EndFrame();
+			g_pMaterialSystem->SwapBuffers();
+		});
+
 		pRenderContext->ClearColor4ub( 76, 88, 68, 255 ); 
 		pRenderContext->ClearBuffers( true, true );
 
 		g_pVGui->RunFrame();
 
 		g_pVGuiSurface->PaintTraverseEx( root, true );
-
-		g_pMaterialSystem->EndFrame();
-		g_pMaterialSystem->SwapBuffers();
-
 	}
-
-	delete mainPanel;
-
-	g_pMaterialSystem->ModShutdown();
 
 	return 1;
 }
