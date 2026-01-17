@@ -32,9 +32,7 @@ CWaveFile::CWaveFile( char const *filename )
 	Q_snprintf( m_szFileName, sizeof( m_szFileName ), "sound/%s", filename );
 }
 
-CWaveFile::~CWaveFile()
-{
-}
+CWaveFile::~CWaveFile() = default;
 
 //-----------------------------------------------------------------------------
 // Purpose: 
