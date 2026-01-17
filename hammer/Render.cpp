@@ -37,7 +37,8 @@ static float s_fOneUnitLength = 1;
 
 CRender::CRender(void)
 {
-	m_pView = NULL;
+	m_pView = nullptr;
+	m_pMesh = nullptr;
 	
 	// returns a handle to the default (first loaded) scheme
 	vgui::IScheme * pScheme = vgui::scheme()->GetIScheme( vgui::scheme()->GetDefaultScheme() );
