@@ -311,6 +311,9 @@ int CMainFrame::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	if (__super::OnCreate(lpCreateStruct) == -1)
 		return -1;
 
+	// dimhotepus: Apply dark mode and Mica theme.
+	Plat_ApplySystemTitleBarTheme(m_hWnd, SystemBackdropType::MainWindow);
+
     m_dpiBehavior.OnCreateWindow(m_hWnd);
 
     if(!wndMDIClient.SubclassWindow(m_hWndMDIClient)) 
