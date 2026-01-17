@@ -272,6 +272,11 @@ void CMessageWnd::OnPaint()
 			oldColor = dc.SetTextColor(RGB(255, 60, 60));
 			isNewColor = true;
 			break;
+		case mwWarning:
+			// dimhotepus: Use Portal orange for warnings.
+			oldColor = dc.SetTextColor(RGB(255, 154, 0));
+			isNewColor = true;
+			break;
 		case mwStatus:
 			oldColor = dc.SetTextColor(RGB(0, 0, 0));
 			isNewColor = true;
