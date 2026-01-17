@@ -73,7 +73,7 @@ class CPrefabRMF : public CPrefab3D
 	public:
 
 		CPrefabRMF();
-		~CPrefabRMF();
+		virtual ~CPrefabRMF();
 
 		int Init(LPCTSTR pszFilename, BOOL bLoadNow = FALSE, DWORD = 0);
 		int Load(DWORD dwFlags = 0);
@@ -94,7 +94,7 @@ class CPrefabVMF : public CPrefab3D
 	public:
 
 		CPrefabVMF();
-		~CPrefabVMF();
+		virtual ~CPrefabVMF();
 
 		int Load(DWORD dwFlags = 0);
 		int Save(LPCTSTR pszFilename, DWORD = 0);
