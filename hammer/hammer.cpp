@@ -2328,7 +2328,8 @@ void CHammer::Autosave( void )
 
 		//creating the proper suffix for the autosave file
 		char szNumberChars[4];
-        CString strAutosaveString = itoa( nCurrentAutosaveNumber, szNumberChars, 10 );
+		V_to_chars(szNumberChars, nCurrentAutosaveNumber);
+		CString strAutosaveString = szNumberChars;
 		CString strAutosaveNumber = "000";
 		strAutosaveNumber += strAutosaveString;
 		strAutosaveNumber = strAutosaveNumber.Right( 3 );

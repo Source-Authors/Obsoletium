@@ -217,7 +217,8 @@ char *CAngleBox::GetAngleEditText(OUT_Z_CAP(len) char *szBuf, ptrdiff_t len)
 	}
 	else if (m_vecAngles[YAW] >= 0)
 	{
-		itoa((int)m_vecAngles[YAW], szBuf, 10);
+		// dimhotepus: itoa -> V_snprintf.
+		V_snprintf(szBuf, len, "%d", (int)m_vecAngles[YAW]);
 	}
 
 	return(szBuf);
