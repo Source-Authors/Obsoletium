@@ -34,7 +34,7 @@ CSoundBrowser::CSoundBrowser( const char *pCurrentSoundName, CWnd* pParent /*=NU
 	m_SoundNameSelected = pCurrentSoundName;
 	m_SoundType = AfxGetApp()->GetProfileInt(s_pszSection, "Sound Type", 0);
 	m_Autoplay = AfxGetApp()->GetProfileInt(s_pszSection, "Sound Autoplay", 0);
-	Q_strncpy(m_szFilter, (LPCSTR)(AfxGetApp()->GetProfileString(s_pszSection, "Sound Filter", "")), 256 ); 
+	V_strcpy_safe(m_szFilter, (LPCSTR)(AfxGetApp()->GetProfileString(s_pszSection, "Sound Filter", ""))); 
 	m_nSelectedSoundIndex = -1;
 
 //	m_bSoundPlayed = false;
