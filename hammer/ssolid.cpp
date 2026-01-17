@@ -1138,15 +1138,6 @@ BOOL CSSolid::SplitFaceByEdges(CSSEdge *pEdge1, CSSEdge *pEdge2)
 	pEdgeTmp->hvEnd = pNewVertex2->id;
 	CalcEdgeCenter(pEdgeTmp);
 
-/*
-	FILE *fp = fopen("split", "w");
-	for(i = 0; i < nVertices; i++)
-	{
-		fprintf(fp, "%lu\n", phVertexList[i]);
-	}
-	fclose(fp);
-*/
-
 	// set up edges - start with newvertex1 
 	SSHANDLE hNewEdges[64];
 	int nNewEdges;
