@@ -393,16 +393,11 @@ void CLightingPreviewThread::HandleGeomMessage( MessageToLPreview &msg_in )
 	CUtlVector<Vector> &tris=*( msg_in.m_pShadowTriangleList);
 	if (tris.Count())
 	{
-//		FILE *fp = fopen( "c:\\gl.out", "w" );
 		m_pRtEnv = new RayTracingEnvironment;
 		for(int i=0;i<tris.Count();i+=3)
 		{
-//			fprintf(fp,"3\n");
-// 			for(int j=0;j<3;j++)
-// 				fprintf( fp,"%f %f %f %f %f %f\n", tris[j+i].x,tris[j+i].y,tris[j+i].z, cr[j],cg[j],cb[j] );
 			m_pRtEnv->AddTriangle( i, tris[i],tris[1+i],tris[2+i], Vector( .5,.5,.5) );
 		}
-//		fclose( fp );
 	}
 	delete msg_in.m_pShadowTriangleList;
 	m_bAccStructureBuilt = false;
