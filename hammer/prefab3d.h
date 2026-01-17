@@ -28,7 +28,7 @@ class CPrefab3D : public CPrefab
 		CPrefab3D();
 		~CPrefab3D();
 
-		virtual bool IsLoaded(void);
+		bool IsLoaded(void) override;
 		void FreeData();
 
 		void CenterOnZero();
@@ -99,7 +99,7 @@ class CPrefabVMF : public CPrefab3D
 		int Load(DWORD dwFlags = 0);
 		int Save(LPCTSTR pszFilename, DWORD = 0);
 
-		virtual bool IsLoaded(void);
+		bool IsLoaded(void) override;
 
 		void SetFilename(const char *szFilename);
 
