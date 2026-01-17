@@ -58,7 +58,7 @@ public:
 	intp GetSelectedHandleCount(void) { return m_SelectedHandles.Count(); }
 	void GetSelectedCenter(Vector& pt);
 	SSHANDLETYPE GetSelectedType() { return m_SelectedType; }
-	bool IsSelected(MORPHHANDLE &mh);
+	bool IsSelected(MORPHHANDLE &mh) const;
 
 	void SelectObject(CMapSolid *pSolid, UINT cmd = scSelect);
 	bool SelectAt( CMapView *pView, UINT nFlags, const Vector2D &vPoint );

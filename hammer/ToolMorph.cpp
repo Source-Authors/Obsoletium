@@ -315,7 +315,7 @@ int Morph3D::HitTest(CMapView *pView, const Vector2D &ptClient, bool bTestHandle
 //-----------------------------------------------------------------------------
 // Purpose: 
 //-----------------------------------------------------------------------------
-bool CompareMorphHandles(const MORPHHANDLE &mh1, const MORPHHANDLE &mh2)
+static bool CompareMorphHandles(const MORPHHANDLE &mh1, const MORPHHANDLE &mh2)
 {
 	return ((mh1.pMapSolid == mh2.pMapSolid) && 
 			(mh1.pStrucSolid == mh2.pStrucSolid) && 
@@ -326,7 +326,7 @@ bool CompareMorphHandles(const MORPHHANDLE &mh1, const MORPHHANDLE &mh2)
 //-----------------------------------------------------------------------------
 // Purpose: Returns whether or not the given morph handle is selected.
 //-----------------------------------------------------------------------------
-bool Morph3D::IsSelected(MORPHHANDLE &mh)
+bool Morph3D::IsSelected(MORPHHANDLE &mh) const
 {
 	for (auto &h : m_SelectedHandles)
 	{
