@@ -977,48 +977,52 @@ MatSysWindow::draw ()
 		return;
 
 	bInDraw = true;
+	RunCodeAtScopeExit(bInDraw = false);
 
 	UpdateSounds(); // need to call this multiple times per frame to avoid audio stuttering
 
 	CMatRenderContextPtr pRenderContext( g_pMaterialSystem );
 	g_pMaterialSystem->BeginFrame( 0 );
-	g_pStudioModel->GetStudioRender()->BeginFrame();
+	RunCodeAtScopeExit(g_pMaterialSystem->EndFrame());
 
-	pRenderContext->ClearColor3ub(g_viewerSettings.bgColor[0] * 255, g_viewerSettings.bgColor[1] * 255, g_viewerSettings.bgColor[2] * 255);
-	// pRenderContext->ClearColor3ub(0, 0, 0 );
-	pRenderContext->ClearBuffers(true, true);
+	int polycount;
 
-	pRenderContext->Viewport( 0, 0, w(), h() );
+	{
+		g_pStudioModel->GetStudioRender()->BeginFrame();
+		RunCodeAtScopeExit(g_pStudioModel->GetStudioRender()->EndFrame());
 
-	pRenderContext->MatrixMode( MATERIAL_PROJECTION );
-	pRenderContext->LoadIdentity( );
-	pRenderContext->PerspectiveX(g_viewerSettings.fov, (float)w() / (float)h(), 1.0f, 20000.0f);
+		pRenderContext->ClearColor3ub(g_viewerSettings.bgColor[0] * 255, g_viewerSettings.bgColor[1] * 255, g_viewerSettings.bgColor[2] * 255);
+		// pRenderContext->ClearColor3ub(0, 0, 0 );
+		pRenderContext->ClearBuffers(true, true);
+
+		pRenderContext->Viewport( 0, 0, w(), h() );
+
+		pRenderContext->MatrixMode( MATERIAL_PROJECTION );
+		pRenderContext->LoadIdentity( );
+		pRenderContext->PerspectiveX(g_viewerSettings.fov, (float)w() / (float)h(), 1.0f, 20000.0f);
 	
-	DrawBackground();
-	DrawGroundPlane();
-	DrawMovementBoxes();
-	DrawHelpers();
+		DrawBackground();
+		DrawGroundPlane();
+		DrawMovementBoxes();
+		DrawHelpers();
 
-	pRenderContext->MatrixMode( MATERIAL_VIEW );
-	pRenderContext->LoadIdentity( );
-	// FIXME: why is this needed?  Doesn't SetView() override this?
-	pRenderContext->Rotate( -90,  1, 0, 0 );	    // put Z going up
-	pRenderContext->Rotate( -90,  0, 0, 1 );
+		pRenderContext->MatrixMode( MATERIAL_VIEW );
+		pRenderContext->LoadIdentity( );
+		// FIXME: why is this needed?  Doesn't SetView() override this?
+		pRenderContext->Rotate( -90,  1, 0, 0 );	    // put Z going up
+		pRenderContext->Rotate( -90,  0, 0, 1 );
 
-	g_pStudioModel->ClearLookTargets();
-	g_pStudioModel->AddLookTarget( Vector( 0, 0, 0 ), g_pStudioModel->GetSolveHeadTurn() ? 1.0f : 0.0f );
-	int polycount = g_pStudioModel->DrawModel ();
-
-	g_pStudioModel->GetStudioRender()->EndFrame();
+		g_pStudioModel->ClearLookTargets();
+		g_pStudioModel->AddLookTarget( Vector( 0, 0, 0 ), g_pStudioModel->GetSolveHeadTurn() ? 1.0f : 0.0f );
+		polycount = g_pStudioModel->DrawModel ();
+	}
 
 	UpdateSounds(); // need to call this multiple times per frame to avoid audio stuttering
 
 	g_ControlPanel->setModelInfo();
 
-	int lod;
-	float metric;
-	metric = g_pStudioModel->GetLodMetric();
-	lod = g_pStudioModel->GetLodUsed();
+	float metric = g_pStudioModel->GetLodMetric();
+	int lod = g_pStudioModel->GetLodUsed();
 	g_ControlPanel->setLOD( lod, true, false );
 	g_ControlPanel->setLODMetric( metric );
 
@@ -1060,14 +1064,14 @@ MatSysWindow::draw ()
 	g_ControlPanel->updatePoseParameters( );
 	
 	// draw what ever else is loaded
-	int i;
-	for (i = 0; i < HLMV_MAX_MERGED_MODELS; i++)
+	for (int i = 0; i < HLMV_MAX_MERGED_MODELS; i++)
 	{
 		if (g_pStudioExtraModel[i] != NULL)
 		{
 			g_pStudioModel->GetStudioRender()->BeginFrame();
+			RunCodeAtScopeExit(g_pStudioModel->GetStudioRender()->EndFrame());
+
 			g_pStudioExtraModel[i]->DrawModel( true );
-			g_pStudioModel->GetStudioRender()->EndFrame();
 		}
 	}
 
@@ -1076,11 +1080,7 @@ MatSysWindow::draw ()
 	PlaySounds( g_pStudioModel );
 	UpdateSounds(); // need to call this multiple times per frame to avoid audio stuttering
 
-    g_pMaterialSystem->SwapBuffers();
-	
-	g_pMaterialSystem->EndFrame();
-
-	bInDraw = false;
+	g_pMaterialSystem->SwapBuffers();
 }
 
 
