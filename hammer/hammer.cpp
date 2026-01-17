@@ -2504,7 +2504,7 @@ void CHammer::LoadLastGoodSave( void )
 			CString newMapPath( szMapDir );
 			newMapPath.Append( "\\" );
 			newMapPath.Append( pszFileName );
-			V_sprintf_safe( szRenameMessage, "The last saved map was found in the autosave directory.\nWould you like to rename it from \"%s\" to \"%s\"?\nNOTE: This will not save the file with the new name; it will only rename it.", szLastSaveCopy, (const char*)newMapPath );
+			V_sprintf_safe( szRenameMessage, "The last saved map was found in the autosave directory.\nWould you like to rename it from \"%s\" to \"%s\"?\n\nNOTE: This will not save the file with the new name; it will only rename it.", szLastSaveCopy, (const char*)newMapPath );
 
 			if ( AfxMessageBox( szRenameMessage, MB_YESNO | MB_ICONQUESTION ) == IDYES )
 			{			
