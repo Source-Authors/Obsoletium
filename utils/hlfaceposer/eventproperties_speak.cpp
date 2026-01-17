@@ -32,7 +32,7 @@ public:
 		m_bShowAll = false;
 		m_szLastFilter[ 0 ] = 0;
 		m_Timer = 0;
-		m_flLastFilterUpdateTime;
+		m_flLastFilterUpdateTime = 0;
 	}
 
 	virtual void		InitDialog( HWND hwndDlg );
