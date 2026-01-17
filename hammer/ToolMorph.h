@@ -27,7 +27,7 @@ class CRender2D;
 class CRender3D;
 
 
-const SSHANDLE SSH_SCALEORIGIN = 0xffff0L;
+constexpr inline SSHANDLE SSH_SCALEORIGIN = 0xffff0L;
 
 
 typedef struct
