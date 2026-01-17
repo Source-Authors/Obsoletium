@@ -658,9 +658,9 @@ void CMapWorld::CullTree_SplitNode(CCullTreeNode *pNode)
 		Vector Mids;
 		int nChild;
 
-		Mids[0] = (Mins[0] + Maxs[0]) / 2.0;
-		Mids[1] = (Mins[1] + Maxs[1]) / 2.0;
-		Mids[2] = (Mins[2] + Maxs[2]) / 2.0;
+		Mids[0] = (Mins[0] + Maxs[0]) / 2.0f;
+		Mids[1] = (Mins[1] + Maxs[1]) / 2.0f;
+		Mids[2] = (Mins[2] + Maxs[2]) / 2.0f;
 
 		for (nChild = 0; nChild < 8; nChild++)
 		{

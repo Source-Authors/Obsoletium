@@ -404,7 +404,7 @@ void CMapCylinder::ComputeCylinderPoints( int nCount, Vector *pStartVerts, Vecto
 	}
 	VectorVectors( zvec, xvec, yvec );
 
-	float flDAngle = 2.0f * M_PI / nCount;
+	float flDAngle = 2.0f * M_PI_F / nCount;
 	for ( int i = 0; i < nCount; ++i )
 	{
 		float flSinAngle, flCosAngle;

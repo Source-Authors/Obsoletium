@@ -678,12 +678,12 @@ void CMapFace::NormalizeTextureShifts(void)
 
 	if (m_pTexture->GetWidth() != 0)
 	{
-		texture.UAxis[3] = fmod(texture.UAxis[3], m_pTexture->GetWidth());
+		texture.UAxis[3] = fmodf(texture.UAxis[3], m_pTexture->GetWidth());
 	}
 
 	if (m_pTexture->GetHeight() != 0)
 	{
-		texture.VAxis[3] = fmod(texture.VAxis[3], m_pTexture->GetHeight());
+		texture.VAxis[3] = fmodf(texture.VAxis[3], m_pTexture->GetHeight());
 	}
 }
 
@@ -1460,8 +1460,8 @@ void CMapFace::CalcTextureCoords(void)
 			float shiftScaleU = texture.scale[0] / (float)texture.nLightmapScale;
 			float shiftScaleV = texture.scale[1] / (float)texture.nLightmapScale;
 
-			m_pLightmapCoords[i][0] = DotProduct(texture.UAxis.AsVector3D(), Points[i]) / texture.nLightmapScale + texture.UAxis[3] * shiftScaleU + 0.5;
-			m_pLightmapCoords[i][1] = DotProduct(texture.VAxis.AsVector3D(), Points[i]) / texture.nLightmapScale + texture.VAxis[3] * shiftScaleV + 0.5;
+			m_pLightmapCoords[i][0] = DotProduct(texture.UAxis.AsVector3D(), Points[i]) / texture.nLightmapScale + texture.UAxis[3] * shiftScaleU + 0.5f;
+			m_pLightmapCoords[i][1] = DotProduct(texture.VAxis.AsVector3D(), Points[i]) / texture.nLightmapScale + texture.VAxis[3] * shiftScaleV + 0.5f;
 		}
  	}
 
@@ -2337,7 +2337,7 @@ void CMapFace::Render2D(CRender2D *pRender)
 		int sizeX = abs(pt2.x-pt.x);
 		int sizeY = abs(pt2.y-pt.y);
 
-		bool bDrawDispMap = Options.view2d.bDrawModels && ( (sizeX+sizeY) > 50 || bRenderSelected );
+		bool bDrawDispMap = Options.view2d.bDrawModels && ( (sizeX+sizeY) > 50.f || bRenderSelected );
 
 		if ( bDrawDispMap )
 		{

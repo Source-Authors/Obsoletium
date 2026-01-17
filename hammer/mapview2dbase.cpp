@@ -314,7 +314,7 @@ void CMapView2DBase::SetColorMode(bool bWhiteOnBlack)
 	m_clrGridCustom.SetColor( GetRValue(clr), GetGValue(clr), GetBValue(clr), 255 );
 	if (Options.colors.bScaleGrid10Color)
 	{
-		AdjustColorIntensity(m_clrGridCustom, 1.5 * Options.view2d.iGridIntensity);
+		AdjustColorIntensity(m_clrGridCustom, 3 * Options.view2d.iGridIntensity / 2);
 	}
 	
 
@@ -470,7 +470,7 @@ void CMapView2DBase::DrawGrid(CRender2D *pRender, int xAxis, int yAxis, float de
 
 			while( nNumPoints > 0)
 			{
-                float roundfx = (int)(v2D.x+0.5);
+				float roundfx = (int)(v2D.x+0.5f);
 				v2D.x += fOffset;
 
 				meshBuilder.Position3f( roundfx, v2D.y, 0 );
@@ -1951,7 +1951,7 @@ void CMapView2DBase::GetBestTransformPlane( Vector &horzAxis, Vector &vertAxis, 
 //-----------------------------------------------------------------------------
 void CMapView2DBase::ZoomIn(BOOL bAllViews)
 {
-	float newZoom = m_fZoom * 1.2;
+	float newZoom = m_fZoom * 1.2f;
 	SetZoom( newZoom );
 
 	//
@@ -1978,7 +1978,7 @@ void CMapView2DBase::ZoomIn(BOOL bAllViews)
 //-----------------------------------------------------------------------------
 void CMapView2DBase::ZoomOut(BOOL bAllViews)
 {
-	SetZoom(m_fZoom / 1.2);
+	SetZoom(m_fZoom / 1.2f);
 
 	//
 	// Set all doc 2d view zooms to this zoom level.

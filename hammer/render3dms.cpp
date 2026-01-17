@@ -673,7 +673,7 @@ void CRender3D::StartRenderFrame(void)
 		m_dwTimeLastFrame = dwTimeNow;
 	}
 	ULONGLONG dwTimeElapsed = dwTimeNow - m_dwTimeLastFrame;
-	m_fTimeElapsed = (float)dwTimeElapsed / 1000.0;
+	m_fTimeElapsed = (float)dwTimeElapsed / 1000.0f;
 	m_dwTimeLastFrame = dwTimeNow;
 
 	//
@@ -882,7 +882,7 @@ static bool LightForString( char const *pLight, Vector& intensity )
 		argCnt=4;
 	}
 	
-	intensity[0] = pow( r / 255.0, 2.2 ) * 255;				// convert to linear
+	intensity[0] = pow( r / 255.0f, 2.2f ) * 255;				// convert to linear
 	
 	switch( argCnt)
 	{
@@ -894,14 +894,14 @@ static bool LightForString( char const *pLight, Vector& intensity )
 		case 3:
 		case 4:
 			// Save the other two G,B values.
-			intensity[1] = pow( g / 255.0, 2.2 ) * 255;
-			intensity[2] = pow( b / 255.0, 2.2 ) * 255;
+			intensity[1] = pow( g / 255.0f, 2.2f ) * 255;
+			intensity[2] = pow( b / 255.0f, 2.2f ) * 255;
 			
 			// Did we also get an "intensity" scaler value too?
 			if ( argCnt == 4 )
 			{
 				// Scale the normalized 0-255 R,G,B values by the intensity scaler
-				VectorScale( intensity, scaler / 255.0, intensity );
+				VectorScale( intensity, scaler / 255.0f, intensity );
 			}
 			break;
 
@@ -1482,7 +1482,7 @@ void CRender3D::EndRenderFrame(void)
 				ULONGLONG dwTimeElapsed = dwTimeNow - m_dwTimeLastSample;
 				if ((dwTimeElapsed > 1000) && (m_nFramesThisSample > 0))
 				{
-					float fTimeElapsed = (float)dwTimeElapsed / 1000.0;
+					float fTimeElapsed = (float)dwTimeElapsed / 1000.0f;
 					m_fFrameRate = m_nFramesThisSample / fTimeElapsed;
 					m_nFramesThisSample = 0;
 					m_dwTimeLastSample = dwTimeNow;

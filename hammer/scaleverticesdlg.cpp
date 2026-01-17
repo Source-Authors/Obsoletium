@@ -61,7 +61,7 @@ void CScaleVerticesDlg::OnChangeScale()
 
 	if (m_fScale <= 0)
 	{
-		m_fScale = (float)0.005;
+		m_fScale = 0.005f;
 	}
 
 	// send command to document

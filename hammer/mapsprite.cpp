@@ -166,7 +166,7 @@ void CMapSprite::CalcBounds(BOOL bFullUpdate)
 	
 	if (m_pSpriteInfo)
 	{
-		fRadius = max(m_pSpriteInfo->GetWidth(), m_pSpriteInfo->GetHeight()) * m_fScale / 2.0;
+		fRadius = max(m_pSpriteInfo->GetWidth(), m_pSpriteInfo->GetHeight()) * m_fScale / 2.0f;
 		if (fRadius == 0)
 		{
 			fRadius = 8;
@@ -378,7 +378,7 @@ void CMapSprite::Render3D(CRender3D *pRender)
 			}
 
 
-			m_pSpriteInfo->SetScale(m_fScale > 0 ? m_fScale : 1.0 );
+			m_pSpriteInfo->SetScale(m_fScale > 0 ? m_fScale : 1.0f );
 
 			float fBlend;
 			// dvs: lots of things contribute to blend factor. See r_blend in engine.
@@ -525,6 +525,7 @@ void CMapSprite::OnParentKeyChanged(const char* szKey, const char* szValue)
 	{
 		float fFramesPerSecond = atof(szValue);
 		if (fabs(fFramesPerSecond) > 0.001)
+		if (fabs(fFramesPerSecond) > 0.001f)
 		{
 			m_fSecondsPerFrame = 1 / fFramesPerSecond;
 		}

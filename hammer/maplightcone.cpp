@@ -188,7 +188,7 @@ void CMapLightCone::BuildCone(void)
 	float fZoneDist[NUM_LIGHTCONE_ZONES];
 	memset( fZoneDist, 0, sizeof( fZoneDist ) );
 	fZoneDist[0] = 0;
-	SolveQuadratic(fZoneDist[1], 0.25 * fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
+	SolveQuadratic(fZoneDist[1], 0.25f * fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
 	SolveQuadratic(fZoneDist[2], fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
 	SolveQuadratic(fZoneDist[3], 4 * fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
 	SolveQuadratic(fZoneDist[4], Options.view3d.fLightConeLength * fScaleFactor, m_fQuadraticAttn, m_fLinearAttn, m_fConstantAttn);
@@ -211,7 +211,7 @@ void CMapLightCone::BuildCone(void)
 		//
 		// Build the new face list using the new parameters.
 		//
-		constexpr float fStepSize = 360.0 / 15.0;
+		constexpr int fStepSize = 360 / 15;
 		for (int nZone = 0; nZone < NUM_LIGHTCONE_ZONES - 1; nZone++)
 		{
 			float fSin0 = 0;
@@ -273,8 +273,8 @@ void CMapLightCone::BuildCone(void)
 	//
 	// Build the a face list that shows light-angle falloff
 	//
-	float fStepSize = 360.0 / 15.0;
-	float fPitchStepSize = 90.0 / 15.0;
+	constexpr int fStepSize = 360 / 15;
+	constexpr float fPitchStepSize = 90.0 / 15.0;
 	float fFocusRadius0 = 0;
 	float fFocusDist0 = fZoneDist[1];
 	float fInnerDot = cos(DEG2RAD(m_fInnerConeAngle));

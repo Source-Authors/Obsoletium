@@ -1624,7 +1624,7 @@ bool CMapView3D::ControlCamera(const CPoint &point)
 		//
 		if (MouseLookDelta.cy)
 		{
-			float fTheta = MouseLookDelta.cy * 0.4;
+			float fTheta = MouseLookDelta.cy * 0.4f;
 			if (Options.view3d.bReverseY)
 			{
 				fTheta = -fTheta;
@@ -1638,7 +1638,7 @@ bool CMapView3D::ControlCamera(const CPoint &point)
 		//
 		if (MouseLookDelta.cx)
 		{
-			float fTheta = MouseLookDelta.cx * 0.4;
+			float fTheta = MouseLookDelta.cx * 0.4f;
 			Yaw(fTheta);
 		}
 	}
