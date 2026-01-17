@@ -2625,7 +2625,10 @@ int CHLFacePoserApp::Main()
 	g_p4factory->SetOpenFileChangeList( "FacePoser Auto Checkout" );
 
 	soundemitter->ModInit();
+	RunCodeAtScopeExit(soundemitter->ModShutdown());
+
 	g_pMaterialSystem->ModInit();
+	RunCodeAtScopeExit(g_pMaterialSystem->ModShutdown());
 
 	// dimhotepus: Double cache size on x86-64.
 #ifdef PLATFORM_64BITS
@@ -2638,6 +2641,7 @@ int CHLFacePoserApp::Main()
 	g_pLocalize->AddFile( "resource/closecaption_english.txt", "GAME", true );
 
 	sound->Init();
+	RunCodeAtScopeExit(sound->Shutdown());
 
 	IFacePoserToolWindow::EnableToolRedraw( false );
 
@@ -2645,15 +2649,16 @@ int CHLFacePoserApp::Main()
 	g_MDLViewer->setMenuBar (g_MDLViewer->getMenuBar ());
 
 	FaceposerVGui()->Init( (HWND)g_MDLViewer->getHandle() );
+	RunCodeAtScopeExit(FaceposerVGui()->Shutdown());
 
 	// Force reload of close captioning data file!!!
 	SetCloseCaptionLanguageId( g_viewerSettings.cclanguageid, true );
 
 	g_pStudioModel->Init();
+	RunCodeAtScopeExit(g_pStudioModel->Shutdown());
 
-	int i;
 	bool modelloaded = false;
-	for ( i = 1; i < CommandLine()->ParmCount(); i++ )
+	for ( int i = 1; i < CommandLine()->ParmCount(); i++ )
 	{
 		if ( Q_stristr (CommandLine()->GetParm( i ), ".mdl") )
 		{
@@ -2673,7 +2678,7 @@ int CHLFacePoserApp::Main()
 
 	// Load expressions from last time
 	int files = workspacefiles->GetNumStoredFiles( IWorkspaceFiles::EXPRESSION );
-	for ( i = 0; i < files; i++ )
+	for ( int i = 0; i < files; i++ )
 	{
 		expressions->LoadClass( workspacefiles->GetStoredFile( IWorkspaceFiles::EXPRESSION, i ) );
 	}
@@ -2681,18 +2686,6 @@ int CHLFacePoserApp::Main()
 	IFacePoserToolWindow::EnableToolRedraw( true );
 
 	int nRetVal = mx::run ();
-
-	if (g_pStudioModel)
-	{
-		g_pStudioModel->Shutdown();
-		g_pStudioModel = NULL;
-	}
-
-	g_pMaterialSystem->ModShutdown();
-	soundemitter->ModShutdown();
- 	g_pMaterialSystem->ModShutdown();
-
-	FaceposerVGui()->Shutdown();
 
 	return nRetVal;
 }
