@@ -1183,6 +1183,9 @@ MDLViewer::MDLViewer () :
 	m_bOldSoundScriptsDirty( true ),
 	m_bVCDSaved( false )
 {
+	// dimhotepus: Apply Dark mode if any and Mica styles to window title bar.
+	Plat_ApplySystemTitleBarTheme( getHandle(), SystemBackdropType::MainWindow );
+
 	intp i;
 
 	g_MDLViewer = this;

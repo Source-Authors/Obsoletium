@@ -1113,6 +1113,9 @@ void WCam_Create(HINSTANCE hInstance) {
           std::system_category().message(::GetLastError()).c_str());
   }
 
+  // dimhotepus: Apply dark mode and Mica theme.
+  Plat_ApplySystemTitleBarTheme(camerawindow, SystemBackdropType::MainWindow);
+
   ::ShowWindow(camerawindow, SW_SHOWDEFAULT);
 }
 

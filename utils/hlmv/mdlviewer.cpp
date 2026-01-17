@@ -244,6 +244,9 @@ AccelTableEntry_t accelTable[] =					{{VK_F1, IDC_FLUSH_SHADERS,		mx::ACCEL_VIRT
 MDLViewer::MDLViewer ()
 : mxWindow (0, 0, 0, 0, 0, g_appTitle, mxWindow::Normal)
 {
+	// dimhotepus: Apply Dark mode if any and Mica styles to window title bar.
+	Plat_ApplySystemTitleBarTheme( getHandle(), SystemBackdropType::MainWindow );
+
 	d_MatSysWindow = 0;
 	d_cpl = 0;
 
