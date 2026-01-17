@@ -70,7 +70,7 @@ CAudioMixerWaveADPCM::CAudioMixerWaveADPCM( CWaveData *data ) : CAudioMixerWave(
 	m_pFormat = (const ADPCMWAVEFORMAT *)m_pData->Source().GetHeader();
 	if ( m_pFormat )
 	{
-		m_pCoefficients = (ADPCMCOEFSET *)((char *)m_pFormat + sizeof(WAVEFORMATEX) + 4);
+		m_pCoefficients = (const ADPCMCOEFSET *)((const char *)m_pFormat + sizeof(WAVEFORMATEX) + 4);
 
 		// create the decode buffer
 		m_pSamples = new short[m_pFormat->wSamplesPerBlock * m_pFormat->wfx.nChannels];
@@ -131,14 +131,14 @@ void CAudioMixerWaveADPCM::DecompressBlockMono( short *pOut, const char *pIn, in
 	int co2 = m_pCoefficients[pred].iCoef2;
 
 	// read initial delta
-	int delta = *((short *)pIn);
+	int delta = *((const short *)pIn);
 	pIn += 2;
 
 	// read initial samples for prediction
-	int samp1 = *((short *)pIn);
+	int samp1 = *((const short *)pIn);
 	pIn += 2;
 
-	int samp2 = *((short *)pIn);
+	int samp2 = *((const short *)pIn);
 	pIn += 2;
 
 	// write out the initial samples (stored in reverse order)
@@ -231,17 +231,17 @@ void CAudioMixerWaveADPCM::DecompressBlockStereo( short *pOut, const char *pIn, 
 	for ( i = 0; i < 2; i++, pIn += 2 )
 	{
 		// read initial delta
-		delta[i] = *((short *)pIn);
+		delta[i] = *((const short *)pIn);
 	}
 
 	// read initial samples for prediction
 	for ( i = 0; i < 2; i++, pIn += 2 )
 	{
-		samp1[i] = *((short *)pIn);
+		samp1[i] = *((const short *)pIn);
 	}
 	for ( i = 0; i < 2; i++, pIn += 2 )
 	{
-		samp2[i] = *((short *)pIn);
+		samp2[i] = *((const short *)pIn);
 	}
 
 	// write out the initial samples (stored in reverse order)
