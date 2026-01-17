@@ -2167,9 +2167,7 @@ bool CHammer::CanAllocateVideo() const
 //-------------------------------------------------------------------------------
 int CHammer::GetNextAutosaveNumber( CUtlMap<FILETIME, WIN32_FIND_DATA, int> *pFileMap, DWORD *pdwTotalDirSize, const CString *pstrMapTitle ) const
 {
-	FILETIME oldestAutosaveTime;
-	oldestAutosaveTime.dwHighDateTime = 0;
-	oldestAutosaveTime.dwLowDateTime = 0; 
+	FILETIME oldestAutosaveTime = {}; 
 
 	char szRootDir[MAX_PATH];
 	APP()->GetDirectory(DIR_AUTOSAVE, szRootDir);
