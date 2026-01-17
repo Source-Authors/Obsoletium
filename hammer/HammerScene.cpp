@@ -128,7 +128,7 @@ CChoreoScene* HammerLoadScene( const char *pFilename )
 {
 	if ( g_pFullFileSystem->FileExists( pFilename ) )
 	{
-		LoadScriptFile( (char*)pFilename );
+		LoadScriptFile( pFilename );
 		CChoreoScene *scene = ChoreoLoadScene( pFilename, NULL, &g_TokenProcessor, Msg );
 		return scene;
 	}
