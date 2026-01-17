@@ -2753,7 +2753,6 @@ int main (int argc, char *argv[])
 	}
 
 	char workingdir[ 256 ];
-	workingdir[0] = '\0';
 	if (!Q_getwd( workingdir ))
 	{
 		mxMessageBox(nullptr, va( "Unable to get current directory: '%s'.",	
@@ -2764,7 +2763,7 @@ int main (int argc, char *argv[])
 	// Set game info directory suggestion callback
 	const ScopedSuggestGameInfoDir scoped_suggest_game_info_dir( CHLFacePoserApp_SuggestGameInfoDirFn );
 
- 	CHLFacePoserApp hlFacePoserApp;
+	CHLFacePoserApp hlFacePoserApp;
 	CSteamApplication steamApplication( &hlFacePoserApp );
 	int rc = steamApplication.Run();
 
