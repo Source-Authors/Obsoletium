@@ -61,7 +61,13 @@ public:
 
 		data = new byte[w * h * pixelSize / 8];
 		if (!data)
+		{
+			width = 0;
+			height = 0;
+			bpp = 0;
+			palette = nullptr;
 			return false;
+		}
 
 		// allocate a palette for 8-bit images
 		if (pixelSize == 8)
