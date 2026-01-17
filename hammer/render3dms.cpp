@@ -823,7 +823,11 @@ void CRender3D::SendShadowTriangles( void )
 		CMapWorld *pWorld = pDoc->GetMapWorld();
 		
 		if ( !pWorld )
+		{
+			// dimhotepus: Do not leak tri list.
+			delete tri_list;
 			return;
+		}
 
 		delete g_pLPreviewOutputBitmap;
 		g_pLPreviewOutputBitmap = NULL;
